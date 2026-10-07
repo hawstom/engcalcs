@@ -42,8 +42,6 @@
 'use strict';
 
 // ---- tuning ----------------------------------------------------------------------------------
-const TOL = 1.0;          // our overlap tolerance in px (the bench forgives 1.5; we stay stricter)
-const HELD_TOL = 1.4;     // for a label held still from the last view
 const GAP = 1.5;          // clearance between a symbol and a label beside it
 const DIRS = [];          // the compass, 16 ways
 for (let k = 0; k < 16; k++) { DIRS.push(k * Math.PI / 8); }
@@ -51,7 +49,6 @@ const RINGS = [0.8, 1.6, 2.6, 4.0];   // leader lengths tried, in row heights
 const RINGS_ALT = [0.8, 1.8];         // and for the other shape, which is lazier
 const RS_ALT = [0, 4], NRS = 5;       // ring slots: RINGS are 0-3, RINGS_ALT reuse 0 and add 4
 const NSLOT = (4 + 16) * NRS;         // leader slots per label: up to 4 gap directions and the compass
-let tol = TOL;
 const DIRS8 = [];
 for (let k = 0; k < 8; k++) { DIRS8.push(k * Math.PI / 4); }
 const ALT_SHAPE = 0.6;     // H1: the other shape costs a little (lazy), used when it wins
@@ -69,11 +66,17 @@ const W = {
 };
 // ---- ingredients, each switchable so its worth can be measured (STRATEGY.md) -----------------
 // In node: PLACER_A_OFF=s4,s15 node run.js ... switches those off. On the page they are all on.
-const ING = { s1: true, s4: true, s5: true, s11: true, s12: true, s13: true, s15: true, grow: true, r5: true };
+const ING = { s1: true, s4: true, s5: true, s11: true, s12: true, s13: true, s15: true, grow: true, r5: true, lead: true };
 (function () {
 	const env = typeof process !== 'undefined' && process.env ? process.env.PLACER_A_OFF : '';
 	(env || '').split(',').forEach(function (k) { k = k.trim(); if (k && Object.prototype.hasOwnProperty.call(ING, k)) { ING[k] = false; } });
 }());
+const SOFT_MS = 600;       // the optional passes stop here, well inside R10's one second
+function nowMs() { return typeof performance !== 'undefined' && performance.now ? performance.now() : Date.now(); }
+// Overlap tolerance in px: a hair inside the bench's 1.5 px of leading (own ingredient 'lead'), or
+// the stricter 1.0 of earlier rounds.
+const TOL = ING.lead ? 1.45 : 1.0, HELD_TOL = ING.lead ? 1.45 : 1.4;
+let tol = TOL;
 const ON_OWN = 3.5;       // a pipe label over its own pipe (R7): just under a row, so a value still wins
 const LEVEL = 2;          // a pipe label the setting asks to turn, left level (R14): under a row
 function distCost(L) { return L > 0 ? 0.6 + 0.6 * L + 0.12 * L * L : 0; }   // L in row heights
@@ -387,6 +390,8 @@ function createPlacer() {
 }
 
 function run(scene, prev, gaps, pool) {
+	const t0 = nowMs();
+	function overTime() { return nowMs() - t0 > SOFT_MS; }
 	const vp = scene.viewport, T = scene.text, RH = T.rowHeightPx;
 	const rw = scene.settings && scene.settings.readableAngleDeg;
 	const WIN = rw && isFinite(rw.min) && isFinite(rw.max) ? rw : { min: -110, max: 70 };
@@ -401,7 +406,7 @@ function run(scene, prev, gaps, pool) {
 		G.addBox({ box: rectBox(s.x, s.y, s.w, s.h), sym: true, node: n.id, lab: -1 });
 	});
 	scene.links.forEach(function (l) {
-		(l.symbols || []).forEach(function (b) { G.addBox({ box: mkBox(b.cx, b.cy, b.w, b.h, b.angle), sym: true, node: null, lab: -1 }); });
+		(l.symbols || []).forEach(function (b) { G.addBox({ box: mkBox(b.cx, b.cy, b.w, b.h, b.angle), sym: true, node: null, link: l._i, lab: -1 }); });
 		const p = l.points;
 		for (let i = 1; i < p.length; i++) {
 			G.addSeg(1, { ax: p[i - 1][0], ay: p[i - 1][1], bx: p[i][0], by: p[i][1], link: l._i });
@@ -432,6 +437,12 @@ function run(scene, prev, gaps, pool) {
 			f.node = nodes[req.owner]; f.pt = [f.node.x, f.node.y]; f.sym = f.node.symbol;
 		} else if (req.kind === 'link' && links[req.owner]) {
 			f.link = links[req.owner]; f.pt = [req.anchor.x, req.anchor.y];
+			// A pump or valve symbol at the anchor: level places hang round it, as round a node.
+			(f.link.symbols || []).forEach(function (b) {
+				const ex = Math.abs(Math.cos(b.angle * Math.PI / 180)) * b.w / 2 + Math.abs(Math.sin(b.angle * Math.PI / 180)) * b.h / 2;
+				const ey = Math.abs(Math.sin(b.angle * Math.PI / 180)) * b.w / 2 + Math.abs(Math.cos(b.angle * Math.PI / 180)) * b.h / 2;
+				if (Math.abs(b.cx - f.pt[0]) <= ex + 2 && Math.abs(b.cy - f.pt[1]) <= ey + 2) { f.lsym = { x: b.cx - ex, y: b.cy - ey, w: 2 * ex, h: 2 * ey, r: Math.max(b.w, b.h) / 2 }; }
+			});
 		} else if (req.kind === 'customer' && custBox[req.owner]) {
 			f.sym = custBox[req.owner]; f.pt = [f.sym.x + f.sym.w / 2, f.sym.y + f.sym.h / 2];
 		} else {
@@ -519,7 +530,7 @@ function run(scene, prev, gaps, pool) {
 		if (needInView && (bb[0] < vp.x + 1 || bb[1] < vp.y + 1 || bb[2] > vp.x + vp.w - 1 || bb[3] > vp.y + vp.h - 1)) { return Infinity; }
 		let cost = cand.base;
 		if (cand.leader) {
-			let lc = cand.lk === undefined ? leaderStatic(f, cand.leader) : f.lcA[cand.lk];
+			let lc = cand.lcFixed !== undefined ? cand.lcFixed : (cand.lk === undefined ? leaderStatic(f, cand.leader) : f.lcA[cand.lk]);
 			if (lc === Infinity) { return Infinity; }
 			cost += lc;
 		}
@@ -566,7 +577,11 @@ function run(scene, prev, gaps, pool) {
 				for (let i = 0; i < n; i++) {
 					const it = buf[i];
 					if (it.sym) {
-						if (!(it.node !== null && it.node === ownNode) && segHitsBox(px, py, qx, qy, it.box, tol)) { return Infinity; }
+						if (it.node === null) {
+							// A pump or valve symbol: its own is where the leader starts; another's is no
+							// never-rule (N3 is node symbols), but it costs like crossing two pipes.
+							if (it.link !== ownLink && segHitsBox(px, py, qx, qy, it.box, tol)) { cost += 2 * W.ldrPipe; }
+						} else if (it.node !== ownNode && segHitsBox(px, py, qx, qy, it.box, tol)) { return Infinity; }
 					} else if (segHitsBox(px, py, qx, qy, it.box, tol)) { cost += 1; }
 				}
 			}
@@ -758,7 +773,8 @@ function run(scene, prev, gaps, pool) {
 			return;
 		}
 		if (t - 1 >= RG.length) { return; }
-		const rs = Math.min(s.w, s.h) / 2, rOut = Math.max(s.w, s.h) / 2 + 2;
+		// A pipe label's leader starts on its pipe, at the anchor, even through its own symbol.
+		const rs = f.link ? 0 : Math.min(s.w, s.h) / 2, rOut = Math.max(s.w, s.h) / 2 + 2;
 		const dirs = dirsFor(f, D), ng = dirs.length - D.length;
 		for (let d = 0; d < dirs.length; d++) {
 			const ux = Math.cos(dirs[d]), uy = Math.sin(dirs[d]), side = sideFor(ux, uy);
@@ -791,7 +807,7 @@ function run(scene, prev, gaps, pool) {
 	function linkCandidates(f, rows, rowPen, out, t) {
 		const sh = shape(f, rows, 'line');
 		const along = !!f.req.along, lvl = along ? LEVEL : 0;
-		const pt0 = { x: f.pt[0], y: f.pt[1], w: 0, h: 0 };
+		const pt0 = f.lsym || { x: f.pt[0], y: f.pt[1], w: 0, h: 0 };
 		if (t > 0) {
 			around(f, sh, pt0, rowPen + lvl, out, DIRS8, RINGS, t);
 			if (rows.length > 1 && ING.s5) { around(f, shape(f, rows, 'stack'), pt0, rowPen + lvl + ALT_SHAPE, out, DIRS8, RINGS_ALT, t); }
@@ -802,21 +818,20 @@ function run(scene, prev, gaps, pool) {
 			const off = sh.h / 2 + GAP + 0.5;
 			for (let k = 0; k < st.length; k++) {
 				const q = st[k], r = q.ang * Math.PI / 180, nx = Math.sin(r), ny = -Math.cos(r);
+				const o = k === 0 && f.lsym ? Math.max(off, f.lsym.r + sh.h / 2 + GAP) : off;
 				for (let side = 1; side >= -1; side -= 2) {
-					const ccx = q.x + nx * off * side, ccy = q.y + ny * off * side;
+					const ccx = q.x + nx * o * side, ccy = q.y + ny * o * side;
 					out.push({ x: ccx - sh.w / 2, y: ccy - sh.h / 2, align: 'left', angle: q.ang, sh: sh, leader: null,
 						base: rowPen + q.pen + (side < 0 ? 0.1 : 0) });
 				}
-				if (k === 0) {
-					// On its own pipe, the last resort before giving up a value (R7).
-					out.push({ x: q.x - sh.w / 2, y: q.y - sh.h / 2, align: 'left', angle: q.ang, sh: sh, leader: null, base: rowPen + 0.2 });
-				}
+				// On its own pipe: dearer than beside it (R7), cheaper than giving up a value.
+				out.push({ x: q.x - sh.w / 2, y: q.y - sh.h / 2, align: 'left', angle: q.ang, sh: sh, leader: null, base: rowPen + q.pen + 0.2 });
 			}
 		}
 		// Level, touching the pipe at the anchor and at the nearer stations; as one line or a stack.
 		const lim = Math.min(st.length, 3);
 		for (let k = 0; k < lim; k++) {
-			const pt = { x: st[k].x, y: st[k].y, w: 0, h: 0 };
+			const pt = k === 0 && f.lsym ? f.lsym : { x: st[k].x, y: st[k].y, w: 0, h: 0 };
 			around(f, sh, pt, rowPen + lvl + st[k].pen, out, DIRS8, RINGS, 0);
 			if (rows.length > 1 && ING.s5) { around(f, shape(f, rows, 'stack'), pt, rowPen + lvl + st[k].pen + ALT_SHAPE, out, DIRS8, RINGS_ALT, 0); }
 		}
@@ -967,7 +982,7 @@ function run(scene, prev, gaps, pool) {
 		for (let s = 1; s < L.length; s++) {
 			const px = L[s - 1][0], py = L[s - 1][1], qx = L[s][0], qy = L[s][1];
 			if (G.query(0, Math.min(px, qx), Math.min(py, qy), Math.max(px, qx), Math.max(py, qy), function (it) {
-				return it.sym && !(it.node !== null && it.node === ownNode) && segHitsBox(px, py, qx, qy, it.box, TOL);
+				return it.sym && it.node !== null && it.node !== ownNode && segHitsBox(px, py, qx, qy, it.box, TOL);
 			})) { return true; }
 		}
 		return false;
@@ -1117,6 +1132,97 @@ function run(scene, prev, gaps, pool) {
 				commit(f, r.cand, r.cost);
 			} else if (p) { p.cost = cur; }
 		});
+	}
+
+	// ---- 4. repair (S15, built in): a label still hidden looks again, finely: a straight leader
+	// every 15 degrees and every half row out to 4 rows, against everything now placed. Then the
+	// rounds run again so what was seated may grow, until nothing changes or time runs short (R10:
+	// bounded by time, never by how many labels there are). ----
+	const DBX = +process.env.DBX, DBY = +process.env.DBY;
+	const FINE_DIRS = [], FINE_LENS = [0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4];
+	for (let d = 0; d < 24; d++) { FINE_DIRS.push(d * Math.PI / 12); }
+	function fineCands(f, k) {
+		const key = 'fine' + k;
+		if (f[key]) { return f[key]; }
+		const rows = f.subsets[k], rowPen = W.row * (f.R - rows.length), out = [];
+		const isLink = f.link && f.req.layout === 'line', lvl = isLink && f.req.along ? LEVEL : 0;
+		const usual = f.req.layout === 'line' ? 'line' : 'stack';
+		const shapes = [[shape(f, rows, usual), 0]];
+		if (rows.length > 1 && ING.s5) { shapes.push([shape(f, rows, usual === 'line' ? 'stack' : 'line'), ALT_SHAPE]); }
+		const s = isLink ? (f.lsym || { x: f.pt[0], y: f.pt[1], w: 0, h: 0 }) : f.sym, cx = f.pt[0], cy = f.pt[1];
+		const rs = f.link ? 0 : Math.min(s.w, s.h) / 2, rOut = Math.max(s.w, s.h) / 2 + 1;
+		f.fineL = f.fineL || {};
+		for (let li = 0; li < FINE_LENS.length; li++) {
+			for (let d = 0; d < FINE_DIRS.length; d++) {
+				const ux = Math.cos(FINE_DIRS[d]), uy = Math.sin(FINE_DIRS[d]), side = sideFor(ux, uy);
+				const dist = rOut + FINE_LENS[li] * RH, px = cx + ux * dist, py = cy + uy * dist;
+				const lkey = li * 24 + d;
+				let L = f.fineL[lkey];
+				if (L === undefined) {
+					L = FINE_LENS[li] === 0 && !f.lsym && !isLink ? 'none' : [[cx + ux * rs, cy + uy * rs], [px, py]];
+					if (L !== 'none') {
+						const lc = leaderStatic(f, L);
+						if (lc === Infinity) { L = null; } else { L.lc = lc; }
+					}
+					f.fineL[lkey] = L;
+				}
+				if (L === null) { continue; }
+				for (let i = 0; i < shapes.length; i++) {
+					const c = hang(shapes[i][0], px, py, side, rowPen + lvl + shapes[i][1] + distCost((dist - rs) / RH), L === 'none' ? null : L);
+					if (L !== 'none') { c.lcFixed = L.lc; }
+					c.k = k;
+					out.push(c);
+				}
+			}
+		}
+		out.sort(function (a, b) { return a.base - b.base; });
+		f[key] = out;
+		return out;
+	}
+	function searchFine(f, bound, k) {
+		const list = fineCands(f, k);
+		let best = null, bestCost = bound;
+		for (let i = 0; i < list.length; i++) {
+			const c = list[i];
+			if (c.base >= bestCost) { break; }
+			if (c.st === undefined) { c.st = evalStatic(f, c, true); }
+			if (c.st >= bestCost) { continue; }
+			const v = evalDyn(f, c, c.st, bestCost);
+			if (v < bestCost) { best = c; bestCost = v; }
+		}
+		return best ? { cand: best, cost: bestCost } : null;
+	}
+	function growRound() {
+		let changed = 0;
+		info.forEach(function (f) {
+			if (kept[f.li] === 'hand' || kept[f.li] === 'empty') { return; }
+			if (kept[f.li] === 'held') { const before = placed[f.li]; growHeld(f); if (placed[f.li] !== before) { changed++; } return; }
+			const p = placed[f.li];
+			if (!p) { return; }
+			const n = f.subsets.length, curK = p.cand.k;
+			if (curK === 0) { return; }
+			const cur = evalDyn(f, p.cand, p.cand.st, Infinity);
+			const r = search(f, cur, Math.max(0, curK - 1), Math.min(curK, n - 1));
+			if (r && r.cand !== p.cand) { uncommit(f); commit(f, r.cand, r.cost); changed++; }
+		});
+		return changed;
+	}
+	if (ING.s15) {
+		free.forEach(function (f) {
+			if (placed[f.li] || overTime()) { return; }
+			const min = f.subsets.length - 1;
+			const r = searchFine(f, hideCost(f), min);
+			if (process.env.PLACER_A_DEBUG === f.req.id) {
+				const list = fineCands(f, min);
+				let ninf = 0, best = Infinity, bestDyn = Infinity, near = [];
+				list.forEach(function (c) { const st = evalStatic(f, c, true); if (st === Infinity) { ninf++; } else { best = Math.min(best, st); const d = evalDyn(f, c, st, Infinity); bestDyn = Math.min(bestDyn, d); if (Math.abs(c.x - DBX) < 6 && Math.abs(c.y - DBY) < 6) { near.push([c.x, c.y, st, d, c.base]); } } });
+				console.error('DEBUG', f.req.id, 'cands', list.length, 'inf', ninf, 'bestStatic', best, 'bestDyn', bestDyn, 'hide', hideCost(f), 'near', JSON.stringify(near), 'r', !!r, 'tooLate', overTime());
+			}
+			if (r) { commit(f, r.cand, r.cost); }
+		});
+	}
+	if (ING.grow) {
+		for (let g = 0; g < 12 && !overTime(); g++) { if (!growRound()) { break; } }
 	}
 
 	// ---- out ----
