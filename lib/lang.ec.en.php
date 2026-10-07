@@ -1096,6 +1096,10 @@ $ec_lang['lpn_hotkeys_map_def']='<table class="lpn-notes-table"><tbody><tr><td>1
 $ec_lang['lpn_hotkeys_menu_heading']='Menus';
 $ec_lang['lpn_hotkeys_menu_term']='Menu keyboard shortcuts';
 $ec_lang['lpn_hotkeys_menu_def']='<table class="lpn-notes-table"><tbody><tr><td>Alt+Shift+letter</td><td>Open the menu with that letter, then press a row\'s letter to choose it. The letters show while you use the keyboard. On a Mac, use Ctrl+Option.</td></tr><tr><td>F10</td><td>Go to the menu bar.</td></tr></tbody></table>';
+// The Screenshot keys. A separate block, for the reason given above the menu block.
+$ec_lang['lpn_hotkeys_snip_heading']='Screenshot';
+$ec_lang['lpn_hotkeys_snip_term']='Screenshot keyboard shortcuts';
+$ec_lang['lpn_hotkeys_snip_def']='<table class="lpn-notes-table"><tbody><tr><td>S</td><td>Snip, while Screenshot is open.</td></tr><tr><td>E</td><td>Eraser, in the markup view.</td></tr><tr><td>Ctrl+Z, Ctrl+Y</td><td>Undo and redo, in the markup view.</td></tr><tr><td>Esc</td><td>Cancel a snip, or leave the eraser. In the markup view, close it when nothing is drawn.</td></tr></tbody></table>';
 // ---- The one-tap grievance link (ROADMAP Task 207, Rung 0) ----
 // The floor of the cost ladder in dev/dilettante-path.md: a visitor says something is wrong here
 // with one tap and nothing typed. Two sites, one behaviour -- a standing cell in the map's bottom
@@ -4445,3 +4449,22 @@ $ec_lang['lpn_result_demand_deficit_tip']='The demand this junction asks for and
 $ec_lang['lpn_pda_deficit_note']='Junctions receiving less than their demand: {n}.';
 $ec_lang['lpn_diag_pda_pressures']='Required pressure must be greater than Minimum pressure. Change one of them in Settings.';
 $ec_lang['lpn_inp_drop_pressure_unit']='This file states a pressure unit other than the one this page reads for its flow unit, which is psi for US units and meters otherwise. Every pressure in the file is read that way, so check the valve settings, emitters, and pressure driven limits it holds. The line is kept and is written back.';
+
+// Map > Screenshot (Tom, 2026-10-05): a snipping tool that re-draws the dragged map area larger than its screen size (3x unless the Screenshot box says otherwise).
+$ec_lang['lpn_screenshot_menu']='Screenshot';
+$ec_lang['lpn_screenshot_tip']='Copy a sharper-than-screen picture of the map area you drag, ready to paste into a report. Click without dragging to take the whole map.';
+$ec_lang['lpn_screenshot_hint']='Drag a rectangle over the map, or click for the whole map. Esc cancels.';
+$ec_lang['lpn_screenshot_copied']='Screenshot copied.';
+$ec_lang['lpn_screenshot_saved']='The clipboard is not available here, so the screenshot was downloaded as a PNG file.';
+$ec_lang['lpn_screenshot_no_basemap']='The street map or satellite image could not be included.';
+$ec_lang['lpn_screenshot_failed']='The screenshot could not be made.';
+$ec_lang['lpn_snip_hint_free']='Drag around the area to snip, or click for the whole map. Esc cancels.';
+$ec_lang['lpn_snip_tip_rect']='Snip a rectangle (S)';
+$ec_lang['lpn_snip_tip_free']='Snip a freehand shape (S)';
+$ec_lang['lpn_snip_tip_mode']='Snip shape';
+$ec_lang['lpn_snip_tip_map']='Screenshot of the whole map';
+$ec_lang['lpn_snip_tip_pen']='Pen';
+$ec_lang['lpn_snip_tip_eraser']='Eraser: click a stroke to remove it (E)';
+$ec_lang['lpn_snip_tip_undo']='Undo (Ctrl+Z)';
+$ec_lang['lpn_snip_tip_redo']='Redo (Ctrl+Y)';
+$ec_lang['lpn_screenshot_scale_tip']='The picture\'s size as a multiple of the area on the screen. A larger one is sharper and makes a bigger file.';

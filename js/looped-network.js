@@ -33483,6 +33483,8 @@ var EngCalcs = EngCalcs || {};
 			// as literals because LPN_NOTESBOX_KEY and LPN_HOTKEYSBOX_KEY are declared later in this
 			// file, the same reason 'lpn_show_titles' below is a literal.
 			'lpn_notesbox', 'lpn_hotkeysbox',
+			// 'lpn_snipbox' (the Screenshot box and its magnification) joined the day it was written.
+			'lpn_snipbox',
 			// AREA_HINT_KEY joined 2026-09-09, having been missed on the day it was written.
 			// dev/cookie-storage-inventory.md already filed it beside PAGE_TITLES_KEY as a reading
 			// preference set deliberately on this screen, so the document and the code disagreed
@@ -42166,6 +42168,9 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {};
 		return [
 			{ icon: 'zoom', label: pc.lpn_tool_zoom_extent || 'Zoom to fit', tip: pc.lpn_tool_zoom_extent_tip, fn: zoomExtent },
+			// **A SNIPPING TOOL, IN THE MAP MENU BECAUSE IT IS NOT ABOUT WATER** (Tom, 2026-10-05). Beside
+			// Zoom to fit: both are about the view of the drawing, and the one frames what the other takes.
+			{ icon: 'image', pointerOnly: true, label: pc.lpn_screenshot_menu || 'Screenshot', tip: pc.lpn_screenshot_tip, fn: function () { startScreenshot(); } },
 			// **THE BACKGROUND IMAGE CAME HERE FROM INSERT** (Tom, 2026-08-27). A picture behind the
 			// drawing is not a water asset; it is the same kind of thing as the street map two rows
 			// down, and EPANET files its own Backdrop under this menu for the same reason. A
@@ -42248,6 +42253,717 @@ var EngCalcs = EngCalcs || {};
 			// sentences only it could say were being translated into 27 languages for a state no
 			// visitor could reach. See dev/geographic-projects.md for what went with it.
 		];
+	}
+	// ---- SCREENSHOT: A SNIPPING TOOL FOR THE MAP ------------------------------------------------
+	// Tom, 2026-10-05, on a proposed "Copy image at 2x-3x": *"Good if presented as a snipping tool.
+	// 'Sharper screenshot' or 'Screenshot' (with tip) may work; I can make a video about sharper
+	// screenshots and Figure scenarios. But where does it live? Map menu seems right to me since
+	// it's not about Water."*
+	//
+	// **THE POINT IS THAT IT RE-DRAWS, NOT THAT IT GRABS.** The network is vector SVG, so the
+	// rectangle the visitor drags is drawn again at the Screenshot box's magnification (3x unless
+	// changed) times its CSS size -- lines and
+	// labels come out sharper than any screen grab of the same area. Basemap tiles are rasters and
+	// are only scaled into place; that is the honest limit.
+	//
+	// **NOTHING IS STORED AND NOTHING NEW IS FETCHED.** The picture goes to the clipboard, or, where
+	// the clipboard refuses, to a file the visitor saves. The tiles drawn are the <image> elements
+	// already on the map, re-read from the browser's cache with the same crossorigin=anonymous they
+	// were loaded with (OSM and Mapbox both answer Access-Control-Allow-Origin: *). A tile that
+	// would still taint the canvas is left out and the confirmation says so.
+	//
+	// **THE PICTURE IS EXACTLY WHAT WAS SNIPPED, AND NOTHING IS ADDED TO IT** (Tom, 2026-10-05:
+	// *"Give the user exactly what they snip. Don't add anything including the Mapbox credits. This
+	// is their freedom that we must give them. We complied with our duty by showing it on our screen
+	// so that they can cite in their report."*). The tile credit stays on the screen in
+	// #lpn_basemap_credit; it is never painted into the image.
+	//
+	// dev/lpn-spike/screenshot-browser-harness.js proves the size, the content, Esc, the fallback,
+	// the box and its magnification, and that no credit is drawn.
+	var SNIP_SCALES = [1, 2, 3, 4], SNIP_SCALE = 3, SNIP_SCALE_SAFE = 2, SNIP_MAX_SIDE = 16384, SNIP_MAX_AREA = 120e6, SNIP_DRAG_PX = 4;
+	// What a snapshot keeps of each element's computed style. The SVG is drawn as an image, where
+	// the page's stylesheet does not reach, so whatever the stylesheet decided is written onto the
+	// element itself.
+	var SNIP_STYLE_PROPS = ['fill', 'fill-opacity', 'fill-rule', 'stroke', 'stroke-width', 'stroke-opacity',
+		'stroke-dasharray', 'stroke-dashoffset', 'stroke-linecap', 'stroke-linejoin', 'stroke-miterlimit',
+		'opacity', 'visibility', 'filter', 'paint-order', 'vector-effect', 'mix-blend-mode',
+		'font-family', 'font-size', 'font-weight', 'font-style', 'letter-spacing',
+		'text-anchor', 'dominant-baseline', 'alignment-baseline', 'baseline-shift', 'direction', 'unicode-bidi',
+		'marker-start', 'marker-mid', 'marker-end', 'shape-rendering', 'text-rendering', 'image-rendering', 'color'];
+	var snipVeil = null;
+	// 'rect' or 'free' (lasso): the shape the next snip is dragged in. Session only, never stored.
+	var snipMode = 'rect';
+	// The magnification the Screenshot box shows, 3 until the visitor chooses another.
+	function snipScaleChosen() {
+		return SNIP_SCALES.indexOf(snipboxLayout.scale) >= 0 ? snipboxLayout.scale : SNIP_SCALE;
+	}
+	function snipScaleFor(w, h) {
+		var s = snipScaleChosen();
+		if (w * s > SNIP_MAX_SIDE || h * s > SNIP_MAX_SIDE || w * s * h * s > SNIP_MAX_AREA) { s = Math.min(s, SNIP_SCALE_SAFE); }
+		if (w * s > SNIP_MAX_SIDE || h * s > SNIP_MAX_SIDE || w * s * h * s > SNIP_MAX_AREA) {
+			s = Math.min(SNIP_MAX_SIDE / w, SNIP_MAX_SIDE / h, Math.sqrt(SNIP_MAX_AREA / (w * h)));
+		}
+		return s;
+	}
+	// The visible map, in client pixels: the canvas's content box (inside its 1px border), cut to
+	// the window, since the canvas is laid out taller than the screen until it is sized.
+	function snipMapRect() {
+		var r = svg.getBoundingClientRect(),
+			left = r.left + svg.clientLeft, top = r.top + svg.clientTop,
+			right = left + svg.clientWidth, bottom = top + svg.clientHeight;
+		left = Math.max(left, 0); top = Math.max(top, 0);
+		right = Math.min(right, window.innerWidth); bottom = Math.min(bottom, window.innerHeight);
+		return { x: left, y: top, w: Math.max(0, right - left), h: Math.max(0, bottom - top) };
+	}
+	// ---- THE SCREENSHOT BOX --------------------------------------------------------------------
+	// Tom, 2026-10-05: *"I hoped that there would be a box, possibly non-modal and dockable, with the
+	// magnification amount and any other possible future settings for the snip."* The Contour box's
+	// shell and memory (wireBoxMemory(), registerDockBox(), placeBoxRemembered()), opened by the
+	// menu row with the snip and left standing after it, so a docked box does not take its column
+	// from the map and give it back on every snip. Its x ends a snip in progress.
+	//
+	// **THE MAGNIFICATION IS THE BROWSER'S, NOT THE PROJECT'S** (Task 584's line): how sharp a
+	// picture somebody pastes into their report is a fact about that person's report, not about the
+	// network, and a colleague opening the file must not inherit it. So it rides in `lpn_snipbox`
+	// beside where the box sits. The box's openness is NOT recorded: it opens with the snip, never
+	// with the page.
+	function snipBoxEl() { return document.getElementById('lpn_snip_box'); }
+	function snipBoxIsOpen() {
+		var box = snipBoxEl();
+		return !!box && box.style.display !== 'none' && box.style.display !== '';
+	}
+	function openSnipBox() {
+		var box = snipBoxEl();
+		if (!box) { return; }
+		closeMenu();
+		hideOpenTips();
+		if (snipBoxIsOpen()) { placePanelForScreen(box, function () {}); return; }
+		box.style.display = 'flex';
+		buildSnipBox();
+		placePanelForScreen(box, function () { placeBoxRemembered(box, snipboxLayout, true); });
+		initTipsIn(box);
+	}
+	function closeSnipBox() {
+		cancelScreenshot();
+		hidePanel(snipBoxEl());
+	}
+	var LPN_SNIPBOX_KEY = 'lpn_snipbox';
+	var snipboxLayout = newBoxLayout();
+	snipboxLayout.userSized = false;
+	snipboxLayout.scale = SNIP_SCALE;
+	delete snipboxLayout.open;   // openness is not recorded (see above); the key is never written
+	function saveSnipboxLayout() {
+		try { localStorage.setItem(LPN_SNIPBOX_KEY, JSON.stringify(snipboxLayout)); } catch (e) {}
+	}
+	function wireSnipBox() {
+		var box = snipBoxEl(), x = document.getElementById('lpn_snip_close');
+		if (!box) { return; }
+		if (x) { x.addEventListener('click', closeSnipBox); }
+		wireBoxMemory(box, LPN_SNIPBOX_KEY, snipboxLayout, saveSnipboxLayout, snipBoxIsOpen);
+	}
+	// **ICONS, NOT WORDS** (Tom, 2026-10-07: "can this entire thing use fewer words? Magnifying glass
+	// for magnification, Rectangle or lasso for Snip, and Monitor for Screenshot"; Ida's spec: every
+	// icon has a tip and an aria-label that name its shortcut, the window title keeps its text).
+	// The glyphs are inline SVG in currentColor, so a disabled button greys its icon with no rule.
+	var SNIP_GLYPHS = {
+		magnifier: '<circle cx="10" cy="10" r="6"/><line x1="14.5" y1="14.5" x2="20" y2="20"/>',
+		monitor: '<rect x="3" y="4" width="18" height="12" rx="1"/><line x1="8" y1="20" x2="16" y2="20"/><line x1="12" y1="16" x2="12" y2="20"/>',
+		rect: '<rect x="4" y="6" width="16" height="12" stroke-dasharray="3 2"/>',
+		free: '<path d="M5 13C3 8 9 4 15 6C21 8 20 15 14 16C11 16.5 9 18 10 20" stroke-dasharray="3 2"/>',
+		chevron: '<polyline points="6,9 12,15 18,9"/>',
+		pen: '<path d="M4 20L5 16L16 5L19 8L8 19Z"/><line x1="13" y1="8" x2="16" y2="11"/>',
+		eraser: '<g transform="rotate(-45 12 12)"><rect x="4" y="8" width="16" height="8" rx="1"/><line x1="11" y1="8" x2="11" y2="16"/></g><line x1="3" y1="21" x2="21" y2="21"/>',
+		undo: '<polyline points="9,6 4,11 9,16"/><path d="M4 11H15a4.5 4.5 0 0 1 0 9H11"/>',
+		redo: '<g transform="translate(24 0) scale(-1 1)"><polyline points="9,6 4,11 9,16"/><path d="M4 11H15a4.5 4.5 0 0 1 0 9H11"/></g>',
+		copy: '<rect x="8" y="8" width="12" height="12" rx="1"/><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1H8"/>',
+		save: '<path d="M5 4H16L19 7V19a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1Z"/><rect x="8" y="4" width="7" height="5"/><rect x="8" y="14" width="8" height="6"/>'
+	};
+	function snipGlyph(name) {
+		var s = document.createElementNS(NS, 'svg');
+		s.setAttribute('viewBox', '0 0 24 24'); s.setAttribute('width', '18'); s.setAttribute('height', '18');
+		s.setAttribute('fill', 'none'); s.setAttribute('stroke', 'currentColor'); s.setAttribute('stroke-width', '2');
+		s.setAttribute('stroke-linecap', 'round'); s.setAttribute('stroke-linejoin', 'round');
+		s.setAttribute('aria-hidden', 'true'); s.setAttribute('focusable', 'false');
+		s.innerHTML = SNIP_GLYPHS[name];
+		return s;
+	}
+	// The one tip text names the control to the eye (title, armed as a styled tip) and to a screen
+	// reader (aria-label). Written as el.title, never removeAttribute (see wireTipDelegation).
+	function snipTip(el, text) { el.title = text; el.setAttribute('aria-label', text); }
+	function snipIconButton(id, glyph, tip) {
+		var b = document.createElement('button');
+		b.type = 'button'; b.id = id; b.className = 'lpn-btn lpn-snip-ic';
+		b.appendChild(snipGlyph(glyph));
+		snipTip(b, tip);
+		return b;
+	}
+	function snipModeTip(mode) {
+		var pc = EngCalcs.pageConfig || {};
+		return mode === 'free' ? (pc.lpn_snip_tip_free || 'Snip a freehand shape (S)') : (pc.lpn_snip_tip_rect || 'Snip a rectangle (S)');
+	}
+	// The Snip button shows the shape it will use; the chevron beside it picks the other one.
+	function updateSnipModeUi() {
+		var go = document.getElementById('lpn_snip_go');
+		if (go) {
+			go.replaceChild(snipGlyph(snipMode === 'free' ? 'free' : 'rect'), go.firstChild);
+			snipTip(go, snipModeTip(snipMode));
+		}
+		['rect', 'free'].forEach(function (m) {
+			var it = document.getElementById('lpn_snip_mode_' + m);
+			if (it) { it.setAttribute('aria-checked', m === snipMode ? 'true' : 'false'); it.classList.toggle('lpn-btn-on', m === snipMode); }
+		});
+	}
+	function closeSnipMenu() {
+		var m = document.getElementById('lpn_snip_menu');
+		if (m) { m.classList.remove('lpn-snip-menu-open'); }
+		var c = document.getElementById('lpn_snip_mode');
+		if (c) { c.setAttribute('aria-expanded', 'false'); }
+	}
+	function buildSnipBox() {
+		var pc = EngCalcs.pageConfig || {}, body = document.getElementById('lpn_snip_body');
+		if (!body) { return; }
+		body.innerHTML = '';
+		var bar = document.createElement('div');
+		bar.className = 'lpn-snip-bar';
+		// Magnification: a magnifier and the factor as a bare number.
+		var magTip = pc.lpn_screenshot_scale_tip || 'The picture\'s size as a multiple of the area on the screen. A larger one is sharper and makes a bigger file.';
+		var mag = document.createElement('span'), sel = document.createElement('select');
+		mag.className = 'lpn-snip-mag';
+		mag.appendChild(snipGlyph('magnifier'));
+		sel.id = 'lpn_snip_scale';
+		SNIP_SCALES.forEach(function (n) {
+			var o = document.createElement('option');
+			o.value = String(n); o.textContent = n + '×';
+			if (n === snipScaleChosen()) { o.selected = true; }
+			sel.appendChild(o);
+		});
+		sel.addEventListener('change', function () {
+			var n = parseInt(sel.value, 10);
+			if (SNIP_SCALES.indexOf(n) < 0) { return; }
+			snipboxLayout.scale = n;
+			saveSnipboxLayout();
+		});
+		mag.appendChild(sel);
+		snipTip(mag, magTip); snipTip(sel, magTip);
+		bar.appendChild(mag);
+		// **ONE SNIP BUTTON WITH A SMALL CHEVRON** (Windows snipping tool: New with a mode dropdown).
+		// Rectangle or Freehand; the choice lasts the session and is stored nowhere.
+		var split = document.createElement('span'), go = snipIconButton('lpn_snip_go', 'rect', snipModeTip('rect')),
+			chev = snipIconButton('lpn_snip_mode', 'chevron', pc.lpn_snip_tip_mode || 'Snip shape'),
+			menu = document.createElement('div');
+		go.id = 'lpn_snip_go'; chev.id = 'lpn_snip_mode';
+		split.className = 'lpn-snip-split';
+		chev.classList.add('lpn-snip-chev');
+		chev.setAttribute('aria-haspopup', 'menu'); chev.setAttribute('aria-expanded', 'false');
+		menu.id = 'lpn_snip_menu'; menu.className = 'lpn-snip-menu'; menu.setAttribute('role', 'menu');
+		[['rect', 'rect'], ['free', 'free']].forEach(function (m) {
+			var it = snipIconButton('lpn_snip_mode_' + m[0], m[1], snipModeTip(m[0]));
+			it.setAttribute('role', 'menuitemradio');
+			it.addEventListener('click', function () {
+				closeSnipMenu();
+				snipMode = m[0];
+				updateSnipModeUi();
+				startScreenshot(snipMode);
+			});
+			menu.appendChild(it);
+		});
+		go.addEventListener('click', function () { startScreenshot(snipMode); });
+		chev.addEventListener('click', function (e) {
+			e.stopPropagation();
+			if (menu.classList.contains('lpn-snip-menu-open')) { closeSnipMenu(); return; }
+			var cr = chev.getBoundingClientRect(), mw = 2 * 40 + 6;
+			menu.style.top = Math.round(cr.bottom + 2) + 'px';
+			menu.style.left = Math.round(Math.max(2, Math.min(cr.left, window.innerWidth - mw - 2))) + 'px';
+			menu.classList.add('lpn-snip-menu-open');
+			chev.setAttribute('aria-expanded', 'true');
+		});
+		split.appendChild(go); split.appendChild(chev);
+		// The menu is a popup on the page, not a child of the box: the box clips whatever hangs
+		// below it (overflow hidden). It sits at the menu level of the z-index ladder.
+		var old = document.getElementById('lpn_snip_menu');
+		if (old && old.parentNode) { old.parentNode.removeChild(old); }
+		document.body.appendChild(menu);
+		bar.appendChild(split);
+		// **THE REPEAT BUTTON, A MONITOR** (Tom, 2026-10-06: *"The panel is missing a Screenshot
+		// button for repeats."*). Pan or zoom the map, press it, and the whole visible map is shot
+		// again at the chosen magnification, with no veil to drag.
+		var again = snipIconButton('lpn_snip_again', 'monitor', pc.lpn_snip_tip_map || 'Screenshot of the whole map');
+		again.addEventListener('click', function () {
+			cancelScreenshot();
+			var m = snipMapRect();
+			if (m.w < 1 || m.h < 1) { return; }
+			takeScreenshot(m, null);
+		});
+		bar.appendChild(again);
+		body.appendChild(bar);
+		updateSnipModeUi();
+	}
+	// Outside click closes the mode menu; S, with the box open, starts a snip in the chosen shape.
+	document.addEventListener('click', function () { closeSnipMenu(); });
+	window.addEventListener('resize', function () { closeSnipMenu(); });
+	document.addEventListener('keydown', function (e) {
+		if (e.key !== 's' && e.key !== 'S') { return; }
+		if (e.ctrlKey || e.metaKey || e.altKey || snipVeil || snipEditor || !snipBoxIsOpen()) { return; }
+		var t = e.target, tag = t && t.tagName;
+		if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || (t && t.isContentEditable)) { return; }
+		e.preventDefault(); e.stopPropagation();
+		startScreenshot(snipMode);
+	}, true);
+	function startScreenshot(mode) {
+		cancelScreenshot();
+		var free = (mode === 'rect' || mode === 'free' ? mode : snipMode) === 'free';
+		snipMode = free ? 'free' : 'rect';
+		updateSnipModeUi();
+		// The box first: docked, it takes its column from the map, and the veil is laid over the
+		// map as it is after that. **NOT ON A PHONE**, where every standing box fills the window
+		// (placePanelForScreen()) and would cover the very map the finger has to drag over; the
+		// magnification last chosen still applies there.
+		if (!smallScreen()) { openSnipBox(); }
+		var pc = EngCalcs.pageConfig || {}, map = snipMapRect(), watcher = null;
+		if (map.w < 1 || map.h < 1) { return; }
+		var veil = document.createElement('div'), box = document.createElement('div'), start = null;
+		veil.className = 'lpn-snip-veil';
+		function fitVeil() {
+			veil.style.left = map.x + 'px'; veil.style.top = map.y + 'px';
+			veil.style.width = map.w + 'px'; veil.style.height = map.h + 'px';
+		}
+		fitVeil();
+		box.className = 'lpn-snip-rect';   // joins the veil on the first move, so a click never shows it
+		document.body.appendChild(veil);
+		snipVeil = { el: veil, onKey: null, watcher: null };
+		// The map changes size while the snip waits (a box docked, undocked or resized, the window):
+		// the veil and the drag's limits follow it, and a drag begun on the old size is dropped.
+		if (window.ResizeObserver) {
+			watcher = new window.ResizeObserver(function () {
+				var m = snipMapRect();
+				if (m.x === map.x && m.y === map.y && m.w === map.w && m.h === map.h) { return; }
+				map = m;
+				fitVeil();
+				if (typeof dropShape === 'function') { dropShape(); }
+			});
+			watcher.observe(svg);
+			snipVeil.watcher = watcher;
+		}
+		function at(e) {
+			return { x: Math.min(Math.max(e.clientX, map.x), map.x + map.w), y: Math.min(Math.max(e.clientY, map.y), map.y + map.h) };
+		}
+		function rectOf(a, b) {
+			return { x: Math.min(a.x, b.x), y: Math.min(a.y, b.y), w: Math.abs(a.x - b.x), h: Math.abs(a.y - b.y) };
+		}
+		// Freehand: the path is drawn on a small SVG inside the veil, as dashes in the accent colour.
+		var pts = [], outline = null;
+		if (free) {
+			outline = document.createElementNS(NS, 'svg');
+			outline.setAttribute('class', 'lpn-snip-lasso');
+			outline.setAttribute('width', map.w); outline.setAttribute('height', map.h);
+			outline.appendChild(document.createElementNS(NS, 'polygon'));
+		}
+		function boundsOf(list) {
+			var xs = list.map(function (p) { return p.x; }), ys = list.map(function (p) { return p.y; });
+			var x0 = Math.min.apply(null, xs), y0 = Math.min.apply(null, ys);
+			return { x: x0, y: y0, w: Math.max.apply(null, xs) - x0, h: Math.max.apply(null, ys) - y0 };
+		}
+		function dropShape() {
+			start = null; pts = [];
+			if (box.parentNode) { veil.removeChild(box); }
+			if (outline && outline.parentNode) { veil.removeChild(outline); }
+		}
+		veil.addEventListener('pointerdown', function (e) {
+			if (e.button !== undefined && e.button !== 0) { return; }
+			e.preventDefault(); e.stopPropagation();
+			start = at(e);
+			pts = [start];
+			try { veil.setPointerCapture(e.pointerId); } catch (err) { /* capture is a nicety */ }
+		});
+		veil.addEventListener('pointermove', function (e) {
+			if (!start) { return; }
+			if (free) {
+				var q = at(e);
+				pts.push(q);
+				if (!outline.parentNode) { veil.appendChild(outline); }
+				outline.firstChild.setAttribute('points', pts.map(function (p) { return (p.x - map.x) + ',' + (p.y - map.y); }).join(' '));
+				return;
+			}
+			var r = rectOf(start, at(e));
+			if (!box.parentNode) { veil.appendChild(box); }
+			box.style.left = (r.x - map.x) + 'px'; box.style.top = (r.y - map.y) + 'px';
+			box.style.width = r.w + 'px'; box.style.height = r.h + 'px';
+		});
+		veil.addEventListener('pointerup', function (e) {
+			if (!start) { return; }
+			e.preventDefault(); e.stopPropagation();
+			var r, poly = null;
+			if (free) { pts.push(at(e)); r = boundsOf(pts); poly = pts; }
+			else { r = rectOf(start, at(e)); }
+			start = null;
+			cancelScreenshot();
+			// A plain click (or a tap) takes the whole visible map, as a snipping tool's does.
+			if (r.w < SNIP_DRAG_PX || r.h < SNIP_DRAG_PX) { r = map; poly = null; }
+			takeScreenshot(r, poly);
+		});
+		veil.addEventListener('pointercancel', dropShape);
+		snipVeil.onKey = function (e) {
+			if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); cancelScreenshot(); setNotice(''); }
+		};
+		document.addEventListener('keydown', snipVeil.onKey, true);
+		setNotice(free ? (pc.lpn_snip_hint_free || 'Drag around the area to snip, or click for the whole map. Esc cancels.')
+			: (pc.lpn_screenshot_hint || 'Drag a rectangle over the map, or click for the whole map. Esc cancels.'));
+	}
+	function cancelScreenshot() {
+		closeSnipEditor();
+		if (!snipVeil) { return; }
+		setNotice('');   // the snip's hint goes with the snip
+		document.removeEventListener('keydown', snipVeil.onKey, true);
+		if (snipVeil.watcher) { snipVeil.watcher.disconnect(); }
+		if (snipVeil.el.parentNode) { snipVeil.el.parentNode.removeChild(snipVeil.el); }
+		snipVeil = null;
+	}
+	function snipLoadImage(src, cors) {
+		return new Promise(function (resolve, reject) {
+			var im = new Image();
+			if (cors) { im.crossOrigin = 'anonymous'; }
+			im.onload = function () { resolve(im); };
+			im.onerror = function () { reject(new Error('image')); };
+			im.src = src;
+		});
+	}
+	// One raster <image> made self-contained. Resolves to a data: URL, or to null when the picture
+	// cannot be read back (a tile whose server sent no CORS header taints the canvas).
+	function snipInlineImage(href) {
+		if (/^data:/i.test(href)) { return Promise.resolve(href); }
+		var sameOrigin = /^blob:/i.test(href);
+		try { sameOrigin = sameOrigin || new URL(href, location.href).origin === location.origin; } catch (err) { /* keep */ }
+		return snipLoadImage(href, !sameOrigin).then(function (im) {
+			var c = document.createElement('canvas');
+			c.width = im.naturalWidth || 1; c.height = im.naturalHeight || 1;
+			c.getContext('2d').drawImage(im, 0, 0);
+			return c.toDataURL('image/png');   // throws SecurityError on a tainted canvas
+		}).catch(function () { return null; });
+	}
+	// A deep copy of the map's SVG with every computed style written onto its element, hidden
+	// elements dropped, and every raster inlined. `out.droppedBasemap` reports a tile left out.
+	function snipCloneSvg(out) {
+		var clone = svg.cloneNode(true), pending = [];
+		function walk(o, c) {
+			var cs = window.getComputedStyle(o);
+			if (cs.display === 'none') { c.parentNode.removeChild(c); return; }
+			var st = [];
+			SNIP_STYLE_PROPS.forEach(function (p) {
+				var v = cs.getPropertyValue(p);
+				if (v !== '' && v !== null) { st.push(p + ':' + v); }
+			});
+			c.setAttribute('style', st.join(';'));
+			if (o.tagName === 'image') {
+				var href = o.getAttribute('href') || o.getAttributeNS('http://www.w3.org/1999/xlink', 'href') || '';
+				var isTile = o.classList.contains('lpn-basemap-tile');
+				pending.push(snipInlineImage(href).then(function (data) {
+					if (data) { c.setAttribute('href', data); c.removeAttributeNS('http://www.w3.org/1999/xlink', 'href'); }
+					else {
+						if (isTile) { out.droppedBasemap = true; }
+						if (c.parentNode) { c.parentNode.removeChild(c); }
+					}
+				}));
+			}
+			var oc = o.children, cc = Array.prototype.slice.call(c.children), i;
+			for (i = 0; i < oc.length; i++) { if (cc[i]) { walk(oc[i], cc[i]); } }
+		}
+		var rs = window.getComputedStyle(svg), kids = Array.prototype.slice.call(clone.children), oks = svg.children, i;
+		for (i = 0; i < oks.length; i++) { if (kids[i]) { walk(oks[i], kids[i]); } }
+		clone.setAttribute('style', 'font-family:' + rs.fontFamily + ';font-size:' + rs.fontSize);
+		return Promise.all(pending).then(function () { return clone; });
+	}
+	// The HTML legends are drawn by hand, box by box and word by word, so they too are re-drawn at
+	// the snapshot's scale rather than copied off the screen. Backgrounds, borders and text are the
+	// whole of what a legend is (see renderColorLegend(), renderLabelsLegend()).
+	function snipPaintHtml(ctx, root) {
+		function paintBox(e) {
+			var cs = window.getComputedStyle(e);
+			if (cs.display === 'none' || cs.visibility === 'hidden') { return; }
+			var r = e.getBoundingClientRect();
+			if (cs.backgroundColor && !/rgba\([^)]*,\s*0\)$|transparent/.test(cs.backgroundColor)) {
+				ctx.fillStyle = cs.backgroundColor; ctx.fillRect(r.left, r.top, r.width, r.height);
+			}
+			[['Top', r.left, r.top, r.width, 0], ['Bottom', r.left, r.bottom, r.width, 0],
+				['Left', r.left, r.top, 0, r.height], ['Right', r.right, r.top, 0, r.height]].forEach(function (b) {
+				var w = parseFloat(cs['border' + b[0] + 'Width']) || 0;
+				if (!w || cs['border' + b[0] + 'Style'] === 'none') { return; }
+				ctx.fillStyle = cs['border' + b[0] + 'Color'];
+				var x = b[1] - (b[0] === 'Right' ? w : 0), y = b[2] - (b[0] === 'Bottom' ? w : 0);
+				ctx.fillRect(x, y, b[3] || w, b[4] || w);
+			});
+			Array.prototype.forEach.call(e.childNodes, function (n) {
+				if (n.nodeType === 1) { paintBox(n); }
+				else if (n.nodeType === 3 && /\S/.test(n.nodeValue)) { paintText(n, cs); }
+			});
+		}
+		function paintText(n, cs) {
+			ctx.font = cs.fontStyle + ' ' + cs.fontWeight + ' ' + cs.fontSize + ' ' + cs.fontFamily;
+			ctx.fillStyle = cs.color;
+			ctx.textBaseline = 'middle';
+			ctx.textAlign = 'left';
+			try { ctx.direction = cs.direction; } catch (err) { /* older canvas */ }
+			var text = n.nodeValue, re = /\S+/g, m, range = document.createRange();
+			while ((m = re.exec(text))) {
+				range.setStart(n, m.index); range.setEnd(n, m.index + m[0].length);
+				var rr = range.getClientRects()[0];
+				if (rr) { ctx.fillText(m[0], rr.left, rr.top + rr.height / 2); }
+			}
+		}
+		paintBox(root);
+	}
+	function snipLegends() {
+		return [document.getElementById('lpn_labels_legend'), colorLegendBox].filter(function (e) {
+			return e && e.isConnected && window.getComputedStyle(e).display !== 'none';
+		});
+	}
+	// Render the client-pixel rectangle `r` of the map. Resolves to { blob, droppedBasemap, scale }.
+	function renderScreenshot(r, poly) {
+		var out = { droppedBasemap: false, scale: snipScaleFor(r.w, r.h) };
+		var s = out.scale, W = Math.max(1, Math.round(r.w * s)), H = Math.max(1, Math.round(r.h * s));
+		var sr = svg.getBoundingClientRect(), ox = sr.left + svg.clientLeft, oy = sr.top + svg.clientTop;
+		return snipCloneSvg(out).then(function (clone) {
+			clone.setAttribute('xmlns', NS);
+			clone.setAttribute('width', W); clone.setAttribute('height', H);
+			clone.setAttribute('viewBox', [r.x - ox, r.y - oy, r.w, r.h].join(' '));
+			clone.setAttribute('preserveAspectRatio', 'none');
+			clone.removeAttribute('id');
+			var xml = new XMLSerializer().serializeToString(clone),
+				url = URL.createObjectURL(new Blob([xml], { type: 'image/svg+xml;charset=utf-8' }));
+			return snipLoadImage(url, false).then(function (im) {
+				URL.revokeObjectURL(url);
+				var c = document.createElement('canvas'), ctx;
+				c.width = W; c.height = H;
+				ctx = c.getContext('2d');
+				ctx.fillStyle = window.getComputedStyle(svg).backgroundColor || 'white';
+				ctx.fillRect(0, 0, W, H);
+				ctx.drawImage(im, 0, 0, W, H);
+				ctx.save();
+				ctx.scale(W / r.w, H / r.h);
+				ctx.translate(-r.x, -r.y);
+				ctx.beginPath(); ctx.rect(r.x, r.y, r.w, r.h); ctx.clip();
+				snipLegends().forEach(function (lg) {
+					var lr = lg.getBoundingClientRect();
+					if (lr.right > r.x && lr.left < r.x + r.w && lr.bottom > r.y && lr.top < r.y + r.h) { snipPaintHtml(ctx, lg); }
+				});
+				ctx.restore();
+				if (poly) {
+					// Freehand: everything outside the outline becomes transparent.
+					ctx.save();
+					ctx.globalCompositeOperation = 'destination-in';
+					ctx.beginPath();
+					poly.forEach(function (p, i) {
+						var x = (p.x - r.x) * W / r.w, y = (p.y - r.y) * H / r.h;
+						if (i) { ctx.lineTo(x, y); } else { ctx.moveTo(x, y); }
+					});
+					ctx.closePath();
+					ctx.fill();
+					ctx.restore();
+				}
+				return new Promise(function (resolve, reject) {
+					c.toBlob(function (b) { if (b) { out.blob = b; resolve(out); } else { reject(new Error('toBlob')); } }, 'image/png');
+				});
+			}, function (err) { URL.revokeObjectURL(url); throw err; });
+		});
+	}
+	function snipDownload(blob) {
+		var a = document.createElement('a'), url = URL.createObjectURL(blob);
+		a.href = url;
+		a.download = safeFileName((project && project.name) || 'map') + '-screenshot.png';
+		document.body.appendChild(a);
+		a.click();
+		document.body.removeChild(a);
+		setTimeout(function () { URL.revokeObjectURL(url); }, 60000);
+	}
+	// A snip or screenshot is drawn, then SHOWN in the markup view, where it can be scribbled on in
+	// red before Copy or Save (Tom, 2026-10-06: the Windows snipping tool's pen is what he uses
+	// "profusely"). Nothing is copied or saved until the visitor presses one of them.
+	function takeScreenshot(r, poly) {
+		var pc = EngCalcs.pageConfig || {};
+		return renderScreenshot(r, poly).then(function (out) {
+			openSnipEditor(out);
+			if (out.droppedBasemap) { setNotice(pc.lpn_screenshot_no_basemap || 'The street map or satellite image could not be included.'); }
+		}).catch(function () {
+			setNotice(pc.lpn_screenshot_failed || 'The screenshot could not be made.');
+		});
+	}
+	// ---- THE MARKUP VIEW -------------------------------------------------------------------
+	// A modal over the page: the picture on a canvas, a red pen, an eraser, Undo, Redo, Copy, Save, Close. The pen is
+	// red only (Tom: "a red scribbler pen like the Windows tool"); its ink is image content, never
+	// chrome. Strokes are kept as point lists and redrawn over the untouched snip, so Undo is exact.
+	// Pointer events, so a mouse, a pen and a finger all draw. Nothing here is stored on the device.
+	var SNIP_PEN_INK = '#ff0000', SNIP_PEN_CSS_PX = 3;
+	var snipEditor = null;
+	function closeSnipEditor() {
+		if (!snipEditor) { return; }
+		document.removeEventListener('keydown', snipEditor.onKey, true);
+		if (snipEditor.el.parentNode) { snipEditor.el.parentNode.removeChild(snipEditor.el); }
+		snipEditor = null;
+	}
+	function openSnipEditor(out) {
+		closeSnipEditor();
+		var pc = EngCalcs.pageConfig || {};
+		return createImageBitmap(out.blob).then(function (bm) {
+			// Every stroke is an object of its own, redrawn over the untouched snip, so an eraser
+			// removes a whole stroke and never paints pixels out. `done` and `undone` hold the
+			// actions (a stroke added, or strokes erased), so Undo and Redo cover both.
+			var strokes = [], done = [], undone = [], drawing = null, erasing = null, eraser = false;
+			var el = document.createElement('div'), panel = document.createElement('div'), bar = document.createElement('div'),
+				cv = document.createElement('canvas'), ctx, held = document.createElement('div');
+			el.id = 'lpn_snip_edit'; el.className = 'lpn-snip-edit';
+			el.setAttribute('role', 'dialog');
+			el.setAttribute('aria-label', pc.lpn_screenshot_menu || 'Screenshot');
+			panel.className = 'lpn-snip-edit-panel';
+			bar.className = 'lpn-snip-edit-bar';
+			cv.id = 'lpn_snip_canvas'; cv.className = 'lpn-snip-edit-canvas';
+			cv.width = bm.width; cv.height = bm.height;
+			ctx = cv.getContext('2d');
+			function button(id, glyph, tip, fn, into) {
+				var b = snipIconButton(id, glyph, tip);
+				b.addEventListener('click', fn);
+				(into || bar).appendChild(b);
+				return b;
+			}
+			function paint() {
+				ctx.clearRect(0, 0, cv.width, cv.height);
+				ctx.drawImage(bm, 0, 0);
+				ctx.strokeStyle = SNIP_PEN_INK; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+				ctx.lineWidth = SNIP_PEN_CSS_PX * out.scale;
+				strokes.forEach(function (st) {
+					ctx.beginPath();
+					st.pts.forEach(function (p, i) { if (i) { ctx.lineTo(p.x, p.y); } else { ctx.moveTo(p.x, p.y); } });
+					ctx.stroke();
+				});
+				undoBtn.disabled = done.length === 0;
+				redoBtn.disabled = undone.length === 0;
+			}
+			function at(e) {
+				var r = cv.getBoundingClientRect();
+				return { x: (e.clientX - r.left) * cv.width / r.width, y: (e.clientY - r.top) * cv.height / r.height };
+			}
+			function setEraser(on) {
+				eraser = on;
+				penBtn.setAttribute('aria-pressed', on ? 'false' : 'true'); penBtn.classList.toggle('lpn-btn-on', !on);
+				eraserBtn.setAttribute('aria-pressed', on ? 'true' : 'false'); eraserBtn.classList.toggle('lpn-btn-on', on);
+				cv.classList.toggle('lpn-snip-eraser-on', on);
+			}
+			// Distance from a point to a stroke's polyline, in canvas pixels.
+			function distTo(st, p) {
+				var best = Infinity, i, a, b, dx, dy, t, len2;
+				for (i = 0; i < st.pts.length; i++) {
+					a = st.pts[i]; b = st.pts[i + 1] || a;
+					dx = b.x - a.x; dy = b.y - a.y; len2 = dx * dx + dy * dy;
+					t = len2 ? Math.max(0, Math.min(1, ((p.x - a.x) * dx + (p.y - a.y) * dy) / len2)) : 0;
+					best = Math.min(best, Math.hypot(p.x - (a.x + t * dx), p.y - (a.y + t * dy)));
+				}
+				return best;
+			}
+			// The topmost stroke within reach of the pointer is removed; its place is kept for Undo.
+			function eraseAt(p) {
+				var r = cv.getBoundingClientRect(), reach = (SNIP_PEN_CSS_PX / 2 * out.scale) + 6 * cv.width / r.width, i;
+				for (i = strokes.length - 1; i >= 0; i--) {
+					if (distTo(strokes[i], p) <= reach) {
+						if (!erasing) { erasing = { type: 'erase', items: [] }; done.push(erasing); undone = []; }
+						erasing.items.push({ stroke: strokes[i], index: i });
+						strokes.splice(i, 1);
+						paint();
+						return;
+					}
+				}
+			}
+			function undo() {
+				var a = done.pop();
+				if (!a) { return; }
+				if (a.type === 'add') { strokes.splice(strokes.indexOf(a.stroke), 1); }
+				else { for (var i = a.items.length - 1; i >= 0; i--) { strokes.splice(a.items[i].index, 0, a.items[i].stroke); } }
+				undone.push(a); paint();
+			}
+			function redo() {
+				var a = undone.pop();
+				if (!a) { return; }
+				if (a.type === 'add') { strokes.push(a.stroke); }
+				else { a.items.forEach(function (it) { strokes.splice(strokes.indexOf(it.stroke), 1); }); }
+				done.push(a); paint();
+			}
+			// Pen and Eraser share one segmented control, so the active tool is always in view.
+			var seg = document.createElement('span');
+			seg.className = 'lpn-snip-seg';
+			bar.appendChild(seg);
+			var penBtn = button('lpn_snip_pen', 'pen', pc.lpn_snip_tip_pen || 'Pen', function () { setEraser(false); }, seg);
+			var eraserBtn = button('lpn_snip_eraser', 'eraser', pc.lpn_snip_tip_eraser || 'Eraser: click a stroke to remove it (E)', function () { setEraser(true); }, seg);
+			var undoBtn = button('lpn_snip_undo', 'undo', pc.lpn_snip_tip_undo || 'Undo (Ctrl+Z)', undo);
+			var redoBtn = button('lpn_snip_redo', 'redo', pc.lpn_snip_tip_redo || 'Redo (Ctrl+Y)', redo);
+			var blobNow = function () { return new Promise(function (res, rej) { cv.toBlob(function (b) { b ? res(b) : rej(new Error('toBlob')); }, 'image/png'); }); };
+			var copyBtn = button('lpn_snip_copy', 'copy', pc.points_data_copy || 'Copy', function () { copyBlob(blobNow()); });
+			button('lpn_snip_save', 'save', pc.lpn_file_save || 'Save', function () {
+				blobNow().then(snipDownload);   // one click, one download
+			});
+			var x = document.createElement('button');
+			x.type = 'button'; x.id = 'lpn_snip_edit_close'; x.className = 'lpn-popover-x'; x.textContent = '×';
+			snipTip(x, pc.lpn_close || 'Close');
+			x.addEventListener('click', closeSnipEditor);
+			bar.appendChild(x);
+			setEraser(false);
+			cv.addEventListener('pointerdown', function (e) {
+				if (e.button !== undefined && e.button !== 0) { return; }
+				e.preventDefault();
+				try { cv.setPointerCapture(e.pointerId); } catch (err) { /* a nicety */ }
+				var p = at(e);
+				if (eraser) { erasing = null; eraseAt(p); drawing = 'erase'; return; }
+				var st = { pts: [p, { x: p.x + 0.01, y: p.y }] };
+				drawing = st;
+				strokes.push(st); done.push({ type: 'add', stroke: st }); undone = [];
+				paint();
+			});
+			cv.addEventListener('pointermove', function (e) {
+				if (!drawing) { return; }
+				if (drawing === 'erase') { eraseAt(at(e)); return; }
+				drawing.pts.push(at(e));
+				paint();
+			});
+			function endStroke() { drawing = null; erasing = null; }
+			cv.addEventListener('pointerup', endStroke);
+			cv.addEventListener('pointercancel', endStroke);
+			held.className = 'lpn-snip-edit-scroll';
+			held.appendChild(cv);
+			panel.appendChild(bar); panel.appendChild(held);
+			el.appendChild(panel);
+			// While the markup view is open it owns the keyboard, and nothing else reaches the map
+			// (its Delete, its own Ctrl+Z). Esc steps back from the eraser to the pen, and closes the
+			// view from the pen; Ctrl+Z undoes, Ctrl+Y (or Ctrl+Shift+Z) redoes, E is the eraser.
+			snipEditor = { el: el, onKey: function (e) {
+				e.stopPropagation();
+				var k = e.key, mod = e.ctrlKey || e.metaKey;
+				// Esc never throws strokes away: it leaves the eraser, and closes only an unmarked view.
+				if (k === 'Escape') { e.preventDefault(); if (eraser) { setEraser(false); } else if (!strokes.length) { closeSnipEditor(); } }
+				else if (mod && !e.shiftKey && (k === 'z' || k === 'Z')) { e.preventDefault(); undo(); }
+				else if (mod && (k === 'y' || k === 'Y' || (e.shiftKey && (k === 'z' || k === 'Z')))) { e.preventDefault(); redo(); }
+				else if (!mod && !e.altKey && (k === 'e' || k === 'E')) { e.preventDefault(); setEraser(!eraser); }
+			} };
+			document.addEventListener('keydown', snipEditor.onKey, true);
+			document.body.appendChild(el);
+			paint();
+			copyBtn.focus();
+		});
+	}
+	// The clipboard write starts inside the Copy click, with the picture as the ClipboardItem's
+	// promise; where the clipboard refuses, the picture is downloaded instead.
+	function copyBlob(blobPromise) {
+		var pc = EngCalcs.pageConfig || {}, wrote;
+		function fallback() {
+			return blobPromise.then(function (b) {
+				snipDownload(b);
+				setNotice(pc.lpn_screenshot_saved || 'The clipboard is not available here, so the screenshot was downloaded as a PNG file.');
+			});
+		}
+		try {
+			if (!navigator.clipboard || !navigator.clipboard.write || typeof window.ClipboardItem !== 'function') { throw new Error('no clipboard'); }
+			wrote = navigator.clipboard.write([new window.ClipboardItem({ 'image/png': blobPromise })]).then(function () {
+				setNotice(pc.lpn_screenshot_copied || 'Screenshot copied.');
+			}, fallback);
+		} catch (err) {
+			wrote = fallback();
+		}
+		return wrote.catch(function () { setNotice(pc.lpn_screenshot_failed || 'The screenshot could not be made.'); });
 	}
 	// **THE PROJECT MENU** (ROADMAP Task 467). Tom, 2026-08-20: *"Maybe we can have a Project menu
 	// with Settings, Library, and Report under it?"*, and his own row order of 2026-08-21:
@@ -43384,6 +44100,7 @@ var EngCalcs = EngCalcs || {};
 		wireDemandScaleBox();
 		wireEnergyBox();
 		wireContourBox();
+		wireSnipBox();
 		wireScenarioCompareBox();
 		wireRunReportBox();
 		wireStatusReportBox();
@@ -51200,6 +51917,7 @@ var EngCalcs = EngCalcs || {};
 			['lpn_ds_box', dsLayout, null, null, dsBoxTip],
 			['lpn_energy_box', energyboxLayout, saveEnergyboxLayout, LPN_ENERGYBOX_KEY],
 			['lpn_contour_box', contourboxLayout, saveContourboxLayout, LPN_CONTOURBOX_KEY],
+			['lpn_snip_box', snipboxLayout, saveSnipboxLayout, LPN_SNIPBOX_KEY, 'lpn_screenshot_tip'],
 			['lpn_scncmp_box', cmpboxLayout, saveCmpboxLayout, LPN_CMPBOX_KEY],
 			['lpn_rptbox', rptboxLayout, saveRptboxLayout, LPN_RPTBOX_KEY],
 			['lpn_status_box', statusboxLayout, saveStatusboxLayout, LPN_STATUSBOX_KEY],

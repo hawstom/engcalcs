@@ -1398,6 +1398,16 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 	<button type="button" id="lpn_contour_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
 	<div id="lpn_contour_body" class="lpn-popover-body"></div>
 </div>
+<?php // THE SCREENSHOT BOX (Tom, 2026-10-05: *"I hoped that there would be a box, possibly non-modal
+      // and dockable, with the magnification amount and any other possible future settings for the
+      // snip."*). Opens with Map > Screenshot, on the Contour box's shell. Its magnification is a
+      // preference of this browser, not modelling data, so it rides in `lpn_snipbox` beside where
+      // the box sits, and never in the project. ?>
+<div id="lpn_snip_box" class="d-print-none lpn-popover lpn-findbox lpn-snipbox" style="display:none;position:fixed;background:var(--ec-bg);border:1px solid var(--ec-ink);padding:40px 8px 8px;box-shadow:2px 2px 6px var(--ec-a-0-0-0-3)" role="dialog" aria-labelledby="lpn_snip_title">
+	<div id="lpn_snip_title" class="lpn-setbox-title"><?=$ec_lang['lpn_screenshot_menu']?></div>
+	<button type="button" id="lpn_snip_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
+	<div id="lpn_snip_body" class="lpn-popover-body"></div>
+</div>
 <?php // THE SCENARIO COMPARISON (the planning engineer's wish-list row 2). Solve every scenario in
       // the project and print one row each: the lowest pressure and the highest velocity, and where
       // each was found. It borrows the fire flow box's shell for the reason the pump energy report
@@ -1921,6 +1931,10 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 <h2><?=$ec_lang['lpn_hotkeys_menu_heading']?></h2>
 <dl>
 	<dt><?=$ec_lang['lpn_hotkeys_menu_term']?></dt><dd><?=$ec_lang['lpn_hotkeys_menu_def']?></dd>
+</dl>
+<h2><?=$ec_lang['lpn_hotkeys_snip_heading']?></h2>
+<dl>
+	<dt><?=$ec_lang['lpn_hotkeys_snip_term']?></dt><dd><?=$ec_lang['lpn_hotkeys_snip_def']?></dd>
 </dl>
 	</div>
 </div>
@@ -2937,6 +2951,23 @@ EngCalcs.pageConfig = {
 	lpn_tool_add_chain_tip: <?=json_encode($ec_lang['lpn_tool_add_chain_tip'])?>,
 	lpn_tool_undo_tip: <?=json_encode($ec_lang['lpn_tool_undo_tip'])?>,
 	lpn_tool_zoom_extent_tip: <?=json_encode($ec_lang['lpn_tool_zoom_extent_tip'])?>,
+	lpn_screenshot_menu: <?=json_encode($ec_lang['lpn_screenshot_menu'])?>,
+	lpn_screenshot_tip: <?=json_encode($ec_lang['lpn_screenshot_tip'])?>,
+	lpn_screenshot_hint: <?=json_encode($ec_lang['lpn_screenshot_hint'])?>,
+	lpn_screenshot_copied: <?=json_encode($ec_lang['lpn_screenshot_copied'])?>,
+	lpn_screenshot_saved: <?=json_encode($ec_lang['lpn_screenshot_saved'])?>,
+	lpn_screenshot_no_basemap: <?=json_encode($ec_lang['lpn_screenshot_no_basemap'])?>,
+	lpn_screenshot_failed: <?=json_encode($ec_lang['lpn_screenshot_failed'])?>,
+	lpn_snip_hint_free: <?=json_encode($ec_lang['lpn_snip_hint_free'])?>,
+	lpn_snip_tip_rect: <?=json_encode($ec_lang['lpn_snip_tip_rect'])?>,
+	lpn_snip_tip_free: <?=json_encode($ec_lang['lpn_snip_tip_free'])?>,
+	lpn_snip_tip_mode: <?=json_encode($ec_lang['lpn_snip_tip_mode'])?>,
+	lpn_snip_tip_map: <?=json_encode($ec_lang['lpn_snip_tip_map'])?>,
+	lpn_snip_tip_pen: <?=json_encode($ec_lang['lpn_snip_tip_pen'])?>,
+	lpn_snip_tip_eraser: <?=json_encode($ec_lang['lpn_snip_tip_eraser'])?>,
+	lpn_snip_tip_undo: <?=json_encode($ec_lang['lpn_snip_tip_undo'])?>,
+	lpn_snip_tip_redo: <?=json_encode($ec_lang['lpn_snip_tip_redo'])?>,
+	lpn_screenshot_scale_tip: <?=json_encode($ec_lang['lpn_screenshot_scale_tip'])?>,
 	lpn_tool_zoom_window_tip: <?=json_encode($ec_lang['lpn_tool_zoom_window_tip'])?>,
 	lpn_zoom_in_tip: <?=json_encode($ec_lang['lpn_zoom_in_tip'])?>,
 	lpn_zoom_out_tip: <?=json_encode($ec_lang['lpn_zoom_out_tip'])?>,
