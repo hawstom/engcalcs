@@ -14172,6 +14172,64 @@ var EngCalcs = EngCalcs || {};
 		});
 	}
 
+	// ---- placing an attached image by the file's own [BACKDROP] DIMENSIONS (Task 282) ----
+	//
+	// EPANET 2.2 manual, [BACKDROP]: DIMENSIONS is the lower-left and upper-right corners (LLx LLy
+	// URx URy) of the map's bounding rectangle, and OFFSET is the X and Y distance of the image's
+	// upper-left corner from the rectangle's upper-left corner. The EXACT rule is EPANET's own source,
+	// Delphi_GUI/epanet2w/Umap.pas, TMap.GetBackdropBounds (https://github.com/USEPA/EPANET2.2):
+	//     x0 := LowerLeft.X + Offset.X;   y0 := UpperRight.Y - Offset.Y;
+	//     w := UpperRight.X - LowerLeft.X;  h := UpperRight.Y - LowerLeft.Y;
+	//     if AspectRatio > 1 then h := w/AspectRatio else w := h*AspectRatio;
+	// with AspectRatio = picture width / picture height (TMap.DrawBackdrop), and the picture is drawn
+	// from (x0, y0) rightward by w and DOWNWARD by h. So the Y offset is SUBTRACTED from the top edge
+	// (Fmap.pas EndPanning: "Y-offset is measured relative to upper right corner"), a landscape
+	// picture fills the rectangle's width and a portrait or square one fills its height, aspect kept.
+	// Followed literally, including that a picture wider than 1:1 but narrower than the rectangle runs
+	// past its bottom edge: that is where EPANET draws it. Returns false when there is no usable
+	// rectangle.
+	function placeBackdropByDimensions(dims, offset) {
+		if (!backdrop || !backdrop.width || !backdrop.height || !dims || dims.length !== 4) { return false; }
+		var ox = offset ? offset[0] : 0, oy = offset ? offset[1] : 0, ar = backdrop.width / backdrop.height,
+			x0 = inwardX(dims[0] + ox), yTop = inwardY(dims[3] - oy),
+			// The rectangle's size is taken in the DRAWING frame (a geographic project draws in
+			// Mercator, so a degree of latitude is not a degree of longitude on the screen).
+			w = inwardX(dims[2]) - inwardX(dims[0]), h = inwardY(dims[1]) - inwardY(dims[3]);
+		if (!(w > 0) || !(h > 0) || !isFinite(w) || !isFinite(h)) { return false; }
+		if (ar > 1) { h = w / ar; } else { w = h * ar; }
+		backdrop.s = w / backdrop.width;
+		backdrop.tx = x0 - backdrop.x * backdrop.s;
+		backdrop.ty = yTop - backdrop.y * backdrop.s;
+		applyBackdropTransform();
+		saveToStorage();
+		return true;
+	}
+	// The picture an imported .inp names, handed over by the user. The SAME door Add uses
+	// (addBackdropFromDataUrl), then the file's rectangle. Reports through `say`.
+	function attachNamedBackdrop(bd, file, say) {
+		var pc = EngCalcs.pageConfig || {}, reader = new FileReader(),
+			named = String(bd.file).split(/[\\\/]/).pop();
+		reader.onload = function (ev) {
+			addBackdropFromDataUrl(ev.target.result, function () {
+				placeBackdropByDimensions(bd.dimensions, bd.offset);
+				var msg = (file.name.toLowerCase() === named.toLowerCase()
+					? (pc.lpn_inp_backdrop_attached || 'Attached {file}, placed where the file says it belongs.')
+					: (pc.lpn_inp_backdrop_attached_other || 'Attached {picked}, placed where the file says it belongs. The file names {file}, which is a different name.'))
+					.replace('{picked}', file.name).replace('{file}', named);
+				say(msg);
+			});
+		};
+		reader.readAsDataURL(file);
+	}
+	EngCalcs.lpnBackdropProbe = function () {
+		var inp = EngCalcs.lpnExportInp(serializeProject(), inpExportOptions()).inp, m = /\[BACKDROP\]([^\[]*)/.exec(inp);
+		return {
+			corners: backdrop ? [outwardX(backdrop.tx), outwardY(backdrop.ty + backdrop.height * backdrop.s),
+				outwardX(backdrop.tx + backdrop.width * backdrop.s), outwardY(backdrop.ty)] : null,
+			section: m ? m[1] : null
+		};
+	};
+
 	// ---- pixel size, typed rather than picked (Task 276) ----
 	// Picking is the coarse step; this is the correction. `backdrop.s` scales the PLACEMENT BOX, not
 	// the image's own pixels, so the number a user thinks in -- ground distance per ORIGINAL image
@@ -35667,32 +35725,205 @@ var EngCalcs = EngCalcs || {};
 			}
 		};
 	}
-	function exportInpFile() {
-		var pcX = EngCalcs.pageConfig || {}, out;
-		saveToStorage();   // export what is on screen, including edits not yet saved
-		out = EngCalcs.lpnExportInp(serializeProject(), inpExportOptions());
-		if (!out || !out.ok) {
-			setNotice((pcX.lpn_inp_export_refused || 'This project cannot be written as an EPANET file: {detail}')
-				.replace('{detail}', (out && out.detail) || '?'));
-			return;
+	// **A 24-BIT WINDOWS BMP, BECAUSE THAT IS WHAT EPANET OPENS** (dev/backdrop-export.md). EPANET
+	// 2.2's backdrop is a Delphi TPicture loaded from the named file (Umap.pas GetBackdrop), its
+	// picker offers *.bmp, *.emf and *.wmf only (Fmain.dfm OpenPictureDialog), and none of its
+	// units links a PNG or JPEG reader, so a PNG named in FILE is "could not read backdrop" there.
+	// Bottom-up rows padded to four bytes, BGR, 72 dpi. A transparent pixel is laid on white, the
+	// colour of EPANET's map behind it, because BMP has no transparency EPANET draws.
+	function encodeBmp24(imageData) {
+		var w = imageData.width, h = imageData.height, src = imageData.data,
+			rowSize = Math.ceil(w * 3 / 4) * 4, size = 54 + rowSize * h,
+			buf = new ArrayBuffer(size), dv = new DataView(buf), out = new Uint8Array(buf), x, y, i, o, a;
+		out[0] = 0x42; out[1] = 0x4d;
+		dv.setUint32(2, size, true); dv.setUint32(10, 54, true); dv.setUint32(14, 40, true);
+		dv.setInt32(18, w, true); dv.setInt32(22, h, true); dv.setUint16(26, 1, true); dv.setUint16(28, 24, true);
+		dv.setUint32(34, rowSize * h, true); dv.setInt32(38, 2835, true); dv.setInt32(42, 2835, true);
+		for (y = 0; y < h; y++) {
+			o = 54 + (h - 1 - y) * rowSize;
+			for (x = 0; x < w; x++) {
+				i = (y * w + x) * 4; a = src[i + 3] / 255;
+				out[o++] = Math.round(src[i + 2] * a + 255 * (1 - a));
+				out[o++] = Math.round(src[i + 1] * a + 255 * (1 - a));
+				out[o++] = Math.round(src[i] * a + 255 * (1 - a));
+			}
 		}
-		var blob = new Blob([out.inp], { type: 'text/plain' }),
-			url = URL.createObjectURL(blob), a = document.createElement('a');
+		return out;
+	}
+	// **THE PICTURE AND ITS WORLD FILE, FOR THE .inp BESIDE THEM.** Calls back with
+	// { bmp: Uint8Array, world: text }, null when there is no picture, or false when there is one
+	// this page cannot read back (undecodable, or a canvas the browser will not let us read).
+	// The picture goes out at its own stored pixels with nothing drawn in (Tom's rule for a
+	// screenshot: exactly what was there, no credit added), at full strength: the map's backdrop
+	// opacity is a display setting, not part of the picture.
+	//
+	// The world file (six lines A, D, B, E, C, F; C and F are the CENTRE of the upper-left pixel,
+	// Esri, "World files for raster datasets") is in the frame the .inp writes. In a grid project
+	// E is exactly -A, the one uniform scale this page draws a picture at, so Background image's
+	// own reader (worldFileRepresentable) takes it back. In a geographic project it is degrees per
+	// pixel along each axis, which is what a GIS reading longitude and latitude expects; the picture
+	// is drawn in Mercator, so that is a straight-line approximation of its latitudes.
+	function backdropExportPicture(done) {
+		if (!backdrop || !backdrop.href) { done(null); return; }
+		var img = new Image();
+		img.onload = function () {
+			var pw = img.naturalWidth, ph = img.naturalHeight;
+			if (!(pw > 0) || !(ph > 0)) { done(false); return; }
+			var cv = document.createElement('canvas'), ctx, pixels;
+			cv.width = pw; cv.height = ph;
+			ctx = cv.getContext('2d');
+			// A picture the browser will draw but not let us read back (a cross-origin one taints the
+			// canvas) throws here. That is "could not be saved", said on screen, never a dead export.
+			try {
+				ctx.drawImage(img, 0, 0, pw, ph);
+				pixels = ctx.getImageData(0, 0, pw, ph);
+			} catch (e) { done(false); return; }
+			var s = backdrop.s || 1, left = backdrop.tx + (backdrop.x || 0) * s, top = backdrop.ty + (backdrop.y || 0) * s,
+				L = outwardX(left), R = outwardX(left + backdrop.width * s),
+				T = outwardY(top), B = outwardY(top + backdrop.height * s),
+				A = (R - L) / pw, E = isLatLonProject() ? -(T - B) / ph : -A;
+			done({ bmp: encodeBmp24(pixels),
+				world: [A, 0, 0, E, L + A / 2, T + E / 2].map(String).join('\r\n') + '\r\n' });
+		};
+		img.onerror = function () { done(false); };
+		img.src = backdrop.href;
+	}
+	// **ONE .zip, BECAUSE CHROME LETS A CLICK DOWNLOAD ONE FILE** (dev/backdrop-export.md). Chrome
+	// allows a site one download per user gesture; a second, even in the same click handler, waits
+	// on a "download multiple files" permission that is easy to miss and, once refused, drops the
+	// file without a word: in Chrome's default setting only the .inp arrived. So the three files travel in one archive.
+	// PKWARE APPNOTE 6.3.x: local headers, a central directory and its end record; deflated where
+	// the browser has CompressionStream('deflate-raw'), stored otherwise. Names flagged UTF-8 (bit
+	// 11), since safeFileName() keeps a non-Latin project name.
+	var zipCrcTable = null;
+	function zipCrc32(bytes) {
+		var c, n, k, crc = 0xffffffff;
+		if (!zipCrcTable) {
+			zipCrcTable = new Uint32Array(256);
+			for (n = 0; n < 256; n++) {
+				c = n;
+				for (k = 0; k < 8; k++) { c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1; }
+				zipCrcTable[n] = c >>> 0;
+			}
+		}
+		for (n = 0; n < bytes.length; n++) { crc = zipCrcTable[(crc ^ bytes[n]) & 0xff] ^ (crc >>> 8); }
+		return (crc ^ 0xffffffff) >>> 0;
+	}
+	function zipDeflate(bytes) {
+		if (typeof CompressionStream !== 'function') { return Promise.resolve(null); }
+		try {
+			return new Response(new Blob([bytes]).stream().pipeThrough(new CompressionStream('deflate-raw')))
+				.arrayBuffer().then(function (b) { return new Uint8Array(b); }, function () { return null; });
+		} catch (e) { return Promise.resolve(null); }
+	}
+	// files: [{ name, data: Uint8Array | string }]. Resolves to a Blob of type application/zip.
+	function buildZip(files) {
+		var enc = new TextEncoder(), now = new Date(),
+			dosTime = (now.getHours() << 11) | (now.getMinutes() << 5) | (now.getSeconds() >> 1),
+			dosDate = ((now.getFullYear() - 1980) << 9) | ((now.getMonth() + 1) << 5) | now.getDate();
+		var items = files.map(function (f) {
+			var raw = typeof f.data === 'string' ? enc.encode(f.data) : f.data;
+			return { name: enc.encode(f.name), raw: raw, crc: zipCrc32(raw) };
+		});
+		return Promise.all(items.map(function (it) { return zipDeflate(it.raw); })).then(function (packed) {
+			var parts = [], central = [], offset = 0, cdSize = 0;
+			items.forEach(function (it, i) {
+				var deflated = packed[i] && packed[i].length < it.raw.length, body = deflated ? packed[i] : it.raw,
+					head = new DataView(new ArrayBuffer(30)), cd = new DataView(new ArrayBuffer(46));
+				head.setUint32(0, 0x04034b50, true); head.setUint16(4, 20, true); head.setUint16(6, 0x0800, true);
+				head.setUint16(8, deflated ? 8 : 0, true); head.setUint16(10, dosTime, true); head.setUint16(12, dosDate, true);
+				head.setUint32(14, it.crc, true); head.setUint32(18, body.length, true); head.setUint32(22, it.raw.length, true);
+				head.setUint16(26, it.name.length, true); head.setUint16(28, 0, true);
+				cd.setUint32(0, 0x02014b50, true); cd.setUint16(4, 20, true); cd.setUint16(6, 20, true); cd.setUint16(8, 0x0800, true);
+				cd.setUint16(10, deflated ? 8 : 0, true); cd.setUint16(12, dosTime, true); cd.setUint16(14, dosDate, true);
+				cd.setUint32(16, it.crc, true); cd.setUint32(20, body.length, true); cd.setUint32(24, it.raw.length, true);
+				cd.setUint16(28, it.name.length, true); cd.setUint32(42, offset, true);
+				parts.push(head.buffer, it.name, body);
+				central.push(cd.buffer, it.name);
+				offset += 30 + it.name.length + body.length;
+				cdSize += 46 + it.name.length;
+			});
+			var end = new DataView(new ArrayBuffer(22));
+			end.setUint32(0, 0x06054b50, true); end.setUint16(8, items.length, true); end.setUint16(10, items.length, true);
+			end.setUint32(12, cdSize, true); end.setUint32(16, offset, true);
+			return new Blob(parts.concat(central, [end.buffer]), { type: 'application/zip' });
+		});
+	}
+	function downloadBlob(blob, name) {
+		var url = URL.createObjectURL(blob), a = document.createElement('a');
 		a.href = url;
-		a.download = safeFileName(projectDisplayName(project)) + '.inp';
+		a.download = name;
 		document.body.appendChild(a);
 		a.click();
 		document.body.removeChild(a);
 		setTimeout(function () { URL.revokeObjectURL(url); }, 10000);
-		// EXPORTING IS NOT SAVING. No stampProjectSaved() here, deliberately: an `.inp` cannot hold
-		// this document (scenarios, text sizes, a backdrop image), so a project that has only been
-		// exported still has unsaved changes and must keep saying so.
-		setNotice((pcX.lpn_status_inp_exported || 'Exported {file}.').replace('{file}', a.download) +
-			(out.differences && out.differences.length
-				? ' ' + (pcX.lpn_inp_export_differences || '{n} things the .inp format cannot hold.')
-					.replace('{n}', String(out.differences.length))
-				: ''));
-		showInpExportFlattening(out.differences, a.download);
+	}
+	// **THE PICTURE'S NAME IS PLAIN ASCII.** EPANET 2.2 desktop is a Delphi ANSI program: it reads
+	// the .inp's FILE line in the system code page, so a name outside it (Café-Ñandú-水) can leave
+	// EPANET looking for a file that is not there. Accents come off (NFD, combining marks dropped),
+	// anything else becomes a dash, and a name with no letter or digit left is "backdrop". The .inp
+	// and the .zip keep the project's own name; only what the FILE line names has to survive ANSI.
+	function asciiPictureBase(name) {
+		var s = String(name || '');
+		if (s.normalize) { s = s.normalize('NFD').replace(/[̀-ͯ]/g, ''); }
+		s = s.replace(/[^A-Za-z0-9._-]+/g, '-').replace(/-{2,}/g, '-').replace(/^[-.]+|[-.]+$/g, '');
+		return /[A-Za-z0-9]/.test(s) ? s : 'backdrop';
+	}
+	function exportInpFile() {
+		var pcX = EngCalcs.pageConfig || {}, base = safeFileName(projectDisplayName(project)),
+			picBase = asciiPictureBase(base);
+		saveToStorage();   // export what is on screen, including edits not yet saved
+		// Every name goes in by split/join, never String.replace(): a project named `a$&b {file}`
+		// would otherwise have its `$&` expanded, or its own `{file}` filled by the next replace.
+		// pic: an object (the picture, saved), null (no picture to save), false (a picture this
+		// page could not read back, or a .zip that could not be built, so it is said, and the .inp
+		// names none).
+		function finish(pic) {
+			var opts = inpExportOptions(), out, inpName = base + '.inp',
+				picName = picBase + '.bmp', worldName = picBase + '.bpw', zipName = base + '.zip';
+			if (pic) { opts.backdropFile = picName; }
+			out = EngCalcs.lpnExportInp(serializeProject(), opts);
+			if (!out || !out.ok) {
+				setNotice((pcX.lpn_inp_export_refused || 'This project cannot be written as an EPANET file: {detail}')
+					.split('{detail}').join((out && out.detail) || '?'));
+				return;
+			}
+			var nDiff = out.differences ? out.differences.length : 0,
+				tail = nDiff === 1 ? ' ' + (pcX.lpn_inp_export_difference_one || 'One thing the .inp format cannot hold.')
+					: nDiff ? ' ' + (pcX.lpn_inp_export_differences || '{n} things the .inp format cannot hold.').split('{n}').join(String(nDiff))
+					: '';
+			// EXPORTING IS NOT SAVING. No stampProjectSaved() here, deliberately: an `.inp` cannot hold
+			// this document (scenarios, text sizes, a backdrop image), so a project that has only been
+			// exported still has unsaved changes and must keep saying so.
+			if (!pic) {
+				downloadBlob(new Blob([out.inp], { type: 'text/plain' }), inpName);
+				setNotice((pic === false
+					? (pcX.lpn_status_inp_exported_no_picture || 'Exported {file}. The background picture could not be saved, so the .inp names none; in EPANET, add it with View > Backdrop > Load.')
+					: (pcX.lpn_status_inp_exported || 'Exported {file}.')).split('{file}').join(inpName) + tail);
+				showInpExportFlattening(out.differences, inpName);
+				return;
+			}
+			var built;
+			try {
+				built = buildZip([{ name: inpName, data: out.inp }, { name: picName, data: pic.bmp }, { name: worldName, data: pic.world }]);
+			} catch (e) { built = Promise.reject(e); }
+			built.then(function (zip) {
+				downloadBlob(zip, zipName);
+				// Each placeholder filled once: first marked by a control character (safeFileName()
+				// strips those from every name), then the marks filled. A name carrying another
+				// placeholder's token is therefore never filled a second time.
+				var tpl = pcX.lpn_status_inp_exported_picture || 'Exported {zip}, holding the EPANET file {file}, its background picture {picture}, and the world file {world}. Extract all three into one folder, then open the .inp there in EPANET; the picture comes with it.';
+				setNotice(tpl.split('{zip}').join('\u0001').split('{file}').join('\u0002')
+					.split('{picture}').join('\u0003').split('{world}').join('\u0004')
+					.split('\u0001').join(zipName).split('\u0002').join(inpName)
+					.split('\u0003').join(picName).split('\u0004').join(worldName) + tail);
+				showInpExportFlattening(out.differences, inpName);
+			}, function () {
+				// No archive, so no picture: the bare .inp, written again without a FILE line, and said.
+				finish(false);
+			});
+		}
+		backdropExportPicture(finish);
 	}
 	/**
 	 * **EXPORT GeoJSON (ROADMAP Task 728, Tom 2026-10-06, approving Mary's order: GeoJSON out
@@ -36704,6 +36935,40 @@ var EngCalcs = EngCalcs || {};
 					|| 'Text labels are placed as EPANET places them, from their top left corner.';
 				body.appendChild(anchorNote);
 			}
+			// **THE FILE NAMES A PICTURE AND SAYS WHERE IT GOES, SO OFFER TO ATTACH IT** (Task 282). A
+			// browser cannot open a file by path, so this is a picker and the name is only said. A file
+			// with no DIMENSIONS keeps today's route: the sentence below and Map, Background image.
+			var bdLi = null, lead, ul;
+			if (parsed.backdrop && parsed.backdrop.dimensions) {
+				var bdFile = String(parsed.backdrop.file).split(/[\\\/]/).pop(),
+					bdRow = document.createElement('p'), bdBtn = document.createElement('button'),
+					bdStatus = document.createElement('div');
+				bdRow.style.margin = '0 0 8px';
+				bdBtn.type = 'button';
+				bdBtn.textContent = (pc.lpn_inp_backdrop_attach || 'Attach {file}…').replace('{file}', bdFile);
+				// The tip is on `.ec-help` wrapping the button, as the Filter in table button does,
+				// and initTipsIn() arms it (EngCalcs.initTips() wires `.ec-help[title]` and nothing else).
+				bdBtn.className = 'ec-help';
+				bdBtn.title = pc.lpn_inp_backdrop_attach_tip || 'A web page cannot open the picture by its name. Choose it on your device and it is placed where the file says it belongs.';
+				bdStatus.setAttribute('role', 'status');
+				bdBtn.addEventListener('click', function () {
+					var pick = document.createElement('input');
+					pick.type = 'file'; pick.accept = 'image/*';
+					pick.addEventListener('change', function () {
+						var f = pick.files && pick.files[0];
+						if (f) { attachNamedBackdrop(parsed.backdrop, f, function (m) {
+								bdStatus.textContent = m;
+								// The file's own sentence says to add the picture by hand, which is now untrue.
+								if (bdLi && bdLi.parentNode) { bdLi.parentNode.removeChild(bdLi); }
+								if (ul && !ul.children.length) { if (ul.parentNode) { ul.parentNode.removeChild(ul); } if (lead.parentNode) { lead.parentNode.removeChild(lead); } }
+							}); }
+					});
+					pick.click();
+				});
+				bdRow.appendChild(bdBtn); bdRow.appendChild(bdStatus);
+				body.appendChild(bdRow);
+				initTipsIn(bdRow);
+			}
 			if (!byText.length) {
 				var ok = document.createElement('p');
 				ok.style.margin = '0';
@@ -36711,15 +36976,16 @@ var EngCalcs = EngCalcs || {};
 				body.appendChild(ok);
 				return;
 			}
-			var lead = document.createElement('p');
+			lead = document.createElement('p');
 			lead.style.margin = '0 0 6px';
 			lead.textContent = pc.lpn_inp_report_lead || 'This page does not use everything EPANET does, but nothing in your file is thrown away. Below is what your file holds that this page keeps without using, and what was changed when the file was read in:';
 			body.appendChild(lead);
-			var ul = document.createElement('ul');
+			ul = document.createElement('ul');
 			ul.style.margin = '0';
 			ul.style.paddingLeft = '20px';
 			byText.forEach(function (row) {
 				var li = document.createElement('li');
+				if (row.text === inpDropText('backdrop-not-embedded')) { bdLi = li; }
 				li.style.marginBottom = '4px';
 				li.textContent = row.ids.length ? row.text + ' (' + row.ids.join(', ') + ')' : row.text;
 				ul.appendChild(li);

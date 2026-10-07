@@ -238,17 +238,6 @@ the block.
   (`convert-as-fotobi-harness.js`, four paths, master and production 9c71d54f); ask which surface.
   BUILT on `feat/web-mercator`, awaiting his pass: EPSG:3857 is a real projected project in metres
   (his call, 2026-10-07: "Make 3857 real."), lengths on the ground, 4326 marked suggested.
-- 75|282| **Offer to attach the backdrop an imported `.inp` names.** An `.inp` (and a `.net`) stores
-  only a PATH to its background picture, never the picture. The import reports the file name and
-  tells the user to add it with Map, Backdrop; it could instead offer a picker right there, seeded
-  with that name, and set the map extent from the file's own `[BACKDROP] DIMENSIONS` so the image
-  lands registered rather than needing the two-point scale gesture. Low priority — a user who wants
-  the picture already knows where it is, and Map, Backdrop already works.
-  - **Worth more than it was, 2026-08-11.** The models Tom is collecting name BMP backdrops, which
-    browsers can actually display, so "the file it names is one you could hand over right now" has
-    gone from hypothetical to the common case. The registration half is the valuable half: an
-    `[BACKDROP] DIMENSIONS` record places the image in the model's own coordinates exactly, which
-    is strictly better than the two-point scale gesture a human would otherwise perform by eye.
 - 75|578| **Fire flow: the EPS frame and the Run concept, extracted from 530.**
   Everything else in Task 530 shipped and that task is closed. Two phases were never built and are
   kept here so they are not lost in a closed block.

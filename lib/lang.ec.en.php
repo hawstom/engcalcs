@@ -2064,11 +2064,14 @@ $ec_lang['lpn_file_export_menu']='Export…';
 $ec_lang['lpn_file_export_item_inp']='EPANET file…';
 $ec_lang['lpn_file_export_item_geojson']='GeoJSON file…';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_file_export_inp_tip']='Download this network as an EPANET .inp file. Anything the .inp format cannot hold is listed for you afterwards.';
+$ec_lang['lpn_file_export_inp_tip']='Download this network as an EPANET .inp file (in a zip file with its image if applicable). Anything the .inp format cannot hold is listed for you afterwards.';
 $ec_lang['lpn_status_inp_exported']='Exported {file}.';
+$ec_lang['lpn_status_inp_exported_picture']='Exported {zip}, holding the EPANET file {file}, its background picture {picture}, and the world file {world}. Extract all three into one folder, then open the .inp there in EPANET; the picture comes with it.';
+$ec_lang['lpn_status_inp_exported_no_picture']='Exported {file}. The background picture could not be saved, so the .inp names none; in EPANET, add it with View > Backdrop > Load.';
 // {n} is a whole number. Said plainly rather than hidden: a file that quietly loses a pump curve is
 // the failure this whole feature exists to prevent.
 $ec_lang['lpn_inp_export_differences']='{n} things the .inp format cannot hold.';
+$ec_lang['lpn_inp_export_difference_one']='One thing the .inp format cannot hold.';
 $ec_lang['lpn_inp_export_refused']='This project cannot be written as an EPANET file: {detail}';
 // GeoJSON export (Task 728). The command is worded like Export EPANET file. Positions in a GeoJSON
 // file are always longitude and latitude (RFC 7946), so a project with no place on the Earth is
@@ -2096,6 +2099,10 @@ $ec_lang['lpn_inp_report_label_anchor']='Text labels are placed as EPANET places
 // or no [BACKDROP] line at all, never only "None" -- because none of those states a real coordinate
 // system either. See showInpReport() in js/looped-network.js.
 $ec_lang['lpn_inp_report_no_crs']='EPANET files contain no coordinate system, so this file will not initially be georeferenced. To place it on a world map, use Map, World map… To convert its coordinates, use File, Convert as…';
+$ec_lang['lpn_inp_backdrop_attach']='Attach {file}…';
+$ec_lang['lpn_inp_backdrop_attach_tip']='A web page cannot open the picture by its name. Choose it on your device and it is placed where the file says it belongs.';
+$ec_lang['lpn_inp_backdrop_attached']='Attached {file}, placed where the file says it belongs.';
+$ec_lang['lpn_inp_backdrop_attached_other']='Attached {picked}, placed where the file says it belongs. The file names {file}, which is a different name.';
 $ec_lang['lpn_inp_report_lead']='This page does not use everything EPANET does, but nothing in your file is thrown away. Below is what your file holds that this page keeps without using, and what was changed when the file was read in:';
 $ec_lang['lpn_inp_drop_headloss']='This file does not use the Hazen-Williams formula. This page computes Hazen-Williams, so the pipe roughness numbers were kept exactly as written, but the answers here will not match the answers in EPANET.';
 $ec_lang['lpn_inp_drop_tank_curve']='These tanks are not straight-sided: the file gives their shape as a curve. The curve is kept in the Libraries box, the tank still refers to it, and an extended period simulation fills and empties the tank on the schedule that curve gives. A single instant is the same either way, because the water surface is the level the file sets. The diameter written in the file is kept beside the curve and is what a tank with no curve is drawn and solved as.';
