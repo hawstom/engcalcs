@@ -35685,8 +35685,10 @@ var EngCalcs = EngCalcs || {};
 		done({
 			ok: true, kind: 'grid', fwd: identity, unitLabel: unitSymbol('lpn_u_length'),
 			insunits: EngCalcs.lpnDxfInsUnits(u), measurement: u === 'm' ? 1 : 0,
+			// {unit} is the unit's own name (ft, m), not the page's translated symbol: the read-me is
+			// for a CAD program, and a translated symbol in a capitalized sentence read "IN 英尺".
 			note: (pc.lpn_dxf_note_grid || 'Coordinates: the X and Y of this project, in {unit}. No coordinate system is stated.')
-				.replace('{unit}', unitSymbol('lpn_u_length'))
+				.replace('{unit}', u)
 		});
 	}
 	function dxfCrsName(code) {
@@ -35697,10 +35699,27 @@ var EngCalcs = EngCalcs || {};
 	// the stored one otherwise, and '' for nothing at all. **VERBATIM** (dev/dxf-interface.md:
 	// *"values match the current project units and are imported verbatim"*): a number is stored in
 	// the displayed unit, so it goes out as stored, unrounded and unconverted.
+	//
+	// **AND AS TYPED** (pre-review 2026-10-07: Net3's 220.0 went out as 220, .1 as 0.1): a number
+	// read from a file keeps its own text beside it, and EngCalcs.lpnNumText() hands that text
+	// back while it still states this number, exactly as the .inp export writes it. The token is
+	// kept under the stored field's name, `_diameter` for an overridable property, `elev` for one
+	// that is not.
+	function dxfNum(rec, key, v) {
+		if (typeof v !== 'number' || !isFinite(v)) { return v === undefined || v === null || typeof v === 'number' ? '' : v; }
+		return EngCalcs.lpnNumText ? EngCalcs.lpnNumText(rec, key, v) : String(v);
+	}
 	function dxfVal(el, prop) {
 		var v = effective(el, prop);
 		if (v === undefined || v === null) { v = el[prop]; }
-		return (v === undefined || v === null || (typeof v === 'number' && !isFinite(v))) ? '' : v;
+		return dxfNum(el, ('_' + prop) in el ? '_' + prop : prop, v);
+	}
+	// **BASE DEMAND IS THE FIRST CATEGORY'S, AS TYPED**, as EPANET's [JUNCTIONS] demand column is,
+	// never a computed sum of categories. dxfModel() counts the junctions that have more.
+	function dxfBaseDemand(n) {
+		var rows = EngCalcs.lpnDemandRows ? EngCalcs.lpnDemandRows(n, effective(n, 'demand')) : null;
+		if (!rows || !rows.length) { return { text: dxfVal(n, 'demand'), more: false }; }
+		return { text: dxfNum(rows[0].rec, rows[0].key, rows[0].base), more: rows.length > 1 };
 	}
 	// The properties each block carries, by internal key. Data only: no solve results, which an
 	// import would have no property to put back into.
@@ -35739,13 +35758,14 @@ var EngCalcs = EngCalcs || {};
 		};
 	}
 	/** { tags: { type: [TAG...] }, prompts: { 'type.TAG': prompt }, tagOf(type, key) }. */
+	function dxfLocale() { return (document.documentElement && document.documentElement.lang) || ''; }
 	function dxfTagTable() {
-		var labels = dxfLabels(), tags = {}, prompts = {}, byKey = {};
+		var labels = dxfLabels(), tags = {}, prompts = {}, byKey = {}, loc = dxfLocale();
 		Object.keys(LPN_DXF_KEYS).forEach(function (t) {
 			var used = {};
 			byKey[t] = {};
 			tags[t] = LPN_DXF_KEYS[t].map(function (key) {
-				var L = labels[t + '.' + key] || labels[key], tag = EngCalcs.lpnDxfTag(L[0]) || key, n = 2, base = tag;
+				var L = labels[t + '.' + key] || labels[key], tag = EngCalcs.lpnDxfTag(L[0], loc) || key, n = 2, base = tag;
 				// Two labels can read alike in a translation; a tag must be unique in its block.
 				while (used[tag]) { tag = base + '_' + (n++); }
 				used[tag] = true;
@@ -35754,15 +35774,16 @@ var EngCalcs = EngCalcs || {};
 				return tag;
 			});
 		});
-		return { tags: tags, prompts: prompts, tagOf: function (t, key) { return byKey[t][key]; } };
+		var idTags = {};
+		Object.keys(byKey).forEach(function (t) { idTags[t] = byKey[t].ID; });
+		return { tags: tags, prompts: prompts, idTags: idTags, tagOf: function (t, key) { return byKey[t][key]; } };
 	}
 	function dxfNodeAttrs(n) {
 		var a = [['ID', n.id]];
 		if (n.type === 'junction') {
-			var d = baseDemandTotal(n);
-			a.push(['ELEV', dxfVal(n, 'elev')], ['DEMAND', (typeof d === 'number' && isFinite(d)) ? d : '']);
+			a.push(['ELEV', dxfVal(n, 'elev')], ['DEMAND', dxfBaseDemand(n).text]);
 		} else if (n.type === 'reservoir') {
-			a.push(['HEAD', nodeFixedHead(n)]);
+			a.push(['HEAD', dxfNum(n, '_head', nodeFixedHead(n))]);
 		} else if (n.type === 'tank') {
 			a.push(['ELEV', dxfVal(n, 'elev')], ['LEVEL', dxfVal(n, 'level')], ['MINLEVEL', dxfVal(n, 'minLevel')],
 				['MAXLEVEL', dxfVal(n, 'maxLevel')], ['DIAMETER', dxfVal(n, 'tankDiameter')]);
@@ -35785,6 +35806,25 @@ var EngCalcs = EngCalcs || {};
 	// into the drawing by `G`. The DXF export's one crossing of that boundary, so
 	// dev/lpn-spike/local-origin-harness.js counts it once.
 	function dxfDrawnToFile(G, x, y) { return G(outwardX(x), outwardY(y)); }
+	/**
+	 * **A SCENARIO'S LAYER CODE, ONE PER SCENARIO, AND NEVER BASE FOR ANOTHER** (pre-review
+	 * 2026-10-07). Every scenario is coded in the project's order so two names that encode alike
+	 * ("Fire flow" and "Fire-flow") are told apart: the later one takes _2, _3. A name with nothing
+	 * left after encoding takes its scenario ID.
+	 */
+	function dxfAlternative(sc) {
+		var used = { BASE: true }, out = 'BASE', loc = dxfLocale();
+		if (!sc || sc.isBase) { return 'BASE'; }
+		scenarios.forEach(function (x) {
+			if (x.isBase) { return; }
+			var base = EngCalcs.lpnDxfAlternative(x.name, loc) || EngCalcs.lpnDxfAlternative(x.id, loc) || 'S',
+				code = base, k = 2;
+			while (used[code]) { code = base + '_' + (k++); }
+			used[code] = true;
+			if (x.id === sc.id) { out = code; }
+		});
+		return out;
+	}
 	/** The whole model as js/lpn-dxf.js's plain model, in `frame`'s coordinates. */
 	function dxfModel(frame) {
 		var pc = EngCalcs.pageConfig || {}, G = frame.fwd, snap = serializeProject(),
@@ -35830,10 +35870,10 @@ var EngCalcs = EngCalcs || {};
 		// codes, and the scenario on screen as the alternative (BASE for Base). The whole network
 		// as that scenario has it is written; an overrides-only layer per alternative waits on
 		// Task 721, which owns the alternatives model.
-		var sc = activeScenario(), alternative = sc && !sc.isBase ? EngCalcs.lpnDxfAlternative(sc.name || sc.id) : 'BASE',
+		var alternative = dxfAlternative(activeScenario()),
 			codes = EngCalcs.lpnDxfAssetCodes(settings.idPrefixes),
 			readme = [projectDisplayName(project), frame.note,
-				(pc.lpn_dxf_note_blocks || 'Layers are named {prefix}, the asset code, and the alternative, as in {example}. Each element is a block inserted at scale 1 with attributes 1 unit high; scale the blocks to set the text height. Only the ID attribute is visible; the ATTDISP command shows the others.')
+				(pc.lpn_dxf_note_blocks || 'Layers are named {prefix}, the asset code, a hyphen, and the alternative, as in {example}. Each element is a block inserted at scale 1 with attributes 1 unit high; scale the blocks to set the text height. Only the ID attribute is visible; the ATTDISP command shows the others.')
 					.replace('{prefix}', EngCalcs.lpnDxfModelPrefix)
 					.replace('{example}', EngCalcs.lpnDxfModelPrefix + codes.junction + '-' + alternative)];
 		// **A VALUE TOO LONG FOR ONE DXF STRING IS SHORTENED, AND THE READ-ME SAYS SO** -- the writer
@@ -35842,13 +35882,19 @@ var EngCalcs = EngCalcs || {};
 		nodes.concat(links, customers).forEach(function (el) {
 			(el.attrs || []).forEach(function (a) { if (EngCalcs.lpnDxfTooLong(a.value)) { longOnes++; } });
 		});
+		// More than one demand category: BASE_DEMAND holds the first only, and the read-me says so.
+		var multi = doc.nodes.filter(function (n) { return n.type === 'junction' && dxfBaseDemand(n).more; }).length;
+		if (multi) {
+			readme.push((pc.lpn_dxf_note_categories || '{n} junctions have more than one demand category. Their {tag} attribute holds the first category only.')
+				.replace('{n}', String(multi)).replace('{tag}', tt.tagOf('junction', 'DEMAND')));
+		}
 		if (longOnes) {
 			readme.push((pc.lpn_dxf_note_shortened || '{n} values were longer than a DXF file allows ({max} characters), so each was shortened and ends in three periods.')
 				.replace('{n}', String(longOnes)).replace('{max}', String(EngCalcs.lpnDxfLimit)));
 		}
 		return {
 			insunits: frame.insunits, measurement: frame.measurement,
-			codes: codes, alternative: alternative,
+			codes: codes, alternative: alternative, locale: dxfLocale(), idTags: tt.idTags,
 			nodes: nodes, links: links, customers: customers, readme: readme,
 			tags: tt.tags, prompts: tt.prompts
 		};

@@ -134,6 +134,8 @@ function structural(d, label) {
 }
 
 function numStr(v) { return v === undefined || v === null ? '' : String(v); }
+// The text a number was typed as, where the file kept it (rec.tok), else its plain rendering.
+function typed(rec, key, v) { const t = rec && rec.tok ? rec.tok[key] : undefined; return typeof t === 'string' && parseFloat(t) === v ? t : numStr(v); }
 
 function openExample(file) {
 	const json = JSON.parse(fs.readFileSync(path.join(__dirname, '../water-network-examples', file), 'utf8'));
@@ -291,8 +293,9 @@ async function main() {
 	e1.filter(e => e.type === 'INSERT' && e.layer === LAY.pipe).forEach(ins => {
 		const l = snap1.links.find(x => x.id === ins.attribs.ID);
 		if (!l) { pipeBad.push('no pipe ' + ins.attribs.ID); return; }
-		[[T.DIAMETER, l._diameter], [T.LENGTH, l._length], [T.ROUGHNESS, l._roughness]].forEach(([t, v]) => {
-			if (ins.attribs[t] !== numStr(v)) { pipeBad.push(l.id + '.' + t + '=' + ins.attribs[t] + ' want ' + v); }
+		[[T.DIAMETER, '_diameter'], [T.LENGTH, '_length'], [T.ROUGHNESS, '_roughness']].forEach(([t, k]) => {
+			const v = typed(l, k, l[k]);
+			if (ins.attribs[t] !== v) { pipeBad.push(l.id + '.' + t + '=' + ins.attribs[t] + ' want ' + v); }
 		});
 		if ('FLOW' in ins.attribs || 'VELOCITY' in ins.attribs) { pipeBad.push(l.id + ' carries a result'); }
 	});
@@ -320,6 +323,67 @@ async function main() {
 			lay2.has('C-WATR-MODL-L___-FIRE_FLOW_2030'), [...lay2].join(' '));
 		Object.assign(st.idPrefixes, keep);
 		L.switchScenario(L.baseScenario().id);
+	}
+
+	console.log('--- pre-review 2026-10-07: D1, the ID is found by property, not by its English tag ---');
+	{
+		const keepId = PC.lpn_field_id;
+		PC.lpn_field_id = 'المعرف';
+		const ents = entities(readDxf(L.dxfExportText(out1.frame).text)).filter(e => e.type === 'INSERT' && e.layer !== 'C-WATR-RDME');
+		const vis = ents.map(e => e.attribEnts.filter(a => g(a, 70) === '0').map(a => g(a, 2)));
+		ok('D1: with the ID label in Arabic, every block still has exactly one visible attribute, the translated ID',
+			vis.length > 0 && vis.every(v => v.length === 1 && v[0] === global.EngCalcs.lpnDxfString('المعرف')), JSON.stringify(vis.slice(0, 2)));
+		PC.lpn_field_id = keepId;
+	}
+
+	console.log('--- D2: scenario names in any script, told apart, never BASE ---');
+	{
+		const layersOf = () => new Set(entities(readDxf(L.dxfExportText(out1.frame).text)).map(e => e.layer));
+		const rdOf = () => Object.values(entities(readDxf(L.dxfExportText(out1.frame).text)).find(e => e.layer === 'C-WATR-RDME').attribs);
+		L.createScenario('Пожар');
+		const cyr = 'C-WATR-MODL-J___-' + global.EngCalcs.lpnDxfString('ПОЖАР');
+		ok('D2: "Пожар" is written on ' + cyr + ', not -BASE', layersOf().has(cyr) && ![...layersOf()].some(n => /-BASE$/.test(n)), [...layersOf()].join(' '));
+		ok('D2: ...and the read-me example names that layer', rdOf().some(t => t.indexOf(cyr) >= 0));
+		L.createScenario('Débit max');
+		ok('D2: "Débit max" keeps its accent (DÉBIT_MAX, one Windows-1252 byte)', layersOf().has('C-WATR-MODL-J___-D\xc9BIT_MAX'), [...layersOf()].join(' '));
+		L.createScenario('Fire flow');
+		L.createScenario('Fire-flow');
+		ok('D2: two names that encode alike are told apart (FIRE_FLOW, then FIRE_FLOW_2)', layersOf().has('C-WATR-MODL-J___-FIRE_FLOW_2'), [...layersOf()].join(' '));
+		L.createScenario('!!!');
+		ok('D2: a name with nothing left after encoding takes its scenario ID, not BASE',
+			[...layersOf()].some(n => /^C-WATR-MODL-J___-S\d+$/.test(n)), [...layersOf()].join(' '));
+		L.switchScenario(L.baseScenario().id);
+	}
+
+	console.log('--- D3: values as typed, and Base demand the first category ---');
+	{
+		const n = L.nodeById('10');
+		const keep = { d: n._demand, tok: n.tok, extra: n.extraDemands };
+		n._demand = 150; n.tok = Object.assign({}, n.tok || {}, { _demand: '150.0' }); n.extraDemands = [{ base: 25 }];
+		const ents = entities(readDxf(L.dxfExportText(out1.frame).text));
+		const ins = ents.find(e => e.type === 'INSERT' && e.layer === LAY.junction && e.attribs.ID === '10');
+		ok('D3: BASE_DEMAND is the first category as typed ("150.0"), not the sum 175', ins.attribs[T.DEMAND] === '150.0', ins.attribs[T.DEMAND]);
+		const rd = Object.values(ents.find(e => e.layer === 'C-WATR-RDME').attribs);
+		ok('D3: the read-me says one junction has more than one category, in capitals',
+			rd.indexOf(global.EngCalcs.lpnDxfString(PC.lpn_dxf_note_categories.replace('{n}', '1').replace('{tag}', 'BASE_DEMAND').toUpperCase())) >= 0, rd.join(' | '));
+		n._demand = keep.d; n.tok = keep.tok; if (keep.extra) { n.extraDemands = keep.extra; } else { delete n.extraDemands; }
+	}
+
+	console.log('--- minor: Turkish capitals, an upright pump ID ---');
+	{
+		ok('a Turkish tag is upper-cased in the Turkish locale (DERİNLİĞİ)', global.EngCalcs.lpnDxfTag('derinliği', 'tr') === 'DERİNLİĞİ');
+		const keepL = global.document.documentElement.lang, keepLab = PC.lpn_field_tank_level;
+		global.document.documentElement.lang = 'tr'; PC.lpn_field_tank_level = 'Su derinliği';
+		const ents = entities(readDxf(L.dxfExportText(out1.frame).text));
+		ok('...and the export passes the page language through', ents.some(e => e.attribs[global.EngCalcs.lpnDxfString('SU_DERİNLİĞİ')] !== undefined));
+		global.document.documentElement.lang = keepL; PC.lpn_field_tank_level = keepLab;
+		const d = readDxf(global.EngCalcs.lpnDxfWrite({
+			nodes: [], tags: { pump: ['ID'] }, idTags: { pump: 'ID' },
+			links: [{ id: 'P1', type: 'pump', pts: [{ x: 10, y: 0 }, { x: 0, y: 0 }], attrs: [{ tag: 'ID', value: 'P1' }] }]
+		}));
+		const ins = d.sections.ENTITIES.find(e => e.type === 'INSERT'), at = d.sections.ENTITIES.find(e => e.type === 'ATTRIB');
+		ok('a pump drawn right to left: its block faces 180, its ID reads at 0, right- and top-justified',
+			+g(ins, 50) === 180 && +(g(at, 50) || 0) === 0 && g(at, 72).trim() === '2' && g(at, 74).trim() === '3', [g(ins, 50), g(at, 50), g(at, 72), g(at, 74)].join(','));
 	}
 
 	console.log('--- strings the user typed reach the file literally ---');
@@ -399,6 +463,19 @@ async function main() {
 		if (ins.attribs[T.ELEV] !== numStr(n.elev)) { attr3.push(n.id + ' ELEVATION ' + ins.attribs[T.ELEV]); }
 	});
 	ok('Net3-World: junction elevations equal the model', attr3.length === 0, attr3.slice(0, 3).join('; '));
+	{
+		const p204 = e3.find(e => e.type === 'INSERT' && e.layer === LAY.pipe && e.attribs.ID === '204');
+		ok('D3: Net3 pipe 204\'s LENGTH is written as the file typed it, "4530."', p204 && p204.attribs[T.LENGTH] === '4530.', p204 && p204.attribs[T.LENGTH]);
+		let tokBad = 0, tokSeen = 0;
+		e3.filter(e => e.type === 'INSERT' && e.layer === LAY.pipe).forEach(ins => {
+			const l = snap3.links.find(x => x.id === ins.attribs.ID);
+			[[T.DIAMETER, '_diameter'], [T.LENGTH, '_length'], [T.ROUGHNESS, '_roughness']].forEach(([t, k]) => {
+				if (l.tok && l.tok[k]) { tokSeen++; }
+				if (ins.attribs[t] !== typed(l, k, l[k])) { tokBad++; }
+			});
+		});
+		ok('D3: every Net3 pipe value is its typed token where the file kept one (' + tokSeen + ' tokens)', tokSeen > 0 && tokBad === 0, tokBad);
+	}
 	{
 		const ci = e3.filter(e => e.type === 'INSERT' && e.layer === LAY.customer),
 			cl = e3.filter(e => e.type === 'LWPOLYLINE' && e.layer === LAY.customer);

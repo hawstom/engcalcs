@@ -148,13 +148,20 @@ function checkDrawing(label, out, geo) {
 	const attribs = ents.filter((e) => e.type === 'ATTRIB');
 	const attdefs = blocks.filter((e) => e.type === 'ATTDEF');
 	ok(label + ': blocks inserted, attributes attached', inserts.length > 0 && attribs.length > 0, inserts.length + ' inserts, ' + attribs.length + ' attributes');
-	const model = attribs.filter((e) => get(e, 8) !== 'C-WATR-RDME');
-	const ids = model.filter((e) => get(e, 2) === 'ID'), rest = model.filter((e) => get(e, 2) !== 'ID');
+	// The ID is each block's FIRST attribute, whatever its tag says: on an Arabic page the tag is
+	// the translated label (pre-review 2026-10-07, D1: there every attribute came out invisible).
+	const ids = [], rest = [];
+	let first = false;
+	ents.forEach((e) => {
+		if (e.type === 'INSERT') { first = get(e, 8) !== 'C-WATR-RDME'; return; }
+		if (e.type !== 'ATTRIB' || get(e, 8) === 'C-WATR-RDME') { return; }
+		(first ? ids : rest).push(e); first = false;
+	});
 	ok(label + ': every ID attribute is visible (70 = 0)', ids.length > 0 && ids.every((e) => (+get(e, 70) & 1) === 0), ids.length + ' IDs');
 	ok(label + ': every other attribute is invisible (70 = 1)', rest.length > 0 && rest.every((e) => (+get(e, 70) & 1) === 1), rest.length + ' others');
 	ok(label + ': every tag and block name is in capitals', attribs.concat(attdefs).every((e) => get(e, 2) === get(e, 2).toUpperCase()) &&
 		inserts.every((e) => get(e, 2) === get(e, 2).toUpperCase()));
-	ok(label + ': ELEVATION is a tag (the property label, in capitals)', attribs.some((e) => get(e, 2) === 'ELEVATION'));
+	if (!out.lang) { ok(label + ': ELEVATION is a tag (the property label, in capitals)', attribs.some((e) => get(e, 2) === 'ELEVATION')); }
 	let curLayer = null, badLayer = 0;
 	ents.forEach((e) => { if (e.type === 'INSERT') { curLayer = get(e, 8); } else if (e.type === 'ATTRIB' && get(e, 8) !== curLayer) { badLayer++; } });
 	ok(label + ': each attribute is on its block\'s own layer', badLayer === 0, badLayer + ' not');
@@ -175,6 +182,9 @@ function checkDrawing(label, out, geo) {
 		ok(label + ': and so does the status line (lpn_dxf_exported_geo)', /UTM zone/.test(out.notice) && has(out.notice, out.words.status), out.notice);
 	} else {
 		ok(label + ': the status line names the file', out.notice.indexOf(out.name) >= 0, out.notice);
+	}
+	if (out.lang === 'zh') {
+		ok(label + ': the read-me states the unit as ft, not the page\'s translated symbol', / IN FT\. /.test(notes), notes.slice(0, 200));
 	}
 	ok(label + ': the read-me names the layer pattern', /C-WATR-MODL-J___-BASE/.test(notes), notes.slice(0, 400));
 	const tmp = path.join(require('os').tmpdir(), NAME + '-' + process.pid + '-' + label.replace(/\W+/g, '_') + '.dxf');
@@ -197,20 +207,23 @@ async function main() {
 	if (!executablePath) { console.error(NAME + ': no Chromium found. SKIPPING.'); if (!BASE) { env.stopServer(); } process.exit(0); }
 	const browser = await chromium.launch({ executablePath });
 	try {
-		for (const c of [{ card: 'lpn_ex_net1_title', label: 'Net1', geo: false }, { card: 'lpn_ex_net3_world_title', label: 'Net3 lat/lon', geo: true }]) {
+		for (const c of [{ card: 'lpn_ex_net1_title', label: 'Net1', geo: false }, { card: 'lpn_ex_net3_world_title', label: 'Net3 lat/lon', geo: true },
+			{ card: 'lpn_ex_net1_title', label: 'Net1 (ar)', geo: false, lang: 'ar' }, { card: 'lpn_ex_net1_title', label: 'Net1 (zh)', geo: false, lang: 'zh' }]) {
+			const q = 'Looped-Network.php?ec_nolog=1' + (c.lang ? '&lang=' + c.lang : '');
 			console.log('\n--- ' + c.label + (BASE ? ' at ' + BASE : '') + ' ---');
 			const a = await Session.open(browser, NAME, { viewport: { width: 1400, height: 900 }, acceptDownloads: true });
 			await a.page.route(/tile\.openstreetmap\.org|api\.mapbox\.com|nominatim/, (route) => route.abort());
 			if (BASE) {
-				await a.page.goto(BASE.replace(/\/?$/, '/') + 'Looped-Network.php?ec_nolog=1', { waitUntil: 'load' });
+				await a.page.goto(BASE.replace(/\/?$/, '/') + q, { waitUntil: 'load' });
 				await a.settle(1500);
 			} else {
-				await a.goto('Looped-Network.php?ec_nolog=1');
+				await a.goto(q);
 			}
 			await a.answerTrainingPanel().catch(() => {});
 			await a.page.evaluate(() => { const k = document.getElementById('ec-consent'); if (k) { k.remove(); } delete window.lpnDialogAnswerer; });
 			await a.settle(800);
 			const out = await exportOnce(a, c.card);
+			out.lang = c.lang || '';
 			checkDrawing(c.label, out, c.geo);
 			ok(c.label + ': no uncaught page errors', a.errors.length === 0, a.errors.slice(0, 2).join(' | ').slice(0, 400));
 			await a.close();

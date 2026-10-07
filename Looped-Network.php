@@ -2117,6 +2117,7 @@ EngCalcs.pageConfig = {
 	lpn_dxf_export_failed: <?=json_encode($ec_lang['lpn_dxf_export_failed'])?>,
 	lpn_dxf_exported_geo: <?=json_encode($ec_lang['lpn_dxf_exported_geo'])?>,
 	lpn_dxf_note_blocks: <?=json_encode($ec_lang['lpn_dxf_note_blocks'])?>,
+	lpn_dxf_note_categories: <?=json_encode($ec_lang['lpn_dxf_note_categories'])?>,
 	lpn_find_menu: <?=json_encode($ec_lang['lpn_find_menu'])?>,
 	lpn_find_scope: <?=json_encode($ec_lang['lpn_find_scope'])?>,
 	lpn_find_scope_all: <?=json_encode($ec_lang['lpn_find_scope_all'])?>,

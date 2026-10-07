@@ -81,10 +81,18 @@
 		}
 		return out;
 	}
-	/** An alternative's name as the part of a layer name after the asset code. */
-	function alternativeCode(name) {
-		var c = String(name || '').toUpperCase().replace(/[^A-Z0-9_]+/g, '_').replace(/^_+|_+$/g, '');
-		return c || 'BASE';
+	/**
+	 * An alternative's name as the part of a layer name after the asset code: capitals in the
+	 * page's locale, letters and digits of ANY script kept (pre-review 2026-10-07: "Пожар" fell back
+	 * to BASE and "Débit max" became D_BIT_MAX), every run of anything else one underscore. A
+	 * character Windows-1252 lacks reaches the file as \U+XXXX through str(), like every string:
+	 * ezdxf's "DXF File Encoding" gives that schema for R2000-R2004 files and says the R2000
+	 * extended symbol names take it; AutoCAD's EXTNAMES = 1 (the AutoCAD 2000 rules) allows a name
+	 * up to 255 characters with "any special characters not used by Microsoft Windows and AutoCAD
+	 * for other purposes". Returns '' when nothing is left; the caller chooses then, never BASE.
+	 */
+	function alternativeCode(name, locale) {
+		return caps(name, locale).replace(/[^\p{L}\p{N}_]+/gu, '_').replace(/^_+|_+$/g, '');
 	}
 	var BLOCK_OF = {
 		junction: 'WATR_JUNCTION', reservoir: 'WATR_RESERVOIR', tank: 'WATR_TANK',
@@ -111,11 +119,18 @@
 	// The ID is the one VISIBLE attribute of an element (Tom, 2026-10-06); every other one is
 	// invisible until ATTDISP ON. Every line of the read-me is visible.
 	var VISIBLE_TAG = 'ID';
-	function caps(v) { return String(v === undefined || v === null ? '' : v).toUpperCase(); }
-	// A layer or block NAME: upper case, the one escape, then the characters the DXF Reference
-	// forbids in a symbol-table name (< > / \ " : ; ? * | = `) made underscores.
+	// Capitals in the page's locale, so Turkish "derinliği" is DERİNLİĞİ, not DERINLIĞI.
+	var LOCALE = '';
+	function caps(v, locale) {
+		var s = String(v === undefined || v === null ? '' : v), loc = locale || LOCALE;
+		if (loc) { try { return s.toLocaleUpperCase(loc); } catch (e) { /* an unknown tag: plain */ } }
+		return s.toUpperCase();
+	}
+	// A layer or block NAME: upper case, the characters the DXF Reference forbids in a
+	// symbol-table name (< > / \ " : ; ? * | = `) made underscores, then the one escape. In that
+	// order, so the backslash of a \U+XXXX escape survives.
 	function tableName(v) {
-		return str(caps(v)).replace(/\\U\+005C/g, '_').replace(/[<>\/\\":;?*|=`]/g, '_');
+		return str(caps(v).replace(/[<>\/\\":;?*|=`]/g, '_'));
 	}
 	// **PLAIN ASCII QUOTES** in what this file composes (Tom: *"Don't use fancy quotes in the
 	// README."*): a translation's typographic quotes become ' and ".
@@ -194,7 +209,7 @@
 	// An attribute TAG: upper case, and no spaces or exclamation points, which AutoCAD's ATTDEF
 	// refuses in a tag (dev/dxf-interface.md: *"spaces can be replaced with underscores or
 	// hyphens"*; underscores are used).
-	function tagName(v) { return caps(v).trim().replace(/\s+/g, '_').replace(/!/g, ''); }
+	function tagName(v, locale) { return caps(v, locale).trim().replace(/\s+/g, '_').replace(/!/g, ''); }
 
 	// ---- THE WRITER ---------------------------------------------------------------------------------
 	function Writer() { this.lines = []; this.next = 0x20; }
@@ -211,6 +226,10 @@
 	 *   insunits, measurement (0 imperial, 1 metric),
 	 *   layerPrefix: replaces MODEL_PREFIX ('C-WATR-MODL-'),
 	 *   codes: { junction: 'J___', ... } (assetCodes()), alternative: 'BASE',
+	 *   locale: the page's language, for capitals ('tr' upper-cases i as İ),
+	 *   idTags: { junction: 'ID', ... } -- each block's ID tag, which is its VISIBLE attribute. By
+	 *     property, not by text: a translated label is not "ID" (pre-review 2026-10-07: in ar, fa,
+	 *     he, km, sw and am every attribute came out invisible).
 	 *   nodes:     [{ id, type, x, y, attrs: [{ tag, value }] }],
 	 *   links:     [{ id, type, pts: [{x, y}...], attrs }]    -- each gets its block at mid-run
 	 *   customers: [{ id, x, y, from: {x, y} | null, attrs }]
@@ -221,14 +240,16 @@
 	 * Returns the DXF text.
 	 */
 	function writeDxf(model) {
+		LOCALE = model.locale || '';
 		var w = new Writer(), pfx = model.layerPrefix === undefined ? MODEL_PREFIX : model.layerPrefix,
-			codes = model.codes || assetCodes(null), alt = alternativeCode(model.alternative),
+			codes = model.codes || assetCodes(null), alt = alternativeCode(model.alternative) || 'BASE',
+			idTags = model.idTags || {},
 			ext = { x0: Infinity, y0: Infinity, x1: -Infinity, y1: -Infinity },
 			H = {}, blockRec = {}, blockTypes = [], tags = {}, i,
 			readme = (model.readme || []).map(function (s) { return caps(plainQuotes(s)); });
 		function layerOf(type) { return tableName(pfx + (codes[type] || codeOf(DEFAULT_PREFIX[TYPE_KEY[type]])) + '-' + alt); }
 		Object.keys(BLOCK_OF).forEach(function (t) {
-			tags[t] = ((model.tags && model.tags[t]) || []).map(tagName);
+			tags[t] = ((model.tags && model.tags[t]) || []).map(function (x) { return tagName(x); });
 		});
 		tags.readme = readme.map(function (s, k) { return 'NOTE_' + (k + 1); });
 		function grow(x, y) {
@@ -282,7 +303,7 @@
 			var r = type === 'tank' ? 1.5 : (type === 'reservoir' ? 1.4 : (type === 'pump' || type === 'valve' ? 1 : (type === 'pipe' ? 0.25 : 0.5)));
 			return { x: r + 0.25, y: -k * 1.5 };
 		}
-		function visible(type, tag) { return type === 'readme' || tag === VISIBLE_TAG; }
+		function visible(type, tag) { return type === 'readme' || tag === tagName(idTags[type] || VISIBLE_TAG); }
 		// INSERT scale 1: an attribute is 1 high in the block and so 1 high in the drawing, and
 		// scaling the insertion is how a CAD user brings it to the height they plot at.
 		function insert(type, x, y, rot, values, layer) {
@@ -295,17 +316,26 @@
 			if (rot) { body.g(50, num(rot)); }
 			if (!tg.length) { return; }
 			c = Math.cos((rot || 0) * Math.PI / 180); s = Math.sin((rot || 0) * Math.PI / 180);
+			// **TEXT READS UPRIGHT.** A pump or valve on a link drawn right to left is inserted at
+			// 90-270 degrees; its attributes turn a half circle and are right- and top-justified on the
+			// same point (72 = 2 with the alignment point 11, DXF Reference TEXT; 74 = 3 below), so they cover the
+			// same place, reading left to right. The symbol itself keeps the link's direction.
+			var r = (((rot || 0) % 360) + 360) % 360, flip = r > 90 && r < 270;
 			for (k = 0; k < tg.length; k++) {
 				var o = attrOffset(k, type), v = values[tg[k]];
 				// An ATTRIB is stored in the drawing's own coordinates, already through the INSERT,
 				// and on the INSERT's layer: its ATTDEF is on layer 0, which AutoCAD resolves to the
 				// insert's layer, so freezing an element's layer hides its attributes with it.
 				entity('ATTRIB', layer, ins);
-				body.g(100, 'AcDbText').g(10, num(x + o.x * c - o.y * s)).g(20, num(y + o.x * s + o.y * c)).g(30, '0.0')
+				var ax = x + o.x * c - o.y * s, ay = y + o.x * s + o.y * c;
+				body.g(100, 'AcDbText').g(10, num(ax)).g(20, num(ay)).g(30, '0.0')
 					.g(40, '1.0').g(1, str(v === undefined || v === null ? '' : v));
-				if (rot) { body.g(50, num(rot)); }
+				if (flip) { body.g(50, num(r - 180)).g(72, 2).g(11, num(ax)).g(21, num(ay)).g(31, '0.0'); } else if (rot) { body.g(50, num(rot)); }
 				// Flag 1 = invisible.
 				body.g(100, 'AcDbAttribute').g(2, str(tg[k])).g(70, visible(type, tg[k]) ? 0 : 1);
+				// Top-justified (ATTRIB 74 = 3, TEXT's 73) so the turned text hangs on the side of
+				// the line the upright text stood on.
+				if (flip) { body.g(74, 3); }
 			}
 			var seq = body.handle();
 			body.g(0, 'SEQEND').g(5, seq).g(330, ins).g(100, 'AcDbEntity').g(8, layer);

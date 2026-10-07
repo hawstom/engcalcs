@@ -24,29 +24,39 @@ and the reasons for R2000 and attributed blocks: `dev/agents/market-researcher/a
     C___ (customer) by default. If any type's prefix is empty, or two types would share a code, the
     built-in set is used for all.
   - The alternative is `BASE` on Base; on another scenario it is that scenario's name in capitals
-    (spaces made `_`), and the whole network as that scenario has it is written. An overrides-only
+    (page locale), letters and digits of any script kept, every other run made `_`, and the whole
+    network as that scenario has it is written. A character Windows-1252 lacks goes out as
+    `\U+XXXX` (ezdxf, "DXF File Encoding": the R2000-R2004 schema, which the R2000 extended symbol
+    names take; AutoCAD EXTNAMES = 1 allows any character "not used by Microsoft Windows and AutoCAD
+    for other purposes"). Every scenario is coded in project order, so two names that encode alike
+    get `_2`, `_3`; a name with nothing left takes its scenario ID. Never `BASE` for a non-Base
+    scenario. An overrides-only
     layer per alternative, as the spec's `R___-0012` describes, waits on Task 721.
   - Each element's attributes are on its block's layer (ATTDEF on layer 0, which resolves to the
     insert's layer), so freezing a layer hides an asset type with its attributes.
   - The read-me is on `C-WATR-RDME`, outside the model prefix so an import never reads it as an
     asset; ACI 7 (white), not plotted (290 = 0).
 - **ALL CAPS** (Tom: *"ALL CAPS in AutoCAD."*): layer names, block names, tags, prompts and the
-  read-me. Attribute values are the user's data and stay as typed.
+  read-me, upper-cased in the page's locale (Turkish DERİNLİĞİ). Attribute values are the user's data and stay as typed.
 - **Tags are the property labels** in the page's language, capitals, spaces made `_` (AutoCAD
   refuses spaces and `!` in a tag): ELEVATION, BASE_DEMAND, HEAD, WATER_DEPTH, LOWEST_WATER_DEPTH,
   HIGHEST_WATER_DEPTH, TANK_DIAMETER, DIAMETER, LENGTH, ROUGHNESS, VALVE_TYPE, SETTING,
-  NUMBER_OF_SERVICES, TAG, DESCRIPTION, plus ID. A clash within one block gets `_2`. The prompt is
+  NUMBER_OF_SERVICES, TAG, DESCRIPTION, plus ID. A clash within one block gets `_2`. The visible
+  ID attribute is found by property, never by the text "ID", which a translation changes. The prompt is
   the label with its unit. No solve results (an import has no property for them).
-- **Values verbatim** in the project's display units, unrounded (CLAUDE.md: only the user touches
-  a file's numbers).
+- **Values verbatim** in the project's display units, as typed: `EngCalcs.lpnNumText()` hands back
+  a number's kept token (Net3's `4530.`), as the `.inp` export does (CLAUDE.md: only the user
+  touches a file's numbers). BASE_DEMAND is the first demand category's, as EPANET's [JUNCTIONS]
+  column is, never a sum; the read-me counts junctions with more categories.
 - **Attribute height 1, INSERT scale 1** (Tom: *"attribute height is 1 so that user can scale the
   blocks to their standards"*). Block geometry is in the same unit: a junction is 1 across, a tank
   3. The file therefore no longer depends on the map's zoom or text size.
 - **The ID attribute is visible; every other is invisible** (flag 1; Tom, 2026-10-06). Every
-  read-me line is visible.
+  read-me line is visible. A pump or valve inserted at 90-270 degrees turns its attributes a half
+  circle, right- and top-justified on the same point, so they read upright.
 - **Read-me**: one WATR_README block, one attribute per line (NOTE_1...): project name; the
-  coordinate statement; the layer pattern, scale-1 and ATTDISP note; and, if any, how many values
-  were shortened. Plain ASCII quotes (Tom: *"Don't use fancy quotes in the README."*).
+  coordinate statement (a grid project's unit as its English name, ft or m); the layer pattern, scale-1 and ATTDISP note; and, if any, how many values
+  were shortened, and how many junctions have more than one demand category. Plain ASCII quotes (Tom: *"Don't use fancy quotes in the README."*).
 - **Text style Standard on `txt`** (group 3, the STYLE record's primary font file). It was blank,
   and AutoCAD showed the text in Arial while editing (Tom, 2026-10-07, TEDIT); `txt` is what
   AutoCAD writes for Standard. No entity names a style (group 7 defaults to STANDARD).

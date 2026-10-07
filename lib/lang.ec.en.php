@@ -2065,16 +2065,18 @@ $ec_lang['lpn_dxf_export_failed']='The DXF file was not written: an error in thi
 // The read-me written into the file as a block of attributes, on a layer that does not plot; the
 // file writes it in capital letters. Each says what
 // the coordinates are and claims no coordinate system the file does not have. {unit} is a length
-// unit symbol; {crs} is a coordinate system name with its EPSG code.
+// unit as written in English (ft, m), not translated; {crs} is a coordinate system name with its EPSG code.
 $ec_lang['lpn_dxf_note_grid']='Coordinates: the X and Y of this project, in {unit}. No coordinate system is stated.';
 $ec_lang['lpn_dxf_note_crs']='Coordinates: {crs}, exactly as this project states them.';
 $ec_lang['lpn_dxf_note_geo']='Coordinates: {crs}, in meters, not latitude and longitude. The latitudes and longitudes of the project were converted to that grid.';
 $ec_lang['lpn_dxf_exported_geo']='Exported {file}. Its coordinates are {crs}, in meters, not latitude and longitude.';
 // {prefix} is the layer-name prefix, C-WATR-MODL-; {example} is a whole layer name such as
 // C-WATR-MODL-J___-BASE. ATTDISP is an AutoCAD command name: keep it in Latin capitals.
-$ec_lang['lpn_dxf_note_blocks']='Layers are named {prefix}, the asset code, and the alternative, as in {example}. Each element is a block inserted at scale 1 with attributes 1 unit high; scale the blocks to set the text height. Only the ID attribute is visible; the ATTDISP command shows the others.';
-// {n} is a whole number; {max} is 2049. The ellipsis is the character the shortened value ends in.
+$ec_lang['lpn_dxf_note_blocks']='Layers are named {prefix}, the asset code, a hyphen, and the alternative, as in {example}. Each element is a block inserted at scale 1 with attributes 1 unit high; scale the blocks to set the text height. Only the ID attribute is visible; the ATTDISP command shows the others.';
+// {n} is a whole number; {max} is 2049. Each shortened value ends in three periods (...).
 $ec_lang['lpn_dxf_note_shortened']='{n} values were longer than a DXF file allows ({max} characters), so each was shortened and ends in three periods.';
+// {n} is a whole number; {tag} is an attribute tag in capitals, BASE_DEMAND in English.
+$ec_lang['lpn_dxf_note_categories']='{n} junctions have more than one demand category. Their {tag} attribute holds the first category only.';
 $ec_lang['lpn_inp_bad_file']='That file could not be read as an EPANET network file.';
 // EPANET has two file formats. This one is about the BINARY .net that its Windows program saves;
 // the way out named here always works, so keep the instruction in the message rather than leaving
