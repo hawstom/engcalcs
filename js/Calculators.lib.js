@@ -1519,15 +1519,109 @@ EngCalcs.setUnits = function(unitSet) {
 	this.submitForm();
 };
 
+/**
+ * Copy and Paste for the points table. A page that sets `EngCalcs.pointsFields` (Manning
+ * Irregular and Weir Flow Irregular: ['station', 'elevation']) copies and pastes the points as
+ * text, one point per line. A page may add `pointsCopyExtra(i)` (more fields for row i) and
+ * `pointsApply(rows)` (its own way of applying parsed rows); without them only the first
+ * `pointsFields.length` fields of a line are used, so a longer line is cut to its points. Any other
+ * page (Branched Network, Irrigation Pressure) copies and pastes its whole row data through the cookie.
+ *
+ * Reading a line: when a line has a tab, only tabs (and runs of spaces) separate fields, and a comma
+ * inside a field is a thousands separator ("1,000.00") or a decimal comma ("10,5"). A line with no
+ * tab is separated at commas, semicolons and spaces. A heading before the first data line is
+ * skipped. A line after that which cannot be read as numbers, or a field with a comma that could
+ * be either, stops the Paste with a message and changes nothing.
+ */
+EngCalcs.pointsReadField = function (raw) {
+	'use strict';
+	var t = raw.trim();
+	if (/^-?\d{1,3}(,\d{3})+(\.\d+)?$/.test(t)) { return t.replace(/,/g, ''); }
+	if (/^-?\d+,\d+$/.test(t)) { return t.replace(',', '.'); }
+	return t;
+};
+
+EngCalcs.pointsParse = function (text, nNumeric) {
+	'use strict';
+	var lines = text.split(/\r\n|\r|\n/), rows = [], i, line, fields, j, ok;
+	for (i = 0; i < lines.length; i += 1) {
+		line = lines[i].trim();
+		if (line === '') { continue; }
+		fields = (line.indexOf('\t') >= 0) ? line.split(/\s*\t\s*|\s{2,}/) : line.split(/[\s,;]+/);
+		for (j = 0; j < fields.length; j += 1) { fields[j] = this.pointsReadField(fields[j]); }
+		ok = fields.length >= nNumeric;
+		for (j = 0; ok && j < nNumeric; j += 1) {
+			if (fields[j] === '' || !isFinite(Number(fields[j]))) { ok = false; }
+		}
+		if (ok) { rows.push(fields); }
+		else if (rows.length) { return { rows: [], badLine: i + 1 }; }
+	}
+	return { rows: rows, badLine: 0 };
+};
+
+EngCalcs.pointsMessage = function (text) {
+	'use strict';
+	var ta = document.getElementById('points_data'), el = document.getElementById('points_data_msg');
+	if (!el) {
+		el = document.createElement('p');
+		el.id = 'points_data_msg';
+		el.setAttribute('role', 'status');
+		ta.parentNode.appendChild(el);
+	}
+	el.textContent = text;
+};
+
 EngCalcs.pointsDataCopy = function() {
 	'use strict';
+	var names = this.pointsFields, text = '', i, j, els, extra;
+	if (names) {
+		for (i = 0; i < this.numCalcRows; i += 1) {
+			for (j = 0; j < names.length; j += 1) {
+				els = document.getElementsByName(names[j]);
+				text += (j ? ',' : '') + els[i].value;
+			}
+			extra = this.pointsCopyExtra ? this.pointsCopyExtra(i) : [];
+			for (j = 0; j < extra.length; j += 1) { text += ',' + extra[j]; }
+			text += '\n';
+		}
+		document.getElementById("points_data").value = text;
+		this.pointsMessage('');
+		return;
+	}
 	this.cookieValueToDataString();
 	document.getElementById("points_data").value = this.dataString;
 };
 
 EngCalcs.pointsDataPaste = function() {
 	'use strict';
-	this.dataString = document.getElementById("points_data").value;
+	var names = this.pointsFields, ta = document.getElementById("points_data"), parsed, rows, i, j;
+	if (names) {
+		parsed = this.pointsParse(ta.value, names.length);
+		if (parsed.badLine) {
+			this.pointsMessage(ta.getAttribute('data-msg-line').replace('{n}', parsed.badLine));
+			return;
+		}
+		if (!parsed.rows.length) {
+			this.pointsMessage(ta.getAttribute('data-msg-none'));
+			return;
+		}
+		this.pointsMessage('');
+		rows = parsed.rows;
+		if (this.pointsApply) {
+			this.pointsApply(rows);
+		} else {
+			while (this.numCalcRows < rows.length) { this.pageAddCalcRow(); }
+			while (this.numCalcRows > rows.length) { this.deleteSingleCalcRow(); }
+			for (i = 0; i < rows.length; i += 1) {
+				for (j = 0; j < names.length; j += 1) {
+					document.getElementsByName(names[j])[i].value = rows[i][j];
+				}
+			}
+		}
+		this.submitForm();
+		return;
+	}
+	this.dataString = ta.value;
 	this.dataStringToCookieValue();
 	this.createCookie();
 	while (this.numCalcRows > this.dataLines.length) {

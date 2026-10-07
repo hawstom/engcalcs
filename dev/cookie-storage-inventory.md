@@ -101,6 +101,7 @@ on a visitor's device at all, and no server-side session state anywhere in the s
 | `lpn_contourbox` | same | The same record for the Contour plot box (Task 600, same ruling). Where it sits and whether it is open only; every contour setting is the project's |
 | `lpn_notesbox` | same | Where the Notes box was left, how big it was made, and whether it was open (Tom, 2026-09-28: *"Draggable non-hog box for Help, Notes. I need it open for my spreadsheet editing video."*). It was a centred, click-away-dismissed popover until then; it now keeps the same kind of record as the boxes above it, for the same reason: a panel layout the visitor set deliberately |
 | `lpn_hotkeysbox` | same | Where the new Help > Tables and Hotkeys box was left, how big it was made, and whether it was open (Task 745, 2026-09-29). Same shell, same memory and same category as `lpn_notesbox` immediately above it |
+| `lpn_snipbox` | same | Where the Map > Screenshot box was left and how big it was made, and the magnification chosen in it (1, 2, 3 or 4; 3 until changed) (Tom, 2026-10-05: *"I hoped that there would be a box, possibly non-modal and dockable, with the magnification amount and any other possible future settings for the snip."*). Not whether it was open: it opens with a snip, never with the page. The magnification is a preference about the visitor's own report, not about the network, so it is furniture by the Task 584 rule. Written only when the visitor moves, sizes, docks the box or changes the magnification |
 | `lpn_runbox` | same | Whether the run progress box is shown at all (Tom, 2026-09-12: *"The run report box is, to me, obnoxious. I want to be able to hide it forever and just see the time steps and run time in the banner briefly."*). Written only when it is OFF, so a browser that has never touched it holds nothing. The same category as the two rows below: a reading preference the visitor set deliberately, on this screen |
 | `lpn_scnbasic` | same | Whether Scenarios > Basic mode is unticked (Tom, 2026-09-30: *"In our Scenarios menu, we have an 'Basic mode' command/row that is checked by default."*; `dev/scenario-alternatives.md`). Written only when it is OFF, so a browser that has never touched it holds nothing. A preference the visitor set deliberately, on this screen, like `lpn_runbox` above |
 | `lpn_menucue` | same | **LEGACY, no longer written** (2026-09-25: the menu cue was deleted on Tom's word, "It failed."). Still listed because browsers that saw the cue still hold it, and Erase everything still deletes it by literal |
@@ -111,7 +112,7 @@ on a visitor's device at all, and no server-side session state anywhere in the s
 
 **Docking rides on the box records above, with no new key (Task 441, 2026-10-03).** `lpn_findbox`,
 `lpn_setbox`, `lpn_libbox`, `lpn_ffbox`, `lpn_energybox`, `lpn_cmpbox`, `lpn_reportbox`,
-`lpn_statusbox`, `lpn_fullbox`, `lpn_contourbox`, `lpn_notesbox` and `lpn_hotkeysbox` may each also
+`lpn_statusbox`, `lpn_fullbox`, `lpn_contourbox`, `lpn_notesbox`, `lpn_hotkeysbox` and `lpn_snipbox` may each also
 hold `dock` (`left` or `right`: the box is docked beside the map on that side), `autohide` (`true`:
 it tucks into a tab at the map's edge), `dockW` (its docked width in pixels) and `dockOrd` (its
 tab's rank along the bar, set when the visitor drags the tab or presses Alt+Arrow on it). Each field is

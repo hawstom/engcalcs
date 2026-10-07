@@ -249,7 +249,7 @@ $root = dirname(__DIR__, 2);
 
 // ---- markup, one page per process (dev/scripts/render_page.php is the only correct way) ---------
 $skip = array('lpn-lock.php', 'log-calc-event.php', 'log-human-view.php', 'log-signal-event.php',
-              'log-title-event.php', 'formmail.php', 'sw.php', 'consent.php', 'manifest.php');
+              'log-title-event.php', 'formmail.php', 'send-feedback.php', 'sw.php', 'consent.php', 'manifest.php');
 $problems = array();
 $rendered = 0;
 $pages = 0;
