@@ -1,6 +1,7 @@
-# DXF import: the DXF Interface Manager (Task 772's other half)
+# The DXF Interface Manager: import AND export (Task 772)
 
-Not built. Tom's own first specification, 2026-10-07, verbatim. He called it "one simplistic thought"
+**One interface for both directions** (Tom, 2026-10-07: *"To be clear, this DXF idea is for import
+and export, not one or the other."*). Not built. Tom's own first specification, 2026-10-07, verbatim. He called it "one simplistic thought"
 and a "possible mostly thorough specification". Read it as his starting point, not as settled
 rulings: ask him before building any part of it that departs from it.
 
@@ -23,8 +24,12 @@ Tell people to use a points import/export LSP routine and EPANET++ Import survey
 
 - "EPANET++" is Tom's working name for the lpn_ page; the visitor-facing name is whatever the page
   says today. Do not put "EPANET++" into a visitor string without asking him.
-- Seams: the export side (`feat/dxf`) writes C-WATR-* layers and attribute tags; import should read
-  back what export writes, so a round trip is the first harness. Alternatives in a layer name meet
+- **The export on `feat/dxf` is not yet this spec.** It writes annotation (labels, a read-me note)
+  and puts attributes on C-WATR-ATTR-* layers per property; this spec is data only, with the asset
+  and alternative in the layer name after a prefix such as C-WATR-MODL-. Reconcile before either
+  side grows: the Interface Manager's export should write exactly what its import reads, and the
+  round trip (export, import, byte-identical model) is the first harness. Whether today's
+  annotated export stays as a separate "drawing" export beside a "model data" one is his call. Alternatives in a layer name meet
   Task 721 (`feat/bentley-interop`), which owns the alternatives model.
 - "Values verbatim in the project units" is CLAUDE.md's rule that only the user touches a file's
   numbers.

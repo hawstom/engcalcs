@@ -387,8 +387,8 @@ the block.
   layers, attributed blocks, XDATA or Map data exist, propose asset types and properties in an
   editable translation table (assets, properties, scenarios, alternatives). Mary, same day: Map
   "ADE" object data does not survive DXF; layers and ATTRIBs are visible everywhere; target ASCII
-  R2000. Tom, 2026-10-07: his own DXF Interface Manager spec and a rudimentary interim workflow,
-  verbatim in `dev/dxf-import.md`.
+  R2000. Tom, 2026-10-07: his DXF Interface Manager spec, for import AND export, and a rudimentary
+  interim workflow, verbatim in `dev/dxf-interface.md`.
 - 75|776| **Copy a table with its headings; export Tables to CSV and ODS.**
   Tom, 2026-10-06: *"When copying from a Table, it would be nice to be able to copy the headings
   somehow. It might also be nice to Export to CSV and ODS the Tables."* Branch `feat/table-export`.
