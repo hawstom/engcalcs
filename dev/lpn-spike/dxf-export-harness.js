@@ -385,17 +385,38 @@ async function main() {
 		ok('D3: one category per junction again: no categories line in the read-me', !rd0.some(t => /CATEGOR/.test(t)), rd0.join(' | '));
 	}
 
-	console.log('--- the MTEXT read-me: long lines chunk at 250, MTEXT codes in a name are neutralized ---');
+	console.log('--- the MTEXT read-me: chunks, real MTEXT escapes, the name (never a note) is cut ---');
 	{
-		const long = 'a'.repeat(600) + ' {b} \\P c';
-		const txt = global.EngCalcs.lpnDxfWrite({ insunits: 0, measurement: 0, nodes: [], links: [], readme: ['Project', long] });
-		const dd = readDxf(txt), mt = dd.sections.ENTITIES.find(e => e.type === 'MTEXT');
-		const ch = gAll(mt, 3).concat(gAll(mt, 1));
-		ok('a 600-character line is split over group 3 chunks of at most 250, ending in group 1', ch.length >= 3 && ch.every(c => c.length <= 250) && g(mt, 1) === gAll(mt, 1)[0] && mt.codes[mt.codes.length - 2][0] === 1, ch.map(c => c.length).join(','));
-		const lines = ch.join('').split('\\P');
-		ok('a backslash, { and } typed in a line cannot act as MTEXT codes (still two paragraphs)', lines.length === 2 && !/[{}]/.test(lines[1]) && lines[1].indexOf('\\U+005C') < 0, lines[1].slice(595));
-		fs.writeFileSync(path.join(tmp, 'long.dxf'), txt);
-		ezdxfAudit(path.join(tmp, 'long.dxf'), 'long read-me');
+		const W = (readme) => global.EngCalcs.lpnDxfWrite({ insunits: 0, measurement: 0, nodes: [], links: [], readme });
+		const mtOf = (txt) => { const mt = readDxf(txt).sections.ENTITIES.find(e => e.type === 'MTEXT'); return { mt, text: gAll(mt, 3).concat(gAll(mt, 1)).join('') }; };
+		const long = 'a'.repeat(600);
+		let txt = W(['Project', long]);
+		let r = mtOf(txt), ch = gAll(r.mt, 3).concat(gAll(r.mt, 1));
+		ok('a 600-character line is split over group 3 chunks of at most 250, ending in group 1', ch.length >= 3 && ch.every(c => c.length <= 250) && r.mt.codes[r.mt.codes.length - 2][0] === 1, ch.map(c => c.length).join(','));
+		// 1. A typed backslash, { and } are written as MTEXT's own escapes, not lookalikes.
+		txt = W(['A\\B {x}', 'NEXT']);
+		r = mtOf(txt);
+		ok('a project named A\\B {x} is written with the escapes \\\\, \\{ and \\} (A\\\\B \\{X\\})', r.text === 'A\\\\B \\{X\\}\\PNEXT', r.text);
+		ok('...and it is still two paragraphs, with no lookalike / ( ) and no \\U+005C', r.text.split('\\P').length === 2 && !/[\/()]/.test(r.text) && r.text.indexOf('\\U+005C') < 0, r.text);
+		fs.writeFileSync(path.join(tmp, 'esc.dxf'), txt);
+		ezdxfAudit(path.join(tmp, 'esc.dxf'), 'escaped read-me');
+		// A chunk boundary never lands inside an escape pair, whatever the offset.
+		let split = 0;
+		for (let pad = 240; pad < 252; pad++) {
+			const t = mtOf(W(['x'.repeat(pad) + '\\{\\}{}Ж'.repeat(3), 'N'])), c = gAll(t.mt, 3);
+			if (c.some(q => /\\$/.test(q.replace(/\\\\/g, '')) || /\\U\+[0-9A-F]{0,3}$/.test(q))) { split++; }
+		}
+		ok('no chunk of 250 ends inside an escape pair, for a dozen offsets of the boundary', split === 0, split);
+		// 2. The cap cuts the NAME, never the notes after it.
+		const name = 'Ж'.repeat(1000), notes = ['LAYERS ARE NAMED C-WATR-MODL-J___-BASE.', '3 JUNCTIONS HAVE MORE THAN ONE DEMAND CATEGORY.', '2 VALUES WERE SHORTENED.'];
+		txt = W([name].concat(notes));
+		r = mtOf(txt);
+		const ls = r.text.split('\\P');
+		ok('a 1000-letter Cyrillic name (7000 characters escaped) is cut to fit and ends in three periods', ls.length === 4 && /\.\.\.$/.test(ls[0]) && ls[0].length < 2049 && /^(\\U\+0416)+\.\.\.$/.test(ls[0]), ls[0].length);
+		ok('...every note after it is whole', notes.every((n, i) => ls[i + 1] === n), ls.slice(1).join(' | '));
+		ok('...and the whole MTEXT is within 2049 characters', r.text.length <= 2049, r.text.length);
+		fs.writeFileSync(path.join(tmp, 'cut.dxf'), txt);
+		ezdxfAudit(path.join(tmp, 'cut.dxf'), 'cut name read-me');
 	}
 
 	console.log('--- minor: Turkish capitals, an upright pump ID ---');

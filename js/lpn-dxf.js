@@ -343,16 +343,40 @@
 		// LAST chunk; 3 each earlier chunk, in order, of at most 250 characters (the Reference's
 		// limit for group 1 and 3 in an MTEXT). Layer, colour and plotting are the layer's (group 8):
 		// C-WATR-RDME, white, non-plotting. Group 41 (reference width) is left out, so a line is not
-		// wrapped. Within the text, "\P" ends a paragraph; a backslash, "{" and "}" are MTEXT
-		// formatting codes, so a literal one in a line (a project name) is written as "/", "(" and ")".
-		// A chunk never splits an escape, so a "\U+XXXX" stays whole.
+		// wrapped. Within the text, "\P" ends a paragraph, and a literal backslash, "{" or "}" in a
+		// line (a project name) is written with MTEXT's own escapes, "\\", "\{" and "\}" (the
+		// Reference's MTEXT formatting codes), never a lookalike. Everything else goes through the one
+		// escape above, run by run, so the specials are never seen by it.
+		// A chunk never splits an escape ("\U+XXXX", "\\", "\P": each is one part), so it stays whole.
+		// **THE CAP (LIMIT_CHARS) CUTS THE FIRST LINE, THE PROJECT NAME, AND NEVER A NOTE**: a long
+		// non-Latin name grows to seven characters a letter, and the notes after it (layer pattern,
+		// demand categories, shortened values) are what the file is for.
+		function mtextParts(ln) {
+			var out = [], run = '', i, c;
+			function flush() { if (run) { escapeParts(run).forEach(function (q) { out.push(q); }); run = ''; } }
+			ln = String(ln);
+			for (i = 0; i < ln.length; i++) {
+				c = ln.charAt(i);
+				if (c === '\\' || c === '{' || c === '}') { flush(); out.push('\\' + c); } else { run += c; }
+			}
+			flush();
+			return out;
+		}
 		function mtext(lines, x, y, layer) {
-			var parts = [], chunks = [], cur = '', size = 0, k, j, ps, total = 0, capped = false;
-			lines.forEach(function (ln, n) {
+			var parts = [], chunks = [], cur = '', size = 0, k, j, per = lines.map(mtextParts), rest = 0, budget, sz;
+			function len(ps) { return ps.reduce(function (t, q) { return t + q.length; }, 0); }
+			for (k = 1; k < per.length; k++) { rest += 2 + len(per[k]); }
+			budget = Math.max(LIMIT_CHARS - ELLIPSIS.length - rest, 20);
+			if (per.length && len(per[0]) > budget + ELLIPSIS.length) {
+				sz = 0;
+				for (j = 0; j < per[0].length && sz + per[0][j].length <= budget; j++) { sz += per[0][j].length; }
+				per[0] = per[0].slice(0, j).concat([ELLIPSIS]);
+			}
+			per.forEach(function (ps, n) {
 				if (n) { parts.push('\\P'); }
-				ps = escapeParts(String(ln).replace(/\\/g, '/').replace(/\{/g, '(').replace(/\}/g, ')'));
 				for (j = 0; j < ps.length; j++) { parts.push(ps[j]); }
 			});
+			var total = 0, capped = false;
 			for (k = 0; k < parts.length; k++) {
 				total += parts[k].length;
 				if (total > LIMIT_CHARS - ELLIPSIS.length) { capped = true; break; }
