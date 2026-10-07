@@ -12,7 +12,8 @@
 // before, about 170 ms after.
 //
 // Asserted on EPANET Net3 (117 pipes), in a scenario, with Show scenarios on (two rows per pipe):
-//   1. Fill down puts a roughness override on every pipe of the scenario.
+//   1. Fill down puts a roughness override on every pipe of the scenario, and with Show scenarios
+//      off the Pipes table marks each one (question 12), and nothing in Base.
 //   2. Clear override on the whole Roughness column clears every one of them, and Base keeps its
 //      own values.
 //   3. The click completes within a time bound.
@@ -110,6 +111,23 @@ async function main() {
 		let c1 = await cells();
 		ok('Fill down puts an override on every pipe of the scenario', c1.length >= 117 && c1.every((c) => c.local && c.value === '0.75'),
 			c1.length + ' rows, ' + c1.filter((c) => c.local).length + ' marked');
+
+		// Question 12 (Tom, 2026-10-07, "Yes, I think?"): with Show scenarios off the asset table marks
+		// the open scenario's overrides, and nothing in Base.
+		const scenarioMenu = async (label) => {
+			await page.click('#lpn_scenario_btn');
+			await page.waitForSelector('#lpn_menu_popup', { state: 'visible' });
+			for (const r of await page.$$('#lpn_menu_list button.lpn-menu-row')) {
+				if ((await r.textContent()).trim().replace(/^\u2713\s*/, '').replace(/\s*\(\d+\)$/, '') === label) { await r.click(); break; }
+			}
+			await a.settle(2500);
+		};
+		await scenarioMenu(await L('lpn_scenario_base'));
+		const inBase = await cells();
+		ok('in Base the same table marks nothing', inBase.length >= 117 && inBase.every((c) => !c.local), inBase.filter((c) => c.local).length + ' marked');
+		await scenarioMenu('Peak');
+		const back = await cells();
+		ok('back in Peak every override is marked again', back.every((c) => c.local), back.filter((c) => c.local).length + ' marked');
 
 		// Show scenarios on: Base's row and Peak's row for every pipe.
 		await page.click('#lpn_pane_pipes td.lpn-pane-col-roughness', { button: 'right' });

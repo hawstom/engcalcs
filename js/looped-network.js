@@ -26316,10 +26316,15 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// 2026-10-06: *"The override shows in the settings box, but not in the Settings table."*): its
 	// one row per setting shows the open scenario's value, so it wears that scenario's mark, as the
 	// Settings box row does. paneScnRowOf() gives such a row the open scenario.
-	function paneMarksOpenScenario(spec) { return !spec.scnRows && spec.id === 'settings' && !inBaseScenario(); }
+	// **AND SO DOES EVERY ASSET TABLE** (Tom, 2026-10-07, question 12: *"Yes, I think?"*): a row of
+	// the Pipes table with Show scenarios off shows the open scenario's values, so a value that
+	// scenario holds wears the same amber, with the same tip. Customers have no overrides.
+	function paneMarksOpenScenario(spec) {
+		return !spec.scnRows && !inBaseScenario() && (spec.id === 'settings' || (!!spec.group && paneScnAvailable(spec)));
+	}
 	function paneScnRowOf(row) {
 		if (row && row._lpnScn) { return row._lpnScn; }
-		return row && row._lpnSetting ? { el: row, scn: activeScenario() } : null;
+		return row ? { el: row, scn: activeScenario() } : null;
 	}
 	function paneScnCellIsLocal(c, row) {
 		var x = paneScnRowOf(row), ov, p, has = Object.prototype.hasOwnProperty;
@@ -28157,7 +28162,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				var target = cells[c.key], text;
 				if (!target) { return; }
 				if (target._lpnCell) { target._lpnCell.el = el; }
-				if ((spec.scnRows || paneMarksOpenScenario(spec) || spec.id === 'settings') && tds) { paneScnMarkCell(tds[c.key], c, el); }
+				// Asked in Base too, so a mark left from the scenario just closed comes off.
+				if ((spec.scnRows || spec.id === 'settings' || (!!spec.group && paneScnAvailable(spec))) && tds) { paneScnMarkCell(tds[c.key], c, el); }
 				// **A CELL IS WRITTEN ONLY WHEN WHAT IT SAYS HAS CHANGED** (R-111). Assigning
 				// `textContent` replaces the text node even when the words are identical, and that
 				// alone marks the cell for layout -- so a refill of a table in which nothing had
