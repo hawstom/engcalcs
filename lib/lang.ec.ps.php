@@ -1756,7 +1756,6 @@ $ec_lang['lpn_file_import_inp']='د EPANET فایل دننه کول…';
 $ec_lang['lpn_file_import_inp_tip']='د EPANET فایل نه یوه شبکه ولولئ، که .inp متني فایل وي یا هغه .net فایل چې EPANET یې ساتي، او یې د نوې پروژې په توګه پدې براوزر کې وساتئ.';
 // The other direction (Task 281). A DOWNLOAD, so the word is Export rather than Save: this page
 // keeps no handle on an `.inp` and never writes back to one.
-$ec_lang['lpn_file_export_inp']='د EPANET فایل صادرول…';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_file_export_inp_tip']='دا شبکه د EPANET .inp فایل په توګه ولیکئ او ډاونلوډ یې کړئ. هغه شمېرې چې تاسو لیکلي، لکه څنګه چې تاسو یې لیکلي هماغسې لیکل کیږي. هرڅه چې .inp فارمېټ نشي ساتلی، وروسته تاسو ته لیست کیږي.';
 $ec_lang['lpn_status_inp_exported']='{file} صادر شو.';

@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**180 still to read on master**, of 283 untranslated keys, of 2505 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**116 still to read on master**, of 222 untranslated keys, of 2444 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -39,7 +39,7 @@ is the one you meant. "The first one" is a complete answer.
   *The proposal:* PROPOSED A: '⚠ At least one junction is below {pressure} at the demands as entered (a demand scale of 1). All junctions keep {pressure} only if demands are cut to a demand scale of {m} or less.' PROPOSED B: '⚠ The demands as entered (a demand scale of 1) leave at least one junction below {pressure}. The largest demand scale that keeps every junction at {pressure} or above is {m}.' B paralle...
   @@ NEEDS RULING
 
-## Synonym entries to approve  (3, 1 to read @@ NEEDS RULING)
+## Synonym entries to approve  (6, 4 to read @@ NEEDS RULING)
 
 **These are translator notes (`$ec_lang_syn`), not visitor wording.** Each was written against an
 English string that has since changed, or against a key that no longer exists. Say which: keep it
@@ -73,14 +73,35 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   _Ruled 2026-10-05: Is this _syn needed?_
 
-## lpn_  (281, 178 to read @@ NEEDS RULING)
+- **`lpn_scenario_push_values`**
+  > Values discarded:
+  *Why stale:* the English changed after this synonym was written
+  *Written against:* Values thrown away:
+  *Current synonym:* Values thrown away, Values discarded, Values lost, Values wiped, Values replaced, Values displaced, Values cleared, Custom values cleared | a count follows this label, not a list of values
+  **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
+  @@ NEEDS RULING
 
-- **`lpn_alt_cat_calculation`**
-  > Calculation
+- **`rc_Hp`**
+  > <span class="ec-help" title="Ponding (Hp > yn) is desirable because it reduces upstream erosion. (USDA)">Inlet weir head, H<sub>p</sub> <span class="ec-tip">?</span></span>
+  *Why stale:* the English changed after this synonym was written
+  *Written against:* <span class="ec-help" title="Ponding (Hp > yn) is good — reduces upstream erosion. (USDA)">Inlet weir head, H<sub>p</sub> <span class="ec-tip">?</span></span>
+  *Current synonym:* | gloss: weir head
+  **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   @@ NEEDS RULING
-- **`lpn_alt_cat_presentation`**
-  > Presentation
+
+- **`rc_yn`**
+  > <span class="ec-help" title="Ponding (Hp > yn) is desirable because it reduces upstream erosion. (USDA)">Normal depth in inlet channel, y<sub>n</sub> <span class="ec-tip">?</span></span>
+  *Why stale:* the English changed after this synonym was written
+  *Written against:* <span class="ec-help" title="Ponding (Hp > yn) is good — reduces upstream erosion. (USDA)">Normal depth in inlet channel, y<sub>n</sub> <span class="ec-tip">?</span></span>
+  *Current synonym:* Enter the normal depth in the channel that delivers flow to this chute. | Upstream, not downstream: ponding reduces erosion UPSTREAM of the chute inlet (above/before it, toward the source). Do not flip the direction.
+  **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   @@ NEEDS RULING
+
+## lpn_  (220, 114 to read @@ NEEDS RULING)
+
+- **`lpn_alt_calc_options`**
+  > Calculation options
+  _Ruled OK 2026-10-05._
 - **`lpn_analyze_at_time`**
   > Time step: {time}.
   _Ruled OK 2026-10-03._
@@ -105,20 +126,14 @@ never edits a synonym.
 - **`lpn_change_type_born`**
   > These are new, as on a newly drawn one:
   @@ NEEDS RULING
-- **`lpn_change_type_create_overrides`**
-  > Create overrides
-  @@ NEEDS RULING
 - **`lpn_change_type_customers`**
-  > Only a pipe serves customers, so these customers are connected instead to the node shown in parentheses, where their demand already lands. They stay where they are drawn, and their demand is unchanged:
+  > Only a pipe serves customers, so these customers are connected instead to the node shown in parentheses, where their demand is already applied. They stay where they are drawn, and their demand is unchanged:
   @@ NEEDS RULING
 - **`lpn_change_type_key`**
   > ID: Lost entry
   @@ NEEDS RULING
 - **`lpn_change_type_line`**
   > {id}: {property} {value}
-  @@ NEEDS RULING
-- **`lpn_change_type_line_alternative`**
-  > {id}: {property} {value}, in alternative {alternative}
   @@ NEEDS RULING
 - **`lpn_change_type_line_scenario`**
   > {id}: {property} {value}, in scenario {scenario}
@@ -144,17 +159,11 @@ never edits a synonym.
 - **`lpn_change_type_rules`**
   > These rule lines name a link by its kind, and will name its new kind instead:
   @@ NEEDS RULING
-- **`lpn_change_type_scenario_ask`**
-  > Current scenario is not Base. Create overrides?
-  @@ NEEDS RULING
 - **`lpn_change_type_setting`**
   > These controls and rules give or test the setting of a link being changed. A setting is a different quantity on a pipe, a pump, and a valve, so these will read it differently:
   @@ NEEDS RULING
 - **`lpn_change_type_surface`**
   > These keep the water surface where it was. A reservoir's head is the tank's elevation plus its water depth, and a tank's water depth is the reservoir's head minus its elevation:
-  @@ NEEDS RULING
-- **`lpn_change_type_switch_base`**
-  > Switch to Base
   @@ NEEDS RULING
 - **`lpn_change_type_tip`**
   > Change the selected nodes into junctions, reservoirs, or tanks, or the selected links into pipes, pumps, or valves. Each keeps its ID, its place, its connections, and every value the new type also has. If anything would be lost, you are asked first.
@@ -169,7 +178,7 @@ never edits a synonym.
   > Clear to hide the fill and the contour lines; select to bring them back as they were. Node colors stay.
   _Ruled OK 2026-10-05._
 - **`lpn_copy_opened_unsaved`**
-  > Opened {file} as a copy, with a new lock of its own that will be saved with the next file save.
+  > Opened {file} as a copy, with a new lock that will be saved with the next file save.
   @@ NEEDS RULING
 - **`lpn_cp_allow_tip`**
   > Allow only these characters:
@@ -265,8 +274,8 @@ never edits a synonym.
   > Demand scale
   _Ruled OK 2026-10-03._
 - **`lpn_ds_multiplier_tip`**
-  > The number each demand is multiplied by: 1.5 is half again as much water. It applies on top of the active scenario's own demand multiplier, which is already in the demands, and it is never saved in your project.
-  _Ruled OK 2026-10-03._
+  > The factor by which each demand is multiplied; 1.5 is a 50% increase. It applies in addition to the demand multiplier of the active scenario, which is already in the demands, and it is never saved in the project.
+  _Ruled 2026-10-07: Technical-English interview: Use proposed_
 - **`lpn_ds_no_junctions`**
   > This project has no junctions yet, so there are no demands to scale.
   _Ruled OK 2026-10-03._
@@ -322,7 +331,7 @@ never edits a synonym.
   > Solved with the EPANET solver, because the demand model is pressure driven.
   _Ruled OK 2026-10-05._
 - **`lpn_engine_unavailable_why`**
-  > Valves that open and close on their own cannot be solved without the EPANET solver. {reason}
+  > Pressure and flow control valves (PRV, PSV, FCV) cannot be solved without the EPANET solver. {reason}
   @@ NEEDS RULING
 - **`lpn_fb_bad_email`**
   > That email address does not look right. Correct it, or leave it empty.
@@ -362,9 +371,6 @@ never edits a synonym.
   @@ NEEDS RULING
 - **`lpn_fb_sends`**
   > What this sends: the name of this page, your language, the version of the site, the code of the message on the map if there is one, and what you picked or typed. Never your drawing or your network. Your email address is used only to reply to you.
-  @@ NEEDS RULING
-- **`lpn_file_export_geojson`**
-  > Export GeoJSON file…
   @@ NEEDS RULING
 - **`lpn_file_export_geojson_tip`**
   > Download this network as a GeoJSON file for QGIS, ArcGIS Pro and other GIS programs. Junctions, tanks and reservoirs are points, and pipes, pumps and valves are lines that follow their vertices. Positions are latitude and longitude. Results are included only when the network has been solved.
@@ -456,15 +462,6 @@ never edits a synonym.
 - **`lpn_pane_scn_alt_tip`**
   > {category} alt.: {alternative}
   @@ NEEDS RULING
-- **`lpn_pane_scn_cur_only`**
-  > Current scenario only
-  @@ NEEDS RULING
-- **`lpn_pane_scn_filter_note`**
-  > {filters}. Showing {n} of {all}.
-  @@ NEEDS RULING
-- **`lpn_pane_scn_ov_only`**
-  > Overrides only
-  @@ NEEDS RULING
 - **`lpn_pane_scn_show`**
   > Show scenarios
   @@ NEEDS RULING
@@ -514,8 +511,8 @@ never edits a synonym.
   > Demand deficit
   _Ruled OK 2026-10-05._
 - **`lpn_result_demand_deficit_tip`**
-  > The demand this junction asks for and does not receive, because the pressure is below the required pressure.
-  _Ruled OK 2026-10-05._
+  > The demand at this junction that is not delivered, because the pressure is below the required pressure.
+  _Ruled 2026-10-07: Technical-English interview: Use proposed_
 - **`lpn_result_pump_head`**
   > Head
   _Ruled OK 2026-10-03._
@@ -531,9 +528,12 @@ never edits a synonym.
 - **`lpn_saved_session`**
   > Not saved
   _Ruled OK 2026-10-05._
-- **`lpn_scenario_delete_has_children`**
-  > The scenario {name} cannot be deleted while other scenarios inherit from it: {list}. Delete those first, or give them another parent.
-  @@ NEEDS RULING
+- **`lpn_scenario_duration_tip`**
+  > Leave blank to inherit from parent. A total run time of 0:00 is a steady-state run.
+  _Ruled OK 2026-10-05._
+- **`lpn_scenario_hyd_step_tip`**
+  > Leave blank to inherit from parent.
+  _Ruled OK 2026-10-05._
 - **`lpn_scncmp_at_time`**
   > {value} at {id}, {time}
   _Ruled OK 2026-10-05._
@@ -582,9 +582,6 @@ never edits a synonym.
 - **`lpn_settings_demand_model_tip`**
   > Choose how junctions receive flow. Demand driven (DDA) delivers every demand in full, whatever the pressure. Pressure driven (PDA) delivers less than the demand where the pressure is below the required pressure, and only the EPANET solver computes it.
   _Ruled OK 2026-10-05._
-- **`lpn_settings_held_base`**
-  > {base}: {value}
-  @@ NEEDS RULING
 - **`lpn_settings_min_pressure`**
   > Minimum pressure
   _Ruled OK 2026-10-05._
@@ -603,6 +600,225 @@ never edits a synonym.
 - **`lpn_settings_req_pressure_tip`**
   > Enter the pressure at or above which a junction receives its full demand. It must be greater than the minimum pressure. Use this project's pressure unit. Leave it blank to use EPANET's default, which is in psi for US flow units and meters otherwise.
   _Ruled OK 2026-10-05._
+- **`lpn_snip_hint_free`**
+  > Drag around the area to snip, or click for the whole map. Esc cancels.
+  @@ NEEDS RULING
+- **`lpn_snip_tip_eraser`**
+  > Eraser: click a stroke to remove it (E)
+  @@ NEEDS RULING
+- **`lpn_snip_tip_free`**
+  > Snip a freehand shape (S)
+  @@ NEEDS RULING
+- **`lpn_snip_tip_map`**
+  > Screenshot of the whole map
+  @@ NEEDS RULING
+- **`lpn_snip_tip_mode`**
+  > Snip shape
+  @@ NEEDS RULING
+- **`lpn_snip_tip_pen`**
+  > Pen
+  @@ NEEDS RULING
+- **`lpn_snip_tip_rect`**
+  > Snip a rectangle (S)
+  @@ NEEDS RULING
+- **`lpn_snip_tip_redo`**
+  > Redo (Ctrl+Y)
+  @@ NEEDS RULING
+- **`lpn_snip_tip_undo`**
+  > Undo (Ctrl+Z)
+  @@ NEEDS RULING
+- **`lpn_status_inp_exported_no_picture`**
+  > Exported {file}. The background picture could not be saved, so the .inp names none; in EPANET, add it with View > Backdrop > Load.
+  @@ NEEDS RULING
+- **`lpn_status_inp_exported_picture`**
+  > Exported {zip}, holding the EPANET file {file}, its background picture {picture}, and the world file {world}. Extract all three into one folder, then open the .inp there in EPANET; the picture comes with it.
+  @@ NEEDS RULING
+- **`lpn_survey_codes_add`**
+  > Add code
+  @@ NEEDS RULING
+- **`lpn_survey_codes_col_code`**
+  > Code
+  @@ NEEDS RULING
+- **`lpn_survey_codes_col_type`**
+  > Asset type
+  @@ NEEDS RULING
+- **`lpn_survey_codes_remove`**
+  > Remove code
+  @@ NEEDS RULING
+- **`lpn_survey_codes_tip`**
+  > Read the first word of each description as a code from the table. Points with the same line code join into one pipe in file order, and WL1 and WL2 are separate lines. +0 starts a line, -0 ends one, and CLO closes one. JPN followed by a point name joins to that point (Carlson), and Civil 3D writes it CPN.
+  @@ NEEDS RULING
+- **`lpn_survey_codes_toggle`**
+  > Read the description as field codes
+  @@ NEEDS RULING
+- **`lpn_survey_confirm_coded`**
+  > {j} junction(s), {r} reservoir(s), {t} tank(s), and {p} pipe(s) found. Proceed?
+  @@ NEEDS RULING
+- **`lpn_survey_note_code_two_nodes`**
+  > More than one node code, the first was used.
+  @@ NEEDS RULING
+- **`lpn_survey_note_code_unknown`**
+  > Code not in the code table, imported as the asset type chosen above.
+  @@ NEEDS RULING
+- **`lpn_survey_note_code_unread`**
+  > Not every word is a code this page reads, kept in the description.
+  @@ NEEDS RULING
+- **`lpn_survey_note_join_missing`**
+  > JPN or CPN names a point not in this file or project, no pipe drawn for it.
+  @@ NEEDS RULING
+- **`lpn_survey_note_join_no_line`**
+  > JPN or CPN on a point with no line code, no pipe drawn for it.
+  @@ NEEDS RULING
+- **`lpn_survey_note_line_one_point`**
+  > Only point on its line, no pipe drawn from it.
+  @@ NEEDS RULING
+- **`lpn_survey_note_no_desc`**
+  > Field codes are on, but this file has no description column, so no codes were read.
+  @@ NEEDS RULING
+- **`lpn_survey_note_node_on_pipe`**
+  > This point lies exactly on a pipe it is not joined to. If they connect, add JPN to say so.
+  @@ NEEDS RULING
+- **`lpn_survey_note_pipe_one_node`**
+  > This line returns to the same node with no other node between, no pipe drawn for it.
+  @@ NEEDS RULING
+- **`lpn_survey_note_pipe_zero_length`**
+  > This point is at the same spot as the node before it, so the pipe between them has no length.
+  @@ NEEDS RULING
+- **`lpn_survey_note_ring_junction`**
+  > This point became a junction so the ring could close.
+  @@ NEEDS RULING
+- **`lpn_survey_note_vertex_text`**
+  > Not every word is a code this page reads, and a vertex keeps no description.
+  @@ NEEDS RULING
+- **`lpn_survey_note_vertices`**
+  > Points that became pipe vertices: {detail}. A vertex keeps no name, elevation, or description.
+  @@ NEEDS RULING
+- **`lpn_survey_report_coded`**
+  > {j} junction(s), {r} reservoir(s), {t} tank(s), and {p} pipe(s) imported, {m} of the nodes with elevation.
+  @@ NEEDS RULING
+- **`lpn_sysflow_title`**
+  > Flow balance
+  _Ruled OK 2026-10-03._
+- **`lpn_time_engine_fetch_failed`**
+  > The download of the EPANET solver failed. Reload the page to try again; a firewall, proxy, or browser extension may be blocking it.
+  @@ NEEDS RULING
+- **`lpn_time_engine_run_failed`**
+  > The EPANET run failed. That is a defect in this page; use the {wrong} link to report it.
+  @@ NEEDS RULING
+- **`lpn_time_engine_start_failed`**
+  > The browser refused to start the EPANET solver. WebAssembly may be turned off by a security setting or an extension.
+  @@ NEEDS RULING
+- **`lpn_time_no_engine_why`**
+  > The built-in solver solves one instant at a time, so this is the network at {time} only: every pattern is read at that instant, and every tank remains at its initial level instead of filling and draining. {reason}
+  @@ NEEDS RULING
+- **`lpn_time_scn_overrides`**
+  > Scenario overrides:
+  _Ruled OK 2026-10-05._
+- **`lpn_time_stat_averaged`**
+  > Avg
+  @@ NEEDS RULING
+- **`lpn_time_stat_maximum`**
+  > Max
+  @@ NEEDS RULING
+- **`lpn_time_stat_minimum`**
+  > Min
+  @@ NEEDS RULING
+- **`lpn_time_stat_none`**
+  > None
+  _Ruled OK 2026-10-05._
+- **`lpn_time_stat_range`**
+  > Range
+  _Ruled OK 2026-10-05._
+- **`lpn_time_statistic`**
+  > Statistic
+  _Ruled OK 2026-10-05._
+- **`lpn_tool_add_chain`**
+  > Junction Pipe Chain
+  _Ruled OK 2026-10-05._
+- **`lpn_tool_add_chain_tip`**
+  > Chain junctions and pipes: specify a point on the map to add a junction, then specify each next point to add a pipe and a junction. Specify an existing node to continue from it. Press Escape to end the chain.
+  _Ruled OK 2026-10-05._
+- **`lpn_valwarn_diameter`**
+  > A pipe or valve diameter is normally between {min} and {max} {unit}. Check the number and the diameter unit.
+  @@ NEEDS RULING
+- **`lpn_valwarn_dw`**
+  > A Darcy-Weisbach roughness is normally more than 0 and at most {max} {unit}. A larger number is often a Hazen-Williams C or a Manning n.
+  @@ NEEDS RULING
+- **`lpn_valwarn_hw`**
+  > A Hazen-Williams C is normally between {min} and {max}. A number outside that range is often a roughness meant for another friction method.
+  @@ NEEDS RULING
+- **`lpn_valwarn_manning`**
+  > A Manning n is normally between {min} and {max}. A number outside that range is often a roughness meant for another friction method.
+  @@ NEEDS RULING
+- **`lpn_valwarn_negative`**
+  > EPANET does not accept a negative number here.
+  @@ NEEDS RULING
+- **`lpn_valwarn_positive`**
+  > EPANET does not accept zero or a negative number here.
+  @@ NEEDS RULING
+- **`lpn_valwarn_tank_levels`**
+  > EPANET does not accept this tank. The lowest water depth must not exceed the water depth, and the water depth must not exceed the highest water depth.
+  @@ NEEDS RULING
+
+## points_  (2, 2 to read @@ NEEDS RULING)
+
+- **`points_data_msg_line`**
+  > Nothing was pasted. Line {n} could not be read as a station and an elevation.
+  @@ NEEDS RULING
+- **`points_data_msg_none`**
+  > Nothing was pasted. No station and elevation pairs were found.
+  @@ NEEDS RULING
+
+---
+
+# Strings waiting on a branch
+
+**131 still to read**, of 134 new keys across 16 unmerged branch(es).
+
+A feature waits on its branch until you have used it and said so, so this is where new
+wording lives before it reaches master. **These strings are real and are not on master**,
+which is why the list above can honestly say none while there is reading to do here.
+
+Each branch carries the commit it was read at. This part is a SNAPSHOT and is not held
+fresh by the build — a branch moves whenever anybody commits on it, and failing master's
+build for that would be a gate nobody keeps. Refresh it with
+`php dev/scripts/new_english_keys.php --write`.
+
+### feat/bentley-interop (`e6b7f7d0`) — 63 new, 63 to read @@ NEEDS RULING
+
+- **`lpn_alt_cat_calculation`**
+  > Calculation
+  @@ NEEDS RULING
+- **`lpn_alt_cat_presentation`**
+  > Presentation
+  @@ NEEDS RULING
+- **`lpn_change_type_create_overrides`**
+  > Create overrides
+  @@ NEEDS RULING
+- **`lpn_change_type_line_alternative`**
+  > {id}: {property} {value}, in alternative {alternative}
+  @@ NEEDS RULING
+- **`lpn_change_type_scenario_ask`**
+  > Current scenario is not Base. Create overrides?
+  @@ NEEDS RULING
+- **`lpn_change_type_switch_base`**
+  > Switch to Base
+  @@ NEEDS RULING
+- **`lpn_pane_scn_cur_only`**
+  > Current scenario only
+  @@ NEEDS RULING
+- **`lpn_pane_scn_filter_note`**
+  > {filters}. Showing {n} of {all}.
+  @@ NEEDS RULING
+- **`lpn_pane_scn_ov_only`**
+  > Overrides only
+  @@ NEEDS RULING
+- **`lpn_scenario_delete_has_children`**
+  > The scenario {name} cannot be deleted while other scenarios inherit from it: {list}. Delete those first, or give them another parent.
+  @@ NEEDS RULING
+- **`lpn_settings_held_base`**
+  > {base}: {value}
+  @@ NEEDS RULING
 - **`lpn_settings_restore_base_only`**
   > Switch to Base to restore the defaults.
   @@ NEEDS RULING
@@ -759,193 +975,6 @@ never edits a synonym.
 - **`lpn_settings_view_top_left`**
   > Top left corner
   @@ NEEDS RULING
-- **`lpn_snip_hint_free`**
-  > Drag around the area to snip, or click for the whole map. Esc cancels.
-  @@ NEEDS RULING
-- **`lpn_snip_tip_eraser`**
-  > Eraser: click a stroke to remove it (E)
-  @@ NEEDS RULING
-- **`lpn_snip_tip_free`**
-  > Snip a freehand shape (S)
-  @@ NEEDS RULING
-- **`lpn_snip_tip_map`**
-  > Screenshot of the whole map
-  @@ NEEDS RULING
-- **`lpn_snip_tip_mode`**
-  > Snip shape
-  @@ NEEDS RULING
-- **`lpn_snip_tip_pen`**
-  > Pen
-  @@ NEEDS RULING
-- **`lpn_snip_tip_rect`**
-  > Snip a rectangle (S)
-  @@ NEEDS RULING
-- **`lpn_snip_tip_redo`**
-  > Redo (Ctrl+Y)
-  @@ NEEDS RULING
-- **`lpn_snip_tip_undo`**
-  > Undo (Ctrl+Z)
-  @@ NEEDS RULING
-- **`lpn_status_inp_exported_no_picture`**
-  > Exported {file}. The background picture could not be saved, so the .inp names none; in EPANET, add it with View > Backdrop > Load.
-  @@ NEEDS RULING
-- **`lpn_status_inp_exported_picture`**
-  > Exported {zip}, holding the EPANET file {file}, its background picture {picture}, and the world file {world}. Extract all three into one folder, then open the .inp there in EPANET; the picture comes with it.
-  @@ NEEDS RULING
-- **`lpn_survey_codes_add`**
-  > Add code
-  @@ NEEDS RULING
-- **`lpn_survey_codes_col_code`**
-  > Code
-  @@ NEEDS RULING
-- **`lpn_survey_codes_col_type`**
-  > Asset type
-  @@ NEEDS RULING
-- **`lpn_survey_codes_remove`**
-  > Remove code
-  @@ NEEDS RULING
-- **`lpn_survey_codes_tip`**
-  > Read the first word of each description as a code from the table. Points with the same line code join into one pipe in file order, and WL1 and WL2 are separate lines. +0 starts a line, -0 ends one, and CLO closes one. JPN followed by a point name joins to that point (Carlson), and Civil 3D writes it CPN.
-  @@ NEEDS RULING
-- **`lpn_survey_codes_toggle`**
-  > Read the description as field codes
-  @@ NEEDS RULING
-- **`lpn_survey_confirm_coded`**
-  > {j} junction(s), {r} reservoir(s), {t} tank(s), and {p} pipe(s) found. Proceed?
-  @@ NEEDS RULING
-- **`lpn_survey_note_code_two_nodes`**
-  > More than one node code, the first was used.
-  @@ NEEDS RULING
-- **`lpn_survey_note_code_unknown`**
-  > Code not in the code table, imported as the asset type chosen above.
-  @@ NEEDS RULING
-- **`lpn_survey_note_code_unread`**
-  > Not every word is a code this page reads, kept in the description.
-  @@ NEEDS RULING
-- **`lpn_survey_note_join_missing`**
-  > JPN or CPN names a point not in this file or project, no pipe drawn for it.
-  @@ NEEDS RULING
-- **`lpn_survey_note_join_no_line`**
-  > JPN or CPN on a point with no line code, no pipe drawn for it.
-  @@ NEEDS RULING
-- **`lpn_survey_note_line_one_point`**
-  > Only point on its line, no pipe drawn from it.
-  @@ NEEDS RULING
-- **`lpn_survey_note_no_desc`**
-  > Field codes are on, but this file has no description column, so no codes were read.
-  @@ NEEDS RULING
-- **`lpn_survey_note_node_on_pipe`**
-  > This point lies exactly on a pipe it is not joined to. If they connect, add JPN to say so.
-  @@ NEEDS RULING
-- **`lpn_survey_note_pipe_one_node`**
-  > This line returns to the same node with no other node between, no pipe drawn for it.
-  @@ NEEDS RULING
-- **`lpn_survey_note_pipe_zero_length`**
-  > This point is at the same spot as the node before it, so the pipe between them has no length.
-  @@ NEEDS RULING
-- **`lpn_survey_note_ring_junction`**
-  > This point became a junction so the ring could close.
-  @@ NEEDS RULING
-- **`lpn_survey_note_vertex_text`**
-  > Not every word is a code this page reads, and a vertex keeps no description.
-  @@ NEEDS RULING
-- **`lpn_survey_note_vertices`**
-  > Points that became pipe vertices: {detail}. A vertex keeps no name, elevation, or description.
-  @@ NEEDS RULING
-- **`lpn_survey_report_coded`**
-  > {j} junction(s), {r} reservoir(s), {t} tank(s), and {p} pipe(s) imported, {m} of the nodes with elevation.
-  @@ NEEDS RULING
-- **`lpn_sysflow_title`**
-  > Flow balance
-  _Ruled OK 2026-10-03._
-- **`lpn_time_engine_fetch_failed`**
-  > The download of the EPANET solver failed. Reload the page to try again; a firewall, proxy, or browser extension may be blocking it.
-  @@ NEEDS RULING
-- **`lpn_time_engine_run_failed`**
-  > The EPANET run failed. That is a defect in this page; use the {wrong} link to report it.
-  @@ NEEDS RULING
-- **`lpn_time_engine_start_failed`**
-  > The browser refused to start the EPANET solver. WebAssembly may be turned off by a security setting or an extension.
-  @@ NEEDS RULING
-- **`lpn_time_no_engine_why`**
-  > The built-in solver calculates one moment at a time, so this is the network at {time} only: every pattern is read at that moment, and every tank still sits at its starting level instead of filling and draining. {reason}
-  @@ NEEDS RULING
-- **`lpn_time_scn_overrides`**
-  > Scenario overrides:
-  _Ruled OK 2026-10-05._
-- **`lpn_time_stat_averaged`**
-  > Avg
-  @@ NEEDS RULING
-- **`lpn_time_stat_maximum`**
-  > Max
-  @@ NEEDS RULING
-- **`lpn_time_stat_minimum`**
-  > Min
-  @@ NEEDS RULING
-- **`lpn_time_stat_none`**
-  > None
-  _Ruled OK 2026-10-05._
-- **`lpn_time_stat_range`**
-  > Range
-  _Ruled OK 2026-10-05._
-- **`lpn_time_statistic`**
-  > Statistic
-  _Ruled OK 2026-10-05._
-- **`lpn_tool_add_chain`**
-  > Junction Pipe Chain
-  _Ruled OK 2026-10-05._
-- **`lpn_tool_add_chain_tip`**
-  > Chain junctions and pipes: specify a point on the map to add a junction, then specify each next point to add a pipe and a junction. Specify an existing node to continue from it. Press Escape to end the chain.
-  _Ruled OK 2026-10-05._
-- **`lpn_valwarn_diameter`**
-  > A pipe or valve diameter is normally between {min} and {max} {unit}. Check the number and the diameter unit.
-  @@ NEEDS RULING
-- **`lpn_valwarn_dw`**
-  > A Darcy-Weisbach roughness is normally more than 0 and at most {max} {unit}. A larger number is often a Hazen-Williams C or a Manning n.
-  @@ NEEDS RULING
-- **`lpn_valwarn_hw`**
-  > A Hazen-Williams C is normally between {min} and {max}. A number outside that range is often a roughness meant for another friction method.
-  @@ NEEDS RULING
-- **`lpn_valwarn_manning`**
-  > A Manning n is normally between {min} and {max}. A number outside that range is often a roughness meant for another friction method.
-  @@ NEEDS RULING
-- **`lpn_valwarn_negative`**
-  > EPANET refuses a negative number here.
-  @@ NEEDS RULING
-- **`lpn_valwarn_positive`**
-  > EPANET refuses zero or a negative number here.
-  @@ NEEDS RULING
-- **`lpn_valwarn_tank_levels`**
-  > EPANET refuses this tank. The lowest water depth must not exceed the water depth, and the water depth must not exceed the highest water depth.
-  @@ NEEDS RULING
-
-## points_  (2, 2 to read @@ NEEDS RULING)
-
-- **`points_data_msg_line`**
-  > Nothing was pasted. Line {n} could not be read as a station and an elevation.
-  @@ NEEDS RULING
-- **`points_data_msg_none`**
-  > Nothing was pasted. No station and elevation pairs were found.
-  @@ NEEDS RULING
-
----
-
-# Strings waiting on a branch
-
-**68 still to read**, of 71 new keys across 19 unmerged branch(es).
-
-A feature waits on its branch until you have used it and said so, so this is where new
-wording lives before it reaches master. **These strings are real and are not on master**,
-which is why the list above can honestly say none while there is reading to do here.
-
-Each branch carries the commit it was read at. This part is a SNAPSHOT and is not held
-fresh by the build — a branch moves whenever anybody commits on it, and failing master's
-build for that would be a gate nobody keeps. Refresh it with
-`php dev/scripts/new_english_keys.php --write`.
-
-### chore/technical-english (`19ba6c4e`) — adds no English strings
-
-### feat/bentley-interop (`415af3e7`) — adds no English strings
 
 ### feat/desktop (`baba0f04`) — adds no English strings
 
@@ -1159,7 +1188,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/visit-dedupe (`08c07d31`) — adds no English strings
 
-### feat/workspace (`98aba740`) — 11 new, 11 to read @@ NEEDS RULING
+### feat/workspace (`be1d23ea`) — 11 new, 11 to read @@ NEEDS RULING
 
 - **`lpn_file_export_item_workspace`**
   > Workspace…
@@ -1196,7 +1225,3 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 
 ### fix/contour-breakline (`8a0177e6`) — adds no English strings
-
-### fix/label-clean-ground (`821e3006`) — adds no English strings
-
-### fix/menu-and-repeat (`dd1c8b52`) — adds no English strings

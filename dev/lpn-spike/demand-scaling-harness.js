@@ -142,7 +142,7 @@ async function minPsiAt(m) {
 	ok('each scaled pressure equals the ordinary solve\'s', !!set && set.pressures.every((x) => Math.abs(x.pressure - plain[x.id]) < 1e-9),
 		set && JSON.stringify(set.pressures.map((x) => [x.id, x.pressure - plain[x.id]])));
 	ok('...and equals its own unscaled column', !!set && set.pressures.every((x) => x.unscaled === x.pressure));
-	ok('the project is unchanged', JSON.stringify(L.getDoc()) === before && L.docGuard());
+	ok('the document is unchanged', JSON.stringify(L.getDoc()) === before && L.docGuard());
 	ok('the verdict leads with a check mark and reads in psi',
 		text(byId.lpn_ds_controls).indexOf(PC.lpn_ds_scale_ok.replace('{m}', '1').replace('{pressure}', '20 psi')) >= 0);
 
@@ -172,7 +172,7 @@ async function minPsiAt(m) {
 	ok('...and a third click is still a sort, never lost rows', rows(byId.lpn_ds_controls).length === tr.length);
 	ok('velocities are highest first, pumps left out', set.velocities.every((x, i, a) => !i || a[i - 1].velocity >= x.velocity) &&
 		!set.velocities.some((x) => x.id === '9'));
-	ok('the project is unchanged', JSON.stringify(L.getDoc()) === before && L.docGuard());
+	ok('the document is unchanged', JSON.stringify(L.getDoc()) === before && L.docGuard());
 
 	console.log('\n--- 3. Find: the largest scale that holds 100 psi ---');
 	L.setMin('100');
@@ -191,7 +191,7 @@ async function minPsiAt(m) {
 	const links = gotoIn(dsHost('search'));
 	ok('the limiting junction is a go-to link', links.length >= 1 && links[0].textContent === s.holding.lowest.id &&
 		links[0].title === PC.lpn_goto_on_map);
-	ok('the project is unchanged', JSON.stringify(L.getDoc()) === before && L.docGuard());
+	ok('the document is unchanged', JSON.stringify(L.getDoc()) === before && L.docGuard());
 
 	console.log('\n--- 4. A limit already broken at the demands as they are ---');
 	const at1 = await minPsiAt(1);
@@ -253,7 +253,7 @@ async function minPsiAt(m) {
 	const whole = EC.lpnDemandScaleModel(L.currentModel(), 3, ['32']);
 	ok('the copy scaled exactly one junction', whole.nodes.filter((n, i) => n !== L.currentModel().nodes[i] && n.type === 'junction').length >= 1 &&
 		whole.nodes.filter((n) => n.type === 'junction' && n.id !== '32').every((n) => n.demand === L.currentModel().nodes.filter((o) => o.id === n.id)[0].demand));
-	ok('the project is unchanged', JSON.stringify(L.getDoc()) === before && L.docGuard());
+	ok('the document is unchanged', JSON.stringify(L.getDoc()) === before && L.docGuard());
 	// Find under Selected (Tom, 2026-10-02: "It appears that Find doesn't respect "Selected
 	// junctions"."): it scales only the selection, and its answer says so.
 	L.setSelectionList([{ kind: 'node', id: '10' }, { kind: 'node', id: '11' }]);

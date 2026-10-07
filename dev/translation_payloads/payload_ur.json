@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "ur",
-        "expected_key_count": 2446,
-        "delta_key_count": 223,
+        "expected_key_count": 2444,
+        "delta_key_count": 222,
         "exempt_key_count": 34,
         "exempt_keys": [
             "u_imgd",
@@ -794,7 +794,7 @@
         "lpn_change_type_born": "These are new, as on a newly drawn one:",
         "lpn_change_type_no_curve": "{id}: No pump head curve, so the pump adds no head until one is selected, and an .inp export writes it as a pipe",
         "lpn_change_type_becomes": "{id}: {property} {value}, in scenario {scenario}, becomes {new}",
-        "lpn_change_type_customers": "Only a pipe serves customers, so these customers are connected instead to the node shown in parentheses, where their demand already lands. They stay where they are drawn, and their demand is unchanged:",
+        "lpn_change_type_customers": "Only a pipe serves customers, so these customers are connected instead to the node shown in parentheses, where their demand is already applied. They stay where they are drawn, and their demand is unchanged:",
         "lpn_change_type_setting": "These controls and rules give or test the setting of a link being changed. A setting is a different quantity on a pipe, a pump, and a valve, so these will read it differently:",
         "lpn_change_type_rules": "These rule lines name a link by its kind, and will name its new kind instead:",
         "lpn_find_scope_source": "Source",
@@ -818,7 +818,6 @@
         "lpn_status_inp_exported_picture": "Exported {zip}, holding the EPANET file {file}, its background picture {picture}, and the world file {world}. Extract all three into one folder, then open the .inp there in EPANET; the picture comes with it.",
         "lpn_status_inp_exported_no_picture": "Exported {file}. The background picture could not be saved, so the .inp names none; in EPANET, add it with View > Backdrop > Load.",
         "lpn_inp_export_difference_one": "One thing the .inp format cannot hold.",
-        "lpn_file_export_geojson": "Export GeoJSON file…",
         "lpn_file_export_geojson_tip": "Download this network as a GeoJSON file for QGIS, ArcGIS Pro and other GIS programs. Junctions, tanks and reservoirs are points, and pipes, pumps and valves are lines that follow their vertices. Positions are latitude and longitude. Results are included only when the network has been solved.",
         "lpn_geojson_refused_local": "A GeoJSON file holds latitude and longitude only, and this project is drawn on a local grid with no place on the Earth. Georeference it first with Map, World map, Attach, then export again.",
         "lpn_geojson_refused_range": "These positions are not valid latitudes and longitudes: {detail}",
@@ -830,8 +829,8 @@
         "lpn_inp_backdrop_attach_tip": "A web page cannot open the picture by its name. Choose it on your device and it is placed where the file says it belongs.",
         "lpn_inp_backdrop_attached": "Attached {file}, placed where the file says it belongs.",
         "lpn_inp_backdrop_attached_other": "Attached {picked}, placed where the file says it belongs. The file names {file}, which is a different name.",
-        "lpn_copy_opened_unsaved": "Opened {file} as a copy, with a new lock of its own that will be saved with the next file save.",
-        "lpn_engine_unavailable_why": "Valves that open and close on their own cannot be solved without the EPANET solver. {reason}",
+        "lpn_copy_opened_unsaved": "Opened {file} as a copy, with a new lock that will be saved with the next file save.",
+        "lpn_engine_unavailable_why": "Pressure and flow control valves (PRV, PSV, FCV) cannot be solved without the EPANET solver. {reason}",
         "lpn_engine_needed_failed_why": "This network can only be solved by the EPANET solver. {reason}",
         "lpn_mode_add_chain": "Mode: Junction Pipe Chain. Specify a point on the map to add a junction, then specify each next point to add a pipe and a junction. Specify an existing node to continue from it. Press Escape to end the chain. Switch to Select mode to change or move assets and labels.",
         "lpn_cp_allow_tip": "Allow only these characters:",
@@ -840,9 +839,9 @@
         "lpn_valwarn_hw": "A Hazen-Williams C is normally between {min} and {max}. A number outside that range is often a roughness meant for another friction method.",
         "lpn_valwarn_manning": "A Manning n is normally between {min} and {max}. A number outside that range is often a roughness meant for another friction method.",
         "lpn_valwarn_dw": "A Darcy-Weisbach roughness is normally more than 0 and at most {max} {unit}. A larger number is often a Hazen-Williams C or a Manning n.",
-        "lpn_valwarn_positive": "EPANET refuses zero or a negative number here.",
-        "lpn_valwarn_negative": "EPANET refuses a negative number here.",
-        "lpn_valwarn_tank_levels": "EPANET refuses this tank. The lowest water depth must not exceed the water depth, and the water depth must not exceed the highest water depth.",
+        "lpn_valwarn_positive": "EPANET does not accept zero or a negative number here.",
+        "lpn_valwarn_negative": "EPANET does not accept a negative number here.",
+        "lpn_valwarn_tank_levels": "EPANET does not accept this tank. The lowest water depth must not exceed the water depth, and the water depth must not exceed the highest water depth.",
         "lpn_alt_calc_options": "Calculation options",
         "lpn_scenario_duration_tip": "Leave blank to inherit from parent. A total run time of 0:00 is a steady-state run.",
         "lpn_scenario_hyd_step_tip": "Leave blank to inherit from parent.",
@@ -859,7 +858,7 @@
         "lpn_time_stat_minimum": "Min",
         "lpn_time_stat_maximum": "Max",
         "lpn_time_stat_range": "Range",
-        "lpn_time_no_engine_why": "The built-in solver calculates one moment at a time, so this is the network at {time} only: every pattern is read at that moment, and every tank still sits at its starting level instead of filling and draining. {reason}",
+        "lpn_time_no_engine_why": "The built-in solver solves one instant at a time, so this is the network at {time} only: every pattern is read at that instant, and every tank remains at its initial level instead of filling and draining. {reason}",
         "lpn_time_engine_fetch_failed": "The download of the EPANET solver failed. Reload the page to try again; a firewall, proxy, or browser extension may be blocking it.",
         "lpn_time_engine_start_failed": "The browser refused to start the EPANET solver. WebAssembly may be turned off by a security setting or an extension.",
         "lpn_time_engine_run_failed": "The EPANET run failed. That is a defect in this page; use the {wrong} link to report it.",
@@ -881,7 +880,7 @@
         "lpn_ds_minpressure_tip": "This is the same number as Lowest pressure allowed elsewhere in Fire flow analysis. Changing it here changes it there.",
         "lpn_ds_head_scale": "Scale the demands",
         "lpn_ds_multiplier": "Demand scale",
-        "lpn_ds_multiplier_tip": "The number each demand is multiplied by: 1.5 is half again as much water. It applies on top of the active scenario's own demand multiplier, which is already in the demands, and it is never saved in your project.",
+        "lpn_ds_multiplier_tip": "The factor by which each demand is multiplied; 1.5 is a 50% increase. It applies in addition to the demand multiplier of the active scenario, which is already in the demands, and it is never saved in the project.",
         "lpn_ds_run": "Run",
         "lpn_ds_head_search": "What demand scale can the system handle?",
         "lpn_ds_head_search_selected": "What demand scale can these junctions handle?",
@@ -946,7 +945,7 @@
         "lpn_result_delivered_demand": "Delivered demand",
         "lpn_result_delivered_demand_tip": "The flow this junction actually receives under the pressure driven demand model. It is less than the demand when the pressure is below the required pressure.",
         "lpn_result_demand_deficit": "Demand deficit",
-        "lpn_result_demand_deficit_tip": "The demand this junction asks for and does not receive, because the pressure is below the required pressure.",
+        "lpn_result_demand_deficit_tip": "The demand at this junction that is not delivered, because the pressure is below the required pressure.",
         "lpn_pda_deficit_note": "Junctions receiving less than their demand: {n}.",
         "lpn_diag_pda_pressures": "Required pressure must be greater than Minimum pressure. Change one of them in Settings.",
         "lpn_inp_drop_pressure_unit": "This file states a pressure unit other than the one this page reads for its flow unit, which is psi for US units and meters otherwise. Every pressure in the file is read that way, so check the valve settings, emitters, and pressure driven limits it holds. The line is kept and is written back.",
@@ -1019,7 +1018,7 @@
         "lpn_change_type_born": "These are new, as on a newly drawn one:",
         "lpn_change_type_no_curve": "{id}: No pump head curve, so the pump adds no head until one is selected, and an .inp export writes it as a pipe",
         "lpn_change_type_becomes": "{id}: {property} {value}, in scenario {scenario}, becomes {new}",
-        "lpn_change_type_customers": "Only a pipe serves customers, so these customers are connected instead to the node shown in parentheses, where their demand already lands. They stay where they are drawn, and their demand is unchanged:",
+        "lpn_change_type_customers": "Only a pipe serves customers, so these customers are connected instead to the node shown in parentheses, where their demand is already applied. They stay where they are drawn, and their demand is unchanged:",
         "lpn_change_type_setting": "These controls and rules give or test the setting of a link being changed. A setting is a different quantity on a pipe, a pump, and a valve, so these will read it differently:",
         "lpn_change_type_rules": "These rule lines name a link by its kind, and will name its new kind instead:",
         "lpn_find_scope_source": "Source",
@@ -1043,7 +1042,6 @@
         "lpn_status_inp_exported_picture": "Exported {zip}, holding the EPANET file {file}, its background picture {picture}, and the world file {world}. Extract all three into one folder, then open the .inp there in EPANET; the picture comes with it.",
         "lpn_status_inp_exported_no_picture": "Exported {file}. The background picture could not be saved, so the .inp names none; in EPANET, add it with View > Backdrop > Load.",
         "lpn_inp_export_difference_one": "One thing the .inp format cannot hold.",
-        "lpn_file_export_geojson": "Export GeoJSON file…",
         "lpn_file_export_geojson_tip": "Download this network as a GeoJSON file for QGIS, ArcGIS Pro and other GIS programs. Junctions, tanks and reservoirs are points, and pipes, pumps and valves are lines that follow their vertices. Positions are latitude and longitude. Results are included only when the network has been solved.",
         "lpn_geojson_refused_local": "A GeoJSON file holds latitude and longitude only, and this project is drawn on a local grid with no place on the Earth. Georeference it first with Map, World map, Attach, then export again.",
         "lpn_geojson_refused_range": "These positions are not valid latitudes and longitudes: {detail}",
@@ -1055,8 +1053,8 @@
         "lpn_inp_backdrop_attach_tip": "A web page cannot open the picture by its name. Choose it on your device and it is placed where the file says it belongs.",
         "lpn_inp_backdrop_attached": "Attached {file}, placed where the file says it belongs.",
         "lpn_inp_backdrop_attached_other": "Attached {picked}, placed where the file says it belongs. The file names {file}, which is a different name.",
-        "lpn_copy_opened_unsaved": "Opened {file} as a copy, with a new lock of its own that will be saved with the next file save.",
-        "lpn_engine_unavailable_why": "Valves that open and close on their own cannot be solved without the EPANET solver. {reason}",
+        "lpn_copy_opened_unsaved": "Opened {file} as a copy, with a new lock that will be saved with the next file save.",
+        "lpn_engine_unavailable_why": "Pressure and flow control valves (PRV, PSV, FCV) cannot be solved without the EPANET solver. {reason}",
         "lpn_engine_needed_failed_why": "This network can only be solved by the EPANET solver. {reason}",
         "lpn_mode_add_chain": "Mode: Junction Pipe Chain. Specify a point on the map to add a junction, then specify each next point to add a pipe and a junction. Specify an existing node to continue from it. Press Escape to end the chain. Switch to Select mode to change or move assets and labels.",
         "lpn_cp_allow_tip": "Allow only these characters:",
@@ -1065,9 +1063,9 @@
         "lpn_valwarn_hw": "A Hazen-Williams C is normally between {min} and {max}. A number outside that range is often a roughness meant for another friction method.",
         "lpn_valwarn_manning": "A Manning n is normally between {min} and {max}. A number outside that range is often a roughness meant for another friction method.",
         "lpn_valwarn_dw": "A Darcy-Weisbach roughness is normally more than 0 and at most {max} {unit}. A larger number is often a Hazen-Williams C or a Manning n.",
-        "lpn_valwarn_positive": "EPANET refuses zero or a negative number here.",
-        "lpn_valwarn_negative": "EPANET refuses a negative number here.",
-        "lpn_valwarn_tank_levels": "EPANET refuses this tank. The lowest water depth must not exceed the water depth, and the water depth must not exceed the highest water depth.",
+        "lpn_valwarn_positive": "EPANET does not accept zero or a negative number here.",
+        "lpn_valwarn_negative": "EPANET does not accept a negative number here.",
+        "lpn_valwarn_tank_levels": "EPANET does not accept this tank. The lowest water depth must not exceed the water depth, and the water depth must not exceed the highest water depth.",
         "lpn_alt_calc_options": "Calculation options",
         "lpn_scenario_duration_tip": "Leave blank to inherit from parent. A total run time of 0:00 is a steady-state run.",
         "lpn_scenario_hyd_step_tip": "Leave blank to inherit from parent.",
@@ -1084,7 +1082,7 @@
         "lpn_time_stat_minimum": "Min",
         "lpn_time_stat_maximum": "Max",
         "lpn_time_stat_range": "Range",
-        "lpn_time_no_engine_why": "The built-in solver calculates one moment at a time, so this is the network at {time} only: every pattern is read at that moment, and every tank still sits at its starting level instead of filling and draining. {reason}",
+        "lpn_time_no_engine_why": "The built-in solver solves one instant at a time, so this is the network at {time} only: every pattern is read at that instant, and every tank remains at its initial level instead of filling and draining. {reason}",
         "lpn_time_engine_fetch_failed": "The download of the EPANET solver failed. Reload the page to try again; a firewall, proxy, or browser extension may be blocking it.",
         "lpn_time_engine_start_failed": "The browser refused to start the EPANET solver. WebAssembly may be turned off by a security setting or an extension.",
         "lpn_time_engine_run_failed": "The EPANET run failed. That is a defect in this page; use the {wrong} link to report it.",
@@ -1106,7 +1104,7 @@
         "lpn_ds_minpressure_tip": "This is the same number as Lowest pressure allowed elsewhere in Fire flow analysis. Changing it here changes it there.",
         "lpn_ds_head_scale": "Scale the demands",
         "lpn_ds_multiplier": "Demand scale",
-        "lpn_ds_multiplier_tip": "The number each demand is multiplied by: 1.5 is half again as much water. It applies on top of the active scenario's own demand multiplier, which is already in the demands, and it is never saved in your project.",
+        "lpn_ds_multiplier_tip": "The factor by which each demand is multiplied; 1.5 is a 50% increase. It applies in addition to the demand multiplier of the active scenario, which is already in the demands, and it is never saved in the project.",
         "lpn_ds_run": "Run",
         "lpn_ds_head_search": "What demand scale can the system handle?",
         "lpn_ds_head_search_selected": "What demand scale can these junctions handle?",
@@ -1171,7 +1169,7 @@
         "lpn_result_delivered_demand": "Delivered demand",
         "lpn_result_delivered_demand_tip": "The flow this junction actually receives under the pressure driven demand model. It is less than the demand when the pressure is below the required pressure.",
         "lpn_result_demand_deficit": "Demand deficit",
-        "lpn_result_demand_deficit_tip": "The demand this junction asks for and does not receive, because the pressure is below the required pressure.",
+        "lpn_result_demand_deficit_tip": "The demand at this junction that is not delivered, because the pressure is below the required pressure.",
         "lpn_pda_deficit_note": "Junctions receiving less than their demand: {n}.",
         "lpn_diag_pda_pressures": "Required pressure must be greater than Minimum pressure. Change one of them in Settings.",
         "lpn_inp_drop_pressure_unit": "This file states a pressure unit other than the one this page reads for its flow unit, which is psi for US units and meters otherwise. Every pressure in the file is read that way, so check the valve settings, emitters, and pressure driven limits it holds. The line is kept and is written back.",
@@ -1441,12 +1439,12 @@
                 "previous_translated": {
                     "key": "lpn_wrong_thanks",
                     "value": "شکریہ۔ یہ ہم تک پہنچ گیا۔",
-                    "english": "Thank you. That reached us."
+                    "english": "Thank you. Your report was received."
                 },
                 "next_translated": {
                     "key": "lpn_status_example_opened",
                     "value": "{name} کھل گیا۔ یہ آپ کی کاپی ہے: اسے فائل، محفوظ کریں بطور سے محفوظ کریں۔",
-                    "english": "Opened {name}. It is your copy: save it with File, Save as."
+                    "english": "Opened {name} as a copy. Save it with File, Save as."
                 }
             }
         },
@@ -1457,12 +1455,12 @@
                 "previous_translated": {
                     "key": "lpn_wrong_thanks",
                     "value": "شکریہ۔ یہ ہم تک پہنچ گیا۔",
-                    "english": "Thank you. That reached us."
+                    "english": "Thank you. Your report was received."
                 },
                 "next_translated": {
                     "key": "lpn_status_example_opened",
                     "value": "{name} کھل گیا۔ یہ آپ کی کاپی ہے: اسے فائل، محفوظ کریں بطور سے محفوظ کریں۔",
-                    "english": "Opened {name}. It is your copy: save it with File, Save as."
+                    "english": "Opened {name} as a copy. Save it with File, Save as."
                 }
             }
         },
@@ -1473,12 +1471,12 @@
                 "previous_translated": {
                     "key": "lpn_wrong_thanks",
                     "value": "شکریہ۔ یہ ہم تک پہنچ گیا۔",
-                    "english": "Thank you. That reached us."
+                    "english": "Thank you. Your report was received."
                 },
                 "next_translated": {
                     "key": "lpn_status_example_opened",
                     "value": "{name} کھل گیا۔ یہ آپ کی کاپی ہے: اسے فائل، محفوظ کریں بطور سے محفوظ کریں۔",
-                    "english": "Opened {name}. It is your copy: save it with File, Save as."
+                    "english": "Opened {name} as a copy. Save it with File, Save as."
                 }
             }
         },
@@ -1489,12 +1487,12 @@
                 "previous_translated": {
                     "key": "lpn_wrong_thanks",
                     "value": "شکریہ۔ یہ ہم تک پہنچ گیا۔",
-                    "english": "Thank you. That reached us."
+                    "english": "Thank you. Your report was received."
                 },
                 "next_translated": {
                     "key": "lpn_status_example_opened",
                     "value": "{name} کھل گیا۔ یہ آپ کی کاپی ہے: اسے فائل، محفوظ کریں بطور سے محفوظ کریں۔",
-                    "english": "Opened {name}. It is your copy: save it with File, Save as."
+                    "english": "Opened {name} as a copy. Save it with File, Save as."
                 }
             }
         },
@@ -1505,12 +1503,12 @@
                 "previous_translated": {
                     "key": "lpn_wrong_thanks",
                     "value": "شکریہ۔ یہ ہم تک پہنچ گیا۔",
-                    "english": "Thank you. That reached us."
+                    "english": "Thank you. Your report was received."
                 },
                 "next_translated": {
                     "key": "lpn_status_example_opened",
                     "value": "{name} کھل گیا۔ یہ آپ کی کاپی ہے: اسے فائل، محفوظ کریں بطور سے محفوظ کریں۔",
-                    "english": "Opened {name}. It is your copy: save it with File, Save as."
+                    "english": "Opened {name} as a copy. Save it with File, Save as."
                 }
             }
         },
@@ -1521,12 +1519,12 @@
                 "previous_translated": {
                     "key": "lpn_wrong_thanks",
                     "value": "شکریہ۔ یہ ہم تک پہنچ گیا۔",
-                    "english": "Thank you. That reached us."
+                    "english": "Thank you. Your report was received."
                 },
                 "next_translated": {
                     "key": "lpn_status_example_opened",
                     "value": "{name} کھل گیا۔ یہ آپ کی کاپی ہے: اسے فائل، محفوظ کریں بطور سے محفوظ کریں۔",
-                    "english": "Opened {name}. It is your copy: save it with File, Save as."
+                    "english": "Opened {name} as a copy. Save it with File, Save as."
                 }
             }
         },
@@ -1537,12 +1535,12 @@
                 "previous_translated": {
                     "key": "lpn_wrong_thanks",
                     "value": "شکریہ۔ یہ ہم تک پہنچ گیا۔",
-                    "english": "Thank you. That reached us."
+                    "english": "Thank you. Your report was received."
                 },
                 "next_translated": {
                     "key": "lpn_status_example_opened",
                     "value": "{name} کھل گیا۔ یہ آپ کی کاپی ہے: اسے فائل، محفوظ کریں بطور سے محفوظ کریں۔",
-                    "english": "Opened {name}. It is your copy: save it with File, Save as."
+                    "english": "Opened {name} as a copy. Save it with File, Save as."
                 }
             }
         },
@@ -1553,12 +1551,12 @@
                 "previous_translated": {
                     "key": "lpn_wrong_thanks",
                     "value": "شکریہ۔ یہ ہم تک پہنچ گیا۔",
-                    "english": "Thank you. That reached us."
+                    "english": "Thank you. Your report was received."
                 },
                 "next_translated": {
                     "key": "lpn_status_example_opened",
                     "value": "{name} کھل گیا۔ یہ آپ کی کاپی ہے: اسے فائل، محفوظ کریں بطور سے محفوظ کریں۔",
-                    "english": "Opened {name}. It is your copy: save it with File, Save as."
+                    "english": "Opened {name} as a copy. Save it with File, Save as."
                 }
             }
         },
@@ -1569,12 +1567,12 @@
                 "previous_translated": {
                     "key": "lpn_wrong_thanks",
                     "value": "شکریہ۔ یہ ہم تک پہنچ گیا۔",
-                    "english": "Thank you. That reached us."
+                    "english": "Thank you. Your report was received."
                 },
                 "next_translated": {
                     "key": "lpn_status_example_opened",
                     "value": "{name} کھل گیا۔ یہ آپ کی کاپی ہے: اسے فائل، محفوظ کریں بطور سے محفوظ کریں۔",
-                    "english": "Opened {name}. It is your copy: save it with File, Save as."
+                    "english": "Opened {name} as a copy. Save it with File, Save as."
                 }
             }
         },
@@ -1585,12 +1583,12 @@
                 "previous_translated": {
                     "key": "lpn_wrong_thanks",
                     "value": "شکریہ۔ یہ ہم تک پہنچ گیا۔",
-                    "english": "Thank you. That reached us."
+                    "english": "Thank you. Your report was received."
                 },
                 "next_translated": {
                     "key": "lpn_status_example_opened",
                     "value": "{name} کھل گیا۔ یہ آپ کی کاپی ہے: اسے فائل، محفوظ کریں بطور سے محفوظ کریں۔",
-                    "english": "Opened {name}. It is your copy: save it with File, Save as."
+                    "english": "Opened {name} as a copy. Save it with File, Save as."
                 }
             }
         },
@@ -1601,12 +1599,12 @@
                 "previous_translated": {
                     "key": "lpn_wrong_thanks",
                     "value": "شکریہ۔ یہ ہم تک پہنچ گیا۔",
-                    "english": "Thank you. That reached us."
+                    "english": "Thank you. Your report was received."
                 },
                 "next_translated": {
                     "key": "lpn_status_example_opened",
                     "value": "{name} کھل گیا۔ یہ آپ کی کاپی ہے: اسے فائل، محفوظ کریں بطور سے محفوظ کریں۔",
-                    "english": "Opened {name}. It is your copy: save it with File, Save as."
+                    "english": "Opened {name} as a copy. Save it with File, Save as."
                 }
             }
         },
@@ -1617,12 +1615,12 @@
                 "previous_translated": {
                     "key": "lpn_wrong_thanks",
                     "value": "شکریہ۔ یہ ہم تک پہنچ گیا۔",
-                    "english": "Thank you. That reached us."
+                    "english": "Thank you. Your report was received."
                 },
                 "next_translated": {
                     "key": "lpn_status_example_opened",
                     "value": "{name} کھل گیا۔ یہ آپ کی کاپی ہے: اسے فائل، محفوظ کریں بطور سے محفوظ کریں۔",
-                    "english": "Opened {name}. It is your copy: save it with File, Save as."
+                    "english": "Opened {name} as a copy. Save it with File, Save as."
                 }
             }
         },
@@ -1633,12 +1631,12 @@
                 "previous_translated": {
                     "key": "lpn_wrong_thanks",
                     "value": "شکریہ۔ یہ ہم تک پہنچ گیا۔",
-                    "english": "Thank you. That reached us."
+                    "english": "Thank you. Your report was received."
                 },
                 "next_translated": {
                     "key": "lpn_status_example_opened",
                     "value": "{name} کھل گیا۔ یہ آپ کی کاپی ہے: اسے فائل، محفوظ کریں بطور سے محفوظ کریں۔",
-                    "english": "Opened {name}. It is your copy: save it with File, Save as."
+                    "english": "Opened {name} as a copy. Save it with File, Save as."
                 }
             }
         },
@@ -2287,9 +2285,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_file_export_inp",
-                    "value": "EPANET فائل برآمد کریں…",
-                    "english": "Export EPANET file…"
+                    "key": "lpn_file_import_inp_tip",
+                    "value": "کسی EPANET فائل سے نیٹ ورک پڑھیں، خواہ وہ .inp متنی فائل ہو یا EPANET کی محفوظ کردہ .net فائل، اور اسے اس براؤزر میں ایک نئے پراجیکٹ کے طور پر محفوظ کریں۔",
+                    "english": "Create a new project from an EPANET file, either the .inp export format (preferred) or the native .net format (last resort)."
                 },
                 "next_translated": {
                     "key": "lpn_file_export_inp_tip",
@@ -2303,9 +2301,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_file_export_inp",
-                    "value": "EPANET فائل برآمد کریں…",
-                    "english": "Export EPANET file…"
+                    "key": "lpn_file_import_inp_tip",
+                    "value": "کسی EPANET فائل سے نیٹ ورک پڑھیں، خواہ وہ .inp متنی فائل ہو یا EPANET کی محفوظ کردہ .net فائل، اور اسے اس براؤزر میں ایک نئے پراجیکٹ کے طور پر محفوظ کریں۔",
+                    "english": "Create a new project from an EPANET file, either the .inp export format (preferred) or the native .net format (last resort)."
                 },
                 "next_translated": {
                     "key": "lpn_file_export_inp_tip",
@@ -2319,9 +2317,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_file_export_inp",
-                    "value": "EPANET فائل برآمد کریں…",
-                    "english": "Export EPANET file…"
+                    "key": "lpn_file_import_inp_tip",
+                    "value": "کسی EPANET فائل سے نیٹ ورک پڑھیں، خواہ وہ .inp متنی فائل ہو یا EPANET کی محفوظ کردہ .net فائل، اور اسے اس براؤزر میں ایک نئے پراجیکٹ کے طور پر محفوظ کریں۔",
+                    "english": "Create a new project from an EPANET file, either the .inp export format (preferred) or the native .net format (last resort)."
                 },
                 "next_translated": {
                     "key": "lpn_file_export_inp_tip",
@@ -2375,22 +2373,6 @@
                     "key": "lpn_inp_export_refused",
                     "value": "یہ پراجیکٹ EPANET فائل کے طور پر نہیں لکھا جا سکتا: {detail}",
                     "english": "This project cannot be written as an EPANET file: {detail}"
-                }
-            }
-        },
-        "lpn_file_export_geojson": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_inp_export_refused",
-                    "value": "یہ پراجیکٹ EPANET فائل کے طور پر نہیں لکھا جا سکتا: {detail}",
-                    "english": "This project cannot be written as an EPANET file: {detail}"
-                },
-                "next_translated": {
-                    "key": "lpn_inp_bad_file",
-                    "value": "اس فائل کو EPANET نیٹ ورک فائل کے طور پر نہیں پڑھا جا سکا۔",
-                    "english": "That file could not be read as an EPANET network file."
                 }
             }
         },
@@ -2518,7 +2500,7 @@
                 "next_translated": {
                     "key": "lpn_inp_report_lead",
                     "value": "یہ صفحہ EPANET کی ہر چیز استعمال نہیں کرتا، مگر آپ کی فائل میں کچھ بھی ضائع نہیں کیا جاتا۔ نیچے وہ ہے جو آپ کی فائل رکھتی ہے اور یہ صفحہ استعمال کیے بغیر محفوظ رکھتا ہے، اور جو فائل پڑھے جانے پر بدلا گیا:",
-                    "english": "This page does not use everything EPANET does, but nothing in your file is thrown away. Below is what your file holds that this page keeps without using, and what was changed when the file was read in:"
+                    "english": "This page does not use every EPANET feature, but no data in the file is discarded. The list below shows data in the file that is retained but not used, and any changes made during import:"
                 }
             }
         },
@@ -2534,7 +2516,7 @@
                 "next_translated": {
                     "key": "lpn_inp_report_lead",
                     "value": "یہ صفحہ EPANET کی ہر چیز استعمال نہیں کرتا، مگر آپ کی فائل میں کچھ بھی ضائع نہیں کیا جاتا۔ نیچے وہ ہے جو آپ کی فائل رکھتی ہے اور یہ صفحہ استعمال کیے بغیر محفوظ رکھتا ہے، اور جو فائل پڑھے جانے پر بدلا گیا:",
-                    "english": "This page does not use everything EPANET does, but nothing in your file is thrown away. Below is what your file holds that this page keeps without using, and what was changed when the file was read in:"
+                    "english": "This page does not use every EPANET feature, but no data in the file is discarded. The list below shows data in the file that is retained but not used, and any changes made during import:"
                 }
             }
         },
@@ -2550,7 +2532,7 @@
                 "next_translated": {
                     "key": "lpn_inp_report_lead",
                     "value": "یہ صفحہ EPANET کی ہر چیز استعمال نہیں کرتا، مگر آپ کی فائل میں کچھ بھی ضائع نہیں کیا جاتا۔ نیچے وہ ہے جو آپ کی فائل رکھتی ہے اور یہ صفحہ استعمال کیے بغیر محفوظ رکھتا ہے، اور جو فائل پڑھے جانے پر بدلا گیا:",
-                    "english": "This page does not use everything EPANET does, but nothing in your file is thrown away. Below is what your file holds that this page keeps without using, and what was changed when the file was read in:"
+                    "english": "This page does not use every EPANET feature, but no data in the file is discarded. The list below shows data in the file that is retained but not used, and any changes made during import:"
                 }
             }
         },
@@ -2566,7 +2548,7 @@
                 "next_translated": {
                     "key": "lpn_inp_report_lead",
                     "value": "یہ صفحہ EPANET کی ہر چیز استعمال نہیں کرتا، مگر آپ کی فائل میں کچھ بھی ضائع نہیں کیا جاتا۔ نیچے وہ ہے جو آپ کی فائل رکھتی ہے اور یہ صفحہ استعمال کیے بغیر محفوظ رکھتا ہے، اور جو فائل پڑھے جانے پر بدلا گیا:",
-                    "english": "This page does not use everything EPANET does, but nothing in your file is thrown away. Below is what your file holds that this page keeps without using, and what was changed when the file was read in:"
+                    "english": "This page does not use every EPANET feature, but no data in the file is discarded. The list below shows data in the file that is retained but not used, and any changes made during import:"
                 }
             }
         },
@@ -2577,7 +2559,7 @@
                 "previous_translated": {
                     "key": "lpn_copy_opened",
                     "value": "{file} کو کاپی کے طور پر کھولا گیا، اس کے اپنے نئے لاک کے ساتھ جو اگلی بار فائل محفوظ کرنے پر محفوظ ہو گا۔",
-                    "english": "Opened {file} as a copy and saved it, with a new lock of its own."
+                    "english": "Opened {file} as a copy and saved it, with a new lock."
                 },
                 "next_translated": {
                     "key": "lpn_lock_requested",
@@ -2593,7 +2575,7 @@
                 "previous_translated": {
                     "key": "lpn_engine_unavailable",
                     "value": "EPANET حل کار حاصل نہیں ہو سکا، جو خود بخود کھلنے اور بند ہونے والے والوز کو حل کرتا ہے۔ ایک بار انٹرنیٹ سے جڑیں اور یہ اس کے بعد اس آلے پر محفوظ رہتا ہے۔",
-                    "english": "Could not get the EPANET solver, which is what solves valves that open and close on their own. Connect to the internet once and it is kept on this device from then on."
+                    "english": "Could not download the EPANET solver, which is required to solve pressure and flow control valves (PRV, PSV, FCV). After one connection to the internet, the solver is stored on this device."
                 },
                 "next_translated": {
                     "key": "lpn_engine_needed_loading",
@@ -2614,7 +2596,7 @@
                 "next_translated": {
                     "key": "lpn_diag_valve_needs_epanet",
                     "value": "یہ والوز خود بخود کھلتے اور بند ہوتے ہیں، اور صرف EPANET حل کار ہی انہیں شمار کر سکتا ہے۔ EPANET حل کار لوڈ نہیں ہو سکا، اس لیے یہ نتائج غائب ہیں:",
-                    "english": "These valves open and close on their own, and only the EPANET solver can compute them. The EPANET solver could not be loaded, so these results are missing:"
+                    "english": "These are pressure or flow control valves, and only the EPANET solver can compute them. The EPANET solver could not be loaded, so these results are missing:"
                 }
             }
         },
@@ -2790,7 +2772,7 @@
                 "next_translated": {
                     "key": "lpn_alt_note",
                     "value": "صرف پڑھنے کے لیے۔ بنیاد ہر زمرے کا بنیادی متبادل استعمال کرتی ہے۔ ہر منظرنامے کو ہر اس زمرے کا اپنا متبادل ملتا ہے جو تبدیل ہوا ہو، جو بنیادی متبادل کی ذیلی شاخ ہے۔ عدد بتاتا ہے کہ اس میں کتنی تبدیل شدہ قدریں ہیں۔",
-                    "english": "Base uses the Base alternative of every category. Each scenario gets its own alternative for any category that is changed, a child of the Base one. The number is how many changed values it has. The last three columns are calculation options: type a scenario's own value, or leave it blank to use its parent's. The project's own are in Settings, Calculation, Time."
+                    "english": "Base uses the Base alternative of every category. Each scenario has a separate alternative, a child of the Base alternative, for any category that is changed. The number is the count of changed values. The last three columns are calculation options: enter a value for the scenario, or leave it blank to use the parent value. The project values are in Settings, Calculation, Time."
                 }
             }
         },
@@ -2801,7 +2783,7 @@
                 "previous_translated": {
                     "key": "lpn_alt_note",
                     "value": "صرف پڑھنے کے لیے۔ بنیاد ہر زمرے کا بنیادی متبادل استعمال کرتی ہے۔ ہر منظرنامے کو ہر اس زمرے کا اپنا متبادل ملتا ہے جو تبدیل ہوا ہو، جو بنیادی متبادل کی ذیلی شاخ ہے۔ عدد بتاتا ہے کہ اس میں کتنی تبدیل شدہ قدریں ہیں۔",
-                    "english": "Base uses the Base alternative of every category. Each scenario gets its own alternative for any category that is changed, a child of the Base one. The number is how many changed values it has. The last three columns are calculation options: type a scenario's own value, or leave it blank to use its parent's. The project's own are in Settings, Calculation, Time."
+                    "english": "Base uses the Base alternative of every category. Each scenario has a separate alternative, a child of the Base alternative, for any category that is changed. The number is the count of changed values. The last three columns are calculation options: enter a value for the scenario, or leave it blank to use the parent value. The project values are in Settings, Calculation, Time."
                 },
                 "next_translated": {
                     "key": "lpn_alt_cat_physical",
@@ -2817,7 +2799,7 @@
                 "previous_translated": {
                     "key": "lpn_alt_note",
                     "value": "صرف پڑھنے کے لیے۔ بنیاد ہر زمرے کا بنیادی متبادل استعمال کرتی ہے۔ ہر منظرنامے کو ہر اس زمرے کا اپنا متبادل ملتا ہے جو تبدیل ہوا ہو، جو بنیادی متبادل کی ذیلی شاخ ہے۔ عدد بتاتا ہے کہ اس میں کتنی تبدیل شدہ قدریں ہیں۔",
-                    "english": "Base uses the Base alternative of every category. Each scenario gets its own alternative for any category that is changed, a child of the Base one. The number is how many changed values it has. The last three columns are calculation options: type a scenario's own value, or leave it blank to use its parent's. The project's own are in Settings, Calculation, Time."
+                    "english": "Base uses the Base alternative of every category. Each scenario has a separate alternative, a child of the Base alternative, for any category that is changed. The number is the count of changed values. The last three columns are calculation options: enter a value for the scenario, or leave it blank to use the parent value. The project values are in Settings, Calculation, Time."
                 },
                 "next_translated": {
                     "key": "lpn_alt_cat_physical",
@@ -2833,7 +2815,7 @@
                 "previous_translated": {
                     "key": "lpn_alt_note",
                     "value": "صرف پڑھنے کے لیے۔ بنیاد ہر زمرے کا بنیادی متبادل استعمال کرتی ہے۔ ہر منظرنامے کو ہر اس زمرے کا اپنا متبادل ملتا ہے جو تبدیل ہوا ہو، جو بنیادی متبادل کی ذیلی شاخ ہے۔ عدد بتاتا ہے کہ اس میں کتنی تبدیل شدہ قدریں ہیں۔",
-                    "english": "Base uses the Base alternative of every category. Each scenario gets its own alternative for any category that is changed, a child of the Base one. The number is how many changed values it has. The last three columns are calculation options: type a scenario's own value, or leave it blank to use its parent's. The project's own are in Settings, Calculation, Time."
+                    "english": "Base uses the Base alternative of every category. Each scenario has a separate alternative, a child of the Base alternative, for any category that is changed. The number is the count of changed values. The last three columns are calculation options: enter a value for the scenario, or leave it blank to use the parent value. The project values are in Settings, Calculation, Time."
                 },
                 "next_translated": {
                     "key": "lpn_alt_cat_physical",
@@ -2854,7 +2836,7 @@
                 "next_translated": {
                     "key": "lpn_engine_valve_route",
                     "value": "EPANET حل کار سے حل کیا گیا، کیونکہ یہ والوز خود بخود کھلتے اور بند ہوتے ہیں:",
-                    "english": "Solved with the EPANET solver, because these valves open and close on their own:"
+                    "english": "Solved with the EPANET solver, because of these pressure and flow control valves:"
                 }
             }
         },
@@ -3041,7 +3023,7 @@
                 "previous_translated": {
                     "key": "lpn_time_no_engine",
                     "value": "بلٹ اِن حل کار ایک وقت میں ایک لمحہ نکالتا ہے، اس لیے یہ صرف {time} پر نیٹ ورک ہے: ہر پیٹرن اسی لمحے پر پڑھا جاتا ہے، اور ہر ٹینک بھرنے اور خالی ہونے کے بجائے اب بھی اپنی ابتدائی سطح پر بیٹھا ہے۔ EPANET حل کار حاصل کرنے کے لیے ایک بار انٹرنیٹ سے جڑیں، جو وقتی دورانیے کی سمولیشن چلاتا ہے۔",
-                    "english": "The built-in solver calculates one moment at a time, so this is the network at {time} only: every pattern is read at that moment, and every tank still sits at its starting level instead of filling and draining. Connect to the internet one time to fetch the EPANET solver, which runs an extended period simulation."
+                    "english": "The built-in solver solves one instant at a time, so this is the network at {time} only: every pattern is read at that instant, and every tank remains at its initial level instead of filling and draining. Connect to the internet once to download the EPANET solver, which runs an extended period simulation."
                 },
                 "next_translated": {
                     "key": "lpn_time_slider",
@@ -3057,7 +3039,7 @@
                 "previous_translated": {
                     "key": "lpn_time_no_engine",
                     "value": "بلٹ اِن حل کار ایک وقت میں ایک لمحہ نکالتا ہے، اس لیے یہ صرف {time} پر نیٹ ورک ہے: ہر پیٹرن اسی لمحے پر پڑھا جاتا ہے، اور ہر ٹینک بھرنے اور خالی ہونے کے بجائے اب بھی اپنی ابتدائی سطح پر بیٹھا ہے۔ EPANET حل کار حاصل کرنے کے لیے ایک بار انٹرنیٹ سے جڑیں، جو وقتی دورانیے کی سمولیشن چلاتا ہے۔",
-                    "english": "The built-in solver calculates one moment at a time, so this is the network at {time} only: every pattern is read at that moment, and every tank still sits at its starting level instead of filling and draining. Connect to the internet one time to fetch the EPANET solver, which runs an extended period simulation."
+                    "english": "The built-in solver solves one instant at a time, so this is the network at {time} only: every pattern is read at that instant, and every tank remains at its initial level instead of filling and draining. Connect to the internet once to download the EPANET solver, which runs an extended period simulation."
                 },
                 "next_translated": {
                     "key": "lpn_time_slider",
@@ -3073,7 +3055,7 @@
                 "previous_translated": {
                     "key": "lpn_time_no_engine",
                     "value": "بلٹ اِن حل کار ایک وقت میں ایک لمحہ نکالتا ہے، اس لیے یہ صرف {time} پر نیٹ ورک ہے: ہر پیٹرن اسی لمحے پر پڑھا جاتا ہے، اور ہر ٹینک بھرنے اور خالی ہونے کے بجائے اب بھی اپنی ابتدائی سطح پر بیٹھا ہے۔ EPANET حل کار حاصل کرنے کے لیے ایک بار انٹرنیٹ سے جڑیں، جو وقتی دورانیے کی سمولیشن چلاتا ہے۔",
-                    "english": "The built-in solver calculates one moment at a time, so this is the network at {time} only: every pattern is read at that moment, and every tank still sits at its starting level instead of filling and draining. Connect to the internet one time to fetch the EPANET solver, which runs an extended period simulation."
+                    "english": "The built-in solver solves one instant at a time, so this is the network at {time} only: every pattern is read at that instant, and every tank remains at its initial level instead of filling and draining. Connect to the internet once to download the EPANET solver, which runs an extended period simulation."
                 },
                 "next_translated": {
                     "key": "lpn_time_slider",
@@ -3089,7 +3071,7 @@
                 "previous_translated": {
                     "key": "lpn_time_no_engine",
                     "value": "بلٹ اِن حل کار ایک وقت میں ایک لمحہ نکالتا ہے، اس لیے یہ صرف {time} پر نیٹ ورک ہے: ہر پیٹرن اسی لمحے پر پڑھا جاتا ہے، اور ہر ٹینک بھرنے اور خالی ہونے کے بجائے اب بھی اپنی ابتدائی سطح پر بیٹھا ہے۔ EPANET حل کار حاصل کرنے کے لیے ایک بار انٹرنیٹ سے جڑیں، جو وقتی دورانیے کی سمولیشن چلاتا ہے۔",
-                    "english": "The built-in solver calculates one moment at a time, so this is the network at {time} only: every pattern is read at that moment, and every tank still sits at its starting level instead of filling and draining. Connect to the internet one time to fetch the EPANET solver, which runs an extended period simulation."
+                    "english": "The built-in solver solves one instant at a time, so this is the network at {time} only: every pattern is read at that instant, and every tank remains at its initial level instead of filling and draining. Connect to the internet once to download the EPANET solver, which runs an extended period simulation."
                 },
                 "next_translated": {
                     "key": "lpn_time_slider",

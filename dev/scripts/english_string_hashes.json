@@ -3479,7 +3479,6 @@
         "lpn_file_changed_elsewhere": "b28191a691cef7b9b535a1d1e40a40966522a88e",
         "lpn_file_convert_as": "015736f96905b3ccd0a806d137e2f0d953839f9c",
         "lpn_file_convert_as_tip": "7f3d6d6996d5a8daf78b017cf5c084b7c6748c2f",
-        "lpn_file_export_inp": "f428aa355e86893429222bafcf7efe0be54a2384",
         "lpn_file_export_inp_tip": "5623e7c0eff07644ef0d32eccda484d204c49d55",
         "lpn_file_import_inp": "422aa12aac66e90544516fbace883e795deba9fd",
         "lpn_file_import_inp_tip": "a9c7de913fc40c9d97ff49f3456f625e79c70b5e",
@@ -8107,10 +8106,6 @@
         "lpn_file_convert_as_tip": {
             "words": 66,
             "ends_sentence": true
-        },
-        "lpn_file_export_inp": {
-            "words": 3,
-            "ends_sentence": false
         },
         "lpn_file_export_inp_tip": {
             "words": 19,

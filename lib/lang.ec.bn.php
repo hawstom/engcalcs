@@ -1765,7 +1765,6 @@ $ec_lang['lpn_file_import_inp']='EPANET ফাইল আমদানি কর�
 $ec_lang['lpn_file_import_inp_tip']='একটি EPANET ফাইল থেকে একটি নেটওয়ার্ক পড়ুন, .inp টেক্সট ফাইল বা EPANET যে .net ফাইল সংরক্ষণ করে তার যেকোনোটি, এবং এই ব্রাউজারে এটি একটি নতুন প্রকল্প হিসেবে সংরক্ষণ করুন।';
 // The other direction (Task 281). A DOWNLOAD, so the word is Export rather than Save: this page
 // keeps no handle on an `.inp` and never writes back to one.
-$ec_lang['lpn_file_export_inp']='EPANET ফাইল এক্সপোর্ট করুন…';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_file_export_inp_tip']='এই নেটওয়ার্কটি একটি EPANET .inp ফাইল হিসেবে লিখুন এবং ডাউনলোড করুন। আপনি যা লিখেছেন তা ঠিক সেভাবেই লেখা হয়। .inp ফরম্যাট যা ধারণ করতে পারে না তা পরে আপনাকে তালিকা আকারে দেখানো হয়।';
 $ec_lang['lpn_status_inp_exported']='{file} এক্সপোর্ট করা হয়েছে।';
