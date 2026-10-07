@@ -302,6 +302,7 @@ const CONDITIONAL_DISPLAY = [
 		+ 'draggable furniture, but it is shown and hidden by what the map holds, never by the visitor, '
 		+ 'so there is no closer to route through hidePanel()'],
 	[/^renderLabelsLegend$/, /^box$/, 'the labels legend on the map: same reasoning as the colour legend above'],
+	[/^paintStatus$/, /^(?:xEl|chipEl)$/, 'the Hide control and the "1 hidden" chip inside the status line (lpn_status), shown by the message on screen'],
 	[/^updateOffscreenNotice$/, /^el$/, 'the one-line "something is off screen" notice on the map'],
 	[/^refreshBasemapTeaser$/, /^b$/, 'the satellite toggle button'],
 	[/^refreshBasemapCredit$/, /^(?:c|el2)$/, 'a basemap attribution line in the map footer, required by the tile licences'],

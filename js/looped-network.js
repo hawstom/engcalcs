@@ -61379,13 +61379,15 @@ var EngCalcs = EngCalcs || {};
 				chipEl.textContent = ((EngCalcs.pageConfig || {}).lpn_status_hidden || '{count} hidden').replace('{count}', '1');
 			}
 		}
-		syncStatusBoxVisibility();
 	}
 	function setStatus(text, code, hideable) {
 		var el = document.getElementById('lpn_status');
 		if (!el) { return; }
 		statusLast = { text: text || '', code: code || '', hideable: !!(text && hideable) };
 		paintStatus();
+		// Hidden when empty, or an empty amber box sits on the drawing saying nothing. It is an
+		// overlay now, so this changes what is COVERED, never what is laid out.
+		syncStatusBoxVisibility();
 		// **THE DIAGNOSTIC IS A MESSAGE TOO** (Task 704, Tom 2026-09-22: "**All** messages now
 		// need to go through this messenger system"). This is the SAME door js/lpn-time.js's
 		// progress box writes through (`host.status`) -- "Working out the extended period
@@ -61747,6 +61749,7 @@ var EngCalcs = EngCalcs || {};
 				if (!statusLast.text || !statusLast.hideable) { return; }
 				statusHidden[statusLast.text] = true;
 				paintStatus();
+				syncStatusBoxVisibility();
 				if (chipEl && chipEl.focus) { chipEl.focus(); }
 			});
 		}
@@ -61754,6 +61757,7 @@ var EngCalcs = EngCalcs || {};
 			chipEl.addEventListener('click', function () {
 				delete statusHidden[statusLast.text];
 				paintStatus();
+				syncStatusBoxVisibility();
 				if (xEl && xEl.focus) { xEl.focus(); }
 			});
 		}
