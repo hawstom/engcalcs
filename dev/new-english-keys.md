@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**116 still to read on master**, of 222 untranslated keys, of 2444 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**179 still to read on master**, of 282 untranslated keys, of 2503 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -97,11 +97,14 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   @@ NEEDS RULING
 
-## lpn_  (220, 114 to read @@ NEEDS RULING)
+## lpn_  (280, 177 to read @@ NEEDS RULING)
 
-- **`lpn_alt_calc_options`**
-  > Calculation options
-  _Ruled OK 2026-10-05._
+- **`lpn_alt_cat_calculation`**
+  > Calculation
+  @@ NEEDS RULING
+- **`lpn_alt_cat_presentation`**
+  > Presentation
+  @@ NEEDS RULING
 - **`lpn_analyze_at_time`**
   > Time step: {time}.
   _Ruled OK 2026-10-03._
@@ -126,6 +129,9 @@ never edits a synonym.
 - **`lpn_change_type_born`**
   > These are new, as on a newly drawn one:
   @@ NEEDS RULING
+- **`lpn_change_type_create_overrides`**
+  > Create overrides
+  @@ NEEDS RULING
 - **`lpn_change_type_customers`**
   > Only a pipe serves customers, so these customers are connected instead to the node shown in parentheses, where their demand is already applied. They stay where they are drawn, and their demand is unchanged:
   @@ NEEDS RULING
@@ -134,6 +140,9 @@ never edits a synonym.
   @@ NEEDS RULING
 - **`lpn_change_type_line`**
   > {id}: {property} {value}
+  @@ NEEDS RULING
+- **`lpn_change_type_line_alternative`**
+  > {id}: {property} {value}, in alternative {alternative}
   @@ NEEDS RULING
 - **`lpn_change_type_line_scenario`**
   > {id}: {property} {value}, in scenario {scenario}
@@ -159,11 +168,17 @@ never edits a synonym.
 - **`lpn_change_type_rules`**
   > These rule lines name a link by its kind, and will name its new kind instead:
   @@ NEEDS RULING
+- **`lpn_change_type_scenario_ask`**
+  > Current scenario is not Base. Create overrides?
+  @@ NEEDS RULING
 - **`lpn_change_type_setting`**
   > These controls and rules give or test the setting of a link being changed. A setting is a different quantity on a pipe, a pump, and a valve, so these will read it differently:
   @@ NEEDS RULING
 - **`lpn_change_type_surface`**
   > These keep the water surface where it was. A reservoir's head is the tank's elevation plus its water depth, and a tank's water depth is the reservoir's head minus its elevation:
+  @@ NEEDS RULING
+- **`lpn_change_type_switch_base`**
+  > Switch to Base
   @@ NEEDS RULING
 - **`lpn_change_type_tip`**
   > Change the selected nodes into junctions, reservoirs, or tanks, or the selected links into pipes, pumps, or valves. Each keeps its ID, its place, its connections, and every value the new type also has. If anything would be lost, you are asked first.
@@ -462,6 +477,15 @@ never edits a synonym.
 - **`lpn_pane_scn_alt_tip`**
   > {category} alt.: {alternative}
   @@ NEEDS RULING
+- **`lpn_pane_scn_cur_only`**
+  > Current scenario only
+  @@ NEEDS RULING
+- **`lpn_pane_scn_filter_note`**
+  > {filters}. Showing {n} of {all}.
+  @@ NEEDS RULING
+- **`lpn_pane_scn_ov_only`**
+  > Overrides only
+  @@ NEEDS RULING
 - **`lpn_pane_scn_show`**
   > Show scenarios
   @@ NEEDS RULING
@@ -528,12 +552,9 @@ never edits a synonym.
 - **`lpn_saved_session`**
   > Not saved
   _Ruled OK 2026-10-05._
-- **`lpn_scenario_duration_tip`**
-  > Leave blank to inherit from parent. A total run time of 0:00 is a steady-state run.
-  _Ruled OK 2026-10-05._
-- **`lpn_scenario_hyd_step_tip`**
-  > Leave blank to inherit from parent.
-  _Ruled OK 2026-10-05._
+- **`lpn_scenario_delete_has_children`**
+  > The scenario {name} cannot be deleted while other scenarios inherit from it: {list}. Delete those first, or give them another parent.
+  @@ NEEDS RULING
 - **`lpn_scncmp_at_time`**
   > {value} at {id}, {time}
   _Ruled OK 2026-10-05._
@@ -582,6 +603,9 @@ never edits a synonym.
 - **`lpn_settings_demand_model_tip`**
   > Choose how junctions receive flow. Demand driven (DDA) delivers every demand in full, whatever the pressure. Pressure driven (PDA) delivers less than the demand where the pressure is below the required pressure, and only the EPANET solver computes it.
   _Ruled OK 2026-10-05._
+- **`lpn_settings_held_base`**
+  > {base}: {value}
+  @@ NEEDS RULING
 - **`lpn_settings_min_pressure`**
   > Minimum pressure
   _Ruled OK 2026-10-05._
@@ -600,6 +624,162 @@ never edits a synonym.
 - **`lpn_settings_req_pressure_tip`**
   > Enter the pressure at or above which a junction receives its full demand. It must be greater than the minimum pressure. Use this project's pressure unit. Leave it blank to use EPANET's default, which is in psi for US flow units and meters otherwise.
   _Ruled OK 2026-10-05._
+- **`lpn_settings_restore_base_only`**
+  > Switch to Base to restore the defaults.
+  @@ NEEDS RULING
+- **`lpn_settings_row_basemap`**
+  > Basemap
+  @@ NEEDS RULING
+- **`lpn_settings_row_basemap_last`**
+  > Basemap to return to
+  @@ NEEDS RULING
+- **`lpn_settings_row_basemap_osm`**
+  > Street map
+  @@ NEEDS RULING
+- **`lpn_settings_row_basemap_satellite`**
+  > Satellite images
+  @@ NEEDS RULING
+- **`lpn_settings_row_check_freq`**
+  > Status check frequency
+  @@ NEEDS RULING
+- **`lpn_settings_row_contour_buffer`**
+  > Contour buffer
+  @@ NEEDS RULING
+- **`lpn_settings_row_contour_fill`**
+  > Contour fill
+  @@ NEEDS RULING
+- **`lpn_settings_row_contour_interval`**
+  > Contour interval
+  @@ NEEDS RULING
+- **`lpn_settings_row_contour_labels`**
+  > Contour labels
+  @@ NEEDS RULING
+- **`lpn_settings_row_contour_opacity`**
+  > Contour fill opacity
+  @@ NEEDS RULING
+- **`lpn_settings_row_contour_terrain`**
+  > Contour ground between nodes from Mapbox DEM
+  @@ NEEDS RULING
+- **`lpn_settings_row_customer_max_width`**
+  > Show customer labels when zoomed to this map width or less
+  @@ NEEDS RULING
+- **`lpn_settings_row_default`**
+  > {value} (default)
+  @@ NEEDS RULING
+- **`lpn_settings_row_elev_source_old`**
+  > Elevation source (older projects)
+  @@ NEEDS RULING
+- **`lpn_settings_row_emitter_exponent_old`**
+  > Emitter exponent (older projects)
+  @@ NEEDS RULING
+- **`lpn_settings_row_id_prefix`**
+  > ID prefix
+  @@ NEEDS RULING
+- **`lpn_settings_row_label_after`**
+  > Text after
+  @@ NEEDS RULING
+- **`lpn_settings_row_label_before`**
+  > Text before
+  @@ NEEDS RULING
+- **`lpn_settings_row_label_drop`**
+  > Drop order
+  @@ NEEDS RULING
+- **`lpn_settings_row_label_on`**
+  > Is active
+  @@ NEEDS RULING
+- **`lpn_settings_row_label_show`**
+  > Show order
+  @@ NEEDS RULING
+- **`lpn_settings_row_labels_customer`**
+  > Customer labels
+  @@ NEEDS RULING
+- **`lpn_settings_row_labels_field`**
+  > {labels}: {field}
+  @@ NEEDS RULING
+- **`lpn_settings_row_labels_part`**
+  > {labels}: {field}, {part}
+  @@ NEEDS RULING
+- **`lpn_settings_row_max_check`**
+  > Maximum status checks
+  @@ NEEDS RULING
+- **`lpn_settings_row_new_asset`**
+  > New assets: {setting}
+  @@ NEEDS RULING
+- **`lpn_settings_row_of`**
+  > {setting}, {member}
+  @@ NEEDS RULING
+- **`lpn_settings_row_pda_src`**
+  > Pressure driven options stated in the file
+  @@ NEEDS RULING
+- **`lpn_settings_row_quality_option`**
+  > Quality option as the file states it
+  @@ NEEDS RULING
+- **`lpn_settings_row_quality_step`**
+  > Quality time step
+  @@ NEEDS RULING
+- **`lpn_settings_row_status_report`**
+  > Status report
+  @@ NEEDS RULING
+- **`lpn_settings_row_symbol_cap_multiple`**
+  > Largest symbol, as a multiple of a typical pipe length
+  @@ NEEDS RULING
+- **`lpn_settings_row_symbol_cap_percentile`**
+  > Typical pipe length, as a percentile of all pipe lengths
+  @@ NEEDS RULING
+- **`lpn_settings_row_tolerance`**
+  > Accuracy (older projects)
+  @@ NEEDS RULING
+- **`lpn_settings_row_view`**
+  > Map view (center and scale)
+  @@ NEEDS RULING
+- **`lpn_settings_row_view_value`**
+  > Center {x}, {y}; scale {s}
+  @@ NEEDS RULING
+- **`lpn_settings_table_category`**
+  > Category
+  @@ NEEDS RULING
+- **`lpn_settings_table_major`**
+  > Major heading
+  @@ NEEDS RULING
+- **`lpn_settings_table_minor`**
+  > Minor heading
+  @@ NEEDS RULING
+- **`lpn_settings_table_no`**
+  > No
+  @@ NEEDS RULING
+- **`lpn_settings_table_owner`**
+  > Owner
+  @@ NEEDS RULING
+- **`lpn_settings_table_setting`**
+  > Setting
+  @@ NEEDS RULING
+- **`lpn_settings_table_yes`**
+  > Yes
+  @@ NEEDS RULING
+- **`lpn_settings_units_one_project`**
+  > Units are the same in every scenario.
+  @@ NEEDS RULING
+- **`lpn_settings_view_bottom_right`**
+  > Bottom right corner
+  @@ NEEDS RULING
+- **`lpn_settings_view_center`**
+  > Map center
+  @@ NEEDS RULING
+- **`lpn_settings_view_save`**
+  > Save this view in this scenario
+  @@ NEEDS RULING
+- **`lpn_settings_view_save_tip`**
+  > Stores this map center and scale in the open scenario, so opening that scenario moves the map here. Moving the map afterward changes nothing until you press this again. Clear the override to follow the {base} view again.
+  @@ NEEDS RULING
+- **`lpn_settings_view_scale`**
+  > Map scale
+  @@ NEEDS RULING
+- **`lpn_settings_view_scale_tip`**
+  > The scale at the center of the map, as 1:N. Type 1:2000, or just 2000, to zoom to that scale.
+  @@ NEEDS RULING
+- **`lpn_settings_view_top_left`**
+  > Top left corner
+  @@ NEEDS RULING
 - **`lpn_snip_hint_free`**
   > Drag around the area to snip, or click for the whole map. Esc cancels.
   @@ NEEDS RULING
@@ -773,7 +953,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**131 still to read**, of 134 new keys across 16 unmerged branch(es).
+**68 still to read**, of 71 new keys across 16 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -784,201 +964,11 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/bentley-interop (`e6b7f7d0`) — 63 new, 63 to read @@ NEEDS RULING
-
-- **`lpn_alt_cat_calculation`**
-  > Calculation
-  @@ NEEDS RULING
-- **`lpn_alt_cat_presentation`**
-  > Presentation
-  @@ NEEDS RULING
-- **`lpn_change_type_create_overrides`**
-  > Create overrides
-  @@ NEEDS RULING
-- **`lpn_change_type_line_alternative`**
-  > {id}: {property} {value}, in alternative {alternative}
-  @@ NEEDS RULING
-- **`lpn_change_type_scenario_ask`**
-  > Current scenario is not Base. Create overrides?
-  @@ NEEDS RULING
-- **`lpn_change_type_switch_base`**
-  > Switch to Base
-  @@ NEEDS RULING
-- **`lpn_pane_scn_cur_only`**
-  > Current scenario only
-  @@ NEEDS RULING
-- **`lpn_pane_scn_filter_note`**
-  > {filters}. Showing {n} of {all}.
-  @@ NEEDS RULING
-- **`lpn_pane_scn_ov_only`**
-  > Overrides only
-  @@ NEEDS RULING
-- **`lpn_scenario_delete_has_children`**
-  > The scenario {name} cannot be deleted while other scenarios inherit from it: {list}. Delete those first, or give them another parent.
-  @@ NEEDS RULING
-- **`lpn_settings_held_base`**
-  > {base}: {value}
-  @@ NEEDS RULING
-- **`lpn_settings_restore_base_only`**
-  > Switch to Base to restore the defaults.
-  @@ NEEDS RULING
-- **`lpn_settings_row_basemap`**
-  > Basemap
-  @@ NEEDS RULING
-- **`lpn_settings_row_basemap_last`**
-  > Basemap to return to
-  @@ NEEDS RULING
-- **`lpn_settings_row_basemap_osm`**
-  > Street map
-  @@ NEEDS RULING
-- **`lpn_settings_row_basemap_satellite`**
-  > Satellite images
-  @@ NEEDS RULING
-- **`lpn_settings_row_check_freq`**
-  > Status check frequency
-  @@ NEEDS RULING
-- **`lpn_settings_row_contour_buffer`**
-  > Contour buffer
-  @@ NEEDS RULING
-- **`lpn_settings_row_contour_fill`**
-  > Contour fill
-  @@ NEEDS RULING
-- **`lpn_settings_row_contour_interval`**
-  > Contour interval
-  @@ NEEDS RULING
-- **`lpn_settings_row_contour_labels`**
-  > Contour labels
-  @@ NEEDS RULING
-- **`lpn_settings_row_contour_opacity`**
-  > Contour fill opacity
-  @@ NEEDS RULING
-- **`lpn_settings_row_contour_terrain`**
-  > Contour ground between nodes from Mapbox DEM
-  @@ NEEDS RULING
-- **`lpn_settings_row_customer_max_width`**
-  > Show customer labels when zoomed to this map width or less
-  @@ NEEDS RULING
-- **`lpn_settings_row_default`**
-  > {value} (default)
-  @@ NEEDS RULING
-- **`lpn_settings_row_elev_source_old`**
-  > Elevation source (older projects)
-  @@ NEEDS RULING
-- **`lpn_settings_row_emitter_exponent_old`**
-  > Emitter exponent (older projects)
-  @@ NEEDS RULING
-- **`lpn_settings_row_id_prefix`**
-  > ID prefix
-  @@ NEEDS RULING
-- **`lpn_settings_row_label_after`**
-  > Text after
-  @@ NEEDS RULING
-- **`lpn_settings_row_label_before`**
-  > Text before
-  @@ NEEDS RULING
-- **`lpn_settings_row_label_drop`**
-  > Drop order
-  @@ NEEDS RULING
-- **`lpn_settings_row_label_on`**
-  > Is active
-  @@ NEEDS RULING
-- **`lpn_settings_row_label_show`**
-  > Show order
-  @@ NEEDS RULING
-- **`lpn_settings_row_labels_customer`**
-  > Customer labels
-  @@ NEEDS RULING
-- **`lpn_settings_row_labels_field`**
-  > {labels}: {field}
-  @@ NEEDS RULING
-- **`lpn_settings_row_labels_part`**
-  > {labels}: {field}, {part}
-  @@ NEEDS RULING
-- **`lpn_settings_row_max_check`**
-  > Maximum status checks
-  @@ NEEDS RULING
-- **`lpn_settings_row_new_asset`**
-  > New assets: {setting}
-  @@ NEEDS RULING
-- **`lpn_settings_row_of`**
-  > {setting}, {member}
-  @@ NEEDS RULING
-- **`lpn_settings_row_pda_src`**
-  > Pressure driven options stated in the file
-  @@ NEEDS RULING
-- **`lpn_settings_row_quality_option`**
-  > Quality option as the file states it
-  @@ NEEDS RULING
-- **`lpn_settings_row_quality_step`**
-  > Quality time step
-  @@ NEEDS RULING
-- **`lpn_settings_row_status_report`**
-  > Status report
-  @@ NEEDS RULING
-- **`lpn_settings_row_symbol_cap_multiple`**
-  > Largest symbol, as a multiple of a typical pipe length
-  @@ NEEDS RULING
-- **`lpn_settings_row_symbol_cap_percentile`**
-  > Typical pipe length, as a percentile of all pipe lengths
-  @@ NEEDS RULING
-- **`lpn_settings_row_tolerance`**
-  > Accuracy (older projects)
-  @@ NEEDS RULING
-- **`lpn_settings_row_view`**
-  > Map view (center and scale)
-  @@ NEEDS RULING
-- **`lpn_settings_row_view_value`**
-  > Center {x}, {y}; scale {s}
-  @@ NEEDS RULING
-- **`lpn_settings_table_category`**
-  > Category
-  @@ NEEDS RULING
-- **`lpn_settings_table_major`**
-  > Major heading
-  @@ NEEDS RULING
-- **`lpn_settings_table_minor`**
-  > Minor heading
-  @@ NEEDS RULING
-- **`lpn_settings_table_no`**
-  > No
-  @@ NEEDS RULING
-- **`lpn_settings_table_owner`**
-  > Owner
-  @@ NEEDS RULING
-- **`lpn_settings_table_setting`**
-  > Setting
-  @@ NEEDS RULING
-- **`lpn_settings_table_yes`**
-  > Yes
-  @@ NEEDS RULING
-- **`lpn_settings_units_one_project`**
-  > Units are the same in every scenario.
-  @@ NEEDS RULING
-- **`lpn_settings_view_bottom_right`**
-  > Bottom right corner
-  @@ NEEDS RULING
-- **`lpn_settings_view_center`**
-  > Map center
-  @@ NEEDS RULING
-- **`lpn_settings_view_save`**
-  > Save this view in this scenario
-  @@ NEEDS RULING
-- **`lpn_settings_view_save_tip`**
-  > Stores this map center and scale in the open scenario, so opening that scenario moves the map here. Moving the map afterward changes nothing until you press this again. Clear the override to follow the {base} view again.
-  @@ NEEDS RULING
-- **`lpn_settings_view_scale`**
-  > Map scale
-  @@ NEEDS RULING
-- **`lpn_settings_view_scale_tip`**
-  > The scale at the center of the map, as 1:N. Type 1:2000, or just 2000, to zoom to that scale.
-  @@ NEEDS RULING
-- **`lpn_settings_view_top_left`**
-  > Top left corner
-  @@ NEEDS RULING
+### feat/bentley-interop (`2c03dc94`) — adds no English strings
 
 ### feat/desktop (`baba0f04`) — adds no English strings
 
-### feat/dxf (`d578b129`) — 12 new, 12 to read @@ NEEDS RULING
+### feat/dxf (`e0fd1f33`) — 12 new, 12 to read @@ NEEDS RULING
 
 - **`lpn_dxf_export_failed`**
   > The DXF file was not written: an error in this page stopped it ({error}).
@@ -1039,7 +1029,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`2e5e81c4`) — adds no English strings
 
-### feat/message-dismiss (`2657d9b1`) — 4 new, 4 to read @@ NEEDS RULING
+### feat/message-dismiss (`89713179`) — 4 new, 4 to read @@ NEEDS RULING
 
 - **`lpn_hotkeys_zoomwin_def`**
   > Zoom Window: drag a rectangle to zoom to.
@@ -1060,7 +1050,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Points data<br />(use Copy to see format)
   @@ NEEDS RULING
 
-### feat/table-export (`3c0c093e`) — 14 new, 14 to read @@ NEEDS RULING
+### feat/table-export (`de2a443b`) — 14 new, 14 to read @@ NEEDS RULING
 
 - **`lpn_export_table_all`**
   > All
@@ -1188,28 +1178,28 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/visit-dedupe (`08c07d31`) — adds no English strings
 
-### feat/workspace (`be1d23ea`) — 11 new, 11 to read @@ NEEDS RULING
+### feat/workspace (`d0f19da3`) — 11 new, 11 to read @@ NEEDS RULING
 
 - **`lpn_file_export_item_workspace`**
   > Workspace…
   @@ NEEDS RULING
 - **`lpn_file_export_workspace_tip`**
-  > Download a small file holding where your boxes sit, their sizes, which are open or docked, your pane and column sizes, and your other browser preferences. Your projects and project settings are not in it. Load it on another screen or browser with File, Import, Workspace.
+  > Download a small file holding where your boxes sit, their sizes, which are open or docked, and your pane and column sizes, plus the reading preferences of this page. Your projects, project settings and cookies (language, consent, units) are not in it. Load it on another screen or browser with File, Import, Workspace.
   @@ NEEDS RULING
 - **`lpn_file_import_workspace`**
   > Workspace…
   @@ NEEDS RULING
 - **`lpn_file_import_workspace_tip`**
-  > Apply a workspace file saved with File, Export, Workspace: box positions and sizes, docking, pane sizes and your other browser preferences. Your projects are not touched. The page reloads once to lay the boxes out.
+  > Apply a workspace file saved with File, Export, Workspace: box positions and sizes, docking, pane sizes and the reading preferences of this page. Your projects and cookies are not touched. The page reloads once to lay the boxes out.
   @@ NEEDS RULING
 - **`lpn_workspace_exported`**
-  > Exported {file}. Saved layout and preference records: {n}.
+  > Workspace saved to {file}: {n} settings.
   @@ NEEDS RULING
 - **`lpn_workspace_ignored`**
-  > Entries in the file that were not recognized and were ignored: {u}.
+  > Entries ignored because they were not recognized: {u}.
   @@ NEEDS RULING
 - **`lpn_workspace_imported`**
-  > Workspace applied from {file}. Records set: {n}. Returned to their defaults: {r}. The page reloads now, once, to lay out your boxes.
+  > Workspace applied from {file}. Settings applied: {n}. Returned to their defaults: {r}. The page reloads now, once, to lay out your boxes.
   @@ NEEDS RULING
 - **`lpn_workspace_refused_format`**
   > This is not a workspace file saved by this page, so nothing was changed.
