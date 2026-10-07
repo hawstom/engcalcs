@@ -41,6 +41,22 @@ EngCalcs.lpnPlacerD = (function () {
 
 	var NAME = 'D (candidates, labels first, ejection repair)';
 
+	// ---- ingredients, each switchable (STRATEGY.md) ----------------------------------------------
+	// Off by name: in node, PLACER_D_OFF=a,b (environment); in a page or a harness,
+	// EngCalcs.lpnPlacerD.off = ['a', 'b'] before create(). Names and what each does: STRATEGY.md.
+	var INGREDIENTS = ['order', 'sticky', 'crowd', 'smallfirst', 'evict', 'polish', 'along', 'altlayout',
+		'rescue', 'tight', 'wedge', 'timebound', 'warm'];
+	var OFF = {}, API = null;
+	function readOff(api) {
+		OFF = {};
+		var list = (api && api.off) || [];
+		if (typeof process !== 'undefined' && process.env && process.env.PLACER_D_OFF) {
+			list = list.concat(process.env.PLACER_D_OFF.split(','));
+		}
+		list.forEach(function (n) { OFF[String(n).trim()] = true; });
+	}
+	function on(name) { return !OFF[name]; }
+
 	// ---- tuning --------------------------------------------------------------------------------
 	var TOL = 1.4;          // box overlap tolerated as leading (the bench tolerates 1.5)
 	var GAP = 1.5;          // clearance between a node symbol and text touching it
@@ -253,9 +269,21 @@ EngCalcs.lpnPlacerD = (function () {
 	}
 
 	// The drop levels: level 0 shows every row; each further level drops the next field in the
-	// user's drop order. A row whose field is not in the order (the ID) is never dropped.
+	// user's drop order, down to the one row the label keeps longest (R1 (3)). The ID is a value
+	// like any other (Tom, 2026-10-06): a scene whose order does not list it drops it first, and a
+	// row whose field is not listed at all goes before every listed one. With the 'order'
+	// ingredient off, the round-6 behaviour: the ID is never dropped.
 	function levelsOf(req, dropOrder) {
-		var order = (dropOrder && dropOrder[req.kind]) || [], present = [], dropped = {}, out = [], k, i;
+		var order = ((dropOrder && dropOrder[req.kind]) || []).slice(), present = [], dropped = {}, out = [], k, i;
+		var idValue = on('order');
+		if (idValue && order.indexOf('id') < 0) { order.unshift('id'); }
+		if (idValue) {
+			// Unlisted fields go first, in row order.
+			for (i = 0; i < req.rows.length; i++) {
+				var fu = req.rows[i].field;
+				if (order.indexOf(fu) < 0 && present.indexOf(fu) < 0) { present.push(fu); }
+			}
+		}
 		for (k = 0; k < order.length; k++) {
 			for (i = 0; i < req.rows.length; i++) { if (req.rows[i].field === order[k]) { present.push(order[k]); break; } }
 		}
@@ -265,11 +293,13 @@ EngCalcs.lpnPlacerD = (function () {
 				var f = req.rows[i].field;
 				if (dropped[f]) { continue; }
 				rows.push(i);
-				if (f === 'id') { continue; }
+				if (f === 'id' && !idValue) { continue; }
 				var pos = order.indexOf(f);
-				val += V_ROW + (pos >= 0 ? V_ROW_ORDER * pos : V_ROW_ORDER * order.length);
+				val += V_ROW + (pos >= 0 ? V_ROW_ORDER * pos : 0);
 			}
-			if (rows.length) { out.push({ rows: rows, value: val }); }
+			if (idValue && rows.length) { val -= V_ROW; }
+			if (!rows.length) { break; }
+			out.push({ rows: rows, value: val });
 			if (k < present.length) { dropped[present[k]] = true; }
 		}
 		return out;
@@ -348,6 +378,7 @@ EngCalcs.lpnPlacerD = (function () {
 	}
 
 	function place(scene, opts, mem) {
+		readOff(API);
 		var text = scene.text, vp = scene.viewport, rowH = text.rowHeightPx || 14.4;
 		var hookLen = Math.min(text.hookMaxPx || 0, 9);
 		var spacing = text.repeatSpacingPx || 0;
@@ -1386,7 +1417,8 @@ EngCalcs.lpnPlacerD = (function () {
 		});
 	}
 
-	return { name: NAME, create: create };
+	API = { name: NAME, create: create, off: [], INGREDIENTS: INGREDIENTS };
+	return API;
 }());
 
 if (typeof module !== 'undefined' && module.exports) {
