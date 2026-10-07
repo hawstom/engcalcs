@@ -146,11 +146,11 @@ Fotobi file never reached jasmine; the lost node symbols are still unreproduced.
 
 ### Label bench
 
-- `feat/label-placer` eaa25d02 (pushed): `dev/label-trials/placement-report-vs-production.md`
+- `feat/label-placer` eaa25d02 (pushed): `feat/label-placer:dev/label-trials/placement-report-vs-production.md`
   (builders 78-79% vs production 41.7%; zero overlaps vs 2,607; stability metric added: production
   0 labels moved per 100, builders 3-14 on a repeat view, the cost of the clock),
   `speed-phase-plan.md`, publish advice (arXiv after round 8). **ID-last is NO** (R1(3) in
-  `dev/label-placement-rules.md`). Port list: rules 1-3 port cleanly; D09 on the interview.
+  `feat/label-placer:dev/label-placement-rules.md`). Port list: rules 1-3 port cleanly; D09 on the interview.
 
 ### Next job
 
