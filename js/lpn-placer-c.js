@@ -540,11 +540,24 @@ EngCalcs.lpnPlacerC = (function () {
 			function hashStr(t) { var k = 0; for (var j = 0; j < t.length; j++) { k = (k * 33 + t.charCodeAt(j)) | 0; } return k; }
 			mix(scene.view.s); mix(scene.view.tx); mix(scene.view.ty); mix(scene.viewport.w); mix(scene.viewport.h);
 			mix(scene.text.sizePx); mix(JSON.stringify(scene.dropOrder || {})); mix(JSON.stringify(scene.settings || null));
-			for (i = 0; i < scene.nodes.length; i++) { mix(scene.nodes[i].x); mix(scene.nodes[i].y); mix(scene.nodes[i].symbol.w); }
+			// Only what lies near the view can change its layout (R10: the cost follows the screen).
+			var vp = scene.viewport, x0 = vp.x - 2 * CELL, y0 = vp.y - 2 * CELL, x1 = vp.x + vp.w + 2 * CELL, y1 = vp.y + vp.h + 2 * CELL;
+			for (i = 0; i < scene.nodes.length; i++) {
+				var n = scene.nodes[i];
+				if (n.x < x0 || n.x > x1 || n.y < y0 || n.y > y1) { continue; }
+				mix(n.x); mix(n.y); mix(n.symbol.w);
+			}
 			for (i = 0; i < scene.links.length; i++) {
-				var l = scene.links[i];
+				var l = scene.links[i], p = l.points, k, in0 = false;
+				for (k = 0; k < p.length && !in0; k++) { in0 = p[k][0] >= x0 && p[k][0] <= x1 && p[k][1] >= y0 && p[k][1] <= y1; }
+				if (!in0 && p.length > 1) {
+					var bx0 = Infinity, by0 = Infinity, bx1 = -Infinity, by1 = -Infinity;
+					for (k = 0; k < p.length; k++) { bx0 = Math.min(bx0, p[k][0]); bx1 = Math.max(bx1, p[k][0]); by0 = Math.min(by0, p[k][1]); by1 = Math.max(by1, p[k][1]); }
+					in0 = bx0 <= x1 && bx1 >= x0 && by0 <= y1 && by1 >= y0;
+				}
+				if (!in0) { continue; }
 				mix(l.id); mix((l.symbols || []).length);
-				for (var k = 0; k < l.points.length; k++) { mix(l.points[k][0]); mix(l.points[k][1]); }
+				for (k = 0; k < p.length; k++) { mix(p[k][0]); mix(p[k][1]); }
 			}
 			for (i = 0; i < (scene.customers || []).length; i++) { mix(scene.customers[i].box.x); mix(scene.customers[i].box.y); }
 			for (i = 0; i < (scene.texts || []).length; i++) { mix(scene.texts[i].box.cx); mix(scene.texts[i].box.cy); mix(scene.texts[i].text); }
@@ -569,7 +582,11 @@ EngCalcs.lpnPlacerC = (function () {
 			var order = labels.filter(function (L) { return !L.req.hand; });
 			// `fewest`: a label with the fewest spots open to it on the fixed map goes first (the
 			// most-constrained-first rule of constraint search), so the labels with choices place round it.
-			if (ING.fewest) { labels.forEach(function (L) { if (!L.req.hand) { L.opts = openSpots(st, L); } }); }
+			// Counting is cut short (the rest count as unconstrained) once half the soft time is gone.
+			if (ING.fewest) {
+				var fewBy = effort.soft ? effort.soft - SOFT_MS / 2 : (effort.deadline ? now() + (effort.deadline - now()) / 4 : Infinity);
+				labels.forEach(function (L) { if (!L.req.hand) { L.opts = now() < fewBy ? openSpots(st, L) : 120; } });
+			}
 			order.sort(function (a, b) { return (a.prevPl ? 0 : 1) - (b.prevPl ? 0 : 1) || (ING.fewest ? a.opts - b.opts : 0) || a.dens - b.dens || (a.id < b.id ? -1 : 1); });
 
 			// 1. KEEP: last view's spot and rows, if still legal and not much worse.
@@ -687,28 +704,36 @@ EngCalcs.lpnPlacerC = (function () {
 			var hg = new Grid(gbb, CELL), sg = new Grid(gbb, CELL), dg = new Grid(gbb, CELL);
 			var hr = new Raster(gbb, RES), dr = new Raster(gbb, RES);
 			var nodes = {}, links = {}, incident = {};
+			// R10: the whole network arrives, but only what is on screen costs more than a glance.
 			scene.nodes.forEach(function (n) {
 				nodes[n.id] = n;
-				var raw = obox(n.symbol.x + n.symbol.w / 2, n.symbol.y + n.symbol.h / 2, n.symbol.w, n.symbol.h, 0);
-				if (!bbHit(raw, gbb)) { return; }
+				var sy = n.symbol;
+				if (sy.x > gbb.x1 || sy.y > gbb.y1 || sy.x + sy.w < gbb.x0 || sy.y + sy.h < gbb.y0) { return; }
+				var raw = obox(sy.x + sy.w / 2, sy.y + sy.h / 2, sy.w, sy.h, 0);
 				var ob = inflate(raw, SYM_PAD);
 				hg.insert({ k: SYM, ob: ob, raw: raw, bb: ob, own: n.id });
 				hr.mark(ob, 1);
 			});
+			// A turned box certainly off the grids' area (its half diagonal from the edge).
+			var far = function (b) { var r = (b.w + b.h) / 2 + 1; return b.cx + r < gbb.x0 || b.cx - r > gbb.x1 || b.cy + r < gbb.y0 || b.cy - r > gbb.y1; };
 			scene.links.forEach(function (l) {
 				links[l.id] = l;
 				(incident[l.from] = incident[l.from] || []).push(l);
 				(incident[l.to] = incident[l.to] || []).push(l);
 				(l.symbols || []).forEach(function (b) {
+					if (far(b)) { return; }
 					var ob = inflate(obox(b.cx, b.cy, b.w, b.h, b.angle), SYM_PAD);
 					if (bbHit(ob, gbb)) { hg.insert({ k: LSYM, ob: ob, bb: ob, own: l.id }); hr.mark(ob, 1); }
 				});
 				(l.arrows || []).forEach(function (b) {
+					if (far(b)) { return; }
 					var ob = obox(b.cx, b.cy, b.w * 0.8, b.h * 0.8, b.angle);
 					if (bbHit(ob, gbb)) { sg.insert({ k: ARROW, ob: ob, bb: ob, own: l.id }); }
 				});
 				for (var i = 1; i < l.points.length; i++) {
-					var s = clipSeg([l.points[i - 1][0], l.points[i - 1][1], l.points[i][0], l.points[i][1]], gbb);
+					var p0 = l.points[i - 1], p1 = l.points[i];
+					if ((p0[0] < gbb.x0 && p1[0] < gbb.x0) || (p0[0] > gbb.x1 && p1[0] > gbb.x1) || (p0[1] < gbb.y0 && p1[1] < gbb.y0) || (p0[1] > gbb.y1 && p1[1] > gbb.y1)) { continue; }
+					var s = clipSeg([p0[0], p0[1], p1[0], p1[1]], gbb);
 					if (s) { sg.insert({ k: PIPE, s: s, bb: segBB(s), own: l.id }); }
 				}
 			});
