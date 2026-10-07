@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**42 still to read on master**, of 148 untranslated keys, of 2371 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**43 still to read on master**, of 149 untranslated keys, of 2372 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -73,7 +73,7 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   _Ruled 2026-10-05: Is this _syn needed?_
 
-## lpn_  (148, 42 to read @@ NEEDS RULING)
+## lpn_  (149, 43 to read @@ NEEDS RULING)
 
 - **`lpn_alt_calc_options`**
   > Calculation options
@@ -162,6 +162,9 @@ never edits a synonym.
 - **`lpn_cp_characters_tip`**
   > "@" means any letter; "#" means any numeric digit, and you must separately list "-", ".", and "," if they are allowed; and any white space characters must be between other characters.
   _Ruled OK 2026-10-05._
+- **`lpn_crs_suggested_mark`**
+  > (suggested)
+  @@ NEEDS RULING
 - **`lpn_diag_pda_needs_epanet`**
   > The demand model is pressure driven, and only the EPANET solver can compute it. The EPANET solver could not be loaded, so these results are missing.
   _Ruled OK 2026-10-05._
@@ -524,7 +527,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**135 still to read**, of 138 new keys across 17 unmerged branch(es).
+**167 still to read**, of 170 new keys across 21 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -534,6 +537,8 @@ Each branch carries the commit it was read at. This part is a SNAPSHOT and is no
 fresh by the build — a branch moves whenever anybody commits on it, and failing master's
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
+
+### chore/technical-english (`8e4d66b8`) — adds no English strings
 
 ### feat/backdrop-attach (`929d7ec9`) — 7 new, 7 to read @@ NEEDS RULING
 
@@ -559,13 +564,25 @@ build for that would be a gate nobody keeps. Refresh it with
   > Exported {zip}, holding the EPANET file {file}, its background picture {picture}, and the world file {world}. Extract all three into one folder, then open the .inp there in EPANET; the picture comes with it.
   @@ NEEDS RULING
 
-### feat/bentley-interop (`43658d9f`) — 52 new, 52 to read @@ NEEDS RULING
+### feat/bentley-interop (`2e07f495`) — 60 new, 60 to read @@ NEEDS RULING
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
   @@ NEEDS RULING
 - **`lpn_alt_cat_presentation`**
   > Presentation
+  @@ NEEDS RULING
+- **`lpn_change_type_line_alternative`**
+  > {id}: {property} {value}, in alternative {alternative}
+  @@ NEEDS RULING
+- **`lpn_pane_scn_cur_only`**
+  > Current scenario only
+  @@ NEEDS RULING
+- **`lpn_pane_scn_filter_note`**
+  > {filters}. Showing {n} of {all}.
+  @@ NEEDS RULING
+- **`lpn_pane_scn_ov_only`**
+  > Overrides only
   @@ NEEDS RULING
 - **`lpn_scenario_delete_has_children`**
   > The scenario {name} cannot be deleted while other scenarios inherit from it: {list}. Delete those first, or give them another parent.
@@ -621,11 +638,23 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_settings_row_emitter_exponent_old`**
   > Emitter exponent (older projects)
   @@ NEEDS RULING
+- **`lpn_settings_row_id_prefix`**
+  > ID prefix
+  @@ NEEDS RULING
 - **`lpn_settings_row_label_after`**
   > Text after
   @@ NEEDS RULING
 - **`lpn_settings_row_label_before`**
   > Text before
+  @@ NEEDS RULING
+- **`lpn_settings_row_label_drop`**
+  > Drop order
+  @@ NEEDS RULING
+- **`lpn_settings_row_label_on`**
+  > Is active
+  @@ NEEDS RULING
+- **`lpn_settings_row_label_show`**
+  > Show order
   @@ NEEDS RULING
 - **`lpn_settings_row_labels_customer`**
   > Customer labels
@@ -638,9 +667,6 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 - **`lpn_settings_row_max_check`**
   > Maximum status checks
-  @@ NEEDS RULING
-- **`lpn_settings_row_minor_label_order`**
-  > Label order (rank and drop)
   @@ NEEDS RULING
 - **`lpn_settings_row_new_asset`**
   > New assets: {setting}
@@ -687,6 +713,9 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_settings_table_no`**
   > No
   @@ NEEDS RULING
+- **`lpn_settings_table_owner`**
+  > Owner
+  @@ NEEDS RULING
 - **`lpn_settings_table_setting`**
   > Setting
   @@ NEEDS RULING
@@ -702,10 +731,10 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_settings_view_center`**
   > Map center
   @@ NEEDS RULING
-- **`lpn_settings_view_hold`**
-  > Hold this view in this scenario
+- **`lpn_settings_view_save`**
+  > Save this view in this scenario
   @@ NEEDS RULING
-- **`lpn_settings_view_hold_tip`**
+- **`lpn_settings_view_save_tip`**
   > Stores this map center and scale in the open scenario, so opening that scenario moves the map here. Moving the map afterward changes nothing until you press this again. Clear the override to follow the {base} view again.
   @@ NEEDS RULING
 - **`lpn_settings_view_scale`**
@@ -720,7 +749,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/desktop (`baba0f04`) — adds no English strings
 
-### feat/dxf (`93469e95`) — 12 new, 12 to read @@ NEEDS RULING
+### feat/dxf (`a5db182f`) — 12 new, 12 to read @@ NEEDS RULING
 
 - **`lpn_dxf_export_failed`**
   > The DXF file was not written: an error in this page stopped it ({error}).
@@ -735,28 +764,28 @@ build for that would be a gate nobody keeps. Refresh it with
   > Exported {file}. Its coordinates are {crs}, in meters, not latitude and longitude.
   @@ NEEDS RULING
 - **`lpn_dxf_note_blocks`**
-  > Block attributes are 1 unit high in each block definition. Every block is inserted at scale {s}, so its attributes are {s} {unit} high; change the insertion scale to change that.
+  > Layers are named {prefix}, the asset code, a hyphen, and the alternative, as in {example}. Each element is a block inserted at scale 1 with attributes 1 unit high; scale the blocks to set the text height. Only the ID attribute is visible; the ATTDISP command shows the others.
+  @@ NEEDS RULING
+- **`lpn_dxf_note_categories`**
+  > {n} junctions have more than one demand category. Their {tag} attribute holds the first category only.
   @@ NEEDS RULING
 - **`lpn_dxf_note_crs`**
   > Coordinates: {crs}, exactly as this project states them.
   @@ NEEDS RULING
 - **`lpn_dxf_note_geo`**
-  > Coordinates: {crs}, in meters, not latitude and longitude. The project’s latitudes and longitudes were converted to that grid.
+  > Coordinates: {crs}, in meters, not latitude and longitude. The latitudes and longitudes of the project were converted to that grid.
   @@ NEEDS RULING
 - **`lpn_dxf_note_grid`**
-  > Coordinates: this project’s own X and Y, in {unit}. No coordinate system is stated.
-  @@ NEEDS RULING
-- **`lpn_dxf_note_scale`**
-  > Text and symbols are sized as the map draws them at Zoom to fit: text {h} high, on a network {w} across.
+  > Coordinates: the X and Y of this project, in {unit}. No coordinate system is stated.
   @@ NEEDS RULING
 - **`lpn_dxf_note_shortened`**
-  > {n} values were longer than a DXF file allows ({max} characters), so each was shortened and ends in “…”.
+  > {n} values were longer than a DXF file allows ({max} characters), so each was shortened and ends in three periods.
   @@ NEEDS RULING
 - **`lpn_file_export_dxf`**
   > Export DXF file…
   @@ NEEDS RULING
 - **`lpn_file_export_dxf_tip`**
-  > Download this network as a drawing that AutoCAD and other CAD programs open: one layer for each kind of asset, each node a block carrying its ID and main values, and the labels as they appear on the map.
+  > Download this network for AutoCAD and other CAD programs: pipes, pumps, and valves as polylines, and every element as a block whose attributes carry its ID and property values in the project units.
   @@ NEEDS RULING
 
 ### feat/feedback (`d96763d3`) — 13 new, 13 to read @@ NEEDS RULING
@@ -849,17 +878,17 @@ build for that would be a gate nobody keeps. Refresh it with
   > Sets the label columns back to their original values: which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.
   _Ruled OK 2026-09-23._
 
-### feat/label-placer (`0885e755`) — adds no English strings
+### feat/label-placer (`eaa25d02`) — adds no English strings
 
-### feat/label-placer-a (`3483bfd6`) — adds no English strings
+### feat/label-placer-a (`2883c033`) — adds no English strings
 
-### feat/label-placer-b (`c5905432`) — adds no English strings
+### feat/label-placer-b (`18cac708`) — adds no English strings
 
-### feat/label-placer-c (`9a790a3e`) — adds no English strings
+### feat/label-placer-c (`4dc27ea1`) — adds no English strings
 
-### feat/label-placer-d (`129b63c4`) — adds no English strings
+### feat/label-placer-d (`2e5e81c4`) — adds no English strings
 
-### feat/screenshot (`26d7b515`) — 14 new, 14 to read @@ NEEDS RULING
+### feat/screenshot (`8a48a1d7`) — 22 new, 22 to read @@ NEEDS RULING
 
 - **`lpn_screenshot_copied`**
   > Screenshot copied.
@@ -903,8 +932,36 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_snip_rectangle`**
   > Rectangle
   @@ NEEDS RULING
+- **`lpn_snip_tip_eraser`**
+  > Eraser: click a stroke to remove it (E)
+  @@ NEEDS RULING
+- **`lpn_snip_tip_free`**
+  > Snip a freehand shape (S)
+  @@ NEEDS RULING
+- **`lpn_snip_tip_map`**
+  > Screenshot of the whole map
+  @@ NEEDS RULING
+- **`lpn_snip_tip_mode`**
+  > Snip shape
+  @@ NEEDS RULING
+- **`lpn_snip_tip_pen`**
+  > Pen (Esc)
+  @@ NEEDS RULING
+- **`lpn_snip_tip_rect`**
+  > Snip a rectangle (S)
+  @@ NEEDS RULING
+- **`lpn_snip_tip_redo`**
+  > Redo (Ctrl+Y)
+  @@ NEEDS RULING
+- **`lpn_snip_tip_undo`**
+  > Undo (Ctrl+Z)
+  @@ NEEDS RULING
 
-### feat/section-grid (`977b887e`) — adds no English strings
+### feat/section-grid (`89905957`) — 1 new, 1 to read @@ NEEDS RULING
+
+- **`points_data_points_heading`**
+  > Points data<br />(use Copy to see format)
+  @@ NEEDS RULING
 
 ### feat/survey-code (`087e6868`) — 21 new, 21 to read @@ NEEDS RULING
 
@@ -972,8 +1029,26 @@ build for that would be a gate nobody keeps. Refresh it with
   > {j} junction(s), {r} reservoir(s), {t} tank(s), and {p} pipe(s) imported, {m} of the nodes with elevation.
   @@ NEEDS RULING
 
-### feat/table-export (`39697062`) — 3 new, 3 to read @@ NEEDS RULING
+### feat/table-export (`15e91ca0`) — 9 new, 9 to read @@ NEEDS RULING
 
+- **`lpn_export_table_all`**
+  > All
+  @@ NEEDS RULING
+- **`lpn_export_table_current`**
+  > Current
+  @@ NEEDS RULING
+- **`lpn_export_table_format`**
+  > Format
+  @@ NEEDS RULING
+- **`lpn_export_table_go`**
+  > Export
+  @@ NEEDS RULING
+- **`lpn_export_table_title`**
+  > Export table
+  @@ NEEDS RULING
+- **`lpn_file_export_table`**
+  > Export table…
+  @@ NEEDS RULING
 - **`lpn_pane_copy_heads`**
   > Copy with headings
   @@ NEEDS RULING
@@ -984,11 +1059,45 @@ build for that would be a gate nobody keeps. Refresh it with
   > Export table as ODS
   @@ NEEDS RULING
 
-### feat/user-guide (`bcb042ef`) — 2 new, 2 to read @@ NEEDS RULING
+### feat/user-guide (`9f844e56`) — 9 new, 9 to read @@ NEEDS RULING
 
 - **`lpn_guide_also`**
   > Also in {menu}
   @@ NEEDS RULING
+- **`lpn_guide_box_help`**
+  > Help for this box
+  @@ NEEDS RULING
+- **`lpn_guide_boxes_heading`**
+  > Boxes
+  @@ NEEDS RULING
+- **`lpn_guide_boxes_intro`**
+  > Each box can be moved, resized, docked at the left or right of the map, or closed. The ? at the right end of a box's title bar opens that box's entry in this guide.
+  @@ NEEDS RULING
+- **`lpn_guide_contents`**
+  > Contents
+  @@ NEEDS RULING
+- **`lpn_guide_rail_hide`**
+  > Hide contents
+  @@ NEEDS RULING
+- **`lpn_guide_rail_show`**
+  > Show contents
+  @@ NEEDS RULING
+- **`lpn_guide_search`**
+  > Search the guide
+  @@ NEEDS RULING
 - **`lpn_help_manual`**
-  > User guide
+  > Guide
+  @@ NEEDS RULING
+
+### feat/visit-dedupe (`82261d32`) — adds no English strings
+
+### feat/web-mercator (`c95599cb`) — adds no English strings
+
+### fix/points-paste-2 (`c84a876e`) — 2 new, 2 to read @@ NEEDS RULING
+
+- **`points_data_msg_line`**
+  > Nothing was pasted. Line {n} could not be read as a station and an elevation.
+  @@ NEEDS RULING
+- **`points_data_msg_none`**
+  > Nothing was pasted. No station and elevation pairs were found.
   @@ NEEDS RULING
