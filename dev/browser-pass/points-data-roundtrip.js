@@ -163,6 +163,91 @@ async function probe(browser, origin, spec) {
 	await context.close();
 }
 
+
+// Points data on mi and wi: Copy and Paste carry station and elevation only, so the same text goes
+// between the two pages, and what a spreadsheet or a Windows editor hands over (tabs, CRLF, a
+// heading line, a trailing blank line, a shorter or longer table) still lands in the table, the
+// sketch and the results. Tom, 2026-10-07: "Paste points doesn't work."
+const POINTS = [
+	{ file: 'Manning-Irregular.php', label: 'mi', result: 'q617' },
+	{ file: 'Weir-Flow-Irregular.php', label: 'wi', result: 'qc' },
+];
+const SECTION = '0,10\r\n5,4\r\n10,4\r\n15,10\r\n';
+
+async function column(page, name) {
+	return page.$$eval(`[name="${name}"]`, (els) => els.map((el) => el.value));
+}
+async function paste(page, text) {
+	await setPointsDataValue(page, text);
+	await clickPaste(page);
+}
+
+async function probePoints(browser, origin, spec) {
+	const context = await browser.newContext();
+	const errors = [];
+	const page = await context.newPage();
+	page.on('pageerror', (e) => errors.push(String(e)));
+	await page.goto(`${origin}/engcalcs/${spec.file}?ec_nolog=1`, { waitUntil: 'load' });
+	await page.waitForSelector('#points_data_paste');
+	await page.waitForFunction(() => window.EngCalcs && EngCalcs.numCalcRows > 0, null, { timeout: 5000 });
+	console.log(`\n--- points data, ${spec.label} ---`);
+
+	// Windows line ends, a longer table than the default.
+	const svgBefore = await page.$eval('#sketch', (el) => el.innerHTML);
+	await paste(page, SECTION);
+	ok((await column(page, 'station')).join() === '0,5,10,15' && (await column(page, 'elevation')).join() === '10,4,4,10',
+		`${spec.label}: CRLF text fills the station and elevation columns`, (await column(page, 'station')).join() + ' | ' + (await column(page, 'elevation')).join());
+	ok((await page.$eval('#sketch', (el) => el.innerHTML)) !== svgBefore, `${spec.label}: the sketch redraws after Paste`);
+	await clickCopy(page);
+	ok((await pointsDataValue(page)) === '0,10\n5,4\n10,4\n15,10\n', `${spec.label}: Copy gives station,elevation lines only`, JSON.stringify(await pointsDataValue(page)));
+	const results = (await column(page, spec.result)).join();
+
+	// Tabs and a heading line and a blank line, a shorter table.
+	await paste(page, 'Station\tElevation\n\n0\t8\n6\t2\n12\t8\n\n');
+	ok((await column(page, 'station')).join() === '0,6,12' && (await column(page, 'elevation')).join() === '8,2,8',
+		`${spec.label}: tab text with a heading and blank lines fills a shorter table`, (await column(page, 'station')).join());
+	ok((await column(page, spec.result)).length === 3, `${spec.label}: result rows follow the point count`);
+
+	// The text survives a reload (Paste saves, as any edit does).
+	await page.reload({ waitUntil: 'load' });
+	await page.waitForFunction(() => window.EngCalcs && EngCalcs.numCalcRows > 0, null, { timeout: 5000 });
+	ok((await column(page, 'station')).join() === '0,6,12', `${spec.label}: pasted points are kept after a reload`, (await column(page, 'station')).join());
+
+	// Text that is not points changes nothing.
+	await paste(page, 'hello\nworld');
+	ok((await column(page, 'station')).join() === '0,6,12', `${spec.label}: text with no points leaves the table alone`);
+	ok(errors.length === 0, `${spec.label}: no uncaught JavaScript`, errors.join(' | '));
+	await context.close();
+	return results;
+}
+
+async function probeCross(browser, origin) {
+	// Copy on wi, Paste on mi, and back.
+	const context = await browser.newContext();
+	const wi = await context.newPage();
+	await wi.goto(`${origin}/engcalcs/Weir-Flow-Irregular.php?ec_nolog=1`, { waitUntil: 'load' });
+	await wi.waitForFunction(() => window.EngCalcs && EngCalcs.numCalcRows > 0, null, { timeout: 5000 });
+	await paste(wi, SECTION);
+	await clickCopy(wi);
+	const text = await pointsDataValue(wi);
+	const mi = await context.newPage();
+	await mi.goto(`${origin}/engcalcs/Manning-Irregular.php?ec_nolog=1`, { waitUntil: 'load' });
+	await mi.waitForFunction(() => window.EngCalcs && EngCalcs.numCalcRows > 0, null, { timeout: 5000 });
+	const nBefore = await column(mi, 'n');
+	await paste(mi, text);
+	ok((await column(mi, 'station')).join() === '0,5,10,15' && (await column(mi, 'elevation')).join() === '10,4,4,10',
+		'wi Copy -> mi Paste carries the points across', (await column(mi, 'station')).join());
+	const nAfter = await column(mi, 'n');
+	ok(nAfter.length === 4 && nAfter.slice(1).every((v) => v !== ''), 'mi: roughness n is not blanked by Paste', nAfter.join());
+	ok(nBefore.slice(1, 2).join() === nAfter.slice(1, 2).join(), 'mi: an existing row keeps its roughness n', nBefore.join() + ' -> ' + nAfter.join());
+	await clickCopy(mi);
+	await clickPaste(wi);
+	await setPointsDataValue(wi, await pointsDataValue(mi));
+	await clickPaste(wi);
+	ok((await column(wi, 'station')).join() === '0,5,10,15', 'mi Copy -> wi Paste carries the points back');
+	await context.close();
+}
+
 (async function main() {
 	let playwright;
 	try { playwright = require('playwright-core'); }
@@ -178,6 +263,10 @@ async function probe(browser, origin, spec) {
 		for (const spec of PAGES) {
 			await probe(browser, origin, spec);
 		}
+		for (const spec of POINTS) {
+			await probePoints(browser, origin, spec);
+		}
+		await probeCross(browser, origin);
 	} catch (err) {
 		failures++;
 		console.log(`\n FAIL  threw\n${err && err.stack ? err.stack : err}`);
