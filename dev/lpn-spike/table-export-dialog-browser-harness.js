@@ -105,6 +105,26 @@ if kind == 'ods':
         if nm:
             frozen[nm] = {i.get(CF + 'name'): i.text for i in ent.findall(CF + 'config-item')}
     out['settings'] = frozen
+    views = [e for e in St.iter(CF + 'config-item-map-indexed') if e.get(CF + 'name') == 'Views']
+    v0 = views[0].find(CF + 'config-item-map-entry') if views else None
+    out['view'] = {i.get(CF + 'name'): i.text for i in v0.findall(CF + 'config-item')} if v0 is not None else None
+    out['viewSetName'] = [e.get(CF + 'name') for e in St.iter(CF + 'config-item-set')]
+    man = ET.fromstring(z.read('META-INF/manifest.xml'))
+    MF = '{urn:oasis:names:tc:opendocument:xmlns:manifest:1.0}'
+    out['manifest'] = [e.get(MF + 'full-path') for e in man.iter(MF + 'file-entry')]
+    # A second, independent reader: odfpy, when it is importable (EC_PYLIBS on PYTHONPATH).
+    try:
+        from odf.opendocument import load
+        from odf import config as ODFC
+        d = load(path)
+        got = {}
+        for ent in d.settings.getElementsByType(ODFC.ConfigItemMapEntry):
+            nm = ent.getAttribute('name')
+            if not nm: continue
+            got[nm] = {it.getAttribute('name'): str(it) for it in ent.getElementsByType(ODFC.ConfigItem)}
+        out['odfpy'] = got
+    except ImportError:
+        out['odfpy'] = None
 elif kind == 'xlsx':
     M = '{http://schemas.openxmlformats.org/spreadsheetml/2006/main}'
     R = '{http://schemas.openxmlformats.org/officeDocument/2006/relationships}'
@@ -114,11 +134,23 @@ elif kind == 'xlsx':
     fmts = {n.get('numFmtId'): n.get('formatCode') for n in st.find(M + 'numFmts')}
     out['xfWrap'] = [(x.find(M + 'alignment').get('wrapText') if x.find(M + 'alignment') is not None else None) for x in xfs]
     out['xfFmt'] = [fmts.get(x.get('numFmtId')) for x in xfs]
+    bv = wb.find(M + 'bookViews')
+    out['workbookViews'] = 0 if bv is None else len(bv.findall(M + 'workbookView'))
+    out['workbookOrder'] = [strip(c.tag) for c in wb]
+    out['openpyxl'] = None
+    try:
+        import openpyxl
+        ob = openpyxl.load_workbook(path)
+        out['openpyxl'] = [ws.freeze_panes for ws in ob.worksheets]
+    except ImportError:
+        pass
     for i, sh in enumerate(wb.find(M + 'sheets')):
         w = ET.fromstring(z.read('xl/worksheets/sheet%d.xml' % (i + 1)))
         pane = w.find(M + 'sheetViews').find(M + 'sheetView').find(M + 'pane')
         s = {'name': sh.get('name'), 'rows': [], 'floats': [], 'styles': [], 'pane': dict(pane.attrib) if pane is not None else None,
-             'widths': [float(c.get('width')) for c in w.find(M + 'cols')]}
+             'widths': [float(c.get('width')) for c in w.find(M + 'cols')],
+             'order': [strip(c.tag) for c in w], 'viewId': int(w.find(M + 'sheetViews').find(M + 'sheetView').get('workbookViewId')),
+             'selections': [x.get('pane') for x in w.find(M + 'sheetViews').find(M + 'sheetView').findall(M + 'selection')]}
         for r in w.find(M + 'sheetData'):
             vals = {}; fl = {}; sty = {}
             for c in r:
@@ -136,7 +168,9 @@ elif kind == 'xlsx':
 print(json.dumps(out))
 `;
 function inspect(file, kind) {
-	const r = spawnSync('python3', ['-c', PY, file, kind], { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
+	const env = Object.assign({}, process.env);
+	if (process.env.EC_PYLIBS) { env.PYTHONPATH = process.env.EC_PYLIBS + (env.PYTHONPATH ? ':' + env.PYTHONPATH : ''); }
+	const r = spawnSync('python3', ['-c', PY, file, kind], { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024, env });
 	if (r.status !== 0) { throw new Error('python: ' + r.stderr); }
 	return JSON.parse(r.stdout);
 }
@@ -264,6 +298,13 @@ async function main() {
 		const cfg = f.settings[sh.name] || {};
 		ok('ODS freezes the heading row and the ID column', cfg.HorizontalSplitMode === '2' && cfg.VerticalSplitMode === '2' &&
 			cfg.HorizontalSplitPosition === '1' && cfg.VerticalSplitPosition === '1', JSON.stringify(cfg));
+		ok('ODS freeze: the cursor and the active pane are the bottom-right, scrolling pane', cfg.ActiveSplitRange === '3' && cfg.PositionRight === '1' && cfg.PositionBottom === '1' && cfg.CursorPositionX === '1' && cfg.CursorPositionY === '1', JSON.stringify(cfg));
+		ok('ODS settings.xml: ooo:view-settings > Views > entry with ViewId, ActiveTable a real sheet, zoom stated', f.viewSetName.includes('ooo:view-settings') && f.view && f.view.ViewId === 'view1' && f.view.ActiveTable === sh.name && f.view.ZoomValue === '100', JSON.stringify(f.view));
+		ok('ODS manifest lists settings.xml', f.manifest.includes('settings.xml'), f.manifest.join(','));
+		if (f.odfpy) {
+			const o = f.odfpy[sh.name] || {};
+			ok('odfpy reads the same freeze from settings.xml', o.HorizontalSplitMode === '2' && o.VerticalSplitMode === '2' && o.HorizontalSplitPosition === '1' && o.VerticalSplitPosition === '1', JSON.stringify(o));
+		} else { console.log('  note odfpy not importable; set EC_PYLIBS to a directory holding it for a second reader'); }
 		const cm = sh.widths.map((w) => parseFloat(w));
 		ok('ODS has a width for every column, in cm, not all alike', cm.length === before.heads.length && cm.every((x) => x > 0) && new Set(cm).size > 2, cm.join(' '));
 		const idW = cm[0], descW = cm[cm.length - 1];
@@ -281,6 +322,13 @@ async function main() {
 		ok('XLSX [Content_Types].xml is the first entry', f.names[0] === '[Content_Types].xml');
 		ok('XLSX cells equal the CSV cells', JSON.stringify(sh.rows) === JSON.stringify(csv), sh.rows.length + ' rows');
 		ok('XLSX freezes the heading row and the ID column', sh.pane && sh.pane.state === 'frozen' && sh.pane.xSplit === '1' && sh.pane.ySplit === '1' && sh.pane.topLeftCell === 'B2', JSON.stringify(sh.pane));
+		const CT_WS = ['sheetPr', 'dimension', 'sheetViews', 'sheetFormatPr', 'cols', 'sheetData', 'ignoredErrors'];
+		ok('XLSX worksheet children follow the CT_Worksheet sequence (ECMA-376 18.3.1.99)', sh.order.every((t, i) => i === 0 || CT_WS.indexOf(sh.order[i - 1]) < CT_WS.indexOf(t)) && sh.order.every((t) => CT_WS.includes(t)), sh.order.join(','));
+		ok('XLSX sheetView names a workbookView that exists (bookViews before sheets)', f.workbookViews > sh.viewId && f.workbookOrder.join() === 'bookViews,sheets', f.workbookViews + ' views; workbook ' + f.workbookOrder.join(','));
+		ok('XLSX pane has a selection for each of its three panes', JSON.stringify(sh.selections) === '["topRight","bottomLeft","bottomRight"]', JSON.stringify(sh.selections));
+		if (f.openpyxl) {
+			ok('openpyxl reads the freeze as B2', f.openpyxl[0] === 'B2', JSON.stringify(f.openpyxl));
+		} else { console.log('  note openpyxl not importable; set EC_PYLIBS to a directory holding it for a second reader'); }
 		ok('XLSX heading cells use a wrapping style', sh.styles[0].every((s) => f.xfWrap[s] === '1'), JSON.stringify(sh.styles[0].slice(0, 4)));
 		ok('XLSX has a width per column, not all alike', sh.widths.length === before.heads.length && new Set(sh.widths).size > 2, sh.widths.join(' '));
 		const nums = sh.floats.slice(1).map((row) => row.map((v, i) => (v !== null ? i : -1)).filter((i) => i >= 0));

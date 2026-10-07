@@ -169,18 +169,39 @@ var EngCalcs = (typeof require === 'function' && typeof module !== 'undefined')
 		}
 		return '<table:table-cell' + st + ' office:value-type="string">' + paragraph(s) + '</table:table-cell>';
 	}
+	// **FROZEN PANES IN ODS LIVE IN settings.xml, NOT IN content.xml.** ODF 1.2 Part 1 section 3.10
+	// (office:settings) and section 3.10.2-3.10.5 (config:config-item-set, -map-indexed, -map-named,
+	// -map-entry, config-item) define only the containers; the item NAMES are the application's own.
+	// These are LibreOffice's (sc/source/ui/view/viewdata.cxx, ScViewDataTable::WriteUserDataSequence),
+	// and they are the ones Tom's own LibreOffice-saved sdnet.ods carries for its frozen sheet: a split
+	// mode of 2 is SC_SPLIT_FIX, a frozen split, and then the two split POSITIONS are a column count
+	// and a row count, not a distance. ActiveSplitRange 3 is the bottom-right pane (SC_SPLIT_BOTTOMRIGHT),
+	// 2 the bottom-left; PositionRight and PositionBottom are the first column and row that scroll.
+	// The cursor starts in the pane that scrolls. Zoom and grid are written per table as LibreOffice
+	// writes them, so a reader never falls back to a default it computes from a missing item.
 	function odsConfigTable(name, cols) {
 		function item(n, t, v) { return '<config:config-item config:name="' + n + '" config:type="' + t + '">' + v + '</config:config-item>'; }
 		// The heading row and, where there is more than one column, the ID column are frozen.
 		var fc = cols > 1 ? 1 : 0;
 		return '<config:config-item-map-entry config:name="' + xmlText(name) + '">' +
-			item('CursorPositionX', 'int', 0) + item('CursorPositionY', 'int', 0) +
+			item('CursorPositionX', 'int', fc) + item('CursorPositionY', 'int', 1) +
 			item('HorizontalSplitMode', 'short', fc ? 2 : 0) + item('VerticalSplitMode', 'short', 2) +
 			item('HorizontalSplitPosition', 'int', fc) + item('VerticalSplitPosition', 'int', 1) +
 			item('ActiveSplitRange', 'short', fc ? 3 : 2) +
 			item('PositionLeft', 'int', 0) + item('PositionRight', 'int', fc) +
 			item('PositionTop', 'int', 0) + item('PositionBottom', 'int', 1) +
+			item('ZoomType', 'short', 0) + item('ZoomValue', 'int', 100) + item('PageViewZoomValue', 'int', 60) +
+			item('ShowGrid', 'boolean', 'true') +
 			'</config:config-item-map-entry>';
+	}
+	// The view-wide items LibreOffice writes beside the Tables map, in its own order.
+	function odsViewItems() {
+		function item(n, t, v) { return '<config:config-item config:name="' + n + '" config:type="' + t + '">' + v + '</config:config-item>'; }
+		return item('ZoomType', 'short', 0) + item('ZoomValue', 'int', 100) + item('PageViewZoomValue', 'int', 60) +
+			item('ShowPageBreakPreview', 'boolean', 'false') + item('ShowZeroValues', 'boolean', 'true') +
+			item('ShowNotes', 'boolean', 'true') + item('ShowGrid', 'boolean', 'true') +
+			item('HasColumnRowHeaders', 'boolean', 'true') + item('HasSheetTabs', 'boolean', 'true') +
+			item('IsOutlineSymbolsSet', 'boolean', 'true');
 	}
 	function odsBook(sheetsIn) {
 		var NS = 'xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" ' +
@@ -234,7 +255,7 @@ var EngCalcs = (typeof require === 'function' && typeof module !== 'undefined')
 			'<config:config-item-map-entry><config:config-item config:name="ViewId" config:type="string">view1</config:config-item>' +
 			'<config:config-item-map-named config:name="Tables">' + config + '</config:config-item-map-named>' +
 			'<config:config-item config:name="ActiveTable" config:type="string">' + xmlText(names[0]) + '</config:config-item>' +
-			'</config:config-item-map-entry></config:config-item-map-indexed></config:config-item-set>' +
+			odsViewItems() + '</config:config-item-map-entry></config:config-item-map-indexed></config:config-item-set>' +
 			'</office:settings></office:document-settings>';
 		manifest = '<?xml version="1.0" encoding="UTF-8"?>\n<manifest:manifest ' +
 			'xmlns:manifest="urn:oasis:names:tc:opendocument:xmlns:manifest:1.0" manifest:version="1.2">' +
@@ -276,7 +297,12 @@ var EngCalcs = (typeof require === 'function' && typeof module !== 'undefined')
 				return '<c r="' + ref + '" t="inlineStr"><is><t xml:space="preserve">' + xmlText(t) + '</t></is></c>';
 			}).join('') + '</row>';
 		});
-		// A pane freezing the heading row and, with more than one column, the ID column.
+		// **A FROZEN PANE** (ECMA-376 Part 1, 18.3.1.66 pane, 18.3.1.87 sheetView, 18.3.1.78 selection):
+		// xSplit and ySplit count the frozen columns and rows when state is "frozen", topLeftCell is the
+		// first cell of the pane that scrolls, and activePane names that pane. One selection per pane,
+		// as Excel itself writes them. sheetView's workbookViewId points into the workbook's bookViews
+		// (18.2.1), which xlsxBook() writes; before 2026-10-07 it pointed at a workbook view that was not
+		// there: the one dangling reference in the file, and the first suspect for a freeze that did not take.
 		pane = fc
 			? '<pane xSplit="1" ySplit="1" topLeftCell="B2" activePane="bottomRight" state="frozen"/>' +
 				'<selection pane="topRight" activeCell="B1" sqref="B1"/><selection pane="bottomLeft" activeCell="A2" sqref="A2"/>' +
@@ -284,6 +310,9 @@ var EngCalcs = (typeof require === 'function' && typeof module !== 'undefined')
 			: '<pane ySplit="1" topLeftCell="A2" activePane="bottomLeft" state="frozen"/><selection pane="bottomLeft" activeCell="A2" sqref="A2"/>';
 		return '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n' +
 			'<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">' +
+			// CT_Worksheet is a SEQUENCE (ECMA-376 Part 1, 18.3.1.99), so order matters: sheetPr,
+			// dimension, sheetViews, sheetFormatPr, cols, sheetData, ... ignoredErrors.
+			'<dimension ref="A1:' + colLetter(Math.max(0, sh.heads.length - 1)) + (sh.rows.length + 1) + '"/>' +
 			'<sheetViews><sheetView workbookViewId="0"' + (first ? ' tabSelected="1"' : '') + '>' + pane + '</sheetView></sheetViews>' +
 			'<sheetFormatPr defaultRowHeight="15"/><cols>' + cols + '</cols><sheetData>' + data + '</sheetData>' +
 			// CT_Worksheet order (ECMA-376 18.3.1.99): sheetData ... pageMargins, pageSetup, headerFooter, ...,
@@ -321,7 +350,10 @@ var EngCalcs = (typeof require === 'function' && typeof module !== 'undefined')
 			sheets.map(function (x, i) {
 				return '<Override PartName="/xl/worksheets/sheet' + (i + 1) + '.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>';
 			}).join('') + '</Types>';
-		wb = head + '<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="' + RN + '"><sheets>' +
+		wb = head + '<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="' + RN + '">' +
+			// CT_Workbook (18.2.27) order: ... workbookPr, workbookProtection, bookViews, sheets. The one
+			// workbookView (18.2.30) is the view every sheetView's workbookViewId="0" names.
+			'<bookViews><workbookView activeTab="0"/></bookViews><sheets>' +
 			names.map(function (n, i) {
 				return '<sheet name="' + xmlText(n) + '" sheetId="' + (i + 1) + '" r:id="rId' + (i + 1) + '"/>';
 			}).join('') + '</sheets></workbook>';
