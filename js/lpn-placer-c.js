@@ -69,6 +69,22 @@ EngCalcs.lpnPlacerC = (function () {
 	var QUICK = { show: 120, grow: 50, mend: 2000, nudge: 600, deadline: 0 };
 	var NAME = 'C (keep, show, grow, mend)';
 
+	// INGREDIENTS, each switchable so its worth can be measured with it off (STRATEGY.md beside the
+	// bench's c-notes). In node: PLACER_C_OFF=evict,fine,... ; on the page: EngCalcs.lpnPlacerCOff
+	// = ['evict', ...] before create().
+	//   deepgrow  GROW looks further down a label's list for room for one more property (S11)
+	//   evict     MEND's blocker may be a leader as well as a label, and up to two neighbours (S16)
+	//   fine      a REPAIR pass: hidden and cut labels try rays every 15 degrees, every half row (S3, S15)
+	var ING_ALL = ['deepgrow', 'evict', 'fine'];
+	function ingredients() {
+		var off = [];
+		if (typeof process !== 'undefined' && process.env && process.env.PLACER_C_OFF) { off = String(process.env.PLACER_C_OFF).split(','); }
+		if (typeof EngCalcs !== 'undefined' && EngCalcs.lpnPlacerCOff) { off = off.concat(EngCalcs.lpnPlacerCOff); }
+		var on = {};
+		ING_ALL.forEach(function (k) { on[k] = off.indexOf(k) < 0 && off.indexOf('all') < 0; });
+		return on;
+	}
+
 	var SYM = 1, LSYM = 2, TEXT = 3, TLEAD = 4, PIPE = 5, LABEL = 6, LEAD = 7, ARROW = 8;
 	var D2R = Math.PI / 180;
 
@@ -464,6 +480,8 @@ EngCalcs.lpnPlacerC = (function () {
 
 	// ---- the placer ------------------------------------------------------------------------
 	function create() {
+		var ING = ingredients();
+		var st0 = null;      // the view being laid out
 		var dirCache = {};   // node id -> the directions of the pipes meeting there (H-b)
 		var specCache = {};  // label id -> its candidate specs (H-b)
 
@@ -527,6 +545,7 @@ EngCalcs.lpnPlacerC = (function () {
 
 		function layout(scene, prev, effort) {
 			var st = setup(scene, prev);
+			st0 = st;
 			var labels = st.labels, i;
 			st.effort = effort;
 
@@ -569,6 +588,26 @@ EngCalcs.lpnPlacerC = (function () {
 			// other convenient space, if that gives it room for its next property.
 			nudge(st, order, touched);
 			grow(st, touched);
+			// 4d. REPAIR (fine): what is still hidden tries rays every 15 degrees and every half
+			// row (S3, S15), then evicts with them; then every label grows again with them.
+			if (ING.fine) {
+				var t2 = [];
+				order.forEach(function (L) {
+					if (L.cur || (st.pan && L.prevHidden && !L.nearEdge) || st.late) { return; }
+					if (effort.deadline && now() > effort.deadline) { return; }
+					var c = withFine(L, function () { return bestFor(st, L, L.rowsets.length - 1, SHOW_MAX, 0); });
+					if (c) { commit(st, L, c); t2.push(L); }
+				});
+				if (ING.evict) {
+					order.forEach(function (L) {
+						if (L.cur || (st.pan && L.prevHidden && !L.nearEdge)) { return; }
+						withFine(L, function () { mend(st, [L], t2); });
+					});
+				}
+				st.fineGrow = true;
+				grow(st, order);
+				st.fineGrow = false;
+			}
 			// 4c. ALIGN (R14): alignment is required wherever the same rows fit aligned. Once
 			// everything has settled, a pipe label still level where the user asked for it along
 			// its pipe takes any aligned spot now free for the same rows.
@@ -739,10 +778,10 @@ EngCalcs.lpnPlacerC = (function () {
 		}
 		// A label's spec list depends only on the shape of the pipes at its owner, which a pan or
 		// zoom does not change: kept across views (H-b), rebuilt when the network changes (R13).
-		function cachedSpecs(L, key, make) {
+		function cachedSpecs(L, key, make, slot) {
 			key += L.usual;
-			var c = specCache[L.id];
-			if (!c || c.key !== key) { c = specCache[L.id] = { key: key, specs: make() }; }
+			var id = slot ? slot + ':' + L.id : L.id, c = specCache[id];
+			if (!c || c.key !== key) { c = specCache[id] = { key: key, specs: make() }; c.specs.key = key; }
 			return c.specs;
 		}
 		function rowsetMatching(L, rows, prevReq) {
@@ -772,6 +811,35 @@ EngCalcs.lpnPlacerC = (function () {
 			return out;
 		}
 
+		// ---- FINE specs (the `fine` ingredient): rays every 15 degrees, every half row out to
+		// four rows, from the node or from the pipe's middle; tried only by the REPAIR pass. ----
+		function withFine(L, fn) {
+			var s0 = L.specs, c0 = L.sc;
+			if (!L.fine) {
+				L.fine = cachedSpecs(L, 'F' + (L.specs.key || ''), function () { return fineSpecs(L, st0.text.rowHeightPx || 14.4); }, 'fine');
+				L.fsc = [];
+			}
+			L.specs = L.fine; L.sc = L.fsc;
+			try { return fn(); } finally { L.specs = s0; L.sc = c0; }
+		}
+		function fineSpecs(L, row) {
+			var specs = [], link = L.owner.t === 'link', nx = 0, ny = 0;
+			if (link) { nx = -L.owner.P.dy; ny = L.owner.P.dx; }
+			for (var i = 0; i < 24; i++) {
+				var deg = i * 15 - 180, ux = Math.cos(deg * D2R), uy = Math.sin(deg * D2R), pref = prefOf(deg);
+				if (link && Math.abs(ux * nx + uy * ny) < 0.26) { continue; }
+				['stack', 'line'].forEach(function (layout) {
+					var sh = layout === L.usual ? 0 : SHAPE;
+					if (!link) { specs.push({ t: 'adj', ux: ux, uy: uy, layout: layout, base: pref + sh }); }
+					for (var k = 1; k <= 8; k++) {
+						var len = k * row / 2 - (link ? 4 : 0);
+						specs.push({ t: 'ldr', ux: ux, uy: uy, len: len, layout: layout,
+							base: (link ? 0.3 : 0) + LDR_BASE + len * LDR_PER_PX + pref * 0.5 + (link && L.along ? LEVEL / 2 : 0) + sh });
+					}
+				});
+			}
+			return finishSpecs(specs);
+		}
 		// ---- candidate SPECS: where to try, cheapest first; positions come later -----------
 		function pointSpecs(L, pipes) {
 			var dirs = [], i;
@@ -1203,7 +1271,8 @@ EngCalcs.lpnPlacerC = (function () {
 					// What the spot is worth, without the bonus for staying put or the LEVEL penalty: a
 					// kept label may grow as freely as a new one.
 					cur -= pen(L, c0.spec) + (c0.spec ? 0 : Math.min(0, c0.base));
-					var c = bestFor(st, L, c0.rs - 1, Math.min(cur + ROW_GAIN, Math.max(cur, SHOW_MAX)), st.effort.grow);
+					var c = st.fineGrow ? null : bestFor(st, L, c0.rs - 1, Math.min(cur + ROW_GAIN, Math.max(cur, SHOW_MAX)), ING.deepgrow ? st.effort.grow * 3 : st.effort.grow);
+					if (!c && st.fineGrow) { c = withFine(L, function () { return bestFor(st, L, c0.rs - 1, Math.min(cur + ROW_GAIN, Math.max(cur, SHOW_MAX)), 0); }); }
 					if (c) { commit(st, L, c); changed = true; } else { commit(st, L, c0); L.stuck = true; }
 				}
 				if (!changed) { break; }
@@ -1213,32 +1282,41 @@ EngCalcs.lpnPlacerC = (function () {
 		// MEND: a hidden label looks for a spot blocked by exactly one movable label; if that one
 		// can go somewhere else (with fewer rows if it must), both are shown.
 		function mend(st, order, touched) {
-			var any = false, limit = st.work + st.effort.mend, c = st.probe;
+			var any = false, limit = st.work + st.effort.mend * (ING.evict ? 3 : 1), c = st.probe, maxB = ING.evict ? 2 : 0;
 			for (var i = 0; i < order.length && st.work < limit; i++) {
 				var L = order[i];
 				if (L.cur || (st.pan && L.prevHidden && !L.nearEdge)) { continue; }
+				if (st.effort.deadline && now() > st.effort.deadline) { break; }
 				var rsI = L.rowsets.length - 1, tried = {};
 				var sc = L.sc[rsI] || (L.sc[rsI] = new Float64Array(L.specs.length).fill(NaN));
-				for (var k = 0; k < L.specs.length && k < 60 && st.work < limit; k++) {
+				for (var k = 0; k < L.specs.length && k < (ING.evict ? 120 : 60) && st.work < limit; k++) {
 					if (sc[k] === Infinity || !fillSpec(st, L, L.specs[k], rsI, c)) { continue; }
 					if (sc[k] !== sc[k]) { sc[k] = staticCost(st, L, c); }
-					if (sc[k] === Infinity) { continue; }
+					if (sc[k] === Infinity || sc[k] >= SHOW_MAX + pen(L, L.specs[k])) { continue; }
 					c.stat = sc[k];
-					var bl = blocker(st, L, c);
-					if (!bl || tried[bl.id]) { continue; }
-					tried[bl.id] = 1;
-					var mine = keep(c), old = bl.cur;
-					uncommit(st, bl);
+					var bl = blocker(st, L, c, maxB);
+					if (!bl) { continue; }
+					var bls = maxB ? bl : [bl], key = bls.map(function (b) { return b.id; }).sort().join('|');
+					if (tried[key]) { continue; }
+					tried[key] = 1;
+					var mine = keep(c), olds = bls.map(function (b) { return b.cur; });
+					bls.forEach(function (b) { uncommit(st, b); });
 					var cap = SHOW_MAX + pen(L, mine.spec);
 					var cost = mine.stat < cap ? dynCost(st, L, mine, mine.stat, cap) : Infinity;
-					if (cost === Infinity) { commit(st, bl, old); continue; }
+					if (cost === Infinity) { bls.forEach(function (b, n) { commit(st, b, olds[n]); }); continue; }
 					mine.cost = cost;
 					commit(st, L, mine);
-					var moved = bestFor(st, bl, old.rs, SHOW_MAX, 50);
-					if (!moved && old.rs < bl.rowsets.length - 1) { moved = bestFor(st, bl, bl.rowsets.length - 1, SHOW_MAX, 50); }
-					if (moved) { commit(st, bl, moved); touched.push(L, bl); any = true; break; }
+					var ok = true;
+					for (var n = 0; n < bls.length && ok; n++) {
+						var bl1 = bls[n], old = olds[n];
+						var moved = bestFor(st, bl1, old.rs, SHOW_MAX, 50);
+						if (!moved && old.rs < bl1.rowsets.length - 1) { moved = bestFor(st, bl1, bl1.rowsets.length - 1, SHOW_MAX, 50); }
+						if (moved) { commit(st, bl1, moved); } else { ok = false; }
+					}
+					if (ok) { touched.push(L); bls.forEach(function (b) { touched.push(b); }); any = true; break; }
 					uncommit(st, L);
-					commit(st, bl, old);
+					bls.forEach(function (b, n) { uncommit(st, b); });
+					bls.forEach(function (b, n) { commit(st, b, olds[n]); });
 				}
 			}
 			return any;
@@ -1258,7 +1336,7 @@ EngCalcs.lpnPlacerC = (function () {
 					var pk = pen(L, L.specs[k]) - pen(L, c0.spec);
 					if (sc[k] >= c0.cost + ROW_GAIN + pk || sc[k] >= SHOW_MAX + pk) { continue; }
 					c.stat = sc[k];
-					var bl = blocker(st, L, c);
+					var bl = blocker1(st, L, c);
 					if (!bl || tried[bl.id] || !bl.cur) { continue; }
 					tried[bl.id] = 1;
 					var mine = keep(c), old = bl.cur;
@@ -1278,7 +1356,36 @@ EngCalcs.lpnPlacerC = (function () {
 			return any;
 		}
 		// The one placed label (not hand-placed) whose ink alone keeps c from being legal, or null.
-		function blocker(st, L, c) {
+		// With `evict`, the labels whose ink or leader keeps c from being free: c's ink on their ink
+		// or their leader, c's leader through their ink or across their leader. Up to `max` of them
+		// (an array), or null when more, or any is hand-placed.
+		function blocker(st, L, c, max) {
+			if (!ING.evict) { return blocker1(st, L, c); }
+			var found = [], arr, k, i, j, it;
+			function add(id) {
+				if (found.indexOf(id) >= 0) { return true; }
+				var B = st.byId[id];
+				if (!B || B.req.hand || found.length >= (max || 1)) { return false; }
+				found.push(id); return true;
+			}
+			arr = st.dg.collect(ubbOf(c), st.buf).slice();
+			for (k = 0; k < arr.length; k++) {
+				it = arr[k];
+				if (it.own === L.id) { continue; }
+				var hitIt = false;
+				if (it.k === LABEL) {
+					if (inkClash(c, it.ob)) { hitIt = true; }
+					for (j = 0; j < c.ns && !hitIt; j++) { var s = c.segs[j]; if (bbHit(s.bb, it.ob) && segHitsOB(s[0], s[1], s[2], s[3], it.ob, 1)) { hitIt = true; } }
+				} else if (it.k === LEAD) {
+					if (inkOnSeg(c, it.s)) { hitIt = true; }
+					for (j = 0; j < c.ns && !hitIt; j++) { if (leadersTouch(c.segs[j], it.s)) { hitIt = true; } }
+				}
+				if (hitIt && !add(it.own)) { return null; }
+			}
+			if (!found.length) { return null; }
+			return max ? found.map(function (id) { return st.byId[id]; }) : st.byId[found[0]];
+		}
+		function blocker1(st, L, c) {
 			var found = null, arr, k, i;
 			for (i = 0; i < c.nb; i++) {
 				var b = c.boxes[i];
