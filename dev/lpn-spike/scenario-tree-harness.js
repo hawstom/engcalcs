@@ -622,7 +622,10 @@ function everyValue() {
 }
 // The saved project without `nextId`: undo recounts the id counters from the elements
 // (recountNextId()), which an opened file states its own way. Nothing about the tree is in them.
-function fileText() { const o = JSON.parse(L.projectFileText()); delete o.nextId; return JSON.stringify(o); }
+// The file's top-level `view` is where the camera is, not the document: undo of a step that
+// changes the open scenario's held view moves the camera as the step did (stage 3c, Perry), so it
+// is set aside here as nextId is. Every scenario's own held view stays in the comparison.
+function fileText() { const o = JSON.parse(L.projectFileText()); delete o.nextId; delete o.view; return JSON.stringify(o); }
 console.log('\n--- 6. promote, and undo ---');
 {
 	let same = 0, n = 0, undone = 0, redone = 0, un = 0;

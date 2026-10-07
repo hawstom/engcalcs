@@ -26369,12 +26369,15 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	// Every tagged row of the Settings box, in document order: its paths, its sub-heading and its
 	// section. The box is built once if it has not been yet, so the table never guesses.
-	var settingBoxPlacesBuilding = false;
+	var settingBoxPlacesBuilding = false, settingBoxPlacesTried = false;
 	function settingBoxPlaces() {
 		var content = document.getElementById('lpn_setbox_content'), out = [], subs;
 		if (!content) { return { tags: out, subOrder: {} }; }
-		if (!content.querySelector('[data-lpn-setting]') && !settingBoxPlacesBuilding) {
+		// Once only: a box that still has no tagged row after one build (a page without the box's
+		// builders) is answered by the fallback, never rebuilt on every read of the table.
+		if (!content.querySelector('[data-lpn-setting]') && !settingBoxPlacesBuilding && !settingBoxPlacesTried) {
 			settingBoxPlacesBuilding = true;
+			settingBoxPlacesTried = true;
 			try { rebuildSettingsBox(); } finally { settingBoxPlacesBuilding = false; }
 		}
 		subs = {};
