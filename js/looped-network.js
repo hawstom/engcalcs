@@ -41595,7 +41595,10 @@ var EngCalcs = EngCalcs || {};
 			if (m[0] === snipMode) { o.selected = true; }
 			modeSel.appendChild(o);
 		});
-		modeSel.addEventListener('change', function () { snipMode = modeSel.value === 'free' ? 'free' : 'rect'; });
+		modeSel.addEventListener('change', function () {
+			snipMode = modeSel.value === 'free' ? 'free' : 'rect';
+			if (snipVeil) { startScreenshot(snipMode); }   // a veil already up takes the new shape
+		});
 		snipBtn.addEventListener('click', function () { startScreenshot(modeSel.value); });
 		snipRow.appendChild(snipBtn); snipRow.appendChild(modeSel);
 		body.appendChild(snipRow);
@@ -41719,6 +41722,7 @@ var EngCalcs = EngCalcs || {};
 	function cancelScreenshot() {
 		closeSnipEditor();
 		if (!snipVeil) { return; }
+		setNotice('');   // the snip's hint goes with the snip
 		document.removeEventListener('keydown', snipVeil.onKey, true);
 		if (snipVeil.watcher) { snipVeil.watcher.disconnect(); }
 		if (snipVeil.el.parentNode) { snipVeil.el.parentNode.removeChild(snipVeil.el); }

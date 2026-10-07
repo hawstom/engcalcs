@@ -152,6 +152,7 @@ async function main() {
 			const cdim = await page.$eval('#lpn_snip_canvas', (c) => ({ w: c.width, h: c.height }));
 			ok('the snip is rectangle x scale (' + r.w * S + ' x ' + r.h * S + ')', cdim.w === r.w * S && cdim.h === r.h * S, JSON.stringify(cdim));
 
+			ok('the snip hint is gone once the markup view is open', (await a.notice()) === '', JSON.stringify(await a.notice()));
 			// 3. The pen, on this snip.
 			const red0 = await page.evaluate(RED_COUNT);
 			const cb = await page.$eval('#lpn_snip_canvas', (c) => { const b = c.getBoundingClientRect(); return { x: b.left, y: b.top, w: b.width, h: b.height }; });
@@ -197,6 +198,27 @@ async function main() {
 				}
 			}
 			ok('the snip matches the same region of the whole-map capture', diff.mean < 6 && diff.badFraction < 0.01, JSON.stringify(diff));
+
+			// 7. The hint goes when the view opens, and the shape switch applies to a veil already up.
+			await pressBox(page, 'lpn_snip_go');
+			await page.waitForSelector('.lpn-snip-veil', { state: 'visible' });
+			ok('the hint shows while the veil is up', (await a.notice()) === await a.lang('lpn_screenshot_hint'), await a.notice());
+			await page.selectOption('#lpn_snip_mode', 'free');
+			ok('switching to Freehand with the veil up shows the freehand hint', (await a.notice()) === await a.lang('lpn_snip_hint_free'), await a.notice());
+			const vs = await page.$$eval('.lpn-snip-veil', (v) => v.length);
+			const T0 = await page.evaluate(MAP_RECT);
+			await page.mouse.move(T0.x + 300, T0.y + 300); await page.mouse.down();
+			await page.mouse.move(T0.x + 400, T0.y + 320, { steps: 4 });
+			ok('...and the veil already up now draws a freehand outline, one veil only', vs === 1 && !!(await page.$('.lpn-snip-lasso polygon')));
+			await page.mouse.move(T0.x + 330, T0.y + 420, { steps: 4 }); await page.mouse.up();
+			await page.waitForSelector('#lpn_snip_canvas', { state: 'visible' });
+			await page.keyboard.press('Escape');
+			await page.selectOption('#lpn_snip_mode', 'rect');
+			await pressBox(page, 'lpn_snip_go');
+			await page.waitForSelector('.lpn-snip-veil', { state: 'visible' });
+			await page.keyboard.press('Escape');
+			await a.settle(200);
+			ok('cancelling a snip clears the hint', (await a.notice()) === '', JSON.stringify(await a.notice()));
 
 			// 4. Esc cancels a snip in progress; and closes the view.
 			const dl0 = downloads, blobs0 = await page.evaluate(() => window.__snipBlobs.length);
