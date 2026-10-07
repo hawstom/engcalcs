@@ -67,6 +67,10 @@ the block.
 ## 100 — Next.
 
 - 100|539| **Gang the neighbour labels so their leaders stop crossing.**
+  **PORTING THE BENCH TO MASTER, 2026-10-07** (Tom agreed D09: rules 1-3 as three defect branches;
+  stability is a criterion of low weight). Rule 1, clean ground first, MERGED (`fix/label-clean-ground`):
+  node labels over pipes -26%, leaders through node symbols -42%, labels shown flat, pass ~8% slower.
+  Rule 2, rescue search, MERGED: labels shown 38.3 -> 39.3 per 100 asked, ~7% slower. Next: rule 3.
   **REBUILD FROM RULES, 2026-09-28:** rules reviewed (`dev/label-placement-rules.md`), bench and
   seam built, two clean-room placers done and both fail R-075; state in the handoff.
   **DROPPED TO 75 BY TOM, 2026-09-17** (*"Task 539: Demote to 75"*). Built on
@@ -236,8 +240,11 @@ the block.
   Tom, 2026-10-06. FIXED: Convert as on an empty project opened a file picker (it now opens the box).
   NOT REPRODUCED: the old project losing its node symbols and its view after a conversion
   (`convert-as-fotobi-harness.js`, four paths, master and production 9c71d54f); ask which surface.
-  BUILT on `feat/web-mercator`, awaiting his pass: EPSG:3857 is a real projected project in metres
-  (his call, 2026-10-07: "Make 3857 real."), lengths on the ground, 4326 marked suggested.
+  MERGED 2026-10-07 (`feat/web-mercator`, Tom: "Merge."): EPSG:3857 is a real projected project in
+  metres, lengths on the ground, 4326 marked suggested. Open: only the unreproduced symbol loss.
+- 75|780| **Write `.epp` project files; keep reading `.lwn` and `.json`.** Tom, 2026-10-07: *"I guess
+  it's time to start saving as .epp What's your advice? We'll support .epp, .lwn, and .json?"* Advice
+  given: yes, once he says so; `LPN_FILE_EXT` and the open filters. Awaiting his word.
 - 75|578| **Fire flow: the EPS frame and the Run concept, extracted from 530.**
   Everything else in Task 530 shipped and that task is closed. Two phases were never built and are
   kept here so they are not lost in a closed block.
@@ -355,17 +362,6 @@ the block.
 - 75|763| **A searchable help manual, built from the tips Tom cut.** Tom, 2026-10-04: *"Almost all
   the deletes could be turned into a searchable help manual."* The cut tips' English is kept in
   `dev/help-manual-source.md` (feat/tip-verdict) as its first material.
-- 75|768| **Report a problem: more information and freedom than one anonymous click.**
-  Tom, 2026-10-05: *"those links open a small form that allows, but doesn't require, a message, an
-  email address, and some selectors or canned phrases."* Ida's ranking (journal 2026-10-05): the
-  Tom, 2026-10-06, rejecting the cheap build (new links, a better contact.php): *"Cheap is no good.
-  Bigger build is needed... Do it right."* "Something wrong here?" opens a little box (canned-message
-  buttons, optional email, comments); Send is the second click. Rebuilt on `feat/feedback`.
-- 75|771| **Survey points as a script: the Description names the asset or vertex.**
-  Tom, 2026-10-05: interpret a point's Description as an asset or a pipe vertex, and the CSV as a
-  batch. The open question is joining several pipes at one node without a custom code; Mary is
-  asked what Civil 3D, Carlson and Trimble codes already do (`dev/agents/market-researcher/survey-codes.md`).
-  Tom, 2026-10-06: OK to reuse Carlson's JPN<point> (Civil 3D's CPN) for a tee rather than invent one.
 - 75|772| **AutoCAD: import, export, and perhaps sync, on a long-lived branch.**
   Tom, 2026-10-05: *"I am an AutoCAD power user and developer... I would like to know what's already
   been done first."* Mary's survey of prior art: `dev/agents/market-researcher/autocad-interop.md`.
@@ -923,7 +919,8 @@ the block.
   interoperate or merge: `dev/agents/market-researcher/gis-plugins.md`.
   Tom, 2026-10-06: yes to shapefile + GeoJSON import behind one mapping step, GeoJSON export first;
   and on the free GIS-to-EPS gap, *"I'd love to collaborate to provide this."* Who to write to
-  (Gusnet, QGISRed, Giswater): Mary's journal, 2026-10-06.
+  (Gusnet, QGISRed, Giswater): Mary's journal, 2026-10-06. **GeoJSON EXPORT MERGED 2026-10-07**
+  (`feat/geojson`, File > Export > GeoJSON file). Open: the import half.
 - 50|733| **Grow the native solver, in phases, to everything EPANET's solves.** Tom, 2026-09-26
   (R-325): *"it would be fun and maybe wise ... to gradually, in phases, build out our native solver
   to do everything that the EPANET solver does. This way the math is less of a black box for us."*

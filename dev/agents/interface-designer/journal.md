@@ -3801,3 +3801,20 @@ Recommendation: one in-page "User guide" box replaces both rows; derived toolbar
 - SPECULATION: recall of Snipping Tool (Win11), Figma, VS Code, Linear, Notion, GitHub Docs, MDN, Stripe docs behaviours from training knowledge to mid-2026; not re-fetched this session. Upgrade by checking each product.
 - OBSERVED: feat/screenshot lang en:4426-4439 holds the wordy strings (Screenshot, Magnification, hint sentence).
 - Recommendation: icon-first controls with tips; eraser = stroke-level (Snipping Tool convention); guide contents = left collapsible rail on desktop, disclosure on phone; name "Guide"; search = filter box (Ctrl+K style) for help pages; per-box title-bar: one "?" glyph only, feedback goes to Help menu.
+
+
+## 2026-10-07 Three questions (zoom window, dismissing diagnostics, "(EPANET)" in Reports)
+- OBSERVED (checked 2026-10-07): Zoom Window EXISTS. js/looped-network.js:44962-45016: one toolbar button, class lpn-tool-more (the CSS corner triangle, Task 682). Press 1 = zoomExtent(false); press 2 consecutive = zoom-window mode and relabels; press 3 exits. Tip lang.ec.en.php:1377-1378 says "Press again". Menu row at :42652 is Zoom to fit only; no Zoom Window menu row, no key found for it (grep: only +/- documented, :1380-1382).
+- OBSERVED: "no path to a reservoir" is a standing DIAGNOSTIC in #lpn_status (Looped-Network.php:425), text from diagIssueText() (js:60949, key lpn_diag_unreachable lang:2460), rewritten by runSolve on a 300ms debounce (js:60960 comment); lpn_wrong_status_btn sits in the same <p> (php:444). Notices (setNotice) are separate and have a 30-row log (js:60966+).
+- OBSERVED: Reports rows js:5070-5135: Pump energy, Scenario comparison, EPANET run, Status, Calibration, Full.
+- SPECULATION: CAD users expect ZOOM > Window via menu/Z,W typing; first-timers do not discover a second-press mode. Mute-by-kind is Outlook/Gmail/VS Code "Don't show again" convention, not re-fetched.
+Recommendations in the report to Tom: (1) keep the triangle, add View > Zoom Window row + key W (hint in tip); (2) per-message-text "Hide" x inside #lpn_status_text only, until text changes or network reopens, "N hidden" chip restores; wrong-button stays; (3) one separator + no parentheses on 3 rows, or parenthetical on all four if Tom wants it; prefer a separator.
+
+## 2026-10-07 (Ida) -- Guide box audit, feat/user-guide @ 9c315b4b
+
+- OBSERVED (Chromium, 1400x1000 and 390x844, today; shots in scratchpad/ida/{d,p}-{top,map,boxes}.png): box 974x686, rail 240 px, pane 724 px; one left edge, three heading levels read consistently. Phone: rail collapses to a 37 px "Contents" row; pane 364 px.
+- OBSERVED: Map and Screenshot sections each print an h2 then an h3 that restates it ("Map" / "Map keyboard shortcuts"). Key-column width differs between the Map table (~78 px) and the Screenshot table (~120 px), so the action column does not align down the pane.
+- OBSERVED: "Screenshot" is a rail entry twice (section, and under Boxes). Boxes entries have no rule or extra space above h3, so they read as bold run-in labels, denser than the Toolbar rows.
+- OBSERVED: phone Toolbar rows for Open, Save, Select... show names in grey with no explanation.
+- OBSERVED prose: "Follow on-screen wizard." (article missing); Settings "Each is saved with the project" has no clear antecedent; Fire flow says "your project" where siblings say "the project".
+- SPECULATION: first thing noticed is the dark "Guide" title bar then the shaded rail selection; the title bar carries four glyphs (dock left, dock right, ?, close) competing with the content. Not tested on a reader.
