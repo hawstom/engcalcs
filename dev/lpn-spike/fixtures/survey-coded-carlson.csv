@@ -1,0 +1,18 @@
+# A made-up coded survey of a small water system, for the field-code import (ROADMAP Task 771).
+# Layout: Carlson's comma-delimited PNEZD point file, no header (point, northing, easting,
+# elevation, description). Descriptions in Carlson "Special Codes" syntax (Carlson Software, 2021):
+# same-code joining with a line number (WL1, WL2), PointCAD +0/-0 start and end, dot syntax for two
+# codes on one shot (WELL.WL1), and JPN<point> joining to a named point. Codes from PennDOT's survey
+# feature code list (WL water line, FH fire hydrant, WELL, CIST). See dev/survey-codes.md.
+# Point 30 is deliberately WRONG (its easting is not a number), point 11 joins to a point that does
+# not exist, and points 4 and 5 carry words that are not codes.
+1,5000.00,5000.00,150.00,WELL.WL1 +0
+2,5000.00,5100.00,101.20,WL1
+3,5000.00,5200.00,100.80,WL1
+4,5050.00,5300.00,100.50,WL1 8IN
+5,5100.00,5400.00,100.10,FH.WL1 -0 HYD-A
+10,4900.00,5200.00,99.70,WL2 JPN3
+11,4800.00,5200.00,99.40,WL2 JPN999
+12,4700.00,5250.00,99.00,WL2 -0
+20,4700.00,5400.00,98.00,CIST.WL3 JPN12
+30,4600.00,X5000,99.00,WV

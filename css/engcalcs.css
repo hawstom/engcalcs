@@ -1809,6 +1809,41 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
    same argument .lpn-vertexmode already makes over links. No `!important` needed: (1,1,0) beats
    every object cursor's (0,1,0), which is what the regmode rule above predates. */
 #lpn_canvas.lpn-placemode, #lpn_canvas.lpn-placemode * { cursor: crosshair; }
+/* Map > Screenshot: the one-shot snipping veil over the map and the rectangle dragged on it
+   (startScreenshot() in js/looped-network.js). Transparent, so the map stays readable under it.
+   The veil sits just UNDER the movable boxes (1200), so the Screenshot box that opens with it,
+   and any other box over the map, can still be used while it is up. The rectangle is half
+   opaque (Tom, 2026-10-05: "The screenshot drag needs to be less than 100% opaque. Try 50%."),
+   so what is being snipped shows through it. */
+.lpn-snip-veil { position: fixed; z-index: 1190; cursor: crosshair; touch-action: none; }
+.lpn-snip-rect { position: absolute; box-sizing: border-box; border: 1px dashed var(--ec-accent); background: var(--ec-select-bg); opacity: 0.5; pointer-events: none; }
+.lpn-snip-lasso { position: absolute; left: 0; top: 0; pointer-events: none; }
+.lpn-snip-lasso polygon { fill: var(--ec-select-bg); fill-opacity: 0.5; stroke: var(--ec-accent); stroke-width: 1; stroke-dasharray: 4 3; }
+.lpn-snip-edit { position: fixed; inset: 0; z-index: 1860; background: var(--ec-a-0-0-0-4); display: flex; align-items: center; justify-content: center; padding: 8px; }
+.lpn-snip-edit-panel { position: relative; background: var(--ec-bg); color: var(--ec-ink); border: 1px solid var(--ec-ink); box-shadow: 2px 2px 6px var(--ec-a-0-0-0-3); padding: 8px; max-width: 100%; max-height: 100%; display: flex; flex-direction: column; gap: 8px; }
+.lpn-snip-edit-bar { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; padding-inline-end: 28px; }
+.lpn-snip-edit-bar .lpn-popover-x { position: absolute; top: 4px; inset-inline-end: 6px; }
+.lpn-snip-edit-bar .lpn-btn-on { background: var(--ec-select-bg); border-color: var(--ec-accent); }
+.lpn-snip-edit-scroll { overflow: auto; min-height: 0; background: var(--ec-border); }
+.lpn-snip-edit-canvas { display: block; max-width: 100%; max-height: calc(100vh - 6rem); touch-action: none; cursor: crosshair; }
+.lpn-snip-edit-canvas.lpn-snip-eraser-on { cursor: pointer; }
+.lpn-snip-ic { display: inline-flex; align-items: center; justify-content: center; min-width: 32px; min-height: 32px; padding: 0 6px; }
+.lpn-snip-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.lpn-snip-mag { display: inline-flex; align-items: center; gap: 4px; }
+.lpn-snip-split { display: inline-flex; }
+.lpn-snip-split .lpn-snip-ic:first-child { border-start-end-radius: 0; border-end-end-radius: 0; }
+.lpn-snip-split .lpn-snip-chev { min-width: 20px; padding: 0 2px; border-inline-start: 0; border-start-start-radius: 0; border-end-start-radius: 0; }
+.lpn-snip-menu { display: none; position: fixed; z-index: 1850; flex-direction: column; gap: 2px; padding: 2px; background: var(--ec-bg); border: 1px solid var(--ec-ink); box-shadow: 2px 2px 6px var(--ec-a-0-0-0-3); }
+.lpn-snip-menu.lpn-snip-menu-open { display: flex; }
+.lpn-snip-seg { display: inline-flex; }
+.lpn-snip-seg .lpn-snip-ic:first-child { border-start-end-radius: 0; border-end-end-radius: 0; }
+.lpn-snip-seg .lpn-snip-ic:last-child { border-start-start-radius: 0; border-end-start-radius: 0; border-inline-start: 0; }
+@media (pointer: coarse), (max-width: 700px) {
+  .lpn-snip-ic { min-width: 40px; min-height: 40px; }
+  .lpn-snip-split .lpn-snip-chev { min-width: 40px; }
+  .lpn-snip-edit-bar .lpn-popover-x { min-width: 40px; min-height: 40px; }
+}
+@media print { .lpn-snip-veil { display: none; } }
 /* Node-mode target step: nodes ARE the valid click target here, so forcing crosshair over them
    removes the one affordance that actually matters. More specific than the rule above (extra
    class), so it wins the !important tie on specificity. */
@@ -2292,6 +2327,8 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
    unit. */
 .lpn-contourbox { width: min(24rem, calc(100vw - 8px)); --lpn-set-name: 8.5rem; --lpn-set-col: 13rem; }
 .lpn-contourbox .lpn-set-row { margin: 7px 0; }
+.lpn-snipbox { width: min(18rem, calc(100vw - 8px)); min-width: min(14rem, 94vw); --lpn-set-name: 8.5rem; --lpn-set-col: 6rem; }
+.lpn-snipbox .lpn-set-row { margin: 7px 0; }
 .lpn-contour-ctl { display: flex; gap: 4px; align-items: baseline; flex-wrap: wrap; min-width: 0; }
 /* The colour scheme button draws its swatches absolutely, so as a flex item it has no width of its
    own to offer: it takes the row. */
@@ -3997,6 +4034,23 @@ label > .lpn-valwarn { margin-inline-start: .3em; }
 /* Once tapped it is no longer a control, and it must not keep looking like one: the label is the
    thank-you, so a hover border on it would invite a second press that posts nothing. */
 .lpn-wrong-btn[disabled] { color: var(--ec-ink-muted); cursor: default; border-color: transparent; opacity: 1; }
+/* ---- The box "Something wrong here?" opens (ROADMAP Task 768), drawn in #lpn_dialog ----
+   The picks are toggles (aria-pressed), wrapping onto as many rows as the width needs, so a phone in
+   tall mode gets a column of them and a desk gets two rows. A pressed pick wears the toolbar's own
+   pressed paint. The fields fill the box; the "What this sends" line is quieter than the controls. */
+.lpn-fb { width: 30em; max-width: 100%; }
+.lpn-fb-picks { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 10px; }
+.lpn-fb-pick { font: inherit; padding: 4px 8px; border: 1px solid var(--ec-gray-bbb); border-radius: 3px; background: var(--ec-bg); color: inherit; cursor: pointer; text-align: left; }
+.lpn-fb-pick[aria-pressed="true"] { background: var(--ec-pressed-bg); border-color: var(--ec-pressed-border); }
+/* The tick is drawn, not a glyph: U+2713 is missing from some system fonts and showed as a box. */
+.lpn-fb-pick[aria-pressed="true"]::before { content: ""; display: inline-block; width: 0.3em; height: 0.6em; margin: 0 0.5em 0.15em 0.1em; border: solid currentColor; border-width: 0 2px 2px 0; transform: rotate(45deg); }
+.lpn-fb-label { display: block; margin-top: 8px; }
+.lpn-fb textarea.lpn-fb-comment { min-height: 5em; font-family: inherit; resize: vertical; }
+.lpn-fb-sends { margin: 10px 0 0; font-size: 0.9em; color: var(--ec-ink-muted); }
+.lpn-fb-status { margin: 8px 0 0; min-height: 1.2em; }
+.lpn-fb-status.lpn-fb-error { color: var(--ec-error-ink); }
+/* The honeypot field: never shown, never reached by Tab, filled only by a bot. */
+.lpn-fb-trap { display: none; }
 /* ---- The message log button and list (ROADMAP Task 704) ----
    Moved 2026-09-21 into #lpn_map_overlay_tl, beside the mode hint it recalls (Tom: "the
    button/glyph must be where the messages appear"). **OPAQUE, not the translucent pill paint the

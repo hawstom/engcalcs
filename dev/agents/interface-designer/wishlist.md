@@ -539,3 +539,5 @@ N+5. **A check that flags one English string holding both a select word and an o
 - Consider the menu bar's bordered pills in the same hierarchy review (same "boxed" problem as the transport; Task 616 lineage).
 
 - (2026-10-05) Feedback usage data: how often does `lpn wrong:*` fire vs contact sends per week (log/lang-log-stats.sh)? Decides whether the in-page dialog is worth ~310 strings.
+
+- (2026-10-06) Check whether every title-bar glyph has a keyboard path and a tip in all 27 languages (RTL mirroring of the contents rail).

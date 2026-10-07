@@ -100,7 +100,7 @@ async function exportOnce(a, card) {
 	const downloads = [];
 	const onDl = (d) => downloads.push(d);
 	a.page.on('download', onDl);
-	const label = await a.lang('lpn_file_export_dxf');
+	const label = await a.lang('lpn_file_export_item_dxf');
 	// The REAL row, clicked with the real mouse: Session.menuClick opens #lpn_menu_file and clicks.
 	await a.menuClick(label, 'file');
 	const t0 = Date.now();
