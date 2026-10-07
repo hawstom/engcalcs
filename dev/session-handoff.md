@@ -99,70 +99,91 @@ lines rather than appending corrections.
   tile counts at a 900 ms settle (basemap.js now waits for a pointable tile). Pre-existing and unrelated: `scale-publish-harness.js` (2 checks). The full `node dev/browser-pass/run.js` is green (1853/1853, 2026-10-04, Task 761); browser-pass specs are not in
   check_all.
 
-## STATE — 2026-10-06 (fourth session; jasmine runs on UTC, so log stamps read a day ahead late in the evening)
+## STATE — 2026-10-07 (fifth session; jasmine runs on UTC)
 
 ### Master = see `git log -1 master`, pushed. Production = 9c71d54f (Tom pulled 2026-09-28)
 
-Merged this session: `feat/scenario-table` (Task 766, "Good. Merge.") and `feat/value-warning`
-(Task 770, "Merge."), both closed; `fix/si-default-diameter` (a new project whose units differ from
-the open one got null diameter/elevation/demand defaults and threw on survey import); Mary's GIS/CAD
-research; his notes on Tasks 728, 768, 771, 772 in the roadmap. `feat/value-warning`, `asset-type`,
-`feedback`, `survey-code`, `geojson`, `dxf` were added to `branch-policy.json` (they had been missed).
+Merged this session: Tasks 774 (Description edits: trimmed every keystroke, refreshed nothing) and 775
+in part (Convert as on an empty project opened a file picker), the usage-report window fix (a
+replayed offline beacon stamped 09-21 made a 5-day log report 15 days), "Is active?" (his word),
+`feat/tip-door` ("Merge") and `feat/asset-type` ("Merge."). Task 769 closed; 759 half done.
+**The usage-report fix reaches his daily mail only after his next pull.**
 
-### Awaiting him (all on the Branch previews page; every one passed Perry, his findings fixed)
+### Awaiting him (all on the Branch previews page with click lists; each passed Perry)
 
-- **`feat/tip-door`** (Task 759): ALL-CAPS heading detector removed (CC's advice; he had asked what
-  it was). ONE style of tip: every `title` (and SVG `<title>`, chart dots) is now the styled Bootstrap
-  name tip via a lazy delegated listener; a tap elsewhere closes a non-control tip on touch. Fire-flow
-  wording is his. Phone check still deferred to the merge.
-- **`feat/screenshot`**: a Screenshot button in the box repeats the shot. No scale bar (his word).
-  An on-map legend that is showing IS in the picture: his call.
-- **`feat/backdrop-attach`** (Task 282): his "only the .inp" was Chrome dropping a 2nd/3rd download
-  from one click (reproduced). Export now saves ONE Name.zip (.inp + .bmp + .bpw); picture name is
-  ASCII for EPANET. He then said the BMP/BPW did arrive late on the old build; CC recommended keeping
-  the zip; he agreed ("Zip: I agree."). Ask: `lpn_file_export_inp_tip` does not mention the .zip.
-- **`feat/asset-type`** (Task 769): the key line "ID: Lost entry"; then CC read his "Proceed" as
-  "build the links" (the branch had left Pipe/Pump/Valve unbuilt), NOT as an all-clear; links are
-  built (TCV for a new valve; a curveless pump adds no head; customers stay on their node; rule words
-  rewritten). Seam: bentley must walk `eachOverrideMap()` in four functions at its merge
-  (`feat/asset-type:dev/asset-type.md`). **Ask him whether "Proceed" meant merge.**
-- **`feat/feedback`** (Task 768, REBUILT): his spec, no links, no contact page: "Something wrong
-  here?" opens a little box (four canned toggles, optional comment and email, what-this-sends line);
-  Send is click two; new endpoint `send-feedback.php`. **privacy.php sentence changed (public text).**
-  jasmine has no MTA, so on the preview a Send with content shows the failure path. The old
-  `lpn_wrong_tip` in 26 languages is now false until the sprint that follows the merge.
-- **`feat/survey-code`** (Task 771, new): opt-in field codes in survey import (Carlson same-code
-  joining, +0/-0, CLO, JPN/CPN tee; PennDOT code defaults). His calls: CPN and B/E in Civil 3D; WV
-  as a junction. Sample CSV is `feat/survey-code:dev/lpn-spike/fixtures/survey-coded-carlson.csv`.
-- **`feat/geojson`** (Task 728, new): File > Export GeoJSON (RFC 7946, Gusnet/WNTR field names,
-  patterns as multipliers, project units stated not converted; XY projects refused).
-- **`feat/dxf`** (Task 772, new): File > Export DXF (R2000, C-WATR-* layers, invisible-attribute
-  blocks incl. a mid-run pipe block, labels as laid out at Zoom to fit, UTM for lat/lon). His calls:
-  invisible ID, layer names, arial.ttf, VALV vs INST.
-- Still from before: `feat/desktop`; `feat/label-placer` (his Q1 yes folded in; Q2 and Q4 on the
-  artifact https://claude.ai/artifact/NEDMYBs4exkWvYcTzaqMUA).
+- **`feat/backdrop-attach`**: his tip wording applied ("in a zip file with its image if
+  applicable"); he wrote "Otherwise it worked great. Good" -- ASK whether that is "Merge".
+- **`feat/feedback`**: "Canned messages (optional)" applied as the first sentence of `lpn_fb_intro`
+  (second sentence kept); "Other than that, it looks great" -- ASK whether that is "Merge".
+- **`feat/survey-code`**: he liked it; no merge word. His questions answered in the report: JPN is
+  Carlson's "join to point number"; CPN came from search summaries, unverified; Civil 3D's linework
+  codes are user-set, as he guessed. Pipe size from codes is Task 778 (25).
+- **`feat/geojson`**: exports now in File > Export... submenu (his ask). Gusnet reads the .inp
+  directly (Processing Toolbox > Gusnet > Import from EPANET .inp file). **Seam:** `feat/dxf` must at
+  its merge add one row to `exportMenuRows()` and rename its key to `lpn_file_export_item_dxf`
+  (list in the geojson agent's report, repeated in `feat/geojson:dev/` docs if any).
+- **`feat/dxf`**: no-download fixed (an SVG HTMLCollection `.forEach`; the stub harness used an
+  Array). Lat/lon writes UTM metres, not degrees (his assumption corrected; status line says so).
+  ID visible, one layer per property C-WATR-ATTR-*, attributes height 1, Standard style.
+- **`feat/screenshot`**: Snip (rectangle, freehand) + red pen markup view (Undo, Copy, Save). His
+  calls: plain Screenshot now opens the view (one more click); view stays open after Copy.
+- **`feat/table-export`** (Task 776): Copy with headings; Export table as CSV / ODS (pane menu).
+- **`feat/section-grid`** (Task 777): 4-8 round station/elevation marks on mi and wi sketches.
+- **`feat/user-guide`**: Ida's design; one Help > User guide replaces Toolbar and Tables and Hotkeys;
+  generated from the live toolbar and menus; "?" opens it at the control. `lpn_help_hotkeys` is an
+  orphan candidate once merged. lpn_notes_6_def cells swapped (order only) in 27 files; its old
+  "OK." ruling lapsed.
+- **`feat/bentley-interop`** (long burn, never merges without him): held values marked in the
+  Settings box (amber, "Base: x", Clear override), view rows + "Hold this view in this scenario",
+  his two notes fixed (Major/Minor from the box; table marks overrides live), Change type walks
+  stored alternatives. Q10 decided by CC (one Clear for all three; may overrule), Q11, Q12 open.
+- Still from before: `feat/desktop`.
 
-### The long burn: `feat/bentley-interop` (long-lived, never merges without him)
+### Label bench
 
-Q6 answered: "Calculation". The Settings table (stage 3b) is built and the Settings box, Graphs >
-Contour and the Map basemap doors now write the open scenario through one seam (his Q4); every
-setting is a row; undo restores only edited paths; a new scenario seeds nothing. Two Perry passes,
-every finding fixed (head a83b751c); on the previews page. His calls: Settings tab in Basic mode;
-Restore defaults disabled in a scenario. Next stage: mark a held value inside the Settings box, and
-"Hold this view in this scenario".
-
-### Next job
-
-- **Translation sprint once his pass merges this batch** (tip-door, feedback, asset-type, survey,
-  geojson, dxf, backdrop all add or change keys; ~150 untranslated). Wave 0 first. Deferred this
-  session to run once rather than twice, and because build agents held most of the 20 slots.
-- jasmine timezone: needs `sudo timedatectl set-timezone America/Phoenix` from him.
+- **Label round 7 is SCORED** (`feat/label-placer` e71dfe82, pushed with the four builder branches):
+  `feat/label-placer:dev/label-trials/round-7-2026-10-07.md`, and the phase-1 close drafted in
+  `feat/label-placer:dev/label-trials/phase-1-summary.md`. A7-D7 within a point of each other
+  (78-79% labels vs round 6's best 71.8%); all six hypotheses held; builder B's accidental read of
+  Part B is disclosed and B's blind tests excluded. Round 8 fixes are listed (room-check counts
+  leader ground and own-pipe ground; Part B out of the builders' file). spot_prime still untried.
+  **Question for him:** the drop order. Scenes that do not list the ID drop it first, so labels show
+  bare values ("P=56.67"); moving the ID last shows 40 of 42 labels instead of 32
+  (`feat/label-placer:dev/label-trials/round-7/drop-order-novato.png`).
 
 ### Decisions waiting on him
 
-- DMARC phase 3: gate met; needs his go and his not-epanet.org choice.
-- Mary's contacts (journal 2026-10-06): Angus McBride (Gusnet), Prof. Fernando Martínez Alzamora
-  (QGISRed), Giswater/BGEO; openers drafted in her journal. Bricsys is now Octave (2026-05-28).
+- **Daily email words.** He believes a yes-browser is never counted again; the code and privacy.php
+  say `ec_seen` is a SESSION cookie, so a yes-browser is counted once per page per browser session.
+  His proposed "browsers (said yes)" is false under that. Choice: keep session ("visits (said
+  yes)"), or make `ec_seen` one year (then "browsers (said yes)" is true and counts first visits
+  only; a storage change: privacy.php row, consent version question). "page loads (everyone
+  else)" is his and is fine either way. Build after he picks.
+- **Convert as (Task 775):** 3857 vs 4326 (R-218 fold) -- explain, hide the 3857 row, or make 3857
+  real; and which surface he saw the lost node symbols on (not reproduced on master or 9c71d54f).
+- **DXF:** answered 2026-10-07: `feat/dxf`'s labels and read-me are fine as they are; labeling is
+  to be "a mere consequence" of transferring data by attributed blocks (`dev/dxf-interface.md`).
+  Spend no more on DXF label layout; the spec's import and export come next, after his pass.
+- **Snip:** keep the view on plain Screenshot? close after Copy?
+- **User guide:** the name; show vs run; English-only prose.
+- DMARC phase 3; Mary's contacts: Gusnet's author only via GitHub Issues
+  (github.com/angusmcb/gusnet/issues; Discussions off); he has written to Prof. Martínez Alzamora.
+- jasmine timezone: `sudo timedatectl set-timezone America/Phoenix` from him.
+
+### Next job
+
+- Merge his next batch, then ONE translation sprint (Wave 0 first) for every new key.
+
+### Traps met 2026-10-07 (fifth session)
+
+- **`json.dumps` with the wrong indent rewrote all of `branch-all-clears.json`** (1126 lines) and
+  was merged locally before CC saw it; master was reset to the reflog SHA (unpushed). The file is
+  `indent=1`; diff `--stat` before committing any rewritten JSON.
+- **A harness wrapped in `flock /tmp/engcalcs-browser.lock` by hand timed out** while suites held it;
+  harnesses take the lock themselves. Run them bare.
+- **A stub DOM hid a real-browser crash** (`feat/dxf`: `children.forEach` on an SVG element). Any
+  export or menu action needs one real-Chromium harness that clicks the real row.
+- **The roadmap lagged again**: Task 617's first step (Basemap style) had shipped weeks earlier.
 
 ### Traps met 2026-10-06 (fourth session)
 
