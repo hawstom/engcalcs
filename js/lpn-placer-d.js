@@ -45,7 +45,7 @@ EngCalcs.lpnPlacerD = (function () {
 	// Off by name: in node, PLACER_D_OFF=a,b (environment); in a page or a harness,
 	// EngCalcs.lpnPlacerD.off = ['a', 'b'] before create(). Names and what each does: STRATEGY.md.
 	var INGREDIENTS = ['order', 'sticky', 'crowd', 'smallfirst', 'evict', 'polish', 'along', 'altlayout',
-		'rescue', 'rescueevict', 'alongfix', 'leadermove', 'bendcheck', 'tight', 'wedge', 'timebound', 'warm'];
+		'rescue', 'rescueevict', 'alongfix', 'bendcheck', 'tight', 'timebound', 'warm'];
 	var OFF = {}, API = null;
 	function readOff(api) {
 		OFF = {};
@@ -454,14 +454,6 @@ EngCalcs.lpnPlacerD = (function () {
 			}
 		});
 		(scene.customers || []).forEach(function (c) { custById[c.id] = c; });
-		// The directions the pipes leave each node in, for the ranked gaps ('wedge', S1).
-		var nodeLinks = {};
-		scene.links.forEach(function (l) {
-			var P = l.points, n = P.length;
-			if (n < 2) { return; }
-			if (l.from !== undefined) { (nodeLinks[l.from] || (nodeLinks[l.from] = [])).push(Math.atan2(P[1][1] - P[0][1], P[1][0] - P[0][0])); }
-			if (l.to !== undefined) { (nodeLinks[l.to] || (nodeLinks[l.to] = [])).push(Math.atan2(P[n - 2][1] - P[n - 1][1], P[n - 2][0] - P[n - 1][0])); }
-		});
 
 		// ---- the free-space model: two summed-area tables of every symbol and Text object ----
 		// Cells of RC px over the view. TOUCHED marks a cell any obstacle touches, so a box whose
@@ -805,7 +797,7 @@ EngCalcs.lpnPlacerD = (function () {
 		// The candidates of one drop level, clear of the fixed world, best first.
 		// Tier 0 is the places touching the owner (and last view's place); tier t > 0 the places
 		// on a leader DISTS[t - 1] long, each built only when the tiers before it cannot win.
-		var NT = 1 + DISTS.length, denseOn = false, leaderBlocks = false;
+		var NT = 1 + DISTS.length, denseOn = false;
 		function ensure(li, k, t) {
 			var L = lab[li], key = (NT + 1) * k + t;
 			if (L.lists[key]) { return L.lists[key]; }
@@ -1001,16 +993,9 @@ EngCalcs.lpnPlacerD = (function () {
 			for (n = 0; n < q.n; n++) {
 				o = q[n];
 				if (o.li === c.li) { continue; }
-				var ps = pairSoft(c, o);
-				// With `leaderBlocks`, a label whose leader the text would lie on (or whose text
-				// the leader would cross) is a blocker to move, not a cost to pay.
-				if (blockers && leaderBlocks && ps >= C_LABEL_LEADER) {
-					if (blockers.indexOf(o.li) < 0) { blockers.push(o.li); }
-					hit = true;
-				}
-				cost += ps;
+				cost += pairSoft(c, o);
 			}
-			return hit ? NaN : cost;
+			return cost;
 		}
 		function keyOf(c) { if (c.fx !== c.fx) { c.fx = softCost(c); } return c.base - c.fx; }
 		function worthNow(li) { var c = cur[li]; return c ? keyOf(c) - dynCost(c, null) : 0; }
@@ -1128,8 +1113,7 @@ EngCalcs.lpnPlacerD = (function () {
 		// DENSE_REACH rows, the block either centred on its leader's end by its first or last row
 		// or hung by its corner (the end at the corner the leader arrives at). For a pipe label,
 		// from the middle of its on-screen stretch, and also beside the pipe further along it.
-		// With 'wedge' (S1), directions are tried in the open gaps between the owner's pipes
-		// first, widest gap first. Only labels the earlier passes left hidden or short reach here.
+		// Only labels the earlier passes left hidden or short reach here.
 		function genDense(li, req, lv, list) {
 			var isPipe = req.kind === 'link' && linksById[req.owner], o, P = null, along = wantsAlong(req);
 			if (isPipe) {
@@ -1160,7 +1144,7 @@ EngCalcs.lpnPlacerD = (function () {
 				o = ownerPoint(req);
 			}
 			var own = req.kind === 'node' ? req.owner : null;
-			var dirs = lab[li].dirs || (lab[li].dirs = denseDirs(req, o));
+			var dirs = DENSE_DIRS;
 			var layouts = lv.rows.length > 1 ? ['stack', 'line'] : ['stack'];
 			if (req.layout === 'line') { layouts.reverse(); }
 			if (!on('altlayout')) { layouts.length = 1; }
@@ -1200,32 +1184,15 @@ EngCalcs.lpnPlacerD = (function () {
 				}
 			}
 		}
-		// Directions for the dense search, each with a small preference: with 'wedge', the gaps
-		// between the pipes at the owner, widest first, are tried first (S1); otherwise all alike.
-		function denseDirs(req, o) {
-			var out = [], n = Math.round(360 / DENSE_STEP), k, gaps = null;
-			if (on('wedge') && req.kind === 'node' && nodeLinks[req.owner] && nodeLinks[req.owner].length) {
-				var angs = nodeLinks[req.owner].map(function (a) { return a; }).sort(function (a, b) { return a - b; });
-				gaps = [];
-				for (k = 0; k < angs.length; k++) {
-					var a0 = angs[k], a1 = k + 1 < angs.length ? angs[k + 1] : angs[0] + 2 * Math.PI;
-					gaps.push({ a0: a0, a1: a1, w: a1 - a0 });
-				}
-				gaps.sort(function (a, b) { return b.w - a.w; });
-			}
-			for (k = 0; k < n; k++) {
-				var th = k * 2 * Math.PI / n, ux = Math.cos(th), uy = Math.sin(th), rank = 0;
-				if (gaps) {
-					rank = gaps.length;
-					for (var g = 0; g < gaps.length; g++) {
-						var t = th; while (t < gaps[g].a0) { t += 2 * Math.PI; }
-						if (t <= gaps[g].a1) { rank = g; break; }
-					}
-				}
-				out.push([Math.round(ux * 1e9) / 1e9, Math.round(uy * 1e9) / 1e9, 0.3 * Math.min(rank, 3)]);
+		// Directions for the dense search, every DENSE_STEP degrees.
+		var DENSE_DIRS = (function () {
+			var out = [], n = Math.round(360 / DENSE_STEP);
+			for (var k = 0; k < n; k++) {
+				var th = k * 2 * Math.PI / n;
+				out.push([Math.round(Math.cos(th) * 1e9) / 1e9, Math.round(Math.sin(th) * 1e9) / 1e9, 0]);
 			}
 			return out;
-		}
+		}());
 
 		function genPoint(li, req, lv, list, tier) {
 			var o = ownerPoint(req), L = o.x - o.hw - GAP, R = o.x + o.hw + GAP, T = o.y - o.hh - GAP, B = o.y + o.hh + GAP;
@@ -1501,13 +1468,12 @@ EngCalcs.lpnPlacerD = (function () {
 		}
 		// A pipe label drawn level where the setting asks for it along its pipe (R14).
 		function notAlong(li) { return !!cur[li] && wantsAlong(reqs[li]) && !cur[li].along; }
-		function tryUpgrade(li, alongOnly) { var r = upgrade(li, alongOnly); unlift(); return r; }
-		// With `alongOnly`, only the same rows along the pipe (R14) are sought.
-		function upgrade(li, alongOnly) {
+		function tryUpgrade(li) { var r = upgrade(li); unlift(); return r; }
+		function upgrade(li) {
 			var cl = levelOf(li), here = worthNow(li);
 			// One more row than it shows (or, for a pipe label drawn level, the same rows along it).
 			var NTT = NT + (denseOn ? 1 : 0);
-			for (var kt = alongOnly ? NTT * cl : Math.max(0, NTT * (cl - 1)); kt < NTT * cl + (notAlong(li) ? 1 : 0); kt++) {
+			for (var kt = Math.max(0, NTT * (cl - 1)); kt < NTT * cl + (notAlong(li) ? 1 : 0); kt++) {
 				var k = Math.floor(kt / NTT), t = kt % NTT;
 				if (tierMax(li, k, t) <= here) { continue; }
 				var list = ensure(li, k, t), tried = 0, tries = denseOn ? TRIES_DENSE : TRIES;
@@ -1520,7 +1486,7 @@ EngCalcs.lpnPlacerD = (function () {
 					var bl = [], d = dynCost(c, null);
 					if (d === d) {
 						if (keyOf(c) - d > here + 1e-6) { seat(li, c); return true; }
-						if (!(leaderBlocks && d >= C_LABEL_LEADER)) { continue; }
+						continue;
 					}
 					if (keyOf(c) <= here) { continue; }
 					tried++;
@@ -1589,9 +1555,7 @@ EngCalcs.lpnPlacerD = (function () {
 				for (i = 0; i < order.length && !overBudget(); i++) { if (levelOf(order[i]) > 0) { grow(order[i]); } }
 				// R14: a pipe label still level where the setting asks for it along its pipe takes
 				// the along place at the tight clearance, moving a neighbour if it must ('alongfix').
-				leaderBlocks = on('leadermove');
 				for (i = 0; i < order.length && !overBudget() && on('alongfix'); i++) { if (notAlong(order[i])) { tryUpgrade(order[i]); } }
-				leaderBlocks = false;
 				setTight(false);
 			}
 			denseOn = false;
