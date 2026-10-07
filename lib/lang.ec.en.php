@@ -1091,11 +1091,17 @@ $ec_lang['lpn_guide_search']='Search the guide';
 $ec_lang['lpn_guide_boxes_heading']='Boxes';
 $ec_lang['lpn_guide_boxes_intro']='Each box can be moved, resized, docked at the left or right of the map, or closed. The ? in a box\'s title bar opens its help.';
 $ec_lang['lpn_guide_box_help']='Help for this box';
+// A Boxes entry whose box shares its name with a section of the Guide ("Screenshot"), in the Guide
+// only, so its Contents list does not show one word twice. Keep {box} as it is.
+$ec_lang['lpn_guide_box_named']='{box} box';
+// Above the Toolbar rows, shown only while some are dimmed (on a phone, or Calculate while
+// Recalculate automatically is on): a grey name otherwise reads as a disabled button.
+$ec_lang['lpn_guide_dimmed']='A dimmed name is a button that is not on the toolbar at the moment.';
 // One entry in the Guide's Boxes section for each box, shown by the "?" in its title bar. Fire flow,
 // Critical assets, and Demand scaling carry theirs in lpn_ff_intro and the keys that follow it.
-$ec_lang['lpn_guide_text_popup']='Shows the properties of the selected asset or text, or of several selected assets, beside the selection on the map or where the box was last moved. An edited value changes the network at once, and the asset\'s map label and the Tables pane follow. The results of the last calculation are listed below the inputs and cannot be edited.';
+$ec_lang['lpn_guide_text_popup']='Shows the properties of the selected asset or text, or of several selected assets, beside the selection, or where the box was last moved. An edited value changes the network at once, and the asset\'s map label and the Tables pane follow. The results of the last calculation are listed below the inputs and cannot be edited.';
 $ec_lang['lpn_guide_text_find_popup']='Finds the assets whose IDs or property values match what is typed, and can replace a value in the matches. A replacement changes the project and can be reversed with Undo.';
-$ec_lang['lpn_guide_text_settings_box']='This is the only place where settings are made, and it is searchable: type one or more words in Search settings to list only the settings that mention all of them. The settings cover symbology and labels, the map and page, values and ID prefixes for new assets, custom properties, and calculation options such as units, time, hydraulics, energy, and quality. Each is saved with the project, except Show the run progress box, which is kept in this browser. The position and size of this box are kept in this browser only.';
+$ec_lang['lpn_guide_text_settings_box']='This is the only place where settings are made, and it is searchable: type one or more words in Search settings to list only the settings that mention all of them. The settings cover symbology and labels, the map and page, values and ID prefixes for new assets, custom properties, and calculation options such as units, time, hydraulics, energy, and quality. Settings are saved with the project, except Show the run progress box, which is kept in this browser. The position and size of this box are also kept in this browser only.';
 $ec_lang['lpn_guide_text_library_box']='Holds the project\'s patterns, curves, pipe types, fittings, controls, and rules. An asset refers to a pattern, curve, pipe type, or fitting by its ID, and that item is edited here. Controls and rules apply to the whole network. All are saved with the project.';
 $ec_lang['lpn_guide_text_energy_box']='Reports the energy use, peak power, and cost of each pump over the last extended period simulation, using each pump\'s efficiency and the energy price set under Settings, Energy. It needs a Total run time in Settings and a solved network. It does not change the network.';
 $ec_lang['lpn_guide_text_contour_box']='Controls the contour plot drawn on the map from the node value chosen in Color nodes by: the color scheme, the fill and its opacity, the contour line interval and labels, and how far the color reaches from each pipe. Turning it off hides the plot and leaves the node colors. It changes only the display, not the network.';
@@ -1402,7 +1408,7 @@ $ec_lang['lpn_tool_key_hint_two']='Shortcut: {key} or {key2}';
 $ec_lang['lpn_tool_add_chain_tip']='Chain junctions and pipes: specify a point on the map to add a junction, then specify each next point to add a pipe and a junction. Specify an existing node to continue from it. Press Escape to end the chain.';
 // Edited by TGH 2026-09-07; the Shift sentence rewritten 2026-09-08 on his ruling that Shift keeps
 // the selection and toggles what the shape catches (it used to say "add").
-$ec_lang['lpn_tool_area_tip']='Follow on-screen wizard. Press again to cycle through window, lasso, and polygon. Hold Shift to keep existing selection set and add or remove (toggle) what you select.';
+$ec_lang['lpn_tool_area_tip']='Follow the on-screen wizard. Press again to cycle through window, lasso, and polygon. Hold Shift to keep existing selection set and add or remove (toggle) what you select.';
 $ec_lang['lpn_area_selected']='{n} selected.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_area_none']='Nothing found in that area.';
@@ -4214,7 +4220,7 @@ $ec_lang['lpn_analyze_menu_tip']='Analyses that run the network on a copy: fire 
 $ec_lang['lpn_ff_menu']='Fire flow analysis…';
 $ec_lang['lpn_ff_menu_tip']='Selection-wide check with collateral effect check';
 $ec_lang['lpn_ff_title']='Fire flow analysis';
-$ec_lang['lpn_ff_intro']='Each junction in turn draws a fire flow on top of its existing demand. The run uses a copy of the network at the time step on screen, so nothing in your project is changed.\n\nFire flow is normally tested at maximum day demand, so set the network to that condition first.\n\nEach junction tested takes about 16 solves of the whole network, so a large system takes minutes: choose the junctions before you run, and stop at any time to keep the partial results.';
+$ec_lang['lpn_ff_intro']='Each junction in turn draws a fire flow on top of its existing demand. The run uses a copy of the network at the time step on screen, so nothing in the project is changed.\n\nFire flow is normally tested at maximum day demand, so set the network to that condition first.\n\nEach junction tested takes about 16 solves of the whole network, so a large system takes minutes: choose the junctions before you run, and stop at any time to keep the partial results.';
 $ec_lang['lpn_ff_scope']='Junctions to test';
 $ec_lang['lpn_ff_all']='All junctions';
 $ec_lang['lpn_ff_selected']='Selected junctions';
@@ -4365,7 +4371,7 @@ $ec_lang['lpn_ff_err_unknown']='No result. Error code: {code}';
 $ec_lang['lpn_crit_menu']='Criticality analysis…';
 $ec_lang['lpn_crit_menu_tip']='Remove each pipe, pump, and valve from the network in turn and report the effect on the system.';
 $ec_lang['lpn_crit_title']='Criticality analysis';
-$ec_lang['lpn_crit_intro']='Each asset is taken out of the network in turn, and the network is solved at the time step on screen in the active scenario. Nothing in your project is changed; the whole run is made on a copy.';
+$ec_lang['lpn_crit_intro']='Each asset is taken out of the network in turn, and the network is solved at the time step on screen in the active scenario. Nothing in the project is changed; the whole run is made on a copy.';
 $ec_lang['lpn_crit_scope']='Links to break';
 $ec_lang['lpn_crit_scope_tip']='All pipes, pumps, and valves, or only those selected on the map. Choose the set before you run.';
 $ec_lang['lpn_crit_scope_all']='All links';
