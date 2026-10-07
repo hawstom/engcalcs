@@ -41553,19 +41553,19 @@ var EngCalcs = EngCalcs || {};
 		var box = hotkeysBoxEl(), input = document.getElementById('lpn_guide_search'), none = document.getElementById('lpn_guide_none'),
 			q = input ? String(input.value || '').trim().toLowerCase() : '', any = false;
 		if (!box) { return; }
-		function show(el, on) { el.style.display = on ? '' : 'none'; return on; }
+		function guideShowEl(el, on) { el.style.display = on ? '' : 'none'; return on; }
 		box.querySelectorAll('.lpn-guide-section').forEach(function (sec) {
 			var hit = false;
-			sec.querySelectorAll('.lpn-guide-rule').forEach(function (r) { show(r, !q); });
+			sec.querySelectorAll('.lpn-guide-rule').forEach(function (r) { guideShowEl(r, !q); });
 			sec.querySelectorAll('#lpn_guide_toolbar > .lpn-guide-row').forEach(function (r) {
-				if (show(r, !q || guideMatch(r, q))) { hit = true; }
+				if (guideShowEl(r, !q || guideMatch(r, q))) { hit = true; }
 			});
 			sec.querySelectorAll('.lpn-guide-menu').forEach(function (m) {
 				var h = m.querySelector('h3'), all = !q || guideMatch(h, q), mhit = false;
 				m.querySelectorAll('.lpn-guide-row').forEach(function (r) {
-					if (show(r, all || guideMatch(r, q))) { mhit = true; }
+					if (guideShowEl(r, all || guideMatch(r, q))) { mhit = true; }
 				});
-				if (show(m, mhit)) { hit = true; }
+				if (guideShowEl(m, mhit)) { hit = true; }
 			});
 			// The PHP tables: a matching term shows its whole entry, otherwise only matching rows.
 			sec.querySelectorAll('dl > dt').forEach(function (dt) {
@@ -41573,12 +41573,12 @@ var EngCalcs = EngCalcs || {};
 				if (!dd || dd.tagName !== 'DD') { return; }
 				trs = dd.querySelectorAll('tr');
 				if (trs.length) {
-					trs.forEach(function (tr) { if (show(tr, all || guideMatch(tr, q))) { dhit = true; } });
+					trs.forEach(function (tr) { if (guideShowEl(tr, all || guideMatch(tr, q))) { dhit = true; } });
 				} else { dhit = all || guideMatch(dd, q); }
-				show(dt, dhit); show(dd, dhit);
+				guideShowEl(dt, dhit); guideShowEl(dd, dhit);
 				if (dhit) { hit = true; }
 			});
-			if (show(sec, hit)) { any = true; }
+			if (guideShowEl(sec, hit)) { any = true; }
 		});
 		if (none) { none.hidden = any; }
 	}
