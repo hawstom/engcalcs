@@ -1088,6 +1088,9 @@ $ec_lang['lpn_hotkeys_map_term']='Map keyboard shortcuts';
 // js/looped-network.js; Select also answers to Esc and Delete to the Delete key
 // (LPN_TOOL_ALT_KEYS); Ctrl+Z is undo(); +/- and = are keyZoom() (ROADMAP Task 682).
 $ec_lang['lpn_hotkeys_map_def']='<table class="lpn-notes-table"><tbody><tr><td>1 or Esc</td><td>Select.</td></tr><tr><td>2</td><td>Add a junction.</td></tr><tr><td>3</td><td>Add a reservoir.</td></tr><tr><td>4</td><td>Add a tank.</td></tr><tr><td>5</td><td>Add a pipe.</td></tr><tr><td>6</td><td>Add a pump.</td></tr><tr><td>7</td><td>Add a valve.</td></tr><tr><td>8</td><td>Add a customer.</td></tr><tr><td>9</td><td>Add text.</td></tr><tr><td>Delete</td><td>Delete the selection.</td></tr><tr><td>Ctrl+Z</td><td>Undo the last change.</td></tr><tr><td>+ or =</td><td>Zoom in.</td></tr><tr><td>-</td><td>Zoom out.</td></tr></tbody></table>';
+// The W row of the Map table. Its own key, spliced into the table by Looped-Network.php, because a new row in
+// lpn_hotkeys_map_def is new markup that 'lang markup matches English' refuses until all 26 languages carry it.
+$ec_lang['lpn_hotkeys_zoomwin_def']='Zoom Window: drag a rectangle to zoom to.';
 // The menu chords (Task 748): Alt+Shift+letter on Windows and Linux, Ctrl+Option on a Mac, and F10.
 // Exactly two rows (Tom, 2026-10-03: "show only the Alt+Shift and the F10"); the letters themselves
 // are assigned per language by menuMnemonics() and shown on the menus, never listed here.
@@ -1105,6 +1108,10 @@ $ec_lang['lpn_hotkeys_snip_def']='<table class="lpn-notes-table"><tbody><tr><td>
 // the solver's diagnostic box when one is on screen. The first click opens a box; Send is the second.
 // The thank-you must never imply an answer: a reply comes only to somebody who left an address.
 $ec_lang['lpn_wrong_btn']='Something wrong here?';
+// The standing message's own Hide control and the chip that brings it back. {count} is how many are hidden.
+$ec_lang['lpn_status_dismiss']='Hide this message';
+$ec_lang['lpn_status_hidden']='{count} hidden';
+$ec_lang['lpn_status_hidden_tip']='Show the hidden message again.';
 // Rewritten for the two-click box (Task 768); TGH's 2026-09-07 wording described one press.
 $ec_lang['lpn_wrong_tip']='Tell us that something on this page is wrong. This opens a small box where you can pick what is wrong, add a comment, and leave an email address if you want a reply. All of it is optional, and nothing is sent until you press Send.';
 $ec_lang['lpn_wrong_thanks']='Thank you. That reached us.';

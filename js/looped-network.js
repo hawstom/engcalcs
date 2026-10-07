@@ -18294,6 +18294,16 @@ var EngCalcs = EngCalcs || {};
 	// straight to Zoom Window with no drag or click-click ever asked for. Tom's rule is "click
 	// TWICE IN A ROW", and a click on the map in between is not that.
 	var zoomToolArmed = false;
+	// Straight into Zoom Window, from the Map menu row and the W key. The toolbar button is painted
+	// as Zoom Window for the duration, exactly as its own second press does, and setMode() puts it
+	// back when the mode ends. Pressed again while already in the mode, it leaves it.
+	function enterZoomWindow() {
+		if (mode === 'zoom-window') { setMode('select'); return; }
+		zoomToolArmed = false;
+		zoomToolShape = 'window';
+		setMode('zoom-window');
+		if (repaintZoomTool) { repaintZoomTool(); }
+	}
 	// The button itself, held the same way `openToolButton`/`saveToolButton` below are, so
 	// `wireZoomArmReset()`'s one, wired-once listener can always test against the CURRENT button
 	// even though wireToolbar() rebuilds the strip (language switch, unit switch) and would
@@ -35305,6 +35315,7 @@ var EngCalcs = EngCalcs || {};
 		renderLabelsLegend();
 		applyMaskLabels();   // the setting belongs to the project, so opening one can change it
 		updateEmptyHint();
+		clearStatusHidden();   // hidden messages belong to the network that was on screen
 		setStatus('');
 		setMode('select');
 		refreshMapStatus();   // units belong to the project now, so switching projects can change this
@@ -42650,6 +42661,11 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {};
 		return [
 			{ icon: 'zoom', label: pc.lpn_tool_zoom_extent || 'Zoom to fit', tip: pc.lpn_tool_zoom_extent_tip, fn: zoomExtent },
+			// **A DOOR TO ZOOM WINDOW THAT NEEDS NO ZOOM TO FIT FIRST** (Tom, 2026-10-07: "We need a way to
+			// zoom window without Zoom to Fit first."). The toolbar button still reaches it by a second
+			// press; this row and the W key enter it directly. Pointer-only, like every tool that
+			// needs a drag.
+			{ icon: 'zoom-window', pointerOnly: true, label: pc.lpn_tool_zoom_window || 'Zoom Window', tip: pc.lpn_tool_zoom_window_tip, hotkey: 'W', fn: enterZoomWindow },
 			// **A SNIPPING TOOL, IN THE MAP MENU BECAUSE IT IS NOT ABOUT WATER** (Tom, 2026-10-05). Beside
 			// Zoom to fit: both are about the view of the drawing, and the one frames what the other takes.
 			{ icon: 'image', pointerOnly: true, label: pc.lpn_screenshot_menu || 'Screenshot', tip: pc.lpn_screenshot_tip, fn: function () { startScreenshot(); } },
@@ -44355,6 +44371,7 @@ var EngCalcs = EngCalcs || {};
 			closePopup();
 			buildDom();
 			updateEmptyHint();
+			clearStatusHidden();
 			setStatus('');
 			setMode('select');
 			refreshScenarioStatus();
@@ -60029,6 +60046,19 @@ var EngCalcs = EngCalcs || {};
 		setMode(m);
 	});
 
+	// **W IS ZOOM WINDOW** (Tom, 2026-10-07). Free of every other plain key on this page (the digits,
+	// Esc, Delete, +, =, -, and the menu mnemonics, which answer only inside an open menu). Same
+	// guard as the digit picker: never with a modifier, never while typing.
+	document.addEventListener('keydown', function (e) {
+		if (e.ctrlKey || e.metaKey || e.altKey) { return; }
+		if (isTextEntry(e.target)) { return; }
+		if (e.key !== 'w' && e.key !== 'W') { return; }
+		// An open menu owns the letters (its rows answer to mnemonics), and it checks defaultPrevented.
+		if (openMenuAnchor) { return; }
+		if (e.preventDefault) { e.preventDefault(); }
+		enterZoomWindow();
+	});
+
 	/**
 	 * **PLAIN `+`/`-`, NEVER Ctrl/Cmd** (ROADMAP Task 682; Tom, 2026-09-17: "How would a person
 	 * zoom on a PC without a mouse wheel or, for that matter, with a keyboard"). Read the ROADMAP
@@ -61307,14 +61337,55 @@ var EngCalcs = EngCalcs || {};
 	// the text -- diagIssueText() already turned the code into the sentence. A caller with no code
 	// gets 'status', which is honest: something was said, and it was not one of the diagnoses.
 	var statusWrongCode = '';
-	function setStatus(text, code) {
+	// **HIDING A STANDING MESSAGE** (Tom, 2026-10-07: "I wish there were a way to dismiss error
+	// messages that I no longer want to see like 'no path to a reservoir'. After about a minute or
+	// two it's just an annoyance."). Ida's design: a small x beside the text (never in the grievance
+	// button's element), hiding exactly that TEXT -- the same words stay hidden, different words (another
+	// node list) show again -- and a quiet "1 hidden" chip that restores it. IN MEMORY ONLY: the
+	// set lives as long as the page and is emptied when a different network opens, so nothing is
+	// stored on the device.
+	//
+	// **ONLY A DIAGNOSTIC THE USER CAN WORK PAST IS HIDEABLE**, and the line is drawn by CODE here
+	// because nothing upstream draws it (every lpnDiagnose() issue withholds the solve). Hideable:
+	// unreachable (the message in Tom's own words), dangling-link and valve-on-fixed-head -- each names
+	// particular assets and is about the drawing, not about whether the model can run at all. NOT
+	// hideable: no-fixed-head ("Add a reservoir"), valve-needs-epanet, pda-pressures and
+	// pda-needs-epanet (the model or its engine cannot run), and every message with no code of its own:
+	// unit-unknown, not-converged, storage-full, engine loading and failure, run summaries.
+	var LPN_STATUS_HIDEABLE = { 'unreachable': true, 'dangling-link': true, 'valve-on-fixed-head': true };
+	function issuesHideable(issues) {
+		return !!issues && issues.length > 0 && issues.every(function (i) { return LPN_STATUS_HIDEABLE[i.code] === true; });
+	}
+	var statusHidden = {};      // message text -> true, for the texts the user has hidden
+	var statusLast = { text: '', code: '', hideable: false };
+	function clearStatusHidden() { statusHidden = {}; }
+	// Paints what setStatus() last stated, honouring the hidden set. Called by setStatus(), and by
+	// the x and the chip, which must not re-log a message that has not changed.
+	function paintStatus() {
 		var el = document.getElementById('lpn_status');
 		var textEl = document.getElementById('lpn_status_text');
+		var xEl = document.getElementById('lpn_status_dismiss');
+		var chipEl = document.getElementById('lpn_status_chip');
 		if (!el) { return; }
+		var hide = !!(statusLast.text && statusLast.hideable && statusHidden[statusLast.text]);
 		// WRITTEN INTO THE INNER SPAN, not into the <p>: the <p> also holds the grievance button,
 		// and textContent on the parent would delete it on the first solve. Falls back to the <p>
 		// where the span is absent, so a harness or a page that has not been updated still works.
-		(textEl || el).textContent = text || '';
+		(textEl || el).textContent = hide ? '' : (statusLast.text || '');
+		if (xEl) { xEl.style.display = (statusLast.text && statusLast.hideable && !hide) ? '' : 'none'; }
+		if (chipEl) {
+			chipEl.style.display = hide ? '' : 'none';
+			if (hide) {
+				chipEl.textContent = ((EngCalcs.pageConfig || {}).lpn_status_hidden || '{count} hidden').replace('{count}', '1');
+			}
+		}
+		syncStatusBoxVisibility();
+	}
+	function setStatus(text, code, hideable) {
+		var el = document.getElementById('lpn_status');
+		if (!el) { return; }
+		statusLast = { text: text || '', code: code || '', hideable: !!(text && hideable) };
+		paintStatus();
 		// **THE DIAGNOSTIC IS A MESSAGE TOO** (Task 704, Tom 2026-09-22: "**All** messages now
 		// need to go through this messenger system"). This is the SAME door js/lpn-time.js's
 		// progress box writes through (`host.status`) -- "Working out the extended period
@@ -61329,9 +61400,6 @@ var EngCalcs = EngCalcs || {};
 		// sentence, and refusing to hear about that one would be the instrument measuring itself.
 		if (next !== statusWrongCode) { resetWrongButton('lpn_wrong_status_btn'); }
 		statusWrongCode = next;
-		// Hidden when empty, or an empty amber box sits on the drawing saying nothing. It is an
-		// overlay now, so this changes what is COVERED, never what is laid out.
-		syncStatusBoxVisibility();
 	}
 
 	/**
@@ -61439,7 +61507,9 @@ var EngCalcs = EngCalcs || {};
 		if (!el) { return; }
 		var textEl = document.getElementById('lpn_status_text');
 		var notesEl = document.getElementById('lpn_status_notes');
-		var any = !!((textEl || el).textContent || '') || !!(notesEl && notesEl.textContent);
+		var chipEl = document.getElementById('lpn_status_chip');
+		var any = !!((textEl || el).textContent || '') || !!(notesEl && notesEl.textContent) ||
+			!!(chipEl && chipEl.style.display !== 'none');
 		el.style.display = any ? 'block' : 'none';
 		// It appears and disappears under a top corner, so the legends re-dodge around it. This is
 		// NOT applyMapHeight() -- see the note above; the map's own height still ignores the model.
@@ -61666,6 +61736,27 @@ var EngCalcs = EngCalcs || {};
 		// empty one would be indistinguishable in the log from a row whose detail was dropped.
 		wireWrongButton('lpn_wrong_btn', 'none');
 		wireWrongButton('lpn_wrong_status_btn', function () { return statusWrongCode || 'status'; });
+		wireStatusHide();
+	}
+	// The x and the chip. Focus follows the control that replaces the one pressed, so a keyboard
+	// user is never dropped onto the page.
+	function wireStatusHide() {
+		var xEl = document.getElementById('lpn_status_dismiss'), chipEl = document.getElementById('lpn_status_chip');
+		if (xEl) {
+			xEl.addEventListener('click', function () {
+				if (!statusLast.text || !statusLast.hideable) { return; }
+				statusHidden[statusLast.text] = true;
+				paintStatus();
+				if (chipEl && chipEl.focus) { chipEl.focus(); }
+			});
+		}
+		if (chipEl) {
+			chipEl.addEventListener('click', function () {
+				delete statusHidden[statusLast.text];
+				paintStatus();
+				if (xEl && xEl.focus) { xEl.focus(); }
+			});
+		}
 	}
 	// Rounds to the same number of decimals the label actually displays, in the DISPLAY unit --
 	// extrema and decoration MUST compare on this, not the raw SI value. Two series links carrying
@@ -62606,7 +62697,7 @@ var EngCalcs = EngCalcs || {};
 		if (issues.length > 0) {
 			lastSolveResult = null;
 			issues.forEach(function (issue) { logLpnDiag(issue.code); });
-			setStatus(issues.map(diagIssueText).join(' '), issues[0].code);
+			setStatus(issues.map(diagIssueText).join(' '), issues[0].code, issuesHideable(issues));
 			refreshLabelText();
 			return;
 		}
@@ -66756,7 +66847,7 @@ var EngCalcs = EngCalcs || {};
 			// diameter that is not there.
 			if (result.issues && result.issues.length > 0) {
 				result.issues.forEach(function (issue) { logLpnDiag(issue.code); });
-				setStatus(result.issues.map(diagIssueText).join(' '), result.issues[0].code);
+				setStatus(result.issues.map(diagIssueText).join(' '), result.issues[0].code, issuesHideable(result.issues));
 				refreshLabelText();
 				refreshValueColors();   // Task 384: the colours came from results that no longer exist
 				refreshPaneIfOpen();    // Task 409: and so did the grade line and the result columns

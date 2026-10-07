@@ -4030,6 +4030,21 @@ label > .lpn-valwarn { margin-inline-start: .3em; }
 	color: var(--ec-ink-muted);
 	cursor: pointer;
 }
+.lpn-status-x, .lpn-status-chip {
+	pointer-events: auto;
+	background: none;
+	border: 1px solid transparent;
+	border-radius: 3px;
+	padding: 0 4px;
+	margin-left: 2px;
+	font: inherit;
+	font-size: 11px;
+	color: var(--ec-ink-muted);
+	cursor: pointer;
+}
+.lpn-status-x { font-size: 13px; line-height: 1; }
+.lpn-status-chip { border-color: var(--ec-gray-bbb); }
+.lpn-status-x:hover, .lpn-status-x:focus, .lpn-status-chip:hover, .lpn-status-chip:focus { border-color: var(--ec-gray-bbb); color: var(--ec-ink-strong); }
 .lpn-wrong-btn:hover, .lpn-wrong-btn:focus { border-color: var(--ec-gray-bbb); color: var(--ec-ink-strong); }
 /* Once tapped it is no longer a control, and it must not keep looking like one: the label is the
    thank-you, so a hover border on it would invite a second press that posts nothing. */
