@@ -632,8 +632,11 @@ EngCalcs.lpnPlacerC = (function () {
 						if (L.cur || (st.pan && L.prevHidden && !L.nearEdge) || st.late || over(st)) { return; }
 						var c = withFine(L, function () { return bestFor(st, L, L.rowsets.length - 1, SHOW_MAX, 0); }, 'finest');
 						if (c) { commit(st, L, c); }
-					});
-				}
+						});
+						st.fineGrow = 'finest';
+						grow(st, order);
+						st.fineGrow = false;
+						}
 			// 4c. ALIGN (R14): alignment is required wherever the same rows fit aligned. Once
 			// everything has settled, a pipe label still level where the user asked for it along
 			// its pipe takes any aligned spot now free for the same rows.
@@ -1322,7 +1325,7 @@ EngCalcs.lpnPlacerC = (function () {
 					// kept label may grow as freely as a new one.
 					cur -= pen(L, c0.spec) + (c0.spec ? 0 : Math.min(0, c0.base));
 					var c = st.fineGrow ? null : bestFor(st, L, c0.rs - 1, Math.min(cur + ROW_GAIN, Math.max(cur, SHOW_MAX)), ING.deepgrow ? st.effort.grow * 3 : st.effort.grow);
-					if (!c && st.fineGrow) { c = withFine(L, function () { return bestFor(st, L, c0.rs - 1, Math.min(cur + ROW_GAIN, Math.max(cur, SHOW_MAX)), 0); }); }
+					if (!c && st.fineGrow) { c = withFine(L, function () { return bestFor(st, L, c0.rs - 1, Math.min(cur + ROW_GAIN, Math.max(cur, SHOW_MAX)), 0); }, st.fineGrow === 'finest' ? 'finest' : 'fine'); }
 					if (c) { commit(st, L, c); changed = true; } else { commit(st, L, c0); L.stuck = true; }
 				}
 				if (!changed) { break; }
