@@ -636,6 +636,14 @@ EngCalcs.lpnPlacerC = (function () {
 						var c = withFine(L, function () { return bestFor(st, L, L.rowsets.length - 1, SHOW_MAX, 0); }, 'finest');
 						if (c) { commit(st, L, c); }
 						});
+						if (ING.evict) {
+							order.forEach(function (L) {
+								if (L.cur || (st.pan && L.prevHidden && !L.nearEdge) || over(st)) { return; }
+								st.fineMend = true;
+								withFine(L, function () { mend(st, [L], []); }, 'finest');
+								st.fineMend = false;
+							});
+						}
 						st.fineGrow = 'finest';
 						grow(st, order);
 						st.fineGrow = false;
