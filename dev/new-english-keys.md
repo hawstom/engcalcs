@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**27 still to read on master**, of 137 untranslated keys, of 2363 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**44 still to read on master**, of 150 untranslated keys, of 2373 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -73,7 +73,7 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   _Ruled 2026-10-05: Is this _syn needed?_
 
-## lpn_  (137, 27 to read @@ NEEDS RULING)
+## lpn_  (150, 44 to read @@ NEEDS RULING)
 
 - **`lpn_alt_calc_options`**
   > Calculation options
@@ -96,6 +96,54 @@ never edits a synonym.
 - **`lpn_basemap_style_normal`**
   > Normal
   _Ruled OK 2026-10-05._
+- **`lpn_change_type_becomes`**
+  > {id}: {property} {value}, in scenario {scenario}, becomes {new}
+  @@ NEEDS RULING
+- **`lpn_change_type_born`**
+  > These are new, as on a newly drawn one:
+  @@ NEEDS RULING
+- **`lpn_change_type_customers`**
+  > Only a pipe serves customers, so these customers are connected instead to the node shown in parentheses, where their demand already lands. They stay where they are drawn, and their demand is unchanged:
+  @@ NEEDS RULING
+- **`lpn_change_type_key`**
+  > ID: Lost entry
+  @@ NEEDS RULING
+- **`lpn_change_type_line`**
+  > {id}: {property} {value}
+  @@ NEEDS RULING
+- **`lpn_change_type_line_scenario`**
+  > {id}: {property} {value}, in scenario {scenario}
+  @@ NEEDS RULING
+- **`lpn_change_type_lost`**
+  > These values will be lost:
+  @@ NEEDS RULING
+- **`lpn_change_type_meaning`**
+  > These controls and rules test a node being changed, and will read it differently: a junction is tested by its pressure, and a tank or reservoir by its water level.
+  @@ NEEDS RULING
+- **`lpn_change_type_menu`**
+  > Change type
+  @@ NEEDS RULING
+- **`lpn_change_type_more`**
+  > And {n} more.
+  @@ NEEDS RULING
+- **`lpn_change_type_no_curve`**
+  > {id}: No pump head curve, so the pump adds no head until one is selected, and an .inp export writes it as a pipe
+  @@ NEEDS RULING
+- **`lpn_change_type_ok`**
+  > Change
+  @@ NEEDS RULING
+- **`lpn_change_type_rules`**
+  > These rule lines name a link by its kind, and will name its new kind instead:
+  @@ NEEDS RULING
+- **`lpn_change_type_setting`**
+  > These controls and rules give or test the setting of a link being changed. A setting is a different quantity on a pipe, a pump, and a valve, so these will read it differently:
+  @@ NEEDS RULING
+- **`lpn_change_type_surface`**
+  > These keep the water surface where it was. A reservoir's head is the tank's elevation plus its water depth, and a tank's water depth is the reservoir's head minus its elevation:
+  @@ NEEDS RULING
+- **`lpn_change_type_tip`**
+  > Change the selected nodes into junctions, reservoirs, or tanks, or the selected links into pipes, pumps, or valves. Each keeps its ID, its place, its connections, and every value the new type also has. If anything would be lost, you are asked first.
+  @@ NEEDS RULING
 - **`lpn_choice_default`**
   > Default
   _Ruled OK 2026-10-05._
@@ -153,9 +201,6 @@ never edits a synonym.
 - **`lpn_ds_col_unscaled_tip`**
   > With the demands as they are in the active scenario at this time step, the same value the map shows.
   _Ruled OK 2026-10-03._
-- **`lpn_ds_eps_note`**
-  > Only the time step now on screen is scaled; levels and statuses are taken from this step. To test the peak, move the clock to the peak demand before you run.
-  _Ruled OK 2026-10-05._
 - **`lpn_ds_found`**
   > ✓ Every junction checked keeps at least {pressure} up to a demand scale of {m}.
   _Ruled 2026-10-05: Proposal approved._
@@ -181,8 +226,8 @@ never edits a synonym.
   > ✓ Every junction keeps {pressure} up to a demand scale of {max}, the top of the search.
   _Ruled OK 2026-10-03._
 - **`lpn_ds_intro`**
-  > The demands are multiplied on a copy of the network, which is solved at the time step on screen in the active scenario. Nothing in your project is changed.
-  _Ruled OK 2026-10-03._
+  > Select the Run button to multiply the demands at the chosen junctions by the demand scale and see the pressures and velocities.\n\nSelect the Find button to find the largest demand scale, to the nearest {step}, at which all these junctions keep at least the lowest pressure allowed; it searches from 0 to {max}.\n\nBoth work on a copy of the network, solved at the time step on screen in the active scenario, so nothing in your project is changed. Only that time step is scaled, and levels and statuses are taken from it; to test the peak, move the clock to the peak demand before you run.
+  @@ NEEDS RULING
 - **`lpn_ds_lowest_at`**
   > At a demand scale of {m}, the lowest pressure is {pressure}, at junction {id}.
   _Ruled OK 2026-10-03._
@@ -237,12 +282,6 @@ never edits a synonym.
 - **`lpn_ds_scope_selected`**
   > Selected junctions
   _Ruled OK 2026-10-03._
-- **`lpn_ds_scope_tip`**
-  > All junctions, or only those selected on the map. Pressures are checked at the scaled demand.
-  _Ruled OK 2026-10-03._
-- **`lpn_ds_search_note`**
-  > Finds the largest demand scale, to the nearest {step}, at which all these junctions keep at least the lowest pressure allowed. It searches from 0 to {max}.
-  _Ruled 2026-10-05: Edited proposal._
 - **`lpn_ds_search_stopped`**
   > The search was stopped before it found an answer.
   _Ruled 2026-10-03: OK. Are we sure this isn't already provided by a different key?_
@@ -491,7 +530,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**149 still to read**, of 152 new keys across 19 unmerged branch(es).
+**132 still to read**, of 135 new keys across 17 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -501,57 +540,6 @@ Each branch carries the commit it was read at. This part is a SNAPSHOT and is no
 fresh by the build — a branch moves whenever anybody commits on it, and failing master's
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
-
-### feat/asset-type (`fdaa932d`) — 16 new, 16 to read @@ NEEDS RULING
-
-- **`lpn_change_type_becomes`**
-  > {id}: {property} {value}, in scenario {scenario}, becomes {new}
-  @@ NEEDS RULING
-- **`lpn_change_type_born`**
-  > These are new, as on a newly drawn one:
-  @@ NEEDS RULING
-- **`lpn_change_type_customers`**
-  > Only a pipe serves customers, so these customers are connected instead to the node shown in parentheses, where their demand already lands. They stay where they are drawn, and their demand is unchanged:
-  @@ NEEDS RULING
-- **`lpn_change_type_key`**
-  > ID: Lost entry
-  @@ NEEDS RULING
-- **`lpn_change_type_line`**
-  > {id}: {property} {value}
-  @@ NEEDS RULING
-- **`lpn_change_type_line_scenario`**
-  > {id}: {property} {value}, in scenario {scenario}
-  @@ NEEDS RULING
-- **`lpn_change_type_lost`**
-  > These values will be lost:
-  @@ NEEDS RULING
-- **`lpn_change_type_meaning`**
-  > These controls and rules test a node being changed, and will read it differently: a junction is tested by its pressure, and a tank or reservoir by its water level.
-  @@ NEEDS RULING
-- **`lpn_change_type_menu`**
-  > Change type
-  @@ NEEDS RULING
-- **`lpn_change_type_more`**
-  > And {n} more.
-  @@ NEEDS RULING
-- **`lpn_change_type_no_curve`**
-  > {id}: No pump head curve, so the pump adds no head until one is selected, and an .inp export writes it as a pipe
-  @@ NEEDS RULING
-- **`lpn_change_type_ok`**
-  > Change
-  @@ NEEDS RULING
-- **`lpn_change_type_rules`**
-  > These rule lines name a link by its kind, and will name its new kind instead:
-  @@ NEEDS RULING
-- **`lpn_change_type_setting`**
-  > These controls and rules give or test the setting of a link being changed. A setting is a different quantity on a pipe, a pump, and a valve, so these will read it differently:
-  @@ NEEDS RULING
-- **`lpn_change_type_surface`**
-  > These keep the water surface where it was. A reservoir's head is the tank's elevation plus its water depth, and a tank's water depth is the reservoir's head minus its elevation:
-  @@ NEEDS RULING
-- **`lpn_change_type_tip`**
-  > Change the selected nodes into junctions, reservoirs, or tanks, or the selected links into pipes, pumps, or valves. Each keeps its ID, its place, its connections, and every value the new type also has. If anything would be lost, you are asked first.
-  @@ NEEDS RULING
 
 ### feat/backdrop-attach (`929d7ec9`) — 7 new, 7 to read @@ NEEDS RULING
 
@@ -577,7 +565,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Exported {zip}, holding the EPANET file {file}, its background picture {picture}, and the world file {world}. Extract all three into one folder, then open the .inp there in EPANET; the picture comes with it.
   @@ NEEDS RULING
 
-### feat/bentley-interop (`43658d9f`) — 52 new, 52 to read @@ NEEDS RULING
+### feat/bentley-interop (`1c62a12d`) — 51 new, 51 to read @@ NEEDS RULING
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -657,9 +645,6 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_settings_row_max_check`**
   > Maximum status checks
   @@ NEEDS RULING
-- **`lpn_settings_row_minor_label_order`**
-  > Label order (rank and drop)
-  @@ NEEDS RULING
 - **`lpn_settings_row_new_asset`**
   > New assets: {setting}
   @@ NEEDS RULING
@@ -738,7 +723,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/desktop (`baba0f04`) — adds no English strings
 
-### feat/dxf (`93469e95`) — 12 new, 12 to read @@ NEEDS RULING
+### feat/dxf (`d535f33d`) — 12 new, 12 to read @@ NEEDS RULING
 
 - **`lpn_dxf_export_failed`**
   > The DXF file was not written: an error in this page stopped it ({error}).
@@ -753,7 +738,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Exported {file}. Its coordinates are {crs}, in meters, not latitude and longitude.
   @@ NEEDS RULING
 - **`lpn_dxf_note_blocks`**
-  > Block attributes are 1 unit high in each block definition. Every block is inserted at scale {s}, so its attributes are {s} {unit} high; change the insertion scale to change that.
+  > Block attributes are 1 unit high in each block definition. Every block is inserted at scale {scale}, so its attributes are {h} high; change the insertion scale to change that.
   @@ NEEDS RULING
 - **`lpn_dxf_note_crs`**
   > Coordinates: {crs}, exactly as this project states them.
@@ -819,7 +804,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > What this sends: the name of this page, your language, the version of the site, the code of the message on the map if there is one, and what you picked or typed. Never your drawing or your network. Your email address is used only to reply to you.
   @@ NEEDS RULING
 
-### feat/geojson (`1352ed11`) — 11 new, 11 to read @@ NEEDS RULING
+### feat/geojson (`0495c559`) — 11 new, 11 to read @@ NEEDS RULING
 
 - **`lpn_file_export_geojson`**
   > Export GeoJSON file…
@@ -877,7 +862,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`129b63c4`) — adds no English strings
 
-### feat/screenshot (`26d7b515`) — 14 new, 14 to read @@ NEEDS RULING
+### feat/screenshot (`1e28e16e`) — 14 new, 14 to read @@ NEEDS RULING
 
 - **`lpn_screenshot_copied`**
   > Screenshot copied.
@@ -1002,6 +987,4 @@ build for that would be a gate nobody keeps. Refresh it with
   > Export table as ODS
   @@ NEEDS RULING
 
-### feat/tip-door (`0711a336`) — adds no English strings
-
-### feat/user-guide (`a06b9bec`) — adds no English strings
+### feat/user-guide (`19887ab3`) — adds no English strings

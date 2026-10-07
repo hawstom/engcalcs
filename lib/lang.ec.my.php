@@ -3741,7 +3741,6 @@ $ec_lang['lpn_ff_menu_tip']='ဆက်စပ်နေရာများကို
 $ec_lang['lpn_ff_title']='မီးငြိမ်းသတ်ရေးစီးနှုန်း ခွဲခြမ်းစိတ်ဖြာမှု';
 $ec_lang['lpn_ff_intro']='ဆက်စပ်နေရာတစ်ခုစီအား ၎င်းတွင် ရှိပြီးသား လိုအင်အပေါ် ထပ်ပေါင်း၍ မီးငြိမ်းသတ်ရေးစီးနှုန်းတစ်ခု ဆွဲယူရန် အလှည့်ကျ တောင်းဆိုသည်။ သင့်ပရောဂျက်ထဲရှိ မည်သည့်အရာမျှ မပြောင်းလဲပါ။ run တစ်ခုလုံးကို မိတ္တူတစ်စောင်ပေါ်တွင် ပြုလုပ်သည်။';
 $ec_lang['lpn_ff_scope']='စစ်ဆေးမည့် ဆက်စပ်နေရာများ';
-$ec_lang['lpn_ff_scope_tip']='run မလုပ်မီ အစုအဝေးကို ရွေးပါ။ ကြီးမားသော စနစ်တစ်ခုရှိ ဆက်စပ်နေရာအားလုံးကို စစ်ဆေးခြင်းသည် မိနစ်များ ကြာနိုင်သည်။';
 $ec_lang['lpn_ff_all']='အားလုံး';
 $ec_lang['lpn_ff_selected']='ရွေးထားသည်များ';
 $ec_lang['lpn_ff_no_junctions']='ဤပရောဂျက်တွင် ဆက်စပ်နေရာ မရှိသေးသောကြောင့်၊ စစ်ဆေးစရာ မရှိပါ။';
@@ -3774,7 +3773,6 @@ $ec_lang['lpn_ff_engine_native']='တွင်ပါ ဖြေရှင်းစ
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_ff_engine_epanet']='EPANET အင်ဂျင်ကို အသုံးပြုထားသည်။';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_ff_engine_cost']='ရရှိနိုင်သော မီးငြိမ်းသတ်ရေးစီးနှုန်းသည် ရှာဖွေမှုတစ်ခုဖြစ်သောကြောင့်၊ စစ်ဆေးသော ဆက်စပ်နေရာတစ်ခုစီအတွက် ကွန်ရက်တစ်ခုလုံးကို ခန့်မှန်း ၁၆ ကြိမ် ဖြေရှင်းသည်။ ကြီးမားသော စနစ်တစ်ခုသည် မိနစ်များ ကြာနိုင်သည်။ မည်သည့်အချိန်တွင်မဆို ရပ်တန့်နိုင်ပြီး၊ ရှိပြီးသား တွက်ချက်ထားသည့်အရာကို ဆက်ထားနိုင်သည်။';
 // The one-condition sentence. Shown only where this project has a run clock, because that is the
 // only place a reader could reasonably expect a fire flow to follow it.
 //
@@ -3782,7 +3780,6 @@ $ec_lang['lpn_ff_engine_cost']='ရရှိနိုင်သော မီး�
 // first sentence over again in other words -- Tom: "I don't know what this means. Are we just
 // repeating what we said above?" It was. What the practice half carries that the first sentence
 // does not is the DEMAND the fire flow is added to, and that survives.
-$ec_lang['lpn_ff_steady']='စခရင်ပေါ်တွင် ယခုပြသနေသော အချိန်အဆင့်ကိုသာ စစ်ဆေးသည်။ မီးငြိမ်းသတ်ရေးစီးနှုန်းကို ပုံမှန်အားဖြင့် အများဆုံးနေ့စဉ် လိုအင်အပေါ် ထပ်ပေါင်း၍ စစ်ဆေးသောကြောင့်၊ run မလုပ်မီ ကွန်ရက်ကို ထိုအခြေအနေသို့ သတ်မှတ်ပါ။';
 // THE RUN HAS A DIALOG OF ITS OWN (Tom, 2026-08-30: "The run progress bar is so important that all
 // applications put it in a new dialog with nothing but the progress, a stop button, and maybe some
 // other progress stats."). It says how far along it is and never how long is left: per-solve cost

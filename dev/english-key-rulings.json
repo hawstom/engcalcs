@@ -1481,11 +1481,6 @@
             "ruled": "2026-10-03",
             "answer": "OK."
         },
-        "lpn_ds_scope_tip": {
-            "on": "All junctions, or only those selected on the map. Pressures are checked at the scaled demand.",
-            "ruled": "2026-10-03",
-            "answer": "OK."
-        },
         "lpn_ds_search_note": {
             "on": "Finds the largest demand scale, to the nearest {step}, at which all these junctions keep at least the lowest pressure allowed. It searches from 0 to {max}.",
             "ruled": "2026-10-05",
