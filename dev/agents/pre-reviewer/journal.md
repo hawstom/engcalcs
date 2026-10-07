@@ -3890,3 +3890,158 @@ OBSERVED (real Chrome on a scratch copy with a test hook, this tree; re-verify b
 - MISSED (low): Recalculate off, pump -> pipe shows velocity 0.00 and head loss 204 ft / gradient 2043% invented from stale numbers.
 - Pipe with scenario type override -> valve: that scenario's diameter silently reverts to Base's.
 Method note: scratch copy served by php -S, injected EngCalcs.__t; playwright from ~/.npm/_npx; lock via flock.
+
+## 2026-10-06 -- feat/dxf (05d5a7ad) and feat/section-grid (89905957)
+
+Neither branch is my work. My test scripts and exported files are in the scratchpad (dxf/, sg-probe*.js, mut/).
+
+### feat/dxf
+- OBSERVED: both harnesses pass (the stub harness and the browser one, 46/46), and ezdxf reports 0 errors and 0 fixes. I re-exported Net1, Net3 lat/lon, Net1 with a customer, three scenarios, and Net1 in ru/zh/fr/ar/de/tr/my in real Chromium. All 12 files pass recover+audit, and every one contains only LWPOLYLINE/INSERT/ATTRIB/SEQEND entities, a read-me layer with 62=7 and 290=0, and STYLE group 3 = txt.
+- OBSERVED: I mutated the stub harness on a scratch copy (read-me colour, plot flag, the visible tag, the attribute height). Each mutation turns it red.
+- OBSERVED DEFECT: in ar, fa, he, km, sw, am, `lpn_field_id` is translated, so no tag equals 'ID' and every attribute in the file is invisible. The Arabic export has 0 visible model attributes.
+- OBSERVED DEFECT: a scenario named in Cyrillic ("Пожар") is written on the -BASE layers. "Débit max" becomes D_BIT_MAX.
+- OBSERVED DEFECT: values the user typed lose their exact characters. In Net3, 220.0 becomes 220, .1 becomes 0.1, 129.0 becomes 129, and 4530. becomes 4530. The export reads the numbers and skips EngCalcs.lpnNumText.
+- CITED (code read only, not run): a junction's BASE_DEMAND comes from baseDemandTotal(), so a junction with several demand categories is written as their sum.
+- OBSERVED: on Net3 lat/lon, the read-me and the blocks are 1 m high in a drawing 8.5 km wide.
+- CITED: Autodesk DXF Reference. STYLE group 3 is the primary font file name; LAYER 62 is the colour number and 290 is the plotting flag.
+- UNVERIFIABLE: whether AutoCAD still shows Arial when an attribute is edited.
+
+### feat/section-grid
+- OBSERVED: both harnesses pass (53/53 and 56 checks). The paste code is identical to what master already carries (e625b6a8). The branch conflicts with master in dev/browser-pass/points-data-roundtrip.js only.
+- OBSERVED DEFECT: on mi, pasting more points than the table holds gives the new rows n = 1. Bank flags stay with their row number, not their point. Adding two dry points past the right bank changed the left overbank flow from 3.92 to 0.00 and the main channel from 28.96 to 36.74.
+- OBSERVED DEFECT: "1,000.00" from a spreadsheet becomes station 1 and elevation 000.00. A decimal comma "10,5" becomes 10. No warning is shown in either case.
+- OBSERVED: the new heading key exists in English only, so the es/fr/ar pages now show English "Points data".
+- SPECULATION: before this change, mi's Copy carried n, the bank flags, the water surface and the slope. Removing that takes away the only way to move a whole section, because row inputs are not in the share URL.
+
+## feat/user-guide at 9f844e56 (OBSERVED, 2026-10-06; re-verify before citing)
+
+OBSERVED (real headless Chromium, desktop 1400x900, phone 390x844 touch, ar RTL, es; scripts in scratchpad/perry-guide/):
+- Both branch harnesses pass (rail 40-odd checks, user-guide all). Mutation "F1/? go to Boxes not the entry" fails 6 rail checks, so not decoration. Mutation "rail choice not saved" is NOT caught (closing the box saves it anyway).
+- MISSED (high): 14 of 17 boxes get the Guide "?", and every one of those 14 entries is a heading with no text. Only the 3 tipped boxes (no Guide "?") have words. The Guide box's own "?" opens its own empty entry.
+- DEFECT: Fire flow and Demand scaling entries show literal "\n\n" (en 8 and 4, ar/es 4 and 4). Seen on phone screenshot.
+- DEFECT: deep link on fresh load to #guide/box-<id> opens the guide at the top (Toolbar); #guide/tables on load works.
+- DEFECT: "?" on Settings then Esc closes Settings, leaves the Guide (on top). F1 from a Settings field then Esc closes neither. Focus never moves into the Guide on ?/F1; on Esc it falls to body.
+- DEFECT low: ar search "المحددة" (no shadda) misses the row with "المحدَّدة". Snippets join table cells with no space ("PageUpSwitch").
+- Guide does not document Ctrl+K, F1, "/" ("Ctrl+K" search: nothing matched).
+- CONFIRMED: rail 240 px / 34 collapsed / persists; RTL rail at right, chevron mirrored; phone closed "Contents" disclosure; no sideways scroll at 390 en and ar; Ctrl+K mid table-cell edit commits the typed 777 exactly as clicking away (undo 1); F1 outside a box is not intercepted.
+- Two "?" kinds: blue thin tip ? (Fire flow) vs black bold Guide ? (Settings). Different colour/weight, same glyph, different behaviour.
+- RTL: box corner (dock buttons, ?, X) not mirrored, pre-existing; new ? sits beside X at the right.
+NOT CHECKED: whether a real Chrome/Edge/Firefox on Windows lets the page take F1; check_all; looks beyond two screenshots.
+
+## feat/user-guide re-check at 0053b8df (OBSERVED, 2026-10-06; re-verify before citing)
+OBSERVED real Chromium (Net3 desktop, 390 phone en/ar, ar, es): six harnesses pass (rail, user-guide, dock, tip-door, analyze-tip-fold, panel-touch).
+- FIXED: all 17 entries have text; no literal \n; Fire flow 6 paragraphs, Demand scaling text reachable through the one Guide "?" (corner now dock,dock,GUIDE?; field tips stay); first-load #guide/box-lpn_settings_box lands on Settings; ar unpointed search finds pointed; snippets spaced; Ctrl+K/F1/"/" documented in "Using the guide"; phone width 390.
+- NEW DEFECT (medium): open Settings, CLICK its "?" with the mouse, press Esc without moving the mouse: Guide AND Settings both close. Guide's Esc handler returns focus to the "?" and doesn't stop the event; the page Escape handler then sees focus+pointer in Settings. Harness misses it because it focuses the "?" by script with the pointer elsewhere. F1-from-field then Esc: correct (Guide only, focus back to field).
+- Text review: inaccurate Status (says every time step; only changes), Alternatives (4 categories, of 9; "read-only" false), Energy ("entered in the box": box has no inputs), Library (controls/rules not referenced; Fittings missing), Properties (node or link only; results only "with Calculate"). Minor: Settings (one browser row), Contour (results only), Guide entry fragment.
+
+# Perry journal, feat/screenshot @ 8a48a1d7, 2026-10-06
+OBSERVED: both bundled harnesses pass (43/43, 48/48) yet the Rectangle/Freehand menu is clipped by the box (overflow hidden): harness checks display, not reachability.
+OBSERVED: raised boxes (z 1201-1204) sit above the markup view (z 1200); Properties/Snip box cover the picture and swallow strokes.
+OBSERVED: branch merge dd721cb3 emptied dev/agents/pre-reviewer/journal.md (3892 lines -> 0).
+OBSERVED: eraser (key, button, mouse, CDP touch drag) removes one whole stroke; crossing click removes topmost only; undo/redo across pen/eraser exact.
+OBSERVED: S/E/typing guard holds in Find, Settings, Tables, Notes, Properties inputs.
+OBSERVED: unrendered keys: lpn_snip_button, lpn_snip_pen, lpn_snip_rectangle, lpn_snip_freehand, lpn_screenshot_scale (lpn_tool_undo IS used by the toolbar).
+Probes: scratchpad probe*.js.
+
+# Perry journal, feat/table-export @15e91ca0, 2026-10-06
+OBSERVED: openpyxl 3.1.5 and odfpy load every XLSX/ODS exported from Net1 and Net3 (All x All, 2 scenarios): freeze B2, wrap, widths, numbers numeric with 0.00 formats, XML well-formed, sheet names <=31 and unique.
+OBSERVED: CSV zip entry names carry scenario name raw: "Junctions-SSSSS/Peak: demand [x]? ...csv" -> unzip makes a folder; ':' '?' invalid on Windows.
+OBSERVED: All scenarios: only the solved scenario has result columns; others blank (Head, Pressure, Demand).
+OBSERVED: sheet names truncated at 31 drop the scenario part; trailing space left on a name.
+OBSERVED: ID and Is active? stored as text in XLSX (green triangle in Excel; cannot confirm here).
+UNVERIFIABLE: real Excel/LibreOffice open, ODS frozen pane, header row height.
+Builder harnesses pass bare (table-export-harness all ok; dialog browser 39/39).
+
+# Perry journal: feat/visit-dedupe pre-review, 2026-10-06 (head 82261d32)
+
+Not my work; reviewed only.
+
+- OBSERVED: dev/calc-spike/visit-dedupe-harness.js 39/39 pass; daily_report_selftest PASS; usage_report_selftest OK.
+- OBSERVED: mutations in a scratch copy bite: ec_seen expiry back to 0 (2 fail), no 'day' row (3 fail), signal writer not diverting (1 fail). Harness has no formmail/contact case (read-only check: code diverts correctly).
+- OBSERVED: under php -S with no env var, a request header or query named EC_TEST_LOG_DIR does not move the log dir (getenv false). Production SAPI is never cli-server.
+- OBSERVED: all seven write sites (lang, human-view, calc, title, signal, contact, tester) checked; every main writer diverts to ecLogTester. consent.php writes no log. Offline queue and SW replay send credentials, so a replay is judged by the cookie at replay time.
+- OBSERVED (defect): one consenting browser, 5 visits to Manning-Pipe-Flow with prior input -> 1 shop row, 4 repeat rows. lang-log-stats.sh REPEAT USE divides repeat rows (per page load) by said-yes shop rows (now once a year) -> ">100%". On master the session cookie gave 5 shop rows -> 80%.
+- OBSERVED: spock.php still says PEOPLE "deduplicated per person per page"; lang-log-stats.sh column headers still say "people" while its legend now says one row is one browser; email says "browsers (said yes)".
+- OBSERVED: "Consent share of reach rows" will fall as returning consenting browsers stop writing reach rows; its warning text now misleads.
+- OBSERVED: daily_report tester "rows held out" sums both bucket tokens and all row kinds.
+- SPECULATION: hosts without a redirect (hawsedc.com, www., librewaternet.org) each need their own mark, so one browser on two hosts on one day is two 'day' rows if they share a log dir.
+- Judgement: the date in ec_nolog is not personal data (same for everyone that day, never logged with an identifier). But storage-rulings.md's reason "the stamp renews the year" is not what makes it necessary: a sliding expiry needs no date. The date exists for the side count.
+- OBSERVED: check_all.sh in the worktree exit 0, all blocking checks pass; worktree left clean. Scratch servers stopped.
+- Verdict: no PASS. One real defect (REPEAT USE), wording and doc defects, two things Tom must decide.
+
+# Perry journal: feat/web-mercator (head 850558e1), 2026-10-06
+
+Did not write any of this branch. Worktree /home/haws/webdev/worktrees/feat-web-mercator/engcalcs; untouched.
+
+## The ask
+CITED (caller relays Tom, verbatim): "Make 3857 real. They aren't the same thing, and some pedantic
+people will notice if 3857 is missing or doesn't work. I grant that the rest will be confused. Maybe
+we can suggest 4326..."
+
+## Old-file risk (the biggest one named in the brief)
+OBSERVED: no version of the page ever wrote project.crs = 'EPSG:3857'. 21c9b501 (first project.crs
+writer, 2026-09-13 04:44) offered UTM only; from ce626311 (same day) on, assignProjectCrs() refused
+3857, the New box mapped it to lat/lon, crsBoxOk() folded it, Convert as mapped it to 'geo'. No
+.lwn/.json in the tree states EPSG:3857. So only a hand-edited file could hold degrees under 3857.
+OBSERVED: such a hand-made file opens silently as metres (no notice). Acceptable given the above.
+
+## Measured in real Chromium (scratchpad wm-probe1..5.js)
+OBSERVED: File > New, geographic radio, chooser lists "WGS 84 (EPSG:4326) (suggested)" first and
+3857 second; 3857 pick stores crs EPSG:3857, status strip names it, map coords unit "m".
+OBSERVED: Go to 59.91 10.75 on a 3857 project lands on mx/my of that point.
+OBSERVED: two junctions + pipe drawn by mouse at 59.91 N: Auto length 154.843 m = Vincenty 154.843
+(plane 308.07). New-node DEM door receives the right lon/lat.
+OBSERVED: Oslo network as lat/lon vs as 3857 at Zoom to fit: same pixel distances, same symbol and
+label sizes, same scale bar (100 m bar = 99.90 m ground; 200 m bar = 200.14 m).
+OBSERVED: Convert as 3857 -> UTM 32N -> 3857: 1.8e-9 m and 3.3e-9 m vs proj4/formula.
+OBSERVED: place-name search with an extent on a 3857 project at 60 N zooms 2x too close (shows
+59.855..59.965 of a 59.81..60.01 box); lat/lon project shows the whole box. projectedFitScale()
+treats plane metres as ground metres. Low cost: a zoom, not a number.
+OBSERVED (node stub): customer offset at 60 N reads 10.025 m for 20 Mercator m (ellipsoidal truth
+E-W 10.025); ft project correct. Code comment calls 3857 conformal; on the ellipsoid it is not
+(N-S vs E-W 0.17% at 60 N). Negligible.
+OBSERVED: mutation: removing the ground-length branch, the scale branch, or the predicate each fails
+web-mercator-harness.js. Scale bar and customer offsets have no harness of their own.
+OBSERVED: stale comments at js/looped-network.js ~3737 and ~3747 still say 3857 is a geographic
+answer.
+
+## Not checked
+How the "(suggested)" mark and the longer tip LOOK; the builder's "stale-zero-length side finding"
+(I did not have its text); Find and replace From DEM driven end to end (same predicate and lon/lat
+path as the new-node door, which I did drive).
+
+## check_all on 850558e1
+OBSERVED: exit 1, the only blocking failure is payload freshness (27 of 27 stale), the orchestrator's
+regeneration job per CLAUDE.md. Everything else passes. The worktree is still clean after the run.
+
+# Perry journal: feat/bentley-interop round three (head bae0ea6a), 2026-10-06
+
+Method: A/B in real Chromium. I exported 32253c06 (before round three) and bae0ea6a into scratch trees
+and ran identical scripts against both. Scripts: scratchpad/speed.js, fr.js, refill.js, audit.js, owner.js, prof.js.
+
+- OBSERVED: the five branch harnesses all pass when run bare (speed, owner, labels, settings-table, settings-box-held).
+- OBSERVED: mutation test. Putting back the per-element afterPropertyEdit in paneClearOverrides makes the speed
+  harness fail (1680 ms against a 1000 ms limit, under check_all load). The harness bites, but only by a modest margin.
+- OBSERVED: clearing a single roughness cell on Net3 was never slow: about 35-55 ms on old and new, under both
+  Hazen-Williams and Darcy-Weisbach ("Roughness, e (ft)").
+- OBSERVED: clearing the whole column with Show scenarios off took 820 ms on old Net3 under Hazen-Williams and
+  1,172 ms under Darcy-Weisbach. The new code takes 70-100 ms. Darcy-Weisbach behaves no differently.
+- OBSERVED: the same clear on a 25x25 grid (1,201 pipes, link labels on) took 144 s on old and 2.5-2.8 s on new.
+  The profile puts about 1.5 s of that in buildLinkSegIndex, which layoutLinkLabel rebuilds once for every pipe
+  label in the batch, so the cost still grows with the square of the pipe count.
+- OBSERVED: map labels came out byte-identical between old and new (text, position) after a column clear, an undo,
+  a Find and replace, and a Multiple properties edit. In each case a single undo restored the state.
+- OBSERVED: Find and replace on 117 pipes went from 402 ms to 365 ms. Multiple properties went from 394 ms to 51 ms.
+- OBSERVED: Fill down on 1,201 pipes in a scenario got slower, about 110-136 ms to 300-370 ms synchronous and about
+  +450 ms in total. Q12 marks every cell. Opening a table and typing one value are unchanged.
+- OBSERVED: the audit still misses one row. Net3 lat/lon colours nodes by Pressure, and the Settings box shows four
+  "Color band boundaries" boxes for it, but the Settings table has no row for them, because unstated colorBreaks of
+  the coloured field are never added. Everything else the box tags either has a row or has no control.
+- OBSERVED: the comment above LPN_SETTAB_PART_ORDER says it follows "the box's own column order", but the box
+  columns read Bef., Aft., Use units, Decimals, Show, Drop, while the table reads Decimals, Text before, Text after,
+  Use units. Cosmetic.
+- OBSERVED: delete_lang_key.php leaves english_string_hashes.json "count" stale. Nothing reads that field
+  (detect_english_drift writes it on --update), so the defect is real but has no consequence.
+- SPECULATION: Tom's CPU fan was the column clear, not the single cell, and most likely with Show scenarios on.
+- OBSERVED: check_all on bae0ea6a fails only "payload freshness", which is expected because the orchestrator
+  regenerates the payloads. Every harness passes. The worktree is still clean.
