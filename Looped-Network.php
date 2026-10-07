@@ -2402,6 +2402,7 @@ EngCalcs.pageConfig = {
 	lpn_dock_right: <?=json_encode($ec_lang['lpn_dock_right'])?>,
 	lpn_dock_float: <?=json_encode($ec_lang['lpn_dock_float'])?>,
 	lpn_dock_autohide: <?=json_encode($ec_lang['lpn_dock_autohide'])?>,
+	lpn_popup_none: <?=json_encode($ec_lang['lpn_popup_none'])?>,
 	lpn_time_speed: <?=json_encode($ec_lang['lpn_time_speed'])?>,
 	lpn_time_speed_tip: <?=json_encode($ec_lang['lpn_time_speed_tip'])?>,
 <?php   // The Settings box (Task 441). Four of its five strings are borrowed from controls that
