@@ -67,7 +67,7 @@
 	// ---- ingredients, each switchable (STRATEGY.md beside this file) ----------------------------
 	// Switch one off with create({off: ['repair']}) or, under the bench, the environment variable
 	// LPN_PLACER_B_OFF=repair,evict (comma separated).
-	const INGREDIENTS = ['keep', 'table', 'crowd', 'smallfirst', 'wedge', 'reach', 'along', 'relocate', 'repair', 'evict', 'polish', 'unwrap', 'raster', 'cleanfirst', 'edgehang', 'rings', 'leaderevict', 'memo'];
+	const INGREDIENTS = ['keep', 'table', 'crowd', 'smallfirst', 'wedge', 'reach', 'along', 'relocate', 'repair', 'evict', 'polish', 'unwrap', 'raster', 'cleanfirst', 'edgehang', 'rings', 'leaderevict', 'memo', 'rekeep'];
 	// Built, measured and left off by default (STRATEGY.md, "Tried and dropped"); LPN_PLACER_B_ON
 	// switches one back on.
 	const DEFAULT_OFF = ['repair'];
@@ -952,7 +952,7 @@
 			});
 
 			// ---- 2. labels shown in the previous view stay put while they can (T1) -----------
-			const kept = {};
+			const kept = {}, lost = [];
 			if (ON.keep && prev && prev.layout && prev.layout.labels && prev.scene) {
 				const pA = {};
 				prev.scene.labels.forEach(function (r) { pA[r.id] = r; });
@@ -967,7 +967,7 @@
 					const layout = a.layout || ra.layout;
 					// R13/R14: a turned label the setting no longer asks for, or a level one it now
 					// asks to turn, is looked at afresh.
-					if (req.kind === 'link' && !alongAgrees(req, a.angle || 0, a.x - ra.anchor.x + req.anchor.x + sizeOf(ra, a.rows, layout).w / 2, a.y - ra.anchor.y + req.anchor.y + 7)) { return; }
+					if (req.kind === 'link' && !alongAgrees(req, a.angle || 0, a.x - ra.anchor.x + req.anchor.x + sizeOf(ra, a.rows, layout).w / 2, a.y - ra.anchor.y + req.anchor.y + 7)) { lost.push([req, rows.length]); return; }
 					const sz = sizeOf(req, rows, layout);
 					const dx = a.x - ra.anchor.x, dy = a.y - ra.anchor.y;
 					const oldW = sizeOf(ra, a.rows, layout).w;
@@ -992,12 +992,13 @@
 					// Held still unless the new view puts it on a leader or a leader on it (§3 item 1).
 					// The view's edge cutting it is not a collision (T1): it holds still.
 					const cost = evaluate(req, c, ink, ownOf(req), false, ON.cleanfirst ? Math.min(KEEP_CAP, CLEAN_CAP) : KEEP_CAP);
-					if (cost === Infinity) { return; }
-					if (c.leader && !leaderReaches(c.leader, ink)) { return; }
+					if (cost === Infinity || (c.leader && !leaderReaches(c.leader, ink))) { lost.push([req, rows.length]); return; }
 					insert(req, c, ink, cost);
 					kept[req.id] = { a: a, ra: ra, dx: dx, dy: dy, oldW: oldW };
 				});
 			}
+			// 'rekeep': a label shown last view that cannot stay where it was is seated at its smallest
+			// with everyone else, then grows FIRST, toward the rows it had (R11).
 			function leaderReaches(L, ink) {
 				const e = L[L.length - 1];
 				return ink.some(function (b) {
@@ -1123,7 +1124,12 @@
 				insert(req, cur.c, cur.ink, cur.cost);
 				return false;
 			}
-			const growOrder = order.concat(seeded.map(function (id) { return reqById[id]; }));
+			let growOrder = order.concat(seeded.map(function (id) { return reqById[id]; }));
+			if (ON.rekeep && lost.length) {
+				const lostId = {};
+				lost.forEach(function (e) { lostId[e[0].id] = 1; });
+				growOrder = growOrder.filter(function (r) { return lostId[r.id]; }).concat(growOrder.filter(function (r) { return !lostId[r.id]; }));
+			}
 			for (let i = 0; i < growOrder.length && !late(); i++) { regrow(growOrder[i]); }
 			TIMING && console.log('p2', (now() - tStart).toFixed(1));
 			// Kept labels grow in place, on the edge they hang from; with 'relocate', a kept label
