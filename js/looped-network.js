@@ -42024,6 +42024,143 @@ var EngCalcs = EngCalcs || {};
 		// only fires while focus is inside it -- and because a place is the first thing to type.
 		if (field && field.focus) { field.focus(); }
 	}
+	// ---- Workspace export and import (Tom, 2026-10-07) ---------------------------------------
+	//
+	// Tom: *"It would be really cool to be able to export and import my workspace (profile), mainly
+	// all my dockable boxes, but anything else also that is a browser-saved user setting."*
+	//
+	// **A WORKSPACE IS THE BROWSER-SCOPED HALF OF THE RULE THAT SPLITS EVERY lpn_ SETTING, AND ONLY
+	// THAT HALF.** CLAUDE.md: a setting belongs to the PROJECT or to the BROWSER, never both. Project
+	// settings ride in the project file already and are NOT here; this file carries where the boxes
+	// sit, how big they are, which are open or docked, the pane sizes, the column widths and the
+	// reading preferences, so a laptop and a desktop (or Tom and his own screen-recording machine)
+	// can be given the same layout. **It adds no storage**: it reads and writes only keys this page
+	// already keeps, and a person has to choose the command to make either happen.
+	//
+	// **ONE DECLARED LIST, AND A CHECK THAT KEEPS IT HONEST.** LPN_WORKSPACE_KEYS is the allow-list;
+	// LPN_WORKSPACE_EXCLUDED names every other thing this suite writes to localStorage and why it is
+	// not a preference. dev/scripts/workspace_keys_check.php fails when a key is written anywhere in
+	// js/ that is in neither, so a new box can never be silently left out of the workspace. Keep
+	// both as plain arrays of string literals: the check reads them from the source text.
+	var LPN_WORKSPACE_FORMAT = 'engcalcs-lpn-workspace';
+	var LPN_WORKSPACE_VERSION = 1;
+	var LPN_WORKSPACE_KEYS = [
+		// Panes and the table columns.
+		'lpn_pane', 'lpn_rpane', 'lpn_panecols',
+		// The standing boxes: position, size, openness, docking.
+		'lpn_setbox', 'lpn_findbox', 'lpn_libbox', 'lpn_ffbox', 'lpn_energybox', 'lpn_cmpbox',
+		'lpn_reportbox', 'lpn_statusbox', 'lpn_fullbox', 'lpn_contourbox', 'lpn_notesbox',
+		'lpn_hotkeysbox', 'lpn_snipbox',
+		// Reading preferences set deliberately on this screen.
+		'lpn_runbox', 'lpn_scnbasic', 'lpn_areahint', 'lpn_survey_format',
+		// The Branched-Network sketch's five checkboxes: a browser preference on a sibling page.
+		'bpn_sketch_toggles'
+	];
+	var LPN_WORKSPACE_EXCLUDED = [
+		// Documents, not preferences: the project library, its index, and the pre-library document.
+		'lpn_index', 'lpn_document', 'lpn_project_',
+		// An opaque token naming this browser to the file-lock broker: identity, not a layout.
+		'lpn_identity',
+		// Legacy keys nothing writes any more; a workspace must not resurrect them.
+		'lpn_show_titles', 'lpn_menucue'
+	];
+	// What is read off the device for a workspace file, as {key: raw string}. A key that is absent
+	// stays absent: several of these exist only while they differ from the default.
+	function workspaceCollect() {
+		var out = {}, raw;
+		LPN_WORKSPACE_KEYS.forEach(function (k) {
+			try { raw = localStorage.getItem(k); } catch (e) { raw = null; }
+			if (typeof raw === 'string') { out[k] = raw; }
+		});
+		return out;
+	}
+	function workspaceFileText() {
+		var settings = workspaceCollect();
+		return JSON.stringify({
+			format: LPN_WORKSPACE_FORMAT, version: LPN_WORKSPACE_VERSION,
+			saved: new Date().toISOString(), settings: settings
+		}, null, '\t') + '\n';
+	}
+	function exportWorkspaceFile() {
+		var pc = EngCalcs.pageConfig || {}, text = workspaceFileText(), n, name = 'lpn-workspace.json';
+		n = Object.keys(JSON.parse(text).settings).length;
+		downloadBlob(new Blob([text], { type: 'application/json' }), name);
+		setNotice((pc.lpn_workspace_exported || 'Exported {file}. Saved layout and preference records: {n}.')
+			.split('{file}').join(name).split('{n}').join(String(n)));
+	}
+	function pickWorkspaceFile() {
+		var input = document.getElementById('lpn_workspace_file');
+		if (input) { input.click(); }
+	}
+	// The four records that are a short plain word and not a JSON object: every other carried key
+	// holds JSON.
+	var LPN_WORKSPACE_PLAIN = ['lpn_runbox', 'lpn_scnbasic', 'lpn_areahint', 'lpn_survey_format'];
+	// A value is usable when it is a string a loader here could have written: a short plain word for
+	// the four plain keys, a JSON object or array that parses for the rest.
+	function workspaceValueOk(key, v) {
+		var j;
+		if (typeof v !== 'string' || v.length > 20000) { return false; }
+		if (LPN_WORKSPACE_PLAIN.indexOf(key) >= 0) { return v.length <= 40 && !/^[\[{]/.test(v); }
+		try { j = JSON.parse(v); } catch (e) { return false; }
+		return !!j && typeof j === 'object';
+	}
+	/** Pure: what a workspace file's text would do, with nothing applied. `ok:false` carries the
+	 * language key of the refusal. Exported for the harness. */
+	function workspacePlan(text) {
+		var doc, set = {}, drop = [], ignored = 0, k, allowed = {};
+		try { doc = JSON.parse(text); } catch (e) { return { ok: false, why: 'lpn_workspace_refused_unreadable' }; }
+		if (!doc || typeof doc !== 'object' || doc.format !== LPN_WORKSPACE_FORMAT
+			|| !doc.settings || typeof doc.settings !== 'object' || Array.isArray(doc.settings)) {
+			return { ok: false, why: 'lpn_workspace_refused_format' };
+		}
+		if (typeof doc.version !== 'number' || doc.version < 1 || doc.version !== Math.floor(doc.version)) {
+			return { ok: false, why: 'lpn_workspace_refused_format' };
+		}
+		if (doc.version > LPN_WORKSPACE_VERSION) {
+			return { ok: false, why: 'lpn_workspace_refused_newer', version: doc.version };
+		}
+		LPN_WORKSPACE_KEYS.forEach(function (key) { allowed[key] = true; });
+		for (k in doc.settings) {
+			if (!Object.prototype.hasOwnProperty.call(doc.settings, k)) { continue; }
+			if (!allowed[k] || !workspaceValueOk(k, doc.settings[k])) { ignored++; continue; }
+			set[k] = doc.settings[k];
+		}
+		// A key the file does not carry is a key at its default, so it is cleared: otherwise a
+		// layout flag that exists only while it is OFF could never be switched back by an import.
+		LPN_WORKSPACE_KEYS.forEach(function (key) { if (!Object.prototype.hasOwnProperty.call(set, key)) { drop.push(key); } });
+		return { ok: true, set: set, drop: drop, ignored: ignored };
+	}
+	function importWorkspaceFromFile(file) {
+		var pc = EngCalcs.pageConfig || {}, reader = new FileReader();
+		reader.onerror = function () { tellNotice(pc.lpn_workspace_refused_unreadable || 'This file could not be read as a workspace.'); };
+		reader.onload = function () {
+			var plan = workspacePlan(String(reader.result || '')), nSet = 0, nDrop = 0, msg;
+			if (!plan.ok) {
+				tellNotice((pc[plan.why] || 'This is not a workspace file saved by this page.').split('{version}').join(String(plan.version || '')));
+				return;
+			}
+			// The open project is autosaved before the page reloads, so the reload loses nothing.
+			saveToStorage();
+			try {
+				Object.keys(plan.set).forEach(function (k) { localStorage.setItem(k, plan.set[k]); nSet++; });
+				plan.drop.forEach(function (k) {
+					if (localStorage.getItem(k) !== null) { localStorage.removeItem(k); nDrop++; }
+				});
+			} catch (e) {
+				tellNotice(pc.lpn_workspace_refused_storage || 'Browser storage is full or unavailable, so the workspace was not applied.');
+				return;
+			}
+			msg = (pc.lpn_workspace_imported || 'Workspace applied from {file}. Records set: {n}. Returned to their defaults: {r}. The page reloads now, once, to lay out your boxes.')
+				.split('{file}').join(file.name || '').split('{n}').join(String(nSet)).split('{r}').join(String(nDrop));
+			if (plan.ignored) {
+				msg += ' ' + (pc.lpn_workspace_ignored || 'Entries in the file that were not recognized and were ignored: {u}.').split('{u}').join(String(plan.ignored));
+			}
+			logMessage(msg, 'notice');
+			askDialog({ kind: 'alert', text: msg }, function () { window.location.reload(); });
+		};
+		reader.readAsText(file);
+	}
+	EngCalcs.lpnWorkspacePlan = workspacePlan;
 	// **THE THREE IMPORT ROWS, APART FROM THE MENU THAT SHOWS THEM** (Task 718), the same split
 	// iconGuideRows() takes from openHelpMenu(): a harness can ask what the submenu offers without
 	// driving a popup. Each row is unchanged from the flat list it moved out of -- same icon, same
@@ -42049,7 +42186,12 @@ var EngCalcs = EngCalcs || {};
 			// and the earlier one should have been questioned rather than built. **Do not put a
 			// button back in the Libraries box.**
 			{ icon: 'open', label: pc.lpn_library_import || 'Import libraries…',
-			  tip: pc.lpn_library_import_tip, fn: libImportPick }
+			  tip: pc.lpn_library_import_tip, fn: libImportPick },
+			// **WORKSPACE (Tom, 2026-10-07)**: the browser-scoped layout and preferences, from a file.
+			// Under File > Import because it comes from a file, by the same vote that put surveyed
+			// points here; Settings holds the settings themselves and this is a file command.
+			{ icon: 'open', label: pc.lpn_file_import_workspace || 'Workspace…',
+			  tip: pc.lpn_file_import_workspace_tip, fn: pickWorkspaceFile }
 		];
 	}
 	// The Export fly-out, a function of its own for the reason importMenuRows() is: a harness can ask
@@ -42063,7 +42205,10 @@ var EngCalcs = EngCalcs || {};
 			  tip: pc.lpn_file_export_inp_tip, fn: exportInpFile },
 			// GeoJSON (Task 728): same verb, same kind of file.
 			{ icon: 'save', label: pc.lpn_file_export_item_geojson || 'GeoJSON file…',
-			  tip: pc.lpn_file_export_geojson_tip, fn: exportGeoJsonFile }
+			  tip: pc.lpn_file_export_geojson_tip, fn: exportGeoJsonFile },
+			// Workspace (Tom, 2026-10-07): the twin of File > Import > Workspace.
+			{ icon: 'save', label: pc.lpn_file_export_item_workspace || 'Workspace…',
+			  tip: pc.lpn_file_export_workspace_tip, fn: exportWorkspaceFile }
 		];
 	}
 	function openFileMenu(anchor) {
@@ -44237,6 +44382,15 @@ var EngCalcs = EngCalcs || {};
 			var inMenu = from.closest && from.closest('#lpn_menu_popup, #lpn_menu_popup2');
 			if (!inside && !onOpener && !inMenu) { closeViewPopovers(); }
 		});
+		// The workspace picker, wired ahead of the rest for the same reason the library one is.
+		var wsFileInput = document.getElementById('lpn_workspace_file');
+		if (wsFileInput) {
+			wsFileInput.addEventListener('change', function () {
+				var f = wsFileInput.files[0];
+				wsFileInput.value = '';
+				if (f) { importWorkspaceFromFile(f); }
+			});
+		}
 		// The hidden picker lives in the page, not in a popup body that gets replaced wholesale --
 		// the same reason lpn_backdrop_file does. Cleared after every pick so re-choosing the SAME
 		// file still fires a change event.

@@ -150,6 +150,12 @@ HttpOnly. Without that round trip the confirm's "the page reloads exactly as a b
 would see it" was false — the banner stayed answered. The redirect back from `consent.php` is also
 the reload the confirm promises, so there is no separate one racing it.
 
+**Workspace export and import (Tom, 2026-10-07) adds no key.** File > Export > Workspace reads the browser-scoped
+rows above (the boxes, panes, column preferences and reading preferences, and `bpn_sketch_toggles`) into a downloaded
+file; File > Import > Workspace writes those same rows back from a file the visitor chose. It never touches
+`lpn_index`, `lpn_project_<id>`, `lpn_document` or `lpn_identity`, and it holds no cookie or consent record.
+The list is `LPN_WORKSPACE_KEYS`, held by `workspace_keys_check.php`.
+
 ### IndexedDB
 
 | Store | Where | What it holds |

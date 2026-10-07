@@ -148,3 +148,10 @@ worth roughly ten a human must remember**, and this file's unexecutable half is 
 
 ---
 
+## workspace keys (`workspace_keys_check.php`)
+
+File > Export > Workspace carries `LPN_WORKSPACE_KEYS` and File > Import > Workspace writes them back; both
+lists are plain literals in `js/looped-network.js`. The check fails when any localStorage key written in `js/`
+is in neither `LPN_WORKSPACE_KEYS` nor `LPN_WORKSPACE_EXCLUDED`, is in both, or is carried but no longer written,
+so a new box can never be silently left out of a person's workspace. The import's own write site is declared in
+`storage_inventory_check.php` and is not counted as a writer. The feature adds no key of its own.

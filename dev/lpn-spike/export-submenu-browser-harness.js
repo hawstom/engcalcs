@@ -34,7 +34,7 @@ if (process.env[LOCK_ENV] !== '1') {
 	console.error(NAME + ': no `flock` binary found -- running WITHOUT the browser lock.');
 }
 
-const ROWS = [['lpn_file_export_item_inp', '.inp'], ['lpn_file_export_item_geojson', '.geojson']];
+const ROWS = [['lpn_file_export_item_inp', '.inp'], ['lpn_file_export_item_geojson', '.geojson'], ['lpn_file_export_item_workspace', '.json']];
 let checks = 0, failures = 0, Session;
 function ok(label, cond, detail) {
 	checks++;
