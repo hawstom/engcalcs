@@ -39,7 +39,7 @@ is the one you meant. "The first one" is a complete answer.
   *The proposal:* PROPOSED A: '⚠ At least one junction is below {pressure} at the demands as entered (a demand scale of 1). All junctions keep {pressure} only if demands are cut to a demand scale of {m} or less.' PROPOSED B: '⚠ The demands as entered (a demand scale of 1) leave at least one junction below {pressure}. The largest demand scale that keeps every junction at {pressure} or above is {m}.' B paralle...
   @@ NEEDS RULING
 
-## Synonym entries to approve  (3, 1 to read @@ NEEDS RULING)
+## Synonym entries to approve  (6, 4 to read @@ NEEDS RULING)
 
 **These are translator notes (`$ec_lang_syn`), not visitor wording.** Each was written against an
 English string that has since changed, or against a key that no longer exists. Say which: keep it
@@ -73,6 +73,30 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   _Ruled 2026-10-05: Is this _syn needed?_
 
+- **`lpn_scenario_push_values`**
+  > Values discarded:
+  *Why stale:* the English changed after this synonym was written
+  *Written against:* Values thrown away:
+  *Current synonym:* Values thrown away, Values discarded, Values lost, Values wiped, Values replaced, Values displaced, Values cleared, Custom values cleared | a count follows this label, not a list of values
+  **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
+  @@ NEEDS RULING
+
+- **`rc_Hp`**
+  > <span class="ec-help" title="Ponding (Hp > yn) is desirable because it reduces upstream erosion. (USDA)">Inlet weir head, H<sub>p</sub> <span class="ec-tip">?</span></span>
+  *Why stale:* the English changed after this synonym was written
+  *Written against:* <span class="ec-help" title="Ponding (Hp > yn) is good — reduces upstream erosion. (USDA)">Inlet weir head, H<sub>p</sub> <span class="ec-tip">?</span></span>
+  *Current synonym:* | gloss: weir head
+  **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
+  @@ NEEDS RULING
+
+- **`rc_yn`**
+  > <span class="ec-help" title="Ponding (Hp > yn) is desirable because it reduces upstream erosion. (USDA)">Normal depth in inlet channel, y<sub>n</sub> <span class="ec-tip">?</span></span>
+  *Why stale:* the English changed after this synonym was written
+  *Written against:* <span class="ec-help" title="Ponding (Hp > yn) is good — reduces upstream erosion. (USDA)">Normal depth in inlet channel, y<sub>n</sub> <span class="ec-tip">?</span></span>
+  *Current synonym:* Enter the normal depth in the channel that delivers flow to this chute. | Upstream, not downstream: ponding reduces erosion UPSTREAM of the chute inlet (above/before it, toward the source). Do not flip the direction.
+  **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
+  @@ NEEDS RULING
+
 ## lpn_  (221, 115 to read @@ NEEDS RULING)
 
 - **`lpn_alt_calc_options`**
@@ -103,7 +127,7 @@ never edits a synonym.
   > These are new, as on a newly drawn one:
   @@ NEEDS RULING
 - **`lpn_change_type_customers`**
-  > Only a pipe serves customers, so these customers are connected instead to the node shown in parentheses, where their demand already lands. They stay where they are drawn, and their demand is unchanged:
+  > Only a pipe serves customers, so these customers are connected instead to the node shown in parentheses, where their demand is already applied. They stay where they are drawn, and their demand is unchanged:
   @@ NEEDS RULING
 - **`lpn_change_type_key`**
   > ID: Lost entry
@@ -154,7 +178,7 @@ never edits a synonym.
   > Clear to hide the fill and the contour lines; select to bring them back as they were. Node colors stay.
   _Ruled OK 2026-10-05._
 - **`lpn_copy_opened_unsaved`**
-  > Opened {file} as a copy, with a new lock of its own that will be saved with the next file save.
+  > Opened {file} as a copy, with a new lock that will be saved with the next file save.
   @@ NEEDS RULING
 - **`lpn_cp_allow_tip`**
   > Allow only these characters:
@@ -250,8 +274,8 @@ never edits a synonym.
   > Demand scale
   _Ruled OK 2026-10-03._
 - **`lpn_ds_multiplier_tip`**
-  > The number each demand is multiplied by: 1.5 is half again as much water. It applies on top of the active scenario's own demand multiplier, which is already in the demands, and it is never saved in your project.
-  _Ruled OK 2026-10-03._
+  > The factor by which each demand is multiplied; 1.5 is a 50% increase. It applies in addition to the demand multiplier of the active scenario, which is already in the demands, and it is never saved in the project.
+  _Ruled 2026-10-07: Technical-English interview: Use proposed_
 - **`lpn_ds_no_junctions`**
   > This project has no junctions yet, so there are no demands to scale.
   _Ruled OK 2026-10-03._
@@ -307,7 +331,7 @@ never edits a synonym.
   > Solved with the EPANET solver, because the demand model is pressure driven.
   _Ruled OK 2026-10-05._
 - **`lpn_engine_unavailable_why`**
-  > Valves that open and close on their own cannot be solved without the EPANET solver. {reason}
+  > Pressure and flow control valves (PRV, PSV, FCV) cannot be solved without the EPANET solver. {reason}
   @@ NEEDS RULING
 - **`lpn_fb_bad_email`**
   > That email address does not look right. Correct it, or leave it empty.
@@ -490,8 +514,8 @@ never edits a synonym.
   > Demand deficit
   _Ruled OK 2026-10-05._
 - **`lpn_result_demand_deficit_tip`**
-  > The demand this junction asks for and does not receive, because the pressure is below the required pressure.
-  _Ruled OK 2026-10-05._
+  > The demand at this junction that is not delivered, because the pressure is below the required pressure.
+  _Ruled 2026-10-07: Technical-English interview: Use proposed_
 - **`lpn_result_pump_head`**
   > Head
   _Ruled OK 2026-10-03._
@@ -688,7 +712,7 @@ never edits a synonym.
   > The browser refused to start the EPANET solver. WebAssembly may be turned off by a security setting or an extension.
   @@ NEEDS RULING
 - **`lpn_time_no_engine_why`**
-  > The built-in solver calculates one moment at a time, so this is the network at {time} only: every pattern is read at that moment, and every tank still sits at its starting level instead of filling and draining. {reason}
+  > The built-in solver solves one instant at a time, so this is the network at {time} only: every pattern is read at that instant, and every tank remains at its initial level instead of filling and draining. {reason}
   @@ NEEDS RULING
 - **`lpn_time_scn_overrides`**
   > Scenario overrides:
@@ -730,13 +754,13 @@ never edits a synonym.
   > A Manning n is normally between {min} and {max}. A number outside that range is often a roughness meant for another friction method.
   @@ NEEDS RULING
 - **`lpn_valwarn_negative`**
-  > EPANET refuses a negative number here.
+  > EPANET does not accept a negative number here.
   @@ NEEDS RULING
 - **`lpn_valwarn_positive`**
-  > EPANET refuses zero or a negative number here.
+  > EPANET does not accept zero or a negative number here.
   @@ NEEDS RULING
 - **`lpn_valwarn_tank_levels`**
-  > EPANET refuses this tank. The lowest water depth must not exceed the water depth, and the water depth must not exceed the highest water depth.
+  > EPANET does not accept this tank. The lowest water depth must not exceed the water depth, and the water depth must not exceed the highest water depth.
   @@ NEEDS RULING
 
 ## points_  (2, 2 to read @@ NEEDS RULING)
@@ -752,7 +776,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**109 still to read**, of 112 new keys across 14 unmerged branch(es).
+**109 still to read**, of 112 new keys across 15 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -763,9 +787,9 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/technical-english (`4be0b5b5`) — adds no English strings
+### chore/technical-english (`70714fa0`) — adds no English strings
 
-### feat/bentley-interop (`780ecda7`) — 60 new, 60 to read @@ NEEDS RULING
+### feat/bentley-interop (`f4e32def`) — 60 new, 60 to read @@ NEEDS RULING
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -950,7 +974,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/desktop (`baba0f04`) — adds no English strings
 
-### feat/dxf (`a5db182f`) — 12 new, 12 to read @@ NEEDS RULING
+### feat/dxf (`4b1b10f0`) — 12 new, 12 to read @@ NEEDS RULING
 
 - **`lpn_dxf_export_failed`**
   > The DXF file was not written: an error in this page stopped it ({error}).
@@ -982,11 +1006,11 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_dxf_note_shortened`**
   > {n} values were longer than a DXF file allows ({max} characters), so each was shortened and ends in three periods.
   @@ NEEDS RULING
-- **`lpn_file_export_dxf`**
-  > Export DXF file…
-  @@ NEEDS RULING
 - **`lpn_file_export_dxf_tip`**
   > Download this network for AutoCAD and other CAD programs: pipes, pumps, and valves as polylines, and every element as a block whose attributes carry its ID and property values in the project units.
+  @@ NEEDS RULING
+- **`lpn_file_export_item_dxf`**
+  > DXF file…
   @@ NEEDS RULING
 
 ### feat/label-gang-search (`8b31a907`) — 3 new, all ruled
@@ -1011,13 +1035,13 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`2e5e81c4`) — adds no English strings
 
-### feat/section-grid (`0345725c`) — 1 new, 1 to read @@ NEEDS RULING
+### feat/section-grid (`56174107`) — 1 new, 1 to read @@ NEEDS RULING
 
 - **`points_data_points_heading`**
   > Points data<br />(use Copy to see format)
   @@ NEEDS RULING
 
-### feat/table-export (`0de5ecbd`) — 10 new, 10 to read @@ NEEDS RULING
+### feat/table-export (`0b6070a6`) — 10 new, 10 to read @@ NEEDS RULING
 
 - **`lpn_export_table_all`**
   > All
@@ -1050,7 +1074,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Export table as ODS
   @@ NEEDS RULING
 
-### feat/user-guide (`747fa29b`) — 26 new, 26 to read @@ NEEDS RULING
+### feat/user-guide (`ab8cca0d`) — 26 new, 26 to read @@ NEEDS RULING
 
 - **`lpn_guide_also`**
   > Also in {menu}
@@ -1131,4 +1155,6 @@ build for that would be a gate nobody keeps. Refresh it with
   > Guide
   @@ NEEDS RULING
 
-### feat/visit-dedupe (`2de0a88e`) — adds no English strings
+### feat/visit-dedupe (`08c07d31`) — adds no English strings
+
+### fix/menu-and-repeat (`4037f224`) — adds no English strings
