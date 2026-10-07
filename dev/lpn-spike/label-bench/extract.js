@@ -178,6 +178,31 @@ async function extractSet(set) {
 			// Several densities of ONE loaded network (set.spacings, a large network without master):
 			// each is its own scene set, `<id>` with its spacing, from one load and one solve.
 			const out = [];
+			// **THE STABILITY SEQUENCE** (spec.stab, dev/label-trials/stability/): at 1x and 2x, the
+			// view, the same view again (a control), one field edited, the edit undone, and the view
+			// panned by a tenth of the canvas width. The edit is the elevation of the node nearest the
+			// view centre retyped with an extra leading digit (+1000 in the file's unit), with no
+			// re-solve, as with Recalculate off: only that label's Z row changes, one character wider.
+			if (set.stab) {
+				const s1 = set.spacingPx / nnDraw;
+				let edN = null, edD = Infinity;
+				doc.nodes.forEach(function (n) {
+					if (n.type !== 'junction') { return; }
+					const p = L.nodeAt(n), d = Math.hypot(p.x - cen.x, p.y - cen.y);
+					if (d < edD) { edD = d; edN = n; }
+				});
+				const e0 = edN.elev || 0;
+				const setElev = function (v) { return function () { edN.elev = v; }; };
+				[1, 2].forEach(function (m) {
+					const v = { cx: cen.x, cy: cen.y, s: s1 * m };
+					out.push({ tag: m + 'x-base', mult: m, v: v, mutate: setElev(e0) });
+					out.push({ tag: m + 'x-control', mult: m, v: v, mutate: setElev(e0) });
+					out.push({ tag: m + 'x-edit', mult: m, v: v, mutate: setElev(e0 + 1000), edited: 'n:' + edN.id });
+					out.push({ tag: m + 'x-undo', mult: m, v: v, mutate: setElev(e0), edited: 'n:' + edN.id });
+					out.push({ tag: m + 'x-pan', mult: m, v: { cx: cen.x + 0.1 * CANVAS.w / v.s, cy: cen.y, s: v.s }, mutate: setElev(e0) });
+				});
+				return out;
+			}
 			(set.spacings || [set.spacingPx]).forEach(function (sp) {
 				const s1 = sp / nnDraw, sid = set.spacings ? set.idFor(sp) : set.id;
 				GEN_MULTS.forEach(function (m, k) {
@@ -194,6 +219,7 @@ async function extractSet(set) {
 
 	const steps = [], masters = [];
 	views().forEach(function (vw) {
+		if (vw.mutate) { vw.mutate(); }
 		if (!L.setView(vw.v)) { throw new Error(set.id + ': view refused ' + JSON.stringify(vw.v)); }
 		// A generated set is laid out ONCE per view: master's pass costs minutes at a few thousand
 		// labels, and there the first pass's JIT share is noise. Its time is that one pass.
@@ -222,6 +248,7 @@ async function extractSet(set) {
 			canvas: CANVAS, measure: textW, obs: lastObs, zoom: vw.mult
 		});
 		const scene = built.scene, V = built.V;
+		if (vw.edited) { scene.edited = vw.edited; }
 		const st = L.state(), s = st.s;
 		const fsWorld = L.effectiveFontSize();
 		const nodeEls = L.nodeEls(), linkEls = L.linkEls();
@@ -333,6 +360,7 @@ async function main() {
 		if (spec.noMaster) {
 			set.noMaster = true;
 		}
+		if (spec.stab) { set.stab = true; set.id += '-stab'; }
 		const t0 = Date.now();
 		if (Array.isArray(spec.spacingPx)) {
 			// One network, several densities: requires noMaster (master's layouts would carry state

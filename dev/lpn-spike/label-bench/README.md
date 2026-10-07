@@ -18,6 +18,8 @@ node dev/lpn-spike/label-bench/run.js --placer dev/lpn-spike/label-bench/placers
 node dev/lpn-spike/label-bench/run.js --placer <path> --room              # adds R1's room score per view (scored, never failing)
 node dev/lpn-spike/label-bench/selftest-harness.js                          # the bench checks itself (in check_all)
 node dev/lpn-spike/label-bench/extract.js                                   # regenerate scenes/ and master/ from the app
+node dev/lpn-spike/label-bench/extract.js --gen '{"family":"grid","n":1000,"seed":1,"spacingPx":28,"stab":true}' <scenes> <master>
+                                                                            # the stability sequence: view, same view, one edit, undo, 10% pan, at 1x and 2x
 ```
 
 ## The contract
