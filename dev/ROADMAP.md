@@ -226,19 +226,18 @@ the block.
   networks at any size and density (grid, radial, branched), a fresh seed each round, plus published
   utility-scale networks. Notes: dev/paper-notes-label-placement.md.
 - 100|759| **One word for the map selection, another for a menu choice; tips that earn their place.**
+  **TIPS HALF MERGED 2026-10-06** (`feat/tip-door`, Tom: "Merge"): one style of tip, every `title` the styled
+  name tip; the ALL-CAPS headings dropped. Open: the selection word (Highlighted / Chosen).
   Tom, 2026-10-03: a "studied, considered, carefully adopted, and audited" strategy to tell the map
   selection set from menu choices (his leading candidate: Highlighted / Chosen), and an audit of tip
   pollution in lpn (status strip, click-to-open, delays in master styles, tips that talk down).
   Ida's audit: `dev/tip-and-selection-audit.md` (branch `chore/ida-tip`); decisions go to him as an interview.
-- 100|774| **Description edits in Properties are refused or vanish.**
-  Tom, 2026-10-06: a new Description first "wouldn't accept a space. Then it wouldn't appear" until
-  close and reopen; past an unstated length limit an edit, and then deleting it, "wouldn't appear";
-  the Tables pane took the same edit. "This kept happening repeatedly." Branch `fix/lpn-description`.
-- 100|775| **File, Convert as: five defects from one session in Fotobi, Ghana.**
-  Tom, 2026-10-06: after converting WGS84 to Pseudo Mercator the OLD project lost its node symbols
-  (back after close and reopen) and was zoomed somewhere wrong; File, New with EPSG:3857 shows 4326
-  on the map; Convert as on an empty project opens a file Open dialog; with map and Current both
-  4326, 3857 cannot be chosen. Branch `fix/convert-as`.
+- 100|775| **File, Convert as: what is left of the Fotobi, Ghana session.**
+  Tom, 2026-10-06. FIXED: Convert as on an empty project opened a file picker (it now opens the box).
+  NOT REPRODUCED: the old project losing its node symbols and its view after a conversion
+  (`convert-as-fotobi-harness.js`, four paths, master and production 9c71d54f); ask which surface.
+  HIS CALL: EPSG:3857 and 4326 are the same lat/lon project here (R-218), so choosing 3857 in File,
+  New or Convert as silently becomes 4326. Options: explain, hide the 3857 row, or make 3857 real.
 - 75|282| **Offer to attach the backdrop an imported `.inp` names.** An `.inp` (and a `.net`) stores
   only a PATH to its background picture, never the picture. The import reports the file name and
   tells the user to add it with Map, Backdrop; it could instead offer a picker right there, seeded
@@ -373,10 +372,6 @@ the block.
   Tom, 2026-10-06, rejecting the cheap build (new links, a better contact.php): *"Cheap is no good.
   Bigger build is needed... Do it right."* "Something wrong here?" opens a little box (canned-message
   buttons, optional email, comments); Send is the second click. Rebuilt on `feat/feedback`.
-- 75|769| **Change type: a junction becomes a tank, a pipe a valve.**
-  Tom, 2026-10-05: *"a tool under Water or Tables to Change node type for any asset, where if it has
-  information that can't be ported to the new type, we alert and ask."* Building on
-  `feat/asset-type`; the seam with `feat/bentley-interop` is alternatives keyed by element id.
 - 75|771| **Survey points as a script: the Description names the asset or vertex.**
   Tom, 2026-10-05: interpret a point's Description as an asset or a pipe vertex, and the CSV as a
   batch. The open question is joining several pipes at one node without a custom code; Mary is
@@ -392,7 +387,8 @@ the block.
   layers, attributed blocks, XDATA or Map data exist, propose asset types and properties in an
   editable translation table (assets, properties, scenarios, alternatives). Mary, same day: Map
   "ADE" object data does not survive DXF; layers and ATTRIBs are visible everywhere; target ASCII
-  R2000.
+  R2000. Tom, 2026-10-07: his DXF Interface Manager spec, for import AND export, and a rudimentary
+  interim workflow, verbatim in `dev/dxf-interface.md`.
 - 75|776| **Copy a table with its headings; export Tables to CSV and ODS.**
   Tom, 2026-10-06: *"When copying from a Table, it would be nice to be able to copy the headings
   somehow. It might also be nice to Export to CSV and ODS the Tables."* Branch `feat/table-export`.
@@ -1167,6 +1163,10 @@ the block.
   across it.** Found 2026-09-26 building Convert as (`feat/convert-as`); an edge case, since the
   mission scope is a 300 km span, but the wizard's world-wide first screen reaches it.
 
+- 25|778| **Read pipe size and material from survey field codes.**
+  Tom, 2026-10-06, on `feat/survey-code`: *"Will people expect us to read more, like pipe diameter
+  etc? If there are clear conventions, we can try!"* First find whether Carlson or Civil 3D users
+  carry size in the description (e.g. `WL 8 DI`) by any published convention; no build without one.
 - 5|114| **Reservoir / detention routing calculator (Modified Puls) — full scope in
   `dev/detention-routing-scope.md`.** A time-stepping engine, which is the real departure from the
   suite's steady-state weir and orifice calculators. **Hydrology stays out of scope** — the user

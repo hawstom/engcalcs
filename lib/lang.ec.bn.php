@@ -3655,7 +3655,6 @@ $ec_lang['lpn_ff_menu_tip']='সংযোগস্থলগুলো একে �
 $ec_lang['lpn_ff_title']='অগ্নিনির্বাপণ প্রবাহ বিশ্লেষণ';
 $ec_lang['lpn_ff_intro']='প্রতিটি সংযোগস্থলকে পালাক্রমে তার বিদ্যমান চাহিদার উপর একটি অগ্নিনির্বাপণ প্রবাহ টানতে বলা হয়। আপনার প্রকল্পে কিছুই পরিবর্তিত হয় না; পুরো রানটি একটি কপিতে করা হয়।';
 $ec_lang['lpn_ff_scope']='যেসব সংযোগস্থল পরীক্ষা করতে হবে';
-$ec_lang['lpn_ff_scope_tip']='রান করার আগে সেটটি বেছে নিন। একটি বড় সিস্টেমের প্রতিটি সংযোগস্থল পরীক্ষা করতে কয়েক মিনিট লাগতে পারে।';
 $ec_lang['lpn_ff_all']='সব';
 $ec_lang['lpn_ff_selected']='নির্বাচিত';
 $ec_lang['lpn_ff_no_junctions']='এই প্রকল্পে এখনও কোনো সংযোগস্থল নেই, তাই পরীক্ষা করার মতো কিছু নেই।';
@@ -3686,7 +3685,6 @@ $ec_lang['lpn_ff_engine_native']='বিল্ট-ইন সমাধানক�
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_ff_engine_epanet']='এটি EPANET ইঞ্জিন ব্যবহৃত হয়।';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_ff_engine_cost']='উপলভ্য অগ্নিনির্বাপণ প্রবাহ একটি অনুসন্ধান, তাই পরীক্ষা করা প্রতিটি সংযোগস্থলের জন্য পুরো নেটওয়ার্ক প্রায় ষোলোবার সমাধান করা হয়। একটি বড় সিস্টেমে কয়েক মিনিট লাগে। আপনি যেকোনো সময় এটি থামিয়ে দিতে পারেন এবং ততক্ষণে যা হিসাব হয়েছে তা রাখতে পারেন।';
 // The one-condition sentence. Shown only where this project has a run clock, because that is the
 // only place a reader could reasonably expect a fire flow to follow it.
 //
@@ -3694,7 +3692,6 @@ $ec_lang['lpn_ff_engine_cost']='উপলভ্য অগ্নিনির্�
 // first sentence over again in other words -- Tom: "I don't know what this means. Are we just
 // repeating what we said above?" It was. What the practice half carries that the first sentence
 // does not is the DEMAND the fire flow is added to, and that survives.
-$ec_lang['lpn_ff_steady']='শুধুমাত্র বর্তমানে স্ক্রিনে থাকা সময় ধাপটি পরীক্ষা করা হয়। অগ্নিনির্বাপণ প্রবাহ সাধারণত সর্বোচ্চ দিনের চাহিদার উপর পরীক্ষা করা হয়, তাই রান করার আগে নেটওয়ার্কটি সেই অবস্থায় নির্ধারণ করুন।';
 // THE RUN HAS A DIALOG OF ITS OWN (Tom, 2026-08-30: "The run progress bar is so important that all
 // applications put it in a new dialog with nothing but the progress, a stop button, and maybe some
 // other progress stats."). It says how far along it is and never how long is left: per-solve cost

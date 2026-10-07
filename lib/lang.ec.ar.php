@@ -3773,7 +3773,6 @@ $ec_lang['lpn_ff_menu_tip']='اختبر الملتقيات واحداً تلو �
 $ec_lang['lpn_ff_title']='تحليل تدفق الحريق';
 $ec_lang['lpn_ff_intro']='يُطلب من كل ملتقى بالتناوب سحب تدفق حريق إضافة إلى الطلب الذي يحمله بالفعل. لا يتغيّر أي شيء في مشروعك؛ يُجرى التشغيل بأكمله على نسخة.';
 $ec_lang['lpn_ff_scope']='الملتقيات المراد اختبارها';
-$ec_lang['lpn_ff_scope_tip']='اختر المجموعة قبل التشغيل. اختبار كل ملتقى في نظام كبير قد يستغرق دقائق.';
 $ec_lang['lpn_ff_all']='الكل';
 $ec_lang['lpn_ff_selected']='المحددة';
 $ec_lang['lpn_ff_no_junctions']='لا يحتوي هذا المشروع على ملتقيات بعد، فلا يوجد ما يُختبر.';
@@ -3803,7 +3802,6 @@ $ec_lang['lpn_ff_engine_native']='يُستخدم الحلّال المدمج.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_ff_engine_epanet']='يُستخدم محرك EPANET.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_ff_engine_cost']='التدفق المتاح للحريق عملية بحث، فتُحل الشبكة بأكملها نحو ست عشرة مرة لكل ملتقى يُختبر. يستغرق نظام كبير دقائق. يمكنك إيقافه في أي وقت والاحتفاظ بما حُسب بالفعل.';
 // The one-condition sentence. Shown only where this project has a run clock, because that is the
 // only place a reader could reasonably expect a fire flow to follow it.
 //
@@ -3811,7 +3809,6 @@ $ec_lang['lpn_ff_engine_cost']='التدفق المتاح للحريق عملي�
 // first sentence over again in other words -- Tom: "I don't know what this means. Are we just
 // repeating what we said above?" It was. What the practice half carries that the first sentence
 // does not is the DEMAND the fire flow is added to, and that survives.
-$ec_lang['lpn_ff_steady']='تُختبر فقط الخطوة الزمنية المعروضة الآن على الشاشة. يُختبر تدفق الحريق عادة إضافة إلى طلب أقصى يوم، لذا اضبط الشبكة على تلك الحالة قبل التشغيل.';
 // THE RUN HAS A DIALOG OF ITS OWN (Tom, 2026-08-30: "The run progress bar is so important that all
 // applications put it in a new dialog with nothing but the progress, a stop button, and maybe some
 // other progress stats."). It says how far along it is and never how long is left: per-solve cost

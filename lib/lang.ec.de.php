@@ -3646,7 +3646,6 @@ $ec_lang['lpn_ff_menu_tip']='Testet Entnahmeknoten einzeln nacheinander: Wie vie
 $ec_lang['lpn_ff_title']='Löschwasserprüfung';
 $ec_lang['lpn_ff_intro']='Jeder Entnahmeknoten wird der Reihe nach aufgefordert, zusätzlich zu seiner bisherigen Entnahme eine Löschwassermenge zu entnehmen. An Ihrem Projekt ändert sich nichts; der gesamte Lauf erfolgt auf einer Kopie.';
 $ec_lang['lpn_ff_scope']='Zu testende Entnahmeknoten';
-$ec_lang['lpn_ff_scope_tip']='Wählen Sie die Menge, bevor Sie starten. Das Testen jedes Entnahmeknotens in einem großen System kann Minuten dauern.';
 $ec_lang['lpn_ff_all']='Alle';
 $ec_lang['lpn_ff_selected']='Ausgewählte';
 $ec_lang['lpn_ff_no_junctions']='Dieses Projekt hat noch keine Entnahmeknoten, daher gibt es nichts zu testen.';
@@ -3676,7 +3675,6 @@ $ec_lang['lpn_ff_engine_native']='Der eingebaute Löser wird verwendet.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_ff_engine_epanet']='EPANET-Löser wird verwendet.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_ff_engine_cost']='Die verfügbare Löschwassermenge wird durch eine Suche ermittelt, daher wird das gesamte Netz für jeden getesteten Entnahmeknoten etwa sechzehnmal berechnet. Bei einem großen System dauert das Minuten. Sie können jederzeit anhalten und behalten, was bereits berechnet wurde.';
 // The one-condition sentence. Shown only where this project has a run clock, because that is the
 // only place a reader could reasonably expect a fire flow to follow it.
 //
@@ -3684,7 +3682,6 @@ $ec_lang['lpn_ff_engine_cost']='Die verfügbare Löschwassermenge wird durch ein
 // first sentence over again in other words -- Tom: "I don't know what this means. Are we just
 // repeating what we said above?" It was. What the practice half carries that the first sentence
 // does not is the DEMAND the fire flow is added to, and that survives.
-$ec_lang['lpn_ff_steady']='Nur der gerade angezeigte Zeitschritt wird getestet. Löschwasser wird normalerweise zusätzlich zum Tagesmaximum getestet, stellen Sie das Netz also vor dem Start auf diesen Zustand ein.';
 // THE RUN HAS A DIALOG OF ITS OWN (Tom, 2026-08-30: "The run progress bar is so important that all
 // applications put it in a new dialog with nothing but the progress, a stop button, and maybe some
 // other progress stats."). It says how far along it is and never how long is left: per-solve cost
