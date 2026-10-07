@@ -1533,10 +1533,9 @@ $ec_lang['lpn_pane_print']='Print table';
 $ec_lang['lpn_pane_copy_heads']='Copy with headings';
 $ec_lang['lpn_pane_export_csv']='Export table as CSV';
 $ec_lang['lpn_pane_export_ods']='Export table as ODS';
-// Tom, 2026-10-07. File > Export > table: a box asking the format, which tables and which scenarios.
-$ec_lang['lpn_file_export_table']='Export table…';
-$ec_lang['lpn_export_table_title']='Export table';
-$ec_lang['lpn_export_table_format']='Format';
+// Tom, 2026-10-07. File, Export to, ODS/XLSX/CSV file: a box asking which tables and which scenarios.
+// {format} is ODS, XLSX or CSV, the file format's own name, never translated.
+$ec_lang['lpn_export_table_title']='Export to {format}';
 $ec_lang['lpn_export_table_current']='Current';
 $ec_lang['lpn_export_table_all']='All';
 $ec_lang['lpn_export_table_go']='Export';
@@ -2087,9 +2086,17 @@ $ec_lang['lpn_file_import_inp_tip']='Create a new project from an EPANET file, e
 $ec_lang['lpn_file_export_inp']='Export EPANET file…';
 // File > Export is a submenu (Tom, 2026-10-06), so its rows drop the verb the heading carries. The
 // two keys above are what the rows were called before it.
-$ec_lang['lpn_file_export_menu']='Export…';
+$ec_lang['lpn_file_export_menu']='Export to…';
 $ec_lang['lpn_file_export_item_inp']='EPANET file…';
 $ec_lang['lpn_file_export_item_geojson']='GeoJSON file…';
+// Tom, 2026-10-07: "File, Export to, and we are adding ODS/XLSX/CSV. And we include Libraries". A heading in
+// the File, Export to submenu over the three table rows, which are named for the file like the rows above.
+$ec_lang['lpn_file_export_tables_heading']='Tables and libraries';
+$ec_lang['lpn_file_export_item_ods']='ODS file…';
+$ec_lang['lpn_file_export_item_xlsx']='XLSX file…';
+$ec_lang['lpn_file_export_item_csv']='CSV file…';
+$ec_lang['lpn_file_export_tables_tip']='Download the tables as the Tables pane shows them, one sheet each, with a sheet for each library their IDs refer to: patterns, curves, pipe types, and fittings.';
+$ec_lang['lpn_file_export_csv_tip']='Download a table as the Tables pane shows it. Several tables come as one zip file of CSV files, with a file for each library their IDs refer to.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_file_export_inp_tip']='Download this network as an EPANET .inp file (in a zip file with its image if applicable). Anything the .inp format cannot hold is listed for you afterwards.';
 $ec_lang['lpn_status_inp_exported']='Exported {file}.';

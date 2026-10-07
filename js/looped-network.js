@@ -29390,9 +29390,70 @@ var EngCalcs = EngCalcs || {};
 		});
 		return items;
 	}
+	// **THE LIBRARIES GO WITH THE TABLES** (Tom, 2026-10-07: *"And we include Libraries so that we
+	// can include Curve, Pattern, etc references."*). A pump's Curve column or a junction's Pattern
+	// column holds an ID, and an ID is worth something in a spreadsheet only when the thing it names
+	// is in the same workbook. One sheet per library that has any entry, ID first so the frozen
+	// column and a lookup both key on it, the numbers as the Library box holds them (what the user
+	// typed, in the project's units, which the headings name). Controls and rules are left out: they
+	// refer to assets, not the other way round.
+	//   Patterns: one row a pattern, its multipliers across, headed by period number 1, 2, 3...
+	//   Curves: one sheet per curve type present, one row a point, headed as the Library heads it.
+	//   Pipe types: one row a type, one column a property it may state; blank where it states none.
+	//   Fittings: one row a fitting of a list, so a list's coefficients can be summed in place.
+	function libraryExportSheets() {
+		var pc = EngCalcs.pageConfig || {}, out = [], idH = pc.lpn_field_id || 'ID',
+			descH = pc.lpn_library_curve_note_label || 'Description', libName = pc.lpn_library_curves || 'Curves';
+		function txt(v) { return v === undefined || v === null ? '' : String(v); }
+		var pats = libPatternsRead().filter(function (p) { return p && p.id !== undefined && p.id !== null && p.id !== ''; });
+		if (pats.length) {
+			var n = 0, heads = [idH], numeric = [false], k;
+			pats.forEach(function (p) { n = Math.max(n, (p.multipliers || []).length); });
+			for (k = 1; k <= n; k++) { heads.push(String(k)); numeric.push(true); }
+			out.push({ name: pc.lpn_library_patterns || 'Patterns', heads: heads, numeric: numeric,
+				rows: pats.map(function (p) { return [txt(p.id)].concat((p.multipliers || []).map(txt)); }) });
+		}
+		var curves = libCurvesRead(), kinds = CURVE_KINDS.map(function (o) { return o[0]; });
+		curves.forEach(function (c) { if (kinds.indexOf(c.kind) < 0) { kinds.push(c.kind); } });
+		kinds.forEach(function (kind) {
+			var mine = curves.filter(function (c) { return c.kind === kind; }), ax, rows = [], label;
+			if (!mine.length) { return; }
+			ax = curveAxisLabels(kind);
+			label = CURVE_KINDS.filter(function (o) { return o[0] === kind; })[0];
+			label = label ? (pc[label[1]] || label[2]) : (pc.lpn_curve_kind_generic || 'Kind not stated');
+			mine.forEach(function (c) {
+				var pts = c.points || [];
+				if (!pts.length) { rows.push([txt(c.id), txt(c.note), '', '']); }
+				pts.forEach(function (pt) { rows.push([txt(c.id), txt(c.note), txt(pt[0]), txt(pt[1])]); });
+			});
+			out.push({ name: libName + ' - ' + label, heads: [idH, descH, ax.x, ax.y], rows: rows, numeric: [false, false, true, true] });
+		});
+		var types = libPipeTypesRead();
+		if (types.length) {
+			out.push({ name: pc.lpn_library_pipetypes || 'Pipe types',
+				heads: [idH, descH].concat(LPN_TYPE_PROPS.map(function (d) { return pipeTypePropLabel(d.prop); })),
+				numeric: [false, false].concat(LPN_TYPE_PROPS.map(function (d) { return !d.ref; })),
+				rows: types.map(function (t) {
+					return [txt(t.id), txt(t.note)].concat(LPN_TYPE_PROPS.map(function (d) { return txt(t.props ? t.props[d.prop] : ''); }));
+				}) });
+		}
+		var sets = libFittingSetsRead(), names = fittingNames(), frows = [];
+		sets.forEach(function (set) {
+			var items = set.items || [];
+			if (!items.length) { frows.push([txt(set.id), txt(set.note), '', '', '']); }
+			items.forEach(function (it) {
+				frows.push([txt(set.id), txt(set.note), names[it.fit] || txt(it.fit), txt(it.qty), txt(it.k)]);
+			});
+		});
+		if (sets.length) {
+			out.push({ name: pc.lpn_library_fittings || 'Fittings', rows: frows, numeric: [false, false, false, true, true],
+				heads: [idH, descH, pc.lpn_fitting_name || 'Fitting', pc.lpn_fitting_qty || 'Quantity', pc.lpn_fitting_k || 'Coefficient'] });
+		}
+		return out;
+	}
 	function paneExportDownload(format, allTables, allScenarios) {
 		var pc = EngCalcs.pageConfig || {}, items = paneExportItems(allTables, allScenarios), pre = paneProjectPrefix(),
-			tables = {}, name, data, mime, multiTables, E = EngCalcs;
+			tables = {}, name, data, mime, multiTables, E = EngCalcs, libs;
 		if (!items.length) { return; }
 		items.forEach(function (it) { tables[it.table] = true; });
 		multiTables = Object.keys(tables).length > 1;
@@ -29408,36 +29469,51 @@ var EngCalcs = EngCalcs || {};
 			if (scn.length + tab.length > room) { scn = scn.slice(0, room - tab.length); }
 			return scn.replace(/\s+$/, '') + ' - ' + tab.replace(/\s+$/, '');
 		}
-		if (items.length === 1) {
-			name = pre + part(items[0], '-') + '.' + format;
-			data = format === 'csv' ? E.lpnTableCsv(items[0].data.heads, items[0].data.cells)
-				: (format === 'ods' ? E.lpnTableOds : E.lpnTableXlsx)(items[0].data.heads, items[0].data.cells, sheetPart(items[0]), items[0].data.numeric);
-			mime = PANE_EXPORT_MIME[format];
+		// **ONE CSV STAYS ONE CSV.** A single table to CSV is the one file it always was, with no
+		// library beside it, because a CSV holds one table and turning a click into a zip would be a
+		// surprise. Whenever the export is a zip anyway, and in every workbook, the libraries ride along.
+		libs = (format === 'csv' && items.length === 1) ? [] : libraryExportSheets();
+		if (format === 'csv' && items.length === 1) {
+			name = pre + part(items[0], '-') + '.csv';
+			data = E.lpnTableCsv(items[0].data.heads, items[0].data.cells);
+			mime = PANE_EXPORT_MIME.csv;
 		} else {
-			name = pre + (multiTables ? (pc.lpn_tables_menu || 'Tables') : items[0].table);
+			name = pre + (multiTables ? (pc.lpn_tables_menu || 'Tables') : (items.length === 1 ? part(items[0], '-') : paneSanitizeFileName(items[0].table)));
 			if (format === 'csv') {
 				var used = {};
 				name += '.zip';
 				mime = PANE_EXPORT_MIME.zip;
 				data = E.lpnZipStore(items.map(function (it) {
-					var base = part(it, '-'), n = base, k = 1;
-					while (used[n.toLowerCase()]) { k++; n = base + ' (' + k + ')'; }
+					return { base: part(it, '-'), heads: it.data.heads, rows: it.data.cells };
+				}).concat(libs.map(function (l) {
+					return { base: paneSanitizeFileName(l.name), heads: l.heads, rows: l.rows };
+				})).map(function (f) {
+					var n = f.base, k = 1;
+					while (used[n.toLowerCase()]) { k++; n = f.base + ' (' + k + ')'; }
 					used[n.toLowerCase()] = true;
-					return { name: n + '.csv', data: new TextEncoder().encode(E.lpnTableCsv(it.data.heads, it.data.cells)) };
+					return { name: n + '.csv', data: new TextEncoder().encode(E.lpnTableCsv(f.heads, f.rows)) };
 				}));
 			} else {
 				name += '.' + format;
 				mime = PANE_EXPORT_MIME[format];
 				data = (format === 'ods' ? E.lpnTableOdsBook : E.lpnTableXlsxBook)(items.map(function (it) {
-					return { name: multiTables ? sheetPart(it) : (it.scn || it.table), heads: it.data.heads, rows: it.data.cells, numeric: it.data.numeric };
-				}));
+					return { name: multiTables ? sheetPart(it) : (items.length > 1 ? (it.scn || it.table) : sheetPart(it)),
+						heads: it.data.heads, rows: it.data.cells, numeric: it.data.numeric };
+				}).concat(libs));
 			}
 		}
 		downloadTextFile(name, data, mime);
 		setNotice((pc.lpn_status_inp_exported || 'Exported {file}.').replace('{file}', name));
 	}
-	function openExportTableBox() {
-		var pc = EngCalcs.pageConfig || {}, cur = activePaneTableSpec(), withScn = scenarios.length > 1, groups = {}, formats;
+	// **FILE, EXPORT TO, ODS / XLSX / CSV** (Tom, 2026-10-07: *"File, Export should not say 'Export
+	// table'. It should say File, Export to, and we are adding ODS/XLSX/CSV."*). The format is the row
+	// that was chosen; the box asks only which tables and, when the project has a scenario besides
+	// Base, which scenarios. Several CSV files go into one zip; several ODS or XLSX tables become one
+	// workbook with a sheet apiece, named for the table and, when scenarios are in play, the
+	// scenario. A table with no rows is left out of "all". Scenario results exist only for the
+	// scenario solved (the rule Show scenarios follows), so the others' result columns are blank.
+	function openExportTableBox(format) {
+		var pc = EngCalcs.pageConfig || {}, cur = activePaneTableSpec(), withScn = scenarios.length > 1, groups = {};
 		if (!EngCalcs.lpnTableCsv) { return; }
 		closeMenu();
 		function radioGroup(body, key, label, options) {
@@ -29466,9 +29542,7 @@ var EngCalcs = EngCalcs || {};
 			var el = groups[key] && groups[key].querySelector('input:checked');
 			return el ? el.value : '';
 		}
-		formats = [['csv', 'CSV'], ['ods', 'ODS'], ['xlsx', 'XLSX']];
 		openDialog(function (body) {
-			radioGroup(body, 'format', pc.lpn_export_table_format || 'Format', formats);
 			radioGroup(body, 'tables', pc.lpn_tables_menu || 'Tables', cur
 				? [['current', pc.lpn_export_table_current || 'Current'], ['all', pc.lpn_export_table_all || 'All']]
 				: [['current', pc.lpn_export_table_current || 'Current', 'off'], ['all', pc.lpn_export_table_all || 'All', 'on']]);
@@ -29486,10 +29560,10 @@ var EngCalcs = EngCalcs || {};
 			}
 		}, [
 			{ label: pc.lpn_export_table_go || 'Export', isDefault: true, fn: function () {
-				paneExportDownload(picked('format'), picked('tables') === 'all', withScn && picked('scenarios') === 'all');
+				paneExportDownload(format, picked('tables') === 'all', withScn && picked('scenarios') === 'all');
 			} },
 			{ label: pc.lpn_cancel || 'Cancel', cancel: true, fn: function () { } }
-		], { title: pc.lpn_export_table_title || 'Export table' });
+		], { title: (pc.lpn_export_table_title || 'Export to {format}').replace('{format}', format.toUpperCase()) });
 	}
 	// ---- the PROFILE panel (ROADMAP Task 409) ------------------------------
 	//
@@ -42262,7 +42336,21 @@ var EngCalcs = EngCalcs || {};
 			  tip: pc.lpn_file_export_inp_tip, fn: exportInpFile },
 			// GeoJSON (Task 728): same verb, same kind of file.
 			{ icon: 'save', label: pc.lpn_file_export_item_geojson || 'GeoJSON file…',
-			  tip: pc.lpn_file_export_geojson_tip, fn: exportGeoJsonFile }
+			  tip: pc.lpn_file_export_geojson_tip, fn: exportGeoJsonFile },
+			// **SEAM WITH feat/dxf**: its DXF row goes HERE, after GeoJSON and before the separator --
+			// the drawing formats together above, the table formats below.
+			// **THE TABLES, BY FORMAT** (Tom, 2026-10-07: *"File, Export to, and we are adding
+			// ODS/XLSX/CSV. And we include Libraries"*). Each row opens the box that asks which tables
+			// and which scenarios; the format is the row. Rows are named for the file, like the two
+			// above, under a heading that says what goes into it.
+			{ separator: true },
+			{ heading: true, label: pc.lpn_file_export_tables_heading || 'Tables and libraries' },
+			{ icon: 'save', label: pc.lpn_file_export_item_ods || 'ODS file…',
+			  tip: pc.lpn_file_export_tables_tip, fn: function () { openExportTableBox('ods'); } },
+			{ icon: 'save', label: pc.lpn_file_export_item_xlsx || 'XLSX file…',
+			  tip: pc.lpn_file_export_tables_tip, fn: function () { openExportTableBox('xlsx'); } },
+			{ icon: 'save', label: pc.lpn_file_export_item_csv || 'CSV file…',
+			  tip: pc.lpn_file_export_csv_tip, fn: function () { openExportTableBox('csv'); } }
 		];
 	}
 	function openFileMenu(anchor) {
@@ -42331,13 +42419,8 @@ var EngCalcs = EngCalcs || {};
 			// **AN EXPORT SUBMENU (Tom, 2026-10-06: "it's time to put all the exports into a
 			// submenu")**, the twin of Import above it and built the same way. Each row keeps its
 			// handler and tip; see exportMenuRows(), where a new export is one line.
-			{ icon: 'save', label: pc.lpn_file_export_menu || 'Export…', submenu: exportMenuRows },
+			{ icon: 'save', label: pc.lpn_file_export_menu || 'Export to…', submenu: exportMenuRows },
 		].concat([
-			// **SEAM WITH feat/geojson, which turns the rows above into an Export submenu**
-			// (exportMenuRows()): when it lands, move this row into that function. It sits below
-			// `].concat([` rather than beside Export EPANET file so the two branches merge without
-			// touching the same lines.
-			{ icon: 'save', label: pc.lpn_file_export_table || 'Export table…', fn: openExportTableBox },
 			{ separator: true },
 			// **The menu says Save and Save as… in every browser**, never "Download a copy": the
 			// paradigm we are ADOPTING has two names for writing a file, this page already spends

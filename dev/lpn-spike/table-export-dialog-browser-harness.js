@@ -1,4 +1,4 @@
-// FILE > EXPORT TABLE... IN A REAL CHROME: CSV, ODS AND XLSX, CURRENT OR ALL (Task 776).
+// FILE, EXPORT TO, ODS / XLSX / CSV FILE IN A REAL CHROME: CURRENT OR ALL, WITH LIBRARIES (Task 776).
 //
 //   node dev/lpn-spike/table-export-dialog-browser-harness.js
 //
@@ -7,15 +7,23 @@
 // possibly with a followup box to ask Tables and Scenarios, current or all to zip, ODS etc with same
 // questions."
 //
-// Clicks the real menu row, the real box and its real Export button on Net1's Junctions table, then
+// Tom, 2026-10-07: "File, Export should not say 'Export table'. It should say File, Export to, and we
+// are adding ODS/XLSX/CSV. And we include Libraries so that we can include Curve, Pattern, etc
+// references." and "the top row and the ID column stay put when you scroll: Bad. Doesn't work."
+//
+// Clicks the real File, Export to submenu row, the real box and its real Export button on Net1's
+// Junctions table, then
 // reads the DOWNLOADED BYTES with Python's zipfile and ElementTree (no spreadsheet program is
 // installed here, so the files are checked against their formats' own structure, not opened in one):
-//   1. A project with no scenario: the box has Format and Tables and no Scenarios question.
+//   1. A project with no scenario: the box is titled for its format and asks only Tables.
 //   2. CSV: BOM, CRLF, the headings and every row as the screen shows them.
 //   3. ODS: mimetype stored first, heading style wraps, columns have measured and unequal widths, the
 //      heading row and the ID column are frozen, numbers are floats whose text is the screen's text.
 //   4. XLSX: the same, as a frozen pane, wrapped heading style, column widths, numbers as numbers.
 //   5. Tables: All, ODS and XLSX: one sheet per table that has rows; CSV: a zip, one file each.
+//   5b. Libraries: a pipe type and a fittings list added through the real Libraries box; every
+//      workbook carries Patterns, Curves - Pump head, Pipe types and Fittings sheets whose IDs are
+//      the ones the asset tables name; a single CSV stays one file; a CSV zip carries them too.
 //   6. With a scenario: the Scenarios question appears; XLSX of the current table, all scenarios, has
 //      a sheet per scenario; CSV of all tables and all scenarios is a zip with a file per pair; the
 //      table on screen keeps its order and its scenario state.
@@ -231,28 +239,34 @@ async function main() {
 		const orderBefore = await idOrder();
 		ok('the Junctions table is on screen with rows', before.rows.length > 5, before.rows.length + ' rows, ' + before.heads.length + ' columns');
 
-		const rowLabel = await a.lang('lpn_file_export_table');
+		const exportMenu = (await a.lang('lpn_file_export_menu')).trim();
+		const rowFor = { ods: await a.lang('lpn_file_export_item_ods'), xlsx: await a.lang('lpn_file_export_item_xlsx'), csv: await a.lang('lpn_file_export_item_csv') };
 		const lbl = {
 			title: await a.lang('lpn_export_table_title'), go: await a.lang('lpn_export_table_go'),
 			tables: await a.lang('lpn_tables_menu'), scn: await a.lang('lpn_scenario_menu'), cancel: await a.lang('lpn_cancel')
 		};
-		const boxOpen = async () => {
-			await a.menuClick(rowLabel);
+		const boxOpen = async (format) => {
+			await a.menuClickSub(exportMenu, rowFor[format]);
 			await page.waitForSelector('#lpn_dialog', { state: 'visible' });
 		};
+		const libLbl = { pat: await a.lang('lpn_library_patterns'), cur: await a.lang('lpn_library_curves'),
+			typ: await a.lang('lpn_library_pipetypes'), fit: await a.lang('lpn_library_fittings') };
+		const esc = (t) => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+		const LIBS = new RegExp('^(' + [libLbl.pat, libLbl.typ, libLbl.fit].map((t) => esc(t) + '$').concat([esc(libLbl.cur) + ' - ']).join('|') + ')');
+		const boxTitle = () => page.evaluate(() => { const t = document.getElementById('lpn_dialog_title'); return t ? t.textContent.trim() : ''; });
 		const groups = () => page.evaluate(() => Array.from(document.querySelectorAll('#lpn_dialog_body .lpn-export-group')).map((g) => ({
 			head: g.firstChild.textContent, options: Array.from(g.querySelectorAll('input')).map((i) => i.value + (i.checked ? '*' : '') + (i.disabled ? '!' : ''))
 		})));
-		async function pick(format, tables, scenarios) {
-			await page.evaluate(([f, t, s]) => {
+		async function pick(tables, scenarios) {
+			await page.evaluate(([t, s]) => {
 				const set = (k, v) => { const e = document.getElementById('lpn_export_' + k + '_' + v); if (e) { e.checked = true; } };
-				set('format', f); set('tables', t); if (s) { set('scenarios', s); }
-			}, [format, tables, scenarios]);
+				set('tables', t); if (s) { set('scenarios', s); }
+			}, [tables, scenarios]);
 		}
 		// Press the box's own Export button with a real mouse click (detail 1) and take the download.
 		async function runExport(format, tables, scenarios) {
-			await boxOpen();
-			await pick(format, tables, scenarios);
+			await boxOpen(format);
+			await pick(tables, scenarios);
 			const [dl] = await Promise.all([page.waitForEvent('download'), page.evaluate((go) => {
 				const b = Array.from(document.querySelectorAll('#lpn_dialog_buttons button')).find((x) => x.textContent.trim() === go);
 				b.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, detail: 1 }));
@@ -265,10 +279,12 @@ async function main() {
 
 		// ---- 1. the box, in a project with no scenario ---------------------------------------
 		console.log('\n--- the box ---');
-		await boxOpen();
+		await boxOpen('xlsx');
 		let g = await groups();
-		ok('Format and Tables are asked, Scenarios is not (no scenario yet)', g.length === 2 && g[0].options.join() === 'csv*,ods,xlsx' && g[1].head === lbl.tables, JSON.stringify(g));
-		ok('Tables opens on Current', g[1].options[0] === 'current*', g[1].options.join());
+		const title = await boxTitle();
+		ok('the box is titled for the row chosen', title === lbl.title.replace('{format}', 'XLSX'), title);
+		ok('only Tables is asked: no Format (the row is the format), no Scenarios (no scenario yet)', g.length === 1 && g[0].head === lbl.tables, JSON.stringify(g));
+		ok('Tables opens on Current', g[0].options[0] === 'current*', g[0].options.join());
 		await page.evaluate((c) => {
 			Array.from(document.querySelectorAll('#lpn_dialog_buttons button')).find((x) => x.textContent.trim() === c)
 				.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, detail: 1 }));
@@ -291,7 +307,7 @@ async function main() {
 		let f = inspect(r.file, 'ods'), sh = f.sheets[0];
 		ok('ODS zip is sound, all entries stored, mimetype sniffable at byte 38', f.bad === null && f.stored && f.sniff, f.names.join(','));
 		ok('ODS carries a settings.xml', f.names.includes('settings.xml'));
-		ok('ODS has one sheet named for the table', f.sheets.length === 1 && /Junctions/.test(sh.name), sh.name);
+		ok('ODS opens on the table, named for it, the library sheets after it', /Junctions/.test(sh.name) && f.sheets.slice(1).every((x) => LIBS.test(x.name)), f.sheets.map((x) => x.name).join(', '));
 		ok('ODS cells equal the CSV cells (heading row and body)', JSON.stringify(sh.rows) === JSON.stringify(csv), sh.rows.length + ' rows');
 		ok('ODS heading cells wrap', sh.headStyleWrap === 'wrap');
 		ok('ODS heading row is the repeated header row', sh.headerRows === 1);
@@ -352,7 +368,8 @@ async function main() {
 		r = await runExport('xlsx', 'all');
 		f = inspect(r.file, 'xlsx');
 		const names = f.sheets.map((s) => s.name);
-		ok('XLSX of all tables: one sheet per table with rows', f.sheets.length >= 4 && names.includes('Junctions') && new Set(names).size === names.length && f.sheets.every((s) => s.rows.length > 1), names.join(', '));
+		const tableNames = names.filter((n) => !LIBS.test(n));
+		ok('XLSX of all tables: one sheet per table with rows, then the libraries', tableNames.length >= 4 && names.includes('Junctions') && new Set(names).size === names.length && f.sheets.every((s) => s.rows.length > 1), names.join(', '));
 		ok('every sheet is frozen and every sheet name is valid', f.sheets.every((s) => s.pane && s.pane.state === 'frozen' && s.name.length <= 31 && !/[\[\]*?:\/\\]/.test(s.name)));
 		r = await runExport('ods', 'all');
 		f = inspect(r.file, 'ods');
@@ -361,6 +378,56 @@ async function main() {
 		f = inspect(r.file, 'zip');
 		ok('CSV of all tables is a zip with one .csv per table', /\.zip$/.test(r.name) && f.bad === null && f.names.length === names.length && f.names.every((n) => /\.csv$/.test(n)), r.name + ': ' + f.names.join(', '));
 		ok('the table on screen is untouched', (await idOrder()) === orderBefore);
+
+		// ---- 5b. libraries -----------------------------------------------------------------------
+		console.log('\n--- libraries ---');
+		await a.menuClick(await a.lang('lpn_library_menu'), 'edit');
+		await page.waitForSelector('#lpn_library_box', { state: 'visible' });
+		const libClick = async (sel, text) => page.evaluate(([sl, t]) => {
+			const b = sl ? document.querySelector(sl) : Array.from(document.querySelectorAll('#lpn_libbox_content button')).find((x) => x.textContent.trim() === t);
+			b.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, detail: 1 }));
+		}, [sel, text]);
+		await libClick('#lpn_libbox_link_pipetypes');
+		await libClick(null, await a.lang('lpn_library_pipetype_add'));
+		await a.settle(200);
+		await page.evaluate(() => {
+			const i = document.querySelector('#lpn_libbox_content input[type=number]');
+			i.value = '8'; i.dispatchEvent(new Event('change', { bubbles: true }));
+		});
+		await libClick('#lpn_libbox_link_fittings');
+		await libClick(null, await a.lang('lpn_library_fittings_add'));
+		await a.settle(200);
+		await libClick(null, await a.lang('lpn_fitting_add'));
+		await a.settle(200);
+		const fitRow = await page.evaluate(() => {
+			const sel = document.querySelector('#lpn_libbox_content select');
+			return sel ? sel.options[sel.selectedIndex].text : null;
+		});
+		await page.evaluate(() => { const x = document.getElementById('lpn_libbox_close'); if (x) { x.click(); } });
+		await a.settle(200);
+		r = await runExport('xlsx', 'all');
+		f = inspect(r.file, 'xlsx');
+		const byName = {};
+		f.sheets.forEach((x) => { byName[x.name] = x; });
+		const pat = byName[libLbl.pat], crv = f.sheets.find((x) => x.name.indexOf(libLbl.cur + ' - ') === 0),
+			typ = byName[libLbl.typ], fit = byName[libLbl.fit];
+		ok('the workbook carries a sheet per library: patterns, curves by type, pipe types, fittings', !!pat && !!crv && !!typ && !!fit, Object.keys(byName).join(', '));
+		ok('Patterns: Net1 pattern 1, its 12 multipliers across, as numbers', !!pat && pat.rows[1][0] === '1' && pat.rows[1].slice(1).map(Number).join() === '1,1.2,1.4,1.6,1.4,1.2,1,0.8,0.6,0.4,0.6,0.8' && pat.floats[1][1] !== null, pat && JSON.stringify(pat.rows[1]));
+		ok('Curves: Net1 curve 1, one point 1500 by 250, headed as the Library heads a pump head curve', !!crv && crv.rows.length === 2 && crv.rows[1][0] === '1' && crv.rows[1][2] === '1500' && crv.rows[1][3] === '250' && /\(/.test(crv.rows[0][2]), crv && JSON.stringify(crv.rows));
+		ok('Pipe types: the type added in the Library, its diameter 8, blank where it states nothing', !!typ && typ.rows.length === 2 && typ.rows[1][2] === '8' && typ.rows[1].slice(3).every((v) => v === ''), typ && JSON.stringify(typ.rows));
+		ok('Fittings: the list added, one row per fitting, named as the Library names it, quantity 1', !!fit && fit.rows.length === 2 && fit.rows[1][2] === fitRow && fit.rows[1][3] === '1' && fit.floats[1][4] !== null, fit && JSON.stringify(fit.rows) + ' vs ' + fitRow);
+		ok('every library sheet is frozen on its ID column', [pat, crv, typ, fit].every((x) => x && x.pane && x.pane.state === 'frozen' && x.rows[0][0] === 'ID'));
+		const pumps = f.sheets.find((x) => /Pumps/.test(x.name));
+		const curveCol = pumps ? pumps.rows[0].findIndex((h) => /curve/i.test(h)) : -1;
+		ok('the curve a pump names is found by ID on the Curves sheet', curveCol > 0 && crv.rows.slice(1).some((row) => row[0] === pumps.rows[1][curveCol]), pumps && JSON.stringify([pumps.rows[0][curveCol], pumps.rows[1][curveCol]]));
+		r = await runExport('ods', 'current');
+		f = inspect(r.file, 'ods');
+		ok('ODS of the current table carries the same four library sheets, each frozen', f.sheets.length === 5 && f.sheets.slice(1).every((x) => LIBS.test(x.name) && (f.settings[x.name] || {}).VerticalSplitMode === '2'), f.sheets.map((x) => x.name).join(', '));
+		r = await runExport('csv', 'current');
+		ok('one table to CSV is still one .csv file, no zip', /Junctions\.csv$/.test(r.name), r.name);
+		r = await runExport('csv', 'all');
+		f = inspect(r.file, 'zip');
+		ok('a CSV zip carries a file per library too', [libLbl.pat, libLbl.typ, libLbl.fit].every((n) => f.names.includes(n + '.csv')) && f.names.some((n) => n.indexOf(libLbl.cur + ' - ') === 0), f.names.join(', '));
 
 		// ---- 6. scenarios ----------------------------------------------------------------------
 		console.log('\n--- scenarios ---');
@@ -374,9 +441,9 @@ async function main() {
 		await a.settle(1500);
 		await page.click('#lpn_pane_tab_junctions');
 		await a.settle(500);
-		await boxOpen();
+		await boxOpen('ods');
 		g = await groups();
-		ok('with a scenario the box also asks Scenarios', g.length === 3 && g[2].head === lbl.scn, JSON.stringify(g.map((x) => x.head)));
+		ok('with a scenario the box also asks Scenarios', g.length === 2 && g[1].head === lbl.scn, JSON.stringify(g.map((x) => x.head)));
 		const noteShown = () => page.evaluate(() => { const n = document.getElementById('lpn_export_scn_note'); return !!n && n.textContent.length > 0; });
 		ok('the results note is hidden while Scenarios is Current', !(await noteShown()));
 		await page.evaluate(() => { const e = document.getElementById('lpn_export_scenarios_all'); e.checked = true; e.dispatchEvent(new Event('change', { bubbles: true })); });
@@ -388,17 +455,19 @@ async function main() {
 		await a.settle(200);
 		r = await runExport('xlsx', 'current', 'all');
 		f = inspect(r.file, 'xlsx');
+		f.sheets = f.sheets.filter((x) => !LIBS.test(x.name));
 		ok('XLSX, current table, all scenarios: a sheet per scenario', f.sheets.length === 2 && /Peak/.test(f.sheets.map((s) => s.name).join()) && f.sheets.some((s) => /Base/.test(s.name)), f.sheets.map((s) => s.name).join(', '));
 		ok('each scenario sheet has the table\'s rows and no Scenario column', f.sheets.every((s) => s.rows.length === before.rows.length + 1 && s.rows[0].join() === before.heads.join()), JSON.stringify(f.sheets.map((s) => [s.rows.length, s.rows[0].length])) + ' ' + before.rows.length);
 		r = await runExport('csv', 'current', 'current');
 		ok('CSV, current scenario: one file named with the scenario', /Junctions-A_B_ C_ Peak\.csv$/.test(r.name), r.name);
 		r = await runExport('xlsx', 'all', 'all');
 		f = inspect(r.file, 'xlsx');
+		f.sheets = f.sheets.filter((x) => !LIBS.test(x.name));
 		ok('workbook sheet names keep the scenario and stay within 31 characters, unique', f.sheets.every((x) => x.name.length <= 31 && /Peak/.test(x.name) || /Base/.test(x.name)) && new Set(f.sheets.map((x) => x.name.toLowerCase())).size === f.sheets.length, f.sheets.map((x) => x.name).join(' | '));
 		r = await runExport('csv', 'all', 'all');
 		f = inspect(r.file, 'zip');
 		const nJ = f.names.filter((n) => /Junctions-/.test(n));
-		ok('CSV of all tables and all scenarios: a zip with a file per table and scenario', f.bad === null && nJ.length === 2 && f.names.length >= 8 && f.names.every((n) => !/[\/\\:*?"<>|]/.test(n)), f.names.join(', '));
+		ok('CSV of all tables and all scenarios: a zip with a file per table and scenario', f.bad === null && nJ.length === 2 && f.names.length >= 8 && f.names.includes('Patterns.csv') && f.names.every((n) => !/[\/\\:*?"<>|]/.test(n)), f.names.join(', '));
 		ok('the table on screen keeps its order, and still shows no scenario column', (await idOrder()) === orderBefore && !(await screen()).heads.includes(await a.lang('lpn_scenario_label')));
 		ok('no page errors', a.errors.length === 0, a.errors.join(' | ').slice(0, 300));
 	} finally {
