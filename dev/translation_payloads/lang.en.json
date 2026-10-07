@@ -87,6 +87,8 @@
         "points_data_heading": "Calculator data<br \/>(use Copy to see format)",
         "points_data_copy": "Copy",
         "points_data_paste": "Paste",
+        "points_data_msg_line": "Nothing was pasted. Line {n} could not be read as a station and an elevation.",
+        "points_data_msg_none": "Nothing was pasted. No station and elevation pairs were found.",
         "calc_inputs": "Inputs",
         "calc_results": "Results",
         "view_hide_line": "Hide this line",
@@ -2373,7 +2375,7 @@
         "lpn_diag_pda_pressures": "Required pressure must be greater than Minimum pressure. Change one of them in Settings.",
         "lpn_inp_drop_pressure_unit": "This file states a pressure unit other than the one this page reads for its flow unit, which is psi for US units and meters otherwise. Every pressure in the file is read that way, so check the valve settings, emitters, and pressure driven limits it holds. The line is kept and is written back."
     },
-    "count": 2371,
+    "count": 2373,
     "active_prefixes": [
         "about",
         "bpn",
