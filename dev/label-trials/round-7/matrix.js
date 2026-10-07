@@ -10,18 +10,18 @@
 
 const path = require('path');
 
-const WT = '/home/haws/webdev/worktrees';
 const HERE = __dirname;
-// The entrants. A7-D7 are the four builders' round-7 placers, read from their worktrees; FREEZE them
-// (record each file's commit and sha256 in the round record) before scoring starts. A6-D6 are their
+// The entrants. A7-D7 are the four builders' round-7 placers, frozen 2026-10-07 in ./frozen from their
+// branches' heads: A 2883c033 (sha256 12e5cad68767), B 18cac708 (493406be5439), C 4dc27ea1
+// (2de9fc6470c3), D 2e5e81c4 (ca198b8d5cc0); their strategy cards beside them. A6-D6 are their
 // round-6 placers, frozen in ./frozen (sha256 e14958e44ebc, d75fee62e228, a21a307a8ad7, 9924a126a244,
 // the same files round 6 scored). R and M are the pilot's repair pass (round-7-pilot/repair.js,
 // mode 'strict'): R on round 6's C, M on an empty map (the measurer alone).
 const PLACERS = {
-	A7: { path: WT + '/feat-label-placer-a/engcalcs/js/lpn-placer-a.js', builder: 'A' },
-	B7: { path: WT + '/feat-label-placer-b/engcalcs/js/lpn-placer-b.js', builder: 'B' },
-	C7: { path: WT + '/feat-label-placer-c/engcalcs/js/lpn-placer-c.js', builder: 'C' },
-	D7: { path: WT + '/feat-label-placer-d/engcalcs/js/lpn-placer-d.js', builder: 'D' },
+	A7: { path: path.join(HERE, 'frozen/placer-a-r7.js'), builder: 'A' },
+	B7: { path: path.join(HERE, 'frozen/placer-b-r7.js'), builder: 'B' },
+	C7: { path: path.join(HERE, 'frozen/placer-c-r7.js'), builder: 'C' },
+	D7: { path: path.join(HERE, 'frozen/placer-d-r7.js'), builder: 'D' },
 	A6: { path: path.join(HERE, 'frozen/placer-a-r6.js'), builder: 'A' },
 	B6: { path: path.join(HERE, 'frozen/placer-b-r6.js'), builder: 'B' },
 	C6: { path: path.join(HERE, 'frozen/placer-c-r6.js'), builder: 'C' },

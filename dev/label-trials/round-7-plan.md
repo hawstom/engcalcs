@@ -411,10 +411,21 @@ first half is scored; and the runners in `dev/label-trials/round-7/` (`matrix.js
 `score-one.js`, `score-all.js`, `analyse.js`), smoke-tested on the pilot's networks (E0 and E3 with
 C6, R and M: 82 cells, none failed; C6 and R reproduce the pilot's 69.8% and 72.3%).
 
+**Frozen 2026-10-07, before any scoring** (this commit is the protocol's final form): A7 from
+`feat/label-placer-a` 2883c033 (sha256 `12e5cad68767`), B7 from 18cac708 (`493406be5439`), C7 from
+4dc27ea1 (`2de9fc6470c3`), D7 from 2e5e81c4 (`ca198b8d5cc0`), copied to `round-7/frozen/` with each
+builder's `STRATEGY.md`; `matrix.js` scores the copies.
+
+**Known before scoring, stated here so it cannot be read as found after:** the round-6 placers never
+drop the ID (they predate Tom's 2026-10-06 yes), so every one of them breaks the drop order on nearly
+every cut label and shows bare IDs, about a third the width of the bare values the round-7 placers
+show. H1 compares realizable room, not labels shown, partly for this reason, but its labels-shown
+condition ("does not fall by more than one point") is confounded by it and will be read with that
+in mind. Builder B disclosed reading Part B of the rules (round record, "Disclosure").
+
 Left:
 
-1. **Freeze A7-D7** when the builders finish: record each placer's commit and sha256 in the round
-   record, then commit this protocol's final form before any scoring.
+1. (Done above.)
 2. **Delivering to builders without the judges.** Do not merge `feat/label-placer` into the builder
    branches: it carries `judges/` (now with `r1.js` and `room-held.js`) and all of
    `dev/label-trials/`, this plan included. Check out only the public paths instead, in each builder
