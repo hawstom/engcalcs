@@ -22,11 +22,19 @@
 //
 // Seating: hand-placed labels first, where the user put them. Then every other label, smallest
 // first and most crowded first, so that as many labels as possible are shown before any label
-// shows a property (G). Then each label grows a row at a time while there is room; a repair pass
-// lets a label that is still short of rows, hidden, or drawn level against the setting push at
-// most two neighbours elsewhere (or trim them a row) when that shows more in all; and a polish
-// pass lets each label re-seat itself to cut crossings. Last view's place is offered back to each
-// label with a bonus, so a label moves only when that buys something.
+// shows a property (G). The smallest form is what the user's drop order leaves last, the ID being
+// a value like any other (R1). Then each label grows a row at a time while there is room; a repair
+// pass lets a label that is still short of rows, hidden, or drawn level against the setting push
+// at most two neighbours elsewhere (or trim them a row) when that shows more in all; and a polish
+// pass lets each label re-seat itself to cut crossings. Then the rescue: every label still hidden
+// searches densely (every 15 degrees, every half row out to 4 rows) at a tighter clearance from
+// its neighbours, evicting neighbours if it must; every label grows again with the dense places;
+// and a pipe label still level against the setting takes an along place if one fits (R14). Last
+// view's place is offered back to each label with a bonus, so a label moves only when that buys
+// something. The work stops at a clock budget, never a count (R10, R1's second half).
+//
+// Each ingredient can be switched off by name for measurement (PLACER_D_OFF=a,b in node, or
+// EngCalcs.lpnPlacerD.off); js/STRATEGY.md lists them with what each buys.
 //
 // Time (R10, R15): candidates, their leaders and their boxes come from a pool kept across layouts,
 // so a layout allocates little; pauses warm the placer up on the real network (H-b).
