@@ -1213,49 +1213,223 @@ EngCalcs.lpnCollide = (function () {
 			if ((a.priority || 0) !== (b.priority || 0)) { return (b.priority || 0) - (a.priority || 0); }
 			return a.id < b.id ? -1 : (a.id > b.id ? 1 : 0);
 		});
-		order.forEach(function (lbl) {
-			var sides = lbl.sides && lbl.sides.length ? lbl.sides : [lbl.home],
-				chosen = null, chosenBox = null, i, c, b, verdict,
-				fallback = null, fallbackBox = null;
+		// **CLEAN GROUND FIRST** (the label bench's rule 1, the first of the three ports agreed on
+		// 2026-10-07; dev/label-trials on feat/label-placer). A side is CLEAN when it is clear of
+		// every hard obstacle, no pipe runs under any of its rows, no pipe label would have to yield
+		// to it, and its leader passes through no other node's symbol. The first sweep seats, in drop
+		// order, every label that has clean ground and nobody else; the last sweep gives the labels
+		// still waiting the old answer (a clear side even with a pipe under it, else a yielding one).
+		// So a pipe crossing goes only to a label that would otherwise hide, and never takes ground a
+		// lower-ranked label could have had clean. Measured on the bench's 64 generated sets (320
+		// views) against master: labels shown 38.2 -> 38.3 in 100 asked, labels on a pipe 32.4 ->
+		// 23.9 per 100 shown, leaders through a node 697 -> 407, the page pass about 8% slower.
+		// `opts.clean === false` is the old single sweep, kept for the harness that measures it.
+		var clean = opts.clean !== false, waiting = [], seat = {};
+		function sidesOf(lbl) { return lbl.sides && lbl.sides.length ? lbl.sides : [lbl.home]; }
+		function commit(lbl, sides, c, b) {
+			// EVERY line box is committed, so the next label sees the staircase this one really
+			// occupies rather than a rectangle around it.
+			b.forEach(function (cb) { index.addBox(obs.boxes.push(cb) - 1); });
+			return { id: lbl.id, x: c.x, y: c.y, dx: c.x - lbl.home.x, dy: c.y - lbl.home.y,
+				dropped: false, side: sides.indexOf(c),
+				// `box` stays the ONE box a reader draws and counts (?debug=boxes, the bench's
+				// overlap count); `boxes` is what the pass actually reserved.
+				box: labelBoxAtEnd(lbl, c), boxes: b, leader: null };
+		}
+		// The first sweep: CLEAN ground only. It also notes the first side that was not blocked
+		// outright, because ground only fills up between the sweeps: every side before that one is
+		// still blocked when the last sweep comes back for this label, so it starts there.
+		var startAt = {};
+		function placeClean(lbl) {
+			var sides = sidesOf(lbl), i, c, b, verdict, first = -1;
 			index.near(lbl.anchor.x, lbl.anchor.y, lbl._reach, local);
 			for (i = 0; i < sides.length; i++) {
+				c = sides[i];
+				b = labelLineBoxes(lbl, c);
+				verdict = boxesClearOf(b, local, pad, lbl.id);
+				if (verdict === 'blocked') { continue; }
+				if (first < 0) { first = i; }
+				if (verdict === 'clear' && !boxesOnLink(b, local, lbl.id) && !leaderThroughSymbol(lbl, c, local)) {
+					return commit(lbl, sides, c, b);
+				}
+			}
+			startAt[lbl.id] = first < 0 ? sides.length : first;
+			return null;
+		}
+		// The last sweep, and the whole of the pass when `clean` is off: the first clear side, a pipe
+		// under it or not, else the first side held only by labels this one outranks, else a drop.
+		function placeAny(lbl, from) {
+			var sides = sidesOf(lbl), i, c, b, verdict, fallback = null, fallbackBox = null;
+			index.near(lbl.anchor.x, lbl.anchor.y, lbl._reach, local);
+			for (i = from || 0; i < sides.length; i++) {
 				c = sides[i];
 				// The STAIRCASE, not the block (Task 406): asking about the block would call a side
 				// occupied because of ground the short rows never cover.
 				b = labelLineBoxes(lbl, c);
 				verdict = lbl.dragged ? 'clear' : boxesClearOf(b, local, pad, lbl.id);
-				if (verdict === 'clear') { chosen = c; chosenBox = b; break; }
+				if (verdict === 'clear') { return commit(lbl, sides, c, b); }
 				// **A SIDE HELD ONLY BY SOMETHING THIS LABEL OUTRANKS IS KEPT AS A FALLBACK, not
 				// taken immediately.** A genuinely clear side on the other hand is still better, so
 				// the preferred-side-first order has to finish before this is used. Dropping while
 				// such a side existed is the ranking working backwards.
 				if (verdict === 'yielding' && !fallback) { fallback = c; fallbackBox = b; }
 			}
-			if (!chosen && fallback) { chosen = fallback; chosenBox = fallbackBox; }
-			if (!chosen) {
-				// **DROPPED: NOTHING IS COMMITTED.** A label nobody can see is not an obstacle, so it
-				// must not go into the index -- otherwise it keeps ground clear for a label that is
-				// not drawn, and the drawing ends up emptier than the conflict warranted.
-				out.push({ id: lbl.id, x: lbl.home.x, y: lbl.home.y, dx: 0, dy: 0,
-					dropped: true, side: -1, box: null, leader: null });
-				return;
-			}
-			// EVERY line box is committed, so the next label sees the staircase this one really
-			// occupies rather than a rectangle around it.
-			chosenBox.forEach(function (cb) { index.addBox(obs.boxes.push(cb) - 1); });
-			out.push({ id: lbl.id, x: chosen.x, y: chosen.y,
-				dx: chosen.x - lbl.home.x, dy: chosen.y - lbl.home.y,
-				dropped: false, side: sides.indexOf(chosen),
-				// `box` stays the ONE box a reader draws and counts (?debug=boxes, the bench's
-				// overlap count); `boxes` is what the pass actually reserved.
-				box: labelBoxAtEnd(lbl, chosen), boxes: chosenBox, leader: null });
+			if (fallback) { return commit(lbl, sides, fallback, fallbackBox); }
+			// **DROPPED: NOTHING IS COMMITTED.** A label nobody can see is not an obstacle, so it
+			// must not go into the index -- otherwise it keeps ground clear for a label that is not
+			// drawn, and the drawing ends up emptier than the conflict warranted.
+			return { id: lbl.id, x: lbl.home.x, y: lbl.home.y, dx: 0, dy: 0,
+				dropped: true, side: -1, box: null, leader: null };
+		}
+		order.forEach(function (lbl) {
+			var r = (clean && !lbl.dragged) ? placeClean(lbl) : placeAny(lbl);
+			if (r) { seat[lbl.id] = r; } else { waiting.push(lbl); }
 		});
+		waiting.forEach(function (lbl) { seat[lbl.id] = placeAny(lbl, startAt[lbl.id]); });
+		// RULE 2: a label both sweeps dropped gets the denser rescue search. `rescue: false` is the
+		// pass without it, kept for the harness that measures it.
+		if (opts.rescue !== false) { rescueDropped(order, seat, obs, pad, opts.leaderMin > 0 ? opts.leaderMin : 0); }
+		// The result keeps the drop order, so a reader of `out` sees the same sequence either way.
+		order.forEach(function (lbl) { out.push(seat[lbl.id]); });
 		// **THE INPUTS COME BACK EXACTLY AS THEY WENT IN.** placeLabels() makes the same promise, and
 		// for the same reason: a pass that scribbles on its arguments cannot be run twice on one
 		// drawing to check that it agrees with itself, which is the cheapest strong assertion there
 		// is -- and it is asserted.
 		labels.forEach(function (l) { delete l._reach; });
 		return out;
+	}
+	// ---- the rescue search (the label bench's rule 2) ---------------------------------------------
+	//
+	// **A NODE LABEL THE TWO SWEEPS DROPPED GETS ONE MORE, DENSER LOOK BEFORE IT HIDES** (the second of
+	// the three ports agreed on 2026-10-07; dev/label-trials on feat/label-placer, strategy 3 of the
+	// phase-1 summary). Its own `sides` are the four corners and a raster in the widest open arc, out
+	// to about three symbol offsets; ground further out, or in a narrower gap between its pipes, was
+	// never asked about. So every label still dropped tries leader ends on rays every 15 degrees (none
+	// orthogonal, as everywhere else on this map), at every half row out to RESCUE_ROWS rows, nearest
+	// first.
+	//
+	// **IT ONLY ADDS.** It runs after both sweeps, in drop order, and takes only ground that is clear:
+	// nothing yields to it, so no label that was drawn is moved or hidden for a rescued one. Its
+	// leader is longer than a corner's, so it must also be clean of what a long leader can hit: it
+	// passes through no node symbol (N3) and no label's text, crosses no other node label's leader,
+	// and its rows lie on no leader. Those are refusals, not costs.
+	//
+	// **CLEAN GROUND FIRST HOLDS HERE TOO** (rule 1): among the rescue spots a label takes the nearest
+	// one with no pipe under its rows, and a spot with a pipe under it only when no clean one exists,
+	// because a rescued label is one that would otherwise hide. That fallback is most of what this
+	// buys and it is not free: measured on the bench's 64 generated sets (320 views) against master,
+	// labels shown 38.3 -> 39.3 in 100 asked (values 25.7 -> 26.9), labels on a pipe 23.9 -> 26.2 per
+	// 100 shown, the page pass about 7% slower (paired median). Clean spots only gave 38.7 in 100 asked
+	// with labels on a pipe unchanged at 23.8.
+	var RESCUE_ROWS = 4;
+	var RESCUE_ANGLES = (function () {
+		// 315 is top-right in y-down bearings, the corner the four fixed sides try first; the rest
+		// fan out from it, so a tie in distance goes to the conventional side.
+		var out = anglesAt(15);
+		function off(a) { var d = Math.abs(a - 315) % 360; return d > 180 ? 360 - d : d; }
+		out.sort(function (a, b) { return (off(a) - off(b)) || (a - b); });
+		return out.map(function (a) { return [Math.cos(a * Math.PI / 180), Math.sin(a * Math.PI / 180)]; });
+	}());
+	function rescueRow(lbl) { return lbl.h / Math.max(1, lbl.lines && lbl.lines.length ? lbl.lines.length : 1); }
+	function rescueCandidates(lbl) {
+		var row = rescueRow(lbl), out = [], k, m;
+		for (k = 1; k <= RESCUE_ROWS * 2; k++) {
+			for (m = 0; m < RESCUE_ANGLES.length; m++) {
+				out.push({ x: lbl.anchor.x + RESCUE_ANGLES[m][0] * k * row / 2,
+					y: lbl.anchor.y + RESCUE_ANGLES[m][1] * k * row / 2 });
+			}
+		}
+		return out;
+	}
+	// The rescue itself. `seat` is the two sweeps' answer by id and is completed in place; `obs` is the
+	// pass's own working copy (the committed rows are already in it). `leaderMin` is the length under
+	// which the page draws no leader, so such a leader cannot cross anything a reader sees.
+	function rescueDropped(order, seat, obs, pad, leaderMin) {
+		var dropped = order.filter(function (l) { return !l.dragged && seat[l.id] && seat[l.id].dropped; }),
+			reach = 0, index, local = { boxes: [], segments: [] }, byId = {};
+		if (!dropped.length) { return; }
+		order.forEach(function (l) { byId[l.id] = l; });
+		// The node leaders already seated become obstacles a rescued label's rows may not lie on.
+		// Only for this sweep: the two before it never drew a leader into the obstacle list, and
+		// the gang repair afterwards still judges crossings against the whole drawing.
+		order.forEach(function (l) {
+			var r = seat[l.id];
+			if (!r || r.dropped) { return; }
+			if (Math.hypot(r.x - l.anchor.x, r.y - l.anchor.y) <= leaderMin) { return; }
+			obs.segments.push(segment(l.anchor.x, l.anchor.y, r.x, r.y, 'leader', l.id));
+		});
+		dropped.forEach(function (l) {
+			reach = Math.max(reach, RESCUE_ROWS * rescueRow(l) + Math.hypot(l.w, l.h) + pad);
+		});
+		// Its own grid: the reach is longer than the sweeps', and a grid answers only queries no
+		// wider than its cell.
+		index = grid(reach, obs);
+		obs.boxes.forEach(function (b, i) { index.addBox(i); });
+		obs.segments.forEach(function (g, i) { index.addSegment(i); });
+		function leaderOk(lbl, c) {
+			var g, i, o;
+			if (Math.hypot(c.x - lbl.anchor.x, c.y - lbl.anchor.y) <= leaderMin) { return true; }
+			g = segment(lbl.anchor.x, lbl.anchor.y, c.x, c.y, 'leader', lbl.id);
+			for (i = 0; i < local.boxes.length; i++) {
+				o = local.boxes[i];
+				if (o.owner !== undefined && o.owner === lbl.id) { continue; }
+				if (o.kind === 'symbol') {
+					// Its own symbol holds the anchor, and every leader starts inside it.
+					if (Math.abs(o.cx - lbl.anchor.x) <= o.w / 2 && Math.abs(o.cy - lbl.anchor.y) <= o.h / 2) { continue; }
+				} else if (o.kind !== 'label') { continue; }
+				if (segmentInBoxFraction(g, o) > 0) { return false; }
+			}
+			for (i = 0; i < local.segments.length; i++) {
+				o = local.segments[i];
+				if (o.kind !== 'leader' || o.owner === lbl.id) { continue; }
+				if (segmentsCross(g, o)) { return false; }
+			}
+			return true;
+		}
+		// **THE SAME 'clear' boxesClearOf() GIVES, ASKED THROUGH A FINE INDEX.** Only 'clear' is
+		// taken here (nothing yields to a rescue), and a dropped label owns nothing on the drawing,
+		// so the question is simply whether any box overlaps a padded row or any leader runs through
+		// one. A rescue asks it at 160 spots a label, and boxIndex() answers it from the few boxes
+		// near the row rather than from everything within the long reach; that is the difference
+		// between a rescue costing a few percent of the pass and a third of it.
+		var boxIdx = boxIndex(obs.boxes), leaders = [];
+		function rowsClear(b) {
+			var k, j, q;
+			for (k = 0; k < b.length; k++) {
+				q = pad > 0 ? box(b[k].cx, b[k].cy, b[k].w + 2 * pad, b[k].h + 2 * pad, b[k].a) : b[k];
+				if (boxIdx.anyOverlap(q)) { return false; }
+				for (j = 0; j < leaders.length; j++) {
+					if (segmentInBoxFraction(leaders[j], q) > 0) { return false; }
+				}
+			}
+			return true;
+		}
+		dropped.forEach(function (lbl) {
+			var cands = rescueCandidates(lbl), i, c, b, fallback = null, fallbackBox = null, chosen = null,
+				chosenBox = null, sides = lbl.sides && lbl.sides.length ? lbl.sides : [lbl.home];
+			index.near(lbl.anchor.x, lbl.anchor.y, RESCUE_ROWS * rescueRow(lbl) + Math.hypot(lbl.w, lbl.h) + pad, local);
+			leaders = local.segments.filter(function (g) { return g.kind === 'leader' && g.owner !== lbl.id; });
+			for (i = 0; i < cands.length; i++) {
+				c = cands[i];
+				b = labelLineBoxes(lbl, c);
+				if (!rowsClear(b)) { continue; }
+				if (!leaderOk(lbl, c)) { continue; }
+				if (!boxesOnLink(b, local, lbl.id)) { chosen = c; chosenBox = b; break; }
+				if (!fallback) { fallback = c; fallbackBox = b; }
+			}
+			if (!chosen) { chosen = fallback; chosenBox = fallbackBox; }
+			if (!chosen) { return; }
+			chosenBox.forEach(function (cb) { index.addBox(obs.boxes.push(cb) - 1); });
+			if (Math.hypot(chosen.x - lbl.anchor.x, chosen.y - lbl.anchor.y) > leaderMin) {
+				index.addSegment(obs.segments.push(segment(lbl.anchor.x, lbl.anchor.y, chosen.x, chosen.y,
+					'leader', lbl.id)) - 1);
+			}
+			// `side` one past the end of `sides` says "a rescue spot" and stays a number for the
+			// readers that compare it; `rescued` says so by name.
+			seat[lbl.id] = { id: lbl.id, x: chosen.x, y: chosen.y, dx: chosen.x - lbl.home.x,
+				dy: chosen.y - lbl.home.y, dropped: false, side: sides.length, rescued: true,
+				box: labelBoxAtEnd(lbl, chosen), boxes: chosenBox, leader: null };
+		});
 	}
 	// **CLEAR MEANS CLEAR OF THE HARD OBSTACLES, AND THE RANKS SAY WHICH THOSE ARE.** A first-fit has
 	// no score, so the goal ladder cannot be read as magnitudes here -- but it still says everything
@@ -1309,6 +1483,36 @@ EngCalcs.lpnCollide = (function () {
 			if (v === 'yielding') { worst = 'yielding'; }
 		}
 		return worst;
+	}
+
+	// Does any row of this staircase lie on a pipe other than its own? The first-fit's CLEAN test
+	// (see placeLabelsFirstFit()). The raw rows, not the padded ones: a pipe that passes within the
+	// pad is not under the text, and the reader sees no crossing.
+	function boxesOnLink(boxes, obs, ownerId) {
+		var i, j, o;
+		for (j = 0; j < obs.segments.length; j++) {
+			o = obs.segments[j];
+			if (o.kind !== 'link') { continue; }
+			if (o.owner !== undefined && o.owner === ownerId) { continue; }
+			for (i = 0; i < boxes.length; i++) {
+				if (segmentInBoxFraction(o, boxes[i]) > 0) { return true; }
+			}
+		}
+		return false;
+	}
+
+	// Does the leader from the anchor to this endpoint pass through a symbol not its own (N3)? The
+	// first-fit draws no leader itself, but the renderer does, so ground reached across another
+	// node's symbol is not clean. The anchor's own symbol is the one that contains the anchor.
+	function leaderThroughSymbol(lbl, c, obs) {
+		var g = segment(lbl.anchor.x, lbl.anchor.y, c.x, c.y, 'leader', lbl.id), i, o;
+		for (i = 0; i < obs.boxes.length; i++) {
+			o = obs.boxes[i];
+			if (o.kind !== 'symbol') { continue; }
+			if (Math.abs(o.cx - lbl.anchor.x) <= o.w / 2 && Math.abs(o.cy - lbl.anchor.y) <= o.h / 2) { continue; }
+			if (segmentInBoxFraction(g, o) > 0) { return true; }
+		}
+		return false;
 	}
 
 	// ---- ROADMAP Task 539, phase one: COUNT the crossings ---------------------------------------

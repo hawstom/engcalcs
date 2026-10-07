@@ -113,7 +113,7 @@ L.applyToAll('J');
 ok('it keeps the name somebody chose', odd.id === 'Tank Farm', odd.id);
 ok('...while the numbered ones moved on', doc.nodes.filter(n => n.type === 'junction')
 	.some(n => n.id.indexOf('W') === 0));
-ok('...and the notice says how many were left alone', /left alone/.test(L.notice()), L.notice());
+ok('...and the notice says how many were not changed', /1 others were not changed/.test(L.notice()), L.notice());
 
 console.log('\n=== a link may take an id a node has: two namespaces, as in EPANET ===');
 // Point the LINK prefix at the junctions' own prefix. Every L-something wants an id a junction

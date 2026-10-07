@@ -266,7 +266,8 @@ console.log('\n--- the command is findable, and a coordinate is what a map gives
 	// August order, the menu changes back and this comment is the record of what that costs.**
 	ok('...the xy fallback sits below Open, and Import EPANET sits against Export',
 		lnSrc.indexOf('pc.lpn_file_convert_as') > lnSrc.indexOf('pc.lpn_file_open |') &&
-		lnSrc.indexOf('pc.lpn_file_import_inp') < lnSrc.indexOf('pc.lpn_file_export_inp'));
+		lnSrc.indexOf('pc.lpn_file_import_inp') > -1 &&
+		lnSrc.indexOf('pc.lpn_file_import_inp') < lnSrc.indexOf('pc.lpn_file_export_menu'));
 	ok('the in-place "Convert to lat/lon" command is gone, key and all',
 		lnSrc.indexOf('lpn_georef_menu') === -1 && lnSrc.indexOf('lpn_georef_tip') === -1);
 	// A GeoMap has to zoom out far enough to FIND a site, not just to look at one.

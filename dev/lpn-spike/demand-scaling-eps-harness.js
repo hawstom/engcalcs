@@ -110,7 +110,7 @@ function dsHost(which) {
 	ok('the Find answer is no longer marked', text(dsHost('search')).indexOf(PC.lpn_analyze_time_moved.split('{time}')[0]) < 0);
 	ok('...while the Run answer, still from 0:00, is', text(dsHost('scale')).indexOf(moved) >= 0);
 	ok('6:00 has an answer of its own', at6 !== at0, at0 + ' at 0:00, ' + at6 + ' at 6:00');
-	ok('the project is unchanged', JSON.stringify(L.getDoc()) === before);
+	ok('the document is unchanged', JSON.stringify(L.getDoc()) === before);
 
 	console.log(fails ? '\n' + fails + ' demand scaling EPS check(s) FAILED' : '\nDemand scaling EPS harness: all checks passed.');
 	process.exit(fails ? 1 : 0);

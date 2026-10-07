@@ -27,29 +27,61 @@ a parser that only understood the standard could not report a violation of it. `
 Not covered: hardcoded entities in `lib/HeadersFooters.lib.php` and per-page SEO meta tags, which are
 not language strings.
 
-### No house style for English source strings
+### House style: standard professional civil-engineering technical English
 
-**Tom, 2026-09-01: *"Anywhere you find anything addressing the need for a certain kind of English or
-language, just strike it. Let's trust our synonyms, glossary, scripts, and feedback procedures."***
+**Tom, 2026-10-07: *"Here and everywhere, now and forever, 'This project's own' is not standard
+technical English. Find the standard technical way to say what you want to say. And make standard
+professional civil engineering technical English the style guide for this project so I don't have
+to look at these AI-isms any more or be embarrassed by them."***
 
-**What stood here and is gone.** A rule telling writers to prefer "Simple English" in explanatory
-strings. It was read as a goal in itself and produced strings a hydraulic engineer does not
-recognise — `Rest pressure` for static pressure, `Pulled down` for drawdown, `settle` for converge,
-`Solves` for runs, and, after two rounds of written correction, `The usual value is {n}.` where the
-word is **default**. Tom, on that last one: *"please quit making up things to avoid the obvious
-terms."* Rewording the rule was tried, on the day, and struck too: a third qualification of a rule
-that had already failed twice is not a fix.
+**The register is that of the manuals an engineer already reads:** FHWA Hydraulic Engineering
+Circulars (HEC-14, HEC-22), the USACE HEC-RAS and HEC-HMS manuals, the EPA EPANET 2.2 user manual,
+and AWWA M-series manuals (M31, M32). Test a sentence against them: if it would look out of place
+in one of those, rewrite it. APA 7th still governs mechanics (below), and the em dash advisory
+still stands.
 
-**What replaces it: nothing, deliberately.** The mechanisms that were always the real ones carry it
-instead — `$ec_lang_syn` for what a translator cannot recover from the words, `glossary.json` for a
-concept that recurs, `dev/scripts/plain_english_swap_check.php` for substitutions that have actually
-shipped and been struck, and Tom reading `dev/new-english-keys.md`. Each of those is evidence about
-a specific string. A house style is a prediction about every future string, and this one predicted
-wrong every time it was applied.
+**What that register does, in practice:**
+- It uses the conventional term (static pressure, drawdown, converge, default, head loss) and
+  never a homemade plain-English substitute.
+- A message or tip is declarative and about the system, or imperative for a step. It does not
+  chat, reassure, joke, or address the reader as a friend.
+- Software, services, and hydraulic objects do not want, ask, say, know, decide, refuse, or sit.
+  Valves and pumps operate; a service returns an error; a file states a value.
+- It states a limitation once, plainly, without apology or hedge.
 
-**So: write the string. Do not reach for a simpler synonym of a word that already names something.**
-There is no register to hit, no word count to hit, and nothing here to cite in defence of replacing
-a conventional term.
+**AI-isms to avoid, with the technical-English replacement:**
+
+| Avoid | Write |
+|---|---|
+| this project's own X; EPANET's own X; its own X | the project X; the EPANET X; X (or "a separate X", "an individual X" where the contrast matters) |
+| your own system; your own copy; for your own purposes | the system being modeled; a copy; user-defined |
+| quietly, silently (of software behavior) | state the behavior: "without a message", "is not reported" |
+| honest, honestly | delete, or state the fact the word was vouching for |
+| lives in, sits on, holds still, follows you | is stored in, is shown in, stays fixed, applies to |
+| earns its place, worth opening, worth it | state the reason or delete |
+| came in, came across, on the way in, works out, worked out | was imported, is computed, is solved |
+| asks, says, wants, knows, refuses, gives up, answered (of software or water) | requests, states, returns, does not accept, stops, responded |
+| valves that open and close on their own | pressure and flow control valves (PRV, PSV, FCV) |
+| throw away, gone for good, behind your back, nothing is stopping, in one go | discard, permanently lost, without your action, another user can, in one operation |
+| Beware: | Warning: |
+| You can..., Feel free to..., Just..., simply, really | the imperative, or a plain statement; delete the filler |
+| is good, is okay, is ideal | is desirable, is acceptable, is recommended |
+| cute metaphors (the model is on the ground; the pictures say where you are looking) | the literal statement |
+| Do X and Y happens | Do X to get Y; If you do X, Y happens (ruling below) |
+
+Write new and edited strings in this register. A shipped string that breaks it is fixed when found,
+as the 2026-10-07 audit did (`dev/technical-english-audit.md`); that is a real defect, not a
+retranslation bill to avoid.
+
+**The rejected alternative, so it is not proposed again: "Simple English."** A rule preferring it
+stood here until 2026-09-01 and produced strings a hydraulic engineer does not recognise: `Rest
+pressure` for static pressure, `Pulled down` for drawdown, `settle` for converge, `Solves` for
+runs, and `The usual value is {n}.` where the word is **default**. Tom: *"please quit making up
+things to avoid the obvious terms."* Technical English is the opposite instruction: the manuals use
+the conventional term, so this house style forbids those substitutions rather than licensing them.
+The per-string mechanisms still carry their own jobs: `$ec_lang_syn` for what a translator cannot
+recover, `glossary.json` for a concept that recurs, `dev/scripts/plain_english_swap_check.php` for
+substitutions that shipped and were struck, and Tom reading `dev/new-english-keys.md`.
 
 **Identity strings (menu entry + `<title>`) match the authoritative published source's own
 terminology.** Robinson's paper is titled "Design of Rock Chutes", so `rc_main_menu` says "Rock
@@ -88,12 +120,11 @@ visitor-facing strings alike. What APA settles, in the order it will come up her
 - **Punctuation goes inside closing quotation marks**, and a colon introduces a list or an
   explanation only after a complete clause.
 
-**This does not reinstate the house style struck above, and reading it that way is the error to
-avoid.** A style guide answers *how is this written down*; the struck house style answered *what may
-be said*, and that is the one that licensed "rest pressure", "pulled down" and "settle" three times
-over. APA has no opinion about whether a string may say *drawdown*, and neither does this line.
-Nothing here overrides `plain_english_swap_check.php`, `$ec_lang_syn`, `glossary.json` or Tom's own
-reading of `dev/new-english-keys.md`, all of which remain the evidence a wording decision rests on.
+**APA settles how a string is written down; the technical-English house style above settles its
+register.** Neither licenses replacing a conventional term: APA has no opinion about whether a string
+may say *drawdown*, and the technical register requires it. Nothing here overrides
+`plain_english_swap_check.php`, `$ec_lang_syn`, `glossary.json` or Tom's own reading of
+`dev/new-english-keys.md`.
 
 **The one deliberate departure is the em dash**, which APA uses freely (closed up, no spaces) and
 this project does not, for the reason immediately below. Where the two disagree, the advisory wins.
@@ -106,8 +137,7 @@ thrust upon us. Avoid the lovely em dash until further notice, children."*
 **This is not a claim about good English and must not be read as one.** The dash is fine; the reader
 is not. It has become a machine-written tell, so a page that leans on it reads as generated whatever
 it says. That is an external bias with an expiry date, which is what "until further notice" is
-carrying. It is the one survivor of the struck house style, and it survives precisely because it is
-about how a page is RECEIVED rather than about which words are correct.
+carrying. It is about how a page is RECEIVED rather than about which words are correct.
 
 A semicolon or a comma usually does the job. Tom, 2026-08-23: *"while I probably was a heavy
 [Alt]+150 emdash user in the pre-AI age, I now find them a little embarrassing... very often a
