@@ -49,7 +49,7 @@
 	const MARGIN = 400;     // px beyond the viewport that the real-estate map covers
 	const EDGE = 80;        // px: a label this near the viewport's edge is always looked at afresh
 	// Costs, in the order of §3.1 (worst first), and what a shown row is worth.
-	const W_LDR_LDR = 3, W_LAB_LDR = 2.5, W_LAB_PIPE = 0.3, W_LDR_PIPE = 0.2;
+	const W_LDR_LDR = 3, W_LAB_LDR = 2.5, W_LAB_PIPE = 0.3, W_LDR_PIPE = 0.2, W_OWN_PIPE = 0.12;
 	const ROW_VALUE = 0.25;     // one more property row is worth this much crossing cost
 	const LABEL_CAP = 0.6;      // a label whose best spot costs more than this is dropped (two pipes)
 	const KEEP_CAP = 0.3;       // a label held from the last view is let go if a leader or a second pipe now crosses it
@@ -59,12 +59,13 @@
 	const RING_COST = 0.12;     // base cost of hanging on a leader
 	const RING_PER_PX = 0.006;  // cost per px of travel
 	const REACH_ROWS = 3;       // 'reach': leaders out to this many text rows, every 15 degrees
-	const DEADLINE_MS = 700;    // R10: a layout returns what it has placed by then (time, never a count)
+	const DEADLINE_MS = 700;
+	const TIMING = typeof process !== 'undefined' && process.env && !!process.env.LPN_PLACER_B_TIMING;    // R10: a layout returns what it has placed by then (time, never a count)
 
 	// ---- ingredients, each switchable (STRATEGY.md beside this file) ----------------------------
 	// Switch one off with create({off: ['repair']}) or, under the bench, the environment variable
 	// LPN_PLACER_B_OFF=repair,evict (comma separated).
-	const INGREDIENTS = ['keep', 'table', 'crowd', 'smallfirst', 'wedge', 'reach', 'along', 'relocate', 'repair', 'evict', 'unwrap'];
+	const INGREDIENTS = ['keep', 'table', 'crowd', 'smallfirst', 'wedge', 'reach', 'along', 'relocate', 'repair', 'evict', 'polish', 'unwrap', 'raster'];
 	function ingredientSwitches(opts) {
 		const on = {};
 		INGREDIENTS.forEach(function (k) { on[k] = true; });
@@ -284,6 +285,7 @@
 		// ONE LAYOUT. `table` (optional) is a per-zoom lookup table of spots found in idle time;
 		// each is tried first and kept if it is still good here.
 		function solve(scene, prev, table) {
+			const tStart = now();
 			const nodeById = {}, linkById = {};
 			scene.nodes.forEach(function (n) { nodeById[n.id] = n; });
 			scene.links.forEach(function (l) { linkById[l.id] = l; });
@@ -298,8 +300,37 @@
 				}
 			});
 			const GH = new Grid(region), GS = new Grid(region);   // hard ground, soft ground
+			// 'raster' (after S9): a count per 4 px cell of the hard boxes that cover the WHOLE cell.
+			// A candidate with a point 2 px inside its ink on a counted cell surely overlaps hard
+			// ground by more than OV, so it is refused without a search; the exact test still decides
+			// every candidate the raster passes.
+			const OC = 4, onx = Math.ceil((region.x1 - region.x0) / OC), ony = Math.ceil((region.y1 - region.y0) / OC);
+			const occ = ON.raster && onx * ony <= 4e6 ? new Int16Array(onx * ony) : null;
+			function occAdd(b, d) {
+				if (!occ || !b.ax) { return; }
+				const i0 = Math.ceil((b.x0 - region.x0) / OC), i1 = Math.floor((b.x1 - region.x0) / OC) - 1;
+				const j0 = Math.ceil((b.y0 - region.y0) / OC), j1 = Math.floor((b.y1 - region.y0) / OC) - 1;
+				for (let j = Math.max(0, j0); j <= Math.min(ony - 1, j1); j++) {
+					const row = j * onx;
+					for (let i = Math.max(0, i0); i <= Math.min(onx - 1, i1); i++) { occ[row + i] += d; }
+				}
+			}
+			function occAt(x, y) {
+				const i = Math.floor((x - region.x0) / OC), j = Math.floor((y - region.y0) / OC);
+				return i >= 0 && j >= 0 && i < onx && j < ony && occ[j * onx + i] > 0;
+			}
+			function occBlocked(b) {
+				const hw = b.w / 2 - 2, hh = b.h / 2 - 2;
+				if (hw < 0 || hh < 0) { return occAt(b.cx, b.cy); }
+				if (occAt(b.cx, b.cy)) { return true; }
+				const sx = [-hw, hw, -hw, hw, 0, 0, -hw, hw], sy = [-hh, -hh, hh, hh, -hh, hh, 0, 0];
+				for (let k = 0; k < 8; k++) {
+					if (occAt(b.cx + sx[k] * b.c - sy[k] * b.s, b.cy + sx[k] * b.s + sy[k] * b.c)) { return true; }
+				}
+				return false;
+			}
 			// Static ground: node symbols, pump and valve symbols, Text objects and their callouts, pipes.
-			scene.nodes.forEach(function (n) { GH.addBox({ t: 'sym', node: n.id, lid: null, box: rectBox(n.symbol) }); });
+			scene.nodes.forEach(function (n) { const b = rectBox(n.symbol); GH.addBox({ t: 'sym', node: n.id, lid: null, box: b }); occAdd(b, 1); });
 			scene.links.forEach(function (l) {
 				(l.symbols || []).forEach(function (b) { GH.addBox({ t: 'sym', node: null, lid: null, box: mkBox(b.cx, b.cy, b.w, b.h, b.angle) }); });
 				for (let i = 1; i < l.points.length; i++) {
@@ -307,7 +338,8 @@
 				}
 			});
 			scene.texts.forEach(function (t) {
-				GH.addBox({ t: 'text', lid: null, box: mkBox(t.box.cx, t.box.cy, t.box.w, t.box.h, t.box.angle) });
+				const tb = mkBox(t.box.cx, t.box.cy, t.box.w, t.box.h, t.box.angle);
+				GH.addBox({ t: 'text', lid: null, box: tb }); occAdd(tb, 1);
 				const L = t.leader;
 				if (L) { for (let i = 1; i < L.length; i++) { GS.addSeg({ t: 'ldr', key: 'T:' + t.id, lid: 'T:' + t.id, p: L[i - 1], q: L[i] }); } }
 			});
@@ -373,6 +405,7 @@
 				}
 				if (strictView && (x0 < vx0 || y0 < vy0 || x1 > vx1 || y1 > vy1)) { return Infinity; }
 				if (x0 < region.x0 || y0 < region.y0 || x1 > region.x1 || y1 > region.y1) { return Infinity; }
+				if (occ) { for (let k = 0; k < ink.length; k++) { if (occBlocked(ink[k])) { return Infinity; } } }
 				// Hard first: symbols, Text, other labels.
 				let n = GH.gather(x0, y0, x1, y1, BUF);
 				for (let m = 0; m < n; m++) {
@@ -392,8 +425,8 @@
 					const it = BUF[m];
 					let w;
 					if (it.t === 'seg') {
-						if (it.link === own.link) { continue; }
-						w = W_LAB_PIPE;
+						// R7: a pipe label sits beside its own pipe, not on it (a small price).
+						w = it.link === own.link ? W_OWN_PIPE : W_LAB_PIPE;
 					} else {
 						if (it.lid === req.id) { continue; }
 						w = W_LAB_LDR;
@@ -460,7 +493,7 @@
 				const g = gaps[req.owner];
 				// Which side is open: score each of the eight compass sides by pipe clearance.
 				function openness(ang) {
-					if (!g || !g.pipes.length) { return 1; }
+					if (!ON.wedge || !g || !g.pipes.length) { return 1; }
 					let m = Math.PI;
 					g.pipes.forEach(function (a) { let d = Math.abs(ang - a) % (2 * Math.PI); if (d > Math.PI) { d = 2 * Math.PI - d; } if (d < m) { m = d; } });
 					return m / Math.PI;
@@ -484,69 +517,160 @@
 				add(Wr, 'right', ny + h0 / 2 - H, 0.09, Math.PI);
 				add(nx - W / 2, 'left', above, 0.08, -Math.PI / 2);
 				add(nx - W / 2, 'left', below, 0.09, Math.PI / 2);
-				// Leader rings, 16 directions, the open ones first.
-				const hx = W / 2 + rw + GAP, hy = H / 2 + rh + GAP;
-				for (let k = 1; k <= RING_MAX; k++) {
-					for (let d = 0; d < RING_DIRS; d++) {
-						const ang = d * 2 * Math.PI / RING_DIRS, ux = Math.cos(ang), uy = Math.sin(ang);
-						const t = Math.min(Math.abs(ux) > 1e-9 ? hx / Math.abs(ux) : Infinity, Math.abs(uy) > 1e-9 ? hy / Math.abs(uy) : Infinity);
-						const dist = k * RING_STEP + 2;
-						const cx = nx + ux * (t + dist), cy = ny + uy * (t + dist);
-						const align = ux < -0.2 ? 'right' : 'left';
-						const x = cx - W / 2, y = cy - H / 2;
-						out.push({ rows: rows, layout: layout, align: align, x: x, y: y, w: W, h: H, angle: 0, leader: 'auto',
-							from: [nx, ny], pref: RING_COST + RING_PER_PX * dist + 0.25 * (1 - openness(ang)), dist: dist });
+				// Leader rings, the open directions first ('wedge'). With 'reach': every 15 degrees,
+				// every half row, out to REACH_ROWS rows; without it, 12 directions, 4 rings of 7 px.
+				ringsAround(req, rows, layout, W, H, nx, ny, rw, rh, 0, out);
+				// 'unwrap' (H-a, S5): the same rows as one line, beside the symbol and on the rings.
+				if (ON.unwrap && rows.length > 1) {
+					const lz = sizeOf(req, rows, 'line');
+					out.push({ rows: rows, layout: 'line', align: 'left', x: E, y: ny - lz.h / 2, w: lz.w, h: lz.h, angle: 0, leader: null,
+						pref: 0.05 + 0.1 * (1 - openness(0)) });
+					out.push({ rows: rows, layout: 'line', align: 'right', x: nx - rw - GAP - lz.w, y: ny - lz.h / 2, w: lz.w, h: lz.h, angle: 0,
+						leader: null, pref: 0.06 + 0.1 * (1 - openness(Math.PI)) });
+					ringsAround(req, rows, 'line', lz.w, lz.h, nx, ny, rw, rh, 0.05, out);
+				}
+				function ringsAround(req, rows, layout, W, H, nx, ny, rw, rh, extra, out) {
+					const hx = W / 2 + rw + GAP, hy = H / 2 + rh + GAP;
+					const kMax = ON.reach ? REACH_ROWS * 2 : RING_MAX, dirs = ON.reach ? 24 : RING_DIRS;
+					for (let k = 1; k <= kMax; k++) {
+						for (let d = 0; d < dirs; d++) {
+							const ang = d * 2 * Math.PI / dirs, ux = Math.cos(ang), uy = Math.sin(ang);
+							const t = Math.min(Math.abs(ux) > 1e-9 ? hx / Math.abs(ux) : Infinity, Math.abs(uy) > 1e-9 ? hy / Math.abs(uy) : Infinity);
+							const dist = ON.reach ? k * T.rowHeightPx / 2 : k * RING_STEP + 2;
+							const cx = nx + ux * (t + dist), cy = ny + uy * (t + dist);
+							const align = ux < -0.2 ? 'right' : 'left';
+							out.push({ rows: rows, layout: layout, align: align, x: cx - W / 2, y: cy - H / 2, w: W, h: H, angle: 0, leader: 'auto',
+								from: [nx, ny], pref: extra + RING_COST + RING_PER_PX * dist + 0.25 * (1 - openness(ang)), dist: dist });
+						}
 					}
 				}
 			}
-			// A pipe label: lying along its pipe on either side, sliding from the middle; then flat
-			// on a short leader from the middle of the pipe.
+			// A pipe label. When the setting asks (req.along, R14): lying along its pipe on either
+			// side, turned into the scene's reading window, sliding from the middle of the pipe's
+			// ON-SCREEN stretch ('along'; without it, from the middle of the whole pipe). Then level
+			// beside the pipe, no leader; then level on a short leader from the pipe. A label the
+			// setting does not ask to turn is never turned (R13).
+			const WIN = (scene.settings && scene.settings.readableAngleDeg) || { min: -110, max: 70 };
+			function readable(ang) {
+				ang = ((ang % 360) + 360) % 360; if (ang > 180) { ang -= 360; }
+				if (!(ang > WIN.min && ang <= WIN.max)) { ang += 180; ang = ((ang % 360) + 360) % 360; if (ang > 180) { ang -= 360; } }
+				return ang;
+			}
+			const pipeGeo = {};
+			function geoOf(l) {
+				if (pipeGeo[l.id]) { return pipeGeo[l.id]; }
+				const P = l.points, segs = [];
+				let total = 0, on0 = Infinity, on1 = -Infinity;
+				for (let i = 1; i < P.length; i++) {
+					const a = P[i - 1], b = P[i], L = Math.hypot(b[0] - a[0], b[1] - a[1]);
+					if (L > 0) {
+						const c = clip(a[0], a[1], b[0], b[1], { x0: vx0, y0: vy0, x1: vx1, y1: vy1 });
+						if (c) {
+							const s0 = total + Math.hypot(c[0] - a[0], c[1] - a[1]), s1 = total + Math.hypot(c[2] - a[0], c[3] - a[1]);
+							on0 = Math.min(on0, s0); on1 = Math.max(on1, s1);
+						}
+					}
+					segs.push({ a: a, b: b, s0: total, L: L });
+					total += L;
+				}
+				if (!(on0 <= on1)) { on0 = 0; on1 = total; }
+				return (pipeGeo[l.id] = { segs: segs, total: total, on0: on0, on1: on1 });
+			}
+			function stationAt(g, s) {
+				for (let i = 0; i < g.segs.length; i++) {
+					const sg = g.segs[i];
+					if (s <= sg.s0 + sg.L || i === g.segs.length - 1) {
+						if (!sg.L) { continue; }
+						const t = Math.max(0, Math.min(1, (s - sg.s0) / sg.L));
+						return { x: sg.a[0] + t * (sg.b[0] - sg.a[0]), y: sg.a[1] + t * (sg.b[1] - sg.a[1]),
+							dir: Math.atan2(sg.b[1] - sg.a[1], sg.b[0] - sg.a[0]) * 180 / Math.PI, seg: sg, s: s };
+					}
+				}
+				return null;
+			}
+			// Does a held spot agree with the setting? Turned only if asked; asked, then turned to
+			// the pipe where it sits (a level label beside a level pipe is along it).
+			function alongAgrees(req, angle, cx, cy) {
+				const turned = Math.abs(angle % 180) > 0.5;
+				if (!req.along) { return !turned; }
+				const l = linkById[req.owner];
+				if (!l) { return true; }
+				let bd = Infinity, dir = 0;
+				for (let i = 1; i < l.points.length; i++) {
+					const a = l.points[i - 1], b = l.points[i], vx = b[0] - a[0], vy = b[1] - a[1], L2 = vx * vx + vy * vy;
+					if (!L2) { continue; }
+					const t = Math.max(0, Math.min(1, ((cx - a[0]) * vx + (cy - a[1]) * vy) / L2));
+					const d = Math.hypot(a[0] + t * vx - cx, a[1] + t * vy - cy);
+					if (d < bd) { bd = d; dir = Math.atan2(vy, vx) * 180 / Math.PI; }
+				}
+				let diff = Math.abs(((angle - dir) % 180 + 180) % 180);
+				diff = Math.min(diff, 180 - diff);
+				return diff <= 4 && Math.abs(readable(angle) - angle) < 0.5;
+			}
+			function nearestOnLink(l, x, y) {
+				let bd = Infinity, bp = [x, y];
+				for (let i = 1; i < l.points.length; i++) {
+					const a = l.points[i - 1], b = l.points[i], vx = b[0] - a[0], vy = b[1] - a[1], L2 = vx * vx + vy * vy;
+					const t = L2 ? Math.max(0, Math.min(1, ((x - a[0]) * vx + (y - a[1]) * vy) / L2)) : 0;
+					const q = [a[0] + t * vx, a[1] + t * vy], d = Math.hypot(q[0] - x, q[1] - y);
+					if (d < bd) { bd = d; bp = q; }
+				}
+				return bp;
+			}
 			function linkCandidates(req, rows, out) {
 				const l = linkById[req.owner];
 				const sz = sizeOf(req, rows, 'line'), W = sz.w, H = sz.h;
+				let ax = req.anchor.x, ay = req.anchor.y;
 				if (l && l.points.length >= 2) {
-					const P = l.points;
-					let total = 0;
-					const segL = [];
-					for (let i = 1; i < P.length; i++) { const d = Math.hypot(P[i][0] - P[i - 1][0], P[i][1] - P[i - 1][1]); segL.push(d); total += d; }
-					const mid = total / 2;
+					const g = geoOf(l), wide = ON.along;
+					const mid = wide ? (g.on0 + g.on1) / 2 : g.total / 2;
+					const lo = wide ? g.on0 : 0, hi = wide ? g.on1 : g.total;
 					const step = Math.max(6, Math.min(W / 2, 20));
-					for (let j = 0; j <= 8; j++) {
-						const off = (j % 2 ? 1 : -1) * Math.ceil(j / 2) * step;
-						const s = mid + off;
-						if (s < 0 || s > total) { continue; }
-						// Locate s.
-						let acc = 0, i = 0;
-						while (i < segL.length - 1 && acc + segL[i] < s) { acc += segL[i]; i++; }
-						const L = segL[i];
-						if (!L) { continue; }
-						const a = P[i], b = P[i + 1], u = (s - acc) / L;
-						// The label must lie within its segment, clear of the end nodes.
-						if (s - acc - W / 2 < 1 || acc + L - s - W / 2 < 1) { continue; }
-						const px = a[0] + (b[0] - a[0]) * u, py = a[1] + (b[1] - a[1]) * u;
-						let ang = Math.atan2(b[1] - a[1], b[0] - a[0]) * 180 / Math.PI;
-						if (ang > 90) { ang -= 180; } else if (ang <= -90) { ang += 180; }
-						const rad = ang * Math.PI / 180, nx = -Math.sin(rad), ny = Math.cos(rad);
-						[-1, 1].forEach(function (side, si) {
-							const o = side * (H / 2 + GAP + 0.5);
-							const cx = px + nx * o, cy = py + ny * o;
-							const angR = Math.round(ang * 100) / 100;
-							out.push({ rows: rows, layout: 'line', align: 'left', x: cx - W / 2, y: cy - H / 2, w: W, h: H,
-								angle: angR, leader: null, pref: 0.01 * Math.ceil(j / 2) + 0.005 * si });
-						});
+					const nSt = wide ? Math.min(40, 2 * Math.ceil((hi - lo) / 2 / step)) : 8;
+					const stations = [];
+					for (let j = 0; j <= nSt; j++) {
+						const s = mid + (j % 2 ? 1 : -1) * Math.ceil(j / 2) * step;
+						if (s < lo || s > hi) { continue; }
+						if (s - W / 2 < 1 || g.total - s - W / 2 < 1) { continue; }
+						const st = stationAt(g, s);
+						if (st) { st.j = j; stations.push(st); }
 					}
+					const midSt = stationAt(g, mid);
+					if (midSt) { ax = midSt.x; ay = midSt.y; }
+					stations.forEach(function (st) {
+						const j = st.j;
+						// Without 'along', the old rule: the label lies within one segment.
+						if (!wide && (st.s - st.seg.s0 - W / 2 < 1 || st.seg.s0 + st.seg.L - st.s - W / 2 < 1)) { return; }
+						if (req.along) {
+							const ang = readable(st.dir), rad = ang * Math.PI / 180, nx = -Math.sin(rad), ny = Math.cos(rad);
+							[-1, 1].forEach(function (side, si) {
+								const o = side * (H / 2 + GAP + 0.5);
+								const angR = Math.round(ang * 100) / 100;
+								out.push({ rows: rows, layout: 'line', align: 'left', x: st.x + nx * o - W / 2, y: st.y + ny * o - H / 2, w: W, h: H,
+									angle: angR, leader: null, pref: 0.01 * Math.ceil(j / 2) + 0.005 * si });
+							});
+						}
+						if (j > 6) { return; }
+						// Level beside the pipe, clear of the line by its own extent across it.
+						const rad = st.dir * Math.PI / 180, ux = Math.cos(rad), uy = Math.sin(rad), nx = -uy, ny = ux;
+						const ext = Math.abs(nx) * W / 2 + Math.abs(ny) * H / 2 + GAP + 1;
+						[-1, 1].forEach(function (side, si) {
+							out.push({ rows: rows, layout: 'line', align: 'left', x: st.x + side * nx * ext - W / 2, y: st.y + side * ny * ext - H / 2,
+								w: W, h: H, angle: 0, leader: null, pref: (req.along ? 0.1 : 0) + 0.012 * Math.ceil(j / 2) + 0.005 * si });
+						});
+					});
 				}
-				// Flat, on a leader from the pipe's middle.
-				const ax = req.anchor.x, ay = req.anchor.y;
+				// Level, on a leader from the pipe's on-screen middle.
 				const hx = W / 2 + 2, hy = H / 2 + 2;
-				for (let k = 1; k <= RING_MAX - 1; k++) {
-					for (let d = 0; d < 8; d++) {
-						const ang = d * Math.PI / 4 + Math.PI / 8, ux = Math.cos(ang), uy = Math.sin(ang);
+				const kMax = ON.reach ? Math.ceil(REACH_ROWS * 2) : RING_MAX - 1, dirs = ON.reach ? 16 : 8;
+				for (let k = 1; k <= kMax; k++) {
+					for (let d = 0; d < dirs; d++) {
+						const ang = d * 2 * Math.PI / dirs + Math.PI / dirs, ux = Math.cos(ang), uy = Math.sin(ang);
 						const t = Math.min(hx / Math.abs(ux), hy / Math.abs(uy));
-						const dist = k * RING_STEP + 4;
+						const dist = ON.reach ? k * T.rowHeightPx / 2 : k * RING_STEP + 4;
 						const cx = ax + ux * (t + dist), cy = ay + uy * (t + dist);
 						out.push({ rows: rows, layout: 'line', align: 'left', x: cx - W / 2, y: cy - H / 2, w: W, h: H, angle: 0,
-							leader: 'auto', from: [ax, ay], pref: RING_COST + 0.05 + RING_PER_PX * dist, dist: dist });
+							leader: 'auto', from: [ax, ay], pref: RING_COST + 0.05 + (req.along ? 0.1 : 0) + RING_PER_PX * dist, dist: dist });
 					}
 				}
 			}
@@ -583,7 +707,7 @@
 			const placed = {};   // id -> {c, ink, items, cost}
 			function insert(req, c, ink, cost) {
 				const items = [];
-				ink.forEach(function (b) { const it = { t: 'lab', key: req.id, lid: req.id, box: b }; GH.addBox(it); items.push(it); });
+				ink.forEach(function (b) { const it = { t: 'lab', key: req.id, lid: req.id, box: b }; GH.addBox(it); occAdd(b, 1); items.push(it); });
 				if (c.leader) {
 					for (let s = 1; s < c.leader.length; s++) {
 						const it = { t: 'ldr', key: 'D:' + req.id, lid: req.id, p: c.leader[s - 1], q: c.leader[s] };
@@ -595,8 +719,34 @@
 			function remove(id) {
 				const p = placed[id];
 				if (!p) { return; }
-				p.items.forEach(function (it) { it.dead = true; });
+				p.items.forEach(function (it) { it.dead = true; if (it.t === 'lab') { occAdd(it.box, -1); } });
 				delete placed[id];
+			}
+			// A label's candidates for one row set, on screen, sorted, with their ink: the ground
+			// does not move within one layout, so each list is built once.
+			const candCache = {};
+			function sortedCandidates(req, rows) {
+				const key = req.id + '|' + rows.join(',');
+				let cs = candCache[key];
+				if (cs) { return cs; }
+				const raw = candidates(req, rows);
+				raw.sort(function (a, b) { return a.pref - b.pref; });
+				cs = [];
+				for (let k = 0; k < raw.length; k++) {
+					const c0 = raw[k];
+					if (!c0.angle && (c0.x < vx0 || c0.y < vy0 || c0.x + c0.w > vx1 || c0.y + c0.h > vy1)) { continue; }
+					cs.push(c0);
+				}
+				return (candCache[key] = cs);
+			}
+			// The raster's look at a candidate before its ink is built: the middle of its first and
+			// last rows (a line's middle, turned or not).
+			function quickBlocked(req, c) {
+				if (c.layout === 'line') { return occAt(c.x + c.w / 2, c.y + c.h / 2); }
+				const r0 = req.rows[c.rows[0]], r1 = req.rows[c.rows[c.rows.length - 1]];
+				const m0 = c.align === 'right' ? c.x + c.w - r0.w / 2 : c.x + r0.w / 2;
+				const m1 = c.align === 'right' ? c.x + c.w - r1.w / 2 : c.x + r1.w / 2;
+				return occAt(m0, c.y + r0.h / 2) || occAt(m1, c.y + c.h - r1.h / 2);
 			}
 			function score(c, cost) { return cost + c.pref - ROW_VALUE * c.rows.length; }
 			// The best spot for one of the given row sets; null if none.
@@ -607,15 +757,14 @@
 					const rows = sets[si];
 					// A bigger row set cannot beat a smaller one by more than its extra rows' value.
 					if (bestC && -ROW_VALUE * rows.length >= bestS) { break; }
-					const cs = candidates(req, rows);
-					cs.sort(function (a, b) { return a.pref - b.pref; });
+					const cs = sortedCandidates(req, rows);
 					for (let k = 0; k < cs.length; k++) {
 						const c0 = cs[k];
 						if (c0.pref - ROW_VALUE * rows.length >= bestS) { break; }
-						if (!c0.angle && (c0.x < vx0 || c0.y < vy0 || c0.x + c0.w > vx1 || c0.y + c0.h > vy1)) { continue; }
-						const r = realize(req, c0);
+						if (occ && quickBlocked(req, c0)) { continue; }
+						const r = c0.real || (c0.real = realize(req, c0));
 						let lim = bestS - (r.c.pref - ROW_VALUE * rows.length);
-						if (capped) { lim = Math.min(lim, LABEL_CAP - r.c.pref); }
+						if (capped) { lim = Math.min(lim, ON.reach ? LABEL_CAP : LABEL_CAP - r.c.pref); }
 						const cost = evaluate(req, r.c, r.ink, own, true, lim);
 						if (cost === Infinity) { continue; }
 						const s = score(r.c, cost);
@@ -712,7 +861,7 @@
 
 			// ---- 2. labels shown in the previous view stay put while they can (T1) -----------
 			const kept = {};
-			if (prev && prev.layout && prev.layout.labels && prev.scene) {
+			if (ON.keep && prev && prev.layout && prev.layout.labels && prev.scene) {
 				const pA = {};
 				prev.scene.labels.forEach(function (r) { pA[r.id] = r; });
 				reqs.forEach(function (req) {
@@ -724,6 +873,9 @@
 					req.rows.forEach(function (r, i) { if (fields.indexOf(r.field) >= 0) { rows.push(i); } });
 					if (!rows.length) { return; }
 					const layout = a.layout || ra.layout;
+					// R13/R14: a turned label the setting no longer asks for, or a level one it now
+					// asks to turn, is looked at afresh.
+					if (req.kind === 'link' && !alongAgrees(req, a.angle || 0, a.x - ra.anchor.x + req.anchor.x + sizeOf(ra, a.rows, layout).w / 2, a.y - ra.anchor.y + req.anchor.y + 7)) { return; }
 					const sz = sizeOf(req, rows, layout);
 					const dx = a.x - ra.anchor.x, dy = a.y - ra.anchor.y;
 					const oldW = sizeOf(ra, a.rows, layout).w;
@@ -742,6 +894,7 @@
 						// The start must still be on the owner (a node's centre, or on its pipe).
 						const n = req.kind === 'node' ? nodeById[req.owner] : null;
 						if (n) { c.leader[0] = [n.x, n.y]; }
+						else if (req.kind === 'link' && linkById[req.owner]) { c.leader[0] = nearestOnLink(linkById[req.owner], c.leader[0][0], c.leader[0][1]); }
 					}
 					const ink = inkOf(req, c);
 					// Held still unless the new view puts it on a leader or a leader on it (§3 item 1).
@@ -772,6 +925,7 @@
 					const rows = [];
 					req.rows.forEach(function (r, i) { if (sd.fields.indexOf(r.field) >= 0) { rows.push(i); } });
 					if (rows.length !== sd.fields.length) { return; }
+					if (req.kind === 'link' && !alongAgrees(req, sd.angle || 0, req.anchor.x + sd.dx + sizeOf(req, rows, sd.layout).w / 2, req.anchor.y + sd.dy + 7)) { return; }
 					const sz = sizeOf(req, rows, sd.layout);
 					const ax = req.anchor.x, ay = req.anchor.y;
 					const c = { rows: rows, layout: sd.layout, align: sd.align, x: ax + sd.dx, y: ay + sd.dy, w: sz.w, h: sz.h,
@@ -780,6 +934,7 @@
 						c.leader = sd.leader.map(function (q) { return [ax + q[0], ay + q[1]]; });
 						const n = req.kind === 'node' ? nodeById[req.owner] : null;
 						if (n) { c.leader[0] = [n.x, n.y]; }
+						else if (req.kind === 'link' && linkById[req.owner]) { c.leader[0] = nearestOnLink(linkById[req.owner], c.leader[0][0], c.leader[0][1]); }
 					}
 					const ink = inkOf(req, c);
 					if (c.leader && !leaderReaches(c.leader, ink)) { return; }
@@ -790,11 +945,12 @@
 				});
 			}
 
+			TIMING && console.log('p0', (now() - tStart).toFixed(1));
 			// ---- 4. everyone else: first a place for each label at its smallest ------------------
-			// A label the table had to drop at this zoom or closer in stays dropped, unless it stands
-			// near the viewport's edge, where the table's crowd may be off screen now.
+			// 'table': a label the table had to drop at this zoom stays out of the first pass, unless
+			// it stands near the viewport's edge, where the table's crowd may be off screen now. It
+			// is not hidden for that: the repair pass looks for room for it like any other.
 			const skip = {};
-			// Closer in than the table, a label is skipped only if the last view could not show it either.
 			if (table) {
 				const closer = table.s < scene.view.s * 0.995;
 				const was = prev && prev.layout && prev.layout.labels;
@@ -807,42 +963,75 @@
 					if (a.x > vx0 + EDGE && a.x < vx1 - EDGE && a.y > vy0 + EDGE && a.y < vy1 - EDGE) { skip[r.id] = 1; }
 				});
 			}
-			const order = reqs.filter(function (r) { return !placed[r.id] && !skip[r.id]; });
-			// Hardest first: the owner with the most symbols and pipes around it.
+			const order = reqs.filter(function (r) { return !placed[r.id] && !skip[r.id] && !r.hand && r.kind !== 'text'; });
+			// 'crowd' (S12): hardest first, the owner with the most symbols and pipes around it.
 			const crowd = {};
 			order.forEach(function (r) {
 				let n = 0;
 				const a = r.anchor;
-				n += GH.gather(a.x - 30, a.y - 30, a.x + 30, a.y + 30, BUF) + GS.gather(a.x - 30, a.y - 30, a.x + 30, a.y + 30, BUF);
+				if (ON.crowd) { n += GH.gather(a.x - 30, a.y - 30, a.x + 30, a.y + 30, BUF) + GS.gather(a.x - 30, a.y - 30, a.x + 30, a.y + 30, BUF); }
 				crowd[r.id] = n + (r.kind === 'link' ? 0.5 : 0);
 			});
 			// Customer labels give way first and easily: they go last.
 			order.sort(function (a, b) {
 				return ((a.kind === 'customer') - (b.kind === 'customer')) || crowd[b.id] - crowd[a.id] || (a.id < b.id ? -1 : 1);
 			});
+			// 'smallfirst' (S11): every label gets its smallest form before any label grows; without
+			// it, each label takes as many rows as it can in turn.
 			order.forEach(function (req) {
 				const sets = setsOf[req.id];
-				const b = best(req, [sets[sets.length - 1]], true);
+				const b = best(req, ON.smallfirst ? [sets[sets.length - 1]] : sets, true);
 				if (b) { insert(req, b.c, b.ink, b.cost); }
 			});
+			function late() { return now() - tStart > DEADLINE_MS; }
 
-			// ---- 5. then grow: each shown label looks again with its whole row set -----------------
-			order.forEach(function (req) {
-				const cur = placed[req.id];
-				if (!cur) { return; }
-				const sets = setsOf[req.id];
-				if (sets.length < 2) { return; }
-				remove(req.id);
-				const b = best(req, sets.slice(0, -1), true);
-				const curS = score(cur.c, cur.cost);
-				if (b && b.s < curS - 1e-9) {
-					insert(req, b.c, b.ink, b.cost);
-				} else {
-					insert(req, cur.c, cur.ink, cur.cost);
+			TIMING && console.log('p1', (now() - tStart).toFixed(1));
+			// ---- 5. then grow: each shown label looks again with every row set -------------------
+			// The current spot stays unless another is better; the label may move to show more, or
+			// to lie along its pipe with the same rows (R14).
+			const freed = [];   // the ink of spots given up by a move: ground a hidden label may now have
+			function nearFreed(req, from) {
+				const a = req.anchor, R = 4 * T.rowHeightPx + 80;
+				for (let i = from || 0; i < freed.length; i++) {
+					const ink = freed[i];
+					for (let k = 0; k < ink.length; k++) {
+						const b = ink[k];
+						if (a.x > b.x0 - R && a.x < b.x1 + R && a.y > b.y0 - R && a.y < b.y1 + R) { return true; }
+					}
 				}
-			});
-			// Kept labels grow only in place, on the edge they hang from.
+				return false;
+			}
+			function regrow(req) {
+				const cur = placed[req.id];
+				if (!cur || req.hand || req.kind === 'text' || kept[req.id]) { return false; }
+				const sets = setsOf[req.id];
+				// Whole, uncrossed and (a pipe label) along its pipe if asked: nothing to gain.
+				if (cur.c.rows.length === sets[0].length && cur.cost === 0
+					&& (req.kind !== 'link' || !req.along || Math.abs((cur.c.angle || 0) % 180) > 0.5 || alongAgrees(req, 0, cur.c.x + cur.c.w / 2, cur.c.y + cur.c.h / 2))) { return false; }
+				remove(req.id);
+				// One row set at a time, upward from the one it shows: a set that finds no place at
+				// all ends the climb, since a bigger block rarely fits where a smaller one did not.
+				const curS = score(cur.c, cur.cost);
+				let ci = sets.length - 1;
+				while (ci > 0 && sets[ci].length < cur.c.rows.length) { ci--; }
+				let b = null;
+				const same = cur.cost > 0 || (req.kind === 'link' && req.along && !alongAgrees(req, cur.c.angle || 0, cur.c.x + cur.c.w / 2, cur.c.y + cur.c.h / 2));
+				for (let j = same ? ci : ci - 1; j >= 0; j--) {
+					const bj = best(req, [sets[j]], true);
+					if (!bj) { if (j < ci) { break; } continue; }
+					if (!b || bj.s < b.s) { b = bj; }
+				}
+				if (b && b.s < curS - 1e-9) { freed.push(cur.ink); insert(req, b.c, b.ink, b.cost); return true; }
+				insert(req, cur.c, cur.ink, cur.cost);
+				return false;
+			}
+			const growOrder = order.concat(seeded.map(function (id) { return reqById[id]; }));
+			for (let i = 0; i < growOrder.length && !late(); i++) { regrow(growOrder[i]); }
+			TIMING && console.log('p2', (now() - tStart).toFixed(1));
+			// Kept labels grow in place, on the edge they hang from; with 'relocate', a kept label
+			// that cannot grow in place may move to where it shows more (a move that shows more).
 			Object.keys(kept).forEach(function (id) {
+				if (late()) { return; }
 				const req = reqById[id];
 				const cur = placed[id];
 				const sets = setsOf[id];
@@ -874,9 +1063,95 @@
 						}
 					}
 				}
+				if (!done && ON.relocate && cur.c.rows.length < sets[0].length) {
+					const bigger = sets.filter(function (r) { return r.length > cur.c.rows.length; });
+					const b = best(req, bigger, true);
+					if (b) { insert(req, b.c, b.ink, b.cost); done = true; }
+				}
 				if (!done) { insert(req, cur.c, cur.ink, cur.cost); }
 			});
 
+			TIMING && console.log('p3', (now() - tStart).toFixed(1));
+			// ---- 6. 'repair' (S15): every label still hidden looks again for its smallest form ---
+			// Moves in the grow pass free ground; the labels the table held out are asked here too.
+			const repaired = [];
+			if (ON.repair) {
+				reqs.forEach(function (req) {
+					if (placed[req.id] || req.hand || req.kind === 'text' || late()) { return; }
+					// Only where ground was freed since the first pass, or a label the table held out.
+					if (!skip[req.id] && !nearFreed(req)) { return; }
+					const sets = setsOf[req.id];
+					const b = best(req, [sets[sets.length - 1]], true);
+					if (b) { insert(req, b.c, b.ink, b.cost); repaired.push(req); }
+				});
+			}
+			TIMING && console.log('p4', (now() - tStart).toFixed(1));
+			// ---- 7. 'evict' (S16): a label still hidden may move ONE blocking neighbour elsewhere,
+			// if the neighbour finds another place (with as many rows as it can); never a kept
+			// label's neighbour that is hand-placed or a Text.
+			if (ON.evict) {
+				reqs.forEach(function (req) {
+					if (placed[req.id] || req.hand || req.kind === 'text' || late()) { return; }
+					const sets = setsOf[req.id], rows = sets[sets.length - 1], own = ownOf(req);
+					const cs = sortedCandidates(req, rows);
+					const tried = {};
+					let tries = 0;
+					for (let k = 0; k < cs.length && k < 60 && tries < 4; k++) {
+						if (occ && quickBlocked(req, cs[k])) { continue; }
+						const r = cs[k].real || (cs[k].real = realize(req, cs[k]));
+						const victim = soleBlocker(req, r.ink);
+						if (!victim || tried[victim]) { continue; }
+						tried[victim] = 1; tries++;
+						const vreq = reqById[victim], vcur = placed[victim];
+						remove(victim);
+						const cost = evaluate(req, r.c, r.ink, own, true, LABEL_CAP);
+						if (cost === Infinity) { insert(vreq, vcur.c, vcur.ink, vcur.cost); continue; }
+						insert(req, r.c, r.ink, cost);
+						// The neighbour keeps as many rows as it had if it can, else fewer.
+						const vsets = setsOf[victim].filter(function (r) { return r.length <= vcur.c.rows.length; });
+						let vb = null;
+						for (let j = 0; j < vsets.length && !vb; j++) { vb = best(vreq, [vsets[j]], true); }
+						if (vb) { insert(vreq, vb.c, vb.ink, vb.cost); repaired.push(req); return; }
+						remove(req.id);
+						insert(vreq, vcur.c, vcur.ink, vcur.cost);
+					}
+				});
+			}
+			function soleBlocker(req, ink) {
+				let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+				ink.forEach(function (b) { x0 = Math.min(x0, b.x0); y0 = Math.min(y0, b.y0); x1 = Math.max(x1, b.x1); y1 = Math.max(y1, b.y1); });
+				if (x0 < vx0 || y0 < vy0 || x1 > vx1 || y1 > vy1) { return null; }
+				const n = GH.gather(x0, y0, x1, y1, BUF);
+				let who = null;
+				for (let m = 0; m < n; m++) {
+					const it = BUF[m];
+					if (it.lid === req.id) { continue; }
+					if (!ink.some(function (b) { return boxHit(b, it.box); })) { continue; }
+					if (it.t !== 'lab') { return null; }
+					const vr = reqById[it.lid];
+					if (!vr || vr.hand || vr.kind === 'text') { return null; }
+					if (who && who !== it.lid) { return null; }
+					who = it.lid;
+				}
+				return who;
+			}
+			TIMING && console.log('p5', (now() - tStart).toFixed(1));
+			// The labels repair and eviction seated grow too.
+			for (let i = 0; i < repaired.length && !late(); i++) { regrow(repaired[i]); }
+			TIMING && console.log('p6', (now() - tStart).toFixed(1));
+			// ---- 8. 'polish' (S17): one more look for every label, since later moves freed ground
+			// (a pipe label seated level early may now lie along its pipe).
+			if (ON.polish) {
+				for (let i = 0; i < growOrder.length && !late(); i++) {
+					const req = growOrder[i], cur = placed[req.id];
+					if (!cur) { continue; }
+					const cut = cur.c.rows.length < setsOf[req.id][0].length;
+					const level = req.kind === 'link' && req.along && !alongAgrees(req, cur.c.angle || 0, cur.c.x + cur.c.w / 2, cur.c.y + cur.c.h / 2);
+					if ((cut || level || cur.cost > 0) && nearFreed(req, 0)) { regrow(req); }
+				}
+			}
+
+			TIMING && console.log('p7', (now() - tStart).toFixed(1));
 			// ---- out -------------------------------------------------------------------------
 			// What this layout teaches the lookup table: each label's spot as an offset from its
 			// anchor, which holds at any pan of the same zoom.
@@ -927,7 +1202,7 @@
 		// are compared with a tolerance, since a view rounds them to its own pixels.
 		function netSnap(scene) {
 			const v = scene.view, xs = [];
-			let topo = scene.text.sizePx + '|' + scene.text.separator + '|' + JSON.stringify(scene.dropOrder);
+			let topo = scene.text.sizePx + '|' + scene.text.separator + '|' + JSON.stringify(scene.dropOrder) + '|' + JSON.stringify(scene.settings || null);
 			scene.nodes.forEach(function (n) { xs.push((n.x - v.tx) / v.s, (n.y - v.ty) / v.s); topo += '|' + n.id + ':' + n.type; });
 			scene.links.forEach(function (l) {
 				l.points.forEach(function (q) { xs.push((q[0] - v.tx) / v.s, (q[1] - v.ty) / v.s); });
@@ -972,13 +1247,13 @@
 			});
 			const labels = Object.keys(registry).sort().map(function (id) {
 				const e = registry[id];
-				return { id: id, owner: e.req.owner, kind: e.req.kind, rows: e.req.rows, layout: e.req.layout,
+				return { id: id, owner: e.req.owner, kind: e.req.kind, rows: e.req.rows, layout: e.req.layout, along: e.req.along,
 					anchor: { x: e.mx * s2 + tx2, y: e.my * s2 + ty2 },
 					hand: e.hand ? { x: e.hand[0] * s2 + tx2, y: e.hand[1] * s2 + ty2 } : null };
 			});
 			const pad = 150;
 			return { id: 'synth', viewport: { x: x0 - pad, y: y0 - pad, w: x1 - x0 + 2 * pad, h: y1 - y0 + 2 * pad },
-				view: { s: s2, tx: tx2, ty: ty2 }, text: scene.text, dropOrder: scene.dropOrder,
+				view: { s: s2, tx: tx2, ty: ty2 }, text: scene.text, dropOrder: scene.dropOrder, settings: scene.settings,
 				nodes: nodes, links: links, texts: texts, customers: scene.customers || [], labels: labels };
 		}
 		function now() { return typeof performance !== 'undefined' ? performance.now() : Date.now(); }
@@ -986,7 +1261,7 @@
 			const t0 = now();
 			if (ctx && ctx.scene) { remember(ctx.scene); }
 			const scene = lastScene;
-			if (!scene) { return; }
+			if (!scene || !ON.table) { return; }
 			const byId = {};
 			scene.nodes.forEach(function (n) { byId[n.id] = n; });
 			gapsOf(scene, byId);
@@ -1022,7 +1297,7 @@
 		function place(scene, opts) {
 			const prev = opts && opts.prev;
 			remember(scene);
-			const table = tables[rungOf(scene.view.s)] || null;
+			const table = ON.table ? tables[rungOf(scene.view.s)] || null : null;
 			// A table a whole rung away is still a good seed; a spot that no longer holds is re-searched.
 			const out = solve(scene, prev, table);
 			lastLayout = { scene: scene, layout: { labels: out.labels } };
