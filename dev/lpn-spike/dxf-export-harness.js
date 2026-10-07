@@ -294,7 +294,7 @@ async function main() {
 		Object.keys(want).forEach(t => {
 			if (ins.attribs[t] !== numStr(want[t])) { attrBad.push(n.id + '.' + t + '=' + ins.attribs[t] + ' want ' + want[t]); }
 		});
-		if (!ins.attribEnts.every(a => g(a, 70) === (g(a, 2) === 'ID' ? '0' : '1'))) { attrBad.push(n.id + ': only the ID attribute may be visible'); }
+		if (!ins.attribEnts.every(a => g(a, 70) === '0')) { attrBad.push(n.id + ': every attribute must be visible'); }
 	});
 	ok('Net1: every node attribute (ELEVATION, BASE_DEMAND, HEAD, WATER_DEPTH...) equals the model', attrBad.length === 0, attrBad.slice(0, 5).join('; '));
 	ok('Net1: every node lands on the file\'s own coordinates, exactly', coordBad.length === 0, coordBad.slice(0, 3).join('; '));
@@ -339,9 +339,9 @@ async function main() {
 		const keepId = PC.lpn_field_id;
 		PC.lpn_field_id = 'المعرف';
 		const ents = entities(readDxf(L.dxfExportText(out1.frame).text)).filter(e => e.type === 'INSERT' && e.layer !== 'C-WATR-RDME');
-		const vis = ents.map(e => e.attribEnts.filter(a => g(a, 70) === '0').map(a => g(a, 2)));
-		ok('D1: with the ID label in Arabic, every block still has exactly one visible attribute, the translated ID',
-			vis.length > 0 && vis.every(v => v.length === 1 && v[0] === global.EngCalcs.lpnDxfString('المعرف')), JSON.stringify(vis.slice(0, 2)));
+		const vis = ents.map(e => e.attribEnts.filter(a => g(a, 70) === '0').length === e.attribEnts.length);
+		ok('D1: with the ID label in Arabic, every attribute of every block is still visible',
+			vis.length > 0 && vis.every(Boolean), JSON.stringify(vis.slice(0, 2)));
 		PC.lpn_field_id = keepId;
 	}
 

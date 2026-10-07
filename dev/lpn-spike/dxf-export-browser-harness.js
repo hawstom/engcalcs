@@ -15,7 +15,7 @@
 //   (b) the file is ASCII DXF R2000 (AC1015) from SECTION to EOF;
 //   (c) data only (Tom's DXF Interface Manager specification, dev/dxf-interface.md): no TEXT,
 //       MTEXT, LINE or MULTILEADER; every layer C-WATR-MODL-XXXX-ALT (or the white read-me layer),
-//       every name and tag in capitals; every ID attribute visible and every other invisible,
+//       every name and tag in capitals; every attribute visible,
 //       each ATTRIB on its INSERT's layer;
 //   (d) every ATTDEF and ATTRIB is 1 high and every INSERT at scale 1 (Tom: "attribute height is 1");
 //   (e) the one text style is Standard on txt, and nothing in the file names Arial;
@@ -158,8 +158,15 @@ function checkDrawing(label, out, geo) {
 		if (e.type !== 'ATTRIB') { return; }
 		(first ? ids : rest).push(e); first = false;
 	});
-	ok(label + ': every ID attribute is visible (70 = 0)', ids.length > 0 && ids.every((e) => (+get(e, 70) & 1) === 0), ids.length + ' IDs');
-	ok(label + ': every other attribute is invisible (70 = 1)', rest.length > 0 && rest.every((e) => (+get(e, 70) & 1) === 1), rest.length + ' others');
+	ok(label + ': NO attribute is invisible (70 bit 1 clear on every ATTRIB and ATTDEF; no exceptions named)',
+		ids.length + rest.length === attribs.length && attribs.concat(attdefs).every((e) => (+get(e, 70) & 1) === 0), (ids.length + rest.length) + ' ATTRIBs, ' + attdefs.length + ' ATTDEFs');
+	// Tom 2026-10-07: blue is unreadable on a dark screen. No ACI 5 on any layer or entity.
+	ok(label + ': no colour 62/420 value of 5 (blue) in the whole file', !P.some((p) => (p[0] === 62 || p[0] === 420) && String(p[1]).trim() === '5'), 'layer colours: ' + tables.filter((e) => e.type === 'LAYER').map((e) => get(e, 2) + '=' + get(e, 62)).join(' '));
+	ok(label + ': layer colours are all among 1, 2, 3, 4, 6, 7 (customer 8 aside)', tables.filter((e) => e.type === 'LAYER').every((e) => [1, 2, 3, 4, 6, 7, 8].includes(Math.abs(+get(e, 62)))));
+	// Stacked, not overprinted: within one INSERT the attributes sit at distinct places.
+	let grp = [], overlap = 0;
+	ents.forEach((e) => { if (e.type === 'INSERT' || e.type === 'SEQEND') { const k = grp.map((a) => get(a, 10) + '/' + get(a, 20)); if (new Set(k).size !== k.length) { overlap++; } grp = []; } else if (e.type === 'ATTRIB') { grp.push(e); } });
+	ok(label + ': the attributes of one element never share a point', overlap === 0, overlap + ' overlapping');
 	ok(label + ': every tag and block name is in capitals', attribs.concat(attdefs).every((e) => get(e, 2) === get(e, 2).toUpperCase()) &&
 		inserts.every((e) => get(e, 2) === get(e, 2).toUpperCase()));
 	if (!out.lang) { ok(label + ': ELEVATION is a tag (the property label, in capitals)', attribs.some((e) => get(e, 2) === 'ELEVATION')); }

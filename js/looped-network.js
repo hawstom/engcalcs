@@ -36253,7 +36253,7 @@ var EngCalcs = EngCalcs || {};
 		var alternative = dxfAlternative(activeScenario()),
 			codes = EngCalcs.lpnDxfAssetCodes(settings.idPrefixes),
 			readme = [projectDisplayName(project), frame.note,
-				(pc.lpn_dxf_note_blocks || 'Layers are named {prefix}, the asset code, a hyphen, and the alternative, as in {example}. Each element is a block inserted at scale 1 with attributes 1 unit high; scale the blocks to set the text height. Only the ID attribute is visible; the ATTDISP command shows the others.')
+				(pc.lpn_dxf_note_blocks || 'Layers are named {prefix}, the asset code, a hyphen, and the alternative, as in {example}. Each element is a block inserted at scale 1 with attributes 1 unit high; scale the blocks to set the text height. Every attribute is visible; the attributes of one element are stacked in a column beside its symbol.')
 					.replace('{prefix}', EngCalcs.lpnDxfModelPrefix)
 					.replace('{example}', EngCalcs.lpnDxfModelPrefix + codes.junction + '-' + alternative)];
 		// **A VALUE TOO LONG FOR ONE DXF STRING IS SHORTENED, AND THE READ-ME SAYS SO** -- the writer

@@ -53,13 +53,14 @@ and the reasons for R2000 and attributed blocks: `dev/agents/market-researcher/a
 - **Attribute height 1, INSERT scale 1** (Tom: *"attribute height is 1 so that user can scale the
   blocks to their standards"*). Block geometry is in the same unit: a junction is 1 across, a tank
   3. The file therefore no longer depends on the map's zoom or text size.
-- **The ID attribute is visible; every other is invisible** (flag 1; Tom, 2026-10-06). Every
-  A pump or valve inserted at 90-270 degrees turns its attributes a half
+- **Every attribute is visible** (flag 0; Tom, 2026-10-07: the hidden ones were contrary to his
+  instructions). They are stacked 1.5 apart beside the symbol. **No ACI 5 (blue)**: unreadable on a dark screen; layer
+  colours come from 1, 2, 3, 4, 6, 7 (pipe 2 yellow, junction 4 cyan). A pump or valve inserted at 90-270 degrees turns its attributes a half
   circle, right- and top-justified on the same point, so they read upright.
 - **Read-me**: one MTEXT on `C-WATR-RDME` (Tom: *"The RDME should be MTEXT, not an attributed
   block."*; R2000 groups 100 AcDbMText, 10/20/30, 40 height 1, 71 top left, 72, 3 and 1 text in
   chunks of 250, 7 Standard), one paragraph per line: project name; the
-  coordinate statement (a grid project's unit as its English name, ft or m); the layer pattern, scale-1 and ATTDISP note; and, if any, how many values
+  coordinate statement (a grid project's unit as its English name, ft or m); the layer pattern, scale-1 note; and, if any, how many values
   were shortened, and how many junctions have more than one demand category. Plain ASCII quotes (Tom: *"Don't use fancy quotes in the README."*).
 - **Text style Standard on `txt`** (group 3, the STYLE record's primary font file). It was blank,
   and AutoCAD showed the text in Arial while editing (Tom, 2026-10-07, TEDIT); `txt` is what

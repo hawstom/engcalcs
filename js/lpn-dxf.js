@@ -55,9 +55,11 @@
 	// js/looped-network.js), used where the project's are empty or two types would share a code.
 	var TYPE_KEY = { junction: 'J', reservoir: 'R', tank: 'T', pipe: 'L', pump: 'P', valve: 'V', customer: 'M' };
 	var DEFAULT_PREFIX = { J: 'J', R: 'R', T: 'T', L: 'L', P: 'P', V: 'V', M: 'C' };
-	// Layer order and ACI colours (1-9 only, so every program shows the same colour).
+	// Layer order and ACI colours (1-9 only, so every program shows the same colour). Never 5, blue,
+	// which is unreadable on a dark screen (Tom, 2026-10-07: choose among 1, 2, 3, 4, 6 and 7); the
+	// pipe is yellow (2) because cyan (4) is the junction's.
 	var TYPES = [
-		{ type: 'pipe', color: 5 }, { type: 'pump', color: 6 }, { type: 'valve', color: 1 },
+		{ type: 'pipe', color: 2 }, { type: 'pump', color: 6 }, { type: 'valve', color: 1 },
 		{ type: 'junction', color: 4 }, { type: 'tank', color: 3 }, { type: 'reservoir', color: 3 },
 		{ type: 'customer', color: 8 }
 	];
@@ -114,8 +116,8 @@
 		// A pipe's data carrier: a POINT at mid-run, which a cursor can snap to.
 		pipe: [{ point: true }]
 	};
-	// The ID is the one VISIBLE attribute of an element (Tom, 2026-10-06); every other one is
-	// invisible until ATTDISP ON.
+	// EVERY attribute is visible (Tom, 2026-10-07: the invisible flag was contrary to his
+	// instructions). They stack 1.5 apart beside the symbol; nothing is hidden until a layer is frozen.
 	var VISIBLE_TAG = 'ID';
 	// Capitals in the page's locale, so Turkish "derinliği" is DERİNLİĞİ, not DERINLIĞI.
 	var LOCALE = '';
@@ -299,7 +301,7 @@
 			var r = type === 'tank' ? 1.5 : (type === 'reservoir' ? 1.4 : (type === 'pump' || type === 'valve' ? 1 : (type === 'pipe' ? 0.25 : 0.5)));
 			return { x: r + 0.25, y: -k * 1.5 };
 		}
-		function visible(type, tag) { return tag === tagName(idTags[type] || VISIBLE_TAG); }
+		function visible() { return true; }
 		// INSERT scale 1: an attribute is 1 high in the block and so 1 high in the drawing, and
 		// scaling the insertion is how a CAD user brings it to the height they plot at.
 		function insert(type, x, y, rot, values, layer) {
@@ -327,7 +329,7 @@
 				body.g(100, 'AcDbText').g(10, num(ax)).g(20, num(ay)).g(30, '0.0')
 					.g(40, '1.0').g(1, str(v === undefined || v === null ? '' : v));
 				if (flip) { body.g(50, num(r - 180)).g(72, 2).g(11, num(ax)).g(21, num(ay)).g(31, '0.0'); } else if (rot) { body.g(50, num(rot)); }
-				// Flag 1 = invisible.
+				// Flag 1 would be invisible; every attribute is visible, so 0.
 				body.g(100, 'AcDbAttribute').g(2, str(tg[k])).g(70, visible(type, tg[k]) ? 0 : 1);
 				// Top-justified (ATTRIB 74 = 3, TEXT's 73) so the turned text hangs on the side of
 				// the line the upright text stood on.

@@ -2102,8 +2102,8 @@ $ec_lang['lpn_dxf_note_crs']='Coordinates: {crs}, exactly as this project states
 $ec_lang['lpn_dxf_note_geo']='Coordinates: {crs}, in meters, not latitude and longitude. The latitudes and longitudes of the project were converted to that grid.';
 $ec_lang['lpn_dxf_exported_geo']='Exported {file}. Its coordinates are {crs}, in meters, not latitude and longitude.';
 // {prefix} is the layer-name prefix, C-WATR-MODL-; {example} is a whole layer name such as
-// C-WATR-MODL-J___-BASE. ATTDISP is an AutoCAD command name: keep it in Latin capitals.
-$ec_lang['lpn_dxf_note_blocks']='Layers are named {prefix}, the asset code, a hyphen, and the alternative, as in {example}. Each element is a block inserted at scale 1 with attributes 1 unit high; scale the blocks to set the text height. Only the ID attribute is visible; the ATTDISP command shows the others.';
+// C-WATR-MODL-J___-BASE.
+$ec_lang['lpn_dxf_note_blocks']='Layers are named {prefix}, the asset code, a hyphen, and the alternative, as in {example}. Each element is a block inserted at scale 1 with attributes 1 unit high; scale the blocks to set the text height. Every attribute is visible; the attributes of one element are stacked in a column beside its symbol.';
 // {n} is a whole number; {max} is 2049. Each shortened value ends in three periods (...).
 $ec_lang['lpn_dxf_note_shortened']='{n} values were longer than a DXF file allows ({max} characters), so each was shortened and ends in three periods.';
 // {n} is a whole number; {tag} is an attribute tag in capitals, BASE_DEMAND in English.
