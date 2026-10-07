@@ -54,6 +54,7 @@ const L = loadLoopedNetwork(
 	"\t\t\trubberBandEl = el('line', {}, world); }\n"
 );
 const PC = global.EngCalcs.pageConfig;
+const EXP = (f) => PC.lpn_export_table_title.replace('{format}', f);
 
 function fire(el, type, ev) {
 	((el && el._listeners && el._listeners[type]) || []).slice().forEach((f) => f(ev || {}));
@@ -168,8 +169,8 @@ print(json.dumps({'bad': bad, 'first': infos[0].filename, 'firstType': infos[0].
 	console.log('--- CSV ---');
 	downloads.length = 0;
 	menu = openMenu(order[0], k1);
-	ok('the menu offers both exports', !!menu && [PC.lpn_pane_export_csv, PC.lpn_pane_export_ods].every((t) => menu.children.some((x) => labelText(x) === t)));
-	pick(menu, PC.lpn_pane_export_csv);
+	ok('the menu offers both exports', !!menu && [EXP('CSV'), EXP('ODS')].every((t) => menu.children.some((x) => labelText(x) === t)));
+	pick(menu, EXP('CSV'));
 	ok('one download per click', downloads.length === 1, String(downloads.length));
 	const csvBytes = Buffer.from(await downloads[0].arrayBuffer());
 	ok('UTF-8 byte order mark first', csvBytes[0] === 0xEF && csvBytes[1] === 0xBB && csvBytes[2] === 0xBF);
@@ -193,7 +194,7 @@ print(json.dumps({'bad': bad, 'first': infos[0].filename, 'firstType': infos[0].
 	console.log('--- ODS ---');
 	downloads.length = 0;
 	menu = openMenu(order[0], k1);
-	pick(menu, PC.lpn_pane_export_ods);
+	pick(menu, EXP('ODS'));
 	ok('one download per click', downloads.length === 1, String(downloads.length));
 	const out = await readOds();
 	ok('zip CRCs are valid (zipfile.testzip)', out.bad === null, String(out.bad));
@@ -226,7 +227,7 @@ print(json.dumps({'bad': bad, 'first': infos[0].filename, 'firstType': infos[0].
 	fire(pTable, 'focusin', { target: pTds[pOrder[0]][pCols[0].key] });
 	fire(pTable, 'contextmenu', { target: pTds[pOrder[0]][pCols[0].key], clientX: 5, clientY: 5, preventDefault() {} });
 	downloads.length = 0;
-	pick(menuEl(), PC.lpn_pane_export_ods);
+	pick(menuEl(), EXP('ODS'));
 	const pOut = await readOds();
 	const fi = pCols.map((c) => c.key).indexOf('from'), ti = pCols.map((c) => c.key).indexOf('to');
 	ok('Pipes has From and To columns', fi >= 0 && ti >= 0);

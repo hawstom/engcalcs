@@ -1531,8 +1531,6 @@ $ec_lang['lpn_pane_print']='Print table';
 // Tom, 2026-10-06. Copy with headings puts the heading line, unit included, above the selected cells; plain
 // Copy never does. The two Export rows download the whole table as shown.
 $ec_lang['lpn_pane_copy_heads']='Copy with headings';
-$ec_lang['lpn_pane_export_csv']='Export table as CSV';
-$ec_lang['lpn_pane_export_ods']='Export table as ODS';
 // Tom, 2026-10-07. File, Export to, ODS/XLSX/CSV file: a box asking which tables and which scenarios.
 // {format} is ODS, XLSX or CSV, the file format's own name, never translated.
 $ec_lang['lpn_export_table_title']='Export to {format}';

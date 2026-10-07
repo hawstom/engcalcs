@@ -28797,8 +28797,9 @@ var EngCalcs = EngCalcs || {};
 		mk(pc.lpn_pane_print || 'Print table', function () { printPaneTable(spec); });
 		// **EXPORT THE TABLE, NEXT TO PRINT IT** (Tom, 2026-10-06). The whole table as it is shown: its
 		// visible columns, its sort, its filter. One file per click.
-		mk(pc.lpn_pane_export_csv || 'Export table as CSV', function () { paneExportTable(spec, 'csv'); });
-		mk(pc.lpn_pane_export_ods || 'Export table as ODS', function () { paneExportTable(spec, 'ods'); });
+		['csv', 'ods', 'xlsx'].forEach(function (kind) {
+			mk((pc.lpn_export_table_title || 'Export to {format}').replace('{format}', kind.toUpperCase()), function () { paneExportTable(spec, kind); });
+		});
 		// **FILL DOWN, ON THE SAME MENU, FOR THE SAME RANGE.** Offered only when the selection
 		// spans more than one row -- a single row has nothing below it to fill, and an item that
 		// does nothing when clicked is worse than an absent one.
@@ -29276,6 +29277,11 @@ var EngCalcs = EngCalcs || {};
 	function paneSanitizeFileName(s) {
 		return String(s || '').replace(/[\\/:*?"<>|]/g, '_').replace(/\s+/g, ' ').replace(/^\s+|\s+$/g, '');
 	}
+	// A name for a file, a zip entry or a sheet: no spaces (Tom, 2026-10-07). A spaced hyphen becomes
+	// a bare one and any other run of white space one underscore.
+	function paneNoSpace(s) {
+		return String(s || '').replace(/\s+-\s+/g, '-').replace(/\s+/g, '_');
+	}
 	function paneEndPrint() {
 		if (document.body) { document.body.classList.remove('lpn-printing-table'); }
 		if (panePrintArea && panePrintArea.parentNode) {
@@ -29322,7 +29328,7 @@ var EngCalcs = EngCalcs || {};
 	}
 	function paneProjectPrefix() {
 		var proj = paneSanitizeFileName((typeof project === 'object' && project && project.name) || '');
-		return proj ? proj + '-' : '';
+		return proj ? paneNoSpace(proj) + '-' : '';
 	}
 	// One table as the three arrays a file writer takes. With `scn` the table is read as Show scenarios
 	// reads it -- its scenario-wrapped columns, so a result that belongs to a scenario that is not the
@@ -29363,9 +29369,11 @@ var EngCalcs = EngCalcs || {};
 	};
 	function paneExportTable(spec, kind) {
 		var pc = EngCalcs.pageConfig || {}, d = paneSheetData(spec), table = paneTableLabel(spec),
-			name = paneProjectPrefix() + table + '.' + kind, data;
+			name = paneProjectPrefix() + paneNoSpace(table) + '.' + kind, data;
 		if (!EngCalcs.lpnTableCsv) { return; }
-		data = kind === 'csv' ? EngCalcs.lpnTableCsv(d.heads, d.cells) : EngCalcs.lpnTableOds(d.heads, d.cells, table, d.numeric);
+		data = kind === 'csv' ? EngCalcs.lpnTableCsv(d.heads, d.cells) : kind === 'xlsx'
+			? EngCalcs.lpnTableXlsx(d.heads, d.cells, table, d.numeric)
+			: EngCalcs.lpnTableOds(d.heads, d.cells, table, d.numeric);
 		downloadTextFile(name, data, PANE_EXPORT_MIME[kind]);
 		setNotice((pc.lpn_status_inp_exported || 'Exported {file}.').replace('{file}', name));
 	}
@@ -29458,7 +29466,7 @@ var EngCalcs = EngCalcs || {};
 		items.forEach(function (it) { tables[it.table] = true; });
 		multiTables = Object.keys(tables).length > 1;
 		// A file name, so the scenario's own name (free text: "A/B: C?") is made safe like the table's.
-		function part(it, sep) { return paneSanitizeFileName(it.table) + (it.scn ? sep + paneSanitizeFileName(it.scn) : ''); }
+		function part(it, sep) { return paneNoSpace(paneSanitizeFileName(it.table)) + (it.scn ? sep + paneNoSpace(paneSanitizeFileName(it.scn)) : ''); }
 		// A sheet name, 31 characters at most: the scenario first, the table shortened before it, so
 		// two scenarios of one table stay distinguishable. Trailing spaces are trimmed.
 		function sheetPart(it) {
@@ -29478,7 +29486,7 @@ var EngCalcs = EngCalcs || {};
 			data = E.lpnTableCsv(items[0].data.heads, items[0].data.cells);
 			mime = PANE_EXPORT_MIME.csv;
 		} else {
-			name = pre + (multiTables ? (pc.lpn_tables_menu || 'Tables') : (items.length === 1 ? part(items[0], '-') : paneSanitizeFileName(items[0].table)));
+			name = pre + (multiTables ? paneNoSpace(pc.lpn_tables_menu || 'Tables') : (items.length === 1 ? part(items[0], '-') : paneNoSpace(paneSanitizeFileName(items[0].table))));
 			if (format === 'csv') {
 				var used = {};
 				name += '.zip';
@@ -29486,10 +29494,10 @@ var EngCalcs = EngCalcs || {};
 				data = E.lpnZipStore(items.map(function (it) {
 					return { base: part(it, '-'), heads: it.data.heads, rows: it.data.cells };
 				}).concat(libs.map(function (l) {
-					return { base: paneSanitizeFileName(l.name), heads: l.heads, rows: l.rows };
+					return { base: paneNoSpace(paneSanitizeFileName(l.name)), heads: l.heads, rows: l.rows };
 				})).map(function (f) {
 					var n = f.base, k = 1;
-					while (used[n.toLowerCase()]) { k++; n = f.base + ' (' + k + ')'; }
+					while (used[n.toLowerCase()]) { k++; n = f.base + '_' + k; }
 					used[n.toLowerCase()] = true;
 					return { name: n + '.csv', data: new TextEncoder().encode(E.lpnTableCsv(f.heads, f.rows)) };
 				}));

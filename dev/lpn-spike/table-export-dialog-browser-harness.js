@@ -249,10 +249,11 @@ async function main() {
 			await a.menuClickSub(exportMenu, rowFor[format]);
 			await page.waitForSelector('#lpn_dialog', { state: 'visible' });
 		};
-		const libLbl = { pat: await a.lang('lpn_library_patterns'), cur: await a.lang('lpn_library_curves'),
-			typ: await a.lang('lpn_library_pipetypes'), fit: await a.lang('lpn_library_fittings') };
+		const ns = (t) => t.replace(/\s+-\s+/g, '-').replace(/\s+/g, '_');
+		const libLbl = { pat: ns(await a.lang('lpn_library_patterns')), cur: ns(await a.lang('lpn_library_curves')),
+			typ: ns(await a.lang('lpn_library_pipetypes')), fit: ns(await a.lang('lpn_library_fittings')) };
 		const esc = (t) => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-		const LIBS = new RegExp('^(' + [libLbl.pat, libLbl.typ, libLbl.fit].map((t) => esc(t) + '$').concat([esc(libLbl.cur) + ' - ']).join('|') + ')');
+		const LIBS = new RegExp('^(' + [libLbl.pat, libLbl.typ, libLbl.fit].map((t) => esc(t) + '$').concat([esc(libLbl.cur) + '-']).join('|') + ')');
 		const boxTitle = () => page.evaluate(() => { const t = document.getElementById('lpn_dialog_title'); return t ? t.textContent.trim() : ''; });
 		const groups = () => page.evaluate(() => Array.from(document.querySelectorAll('#lpn_dialog_body .lpn-export-group')).map((g) => ({
 			head: g.firstChild.textContent, options: Array.from(g.querySelectorAll('input')).map((i) => i.value + (i.checked ? '*' : '') + (i.disabled ? '!' : ''))
@@ -274,6 +275,11 @@ async function main() {
 			const file = path.join(tmp, dl.suggestedFilename());
 			await dl.saveAs(file);
 			await a.settle(300);
+			// Tom, 2026-10-07: "Remove spaces from library file and tab names." Nothing a download
+			// names -- the file, a zip entry, a sheet -- may hold a space.
+			const inner = /\.csv$/.test(dl.suggestedFilename()) ? { sheets: [], names: [] } : inspect(file, format === 'csv' ? 'zip' : format);
+			const names = (inner.sheets && inner.sheets.length ? inner.sheets.map((x) => x.name) : []).concat(/\.zip$/.test(dl.suggestedFilename()) ? inner.names : []);
+			ok('no space in ' + dl.suggestedFilename() + ' or in what is inside it', !/\s/.test(dl.suggestedFilename()) && names.every((n) => !/\s/.test(n)), names.filter((n) => /\s/.test(n)).join(' | '));
 			return { file, name: dl.suggestedFilename() };
 		}
 
@@ -381,7 +387,7 @@ async function main() {
 
 		// ---- 5b. libraries -----------------------------------------------------------------------
 		console.log('\n--- libraries ---');
-		await a.menuClick(await a.lang('lpn_library_menu'), 'edit');
+		await a.menuClick(await a.lang('lpn_library_menu'), 'project');
 		await page.waitForSelector('#lpn_library_box', { state: 'visible' });
 		const libClick = async (sel, text) => page.evaluate(([sl, t]) => {
 			const b = sl ? document.querySelector(sl) : Array.from(document.querySelectorAll('#lpn_libbox_content button')).find((x) => x.textContent.trim() === t);
@@ -409,7 +415,7 @@ async function main() {
 		f = inspect(r.file, 'xlsx');
 		const byName = {};
 		f.sheets.forEach((x) => { byName[x.name] = x; });
-		const pat = byName[libLbl.pat], crv = f.sheets.find((x) => x.name.indexOf(libLbl.cur + ' - ') === 0),
+		const pat = byName[libLbl.pat], crv = f.sheets.find((x) => x.name.indexOf(libLbl.cur + '-') === 0),
 			typ = byName[libLbl.typ], fit = byName[libLbl.fit];
 		ok('the workbook carries a sheet per library: patterns, curves by type, pipe types, fittings', !!pat && !!crv && !!typ && !!fit, Object.keys(byName).join(', '));
 		ok('Patterns: Net1 pattern 1, its 12 multipliers across, as numbers', !!pat && pat.rows[1][0] === '1' && pat.rows[1].slice(1).map(Number).join() === '1,1.2,1.4,1.6,1.4,1.2,1,0.8,0.6,0.4,0.6,0.8' && pat.floats[1][1] !== null, pat && JSON.stringify(pat.rows[1]));
@@ -427,7 +433,41 @@ async function main() {
 		ok('one table to CSV is still one .csv file, no zip', /Junctions\.csv$/.test(r.name), r.name);
 		r = await runExport('csv', 'all');
 		f = inspect(r.file, 'zip');
-		ok('a CSV zip carries a file per library too', [libLbl.pat, libLbl.typ, libLbl.fit].every((n) => f.names.includes(n + '.csv')) && f.names.some((n) => n.indexOf(libLbl.cur + ' - ') === 0), f.names.join(', '));
+		ok('a CSV zip carries a file per library too', [libLbl.pat, libLbl.typ, libLbl.fit].every((n) => f.names.includes(n + '.csv')) && f.names.some((n) => n.indexOf(libLbl.cur + '-') === 0), f.names.join(', '));
+
+		// ---- 5c. the right-click rows ----------------------------------------------------------------
+		console.log('\n--- right-click ---');
+		const ctxRows = async () => {
+			await page.click('#lpn_pane_junctions tbody td', { button: 'right' });
+			await page.waitForSelector('.lpn-pane-ctxmenu', { state: 'visible' });
+			return page.evaluate(() => Array.from(document.querySelector('.lpn-pane-ctxmenu').children).map((x) => x.textContent.replace(/\s+/g, ' ').trim()));
+		};
+		let rows = await ctxRows();
+		const want = ['CSV', 'ODS', 'XLSX'].map((x) => lbl.title.replace('{format}', x));
+		ok('the table right-click offers Export to CSV, Export to ODS and Export to XLSX in a row', want.every((w) => rows.some((x) => x.indexOf(w) === 0)) &&
+			rows.findIndex((x) => x.indexOf(want[0]) === 0) + 2 === rows.findIndex((x) => x.indexOf(want[2]) === 0), rows.join(' | '));
+		ok('the old "Export table as" wording is gone', !rows.some((x) => /Export table/.test(x)), rows.join(' | '));
+		const ctxExport = async (w) => {
+			if (!(await page.$('.lpn-pane-ctxmenu'))) { await ctxRows(); }
+			const [dl] = await Promise.all([page.waitForEvent('download'), page.evaluate((t) => {
+				const row = Array.from(document.querySelector('.lpn-pane-ctxmenu').children).find((x) => x.textContent.replace(/\s+/g, ' ').trim().indexOf(t) === 0);
+				row.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, detail: 1 }));
+			}, w)]);
+			const file = path.join(tmp, 'ctx-' + dl.suggestedFilename());
+			await dl.saveAs(file);
+			await a.settle(300);
+			return { file, name: dl.suggestedFilename() };
+		};
+		r = await ctxExport(want[2]);
+		f = inspect(r.file, 'xlsx');
+		ok('right-click XLSX: a valid workbook, one sheet, the one table, no space in any name', /Junctions\.xlsx$/.test(r.name) && !/\s/.test(r.name) && f.bad === null && f.names.includes('[Content_Types].xml') &&
+			f.sheets.length === 1 && f.sheets[0].name === 'Junctions' && JSON.stringify(f.sheets[0].rows) === JSON.stringify(csv), r.name + ' ' + f.sheets.map((x) => x.name).join());
+		ok('right-click XLSX is frozen and has numbers as numbers like the File menu one', f.sheets[0].pane && f.sheets[0].pane.state === 'frozen' && f.sheets[0].floats.slice(1).some((row) => row.some((v) => v !== null)));
+		r = await ctxExport(want[1]);
+		f = inspect(r.file, 'ods');
+		ok('right-click ODS: one sheet, the table', /Junctions\.ods$/.test(r.name) && f.sheets.length === 1 && f.sheets[0].name === 'Junctions', r.name);
+		r = await ctxExport(want[0]);
+		ok('right-click CSV: the table CSV', /Junctions\.csv$/.test(r.name) && JSON.stringify(parseCsv(fs.readFileSync(r.file, 'utf8').replace(/^\uFEFF/, ''))) === JSON.stringify(csv), r.name);
 
 		// ---- 6. scenarios ----------------------------------------------------------------------
 		console.log('\n--- scenarios ---');
@@ -459,7 +499,7 @@ async function main() {
 		ok('XLSX, current table, all scenarios: a sheet per scenario', f.sheets.length === 2 && /Peak/.test(f.sheets.map((s) => s.name).join()) && f.sheets.some((s) => /Base/.test(s.name)), f.sheets.map((s) => s.name).join(', '));
 		ok('each scenario sheet has the table\'s rows and no Scenario column', f.sheets.every((s) => s.rows.length === before.rows.length + 1 && s.rows[0].join() === before.heads.join()), JSON.stringify(f.sheets.map((s) => [s.rows.length, s.rows[0].length])) + ' ' + before.rows.length);
 		r = await runExport('csv', 'current', 'current');
-		ok('CSV, current scenario: one file named with the scenario', /Junctions-A_B_ C_ Peak\.csv$/.test(r.name), r.name);
+		ok('CSV, current scenario: one file named with the scenario', /Junctions-A_B__C__Peak\.csv$/.test(r.name), r.name);
 		r = await runExport('xlsx', 'all', 'all');
 		f = inspect(r.file, 'xlsx');
 		f.sheets = f.sheets.filter((x) => !LIBS.test(x.name));

@@ -100,10 +100,12 @@ var EngCalcs = (typeof require === 'function' && typeof module !== 'undefined')
 	function sheetNames(wanted) {
 		var seen = {};
 		return wanted.map(function (w) {
-			var base = String(w || 'Table').replace(/[\[\]*?:\/\\]/g, ' ').replace(/\s+/g, ' ').replace(/^[\s']+|[\s']+$/g, '').slice(0, 31) || 'Table',
+			// **NO SPACES IN A SHEET NAME** (Tom, 2026-10-07): a run of spaces becomes one underscore, and
+			// a spaced hyphen becomes a bare one, so "Curves - Pump head" is "Curves-Pump_head".
+			var base = String(w || 'Table').replace(/[\[\]*?:\/\\]/g, '_').replace(/\s+-\s+/g, '-').replace(/\s+/g, '_').replace(/^[\s_']+|[\s_']+$/g, '').slice(0, 31) || 'Table',
 				name = base, n = 1, tail;
 			while (seen[name.toLowerCase()]) {
-				n++; tail = ' (' + n + ')';
+				n++; tail = '_' + n;
 				name = base.slice(0, 31 - tail.length) + tail;
 			}
 			seen[name.toLowerCase()] = true;
