@@ -66,7 +66,7 @@ EngCalcs.lpnPlacerD = (function () {
 	var PADX0 = 8, PADY0 = 3; // clearance between two different labels, so each reads as its own
 	var PADX_T = 3, PADY_T = 1.5; // the tighter clearance a label takes rather than be hidden ('tight')
 	var PADX = PADX0, PADY = PADY0, tightMode = false;
-	var BUDGET_MS = 700;      // R10: a layout stops improving after this long ('timebound')
+	var BUDGET_MS = 650;      // R10: a layout stops improving after this long ('timebound')
 	var DENSE_REACH = 4;      // 'rescue': leader lengths out to this many rows, every half row
 	var DENSE_STEP = 15;      // 'rescue': every this many degrees
 
