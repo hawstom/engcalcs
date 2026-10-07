@@ -23,18 +23,21 @@ header('Content-Type: text/plain');
 // OPENED IN A BROWSER BY HAND, this endpoint says whether THAT browser is counted. It is the only
 // way to verify the ?ec_nolog=1 opt-out took: the cookie is httponly, so no script and no
 // address-bar trick can read it, and a beacon answers 204 whether it wrote a row or not. Plain
-// text, no markup, nothing logged. A GET with no page is what a person typing the address
+// text, no markup, nothing logged here (a tester's first request of the day is still tallied by
+// lib/config.inc.php). A GET with no page is what a person typing the address
 // produces; a beacon is always a POST. Task 210.
 if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'GET') {
     echo (function_exists('ecLoggingOptedOut') && ecLoggingOptedOut())
-        ? "not counted: this browser carries ec_nolog=1 and no usage log will record it\n"
-        : "counted: this browser is not opted out (open any page with ?ec_nolog=1 to opt out)\n";
+        ? "tester: this browser carries ec_nolog and is counted only in the tester tally (?ec_nolog=0 clears it)\n"
+        : "counted: this browser is not a tester (open any page with ?ec_nolog=1 to mark it as one)\n";
     exit;
 }
 
 // Task 210: a browser that opted out is not counted. Answered 204 like a normal success so the
 // beacon is never queued for retry -- an opted-out event must not come back later.
+// Since 2026-10-07 a tester browser's event goes to the tester tally instead of this log.
 if (function_exists('ecLoggingOptedOut') && ecLoggingOptedOut()) {
+    ecLogTester('shopping', isset($_POST['page']) ? (string) $_POST['page'] : '');
     http_response_code(204);
     exit;
 }

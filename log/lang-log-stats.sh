@@ -339,8 +339,11 @@ echo ""
 echo "-------------------------------------------------------------------------------"
 echo " THE TWO BUCKETS — never summed, never in the same table"
 echo "-------------------------------------------------------------------------------"
-echo "   people      rows from visitors who agreed to being counted once instead of every time."
-echo "               De-duplicated per (visit, page). ONE ROW IS ONE PERSON."
+echo "   people      rows from browsers that said yes to the counting question. Since 2026-10-07"
+echo "               each such browser is counted the FIRST time it does each thing on each page,"
+echo "               and not again while its one-year ec_seen cookie lasts, so in any window this"
+echo "               bucket counts browsers seen there for the first time. Rows before that date"
+echo "               were de-duplicated per visit. ONE ROW IS ONE BROWSER, PER PAGE."
 echo "   page loads  rows from everybody else — refused, or has not answered the banner. Nothing"
 echo "               is stored on their device, so nothing tells their second load from their"
 echo "               first. ONE ROW IS ONE PAGE LOAD."
@@ -410,10 +413,11 @@ echo ""
     $1 != "" { if ($2=="p") p[$1]++; else l[$1]++; seen[$1]=1 }
     END { for (k in seen) printf "%d\t%d\t%s\n", (k in p?p[k]:0), (k in l?l[k]:0), k }' \
 | sort -t$'\t' -k1,1rn -k2,2rn | awk -F'\t' '
-    BEGIN { printf "   %-6s %-28s %14s %16s\n", "rank", "page", "people", "page loads" }
+    BEGIN { printf "   %-6s %-28s %14s %16s\n", "", "", "browsers", "page loads"
+            printf "   %-6s %-28s %14s %16s\n", "rank", "page", "(said yes)", "(everyone else)" }
     { n++; printf "   %-6d %-28s %14d %16d\n", n, $3, $1, $2 }'
 echo ""
-echo "   Rank is by the people bucket, with the page-load bucket printed beside it so a"
+echo "   Rank is by the said-yes bucket, with the page-load bucket printed beside it so a"
 echo "   disagreement between the two is visible. They are different units; the ranks are"
 echo "   comparable, the counts are not."
 

@@ -62,6 +62,9 @@ $cutoff = gmdate('Y-m-d\TH:i:s\Z', strtotime("-{$months} months"));
 // until 2026-08-21, so the behaviour-signal rows were the one set the retention backstop never
 // touched.
 $logs = [LANG_LOG, HUMAN_VIEW_LOG, CALC_USAGE_LOG, TITLE_LOG, CONTACT_SEND_LOG, SIGNAL_LOG];
+// TESTER_LOG (2026-10-07) is trimmed under the same promise but is NOT rotated by archive_logs.php:
+// it is a few rows a day, and the daily report's tester count reads one continuous file.
+$logs[] = TESTER_LOG;
 
 // AND EVERY ARCHIVE. Until 2026-08-23 this script read the six live paths and nothing else, so a
 // log rotated into spock/<date>/ by dev/scripts/archive_logs.php -- or hand-moved there, which is

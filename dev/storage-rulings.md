@@ -42,6 +42,16 @@ Full inventory: `dev/cookie-storage-inventory.md`.
 - **Never restyle one consent button to stand out.** `.ec-consent-btn` styles both answers identically
   on purpose; a coloured Accept beside a grey Reject is the dark pattern this design avoids.
 - **Cookie lifetimes are defensible out loud.** One year is the house default.
+- **`ec_seen` lasts one year, not one session** (Tom, 2026-10-07: *"if we are collecting consent
+  anyway, let's collect it for remembering for a year that they've been here"*). A session lifetime
+  spent the banner's interruption on a per-visit count; a year makes the said-yes bucket count
+  browsers, per page. `consent_body` names no lifetime, so it stays true and the version does not
+  move.
+- **The tester mark (`ec_nolog`) is exempt, day stamp included.** Nobody reaches it by accident:
+  the only door is typing `?ec_nolog=1`, which is a request to be kept out of the counts, and the
+  cookie does nothing but carry that request out. The stamp is what renews the year once a day
+  while the mark is in use, and it is a date shared by everyone, so it identifies no one; that it
+  also yields the tester-browser count is a by-product, not a second purpose stored for it.
 
 ---
 

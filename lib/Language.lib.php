@@ -21,8 +21,8 @@
   *
   */
 // $source: 'get' = explicit ?lang=XX (every occurrence)
-//          'cookie' = returning user with saved preference (once per session)
-//          'browser' = Accept-Language auto-detection (once per session)
+//          'cookie' = returning user with saved preference (once per ec_seen year)
+//          'browser' = Accept-Language auto-detection (once per browser, via ec_blang)
 //          'view' = a later page in a session whose language was already pinned by one of the
 //                   above (once per session per page). Exists purely so LANG_LOG's page/lang
 //                   breakdown covers every page visited, not just the page that pinned the
@@ -57,7 +57,11 @@ function logLanguageSelection($lang, $source, $served = '') {
     if (!$logFile) return;
     // Task 210: a browser that opted out of being counted is not counted here either. All three log
     // writers check the same one flag, so an opt-out cannot half-apply.
-    if (function_exists('ecLoggingOptedOut') && ecLoggingOptedOut()) return;
+    // Since 2026-10-07 a tester's row goes to the tester tally instead (ecLogTester()).
+    if (function_exists('ecLoggingOptedOut') && ecLoggingOptedOut()) {
+        ecLogTester('reach', isset($_SERVER['SCRIPT_NAME']) ? basename($_SERVER['SCRIPT_NAME'], '.php') : '');
+        return;
+    }
     // Nothing rendered from the command line is a visitor. This never mattered before Task 286,
     // because a CLI render had a session and so logged at most one row per process; now that the
     // storage-free path logs one row per page load, a single run of html_balance_check.php (which

@@ -322,6 +322,7 @@ if [ -x "$PROD/log/lang-log-stats.sh" ] || [ -r "$PROD/log/lang-log-stats.sh" ];
         echo " $2 (${dur:-?} days, $win):"
         printf '%s\n' "$1" | awk '
             /RANK BY SHOPPING/         {r=1; next}
+            r && /^ +browsers +page loads *$/ {print; next}
             r && /^ *rank[[:space:]]/  {print; next}
             r && /^ *[0-9]+ +[A-Za-z]/ {if (++k<=6) print; next}
             r && k>0 && /^ *$/         {exit}
@@ -339,9 +340,10 @@ if [ -x "$PROD/log/lang-log-stats.sh" ] || [ -r "$PROD/log/lang-log-stats.sh" ];
             # page view. Both columns come from the >=10s-dwell "shopping" beacon, so robots are
             # nearly all excluded by behaviour; there is no robot list in this codebase.
             echo " The two counts are different units; never add them:"
-            echo "   people      visitors who accepted the consent banner, counted"
-            echo "               once per person per page"
-            echo "   page loads  everyone else, one row per page view"
+            echo "   browsers (said yes)         browsers that accepted the consent banner,"
+            echo "                               each counted the first time it opens each"
+            echo "                               page, and not again for a year"
+            echo "   page loads (everyone else)  one row per page view"
             echo "   Both count only after 10+ seconds on the page, so robots are"
             echo "   nearly all excluded."
             printf '%s\n' "$out" | awk '
@@ -363,6 +365,34 @@ if [ -x "$PROD/log/lang-log-stats.sh" ] || [ -r "$PROD/log/lang-log-stats.sh" ];
     fi
 else
     miss "$PROD/log/lang-log-stats.sh not found"
+fi
+
+# TESTER BROWSERS, the side count (Tom, 2026-10-07). A browser that opened any page with
+# ?ec_nolog=1 writes nothing to the logs above; its activity goes to engcalcs-tester.log instead,
+# and its first request of each UTC day writes one 'day' row there. So the 'day' rows on a date are
+# the number of distinct tester browsers used that day. lib/config.inc.php, ecTesterRequest().
+TESTER="$PROD/log/engcalcs-tester.log"
+echo ""
+echo "    Tester browsers (marked by ?ec_nolog=1), kept out of every count above:"
+if [ -r "$TESTER" ]; then
+    echo "     UTC day      tester browsers"
+    for i in 6 5 4 3 2 1 0; do
+        d=$(date -u -d "$i days ago" '+%Y-%m-%d' 2>/dev/null)
+        [ -n "$d" ] || continue
+        n=$(awk -F'\t' -v d="$d" '$2 == "day" && substr($1, 1, 10) == d' "$TESTER" | wc -l | tr -d ' ')
+        echo "     $d   $n"
+    done
+    since=$(date -u -d '24 hours ago' '+%Y-%m-%dT%H:%M:%SZ' 2>/dev/null)
+    if [ -n "$since" ]; then
+        held=$(awk -F'\t' -v s="$since" '$1 >= s && $2 != "day" && $2 != "on" && $2 != "off"' "$TESTER" | wc -l | tr -d ' ')
+        echo "     tester rows held out of the counts, last 24 hours: $held"
+    fi
+    on=$(awk -F'\t' '$2 == "on"' "$TESTER" | wc -l | tr -d ' ')
+    off=$(awk -F'\t' '$2 == "off"' "$TESTER" | wc -l | tr -d ' ')
+    first=$(head -1 "$TESTER" | cut -c1-10)
+    echo "     browsers marked since $first: $on; marks cleared: $off"
+else
+    echo "     none: no tester log yet ($TESTER)"
 fi
 
 # ---------------------------------------------------------------------------

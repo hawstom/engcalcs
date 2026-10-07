@@ -24,7 +24,7 @@ echoHeader("EngCalcs", $html_title, "", false);
 ?>
 <div class="ec-legal">
 
-<p><em>Last updated: 7 September 2026. This notice covers hawsedc.com, including the EngCalcs
+<p><em>Last updated: 7 October 2026. This notice covers hawsedc.com, including the EngCalcs
 engineering calculators at hawsedc.com/engcalcs.</em></p>
 
 <h2>The short version</h2>
@@ -95,9 +95,9 @@ USA.</p>
 
 <h3>The counting question</h3>
 
-<p>To count you once rather than once per page, we keep one digit per page in your browser, which is
-why we ask first. You can answer in three ways: <em>Refuse all</em> and we store nothing and never
-ask again; <em>Allow this</em> covers what is described here, and we ask again only if we ever want
+<p>To count you once per page rather than every time you open it, we keep one digit per page in
+your browser for a year, which is why we ask first. You can answer in three ways: <em>Refuse
+all</em> and we store nothing and never ask again; <em>Allow this</em> covers what is described here, and we ask again only if we ever want
 to do something different; <em>Allow all</em> covers that too.</p>
 
 <p>If you say no we keep nothing in your browser, and we still count the page load itself, in a more
@@ -117,7 +117,7 @@ did agree, because they are a different kind of number.</p>
 	<tr><td><code>ec_geosearch</code></td><td>Your yes to place-name search. Only a yes is stored</td><td>1 year</td><td>No</td></tr>
 	<tr><td><code>ec_terrain</code></td><td>Your yes to elevation lookup. Only a yes is stored</td><td>1 year</td><td>No</td></tr>
 	<tr><td><code>ec_blang</code></td><td>One digit: we have already recorded which language your browser asks for</td><td>1 year</td><td><strong>Yes</strong></td></tr>
-	<tr><td><code>ec_seen</code></td><td>One digit per page: which counts we have already made. No identifier</td><td>Until you close your browser</td><td><strong>Yes</strong></td></tr>
+	<tr><td><code>ec_seen</code></td><td>One digit per page: which counts we have already made. No identifier</td><td>1 year</td><td><strong>Yes</strong></td></tr>
 	<tr><td>Saved networks (browser storage)</td><td>The pipe networks you draw</td><td>Until you delete them</td><td>No</td></tr>
 	<tr><td>Lock token and page layout (browser storage)</td><td>A random code that tells the lock server which locks are yours, and how you left the panels</td><td>Until you delete them</td><td>No</td></tr>
 	<tr><td>Offline copy of the suite (browser cache)</td><td>This site&rsquo;s own pages, scripts, styles, and icons, kept so the calculators open without a connection. It holds no identifier and nothing you entered, and it is sent nowhere. On the Looped Pipe Network page it also keeps our own EPANET engine, fetched quietly in advance so that solver starts at once. To remove it, clear this site&rsquo;s data in your browser; the next visit rebuilds it</td><td>Until you clear it. Files are replaced when we publish a new version</td><td>No</td></tr>

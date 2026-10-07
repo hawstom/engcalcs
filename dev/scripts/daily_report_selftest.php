@@ -57,7 +57,8 @@ echo " RANK BY SHOPPING (fixture)"
 echo "==============================================================================="
 echo "   some explanatory prose a real reader would have to skip past."
 echo ""
-printf "   %-6s %-28s %14s %16s\n" "rank" "page" "people" "page loads"
+printf "   %-6s %-28s %14s %16s\n" "" "" "browsers" "page loads"
+printf "   %-6s %-28s %14s %16s\n" "rank" "page" "(said yes)" "(everyone else)"
 printf "   %-6d %-28s %14d %16d\n" 1 "Fixture-Calculator" 3 7
 printf "   %-6d %-28s %14d %16d\n" 2 "Second-Calculator" 1 1
 echo ""
@@ -66,6 +67,20 @@ echo ""
 echo "    PAGE LOADS - reach rows: 8   classified: 8   unclassified (older format): 0"
 SH;
 file_put_contents($tmp . '/log/lang-log-stats.sh', $fixtureScript);
+
+// The tester log (2026-10-07): two tester browsers used today, one yesterday, one held-out row in
+// the last 24 hours, two marks set and none cleared. Rows in the exact shape ecLogTester() writes.
+$today = gmdate('Y-m-d');
+$yday  = gmdate('Y-m-d', time() - 86400);
+$nowTs = gmdate('Y-m-d\TH:i:s\Z', time() - 60);
+file_put_contents($tmp . '/log/engcalcs-tester.log', implode('', array(
+    $yday  . "T09:00:00Z\ton\tManning-Pipe-Flow\tvisit\n",
+    $yday  . "T09:00:00Z\tday\tManning-Pipe-Flow\tvisit\n",
+    $today . "T00:00:01Z\tday\tLooped-Network\tvisit\n",
+    $today . "T00:00:02Z\ton\tDarcy-Weisbach\tvisitor\n",
+    $today . "T00:00:02Z\tday\tDarcy-Weisbach\tvisitor\n",
+    $nowTs . "\tshopping\tDarcy-Weisbach\tvisitor\n",
+)));
 chmod($tmp . '/log/lang-log-stats.sh', 0755);
 
 $phpBin = PHP_BINARY ?: 'php';
@@ -92,20 +107,33 @@ ec_dr_expect('the USAGE section ran at all', $usageStart !== false,
 
 // ---- R-121: headings. The literal header row lang-log-stats.sh already prints must survive the
 // extraction, not just daily_report.sh's own synthesized label line. ----------------------------
-ec_dr_expect('the rank-by-shopping table keeps its column header row',
-    (bool) preg_match('/rank\s+page\s+people\s+page loads/', $usage), $usage);
+ec_dr_expect('the rank-by-shopping table keeps its column header row, with the 2026-10-07 names',
+    (bool) preg_match('/browsers\s+page loads\s*\n\s*rank\s+page\s+\(said yes\)\s+\(everyone else\)/', $usage), $usage);
 ec_dr_expect('a data row (Fixture-Calculator, 3, 7) still comes through',
     (bool) preg_match('/Fixture-Calculator\s+3\s+7/', $usage), $usage);
 
 // ---- R-123: "people" is the consented bucket, never "long-dwell". ------------------------------
-ec_dr_expect('the mail states what "people" means (consented, once per person per page)',
-    strpos($usage, 'accepted the consent banner') !== false, $usage);
+ec_dr_expect('the mail states what "browsers (said yes)" means (consented, first time per page, a year)',
+    strpos($usage, 'accepted the consent banner') !== false
+    && strpos($usage, 'not again for a year') !== false, $usage);
 ec_dr_expect('the mail says both counts need 10+ seconds on the page',
     strpos($usage, '10+ seconds on the page') !== false, $usage);
 
 // ---- R-122: "page loads" does not silently claim or deny robots without saying why. ------------
-ec_dr_expect('the mail states what "page loads" means (everyone else, one row per view)',
-    strpos($usage, 'everyone else, one row per page view') !== false, $usage);
+ec_dr_expect('the mail states what "page loads (everyone else)" means (one row per view)',
+    (bool) preg_match('/page loads \(everyone else\)\s+one row per page view/', $usage), $usage);
+
+// ---- Tom, 2026-10-07: the side count of tester browsers. ---------------------------------------
+ec_dr_expect('the mail carries a tester-browser side count',
+    strpos($usage, 'Tester browsers (marked by ?ec_nolog=1)') !== false, $usage);
+ec_dr_expect('today shows 2 tester browsers (two day rows today)',
+    (bool) preg_match('/' . preg_quote($today, '/') . '\s+2\b/', $usage), $usage);
+ec_dr_expect('yesterday shows 1 tester browser',
+    (bool) preg_match('/' . preg_quote($yday, '/') . '\s+1\b/', $usage), $usage);
+ec_dr_expect('one tester row was held out of the counts in the last 24 hours',
+    strpos($usage, 'tester rows held out of the counts, last 24 hours: 1') !== false, $usage);
+ec_dr_expect('marks set and cleared are counted from the whole file',
+    strpos($usage, 'browsers marked since ' . $yday . ': 2; marks cleared: 0') !== false, $usage);
 ec_dr_expect('the mail gives the true, checked answer on robots (excluded by the dwell gate, '
     . 'not by a robot list)', strpos($usage, 'robots are') !== false, $usage);
 
@@ -120,6 +148,7 @@ ec_dr_expect('a zero old-format count prints no reach-rows line',
 
 // cleanup
 @unlink($tmp . '/log/lang-log-stats.sh');
+@unlink($tmp . '/log/engcalcs-tester.log');
 @rmdir($tmp . '/log');
 @rmdir($tmp);
 

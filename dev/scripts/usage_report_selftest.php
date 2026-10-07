@@ -44,12 +44,15 @@ function ec_ur_expect($label, $ok, $detail = '') {
 $cfg = (string) file_get_contents($root . '/lib/config.inc.php');
 foreach (array_keys(ecUsageLogKinds()) as $name) {
     ec_ur_expect("config.inc.php still defines a log named $name",
-        strpos($cfg, "/log/" . $name . "'") !== false);
+        strpos($cfg, "EC_LOG_DIR . '/" . $name . "'") !== false);
 }
-preg_match_all("#/log/(engcalcs-[a-z-]+\.log)'#", $cfg, $m);
+// engcalcs-tester.log (2026-10-07) is deliberately NOT one of the page's logs: it holds the tester
+// browsers kept OUT of every count, and the daily report reads it on its own.
+preg_match_all("#EC_LOG_DIR \. '/(engcalcs-[a-z-]+\.log)'#", $cfg, $m);
+$cfgNames = array_values(array_diff(array_unique($m[1]), array('engcalcs-tester.log')));
 ec_ur_expect('config.inc.php defines no SEVENTH log this page would silently miss',
-    count(array_unique($m[1])) === count(ecUsageLogKinds()),
-    'config names: ' . implode(', ', array_unique($m[1])));
+    count($cfgNames) === count(ecUsageLogKinds()),
+    'config names: ' . implode(', ', $cfgNames));
 
 // ---- 2. the parser, row by row, on the vintages that actually exist ---------------------------
 $T = "\t";

@@ -21,7 +21,9 @@ header('Content-Type: text/plain');
 
 // Task 210: a browser that opted out is not counted. Answered 204 like a normal success so the
 // beacon is never queued for retry -- an opted-out event must not come back later.
+// Since 2026-10-07 a tester browser's event goes to the tester tally instead of this log.
 if (function_exists('ecLoggingOptedOut') && ecLoggingOptedOut()) {
+    ecLogTester('behaviour', isset($_POST['page']) ? (string) $_POST['page'] : '');
     http_response_code(204);
     exit;
 }
