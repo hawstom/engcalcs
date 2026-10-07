@@ -14,6 +14,7 @@
 //   3. Junction 22 dragged with the mouse: its four Auto pipe lengths, as the .inp export states
 //      them, are ground lengths within 0.1% of Vincenty's geodesic, not the 41% longer plane
 //      distance between the metre coordinates.
+//   3a. The scale bar and a customer's Offset box (read, then typed) are ground distances.
 //   4. File, Export EPANET file writes those metre values into [COORDINATES]; importing that .inp
 //      and exporting it again gives back the same characters (only the user touches a file's
 //      numbers).
@@ -121,6 +122,8 @@ function net1() {
 		project: { name: 'Net1 at 45N', activeScenario: 'base', coords: 'geo', basemap: 'osm' },
 		scenarios: [{ id: 'base', name: 'Base', isBase: true, overrides: {} }],
 		nodes, links,
+		// One customer on pipe 11, half way along, about 22 m off it (0.0002 degree of latitude).
+		customers: [{ id: 'C1', link: '11', t: 0.5, x: 0, y: -0.0002, count: 1, demand: 0.5 }],
 		units: { lpn_u_length: 'm', lpn_u_diameter: 'mm', lpn_u_elevhead: 'mh2o', lpn_u_pressure: 'kpa',
 			lpn_u_flow: 'lps', lpn_u_velocity: 'mps', lpn_u_gradient: 'gradePercent', lpn_u_roughness: 'mm', lpn_u_age: 'hr' }
 	};
@@ -219,9 +222,10 @@ async function main() {
 			}, label)]);
 			const text = fs.readFileSync(await dl.path(), 'utf8');
 			await a.settle(600);
-			// The export may list what the format could not hold; that box is closed so it does not
-			// sit over the menu bar.
-			await page.evaluate(() => { document.querySelectorAll('.lpn-dialog-x, #lpn_dialog_close').forEach((b) => { if (b.offsetParent) { b.click(); } }); });
+			// The export lists what the format could not hold (the customer); that dialog is answered
+			// with its own button so it does not sit over the menu bar.
+			const d = await a.dialog();
+			if (d && d.buttons.length) { await a.dialogClick(d.buttons[d.buttons.length - 1]); }
 			return text;
 		}
 
@@ -277,6 +281,50 @@ async function main() {
 			m['9'].x.toFixed(3) + ', ' + m['9'].y.toFixed(3));
 		const status = await page.$eval('#lpn_crs', (e) => e.textContent).catch(() => '');
 		ok('the status strip names EPSG:3857', status === NAME_3857, status);
+
+		console.log('\n--- 3a. the scale bar and a customer offset are ground distances ---');
+		{
+			const bar = await page.$eval('#lpn_scalebar', (e) => ({ shown: e.style.display !== 'none', text: e.textContent, w: e.getBoundingClientRect().width }));
+			const at = (id) => page.$eval('#lpn_canvas circle.lpn-node[data-node="' + id + '"]', (e) => { const b = e.getBoundingClientRect(); return { x: b.left + b.width / 2, y: b.top + b.height / 2 }; });
+			const p9 = await at('9'), p13 = await at('13');
+			const groundPerPx = vincenty(ll0['9'].x, ll0['9'].y, ll0['13'].x, ll0['13'].y) / Math.hypot(p13.x - p9.x, p13.y - p9.y);
+			const barPerPx = parseFloat(bar.text) / bar.w;
+			ok('the scale bar is shown', bar.shown && barPerPx > 0, JSON.stringify(bar));
+			ok('...and its length is a ground distance, within 3% of the map\'s own', Math.abs(barPerPx - groundPerPx) / groundPerPx < 0.03,
+				barPerPx.toFixed(4) + ' vs ' + groundPerPx.toFixed(4) + ' m/px (plane would be ' + (groundPerPx / Math.cos(45.035 * RAD)).toFixed(4) + ')');
+			// The customer: its stored offset is in Mercator metres; the ground distance it stands for
+			// is measured here from the metres back through the formula written out above.
+			const cst = (await stored(mercId)).customers[0], a11 = m['11'], a12 = m['12'];
+			const ax = a11.x + (a12.x - a11.x) * cst.t, ay = a11.y + (a12.y - a11.y) * cst.t;
+			const deg = (x, y) => ({ lon: x / R / RAD, lat: (2 * Math.atan(Math.exp(y / R)) - Math.PI / 2) / RAD });
+			const groundOff = (c) => { const A = deg(ax, ay), B = deg(ax + c.x, ay + c.y); return vincenty(A.lon, A.lat, B.lon, B.lat); };
+			const truth = groundOff(cst);
+			const cp = await page.$eval('#lpn_canvas circle.lpn-meter[data-cust="C1"]', (e) => { const b = e.getBoundingClientRect(); return { x: b.left + b.width / 2, y: b.top + b.height / 2 }; });
+			await page.mouse.click(cp.x, cp.y);
+			await a.settle(800);
+			const offLabel = await S('lpn_field_meter_offset');
+			const readOff = () => page.evaluate((lab) => {
+				const l = Array.from(document.querySelectorAll('label')).find((e) => e.offsetParent && e.textContent.indexOf(lab) === 0 && e.querySelector('input'));
+				return l ? l.querySelector('input').value : null;
+			}, offLabel);
+			const shown = await readOff();
+			ok('the Offset box shows the ground distance of the stored offset, within 0.5%',
+				shown !== null && Math.abs(Math.abs(parseFloat(shown)) - truth) / truth < 0.005, shown + ' vs ' + truth.toFixed(3) + ' m');
+			if (shown !== null) {
+				await page.evaluate((lab) => {
+					const l = Array.from(document.querySelectorAll('label')).find((e) => e.offsetParent && e.textContent.indexOf(lab) === 0 && e.querySelector('input'));
+					const i = l.querySelector('input');
+					i.value = String(Math.sign(parseFloat(i.value) || 1) * 25);
+					i.dispatchEvent(new Event('change', { bubbles: true }));
+				}, offLabel);
+				await a.settle(1000);
+				const typed = groundOff((await stored(mercId)).customers[0]);
+				ok('...and typing 25 m puts the customer 25 m off the pipe on the ground, within 0.5%',
+					Math.abs(typed - 25) / 25 < 0.005, typed.toFixed(3) + ' m');
+			}
+			await page.keyboard.press('Escape');
+			await a.settle(300);
+		}
 
 		console.log('\n--- 3. Auto pipe lengths are ground lengths, as the .inp export states them ---');
 		// A length is derived when the drawing changes (an opened file keeps its own numbers), so

@@ -23,7 +23,7 @@
 'use strict';
 
 const path = require('path');
-const { ROOT, loadLoopedNetwork } = require('./lpn-dom-stub.js');
+const { ROOT, byId, loadLoopedNetwork } = require('./lpn-dom-stub.js');
 
 global.window.EngCalcs = global.EngCalcs;
 require(path.join(ROOT, 'js', 'lpn-crs.js'));
@@ -110,6 +110,7 @@ const L = loadLoopedNetwork(
 	"\t\tinwardX: inwardX, inwardY: inwardY, outwardX: outwardX, outwardY: outwardY,\n" +
 	"\t\tlinkGeomLength: linkGeomLength, metresPerWorldUnit: metresPerWorldUnit,\n" +
 	"\t\tisWebMerc: isWebMercProject, isProjected: isProjectedProject, isGeo: isLatLonProject,\n" +
+	"\t\tfitScale: projectedFitScale,\n" +
 	"\t\tlocatable: projectLocatable, crsName: crsDisplayName, unitKey: unitKey,\n" +
 	"\t\tbuildLayers: function () { svg = document.getElementById('lpn_canvas');\n" +
 	"\t\t\tworld = el('g', {}, svg);\n" +
@@ -163,6 +164,22 @@ console.log('\n--- 3. a project on EPSG:3857 measures its pipes on the ground --
 	const k = L.metresPerWorldUnit(at['22'].x, at['22'].y), c = Math.cos(latOf(40) * Math.PI / 180);
 	ok('one Web Mercator metre is about cos(latitude) of a ground metre', Math.abs(k - c) / c < 0.005,
 		k.toFixed(5) + ' vs cos ' + c.toFixed(5));
+}
+
+console.log('\n--- 5. a place-name search lands at the ground scale ---');
+{
+	byId.lpn_canvas.clientWidth = 1000;
+	byId.lpn_canvas.clientHeight = 500;
+	const place = { lat: 45, lon: -122, extent: { west: -122.01, east: -121.99, south: 44.995, north: 45.005 } };
+	L.newProject(null, 'EPSG:32610');
+	const utm = L.fitScale(place), lenK = L.unitKey('lpn_u_length'), toM = lenK === 'ft' ? 0.3048 : 1;
+	L.newProject(null, 'EPSG:3857');
+	const wm = L.fitScale(place);
+	// A UTM unit is the length unit here (a ground length, near enough); a 3857 unit is a Mercator
+	// metre, 1/cos(45) of them to a ground metre, so the same view needs cos(45) of the UTM scale.
+	const want = utm / toM * Math.cos(45 * Math.PI / 180);
+	ok('a searched place opens a 3857 project at cos(latitude) of the ground-metre scale, not 1/cos too close',
+		Math.abs(wm - want) / want < 1e-9, wm.toExponential(4) + ' vs ' + want.toExponential(4) + ' px per unit');
 }
 
 console.log(fails === 0 ? '\nALL PASS' : '\n' + fails + ' FAILED');

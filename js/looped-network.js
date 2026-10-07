@@ -3734,9 +3734,10 @@ var EngCalcs = EngCalcs || {};
 	function assignProjectCrs(code) {
 		if (!project || !code) { return false; }
 		if (isLatLonProject()) { return false; }
-		// **EPSG:3857 AND EPSG:4326 ARE BOTH THE GEOGRAPHIC ANSWER, NOT A PROJECTED ONE.** Choosing
-		// either in the box makes a lon/lat project, and newProject() takes that branch; if either
-		// ever reached here it would write a document claiming its longitudes were metres.
+		// **EPSG:4326 IS THE GEOGRAPHIC ANSWER, NOT A PROJECTED ONE.** Choosing it in the box makes a
+		// lon/lat project, and newProject() takes that branch; if it ever reached here it would write
+		// a document claiming its longitudes were metres. EPSG:3857 is a projected answer like UTM
+		// (Task 775) and is accepted here.
 		if (crsIsLatLonCode(String(code))) { return false; }
 		if (project.crs) { return false; }
 		if (doc && ((doc.nodes && doc.nodes.length) || (doc.links && doc.links.length) ||
@@ -3744,7 +3745,7 @@ var EngCalcs = EngCalcs || {};
 		project.crs = String(code);
 		return true;
 	}
-	// What the status strip says this project is drawn in. EPSG:3857 names itself for a geographic
+	// What the status strip says this project is drawn in. WGS 84 (EPSG:4326) names a geographic
 	// project, and an unprojected grid is a plane the user declared the meaning of that sits nowhere
 	// on the Earth -- which is a fact worth printing rather than leaving blank.
 	/**
@@ -11668,7 +11669,8 @@ var EngCalcs = EngCalcs || {};
 	// with the same geodesic a pipe's Auto length is measured with.
 	function customerOffsetUnitsPerDrawn(c) {
 		var l = customerLink(c), an, n;
-		// Web Mercator (Task 775) is conformal, so one scale serves every direction at a point.
+		// Web Mercator (Task 775): one scale at a point serves every direction, to well within the
+		// accuracy of an offset (the sphere-on-ellipsoid departure is a fraction of a percent).
 		if (l && isWebMercProject()) {
 			an = Geom.pointAlongPolyline(linkPointList(l), customerT(c));
 			return metresPerWorldUnit(an.x, an.y) * unitFactor('lpn_u_length');
@@ -41052,6 +41054,10 @@ var EngCalcs = EngCalcs || {};
 		// multiplies, exactly as a display conversion does.
 		perUnit = unitFactor('lpn_u_length');
 		if (!isFinite(perUnit) || perUnit <= 0) { perUnit = 1; }
+		// **A WEB MERCATOR PLANE IS ALWAYS METRES, AND MERCATOR METRES** (Task 775): a ground metre
+		// spans 1/cos(latitude) of them, the same scale the length code corrects for, so the search
+		// does not land that much too close.
+		if (isWebMercProject()) { perUnit = 1 / Math.max(1e-6, Math.cos(lat * Math.PI / 180)); }
 		sw = w / (wideM * perUnit);
 		sh = h / (highM * perUnit);
 		s = Math.min(sw, sh) * SEARCH_FIT_PAD;

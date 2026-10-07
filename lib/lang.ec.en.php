@@ -1302,7 +1302,7 @@ $ec_lang['lpn_convas_coordsys_tip']='The coordinate system the copy is converted
 // {crs} is the name the map status strip shows for this project's coordinate system.
 $ec_lang['lpn_convas_from']='Current: {crs}';
 $ec_lang['lpn_convas_epsg']='EPSG coordinate system';
-$ec_lang['lpn_convas_epsg_tip']='Choose a coordinate system from the EPSG register. WGS 84 (EPSG:4326), latitude and longitude, is the suggested choice. WGS 84 / Pseudo-Mercator (EPSG:3857), commonly called Web Mercator, stores x and y in meters, and its map distances exceed ground distances away from the equator. Pipe lengths are computed as ground distances in either system.';
+$ec_lang['lpn_convas_epsg_tip']='Choose a coordinate system from the EPSG register. WGS 84 (EPSG:4326), latitude and longitude, is the suggested choice. WGS 84 / Pseudo-Mercator (EPSG:3857), commonly called Web Mercator, gives x and y in meters, and its map distances exceed ground distances away from the equator. Pipe lengths are computed as ground distances in either system.';
 $ec_lang['lpn_convas_unnamed']='Unnamed (local) georeference';
 $ec_lang['lpn_convas_unnamed_tip']='Local coordinates in the length unit, with the world map attached.';
 $ec_lang['lpn_convas_none_tip']='Local coordinates in the length unit, with no world map for now.';
