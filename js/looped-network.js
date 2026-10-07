@@ -29156,24 +29156,164 @@ var EngCalcs = EngCalcs || {};
 	// the printed sheet uses, so a file says what the screen says -- a choice column its label, a
 	// result its two decimals. A column is numeric to a spreadsheet only when it is a number column
 	// (no text, choice or yes/no flag) and not the ID.
-	function paneExportTable(spec, kind) {
-		var pc = EngCalcs.pageConfig || {}, cols = paneCols(spec), rows = paneTableRowsInOrder(spec),
-			heads = cols.map(paneHeadingText),
-			cells = rows.map(function (el) { return cols.map(function (c) { return paneCellDisplayText(c, el, true); }); }),
-			proj = paneSanitizeFileName((typeof project === 'object' && project && project.name) || ''),
-			table = paneSanitizeFileName(pc[spec.label] || spec.id),
-			name = (proj ? proj + '-' : '') + table + '.' + kind, data;
-		if (!EngCalcs.lpnTableCsv) { return; }
-		if (kind === 'csv') {
-			data = EngCalcs.lpnTableCsv(heads, cells);
-			downloadTextFile(name, data, 'text/csv;charset=utf-8');
-		} else {
-			data = EngCalcs.lpnTableOds(heads, cells, table, cols.map(function (c) {
-				return c.key !== 'id' && !c.refTo && !c.str && !c.choices && !c.bool && !c.plainWord;
-			}));
-			downloadTextFile(name, data, 'application/vnd.oasis.opendocument.spreadsheet');
+	function paneColIsNumeric(c) {
+		return c.key !== 'id' && !c.refTo && !c.str && !c.choices && !c.bool && !c.plainWord;
+	}
+	function paneTableLabel(spec) {
+		var pc = EngCalcs.pageConfig || {};
+		return paneSanitizeFileName(pc[spec.label] || spec.id);
+	}
+	function paneProjectPrefix() {
+		var proj = paneSanitizeFileName((typeof project === 'object' && project && project.name) || '');
+		return proj ? proj + '-' : '';
+	}
+	// One table as the three arrays a file writer takes. With `scn` the table is read as Show scenarios
+	// reads it -- its scenario-wrapped columns, so a result that belongs to a scenario that is not the
+	// one solved stays blank -- and cut down to that scenario's rows, without the Scenario column.
+	// The spec's own view state is put back, so exporting is invisible on screen.
+	function paneSheetData(spec, scn) {
+		var save = { scnRows: spec.scnRows, scnSet: spec.scnSet, sort: spec.sort, orderIds: spec.orderIds, lastOrderIds: spec.lastOrderIds },
+			cols, rows, out;
+		try {
+			if (scn) {
+				spec.scnRows = true;
+				if (!save.scnRows) { spec.sort = { col: 'id', dir: 1 }; }
+				spec.orderIds = null;
+				spec.lastOrderIds = null;
+			}
+			cols = paneCols(spec);
+			rows = paneTableRowsInOrder(spec);
+			if (scn) {
+				cols = cols.filter(function (c) { return c.key !== 'scn_name'; });
+				rows = rows.filter(function (r) { return r._lpnScn && r._lpnScn.scn.id === scn.id; });
+			}
+			out = {
+				heads: cols.map(paneHeadingText),
+				cells: rows.map(function (el) { return cols.map(function (c) { return paneCellDisplayText(c, el, true); }); }),
+				numeric: cols.map(paneColIsNumeric)
+			};
+		} finally {
+			spec.scnRows = save.scnRows; spec.scnSet = save.scnSet; spec.sort = save.sort;
+			spec.orderIds = save.orderIds; spec.lastOrderIds = save.lastOrderIds;
 		}
+		return out;
+	}
+	var PANE_EXPORT_MIME = {
+		csv: 'text/csv;charset=utf-8',
+		ods: 'application/vnd.oasis.opendocument.spreadsheet',
+		xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+		zip: 'application/zip'
+	};
+	function paneExportTable(spec, kind) {
+		var pc = EngCalcs.pageConfig || {}, d = paneSheetData(spec), table = paneTableLabel(spec),
+			name = paneProjectPrefix() + table + '.' + kind, data;
+		if (!EngCalcs.lpnTableCsv) { return; }
+		data = kind === 'csv' ? EngCalcs.lpnTableCsv(d.heads, d.cells) : EngCalcs.lpnTableOds(d.heads, d.cells, table, d.numeric);
+		downloadTextFile(name, data, PANE_EXPORT_MIME[kind]);
 		setNotice((pc.lpn_status_inp_exported || 'Exported {file}.').replace('{file}', name));
+	}
+	// **FILE > EXPORT > TABLE** (Tom, 2026-10-07: *"CSV possibly with a followup box to ask Tables and
+	// Scenarios, current or all to zip, ODS etc with same questions."*). Format, which tables, which
+	// scenarios. Several CSV files go into one zip; several ODS or XLSX tables become one workbook
+	// with a sheet apiece, named for the table and, when scenarios are in play, the scenario.
+	// Scenarios are offered only when the project has one besides Base. A table with no rows is left
+	// out of "all". Scenario results exist only for the scenario solved (the rule Show scenarios
+	// follows), so the others' result columns are blank.
+	function paneExportItems(allTables, allScenarios) {
+		var cur = activePaneTableSpec(), specs, scns, items = [], withScn = scenarios.length > 1;
+		specs = allTables ? paneTables() : (cur ? [cur] : []);
+		scns = (withScn && allScenarios) ? scenariosForDisplay() : [activeScenario()];
+		specs.forEach(function (spec) {
+			var use = (withScn && paneScnAvailable(spec)) ? scns : [null];
+			use.forEach(function (scn) {
+				var d = paneSheetData(spec, scn);
+				if (allTables && !d.cells.length) { return; }
+				items.push({ table: paneTableLabel(spec), scn: scn ? scenarioDisplayName(scn) : '', data: d });
+			});
+		});
+		return items;
+	}
+	function paneExportDownload(format, allTables, allScenarios) {
+		var pc = EngCalcs.pageConfig || {}, items = paneExportItems(allTables, allScenarios), pre = paneProjectPrefix(),
+			tables = {}, name, data, mime, multiTables, E = EngCalcs;
+		if (!items.length) { return; }
+		items.forEach(function (it) { tables[it.table] = true; });
+		multiTables = Object.keys(tables).length > 1;
+		function part(it, sep) { return it.table + (it.scn ? sep + it.scn : ''); }
+		if (items.length === 1) {
+			name = pre + part(items[0], '-') + '.' + format;
+			data = format === 'csv' ? E.lpnTableCsv(items[0].data.heads, items[0].data.cells)
+				: (format === 'ods' ? E.lpnTableOds : E.lpnTableXlsx)(items[0].data.heads, items[0].data.cells, part(items[0], ' - '), items[0].data.numeric);
+			mime = PANE_EXPORT_MIME[format];
+		} else {
+			name = pre + (multiTables ? (pc.lpn_tables_menu || 'Tables') : items[0].table);
+			if (format === 'csv') {
+				var used = {};
+				name += '.zip';
+				mime = PANE_EXPORT_MIME.zip;
+				data = E.lpnZipStore(items.map(function (it) {
+					var base = part(it, '-'), n = base, k = 1;
+					while (used[n.toLowerCase()]) { k++; n = base + ' (' + k + ')'; }
+					used[n.toLowerCase()] = true;
+					return { name: n + '.csv', data: new TextEncoder().encode(E.lpnTableCsv(it.data.heads, it.data.cells)) };
+				}));
+			} else {
+				name += '.' + format;
+				mime = PANE_EXPORT_MIME[format];
+				data = (format === 'ods' ? E.lpnTableOdsBook : E.lpnTableXlsxBook)(items.map(function (it) {
+					return { name: multiTables ? part(it, ' - ') : (it.scn || it.table), heads: it.data.heads, rows: it.data.cells, numeric: it.data.numeric };
+				}));
+			}
+		}
+		downloadTextFile(name, data, mime);
+		setNotice((pc.lpn_status_inp_exported || 'Exported {file}.').replace('{file}', name));
+	}
+	function openExportTableBox() {
+		var pc = EngCalcs.pageConfig || {}, cur = activePaneTableSpec(), withScn = scenarios.length > 1, groups = {}, formats;
+		if (!EngCalcs.lpnTableCsv) { return; }
+		closeMenu();
+		function radioGroup(body, key, label, options) {
+			var wrap = document.createElement('div'), head = document.createElement('div');
+			wrap.className = 'lpn-export-group';
+			head.style.fontWeight = 'bold';
+			head.textContent = label;
+			wrap.appendChild(head);
+			options.forEach(function (o, i) {
+				var lab = document.createElement('label'), inp = document.createElement('input');
+				lab.style.display = 'block';
+				inp.type = 'radio';
+				inp.name = 'lpn_export_' + key;
+				inp.value = o[0];
+				inp.id = 'lpn_export_' + key + '_' + o[0];
+				inp.checked = i === 0 || !!o[2];
+				if (o[2] === 'off') { inp.disabled = true; inp.checked = false; }
+				lab.appendChild(inp);
+				lab.appendChild(document.createTextNode(' ' + o[1]));
+				wrap.appendChild(lab);
+			});
+			body.appendChild(wrap);
+			groups[key] = wrap;
+		}
+		function picked(key) {
+			var el = groups[key] && groups[key].querySelector('input:checked');
+			return el ? el.value : '';
+		}
+		formats = [['csv', 'CSV'], ['ods', 'ODS'], ['xlsx', 'XLSX']];
+		openDialog(function (body) {
+			radioGroup(body, 'format', pc.lpn_export_table_format || 'Format', formats);
+			radioGroup(body, 'tables', pc.lpn_tables_menu || 'Tables', cur
+				? [['current', pc.lpn_export_table_current || 'Current'], ['all', pc.lpn_export_table_all || 'All']]
+				: [['current', pc.lpn_export_table_current || 'Current', 'off'], ['all', pc.lpn_export_table_all || 'All', 'on']]);
+			if (withScn) {
+				radioGroup(body, 'scenarios', pc.lpn_scenario_menu || 'Scenarios',
+					[['current', pc.lpn_export_table_current || 'Current'], ['all', pc.lpn_export_table_all || 'All']]);
+			}
+		}, [
+			{ label: pc.lpn_export_table_go || 'Export', isDefault: true, fn: function () {
+				paneExportDownload(picked('format'), picked('tables') === 'all', withScn && picked('scenarios') === 'all');
+			} },
+			{ label: pc.lpn_cancel || 'Cancel', cancel: true, fn: function () { } }
+		], { title: pc.lpn_export_table_title || 'Export table' });
 	}
 	function paneEndPrint() {
 		if (document.body) { document.body.classList.remove('lpn-printing-table'); }
@@ -41620,6 +41760,11 @@ var EngCalcs = EngCalcs || {};
 			{ icon: 'save', label: pc.lpn_file_export_inp || 'Export EPANET file…',
 			  tip: pc.lpn_file_export_inp_tip, fn: exportInpFile },
 		].concat([
+			// **SEAM WITH feat/geojson, which turns the rows above into an Export submenu**
+			// (exportMenuRows()): when it lands, move this row into that function. It sits below
+			// `].concat([` rather than beside Export EPANET file so the two branches merge without
+			// touching the same lines.
+			{ icon: 'save', label: pc.lpn_file_export_table || 'Export table…', fn: openExportTableBox },
 			{ separator: true },
 			// **The menu says Save and Save as… in every browser**, never "Download a copy": the
 			// paradigm we are ADOPTING has two names for writing a file, this page already spends

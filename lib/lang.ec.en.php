@@ -1512,6 +1512,13 @@ $ec_lang['lpn_pane_print']='Print table';
 $ec_lang['lpn_pane_copy_heads']='Copy with headings';
 $ec_lang['lpn_pane_export_csv']='Export table as CSV';
 $ec_lang['lpn_pane_export_ods']='Export table as ODS';
+// Tom, 2026-10-07. File > Export > table: a box asking the format, which tables and which scenarios.
+$ec_lang['lpn_file_export_table']='Export table…';
+$ec_lang['lpn_export_table_title']='Export table';
+$ec_lang['lpn_export_table_format']='Format';
+$ec_lang['lpn_export_table_current']='Current';
+$ec_lang['lpn_export_table_all']='All';
+$ec_lang['lpn_export_table_go']='Export';
 
 // **HIDE MAP READOUTS IS RETIRED, 2026-09-22** (Tom: "Hide map readouts was a print prep command.
 // But it isn't very useful any more. Let's remove it."). lpn_clean_map, lpn_clean_map_off and
