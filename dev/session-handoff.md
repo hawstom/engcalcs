@@ -134,7 +134,7 @@ replayed offline beacon stamped 09-21 made a 5-day log report 15 days), "Is acti
   orphan candidate once merged. lpn_notes_6_def cells swapped (order only) in 27 files; its old
   "OK." ruling lapsed.
 - **`feat/bentley-interop`** (long burn, never merges without him): held values marked in the
-  Settings box (amber, "Base: x", Clear override), view rows + "Hold this view in this scenario",
+  Settings box (amber, "Base: x", Clear override), view rows + "Save this view in this scenario",
   his two notes fixed (Major/Minor from the box; table marks overrides live), Change type walks
   stored alternatives. Q10 decided by CC (one Clear for all three; may overrule), Q11, Q12 open.
 - Still from before: `feat/desktop`.

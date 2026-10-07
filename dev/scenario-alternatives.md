@@ -202,7 +202,7 @@ map is looking.
 | `settings`, map appearance | `basemapStyle`, `backdropOpacity` | `basemapStyleName()`, `backdropImageOpacity()` |
 | `settings`, colour by value | `colorNodeField`, `colorLinkField`, `colorRampNode`, `colorRampLink`, `colorClassesNode`, `colorClassesLink`, `colorReverseNode`, `colorReverseLink`, `colorBreaks`, `colorModes`, `colorLegendPosition` | `colorFieldOf()`, `colorRampKey()`, `colorClassCount()`, `colorReverseOf()`, `storedBreaks()`, `effectiveBreaks()`, `colorModeOf()`, `renderColorLegend()` |
 | `settings`, contours | `contourFill`, `contourLines`, `contourLabels`, `contourOpacity`, `contourInterval`, `contourBuffer`, `contourTerrain` | `contourFillMode()`, `contourIsOn()`, `drawContourLabels()`, `contourOpacityOf()`, `contourIntervalOf()`, `contourBufferOf()`, `contourTerrainWanted()` |
-| `view` (Tom, 2026-10-06, Q2) | the window: centre and scale, one atomic value | `followScenarioView()` on a switch. **Stored outward**, as a node's position override is (longitude and latitude, or the grid's absolute x and y), so the Y flip, the origin shift and the projection never touch it. Written only when a scenario deliberately holds one (`setScenarioView()`, called by the Settings box's Hold this view in this scenario), as centre plus ground metres per CSS pixel. |
+| `view` (Tom, 2026-10-06, Q2) | the window: centre and scale, one atomic value | `followScenarioView()` on a switch. **Stored outward**, as a node's position override is (longitude and latitude, or the grid's absolute x and y), so the Y flip, the origin shift and the projection never touch it. Written only when a scenario deliberately holds one (`setScenarioView()`, called by the Settings box's Save this view in this scenario), as centre plus ground metres per CSS pixel. |
 
 **Calculation (`calculation`), 9 paths, two of them whole groups.** What the solver is told, other
 than the network itself.
@@ -407,8 +407,8 @@ are the asset tables' own.
   unstated row shows the value the page uses, marked "(default)". A legacy setting
   (`LPN_SETTAB_SUPERSEDED`) is hidden while the one that replaced it is stated. Units and the
   coordinate frame are never rows. A row's id is the path as JSON.
-- **Columns: Major heading, Minor heading, Category, Setting, Value** (Tom, 2026-10-05). Major and
-  Minor are where the Settings box shows it; the label ranks and drops have their own Minor heading.
+- **Columns: Major heading, Minor heading, Owner, Setting, Category, Value** (Tom, 2026-10-05; Owner
+  2026-10-07, see round three). Major and Minor are where the Settings box shows it.
   **Setting is always visitor words, never a stored name**: the box's own label, else a key of its
   own (`lpn_settings_row_*`), a map's member in the Labels box's and toolbar's words ("Node labels:
   Pressure, Decimals", "ID prefixes, Junction"), contour rows saying Contour, and new-asset values
@@ -482,7 +482,7 @@ Settings table's Value cell.
 - **A row says which settings it edits** (`setboxTag()`, a `data-lpn-setting` list of paths, written
   where each row is built: Map display, labels, colours, new assets, ID prefixes, Hydraulics, Time,
   Quality, Energy). A path covers every Settings table row under it, so one Labels row (show,
-  decimals, before, after, units, ranks) is one mark, and its note names each held part. The
+  decimals, before, after, units, show order, drop order) is one mark, and its note names each held part. The
   harness fails a Settings table row the box has a control for and does not tag.
 - **Clear override is the Settings table's own** (`settingRowClear()` through `setScenarioSetting()`),
   one undo step, then what any setting edit redraws (`clearHeldSetboxRows()`). Undo of it, or of any
@@ -494,7 +494,7 @@ Settings table's Value cell.
 - **The view in the box** (Map display): the map's centre (latitude and longitude, or x and y, in
   public order), its scale as 1:N, and its top left and bottom right corners, shown and never
   stored. They show the map as it is and follow it when it comes to rest. Typing a centre or a scale
-  moves the map. **Hold this view in this scenario** (a button, shown only in a scenario) stores the
+  moves the map. **Save this view in this scenario** (a button, shown only in a scenario) stores the
   view through `setScenarioView()`; panning and zooming never write it. While the scenario holds a
   view, a typed centre or scale is written to it as well. The view rows are then marked like any
   held value, "Base: {view}" being Base's live view, and Clear override releases it
@@ -520,7 +520,7 @@ box, but not in the Settings table. Good start. Keep building."*
 - **(2) The Settings table marks the open scenario's overrides with Show scenarios off**, as the
   box does (`paneMarksOpenScenario()`), and a box edit refreshes the open table at once. Before,
   the wash existed only in Show scenarios rows, and nothing refreshed the table after a box edit.
-  The asset tables are unchanged: they still mark only with Show scenarios on (question 12).
+  The asset tables do the same since round three (question 12).
 - **Clear override on Friction method clears what picking it wrote** (the new-asset roughness and
   the roughness label's decimals), in the same undo step (`LPN_METHOD_DEPENDENTS` in
   `settingRowClear()`, so the table's Clear does the same). This settles question 10 below.
@@ -666,10 +666,53 @@ named set and stops pretending to have a parent. Recommendation: keep the column
     the two companions with it, in one undo step. Each companion still has its own mark and its own
     Clear.
 11. **The link under a held row says "Clear override"**, the Settings table's own words, where Ida
-    drew "Reset". Recommendation: keep "Clear override", one name for one act.
+    drew "Reset". Answered: *"Clear override"* (Tom, 2026-10-07). No visitor string says Reset for
+    an override.
 12. **Should the asset tables (Junctions, Pipes...) also mark the open scenario's overrides with
-    Show scenarios off**, as the Settings table now does? Today they mark only in Show scenarios
-    rows. Recommendation: yes, for the same reason; it is a separate change to every table.
+    Show scenarios off**, as the Settings table now does? Answered: *"Yes, I think?"* (Tom,
+    2026-10-07). Built in round three.
+
+### Round three (2026-10-07), after Tom's browser pass
+
+- **(1) Owner** (Tom: *"We need a third organizational hierarchy column to help organize the labels
+  and custom properties settings... We could call it 'Owner'."*). Between Minor heading and
+  Setting, so the four read as his dotted path: Symbology, Node labels, ID, Is active / Show order /
+  Drop order. Owned rows: a label field's settings (Is active, Decimals, Text before, Text after,
+  Use units, Show order, Drop order), a coloured field's classification and band boundaries, a
+  contour field's interval, an ID prefix's asset, a custom property's design fields. Any other row
+  leaves Owner blank. Category moved after Setting: it is useful but outside the hierarchy.
+  (`settingTableOwnerSetting()`.)
+- **"Rank" is gone.** It was `lpn_labels_col_rank`, the Labels box's heading of the drop column
+  until Task 445 (2026-08-19) made it Drop, kept unrendered since; the Settings table borrowed it in
+  7c758f15 for the show-order column. Show order IS a stored setting (`labelSettings.show`, per
+  field, the Labels box's Show column). The key is deleted.
+- **(2) Overrides only, Current scenario only**: two switches on the cell menu and the heading menu
+  while Show scenarios is on, in every table. Overrides only keeps a row when its scenario holds a
+  value of its own in a column of the table (the amber rule, so Base's rows never qualify); Current
+  scenario only keeps the open scenario's rows. A line above the table names them, with Show all,
+  the way back when no row is left (`paneScnFilterBanner()`).
+- **(3) Clear override was one table render per cell**: `afterPropertyEdit()` per element
+  re-rendered the open table, and each pipe's label forced a layout of the drawing. Now
+  `afterPropertyEdits()` redraws each element and runs the shared tail once, and
+  `withOneLabelBatch()` measures every label together. Net3, 117 pipes, Show scenarios on: 3,135 ms
+  before, about 170 ms after (jasmine). Find and replace and the Multiple properties row share it.
+- **(4) Save this view**, not Hold (keys renamed `lpn_settings_view_save`, `_tip`).
+- **(5) The audit.** Rows the table omitted, against every control the Settings box tags: every
+  label field's Before and After (the maps ship empty, so the stated-leaf walk found none), Use
+  units where a field has a unit and the project leaves it unstated, Energy currency, and every
+  custom property design field. Now all rows; an unstated Before or After shows the default the
+  page prints ("Q= (default)"). Left out on purpose: Decimals of a field with no number (the box has
+  no spinner for it), the PDA "stated in the file" marker, and the superseded emitter exponent.
+  **A custom property's design stays the project's in every scenario** (the Excluded table): its
+  rows have no category, are never marked, and are read-only in a scenario's row.
+- **(6c, Q11) Clear override, never Reset**: already true of every visitor string.
+- **Asset-type overrides (6a, Q10)**: unchanged this round, by Tom's "stay the course".
+
+Harnesses: `settings-table-owner-browser-harness.js` (real Chromium: Owner, Rank gone, Before/After
+stated or not and typed in a scenario, the box note, both filters and the banner in the Settings
+and Pipes tables, Net3 lat/lon's custom property rows); `pane-clear-override-speed-browser-harness.js`
+(a 117-pipe column cleared under a time bound, Q12's marks, one undo); `settings-table-labels-harness.js`
+(Owner and Setting words on every example, no duplicates, Tom's example rows).
 
 ## The long burn: from Basic mode to the full model (2026-10-06)
 
