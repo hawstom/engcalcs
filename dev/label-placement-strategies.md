@@ -98,7 +98,7 @@ know."*
 
 | ID | Strategy | Source | Measured so far |
 |---|---|---|---|
-| S11 | **Smallest form first, then grow** a value at a time in rounds, so every label gets a place before any label gets a second value | Priority-ordered greedy (Christensen et al. 1995); rule G | Three earlier placers. The same plain search placing labels from an empty map showed 78% of labels in this order and 70% when each label took as many values as it could in turn: eight points from the order alone |
+| S11 | **Smallest form first, then grow** a value at a time in rounds, so every label gets a place before any label gets a second value. The smallest form is the last value in the user's drop order, never the ID moved last because it is narrow (Tom, 2026-10-07) | Priority-ordered greedy (Christensen et al. 1995); rule G | Three earlier placers. The same plain search placing labels from an empty map showed 78% of labels in this order and 70% when each label took as many values as it could in turn: eight points from the order alone |
 | S12 | **Most crowded first** | Common greedy heuristic | All four earlier placers |
 | S13 | **Carry last view's spot** when it is still legal; move only when that buys something | Been, Daiches & Yap 2006; MapLibre persistent identity | Three earlier placers. Not a rule (there is no stillness rule); it saves time and churn |
 | S14 | **Two-SAT existence check**: in a two-position model, is a full labelling possible before anything is dropped? | Standard result: with two positions per label, each label is one yes/no choice and each conflict a two-term clause, solvable in linear time | Not tried |

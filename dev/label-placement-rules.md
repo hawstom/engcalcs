@@ -44,7 +44,9 @@ pipe is medium-low cost; leader on pipe is very low cost. A label on a customer 
   many labels are already showing.** When space runs out, give up in this order: (1) nearness to
   home if there is convenient available space; (2) wholeness; (3) properties that won't fit, by drop
   order, **the ID being one of them like any other value: a label keeps the last value in the user's
-  drop order longest, whether that is a value or the ID** (Tom, 2026-10-06); (4) the label itself.
+  drop order longest, whether that is a value or the ID** (Tom, 2026-10-06). **Never force the ID
+  last because it is narrow:** the ID drops where the user's order puts it, and a placer that keeps
+  it later than that breaks the order (Tom, 2026-10-07); (4) the label itself.
 - **R2. If there is convenient available space, use it if that saves a neighbour's properties.**
 - **R5. Basic leader conventions:** label text is justified to the leader side, never to centre or
   to the far side.
@@ -369,3 +371,13 @@ is not only human, it is biological; it is real."*
     list."*
   "Emergent ability or delusion?" is answered in `dev/label-trials/round-7-2026-10-07.md`; the
   phase-1 close he proposes is `dev/label-trials/phase-1-summary.md`.
+
+### Round 7 proposal 1, his answer, 2026-10-07
+
+- **At a crowded view, keep a bare value or a bare ID?** *"I repeat 'No' about keeping ID last. If
+  user doesn't want it last, don't force that on them just because it's small."* **Settled, and now
+  R1 (3):** drop order follows the user's order; the ID is never moved to last because it is narrow.
+  The default order stays as the app ships it (an order that does not name the ID drops it first),
+  so a crowded default view keeps a bare value such as P=94.65. No round-7 placer forces the ID last;
+  D's `order` switch, off, restores round 6's never-drop-ID behaviour for ablation only and must not
+  be used in a placer that ships. Round 6's placers kept the ID last; that behaviour does not return.

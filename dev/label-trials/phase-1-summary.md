@@ -115,7 +115,9 @@ fastest. Each difference is a choice of weights, not of structure.
   corner of the screen for a whole round; the bench now refuses a scene with a non-numeric point.
 - **Defaults leak into results.** Changing what an unnamed ID means in the drop order changed every
   placer's numbers by 5-12 labels in 100 and turned the shipped default into bare values with no ID
-  (round 7 record, 2.9; a question for Tom).
+  (round 7 record, 2.9). Tom, 2026-10-07: *"I repeat 'No' about keeping ID last. If user doesn't want
+  it last, don't force that on them just because it's small."* The drop order is the user's; a placer
+  never forces the ID last (R1 (3)). The narrower ID showing more labels is not a reason to move it.
 - **Known bench defects to fix before phase 2** are listed in the round 7 record, 2.8.
 
 ---
