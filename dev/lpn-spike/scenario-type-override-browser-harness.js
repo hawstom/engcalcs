@@ -115,8 +115,8 @@ async function main() {
 		await changeTo('lpn_tool_add_tank');
 		await settle(800);
 		const d = await a.dialog();
-		ok('1.2 the page\'s own box asks Tom\'s sentence', d && d.text.trim() === 'Current scenario is not Base. Create overrides?', d && d.text);
-		ok('1.3 ...with exactly his three buttons, in his order', d && JSON.stringify(d.buttons) === JSON.stringify(['Create overrides', 'Switch to Base', await L('lpn_cancel')]),
+		ok('1.2 the page\'s own box asks Tom\'s sentence', d && d.text.trim() === await L('lpn_change_type_scenario_ask'), d && d.text);
+		ok('1.3 ...with exactly his three buttons, in his order', d && JSON.stringify(d.buttons) === JSON.stringify([await L('lpn_change_type_create_overrides'), await L('lpn_change_type_switch_base'), await L('lpn_cancel')]),
 			d && JSON.stringify(d.buttons));
 
 		console.log('\n--- 2. Cancel ---');
@@ -126,7 +126,7 @@ async function main() {
 		console.log('\n--- 3. Create overrides ---');
 		await clickNode('22');
 		await changeTo('lpn_tool_add_tank');
-		ok('3.1 Create overrides is pressed', await press('Create overrides'));
+		ok('3.1 Create overrides is pressed', await press(await L('lpn_change_type_create_overrides')));
 		ok('3.2 no second box (a junction made a tank loses nothing in B)', !(await a.dialog()), JSON.stringify(await a.dialog()));
 		ok('3.3 22 is drawn as a tank in B', /lpn-node-tank/.test(await nodeClass('22') || ''), await nodeClass('22'));
 		await a.toolbarClick(await L('lpn_pane_toggle'));
@@ -149,7 +149,7 @@ async function main() {
 		await scenarioMenu('B');
 		ok('4.0 a click selects junction 23', await clickNode('23') && await page.evaluate(() => !!document.querySelector('circle.lpn-node.lpn-selected[data-node="23"]')));
 		await changeTo('lpn_tool_add_tank');
-		ok('4.1 Switch to Base is pressed', await press('Switch to Base'));
+		ok('4.1 Switch to Base is pressed', await press(await L('lpn_change_type_switch_base')));
 		const d2 = await a.dialog();
 		const btn = await page.evaluate(() => (document.getElementById('lpn_scenario_btn') || {}).textContent || '');
 		ok('4.2 Base is showing', btn.indexOf(': ' + await L('lpn_scenario_base') + ' ') >= 0, btn);

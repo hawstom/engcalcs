@@ -138,9 +138,9 @@ async function run(mutate, quiet) {
 	q = change('node', '22', 'tank', null);
 	const ask = q[0] || {};
 	ok('1.2 in scenario B the first question is the scope question', ask.kind === 'choice', JSON.stringify(q.map((r) => r.kind)));
-	ok('1.3 ...in Tom\'s words', ask.text === 'Current scenario is not Base. Create overrides?' && ask.text === PC.lpn_change_type_scenario_ask, ask.text);
+	ok('1.3 ...in Tom\'s words', ask.text === PC.lpn_change_type_scenario_ask, ask.text);
 	ok('1.4 ...with exactly his three buttons, in his order',
-		JSON.stringify((ask.choices || []).map((c) => c.label)) === JSON.stringify(['Create overrides', 'Switch to Base', PC.lpn_cancel]),
+		JSON.stringify((ask.choices || []).map((c) => c.label)) === JSON.stringify([PC.lpn_change_type_create_overrides, PC.lpn_change_type_switch_base, PC.lpn_cancel]),
 		JSON.stringify((ask.choices || []).map((c) => c.label)));
 
 	say('\n--- 2. Cancel, and Switch to Base ---');
