@@ -33543,6 +33543,9 @@ var EngCalcs = EngCalcs || {};
 			'lpn_notesbox', 'lpn_hotkeysbox',
 			// 'lpn_snipbox' (the Screenshot box and its magnification) joined the day it was written.
 			'lpn_snipbox',
+			// 'lpn_statusbox' and 'lpn_fullbox' were missed on the days they were written; 'lpn_dockbox'
+			// (docks of the boxes with no record of their own) joined the day it was.
+			'lpn_statusbox', 'lpn_fullbox', 'lpn_dockbox',
 			// AREA_HINT_KEY joined 2026-09-09, having been missed on the day it was written.
 			// dev/cookie-storage-inventory.md already filed it beside PAGE_TITLES_KEY as a reading
 			// preference set deliberately on this screen, so the document and the code disagreed
@@ -41263,7 +41266,7 @@ var EngCalcs = EngCalcs || {};
 		// for Tom's words and the reasoning. Each is asked separately rather than as one group, so
 		// an Escape inside Settings costs Settings and leaves an open Properties box alone: one
 		// press, one thing, which is the rule the rest of this handler already keeps.
-		if (escapeOwnsBox('lpn_popup')) { closePopup(); }
+		if (escapeOwnsBox('lpn_popup')) { closePopup(true); }
 		if (escapeOwnsBox('lpn_settings_box')) { closeSettingsBox(); }
 		if (escapeOwnsBox('lpn_library_box')) { closeLibraryBox(); }
 		// ...and the examples wall, which was the ONE overlay Escape could not reach. Guarded on
@@ -44617,6 +44620,7 @@ var EngCalcs = EngCalcs || {};
 		wireBoxDocking();
 		dockBooting = true;
 		restoreOpenBoxes();
+		restoreDockedShared();
 		dockBooting = false;
 		// **The banner has to be painted on the BOOT path too.** refreshAllFromDocument() ends with
 		// this call but is shared by openProject() and newProject() only, so the one situation the
@@ -51168,7 +51172,7 @@ var EngCalcs = EngCalcs || {};
 		if (!el) { return; }
 		hideTipsIn(el);
 		// A docked box gives its column back to the map once it is closed (Task 441).
-		if (el.__lpnDock) { dockLayoutSoon(); }
+		if (el.__lpnDock) { dockNoteOpen(el.__lpnDock, false); dockLayoutSoon(); }
 		el.style.display = 'none';
 	}
 	function openSettingsBox(section) {
@@ -51313,6 +51317,11 @@ var EngCalcs = EngCalcs || {};
 		if (contourboxLayout.open) { openContourBox(); }
 		if (cmpboxLayout.open) { openScenarioCompareBox(); }
 		if (rptboxLayout.open) { openRunReportBox(true); }
+		// The Status and Full reports kept `open` on their records from the day they were written
+		// and were never asked for it here, so a docked one vanished on every reload (Tom,
+		// 2026-10-07: *"All the docks I make need to be remembered."*).
+		if (statusboxLayout.open) { openStatusReportBox(); }
+		if (fullboxLayout.open) { openFullReportBox(); }
 		// The Notes box (Tom, 2026-09-28), after the reports and before Find for the same stacking
 		// reason: Find is the smallest and ends up on top.
 		if (notesboxLayout.open) { openNotesBox(); }
@@ -51851,12 +51860,89 @@ var EngCalcs = EngCalcs || {};
 		try { raw = localStorage.getItem(key); } catch (e) { return; }
 		if (!raw) { return; }
 		try { v = JSON.parse(raw); } catch (e) { return; }
+		readDockFields(v, rec);
+	}
+	function readDockFields(v, rec) {
 		if (!v || typeof v !== 'object') { return; }
 		if (v.dock === 'left' || v.dock === 'right') { rec.dock = v.dock; }
 		if (v.autohide === true) { rec.autohide = true; }
 		if (typeof v.dockW === 'number' && isFinite(v.dockW) && v.dockW > 0) { rec.dockW = Math.round(v.dockW); }
 		// Where its flag sits along the bar: a rank among the flags, set by dragging one (or Alt+Arrow).
 		if (typeof v.dockOrd === 'number' && isFinite(v.dockOrd) && v.dockOrd >= 0) { rec.dockOrd = Math.round(v.dockOrd); }
+	}
+	// **A BOX WITH NO RECORD OF ITS OWN KEEPS ITS DOCKING HERE** (Tom, 2026-10-07: *"there seems to
+	// be a limit to the number of docks that are remembered on production. All the docks I make
+	// need to be remembered."*). Properties, Criticality, Demand scaling, Alternatives and
+	// Calibration keep no furniture record, so their docks lasted one page load: of fifteen docked
+	// boxes, five came back as nothing on every reload. One key holds, per box id, only the dock
+	// fields and whether the docked box is open; nothing of where the box floats, which stays the
+	// page-load-only ruling those boxes carry. An entry exists only while that box is docked, and
+	// the key is removed when none is, so a visitor who never docks one of them stores nothing.
+	// A box that gains a record of its own (registerDockBox() given a key) leaves this store by
+	// that fact alone.
+	var LPN_DOCKBOX_KEY = 'lpn_dockbox';
+	var dockShared = null;
+	function dockSharedLoad() {
+		var raw = null, v = null;
+		if (dockShared) { return dockShared; }
+		dockShared = {};
+		try { raw = localStorage.getItem(LPN_DOCKBOX_KEY); } catch (e) { return dockShared; }
+		if (!raw) { return dockShared; }
+		try { v = JSON.parse(raw); } catch (e) { return dockShared; }
+		if (v && typeof v === 'object') { dockShared = v; }
+		return dockShared;
+	}
+	function saveDockShared() {
+		var v = {}, n = 0;
+		dockBoxes.forEach(function (d) {
+			var r;
+			if (!d.shared || !d.rec.dock) { return; }
+			r = { dock: d.rec.dock, open: !!d.open };
+			if (d.rec.autohide) { r.autohide = true; }
+			if (d.rec.dockW) { r.dockW = d.rec.dockW; }
+			if (d.rec.dockOrd !== undefined) { r.dockOrd = d.rec.dockOrd; }
+			v[d.box.id] = r;
+			n++;
+		});
+		dockShared = v;
+		try {
+			if (n) { localStorage.setItem(LPN_DOCKBOX_KEY, JSON.stringify(v)); }
+			else { localStorage.removeItem(LPN_DOCKBOX_KEY); }
+		} catch (e) {}
+	}
+	// Opened or closed while docked: a box with its own record keeps `open` there already.
+	function dockNoteOpen(d, open) {
+		if (!d || !d.shared || !d.rec.dock || d.open === !!open) { return; }
+		d.open = !!open;
+		saveDockShared();
+	}
+	// **A NEWLY DOCKED BOX GOES TO THE BOTTOM OF ITS EDGE** (Tom, 2026-10-07: *"Is there a default
+	// order for docks? I am finding that my docks are not going to the bottom. Contour plot keeps
+	// scooting to the bottom."*). A box docked with no rank sorted after every ranked one, and the
+	// unranked ones among themselves by the order the page happens to wire them in, so a dragged
+	// strip put each new dock last while an undragged one slotted it in by wiring order. Every
+	// docked box now carries its rank from the moment it docks; a closed docked box keeps its slot.
+	function dockNextOrd(side, except) {
+		var m = -1;
+		dockBoxes.forEach(function (d) {
+			if (d !== except && d.rec.dock === side && d.rec.dockOrd !== undefined) { m = Math.max(m, d.rec.dockOrd); }
+		});
+		return m + 1;
+	}
+	function dockByOrd(a, b) {
+		var x = a.rec.dockOrd === undefined ? 1e9 : a.rec.dockOrd, y = b.rec.dockOrd === undefined ? 1e9 : b.rec.dockOrd;
+		return (x - y) || (dockBoxes.indexOf(a) - dockBoxes.indexOf(b));
+	}
+	// A record from before every dock carried a rank: ranked in memory, in the order it was already
+	// being shown, so the next dock lands after it. Stored only when that box is next saved.
+	function dockRankUnranked() {
+		['left', 'right'].forEach(function (s) {
+			var list = dockBoxes.filter(function (d) { return d.rec.dock === s; }).sort(dockByOrd), next = 0;
+			list.forEach(function (d) {
+				if (d.rec.dockOrd === undefined || d.rec.dockOrd < next) { d.rec.dockOrd = next; }
+				next = d.rec.dockOrd + 1;
+			});
+		});
 	}
 	function clampDockW(w, room) {
 		var max = Math.max(LPN_DOCK_MIN_W, Math.floor((window.innerWidth || 1000) * LPN_DOCK_MAX_FRAC));
@@ -51948,10 +52034,13 @@ var EngCalcs = EngCalcs || {};
 				r = d.box.getBoundingClientRect();
 				if (r.width > 0) { d.rec.dockW = Math.round(r.width); }
 			}
+			if (d.rec.dock !== act || d.rec.dockOrd === undefined) { d.rec.dockOrd = dockNextOrd(act, d); }
 			d.rec.dock = act;
+			d.open = true;
 		} else if (act === 'float') {
 			delete d.rec.dock;
 			delete d.rec.autohide;
+			delete d.rec.dockOrd;
 		} else if (act === 'autohide') {
 			if (d.rec.autohide) { delete d.rec.autohide; } else { d.rec.autohide = true; }
 		}
@@ -51970,6 +52059,7 @@ var EngCalcs = EngCalcs || {};
 		was = box.getBoundingClientRect();
 		delete d.rec.dock;
 		delete d.rec.autohide;
+		delete d.rec.dockOrd;
 		if (dockFlyout === d) { dockFlyout = null; }
 		if (d.save) { d.save(); }
 		layoutDocks();
@@ -51985,6 +52075,7 @@ var EngCalcs = EngCalcs || {};
 	function dockPlaced(box) {
 		var d = box && box.__lpnDock;
 		if (!d || !dockSideOf(d)) { return; }
+		dockNoteOpen(d, true);
 		if (d.rec.autohide && !dockBooting) { dockFlyout = d; }
 		layoutDocks();
 	}
@@ -52133,10 +52224,8 @@ var EngCalcs = EngCalcs || {};
 		// Flags lie along the bar in the order the visitor dragged them to (`dockOrd`); a box never
 		// dragged has none and follows, in the order the boxes were registered.
 		['left', 'right'].forEach(function (s) {
-			sides[s].auto.sort(function (a, b) {
-				var x = a.rec.dockOrd === undefined ? 1e9 : a.rec.dockOrd, y = b.rec.dockOrd === undefined ? 1e9 : b.rec.dockOrd;
-				return (x - y) || (dockBoxes.indexOf(a) - dockBoxes.indexOf(b));
-			});
+			sides[s].auto.sort(dockByOrd);
+			sides[s].pinned.sort(dockByOrd);
 		});
 		wr = wrap.getBoundingClientRect();
 		sr = svg.getBoundingClientRect();
@@ -52251,15 +52340,16 @@ var EngCalcs = EngCalcs || {};
 	// of each flag rides on its box's own record as `dockOrd` (no new key). Alt+Arrow does the same
 	// from the keyboard.
 	var LPN_FLAG_SLOP = 6;
+	// The flags on the bar take the ranks they already held, in their new order, so a closed docked
+	// box or a pinned one on the same edge keeps its place among them.
 	function dockCommitOrder(strip) {
-		var seen = [];
-		Array.prototype.forEach.call(strip.children, function (t, i) {
-			var d = t.lpnDock;
-			if (!d) { return; }
-			d.rec.dockOrd = i;
-			seen.push(d);
-		});
-		seen.forEach(function (d) { if (d.save) { d.save(); } });
+		var seen = [], ranks;
+		Array.prototype.forEach.call(strip.children, function (t) { if (t.lpnDock) { seen.push(t.lpnDock); } });
+		ranks = seen.map(function (d, i) { return d.rec.dockOrd === undefined ? 1e9 + i : d.rec.dockOrd; })
+			.sort(function (a, b) { return a - b; });
+		seen.forEach(function (d, i) { d.rec.dockOrd = ranks[i] >= 1e9 ? dockNextOrd(d.rec.dock, d) : ranks[i]; });
+		seen.forEach(function (d) { if (d.save && !d.shared) { d.save(); } });
+		if (seen.some(function (d) { return d.shared; })) { saveDockShared(); }
 	}
 	// The press is remembered here and the rest of the drag is judged on the STRIP, which holds the
 	// pointer capture: moving the flag's own node along the bar drops a capture held on that node, and
@@ -52353,8 +52443,14 @@ var EngCalcs = EngCalcs || {};
 	function registerDockBox(id, rec, save, key, tipKey) {
 		var box = document.getElementById(id), pc = EngCalcs.pageConfig || {}, x, row, d, tip;
 		if (!box || box.__lpnDock) { return; }
-		d = { box: box, rec: rec || {}, save: save || null, help: null, tab: null };
-		readDockRecord(key, d.rec);
+		d = { box: box, rec: rec || {}, save: save || null, help: null, tab: null, shared: !key, open: false };
+		if (d.shared) {
+			readDockFields(dockSharedLoad()[id], d.rec);
+			d.open = !!d.rec.dock && !!(dockSharedLoad()[id] || {}).open;
+			d.save = saveDockShared;
+		} else {
+			readDockRecord(key, d.rec);
+		}
 		row = document.createElement('div');
 		row.className = 'lpn-box-corner';
 		x = box.querySelector('.lpn-popover-x');
@@ -52387,6 +52483,22 @@ var EngCalcs = EngCalcs || {};
 	// whole strings joined in order (Task 759, Tom 2026-10-03: one `?` by the x of each Analyze box).
 	// Fire flow and Demand scaling build theirs (ffBoxTip(), dsBoxTip()): every paragraph that box
 	// used to show is in it, and some of those carry the engine and the units of the moment.
+	// **A DOCKED BOX WITH NO RECORD OF ITS OWN COMES BACK OPEN** if it was open when the page went
+	// away, by its own opener, in the boot restore beside the boxes that keep their own. Not on a
+	// phone, where every box fills the window and none is docked: its docking waits for a wider one.
+	function restoreDockedShared() {
+		var openers = {
+			lpn_popup: openPopupEmpty,
+			lpn_crit_box: openCriticalityBox,
+			lpn_ds_box: openDemandScaleBox,
+			lpn_alt_box: function () { if (!scenarioBasicMode) { openAlternativesBox(); } },
+			lpn_calib_box: openCalibBox
+		};
+		if (smallScreen()) { return; }
+		dockBoxes.slice().sort(dockByOrd).forEach(function (d) {
+			if (d.shared && d.rec.dock && d.open && openers[d.box.id] && !dockBoxShown(d)) { openers[d.box.id](); }
+		});
+	}
 	function wireBoxDocking() {
 		[
 			['lpn_popup', {}, null, null],
@@ -52408,6 +52520,7 @@ var EngCalcs = EngCalcs || {};
 			['lpn_notes_popup', notesboxLayout, saveNotesboxLayout, LPN_NOTESBOX_KEY],
 			['lpn_hotkeys_popup', hotkeysboxLayout, saveHotkeysboxLayout, LPN_HOTKEYSBOX_KEY]
 		].forEach(function (r) { registerDockBox(r[0], r[1], r[2], r[3], r[4]); });
+		dockRankUnranked();
 		document.addEventListener('pointerdown', dockCloseHelpTips, true);
 		dockWasSmall = smallScreen();
 		window.addEventListener('resize', function () {
@@ -55460,8 +55573,19 @@ var EngCalcs = EngCalcs || {};
 	// (Elevation+Demand for a junction, Fixed head for a reservoir, Diameter+Roughness+Length
 	// for a pipe). Pump curve entry isn't implemented -- see the scope doc's design note.
 	var currentPopup = null; // {kind:'node'|'link', id} -- lets a unit-strip change refresh the open popup in place
-	function closePopup() {
+	// **A DOCKED PROPERTIES BOX STAYS IN ITS DOCK WHEN NOTHING IS SELECTED**, saying so, the way a
+	// docked property palette does in every CAD program: Tom's docks are to be remembered, and one
+	// that vanished whenever a selection cleared could not be. Only its own X (or Escape) closes it;
+	// every other caller is a selection going away. A floating box closes as it always did.
+	function closePopup(explicit) {
 		var popup = document.getElementById('lpn_popup');
+		if (explicit !== true && boxIsDocked(popup) && dockBoxShown(popup.__lpnDock)) {
+			if (ghostShieldTimer) { clearTimeout(ghostShieldTimer); ghostShieldTimer = null; }
+			lastMapTapFinger = false;
+			popup.style.pointerEvents = '';
+			renderPopupEmpty();
+			return;
+		}
 		// AND THE GHOST-CLICK SHIELD COMES DOWN WITH THE BOX. A pending timer would otherwise
 		// restore `pointerEvents` on a popup that has since been reopened by a mouse, and a box
 		// closed inside the shield window would come back inert -- the same class of leak as the
@@ -55473,6 +55597,24 @@ var EngCalcs = EngCalcs || {};
 		// a sibling of the popup in document.body rather than a child of it. hidePanel() sweeps.
 		hidePanel(popup);
 		currentPopup = null;
+	}
+	function renderPopupEmpty() {
+		var pc = EngCalcs.pageConfig || {}, popup = document.getElementById('lpn_popup'),
+			title = document.getElementById('lpn_popup_title'), fields = document.getElementById('lpn_popup_fields'), p;
+		hideTipsIn(popup);
+		currentPopup = null;
+		title.textContent = '';
+		clearFields(fields);
+		p = document.createElement('p');
+		p.className = 'lpn-popup-none';
+		p.textContent = pc.lpn_popup_none || 'Nothing is selected. Select an asset on the map to see its properties.';
+		fields.appendChild(p);
+		propGraphSync();
+	}
+	// The docked box brought back by a reload, before anything is selected.
+	function openPopupEmpty() {
+		renderPopupEmpty();
+		openPopupAt(0, 0);
 	}
 	// DRAGGING THE PROPERTY POPUP. The grab surface is the popup's own CHROME -- the padded band
 	// around the body, where `e.target` is the popup element itself -- and never a child, which is
@@ -55742,7 +55884,7 @@ var EngCalcs = EngCalcs || {};
 	}
 	function wirePopup() {
 		var popup = document.getElementById('lpn_popup');
-		document.getElementById('lpn_popup_close').addEventListener('click', closePopup);
+		document.getElementById('lpn_popup_close').addEventListener('click', function () { closePopup(true); });
 		popup.addEventListener('keydown', function (e) { popupArrowKey(e, popup); });
 		makePanelDraggable(popup, function (at) { popupUserPos = at; });
 		popup.addEventListener('dblclick', function (e) {
