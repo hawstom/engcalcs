@@ -172,9 +172,9 @@ async function main() {
 		const bad = [
 			['not JSON', '{ this is not json', 'lpn_workspace_refused_unreadable'],
 			['wrong format', JSON.stringify({ format: 'something-else', version: 1, settings: {} }), 'lpn_workspace_refused_format'],
-			['a project file', JSON.stringify({ v: 3, name: 'x', nodes: [] }), 'lpn_workspace_refused_format'],
+			['a project document', JSON.stringify({ v: 3, name: 'x', nodes: [] }), 'lpn_workspace_refused_format'],
 			['settings an array', JSON.stringify({ format: 'engcalcs-lpn-workspace', version: 1, settings: [] }), 'lpn_workspace_refused_format'],
-			['a newer version', JSON.stringify({ format: 'engcalcs-lpn-workspace', version: 99, settings: {} }), 'lpn_workspace_refused_newer']
+			['a future format', JSON.stringify({ format: 'engcalcs-lpn-workspace', version: 99, settings: {} }), 'lpn_workspace_refused_newer']
 		];
 		for (const [label, text, key] of bad) {
 			const d = await importWorkspace(a, text, 'bad.json');
