@@ -47,8 +47,10 @@ Links follow under "Links" below.
     `libAnnotateControl()` draws the same line.
   - A rule clause that names the node by a kind it no longer is.
 - **One undo** reverses the whole change, the selection included.
-- **Base-owned.** The type is not in `LPN_OVERRIDABLE`, like a valve's type, so a change made
-  while a scenario is showing applies in every scenario.
+- **Base's, and a scenario may state its own** (Tom, 2026-10-07). The type is not in
+  `LPN_OVERRIDABLE`. In Base a change applies in every scenario that states no type of its own; in
+  any other scenario Change type first asks "Current scenario is not Base. Create overrides?"
+  (Create overrides, Switch to Base, Cancel). See `dev/scenario-alternatives.md`, "Type overrides".
 
 ## Why Water, at the foot
 

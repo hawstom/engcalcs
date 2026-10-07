@@ -708,13 +708,49 @@ named set and stops pretending to have a parent. Recommendation: keep the column
   **A custom property's design stays the project's in every scenario** (the Excluded table): its
   rows have no category, are never marked, and are read-only in a scenario's row.
 - **(6c, Q11) Clear override, never Reset**: already true of every visitor string.
-- **Asset-type overrides (6a, Q10)**: unchanged this round, by Tom's "stay the course".
+- **Asset-type overrides (6a)**: built 2026-10-07, see "Type overrides" below.
 
 Harnesses: `settings-table-owner-browser-harness.js` (real Chromium: Owner, Rank gone, Before/After
 stated or not and typed in a scenario, the box note, both filters and the banner in the Settings
 and Pipes tables, Net3 lat/lon's custom property rows); `pane-clear-override-speed-browser-harness.js`
 (a 117-pipe column cleared under a time bound, Q12's marks, one undo); `settings-table-labels-harness.js`
 (Owner and Setting words on every example, no duplicates, Tom's example rows).
+
+### Type overrides (built 2026-10-07, Tom's 6a)
+
+Tom, 2026-10-07: *"You make it sound easy, so I guess we should build it out. I just want to
+minimize user confusion. So if Change type is used, with other than Base scenario, put up an alert
+box. 'Current scenario is not Base. Create overrides? [Create overrides] [Switch to Base] [Cancel]'"*
+
+- **The question** is the page's own box (`askDialog` kind `choice`), his sentence and his three
+  buttons, asked only outside Base. Switch to Base switches, then makes the ordinary Base change
+  with its own box. Cancel writes nothing. Create overrides is followed by the Change type box only
+  when something is listed (the scenario's own overrides lost, born link values, a water surface).
+- **Stored** as `type` in the scenario's override map for the asset, beside the values the new type
+  needs: an overridable one as its ordinary override (`level`, `setting`, `diameter`), a Base-owned
+  one under its stored name (`minLevel`, `maxLevel`, `tankDiameter`, `valveType`, `lenAuto`,
+  `speed`...). Their categories are `LPN_TYPE_FIELD_CATEGORY_OF` (Physical, the demand storage in
+  Demand); they are not in `LPN_OVERRIDABLE` and cannot be set on their own. Base is untouched.
+- **Every reader sees the scenario's type** because the elements are laid out as the open scenario
+  sees them (`typeViewSync()` at the top of `buildDom()`, and on every temporary swap:
+  `paneInScenario()`, the scenario comparison), and laid back as Base around `serializeProject()`
+  and the undo snapshot (`withBaseTypes()`), so a file, an autosave, an undo step and the dirty
+  signature are always Base's. The `.inp` export asks for the view (`serializeProject(true)`). A
+  Base-owned field typed while laid out (a tank's highest depth in Properties) is written back into
+  the scenario's map when Base is laid back. Controls are re-annotated for the type showing.
+- **Values**: the new type's own come from the scenario's New assets settings, as a drawn one's do;
+  a water surface is carried as in Base; every value both types have keeps what the scenario showed
+  (a library pipe's diameter on a pipe made a valve). Changing back to Base's own type removes the
+  override and what it brought.
+- **A Base change never reaches into a map that states its own type** (`eachElementOverride()`
+  skips it), and `pinTypeOverrideInheritance()` copies into that map what it inherited from Base
+  and Base is about to drop.
+- **Show scenarios**: a row is shown only where the asset is that table's type in that scenario.
+  Known gap: an asset that is this table's type only in another scenario has no row here.
+- Harnesses: `scenario-type-override-harness.js` (Net1: junction 22 a tank in B; Base's heads
+  unchanged to 1e-6 and B's equal to a hand-built Net1 with a real tank 22, both engines; undo;
+  save and reopen; `.inp` of each scenario; the asset-type pre-review's three findings; live
+  mutations) and `scenario-type-override-browser-harness.js` (the real rows and buttons).
 
 ## The long burn: from Basic mode to the full model (2026-10-06)
 
