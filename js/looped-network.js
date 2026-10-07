@@ -9092,7 +9092,7 @@ var EngCalcs = EngCalcs || {};
 		// WHICH LINKS JOIN, AND WHICH ARE WALLS. An open pipe (a check valve is a pipe, closed when it
 		// is shut) and an open throttle control valve, which is a loss like a pipe's, join. A pump,
 		// every other valve and anything closed is a wall: head jumps across it.
-		var joins = [], lens = [], dataLinks = [], walls = [], geomPts = [];
+		var joins = [], lens = [], dataLinks = [], walls = [], geomPts = [], linkPolys = [];
 		doc.links.forEach(function (l) {
 			if (!isActive(l)) { return; }
 			var a = allIdx[l.from], b = allIdx[l.to];
@@ -9102,6 +9102,7 @@ var EngCalcs = EngCalcs || {};
 			var len = 0, i;
 			for (i = 0; i + 1 < pts.length; i++) { len += Math.sqrt(Math.pow(pts[i + 1].x - pts[i].x, 2) + Math.pow(pts[i + 1].y - pts[i].y, 2)); }
 			pts.forEach(function (p) { geomPts.push(p.x, p.y); });
+			linkPolys.push(pts);
 			// The reach's scale is every pipe as drawn, open or closed: how far apart the network's
 			// nodes are does not change when a valve shuts.
 			if (l.type === 'pipe') { lens.push(len); }
@@ -9153,8 +9154,19 @@ var EngCalcs = EngCalcs || {};
 		// nothing else would stop the colour running across it. A fault on every barrier sliced a
 		// pump station's short links into wedges with no pipe visible in them (Net3's pump 335, its
 		// bypass 330 and pipe 333: a bare hole in the one loop they make).
+		//
+		// EACH FAULT IS THEN CUT TO ITS OWN LINK'S BREAK (faultReach() in js/lpn-contour.js, Tom,
+		// 2026-10-07): laid the reach each side, it keeps the stretch nearer its link than any other
+		// link and breaking the surface no more than the link does plus half a contour interval, and
+		// the field, the contour lines and the drawn break line all use that shortened fault. Over
+		// the ground the field is head in metres, so the half interval is turned into head.
 		var faults = walls.filter(function (w) { return zoneOf[allIdx[w.from]] === zoneOf[allIdx[w.to]]; })
 			.map(function (w) { return C.faultAcross(w.pts, R); }).filter(Boolean);
+		if (faults.length && grid && segs.length) {
+			var toShown = useHeads ? contourGroundScale() : 1, vlo = Infinity, vhi = -Infinity;
+			Object.keys(val).forEach(function (id) { vlo = Math.min(vlo, val[id] * toShown); vhi = Math.max(vhi, val[id] * toShown); });
+			faults = C.faultReach(faults, linkPolys, C.segmentSet(segs), grid, R, { slack: contourIntervalOf(field, vlo, vhi) / 2 / toShown });
+		}
 		return { nodes: nVal, pipes: dataLinks.length, segs: segs, faults: faults, R: R, med: med, grid: grid,
 			walls: walls.map(function (w) { return w.pts; }) };
 	}
@@ -9203,19 +9215,22 @@ var EngCalcs = EngCalcs || {};
 		var w = grid.nx * grid.dx, h = grid.ny * grid.dy, cell = Math.max(w, h) / CONTOUR_DEM_CELLS;
 		return { x0: grid.x0, y0: grid.y0, dx: cell, dy: cell, nx: Math.max(2, Math.ceil(w / cell)), ny: Math.max(2, Math.ceil(h / cell)) };
 	}
+	// One metre of head as the displayed pressure: the specific gravity times the unit's factor.
+	function contourGroundScale() {
+		var sg = (settings.hydraulics && typeof settings.hydraulics.specificGravity === 'number' &&
+			isFinite(settings.hydraulics.specificGravity)) ? settings.hydraulics.specificGravity : 1;
+		return sg * toDisplay(1, resultUnit('pressure'));
+	}
 	// The pressure in the display unit at every cell, from head interpolated and ground subtracted.
 	function contourSubtractGround(F, grid, ground) {
-		var C = EngCalcs.lpnContour, i, j,
-			sg = (settings.hydraulics && typeof settings.hydraulics.specificGravity === 'number' &&
-				isFinite(settings.hydraulics.specificGravity)) ? settings.hydraulics.specificGravity : 1,
-			f = toDisplay(1, resultUnit('pressure'));
+		var C = EngCalcs.lpnContour, i, j, k = contourGroundScale();
 		for (j = 0; j < grid.ny; j++) {
 			for (i = 0; i < grid.nx; i++) {
 				var c = j * grid.nx + i;
 				if (!isFinite(F.val[c])) { continue; }
 				var e = C.sampleField(ground.elev, ground.grid, grid.x0 + (i + 0.5) * grid.dx, grid.y0 + (j + 0.5) * grid.dy);
 				if (!isFinite(e)) { var cc = C.cellAt(ground.grid, grid.x0 + (i + 0.5) * grid.dx, grid.y0 + (j + 0.5) * grid.dy); e = cc >= 0 ? ground.elev[cc] : NaN; }
-				F.val[c] = isFinite(e) ? (F.val[c] - e) * sg * f : NaN;
+				F.val[c] = isFinite(e) ? (F.val[c] - e) * k : NaN;
 				if (!isFinite(F.val[c])) { F.alpha[c] = 0; }
 			}
 		}
@@ -9286,21 +9301,23 @@ var EngCalcs = EngCalcs || {};
 		return canvas.toDataURL('image/png');
 	}
 	// The break lines: every boundary between two coloured zones, traced from the field, and each
-	// fault cut to the run of it round the link's midpoint that lies over colour.
+	// fault (already cut to its own link's break by contourNetwork()) cut again to the run of it
+	// round the link that lies over colour.
 	function contourWallLines(grid, F) {
 		// A zone boundary is drawn only within the reach of the pump, valve or closed link that makes
 		// it, so it crosses the corridor there and never runs on across open land.
 		var C = EngCalcs.lpnContour, out = C.clipNear(C.zoneBreaks(F, grid, { minAlpha: 0.2, smooth: 2 }), contourWalls, contourReach);
 		contourFaults.forEach(function (f) {
-			var n = 40, s;
-			// From the middle outward in both directions, while the colour lasts.
+			var n = 40, s, gx = f.x1 - f.x0, gy = f.y1 - f.y0, g2 = gx * gx + gy * gy;
+			// From the link outward in both directions, while the colour lasts. The wall may have
+			// been cut more on one side than the other, so the link is not always its middle.
 			function covered(t) {
-				var x = f.x0 + t * (f.x1 - f.x0), y = f.y0 + t * (f.y1 - f.y0), c = C.cellAt(grid, x, y);
+				var x = f.x0 + t * gx, y = f.y0 + t * gy, c = C.cellAt(grid, x, y);
 				return c >= 0 && F.alpha[c] >= 0.2;
 			}
-			var lo = 0.5, hi = 0.5;
-			for (s = 1; s <= n / 2; s++) { if (covered(0.5 - s / n)) { lo = 0.5 - s / n; } else { break; } }
-			for (s = 1; s <= n / 2; s++) { if (covered(0.5 + s / n)) { hi = 0.5 + s / n; } else { break; } }
+			var tm = g2 > 0 ? Math.max(0, Math.min(1, ((f.mx - f.x0) * gx + (f.my - f.y0) * gy) / g2)) : 0.5, lo = tm, hi = tm;
+			for (s = 1; s <= n; s++) { var a = Math.max(0, tm - s / n); if (covered(a)) { lo = a; } else { break; } if (a === 0) { break; } }
+			for (s = 1; s <= n; s++) { var b = Math.min(1, tm + s / n); if (covered(b)) { hi = b; } else { break; } if (b === 1) { break; } }
 			if (hi - lo < 2 / n) { return; }
 			out.push([f.x0 + lo * (f.x1 - f.x0), f.y0 + lo * (f.y1 - f.y0), f.x0 + hi * (f.x1 - f.x0), f.y0 + hi * (f.y1 - f.y0)]);
 		});
