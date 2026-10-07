@@ -66,7 +66,7 @@
 	// ---- ingredients, each switchable (STRATEGY.md beside this file) ----------------------------
 	// Switch one off with create({off: ['repair']}) or, under the bench, the environment variable
 	// LPN_PLACER_B_OFF=repair,evict (comma separated).
-	const INGREDIENTS = ['keep', 'table', 'crowd', 'smallfirst', 'wedge', 'reach', 'along', 'relocate', 'repair', 'evict', 'polish', 'unwrap', 'raster', 'cleanfirst'];
+	const INGREDIENTS = ['keep', 'table', 'crowd', 'smallfirst', 'wedge', 'reach', 'along', 'relocate', 'repair', 'evict', 'polish', 'unwrap', 'raster', 'cleanfirst', 'edgehang', 'rings'];
 	// Built, measured and left off by default (STRATEGY.md, "Tried and dropped"); LPN_PLACER_B_ON
 	// switches one back on.
 	const DEFAULT_OFF = ['repair'];
@@ -343,7 +343,7 @@
 			// Static ground: node symbols, pump and valve symbols, Text objects and their callouts, pipes.
 			scene.nodes.forEach(function (n) { const b = rectBox(n.symbol); GH.addBox({ t: 'sym', node: n.id, lid: null, box: b }); occAdd(b, 1); });
 			scene.links.forEach(function (l) {
-				(l.symbols || []).forEach(function (b) { GH.addBox({ t: 'sym', node: null, lid: null, box: mkBox(b.cx, b.cy, b.w, b.h, b.angle) }); });
+				(l.symbols || []).forEach(function (b) { GH.addBox({ t: 'sym', node: null, link: l.id, key: 'S' + l.id, lid: null, box: mkBox(b.cx, b.cy, b.w, b.h, b.angle) }); });
 				for (let i = 1; i < l.points.length; i++) {
 					GS.addSeg({ t: 'seg', key: 'L' + l.id, link: l.id, from: l.from, to: l.to, lid: null, p: l.points[i - 1], q: l.points[i] });
 				}
@@ -466,6 +466,13 @@
 						const it = BUF2[m];
 						if (it.t === 'sym') {
 							if (own.node !== undefined && it.node === own.node) { continue; }
+							// N3 is about NODE symbols. A pump or valve symbol on the way costs what
+							// its pipe would; the label's own one costs nothing.
+							if (it.node === null) {
+								if (it.link === own.link || seen.indexOf(it.key) >= 0) { continue; }
+								if (segBox(p[0], p[1], q[0], q[1], it.box, 0.5)) { seen.push(it.key); cost += W_LDR_PIPE; }
+								continue;
+							}
 							if (segBox(p[0], p[1], q[0], q[1], it.box, 0.5)) { return Infinity; }
 						} else if (it.t === 'lab') {
 							if (it.lid === req.id || seen.indexOf(it.key) >= 0) { continue; }
@@ -530,7 +537,10 @@
 				add(nx - W / 2, 'left', below, 0.09, Math.PI / 2);
 				// Leader rings, the open directions first ('wedge'). With 'reach': every 15 degrees,
 				// every half row, out to REACH_ROWS rows; without it, 12 directions, 4 rings of 7 px.
-				ringsAround(req, rows, layout, W, H, nx, ny, rw, rh, 0, out);
+				// With 'edgehang', the rings search only for a label's smallest form (a place at all).
+				const smallest = rows.length === setsOf[req.id][setsOf[req.id].length - 1].length;
+				if (!ON.edgehang || (ON.rings && smallest)) { ringsAround(req, rows, layout, W, H, nx, ny, rw, rh, 0, out); }
+				if (ON.edgehang) { edgeHang(req, rows, layout, W, H, nx, ny, Math.max(rw, rh), openness, out); }
 				// 'unwrap' (H-a, S5): the same rows as one line, beside the symbol and on the rings.
 				if (ON.unwrap && rows.length > 1) {
 					const lz = sizeOf(req, rows, 'line');
@@ -538,7 +548,8 @@
 						pref: 0.05 + 0.1 * (1 - openness(0)) });
 					out.push({ rows: rows, layout: 'line', align: 'right', x: nx - rw - GAP - lz.w, y: ny - lz.h / 2, w: lz.w, h: lz.h, angle: 0,
 						leader: null, pref: 0.06 + 0.1 * (1 - openness(Math.PI)) });
-					ringsAround(req, rows, 'line', lz.w, lz.h, nx, ny, rw, rh, 0.05, out);
+					if (!ON.edgehang) { ringsAround(req, rows, 'line', lz.w, lz.h, nx, ny, rw, rh, 0.05, out); }
+					else { edgeHang(req, rows, 'line', lz.w, lz.h, nx, ny, Math.max(rw, rh), openness, out, 0.05); }
 				}
 				function ringsAround(req, rows, layout, W, H, nx, ny, rw, rh, extra, out) {
 					const hx = W / 2 + rw + GAP, hy = H / 2 + rh + GAP;
@@ -628,6 +639,24 @@
 				}
 				return bp;
 			}
+			// 'edgehang' (the self-test's own geometry, used to build with): a straight leader from
+			// the anchor every 15 degrees and every half row out to REACH_ROWS rows, the block hung
+			// by the edge its leader arrives at (R5), so its near corner or edge midpoint is the end.
+			function edgeHang(req, rows, layout, W, H, ax, ay, r0, openness, out, extra) {
+				const row = T.rowHeightPx;
+				for (let k = 1; k <= REACH_ROWS * 2; k++) {
+					const len = r0 + 1 + k * row / 2;
+					for (let deg = 0; deg < 360; deg += 15) {
+						const rad = deg * Math.PI / 180, cs = Math.cos(rad), sn = Math.sin(rad);
+						const ex = ax + len * cs, ey = ay + len * sn;
+						const east = cs > 0.26, west = cs < -0.26;
+						const x = east ? ex : (west ? ex - W : ex - W / 2);
+						const y = sn < -0.26 ? ey - H : (sn > 0.26 ? ey : ey - H / 2);
+						out.push({ rows: rows, layout: layout, align: west ? 'right' : 'left', x: x, y: y, w: W, h: H, angle: 0, leader: 'auto',
+							from: [ax, ay], pref: (extra || 0) + 0.01 + RING_COST + RING_PER_PX * len + (openness ? 0.25 * (1 - openness(rad)) : 0), dist: len });
+					}
+				}
+			}
 			function linkCandidates(req, rows, out) {
 				const l = linkById[req.owner];
 				const sz = sizeOf(req, rows, 'line'), W = sz.w, H = sz.h;
@@ -676,6 +705,7 @@
 						});
 					});
 				}
+				if (ON.edgehang) { edgeHang(req, rows, 'line', W, H, ax, ay, 0, null, out); }
 				// Level, on a leader from the pipe's on-screen middle.
 				const hx = W / 2 + 2, hy = H / 2 + 2;
 				const kMax = ON.reach ? Math.ceil(REACH_ROWS * 2) : RING_MAX - 1, dirs = ON.reach ? 16 : 8;
