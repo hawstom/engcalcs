@@ -58,6 +58,25 @@
 	const RING_DIRS = 12;       // directions tried on each ring
 	const RING_COST = 0.12;     // base cost of hanging on a leader
 	const RING_PER_PX = 0.006;  // cost per px of travel
+	const REACH_ROWS = 3;       // 'reach': leaders out to this many text rows, every 15 degrees
+	const DEADLINE_MS = 700;    // R10: a layout returns what it has placed by then (time, never a count)
+
+	// ---- ingredients, each switchable (STRATEGY.md beside this file) ----------------------------
+	// Switch one off with create({off: ['repair']}) or, under the bench, the environment variable
+	// LPN_PLACER_B_OFF=repair,evict (comma separated).
+	const INGREDIENTS = ['keep', 'table', 'crowd', 'smallfirst', 'wedge', 'reach', 'along', 'relocate', 'repair', 'evict', 'unwrap'];
+	function ingredientSwitches(opts) {
+		const on = {};
+		INGREDIENTS.forEach(function (k) { on[k] = true; });
+		let off = (opts && opts.off) || [];
+		try {
+			if (!off.length && typeof process !== 'undefined' && process.env && process.env.LPN_PLACER_B_OFF) {
+				off = process.env.LPN_PLACER_B_OFF.split(',');
+			}
+		} catch (e) { off = []; }
+		off.forEach(function (k) { on[String(k).trim()] = false; });
+		return on;
+	}
 
 	// ---- small geometry ------------------------------------------------------------------------
 	function mkBox(cx, cy, w, h, angDeg) {
@@ -220,7 +239,8 @@
 	}
 
 	// ---- the placer -----------------------------------------------------------------------------
-	function create() {
+	function create(createOpts) {
+		const ON = ingredientSwitches(createOpts);
 		// Zoom-invariant knowledge, keyed on the network's shape (T2, T3): per node, the directions
 		// of its pipes and the open gaps between them, widest first.
 		let cacheSig = null, gapCache = {};
@@ -296,15 +316,22 @@
 			const vx0 = VP.x, vy0 = VP.y, vx1 = VP.x + VP.w, vy1 = VP.y + VP.h;
 			// ---- one label's geometry --------------------------------------------------------
 			function rowSets(req) {
-				const order = (scene.dropOrder && scene.dropOrder[req.kind]) || [];
+				// The user's drop order, first to go first; the ID is a value like any other, and a
+				// scene that does not list it lets it go first (the contract's dropOrderOf). A field
+				// the order does not list goes before every listed one.
+				const order = ((scene.dropOrder && scene.dropOrder[req.kind]) || []).slice();
+				if (order.indexOf('id') < 0) { order.unshift('id'); }
+				const rank = function (f) { return order.indexOf(f); };
+				const fields = [];
+				req.rows.forEach(function (r) { if (fields.indexOf(r.field) < 0) { fields.push(r.field); } });
+				fields.sort(function (a, b) { return rank(a) - rank(b); });
 				const idx = req.rows.map(function (r, i) { return i; });
 				const sets = [idx.slice()];
 				let cur = idx.slice();
-				order.forEach(function (f) {
+				fields.forEach(function (f) {
 					const nx = cur.filter(function (i) { return req.rows[i].field !== f; });
 					if (nx.length && nx.length < cur.length) { cur = nx; sets.push(cur.slice()); }
 				});
-				// A label with no ID row keeps its single last property (S4).
 				return sets;
 			}
 			function sizeOf(req, rows, layout) {
