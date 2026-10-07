@@ -5079,7 +5079,7 @@ var EngCalcs = EngCalcs || {};
 				fn: function () { closeMenu(); openScenarioCompareBox(); }
 			},
 			{
-				icon: 'info', label: pc.lpn_reports_epanet || 'EPANET run',
+				icon: 'info', label: pc.lpn_reports_epanet || 'Run (EPANET)',
 				tip: pc.lpn_time_run_report_tip,
 				// **SHOWN, OR EXPLAINED -- never an empty box.** The row is always here rather than
 				// hidden when there is nothing to show: a row that disappears teaches nobody that
@@ -5101,7 +5101,7 @@ var EngCalcs = EngCalcs || {};
 			// carries the word so no row has to, the same rule "EPANET run" (not "EPANET run
 			// report") already follows two rows up. The BOX TITLES keep the full names.
 			{
-				icon: 'info', label: pc.lpn_reports_status || 'Status',
+				icon: 'info', label: pc.lpn_reports_status || 'Status (EPANET)',
 				tip: pc.lpn_reports_status_tip,
 				fn: function () { closeMenu(); openStatusReportBox(); }
 			},
@@ -42233,10 +42233,6 @@ var EngCalcs = EngCalcs || {};
 			// menu is about; View holds the things that change how the map is drawn. Every editor
 			// puts Find in Edit for the same reason.
 			{ icon: 'find', label: pc.lpn_find_menu || 'Find and replace', fn: function () { toggleFindPopup(anchor); } },
-			// Libraries is in Edit for the same reason Find is: it acts on the CONTENT of the
-			// document -- the patterns, the curves and the controls it holds -- rather than on how
-			// the map is drawn. Two doors, one implementation, exactly as Settings has.
-			{ icon: 'library', label: pc.lpn_library_menu || 'Libraries', fn: function () { toggleLibraryBox(); } },
 			{ separator: true },
 			// SUBJECT, THEN VERB (Task 415): with something selected this row deletes it, which is
 			// what Delete means in every editor. With nothing selected it still toggles the Delete

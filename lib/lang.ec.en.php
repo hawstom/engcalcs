@@ -3635,7 +3635,10 @@ $ec_lang['lpn_settings_energy']='Energy';
 // lpn_time_run_report keep the word and lpn_energy_menu and lpn_reports_epanet do not.
 $ec_lang['lpn_reports_menu']='Reports';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_reports_epanet']='EPANET run';
+// Row label only (the box title is lpn_time_run_report). Tom, 2026-10-07: 'Run (EPANET)'. The suffix
+// is on the rows only the EPANET engine can fill: this one and Status. Full and Calibration also
+// read the built-in solver's single instant, so they carry no suffix.
+$ec_lang['lpn_reports_epanet']='Run (EPANET)';
 $ec_lang['lpn_energy_title']='Pump energy report';
 $ec_lang['lpn_energy_menu']='Pump energy';
 $ec_lang['lpn_energy_efficiency']='Pump efficiency (percent)';
@@ -3698,7 +3701,7 @@ $ec_lang['lpn_energy_total_cost']='Total cost';
 // **THE ROW SAYS "Status", NOT "Status report"** -- the Reports fly-out carries the word so no row
 // has to (js/looped-network.js:4630's own rule, already followed by "EPANET run"). The box title,
 // lpn_status_title, keeps the full name.
-$ec_lang['lpn_reports_status']='Status';
+$ec_lang['lpn_reports_status']='Status (EPANET)';
 $ec_lang['lpn_reports_status_tip']='Chronological table of status changes during the last extended period simulation: pumps and valves opening or closing, tanks filling, emptying, filling up or running dry, and steps that did not fully converge.';
 $ec_lang['lpn_status_title']='Status report';
 $ec_lang['lpn_status_needs_run']='The status report lists what changed during an extended period simulation. Set a Total run time in Settings, Calculation, Time, press Calculate, then open Water, Reports, Status report.';
