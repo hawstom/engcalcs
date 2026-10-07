@@ -192,6 +192,9 @@ async function probePoints(browser, origin, spec) {
 	await page.waitForFunction(() => window.EngCalcs && EngCalcs.numCalcRows > 0, null, { timeout: 5000 });
 	console.log(`\n--- points data, ${spec.label} ---`);
 
+	const heading = await page.$eval('#points_data_copy', (b) => b.parentElement.textContent);
+	ok(/Points data/.test(heading) && !/Calculator data/.test(heading), `${spec.label}: the box is headed "Points data"`, heading.trim().slice(0, 40));
+
 	// Windows line ends, a longer table than the default.
 	const svgBefore = await page.$eval('#sketch', (el) => el.innerHTML);
 	await paste(page, SECTION);

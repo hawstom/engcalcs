@@ -113,7 +113,7 @@ function echoCalculatorFormAppend() {
 	</table>
 	<div class='d-print-none' style='float:left;'>
 		<p>
-			<?=$ec_lang['points_data_heading']?>
+			<?=$ec_lang['points_data_points_heading']?>
 			<br />
 			<button type="button" id="points_data_copy"><?=$ec_lang['points_data_copy']?></button>
 			<button type="button" id="points_data_paste"><?=$ec_lang['points_data_paste']?></button>
