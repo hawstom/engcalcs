@@ -1409,10 +1409,12 @@ var EngCalcs = EngCalcs || {};
 		var l = linkById(id), le = linkEls[id]; if (!le) { return; }
 		// Set BEFORE anything is placed, so every station obeys it.
 		le.hiddenShort = linkLabelTooShort(l, le);
-		// FOUR WAYS A LINK LABEL IS NOT DRAWN, ONE SEAM: too long for its own segment, shed out and
-		// still in conflict, standing on ground a node label has just taken (yieldStationedLabels()),
+		// FIVE WAYS A LINK LABEL IS NOT DRAWN, ONE SEAM: too long for its own segment, shed out and
+		// still in conflict, no clear station on its pipe (placeStationedLabels()), standing on
+		// ground a node label has just taken (yieldStationedLabels()),
 		// or the losing half of a crossing nothing could repair (shedCrossingLabels(), Task 539).
-		var hideAll = le.hiddenShort || !!le.hiddenCrowded || !!le.hiddenYielded || !!le.hiddenCrossed;
+		var hideAll = le.hiddenShort || !!le.hiddenCrowded || !!le.hiddenBlocked || !!le.hiddenYielded ||
+			!!le.hiddenCrossed;
 		setLabelAssemblyHidden(le, hideAll);
 		var single = linkLabelStations(l).length === 1,
 			stations = perfDebugAccum('  lkL:stations', function () {
@@ -1768,7 +1770,7 @@ var EngCalcs = EngCalcs || {};
 	// freedom: an aligned label gave up sideways movement by lying on its pipe, a chain gave up its
 	// station by being evenly spaced -- move one link of the chain and the regular spacing that makes
 	// it read as one repeated name is gone.
-	function placeStationedLabels(list, obs, fs) {
+	function placeStationedLabels(list, obs, fs, hideBlocked) {
 		var pad = fs * LPN_ALIGNED_PAD_FRAC;
 		list.map(function (l) {
 			return { l: l, len: Geom.polylineLength(linkPointList(l)) };
@@ -1805,6 +1807,16 @@ var EngCalcs = EngCalcs || {};
 				le.alignedAlong = best;
 				le.forceSide = undefined;
 				le.stationSides = [];
+				// **NO CLEAR STATION, EVEN TOUCHING, MEANS HIDE -- NEVER THE MIDDLE.** The middle is
+				// only the fallback for the PREDICTION, which must reserve something. On the real pass
+				// the middle of a short pipe lies on its own end junctions, and the shed cannot have
+				// ruled that out: it tests every station against the boxes IT placed, and the slide's
+				// earlier labels sit elsewhere (the label bench, 2026-10-07: 204 pipe labels over node
+				// symbols on plain networks). A hidden label is not drawn and reserves nothing.
+				// **ITS OWN FLAG, CLEARED BY THE CALLER EVERY PASS**, not `hiddenCrowded`: that one is
+				// the shed's and survives drag frames, so writing it here would let one pass hide a
+				// label for every pass after it (labelFlipProbe() reruns this and expects no change).
+				if (!clear && hideBlocked) { le.hiddenBlocked = true; return; }
 				boxes.push(bestBox);
 			} else {
 				// A chain's stations are fixed by the spacing rule, so there is nothing to search
@@ -2132,7 +2144,7 @@ var EngCalcs = EngCalcs || {};
 				var le = linkEls[l.id]; return le && le.hiddenShort;
 			}).length,
 			hidCrowd = doc.links.filter(function (l) {
-				var le = linkEls[l.id]; return le && le.hiddenCrowded && !le.hiddenShort;
+				var le = linkEls[l.id]; return le && (le.hiddenCrowded || le.hiddenBlocked) && !le.hiddenShort;
 			}).length;
 		drawCollisionBoxes(lineBoxes, obs, placed.map(function (r) { return r.leader; }).filter(Boolean));
 		if (!debugOn('labels')) { return; }
@@ -2759,6 +2771,7 @@ var EngCalcs = EngCalcs || {};
 		});
 		doc.links.forEach(function (l) {
 			var le = linkEls[l.id]; if (!le) { return; }
+			le.hiddenBlocked = false;   // placeStationedLabels()'s own decision, made again below
 			// A label nobody can see is not an obstacle. Skipping it here also clears its nudge, so
 			// zooming back in restores it where it belongs rather than where it was last pushed.
 			if (linkLabelTooShort(l, le)) { le.nudge = { x: 0, y: 0 }; return; }
@@ -2766,8 +2779,13 @@ var EngCalcs = EngCalcs || {};
 			// goes to placeStationedLabels(), which commits it as an obstacle at the placement the
 			// drawing really uses, rotated as it is really drawn. The nudge is cleared for it too: a
 			// nudge is measured from the half-way point, and a chain is not drawn there.
+			//
+			// **A LABEL THE SHED HID IS NOT IN THE WAY.** It is not drawn, so committing its box made
+			// the next pipe's slide find no clear station for something nobody can see.
 			if (linkLabelAligned(l) || linkLabelStations(l).length > 1) {
-				stationed.push(l); le.nudge = { x: 0, y: 0 }; return;
+				le.nudge = { x: 0, y: 0 };
+				if (!le.hiddenCrowded) { stationed.push(l); }
+				return;
 			}
 			addDataLabel(linkLabelKey(l.id), le, linkLabelMid(l), linkLabelBase(l),
 				l.lx !== undefined, le.lineCount);
@@ -2777,7 +2795,7 @@ var EngCalcs = EngCalcs || {};
 		// unplaced. A link label is bound to its pipe and has the fewest choices, so it chooses while
 		// it can; when something has to go it is the link, yielding by SHEDDING values in
 		// shedAlignedForConflicts(), which has already run by the time this pass places anything.
-		placeStationedLabels(stationed, obs, fs);
+		placeStationedLabels(stationed, obs, fs, true);
 		rankNodeLabels(nodeLabels);
 		// **NO REPAIR PASS: a node label never takes a blocking link label's ground and hides it
 		// WHOLE.** shedAlignedForConflicts() makes the link label give up VALUES for the node label
@@ -47749,7 +47767,7 @@ var EngCalcs = EngCalcs || {};
 			placedSide: h.placedSide, side: h.side, lines: h.lines ? h.lines.slice() : null,
 			lineCount: h.lineCount, shedCount: h.shedCount || 0,
 			hiddenShort: !!h.hiddenShort, hiddenCrowded: !!h.hiddenCrowded, hiddenYielded: !!h.hiddenYielded,
-			hiddenCrossed: !!h.hiddenCrossed, hiddenDropped: !!h.hiddenDropped,
+			hiddenBlocked: !!h.hiddenBlocked, hiddenCrossed: !!h.hiddenCrossed, hiddenDropped: !!h.hiddenDropped,
 			alignedAlong: h.alignedAlong, stationSides: h.stationSides ? h.stationSides.slice() : h.stationSides,
 			tw: h.tw, twPx: h.twPx, width: h.width, widthPx: h.widthPx,
 			rowW: h.rowW ? h.rowW.slice() : null, rowWPx: h.rowWPx ? h.rowWPx.slice() : null,
@@ -47802,6 +47820,7 @@ var EngCalcs = EngCalcs || {};
 		h.nudgeManual = c.nudgeManual; h.placedSide = c.placedSide; h.side = c.side;
 		h.shedCount = c.shedCount;
 		h.hiddenShort = c.hiddenShort; h.hiddenCrowded = c.hiddenCrowded; h.hiddenYielded = c.hiddenYielded;
+		h.hiddenBlocked = c.hiddenBlocked;
 		h.hiddenCrossed = c.hiddenCrossed; h.hiddenDropped = c.hiddenDropped;
 		h.alignedAlong = c.alignedAlong;
 		h.stationSides = c.stationSides ? c.stationSides.slice() : c.stationSides;
