@@ -24,7 +24,7 @@ exports.title = '3. The File menu';
 // from the page at run time.
 // The three import rows are one fly-out row, "Import…" (Task 718, e6c05a1b, 2026-09-29).
 const EXPECTED_KEYS = ['lpn_file_new', 'lpn_file_open', 'lpn_examples_menu', 'lpn_file_import_menu',
-	'lpn_file_export_inp',
+	'lpn_file_export_menu',
 	'lpn_file_save', 'lpn_file_saveas', 'lpn_file_convert_as', 'lpn_file_saveall', 'lpn_file_revert',
 	'lpn_close'];
 

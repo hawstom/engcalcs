@@ -3796,3 +3796,8 @@ Tom (via launcher, verbatim): "The Help, Toolbar menu is unconventional. It shou
 [SPECULATION] Row click should SHOW (pulse the toolbar button, or open the menu path at that row), not RUN. A guide that runs commands lets a reader never meet the menu bar, which is the 2026-09-09 finding; a guide that points at it teaches it. This is not the Hide-titles mistake: the reader asked "where", so attention is on the mark.
 
 Recommendation: one in-page "User guide" box replaces both rows; derived toolbar list with tips visible; menus index; existing hotkey tables; search; '?' opens it, at the hovered control. 1 new key (26 translations). Full ranking in the report.
+
+## 2026-10-06 Three questions (screenshot words/eraser; guide contents/name/search; title-bar glyphs)
+- SPECULATION: recall of Snipping Tool (Win11), Figma, VS Code, Linear, Notion, GitHub Docs, MDN, Stripe docs behaviours from training knowledge to mid-2026; not re-fetched this session. Upgrade by checking each product.
+- OBSERVED: feat/screenshot lang en:4426-4439 holds the wordy strings (Screenshot, Magnification, hint sentence).
+- Recommendation: icon-first controls with tips; eraser = stroke-level (Snipping Tool convention); guide contents = left collapsible rail on desktop, disclosure on phone; name "Guide"; search = filter box (Ctrl+K style) for help pages; per-box title-bar: one "?" glyph only, feedback goes to Help menu.

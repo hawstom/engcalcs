@@ -130,6 +130,8 @@ $ec_lang['points_data_note']='(or copy/paste using the data area)';
 $ec_lang['points_data_heading']='Calculator data<br />(use Copy to see format)';
 $ec_lang['points_data_copy']='Copy';
 $ec_lang['points_data_paste']='Paste';
+$ec_lang['points_data_msg_line']='Nothing was pasted. Line {n} could not be read as a station and an elevation.';
+$ec_lang['points_data_msg_none']='Nothing was pasted. No station and elevation pairs were found.';
 $ec_lang['calc_inputs']='Inputs';
 $ec_lang['calc_results']='Results';
 $ec_lang['view_hide_line']='Hide this line';
@@ -1130,17 +1132,35 @@ $ec_lang['lpn_hotkeys_map_def']='<table class="lpn-notes-table"><tbody><tr><td>1
 $ec_lang['lpn_hotkeys_menu_heading']='Menus';
 $ec_lang['lpn_hotkeys_menu_term']='Menu keyboard shortcuts';
 $ec_lang['lpn_hotkeys_menu_def']='<table class="lpn-notes-table"><tbody><tr><td>Alt+Shift+letter</td><td>Open the menu with that letter, then press a row\'s letter to choose it. The letters show while you use the keyboard. On a Mac, use Ctrl+Option.</td></tr><tr><td>F10</td><td>Go to the menu bar.</td></tr></tbody></table>';
-// ---- The one-tap grievance link (ROADMAP Task 207, Rung 0) ----
-// The floor of the cost ladder in dev/dilettante-path.md: a visitor says something is wrong here
-// with one tap and nothing typed. Two sites, one behaviour -- a standing cell in the map's bottom
-// strip, and the same control inside the solver's diagnostic box when one is on screen.
-// THE TIP SAYS EXACTLY WHAT THE TAP SENDS, because a control that posts on one press and does not
-// say what it posts is asking for trust it has not earned. It also says no reply is coming, which
-// is the honesty boundary that document draws: a thank-you must never imply an answer.
+// The Screenshot keys. A separate block, for the reason given above the menu block.
+$ec_lang['lpn_hotkeys_snip_heading']='Screenshot';
+$ec_lang['lpn_hotkeys_snip_term']='Screenshot keyboard shortcuts';
+$ec_lang['lpn_hotkeys_snip_def']='<table class="lpn-notes-table"><tbody><tr><td>S</td><td>Snip, while Screenshot is open.</td></tr><tr><td>E</td><td>Eraser, in the markup view.</td></tr><tr><td>Ctrl+Z, Ctrl+Y</td><td>Undo and redo, in the markup view.</td></tr><tr><td>Esc</td><td>Cancel a snip, or leave the eraser. In the markup view, close it when nothing is drawn.</td></tr></tbody></table>';
+// ---- "Something wrong here?" (ROADMAP Tasks 207 and 768) ----
+// Two sites, one behaviour -- a standing cell in the map's bottom strip, and the same control inside
+// the solver's diagnostic box when one is on screen. The first click opens a box; Send is the second.
+// The thank-you must never imply an answer: a reply comes only to somebody who left an address.
 $ec_lang['lpn_wrong_btn']='Something wrong here?';
-// Edited by TGH 2026-09-07
-$ec_lang['lpn_wrong_tip']='Use this link to tell us that something on this page is wrong. It sends the name of this page, the language you are reading it in, and the message on the map if there is one. It sends nothing you have entered, no address, and nothing at all out of your drawing. Nobody can write back, because this tells us nothing about who you are. Use Help, Fix something when you want to say more.';
+// Rewritten for the two-click box (Task 768); TGH's 2026-09-07 wording described one press.
+$ec_lang['lpn_wrong_tip']='Tell us that something on this page is wrong. This opens a small box where you can pick what is wrong, add a comment, and leave an email address if you want a reply. All of it is optional, and nothing is sent until you press Send.';
 $ec_lang['lpn_wrong_thanks']='Thank you. That reached us.';
+// The box "Something wrong here?" opens (ROADMAP Task 768). Every field is optional; Send with
+// nothing in it posts only the anonymous tally the button always posted. The four picks are canned
+// phrases a visitor may toggle in any combination. lpn_fb_sends must stay true to send-feedback.php
+// and to the "Messages you send us" row of privacy.php.
+$ec_lang['lpn_fb_intro']='Canned messages (optional). Nothing is sent until you press Send.';
+$ec_lang['lpn_fb_pick_numbers']='The numbers look wrong';
+$ec_lang['lpn_fb_pick_broken']='Something did not work';
+$ec_lang['lpn_fb_pick_wording']='The wording or translation is wrong';
+$ec_lang['lpn_fb_pick_confusing']='This is confusing';
+$ec_lang['lpn_fb_comment']='Comments (optional)';
+$ec_lang['lpn_fb_email']='Email (optional, only if you want a reply)';
+$ec_lang['lpn_fb_sends']='What this sends: the name of this page, your language, the version of the site, the code of the message on the map if there is one, and what you picked or typed. Never your drawing or your network. Your email address is used only to reply to you.';
+$ec_lang['lpn_fb_send']='Send';
+$ec_lang['lpn_fb_sending']='Sending…';
+$ec_lang['lpn_fb_failed']='That did not reach us. What you wrote is still here, so you can try again.';
+$ec_lang['lpn_fb_bad_email']='That email address does not look right. Correct it, or leave it empty.';
+$ec_lang['lpn_fb_busy']='Too many messages have arrived in the last few minutes. What you wrote is still here, so you can try again later.';
 $ec_lang['lpn_status_example_opened']='Opened {name}. It is your copy: save it with File, Save as.';
 // Stands while the fault stands, rather than expiring like every other notice on the map: it
 // reports a page that cannot lay itself out, which is true until a measurement recovers.
@@ -1331,13 +1351,14 @@ $ec_lang['lpn_file_convert_as']='Convert as…';
 $ec_lang['lpn_copy_of']='Copy of {name}';
 // ---- THE CONVERT AS BOX (Task 696) ------------------------------------------------------------
 // The three coordinate cases are Tom's own (R-155, 2026-09-22): "EPSG, unnamed (local) georeference,
-// and not georeferenced". lat/lon is one EPSG system (EPSG:3857 on this page), not a fourth case.
+// and not georeferenced". lat/lon is one EPSG system (EPSG:4326), not a fourth case; EPSG:3857 is a
+// projected system in meters since Task 775.
 $ec_lang['lpn_convas_title']='Convert as';
 $ec_lang['lpn_convas_coordsys_tip']='The coordinate system the copy is converted to. When it differs from this project\'s, two placement steps follow. A project that already knows where it is opens both steps already answered, ready to accept as they are or to change.';
 // {crs} is the name the map status strip shows for this project's coordinate system.
 $ec_lang['lpn_convas_from']='Current: {crs}';
 $ec_lang['lpn_convas_epsg']='EPSG coordinate system';
-$ec_lang['lpn_convas_epsg_tip']='Choose a coordinate system from the EPSG register. Latitude and longitude is WGS 84 (EPSG:4326).';
+$ec_lang['lpn_convas_epsg_tip']='Choose a coordinate system from the EPSG register. WGS 84 (EPSG:4326), latitude and longitude, is the suggested choice. WGS 84 / Pseudo-Mercator (EPSG:3857), commonly called Web Mercator, gives x and y in meters, and its map distances exceed ground distances away from the equator. Pipe lengths are computed as ground distances in either system.';
 $ec_lang['lpn_convas_unnamed']='Unnamed (local) georeference';
 $ec_lang['lpn_convas_unnamed_tip']='Local coordinates in the length unit, with the world map attached.';
 $ec_lang['lpn_convas_none_tip']='Local coordinates in the length unit, with no world map for now.';
@@ -2016,6 +2037,8 @@ $ec_lang['lpn_crs_count_network']='{n} of {total} coordinate systems cover this 
 // when this page has no transform for it. Short on purpose: it sits at the end of a register name
 // that can already run to 50 characters.
 $ec_lang['lpn_crs_unplaceable_mark']='(no map)';
+// Shown beside WGS 84 (EPSG:4326) in the chooser only (Task 775), never on the status strip.
+$ec_lang['lpn_crs_suggested_mark']='(suggested)';
 // The same fact in a sentence: when such a project is created, and when Go to or place name search
 // is used on one. File, Convert as says it in its own words (lpn_convas_no_transform).
 $ec_lang['lpn_crs_unplaceable']='{crs} is one of the few listed coordinate systems without usable projection information. This means that world map, place name search, and DEM elevations don\'t work. Your coordinates are unaffected.';
@@ -2085,13 +2108,32 @@ $ec_lang['lpn_file_import_inp_tip']='Create a new project from an EPANET file, e
 // The other direction (Task 281). A DOWNLOAD, so the word is Export rather than Save: this page
 // keeps no handle on an `.inp` and never writes back to one.
 $ec_lang['lpn_file_export_inp']='Export EPANET file…';
+// File > Export is a submenu (Tom, 2026-10-06), so its rows drop the verb the heading carries. The
+// two keys above are what the rows were called before it.
+$ec_lang['lpn_file_export_menu']='Export…';
+$ec_lang['lpn_file_export_item_inp']='EPANET file…';
+$ec_lang['lpn_file_export_item_geojson']='GeoJSON file…';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_file_export_inp_tip']='Download this network as an EPANET .inp file. Anything the .inp format cannot hold is listed for you afterwards.';
+$ec_lang['lpn_file_export_inp_tip']='Download this network as an EPANET .inp file (in a zip file with its image if applicable). Anything the .inp format cannot hold is listed for you afterwards.';
 $ec_lang['lpn_status_inp_exported']='Exported {file}.';
+$ec_lang['lpn_status_inp_exported_picture']='Exported {zip}, holding the EPANET file {file}, its background picture {picture}, and the world file {world}. Extract all three into one folder, then open the .inp there in EPANET; the picture comes with it.';
+$ec_lang['lpn_status_inp_exported_no_picture']='Exported {file}. The background picture could not be saved, so the .inp names none; in EPANET, add it with View > Backdrop > Load.';
 // {n} is a whole number. Said plainly rather than hidden: a file that quietly loses a pump curve is
 // the failure this whole feature exists to prevent.
 $ec_lang['lpn_inp_export_differences']='{n} things the .inp format cannot hold.';
+$ec_lang['lpn_inp_export_difference_one']='One thing the .inp format cannot hold.';
 $ec_lang['lpn_inp_export_refused']='This project cannot be written as an EPANET file: {detail}';
+// GeoJSON export (Task 728). The command is worded like Export EPANET file. Positions in a GeoJSON
+// file are always longitude and latitude (RFC 7946), so a project with no place on the Earth is
+// refused and told how to get one, never written with an invented coordinate system.
+$ec_lang['lpn_file_export_geojson']='Export GeoJSON file…';
+$ec_lang['lpn_file_export_geojson_tip']='Download this network as a GeoJSON file for QGIS, ArcGIS Pro and other GIS programs. Junctions, tanks and reservoirs are points, and pipes, pumps and valves are lines that follow their vertices. Positions are latitude and longitude. Results are included only when the network has been solved.';
+$ec_lang['lpn_geojson_refused_local']='A GeoJSON file holds latitude and longitude only, and this project is drawn on a local grid with no place on the Earth. Georeference it first with Map, World map, Attach, then export again.';
+$ec_lang['lpn_geojson_refused_range']='These positions are not valid latitudes and longitudes: {detail}';
+$ec_lang['lpn_geojson_refused_crs']='The coordinate system of this project ({detail}) is not known to this page, so its positions cannot be converted to latitude and longitude. Use Convert as… to copy the project into one this page knows, then export again.';
+$ec_lang['lpn_geojson_refused_empty']='There is nothing to export yet. Draw or open a network first.';
+$ec_lang['lpn_geojson_results_in']='The results on screen are included.';
+$ec_lang['lpn_geojson_results_out']='No results are included, because the network is not solved.';
 $ec_lang['lpn_inp_bad_file']='That file could not be read as an EPANET network file.';
 // EPANET has two file formats. This one is about the BINARY .net that its Windows program saves;
 // the way out named here always works, so keep the instruction in the message rather than leaving
@@ -2107,6 +2149,10 @@ $ec_lang['lpn_inp_report_label_anchor']='Text labels are placed as EPANET places
 // or no [BACKDROP] line at all, never only "None" -- because none of those states a real coordinate
 // system either. See showInpReport() in js/looped-network.js.
 $ec_lang['lpn_inp_report_no_crs']='EPANET files contain no coordinate system, so this file will not initially be georeferenced. To place it on a world map, use Map, World map… To convert its coordinates, use File, Convert as…';
+$ec_lang['lpn_inp_backdrop_attach']='Attach {file}…';
+$ec_lang['lpn_inp_backdrop_attach_tip']='A web page cannot open the picture by its name. Choose it on your device and it is placed where the file says it belongs.';
+$ec_lang['lpn_inp_backdrop_attached']='Attached {file}, placed where the file says it belongs.';
+$ec_lang['lpn_inp_backdrop_attached_other']='Attached {picked}, placed where the file says it belongs. The file names {file}, which is a different name.';
 $ec_lang['lpn_inp_report_lead']='This page does not use everything EPANET does, but nothing in your file is thrown away. Below is what your file holds that this page keeps without using, and what was changed when the file was read in:';
 $ec_lang['lpn_inp_drop_headloss']='This file does not use the Hazen-Williams formula. This page computes Hazen-Williams, so the pipe roughness numbers were kept exactly as written, but the answers here will not match the answers in EPANET.';
 $ec_lang['lpn_inp_drop_tank_curve']='These tanks are not straight-sided: the file gives their shape as a curve. The curve is kept in the Libraries box, the tank still refers to it, and an extended period simulation fills and empties the tank on the schedule that curve gives. A single instant is the same either way, because the water surface is the level the file sets. The diameter written in the file is kept beside the curve and is what a tank with no curve is drawn and solved as.';
@@ -4408,7 +4454,7 @@ $ec_lang['lpn_analyze_time_moved']='⚠ This was computed at {time}, and the clo
 // cannot tell a mistake from a place; a file of eastings and northings is refused by name, because
 // a plane coordinate read as a degree is silent and puts a network in the Gulf of Guinea.
 $ec_lang['lpn_file_import_survey']='Import surveyed points…';
-$ec_lang['lpn_file_import_survey_tip']='Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not.';
+$ec_lang['lpn_file_import_survey_tip']='Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not.';
 $ec_lang['lpn_survey_read_error']='That file could not be read from your disk.';
 $ec_lang['lpn_survey_cancelled']='Nothing was created and nothing was changed.';
 // What the project calls its two axes, for a sentence js/lpn-survey.js writes about a column. The
@@ -4459,6 +4505,28 @@ $ec_lang['lpn_survey_note_blank_rows']='Blank lines skipped: {detail}.';
 $ec_lang['lpn_survey_note_id_duplicate']='Name already used earlier in this file, new name assigned.';
 $ec_lang['lpn_survey_note_id_taken']='Name already in project, new name assigned.';
 $ec_lang['lpn_survey_note_id_invalid']='Name cannot be used here, new name assigned.';
+// Field codes (Task 771): the Description read as Carlson-style codes. See dev/survey-codes.md.
+$ec_lang['lpn_survey_codes_toggle']='Read the description as field codes';
+$ec_lang['lpn_survey_codes_tip']='Read the first word of each description as a code from the table. Points with the same line code join into one pipe in file order, and WL1 and WL2 are separate lines. +0 starts a line, -0 ends one, and CLO closes one. JPN followed by a point name joins to that point (Carlson), and Civil 3D writes it CPN.';
+$ec_lang['lpn_survey_codes_col_code']='Code';
+$ec_lang['lpn_survey_codes_col_type']='Asset type';
+$ec_lang['lpn_survey_codes_add']='Add code';
+$ec_lang['lpn_survey_codes_remove']='Remove code';
+$ec_lang['lpn_survey_confirm_coded']='{j} junction(s), {r} reservoir(s), {t} tank(s), and {p} pipe(s) found. Proceed?';
+$ec_lang['lpn_survey_report_coded']='{j} junction(s), {r} reservoir(s), {t} tank(s), and {p} pipe(s) imported, {m} of the nodes with elevation.';
+$ec_lang['lpn_survey_note_code_unknown']='Code not in the code table, imported as the asset type chosen above.';
+$ec_lang['lpn_survey_note_code_two_nodes']='More than one node code, the first was used.';
+$ec_lang['lpn_survey_note_code_unread']='Not every word is a code this page reads, kept in the description.';
+$ec_lang['lpn_survey_note_vertex_text']='Not every word is a code this page reads, and a vertex keeps no description.';
+$ec_lang['lpn_survey_note_join_missing']='JPN or CPN names a point not in this file or project, no pipe drawn for it.';
+$ec_lang['lpn_survey_note_join_no_line']='JPN or CPN on a point with no line code, no pipe drawn for it.';
+$ec_lang['lpn_survey_note_pipe_one_node']='This line returns to the same node with no other node between, no pipe drawn for it.';
+$ec_lang['lpn_survey_note_line_one_point']='Only point on its line, no pipe drawn from it.';
+$ec_lang['lpn_survey_note_vertices']='Points that became pipe vertices: {detail}. A vertex keeps no name, elevation, or description.';
+$ec_lang['lpn_survey_note_no_desc']='Field codes are on, but this file has no description column, so no codes were read.';
+$ec_lang['lpn_survey_note_ring_junction']='This point became a junction so the ring could close.';
+$ec_lang['lpn_survey_note_pipe_zero_length']='This point is at the same spot as the node before it, so the pipe between them has no length.';
+$ec_lang['lpn_survey_note_node_on_pipe']='This point lies exactly on a pipe it is not joined to. If they connect, add JPN to say so.';
 $ec_lang['lpn_settings_demand_model']='Demand model';
 $ec_lang['lpn_settings_demand_model_tip']='Choose how junctions receive flow. Demand driven (DDA) delivers every demand in full, whatever the pressure. Pressure driven (PDA) delivers less than the demand where the pressure is below the required pressure, and only the EPANET solver computes it.';
 $ec_lang['lpn_settings_demand_model_dda']='Demand driven';
@@ -4478,3 +4546,22 @@ $ec_lang['lpn_result_demand_deficit_tip']='The demand this junction asks for and
 $ec_lang['lpn_pda_deficit_note']='Junctions receiving less than their demand: {n}.';
 $ec_lang['lpn_diag_pda_pressures']='Required pressure must be greater than Minimum pressure. Change one of them in Settings.';
 $ec_lang['lpn_inp_drop_pressure_unit']='This file states a pressure unit other than the one this page reads for its flow unit, which is psi for US units and meters otherwise. Every pressure in the file is read that way, so check the valve settings, emitters, and pressure driven limits it holds. The line is kept and is written back.';
+
+// Map > Screenshot (Tom, 2026-10-05): a snipping tool that re-draws the dragged map area larger than its screen size (3x unless the Screenshot box says otherwise).
+$ec_lang['lpn_screenshot_menu']='Screenshot';
+$ec_lang['lpn_screenshot_tip']='Copy a sharper-than-screen picture of the map area you drag, ready to paste into a report. Click without dragging to take the whole map.';
+$ec_lang['lpn_screenshot_hint']='Drag a rectangle over the map, or click for the whole map. Esc cancels.';
+$ec_lang['lpn_screenshot_copied']='Screenshot copied.';
+$ec_lang['lpn_screenshot_saved']='The clipboard is not available here, so the screenshot was downloaded as a PNG file.';
+$ec_lang['lpn_screenshot_no_basemap']='The street map or satellite image could not be included.';
+$ec_lang['lpn_screenshot_failed']='The screenshot could not be made.';
+$ec_lang['lpn_snip_hint_free']='Drag around the area to snip, or click for the whole map. Esc cancels.';
+$ec_lang['lpn_snip_tip_rect']='Snip a rectangle (S)';
+$ec_lang['lpn_snip_tip_free']='Snip a freehand shape (S)';
+$ec_lang['lpn_snip_tip_mode']='Snip shape';
+$ec_lang['lpn_snip_tip_map']='Screenshot of the whole map';
+$ec_lang['lpn_snip_tip_pen']='Pen';
+$ec_lang['lpn_snip_tip_eraser']='Eraser: click a stroke to remove it (E)';
+$ec_lang['lpn_snip_tip_undo']='Undo (Ctrl+Z)';
+$ec_lang['lpn_snip_tip_redo']='Redo (Ctrl+Y)';
+$ec_lang['lpn_screenshot_scale_tip']='The picture\'s size as a multiple of the area on the screen. A larger one is sharper and makes a bigger file.';

@@ -180,7 +180,7 @@ const ready = () => new Promise((res) => global.EngCalcs.lpnCrsLoad(res));
 		L.saveToStorage();
 		const origId = lib.openId, before = bytes(origId);
 		const ll = L.getDoc().nodes.map((nd) => [L.outwardX(nd.x), L.outwardY(nd.y)]);
-		ok('the project is lat/lon, which is EPSG:3857 here', L.coordKind().crs === 'EPSG:3857');
+		ok('the project is lat/lon, which is EPSG:4326 here', L.coordKind().crs === 'EPSG:4326');
 		ok('...whose map coordinates are in degrees', byId.lpn_u_mapcoords.textContent === PC.lpn_units_mapcoords_deg,
 			byId.lpn_u_mapcoords.textContent);
 
@@ -225,7 +225,7 @@ const ready = () => new Promise((res) => global.EngCalcs.lpnCrsLoad(res));
 		const origId = lib.openId, before = bytes(origId);
 		ok('the project is an unnamed (local) georeference', L.coordKind().kind === 'unnamed');
 		const want = L.getDoc().nodes.map((nd) => global.EngCalcs.lpnGeorefToLonLat(t, L.outwardX(nd.x), L.outwardY(nd.y)));
-		await L.runConvertAs({ kind: 'epsg', crs: 'EPSG:3857', units: sameUnits(), rounding: {} });
+		await L.runConvertAs({ kind: 'epsg', crs: 'EPSG:4326', units: sameUnits(), rounding: {} });
 		const g = L.georef();
 		ok('the wizard opens at step 1', !!g && g.step === 1);
 		// R-172 (1), the answered half: the site plan is drawn where the copy's own numbers put it
@@ -282,7 +282,7 @@ const ready = () => new Promise((res) => global.EngCalcs.lpnCrsLoad(res));
 		console.log('\n--- 6. Cancel in the steps closes the copy ---');
 		const tabs = lib.projects.length;
 		const here = lib.openId;
-		await L.runConvertAs({ kind: 'epsg', crs: 'EPSG:3857', units: sameUnits(), rounding: {} });
+		await L.runConvertAs({ kind: 'epsg', crs: 'EPSG:4326', units: sameUnits(), rounding: {} });
 		ok('a copy is being placed', !!L.georef() && lib.openId !== here);
 		L.georefCancel();
 		ok('Cancel closes it and returns to the project it came from',

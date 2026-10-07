@@ -567,6 +567,48 @@
    "words": "Merge.",
    "context": "His pasted message of 2026-10-06, \"4. feat/asset-type. Merge.\", after his browser pass, with a question about the 'ID: Lost entry' key line.",
    "pin_note": "Pinned to the clean merge of master into the branch made right after his word; it adds only master's commits."
+  },
+  "feat/backdrop-attach": {
+   "head": "929d7ec96cc91b073fc68991c9ebdf614712be1f",
+   "date": "2026-10-07",
+   "words": "Merge",
+   "context": "Typed in his pasted session message of 2026-10-07 (his own message, per his global CLAUDE.md), under 'Merge words. Please type these' and 'Browser passes'. He had already written \"Good\" after his browser pass; this is the merge word asked for.",
+   "pin_note": "Pinned to the branch head as it stood when he wrote the word (master merges included)."
+  },
+  "feat/feedback": {
+   "head": "d96763d3f56e7dc2d2bff62f431619380ce42e8c",
+   "date": "2026-10-07",
+   "words": "Merge.",
+   "context": "Typed in his pasted session message of 2026-10-07 (his own message, per his global CLAUDE.md), under 'Merge words. Please type these' and 'Browser passes'. He had already written \"looks great\" after his browser pass.",
+   "pin_note": "Pinned to the branch head as it stood when he wrote the word (master merges included)."
+  },
+  "feat/survey-code": {
+   "head": "087e6868199b31f05fbb5258c4246ca059e285cb",
+   "date": "2026-10-07",
+   "words": "Merge.",
+   "context": "Typed in his pasted session message of 2026-10-07 (his own message, per his global CLAUDE.md), under 'Merge words. Please type these' and 'Browser passes'. Given in answer to the request to type the merge word.",
+   "pin_note": "Pinned to the branch head as it stood when he wrote the word (master merges included)."
+  },
+  "feat/geojson": {
+   "head": "0495c5599c934a1fbd909d98c47c062529065e79",
+   "date": "2026-10-07",
+   "words": "Merge.",
+   "context": "Typed in his pasted session message of 2026-10-07 (his own message, per his global CLAUDE.md), under 'Merge words. Please type these' and 'Browser passes'. Given in answer to the request to type the merge word.",
+   "pin_note": "Pinned to the branch head as it stood when he wrote the word (master merges included)."
+  },
+  "feat/screenshot": {
+   "head": "236735e468391b6cee4cc6b4cee3334833a4a205",
+   "date": "2026-10-07",
+   "words": "Merge.",
+   "context": "Typed in his pasted session message of 2026-10-07 (his own message, per his global CLAUDE.md), under 'Merge words. Please type these' and 'Browser passes'. Said after his browser pass of the stroke eraser, Undo/Redo and chevron shape menu round.",
+   "pin_note": "Pinned to the branch head as it stood when he wrote the word (master merges included)."
+  },
+  "feat/web-mercator": {
+   "head": "2fbf8120c54509fdce6b40022a9f4df77e3fc634",
+   "date": "2026-10-07",
+   "words": "Merge.",
+   "context": "Typed in his pasted session message of 2026-10-07 (his own message, per his global CLAUDE.md), under 'Merge words. Please type these' and 'Browser passes'. Said after his browser pass; on the interview page he also chose \"Approve both\" for the two EPSG:3857 strings (D06).",
+   "pin_note": "Pinned to the branch head as it stood when he wrote the word (master merges included)."
   }
  }
 }
