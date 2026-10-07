@@ -724,11 +724,16 @@ EngCalcs.lpnPlacerC = (function () {
 		}
 
 		// The rows, in the user's drop order: rowsets[0] is every row, each next one has dropped
-		// one more property, the last is the label itself (the rows the drop order never names).
+		// one more value, the last is the one value the order keeps longest.
 		function mkLabel(st, req, nodes, links, incident, customers) {
 			var rows = req.rows || [];
 			if (!rows.length) { return null; }
-			var drop = (st.scene.dropOrder && st.scene.dropOrder[req.kind]) || [];
+			// The user's order, first to go first, with the ID in it like any other value (Tom,
+			// 2026-10-06); an order that does not name the ID puts it first to go, and a row whose
+			// field the order does not name goes before all that it does (the bench's contract).
+			var drop = ((st.scene.dropOrder && st.scene.dropOrder[req.kind]) || []).slice();
+			if (drop.indexOf('id') < 0) { drop.unshift('id'); }
+			rows.forEach(function (r) { if (drop.indexOf(r.field) < 0) { drop.unshift(r.field); } });
 			var keepRows = rows.map(function (r, i) { return i; }), rowsets = [keepRows.slice()];
 			drop.forEach(function (f) {
 				var k = keepRows.filter(function (i) { return rows[i].field !== f; });
