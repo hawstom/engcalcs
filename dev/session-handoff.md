@@ -141,12 +141,13 @@ replayed offline beacon stamped 09-21 made a 5-day log report 15 days), "Is acti
 
 ### Running at /clear time
 
-- **Label round 7** (`feat/label-placer-a..d`, a Workflow of four Opus builders): each got only the
-  public bench files plus the self-test `room-check.js` and `dev/label-placement-strategies.md`
-  (judges removed from their trees; never merge `feat/label-placer` into them). When they finish:
-  freeze A7-D7 (commit + sha256 in the round record), commit the plan's final form, then
-  `dev/label-trials/round-7/` extract-all, score-all, analyse (one worker, on disk,
-  /home/haws/label-trials-work/r7; plan §5). His Q1/Q2 answers are recorded on `feat/label-placer`;
+- **Label round 7** (builder branches feat/label-placer-a to -d, four Opus builders, DONE): each got
+  only the public bench files plus the self-test and the strategies doc
+  (`feat/label-placer:dev/label-placement-strategies.md`; judges removed from their trees; never merge
+  `feat/label-placer` into them). Builders finished 2026-10-07; the judge agent is freezing A7-D7 and
+  scoring (`feat/label-placer:dev/label-trials/round-7-plan.md` §5; one worker, on disk,
+  /home/haws/label-trials-work/r7). Builder B read Part B of the rules by accident (disclosed; the
+  round record says how it is treated). His Q1/Q2 answers are recorded on `feat/label-placer`;
   sharing the self-test, the catalogue and spot_prime rest on his quotes (plan top); he may object.
 
 ### Decisions waiting on him
@@ -159,6 +160,9 @@ replayed offline beacon stamped 09-21 made a 5-day log report 15 days), "Is acti
   else)" is his and is fine either way. Build after he picks.
 - **Convert as (Task 775):** 3857 vs 4326 (R-218 fold) -- explain, hide the 3857 row, or make 3857
   real; and which surface he saw the lost node symbols on (not reproduced on master or 9c71d54f).
+- **DXF:** his Interface Manager spec (`dev/dxf-interface.md`) is import AND export, data only, with
+  asset and alternative in the layer name; `feat/dxf` writes an annotated drawing instead. Merge
+  feat/dxf as a "drawing" export and build the spec's model export later, or reshape it first?
 - **Snip:** keep the view on plain Screenshot? close after Copy?
 - **User guide:** the name; show vs run; English-only prose.
 - DMARC phase 3; Mary's contacts: Gusnet's author only via GitHub Issues
