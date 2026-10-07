@@ -221,6 +221,12 @@ Follow the `add-calculator` skill (`.claude/skills/add-calculator/SKILL.md`) —
   `$text` is trusted HTML; `$tip` is plain text. Exactly one `?` per label, always the tip. A link
   with no tip needs no wrapper. Never put explanation in a link's `title=` (touch just navigates).
   If the linked page is untranslated, say "English only" in the tip.
+- **One style of tip.** Any element with a `title`, or an SVG element with a `<title>` child, is
+  armed lazily by `EngCalcs.wireTipDelegation()` (js/Calculators.lib.js) as a styled name tip; the
+  browser's native tooltip never shows (an `<option>` and an `<svg>` root's own title excepted). On
+  touch, a name tip on a non-control closes on any tap elsewhere. After arming, change a tip by
+  writing `el.title` (or a new SVG `<title>`); clear it with `el.title = ''`, never
+  `removeAttribute`. `data-ec-native-title` opts out. `tip-one-style-browser-harness.js` holds it.
 - **Reuse whole labels across calculators, never fragments.** Incumbency decides the owning key;
   menu order breaks ties; the survivor takes the best wording. A shared label fits its narrowest
   use; reuse stops at sentences. Loss symbols: lowercase `h` for components (`h_f`, `h_m`, `h_L`,
