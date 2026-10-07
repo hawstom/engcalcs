@@ -911,7 +911,7 @@ var EngCalcs = EngCalcs || {};
 		});
 		if (!specs.length) { return []; }
 		return Collide.placeLabelsFirstFit(rankNodeLabels(specs), obs,
-			{ pad: fs * LPN_ALIGNED_PAD_FRAC });
+			{ pad: fs * LPN_ALIGNED_PAD_FRAC, leaderMin: leaderThreshold() });
 	}
 	function shedAlignedForConflicts(fsNow, fs) {
 		// **NO PAD HERE.** LPN_ALIGNED_PAD_FRAC is 0.35 of a font size and grows the box on EVERY
@@ -2554,7 +2554,7 @@ var EngCalcs = EngCalcs || {};
 				rec.lbl.h = dataLabelBoxHeight(rec.ne.lineCount);
 				rec.lbl.lines = labelRowWidths(rec.ne);
 			});
-			placed = Collide.placeLabelsFirstFit(nodeLabels, obs, { pad: pad });
+			placed = Collide.placeLabelsFirstFit(nodeLabels, obs, { pad: pad, leaderMin: leaderThreshold() });
 			rungs++;
 		}
 		lastNodeShedRungs = rungs;
@@ -2803,7 +2803,7 @@ var EngCalcs = EngCalcs || {};
 		// second, cruder mechanism reaching the same situation by another door, and a reader cannot
 		// tell the two apart. If a node label still cannot fit once link labels have shed, it drops.
 		var pad = fs * LPN_ALIGNED_PAD_FRAC,
-			nodePlaced = Collide.placeLabelsFirstFit(nodeLabels, obs, { pad: pad });
+			nodePlaced = Collide.placeLabelsFirstFit(nodeLabels, obs, { pad: pad, leaderMin: leaderThreshold() });
 		// **AND THEN THE ONES THAT DID NOT FIT GIVE UP A PROPERTY AND TRY AGAIN** (Task 469). This
 		// is the graceful rung the node half never had; the drop above is now its terminal one.
 		//
