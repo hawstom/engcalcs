@@ -55,7 +55,7 @@ const ALT_SHAPE = 0.6;     // H1: the other shape costs a little (lazy), used wh
 const CS = 24;            // grid cell size, px
 const MARGIN = 320;       // grid reaches this far beyond the viewport
 const W = {
-	row: 4,               // each value row given up
+	row: +(typeof process !== "undefined" && process.env.PA_ROW) || 4,   // each value row given up
 	hide: 10,             // on top of the rows, for hiding the whole label
 	hideCustomer: 1,      // customer labels give way first and easily
 	lblPipe: 8,           // a label on a pipe
@@ -66,7 +66,7 @@ const W = {
 };
 // ---- ingredients, each switchable so its worth can be measured (STRATEGY.md) -----------------
 // In node: PLACER_A_OFF=s4,s15 node run.js ... switches those off. On the page they are all on.
-const ING = { s1: true, s4: true, s5: true, s11: true, s12: true, s13: true, s15: true, grow: true, r5: true, lead: true, dirty: true, s16: true };
+const ING = { s1: true, s4: true, s5: true, s11: true, s12: true, s13: true, s15: true, grow: true, r5: true, lead: true, dirty: true, s16: true, reseat: true };
 (function () {
 	const env = typeof process !== 'undefined' && process.env ? process.env.PLACER_A_OFF : '';
 	(env || '').split(',').forEach(function (k) { k = k.trim(); if (k && Object.prototype.hasOwnProperty.call(ING, k)) { ING[k] = false; } });
@@ -79,7 +79,8 @@ const TOL = ING.lead ? 1.45 : 1.0, HELD_TOL = ING.lead ? 1.45 : 1.4;
 let tol = TOL;
 const ON_OWN = 3.5;       // a pipe label over its own pipe (R7): just under a row, so a value still wins
 const LEVEL = 2;          // a pipe label the setting asks to turn, left level (R14): under a row
-function distCost(L) { return L > 0 ? 0.6 + 0.6 * L + 0.12 * L * L : 0; }   // L in row heights
+const DSCALE = +(typeof process !== "undefined" && process.env.PA_DIST) || 1;
+function distCost(L) { return L > 0 ? DSCALE * (0.6 + 0.6 * L + 0.12 * L * L) : 0; }   // L in row heights
 
 // ---- geometry --------------------------------------------------------------------------------
 function mkBox(cx, cy, w, h, angle) {
@@ -1045,6 +1046,8 @@ function run(scene, prev, gaps, pool) {
 		}
 		// The bench's own tolerance, a hair inside it: a symbol that grew by a pixel on zooming in
 		// does not force a label to jump.
+		c.k = subsetIndex(f, c.sh.rows);
+		if (c.k < 0) { return; }
 		tol = HELD_TOL;
 		const cost = evalFull(f, c, false);
 		tol = TOL;
@@ -1211,11 +1214,18 @@ function run(scene, prev, gaps, pool) {
 		info.forEach(function (f) {
 			if (overTime()) { return; }
 			if (kept[f.li] === 'hand' || kept[f.li] === 'empty') { return; }
-			if (kept[f.li] === 'held') { const before = placed[f.li]; growHeld(f); if (placed[f.li] !== before) { changed++; } return; }
+			if (kept[f.li] === 'held') {
+				const before = placed[f.li] && placed[f.li].cand;
+				growHeld(f);
+				if (placed[f.li] && placed[f.li].cand !== before) { changed++; return; }
+				// R11: a held label that cannot grow where it stands may move to show more.
+				if (!ING.reseat) { return; }
+			}
 			const p = placed[f.li];
 			if (!p) { return; }
 			const n = f.subsets.length, curK = p.cand.k;
 			if (curK === 0) { return; }
+			if (p.cand.st === undefined) { p.cand.st = evalStatic(f, p.cand, false); }
 			const cur = evalDyn(f, p.cand, p.cand.st, Infinity);
 			const k0 = Math.max(0, curK - 1);
 			if (unchanged(f, k0) && (!fine || f.fineTried === k0)) { return; }
@@ -1226,7 +1236,10 @@ function run(scene, prev, gaps, pool) {
 				f.fineTried = curK - 1;
 				r = searchFine(f, cur, curK - 1);
 			}
-			if (r && r.cand !== p.cand) { uncommit(f); commit(f, r.cand, r.cost); if (r.cand.k < curK) { changed++; } else { remember(f, k0); } } else { remember(f, k0); }
+			if (r && r.cand !== p.cand && (kept[f.li] !== 'held' || r.cand.k < curK)) {
+				uncommit(f); commit(f, r.cand, r.cost);
+				if (r.cand.k < curK) { changed++; if (kept[f.li] === 'held') { kept[f.li] = undefined; } } else { remember(f, k0); }
+			} else { remember(f, k0); }
 		});
 		return changed;
 	}
