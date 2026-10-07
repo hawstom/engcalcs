@@ -160,6 +160,52 @@ async function main() {
 		await scenarioMenu('B');
 		ok('4.5 ...and in B, which states no type of its own for it', /lpn-node-tank/.test(await nodeClass('23') || ''), await nodeClass('23'));
 		ok('4.6 ...while 22 is still B\'s tank', /lpn-node-tank/.test(await nodeClass('22') || ''));
+
+		console.log('\n--- 5. Properties on B\'s own valve (Perry, 2026-10-07) ---');
+		// Pipe 10 a valve in B only, then its Valve type changed in Properties: the PRV and its setting
+		// must stay B's after Base is laid back (an autosave, a switch), and B must solve.
+		const clickLink = async (id) => {
+			await page.keyboard.press('Escape');
+			const r = await page.evaluate((id) => {
+				const c = document.querySelector('.lpn-link-symbol-hit[data-link="' + id + '"]') || document.querySelector('.lpn-link-hit[data-link="' + id + '"]');
+				if (!c) { return null; }
+				const b = c.getBoundingClientRect();
+				return { x: b.left + b.width / 2, y: b.top + b.height / 2 };
+			}, id);
+			if (!r) { return false; }
+			await page.mouse.click(r.x, r.y);
+			await settle(600);
+			return true;
+		};
+		ok('5.0 a click selects pipe 10', await clickLink('10'));
+		await changeTo('lpn_tool_add_valve');
+		await press(await L('lpn_change_type_create_overrides'));
+		const d5 = await a.dialog();
+		if (d5) { await press(await L('lpn_change_type_ok')); }
+		await clickLink('10');
+		const vtLabel = await L('lpn_field_valve_type');
+		const picked = await page.evaluate((lab) => {
+			const lb = Array.from(document.querySelectorAll('#lpn_popup label')).find((x) => x.textContent.indexOf(lab) === 0 && x.querySelector('select'));
+			return lb ? lb.querySelector('select').id || (lb.querySelector('select').setAttribute('data-sto', '1'), 'data-sto') : null;
+		}, vtLabel);
+		ok('5.1 Properties of B\'s valve 10 shows its Valve type select', !!picked);
+		await page.selectOption(picked === 'data-sto' ? '#lpn_popup select[data-sto="1"]' : '#' + picked, 'PRV');
+		await settle(4000);
+		const settingText = async () => page.evaluate(() => Array.from(document.querySelectorAll('#lpn_popup label')).map((x) => {
+			const i = x.querySelector('input'); return x.textContent.trim().split('(')[0].trim() + '=' + (i ? i.value : ''); }).join(' | '));
+		const sAfter = await settingText();
+		const prvLabel = await L('lpn_field_valve_setting_pressure');
+		ok('5.2 the popup shows the PRV\'s pressure setting with a number', new RegExp(prvLabel.replace(/[()]/g, '.') + '[^|]*=\\d').test(sAfter), sAfter.slice(0, 300));
+		const status = await page.evaluate(() => { const e = document.getElementById('lpn_status'); return e && e.style.display !== 'none' ? e.textContent : ''; });
+		ok('5.3 B solves with its PRV (no diagnostic on the status line)', status === '' || !/cannot|could not|no answers/i.test(status), status);
+		await scenarioMenu(await L('lpn_scenario_base'));
+		ok('5.4 in Base, 10 is a pipe', /lpn-link-pipe|lpn-pipe/.test(await page.evaluate(() => { const e = document.querySelector('.lpn-link[data-link="10"], [data-link="10"]:not(.lpn-link-hit)'); return e ? e.getAttribute('class') : ''; })) ||
+			await page.evaluate(() => !document.querySelector('.lpn-link-symbol-hit[data-link="10"]')));
+		await scenarioMenu('B');
+		await clickLink('10');
+		const sBack = await settingText();
+		ok('5.5 back in B the valve is still a PRV with its pressure setting', new RegExp(prvLabel.replace(/[()]/g, '.') + '[^|]*=\\d').test(sBack) &&
+			await page.evaluate(() => { const s = Array.from(document.querySelectorAll('#lpn_popup select')).find((x) => Array.from(x.options).some((o) => o.value === 'PRV')); return !!s && s.value === 'PRV'; }), sBack.slice(0, 300));
 		ok('no uncaught page errors', errors.length === 0, errors.join(' | '));
 	} finally { await browser.close(); env.stopServer(); }
 	console.log(fails ? `\n${fails} FAILED` : '\nall ok');

@@ -54,6 +54,11 @@ const INJECT =
 	"\t\tcolorLinkValue: colorLinkValue, importInp: importInpFromFile, assembleModel: assembleModel,\n" +
 	"\t\texportInp: function () { return EngCalcs.lpnExportInp(inpExportDocument(), inpExportOptions()); },\n" +
 	"\t\tsaveToStorage: saveToStorage, makeUndoSnapshot: makeUndoSnapshot,\n" +
+	// The Properties box's own Valve type select, rendered and changed as a person changes it.
+	"\t\tpickValveType: function (id, v) { var f = document.createElement('div'), l = linkById(id), sel = null;\n" +
+	"\t\t\trenderValveFields(f, l, id);\n" +
+	"\t\t\t(function walk(e) { (e.children || e.childNodes || []).forEach(function (c) { if (!sel && c.tagName && String(c.tagName).toUpperCase() === 'SELECT') { sel = c; } walk(c); }); }(f));\n" +
+	"\t\t\tif (!sel) { return false; } sel.value = v; (sel._listeners.change || []).slice().forEach(function (f) { f({ type: 'change', target: sel }); }); return true; },\n" +
 	"\t\tnodeClass: function (id) { var e = nodeEls[id]; return e && e.circle ? e.circle.getAttribute('class') : null; },\n" +
 	"\t\tbuildLayers: function () { svg = document.getElementById('lpn_canvas');\n" +
 	"\t\t\tworld = el('g', {}, svg);\n" +
@@ -276,6 +281,29 @@ async function run(mutate, quiet) {
 		ok('7.9 Base still solves to its own heads', worst(baseNative0, bv) < 1e-6, 'worst ' + worst(baseNative0, bv));
 	}
 
+	say('\n--- 7b. Properties on B\'s own valve: the valve type and its setting are B\'s ---');
+	{
+		// Perry, 2026-10-07: TCV -> PRV in Properties showed the new setting, then left B's valve
+		// with none once Base was laid back.
+		L.switchScenario(B.id);
+		ok('7b.1 Properties\' Valve type select was found and changed to PRV', L.pickValveType('10', 'PRV'));
+		L.saveToStorage();   // Base laid back and out again, as every autosave does
+		const v = L.linkById('10');
+		ok('7b.2 B\'s valve is a PRV with the PRV default setting', v.valveType === 'PRV' && typeof L.effective(v, 'setting') === 'number' && L.effective(v, 'setting') !== 2,
+			JSON.stringify({ vt: v.valveType, s: L.effective(v, 'setting'), ov: ovIn('B', 'l:10') }));
+		ok('7b.3 ...held in B\'s map', ovIn('B', 'l:10').valveType === 'PRV' && typeof ovIn('B', 'l:10').setting === 'number', JSON.stringify(ovIn('B', 'l:10')));
+		ok('7b.4 ...the file\'s pipe 10 has no setting or valve type', (function () { const l = L.serializeProject().links.filter((x) => x.id === '10')[0]; return l.type === 'pipe' && !('_setting' in l) && !('valveType' in l); }()));
+		const pe = await epanetHeads();
+		ok('7b.5 B solves with its PRV (EPANET, which a PRV needs)', !!pe, String(!!pe));
+		L.switchScenario(L.baseScenario().id);
+		ok('7b.6 Base still solves to its own heads', worst(baseNative0, nativeHeads()) < 1e-6);
+		L.switchScenario(B.id);
+		L.undo();
+		ok('7b.7 one undo: back to B\'s TCV with setting 2', L.linkById('10').valveType === 'TCV' && L.effective(L.linkById('10'), 'setting') === 2,
+			JSON.stringify(ovIn('B', 'l:10')));
+		L.switchScenario(L.baseScenario().id);
+	}
+
 	say('\n--- 8. a Base change never reaches into B\'s own type ---');
 	{
 		// B: 10 a valve of 30 in. Base: 10 becomes a pump (no diameter of its own).
@@ -317,6 +345,9 @@ const MUTATIONS = [
 		"if (owner.isBase || !plainObject(map[key])) { return; }")],
 	['the scenario keeps no value both types have', (src) => src.replace(
 		"\t\t\tif (pre.kept[p] === undefined || sameJSON(effective(el, p), pre.kept[p])) { return; }", "\t\t\treturn;")],
+	['Properties\' valve type writes Base\'s setting in a scenario, and nothing writes it back', (src) => src.replace(
+		"\t\t\tif (typeOverriddenHere(l)) {\n\t\t\t\twriteOverrideIn(activeScenario(), l, 'setting', defaultValveSetting(v));", "\t\t\tif (false) {").replace(
+		"if (has.call(el, k) && !sameJSON(el[k], e.applied[k])) { writeOverrideIn(e.scn, el, e.props[k]", "if (false) { writeOverrideIn(e.scn, el, e.props[k]")],
 	['the elements are not laid out for the scenario', (src) => src.replace(
 		"\t\tif (typeOvAny) { typeViewApply(); } else { typeView.doc = doc; }", "\t\ttypeView.doc = doc;")]
 ];

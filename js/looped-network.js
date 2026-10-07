@@ -35135,6 +35135,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (ov && typeof ov.type === 'string' && typeIsValidFor(el, ov.type)) { return ov.type; }
 		return baseTypeOf(el);
 	}
+	// Is this asset laid out as another type than Base's, in the scenario showing? Then every edit of
+	// a value its type owns belongs to that scenario's map, never to the element.
+	function typeOverriddenHere(el) { return !!el && typeView.byEl.has(el) && !inBaseScenario(); }
 	// Base's type of an asset, laid out or not.
 	function baseTypeOf(el) {
 		var e = typeView.byEl.get(el);
@@ -35143,7 +35146,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// ---- laying the elements out, and back ----
 	var typeView = { doc: null, list: [], byEl: new Map() }, typeOvAny = false;
 	function typeMaterialize(el, ov, scn) {
-		var base = el.type, to = ov.type, stash = Object.assign({}, el), keep = {}, raw = {}, applied = {},
+		var base = el.type, to = ov.type, stash = Object.assign({}, el), keep = {}, raw = {}, applied = {}, props = {},
 			view = typeDescFor(el, to, ov.valveType !== undefined ? ov.valveType : (base === 'valve' ? el.valveType : undefined)),
 			from = elGroup(el) === 'link' ? linkTypeDesc(el) : { type: base };
 		typeSpecsOf(el).forEach(function (spec) {
@@ -35152,6 +35155,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				// A key two rows share (a pump's curve and a GPV's) is kept if either keeps it.
 				if (vh && (bh || spec.custom)) { keep[k] = true; } else if (keep[k] === undefined) { keep[k] = false; }
 				if (vh && typeKeyProp(spec, k) === null) { raw[k] = true; }
+				if (vh && typeKeyProp(spec, k) !== null && !spec.custom) { props[k] = typeKeyProp(spec, k); }
 			});
 		});
 		Object.keys(keep).forEach(function (k) { if (!keep[k]) { delete el[k]; } });
@@ -35162,7 +35166,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			applied[k] = altCopy(el[k]);
 		});
 		el.type = to;
-		return { el: el, scn: scn, stash: stash, raw: raw, applied: applied };
+		Object.keys(props).forEach(function (k) { applied[k] = altCopy(el[k]); });
+		return { el: el, scn: scn, stash: stash, raw: raw, props: props, applied: applied };
 	}
 	function typeUnmaterialize(e, writeBack) {
 		var el = e.el, owned = typeOwnedKeySet(el), out = {}, has = Object.prototype.hasOwnProperty;
@@ -35170,6 +35175,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (writeBack) {
 			Object.keys(e.raw).forEach(function (k) {
 				if (!sameJSON(el[k], e.applied[k])) { writeOverrideIn(e.scn, el, k, el[k] === undefined ? null : el[k]); }
+			});
+			// **AND A STORED VALUE WRITTEN STRAIGHT ONTO THE ELEMENT** (an editor's Base write, `_setting`,
+			// `_length`) while it was laid out: it is the scenario's override of that property, since
+			// Base laid back would otherwise discard it (Perry, 2026-10-07).
+			Object.keys(e.props || {}).forEach(function (k) {
+				if (has.call(el, k) && !sameJSON(el[k], e.applied[k])) { writeOverrideIn(e.scn, el, e.props[k], el[k] === undefined ? null : el[k]); }
 			});
 		}
 		// Base's own keys in Base's own order, so a file, a signature and a guard read the same bytes.
@@ -59609,7 +59620,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// geometry is Base-owned (a node cannot be in two places at once in one rendered map),
 			// so "follow the drawing" is a statement about the drawing, which every scenario shares.
 			// `lenAuto` itself is that same kind of flag and is deliberately not overridable.
-			if (l.lenAuto) {
+			if (l.lenAuto && typeOverriddenHere(l)) {
+				// A pipe only this scenario has (a type override): its drawn length is this scenario's.
+				writeOverrideIn(activeScenario(), l, 'length', linkGeomLength(l));
+				input.value = effective(l, 'length').toFixed(2);
+				refreshPopupIfOpen();
+			} else if (l.lenAuto) {
 				l._length = linkGeomLength(l);   // base-write: Auto reverts to the drawing, which every scenario shares; the override is cleared on the next line
 				if (!inBaseScenario()) { clearOverride(l, 'length'); }
 				input.value = effective(l, 'length').toFixed(2);
@@ -61966,11 +61982,20 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// belongs to a type must be Base-wide too. The overrides are the part easy to miss: 60 psi
 			// read as a loss coefficient of 60 is as wrong in a scenario as in Base, and an override
 			// would SURVIVE silently as a stale pressure under a valve that now wants a flow.
-			l._setting = defaultValveSetting(v);   // base-write: valveType is Base-owned, so the setting that belongs to it is too
-			eachOverrideMap(function (map) {
-				var ovv = map[ovKey(l)];
-				if (ovv) { delete ovv.setting; }
-			});
+			// **A VALVE ONLY THIS SCENARIO HAS (a type override) IS THIS SCENARIO'S, type and setting
+			// alike** (Perry, 2026-10-07: the new setting showed, then vanished when Base was laid
+			// back). `l.valveType` above is written back into the scenario's map; the setting goes
+			// there directly, and Base and every other scenario are left alone.
+			if (typeOverriddenHere(l)) {
+				writeOverrideIn(activeScenario(), l, 'setting', defaultValveSetting(v));
+			} else {
+				l._setting = defaultValveSetting(v);   // base-write: valveType is Base-owned, so the setting that belongs to it is too
+				// A map stating its own type for this asset keeps its own valve and setting.
+				eachOverrideMap(function (map) {
+					var ovv = map[ovKey(l)];
+					if (ovv && typeof ovv.type !== 'string') { delete ovv.setting; }
+				});
+			}
 			refreshPopupIfOpen();
 			scheduleSolve();
 		}, pc.lpn_field_valve_type_tip);
