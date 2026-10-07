@@ -29,7 +29,12 @@ Tell people to use a points import/export LSP routine and EPANET++ Import survey
   and alternative in the layer name after a prefix such as C-WATR-MODL-. Reconcile before either
   side grows: the Interface Manager's export should write exactly what its import reads, and the
   round trip (export, import, byte-identical model) is the first harness. Whether today's
-  annotated export stays as a separate "drawing" export beside a "model data" one is his call. Alternatives in a layer name meet
+  annotated export stays as a separate "drawing" export beside a "model data" one is his call.
+- **Labeling is a consequence, not a feature** (Tom, 2026-10-07: *"Labels and readme are okay. I just
+  don't want to get wrapped around the axle about them. I would like labeling to be a mere
+  consequence of the decision to transfer data by attributed blocks."*). So the drawing's labels
+  are the blocks' own attributes, shown or hidden by layer, and no further effort goes into
+  laying out separate label text in the DXF. `feat/dxf`'s labels and read-me stay as they are. Alternatives in a layer name meet
   Task 721 (`feat/bentley-interop`), which owns the alternatives model.
 - "Values verbatim in the project units" is CLAUDE.md's rule that only the user touches a file's
   numbers.

@@ -160,9 +160,9 @@ replayed offline beacon stamped 09-21 made a 5-day log report 15 days), "Is acti
   else)" is his and is fine either way. Build after he picks.
 - **Convert as (Task 775):** 3857 vs 4326 (R-218 fold) -- explain, hide the 3857 row, or make 3857
   real; and which surface he saw the lost node symbols on (not reproduced on master or 9c71d54f).
-- **DXF:** his Interface Manager spec (`dev/dxf-interface.md`) is import AND export, data only, with
-  asset and alternative in the layer name; `feat/dxf` writes an annotated drawing instead. Merge
-  feat/dxf as a "drawing" export and build the spec's model export later, or reshape it first?
+- **DXF:** answered 2026-10-07: `feat/dxf`'s labels and read-me are fine as they are; labeling is
+  to be "a mere consequence" of transferring data by attributed blocks (`dev/dxf-interface.md`).
+  Spend no more on DXF label layout; the spec's import and export come next, after his pass.
 - **Snip:** keep the view on plain Screenshot? close after Copy?
 - **User guide:** the name; show vs run; English-only prose.
 - DMARC phase 3; Mary's contacts: Gusnet's author only via GitHub Issues
