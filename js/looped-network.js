@@ -54540,7 +54540,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// so there is no column to dock into: the dock buttons are not offered there, and a box that is
 	// docked on the desktop opens as it always did. Its docking is kept and comes back on a wider
 	// window.
-	var LPN_DOCK_MIN_W = 240, LPN_DOCK_MAX_FRAC = 0.45, LPN_DOCK_MAP_MIN = 320, LPN_DOCK_DEFAULT_W = 360,
+	// **NO SHARE OF THE WINDOW CAPS A DOCKED BOX; ONLY THE MAP'S OWN MINIMUM DOES** (Tom, 2026-10-07,
+	// on the Alternatives preview stopping at about 860 px: *"Is there any reason not to give the user
+	// control and freedom?"*). There was not. A column used to stop at 45% of the window, which on a
+	// 1920 screen held a docked table to 864 px while the map beside it had a thousand to spare. The
+	// map keeps LPN_DOCK_MAP_MIN, and that was always the reason the cap existed.
+	var LPN_DOCK_MIN_W = 240, LPN_DOCK_MAP_MIN = 320, LPN_DOCK_DEFAULT_W = 360, LPN_DOCK_FIRST_FRAC = 0.45,
 		LPN_DOCK_STRIP_W = 24, LPN_DOCK_TUCK_MS = 400, LPN_DOCK_HOVER_MS = 150, LPN_CORNER_BTN_W = 28,
 		LPN_UNDOCK_SLOP = 6;
 	var dockBoxes = [], dockFlyout = null, dockTimer = null, dockBooting = false, dockQueued = false,
@@ -54570,7 +54575,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (typeof v.dockOrd === 'number' && isFinite(v.dockOrd) && v.dockOrd >= 0) { rec.dockOrd = Math.round(v.dockOrd); }
 	}
 	function clampDockW(w, room) {
-		var max = Math.max(LPN_DOCK_MIN_W, Math.floor((window.innerWidth || 1000) * LPN_DOCK_MAX_FRAC));
+		var max = Math.max(LPN_DOCK_MIN_W, Math.floor((window.innerWidth || 1000) - LPN_DOCK_MAP_MIN));
 		if (!(w > 0)) { w = LPN_DOCK_DEFAULT_W; }
 		if (room > 0) { max = Math.min(max, room); }
 		return Math.round(Math.max(Math.min(LPN_DOCK_MIN_W, max), Math.min(w, max)));
@@ -54654,10 +54659,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function dockAct(d, act) {
 		var r, wasSide = dockSideOf(d);
 		if (act === 'left' || act === 'right') {
-			// The width it floats at is the width it docks at, the first time.
+			// The width it floats at is the width it docks at, the first time, up to 45% of the
+			// window, so a box that floats wide (Alternatives, 1500 px) does not dock over most of
+			// the map. That is the first width only: the grip takes it anywhere the map allows.
 			if (!wasSide && !d.rec.dockW) {
 				r = d.box.getBoundingClientRect();
-				if (r.width > 0) { d.rec.dockW = Math.round(r.width); }
+				if (r.width > 0) { d.rec.dockW = Math.round(Math.min(r.width, Math.max(LPN_DOCK_MIN_W, (window.innerWidth || 1000) * LPN_DOCK_FIRST_FRAC))); }
 			}
 			d.rec.dock = act;
 		} else if (act === 'float') {
@@ -54758,9 +54765,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		el.lpnDockList = list;
 		el.classList.toggle('lpn-dock-grip-live', x !== null);
 		if (x === null) { return; }
-		// In front of a flown-out box, whose own stacking number is above the strip's.
-		el.style.zIndex = String((list.length === 1 && list[0].box.classList.contains('lpn-dock-out'))
-			? (Number(list[0].box.style.zIndex) || 0) + 1 : '');
+		// In front of the boxes it sizes, whose own stacking numbers rise each time one is brought
+		// forward: under a raised docked box the grip's inner half was the box's own edge, so a press
+		// there did nothing a reader could see (found 2026-10-07, docking Alternatives).
+		var zTop = 0;
+		list.forEach(function (d) { zTop = Math.max(zTop, Number(d.box.style.zIndex) || 0); });
+		el.style.zIndex = zTop ? String(zTop + 1) : '';
 		el.style.left = Math.round(x) + 'px';
 		el.style.top = Math.round(y) + 'px';
 		el.style.height = Math.round(h) + 'px';

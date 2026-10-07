@@ -156,6 +156,40 @@ async function main() {
 		};
 		const pcW = await openedWidth(1920, 1080);
 		ok('at 1920x1080 the box is about 1500 px wide', pcW >= 1450 && pcW <= 1510, pcW.toFixed(0));
+
+		// TOM, 2026-10-07: "Am I supposed to max out on the width of the Alternatives preview at about
+		// 800 or 900 px? Is there any reason not to give the user control and freedom?" The cap was
+		// the docked column's 45% of the window (864 px at 1920). Docked right, its grip dragged far
+		// to the left: the box follows the pointer past that, and only the map's 320 px stops it.
+		await a.page.click('#lpn_alt_box .lpn-corner-btn[data-dock="right"]');
+		await a.settle(500);
+		const dockGeom = () => a.page.evaluate(() => {
+			const b = document.getElementById('lpn_alt_box').getBoundingClientRect(),
+				s = document.getElementById('lpn_svg') || document.querySelector('.lpn-map-wrap svg'),
+				g = document.getElementById('lpn_dock_grip_right'), gr = g ? g.getBoundingClientRect() : null;
+			return { w: b.width, svgW: s ? s.getBoundingClientRect().width : null,
+				gx: gr && gr.left + gr.width / 2, gy: gr && gr.top + gr.height / 2 };
+		});
+		let dg = await dockGeom();
+		ok("docked right, it first takes the 45% of the window it always docked at (864 px)", Math.abs(dg.w - 864) <= 2 && dg.gx !== null, JSON.stringify(dg));
+		const hit = await a.page.evaluate((p) => { const e = document.elementFromPoint(p.gx, p.gy); return e && (e.id || e.className); }, dg);
+		ok('...its inner edge is the width grip', hit === 'lpn_dock_grip_right', String(hit));
+		const dragGrip = async (toX) => {
+			await a.page.mouse.move(dg.gx, dg.gy, { steps: 2 });
+			await a.page.mouse.down();
+			await a.page.mouse.move(toX, dg.gy, { steps: 8 });
+			await a.page.mouse.up();
+			await a.settle(500);
+			dg = await dockGeom();
+		};
+		await dragGrip(1920 - 1300);
+		ok('...its grip widens it to about 1300 px, far past the old 864 px cap', Math.abs(dg.w - 1300) <= 6, dg.w.toFixed(0));
+		ok('...and the map beside it keeps its width', dg.svgW >= 320, String(dg.svgW));
+		await dragGrip(5);
+		ok('...dragged to the window\'s far edge, it stops where the map keeps its 320 px', dg.svgW >= 319 && dg.svgW <= 330 && dg.w > 1500,
+			JSON.stringify({ box: dg.w, map: dg.svgW }));
+		await a.page.click('#lpn_alt_box .lpn-corner-btn[data-dock="float"]');
+		await a.settle(400);
 		const phW = await openedWidth(390, 800);
 		ok('at 390 px the box fits the window with a gutter', phW <= 390 && phW >= 390 * 0.9, phW.toFixed(0));
 		await openedWidth(1280, 800);
