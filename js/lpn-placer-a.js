@@ -1,40 +1,40 @@
-// LABEL PLACER A: free space first, near home first, drop before travel.
+// LABEL PLACER A: free space first, labels before properties, near home before far.
 //
-// APPROACH. Before any label is placed, the view's real estate is mapped: every symbol, Text object,
-// pipe and Text callout goes into a 24 px bucket grid (exact tests) and a 3 px raster with
-// summed-area tables ("is this rectangle clear?" in four reads). Each label then gets candidate
-// places in tiers: tier 0 touches home (the eight Imhof positions and two centred ones beside a node;
-// above, below or on its own pipe for a pipe label); tiers 1-4 hang it on a straight leader, one
-// ring further out each (0.8 to 4 row heights), in the widest gaps between the node's pipes first
-// and then round the compass. A tier is only built when a search could still afford it, so a label
-// with room at home never generates a leader. Cost = rows given up + leader length (rising faster
-// than linearly) + crossings in Tom's order (leader on leader > label on leader > label on pipe >
-// leader on pipe); a never-rule break is not a cost, it removes the candidate.
-// Order: hand-placed labels hang at the user's point (N4); labels shown in the last view are held
-// (T1); then every other label takes its SMALLEST form (ID, or one row) near home, the most crowded
-// choosing first, customers last; then rounds in which each label may take back one row, so room is
-// shared out fairly. Dropping follows the user's drop order (S4); a stack may unwrap to one line, or
-// a pipe label wrap to a stack, at a small extra cost (H1).
+// The recipe, round 7 (STRATEGY.md beside this file has the numbers, and each ingredient's switch):
 //
-// FREE SPACE. The raster and the gap list decide where leaders are even tried; a leader whose path
-// crosses a symbol, or whose landing core is already covered, is judged once and skipped for every
-// shape and row set. Open ground far from home is not chased: the leader cost makes dropping a row
-// cheaper than a walk past about three row heights (S3).
+// MAP THE GROUND. Symbols, Text, pipes and Text callouts go into a 24 px bucket grid (exact tests)
+// and a 3 px raster with summed-area tables, "is this rectangle clear?" in four reads (S8, S9).
+// Overlaps up to 1.45 px are leading, not ink, a hair inside the bench's 1.5 (own: 'lead').
 //
-// ZOOMING. A label shown in the last view is carried at the same pixel offset from its anchor and
-// kept if it is still legal (it breaks no never-rule), before anything new is placed; it may only
-// grow downward/away from its anchored edge, one row per round (S2). It moves only when forced.
+// WHERE TO LOOK. Tier 0 touches home: eight Imhof positions and two centred ones beside a node (S2);
+// for a pipe label the setting asks to turn, turned and beside its pipe at stations sliding out from
+// the middle of its on-screen stretch, on either side, close or half a row clear (S4), with level
+// places dearer and on-the-pipe places dearer still (R7, R14); a pipe label it does not ask to turn
+// is never turned (R13). Tiers 1-4 hang the label on a straight leader one ring further out each, in
+// the widest gaps between the node's pipes first (S1), then round the compass (S3). A stack may
+// unwrap to one line or a line wrap to a stack, a little dearer (S5). A leader that arrives at the
+// top or bottom lands near a corner, and the rows are justified to that side (R5).
 //
-// IDLE. Kept per network: each node's ranked gap list (angles do not change with zoom). When the
-// project opens, one throwaway rehearsal of the opening view warms the engine. Buffers (raster,
-// grids) are reused from view to view. There is no per-zoom layout cache: the next view cannot be
-// predicted from the bench's idle hook, and I did not want to report a cached answer as a layout time.
+// IN WHAT ORDER. Hand-placed labels hang at the user's point (N4). Labels shown in the last view are
+// carried at the same offset if still legal (S13). Every other label then takes its smallest form
+// (the value the drop order keeps longest), most crowded first (S12, S11). A label still hidden
+// looks again on a fine tier, every 15 degrees and every half row (S15, built in); then far, along
+// straight leaders in 48 directions to the first clean open ground (S7, own form: 'far'); then it
+// may move one or two neighbours that stand where it could go (S16). Then a label that took a spot
+// across a pipe or leader asks the fine tier for cleaner ground ('clean'). Then rounds of growth, a
+// row per label per round: in place first ('inplace'), else re-seated, held labels too ('reseat',
+// R11), coarse tiers and then the fine tier. Last, a level pipe label turns if it now can (R14).
 //
-// STILL DOES BADLY. Greedy plus local rounds, no global search, so dense cores at the fit view still
-// hide about a fifth of the labels. A turned pipe label never grows while zooming in (growing would
-// move its text start); an unwrapped one-line node label on a leader can read like a table beside the
-// network. The standard hook is never used. A hand point on the label's own symbol cannot satisfy
-// both N1 and N4; N4 wins. Leader checks dominate the time on 200-label views.
+// TIME. Pass A is not bounded, so no label is hidden for want of time (R1). Everything after it is
+// bounded by time, never by count (S21): eviction and far stop at 250 ms, growth at 500 ms, well
+// inside R10's second; a slower machine shows fewer values, not fewer labels. A search that failed
+// is not repeated until something near it has changed (own: 'dirty', stamped regions).
+//
+// STILL DOES BADLY. Greedy plus local repair, no global optimum. In a dense core every straight
+// leader outward meets another node's symbol (N3), so labels there stay hidden although the screen
+// has open ground. A level pipe label that turns at the next zoom shows nothing more for the move,
+// so the bench counts it as churn. The standard hook is never used. A hand point on the label's own
+// symbol cannot satisfy both N1 and N4; N4 wins.
 //
 // Copyright 2009 Thomas Gail Haws
 // Licensed under GNU GPL v3.0 or later
@@ -55,7 +55,7 @@ const ALT_SHAPE = 0.6;     // H1: the other shape costs a little (lazy), used wh
 const CS = 24;            // grid cell size, px
 const MARGIN = 320;       // grid reaches this far beyond the viewport
 const W = {
-	row: +(typeof process !== "undefined" && process.env.PA_ROW) || 4,   // each value row given up
+	row: 4,               // each value row given up
 	hide: 10,             // on top of the rows, for hiding the whole label
 	hideCustomer: 1,      // customer labels give way first and easily
 	lblPipe: 8,           // a label on a pipe
@@ -66,13 +66,13 @@ const W = {
 };
 // ---- ingredients, each switchable so its worth can be measured (STRATEGY.md) -----------------
 // In node: PLACER_A_OFF=s4,s15 node run.js ... switches those off. On the page they are all on.
-const ING = { s1: true, s4: true, s5: true, s11: true, s12: true, s13: true, s15: true, grow: true, r5: true, lead: true, dirty: true, s16: true, reseat: true, inplace: true };
+const ING = { s1: true, s4: true, s5: true, s11: true, s12: true, s13: true, s15: true, grow: true, r5: true, lead: true, dirty: true, s16: true, reseat: true, inplace: true, clean: true, far: true };
 (function () {
 	const env = typeof process !== 'undefined' && process.env ? process.env.PLACER_A_OFF : '';
 	(env || '').split(',').forEach(function (k) { k = k.trim(); if (k && Object.prototype.hasOwnProperty.call(ING, k)) { ING[k] = false; } });
 }());
-const SOFT_MS = 500;       // growth and repair stop here, well inside R10's one second
-const EVICT_MS = 250;      // and eviction here, so growth has time after it
+const SOFT_MS = +(typeof process !== "undefined" && process.env && process.env.PLACER_A_SOFT_MS) || 500;       // growth and repair stop here, well inside R10's one second
+const EVICT_MS = +(typeof process !== "undefined" && process.env && process.env.PLACER_A_EVICT_MS) || 250;      // and eviction here, so growth has time after it
 function nowMs() { return typeof performance !== 'undefined' && performance.now ? performance.now() : Date.now(); }
 // Overlap tolerance in px: a hair inside the bench's 1.5 px of leading (own ingredient 'lead'), or
 // the stricter 1.0 of earlier rounds.
@@ -80,8 +80,7 @@ const TOL = ING.lead ? 1.45 : 1.0, HELD_TOL = ING.lead ? 1.45 : 1.4;
 let tol = TOL;
 const ON_OWN = 3.5;       // a pipe label over its own pipe (R7): just under a row, so a value still wins
 const LEVEL = 2;          // a pipe label the setting asks to turn, left level (R14): under a row
-const DSCALE = +(typeof process !== "undefined" && process.env.PA_DIST) || 1;
-function distCost(L) { return L > 0 ? DSCALE * (0.6 + 0.6 * L + 0.12 * L * L) : 0; }   // L in row heights
+function distCost(L) { return L > 0 ? 0.6 + 0.6 * L + 0.12 * L * L : 0; }   // L in row heights
 
 // ---- geometry --------------------------------------------------------------------------------
 function mkBox(cx, cy, w, h, angle) {
@@ -388,7 +387,7 @@ function createPlacer() {
 			run(ctx.scene, null, gapsFor(ctx.scene), pool);
 		}
 	}
-	return { name: 'a (free-space grid, near home first, drop before travel)', place: place, idle: idle };
+	return { name: 'a (free space first, labels before properties, near before far)', place: place, idle: idle };
 }
 
 function run(scene, prev, gaps, pool) {
@@ -1270,6 +1269,86 @@ function run(scene, prev, gaps, pool) {
 			if (r) { commit(f, r.cand, r.cost); }
 		});
 	}
+	// Far (S7, own form): R1 gives up nearness to home first. A label still hidden walks a straight
+	// leader out, in 48 directions, past where the near tiers stop, and takes the first landing on
+	// clean open ground: no symbol, Text, pipe, label or leader under the text. A direction ends at
+	// the first node symbol, Text, label or leader its leader would cross (N3, and the two worst
+	// crossings); crossing pipes is allowed and counted. The shortest landing over all directions wins.
+	const FAR_BASE = 8, FAR_PIPE = 0.3, FAR_LEN = 0.05;
+	function segBlocked(f, ax, ay, bx, by) {
+		const x0 = Math.min(ax, bx), x1 = Math.max(ax, bx), y0 = Math.min(ay, by), y1 = Math.max(ay, by), ownNode = f.node ? f.node.id : null;
+		if (G.query(0, x0, y0, x1, y1, function (it) {
+			if (it.sym && (it.node === null || it.node === ownNode)) { return false; }
+			return segHitsBox(ax, ay, bx, by, it.box, tol);
+		})) { return true; }
+		if (G.query(2, x0, y0, x1, y1, function (it) { return segCrossT(ax, ay, bx, by, it.ax, it.ay, it.bx, it.by) >= 0; })) { return true; }
+		if (D.query(0, x0, y0, x1, y1, function (it) { return it.lab !== f.li && segHitsBox(ax, ay, bx, by, it.box, tol); })) { return true; }
+		return D.query(2, x0, y0, x1, y1, function (it) { return it.lab !== f.li && segCrossT(ax, ay, bx, by, it.ax, it.ay, it.bx, it.by) >= 0; });
+	}
+	function pipesCrossed(f, ax, ay, bx, by, sx, sy) {
+		const ownLink = f.link ? f.link._i : -1, es = ++evalStamp;
+		let n = 0;
+		G.query(1, Math.min(ax, bx), Math.min(ay, by), Math.max(ax, bx), Math.max(ay, by), function (it) {
+			if (it.link === ownLink || linkSeen[it.link] === es) { return false; }
+			const t = segCrossT(ax, ay, bx, by, it.ax, it.ay, it.bx, it.by);
+			if (t >= 0 && Math.hypot(ax + t * (bx - ax) - sx, ay + t * (by - ay) - sy) > 1) { linkSeen[it.link] = es; n++; }
+			return false;
+		});
+		return n;
+	}
+	// Clean ground for the text alone: nothing under it at all, and on screen.
+	function cleanGround(f, c) {
+		const boxes = boxesFor(c), bb = c.bb || (c.bb = aabbOf(boxes));
+		if (bb[0] < vp.x + 1 || bb[1] < vp.y + 1 || bb[2] > vp.x + vp.w - 1 || bb[3] > vp.y + vp.h - 1) { return false; }
+		if (Rs.covers(bb) && Rs.sum(Rs.hard, bb[0], bb[1], bb[2], bb[3]) + Rs.sum(Rs.pipe, bb[0], bb[1], bb[2], bb[3]) + Rs.sum(Rs.tldr, bb[0], bb[1], bb[2], bb[3]) > 0) { return false; }
+		const buf = D.buf;
+		let n = D.collect(0, bb[0], bb[1], bb[2], bb[3]);
+		for (let i = 0; i < n; i++) { for (let j = 0; j < boxes.length; j++) { if (boxesOverlap(boxes[j], buf[i].box)) { return false; } } }
+		n = D.collect(2, bb[0], bb[1], bb[2], bb[3]);
+		for (let i = 0; i < n; i++) { if (anyBoxHitsSeg(boxes, buf[i])) { return false; } }
+		return true;
+	}
+	function farSearch(f, k) {
+		const rows = f.subsets[k], sh = shape(f, rows, f.req.layout === 'line' ? 'line' : 'stack');
+		const rowPen = W.row * (f.R - rows.length), lvl = f.link && f.req.along ? LEVEL : 0;
+		const s0 = f.link ? (f.lsym || { x: f.pt[0], y: f.pt[1], w: 0, h: 0 }) : f.sym, cx = f.pt[0], cy = f.pt[1];
+		const rs = f.link ? 0 : Math.min(s0.w, s0.h) / 2, rOut = Math.max(s0.w, s0.h) / 2 + 1;
+		const step = RH / 2, maxLen = Math.hypot(vp.w, vp.h);
+		let best = null, bestCost = hideCost(f);
+		for (let d = 0; d < 48; d++) {
+			const a = d * Math.PI / 24, ux = Math.cos(a), uy = Math.sin(a), side = sideFor(ux, uy);
+			const sx = cx + ux * rs, sy = cy + uy * rs;
+			let dist = rOut + 4.5 * RH, px = cx + ux * dist, py = cy + uy * dist;
+			if (segBlocked(f, sx, sy, px, py)) { continue; }
+			for (; dist < maxLen; dist += step) {
+				const nx = cx + ux * dist, ny = cy + uy * dist;
+				if (nx < vp.x || ny < vp.y || nx > vp.x + vp.w || ny > vp.y + vp.h) { break; }
+				if (dist > rOut + 4.5 * RH && segBlocked(f, px, py, nx, ny)) { break; }
+				px = nx; py = ny;
+				const L = [[sx, sy], [px, py]];
+				const base = rowPen + lvl + FAR_BASE + FAR_LEN * (dist - rs) / RH;
+				if (base >= bestCost) { break; }
+				const c = hang(sh, px, py, side, base, L);
+				if (!cleanGround(f, c)) { continue; }
+				const pc = pipesCrossed(f, sx, sy, px, py, sx, sy);
+				c.lcFixed = FAR_PIPE * pc;
+				c.k = k; c.far = true;
+				if (base + c.lcFixed < bestCost) { best = c; bestCost = base + c.lcFixed; }
+				break;
+			}
+		}
+		if (!best) { return null; }
+		best.st = evalStatic(f, best, true);
+		const v = best.st < Infinity ? evalDyn(f, best, best.st, Infinity) : Infinity;
+		return v < hideCost(f) ? { cand: best, cost: v } : null;
+	}
+	if (ING.far) {
+		free.forEach(function (f) {
+			if (placed[f.li] || nowMs() - t0 > EVICT_MS) { return; }
+			const r = farSearch(f, f.subsets.length - 1);
+			if (r) { commit(f, r.cand, r.cost); }
+		});
+	}
 	// Eviction (S16): a label still hidden may move one or two neighbours that stand on a spot it
 	// could use, if each of them finds another place (with fewer values, if need be), so that more
 	// labels show in all.
@@ -1318,6 +1397,19 @@ function run(scene, prev, gaps, pool) {
 	}
 	if (ING.s16) {
 		free.forEach(function (f) { if (!placed[f.li] && nowMs() - t0 < EVICT_MS) { evict(f); } });
+	}
+	// Cleaner ground (own ingredient 'clean'): a label that took a spot across a pipe or a leader,
+	// because the coarse tiers had nothing better, asks the fine tier for a clean one, same rows.
+	if (ING.clean) {
+		info.forEach(function (f) {
+			const p = placed[f.li];
+			if (!p || kept[f.li] || overTime() || p.cand.k === undefined) { return; }
+			if (p.cand.st === undefined) { p.cand.st = evalStatic(f, p.cand, true); }
+			const cur = evalDyn(f, p.cand, p.cand.st, Infinity);
+			if (cur - p.cand.base < W.ldrPipe) { return; }
+			const r = searchFine(f, cur, p.cand.k);
+			if (r && r.cand !== p.cand) { uncommit(f); commit(f, r.cand, r.cost); }
+		});
 	}
 	// Pass B: rounds in which each label may take back one row (a better place for it, given the
 	// others), so room is shared out fairly rather than to whoever asks first; then the same with
