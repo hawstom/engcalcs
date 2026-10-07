@@ -156,6 +156,8 @@ async function main() {
 				const closed = await page.$eval('#lpn_snip_menu', (m) => getComputedStyle(m).display === 'none');
 				await page.click('#lpn_snip_mode');
 				const opened = await page.$eval('#lpn_snip_menu', (m) => getComputedStyle(m).display !== 'none');
+				const reach = await page.evaluate(() => ['lpn_snip_mode_rect', 'lpn_snip_mode_free'].map((i) => { const e = document.getElementById(i), r = e.getBoundingClientRect(), h = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2); return !!h && (h === e || e.contains(h)); }));
+				ok('both menu items are really reachable (elementFromPoint lands on them, not on a box or the map)', reach[0] && reach[1], JSON.stringify(reach));
 				await page.click('#lpn_snip_mode');
 				return closed && opened && await page.$eval('#lpn_snip_menu', (m) => getComputedStyle(m).display === 'none');
 			})());
@@ -228,6 +230,15 @@ async function main() {
 			// Clear the canvas of strokes for what follows: undo everything.
 			for (let i = 0; i < 10; i++) { await page.keyboard.press('Control+z'); }
 			ok('everything undone leaves no red', (await page.evaluate(RED_COUNT)) === red0);
+			// The view owns the pointer: a raised box cannot sit over it, and Esc never discards strokes.
+			await page.mouse.move(p1.x, p1.y); await page.mouse.down(); await page.mouse.move(p2.x, p2.y, { steps: 6 }); await page.mouse.up();
+			const hitTop = await page.evaluate(() => { const b = document.getElementById('lpn_snip_box'), c = document.getElementById('lpn_snip_canvas'), r = c.getBoundingClientRect();
+				b.style.zIndex = '1799'; b.style.display = 'block'; b.style.left = (r.left + r.width / 2 - 20) + 'px'; b.style.top = (r.top + r.height / 2 - 20) + 'px';
+				const h = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2); b.style.display = 'none'; return h === c; });
+			ok('a box raised to the top of the box band does not cover the markup view', hitTop);
+			await page.keyboard.press('Escape');
+			ok('Esc with a stroke drawn does not close the view', !!(await page.$('#lpn_snip_canvas')) && (await page.evaluate(RED_COUNT)) > red0);
+			await page.keyboard.press('Control+z');
 			// Put a stroke on and copy: the copied picture carries it.
 			await page.mouse.move(p1.x, p1.y); await page.mouse.down(); await page.mouse.move(p2.x, p2.y, { steps: 6 }); await page.mouse.up();
 			await page.click('#lpn_snip_copy');

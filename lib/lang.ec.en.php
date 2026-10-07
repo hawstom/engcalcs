@@ -1085,7 +1085,7 @@ $ec_lang['lpn_hotkeys_map_term']='Map keyboard shortcuts';
 // Same shape as lpn_notes_7_def: one table, one row per key. The nine digits are LPN_TOOL_KEYS in
 // js/looped-network.js; Select also answers to Esc and Delete to the Delete key
 // (LPN_TOOL_ALT_KEYS); Ctrl+Z is undo(); +/- and = are keyZoom() (ROADMAP Task 682).
-$ec_lang['lpn_hotkeys_map_def']='<table class="lpn-notes-table"><tbody><tr><td>1 or Esc</td><td>Select.</td></tr><tr><td>2</td><td>Add a junction.</td></tr><tr><td>3</td><td>Add a reservoir.</td></tr><tr><td>4</td><td>Add a tank.</td></tr><tr><td>5</td><td>Add a pipe.</td></tr><tr><td>6</td><td>Add a pump.</td></tr><tr><td>7</td><td>Add a valve.</td></tr><tr><td>8</td><td>Add a customer.</td></tr><tr><td>9</td><td>Add text.</td></tr><tr><td>Delete</td><td>Delete the selection.</td></tr><tr><td>Ctrl+Z</td><td>Undo the last change.</td></tr><tr><td>+ or =</td><td>Zoom in.</td></tr><tr><td>-</td><td>Zoom out.</td></tr></tbody></table>';
+$ec_lang['lpn_hotkeys_map_def']='<table class="lpn-notes-table"><tbody><tr><td>1 or Esc</td><td>Select.</td></tr><tr><td>2</td><td>Add a junction.</td></tr><tr><td>3</td><td>Add a reservoir.</td></tr><tr><td>4</td><td>Add a tank.</td></tr><tr><td>5</td><td>Add a pipe.</td></tr><tr><td>6</td><td>Add a pump.</td></tr><tr><td>7</td><td>Add a valve.</td></tr><tr><td>8</td><td>Add a customer.</td></tr><tr><td>9</td><td>Add text.</td></tr><tr><td>Delete</td><td>Delete the selection.</td></tr><tr><td>Ctrl+Z</td><td>Undo the last change.</td></tr><tr><td>S</td><td>Snip, with the Screenshot box open.</td></tr><tr><td>E</td><td>Eraser, in the Screenshot markup view.</td></tr><tr><td>Ctrl+Y</td><td>Redo, in the Screenshot markup view.</td></tr><tr><td>+ or =</td><td>Zoom in.</td></tr><tr><td>-</td><td>Zoom out.</td></tr></tbody></table>';
 // The menu chords (Task 748): Alt+Shift+letter on Windows and Linux, Ctrl+Option on a Mac, and F10.
 // Exactly two rows (Tom, 2026-10-03: "show only the Alt+Shift and the F10"); the letters themselves
 // are assigned per language by menuMnemonics() and shown on the menus, never listed here.
@@ -4449,18 +4449,13 @@ $ec_lang['lpn_screenshot_copied']='Screenshot copied.';
 $ec_lang['lpn_screenshot_saved']='The clipboard is not available here, so the screenshot was downloaded as a PNG file.';
 $ec_lang['lpn_screenshot_no_basemap']='The street map or satellite image could not be included.';
 $ec_lang['lpn_screenshot_failed']='The screenshot could not be made.';
-$ec_lang['lpn_snip_button']='Snip';
-$ec_lang['lpn_snip_rectangle']='Rectangle';
-$ec_lang['lpn_snip_freehand']='Freehand';
-$ec_lang['lpn_snip_pen']='Pen';
 $ec_lang['lpn_snip_hint_free']='Drag around the area to snip, or click for the whole map. Esc cancels.';
 $ec_lang['lpn_snip_tip_rect']='Snip a rectangle (S)';
 $ec_lang['lpn_snip_tip_free']='Snip a freehand shape (S)';
 $ec_lang['lpn_snip_tip_mode']='Snip shape';
 $ec_lang['lpn_snip_tip_map']='Screenshot of the whole map';
-$ec_lang['lpn_snip_tip_pen']='Pen (Esc)';
+$ec_lang['lpn_snip_tip_pen']='Pen';
 $ec_lang['lpn_snip_tip_eraser']='Eraser: click a stroke to remove it (E)';
 $ec_lang['lpn_snip_tip_undo']='Undo (Ctrl+Z)';
 $ec_lang['lpn_snip_tip_redo']='Redo (Ctrl+Y)';
-$ec_lang['lpn_screenshot_scale']='Magnification';
 $ec_lang['lpn_screenshot_scale_tip']='The picture\'s size as a multiple of the area on the screen. A larger one is sharper and makes a bigger file.';

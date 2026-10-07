@@ -42401,10 +42401,18 @@ var EngCalcs = EngCalcs || {};
 		chev.addEventListener('click', function (e) {
 			e.stopPropagation();
 			if (menu.classList.contains('lpn-snip-menu-open')) { closeSnipMenu(); return; }
+			var cr = chev.getBoundingClientRect(), mw = 2 * 40 + 6;
+			menu.style.top = Math.round(cr.bottom + 2) + 'px';
+			menu.style.left = Math.round(Math.max(2, Math.min(cr.left, window.innerWidth - mw - 2))) + 'px';
 			menu.classList.add('lpn-snip-menu-open');
 			chev.setAttribute('aria-expanded', 'true');
 		});
-		split.appendChild(go); split.appendChild(chev); split.appendChild(menu);
+		split.appendChild(go); split.appendChild(chev);
+		// The menu is a popup on the page, not a child of the box: the box clips whatever hangs
+		// below it (overflow hidden). It sits at the menu level of the z-index ladder.
+		var old = document.getElementById('lpn_snip_menu');
+		if (old && old.parentNode) { old.parentNode.removeChild(old); }
+		document.body.appendChild(menu);
 		bar.appendChild(split);
 		// **THE REPEAT BUTTON, A MONITOR** (Tom, 2026-10-06: *"The panel is missing a Screenshot
 		// button for repeats."*). Pan or zoom the map, press it, and the whole visible map is shot
@@ -42422,6 +42430,7 @@ var EngCalcs = EngCalcs || {};
 	}
 	// Outside click closes the mode menu; S, with the box open, starts a snip in the chosen shape.
 	document.addEventListener('click', function () { closeSnipMenu(); });
+	window.addEventListener('resize', function () { closeSnipMenu(); });
 	document.addEventListener('keydown', function (e) {
 		if (e.key !== 's' && e.key !== 'S') { return; }
 		if (e.ctrlKey || e.metaKey || e.altKey || snipVeil || snipEditor || !snipBoxIsOpen()) { return; }
@@ -42809,7 +42818,7 @@ var EngCalcs = EngCalcs || {};
 			var seg = document.createElement('span');
 			seg.className = 'lpn-snip-seg';
 			bar.appendChild(seg);
-			var penBtn = button('lpn_snip_pen', 'pen', pc.lpn_snip_tip_pen || 'Pen (Esc)', function () { setEraser(false); }, seg);
+			var penBtn = button('lpn_snip_pen', 'pen', pc.lpn_snip_tip_pen || 'Pen', function () { setEraser(false); }, seg);
 			var eraserBtn = button('lpn_snip_eraser', 'eraser', pc.lpn_snip_tip_eraser || 'Eraser: click a stroke to remove it (E)', function () { setEraser(true); }, seg);
 			var undoBtn = button('lpn_snip_undo', 'undo', pc.lpn_snip_tip_undo || 'Undo (Ctrl+Z)', undo);
 			var redoBtn = button('lpn_snip_redo', 'redo', pc.lpn_snip_tip_redo || 'Redo (Ctrl+Y)', redo);
@@ -42854,7 +42863,8 @@ var EngCalcs = EngCalcs || {};
 			snipEditor = { el: el, onKey: function (e) {
 				e.stopPropagation();
 				var k = e.key, mod = e.ctrlKey || e.metaKey;
-				if (k === 'Escape') { e.preventDefault(); if (eraser) { setEraser(false); } else { closeSnipEditor(); } }
+				// Esc never throws strokes away: it leaves the eraser, and closes only an unmarked view.
+				if (k === 'Escape') { e.preventDefault(); if (eraser) { setEraser(false); } else if (!strokes.length) { closeSnipEditor(); } }
 				else if (mod && !e.shiftKey && (k === 'z' || k === 'Z')) { e.preventDefault(); undo(); }
 				else if (mod && (k === 'y' || k === 'Y' || (e.shiftKey && (k === 'z' || k === 'Z')))) { e.preventDefault(); redo(); }
 				else if (!mod && !e.altKey && (k === 'e' || k === 'E')) { e.preventDefault(); setEraser(!eraser); }
