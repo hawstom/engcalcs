@@ -130,7 +130,7 @@ async function main() {
 		await a.settle(500);
 		await a.menuClick(await a.lang('lpn_find_menu'), 'edit');
 		await a.settle(500);
-		await drag(a, '#lpn_settings_box .lpn-setbox-title', 120, 90);
+		await drag(a, '#lpn_settings_box .lpn-setbox-title', -150, 90);
 		await resizeBy(a, 'lpn_settings_box', 60, 40);
 		await a.settle(500);
 		await drag(a, "#lpn_find_popup .lpn-setbox-title", 0, 160);
@@ -156,7 +156,7 @@ async function main() {
 		ok('with the keys cleared, neither box comes back', (await rect(a, 'lpn_settings_box')) === null && (await rect(a, 'lpn_find_popup')) === null);
 		const keysCleared = await allKeys(a);
 		const dlg = await importWorkspace(a, out.text);
-		ok('a report dialog says what was applied and that the page reloads', !!dlg && /Workspace applied/.test(dlg.text) && /reload/.test(dlg.text), dlg && dlg.text);
+		ok('a report dialog says what was applied and that the page reloads', !!dlg && /Workspace applied/.test(dlg.text) && !/records/i.test(dlg.text) && /reload/.test(dlg.text), dlg && dlg.text);
 		await Promise.all([a.page.waitForNavigation({ timeout: 10000 }), a.dialogClick('OK')]);
 		await a.page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } delete window.lpnDialogAnswerer; });
 		await a.settle(2000);
@@ -189,7 +189,7 @@ async function main() {
 			lpn_runbox: 'off', lpn_index: 'EVIL', lpn_project_zzz: '{}', lpn_identity: 'EVIL', ec_consent: 'x', unknown_key: 'y',
 			lpn_setbox: 'not json {' } });
 		const d = await importWorkspace(a, mixed, 'mixed.json');
-		ok('a file with strangers applies what it knows and reports the rest', !!d && /Records set: 1\./.test(d.text) && /ignored: 6\./.test(d.text), d && d.text);
+		ok('a file with strangers applies what it knows and reports the rest', !!d && /Settings applied: 1\./.test(d.text) && /recognized: 6\./.test(d.text), d && d.text);
 		await Promise.all([a.page.waitForNavigation({ timeout: 10000 }), a.dialogClick('OK')]);
 		await a.page.evaluate(() => { delete window.lpnDialogAnswerer; });
 		await a.settle(1500);
@@ -198,6 +198,22 @@ async function main() {
 		ok('the project index and identity were not overwritten, no stranger key appeared', fin.lpn_identity === snap.lpn_identity && fin.lpn_index.indexOf('EVIL') < 0 && !('lpn_project_zzz' in fin) && !('unknown_key' in fin) && fin.ec_consent === undefined);
 		ok('keys absent from the file were returned to their defaults', fin.lpn_setbox === undefined && fin.lpn_findbox === undefined);
 		ok('no uncaught page errors', a.errors.length === 0, a.errors.slice(0, 2).join(' | '));
+
+		console.log('\n--- 5. boxes from a bigger screen land inside this window ---');
+		const big = JSON.stringify({ format: 'engcalcs-lpn-workspace', version: 1, settings: {
+			lpn_setbox: JSON.stringify({ left: 5000, top: 4000, w: 430, h: 380, open: true }),
+			lpn_findbox: JSON.stringify({ left: -3000, top: -50, w: 400, h: 300, open: true }) } });
+		const d5 = await importWorkspace(a, big, 'big.json');
+		ok('the big-screen file is accepted', !!d5 && /Workspace applied/.test(d5.text), d5 && d5.text);
+		await Promise.all([a.page.waitForNavigation({ timeout: 10000 }), a.dialogClick('OK')]);
+		await a.page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } delete window.lpnDialogAnswerer; });
+		await a.settle(2000);
+		for (const id of ['lpn_settings_box', 'lpn_find_popup']) {
+			const r = await rect(a, id);
+			const vp = await a.page.evaluate(() => ({ w: innerWidth, h: innerHeight }));
+			ok(id + ' is open with its whole title bar inside the window', !!r && r.l >= 0 && r.l + r.w <= vp.w + 1 && r.t >= 0 && r.t + 40 <= vp.h, JSON.stringify([r, vp]));
+		}
+		ok('no uncaught page errors (after import 5)', a.errors.length === 0, a.errors.slice(0, 2).join(' | '));
 		await a.close();
 
 		console.log('\n--- 4. the allow-list check fails on a key that is in neither list ---');

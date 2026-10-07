@@ -42085,7 +42085,7 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {}, text = workspaceFileText(), n, name = 'lpn-workspace.json';
 		n = Object.keys(JSON.parse(text).settings).length;
 		downloadBlob(new Blob([text], { type: 'application/json' }), name);
-		setNotice((pc.lpn_workspace_exported || 'Exported {file}. Saved layout and preference records: {n}.')
+		setNotice((pc.lpn_workspace_exported || 'Workspace saved to {file}: {n} settings.')
 			.split('{file}').join(name).split('{n}').join(String(n)));
 	}
 	function pickWorkspaceFile() {
@@ -42103,6 +42103,22 @@ var EngCalcs = EngCalcs || {};
 		if (LPN_WORKSPACE_PLAIN.indexOf(key) >= 0) { return v.length <= 40 && !/^[\[{]/.test(v); }
 		try { j = JSON.parse(v); } catch (e) { return false; }
 		return !!j && typeof j === 'object';
+	}
+	// **A BOX FROM A BIGGER SCREEN MUST LAND WHERE ITS TITLE BAR CAN BE GRABBED.** A box stored at
+	// left 5000 or top 4000 would otherwise come back with a sliver showing. Only the imported
+	// value is moved, into this window: the bar fully inside, below the menu and toolbar.
+	function workspaceClampBox(key, raw) {
+		var v, w, floor, maxLeft, maxTop;
+		if (LPN_WORKSPACE_PLAIN.indexOf(key) >= 0) { return raw; }
+		try { v = JSON.parse(raw); } catch (e) { return raw; }
+		if (!v || typeof v.left !== 'number' || typeof v.top !== 'number') { return raw; }
+		w = typeof v.w === 'number' && isFinite(v.w) ? v.w : 0;
+		floor = typeof chromeFloor === 'function' ? chromeFloor() : 0;
+		maxLeft = Math.max(0, window.innerWidth - Math.min(w, window.innerWidth));
+		maxTop = Math.max(floor, window.innerHeight - 48);
+		v.left = Math.round(Math.min(Math.max(0, v.left), maxLeft));
+		v.top = Math.round(Math.min(Math.max(floor, v.top), maxTop));
+		return JSON.stringify(v);
 	}
 	/** Pure: what a workspace file's text would do, with nothing applied. `ok:false` carries the
 	 * language key of the refusal. Exported for the harness. */
@@ -42123,7 +42139,7 @@ var EngCalcs = EngCalcs || {};
 		for (k in doc.settings) {
 			if (!Object.prototype.hasOwnProperty.call(doc.settings, k)) { continue; }
 			if (!allowed[k] || !workspaceValueOk(k, doc.settings[k])) { ignored++; continue; }
-			set[k] = doc.settings[k];
+			set[k] = workspaceClampBox(k, doc.settings[k]);
 		}
 		// A key the file does not carry is a key at its default, so it is cleared: otherwise a
 		// layout flag that exists only while it is OFF could never be switched back by an import.
@@ -42150,10 +42166,10 @@ var EngCalcs = EngCalcs || {};
 				tellNotice(pc.lpn_workspace_refused_storage || 'Browser storage is full or unavailable, so the workspace was not applied.');
 				return;
 			}
-			msg = (pc.lpn_workspace_imported || 'Workspace applied from {file}. Records set: {n}. Returned to their defaults: {r}. The page reloads now, once, to lay out your boxes.')
+			msg = (pc.lpn_workspace_imported || 'Workspace applied from {file}. Settings applied: {n}. Returned to their defaults: {r}. The page reloads now, once, to lay out your boxes.')
 				.split('{file}').join(file.name || '').split('{n}').join(String(nSet)).split('{r}').join(String(nDrop));
 			if (plan.ignored) {
-				msg += ' ' + (pc.lpn_workspace_ignored || 'Entries in the file that were not recognized and were ignored: {u}.').split('{u}').join(String(plan.ignored));
+				msg += ' ' + (pc.lpn_workspace_ignored || 'Entries ignored because they were not recognized: {u}.').split('{u}').join(String(plan.ignored));
 			}
 			logMessage(msg, 'notice');
 			askDialog({ kind: 'alert', text: msg }, function () { window.location.reload(); });

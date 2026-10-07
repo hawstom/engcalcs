@@ -367,13 +367,13 @@ never edits a synonym.
   > Export…
   @@ NEEDS RULING
 - **`lpn_file_export_workspace_tip`**
-  > Download a small file holding where your boxes sit, their sizes, which are open or docked, your pane and column sizes, and your other browser preferences. Your projects and project settings are not in it. Load it on another screen or browser with File, Import, Workspace.
+  > Download a small file holding where your boxes sit, their sizes, which are open or docked, and your pane and column sizes, plus the reading preferences of this page. Your projects, project settings and cookies (language, consent, units) are not in it. Load it on another screen or browser with File, Import, Workspace.
   @@ NEEDS RULING
 - **`lpn_file_import_workspace`**
   > Workspace…
   @@ NEEDS RULING
 - **`lpn_file_import_workspace_tip`**
-  > Apply a workspace file saved with File, Export, Workspace: box positions and sizes, docking, pane sizes and your other browser preferences. Your projects are not touched. The page reloads once to lay the boxes out.
+  > Apply a workspace file saved with File, Export, Workspace: box positions and sizes, docking, pane sizes and the reading preferences of this page. Your projects and cookies are not touched. The page reloads once to lay the boxes out.
   @@ NEEDS RULING
 - **`lpn_find_scope_source`**
   > Source
@@ -751,13 +751,13 @@ never edits a synonym.
   > EPANET refuses this tank. The lowest water depth must not exceed the water depth, and the water depth must not exceed the highest water depth.
   @@ NEEDS RULING
 - **`lpn_workspace_exported`**
-  > Exported {file}. Saved layout and preference records: {n}.
+  > Workspace saved to {file}: {n} settings.
   @@ NEEDS RULING
 - **`lpn_workspace_ignored`**
-  > Entries in the file that were not recognized and were ignored: {u}.
+  > Entries ignored because they were not recognized: {u}.
   @@ NEEDS RULING
 - **`lpn_workspace_imported`**
-  > Workspace applied from {file}. Records set: {n}. Returned to their defaults: {r}. The page reloads now, once, to lay out your boxes.
+  > Workspace applied from {file}. Settings applied: {n}. Returned to their defaults: {r}. The page reloads now, once, to lay out your boxes.
   @@ NEEDS RULING
 - **`lpn_workspace_refused_format`**
   > This is not a workspace file saved by this page, so nothing was changed.
@@ -785,7 +785,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**120 still to read**, of 123 new keys across 20 unmerged branch(es).
+**120 still to read**, of 123 new keys across 16 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -796,9 +796,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/technical-english (`2f755ce7`) — adds no English strings
-
-### feat/bentley-interop (`415af3e7`) — 63 new, 63 to read @@ NEEDS RULING
+### feat/bentley-interop (`e2ddbddc`) — 63 new, 63 to read @@ NEEDS RULING
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -992,7 +990,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/desktop (`baba0f04`) — adds no English strings
 
-### feat/dxf (`5b7618f2`) — 12 new, 12 to read @@ NEEDS RULING
+### feat/dxf (`e0fd1f33`) — 12 new, 12 to read @@ NEEDS RULING
 
 - **`lpn_dxf_export_failed`**
   > The DXF file was not written: an error in this page stopped it ({error}).
@@ -1053,7 +1051,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`2e5e81c4`) — adds no English strings
 
-### feat/message-dismiss (`025f738c`) — 4 new, 4 to read @@ NEEDS RULING
+### feat/message-dismiss (`89713179`) — 4 new, 4 to read @@ NEEDS RULING
 
 - **`lpn_hotkeys_zoomwin_def`**
   > Zoom Window: drag a rectangle to zoom to.
@@ -1074,7 +1072,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Points data<br />(use Copy to see format)
   @@ NEEDS RULING
 
-### feat/table-export (`3c0c093e`) — 14 new, 14 to read @@ NEEDS RULING
+### feat/table-export (`de2a443b`) — 14 new, 14 to read @@ NEEDS RULING
 
 - **`lpn_export_table_all`**
   > All
@@ -1119,7 +1117,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Export table as ODS
   @@ NEEDS RULING
 
-### feat/user-guide (`7ff71a96`) — 26 new, 26 to read @@ NEEDS RULING
+### feat/user-guide (`9c315b4b`) — 26 new, 26 to read @@ NEEDS RULING
 
 - **`lpn_guide_also`**
   > Also in {menu}
@@ -1202,12 +1200,6 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/visit-dedupe (`08c07d31`) — adds no English strings
 
-### feat/workspace (`5c779c23`) — adds no English strings
+### feat/workspace (`bb01f8e6`) — adds no English strings
 
 ### fix/contour-breakline (`8a0177e6`) — adds no English strings
-
-### fix/label-clean-ground (`821e3006`) — adds no English strings
-
-### fix/menu-and-repeat (`dd1c8b52`) — adds no English strings
-
-### fix/merge-1007 (`9e169a1a`) — adds no English strings

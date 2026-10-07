@@ -2094,12 +2094,12 @@ $ec_lang['lpn_file_export_geojson']='Export GeoJSON file…';
 $ec_lang['lpn_file_export_geojson_tip']='Download this network as a GeoJSON file for QGIS, ArcGIS Pro and other GIS programs. Junctions, tanks and reservoirs are points, and pipes, pumps and valves are lines that follow their vertices. Positions are latitude and longitude. Results are included only when the network has been solved.';
 // Workspace export and import (Tom, 2026-10-07). {file}, {n}, {r}, {u} and {version} are filled in by the page.
 $ec_lang['lpn_file_export_item_workspace']='Workspace…';
-$ec_lang['lpn_file_export_workspace_tip']='Download a small file holding where your boxes sit, their sizes, which are open or docked, your pane and column sizes, and your other browser preferences. Your projects and project settings are not in it. Load it on another screen or browser with File, Import, Workspace.';
+$ec_lang['lpn_file_export_workspace_tip']='Download a small file holding where your boxes sit, their sizes, which are open or docked, and your pane and column sizes, plus the reading preferences of this page. Your projects, project settings and cookies (language, consent, units) are not in it. Load it on another screen or browser with File, Import, Workspace.';
 $ec_lang['lpn_file_import_workspace']='Workspace…';
-$ec_lang['lpn_file_import_workspace_tip']='Apply a workspace file saved with File, Export, Workspace: box positions and sizes, docking, pane sizes and your other browser preferences. Your projects are not touched. The page reloads once to lay the boxes out.';
-$ec_lang['lpn_workspace_exported']='Exported {file}. Saved layout and preference records: {n}.';
-$ec_lang['lpn_workspace_imported']='Workspace applied from {file}. Records set: {n}. Returned to their defaults: {r}. The page reloads now, once, to lay out your boxes.';
-$ec_lang['lpn_workspace_ignored']='Entries in the file that were not recognized and were ignored: {u}.';
+$ec_lang['lpn_file_import_workspace_tip']='Apply a workspace file saved with File, Export, Workspace: box positions and sizes, docking, pane sizes and the reading preferences of this page. Your projects and cookies are not touched. The page reloads once to lay the boxes out.';
+$ec_lang['lpn_workspace_exported']='Workspace saved to {file}: {n} settings.';
+$ec_lang['lpn_workspace_imported']='Workspace applied from {file}. Settings applied: {n}. Returned to their defaults: {r}. The page reloads now, once, to lay out your boxes.';
+$ec_lang['lpn_workspace_ignored']='Entries ignored because they were not recognized: {u}.';
 $ec_lang['lpn_workspace_refused_unreadable']='This file could not be read as a workspace, so nothing was changed.';
 $ec_lang['lpn_workspace_refused_format']='This is not a workspace file saved by this page, so nothing was changed.';
 $ec_lang['lpn_workspace_refused_newer']='This workspace file was saved by a newer version of this page (format {version}), so nothing was changed.';
