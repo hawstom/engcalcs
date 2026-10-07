@@ -1,11 +1,10 @@
-// EVERY INSERTER STAYS ARMED, EXCEPT TEXT; EDIT HAS NO LIBRARIES ROW; REPORTS ROW LABELS, in a real Chrome.
+// EVERY INSERTER STAYS ARMED, TEXT INCLUDED; EDIT HAS NO LIBRARIES ROW; REPORTS ROW LABELS, in a real Chrome.
 //
 //   node dev/lpn-spike/inserter-repeat-browser-harness.js
 //
 // Tom, 2026-10-07: *"All inserters should be in repeater mode. Text is not."* One tool pick (the
 // shortcut digit), then several real clicks on the map: junction, reservoir, tank, pipe, pump,
-// valve and customer each place one thing per click and stay armed; Text places one and the tool
-// puts itself away. Also: Edit has no Libraries row (Water still does), and the Reports rows read
+// valve, customer and Text each place one thing per click and stay armed until Esc or another tool. Also: Edit has no Libraries row (Water still does), and the Reports rows read
 // Run (EPANET), Status (EPANET), Calibration, Full.
 'use strict';
 
@@ -113,17 +112,39 @@ async function main() {
 			const after = await count(a, 'data-cust');
 			ok('customer: three location+pipe pairs after one pick place three', after - before === 3, before + ' -> ' + after);
 		}
-		console.log('\n--- Text is one-shot ---');
+		console.log('\n--- Text repeats like every other inserter ---');
 		{
-			const T = 'text';
-			const before = await P.evaluate((t) => document.querySelectorAll('#lpn_canvas text').length, T);
+			const nT = () => count(a, 'data-lbl');
+			const row = (n) => ({ x: box.x + 150 + n * 140, y: box.y + 700 });
+			// 1. key 9: one pick, three clicks, three Texts.
+			let before = await nT();
 			await pick('9');
-			await click({ x: box.x + 300, y: box.y + 600 });
-			const one = await P.evaluate((t) => document.querySelectorAll('#lpn_canvas text').length, T);
-			await click({ x: box.x + 600, y: box.y + 650 });
-			const two = await P.evaluate((t) => document.querySelectorAll('#lpn_canvas text').length, T);
-			ok('Text: the first click places one', one - before >= 1, before + ' -> ' + one);
-			ok('Text: the second click places no second one', two === one, one + ' -> ' + two);
+			for (let i = 0; i < 3; i++) { await click(row(i)); }
+			ok('Text (key 9): three clicks after one pick place three', (await nT()) - before === 3, before + ' -> ' + (await nT()));
+			ok('Text (key 9): the tool is still armed', (await P.evaluate(() => document.querySelector('#lpn_toolbar button[aria-pressed=true]') && document.querySelector('#lpn_toolbar button[aria-pressed=true]').getAttribute('aria-label'))) === 'Text');
+			// Esc ends the repeat.
+			await P.keyboard.press('Escape'); await a.settle(200);
+			before = await nT();
+			await click({ x: box.x + 150, y: box.y + 800 });
+			ok('Esc ends the repeat: the next click places no Text', (await nT()) === before);
+			// 2. toolbar: one pick, three clicks, three Texts.
+			await P.keyboard.press('Escape');
+			await a.toolbarClick('Text'); await a.settle(200);
+			for (let i = 0; i < 3; i++) { await click({ x: box.x + 150 + i * 140, y: box.y + 560 }); }
+			ok('Text (toolbar): three clicks after one pick place three', (await nT()) - before === 3, before + ' -> ' + (await nT()));
+			// 3. another tool ends it.
+			await a.toolbarClick('Select'); await a.settle(200);
+			before = await nT();
+			await click({ x: box.x + 150 + 3 * 140, y: box.y + 560 });
+			ok('choosing another tool ends the repeat', (await nT()) === before);
+			// 4. editing an existing Text still works.
+			await click({ x: box.x + 150, y: box.y + 560 });
+			await P.waitForSelector('#lpn_popup_fields textarea', { timeout: 3000 });
+			await P.fill('#lpn_popup_fields textarea', 'Edited note');
+			await P.keyboard.press('Tab'); await a.settle(300);
+			const edited = await P.evaluate(() => Array.from(document.querySelectorAll('#lpn_canvas text[data-lbl]')).some((t) => (t.textContent || '').indexOf('Edited note') >= 0));
+			ok('editing an existing Text still works', edited);
+			await P.keyboard.press('Escape'); await a.settle(200);
 		}
 
 		console.log('\n--- menus ---');
