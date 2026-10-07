@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**117 still to read on master**, of 223 untranslated keys, of 2446 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**116 still to read on master**, of 222 untranslated keys, of 2444 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -97,7 +97,7 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   @@ NEEDS RULING
 
-## lpn_  (221, 115 to read @@ NEEDS RULING)
+## lpn_  (220, 114 to read @@ NEEDS RULING)
 
 - **`lpn_alt_calc_options`**
   > Calculation options
@@ -371,9 +371,6 @@ never edits a synonym.
   @@ NEEDS RULING
 - **`lpn_fb_sends`**
   > What this sends: the name of this page, your language, the version of the site, the code of the message on the map if there is one, and what you picked or typed. Never your drawing or your network. Your email address is used only to reply to you.
-  @@ NEEDS RULING
-- **`lpn_file_export_geojson`**
-  > Export GeoJSON file…
   @@ NEEDS RULING
 - **`lpn_file_export_geojson_tip`**
   > Download this network as a GeoJSON file for QGIS, ArcGIS Pro and other GIS programs. Junctions, tanks and reservoirs are points, and pipes, pumps and valves are lines that follow their vertices. Positions are latitude and longitude. Results are included only when the network has been solved.
@@ -776,7 +773,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**109 still to read**, of 112 new keys across 15 unmerged branch(es).
+**131 still to read**, of 134 new keys across 16 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -787,9 +784,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/technical-english (`70714fa0`) — adds no English strings
-
-### feat/bentley-interop (`f4e32def`) — 60 new, 60 to read @@ NEEDS RULING
+### feat/bentley-interop (`e6b7f7d0`) — 63 new, 63 to read @@ NEEDS RULING
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -797,8 +792,17 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_alt_cat_presentation`**
   > Presentation
   @@ NEEDS RULING
+- **`lpn_change_type_create_overrides`**
+  > Create overrides
+  @@ NEEDS RULING
 - **`lpn_change_type_line_alternative`**
   > {id}: {property} {value}, in alternative {alternative}
+  @@ NEEDS RULING
+- **`lpn_change_type_scenario_ask`**
+  > Current scenario is not Base. Create overrides?
+  @@ NEEDS RULING
+- **`lpn_change_type_switch_base`**
+  > Switch to Base
   @@ NEEDS RULING
 - **`lpn_pane_scn_cur_only`**
   > Current scenario only
@@ -974,7 +978,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/desktop (`baba0f04`) — adds no English strings
 
-### feat/dxf (`4b1b10f0`) — 12 new, 12 to read @@ NEEDS RULING
+### feat/dxf (`d578b129`) — 12 new, 12 to read @@ NEEDS RULING
 
 - **`lpn_dxf_export_failed`**
   > The DXF file was not written: an error in this page stopped it ({error}).
@@ -992,7 +996,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Layers are named {prefix}, the asset code, a hyphen, and the alternative, as in {example}. Each element is a block inserted at scale 1 with attributes 1 unit high; scale the blocks to set the text height. Only the ID attribute is visible; the ATTDISP command shows the others.
   @@ NEEDS RULING
 - **`lpn_dxf_note_categories`**
-  > {n} junctions have more than one demand category. Their {tag} attribute holds the first category only.
+  > {n} junctions have more than one demand category. Their {tag} attribute holds the sum of the base demands of all categories.
   @@ NEEDS RULING
 - **`lpn_dxf_note_crs`**
   > Coordinates: {crs}, exactly as this project states them.
@@ -1035,22 +1039,34 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`2e5e81c4`) — adds no English strings
 
-### feat/section-grid (`56174107`) — 1 new, 1 to read @@ NEEDS RULING
+### feat/message-dismiss (`2657d9b1`) — 4 new, 4 to read @@ NEEDS RULING
+
+- **`lpn_hotkeys_zoomwin_def`**
+  > Zoom Window: drag a rectangle to zoom to.
+  @@ NEEDS RULING
+- **`lpn_status_dismiss`**
+  > Hide this message
+  @@ NEEDS RULING
+- **`lpn_status_hidden`**
+  > {count} hidden
+  @@ NEEDS RULING
+- **`lpn_status_hidden_tip`**
+  > Show the hidden message again.
+  @@ NEEDS RULING
+
+### feat/section-grid (`005d4e63`) — 1 new, 1 to read @@ NEEDS RULING
 
 - **`points_data_points_heading`**
   > Points data<br />(use Copy to see format)
   @@ NEEDS RULING
 
-### feat/table-export (`0b6070a6`) — 10 new, 10 to read @@ NEEDS RULING
+### feat/table-export (`3c0c093e`) — 14 new, 14 to read @@ NEEDS RULING
 
 - **`lpn_export_table_all`**
   > All
   @@ NEEDS RULING
 - **`lpn_export_table_current`**
   > Current
-  @@ NEEDS RULING
-- **`lpn_export_table_format`**
-  > Format
   @@ NEEDS RULING
 - **`lpn_export_table_go`**
   > Export
@@ -1059,10 +1075,25 @@ build for that would be a gate nobody keeps. Refresh it with
   > Results are exported only for the scenario last calculated.
   @@ NEEDS RULING
 - **`lpn_export_table_title`**
-  > Export table
+  > Export to {format}
   @@ NEEDS RULING
-- **`lpn_file_export_table`**
-  > Export table…
+- **`lpn_file_export_csv_tip`**
+  > Download a table as the Tables pane shows it. Several tables come as one zip file of CSV files, with a file for each library their IDs refer to.
+  @@ NEEDS RULING
+- **`lpn_file_export_item_csv`**
+  > CSV file…
+  @@ NEEDS RULING
+- **`lpn_file_export_item_ods`**
+  > ODS file…
+  @@ NEEDS RULING
+- **`lpn_file_export_item_xlsx`**
+  > XLSX file…
+  @@ NEEDS RULING
+- **`lpn_file_export_tables_heading`**
+  > Tables and libraries
+  @@ NEEDS RULING
+- **`lpn_file_export_tables_tip`**
+  > Download the tables as the Tables pane shows them, one sheet each, with a sheet for each library their IDs refer to: patterns, curves, pipe types, and fittings.
   @@ NEEDS RULING
 - **`lpn_pane_copy_heads`**
   > Copy with headings
@@ -1074,7 +1105,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Export table as ODS
   @@ NEEDS RULING
 
-### feat/user-guide (`ab8cca0d`) — 26 new, 26 to read @@ NEEDS RULING
+### feat/user-guide (`9c315b4b`) — 26 new, 26 to read @@ NEEDS RULING
 
 - **`lpn_guide_also`**
   > Also in {menu}
@@ -1119,7 +1150,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Reports the energy use, peak power, and cost of each pump over the last extended period simulation, using each pump's efficiency and the energy price set under Settings, Energy. It needs a Total run time in Settings and a solved network. It does not change the network.
   @@ NEEDS RULING
 - **`lpn_guide_text_find_popup`**
-  > Finds the elements whose IDs or property values match what is typed, and can replace a value in the matches. A replacement changes the project and can be reversed with Undo.
+  > Finds the assets whose IDs or property values match what is typed, and can replace a value in the matches. A replacement changes the project and can be reversed with Undo.
   @@ NEEDS RULING
 - **`lpn_guide_text_full_box`**
   > Lists every node and every link at every reporting time step, in the units shown on the Tables pane. It is available after Calculate. Download or print carries every time step, and the table shows one at a time.
@@ -1128,13 +1159,13 @@ build for that would be a gate nobody keeps. Refresh it with
   > Lists every toolbar button and menu row, the keyboard shortcuts, and an entry for each box. Selecting a row shows where that control is; it never runs it. To search, press Ctrl+K from anywhere, or / while the guide has focus.
   @@ NEEDS RULING
 - **`lpn_guide_text_library_box`**
-  > Holds the project's patterns, curves, pipe types, fittings, controls, and rules. An element refers to a pattern, curve, pipe type, or fitting by its ID, and that item is edited here. Controls and rules apply to the whole network. All are saved with the project.
+  > Holds the project's patterns, curves, pipe types, fittings, controls, and rules. An asset refers to a pattern, curve, pipe type, or fitting by its ID, and that item is edited here. Controls and rules apply to the whole network. All are saved with the project.
   @@ NEEDS RULING
 - **`lpn_guide_text_notes_popup`**
   > Lists notes on how this page behaves and what it does not do, each as a term followed by its definition. It does not change the network.
   @@ NEEDS RULING
 - **`lpn_guide_text_popup`**
-  > Shows the properties of the selected element, or of several selected elements, beside the selection on the map or where the box was last moved. An edited value changes the network at once, and the element's map label and the Tables pane follow. Calculated results appear once the network is solved, automatically when Recalculate automatically is on, or by Calculate.
+  > Shows the properties of the selected asset or text, or of several selected assets, beside the selection on the map or where the box was last moved. An edited value changes the network at once, and the asset's map label and the Tables pane follow. The results of the last calculation are listed below the inputs and cannot be edited.
   @@ NEEDS RULING
 - **`lpn_guide_text_rptbox`**
   > Shows the text report written by the EPANET engine for the last run, including its warnings and the network summary. It is replaced each time the network is solved with the EPANET engine.
@@ -1143,7 +1174,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Solves every scenario from a copy of the drawing and tabulates, for each, the number of differences from Base, the lowest pressure, and the highest velocity. It does not change the project, and the scenario that is open is left as it was.
   @@ NEEDS RULING
 - **`lpn_guide_text_settings_box`**
-  > Holds the project's settings: symbology and labels, the map and page, values and ID prefixes for new assets, custom properties, and calculation options such as units, time, hydraulics, energy, and quality. Each is saved with the project, except Show the run progress box, which is kept in this browser. The position and size of this box are kept in this browser only.
+  > This is the only place where settings are made, and it is searchable: type one or more words in Search settings to list only the settings that mention all of them. The settings cover symbology and labels, the map and page, values and ID prefixes for new assets, custom properties, and calculation options such as units, time, hydraulics, energy, and quality. Each is saved with the project, except Show the run progress box, which is kept in this browser. The position and size of this box are kept in this browser only.
   @@ NEEDS RULING
 - **`lpn_guide_text_status_box`**
   > Lists, in time order, each change during the last extended period simulation: a pump, valve, or pipe opening or closing, a tank starting to fill or empty or becoming full or empty, and any time step that did not fully converge. Only changes are listed, not every time step.
@@ -1157,4 +1188,40 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/visit-dedupe (`08c07d31`) — adds no English strings
 
-### fix/menu-and-repeat (`4037f224`) — adds no English strings
+### feat/workspace (`be1d23ea`) — 11 new, 11 to read @@ NEEDS RULING
+
+- **`lpn_file_export_item_workspace`**
+  > Workspace…
+  @@ NEEDS RULING
+- **`lpn_file_export_workspace_tip`**
+  > Download a small file holding where your boxes sit, their sizes, which are open or docked, your pane and column sizes, and your other browser preferences. Your projects and project settings are not in it. Load it on another screen or browser with File, Import, Workspace.
+  @@ NEEDS RULING
+- **`lpn_file_import_workspace`**
+  > Workspace…
+  @@ NEEDS RULING
+- **`lpn_file_import_workspace_tip`**
+  > Apply a workspace file saved with File, Export, Workspace: box positions and sizes, docking, pane sizes and your other browser preferences. Your projects are not touched. The page reloads once to lay the boxes out.
+  @@ NEEDS RULING
+- **`lpn_workspace_exported`**
+  > Exported {file}. Saved layout and preference records: {n}.
+  @@ NEEDS RULING
+- **`lpn_workspace_ignored`**
+  > Entries in the file that were not recognized and were ignored: {u}.
+  @@ NEEDS RULING
+- **`lpn_workspace_imported`**
+  > Workspace applied from {file}. Records set: {n}. Returned to their defaults: {r}. The page reloads now, once, to lay out your boxes.
+  @@ NEEDS RULING
+- **`lpn_workspace_refused_format`**
+  > This is not a workspace file saved by this page, so nothing was changed.
+  @@ NEEDS RULING
+- **`lpn_workspace_refused_newer`**
+  > This workspace file was saved by a newer version of this page (format {version}), so nothing was changed.
+  @@ NEEDS RULING
+- **`lpn_workspace_refused_storage`**
+  > Browser storage is full or unavailable, so the workspace was not applied.
+  @@ NEEDS RULING
+- **`lpn_workspace_refused_unreadable`**
+  > This file could not be read as a workspace, so nothing was changed.
+  @@ NEEDS RULING
+
+### fix/contour-breakline (`8a0177e6`) — adds no English strings
