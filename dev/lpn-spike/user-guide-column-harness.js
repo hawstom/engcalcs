@@ -153,7 +153,8 @@ async function pass(browser, Session, tag, extra) {
 		ok('5. Properties shows the 2026-10-07 wording', props === enString('lpn_guide_text_popup'), props);
 		ok('...without the Recalculate sentence it replaced', !/Recalculate automatically/.test(props || ''));
 		const set = await entry('lpn_settings_box');
-		ok('...Settings shows its wording, leading with the only place and the search', set === enString('lpn_guide_text_settings_box') && /^This is the only place where settings are made, and it is searchable/.test(set || ''), set);
+		// Tom, 2026-10-07: his sentences, and no list of what the settings cover (they are all of them).
+		ok('...Settings shows its wording, leading with the only place and the search', set === enString('lpn_guide_text_settings_box') && /There is no other place to find settings\. The box is searchable/.test(set || '') && !/symbology/.test(set || ''), set);
 	} else {
 		const w = await page.evaluate(() => document.getElementById('lpn_guide_content').clientWidth);
 		ok('...measured at phone width (pane at most 390 px)', w <= 390, String(w));

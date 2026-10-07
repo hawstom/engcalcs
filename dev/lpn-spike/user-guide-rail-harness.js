@@ -134,7 +134,7 @@ async function desktop(browser, Session) {
 	ok('the rail lists the five sections and a row per box', ['toolbar', 'menus', 'map', 'tables', 'boxes'].every(k => links.indexOf(k) >= 0) && links.filter(k => /^box-/.test(k)).length >= 10, JSON.stringify(links));
 	await page.evaluate(() => { document.getElementById('lpn_guide_content').scrollTop = 0; });
 	await a.settle(250);
-	ok('at the top the first section is current', (await cur(page)) === 'toolbar', await cur(page));
+	ok('at the top the first section (Using the guide) is current', (await cur(page)) === 'using', await cur(page));
 	await page.evaluate(() => {
 		const c = document.getElementById('lpn_guide_content'), t = document.querySelector('[data-guide-key="tables"]');
 		c.scrollTop = t.getBoundingClientRect().top - c.getBoundingClientRect().top + c.scrollTop + 2;
