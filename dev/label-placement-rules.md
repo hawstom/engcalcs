@@ -353,8 +353,8 @@ is not only human, it is biological; it is real."*
   each round of testing would result in a successively better handful of tested and compared
   creative strategies and recipes for combining them."* **Not a rule.** It goes into round 7's
   strategy catalogue, handed to the builders as a suggestion (`dev/label-trials/round-7-plan.md` §3).
-- **His earlier draft of the same answers, found 2026-10-07, verbatim** (it says the same as the answers above and adds points):
-
+- **His earlier draft of the same answers, found 2026-10-07, verbatim** (it says the
+  same as the answers above and adds points):
   - **Proposal 2:** *"(1) This is the grand prize. This is Rule 1. This is the impossible. We can't
     fail anybody outright because nobody knows how to succeed yet. (2) I have been wondering, but I
     have not asked before now, how you evaluate success. And I am led to posit that anybody who is
@@ -367,7 +367,5 @@ is not only human, it is biological; it is real."*
     promising strategies, compile a list of a dozen or so strategies, and offer them as state of the
     art to the next Phase of builders. This one seems like it would be one among a dozen in such a
     list."*
-
-"Emergent ability or delusion?" is answered in `dev/label-trials/round-7-2026-10-07.md`; the phase-1
-close he proposes is `dev/label-trials/phase-1-summary.md`.
-
+  "Emergent ability or delusion?" is answered in `dev/label-trials/round-7-2026-10-07.md`; the
+  phase-1 close he proposes is `dev/label-trials/phase-1-summary.md`.
