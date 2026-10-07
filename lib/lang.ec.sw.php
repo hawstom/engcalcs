@@ -1755,7 +1755,6 @@ $ec_lang['lpn_file_import_inp']='Leta Faili la EPANET…';
 $ec_lang['lpn_file_import_inp_tip']='Soma mtandao kutoka faili la EPANET, iwe faili la maandishi la .inp au faili la .net linalohifadhiwa na EPANET, na ulihifadhi katika kivinjari hiki kama mradi mpya.';
 // The other direction (Task 281). A DOWNLOAD, so the word is Export rather than Save: this page
 // keeps no handle on an `.inp` and never writes back to one.
-$ec_lang['lpn_file_export_inp']='Hamisha faili la EPANET…';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_file_export_inp_tip']='Andika mtandao huu kama faili la EPANET .inp na ulipakue. Namba ulizoandika zinaandikwa kama ulivyoziandika kabisa. Chochote ambacho muundo wa .inp hauwezi kubeba kinaorodheshwa kwako baadaye.';
 $ec_lang['lpn_status_inp_exported']='{file} imehamishwa.';

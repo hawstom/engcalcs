@@ -1795,7 +1795,6 @@ $ec_lang['lpn_file_import_inp']='នាំចូលឯកសារ EPANET…';
 $ec_lang['lpn_file_import_inp_tip']='អានបណ្ដាញចេញពីឯកសារ EPANET ទាំងឯកសារអត្ថបទ .inp ឬឯកសារ .net ដែល EPANET រក្សាទុក រួចរក្សាទុកវានៅក្នុងកម្មវិធីរុករកនេះជាគម្រោងថ្មី។';
 // The other direction (Task 281). A DOWNLOAD, so the word is Export rather than Save: this page
 // keeps no handle on an `.inp` and never writes back to one.
-$ec_lang['lpn_file_export_inp']='នាំចេញឯកសារ EPANET…';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_file_export_inp_tip']='សរសេរបណ្ដាញនេះជាឯកសារ EPANET .inp មួយ ហើយទាញយកវា។ លេខដែលអ្នកបានវាយ ត្រូវបានសរសេរឲ្យដូចអ្វីដែលអ្នកបានវាយបេះបិទ។ អ្វីៗដែលទម្រង់ .inp មិនអាចផ្ទុកបាន ត្រូវបានរាយឲ្យអ្នកឃើញនៅពេលក្រោយ។';
 $ec_lang['lpn_status_inp_exported']='បាននាំចេញ {file}។';
