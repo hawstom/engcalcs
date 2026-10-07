@@ -67,6 +67,10 @@ EngCalcs.lpnPlacerC = (function () {
 	// growing looks only this far (convenient space), and MEND and NUDGE judge at most this many
 	// spots each.
 	var QUICK = { show: 120, grow: 50, mend: 2000, nudge: 600, deadline: 0 };
+	// R10, bounded by time and never by count (S21): past SOFT_MS a pan or zoom stops IMPROVING
+	// (growing, mending, repairing) and shows what is placed; past STOP_MS any search still running
+	// returns the best it has. Placing every label in its smallest form is never cut short.
+	var SOFT_MS = 450, STOP_MS = 750;
 	var NAME = 'C (keep, show, grow, mend)';
 
 	// INGREDIENTS, each switchable so its worth can be measured with it off (STRATEGY.md beside the
@@ -491,7 +495,12 @@ EngCalcs.lpnPlacerC = (function () {
 		function place(scene, opts) {
 			var prev = opts && opts.prev && opts.prev.layout && opts.prev.scene ? opts.prev : null;
 			var fp = fingerprint(scene, prev), out;
-			if (ready && ready.fp === fp) { out = ready.layout; } else { out = layout(scene, prev, QUICK); }
+			if (ready && ready.fp === fp) { out = ready.layout; } else {
+				var t0 = now(), q = {};
+				for (var k in QUICK) { q[k] = QUICK[k]; }
+				q.soft = t0 + SOFT_MS; q.stop = t0 + STOP_MS;
+				out = layout(scene, prev, q);
+			}
 			ready = null;
 			last = { scene: scene, prev: prev, fp: fp, layout: out };
 			return out;
@@ -574,11 +583,13 @@ EngCalcs.lpnPlacerC = (function () {
 				uncommit(st, L);
 				commit(st, L, bestFor(st, L, c0.rs, c0.cost - PREV_BONUS + (level ? LEVEL / 2 : 0), 40, level ? 'along' : true) || c0);
 			});
-			// 2. SHOW: everything else, with the label itself only.
+			// 2. SHOW: everything else, with the label itself only. Never cut short by time.
+			st.phase = 'show';
 			order.forEach(function (L) {
 				if (L.cur || (st.pan && L.prevHidden && !L.nearEdge)) { return; }
 				commit(st, L, bestFor(st, L, L.rowsets.length - 1, SHOW_MAX, effort.show));
 			});
+			st.phase = '';
 			// 3. GROW, in rounds.
 			grow(st, order);
 			// 4. MEND: a hidden label may evict one neighbour who can move.
@@ -593,17 +604,17 @@ EngCalcs.lpnPlacerC = (function () {
 			if (ING.fine) {
 				var t2 = [];
 				order.forEach(function (L) {
-					if (L.cur || (st.pan && L.prevHidden && !L.nearEdge) || st.late) { return; }
+					if (L.cur || (st.pan && L.prevHidden && !L.nearEdge) || st.late || over(st)) { return; }
 					if (effort.deadline && now() > effort.deadline) { return; }
 					var c = withFine(L, function () { return bestFor(st, L, L.rowsets.length - 1, SHOW_MAX, 0); });
 					if (c) { commit(st, L, c); t2.push(L); }
 				});
 				if (ING.evict) {
 					order.forEach(function (L) {
-						if (L.cur || (st.pan && L.prevHidden && !L.nearEdge)) { return; }
+						if (L.cur || (st.pan && L.prevHidden && !L.nearEdge) || over(st)) { return; }
 						st.fineMend = true;
-					withFine(L, function () { mend(st, [L], t2); });
-					st.fineMend = false;
+						withFine(L, function () { mend(st, [L], t2); });
+						st.fineMend = false;
 					});
 				}
 				st.fineGrow = true;
@@ -618,7 +629,7 @@ EngCalcs.lpnPlacerC = (function () {
 				if (!c0 || !L.along || c0.angle || L.panKept || alignedNow(L, c0)) { return; }
 				var own = (c0.cost || 0) - pen(L, c0.spec) - (c0.spec ? 0 : Math.min(0, c0.base));
 				uncommit(st, L);
-				commit(st, L, bestFor(st, L, c0.rs, Math.max(own + LEVEL / 2, SHOW_MAX), 60, 'along') || c0);
+				commit(st, L, bestFor(st, L, c0.rs, Math.max(own + LEVEL / 2, SHOW_MAX), 0, 'along') || c0);
 			});
 			// 5. Repeats along long pipes (R9), in whatever room is left.
 			for (i = 0; i < labels.length; i++) { if (labels[i].cur && labels[i].owner.t === 'link') { repeats(st, labels[i]); } }
@@ -1224,7 +1235,11 @@ EngCalcs.lpnPlacerC = (function () {
 			if (!sc) { sc = L.sc[rsI] = new Float64Array(specs.length); sc.fill(NaN); }
 			for (i = 0; i < specs.length; i++) {
 				if (specs[i].base >= bestCost) { break; }
-				if (st.effort.deadline && (i & 31) === 31 && now() > st.effort.deadline) { st.late = true; break; }
+				if ((i & 31) === 31 && (st.effort.deadline || st.effort.stop)) {
+					var tn = now();
+					if (st.effort.deadline && tn > st.effort.deadline) { st.late = true; break; }
+					if (st.effort.stop && tn > st.effort.stop && st.phase !== 'show') { break; }
+				}
 				sv = sc[i];
 				// A level spot for a label asked along its pipe carries the LEVEL penalty in its
 				// cost, which ranks it behind a spot along the pipe but never bars it: the bound is
@@ -1244,6 +1259,8 @@ EngCalcs.lpnPlacerC = (function () {
 			return best;
 		}
 
+		// Past the soft time bound of a pan or zoom: stop improving, show what is placed (R10).
+		function over(st) { return !!st.effort.soft && now() > st.effort.soft; }
 		// The LEVEL penalty a spot carries in its cost, for bounds that must not count it.
 		function pen(L, spec) { return L.along && spec && spec.t !== 'along' ? LEVEL / 2 : 0; }
 		// Is a level block already along its pipe (a pipe level on screen, within 5 degrees)?
@@ -1278,6 +1295,7 @@ EngCalcs.lpnPlacerC = (function () {
 				for (var i = 0; i < order.length; i++) {
 					var L = order[i], c0 = L.cur;
 					if (!c0 || c0.rs === 0 || L.stuck) { continue; }
+					if (over(st)) { return; }
 					uncommit(st, L);
 					var cur = dynCost(st, L, c0, c0.stat === undefined ? (c0.stat = staticCost(st, L, c0)) : c0.stat, Infinity);
 					if (cur === Infinity) { cur = c0.cost || 0; }
@@ -1301,7 +1319,7 @@ EngCalcs.lpnPlacerC = (function () {
 			for (var i = 0; i < order.length && st.work < limit; i++) {
 				var L = order[i];
 				if (L.cur || (st.pan && L.prevHidden && !L.nearEdge)) { continue; }
-				if (st.effort.deadline && now() > st.effort.deadline) { break; }
+				if ((st.effort.deadline && now() > st.effort.deadline) || over(st)) { break; }
 				var rsI = L.rowsets.length - 1, tried = {};
 				var sc = L.sc[rsI] || (L.sc[rsI] = new Float64Array(L.specs.length).fill(NaN));
 				for (var k = 0; k < L.specs.length && k < (st.fineMend ? 400 : (ING.evict ? 120 : 60)) && st.work < limit; k++) {
@@ -1347,7 +1365,7 @@ EngCalcs.lpnPlacerC = (function () {
 		}
 		function nudge(st, order, touched) {
 			var any = false, limit = st.work + st.effort.nudge, c = st.probe;
-			for (var i = 0; i < order.length && st.work < limit; i++) {
+			for (var i = 0; i < order.length && st.work < limit && !over(st); i++) {
 				var L = order[i], c0 = L.cur;
 				if (!c0 || c0.rs === 0 || L.panKept) { continue; }
 				var rsI = c0.rs - 1, tried = {};
