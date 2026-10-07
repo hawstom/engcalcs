@@ -1754,7 +1754,6 @@ $ec_lang['lpn_file_import_inp']='የEPANET ፋይል አስገባ…';
 $ec_lang['lpn_file_import_inp_tip']='ከEPANET ፋይል፣ ወይም ከ.inp የጽሑፍ ፋይል ወይም EPANET ከሚያስቀምጠው .net ፋይል፣ መረብ ያንብቡና በዚህ አሳሽ ውስጥ እንደ አዲስ ፕሮጀክት ያስቀምጡ።';
 // The other direction (Task 281). A DOWNLOAD, so the word is Export rather than Save: this page
 // keeps no handle on an `.inp` and never writes back to one.
-$ec_lang['lpn_file_export_inp']='የEPANET ፋይል ላክ…';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_file_export_inp_tip']='ይህን መረብ እንደ EPANET .inp ፋይል ጽፎ ያውርዱት። የተየቡት ቁጥሮች እርስዎ በተየቡት መንገድ በትክክል ይጻፋሉ። የ.inp ቅርጸት መያዝ የማይችለው ማንኛውም ነገር በኋላ ለእርስዎ ይዘረዘራል።';
 $ec_lang['lpn_status_inp_exported']='{file} ተልኳል።';

@@ -216,12 +216,11 @@ async function main() {
 			const label = await S('lpn_file_export_item_inp');
 			await page.click('#lpn_menu_file');
 			await page.waitForSelector('#lpn_menu_popup', { state: 'visible' });
-			// Export is a fly-out of File (2026-10-06): open it by its row, then press the row inside it.
-			const menu = await S('lpn_file_export_menu');
+			// Export is a fly-out of File: open it by its row, then press the row inside it.
 			await page.evaluate((l) => {
 				const r = Array.from(document.querySelectorAll('#lpn_menu_list button.lpn-menu-row')).find((b) => b.textContent.trim().indexOf(l) === 0);
 				if (r) { r.click(); }
-			}, menu);
+			}, await S('lpn_file_export_menu'));
 			await page.waitForSelector('#lpn_menu_list2 button.lpn-menu-row', { state: 'attached' });
 			const [dl] = await Promise.all([page.waitForEvent('download'), page.evaluate((l) => {
 				const r = Array.from(document.querySelectorAll('#lpn_menu_list2 button.lpn-menu-row')).find((b) => b.textContent.trim().indexOf(l) === 0);

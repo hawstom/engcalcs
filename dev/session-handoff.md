@@ -99,64 +99,66 @@ lines rather than appending corrections.
   tile counts at a 900 ms settle (basemap.js now waits for a pointable tile). Pre-existing and unrelated: `scale-publish-harness.js` (2 checks). The full `node dev/browser-pass/run.js` is green (1853/1853, 2026-10-04, Task 761); browser-pass specs are not in
   check_all.
 
-## STATE — 2026-10-06 evening to 10-07 early (sixth session; jasmine is on Arizona time now)
+## STATE — 2026-10-07 (seventh session, Arizona time)
 
-**Dates here are Arizona local from this session on** (Tom set jasmine to America/Phoenix
-2026-10-06; earlier sessions' dates were UTC, a day ahead of his evening).
+### Master = see `git log -1 master`, pushed. Production: Tom wrote "Pulling" 2026-10-07 (master was edc78d01); confirm with the About box
 
-### Master = see `git log -1 master`, pushed. Production = 9c71d54f (Tom pulled 2026-09-28)
+Merged this session: feat/web-mercator, feat/screenshot, feat/survey-code, feat/geojson,
+feat/backdrop-attach, feat/feedback (his typed "Merge"), chore/technical-english (his "Done", plus his
+41 interview answers applied: 38 ruled in english-key-rulings.json), fix/menu-and-repeat (Libraries
+off Edit; Reports "Run (EPANET)", "Status (EPANET)"; inserters already repeat), fix/label-clean-ground
+(label rule 1), fix/merge-1007 (two harnesses followed geojson's File > Export submenu). Deleted keys:
+lpn_file_export_inp, lpn_file_export_geojson (nothing rendered them).
 
-Merged this session (defect tracks, on green): mi/wi Paste points (two rounds: points only, then n
-and banks follow stations and tab text with 1,000.00 / 10,5 reads right); **Task 775's zombie
-label** (a rename left the label and a renamed pipe's line answering to the old ID: same on
-production; `rename-label-zombie-harness.js`); **pipe labels over node symbols** (204 on master since
-9ce21702; now 0, net +490 labels; `label-node-symbol-harness.js`); Task 779 (Shape) added. The
-Fotobi file never reached jasmine; the lost node symbols are still unreproduced.
+### Awaiting him (all on the Branch previews page with click lists)
 
-### Awaiting him (all on the Branch previews page with click lists; each passed Perry)
-
-- **Merge word still missing** (he did not answer): `feat/backdrop-attach` ("Good"),
-  `feat/feedback` ("looks great"), `feat/survey-code`, `feat/geojson`. Ask him to TYPE "Merge X".
-- **`feat/dxf`** (a5db182f): reshaped to `dev/dxf-interface.md` per his "Reshape": data only,
-  C-WATR-MODL-<code>-<ALT> layers, ALL CAPS, height 1, STYLE font `txt` (the blank font field was
-  the Arial), values as typed, MLEADER and results dropped. Seam with geojson unchanged.
-- **`feat/screenshot`** (236735e4): stroke eraser, Undo/Redo, icons, chevron shape menu; Esc with
-  strokes does nothing. Deleted keys: lpn_snip_button, _pen, _rectangle, _freehand,
-  lpn_screenshot_scale.
-- **`feat/table-export`** (0de5ecbd): ODS/XLSX wrap, freeze, widths; File > Export table... dialog.
-  Not opened in Excel or LibreOffice by anyone yet (neither installed): his pass is that test.
-- **`feat/section-grid`** (0345725c): "Points data" on both pages (paste fix already on master).
-- **`feat/user-guide`** (747fa29b): named Guide; Contents rail, search, Ctrl+K, F1, one "?" per box
-  title bar. **His call:** the corner tips of Fire flow / Critical assets / Demand scaling moved
-  into their Guide entries (reverses his 10-03/10-05 ask).
-- **`feat/bentley-interop`** (780ecda7, long burn): Owner column, Rank gone (key deleted, 27
-  files), Overrides only / Current scenario only, Clear override fast, "Save this view", audit
-  rows, Q12 marks everywhere. Q10 and Q12 explained to him in plain words (2026-10-06 report).
-- **`feat/web-mercator`** (2fbf8120, Task 775): 3857 is a projected project in metres, ground
-  lengths; 4326 "(suggested)".
-- **`feat/visit-dedupe`** (2de0a88e): STORAGE CHANGE, needs his yes: ec_seen 1 year; ec_nolog 1
-  year with a date, tester log and side count. No privacy row for the tester cookie (his
-  2026-08-12 call; Perry asks him to reconfirm).
-- **`chore/technical-english`** (4be0b5b5): house style is now standard civil-engineering technical
-  English (CLAUDE.md + language-strings.md); 151 CLEAR rewrites applied in en; 41 ASK held.
-- **His answers go in the interview page** https://claude.ai/artifact/3eMmdZMvaLg6Mcj4tsSPk8
-  (db collection `answers`, doc ids D01-D10 and `ask-<key>`). Read with ArtifactData list.
-  Apply ASK answers on `chore/technical-english`, then merge it, regenerate payloads, sprint.
+- Browser pass, each Perry-reviewed and fixed: `feat/table-export` (Export to... submenu, freeze, library
+  sheets; never opened in Excel/LibreOffice here), `feat/dxf` (MTEXT read-me, demand sum, real MTEXT
+  escapes), `feat/user-guide` (one column + Ida's audit), `feat/message-dismiss` (x + chip, Zoom Window row
+  and W), `feat/workspace` (File > Export/Import > Workspace), `feat/bentley-interop` (type overrides per
+  scenario with his three-button box; docked width uncapped), `fix/contour-breakline` (shorter fault line;
+  CC's own picture still shows a long east arm: his eye decides), `feat/section-grid` (code already copies
+  point rows only; could not reproduce his "header inputs": ask for the copied text).
+- `feat/visit-dedupe` BLOCKED ON HIM: counting each browser once per window (his D01 rule) needs a date per
+  page in ec_seen, which makes consent_body ("one-digit cookie") false: consent-version bump, 26
+  retranslations, $ec_lang_syn change. Or keep one digit and accept inexact counts. Builder's design and
+  cookie before/after in its report (this session's final report to Tom).
+- **His answers go in the interview page** https://claude.ai/artifact/J8dPJK2nX4Fs6xkH3yWwr3 (db
+  collection `answers`, ids E01-E08 and `w-<key>`). Read with ArtifactData list.
+- Wording questions: lpn_inp_export_flat_customers ("What are we talking about here?"), max-day/peak-hour
+  tips "Can these be combined?" (yes: one key with placeholders), lpn_wrong_tip rewritten by CC for the new
+  feedback box in his "new tone" (not ruled), Task 780 `.epp`.
 - Still from before: `feat/desktop`.
 
-### Label bench
+### Label port (Task 539)
 
-- `feat/label-placer` eaa25d02 (pushed): `feat/label-placer:dev/label-trials/placement-report-vs-production.md`
-  (builders 78-79% vs production 41.7%; zero overlaps vs 2,607; stability metric added: production
-  0 labels moved per 100, builders 3-14 on a repeat view, the cost of the clock),
-  `speed-phase-plan.md`, publish advice (arXiv after round 8). **ID-last is NO** (R1(3) in
-  `feat/label-placer:dev/label-placement-rules.md`). Port list: rules 1-3 port cleanly; D09 on the interview.
+- Rules 1 and 2 merged 2026-10-07. Rule 2 (rescue search): labels shown 38.3 -> 39.3 per 100 asked,
+  ~+7% pass time; its pipe fallback lifts labels-on-a-pipe 23.9 -> 26.2 per 100 shown. Clean-only is two
+  lines in `rescueDropped()` (js/lpn-collide.js): his call. Next: rule 3 (eviction). Bigger gains sit in
+  bench rule 6 (looser pad for would-be-hidden labels). Method: /home/haws/label-trials-work/{cleanground,rescue}.
 
 ### Next job
 
-- Read the interview answers; merge what he clears (merge master in first, regenerate payloads on
-  the merge, suite on the merge commit); then ONE translation sprint (Wave 0 first). Many new
-  English keys are waiting on these branches, so the sprint waits for the merges.
+- Merge what he clears (merge master in first, regenerate payloads on the merge, suite on the merge).
+  table-export and dxf both edit the File > Export submenu (table-export renames it "Export to..."): merge
+  one, then merge master into the other.
+- Then ONE translation sprint (Wave 0 first). Deferred this session on purpose: technical English changed
+  ~190 English strings, and six branches with new keys are waiting on his pass.
+- The feedback box strings merged today (lpn_fb_*) predate the technical-English style ("That did not
+  reach us"); give them the same pass before the sprint.
+
+### Traps met 2026-10-07 (seventh session)
+
+- **Six green branches merged in a row broke two harnesses together** (geojson moved Export EPANET file
+  into a submenu; two other branches' harnesses still clicked the old row). Every branch suite queued
+  after that failed the same two. Fix master first, in a fifth slot (`EC_CHECK_SLOTS=5`).
+- **A rewritten string can trip `harness wording pins`** by coincidence: "the project is unchanged" was a
+  check label in three harnesses. Reword the labels and lower the baseline.
+- **Applying interview answers by whole-value replace dropped two sentences** the page had shown only in
+  part (lpn_settings_runbox_tip). Diff every replaced value against the original before committing.
+- **The rulings file is not sorted**; a `sorted()` rewrite churned 200 lines. Insert, never re-sort.
+- **JS fallbacks drift with every English rewrite** (22 after technical English): fix with
+  `js_fallback_string_check.php --list`, watch double-escaped apostrophes.
 
 ### Traps met 2026-10-06 (sixth session)
 

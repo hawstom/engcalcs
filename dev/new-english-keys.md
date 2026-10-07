@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**128 still to read on master**, of 234 untranslated keys, of 2457 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**116 still to read on master**, of 222 untranslated keys, of 2444 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -39,7 +39,7 @@ is the one you meant. "The first one" is a complete answer.
   *The proposal:* PROPOSED A: '⚠ At least one junction is below {pressure} at the demands as entered (a demand scale of 1). All junctions keep {pressure} only if demands are cut to a demand scale of {m} or less.' PROPOSED B: '⚠ The demands as entered (a demand scale of 1) leave at least one junction below {pressure}. The largest demand scale that keeps every junction at {pressure} or above is {m}.' B paralle...
   @@ NEEDS RULING
 
-## Synonym entries to approve  (3, 1 to read @@ NEEDS RULING)
+## Synonym entries to approve  (6, 4 to read @@ NEEDS RULING)
 
 **These are translator notes (`$ec_lang_syn`), not visitor wording.** Each was written against an
 English string that has since changed, or against a key that no longer exists. Say which: keep it
@@ -73,7 +73,31 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   _Ruled 2026-10-05: Is this _syn needed?_
 
-## lpn_  (232, 126 to read @@ NEEDS RULING)
+- **`lpn_scenario_push_values`**
+  > Values discarded:
+  *Why stale:* the English changed after this synonym was written
+  *Written against:* Values thrown away:
+  *Current synonym:* Values thrown away, Values discarded, Values lost, Values wiped, Values replaced, Values displaced, Values cleared, Custom values cleared | a count follows this label, not a list of values
+  **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
+  @@ NEEDS RULING
+
+- **`rc_Hp`**
+  > <span class="ec-help" title="Ponding (Hp > yn) is desirable because it reduces upstream erosion. (USDA)">Inlet weir head, H<sub>p</sub> <span class="ec-tip">?</span></span>
+  *Why stale:* the English changed after this synonym was written
+  *Written against:* <span class="ec-help" title="Ponding (Hp > yn) is good — reduces upstream erosion. (USDA)">Inlet weir head, H<sub>p</sub> <span class="ec-tip">?</span></span>
+  *Current synonym:* | gloss: weir head
+  **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
+  @@ NEEDS RULING
+
+- **`rc_yn`**
+  > <span class="ec-help" title="Ponding (Hp > yn) is desirable because it reduces upstream erosion. (USDA)">Normal depth in inlet channel, y<sub>n</sub> <span class="ec-tip">?</span></span>
+  *Why stale:* the English changed after this synonym was written
+  *Written against:* <span class="ec-help" title="Ponding (Hp > yn) is good — reduces upstream erosion. (USDA)">Normal depth in inlet channel, y<sub>n</sub> <span class="ec-tip">?</span></span>
+  *Current synonym:* Enter the normal depth in the channel that delivers flow to this chute. | Upstream, not downstream: ponding reduces erosion UPSTREAM of the chute inlet (above/before it, toward the source). Do not flip the direction.
+  **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
+  @@ NEEDS RULING
+
+## lpn_  (220, 114 to read @@ NEEDS RULING)
 
 - **`lpn_alt_calc_options`**
   > Calculation options
@@ -103,7 +127,7 @@ never edits a synonym.
   > These are new, as on a newly drawn one:
   @@ NEEDS RULING
 - **`lpn_change_type_customers`**
-  > Only a pipe serves customers, so these customers are connected instead to the node shown in parentheses, where their demand already lands. They stay where they are drawn, and their demand is unchanged:
+  > Only a pipe serves customers, so these customers are connected instead to the node shown in parentheses, where their demand is already applied. They stay where they are drawn, and their demand is unchanged:
   @@ NEEDS RULING
 - **`lpn_change_type_key`**
   > ID: Lost entry
@@ -154,7 +178,7 @@ never edits a synonym.
   > Clear to hide the fill and the contour lines; select to bring them back as they were. Node colors stay.
   _Ruled OK 2026-10-05._
 - **`lpn_copy_opened_unsaved`**
-  > Opened {file} as a copy, with a new lock of its own that will be saved with the next file save.
+  > Opened {file} as a copy, with a new lock that will be saved with the next file save.
   @@ NEEDS RULING
 - **`lpn_cp_allow_tip`**
   > Allow only these characters:
@@ -250,8 +274,8 @@ never edits a synonym.
   > Demand scale
   _Ruled OK 2026-10-03._
 - **`lpn_ds_multiplier_tip`**
-  > The number each demand is multiplied by: 1.5 is half again as much water. It applies on top of the active scenario's own demand multiplier, which is already in the demands, and it is never saved in your project.
-  _Ruled OK 2026-10-03._
+  > The factor by which each demand is multiplied; 1.5 is a 50% increase. It applies in addition to the demand multiplier of the active scenario, which is already in the demands, and it is never saved in the project.
+  _Ruled 2026-10-07: Technical-English interview: Use proposed_
 - **`lpn_ds_no_junctions`**
   > This project has no junctions yet, so there are no demands to scale.
   _Ruled OK 2026-10-03._
@@ -307,7 +331,7 @@ never edits a synonym.
   > Solved with the EPANET solver, because the demand model is pressure driven.
   _Ruled OK 2026-10-05._
 - **`lpn_engine_unavailable_why`**
-  > Valves that open and close on their own cannot be solved without the EPANET solver. {reason}
+  > Pressure and flow control valves (PRV, PSV, FCV) cannot be solved without the EPANET solver. {reason}
   @@ NEEDS RULING
 - **`lpn_fb_bad_email`**
   > That email address does not look right. Correct it, or leave it empty.
@@ -348,9 +372,6 @@ never edits a synonym.
 - **`lpn_fb_sends`**
   > What this sends: the name of this page, your language, the version of the site, the code of the message on the map if there is one, and what you picked or typed. Never your drawing or your network. Your email address is used only to reply to you.
   @@ NEEDS RULING
-- **`lpn_file_export_geojson`**
-  > Export GeoJSON file…
-  @@ NEEDS RULING
 - **`lpn_file_export_geojson_tip`**
   > Download this network as a GeoJSON file for QGIS, ArcGIS Pro and other GIS programs. Junctions, tanks and reservoirs are points, and pipes, pumps and valves are lines that follow their vertices. Positions are latitude and longitude. Results are included only when the network has been solved.
   @@ NEEDS RULING
@@ -360,20 +381,8 @@ never edits a synonym.
 - **`lpn_file_export_item_inp`**
   > EPANET file…
   @@ NEEDS RULING
-- **`lpn_file_export_item_workspace`**
-  > Workspace…
-  @@ NEEDS RULING
 - **`lpn_file_export_menu`**
   > Export…
-  @@ NEEDS RULING
-- **`lpn_file_export_workspace_tip`**
-  > Download a small file holding where your boxes sit, their sizes, which are open or docked, and your pane and column sizes, plus the reading preferences of this page. Your projects, project settings and cookies (language, consent, units) are not in it. Load it on another screen or browser with File, Import, Workspace.
-  @@ NEEDS RULING
-- **`lpn_file_import_workspace`**
-  > Workspace…
-  @@ NEEDS RULING
-- **`lpn_file_import_workspace_tip`**
-  > Apply a workspace file saved with File, Export, Workspace: box positions and sizes, docking, pane sizes and the reading preferences of this page. Your projects and cookies are not touched. The page reloads once to lay the boxes out.
   @@ NEEDS RULING
 - **`lpn_find_scope_source`**
   > Source
@@ -502,8 +511,8 @@ never edits a synonym.
   > Demand deficit
   _Ruled OK 2026-10-05._
 - **`lpn_result_demand_deficit_tip`**
-  > The demand this junction asks for and does not receive, because the pressure is below the required pressure.
-  _Ruled OK 2026-10-05._
+  > The demand at this junction that is not delivered, because the pressure is below the required pressure.
+  _Ruled 2026-10-07: Technical-English interview: Use proposed_
 - **`lpn_result_pump_head`**
   > Head
   _Ruled OK 2026-10-03._
@@ -700,7 +709,7 @@ never edits a synonym.
   > The browser refused to start the EPANET solver. WebAssembly may be turned off by a security setting or an extension.
   @@ NEEDS RULING
 - **`lpn_time_no_engine_why`**
-  > The built-in solver calculates one moment at a time, so this is the network at {time} only: every pattern is read at that moment, and every tank still sits at its starting level instead of filling and draining. {reason}
+  > The built-in solver solves one instant at a time, so this is the network at {time} only: every pattern is read at that instant, and every tank remains at its initial level instead of filling and draining. {reason}
   @@ NEEDS RULING
 - **`lpn_time_scn_overrides`**
   > Scenario overrides:
@@ -742,34 +751,13 @@ never edits a synonym.
   > A Manning n is normally between {min} and {max}. A number outside that range is often a roughness meant for another friction method.
   @@ NEEDS RULING
 - **`lpn_valwarn_negative`**
-  > EPANET refuses a negative number here.
+  > EPANET does not accept a negative number here.
   @@ NEEDS RULING
 - **`lpn_valwarn_positive`**
-  > EPANET refuses zero or a negative number here.
+  > EPANET does not accept zero or a negative number here.
   @@ NEEDS RULING
 - **`lpn_valwarn_tank_levels`**
-  > EPANET refuses this tank. The lowest water depth must not exceed the water depth, and the water depth must not exceed the highest water depth.
-  @@ NEEDS RULING
-- **`lpn_workspace_exported`**
-  > Workspace saved to {file}: {n} settings.
-  @@ NEEDS RULING
-- **`lpn_workspace_ignored`**
-  > Entries ignored because they were not recognized: {u}.
-  @@ NEEDS RULING
-- **`lpn_workspace_imported`**
-  > Workspace applied from {file}. Settings applied: {n}. Returned to their defaults: {r}. The page reloads now, once, to lay out your boxes.
-  @@ NEEDS RULING
-- **`lpn_workspace_refused_format`**
-  > This is not a workspace file saved by this page, so nothing was changed.
-  @@ NEEDS RULING
-- **`lpn_workspace_refused_newer`**
-  > This workspace file was saved by a newer version of this page (format {version}), so nothing was changed.
-  @@ NEEDS RULING
-- **`lpn_workspace_refused_storage`**
-  > Browser storage is full or unavailable, so the workspace was not applied.
-  @@ NEEDS RULING
-- **`lpn_workspace_refused_unreadable`**
-  > This file could not be read as a workspace, so nothing was changed.
+  > EPANET does not accept this tank. The lowest water depth must not exceed the water depth, and the water depth must not exceed the highest water depth.
   @@ NEEDS RULING
 
 ## points_  (2, 2 to read @@ NEEDS RULING)
@@ -785,7 +773,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**120 still to read**, of 123 new keys across 16 unmerged branch(es).
+**131 still to read**, of 134 new keys across 16 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -796,7 +784,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/bentley-interop (`e2ddbddc`) — 63 new, 63 to read @@ NEEDS RULING
+### feat/bentley-interop (`e6b7f7d0`) — 63 new, 63 to read @@ NEEDS RULING
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -990,7 +978,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/desktop (`baba0f04`) — adds no English strings
 
-### feat/dxf (`e0fd1f33`) — 12 new, 12 to read @@ NEEDS RULING
+### feat/dxf (`d578b129`) — 12 new, 12 to read @@ NEEDS RULING
 
 - **`lpn_dxf_export_failed`**
   > The DXF file was not written: an error in this page stopped it ({error}).
@@ -1051,7 +1039,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`2e5e81c4`) — adds no English strings
 
-### feat/message-dismiss (`89713179`) — 4 new, 4 to read @@ NEEDS RULING
+### feat/message-dismiss (`2657d9b1`) — 4 new, 4 to read @@ NEEDS RULING
 
 - **`lpn_hotkeys_zoomwin_def`**
   > Zoom Window: drag a rectangle to zoom to.
@@ -1072,7 +1060,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Points data<br />(use Copy to see format)
   @@ NEEDS RULING
 
-### feat/table-export (`de2a443b`) — 14 new, 14 to read @@ NEEDS RULING
+### feat/table-export (`3c0c093e`) — 14 new, 14 to read @@ NEEDS RULING
 
 - **`lpn_export_table_all`**
   > All
@@ -1200,6 +1188,40 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/visit-dedupe (`08c07d31`) — adds no English strings
 
-### feat/workspace (`bb01f8e6`) — adds no English strings
+### feat/workspace (`be1d23ea`) — 11 new, 11 to read @@ NEEDS RULING
+
+- **`lpn_file_export_item_workspace`**
+  > Workspace…
+  @@ NEEDS RULING
+- **`lpn_file_export_workspace_tip`**
+  > Download a small file holding where your boxes sit, their sizes, which are open or docked, your pane and column sizes, and your other browser preferences. Your projects and project settings are not in it. Load it on another screen or browser with File, Import, Workspace.
+  @@ NEEDS RULING
+- **`lpn_file_import_workspace`**
+  > Workspace…
+  @@ NEEDS RULING
+- **`lpn_file_import_workspace_tip`**
+  > Apply a workspace file saved with File, Export, Workspace: box positions and sizes, docking, pane sizes and your other browser preferences. Your projects are not touched. The page reloads once to lay the boxes out.
+  @@ NEEDS RULING
+- **`lpn_workspace_exported`**
+  > Exported {file}. Saved layout and preference records: {n}.
+  @@ NEEDS RULING
+- **`lpn_workspace_ignored`**
+  > Entries in the file that were not recognized and were ignored: {u}.
+  @@ NEEDS RULING
+- **`lpn_workspace_imported`**
+  > Workspace applied from {file}. Records set: {n}. Returned to their defaults: {r}. The page reloads now, once, to lay out your boxes.
+  @@ NEEDS RULING
+- **`lpn_workspace_refused_format`**
+  > This is not a workspace file saved by this page, so nothing was changed.
+  @@ NEEDS RULING
+- **`lpn_workspace_refused_newer`**
+  > This workspace file was saved by a newer version of this page (format {version}), so nothing was changed.
+  @@ NEEDS RULING
+- **`lpn_workspace_refused_storage`**
+  > Browser storage is full or unavailable, so the workspace was not applied.
+  @@ NEEDS RULING
+- **`lpn_workspace_refused_unreadable`**
+  > This file could not be read as a workspace, so nothing was changed.
+  @@ NEEDS RULING
 
 ### fix/contour-breakline (`8a0177e6`) — adds no English strings

@@ -503,7 +503,7 @@
 			'These are the nodes that will be filled in: {ids}', want);
 		if (keepCount > 0 && replacing === undefined) {
 			s += '\n\n' + t('lpn_terrain_keep',
-				'{k} node(s) already have an elevation and will not be touched.').replace('{k}', keepCount)
+				'{k} node(s) already have an elevation and will not be changed.').replace('{k}', keepCount)
 				+ ' ' + named('lpn_terrain_keep_ids', 'They are: {ids}', keep);
 		}
 		s += '\n\n' + accuracy();
@@ -545,7 +545,7 @@
 		}
 		if (failedTiles > 0) {
 			parts.push(t('lpn_terrain_partial',
-				'{f} terrain tile(s) did not answer.').replace('{f}', failedTiles));
+				'{f} terrain tile(s) did not respond.').replace('{f}', failedTiles));
 		}
 		parts.push(accuracy());
 		parts.push(CREDIT);
@@ -746,7 +746,7 @@
 		var token = seam.token && seam.token();
 		if (!token) { return; }
 		if (running) {
-			notice(t('lpn_terrain_busy', 'Elevations are already being filled in. Wait for them.'));
+			notice(t('lpn_terrain_busy', 'Elevations are already being filled in. Wait for that to finish.'));
 			return;
 		}
 		if (!want || !want.length) { reportNothingToDo(); return; }
@@ -789,7 +789,7 @@
 		var token = seam.token && seam.token();
 		if (!token) { return; }
 		if (running) {
-			notice(t('lpn_terrain_busy', 'Elevations are already being filled in. Wait for them.'));
+			notice(t('lpn_terrain_busy', 'Elevations are already being filled in. Wait for that to finish.'));
 			return;
 		}
 		if (!want || !want.length) { reportNothingToDo(); return; }

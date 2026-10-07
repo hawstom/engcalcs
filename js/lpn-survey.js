@@ -963,7 +963,7 @@
 		var code = (parsed && parsed.error) || '', d = (parsed && parsed.detail) || '',
 			ax = axisWord(axes, (parsed && parsed.axis) || 'north');
 		if (code === 'empty') { return fill(PC.lpn_survey_err_empty || 'That file has nothing in it.', d, ax); }
-		if (code === 'ambiguous-coord') { return fill(PC.lpn_survey_err_ambiguous_coord || 'More than one column in that file could be the {axis} ({detail}), and this page will not choose between them. Leave one of them named as the {axis} and try again.', d, ax); }
+		if (code === 'ambiguous-coord') { return fill(PC.lpn_survey_err_ambiguous_coord || 'More than one column in that file could be the {axis} ({detail}), and this page does not choose between them. Leave only one of them named as the {axis} and try again.', d, ax); }
 		if (code === 'no-points') { return fill(PC.lpn_survey_err_no_points || 'Not one row of that file could be read as a surveyed point. Rows read: {detail}', d, ax); }
 		return fill(PC.lpn_survey_err_unreadable || 'That file could not be read as a surveyed point list.', d, ax);
 	};
@@ -1073,7 +1073,7 @@
 			.sort(function (a, b) { return (a.n.line - b.n.line) || (a.i - b.i); })
 			.map(function (w) { return { text: w.n.text, raw: w.n.raw }; });
 		if (!perLine.length && !fileWide.length) {
-			out.push({ text: PC.lpn_survey_report_clean || 'Every point in the file came across, and nothing was changed on the way in.', raw: null });
+			out.push({ text: PC.lpn_survey_report_clean || 'Every point in the file was imported without change.', raw: null });
 			return out;
 		}
 		// **A HEADING, NOT A LEAD-IN** (Tom, 2026-09-18: *"Import errors and notes:"*). What stood
