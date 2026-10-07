@@ -1490,6 +1490,13 @@ $ec_lang['lpn_pane_sel_only_none']='No elements are selected. Select elements on
 // Show scenarios (Tom, 2026-10-05): the table's cell menu switch that lists every asset once per
 // scenario, with a Scenario column after ID.
 $ec_lang['lpn_pane_scn_show']='Show scenarios';
+// Two switches on the cell menu while Show scenarios is on (Tom, 2026-10-07): keep only the rows whose
+// scenario holds a value of its own in this table, and keep only the open scenario's rows.
+$ec_lang['lpn_pane_scn_ov_only']='Overrides only';
+$ec_lang['lpn_pane_scn_cur_only']='Current scenario only';
+// The line above a table while either switch is on, beside the filter's own Show all. {filters} is one
+// or both of the two switch names, joined by a comma; {n} the rows showing, {all} the rows without them.
+$ec_lang['lpn_pane_scn_filter_note']='{filters}. Showing {n} of {all}.';
 // The cell menu's item that removes the selected cells' scenario overrides, so each reads what its
 // scenario inherits (Tom, 2026-10-06). Greyed when no selected cell holds one.
 $ec_lang['lpn_pane_clear_override']='Clear override';
@@ -3028,6 +3035,10 @@ $ec_lang['lpn_time_scn_overrides']='Scenario overrides:';
 $ec_lang['lpn_settings_table_major']='Major heading';
 $ec_lang['lpn_settings_table_minor']='Minor heading';
 $ec_lang['lpn_settings_table_category']='Category';
+// The Settings table's third heading level, between Minor heading and Setting: the label field, coloured
+// field, asset or custom property a group of settings belongs to (Tom, 2026-10-07: "We could call it
+// 'Owner'.").
+$ec_lang['lpn_settings_table_owner']='Owner';
 $ec_lang['lpn_settings_table_setting']='Setting';
 $ec_lang['lpn_settings_table_yes']='Yes';
 $ec_lang['lpn_settings_table_no']='No';
@@ -3037,6 +3048,15 @@ $ec_lang['lpn_settings_row_labels_part']='{labels}: {field}, {part}';
 $ec_lang['lpn_settings_row_labels_customer']='Customer labels';
 $ec_lang['lpn_settings_row_label_before']='Text before';
 $ec_lang['lpn_settings_row_label_after']='Text after';
+// A label field's settings, named in the Setting column with the field itself in the Owner column
+// (Tom, 2026-10-07: "Symbology.Node labels.ID.Is Active", "Show order", "Drop order"). Whether the
+// value appears on the label at all; where it sits on the label (1 first); which value is given up
+// first when labels crowd (1 first).
+$ec_lang['lpn_settings_row_label_on']='Is active';
+$ec_lang['lpn_settings_row_label_show']='Show order';
+$ec_lang['lpn_settings_row_label_drop']='Drop order';
+// The Setting column of an ID prefix row; the asset it applies to is in the Owner column.
+$ec_lang['lpn_settings_row_id_prefix']='ID prefix';
 $ec_lang['lpn_settings_row_symbol_cap_multiple']='Largest symbol, as a multiple of a typical pipe length';
 $ec_lang['lpn_settings_row_symbol_cap_percentile']='Typical pipe length, as a percentile of all pipe lengths';
 $ec_lang['lpn_settings_row_contour_labels']='Contour labels';
@@ -3788,9 +3808,7 @@ $ec_lang['lpn_energy_curve_note']='These pumps call an efficiency curve with no 
 // "Drop" heads the priority column (Task 445): the number says the order values and labels are
 // given up in, and the term of art, Priority, lives in the heading's own tip. It replaced an icon,
 // so it must stay about as short as one -- a heading that needs a wider box is the wrong word.
-// 'lpn_labels_col_rank' is what it replaced, kept unrendered because "Rank" is the OLD sense.
 $ec_lang['lpn_labels_col_decimals_example']='0.000';
-$ec_lang['lpn_labels_col_rank']='Rank';
 $ec_lang['lpn_labels_col_drop']='Drop';
 
 // ---- Task 441 follow-up: the two symbology groups each carry a colour scheme -----------------

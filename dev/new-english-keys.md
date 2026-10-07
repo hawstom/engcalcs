@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**94 still to read on master**, of 197 untranslated keys, of 2420 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**102 still to read on master**, of 205 untranslated keys, of 2427 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -73,7 +73,7 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   _Ruled 2026-10-05: Is this _syn needed?_
 
-## lpn_  (197, 94 to read @@ NEEDS RULING)
+## lpn_  (205, 102 to read @@ NEEDS RULING)
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -348,6 +348,15 @@ never edits a synonym.
 - **`lpn_pane_scn_alt_tip`**
   > {category} alt.: {alternative}
   @@ NEEDS RULING
+- **`lpn_pane_scn_cur_only`**
+  > Current scenario only
+  @@ NEEDS RULING
+- **`lpn_pane_scn_filter_note`**
+  > {filters}. Showing {n} of {all}.
+  @@ NEEDS RULING
+- **`lpn_pane_scn_ov_only`**
+  > Overrides only
+  @@ NEEDS RULING
 - **`lpn_pane_scn_show`**
   > Show scenarios
   @@ NEEDS RULING
@@ -510,11 +519,23 @@ never edits a synonym.
 - **`lpn_settings_row_emitter_exponent_old`**
   > Emitter exponent (older projects)
   @@ NEEDS RULING
+- **`lpn_settings_row_id_prefix`**
+  > ID prefix
+  @@ NEEDS RULING
 - **`lpn_settings_row_label_after`**
   > Text after
   @@ NEEDS RULING
 - **`lpn_settings_row_label_before`**
   > Text before
+  @@ NEEDS RULING
+- **`lpn_settings_row_label_drop`**
+  > Drop order
+  @@ NEEDS RULING
+- **`lpn_settings_row_label_on`**
+  > Is active
+  @@ NEEDS RULING
+- **`lpn_settings_row_label_show`**
+  > Show order
   @@ NEEDS RULING
 - **`lpn_settings_row_labels_customer`**
   > Customer labels
@@ -572,6 +593,9 @@ never edits a synonym.
   @@ NEEDS RULING
 - **`lpn_settings_table_no`**
   > No
+  @@ NEEDS RULING
+- **`lpn_settings_table_owner`**
+  > Owner
   @@ NEEDS RULING
 - **`lpn_settings_table_setting`**
   > Setting
@@ -671,7 +695,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**105 still to read**, of 108 new keys across 22 unmerged branch(es).
+**105 still to read**, of 108 new keys across 21 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -681,8 +705,6 @@ Each branch carries the commit it was read at. This part is a SNAPSHOT and is no
 fresh by the build — a branch moves whenever anybody commits on it, and failing master's
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
-
-### chore/roadmap-1006 (`94175840`) — adds no English strings
 
 ### chore/technical-english (`8e4d66b8`) — adds no English strings
 
@@ -710,7 +732,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Exported {zip}, holding the EPANET file {file}, its background picture {picture}, and the world file {world}. Extract all three into one folder, then open the .inp there in EPANET; the picture comes with it.
   @@ NEEDS RULING
 
-### feat/bentley-interop (`31308289`) — adds no English strings
+### feat/bentley-interop (`3b4ed634`) — adds no English strings
 
 ### feat/desktop (`baba0f04`) — adds no English strings
 
@@ -850,7 +872,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`2e5e81c4`) — adds no English strings
 
-### feat/screenshot (`3263b19f`) — 22 new, 22 to read @@ NEEDS RULING
+### feat/screenshot (`8a48a1d7`) — 22 new, 22 to read @@ NEEDS RULING
 
 - **`lpn_screenshot_copied`**
   > Screenshot copied.
@@ -919,7 +941,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Undo (Ctrl+Z)
   @@ NEEDS RULING
 
-### feat/section-grid (`2b918edc`) — 1 new, 1 to read @@ NEEDS RULING
+### feat/section-grid (`89905957`) — 1 new, 1 to read @@ NEEDS RULING
 
 - **`points_data_points_heading`**
   > Points data<br />(use Copy to see format)
@@ -991,7 +1013,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > {j} junction(s), {r} reservoir(s), {t} tank(s), and {p} pipe(s) imported, {m} of the nodes with elevation.
   @@ NEEDS RULING
 
-### feat/table-export (`0479ba2a`) — 9 new, 9 to read @@ NEEDS RULING
+### feat/table-export (`15e91ca0`) — 9 new, 9 to read @@ NEEDS RULING
 
 - **`lpn_export_table_all`**
   > All
@@ -1021,7 +1043,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Export table as ODS
   @@ NEEDS RULING
 
-### feat/user-guide (`3db1e4b8`) — 9 new, 9 to read @@ NEEDS RULING
+### feat/user-guide (`9f844e56`) — 9 new, 9 to read @@ NEEDS RULING
 
 - **`lpn_guide_also`**
   > Also in {menu}

@@ -28,7 +28,8 @@ function ok(name, cond, extra) {
 
 setUnitSet('us');
 const L = loadLoopedNetwork(EXAMPLE_EXPORTS +
-	"\t\tlabels: function () { return settingTableRows().map(function (r) { return { id: r.id, label: settingTableLabel(r.path), minor: r.minor }; }); },\n" +
+	"\t\tlabels: function () { return settingTableRows().map(function (r) { var os = settingTableOwnerSetting(r.path); return { id: r.id, label: settingTableLabel(r.path), minor: r.minor, owner: os.owner, setting: os.setting, cpKey: r.path[0] === 'customProps' ? customPropBareKey(r.path[1]) : '' }; }); },\n" +
+	"\t\taddCustomProp: function () { settings.customProps = [{ key: 'custom_date_installed', label: 'Date installed', applies: 'L', validate: 'none', restrictMode: 'allow', restrict: '#-', minLength: '', maxLength: '', low: '', high: '' }]; },\n" +
 	// Every view option on, in the project's own objects, the way the Settings and Labels boxes write them.
 	"\t\tallOn: function () {\n" +
 	"\t\t\tvar pc = EngCalcs.pageConfig || {};\n" +
@@ -69,18 +70,43 @@ const files = ['Net1.lwn', 'Net3-Novato-CA-World.lwn', 'Net3.lwn', 'Net2.lwn', '
 files.forEach(function (f) {
 	console.log('--- ' + f + ' ---');
 	L.applySaved(L.acceptImportedText(fs.readFileSync(ROOT + 'examples/' + f, 'utf8')));
-	const shipped = L.labels().filter((r) => CODE.test(r.label));
+	const shipped = L.labels().filter((r) => CODE.test(r.label.split(r.cpKey || '\u0000').join('')));
 	ok(f + ' as shipped: no Setting cell reads as a stored name', shipped.length === 0,
 		JSON.stringify(shipped.slice(0, 12).map((r) => r.label)));
 	L.allOn();
-	const all = L.labels(), bad = all.filter((r) => CODE.test(r.label));
+	const all = L.labels(), bad = all.filter((r) => CODE.test(r.label.split(r.cpKey || '\u0000').join('')));
 	ok(f + ' with every view option on (' + all.length + ' rows): no Setting cell reads as a stored name', bad.length === 0,
 		JSON.stringify(bad.slice(0, 12).map((r) => r.id + ' => ' + r.label)));
 	const seen = {}, dup = [];
 	// Node and link colours share their words; the Minor heading (Node colors, Link colors) tells them apart.
 	all.forEach((r) => { const k = r.minor + '|' + r.label; if (seen[k]) { dup.push(k); } seen[k] = true; });
 	ok('...and no two rows under one Minor heading share one label', dup.length === 0, JSON.stringify(dup.slice(0, 12)));
+	// The Owner column (Tom, 2026-10-07): Minor, Owner and Setting together name one row, in visitor
+	// words (a custom property's key is the user's own, as the box heads it), and never "Rank".
+	const seen2 = {}, dup2 = [], bad2 = all.filter((r) => (r.owner !== r.cpKey && CODE.test(r.owner)) || CODE.test(r.setting) || /Rank/.test(r.setting));
+	all.forEach((r) => { const k = r.minor + '|' + r.owner + '|' + r.setting; if (seen2[k]) { dup2.push(k); } seen2[k] = true; });
+	ok('...Owner and Setting are visitor words, never Rank', bad2.length === 0, JSON.stringify(bad2.slice(0, 8).map((r) => r.id + ' => ' + r.owner + ' / ' + r.setting)));
+	ok('...and no two rows share one Minor, Owner and Setting', dup2.length === 0, JSON.stringify(dup2.slice(0, 12)));
 });
+// Tom's own examples, row for row: Node labels.ID.Is active / Show order / Drop order, a label's Before
+// and After stated or not (his "Bef. and Aft."), and a custom property's design owned by its key.
+L.applySaved(L.acceptImportedText(fs.readFileSync(ROOT + 'examples/Net1.lwn', 'utf8')));
+L.addCustomProp();
+{
+	const rows = L.labels(), pick = (id) => rows.filter((r) => r.id === JSON.stringify(id))[0];
+	const on = pick(['labelSettings', 'node', 'id']), show = pick(['labelSettings', 'show', 'node', 'id']),
+		drop = pick(['labelSettings', 'priority', 'node', 'id']), bef = pick(['labelSettings', 'prefix', 'link', 'flow']),
+		aft = pick(['labelSettings', 'suffix', 'node', 'pressure']), uu = pick(['labelSettings', 'useUnits', 'node', 'pressure']),
+		cpl = pick(['customProps', 'custom_date_installed', 'label']), cpr = pick(['customProps', 'custom_date_installed', 'restrict']);
+	ok('Node labels, ID, Is active', on && on.owner === 'ID' && on.setting === 'Is active', JSON.stringify(on));
+	ok('Node labels, ID, Show order (not Rank)', show && show.owner === 'ID' && show.setting === 'Show order', JSON.stringify(show));
+	ok('Node labels, ID, Drop order', drop && drop.owner === 'ID' && drop.setting === 'Drop order', JSON.stringify(drop));
+	ok('an unstated Before is a row (Link labels, Flow, Text before)', bef && bef.owner === 'Flow' && bef.setting === 'Text before', JSON.stringify(bef));
+	ok('an unstated After is a row, and so is its Use units', !!aft && !!uu && uu.setting === 'Use units', JSON.stringify([aft, uu]));
+	ok('a custom property\'s design is rows owned by its key, under Custom properties',
+		cpl && cpl.owner === 'date_installed' && cpl.setting === 'Label' && cpl.minor === 'lpn_set_sub_customProps', JSON.stringify(cpl));
+	ok('...its character box named by its mode, as the box names it', cpr && cpr.setting === 'Allow only these characters', JSON.stringify(cpr));
+}
 // The pattern itself is live: a stored name it must refuse.
 ok('the check refuses a stored name (symbolCapMultiple, colorBreaks \u203a node.pressure)',
 	CODE.test('symbolCapMultiple') && CODE.test('colorBreaks \u203a node.pressure') && !CODE.test('Plain words, with a unit (in parentheses)'));

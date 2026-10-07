@@ -2289,6 +2289,9 @@ EngCalcs.pageConfig = {
 	lpn_pane_sel_only: <?=json_encode($ec_lang['lpn_pane_sel_only'])?>,
 	lpn_pane_sel_only_none: <?=json_encode($ec_lang['lpn_pane_sel_only_none'])?>,
 	lpn_pane_scn_show: <?=json_encode($ec_lang['lpn_pane_scn_show'])?>,
+	lpn_pane_scn_ov_only: <?=json_encode($ec_lang['lpn_pane_scn_ov_only'])?>,
+	lpn_pane_scn_cur_only: <?=json_encode($ec_lang['lpn_pane_scn_cur_only'])?>,
+	lpn_pane_scn_filter_note: <?=json_encode($ec_lang['lpn_pane_scn_filter_note'])?>,
 	lpn_pane_clear_override: <?=json_encode($ec_lang['lpn_pane_clear_override'])?>,
 	lpn_pane_scn_alt_tip: <?=json_encode($ec_lang['lpn_pane_scn_alt_tip'])?>,
 	lpn_pane_goto_tip: <?=json_encode($ec_lang['lpn_pane_goto_tip'])?>,
@@ -2602,7 +2605,6 @@ EngCalcs.pageConfig = {
 	lpn_labels_col_after: <?=json_encode($ec_lang['lpn_labels_col_after'])?>,
 	lpn_labels_col_decimals: <?=json_encode($ec_lang['lpn_labels_col_decimals'])?>,
 	lpn_labels_col_decimals_example: <?=json_encode($ec_lang['lpn_labels_col_decimals_example'])?>,
-	lpn_labels_col_rank: <?=json_encode($ec_lang['lpn_labels_col_rank'])?>,
 <?php // **A KEY THAT WAS TRANSLATED INTO ALL 26 AND NEVER REACHED THE PAGE.** The Labels panel read
       // `pc.lpn_labels_col_drop` and this line was not here, so the heading fell through to its
       // English fallback in every language while `lang.ec.es.php` had carried "Descarte" all along.
@@ -3497,6 +3499,7 @@ EngCalcs.pageConfig = {
 	lpn_settings_table_major: <?=json_encode($ec_lang['lpn_settings_table_major'])?>,
 	lpn_settings_table_minor: <?=json_encode($ec_lang['lpn_settings_table_minor'])?>,
 	lpn_settings_table_category: <?=json_encode($ec_lang['lpn_settings_table_category'])?>,
+	lpn_settings_table_owner: <?=json_encode($ec_lang['lpn_settings_table_owner'])?>,
 	lpn_settings_table_setting: <?=json_encode($ec_lang['lpn_settings_table_setting'])?>,
 	lpn_settings_table_yes: <?=json_encode($ec_lang['lpn_settings_table_yes'])?>,
 	lpn_settings_table_no: <?=json_encode($ec_lang['lpn_settings_table_no'])?>,
@@ -3506,6 +3509,10 @@ EngCalcs.pageConfig = {
 	lpn_settings_row_labels_customer: <?=json_encode($ec_lang['lpn_settings_row_labels_customer'])?>,
 	lpn_settings_row_label_before: <?=json_encode($ec_lang['lpn_settings_row_label_before'])?>,
 	lpn_settings_row_label_after: <?=json_encode($ec_lang['lpn_settings_row_label_after'])?>,
+	lpn_settings_row_label_on: <?=json_encode($ec_lang['lpn_settings_row_label_on'])?>,
+	lpn_settings_row_label_show: <?=json_encode($ec_lang['lpn_settings_row_label_show'])?>,
+	lpn_settings_row_label_drop: <?=json_encode($ec_lang['lpn_settings_row_label_drop'])?>,
+	lpn_settings_row_id_prefix: <?=json_encode($ec_lang['lpn_settings_row_id_prefix'])?>,
 	lpn_settings_row_symbol_cap_multiple: <?=json_encode($ec_lang['lpn_settings_row_symbol_cap_multiple'])?>,
 	lpn_settings_row_symbol_cap_percentile: <?=json_encode($ec_lang['lpn_settings_row_symbol_cap_percentile'])?>,
 	lpn_settings_row_contour_labels: <?=json_encode($ec_lang['lpn_settings_row_contour_labels'])?>,

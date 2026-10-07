@@ -3378,9 +3378,7 @@ $ec_lang['lpn_energy_curve_note']='Ці насоси посилаються на
 // "Drop" heads the priority column (Task 445): the number says the order values and labels are
 // given up in, and the term of art, Priority, lives in the heading's own tip. It replaced an icon,
 // so it must stay about as short as one -- a heading that needs a wider box is the wrong word.
-// 'lpn_labels_col_rank' is what it replaced, kept unrendered because "Rank" is the OLD sense.
 $ec_lang['lpn_labels_col_decimals_example']='0,000';
-$ec_lang['lpn_labels_col_rank']='Ранг';
 $ec_lang['lpn_labels_col_drop']='Пропуск';
 
 // ---- Task 441 follow-up: the two symbology groups each carry a colour scheme -----------------

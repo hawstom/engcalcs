@@ -26237,10 +26237,34 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		paneScnNoteScenarioSet(spec, info);
 		els.forEach(function (el) {
 			info.order.forEach(function (sc) {
-				list.push({ id: paneScnRowKey(el.id, sc.id), _lpnScn: { el: el, scn: sc, info: info } });
+				var row;
+				// **CURRENT SCENARIO ONLY** and **OVERRIDES ONLY** (Tom, 2026-10-07: *"Can the tables,
+				// in Show scenarios mode, have an options to show overrides only and show current
+				// scenario only?"*). Two filters on the rows, either or both: the open scenario's rows
+				// alone, and rows whose scenario holds at least one value of its own in a column of
+				// this table (the same rule that marks a cell amber, so Base's rows never qualify).
+				if (spec.scnCurOnly && sc.id !== activeScenario().id) { return; }
+				row = { id: paneScnRowKey(el.id, sc.id), _lpnScn: { el: el, scn: sc, info: info } };
+				if (spec.scnOvOnly && !paneScnRowHoldsOverride(spec, row)) { return; }
+				list.push(row);
 			});
 		});
 		return list;
+	}
+	function paneScnRowHoldsOverride(spec, row) {
+		var x = row._lpnScn;
+		if (!x || x.scn.isBase) { return false; }
+		if (x.el._lpnSetting) { return settingRowIsLocal(x.el, x.scn); }
+		return paneColsBase(spec).some(function (c) { return !!paneColProp(c) && paneScnCellIsLocal(c, row); });
+	}
+	// The two filters' switches, on the cell menu while Show scenarios is on. The selection is
+	// dropped, since the row it stood on may have gone.
+	function paneScnFilterToggle(spec, which) {
+		spec[which] = !spec[which];
+		spec.sel = null;
+		spec.lastOrderIds = null;
+		paneTableReset(spec);
+		renderPaneTable(spec);
 	}
 	function paneScnNoteScenarioSet(spec, info) {
 		var sig = info.order.map(function (sc) { return sc.id; }).sort().join(PANE_SCN_SEP);
@@ -26420,6 +26444,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			own = side(m) || (m === 'customerMaxWidth' ? 'lpn_set_sub_custLbl' : side(p[2]));
 			return own || 'lpn_set_sub_nodeLink';
 		}
+		if (p[0] === 'customProps') { return 'lpn_set_sub_customProps'; }
 		if (p[0] === 'project' || p[0] === 'view') { return 'lpn_set_sub_mapDisplay'; }
 		if (p[0] === 'times') { return 'lpn_set_sub_time'; }
 		if (p[0] === 'defaultPattern') { return 'lpn_set_sub_hydraulics'; }
@@ -26555,9 +26580,74 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		'labelSettings.customerMaxWidth': 'lpn_settings_row_customer_max_width',
 		'times.qualityStep': 'lpn_settings_row_quality_step', view: 'lpn_settings_row_view'
 	};
-	var LPN_SETTAB_LABEL_PARTS = { decimals: 'lpn_labels_col_decimals', show: 'lpn_labels_col_rank',
-		priority: 'lpn_labels_col_drop', useUnits: 'lpn_labels_use_units',
+	// **"SHOW ORDER" AND "DROP ORDER", NEVER "RANK"** (Tom, 2026-10-07: *"You called this Rank, but
+	// that is a very dangerous term."*). Rank was the Labels box's heading of the drop column before
+	// Task 445 made it Drop; nothing should have read it again.
+	var LPN_SETTAB_LABEL_PARTS = { decimals: 'lpn_labels_col_decimals', show: 'lpn_settings_row_label_show',
+		priority: 'lpn_settings_row_label_drop', useUnits: 'lpn_labels_use_units',
 		prefix: 'lpn_settings_row_label_before', suffix: 'lpn_settings_row_label_after' };
+	var LPN_SETTAB_PART_FALLBACK = { lpn_labels_col_decimals: 'Decimals', lpn_settings_row_label_show: 'Show order',
+		lpn_settings_row_label_drop: 'Drop order', lpn_labels_use_units: 'Use units',
+		lpn_settings_row_label_before: 'Text before', lpn_settings_row_label_after: 'Text after' };
+	// **THE OWNER COLUMN: THE THING A SETTING BELONGS TO, BETWEEN MINOR HEADING AND SETTING** (Tom,
+	// 2026-10-07: *"We need a third organizational hierarchy column to help organize the labels and
+	// custom properties settings... We could call it 'Owner'."*, with Symbology.Node labels.ID.Is
+	// Active and Assets.Custom properties.date_installed.Label as his examples). A label field, a
+	// coloured field, a contour field, an ID prefix's asset and a custom property each own several
+	// settings; a row with no such owner leaves the column blank and names itself in Setting.
+	// Returns {owner, setting}, owner '' where there is none.
+	function settingTableOwnerSetting(p) {
+		var pc = EngCalcs.pageConfig || {}, groups = { node: 1, link: 1, customer: 1 }, fld, partKey, k, own, asset;
+		function words(key) { return pc[key] || LPN_SETTAB_PART_FALLBACK[key] || key; }
+		function ownKey(path) { var kk = LPN_SETTAB_ROW_KEY[path.join('.')] || LPN_SETTAB_LABEL[path.join('.')]; return kk && pc[kk] ? pc[kk] : null; }
+		if (p[0] === 'customProps') { return { owner: customPropBareKey(p[1]), setting: customPropFieldWords(p[2], p[1]) }; }
+		if (p[0] === 'labelSettings' && p.length === 3 && groups[p[1]] && (fld = settingTableField(p[1], p[2]))) {
+			return { owner: fld, setting: pc.lpn_settings_row_label_on || 'Is active' };
+		}
+		if (p[0] === 'labelSettings' && p.length === 4 && groups[p[2]] && (partKey = LPN_SETTAB_LABEL_PARTS[p[1]]) &&
+			(fld = settingTableField(p[2], p[3]))) {
+			return { owner: fld, setting: words(partKey) };
+		}
+		if (p[0] === 'settings' && (p[1] === 'colorBreaks' || p[1] === 'colorModes') && p.length === 3 && (own = ownKey(p.slice(0, 2)))) {
+			k = String(p[2]).split('.');
+			fld = settingTableField(k[0], k.slice(1).join('.'));
+			if (fld) { return { owner: fld, setting: own }; }
+		}
+		if (p[0] === 'settings' && p[1] === 'contourInterval' && p.length === 3 && (own = ownKey(p.slice(0, 2)))) {
+			k = String(p[2]).split('|');
+			fld = settingTableField('node', k[0]);
+			if (fld) { return { owner: fld + (k[1] ? ' (' + k[1] + ')' : ''), setting: own }; }
+		}
+		if (p[0] === 'settings' && p[1] === 'idPrefixes' && p.length === 3) {
+			asset = { J: 'lpn_tool_add_junction', R: 'lpn_tool_add_reservoir', T: 'lpn_tool_add_tank', L: 'lpn_tool_add_pipe',
+				P: 'lpn_tool_add_pump', V: 'lpn_tool_add_valve', X: 'lpn_tool_add_text', M: 'lpn_tool_add_meter' }[p[2]];
+			if (asset && pc[asset]) { return { owner: pc[asset], setting: pc.lpn_settings_row_id_prefix || 'ID prefix' }; }
+		}
+		return { owner: '', setting: settingTableLabel(p) };
+	}
+	// ---- A CUSTOM PROPERTY'S DESIGN, AS SETTINGS TABLE ROWS (Tom, 2026-10-07, (5)) ----
+	// Each design field the Settings box edits is a row, owned by the property's key. **The design
+	// is the project's in every scenario** (dev/scenario-alternatives.md, Excluded: two scenarios
+	// disagreeing about a design would read the same value two ways), so these rows have no category,
+	// are never an override, and a scenario's row under Show scenarios is read-only. Typed in the
+	// open table they write the project's design, as the Settings box does from inside a scenario.
+	// The key itself is the Owner and is renamed in the box, which guards it against a duplicate.
+	var LPN_CP_TABLE_FIELDS = ['label', 'applies', 'validate', 'restrictMode', 'restrict', 'minLength', 'maxLength', 'low', 'high'];
+	function customPropFieldWords(field, key) {
+		var pc = EngCalcs.pageConfig || {};
+		return {
+			label: pc.lpn_cp_label || 'Label', applies: pc.lpn_cp_applies || 'Applies to', validate: pc.lpn_cp_validate || 'Validate as',
+			restrictMode: pc.lpn_cp_restrict_mode || 'Allow or restrict',
+			// The character box is captioned by its mode, as the Settings box captions it.
+			restrict: customPropOptionLabel(customPropRestrictOptions(), (customPropDefByKey(key) || {}).restrictMode, 'allow'),
+			minLength: pc.lpn_cp_minlength || 'Length lower limit', maxLength: pc.lpn_cp_length || 'Length upper limit',
+			low: pc.lpn_cp_low || 'Low limit', high: pc.lpn_cp_high || 'High limit'
+		}[field] || field;
+	}
+	function customPropRowDef(row) { return customPropDefByKey(row.path[1]); }
+	function customPropRowChoices(row) {
+		return row.path[2] === 'validate' ? customPropValidateOptions() : row.path[2] === 'restrictMode' ? customPropRestrictOptions() : null;
+	}
 	// Each token by name, so the placeholder check can see what substitutes it.
 	function settingTableFill(tpl, map) {
 		function v(k) { return map[k] === undefined ? '' : String(map[k]); }
@@ -26593,7 +26683,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// New-asset values say so ("New assets: Diameter"), so they do not read as a setting of the
 	// pipes already drawn.
 	function settingTableLabel(p) {
-		var bare = settingTableLabelBare(p);
+		var bare;
+		// A custom property's design field, named with the property's key, as the box heads it.
+		if (p[0] === 'customProps') {
+			return settingTableFill((EngCalcs.pageConfig || {}).lpn_settings_row_of || '{setting}, {member}',
+				{ setting: customPropBareKey(p[1]), member: customPropFieldWords(p[2], p[1]) });
+		}
+		bare = settingTableLabelBare(p);
 		if (p[0] === 'settings' && p[1] === 'defaults') {
 			return settingTableFill((EngCalcs.pageConfig || {}).lpn_settings_row_new_asset || 'New assets: {setting}', { setting: bare });
 		}
@@ -26676,6 +26772,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		[['settings', 'reactions', 'roughnessCorrelation'], undefined],
 		[['settings', 'energy', 'globalEfficiency'], 75], [['settings', 'energy', 'globalPrice'], 0],
 		[['settings', 'energy', 'globalPattern'], undefined], [['settings', 'energy', 'demandCharge'], 0],
+		[['settings', 'energy', 'currency'], undefined],
 		[['defaultPattern'], undefined], [['view'], undefined],
 		[['project', 'basemap'], 'osm']
 	];
@@ -26777,22 +26874,30 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		}
 		return 'str';
 	}
+	// Within one label field the box's own column order: the tick, Decimals, Before, After, Use
+	// units, Show order, Drop order. Added to the box position, which is the field's row.
+	var LPN_SETTAB_PART_ORDER = { decimals: 1, prefix: 2, suffix: 3, useUnits: 4, show: 5, priority: 6 };
+	function settingTablePartOrder(p) {
+		if (p[0] === 'customProps') { return LPN_CP_TABLE_FIELDS.indexOf(p[2]) / 100; }
+		return p[0] === 'labelSettings' && p.length === 4 ? (LPN_SETTAB_PART_ORDER[p[1]] || 0) / 10 : 0;
+	}
 	function settingTableRows() {
-		var seen = {}, out = [], held = [], dflt = {}, base = baseScenario(), f, places = settingBoxPlaces();
+		var seen = {}, out = [], held = [], dflt = {}, base = baseScenario(), f, places = settingBoxPlaces(),
+			freshLabels = defaultLabelSettings();
 		function add(path) {
 			var p = path.slice(), id, cat, h;
 			if (p[0] === 'times') { if (p[1] === 'text' || p.length < 2) { return; } p = p.slice(0, 2); }
-			cat = categoryOfSetting(p);
-			if (!cat) { return; }
+			cat = p[0] === 'customProps' ? null : categoryOfSetting(p);
+			if (!cat && p[0] !== 'customProps') { return; }
 			id = JSON.stringify(p);
 			if (seen[id]) { return; }
 			seen[id] = true;
 			h = settingTablePlace(p, places);
-			out.push({ id: id, _lpnSetting: true, path: p, cat: cat, home: settingRowHome(p),
-				major: h.major, minor: h.minor, order: h.order, n: out.length });
+			out.push({ id: id, _lpnSetting: true, path: p, cat: cat, home: p[0] === 'customProps' ? 'cp' : settingRowHome(p),
+				major: h.major, minor: h.minor, order: h.order + settingTablePartOrder(p), n: out.length });
 		}
 		// A fresh project's own values are the defaults of what it states.
-		settingLeaves({ settings: defaultSettings(), labelSettings: defaultLabelSettings() }).forEach(function (l) {
+		settingLeaves({ settings: defaultSettings(), labelSettings: freshLabels }).forEach(function (l) {
 			if (l.value !== null && l.value !== undefined) { dflt[JSON.stringify(l.path)] = l.value; }
 			add(l.path);
 		});
@@ -26803,6 +26908,28 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		(EngCalcs.LPN_TIME_FIELDS || LPN_SCENARIO_TIME_KEYS.map(function (k) { return [k]; })).forEach(function (t) { add(['times', t[0]]); });
 		Object.keys(projectTimes()).forEach(function (k) { add(['times', k]); });
 		add(['times', 'statistic']);
+		// **EVERY LABELS ROW'S BEFORE AND AFTER, AND ITS USE UNITS WHERE IT HAS A UNIT, STATED OR NOT**
+		// (Tom, 2026-10-07: *"I don't see Bef. and Aft. in the Settings table. Better do an audit."*).
+		// The prefix and suffix maps ship empty, because an unstated affix asks a default that follows
+		// the friction method and the unit, so walking the stated leaves found none of them; and a
+		// Use units tick a fresh project leaves unstated was missing the same way. A field with no
+		// number has no Decimals box in the Labels box, so it has no Decimals row either.
+		['node', 'link', 'customer'].forEach(function (g) {
+			Object.keys(freshLabels[g] || {}).forEach(function (fk) {
+				var keys = [fk];
+				if (fk === 'quality' && labelAffixKey(fk) !== fk) { keys.push(labelAffixKey(fk)); }
+				keys.forEach(function (k) { add(['labelSettings', 'prefix', g, k]); add(['labelSettings', 'suffix', g, k]); });
+				if (labelUnitsCapable(g, fk)) {
+					if (dflt[JSON.stringify(['labelSettings', 'useUnits', g, fk])] === undefined) { dflt[JSON.stringify(['labelSettings', 'useUnits', g, fk])] = false; }
+					add(['labelSettings', 'useUnits', g, fk]);
+				}
+			});
+		});
+		// Each custom property's design, field by field.
+		customPropDefs().forEach(function (d) {
+			if (!d.key) { return; }
+			LPN_CP_TABLE_FIELDS.forEach(function (fk) { add(['customProps', d.key, fk]); });
+		});
 		// The colour and contour settings of the fields being coloured now, stated or not.
 		['node', 'link'].forEach(function (g) {
 			f = settingFor(base, ['settings', g === 'node' ? 'colorNodeField' : 'colorLinkField']);
@@ -26820,7 +26947,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			return (v === undefined || v === null) || held.some(function (h) { return JSON.stringify(h.path) === r.id; });
 		});
 		out.forEach(function (r) {
-			var sample = settingFor(base, r.path), i;
+			var sample, i;
+			if (r.home === 'cp') {
+				r.kind = customPropRowChoices(r) ? 'choice' : 'str';
+				r.dflt = { validate: 'none', restrictMode: 'allow' }[r.path[2]];
+				return;
+			}
+			sample = settingFor(base, r.path);
 			for (i = 0; (sample === null || sample === undefined) && i < held.length; i++) {
 				if (JSON.stringify(held[i].path) === r.id) { sample = held[i].value; }
 			}
@@ -26832,7 +26965,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	// The value this row has in scenario `scn` (Base: the project's own), `undefined` when unstated.
 	function settingRowValue(row, scn) {
-		var v;
+		var v, d;
+		if (row.home === 'cp') {
+			d = customPropRowDef(row);
+			v = d ? d[row.path[2]] : undefined;
+			return (v === null || v === undefined || v === '') ? undefined : v;
+		}
 		if (row.home === 'dm') {
 			v = scn.isBase ? undefined : heldCalcOption(scn, 'demandMultiplier');
 			if (v === undefined) { v = (settings.hydraulics || {}).demandMultiplier; }
@@ -26844,7 +26982,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// A select row (a choice, or a yes/no) shows the Settings box's own options.
 	function settingRowIsSelect(row) { return row.kind === 'choice' || row.kind === 'bool'; }
 	function settingRowOptions(row, scn) {
-		var ch = row.kind === 'bool' ? [['true', settingTableYes()], ['false', settingTableNo()]] : settingTableChoices(row.path) || [],
+		var ch = row.kind === 'bool' ? [['true', settingTableYes()], ['false', settingTableNo()]] : (row.home === 'cp' ? customPropRowChoices(row) : settingTableChoices(row.path)) || [],
 			v = settingRowValue(row, scn), d, i, word = null;
 		// Unstated: the default's own option says so ("Hazen-Williams (default)") and is the one shown;
 		// with no default among the options, a blank "Not stated" option is.
@@ -26888,6 +27026,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			return EngCalcs.lpnTimeText ? EngCalcs.lpnTimeText({ text: typeof t === 'string' ? (function () { var o = {}; o[key] = t; return o; }()) : {} }, key, v) : String(v);
 		}
 		if (row.kind === 'json') { return settingRowSummary(row, v); }
+		if (v === undefined && row.path[0] === 'labelSettings' && (row.path[1] === 'prefix' || row.path[1] === 'suffix') && row.path.length === 4) {
+			return settingTableDefaultText(settingRowAffixDefault(row, scn));
+		}
+		if (v === undefined && row.home === 'cp') { return ''; }
 		if (v === undefined) {
 			if (row.path.join('.') === 'settings.labelMaxWidth' || row.path.join('.') === 'labelSettings.customerMaxWidth') {
 				return pc.lpn_settings_label_always || 'Always show';
@@ -26901,10 +27043,33 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (typeof v === 'object') { return settingRowSummary(row, v); }
 		return String(v);
 	}
+	// What an unstated Before or After prints in scenario `scn`: the default the page works out
+	// (labelPrefixFor()/labelSuffixFor(), which follow the friction method and the unit), quoted
+	// when it is blank or space-edged, as the Settings box's Base line quotes it.
+	function settingRowAffixDefault(row, scn) {
+		var p = row.path;
+		return paneInScenario(scn, function () {
+			var field = String(p[3]).split(':')[0];
+			return setboxQuoteBlank(p[1] === 'prefix' ? labelDefaultPrefix(p[2], field) : labelDefaultSuffix(p[2], field));
+		});
+	}
 	// Typed text (or a picked option) to the value it stores, or {ok: false}. The same rule in every
 	// scenario. A number may carry its unit, as the cell shows it.
 	function settingRowParse(row, text) {
 		var t = String(text === null || text === undefined ? '' : text).trim(), sec, ch, i, v, base, u = settingRowUnitText(row);
+		// A label's Before and After keep their spaces ("Q=", " gpm"): blank prints nothing, which
+		// is not the same as unstated (labelSettings' own rule).
+		if (row.path[0] === 'labelSettings' && (row.path[1] === 'prefix' || row.path[1] === 'suffix')) {
+			return { ok: true, v: String(text === null || text === undefined ? '' : text) };
+		}
+		if (row.home === 'cp') {
+			ch = customPropRowChoices(row);
+			if (!ch) { return { ok: true, v: t }; }
+			for (i = 0; i < ch.length; i++) {
+				if (t.toLowerCase() === String(ch[i][0]).toLowerCase() || t.toLowerCase() === String(ch[i][1]).toLowerCase()) { return { ok: true, v: ch[i][0] }; }
+			}
+			return { ok: false };
+		}
 		if (u && t.length > u.length && t.slice(-u.length) === u) { t = t.slice(0, -u.length).trim(); }
 		switch (row.kind) {
 			case 'time':
@@ -26939,7 +27104,17 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// **WHERE AN EDIT OF THIS ROW LANDS IN THIS SCENARIO**: the scenario (or the stored alternative or
 	// calculation set it names), through setScenarioSetting(); Base writes the project's own object.
 	function settingRowWrite(row, scn, p) {
-		var root, node, i, k = row.path[1], times;
+		var root, node, i, k = row.path[1], times, d;
+		// A custom property's design is the project's in every scenario.
+		if (row.home === 'cp') {
+			d = customPropRowDef(row);
+			if (!d) { return false; }
+			undoTopHoldsSettingPaths([['settings', 'customProps']]);
+			d[row.path[2]] = row.path[2] === 'applies' ? customPropAppliesLetters({ applies: p.v }).join(',') : p.v;
+			rebuildSettingsFields();
+			refreshPopupIfOpen();
+			return true;
+		}
 		if (!scn.isBase) {
 			if (row.home === 'dm') { touchTree('demandMultiplier'); calcTargetOf(scn).demandMultiplier = p.v; return true; }
 			if (row.home === 'time2') { return setScenarioTime(calcTargetOf(scn), k, p.text); }
@@ -26974,7 +27149,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// scenario WRITES, so a value it only inherits is not marked. Base holds none.
 	function settingRowIsLocal(row, scn) {
 		var t;
-		if (!scn || scn.isBase) { return false; }
+		if (!scn || scn.isBase || row.home === 'cp') { return false; }
 		t = writeTargetFor(scn, row.cat).obj;
 		if (row.home === 'dm') { return typeof t.demandMultiplier === 'number' && isFinite(t.demandMultiplier); }
 		if (row.home === 'time2') { return scenarioTimeValue(t, row.path[1]) !== undefined; }
@@ -27056,10 +27231,15 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			{ key: 'st_minor', label: 'lpn_settings_table_minor', str: true, em: 8,
 				get: function (r) { return settingTableHeadingWords(r.minor, 'minor'); },
 				sortKey: function (r) { return r.order; } },
+			// Major, Minor, Owner, Setting: the hierarchy reads left to right, Tom's dotted path.
+			{ key: 'st_owner', label: 'lpn_settings_table_owner', str: true, em: 8,
+				get: function (r) { return settingTableOwnerSetting(r.path).owner; },
+				sortKey: function (r) { return settingTableOwnerSetting(r.path).owner.toLowerCase(); } },
+			{ key: 'st_setting', label: 'lpn_settings_table_setting', str: true, em: 12,
+				get: function (r) { return settingTableOwnerSetting(r.path).setting; } },
+			// The alternatives category the row belongs to; none for a custom property's design.
 			{ key: 'st_category', label: 'lpn_settings_table_category', str: true, em: 7,
-				get: function (r) { return altCategoryLabel(r.cat); } },
-			{ key: 'st_setting', label: 'lpn_settings_table_setting', str: true, em: 16,
-				get: function (r) { return settingTableLabel(r.path); } },
+				get: function (r) { return r.cat ? altCategoryLabel(r.cat) : ''; } },
 			// **THE VALUE, IN THE SCENARIO THE ROW SHOWS**: the open one with Show scenarios off, the
 			// row's own with it on (paneScnWrapCol() makes it the open one for the call).
 			// A choice or a yes/no is a select of the Settings box's own options (choicesFor()); an
@@ -27093,7 +27273,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				},
 				// The Show scenarios hooks (paneScnWrapCol(), paneScnCellIsLocal(), paneOverrideCells()):
 				// every scenario may hold every row, so a scenario's Value is always typeable.
-				scnEditable: function (r) { return r.kind !== 'json'; },
+				scnEditable: function (r) { return r.kind !== 'json' && r.home !== 'cp'; },
 				scnLocal: function (r, scn) { return settingRowIsLocal(r, scn); },
 				scnClear: function (r, scn) { return settingRowClear(r, scn); },
 				scnCat: function (r) { return r.cat; } }
@@ -27696,10 +27876,41 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		}
 		return wrap;
 	}
+	// **THE SHOW SCENARIOS FILTERS SAY SO TOO**, with the same Show all, for the same reason: rows
+	// held back with no visible cause mislead, and a filter that leaves no row leaves no cell whose
+	// menu could turn it off.
+	function paneScnFilterBanner(spec, rows) {
+		var pc = EngCalcs.pageConfig || {}, names = [], wrap, text, btn;
+		if (!spec.scnRows) { return null; }
+		if (spec.scnOvOnly) { names.push(pc.lpn_pane_scn_ov_only || 'Overrides only'); }
+		if (spec.scnCurOnly) { names.push(pc.lpn_pane_scn_cur_only || 'Current scenario only'); }
+		if (!names.length) { return null; }
+		wrap = document.createElement('div');
+		wrap.className = 'lpn-pane-filter';
+		text = document.createElement('span');
+		text.textContent = String(pc.lpn_pane_scn_filter_note || '{filters}. Showing {n} of {all}.')
+			.split('{filters}').join(names.join(', '))
+			.split('{n}').join(String(rows.length))
+			.split('{all}').join(String(paneTableElements(spec).length * scenariosForDisplay().length));
+		wrap.appendChild(text);
+		btn = document.createElement('button');
+		btn.type = 'button';
+		btn.className = 'lpn-pane-filter-clear';
+		btn.textContent = pc.lpn_pane_filter_clear || 'Show all';
+		btn.addEventListener('click', function () {
+			spec.scnOvOnly = false;
+			spec.scnCurOnly = false;
+			spec.sel = null;
+			paneTableReset(spec);
+			renderPaneTable(spec);
+		});
+		wrap.appendChild(btn);
+		return wrap;
+	}
 	function renderPaneTable(spec) {
 		var host = document.getElementById(spec.panel), pc = EngCalcs.pageConfig || {},
 				rows = paneTableRowsInOrder(spec), sig = paneTableSignature(spec, rows),
-			table, thead, tr, tbody, note, filterNote, cg;
+			table, thead, tr, tbody, note, filterNote, scnNote, cg;
 		if (!host) { return; }
 		if (sig === spec.sig && spec.cells) { refillPaneTable(spec, rows); return; }
 		spec.sig = sig;
@@ -27713,6 +27924,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// rows with no visible cause is the one way this feature can mislead somebody.
 		filterNote = paneFilterBanner(spec, rows, true);
 		if (filterNote) { host.appendChild(filterNote); }
+		scnNote = paneScnFilterBanner(spec, rows);
+		if (scnNote) { host.appendChild(scnNote); filterNote = filterNote || scnNote; }
 		// **NO STANDING NOTE ABOVE THE TABLE** (Tom, 2026-09-21: *"There is a message about 'rows that
 		// already exist'. When I scroll past the last visible row, that message disappears, and the
 		// headings jump upward. This is startling. The message uses precious head room. Maybe we
@@ -30548,6 +30761,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// Offered once there is a scenario besides Base, or while it is on so it can be turned off.
 		if (paneScnAvailable(spec) && (spec.scnRows || scenarios.length > 1)) {
 			mk((spec.scnRows ? '\u2713 ' : '') + (pc.lpn_pane_scn_show || 'Show scenarios'), function () { paneScnToggle(spec); });
+			if (spec.scnRows) {
+				mk((spec.scnOvOnly ? '\u2713 ' : '') + (pc.lpn_pane_scn_ov_only || 'Overrides only'), function () { paneScnFilterToggle(spec, 'scnOvOnly'); });
+				mk((spec.scnCurOnly ? '\u2713 ' : '') + (pc.lpn_pane_scn_cur_only || 'Current scenario only'), function () { paneScnFilterToggle(spec, 'scnCurOnly'); });
+			}
 		}
 		// **CLEAR OVERRIDE** (Tom, 2026-10-06: *"Would it be good UI design to add a 'Clear override'
 		// item to the right-click menu in Tables? I think I would love that."*). HIDDEN (Tom,
@@ -30650,6 +30867,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// standing on a cell.
 		if (paneCanCreate(spec)) {
 			mk(pc.lpn_pane_paste_append || 'Paste as new rows at end of table', function () { paneArmAppend(spec); });
+		}
+		// Show scenarios and its two filters, here too: a filter that leaves no row leaves no cell
+		// to right-click, and the headings are still there.
+		if (spec.scnRows) {
+			mk('\u2713 ' + (pc.lpn_pane_scn_show || 'Show scenarios'), function () { paneScnToggle(spec); });
+			mk((spec.scnOvOnly ? '\u2713 ' : '') + (pc.lpn_pane_scn_ov_only || 'Overrides only'), function () { paneScnFilterToggle(spec, 'scnOvOnly'); });
+			mk((spec.scnCurOnly ? '\u2713 ' : '') + (pc.lpn_pane_scn_cur_only || 'Current scenario only'), function () { paneScnFilterToggle(spec, 'scnCurOnly'); });
 		}
 		document.body.appendChild(menu);
 		paneCtxMenuEl = menu;
@@ -51829,9 +52053,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function setboxLabelPart(p) {
 		var pc = EngCalcs.pageConfig || {}, groups = { node: 1, link: 1, customer: 1 }, k;
 		if (p[0] !== 'labelSettings') { return null; }
-		if (groups[p[1]] && p.length === 3) { return pc.lpn_labels_col_show || 'Show'; }
+		if (groups[p[1]] && p.length === 3) { return pc.lpn_settings_row_label_on || 'Is active'; }
 		k = { decimals: 'lpn_labels_col_decimals', prefix: 'lpn_labels_col_before', suffix: 'lpn_labels_col_after',
-			useUnits: 'lpn_labels_use_units', show: 'lpn_labels_col_rank', priority: 'lpn_labels_col_drop' }[p[1]];
+			useUnits: 'lpn_labels_use_units', show: 'lpn_settings_row_label_show', priority: 'lpn_settings_row_label_drop' }[p[1]];
 		return k && groups[p[2]] && p.length === 4 ? (pc[k] || p[1]) : null;
 	}
 	// The box's left index marks a sub-heading that holds an override, so a held value can be found.

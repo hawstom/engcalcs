@@ -8,8 +8,8 @@
 // demand multiplier, run time and time step retire, and its two setting columns are headed
 // Presentation and Calculation. Asserted on Net1 (US units, Hazen-Williams):
 //
-//   1. The Settings tab is a table of the Tables pane: Major heading, Minor heading, Category,
-//      Setting, Value; units and the coordinate frame are not rows.
+//   1. The Settings tab is a table of the Tables pane: Major heading, Minor heading, Owner,
+//      Setting, Category, Value; units and the coordinate frame are not rows.
 //   2. A Base edit (the demand multiplier) writes the project: the solve changes, and comes back.
 //   3. Show scenarios gives one row per setting per scenario, Scenario after Setting.
 //   4. In a child scenario, Darcy-Weisbach typed into Friction method is that scenario's override:
@@ -166,9 +166,11 @@ async function main() {
 		ok('the pane has a Settings tab', tabText === await L('lpn_tool_settings'), tabText);
 		await H.tab('settings');
 		const heads = await H.headings();
-		ok('columns: Major heading, Minor heading, Category, Setting, Value',
+		// Tom, 2026-10-07: Owner, the third level of the hierarchy, between Minor heading and Setting.
+		ok('columns: Major heading, Minor heading, Owner, Setting, Category, Value',
 			JSON.stringify(heads) === JSON.stringify([await L('lpn_settings_table_major'), await L('lpn_settings_table_minor'),
-				await L('lpn_settings_table_category'), await L('lpn_settings_table_setting'), await L('lpn_find_value')]), JSON.stringify(heads));
+				await L('lpn_settings_table_owner'), await L('lpn_settings_table_setting'), await L('lpn_settings_table_category'),
+				await L('lpn_find_value')]), JSON.stringify(heads));
 		let rows = await H.settingRows();
 		const FM = await L('bpn_method'), DM = await L('bpn_demand_mult'), DUR = await L('lpn_time_duration'),
 			TS = await L('lpn_settings_text_size'), CALC = await L('lpn_alt_cat_calculation'), PRES = await L('lpn_alt_cat_presentation');

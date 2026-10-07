@@ -3704,7 +3704,6 @@
         "lpn_labels_col_decimals": "2a4e3cb3c61a05b20a67803c34e108388104bb00",
         "lpn_labels_col_decimals_example": "725af3071b1eef0162f9a95017e7c21a35821798",
         "lpn_labels_col_drop": "0a088b3115056ef6acd3ab4b406c823e1724e216",
-        "lpn_labels_col_rank": "dd48a1149548f0b07ddec97e040571c91978fbab",
         "lpn_labels_col_show": "d97d1ee339e4eeaba8cac91dca37c8b4ec8f5501",
         "lpn_labels_customer_note": "4a04d76d36540eaaf36c45509b0845afb561e23b",
         "lpn_labels_customer_width_tip": "4ec178bed1bcda29184736c54e146af3bf221aed",
@@ -9006,10 +9005,6 @@
             "ends_sentence": false
         },
         "lpn_labels_col_drop": {
-            "words": 1,
-            "ends_sentence": false
-        },
-        "lpn_labels_col_rank": {
             "words": 1,
             "ends_sentence": false
         },
