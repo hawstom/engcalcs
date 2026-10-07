@@ -170,7 +170,11 @@ console.log('\n--- one seam decides how a standing box opens (rule 2) ---');
 		['openCalibBox', 'the calibration report box'],
 		// The Contour plot box (Task 600): the Find box's shell and the same rule as Find -- a
 		// column of controls that is unreadable at a third of a phone's width.
-		['openContourBox', 'the contour plot box']];
+		['openContourBox', 'the contour plot box'],
+		// The Screenshot box (Tom, 2026-10-05): the Contour box's shell. It goes through the seam like
+		// its siblings, though startScreenshot() does not open it on a phone at all, where filling the
+		// window would cover the map the finger has to drag over.
+		['openSnipBox', 'the Screenshot box']];
 	FILLS.forEach(function (p) {
 		ok(p[1] + ' opens through the seam', /placePanelForScreen\(/.test(body(p[0])));
 	});

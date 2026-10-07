@@ -244,7 +244,7 @@ exports.run = async function ({ browser, report }) {
 		// The string read here is serializeProject()'s own output, not a spec's idea of our format.
 		await a.menuClick(await a.lang('lpn_file_convert_as'));
 		await a.settle(300);
-		// File, Convert as (Task 696) opens its box first: choose lat/lon, which is EPSG:3857, and Convert.
+		// File, Convert as (Task 696) opens its box first: choose lat/lon, which is EPSG:4326, and Convert.
 		await a.page.evaluate(() => {
 			const r = document.getElementById('lpn_convas_kind_epsg'), ok = document.getElementById('lpn_convas_ok');
 			if (r && ok) { r.checked = true; ok.click(); }

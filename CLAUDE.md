@@ -198,8 +198,10 @@ it. **A core calculator, in scope in all 26 languages. Never call it "preview".*
   behind the first, empty project (Tom, 2026-09-25); the other three are opt-in.
   Never write "the only third-party request". A fifth service is a new paragraph in `privacy.php`,
   not a `consent_body` change.
-- **A geographic project is drawn in Web Mercator and stored in longitude/latitude.** Never store
-  the projection. Mission scope is a 300 km system span; `geodesicMeters()` is flat per leg
+- **A geographic project is drawn in Web Mercator and stored in longitude/latitude.** A lat/lon
+  project never stores its Mercator drawing numbers; **EPSG:3857 chosen on purpose is a projected
+  project in metres**, its lengths measured on the ground (`isWebMercProject()`). EPSG:4326 is the
+  suggested row. Mission scope is a 300 km system span; `geodesicMeters()` is flat per leg
   (206 ppm at scope). `dev/geographic-projects.md`.
 - **Reads and writes EPANET `.inp`** (`js/lpn-inp.js`). Import reports every difference, never
   rejects, never drops silently. Export is character-exact on Net1/2/3.

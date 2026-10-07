@@ -71,7 +71,7 @@ USA.</p>
 		<td>Necessary to provide what you asked for</td>
 	</tr>
 	<tr>
-		<td><strong>Messages you send us.</strong> Your name, email address and message</td>
+		<td><strong>Messages you send us.</strong> Your name, email address and message. From the <em>Something wrong here?</em> box on the pipe-network map: what you pick or type, with the page, your language, the site version and the code of any message on the map. There the email address is optional, and used only to reply</td>
 		<td>To answer you and refer back to the conversation</td>
 		<td>Necessary to answer you</td>
 	</tr>
@@ -160,7 +160,7 @@ A fifth such feature would ask you in the same way.</p>
 
 <p>Our server is in the United States, so what little we collect is transferred outside the European
 Economic Area. For the usage counts we rely on your explicit consent (GDPR Article 49(1)(a)); for
-the contact form, on the transfer being necessary to do what you asked (Article 49(1)(b)).</p>
+messages you send us, on the transfer being necessary to do what you asked (Article 49(1)(b)).</p>
 
 <h2>How long we keep it</h2>
 

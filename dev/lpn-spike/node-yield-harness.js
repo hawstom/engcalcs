@@ -141,7 +141,7 @@ function alignedLinkBoxes() {
 	const fs = L.fs(), out = [];
 	doc.links.forEach(function (l) {
 		const le = linkEls[l.id];
-		if (!le || le.empty || le.hiddenShort || le.hiddenCrowded || le.hiddenYielded) { return; }
+		if (!le || le.empty || le.hiddenShort || le.hiddenCrowded || le.hiddenBlocked || le.hiddenYielded) { return; }
 		if (!L.aligned(l)) { return; }
 		const w = L.labelBoxWidth(le), h = L.boxH(le.lineCount), full = L.stations(l),
 			lone = full.length === 1,

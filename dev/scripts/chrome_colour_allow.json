@@ -62,6 +62,11 @@
 		"_about": "A colour literal in js/*.js may appear only on a line matching one of these (file, regex on the line, reason). Everything else, a box, button, banner, table or menu, writes var(--ec-*). Keyed on line content, not number, so a neighbouring branch moving code does not break it.",
 		"entries": [
 			{
+				"file": "js/looped-network.js",
+				"match": "SNIP_PEN_INK =",
+				"reason": "annotation ink drawn into the exported picture"
+			},
+			{
 				"file": "js/branched-network.js",
 				"match": "bpnFieldColors|stroke=\"#000\"|rx=\"4\"",
 				"reason": "the branched-network sketch SVG and its field colours: drawing ink, matching the legend keys"

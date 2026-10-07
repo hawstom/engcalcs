@@ -134,6 +134,7 @@ function ecSwPageExclusions() {
         'log-human-view.php'    => 'log endpoint',
         'log-signal-event.php'  => 'log endpoint',
         'log-title-event.php'   => 'log endpoint',
+        'send-feedback.php'     => 'POST endpoint; mails a report, so it cannot work offline',
         'lpn-lock.php'          => 'multi-tab lock endpoint; a cached answer would be a wrong one',
         'consent.php'           => 'records the consent choice; must always reach the server',
         'sw.php'                => 'the service worker itself; the browser manages its own copy',

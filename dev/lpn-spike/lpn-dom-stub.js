@@ -1101,6 +1101,8 @@ require(ROOT + 'js/lpn-epanet.js');
 // is the honest signal that the old declaration ("read only when a file is opened or saved") had
 // stopped being true. Keep it here rather than adding a require to each harness that solves.
 require(ROOT + 'js/lpn-inp.js');
+// The GeoJSON writer, after lpn-inp.js (it reads EngCalcs.lpnNumText), in the page's own order.
+require(ROOT + 'js/lpn-geojson.js');
 const NODE_ENGINE_URL = 'file://' + path.join(ROOT, 'js', 'vendor', 'epanet-js.js');
 {
 	const browserLoad = global.EngCalcs.lpnEpanetLoad;

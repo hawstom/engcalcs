@@ -303,13 +303,13 @@ async function openAsLatLon(a, name, text) {
 }
 // Draw the L, then open it as lat/lon: the whole placement entry, in one line at each call site.
 // File, Convert as copies the project on screen (Task 696): the row opens its box, and lat/lon
-// (EPSG:3857) is chosen there. `name` is kept for the call sites; the copy is named by the page.
+// (EPSG:4326) is chosen there. `name` is kept for the call sites; the copy is named by the page.
 async function placeCurrent(a, name) {
 	await a.menuClick(ROW);
 	await a.settle(300);
 	await chooseLatLonInBox(a);
 }
-// The Convert as box is open: lat/lon (EPSG:3857) is chosen and OK pressed.
+// The Convert as box is open: lat/lon (EPSG:4326) is chosen and OK pressed.
 async function chooseLatLonInBox(a) {
 	await a.page.evaluate(() => {
 		const r = document.getElementById('lpn_convas_kind_epsg'), ok = document.getElementById('lpn_convas_ok');

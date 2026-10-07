@@ -100,6 +100,17 @@ network drawn over one must keep those coordinates whatever basemap is switched 
 document's coordinates are longitude and latitude, byte for byte the ones the user's file states. The
 distinction is the whole design, and the measurement that forces it is in §6.
 
+**EPSG:3857 chosen on purpose is a different thing, and it is allowed** (Task 775; Tom, 2026-10-07:
+*"Make 3857 real. They aren't the same thing, and some pedantic people will notice if 3857 is
+missing or doesn't work."*). The rule above forbids a lat/lon document from storing its Mercator
+DRAWING numbers. A user who picks EPSG:3857 in File, New or File, Convert as gets a projected project
+like a UTM one: `project.crs` is `EPSG:3857`, the stored numbers are Web Mercator metres, and they
+are the user's own from then on. Its transform is closed-form in `js/lpn-crs.js`. Because its map
+distance exceeds the ground distance by 1/cos(latitude), its Auto lengths, scale bar, customer
+offsets and symbol scale are measured on the ground (`isWebMercProject()`), never on the plane.
+EPSG:4326 is the suggested row in the list. Rejected and not to be re-proposed: folding a 3857 pick
+onto the lat/lon project (R-218), which named metres and made degrees.
+
 ## 4. The basemap: plain OpenStreetMap raster tiles, and it is built
 
 **Decided and shipped:** OSM raster tiles, hand-rolled, no library. No key, no billing account,

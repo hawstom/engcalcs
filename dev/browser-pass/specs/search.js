@@ -343,7 +343,7 @@ exports.run = async function ({ browser, report }) {
 		// opened again through File > the lat/lon row (`lpn_file_convert_as`), which lands it in a new tab, in step 1.
 		await a.menuClick(await a.lang('lpn_file_convert_as'));
 		await a.settle(300);
-		// File, Convert as (Task 696) opens its box first: choose lat/lon, which is EPSG:3857, and Convert.
+		// File, Convert as (Task 696) opens its box first: choose lat/lon, which is EPSG:4326, and Convert.
 		await a.page.evaluate(() => {
 			const r = document.getElementById('lpn_convas_kind_epsg'), ok = document.getElementById('lpn_convas_ok');
 			if (r && ok) { r.checked = true; ok.click(); }
