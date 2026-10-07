@@ -42841,6 +42841,7 @@ var EngCalcs = EngCalcs || {};
 		});
 		if (block) { guideTrimRule(block); }
 		renderGuideBoxes();
+		guideDimNote();
 		guideFilter();
 		guideObserve();
 	}
@@ -42850,6 +42851,12 @@ var EngCalcs = EngCalcs || {};
 	// buttons whenever anything on the strip changes, not only when the guide is drawn. A button
 	// that is not in the guide yet (the strip was rebuilt) redraws the section instead.
 	var guideDimQueued = false;
+	// The one sentence that says what a dimmed name means (Ida, 2026-10-07: on a phone, grey names
+	// read as disabled). Shown only while some toolbar row is dimmed.
+	function guideDimNote() {
+		var note = document.getElementById('lpn_guide_dimnote');
+		if (note) { note.hidden = !document.querySelector('#lpn_guide_toolbar > .lpn-guide-row.lpn-guide-off'); }
+	}
 	function guideRefreshDimming() {
 		var rows, n = 0;
 		guideDimQueued = false;
@@ -42860,6 +42867,7 @@ var EngCalcs = EngCalcs || {};
 			if (g && toolbarIconIndex.indexOf(g.b) >= 0) { n++; }
 			r.classList.toggle('lpn-guide-off', !(el && el.isConnected && el.getClientRects().length > 0));
 		});
+		guideDimNote();
 		if (n !== toolbarIconIndex.length || rows.length !== toolbarIconIndex.length) { renderGuide(); }
 	}
 	function guideQueueDimming() {
@@ -42945,12 +42953,18 @@ var EngCalcs = EngCalcs || {};
 		var host = document.getElementById('lpn_guide_boxes'), pc = EngCalcs.pageConfig || {};
 		if (!host) { return; }
 		while (host.firstChild) { host.removeChild(host.firstChild); }
+		var sectionNames = Array.prototype.map.call(document.querySelectorAll('#lpn_hotkeys_popup .lpn-guide-section > h2'),
+			function (h2) { return String(h2.textContent || '').replace(/\s+/g, ' ').trim().toLowerCase(); });
 		guideBoxList().forEach(function (e) {
 			var en = document.createElement('div'), h = document.createElement('h3'), p;
 			en.className = 'lpn-guide-boxentry';
 			en.id = 'lpn_guide_b_' + e.id;
 			en.setAttribute('data-guide-key', 'box-' + e.id);
-			h.textContent = e.title;
+			// A box named like a section of the Guide ("Screenshot") is told apart in the Guide only, as
+			// "Screenshot box", so the rail does not list one word twice (Ida, 2026-10-07). The box's
+			// own title is untouched.
+			h.textContent = sectionNames.indexOf(e.title.toLowerCase()) >= 0 ?
+				(pc.lpn_guide_box_named || '{box} box').replace('{box}', e.title) : e.title;
 			en.appendChild(h);
 			h.tabIndex = -1;
 			(e.d.tipText || pc['lpn_guide_text_' + e.id.replace(/^lpn_/, '')] || '').split(/\\n\\n|\n\n/).forEach(function (para) {
@@ -53020,7 +53034,9 @@ var EngCalcs = EngCalcs || {};
 		// its explanation as a corner tip now has it as its Guide entry; the blue tip `?` stays beside
 		// field labels only. renderGuideBoxes() reads this, and refreshBoxTip() keeps it current.
 		d.tipText = tip || '';
-		d.guideBtn = guideCornerButton(d);
+		// The Guide's own title bar carries no "?": in the Guide it would open help inside help
+		// (Ida, 2026-10-07). Its entry in the Boxes section stays, reached by search or the rail.
+		d.guideBtn = box.id === 'lpn_hotkeys_popup' ? null : guideCornerButton(d);
 		box.addEventListener('keydown', function (e) {
 			if (e.key === 'F1' && !e.ctrlKey && !e.altKey && !e.shiftKey && !e.metaKey) {
 				e.preventDefault();

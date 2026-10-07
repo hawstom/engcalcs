@@ -4531,6 +4531,15 @@ html[dir="rtl"] .lpn-guide-rail-collapsed .lpn-guide-railtoggle svg { transform:
 }
 .lpn-guide-section dd { margin: 0 0 .6em; }
 .lpn-guide-boxentry > h3 { font-size: 1rem; font-weight: bold; }
+/* A Boxes entry is separated as a toolbar row group is: 12 px of air and the same hairline. */
+.lpn-guidebox .lpn-guide-boxentry { margin: 12px 0 0; padding-top: 4px; border-top: 1px solid var(--ec-border); }
+.lpn-guidebox .lpn-guide-boxentry > h3 { margin-top: 0; }
+/* A term that only repeats its section's heading ("Map" then "Map keyboard shortcuts") is kept for
+   search, Find-in-page and screen readers, and not drawn. */
+.lpn-guide-section dt.lpn-guide-dup {
+	position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%);
+	white-space: nowrap; margin: 0; padding: 0; border: 0;
+}
 .lpn-guide-row {
 	display: grid; grid-template-columns: 1.6em 1fr auto; column-gap: .4em; row-gap: 2px;
 	align-items: start; width: 100%; box-sizing: border-box; text-align: start;
@@ -4559,19 +4568,21 @@ html[dir="rtl"] .lpn-guide-chev { transform: scaleX(-1); }
 .lpn-guide-sub { margin-inline-start: 1.6em; width: calc(100% - 1.6em); }
 .lpn-guide-rule { margin: 3px 0; border: 0; border-top: 1px solid var(--ec-border); }
 /* The key tables (Map, Screenshot, Tables, Using the guide) are real tables, a key and its action.
-   Inside the Guide they lose the suite's blue cell borders for one quiet rule per row, the key
-   column takes only the width its keys need, and below 520 px of box they stack, key above action,
-   by the same container width that folds nothing else now because nothing else has columns. */
+   Inside the Guide they lose the suite's blue cell borders for one quiet rule per row, every key
+   column is the same 12em (room for "Ctrl+Shift+PageDown,") so the actions line up from one
+   table to the next, and below 520 px of box they stack, key above action. */
 .lpn-guidebox table.lpn-notes-table, .lpn-guidebox table.lpn-notes-table td { border: 0; }
 .lpn-guidebox table.lpn-notes-table tr { border: 0; border-bottom: 1px solid var(--ec-border); }
 .lpn-guidebox table.lpn-notes-table td { padding: .25em 1em .25em 0; }
-.lpn-guidebox table.lpn-notes-table td:first-child { width: 1%; white-space: nowrap; }
-/* The Tables section's first column is a gesture written out, not a key, so it wraps. */
-.lpn-guidebox [data-guide-section="tables"] table.lpn-notes-table td:first-child { width: 40%; white-space: normal; }
+.lpn-guidebox table.lpn-notes-table td:first-child { width: 12em; min-width: 12em; }
+/* Table columns help (the first table under Tables) has a gesture written out in its first column,
+   not a key, so that one table keeps a wider column. */
+.lpn-guidebox [data-guide-section="tables"] dd:first-of-type table.lpn-notes-table td:first-child { width: 40%; }
 @container (max-width: 520px) {
 	.lpn-guidebox table.lpn-notes-table, .lpn-guidebox table.lpn-notes-table tbody,
 	.lpn-guidebox table.lpn-notes-table tr { display: block; width: auto; }
-	.lpn-guidebox .lpn-guide-section[data-guide-section] table.lpn-notes-table td { display: block; width: auto; white-space: normal; }
+	.lpn-guidebox .lpn-guide-section[data-guide-section] table.lpn-notes-table td { display: block; width: auto; min-width: 0; }
+	.lpn-guidebox .lpn-guide-section[data-guide-section="tables"] dd:first-of-type table.lpn-notes-table td:first-child { width: auto; }
 	.lpn-guidebox table.lpn-notes-table tr { padding: .25em 0; }
 	.lpn-guidebox table.lpn-notes-table td { padding: 0; }
 }

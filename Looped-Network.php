@@ -1929,6 +1929,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 <p id="lpn_guide_none" class="lpn-guide-none" hidden><?=$ec_lang['lpn_find_none']?></p>
 <section class="lpn-guide-section" data-guide-section="toolbar">
 <h2><?=$ec_lang['lpn_help_icons']?></h2>
+<p id="lpn_guide_dimnote" class="lpn-guide-prose" hidden><?=$ec_lang['lpn_guide_dimmed']?></p>
 <div id="lpn_guide_toolbar" class="lpn-guide-list"></div>
 </section>
 <section class="lpn-guide-section" data-guide-section="menus">
@@ -1941,13 +1942,13 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 <section class="lpn-guide-section" data-guide-section="map">
 <h2><?=$ec_lang['lpn_hotkeys_map_heading']?></h2>
 <dl>
-	<dt><?=$ec_lang['lpn_hotkeys_map_term']?></dt><dd><?=$ec_lang['lpn_hotkeys_map_def']?></dd>
+	<dt class="lpn-guide-dup"><?=$ec_lang['lpn_hotkeys_map_term']?></dt><dd><?=$ec_lang['lpn_hotkeys_map_def']?></dd>
 </dl>
 </section>
 <section class="lpn-guide-section" data-guide-section="snip">
 <h2><?=$ec_lang['lpn_hotkeys_snip_heading']?></h2>
 <dl>
-	<dt><?=$ec_lang['lpn_hotkeys_snip_term']?></dt><dd><?=$ec_lang['lpn_hotkeys_snip_def']?></dd>
+	<dt class="lpn-guide-dup"><?=$ec_lang['lpn_hotkeys_snip_term']?></dt><dd><?=$ec_lang['lpn_hotkeys_snip_def']?></dd>
 </dl>
 </section>
 <section class="lpn-guide-section" data-guide-section="tables">
@@ -2568,6 +2569,7 @@ EngCalcs.pageConfig = {
 	lpn_guide_also: <?=json_encode($ec_lang['lpn_guide_also'])?>,
 	lpn_guide_box_help: <?=json_encode($ec_lang['lpn_guide_box_help'])?>,
 	lpn_guide_contents: <?=json_encode($ec_lang['lpn_guide_contents'])?>,
+	lpn_guide_box_named: <?=json_encode($ec_lang['lpn_guide_box_named'])?>,
 	lpn_guide_text_popup: <?=json_encode($ec_lang['lpn_guide_text_popup'])?>,
 	lpn_guide_text_find_popup: <?=json_encode($ec_lang['lpn_guide_text_find_popup'])?>,
 	lpn_guide_text_settings_box: <?=json_encode($ec_lang['lpn_guide_text_settings_box'])?>,
