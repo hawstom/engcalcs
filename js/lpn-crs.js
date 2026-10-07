@@ -54,6 +54,25 @@
 
 	function base() { return EngCalcs.suiteBase || '/engcalcs/'; }
 
+	// ---- EPSG:3857, IN CLOSED FORM (Task 775) --------------------------------------------------
+	//
+	// **WEB MERCATOR NEEDS NO LIBRARY AND NO DOWNLOAD.** It is the spherical Mercator of the WGS 84
+	// semi-major axis applied to WGS 84 latitude and longitude, EPSG's "Popular Visualisation
+	// Pseudo Mercator" (method 1024): x = R lon, y = R ln tan(pi/4 + lat/2), R = 6,378,137 m. The
+	// generated definitions file does not carry it (it was the lat/lon project's own frame when the
+	// file was built), and a project on it must not wait 190 KB for a formula. So has() answers true
+	// for it before anything has loaded, and forward()/inverse() never touch proj4 for it.
+	var WEBMERC = '3857';
+	var WEBMERC_R = 6378137;
+	var DEG = Math.PI / 180;
+	function webMercForward(ll) {
+		var lat = Math.max(-89.999999, Math.min(89.999999, ll.lat));
+		return { x: WEBMERC_R * ll.lon * DEG, y: WEBMERC_R * Math.log(Math.tan(Math.PI / 4 + lat * DEG / 2)) };
+	}
+	function webMercInverse(xy) {
+		return { lon: xy.x / WEBMERC_R / DEG, lat: (2 * Math.atan(Math.exp(xy.y / WEBMERC_R)) - Math.PI / 2) / DEG };
+	}
+
 	// **EVERY CALLER IS ANSWERED, INCLUDING ONE THAT ARRIVES MID-FLIGHT.** The map repaints on a
 	// pan, so the second, third and tenth caller all turn up while the first fetch is still in the
 	// air; a loader that returned silently for those would leave the tiles missing until something
@@ -115,6 +134,7 @@
 	/** Is there a transform for this coordinate system, right now? */
 	function has(code) {
 		var k = key(code);
+		if (k === WEBMERC) { return true; }
 		return ready() && !!defs[k];
 	}
 
@@ -137,7 +157,13 @@
 	 * Returns `{x, y}` or null where there is no transform.
 	 */
 	function forward(code, ll) {
-		var id = name(code), out;
+		var id, out;
+		if (key(code) === WEBMERC) {
+			if (!ll || !isFinite(ll.lon) || !isFinite(ll.lat)) { return null; }
+			out = webMercForward(ll);
+			return (isFinite(out.x) && isFinite(out.y)) ? out : null;
+		}
+		id = name(code);
 		if (!id || !ll || !isFinite(ll.lon) || !isFinite(ll.lat)) { return null; }
 		try { out = root.proj4(WGS84, id, [ll.lon, ll.lat]); } catch (e) { return null; }
 		if (!out || !isFinite(out[0]) || !isFinite(out[1])) { return null; }
@@ -146,7 +172,13 @@
 
 	/** The plane -> lon/lat. Returns `{lon, lat}` or null. */
 	function inverse(code, xy) {
-		var id = name(code), out;
+		var id, out;
+		if (key(code) === WEBMERC) {
+			if (!xy || !isFinite(xy.x) || !isFinite(xy.y)) { return null; }
+			out = webMercInverse(xy);
+			return (isFinite(out.lon) && isFinite(out.lat)) ? out : null;
+		}
+		id = name(code);
 		if (!id || !xy || !isFinite(xy.x) || !isFinite(xy.y)) { return null; }
 		try { out = root.proj4(id, WGS84, [xy.x, xy.y]); } catch (e) { return null; }
 		if (!out || !isFinite(out[0]) || !isFinite(out[1])) { return null; }
@@ -228,6 +260,7 @@
 	 */
 	function unitOf(code) {
 		var k = key(code), d = ready() ? defs[k] : null, m;
+		if (k === WEBMERC) { return { units: 'm' }; }
 		if (!d) { return null; }
 		m = /\+units=(\S+)/.exec(d);
 		if (m) { return { units: m[1] }; }

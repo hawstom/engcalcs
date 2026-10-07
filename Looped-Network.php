@@ -1398,6 +1398,16 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 	<button type="button" id="lpn_contour_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
 	<div id="lpn_contour_body" class="lpn-popover-body"></div>
 </div>
+<?php // THE SCREENSHOT BOX (Tom, 2026-10-05: *"I hoped that there would be a box, possibly non-modal
+      // and dockable, with the magnification amount and any other possible future settings for the
+      // snip."*). Opens with Map > Screenshot, on the Contour box's shell. Its magnification is a
+      // preference of this browser, not modelling data, so it rides in `lpn_snipbox` beside where
+      // the box sits, and never in the project. ?>
+<div id="lpn_snip_box" class="d-print-none lpn-popover lpn-findbox lpn-snipbox" style="display:none;position:fixed;background:var(--ec-bg);border:1px solid var(--ec-ink);padding:40px 8px 8px;box-shadow:2px 2px 6px var(--ec-a-0-0-0-3)" role="dialog" aria-labelledby="lpn_snip_title">
+	<div id="lpn_snip_title" class="lpn-setbox-title"><?=$ec_lang['lpn_screenshot_menu']?></div>
+	<button type="button" id="lpn_snip_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
+	<div id="lpn_snip_body" class="lpn-popover-body"></div>
+</div>
 <?php // THE SCENARIO COMPARISON (the planning engineer's wish-list row 2). Solve every scenario in
       // the project and print one row each: the lowest pressure and the highest velocity, and where
       // each was found. It borrows the fire flow box's shell for the reason the pump energy report
@@ -1922,6 +1932,10 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 <dl>
 	<dt><?=$ec_lang['lpn_hotkeys_menu_term']?></dt><dd><?=$ec_lang['lpn_hotkeys_menu_def']?></dd>
 </dl>
+<h2><?=$ec_lang['lpn_hotkeys_snip_heading']?></h2>
+<dl>
+	<dt><?=$ec_lang['lpn_hotkeys_snip_term']?></dt><dd><?=$ec_lang['lpn_hotkeys_snip_def']?></dd>
+</dl>
 	</div>
 </div>
 
@@ -2059,6 +2073,19 @@ EngCalcs.pageConfig = {
 	lpn_status_example_opened: <?=json_encode($ec_lang['lpn_status_example_opened'])?>,
 	lpn_map_unmeasurable: <?=json_encode($ec_lang['lpn_map_unmeasurable'])?>,
 	lpn_wrong_thanks: <?=json_encode($ec_lang['lpn_wrong_thanks'])?>,
+	lpn_fb_intro: <?=json_encode($ec_lang['lpn_fb_intro'])?>,
+	lpn_fb_pick_numbers: <?=json_encode($ec_lang['lpn_fb_pick_numbers'])?>,
+	lpn_fb_pick_broken: <?=json_encode($ec_lang['lpn_fb_pick_broken'])?>,
+	lpn_fb_pick_wording: <?=json_encode($ec_lang['lpn_fb_pick_wording'])?>,
+	lpn_fb_pick_confusing: <?=json_encode($ec_lang['lpn_fb_pick_confusing'])?>,
+	lpn_fb_comment: <?=json_encode($ec_lang['lpn_fb_comment'])?>,
+	lpn_fb_email: <?=json_encode($ec_lang['lpn_fb_email'])?>,
+	lpn_fb_sends: <?=json_encode($ec_lang['lpn_fb_sends'])?>,
+	lpn_fb_send: <?=json_encode($ec_lang['lpn_fb_send'])?>,
+	lpn_fb_sending: <?=json_encode($ec_lang['lpn_fb_sending'])?>,
+	lpn_fb_failed: <?=json_encode($ec_lang['lpn_fb_failed'])?>,
+	lpn_fb_bad_email: <?=json_encode($ec_lang['lpn_fb_bad_email'])?>,
+	lpn_fb_busy: <?=json_encode($ec_lang['lpn_fb_busy'])?>,
 	lpn_field_text_anchor: <?=json_encode($ec_lang['lpn_field_text_anchor'])?>,
 	lpn_field_text_align: <?=json_encode($ec_lang['lpn_field_text_align'])?>,
 	lpn_field_text_align_left: <?=json_encode($ec_lang['lpn_field_text_align_left'])?>,
@@ -2084,6 +2111,7 @@ EngCalcs.pageConfig = {
 	lpn_crs_count: <?=json_encode($ec_lang['lpn_crs_count'])?>,
 	lpn_crs_count_network: <?=json_encode($ec_lang['lpn_crs_count_network'])?>,
 	lpn_crs_unplaceable_mark: <?=json_encode($ec_lang['lpn_crs_unplaceable_mark'])?>,
+	lpn_crs_suggested_mark: <?=json_encode($ec_lang['lpn_crs_suggested_mark'])?>,
 	lpn_crs_unplaceable: <?=json_encode($ec_lang['lpn_crs_unplaceable'])?>,
 	lpn_valve_type_pbv: <?=json_encode($ec_lang['lpn_valve_type_pbv'])?>,
 	lpn_valve_type_gpv: <?=json_encode($ec_lang['lpn_valve_type_gpv'])?>,
@@ -2102,10 +2130,24 @@ EngCalcs.pageConfig = {
 	lpn_status_reinterpreted: <?=json_encode($ec_lang['lpn_status_reinterpreted'])?>,
 	lpn_status_converted: <?=json_encode($ec_lang['lpn_status_converted'])?>,
 	lpn_file_export_inp: <?=json_encode($ec_lang['lpn_file_export_inp'])?>,
+	lpn_file_export_menu: <?=json_encode($ec_lang['lpn_file_export_menu'])?>,
+	lpn_file_export_item_inp: <?=json_encode($ec_lang['lpn_file_export_item_inp'])?>,
+	lpn_file_export_item_geojson: <?=json_encode($ec_lang['lpn_file_export_item_geojson'])?>,
 	lpn_file_export_inp_tip: <?=json_encode($ec_lang['lpn_file_export_inp_tip'])?>,
 	lpn_status_inp_exported: <?=json_encode($ec_lang['lpn_status_inp_exported'])?>,
+	lpn_status_inp_exported_picture: <?=json_encode($ec_lang['lpn_status_inp_exported_picture'])?>,
+	lpn_status_inp_exported_no_picture: <?=json_encode($ec_lang['lpn_status_inp_exported_no_picture'])?>,
 	lpn_inp_export_differences: <?=json_encode($ec_lang['lpn_inp_export_differences'])?>,
+	lpn_inp_export_difference_one: <?=json_encode($ec_lang['lpn_inp_export_difference_one'])?>,
 	lpn_inp_export_refused: <?=json_encode($ec_lang['lpn_inp_export_refused'])?>,
+	lpn_file_export_geojson: <?=json_encode($ec_lang['lpn_file_export_geojson'])?>,
+	lpn_file_export_geojson_tip: <?=json_encode($ec_lang['lpn_file_export_geojson_tip'])?>,
+	lpn_geojson_refused_local: <?=json_encode($ec_lang['lpn_geojson_refused_local'])?>,
+	lpn_geojson_refused_range: <?=json_encode($ec_lang['lpn_geojson_refused_range'])?>,
+	lpn_geojson_refused_crs: <?=json_encode($ec_lang['lpn_geojson_refused_crs'])?>,
+	lpn_geojson_refused_empty: <?=json_encode($ec_lang['lpn_geojson_refused_empty'])?>,
+	lpn_geojson_results_in: <?=json_encode($ec_lang['lpn_geojson_results_in'])?>,
+	lpn_geojson_results_out: <?=json_encode($ec_lang['lpn_geojson_results_out'])?>,
 	lpn_find_menu: <?=json_encode($ec_lang['lpn_find_menu'])?>,
 	lpn_find_scope: <?=json_encode($ec_lang['lpn_find_scope'])?>,
 	lpn_find_scope_all: <?=json_encode($ec_lang['lpn_find_scope_all'])?>,
@@ -2936,6 +2978,23 @@ EngCalcs.pageConfig = {
 	lpn_tool_add_chain_tip: <?=json_encode($ec_lang['lpn_tool_add_chain_tip'])?>,
 	lpn_tool_undo_tip: <?=json_encode($ec_lang['lpn_tool_undo_tip'])?>,
 	lpn_tool_zoom_extent_tip: <?=json_encode($ec_lang['lpn_tool_zoom_extent_tip'])?>,
+	lpn_screenshot_menu: <?=json_encode($ec_lang['lpn_screenshot_menu'])?>,
+	lpn_screenshot_tip: <?=json_encode($ec_lang['lpn_screenshot_tip'])?>,
+	lpn_screenshot_hint: <?=json_encode($ec_lang['lpn_screenshot_hint'])?>,
+	lpn_screenshot_copied: <?=json_encode($ec_lang['lpn_screenshot_copied'])?>,
+	lpn_screenshot_saved: <?=json_encode($ec_lang['lpn_screenshot_saved'])?>,
+	lpn_screenshot_no_basemap: <?=json_encode($ec_lang['lpn_screenshot_no_basemap'])?>,
+	lpn_screenshot_failed: <?=json_encode($ec_lang['lpn_screenshot_failed'])?>,
+	lpn_snip_hint_free: <?=json_encode($ec_lang['lpn_snip_hint_free'])?>,
+	lpn_snip_tip_rect: <?=json_encode($ec_lang['lpn_snip_tip_rect'])?>,
+	lpn_snip_tip_free: <?=json_encode($ec_lang['lpn_snip_tip_free'])?>,
+	lpn_snip_tip_mode: <?=json_encode($ec_lang['lpn_snip_tip_mode'])?>,
+	lpn_snip_tip_map: <?=json_encode($ec_lang['lpn_snip_tip_map'])?>,
+	lpn_snip_tip_pen: <?=json_encode($ec_lang['lpn_snip_tip_pen'])?>,
+	lpn_snip_tip_eraser: <?=json_encode($ec_lang['lpn_snip_tip_eraser'])?>,
+	lpn_snip_tip_undo: <?=json_encode($ec_lang['lpn_snip_tip_undo'])?>,
+	lpn_snip_tip_redo: <?=json_encode($ec_lang['lpn_snip_tip_redo'])?>,
+	lpn_screenshot_scale_tip: <?=json_encode($ec_lang['lpn_screenshot_scale_tip'])?>,
 	lpn_tool_zoom_window_tip: <?=json_encode($ec_lang['lpn_tool_zoom_window_tip'])?>,
 	lpn_zoom_in_tip: <?=json_encode($ec_lang['lpn_zoom_in_tip'])?>,
 	lpn_zoom_out_tip: <?=json_encode($ec_lang['lpn_zoom_out_tip'])?>,
@@ -3249,6 +3308,10 @@ EngCalcs.pageConfig = {
 	lpn_inp_drop_net_options: <?=json_encode($ec_lang['lpn_inp_drop_net_options'])?>,
 	lpn_net_emergency: <?=json_encode($ec_lang['lpn_net_emergency'])?>,
 	lpn_inp_drop_backdrop: <?=json_encode($ec_lang['lpn_inp_drop_backdrop'])?>,
+	lpn_inp_backdrop_attach: <?=json_encode($ec_lang['lpn_inp_backdrop_attach'])?>,
+	lpn_inp_backdrop_attach_tip: <?=json_encode($ec_lang['lpn_inp_backdrop_attach_tip'])?>,
+	lpn_inp_backdrop_attached: <?=json_encode($ec_lang['lpn_inp_backdrop_attached'])?>,
+	lpn_inp_backdrop_attached_other: <?=json_encode($ec_lang['lpn_inp_backdrop_attached_other'])?>,
 	lpn_inp_drop_dangling: <?=json_encode($ec_lang['lpn_inp_drop_dangling'])?>,
 	lpn_inp_drop_units: <?=json_encode($ec_lang['lpn_inp_drop_units'])?>,
 	lpn_inp_drop_anchor_missing: <?=json_encode($ec_lang['lpn_inp_drop_anchor_missing'])?>,
@@ -3767,6 +3830,28 @@ EngCalcs.pageConfig = {
 	lpn_survey_note_id_duplicate: <?=json_encode($ec_lang['lpn_survey_note_id_duplicate'])?>,
 	lpn_survey_note_id_taken: <?=json_encode($ec_lang['lpn_survey_note_id_taken'])?>,
 	lpn_survey_note_id_invalid: <?=json_encode($ec_lang['lpn_survey_note_id_invalid'])?>,
+	lpn_survey_codes_toggle: <?=json_encode($ec_lang['lpn_survey_codes_toggle'])?>,
+	lpn_survey_codes_tip: <?=json_encode($ec_lang['lpn_survey_codes_tip'])?>,
+	lpn_survey_codes_col_code: <?=json_encode($ec_lang['lpn_survey_codes_col_code'])?>,
+	lpn_survey_codes_col_type: <?=json_encode($ec_lang['lpn_survey_codes_col_type'])?>,
+	lpn_survey_codes_add: <?=json_encode($ec_lang['lpn_survey_codes_add'])?>,
+	lpn_survey_codes_remove: <?=json_encode($ec_lang['lpn_survey_codes_remove'])?>,
+	lpn_survey_confirm_coded: <?=json_encode($ec_lang['lpn_survey_confirm_coded'])?>,
+	lpn_survey_report_coded: <?=json_encode($ec_lang['lpn_survey_report_coded'])?>,
+	lpn_survey_note_code_unknown: <?=json_encode($ec_lang['lpn_survey_note_code_unknown'])?>,
+	lpn_survey_note_code_two_nodes: <?=json_encode($ec_lang['lpn_survey_note_code_two_nodes'])?>,
+	lpn_survey_note_code_unread: <?=json_encode($ec_lang['lpn_survey_note_code_unread'])?>,
+	lpn_survey_note_vertex_text: <?=json_encode($ec_lang['lpn_survey_note_vertex_text'])?>,
+	lpn_survey_note_join_missing: <?=json_encode($ec_lang['lpn_survey_note_join_missing'])?>,
+	lpn_survey_note_join_no_line: <?=json_encode($ec_lang['lpn_survey_note_join_no_line'])?>,
+	lpn_survey_note_pipe_one_node: <?=json_encode($ec_lang['lpn_survey_note_pipe_one_node'])?>,
+	lpn_survey_note_line_one_point: <?=json_encode($ec_lang['lpn_survey_note_line_one_point'])?>,
+	lpn_survey_note_vertices: <?=json_encode($ec_lang['lpn_survey_note_vertices'])?>,
+	lpn_survey_note_no_desc: <?=json_encode($ec_lang['lpn_survey_note_no_desc'])?>,
+	lpn_survey_note_ring_junction: <?=json_encode($ec_lang['lpn_survey_note_ring_junction'])?>,
+	lpn_survey_note_pipe_zero_length: <?=json_encode($ec_lang['lpn_survey_note_pipe_zero_length'])?>,
+	lpn_survey_note_node_on_pipe: <?=json_encode($ec_lang['lpn_survey_note_node_on_pipe'])?>,
+	lpn_new_create: <?=json_encode($ec_lang['lpn_new_create'])?>,
 };
 </script>
 <script src="/engcalcs/js/PipeHydraulics.lib.js?v=<?=filemtime(__DIR__.'/js/PipeHydraulics.lib.js')?>"></script>
@@ -3778,6 +3863,8 @@ EngCalcs.pageConfig = {
       // the difference between importing a pattern and reporting that one was dropped. ?>
 <script src="/engcalcs/js/lpn-patterns.js?v=<?=filemtime(__DIR__.'/js/lpn-patterns.js')?>"></script>
 <script src="/engcalcs/js/lpn-inp.js?v=<?=filemtime(__DIR__.'/js/lpn-inp.js')?>"></script>
+<?php // The GeoJSON writer (ROADMAP Task 728). Pure; reads EngCalcs.lpnNumText from lpn-inp.js, so AFTER it. ?>
+<script src="/engcalcs/js/lpn-geojson.js?v=<?=filemtime(__DIR__.'/js/lpn-geojson.js')?>"></script>
 <?php // The clock's RUN half (ROADMAP Task 248). AFTER lpn-patterns.js, which it reads for
       // lpnParseTime, lpnTimeText and lpnTimesDefaults; BEFORE looped-network.js, which calls
       // EngCalcs.lpnTimeInit() at script scope to register its own bottom-pane tab. Get this

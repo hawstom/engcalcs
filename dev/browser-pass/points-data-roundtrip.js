@@ -163,6 +163,169 @@ async function probe(browser, origin, spec) {
 	await context.close();
 }
 
+
+// Points data on mi and wi: Copy and Paste carry station and elevation only, so the same text goes
+// between the two pages, and what a spreadsheet or a Windows editor hands over (tabs, CRLF, a
+// heading line, a trailing blank line, a shorter or longer table) still lands in the table, the
+// sketch and the results. Tom, 2026-10-07: "Paste points doesn't work."
+const POINTS = [
+	{ file: 'Manning-Irregular.php', label: 'mi', result: 'q617' },
+	{ file: 'Weir-Flow-Irregular.php', label: 'wi', result: 'qc' },
+];
+const SECTION = '0,10\r\n5,4\r\n10,4\r\n15,10\r\n';
+
+async function column(page, name) {
+	return page.$$eval(`[name="${name}"]`, (els) => els.map((el) => el.value));
+}
+async function paste(page, text) {
+	await setPointsDataValue(page, text);
+	await clickPaste(page);
+}
+
+async function probePoints(browser, origin, spec) {
+	const context = await browser.newContext();
+	const errors = [];
+	const page = await context.newPage();
+	page.on('pageerror', (e) => errors.push(String(e)));
+	await page.goto(`${origin}/engcalcs/${spec.file}?ec_nolog=1`, { waitUntil: 'load' });
+	await page.waitForSelector('#points_data_paste');
+	await page.waitForFunction(() => window.EngCalcs && EngCalcs.numCalcRows > 0, null, { timeout: 5000 });
+	console.log(`\n--- points data, ${spec.label} ---`);
+
+	// Windows line ends, a longer table than the default.
+	const svgBefore = await page.$eval('#sketch', (el) => el.innerHTML);
+	await paste(page, SECTION);
+	ok((await column(page, 'station')).join() === '0,5,10,15' && (await column(page, 'elevation')).join() === '10,4,4,10',
+		`${spec.label}: CRLF text fills the station and elevation columns`, (await column(page, 'station')).join() + ' | ' + (await column(page, 'elevation')).join());
+	ok((await page.$eval('#sketch', (el) => el.innerHTML)) !== svgBefore, `${spec.label}: the sketch redraws after Paste`);
+	await clickCopy(page);
+	const copied = await pointsDataValue(page);
+	if (spec.label === 'wi') {
+		ok(copied === '0,10\n5,4\n10,4\n15,10\n', 'wi: Copy gives station,elevation lines only', JSON.stringify(copied));
+	} else {
+		const cl = copied.trim().split('\n');
+		ok(cl[0] === '0,10' && cl.length === 4 && cl.slice(1).every((l) => /^-?[\d.]+,-?[\d.]+,(true|false),[\d.]+$/.test(l)),
+			'mi: Copy gives full rows (station, elevation, bank flag, n)', JSON.stringify(copied));
+	}
+	const results = (await column(page, spec.result)).join();
+
+	// Tabs and a heading line and a blank line, a shorter table.
+	await paste(page, 'Station\tElevation\n\n0\t8\n6\t2\n12\t8\n\n');
+	ok((await column(page, 'station')).join() === '0,6,12' && (await column(page, 'elevation')).join() === '8,2,8',
+		`${spec.label}: tab text with a heading and blank lines fills a shorter table`, (await column(page, 'station')).join());
+	ok((await column(page, spec.result)).length === 3, `${spec.label}: result rows follow the point count`);
+
+	// The text survives a reload (Paste saves, as any edit does).
+	await page.reload({ waitUntil: 'load' });
+	await page.waitForFunction(() => window.EngCalcs && EngCalcs.numCalcRows > 0, null, { timeout: 5000 });
+	ok((await column(page, 'station')).join() === '0,6,12', `${spec.label}: pasted points are kept after a reload`, (await column(page, 'station')).join());
+
+	// Text that is not points changes nothing.
+	await paste(page, 'hello\nworld');
+	ok((await column(page, 'station')).join() === '0,6,12', `${spec.label}: text with no points leaves the table alone`);
+	ok(errors.length === 0, `${spec.label}: no uncaught JavaScript`, errors.join(' | '));
+	await context.close();
+	return results;
+}
+
+async function probeCross(browser, origin) {
+	// Copy on wi, Paste on mi, and back.
+	const context = await browser.newContext();
+	const wi = await context.newPage();
+	await wi.goto(`${origin}/engcalcs/Weir-Flow-Irregular.php?ec_nolog=1`, { waitUntil: 'load' });
+	await wi.waitForFunction(() => window.EngCalcs && EngCalcs.numCalcRows > 0, null, { timeout: 5000 });
+	await paste(wi, SECTION);
+	await clickCopy(wi);
+	const text = await pointsDataValue(wi);
+	const mi = await context.newPage();
+	await mi.goto(`${origin}/engcalcs/Manning-Irregular.php?ec_nolog=1`, { waitUntil: 'load' });
+	await mi.waitForFunction(() => window.EngCalcs && EngCalcs.numCalcRows > 0, null, { timeout: 5000 });
+	const nBefore = await column(mi, 'n');
+	await paste(mi, text);
+	ok((await column(mi, 'station')).join() === '0,5,10,15' && (await column(mi, 'elevation')).join() === '10,4,4,10',
+		'wi Copy -> mi Paste carries the points across', (await column(mi, 'station')).join());
+	const nAfter = await column(mi, 'n');
+	ok(nAfter.length === 4 && nAfter.slice(1).every((v) => v !== ''), 'mi: roughness n is not blanked by Paste', nAfter.join());
+	ok(nBefore.slice(1, 2).join() === nAfter.slice(1, 2).join(), 'mi: an existing row keeps its roughness n', nBefore.join() + ' -> ' + nAfter.join());
+	await clickCopy(mi);
+	await clickPaste(wi);
+	await setPointsDataValue(wi, await pointsDataValue(mi));
+	await clickPaste(wi);
+	ok((await column(wi, 'station')).join() === '0,5,10,15', 'mi Copy -> wi Paste carries the points back');
+	await context.close();
+}
+
+// mi: points-only Paste keeps n and bank flags with their STATIONS, and the reading rules for commas.
+async function flows(page) {
+	return page.$$eval('[name="q617"]', (els) => els.map((el) => (el.value !== undefined && el.value !== '') ? el.value : el.textContent.trim()));
+}
+async function banks(page) {
+	return page.$$eval('[name="is_bank"]', (els) => els.map((el) => el.checked));
+}
+async function probeMi(browser, origin) {
+	const context = await browser.newContext();
+	const page = await context.newPage();
+	const errors = [];
+	page.on('pageerror', (e) => errors.push(String(e)));
+	await page.goto(`${origin}/engcalcs/Manning-Irregular.php?ec_nolog=1`, { waitUntil: 'load' });
+	await page.waitForFunction(() => window.EngCalcs && EngCalcs.numCalcRows > 0, null, { timeout: 5000 });
+	console.log('\n--- mi: points follow stations ---');
+	await clickCopy(page);
+	const full0 = await pointsDataValue(page);
+	const stations0 = (await column(page, 'station')).join();
+	const n0 = (await column(page, 'n')).join();
+	const flows0 = await flows(page);
+	const banks0 = (await banks(page)).join();
+
+	// Perry's S1: the defaults' own points, then two dry points beyond the last.
+	await paste(page, '0,6\n30,3\n40,1\n60,1\n70,3\n100,6\n130,6\n160,6');
+	const n1 = await column(page, 'n');
+	ok(n1.join() === n0 + ',0.04,0.04', 'S1: n follows stations; added segments take the end segment n', n0 + ' -> ' + n1.join());
+	const st1 = await column(page, 'station');
+	const bk1 = await banks(page);
+	ok(st1.filter((_, i) => i > 0 && bk1[i]).join() === '30,70,100,160', 'S1: bank flags stay on stations 30, 70 and 100 (160 is the last point, always a bank)', st1.filter((_, i) => i > 0 && bk1[i]).join());
+	ok(banks0 === bk1.slice(0, 6).join(), 'S1: the first six bank flags are untouched', banks0 + ' -> ' + bk1.join());
+	const flows1 = await flows(page);
+	ok(flows0.join() === flows1.slice(0, flows0.length).join(), 'S1: results for the original points do not move', flows0.join() + ' -> ' + flows1.join());
+
+	// Perry's one-then-four: n must come back from the last section that had segments.
+	await paste(page, '0,6');
+	await paste(page, '0,6\n30,3\n40,1\n60,1\n70,3\n100,6');
+	ok((await column(page, 'n')).join() === n0, 'one point, then the six: n is restored, not 1', (await column(page, 'n')).join());
+	ok((await banks(page)).join() === banks0, 'one point, then the six: bank flags are restored', (await banks(page)).join());
+
+	// Full rows restore everything.
+	await paste(page, full0);
+	await clickCopy(page);
+	ok((await pointsDataValue(page)) === full0, 'full-row Copy -> Paste is the identity', JSON.stringify(await pointsDataValue(page)));
+	await paste(page, '0,6\n30,3,true,0.07\n40,1,false,0.05\n100,6,true,0.09');
+	ok((await column(page, 'n')).slice(1).join() === '0.07,0.05,0.09' && (await banks(page)).slice(1).join() === 'true,false,true', 'full rows restore n and bank flags exactly', (await column(page, 'n')).join());
+
+	// S2: thousands separators and decimal commas, on a tab line.
+	await paste(page, '0\t10,5\n1,000.00\t100.0\n2,000.50\t90,25\n');
+	ok((await column(page, 'station')).join() === '0,1000.00,2000.50' && (await column(page, 'elevation')).join() === '10.5,100.0,90.25',
+		'S2: tab text reads 1,000.00 as 1000 and 10,5 as 10.5', (await column(page, 'station')).join() + ' | ' + (await column(page, 'elevation')).join());
+	// An unreadable line after data stops the Paste and says so.
+	const before = (await column(page, 'station')).join();
+	await paste(page, '0\t1\n5\t2\n1.000,50\t3\n');
+	ok((await column(page, 'station')).join() === before, 'an ambiguous line leaves the table unchanged');
+	const msg = await page.$eval('#points_data_msg', (el) => el.textContent);
+	ok(/Line 3/.test(msg), 'and a message names the line', msg);
+	ok(errors.length === 0, 'mi: no uncaught JavaScript', errors.join(' | '));
+	await context.close();
+
+	// wi: the same reading rules; four columns use the first two.
+	const w = await browser.newContext();
+	const wp = await w.newPage();
+	await wp.goto(`${origin}/engcalcs/Weir-Flow-Irregular.php?ec_nolog=1`, { waitUntil: 'load' });
+	await wp.waitForFunction(() => window.EngCalcs && EngCalcs.numCalcRows > 0, null, { timeout: 5000 });
+	await paste(wp, '0\t10,5\n1,000.00\t100.0\n');
+	ok((await column(wp, 'station')).join() === '0,1000.00' && (await column(wp, 'elevation')).join() === '10.5,100.0', 'S2 on wi: thousands and decimal commas');
+	await paste(wp, '0,6\n30,3,true,0.04\n40,1,false,0.03\n');
+	ok((await column(wp, 'station')).join() === '0,30,40' && (await column(wp, 'elevation')).join() === '6,3,1', 'wi: a four-column paste uses the first two');
+	await w.close();
+}
+
 (async function main() {
 	let playwright;
 	try { playwright = require('playwright-core'); }
@@ -178,6 +341,11 @@ async function probe(browser, origin, spec) {
 		for (const spec of PAGES) {
 			await probe(browser, origin, spec);
 		}
+		for (const spec of POINTS) {
+			await probePoints(browser, origin, spec);
+		}
+		await probeCross(browser, origin);
+		await probeMi(browser, origin);
 	} catch (err) {
 		failures++;
 		console.log(`\n FAIL  threw\n${err && err.stack ? err.stack : err}`);

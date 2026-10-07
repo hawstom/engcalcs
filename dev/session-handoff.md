@@ -99,80 +99,82 @@ lines rather than appending corrections.
   tile counts at a 900 ms settle (basemap.js now waits for a pointable tile). Pre-existing and unrelated: `scale-publish-harness.js` (2 checks). The full `node dev/browser-pass/run.js` is green (1853/1853, 2026-10-04, Task 761); browser-pass specs are not in
   check_all.
 
-## STATE — 2026-10-07 (fifth session; jasmine runs on UTC)
+## STATE — 2026-10-06 evening to 10-07 early (sixth session; jasmine is on Arizona time now)
+
+**Dates here are Arizona local from this session on** (Tom set jasmine to America/Phoenix
+2026-10-06; earlier sessions' dates were UTC, a day ahead of his evening).
 
 ### Master = see `git log -1 master`, pushed. Production = 9c71d54f (Tom pulled 2026-09-28)
 
-Merged this session: Tasks 774 (Description edits: trimmed every keystroke, refreshed nothing) and 775
-in part (Convert as on an empty project opened a file picker), the usage-report window fix (a
-replayed offline beacon stamped 09-21 made a 5-day log report 15 days), "Is active?" (his word),
-`feat/tip-door` ("Merge") and `feat/asset-type` ("Merge."). Task 769 closed; 759 half done.
-**The usage-report fix reaches his daily mail only after his next pull.**
+Merged this session (defect tracks, on green): mi/wi Paste points (two rounds: points only, then n
+and banks follow stations and tab text with 1,000.00 / 10,5 reads right); **Task 775's zombie
+label** (a rename left the label and a renamed pipe's line answering to the old ID: same on
+production; `rename-label-zombie-harness.js`); **pipe labels over node symbols** (204 on master since
+9ce21702; now 0, net +490 labels; `label-node-symbol-harness.js`); Task 779 (Shape) added. The
+Fotobi file never reached jasmine; the lost node symbols are still unreproduced.
 
 ### Awaiting him (all on the Branch previews page with click lists; each passed Perry)
 
-- **`feat/backdrop-attach`**: his tip wording applied ("in a zip file with its image if
-  applicable"); he wrote "Otherwise it worked great. Good" -- ASK whether that is "Merge".
-- **`feat/feedback`**: "Canned messages (optional)" applied as the first sentence of `lpn_fb_intro`
-  (second sentence kept); "Other than that, it looks great" -- ASK whether that is "Merge".
-- **`feat/survey-code`**: he liked it; no merge word. His questions answered in the report: JPN is
-  Carlson's "join to point number"; CPN came from search summaries, unverified; Civil 3D's linework
-  codes are user-set, as he guessed. Pipe size from codes is Task 778 (25).
-- **`feat/geojson`**: exports now in File > Export... submenu (his ask). Gusnet reads the .inp
-  directly (Processing Toolbox > Gusnet > Import from EPANET .inp file). **Seam:** `feat/dxf` must at
-  its merge add one row to `exportMenuRows()` and rename its key to `lpn_file_export_item_dxf`
-  (list in the geojson agent's report, repeated in `feat/geojson:dev/` docs if any).
-- **`feat/dxf`**: no-download fixed (an SVG HTMLCollection `.forEach`; the stub harness used an
-  Array). Lat/lon writes UTM metres, not degrees (his assumption corrected; status line says so).
-  ID visible, one layer per property C-WATR-ATTR-*, attributes height 1, Standard style.
-- **`feat/screenshot`**: Snip (rectangle, freehand) + red pen markup view (Undo, Copy, Save). His
-  calls: plain Screenshot now opens the view (one more click); view stays open after Copy.
-- **`feat/table-export`** (Task 776): Copy with headings; Export table as CSV / ODS (pane menu).
-- **`feat/section-grid`** (Task 777): 4-8 round station/elevation marks on mi and wi sketches.
-- **`feat/user-guide`**: Ida's design; one Help > User guide replaces Toolbar and Tables and Hotkeys;
-  generated from the live toolbar and menus; "?" opens it at the control. `lpn_help_hotkeys` is an
-  orphan candidate once merged. lpn_notes_6_def cells swapped (order only) in 27 files; its old
-  "OK." ruling lapsed.
-- **`feat/bentley-interop`** (long burn, never merges without him): held values marked in the
-  Settings box (amber, "Base: x", Clear override), view rows + "Hold this view in this scenario",
-  his two notes fixed (Major/Minor from the box; table marks overrides live), Change type walks
-  stored alternatives. Q10 decided by CC (one Clear for all three; may overrule), Q11, Q12 open.
+- **Merge word still missing** (he did not answer): `feat/backdrop-attach` ("Good"),
+  `feat/feedback` ("looks great"), `feat/survey-code`, `feat/geojson`. Ask him to TYPE "Merge X".
+- **`feat/dxf`** (a5db182f): reshaped to `dev/dxf-interface.md` per his "Reshape": data only,
+  C-WATR-MODL-<code>-<ALT> layers, ALL CAPS, height 1, STYLE font `txt` (the blank font field was
+  the Arial), values as typed, MLEADER and results dropped. Seam with geojson unchanged.
+- **`feat/screenshot`** (236735e4): stroke eraser, Undo/Redo, icons, chevron shape menu; Esc with
+  strokes does nothing. Deleted keys: lpn_snip_button, _pen, _rectangle, _freehand,
+  lpn_screenshot_scale.
+- **`feat/table-export`** (0de5ecbd): ODS/XLSX wrap, freeze, widths; File > Export table... dialog.
+  Not opened in Excel or LibreOffice by anyone yet (neither installed): his pass is that test.
+- **`feat/section-grid`** (0345725c): "Points data" on both pages (paste fix already on master).
+- **`feat/user-guide`** (747fa29b): named Guide; Contents rail, search, Ctrl+K, F1, one "?" per box
+  title bar. **His call:** the corner tips of Fire flow / Critical assets / Demand scaling moved
+  into their Guide entries (reverses his 10-03/10-05 ask).
+- **`feat/bentley-interop`** (780ecda7, long burn): Owner column, Rank gone (key deleted, 27
+  files), Overrides only / Current scenario only, Clear override fast, "Save this view", audit
+  rows, Q12 marks everywhere. Q10 and Q12 explained to him in plain words (2026-10-06 report).
+- **`feat/web-mercator`** (2fbf8120, Task 775): 3857 is a projected project in metres, ground
+  lengths; 4326 "(suggested)".
+- **`feat/visit-dedupe`** (2de0a88e): STORAGE CHANGE, needs his yes: ec_seen 1 year; ec_nolog 1
+  year with a date, tester log and side count. No privacy row for the tester cookie (his
+  2026-08-12 call; Perry asks him to reconfirm).
+- **`chore/technical-english`** (4be0b5b5): house style is now standard civil-engineering technical
+  English (CLAUDE.md + language-strings.md); 151 CLEAR rewrites applied in en; 41 ASK held.
+- **His answers go in the interview page** https://claude.ai/artifact/3eMmdZMvaLg6Mcj4tsSPk8
+  (db collection `answers`, doc ids D01-D10 and `ask-<key>`). Read with ArtifactData list.
+  Apply ASK answers on `chore/technical-english`, then merge it, regenerate payloads, sprint.
 - Still from before: `feat/desktop`.
 
 ### Label bench
 
-- **Label round 7 is SCORED** (`feat/label-placer` e71dfe82, pushed with the four builder branches):
-  `feat/label-placer:dev/label-trials/round-7-2026-10-07.md`, and the phase-1 close drafted in
-  `feat/label-placer:dev/label-trials/phase-1-summary.md`. A7-D7 within a point of each other
-  (78-79% labels vs round 6's best 71.8%); all six hypotheses held; builder B's accidental read of
-  Part B is disclosed and B's blind tests excluded. Round 8 fixes are listed (room-check counts
-  leader ground and own-pipe ground; Part B out of the builders' file). spot_prime still untried.
-  **Question for him:** the drop order. Scenes that do not list the ID drop it first, so labels show
-  bare values ("P=56.67"); moving the ID last shows 40 of 42 labels instead of 32
-  (`feat/label-placer:dev/label-trials/round-7/drop-order-novato.png`).
-
-### Decisions waiting on him
-
-- **Daily email words.** He believes a yes-browser is never counted again; the code and privacy.php
-  say `ec_seen` is a SESSION cookie, so a yes-browser is counted once per page per browser session.
-  His proposed "browsers (said yes)" is false under that. Choice: keep session ("visits (said
-  yes)"), or make `ec_seen` one year (then "browsers (said yes)" is true and counts first visits
-  only; a storage change: privacy.php row, consent version question). "page loads (everyone
-  else)" is his and is fine either way. Build after he picks.
-- **Convert as (Task 775):** 3857 vs 4326 (R-218 fold) -- explain, hide the 3857 row, or make 3857
-  real; and which surface he saw the lost node symbols on (not reproduced on master or 9c71d54f).
-- **DXF:** answered 2026-10-07: `feat/dxf`'s labels and read-me are fine as they are; labeling is
-  to be "a mere consequence" of transferring data by attributed blocks (`dev/dxf-interface.md`).
-  Spend no more on DXF label layout; the spec's import and export come next, after his pass.
-- **Snip:** keep the view on plain Screenshot? close after Copy?
-- **User guide:** the name; show vs run; English-only prose.
-- DMARC phase 3; Mary's contacts: Gusnet's author only via GitHub Issues
-  (github.com/angusmcb/gusnet/issues; Discussions off); he has written to Prof. Martínez Alzamora.
-- jasmine timezone: `sudo timedatectl set-timezone America/Phoenix` from him.
+- `feat/label-placer` eaa25d02 (pushed): `feat/label-placer:dev/label-trials/placement-report-vs-production.md`
+  (builders 78-79% vs production 41.7%; zero overlaps vs 2,607; stability metric added: production
+  0 labels moved per 100, builders 3-14 on a repeat view, the cost of the clock),
+  `speed-phase-plan.md`, publish advice (arXiv after round 8). **ID-last is NO** (R1(3) in
+  `feat/label-placer:dev/label-placement-rules.md`). Port list: rules 1-3 port cleanly; D09 on the interview.
 
 ### Next job
 
-- Merge his next batch, then ONE translation sprint (Wave 0 first) for every new key.
+- Read the interview answers; merge what he clears (merge master in first, regenerate payloads on
+  the merge, suite on the merge commit); then ONE translation sprint (Wave 0 first). Many new
+  English keys are waiting on these branches, so the sprint waits for the merges.
+
+### Traps met 2026-10-06 (sixth session)
+
+- **Perry's corrected wording lives in his REPORT, not his journal.** CC told a builder to read the
+  journal; it found no wording and wrote its own, repeating one inaccuracy. Paste the text into the
+  brief.
+- **A merge of master into a branch emptied `dev/agents/pre-reviewer/journal.md`** (feat/screenshot,
+  3892 lines to 0); Perry caught it. After any branch's merge, `git diff --stat master` the journals.
+- **Six suites queued at once took over an hour each to start.** One agent used `EC_CHECK_SLOTS=5`
+  to take a fifth slot; it worked. Stagger fix rounds.
+- **`wait_for.sh --sentinel` returned before the log had EXIT=** once (the job was alive); read the
+  log before pushing, never the waiter's exit code.
+- **`delete_lang_key.php` left `count` stale** in english_string_hashes.json (fixed on
+  `fix/delete-key-count`).
+- **Perry earned his keep on every branch**: invisible attributes in six languages (DXF), a menu
+  clipped by its box (screenshot), one Esc closing two boxes and 14 empty help entries (Guide), a
+  zip entry with a slash (table export), a repeat-use ratio over 100% (dedupe), n moved by row
+  number (paste). None was caught by the builder's own harness.
 
 ### Traps met 2026-10-07 (fifth session)
 

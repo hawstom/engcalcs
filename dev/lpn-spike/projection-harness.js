@@ -320,15 +320,23 @@ setUnitSet('si');
 	// **A COUNT IS A MEASUREMENT AND IS PINNED DELIBERATELY.** 183 from 2026-09-13 to 2026-09-25,
 	// when EPSG:4326 became the 184th row; see dev/projection-catalogue.md.
 	ok('...one hundred and eighty four rows in all', list.length === 184, String(list.length));
-	ok('...and Pseudo-Mercator is still first, being the commonest answer', list[0].code === L.WEBMERC, list[0].code);
+	// Task 775: WGS 84 latitude and longitude is first, the suggested answer, and Pseudo-Mercator
+	// right after it.
+	ok('...and WGS 84 (EPSG:4326) is first, being the suggested answer', list[0].code === L.GEOWGS84, list[0].code);
+	ok('...with Pseudo-Mercator second', list[1].code === L.WEBMERC, list[1].code);
 	ok('...named as the register names it, not described',
 		/Pseudo-Mercator/.test(L.crsLabel(L.WEBMERC)), L.crsLabel(L.WEBMERC));
-	// A lon/lat document must never store it as a projected plane: its numbers are degrees, and a
-	// project.crs of EPSG:3857 or EPSG:4326 would be claiming they are metres.
+	// A lon/lat document must never store EPSG:4326 as a projected plane: its numbers are degrees.
+	// **EPSG:3857 IS A REAL PROJECTED DECLARATION SINCE TASK 775** (Tom, 2026-10-07: "Make 3857
+	// real."): its numbers are Web Mercator metres.
 	L.reset();
-	ok('and it is refused as a projected declaration', L.assignCrs(L.WEBMERC) === false);
-	ok('...EPSG:4326 the same way', L.assignCrs(L.GEOWGS84) === false);
+	ok('EPSG:4326 is refused as a projected declaration', L.assignCrs(L.GEOWGS84) === false);
 	ok('...leaving the project with no projection at all', L.crsCode() === '');
+	ok('EPSG:3857 is accepted as a projected declaration', L.assignCrs(L.WEBMERC) === true);
+	ok('...and stated as project.crs', L.crsCode() === L.WEBMERC, L.crsCode());
+	ok('...naming itself on the status strip as the register does',
+		L.crsName() === L.crsLabel(L.WEBMERC) + ' (' + L.WEBMERC + ')', L.crsName());
+	L.reset();
 	// **THE STATUS STRIP'S GEOGRAPHIC NAME NO LONGER COMES FROM THE CATALOGUE'S 3857 ENTRY** (R-218;
 	// Tom, 2026-09-24, resolving R-188). It used to be one string with the catalogue's own
 	// Pseudo-Mercator entry, on the argument that a geographic project's internal code IS EPSG:3857
@@ -347,7 +355,7 @@ setUnitSet('si');
 	// this page's own native Mercator math, never through js/lpn-crs.js's proj4 definitions, so
 	// asking lpnCrsHas() for either was always the wrong question. crsCannotBePlaced() short-
 	// circuits before it gets there, which does not depend on the register having loaded.
-	ok('EPSG:3857 is never marked unplaceable', !L.crsCannotBePlaced(L.WEBMERC));
+	ok('EPSG:3857 is never marked unplaceable (closed form in js/lpn-crs.js)', !L.crsCannotBePlaced(L.WEBMERC));
 	ok('EPSG:4326 is never marked unplaceable', !L.crsCannotBePlaced(L.GEOWGS84));
 }
 
@@ -577,10 +585,13 @@ setUnitSet('si');
 
 	newCoordsRadios.geo.checked = true;
 	ok('choosing the geographic radio is read back', L.newBoxCoords() === 'geo');
-	L.newBoxGeo().crs = L.WEBMERC;
+	L.newBoxGeo().crs = L.GEOWGS84;
 	L.newBoxGeo().place = null;
-	ok('...and EPSG:3857 makes a lat/lon project, not a projected one',
+	ok('...and EPSG:4326 makes a lat/lon project, not a projected one',
 		L.newBoxAnswers().geo === true && L.newBoxAnswers().crs === '');
+	L.newBoxGeo().crs = L.WEBMERC;
+	ok('...while EPSG:3857 makes a projected one (Task 775)',
+		L.newBoxAnswers().geo === false && L.newBoxAnswers().crs === L.WEBMERC);
 
 	L.newBoxGeo().crs = ZONE12N;
 	ok('...while any other projection makes a projected one',

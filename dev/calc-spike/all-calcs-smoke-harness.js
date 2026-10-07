@@ -40,7 +40,7 @@ const r = makeReporter('every calculator, on its own defaults');
 const NOT_CALCULATORS = new Set([
 	'About.php', 'Compare-Languages.php', 'Install.php', 'consent.php', 'contact.php',
 	'formmail.php', 'formmailsuccess.php', 'index.php', 'log-calc-event.php',
-	'log-human-view.php', 'log-title-event.php', 'log-signal-event.php',
+	'log-human-view.php', 'log-title-event.php', 'log-signal-event.php', 'send-feedback.php',
 	'lpn-lock.php', 'privacy.php', 'terms.php',
 	'Looped-Network.php',
 	// A reference table, not a calculator: it has a form but defines no pageCalculator.

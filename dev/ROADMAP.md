@@ -236,19 +236,8 @@ the block.
   Tom, 2026-10-06. FIXED: Convert as on an empty project opened a file picker (it now opens the box).
   NOT REPRODUCED: the old project losing its node symbols and its view after a conversion
   (`convert-as-fotobi-harness.js`, four paths, master and production 9c71d54f); ask which surface.
-  HIS CALL: EPSG:3857 and 4326 are the same lat/lon project here (R-218), so choosing 3857 in File,
-  New or Convert as silently becomes 4326. Options: explain, hide the 3857 row, or make 3857 real.
-- 75|282| **Offer to attach the backdrop an imported `.inp` names.** An `.inp` (and a `.net`) stores
-  only a PATH to its background picture, never the picture. The import reports the file name and
-  tells the user to add it with Map, Backdrop; it could instead offer a picker right there, seeded
-  with that name, and set the map extent from the file's own `[BACKDROP] DIMENSIONS` so the image
-  lands registered rather than needing the two-point scale gesture. Low priority — a user who wants
-  the picture already knows where it is, and Map, Backdrop already works.
-  - **Worth more than it was, 2026-08-11.** The models Tom is collecting name BMP backdrops, which
-    browsers can actually display, so "the file it names is one you could hand over right now" has
-    gone from hypothetical to the common case. The registration half is the valuable half: an
-    `[BACKDROP] DIMENSIONS` record places the image in the model's own coordinates exactly, which
-    is strictly better than the two-point scale gesture a human would otherwise perform by eye.
+  BUILT on `feat/web-mercator`, awaiting his pass: EPSG:3857 is a real projected project in metres
+  (his call, 2026-10-07: "Make 3857 real."), lengths on the ground, 4326 marked suggested.
 - 75|578| **Fire flow: the EPS frame and the Run concept, extracted from 530.**
   Everything else in Task 530 shipped and that task is closed. Two phases were never built and are
   kept here so they are not lost in a closed block.
@@ -395,6 +384,11 @@ the block.
 - 75|777| **Station and elevation marks on the mi and wi section sketches.**
   Tom, 2026-10-06: *"it would be very nice to add either an automatic stations and elevations grid
   or the stations and elevations about 4 to 8 points."* Branch `feat/section-grid`.
+- 75|779| **Shape: a simple drawn element, point, polyline or polygon, with snapping.**
+  Tom, 2026-10-06: *"a very simple shape element type (if one point, it's a point, and if more,
+  it's a polyline, and it can close into a polygon if you let it. Either way, we call it a
+  'Shape', and we can export or import to and from points, polylines, and polygons.) and the
+  ability to snap or magnet to shape points."* Seams: DXF (Task 772), GeoJSON, survey points.
 - 50|146.09| **An inset overview map: the whole project, with a box round where you are.**
   Reworked by Tom 2026-08-25, and it is a different feature from the one this ID used to hold:
   *"146.09 reworked as a key/overview map inset like many games where the entire project is depicted
