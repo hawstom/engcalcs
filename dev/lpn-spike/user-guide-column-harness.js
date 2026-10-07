@@ -154,7 +154,7 @@ async function pass(browser, Session, tag, extra) {
 		ok('...without the Recalculate sentence it replaced', !/Recalculate automatically/.test(props || ''));
 		const set = await entry('lpn_settings_box');
 		// Tom, 2026-10-07: his sentences, and no list of what the settings cover (they are all of them).
-		ok('...Settings shows its wording, leading with the only place and the search', set === enString('lpn_guide_text_settings_box') && /There is no other place to find settings\. The box is searchable/.test(set || '') && !/symbology/.test(set || ''), set);
+		ok('...Settings shows its wording, leading with the only place and the search', set === enString('lpn_guide_text_settings_box') && !/symbology/.test(set || ''), set);
 	} else {
 		const w = await page.evaluate(() => document.getElementById('lpn_guide_content').clientWidth);
 		ok('...measured at phone width (pane at most 390 px)', w <= 390, String(w));

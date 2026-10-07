@@ -59,17 +59,27 @@ function exampleQueries() {
 	while ((m = re.exec(html))) { out.push({ q: m[1], text: m[2] }); }
 	return out;
 }
-// What each worked query returns on Net3, measured. `ordered` where the chapter states the order.
-// A query added to the chapter without a line here fails, so every example stays measured.
-const EXPECT = {
-	"Everything.ID equal to '60'": { ids: ['Junction 60', 'Pipe 60'] },
-	'Junction.Pressure below 40': { ids: ['Junction 10', 'Junction 40', 'Junction 50', 'Junction 20', 'Junction 153'], ordered: true },
-	'Pipe.Velocity 5 highest': { ids: ['Pipe 60', 'Pipe 329', 'Pipe 125', 'Pipe 123', 'Pipe 149'], ordered: true },
-	'Junction.Pressure below 20 OR Pipe.Velocity above 5': { ids: ['Junction 10', 'Junction 20', 'Junction 40', 'Junction 50', 'Pipe 60', 'Pipe 125', 'Pipe 329'] },
-	'Junction.Pressure below 40 AND Junction.Elevation above 100': { ids: ['Junction 10', 'Junction 20', 'Junction 40', 'Junction 50'] },
-	"Pipe.Closed equal to 'closed'": { ids: ['Pipe 330'] },
-	'Junction.Connectivity no open path to a source': { ids: [] }
-};
+// What each worked query returns on Net3, measured, ROW BY ROW in the chapter's table (the queries
+// themselves are read from the language file, never written here). `ordered` where the chapter
+// states the order. A row added to the chapter without a line here fails, so every example stays
+// measured; a reworded query is run as reworded and must still return these assets.
+const ROWS = [
+	{ ids: ['Junction 60', 'Pipe 60'] },
+	{ ids: ['Junction 10', 'Junction 40', 'Junction 50', 'Junction 20', 'Junction 153'], ordered: true },
+	{ ids: ['Pipe 60', 'Pipe 329', 'Pipe 125', 'Pipe 123', 'Pipe 149'], ordered: true },
+	{ ids: ['Junction 10', 'Junction 20', 'Junction 40', 'Junction 50', 'Pipe 60', 'Pipe 125', 'Pipe 329'] },
+	{ ids: ['Junction 10', 'Junction 20', 'Junction 40', 'Junction 50'], inner: [] },
+	{ ids: ['Pipe 330'] },
+	{ ids: [] }
+];
+// Every <code> in a key, in order: the queries a chapter paragraph quotes.
+function codesIn(key) {
+	const out = [], re = /<code>([^<]+)<\/code>/g;
+	let m;
+	const html = enString(key);
+	while ((m = re.exec(html))) { out.push(m[1]); }
+	return out;
+}
 
 async function boot(Session, browser, tag, example) {
 	const a = await Session.open(browser, 'gfind-' + tag);
@@ -151,12 +161,12 @@ async function orderAndKeys(browser, Session) {
 	await page.keyboard.press('Escape');
 	await a.settle(200);
 	// Text selected inside a text box: part of the Find box's query.
-	await page.fill('#lpn_find_popup .lpn-find-query', 'Junction.Pressure below 40');
-	await page.evaluate(() => { const i = document.querySelector('#lpn_find_popup .lpn-find-query'); i.focus(); i.setSelectionRange(9, 17); });
+	await page.fill('#lpn_find_popup .lpn-find-query', 'Pipe.Length above 900');
+	const part = await page.evaluate(() => { const i = document.querySelector('#lpn_find_popup .lpn-find-query'); i.focus(); i.setSelectionRange(5, 11); return i.value.substring(5, 11); });
 	await page.keyboard.press('Control+k');
 	await a.settle(300);
 	st = await page.evaluate(() => ({ v: document.getElementById('lpn_guide_search').value }));
-	ok('text selected in a text box: that text is in the search field', st.v === 'Pressure', JSON.stringify(st));
+	ok('text selected in a text box: that text is in the search field', st.v === part && part.length === 6, JSON.stringify(st) + ' ' + part);
 	await page.keyboard.press('Escape');
 	await a.settle(200);
 	// Nothing selected.
@@ -194,25 +204,34 @@ async function net3(browser, Session) {
 	await openFind(a);
 	console.log('\n3. Every worked example returns what the chapter says (Net3)');
 	const ex = exampleQueries();
-	ok('the chapter has worked examples', ex.length >= 5, String(ex.length));
-	for (const e of ex) {
-		const want = EXPECT[e.q];
+	ok('every worked example in the chapter is measured here, and no more', ex.length === ROWS.length, ex.length + ' rows, ' + ROWS.length + ' measured');
+	for (let i = 0; i < ex.length; i++) {
+		const e = ex[i], want = ROWS[i];
 		if (!want) { ok('measured: ' + e.q, false, 'no expectation in this harness'); continue; }
 		const got = (await runQuery(a, e.q)).map(idOf);
 		ok(e.q + ' -> ' + (want.ids.join(', ') || 'nothing'), want.ordered ? got.join('|') === want.ids.join('|') : sameSet(got, want.ids), got.join(', '));
+		// A query quoted inside the row's text (the AND across two kinds of asset) matches nothing.
+		if (want.inner) {
+			const inner = (e.text.match(/<code>([^<]+)<\/code>/) || [])[1];
+			const g2 = inner ? await runQuery(a, inner) : null;
+			ok('...and ' + inner + ' matches nothing', !!g2 && g2.length === 0, g2 && g2.join(', '));
+		}
 		// The chapter names the same assets it was measured with.
 		want.ids.forEach(id => { const n = id.split(' ')[1]; if (!new RegExp('\\b' + n + '\\b').test(e.text)) { ok('the chapter names ' + id + ' for ' + e.q, false); } });
 	}
 	console.log('\n5. A choice typed as the word the list shows');
 	const closedWord = await a.lang('lpn_result_status_closed');
-	let got = (await runQuery(a, "Pipe.Closed equal to '" + closedWord + "'")).map(idOf);
-	ok("Pipe.Closed equal to '<displayed word>' finds Pipe 330 alone", got.join('|') === 'Pipe 330', got.slice(0, 4).join(', '));
-	got = await runQuery(a, "Pipe.Closed equal to 'shut'");
+	const closedQ = (w) => [a.lang('lpn_tool_add_pipe'), a.lang('lpn_field_closed'), a.lang('lpn_find_op_equals')];
+	const [pipeW, closedP, eqW] = await Promise.all(closedQ());
+	let got = (await runQuery(a, pipeW + '.' + closedP + ' ' + eqW + " '" + closedWord + "'")).map(idOf);
+	ok('a choice typed as its displayed word (' + closedWord + ') finds Pipe 330 alone', got.join('|') === 'Pipe 330', got.slice(0, 4).join(', '));
+	got = await runQuery(a, pipeW + '.' + closedP + ' ' + eqW + " 'shut'");
 	ok('a word that is no choice finds nothing (never the first choice)', got.length === 0, got.slice(0, 3).join(', '));
 
 	console.log('\n4b. Replace closes Pipe 247; the connectivity query lists the junctions it cut off');
-	got = (await runQuery(a, "Pipe.ID equal to '247'")).map(idOf);
-	ok("Pipe.ID equal to '247' finds Pipe 247", got.join('|') === 'Pipe 247', got.join(', '));
+	const rq = codesIn('lpn_guide_find_replace_def'), connQ = ex[ex.length - 1].q;
+	got = (await runQuery(a, rq[1])).map(idOf);
+	ok(rq[1] + ' -> Pipe 247', got.join('|') === 'Pipe 247', got.join(', '));
 	const propSel = await replaceControl(a, 'lpn_replace_prop', 'select');
 	await propSel.asElement().selectOption('status');
 	await a.settle(200);
@@ -221,12 +240,12 @@ async function net3(browser, Session) {
 	await a.settle(100);
 	await pressButton(a, 'lpn_replace_btn');
 	await pressButton(a, 'lpn_replace_apply');
-	got = (await runQuery(a, 'Junction.Connectivity no open path to a source')).map(idOf);
+	got = (await runQuery(a, connQ)).map(idOf);
 	ok('with Pipe 247 closed: Junctions 215, 217, 219, and 225', sameSet(got, ['Junction 215', 'Junction 217', 'Junction 219', 'Junction 225']), got.join(', '));
 	ok('...and the chapter names those four', ['215', '217', '219', '225'].every(n => enString('lpn_guide_find_examples_def').indexOf(n) >= 0));
 	await undo(a);
 	await openFind(a);
-	got = await runQuery(a, 'Junction.Connectivity no open path to a source');
+	got = await runQuery(a, connQ);
 	ok('Undo reopens the pipe: nothing is cut off', got.length === 0, got.join(', '));
 	ok('no page errors', a.errors.length === 0, a.errors.slice(0, 2).join(' | '));
 	await a.context.close().catch(() => {});
@@ -236,8 +255,9 @@ async function net1(browser, Session) {
 	const a = await boot(Session, browser, 'net1', 'lpn_ex_net1_title');
 	await openFind(a);
 	console.log('\n4a. Replace on Net1: four diameters, one Undo');
-	let got = (await runQuery(a, 'Pipe.Diameter below 10')).map(idOf);
-	ok('Pipe.Diameter below 10 finds Pipes 31, 122, 113, and 121', sameSet(got, ['Pipe 31', 'Pipe 122', 'Pipe 113', 'Pipe 121']), got.join(', '));
+	const dq = codesIn('lpn_guide_find_replace_def')[0];
+	let got = (await runQuery(a, dq)).map(idOf);
+	ok(dq + ' -> Pipes 31, 122, 113, and 121', sameSet(got, ['Pipe 31', 'Pipe 122', 'Pipe 113', 'Pipe 121']), got.join(', '));
 	const propSel = await replaceControl(a, 'lpn_replace_prop', 'select');
 	await propSel.asElement().selectOption('diameter');
 	await a.settle(200);
@@ -248,16 +268,17 @@ async function net1(browser, Session) {
 	const want = (await a.lang('lpn_replace_preview')).replace('{n}', '4');
 	ok('the box shows the preview for 4 assets', preview.indexOf(want) >= 0, want);
 	await pressButton(a, 'lpn_replace_apply');
-	got = await runQuery(a, 'Pipe.Diameter below 10');
+	got = await runQuery(a, dq);
 	ok('after Change them, no pipe is below 10 in.', got.length === 0, got.join(', '));
-	got = (await runQuery(a, 'Pipe.Diameter equal to 10')).map(idOf);
+	got = (await runQuery(a, dq.replace(/ \S+ 10$/, ' ' + (await a.lang('lpn_find_op_equals')) + ' 10'))).map(idOf);
 	ok('...the four are 10 in.', ['Pipe 31', 'Pipe 122', 'Pipe 113', 'Pipe 121'].every(p => got.indexOf(p) >= 0), got.join(', '));
 	await undo(a);
 	await openFind(a);
-	got = await runQuery(a, 'Pipe.Diameter below 10');
+	got = await runQuery(a, dq);
 	ok('one Undo returns all four to 6 and 8 in.', got.length === 4 && got.every(r => / (6|8)$/.test(r)), got.join(', '));
-	got = (await runQuery(a, "Junction.ID above '20'")).map(idOf);
-	ok("Junction.ID above '20' finds Junctions 21, 22, 23, 31, and 32", sameSet(got, ['Junction 21', 'Junction 22', 'Junction 23', 'Junction 31', 'Junction 32']), got.join(', '));
+	const tq = codesIn('lpn_guide_find_notes_def')[0];
+	got = (await runQuery(a, tq)).map(idOf);
+	ok(tq + ' -> Junctions 21, 22, 23, 31, and 32', sameSet(got, ['Junction 21', 'Junction 22', 'Junction 23', 'Junction 31', 'Junction 32']), got.join(', '));
 	ok('no page errors', a.errors.length === 0, a.errors.slice(0, 2).join(' | '));
 	await a.context.close().catch(() => {});
 }
