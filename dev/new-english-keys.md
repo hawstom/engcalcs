@@ -328,7 +328,7 @@ never edits a synonym.
   > Contents
   @@ NEEDS RULING
 - **`lpn_guide_keys_def`**
-  > <table class="lpn-notes-table"><tbody><tr><td>?</td><td>Open the guide at the control under the pointer or holding focus.</td></tr><tr><td>F1</td><td>Open the guide at the box that has focus.</td></tr><tr><td>Ctrl+K</td><td>Open the guide with the search field selected.</td></tr><tr><td>/</td><td>Select the search field while the guide has focus.</td></tr><tr><td>Esc</td><td>Close the guide and return to where you were.</td></tr></tbody></table>
+  > <table class="lpn-notes-table"><tbody><tr><td>?</td><td>Open the guide at the control under the pointer or holding focus.</td></tr><tr><td>F1</td><td>Open the guide at the entry for the box that has focus.</td></tr><tr><td>Ctrl+K</td><td>Open the guide with the search field selected.</td></tr><tr><td>/</td><td>Select the search field while the guide has focus.</td></tr><tr><td>Esc</td><td>Close the guide and return to where you were.</td></tr></tbody></table>
   @@ NEEDS RULING
 - **`lpn_guide_keys_term`**
   > Guide keyboard shortcuts
@@ -343,16 +343,16 @@ never edits a synonym.
   > Search the guide
   @@ NEEDS RULING
 - **`lpn_guide_text_alt_box`**
-  > Shows, for each scenario, which alternative it uses in each category (Physical, Demand, Asset activation, and Initial settings), and the calculation options of each. The table is read-only. It is shown when Scenarios, Basic mode is not selected.
+  > Shows, for each scenario, which alternative it uses in each of the nine categories (Physical, Demand, Asset activation, Initial settings, Constituent, Fire flow, Energy cost, Custom properties, and Text), with the number of changed values, and the calculation options of the scenario, which can be typed there. It is shown when Scenarios, Basic mode is not selected.
   @@ NEEDS RULING
 - **`lpn_guide_text_calib_box`**
   > Compares a file of field measurements with the calculated results at the same locations and times, one file for each parameter. The file is held for the current session only and is not saved with the project.
   @@ NEEDS RULING
 - **`lpn_guide_text_contour_box`**
-  > Controls the contour plot drawn on the map from the node results: the fill, its opacity, the contour line interval, and how far the color extends beside each pipe. Turning it off hides the plot and leaves the node colors. It changes only the display, not the network.
+  > Controls the contour plot drawn on the map from the calculated results: the fill, its opacity, the contour line interval, and how far the color extends beside each pipe. Turning it off hides the plot and leaves the node colors. It changes only the display, not the network.
   @@ NEEDS RULING
 - **`lpn_guide_text_energy_box`**
-  > Reports the energy use, cost, and efficiency of each pump over an extended period simulation, using the efficiency and the price of power entered in the box. It needs a Total run time in Settings and a Calculate. It does not change the network.
+  > Reports the energy use, cost, and efficiency of each pump over an extended period simulation. The efficiency and the price of power it uses are set in Settings, Energy, and at the pump. It needs a Total run time in Settings and a Calculate. It does not change the network.
   @@ NEEDS RULING
 - **`lpn_guide_text_find_popup`**
   > Finds the elements whose IDs or property values match what is typed, and can replace a value in the matches. A replacement changes the project and can be reversed with Undo.
@@ -361,16 +361,16 @@ never edits a synonym.
   > Lists every node and every link at every reporting time step, in the units shown on the Tables pane. It is available after Calculate. Download or print carries every time step, and the table shows one at a time.
   @@ NEEDS RULING
 - **`lpn_guide_text_hotkeys_popup`**
-  > This guide. It lists every toolbar button and menu row, read from the application itself, the keyboard shortcuts, and an entry for each box. Selecting a row shows where the control is and never runs it. Search the guide with / or Ctrl+K.
+  > This guide lists every toolbar button and menu row, read from the application itself, together with the keyboard shortcuts and an entry for each box. Selecting a row shows where the control is and never runs it. Search the guide with / or Ctrl+K.
   @@ NEEDS RULING
 - **`lpn_guide_text_library_box`**
-  > Holds the curves, patterns, pipe types, controls, and rules that elements refer to. An element states a reference to an item, and the item itself is edited only here. The items are saved with the project.
+  > Holds the patterns, curves, fittings lists, controls, and rules of the project. A pattern, curve, or fittings list is stated on an element as a reference and is edited only here. Controls and rules apply to the network as a whole. All of them are saved with the project.
   @@ NEEDS RULING
 - **`lpn_guide_text_notes_popup`**
   > Lists notes on how this page behaves and what it does not do, each as a term followed by its definition. It does not change the network.
   @@ NEEDS RULING
 - **`lpn_guide_text_popup`**
-  > Shows the properties of the selected node or link, at the point on the map where it was selected. A value edited here changes the network, and the change appears at once on the map and in the Tables pane. Calculated results appear after the network is solved with Calculate.
+  > Shows the properties of a selected node or link, at the point on the map where it was selected. A value edited here changes the network, and the change appears at once on the map and in the Tables pane. Calculated results appear after the network is solved.
   @@ NEEDS RULING
 - **`lpn_guide_text_rptbox`**
   > Shows the text report written by the EPANET engine for the last run, including its warnings and the network summary. It is replaced each time the network is solved with the EPANET engine.
@@ -379,10 +379,10 @@ never edits a synonym.
   > Solves every scenario from a copy of the drawing and tabulates, for each, the number of differences from Base, the lowest pressure, and the highest velocity. It does not change the project, and the scenario that is open is left as it was.
   @@ NEEDS RULING
 - **`lpn_guide_text_settings_box`**
-  > Holds the settings that apply to the whole project: units, calculation options, defaults for new assets, labels, and colors. A change applies to the project and is saved with it. The position and size of this box are kept in the browser only.
+  > Holds the settings of the project: units, calculation options, defaults for new assets, labels, and colors. A change applies to the project and is saved with it.
   @@ NEEDS RULING
 - **`lpn_guide_text_status_box`**
-  > Lists the status of links and the hydraulic events at each time step of the last run, in the form of the EPANET status report. Use it to see when a pump or valve changed status, or when a tank filled or emptied.
+  > Lists the changes in the status of links and the hydraulic events during the last extended period run, in the form of the EPANET status report. Only a change is listed, not every time step. Use it to see when a pump or valve changed status.
   @@ NEEDS RULING
 - **`lpn_guide_using_heading`**
   > Using the guide
@@ -602,7 +602,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**159 still to read**, of 162 new keys across 22 unmerged branch(es).
+**158 still to read**, of 161 new keys across 21 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -613,7 +613,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/technical-english (`8e4d66b8`) — adds no English strings
+### chore/technical-english (`4be0b5b5`) — adds no English strings
 
 ### feat/backdrop-attach (`929d7ec9`) — 7 new, 7 to read @@ NEEDS RULING
 
@@ -963,8 +963,17 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`2e5e81c4`) — adds no English strings
 
-### feat/screenshot (`8a48a1d7`) — 22 new, 22 to read @@ NEEDS RULING
+### feat/screenshot (`7a5178c7`) — 20 new, 20 to read @@ NEEDS RULING
 
+- **`lpn_hotkeys_snip_def`**
+  > <table class="lpn-notes-table"><tbody><tr><td>S</td><td>Snip, with the Screenshot box open.</td></tr><tr><td>E</td><td>Eraser, in the markup view.</td></tr><tr><td>Ctrl+Z, Ctrl+Y</td><td>Undo and redo, in the markup view.</td></tr><tr><td>Esc</td><td>Cancel a snip, or leave the eraser. In the markup view, close it when nothing is drawn.</td></tr></tbody></table>
+  @@ NEEDS RULING
+- **`lpn_hotkeys_snip_heading`**
+  > Screenshot
+  @@ NEEDS RULING
+- **`lpn_hotkeys_snip_term`**
+  > Screenshot keyboard shortcuts
+  @@ NEEDS RULING
 - **`lpn_screenshot_copied`**
   > Screenshot copied.
   @@ NEEDS RULING
@@ -983,29 +992,14 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_screenshot_saved`**
   > The clipboard is not available here, so the screenshot was downloaded as a PNG file.
   @@ NEEDS RULING
-- **`lpn_screenshot_scale`**
-  > Magnification
-  @@ NEEDS RULING
 - **`lpn_screenshot_scale_tip`**
   > The picture's size as a multiple of the area on the screen. A larger one is sharper and makes a bigger file.
   @@ NEEDS RULING
 - **`lpn_screenshot_tip`**
   > Copy a sharper-than-screen picture of the map area you drag, ready to paste into a report. Click without dragging to take the whole map.
   @@ NEEDS RULING
-- **`lpn_snip_button`**
-  > Snip
-  @@ NEEDS RULING
-- **`lpn_snip_freehand`**
-  > Freehand
-  @@ NEEDS RULING
 - **`lpn_snip_hint_free`**
   > Drag around the area to snip, or click for the whole map. Esc cancels.
-  @@ NEEDS RULING
-- **`lpn_snip_pen`**
-  > Pen
-  @@ NEEDS RULING
-- **`lpn_snip_rectangle`**
-  > Rectangle
   @@ NEEDS RULING
 - **`lpn_snip_tip_eraser`**
   > Eraser: click a stroke to remove it (E)
@@ -1020,7 +1014,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Snip shape
   @@ NEEDS RULING
 - **`lpn_snip_tip_pen`**
-  > Pen (Esc)
+  > Pen
   @@ NEEDS RULING
 - **`lpn_snip_tip_rect`**
   > Snip a rectangle (S)
@@ -1032,8 +1026,14 @@ build for that would be a gate nobody keeps. Refresh it with
   > Undo (Ctrl+Z)
   @@ NEEDS RULING
 
-### feat/section-grid (`89905957`) — 1 new, 1 to read @@ NEEDS RULING
+### feat/section-grid (`0345725c`) — 3 new, 3 to read @@ NEEDS RULING
 
+- **`points_data_msg_line`**
+  > Nothing was pasted. Line {n} could not be read as a station and an elevation.
+  @@ NEEDS RULING
+- **`points_data_msg_none`**
+  > Nothing was pasted. No station and elevation pairs were found.
+  @@ NEEDS RULING
 - **`points_data_points_heading`**
   > Points data<br />(use Copy to see format)
   @@ NEEDS RULING
@@ -1104,7 +1104,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > {j} junction(s), {r} reservoir(s), {t} tank(s), and {p} pipe(s) imported, {m} of the nodes with elevation.
   @@ NEEDS RULING
 
-### feat/table-export (`15e91ca0`) — 9 new, 9 to read @@ NEEDS RULING
+### feat/table-export (`0de5ecbd`) — 10 new, 10 to read @@ NEEDS RULING
 
 - **`lpn_export_table_all`**
   > All
@@ -1117,6 +1117,9 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 - **`lpn_export_table_go`**
   > Export
+  @@ NEEDS RULING
+- **`lpn_export_table_scn_note`**
+  > Results are exported only for the scenario last calculated.
   @@ NEEDS RULING
 - **`lpn_export_table_title`**
   > Export table
@@ -1134,23 +1137,14 @@ build for that would be a gate nobody keeps. Refresh it with
   > Export table as ODS
   @@ NEEDS RULING
 
-### feat/user-guide (`9f844e56`) — adds no English strings
+### feat/user-guide (`0053b8df`) — adds no English strings
 
-### feat/visit-dedupe (`82261d32`) — adds no English strings
+### feat/visit-dedupe (`2de0a88e`) — adds no English strings
 
-### feat/web-mercator (`850558e1`) — 1 new, 1 to read @@ NEEDS RULING
+### feat/web-mercator (`2fbf8120`) — 1 new, 1 to read @@ NEEDS RULING
 
 - **`lpn_crs_suggested_mark`**
   > (suggested)
   @@ NEEDS RULING
 
 ### fix/label-node-overlap (`fe5c3d57`) — adds no English strings
-
-### fix/points-paste-2 (`c84a876e`) — 2 new, 2 to read @@ NEEDS RULING
-
-- **`points_data_msg_line`**
-  > Nothing was pasted. Line {n} could not be read as a station and an elevation.
-  @@ NEEDS RULING
-- **`points_data_msg_none`**
-  > Nothing was pasted. No station and elevation pairs were found.
-  @@ NEEDS RULING

@@ -42083,7 +42083,10 @@ var EngCalcs = EngCalcs || {};
 		if (!box) { return; }
 		if (x) { x.addEventListener('click', closeHotkeysBox); }
 		box.addEventListener('keydown', function (e) {
-			if (e.key === 'Escape') { e.preventDefault(); closeHotkeysBox(); }
+			// **THE KEY IS SPENT HERE.** Closing returns focus to the control that opened the Guide,
+			// which is often inside another box; the page's own Escape handler would then see focus
+			// (and the pointer) in that box and close it too. One Esc, one box.
+			if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); if (e.stopImmediatePropagation) { e.stopImmediatePropagation(); } closeHotkeysBox(); }
 		});
 		wireBoxMemory(box, LPN_HOTKEYSBOX_KEY, hotkeysboxLayout, saveHotkeysboxLayout, hotkeysBoxIsOpen);
 	}

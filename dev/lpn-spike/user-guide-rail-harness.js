@@ -275,6 +275,20 @@ async function desktop(browser, Session) {
 	await page.keyboard.press('Escape');
 	await a.settle(300);
 	ok('...and Esc returns focus to where F1 was pressed', await page.evaluate(() => document.activeElement === document.querySelector('[data-guide-for="lpn_settings_box"]')));
+	// A REAL mouse click on the ?, the pointer left over the origin box, then Esc (Perry, 2026-10-07).
+	await page.evaluate(() => { const g = document.getElementById('lpn_settings_box'); g.style.display = 'none'; });
+	await a.toolbarClick(await a.lang('lpn_tool_settings'));
+	await a.settle(400);
+	await page.click('#lpn_settings_box [data-guide-for]');
+	await a.settle(400);
+	ok('a mouse click on the Settings ? opens the Guide', await boxOpen(page));
+	await page.keyboard.press('Escape');
+	await a.settle(300);
+	const esc1 = await page.evaluate(() => ({ guide: document.getElementById('lpn_hotkeys_popup').style.display === 'flex', settings: document.getElementById('lpn_settings_box').style.display }));
+	ok('one Esc closes the Guide only; Settings, under the pointer, stays open', !esc1.guide && esc1.settings !== 'none', JSON.stringify(esc1));
+	await page.keyboard.press('Escape');
+	await a.settle(300);
+	ok('...and a second Esc closes Settings', await page.evaluate(() => document.getElementById('lpn_settings_box').style.display === 'none'));
 	// folding
 	const fold = await page.evaluate(() => { const f = EngCalcs.lpnGuideProbe().fold; return {
 		ar: f('مُحَمَّدٌ') === f('محمد'), tat: f('كتـــاب') === f('كتاب'), he: f('שָׁלוֹם') === f('שלום'), lat: f('Café Ångström') === 'cafe angstrom' }; });
