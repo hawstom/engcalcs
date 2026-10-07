@@ -387,7 +387,8 @@ the block.
   layers, attributed blocks, XDATA or Map data exist, propose asset types and properties in an
   editable translation table (assets, properties, scenarios, alternatives). Mary, same day: Map
   "ADE" object data does not survive DXF; layers and ATTRIBs are visible everywhere; target ASCII
-  R2000.
+  R2000. Tom, 2026-10-07: his DXF Interface Manager spec, for import AND export, and a rudimentary
+  interim workflow, verbatim in `dev/dxf-interface.md`.
 - 75|776| **Copy a table with its headings; export Tables to CSV and ODS.**
   Tom, 2026-10-06: *"When copying from a Table, it would be nice to be able to copy the headings
   somehow. It might also be nice to Export to CSV and ODS the Tables."* Branch `feat/table-export`.
@@ -1162,6 +1163,10 @@ the block.
   across it.** Found 2026-09-26 building Convert as (`feat/convert-as`); an edge case, since the
   mission scope is a 300 km span, but the wizard's world-wide first screen reaches it.
 
+- 25|778| **Read pipe size and material from survey field codes.**
+  Tom, 2026-10-06, on `feat/survey-code`: *"Will people expect us to read more, like pipe diameter
+  etc? If there are clear conventions, we can try!"* First find whether Carlson or Civil 3D users
+  carry size in the description (e.g. `WL 8 DI`) by any published convention; no build without one.
 - 5|114| **Reservoir / detention routing calculator (Modified Puls) — full scope in
   `dev/detention-routing-scope.md`.** A time-stepping engine, which is the real departure from the
   suite's steady-state weir and orifice calculators. **Hydrology stays out of scope** — the user
