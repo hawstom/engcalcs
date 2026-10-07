@@ -79,7 +79,7 @@ EngCalcs.lpnPlacerC = (function () {
 	//   deepgrow  GROW looks further down a label's list for room for one more property (S11)
 	//   evict     MEND's blocker may be a leader as well as a label, and up to two neighbours (S16)
 	//   fine      a REPAIR pass: hidden and cut labels try rays every 15 degrees, every half row (S3, S15)
-	var ING_ALL = ['deepgrow', 'evict', 'fine', 'finest'];
+	var ING_ALL = ['deepgrow', 'evict', 'fine', 'finest', 'fewest'];
 	function ingredients() {
 		var off = [];
 		if (typeof process !== 'undefined' && process.env && process.env.PLACER_C_OFF) { off = String(process.env.PLACER_C_OFF).split(','); }
@@ -567,7 +567,10 @@ EngCalcs.lpnPlacerC = (function () {
 			labels.forEach(function (L) { if (L.req.hand) { commit(st, L, handCand(st, L)); } });
 
 			var order = labels.filter(function (L) { return !L.req.hand; });
-			order.sort(function (a, b) { return (a.prevPl ? 0 : 1) - (b.prevPl ? 0 : 1) || a.dens - b.dens || (a.id < b.id ? -1 : 1); });
+			// `fewest`: a label with the fewest spots open to it on the fixed map goes first (the
+			// most-constrained-first rule of constraint search), so the labels with choices place round it.
+			if (ING.fewest) { labels.forEach(function (L) { if (!L.req.hand) { L.opts = openSpots(st, L); } }); }
+			order.sort(function (a, b) { return (a.prevPl ? 0 : 1) - (b.prevPl ? 0 : 1) || (ING.fewest ? a.opts - b.opts : 0) || a.dens - b.dens || (a.id < b.id ? -1 : 1); });
 
 			// 1. KEEP: last view's spot and rows, if still legal and not much worse.
 			order.forEach(function (L) {
@@ -1279,6 +1282,17 @@ EngCalcs.lpnPlacerC = (function () {
 			return best;
 		}
 
+		// How many of a label's first spots are open on the fixed map for its smallest form (their
+		// static cost is kept, so SHOW does not judge them twice).
+		function openSpots(st, L) {
+			var rsI = L.rowsets.length - 1, specs = L.specs, c = st.probe, n = 0;
+			var sc = L.sc[rsI] || (L.sc[rsI] = new Float64Array(specs.length).fill(NaN));
+			for (var i = 0; i < specs.length && i < 120; i++) {
+				if (sc[i] !== sc[i]) { sc[i] = fillSpec(st, L, specs[i], rsI, c) ? staticCost(st, L, c) : Infinity; }
+				if (sc[i] < SHOW_MAX) { n++; }
+			}
+			return n;
+		}
 		// Past the soft time bound of a pan or zoom: stop improving, show what is placed (R10).
 		function over(st) { return !!st.effort.soft && now() > st.effort.soft; }
 		// The LEVEL penalty a spot carries in its cost, for bounds that must not count it.
