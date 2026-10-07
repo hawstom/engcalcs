@@ -42291,19 +42291,79 @@ var EngCalcs = EngCalcs || {};
 		if (x) { x.addEventListener('click', closeSnipBox); }
 		wireBoxMemory(box, LPN_SNIPBOX_KEY, snipboxLayout, saveSnipboxLayout, snipBoxIsOpen);
 	}
+	// **ICONS, NOT WORDS** (Tom, 2026-10-07: "can this entire thing use fewer words? Magnifying glass
+	// for magnification, Rectangle or lasso for Snip, and Monitor for Screenshot"; Ida's spec: every
+	// icon has a tip and an aria-label that name its shortcut, the window title keeps its text).
+	// The glyphs are inline SVG in currentColor, so a disabled button greys its icon with no rule.
+	var SNIP_GLYPHS = {
+		magnifier: '<circle cx="10" cy="10" r="6"/><line x1="14.5" y1="14.5" x2="20" y2="20"/>',
+		monitor: '<rect x="3" y="4" width="18" height="12" rx="1"/><line x1="8" y1="20" x2="16" y2="20"/><line x1="12" y1="16" x2="12" y2="20"/>',
+		rect: '<rect x="4" y="6" width="16" height="12" stroke-dasharray="3 2"/>',
+		free: '<path d="M5 13C3 8 9 4 15 6C21 8 20 15 14 16C11 16.5 9 18 10 20" stroke-dasharray="3 2"/>',
+		chevron: '<polyline points="6,9 12,15 18,9"/>',
+		pen: '<path d="M4 20L5 16L16 5L19 8L8 19Z"/><line x1="13" y1="8" x2="16" y2="11"/>',
+		eraser: '<g transform="rotate(-45 12 12)"><rect x="4" y="8" width="16" height="8" rx="1"/><line x1="11" y1="8" x2="11" y2="16"/></g><line x1="3" y1="21" x2="21" y2="21"/>',
+		undo: '<polyline points="9,6 4,11 9,16"/><path d="M4 11H15a4.5 4.5 0 0 1 0 9H11"/>',
+		redo: '<g transform="translate(24 0) scale(-1 1)"><polyline points="9,6 4,11 9,16"/><path d="M4 11H15a4.5 4.5 0 0 1 0 9H11"/></g>',
+		copy: '<rect x="8" y="8" width="12" height="12" rx="1"/><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1H8"/>',
+		save: '<path d="M5 4H16L19 7V19a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1Z"/><rect x="8" y="4" width="7" height="5"/><rect x="8" y="14" width="8" height="6"/>'
+	};
+	function snipGlyph(name) {
+		var s = document.createElementNS(NS, 'svg');
+		s.setAttribute('viewBox', '0 0 24 24'); s.setAttribute('width', '18'); s.setAttribute('height', '18');
+		s.setAttribute('fill', 'none'); s.setAttribute('stroke', 'currentColor'); s.setAttribute('stroke-width', '2');
+		s.setAttribute('stroke-linecap', 'round'); s.setAttribute('stroke-linejoin', 'round');
+		s.setAttribute('aria-hidden', 'true'); s.setAttribute('focusable', 'false');
+		s.innerHTML = SNIP_GLYPHS[name];
+		return s;
+	}
+	// The one tip text names the control to the eye (title, armed as a styled tip) and to a screen
+	// reader (aria-label). Written as el.title, never removeAttribute (see wireTipDelegation).
+	function snipTip(el, text) { el.title = text; el.setAttribute('aria-label', text); }
+	function snipIconButton(id, glyph, tip) {
+		var b = document.createElement('button');
+		b.type = 'button'; b.id = id; b.className = 'lpn-btn lpn-snip-ic';
+		b.appendChild(snipGlyph(glyph));
+		snipTip(b, tip);
+		return b;
+	}
+	function snipModeTip(mode) {
+		var pc = EngCalcs.pageConfig || {};
+		return mode === 'free' ? (pc.lpn_snip_tip_free || 'Snip a freehand shape (S)') : (pc.lpn_snip_tip_rect || 'Snip a rectangle (S)');
+	}
+	// The Snip button shows the shape it will use; the chevron beside it picks the other one.
+	function updateSnipModeUi() {
+		var go = document.getElementById('lpn_snip_go');
+		if (go) {
+			go.replaceChild(snipGlyph(snipMode === 'free' ? 'free' : 'rect'), go.firstChild);
+			snipTip(go, snipModeTip(snipMode));
+		}
+		['rect', 'free'].forEach(function (m) {
+			var it = document.getElementById('lpn_snip_mode_' + m);
+			if (it) { it.setAttribute('aria-checked', m === snipMode ? 'true' : 'false'); it.classList.toggle('lpn-btn-on', m === snipMode); }
+		});
+	}
+	function closeSnipMenu() {
+		var m = document.getElementById('lpn_snip_menu');
+		if (m) { m.style.display = 'none'; }
+		var c = document.getElementById('lpn_snip_mode');
+		if (c) { c.setAttribute('aria-expanded', 'false'); }
+	}
 	function buildSnipBox() {
 		var pc = EngCalcs.pageConfig || {}, body = document.getElementById('lpn_snip_body');
 		if (!body) { return; }
 		body.innerHTML = '';
-		var r = document.createElement('div'), lab = document.createElement('label'), sel = document.createElement('select');
-		r.className = 'lpn-set-row';
-		lab.textContent = pc.lpn_screenshot_scale || 'Magnification';
-		lab.htmlFor = 'lpn_snip_scale';
-		if (pc.lpn_screenshot_scale_tip) { lab.title = pc.lpn_screenshot_scale_tip; lab.className = 'ec-help'; }
+		var bar = document.createElement('div');
+		bar.className = 'lpn-snip-bar';
+		// Magnification: a magnifier and the factor as a bare number.
+		var magTip = pc.lpn_screenshot_scale_tip || 'The picture\'s size as a multiple of the area on the screen. A larger one is sharper and makes a bigger file.';
+		var mag = document.createElement('span'), sel = document.createElement('select');
+		mag.className = 'lpn-snip-mag';
+		mag.appendChild(snipGlyph('magnifier'));
 		sel.id = 'lpn_snip_scale';
 		SNIP_SCALES.forEach(function (n) {
 			var o = document.createElement('option');
-			o.value = String(n); o.textContent = n + '\u00d7';
+			o.value = String(n); o.textContent = n + '×';
 			if (n === snipScaleChosen()) { o.selected = true; }
 			sel.appendChild(o);
 		});
@@ -42313,52 +42373,68 @@ var EngCalcs = EngCalcs || {};
 			snipboxLayout.scale = n;
 			saveSnipboxLayout();
 		});
-		r.appendChild(lab); r.appendChild(sel);
-		body.appendChild(r);
-		// **SNIP, WITH ITS SHAPE BESIDE IT** (Tom, 2026-10-06, on the Windows snipping tool: a mode
-		// dropdown beside the New button). Rectangle or Freehand (a lasso); the choice lasts the
-		// session and is stored nowhere.
-		var snipRow = document.createElement('div'), snipBtn = document.createElement('button'), modeSel = document.createElement('select');
-		snipRow.className = 'lpn-set-row';
-		snipBtn.type = 'button'; snipBtn.id = 'lpn_snip_go'; snipBtn.className = 'lpn-btn';
-		snipBtn.textContent = pc.lpn_snip_button || 'Snip';
-		modeSel.id = 'lpn_snip_mode';
-		modeSel.setAttribute('aria-label', pc.lpn_snip_button || 'Snip');
-		[['rect', pc.lpn_snip_rectangle || 'Rectangle'], ['free', pc.lpn_snip_freehand || 'Freehand']].forEach(function (m) {
-			var o = document.createElement('option');
-			o.value = m[0]; o.textContent = m[1];
-			if (m[0] === snipMode) { o.selected = true; }
-			modeSel.appendChild(o);
+		mag.appendChild(sel);
+		snipTip(mag, magTip); snipTip(sel, magTip);
+		bar.appendChild(mag);
+		// **ONE SNIP BUTTON WITH A SMALL CHEVRON** (Windows snipping tool: New with a mode dropdown).
+		// Rectangle or Freehand; the choice lasts the session and is stored nowhere.
+		var split = document.createElement('span'), go = snipIconButton('lpn_snip_go', 'rect', snipModeTip('rect')),
+			chev = snipIconButton('lpn_snip_mode', 'chevron', pc.lpn_snip_tip_mode || 'Snip shape'),
+			menu = document.createElement('div');
+		split.className = 'lpn-snip-split';
+		chev.classList.add('lpn-snip-chev');
+		chev.setAttribute('aria-haspopup', 'menu'); chev.setAttribute('aria-expanded', 'false');
+		menu.id = 'lpn_snip_menu'; menu.className = 'lpn-snip-menu'; menu.setAttribute('role', 'menu'); menu.style.display = 'none';
+		[['rect', 'rect'], ['free', 'free']].forEach(function (m) {
+			var it = snipIconButton('lpn_snip_mode_' + m[0], m[1], snipModeTip(m[0]));
+			it.setAttribute('role', 'menuitemradio');
+			it.addEventListener('click', function () {
+				closeSnipMenu();
+				snipMode = m[0];
+				updateSnipModeUi();
+				startScreenshot(snipMode);
+			});
+			menu.appendChild(it);
 		});
-		modeSel.addEventListener('change', function () {
-			snipMode = modeSel.value === 'free' ? 'free' : 'rect';
-			if (snipVeil) { startScreenshot(snipMode); }   // a veil already up takes the new shape
+		go.addEventListener('click', function () { startScreenshot(snipMode); });
+		chev.addEventListener('click', function (e) {
+			e.stopPropagation();
+			var open = menu.style.display !== 'none';
+			if (open) { closeSnipMenu(); return; }
+			menu.style.display = 'flex';
+			chev.setAttribute('aria-expanded', 'true');
 		});
-		snipBtn.addEventListener('click', function () { startScreenshot(modeSel.value); });
-		snipRow.appendChild(snipBtn); snipRow.appendChild(modeSel);
-		body.appendChild(snipRow);
-		// **THE REPEAT BUTTON** (Tom, 2026-10-06: *"The panel is missing a Screenshot button for
-		// repeats."*). Pan or zoom the map, press it, and the whole visible map is shot again at
-		// the chosen magnification, with no veil to drag. Same word as the menu row.
-		var again = document.createElement('button'), row = document.createElement('div');
-		row.className = 'lpn-set-row';
-		again.type = 'button'; again.id = 'lpn_snip_again'; again.className = 'lpn-btn';
-		again.textContent = pc.lpn_screenshot_menu || 'Screenshot';
+		split.appendChild(go); split.appendChild(chev); split.appendChild(menu);
+		bar.appendChild(split);
+		// **THE REPEAT BUTTON, A MONITOR** (Tom, 2026-10-06: *"The panel is missing a Screenshot
+		// button for repeats."*). Pan or zoom the map, press it, and the whole visible map is shot
+		// again at the chosen magnification, with no veil to drag.
+		var again = snipIconButton('lpn_snip_again', 'monitor', pc.lpn_snip_tip_map || 'Screenshot of the whole map');
 		again.addEventListener('click', function () {
 			cancelScreenshot();
 			var m = snipMapRect();
 			if (m.w < 1 || m.h < 1) { return; }
 			takeScreenshot(m, null);
 		});
-		row.appendChild(again);
-		body.appendChild(row);
+		bar.appendChild(again);
+		body.appendChild(bar);
+		updateSnipModeUi();
 	}
+	// Outside click closes the mode menu; S, with the box open, starts a snip in the chosen shape.
+	document.addEventListener('click', function () { closeSnipMenu(); });
+	document.addEventListener('keydown', function (e) {
+		if (e.key !== 's' && e.key !== 'S') { return; }
+		if (e.ctrlKey || e.metaKey || e.altKey || snipVeil || snipEditor || !snipBoxIsOpen()) { return; }
+		var t = e.target, tag = t && t.tagName;
+		if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || (t && t.isContentEditable)) { return; }
+		e.preventDefault(); e.stopPropagation();
+		startScreenshot(snipMode);
+	}, true);
 	function startScreenshot(mode) {
 		cancelScreenshot();
 		var free = (mode === 'rect' || mode === 'free' ? mode : snipMode) === 'free';
 		snipMode = free ? 'free' : 'rect';
-		var modeEl = document.getElementById('lpn_snip_mode');
-		if (modeEl) { modeEl.value = snipMode; }
+		updateSnipModeUi();
 		// The box first: docked, it takes its column from the map, and the veil is laid over the
 		// map as it is after that. **NOT ON A PHONE**, where every standing box fills the window
 		// (placePanelForScreen()) and would cover the very map the finger has to drag over; the
@@ -42632,7 +42708,7 @@ var EngCalcs = EngCalcs || {};
 		});
 	}
 	// ---- THE MARKUP VIEW -------------------------------------------------------------------
-	// A modal over the page: the picture on a canvas, a red pen, Undo, Copy, Save, Close. The pen is
+	// A modal over the page: the picture on a canvas, a red pen, an eraser, Undo, Redo, Copy, Save, Close. The pen is
 	// red only (Tom: "a red scribbler pen like the Windows tool"); its ink is image content, never
 	// chrome. Strokes are kept as point lists and redrawn over the untouched snip, so Undo is exact.
 	// Pointer events, so a mouse, a pen and a finger all draw. Nothing here is stored on the device.
@@ -42648,21 +42724,24 @@ var EngCalcs = EngCalcs || {};
 		closeSnipEditor();
 		var pc = EngCalcs.pageConfig || {};
 		return createImageBitmap(out.blob).then(function (bm) {
-			var strokes = [], drawing = null, pen = true;
+			// Every stroke is an object of its own, redrawn over the untouched snip, so an eraser
+			// removes a whole stroke and never paints pixels out. `done` and `undone` hold the
+			// actions (a stroke added, or strokes erased), so Undo and Redo cover both.
+			var strokes = [], done = [], undone = [], drawing = null, erasing = null, eraser = false;
 			var el = document.createElement('div'), panel = document.createElement('div'), bar = document.createElement('div'),
 				cv = document.createElement('canvas'), ctx, held = document.createElement('div');
 			el.id = 'lpn_snip_edit'; el.className = 'lpn-snip-edit';
 			el.setAttribute('role', 'dialog');
+			el.setAttribute('aria-label', pc.lpn_screenshot_menu || 'Screenshot');
 			panel.className = 'lpn-snip-edit-panel';
 			bar.className = 'lpn-snip-edit-bar';
 			cv.id = 'lpn_snip_canvas'; cv.className = 'lpn-snip-edit-canvas';
 			cv.width = bm.width; cv.height = bm.height;
 			ctx = cv.getContext('2d');
-			function button(id, text, fn) {
-				var b = document.createElement('button');
-				b.type = 'button'; b.id = id; b.className = 'lpn-btn'; b.textContent = text;
+			function button(id, glyph, tip, fn, into) {
+				var b = snipIconButton(id, glyph, tip);
 				b.addEventListener('click', fn);
-				bar.appendChild(b);
+				(into || bar).appendChild(b);
 				return b;
 			}
 			function paint() {
@@ -42672,57 +42751,113 @@ var EngCalcs = EngCalcs || {};
 				ctx.lineWidth = SNIP_PEN_CSS_PX * out.scale;
 				strokes.forEach(function (st) {
 					ctx.beginPath();
-					st.forEach(function (p, i) { if (i) { ctx.lineTo(p.x, p.y); } else { ctx.moveTo(p.x, p.y); } });
+					st.pts.forEach(function (p, i) { if (i) { ctx.lineTo(p.x, p.y); } else { ctx.moveTo(p.x, p.y); } });
 					ctx.stroke();
 				});
-				undoBtn.disabled = strokes.length === 0;
+				undoBtn.disabled = done.length === 0;
+				redoBtn.disabled = undone.length === 0;
 			}
 			function at(e) {
 				var r = cv.getBoundingClientRect();
 				return { x: (e.clientX - r.left) * cv.width / r.width, y: (e.clientY - r.top) * cv.height / r.height };
 			}
-			var penBtn = button('lpn_snip_pen', pc.lpn_snip_pen || 'Pen', function () {
-				pen = !pen;
-				penBtn.setAttribute('aria-pressed', pen ? 'true' : 'false');
-				penBtn.classList.toggle('lpn-btn-on', pen);
-				cv.classList.toggle('lpn-snip-pen-off', !pen);
-			});
-			penBtn.setAttribute('aria-pressed', 'true'); penBtn.classList.add('lpn-btn-on');
-			var undoBtn = button('lpn_snip_undo', pc.lpn_tool_undo || 'Undo', function () { strokes.pop(); paint(); });
+			function setEraser(on) {
+				eraser = on;
+				penBtn.setAttribute('aria-pressed', on ? 'false' : 'true'); penBtn.classList.toggle('lpn-btn-on', !on);
+				eraserBtn.setAttribute('aria-pressed', on ? 'true' : 'false'); eraserBtn.classList.toggle('lpn-btn-on', on);
+				cv.classList.toggle('lpn-snip-eraser-on', on);
+			}
+			// Distance from a point to a stroke's polyline, in canvas pixels.
+			function distTo(st, p) {
+				var best = Infinity, i, a, b, dx, dy, t, len2;
+				for (i = 0; i < st.pts.length; i++) {
+					a = st.pts[i]; b = st.pts[i + 1] || a;
+					dx = b.x - a.x; dy = b.y - a.y; len2 = dx * dx + dy * dy;
+					t = len2 ? Math.max(0, Math.min(1, ((p.x - a.x) * dx + (p.y - a.y) * dy) / len2)) : 0;
+					best = Math.min(best, Math.hypot(p.x - (a.x + t * dx), p.y - (a.y + t * dy)));
+				}
+				return best;
+			}
+			// The topmost stroke within reach of the pointer is removed; its place is kept for Undo.
+			function eraseAt(p) {
+				var r = cv.getBoundingClientRect(), reach = (SNIP_PEN_CSS_PX / 2 * out.scale) + 6 * cv.width / r.width, i;
+				for (i = strokes.length - 1; i >= 0; i--) {
+					if (distTo(strokes[i], p) <= reach) {
+						if (!erasing) { erasing = { type: 'erase', items: [] }; done.push(erasing); undone = []; }
+						erasing.items.push({ stroke: strokes[i], index: i });
+						strokes.splice(i, 1);
+						paint();
+						return;
+					}
+				}
+			}
+			function undo() {
+				var a = done.pop();
+				if (!a) { return; }
+				if (a.type === 'add') { strokes.splice(strokes.indexOf(a.stroke), 1); }
+				else { for (var i = a.items.length - 1; i >= 0; i--) { strokes.splice(a.items[i].index, 0, a.items[i].stroke); } }
+				undone.push(a); paint();
+			}
+			function redo() {
+				var a = undone.pop();
+				if (!a) { return; }
+				if (a.type === 'add') { strokes.push(a.stroke); }
+				else { a.items.forEach(function (it) { strokes.splice(strokes.indexOf(it.stroke), 1); }); }
+				done.push(a); paint();
+			}
+			// Pen and Eraser share one segmented control, so the active tool is always in view.
+			var seg = document.createElement('span');
+			seg.className = 'lpn-snip-seg';
+			bar.appendChild(seg);
+			var penBtn = button('lpn_snip_pen', 'pen', pc.lpn_snip_tip_pen || 'Pen (Esc)', function () { setEraser(false); }, seg);
+			var eraserBtn = button('lpn_snip_eraser', 'eraser', pc.lpn_snip_tip_eraser || 'Eraser: click a stroke to remove it (E)', function () { setEraser(true); }, seg);
+			var undoBtn = button('lpn_snip_undo', 'undo', pc.lpn_snip_tip_undo || 'Undo (Ctrl+Z)', undo);
+			var redoBtn = button('lpn_snip_redo', 'redo', pc.lpn_snip_tip_redo || 'Redo (Ctrl+Y)', redo);
 			var blobNow = function () { return new Promise(function (res, rej) { cv.toBlob(function (b) { b ? res(b) : rej(new Error('toBlob')); }, 'image/png'); }); };
-			var copyBtn = button('lpn_snip_copy', pc.points_data_copy || 'Copy', function () { copyBlob(blobNow()); });
-			button('lpn_snip_save', pc.lpn_file_save || 'Save', function () {
+			var copyBtn = button('lpn_snip_copy', 'copy', pc.points_data_copy || 'Copy', function () { copyBlob(blobNow()); });
+			button('lpn_snip_save', 'save', pc.lpn_file_save || 'Save', function () {
 				blobNow().then(snipDownload);   // one click, one download
 			});
-			var x = button('lpn_snip_edit_close', '×', closeSnipEditor);
-			x.className = 'lpn-popover-x'; x.title = pc.lpn_close || 'Close'; x.setAttribute('aria-label', pc.lpn_close || 'Close');
+			var x = document.createElement('button');
+			x.type = 'button'; x.id = 'lpn_snip_edit_close'; x.className = 'lpn-popover-x'; x.textContent = '×';
+			snipTip(x, pc.lpn_close || 'Close');
+			x.addEventListener('click', closeSnipEditor);
+			bar.appendChild(x);
+			setEraser(false);
 			cv.addEventListener('pointerdown', function (e) {
-				if (!pen || (e.button !== undefined && e.button !== 0)) { return; }
+				if (e.button !== undefined && e.button !== 0) { return; }
 				e.preventDefault();
-				var p = at(e);
-				drawing = [p, { x: p.x + 0.01, y: p.y }];
-				strokes.push(drawing);
 				try { cv.setPointerCapture(e.pointerId); } catch (err) { /* a nicety */ }
+				var p = at(e);
+				if (eraser) { erasing = null; eraseAt(p); drawing = 'erase'; return; }
+				var st = { pts: [p, { x: p.x + 0.01, y: p.y }] };
+				drawing = st;
+				strokes.push(st); done.push({ type: 'add', stroke: st }); undone = [];
 				paint();
 			});
 			cv.addEventListener('pointermove', function (e) {
 				if (!drawing) { return; }
-				drawing.push(at(e));
+				if (drawing === 'erase') { eraseAt(at(e)); return; }
+				drawing.pts.push(at(e));
 				paint();
 			});
-			function endStroke() { drawing = null; }
+			function endStroke() { drawing = null; erasing = null; }
 			cv.addEventListener('pointerup', endStroke);
 			cv.addEventListener('pointercancel', endStroke);
 			held.className = 'lpn-snip-edit-scroll';
 			held.appendChild(cv);
 			panel.appendChild(bar); panel.appendChild(held);
 			el.appendChild(panel);
-			// While the markup view is open it owns the keyboard: Esc closes it, Ctrl+Z undoes a
-			// stroke, and nothing else reaches the map (its Delete, its own Ctrl+Z).
+			// While the markup view is open it owns the keyboard, and nothing else reaches the map
+			// (its Delete, its own Ctrl+Z). Esc steps back from the eraser to the pen, and closes the
+			// view from the pen; Ctrl+Z undoes, Ctrl+Y (or Ctrl+Shift+Z) redoes, E is the eraser.
 			snipEditor = { el: el, onKey: function (e) {
 				e.stopPropagation();
-				if (e.key === 'Escape') { e.preventDefault(); closeSnipEditor(); }
-				else if ((e.ctrlKey || e.metaKey) && !e.shiftKey && (e.key === 'z' || e.key === 'Z')) { e.preventDefault(); strokes.pop(); paint(); }
+				var k = e.key, mod = e.ctrlKey || e.metaKey;
+				if (k === 'Escape') { e.preventDefault(); if (eraser) { setEraser(false); } else { closeSnipEditor(); } }
+				else if (mod && !e.shiftKey && (k === 'z' || k === 'Z')) { e.preventDefault(); undo(); }
+				else if (mod && (k === 'y' || k === 'Y' || (e.shiftKey && (k === 'z' || k === 'Z')))) { e.preventDefault(); redo(); }
+				else if (!mod && !e.altKey && (k === 'e' || k === 'E')) { e.preventDefault(); setEraser(!eraser); }
 			} };
 			document.addEventListener('keydown', snipEditor.onKey, true);
 			document.body.appendChild(el);

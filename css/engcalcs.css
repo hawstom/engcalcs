@@ -1826,7 +1826,22 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 .lpn-snip-edit-bar .lpn-btn-on { background: var(--ec-select-bg); border-color: var(--ec-accent); }
 .lpn-snip-edit-scroll { overflow: auto; min-height: 0; background: var(--ec-border); }
 .lpn-snip-edit-canvas { display: block; max-width: 100%; max-height: calc(100vh - 6rem); touch-action: none; cursor: crosshair; }
-.lpn-snip-edit-canvas.lpn-snip-pen-off { cursor: default; }
+.lpn-snip-edit-canvas.lpn-snip-eraser-on { cursor: pointer; }
+.lpn-snip-ic { display: inline-flex; align-items: center; justify-content: center; min-width: 32px; min-height: 32px; padding: 0 6px; }
+.lpn-snip-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.lpn-snip-mag { display: inline-flex; align-items: center; gap: 4px; }
+.lpn-snip-split { position: relative; display: inline-flex; }
+.lpn-snip-split .lpn-snip-ic:first-child { border-top-right-radius: 0; border-bottom-right-radius: 0; }
+.lpn-snip-split .lpn-snip-chev { min-width: 20px; padding: 0 2px; border-left: 0; border-top-left-radius: 0; border-bottom-left-radius: 0; }
+.lpn-snip-menu { position: absolute; left: 0; top: 100%; z-index: 1; flex-direction: column; gap: 2px; padding: 2px; background: var(--ec-bg); border: 1px solid var(--ec-ink); box-shadow: 2px 2px 6px var(--ec-a-0-0-0-3); }
+.lpn-snip-seg { display: inline-flex; }
+.lpn-snip-seg .lpn-snip-ic:first-child { border-top-right-radius: 0; border-bottom-right-radius: 0; }
+.lpn-snip-seg .lpn-snip-ic:last-child { border-top-left-radius: 0; border-bottom-left-radius: 0; border-left: 0; }
+@media (pointer: coarse), (max-width: 700px) {
+  .lpn-snip-ic { min-width: 40px; min-height: 40px; }
+  .lpn-snip-split .lpn-snip-chev { min-width: 40px; }
+  .lpn-snip-edit-bar .lpn-popover-x { min-width: 40px; min-height: 40px; }
+}
 @media print { .lpn-snip-veil { display: none; } }
 /* Node-mode target step: nodes ARE the valid click target here, so forcing crosshair over them
    removes the one affordance that actually matters. More specific than the rule above (extra

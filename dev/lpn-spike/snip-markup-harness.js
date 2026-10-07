@@ -9,6 +9,8 @@
 //      and Ctrl+Z does not reach the map;
 //   4. Esc cancels a snip in progress (no view, no download) and closes the view (no download);
 //   5. Save fires exactly one download per click;
+//   7. the eraser removes whole strokes (click and drag), Undo and Redo include erasures, E and Esc
+//      switch tool, every icon has a tip equal to its aria-label, and the box and view carry no words;
 //   6. Freehand leaves every pixel outside the outline transparent and the inside opaque.
 //
 //   node dev/lpn-spike/snip-markup-harness.js   (takes the browser lock itself)
@@ -132,16 +134,31 @@ async function main() {
 			// Whole map first, as the reference.
 			await capture(page, 1, () => pressBox(page, 'lpn_snip_again'));
 			ok('a capture opens the markup view and copies nothing yet', (await page.evaluate(() => window.__snipBlobs.length)) === 0);
-			const btnText = await page.evaluate(() => ['lpn_snip_pen', 'lpn_snip_undo', 'lpn_snip_copy', 'lpn_snip_save'].map((i) => document.getElementById(i).textContent.trim()).join(','));
-			ok('the view offers Pen, Undo, Copy, Save', btnText === 'Pen,Undo,Copy,Save', btnText);
+			const IDS = ['lpn_snip_pen', 'lpn_snip_eraser', 'lpn_snip_undo', 'lpn_snip_redo', 'lpn_snip_copy', 'lpn_snip_save', 'lpn_snip_edit_close'];
+			const icons = await page.evaluate((ids) => ids.map((i) => { const e = document.getElementById(i), b = e.getBoundingClientRect();
+				return { id: i, title: e.title || e.getAttribute('data-bs-original-title'), aria: e.getAttribute('aria-label'), text: e.textContent.trim(), svg: !!e.querySelector('svg') || i === 'lpn_snip_edit_close', h: b.height }; }), IDS);
+			ok('the view offers Pen, Eraser, Undo, Redo, Copy, Save, Close, each with a tip and the same aria-label',
+				icons.length === 7 && icons.every((i) => i.title && i.title === i.aria && i.svg), JSON.stringify(icons.map((i) => i.title)));
+			ok('...and the icon buttons carry no words', icons.filter((i) => i.id !== 'lpn_snip_edit_close').every((i) => i.text === ''));
+			ok('the eraser tip and the shortcuts are named', icons[1].title === 'Eraser: click a stroke to remove it (E)' && /Ctrl\+Z/.test(icons[2].title) && /Ctrl\+Y/.test(icons[3].title), icons[1].title);
 			await copyAndClose(page, 1);
 			const full = await page.evaluate(DECODE, 0);
 			ok('the whole map is map x 2', full.w === Math.round(map.w * S) && full.h === Math.round(map.h * S), full.w + ' x ' + full.h);
 
 			// 1. Snip, rectangle, from the box.
-			const goLabel = await page.evaluate(() => document.getElementById('lpn_snip_go').textContent.trim());
-			ok('the box has a Snip button, with Rectangle and Freehand beside it', goLabel === 'Snip'
-				&& (await page.evaluate(() => Array.from(document.getElementById('lpn_snip_mode').options).map((o) => o.textContent).join(','))) === 'Rectangle,Freehand');
+			const boxIcons = await page.evaluate(() => ['lpn_snip_scale', 'lpn_snip_go', 'lpn_snip_mode', 'lpn_snip_again', 'lpn_snip_mode_rect', 'lpn_snip_mode_free'].map((i) => { const e = document.getElementById(i);
+				return { id: i, title: e.title || e.getAttribute('data-bs-original-title'), aria: e.getAttribute('aria-label'), text: i === 'lpn_snip_scale' ? '' : e.textContent.trim() }; }));
+			ok('the box is wordless: tips and aria-labels on the scale, Snip, its chevron, the monitor, and both modes',
+				boxIcons.every((i) => i.title && i.title === i.aria && i.text === ''), JSON.stringify(boxIcons.map((i) => i.title)));
+			ok('...Snip says Rectangle with its shortcut, and the scale reads as a bare number', boxIcons[1].title === 'Snip a rectangle (S)'
+				&& (await page.$eval('#lpn_snip_scale', (s) => Array.from(s.options).map((o) => o.textContent).join(','))) === '1\u00d7,2\u00d7,3\u00d7,4\u00d7');
+			ok('the mode menu opens from the chevron and holds Rectangle and Freehand', await (async () => {
+				const closed = await page.$eval('#lpn_snip_menu', (m) => getComputedStyle(m).display === 'none');
+				await page.click('#lpn_snip_mode');
+				const opened = await page.$eval('#lpn_snip_menu', (m) => getComputedStyle(m).display !== 'none');
+				await page.click('#lpn_snip_mode');
+				return closed && opened && await page.$eval('#lpn_snip_menu', (m) => getComputedStyle(m).display === 'none');
+			})());
 			const r = { x: Math.round(map.x + map.w * 0.3), y: Math.round(map.y + map.h * 0.3), w: 240, h: 180 };
 			await pressBox(page, 'lpn_snip_go');
 			await page.waitForSelector('.lpn-snip-veil', { state: 'visible' });
@@ -176,6 +193,41 @@ async function main() {
 			await page.keyboard.press('Control+z');
 			ok('Ctrl+Z undoes it', (await page.evaluate(RED_COUNT)) === red0);
 			ok('...without reaching the map', (await page.evaluate(() => window.__mapKeys)) === 0);
+			// The eraser: three strokes, erase the middle one by click; two remain and the picture differs.
+			const ys = [0.25, 0.5, 0.75];
+			for (const f of ys) {
+				await page.mouse.move(p1.x, cb.y + cb.h * f); await page.mouse.down();
+				await page.mouse.move(p2.x, cb.y + cb.h * f, { steps: 6 }); await page.mouse.up();
+			}
+			const pngNow = () => page.evaluate(() => document.getElementById('lpn_snip_canvas').toDataURL('image/png'));
+			const three = await pngNow(), redThree = await page.evaluate(RED_COUNT);
+			await page.keyboard.press('e');
+			ok('E selects the eraser', (await page.getAttribute('#lpn_snip_eraser', 'aria-pressed')) === 'true' && (await page.getAttribute('#lpn_snip_pen', 'aria-pressed')) === 'false');
+			await page.mouse.click((p1.x + p2.x) / 2, cb.y + cb.h * 0.5);
+			const two = await pngNow(), redTwo = await page.evaluate(RED_COUNT);
+			ok('clicking the middle stroke removes that whole stroke (red falls by about a third)', redTwo < redThree * 0.75 && redTwo > redThree * 0.5, redThree + ' -> ' + redTwo);
+			ok('...and the exported PNG differs', two !== three);
+			const rowRed = (y) => page.evaluate((a) => { const c = document.getElementById('lpn_snip_canvas'), d = c.getContext('2d').getImageData(0, Math.round(c.height * a), c.width, 1).data; let n = 0; for (let i = 0; i < d.length; i += 4) { if (d[i] > 200 && d[i + 1] < 60) { n++; } } return n; }, y);
+			ok('...the top and bottom strokes remain, the middle row is clear', (await rowRed(0.25)) > 100 && (await rowRed(0.75)) > 100 && (await rowRed(0.5)) === 0);
+			await page.click('#lpn_snip_undo');
+			ok('Undo restores the erased stroke', (await page.evaluate(RED_COUNT)) === redThree && (await pngNow()) === three);
+			await page.keyboard.press('Control+y');
+			ok('Redo erases it again', (await pngNow()) === two);
+			await page.keyboard.press('Control+z');
+			await page.keyboard.press('Control+z');
+			ok('Undo steps back past the erasure to two strokes', (await page.evaluate(RED_COUNT)) < redThree * 0.75 && (await page.evaluate(RED_COUNT)) > redThree * 0.5);
+			await page.keyboard.press('Control+y');
+			// A drag across two strokes erases both, as one Undo.
+			await page.mouse.move(cb.x + cb.w * 0.5, cb.y + cb.h * 0.15); await page.mouse.down();
+			await page.mouse.move(cb.x + cb.w * 0.5, cb.y + cb.h * 0.9, { steps: 20 }); await page.mouse.up();
+			ok('dragging the eraser across strokes removes them all', (await page.evaluate(RED_COUNT)) === 0);
+			await page.keyboard.press('Control+z');
+			ok('...and one Undo brings them back', (await page.evaluate(RED_COUNT)) > 0);
+			await page.keyboard.press('Escape');
+			ok('Esc returns from the eraser to the pen without closing the view', (await page.getAttribute('#lpn_snip_pen', 'aria-pressed')) === 'true' && !!(await page.$('#lpn_snip_canvas')));
+			// Clear the canvas of strokes for what follows: undo everything.
+			for (let i = 0; i < 10; i++) { await page.keyboard.press('Control+z'); }
+			ok('everything undone leaves no red', (await page.evaluate(RED_COUNT)) === red0);
 			// Put a stroke on and copy: the copied picture carries it.
 			await page.mouse.move(p1.x, p1.y); await page.mouse.down(); await page.mouse.move(p2.x, p2.y, { steps: 6 }); await page.mouse.up();
 			await page.click('#lpn_snip_copy');
@@ -203,7 +255,8 @@ async function main() {
 			await pressBox(page, 'lpn_snip_go');
 			await page.waitForSelector('.lpn-snip-veil', { state: 'visible' });
 			ok('the hint shows while the veil is up', (await a.notice()) === await a.lang('lpn_screenshot_hint'), await a.notice());
-			await page.selectOption('#lpn_snip_mode', 'free');
+			await page.click('#lpn_snip_mode');
+			await page.click('#lpn_snip_mode_free');
 			ok('switching to Freehand with the veil up shows the freehand hint', (await a.notice()) === await a.lang('lpn_snip_hint_free'), await a.notice());
 			const vs = await page.$$eval('.lpn-snip-veil', (v) => v.length);
 			const T0 = await page.evaluate(MAP_RECT);
@@ -213,8 +266,11 @@ async function main() {
 			await page.mouse.move(T0.x + 330, T0.y + 420, { steps: 4 }); await page.mouse.up();
 			await page.waitForSelector('#lpn_snip_canvas', { state: 'visible' });
 			await page.keyboard.press('Escape');
-			await page.selectOption('#lpn_snip_mode', 'rect');
-			await pressBox(page, 'lpn_snip_go');
+			await page.click('#lpn_snip_mode'); await page.click('#lpn_snip_mode_rect');
+			await page.waitForSelector('.lpn-snip-veil', { state: 'visible' });
+			ok('picking Rectangle from the menu starts a rectangle snip and the S key does too', (await page.$eval('#lpn_snip_go', (b) => b.title || b.getAttribute('data-bs-original-title'))) === 'Snip a rectangle (S)');
+			await page.keyboard.press('Escape');
+			await page.keyboard.press('s');
 			await page.waitForSelector('.lpn-snip-veil', { state: 'visible' });
 			await page.keyboard.press('Escape');
 			await a.settle(200);
@@ -243,9 +299,9 @@ async function main() {
 			await page.keyboard.press('Escape');
 
 			// 6. Freehand: a triangle.
-			await page.selectOption('#lpn_snip_mode', 'free');
-			await pressBox(page, 'lpn_snip_go');
+			await page.click('#lpn_snip_mode'); await page.click('#lpn_snip_mode_free');
 			await page.waitForSelector('.lpn-snip-veil', { state: 'visible' });
+			ok('after Freehand, Snip carries the freehand tip', (await page.$eval('#lpn_snip_go', (b) => b.title || b.getAttribute('data-bs-original-title'))) === 'Snip a freehand shape (S)');
 			const T = [{ x: r.x, y: r.y + r.h }, { x: r.x + r.w, y: r.y + r.h }, { x: r.x + r.w / 2, y: r.y }];
 			await page.mouse.move(T[0].x, T[0].y); await page.mouse.down();
 			for (const p of [T[1], T[2], { x: T[0].x + 2, y: T[0].y - 2 }]) { await page.mouse.move(p.x, p.y, { steps: 8 }); }
@@ -259,6 +315,16 @@ async function main() {
 			const inside = await page.evaluate(PIXEL, { i: 3, x: Math.round(free.w / 2), y: Math.round(free.h * 0.8) });
 			ok('outside the outline is transparent (top corners)', out1[3] === 0 && out2[3] === 0, JSON.stringify([out1, out2]));
 			ok('inside the outline is opaque', inside[3] === 255, JSON.stringify(inside));
+			// 8. Phone width: every icon button in the view is at least 40 px each way.
+			await page.setViewportSize({ width: 390, height: 800 });
+			await a.settle(500);
+			await page.evaluate(() => { const b = document.getElementById('lpn_snip_box'); if (b) { b.style.display = 'none'; } });
+			await pressBox(page, 'lpn_snip_again').catch(() => {});
+			const phoneOpen = await page.waitForSelector('#lpn_snip_canvas', { state: 'visible', timeout: 5000 }).then(() => true, () => false);
+			if (phoneOpen) {
+				const sizes = await page.evaluate(() => Array.from(document.querySelectorAll('#lpn_snip_edit .lpn-snip-ic, #lpn_snip_edit .lpn-popover-x')).map((e) => { const b = e.getBoundingClientRect(); return Math.min(b.width, b.height); }));
+				ok('on a phone every icon button in the view is at least 40 px', sizes.length === 7 && sizes.every((n) => n >= 39.5), JSON.stringify(sizes));
+			} else { ok('on a phone the markup view opens (reached through the box button)', false); }
 			ok('no page errors', a.errors.length === 0, a.errors.join(' | ').slice(0, 300));
 		} finally { await a.close(); }
 	} finally {

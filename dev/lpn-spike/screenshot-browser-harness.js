@@ -250,8 +250,8 @@ async function desktop(Session, browser) {
 		// 8c. The box's own Screenshot button repeats the shot at the chosen magnification.
 		await page.selectOption('#lpn_snip_scale', '2');
 		const before = await page.evaluate(() => window.__snipBlobs.length);
-		const againLabel = await page.evaluate(() => document.getElementById('lpn_snip_again') && document.getElementById('lpn_snip_again').textContent.trim());
-		ok('the box has a button labelled Screenshot', againLabel === LABEL, againLabel);
+		const againTip = await page.evaluate(() => document.getElementById('lpn_snip_again') && document.getElementById('lpn_snip_again').title);
+		ok('the box has a monitor button whose tip says Screenshot', /Screenshot/.test(againTip || ''), againTip);
 		await page.focus('#lpn_snip_again');
 		await page.keyboard.press('Enter');
 		await waitBlobs(page, before + 1);
