@@ -22,6 +22,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { scoreView, stability, zoomRowChange } = require('./score.js');
+const C = require('./contract.js');
 
 // The crossing costs, worst to least (dev/label-placement-rules.md §3, "Costs, worst first").
 // Builders get the order only (Tom's ruling of 2026-09-28): score.js counts each crossing by its
@@ -49,7 +50,14 @@ function loadSets(dir, only) {
 	return fs.readdirSync(dir).filter(function (f) { return /\.json$/.test(f); }).sort()
 		.map(function (f) { return JSON.parse(fs.readFileSync(path.join(dir, f), 'utf8')); })
 		.filter(function (s) { return !only || only.indexOf(s.id) >= 0; })
-		.map(function (s) { s.steps.forEach(withRepeatSpacing); return s; });
+		.map(function (s) {
+			s.steps.forEach(function (sc) {
+				const bad = C.sceneProblem(sc);
+				if (bad) { throw new Error('scene refused (missing or non-numeric coordinate): ' + bad); }
+			});
+			s.steps.forEach(withRepeatSpacing);
+			return s;
+		});
 }
 function loadPlacer(p) {
 	const mod = typeof p === 'string' ? require(path.resolve(p)) : p;
@@ -148,7 +156,7 @@ function printTable(results, log) {
 	log(cols.map(function (c) { return pad(c[0], c[1], c[2]); }).join(' '));
 	const T = { N1: 0, N3: 0, N4: 0, N5: 0, invalid: 0, cost: 0, rowsR: 0, rowsS: 0, labR: 0, labS: 0,
 		ldr: [], moved: 0, churn: 0, compared: 0, ms: [],
-		r5c: 0, r5m: 0, r7c: 0, r7o: 0, r9s: 0, r9h: 0, r14a: 0, r14y: 0, r14m: 0, r14ca: 0, r14cy: 0, r14cm: 0, zoomRegained: 0, zoomLost: 0 };
+		r5c: 0, r5m: 0, r7c: 0, r7o: 0, r9s: 0, r9h: 0, dc: 0, dx: 0, r14a: 0, r14y: 0, r14m: 0, r14ca: 0, r14cy: 0, r14cm: 0, zoomRegained: 0, zoomLost: 0 };
 	results.forEach(function (set) {
 		set.steps.forEach(function (st) {
 			const s = st.score, b = s.breaks;
@@ -157,6 +165,7 @@ function printTable(results, log) {
 			T.ldr = T.ldr.concat(s.leaderLH); T.ms.push(st.ms);
 			T.r5c += s.r5.checked; T.r5m += s.r5.mismatch; T.r7c += s.r7.checked; T.r7o += s.r7.onOwnPipe;
 			T.r9s += s.r9.should; T.r9h += s.r9.has;
+			T.dc += s.dropOrder.checked; T.dx += s.dropOrder.outOfOrder;
 			T.r14a += s.r14.asked; T.r14y += s.r14.along; T.r14m += s.r14.missedWithRoom;
 			if (s.r14.zoom >= CLOSE_ZOOM) { T.r14ca += s.r14.asked; T.r14cy += s.r14.along; T.r14cm += s.r14.missedWithRoom; }
 			const stab = st.stability;
@@ -183,6 +192,8 @@ function printTable(results, log) {
 	log('REPORTED, never failing -- R5 leader-side align: ' + T.r5m + '/' + T.r5c + ' stacked+leadered labels not'
 		+ ' justified to their leader\'s side; R7 label-on-own-pipe: ' + T.r7o + '/' + T.r7c + ' shown pipe labels sit on'
 		+ ' their own pipe; R9 repeats: ' + T.r9h + '/' + T.r9s + ' pipes longer than the repeat spacing carry repeats;'
+		+ ' drop order (the ID is a value like any other; a label keeps the last in the user\'s order longest): '
+		+ T.dx + '/' + T.dc + ' labels that gave up rows kept one that comes earlier in the order than one they hid;'
 		+ ' R11 zoom-in row change: ' + T.zoomRegained + ' regained, ' + T.zoomLost + ' lost, across zoom-in steps;'
 		+ ' R14 along the pipe: ' + T.r14y + '/' + T.r14a + ' shown pipe labels the setting asks to lie along their pipe do,'
 		+ ' and ' + T.r14m + ' of the rest had room beside their pipe to; R14 at close zoom (' + CLOSE_ZOOM + 'x and closer): of '
@@ -191,11 +202,32 @@ function printTable(results, log) {
 	return T;
 }
 
+// **--room: R1's first half, SCORED (room-check.js).** Per view, of the labels hidden, those with free
+// ground for their smallest form within reach; of those cut, those with room for the whole label.
+// Each label is asked about alone against the finished layout, so the count is a score, not how many
+// more labels could be shown at once. Never failing.
+function printRoom(results, sets, verbose) {
+	const R = require('./room-check.js');
+	let h = 0, hr = 0, c = 0, cr = 0;
+	console.log('R1, hidden only for lack of room (scored, never failing; room-check.js):');
+	results.forEach(function (set, si) {
+		set.steps.forEach(function (st, k) {
+			const r = R.roomReport(sets[si].steps[k], st.layout);
+			h += r.hidden; hr += r.hiddenWithRoom; c += r.cut; cr += r.cutWithRoom;
+			console.log('  ' + pad(st.id, 24, true) + ' hidden with room ' + pad(r.hiddenWithRoom + '/' + r.hidden, 11)
+				+ '   cut with room for the whole label ' + r.cutWithRoom + '/' + r.cut);
+			if (verbose && r.ids.hiddenWithRoom.length) { console.log('    hidden with room: ' + r.ids.hiddenWithRoom.join(' ')); }
+		});
+	});
+	console.log('  ' + pad('TOTAL', 24, true) + ' hidden with room ' + pad(hr + '/' + h, 11) + ' (' + pct(hr, h)
+		+ ')   cut with room ' + cr + '/' + c + ' (' + pct(cr, c) + ')');
+}
+
 function main() {
 	const a = process.argv.slice(2);
 	function opt(name) { const i = a.indexOf(name); return i >= 0 ? a[i + 1] : undefined; }
 	const placer = opt('--placer');
-	if (!placer) { console.error('usage: node run.js --placer <path> [--only set,set] [--verbose] [--json file]'); process.exit(2); }
+	if (!placer) { console.error('usage: node run.js --placer <path> [--only set,set] [--room] [--verbose] [--json file]'); process.exit(2); }
 	const only = opt('--only') ? opt('--only').split(',') : null;
 	const sets = loadSets(opt('--scenes') || path.join(__dirname, 'scenes'), only);
 	if (!sets.length) { console.error('no scene sets found'); process.exit(2); }
@@ -207,6 +239,7 @@ function main() {
 	console.log('REPORTED, never failing -- R13 alignment setting switched off at the same view: '
 		+ (tog.skipped && !tog.checked ? 'not measurable (this placer cannot place a scene it has not seen)'
 			: tog.stillTurned + '/' + tog.checked + ' shown pipe labels still turned (should be 0)'));
+	if (a.indexOf('--room') >= 0) { printRoom(res, sets, a.indexOf('--verbose') >= 0); }
 	if (a.indexOf('--verbose') >= 0) {
 		tog.ids.forEach(function (m) { console.log('  R13 still turned after the setting went off: ' + m); });
 		res.forEach(function (set) {

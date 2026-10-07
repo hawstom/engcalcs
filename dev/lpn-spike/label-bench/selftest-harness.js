@@ -253,5 +253,99 @@ if (sets.length) {
 		JSON.stringify(mast.r14));
 }
 
+// ---- drop order: the ID is a value like any other, and a label keeps the LAST one longest ----------
+// (Tom, 2026-10-06: "Keep the last dropped property.") A placer that keeps a bare ID while it drops
+// the value the user ranks last to go has broken the user's order; one that keeps that value alone
+// has not. A scene recorded before the ID joined the order lists no 'id'; it is read as first to go.
+{
+	const mk = function (order) {
+		const sc = JSON.parse(JSON.stringify(scene));
+		sc.id = 'selftest-drop@0';
+		sc.dropOrder = { node: order, link: [], customer: [] };
+		sc.labels = [{ id: 'n:A', owner: 'A', kind: 'node', anchor: { x: 100, y: 100 }, hand: null, layout: 'stack',
+			rows: [{ field: 'id', text: 'A', w: 20, h: 10 }, { field: 'elev', text: 'Z=5', w: 20, h: 10 }, { field: 'pressure', text: 'P=60', w: 20, h: 10 }] }];
+		return sc;
+	};
+	const lay = function (rows) { return { labels: { 'n:A': { shown: true, rows: rows, layout: 'stack', align: 'left', x: 110, y: 80, leader: null } } }; };
+	[['id', 'elev', 'pressure'], ['elev', 'pressure']].forEach(function (order) {
+		const sc = mk(order), tag = order[0] === 'id' ? 'ID listed' : 'ID not listed (an older scene)';
+		const bareId = scoreView(sc, lay([0])), bareLast = scoreView(sc, lay([2])), pair = scoreView(sc, lay([1, 2])), whole = scoreView(sc, lay([0, 1, 2]));
+		const idPlusLast = scoreView(sc, lay([0, 2]));
+		report(bareId.dropOrder.checked === 1 && bareId.dropOrder.outOfOrder === 1,
+			'drop order (' + tag + '): a placer that keeps a bare ID while dropping the last-in-order value is caught', JSON.stringify(bareId.dropOrder));
+		report(bareLast.dropOrder.outOfOrder === 0 && pair.dropOrder.outOfOrder === 0 && whole.dropOrder.outOfOrder === 0,
+			'drop order (' + tag + '): keeping the last value alone, the last two, or all of them is in order',
+			JSON.stringify([bareLast.dropOrder, pair.dropOrder, whole.dropOrder]));
+		report(idPlusLast.dropOrder.outOfOrder === 1,
+			'drop order (' + tag + '): keeping the ID and the last value but dropping the one between is out of order', JSON.stringify(idPlusLast.dropOrder));
+	});
+	// A user who ranks the ID LAST to go keeps it longest: the bare ID is then in order, and a bare pressure is not.
+	const idLast = mk(['elev', 'pressure', 'id']);
+	report(scoreView(idLast, lay([0])).dropOrder.outOfOrder === 0 && scoreView(idLast, lay([2])).dropOrder.outOfOrder === 1,
+		'drop order: when the user ranks the ID last to go, the bare ID is in order and a bare pressure is not');
+}
+
+// ---- a scene with a missing or non-numeric coordinate is refused ------------------------------------
+// (Round 5's generated pipes had vertices that were NaN in the page and null in the file; arithmetic
+// read them as 0 and nobody saw it for a whole round.)
+{
+	const fs = require('fs'), os = require('os');
+	const all = loadSets(path.join(__dirname, 'scenes'));
+	report(all.length >= 6, 'every committed scene set loads, so every committed coordinate is a finite number', all.map(function (x) { return x.id; }).join(', '));
+	const raw = JSON.parse(fs.readFileSync(path.join(__dirname, 'scenes', 'net1.json'), 'utf8'));
+	const bent = JSON.parse(JSON.stringify(raw));
+	const L = bent.steps[0].links[0];
+	L.points.splice(1, 0, [null, null]);   // what JSON makes of a NaN vertex
+	const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'bench-refuse-'));
+	fs.writeFileSync(path.join(dir, 'bad.json'), JSON.stringify(bent));
+	let refused = '';
+	try { loadSets(dir); } catch (e) { refused = e.message; }
+	fs.rmSync(dir, { recursive: true, force: true });
+	report(/refused/.test(refused) && refused.indexOf('link ' + L.id) >= 0, 'a scene with a null pipe vertex is refused, naming the link', refused);
+	const noAnchor = JSON.parse(JSON.stringify(raw)).steps[0];
+	noAnchor.labels[0].anchor = { x: NaN, y: 10 };
+	const why = require('./contract.js').sceneProblem(noAnchor);
+	report(!!why && why.indexOf(noAnchor.labels[0].id) >= 0, 'a label anchor that is not a number is refused', why);
+}
+
+// ---- room-check.js, the R1 self-test builders call on their own output ------------------------------
+// It must say "room" where the ground is plainly free, "no room" where it plainly is not, and every
+// spot it hands back must be a placement the scorer accepts (no break, a leader that reaches its text).
+{
+	const RC = require('./room-check.js');
+	// Nothing shown on the hand-built scene: n:A, n:B and l:AB are hidden in open ground (n:C is hand-
+	// placed, N4's business): all three must have room.
+	const empty = RC.roomReport(scene, { labels: {} });
+	report(empty.hidden === 3 && empty.hiddenWithRoom === 3, 'room-check: three labels hidden in open ground all have room', JSON.stringify({ hidden: empty.hidden, withRoom: empty.hiddenWithRoom }));
+	// The clean layout shows n:A whole, so the only hidden label is l:AB.
+	const cl = RC.roomReport(scene, clean());
+	report(cl.hidden === 1 && cl.ids.hiddenWithRoom.join() === 'l:AB', 'room-check: with the clean layout only the pipe label is hidden, and it has room', JSON.stringify(cl.ids));
+	// A screen too small for anything but the node: no room at all.
+	const tight = { id: 'tight@0', viewport: { x: 0, y: 0, w: 14, h: 14 }, view: { s: 1, tx: 0, ty: 0 }, text: scene.text,
+		dropOrder: scene.dropOrder, nodes: [{ id: 'A', type: 'junction', x: 7, y: 7, symbol: { x: 2, y: 2, w: 10, h: 10 } }],
+		links: [], texts: [], customers: [], labels: [{ id: 'n:A', owner: 'A', kind: 'node', anchor: { x: 7, y: 7 }, rows: [row('A')], layout: 'stack', hand: null }] };
+	const tr = RC.roomReport(tight, { labels: {} });
+	report(tr.hidden === 1 && tr.hiddenWithRoom === 0, 'room-check: a label with no ground on screen beside its node has no room');
+	// The smallest form is the last field in the drop order.
+	const ordered = Object.assign({}, scene, { dropOrder: { node: ['id', 'elev'], link: [], customer: [] } });
+	const req2 = { id: 'n:Z', kind: 'node', rows: [{ field: 'elev', text: 'Z=1', w: 18, h: 10 }, { field: 'id', text: 'Z', w: 6, h: 10 }] };
+	report(RC.smallestRows(ordered, req2).join() === '0', 'room-check: a label\'s smallest form is the value its drop order keeps longest');
+	// On Net1 and Novato with nothing shown, every spot handed back is, alone, a clean placement.
+	const sets = loadSets(path.join(__dirname, 'scenes'), ['net1', 'novato-zoom']);
+	let spots = 0, bad = [];
+	sets.forEach(function (set) {
+		const sc = set.steps[0], r = RC.roomReport(sc, { labels: {} });
+		Object.keys(r.spots).forEach(function (id) {
+			spots++;
+			const lay = { labels: {} };
+			lay.labels[id] = r.spots[id];
+			const b = scoreView(sc, lay).breaks;
+			const n = b.N1.length + b.N3.length + b.N5.length + b.invalid.length;
+			if (n) { bad.push(id + ' ' + count(scoreView(sc, lay))); }
+		});
+	});
+	report(spots > 100 && bad.length === 0, 'room-check: each of ' + spots + ' spots it hands back, placed alone, breaks nothing', bad.slice(0, 3).join('; '));
+}
+
 console.log(`\n${checks - failures}/${checks} checks passed.`);
 process.exit(failures ? 1 : 0);
