@@ -4088,3 +4088,11 @@ OBSERVED GDAL 3.12 (pyogrio in a venv, no sudo): exported Net3 world loads, EPSG
 OBSERVED DEFECTS: (1) projected export before the CRS table is loaded (basemap off) or for a CRS outside the 5,240 gets the "not valid latitudes" refusal naming an easting; the `crs` message is unreachable and not in lang. (2) Gusnet reads demand_pattern/head_pattern/speed_pattern as multiplier STRINGS and pump_curve/vol_curve as point lists; we write names. A pattern named 3 reads as a constant x3 in Gusnet, silently; pump_curve 1 errors. (3) Gusnet REQUIRES tank min_vol; we omit it. (4) D-W roughness in ft vs Gusnet 1e-3 ft; gradient in percent vs m/1000m. (5) result values carry float noise (56.999999999999744).
 OBSERVED harness gaps by mutation on a scratch copy: a scenario switching an element off, a scenario-moved node, and the document origin are all unasserted (mutants passed). Swap lon/lat, drop vertices, results-without-solve, tank diameter unit are caught. I verified scenario and origin by hand: correct.
 Lesson: the harness's projected case used a stub transform; run the real one.
+
+## 2026-10-07 feat/message-dismiss (Hide a standing message; Zoom Window row and W)
+- OBSERVED: harness message-dismiss-browser-harness.js 30/30 passes; adding 'no-fixed-head' to the hideable set makes it fail (1 FAIL), so it holds the line.
+- OBSERVED: the x is 18x15 px on desktop and at 390/320 wide; a real click at its centre works; no sideways scroll; Something-wrong button untouched.
+- OBSERVED: hidden set is keyed on text only and survives the problem going away and returning (undo x2 then redo x2 left it hidden, chip shown). Chip is always "1 hidden" (only one message exists at a time, so it never miscounts).
+- OBSERVED: W keys on e.key only; a keydown with key 'ц' code 'KeyW' does nothing. Latin w/W, toolbar-button focus, Settings box open: works; open menu: ignored; Escape-closed menu: works.
+- OBSERVED: menu rows have no active state anywhere in this menu (menu closes on click), so Zoom Window row shows none; toolbar button does show pressed.
+- LESSON: Session.closeMenu() only hides the popup with CSS, leaving openMenuAnchor set; use Escape in probes.
