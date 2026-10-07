@@ -17212,7 +17212,7 @@ var EngCalcs = EngCalcs || {};
 		saveUndoSnapshot();
 		setBasemapOn(true);
 		setNotice(pc.lpn_map_attach_done ||
-			'The world map is behind your drawing now, and your project is unchanged. Use Map, World map, Detach to take it away again.');
+			'The world map is now displayed behind the drawing, and the project is unchanged. Use Map, World map, Detach to remove it.');
 	}
 	/**
 	 * **DETACH HIDES THE MAP AND KEEPS THE PLACEMENT, ON EVERY PROJECT KIND** (Perry's review,
@@ -17228,7 +17228,7 @@ var EngCalcs = EngCalcs || {};
 		saveUndoSnapshot();
 		setBasemapOn(false);
 		refreshMapStatus();
-		setNotice(pc.lpn_map_attach_removed || 'The world map is gone, and the drawing is exactly as it was.');
+		setNotice(pc.lpn_map_attach_removed || 'The world map is detached, and the network is unaffected.');
 	}
 	// **THE FOUR WORLD-MAP COMMANDS, in the shape Background image already uses** (Tom, 2026-09-18).
 	// Built fresh on every open so `disabled` is read from the state of the moment. Attach is dead
@@ -17462,7 +17462,7 @@ var EngCalcs = EngCalcs || {};
 		refreshBasemap();
 		refreshMapStatus();
 		mapgeoRefreshBar();
-		setNotice(pc.lpn_map_attach_done || 'The world map is behind your drawing now, and your project is unchanged. Use Map, World map, Detach to take it away again.');
+		setNotice(pc.lpn_map_attach_done || 'The world map is now displayed behind the drawing, and the project is unchanged. Use Map, World map, Detach to remove it.');
 		convasPlaced();
 	}
 	function mapgeoCancel() {
@@ -17477,7 +17477,7 @@ var EngCalcs = EngCalcs || {};
 		refreshBasemap();
 		refreshMapStatus();
 		mapgeoRefreshBar();
-		setNotice(pc.lpn_mapgeo_cancelled || 'The world map is back where it was, and your drawing never moved.');
+		setNotice(pc.lpn_mapgeo_cancelled || 'The world map is restored to its previous position, and the drawing was not moved.');
 		convasAbandon();
 	}
 	// ---- the bar ---------------------------------------------------------------------------------
@@ -17495,7 +17495,7 @@ var EngCalcs = EngCalcs || {};
 		if (!mapgeo) { mapgeoShow('lpn_mapgeo_dial', false); return; }
 		world1 = mapgeo.step === MAPGEO_STEP_WORLD;
 		mapgeoBarEl('lpn_mapgeo_step').textContent = world1
-			? (pc.lpn_mapgeo_step1 || 'Step 1 of 2: find your place in the world')
+			? (pc.lpn_mapgeo_step1 || 'Step 1 of 2: find the project location')
 			: (pc.lpn_mapgeo_step2 || 'Step 2 of 2: fit the map behind your drawing');
 		mapgeoBarEl('lpn_mapgeo_hint').textContent = world1
 			? (pc.lpn_mapgeo_hint1 || 'Pan and zoom the map behind your drawing, or search for a place, or enter a latitude and longitude. Then press Place approximately.')
@@ -36036,7 +36036,7 @@ var EngCalcs = EngCalcs || {};
 		});
 		if (!types && !fittings && !coords && !custs) { return; }
 		if (types) {
-			said.push((pc.lpn_inp_export_flat_types || '{n} pipes here refer to {t} pipe types. In the file each of those pipes carries its own copy of the numbers, so the answers are the same. What the file cannot hold is the pipe type itself, so editing one definition and having every pipe follow is something only your own project file records.')
+			said.push((pc.lpn_inp_export_flat_types || '{n} pipes here refer to {t} pipe types. In the file each of those pipes carries its own copy of the numbers, so the answers are the same. What the file cannot hold is the pipe type itself, so the link between one definition and every pipe that uses it is recorded only in the project file.')
 				.replace('{n}', String(types.ids.length)).replace('{t}', String(types.detail || '?')));
 		}
 		if (custs) {
@@ -36044,7 +36044,7 @@ var EngCalcs = EngCalcs || {};
 				.replace('{n}', String(custs.ids.length)));
 		}
 		if (coords) {
-			said.push((pc.lpn_inp_export_flat_coords || 'An EPANET file holds one position for each node. This scenario places {n} of them somewhere else, and those are the positions in the file. Every other scenario keeps its own positions in your project file alone.')
+			said.push((pc.lpn_inp_export_flat_coords || 'An EPANET file holds one position for each node. This scenario places {n} of them somewhere else, and those are the positions in the file. Every other scenario keeps its positions in the project file only.')
 				.replace('{n}', String(coords.ids.length)));
 		}
 		if (fittings) {
@@ -36772,7 +36772,7 @@ var EngCalcs = EngCalcs || {};
 	function inpDropText(code) {
 		var pc = EngCalcs.pageConfig || {};
 		switch (code) {
-			case 'headloss-formula': return pc.lpn_inp_drop_headloss || 'This file does not use the Hazen-Williams formula. This page computes Hazen-Williams, so the pipe roughness numbers were kept exactly as written, but the answers here will not match the answers in EPANET.';
+			case 'headloss-formula': return pc.lpn_inp_drop_headloss || 'This file does not use the Hazen-Williams formula. This page computes Hazen-Williams, so the pipe roughness numbers were kept exactly as written, but the results here will not match the results in EPANET.';
 			// 'tanks' and 'links-on-tanks' are gone (Task 248): tanks are imported now, so neither
 			// case can be reported. The lang keys are retired with them.
 			// The fallback is kept in step with the key on purpose: it is what a page whose
@@ -36861,13 +36861,13 @@ var EngCalcs = EngCalcs || {};
 			// `.net` stores its options as an indexed array with no keywords, so a slot this page
 			// has no name for has nothing it could be called in the file we convert to.
 			case 'net-options': return pc.lpn_inp_drop_net_options || 'This EPANET .net file states settings that this page has no control for, so their values are listed here rather than carried across. Everything else came over. If you need them, open the file in EPANET and use File, Export, Network to save it as an .inp file, then import that.';
-			case 'file-options': return pc.lpn_inp_drop_file_options || 'This file refers to an auxiliary file: Map, which holds coordinates, or Hydraulics, which holds hydraulics already worked out. This page cannot open either, so the lines are kept as they are and written back if you save an EPANET file.';
+			case 'file-options': return pc.lpn_inp_drop_file_options || 'This file refers to an auxiliary file: Map, which holds coordinates, or Hydraulics, which holds previously computed hydraulics. This page cannot open either, so the lines are kept as they are and written back if you save an EPANET file.';
 			case 'backdrop-not-embedded': return pc.lpn_inp_drop_backdrop || 'This file names a background picture but does not contain the picture itself. Add it yourself with File, Background image, Add image.';
 			case 'dangling-link': return pc.lpn_inp_drop_dangling || 'These pipes name a junction that is not in the file, so they were left out.';
 			// OUR VOCABULARY, NOT EPANET'S: what EPANET calls a Label is our Text object, so the
 			// sentence names the Text and never the other word.
 			case 'label-anchor-missing': return pc.lpn_inp_drop_anchor_missing || 'This text was attached to a junction, reservoir, or tank that is not in the file. It was imported as free text at the location stated in the file and is not attached to any asset.';
-			case 'unknown-flow-units': return pc.lpn_inp_drop_units || 'The flow unit named in this file is not one this page knows, so every number was read as gallons per minute. Check every number before you use the answers.';
+			case 'unknown-flow-units': return pc.lpn_inp_drop_units || 'The flow unit named in this file is not one this page knows, so every number was read as gallons per minute. Check every value before using the results.';
 			default: return code;
 		}
 	}
@@ -39259,7 +39259,7 @@ var EngCalcs = EngCalcs || {};
 	async function askForLockedFile(saved) {
 		var pc = EngCalcs.pageConfig || {};
 		var docId = saved.project && saved.project.docId;
-		var initials = await askDialogP({ kind: 'prompt', text: pc.lpn_lock_ask_prompt || 'Who should we say is asking? Your initials are ideal. They are kept with this file\'s lock on our server, for whoever has it open, and deleted within 30 days.', value: '' });
+		var initials = await askDialogP({ kind: 'prompt', text: pc.lpn_lock_ask_prompt || 'Who should we say is asking? Enter your initials, for example. They are kept with this file\'s lock on our server, for whoever has it open, and deleted within 30 days.', value: '' });
 		// Backed out: nothing sent, and nothing opened -- and it says so, for the same reason the
 		// Cancel button below does (Task 704). A dialog closing on its own is not an answer.
 		if (initials === null) {
@@ -53118,11 +53118,11 @@ var EngCalcs = EngCalcs || {};
 					.replace('{names}', p.clashed.join(', ')));
 			}
 			if (unusable.length) {
-				lines.push((pc.lpn_library_import_curve_shape || 'These curves came across exactly as the file wrote them, and a run cannot use one until its first column rises from each point to the next: {names}')
+				lines.push((pc.lpn_library_import_curve_shape || 'These curves were imported exactly as written in the file, and a run cannot use one until its first column rises from each point to the next: {names}')
 					.replace('{names}', unusable.join(', ')));
 			}
 			if (orphan.length) {
-				lines.push((pc.lpn_library_import_needs_fittings || 'These pipe types refer to a fittings list this project does not have: {names}. Import the fittings library from the same file and they will find it.')
+				lines.push((pc.lpn_library_import_needs_fittings || 'These pipe types refer to a fittings list this project does not have: {names}. Import the fittings library from the same file to resolve these references.')
 					.replace('{names}', orphan.join(', ')));
 			}
 			// A library the user checked whose every record turned out to be nameless says nothing
@@ -54168,7 +54168,7 @@ var EngCalcs = EngCalcs || {};
 	 */
 	function buildPipeTypeSection(host) {
 		var pc = EngCalcs.pageConfig || {}, list = libPipeTypesRead();
-		host.appendChild(libEl('p', 'lpn-lib-note', pc.lpn_library_pipetypes_note || 'Each project has its own pipe type library. You may leave properties blank in a pipe type definition. For example, a pipe type that specifies a roughness and no diameter is okay. You attach pipe types to pipes in their properties editor. Editing a definition here changes every pipe that references it.'));
+		host.appendChild(libEl('p', 'lpn-lib-note', pc.lpn_library_pipetypes_note || 'Each project has a separate pipe type library. Properties may be left blank in a pipe type definition; for example, a pipe type may specify a roughness and no diameter. Pipe types are assigned to pipes in the pipe properties. Editing a definition here changes every pipe that references it.'));
 		// Said once for the section, not once per entry -- buildCurveSection()'s rule, and for the
 		// same reason: it is the same sentence about every row, and twenty copies of a sentence is
 		// what makes a panel unreadable.
@@ -54360,7 +54360,7 @@ var EngCalcs = EngCalcs || {};
 	}
 	function buildFittingSection(host) {
 		var pc = EngCalcs.pageConfig || {}, list = libFittingSetsRead();
-		host.appendChild(libEl('p', 'lpn-lib-note', pc.lpn_library_fittings_note || 'Each project has its own fittings library. A fittings list has fittings with a quantity for each one, and it adds up to a single minor loss coefficient. Both pipes and pipe types may refer to a list.'));
+		host.appendChild(libEl('p', 'lpn-lib-note', pc.lpn_library_fittings_note || 'Each project has a separate fittings library. A fittings list has fittings with a quantity for each one, and it adds up to a single minor loss coefficient. Both pipes and pipe types may refer to a list.'));
 		// **WHERE THE OFFERED COEFFICIENTS COME FROM, SAID ONCE FOR THE SECTION.** An unsourced
 		// number that looks authoritative is worse than none at all, so the source is named on the
 		// screen and not only at the code.
@@ -54776,7 +54776,7 @@ var EngCalcs = EngCalcs || {};
 			var inUse = curveUsers(c.id);
 			if (inUse.length) {
 				setWarning((pc.lpn_library_curve_in_use
-					|| 'This curve is used by {count} elements: {ids}. Point them at another curve first, then delete this one.')
+					|| 'This curve is used by {count} elements: {ids}. Assign another curve to them first, then delete this one.')
 					.replace('{count}', String(inUse.length)).replace('{ids}', inUse.join(', ')));
 				return;
 			}
@@ -56266,7 +56266,7 @@ var EngCalcs = EngCalcs || {};
 		said = document.createElement('div');
 		said.className = 'lpn-set-note';
 		if (shown !== null) {
-			said.textContent = (pc.lpn_elev_dem_said || 'Mapbox DEM says {v} {u}.')
+			said.textContent = (pc.lpn_elev_dem_said || 'Mapbox DEM elevation: {v} {u}.')
 				.replace('{v}', String(shown)).replace('{u}', unitLabel('lpn_u_elevhead'));
 		} else if (terrainAsked[nodeId]) {
 			// **THE REASON, HERE, NOT ONLY IN THE NOTICE AT THE OTHER SIDE OF THE SCREEN.** This
@@ -61262,7 +61262,7 @@ var EngCalcs = EngCalcs || {};
 			showNotice('');
 			return;
 		}
-		words = pc.lpn_map_unmeasurable || 'This page could not work out the size of the drawing area, so the map is showing the last view it was able to compute. Resizing the window makes it try again. If it keeps happening, a browser extension that blocks page measurements is the usual cause.';
+		words = pc.lpn_map_unmeasurable || 'This page could not determine the size of the drawing area, so the map shows the last view it was able to compute. Resizing the window repeats the measurement. If this persists, the usual cause is a browser extension that blocks page measurements.';
 		// Logged on the TRANSITION only, not on every re-show: this message is re-shown whenever an
 		// ordinary notice has covered it, and each of those is the same standing fact said again.
 		if (!mapUnmeasurable) { logMessage(words, 'warning'); }
@@ -61482,7 +61482,7 @@ var EngCalcs = EngCalcs || {};
 	function thankWrongButton(btn) {
 		var pcW = EngCalcs.pageConfig || {};
 		// textContent, not the tip markup: the thank-you is a statement and not a control.
-		btn.textContent = pcW.lpn_wrong_thanks || 'Thank you. That reached us.';
+		btn.textContent = pcW.lpn_wrong_thanks || 'Thank you. Your report was received.';
 		btn.disabled = true;
 		// **AND THEN IT IS A DOOR AGAIN** (Tom: "give the users the information and the freedom").
 		// A second report in the same visit is a real thing to want, so the thank-you stands for a
@@ -63508,7 +63508,7 @@ var EngCalcs = EngCalcs || {};
 		if (rec.code === C.UNKNOWN_NODE) { return pc.lpn_ff_err_not_junction || 'Not a junction'; }
 		// **THE PLACEHOLDER IS {code}, NOT {id}.** Every other {id} in this report holds an asset
 		// name, and a translator reasoning about the token wrote about a node. Task 573 Wave 0.
-		return (pc.lpn_ff_err_unknown || 'No answer. The code reported was {code}.')
+		return (pc.lpn_ff_err_unknown || 'No result. Error code: {code}')
 			.replace('{code}', rec.code || '');
 	}
 	// The available flow as a person should read it. A junction that held the residual at the search
