@@ -202,11 +202,32 @@ function printTable(results, log) {
 	return T;
 }
 
+// **--room: R1's first half, SCORED (room-check.js).** Per view, of the labels hidden, those with free
+// ground for their smallest form within reach; of those cut, those with room for the whole label.
+// Each label is asked about alone against the finished layout, so the count is a score, not how many
+// more labels could be shown at once. Never failing.
+function printRoom(results, sets, verbose) {
+	const R = require('./room-check.js');
+	let h = 0, hr = 0, c = 0, cr = 0;
+	console.log('R1, hidden only for lack of room (scored, never failing; room-check.js):');
+	results.forEach(function (set, si) {
+		set.steps.forEach(function (st, k) {
+			const r = R.roomReport(sets[si].steps[k], st.layout);
+			h += r.hidden; hr += r.hiddenWithRoom; c += r.cut; cr += r.cutWithRoom;
+			console.log('  ' + pad(st.id, 24, true) + ' hidden with room ' + pad(r.hiddenWithRoom + '/' + r.hidden, 11)
+				+ '   cut with room for the whole label ' + r.cutWithRoom + '/' + r.cut);
+			if (verbose && r.ids.hiddenWithRoom.length) { console.log('    hidden with room: ' + r.ids.hiddenWithRoom.join(' ')); }
+		});
+	});
+	console.log('  ' + pad('TOTAL', 24, true) + ' hidden with room ' + pad(hr + '/' + h, 11) + ' (' + pct(hr, h)
+		+ ')   cut with room ' + cr + '/' + c + ' (' + pct(cr, c) + ')');
+}
+
 function main() {
 	const a = process.argv.slice(2);
 	function opt(name) { const i = a.indexOf(name); return i >= 0 ? a[i + 1] : undefined; }
 	const placer = opt('--placer');
-	if (!placer) { console.error('usage: node run.js --placer <path> [--only set,set] [--verbose] [--json file]'); process.exit(2); }
+	if (!placer) { console.error('usage: node run.js --placer <path> [--only set,set] [--room] [--verbose] [--json file]'); process.exit(2); }
 	const only = opt('--only') ? opt('--only').split(',') : null;
 	const sets = loadSets(opt('--scenes') || path.join(__dirname, 'scenes'), only);
 	if (!sets.length) { console.error('no scene sets found'); process.exit(2); }
@@ -218,6 +239,7 @@ function main() {
 	console.log('REPORTED, never failing -- R13 alignment setting switched off at the same view: '
 		+ (tog.skipped && !tog.checked ? 'not measurable (this placer cannot place a scene it has not seen)'
 			: tog.stillTurned + '/' + tog.checked + ' shown pipe labels still turned (should be 0)'));
+	if (a.indexOf('--room') >= 0) { printRoom(res, sets, a.indexOf('--verbose') >= 0); }
 	if (a.indexOf('--verbose') >= 0) {
 		tog.ids.forEach(function (m) { console.log('  R13 still turned after the setting went off: ' + m); });
 		res.forEach(function (set) {

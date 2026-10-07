@@ -54,6 +54,14 @@ node dev/lpn-spike/label-bench/judges/judge.js --placer dev/lpn-spike/label-benc
   Master's replay cannot place a scene it was not recorded on, so only the first half is measured
   for it; round 5's ID-length result (the same share shown for 3- and 9-character IDs) is the
   evidence there.
+- **R1's first half, the two scores builders do not see** (round 7, `room-held.js`). Builders
+  self-test with the public `room-check.js` (the same question as `r1.js`, label for label; the
+  selftest proves it). The judges add a **held-back room** score (the same question searched every 5
+  degrees and every quarter row out to 5 rows, refusing ground under another label's leader and a
+  leader through another label's text) and **realizable room** (labels a strict repair pass brings
+  back, smallest form first, each seated label an obstacle for the next: no ground counted twice).
+  Scored, never failing (Tom, 2026-10-06: *"You can't fail builders who fail it, because they all fail
+  it. You must score them."*). Why both: `dev/label-trials/round-7-plan.md` §1c.
 - `master/` holds the shipped page's layouts of the prefixed scenes, for `placers/master-replay.js`.
 - `selftest-harness.js` (in `check_all.sh`) proves the three measure what they say, and that no
   file a builder reads states Tom's numeric weights.

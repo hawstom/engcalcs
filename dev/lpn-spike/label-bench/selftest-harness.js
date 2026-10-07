@@ -308,5 +308,44 @@ if (sets.length) {
 	report(!!why && why.indexOf(noAnchor.labels[0].id) >= 0, 'a label anchor that is not a number is refused', why);
 }
 
+// ---- room-check.js, the R1 self-test builders call on their own output ------------------------------
+// It must say "room" where the ground is plainly free, "no room" where it plainly is not, and every
+// spot it hands back must be a placement the scorer accepts (no break, a leader that reaches its text).
+{
+	const RC = require('./room-check.js');
+	// Nothing shown on the hand-built scene: n:A, n:B and l:AB are hidden in open ground (n:C is hand-
+	// placed, N4's business): all three must have room.
+	const empty = RC.roomReport(scene, { labels: {} });
+	report(empty.hidden === 3 && empty.hiddenWithRoom === 3, 'room-check: three labels hidden in open ground all have room', JSON.stringify({ hidden: empty.hidden, withRoom: empty.hiddenWithRoom }));
+	// The clean layout shows n:A whole, so the only hidden label is l:AB.
+	const cl = RC.roomReport(scene, clean());
+	report(cl.hidden === 1 && cl.ids.hiddenWithRoom.join() === 'l:AB', 'room-check: with the clean layout only the pipe label is hidden, and it has room', JSON.stringify(cl.ids));
+	// A screen too small for anything but the node: no room at all.
+	const tight = { id: 'tight@0', viewport: { x: 0, y: 0, w: 14, h: 14 }, view: { s: 1, tx: 0, ty: 0 }, text: scene.text,
+		dropOrder: scene.dropOrder, nodes: [{ id: 'A', type: 'junction', x: 7, y: 7, symbol: { x: 2, y: 2, w: 10, h: 10 } }],
+		links: [], texts: [], customers: [], labels: [{ id: 'n:A', owner: 'A', kind: 'node', anchor: { x: 7, y: 7 }, rows: [row('A')], layout: 'stack', hand: null }] };
+	const tr = RC.roomReport(tight, { labels: {} });
+	report(tr.hidden === 1 && tr.hiddenWithRoom === 0, 'room-check: a label with no ground on screen beside its node has no room');
+	// The smallest form is the last field in the drop order.
+	const ordered = Object.assign({}, scene, { dropOrder: { node: ['id', 'elev'], link: [], customer: [] } });
+	const req2 = { id: 'n:Z', kind: 'node', rows: [{ field: 'elev', text: 'Z=1', w: 18, h: 10 }, { field: 'id', text: 'Z', w: 6, h: 10 }] };
+	report(RC.smallestRows(ordered, req2).join() === '0', 'room-check: a label\'s smallest form is the value its drop order keeps longest');
+	// On Net1 and Novato with nothing shown, every spot handed back is, alone, a clean placement.
+	const sets = loadSets(path.join(__dirname, 'scenes'), ['net1', 'novato-zoom']);
+	let spots = 0, bad = [];
+	sets.forEach(function (set) {
+		const sc = set.steps[0], r = RC.roomReport(sc, { labels: {} });
+		Object.keys(r.spots).forEach(function (id) {
+			spots++;
+			const lay = { labels: {} };
+			lay.labels[id] = r.spots[id];
+			const b = scoreView(sc, lay).breaks;
+			const n = b.N1.length + b.N3.length + b.N5.length + b.invalid.length;
+			if (n) { bad.push(id + ' ' + count(scoreView(sc, lay))); }
+		});
+	});
+	report(spots > 100 && bad.length === 0, 'room-check: each of ' + spots + ' spots it hands back, placed alone, breaks nothing', bad.slice(0, 3).join('; '));
+}
+
 console.log(`\n${checks - failures}/${checks} checks passed.`);
 process.exit(failures ? 1 : 0);

@@ -1,8 +1,21 @@
 # Label placement, round 7 (plan, 2026-10-06): the golden prize scored, a self-test, and a strategy catalogue
 
-**Builders must not read this file or `dev/label-trials/`.** It is the judges' side. At launch, §2
-(the self-test) and §3 (the strategy catalogue) are copied, as written there, into a file the
-builders may read (`dev/label-placement-strategies.md`); nothing else here goes to them.
+**Builders must not read this file or `dev/label-trials/`.** It is the judges' side. The builders'
+copy of §2 (the self-test) and §3 (the strategy catalogue) is `dev/label-placement-strategies.md`,
+written 2026-10-07; nothing else here goes to them (§5 says how they receive it without the judges'
+files).
+
+**Three launch decisions rest on Tom's own words, read as his direction, not on a separate yes from
+him** (the coordinator's reading, 2026-10-07; if he objects, we revise):
+
+1. **Share the self-test with the builders**: his question of 2026-10-06, *"can we share our measuring
+   tool with the builders so that they can self-test their strategies in real-time?"*
+2. **Hand them the catalogue**: his answer the same day, *"We might list known and propounded
+   strategies as suggestions including this one."*
+3. **Put `spot_prime` and `box_est` in the catalogue as a suggestion**, no longer held back: his
+   comment of 2026-09-21, *"I don't understand why we are spending effort on the rings model instead
+   of giving the spot-prime box model a good college try."* (`dev/tom-review-queue.md`, R-103, as
+   recorded in `dev/ROADMAP.md`.)
 
 Tasks 741 and 539. Tom's answers to round 6's proposals 2 and 4, 2026-10-06, are quoted in full in
 `dev/label-trials/round-6-2026-10-05.md` ("His answers to proposals 2 and 4") and in
@@ -196,16 +209,18 @@ The risk is Goodhart's: a builder tuned to the public measure can exploit its bl
 instance, by leaving labels where only ground under a leader is "free"). So the judges keep three
 things back (§2): a stricter, finer version of the same search, the realizable-room score, and the
 fresh secret scenes. If the public and held-back scores rank the builders the same way, the tool
-helped; if not, they built to the tool (H5 in §4.5). **This needs Tom's yes**: sharing it reveals
-part of how R1 is judged, which until now was a judges' secret.
+helped; if not, they built to the tool (H5 in §4.5). Sharing it reveals part of how R1 is judged,
+which until now was a judges' secret; it is shared on the reading of his question recorded at the top
+of this file.
 
 ---
 
-## 2. The self-test tool (handed to builders, if Tom says yes)
+## 2. The self-test tool (built 2026-10-07)
 
-`dev/lpn-spike/label-bench/room-check.js`, public, built from the grid version of `room.js`
-(`round-5-2026-09-29/metrics.js`) and the repair pass's spot search, so the public and judges'
-versions share one implementation of the search:
+`dev/lpn-spike/label-bench/room-check.js`, public: the grid version of `room.js`
+(`round-5-2026-09-29/metrics.js`) as a library builders may read and call, with `makeIndex`,
+`addPlacement`, `findSpot` and `smallestRows` exported so they can build with its search, not only
+measure. The judges' held-back scores (`judges/room-held.js`) use its index:
 
 ```sh
 node dev/lpn-spike/label-bench/run.js --placer <your-placer.js> --room     # adds two columns per view
@@ -214,20 +229,26 @@ node dev/lpn-spike/label-bench/run.js --placer <your-placer.js> --room     # add
 ```js
 const { roomReport } = require('dev/lpn-spike/label-bench/room-check.js');
 const r = roomReport(scene, layout);          // in your own loop, on your own output
-// r.hidden, r.hiddenWithRoom, r.cutWithRoom, r.spots: {labelId: placement}   (one label at a time)
+// r.hidden, r.hiddenWithRoom, r.cut, r.cutWithRoom, r.ids, r.spots: {labelId: placement}   (one label at a time)
 ```
 
 What builders are told about it, word for word in the handed-over copy: what it checks and what it
 does not (the table in 1c, without the numbers); that it asks about one label at a time, so its
 count is not what can be shown at once; and that the judges score with a stricter and finer version
-they do not see. What the judges keep: the strict, finer search (5-degree steps, quarter-row steps,
-reach 5 rows, the standard hook, labels on pipes allowed at their cost, no label over a leader, no
-leader through text); the realizable-room score (§4.4); the count probe; the 12345678 scenes; and
-the fresh seeds.
+they do not see. What the judges keep (`judges/room-held.js`): the held-back search (every 5 degrees,
+every quarter row, out to 5 rows; no label over another label's leader, no leader through another
+label's text, the boxes exactly as the scorer draws them; level and straight, as the public one); the
+realizable-room score (§4.4); the count probe; the 12345678 scenes; and the fresh seeds. The hook and
+labels across pipes, first proposed for the held-back search, were left out to keep it one search
+with the public one; it is finer, farther and stricter, so on master's Novato layouts it finds room
+for 973 of 1,186 hidden labels against the public 989, and realizable room brings back 534.
 
-Building it is about an hour, plus the bench's selftest (`selftest-harness.js`, in check_all): a
-`--room` run on a placer that hides everything must report every label with room on an empty view,
-and one on master's replay must match `judges/r1.js` label for label.
+Selftests: the bench's (`selftest-harness.js`, in check_all) checks that labels hidden in open ground
+all have room, a label with no ground on screen has none, the smallest form follows the drop order,
+and each of 225 spots it hands back on Net1 and Novato breaks nothing when placed alone. The judges'
+(`judges/selftest-harness.js`) checks that `room-check.js` and `judges/r1.js` name the same
+hidden-with-room labels on every Novato view of master's layouts, that realizable room never exceeds
+the public count, and that it seats its labels together with no break and no label on a leader.
 
 ---
 
@@ -236,8 +257,9 @@ and one on master's replay must match `judges/r1.js` label for label.
 Tom's principle stands: *"Don't dictate strategies. Maybe hint, but don't dictate."* Every entry is
 an idea a builder may take, combine, change or ignore. Sources are the published literature
 already surveyed in `dev/label-placement-algorithms.md` (full references there) and what our own
-rounds measured. Entries marked **[Tom's yes needed]** are held back today (`dev/label-placement-rules.md`
-Part B) and go in only if he says so.
+rounds measured. The builders' copy (`dev/label-placement-strategies.md`) says the same without our
+file paths, describes earlier builders by idea rather than by letter, and omits the judges' screenshot
+test.
 
 ### 3.1 Where to look (candidate generation)
 
@@ -249,7 +271,7 @@ Part B) and go in only if he says so.
 | S4 | **Pipe labels along the pipe, either side, sliding from the middle**, level only as a fallback | Imhof's line rules (via Penn State GEOG 486); MapLibre line placement; R14 | B and D; at close zoom C and D leave 6-9% level with room (round 5), A and B 77-79% (built before R14) |
 | S5 | **Unwrap a stack to one line, or wrap a line to a stack**, when it uses the ground better | Hint H-a; Tom's Q07 | A and D, at a small extra cost |
 | S6 | **A column (gang) hung on its shared edge, growing toward open ground**, its labels ordered by the angle of their owners so the leaders fan out and never cross | Hint H-c; Tom 2026-09-27 (a); his 2026-09-08 sketch, step 4 (`dev/label-placement-algorithms.md` §9a) | Not built by any builder as such; the judges' screenshot test `gang-runs-south` |
-| S7 | **`spot_prime` and `box_est`**: find the best patch of open ground near the labels that need it, size a box for n stacked labels in it, and seat them by angle **[Tom's yes needed]** | Tom's sketch of 2026-09-08 (`dev/label-placement-algorithms.md` §9b-9d) | Step 1 measured in round 6 via S1; steps 2-3 never built |
+| S7 | **`spot_prime` and `box_est`**: find the best patch of open ground near the labels that need it, size a box for n stacked labels in it, and seat them by angle (in the catalogue on his 2026-09-21 comment, top of this file) | Tom's sketch of 2026-09-08 (`dev/label-placement-algorithms.md` §9b-9d) | Step 1 measured in round 6 via S1; steps 2-3 never built |
 
 ### 3.2 How to know a spot is free (indexes)
 
@@ -310,9 +332,9 @@ scoring starts are listed as deviations in the results, never edited in silently
 - **Builders: the four existing ones, A to D, continuing** from their round-6 commits in their own
   worktrees (`feat/label-placer-a` to `-d`), so each has a paired before and after. Each receives
   Part A of the rules (with §5's line that R1's first half is scored), the bench, the self-test
-  (§2) and the catalogue (§3), and nothing else from the judges' side.
+  (§2) and the catalogue (§3), and nothing else from the judges' side (§5, "Delivering").
 - **Reference entrants** (not builders): the four round-6 placers frozen (A `3483bfd6`, B `c5905432`,
-  C `9a790a3e`, D `129b63c4`); **R** = round-6 C plus the strict repair pass (`round-7-pilot/repair.js`,
+  C `9a790a3e`, D `129b63c4`; copies in `round-7/frozen/`, same sha256 as round 6 scored); **R** = round-6 C plus the strict repair pass (`round-7-pilot/repair.js`,
   mode `strict`); **M** = the measurer alone (empty map plus the strict repair pass). Master is not
   re-run (round 6 and its 2.8 defect stand).
 - **Scenes**: fresh secret seeds 71-74. Drop order with the ID in it (Tom, 2026-10-06).
@@ -382,21 +404,38 @@ Analysis as round 6 (`analyse.js`, deterministic, generated tables in the round 
 
 ## 5. Before launch
 
-1. **Tom's yes to three things**: share the self-test with the builders (1d); hand them the
-   catalogue (§3); and whether S7 (`spot_prime`, `box_est`) goes in or stays held back.
-2. Build `room-check.js` and the `--room` column (§2), with its selftest; run the bench's own
-   selftests.
-3. Write `dev/label-placement-strategies.md` (the builders' copy of §2 and §3) and the one line in
-   Part A §5 (done: R1's first half is scored).
-4. Commit `matrix.js`, `extract-all.js`, `score-all.js`, `analyse.js` for round 7 (round 6's, with
-   the new entrants and the two new room scores), then commit this protocol's final form before any
-   scoring.
+Done 2026-10-07: the self-test (`room-check.js`, `run.js --room`) and the judges' held-back scores
+(`judges/room-held.js`), with selftests in both harnesses; the builders' copy
+(`dev/label-placement-strategies.md`) and the bench README's pointer to it; Part A §5's line that R1's
+first half is scored; and the runners in `dev/label-trials/round-7/` (`matrix.js`, `extract-all.js`,
+`score-one.js`, `score-all.js`, `analyse.js`), smoke-tested on the pilot's networks (E0 and E3 with
+C6, R and M: 82 cells, none failed; C6 and R reproduce the pilot's 69.8% and 72.3%).
+
+Left:
+
+1. **Freeze A7-D7** when the builders finish: record each placer's commit and sha256 in the round
+   record, then commit this protocol's final form before any scoring.
+2. **Delivering to builders without the judges.** Do not merge `feat/label-placer` into the builder
+   branches: it carries `judges/` (now with `r1.js` and `room-held.js`) and all of
+   `dev/label-trials/`, this plan included. Check out only the public paths instead, in each builder
+   worktree: `git checkout feat/label-placer -- dev/label-placement-rules.md
+   dev/label-placement-strategies.md dev/lpn-spike/label-bench/README.md dev/lpn-spike/label-bench/contract.js
+   dev/lpn-spike/label-bench/run.js dev/lpn-spike/label-bench/score.js dev/lpn-spike/label-bench/room-check.js
+   dev/lpn-spike/label-bench/selftest-harness.js dev/lpn-spike/label-bench/generator.js
+   dev/lpn-spike/label-bench/extract.js dev/lpn-spike/label-bench/scenes dev/lpn-spike/label-bench/master
+   js/lpn-label-scene.js`. **The four builder worktrees already hold an old `judges/` directory**
+   (from the round-2 merge, last changed in `a01171ea`); remove it there (`git rm -r
+   dev/lpn-spike/label-bench/judges`) so it cannot be read.
+3. Run order, one worker, on disk: `extract-all.js /home/haws/label-trials-work/r7` (E2's 20,000-node
+   networks take about 4 minutes and up to 16 GB each), then `score-all.js` on the same folder, then
+   `analyse.js <work>/raw > round-7/results.md`. The E3 scenes can be copied from
+   `/home/haws/label-trials-work/r7pilot/scenes` instead of re-extracted.
 
 **Agents and machine time.** Four builder agents (A to D continuing), one per worktree, concurrent;
 by rounds 2 to 4 a builder's turn has run a few hours of agent time. Machine time, measured on the
 pilot (about 3 seconds per cell on a 1,000-node set with every room measure, one process at a time,
-with other suites running): extraction of 32 new networks about 5 minutes; E1 and E3 together about
-950 cells, so about 50 minutes with one worker, a third of that with three; E2 three 20,000-node
+with other suites running): extraction of 48 networks about 6 minutes; E1 and E3 together about
+930 cells, so about 50 minutes with one worker, a third of that with three; E2 three 20,000-node
 extractions at about 4 minutes each plus 24 cells at one to two minutes; the count probe roughly
 doubles the E1 builder cells. **In all, about 2 to 3 hours with one worker, about one hour with three of machine time after the builders
 finish**, on jasmine, never in `/tmp`.

@@ -153,6 +153,19 @@ function repair(scene, layout, mode, reachRows) {
 	return back;
 }
 
+// With no placer underneath, hand-placed labels still hang at their user's point (N4), as
+// placers/trivial.js hangs them; the generated scenes of the pilot have none, so its numbers are
+// unchanged by this (added for round 7's public scenes).
+function handOnly(scene) {
+	const out = {};
+	scene.labels.forEach(function (req) {
+		if (!req.hand) { return; }
+		const rows = req.rows.map(function (r, i) { return i; });
+		out[req.id] = { shown: true, rows: rows, layout: req.layout, align: 'left', x: req.hand.x, y: req.hand.y - req.rows[0].h / 2, leader: null };
+	});
+	return out;
+}
+
 // A placer module wrapping another with the repair pass. `inner` is a module path or null (null:
 // the measurer is the whole placer, starting from an empty map).
 function wrap(innerPath, mode) {
@@ -164,7 +177,7 @@ function wrap(innerPath, mode) {
 				name: (inner ? inner.name || innerPath : 'empty') + '+' + mode,
 				idle: inner && typeof inner.idle === 'function' ? function (ms, ctx) { return inner.idle(ms, ctx); } : undefined,
 				place: function (scene, opts) {
-					const out = inner ? inner.place(scene, opts) : { labels: {} };
+					const out = inner ? inner.place(scene, opts) : { labels: handOnly(scene) };
 					// A copy, so the inner placer's own record of what it returned is untouched.
 					const labels = Object.assign({}, (out && out.labels) || {});
 					const lay = { labels: labels };

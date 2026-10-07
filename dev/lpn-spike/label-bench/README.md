@@ -4,7 +4,8 @@ The neutral bench every label placer is run on (dev/label-placement-rules.md §5
 builds no placer.
 
 **If you are building a placer: read `dev/label-placement-rules.md` Part A only — §1 through §5
-(the goal, Never, what the result looks like, the hints, and the job). Do not read Part B (§5-§6
+(the goal, Never, what the result looks like, the hints, and the job), and the strategy catalogue
+`dev/label-placement-strategies.md` (suggestions, never mandates). Do not read Part B (§5-§6
 held back, and §6) of that file, this repo's `judges/` directory, this branch's or this bench's git
 history, the trial records in `dev/label-trials/`, or the app's existing label placement code
 (`js/lpn-collide.js` and friends) — those hold secret tests and prior answers you are meant to solve
@@ -14,6 +15,7 @@ independently.**
 node dev/lpn-spike/label-bench/run.js --placer <your-placer.js>            # one table, exit 1 on any N1, N3, N4 or N5 break
 node dev/lpn-spike/label-bench/run.js --placer <path> --only novato-seq --verbose
 node dev/lpn-spike/label-bench/run.js --placer dev/lpn-spike/label-bench/placers/master-replay.js   # the baseline
+node dev/lpn-spike/label-bench/run.js --placer <path> --room              # adds R1's room score per view (scored, never failing)
 node dev/lpn-spike/label-bench/selftest-harness.js                          # the bench checks itself (in check_all)
 node dev/lpn-spike/label-bench/extract.js                                   # regenerate scenes/ and master/ from the app
 ```
@@ -119,6 +121,18 @@ stillness rule and no numeric target for the rest, only the order Tom gave the c
 - **R11, reported**: across the zoom-in steps of a set (`view.s` increasing), rows regained (shown
   now that were not, or more of them) versus rows lost, summed over labels present in both views.
 - **Time per layout**, median and max, with the machine it ran on.
+
+## The R1 self-test (`room-check.js`)
+
+R1's first half, *"Hide a label only because there is no room for it on screen"*, is **scored, never
+passed or failed**. `room-check.js` is the score, and you may call it on your own output inside your
+own loop: `roomReport(scene, layout)` returns, of the labels hidden, those with free ground for their
+smallest form (the last value in the drop order) within 3 rows; of those cut, those with room for the
+whole label; and one free spot for each (`spots`). `run.js --room` prints it per view. The header of
+`room-check.js` says exactly what it checks and what it does not: above all, it asks about **one label
+at a time**, so two hidden labels may be told "room" for the same ground, and it lets a label sit over
+another label's leader. The judges score R1 with a stricter, finer version of the question that you do
+not see. Strategies that use it, and many others, are in `dev/label-placement-strategies.md`.
 
 ## Scenes (`scenes/`)
 

@@ -12,6 +12,8 @@
 //   4. R1 (Tom, 2026-10-05: "Hide a label only because there is no room for it on screen. Never hide
 //      it because of how many labels are already showing."): a placer that hides only where no
 //      ground is free passes the count probe, and the same placer capped at a count fails it.
+//   5. The builders' self-test (room-check.js) asks r1.js's question label for label; the two
+//      held-back scores (room-held.js) find no more than it and seat labels without breaks.
 //
 // Copyright 2009 Thomas Gail Haws
 // Licensed under GNU GPL v3.0 or later
@@ -161,6 +163,37 @@ report(honest.withRoom === 0 && honest.revived <= R1_MAX_REVIVED * honest.farHid
 	'R1: a placer that hides only where no ground is free hides none with room and revives none far from the cut', JSON.stringify(honest));
 report(capped.farHidden > 0 && capped.revived - capped.controlFlips > R1_MAX_REVIVED * capped.farHidden && capped.withRoom > 0,
 	'R1: the same placer capped at 60 labels fails both halves (hid with room; far labels come back when half the screen asks for none)', JSON.stringify(capped));
+
+// ---- 5. room-check.js (public) agrees with the judges' R1 label for label; the held-back scores -----
+// The builders self-test with room-check.js; the judges score R1 with r1.js. They must be the same
+// question, label for label, on master's recorded layouts of the Novato sets. The two held-back scores
+// (room-held.js) can only find fewer: they are stricter, and the realizable one does not double-count.
+{
+	const RC = require('../room-check.js'), RH = require('./room-held.js');
+	const master = require('../placers/master-replay.js');
+	let same = 0, diff = [], pub = 0, held = 0, real = 0, hidden = 0;
+	loadSets(path.join(bench, 'scenes'), ['novato-zoom', 'novato-seq']).forEach(function (set) {
+		set.steps.forEach(function (sc) {
+			const lay = master.place(sc, { prev: null });
+			const a = R1.hiddenWithRoom(sc, lay).ids.slice().sort().join(), b = RC.roomReport(sc, lay).ids.hiddenWithRoom.slice().sort().join();
+			if (a === b) { same++; } else { diff.push(sc.id); }
+			const r = RC.roomReport(sc, lay);
+			pub += r.hiddenWithRoom; hidden += r.hidden;
+			held += RH.heldBackRoom(sc, lay).withRoom;
+			real += RH.realizableRoom(sc, lay).brought;
+		});
+	});
+	report(diff.length === 0 && same > 0, 'room-check (public) and r1.js (judges) name the same hidden-with-room labels on every Novato view', diff.join(' '));
+	report(real <= pub && real > 0, 'realizable room never exceeds the public count, and finds some', 'public ' + pub + ', realizable ' + real + ', of ' + hidden + ' hidden');
+	report(held > 0 && held <= hidden, 'held-back room finds some room on master\'s layouts', 'held-back ' + held + ' of ' + hidden);
+	const empty = RH.realizableRoom(r1Scenes[0], { labels: {} });
+	const placedLay = { labels: empty.placed };
+	let breaks = 0;
+	const sc0 = r1Scenes[0], { scoreView } = require('../score.js'), sv = scoreView(sc0, placedLay);
+	breaks = sv.breaks.N1.length + sv.breaks.N3.length + sv.breaks.N5.length + sv.breaks.invalid.length;
+	report(empty.brought > 50 && breaks === 0 && sv.counts.labelOnLeader === 0,
+		'realizable room on an empty Novato view seats ' + empty.brought + ' labels together with no break and no label on a leader', 'breaks ' + breaks + ', label on leader ' + sv.counts.labelOnLeader);
+}
 
 console.log(`\n${checks - failures}/${checks} checks passed.`);
 process.exit(failures ? 1 : 0);
