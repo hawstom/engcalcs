@@ -16,7 +16,7 @@
 // top or bottom lands near a corner, and the rows are justified to that side (R5).
 //
 // IN WHAT ORDER. Hand-placed labels hang at the user's point (N4). Labels shown in the last view are
-// carried at the same offset if still legal (S13). Every other label then takes its smallest form
+// carried at the same offset if still legal and still clean (S13, own: 'holdclean'). Every other label then takes its smallest form
 // (the value the drop order keeps longest), most crowded first (S12, S11). A label still hidden
 // looks again on a fine tier, every 15 degrees and every half row (S15, built in); then far, along
 // straight leaders in 48 directions to the first clean open ground (S7, own form: 'far'); then it
@@ -66,7 +66,7 @@ const W = {
 };
 // ---- ingredients, each switchable so its worth can be measured (STRATEGY.md) -----------------
 // In node: PLACER_A_OFF=s4,s15 node run.js ... switches those off. On the page they are all on.
-const ING = { s1: true, s4: true, s5: true, s11: true, s12: true, s13: true, s15: true, grow: true, r5: true, lead: true, dirty: true, s16: true, reseat: true, inplace: true, clean: true, far: true };
+const ING = { s1: true, s4: true, s5: true, s11: true, s12: true, s13: true, s15: true, grow: true, r5: true, lead: true, dirty: true, s16: true, reseat: true, inplace: true, clean: true, far: true, holdclean: true };
 (function () {
 	const env = typeof process !== 'undefined' && process.env ? process.env.PLACER_A_OFF : '';
 	(env || '').split(',').forEach(function (k) { k = k.trim(); if (k && Object.prototype.hasOwnProperty.call(ING, k)) { ING[k] = false; } });
@@ -1054,7 +1054,9 @@ function run(scene, prev, gaps, pool) {
 		tol = HELD_TOL;
 		const cost = evalFull(f, c, false);
 		tol = TOL;
-		if (cost < Infinity) { commit(f, c, cost); kept[f.li] = 'held'; }
+		// Held only while it crosses nothing worse than a pipe with its leader ('holdclean'): a
+		// carried label that now lies across a pipe or a leader looks again like any other.
+		if (cost < Infinity && (!ING.holdclean || cost - c.base < W.lblPipe - 0.01)) { commit(f, c, cost); kept[f.li] = 'held'; }
 	});
 	function subsetIndex(f, rows) {
 		for (let k = 0; k < f.subsets.length; k++) {
