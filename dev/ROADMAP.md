@@ -1162,6 +1162,10 @@ the block.
   across it.** Found 2026-09-26 building Convert as (`feat/convert-as`); an edge case, since the
   mission scope is a 300 km span, but the wizard's world-wide first screen reaches it.
 
+- 25|778| **Read pipe size and material from survey field codes.**
+  Tom, 2026-10-06, on `feat/survey-code`: *"Will people expect us to read more, like pipe diameter
+  etc? If there are clear conventions, we can try!"* First find whether Carlson or Civil 3D users
+  carry size in the description (e.g. `WL 8 DI`) by any published convention; no build without one.
 - 5|114| **Reservoir / detention routing calculator (Modified Puls) — full scope in
   `dev/detention-routing-scope.md`.** A time-stepping engine, which is the real departure from the
   suite's steady-state weir and orifice calculators. **Hydrology stays out of scope** — the user
