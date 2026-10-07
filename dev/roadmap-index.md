@@ -7,7 +7,7 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**93 open tasks.** Next (100): 8 · Soon (75): 16 · Someday (50): 35 · Maybe (25): 15 · Parked (5): 19
+**92 open tasks.** Next (100): 8 · Soon (75): 15 · Someday (50): 35 · Maybe (25): 15 · Parked (5): 19
 
 ## 100 — Next (8)
 
@@ -20,7 +20,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - ! Task 759 — One word for the map selection, another for a menu choice; tips that earn their place.
 - Task 775 — File, Convert as: what is left of the Fotobi, Ghana session.
 
-## 75 — Soon (16)
+## 75 — Soon (15)
 
 - Task 282 — Offer to attach the backdrop an imported `.inp` names.
 - Task 578 — Fire flow: the EPS frame and the Run concept, extracted from 530.
@@ -33,7 +33,6 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 756 — Cross-platform: the suite as a desktop application, beyond the web folder.
 - Task 763 — A searchable help manual, built from the tips Tom cut.
 - Task 768 — Report a problem: more information and freedom than one anonymous click.
-- Task 769 — Change type: a junction becomes a tank, a pipe a valve.
 - Task 771 — Survey points as a script: the Description names the asset or vertex.
 - Task 772 — AutoCAD: import, export, and perhaps sync, on a long-lived branch.
 - Task 776 — Copy a table with its headings; export Tables to CSV and ODS.
@@ -121,5 +120,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-85 of 93 titles are within 4–12 words. `!` marks the rest;
+84 of 92 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.

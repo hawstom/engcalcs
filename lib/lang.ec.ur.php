@@ -3643,7 +3643,6 @@ $ec_lang['lpn_ff_menu_tip']='جنکشنز کو ایک ایک کر کے آزما�
 $ec_lang['lpn_ff_title']='فائر فلو تجزیہ';
 $ec_lang['lpn_ff_intro']='ہر جنکشن کو باری باری اپنی موجودہ طلب پر فائر فلو کھینچنے کو کہا جاتا ہے۔ آپ کے پراجیکٹ میں کچھ تبدیل نہیں ہوتا؛ پورا رن ایک نقل پر کیا جاتا ہے۔';
 $ec_lang['lpn_ff_scope']='آزمانے کے لیے جنکشنز';
-$ec_lang['lpn_ff_scope_tip']='چلانے سے پہلے مجموعہ چنیں۔ بڑے نظام کے ہر جنکشن کو آزمانے میں منٹ لگ سکتے ہیں۔';
 $ec_lang['lpn_ff_all']='سب';
 $ec_lang['lpn_ff_selected']='منتخب';
 $ec_lang['lpn_ff_no_junctions']='اس پراجیکٹ میں ابھی تک کوئی جنکشن نہیں، اس لیے آزمانے کو کچھ نہیں۔';
@@ -3673,7 +3672,6 @@ $ec_lang['lpn_ff_engine_native']='بلٹ اِن حل کار استعمال کی�
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_ff_engine_epanet']='EPANET انجن استعمال کیا جاتا ہے۔';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_ff_engine_cost']='دستیاب فائر فلو ایک تلاش ہے، اس لیے آزمائے جانے والے ہر جنکشن کے لیے پورا نیٹ ورک تقریباً سولہ بار حل کیا جاتا ہے۔ بڑے نظام کو منٹ لگتے ہیں۔ آپ اسے کسی بھی وقت روک سکتے ہیں اور جو اب تک نکل چکا ہے وہ رکھ سکتے ہیں۔';
 // The one-condition sentence. Shown only where this project has a run clock, because that is the
 // only place a reader could reasonably expect a fire flow to follow it.
 //
@@ -3681,7 +3679,6 @@ $ec_lang['lpn_ff_engine_cost']='دستیاب فائر فلو ایک تلاش ہ�
 // first sentence over again in other words -- Tom: "I don't know what this means. Are we just
 // repeating what we said above?" It was. What the practice half carries that the first sentence
 // does not is the DEMAND the fire flow is added to, and that survives.
-$ec_lang['lpn_ff_steady']='صرف وہ وقتی مرحلہ آزمایا جاتا ہے جو ابھی سکرین پر ہے۔ فائر فلو عام طور پر زیادہ سے زیادہ دن کی طلب پر آزمایا جاتا ہے، اس لیے چلانے سے پہلے نیٹ ورک کو اسی حالت پر مقرر کریں۔';
 // THE RUN HAS A DIALOG OF ITS OWN (Tom, 2026-08-30: "The run progress bar is so important that all
 // applications put it in a new dialog with nothing but the progress, a stop button, and maybe some
 // other progress stats."). It says how far along it is and never how long is left: per-solve cost

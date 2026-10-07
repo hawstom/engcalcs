@@ -266,18 +266,26 @@ console.log('\n--- ...while a tap on the label TEXT still reaches the field ---'
 	ok(f.input.focused === true, '...and it still focuses the field it names');
 }
 
-// A MOUSE IS UNTOUCHED. It reaches the tip by hovering and never taps the glyph to read it, so
-// nothing about the pointer behaviour moves -- asserted by running the same tap on a hovering
-// device and finding the label doing exactly what it always did.
-console.log('\n--- ...and a pointer device behaves exactly as before ---');
+// ONE DOOR ON EVERY DEVICE (Task 759, Tom 2026-10-03: *"Click the ?, closed by a click elsewhere
+// or Esc; one door on desktop and phone."*). A mouse now opens the explanation by clicking the "?",
+// so the same click must be cancelled there too, or it would open the tip AND put the cursor in
+// the field. The label WORDS still reach the field on a pointer, as they do on touch.
+console.log('\n--- ...and a pointer device has the same one door ---');
 {
 	const before = win.matchMedia;
 	win.matchMedia = () => ({ matches: true });
 	const f = fieldWithTip('plain');
 	EngCalcs.initTips(documentEl);
 	const evt = click(f.glyph);
-	ok(!evt.defaultPrevented, 'on a device that can hover, nothing is cancelled');
-	ok(f.input.focused === true, '...and the label still does what a label does');
+	const tip = bootstrap.Tooltip.getInstance(f.help);
+	ok(!!tip && tip.shown, 'on a device that can hover, a click on the "?" opens the tip');
+	ok(evt.defaultPrevented && f.input.focused === false, '...and does not put the cursor in the field');
+	ok(!/hover|focus|click/.test(String(tip.config.trigger)), '...because the tip has no Bootstrap trigger of its own',
+		'trigger="' + tip.config.trigger + '"');
+	click(f.glyph);
+	ok(tip.shown === false, '...and a second click on the "?" closes it');
+	const evt2 = click(f.text);
+	ok(!evt2.defaultPrevented && f.input.focused === true, '...while the label words still reach the field');
 	win.matchMedia = before;
 }
 
