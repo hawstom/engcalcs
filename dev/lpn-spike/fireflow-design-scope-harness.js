@@ -94,7 +94,8 @@ function ffFormRows(el) {
 		const cls = String((x.className || x['class'] || '')).split(/\s+/);
 		if (cls.indexOf('lpn-ff-row') >= 0) {
 			const c = kids(x);
-			out.push({ label: c[0] ? c[0].textContent : '', control: c[1] });
+			// A row with a tip ends in its `?` glyph (Task 759); the label is the words before it.
+			out.push({ label: c[0] ? String(c[0].textContent).replace(/\s*\?$/, '') : '', control: c[1] });
 			return;
 		}
 		kids(x).forEach(walk);

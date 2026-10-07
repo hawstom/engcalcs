@@ -191,7 +191,7 @@ async function main() {
 			await a.settle(900);
 		}
 		const before = await seen(), srcBytes = await bytes(srcId);
-		const starOf = (nm) => page.$$eval('#lpn_tabs .lpn-tab-name', (ts, nm) => { const t = ts.find((e) => e.textContent.indexOf(nm) >= 0 && e.textContent.indexOf('Copy') < 0); return t ? t.title : null; }, nm);
+		const starOf = (nm) => page.$$eval('#lpn_tabs .lpn-tab-name', (ts, nm) => { const t = ts.find((e) => e.textContent.indexOf(nm) >= 0 && e.textContent.indexOf('Copy') < 0); return t ? (t.getAttribute('data-bs-original-title') || t.title) : null; }, nm);
 		const srcTitle = await starOf('Fotobi');
 		await openConvertAs();
 		await pickCrs('EPSG:3857');

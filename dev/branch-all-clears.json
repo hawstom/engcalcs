@@ -553,6 +553,20 @@
    "words": "Merge.",
    "context": "Said after his browser pass, in his pasted message of 2026-10-06 (\"5. feat/value-warning (new): Merge.\"). The two numbers put to him (Darcy-Weisbach roughness limit 10 mm, Hazen-Williams C ceiling 200) were not answered and ship as built.",
    "pin_note": "Pinned to the merge of master into the branch made right after his word; it adds only master's commits."
+  },
+  "feat/tip-door": {
+   "head": "a6a992b6bc78bebe6c74b7c76ec253f5a303c358",
+   "date": "2026-10-06",
+   "words": "Merge",
+   "context": "His pasted message of 2026-10-06, \"1. feat/tip-door: Merge\", after his browser pass.",
+   "pin_note": "Pinned two commits past what he tested: a merge of master (one conflict in js/Calculators.lib.js resolved to keep master's data-ec-tip-glyph no-focus on touch) and a harness fix reading a styled tab tip's text."
+  },
+  "feat/asset-type": {
+   "head": "fdaa932dd74977d24f4c95d7e998bf82e2d21713",
+   "date": "2026-10-06",
+   "words": "Merge.",
+   "context": "His pasted message of 2026-10-06, \"4. feat/asset-type. Merge.\", after his browser pass, with a question about the 'ID: Lost entry' key line.",
+   "pin_note": "Pinned to the clean merge of master into the branch made right after his word; it adds only master's commits."
   }
  }
 }

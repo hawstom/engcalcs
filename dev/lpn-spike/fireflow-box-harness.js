@@ -29,7 +29,7 @@ const L = loadLoopedNetwork(
 	"\t\tgetDoc: function () { return doc; },\n" +
 	"\t\trunSolve: runSolve, assembleModel: assembleModel,\n" +
 	"\t\topenFireFlowBox: openFireFlowBox, closeFireFlowBox: closeFireFlowBox,\n" +
-	"\t\twireFireFlowBox: wireFireFlowBox,\n" +
+	"\t\twireFireFlowBox: wireFireFlowBox, ffBoxTip: ffBoxTip,\n" +
 	"\t\trunFireFlowSweep: runFireFlowSweep,\n" +
 	"\t\tdefaults: function () { return fireFlowDefaults(); },\n" +
 	// The run dialog, read the way a person reads it: what is on the screen, not what the page
@@ -191,12 +191,15 @@ const SUMMARY_RE = new RegExp(PC.lpn_ff_summary
 	// One assertion for the whole sentence rather than three for its clauses: what this harness can
 	// hold is that the note REACHES THE SCREEN. Whether it leads with the method is a question about
 	// the string, and the string is Tom's to rule on in dev/new-english-keys.md.
-	ok('it says where the fire flow is drawn, in full',
-		controls.indexOf(PC.lpn_ff_accounting) >= 0,
+	// Behind the box's corner `?` since Tom, 2026-10-05: "a lot of head room is spent in Fire flow
+	// analysis on paragraph text ... Both of these can be folded into the box ? glyph tip."
+	ok('the box\'s `?` says where the fire flow is drawn, in full',
+		L.ffBoxTip().indexOf(PC.lpn_ff_accounting) >= 0 && controls.indexOf(PC.lpn_ff_accounting) < 0,
 		'this is the one thing Tom asked to be explicit about');
 	ok('and it says which engine will do the work, in the present tense',
-		controls.indexOf(' is used.') >= 0 &&
-		controls.indexOf('will be used') < 0);
+		L.ffBoxTip({ epanet: false }).indexOf(PC.lpn_ff_engine_native) > 0 &&
+		L.ffBoxTip({ epanet: true }).indexOf(PC.lpn_ff_engine_epanet) > 0 &&
+		PC.lpn_ff_engine_native.indexOf(' is used.') >= 0);
 	ok('a run has not happened yet, so there is no report', textOf(byId.lpn_ff_report).trim() === '');
 
 	console.log('\n--- one run, one result set, one wide table ---');
@@ -326,7 +329,8 @@ const SUMMARY_RE = new RegExp(PC.lpn_ff_summary
 		staticTh ? staticTh.title : '');
 	ok('the summary counts the two failure modes and the clean junctions',
 		SUMMARY_RE.test(report));
-	ok('the ISO credit limit travels with the numbers', report.indexOf('(ISO) credits') >= 0);
+	ok('the ISO credit limit is said behind the box\'s `?`, in this project\'s flow unit, and not in the report',
+		L.ffBoxTip().indexOf('(ISO) credits') >= 0 && L.ffBoxTip().indexOf(' gpm') > 0 && report.indexOf('(ISO) credits') < 0);
 	// The table has a heading row plus one row per junction, capped -- the example is well under
 	// the cap, so every junction is printed.
 	ok('the table prints one row per tested junction, plus the heading',
