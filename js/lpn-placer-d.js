@@ -61,6 +61,7 @@ EngCalcs.lpnPlacerD = (function () {
 	var TOL = 1.4;          // box overlap tolerated as leading (the bench tolerates 1.5)
 	var GAP = 1.5;          // clearance between a node symbol and text touching it
 	var PIPE_GAP = 3;       // clearance between a pipe and a label beside it
+	var EDGE = 0.01;        // how far inside the view edge text must stay (px)
 	var CELL = 48;          // spatial grid cell, px
 	var PADX0 = 8, PADY0 = 3; // clearance between two different labels, so each reads as its own
 	var PADX_T = 3, PADY_T = 1.5; // the tighter clearance a label takes rather than be hidden ('tight')
@@ -613,7 +614,7 @@ EngCalcs.lpnPlacerD = (function () {
 			for (i = 0; i < nb; i++) {
 				b = boxes[i];
 				// A repeat may lie off screen (it is still kept clear of everything).
-				var hit = !b.rep && (b.x0 < vp.x + 1 || b.y0 < vp.y + 1 || b.x1 > vp.x + vp.w - 1 || b.y1 > vp.y + vp.h - 1);
+				var hit = !b.rep && (b.x0 < vp.x + EDGE || b.y0 < vp.y + EDGE || b.x1 > vp.x + vp.w - EDGE || b.y1 > vp.y + vp.h - EDGE);
 				if (!hit) {
 					if (!b.rot && !hand) { hit = rasterHit(b); } else if (!hand && !rasterTouched(b)) { hit = false; } else {
 						q = hardG.query(b.x0, b.y0, b.x1, b.y1, qa);
@@ -662,7 +663,7 @@ EngCalcs.lpnPlacerD = (function () {
 		// free-space raster row by row without building anything; turned text, repeats and leaders
 		// take the exact tests.
 		function blockFree(req, rows, layout, d, align, x, y) {
-			if (x < vp.x + 1 || y < vp.y + 1 || x + d.w > vp.x + vp.w - 1 || y + d.h > vp.y + vp.h - 1) { return false; }
+			if (x < vp.x + EDGE || y < vp.y + EDGE || x + d.w > vp.x + vp.w - EDGE || y + d.h > vp.y + vp.h - EDGE) { return false; }
 			if (layout === 'line') { return !rasterRect(x, y, x + d.w, y + d.h); }
 			for (var i = 0, top = y; i < rows.length; i++) {
 				var rw = req.rows[rows[i]].w, rh = req.rows[rows[i]].h;
