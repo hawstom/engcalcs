@@ -66,12 +66,13 @@ const W = {
 };
 // ---- ingredients, each switchable so its worth can be measured (STRATEGY.md) -----------------
 // In node: PLACER_A_OFF=s4,s15 node run.js ... switches those off. On the page they are all on.
-const ING = { s1: true, s4: true, s5: true, s11: true, s12: true, s13: true, s15: true, grow: true, r5: true, lead: true, dirty: true, s16: true, reseat: true };
+const ING = { s1: true, s4: true, s5: true, s11: true, s12: true, s13: true, s15: true, grow: true, r5: true, lead: true, dirty: true, s16: true, reseat: true, inplace: true };
 (function () {
 	const env = typeof process !== 'undefined' && process.env ? process.env.PLACER_A_OFF : '';
 	(env || '').split(',').forEach(function (k) { k = k.trim(); if (k && Object.prototype.hasOwnProperty.call(ING, k)) { ING[k] = false; } });
 }());
 const SOFT_MS = 500;       // growth and repair stop here, well inside R10's one second
+const EVICT_MS = 250;      // and eviction here, so growth has time after it
 function nowMs() { return typeof performance !== 'undefined' && performance.now ? performance.now() : Date.now(); }
 // Overlap tolerance in px: a hair inside the bench's 1.5 px of leading (own ingredient 'lead'), or
 // the stricter 1.0 of earlier rounds.
@@ -710,14 +711,17 @@ function run(scene, prev, gaps, pool) {
 			f.minW = Infinity; f.minH = Infinity;
 			f.req.rows.forEach(function (r) { f.minW = Math.min(f.minW, r.w); f.minH = Math.min(f.minH, r.h); });
 		}
-		const w = f.minW, h = f.minH;
-		if (side === 'E') { return mkBox(px + w / 2, py, w, h, 0); }
-		if (side === 'W') { return mkBox(px - w / 2, py, w, h, 0); }
-		if (side === 'N') { return mkBox(px, py - h / 2, w, h, 0); }
-		return mkBox(px, py + h / 2, w, h, 0);
+		// Above or below, a leader lands near a corner (R5), so only the middle is certain.
+		const h = f.minH, w = side === 'E' || side === 'W' ? f.minW : (ING.r5 ? 2 * Math.min(5, f.minW / 2) : f.minW);
+		const cx = side === 'E' ? px + w / 2 : (side === 'W' ? px - w / 2 : px), cy = side === 'N' ? py - h / 2 : (side === 'S' ? py + h / 2 : py);
+		const b = CORE;
+		b.cx = cx; b.cy = cy; b.hw = w / 2; b.hh = h / 2; b.x0 = cx - w / 2; b.x1 = cx + w / 2; b.y0 = cy - h / 2; b.y1 = cy + h / 2;
+		return b;
 	}
+	const CORE = mkBox(0, 0, 0, 0, 0), CBB = [0, 0, 0, 0];
 	function coreHits(grid, b, li) {
-		if (grid === G && Rs.covers([b.x0, b.y0, b.x1, b.y1]) && Rs.sum(Rs.hard, b.x0 + tol / 2, b.y0 + tol / 2, b.x1 - tol / 2, b.y1 - tol / 2) === 0) { return false; }
+		CBB[0] = b.x0; CBB[1] = b.y0; CBB[2] = b.x1; CBB[3] = b.y1;
+		if (grid === G && Rs.covers(CBB) && Rs.sum(Rs.hard, b.x0 + tol / 2, b.y0 + tol / 2, b.x1 - tol / 2, b.y1 - tol / 2) === 0) { return false; }
 		const n = grid.collect(0, b.x0, b.y0, b.x1, b.y1), buf = grid.buf;
 		for (let i = 0; i < n; i++) { if (buf[i].lab !== li && boxesOverlap(b, buf[i].box)) { return true; } }
 		return false;
@@ -1115,7 +1119,7 @@ function run(scene, prev, gaps, pool) {
 				x = cx - sh.w / 2; y = cy - sh.h / 2;
 			}
 			const c = { x: x, y: y, align: c0.align, angle: c0.angle, sh: sh,
-				leader: c0.leader, base: W.row * (f.R - rows.length) + (c0.lead || 0), lead: c0.lead };
+				leader: c0.leader, base: c0.base - W.row * (rows.length - n0), lead: c0.lead };
 			if (c.leader && !leaderTouches(c)) { continue; }
 			const cur = placed[f.li];
 			uncommit(f);
@@ -1214,12 +1218,13 @@ function run(scene, prev, gaps, pool) {
 		info.forEach(function (f) {
 			if (overTime()) { return; }
 			if (kept[f.li] === 'hand' || kept[f.li] === 'empty') { return; }
-			if (kept[f.li] === 'held') {
+			if (kept[f.li] === 'held' || ING.inplace) {
+				// Grow where it stands first: cheap, and the label holds still.
 				const before = placed[f.li] && placed[f.li].cand;
-				growHeld(f);
+				if (before) { growHeld(f); }
 				if (placed[f.li] && placed[f.li].cand !== before) { changed++; return; }
 				// R11: a held label that cannot grow where it stands may move to show more.
-				if (!ING.reseat) { return; }
+				if (kept[f.li] === 'held' && !ING.reseat) { return; }
 			}
 			const p = placed[f.li];
 			if (!p) { return; }
@@ -1284,7 +1289,7 @@ function run(scene, prev, gaps, pool) {
 		const min = f.subsets.length - 1, hc = hideCost(f);
 		const list = fineCands(f, min).concat(cands(f, min, 0));
 		let tried = 0;
-		for (let i = 0; i < list.length && tried < 24; i++) {
+		for (let i = 0; i < list.length && tried < 10 && nowMs() - t0 < EVICT_MS; i++) {
 			const c = list[i];
 			if (c.base >= hc) { continue; }
 			if (c.st === undefined) { c.st = evalStatic(f, c, true); }
@@ -1299,8 +1304,8 @@ function run(scene, prev, gaps, pool) {
 				commit(f, c, v);
 				const moved = [];
 				for (let j = 0; j < saved.length && ok; j++) {
-					const g = saved[j].f, gm = g.subsets.length - 1;
-					let r = search(g, hideCost(g), 0, gm);
+					const g = saved[j].f, gm = g.subsets.length - 1, gk = saved[j].p.cand.k >= 0 ? saved[j].p.cand.k : 0;
+					let r = search(g, hideCost(g), gk, gm);
 					if (!r) { r = searchFine(g, hideCost(g), gm); }
 					if (r) { commit(g, r.cand, r.cost); moved.push(g); } else { ok = false; }
 				}
@@ -1312,7 +1317,7 @@ function run(scene, prev, gaps, pool) {
 		return false;
 	}
 	if (ING.s16) {
-		free.forEach(function (f) { if (!placed[f.li] && !overTime()) { evict(f); } });
+		free.forEach(function (f) { if (!placed[f.li] && nowMs() - t0 < EVICT_MS) { evict(f); } });
 	}
 	// Pass B: rounds in which each label may take back one row (a better place for it, given the
 	// others), so room is shared out fairly rather than to whoever asks first; then the same with
