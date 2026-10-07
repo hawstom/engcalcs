@@ -66,12 +66,12 @@ const W = {
 };
 // ---- ingredients, each switchable so its worth can be measured (STRATEGY.md) -----------------
 // In node: PLACER_A_OFF=s4,s15 node run.js ... switches those off. On the page they are all on.
-const ING = { s1: true, s4: true, s5: true, s11: true, s12: true, s13: true, s15: true, grow: true, r5: true, lead: true };
+const ING = { s1: true, s4: true, s5: true, s11: true, s12: true, s13: true, s15: true, grow: true, r5: true, lead: true, dirty: true, s16: true };
 (function () {
 	const env = typeof process !== 'undefined' && process.env ? process.env.PLACER_A_OFF : '';
 	(env || '').split(',').forEach(function (k) { k = k.trim(); if (k && Object.prototype.hasOwnProperty.call(ING, k)) { ING[k] = false; } });
 }());
-const SOFT_MS = 600;       // the optional passes stop here, well inside R10's one second
+const SOFT_MS = 500;       // growth and repair stop here, well inside R10's one second
 function nowMs() { return typeof performance !== 'undefined' && performance.now ? performance.now() : Date.now(); }
 // Overlap tolerance in px: a hair inside the bench's 1.5 px of leading (own ingredient 'lead'), or
 // the stricter 1.0 of earlier rounds.
@@ -651,8 +651,38 @@ function run(scene, prev, gaps, pool) {
 		return st === Infinity ? st : evalDyn(f, cand, st, Infinity);
 	}
 
+	// Dirty regions (own ingredient 'dirty'): every commit and uncommit stamps the cells it touches,
+	// so a label whose search failed is not searched again until something near it has changed.
+	const DC = 48, dx0 = vp.x - MARGIN, dy0 = vp.y - MARGIN;
+	const dnx = Math.ceil((vp.w + 2 * MARGIN) / DC), dny = Math.ceil((vp.h + 2 * MARGIN) / DC);
+	const dirty = new Int32Array(dnx * dny);
+	let ver = 1;
+	function dcell(v, n0, d) { const i = Math.floor((v - n0) / DC); return i < 0 ? 0 : (i >= d ? d - 1 : i); }
+	function stamp(cand) {
+		const bb = cand.bb || (cand.bb = aabbOf(boxesFor(cand)));
+		let x0 = bb[0], y0 = bb[1], x1 = bb[2], y1 = bb[3];
+		if (cand.leader) { const L = cand.leader; for (let i = 0; i < L.length; i++) { x0 = Math.min(x0, L[i][0]); y0 = Math.min(y0, L[i][1]); x1 = Math.max(x1, L[i][0]); y1 = Math.max(y1, L[i][1]); } }
+		ver++;
+		const i0 = dcell(x0, dx0, dnx), i1 = dcell(x1, dx0, dnx), j0 = dcell(y0, dy0, dny), j1 = dcell(y1, dy0, dny);
+		for (let j = j0; j <= j1; j++) { for (let i = i0; i <= i1; i++) { dirty[j * dnx + i] = ver; } }
+	}
+	function regionVer(f) {
+		if (f.reach === undefined) {
+			let w = 0;
+			f.req.rows.forEach(function (r) { w += r.w + T.separatorW; });
+			f.reach = Math.max(f.sym.w, f.sym.h) / 2 + 4.6 * RH + w + 8;
+		}
+		const r = f.reach, i0 = dcell(f.pt[0] - r, dx0, dnx), i1 = dcell(f.pt[0] + r, dx0, dnx), j0 = dcell(f.pt[1] - r, dy0, dny), j1 = dcell(f.pt[1] + r, dy0, dny);
+		let m = 0;
+		for (let j = j0; j <= j1; j++) { for (let i = i0; i <= i1; i++) { if (dirty[j * dnx + i] > m) { m = dirty[j * dnx + i]; } } }
+		return m;
+	}
+	// True when the same search for f (row sets from k0) already failed and nothing near changed.
+	function unchanged(f, k0) { return ING.dirty && f.memoK0 === k0 && regionVer(f) <= f.memoVer; }
+	function remember(f, k0) { f.memoK0 = k0; f.memoVer = ver; }
 	const placed = new Array(N);      // {cand, cost, items}
 	function commit(f, cand, cost) {
+		stamp(cand);
 		const items = [];
 		boxesFor(cand).forEach(function (b) { const it = { box: b, lab: f.li }; D.addBox(it); items.push(it); });
 		if (cand.leader) {
@@ -668,6 +698,7 @@ function run(scene, prev, gaps, pool) {
 		const p = placed[f.li];
 		if (!p) { return null; }
 		p.items.forEach(function (it) { it.dead = true; });
+		stamp(p.cand);
 		placed[f.li] = null;
 		return p;
 	}
@@ -820,9 +851,14 @@ function run(scene, prev, gaps, pool) {
 				const q = st[k], r = q.ang * Math.PI / 180, nx = Math.sin(r), ny = -Math.cos(r);
 				const o = k === 0 && f.lsym ? Math.max(off, f.lsym.r + sh.h / 2 + GAP) : off;
 				for (let side = 1; side >= -1; side -= 2) {
-					const ccx = q.x + nx * o * side, ccy = q.y + ny * o * side;
-					out.push({ x: ccx - sh.w / 2, y: ccy - sh.h / 2, align: 'left', angle: q.ang, sh: sh, leader: null,
-						base: rowPen + q.pen + (side < 0 ? 0.1 : 0) });
+					// Close beside the pipe, or half a row clear of it.
+					for (let m = 0; m < 2; m++) {
+						const oo = m ? Math.max(o, sh.h / 2 + RH / 2 + 0.5) : o;
+						if (m && oo - o < 2) { continue; }
+						const ccx = q.x + nx * oo * side, ccy = q.y + ny * oo * side;
+						out.push({ x: ccx - sh.w / 2, y: ccy - sh.h / 2, align: 'left', angle: q.ang, sh: sh, leader: null,
+							base: rowPen + q.pen + (side < 0 ? 0.1 : 0) + m * 0.15 });
+					}
 				}
 				// On its own pipe: dearer than beside it (R7), cheaper than giving up a value.
 				out.push({ x: q.x - sh.w / 2, y: q.y - sh.h / 2, align: 'left', angle: q.ang, sh: sh, leader: null, base: rowPen + q.pen + 0.2 });
@@ -1103,43 +1139,19 @@ function run(scene, prev, gaps, pool) {
 		for (let i = 0; i < l.length; i++) { if (l[i].st === undefined) { l[i].st = evalStatic(f, l[i], true); } if (l[i].st < l[i].base + 2) { c++; } }
 		f.room = c;
 	});
-	free.sort(function (a, b) { return (kindRank[a.kind] || 0) - (kindRank[b.kind] || 0) || a.room - b.room; });
+	free.sort(function (a, b) { return (kindRank[a.kind] || 0) - (kindRank[b.kind] || 0) || (ING.s12 ? a.room - b.room : a.li - b.li); });
 	// Pass A: every label in its smallest form, near home, so as many as possible get a place.
 	free.forEach(function (f) {
 		const min = f.subsets.length - 1;
-		const r = search(f, hideCost(f), min, min);
+		// Smallest form first (S11); switched off, each label takes all it can in turn.
+		const r = search(f, hideCost(f), ING.s11 ? min : 0, min);
 		if (r) { commit(f, r.cand, r.cost); }
 	});
-	// Pass B: rounds in which each label may take back one row (a better place for it, given
-	// the others), so the room is shared out fairly rather than to whoever asks first.
-	let maxSets = 1;
-	info.forEach(function (f) { if (f.subsets.length > maxSets) { maxSets = f.subsets.length; } });
-	for (let round = 0; round < maxSets; round++) {
-		info.forEach(function (f) {
-			if (kept[f.li] === 'hand' || kept[f.li] === 'empty') { return; }
-			if (kept[f.li] === 'held') { growHeld(f); return; }
-			const n = f.subsets.length, p = placed[f.li];
-			// A label with no place at all looks again only in the last round (little moves before it).
-			if (!p && round < maxSets - 1) { return; }
-			const curK = p ? p.cand.k : n;
-			const k0 = Math.max(0, curK - 1), k1 = Math.min(curK, n - 1);
-			const cur = p ? evalDyn(f, p.cand, p.cand.st, Infinity) : hideCost(f);
-			// Already holding every row this round allows, on clean ground, next to home: done.
-			if (p && p.cand.k === k0 && cur <= W.row * (f.R - f.subsets[k0].length) + 0.5) { p.cost = cur; return; }
-			const r = search(f, cur, k0, k1);
-			if (r && (!p || r.cand !== p.cand)) {
-				if (p) { uncommit(f); }
-				commit(f, r.cand, r.cost);
-			} else if (p) { p.cost = cur; }
-		});
-	}
-
 	// ---- 4. repair (S15, built in): a label still hidden looks again, finely: a straight leader
 	// every 15 degrees and every half row out to 4 rows, against everything now placed. Then the
 	// rounds run again so what was seated may grow, until nothing changes or time runs short (R10:
 	// bounded by time, never by how many labels there are). ----
-	const DBX = +process.env.DBX, DBY = +process.env.DBY;
-	const FINE_DIRS = [], FINE_LENS = [0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4];
+		const FINE_DIRS = [], FINE_LENS = [0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4];
 	for (let d = 0; d < 24; d++) { FINE_DIRS.push(d * Math.PI / 12); }
 	function fineCands(f, k) {
 		const key = 'fine' + k;
@@ -1192,9 +1204,12 @@ function run(scene, prev, gaps, pool) {
 		}
 		return best ? { cand: best, cost: bestCost } : null;
 	}
-	function growRound() {
+	// One round of growth: each label may take back one row, re-seating itself to do it. Returns how
+	// many grew. The first round may also re-seat a label at the rows it has, if that is cheaper.
+	function growRound(fine, first) {
 		let changed = 0;
 		info.forEach(function (f) {
+			if (overTime()) { return; }
 			if (kept[f.li] === 'hand' || kept[f.li] === 'empty') { return; }
 			if (kept[f.li] === 'held') { const before = placed[f.li]; growHeld(f); if (placed[f.li] !== before) { changed++; } return; }
 			const p = placed[f.li];
@@ -1202,28 +1217,98 @@ function run(scene, prev, gaps, pool) {
 			const n = f.subsets.length, curK = p.cand.k;
 			if (curK === 0) { return; }
 			const cur = evalDyn(f, p.cand, p.cand.st, Infinity);
-			const r = search(f, cur, Math.max(0, curK - 1), Math.min(curK, n - 1));
-			if (r && r.cand !== p.cand) { uncommit(f); commit(f, r.cand, r.cost); changed++; }
+			const k0 = Math.max(0, curK - 1);
+			if (unchanged(f, k0) && (!fine || f.fineTried === k0)) { return; }
+			let r = unchanged(f, k0) ? null : search(f, cur, k0, first ? Math.min(curK, n - 1) : k0);
+			if ((!r || r.cand === p.cand) && fine && f.fineTried !== curK - 1 && !overTime()) {
+				// The fine tier once per row set and view: it is dear, and what is placed near a
+				// label rarely gives way between two rounds.
+				f.fineTried = curK - 1;
+				r = searchFine(f, cur, curK - 1);
+			}
+			if (r && r.cand !== p.cand) { uncommit(f); commit(f, r.cand, r.cost); if (r.cand.k < curK) { changed++; } else { remember(f, k0); } } else { remember(f, k0); }
 		});
 		return changed;
 	}
+	// R14, last: a pipe label the setting asks to turn, still level, turns when a clean spot beside
+	// its pipe has opened up for the same rows.
+	function alignPass() {
+		info.forEach(function (f) {
+			const p = placed[f.li];
+			if (!p || !f.link || !f.req.along || p.cand.angle || kept[f.li] === 'hand') { return; }
+			const k = p.cand.k !== undefined ? p.cand.k : subsetIndex(f, p.cand.sh.rows);
+			if (k < 0) { return; }
+			uncommit(f);
+			const a = bestAligned(f, k);
+			if (a) { commit(f, a.cand, a.cost); } else { commit(f, p.cand, p.cost); }
+		});
+	}
+	// Labels before properties (S11): a label still hidden after pass A looks again, finely.
 	if (ING.s15) {
 		free.forEach(function (f) {
 			if (placed[f.li] || overTime()) { return; }
 			const min = f.subsets.length - 1;
 			const r = searchFine(f, hideCost(f), min);
-			if (process.env.PLACER_A_DEBUG === f.req.id) {
-				const list = fineCands(f, min);
-				let ninf = 0, best = Infinity, bestDyn = Infinity, near = [];
-				list.forEach(function (c) { const st = evalStatic(f, c, true); if (st === Infinity) { ninf++; } else { best = Math.min(best, st); const d = evalDyn(f, c, st, Infinity); bestDyn = Math.min(bestDyn, d); if (Math.abs(c.x - DBX) < 6 && Math.abs(c.y - DBY) < 6) { near.push([c.x, c.y, st, d, c.base]); } } });
-				console.error('DEBUG', f.req.id, 'cands', list.length, 'inf', ninf, 'bestStatic', best, 'bestDyn', bestDyn, 'hide', hideCost(f), 'near', JSON.stringify(near), 'r', !!r, 'tooLate', overTime());
-			}
 			if (r) { commit(f, r.cand, r.cost); }
 		});
 	}
-	if (ING.grow) {
-		for (let g = 0; g < 12 && !overTime(); g++) { if (!growRound()) { break; } }
+	// Eviction (S16): a label still hidden may move one or two neighbours that stand on a spot it
+	// could use, if each of them finds another place (with fewer values, if need be), so that more
+	// labels show in all.
+	function blockersOf(f, c) {
+		const boxes = boxesFor(c), bb = c.bb || (c.bb = aabbOf(boxes)), buf = D.buf, out = [];
+		let n = D.collect(0, bb[0], bb[1], bb[2], bb[3]);
+		for (let i = 0; i < n; i++) {
+			const it = buf[i];
+			if (it.lab === f.li || out.indexOf(it.lab) >= 0) { continue; }
+			for (let j = 0; j < boxes.length; j++) { if (boxesOverlap(boxes[j], it.box)) { out.push(it.lab); break; } }
+		}
+		n = D.collect(2, bb[0], bb[1], bb[2], bb[3]);
+		for (let i = 0; i < n; i++) { const it = buf[i]; if (it.lab !== f.li && out.indexOf(it.lab) < 0 && anyBoxHitsSeg(boxes, it)) { out.push(it.lab); } }
+		return out;
 	}
+	function evict(f) {
+		const min = f.subsets.length - 1, hc = hideCost(f);
+		const list = fineCands(f, min).concat(cands(f, min, 0));
+		let tried = 0;
+		for (let i = 0; i < list.length && tried < 24; i++) {
+			const c = list[i];
+			if (c.base >= hc) { continue; }
+			if (c.st === undefined) { c.st = evalStatic(f, c, true); }
+			if (c.st >= hc) { continue; }
+			const B = blockersOf(f, c);
+			if (!B.length || B.length > 2 || B.some(function (li) { return kept[li] === 'hand'; })) { continue; }
+			tried++;
+			const saved = B.map(function (li) { return { f: info[li], p: uncommit(info[li]), kept: kept[li] }; });
+			const v = evalDyn(f, c, c.st, hc);
+			let ok = v < hc;
+			if (ok) {
+				commit(f, c, v);
+				const moved = [];
+				for (let j = 0; j < saved.length && ok; j++) {
+					const g = saved[j].f, gm = g.subsets.length - 1;
+					let r = search(g, hideCost(g), 0, gm);
+					if (!r) { r = searchFine(g, hideCost(g), gm); }
+					if (r) { commit(g, r.cand, r.cost); moved.push(g); } else { ok = false; }
+				}
+				if (!ok) { moved.forEach(function (g) { uncommit(g); }); uncommit(f); }
+			}
+			if (ok) { saved.forEach(function (sv) { if (kept[sv.f.li] === 'held') { kept[sv.f.li] = undefined; } }); return true; }
+			saved.forEach(function (sv) { commit(sv.f, sv.p.cand, sv.p.cost); });
+		}
+		return false;
+	}
+	if (ING.s16) {
+		free.forEach(function (f) { if (!placed[f.li] && !overTime()) { evict(f); } });
+	}
+	// Pass B: rounds in which each label may take back one row (a better place for it, given the
+	// others), so room is shared out fairly rather than to whoever asks first; then the same with
+	// the fine tier. Bounded by time, never by how many labels there are (S21, R10).
+	for (let g = 0; g < 32 && !overTime(); g++) { if (!growRound(false, g === 0)) { break; } }
+	if (ING.grow) {
+		for (let g = 0; g < 32 && !overTime(); g++) { if (!growRound(true, false)) { break; } }
+	}
+	if (ING.s4) { alignPass(); }
 
 	// ---- out ----
 	const out = {};
