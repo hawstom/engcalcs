@@ -123,6 +123,8 @@ lpn_file_export_inp, lpn_file_export_geojson (nothing rendered them).
   page in ec_seen, which makes consent_body ("one-digit cookie") false: consent-version bump, 26
   retranslations, $ec_lang_syn change. Or keep one digit and accept inexact counts. Builder's design and
   cookie before/after in its report (this session's final report to Tom).
+- **His answers go in the interview page** https://claude.ai/artifact/J8dPJK2nX4Fs6xkH3yWwr3 (db
+  collection `answers`, ids E01-E08 and `w-<key>`). Read with ArtifactData list.
 - Wording questions: lpn_inp_export_flat_customers ("What are we talking about here?"), max-day/peak-hour
   tips "Can these be combined?" (yes: one key with placeholders), lpn_wrong_tip rewritten by CC for the new
   feedback box in his "new tone" (not ruled), Task 780 `.epp`.
