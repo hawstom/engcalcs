@@ -1097,7 +1097,7 @@ $ec_lang['lpn_hotkeys_menu_def']='<table class="lpn-notes-table"><tbody><tr><td>
 // The Screenshot keys. A separate block, for the reason given above the menu block.
 $ec_lang['lpn_hotkeys_snip_heading']='Screenshot';
 $ec_lang['lpn_hotkeys_snip_term']='Screenshot keyboard shortcuts';
-$ec_lang['lpn_hotkeys_snip_def']='<table class="lpn-notes-table"><tbody><tr><td>S</td><td>Snip, with the Screenshot box open.</td></tr><tr><td>E</td><td>Eraser, in the markup view.</td></tr><tr><td>Ctrl+Z, Ctrl+Y</td><td>Undo and redo, in the markup view.</td></tr><tr><td>Esc</td><td>Cancel a snip, or leave the eraser. In the markup view, close it when nothing is drawn.</td></tr></tbody></table>';
+$ec_lang['lpn_hotkeys_snip_def']='<table class="lpn-notes-table"><tbody><tr><td>S</td><td>Snip, while Screenshot is open.</td></tr><tr><td>E</td><td>Eraser, in the markup view.</td></tr><tr><td>Ctrl+Z, Ctrl+Y</td><td>Undo and redo, in the markup view.</td></tr><tr><td>Esc</td><td>Cancel a snip, or leave the eraser. In the markup view, close it when nothing is drawn.</td></tr></tbody></table>';
 // ---- The one-tap grievance link (ROADMAP Task 207, Rung 0) ----
 // The floor of the cost ladder in dev/dilettante-path.md: a visitor says something is wrong here
 // with one tap and nothing typed. Two sites, one behaviour -- a standing cell in the map's bottom
