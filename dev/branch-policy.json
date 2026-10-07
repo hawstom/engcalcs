@@ -141,7 +141,9 @@
         "feat/feedback",
         "feat/survey-code",
         "feat/geojson",
-        "feat/dxf"
+        "feat/dxf",
+        "feat/message-dismiss",
+        "feat/workspace"
     ],
     "feature_freeze": {
         "active": false,

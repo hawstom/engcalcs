@@ -104,9 +104,9 @@ async function sectionBoxWarning(browser) {
 	const dialogs = [];
 	const a = await openSession(browser, { width: 390, height: 844 }, dialogs);
 	const names = await a.page.evaluate(() => ({ e: EngCalcs.pageConfig.lpn_menu_edit, l: EngCalcs.pageConfig.lpn_library_menu, said: EngCalcs.pageConfig.lpn_import_bad_file }));
-	await a.page.click('#lpn_menu_edit');
+	await a.page.click('#lpn_menu_project');
 	await a.page.waitForSelector('#lpn_menu_popup', { state: 'visible' });
-	ok('Edit has a Libraries row', await menuRow(a, '#lpn_menu_list', names.l));
+	ok('Water has a Libraries row', await menuRow(a, '#lpn_menu_list', names.l));
 	await a.settle(800);
 	const open = await a.page.evaluate(() => { const b = document.getElementById('lpn_library_box'); return !!b && getComputedStyle(b).display !== 'none'; });
 	ok('the Libraries box is open', open);

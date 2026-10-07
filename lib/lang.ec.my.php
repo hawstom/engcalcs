@@ -1789,7 +1789,6 @@ $ec_lang['lpn_file_import_inp']='EPANET ဖိုင် တင်သွင်း
 $ec_lang['lpn_file_import_inp_tip']='EPANET ဖိုင်တစ်ခု - .inp စာသားဖိုင် (သို့) EPANET သိမ်းဆည်းသော .net ဖိုင် တစ်ခုခုမှ ကွန်ရက်တစ်ခုကို ဖတ်ယူပြီး၊ ဤဘရောက်ဇာထဲတွင် ပရောဂျက်အသစ်တစ်ခုအဖြစ် သိမ်းဆည်းသည်။';
 // The other direction (Task 281). A DOWNLOAD, so the word is Export rather than Save: this page
 // keeps no handle on an `.inp` and never writes back to one.
-$ec_lang['lpn_file_export_inp']='EPANET ဖိုင် ထုတ်ရန်…';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_file_export_inp_tip']='ဤကွန်ရက်ကို EPANET .inp ဖိုင်အဖြစ် ရေးပြီး ဒေါင်းလုဒ်ဆွဲပါ။ သင်ရိုက်ထည့်ခဲ့သော ဂဏန်းများကို ရိုက်ထည့်ခဲ့သည့်အတိုင်း အတိအကျ ရေးမည်။ .inp ဖော်မတ်က မသိမ်းနိုင်သည့် အရာများကို နောက်ပိုင်းတွင် စာရင်းပြုစုပေးမည်။';
 $ec_lang['lpn_status_inp_exported']='{file} ကို ထုတ်ပြီးပါပြီ။';

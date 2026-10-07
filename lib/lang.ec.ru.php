@@ -1755,7 +1755,6 @@ $ec_lang['lpn_file_import_inp']='Импорт файла EPANET…';
 $ec_lang['lpn_file_import_inp_tip']='Считывает сеть из файла EPANET — текстового файла .inp или файла .net, который сохраняет EPANET, — и сохраняет её в этом браузере как новый проект.';
 // The other direction (Task 281). A DOWNLOAD, so the word is Export rather than Save: this page
 // keeps no handle on an `.inp` and never writes back to one.
-$ec_lang['lpn_file_export_inp']='Экспортировать файл EPANET…';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_file_export_inp_tip']='Записать эту сеть в виде файла EPANET .inp и скачать его. Введённые вами числа записываются точно так, как вы их ввели. Всё, что формат .inp не может хранить, будет затем перечислено для вас.';
 $ec_lang['lpn_status_inp_exported']='Экспортировано: {file}.';

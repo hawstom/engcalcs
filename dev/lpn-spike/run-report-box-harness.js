@@ -40,7 +40,7 @@ const L = loadLoopedNetwork(
 	"\t\treportMenuRow: function () {\n" +
 	"\t\t\tvar pc = EngCalcs.pageConfig || {};\n" +
 	"\t\t\treturn reportMenuRows().filter(function (r) {\n" +
-	"\t\t\t\treturn r && r.label === (pc.lpn_reports_epanet || 'EPANET run');\n" +
+	"\t\t\t\treturn r && r.label === (pc.lpn_reports_epanet || 'Run (EPANET)');\n" +
 	"\t\t\t})[0] || null;\n" +
 	"\t\t},\n"
 );
