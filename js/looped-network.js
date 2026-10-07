@@ -13218,6 +13218,7 @@ var EngCalcs = EngCalcs || {};
 			lines = nodeDisplayOrder(lines);
 			ne.allLines = lines;
 			writeNodeLabelGlyphs(ne, n, lines, fsNow);
+			if (oneLabelBatch) { oneLabelBatch.push({ holder: ne, node: n.id }); return; }
 			measureLabelWidths(ne);
 			layoutNodeLabel(n.id);
 		} else if (group === 'link') {
@@ -13252,8 +13253,26 @@ var EngCalcs = EngCalcs || {};
 			if (lines.length === 0) { lines.push({ text: '' }); }
 			le.allLines = lines;
 			writeLabelGlyphs(le, l, lines, fsNow);
+			if (oneLabelBatch) { oneLabelBatch.push({ holder: le, link: l.id }); return; }
 			measureLabelWidths(le);
 			layoutLinkLabel(l.id);
+		}
+	}
+	// **MANY LABELS, ONE LAYOUT** (Tom, 2026-10-07, the slow Clear override). Each label written,
+	// then measured, then placed forced one layout of the whole drawing per label: 117 of them,
+	// 460 ms, for a cleared column. Inside withOneLabelBatch() refreshOneLabelInPlace() only writes;
+	// every label is then measured together (one layout) and placed together.
+	var oneLabelBatch = null;
+	function withOneLabelBatch(fn) {
+		var mine = !oneLabelBatch, list;
+		if (mine) { oneLabelBatch = []; }
+		try { fn(); } finally {
+			if (mine) {
+				list = oneLabelBatch;
+				oneLabelBatch = null;
+				list.forEach(function (b) { measureLabelWidths(b.holder); });
+				list.forEach(function (b) { if (b.link !== undefined) { layoutLinkLabel(b.link); } else { layoutNodeLabel(b.node); } });
+			}
 		}
 	}
 	// **BOTH OF THESE SNAPSHOT FOR THEMSELVES, AND THAT IS THE POINT OF PUTTING IT HERE.**
@@ -22364,7 +22383,8 @@ var EngCalcs = EngCalcs || {};
 		// make undoing a 37-pipe replace 37 presses of Ctrl+Z -- and with UNDO_LIMIT at 20 the first
 		// seventeen would already be gone, leaving the document permanently half-replaced.
 		saveUndoSnapshot();
-		replacePending.refs.forEach(function (ref) {
+		// Every label written first and measured together (withOneLabelBatch()).
+		withOneLabelBatch(function () { replacePending.refs.forEach(function (ref) {
 			// Re-resolved by id: the set was measured before the button was pressed, so an element
 			// deleted in between is skipped rather than written through a stale reference.
 			var el = replaceElement(ref);
@@ -22372,7 +22392,7 @@ var EngCalcs = EngCalcs || {};
 			replaceWrite(el, spec, replacePending.value);
 			replaceRedraw(el, ref.group);
 			n++;
-		});
+		}); });
 		replacePending = null;
 		// afterPropertyEdit()'s shared tail, once for the whole set.
 		refreshScenarioMarks();
@@ -30329,9 +30349,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			paneInScenario(h.scn, function () { h.props.forEach(function (k) { clearOverride(h.el, k); }); });
 			touched[elGroup(h.el) + '\u0000' + h.el.id] = h.el;
 		});
-		Object.keys(touched).forEach(function (k) { afterPropertyEdit(touched[k]); });
-		if (settingsCleared) { settingTableAfterEdit(); }
-		refreshPopupIfOpen();
+		// Each element redrawn, the table rendered once (afterPropertyEdits()), not once per cell.
+		paneRenderHeld++;
+		try {
+			afterPropertyEdits(Object.keys(touched).map(function (k) { return touched[k]; }));
+			if (settingsCleared) { settingTableAfterEdit(); }
+			refreshPopupIfOpen();
+		} finally { paneRenderHeld--; }
 		renderPaneTable(spec);
 		return true;
 	}
@@ -31246,9 +31270,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// System flow draws from the run, as Time series does.
 		else if (paneIsOpen() && t && t.id === 'sysflow' && t.show) { t.show(); }
 	}
+	// Held while one act edits many rows and renders the table itself once at its end.
+	var paneRenderHeld = 0;
 	function refreshPaneIfOpen() {
 		var t = activePaneTab();
-		if (!paneIsOpen() || !t || !t.refresh) { return; }
+		if (paneRenderHeld || !paneIsOpen() || !t || !t.refresh) { return; }
 		t.refresh();
 	}
 	// A panel that opens on two empty pull-downs asks the user to do work before it can show them
@@ -57072,6 +57098,31 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		scheduleSave();
 		refreshPaneIfOpen();
 	}
+	// **MANY ELEMENTS EDITED BY ONE ACT: EACH REDRAWN, THE SHARED TAIL ONCE** (Tom, 2026-10-07:
+	// *"When I used Clear override on roughness.e, my CPU fan revved up and there was a long delay
+	// completing the override clear."*). afterPropertyEdit() per element re-rendered the open table
+	// and recounted the scenario once per element, so clearing a column of N pipes rendered the
+	// table N times (3.1 s for Net3's 117 pipes with Show scenarios on, on a fast machine). The
+	// redraw is per element; the count, the solve, the save and the table are once, as
+	// applyReplace() does. dev/lpn-spike/pane-clear-override-speed-browser-harness.js.
+	function afterPropertyEdits(els) {
+		if (!els.length) { return; }
+		if (els.length === 1) { afterPropertyEdit(els[0]); return; }
+		beginMapBoxHold();
+		try {
+			withOneLabelBatch(function () { els.forEach(function (el) {
+				var group = elGroup(el);
+				if (group === 'link') { rebuildLink(el); }
+				else if (group === 'label') { refreshLabelContent(el.id); }
+				else if (nodeEls[el.id]) { updateNode(el.id, true); }
+				applyScenarioMarks(el);
+			}); });
+		} finally { endMapBoxHold(); }
+		refreshScenarioStatus();
+		scheduleSolve();
+		scheduleSave();
+		refreshPaneIfOpen();
+	}
 	function overrideMarker(fields, el, prop, format) {
 		var pc = EngCalcs.pageConfig || {};
 		// Nothing at all in Base: there is no scenario to belong to, and a permanently-unticked box
@@ -60093,7 +60144,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			if (c.bool) { input.indeterminate = false; }
 			// A property the element is DRAWN from (presence, the words) redraws each element, as
 			// the popup's own row does; anything else only needs the solve.
-			if (paneColProp(c)) { els.forEach(function (el) { afterPropertyEdit(el); }); } else { completeEdit(null); }
+			if (paneColProp(c)) { afterPropertyEdits(els); } else { completeEdit(null); }
 			// **IT STATES ITS COUNT, exactly as Find and replace does before it writes.** A bulk
 			// edit whose reach is invisible is the one gesture on this page that can quietly be
 			// wrong about four hundred elements.
