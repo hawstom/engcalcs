@@ -45,7 +45,7 @@ EngCalcs.lpnPlacerD = (function () {
 	// Off by name: in node, PLACER_D_OFF=a,b (environment); in a page or a harness,
 	// EngCalcs.lpnPlacerD.off = ['a', 'b'] before create(). Names and what each does: STRATEGY.md.
 	var INGREDIENTS = ['order', 'sticky', 'crowd', 'smallfirst', 'evict', 'polish', 'along', 'altlayout',
-		'rescue', 'rescueevict', 'tight', 'wedge', 'timebound', 'warm'];
+		'rescue', 'rescueevict', 'alongfix', 'leadermove', 'bendcheck', 'tight', 'wedge', 'timebound', 'warm'];
 	var OFF = {}, API = null;
 	function readOff(api) {
 		OFF = {};
@@ -248,6 +248,18 @@ EngCalcs.lpnPlacerD = (function () {
 		var ux = (b[0] - a[0]) / L, uy = (b[1] - a[1]) / L;
 		if (!isFinite(ux) || (!ux && !uy)) { ux = 1; uy = 0; }
 		return { x: a[0] + t * (b[0] - a[0]), y: a[1] + t * (b[1] - a[1]), ux: ux, uy: uy };
+	}
+	// The unit direction of the leg of a polyline nearest a point.
+	function nearestSegDir(pts, px, py) {
+		var best = null, bd = Infinity;
+		for (var i = 1; i < pts.length; i++) {
+			var a = pts[i - 1], b = pts[i], vx = b[0] - a[0], vy = b[1] - a[1], L2 = vx * vx + vy * vy;
+			if (!L2) { continue; }
+			var t = Math.max(0, Math.min(1, ((px - a[0]) * vx + (py - a[1]) * vy) / L2));
+			var d = Math.hypot(px - a[0] - t * vx, py - a[1] - t * vy);
+			if (d < bd) { bd = d; var L = Math.sqrt(L2); best = [vx / L, vy / L]; }
+		}
+		return best;
 	}
 	function nearestOnPolyline(pts, px, py) {
 		var best = null, bd = Infinity;
@@ -792,7 +804,7 @@ EngCalcs.lpnPlacerD = (function () {
 		// The candidates of one drop level, clear of the fixed world, best first.
 		// Tier 0 is the places touching the owner (and last view's place); tier t > 0 the places
 		// on a leader DISTS[t - 1] long, each built only when the tiers before it cannot win.
-		var NT = 1 + DISTS.length, denseOn = false;
+		var NT = 1 + DISTS.length, denseOn = false, leaderBlocks = false;
 		function ensure(li, k, t) {
 			var L = lab[li], key = (NT + 1) * k + t;
 			if (L.lists[key]) { return L.lists[key]; }
@@ -987,9 +999,17 @@ EngCalcs.lpnPlacerD = (function () {
 			q = dyn.query(c.x0, c.y0, c.x1, c.y1, qd);
 			for (n = 0; n < q.n; n++) {
 				o = q[n];
-				if (o.li !== c.li) { cost += pairSoft(c, o); }
+				if (o.li === c.li) { continue; }
+				var ps = pairSoft(c, o);
+				// With `leaderBlocks`, a label whose leader the text would lie on (or whose text
+				// the leader would cross) is a blocker to move, not a cost to pay.
+				if (blockers && leaderBlocks && ps >= C_LABEL_LEADER) {
+					if (blockers.indexOf(o.li) < 0) { blockers.push(o.li); }
+					hit = true;
+				}
+				cost += ps;
 			}
-			return cost;
+			return hit ? NaN : cost;
 		}
 		function keyOf(c) { if (c.fx !== c.fx) { c.fx = softCost(c); } return c.base - c.fx; }
 		function worthNow(li) { var c = cur[li]; return c ? keyOf(c) - dynCost(c, null) : 0; }
@@ -1323,6 +1343,14 @@ EngCalcs.lpnPlacerD = (function () {
 					var at = mid + f * span;
 					if (at >= 0 && at <= Ltot) { beside(at, alt + 2 * Math.abs(f), null); }
 				});
+				// On a bent pipe, also the middle of each leg on screen ('bendcheck').
+				if (pts.length > 2 && on('bendcheck') && vis) {
+					for (var sg = 1; sg < pts.length; sg++) {
+						var atm = (cum[sg - 1] + cum[sg]) / 2;
+						if (atm < vis[0] || atm > vis[1]) { continue; }
+						beside(atm, alt + 0.1 + 2 * Math.min(0.5, Math.abs(atm - mid) / (span || 1)), null);
+					}
+				}
 			});
 		}
 		// A pipe label beside its pipe (R7): 'along' lies parallel to it, turned to read inside the
@@ -1335,6 +1363,12 @@ EngCalcs.lpnPlacerD = (function () {
 			if (kind === 'along') {
 				off = d.h / 2 + PIPE_GAP;
 				cx = P.x + nx * off; cy = P.y + ny * off;
+				// On a bent pipe, text turned to one leg but centred nearer another is not along
+				// the pipe where it sits ('bendcheck').
+				if (pts.length > 2 && on('bendcheck')) {
+					var sd = nearestSegDir(pts, cx, cy);
+					if (sd && Math.abs(readAngle(sd[0], sd[1]) - ang) > 4) { return null; }
+				}
 				c = newCand(li, lv, layout, 'left', cx - d.w / 2, cy - d.h / 2, d.w, d.h, ang, null, pref + sidePref);
 				c.along = true; c.nx = nx; c.ny = ny;
 				// Tested only when the search reaches it (hardLazy); most never are.
@@ -1466,12 +1500,13 @@ EngCalcs.lpnPlacerD = (function () {
 		}
 		// A pipe label drawn level where the setting asks for it along its pipe (R14).
 		function notAlong(li) { return !!cur[li] && wantsAlong(reqs[li]) && !cur[li].along; }
-		function tryUpgrade(li) { var r = upgrade(li); unlift(); return r; }
-		function upgrade(li) {
+		function tryUpgrade(li, alongOnly) { var r = upgrade(li, alongOnly); unlift(); return r; }
+		// With `alongOnly`, only the same rows along the pipe (R14) are sought.
+		function upgrade(li, alongOnly) {
 			var cl = levelOf(li), here = worthNow(li);
 			// One more row than it shows (or, for a pipe label drawn level, the same rows along it).
 			var NTT = NT + (denseOn ? 1 : 0);
-			for (var kt = Math.max(0, NTT * (cl - 1)); kt < NTT * cl + (notAlong(li) ? 1 : 0); kt++) {
+			for (var kt = alongOnly ? NTT * cl : Math.max(0, NTT * (cl - 1)); kt < NTT * cl + (notAlong(li) ? 1 : 0); kt++) {
 				var k = Math.floor(kt / NTT), t = kt % NTT;
 				if (tierMax(li, k, t) <= here) { continue; }
 				var list = ensure(li, k, t), tried = 0, tries = denseOn ? TRIES_DENSE : TRIES;
@@ -1484,7 +1519,7 @@ EngCalcs.lpnPlacerD = (function () {
 					var bl = [], d = dynCost(c, null);
 					if (d === d) {
 						if (keyOf(c) - d > here + 1e-6) { seat(li, c); return true; }
-						continue;
+						if (!(leaderBlocks && d >= C_LABEL_LEADER)) { continue; }
 					}
 					if (keyOf(c) <= here) { continue; }
 					tried++;
@@ -1551,6 +1586,11 @@ EngCalcs.lpnPlacerD = (function () {
 			if (on('tight')) {
 				setTight(true);
 				for (i = 0; i < order.length && !overBudget(); i++) { if (levelOf(order[i]) > 0) { grow(order[i]); } }
+				// R14: a pipe label still level where the setting asks for it along its pipe takes
+				// the along place at the tight clearance, moving a neighbour if it must ('alongfix').
+				leaderBlocks = on('leadermove');
+				for (i = 0; i < order.length && !overBudget() && on('alongfix'); i++) { if (notAlong(order[i])) { tryUpgrade(order[i]); } }
+				leaderBlocks = false;
 				setTight(false);
 			}
 			denseOn = false;
