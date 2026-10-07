@@ -2519,6 +2519,7 @@ EngCalcs.pageConfig = {
 	lpn_help_manual: <?=json_encode($ec_lang['lpn_help_manual'])?>,
 	lpn_guide_also: <?=json_encode($ec_lang['lpn_guide_also'])?>,
 	lpn_guide_box_help: <?=json_encode($ec_lang['lpn_guide_box_help'])?>,
+	lpn_guide_contents: <?=json_encode($ec_lang['lpn_guide_contents'])?>,
 	lpn_guide_rail_hide: <?=json_encode($ec_lang['lpn_guide_rail_hide'])?>,
 	lpn_guide_rail_show: <?=json_encode($ec_lang['lpn_guide_rail_show'])?>,
 <?php   // The suite's existing legal-link strings, needed here because this page's Help menu and

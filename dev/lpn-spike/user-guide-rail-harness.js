@@ -103,7 +103,7 @@ async function desktop(browser, Session) {
 	const keysBefore = await page.evaluate(() => Object.keys(localStorage).sort());
 	await viaHelp(a);
 	ok('the guide opens', await boxOpen(page));
-	ok('...titled "Guide"', (await page.textContent('#lpn_hotkeys_title')).trim() === 'Guide');
+	ok('...titled with the Help row\'s word', (await page.textContent('#lpn_hotkeys_title')).trim() === (await a.lang('lpn_help_manual')));
 
 	console.log('\n1. The rail collapses, and stays collapsed');
 	let st = await railState(page);
@@ -193,9 +193,22 @@ async function desktop(browser, Session) {
 	await page.evaluate(() => { const b = document.getElementById('lpn_toolbar_settings') || document.querySelector('#lpn_toolbar [data-tool="settings"]'); if (b) { b.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 })); } });
 	await a.settle(300);
 	const boxes = await page.evaluate(() => Array.from(document.querySelectorAll('[data-guide-for]')).map(b => b.getAttribute('data-guide-for')));
-	ok('every standing box carries one guide "?"', boxes.length >= 15 && new Set(boxes).size === boxes.length, boxes.length + ' ' + JSON.stringify(boxes));
+	const per = await page.evaluate(() => Array.from(document.querySelectorAll('.lpn-has-corner')).map(b => ({ id: b.id,
+		n: b.querySelectorAll('.lpn-box-corner [data-guide-for], .lpn-box-corner .ec-tip').length })));
+	ok('every standing box carries exactly one "?" (its guide "?", or the tip "?" it already had)', per.length >= 15 && per.every(b => b.n === 1), JSON.stringify(per.filter(b => b.n !== 1)));
+	ok('boxes without a tip have the guide "?"', boxes.length >= 10 && new Set(boxes).size === boxes.length, boxes.length + ' ' + JSON.stringify(boxes));
 	const tip = await page.evaluate(() => document.querySelector('[data-guide-for]').title);
-	ok('...tip "Help for this box"', tip === 'Help for this box', tip);
+	ok('...tip "Help for this box"', tip === (await a.lang('lpn_guide_box_help')), tip);
+	// A tipped box (Fire flow) has its tip "?" and its entry in the Guide, reached by F1.
+	await page.evaluate(() => { const b = document.getElementById('lpn_ff_box'); b.style.display = 'flex'; const f = b.querySelector('input, button, select'); if (f) { f.focus(); } });
+	await page.keyboard.press('F1');
+	await a.settle(400);
+	ok('F1 in a tipped box (Fire flow) opens its entry, which repeats the tip', await page.evaluate(() => {
+		const e = document.querySelector('[data-guide-key="box-lpn_ff_box"]');
+		return location.hash === '#guide/box-lpn_ff_box' && !!e && e.querySelector('p') && e.querySelector('p').textContent.length > 40;
+	}));
+	await closeBox(page);
+	await a.settle(150);
 	async function opens(boxId, why) {
 		await page.evaluate((id) => {
 			const box = document.getElementById(id);
@@ -256,7 +269,7 @@ async function phone(browser, Session) {
 		return { railW: Math.round(r.width), contentTop: Math.round(c.top), railBottom: Math.round(r.bottom), title: document.querySelector('.lpn-guide-railtitle').getClientRects().length > 0,
 			label: document.querySelector('.lpn-guide-railtitle').textContent.trim() };
 	});
-	ok('...full width, content below it, labelled "Contents"', lay.railW > 300 && lay.contentTop >= lay.railBottom - 1 && lay.title && lay.label === 'Contents', JSON.stringify(lay));
+	ok('...full width, content below it, labelled "Contents"', lay.railW > 300 && lay.contentTop >= lay.railBottom - 1 && lay.title && lay.label === (await a.lang('lpn_guide_contents')), JSON.stringify(lay));
 	await page.tap('#lpn_guide_railtoggle');
 	await a.settle(200);
 	st = await railState(page);

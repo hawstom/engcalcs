@@ -41859,7 +41859,7 @@ var EngCalcs = EngCalcs || {};
 			// reach. The box shows every toolbar button with its tip written out, every menu row, and
 			// the map and table keys, with a search over all of it. `?` opens it from anywhere but a
 			// field, at the control under the pointer or holding focus -- see openGuideAt().
-			{ icon: 'help', label: pc.lpn_help_manual || 'User guide', hotkey: '?', fn: toggleHotkeysBox },
+			{ icon: 'help', label: pc.lpn_help_manual || 'Guide', hotkey: '?', fn: toggleHotkeysBox },
 			{ separator: true },
 			// ---- Group 2: helpers ----
 			// **A VERB, not a noun.** "Contribute" reads as money or code to most visitors; the
@@ -51700,7 +51700,10 @@ var EngCalcs = EngCalcs || {};
 		tip = typeof tipKey === 'function' ? tipKey() :
 			[].concat(tipKey || []).map(function (k) { return pc[k]; }).filter(Boolean).join(' ');
 		if (tip) { d.help = cornerHelp(tip); d.tipText = tip; }
-		d.guideBtn = guideCornerButton(d);
+		// **ONE `?` PER BOX** (Task 759, which the dock harness holds, and Ida's spec). A box that
+		// already carries its explanation as a tip keeps that `?`; the rest get this one. The Guide's
+		// Boxes entry for a tipped box repeats the tip, and F1 reaches it from inside the box.
+		d.guideBtn = tip ? null : guideCornerButton(d);
 		box.addEventListener('keydown', function (e) {
 			if (e.key === 'F1' && !e.ctrlKey && !e.altKey && !e.shiftKey && !e.metaKey) {
 				e.preventDefault();
