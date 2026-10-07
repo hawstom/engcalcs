@@ -370,6 +370,7 @@ ok('...and no declaration is left unused', condUsed.every(function (n) { return 
 		[/.*/, /^\.style\.cssText\s*=\s*'display:flex;gap:0\.5em/, 'a row built inside a box, with its layout'],
 		[/^guideApplyRail$/, /lpn-guide-rail-collapsed/, 'the Guide\'s Contents rail folding to a strip (or, on a phone, closing its disclosure); '
 			+ 'the Guide box itself stays open and keeps its display'],
+		[/^guideDimNote$/, /^\.hidden\s*=\s*!document\.querySelector/, 'the one-line note above the Guide\'s Toolbar rows, shown while a toolbar name is dimmed'],
 		[/^guideFilter$/, /^\.hidden\s*=\s*any;/, 'the "Nothing matched." line inside the User guide box, by its search field'],
 		[/^wipeEverything$/, /^\.hidden\s*=\s*true/, 'a throwaway download form built and submitted in one breath, never in the page'],
 		[/^(?:dockPlace|dockRelease)$/, /lpn-dock-collapsed/, 'auto-hide tucking a docked box into its tab (Task 441). '
