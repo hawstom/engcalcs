@@ -51,7 +51,8 @@
 	// Costs, in the order of §3.1 (worst first), and what a shown row is worth.
 	const W_LDR_LDR = 3, W_LAB_LDR = 2.5, W_LAB_PIPE = 0.3, W_LDR_PIPE = 0.2, W_OWN_PIPE = 0.12;
 	const ROW_VALUE = 0.25;     // one more property row is worth this much crossing cost
-	const LABEL_CAP = 0.6;      // a label whose best spot costs more than this is dropped (two pipes)
+	const LABEL_CAP = (typeof process !== 'undefined' && process.env && +process.env.LPN_PLACER_B_CAP) || 0.35;   // a label whose best spot costs more than this is dropped (one pipe)
+	const CLEAN_CAP = (typeof process !== 'undefined' && process.env && +process.env.LPN_PLACER_B_CLEAN) || 0.13;  // 'cleanfirst': at most its own pipe
 	const KEEP_CAP = 0.3;       // a label held from the last view is let go if a leader or a second pipe now crosses it
 	const RING_STEP = 7;        // px between leader rings
 	const RING_MAX = 4;         // rings tried (S3: drop rather than travel)
@@ -65,10 +66,13 @@
 	// ---- ingredients, each switchable (STRATEGY.md beside this file) ----------------------------
 	// Switch one off with create({off: ['repair']}) or, under the bench, the environment variable
 	// LPN_PLACER_B_OFF=repair,evict (comma separated).
-	const INGREDIENTS = ['keep', 'table', 'crowd', 'smallfirst', 'wedge', 'reach', 'along', 'relocate', 'repair', 'evict', 'polish', 'unwrap', 'raster'];
+	const INGREDIENTS = ['keep', 'table', 'crowd', 'smallfirst', 'wedge', 'reach', 'along', 'relocate', 'repair', 'evict', 'polish', 'unwrap', 'raster', 'cleanfirst'];
+	// Built, measured and left off by default (STRATEGY.md, "Tried and dropped"); LPN_PLACER_B_ON
+	// switches one back on.
+	const DEFAULT_OFF = ['repair'];
 	function ingredientSwitches(opts) {
 		const on = {};
-		INGREDIENTS.forEach(function (k) { on[k] = true; });
+		INGREDIENTS.forEach(function (k) { on[k] = DEFAULT_OFF.indexOf(k) < 0; });
 		let off = (opts && opts.off) || [];
 		try {
 			if (!off.length && typeof process !== 'undefined' && process.env && process.env.LPN_PLACER_B_OFF) {
@@ -76,6 +80,13 @@
 			}
 		} catch (e) { off = []; }
 		off.forEach(function (k) { on[String(k).trim()] = false; });
+		let onl = (opts && opts.on) || [];
+		try {
+			if (!onl.length && typeof process !== 'undefined' && process.env && process.env.LPN_PLACER_B_ON) {
+				onl = process.env.LPN_PLACER_B_ON.split(',');
+			}
+		} catch (e) { onl = []; }
+		onl.forEach(function (k) { on[String(k).trim()] = true; });
 		return on;
 	}
 
@@ -123,14 +134,14 @@
 		return t0 < t1;
 	}
 	function orient(ax, ay, bx, by, cx, cy) { return (bx - ax) * (cy - ay) - (by - ay) * (cx - ax); }
-	// Proper crossing, ignoring shared end points (within 2 px).
+	// Proper crossing, ignoring shared end points (within 1.4 px).
 	function segCross(a, b, c, d) {
 		if (near(a, c) || near(a, d) || near(b, c) || near(b, d)) { return false; }
 		const d1 = orient(c[0], c[1], d[0], d[1], a[0], a[1]), d2 = orient(c[0], c[1], d[0], d[1], b[0], b[1]);
 		const d3 = orient(a[0], a[1], b[0], b[1], c[0], c[1]), d4 = orient(a[0], a[1], b[0], b[1], d[0], d[1]);
 		return ((d1 > 0) !== (d2 > 0)) && ((d3 > 0) !== (d4 > 0)) && d1 !== 0 && d2 !== 0 && d3 !== 0 && d4 !== 0;
 	}
-	function near(a, b) { return Math.abs(a[0] - b[0]) <= 2 && Math.abs(a[1] - b[1]) <= 2; }
+	function near(a, b) { return Math.hypot(a[0] - b[0], a[1] - b[1]) <= 1.4; }   // the bench forgives 1.5
 	// Nearest point of an axis-aligned box to p.
 	function nearestOnBox(b, px, py) {
 		return [Math.max(b.x0, Math.min(b.x1, px)), Math.max(b.y0, Math.min(b.y1, py))];
@@ -631,7 +642,9 @@
 					for (let j = 0; j <= nSt; j++) {
 						const s = mid + (j % 2 ? 1 : -1) * Math.ceil(j / 2) * step;
 						if (s < lo || s > hi) { continue; }
-						if (s - W / 2 < 1 || g.total - s - W / 2 < 1) { continue; }
+						// Without 'along', the label keeps within the pipe's length; with it, a label
+						// longer than a short pipe may overhang its ends (the symbols still refuse it).
+						if (!wide && (s - W / 2 < 1 || g.total - s - W / 2 < 1)) { continue; }
 						const st = stationAt(g, s);
 						if (st) { st.j = j; stations.push(st); }
 					}
@@ -643,11 +656,14 @@
 						if (!wide && (st.s - st.seg.s0 - W / 2 < 1 || st.seg.s0 + st.seg.L - st.s - W / 2 < 1)) { return; }
 						if (req.along) {
 							const ang = readable(st.dir), rad = ang * Math.PI / 180, nx = -Math.sin(rad), ny = Math.cos(rad);
-							[-1, 1].forEach(function (side, si) {
-								const o = side * (H / 2 + GAP + 0.5);
-								const angR = Math.round(ang * 100) / 100;
-								out.push({ rows: rows, layout: 'line', align: 'left', x: st.x + nx * o - W / 2, y: st.y + ny * o - H / 2, w: W, h: H,
-									angle: angR, leader: null, pref: 0.01 * Math.ceil(j / 2) + 0.005 * si });
+							const offs = wide ? [H / 2 + GAP + 0.5, H / 2 + T.rowHeightPx / 2] : [H / 2 + GAP + 0.5];
+							offs.forEach(function (off, oi) {
+								[-1, 1].forEach(function (side, si) {
+									const o = side * off;
+									const angR = Math.round(ang * 100) / 100;
+									out.push({ rows: rows, layout: 'line', align: 'left', x: st.x + nx * o - W / 2, y: st.y + ny * o - H / 2, w: W, h: H,
+										angle: angR, leader: null, pref: 0.01 * Math.ceil(j / 2) + 0.005 * si + 0.003 * oi });
+								});
 							});
 						}
 						if (j > 6) { return; }
@@ -750,6 +766,9 @@
 			}
 			function score(c, cost) { return cost + c.pref - ROW_VALUE * c.rows.length; }
 			// The best spot for one of the given row sets; null if none.
+			// 'cleanfirst': every pass seats labels where they cross nothing (CLEAN_CAP) before a last
+			// sweep lets a label still hidden cross a pipe (LABEL_CAP).
+			let capNow = ON.cleanfirst ? CLEAN_CAP : LABEL_CAP;
 			function best(req, sets, capped) {
 				const own = ownOf(req);
 				let bestC = null, bestS = Infinity, bestInk = null, bestCost = 0;
@@ -764,7 +783,7 @@
 						if (occ && quickBlocked(req, c0)) { continue; }
 						const r = c0.real || (c0.real = realize(req, c0));
 						let lim = bestS - (r.c.pref - ROW_VALUE * rows.length);
-						if (capped) { lim = Math.min(lim, ON.reach ? LABEL_CAP : LABEL_CAP - r.c.pref); }
+						if (capped) { lim = Math.min(lim, ON.reach ? capNow : capNow - r.c.pref); }
 						const cost = evaluate(req, r.c, r.ink, own, true, lim);
 						if (cost === Infinity) { continue; }
 						const s = score(r.c, cost);
@@ -899,7 +918,7 @@
 					const ink = inkOf(req, c);
 					// Held still unless the new view puts it on a leader or a leader on it (§3 item 1).
 					// The view's edge cutting it is not a collision (T1): it holds still.
-					const cost = evaluate(req, c, ink, ownOf(req), false, KEEP_CAP);
+					const cost = evaluate(req, c, ink, ownOf(req), false, ON.cleanfirst ? Math.min(KEEP_CAP, CLEAN_CAP) : KEEP_CAP);
 					if (cost === Infinity) { return; }
 					if (c.leader && !leaderReaches(c.leader, ink)) { return; }
 					insert(req, c, ink, cost);
@@ -1136,7 +1155,17 @@
 				return who;
 			}
 			TIMING && console.log('p5', (now() - tStart).toFixed(1));
-			// The labels repair and eviction seated grow too.
+			// The last sweep: a label still hidden may now cross a pipe.
+			if (ON.cleanfirst && capNow < LABEL_CAP) {
+				capNow = LABEL_CAP;
+				reqs.forEach(function (req) {
+					if (placed[req.id] || req.hand || req.kind === 'text' || late()) { return; }
+					const sets = setsOf[req.id];
+					const b = best(req, [sets[sets.length - 1]], true);
+					if (b) { insert(req, b.c, b.ink, b.cost); repaired.push(req); }
+				});
+			}
+			// The labels repair, eviction and the sweep seated grow too.
 			for (let i = 0; i < repaired.length && !late(); i++) { regrow(repaired[i]); }
 			TIMING && console.log('p6', (now() - tStart).toFixed(1));
 			// ---- 8. 'polish' (S17): one more look for every label, since later moves freed ground
