@@ -2306,6 +2306,7 @@ EngCalcs.pageConfig = {
 	lpn_export_table_current: <?=json_encode($ec_lang['lpn_export_table_current'])?>,
 	lpn_export_table_all: <?=json_encode($ec_lang['lpn_export_table_all'])?>,
 	lpn_export_table_go: <?=json_encode($ec_lang['lpn_export_table_go'])?>,
+	lpn_export_table_scn_note: <?=json_encode($ec_lang['lpn_export_table_scn_note'])?>,
 	lpn_time_menu: <?=json_encode($ec_lang['lpn_time_menu'])?>,
 	lpn_time_duration: <?=json_encode($ec_lang['lpn_time_duration'])?>,
 	lpn_time_hyd_step: <?=json_encode($ec_lang['lpn_time_hyd_step'])?>,

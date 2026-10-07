@@ -1519,6 +1519,7 @@ $ec_lang['lpn_export_table_format']='Format';
 $ec_lang['lpn_export_table_current']='Current';
 $ec_lang['lpn_export_table_all']='All';
 $ec_lang['lpn_export_table_go']='Export';
+$ec_lang['lpn_export_table_scn_note']='Results are exported only for the scenario last calculated.';
 
 // **HIDE MAP READOUTS IS RETIRED, 2026-09-22** (Tom: "Hide map readouts was a print prep command.
 // But it isn't very useful any more. Let's remove it."). lpn_clean_map, lpn_clean_map_off and

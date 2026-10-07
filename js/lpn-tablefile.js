@@ -285,7 +285,10 @@ var EngCalcs = (typeof require === 'function' && typeof module !== 'undefined')
 		return '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n' +
 			'<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">' +
 			'<sheetViews><sheetView workbookViewId="0"' + (first ? ' tabSelected="1"' : '') + '>' + pane + '</sheetView></sheetViews>' +
-			'<sheetFormatPr defaultRowHeight="15"/><cols>' + cols + '</cols><sheetData>' + data + '</sheetData></worksheet>';
+			'<sheetFormatPr defaultRowHeight="15"/><cols>' + cols + '</cols><sheetData>' + data + '</sheetData>' +
+			// CT_Worksheet order (ECMA-376 18.3.1.99): sheetData ... pageMargins, pageSetup, headerFooter, ...,
+			// ignoredErrors, smartTags, drawing. None of the elements between is written, so it follows sheetData.
+			'<ignoredErrors><ignoredError sqref="A1:XFD1048576" numberStoredAsText="1"/></ignoredErrors></worksheet>';
 	}
 	function xlsxStyles() {
 		var xfs = '<xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/>' +

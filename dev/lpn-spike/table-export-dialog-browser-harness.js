@@ -297,6 +297,7 @@ async function main() {
 		ok('a number shown with decimals carries a matching number format', !!decimalCell &&
 			f.xfFmt[sh.styles[decimalCell.ri][decimalCell.i]] === '0.' + '0'.repeat(decimalCell.d), JSON.stringify(decimalCell));
 		ok('the ID column is text', sh.floats.slice(1).every((row) => row[0] === null));
+		ok('XLSX tells Excel not to flag numbers stored as text', /<ignoredErrors><ignoredError sqref="A1:XFD1048576" numberStoredAsText="1"\/><\/ignoredErrors><\/worksheet>$/.test(spawnSync('unzip', ['-p', r.file, 'xl/worksheets/sheet1.xml'], { encoding: 'utf8' }).stdout));
 
 		// ---- 5. All tables ---------------------------------------------------------------------
 		console.log('\n--- all tables ---');
@@ -317,7 +318,7 @@ async function main() {
 		console.log('\n--- scenarios ---');
 		await a.menuClickSub(lbl.scn, await a.lang('lpn_scenario_new'), 'project');
 		await page.waitForSelector('#lpn_dialog', { state: 'visible' });
-		await page.fill('#lpn_dialog_body input', 'Peak');
+		await page.fill('#lpn_dialog_body input', 'A/B: C? Peak');
 		await page.evaluate(() => {
 			const b = document.querySelector('#lpn_dialog_buttons button');
 			b.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, detail: 1 }));
@@ -328,6 +329,10 @@ async function main() {
 		await boxOpen();
 		g = await groups();
 		ok('with a scenario the box also asks Scenarios', g.length === 3 && g[2].head === lbl.scn, JSON.stringify(g.map((x) => x.head)));
+		const noteShown = () => page.evaluate(() => { const n = document.getElementById('lpn_export_scn_note'); return !!n && n.style.display !== 'none'; });
+		ok('the results note is hidden while Scenarios is Current', !(await noteShown()));
+		await page.evaluate(() => { const e = document.getElementById('lpn_export_scenarios_all'); e.checked = true; e.dispatchEvent(new Event('change', { bubbles: true })); });
+		ok('the results note shows when Scenarios is All', await noteShown());
 		await page.evaluate((c) => {
 			Array.from(document.querySelectorAll('#lpn_dialog_buttons button')).find((x) => x.textContent.trim() === c)
 				.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, detail: 1 }));
@@ -338,11 +343,14 @@ async function main() {
 		ok('XLSX, current table, all scenarios: a sheet per scenario', f.sheets.length === 2 && /Peak/.test(f.sheets.map((s) => s.name).join()) && f.sheets.some((s) => /Base/.test(s.name)), f.sheets.map((s) => s.name).join(', '));
 		ok('each scenario sheet has the table\'s rows and no Scenario column', f.sheets.every((s) => s.rows.length === before.rows.length + 1 && s.rows[0].join() === before.heads.join()), JSON.stringify(f.sheets.map((s) => [s.rows.length, s.rows[0].length])) + ' ' + before.rows.length);
 		r = await runExport('csv', 'current', 'current');
-		ok('CSV, current scenario: one file named with the scenario', /Junctions-Peak\.csv$/.test(r.name), r.name);
+		ok('CSV, current scenario: one file named with the scenario', /Junctions-A_B_ C_ Peak\.csv$/.test(r.name), r.name);
+		r = await runExport('xlsx', 'all', 'all');
+		f = inspect(r.file, 'xlsx');
+		ok('workbook sheet names keep the scenario and stay within 31 characters, unique', f.sheets.every((x) => x.name.length <= 31 && /Peak/.test(x.name) || /Base/.test(x.name)) && new Set(f.sheets.map((x) => x.name.toLowerCase())).size === f.sheets.length, f.sheets.map((x) => x.name).join(' | '));
 		r = await runExport('csv', 'all', 'all');
 		f = inspect(r.file, 'zip');
 		const nJ = f.names.filter((n) => /Junctions-/.test(n));
-		ok('CSV of all tables and all scenarios: a zip with a file per table and scenario', f.bad === null && nJ.length === 2 && f.names.length >= 8, f.names.join(', '));
+		ok('CSV of all tables and all scenarios: a zip with a file per table and scenario', f.bad === null && nJ.length === 2 && f.names.length >= 8 && f.names.every((n) => !/[\/\\:*?"<>|]/.test(n)), f.names.join(', '));
 		ok('the table on screen keeps its order, and still shows no scenario column', (await idOrder()) === orderBefore && !(await screen()).heads.includes(await a.lang('lpn_scenario_label')));
 		ok('no page errors', a.errors.length === 0, a.errors.join(' | ').slice(0, 300));
 	} finally {

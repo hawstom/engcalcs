@@ -29272,11 +29272,22 @@ var EngCalcs = EngCalcs || {};
 		if (!items.length) { return; }
 		items.forEach(function (it) { tables[it.table] = true; });
 		multiTables = Object.keys(tables).length > 1;
-		function part(it, sep) { return it.table + (it.scn ? sep + it.scn : ''); }
+		// A file name, so the scenario's own name (free text: "A/B: C?") is made safe like the table's.
+		function part(it, sep) { return paneSanitizeFileName(it.table) + (it.scn ? sep + paneSanitizeFileName(it.scn) : ''); }
+		// A sheet name, 31 characters at most: the scenario first, the table shortened before it, so
+		// two scenarios of one table stay distinguishable. Trailing spaces are trimmed.
+		function sheetPart(it) {
+			var scn = it.scn, tab = it.table, room;
+			if (!scn) { return tab; }
+			room = 31 - 3;
+			if (scn.length + tab.length > room) { tab = tab.slice(0, Math.max(8, room - scn.length)); }
+			if (scn.length + tab.length > room) { scn = scn.slice(0, room - tab.length); }
+			return scn.replace(/\s+$/, '') + ' - ' + tab.replace(/\s+$/, '');
+		}
 		if (items.length === 1) {
 			name = pre + part(items[0], '-') + '.' + format;
 			data = format === 'csv' ? E.lpnTableCsv(items[0].data.heads, items[0].data.cells)
-				: (format === 'ods' ? E.lpnTableOds : E.lpnTableXlsx)(items[0].data.heads, items[0].data.cells, part(items[0], ' - '), items[0].data.numeric);
+				: (format === 'ods' ? E.lpnTableOds : E.lpnTableXlsx)(items[0].data.heads, items[0].data.cells, sheetPart(items[0]), items[0].data.numeric);
 			mime = PANE_EXPORT_MIME[format];
 		} else {
 			name = pre + (multiTables ? (pc.lpn_tables_menu || 'Tables') : items[0].table);
@@ -29294,7 +29305,7 @@ var EngCalcs = EngCalcs || {};
 				name += '.' + format;
 				mime = PANE_EXPORT_MIME[format];
 				data = (format === 'ods' ? E.lpnTableOdsBook : E.lpnTableXlsxBook)(items.map(function (it) {
-					return { name: multiTables ? part(it, ' - ') : (it.scn || it.table), heads: it.data.heads, rows: it.data.cells, numeric: it.data.numeric };
+					return { name: multiTables ? sheetPart(it) : (it.scn || it.table), heads: it.data.heads, rows: it.data.cells, numeric: it.data.numeric };
 				}));
 			}
 		}
@@ -29340,6 +29351,15 @@ var EngCalcs = EngCalcs || {};
 			if (withScn) {
 				radioGroup(body, 'scenarios', pc.lpn_scenario_menu || 'Scenarios',
 					[['current', pc.lpn_export_table_current || 'Current'], ['all', pc.lpn_export_table_all || 'All']]);
+			}
+			// Shown only while Scenarios is All: results exist for the scenario last calculated only.
+			if (withScn) {
+				var note = document.createElement('div');
+				note.id = 'lpn_export_scn_note';
+				note.style.display = 'none';
+				note.textContent = pc.lpn_export_table_scn_note || 'Results are exported only for the scenario last calculated.';
+				body.appendChild(note);
+				groups.scenarios.addEventListener('change', function () { note.style.display = picked('scenarios') === 'all' ? '' : 'none'; });
 			}
 		}, [
 			{ label: pc.lpn_export_table_go || 'Export', isDefault: true, fn: function () {
