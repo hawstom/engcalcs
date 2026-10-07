@@ -14,7 +14,7 @@
 //      nothing: no document change, no undo entry, no tool change. Delete network is the row used.
 //   5. "?" opens the guide at the focused control, at the hovered one, at a hovered menu row, and
 //      types a plain "?" in a field.
-//   6. At 390 px the box fills the width, rows fold (tip under name), nothing scrolls sideways, and
+//   6. At 390 px the box fills the width, rows fold (tip under name, at the row's edge), nothing scrolls sideways, and
 //      a toolbar row opens the menu twin above the box.
 //   7. Looped-Network.php#guide opens it.
 //
@@ -409,7 +409,9 @@ async function phone(browser, Session) {
 	ok('the box fills the width', geo.w >= geo.vw - 20 && geo.left <= 10, JSON.stringify({ w: geo.w, vw: geo.vw, left: geo.left }));
 	ok('...and nothing in it scrolls sideways', geo.sw <= geo.cw + 1, geo.sw + ' > ' + geo.cw);
 	ok('every toolbar record has its row on a phone too', geo.rows === geo.index && geo.rows > 15, geo.rows + '/' + geo.index);
-	ok('rows fold: the tip sits under the name', geo.descTop >= geo.nameBottom - 1 && Math.abs(geo.descLeft - geo.nameLeft) < 2, JSON.stringify(geo));
+	// Since 2026-10-07 (Tom: "put it all in line") the tip starts at the row's own edge, under the
+	// icon, not indented under the name; user-guide-column-harness.js holds that at both widths.
+	ok('rows fold: the tip sits under the name, at the row\'s edge', geo.descTop >= geo.nameBottom - 1 && geo.descLeft < geo.nameLeft, JSON.stringify(geo));
 	ok('buttons the phone has folded away are dimmed, one for one', geo.off === geo.hidden && geo.hidden > 0, geo.off + ' dimmed, ' + geo.hidden + ' hidden');
 	const before = await probe(page);
 	await page.evaluate((t) => {
