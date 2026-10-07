@@ -42233,10 +42233,6 @@ var EngCalcs = EngCalcs || {};
 			// menu is about; View holds the things that change how the map is drawn. Every editor
 			// puts Find in Edit for the same reason.
 			{ icon: 'find', label: pc.lpn_find_menu || 'Find and replace', fn: function () { toggleFindPopup(anchor); } },
-			// Libraries is in Edit for the same reason Find is: it acts on the CONTENT of the
-			// document -- the patterns, the curves and the controls it holds -- rather than on how
-			// the map is drawn. Two doors, one implementation, exactly as Settings has.
-			{ icon: 'library', label: pc.lpn_library_menu || 'Libraries', fn: function () { toggleLibraryBox(); } },
 			{ separator: true },
 			// SUBJECT, THEN VERB (Task 415): with something selected this row deletes it, which is
 			// what Delete means in every editor. With nothing selected it still toggles the Delete
