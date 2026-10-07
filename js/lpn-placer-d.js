@@ -45,7 +45,7 @@ EngCalcs.lpnPlacerD = (function () {
 	// Off by name: in node, PLACER_D_OFF=a,b (environment); in a page or a harness,
 	// EngCalcs.lpnPlacerD.off = ['a', 'b'] before create(). Names and what each does: STRATEGY.md.
 	var INGREDIENTS = ['order', 'sticky', 'crowd', 'smallfirst', 'evict', 'polish', 'along', 'altlayout',
-		'rescue', 'rescueevict', 'alongfix', 'bendcheck', 'tight', 'timebound', 'warm'];
+		'rescue', 'rescueevict', 'alongfix', 'bendcheck', 'stickyalong', 'tight', 'timebound', 'warm'];
 	var OFF = {}, API = null;
 	function readOff(api) {
 		OFF = {};
@@ -1416,7 +1416,9 @@ EngCalcs.lpnPlacerD = (function () {
 			if (req.kind === 'link') {
 				var lk2 = linksById[req.owner];
 				c.along = !!c.angle || (!!lk2 && levelPipeAt(lk2.points, x + d.w / 2, y + d.h / 2));
-				if (wantsAlong(req) && !c.along) { c.base -= C_NOT_ALONG; }
+				// R14 outranks stillness (there is no stillness rule): a level place is not carried
+				// over for a label the setting turns ('stickyalong').
+				if (wantsAlong(req) && !c.along) { if (on('stickyalong')) { np--; return; } c.base -= C_NOT_ALONG; }
 			}
 			if (pl.repeats && pl.repeats.length) {
 				c.reps = pl.repeats.map(function (r) {
