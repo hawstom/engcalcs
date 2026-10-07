@@ -272,12 +272,6 @@ console.log('label-priority-harness: ' + checks + ' checks passed');
 // The pure pass, driven directly, because the page cannot show what it refused to do. Everything
 // here is values in and values out -- no DOM, no doc.
 const Collide = require(ROOT + 'js/lpn-collide.js').lpnCollide;
-// **THIS SECTION IS THE TWO SWEEPS, WITHOUT THE RESCUE** (rule 2, fix/label-rescue). It asserts
-// that the pass offers only its own `sides` and that a label with none free is dropped; the rescue
-// search that runs after the sweeps exists to seat exactly those labels somewhere else, and
-// label-rescue-harness.js holds it. Before rule 2 these calls passed `{}`; with it, `{}` rescued
-// n9 at a spot off its two sides (the 'exactly one of its two sides' check failed on it).
-const NO_RESCUE = { rescue: false };
 
 function ff(n, spacing, obstacles) {
 	// n labels in a row `spacing` apart, each offered right-then-left at +-20, boxes 40x12.
@@ -290,7 +284,7 @@ function ff(n, spacing, obstacles) {
 			sides: [{ x: x + 20, y: -20 }, { x: x - 20, y: -20 }]
 		});
 	}
-	return { labels: labels, out: Collide.placeLabelsFirstFit(labels, obstacles || { boxes: [], segments: [] }, NO_RESCUE) };
+	return { labels: labels, out: Collide.placeLabelsFirstFit(labels, obstacles || { boxes: [], segments: [] }, {}) };
 }
 
 // Wide apart: everybody gets their preferred side and nothing is dropped.
@@ -352,7 +346,7 @@ for (let i = 0; i < placedBoxes.length; i++) {
 // IDEMPOTENT AND NON-MUTATING, the same two properties placeLabels() carries. A pass that scribbles
 // on its inputs cannot be run twice on the same data to check that it agrees with itself, which is
 // the cheapest strong assertion there is.
-const again = Collide.placeLabelsFirstFit(r.labels, { boxes: [], segments: [] }, NO_RESCUE);
+const again = Collide.placeLabelsFirstFit(r.labels, { boxes: [], segments: [] }, {});
 eq(JSON.stringify(again), JSON.stringify(r.out), 'the first-fit is idempotent');
 
 // MONOTONE IN CROWDING: more room can never drop more labels.
@@ -368,7 +362,7 @@ let prev = Infinity;
 const wall = { boxes: [Collide.box(0, 0, 400, 400, 0, 'label', 'other')], segments: [] };
 const dragged = [{ id: 'd', anchor: { x: 0, y: 0 }, home: { x: 20, y: -20 }, dragged: true,
 	priority: 99, w: 40, h: 12, yOff: 0, sides: [{ x: 20, y: -20 }, { x: -20, y: -20 }] }];
-const dr = Collide.placeLabelsFirstFit(dragged, wall, NO_RESCUE);
+const dr = Collide.placeLabelsFirstFit(dragged, wall, {});
 eq(dr[0].dropped, false, 'a dragged label survives a wall of obstacles');
 eq(dr[0].side, 0, 'a dragged label does not jump sides');
 
@@ -389,15 +383,15 @@ eq(dr[0].side, 0, 'a dragged label does not jump sides');
 			priority: 0, w: 40, h: 12, yOff: 0,
 			sides: [{ x: 20, y: -20 }, { x: -20, y: -20 }] }];
 	};
-	const soft = Collide.placeLabelsFirstFit(lbl(), boxed(true), NO_RESCUE);
+	const soft = Collide.placeLabelsFirstFit(lbl(), boxed(true), {});
 	eq(soft[0].dropped, false, 'both sides held only by yielding boxes: the label is placed anyway');
 	eq(soft[0].side, 0, '...and it takes its PREFERRED side, not an arbitrary one');
-	const hard = Collide.placeLabelsFirstFit(lbl(), boxed(false), NO_RESCUE);
+	const hard = Collide.placeLabelsFirstFit(lbl(), boxed(false), {});
 	eq(hard[0].dropped, true, 'both sides held by boxes it does NOT outrank: it drops');
 	// A CLEAR side still beats a yielding one -- the fallback must not short-circuit the search.
 	const mixed = { boxes: [Collide.box(40, -14, 40, 12, 0, 'label', 'x1')], segments: [] };
 	mixed.boxes[0].yields = true;
-	const pick = Collide.placeLabelsFirstFit(lbl(), mixed, NO_RESCUE);
+	const pick = Collide.placeLabelsFirstFit(lbl(), mixed, {});
 	eq(pick[0].dropped, false, 'a label with one blocked side and one clear side is placed');
 	eq(pick[0].side, 1, '...on the CLEAR side, not on the one it could have taken by rank');
 }
@@ -407,12 +401,12 @@ eq(dr[0].side, 0, 'a dragged label does not jump sides');
 const onPipe = Collide.placeLabelsFirstFit(
 	[{ id: 'a', anchor: { x: 0, y: 0 }, home: { x: 20, y: -20 }, dragged: false, priority: 0,
 		w: 40, h: 12, yOff: 0, sides: [{ x: 20, y: -20 }, { x: -20, y: -20 }] }],
-	{ boxes: [], segments: [{ ax: -200, ay: -20, bx: 200, by: -20, kind: 'link' }] }, NO_RESCUE);
+	{ boxes: [], segments: [{ ax: -200, ay: -20, bx: 200, by: -20, kind: 'link' }] }, {});
 eq(onPipe[0].dropped, false, 'a label may sit on a pipe and still win');
 const onLeader = Collide.placeLabelsFirstFit(
 	[{ id: 'a', anchor: { x: 0, y: 0 }, home: { x: 20, y: -20 }, dragged: false, priority: 0,
 		w: 40, h: 12, yOff: 0, sides: [{ x: 20, y: -20 }, { x: -20, y: -20 }] }],
-	{ boxes: [], segments: [{ ax: -200, ay: -20, bx: 200, by: -20, kind: 'leader' }] }, NO_RESCUE);
+	{ boxes: [], segments: [{ ax: -200, ay: -20, bx: 200, by: -20, kind: 'leader' }] }, {});
 eq(onLeader[0].dropped, true, 'a label may not sit on a leader');
 
 console.log('label-priority-harness: phase 1 section passed');

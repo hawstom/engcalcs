@@ -73,10 +73,7 @@ function report(ok, label, detail) {
 		report(!byId['n:hi'].dropped && byId['n:hi'].side === 1,
 			'...and the higher-ranked one, crossing a pipe anyway, takes its other side and is drawn',
 			JSON.stringify({ dropped: byId['n:hi'].dropped, side: byId['n:hi'].side }));
-		// `rescue: false` as well (rule 2, fix/label-rescue): this compares the two sweeps with the
-		// single one, and the rescue that runs after either now seats n:lo off its only side, so
-		// with `{ clean: false }` alone loDropped read false where it read true before rule 2.
-		const b = Collide.placeLabelsFirstFit(scene, obs, { clean: false, rescue: false }), old = {};
+		const b = Collide.placeLabelsFirstFit(scene, obs, { clean: false }), old = {};
 		b.forEach(function (r) { old[r.id] = r; });
 		report(old['n:hi'].side === 0 && old['n:lo'].dropped,
 			'...where the single sweep let the crossing take the clean ground and hid the other label',
