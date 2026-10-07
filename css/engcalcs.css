@@ -4455,9 +4455,9 @@ html:has(#lpn_canvas) { overflow: hidden; }
 .lpn-guidebox { width: min(62rem, 94vw); }
 /* ---- THE USER GUIDE (Tom, 2026-10-06; Ida's design) ---------------------------------------------
    The Notes shell, with a search pinned at the top and rows that are a legend, not a menu: icon,
-   name, the whole tip written out, and the key. The body is a size container so a row folds by
-   the BOX's width (a narrow box on a desktop folds the same as a phone): name above tip, key
-   still at the end. A toolbar button that is not on screen now is dimmed, not dropped. */
+   name and key on one line, the whole tip written out below them. The body is a size container so
+   the key tables stack by the BOX's width (a narrow box on a desktop stacks the same as a phone).
+   A toolbar button that is not on screen now is dimmed, not dropped. */
 .lpn-guide-body { container-type: inline-size; }
 /* **THE CONTENTS RAIL** (Tom, 2026-10-07: *"a collapsible top or side Contents pane"*; Ida's spec).
    A 240 px rail at the start edge holding the search and the list of sections; collapsed it is a
