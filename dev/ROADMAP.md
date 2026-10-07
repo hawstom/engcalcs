@@ -242,9 +242,6 @@ the block.
   (`convert-as-fotobi-harness.js`, four paths, master and production 9c71d54f); ask which surface.
   MERGED 2026-10-07 (`feat/web-mercator`, Tom: "Merge."): EPSG:3857 is a real projected project in
   metres, lengths on the ground, 4326 marked suggested. Open: only the unreproduced symbol loss.
-- 75|780| **Write `.epp` project files; keep reading `.lwn` and `.json`.** Tom, 2026-10-07: *"I guess
-  it's time to start saving as .epp What's your advice? We'll support .epp, .lwn, and .json?"* Advice
-  given: yes, once he says so; `LPN_FILE_EXT` and the open filters. Awaiting his word.
 - 75|578| **Fire flow: the EPS frame and the Run concept, extracted from 530.**
   Everything else in Task 530 shipped and that task is closed. Two phases were never built and are
   kept here so they are not lost in a closed block.

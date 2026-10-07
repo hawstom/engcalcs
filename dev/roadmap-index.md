@@ -35,7 +35,6 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 776 — Copy a table with its headings; export Tables to CSV and ODS.
 - Task 777 — Station and elevation marks on the mi and wi section sketches.
 - Task 779 — Shape: a simple drawn element, point, polyline or polygon, with snapping.
-- Task 780 — Write `.epp` project files; keep reading `.lwn` and `.json`.
 
 ## 50 — Someday (35)
 
