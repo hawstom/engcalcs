@@ -758,6 +758,11 @@
 			}
 			// Materialize a leader to the nearest ink of the block.
 			function realize(req, c) {
+				// R5: a stack on a leader is justified to the side its leader comes from.
+				if (c.leader === 'auto' && c.layout === 'stack' && c.rows.length > 1) {
+					const side = c.from[0] > c.x + c.w / 2 ? 'right' : 'left';
+					if (side !== c.align) { c = Object.assign({}, c, { align: side }); }
+				}
 				const ink = inkOf(req, c);
 				if (c.leader === 'auto') {
 					const f = c.from;
