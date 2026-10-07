@@ -187,6 +187,9 @@ $ovAllowed = [
     'sanitizeScenarioTree', 'mergeAlternativeInto', 'combineHolders', 'scenarioHoldsLocal', 'takeScenarioLocals', 'promoteStored',
     // the one write seam, and the scenario's own count beside its name
     'setOverride', 'clearOverride', 'overrideCount',
+    // a type override's own door (Tom, 2026-10-07, 6a): it writes the names LPN_OVERRIDABLE does not
+    // hold that a scenario's type needs, into the map writeTargetFor() names, as setOverride() does
+    'writeOverrideIn',
     // the derived (Basic mode) alternatives, read off each scenario's own map
     'alternativesOf', 'resolveThroughAlternatives', 'alternativeOverrides',
     // opening a file: the old key migration, and the guarantee that every scenario has a map
