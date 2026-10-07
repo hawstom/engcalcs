@@ -1941,6 +1941,12 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 	<dt><?=$ec_lang['lpn_notes_7_term']?></dt><dd><?=$ec_lang['lpn_notes_7_def']?></dd>
 </dl>
 </section>
+<section class="lpn-guide-section" data-guide-section="using">
+<h2><?=$ec_lang['lpn_guide_using_heading']?></h2>
+<dl>
+	<dt><?=$ec_lang['lpn_guide_keys_term']?></dt><dd><?=$ec_lang['lpn_guide_keys_def']?></dd>
+</dl>
+</section>
 <section class="lpn-guide-section" data-guide-section="boxes">
 <h2><?=$ec_lang['lpn_guide_boxes_heading']?></h2>
 <p class="lpn-guide-prose"><?=$ec_lang['lpn_guide_boxes_intro']?></p>
@@ -2520,6 +2526,20 @@ EngCalcs.pageConfig = {
 	lpn_guide_also: <?=json_encode($ec_lang['lpn_guide_also'])?>,
 	lpn_guide_box_help: <?=json_encode($ec_lang['lpn_guide_box_help'])?>,
 	lpn_guide_contents: <?=json_encode($ec_lang['lpn_guide_contents'])?>,
+	lpn_guide_text_popup: <?=json_encode($ec_lang['lpn_guide_text_popup'])?>,
+	lpn_guide_text_find_popup: <?=json_encode($ec_lang['lpn_guide_text_find_popup'])?>,
+	lpn_guide_text_settings_box: <?=json_encode($ec_lang['lpn_guide_text_settings_box'])?>,
+	lpn_guide_text_library_box: <?=json_encode($ec_lang['lpn_guide_text_library_box'])?>,
+	lpn_guide_text_energy_box: <?=json_encode($ec_lang['lpn_guide_text_energy_box'])?>,
+	lpn_guide_text_contour_box: <?=json_encode($ec_lang['lpn_guide_text_contour_box'])?>,
+	lpn_guide_text_scncmp_box: <?=json_encode($ec_lang['lpn_guide_text_scncmp_box'])?>,
+	lpn_guide_text_rptbox: <?=json_encode($ec_lang['lpn_guide_text_rptbox'])?>,
+	lpn_guide_text_status_box: <?=json_encode($ec_lang['lpn_guide_text_status_box'])?>,
+	lpn_guide_text_alt_box: <?=json_encode($ec_lang['lpn_guide_text_alt_box'])?>,
+	lpn_guide_text_full_box: <?=json_encode($ec_lang['lpn_guide_text_full_box'])?>,
+	lpn_guide_text_calib_box: <?=json_encode($ec_lang['lpn_guide_text_calib_box'])?>,
+	lpn_guide_text_notes_popup: <?=json_encode($ec_lang['lpn_guide_text_notes_popup'])?>,
+	lpn_guide_text_hotkeys_popup: <?=json_encode($ec_lang['lpn_guide_text_hotkeys_popup'])?>,
 	lpn_guide_rail_hide: <?=json_encode($ec_lang['lpn_guide_rail_hide'])?>,
 	lpn_guide_rail_show: <?=json_encode($ec_lang['lpn_guide_rail_show'])?>,
 <?php   // The suite's existing legal-link strings, needed here because this page's Help menu and

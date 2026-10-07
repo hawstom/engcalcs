@@ -42037,9 +42037,12 @@ var EngCalcs = EngCalcs || {};
 	function saveHotkeysboxLayout() {
 		try { localStorage.setItem(LPN_HOTKEYSBOX_KEY, JSON.stringify(hotkeysboxLayout)); } catch (e) {}
 	}
+	// Where focus was when the Guide opened, so that closing it puts the reader back there.
+	var guideReturnEl = null, guidePendingKey = null;
 	function openHotkeysBox() {
-		var box = hotkeysBoxEl(), r, at, home, floor;
+		var box = hotkeysBoxEl(), r, at, home, floor, ae = document.activeElement;
 		if (!box) { return; }
+		if (ae && ae !== document.body && !box.contains(ae)) { guideReturnEl = ae; }
 		closeMenu();
 		closeViewPopovers();
 		hideOpenTips();
@@ -42064,7 +42067,10 @@ var EngCalcs = EngCalcs || {};
 		if (!hotkeysboxLayout.open) { hotkeysboxLayout.open = true; saveHotkeysboxLayout(); }
 	}
 	function closeHotkeysBox() {
+		var back = guideReturnEl;
+		guideReturnEl = null;
 		hidePanel(hotkeysBoxEl());
+		if (back && back.isConnected && back.getClientRects().length && back.focus) { try { back.focus({ preventScroll: true }); } catch (e) { back.focus(); } }
 		try { if (/^#guide/i.test(location.hash)) { history.replaceState(null, '', location.pathname + location.search); } } catch (e) {}
 		if (hotkeysboxLayout.open) { hotkeysboxLayout.open = false; saveHotkeysboxLayout(); }
 	}
@@ -42309,10 +42315,30 @@ var EngCalcs = EngCalcs || {};
 		(window.requestAnimationFrame || setTimeout)(guideRefreshDimming);
 	}
 	// ---- Search: one box over all four sections ----
-	function guideMatch(el, q) { return String(el.textContent || '').toLowerCase().indexOf(q) >= 0; }
+	// **MATCHING IGNORES MARKS**: Arabic harakat, shadda and tatweel, Hebrew points, and the accents of
+	// Latin letters, so a reader who types the bare letters finds the pointed word. One character at a
+	// time, so an index in the folded text is an index in the original (guideSnippet() needs that).
+	var GUIDE_MARKS = /[\u0300-\u036f\u0610-\u061a\u064b-\u065f\u0670\u06d6-\u06ed\u0640\u0591-\u05bd\u05bf\u05c1\u05c2\u05c4\u05c5\u05c7]/g;
+	function guideFoldChar(ch) {
+		var f = ch;
+		try { f = ch.normalize('NFD'); } catch (e) { /* no normalize */ }
+		return f.replace(GUIDE_MARKS, '').toLowerCase();
+	}
+	function guideFold(t) {
+		var out = '', i, s = String(t || '');
+		for (i = 0; i < s.length; i++) { out += guideFoldChar(s.charAt(i)); }
+		return out;
+	}
+	// Text as read: table cells and list rows with a space between them, not run together.
+	function guideTextOf(el) {
+		var cells = el.querySelectorAll ? el.querySelectorAll('td, th') : [];
+		if (cells.length) { return Array.prototype.map.call(cells, function (c) { return c.textContent; }).join(' '); }
+		return String(el.textContent || '');
+	}
+	function guideMatch(el, q) { return guideFold(guideTextOf(el)).indexOf(q) >= 0; }
 	function guideFilter() {
 		var box = hotkeysBoxEl(), input = document.getElementById('lpn_guide_search'), none = document.getElementById('lpn_guide_none'),
-			q = input ? String(input.value || '').trim().toLowerCase() : '', any = false;
+			q = input ? guideFold(String(input.value || '').trim()) : '', any = false;
 		if (!box) { return; }
 		function guideShowEl(el, on) { el.style.display = on ? '' : 'none'; return on; }
 		box.querySelectorAll('.lpn-guide-section').forEach(function (sec) {
@@ -42363,7 +42389,7 @@ var EngCalcs = EngCalcs || {};
 		}).filter(function (e) { return !!e.title; });
 	}
 	function renderGuideBoxes() {
-		var host = document.getElementById('lpn_guide_boxes');
+		var host = document.getElementById('lpn_guide_boxes'), pc = EngCalcs.pageConfig || {};
 		if (!host) { return; }
 		while (host.firstChild) { host.removeChild(host.firstChild); }
 		guideBoxList().forEach(function (e) {
@@ -42373,21 +42399,31 @@ var EngCalcs = EngCalcs || {};
 			en.setAttribute('data-guide-key', 'box-' + e.id);
 			h.textContent = e.title;
 			en.appendChild(h);
-			if (e.d.tipText) { p = document.createElement('p'); p.textContent = e.d.tipText; en.appendChild(p); }
+			h.tabIndex = -1;
+			(e.d.tipText || pc['lpn_guide_text_' + e.id.replace(/^lpn_/, '')] || '').split(/\\n\\n|\n\n/).forEach(function (para) {
+				if (!String(para).trim()) { return; }
+				p = document.createElement('p');
+				p.textContent = String(para).trim();
+				en.appendChild(p);
+			});
 			host.appendChild(en);
 		});
 	}
 	function guideContentEl() { return document.getElementById('lpn_guide_content'); }
 	function guideVisible(el) { return !!el && el.style.display !== 'none' && (!el.closest || !el.closest('[style*="display: none"]')); }
 	function guideSnippet(sec, q) {
-		var cands = sec.querySelectorAll('.lpn-guide-row, tr, dt, dd, .lpn-guide-boxentry, .lpn-guide-prose'), i, el, t, at;
+		var cands = sec.querySelectorAll('.lpn-guide-row, tr, dt, dd, .lpn-guide-boxentry, .lpn-guide-prose'), i, el, t, at, map, f, k, from, to;
 		for (i = 0; i < cands.length; i++) {
 			el = cands[i];
 			if (!guideVisible(el) || el.querySelector('.lpn-guide-row, tr')) { continue; }
-			t = String(el.textContent || '').replace(/\s+/g, ' ').trim();
-			at = t.toLowerCase().indexOf(q);
+			t = guideTextOf(el).replace(/\s+/g, ' ').trim();
+			f = ''; map = [];
+			for (k = 0; k < t.length; k++) { var fc = guideFoldChar(t.charAt(k)); f += fc; for (var m = 0; m < fc.length; m++) { map.push(k); } }
+			at = f.indexOf(q);
 			if (at >= 0) {
-				return (at > 20 ? '…' : '') + t.slice(Math.max(0, at - 20), at + 50) + (t.length > at + 50 ? '…' : '');
+				from = Math.max(0, map[at] - 20);
+				to = Math.min(t.length, (map[Math.min(map.length - 1, at + q.length - 1)] || 0) + 50);
+				return (from > 0 ? '\u2026' : '') + t.slice(from, to) + (to < t.length ? '\u2026' : '');
 			}
 		}
 		return '';
@@ -42452,8 +42488,8 @@ var EngCalcs = EngCalcs || {};
 		}, { root: content, rootMargin: '0px 0px -70% 0px', threshold: [0, 1] });
 		content.querySelectorAll('[data-guide-key]').forEach(function (el) { guideIO.observe(el); });
 	}
-	function guideGoto(key) {
-		var content = guideContentEl(), el, pulseEl;
+	function guideGoto(key, focusIn) {
+		var content = guideContentEl(), el, pulseEl, heading;
 		if (!content) { return false; }
 		el = content.querySelector('[data-guide-key="' + String(key).replace(/"/g, '') + '"]');
 		if (!el || el.style.display === 'none') { return false; }
@@ -42461,6 +42497,9 @@ var EngCalcs = EngCalcs || {};
 		guideSetCurrent(key);
 		pulseEl = el.classList.contains('lpn-guide-boxentry') ? el : null;
 		if (pulseEl) { guidePulse(pulseEl); }
+		// Focus moves into the Guide, to the entry's heading (or the section's), so Esc and Tab work from there.
+		heading = el.querySelector('h3, h2');
+		if (focusIn && heading) { heading.tabIndex = -1; heading.focus({ preventScroll: true }); }
 		try { history.replaceState(null, '', '#guide/' + key); } catch (e) {}
 		return true;
 	}
@@ -42471,9 +42510,9 @@ var EngCalcs = EngCalcs || {};
 		if (input) { input.value = ''; }
 		openHotkeysBox();
 		guideFilter();
-		if (!guideGoto('box-' + boxId)) { guideGoto('boxes'); }
+		if (!guideGoto('box-' + boxId, true)) { guideGoto('boxes', true); }
 		(window.requestAnimationFrame || setTimeout)(function () {
-			if (!guideGoto('box-' + boxId)) { guideGoto('boxes'); }
+			if (!guideGoto('box-' + boxId, true)) { guideGoto('boxes', true); }
 		});
 	}
 	// ---- the rail: collapsed state is window furniture inside the record the box already keeps ----
@@ -42629,7 +42668,7 @@ var EngCalcs = EngCalcs || {};
 				if (!a) { return; }
 				e.preventDefault();
 				e.stopPropagation();
-				guideGoto(a.getAttribute('data-guide-link'));
+				guideGoto(a.getAttribute('data-guide-link'), true);
 			});
 		}
 		// "/" inside the guide goes to its search; Ctrl+K opens the guide there from anywhere.
@@ -42666,7 +42705,7 @@ var EngCalcs = EngCalcs || {};
 			var m = /^#guide(?:\/(.+))?$/i.exec(String(location.hash || ''));
 			if (!m) { return; }
 			openGuideAt(null);
-			if (m[1]) { guideGoto(decodeURIComponent(m[1])); }
+			if (m[1] && !guideGoto(decodeURIComponent(m[1]))) { guidePendingKey = decodeURIComponent(m[1]); }
 		}
 		window.addEventListener('hashchange', fromHash);
 		fromHash();
@@ -43935,6 +43974,12 @@ var EngCalcs = EngCalcs || {};
 		// the tab strip are all the ones the visitor will actually be looking at.
 		// Docking (Task 441) is wired after every box it docks, and read before any of them reopens.
 		wireBoxDocking();
+		// A #guide/<key> link met on load before the boxes existed to list: land on it now.
+		if (guidePendingKey) {
+			renderGuide();
+			(window.requestAnimationFrame || setTimeout)(function () { guideGoto(guidePendingKey); guidePendingKey = null; });
+			guideGoto(guidePendingKey);
+		}
 		dockBooting = true;
 		restoreOpenBoxes();
 		dockBooting = false;
@@ -51699,11 +51744,11 @@ var EngCalcs = EngCalcs || {};
 		d.corner = row;
 		tip = typeof tipKey === 'function' ? tipKey() :
 			[].concat(tipKey || []).map(function (k) { return pc[k]; }).filter(Boolean).join(' ');
-		if (tip) { d.help = cornerHelp(tip); d.tipText = tip; }
-		// **ONE `?` PER BOX** (Task 759, which the dock harness holds, and Ida's spec). A box that
-		// already carries its explanation as a tip keeps that `?`; the rest get this one. The Guide's
-		// Boxes entry for a tipped box repeats the tip, and F1 reaches it from inside the box.
-		d.guideBtn = tip ? null : guideCornerButton(d);
+		// **THE EXPLANATION LIVES IN THE GUIDE** (Perry, 2026-10-07: one kind of `?`). A box that had
+		// its explanation as a corner tip now has it as its Guide entry; the blue tip `?` stays beside
+		// field labels only. renderGuideBoxes() reads this, and refreshBoxTip() keeps it current.
+		d.tipText = tip || '';
+		d.guideBtn = guideCornerButton(d);
 		box.addEventListener('keydown', function (e) {
 			if (e.key === 'F1' && !e.ctrlKey && !e.altKey && !e.shiftKey && !e.metaKey) {
 				e.preventDefault();
@@ -62529,7 +62574,7 @@ var EngCalcs = EngCalcs || {};
 	}
 	function refreshBoxTip(id, text) {
 		var box = document.getElementById(id), d = box && box.__lpnDock;
-		if (d && d.help && text) { EngCalcs.setTipText(d.help, text); }
+		if (d && text) { d.tipText = text; if (d.help) { EngCalcs.setTipText(d.help, text); } }
 	}
 	function buildFireFlowControls() {
 		var pc = EngCalcs.pageConfig || {},
@@ -66367,7 +66412,7 @@ var EngCalcs = EngCalcs || {};
 	EngCalcs.lpnGuideProbe = function () {
 		return {
 			toolbar: toolbarIconIndex.map(function (b) { return { el: b.el, icon: b.icon, name: b.name }; }),
-			undo: undoStack.length, sig: docSignature(), mode: mode
+			undo: undoStack.length, sig: docSignature(), mode: mode, fold: guideFold
 		};
 	};
 	// The Full report's Type column harness opens the box through this, not through the menu.

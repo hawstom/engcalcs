@@ -4442,7 +4442,9 @@ html[dir="rtl"] .lpn-guide-rail-collapsed .lpn-guide-railtoggle svg { transform:
 .lpn-guide-prose { margin: .3em 0 .6em; }
 .lpn-guide-boxentry { margin: 0 0 .6em; }
 .lpn-guide-boxentry > h3 { margin: .6em 0 .2em; }
-.lpn-guide-boxentry > p { margin: 0; white-space: pre-line; }
+.lpn-guide-boxentry > p { margin: 0 0 .4em; }
+.lpn-guide-boxentry > h3:focus { outline: none; }
+.lpn-guide-boxentry > h3:focus-visible { outline: 2px solid var(--ec-accent); outline-offset: 2px; }
 @media (max-width: 640px) {
 	.lpn-guide-panes { flex-direction: column; gap: 4px; }
 	.lpn-guide-rail { flex: 0 0 auto; border-inline-end: 0; padding-inline-end: 0; border-bottom: 1px solid var(--ec-border); padding-bottom: 4px; }

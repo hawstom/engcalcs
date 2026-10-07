@@ -196,7 +196,7 @@ async function desktop(browser, Session) {
 	const per = await page.evaluate(() => Array.from(document.querySelectorAll('.lpn-has-corner')).map(b => ({ id: b.id,
 		n: b.querySelectorAll('.lpn-box-corner [data-guide-for], .lpn-box-corner .ec-tip').length })));
 	ok('every standing box carries exactly one "?" (its guide "?", or the tip "?" it already had)', per.length >= 15 && per.every(b => b.n === 1), JSON.stringify(per.filter(b => b.n !== 1)));
-	ok('boxes without a tip have the guide "?"', boxes.length >= 10 && new Set(boxes).size === boxes.length, boxes.length + ' ' + JSON.stringify(boxes));
+	ok('every box has the guide "?"', boxes.length >= 15 && new Set(boxes).size === boxes.length, boxes.length + ' ' + JSON.stringify(boxes));
 	const tip = await page.evaluate(() => document.querySelector('[data-guide-for]').title);
 	ok('...tip "Help for this box"', tip === (await a.lang('lpn_guide_box_help')), tip);
 	// A tipped box (Fire flow) has its tip "?" and its entry in the Guide, reached by F1.
@@ -249,7 +249,71 @@ async function desktop(browser, Session) {
 	await a.settle(400);
 	ok('#guide/menus deep-links to Menus', await boxOpen(page) && (await cur(page)) === 'menus', await cur(page));
 
+	console.log('\n6. Perry\'s round: text in every entry, focus, folding, snippets, keys, first-load deep link');
+	await closeBox(page);
+	await a.settle(200);
+	await page.evaluate(() => { const b = document.querySelector('[data-guide-for="lpn_settings_box"]'); document.getElementById('lpn_settings_box').style.display = 'flex'; b.focus(); });
+	await page.evaluate(() => document.querySelector('[data-guide-for="lpn_settings_box"]').dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 })));
+	await a.settle(400);
+	const entries = await page.evaluate(() => Array.from(document.querySelectorAll('.lpn-guide-boxentry')).map(e => ({
+		id: e.getAttribute('data-guide-key'), p: e.querySelectorAll('p').length,
+		text: Array.from(e.querySelectorAll('p')).map(p => p.textContent).join(' ') })));
+	const bare = entries.filter(e => e.p < 1 || e.text.length < 80);
+	ok('every box entry (all ' + entries.length + ') has text of its own, never just a name', entries.length >= 15 && bare.length === 0, JSON.stringify(bare.map(e => e.id)));
+	ok('...including the Guide\'s own entry', entries.some(e => e.id === 'box-lpn_hotkeys_popup' && e.text.length > 80));
+	ok('...with no literal \\n in any of them', entries.every(e => e.text.indexOf('\\n') < 0));
+	ok('...and Fire flow breaks into paragraphs', (await page.evaluate(() => document.querySelectorAll('[data-guide-key="box-lpn_ff_box"] p').length)) >= 3);
+	ok('the Boxes intro says the ? in a title bar opens its help', await page.evaluate(() => /title bar opens its help\.$/.test(document.querySelector('[data-guide-section="boxes"] .lpn-guide-prose').textContent.trim())));
+	ok('opening by the ? moves focus into the Guide', await page.evaluate(() => document.getElementById('lpn_hotkeys_popup').contains(document.activeElement)), await page.evaluate(() => document.activeElement && (document.activeElement.id || document.activeElement.tagName)));
+	await page.keyboard.press('Escape');
+	await a.settle(300);
+	ok('Esc closes the Guide first (Settings stays open)', !(await boxOpen(page)) && (await page.evaluate(() => document.getElementById('lpn_settings_box').style.display === 'flex')));
+	ok('...and focus returns to the ? that opened it', await page.evaluate(() => document.activeElement === document.querySelector('[data-guide-for="lpn_settings_box"]')));
+	await page.keyboard.press('F1');
+	await a.settle(400);
+	ok('F1 moves focus into the Guide too', (await boxOpen(page)) && await page.evaluate(() => document.getElementById('lpn_hotkeys_popup').contains(document.activeElement)));
+	await page.keyboard.press('Escape');
+	await a.settle(300);
+	ok('...and Esc returns focus to where F1 was pressed', await page.evaluate(() => document.activeElement === document.querySelector('[data-guide-for="lpn_settings_box"]')));
+	// folding
+	const fold = await page.evaluate(() => { const f = EngCalcs.lpnGuideProbe().fold; return {
+		ar: f('مُحَمَّدٌ') === f('محمد'), tat: f('كتـــاب') === f('كتاب'), he: f('שָׁלוֹם') === f('שלום'), lat: f('Café Ångström') === 'cafe angstrom' }; });
+	ok('folding ignores Arabic harakat, shadda and tatweel', fold.ar && fold.tat, JSON.stringify(fold));
+	ok('...Hebrew points, and Latin accents', fold.he && fold.lat, JSON.stringify(fold));
+	await viaHelp(a);
+	await page.evaluate(() => { const h = document.getElementById('lpn_guide_boxes'); const e = document.createElement('div'); e.className = 'lpn-guide-boxentry'; e.setAttribute('data-guide-key', 'box-probe'); e.innerHTML = '<h3>x</h3><p>كَتَبَ الْمُهَنْدِسُ</p>'; h.appendChild(e); });
+	await page.fill('#lpn_guide_search', 'المهندس');
+	await a.settle(200);
+	ok('an unpointed Arabic search finds pointed Arabic text', await page.evaluate(() => { const e = document.querySelector('[data-guide-key="box-probe"]'); return e.style.display !== 'none'; }));
+	await page.fill('#lpn_guide_search', 'Esc');
+	await a.settle(200);
+	const snip = await page.evaluate(() => Array.from(document.querySelectorAll('.lpn-guide-nav-snip')).map(s => s.textContent).join(' | '));
+	ok('a snippet puts a space between table cells', /Esc\s+\S/.test(snip) && !/Esc[A-Z]/.test(snip), snip);
+	for (const k of ['Ctrl+K', 'F1', '/']) {
+		await page.fill('#lpn_guide_search', k);
+		await a.settle(200);
+		const found = await page.evaluate(() => Array.from(document.querySelectorAll('#lpn_guide_nav a')).map(x => x.getAttribute('data-guide-link')));
+		ok('searching "' + k + '" finds the keys section', found.indexOf('using') >= 0, JSON.stringify(found));
+	}
+	await page.fill('#lpn_guide_search', '');
+	await closeBox(page);
+	await a.close ? 0 : 0;
+
 	ok('no page errors on the desktop pass', a.errors.length === 0, a.errors.slice(0, 2).join(' | '));
+	await a.context.close().catch(() => {});
+}
+
+async function deepLink(browser, Session) {
+	const a = await Session.open(browser, 'guide-deeplink');
+	await a.goto('Looped-Network.php#guide/box-lpn_settings_box');
+	await a.page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } });
+	await a.settle(1500);
+	console.log('\n7. #guide/box-lpn_settings_box on first load');
+	const r = await a.page.evaluate(() => {
+		const c = document.getElementById('lpn_guide_content'), e = document.querySelector('[data-guide-key="box-lpn_settings_box"]'), b = document.getElementById('lpn_hotkeys_popup');
+		return { open: b.style.display === 'flex', top: e ? Math.round(e.getBoundingClientRect().top - c.getBoundingClientRect().top) : null, scrolled: c.scrollTop };
+	});
+	ok('the Guide opens at the Settings entry, not at the top', r.open && r.top !== null && Math.abs(r.top) < 40 && r.scrolled > 100, JSON.stringify(r));
 	await a.context.close().catch(() => {});
 }
 
@@ -293,6 +357,7 @@ async function main() {
 	const browser = await chromium.launch({ executablePath });
 	try {
 		await desktop(browser, Session);
+		await deepLink(browser, Session);
 		await phone(browser, Session);
 	} catch (e) {
 		console.error(e && e.stack || e);

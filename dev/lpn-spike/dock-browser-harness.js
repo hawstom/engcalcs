@@ -375,43 +375,34 @@ async function sectionAutohide(Session, browser) {
 
 // ---------------------------------------------------------------------------------------------
 async function sectionHelp(Session, browser) {
-	console.log('\n--- 4. one ? beside the X of the three Analyze tools (Q5) ---');
+	console.log('\n--- 4. one ? beside the X of every box: the Guide ? (Perry 2026-10-07; Q5 before it) ---');
 	const a = await openNet3(Session, browser);
 	try {
 		const facts = await a.page.evaluate((ids) => ids.map((id) => {
 			const b = document.getElementById(id), row = b.querySelector('.lpn-box-corner');
-			const glyphs = row.querySelectorAll('.ec-tip'), help = row.querySelector('.ec-help');
-			return { id, glyphs: glyphs.length, tip: help ? (help.getAttribute('data-bs-original-title') || help.title) : null,
-				focusable: glyphs.length === 1 && glyphs[0].tabIndex === 0, last: !!help && row.lastElementChild === help };
+			const glyphs = row.querySelectorAll('.lpn-corner-guide'), tips = row.querySelectorAll('.ec-tip, .ec-help');
+			return { id, glyphs: glyphs.length, tips: tips.length, last: row.lastElementChild === glyphs[0],
+				focusable: glyphs.length === 1 && glyphs[0].tabIndex === 0 };
 		}), BOXES);
-		for (const id of Object.keys(HELP)) {
-			const f = facts.find((x) => x.id === id);
-			ok(id + ': exactly one ?, the last thing before the X, focusable', f.glyphs === 1 && f.last && f.focusable, JSON.stringify(f));
-			const want = [];
-			for (const k of HELP[id]) { want.push(await a.lang(k)); }
-			// Fire flow and Demand scaling fold the box's former paragraphs in after the intro.
-			const whole = want.join(' ');
-			ok(id + ': ...its tip opens with the tool\'s intro', id === 'lpn_crit_box' ? f.tip === whole :
-				String(f.tip).indexOf(whole.split('{')[0]) === 0, String(f.tip).slice(0, 60));
+		for (const f of facts) {
+			ok(f.id + ': exactly one ?, the last thing before the X, focusable, and not a blue tip', f.glyphs === 1 && f.tips === 0 && f.last && f.focusable, JSON.stringify(f));
 		}
-		ok('no other box carries a ? in its corner', facts.filter((f) => !HELP[f.id]).every((f) => f.glyphs === 0));
+		// The three boxes that carried their explanation as a tip carry it as their Guide entry.
 		await a.menuClickSub(await a.lang('lpn_analyze_menu'), await a.lang('lpn_ff_menu'), 'project');
 		await a.settle(400);
-		await a.page.focus('#lpn_ff_box .lpn-corner-help .ec-tip');
-		await a.page.keyboard.press('Enter');
-		await a.settle(700);
-		const shown = await a.page.evaluate(() => {
-			const h = document.querySelector('#lpn_ff_box .lpn-corner-help'), id = h.getAttribute('aria-describedby');
-			const t = id && document.getElementById(id);
-			return t ? t.textContent : null;
-		});
-		await shot(a.page, 'q5-help');
-		const tb = await a.page.evaluate(() => { const r = document.querySelector('#lpn_ff_box .lpn-setbox-title').getBoundingClientRect(); return { x: r.left + 8, y: r.top + r.height / 2 }; });
-		await a.page.mouse.click(tb.x, tb.y);
-		await a.settle(400);
-		const still = await a.page.evaluate(() => { const h = document.querySelector('#lpn_ff_box .lpn-corner-help'); return !!h.getAttribute('aria-describedby') && !!document.getElementById(h.getAttribute('aria-describedby')); });
-		ok('a click on the box title bar closes the ? tip', !still);
-		ok('Enter on the ? shows the tip', !!shown && shown.indexOf((await a.lang('lpn_ff_intro')).slice(0, 20)) >= 0, String(shown).slice(0, 60));
+		for (const id of Object.keys(HELP)) {
+			await a.page.evaluate((i) => { document.getElementById(i).style.display = 'flex'; }, id);
+			await a.page.evaluate((i) => { document.querySelector('#' + i + ' .lpn-corner-guide').dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 })); }, id);
+			await a.settle(500);
+			const entry = await a.page.evaluate((i) => { const e = document.querySelector('[data-guide-key="box-' + i + '"]'); return e ? Array.from(e.querySelectorAll('p')).map((p) => p.textContent).join(' ') : null; }, id);
+			const want = [];
+			for (const k of HELP[id]) { want.push(await a.lang(k)); }
+			const whole = want.join(' ').split('\\n\\n').join(' ');
+			ok(id + ': its Guide entry opens with the tool\'s intro', entry !== null && entry.indexOf(whole.split('{')[0].trim()) === 0, String(entry).slice(0, 60));
+			ok(id + ': ...and holds no literal \\n', entry !== null && entry.indexOf('\\n') < 0);
+			await a.page.keyboard.press('Escape');
+			await a.settle(300);
+		}
 		ok('no uncaught page errors', a.errors.length === 0, a.errors.slice(0, 2).join(' | '));
 	} finally {
 		await a.close();
