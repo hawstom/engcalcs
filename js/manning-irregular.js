@@ -374,6 +374,83 @@ EngCalcs.pageAddCalcRow = function () {
 };
 
 EngCalcs.pointsFields = ['station', 'elevation'];
+
+// Copy writes station, elevation, bank flag and n for every row but the first (which has neither
+// of the last two), so a whole section moves between browsers. Paste takes those full rows, or
+// two columns, which move the points only: bank flags and n then follow STATIONS, never row numbers.
+EngCalcs.pointsCopyExtra = function (i) {
+	'use strict';
+	if (i === 0) { return []; }
+	return [document.getElementsByName('is_bank')[i].checked ? 'true' : 'false',
+		document.getElementsByName('n')[i].value];
+};
+
+EngCalcs.pointsSnapshot = function () {
+	'use strict';
+	var st = document.getElementsByName('station'), banks = document.getElementsByName('is_bank'),
+		ns = document.getElementsByName('n'), snap = { st: [], bankSt: [], n: [] }, i;
+	for (i = 0; i < this.numCalcRows; i += 1) {
+		snap.st.push(parseFloat(st[i].value));
+		if (i > 0) {
+			snap.n.push(ns[i].value);
+			if (banks[i].checked) { snap.bankSt.push(parseFloat(st[i].value)); }
+		}
+	}
+	return snap;
+};
+
+EngCalcs.pointsApply = function (rows) {
+	'use strict';
+	var full = rows.length > 1, i, j, k, snap, live, newSt, bankIdx = {}, best, d, mid, n, last, els;
+	for (i = 1; full && i < rows.length; i += 1) {
+		if (!/^(true|false)$/i.test(rows[i][2] || '') || (rows[i][3] || '') === '' || !isFinite(Number(rows[i][3]))) { full = false; }
+	}
+	// The section as it stands, or, when it has no segment (one point), the last one that had.
+	live = this.pointsSnapshot();
+	snap = (live.st.length > 1) ? live : (this.pointsMemo || live);
+	this.pointsMemo = (rows.length < 2 && live.st.length > 1) ? live : (rows.length < 2 ? this.pointsMemo : null);
+	while (this.numCalcRows < rows.length) { this.pageAddCalcRow(); }
+	while (this.numCalcRows > rows.length) { this.deleteSingleCalcRow(); }
+	newSt = [];
+	for (i = 0; i < rows.length; i += 1) {
+		els = document.getElementsByName('station')[i];
+		els.value = rows[i][0];
+		document.getElementsByName('elevation')[i].value = rows[i][1];
+		newSt.push(parseFloat(rows[i][0]));
+	}
+	if (full) {
+		for (i = 1; i < rows.length; i += 1) {
+			document.getElementsByName('is_bank')[i].checked = /^true$/i.test(rows[i][2]);
+			document.getElementsByName('n')[i].value = rows[i][3];
+		}
+		return;
+	}
+	// Bank flags: the point with the same station, else the nearest station (never the first point).
+	for (k = 0; k < snap.bankSt.length; k += 1) {
+		best = -1;
+		for (j = 1; j < newSt.length; j += 1) {
+			d = Math.abs(newSt[j] - snap.bankSt[k]);
+			if (best < 0 || d < Math.abs(newSt[best] - snap.bankSt[k])) { best = j; }
+		}
+		if (best > 0) { bankIdx[best] = true; }
+	}
+	// n: the old segment that covered this segment's midpoint; beyond the old ends, the end segment.
+	last = snap.st.length - 1;
+	for (i = 1; i < rows.length; i += 1) {
+		mid = (newSt[i - 1] + newSt[i]) / 2;
+		n = snap.n.length ? snap.n[snap.n.length - 1] : '0.03';
+		if (snap.n.length) {
+			if (mid <= snap.st[0]) { n = snap.n[0]; }
+			else {
+				for (j = 1; j <= last; j += 1) {
+					if (mid >= snap.st[j - 1] && mid <= snap.st[j]) { n = snap.n[j - 1]; break; }
+				}
+			}
+		}
+		document.getElementsByName('n')[i].value = n;
+		document.getElementsByName('is_bank')[i].checked = !!bankIdx[i];
+	}
+};
 EngCalcs.dataSingletonsCount = 4;
 EngCalcs.dataColumnsFirstRowCount = 2;
 EngCalcs.dataColumnsOtherRowsCount = 4;
