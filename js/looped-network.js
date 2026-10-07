@@ -35695,6 +35695,83 @@ var EngCalcs = EngCalcs || {};
 		showInpExportFlattening(out.differences, a.download);
 	}
 	/**
+	 * **EXPORT GeoJSON (ROADMAP Task 728, Tom 2026-10-06, approving Mary's order: GeoJSON out
+	 * first).** The writer is js/lpn-geojson.js and its rules are dev/geojson.md; this is the way in
+	 * (the document, the scenario on screen, the results on screen) and the way out (a download).
+	 *
+	 * **RESULTS ARE WHAT IS ON SCREEN, READ THROUGH THE MAP COLOURING'S OWN VALUE FUNCTIONS**
+	 * (colorNodeValue / colorLinkValue), so the file and the map cannot disagree about a pressure and
+	 * the result units are the ones the Results strip shows. Absent when nothing has been solved --
+	 * a stale snapshot (Recalculate off) is still what the screen shows, and the file says only
+	 * "the results on the screen".
+	 */
+	function geoJsonResults() {
+		var out = { nodes: {}, links: {}, time: (lastSolveResult && typeof lastSolveResult.t === 'number') ? lastSolveResult.t : undefined };
+		if (!lastSolveResult) { return null; }
+		doc.nodes.forEach(function (n) {
+			out.nodes[n.id] = { head: colorNodeValue(n, 'head'), pressure: colorNodeValue(n, 'pressure'),
+				demand: colorNodeValue(n, 'demandActual') };
+		});
+		doc.links.forEach(function (l) {
+			out.links[l.id] = { flowrate: colorLinkValue(l, 'flow'), headloss: colorLinkValue(l, 'headloss'),
+				unit_headloss: colorLinkValue(l, 'gradient'), velocity: colorLinkValue(l, 'velocity') };
+		});
+		return out;
+	}
+	function geoJsonExportOptions() {
+		return {
+			effective: effective,
+			coordOverride: inpExportOptions().coordOverride,
+			customProps: function (el) {
+				return customPropsFor(el).map(function (def) { return { key: def.key, value: customPropValue(el, def) }; });
+			},
+			results: geoJsonResults(),
+			scenarioName: scenarioDisplayName(activeScenario())
+		};
+	}
+	/**
+	 * **THE WRITER'S ANSWER, WITH THE COORDINATE TABLE LOADED FIRST WHEN A PROJECTED PROJECT NEEDS
+	 * IT.** The transform is fetched on demand (js/lpn-crs.js), so asking before it arrives would
+	 * refuse a project the page can in fact place. Same wait the basemap makes. `done(out)` is
+	 * called once, with the writer's result; a harness drives this half.
+	 */
+	function exportGeoJsonResult(done) {
+		function go() { done(EngCalcs.lpnExportGeoJson(serializeProject(), geoJsonExportOptions())); }
+		saveToStorage();   // export what is on screen, including edits not yet saved
+		if (isProjectedProject() && EngCalcs.lpnCrsLoad && EngCalcs.lpnCrsReady && !EngCalcs.lpnCrsReady()) {
+			EngCalcs.lpnCrsLoad(go);
+			return;
+		}
+		go();
+	}
+	function exportGeoJsonFile() {
+		exportGeoJsonResult(function (out) {
+			var pcX = EngCalcs.pageConfig || {}, fallback = {
+				local: 'A GeoJSON file holds latitude and longitude only, and this project is drawn on a local grid with no place on the Earth. Georeference it first with Map, World map, Attach, then export again.',
+				range: 'These positions are not valid latitudes and longitudes: {detail}',
+				empty: 'There is nothing to export yet. Draw or open a network first.',
+				crs: 'The coordinate system of this project ({detail}) is not known to this page, so its positions cannot be converted to latitude and longitude. Use Convert as… to copy the project into one this page knows, then export again.'
+			};
+			if (!out || !out.ok) {
+				setNotice((pcX['lpn_geojson_refused_' + (out && out.error)] || fallback[out && out.error] || fallback.empty)
+					.replace('{detail}', (out && out.detail) || '?'));
+				return;
+			}
+			var blob = new Blob([out.text], { type: 'application/geo+json' }),
+				url = URL.createObjectURL(blob), a = document.createElement('a');
+			a.href = url;
+			a.download = safeFileName(projectDisplayName(project)) + '.geojson';
+			document.body.appendChild(a);
+			a.click();
+			document.body.removeChild(a);
+			setTimeout(function () { URL.revokeObjectURL(url); }, 10000);
+			// EXPORTING IS NOT SAVING, for the reason exportInpFile() gives: no stampProjectSaved().
+			setNotice((pcX.lpn_status_inp_exported || 'Exported {file}.').replace('{file}', a.download) + ' ' +
+				(out.hasResults ? (pcX.lpn_geojson_results_in || 'The results on screen are included.')
+					: (pcX.lpn_geojson_results_out || 'No results are included, because the network is not solved.')));
+		});
+	}
+	/**
 	 * **THE EXPORT ALERT** (ROADMAP Task 465 slice 5; Tom, 2026-09-06, on a library pipe being
 	 * something a round trip loses: *"Yes. And we have to start showing an export alert."*). It is
 	 * the discipline js/lpn-inp.js already applies on IMPORT, pointed the other way: report the
@@ -41709,6 +41786,20 @@ var EngCalcs = EngCalcs || {};
 			  tip: pc.lpn_library_import_tip, fn: libImportPick }
 		];
 	}
+	// The Export fly-out, a function of its own for the reason importMenuRows() is: a harness can ask
+	// what it offers without driving a popup. **ADDING AN EXPORT IS ONE LINE HERE**, nothing in
+	// openFileMenu() changes. Each is a DOWNLOAD and never a live handle (Task 281): a file we hand
+	// over, not one this page keeps writing to, which is why Export is not a second Save as.
+	function exportMenuRows() {
+		var pc = EngCalcs.pageConfig || {};
+		return [
+			{ icon: 'save', label: pc.lpn_file_export_item_inp || 'EPANET file…',
+			  tip: pc.lpn_file_export_inp_tip, fn: exportInpFile },
+			// GeoJSON (Task 728): same verb, same kind of file.
+			{ icon: 'save', label: pc.lpn_file_export_item_geojson || 'GeoJSON file…',
+			  tip: pc.lpn_file_export_geojson_tip, fn: exportGeoJsonFile }
+		];
+	}
 	function openFileMenu(anchor) {
 		// **THE FILE MENU AND THE OPEN BUTTON TAKE THE SAME REFUSAL AS THE TAB STRIP** (Tom,
 		// 2026-09-08: *"I think the File menu and Open toolbar also must be disabled just for
@@ -41772,11 +41863,10 @@ var EngCalcs = EngCalcs || {};
 			// EPANET found each other by standing side by side -- even though the three import rows
 			// no longer stand in the flat list themselves.
 			{ icon: 'open', label: pc.lpn_file_import_menu || 'Import…', submenu: importMenuRows },
-			// The other direction (Task 281). A DOWNLOAD and never a live handle: an `.inp` is a
-			// file we hand over, not one this page keeps writing to -- the same reason Import is a
-			// separate row from Open rather than a second file type on it.
-			{ icon: 'save', label: pc.lpn_file_export_inp || 'Export EPANET file…',
-			  tip: pc.lpn_file_export_inp_tip, fn: exportInpFile },
+			// **AN EXPORT SUBMENU (Tom, 2026-10-06: "it's time to put all the exports into a
+			// submenu")**, the twin of Import above it and built the same way. Each row keeps its
+			// handler and tip; see exportMenuRows(), where a new export is one line.
+			{ icon: 'save', label: pc.lpn_file_export_menu || 'Export…', submenu: exportMenuRows },
 		].concat([
 			{ separator: true },
 			// **The menu says Save and Save as… in every browser**, never "Download a copy": the

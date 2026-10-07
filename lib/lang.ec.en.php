@@ -2058,6 +2058,11 @@ $ec_lang['lpn_file_import_inp_tip']='Create a new project from an EPANET file, e
 // The other direction (Task 281). A DOWNLOAD, so the word is Export rather than Save: this page
 // keeps no handle on an `.inp` and never writes back to one.
 $ec_lang['lpn_file_export_inp']='Export EPANET file…';
+// File > Export is a submenu (Tom, 2026-10-06), so its rows drop the verb the heading carries. The
+// two keys above are what the rows were called before it.
+$ec_lang['lpn_file_export_menu']='Export…';
+$ec_lang['lpn_file_export_item_inp']='EPANET file…';
+$ec_lang['lpn_file_export_item_geojson']='GeoJSON file…';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_file_export_inp_tip']='Download this network as an EPANET .inp file. Anything the .inp format cannot hold is listed for you afterwards.';
 $ec_lang['lpn_status_inp_exported']='Exported {file}.';
@@ -2065,6 +2070,17 @@ $ec_lang['lpn_status_inp_exported']='Exported {file}.';
 // the failure this whole feature exists to prevent.
 $ec_lang['lpn_inp_export_differences']='{n} things the .inp format cannot hold.';
 $ec_lang['lpn_inp_export_refused']='This project cannot be written as an EPANET file: {detail}';
+// GeoJSON export (Task 728). The command is worded like Export EPANET file. Positions in a GeoJSON
+// file are always longitude and latitude (RFC 7946), so a project with no place on the Earth is
+// refused and told how to get one, never written with an invented coordinate system.
+$ec_lang['lpn_file_export_geojson']='Export GeoJSON file…';
+$ec_lang['lpn_file_export_geojson_tip']='Download this network as a GeoJSON file for QGIS, ArcGIS Pro and other GIS programs. Junctions, tanks and reservoirs are points, and pipes, pumps and valves are lines that follow their vertices. Positions are latitude and longitude. Results are included only when the network has been solved.';
+$ec_lang['lpn_geojson_refused_local']='A GeoJSON file holds latitude and longitude only, and this project is drawn on a local grid with no place on the Earth. Georeference it first with Map, World map, Attach, then export again.';
+$ec_lang['lpn_geojson_refused_range']='These positions are not valid latitudes and longitudes: {detail}';
+$ec_lang['lpn_geojson_refused_crs']='The coordinate system of this project ({detail}) is not known to this page, so its positions cannot be converted to latitude and longitude. Use Convert as… to copy the project into one this page knows, then export again.';
+$ec_lang['lpn_geojson_refused_empty']='There is nothing to export yet. Draw or open a network first.';
+$ec_lang['lpn_geojson_results_in']='The results on screen are included.';
+$ec_lang['lpn_geojson_results_out']='No results are included, because the network is not solved.';
 $ec_lang['lpn_inp_bad_file']='That file could not be read as an EPANET network file.';
 // EPANET has two file formats. This one is about the BINARY .net that its Windows program saves;
 // the way out named here always works, so keep the instruction in the message rather than leaving
