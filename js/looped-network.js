@@ -55915,6 +55915,29 @@ var EngCalcs = EngCalcs || {};
 	 * fix `dev/scenario-seam-repair.md` argues for: one write seam, not two callers each trusted
 	 * to remember the other half.
 	 */
+	// **EVERY ELEMENT ON THE MAP THAT ANSWERS TO AN ID ANSWERS TO THE NEW ONE** (Tom, 2026-10-07,
+	// Task 775: *"Labels edited in Properties repeatedly went zombie in that session"*). A rename
+	// keeps the drawn elements and rekeys their holder, so each element's own `data-*` id has to
+	// follow, because that is what a pointer press reads. Only the disc and the grab band (a node)
+	// and the bend handles (a link) used to: the label and its grab path kept naming the old id, so
+	// the label showed the new name and followed its element while a drag threw on a node that no
+	// longer exists and a click opened nothing; a renamed pipe's own line, band and symbol stopped
+	// answering a click too. The same parts removeLinkEls() tears down, so keep the two in step.
+	// `dev/lpn-spike/rename-label-zombie-harness.js`.
+	function retagNodeEls(ne, id) {
+		if (!ne) { return; }
+		[ne.circle, ne.hit].forEach(function (e) { if (e) { e.setAttribute('data-node', id); } });
+		[ne.text, ne.lblHit].forEach(function (e) { if (e) { e.setAttribute('data-nodelbl', id); } });
+	}
+	function retagLinkEls(le, id) {
+		if (!le) { return; }
+		[le.line, le.hit, le.symbolHit].concat(le.handles || [], le.arrows || []).forEach(function (e) {
+			if (e) { e.setAttribute('data-link', id); }
+		});
+		var lbl = [le.text, le.lblHit];
+		(le.repeats || []).forEach(function (r) { lbl.push(r.text, r.lblHit); });
+		lbl.forEach(function (e) { if (e) { e.setAttribute('data-linklbl', id); } });
+	}
 	function applyNodeRename(oldId, newId) {
 		var n = nodeById(oldId);
 		n.id = newId;
@@ -55927,8 +55950,7 @@ var EngCalcs = EngCalcs || {};
 		nodeEls[newId] = nodeEls[oldId]; delete nodeEls[oldId];
 		incidentLinks[newId] = incidentLinks[oldId]; delete incidentLinks[oldId];
 		labelsByAnchor[newId] = labelsByAnchor[oldId]; delete labelsByAnchor[oldId];
-		nodeEls[newId].circle.setAttribute('data-node', newId);
-		if (nodeEls[newId].hit) { nodeEls[newId].hit.setAttribute('data-node', newId); }
+		retagNodeEls(nodeEls[newId], newId);
 		doc.links.forEach(function (l) {
 			if (l.from === oldId) { l.from = newId; }
 			if (l.to === oldId) { l.to = newId; }
@@ -55985,7 +56007,7 @@ var EngCalcs = EngCalcs || {};
 		// silently takes its demand out of the answers.
 		customersByLink[newId] = customersByLink[oldId] || []; delete customersByLink[oldId];
 		(doc.customers || []).forEach(function (c) { if (c.link === oldId) { c.link = newId; } });
-		linkEls[newId].handles.forEach(function (h) { h.setAttribute('data-link', newId); });
+		retagLinkEls(linkEls[newId], newId);
 		// **THE DEFECT TASK 533 WAS OPENED FOR.** `incidentLinks` is keyed by NODE and holds LINK
 		// ids, so a link rename does not rekey it -- it has to rewrite the ids inside two of its
 		// arrays. Left out, the index still held the old id, and updateNode() walks that list into
