@@ -3932,3 +3932,10 @@ OBSERVED (real Chrome on a scratch copy with a test hook, this tree; re-verify b
 - MISSED (low): Recalculate off, pump -> pipe shows velocity 0.00 and head loss 204 ft / gradient 2043% invented from stale numbers.
 - Pipe with scenario type override -> valve: that scenario's diameter silently reverts to Base's.
 Method note: scratch copy served by php -S, injected EngCalcs.__t; playwright from ~/.npm/_npx; lock via flock.
+
+## 2026-10-07 Perry: re-check of feat/bentley-interop @ 6f191a40
+OBSERVED (real Chromium, Net1 and Net3 lat/lon; re-verify before citing):
+- My three defects FIXED: Clear override on Friction method clears method, default roughness and roughness label decimals together, one undo restores all three; the H-W note reads "Base: 100" (no unit). Typed Bef./Aft./Separator text keeps the whole string and marks live, notes quote Base's real text (Bef.: Q=). Latitude 122, -95, 90.5, "abc" refused (silent revert, no dialog); longitude 190 refused; centre moved off the network shows "Your network is intact." with Zoom to fit.
+- Tom's notes: 205 of 244 Settings-table rows matched their box section and sub-heading by label, 0 genuine mismatches (4 were same-name label collisions); an override typed in the box shows in the table within 400 ms with Show scenarios off, with the amber wash.
+- Change type seam: junction 12 with a Peak demand override of 333 to Tank lists "12: Base demand 333 gpm, in scenario Peak", override count 1 to 0, undo restores 1 and the 333.
+NOT CHECKED: how any of it looks beyond reading screenshots.
