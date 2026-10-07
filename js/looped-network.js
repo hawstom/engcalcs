@@ -1409,10 +1409,12 @@ var EngCalcs = EngCalcs || {};
 		var l = linkById(id), le = linkEls[id]; if (!le) { return; }
 		// Set BEFORE anything is placed, so every station obeys it.
 		le.hiddenShort = linkLabelTooShort(l, le);
-		// FOUR WAYS A LINK LABEL IS NOT DRAWN, ONE SEAM: too long for its own segment, shed out and
-		// still in conflict, standing on ground a node label has just taken (yieldStationedLabels()),
+		// FIVE WAYS A LINK LABEL IS NOT DRAWN, ONE SEAM: too long for its own segment, shed out and
+		// still in conflict, no clear station on its pipe (placeStationedLabels()), standing on
+		// ground a node label has just taken (yieldStationedLabels()),
 		// or the losing half of a crossing nothing could repair (shedCrossingLabels(), Task 539).
-		var hideAll = le.hiddenShort || !!le.hiddenCrowded || !!le.hiddenYielded || !!le.hiddenCrossed;
+		var hideAll = le.hiddenShort || !!le.hiddenCrowded || !!le.hiddenBlocked || !!le.hiddenYielded ||
+			!!le.hiddenCrossed;
 		setLabelAssemblyHidden(le, hideAll);
 		var single = linkLabelStations(l).length === 1,
 			stations = perfDebugAccum('  lkL:stations', function () {
@@ -1768,7 +1770,7 @@ var EngCalcs = EngCalcs || {};
 	// freedom: an aligned label gave up sideways movement by lying on its pipe, a chain gave up its
 	// station by being evenly spaced -- move one link of the chain and the regular spacing that makes
 	// it read as one repeated name is gone.
-	function placeStationedLabels(list, obs, fs) {
+	function placeStationedLabels(list, obs, fs, hideBlocked) {
 		var pad = fs * LPN_ALIGNED_PAD_FRAC;
 		list.map(function (l) {
 			return { l: l, len: Geom.polylineLength(linkPointList(l)) };
@@ -1805,6 +1807,16 @@ var EngCalcs = EngCalcs || {};
 				le.alignedAlong = best;
 				le.forceSide = undefined;
 				le.stationSides = [];
+				// **NO CLEAR STATION, EVEN TOUCHING, MEANS HIDE -- NEVER THE MIDDLE.** The middle is
+				// only the fallback for the PREDICTION, which must reserve something. On the real pass
+				// the middle of a short pipe lies on its own end junctions, and the shed cannot have
+				// ruled that out: it tests every station against the boxes IT placed, and the slide's
+				// earlier labels sit elsewhere (the label bench, 2026-10-07: 204 pipe labels over node
+				// symbols on plain networks). A hidden label is not drawn and reserves nothing.
+				// **ITS OWN FLAG, CLEARED BY THE CALLER EVERY PASS**, not `hiddenCrowded`: that one is
+				// the shed's and survives drag frames, so writing it here would let one pass hide a
+				// label for every pass after it (labelFlipProbe() reruns this and expects no change).
+				if (!clear && hideBlocked) { le.hiddenBlocked = true; return; }
 				boxes.push(bestBox);
 			} else {
 				// A chain's stations are fixed by the spacing rule, so there is nothing to search
@@ -2132,7 +2144,7 @@ var EngCalcs = EngCalcs || {};
 				var le = linkEls[l.id]; return le && le.hiddenShort;
 			}).length,
 			hidCrowd = doc.links.filter(function (l) {
-				var le = linkEls[l.id]; return le && le.hiddenCrowded && !le.hiddenShort;
+				var le = linkEls[l.id]; return le && (le.hiddenCrowded || le.hiddenBlocked) && !le.hiddenShort;
 			}).length;
 		drawCollisionBoxes(lineBoxes, obs, placed.map(function (r) { return r.leader; }).filter(Boolean));
 		if (!debugOn('labels')) { return; }
@@ -2759,6 +2771,7 @@ var EngCalcs = EngCalcs || {};
 		});
 		doc.links.forEach(function (l) {
 			var le = linkEls[l.id]; if (!le) { return; }
+			le.hiddenBlocked = false;   // placeStationedLabels()'s own decision, made again below
 			// A label nobody can see is not an obstacle. Skipping it here also clears its nudge, so
 			// zooming back in restores it where it belongs rather than where it was last pushed.
 			if (linkLabelTooShort(l, le)) { le.nudge = { x: 0, y: 0 }; return; }
@@ -2766,8 +2779,13 @@ var EngCalcs = EngCalcs || {};
 			// goes to placeStationedLabels(), which commits it as an obstacle at the placement the
 			// drawing really uses, rotated as it is really drawn. The nudge is cleared for it too: a
 			// nudge is measured from the half-way point, and a chain is not drawn there.
+			//
+			// **A LABEL THE SHED HID IS NOT IN THE WAY.** It is not drawn, so committing its box made
+			// the next pipe's slide find no clear station for something nobody can see.
 			if (linkLabelAligned(l) || linkLabelStations(l).length > 1) {
-				stationed.push(l); le.nudge = { x: 0, y: 0 }; return;
+				le.nudge = { x: 0, y: 0 };
+				if (!le.hiddenCrowded) { stationed.push(l); }
+				return;
 			}
 			addDataLabel(linkLabelKey(l.id), le, linkLabelMid(l), linkLabelBase(l),
 				l.lx !== undefined, le.lineCount);
@@ -2777,7 +2795,7 @@ var EngCalcs = EngCalcs || {};
 		// unplaced. A link label is bound to its pipe and has the fewest choices, so it chooses while
 		// it can; when something has to go it is the link, yielding by SHEDDING values in
 		// shedAlignedForConflicts(), which has already run by the time this pass places anything.
-		placeStationedLabels(stationed, obs, fs);
+		placeStationedLabels(stationed, obs, fs, true);
 		rankNodeLabels(nodeLabels);
 		// **NO REPAIR PASS: a node label never takes a blocking link label's ground and hides it
 		// WHOLE.** shedAlignedForConflicts() makes the link label give up VALUES for the node label
@@ -3401,25 +3419,29 @@ var EngCalcs = EngCalcs || {};
 	//
 	// **PHASE 2 COLLAPSED THE QUESTION FROM THREE ANSWERS TO TWO** (Tom's interface specification,
 	// 2026-09-13). lat/lon is not a third kind beside "projected"; it IS a projection, and the
-	// register names it -- EPSG:3857, WGS 84 / Pseudo-Mercator, which is the frame this page has
-	// drawn in since the projection seam landed. So the catalogue carries it, the New-project box
-	// offers one "geographic projection" radio over the whole list, and EPSG:3857 is the answer
+	// register names it -- EPSG:4326, WGS 84. So the catalogue carries it, the New-project box
+	// offers one "geographic projection" radio over the whole list, and EPSG:4326 is the answer
 	// that produces exactly the lat/lon project this page has always made -- basemap, place-name
-	// search, terrain elevations and all. Everything else in the catalogue is a plane we hold the
-	// user's own eastings and northings in without converting them.
+	// search, terrain elevations and all. Everything else in the catalogue, EPSG:3857 included
+	// since Task 775, is a plane we hold the user's own eastings and northings in without
+	// converting them.
 
-	// **EPSG:3857 IS THE GEOGRAPHIC ANSWER AND IS NEVER STORED AS `project.crs`.** It names the
-	// drawing frame of a lon/lat document, and a document that stated it as a projected plane would
-	// be claiming its numbers are metres. isLatLonProject() is the one thing that answers "is this
-	// document lon/lat", and this constant is only ever the code the CHOOSER hands back.
-	var LPN_CRS_WEBMERC = 'EPSG:3857';
-	// **WGS 84 ITSELF, THE OTHER GEOGRAPHIC ANSWER** (Tom, 2026-09-25: EPSG:4326 was missing from
-	// the chooser and must be an ordinary, unmodified-name option). Its own stored numbers are the
-	// same longitude and latitude degrees LPN_CRS_WEBMERC already means here, so picking either one
-	// makes the identical lat/lon project -- crsIsLatLonCode() is where that equivalence is stated,
-	// and crsBoxOk() is where a 4326 pick is folded onto LPN_CRS_WEBMERC before anything reads it.
+	// **EPSG:4326 IS THE lat/lon PROJECT, AND IT IS NEVER STORED AS `project.crs`.** A lat/lon
+	// document states `project.coords`, and isLatLonProject() is the one thing that answers "is this
+	// document lon/lat"; this constant is only ever the code the CHOOSER hands back for it.
 	var LPN_CRS_GEOWGS84 = 'EPSG:4326';
-	function crsIsLatLonCode(code) { return code === LPN_CRS_WEBMERC || code === LPN_CRS_GEOWGS84; }
+	var LPN_CRS_LATLON = LPN_CRS_GEOWGS84;
+	// **EPSG:3857 IS A PROJECTED SYSTEM LIKE ANY OTHER** (Task 775; Tom, 2026-10-07: *"Make 3857
+	// real. They aren't the same thing, and some pedantic people will notice if 3857 is missing or
+	// doesn't work."*). Until then a 3857 pick was folded onto the lat/lon project (R-218), so the
+	// row named metres and made degrees. Now it is stored as `project.crs` and its numbers are Web
+	// Mercator x and y in metres, exactly as a UTM project's are eastings and northings. Its
+	// transform is closed-form in js/lpn-crs.js (no proj4, no download), and because its map
+	// distances exceed ground distances by 1/cos(latitude), every length read off its coordinates
+	// is a geodesic one -- see isWebMercProject().
+	var LPN_CRS_WEBMERC = 'EPSG:3857';
+	function crsIsLatLonCode(code) { return code === LPN_CRS_LATLON; }
+	function isWebMercProject() { return isProjectedProject() && projectCrsCode() === LPN_CRS_WEBMERC; }
 	// **A PROJECTION'S NAME IS NOT A LANGUAGE KEY**, for the reason the OpenStreetMap credit is not
 	// one: "WGS 84 / UTM zone 12N" is the EPSG register's own name for a registered thing, it names
 	// rather than describes, and a GIS reader in any language looks for exactly those characters.
@@ -3588,14 +3610,14 @@ var EngCalcs = EngCalcs || {};
 	function crsFamilyName(f, z) { return f.name.replace('{z}', String(z)); }
 	function crsCatalogue() {
 		var out = [], i, f, z;
-		// FIRST, because it is the commonest answer and the one Tom's own tip points at.
-		out.push({ code: LPN_CRS_WEBMERC, name: 'WGS 84 / Pseudo-Mercator' });
-		// **AND EPSG:4326 RIGHT BESIDE IT** (Tom, 2026-09-25), the register's own name for the plain
-		// longitude/latitude CRS this page's own lat/lon project actually stores. Both entries lead
-		// to the identical project -- crsIsLatLonCode() -- so neither is a projected CRS the register
-		// list below could duplicate.
+		// FIRST, because it is the commonest answer and the suggested one (Task 775): the plain
+		// longitude/latitude CRS this page's lat/lon project stores, marked as suggested in the list
+		// by crsOptionText().
 		out.push({ code: LPN_CRS_GEOWGS84, name: 'WGS 84' });
-		// The register, once it is here. Pseudo-Mercator is already first and is a live projected
+		// **AND EPSG:3857 RIGHT BESIDE IT**, Web Mercator, which since Task 775 makes a projected
+		// project in metres rather than a second door to the lat/lon one.
+		out.push({ code: LPN_CRS_WEBMERC, name: 'WGS 84 / Pseudo-Mercator' });
+		// The register, once it is here. Pseudo-Mercator is already listed and is a live projected
 		// CRS like any other, so it is skipped rather than offered twice. EPSG:4326 is geographic,
 		// not projected, so the register (projected CRS only) never carries it and needs no skip.
 		if (crsRegisterReady()) {
@@ -3730,9 +3752,10 @@ var EngCalcs = EngCalcs || {};
 	function assignProjectCrs(code) {
 		if (!project || !code) { return false; }
 		if (isLatLonProject()) { return false; }
-		// **EPSG:3857 AND EPSG:4326 ARE BOTH THE GEOGRAPHIC ANSWER, NOT A PROJECTED ONE.** Choosing
-		// either in the box makes a lon/lat project, and newProject() takes that branch; if either
-		// ever reached here it would write a document claiming its longitudes were metres.
+		// **EPSG:4326 IS THE GEOGRAPHIC ANSWER, NOT A PROJECTED ONE.** Choosing it in the box makes a
+		// lon/lat project, and newProject() takes that branch; if it ever reached here it would write
+		// a document claiming its longitudes were metres. EPSG:3857 is a projected answer like UTM
+		// (Task 775) and is accepted here.
 		if (crsIsLatLonCode(String(code))) { return false; }
 		if (project.crs) { return false; }
 		if (doc && ((doc.nodes && doc.nodes.length) || (doc.links && doc.links.length) ||
@@ -3740,7 +3763,7 @@ var EngCalcs = EngCalcs || {};
 		project.crs = String(code);
 		return true;
 	}
-	// What the status strip says this project is drawn in. EPSG:3857 names itself for a geographic
+	// What the status strip says this project is drawn in. WGS 84 (EPSG:4326) names a geographic
 	// project, and an unprojected grid is a plane the user declared the meaning of that sits nowhere
 	// on the Earth -- which is a fact worth printing rather than leaving blank.
 	/**
@@ -3755,11 +3778,11 @@ var EngCalcs = EngCalcs || {};
 	 */
 	function crsDisplayName() {
 		var pc = EngCalcs.pageConfig || {}, code;
-		// **R-218: NEVER "WGS 84 / Pseudo-Mercator (EPSG:3857)" HERE.** That is the catalogue's own
-		// name for the code this page uses internally to mark a lat/lon project (comment at
-		// LPN_CRS_WEBMERC's declaration), and showing it verbatim told Tom the stored numbers were
-		// projected metres when they are longitude and latitude degrees (R-188). This is the one
-		// place that names a lat/lon project's coordinate system, and it says what the numbers are.
+		// **R-218: A lat/lon PROJECT IS NEVER NAMED "WGS 84 / Pseudo-Mercator (EPSG:3857)".** That
+		// told Tom the stored numbers were projected metres when they are longitude and latitude
+		// degrees (R-188). Since Task 775 EPSG:3857 is a real projected project of its own, named
+		// by the projected branch below. This is the one place that names a lat/lon project's
+		// coordinate system, and it says what the numbers are.
 		//
 		// **THROUGH THE CATALOGUE'S OWN EPSG:4326 ENTRY, NOT A SEPARATE STRING** (Tom, 2026-09-25,
 		// closing R-218's own key: "probably no longer needed since we are not changing any of the
@@ -7513,11 +7536,14 @@ var EngCalcs = EngCalcs || {};
 	function scaleBarUnitsPerPx() {
 		var probe = 100, a, b, metres;
 		if (!svg || !state.s || !isFinite(state.s) || state.s <= 0) { return null; }
-		if (!isLatLonProject()) {
+		if (!isLatLonProject() && !isWebMercProject()) {
 			// A grid project's world unit IS the display length unit, so there is nothing to ask.
 			return 1 / state.s;
 		}
 		if (!Geom || !Geom.geodesicMeters) { return null; }
+		// A Web Mercator project (Task 775): measured on the ground like a lat/lon one, because a
+		// Mercator metre is a ground metre only at the equator.
+		if (isWebMercProject()) { return scaleBarWebMercUnitsPerPx(probe); }
 		// The bar sits at the bottom left, so it is measured there: same latitude, two points the
 		// probe width apart. y is whatever the bottom of the canvas is; x starts at the left.
 		var r = svg.getBoundingClientRect();
@@ -7532,6 +7558,20 @@ var EngCalcs = EngCalcs || {};
 		// of the screen, and Mercator has pinned the poles besides. Measured in degrees of
 		// longitude because that is what the frame's x axis IS.
 		if (r.width / state.s > SCALEBAR_MAX_DEGREES) { return null; }
+		metres = Geom.geodesicMeters(a.lon, a.lat, b.lon, b.lat);
+		if (!isFinite(metres) || metres <= 0) { return null; }
+		return toDisplay(metres / probe, 'lpn_u_length');
+	}
+
+	// The scale bar of a Web Mercator project: the same probe at the bottom left, its two ends taken
+	// to longitude and latitude through drawLonLat(), and the same whole-window test in degrees.
+	function scaleBarWebMercUnitsPerPx(probe) {
+		var r = svg.getBoundingClientRect(), w0, w1, a, b, metres;
+		if (!r || !r.width) { return null; }
+		w0 = screenToWorld(r.left, r.bottom); w1 = screenToWorld(r.left + probe, r.bottom);
+		a = drawLonLat(w0.x, w0.y); b = drawLonLat(w1.x, w1.y);
+		if (!a || !b || !isFinite(a.lat) || !isFinite(b.lon)) { return null; }
+		if (Math.abs(b.lon - a.lon) * r.width / probe > SCALEBAR_MAX_DEGREES) { return null; }
 		metres = Geom.geodesicMeters(a.lon, a.lat, b.lon, b.lat);
 		if (!isFinite(metres) || metres <= 0) { return null; }
 		return toDisplay(metres / probe, 'lpn_u_length');
@@ -8287,8 +8327,21 @@ var EngCalcs = EngCalcs || {};
 	// of a number anybody typed. Getting that wrong is silent: a 1200 ft pipe comes back as 366 and
 	// looks like a units bug in the solver.
 
+	// **A WEB MERCATOR PROJECT IS MEASURED ON THE GROUND TOO** (Task 775). Its x and y are metres,
+	// but Mercator metres: a map distance exceeds the ground distance by 1/cos(latitude), 31% at
+	// 40 degrees. So each vertex is taken back to longitude and latitude (drawLonLat(), the closed
+	// form in js/lpn-crs.js) and the polyline is measured with the same geodesicPolylineMeters()
+	// as a lat/lon project, never hypot() on the plane.
 	function linkGeomLength(l) {
-		var pts = linkPointList(l);
+		var pts = linkPointList(l), ll, bad = false;
+		if (isWebMercProject()) {
+			ll = pts.map(function (p) {
+				var q = drawLonLat(p.x, p.y);
+				if (!q) { bad = true; return { x: 0, y: 0 }; }
+				return { x: q.lon, y: q.lat };
+			});
+			if (!bad) { return Geom.geodesicPolylineMeters(ll) * unitFactor('lpn_u_length'); }
+		}
 		if (!isLatLonProject()) { return Geom.polylineLength(pts); }
 		return Geom.geodesicPolylineMeters(pts.map(function (p) {
 			return { x: outwardX(p.x), y: outwardY(p.y) };
@@ -11464,7 +11517,14 @@ var EngCalcs = EngCalcs || {};
 	// ground distance at a given latitude -- which is what lets a meter be drawn as a SQUARE in
 	// world units and still be square on the screen.
 	function metresPerWorldUnit(x, y) {
-		var f, d = 0.001, m, lon, lat;
+		var f, d = 0.001, m, lon, lat, a, b;
+		// A Web Mercator project (Task 775): a world unit is a Mercator metre, which is cos(latitude)
+		// of a ground metre. Measured, as below, rather than a cosine typed out a second time.
+		if (isWebMercProject() && Geom && Geom.geodesicMeters) {
+			a = drawLonLat(x, y); b = drawLonLat(x + 1, y);
+			m = (a && b) ? Geom.geodesicMeters(a.lon, a.lat, b.lon, b.lat) : NaN;
+			if (isFinite(m) && m > 0) { return m; }
+		}
 		if (!isLatLonProject()) {
 			f = unitFactor('lpn_u_length');
 			return (f && isFinite(f)) ? 1 / f : 1;
@@ -12707,6 +12767,12 @@ var EngCalcs = EngCalcs || {};
 	// with the same geodesic a pipe's Auto length is measured with.
 	function customerOffsetUnitsPerDrawn(c) {
 		var l = customerLink(c), an, n;
+		// Web Mercator (Task 775): one scale at a point serves every direction, to well within the
+		// accuracy of an offset (the sphere-on-ellipsoid departure is a fraction of a percent).
+		if (l && isWebMercProject()) {
+			an = Geom.pointAlongPolyline(linkPointList(l), customerT(c));
+			return metresPerWorldUnit(an.x, an.y) * unitFactor('lpn_u_length');
+		}
 		if (!l || !isLatLonProject()) { return 1; }
 		an = Geom.pointAlongPolyline(linkPointList(l), customerT(c));
 		n = linkNormalAt(l, customerT(c));
@@ -15218,6 +15284,64 @@ var EngCalcs = EngCalcs || {};
 		});
 	}
 
+	// ---- placing an attached image by the file's own [BACKDROP] DIMENSIONS (Task 282) ----
+	//
+	// EPANET 2.2 manual, [BACKDROP]: DIMENSIONS is the lower-left and upper-right corners (LLx LLy
+	// URx URy) of the map's bounding rectangle, and OFFSET is the X and Y distance of the image's
+	// upper-left corner from the rectangle's upper-left corner. The EXACT rule is EPANET's own source,
+	// Delphi_GUI/epanet2w/Umap.pas, TMap.GetBackdropBounds (https://github.com/USEPA/EPANET2.2):
+	//     x0 := LowerLeft.X + Offset.X;   y0 := UpperRight.Y - Offset.Y;
+	//     w := UpperRight.X - LowerLeft.X;  h := UpperRight.Y - LowerLeft.Y;
+	//     if AspectRatio > 1 then h := w/AspectRatio else w := h*AspectRatio;
+	// with AspectRatio = picture width / picture height (TMap.DrawBackdrop), and the picture is drawn
+	// from (x0, y0) rightward by w and DOWNWARD by h. So the Y offset is SUBTRACTED from the top edge
+	// (Fmap.pas EndPanning: "Y-offset is measured relative to upper right corner"), a landscape
+	// picture fills the rectangle's width and a portrait or square one fills its height, aspect kept.
+	// Followed literally, including that a picture wider than 1:1 but narrower than the rectangle runs
+	// past its bottom edge: that is where EPANET draws it. Returns false when there is no usable
+	// rectangle.
+	function placeBackdropByDimensions(dims, offset) {
+		if (!backdrop || !backdrop.width || !backdrop.height || !dims || dims.length !== 4) { return false; }
+		var ox = offset ? offset[0] : 0, oy = offset ? offset[1] : 0, ar = backdrop.width / backdrop.height,
+			x0 = inwardX(dims[0] + ox), yTop = inwardY(dims[3] - oy),
+			// The rectangle's size is taken in the DRAWING frame (a geographic project draws in
+			// Mercator, so a degree of latitude is not a degree of longitude on the screen).
+			w = inwardX(dims[2]) - inwardX(dims[0]), h = inwardY(dims[1]) - inwardY(dims[3]);
+		if (!(w > 0) || !(h > 0) || !isFinite(w) || !isFinite(h)) { return false; }
+		if (ar > 1) { h = w / ar; } else { w = h * ar; }
+		backdrop.s = w / backdrop.width;
+		backdrop.tx = x0 - backdrop.x * backdrop.s;
+		backdrop.ty = yTop - backdrop.y * backdrop.s;
+		applyBackdropTransform();
+		saveToStorage();
+		return true;
+	}
+	// The picture an imported .inp names, handed over by the user. The SAME door Add uses
+	// (addBackdropFromDataUrl), then the file's rectangle. Reports through `say`.
+	function attachNamedBackdrop(bd, file, say) {
+		var pc = EngCalcs.pageConfig || {}, reader = new FileReader(),
+			named = String(bd.file).split(/[\\\/]/).pop();
+		reader.onload = function (ev) {
+			addBackdropFromDataUrl(ev.target.result, function () {
+				placeBackdropByDimensions(bd.dimensions, bd.offset);
+				var msg = (file.name.toLowerCase() === named.toLowerCase()
+					? (pc.lpn_inp_backdrop_attached || 'Attached {file}, placed where the file says it belongs.')
+					: (pc.lpn_inp_backdrop_attached_other || 'Attached {picked}, placed where the file says it belongs. The file names {file}, which is a different name.'))
+					.replace('{picked}', file.name).replace('{file}', named);
+				say(msg);
+			});
+		};
+		reader.readAsDataURL(file);
+	}
+	EngCalcs.lpnBackdropProbe = function () {
+		var inp = EngCalcs.lpnExportInp(serializeProject(), inpExportOptions()).inp, m = /\[BACKDROP\]([^\[]*)/.exec(inp);
+		return {
+			corners: backdrop ? [outwardX(backdrop.tx), outwardY(backdrop.ty + backdrop.height * backdrop.s),
+				outwardX(backdrop.tx + backdrop.width * backdrop.s), outwardY(backdrop.ty)] : null,
+			section: m ? m[1] : null
+		};
+	};
+
 	// ---- pixel size, typed rather than picked (Task 276) ----
 	// Picking is the coarse step; this is the correction. `backdrop.s` scales the PLACEMENT BOX, not
 	// the image's own pixels, so the number a user thinks in -- ground distance per ORIGINAL image
@@ -17343,7 +17467,7 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {};
 		if (georef) { return; }
 		// **A lat/lon PROJECT IS NOT A REASON TO REFUSE** (Task 696; Tom, 2026-09-23: the wizard
-		// *"exits with the message 'This project is already on lat/lon'"*). lat/lon is EPSG:3857 on
+		// *"exits with the message 'This project is already on lat/lon'"*). lat/lon is EPSG:4326 on
 		// this page, one coordinate system among hundreds, so being on it says nothing about whether
 		// somebody may convert to another. It says where the network already is, so the wizard opens
 		// with that answer in place rather than asking the question again from the whole world.
@@ -35582,6 +35706,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// as literals because LPN_NOTESBOX_KEY and LPN_HOTKEYSBOX_KEY are declared later in this
 			// file, the same reason 'lpn_show_titles' below is a literal.
 			'lpn_notesbox', 'lpn_hotkeysbox',
+			// 'lpn_snipbox' (the Screenshot box and its magnification) joined the day it was written.
+			'lpn_snipbox',
 			// AREA_HINT_KEY joined 2026-09-09, having been missed on the day it was written.
 			// dev/cookie-storage-inventory.md already filed it beside PAGE_TITLES_KEY as a reading
 			// preference set deliberately on this screen, so the document and the code disagreed
@@ -37785,32 +37911,282 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			}
 		};
 	}
-	function exportInpFile() {
-		var pcX = EngCalcs.pageConfig || {}, out;
-		saveToStorage();   // export what is on screen, including edits not yet saved
-		out = EngCalcs.lpnExportInp(inpExportDocument(), inpExportOptions());
-		if (!out || !out.ok) {
-			setNotice((pcX.lpn_inp_export_refused || 'This project cannot be written as an EPANET file: {detail}')
-				.replace('{detail}', (out && out.detail) || '?'));
-			return;
+	// **A 24-BIT WINDOWS BMP, BECAUSE THAT IS WHAT EPANET OPENS** (dev/backdrop-export.md). EPANET
+	// 2.2's backdrop is a Delphi TPicture loaded from the named file (Umap.pas GetBackdrop), its
+	// picker offers *.bmp, *.emf and *.wmf only (Fmain.dfm OpenPictureDialog), and none of its
+	// units links a PNG or JPEG reader, so a PNG named in FILE is "could not read backdrop" there.
+	// Bottom-up rows padded to four bytes, BGR, 72 dpi. A transparent pixel is laid on white, the
+	// colour of EPANET's map behind it, because BMP has no transparency EPANET draws.
+	function encodeBmp24(imageData) {
+		var w = imageData.width, h = imageData.height, src = imageData.data,
+			rowSize = Math.ceil(w * 3 / 4) * 4, size = 54 + rowSize * h,
+			buf = new ArrayBuffer(size), dv = new DataView(buf), out = new Uint8Array(buf), x, y, i, o, a;
+		out[0] = 0x42; out[1] = 0x4d;
+		dv.setUint32(2, size, true); dv.setUint32(10, 54, true); dv.setUint32(14, 40, true);
+		dv.setInt32(18, w, true); dv.setInt32(22, h, true); dv.setUint16(26, 1, true); dv.setUint16(28, 24, true);
+		dv.setUint32(34, rowSize * h, true); dv.setInt32(38, 2835, true); dv.setInt32(42, 2835, true);
+		for (y = 0; y < h; y++) {
+			o = 54 + (h - 1 - y) * rowSize;
+			for (x = 0; x < w; x++) {
+				i = (y * w + x) * 4; a = src[i + 3] / 255;
+				out[o++] = Math.round(src[i + 2] * a + 255 * (1 - a));
+				out[o++] = Math.round(src[i + 1] * a + 255 * (1 - a));
+				out[o++] = Math.round(src[i] * a + 255 * (1 - a));
+			}
 		}
-		var blob = new Blob([out.inp], { type: 'text/plain' }),
-			url = URL.createObjectURL(blob), a = document.createElement('a');
+		return out;
+	}
+	// **THE PICTURE AND ITS WORLD FILE, FOR THE .inp BESIDE THEM.** Calls back with
+	// { bmp: Uint8Array, world: text }, null when there is no picture, or false when there is one
+	// this page cannot read back (undecodable, or a canvas the browser will not let us read).
+	// The picture goes out at its own stored pixels with nothing drawn in (Tom's rule for a
+	// screenshot: exactly what was there, no credit added), at full strength: the map's backdrop
+	// opacity is a display setting, not part of the picture.
+	//
+	// The world file (six lines A, D, B, E, C, F; C and F are the CENTRE of the upper-left pixel,
+	// Esri, "World files for raster datasets") is in the frame the .inp writes. In a grid project
+	// E is exactly -A, the one uniform scale this page draws a picture at, so Background image's
+	// own reader (worldFileRepresentable) takes it back. In a geographic project it is degrees per
+	// pixel along each axis, which is what a GIS reading longitude and latitude expects; the picture
+	// is drawn in Mercator, so that is a straight-line approximation of its latitudes.
+	function backdropExportPicture(done) {
+		if (!backdrop || !backdrop.href) { done(null); return; }
+		var img = new Image();
+		img.onload = function () {
+			var pw = img.naturalWidth, ph = img.naturalHeight;
+			if (!(pw > 0) || !(ph > 0)) { done(false); return; }
+			var cv = document.createElement('canvas'), ctx, pixels;
+			cv.width = pw; cv.height = ph;
+			ctx = cv.getContext('2d');
+			// A picture the browser will draw but not let us read back (a cross-origin one taints the
+			// canvas) throws here. That is "could not be saved", said on screen, never a dead export.
+			try {
+				ctx.drawImage(img, 0, 0, pw, ph);
+				pixels = ctx.getImageData(0, 0, pw, ph);
+			} catch (e) { done(false); return; }
+			var s = backdrop.s || 1, left = backdrop.tx + (backdrop.x || 0) * s, top = backdrop.ty + (backdrop.y || 0) * s,
+				L = outwardX(left), R = outwardX(left + backdrop.width * s),
+				T = outwardY(top), B = outwardY(top + backdrop.height * s),
+				A = (R - L) / pw, E = isLatLonProject() ? -(T - B) / ph : -A;
+			done({ bmp: encodeBmp24(pixels),
+				world: [A, 0, 0, E, L + A / 2, T + E / 2].map(String).join('\r\n') + '\r\n' });
+		};
+		img.onerror = function () { done(false); };
+		img.src = backdrop.href;
+	}
+	// **ONE .zip, BECAUSE CHROME LETS A CLICK DOWNLOAD ONE FILE** (dev/backdrop-export.md). Chrome
+	// allows a site one download per user gesture; a second, even in the same click handler, waits
+	// on a "download multiple files" permission that is easy to miss and, once refused, drops the
+	// file without a word: in Chrome's default setting only the .inp arrived. So the three files travel in one archive.
+	// PKWARE APPNOTE 6.3.x: local headers, a central directory and its end record; deflated where
+	// the browser has CompressionStream('deflate-raw'), stored otherwise. Names flagged UTF-8 (bit
+	// 11), since safeFileName() keeps a non-Latin project name.
+	var zipCrcTable = null;
+	function zipCrc32(bytes) {
+		var c, n, k, crc = 0xffffffff;
+		if (!zipCrcTable) {
+			zipCrcTable = new Uint32Array(256);
+			for (n = 0; n < 256; n++) {
+				c = n;
+				for (k = 0; k < 8; k++) { c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1; }
+				zipCrcTable[n] = c >>> 0;
+			}
+		}
+		for (n = 0; n < bytes.length; n++) { crc = zipCrcTable[(crc ^ bytes[n]) & 0xff] ^ (crc >>> 8); }
+		return (crc ^ 0xffffffff) >>> 0;
+	}
+	function zipDeflate(bytes) {
+		if (typeof CompressionStream !== 'function') { return Promise.resolve(null); }
+		try {
+			return new Response(new Blob([bytes]).stream().pipeThrough(new CompressionStream('deflate-raw')))
+				.arrayBuffer().then(function (b) { return new Uint8Array(b); }, function () { return null; });
+		} catch (e) { return Promise.resolve(null); }
+	}
+	// files: [{ name, data: Uint8Array | string }]. Resolves to a Blob of type application/zip.
+	function buildZip(files) {
+		var enc = new TextEncoder(), now = new Date(),
+			dosTime = (now.getHours() << 11) | (now.getMinutes() << 5) | (now.getSeconds() >> 1),
+			dosDate = ((now.getFullYear() - 1980) << 9) | ((now.getMonth() + 1) << 5) | now.getDate();
+		var items = files.map(function (f) {
+			var raw = typeof f.data === 'string' ? enc.encode(f.data) : f.data;
+			return { name: enc.encode(f.name), raw: raw, crc: zipCrc32(raw) };
+		});
+		return Promise.all(items.map(function (it) { return zipDeflate(it.raw); })).then(function (packed) {
+			var parts = [], central = [], offset = 0, cdSize = 0;
+			items.forEach(function (it, i) {
+				var deflated = packed[i] && packed[i].length < it.raw.length, body = deflated ? packed[i] : it.raw,
+					head = new DataView(new ArrayBuffer(30)), cd = new DataView(new ArrayBuffer(46));
+				head.setUint32(0, 0x04034b50, true); head.setUint16(4, 20, true); head.setUint16(6, 0x0800, true);
+				head.setUint16(8, deflated ? 8 : 0, true); head.setUint16(10, dosTime, true); head.setUint16(12, dosDate, true);
+				head.setUint32(14, it.crc, true); head.setUint32(18, body.length, true); head.setUint32(22, it.raw.length, true);
+				head.setUint16(26, it.name.length, true); head.setUint16(28, 0, true);
+				cd.setUint32(0, 0x02014b50, true); cd.setUint16(4, 20, true); cd.setUint16(6, 20, true); cd.setUint16(8, 0x0800, true);
+				cd.setUint16(10, deflated ? 8 : 0, true); cd.setUint16(12, dosTime, true); cd.setUint16(14, dosDate, true);
+				cd.setUint32(16, it.crc, true); cd.setUint32(20, body.length, true); cd.setUint32(24, it.raw.length, true);
+				cd.setUint16(28, it.name.length, true); cd.setUint32(42, offset, true);
+				parts.push(head.buffer, it.name, body);
+				central.push(cd.buffer, it.name);
+				offset += 30 + it.name.length + body.length;
+				cdSize += 46 + it.name.length;
+			});
+			var end = new DataView(new ArrayBuffer(22));
+			end.setUint32(0, 0x06054b50, true); end.setUint16(8, items.length, true); end.setUint16(10, items.length, true);
+			end.setUint32(12, cdSize, true); end.setUint32(16, offset, true);
+			return new Blob(parts.concat(central, [end.buffer]), { type: 'application/zip' });
+		});
+	}
+	function downloadBlob(blob, name) {
+		var url = URL.createObjectURL(blob), a = document.createElement('a');
 		a.href = url;
-		a.download = safeFileName(projectDisplayName(project)) + '.inp';
+		a.download = name;
 		document.body.appendChild(a);
 		a.click();
 		document.body.removeChild(a);
 		setTimeout(function () { URL.revokeObjectURL(url); }, 10000);
-		// EXPORTING IS NOT SAVING. No stampProjectSaved() here, deliberately: an `.inp` cannot hold
-		// this document (scenarios, text sizes, a backdrop image), so a project that has only been
-		// exported still has unsaved changes and must keep saying so.
-		setNotice((pcX.lpn_status_inp_exported || 'Exported {file}.').replace('{file}', a.download) +
-			(out.differences && out.differences.length
-				? ' ' + (pcX.lpn_inp_export_differences || '{n} things the .inp format cannot hold.')
-					.replace('{n}', String(out.differences.length))
-				: ''));
-		showInpExportFlattening(out.differences, a.download);
+	}
+	// **THE PICTURE'S NAME IS PLAIN ASCII.** EPANET 2.2 desktop is a Delphi ANSI program: it reads
+	// the .inp's FILE line in the system code page, so a name outside it (Café-Ñandú-水) can leave
+	// EPANET looking for a file that is not there. Accents come off (NFD, combining marks dropped),
+	// anything else becomes a dash, and a name with no letter or digit left is "backdrop". The .inp
+	// and the .zip keep the project's own name; only what the FILE line names has to survive ANSI.
+	function asciiPictureBase(name) {
+		var s = String(name || '');
+		if (s.normalize) { s = s.normalize('NFD').replace(/[̀-ͯ]/g, ''); }
+		s = s.replace(/[^A-Za-z0-9._-]+/g, '-').replace(/-{2,}/g, '-').replace(/^[-.]+|[-.]+$/g, '');
+		return /[A-Za-z0-9]/.test(s) ? s : 'backdrop';
+	}
+	function exportInpFile() {
+		var pcX = EngCalcs.pageConfig || {}, base = safeFileName(projectDisplayName(project)),
+			picBase = asciiPictureBase(base);
+		saveToStorage();   // export what is on screen, including edits not yet saved
+		// Every name goes in by split/join, never String.replace(): a project named `a$&b {file}`
+		// would otherwise have its `$&` expanded, or its own `{file}` filled by the next replace.
+		// pic: an object (the picture, saved), null (no picture to save), false (a picture this
+		// page could not read back, or a .zip that could not be built, so it is said, and the .inp
+		// names none).
+		function finish(pic) {
+			var opts = inpExportOptions(), out, inpName = base + '.inp',
+				picName = picBase + '.bmp', worldName = picBase + '.bpw', zipName = base + '.zip';
+			if (pic) { opts.backdropFile = picName; }
+			out = EngCalcs.lpnExportInp(inpExportDocument(), opts);
+			if (!out || !out.ok) {
+				setNotice((pcX.lpn_inp_export_refused || 'This project cannot be written as an EPANET file: {detail}')
+					.split('{detail}').join((out && out.detail) || '?'));
+				return;
+			}
+			var nDiff = out.differences ? out.differences.length : 0,
+				tail = nDiff === 1 ? ' ' + (pcX.lpn_inp_export_difference_one || 'One thing the .inp format cannot hold.')
+					: nDiff ? ' ' + (pcX.lpn_inp_export_differences || '{n} things the .inp format cannot hold.').split('{n}').join(String(nDiff))
+					: '';
+			// EXPORTING IS NOT SAVING. No stampProjectSaved() here, deliberately: an `.inp` cannot hold
+			// this document (scenarios, text sizes, a backdrop image), so a project that has only been
+			// exported still has unsaved changes and must keep saying so.
+			if (!pic) {
+				downloadBlob(new Blob([out.inp], { type: 'text/plain' }), inpName);
+				setNotice((pic === false
+					? (pcX.lpn_status_inp_exported_no_picture || 'Exported {file}. The background picture could not be saved, so the .inp names none; in EPANET, add it with View > Backdrop > Load.')
+					: (pcX.lpn_status_inp_exported || 'Exported {file}.')).split('{file}').join(inpName) + tail);
+				showInpExportFlattening(out.differences, inpName);
+				return;
+			}
+			var built;
+			try {
+				built = buildZip([{ name: inpName, data: out.inp }, { name: picName, data: pic.bmp }, { name: worldName, data: pic.world }]);
+			} catch (e) { built = Promise.reject(e); }
+			built.then(function (zip) {
+				downloadBlob(zip, zipName);
+				// Each placeholder filled once: first marked by a control character (safeFileName()
+				// strips those from every name), then the marks filled. A name carrying another
+				// placeholder's token is therefore never filled a second time.
+				var tpl = pcX.lpn_status_inp_exported_picture || 'Exported {zip}, holding the EPANET file {file}, its background picture {picture}, and the world file {world}. Extract all three into one folder, then open the .inp there in EPANET; the picture comes with it.';
+				setNotice(tpl.split('{zip}').join('\u0001').split('{file}').join('\u0002')
+					.split('{picture}').join('\u0003').split('{world}').join('\u0004')
+					.split('\u0001').join(zipName).split('\u0002').join(inpName)
+					.split('\u0003').join(picName).split('\u0004').join(worldName) + tail);
+				showInpExportFlattening(out.differences, inpName);
+			}, function () {
+				// No archive, so no picture: the bare .inp, written again without a FILE line, and said.
+				finish(false);
+			});
+		}
+		backdropExportPicture(finish);
+	}
+	/**
+	 * **EXPORT GeoJSON (ROADMAP Task 728, Tom 2026-10-06, approving Mary's order: GeoJSON out
+	 * first).** The writer is js/lpn-geojson.js and its rules are dev/geojson.md; this is the way in
+	 * (the document, the scenario on screen, the results on screen) and the way out (a download).
+	 *
+	 * **RESULTS ARE WHAT IS ON SCREEN, READ THROUGH THE MAP COLOURING'S OWN VALUE FUNCTIONS**
+	 * (colorNodeValue / colorLinkValue), so the file and the map cannot disagree about a pressure and
+	 * the result units are the ones the Results strip shows. Absent when nothing has been solved --
+	 * a stale snapshot (Recalculate off) is still what the screen shows, and the file says only
+	 * "the results on the screen".
+	 */
+	function geoJsonResults() {
+		var out = { nodes: {}, links: {}, time: (lastSolveResult && typeof lastSolveResult.t === 'number') ? lastSolveResult.t : undefined };
+		if (!lastSolveResult) { return null; }
+		doc.nodes.forEach(function (n) {
+			out.nodes[n.id] = { head: colorNodeValue(n, 'head'), pressure: colorNodeValue(n, 'pressure'),
+				demand: colorNodeValue(n, 'demandActual') };
+		});
+		doc.links.forEach(function (l) {
+			out.links[l.id] = { flowrate: colorLinkValue(l, 'flow'), headloss: colorLinkValue(l, 'headloss'),
+				unit_headloss: colorLinkValue(l, 'gradient'), velocity: colorLinkValue(l, 'velocity') };
+		});
+		return out;
+	}
+	function geoJsonExportOptions() {
+		return {
+			effective: effective,
+			coordOverride: inpExportOptions().coordOverride,
+			customProps: function (el) {
+				return customPropsFor(el).map(function (def) { return { key: def.key, value: customPropValue(el, def) }; });
+			},
+			results: geoJsonResults(),
+			scenarioName: scenarioDisplayName(activeScenario())
+		};
+	}
+	/**
+	 * **THE WRITER'S ANSWER, WITH THE COORDINATE TABLE LOADED FIRST WHEN A PROJECTED PROJECT NEEDS
+	 * IT.** The transform is fetched on demand (js/lpn-crs.js), so asking before it arrives would
+	 * refuse a project the page can in fact place. Same wait the basemap makes. `done(out)` is
+	 * called once, with the writer's result; a harness drives this half.
+	 */
+	function exportGeoJsonResult(done) {
+		function go() { done(EngCalcs.lpnExportGeoJson(serializeProject(), geoJsonExportOptions())); }
+		saveToStorage();   // export what is on screen, including edits not yet saved
+		if (isProjectedProject() && EngCalcs.lpnCrsLoad && EngCalcs.lpnCrsReady && !EngCalcs.lpnCrsReady()) {
+			EngCalcs.lpnCrsLoad(go);
+			return;
+		}
+		go();
+	}
+	function exportGeoJsonFile() {
+		exportGeoJsonResult(function (out) {
+			var pcX = EngCalcs.pageConfig || {}, fallback = {
+				local: 'A GeoJSON file holds latitude and longitude only, and this project is drawn on a local grid with no place on the Earth. Georeference it first with Map, World map, Attach, then export again.',
+				range: 'These positions are not valid latitudes and longitudes: {detail}',
+				empty: 'There is nothing to export yet. Draw or open a network first.',
+				crs: 'The coordinate system of this project ({detail}) is not known to this page, so its positions cannot be converted to latitude and longitude. Use Convert as… to copy the project into one this page knows, then export again.'
+			};
+			if (!out || !out.ok) {
+				setNotice((pcX['lpn_geojson_refused_' + (out && out.error)] || fallback[out && out.error] || fallback.empty)
+					.replace('{detail}', (out && out.detail) || '?'));
+				return;
+			}
+			var blob = new Blob([out.text], { type: 'application/geo+json' }),
+				url = URL.createObjectURL(blob), a = document.createElement('a');
+			a.href = url;
+			a.download = safeFileName(projectDisplayName(project)) + '.geojson';
+			document.body.appendChild(a);
+			a.click();
+			document.body.removeChild(a);
+			setTimeout(function () { URL.revokeObjectURL(url); }, 10000);
+			// EXPORTING IS NOT SAVING, for the reason exportInpFile() gives: no stampProjectSaved().
+			setNotice((pcX.lpn_status_inp_exported || 'Exported {file}.').replace('{file}', a.download) + ' ' +
+				(out.hasResults ? (pcX.lpn_geojson_results_in || 'The results on screen are included.')
+					: (pcX.lpn_geojson_results_out || 'No results are included, because the network is not solved.')));
+		});
 	}
 	/**
 	 * **THE EXPORT ALERT** (ROADMAP Task 465 slice 5; Tom, 2026-09-06, on a library pipe being
@@ -38745,6 +39121,40 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 					|| 'Text labels are placed as EPANET places them, from their top left corner.';
 				body.appendChild(anchorNote);
 			}
+			// **THE FILE NAMES A PICTURE AND SAYS WHERE IT GOES, SO OFFER TO ATTACH IT** (Task 282). A
+			// browser cannot open a file by path, so this is a picker and the name is only said. A file
+			// with no DIMENSIONS keeps today's route: the sentence below and Map, Background image.
+			var bdLi = null, lead, ul;
+			if (parsed.backdrop && parsed.backdrop.dimensions) {
+				var bdFile = String(parsed.backdrop.file).split(/[\\\/]/).pop(),
+					bdRow = document.createElement('p'), bdBtn = document.createElement('button'),
+					bdStatus = document.createElement('div');
+				bdRow.style.margin = '0 0 8px';
+				bdBtn.type = 'button';
+				bdBtn.textContent = (pc.lpn_inp_backdrop_attach || 'Attach {file}…').replace('{file}', bdFile);
+				// The tip is on `.ec-help` wrapping the button, as the Filter in table button does,
+				// and initTipsIn() arms it (EngCalcs.initTips() wires `.ec-help[title]` and nothing else).
+				bdBtn.className = 'ec-help';
+				bdBtn.title = pc.lpn_inp_backdrop_attach_tip || 'A web page cannot open the picture by its name. Choose it on your device and it is placed where the file says it belongs.';
+				bdStatus.setAttribute('role', 'status');
+				bdBtn.addEventListener('click', function () {
+					var pick = document.createElement('input');
+					pick.type = 'file'; pick.accept = 'image/*';
+					pick.addEventListener('change', function () {
+						var f = pick.files && pick.files[0];
+						if (f) { attachNamedBackdrop(parsed.backdrop, f, function (m) {
+								bdStatus.textContent = m;
+								// The file's own sentence says to add the picture by hand, which is now untrue.
+								if (bdLi && bdLi.parentNode) { bdLi.parentNode.removeChild(bdLi); }
+								if (ul && !ul.children.length) { if (ul.parentNode) { ul.parentNode.removeChild(ul); } if (lead.parentNode) { lead.parentNode.removeChild(lead); } }
+							}); }
+					});
+					pick.click();
+				});
+				bdRow.appendChild(bdBtn); bdRow.appendChild(bdStatus);
+				body.appendChild(bdRow);
+				initTipsIn(bdRow);
+			}
 			if (!byText.length) {
 				var ok = document.createElement('p');
 				ok.style.margin = '0';
@@ -38752,15 +39162,16 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				body.appendChild(ok);
 				return;
 			}
-			var lead = document.createElement('p');
+			lead = document.createElement('p');
 			lead.style.margin = '0 0 6px';
 			lead.textContent = pc.lpn_inp_report_lead || 'This page does not use everything EPANET does, but nothing in your file is thrown away. Below is what your file holds that this page keeps without using, and what was changed when the file was read in:';
 			body.appendChild(lead);
-			var ul = document.createElement('ul');
+			ul = document.createElement('ul');
 			ul.style.margin = '0';
 			ul.style.paddingLeft = '20px';
 			byText.forEach(function (row) {
 				var li = document.createElement('li');
+				if (row.text === inpDropText('backdrop-not-embedded')) { bdLi = li; }
 				li.style.marginBottom = '4px';
 				li.textContent = row.ids.length ? row.text + ' (' + row.ids.join(', ') + ')' : row.text;
 				ul.appendChild(li);
@@ -39003,10 +39414,22 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// that file: a reader who imported three tanks last week and drops in a point list this
 			// week must not find 200 tanks on the map because a control remembered something.
 			// Junction is the hard-coded default, which is what a surveyed point usually is.
-			assetType = 'junction';
+			assetType = 'junction',
+			// **FIELD CODES ARE OPT-IN AND START OFF EVERY TIME** (Task 771). Off, this box and
+			// the import are exactly what they were; the table is per import and stored nowhere.
+			useCodes = false,
+			createPlain = pc.lpn_survey_create || 'Create nodes', createCoded = pc.lpn_new_create || 'Create',
+			codeTable = (EngCalcs.LPN_SURVEY_CODE_DEFAULTS || []).map(function (r) { return { code: r.code, as: r.as }; });
 		function read() {
 			return EngCalcs.lpnSurveyParse
 				? EngCalcs.lpnSurveyParse(text, { limits: limits, format: format }) : { ok: false };
+		}
+		// The network the codes describe, or null with codes off. Re-planned on every change, for
+		// the reason read() is: what the box says is what the button will do.
+		function plan() {
+			if (!useCodes || !parsed.ok || !EngCalcs.lpnSurveyCodePlan) { return null; }
+			return EngCalcs.lpnSurveyCodePlan(parsed, { table: codeTable, fallback: assetType,
+				hasNode: function (id) { return !!nodeById(id); } });
 		}
 		parsed = read();
 		// A file nothing can be read out of at all gets the sentence and no box: there is no
@@ -39036,6 +39459,84 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				typeSel.appendChild(o);
 			});
 			wrap.appendChild(typeSel);
+			// **THE FIELD-CODE TICK AND ITS TABLE** (Task 771; Tom, 2026-10-05: interpret a point's
+			// Description as an asset or a pipe vertex). A choice in this box, not a new door. The
+			// asset type above stays the answer for a point whose code the table does not hold.
+			var codesRow = document.createElement('div'), codesBox = document.createElement('input'),
+				codesLabel = document.createElement('label'), codesTable = document.createElement('div');
+			codesRow.style.margin = '8px 0 6px';
+			codesBox.type = 'checkbox';
+			codesBox.id = 'lpn_survey_codes';
+			codesLabel.htmlFor = 'lpn_survey_codes';
+			setFieldLabel(codesLabel, pc.lpn_survey_codes_toggle || 'Read the description as field codes',
+				pc.lpn_survey_codes_tip || 'Read the first word of each description as a code from the table. Points with the same line code join into one pipe in file order, and WL1 and WL2 are separate lines. +0 starts a line, -0 ends one, and CLO closes one. JPN followed by a point name joins to that point (Carlson), and Civil 3D writes it CPN.');
+			codesRow.appendChild(codesBox);
+			codesRow.appendChild(document.createTextNode(' '));
+			codesRow.appendChild(codesLabel);
+			wrap.appendChild(codesRow);
+			// Empty while unticked rather than hidden: it is part of this box, not a panel.
+			codesTable.id = 'lpn_survey_code_table';
+			codesTable.style.margin = '0 0 6px 1.5em';
+			wrap.appendChild(codesTable);
+			function fillCodeTable() {
+				var tbl = document.createElement('table'), head = document.createElement('tr'), add;
+				codesTable.innerHTML = '';
+				[pc.lpn_survey_codes_col_code || 'Code', pc.lpn_survey_codes_col_type || 'Asset type'].forEach(function (t) {
+					var th = document.createElement('th');
+					th.textContent = t;
+					th.style.textAlign = 'left';
+					head.appendChild(th);
+				});
+				tbl.appendChild(head);
+				codeTable.forEach(function (row, i) {
+					var tr = document.createElement('tr'), td1 = document.createElement('td'),
+						td2 = document.createElement('td'), td3 = document.createElement('td'),
+						inp = document.createElement('input'), as = document.createElement('select'),
+						rm = document.createElement('button');
+					inp.type = 'text';
+					inp.size = 6;
+					inp.value = row.code;
+					inp.className = 'lpn-survey-code';
+					inp.addEventListener('input', function () { row.code = inp.value; draw(); });
+					td1.appendChild(inp);
+					LPN_SURVEY_TYPES.concat(['pipe']).forEach(function (t) {
+						var o = document.createElement('option');
+						o.value = t;
+						o.textContent = t === 'pipe' ? (pc.lpn_tool_add_pipe || 'Pipe') : surveyTypeLabel(t);
+						if (t === row.as) { o.selected = true; }
+						as.appendChild(o);
+					});
+					as.className = 'lpn-survey-code-as';
+					as.addEventListener('change', function () { row.as = as.value; draw(); });
+					td2.appendChild(as);
+					rm.type = 'button';
+					rm.textContent = '\u00d7';
+					rm.title = pc.lpn_survey_codes_remove || 'Remove code';
+					rm.setAttribute('aria-label', rm.title);
+					rm.addEventListener('click', function () { codeTable.splice(i, 1); fillCodeTable(); draw(); });
+					td3.appendChild(rm);
+					tr.appendChild(td1); tr.appendChild(td2); tr.appendChild(td3);
+					tbl.appendChild(tr);
+				});
+				codesTable.appendChild(tbl);
+				add = document.createElement('button');
+				add.type = 'button';
+				add.id = 'lpn_survey_code_add';
+				add.textContent = pc.lpn_survey_codes_add || 'Add code';
+				add.addEventListener('click', function () { codeTable.push({ code: '', as: 'junction' }); fillCodeTable(); draw(); });
+				codesTable.appendChild(add);
+			}
+			codesBox.addEventListener('change', function () {
+				var was = useCodes ? createCoded : createPlain, bar = document.getElementById('lpn_dialog_buttons');
+				useCodes = !!codesBox.checked;
+				if (useCodes) { fillCodeTable(); } else { codesTable.innerHTML = ''; }
+				// **THE BUTTON SAYS WHAT IT WILL DO**: with codes on it makes pipes too, so "Create
+				// nodes" would understate it. The New project box's own "Create" is reused whole.
+				Array.prototype.forEach.call((bar && bar.children) || [], function (b) {
+					if (b.textContent === was) { b.textContent = useCodes ? createCoded : createPlain; }
+				});
+				draw();
+			});
 			// **THE CHOOSER IS SHOWN EVEN WHEN THE HEADER ANSWERED, AND IT SHOWS WHAT THE HEADER
 			// SAID** (Tom, 2026-09-18, writing the box: *"File format: / PNEZD specified
 			// internally"*). It used to grey out beside a sentence of ours explaining that a header
@@ -39100,7 +39601,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				preview.innerHTML = '';
 				fillChooser();
 				var text2 = parsed.ok
-					? EngCalcs.lpnSurveyConfirmText(parsed, assetType)
+					? EngCalcs.lpnSurveyConfirmText(parsed, assetType, plan())
 					: EngCalcs.lpnSurveyErrorText(parsed, axes);
 				text2.split('\n\n').forEach(function (para) {
 					var p = document.createElement('p');
@@ -39124,11 +39625,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				draw();
 			});
 			draw();
+			tipsIn(wrap);
 		}, [
-			{ label: pc.lpn_survey_create || 'Create nodes', fn: function () {
+			{ label: createPlain, fn: function () {
 				if (!parsed.ok) { setWarning(EngCalcs.lpnSurveyErrorText(parsed, axes)); return; }
 				rememberSurveyFormat(format);
-				showSurveyReport(parsed, createSurveyNodes(parsed, assetType));
+				showSurveyReport(parsed, createSurveyNodes(parsed, assetType, plan()));
 			} },
 			{ label: pc.lpn_cancel || 'Cancel', fn: function () {
 				setNotice(pc.lpn_survey_cancelled || 'Nothing was created and nothing was changed.');
@@ -39146,12 +39648,22 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	 * already reads. Neither is a new mechanism and neither needs a call site to remember anything:
 	 * both are believed only while the drawn number is still the one derived from them.
 	 */
-	function createSurveyNodes(parsed, assetType) {
+	function createSurveyNodes(parsed, assetType, codePlan) {
 		var notes = [], created = 0, elevFromFile = 0;
 		var geo = isLatLonProject();
 		var type = LPN_SURVEY_TYPES.indexOf(assetType) >= 0 ? assetType : 'junction';
 		saveUndoSnapshot();
-		parsed.points.forEach(function (p) {
+		// **WITH FIELD CODES ON, THE PLAN DECIDES WHICH POINTS ARE NODES AND OF WHAT KIND** (Task
+		// 771), and every node is still made by the one function below, so a coded junction and an
+		// uncoded one cannot come to differ. Off, the plan is null and this is the loop it always was.
+		var made = {}, coded = null;
+		var nodePoints = codePlan
+			? codePlan.nodes.map(function (w) { return { p: parsed.points[w.pt], as: w.as, pt: w.pt }; })
+			: parsed.points.map(function (p) { return { p: p, as: type }; });
+		// One crossing into the drawing frame for a surveyed position, node or vertex alike.
+		function surveyAt(p) { return { x: inwardX(p.east), y: inwardY(p.north) }; }
+		nodePoints.forEach(function (w) {
+			var p = w.p, type = w.as, at = surveyAt(p);
 			// **THE EAST COLUMN IS THE DOCUMENT'S x AND THE NORTH COLUMN IS ITS y, in every kind of
 			// project** -- a longitude on a georeferenced one, an easting on a projected one, a
 			// plain X on a grid. inwardX/inwardY is the one door either number comes through, and it
@@ -39162,7 +39674,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// set -- none of which a point list states, and all of which the reader can edit. An
 			// ELEVATION is the one field all three share, which is why the file's own number needs
 			// no case below.
-			var n = addNode(type, inwardX(p.east), inwardY(p.north)), want = p.id;
+			var n = addNode(type, at.x, at.y), want = p.id;
 			// **THE SOURCE RECORD IS GEOGRAPHIC ONLY, for the reason setNodeCoordAxis() states**:
 			// these two keys are stripped from the snapshot by unprojectStoredGeo(), which no other
 			// kind of project runs -- so writing one here would put it in the saved file. A grid
@@ -39201,8 +39713,33 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				else if (allIds('node').indexOf(want) !== -1) { notes.push({ code: 'id-taken', line: p.line, raw: p.raw, detail: want }); }
 				else { applyNodeRename(n.id, want); }
 			}
+			if (w.pt !== undefined) { made[w.pt] = n; }
 			created++;
 		});
+		// **THE PIPES, EACH BETWEEN TWO NODES, THROUGH THE VERTICES BETWEEN THEM.** addLink() is the
+		// toolbar's door, so each pipe takes the New assets defaults (diameter, roughness, minor
+		// loss) and an automatic length from its drawn geometry. A vertex keeps the file's own double
+		// through the same `_xsrc`/`_ysrc` channel a node does.
+		if (codePlan) {
+			coded = { junction: 0, reservoir: 0, tank: 0, pipe: 0 };
+			codePlan.nodes.forEach(function (w) { coded[w.as]++; });
+			codePlan.pipes.forEach(function (pp) {
+				var ends = [pp.from, pp.to].map(function (r) {
+					return typeof r === 'number' ? (made[r] && made[r].id) : r.existing;
+				}), verts, l;
+				if (!ends[0] || !ends[1] || !nodeById(ends[0]) || !nodeById(ends[1])) { return; }
+				verts = pp.verts.map(function (i) {
+					var v = parsed.points[i], at = surveyAt(v);
+					return { x: at.x, y: at.y, e: v.east, n: v.north };
+				});
+				l = addLink('pipe', ends[0], ends[1], verts);
+				if (geo) {
+					verts.forEach(function (v, k) { l.verts[k][LPN_GEO_XSRC] = v.e; l.verts[k][LPN_GEO_YSRC] = v.n; });
+				}
+				coded.pipe++;
+			});
+			codePlan.notes.forEach(function (n) { notes.push(n); });
+		}
 		// **THE ORIGIN IS RE-DERIVED, for the reason Task 439 gives**: a geographic document's
 		// coordinates are shifted onto a 1/128-degree grid near the network so float32 rasterising
 		// cannot lose a pipe, and a batch of points dropped into an empty project is exactly the
@@ -39226,7 +39763,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// holds three whole sentences for it rather than a noun it drops into one -- see
 		// assetSentence() in js/lpn-survey.js, and CLAUDE.md on why a label is never composed from
 		// fragments at render time.
-		return { created: created, elevFromFile: elevFromFile, notes: notes, type: type };
+		return { created: created, elevFromFile: elevFromFile, notes: notes, type: type, coded: coded };
 	}
 	// **THE REPORT OPENS ON THE COUNT, AND ON NOTHING ELSE** (Tom, 2026-09-18, writing it out:
 	// *"6 junction(s) imported, 5 with elevation. / Import errors and notes: / Line 11: ..."*). It
@@ -39323,7 +39860,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// exact factors still fail in doubles (150 * 0.3048 / 0.3048 is 149.99999999999997).
 	//
 	// **THE THREE COORDINATE CASES ARE HIS** (R-155): an EPSG coordinate system (lat/lon is
-	// EPSG:3857 here, one of them), an unnamed (local) georeference, and not georeferenced.
+	// EPSG:4326 here, one of them), an unnamed (local) georeference, and not georeferenced.
 	//
 	// **WHERE THE COORDINATES ARE CONVERTED: ON THE SAVED DOCUMENT, NOT THE LIVE ONE.** A saved
 	// document states its frame plainly -- Cartesian, absolute through `origin`, and longitude and
@@ -39333,11 +39870,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// existing wizard, unchanged, which is where every conversion to a new place already went.
 	var convas = null;          // a conversion in flight, from the box to the end of the placement
 	var convasUnits = [];       // [{ name, sel, item }], cloned from the strip as the New project box does
-	var convasPick = { crs: LPN_CRS_WEBMERC, place: null };
+	var convasPick = { crs: LPN_CRS_LATLON, place: null };
 	var convasWired = false;
 	// Which of the three cases this project is, plus the EPSG code when it states one.
 	function projectCoordKind() {
-		if (isLatLonProject()) { return { kind: 'epsg', crs: LPN_CRS_WEBMERC }; }
+		if (isLatLonProject()) { return { kind: 'epsg', crs: LPN_CRS_LATLON }; }
 		if (projectCrsCode()) { return { kind: 'epsg', crs: projectCrsCode() }; }
 		return { kind: xyGeorefOk() ? 'unnamed' : 'none', crs: '' };
 	}
@@ -39390,13 +39927,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			off = convasKind() !== 'epsg';
 		if (b) { b.disabled = off; }
 		if (n) {
-			// R-218: the same lat/lon name crsDisplayName() reads off the catalogue's own EPSG:4326
-			// entry, not the catalogue's Pseudo-Mercator name -- crsBoxOk() has already folded any
-			// 4326 pick onto LPN_CRS_WEBMERC by the time convasPick.crs is read here, so this is the
-			// one comparison that still needs to ask which code it is.
-			n.textContent = convasPick.crs === LPN_CRS_WEBMERC
-				? crsOptionText({ code: LPN_CRS_GEOWGS84, name: crsLabel(LPN_CRS_GEOWGS84) })
-				: crsOptionText({ code: convasPick.crs, name: crsLabel(convasPick.crs) });
+			// The same name crsDisplayName() prints: lat/lon is the catalogue's own EPSG:4326 entry.
+			n.textContent = crsOptionText({ code: convasPick.crs, name: crsLabel(convasPick.crs) });
 			n.className = off ? 'lpn-new-crs-name lpn-dim' : 'lpn-new-crs-name';
 		}
 	}
@@ -39435,7 +39967,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				// row selected is the UTM zone the network sits in. The pick itself does not change
 				// until Select, so Cancel still leaves a plain copy.
 				var place = convasPick.place || networkPlace(),
-					start = convasPick.crs === LPN_CRS_WEBMERC ? (crsUtmCodeFor(place) || convasPick.crs) : convasPick.crs;
+					start = convasPick.crs === LPN_CRS_LATLON ? (crsUtmCodeFor(place) || convasPick.crs) : convasPick.crs;
 				openCrsBox(start, place, function (code, ll) {
 					convasPick.crs = code;
 					convasPick.place = ll || convasPick.place;
@@ -39457,7 +39989,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		closeViewPopovers();
 		wireConvasBox();
 		convasFor = library.openId;
-		convasPick = { crs: from.kind === 'epsg' ? from.crs : LPN_CRS_WEBMERC, place: null };
+		convasPick = { crs: from.kind === 'epsg' ? from.crs : LPN_CRS_LATLON, place: null };
 		convasSetKind(from.kind);
 		// Attaching the world map IS a placement, and an empty project has nothing to place, so that
 		// one answer is offered only where it already is the project's own.
@@ -39537,7 +40069,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			rounding[k] = s ? String(s.value || '') : '';
 			suffix[k] = sf ? String(sf.value || '') : '';
 		});
-		return { kind: kind, crs: kind === 'epsg' ? String(convasPick.crs || LPN_CRS_WEBMERC) : '',
+		return { kind: kind, crs: kind === 'epsg' ? String(convasPick.crs || LPN_CRS_LATLON) : '',
 			units: units, rounding: rounding, suffix: suffix };
 	}
 	// The box is not modal, so a tab switch can happen under it; its answers were read off the
@@ -39554,8 +40086,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// FROM side is named: its caller, convasProceed(), fails only while reading the project's own
 	// coordinates. runConvertAs() names the missing side itself, before anything is copied.
 	function convasForeignCrs(from, to) {
-		if (from.kind === 'epsg' && from.crs !== LPN_CRS_WEBMERC) { return from.crs; }
-		if (to.kind === 'epsg' && to.crs !== LPN_CRS_WEBMERC) { return to.crs; }
+		if (from.kind === 'epsg' && from.crs !== LPN_CRS_LATLON) { return from.crs; }
+		if (to.kind === 'epsg' && to.crs !== LPN_CRS_LATLON) { return to.crs; }
 		return '';
 	}
 	function convasNoTransformMessage(pc, code) {
@@ -39568,11 +40100,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// this page cannot transform refuses up front rather than half way through.
 	function runConvertAs(a) {
 		var pc = EngCalcs.pageConfig || {}, from = projectCoordKind(),
-			to = { kind: a.kind, crs: a.kind === 'epsg' ? String(a.crs || LPN_CRS_WEBMERC) : '' },
+			to = { kind: a.kind, crs: a.kind === 'epsg' ? String(a.crs || LPN_CRS_LATLON) : '' },
 			changed = convasCrsChanged(from, to), need = [], bornAs = library.openId;
 		if (changed) {
-			if (from.kind === 'epsg' && from.crs !== LPN_CRS_WEBMERC) { need.push(from.crs); }
-			if (to.kind === 'epsg' && to.crs !== LPN_CRS_WEBMERC) { need.push(to.crs); }
+			if (from.kind === 'epsg' && from.crs !== LPN_CRS_LATLON) { need.push(from.crs); }
+			if (to.kind === 'epsg' && to.crs !== LPN_CRS_LATLON) { need.push(to.crs); }
 		}
 		if (!need.length) { convasProceed(a, from, to, changed); return; }
 		var refuse = function (code) {
@@ -39595,7 +40127,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// where it is. Null for the case that does not.
 	function savedLonLatReader(saved, from) {
 		var t = saved.project && saved.project.georef;
-		if (from.kind === 'epsg' && from.crs === LPN_CRS_WEBMERC) { return function (p) { return { x: p.x, y: p.y }; }; }
+		if (from.kind === 'epsg' && from.crs === LPN_CRS_LATLON) { return function (p) { return { x: p.x, y: p.y }; }; }
 		if (from.kind === 'epsg') {
 			return function (p) {
 				var ll = EngCalcs.lpnCrsInverse(from.crs, p);
@@ -39882,7 +40414,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// Null for lat/lon, whose unit is a degree and has no one ground length.
 		var bdTurn = saved.project.georef && isFinite(saved.project.georef.rotDeg) ? saved.project.georef.rotDeg : 0;
 		var srcUnitM = from.kind === 'unnamed' && saved.project.georef ? saved.project.georef.metersPerUnit
-			: (from.kind === 'epsg' && from.crs !== LPN_CRS_WEBMERC ? planeUnitMetres(from.crs) : null);
+			: (from.kind === 'epsg' && from.crs !== LPN_CRS_LATLON ? planeUnitMetres(from.crs) : null);
+		// A Web Mercator metre is cos(latitude) of a ground metre (Task 775), read at the first node.
+		if (from.kind === 'epsg' && from.crs === LPN_CRS_WEBMERC && doc.nodes.length && isWebMercProject()) {
+			srcUnitM = metresPerWorldUnit(doc.nodes[0].x, doc.nodes[0].y);
+		}
 		name = (pc.lpn_copy_of || 'Copy of {name}').replace('{name}', projectDisplayName(project));
 		// **A COPY IS A DIFFERENT DOCUMENT AND MUST NOT CARRY THE ORIGINAL'S IDENTITY.** The docId is
 		// what the lock broker and every live file handle key on.
@@ -39906,7 +40442,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// **AN EMPTY PROJECT: NO COORDINATE TO MOVE, SO NO PLACEMENT STEPS** (Task 775). The copy
 			// states the system asked for and opens on that system's own default view; the old
 			// origin and view were numbers in the old frame and would mean nothing in the new one.
-			if (to.kind === 'epsg' && to.crs === LPN_CRS_WEBMERC) { savedSetKind(saved, 'geo'); }
+			if (to.kind === 'epsg' && to.crs === LPN_CRS_LATLON) { savedSetKind(saved, 'geo'); }
 			else if (to.kind === 'epsg') { savedSetKind(saved, 'epsg', to.crs); }
 			else { savedSetKind(saved, 'none'); }
 			delete saved.origin;
@@ -39924,7 +40460,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				}, false);
 				if (ok) { savedSetKind(saved, 'none'); }
 			} else {
-				if (!(from.kind === 'epsg' && from.crs === LPN_CRS_WEBMERC)) {
+				if (!(from.kind === 'epsg' && from.crs === LPN_CRS_LATLON)) {
 					ok = !!toLL && convertSavedGeometry(saved, toLL, true);
 					if (ok) { savedSetKind(saved, 'geo'); }
 				}
@@ -39961,7 +40497,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var pc = EngCalcs.pageConfig || {}, c = convas, saved, t2, ok = true, prepared;
 		convas = null;
 		if (!c || c.copyId !== library.openId) { return; }
-		if (c.step === 'attach' || (c.to.kind === 'epsg' && c.to.crs === LPN_CRS_WEBMERC)) { return; }
+		if (c.step === 'attach' || (c.to.kind === 'epsg' && c.to.crs === LPN_CRS_LATLON)) { return; }
 		try { saved = JSON.parse(JSON.stringify(serializeProject())); } catch (err) { saved = null; }
 		if (!saved || !saved.project) { return; }
 		if (c.to.kind === 'epsg') {
@@ -43011,11 +43547,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		return (r && r.value) ? String(r.value) : 'local';
 	}
 	// **THE BOX'S OWN ANSWER TO THE PROJECTION QUESTION, AND THE PLACE THAT CAME WITH IT.**
-	// EPSG:3857 to begin with, which is Tom's own recommendation in the radio's tip and which makes
-	// exactly the lat/lon project this page has always made. `place` is whatever the projection
+	// EPSG:4326 to begin with, the suggested row (Task 775), which makes exactly the lat/lon
+	// project this page has always made. `place` is whatever the projection
 	// box's place-name search last found: it filters the catalogue there, and it is where the new
 	// project opens here, so one search answers two questions.
-	var newBoxGeo = { crs: LPN_CRS_WEBMERC, place: null };
+	var newBoxGeo = { crs: LPN_CRS_LATLON, place: null };
 	// The chooser states the answer and changes it, so its LABEL is the projection now in force.
 	function syncNewBoxCrsPick() {
 		var b = document.getElementById('lpn_new_crs_pick'),
@@ -43122,16 +43658,17 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			code = onEarth ? String(newBoxGeo.crs || '') : '', units = {};
 		newBoxUnits.forEach(function (u) { units[u.name] = u.sel.value; });
 		return {
-			// **EPSG:3857 IS THE lat/lon PROJECT AND EVERY OTHER CODE IS A PROJECTED ONE.** That is
+			// **EPSG:4326 IS THE lat/lon PROJECT AND EVERY OTHER CODE IS A PROJECTED ONE** (EPSG:3857
+			// included since Task 775). That is
 			// the whole of what collapsing three radios into two costs: one comparison, here, at the
 			// one place the box's answer becomes a project. The two kinds are genuinely different
 			// documents -- one stores degrees and draws Web Mercator behind them, the other stores
 			// the plane's own eastings and northings -- and this is where they part.
-			geo: onEarth && code === LPN_CRS_WEBMERC,
+			geo: onEarth && code === LPN_CRS_LATLON,
 			// Only when the geographic radio is the one checked: a code left over from a chooser
 			// nobody opened is a declaration nobody made, and this is the one declaration that can
 			// never be withdrawn.
-			crs: (onEarth && code !== LPN_CRS_WEBMERC) ? code : '',
+			crs: (onEarth && code !== LPN_CRS_LATLON) ? code : '',
 			// The point the place-name search found, not the words that found it: the search has
 			// already run, in the projection box, so this costs no second request.
 			place: onEarth ? newBoxGeo.place : null,
@@ -43191,6 +43728,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// multiplies, exactly as a display conversion does.
 		perUnit = unitFactor('lpn_u_length');
 		if (!isFinite(perUnit) || perUnit <= 0) { perUnit = 1; }
+		// **A WEB MERCATOR PLANE IS ALWAYS METRES, AND MERCATOR METRES** (Task 775): a ground metre
+		// spans 1/cos(latitude) of them, the same scale the length code corrects for, so the search
+		// does not land that much too close.
+		if (isWebMercProject()) { perUnit = 1 / Math.max(1e-6, Math.cos(lat * Math.PI / 180)); }
 		sw = w / (wideM * perUnit);
 		sh = h / (highM * perUnit);
 		s = Math.min(sw, sh) * SEARCH_FIT_PAD;
@@ -43368,7 +43909,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// The projection answer resets with the box, for the reason the note above gives: a box that
 		// remembered the last answers would be a fifth kind of stored preference, and a remembered
 		// PLACE is a record of where somebody's network is, which this page stores nowhere.
-		newBoxGeo = { crs: LPN_CRS_WEBMERC, place: null };
+		newBoxGeo = { crs: LPN_CRS_LATLON, place: null };
 		buildNewBoxUnits();
 		method = document.getElementById('lpn_new_method');
 		if (method) { method.value = frictionMethod(); }
@@ -43442,13 +43983,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	 * everything, so a mark drawn from it would brand all 5,346. This returns false while the
 	 * answer is not yet knowable, and openCrsBox() asks for the load and re-renders when it lands.
 	 *
-	 * **NEITHER LAT/LON CODE EVER ASKS lpnCrsHas() AT ALL** (Tom, 2026-09-25, on finding "(no map)"
-	 * beside "WGS 84 / Pseudo-Mercator (EPSG:3857)" -- the very projection the map is drawn in).
-	 * js/lpn-crs.js's proj4 definitions cover PROJECTED systems; EPSG:3857 and EPSG:4326 both mean
-	 * this page's own native lat/lon project, placed with the hand-written Mercator math
-	 * (Geom.mercLat/mercY) this page has always drawn its basemap with, never through proj4 --
-	 * lpnCrsHas('3857') and lpnCrsHas('4326') both correctly answer false, and asking either was the
-	 * defect, not the answer.
+	 * **THE lat/lon CODE NEVER ASKS lpnCrsHas() AT ALL** (Tom, 2026-09-25, on finding "(no map)"
+	 * beside a lat/lon row). EPSG:4326 is this page's own native lat/lon project, placed with the
+	 * hand-written Mercator math (Geom.mercLat/mercY), never through proj4. EPSG:3857 is asked like
+	 * any projected code, and js/lpn-crs.js answers true for it at all times (closed form, Task 775).
 	 */
 	function crsCannotBePlaced(code) {
 		if (!code || crsIsLatLonCode(code)) { return false; }
@@ -43469,7 +44007,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		}
 		return text;
 	}
-	var crsBox = { code: LPN_CRS_WEBMERC, place: null, onPick: null };
+	var crsBox = { code: LPN_CRS_LATLON, place: null, onPick: null };
 	function crsBoxEl() { return document.getElementById('lpn_crsbox'); }
 	function crsBoxViewOn() {
 		var c = document.getElementById('lpn_crsbox_view');
@@ -43497,6 +44035,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			opt = document.createElement('option');
 			opt.value = list[i].code;
 			opt.textContent = crsOptionText(list[i]);
+			// **THE SUGGESTED ROW** (Task 775): latitude and longitude, marked in the list only.
+			// Not in crsOptionText(), which also names the project on the status strip, where a
+			// recommendation would read as a property of the project.
+			if (list[i].code === LPN_CRS_LATLON) {
+				opt.textContent += ' ' + (pc.lpn_crs_suggested_mark || '(suggested)');
+			}
 			sel.appendChild(opt);
 		}
 		// Membership is decided from the LIST rather than by writing to the select and reading it
@@ -43546,12 +44090,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			code = (sel && sel.value) ? String(sel.value) : crsBox.code,
 			pick = crsBox.onPick;
 		closeCrsBox();
-		// **BOTH LAT/LON ENTRIES ANSWER AS LPN_CRS_WEBMERC**, the one code every caller downstream
-		// (New project, Convert as) already knows means "make the lat/lon project". EPSG:3857 and
-		// EPSG:4326 are offered as two unmodified, honestly-named rows so nothing in the register is
-		// hidden (Tom, 2026-09-25); which one somebody clicked never needs to be told apart again
-		// after this point, because both name the identical project.
-		if (pick) { pick(crsIsLatLonCode(code) ? LPN_CRS_WEBMERC : code, crsBox.place); }
+		// **NO FOLD** (Task 775). EPSG:4326 is the lat/lon project and EPSG:3857 is a projected one
+		// in metres; until Task 775 a 3857 pick was answered as 4326 here (R-218).
+		if (pick) { pick(code, crsBox.place); }
 	}
 	var crsBoxWired = false;
 	function wireCrsBox() {
@@ -43611,7 +44152,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var box = crsBoxEl(), h, r, v;
 		if (!box) { return; }
 		wireCrsBox();
-		crsBox.code = code || LPN_CRS_WEBMERC;
+		crsBox.code = code || LPN_CRS_LATLON;
 		crsBox.onPick = onPick || null;
 		// **THE MAP VIEW, WHEN THERE IS ONE TO READ.** The point comes from the open project when
 		// it can, from the caller when it was found earlier in this box, and from the place-name
@@ -43696,6 +44237,20 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			  tip: pc.lpn_library_import_tip, fn: libImportPick }
 		];
 	}
+	// The Export fly-out, a function of its own for the reason importMenuRows() is: a harness can ask
+	// what it offers without driving a popup. **ADDING AN EXPORT IS ONE LINE HERE**, nothing in
+	// openFileMenu() changes. Each is a DOWNLOAD and never a live handle (Task 281): a file we hand
+	// over, not one this page keeps writing to, which is why Export is not a second Save as.
+	function exportMenuRows() {
+		var pc = EngCalcs.pageConfig || {};
+		return [
+			{ icon: 'save', label: pc.lpn_file_export_item_inp || 'EPANET file…',
+			  tip: pc.lpn_file_export_inp_tip, fn: exportInpFile },
+			// GeoJSON (Task 728): same verb, same kind of file.
+			{ icon: 'save', label: pc.lpn_file_export_item_geojson || 'GeoJSON file…',
+			  tip: pc.lpn_file_export_geojson_tip, fn: exportGeoJsonFile }
+		];
+	}
 	function openFileMenu(anchor) {
 		// **THE FILE MENU AND THE OPEN BUTTON TAKE THE SAME REFUSAL AS THE TAB STRIP** (Tom,
 		// 2026-09-08: *"I think the File menu and Open toolbar also must be disabled just for
@@ -43759,11 +44314,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// EPANET found each other by standing side by side -- even though the three import rows
 			// no longer stand in the flat list themselves.
 			{ icon: 'open', label: pc.lpn_file_import_menu || 'Import…', submenu: importMenuRows },
-			// The other direction (Task 281). A DOWNLOAD and never a live handle: an `.inp` is a
-			// file we hand over, not one this page keeps writing to -- the same reason Import is a
-			// separate row from Open rather than a second file type on it.
-			{ icon: 'save', label: pc.lpn_file_export_inp || 'Export EPANET file…',
-			  tip: pc.lpn_file_export_inp_tip, fn: exportInpFile },
+			// **AN EXPORT SUBMENU (Tom, 2026-10-06: "it's time to put all the exports into a
+			// submenu")**, the twin of Import above it and built the same way. Each row keeps its
+			// handler and tip; see exportMenuRows(), where a new export is one line.
+			{ icon: 'save', label: pc.lpn_file_export_menu || 'Export…', submenu: exportMenuRows },
 		].concat([
 			{ separator: true },
 			// **The menu says Save and Save as… in every browser**, never "Download a copy": the
@@ -44281,6 +44835,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var pc = EngCalcs.pageConfig || {};
 		return [
 			{ icon: 'zoom', label: pc.lpn_tool_zoom_extent || 'Zoom to fit', tip: pc.lpn_tool_zoom_extent_tip, fn: zoomExtent },
+			// **A SNIPPING TOOL, IN THE MAP MENU BECAUSE IT IS NOT ABOUT WATER** (Tom, 2026-10-05). Beside
+			// Zoom to fit: both are about the view of the drawing, and the one frames what the other takes.
+			{ icon: 'image', pointerOnly: true, label: pc.lpn_screenshot_menu || 'Screenshot', tip: pc.lpn_screenshot_tip, fn: function () { startScreenshot(); } },
 			// **THE BACKGROUND IMAGE CAME HERE FROM INSERT** (Tom, 2026-08-27). A picture behind the
 			// drawing is not a water asset; it is the same kind of thing as the street map two rows
 			// down, and EPANET files its own Backdrop under this menu for the same reason. A
@@ -44363,6 +44920,717 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// sentences only it could say were being translated into 27 languages for a state no
 			// visitor could reach. See dev/geographic-projects.md for what went with it.
 		];
+	}
+	// ---- SCREENSHOT: A SNIPPING TOOL FOR THE MAP ------------------------------------------------
+	// Tom, 2026-10-05, on a proposed "Copy image at 2x-3x": *"Good if presented as a snipping tool.
+	// 'Sharper screenshot' or 'Screenshot' (with tip) may work; I can make a video about sharper
+	// screenshots and Figure scenarios. But where does it live? Map menu seems right to me since
+	// it's not about Water."*
+	//
+	// **THE POINT IS THAT IT RE-DRAWS, NOT THAT IT GRABS.** The network is vector SVG, so the
+	// rectangle the visitor drags is drawn again at the Screenshot box's magnification (3x unless
+	// changed) times its CSS size -- lines and
+	// labels come out sharper than any screen grab of the same area. Basemap tiles are rasters and
+	// are only scaled into place; that is the honest limit.
+	//
+	// **NOTHING IS STORED AND NOTHING NEW IS FETCHED.** The picture goes to the clipboard, or, where
+	// the clipboard refuses, to a file the visitor saves. The tiles drawn are the <image> elements
+	// already on the map, re-read from the browser's cache with the same crossorigin=anonymous they
+	// were loaded with (OSM and Mapbox both answer Access-Control-Allow-Origin: *). A tile that
+	// would still taint the canvas is left out and the confirmation says so.
+	//
+	// **THE PICTURE IS EXACTLY WHAT WAS SNIPPED, AND NOTHING IS ADDED TO IT** (Tom, 2026-10-05:
+	// *"Give the user exactly what they snip. Don't add anything including the Mapbox credits. This
+	// is their freedom that we must give them. We complied with our duty by showing it on our screen
+	// so that they can cite in their report."*). The tile credit stays on the screen in
+	// #lpn_basemap_credit; it is never painted into the image.
+	//
+	// dev/lpn-spike/screenshot-browser-harness.js proves the size, the content, Esc, the fallback,
+	// the box and its magnification, and that no credit is drawn.
+	var SNIP_SCALES = [1, 2, 3, 4], SNIP_SCALE = 3, SNIP_SCALE_SAFE = 2, SNIP_MAX_SIDE = 16384, SNIP_MAX_AREA = 120e6, SNIP_DRAG_PX = 4;
+	// What a snapshot keeps of each element's computed style. The SVG is drawn as an image, where
+	// the page's stylesheet does not reach, so whatever the stylesheet decided is written onto the
+	// element itself.
+	var SNIP_STYLE_PROPS = ['fill', 'fill-opacity', 'fill-rule', 'stroke', 'stroke-width', 'stroke-opacity',
+		'stroke-dasharray', 'stroke-dashoffset', 'stroke-linecap', 'stroke-linejoin', 'stroke-miterlimit',
+		'opacity', 'visibility', 'filter', 'paint-order', 'vector-effect', 'mix-blend-mode',
+		'font-family', 'font-size', 'font-weight', 'font-style', 'letter-spacing',
+		'text-anchor', 'dominant-baseline', 'alignment-baseline', 'baseline-shift', 'direction', 'unicode-bidi',
+		'marker-start', 'marker-mid', 'marker-end', 'shape-rendering', 'text-rendering', 'image-rendering', 'color'];
+	var snipVeil = null;
+	// 'rect' or 'free' (lasso): the shape the next snip is dragged in. Session only, never stored.
+	var snipMode = 'rect';
+	// The magnification the Screenshot box shows, 3 until the visitor chooses another.
+	function snipScaleChosen() {
+		return SNIP_SCALES.indexOf(snipboxLayout.scale) >= 0 ? snipboxLayout.scale : SNIP_SCALE;
+	}
+	function snipScaleFor(w, h) {
+		var s = snipScaleChosen();
+		if (w * s > SNIP_MAX_SIDE || h * s > SNIP_MAX_SIDE || w * s * h * s > SNIP_MAX_AREA) { s = Math.min(s, SNIP_SCALE_SAFE); }
+		if (w * s > SNIP_MAX_SIDE || h * s > SNIP_MAX_SIDE || w * s * h * s > SNIP_MAX_AREA) {
+			s = Math.min(SNIP_MAX_SIDE / w, SNIP_MAX_SIDE / h, Math.sqrt(SNIP_MAX_AREA / (w * h)));
+		}
+		return s;
+	}
+	// The visible map, in client pixels: the canvas's content box (inside its 1px border), cut to
+	// the window, since the canvas is laid out taller than the screen until it is sized.
+	function snipMapRect() {
+		var r = svg.getBoundingClientRect(),
+			left = r.left + svg.clientLeft, top = r.top + svg.clientTop,
+			right = left + svg.clientWidth, bottom = top + svg.clientHeight;
+		left = Math.max(left, 0); top = Math.max(top, 0);
+		right = Math.min(right, window.innerWidth); bottom = Math.min(bottom, window.innerHeight);
+		return { x: left, y: top, w: Math.max(0, right - left), h: Math.max(0, bottom - top) };
+	}
+	// ---- THE SCREENSHOT BOX --------------------------------------------------------------------
+	// Tom, 2026-10-05: *"I hoped that there would be a box, possibly non-modal and dockable, with the
+	// magnification amount and any other possible future settings for the snip."* The Contour box's
+	// shell and memory (wireBoxMemory(), registerDockBox(), placeBoxRemembered()), opened by the
+	// menu row with the snip and left standing after it, so a docked box does not take its column
+	// from the map and give it back on every snip. Its x ends a snip in progress.
+	//
+	// **THE MAGNIFICATION IS THE BROWSER'S, NOT THE PROJECT'S** (Task 584's line): how sharp a
+	// picture somebody pastes into their report is a fact about that person's report, not about the
+	// network, and a colleague opening the file must not inherit it. So it rides in `lpn_snipbox`
+	// beside where the box sits. The box's openness is NOT recorded: it opens with the snip, never
+	// with the page.
+	function snipBoxEl() { return document.getElementById('lpn_snip_box'); }
+	function snipBoxIsOpen() {
+		var box = snipBoxEl();
+		return !!box && box.style.display !== 'none' && box.style.display !== '';
+	}
+	function openSnipBox() {
+		var box = snipBoxEl();
+		if (!box) { return; }
+		closeMenu();
+		hideOpenTips();
+		if (snipBoxIsOpen()) { placePanelForScreen(box, function () {}); return; }
+		box.style.display = 'flex';
+		buildSnipBox();
+		placePanelForScreen(box, function () { placeBoxRemembered(box, snipboxLayout, true); });
+		initTipsIn(box);
+	}
+	function closeSnipBox() {
+		cancelScreenshot();
+		hidePanel(snipBoxEl());
+	}
+	var LPN_SNIPBOX_KEY = 'lpn_snipbox';
+	var snipboxLayout = newBoxLayout();
+	snipboxLayout.userSized = false;
+	snipboxLayout.scale = SNIP_SCALE;
+	delete snipboxLayout.open;   // openness is not recorded (see above); the key is never written
+	function saveSnipboxLayout() {
+		try { localStorage.setItem(LPN_SNIPBOX_KEY, JSON.stringify(snipboxLayout)); } catch (e) {}
+	}
+	function wireSnipBox() {
+		var box = snipBoxEl(), x = document.getElementById('lpn_snip_close');
+		if (!box) { return; }
+		if (x) { x.addEventListener('click', closeSnipBox); }
+		wireBoxMemory(box, LPN_SNIPBOX_KEY, snipboxLayout, saveSnipboxLayout, snipBoxIsOpen);
+	}
+	// **ICONS, NOT WORDS** (Tom, 2026-10-07: "can this entire thing use fewer words? Magnifying glass
+	// for magnification, Rectangle or lasso for Snip, and Monitor for Screenshot"; Ida's spec: every
+	// icon has a tip and an aria-label that name its shortcut, the window title keeps its text).
+	// The glyphs are inline SVG in currentColor, so a disabled button greys its icon with no rule.
+	var SNIP_GLYPHS = {
+		magnifier: '<circle cx="10" cy="10" r="6"/><line x1="14.5" y1="14.5" x2="20" y2="20"/>',
+		monitor: '<rect x="3" y="4" width="18" height="12" rx="1"/><line x1="8" y1="20" x2="16" y2="20"/><line x1="12" y1="16" x2="12" y2="20"/>',
+		rect: '<rect x="4" y="6" width="16" height="12" stroke-dasharray="3 2"/>',
+		free: '<path d="M5 13C3 8 9 4 15 6C21 8 20 15 14 16C11 16.5 9 18 10 20" stroke-dasharray="3 2"/>',
+		chevron: '<polyline points="6,9 12,15 18,9"/>',
+		pen: '<path d="M4 20L5 16L16 5L19 8L8 19Z"/><line x1="13" y1="8" x2="16" y2="11"/>',
+		eraser: '<g transform="rotate(-45 12 12)"><rect x="4" y="8" width="16" height="8" rx="1"/><line x1="11" y1="8" x2="11" y2="16"/></g><line x1="3" y1="21" x2="21" y2="21"/>',
+		undo: '<polyline points="9,6 4,11 9,16"/><path d="M4 11H15a4.5 4.5 0 0 1 0 9H11"/>',
+		redo: '<g transform="translate(24 0) scale(-1 1)"><polyline points="9,6 4,11 9,16"/><path d="M4 11H15a4.5 4.5 0 0 1 0 9H11"/></g>',
+		copy: '<rect x="8" y="8" width="12" height="12" rx="1"/><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1H8"/>',
+		save: '<path d="M5 4H16L19 7V19a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1Z"/><rect x="8" y="4" width="7" height="5"/><rect x="8" y="14" width="8" height="6"/>'
+	};
+	function snipGlyph(name) {
+		var s = document.createElementNS(NS, 'svg');
+		s.setAttribute('viewBox', '0 0 24 24'); s.setAttribute('width', '18'); s.setAttribute('height', '18');
+		s.setAttribute('fill', 'none'); s.setAttribute('stroke', 'currentColor'); s.setAttribute('stroke-width', '2');
+		s.setAttribute('stroke-linecap', 'round'); s.setAttribute('stroke-linejoin', 'round');
+		s.setAttribute('aria-hidden', 'true'); s.setAttribute('focusable', 'false');
+		s.innerHTML = SNIP_GLYPHS[name];
+		return s;
+	}
+	// The one tip text names the control to the eye (title, armed as a styled tip) and to a screen
+	// reader (aria-label). Written as el.title, never removeAttribute (see wireTipDelegation).
+	function snipTip(el, text) { el.title = text; el.setAttribute('aria-label', text); }
+	function snipIconButton(id, glyph, tip) {
+		var b = document.createElement('button');
+		b.type = 'button'; b.id = id; b.className = 'lpn-btn lpn-snip-ic';
+		b.appendChild(snipGlyph(glyph));
+		snipTip(b, tip);
+		return b;
+	}
+	function snipModeTip(mode) {
+		var pc = EngCalcs.pageConfig || {};
+		return mode === 'free' ? (pc.lpn_snip_tip_free || 'Snip a freehand shape (S)') : (pc.lpn_snip_tip_rect || 'Snip a rectangle (S)');
+	}
+	// The Snip button shows the shape it will use; the chevron beside it picks the other one.
+	function updateSnipModeUi() {
+		var go = document.getElementById('lpn_snip_go');
+		if (go) {
+			go.replaceChild(snipGlyph(snipMode === 'free' ? 'free' : 'rect'), go.firstChild);
+			snipTip(go, snipModeTip(snipMode));
+		}
+		['rect', 'free'].forEach(function (m) {
+			var it = document.getElementById('lpn_snip_mode_' + m);
+			if (it) { it.setAttribute('aria-checked', m === snipMode ? 'true' : 'false'); it.classList.toggle('lpn-btn-on', m === snipMode); }
+		});
+	}
+	function closeSnipMenu() {
+		var m = document.getElementById('lpn_snip_menu');
+		if (m) { m.classList.remove('lpn-snip-menu-open'); }
+		var c = document.getElementById('lpn_snip_mode');
+		if (c) { c.setAttribute('aria-expanded', 'false'); }
+	}
+	function buildSnipBox() {
+		var pc = EngCalcs.pageConfig || {}, body = document.getElementById('lpn_snip_body');
+		if (!body) { return; }
+		body.innerHTML = '';
+		var bar = document.createElement('div');
+		bar.className = 'lpn-snip-bar';
+		// Magnification: a magnifier and the factor as a bare number.
+		var magTip = pc.lpn_screenshot_scale_tip || 'The picture\'s size as a multiple of the area on the screen. A larger one is sharper and makes a bigger file.';
+		var mag = document.createElement('span'), sel = document.createElement('select');
+		mag.className = 'lpn-snip-mag';
+		mag.appendChild(snipGlyph('magnifier'));
+		sel.id = 'lpn_snip_scale';
+		SNIP_SCALES.forEach(function (n) {
+			var o = document.createElement('option');
+			o.value = String(n); o.textContent = n + '×';
+			if (n === snipScaleChosen()) { o.selected = true; }
+			sel.appendChild(o);
+		});
+		sel.addEventListener('change', function () {
+			var n = parseInt(sel.value, 10);
+			if (SNIP_SCALES.indexOf(n) < 0) { return; }
+			snipboxLayout.scale = n;
+			saveSnipboxLayout();
+		});
+		mag.appendChild(sel);
+		snipTip(mag, magTip); snipTip(sel, magTip);
+		bar.appendChild(mag);
+		// **ONE SNIP BUTTON WITH A SMALL CHEVRON** (Windows snipping tool: New with a mode dropdown).
+		// Rectangle or Freehand; the choice lasts the session and is stored nowhere.
+		var split = document.createElement('span'), go = snipIconButton('lpn_snip_go', 'rect', snipModeTip('rect')),
+			chev = snipIconButton('lpn_snip_mode', 'chevron', pc.lpn_snip_tip_mode || 'Snip shape'),
+			menu = document.createElement('div');
+		go.id = 'lpn_snip_go'; chev.id = 'lpn_snip_mode';
+		split.className = 'lpn-snip-split';
+		chev.classList.add('lpn-snip-chev');
+		chev.setAttribute('aria-haspopup', 'menu'); chev.setAttribute('aria-expanded', 'false');
+		menu.id = 'lpn_snip_menu'; menu.className = 'lpn-snip-menu'; menu.setAttribute('role', 'menu');
+		[['rect', 'rect'], ['free', 'free']].forEach(function (m) {
+			var it = snipIconButton('lpn_snip_mode_' + m[0], m[1], snipModeTip(m[0]));
+			it.setAttribute('role', 'menuitemradio');
+			it.addEventListener('click', function () {
+				closeSnipMenu();
+				snipMode = m[0];
+				updateSnipModeUi();
+				startScreenshot(snipMode);
+			});
+			menu.appendChild(it);
+		});
+		go.addEventListener('click', function () { startScreenshot(snipMode); });
+		chev.addEventListener('click', function (e) {
+			e.stopPropagation();
+			if (menu.classList.contains('lpn-snip-menu-open')) { closeSnipMenu(); return; }
+			var cr = chev.getBoundingClientRect(), mw = 2 * 40 + 6;
+			menu.style.top = Math.round(cr.bottom + 2) + 'px';
+			menu.style.left = Math.round(Math.max(2, Math.min(cr.left, window.innerWidth - mw - 2))) + 'px';
+			menu.classList.add('lpn-snip-menu-open');
+			chev.setAttribute('aria-expanded', 'true');
+		});
+		split.appendChild(go); split.appendChild(chev);
+		// The menu is a popup on the page, not a child of the box: the box clips whatever hangs
+		// below it (overflow hidden). It sits at the menu level of the z-index ladder.
+		var old = document.getElementById('lpn_snip_menu');
+		if (old && old.parentNode) { old.parentNode.removeChild(old); }
+		document.body.appendChild(menu);
+		bar.appendChild(split);
+		// **THE REPEAT BUTTON, A MONITOR** (Tom, 2026-10-06: *"The panel is missing a Screenshot
+		// button for repeats."*). Pan or zoom the map, press it, and the whole visible map is shot
+		// again at the chosen magnification, with no veil to drag.
+		var again = snipIconButton('lpn_snip_again', 'monitor', pc.lpn_snip_tip_map || 'Screenshot of the whole map');
+		again.addEventListener('click', function () {
+			cancelScreenshot();
+			var m = snipMapRect();
+			if (m.w < 1 || m.h < 1) { return; }
+			takeScreenshot(m, null);
+		});
+		bar.appendChild(again);
+		body.appendChild(bar);
+		updateSnipModeUi();
+	}
+	// Outside click closes the mode menu; S, with the box open, starts a snip in the chosen shape.
+	document.addEventListener('click', function () { closeSnipMenu(); });
+	window.addEventListener('resize', function () { closeSnipMenu(); });
+	document.addEventListener('keydown', function (e) {
+		if (e.key !== 's' && e.key !== 'S') { return; }
+		if (e.ctrlKey || e.metaKey || e.altKey || snipVeil || snipEditor || !snipBoxIsOpen()) { return; }
+		var t = e.target, tag = t && t.tagName;
+		if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || (t && t.isContentEditable)) { return; }
+		e.preventDefault(); e.stopPropagation();
+		startScreenshot(snipMode);
+	}, true);
+	function startScreenshot(mode) {
+		cancelScreenshot();
+		var free = (mode === 'rect' || mode === 'free' ? mode : snipMode) === 'free';
+		snipMode = free ? 'free' : 'rect';
+		updateSnipModeUi();
+		// The box first: docked, it takes its column from the map, and the veil is laid over the
+		// map as it is after that. **NOT ON A PHONE**, where every standing box fills the window
+		// (placePanelForScreen()) and would cover the very map the finger has to drag over; the
+		// magnification last chosen still applies there.
+		if (!smallScreen()) { openSnipBox(); }
+		var pc = EngCalcs.pageConfig || {}, map = snipMapRect(), watcher = null;
+		if (map.w < 1 || map.h < 1) { return; }
+		var veil = document.createElement('div'), box = document.createElement('div'), start = null;
+		veil.className = 'lpn-snip-veil';
+		function fitVeil() {
+			veil.style.left = map.x + 'px'; veil.style.top = map.y + 'px';
+			veil.style.width = map.w + 'px'; veil.style.height = map.h + 'px';
+		}
+		fitVeil();
+		box.className = 'lpn-snip-rect';   // joins the veil on the first move, so a click never shows it
+		document.body.appendChild(veil);
+		snipVeil = { el: veil, onKey: null, watcher: null };
+		// The map changes size while the snip waits (a box docked, undocked or resized, the window):
+		// the veil and the drag's limits follow it, and a drag begun on the old size is dropped.
+		if (window.ResizeObserver) {
+			watcher = new window.ResizeObserver(function () {
+				var m = snipMapRect();
+				if (m.x === map.x && m.y === map.y && m.w === map.w && m.h === map.h) { return; }
+				map = m;
+				fitVeil();
+				if (typeof dropShape === 'function') { dropShape(); }
+			});
+			watcher.observe(svg);
+			snipVeil.watcher = watcher;
+		}
+		function at(e) {
+			return { x: Math.min(Math.max(e.clientX, map.x), map.x + map.w), y: Math.min(Math.max(e.clientY, map.y), map.y + map.h) };
+		}
+		function rectOf(a, b) {
+			return { x: Math.min(a.x, b.x), y: Math.min(a.y, b.y), w: Math.abs(a.x - b.x), h: Math.abs(a.y - b.y) };
+		}
+		// Freehand: the path is drawn on a small SVG inside the veil, as dashes in the accent colour.
+		var pts = [], outline = null;
+		if (free) {
+			outline = document.createElementNS(NS, 'svg');
+			outline.setAttribute('class', 'lpn-snip-lasso');
+			outline.setAttribute('width', map.w); outline.setAttribute('height', map.h);
+			outline.appendChild(document.createElementNS(NS, 'polygon'));
+		}
+		function boundsOf(list) {
+			var xs = list.map(function (p) { return p.x; }), ys = list.map(function (p) { return p.y; });
+			var x0 = Math.min.apply(null, xs), y0 = Math.min.apply(null, ys);
+			return { x: x0, y: y0, w: Math.max.apply(null, xs) - x0, h: Math.max.apply(null, ys) - y0 };
+		}
+		function dropShape() {
+			start = null; pts = [];
+			if (box.parentNode) { veil.removeChild(box); }
+			if (outline && outline.parentNode) { veil.removeChild(outline); }
+		}
+		veil.addEventListener('pointerdown', function (e) {
+			if (e.button !== undefined && e.button !== 0) { return; }
+			e.preventDefault(); e.stopPropagation();
+			start = at(e);
+			pts = [start];
+			try { veil.setPointerCapture(e.pointerId); } catch (err) { /* capture is a nicety */ }
+		});
+		veil.addEventListener('pointermove', function (e) {
+			if (!start) { return; }
+			if (free) {
+				var q = at(e);
+				pts.push(q);
+				if (!outline.parentNode) { veil.appendChild(outline); }
+				outline.firstChild.setAttribute('points', pts.map(function (p) { return (p.x - map.x) + ',' + (p.y - map.y); }).join(' '));
+				return;
+			}
+			var r = rectOf(start, at(e));
+			if (!box.parentNode) { veil.appendChild(box); }
+			box.style.left = (r.x - map.x) + 'px'; box.style.top = (r.y - map.y) + 'px';
+			box.style.width = r.w + 'px'; box.style.height = r.h + 'px';
+		});
+		veil.addEventListener('pointerup', function (e) {
+			if (!start) { return; }
+			e.preventDefault(); e.stopPropagation();
+			var r, poly = null;
+			if (free) { pts.push(at(e)); r = boundsOf(pts); poly = pts; }
+			else { r = rectOf(start, at(e)); }
+			start = null;
+			cancelScreenshot();
+			// A plain click (or a tap) takes the whole visible map, as a snipping tool's does.
+			if (r.w < SNIP_DRAG_PX || r.h < SNIP_DRAG_PX) { r = map; poly = null; }
+			takeScreenshot(r, poly);
+		});
+		veil.addEventListener('pointercancel', dropShape);
+		snipVeil.onKey = function (e) {
+			if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); cancelScreenshot(); setNotice(''); }
+		};
+		document.addEventListener('keydown', snipVeil.onKey, true);
+		setNotice(free ? (pc.lpn_snip_hint_free || 'Drag around the area to snip, or click for the whole map. Esc cancels.')
+			: (pc.lpn_screenshot_hint || 'Drag a rectangle over the map, or click for the whole map. Esc cancels.'));
+	}
+	function cancelScreenshot() {
+		closeSnipEditor();
+		if (!snipVeil) { return; }
+		setNotice('');   // the snip's hint goes with the snip
+		document.removeEventListener('keydown', snipVeil.onKey, true);
+		if (snipVeil.watcher) { snipVeil.watcher.disconnect(); }
+		if (snipVeil.el.parentNode) { snipVeil.el.parentNode.removeChild(snipVeil.el); }
+		snipVeil = null;
+	}
+	function snipLoadImage(src, cors) {
+		return new Promise(function (resolve, reject) {
+			var im = new Image();
+			if (cors) { im.crossOrigin = 'anonymous'; }
+			im.onload = function () { resolve(im); };
+			im.onerror = function () { reject(new Error('image')); };
+			im.src = src;
+		});
+	}
+	// One raster <image> made self-contained. Resolves to a data: URL, or to null when the picture
+	// cannot be read back (a tile whose server sent no CORS header taints the canvas).
+	function snipInlineImage(href) {
+		if (/^data:/i.test(href)) { return Promise.resolve(href); }
+		var sameOrigin = /^blob:/i.test(href);
+		try { sameOrigin = sameOrigin || new URL(href, location.href).origin === location.origin; } catch (err) { /* keep */ }
+		return snipLoadImage(href, !sameOrigin).then(function (im) {
+			var c = document.createElement('canvas');
+			c.width = im.naturalWidth || 1; c.height = im.naturalHeight || 1;
+			c.getContext('2d').drawImage(im, 0, 0);
+			return c.toDataURL('image/png');   // throws SecurityError on a tainted canvas
+		}).catch(function () { return null; });
+	}
+	// A deep copy of the map's SVG with every computed style written onto its element, hidden
+	// elements dropped, and every raster inlined. `out.droppedBasemap` reports a tile left out.
+	function snipCloneSvg(out) {
+		var clone = svg.cloneNode(true), pending = [];
+		function walk(o, c) {
+			var cs = window.getComputedStyle(o);
+			if (cs.display === 'none') { c.parentNode.removeChild(c); return; }
+			var st = [];
+			SNIP_STYLE_PROPS.forEach(function (p) {
+				var v = cs.getPropertyValue(p);
+				if (v !== '' && v !== null) { st.push(p + ':' + v); }
+			});
+			c.setAttribute('style', st.join(';'));
+			if (o.tagName === 'image') {
+				var href = o.getAttribute('href') || o.getAttributeNS('http://www.w3.org/1999/xlink', 'href') || '';
+				var isTile = o.classList.contains('lpn-basemap-tile');
+				pending.push(snipInlineImage(href).then(function (data) {
+					if (data) { c.setAttribute('href', data); c.removeAttributeNS('http://www.w3.org/1999/xlink', 'href'); }
+					else {
+						if (isTile) { out.droppedBasemap = true; }
+						if (c.parentNode) { c.parentNode.removeChild(c); }
+					}
+				}));
+			}
+			var oc = o.children, cc = Array.prototype.slice.call(c.children), i;
+			for (i = 0; i < oc.length; i++) { if (cc[i]) { walk(oc[i], cc[i]); } }
+		}
+		var rs = window.getComputedStyle(svg), kids = Array.prototype.slice.call(clone.children), oks = svg.children, i;
+		for (i = 0; i < oks.length; i++) { if (kids[i]) { walk(oks[i], kids[i]); } }
+		clone.setAttribute('style', 'font-family:' + rs.fontFamily + ';font-size:' + rs.fontSize);
+		return Promise.all(pending).then(function () { return clone; });
+	}
+	// The HTML legends are drawn by hand, box by box and word by word, so they too are re-drawn at
+	// the snapshot's scale rather than copied off the screen. Backgrounds, borders and text are the
+	// whole of what a legend is (see renderColorLegend(), renderLabelsLegend()).
+	function snipPaintHtml(ctx, root) {
+		function paintBox(e) {
+			var cs = window.getComputedStyle(e);
+			if (cs.display === 'none' || cs.visibility === 'hidden') { return; }
+			var r = e.getBoundingClientRect();
+			if (cs.backgroundColor && !/rgba\([^)]*,\s*0\)$|transparent/.test(cs.backgroundColor)) {
+				ctx.fillStyle = cs.backgroundColor; ctx.fillRect(r.left, r.top, r.width, r.height);
+			}
+			[['Top', r.left, r.top, r.width, 0], ['Bottom', r.left, r.bottom, r.width, 0],
+				['Left', r.left, r.top, 0, r.height], ['Right', r.right, r.top, 0, r.height]].forEach(function (b) {
+				var w = parseFloat(cs['border' + b[0] + 'Width']) || 0;
+				if (!w || cs['border' + b[0] + 'Style'] === 'none') { return; }
+				ctx.fillStyle = cs['border' + b[0] + 'Color'];
+				var x = b[1] - (b[0] === 'Right' ? w : 0), y = b[2] - (b[0] === 'Bottom' ? w : 0);
+				ctx.fillRect(x, y, b[3] || w, b[4] || w);
+			});
+			Array.prototype.forEach.call(e.childNodes, function (n) {
+				if (n.nodeType === 1) { paintBox(n); }
+				else if (n.nodeType === 3 && /\S/.test(n.nodeValue)) { paintText(n, cs); }
+			});
+		}
+		function paintText(n, cs) {
+			ctx.font = cs.fontStyle + ' ' + cs.fontWeight + ' ' + cs.fontSize + ' ' + cs.fontFamily;
+			ctx.fillStyle = cs.color;
+			ctx.textBaseline = 'middle';
+			ctx.textAlign = 'left';
+			try { ctx.direction = cs.direction; } catch (err) { /* older canvas */ }
+			var text = n.nodeValue, re = /\S+/g, m, range = document.createRange();
+			while ((m = re.exec(text))) {
+				range.setStart(n, m.index); range.setEnd(n, m.index + m[0].length);
+				var rr = range.getClientRects()[0];
+				if (rr) { ctx.fillText(m[0], rr.left, rr.top + rr.height / 2); }
+			}
+		}
+		paintBox(root);
+	}
+	function snipLegends() {
+		return [document.getElementById('lpn_labels_legend'), colorLegendBox].filter(function (e) {
+			return e && e.isConnected && window.getComputedStyle(e).display !== 'none';
+		});
+	}
+	// Render the client-pixel rectangle `r` of the map. Resolves to { blob, droppedBasemap, scale }.
+	function renderScreenshot(r, poly) {
+		var out = { droppedBasemap: false, scale: snipScaleFor(r.w, r.h) };
+		var s = out.scale, W = Math.max(1, Math.round(r.w * s)), H = Math.max(1, Math.round(r.h * s));
+		var sr = svg.getBoundingClientRect(), ox = sr.left + svg.clientLeft, oy = sr.top + svg.clientTop;
+		return snipCloneSvg(out).then(function (clone) {
+			clone.setAttribute('xmlns', NS);
+			clone.setAttribute('width', W); clone.setAttribute('height', H);
+			clone.setAttribute('viewBox', [r.x - ox, r.y - oy, r.w, r.h].join(' '));
+			clone.setAttribute('preserveAspectRatio', 'none');
+			clone.removeAttribute('id');
+			var xml = new XMLSerializer().serializeToString(clone),
+				url = URL.createObjectURL(new Blob([xml], { type: 'image/svg+xml;charset=utf-8' }));
+			return snipLoadImage(url, false).then(function (im) {
+				URL.revokeObjectURL(url);
+				var c = document.createElement('canvas'), ctx;
+				c.width = W; c.height = H;
+				ctx = c.getContext('2d');
+				ctx.fillStyle = window.getComputedStyle(svg).backgroundColor || 'white';
+				ctx.fillRect(0, 0, W, H);
+				ctx.drawImage(im, 0, 0, W, H);
+				ctx.save();
+				ctx.scale(W / r.w, H / r.h);
+				ctx.translate(-r.x, -r.y);
+				ctx.beginPath(); ctx.rect(r.x, r.y, r.w, r.h); ctx.clip();
+				snipLegends().forEach(function (lg) {
+					var lr = lg.getBoundingClientRect();
+					if (lr.right > r.x && lr.left < r.x + r.w && lr.bottom > r.y && lr.top < r.y + r.h) { snipPaintHtml(ctx, lg); }
+				});
+				ctx.restore();
+				if (poly) {
+					// Freehand: everything outside the outline becomes transparent.
+					ctx.save();
+					ctx.globalCompositeOperation = 'destination-in';
+					ctx.beginPath();
+					poly.forEach(function (p, i) {
+						var x = (p.x - r.x) * W / r.w, y = (p.y - r.y) * H / r.h;
+						if (i) { ctx.lineTo(x, y); } else { ctx.moveTo(x, y); }
+					});
+					ctx.closePath();
+					ctx.fill();
+					ctx.restore();
+				}
+				return new Promise(function (resolve, reject) {
+					c.toBlob(function (b) { if (b) { out.blob = b; resolve(out); } else { reject(new Error('toBlob')); } }, 'image/png');
+				});
+			}, function (err) { URL.revokeObjectURL(url); throw err; });
+		});
+	}
+	function snipDownload(blob) {
+		var a = document.createElement('a'), url = URL.createObjectURL(blob);
+		a.href = url;
+		a.download = safeFileName((project && project.name) || 'map') + '-screenshot.png';
+		document.body.appendChild(a);
+		a.click();
+		document.body.removeChild(a);
+		setTimeout(function () { URL.revokeObjectURL(url); }, 60000);
+	}
+	// A snip or screenshot is drawn, then SHOWN in the markup view, where it can be scribbled on in
+	// red before Copy or Save (Tom, 2026-10-06: the Windows snipping tool's pen is what he uses
+	// "profusely"). Nothing is copied or saved until the visitor presses one of them.
+	function takeScreenshot(r, poly) {
+		var pc = EngCalcs.pageConfig || {};
+		return renderScreenshot(r, poly).then(function (out) {
+			openSnipEditor(out);
+			if (out.droppedBasemap) { setNotice(pc.lpn_screenshot_no_basemap || 'The street map or satellite image could not be included.'); }
+		}).catch(function () {
+			setNotice(pc.lpn_screenshot_failed || 'The screenshot could not be made.');
+		});
+	}
+	// ---- THE MARKUP VIEW -------------------------------------------------------------------
+	// A modal over the page: the picture on a canvas, a red pen, an eraser, Undo, Redo, Copy, Save, Close. The pen is
+	// red only (Tom: "a red scribbler pen like the Windows tool"); its ink is image content, never
+	// chrome. Strokes are kept as point lists and redrawn over the untouched snip, so Undo is exact.
+	// Pointer events, so a mouse, a pen and a finger all draw. Nothing here is stored on the device.
+	var SNIP_PEN_INK = '#ff0000', SNIP_PEN_CSS_PX = 3;
+	var snipEditor = null;
+	function closeSnipEditor() {
+		if (!snipEditor) { return; }
+		document.removeEventListener('keydown', snipEditor.onKey, true);
+		if (snipEditor.el.parentNode) { snipEditor.el.parentNode.removeChild(snipEditor.el); }
+		snipEditor = null;
+	}
+	function openSnipEditor(out) {
+		closeSnipEditor();
+		var pc = EngCalcs.pageConfig || {};
+		return createImageBitmap(out.blob).then(function (bm) {
+			// Every stroke is an object of its own, redrawn over the untouched snip, so an eraser
+			// removes a whole stroke and never paints pixels out. `done` and `undone` hold the
+			// actions (a stroke added, or strokes erased), so Undo and Redo cover both.
+			var strokes = [], done = [], undone = [], drawing = null, erasing = null, eraser = false;
+			var el = document.createElement('div'), panel = document.createElement('div'), bar = document.createElement('div'),
+				cv = document.createElement('canvas'), ctx, held = document.createElement('div');
+			el.id = 'lpn_snip_edit'; el.className = 'lpn-snip-edit';
+			el.setAttribute('role', 'dialog');
+			el.setAttribute('aria-label', pc.lpn_screenshot_menu || 'Screenshot');
+			panel.className = 'lpn-snip-edit-panel';
+			bar.className = 'lpn-snip-edit-bar';
+			cv.id = 'lpn_snip_canvas'; cv.className = 'lpn-snip-edit-canvas';
+			cv.width = bm.width; cv.height = bm.height;
+			ctx = cv.getContext('2d');
+			function button(id, glyph, tip, fn, into) {
+				var b = snipIconButton(id, glyph, tip);
+				b.addEventListener('click', fn);
+				(into || bar).appendChild(b);
+				return b;
+			}
+			function paint() {
+				ctx.clearRect(0, 0, cv.width, cv.height);
+				ctx.drawImage(bm, 0, 0);
+				ctx.strokeStyle = SNIP_PEN_INK; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+				ctx.lineWidth = SNIP_PEN_CSS_PX * out.scale;
+				strokes.forEach(function (st) {
+					ctx.beginPath();
+					st.pts.forEach(function (p, i) { if (i) { ctx.lineTo(p.x, p.y); } else { ctx.moveTo(p.x, p.y); } });
+					ctx.stroke();
+				});
+				undoBtn.disabled = done.length === 0;
+				redoBtn.disabled = undone.length === 0;
+			}
+			function at(e) {
+				var r = cv.getBoundingClientRect();
+				return { x: (e.clientX - r.left) * cv.width / r.width, y: (e.clientY - r.top) * cv.height / r.height };
+			}
+			function setEraser(on) {
+				eraser = on;
+				penBtn.setAttribute('aria-pressed', on ? 'false' : 'true'); penBtn.classList.toggle('lpn-btn-on', !on);
+				eraserBtn.setAttribute('aria-pressed', on ? 'true' : 'false'); eraserBtn.classList.toggle('lpn-btn-on', on);
+				cv.classList.toggle('lpn-snip-eraser-on', on);
+			}
+			// Distance from a point to a stroke's polyline, in canvas pixels.
+			function distTo(st, p) {
+				var best = Infinity, i, a, b, dx, dy, t, len2;
+				for (i = 0; i < st.pts.length; i++) {
+					a = st.pts[i]; b = st.pts[i + 1] || a;
+					dx = b.x - a.x; dy = b.y - a.y; len2 = dx * dx + dy * dy;
+					t = len2 ? Math.max(0, Math.min(1, ((p.x - a.x) * dx + (p.y - a.y) * dy) / len2)) : 0;
+					best = Math.min(best, Math.hypot(p.x - (a.x + t * dx), p.y - (a.y + t * dy)));
+				}
+				return best;
+			}
+			// The topmost stroke within reach of the pointer is removed; its place is kept for Undo.
+			function eraseAt(p) {
+				var r = cv.getBoundingClientRect(), reach = (SNIP_PEN_CSS_PX / 2 * out.scale) + 6 * cv.width / r.width, i;
+				for (i = strokes.length - 1; i >= 0; i--) {
+					if (distTo(strokes[i], p) <= reach) {
+						if (!erasing) { erasing = { type: 'erase', items: [] }; done.push(erasing); undone = []; }
+						erasing.items.push({ stroke: strokes[i], index: i });
+						strokes.splice(i, 1);
+						paint();
+						return;
+					}
+				}
+			}
+			function undo() {
+				var a = done.pop();
+				if (!a) { return; }
+				if (a.type === 'add') { strokes.splice(strokes.indexOf(a.stroke), 1); }
+				else { for (var i = a.items.length - 1; i >= 0; i--) { strokes.splice(a.items[i].index, 0, a.items[i].stroke); } }
+				undone.push(a); paint();
+			}
+			function redo() {
+				var a = undone.pop();
+				if (!a) { return; }
+				if (a.type === 'add') { strokes.push(a.stroke); }
+				else { a.items.forEach(function (it) { strokes.splice(strokes.indexOf(it.stroke), 1); }); }
+				done.push(a); paint();
+			}
+			// Pen and Eraser share one segmented control, so the active tool is always in view.
+			var seg = document.createElement('span');
+			seg.className = 'lpn-snip-seg';
+			bar.appendChild(seg);
+			var penBtn = button('lpn_snip_pen', 'pen', pc.lpn_snip_tip_pen || 'Pen', function () { setEraser(false); }, seg);
+			var eraserBtn = button('lpn_snip_eraser', 'eraser', pc.lpn_snip_tip_eraser || 'Eraser: click a stroke to remove it (E)', function () { setEraser(true); }, seg);
+			var undoBtn = button('lpn_snip_undo', 'undo', pc.lpn_snip_tip_undo || 'Undo (Ctrl+Z)', undo);
+			var redoBtn = button('lpn_snip_redo', 'redo', pc.lpn_snip_tip_redo || 'Redo (Ctrl+Y)', redo);
+			var blobNow = function () { return new Promise(function (res, rej) { cv.toBlob(function (b) { b ? res(b) : rej(new Error('toBlob')); }, 'image/png'); }); };
+			var copyBtn = button('lpn_snip_copy', 'copy', pc.points_data_copy || 'Copy', function () { copyBlob(blobNow()); });
+			button('lpn_snip_save', 'save', pc.lpn_file_save || 'Save', function () {
+				blobNow().then(snipDownload);   // one click, one download
+			});
+			var x = document.createElement('button');
+			x.type = 'button'; x.id = 'lpn_snip_edit_close'; x.className = 'lpn-popover-x'; x.textContent = '×';
+			snipTip(x, pc.lpn_close || 'Close');
+			x.addEventListener('click', closeSnipEditor);
+			bar.appendChild(x);
+			setEraser(false);
+			cv.addEventListener('pointerdown', function (e) {
+				if (e.button !== undefined && e.button !== 0) { return; }
+				e.preventDefault();
+				try { cv.setPointerCapture(e.pointerId); } catch (err) { /* a nicety */ }
+				var p = at(e);
+				if (eraser) { erasing = null; eraseAt(p); drawing = 'erase'; return; }
+				var st = { pts: [p, { x: p.x + 0.01, y: p.y }] };
+				drawing = st;
+				strokes.push(st); done.push({ type: 'add', stroke: st }); undone = [];
+				paint();
+			});
+			cv.addEventListener('pointermove', function (e) {
+				if (!drawing) { return; }
+				if (drawing === 'erase') { eraseAt(at(e)); return; }
+				drawing.pts.push(at(e));
+				paint();
+			});
+			function endStroke() { drawing = null; erasing = null; }
+			cv.addEventListener('pointerup', endStroke);
+			cv.addEventListener('pointercancel', endStroke);
+			held.className = 'lpn-snip-edit-scroll';
+			held.appendChild(cv);
+			panel.appendChild(bar); panel.appendChild(held);
+			el.appendChild(panel);
+			// While the markup view is open it owns the keyboard, and nothing else reaches the map
+			// (its Delete, its own Ctrl+Z). Esc steps back from the eraser to the pen, and closes the
+			// view from the pen; Ctrl+Z undoes, Ctrl+Y (or Ctrl+Shift+Z) redoes, E is the eraser.
+			snipEditor = { el: el, onKey: function (e) {
+				e.stopPropagation();
+				var k = e.key, mod = e.ctrlKey || e.metaKey;
+				// Esc never throws strokes away: it leaves the eraser, and closes only an unmarked view.
+				if (k === 'Escape') { e.preventDefault(); if (eraser) { setEraser(false); } else if (!strokes.length) { closeSnipEditor(); } }
+				else if (mod && !e.shiftKey && (k === 'z' || k === 'Z')) { e.preventDefault(); undo(); }
+				else if (mod && (k === 'y' || k === 'Y' || (e.shiftKey && (k === 'z' || k === 'Z')))) { e.preventDefault(); redo(); }
+				else if (!mod && !e.altKey && (k === 'e' || k === 'E')) { e.preventDefault(); setEraser(!eraser); }
+			} };
+			document.addEventListener('keydown', snipEditor.onKey, true);
+			document.body.appendChild(el);
+			paint();
+			copyBtn.focus();
+		});
+	}
+	// The clipboard write starts inside the Copy click, with the picture as the ClipboardItem's
+	// promise; where the clipboard refuses, the picture is downloaded instead.
+	function copyBlob(blobPromise) {
+		var pc = EngCalcs.pageConfig || {}, wrote;
+		function fallback() {
+			return blobPromise.then(function (b) {
+				snipDownload(b);
+				setNotice(pc.lpn_screenshot_saved || 'The clipboard is not available here, so the screenshot was downloaded as a PNG file.');
+			});
+		}
+		try {
+			if (!navigator.clipboard || !navigator.clipboard.write || typeof window.ClipboardItem !== 'function') { throw new Error('no clipboard'); }
+			wrote = navigator.clipboard.write([new window.ClipboardItem({ 'image/png': blobPromise })]).then(function () {
+				setNotice(pc.lpn_screenshot_copied || 'Screenshot copied.');
+			}, fallback);
+		} catch (err) {
+			wrote = fallback();
+		}
+		return wrote.catch(function () { setNotice(pc.lpn_screenshot_failed || 'The screenshot could not be made.'); });
 	}
 	// **THE PROJECT MENU** (ROADMAP Task 467). Tom, 2026-08-20: *"Maybe we can have a Project menu
 	// with Settings, Library, and Report under it?"*, and his own row order of 2026-08-21:
@@ -44842,6 +46110,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			.filter(function (el) { return !el.disabled && el.offsetParent !== null; });
 	}
 	function pressDialogButton(b) {
+		// A `keepOpen` button (the feedback box's Send) does its own closing, because its answer
+		// arrives later and may be a refusal the visitor must read in the box, beside what they typed.
+		if (b.keepOpen) { return b.fn(); }
 		closeDialog();
 		var r = b.fn();
 		// The answer may ask the next question; only when it did not does the queue or the opener
@@ -45506,6 +46777,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		wireDemandScaleBox();
 		wireEnergyBox();
 		wireContourBox();
+		wireSnipBox();
 		wireScenarioCompareBox();
 		wireRunReportBox();
 		wireStatusReportBox();
@@ -49953,7 +51225,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			placedSide: h.placedSide, side: h.side, lines: h.lines ? h.lines.slice() : null,
 			lineCount: h.lineCount, shedCount: h.shedCount || 0,
 			hiddenShort: !!h.hiddenShort, hiddenCrowded: !!h.hiddenCrowded, hiddenYielded: !!h.hiddenYielded,
-			hiddenCrossed: !!h.hiddenCrossed, hiddenDropped: !!h.hiddenDropped,
+			hiddenBlocked: !!h.hiddenBlocked, hiddenCrossed: !!h.hiddenCrossed, hiddenDropped: !!h.hiddenDropped,
 			alignedAlong: h.alignedAlong, stationSides: h.stationSides ? h.stationSides.slice() : h.stationSides,
 			tw: h.tw, twPx: h.twPx, width: h.width, widthPx: h.widthPx,
 			rowW: h.rowW ? h.rowW.slice() : null, rowWPx: h.rowWPx ? h.rowWPx.slice() : null,
@@ -50006,6 +51278,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		h.nudgeManual = c.nudgeManual; h.placedSide = c.placedSide; h.side = c.side;
 		h.shedCount = c.shedCount;
 		h.hiddenShort = c.hiddenShort; h.hiddenCrowded = c.hiddenCrowded; h.hiddenYielded = c.hiddenYielded;
+		h.hiddenBlocked = c.hiddenBlocked;
 		h.hiddenCrossed = c.hiddenCrossed; h.hiddenDropped = c.hiddenDropped;
 		h.alignedAlong = c.alignedAlong;
 		h.stationSides = c.stationSides ? c.stationSides.slice() : c.stationSides;
@@ -53836,6 +55109,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			['lpn_ds_box', dsLayout, null, null, dsBoxTip],
 			['lpn_energy_box', energyboxLayout, saveEnergyboxLayout, LPN_ENERGYBOX_KEY],
 			['lpn_contour_box', contourboxLayout, saveContourboxLayout, LPN_CONTOURBOX_KEY],
+			['lpn_snip_box', snipboxLayout, saveSnipboxLayout, LPN_SNIPBOX_KEY, 'lpn_screenshot_tip'],
 			['lpn_scncmp_box', cmpboxLayout, saveCmpboxLayout, LPN_CMPBOX_KEY],
 			['lpn_rptbox', rptboxLayout, saveRptboxLayout, LPN_RPTBOX_KEY],
 			['lpn_status_box', statusboxLayout, saveStatusboxLayout, LPN_STATUSBOX_KEY],
@@ -58651,6 +59925,29 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	 * fix `dev/scenario-seam-repair.md` argues for: one write seam, not two callers each trusted
 	 * to remember the other half.
 	 */
+	// **EVERY ELEMENT ON THE MAP THAT ANSWERS TO AN ID ANSWERS TO THE NEW ONE** (Tom, 2026-10-07,
+	// Task 775: *"Labels edited in Properties repeatedly went zombie in that session"*). A rename
+	// keeps the drawn elements and rekeys their holder, so each element's own `data-*` id has to
+	// follow, because that is what a pointer press reads. Only the disc and the grab band (a node)
+	// and the bend handles (a link) used to: the label and its grab path kept naming the old id, so
+	// the label showed the new name and followed its element while a drag threw on a node that no
+	// longer exists and a click opened nothing; a renamed pipe's own line, band and symbol stopped
+	// answering a click too. The same parts removeLinkEls() tears down, so keep the two in step.
+	// `dev/lpn-spike/rename-label-zombie-harness.js`.
+	function retagNodeEls(ne, id) {
+		if (!ne) { return; }
+		[ne.circle, ne.hit].forEach(function (e) { if (e) { e.setAttribute('data-node', id); } });
+		[ne.text, ne.lblHit].forEach(function (e) { if (e) { e.setAttribute('data-nodelbl', id); } });
+	}
+	function retagLinkEls(le, id) {
+		if (!le) { return; }
+		[le.line, le.hit, le.symbolHit].concat(le.handles || [], le.arrows || []).forEach(function (e) {
+			if (e) { e.setAttribute('data-link', id); }
+		});
+		var lbl = [le.text, le.lblHit];
+		(le.repeats || []).forEach(function (r) { lbl.push(r.text, r.lblHit); });
+		lbl.forEach(function (e) { if (e) { e.setAttribute('data-linklbl', id); } });
+	}
 	function applyNodeRename(oldId, newId) {
 		var n = nodeById(oldId);
 		n.id = newId;
@@ -58663,8 +59960,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		nodeEls[newId] = nodeEls[oldId]; delete nodeEls[oldId];
 		incidentLinks[newId] = incidentLinks[oldId]; delete incidentLinks[oldId];
 		labelsByAnchor[newId] = labelsByAnchor[oldId]; delete labelsByAnchor[oldId];
-		nodeEls[newId].circle.setAttribute('data-node', newId);
-		if (nodeEls[newId].hit) { nodeEls[newId].hit.setAttribute('data-node', newId); }
+		retagNodeEls(nodeEls[newId], newId);
 		doc.links.forEach(function (l) {
 			if (l.from === oldId) { l.from = newId; }
 			if (l.to === oldId) { l.to = newId; }
@@ -58721,7 +60017,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// silently takes its demand out of the answers.
 		customersByLink[newId] = customersByLink[oldId] || []; delete customersByLink[oldId];
 		(doc.customers || []).forEach(function (c) { if (c.link === oldId) { c.link = newId; } });
-		linkEls[newId].handles.forEach(function (h) { h.setAttribute('data-link', newId); });
+		retagLinkEls(linkEls[newId], newId);
 		// **THE DEFECT TASK 533 WAS OPENED FOR.** `incidentLinks` is keyed by NODE and holds LINK
 		// ids, so a link rename does not rekey it -- it has to rewrite the ids inside two of its
 		// arrays. Left out, the index still held the old id, and updateNode() walks that list into
@@ -63014,38 +64310,206 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		placeLegends();
 	}
 
-	// ---- The one-tap grievance link (ROADMAP Task 207, Rung 0; dev/dilettante-path.md) ----
+	// ---- "Something wrong here?": two clicks (ROADMAP Task 768; Task 207 before it) ----
 	//
-	// ONE PRESS, NOTHING TYPED, AND NO NEW CHANNEL. EngCalcs.logSignal already posts, already
-	// dedupes per page load, and already queues to IndexedDB and retries when the visitor is
-	// offline -- which is the requirement that matters most here, because the field users in
-	// low-resource regions this most needs to hear from are the likeliest to be offline. So this
-	// adds a detail slug to the lpn rows that already carry 'first:' and 'diag:', and nothing else.
+	// Tom, 2026-10-05: "those links open a small form that allows, but doesn't require, a message,
+	// an email address, and some selectors or canned phrases." And of the one-press version it
+	// replaces: "Give the users the information and the freedom." So the FIRST click opens a box and
+	// sends nothing; the SECOND is Send.
 	//
-	// WHAT IT SENDS IS FIXED AND SMALL: page, served language, and 'wrong:none' from the standing
-	// cell or 'wrong:<code>' from the diagnostic box. NEVER anything out of the user's document --
-	// not an element id, not a coordinate, not a count of what they drew. A node coordinate says
-	// where their network is.
+	// SEND WITH NOTHING IN THE BOX SENDS EXACTLY WHAT ONE PRESS USED TO: the anonymous tally
+	// 'wrong:<code>' through EngCalcs.logSignal (page, served language, and the code of the message
+	// on screen, or 'none'). That row is posted on EVERY Send, so the count of reports stays the
+	// same instrument it was. Only when something was picked or typed does a second request go,
+	// to send-feedback.php, which e-mails it to Tom. Never anything out of the user's document.
 	//
-	// NOTHING NEW IS STORED ON THE DEVICE, which is the entire reason the shape is this one: new
-	// storage would make a sentence in the consent banner false and re-ask every visitor. The
-	// dedupe is EngCalcs.logSignal's in-memory map and the button's own disabled flag, both of
-	// which end with the page load.
+	// NOTHING NEW IS STORED ON THE DEVICE. What the visitor typed lives in this closure until a
+	// send succeeds or they cancel; a failed send keeps it on screen, never in browser storage.
+	// That is also why the mail goes by fetch and not by logSignal's offline queue.
 	//
-	// THE THANK-YOU REPLACES THE LABEL IN PLACE and promises nothing. There is no reply coming and
-	// the tip says so; a thank-you that implies one is the honesty boundary this task is not
-	// allowed to cross.
+	// THE THANK-YOU REPLACES THE LABEL IN PLACE for FEEDBACK_THANKS_MS, promises nothing, and then
+	// gives the door back.
+	var FEEDBACK_PICKS = ['numbers', 'broken', 'wording', 'confusing'];
+	var FEEDBACK_ENDPOINT = '/engcalcs/send-feedback.php';
+	var FEEDBACK_THANKS_MS = 4000;
 	function resetWrongButton(id) {
 		var btn = document.getElementById(id);
 		if (!btn || !btn.dataset || !btn.dataset.lpnWrongWired) { return; }
 		// Restored as HTML because the label is the tip markup ecTipLabel() built, and the tip has
-		// to come back with the control: a button offering to send something with no way left to
-		// read what it sends is the one shape this feature must not take.
+		// to come back with the control.
 		if (btn.dataset.lpnWrongLabel) { btn.innerHTML = btn.dataset.lpnWrongLabel; }
 		btn.disabled = false;
 		// initTipsIn(), never EngCalcs.initTips() (Task 562): the direct call skips the orphan
 		// sweep, and a tip left standing over the map has no trigger to dismiss it on touch.
 		initTipsIn(btn);
+	}
+	function thankWrongButton(btn) {
+		var pcW = EngCalcs.pageConfig || {};
+		// textContent, not the tip markup: the thank-you is a statement and not a control.
+		btn.textContent = pcW.lpn_wrong_thanks || 'Thank you. That reached us.';
+		btn.disabled = true;
+		// **AND THEN IT IS A DOOR AGAIN** (Tom: "give the users the information and the freedom").
+		// A second report in the same visit is a real thing to want, so the thank-you stands for a
+		// few seconds and the label comes back; the next click opens a fresh, empty box.
+		if (btn.id) { setTimeout(function () { if (btn.disabled) { resetWrongButton(btn.id); } }, FEEDBACK_THANKS_MS); }
+	}
+	/**
+	 * Posts what the visitor picked or typed. Resolves {ok, reason}; never rejects. A network
+	 * failure, a timeout and an unreadable answer all come back as reason 'failed'.
+	 */
+	function postFeedback(fields) {
+		var body = Object.keys(fields).map(function (k) {
+			return encodeURIComponent(k) + '=' + encodeURIComponent(fields[k]);
+		}).join('&');
+		if (typeof fetch !== 'function') { return Promise.resolve({ ok: false, reason: 'failed' }); }
+		var ctl = typeof AbortController === 'function' ? new AbortController() : null;
+		var timer = ctl ? setTimeout(function () { ctl.abort(); }, 20000) : 0;
+		return fetch(FEEDBACK_ENDPOINT, {
+			method: 'POST', credentials: 'same-origin', signal: ctl ? ctl.signal : undefined,
+			headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'X-EngCalcs-Feedback': '1' },
+			body: body
+		}).then(function (r) {
+			return r.json().then(function (j) {
+				return { ok: !!(r.ok && j && j.ok), reason: (j && j.reason) || (r.ok ? '' : 'failed') };
+			}, function () { return { ok: false, reason: 'failed' }; });
+		}, function () { return { ok: false, reason: 'failed' }; }).then(function (res) {
+			if (timer) { clearTimeout(timer); }
+			return res;
+		});
+	}
+	/**
+	 * The box. `code` is the message that was on screen when the button was pressed ('none' from
+	 * the standing cell). `keep` and `note` reopen it after a send that failed with the box closed.
+	 */
+	function openFeedbackBox(btn, code, keep, note) {
+		var pc = EngCalcs.pageConfig || {};
+		if (dialogIsOpen()) { dialogQueue.push(function () { openFeedbackBox(btn, code, keep, note); }); return; }
+		var st = keep || { picks: [], email: '', comment: '' };
+		var els = { picks: [] }, sending = false;
+		// Is the open dialog still THIS box? Another question replaces the body, which detaches our wrap.
+		function mine() { return dialogIsOpen() && !!els.wrap && els.wrap.parentNode === document.getElementById('lpn_dialog_body'); }
+		function read() {
+			if (!mine()) { return; }
+			st.picks = els.picks.filter(function (b) { return b.getAttribute('aria-pressed') === 'true'; })
+				.map(function (b) { return b.dataset.pick; });
+			st.email = els.email.value;
+			st.comment = els.comment.value;
+		}
+		function say(text, isError) {
+			if (!els.status) { return; }
+			els.status.textContent = text || '';
+			els.status.className = 'lpn-fb-status' + (isError ? ' lpn-fb-error' : '');
+		}
+		function lockButtons(on) {
+			var bar = document.getElementById('lpn_dialog_buttons');
+			if (bar) { Array.prototype.forEach.call(bar.querySelectorAll('button'), function (b) { b.disabled = on && b.dataset.fbSend === '1'; }); }
+		}
+		function done() {
+			if (mine()) { closeDialog(); afterDialogAnswer(); }
+			thankWrongButton(btn);
+		}
+		function send() {
+			if (sending) { return; }
+			read();
+			var comment = st.comment.trim(), email = st.email.trim();
+			// The tally goes on every Send, empty or not: it is the same row one press used to post.
+			if (EngCalcs.logSignal) { EngCalcs.logSignal('lpn', 'wrong:' + code); }
+			if (!st.picks.length && !comment && !email) { done(); return; }
+			sending = true;
+			lockButtons(true);
+			say(pc.lpn_fb_sending || 'Sending…', false);
+			postFeedback({
+				page: EngCalcs.cookieName || 'Looped-Network',
+				lang: (document.documentElement && document.documentElement.lang) || '',
+				code: code, picks: st.picks.join(','), email: email, comment: st.comment,
+				website: els.trap ? els.trap.value : ''
+			}).then(function (res) {
+				sending = false;
+				if (res.ok) { done(); return; }
+				var msg = res.reason === 'email' ? pc.lpn_fb_bad_email
+					: res.reason === 'busy' ? pc.lpn_fb_busy : pc.lpn_fb_failed;
+				msg = msg || 'That did not reach us.';
+				if (mine()) {
+					lockButtons(false);
+					say(msg, true);
+					if (res.reason === 'email') { els.email.focus(); }
+				} else {
+					// Cancelled while it was on its way: what they wrote is not thrown away.
+					openFeedbackBox(btn, code, st, msg);
+				}
+			});
+		}
+		function field(body, labelText, tag, cls) {
+			var lab = document.createElement('label');
+			lab.className = 'lpn-fb-label';
+			lab.appendChild(document.createTextNode(labelText));
+			var f = document.createElement(tag);
+			f.className = 'lpn-dialog-input ' + cls;
+			lab.appendChild(f);
+			body.appendChild(lab);
+			return f;
+		}
+		openDialog(function (body) {
+			var wrap = els.wrap = document.createElement('div');
+			wrap.className = 'lpn-fb';
+			body.appendChild(wrap);
+			var intro = document.createElement('p');
+			intro.className = 'lpn-dialog-msg';
+			intro.id = 'lpn_fb_intro';
+			intro.textContent = pc.lpn_fb_intro;
+			wrap.appendChild(intro);
+			var group = document.createElement('div');
+			group.className = 'lpn-fb-picks';
+			group.setAttribute('role', 'group');
+			group.setAttribute('aria-labelledby', 'lpn_fb_intro');
+			FEEDBACK_PICKS.forEach(function (id) {
+				var b = document.createElement('button');
+				b.type = 'button';
+				b.className = 'lpn-fb-pick';
+				b.dataset.pick = id;
+				b.textContent = pc['lpn_fb_pick_' + id] || id;
+				b.setAttribute('aria-pressed', st.picks.indexOf(id) >= 0 ? 'true' : 'false');
+				b.addEventListener('click', function () {
+					b.setAttribute('aria-pressed', b.getAttribute('aria-pressed') === 'true' ? 'false' : 'true');
+				});
+				group.appendChild(b);
+				els.picks.push(b);
+			});
+			wrap.appendChild(group);
+			els.comment = field(wrap, pc.lpn_fb_comment, 'textarea', 'lpn-fb-comment');
+			els.comment.rows = 4;
+			els.comment.value = st.comment;
+			els.email = field(wrap, pc.lpn_fb_email, 'input', 'lpn-fb-email');
+			els.email.type = 'email';
+			els.email.autocomplete = 'email';
+			els.email.value = st.email;
+			// THE HONEYPOT. display:none (.lpn-fb-trap), so no visitor sees it, Tab never reaches it (the box's Tab
+			// ring skips what has no layout), and the endpoint drops any post that fills it.
+			var trapBox = document.createElement('div');
+			trapBox.className = 'lpn-fb-trap';
+			trapBox.setAttribute('aria-hidden', 'true');
+			els.trap = document.createElement('input');
+			els.trap.type = 'text';
+			els.trap.name = 'website';
+			els.trap.tabIndex = -1;
+			els.trap.autocomplete = 'off';
+			trapBox.appendChild(els.trap);
+			wrap.appendChild(trapBox);
+			var sends = document.createElement('p');
+			sends.className = 'lpn-fb-sends';
+			sends.textContent = pc.lpn_fb_sends;
+			wrap.appendChild(sends);
+			els.status = document.createElement('p');
+			els.status.setAttribute('role', 'status');
+			els.status.setAttribute('aria-live', 'polite');
+			wrap.appendChild(els.status);
+			say(note || '', !!note);
+		}, [
+			{ label: pc.lpn_fb_send || 'Send', keepOpen: true, fn: send },
+			{ label: pc.lpn_cancel || 'Cancel', cancel: true, fn: function () { } }
+		], { title: pc.lpn_wrong_btn, focus: function () { return els.picks[0]; } });
+		var bar = document.getElementById('lpn_dialog_buttons');
+		if (bar && bar.firstChild) { bar.firstChild.dataset.fbSend = '1'; }
 	}
 	function wireWrongButton(id, detail) {
 		var btn = document.getElementById(id);
@@ -63056,14 +64520,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		btn.dataset.lpnWrongLabel = btn.innerHTML;
 		btn.addEventListener('click', function () {
 			if (btn.disabled) { return; }
-			var pcW = EngCalcs.pageConfig || {};
-			if (EngCalcs.logSignal) {
-				EngCalcs.logSignal('lpn', 'wrong:' + (typeof detail === 'function' ? detail() : detail));
-			}
-			// textContent, not the tip markup: the thank-you is a statement and not a control, so
-			// it carries no "?" and no title of its own.
-			btn.textContent = pcW.lpn_wrong_thanks || 'Thank you. That reached us.';
-			btn.disabled = true;
+			// The code is read NOW, at the first click: the report is about the message the
+			// visitor was looking at, even if a solve replaces it while they type.
+			openFeedbackBox(btn, typeof detail === 'function' ? detail() : detail);
 		});
 	}
 	function wireWrongButtons() {

@@ -1,5 +1,10 @@
-// THE ONE-TAP GRIEVANCE LINK -- ROADMAP Task 207 (Rung 0), dev/dilettante-path.md. Run with:
+// "SOMETHING WRONG HERE?" -- ROADMAP Task 207 (Rung 0), made two clicks by Task 768. Run with:
 //   node dev/lpn-spike/grievance-link-harness.js
+//
+// Since Task 768 the first click opens a box and posts nothing; Send with the box empty posts the
+// row one press used to post, and that row is what sections 4 and 5 hold. What the box does with
+// picks, an address and a comment is dev/lpn-spike/feedback-box-browser-harness.js, in a real
+// browser, and the endpoint's guards are dev/lpn-spike/feedback-endpoint-harness.js.
 //
 // WHAT IS ACTUALLY AT RISK HERE, and none of it is visible from a browser pass:
 //
@@ -79,14 +84,16 @@ ok('both doors are buttons rather than links',
 // The tip is the helper's, which is what makes it reachable on a touch screen: initTips() wires
 // long-press for a tip inside a control and hover for everything else, and it only ever looks at
 // .ec-help[title].
-const tipCount = (html.match(/<span class="ec-help" title="Use this link to tell us/g) || []).length;
-ok('each door carries a helper-built .ec-help tip, so touch can read it', tipCount === 2, tipCount);
 // Scoped to the two buttons, not counted across the page: four other controls on this page end
 // their label the same way, and a page-wide count would have said 4 and meant nothing.
 function buttonInner(id) {
 	const m = new RegExp('id="' + id + '"[^>]*>([\\s\\S]*?)</button>').exec(html);
 	return m ? m[1] : '';
 }
+ok('each door carries a helper-built .ec-help tip, so touch can read it',
+	['lpn_wrong_btn', 'lpn_wrong_status_btn'].every(function (id) {
+		return (buttonInner(id).match(/<span class="ec-help" title="/g) || []).length === 1;
+	}));
 ok('...and exactly one "?" glyph inside each',
 	['lpn_wrong_btn', 'lpn_wrong_status_btn'].every(function (id) {
 		return (buttonInner(id).match(/<span class="ec-tip">/g) || []).length === 1;
@@ -146,7 +153,7 @@ ok('...and it is the shipped one, posting to the shipped endpoint',
 console.log('\n---- 4. the standing door ----');
 const L = loadLoopedNetwork(
 	EXAMPLE_EXPORTS +
-	"\t\twireWrongButtons: wireWrongButtons, setStatus: setStatus,\n" +
+	"\t\twireWrongButtons: wireWrongButtons, setStatus: setStatus, closeDialog: closeDialog,\n" +
 	"\t\tstatusCode: function () { return statusWrongCode; },\n" +
 	"\t\tstatusText: function () { return document.getElementById('lpn_status_text').textContent; },\n" +
 	"\t\trunSolve: runSolve, getDoc: function () { return doc; },\n" +
@@ -183,25 +190,12 @@ function press(id) {
 	(btn._listeners.click || []).forEach(function (fn) { fn({ type: 'click', target: btn }); });
 }
 
+ok('no other question is open before the click', byId.lpn_dialog.style.display !== 'block', byId.lpn_dialog.style.display + ' ' + (byId.lpn_dialog_body.children[0] || {}).textContent);
 press('lpn_wrong_btn');
-ok('one press posts exactly one row', wrongs().length === 1, JSON.stringify(posts));
-const p0 = wrongs()[0] || { params: {} };
-ok('...to the signal endpoint', p0.url === '/engcalcs/log-signal-event.php', p0.url);
-ok('...on the lpn event that already exists', p0.params.event === 'lpn', p0.params.event);
-ok('...with the standing slug', p0.params.detail === 'wrong:none', p0.params.detail);
-ok('...and the body is page, lang, event and detail AND NOTHING ELSE',
-	Object.keys(p0.params).sort().join(',') === 'detail,event,lang,page', Object.keys(p0.params).join(','));
-ok('...naming this page and the served language only',
-	p0.params.page === 'Looped-Network' && typeof p0.params.lang === 'string');
-// Nothing about the drawing may appear in the row: no ids, no numbers, no counts.
-ok('nothing out of the drawing rides along',
-	/^wrong:[a-z-]+$/.test(p0.params.detail), p0.params.detail);
-
-ok('the label becomes the thank-you, in place', byId.lpn_wrong_btn.textContent === thanks,
-	byId.lpn_wrong_btn.textContent);
-ok('...and it is no longer a control', byId.lpn_wrong_btn.disabled === true);
-press('lpn_wrong_btn');
-ok('a second press in the same page load posts nothing', wrongs().length === 1, wrongs().length);
+ok('the first click posts nothing: it opens the box (Task 768)', wrongs().length === 0, JSON.stringify(posts));
+ok('...and the box is the page\'s own dialog', byId.lpn_dialog.style.display === 'block', byId.lpn_dialog.style.display);
+ok('...and the button is still a control, not yet a thank-you', byId.lpn_wrong_btn.disabled !== true);
+L.closeDialog();
 
 // ================================================================================================
 // 5. THE DIAGNOSTIC DOOR CARRIES THE CODE THAT WAS ON SCREEN
@@ -229,15 +223,34 @@ ok('...and the solve wrote its OWN diag row, which is a different kind of row',
 	posts.some((p) => p.params.detail === 'diag:no-fixed-head'),
 	posts.map((p) => p.params.detail).join(' '));
 
-press('lpn_wrong_status_btn');
-ok('pressing it posts one more grievance row', wrongs().length === 2, wrongs().length);
+// THE SECOND CLICK. Send with nothing picked or typed: the box's own Send button, pressed as a mouse
+// would press it (detail 1). What it must post is exactly the row one press used to post.
+function sendEmpty(id) {
+	press(id);
+	const send = byId.lpn_dialog_buttons.children[0];
+	(send._listeners.click || []).forEach(function (fn) { fn({ type: 'click', target: send, detail: 1 }); });
+}
+// The standing door first: empty Send posts 'wrong:none' and thanks in place.
+sendEmpty('lpn_wrong_btn');
+ok('Send with nothing in the box posts one row, the standing slug', wrongs().length === 1 && wrongs()[0].params.detail === 'wrong:none',
+	wrongs().map((p) => p.params.detail).join(' '));
+ok('...and the body is page, lang, event and detail AND NOTHING ELSE',
+	wrongs().length === 1 && Object.keys(wrongs()[0].params).sort().join(',') === 'detail,event,lang,page');
+ok('...and the box closed', byId.lpn_dialog.style.display !== 'block');
+ok('...and the label became the thank-you', byId.lpn_wrong_btn.textContent === thanks && byId.lpn_wrong_btn.disabled === true);
+posts.splice(0, posts.length, ...posts.filter((p) => String(p.params.detail).indexOf('wrong:') !== 0));
+global.EngCalcs._signalSent = {};
+
+sendEmpty('lpn_wrong_status_btn');
+ok('Send from the diagnostic box posts one grievance row', wrongs().length === 1, wrongs().length);
 ok('...carrying the diagnostic code that was on screen',
-	wrongs().length > 1 && wrongs()[1].params.detail === 'wrong:no-fixed-head',
-	wrongs().length > 1 ? wrongs()[1].params.detail : '');
+	wrongs().length === 1 && wrongs()[0].params.detail === 'wrong:no-fixed-head',
+	wrongs().length ? wrongs()[0].params.detail : '');
 ok('...and still nothing else',
-	wrongs().length > 1 && Object.keys(wrongs()[1].params).sort().join(',') === 'detail,event,lang,page');
+	wrongs().length === 1 && Object.keys(wrongs()[0].params).sort().join(',') === 'detail,event,lang,page');
 press('lpn_wrong_status_btn');
-ok('and pressing it again on the same message posts nothing', wrongs().length === 2, wrongs().length);
+ok('and pressing it again on the same message opens nothing: it is a thank-you now',
+	wrongs().length === 1 && byId.lpn_dialog.style.display !== 'block', wrongs().length);
 
 // A DIFFERENT MESSAGE IS A DIFFERENT THING TO REPORT. Refusing to hear about the second one would
 // be the instrument measuring itself rather than the page.
@@ -245,9 +258,9 @@ L.setStatus('These nodes have no path to a reservoir: J5', 'unreachable');
 ok('a new diagnostic offers the control again', byId.lpn_wrong_status_btn.disabled === false);
 ok('...with its tip label restored, not left as the thank-you',
 	byId.lpn_wrong_status_btn.innerHTML.indexOf('ec-help') >= 0);
-press('lpn_wrong_status_btn');
+sendEmpty('lpn_wrong_status_btn');
 ok('...and it posts the new code',
-	wrongs().length === 3 && wrongs()[2].params.detail === 'wrong:unreachable',
+	wrongs().length === 2 && wrongs()[1].params.detail === 'wrong:unreachable',
 	wrongs().map((p) => p.params.detail).join(' '));
 
 L.setStatus('These nodes have no path to a reservoir: J5', 'unreachable');
@@ -256,9 +269,9 @@ ok('the same message standing again does NOT re-offer it', byId.lpn_wrong_status
 // A caller with no code says something that is not one of the diagnoses, and the slug says so.
 L.setStatus('Loading the EPANET engine');
 ok('a message that is not a diagnosis is reported as "status"', L.statusCode() === 'status', L.statusCode());
-press('lpn_wrong_status_btn');
+sendEmpty('lpn_wrong_status_btn');
 ok('...and posts that slug',
-	wrongs().length === 4 && wrongs()[3].params.detail === 'wrong:status',
+	wrongs().length === 3 && wrongs()[2].params.detail === 'wrong:status',
 	wrongs().map((p) => p.params.detail).join(' '));
 
 L.setStatus('');
@@ -280,18 +293,38 @@ function val(key) {
 const tip = val('lpn_wrong_tip');
 const thanksEn = val('lpn_wrong_thanks');
 const btnEn = val('lpn_wrong_btn');
-ok('all three strings are defined in English', !!tip && !!thanksEn && !!btnEn);
-// 'One press', not 'One tap' -- Wave 0, 2026-09-06. The gesture word follows the page's own
-// pointer-first design; a 44px touch target is not an argument here and neither is its verb.
-ok('the tip says what using it sends', /tell us/i.test(tip) && /sends/i.test(tip));
-ok('...names every field that goes: the page, the language, the message', /page/i.test(tip) &&
-	/language/i.test(tip) && /message/i.test(tip));
-ok('...and says outright that the drawing is not sent', /drawing/i.test(tip));
-ok('...and that no reply is coming', /nobody can write back/i.test(tip));
+const sendsEn = val('lpn_fb_sends');
+const sendEn = val('lpn_fb_send');
+ok('the button, tip and thank-you are defined in English', !!tip && !!thanksEn && !!btnEn);
+// Task 768: the first click opens a box. The tip says so, says it is all optional, and says nothing
+// goes until the box's own Send is pressed -- named by reading that button's label, not retyped.
+ok('the tip says the click opens a box', /\bbox\b/i.test(tip), tip);
+ok('...that everything in it is optional', /optional/i.test(tip), tip);
+ok('...and that nothing goes until Send', !!sendEn && tip.indexOf(sendEn) >= 0, tip);
+ok('the box says what it sends', !!sendsEn && /sends/i.test(sendsEn));
+ok('...naming the page, the language, the site version, and the map message',
+	/page/i.test(sendsEn) && /language/i.test(sendsEn) && /version/i.test(sendsEn) && /message/i.test(sendsEn), sendsEn);
+ok('...and that the drawing is never sent', /never/i.test(sendsEn) && /drawing/i.test(sendsEn), sendsEn);
+ok('...and that an address is used only to reply', /only/i.test(sendsEn) && /reply/i.test(sendsEn), sendsEn);
 ok('the thank-you promises nothing', !/(reply|answer|respond|get back|soon|shortly)/i.test(thanksEn),
 	thanksEn);
-ok('no em dash in any of the three, which is the one surviving advisory',
-	[tip, thanksEn, btnEn].every(function (v) { return v.indexOf('—') < 0; }));
+const fbKeys = ['lpn_fb_intro', 'lpn_fb_pick_numbers', 'lpn_fb_pick_broken', 'lpn_fb_pick_wording', 'lpn_fb_pick_confusing',
+	'lpn_fb_comment', 'lpn_fb_email', 'lpn_fb_sends', 'lpn_fb_send', 'lpn_fb_sending', 'lpn_fb_failed', 'lpn_fb_bad_email', 'lpn_fb_busy'];
+ok('every string the box shows is defined in English', fbKeys.every((k) => !!val(k)), fbKeys.filter((k) => !val(k)).join(','));
+ok('...and reaches JS through the pageConfig bridge', fbKeys.every((k) => new RegExp(k + ':\\s*"').test(html)),
+	fbKeys.filter((k) => !new RegExp(k + ':\\s*"').test(html)).join(','));
+// The four canned phrases are the endpoint's closed set: the ids the page offers are the ids
+// lib/FeedbackMail.lib.php accepts, read out of both files.
+const lib = fs.readFileSync(path.join(ROOT, 'lib', 'FeedbackMail.lib.php'), 'utf8');
+const libIds = (/function ecFeedbackPicks\(\)[\s\S]*?\);/.exec(lib) || [''])[0].match(/'([a-z]+)'\s*=>/g) || [];
+const jsSrc = fs.readFileSync(path.join(ROOT, 'js', 'looped-network.js'), 'utf8');
+const jsIds = (/var FEEDBACK_PICKS = \[([^\]]*)\]/.exec(jsSrc) || ['', ''])[1].match(/'([a-z]+)'/g) || [];
+ok('the page offers exactly the picks the endpoint accepts',
+	libIds.map((x) => x.replace(/'|\s*=>/g, '')).join(',') === jsIds.map((x) => x.replace(/'/g, '')).join(',') && jsIds.length === 4,
+	libIds.join(' ') + ' / ' + jsIds.join(' '));
+ok('...and each has its English label', jsIds.every((x) => !!val('lpn_fb_pick_' + x.replace(/'/g, ''))));
+ok('no em dash in any of them, which is the one surviving advisory',
+	[tip, thanksEn, btnEn].concat(fbKeys.map(val)).every(function (v) { return !v || v.indexOf('—') < 0; }));
 
 // **AN ABSENT KEY IS THE CORRECT UNTRANSLATED STATE, AND A TRANSLATED ONE IS THE CORRECT TRANSLATED
 // STATE.** This asserted the three keys were in `lang.ec.en.php` ALONE, which was true while they
@@ -299,7 +332,7 @@ ok('no em dash in any of the three, which is the one surviving advisory',
 // sprint doing its job, which is the worst kind of red. The comment above it always named the real
 // rule and the assertion did not: what blocks the build is a byte-IDENTICAL copy in another
 // language file, never a genuine translation. That is the rule now asserted.
-const wrongKeys = ["lpn_wrong_tip", "lpn_wrong_thanks", "lpn_wrong_btn"];
+const wrongKeys = ["lpn_wrong_tip", "lpn_wrong_thanks", "lpn_wrong_btn"].concat(fbKeys);
 const enVals = {};
 wrongKeys.forEach(function (k) {
 	const m = new RegExp("\\$ec_lang\\['" + k + "'\\]='((?:[^'\\\\]|\\\\.)*)';").exec(en);

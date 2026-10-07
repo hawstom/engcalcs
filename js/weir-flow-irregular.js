@@ -82,6 +82,7 @@ EngCalcs.pageAddCalcRow = function () {
     this.addWeirStation(station,elevation);
 };
 
+EngCalcs.pointsFields = ['station', 'elevation'];
 EngCalcs.dataSingletonsCount = 4;
 EngCalcs.dataColumnsFirstRowCount = 2;
 EngCalcs.dataColumnsOtherRowsCount = 2;

@@ -40,6 +40,7 @@ Derived from `EC_LPN_FURNITURE` in `dev/scripts/lpn_furniture_check.php`; the ch
 | `lpn_pane` | Height and open tab of the bottom pane (drag the pane edge, pick a tab) |
 | `lpn_rpane` | Width of the right pane (drag its edge) |
 | `lpn_setbox`, `lpn_findbox`, `lpn_libbox`, `lpn_ffbox`, `lpn_energybox`, `lpn_cmpbox`, `lpn_reportbox`, `lpn_statusbox`, `lpn_fullbox`, `lpn_notesbox`, `lpn_hotkeysbox`, `lpn_contourbox` | Position, size and openness of each standing box (drag, resize, close) |
+| `lpn_snipbox` | Map > Screenshot: the Screenshot box's position and size (drag, resize), and its Magnification |
 | `lpn_panecols` | Column width, order and hidden columns of the Tables (drag a divider or heading, Manage columns) |
 | `lpn_runbox` | Settings > Calculation > Hydraulics > Show the run progress box |
 | `lpn_scnbasic` | Scenarios > Basic mode |

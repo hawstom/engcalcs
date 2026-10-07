@@ -22,7 +22,6 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ## 75 — Soon (15)
 
-- Task 282 — Offer to attach the backdrop an imported `.inp` names.
 - Task 578 — Fire flow: the EPS frame and the Run concept, extracted from 530.
 - Task 617 — More map view options, the opacity one having shipped.
 - Task 623 — File loss judged only by people whose files are throwaway.
@@ -37,6 +36,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 772 — AutoCAD: import, export, and perhaps sync, on a long-lived branch.
 - Task 776 — Copy a table with its headings; export Tables to CSV and ODS.
 - Task 777 — Station and elevation marks on the mi and wi section sketches.
+- Task 779 — Shape: a simple drawn element, point, polyline or polygon, with snapping.
 
 ## 50 — Someday (35)
 
