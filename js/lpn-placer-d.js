@@ -62,7 +62,12 @@ EngCalcs.lpnPlacerD = (function () {
 	var GAP = 1.5;          // clearance between a node symbol and text touching it
 	var PIPE_GAP = 3;       // clearance between a pipe and a label beside it
 	var CELL = 48;          // spatial grid cell, px
-	var PADX = 8, PADY = 3; // clearance between two different labels, so each reads as its own
+	var PADX0 = 8, PADY0 = 3; // clearance between two different labels, so each reads as its own
+	var PADX_T = 3, PADY_T = 1.5; // the tighter clearance a label takes rather than be hidden ('tight')
+	var PADX = PADX0, PADY = PADY0, tightMode = false;
+	var BUDGET_MS = 700;      // R10: a layout stops improving after this long ('timebound')
+	var DENSE_REACH = 4;      // 'rescue': leader lengths out to this many rows, every half row
+	var DENSE_STEP = 15;      // 'rescue': every this many degrees
 
 	// Worth, in one currency. A shown row is 10; the label itself (its ID) is 40, so every property
 	// row goes before any label does (G, R1). Costs follow Tom's order, worst first.
@@ -379,10 +384,20 @@ EngCalcs.lpnPlacerD = (function () {
 
 	function place(scene, opts, mem) {
 		readOff(API);
+		PADX = PADX0; PADY = PADY0; tightMode = false;
 		var text = scene.text, vp = scene.viewport, rowH = text.rowHeightPx || 14.4;
 		var hookLen = Math.min(text.hookMaxPx || 0, 9);
 		var spacing = text.repeatSpacingPx || 0;
-		var nDyn = 0;       // label-against-label tests made, for the repair's work cap
+		var nDyn = 0;       // label-against-label tests made, for the round-6 work cap ('timebound' off)
+		var tStart = now(), late = false;
+		// R10 and S21: bounded by the clock, never by how many labels there are. With 'timebound'
+		// off, the round-6 count cap.
+		function overBudget() {
+			if (!on('timebound')) { return nDyn > MAX_DYN; }
+			if (late) { return true; }
+			if ((nDyn & 63) === 0 && now() - tStart > BUDGET_MS) { late = true; }
+			return late;
+		}
 
 		// ---- the fixed world: symbols and Text objects (hard), pipes, arrows, callouts (soft) ----
 		var hardG = new Grid(vp), softG = new Grid(vp), nodesById = {}, linksById = {}, custById = {};
@@ -422,6 +437,14 @@ EngCalcs.lpnPlacerD = (function () {
 			}
 		});
 		(scene.customers || []).forEach(function (c) { custById[c.id] = c; });
+		// The directions the pipes leave each node in, for the ranked gaps ('wedge', S1).
+		var nodeLinks = {};
+		scene.links.forEach(function (l) {
+			var P = l.points, n = P.length;
+			if (n < 2) { return; }
+			if (l.from !== undefined) { (nodeLinks[l.from] || (nodeLinks[l.from] = [])).push(Math.atan2(P[1][1] - P[0][1], P[1][0] - P[0][0])); }
+			if (l.to !== undefined) { (nodeLinks[l.to] || (nodeLinks[l.to] = [])).push(Math.atan2(P[n - 2][1] - P[n - 1][1], P[n - 2][0] - P[n - 1][0])); }
+		});
 
 		// ---- the free-space model: two summed-area tables of every symbol and Text object ----
 		// Cells of RC px over the view. TOUCHED marks a cell any obstacle touches, so a box whose
@@ -765,12 +788,14 @@ EngCalcs.lpnPlacerD = (function () {
 		// The candidates of one drop level, clear of the fixed world, best first.
 		// Tier 0 is the places touching the owner (and last view's place); tier t > 0 the places
 		// on a leader DISTS[t - 1] long, each built only when the tiers before it cannot win.
-		var NT = 1 + DISTS.length;
+		var NT = 1 + DISTS.length, denseOn = false;
 		function ensure(li, k, t) {
-			var L = lab[li], key = NT * k + t;
+			var L = lab[li], key = (NT + 1) * k + t;
 			if (L.lists[key]) { return L.lists[key]; }
 			var req = L.req, lv = L.levels[k], raw = [], out = [];
-			if (L.hand) { if (!t) { genHand(li, req, lv, raw); } } else {
+			if (L.hand) { if (!t) { genHand(li, req, lv, raw); } } else if (t === NT) {
+				genDense(li, req, lv, raw);
+			} else {
 				if (req.kind === 'link' && linksById[req.owner]) { genPipe(li, req, lv, raw, t); } else { genPoint(li, req, lv, raw, t); }
 				if (!t) { genSticky(li, req, lv, raw); }
 			}
@@ -784,6 +809,7 @@ EngCalcs.lpnPlacerD = (function () {
 		}
 		function tierMax(li, k, t) {
 			var lv = lab[li].levels[k];
+			if (t === NT) { return lv.value + keepBonus(li, lv) - C_LEADER_BASE - C_LEADER_PER_ROW * 0.5; }
 			return lv.value + keepBonus(li, lv) +
 				(t ? -C_LEADER_BASE - C_LEADER_PER_ROW * DISTS[t - 1] - (wantsAlong(reqs[li]) ? C_NOT_ALONG : 0) : B_STICK);
 		}
@@ -800,8 +826,8 @@ EngCalcs.lpnPlacerD = (function () {
 		if (!mem.lt || mem.lt.length !== LW * LH) { mem.lt = new Int16Array(LW * LH); mem.lc = new Int16Array(LW * LH); } else { mem.lt.fill(0); mem.lc.fill(0); }
 		var lt = mem.lt, lc = mem.lc;
 		function stamp(b, sgn) {
-			var py = b.rot ? PADX : PADY;   // a turned row's clearance, measured on its own axes, is wider
-			var fx0 = (b.x0 - PADX - vp.x) / LC, fx1 = (b.x1 + PADX - vp.x) / LC, fy0 = (b.y0 - py - vp.y) / LC, fy1 = (b.y1 + py - vp.y) / LC, i, j, r;
+			var py = b.rot ? PADX0 : PADY0;   // a turned row's clearance, measured on its own axes, is wider
+			var fx0 = (b.x0 - PADX0 - vp.x) / LC, fx1 = (b.x1 + PADX0 - vp.x) / LC, fy0 = (b.y0 - py - vp.y) / LC, fy1 = (b.y1 + py - vp.y) / LC, i, j, r;
 			var i0 = Math.max(0, Math.floor(fx0)), i1 = Math.min(LW, Math.ceil(fx1)), j0 = Math.max(0, Math.floor(fy0)), j1 = Math.min(LH, Math.ceil(fy1));
 			for (j = j0; j < j1; j++) { r = j * LW; for (i = i0; i < i1; i++) { lt[r + i] += sgn; } }
 			if (b.rot) { return; }
@@ -874,7 +900,7 @@ EngCalcs.lpnPlacerD = (function () {
 		function dynCost(c, blockers) {
 			var cost = 0, n, i, it, o, top;
 			nDyn++;
-			if (!blockers && c.bl && cur[c.bl.li] === c.bl) { return NaN; }
+			if (!blockers && !tightMode && c.bl && cur[c.bl.li] === c.bl) { return NaN; }
 			var hit = false, q, b;
 			if (!c.boxes && !c.angle && !c.reps) {
 				// Unturned rows as plain rectangles: no ink is built for a candidate that is blocked.
@@ -888,8 +914,8 @@ EngCalcs.lpnPlacerD = (function () {
 						var lf0 = line || c.align === 'left' ? c.x : (c.align === 'right' ? c.x + c.w - rw0 : c.x + (c.w - rw0) / 2);
 						var v = rowRaster(lf0, top, lf0 + rw0, top + rh0);
 						top += rh0;
-						if (v === 1) { return NaN; }
-						if (v === -1) { undecided = true; }
+						if (v === 1 && !tightMode) { return NaN; }
+						if (v !== 0) { undecided = true; }
 					}
 					if (!undecided) { q = qd; q.n = 0; } else { q = null; }
 				} else { q = null; }
@@ -922,8 +948,8 @@ EngCalcs.lpnPlacerD = (function () {
 					und = false;
 					for (i = 0; i < c.boxes.length; i++) {
 						var bv = boxRaster(c.boxes[i]);
-						if (bv === 1) { return NaN; }
-						if (bv === -1) { und = true; }
+						if (bv === 1 && !tightMode) { return NaN; }
+						if (bv !== 0) { und = true; }
 					}
 				}
 				if (und) { q = dynB.query(c.bx0 - PADX, c.by0 - PADY, c.bx1 + PADX, c.by1 + PADY, qd); } else { q = qd; q.n = 0; }
@@ -961,13 +987,13 @@ EngCalcs.lpnPlacerD = (function () {
 			lift(li);
 			for (var k = Math.max(0, k0); k <= k1 && k < L.levels.length; k++) {
 				if (tierMax(li, k, 0) <= bs) { break; }
-				for (var t = 0; t < NT; t++) {
+				for (var t = 0; t < NT + (denseOn ? 1 : 0); t++) {
 					if (tierMax(li, k, t) <= bs) { continue; }
 					var list = ensure(li, k, t);
 					for (var i = 0; i < list.length; i++) {
 						var c = list[i];
 						if (c.base <= bs) { break; }
-						if (nDyn > MAX_DYN && best) { break; }
+						if (overBudget() && best) { break; }
 						if (c.fx === c.fx && c.base - c.fx <= bs) { continue; }
 						if (c.dead || (c.lazy && !hardLazy(c))) { continue; }
 						var d = dynCost(c, null);
@@ -1059,6 +1085,107 @@ EngCalcs.lpnPlacerD = (function () {
 					}
 				}
 			}
+		}
+
+		// 'rescue' (S3 made dense, S15 built in): every DENSE_STEP degrees, every half row out to
+		// DENSE_REACH rows, the block either centred on its leader's end by its first or last row
+		// or hung by its corner (the end at the corner the leader arrives at). For a pipe label,
+		// from the middle of its on-screen stretch, and also beside the pipe further along it.
+		// With 'wedge' (S1), directions are tried in the open gaps between the owner's pipes
+		// first, widest gap first. Only labels the earlier passes left hidden or short reach here.
+		function genDense(li, req, lv, list) {
+			var isPipe = req.kind === 'link' && linksById[req.owner], o, P = null, along = wantsAlong(req);
+			if (isPipe) {
+				var lk = linksById[req.owner], cum = cumLengths(lk.points), vis = visibleSpan(lk.points, cum);
+				var Lt = cum[cum.length - 1], mid = vis ? (vis[0] + vis[1]) / 2 : Lt / 2, span = vis ? vis[1] - vis[0] : Lt;
+				P = pointAt(lk.points, cum, mid);
+				o = { x: P.x, y: P.y, r: 0, hw: 0, hh: 0 };
+				if (!(spacing > 0 && Lt > spacing)) {
+					// Beside the pipe further out along it than the first passes look.
+					var layoutsB = lv.rows.length > 1 ? ['line', 'stack'] : ['line'];
+					layoutsB.forEach(function (layout, i2) {
+						var d0 = dims(req, lv.rows, layout, text);
+						[-0.45, 0.45, -0.4, 0.4, -0.35, 0.35].forEach(function (f) {
+							var at = mid + f * span;
+							if (at < 0 || at > Lt) { return; }
+							for (var side = -1; side <= 1; side += 2) {
+								var kinds = along && layout === 'line' ? ['along', 'level'] : ['level'];
+								for (var q = 0; q < kinds.length; q++) {
+									var cb = besidePipe(li, lv, layout, d0, lk.points, cum, at, side, kinds[q],
+										(i2 ? C_ALT_LAYOUT : 0) + 2 * Math.abs(f) + (kinds[q] === 'level' && along ? C_NOT_ALONG : 0), true);
+									if (cb) { list.push(cb); }
+								}
+							}
+						});
+					});
+				}
+			} else {
+				o = ownerPoint(req);
+			}
+			var own = req.kind === 'node' ? req.owner : null;
+			var dirs = denseDirs(req, o);
+			var layouts = lv.rows.length > 1 ? ['stack', 'line'] : ['stack'];
+			if (req.layout === 'line') { layouts.reverse(); }
+			var extra = isPipe ? 0.3 + (along ? C_NOT_ALONG : 0) : 0;
+			for (var lo = 0; lo < layouts.length; lo++) {
+				var layout = layouts[lo], d = dims(req, lv.rows, layout, text), alt = lo ? C_ALT_LAYOUT : 0;
+				for (var k = 1; k <= DENSE_REACH * 2; k++) {
+					var rr = o.r + 1 + k * rowH / 2;
+					for (var m = 0; m < dirs.length; m++) {
+						var ux = dirs[m][0], uy = dirs[m][1], pref = alt + extra + 0.2 + dirs[m][2];
+						var px = o.x + ux * rr, py = o.y + uy * rr, sx = o.x + ux * o.r, sy = o.y + uy * o.r;
+						var east = ux > 0.26, west = ux < -0.26, segOk = null;
+						// Variant A: the end at the middle of the row nearest it.
+						// Variant B: the end at the block's corner (or the middle of its side).
+						for (var vnt = 0; vnt < 3; vnt++) {
+							var x, y, al;
+							if (vnt === 0) {
+								if (!east && !west) { continue; }
+								var row = uy < -0.2 ? d.mids.length - 1 : 0;
+								x = east ? px : px - d.w; y = py - d.mids[row]; al = east ? 'left' : 'right';
+							} else {
+								if ((east || west) && vnt === 2) { continue; }
+								var toLeft = east || (!west && vnt === 1);
+								x = toLeft ? px : px - d.w; al = toLeft ? 'left' : 'right';
+								y = uy < -0.26 ? py - d.h : (uy > 0.26 ? py : py - d.h / 2);
+								if (vnt === 1 && (east || west) && y === py - d.h / 2) { continue; }
+							}
+							if (!blockFree(req, lv.rows, layout, d, al, x, y)) { continue; }
+							if (segOk === null) { segOk = segFree(sx, sy, px, py, own); }
+							if (!segOk) { break; }
+							var c = newCand(li, lv, layout, al, x, y, d.w, d.h, 0, null, pref + 0.05 * vnt);
+							setLeader(c, lead2(c, sx, sy, px, py));
+							c.ok = true; list.push(c);
+						}
+					}
+				}
+			}
+		}
+		// Directions for the dense search, each with a small preference: with 'wedge', the gaps
+		// between the pipes at the owner, widest first, are tried first (S1); otherwise all alike.
+		function denseDirs(req, o) {
+			var out = [], n = Math.round(360 / DENSE_STEP), k, gaps = null;
+			if (on('wedge') && req.kind === 'node' && nodeLinks[req.owner] && nodeLinks[req.owner].length) {
+				var angs = nodeLinks[req.owner].map(function (a) { return a; }).sort(function (a, b) { return a - b; });
+				gaps = [];
+				for (k = 0; k < angs.length; k++) {
+					var a0 = angs[k], a1 = k + 1 < angs.length ? angs[k + 1] : angs[0] + 2 * Math.PI;
+					gaps.push({ a0: a0, a1: a1, w: a1 - a0 });
+				}
+				gaps.sort(function (a, b) { return b.w - a.w; });
+			}
+			for (k = 0; k < n; k++) {
+				var th = k * 2 * Math.PI / n, ux = Math.cos(th), uy = Math.sin(th), rank = 0;
+				if (gaps) {
+					rank = gaps.length;
+					for (var g = 0; g < gaps.length; g++) {
+						var t = th; while (t < gaps[g].a0) { t += 2 * Math.PI; }
+						if (t <= gaps[g].a1) { rank = g; break; }
+					}
+				}
+				out.push([Math.round(ux * 1e9) / 1e9, Math.round(uy * 1e9) / 1e9, 0.3 * Math.min(rank, 3)]);
+			}
+			return out;
 		}
 
 		function genPoint(li, req, lv, list, tier) {
@@ -1293,7 +1420,7 @@ EngCalcs.lpnPlacerD = (function () {
 		order.forEach(function (li) { var n = lab[li].levels.length - 1; seat(li, bestFor(li, n, n).c); });
 		// ... then each grows into the room around it, a row at a time: a label with no room for
 		// one more row has none for two.
-		order.forEach(function (li) {
+		function grow(li) {
 			var best = null, w = worthNow(li) + 1e-6;
 			for (var k = levelOf(li) - 1; k >= 0; k--) {
 				var b = bestFor(li, k, k, w);
@@ -1301,7 +1428,8 @@ EngCalcs.lpnPlacerD = (function () {
 				best = b.c; w = b.w + 1e-6;
 			}
 			if (best) { seat(li, best); }
-		});
+		}
+		order.forEach(grow);
 
 		// ---- 3. repair: show more of each short-changed label, moving at most two neighbours ----
 		function levelOf(li) { return cur[li] ? lab[li].levels.indexOf(cur[li].lv) : lab[li].levels.length; }
@@ -1339,7 +1467,7 @@ EngCalcs.lpnPlacerD = (function () {
 					tried++;
 					d = dynCost(c, bl);
 					if (bl.length > 2 || bl.some(function (b) { return lab[b].hand; })) { continue; }
-					if (nDyn > MAX_DYN) { return false; }
+					if (overBudget()) { return false; }
 					var set = [li].concat(bl), saved = set.map(function (s) { return cur[s]; });
 					var before = unseatAll(set);
 					seat(li, c);
@@ -1367,14 +1495,37 @@ EngCalcs.lpnPlacerD = (function () {
 			todo.sort(function (a, b) { return (cur[a] ? 1 : 0) - (cur[b] ? 1 : 0) || levelOf(b) - levelOf(a) || a - b; });
 			var changed = false;
 			for (i = 0; i < todo.length; i++) {
-				while (tryUpgrade(todo[i])) { changed = true; if (!levelOf(todo[i]) || nDyn > MAX_DYN) { break; } }
+				while (tryUpgrade(todo[i])) { changed = true; if (!levelOf(todo[i]) || overBudget()) { break; } }
 			}
 			// ---- 4. polish: every label re-seats itself if that is worth more ----
 			for (i = 0; i < order.length; i++) {
 				var lj = order[i], here = worthNow(lj), cl = levelOf(lj), b = bestFor(lj, cl - 1, cl, here + 1e-6);
 				if (b.c && b.c !== cur[lj] && b.w > here + 1e-6) { seat(lj, b.c); changed = true; }
 			}
-			if (!changed || nDyn > MAX_DYN) { break; }
+			if (!changed || overBudget()) { break; }
+		}
+
+		// ---- 5. rescue: the dense search for every label still hidden, then for every label
+		// still short of rows (S15 built in; 'tight' lets a label that would otherwise be hidden
+		// stand closer to its neighbours) ----
+		if (on('rescue') && !overBudget()) {
+			denseOn = true;
+			if (on('tight')) { PADX = PADX_T; PADY = PADY_T; tightMode = true; }
+			for (i = 0; i < order.length && !overBudget(); i++) {
+				var lh = order[i];
+				if (cur[lh]) { continue; }
+				var nl = lab[lh].levels.length - 1, bh = bestFor(lh, nl, nl);
+				if (bh.c) { seat(lh, bh.c); }
+			}
+			PADX = PADX0; PADY = PADY0; tightMode = false;
+			for (i = 0; i < order.length && !overBudget(); i++) { if (levelOf(order[i]) > 0) { grow(order[i]); } }
+			// And with the tighter clearance, a row more where only that fits.
+			if (on('tight')) {
+				PADX = PADX_T; PADY = PADY_T; tightMode = true;
+				for (i = 0; i < order.length && !overBudget(); i++) { if (levelOf(order[i]) > 0) { grow(order[i]); } }
+				PADX = PADX0; PADY = PADY0; tightMode = false;
+			}
+			denseOn = false;
 		}
 
 		// ---- answer ----
