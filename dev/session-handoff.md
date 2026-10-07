@@ -130,10 +130,12 @@ lpn_file_export_inp, lpn_file_export_geojson (nothing rendered them).
   feedback box in his "new tone" (not ruled), Task 780 `.epp`.
 - Still from before: `feat/desktop`.
 
-### Running at handoff
+### Label port (Task 539)
 
-- `fix/label-rescue` (label rule 2), worktree ~/webdev/worktrees/fix-label-rescue. Measure method:
-  /home/haws/label-trials-work/cleanground. Rule 3 (eviction) after it.
+- Rules 1 and 2 merged 2026-10-07. Rule 2 (rescue search): labels shown 38.3 -> 39.3 per 100 asked,
+  ~+7% pass time; its pipe fallback lifts labels-on-a-pipe 23.9 -> 26.2 per 100 shown. Clean-only is two
+  lines in `rescueDropped()` (js/lpn-collide.js): his call. Next: rule 3 (eviction). Bigger gains sit in
+  bench rule 6 (looser pad for would-be-hidden labels). Method: /home/haws/label-trials-work/{cleanground,rescue}.
 
 ### Next job
 
