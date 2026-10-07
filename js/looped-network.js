@@ -29152,6 +29152,39 @@ var EngCalcs = EngCalcs || {};
 	function paneSanitizeFileName(s) {
 		return String(s || '').replace(/[\\/:*?"<>|]/g, '_').replace(/\s+/g, ' ').replace(/^\s+|\s+$/g, '');
 	}
+	function paneEndPrint() {
+		if (document.body) { document.body.classList.remove('lpn-printing-table'); }
+		if (panePrintArea && panePrintArea.parentNode) {
+			panePrintArea.parentNode.removeChild(panePrintArea);
+		}
+		panePrintArea = null;
+		if (panePrintPrevTitle !== null) { document.title = panePrintPrevTitle; panePrintPrevTitle = null; }
+	}
+	function printPaneTable(spec) {
+		var pc = EngCalcs.pageConfig || {}, projectName, tableName;
+		if (!spec || !document.body) { return; }
+		paneEndPrint();
+		panePrintArea = paneBuildPrintable(spec);
+		document.body.appendChild(panePrintArea);
+		document.body.classList.add('lpn-printing-table');
+		projectName = paneSanitizeFileName((typeof project === 'object' && project && project.name) || '');
+		tableName = paneSanitizeFileName(pc[spec.label] || spec.id);
+		panePrintPrevTitle = document.title;
+		document.title = (projectName ? projectName + '-' : '') + tableName;
+		if (typeof window.onafterprint !== 'undefined' && window.addEventListener) {
+			window.addEventListener('afterprint', paneEndPrint);
+			window.print();
+		} else {
+			try { window.print(); } finally { paneEndPrint(); }
+		}
+	}
+	// The active tab, as a table -- or nothing, which is what Profile is. The button that calls
+	// this is hidden on Profile for the same reason; both read the same answer, so a tab that is
+	// not a table can neither show the button nor be reached through it.
+	function activePaneTableSpec() {
+		return paneTableById(paneState.tab);
+	}
+
 	// **THE TABLE AS A FILE** (Tom, 2026-10-06). Cells read through paneCellDisplayText(), the same reader
 	// the printed sheet uses, so a file says what the screen says -- a choice column its label, a
 	// result its two decimals. A column is numeric to a spreadsheet only when it is a number column
@@ -29315,39 +29348,6 @@ var EngCalcs = EngCalcs || {};
 			{ label: pc.lpn_cancel || 'Cancel', cancel: true, fn: function () { } }
 		], { title: pc.lpn_export_table_title || 'Export table' });
 	}
-	function paneEndPrint() {
-		if (document.body) { document.body.classList.remove('lpn-printing-table'); }
-		if (panePrintArea && panePrintArea.parentNode) {
-			panePrintArea.parentNode.removeChild(panePrintArea);
-		}
-		panePrintArea = null;
-		if (panePrintPrevTitle !== null) { document.title = panePrintPrevTitle; panePrintPrevTitle = null; }
-	}
-	function printPaneTable(spec) {
-		var pc = EngCalcs.pageConfig || {}, projectName, tableName;
-		if (!spec || !document.body) { return; }
-		paneEndPrint();
-		panePrintArea = paneBuildPrintable(spec);
-		document.body.appendChild(panePrintArea);
-		document.body.classList.add('lpn-printing-table');
-		projectName = paneSanitizeFileName((typeof project === 'object' && project && project.name) || '');
-		tableName = paneSanitizeFileName(pc[spec.label] || spec.id);
-		panePrintPrevTitle = document.title;
-		document.title = (projectName ? projectName + '-' : '') + tableName;
-		if (typeof window.onafterprint !== 'undefined' && window.addEventListener) {
-			window.addEventListener('afterprint', paneEndPrint);
-			window.print();
-		} else {
-			try { window.print(); } finally { paneEndPrint(); }
-		}
-	}
-	// The active tab, as a table -- or nothing, which is what Profile is. The button that calls
-	// this is hidden on Profile for the same reason; both read the same answer, so a tab that is
-	// not a table can neither show the button nor be reached through it.
-	function activePaneTableSpec() {
-		return paneTableById(paneState.tab);
-	}
-
 	// ---- the PROFILE panel (ROADMAP Task 409) ------------------------------
 	//
 	// Pick a start node and an end node; the app suggests the shortest route by LINK LENGTH; the
