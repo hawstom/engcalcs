@@ -1833,7 +1833,8 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 .lpn-snip-split { position: relative; display: inline-flex; }
 .lpn-snip-split .lpn-snip-ic:first-child { border-top-right-radius: 0; border-bottom-right-radius: 0; }
 .lpn-snip-split .lpn-snip-chev { min-width: 20px; padding: 0 2px; border-left: 0; border-top-left-radius: 0; border-bottom-left-radius: 0; }
-.lpn-snip-menu { position: absolute; left: 0; top: 100%; z-index: 1; flex-direction: column; gap: 2px; padding: 2px; background: var(--ec-bg); border: 1px solid var(--ec-ink); box-shadow: 2px 2px 6px var(--ec-a-0-0-0-3); }
+.lpn-snip-menu { display: none; position: absolute; left: 0; top: 100%; z-index: 1; flex-direction: column; gap: 2px; padding: 2px; background: var(--ec-bg); border: 1px solid var(--ec-ink); box-shadow: 2px 2px 6px var(--ec-a-0-0-0-3); }
+.lpn-snip-menu.lpn-snip-menu-open { display: flex; }
 .lpn-snip-seg { display: inline-flex; }
 .lpn-snip-seg .lpn-snip-ic:first-child { border-top-right-radius: 0; border-bottom-right-radius: 0; }
 .lpn-snip-seg .lpn-snip-ic:last-child { border-top-left-radius: 0; border-bottom-left-radius: 0; border-left: 0; }

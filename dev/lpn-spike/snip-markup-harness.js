@@ -140,7 +140,7 @@ async function main() {
 			ok('the view offers Pen, Eraser, Undo, Redo, Copy, Save, Close, each with a tip and the same aria-label',
 				icons.length === 7 && icons.every((i) => i.title && i.title === i.aria && i.svg), JSON.stringify(icons.map((i) => i.title)));
 			ok('...and the icon buttons carry no words', icons.filter((i) => i.id !== 'lpn_snip_edit_close').every((i) => i.text === ''));
-			ok('the eraser tip and the shortcuts are named', icons[1].title === 'Eraser: click a stroke to remove it (E)' && /Ctrl\+Z/.test(icons[2].title) && /Ctrl\+Y/.test(icons[3].title), icons[1].title);
+			ok('the eraser tip and the shortcuts are named', icons[1].title === await a.lang('lpn_snip_tip_eraser') && /Ctrl\+Z/.test(icons[2].title) && /Ctrl\+Y/.test(icons[3].title), icons[1].title);
 			await copyAndClose(page, 1);
 			const full = await page.evaluate(DECODE, 0);
 			ok('the whole map is map x 2', full.w === Math.round(map.w * S) && full.h === Math.round(map.h * S), full.w + ' x ' + full.h);
@@ -150,7 +150,7 @@ async function main() {
 				return { id: i, title: e.title || e.getAttribute('data-bs-original-title'), aria: e.getAttribute('aria-label'), text: i === 'lpn_snip_scale' ? '' : e.textContent.trim() }; }));
 			ok('the box is wordless: tips and aria-labels on the scale, Snip, its chevron, the monitor, and both modes',
 				boxIcons.every((i) => i.title && i.title === i.aria && i.text === ''), JSON.stringify(boxIcons.map((i) => i.title)));
-			ok('...Snip says Rectangle with its shortcut, and the scale reads as a bare number', boxIcons[1].title === 'Snip a rectangle (S)'
+			ok('...Snip says Rectangle with its shortcut, and the scale reads as a bare number', boxIcons[1].title === await a.lang('lpn_snip_tip_rect')
 				&& (await page.$eval('#lpn_snip_scale', (s) => Array.from(s.options).map((o) => o.textContent).join(','))) === '1\u00d7,2\u00d7,3\u00d7,4\u00d7');
 			ok('the mode menu opens from the chevron and holds Rectangle and Freehand', await (async () => {
 				const closed = await page.$eval('#lpn_snip_menu', (m) => getComputedStyle(m).display === 'none');
@@ -268,7 +268,7 @@ async function main() {
 			await page.keyboard.press('Escape');
 			await page.click('#lpn_snip_mode'); await page.click('#lpn_snip_mode_rect');
 			await page.waitForSelector('.lpn-snip-veil', { state: 'visible' });
-			ok('picking Rectangle from the menu starts a rectangle snip and the S key does too', (await page.$eval('#lpn_snip_go', (b) => b.title || b.getAttribute('data-bs-original-title'))) === 'Snip a rectangle (S)');
+			ok('picking Rectangle from the menu starts a rectangle snip and the S key does too', (await page.$eval('#lpn_snip_go', (b) => b.title || b.getAttribute('data-bs-original-title'))) === await a.lang('lpn_snip_tip_rect'));
 			await page.keyboard.press('Escape');
 			await page.keyboard.press('s');
 			await page.waitForSelector('.lpn-snip-veil', { state: 'visible' });
@@ -301,7 +301,7 @@ async function main() {
 			// 6. Freehand: a triangle.
 			await page.click('#lpn_snip_mode'); await page.click('#lpn_snip_mode_free');
 			await page.waitForSelector('.lpn-snip-veil', { state: 'visible' });
-			ok('after Freehand, Snip carries the freehand tip', (await page.$eval('#lpn_snip_go', (b) => b.title || b.getAttribute('data-bs-original-title'))) === 'Snip a freehand shape (S)');
+			ok('after Freehand, Snip carries the freehand tip', (await page.$eval('#lpn_snip_go', (b) => b.title || b.getAttribute('data-bs-original-title'))) === await a.lang('lpn_snip_tip_free'));
 			const T = [{ x: r.x, y: r.y + r.h }, { x: r.x + r.w, y: r.y + r.h }, { x: r.x + r.w / 2, y: r.y }];
 			await page.mouse.move(T[0].x, T[0].y); await page.mouse.down();
 			for (const p of [T[1], T[2], { x: T[0].x + 2, y: T[0].y - 2 }]) { await page.mouse.move(p.x, p.y, { steps: 8 }); }

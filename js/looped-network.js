@@ -42345,7 +42345,7 @@ var EngCalcs = EngCalcs || {};
 	}
 	function closeSnipMenu() {
 		var m = document.getElementById('lpn_snip_menu');
-		if (m) { m.style.display = 'none'; }
+		if (m) { m.classList.remove('lpn-snip-menu-open'); }
 		var c = document.getElementById('lpn_snip_mode');
 		if (c) { c.setAttribute('aria-expanded', 'false'); }
 	}
@@ -42381,10 +42381,11 @@ var EngCalcs = EngCalcs || {};
 		var split = document.createElement('span'), go = snipIconButton('lpn_snip_go', 'rect', snipModeTip('rect')),
 			chev = snipIconButton('lpn_snip_mode', 'chevron', pc.lpn_snip_tip_mode || 'Snip shape'),
 			menu = document.createElement('div');
+		go.id = 'lpn_snip_go'; chev.id = 'lpn_snip_mode';
 		split.className = 'lpn-snip-split';
 		chev.classList.add('lpn-snip-chev');
 		chev.setAttribute('aria-haspopup', 'menu'); chev.setAttribute('aria-expanded', 'false');
-		menu.id = 'lpn_snip_menu'; menu.className = 'lpn-snip-menu'; menu.setAttribute('role', 'menu'); menu.style.display = 'none';
+		menu.id = 'lpn_snip_menu'; menu.className = 'lpn-snip-menu'; menu.setAttribute('role', 'menu');
 		[['rect', 'rect'], ['free', 'free']].forEach(function (m) {
 			var it = snipIconButton('lpn_snip_mode_' + m[0], m[1], snipModeTip(m[0]));
 			it.setAttribute('role', 'menuitemradio');
@@ -42399,9 +42400,8 @@ var EngCalcs = EngCalcs || {};
 		go.addEventListener('click', function () { startScreenshot(snipMode); });
 		chev.addEventListener('click', function (e) {
 			e.stopPropagation();
-			var open = menu.style.display !== 'none';
-			if (open) { closeSnipMenu(); return; }
-			menu.style.display = 'flex';
+			if (menu.classList.contains('lpn-snip-menu-open')) { closeSnipMenu(); return; }
+			menu.classList.add('lpn-snip-menu-open');
 			chev.setAttribute('aria-expanded', 'true');
 		});
 		split.appendChild(go); split.appendChild(chev); split.appendChild(menu);
