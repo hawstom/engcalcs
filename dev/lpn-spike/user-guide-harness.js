@@ -261,6 +261,114 @@ async function desktop(browser, Session) {
 	await page.fill('#lpn_guide_search', '');
 	await page.evaluate(() => document.getElementById('lpn_guide_search').dispatchEvent(new Event('input')));
 
+	console.log('\n8. Dimming follows the strip while the guide stays open (Perry)');
+	// Every toolbar row's dimming must equal "that button is not on screen now", after the strip
+	// changes under an open guide: another project, and the Recalculate-off Calculate button.
+	const dimMismatch = () => page.evaluate(() => {
+		const out = [];
+		document.querySelectorAll('#lpn_guide_toolbar > .lpn-guide-row').forEach((r) => {
+			const g = r.__lpnGuide && r.__lpnGuide.g, el = g && g.b.el;
+			const shown = !!(el && el.isConnected && el.getClientRects().length > 0);
+			if (r.classList.contains('lpn-guide-off') === shown) { out.push((g ? g.b.name : '?') + (shown ? ' (shown, dimmed)' : ' (hidden, lit)')); }
+		});
+		const n = document.querySelectorAll('#lpn_guide_toolbar > .lpn-guide-row').length;
+		if (n !== EngCalcs.lpnGuideProbe().toolbar.length) { out.push('row count ' + n); }
+		return out;
+	});
+	await page.keyboard.press('Escape');
+	await page.evaluate(() => { if (document.activeElement) { document.activeElement.blur(); } });
+	if (!(await boxOpen(page))) {
+		await page.keyboard.type('?');
+		await a.settle(200);
+	}
+	ok('(the guide is open)', await boxOpen(page));
+	ok('dimming matches the strip to begin with', (await dimMismatch()).length === 0, JSON.stringify(await dimMismatch()));
+	const net3Tab = ((await a.tabs()).filter(t => t.current)[0] || {}).label;
+	await a.newProject();
+	await a.settle(500);
+	ok('...after opening an empty project', (await dimMismatch()).length === 0, JSON.stringify(await dimMismatch()));
+	await a.menuClick(await a.lang('lpn_examples_menu'), 'file');   // File > Open example... shows the gallery
+	await a.settle(400);
+	await a.openExampleCard(await a.lang('lpn_ex_net3_title'));
+	await a.settle(800);
+	ok('...and after Net3 from the gallery', (await dimMismatch()).length === 0, JSON.stringify(await dimMismatch()));
+	// Hidden to SHOWN as well: back to the first Net3 tab, whose player is on the strip.
+	await page.evaluate((label) => {
+		const t = Array.from(document.querySelectorAll('#lpn_tabs .lpn-tab')).filter(e => ((e.querySelector('.lpn-tab-name') || {}).textContent || '') === label)[0];
+		const n = t && (t.querySelector('.lpn-tab-name') || t);
+		if (n) { n.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 })); }
+	}, net3Tab);
+	await page.waitForFunction(() => Array.from(document.querySelectorAll('#lpn_toolbar_run button.lpn-transport-btn')).some(b => b.getClientRects().length > 0), null, { timeout: 8000 }).catch(() => {});
+	await a.settle(200);
+	const transportShown = await page.evaluate(() => Array.from(document.querySelectorAll('#lpn_toolbar_run button.lpn-transport-btn')).some(b => b.getClientRects().length > 0));
+	ok('(back on the first Net3, the transport shows on the strip)', transportShown);
+	ok('...and the transport rows are no longer dimmed', (await dimMismatch()).length === 0, JSON.stringify(await dimMismatch()));
+	ok('(the guide stayed open throughout)', await boxOpen(page));
+	// Recalculate off puts Calculate on the strip; on again takes it away.
+	const AUTO = await a.lang('lpn_settings_auto_run');
+	const flipAuto = () => page.evaluate((label) => {
+		const was = document.getElementById('lpn_settings_box');
+		const wasOpen = !!was && was.getClientRects().length > 0;
+		const label2 = Array.from(document.querySelectorAll('#lpn_settings_box label, #lpn_settings_box .lpn-setrow, #lpn_settings_box tr, #lpn_settings_box div'))
+			.filter(e => (e.textContent || '').trim().indexOf(label) === 0 && e.querySelector('input[type=checkbox]'))
+			.sort((x, y) => x.textContent.length - y.textContent.length)[0];
+		const cb = label2 && label2.querySelector('input[type=checkbox]');
+		if (!cb) { return null; }
+		cb.checked = !cb.checked;
+		cb.dispatchEvent(new Event('change', { bubbles: true }));
+		return { checked: cb.checked, wasOpen };
+	}, AUTO);
+	await page.evaluate(() => { const b = EngCalcs.lpnGuideProbe().toolbar.filter(t => t.icon === 'settings')[0]; b.el.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 })); });
+	await a.settle(300);
+	const before8 = (await probe(page)).names.length;
+	const f1 = await flipAuto();
+	await a.settle(400);
+	ok('(Recalculate automatically turned off)', !!f1 && f1.checked === false, JSON.stringify(f1));
+	ok('...the Calculate button\'s row follows, not dimmed while the button shows', (await dimMismatch()).length === 0, JSON.stringify(await dimMismatch()));
+	const f2 = await flipAuto();
+	await a.settle(400);
+	ok('...and back on, the row follows again', !!f2 && f2.checked === true && (await dimMismatch()).length === 0, JSON.stringify(await dimMismatch()) + ' rows ' + before8);
+
+	console.log('\n9. "?" on a guide row points at that row');
+	await page.fill('#lpn_guide_search', L.pipe.toLowerCase());
+	await a.settle(100);
+	await page.evaluate((t) => {
+		const r = Array.from(document.querySelectorAll('#lpn_guide_toolbar > .lpn-guide-row')).filter(x => x.style.display !== 'none' && x.querySelector('.lpn-guide-name').textContent === t)[0];
+		r.focus();
+	}, L.pipe);
+	await page.keyboard.type('?');
+	await a.settle(150);
+	const q9 = await page.evaluate(() => {
+		const ae = document.activeElement, row = ae && ae.closest && ae.closest('.lpn-guide-row');
+		return { search: document.getElementById('lpn_guide_search').value, row: row ? row.querySelector('.lpn-guide-name').textContent : null,
+			pulse: !!(row && row.classList.contains('lpn-guide-pulse')) };
+	});
+	ok('the search is kept', q9.search === L.pipe.toLowerCase(), JSON.stringify(q9));
+	ok('...and focus stays on that row, pointed at', q9.row === L.pipe && q9.pulse, JSON.stringify(q9));
+	await page.fill('#lpn_guide_search', '');
+	await page.evaluate(() => document.getElementById('lpn_guide_search').dispatchEvent(new Event('input')));
+
+	console.log('\n10. "?" never opens the guide over a modal dialog');
+	await closeBox(page);
+	await a.settle(100);
+	// The browser-pass seam answers dialogs itself (window.lpnDialogAnswerer); set it aside so a real
+	// modal #lpn_dialog goes up, and put it back afterwards.
+	await page.evaluate(() => {
+		window.__ugAnswerer = window.lpnDialogAnswerer; window.lpnDialogAnswerer = null;
+		EngCalcs.lpnAsk({ kind: 'confirm', text: 'Harness stub question?' }, function () {});
+	});
+	await a.settle(200);
+	const dlgUp = await page.evaluate(() => { const d = document.getElementById('lpn_dialog'); return !!d && d.style.display !== 'none' && d.getClientRects().length > 0; });
+	ok('(a modal dialog is up)', dlgUp);
+	await page.evaluate(() => { const d = document.getElementById('lpn_dialog'); const b = d.querySelector('button'); if (b) { b.focus(); } });
+	await page.keyboard.type('?');
+	await a.settle(200);
+	ok('"?" does not open the guide over it', !(await boxOpen(page)));
+	ok('...and the dialog is still up', await page.evaluate(() => { const d = document.getElementById('lpn_dialog'); return d.style.display !== 'none' && d.getClientRects().length > 0; }));
+	await page.keyboard.press('Escape');
+	await a.settle(200);
+	await page.evaluate(() => { window.lpnDialogAnswerer = window.__ugAnswerer; });
+
 	console.log('\n7. Looped-Network.php#guide opens it');
 	await closeBox(page);
 	await a.goto('Looped-Network.php#guide');

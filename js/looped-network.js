@@ -42282,6 +42282,29 @@ var EngCalcs = EngCalcs || {};
 		if (block) { guideTrimRule(block); }
 		guideFilter();
 	}
+	// **DIMMING FOLLOWS THE STRIP WHILE THE GUIDE IS OPEN** (Perry, pre-review 2026-10-06). The
+	// strip shows and hides buttons under an open guide -- the transport when another project opens,
+	// Calculate when Recalculate automatically is turned off -- so "dimmed" is re-read from the
+	// buttons whenever anything on the strip changes, not only when the guide is drawn. A button
+	// that is not in the guide yet (the strip was rebuilt) redraws the section instead.
+	var guideDimQueued = false;
+	function guideRefreshDimming() {
+		var rows, n = 0;
+		guideDimQueued = false;
+		if (!hotkeysBoxIsOpen()) { return; }
+		rows = document.querySelectorAll('#lpn_guide_toolbar > .lpn-guide-row');
+		Array.prototype.forEach.call(rows, function (r) {
+			var g = r.__lpnGuide && r.__lpnGuide.g, el = g && g.b.el;
+			if (g && toolbarIconIndex.indexOf(g.b) >= 0) { n++; }
+			r.classList.toggle('lpn-guide-off', !(el && el.isConnected && el.getClientRects().length > 0));
+		});
+		if (n !== toolbarIconIndex.length || rows.length !== toolbarIconIndex.length) { renderGuide(); }
+	}
+	function guideQueueDimming() {
+		if (guideDimQueued) { return; }
+		guideDimQueued = true;
+		(window.requestAnimationFrame || setTimeout)(guideRefreshDimming);
+	}
 	// ---- Search: one box over all four sections ----
 	function guideMatch(el, q) { return String(el.textContent || '').toLowerCase().indexOf(q) >= 0; }
 	function guideFilter() {
@@ -42417,6 +42440,11 @@ var EngCalcs = EngCalcs || {};
 		var ae = document.activeElement, subject;
 		if (e.defaultPrevented || e.key !== '?' || e.ctrlKey || e.altKey || e.metaKey) { return; }
 		if (guideTyping(e.target) || guideTyping(ae)) { return; }
+		// A modal question owns the keyboard; the guide never opens over it (Perry).
+		if (dialogIsOpen()) { return; }
+		// Already ON a guide row: point at that row, and leave the search and the scroll alone.
+		var onRow = ae && ae.closest ? ae.closest('#lpn_hotkeys_popup .lpn-guide-row') : null;
+		if (onRow) { e.preventDefault(); e.stopPropagation(); guidePulse(onRow); return; }
 		subject = guideSubjectOf(ae) || guideSubjectOf(guideHoverEl);
 		e.preventDefault();
 		e.stopPropagation();
@@ -42426,6 +42454,13 @@ var EngCalcs = EngCalcs || {};
 		var box = hotkeysBoxEl(), input = document.getElementById('lpn_guide_search');
 		if (!box) { return; }
 		if (input) { input.addEventListener('input', guideFilter); }
+		var strip = document.getElementById('lpn_toolbar');
+		if (strip && window.MutationObserver) {
+			new window.MutationObserver(guideQueueDimming).observe(strip,
+				{ subtree: true, childList: true, attributes: true, attributeFilter: ['style', 'class', 'hidden'] });
+		}
+		// The phone breakpoint folds the strip away without touching a single attribute on it.
+		window.addEventListener('resize', guideQueueDimming);
 		if (hotkeysBoxIsOpen()) { renderGuide(); }   // reopened from memory before the menu bar existed
 		box.addEventListener('click', function (e) {
 			var row = e.target && e.target.closest ? e.target.closest('.lpn-guide-row') : null;
