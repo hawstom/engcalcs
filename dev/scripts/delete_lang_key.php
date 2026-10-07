@@ -29,6 +29,7 @@
  *   php dev/scripts/delete_lang_key.php key --with-supply --apply
  */
 require_once __DIR__ . '/lang_parse.inc.php';
+require_once __DIR__ . '/delete_lang_key.inc.php';
 
 $argvRest = array_values(array_filter(array_slice($argv, 1), function ($a) { return substr($a, 0, 2) !== '--'; }));
 $apply       = in_array('--apply', $argv, true);
@@ -126,7 +127,7 @@ foreach ($keys as $key) {
         $data = json_decode($content, true);
         if (!is_array($data)) { continue; }
         $n = 0;
-        $data = jsonDropKey($data, $key, $n);
+        $data = jsonDropKeyKeepCount($data, $key, $n);
         if ($n) {
             noteEdit($edits, $file, $n);
             if ($apply) {
@@ -143,18 +144,6 @@ foreach ($keys as $key) {
             if ($count) { noteEdit($edits, $file, $count); if ($apply) { file_put_contents($file, $out); } }
         }
     }
-}
-
-/** Removes every occurrence of $key as an object key, at any depth, counting as it goes. */
-function jsonDropKey($node, $key, &$n)
-{
-    if (!is_array($node)) { return $node; }
-    $out = [];
-    foreach ($node as $k => $v) {
-        if ($k === $key) { $n++; continue; }
-        $out[$k] = jsonDropKey($v, $key, $n);
-    }
-    return $out;
 }
 
 // --- Report --------------------------------------------------------------------------------------
