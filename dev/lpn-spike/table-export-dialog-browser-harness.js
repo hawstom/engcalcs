@@ -329,7 +329,7 @@ async function main() {
 		await boxOpen();
 		g = await groups();
 		ok('with a scenario the box also asks Scenarios', g.length === 3 && g[2].head === lbl.scn, JSON.stringify(g.map((x) => x.head)));
-		const noteShown = () => page.evaluate(() => { const n = document.getElementById('lpn_export_scn_note'); return !!n && n.style.display !== 'none'; });
+		const noteShown = () => page.evaluate(() => { const n = document.getElementById('lpn_export_scn_note'); return !!n && n.textContent.length > 0; });
 		ok('the results note is hidden while Scenarios is Current', !(await noteShown()));
 		await page.evaluate(() => { const e = document.getElementById('lpn_export_scenarios_all'); e.checked = true; e.dispatchEvent(new Event('change', { bubbles: true })); });
 		ok('the results note shows when Scenarios is All', await noteShown());

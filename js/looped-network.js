@@ -29356,10 +29356,9 @@ var EngCalcs = EngCalcs || {};
 			if (withScn) {
 				var note = document.createElement('div');
 				note.id = 'lpn_export_scn_note';
-				note.style.display = 'none';
-				note.textContent = pc.lpn_export_table_scn_note || 'Results are exported only for the scenario last calculated.';
+				var noteText = pc.lpn_export_table_scn_note || 'Results are exported only for the scenario last calculated.';
 				body.appendChild(note);
-				groups.scenarios.addEventListener('change', function () { note.style.display = picked('scenarios') === 'all' ? '' : 'none'; });
+				groups.scenarios.addEventListener('change', function () { note.textContent = picked('scenarios') === 'all' ? noteText : ''; });
 			}
 		}, [
 			{ label: pc.lpn_export_table_go || 'Export', isDefault: true, fn: function () {
