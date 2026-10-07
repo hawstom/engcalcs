@@ -113,7 +113,12 @@ async function exportOnce(a, card) {
 		const p = await downloads[0].path();
 		text = p ? fs.readFileSync(p, 'latin1') : null;
 	}
-	return { count: downloads.length, name, text, notice };
+	// The page's own words, never pinned here: the read-me note and status templates.
+	const words = await a.page.evaluate(() => {
+		const pc = (window.EngCalcs || {}).pageConfig || {};
+		return { note: pc.lpn_dxf_note_geo || '', status: pc.lpn_dxf_exported_geo || '' };
+	});
+	return { count: downloads.length, name, text, notice, words };
 }
 
 function checkDrawing(label, out, geo) {
@@ -163,8 +168,11 @@ function checkDrawing(label, out, geo) {
 	if (geo) {
 		ok(label + ': coordinates are UTM metres, not degrees (easting 100 000..900 000, northing > 1 000 000)',
 			xs.every((x) => x > 1e5 && x < 9e5) && ys.every((y) => y > 1e6), 'x ' + Math.min(...xs).toFixed(0) + '..' + Math.max(...xs).toFixed(0));
-		ok(label + ': the read-me note says they are not latitude and longitude', /UTM zone/.test(notes) && /not latitude and longitude/i.test(notes), notes.slice(0, 240));
-		ok(label + ': and so does the status line', /UTM zone/.test(out.notice) && /not latitude and longitude/i.test(out.notice), out.notice);
+		// Every literal piece of the page's own template is there, around the UTM zone's name.
+		const has = (hay, tpl) => !!tpl && tpl.split(/\{\w+\}/).every((piece) => hay.indexOf(piece.trim()) >= 0);
+		const notes1252 = new TextDecoder('windows-1252').decode(Buffer.from(notes, 'latin1'));
+		ok(label + ': the read-me note says UTM metres, not latitude and longitude (lpn_dxf_note_geo)', /UTM zone/.test(notes) && has(notes1252, out.words.note), notes1252.slice(0, 240));
+		ok(label + ': and so does the status line (lpn_dxf_exported_geo)', /UTM zone/.test(out.notice) && has(out.notice, out.words.status), out.notice);
 	} else {
 		ok(label + ': the status line names the file', out.notice.indexOf(out.name) >= 0, out.notice);
 	}
