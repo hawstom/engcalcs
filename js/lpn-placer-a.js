@@ -16,8 +16,9 @@
 // top or bottom lands near a corner, and the rows are justified to that side (R5).
 //
 // IN WHAT ORDER. Hand-placed labels hang at the user's point (N4). Labels shown in the last view are
-// carried at the same offset if still legal and still clean (S13, own: 'holdclean'). Every other label then takes its smallest form
-// (the value the drop order keeps longest), most crowded first (S12, S11). A label still hidden
+// carried at the same offset if still legal and still clean (S13, own: 'holdclean'). Every other
+// label then takes its smallest form (the value the drop order keeps longest), most crowded first
+// (S12, S11). A label still hidden
 // looks again on a fine tier, every 15 degrees and every half row (S15, built in); then far, along
 // straight leaders in 48 directions to the first clean open ground (S7, own form: 'far'); then it
 // may move one or two neighbours that stand where it could go (S16). Then a label that took a spot
