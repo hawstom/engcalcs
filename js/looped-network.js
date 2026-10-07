@@ -5873,7 +5873,7 @@ var EngCalcs = EngCalcs || {};
 		var block = scenarioSettingsBlock(scn);
 		return block && block.view !== undefined ? inwardViewOf(block.view) : null;
 	}
-	// **WRITTEN ONLY WHEN DELIBERATELY SET**: the Settings box's Hold this view in this scenario, or a
+	// **WRITTEN ONLY WHEN DELIBERATELY SET**: the Settings box's Save this view in this scenario, or a
 	// centre or scale typed while the scenario holds one. A scenario holding a view is a deliberate
 	// act, never a side effect of looking.
 	function setScenarioView(scn, v) {
@@ -51851,12 +51851,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		refreshPaneIfOpen();
 		return true;
 	}
-	// ---- THE VIEW IN THE SETTINGS BOX, AND "HOLD THIS VIEW IN THIS SCENARIO" (Tom, 2026-10-06, Q2 and Q9) ----
+	// ---- THE VIEW IN THE SETTINGS BOX, AND "SAVE THIS VIEW IN THIS SCENARIO" (Tom, 2026-10-06, Q2 and Q9) ----
 	//
 	// The rows show the map as it is now: its centre (latitude and longitude, or x and y, in public
 	// order), its scale as 1:N, and its two corners, which depend on the window and so are shown and
-	// never stored. Typing a centre or a scale moves the map. **HOLDING IS A CLICK, NEVER A SIDE
-	// EFFECT OF LOOKING**: panning and zooming write nothing; the Hold button stores the view as it
+	// never stored. Typing a centre or a scale moves the map. **SAVING IS A CLICK, NEVER A SIDE
+	// EFFECT OF LOOKING**: panning and zooming write nothing; the Save button stores the view as it
 	// is now in the open scenario (setScenarioView(), centre plus metres per pixel), and while the
 	// scenario holds one, a typed centre or scale is written to it too. Entering the scenario then
 	// moves the map there (followScenarioView()). Clear override releases it, and the map goes back
@@ -51897,11 +51897,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (scn && !scn.isBase) {
 			hold = document.createElement('button');
 			hold.type = 'button';
-			hold.id = 'lpn_set_view_hold';
-			hold.textContent = pc.lpn_settings_view_hold || 'Hold this view in this scenario';
-			helpTip(hold, (pc.lpn_settings_view_hold_tip || 'Stores this map center and scale in the open scenario, so opening that scenario moves the map here. Moving the map afterward changes nothing until you press this again. Clear the override to follow the {base} view again.')
+			hold.id = 'lpn_set_view_save';
+			hold.textContent = pc.lpn_settings_view_save || 'Save this view in this scenario';
+			helpTip(hold, (pc.lpn_settings_view_save_tip || 'Stores this map center and scale in the open scenario, so opening that scenario moves the map here. Moving the map afterward changes nothing until you press this again. Clear the override to follow the {base} view again.')
 				.split('{base}').join(pc.lpn_scenario_base || 'Base'));
-			hold.addEventListener('click', function () { holdScenarioView(); });
+			hold.addEventListener('click', function () { saveScenarioView(); });
 			group.appendChild(hold);
 		}
 		setboxTag(group, [['view']]);
@@ -51969,9 +51969,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (tl && a) { tl.textContent = viewPointText(a.cx, a.cy); }
 		if (br && b) { br.textContent = viewPointText(b.cx, b.cy); }
 	}
-	// "Hold this view in this scenario": one undo step. Base's live view is remembered first, so
+	// "Save this view in this scenario": one undo step. Base's live view is remembered first, so
 	// Clear override can go back to it, as leaving the scenario does.
-	function holdScenarioView() {
+	function saveScenarioView() {
 		var scn = activeScenario(), v = currentView();
 		if (!scn || scn.isBase || !v) { return false; }
 		saveUndoSnapshot();

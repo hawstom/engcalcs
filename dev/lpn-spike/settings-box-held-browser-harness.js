@@ -1,4 +1,4 @@
-// A HELD VALUE MARKED IN THE SETTINGS BOX, AND "HOLD THIS VIEW IN THIS SCENARIO", IN A REAL CHROMIUM
+// A HELD VALUE MARKED IN THE SETTINGS BOX, AND "SAVE THIS VIEW IN THIS SCENARIO", IN A REAL CHROMIUM
 // -- dev/scenario-alternatives.md, "Stage 3c".
 // Run with:
 //   node dev/lpn-spike/settings-box-held-browser-harness.js
@@ -142,7 +142,7 @@ async function main() {
 		const tagged = await page.evaluate(() => document.querySelectorAll('#lpn_settings_box [data-lpn-setting]').length);
 		ok('the box says which setting each row edits (a row per setting, tagged)', tagged >= 60, tagged);
 		ok('in Base no row is marked and no note is shown', (await marks()).length === 0 && await notes() === 0);
-		ok('in Base there is no Hold this view button', await page.evaluate(() => !document.getElementById('lpn_set_view_hold')));
+		ok('in Base there is no Save this view button', await page.evaluate(() => !document.getElementById('lpn_set_view_save')));
 		// EVERY SETTING THE BOX EDITS CAN BE MARKED THERE: each Settings table row is covered by some
 		// tagged row of the box, except the ones the box has no control for. Those are edited in the
 		// Settings table (and the contour ones in the Contour box), and are listed here by name so
@@ -197,7 +197,7 @@ async function main() {
 		await newScenario('Peak');
 		await openBox();
 		ok('Peak, holding nothing: no row is marked', (await marks()).length === 0, JSON.stringify(await marks()));
-		ok('...and the Hold this view button is there', await page.evaluate(() => !!document.getElementById('lpn_set_view_hold')));
+		ok('...and the Save this view button is there', await page.evaluate(() => !!document.getElementById('lpn_set_view_save')));
 
 		console.log('\n--- 3. a value changed in the box is marked, with Base\'s value, in the box and the table ---');
 		// TOM: "The override shows in the settings box, but not in the Settings table." The table is
@@ -349,17 +349,17 @@ async function main() {
 		ok('entering Peak, which holds no view, moves nothing', (await view()).scale === '1:' + NB, (await view()).scale);
 		await typeScale(NP);
 		const holdState = await page.evaluate(() => {
-			const b = document.getElementById('lpn_set_view_hold');
+			const b = document.getElementById('lpn_set_view_save');
 			if (!b) { return 'absent'; }
 			let e = b, hid = [];
 			while (e) { if (getComputedStyle(e).display === 'none') { hid.push(e.id || e.className); } e = e.parentElement; }
 			b.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, detail: 1 }));
 			return hid.length ? 'hidden by ' + hid.join(' < ') : 'pressed';
 		});
-		ok('the Hold this view button is there in Peak, and pressed', holdState === 'pressed', holdState);
+		ok('the Save this view button is there in Peak, and pressed', holdState === 'pressed', holdState);
 		await a.settle(1200);
 		const vm = await markOf(['view']);
-		ok('Hold this view in this scenario: the view rows are marked, with Clear override', vm && vm.note && vm.note.slice(-CLEAR.length) === CLEAR, vm && vm.note);
+		ok('Save this view in this scenario: the view rows are marked, with Clear override', vm && vm.note && vm.note.slice(-CLEAR.length) === CLEAR, vm && vm.note);
 		const stored = await page.evaluate(() => {
 			// The autosave of the open project: its scenarios' own views (Base's live view is the
 			// file's top-level `view`, which is not a scenario's).
