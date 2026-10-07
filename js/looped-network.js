@@ -42132,7 +42132,7 @@ var EngCalcs = EngCalcs || {};
 	}
 	function importWorkspaceFromFile(file) {
 		var pc = EngCalcs.pageConfig || {}, reader = new FileReader();
-		reader.onerror = function () { tellNotice(pc.lpn_workspace_refused_unreadable || 'This file could not be read as a workspace.'); };
+		reader.onerror = function () { tellNotice(pc.lpn_workspace_refused_unreadable || 'This file could not be read as a workspace, so nothing was changed.'); };
 		reader.onload = function () {
 			var plan = workspacePlan(String(reader.result || '')), nSet = 0, nDrop = 0, msg;
 			if (!plan.ok) {
