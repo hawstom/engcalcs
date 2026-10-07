@@ -4045,3 +4045,8 @@ and ran identical scripts against both. Scripts: scratchpad/speed.js, fr.js, ref
 - SPECULATION: Tom's CPU fan was the column clear, not the single cell, and most likely with Show scenarios on.
 - OBSERVED: check_all on bae0ea6a fails only "payload freshness", which is expected because the orchestrator
   regenerates the payloads. Every harness passes. The worktree is still clean.
+## feat/survey-code (Task 771) at b530f536 (OBSERVED, 2026-10-06; re-verify before citing)
+CITED (read): Carlson Special Codes 2021 PDF: JPN 3.28, CLO 3.13 (a Carlson code, so the doc's "Civil 3D, unverified" attribution of CLO is wrong), +0/-0 PointCAD, group-number same-code joining. PennDOT WL/WV/FH/WM confirmed. Civil 3D CPN: search summary only (single separate segment, example `EP1 B CPN101`).
+OBSERVED real Chromium (xy-us, geo-us, xy-si, geo-si, phone 390): one undo clears the import; unticked saved file identical to master (xy and geo); georef vertices keep the file's doubles; messy file (blank/mixed case/trailing spaces/WL10 vs WL1/forward JPN/self-cross) read as expected; bad rows carry line numbers.
+OBSERVED defects: (1) a ring coded WL3 ... CLO with no second node draws NO pipe, and its other points are counted as "vertices"; same for a ring fed by a JPN tee. (2) two nodes at the same spot give a 0-length pipe, unreported. (3) PRE-EXISTING on master: New SI project, import throws in label refresh (no default pipe diameter), report dialog never appears; this branch inherits it with pipes.
+Not done: harness mutation test (would need to edit the worktree), appearance of the table.
