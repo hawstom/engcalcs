@@ -453,6 +453,9 @@ EngCalcs.lpnPlacerD = (function () {
 					Math.min(L[i - 1][0], L[i][0]), Math.min(L[i - 1][1], L[i][1]), Math.max(L[i - 1][0], L[i][0]), Math.max(L[i - 1][1], L[i][1]));
 			}
 		});
+		// The page's own furniture over the map (legends, zoom buttons, status chips) is kept clear
+		// of as a Text object is.
+		(scene.furniture || []).forEach(function (f) { var fb = rectBox(f); addHard(new Item('text', null, null, fb, 0, 0, 0, 0), fb); });
 		(scene.customers || []).forEach(function (c) { custById[c.id] = c; });
 
 		// ---- the free-space model: two summed-area tables of every symbol and Text object ----
