@@ -3893,6 +3893,21 @@ Fire flow strings match Tom's words; only those two keys changed. dev/translatio
 - OBSERVED defect (low): String.replace with a name holding `$&` or `{file}` mangles the status line (project named `a$&b {file} x`). Files themselves fine.
 - Other languages have no new keys, so they fall back to English (no stale translation).
 - Not checkable: Windows Explorer, 7-Zip, macOS Archive Utility, EPANET desktop.
+## 2026-10-05 feat/feedback (36dc08eb)
+- OBSERVED: ecContactCompose resists CRLF in code/lang/cat/email; empty email sends, replyto ''. Harness passes.
+- OBSERVED: privacy.php line 74 still lists only "name, email address and message" -- page, language, category, error code undisclosed.
+- OBSERVED: contactYourEmail deleted from all 26 lang files; non-English pages now show English "Email (only if you want a reply)".
+- OBSERVED: uppercase email (A@B.com) rejected by old lowercase-only regex; empty-message refusal is a bare die() text.
+- OBSERVED: with empty email, mail headers end in a trailing CRLF (unverified effect).
+- SPECULATION: render in php -S needs a parent dir with an /engcalcs symlink (base path).
+
+## 2026-10-06 feat/feedback rebuild (eccd64ca) (OBSERVED; re-verify before citing)
+- OBSERVED: no <a>/href/contact.php added vs merge-base; contact.php, formmail.php byte-identical to master; privacy.php differs only by the intended two edits.
+- OBSERVED: harnesses 42/42, 74/74, grievance ALL PASS. Mutations: honeypot removed -> caught; rate limit removed -> caught; explicit CR/LF email check removed -> NOT caught (regex alone also refuses; redundant, harmless).
+- OBSERVED DEFECT: 26 non-English lang files keep the old lpn_wrong_tip ("nothing you typed... Nadie puede responderle... Use Ayuda, Corregir algo") - now false. New lpn_fb_* keys fall back to English.
+- OBSERVED: desk box 506x579 px (not small); phone 358x611, "What this sends" line clipped at the bottom of the box on 390x844 (scroll, unmeasured). Enter in email sends; Enter in comment is a newline.
+- OBSERVED: outside click does not close box; Esc/Cancel reopen fresh.
+- SPECULATION: global rate limit lets any curl script lock out real reporters for 10 min.
 ## feat/value-warning at 424b278e (OBSERVED, 2026-10-06; re-verify before citing)
 OBSERVED real Chromium: branch's own harness passes. All 7 shipped examples: 0 warnings in every table. Undo/redo, unit change (in to mm: thresholds 12 and 3810 mm), method change all refresh the glyph. Net3 Pipes tab fill median ~9-10 ms before and after; 117 glyphs painted at no measurable cost.
 OBSERVED DEFECT: touch (hover none): tapping the glyph in the Properties box opens the tip AND focuses the Diameter input (label activation), the exact 2026-08-29 complaint; initTips only cancels this on `.ec-tip`, the glyph here is a bare `.ec-help`. Tables-pane tap also focuses a cell input.
