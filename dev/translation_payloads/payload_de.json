@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "de",
-        "expected_key_count": 2373,
-        "delta_key_count": 150,
+        "expected_key_count": 2446,
+        "delta_key_count": 223,
         "exempt_key_count": 51,
         "exempt_keys": [
             "calc_units_us",
@@ -773,6 +773,22 @@
         "lpn_dock_right": "Dock at the right of the map",
         "lpn_dock_float": "Float",
         "lpn_dock_autohide": "Auto-hide",
+        "lpn_hotkeys_snip_heading": "Screenshot",
+        "lpn_hotkeys_snip_term": "Screenshot keyboard shortcuts",
+        "lpn_hotkeys_snip_def": "<table class=\"lpn-notes-table\"><tbody><tr><td>S<\/td><td>Snip, while Screenshot is open.<\/td><\/tr><tr><td>E<\/td><td>Eraser, in the markup view.<\/td><\/tr><tr><td>Ctrl+Z, Ctrl+Y<\/td><td>Undo and redo, in the markup view.<\/td><\/tr><tr><td>Esc<\/td><td>Cancel a snip, or leave the eraser. In the markup view, close it when nothing is drawn.<\/td><\/tr><\/tbody><\/table>",
+        "lpn_fb_intro": "Canned messages (optional). Nothing is sent until you press Send.",
+        "lpn_fb_pick_numbers": "The numbers look wrong",
+        "lpn_fb_pick_broken": "Something did not work",
+        "lpn_fb_pick_wording": "The wording or translation is wrong",
+        "lpn_fb_pick_confusing": "This is confusing",
+        "lpn_fb_comment": "Comments (optional)",
+        "lpn_fb_email": "Email (optional, only if you want a reply)",
+        "lpn_fb_sends": "What this sends: the name of this page, your language, the version of the site, the code of the message on the map if there is one, and what you picked or typed. Never your drawing or your network. Your email address is used only to reply to you.",
+        "lpn_fb_send": "Send",
+        "lpn_fb_sending": "Sending…",
+        "lpn_fb_failed": "That did not reach us. What you wrote is still here, so you can try again.",
+        "lpn_fb_bad_email": "That email address does not look right. Correct it, or leave it empty.",
+        "lpn_fb_busy": "Too many messages have arrived in the last few minutes. What you wrote is still here, so you can try again later.",
         "lpn_tool_add_chain_tip": "Chain junctions and pipes: specify a point on the map to add a junction, then specify each next point to add a pipe and a junction. Specify an existing node to continue from it. Press Escape to end the chain.",
         "lpn_pane_filter_sel_note": "Selection only. Showing {n} of {all}.",
         "lpn_pane_filter_sel_and": "Filtered by {q} and selection only. Showing {n} of {all}.",
@@ -812,6 +828,25 @@
         "lpn_contour_show": "Show contours",
         "lpn_contour_show_tip": "Clear to hide the fill and the contour lines; select to bring them back as they were. Node colors stay.",
         "lpn_sysflow_title": "Flow balance",
+        "lpn_crs_suggested_mark": "(suggested)",
+        "lpn_file_export_menu": "Export…",
+        "lpn_file_export_item_inp": "EPANET file…",
+        "lpn_file_export_item_geojson": "GeoJSON file…",
+        "lpn_status_inp_exported_picture": "Exported {zip}, holding the EPANET file {file}, its background picture {picture}, and the world file {world}. Extract all three into one folder, then open the .inp there in EPANET; the picture comes with it.",
+        "lpn_status_inp_exported_no_picture": "Exported {file}. The background picture could not be saved, so the .inp names none; in EPANET, add it with View > Backdrop > Load.",
+        "lpn_inp_export_difference_one": "One thing the .inp format cannot hold.",
+        "lpn_file_export_geojson": "Export GeoJSON file…",
+        "lpn_file_export_geojson_tip": "Download this network as a GeoJSON file for QGIS, ArcGIS Pro and other GIS programs. Junctions, tanks and reservoirs are points, and pipes, pumps and valves are lines that follow their vertices. Positions are latitude and longitude. Results are included only when the network has been solved.",
+        "lpn_geojson_refused_local": "A GeoJSON file holds latitude and longitude only, and this project is drawn on a local grid with no place on the Earth. Georeference it first with Map, World map, Attach, then export again.",
+        "lpn_geojson_refused_range": "These positions are not valid latitudes and longitudes: {detail}",
+        "lpn_geojson_refused_crs": "The coordinate system of this project ({detail}) is not known to this page, so its positions cannot be converted to latitude and longitude. Use Convert as… to copy the project into one this page knows, then export again.",
+        "lpn_geojson_refused_empty": "There is nothing to export yet. Draw or open a network first.",
+        "lpn_geojson_results_in": "The results on screen are included.",
+        "lpn_geojson_results_out": "No results are included, because the network is not solved.",
+        "lpn_inp_backdrop_attach": "Attach {file}…",
+        "lpn_inp_backdrop_attach_tip": "A web page cannot open the picture by its name. Choose it on your device and it is placed where the file says it belongs.",
+        "lpn_inp_backdrop_attached": "Attached {file}, placed where the file says it belongs.",
+        "lpn_inp_backdrop_attached_other": "Attached {picked}, placed where the file says it belongs. The file names {file}, which is a different name.",
         "lpn_copy_opened_unsaved": "Opened {file} as a copy, with a new lock of its own that will be saved with the next file save.",
         "lpn_engine_unavailable_why": "Valves that open and close on their own cannot be solved without the EPANET solver. {reason}",
         "lpn_engine_needed_failed_why": "This network can only be solved by the EPANET solver. {reason}",
@@ -892,6 +927,27 @@
         "lpn_ds_stale": "The drawing changed, so the demand scaling results were cleared. Run it again.",
         "lpn_analyze_at_time": "Time step: {time}.",
         "lpn_analyze_time_moved": "⚠ This was computed at {time}, and the clock is now at {now}. Run it again for the time step on screen.",
+        "lpn_survey_codes_toggle": "Read the description as field codes",
+        "lpn_survey_codes_tip": "Read the first word of each description as a code from the table. Points with the same line code join into one pipe in file order, and WL1 and WL2 are separate lines. +0 starts a line, -0 ends one, and CLO closes one. JPN followed by a point name joins to that point (Carlson), and Civil 3D writes it CPN.",
+        "lpn_survey_codes_col_code": "Code",
+        "lpn_survey_codes_col_type": "Asset type",
+        "lpn_survey_codes_add": "Add code",
+        "lpn_survey_codes_remove": "Remove code",
+        "lpn_survey_confirm_coded": "{j} junction(s), {r} reservoir(s), {t} tank(s), and {p} pipe(s) found. Proceed?",
+        "lpn_survey_report_coded": "{j} junction(s), {r} reservoir(s), {t} tank(s), and {p} pipe(s) imported, {m} of the nodes with elevation.",
+        "lpn_survey_note_code_unknown": "Code not in the code table, imported as the asset type chosen above.",
+        "lpn_survey_note_code_two_nodes": "More than one node code, the first was used.",
+        "lpn_survey_note_code_unread": "Not every word is a code this page reads, kept in the description.",
+        "lpn_survey_note_vertex_text": "Not every word is a code this page reads, and a vertex keeps no description.",
+        "lpn_survey_note_join_missing": "JPN or CPN names a point not in this file or project, no pipe drawn for it.",
+        "lpn_survey_note_join_no_line": "JPN or CPN on a point with no line code, no pipe drawn for it.",
+        "lpn_survey_note_pipe_one_node": "This line returns to the same node with no other node between, no pipe drawn for it.",
+        "lpn_survey_note_line_one_point": "Only point on its line, no pipe drawn from it.",
+        "lpn_survey_note_vertices": "Points that became pipe vertices: {detail}. A vertex keeps no name, elevation, or description.",
+        "lpn_survey_note_no_desc": "Field codes are on, but this file has no description column, so no codes were read.",
+        "lpn_survey_note_ring_junction": "This point became a junction so the ring could close.",
+        "lpn_survey_note_pipe_zero_length": "This point is at the same spot as the node before it, so the pipe between them has no length.",
+        "lpn_survey_note_node_on_pipe": "This point lies exactly on a pipe it is not joined to. If they connect, add JPN to say so.",
         "lpn_settings_demand_model": "Demand model",
         "lpn_settings_demand_model_tip": "Choose how junctions receive flow. Demand driven (DDA) delivers every demand in full, whatever the pressure. Pressure driven (PDA) delivers less than the demand where the pressure is below the required pressure, and only the EPANET solver computes it.",
         "lpn_settings_demand_model_dda": "Demand driven",
@@ -910,7 +966,24 @@
         "lpn_result_demand_deficit_tip": "The demand this junction asks for and does not receive, because the pressure is below the required pressure.",
         "lpn_pda_deficit_note": "Junctions receiving less than their demand: {n}.",
         "lpn_diag_pda_pressures": "Required pressure must be greater than Minimum pressure. Change one of them in Settings.",
-        "lpn_inp_drop_pressure_unit": "This file states a pressure unit other than the one this page reads for its flow unit, which is psi for US units and meters otherwise. Every pressure in the file is read that way, so check the valve settings, emitters, and pressure driven limits it holds. The line is kept and is written back."
+        "lpn_inp_drop_pressure_unit": "This file states a pressure unit other than the one this page reads for its flow unit, which is psi for US units and meters otherwise. Every pressure in the file is read that way, so check the valve settings, emitters, and pressure driven limits it holds. The line is kept and is written back.",
+        "lpn_screenshot_menu": "Screenshot",
+        "lpn_screenshot_tip": "Copy a sharper-than-screen picture of the map area you drag, ready to paste into a report. Click without dragging to take the whole map.",
+        "lpn_screenshot_hint": "Drag a rectangle over the map, or click for the whole map. Esc cancels.",
+        "lpn_screenshot_copied": "Screenshot copied.",
+        "lpn_screenshot_saved": "The clipboard is not available here, so the screenshot was downloaded as a PNG file.",
+        "lpn_screenshot_no_basemap": "The street map or satellite image could not be included.",
+        "lpn_screenshot_failed": "The screenshot could not be made.",
+        "lpn_snip_hint_free": "Drag around the area to snip, or click for the whole map. Esc cancels.",
+        "lpn_snip_tip_rect": "Snip a rectangle (S)",
+        "lpn_snip_tip_free": "Snip a freehand shape (S)",
+        "lpn_snip_tip_mode": "Snip shape",
+        "lpn_snip_tip_map": "Screenshot of the whole map",
+        "lpn_snip_tip_pen": "Pen",
+        "lpn_snip_tip_eraser": "Eraser: click a stroke to remove it (E)",
+        "lpn_snip_tip_undo": "Undo (Ctrl+Z)",
+        "lpn_snip_tip_redo": "Redo (Ctrl+Y)",
+        "lpn_screenshot_scale_tip": "The picture's size as a multiple of the area on the screen. A larger one is sharper and makes a bigger file."
     },
     "keys": {
         "points_data_msg_line": "Nothing was pasted. Line {n} could not be read as a station and an elevation.",
@@ -925,6 +998,22 @@
         "lpn_dock_right": "Dock at the right of the map",
         "lpn_dock_float": "Float",
         "lpn_dock_autohide": "Auto-hide",
+        "lpn_hotkeys_snip_heading": "Screenshot",
+        "lpn_hotkeys_snip_term": "Screenshot keyboard shortcuts",
+        "lpn_hotkeys_snip_def": "<table class=\"lpn-notes-table\"><tbody><tr><td>S<\/td><td>Snip, while Screenshot is open.<\/td><\/tr><tr><td>E<\/td><td>Eraser, in the markup view.<\/td><\/tr><tr><td>Ctrl+Z, Ctrl+Y<\/td><td>Undo and redo, in the markup view.<\/td><\/tr><tr><td>Esc<\/td><td>Cancel a snip, or leave the eraser. In the markup view, close it when nothing is drawn.<\/td><\/tr><\/tbody><\/table>",
+        "lpn_fb_intro": "Canned messages (optional). Nothing is sent until you press Send.",
+        "lpn_fb_pick_numbers": "The numbers look wrong",
+        "lpn_fb_pick_broken": "Something did not work",
+        "lpn_fb_pick_wording": "The wording or translation is wrong",
+        "lpn_fb_pick_confusing": "This is confusing",
+        "lpn_fb_comment": "Comments (optional)",
+        "lpn_fb_email": "Email (optional, only if you want a reply)",
+        "lpn_fb_sends": "What this sends: the name of this page, your language, the version of the site, the code of the message on the map if there is one, and what you picked or typed. Never your drawing or your network. Your email address is used only to reply to you.",
+        "lpn_fb_send": "Send",
+        "lpn_fb_sending": "Sending…",
+        "lpn_fb_failed": "That did not reach us. What you wrote is still here, so you can try again.",
+        "lpn_fb_bad_email": "That email address does not look right. Correct it, or leave it empty.",
+        "lpn_fb_busy": "Too many messages have arrived in the last few minutes. What you wrote is still here, so you can try again later.",
         "lpn_tool_add_chain_tip": "Chain junctions and pipes: specify a point on the map to add a junction, then specify each next point to add a pipe and a junction. Specify an existing node to continue from it. Press Escape to end the chain.",
         "lpn_pane_filter_sel_note": "Selection only. Showing {n} of {all}.",
         "lpn_pane_filter_sel_and": "Filtered by {q} and selection only. Showing {n} of {all}.",
@@ -964,6 +1053,25 @@
         "lpn_contour_show": "Show contours",
         "lpn_contour_show_tip": "Clear to hide the fill and the contour lines; select to bring them back as they were. Node colors stay.",
         "lpn_sysflow_title": "Flow balance",
+        "lpn_crs_suggested_mark": "(suggested)",
+        "lpn_file_export_menu": "Export…",
+        "lpn_file_export_item_inp": "EPANET file…",
+        "lpn_file_export_item_geojson": "GeoJSON file…",
+        "lpn_status_inp_exported_picture": "Exported {zip}, holding the EPANET file {file}, its background picture {picture}, and the world file {world}. Extract all three into one folder, then open the .inp there in EPANET; the picture comes with it.",
+        "lpn_status_inp_exported_no_picture": "Exported {file}. The background picture could not be saved, so the .inp names none; in EPANET, add it with View > Backdrop > Load.",
+        "lpn_inp_export_difference_one": "One thing the .inp format cannot hold.",
+        "lpn_file_export_geojson": "Export GeoJSON file…",
+        "lpn_file_export_geojson_tip": "Download this network as a GeoJSON file for QGIS, ArcGIS Pro and other GIS programs. Junctions, tanks and reservoirs are points, and pipes, pumps and valves are lines that follow their vertices. Positions are latitude and longitude. Results are included only when the network has been solved.",
+        "lpn_geojson_refused_local": "A GeoJSON file holds latitude and longitude only, and this project is drawn on a local grid with no place on the Earth. Georeference it first with Map, World map, Attach, then export again.",
+        "lpn_geojson_refused_range": "These positions are not valid latitudes and longitudes: {detail}",
+        "lpn_geojson_refused_crs": "The coordinate system of this project ({detail}) is not known to this page, so its positions cannot be converted to latitude and longitude. Use Convert as… to copy the project into one this page knows, then export again.",
+        "lpn_geojson_refused_empty": "There is nothing to export yet. Draw or open a network first.",
+        "lpn_geojson_results_in": "The results on screen are included.",
+        "lpn_geojson_results_out": "No results are included, because the network is not solved.",
+        "lpn_inp_backdrop_attach": "Attach {file}…",
+        "lpn_inp_backdrop_attach_tip": "A web page cannot open the picture by its name. Choose it on your device and it is placed where the file says it belongs.",
+        "lpn_inp_backdrop_attached": "Attached {file}, placed where the file says it belongs.",
+        "lpn_inp_backdrop_attached_other": "Attached {picked}, placed where the file says it belongs. The file names {file}, which is a different name.",
         "lpn_copy_opened_unsaved": "Opened {file} as a copy, with a new lock of its own that will be saved with the next file save.",
         "lpn_engine_unavailable_why": "Valves that open and close on their own cannot be solved without the EPANET solver. {reason}",
         "lpn_engine_needed_failed_why": "This network can only be solved by the EPANET solver. {reason}",
@@ -1044,6 +1152,27 @@
         "lpn_ds_stale": "The drawing changed, so the demand scaling results were cleared. Run it again.",
         "lpn_analyze_at_time": "Time step: {time}.",
         "lpn_analyze_time_moved": "⚠ This was computed at {time}, and the clock is now at {now}. Run it again for the time step on screen.",
+        "lpn_survey_codes_toggle": "Read the description as field codes",
+        "lpn_survey_codes_tip": "Read the first word of each description as a code from the table. Points with the same line code join into one pipe in file order, and WL1 and WL2 are separate lines. +0 starts a line, -0 ends one, and CLO closes one. JPN followed by a point name joins to that point (Carlson), and Civil 3D writes it CPN.",
+        "lpn_survey_codes_col_code": "Code",
+        "lpn_survey_codes_col_type": "Asset type",
+        "lpn_survey_codes_add": "Add code",
+        "lpn_survey_codes_remove": "Remove code",
+        "lpn_survey_confirm_coded": "{j} junction(s), {r} reservoir(s), {t} tank(s), and {p} pipe(s) found. Proceed?",
+        "lpn_survey_report_coded": "{j} junction(s), {r} reservoir(s), {t} tank(s), and {p} pipe(s) imported, {m} of the nodes with elevation.",
+        "lpn_survey_note_code_unknown": "Code not in the code table, imported as the asset type chosen above.",
+        "lpn_survey_note_code_two_nodes": "More than one node code, the first was used.",
+        "lpn_survey_note_code_unread": "Not every word is a code this page reads, kept in the description.",
+        "lpn_survey_note_vertex_text": "Not every word is a code this page reads, and a vertex keeps no description.",
+        "lpn_survey_note_join_missing": "JPN or CPN names a point not in this file or project, no pipe drawn for it.",
+        "lpn_survey_note_join_no_line": "JPN or CPN on a point with no line code, no pipe drawn for it.",
+        "lpn_survey_note_pipe_one_node": "This line returns to the same node with no other node between, no pipe drawn for it.",
+        "lpn_survey_note_line_one_point": "Only point on its line, no pipe drawn from it.",
+        "lpn_survey_note_vertices": "Points that became pipe vertices: {detail}. A vertex keeps no name, elevation, or description.",
+        "lpn_survey_note_no_desc": "Field codes are on, but this file has no description column, so no codes were read.",
+        "lpn_survey_note_ring_junction": "This point became a junction so the ring could close.",
+        "lpn_survey_note_pipe_zero_length": "This point is at the same spot as the node before it, so the pipe between them has no length.",
+        "lpn_survey_note_node_on_pipe": "This point lies exactly on a pipe it is not joined to. If they connect, add JPN to say so.",
         "lpn_settings_demand_model": "Demand model",
         "lpn_settings_demand_model_tip": "Choose how junctions receive flow. Demand driven (DDA) delivers every demand in full, whatever the pressure. Pressure driven (PDA) delivers less than the demand where the pressure is below the required pressure, and only the EPANET solver computes it.",
         "lpn_settings_demand_model_dda": "Demand driven",
@@ -1062,7 +1191,24 @@
         "lpn_result_demand_deficit_tip": "The demand this junction asks for and does not receive, because the pressure is below the required pressure.",
         "lpn_pda_deficit_note": "Junctions receiving less than their demand: {n}.",
         "lpn_diag_pda_pressures": "Required pressure must be greater than Minimum pressure. Change one of them in Settings.",
-        "lpn_inp_drop_pressure_unit": "This file states a pressure unit other than the one this page reads for its flow unit, which is psi for US units and meters otherwise. Every pressure in the file is read that way, so check the valve settings, emitters, and pressure driven limits it holds. The line is kept and is written back."
+        "lpn_inp_drop_pressure_unit": "This file states a pressure unit other than the one this page reads for its flow unit, which is psi for US units and meters otherwise. Every pressure in the file is read that way, so check the valve settings, emitters, and pressure driven limits it holds. The line is kept and is written back.",
+        "lpn_screenshot_menu": "Screenshot",
+        "lpn_screenshot_tip": "Copy a sharper-than-screen picture of the map area you drag, ready to paste into a report. Click without dragging to take the whole map.",
+        "lpn_screenshot_hint": "Drag a rectangle over the map, or click for the whole map. Esc cancels.",
+        "lpn_screenshot_copied": "Screenshot copied.",
+        "lpn_screenshot_saved": "The clipboard is not available here, so the screenshot was downloaded as a PNG file.",
+        "lpn_screenshot_no_basemap": "The street map or satellite image could not be included.",
+        "lpn_screenshot_failed": "The screenshot could not be made.",
+        "lpn_snip_hint_free": "Drag around the area to snip, or click for the whole map. Esc cancels.",
+        "lpn_snip_tip_rect": "Snip a rectangle (S)",
+        "lpn_snip_tip_free": "Snip a freehand shape (S)",
+        "lpn_snip_tip_mode": "Snip shape",
+        "lpn_snip_tip_map": "Screenshot of the whole map",
+        "lpn_snip_tip_pen": "Pen",
+        "lpn_snip_tip_eraser": "Eraser: click a stroke to remove it (E)",
+        "lpn_snip_tip_undo": "Undo (Ctrl+Z)",
+        "lpn_snip_tip_redo": "Redo (Ctrl+Y)",
+        "lpn_screenshot_scale_tip": "The picture's size as a multiple of the area on the screen. A larger one is sharper and makes a bigger file."
     },
     "key_context": {
         "points_data_msg_line": {
@@ -1254,6 +1400,262 @@
                     "key": "lpn_popup_boxtitle",
                     "value": "Eigenschaften",
                     "english": "Properties"
+                }
+            }
+        },
+        "lpn_hotkeys_snip_heading": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_hotkeys_menu_def",
+                    "value": "<table class=\"lpn-notes-table\"><tbody><tr><td>Alt+Umschalt+Buchstabe<\/td><td>Öffnet das Menü mit diesem Buchstaben; drücken Sie dann den Buchstaben einer Zeile, um sie zu wählen. Die Buchstaben werden angezeigt, solange Sie die Tastatur benutzen. Auf einem Mac verwenden Sie Strg+Option.<\/td><\/tr><tr><td>F10<\/td><td>Wechselt zur Menüleiste.<\/td><\/tr><\/tbody><\/table>",
+                    "english": "<table class=\"lpn-notes-table\"><tbody><tr><td>Alt+Shift+letter<\/td><td>Open the menu with that letter, then press a row's letter to choose it. The letters show while you use the keyboard. On a Mac, use Ctrl+Option.<\/td><\/tr><tr><td>F10<\/td><td>Go to the menu bar.<\/td><\/tr><\/tbody><\/table>"
+                },
+                "next_translated": {
+                    "key": "lpn_wrong_btn",
+                    "value": "Hier stimmt etwas nicht?",
+                    "english": "Something wrong here?"
+                }
+            }
+        },
+        "lpn_hotkeys_snip_term": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_hotkeys_menu_def",
+                    "value": "<table class=\"lpn-notes-table\"><tbody><tr><td>Alt+Umschalt+Buchstabe<\/td><td>Öffnet das Menü mit diesem Buchstaben; drücken Sie dann den Buchstaben einer Zeile, um sie zu wählen. Die Buchstaben werden angezeigt, solange Sie die Tastatur benutzen. Auf einem Mac verwenden Sie Strg+Option.<\/td><\/tr><tr><td>F10<\/td><td>Wechselt zur Menüleiste.<\/td><\/tr><\/tbody><\/table>",
+                    "english": "<table class=\"lpn-notes-table\"><tbody><tr><td>Alt+Shift+letter<\/td><td>Open the menu with that letter, then press a row's letter to choose it. The letters show while you use the keyboard. On a Mac, use Ctrl+Option.<\/td><\/tr><tr><td>F10<\/td><td>Go to the menu bar.<\/td><\/tr><\/tbody><\/table>"
+                },
+                "next_translated": {
+                    "key": "lpn_wrong_btn",
+                    "value": "Hier stimmt etwas nicht?",
+                    "english": "Something wrong here?"
+                }
+            }
+        },
+        "lpn_hotkeys_snip_def": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_hotkeys_menu_def",
+                    "value": "<table class=\"lpn-notes-table\"><tbody><tr><td>Alt+Umschalt+Buchstabe<\/td><td>Öffnet das Menü mit diesem Buchstaben; drücken Sie dann den Buchstaben einer Zeile, um sie zu wählen. Die Buchstaben werden angezeigt, solange Sie die Tastatur benutzen. Auf einem Mac verwenden Sie Strg+Option.<\/td><\/tr><tr><td>F10<\/td><td>Wechselt zur Menüleiste.<\/td><\/tr><\/tbody><\/table>",
+                    "english": "<table class=\"lpn-notes-table\"><tbody><tr><td>Alt+Shift+letter<\/td><td>Open the menu with that letter, then press a row's letter to choose it. The letters show while you use the keyboard. On a Mac, use Ctrl+Option.<\/td><\/tr><tr><td>F10<\/td><td>Go to the menu bar.<\/td><\/tr><\/tbody><\/table>"
+                },
+                "next_translated": {
+                    "key": "lpn_wrong_btn",
+                    "value": "Hier stimmt etwas nicht?",
+                    "english": "Something wrong here?"
+                }
+            }
+        },
+        "lpn_fb_intro": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_wrong_thanks",
+                    "value": "Danke. Das hat uns erreicht.",
+                    "english": "Thank you. That reached us."
+                },
+                "next_translated": {
+                    "key": "lpn_status_example_opened",
+                    "value": "{name} geöffnet. Es ist Ihre eigene Kopie: Speichern Sie sie mit Datei, Speichern unter.",
+                    "english": "Opened {name}. It is your copy: save it with File, Save as."
+                }
+            }
+        },
+        "lpn_fb_pick_numbers": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_wrong_thanks",
+                    "value": "Danke. Das hat uns erreicht.",
+                    "english": "Thank you. That reached us."
+                },
+                "next_translated": {
+                    "key": "lpn_status_example_opened",
+                    "value": "{name} geöffnet. Es ist Ihre eigene Kopie: Speichern Sie sie mit Datei, Speichern unter.",
+                    "english": "Opened {name}. It is your copy: save it with File, Save as."
+                }
+            }
+        },
+        "lpn_fb_pick_broken": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_wrong_thanks",
+                    "value": "Danke. Das hat uns erreicht.",
+                    "english": "Thank you. That reached us."
+                },
+                "next_translated": {
+                    "key": "lpn_status_example_opened",
+                    "value": "{name} geöffnet. Es ist Ihre eigene Kopie: Speichern Sie sie mit Datei, Speichern unter.",
+                    "english": "Opened {name}. It is your copy: save it with File, Save as."
+                }
+            }
+        },
+        "lpn_fb_pick_wording": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_wrong_thanks",
+                    "value": "Danke. Das hat uns erreicht.",
+                    "english": "Thank you. That reached us."
+                },
+                "next_translated": {
+                    "key": "lpn_status_example_opened",
+                    "value": "{name} geöffnet. Es ist Ihre eigene Kopie: Speichern Sie sie mit Datei, Speichern unter.",
+                    "english": "Opened {name}. It is your copy: save it with File, Save as."
+                }
+            }
+        },
+        "lpn_fb_pick_confusing": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_wrong_thanks",
+                    "value": "Danke. Das hat uns erreicht.",
+                    "english": "Thank you. That reached us."
+                },
+                "next_translated": {
+                    "key": "lpn_status_example_opened",
+                    "value": "{name} geöffnet. Es ist Ihre eigene Kopie: Speichern Sie sie mit Datei, Speichern unter.",
+                    "english": "Opened {name}. It is your copy: save it with File, Save as."
+                }
+            }
+        },
+        "lpn_fb_comment": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_wrong_thanks",
+                    "value": "Danke. Das hat uns erreicht.",
+                    "english": "Thank you. That reached us."
+                },
+                "next_translated": {
+                    "key": "lpn_status_example_opened",
+                    "value": "{name} geöffnet. Es ist Ihre eigene Kopie: Speichern Sie sie mit Datei, Speichern unter.",
+                    "english": "Opened {name}. It is your copy: save it with File, Save as."
+                }
+            }
+        },
+        "lpn_fb_email": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_wrong_thanks",
+                    "value": "Danke. Das hat uns erreicht.",
+                    "english": "Thank you. That reached us."
+                },
+                "next_translated": {
+                    "key": "lpn_status_example_opened",
+                    "value": "{name} geöffnet. Es ist Ihre eigene Kopie: Speichern Sie sie mit Datei, Speichern unter.",
+                    "english": "Opened {name}. It is your copy: save it with File, Save as."
+                }
+            }
+        },
+        "lpn_fb_sends": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_wrong_thanks",
+                    "value": "Danke. Das hat uns erreicht.",
+                    "english": "Thank you. That reached us."
+                },
+                "next_translated": {
+                    "key": "lpn_status_example_opened",
+                    "value": "{name} geöffnet. Es ist Ihre eigene Kopie: Speichern Sie sie mit Datei, Speichern unter.",
+                    "english": "Opened {name}. It is your copy: save it with File, Save as."
+                }
+            }
+        },
+        "lpn_fb_send": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_wrong_thanks",
+                    "value": "Danke. Das hat uns erreicht.",
+                    "english": "Thank you. That reached us."
+                },
+                "next_translated": {
+                    "key": "lpn_status_example_opened",
+                    "value": "{name} geöffnet. Es ist Ihre eigene Kopie: Speichern Sie sie mit Datei, Speichern unter.",
+                    "english": "Opened {name}. It is your copy: save it with File, Save as."
+                }
+            }
+        },
+        "lpn_fb_sending": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_wrong_thanks",
+                    "value": "Danke. Das hat uns erreicht.",
+                    "english": "Thank you. That reached us."
+                },
+                "next_translated": {
+                    "key": "lpn_status_example_opened",
+                    "value": "{name} geöffnet. Es ist Ihre eigene Kopie: Speichern Sie sie mit Datei, Speichern unter.",
+                    "english": "Opened {name}. It is your copy: save it with File, Save as."
+                }
+            }
+        },
+        "lpn_fb_failed": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_wrong_thanks",
+                    "value": "Danke. Das hat uns erreicht.",
+                    "english": "Thank you. That reached us."
+                },
+                "next_translated": {
+                    "key": "lpn_status_example_opened",
+                    "value": "{name} geöffnet. Es ist Ihre eigene Kopie: Speichern Sie sie mit Datei, Speichern unter.",
+                    "english": "Opened {name}. It is your copy: save it with File, Save as."
+                }
+            }
+        },
+        "lpn_fb_bad_email": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_wrong_thanks",
+                    "value": "Danke. Das hat uns erreicht.",
+                    "english": "Thank you. That reached us."
+                },
+                "next_translated": {
+                    "key": "lpn_status_example_opened",
+                    "value": "{name} geöffnet. Es ist Ihre eigene Kopie: Speichern Sie sie mit Datei, Speichern unter.",
+                    "english": "Opened {name}. It is your copy: save it with File, Save as."
+                }
+            }
+        },
+        "lpn_fb_busy": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_wrong_thanks",
+                    "value": "Danke. Das hat uns erreicht.",
+                    "english": "Thank you. That reached us."
+                },
+                "next_translated": {
+                    "key": "lpn_status_example_opened",
+                    "value": "{name} geöffnet. Es ist Ihre eigene Kopie: Speichern Sie sie mit Datei, Speichern unter.",
+                    "english": "Opened {name}. It is your copy: save it with File, Save as."
                 }
             }
         },
@@ -1878,6 +2280,310 @@
                     "key": "lpn_sysflow_produced",
                     "value": "Erzeugt",
                     "english": "Produced"
+                }
+            }
+        },
+        "lpn_crs_suggested_mark": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_crs_unplaceable_mark",
+                    "value": "(keine Karte)",
+                    "english": "(no map)"
+                },
+                "next_translated": {
+                    "key": "lpn_crs_unplaceable",
+                    "value": "{crs} ist eines der wenigen aufgeführten Koordinatensysteme ohne verwendbare Projektionsangaben. Das bedeutet, dass Weltkarte, Ortsnamensuche und DGM-Höhen nicht funktionieren. Ihre Koordinaten sind davon nicht betroffen.",
+                    "english": "{crs} is one of the few listed coordinate systems without usable projection information. This means that world map, place name search, and DEM elevations don't work. Your coordinates are unaffected."
+                }
+            }
+        },
+        "lpn_file_export_menu": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_export_inp",
+                    "value": "EPANET-Datei exportieren…",
+                    "english": "Export EPANET file…"
+                },
+                "next_translated": {
+                    "key": "lpn_file_export_inp_tip",
+                    "value": "Schreibt dieses Netz als EPANET-.inp-Datei und lädt sie herunter. Von Ihnen eingegebene Zahlen werden genau so geschrieben, wie Sie sie eingegeben haben. Alles, was das .inp-Format nicht abbilden kann, wird Ihnen anschließend aufgelistet.",
+                    "english": "Download this network as an EPANET .inp file (in a zip file with its image if applicable). Anything the .inp format cannot hold is listed for you afterwards."
+                }
+            }
+        },
+        "lpn_file_export_item_inp": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_export_inp",
+                    "value": "EPANET-Datei exportieren…",
+                    "english": "Export EPANET file…"
+                },
+                "next_translated": {
+                    "key": "lpn_file_export_inp_tip",
+                    "value": "Schreibt dieses Netz als EPANET-.inp-Datei und lädt sie herunter. Von Ihnen eingegebene Zahlen werden genau so geschrieben, wie Sie sie eingegeben haben. Alles, was das .inp-Format nicht abbilden kann, wird Ihnen anschließend aufgelistet.",
+                    "english": "Download this network as an EPANET .inp file (in a zip file with its image if applicable). Anything the .inp format cannot hold is listed for you afterwards."
+                }
+            }
+        },
+        "lpn_file_export_item_geojson": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_export_inp",
+                    "value": "EPANET-Datei exportieren…",
+                    "english": "Export EPANET file…"
+                },
+                "next_translated": {
+                    "key": "lpn_file_export_inp_tip",
+                    "value": "Schreibt dieses Netz als EPANET-.inp-Datei und lädt sie herunter. Von Ihnen eingegebene Zahlen werden genau so geschrieben, wie Sie sie eingegeben haben. Alles, was das .inp-Format nicht abbilden kann, wird Ihnen anschließend aufgelistet.",
+                    "english": "Download this network as an EPANET .inp file (in a zip file with its image if applicable). Anything the .inp format cannot hold is listed for you afterwards."
+                }
+            }
+        },
+        "lpn_status_inp_exported_picture": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_inp_exported",
+                    "value": "{file} exportiert.",
+                    "english": "Exported {file}."
+                },
+                "next_translated": {
+                    "key": "lpn_inp_export_differences",
+                    "value": "{n} Dinge, die das .inp-Format nicht abbilden kann.",
+                    "english": "{n} things the .inp format cannot hold."
+                }
+            }
+        },
+        "lpn_status_inp_exported_no_picture": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_inp_exported",
+                    "value": "{file} exportiert.",
+                    "english": "Exported {file}."
+                },
+                "next_translated": {
+                    "key": "lpn_inp_export_differences",
+                    "value": "{n} Dinge, die das .inp-Format nicht abbilden kann.",
+                    "english": "{n} things the .inp format cannot hold."
+                }
+            }
+        },
+        "lpn_inp_export_difference_one": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_export_differences",
+                    "value": "{n} Dinge, die das .inp-Format nicht abbilden kann.",
+                    "english": "{n} things the .inp format cannot hold."
+                },
+                "next_translated": {
+                    "key": "lpn_inp_export_refused",
+                    "value": "Dieses Projekt kann nicht als EPANET-Datei geschrieben werden: {detail}",
+                    "english": "This project cannot be written as an EPANET file: {detail}"
+                }
+            }
+        },
+        "lpn_file_export_geojson": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_export_refused",
+                    "value": "Dieses Projekt kann nicht als EPANET-Datei geschrieben werden: {detail}",
+                    "english": "This project cannot be written as an EPANET file: {detail}"
+                },
+                "next_translated": {
+                    "key": "lpn_inp_bad_file",
+                    "value": "Diese Datei konnte nicht als EPANET-Netzdatei gelesen werden.",
+                    "english": "That file could not be read as an EPANET network file."
+                }
+            }
+        },
+        "lpn_file_export_geojson_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_export_refused",
+                    "value": "Dieses Projekt kann nicht als EPANET-Datei geschrieben werden: {detail}",
+                    "english": "This project cannot be written as an EPANET file: {detail}"
+                },
+                "next_translated": {
+                    "key": "lpn_inp_bad_file",
+                    "value": "Diese Datei konnte nicht als EPANET-Netzdatei gelesen werden.",
+                    "english": "That file could not be read as an EPANET network file."
+                }
+            }
+        },
+        "lpn_geojson_refused_local": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_export_refused",
+                    "value": "Dieses Projekt kann nicht als EPANET-Datei geschrieben werden: {detail}",
+                    "english": "This project cannot be written as an EPANET file: {detail}"
+                },
+                "next_translated": {
+                    "key": "lpn_inp_bad_file",
+                    "value": "Diese Datei konnte nicht als EPANET-Netzdatei gelesen werden.",
+                    "english": "That file could not be read as an EPANET network file."
+                }
+            }
+        },
+        "lpn_geojson_refused_range": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_export_refused",
+                    "value": "Dieses Projekt kann nicht als EPANET-Datei geschrieben werden: {detail}",
+                    "english": "This project cannot be written as an EPANET file: {detail}"
+                },
+                "next_translated": {
+                    "key": "lpn_inp_bad_file",
+                    "value": "Diese Datei konnte nicht als EPANET-Netzdatei gelesen werden.",
+                    "english": "That file could not be read as an EPANET network file."
+                }
+            }
+        },
+        "lpn_geojson_refused_crs": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_export_refused",
+                    "value": "Dieses Projekt kann nicht als EPANET-Datei geschrieben werden: {detail}",
+                    "english": "This project cannot be written as an EPANET file: {detail}"
+                },
+                "next_translated": {
+                    "key": "lpn_inp_bad_file",
+                    "value": "Diese Datei konnte nicht als EPANET-Netzdatei gelesen werden.",
+                    "english": "That file could not be read as an EPANET network file."
+                }
+            }
+        },
+        "lpn_geojson_refused_empty": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_export_refused",
+                    "value": "Dieses Projekt kann nicht als EPANET-Datei geschrieben werden: {detail}",
+                    "english": "This project cannot be written as an EPANET file: {detail}"
+                },
+                "next_translated": {
+                    "key": "lpn_inp_bad_file",
+                    "value": "Diese Datei konnte nicht als EPANET-Netzdatei gelesen werden.",
+                    "english": "That file could not be read as an EPANET network file."
+                }
+            }
+        },
+        "lpn_geojson_results_in": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_export_refused",
+                    "value": "Dieses Projekt kann nicht als EPANET-Datei geschrieben werden: {detail}",
+                    "english": "This project cannot be written as an EPANET file: {detail}"
+                },
+                "next_translated": {
+                    "key": "lpn_inp_bad_file",
+                    "value": "Diese Datei konnte nicht als EPANET-Netzdatei gelesen werden.",
+                    "english": "That file could not be read as an EPANET network file."
+                }
+            }
+        },
+        "lpn_geojson_results_out": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_export_refused",
+                    "value": "Dieses Projekt kann nicht als EPANET-Datei geschrieben werden: {detail}",
+                    "english": "This project cannot be written as an EPANET file: {detail}"
+                },
+                "next_translated": {
+                    "key": "lpn_inp_bad_file",
+                    "value": "Diese Datei konnte nicht als EPANET-Netzdatei gelesen werden.",
+                    "english": "That file could not be read as an EPANET network file."
+                }
+            }
+        },
+        "lpn_inp_backdrop_attach": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_report_no_crs",
+                    "value": "EPANET-Dateien enthalten kein Koordinatensystem, daher ist diese Datei zunächst nicht georeferenziert. Um sie auf einer Weltkarte zu platzieren, verwenden Sie Karte, Weltkarte… Um ihre Koordinaten umzuwandeln, verwenden Sie Datei, Konvertieren als…",
+                    "english": "EPANET files contain no coordinate system, so this file will not initially be georeferenced. To place it on a world map, use Map, World map… To convert its coordinates, use File, Convert as…"
+                },
+                "next_translated": {
+                    "key": "lpn_inp_report_lead",
+                    "value": "Diese Seite verwendet nicht alles, was EPANET kann, aber nichts in Ihrer Datei geht verloren. Es folgt, was Ihre Datei enthält und diese Seite beibehält, ohne es zu verwenden, sowie was beim Einlesen der Datei geändert wurde:",
+                    "english": "This page does not use everything EPANET does, but nothing in your file is thrown away. Below is what your file holds that this page keeps without using, and what was changed when the file was read in:"
+                }
+            }
+        },
+        "lpn_inp_backdrop_attach_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_report_no_crs",
+                    "value": "EPANET-Dateien enthalten kein Koordinatensystem, daher ist diese Datei zunächst nicht georeferenziert. Um sie auf einer Weltkarte zu platzieren, verwenden Sie Karte, Weltkarte… Um ihre Koordinaten umzuwandeln, verwenden Sie Datei, Konvertieren als…",
+                    "english": "EPANET files contain no coordinate system, so this file will not initially be georeferenced. To place it on a world map, use Map, World map… To convert its coordinates, use File, Convert as…"
+                },
+                "next_translated": {
+                    "key": "lpn_inp_report_lead",
+                    "value": "Diese Seite verwendet nicht alles, was EPANET kann, aber nichts in Ihrer Datei geht verloren. Es folgt, was Ihre Datei enthält und diese Seite beibehält, ohne es zu verwenden, sowie was beim Einlesen der Datei geändert wurde:",
+                    "english": "This page does not use everything EPANET does, but nothing in your file is thrown away. Below is what your file holds that this page keeps without using, and what was changed when the file was read in:"
+                }
+            }
+        },
+        "lpn_inp_backdrop_attached": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_report_no_crs",
+                    "value": "EPANET-Dateien enthalten kein Koordinatensystem, daher ist diese Datei zunächst nicht georeferenziert. Um sie auf einer Weltkarte zu platzieren, verwenden Sie Karte, Weltkarte… Um ihre Koordinaten umzuwandeln, verwenden Sie Datei, Konvertieren als…",
+                    "english": "EPANET files contain no coordinate system, so this file will not initially be georeferenced. To place it on a world map, use Map, World map… To convert its coordinates, use File, Convert as…"
+                },
+                "next_translated": {
+                    "key": "lpn_inp_report_lead",
+                    "value": "Diese Seite verwendet nicht alles, was EPANET kann, aber nichts in Ihrer Datei geht verloren. Es folgt, was Ihre Datei enthält und diese Seite beibehält, ohne es zu verwenden, sowie was beim Einlesen der Datei geändert wurde:",
+                    "english": "This page does not use everything EPANET does, but nothing in your file is thrown away. Below is what your file holds that this page keeps without using, and what was changed when the file was read in:"
+                }
+            }
+        },
+        "lpn_inp_backdrop_attached_other": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_report_no_crs",
+                    "value": "EPANET-Dateien enthalten kein Koordinatensystem, daher ist diese Datei zunächst nicht georeferenziert. Um sie auf einer Weltkarte zu platzieren, verwenden Sie Karte, Weltkarte… Um ihre Koordinaten umzuwandeln, verwenden Sie Datei, Konvertieren als…",
+                    "english": "EPANET files contain no coordinate system, so this file will not initially be georeferenced. To place it on a world map, use Map, World map… To convert its coordinates, use File, Convert as…"
+                },
+                "next_translated": {
+                    "key": "lpn_inp_report_lead",
+                    "value": "Diese Seite verwendet nicht alles, was EPANET kann, aber nichts in Ihrer Datei geht verloren. Es folgt, was Ihre Datei enthält und diese Seite beibehält, ohne es zu verwenden, sowie was beim Einlesen der Datei geändert wurde:",
+                    "english": "This page does not use everything EPANET does, but nothing in your file is thrown away. Below is what your file holds that this page keeps without using, and what was changed when the file was read in:"
                 }
             }
         },
@@ -3161,6 +3867,258 @@
                 }
             }
         },
+        "lpn_survey_codes_toggle": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_survey_note_id_invalid",
+                    "value": "Name kann hier nicht verwendet werden, neuer Name zugewiesen.",
+                    "english": "Name cannot be used here, new name assigned."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_survey_codes_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_survey_note_id_invalid",
+                    "value": "Name kann hier nicht verwendet werden, neuer Name zugewiesen.",
+                    "english": "Name cannot be used here, new name assigned."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_survey_codes_col_code": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_survey_note_id_invalid",
+                    "value": "Name kann hier nicht verwendet werden, neuer Name zugewiesen.",
+                    "english": "Name cannot be used here, new name assigned."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_survey_codes_col_type": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_survey_note_id_invalid",
+                    "value": "Name kann hier nicht verwendet werden, neuer Name zugewiesen.",
+                    "english": "Name cannot be used here, new name assigned."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_survey_codes_add": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_survey_note_id_invalid",
+                    "value": "Name kann hier nicht verwendet werden, neuer Name zugewiesen.",
+                    "english": "Name cannot be used here, new name assigned."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_survey_codes_remove": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_survey_note_id_invalid",
+                    "value": "Name kann hier nicht verwendet werden, neuer Name zugewiesen.",
+                    "english": "Name cannot be used here, new name assigned."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_survey_confirm_coded": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_survey_note_id_invalid",
+                    "value": "Name kann hier nicht verwendet werden, neuer Name zugewiesen.",
+                    "english": "Name cannot be used here, new name assigned."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_survey_report_coded": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_survey_note_id_invalid",
+                    "value": "Name kann hier nicht verwendet werden, neuer Name zugewiesen.",
+                    "english": "Name cannot be used here, new name assigned."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_survey_note_code_unknown": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_survey_note_id_invalid",
+                    "value": "Name kann hier nicht verwendet werden, neuer Name zugewiesen.",
+                    "english": "Name cannot be used here, new name assigned."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_survey_note_code_two_nodes": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_survey_note_id_invalid",
+                    "value": "Name kann hier nicht verwendet werden, neuer Name zugewiesen.",
+                    "english": "Name cannot be used here, new name assigned."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_survey_note_code_unread": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_survey_note_id_invalid",
+                    "value": "Name kann hier nicht verwendet werden, neuer Name zugewiesen.",
+                    "english": "Name cannot be used here, new name assigned."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_survey_note_vertex_text": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_survey_note_id_invalid",
+                    "value": "Name kann hier nicht verwendet werden, neuer Name zugewiesen.",
+                    "english": "Name cannot be used here, new name assigned."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_survey_note_join_missing": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_survey_note_id_invalid",
+                    "value": "Name kann hier nicht verwendet werden, neuer Name zugewiesen.",
+                    "english": "Name cannot be used here, new name assigned."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_survey_note_join_no_line": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_survey_note_id_invalid",
+                    "value": "Name kann hier nicht verwendet werden, neuer Name zugewiesen.",
+                    "english": "Name cannot be used here, new name assigned."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_survey_note_pipe_one_node": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_survey_note_id_invalid",
+                    "value": "Name kann hier nicht verwendet werden, neuer Name zugewiesen.",
+                    "english": "Name cannot be used here, new name assigned."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_survey_note_line_one_point": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_survey_note_id_invalid",
+                    "value": "Name kann hier nicht verwendet werden, neuer Name zugewiesen.",
+                    "english": "Name cannot be used here, new name assigned."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_survey_note_vertices": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_survey_note_id_invalid",
+                    "value": "Name kann hier nicht verwendet werden, neuer Name zugewiesen.",
+                    "english": "Name cannot be used here, new name assigned."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_survey_note_no_desc": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_survey_note_id_invalid",
+                    "value": "Name kann hier nicht verwendet werden, neuer Name zugewiesen.",
+                    "english": "Name cannot be used here, new name assigned."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_survey_note_ring_junction": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_survey_note_id_invalid",
+                    "value": "Name kann hier nicht verwendet werden, neuer Name zugewiesen.",
+                    "english": "Name cannot be used here, new name assigned."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_survey_note_pipe_zero_length": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_survey_note_id_invalid",
+                    "value": "Name kann hier nicht verwendet werden, neuer Name zugewiesen.",
+                    "english": "Name cannot be used here, new name assigned."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_survey_note_node_on_pipe": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_survey_note_id_invalid",
+                    "value": "Name kann hier nicht verwendet werden, neuer Name zugewiesen.",
+                    "english": "Name cannot be used here, new name assigned."
+                },
+                "next_translated": null
+            }
+        },
         "lpn_settings_demand_model": {
             "reason": "missing",
             "current_value": null,
@@ -3378,6 +4336,210 @@
             }
         },
         "lpn_inp_drop_pressure_unit": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_survey_note_id_invalid",
+                    "value": "Name kann hier nicht verwendet werden, neuer Name zugewiesen.",
+                    "english": "Name cannot be used here, new name assigned."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_screenshot_menu": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_survey_note_id_invalid",
+                    "value": "Name kann hier nicht verwendet werden, neuer Name zugewiesen.",
+                    "english": "Name cannot be used here, new name assigned."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_screenshot_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_survey_note_id_invalid",
+                    "value": "Name kann hier nicht verwendet werden, neuer Name zugewiesen.",
+                    "english": "Name cannot be used here, new name assigned."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_screenshot_hint": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_survey_note_id_invalid",
+                    "value": "Name kann hier nicht verwendet werden, neuer Name zugewiesen.",
+                    "english": "Name cannot be used here, new name assigned."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_screenshot_copied": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_survey_note_id_invalid",
+                    "value": "Name kann hier nicht verwendet werden, neuer Name zugewiesen.",
+                    "english": "Name cannot be used here, new name assigned."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_screenshot_saved": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_survey_note_id_invalid",
+                    "value": "Name kann hier nicht verwendet werden, neuer Name zugewiesen.",
+                    "english": "Name cannot be used here, new name assigned."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_screenshot_no_basemap": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_survey_note_id_invalid",
+                    "value": "Name kann hier nicht verwendet werden, neuer Name zugewiesen.",
+                    "english": "Name cannot be used here, new name assigned."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_screenshot_failed": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_survey_note_id_invalid",
+                    "value": "Name kann hier nicht verwendet werden, neuer Name zugewiesen.",
+                    "english": "Name cannot be used here, new name assigned."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_snip_hint_free": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_survey_note_id_invalid",
+                    "value": "Name kann hier nicht verwendet werden, neuer Name zugewiesen.",
+                    "english": "Name cannot be used here, new name assigned."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_snip_tip_rect": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_survey_note_id_invalid",
+                    "value": "Name kann hier nicht verwendet werden, neuer Name zugewiesen.",
+                    "english": "Name cannot be used here, new name assigned."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_snip_tip_free": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_survey_note_id_invalid",
+                    "value": "Name kann hier nicht verwendet werden, neuer Name zugewiesen.",
+                    "english": "Name cannot be used here, new name assigned."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_snip_tip_mode": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_survey_note_id_invalid",
+                    "value": "Name kann hier nicht verwendet werden, neuer Name zugewiesen.",
+                    "english": "Name cannot be used here, new name assigned."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_snip_tip_map": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_survey_note_id_invalid",
+                    "value": "Name kann hier nicht verwendet werden, neuer Name zugewiesen.",
+                    "english": "Name cannot be used here, new name assigned."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_snip_tip_pen": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_survey_note_id_invalid",
+                    "value": "Name kann hier nicht verwendet werden, neuer Name zugewiesen.",
+                    "english": "Name cannot be used here, new name assigned."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_snip_tip_eraser": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_survey_note_id_invalid",
+                    "value": "Name kann hier nicht verwendet werden, neuer Name zugewiesen.",
+                    "english": "Name cannot be used here, new name assigned."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_snip_tip_undo": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_survey_note_id_invalid",
+                    "value": "Name kann hier nicht verwendet werden, neuer Name zugewiesen.",
+                    "english": "Name cannot be used here, new name assigned."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_snip_tip_redo": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_survey_note_id_invalid",
+                    "value": "Name kann hier nicht verwendet werden, neuer Name zugewiesen.",
+                    "english": "Name cannot be used here, new name assigned."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_screenshot_scale_tip": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
