@@ -1108,10 +1108,12 @@ $ec_lang['lpn_hotkeys_snip_def']='<table class="lpn-notes-table"><tbody><tr><td>
 // the solver's diagnostic box when one is on screen. The first click opens a box; Send is the second.
 // The thank-you must never imply an answer: a reply comes only to somebody who left an address.
 $ec_lang['lpn_wrong_btn']='Something wrong here?';
-// The standing message's own Hide control and the chip that brings it back. {count} is how many are hidden.
+// The standing message's own Hide control. A hidden message leaves the map and waits as the top row of the
+// message history (the down-arrow glyph), marked by lpn_msglog_hidden, with lpn_msglog_unhide to bring it back.
 $ec_lang['lpn_status_dismiss']='Hide this message';
-$ec_lang['lpn_status_hidden']='{count} hidden';
-$ec_lang['lpn_status_hidden_tip']='Show the hidden message again.';
+$ec_lang['lpn_msglog_hidden']='Hidden';
+$ec_lang['lpn_msglog_unhide']='Show';
+$ec_lang['lpn_status_hidden_tip']='Show the hidden message on the map again.';
 // Rewritten for the two-click box (Task 768); TGH's 2026-09-07 wording described one press.
 $ec_lang['lpn_wrong_tip']='Report an error on this page. This opens a box to select the problem, add a comment, and enter an email address if a reply is wanted. All fields are optional, and nothing is sent until you press Send.';
 $ec_lang['lpn_wrong_thanks']='Thank you. Your report was received.';
@@ -1381,7 +1383,7 @@ $ec_lang['lpn_area_none']='Nothing found in that area.';
 $ec_lang['lpn_tool_vertices_tip']='Add and remove pipe vertices. Specify a point on a pipe to add a vertex, select a vertex to remove it, and drag a vertex to move it. A vertex changes automatic length, but doesn’t add or change minor (local) losses.';
 $ec_lang['lpn_tool_undo_tip']='Undo history length = 20 actions';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_tool_zoom_extent_tip']='Fit the whole network to the map window. Press again for Zoom Window. See also upper right map zoom controls.';
+$ec_lang['lpn_tool_zoom_extent_tip']='Fit the whole network to the map window. For Zoom Window with no fit first, press W or click the small triangle in the corner of the Zoom to fit toolbar button. See also upper right map zoom controls.';
 $ec_lang['lpn_tool_zoom_window_tip']='Specify corners or drag a rectangle. Press again for Zoom to fit.';
 // Tom's wording, 2026-09-25.
 $ec_lang['lpn_zoom_in_tip']='Zoom in. Shortcut: +';

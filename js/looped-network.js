@@ -18304,6 +18304,16 @@ var EngCalcs = EngCalcs || {};
 		setMode('zoom-window');
 		if (repaintZoomTool) { repaintZoomTool(); }
 	}
+	// The corner target of the Zoom to fit button: a square at its lower-right corner, about 14 px for
+	// a mouse and 22 px for a finger, never more than half the button either way.
+	function zoomCornerHit(btn, e) {
+		var r = btn.getBoundingClientRect();
+		var coarse = !!(window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
+		var side = coarse ? 22 : 14;
+		var w = Math.min(side, r.width / 2), h = Math.min(side, r.height / 2);
+		// Physical right in every language, because the CSS triangle is drawn at `right: 2px`.
+		return e.clientX >= r.right - w && e.clientX <= r.right && e.clientY >= r.bottom - h && e.clientY <= r.bottom;
+	}
 	// The button itself, held the same way `openToolButton`/`saveToolButton` below are, so
 	// `wireZoomArmReset()`'s one, wired-once listener can always test against the CURRENT button
 	// even though wireToolbar() rebuilds the strip (language switch, unit switch) and would
@@ -45001,7 +45011,14 @@ var EngCalcs = EngCalcs || {};
 			extentBtn.dataset.tool = 'zoom-window';
 			extentBtn.setAttribute('aria-pressed', mode === 'zoom-window' ? 'true' : 'false');
 		}
-		extentBtn.addEventListener('click', function () {
+		extentBtn.addEventListener('click', function (e) {
+			// **THE CORNER TRIANGLE IS A DOOR NOW** (Tom, 2026-10-07: "Maybe the little triangle really
+			// means something if you click there", and "We need to access Zoom Window without any view
+			// change intervening"). A pointer click in the button's lower-right corner enters Zoom Window
+			// at once, with no fit; anywhere else on the button keeps the press-twice behaviour below.
+			// Measured from the click's own coordinates because the triangle is a CSS ::after with
+			// nothing in the DOM to click; a keyboard press (detail 0) has no position and is never one.
+			if (e && e.detail > 0 && zoomCornerHit(extentBtn, e)) { enterZoomWindow(); return; }
 			// Already drawing a Zoom Window: a second press exits it and shows Zoom to fit again,
 			// mirroring select-area's "press again to cycle" -- except this cycle has one member to
 			// come back to, because Zoom to fit is what the button shows by default.
@@ -61109,7 +61126,35 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {}, panel = document.getElementById('lpn_msglog_panel');
 		if (!panel) { return; }
 		panel.innerHTML = '';
-		if (!noticeLog.length) {
+		// **A HIDDEN MESSAGE IS THE TOP ROW, MARKED, WITH ITS RESTORE** (Tom, 2026-10-07: "Put the hidden
+		// at the top of the expando history"). Pinned above the newest-first list, and its own entry in
+		// that list is left out below so the same words never appear twice.
+		var hiddenText = statusHiddenText();
+		if (hiddenText) {
+			var hrow = document.createElement('div');
+			hrow.className = 'lpn-msglog-panel-row lpn-msglog-panel-hidden';
+			var mark = document.createElement('span');
+			mark.className = 'lpn-msglog-panel-when lpn-msglog-hidden-mark';
+			mark.textContent = pc.lpn_msglog_hidden || 'Hidden';
+			hrow.appendChild(mark);
+			var htext = document.createElement('span');
+			htext.className = 'lpn-msglog-panel-text';
+			htext.textContent = hiddenText;
+			hrow.appendChild(htext);
+			var show = document.createElement('button');
+			show.type = 'button';
+			show.className = 'lpn-msglog-unhide';
+			show.textContent = pc.lpn_msglog_unhide || 'Show';
+			show.title = pc.lpn_status_hidden_tip || 'Show the hidden message on the map again.';
+			show.addEventListener('click', function () {
+				unhideStatus();
+				var xEl = document.getElementById('lpn_status_dismiss');
+				if (xEl && xEl.focus) { xEl.focus(); }
+			});
+			hrow.appendChild(show);
+			panel.appendChild(hrow);
+		}
+		if (!noticeLog.length && !hiddenText) {
 			// A DIFFERENT CLASS FROM A REAL ROW ON PURPOSE: "no messages yet" is not itself a
 			// kept message, so it must not count as one to anything reading .lpn-msglog-panel-row.
 			var none = document.createElement('div');
@@ -61121,6 +61166,7 @@ var EngCalcs = EngCalcs || {};
 		// Newest first, matching noticeLog's own order (Tom: "oldest at the bottom") -- no
 		// re-sorting at render time, so the panel can never disagree with the log it is reading.
 		noticeLog.forEach(function (row) {
+			if (hiddenText && row.text === hiddenText) { return; }
 			var pill = document.createElement('div');
 			pill.className = 'lpn-msglog-panel-row' + (row.severity === 'warning' ? ' lpn-msglog-panel-warn' : '');
 			var when = document.createElement('span');
@@ -61339,9 +61385,16 @@ var EngCalcs = EngCalcs || {};
 	// messages that I no longer want to see like 'no path to a reservoir'. After about a minute or
 	// two it's just an annoyance."). Ida's design: a small x beside the text (never in the grievance
 	// button's element), hiding exactly that TEXT -- the same words stay hidden, different words (another
-	// node list) show again -- and a quiet "1 hidden" chip that restores it. IN MEMORY ONLY: the
-	// set lives as long as the page and is emptied when a different network opens, so nothing is
-	// stored on the device.
+	// node list) show again. IN MEMORY ONLY: the set lives as long as the page and is emptied when a
+	// different network opens, so nothing is stored on the device.
+	//
+	// **HIDDEN MEANS HIDDEN** (Tom, 2026-10-07, of a "1 hidden" chip left in the amber box: "Put the
+	// hidden at the top of the expando history instead of still on the map. Hidden means hidden, and
+	// it's not hidden."). Nothing of a hidden message stays on the map: the box goes with it, its
+	// grievance button included (the bottom strip keeps the standing one). The message waits as the
+	// TOP row of the message history panel (renderMsglogPanel()), marked Hidden, with the one control
+	// that brings it back. No count, badge or highlight on the history glyph either: that glyph sits
+	// on the map too, and lighting it would be the chip again in another place.
 	//
 	// **ONLY A DIAGNOSTIC THE USER CAN WORK PAST IS HIDEABLE**, and the line is drawn by CODE here
 	// because nothing upstream draws it (every lpnDiagnose() issue withholds the solve). Hideable:
@@ -61357,26 +61410,32 @@ var EngCalcs = EngCalcs || {};
 	var statusHidden = {};      // message text -> true, for the texts the user has hidden
 	var statusLast = { text: '', code: '', hideable: false };
 	function clearStatusHidden() { statusHidden = {}; }
+	// The text the user has hidden and that is still the standing message, or '' -- what the history
+	// panel pins at its top.
+	function statusHiddenText() {
+		return (statusLast.text && statusLast.hideable && statusHidden[statusLast.text]) ? statusLast.text : '';
+	}
 	// Paints what setStatus() last stated, honouring the hidden set. Called by setStatus(), and by
-	// the x and the chip, which must not re-log a message that has not changed.
+	// the x and the history row's Show, which must not re-log a message that has not changed.
 	function paintStatus() {
 		var el = document.getElementById('lpn_status');
 		var textEl = document.getElementById('lpn_status_text');
 		var xEl = document.getElementById('lpn_status_dismiss');
-		var chipEl = document.getElementById('lpn_status_chip');
 		if (!el) { return; }
-		var hide = !!(statusLast.text && statusLast.hideable && statusHidden[statusLast.text]);
+		var hide = !!statusHiddenText();
 		// WRITTEN INTO THE INNER SPAN, not into the <p>: the <p> also holds the grievance button,
 		// and textContent on the parent would delete it on the first solve. Falls back to the <p>
 		// where the span is absent, so a harness or a page that has not been updated still works.
 		(textEl || el).textContent = hide ? '' : (statusLast.text || '');
 		if (xEl) { xEl.style.display = (statusLast.text && statusLast.hideable && !hide) ? '' : 'none'; }
-		if (chipEl) {
-			chipEl.style.display = hide ? '' : 'none';
-			if (hide) {
-				chipEl.textContent = ((EngCalcs.pageConfig || {}).lpn_status_hidden || '{count} hidden').replace('{count}', '1');
-			}
-		}
+		// An open history panel follows: a hidden message forgotten by an edit leaves its top row.
+		if (msglogPanelOpen) { renderMsglogPanel(); }
+	}
+	// Brings the hidden message back onto the map. The one restore door, on the history row.
+	function unhideStatus() {
+		delete statusHidden[statusLast.text];
+		paintStatus();
+		syncStatusBoxVisibility();
 	}
 	function setStatus(text, code, hideable) {
 		var el = document.getElementById('lpn_status');
@@ -61510,9 +61569,7 @@ var EngCalcs = EngCalcs || {};
 		if (!el) { return; }
 		var textEl = document.getElementById('lpn_status_text');
 		var notesEl = document.getElementById('lpn_status_notes');
-		var chipEl = document.getElementById('lpn_status_chip');
-		var any = !!((textEl || el).textContent || '') || !!(notesEl && notesEl.textContent) ||
-			!!(chipEl && chipEl.style.display !== 'none');
+		var any = !!((textEl || el).textContent || '') || !!(notesEl && notesEl.textContent);
 		el.style.display = any ? 'block' : 'none';
 		// It appears and disappears under a top corner, so the legends re-dodge around it. This is
 		// NOT applyMapHeight() -- see the note above; the map's own height still ignores the model.
@@ -61741,25 +61798,18 @@ var EngCalcs = EngCalcs || {};
 		wireWrongButton('lpn_wrong_status_btn', function () { return statusWrongCode || 'status'; });
 		wireStatusHide();
 	}
-	// The x and the chip. Focus follows the control that replaces the one pressed, so a keyboard
-	// user is never dropped onto the page.
+	// The x. Focus moves to the history glyph, which is where the message went, so a keyboard user is
+	// never dropped onto the page and is one Enter away from bringing it back.
 	function wireStatusHide() {
-		var xEl = document.getElementById('lpn_status_dismiss'), chipEl = document.getElementById('lpn_status_chip');
+		var xEl = document.getElementById('lpn_status_dismiss');
 		if (xEl) {
 			xEl.addEventListener('click', function () {
 				if (!statusLast.text || !statusLast.hideable) { return; }
 				statusHidden[statusLast.text] = true;
 				paintStatus();
 				syncStatusBoxVisibility();
-				if (chipEl && chipEl.focus) { chipEl.focus(); }
-			});
-		}
-		if (chipEl) {
-			chipEl.addEventListener('click', function () {
-				delete statusHidden[statusLast.text];
-				paintStatus();
-				syncStatusBoxVisibility();
-				if (xEl && xEl.focus) { xEl.focus(); }
+				var logBtn = document.getElementById('lpn_msglog_btn');
+				if (logBtn && logBtn.focus) { logBtn.focus(); }
 			});
 		}
 	}

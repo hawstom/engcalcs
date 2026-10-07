@@ -430,7 +430,8 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 			      // HIDE THIS MESSAGE (Tom, 2026-10-07: "I wish there were a way to dismiss error messages that I
 			      // no longer want to see"). Its own sibling, so setStatus()'s write of the text cannot wipe it
 			      // and it never touches the grievance button below. Shown only for a message the user can work
-			      // past; the chip appears in its place while that message is hidden. In memory only. ?><button type="button" id="lpn_status_dismiss" class="lpn-status-x d-print-none" style="display:none" title="<?=htmlspecialchars($ec_lang['lpn_status_dismiss'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_status_dismiss'])?>">&times;</button><button type="button" id="lpn_status_chip" class="lpn-status-chip d-print-none" style="display:none" title="<?=htmlspecialchars($ec_lang['lpn_status_hidden_tip'])?>"></button><?php
+			      // past. A hidden message leaves NOTHING on the map (Tom, 2026-10-07: "Hidden means hidden"); it
+			      // waits as the top row of the message history instead, where it is restored. In memory only. ?><button type="button" id="lpn_status_dismiss" class="lpn-status-x d-print-none" style="display:none" title="<?=htmlspecialchars($ec_lang['lpn_status_dismiss'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_status_dismiss'])?>">&times;</button><?php
 			      // AND THE ENGINE-DIFFERENCE NOTES ARE THEIR OWN SPAN, because they are the only
 			      // part of this box that EXPIRES on a clock of its own (Tom, 2026-09-05, of the
 			      // gravity note: "Give it a timer, maybe 2 minutes and maybe fading if that's
@@ -2364,7 +2365,9 @@ EngCalcs.pageConfig = {
 	lpn_time_engine_start_failed: <?=json_encode($ec_lang['lpn_time_engine_start_failed'])?>,
 	lpn_time_engine_run_failed: <?=json_encode($ec_lang['lpn_time_engine_run_failed'])?>,
 	lpn_wrong_btn: <?=json_encode($ec_lang['lpn_wrong_btn'])?>,
-	lpn_status_hidden: <?=json_encode($ec_lang['lpn_status_hidden'])?>,
+	lpn_msglog_hidden: <?=json_encode($ec_lang['lpn_msglog_hidden'])?>,
+	lpn_msglog_unhide: <?=json_encode($ec_lang['lpn_msglog_unhide'])?>,
+	lpn_status_hidden_tip: <?=json_encode($ec_lang['lpn_status_hidden_tip'])?>,
 	lpn_time_slider: <?=json_encode($ec_lang['lpn_time_slider'])?>,
 	lpn_time_no_period: <?=json_encode($ec_lang['lpn_time_no_period'])?>,
 	lpn_time_first: <?=json_encode($ec_lang['lpn_time_first'])?>,
