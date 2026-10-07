@@ -93,7 +93,9 @@ shown rows and leader come out. The bench (`dev/lpn-spike/label-bench/`) runs ev
 the same scenes (EPA Net1, Net2, Net3, and Net3 on the world map near Novato at several zooms) and
 prints the same scores: breaks of N1, N3, N4 and N5 (must be zero), crossing cost, values and
 labels shown, leader length, churn (a label that moves between two views and shows nothing more
-for it), and time per layout.
+for it), and time per layout. R1's first half (a label hidden only for lack of room) is scored,
+never passed or failed: how often a label is hidden where there was room counts against a layout,
+and no layout fails on it.
 
 The setting R14 names is the user's "Draw link labels along the link line" (Settings, Symbology,
 Labels). A scene carries it as `scene.settings.alignPipeLabels`, with the reading window a turned
@@ -336,3 +338,18 @@ is not only human, it is biological; it is real."*
   ID is never dropped"; the scene's `dropOrder` carries `id`, and the judges score a label that
   keeps a value earlier in the order than one it hides.
 
+- **Proposal 2, R1's "only for lack of room" scored as pass or fail:** *"This (use conveniently
+  available space) is the golden prize, the end of the rainbow. You can't fail builders who fail it,
+  because they all fail it. You must score them. But the fact that you have a bench that measures it
+  is like a hidden-in-plain-sight or 'The Answer in the Back of the Book' trope. If we can measure
+  it, does that mean we can build it? And how did we learn how to measure it? And how well are we
+  measuring it? And can we share our measuring tool with the builders so that they can self-test
+  their strategies in real-time?"* **Settled: R1's first half is SCORED, never pass or fail.** The
+  judges report the share of hidden labels that had room; no layout fails on it (Part A §5 says so).
+  R1's second half (never by count) stays a judges' assertion. His four questions are answered in
+  `dev/label-trials/round-7-plan.md` §1.
+- **Proposal 4, search a node's two widest gaps (Task 539, `spot_prime` step 1):** *"This a strategy.
+  We might list known and propounded strategies as suggestions including this one. I would hope that
+  each round of testing would result in a successively better handful of tested and compared
+  creative strategies and recipes for combining them."* **Not a rule.** It goes into round 7's
+  strategy catalogue, handed to the builders as a suggestion (`dev/label-trials/round-7-plan.md` §3).
