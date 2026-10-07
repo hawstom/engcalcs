@@ -383,7 +383,10 @@ async function sectionHelp(Session, browser) {
 			const glyphs = row.querySelectorAll('.lpn-corner-guide'), tips = row.querySelectorAll('.ec-tip, .ec-help');
 			return { id, glyphs: glyphs.length, tips: tips.length, last: row.lastElementChild === glyphs[0],
 				focusable: glyphs.length === 1 && glyphs[0].tabIndex === 0 };
-		}), BOXES);
+		}), BOXES.filter((id) => id !== 'lpn_hotkeys_popup'));
+		// The Guide is the one box with no "?": in the Guide it would open help inside help (Ida,
+		// 2026-10-07).
+		ok('the Guide\'s own title bar has no ?', await a.page.evaluate(() => document.querySelectorAll('#lpn_hotkeys_popup .lpn-box-corner .lpn-corner-guide, #lpn_hotkeys_popup .lpn-box-corner .ec-tip').length === 0));
 		for (const f of facts) {
 			ok(f.id + ': exactly one ?, the last thing before the X, focusable, and not a blue tip', f.glyphs === 1 && f.tips === 0 && f.last && f.focusable, JSON.stringify(f));
 		}

@@ -17,6 +17,10 @@
 //   4. No Guide text says "element" unless the sentence is on ALLOW below (an interface or DOM
 //      element, never a network asset).
 //   5. The Properties and Settings entries carry the 2026-10-07 wording.
+//   6. Ida's audit, 2026-10-07: a term that repeats its section's heading is not drawn but search
+//      still finds it; a Boxes entry has 12 px of air and a hairline above it; every key table's
+//      action column starts at one x; the Guide's own title bar has no "?"; the rail never lists
+//      one name twice; and the note about dimmed names shows exactly when a name is dimmed.
 //
 // Copyright 2009 Thomas Gail Haws
 // Licensed under GNU GPL v3.0 or later
@@ -104,7 +108,7 @@ const measure = (page) => page.evaluate(() => {
 	});
 	pane.querySelectorAll('.lpn-guide-section > h2').forEach((el) => { if (shown(el)) { note('h2', el); } });
 	pane.querySelectorAll('.lpn-guide-menu > h3').forEach((el) => { if (shown(el)) { note('menu h3', el); } });
-	pane.querySelectorAll('.lpn-guide-section dt').forEach((el) => { if (shown(el)) { note('term', el); } });
+	pane.querySelectorAll('.lpn-guide-section dt:not(.lpn-guide-dup)').forEach((el) => { if (shown(el)) { note('term', el); } });
 	pane.querySelectorAll('.lpn-guide-section dd td:first-child').forEach((el) => { if (shown(el)) { note('key cell', el); } });
 	pane.querySelectorAll('.lpn-guide-prose').forEach((el) => { if (shown(el)) { note('prose', el); } });
 	pane.querySelectorAll('.lpn-guide-boxentry').forEach((en) => {
@@ -158,6 +162,42 @@ async function pass(browser, Session, tag, extra) {
 			return { keyBottom: Math.round(td.getBoundingClientRect().bottom), actTop: Math.round(nx.getBoundingClientRect().top) };
 		});
 		ok('a key table stacks its action below its key at phone width', cells.actTop >= cells.keyBottom - 1, JSON.stringify(cells));
+	}
+	const audit = await page.evaluate(() => {
+		const pane = document.getElementById('lpn_guide_content');
+		const dups = Array.from(pane.querySelectorAll('dt.lpn-guide-dup'));
+		const en = Array.from(pane.querySelectorAll('.lpn-guide-boxentry')).map((e) => getComputedStyle(e));
+		const actX = Array.from(pane.querySelectorAll('[data-guide-section]:not([data-guide-section="tables"]) dd td:nth-child(2), [data-guide-section="tables"] dd:not(:first-of-type) td:nth-child(2)'))
+			.filter((td) => td.getClientRects().length).map((td) => Math.round(td.getBoundingClientRect().left));
+		const rail = Array.from(document.querySelectorAll('#lpn_guide_nav a')).map((a) => a.firstChild ? a.firstChild.textContent.trim() : '');
+		const off = !!pane.querySelector('#lpn_guide_toolbar > .lpn-guide-row.lpn-guide-off'), note = document.getElementById('lpn_guide_dimnote');
+		return {
+			dups: dups.map((d) => ({ t: d.textContent.trim(), h: d.getBoundingClientRect().height })),
+			entries: en.length, air: en.filter((c) => c.marginTop !== '12px' || c.borderTopWidth !== '1px' || c.borderTopStyle !== 'solid').length,
+			actX: Array.from(new Set(actX)), cells: actX.length,
+			railDup: rail.filter((t, i) => rail.indexOf(t) !== i),
+			guideQ: document.querySelectorAll('#lpn_hotkeys_popup .lpn-box-corner .lpn-corner-guide, #lpn_hotkeys_popup .lpn-box-corner .ec-tip').length,
+			off, noteShown: !!note && !note.hidden && note.getClientRects().length > 0
+		};
+	});
+	ok('6. the Map and Screenshot terms that repeat their heading are kept but not drawn', audit.dups.length === 2 && audit.dups.every((d) => d.h <= 1), JSON.stringify(audit.dups));
+	ok('...a Boxes entry has 12 px of air and a hairline above it', audit.entries > 10 && audit.air === 0, audit.air + ' of ' + audit.entries);
+	ok('...the Guide\'s own title bar has no "?"', audit.guideQ === 0, String(audit.guideQ));
+	ok('...the rail never lists one name twice', audit.railDup.length === 0, JSON.stringify(audit.railDup));
+	ok('...the dimmed-name note shows exactly when a name is dimmed', audit.noteShown === audit.off, JSON.stringify({ off: audit.off, note: audit.noteShown }));
+	if (tag === 'desktop') {
+		ok('...every key table\'s action column starts at one x', audit.cells > 20 && audit.actX.length === 1, JSON.stringify(audit.actX));
+		await page.fill('#lpn_guide_search', enString('lpn_hotkeys_snip_term'));
+		await a.settle(300);
+		const found = await page.evaluate(() => {
+			const sec = document.querySelector('[data-guide-section="snip"]');
+			return sec.style.display !== 'none' && sec.querySelectorAll('tr:not([style*="none"])').length > 2;
+		});
+		ok('...a search for the hidden term still finds its whole table', found);
+		await page.fill('#lpn_guide_search', '');
+		await a.settle(200);
+	} else {
+		ok('...on a phone some toolbar names are dimmed, so the note shows', audit.off && audit.noteShown);
 	}
 	ok('no page errors', a.errors.length === 0, a.errors.slice(0, 2).join(' | '));
 	await a.context.close().catch(() => {});

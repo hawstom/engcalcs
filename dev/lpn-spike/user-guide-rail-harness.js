@@ -195,7 +195,8 @@ async function desktop(browser, Session) {
 	const boxes = await page.evaluate(() => Array.from(document.querySelectorAll('[data-guide-for]')).map(b => b.getAttribute('data-guide-for')));
 	const per = await page.evaluate(() => Array.from(document.querySelectorAll('.lpn-has-corner')).map(b => ({ id: b.id,
 		n: b.querySelectorAll('.lpn-box-corner [data-guide-for], .lpn-box-corner .ec-tip').length })));
-	ok('every standing box carries exactly one "?" (its guide "?", or the tip "?" it already had)', per.length >= 15 && per.every(b => b.n === 1), JSON.stringify(per.filter(b => b.n !== 1)));
+	// The Guide itself carries none: in the Guide its "?" would open help inside help (Ida, 2026-10-07).
+	ok('every standing box but the Guide carries exactly one "?" (its guide "?", or the tip "?" it already had)', per.length >= 15 && per.every(b => b.n === (b.id === 'lpn_hotkeys_popup' ? 0 : 1)), JSON.stringify(per.filter(b => b.n !== (b.id === 'lpn_hotkeys_popup' ? 0 : 1))));
 	ok('every box has the guide "?"', boxes.length >= 15 && new Set(boxes).size === boxes.length, boxes.length + ' ' + JSON.stringify(boxes));
 	const tip = await page.evaluate(() => document.querySelector('[data-guide-for]').title);
 	ok('...tip "Help for this box"', tip === (await a.lang('lpn_guide_box_help')), tip);
