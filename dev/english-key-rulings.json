@@ -4436,20 +4436,10 @@
             "ruled": "2026-10-01",
             "answer": "OK."
         },
-        "lpn_scenario_preset_max_day_tip": {
-            "on": "Demand multiplier 2.0 times average day, a placeholder value. Most systems fall between 1.2 and 3.0 (National Research Council, 2006). Set the value for the system being modeled in Settings, Calculation, Hydraulics, Demand multiplier.",
-            "ruled": "2026-10-07",
-            "answer": "Technical-English interview: Use proposed"
-        },
         "lpn_scenario_preset_peak_hour": {
             "on": "6. Peak hour",
             "ruled": "2026-10-01",
             "answer": "OK."
-        },
-        "lpn_scenario_preset_peak_hour_tip": {
-            "on": "Demand multiplier 3.0 times average day, a placeholder value. Most systems fall between 3.0 and 6.0 (National Research Council, 2006). Set the value for the system being modeled in Settings, Calculation, Hydraulics, Demand multiplier.",
-            "ruled": "2026-10-07",
-            "answer": "Technical-English interview: Use proposed / [TGH: Can these be combined?]"
         },
         "lpn_scncmp_at": {
             "on": "{value} at {id}",
