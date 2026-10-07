@@ -44,7 +44,7 @@
 
 	// ---- tunables ------------------------------------------------------------------------------
 	const GAP = 2;          // px between a symbol and a label that touches it
-	const OV = 1.25;        // px of overlap we already call ink (the bench forgives 1.5, as leading)
+	const OV = 1.4;         // px of overlap we already call ink (the bench forgives 1.5, as leading)
 	const CELL = 32;        // spatial grid cell, px
 	const MARGIN = 400;     // px beyond the viewport that the real-estate map covers
 	const EDGE = 80;        // px: a label this near the viewport's edge is always looked at afresh
@@ -59,6 +59,7 @@
 	const RING_DIRS = 12;       // directions tried on each ring
 	const RING_COST = 0.12;     // base cost of hanging on a leader
 	const RING_PER_PX = 0.006;  // cost per px of travel
+	const FAR_ROWS = 6;         // 'farreach': the last sweep's reach, in rows
 	const REACH_ROWS = 3;       // 'reach': leaders out to this many text rows, every 15 degrees
 	const DEADLINE_MS = 700;
 	const LITE_DEADLINE_MS = 400;
@@ -67,10 +68,10 @@
 	// ---- ingredients, each switchable (STRATEGY.md beside this file) ----------------------------
 	// Switch one off with create({off: ['repair']}) or, under the bench, the environment variable
 	// LPN_PLACER_B_OFF=repair,evict (comma separated).
-	const INGREDIENTS = ['keep', 'table', 'crowd', 'smallfirst', 'wedge', 'reach', 'along', 'relocate', 'repair', 'evict', 'polish', 'unwrap', 'raster', 'cleanfirst', 'edgehang', 'rings', 'leaderevict', 'memo', 'rekeep'];
+	const INGREDIENTS = ['keep', 'table', 'crowd', 'smallfirst', 'wedge', 'reach', 'along', 'relocate', 'repair', 'evict', 'polish', 'unwrap', 'raster', 'cleanfirst', 'edgehang', 'rings', 'leaderevict', 'memo', 'rekeep', 'farreach'];
 	// Built, measured and left off by default (STRATEGY.md, "Tried and dropped"); LPN_PLACER_B_ON
 	// switches one back on.
-	const DEFAULT_OFF = ['repair'];
+	const DEFAULT_OFF = ['repair', 'farreach'];
 	function ingredientSwitches(opts) {
 		const on = {};
 		INGREDIENTS.forEach(function (k) { on[k] = DEFAULT_OFF.indexOf(k) < 0; });
@@ -498,7 +499,7 @@
 								if (segBox(p[0], p[1], q[0], q[1], it.box, 0.5)) { seen.push(it.key); cost += W_LDR_PIPE; }
 								continue;
 							}
-							if (segBox(p[0], p[1], q[0], q[1], it.box, 0.5)) { return Infinity; }
+							if (segBox(p[0], p[1], q[0], q[1], it.box, 1.4)) { return Infinity; }   // N3; the bench forgives 1.5
 						} else if (it.t === 'lab') {
 							if (it.lid === req.id || seen.indexOf(it.key) >= 0) { continue; }
 							if (segBox(p[0], p[1], q[0], q[1], it.box, 1.0)) { seen.push(it.key); cost += W_LAB_LDR; }
@@ -669,7 +670,7 @@
 			// by the edge its leader arrives at (R5), so its near corner or edge midpoint is the end.
 			function edgeHang(req, rows, layout, W, H, ax, ay, r0, openness, out, extra) {
 				const row = T.rowHeightPx;
-				for (let k = 1; k <= REACH_ROWS * 2; k++) {
+				for (let k = 1; k <= (farNow ? FAR_ROWS : REACH_ROWS) * 2; k++) {
 					const len = r0 + 1 + k * row / 2;
 					for (let deg = 0; deg < 360; deg += 15) {
 						const rad = deg * Math.PI / 180, cs = Math.cos(rad), sn = Math.sin(rad);
@@ -799,7 +800,7 @@
 			// does not move within one layout, so each list is built once.
 			const candCache = {};
 			function sortedCandidates(req, rows) {
-				const key = req.id + '|' + rows.join(',');
+				const key = req.id + '|' + rows.join(',') + (farNow ? '|F' : '');
 				let cs = candCache[key];
 				if (cs) { return cs; }
 				const raw = candidates(req, rows);
@@ -842,6 +843,7 @@
 			// 'cleanfirst': every pass seats labels where they cross nothing (CLEAN_CAP) before a last
 			// sweep lets a label still hidden cross a pipe (LABEL_CAP).
 			let capNow = ON.cleanfirst ? CLEAN_CAP : LABEL_CAP;
+			let farNow = false;   // 'farreach': the last sweep's leaders reach FAR_ROWS rows
 			function best(req, sets, capped) {
 				const own = ownOf(req);
 				let bestC = null, bestS = Infinity, bestInk = null, bestCost = 0;
@@ -1083,7 +1085,7 @@
 			// The current spot stays unless another is better; the label may move to show more, or
 			// to lie along its pipe with the same rows (R14).
 			const freed = [];   // the ink of spots given up by a move: ground a hidden label may now have
-			const failedAt = {}, failedFrom = {}, PC = {};
+			const failedAt = {}, failedFrom = {};
 			function nearFreed(req, from) {
 				const a = req.anchor, R = 4 * T.rowHeightPx + 80;
 				for (let i = from || 0; i < freed.length; i++) {
@@ -1284,22 +1286,40 @@
 					if (b) { insert(req, b.c, b.ink, b.cost); repaired.push(req); }
 				});
 			}
-			// The labels repair, eviction and the sweep seated grow too.
+			// 'farreach' (R1: nearness to home is the first thing given up): a label still hidden
+			// may travel further, on a longer leader, before it is dropped.
+			if (ON.farreach && !lite) {
+				capNow = LABEL_CAP; farNow = true;
+				reqs.forEach(function (req) {
+					if (placed[req.id] || req.hand || req.kind === 'text' || late()) { return; }
+					const sets = setsOf[req.id];
+					const b = best(req, [sets[sets.length - 1]], true);
+					if (b) { insert(req, b.c, b.ink, b.cost); repaired.push(req); }
+				});
+				farNow = false;
+			}
+			// The labels repair, eviction and the sweeps seated grow too.
 			for (let i = 0; i < repaired.length && !late(); i++) { regrow(repaired[i]); }
 			TIMING && console.log('p6', (now() - tStart).toFixed(1));
 			// ---- 8. 'polish' (S17): one more look for every label, since later moves freed ground
 			// (a pipe label seated level early may now lie along its pipe).
 			if (ON.polish && !lite) {
-				for (let i = 0; i < growOrder.length && !late(); i++) {
-					const req = growOrder[i], cur = placed[req.id];
-					if (!cur) { continue; }
-					const cut = cur.c.rows.length < setsOf[req.id][0].length;
-					const level = req.kind === 'link' && req.along && !alongAgrees(req, cur.c.angle || 0, cur.c.x + cur.c.w / 2, cur.c.y + cur.c.h / 2);
-					if ((cut || level || cur.cost > 0) && nearFreed(req, 0)) { if (TIMING) { PC[(cut ? 'c' : '') + (level ? 'l' : '') + (cur.cost > 0 ? 'x' : '')] = (PC[(cut ? 'c' : '') + (level ? 'l' : '') + (cur.cost > 0 ? 'x' : '')] || 0) + 1; } regrow(req); }
+				// Rounds: each looks only near ground the round before it freed, so it ends quickly.
+				let from = 0;
+				for (let round = 0; round < 4 && !late(); round++) {
+					const mark = freed.length;
+					for (let i = 0; i < growOrder.length && !late(); i++) {
+						const req = growOrder[i], cur = placed[req.id];
+						if (!cur) { continue; }
+						const cut = cur.c.rows.length < setsOf[req.id][0].length;
+						const level = req.kind === 'link' && req.along && !alongAgrees(req, cur.c.angle || 0, cur.c.x + cur.c.w / 2, cur.c.y + cur.c.h / 2);
+						if ((cut || level || cur.cost > 0) && nearFreed(req, from)) { regrow(req); }
+					}
+					if (freed.length === mark) { break; }
+					from = mark;
 				}
 			}
-
-			TIMING && console.log('p7', (now() - tStart).toFixed(1), JSON.stringify(PC));
+			TIMING && console.log('p7', (now() - tStart).toFixed(1));
 			// ---- out -------------------------------------------------------------------------
 			// What this layout teaches the lookup table: each label's spot as an offset from its
 			// anchor, which holds at any pan of the same zoom.
