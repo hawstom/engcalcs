@@ -1316,7 +1316,11 @@ EngCalcs.lpnCollide = (function () {
 	//
 	// **CLEAN GROUND FIRST HOLDS HERE TOO** (rule 1): among the rescue spots a label takes the nearest
 	// one with no pipe under its rows, and a spot with a pipe under it only when no clean one exists,
-	// because a rescued label is one that would otherwise hide.
+	// because a rescued label is one that would otherwise hide. That fallback is most of what this
+	// buys and it is not free: measured on the bench's 64 generated sets (320 views) against master,
+	// labels shown 38.3 -> 39.3 in 100 asked (values 25.7 -> 26.9), labels on a pipe 23.9 -> 26.2 per
+	// 100 shown, the page pass about 7% slower (paired median). Clean spots only gave 38.7 in 100 asked
+	// with labels on a pipe unchanged at 23.8.
 	var RESCUE_ROWS = 4;
 	var RESCUE_ANGLES = (function () {
 		// 315 is top-right in y-down bearings, the corner the four fixed sides try first; the rest
