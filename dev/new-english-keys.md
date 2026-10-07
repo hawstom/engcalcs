@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**44 still to read on master**, of 150 untranslated keys, of 2373 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**117 still to read on master**, of 223 untranslated keys, of 2446 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -73,7 +73,7 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   _Ruled 2026-10-05: Is this _syn needed?_
 
-## lpn_  (148, 42 to read @@ NEEDS RULING)
+## lpn_  (221, 115 to read @@ NEEDS RULING)
 
 - **`lpn_alt_calc_options`**
   > Calculation options
@@ -162,6 +162,9 @@ never edits a synonym.
 - **`lpn_cp_characters_tip`**
   > "@" means any letter; "#" means any numeric digit, and you must separately list "-", ".", and "," if they are allowed; and any white space characters must be between other characters.
   _Ruled OK 2026-10-05._
+- **`lpn_crs_suggested_mark`**
+  > (suggested)
+  @@ NEEDS RULING
 - **`lpn_diag_pda_needs_epanet`**
   > The demand model is pressure driven, and only the EPANET solver can compute it. The EPANET solver could not be loaded, so these results are missing.
   _Ruled OK 2026-10-05._
@@ -306,15 +309,111 @@ never edits a synonym.
 - **`lpn_engine_unavailable_why`**
   > Valves that open and close on their own cannot be solved without the EPANET solver. {reason}
   @@ NEEDS RULING
+- **`lpn_fb_bad_email`**
+  > That email address does not look right. Correct it, or leave it empty.
+  @@ NEEDS RULING
+- **`lpn_fb_busy`**
+  > Too many messages have arrived in the last few minutes. What you wrote is still here, so you can try again later.
+  @@ NEEDS RULING
+- **`lpn_fb_comment`**
+  > Comments (optional)
+  @@ NEEDS RULING
+- **`lpn_fb_email`**
+  > Email (optional, only if you want a reply)
+  @@ NEEDS RULING
+- **`lpn_fb_failed`**
+  > That did not reach us. What you wrote is still here, so you can try again.
+  @@ NEEDS RULING
+- **`lpn_fb_intro`**
+  > Canned messages (optional). Nothing is sent until you press Send.
+  @@ NEEDS RULING
+- **`lpn_fb_pick_broken`**
+  > Something did not work
+  @@ NEEDS RULING
+- **`lpn_fb_pick_confusing`**
+  > This is confusing
+  @@ NEEDS RULING
+- **`lpn_fb_pick_numbers`**
+  > The numbers look wrong
+  @@ NEEDS RULING
+- **`lpn_fb_pick_wording`**
+  > The wording or translation is wrong
+  @@ NEEDS RULING
+- **`lpn_fb_send`**
+  > Send
+  @@ NEEDS RULING
+- **`lpn_fb_sending`**
+  > Sending…
+  @@ NEEDS RULING
+- **`lpn_fb_sends`**
+  > What this sends: the name of this page, your language, the version of the site, the code of the message on the map if there is one, and what you picked or typed. Never your drawing or your network. Your email address is used only to reply to you.
+  @@ NEEDS RULING
+- **`lpn_file_export_geojson`**
+  > Export GeoJSON file…
+  @@ NEEDS RULING
+- **`lpn_file_export_geojson_tip`**
+  > Download this network as a GeoJSON file for QGIS, ArcGIS Pro and other GIS programs. Junctions, tanks and reservoirs are points, and pipes, pumps and valves are lines that follow their vertices. Positions are latitude and longitude. Results are included only when the network has been solved.
+  @@ NEEDS RULING
+- **`lpn_file_export_item_geojson`**
+  > GeoJSON file…
+  @@ NEEDS RULING
+- **`lpn_file_export_item_inp`**
+  > EPANET file…
+  @@ NEEDS RULING
+- **`lpn_file_export_menu`**
+  > Export…
+  @@ NEEDS RULING
 - **`lpn_find_scope_source`**
   > Source
   @@ NEEDS RULING
 - **`lpn_find_source_no_chemical`**
   > No chemical is being tracked, so no node has a source.
   @@ NEEDS RULING
+- **`lpn_geojson_refused_crs`**
+  > The coordinate system of this project ({detail}) is not known to this page, so its positions cannot be converted to latitude and longitude. Use Convert as… to copy the project into one this page knows, then export again.
+  @@ NEEDS RULING
+- **`lpn_geojson_refused_empty`**
+  > There is nothing to export yet. Draw or open a network first.
+  @@ NEEDS RULING
+- **`lpn_geojson_refused_local`**
+  > A GeoJSON file holds latitude and longitude only, and this project is drawn on a local grid with no place on the Earth. Georeference it first with Map, World map, Attach, then export again.
+  @@ NEEDS RULING
+- **`lpn_geojson_refused_range`**
+  > These positions are not valid latitudes and longitudes: {detail}
+  @@ NEEDS RULING
+- **`lpn_geojson_results_in`**
+  > The results on screen are included.
+  @@ NEEDS RULING
+- **`lpn_geojson_results_out`**
+  > No results are included, because the network is not solved.
+  @@ NEEDS RULING
+- **`lpn_hotkeys_snip_def`**
+  > <table class="lpn-notes-table"><tbody><tr><td>S</td><td>Snip, while Screenshot is open.</td></tr><tr><td>E</td><td>Eraser, in the markup view.</td></tr><tr><td>Ctrl+Z, Ctrl+Y</td><td>Undo and redo, in the markup view.</td></tr><tr><td>Esc</td><td>Cancel a snip, or leave the eraser. In the markup view, close it when nothing is drawn.</td></tr></tbody></table>
+  @@ NEEDS RULING
+- **`lpn_hotkeys_snip_heading`**
+  > Screenshot
+  @@ NEEDS RULING
+- **`lpn_hotkeys_snip_term`**
+  > Screenshot keyboard shortcuts
+  @@ NEEDS RULING
+- **`lpn_inp_backdrop_attach`**
+  > Attach {file}…
+  @@ NEEDS RULING
+- **`lpn_inp_backdrop_attach_tip`**
+  > A web page cannot open the picture by its name. Choose it on your device and it is placed where the file says it belongs.
+  @@ NEEDS RULING
+- **`lpn_inp_backdrop_attached`**
+  > Attached {file}, placed where the file says it belongs.
+  @@ NEEDS RULING
+- **`lpn_inp_backdrop_attached_other`**
+  > Attached {picked}, placed where the file says it belongs. The file names {file}, which is a different name.
+  @@ NEEDS RULING
 - **`lpn_inp_drop_pressure_unit`**
   > This file states a pressure unit other than the one this page reads for its flow unit, which is psi for US units and meters otherwise. Every pressure in the file is read that way, so check the valve settings, emitters, and pressure driven limits it holds. The line is kept and is written back.
   _Ruled OK 2026-10-05._
+- **`lpn_inp_export_difference_one`**
+  > One thing the .inp format cannot hold.
+  @@ NEEDS RULING
 - **`lpn_mode_add_chain`**
   > Mode: Junction Pipe Chain. Specify a point on the map to add a junction, then specify each next point to add a pipe and a junction. Specify an existing node to continue from it. Press Escape to end the chain. Switch to Select mode to change or move assets and labels.
   _Ruled OK 2026-10-05._
@@ -423,6 +522,30 @@ never edits a synonym.
 - **`lpn_scncmp_same`**
   > The same in every scenario
   _Ruled OK 2026-10-05._
+- **`lpn_screenshot_copied`**
+  > Screenshot copied.
+  @@ NEEDS RULING
+- **`lpn_screenshot_failed`**
+  > The screenshot could not be made.
+  @@ NEEDS RULING
+- **`lpn_screenshot_hint`**
+  > Drag a rectangle over the map, or click for the whole map. Esc cancels.
+  @@ NEEDS RULING
+- **`lpn_screenshot_menu`**
+  > Screenshot
+  @@ NEEDS RULING
+- **`lpn_screenshot_no_basemap`**
+  > The street map or satellite image could not be included.
+  @@ NEEDS RULING
+- **`lpn_screenshot_saved`**
+  > The clipboard is not available here, so the screenshot was downloaded as a PNG file.
+  @@ NEEDS RULING
+- **`lpn_screenshot_scale_tip`**
+  > The picture's size as a multiple of the area on the screen. A larger one is sharper and makes a bigger file.
+  @@ NEEDS RULING
+- **`lpn_screenshot_tip`**
+  > Copy a sharper-than-screen picture of the map area you drag, ready to paste into a report. Click without dragging to take the whole map.
+  @@ NEEDS RULING
 - **`lpn_settings_basemap_style`**
   > Basemap style
   _Ruled OK 2026-10-05._
@@ -456,6 +579,102 @@ never edits a synonym.
 - **`lpn_settings_req_pressure_tip`**
   > Enter the pressure at or above which a junction receives its full demand. It must be greater than the minimum pressure. Use this project's pressure unit. Leave it blank to use EPANET's default, which is in psi for US flow units and meters otherwise.
   _Ruled OK 2026-10-05._
+- **`lpn_snip_hint_free`**
+  > Drag around the area to snip, or click for the whole map. Esc cancels.
+  @@ NEEDS RULING
+- **`lpn_snip_tip_eraser`**
+  > Eraser: click a stroke to remove it (E)
+  @@ NEEDS RULING
+- **`lpn_snip_tip_free`**
+  > Snip a freehand shape (S)
+  @@ NEEDS RULING
+- **`lpn_snip_tip_map`**
+  > Screenshot of the whole map
+  @@ NEEDS RULING
+- **`lpn_snip_tip_mode`**
+  > Snip shape
+  @@ NEEDS RULING
+- **`lpn_snip_tip_pen`**
+  > Pen
+  @@ NEEDS RULING
+- **`lpn_snip_tip_rect`**
+  > Snip a rectangle (S)
+  @@ NEEDS RULING
+- **`lpn_snip_tip_redo`**
+  > Redo (Ctrl+Y)
+  @@ NEEDS RULING
+- **`lpn_snip_tip_undo`**
+  > Undo (Ctrl+Z)
+  @@ NEEDS RULING
+- **`lpn_status_inp_exported_no_picture`**
+  > Exported {file}. The background picture could not be saved, so the .inp names none; in EPANET, add it with View > Backdrop > Load.
+  @@ NEEDS RULING
+- **`lpn_status_inp_exported_picture`**
+  > Exported {zip}, holding the EPANET file {file}, its background picture {picture}, and the world file {world}. Extract all three into one folder, then open the .inp there in EPANET; the picture comes with it.
+  @@ NEEDS RULING
+- **`lpn_survey_codes_add`**
+  > Add code
+  @@ NEEDS RULING
+- **`lpn_survey_codes_col_code`**
+  > Code
+  @@ NEEDS RULING
+- **`lpn_survey_codes_col_type`**
+  > Asset type
+  @@ NEEDS RULING
+- **`lpn_survey_codes_remove`**
+  > Remove code
+  @@ NEEDS RULING
+- **`lpn_survey_codes_tip`**
+  > Read the first word of each description as a code from the table. Points with the same line code join into one pipe in file order, and WL1 and WL2 are separate lines. +0 starts a line, -0 ends one, and CLO closes one. JPN followed by a point name joins to that point (Carlson), and Civil 3D writes it CPN.
+  @@ NEEDS RULING
+- **`lpn_survey_codes_toggle`**
+  > Read the description as field codes
+  @@ NEEDS RULING
+- **`lpn_survey_confirm_coded`**
+  > {j} junction(s), {r} reservoir(s), {t} tank(s), and {p} pipe(s) found. Proceed?
+  @@ NEEDS RULING
+- **`lpn_survey_note_code_two_nodes`**
+  > More than one node code, the first was used.
+  @@ NEEDS RULING
+- **`lpn_survey_note_code_unknown`**
+  > Code not in the code table, imported as the asset type chosen above.
+  @@ NEEDS RULING
+- **`lpn_survey_note_code_unread`**
+  > Not every word is a code this page reads, kept in the description.
+  @@ NEEDS RULING
+- **`lpn_survey_note_join_missing`**
+  > JPN or CPN names a point not in this file or project, no pipe drawn for it.
+  @@ NEEDS RULING
+- **`lpn_survey_note_join_no_line`**
+  > JPN or CPN on a point with no line code, no pipe drawn for it.
+  @@ NEEDS RULING
+- **`lpn_survey_note_line_one_point`**
+  > Only point on its line, no pipe drawn from it.
+  @@ NEEDS RULING
+- **`lpn_survey_note_no_desc`**
+  > Field codes are on, but this file has no description column, so no codes were read.
+  @@ NEEDS RULING
+- **`lpn_survey_note_node_on_pipe`**
+  > This point lies exactly on a pipe it is not joined to. If they connect, add JPN to say so.
+  @@ NEEDS RULING
+- **`lpn_survey_note_pipe_one_node`**
+  > This line returns to the same node with no other node between, no pipe drawn for it.
+  @@ NEEDS RULING
+- **`lpn_survey_note_pipe_zero_length`**
+  > This point is at the same spot as the node before it, so the pipe between them has no length.
+  @@ NEEDS RULING
+- **`lpn_survey_note_ring_junction`**
+  > This point became a junction so the ring could close.
+  @@ NEEDS RULING
+- **`lpn_survey_note_vertex_text`**
+  > Not every word is a code this page reads, and a vertex keeps no description.
+  @@ NEEDS RULING
+- **`lpn_survey_note_vertices`**
+  > Points that became pipe vertices: {detail}. A vertex keeps no name, elevation, or description.
+  @@ NEEDS RULING
+- **`lpn_survey_report_coded`**
+  > {j} junction(s), {r} reservoir(s), {t} tank(s), and {p} pipe(s) imported, {m} of the nodes with elevation.
+  @@ NEEDS RULING
 - **`lpn_sysflow_title`**
   > Flow balance
   _Ruled OK 2026-10-03._
@@ -533,7 +752,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**165 still to read**, of 168 new keys across 20 unmerged branch(es).
+**109 still to read**, of 112 new keys across 14 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -544,33 +763,9 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/technical-english (`8e4d66b8`) — adds no English strings
+### chore/technical-english (`4be0b5b5`) — adds no English strings
 
-### feat/backdrop-attach (`929d7ec9`) — 7 new, 7 to read @@ NEEDS RULING
-
-- **`lpn_inp_backdrop_attach`**
-  > Attach {file}…
-  @@ NEEDS RULING
-- **`lpn_inp_backdrop_attach_tip`**
-  > A web page cannot open the picture by its name. Choose it on your device and it is placed where the file says it belongs.
-  @@ NEEDS RULING
-- **`lpn_inp_backdrop_attached`**
-  > Attached {file}, placed where the file says it belongs.
-  @@ NEEDS RULING
-- **`lpn_inp_backdrop_attached_other`**
-  > Attached {picked}, placed where the file says it belongs. The file names {file}, which is a different name.
-  @@ NEEDS RULING
-- **`lpn_inp_export_difference_one`**
-  > One thing the .inp format cannot hold.
-  @@ NEEDS RULING
-- **`lpn_status_inp_exported_no_picture`**
-  > Exported {file}. The background picture could not be saved, so the .inp names none; in EPANET, add it with View > Backdrop > Load.
-  @@ NEEDS RULING
-- **`lpn_status_inp_exported_picture`**
-  > Exported {zip}, holding the EPANET file {file}, its background picture {picture}, and the world file {world}. Extract all three into one folder, then open the .inp there in EPANET; the picture comes with it.
-  @@ NEEDS RULING
-
-### feat/bentley-interop (`2e07f495`) — 60 new, 60 to read @@ NEEDS RULING
+### feat/bentley-interop (`780ecda7`) — 60 new, 60 to read @@ NEEDS RULING
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -755,7 +950,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/desktop (`baba0f04`) — adds no English strings
 
-### feat/dxf (`05d5a7ad`) — 11 new, 11 to read @@ NEEDS RULING
+### feat/dxf (`a5db182f`) — 12 new, 12 to read @@ NEEDS RULING
 
 - **`lpn_dxf_export_failed`**
   > The DXF file was not written: an error in this page stopped it ({error}).
@@ -770,7 +965,10 @@ build for that would be a gate nobody keeps. Refresh it with
   > Exported {file}. Its coordinates are {crs}, in meters, not latitude and longitude.
   @@ NEEDS RULING
 - **`lpn_dxf_note_blocks`**
-  > Layers are named {prefix}, the asset code, and the alternative, as in {example}. Each element is a block inserted at scale 1 with attributes 1 unit high; scale the blocks to set the text height. Only the ID attribute is visible; the ATTDISP command shows the others.
+  > Layers are named {prefix}, the asset code, a hyphen, and the alternative, as in {example}. Each element is a block inserted at scale 1 with attributes 1 unit high; scale the blocks to set the text height. Only the ID attribute is visible; the ATTDISP command shows the others.
+  @@ NEEDS RULING
+- **`lpn_dxf_note_categories`**
+  > {n} junctions have more than one demand category. Their {tag} attribute holds the first category only.
   @@ NEEDS RULING
 - **`lpn_dxf_note_crs`**
   > Coordinates: {crs}, exactly as this project states them.
@@ -789,84 +987,6 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 - **`lpn_file_export_dxf_tip`**
   > Download this network for AutoCAD and other CAD programs: pipes, pumps, and valves as polylines, and every element as a block whose attributes carry its ID and property values in the project units.
-  @@ NEEDS RULING
-
-### feat/feedback (`d96763d3`) — 13 new, 13 to read @@ NEEDS RULING
-
-- **`lpn_fb_bad_email`**
-  > That email address does not look right. Correct it, or leave it empty.
-  @@ NEEDS RULING
-- **`lpn_fb_busy`**
-  > Too many messages have arrived in the last few minutes. What you wrote is still here, so you can try again later.
-  @@ NEEDS RULING
-- **`lpn_fb_comment`**
-  > Comments (optional)
-  @@ NEEDS RULING
-- **`lpn_fb_email`**
-  > Email (optional, only if you want a reply)
-  @@ NEEDS RULING
-- **`lpn_fb_failed`**
-  > That did not reach us. What you wrote is still here, so you can try again.
-  @@ NEEDS RULING
-- **`lpn_fb_intro`**
-  > Canned messages (optional). Nothing is sent until you press Send.
-  @@ NEEDS RULING
-- **`lpn_fb_pick_broken`**
-  > Something did not work
-  @@ NEEDS RULING
-- **`lpn_fb_pick_confusing`**
-  > This is confusing
-  @@ NEEDS RULING
-- **`lpn_fb_pick_numbers`**
-  > The numbers look wrong
-  @@ NEEDS RULING
-- **`lpn_fb_pick_wording`**
-  > The wording or translation is wrong
-  @@ NEEDS RULING
-- **`lpn_fb_send`**
-  > Send
-  @@ NEEDS RULING
-- **`lpn_fb_sending`**
-  > Sending…
-  @@ NEEDS RULING
-- **`lpn_fb_sends`**
-  > What this sends: the name of this page, your language, the version of the site, the code of the message on the map if there is one, and what you picked or typed. Never your drawing or your network. Your email address is used only to reply to you.
-  @@ NEEDS RULING
-
-### feat/geojson (`0495c559`) — 11 new, 11 to read @@ NEEDS RULING
-
-- **`lpn_file_export_geojson`**
-  > Export GeoJSON file…
-  @@ NEEDS RULING
-- **`lpn_file_export_geojson_tip`**
-  > Download this network as a GeoJSON file for QGIS, ArcGIS Pro and other GIS programs. Junctions, tanks and reservoirs are points, and pipes, pumps and valves are lines that follow their vertices. Positions are latitude and longitude. Results are included only when the network has been solved.
-  @@ NEEDS RULING
-- **`lpn_file_export_item_geojson`**
-  > GeoJSON file…
-  @@ NEEDS RULING
-- **`lpn_file_export_item_inp`**
-  > EPANET file…
-  @@ NEEDS RULING
-- **`lpn_file_export_menu`**
-  > Export…
-  @@ NEEDS RULING
-- **`lpn_geojson_refused_crs`**
-  > The coordinate system of this project ({detail}) is not known to this page, so its positions cannot be converted to latitude and longitude. Use Convert as… to copy the project into one this page knows, then export again.
-  @@ NEEDS RULING
-- **`lpn_geojson_refused_empty`**
-  > There is nothing to export yet. Draw or open a network first.
-  @@ NEEDS RULING
-- **`lpn_geojson_refused_local`**
-  > A GeoJSON file holds latitude and longitude only, and this project is drawn on a local grid with no place on the Earth. Georeference it first with Map, World map, Attach, then export again.
-  @@ NEEDS RULING
-- **`lpn_geojson_refused_range`**
-  > These positions are not valid latitudes and longitudes: {detail}
-  @@ NEEDS RULING
-- **`lpn_geojson_results_in`**
-  > The results on screen are included.
-  @@ NEEDS RULING
-- **`lpn_geojson_results_out`**
-  > No results are included, because the network is not solved.
   @@ NEEDS RULING
 
 ### feat/label-gang-search (`8b31a907`) — 3 new, all ruled
@@ -891,148 +1011,13 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`2e5e81c4`) — adds no English strings
 
-### feat/screenshot (`8a48a1d7`) — 22 new, 22 to read @@ NEEDS RULING
-
-- **`lpn_screenshot_copied`**
-  > Screenshot copied.
-  @@ NEEDS RULING
-- **`lpn_screenshot_failed`**
-  > The screenshot could not be made.
-  @@ NEEDS RULING
-- **`lpn_screenshot_hint`**
-  > Drag a rectangle over the map, or click for the whole map. Esc cancels.
-  @@ NEEDS RULING
-- **`lpn_screenshot_menu`**
-  > Screenshot
-  @@ NEEDS RULING
-- **`lpn_screenshot_no_basemap`**
-  > The street map or satellite image could not be included.
-  @@ NEEDS RULING
-- **`lpn_screenshot_saved`**
-  > The clipboard is not available here, so the screenshot was downloaded as a PNG file.
-  @@ NEEDS RULING
-- **`lpn_screenshot_scale`**
-  > Magnification
-  @@ NEEDS RULING
-- **`lpn_screenshot_scale_tip`**
-  > The picture's size as a multiple of the area on the screen. A larger one is sharper and makes a bigger file.
-  @@ NEEDS RULING
-- **`lpn_screenshot_tip`**
-  > Copy a sharper-than-screen picture of the map area you drag, ready to paste into a report. Click without dragging to take the whole map.
-  @@ NEEDS RULING
-- **`lpn_snip_button`**
-  > Snip
-  @@ NEEDS RULING
-- **`lpn_snip_freehand`**
-  > Freehand
-  @@ NEEDS RULING
-- **`lpn_snip_hint_free`**
-  > Drag around the area to snip, or click for the whole map. Esc cancels.
-  @@ NEEDS RULING
-- **`lpn_snip_pen`**
-  > Pen
-  @@ NEEDS RULING
-- **`lpn_snip_rectangle`**
-  > Rectangle
-  @@ NEEDS RULING
-- **`lpn_snip_tip_eraser`**
-  > Eraser: click a stroke to remove it (E)
-  @@ NEEDS RULING
-- **`lpn_snip_tip_free`**
-  > Snip a freehand shape (S)
-  @@ NEEDS RULING
-- **`lpn_snip_tip_map`**
-  > Screenshot of the whole map
-  @@ NEEDS RULING
-- **`lpn_snip_tip_mode`**
-  > Snip shape
-  @@ NEEDS RULING
-- **`lpn_snip_tip_pen`**
-  > Pen (Esc)
-  @@ NEEDS RULING
-- **`lpn_snip_tip_rect`**
-  > Snip a rectangle (S)
-  @@ NEEDS RULING
-- **`lpn_snip_tip_redo`**
-  > Redo (Ctrl+Y)
-  @@ NEEDS RULING
-- **`lpn_snip_tip_undo`**
-  > Undo (Ctrl+Z)
-  @@ NEEDS RULING
-
-### feat/section-grid (`89905957`) — 1 new, 1 to read @@ NEEDS RULING
+### feat/section-grid (`0345725c`) — 1 new, 1 to read @@ NEEDS RULING
 
 - **`points_data_points_heading`**
   > Points data<br />(use Copy to see format)
   @@ NEEDS RULING
 
-### feat/survey-code (`087e6868`) — 21 new, 21 to read @@ NEEDS RULING
-
-- **`lpn_survey_codes_add`**
-  > Add code
-  @@ NEEDS RULING
-- **`lpn_survey_codes_col_code`**
-  > Code
-  @@ NEEDS RULING
-- **`lpn_survey_codes_col_type`**
-  > Asset type
-  @@ NEEDS RULING
-- **`lpn_survey_codes_remove`**
-  > Remove code
-  @@ NEEDS RULING
-- **`lpn_survey_codes_tip`**
-  > Read the first word of each description as a code from the table. Points with the same line code join into one pipe in file order, and WL1 and WL2 are separate lines. +0 starts a line, -0 ends one, and CLO closes one. JPN followed by a point name joins to that point (Carlson), and Civil 3D writes it CPN.
-  @@ NEEDS RULING
-- **`lpn_survey_codes_toggle`**
-  > Read the description as field codes
-  @@ NEEDS RULING
-- **`lpn_survey_confirm_coded`**
-  > {j} junction(s), {r} reservoir(s), {t} tank(s), and {p} pipe(s) found. Proceed?
-  @@ NEEDS RULING
-- **`lpn_survey_note_code_two_nodes`**
-  > More than one node code, the first was used.
-  @@ NEEDS RULING
-- **`lpn_survey_note_code_unknown`**
-  > Code not in the code table, imported as the asset type chosen above.
-  @@ NEEDS RULING
-- **`lpn_survey_note_code_unread`**
-  > Not every word is a code this page reads, kept in the description.
-  @@ NEEDS RULING
-- **`lpn_survey_note_join_missing`**
-  > JPN or CPN names a point not in this file or project, no pipe drawn for it.
-  @@ NEEDS RULING
-- **`lpn_survey_note_join_no_line`**
-  > JPN or CPN on a point with no line code, no pipe drawn for it.
-  @@ NEEDS RULING
-- **`lpn_survey_note_line_one_point`**
-  > Only point on its line, no pipe drawn from it.
-  @@ NEEDS RULING
-- **`lpn_survey_note_no_desc`**
-  > Field codes are on, but this file has no description column, so no codes were read.
-  @@ NEEDS RULING
-- **`lpn_survey_note_node_on_pipe`**
-  > This point lies exactly on a pipe it is not joined to. If they connect, add JPN to say so.
-  @@ NEEDS RULING
-- **`lpn_survey_note_pipe_one_node`**
-  > This line returns to the same node with no other node between, no pipe drawn for it.
-  @@ NEEDS RULING
-- **`lpn_survey_note_pipe_zero_length`**
-  > This point is at the same spot as the node before it, so the pipe between them has no length.
-  @@ NEEDS RULING
-- **`lpn_survey_note_ring_junction`**
-  > This point became a junction so the ring could close.
-  @@ NEEDS RULING
-- **`lpn_survey_note_vertex_text`**
-  > Not every word is a code this page reads, and a vertex keeps no description.
-  @@ NEEDS RULING
-- **`lpn_survey_note_vertices`**
-  > Points that became pipe vertices: {detail}. A vertex keeps no name, elevation, or description.
-  @@ NEEDS RULING
-- **`lpn_survey_report_coded`**
-  > {j} junction(s), {r} reservoir(s), {t} tank(s), and {p} pipe(s) imported, {m} of the nodes with elevation.
-  @@ NEEDS RULING
-
-### feat/table-export (`15e91ca0`) — 9 new, 9 to read @@ NEEDS RULING
+### feat/table-export (`0de5ecbd`) — 10 new, 10 to read @@ NEEDS RULING
 
 - **`lpn_export_table_all`**
   > All
@@ -1045,6 +1030,9 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 - **`lpn_export_table_go`**
   > Export
+  @@ NEEDS RULING
+- **`lpn_export_table_scn_note`**
+  > Results are exported only for the scenario last calculated.
   @@ NEEDS RULING
 - **`lpn_export_table_title`**
   > Export table
@@ -1062,7 +1050,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Export table as ODS
   @@ NEEDS RULING
 
-### feat/user-guide (`9f844e56`) — 9 new, 9 to read @@ NEEDS RULING
+### feat/user-guide (`747fa29b`) — 26 new, 26 to read @@ NEEDS RULING
 
 - **`lpn_guide_also`**
   > Also in {menu}
@@ -1074,10 +1062,16 @@ build for that would be a gate nobody keeps. Refresh it with
   > Boxes
   @@ NEEDS RULING
 - **`lpn_guide_boxes_intro`**
-  > Each box can be moved, resized, docked at the left or right of the map, or closed. The ? at the right end of a box's title bar opens that box's entry in this guide.
+  > Each box can be moved, resized, docked at the left or right of the map, or closed. The ? in a box's title bar opens its help.
   @@ NEEDS RULING
 - **`lpn_guide_contents`**
   > Contents
+  @@ NEEDS RULING
+- **`lpn_guide_keys_def`**
+  > <table class="lpn-notes-table"><tbody><tr><td>?</td><td>Open the guide at the control under the pointer or holding focus.</td></tr><tr><td>F1</td><td>Open the guide at the entry for the box that has focus.</td></tr><tr><td>Ctrl+K</td><td>Open the guide with the search field selected.</td></tr><tr><td>/</td><td>Select the search field while the guide has focus.</td></tr><tr><td>Esc</td><td>Close the guide and return to where you were.</td></tr></tbody></table>
+  @@ NEEDS RULING
+- **`lpn_guide_keys_term`**
+  > Guide keyboard shortcuts
   @@ NEEDS RULING
 - **`lpn_guide_rail_hide`**
   > Hide contents
@@ -1088,14 +1082,53 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_guide_search`**
   > Search the guide
   @@ NEEDS RULING
+- **`lpn_guide_text_alt_box`**
+  > Shows, for each scenario, which alternative it uses in each category, such as Physical, Demand, and Asset activation, and its calculation options: demand multiplier, total run time, and hydraulic time step. The alternatives are read-only. A scenario's calculation options can be typed here, and a blank uses its parent's value. Open it from the Scenarios menu after clearing Basic mode.
+  @@ NEEDS RULING
+- **`lpn_guide_text_calib_box`**
+  > Compares a file of field measurements with the calculated results at the same locations and times, one file for each parameter. The file is held for the current session only and is not saved with the project.
+  @@ NEEDS RULING
+- **`lpn_guide_text_contour_box`**
+  > Controls the contour plot drawn on the map from the node value chosen in Color nodes by: the color scheme, the fill and its opacity, the contour line interval and labels, and how far the color reaches from each pipe. Turning it off hides the plot and leaves the node colors. It changes only the display, not the network.
+  @@ NEEDS RULING
+- **`lpn_guide_text_energy_box`**
+  > Reports the energy use, peak power, and cost of each pump over the last extended period simulation, using each pump's efficiency and the energy price set under Settings, Energy. It needs a Total run time in Settings and a solved network. It does not change the network.
+  @@ NEEDS RULING
+- **`lpn_guide_text_find_popup`**
+  > Finds the elements whose IDs or property values match what is typed, and can replace a value in the matches. A replacement changes the project and can be reversed with Undo.
+  @@ NEEDS RULING
+- **`lpn_guide_text_full_box`**
+  > Lists every node and every link at every reporting time step, in the units shown on the Tables pane. It is available after Calculate. Download or print carries every time step, and the table shows one at a time.
+  @@ NEEDS RULING
+- **`lpn_guide_text_hotkeys_popup`**
+  > Lists every toolbar button and menu row, the keyboard shortcuts, and an entry for each box. Selecting a row shows where that control is; it never runs it. To search, press Ctrl+K from anywhere, or / while the guide has focus.
+  @@ NEEDS RULING
+- **`lpn_guide_text_library_box`**
+  > Holds the project's patterns, curves, pipe types, fittings, controls, and rules. An element refers to a pattern, curve, pipe type, or fitting by its ID, and that item is edited here. Controls and rules apply to the whole network. All are saved with the project.
+  @@ NEEDS RULING
+- **`lpn_guide_text_notes_popup`**
+  > Lists notes on how this page behaves and what it does not do, each as a term followed by its definition. It does not change the network.
+  @@ NEEDS RULING
+- **`lpn_guide_text_popup`**
+  > Shows the properties of the selected element, or of several selected elements, beside the selection on the map or where the box was last moved. An edited value changes the network at once, and the element's map label and the Tables pane follow. Calculated results appear once the network is solved, automatically when Recalculate automatically is on, or by Calculate.
+  @@ NEEDS RULING
+- **`lpn_guide_text_rptbox`**
+  > Shows the text report written by the EPANET engine for the last run, including its warnings and the network summary. It is replaced each time the network is solved with the EPANET engine.
+  @@ NEEDS RULING
+- **`lpn_guide_text_scncmp_box`**
+  > Solves every scenario from a copy of the drawing and tabulates, for each, the number of differences from Base, the lowest pressure, and the highest velocity. It does not change the project, and the scenario that is open is left as it was.
+  @@ NEEDS RULING
+- **`lpn_guide_text_settings_box`**
+  > Holds the project's settings: symbology and labels, the map and page, values and ID prefixes for new assets, custom properties, and calculation options such as units, time, hydraulics, energy, and quality. Each is saved with the project, except Show the run progress box, which is kept in this browser. The position and size of this box are kept in this browser only.
+  @@ NEEDS RULING
+- **`lpn_guide_text_status_box`**
+  > Lists, in time order, each change during the last extended period simulation: a pump, valve, or pipe opening or closing, a tank starting to fill or empty or becoming full or empty, and any time step that did not fully converge. Only changes are listed, not every time step.
+  @@ NEEDS RULING
+- **`lpn_guide_using_heading`**
+  > Using the guide
+  @@ NEEDS RULING
 - **`lpn_help_manual`**
   > Guide
   @@ NEEDS RULING
 
-### feat/visit-dedupe (`82261d32`) — adds no English strings
-
-### feat/web-mercator (`c95599cb`) — 1 new, 1 to read @@ NEEDS RULING
-
-- **`lpn_crs_suggested_mark`**
-  > (suggested)
-  @@ NEEDS RULING
+### feat/visit-dedupe (`2de0a88e`) — adds no English strings
