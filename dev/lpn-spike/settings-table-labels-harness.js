@@ -29,6 +29,7 @@ function ok(name, cond, extra) {
 setUnitSet('us');
 const L = loadLoopedNetwork(EXAMPLE_EXPORTS +
 	"\t\tlabels: function () { return settingTableRows().map(function (r) { var os = settingTableOwnerSetting(r.path); return { id: r.id, label: settingTableLabel(r.path), minor: r.minor, owner: os.owner, setting: os.setting, cpKey: r.path[0] === 'customProps' ? customPropBareKey(r.path[1]) : '' }; }); },\n" +
+	"\t\tpc: function (k) { return (EngCalcs.pageConfig || {})[k]; },\n" +
 	"\t\taddCustomProp: function () { settings.customProps = [{ key: 'custom_date_installed', label: 'Date installed', applies: 'L', validate: 'none', restrictMode: 'allow', restrict: '#-', minLength: '', maxLength: '', low: '', high: '' }]; },\n" +
 	// Every view option on, in the project's own objects, the way the Settings and Labels boxes write them.
 	"\t\tallOn: function () {\n" +
@@ -98,14 +99,15 @@ L.addCustomProp();
 		drop = pick(['labelSettings', 'priority', 'node', 'id']), bef = pick(['labelSettings', 'prefix', 'link', 'flow']),
 		aft = pick(['labelSettings', 'suffix', 'node', 'pressure']), uu = pick(['labelSettings', 'useUnits', 'node', 'pressure']),
 		cpl = pick(['customProps', 'custom_date_installed', 'label']), cpr = pick(['customProps', 'custom_date_installed', 'restrict']);
-	ok('Node labels, ID, Is active', on && on.owner === 'ID' && on.setting === 'Is active', JSON.stringify(on));
-	ok('Node labels, ID, Show order (not Rank)', show && show.owner === 'ID' && show.setting === 'Show order', JSON.stringify(show));
-	ok('Node labels, ID, Drop order', drop && drop.owner === 'ID' && drop.setting === 'Drop order', JSON.stringify(drop));
-	ok('an unstated Before is a row (Link labels, Flow, Text before)', bef && bef.owner === 'Flow' && bef.setting === 'Text before', JSON.stringify(bef));
-	ok('an unstated After is a row, and so is its Use units', !!aft && !!uu && uu.setting === 'Use units', JSON.stringify([aft, uu]));
+	const W = (k) => L.pc(k), ID = W('lpn_field_id');
+	ok('Node labels, ID, Is active', on && on.owner === ID && on.setting === W('lpn_settings_row_label_on'), JSON.stringify(on));
+	ok('Node labels, ID, Show order (not Rank)', show && show.owner === ID && show.setting === W('lpn_settings_row_label_show'), JSON.stringify(show));
+	ok('Node labels, ID, Drop order', drop && drop.owner === ID && drop.setting === W('lpn_settings_row_label_drop'), JSON.stringify(drop));
+	ok('an unstated Before is a row (Link labels, Flow, Text before)', bef && !!bef.owner && bef.setting === W('lpn_settings_row_label_before'), JSON.stringify(bef));
+	ok('an unstated After is a row, and so is its Use units', !!aft && !!uu && uu.setting === W('lpn_labels_use_units'), JSON.stringify([aft, uu]));
 	ok('a custom property\'s design is rows owned by its key, under Custom properties',
-		cpl && cpl.owner === 'date_installed' && cpl.setting === 'Label' && cpl.minor === 'lpn_set_sub_customProps', JSON.stringify(cpl));
-	ok('...its character box named by its mode, as the box names it', cpr && cpr.setting === 'Allow only these characters', JSON.stringify(cpr));
+		cpl && cpl.owner === 'date_installed' && cpl.setting === W('lpn_cp_label') && cpl.minor === 'lpn_set_sub_customProps', JSON.stringify(cpl));
+	ok('...its character box named by its mode, as the box names it', cpr && cpr.setting === W('lpn_cp_restrict_allow'), JSON.stringify(cpr));
 }
 // The pattern itself is live: a stored name it must refuse.
 ok('the check refuses a stored name (symbolCapMultiple, colorBreaks \u203a node.pressure)',
