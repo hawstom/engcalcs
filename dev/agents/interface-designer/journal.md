@@ -3778,3 +3778,8 @@ Asked by Tom (via the launching agent) for advice on feat/tip-door's paragraph m
 - SPECULATION: translators reliably preserve a literal \n\n (already how 26 files carry the existing intros). A heading marker would need a visible token, which is a translator hazard (dropped, translated, or moved) and a lint burden; and a heading in a 3-paragraph note is a sign the content has outgrown a tip.
 
 Recommendation as given: tip = plain sentence(s) and \n\n paragraphs only; no headings, no lists, no ALL-CAPS detector (remove it); one optional "More in the manual" link, supplied by a separate key or argument, never typed in the string; move to a manual page or a dialog at about 3 paragraphs or ~60 words; text a user needs to finish the task goes on the page, not behind a "?".
+
+## 2026-10-06 Three questions (screenshot words/eraser; guide contents/name/search; title-bar glyphs)
+- SPECULATION: recall of Snipping Tool (Win11), Figma, VS Code, Linear, Notion, GitHub Docs, MDN, Stripe docs behaviours from training knowledge to mid-2026; not re-fetched this session. Upgrade by checking each product.
+- OBSERVED: feat/screenshot lang en:4426-4439 holds the wordy strings (Screenshot, Magnification, hint sentence).
+- Recommendation: icon-first controls with tips; eraser = stroke-level (Snipping Tool convention); guide contents = left collapsible rail on desktop, disclosure on phone; name "Guide"; search = filter box (Ctrl+K style) for help pages; per-box title-bar: one "?" glyph only, feedback goes to Help menu.
