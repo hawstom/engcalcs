@@ -18,15 +18,29 @@
  * @property {string} id                    e.g. 'novato-zoom@4x'
  * @property {string} set                   the scene set (one project, one or more views)
  * @property {number} step                  index of this view within its set
- * @property {Rect}   viewport              the visible canvas; the model runs off it on every side
+ * @property {Rect}   viewport              the visible map; the model runs off it on every side. On
+ *          the page it is the canvas less the strips the page's mode hint and status footer cover,
+ *          so its top-left need not be (0, 0).
+ * @property {Rect[]} [furniture]           boxes the page draws OVER the map inside the viewport
+ *          (legends, the zoom buttons, status chips): a label under one cannot be read, so keep
+ *          clear of them as of a Text object. Absent in the bench's scenes.
  * @property {{s:number, tx:number, ty:number}} view   view px = model * s + t, for a placer that
- *          caches in model space across zooms (rule T2). Everything else is already in view px.
+ *          caches in model space across zooms (H-b: hard thinking may be cached across zooms).
+ *          Everything else is already in view px.
  * @property {{sizePx:number, rowHeightPx:number, separator:string, separatorW:number,
- *            hookMaxPx:number}} text   the lettering: row height, the separator a one-line
- *          label joins its rows with (and its measured width), and the longest allowed hook
+ *            hookMaxPx:number, repeatSpacingPx:number}} text   the lettering: row height, the
+ *          separator a one-line label joins its rows with (and its measured width), the longest
+ *          allowed hook, and the spacing a pipe longer than it repeats its label along (R9)
  * @property {{node:string[], link:string[], customer:string[]}} dropOrder   the user's per-kind
- *          value drop order, FIRST TO GO first. A row whose `field` is not listed ('id') is the
- *          label itself and is never dropped.
+ *          value drop order, FIRST TO GO first. The ID is in it like any other value (Tom,
+ *          2026-10-06: "Keep the last dropped property."): a label keeps the LAST value in this order
+ *          longest, and that may be a value rather than the ID. A scene recorded before then lacks
+ *          'id'; dropOrderOf() puts it first to go, as Tom's table does. A row whose `field` is not
+ *          listed goes before every listed one.
+ * @property {{alignPipeLabels:boolean, readableAngleDeg:{min:number, max:number}}} [settings]   the
+ *          user's "Draw link labels along the link line" setting (Settings > Symbology > Labels), and
+ *          the reading window a turned label keeps to: its `angle` lies in (min, max], so no label
+ *          reads upside down. Scenes made before 2026-09-28 lack it; read it as off.
  * @property {Array<{id:string, type:string, x:number, y:number, symbol:Rect}>} nodes   EVERY node,
  *          on screen or not
  * @property {Array<{id:string, type:string, from:string, to:string, points:number[][],
@@ -46,16 +60,21 @@
  * @property {Array<{field:string, text:string, w:number, h:number}>} rows   in display order,
  *          each measured
  * @property {'stack'|'line'} layout        its usual shape: a node label stacks, a pipe label is
- *          one line (rule H1). A placer may choose the other and says so in its output.
+ *          one line. A placer may choose the other (H-a) and says so in its output.
  * @property {Pt|null} hand                 the leader end point the USER dragged it to, or null.
  *          A hand-placed label must stay attached there and must be shown (N4).
+ * @property {boolean} [along]              a pipe label only: true when the setting above asks this
+ *          label to lie ALONG its pipe (turned to the pipe where it sits, read the right way up,
+ *          beside the line), which R14 asks for when there is space available. False for a label
+ *          the user dragged, which opts out; absent (false) on a node label.
  *
  * @typedef {Object} Placement              ONE LABEL'S ANSWER. Missing or {shown:false} = hidden.
  * @property {boolean} shown
  * @property {number[]} rows                indices into LabelReq.rows that are shown, ascending
  * @property {'stack'|'line'} [layout]      default: the label's own
- * @property {'left'|'right'|'center'} [align]   how rows of different widths line up in a stack
- *          (S2: a label hanging west of its node is right-aligned and grows west). Default left.
+ * @property {'left'|'right'|'center'} [align]   how rows of different widths line up in a stack,
+ *          justified to the side its leader arrives from (R5: a label hanging west of its node,
+ *          with its leader arriving from the east, is right-aligned and grows west). Default left.
  * @property {number} x                     top-left of the UNTURNED text block
  * @property {number} y
  * @property {number} [angle]               degrees, turned about the block's centre (a pipe label
@@ -71,7 +90,7 @@
  * @property {string} name
  * @property {function(Scene, {prev:{scene:Scene, layout:Object}|null}):{labels:Object<string,Placement>}} place
  * @property {function(number, {scene:Scene, opening:boolean}):void} [idle]   called between views
- *          with a time budget in ms, so a placer can think during the breathers and cache (T2)
+ *          with a time budget in ms, so a placer can think during the breathers and cache (H-b)
  * A module exports either a Placer or {create: () => Placer}; create() is called once per scene
  * set (one project opened), so a cache cannot leak between projects.
  */
@@ -235,5 +254,75 @@ function polylineLength(pts) {
 	return d;
 }
 
-module.exports = { EPS, blockSize, placementBoxes, invalidReason, corners, rectToOBox, boxesOverlap,
+// **A SCENE WITH A MISSING OR NON-NUMERIC COORDINATE IS REFUSED.** Round 5 ran a whole round on
+// generated pipes whose vertices were NaN in the page and null in the scene file; arithmetic read
+// them as 0, so those pipes ran to the corner of the screen and nobody saw it. Returns the first
+// problem found, as a sentence, or null when every coordinate is a finite number.
+function sceneProblem(scene) {
+	function num(v) { return typeof v === 'number' && isFinite(v); }
+	function rect(r, what) { return r && num(r.x) && num(r.y) && num(r.w) && num(r.h) ? null : what + ' is not four finite numbers'; }
+	function obox(b, what) { return b && num(b.cx) && num(b.cy) && num(b.w) && num(b.h) && num(b.angle || 0) ? null : what + ' is not a finite box'; }
+	function pts(a, what) {
+		if (!Array.isArray(a) || !a.length) { return what + ' has no points'; }
+		for (let i = 0; i < a.length; i++) { if (!a[i] || !num(a[i][0]) || !num(a[i][1])) { return what + ' point ' + i + ' is ' + JSON.stringify(a[i]); } }
+		return null;
+	}
+	const id = (scene && scene.id) || '?';
+	let p = rect(scene && scene.viewport, id + ': viewport');
+	if (p) { return p; }
+	const v = scene.view;
+	if (!v || !num(v.s) || !num(v.tx) || !num(v.ty)) { return id + ': view is not finite'; }
+	for (const n of scene.nodes || []) {
+		if (!num(n.x) || !num(n.y)) { return id + ': node ' + n.id + ' is at ' + JSON.stringify([n.x, n.y]); }
+		if ((p = rect(n.symbol, id + ': node ' + n.id + ' symbol'))) { return p; }
+	}
+	for (const l of scene.links || []) {
+		if ((p = pts(l.points, id + ': link ' + l.id))) { return p; }
+		for (const b of (l.symbols || []).concat(l.arrows || [])) { if ((p = obox(b, id + ': link ' + l.id + ' symbol or arrow'))) { return p; } }
+	}
+	for (const t of scene.texts || []) {
+		if ((p = obox(t.box, id + ': text ' + t.id))) { return p; }
+		if (t.leader && (p = pts(t.leader, id + ': text ' + t.id + ' leader'))) { return p; }
+	}
+	for (const c of scene.customers || []) { if ((p = rect(c.box, id + ': customer ' + c.id))) { return p; } }
+	for (const f of scene.furniture || []) { if ((p = rect(f, id + ': furniture'))) { return p; } }
+	for (const r of scene.labels || []) {
+		if (!r.anchor || !num(r.anchor.x) || !num(r.anchor.y)) { return id + ': label ' + r.id + ' anchor is ' + JSON.stringify(r.anchor); }
+		if (r.hand && (!num(r.hand.x) || !num(r.hand.y))) { return id + ': label ' + r.id + ' hand point is ' + JSON.stringify(r.hand); }
+		for (const row of r.rows || []) { if (!num(row.w) || !num(row.h)) { return id + ': label ' + r.id + ' row ' + row.field + ' has no measured size'; } }
+	}
+	return null;
+}
+
+// The drop order of one kind, FIRST TO GO first, with the ID in it (Tom, 2026-10-06: the ID is dropped
+// like any other value, and a label keeps the last value in the user's order longest). A scene
+// recorded before then names no 'id'; it is put first to go, where Tom's table (R-326) ranks it
+// among Novato's fields.
+function dropOrderOf(scene, kind) {
+	const o = ((scene.dropOrder && scene.dropOrder[kind]) || []).slice();
+	if (o.indexOf('id') < 0) { o.unshift('id'); }
+	return o;
+}
+// A shown label gives up values in the user's order, so what it shows is what is LEFT when the first
+// k have gone. It breaks that when it shows a row that comes earlier in the order than a row it
+// hides: a bare ID beside a hidden last-in-order value is the case that matters. A row whose field
+// is not in the order ranks before all that are. `shownIdx` is the placement's `rows`. Returns the
+// hidden row's field that outranks a shown one, or null.
+function dropOrderBreak(scene, req, shownIdx) {
+	const order = dropOrderOf(scene, req.kind);
+	const rank = function (i) { return order.indexOf(req.rows[i].field); };
+	const shown = {};
+	shownIdx.forEach(function (i) { shown[i] = true; });
+	let minShown = Infinity;
+	shownIdx.forEach(function (i) { minShown = Math.min(minShown, rank(i)); });
+	let worst = null, worstRank = -Infinity;
+	req.rows.forEach(function (r, i) {
+		if (shown[i]) { return; }
+		const k = rank(i);
+		if (k > minShown && k > worstRank) { worst = r.field; worstRank = k; }
+	});
+	return worst;
+}
+
+module.exports = { dropOrderOf, dropOrderBreak, sceneProblem, EPS, blockSize, placementBoxes, invalidReason, corners, rectToOBox, boxesOverlap,
 	segsCross, segHitsBox, distToSeg, distToPolyline, distToOBox, polylineLength, pointInOBox };
