@@ -10,8 +10,9 @@
 //   (3) "File, Convert as on a project that has no objects causes a file Open dialog"
 //
 // What it holds:
-//   1. Fotobi opened from a file, Convert as with the chooser's EPSG:3857 row, then back to the
-//      original through its tab: every node symbol is drawn, on the screen where it was before.
+//   1. Fotobi opened from a file, Convert as with the chooser's EPSG:3857 row (placed and kept, a
+//      projected copy since Task 775), then back to the original through its tab: every node
+//      symbol is drawn, on the screen where it was before.
 //   2. The same through a conversion that DOES change the coordinate system (UTM zone 30N) and is
 //      then cancelled in the placement steps: the original is drawn whole, where it was.
 //   3. An empty project: Convert as opens the Convert as box, never a file picker, and Convert
@@ -166,6 +167,15 @@ async function main() {
 			await page.waitForSelector('#lpn_crsbox', { state: 'hidden' });
 		}
 
+		// The answered placement steps, accepted as they open: Keep this placement.
+		async function placeAndKeep() {
+			const open = await page.$eval('#lpn_georef_bar', (e) => e.style.display !== 'none').catch(() => false);
+			ok('the placement steps opened on the copy', open);
+			if (!open) { return; }
+			await page.click('#lpn_georef_drop'); await a.settle(800);
+			await page.click('#lpn_georef_finish'); await a.settle(1500);
+		}
+
 		await a.goto('Looped-Network.php?ec_nolog=1');
 		await page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } });
 		await a.dismissGallery();
@@ -197,7 +207,16 @@ async function main() {
 		await pickCrs('EPSG:3857');
 		await page.click('#lpn_convas_ok');
 		await a.settle(1500);
+		// **EPSG:3857 IS A PROJECTED SYSTEM SINCE TASK 775**, so the placement steps open, answered,
+		// and Keep this placement lays the copy onto Web Mercator metres.
+		await placeAndKeep();
 		ok('a copy is open in a new tab', (await index()).openId !== srcId, await tabName());
+		{
+			const cp = await stored((await index()).openId);
+			ok('...stated on EPSG:3857 (Web Mercator metres), not folded onto lat/lon',
+				!!cp && cp.project.crs === 'EPSG:3857' && cp.project.coords === undefined,
+				cp ? JSON.stringify({ crs: cp.project.crs, coords: cp.project.coords }) : 'none');
+		}
 		const copy = await seen();
 		// Worked in for a moment, as anybody looks at what they just made: zoomed out a notch.
 		{
@@ -206,7 +225,8 @@ async function main() {
 			for (let i = 0; i < 2; i++) { await page.mouse.wheel(0, 240); await page.waitForTimeout(120); }
 			await a.settle(800);
 		}
-		ok('the copy draws every node symbol', copy.n === before.n, copy.n + ' of ' + before.n);
+		// The copy opens fitted to its whole network, so all seven, whatever the original's view hides.
+		ok('the copy draws every node symbol', copy.n === 7, copy.n + ' of 7');
 		ok('back on the original through its tab', await switchTo(srcName) && (await index()).openId === srcId);
 		const back = await seen();
 		ok('Tom (1): the original still draws every node symbol', back.n === before.n, back.n + ' of ' + before.n);
@@ -276,6 +296,7 @@ async function main() {
 		await pickCrs('EPSG:3857');
 		await page.click('#lpn_convas_ok');
 		await a.settle(1500);
+		await placeAndKeep();
 		ok('a copy is open', (await index()).openId !== drawnId, await tabName());
 		ok('back on the drawn project through its tab', await switchTo(drawnName) && (await index()).openId === drawnId);
 		const d1 = await seen();

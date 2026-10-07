@@ -200,7 +200,9 @@ it. **A core calculator, in scope in all 26 languages. Never call it "preview".*
   not a `consent_body` change.
 - **A geographic project is drawn in Web Mercator and stored in longitude/latitude.** Never store
   the projection. Mission scope is a 300 km system span; `geodesicMeters()` is flat per leg
-  (206 ppm at scope). `dev/geographic-projects.md`.
+  (206 ppm at scope). `dev/geographic-projects.md`. **EPSG:3857 is a projected project in
+  metres, not a lat/lon one**; its lengths are measured on the ground (`isWebMercProject()`).
+  EPSG:4326 is the suggested row.
 - **Reads and writes EPANET `.inp`** (`js/lpn-inp.js`). Import reports every difference, never
   rejects, never drops silently. Export is character-exact on Net1/2/3.
 - **Design for a pointer; make a phone survivable.** Never call it a PC application in public — it

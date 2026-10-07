@@ -1295,13 +1295,14 @@ $ec_lang['lpn_file_convert_as']='Convert as…';
 $ec_lang['lpn_copy_of']='Copy of {name}';
 // ---- THE CONVERT AS BOX (Task 696) ------------------------------------------------------------
 // The three coordinate cases are Tom's own (R-155, 2026-09-22): "EPSG, unnamed (local) georeference,
-// and not georeferenced". lat/lon is one EPSG system (EPSG:3857 on this page), not a fourth case.
+// and not georeferenced". lat/lon is one EPSG system (EPSG:4326), not a fourth case; EPSG:3857 is a
+// projected system in meters since Task 775.
 $ec_lang['lpn_convas_title']='Convert as';
 $ec_lang['lpn_convas_coordsys_tip']='The coordinate system the copy is converted to. When it differs from this project\'s, two placement steps follow. A project that already knows where it is opens both steps already answered, ready to accept as they are or to change.';
 // {crs} is the name the map status strip shows for this project's coordinate system.
 $ec_lang['lpn_convas_from']='Current: {crs}';
 $ec_lang['lpn_convas_epsg']='EPSG coordinate system';
-$ec_lang['lpn_convas_epsg_tip']='Choose a coordinate system from the EPSG register. Latitude and longitude is WGS 84 (EPSG:4326).';
+$ec_lang['lpn_convas_epsg_tip']='Choose a coordinate system from the EPSG register. WGS 84 (EPSG:4326), latitude and longitude, is the suggested choice. WGS 84 / Pseudo-Mercator (EPSG:3857), commonly called Web Mercator, stores x and y in meters, and its map distances exceed ground distances away from the equator. Pipe lengths are computed as ground distances in either system.';
 $ec_lang['lpn_convas_unnamed']='Unnamed (local) georeference';
 $ec_lang['lpn_convas_unnamed_tip']='Local coordinates in the length unit, with the world map attached.';
 $ec_lang['lpn_convas_none_tip']='Local coordinates in the length unit, with no world map for now.';
@@ -1980,6 +1981,8 @@ $ec_lang['lpn_crs_count_network']='{n} of {total} coordinate systems cover this 
 // when this page has no transform for it. Short on purpose: it sits at the end of a register name
 // that can already run to 50 characters.
 $ec_lang['lpn_crs_unplaceable_mark']='(no map)';
+// Shown beside WGS 84 (EPSG:4326) in the chooser only (Task 775), never on the status strip.
+$ec_lang['lpn_crs_suggested_mark']='(suggested)';
 // The same fact in a sentence: when such a project is created, and when Go to or place name search
 // is used on one. File, Convert as says it in its own words (lpn_convas_no_transform).
 $ec_lang['lpn_crs_unplaceable']='{crs} is one of the few listed coordinate systems without usable projection information. This means that world map, place name search, and DEM elevations don\'t work. Your coordinates are unaffected.';
