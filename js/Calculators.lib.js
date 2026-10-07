@@ -1519,14 +1519,58 @@ EngCalcs.setUnits = function(unitSet) {
 	this.submitForm();
 };
 
+/**
+ * Copy and Paste for the points table. A page that sets `EngCalcs.pointsFields` (Manning
+ * Irregular and Weir Flow Irregular: ['station', 'elevation']) copies and pastes exactly those
+ * columns, one point per line, and nothing else: the same text moves between the two pages, and a
+ * page's other row inputs (bank flag, roughness) are never overwritten by it. Any other page
+ * (Branched Network, Irrigation Pressure) copies and pastes its whole row data through the cookie.
+ * Paste accepts comma, tab or space between fields, Windows or Unix line ends, blank lines, and
+ * a heading line (a line that is not numbers is skipped).
+ */
 EngCalcs.pointsDataCopy = function() {
 	'use strict';
+	var names = this.pointsFields, text = '', i, j, els;
+	if (names) {
+		for (i = 0; i < this.numCalcRows; i += 1) {
+			for (j = 0; j < names.length; j += 1) {
+				els = document.getElementsByName(names[j]);
+				text += (j ? ',' : '') + els[i].value;
+			}
+			text += '\n';
+		}
+		document.getElementById("points_data").value = text;
+		return;
+	}
 	this.cookieValueToDataString();
 	document.getElementById("points_data").value = this.dataString;
 };
 
 EngCalcs.pointsDataPaste = function() {
 	'use strict';
+	var names = this.pointsFields, rows = [], lines, fields, i, j, ok;
+	if (names) {
+		lines = document.getElementById("points_data").value.split(/\r\n|\r|\n/);
+		for (i = 0; i < lines.length; i += 1) {
+			fields = lines[i].trim().split(/[\s,;]+/);
+			if (fields.length < names.length) { continue; }
+			ok = true;
+			for (j = 0; j < names.length; j += 1) {
+				if (fields[j] === '' || !isFinite(Number(fields[j]))) { ok = false; }
+			}
+			if (ok) { rows.push(fields.slice(0, names.length)); }
+		}
+		if (!rows.length) { return; }
+		while (this.numCalcRows < rows.length) { this.pageAddCalcRow(); }
+		while (this.numCalcRows > rows.length) { this.deleteSingleCalcRow(); }
+		for (i = 0; i < rows.length; i += 1) {
+			for (j = 0; j < names.length; j += 1) {
+				document.getElementsByName(names[j])[i].value = rows[i][j];
+			}
+		}
+		this.submitForm();
+		return;
+	}
 	this.dataString = document.getElementById("points_data").value;
 	this.dataStringToCookieValue();
 	this.createCookie();
