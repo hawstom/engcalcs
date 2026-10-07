@@ -61,12 +61,13 @@
 	const RING_PER_PX = 0.006;  // cost per px of travel
 	const REACH_ROWS = 3;       // 'reach': leaders out to this many text rows, every 15 degrees
 	const DEADLINE_MS = 700;
+	const LITE_DEADLINE_MS = 400;
 	const TIMING = typeof process !== 'undefined' && process.env && !!process.env.LPN_PLACER_B_TIMING;    // R10: a layout returns what it has placed by then (time, never a count)
 
 	// ---- ingredients, each switchable (STRATEGY.md beside this file) ----------------------------
 	// Switch one off with create({off: ['repair']}) or, under the bench, the environment variable
 	// LPN_PLACER_B_OFF=repair,evict (comma separated).
-	const INGREDIENTS = ['keep', 'table', 'crowd', 'smallfirst', 'wedge', 'reach', 'along', 'relocate', 'repair', 'evict', 'polish', 'unwrap', 'raster', 'cleanfirst', 'edgehang', 'rings'];
+	const INGREDIENTS = ['keep', 'table', 'crowd', 'smallfirst', 'wedge', 'reach', 'along', 'relocate', 'repair', 'evict', 'polish', 'unwrap', 'raster', 'cleanfirst', 'edgehang', 'rings', 'leaderevict', 'memo'];
 	// Built, measured and left off by default (STRATEGY.md, "Tried and dropped"); LPN_PLACER_B_ON
 	// switches one back on.
 	const DEFAULT_OFF = ['repair'];
@@ -137,6 +138,12 @@
 	// Proper crossing, ignoring shared end points (within 1.4 px).
 	function segCross(a, b, c, d) {
 		if (near(a, c) || near(a, d) || near(b, c) || near(b, d)) { return false; }
+		const d1 = orient(c[0], c[1], d[0], d[1], a[0], a[1]), d2 = orient(c[0], c[1], d[0], d[1], b[0], b[1]);
+		const d3 = orient(a[0], a[1], b[0], b[1], c[0], c[1]), d4 = orient(a[0], a[1], b[0], b[1], d[0], d[1]);
+		return ((d1 > 0) !== (d2 > 0)) && ((d3 > 0) !== (d4 > 0)) && d1 !== 0 && d2 !== 0 && d3 !== 0 && d4 !== 0;
+	}
+	// Proper crossing with no forgiveness for nearby ends.
+	function segCrossTight(a, b, c, d) {
 		const d1 = orient(c[0], c[1], d[0], d[1], a[0], a[1]), d2 = orient(c[0], c[1], d[0], d[1], b[0], b[1]);
 		const d3 = orient(a[0], a[1], b[0], b[1], c[0], c[1]), d4 = orient(a[0], a[1], b[0], b[1], d[0], d[1]);
 		return ((d1 > 0) !== (d2 > 0)) && ((d3 > 0) !== (d4 > 0)) && d1 !== 0 && d2 !== 0 && d3 !== 0 && d4 !== 0;
@@ -295,7 +302,9 @@
 
 		// ONE LAYOUT. `table` (optional) is a per-zoom lookup table of spots found in idle time;
 		// each is tried first and kept if it is still good here.
-		function solve(scene, prev, table) {
+		// `lite`: the idle-time table rungs (the whole network) skip eviction and polish and keep
+		// to a shorter bound, so the breathers can build more rungs.
+		function solve(scene, prev, table, lite) {
 			const tStart = now();
 			const nodeById = {}, linkById = {};
 			scene.nodes.forEach(function (n) { nodeById[n.id] = n; });
@@ -317,18 +326,34 @@
 			// every candidate the raster passes.
 			const OC = 4, onx = Math.ceil((region.x1 - region.x0) / OC), ony = Math.ceil((region.y1 - region.y0) / OC);
 			const occ = ON.raster && onx * ony <= 4e6 ? new Int16Array(onx * ony) : null;
-			function occAdd(b, d) {
+			const occS = occ ? new Uint8Array(onx * ony) : null;   // symbols and Text only (eviction)
+			function occAdd(b, d, fixed) {
 				if (!occ || !b.ax) { return; }
+				if (fixed) { occAddTo(occS, b, 1); }
+				occAddTo(occ, b, d);
+			}
+			function occAddTo(grid, b, d) {
 				const i0 = Math.ceil((b.x0 - region.x0) / OC), i1 = Math.floor((b.x1 - region.x0) / OC) - 1;
 				const j0 = Math.ceil((b.y0 - region.y0) / OC), j1 = Math.floor((b.y1 - region.y0) / OC) - 1;
 				for (let j = Math.max(0, j0); j <= Math.min(ony - 1, j1); j++) {
 					const row = j * onx;
-					for (let i = Math.max(0, i0); i <= Math.min(onx - 1, i1); i++) { occ[row + i] += d; }
+					for (let i = Math.max(0, i0); i <= Math.min(onx - 1, i1); i++) { grid[row + i] += d; }
 				}
 			}
-			function occAt(x, y) {
+			// Any counted cell meeting the rectangle (x0, y0)-(x1, y1)?
+			function cellsHit(G, x0, y0, x1, y1) {
+				if (x1 < x0 || y1 < y0) { return false; }
+				const i0 = Math.max(0, Math.floor((x0 - region.x0) / OC)), i1 = Math.min(onx - 1, Math.floor((x1 - region.x0) / OC));
+				const j0 = Math.max(0, Math.floor((y0 - region.y0) / OC)), j1 = Math.min(ony - 1, Math.floor((y1 - region.y0) / OC));
+				for (let j = j0; j <= j1; j++) {
+					const row = j * onx;
+					for (let i = i0; i <= i1; i++) { if (G[row + i] > 0) { return true; } }
+				}
+				return false;
+			}
+			function occAt(x, y, grid) {
 				const i = Math.floor((x - region.x0) / OC), j = Math.floor((y - region.y0) / OC);
-				return i >= 0 && j >= 0 && i < onx && j < ony && occ[j * onx + i] > 0;
+				return i >= 0 && j >= 0 && i < onx && j < ony && (grid || occ)[j * onx + i] > 0;
 			}
 			function occBlocked(b) {
 				const hw = b.w / 2 - 2, hh = b.h / 2 - 2;
@@ -341,7 +366,7 @@
 				return false;
 			}
 			// Static ground: node symbols, pump and valve symbols, Text objects and their callouts, pipes.
-			scene.nodes.forEach(function (n) { const b = rectBox(n.symbol); GH.addBox({ t: 'sym', node: n.id, lid: null, box: b }); occAdd(b, 1); });
+			scene.nodes.forEach(function (n) { const b = rectBox(n.symbol); GH.addBox({ t: 'sym', node: n.id, lid: null, box: b }); occAdd(b, 1, true); });
 			scene.links.forEach(function (l) {
 				(l.symbols || []).forEach(function (b) { GH.addBox({ t: 'sym', node: null, link: l.id, key: 'S' + l.id, lid: null, box: mkBox(b.cx, b.cy, b.w, b.h, b.angle) }); });
 				for (let i = 1; i < l.points.length; i++) {
@@ -350,7 +375,7 @@
 			});
 			scene.texts.forEach(function (t) {
 				const tb = mkBox(t.box.cx, t.box.cy, t.box.w, t.box.h, t.box.angle);
-				GH.addBox({ t: 'text', lid: null, box: tb }); occAdd(tb, 1);
+				GH.addBox({ t: 'text', lid: null, box: tb }); occAdd(tb, 1, true);
 				const L = t.leader;
 				if (L) { for (let i = 1; i < L.length; i++) { GS.addSeg({ t: 'ldr', key: 'T:' + t.id, lid: 'T:' + t.id, p: L[i - 1], q: L[i] }); } }
 			});
@@ -787,12 +812,28 @@
 			}
 			// The raster's look at a candidate before its ink is built: the middle of its first and
 			// last rows (a line's middle, turned or not).
-			function quickBlocked(req, c) {
-				if (c.layout === 'line') { return occAt(c.x + c.w / 2, c.y + c.h / 2); }
-				const r0 = req.rows[c.rows[0]], r1 = req.rows[c.rows[c.rows.length - 1]];
-				const m0 = c.align === 'right' ? c.x + c.w - r0.w / 2 : c.x + r0.w / 2;
-				const m1 = c.align === 'right' ? c.x + c.w - r1.w / 2 : c.x + r1.w / 2;
-				return occAt(m0, c.y + r0.h / 2) || occAt(m1, c.y + c.h - r1.h / 2);
+			// Every 4 px across each row, 2 px inside it: any counted cell there is a sure overlap.
+			function quickBlocked(req, c, grid) {
+				const G = grid || occ;
+				if (c.layout === 'line' && !c.angle) { return cellsHit(G, c.x + 2, c.y + 2, c.x + c.w - 2, c.y + c.h - 2); }
+				if (c.layout === 'line') {
+					const a = (c.angle || 0) * Math.PI / 180, cs = Math.cos(a), sn = Math.sin(a);
+					const cx = c.x + c.w / 2, cy = c.y + c.h / 2, hw = c.w / 2 - 2, hh = c.h / 2 - 2;
+					for (let u = -hw; u <= hw + 0.01; u += OC) {
+						for (let v = -hh; v <= hh + 0.01; v += OC) {
+							if (occAt(cx + u * cs - v * sn, cy + u * sn + v * cs, G)) { return true; }
+						}
+					}
+					return false;
+				}
+				let top = c.y;
+				for (let k = 0; k < c.rows.length; k++) {
+					const r = req.rows[c.rows[k]];
+					const left = c.align === 'right' ? c.x + c.w - r.w : (c.align === 'center' ? c.x + (c.w - r.w) / 2 : c.x);
+					if (cellsHit(G, left + 2, top + 2, left + r.w - 2, top + r.h - 2)) { return true; }
+					top += r.h;
+				}
+				return false;
 			}
 			function score(c, cost) { return cost + c.pref - ROW_VALUE * c.rows.length; }
 			// The best spot for one of the given row sets; null if none.
@@ -1032,13 +1073,14 @@
 				const b = best(req, ON.smallfirst ? [sets[sets.length - 1]] : sets, true);
 				if (b) { insert(req, b.c, b.ink, b.cost); }
 			});
-			function late() { return now() - tStart > DEADLINE_MS; }
+			function late() { return now() - tStart > (lite ? LITE_DEADLINE_MS : DEADLINE_MS); }
 
 			TIMING && console.log('p1', (now() - tStart).toFixed(1));
 			// ---- 5. then grow: each shown label looks again with every row set -------------------
 			// The current spot stays unless another is better; the label may move to show more, or
 			// to lie along its pipe with the same rows (R14).
 			const freed = [];   // the ink of spots given up by a move: ground a hidden label may now have
+			const failedAt = {}, failedFrom = {}, PC = {};
 			function nearFreed(req, from) {
 				const a = req.anchor, R = 4 * T.rowHeightPx + 80;
 				for (let i = from || 0; i < freed.length; i++) {
@@ -1065,9 +1107,14 @@
 				while (ci > 0 && sets[ci].length < cur.c.rows.length) { ci--; }
 				let b = null;
 				const same = cur.cost > 0 || (req.kind === 'link' && req.along && !alongAgrees(req, cur.c.angle || 0, cur.c.x + cur.c.w / 2, cur.c.y + cur.c.h / 2));
+				// 'memo': a climb that found no place, with no ground freed near it since, fails again.
+				if (ON.memo && !same && failedAt[req.id] !== undefined && failedAt[req.id] >= ci - 1 && !nearFreed(req, failedFrom[req.id])) {
+					insert(req, cur.c, cur.ink, cur.cost);
+					return false;
+				}
 				for (let j = same ? ci : ci - 1; j >= 0; j--) {
 					const bj = best(req, [sets[j]], true);
-					if (!bj) { if (j < ci) { break; } continue; }
+					if (!bj) { if (j < ci) { failedAt[req.id] = j; failedFrom[req.id] = freed.length; break; } continue; }
 					if (!b || bj.s < b.s) { b = bj; }
 				}
 				if (b && b.s < curS - 1e-9) { freed.push(cur.ink); insert(req, b.c, b.ink, b.cost); return true; }
@@ -1138,7 +1185,7 @@
 			// ---- 7. 'evict' (S16): a label still hidden may move ONE blocking neighbour elsewhere,
 			// if the neighbour finds another place (with as many rows as it can); never a kept
 			// label's neighbour that is hand-placed or a Text.
-			if (ON.evict) {
+			if (ON.evict && !lite) {
 				reqs.forEach(function (req) {
 					if (placed[req.id] || req.hand || req.kind === 'text' || late()) { return; }
 					const sets = setsOf[req.id], rows = sets[sets.length - 1], own = ownOf(req);
@@ -1146,9 +1193,9 @@
 					const tried = {};
 					let tries = 0;
 					for (let k = 0; k < cs.length && k < 60 && tries < 4; k++) {
-						if (occ && quickBlocked(req, cs[k])) { continue; }
+						if (occ && quickBlocked(req, cs[k], occS)) { continue; }
 						const r = cs[k].real || (cs[k].real = realize(req, cs[k]));
-						const victim = soleBlocker(req, r.ink);
+						const victim = soleBlocker(req, r);
 						if (!victim || tried[victim]) { continue; }
 						tried[victim] = 1; tries++;
 						const vreq = reqById[victim], vcur = placed[victim];
@@ -1166,23 +1213,57 @@
 					}
 				});
 			}
-			function soleBlocker(req, ink) {
+			// The one movable label in the way of candidate r, or null (none, several, or a fixed
+			// thing in the way). With 'leaderevict', a label whose LEADER the candidate would lie
+			// on or cross, or whose text the candidate's leader would cross, is in the way too.
+			function soleBlocker(req, r) {
+				const ink = r.ink;
 				let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
 				ink.forEach(function (b) { x0 = Math.min(x0, b.x0); y0 = Math.min(y0, b.y0); x1 = Math.max(x1, b.x1); y1 = Math.max(y1, b.y1); });
 				if (x0 < vx0 || y0 < vy0 || x1 > vx1 || y1 > vy1) { return null; }
+				let who = null, bad = false;
+				function take(lid) {
+					const vr = reqById[lid];
+					if (!vr || vr.hand || vr.kind === 'text' || (who && who !== lid)) { bad = true; return true; }
+					who = lid; return false;
+				}
 				const n = GH.gather(x0, y0, x1, y1, BUF);
-				let who = null;
 				for (let m = 0; m < n; m++) {
 					const it = BUF[m];
 					if (it.lid === req.id) { continue; }
 					if (!ink.some(function (b) { return boxHit(b, it.box); })) { continue; }
 					if (it.t !== 'lab') { return null; }
-					const vr = reqById[it.lid];
-					if (!vr || vr.hand || vr.kind === 'text') { return null; }
-					if (who && who !== it.lid) { return null; }
-					who = it.lid;
+					if (take(it.lid)) { return null; }
 				}
-				return who;
+				if (ON.leaderevict) {
+					const m2 = GS.gather(x0, y0, x1, y1, BUF);
+					for (let m = 0; m < m2; m++) {
+						const it = BUF[m];
+						if (it.t !== 'ldr' || it.lid === req.id) { continue; }
+						if (!ink.some(function (b) { return segBox(it.p[0], it.p[1], it.q[0], it.q[1], b, 1.0); })) { continue; }
+						if (String(it.lid).indexOf('T:') === 0 || take(it.lid)) { return null; }
+					}
+					const L = r.c.leader;
+					if (L) {
+						for (let sg = 1; sg < L.length; sg++) {
+							const p = L[sg - 1], q = L[sg];
+							const lx0 = Math.min(p[0], q[0]), ly0 = Math.min(p[1], q[1]), lx1 = Math.max(p[0], q[0]), ly1 = Math.max(p[1], q[1]);
+							let k2 = GH.gather(lx0, ly0, lx1, ly1, BUF);
+							for (let m = 0; m < k2; m++) {
+								const it = BUF[m];
+								if (it.t === 'lab' && it.lid !== req.id && segBox(p[0], p[1], q[0], q[1], it.box, 1.0) && take(it.lid)) { return null; }
+							}
+							k2 = GS.gather(lx0, ly0, lx1, ly1, BUF);
+							for (let m = 0; m < k2; m++) {
+								const it = BUF[m];
+								if (it.t === 'ldr' && it.lid !== req.id && segCrossTight(p, q, it.p, it.q)) {
+									if (String(it.lid).indexOf('T:') === 0 || take(it.lid)) { return null; }
+								}
+							}
+						}
+					}
+				}
+				return bad ? null : who;
 			}
 			TIMING && console.log('p5', (now() - tStart).toFixed(1));
 			// The last sweep: a label still hidden may now cross a pipe.
@@ -1200,17 +1281,17 @@
 			TIMING && console.log('p6', (now() - tStart).toFixed(1));
 			// ---- 8. 'polish' (S17): one more look for every label, since later moves freed ground
 			// (a pipe label seated level early may now lie along its pipe).
-			if (ON.polish) {
+			if (ON.polish && !lite) {
 				for (let i = 0; i < growOrder.length && !late(); i++) {
 					const req = growOrder[i], cur = placed[req.id];
 					if (!cur) { continue; }
 					const cut = cur.c.rows.length < setsOf[req.id][0].length;
 					const level = req.kind === 'link' && req.along && !alongAgrees(req, cur.c.angle || 0, cur.c.x + cur.c.w / 2, cur.c.y + cur.c.h / 2);
-					if ((cut || level || cur.cost > 0) && nearFreed(req, 0)) { regrow(req); }
+					if ((cut || level || cur.cost > 0) && nearFreed(req, 0)) { if (TIMING) { PC[(cut ? 'c' : '') + (level ? 'l' : '') + (cur.cost > 0 ? 'x' : '')] = (PC[(cut ? 'c' : '') + (level ? 'l' : '') + (cur.cost > 0 ? 'x' : '')] || 0) + 1; } regrow(req); }
 				}
 			}
 
-			TIMING && console.log('p7', (now() - tStart).toFixed(1));
+			TIMING && console.log('p7', (now() - tStart).toFixed(1), JSON.stringify(PC));
 			// ---- out -------------------------------------------------------------------------
 			// What this layout teaches the lookup table: each label's spot as an offset from its
 			// anchor, which holds at any pan of the same zoom.
@@ -1346,7 +1427,7 @@
 				if (now() - t0 + rungMs * 1.25 > budgetMs) { break; }
 				const t1 = now();
 				const f = baseS * Math.pow(2, k / 4) / scene.view.s;
-				const out = solve(synth(scene, f), fromView, null);
+				const out = solve(synth(scene, f), fromView, null, true);
 				tables[k] = out.learned;
 				tables[k].from = fromView;
 				rungMs = 0.5 * rungMs + 0.5 * (now() - t1);
