@@ -273,6 +273,21 @@ async function probeMi(browser, origin) {
 	await page.goto(`${origin}/engcalcs/Manning-Irregular.php?ec_nolog=1`, { waitUntil: 'load' });
 	await page.waitForFunction(() => window.EngCalcs && EngCalcs.numCalcRows > 0, null, { timeout: 5000 });
 	console.log('\n--- mi: points follow stations ---');
+	// Points data is the table only (Tom, 2026-10-07): put distinctive numbers in the inputs above
+	// the table and require Copy to carry none of them, and no heading line either.
+	const wsOrig = await page.$eval('[name="ws"]', (el) => el.value);
+	const s0Orig = await page.$eval('[name="s0"]', (el) => el.value);
+	await page.$eval('[name="ws"]', (el) => { el.value = '7.77'; });
+	await page.$eval('[name="s0"]', (el) => { el.value = '0.01234'; });
+	await clickCopy(page);
+	const hdrText = await pointsDataValue(page);
+	const hdrLines = hdrText.trim().split('\n');
+	ok(!/7\.77|0\.01234/.test(hdrText), 'mi: Copy carries no header input (water surface, slope)', JSON.stringify(hdrText));
+	ok(hdrLines.length === (await column(page, 'station')).length && /^-?[\d.]+,-?[\d.]+/.test(hdrLines[0]),
+		'mi: Copy is one line per point, no heading line, nothing above the table', hdrLines.length + ' lines');
+	ok(hdrLines.slice(1).every((l) => l.split(',').length === 4), 'mi: every point row after the first is station, elevation, bank flag, n');
+	await page.$eval('[name="ws"]', (el, v) => { el.value = v; }, wsOrig);
+	await page.$eval('[name="s0"]', (el, v) => { el.value = v; }, s0Orig);
 	await clickCopy(page);
 	const full0 = await pointsDataValue(page);
 	const stations0 = (await column(page, 'station')).join();
