@@ -1,41 +1,40 @@
 // LPN LABEL PLACER B: a pure function of one view (the label bench's contract), no DOM.
+// Round 7. The recipe, its measurements and what was dropped: STRATEGY.md beside this file. Every
+// ingredient named in quotes below can be switched off (INGREDIENTS, LPN_PLACER_B_OFF).
 //
-// APPROACH. First a map of the ground: every symbol, Text object and pipe goes into a hashed grid
-// (hard ground: symbols, Text, placed labels; soft ground: pipes and leaders). Then each label is
-// tried at a short list of spots, nearest home first: touching its symbol on the eight sides (the
-// open sides between its pipes preferred), then on short straight leaders in rings a few pixels
-// apart, toward the open gaps. A pipe label lies along its pipe, either side, sliding from the
-// middle; failing that it sits level on a short leader from the pipe. A spot that covers a symbol,
-// a Text object or a label is never taken; crossings are costed in the rules' order (leader on
-// leader, label on leader, label on pipe, leader on pipe) plus a small price per pixel of travel.
-// Hand-placed labels go first, hung at the user's point (the leader may start anywhere on the pipe
-// or use the one hook to miss a symbol). Customer labels go last.
+// THE GROUND. Every symbol, Text object and pipe goes into a hashed grid (hard ground: symbols,
+// Text, placed labels; soft ground: pipes and leaders), and the hard ground also into a 4 px count
+// raster ('raster') that refuses most blocked candidates before any geometry is built.
 //
-// FREE SPACE AND DROPPING (S3, S4). Pass one gives every label a place at its smallest (the ID, or
-// the last property to go), crowded owners first, so labels outrank properties. Pass two lets each
-// label look again with more rows; a row is worth about one pipe crossing. A label whose best spot
-// still costs more than two pipe crossings is dropped rather than sent far away (four rings, about
-// two label heights, is the furthest it travels).
+// WHERE A LABEL MAY GO. A node label: touching its symbol on the eight sides, the open gaps between
+// its pipes preferred ('wedge'); then on straight leaders hung by the edge the leader arrives at,
+// every 15 degrees and every half row out to three rows ('edgehang', 'reach'), and for its smallest
+// form also on rings around it ('rings'); and its rows as one line ('unwrap'). A pipe label the
+// setting asks to turn: along its pipe, either side, in the scene's reading window, sliding over the
+// pipe's on-screen stretch and turned to the leg it sits beside ('along'); then level beside the
+// pipe; then level on a leader. A label the setting does not ask to turn is never turned (R13).
 //
-// HOLDING STILL (T1). A label shown in the last view keeps its pixel offset from its owner and its
-// rows, unless a symbol, Text, label, leader or a second pipe now lies under it. It may grow in place:
-// a stack from the edge it hangs on (left, or right when it hangs west, S2), a pipe label along its
-// pipe from the end that holds. Note: the bench counts a turned pipe label growing from its fixed
-// end as a move, since it compares unturned corners; on screen it does not move.
+// IN WHAT ORDER. Hand-placed labels and Text first (N4). Labels shown last view keep their spot
+// while it is clean ('keep'), and spots from the idle-time zoom table are checked next ('table').
+// Then every other label gets its smallest form (the last value in the user's drop order, the ID a
+// value like any other), crowded owners first ('crowd', 'smallfirst'), where it crosses nothing
+// but at most its own pipe ('cleanfirst'). Then each label climbs one row set at a time while a
+// bigger one fits ('relocate' lets a kept label move to show more; 'rekeep' grows first the labels
+// that lost their spot). A label still hidden may move ONE neighbour that is in its way, whether
+// by its text or by its leader, if the neighbour finds another place ('evict', 'leaderevict'). A
+// last sweep lets a label still hidden cross one pipe. Polish rounds look again wherever moves
+// freed ground ('polish'), and a climb that failed is not retried until ground near it is freed
+// ('memo'). A crossing is never accepted over a leader or a label (cost caps), and a layout stops
+// improving at DEADLINE_MS and returns what it has (R10: bounded by time, never by a count).
 //
-// IDLE TIME (T2, T3). The breathers build a per-zoom lookup table: the whole network (every label
-// ever requested, no viewport) laid out at a ladder of zooms a quarter-octave apart, each spot kept
-// as an offset from its anchor, which holds at any pan of that zoom. On opening, rungs nearest the
-// current zoom first; between views, the likeliest next zooms are rebuilt around what is on screen.
-// A view then only checks each cached spot and searches for the few that fail. The table is thrown
-// away when the network moves or is re-topologized, or the lettering or drop order changes; a label
-// whose own rows changed loses only its own entry.
+// IDLE TIME. The breathers build a per-zoom lookup table: the whole network laid out at a ladder of
+// zooms a quarter-octave apart (a lighter recipe, without eviction or polish), each spot kept as an
+// offset from its anchor. The table is thrown away when the network, lettering, drop order or
+// settings change; a label whose own rows changed loses only its own entry.
 //
-// KNOWN WEAKNESSES. Greedy, not optimal: a label placed early can take a spot a later one needed.
-// Held labels do not relocate to show more rows, so a label that settled small on a crowded view
-// can stay small after zooming in. No wrapping (H1) and no hook on automatic leaders. A single rung
-// can overrun a short idle budget on a very large network. Without idle time, a first view of Net3
-// takes 50-150 ms.
+// KNOWN WEAKNESSES. Greedy, not optimal. Results vary a little run to run, since the idle table's
+// depth depends on how many rungs the machine finishes in its budget. No hook on automatic leaders.
+// Churn rose this round: pipe labels re-seat to follow their on-screen stretch and the setting.
 //
 // Copyright 2009 Thomas Gail Haws
 // Licensed under GNU GPL v3.0 or later
@@ -51,19 +50,18 @@
 	// Costs, in the order of §3.1 (worst first), and what a shown row is worth.
 	const W_LDR_LDR = 3, W_LAB_LDR = 2.5, W_LAB_PIPE = 0.3, W_LDR_PIPE = 0.2, W_OWN_PIPE = 0.12;
 	const ROW_VALUE = 0.25;     // one more property row is worth this much crossing cost
-	const LABEL_CAP = (typeof process !== 'undefined' && process.env && +process.env.LPN_PLACER_B_CAP) || 0.35;   // a label whose best spot costs more than this is dropped (one pipe)
-	const CLEAN_CAP = (typeof process !== 'undefined' && process.env && +process.env.LPN_PLACER_B_CLEAN) || 0.13;  // 'cleanfirst': at most its own pipe
+	const LABEL_CAP = 0.35;   // a label whose best spot costs more than this is dropped (one pipe)
+	const CLEAN_CAP = 0.13;  // 'cleanfirst': at most its own pipe
 	const KEEP_CAP = 0.3;       // a label held from the last view is let go if a leader or a second pipe now crosses it
 	const RING_STEP = 7;        // px between leader rings
-	const RING_MAX = 4;         // rings tried (S3: drop rather than travel)
+	const RING_MAX = 4;         // rings tried without 'reach'
 	const RING_DIRS = 12;       // directions tried on each ring
 	const RING_COST = 0.12;     // base cost of hanging on a leader
 	const RING_PER_PX = 0.006;  // cost per px of travel
 	const FAR_ROWS = 6;         // 'farreach': the last sweep's reach, in rows
 	const REACH_ROWS = 3;       // 'reach': leaders out to this many text rows, every 15 degrees
-	const DEADLINE_MS = 700;
-	const LITE_DEADLINE_MS = 400;
-	const TIMING = typeof process !== 'undefined' && process.env && !!process.env.LPN_PLACER_B_TIMING;    // R10: a layout returns what it has placed by then (time, never a count)
+	const DEADLINE_MS = 700;      // R10: a layout returns what it has placed by then (time, never a count)
+	const LITE_DEADLINE_MS = 400; // the same for an idle-time table rung
 
 	// ---- ingredients, each switchable (STRATEGY.md beside this file) ----------------------------
 	// Switch one off with create({off: ['repair']}) or, under the bench, the environment variable
@@ -1040,7 +1038,6 @@
 				});
 			}
 
-			TIMING && console.log('p0', (now() - tStart).toFixed(1));
 			// ---- 4. everyone else: first a place for each label at its smallest ------------------
 			// 'table': a label the table had to drop at this zoom stays out of the first pass, unless
 			// it stands near the viewport's edge, where the table's crowd may be off screen now. It
@@ -1080,7 +1077,6 @@
 			});
 			function late() { return now() - tStart > (lite ? LITE_DEADLINE_MS : DEADLINE_MS); }
 
-			TIMING && console.log('p1', (now() - tStart).toFixed(1));
 			// ---- 5. then grow: each shown label looks again with every row set -------------------
 			// The current spot stays unless another is better; the label may move to show more, or
 			// to lie along its pipe with the same rows (R14).
@@ -1133,7 +1129,6 @@
 				growOrder = growOrder.filter(function (r) { return lostId[r.id]; }).concat(growOrder.filter(function (r) { return !lostId[r.id]; }));
 			}
 			for (let i = 0; i < growOrder.length && !late(); i++) { regrow(growOrder[i]); }
-			TIMING && console.log('p2', (now() - tStart).toFixed(1));
 			// Kept labels grow in place, on the edge they hang from; with 'relocate', a kept label
 			// that cannot grow in place may move to where it shows more (a move that shows more).
 			Object.keys(kept).forEach(function (id) {
@@ -1177,7 +1172,6 @@
 				if (!done) { insert(req, cur.c, cur.ink, cur.cost); }
 			});
 
-			TIMING && console.log('p3', (now() - tStart).toFixed(1));
 			// ---- 6. 'repair' (S15): every label still hidden looks again for its smallest form ---
 			// Moves in the grow pass free ground; the labels the table held out are asked here too.
 			const repaired = [];
@@ -1191,7 +1185,6 @@
 					if (b) { insert(req, b.c, b.ink, b.cost); repaired.push(req); }
 				});
 			}
-			TIMING && console.log('p4', (now() - tStart).toFixed(1));
 			// ---- 7. 'evict' (S16): a label still hidden may move ONE blocking neighbour elsewhere,
 			// if the neighbour finds another place (with as many rows as it can); never a kept
 			// label's neighbour that is hand-placed or a Text.
@@ -1275,7 +1268,6 @@
 				}
 				return bad ? null : who;
 			}
-			TIMING && console.log('p5', (now() - tStart).toFixed(1));
 			// The last sweep: a label still hidden may now cross a pipe.
 			if (ON.cleanfirst && capNow < LABEL_CAP) {
 				capNow = LABEL_CAP;
@@ -1300,7 +1292,6 @@
 			}
 			// The labels repair, eviction and the sweeps seated grow too.
 			for (let i = 0; i < repaired.length && !late(); i++) { regrow(repaired[i]); }
-			TIMING && console.log('p6', (now() - tStart).toFixed(1));
 			// ---- 8. 'polish' (S17): one more look for every label, since later moves freed ground
 			// (a pipe label seated level early may now lie along its pipe).
 			if (ON.polish && !lite) {
@@ -1319,7 +1310,6 @@
 					from = mark;
 				}
 			}
-			TIMING && console.log('p7', (now() - tStart).toFixed(1));
 			// ---- out -------------------------------------------------------------------------
 			// What this layout teaches the lookup table: each label's spot as an offset from its
 			// anchor, which holds at any pan of the same zoom.
