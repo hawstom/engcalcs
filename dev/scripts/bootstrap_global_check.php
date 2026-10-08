@@ -1,7 +1,7 @@
 <?php
 /**
  * bootstrap_global_check.php -- a shipped PHP function that reads a bootstrap global DECLARES it
- * global. BLOCKING, and a ratchet at one declared exception.
+ * global. BLOCKING, and a ratchet at two declared exceptions.
  *
  * Copyright 2009 Thomas Gail Haws
  * Licensed under GNU GPL v3.0 or later
@@ -63,6 +63,10 @@ function ecBootstrapGlobalExceptions(): array
             . 'files into its own scope to diff them, so a `global` would overwrite the page\'s own '
             . 'strings with whichever file it read last. The one place in the suite where the local '
             . 'copy IS the point.',
+        'lib/Language.lib.php::ecEnglishStrings' =>
+            '$ec_lang is deliberately LOCAL here: it requires lang.ec.en.php into its own scope to read '
+            . 'the English words the Find parser accepts on every page; a `global` would overwrite the '
+            . 'page\'s own strings with English.',
     ];
 }
 
@@ -236,7 +240,7 @@ if ($r['findings']) {
 
 printf("Bootstrap globals OK -- %d reach(es) into %d derived global name(s) across %d shipped PHP "
     . "file(s):\n%d declare `global`, %d take the name as a parameter, %d declared exception(s), "
-    . "all of them\nstill reachable. A ratchet at one.\n",
+    . "all of them\nstill reachable. A ratchet at two.\n",
     $r['pairs'], count($r['names']), count($files), $r['declared'], count($r['params']),
     count($r['used']));
 echo 'The derived names: $' . implode(', $', $r['names']) . "\n";
