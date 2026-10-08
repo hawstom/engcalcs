@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**35 still to read on master**, of 36 untranslated keys, of 2480 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**34 still to read on master**, of 36 untranslated keys, of 2480 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -21,7 +21,7 @@ hit takes you to a section and the rest walk its keys. A key already ruled does 
 it, and a fully ruled group says `all ruled` and can be skipped whole.
 Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
-## Questions from the translators  (11 to read @@ NEEDS RULING)
+## Questions from the translators  (1 to read @@ NEEDS RULING)
 
 **These are SHIPPED strings, already translated into 26 languages.** A wave-0
 reading or a translator found each one readable two ways, and no sprint launches while one is
@@ -37,89 +37,6 @@ is the one you meant. "The first one" is a complete answer.
   2. demands must be cut to {m} times what is entered for every junction to keep the pressure (right)
   **What this asks for:** which of the readings above you meant.
   *The proposal:* PROPOSED A: '⚠ At least one junction is below {pressure} at the demands as entered (a demand scale of 1). All junctions keep {pressure} only if demands are cut to a demand scale of {m} or less.' PROPOSED B: '⚠ The demands as entered (a demand scale of 1) leave at least one junction below {pressure}. The largest demand scale that keeps every junction at {pressure} or above is {m}.' B paralle...
-  @@ NEEDS RULING
-
-### from sprint 1008
-
-- **`lpn_change_type_key`**
-  > ID: Lost entry
-  *The finding:* 'ID: Lost entry' reads like a column-header pair; unclear whether 'Lost entry' means a lost value or a lost record.
-  1. ID: Загубена стойност (lost value)
-  2. lost record
-  **What this asks for:** a WORDING ruling -- is the English above right, or say what it should say.
-  *The proposal:* PROPOSED English for Tom: 'Each line: ID: the property and value that would be lost'. 'ID: Lost entry' is a legend over the lines listing what a type change loses; seven translators could not tell lost value from lost record.
-  @@ NEEDS RULING
-- **`lpn_change_type_key`**
-  > ID: Lost entry
-  *The finding:* 'ID: Lost entry' reads as a column-heading pair with no stated structure.
-  1. column headings: ID, then the lost entry
-  2. a sentence
-  **What this asks for:** a WORDING ruling -- is the English above right, or say what it should say.
-  *The proposal:* PROPOSED English for Tom: 'Each line: ID: the property and value that would be lost'. 'ID: Lost entry' is a legend over the lines listing what a type change loses; seven translators could not tell lost value from lost record.
-  @@ NEEDS RULING
-- **`lpn_change_type_key`**
-  > ID: Lost entry
-  *The finding:* 'ID: Lost entry' reads as a legend for the lines below, but 'Lost entry' has no stated object; guessed it labels the line format {id}: {property} {value} of a lost value.
-  1. legend: ID then the lost entry (property and value)
-  2. a status label
-  **What this asks for:** a WORDING ruling -- is the English above right, or say what it should say.
-  *The proposal:* PROPOSED English for Tom: 'Each line: ID: the property and value that would be lost'. 'ID: Lost entry' is a legend over the lines listing what a type change loses; seven translators could not tell lost value from lost record.
-  @@ NEEDS RULING
-- **`lpn_change_type_key`**
-  > ID: Lost entry
-  *The finding:* 'ID: Lost entry' is not clear whether 'Lost entry' names a lost row or a key label; guessed a heading for a lost item.
-  1. ID - lost entry (item lost in conversion)
-  2. ID: entry that is lost
-  **What this asks for:** a WORDING ruling -- is the English above right, or say what it should say.
-  *The proposal:* PROPOSED English for Tom: 'Each line: ID: the property and value that would be lost'. 'ID: Lost entry' is a legend over the lines listing what a type change loses; seven translators could not tell lost value from lost record.
-  @@ NEEDS RULING
-- **`lpn_change_type_key`**
-  > ID: Lost entry
-  *The finding:* 'ID: Lost entry' has no verb or object; unclear whether 'Lost entry' names the thing lost or labels a column of lost entries.
-  1. ID: потерянная запись (label of a lost-entry line)
-  2. ID: the entry that is lost on conversion
-  **What this asks for:** a WORDING ruling -- is the English above right, or say what it should say.
-  *The proposal:* PROPOSED English for Tom: 'Each line: ID: the property and value that would be lost'. 'ID: Lost entry' is a legend over the lines listing what a type change loses; seven translators could not tell lost value from lost record.
-  @@ NEEDS RULING
-- **`lpn_change_type_key`**
-  > ID: Lost entry
-  *The finding:* 'ID: Lost entry' is ambiguous: unclear whether it is a heading, a line label, or a fragment, and what 'Lost entry' refers to.
-  1. Kitambulisho: Kiingizo kilichopotea (the ID/key entry that is lost)
-  2. a lost row or record
-  **What this asks for:** a WORDING ruling -- is the English above right, or say what it should say.
-  *The proposal:* PROPOSED English for Tom: 'Each line: ID: the property and value that would be lost'. 'ID: Lost entry' is a legend over the lines listing what a type change loses; seven translators could not tell lost value from lost record.
-  @@ NEEDS RULING
-- **`lpn_change_type_key`**
-  > ID: Lost entry
-  *The finding:* 'ID: Lost entry' reads as a column header, but 'Lost entry' has no stated object (a value? a property?).
-  1. a table key: the ID followed by the lost value
-  2. a status label saying the ID itself was lost
-  **What this asks for:** a WORDING ruling -- is the English above right, or say what it should say.
-  *The proposal:* PROPOSED English for Tom: 'Each line: ID: the property and value that would be lost'. 'ID: Lost entry' is a legend over the lines listing what a type change loses; seven translators could not tell lost value from lost record.
-  @@ NEEDS RULING
-- **`lpn_settings_auto_run_tip`**
-  > Turn off if recalculation is too slow. Hides the Calculate button.
-  *The finding:* 'Hides the Calculate button' has no stated condition: does it hide the button when the setting is on or when it is turned off?
-  1. The button is hidden while the setting is on (automatic recalculation)
-  2. The button is hidden when the user turns the setting off
-  **What this asks for:** a WORDING ruling -- is the English above right, or say what it should say.
-  *The proposal:* PROPOSED English for Tom: 'Turn off if recalculation is too slow. While this is on, the Calculate button is hidden.' Two translators could not tell which state hides the button.
-  @@ NEEDS RULING
-- **`lpn_settings_auto_run_tip`**
-  > Turn off if recalculation is too slow. Hides the Calculate button.
-  *The finding:* 'Hides the Calculate button' has no stated subject: does turning the setting off or on hide the button?
-  1. the setting being on hides the button (translated literally, ambiguous)
-  2. turning it off hides the button
-  **What this asks for:** a WORDING ruling -- is the English above right, or say what it should say.
-  *The proposal:* PROPOSED English for Tom: 'Turn off if recalculation is too slow. While this is on, the Calculate button is hidden.' Two translators could not tell which state hides the button.
-  @@ NEEDS RULING
-- **`lpn_settings_elev_source_tip`**
-  > 2026 Mapbox DEM horizontal and vertical accuracy ranges through 1–10 m and <1 m in the US, 2–10 m and 1–3 m in Europe and Japan, 30 m and 10–16 m globally, and 90 m and >16 m at the poles.
-  *The finding:* 'ranges through 1-10 m and <1 m' pairs horizontal and vertical accuracy without saying which figure is which; the pairing is inferred from the order 'horizontal and vertical'.
-  1. first figure horizontal, second vertical
-  2. ranges as an interval from one region to the next
-  **What this asks for:** a WORDING ruling -- is the English above right, or say what it should say.
-  *The proposal:* PROPOSED English for Tom: 'Mapbox DEM accuracy in 2026, horizontal then vertical: 1–10 m and under 1 m in the US, 2–10 m and 1–3 m in Europe and Japan, 30 m and 10–16 m globally, and 90 m and over 16 m at the poles.'
   @@ NEEDS RULING
 
 ## Synonym entries to approve  (12, 10 to read @@ NEEDS RULING)
@@ -222,7 +139,7 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   @@ NEEDS RULING
 
-## lpn_  (36, 35 to read @@ NEEDS RULING)
+## lpn_  (36, 34 to read @@ NEEDS RULING)
 
 - **`lpn_dxf_export_failed`**
   > The DXF file was not written: an error in this page stopped it ({error}).
@@ -238,7 +155,7 @@ never edits a synonym.
   @@ NEEDS RULING
 - **`lpn_dxf_note_blocks`**
   > Layers are named {prefix}, the asset code, a hyphen, and the alternative, as in {example}. Each element is a block inserted at scale 1 with attributes 1 unit high; scale the blocks to set the text height. Every attribute is visible; the attributes of one element are stacked in a column beside its symbol.
-  @@ NEEDS RULING
+  _Ruled 2026-10-08: Calls page 8 October: Use as written_
 - **`lpn_dxf_note_categories`**
   > {n} junctions have more than one demand category. Their {tag} attribute holds the sum of the base demands of all categories.
   @@ NEEDS RULING
@@ -337,7 +254,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**110 still to read**, of 113 new keys across 14 unmerged branch(es).
+**110 still to read**, of 113 new keys across 13 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -718,5 +635,3 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 
 ### feat/visit-dedupe (`b4a99e9a`) — adds no English strings
-
-### feat/workspace (`60879c22`) — adds no English strings
