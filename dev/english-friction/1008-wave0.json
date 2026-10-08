@@ -1,0 +1,206 @@
+{
+ "sprint": "1008-wave0",
+ "description": "Adversarial Wave 0 on the 413 keys php dev/scripts/wave0_keyset.php --new-and-changed reports for sprint 1008 (407 lpn_, plus points_data, install, rc, bpn); 147 keys Tom has ruled are excluded and 9 with a syn entry skipped. Each string was asked for every plausible reading, and every finding was checked against its call site. 12 are referred to Tom: 7 proposed English rewrites and 5 proposed $ec_lang_syn notes. 5 are recorded dismissals; the other 396 keys had one reading and are not listed. No English or $ec_lang_syn was changed.",
+ "entries": [
+  {
+   "key": "lpn_meter_placed",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "'press it in Select' names neither the mode nor what 'it' is; Select is a mode (lpn_tool_select), and 'press' reads as a keyboard press. 'its box' does not say which box. Notice after placing a customer (js/looped-network.js:45867).",
+   "readings": [
+    "select the customer on the map while the Select mode is on, to open its properties box",
+    "press a key or a button called Select to open some box"
+   ],
+   "disposition": "refer-to-human",
+   "resolution": "PROPOSED English: 'Customer {id} added. Enter its description and demand in the Customers table, or select it in Select mode to open its properties box.' Cost: 26 retranslations."
+  },
+  {
+   "key": "lpn_change_type_born",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "'These are new, as on a newly drawn one:' has no noun for 'these' or for 'one'. It heads a list of values that the changed asset receives as defaults (js/looped-network.js:32833).",
+   "readings": [
+    "these values are created with their defaults, as on an asset newly drawn",
+    "these assets are new, like a newly drawn asset"
+   ],
+   "disposition": "refer-to-human",
+   "resolution": "PROPOSED English: 'These values are new, set as on a newly drawn asset:' Cost: 26 retranslations."
+  },
+  {
+   "key": "lpn_find_filter_tip",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "The verb has no object, and 'Filter in' parses two ways: include in the table, or filter the tables. Button 'Filter in table' in Find and replace; it filters the rows of the table searched (applyTableFilter, js/looped-network.js:20610).",
+   "readings": [
+    "show only the rows that match \"What to search\" in the table or tables searched",
+    "filter (choose) the tables whose name matches \"What to search\""
+   ],
+   "disposition": "refer-to-human",
+   "resolution": "PROPOSED English: 'Show only the rows that match \"What to search\" above, in each table searched.' Cost: 26 retranslations."
+  },
+  {
+   "key": "lpn_mapgeo_dial_help",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "'so 1 and 0 mean no change' does not pair the numbers with the two bars. The bars are Map size (read as {f} times) and rotation.",
+   "readings": [
+    "a size of 1 and a rotation of 0 mean no change",
+    "either bar set to 1 or 0 means no change"
+   ],
+   "disposition": "refer-to-human",
+   "resolution": "PROPOSED English: replace the last clause with 'so a size of 1 and a rotation of 0 mean no change.' Cost: 26 retranslations."
+  },
+  {
+   "key": "lpn_ff_menu_tip",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "'Selection-wide check with collateral effect check' is a noun stack an English reader also has to decode; 'collateral effect' is not engineering usage, and 'Selection-wide' can read as one check over the whole selection rather than one per junction. The analysis tests each chosen junction in turn and then checks the rest of the system (lpn_ff_intro, lpn_ff_design_tip).",
+   "readings": [
+    "each selected junction is tested for fire flow in turn, and the effect on other junctions and pipes is checked",
+    "one combined check of the whole selection, plus a check of side effects of some kind"
+   ],
+   "disposition": "refer-to-human",
+   "resolution": "PROPOSED English: 'Test each selected junction for fire flow, and check the effect on the rest of the system' Cost: 26 retranslations."
+  },
+  {
+   "key": "lpn_tool_area_tip",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "'Hold Shift to keep existing selection set and add or remove' is a garden path: 'set' reads as a verb ('keep ..., set and add') before it reads as the noun 'selection set'. Articles are also dropped ('Follow on-screen wizard').",
+   "readings": [
+    "keep the current selection set and add to it or remove from it",
+    "keep the existing selection, set something, and add or remove"
+   ],
+   "disposition": "refer-to-human",
+   "resolution": "PROPOSED English: 'Follow the on-screen prompts. Press again to cycle through window, lasso, and polygon. Hold Shift to keep the current selection and add or remove (toggle) what you select.' Cost: 26 retranslations."
+  },
+  {
+   "key": "lpn_search_refused",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "'Go to a latitude and longitude still works' starts with what reads as an imperative; it is the name of the menu item lpn_goto_menu ('Go to a latitude and longitude...'). Low.",
+   "readings": [
+    "the Go to a latitude and longitude command still works",
+    "an instruction to go to a latitude and longitude, followed by 'still works'"
+   ],
+   "disposition": "refer-to-human",
+   "resolution": "PROPOSED English: 'Place-name search is off, and nothing was sent. The Go to a latitude and longitude command still works.' Cost: 26 retranslations."
+  },
+  {
+   "key": "lpn_reports_epanet",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "Menu item under Water, Reports that opens the EPANET run report (js/looped-network.js:5111). Alone, 'Run' is a verb in most languages' default sense, and a translator will render 'run the model', which is a different command (the toolbar Calculate). English stands: Tom named it in fix/report-names.",
+   "readings": [
+    "noun: the report of the last run",
+    "verb: start a run"
+   ],
+   "disposition": "refer-to-human",
+   "resolution": "Add $ec_lang_syn PROPOSAL (AI may not write it): 'Run report; a noun, the report EPANET wrote for the last run, not the command to start a run'. English unchanged, no retranslation of English needed beyond the note."
+  },
+  {
+   "key": "lpn_snip_tip_mode",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "Tip on the chevron beside the Snip button that opens a menu of Rectangle or Freehand (js/looped-network.js:42979). 'Snip shape' reads as an imperative (snip a shape) as easily as a noun.",
+   "readings": [
+    "noun: the shape of the snip, chosen from this menu",
+    "verb: snip a shape"
+   ],
+   "disposition": "refer-to-human",
+   "resolution": "Add $ec_lang_syn PROPOSAL (AI may not write it): 'Snip shape; a noun, the choice of shape (rectangle or freehand) for the next snip, not an instruction'. English unchanged."
+  },
+  {
+   "key": "lpn_pane_scn_alt_tip",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "'alt.' is an English abbreviation for alternative (the scenario alternative holding the override, Tom's wording 2026-10-06, js/looped-network.js:25361). A translator meets it with no expansion; altitude and the Alt key are both plausible.",
+   "readings": [
+    "alternative: the scenario alternative that holds this value",
+    "altitude, or the Alt key"
+   ],
+   "disposition": "refer-to-human",
+   "resolution": "Add $ec_lang_syn PROPOSAL (AI may not write it): 'alt. abbreviates alternative (the scenario alternative that holds this override); abbreviate it the way your language abbreviates that word'. English unchanged."
+  },
+  {
+   "key": "lpn_cp_restrict_tip",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "Leads the tip in the Restrict mode of a custom property's character rule; the other mode is 'Allow only these characters:' (js/looped-network.js:49645). 'Restrict' can mean forbid or limit to, and the second sense is the Allow mode. The sibling option label lpn_cp_restrict carries the same words and must stay identical, so English is not the route.",
+   "readings": [
+    "forbid the characters listed",
+    "limit entries to the characters listed (the same as Allow only)"
+   ],
+   "disposition": "refer-to-human",
+   "resolution": "Add $ec_lang_syn PROPOSAL (AI may not write it) on lpn_cp_restrict_tip and its sibling lpn_cp_restrict: 'Forbid these characters; the opposite of Allow only these characters'. English unchanged."
+  },
+  {
+   "key": "lpn_fb_intro",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "'Canned messages' is an English idiom for ready-made messages; read literally it is about tins, and a translator who does not know the idiom has nothing else to go on. Heads the row of pick buttons in the feedback box (js/looped-network.js:61769).",
+   "readings": [
+    "ready-made messages to pick from",
+    "messages in a can (literal), or discarded messages"
+   ],
+   "disposition": "refer-to-human",
+   "resolution": "Add $ec_lang_syn PROPOSAL (AI may not write it): 'Ready-made messages; preset choices the visitor can pick instead of typing'. English unchanged."
+  },
+  {
+   "key": "lpn_scenario_overrides",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "'No.' as an abbreviation for number can read as the negation 'No'.",
+   "readings": [
+    "the number of overrides",
+    "no overrides"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Not re-raised: Tom ruled the 'No. of' pattern on 2026-09-06 (584-wave0, lpn_scenario_overrides: \"We resolved this yesterday. ... You are wrong.\"). Same pattern on the current text."
+  },
+  {
+   "key": "lpn_settings_symbol_cap_sentence",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "Checked whether '{p} percentile pipe' reads as a percentage of a pipe.",
+   "readings": [
+    "the pipe at the {p}th percentile of all pipe lengths"
+   ],
+   "disposition": "dismissed",
+   "resolution": "One reading: the boxes split the sentence and the % sign follows {p}; lpn_settings_symbol_cap_tip states it in full."
+  },
+  {
+   "key": "lpn_mode_add_text",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "'place a Text' uses Text as a countable noun.",
+   "readings": [
+    "a Text element (our name for EPANET's Label)"
+   ],
+   "disposition": "dismissed",
+   "resolution": "One reading: Text is this page's asset name for EPANET's Label (CLAUDE.md vocabulary), and the capital marks it as the name."
+  },
+  {
+   "key": "lpn_pane_clear_override",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "Checked whether 'Clear' reads as an adjective (an obvious override).",
+   "readings": [
+    "remove the override"
+   ],
+   "disposition": "dismissed",
+   "resolution": "One reading in place: a button, where Clear is the standard command verb."
+  },
+  {
+   "key": "lpn_time_stat_averaged",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "'Avg', with its siblings 'Min' and 'Max', are abbreviations.",
+   "readings": [
+    "average"
+   ],
+   "disposition": "dismissed",
+   "resolution": "One reading: universal column abbreviations, and results columns keep headings narrow (CLAUDE.md, width is king)."
+  }
+ ]
+}
