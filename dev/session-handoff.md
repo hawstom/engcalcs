@@ -99,7 +99,7 @@ lines rather than appending corrections.
   tile counts at a 900 ms settle (basemap.js now waits for a pointable tile). Pre-existing and unrelated: `scale-publish-harness.js` (2 checks). The full `node dev/browser-pass/run.js` is green (1853/1853, 2026-10-04, Task 761); browser-pass specs are not in
   check_all.
 
-## STATE — 2026-10-09 (ninth session, Arizona time)
+## STATE — 2026-10-08 (ninth session, Arizona time)
 
 ### Master = see `git log -1 master`, pushed. Production: last confirmed pull edc78d01 (2026-10-07); confirm with the About box
 
@@ -137,7 +137,7 @@ first install wrote ~23 page-load rows per visit; now one), chore/protect-1008. 
 - G01 "Translate first": 26 Sonnet agents on feat/visit-dedupe for consent_body plus the two banner strings.
 - Task 714 (theming) is the next 75 build if nothing of his is waiting.
 
-### Traps met 2026-10-09 (ninth session)
+### Traps met 2026-10-08 (ninth session)
 
 - **A key renamed when its meaning flipped kept its old translations under a baselined hash**:
   lpn_settings_engine_native ("Use the built-in solver when possible") said "Solve with the EPANET solver"
