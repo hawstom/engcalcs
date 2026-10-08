@@ -74,6 +74,31 @@ ec_ur_expect('a five-field reach row is unclassified, and its asked tag is not i
 $new = ecUsageParseRow('reach', "2026-09-08T00:00:01Z{$T}es{$T}get{$T}Manning-Trap{$T}es{$T}en-us{$T}visitor");
 ec_ur_expect('a seven-field reach row carries served and asked',
     $new['classified'] === true && $new['served'] === 'es' && $new['asked'] === 'en-us');
+// The browser code (Tom, call F01, 2026-10-08): the field just before the bucket on a said-yes row,
+// exactly 16 lowercase hex characters, taken off the BACK so every front-counted column stays put.
+$A = '0123456789abcdef'; $B = 'fedcba9876543210';
+$coded = ecUsageParseRow('view', "2026-10-08T00:00:00Z{$T}Manning-Pipe-Flow{$T}en{$T}en-us{$T}fine{$T}{$A}{$T}visitor");
+ec_ur_expect('a coded said-yes view row yields its code, and its pointer is still the pointer',
+    $coded['code'] === $A && $coded['pointer'] === 'fine' && $coded['bucket'] === 'visitor',
+    json_encode($coded));
+$codedSig = ecUsageParseRow('signal', "2026-10-08T00:00:00Z{$T}Manning-Pipe-Flow{$T}en{$T}en-us{$T}outbound{$T}example.com/x{$T}{$A}{$T}visitor");
+ec_ur_expect('a coded signal row keeps its detail in place and its code apart',
+    $codedSig['code'] === $A && $codedSig['detail'] === 'example.com/x', json_encode($codedSig));
+$codedReach = ecUsageParseRow('reach', "2026-10-08T00:00:00Z{$T}en{$T}cookie{$T}Manning-Trap{$T}en{$T}en-us{$T}{$A}{$T}visitor");
+ec_ur_expect('a coded reach row is still classified, with served and asked where they were',
+    $codedReach['code'] === $A && $codedReach['classified'] === true && $codedReach['asked'] === 'en-us',
+    json_encode($codedReach));
+$codedSend = ecUsageParseRow('send', "2026-10-08T00:00:00Z{$T}contact{$T}en{$T}en-us{$T}{$A}{$T}visitor");
+ec_ur_expect('a coded contact-send row yields its code and keeps its asked tag',
+    $codedSend['code'] === $A && $codedSend['asked'] === 'en-us', json_encode($codedSend));
+ec_ur_expect('a said-yes row from before codes reads as no code, never as one',
+    $legacy['code'] === '' && $new['code'] === '');
+$visitHex = ecUsageParseRow('view', "2026-10-08T00:00:00Z{$T}Manning-Pipe-Flow{$T}en{$T}en-us{$T}{$A}{$T}visit");
+ec_ur_expect('a page-load row never yields a code, whatever sits before its bucket',
+    $visitHex['code'] === '' && $visitHex['pointer'] === $A);
+$upper = ecUsageParseRow('view', "2026-10-08T00:00:00Z{$T}Manning-Pipe-Flow{$T}en{$T}en-us{$T}fine{$T}0123456789ABCDEF{$T}visitor");
+ec_ur_expect('anything but 16 lowercase hex characters is not a code',
+    $upper['code'] === '');
 ec_ur_expect('a line that is not a row is refused rather than guessed at',
     ecUsageParseRow('view', 'not a log line') === null
     && ecUsageParseRow('view', '') === null
@@ -96,6 +121,12 @@ $rows = array(
         "2026-09-08T00:00:05Z{$T}Looped-Network{$T}en{$T}en-us{$T}coarse{$T}visit",
         "2026-09-08T00:00:09Z{$T}Looped-Network{$T}en{$T}en-us{$T}coarse{$T}visitor",
         "2026-09-08T00:00:10Z{$T}Manning-Pipe-Flow{$T}en{$T}en-us{$T}fine{$T}visitor",
+        // Coded rows (2026-10-08 on): browser A uses Manning-Pipe-Flow twice, browser B once, and
+        // B also uses Looped-Network. Mixed with the two uncoded said-yes rows just above.
+        "2026-09-09T00:00:01Z{$T}Manning-Pipe-Flow{$T}en{$T}en-us{$T}fine{$T}{$A}{$T}visitor",
+        "2026-09-09T00:00:02Z{$T}Manning-Pipe-Flow{$T}en{$T}en-us{$T}fine{$T}{$A}{$T}visitor",
+        "2026-09-09T00:00:03Z{$T}Manning-Pipe-Flow{$T}en{$T}en-us{$T}coarse{$T}{$B}{$T}visitor",
+        "2026-09-09T00:00:04Z{$T}Looped-Network{$T}en{$T}en-us{$T}fine{$T}{$B}{$T}visitor",
     ),
     'engcalcs-title.log' => array(
         "2026-09-08T00:00:06Z{$T}Looped-Network{$T}en{$T}en-us{$T}save{$T}visitor",
@@ -117,6 +148,7 @@ $rows = array(
     ),
     'engcalcs-contact-send.log' => array(
         "2026-09-01T00:00:04Z{$T}contact{$T}en{$T}en-us{$T}visitor",
+        "2026-09-09T00:00:05Z{$T}contact{$T}en{$T}en-us{$T}{$A}{$T}visitor",
     ),
 );
 foreach ($rows as $name => $lines) {
@@ -147,8 +179,16 @@ ec_ur_expect('pointer, PAGE LOADS: two unknown, one coarse, one fine -- and no e
     && !isset($byPtr['visit']['en-us']), json_encode($byPtr['visit']));
 
 $ct = ecUsageBucketTotals($data['calc']);
-ec_ur_expect('calculations: 2 people rows, 1 page-load row',
-    $ct === array('visitor' => 2, 'visit' => 1), json_encode($ct));
+ec_ur_expect('calculations: 6 said-yes rows (uses), 1 page-load row',
+    $ct === array('visitor' => 6, 'visit' => 1), json_encode($ct));
+$cb = ecUsageBrowsers($data['calc'], 'page');
+ec_ur_expect('calculations: 2 distinct browsers, 2 said-yes rows with no code',
+    $cb['total'] === 2 && $cb['uncoded'] === 2, json_encode($cb));
+ec_ur_expect('browsers by page: Manning-Pipe-Flow 2 (A twice, B once), Looped-Network 1 (B)',
+    $cb['by'] === array('Manning-Pipe-Flow' => 2, 'Looped-Network' => 1), json_encode($cb['by']));
+$vb = ecUsageBrowsers($data['view'], 'page');
+ec_ur_expect('views from before codes: uses, and not one browser',
+    $vb['total'] === 0 && $vb['uncoded'] === 3 && $vb['by'] === array(), json_encode($vb));
 
 $byField = ecUsageCountBy($data['naming'], 'field');
 ec_ur_expect('naming, PEOPLE: title 1, save 1, rename 1; PAGE LOADS: subtitle 1',
@@ -186,7 +226,7 @@ ec_ur_expect('a quiet day is a zero, not a gap the eye closes up',
     $daily['visitor']['2026-09-04'] === 0 && $daily['visit']['2026-09-04'] === 0);
 
 list($first, $last) = ecUsageSpan($data);
-ec_ur_expect('the span is read across all six logs', $first === '2026-09-01' && $last === '2026-09-08');
+ec_ur_expect('the span is read across all six logs', $first === '2026-09-01' && $last === '2026-09-09');
 
 $win = ecUsageWindow($data['view'], '2026-09-08', '2026-09-08');
 ec_ur_expect('the window filter keeps only that day', count($win) === 4);
@@ -245,6 +285,17 @@ function ec_ur_row($xp, $label) {
     return $out;
 }
 function ec_ur_q($s) { return "'" . $s . "'"; }
+/** The row labelled $label in the table that follows the h3 captioned $caption. */
+function ec_ur_row_in($xp, $caption, $label) {
+    $tds = $xp->query("//h3[normalize-space(text())=" . ec_ur_q($caption) . "]/following-sibling::table[1]"
+        . "//td[normalize-space(text())=" . ec_ur_q($label) . "]");
+    if (!$tds->length) { return null; }
+    $out = array();
+    foreach ($tds->item(0)->parentNode->childNodes as $c) {
+        if ($c->nodeName === 'td') { $out[] = trim($c->textContent); }
+    }
+    return $out;
+}
 
 /** One PHP file's source with every comment blanked, so prose about a construct is not the construct. */
 function ec_ur_code($path) {
@@ -260,15 +311,23 @@ function ec_ur_code($path) {
     return $out;
 }
 
-ec_ur_expect('the page prints Manning-Pipe-Flow as 2 people and 1 page load',
-    ec_ur_row($xp, 'Manning-Pipe-Flow') === array('Manning-Pipe-Flow', '2', '1'),
-    json_encode(ec_ur_row($xp, 'Manning-Pipe-Flow')));
-ec_ur_expect('the page prints Looped-Network as 0 people and 2 page loads',
-    ec_ur_row($xp, 'Looped-Network') === array('Looped-Network', '0', '2'),
-    json_encode(ec_ur_row($xp, 'Looped-Network')));
-ec_ur_expect('the contact funnel prints 1 view and 1 send, both in the people column',
-    ec_ur_row($xp, 'contact page viewed') === array('contact page viewed', '1', '0')
-    && ec_ur_row($xp, 'message sent') === array('message sent', '1', '0'),
+ec_ur_expect('pages looked at: Manning-Pipe-Flow is 0 browsers, 2 uses, 1 page load (uses from before codes)',
+    ec_ur_row_in($xp, 'Pages looked at', 'Manning-Pipe-Flow') === array('Manning-Pipe-Flow', '0', '2', '1'),
+    json_encode(ec_ur_row_in($xp, 'Pages looked at', 'Manning-Pipe-Flow')));
+ec_ur_expect('pages looked at: Looped-Network is 0 browsers, 0 uses, 2 page loads',
+    ec_ur_row_in($xp, 'Pages looked at', 'Looped-Network') === array('Looped-Network', '0', '0', '2'),
+    json_encode(ec_ur_row_in($xp, 'Pages looked at', 'Looped-Network')));
+ec_ur_expect('calculators used: Manning-Pipe-Flow is 2 browsers and 4 uses, 0 page loads',
+    ec_ur_row_in($xp, 'Calculators actually used', 'Manning-Pipe-Flow') === array('Manning-Pipe-Flow', '2', '4', '0'),
+    json_encode(ec_ur_row_in($xp, 'Calculators actually used', 'Manning-Pipe-Flow')));
+ec_ur_expect('calculators used: Looped-Network is 1 browser, 2 uses and 1 page load',
+    ec_ur_row_in($xp, 'Calculators actually used', 'Looped-Network') === array('Looped-Network', '1', '2', '1'),
+    json_encode(ec_ur_row_in($xp, 'Calculators actually used', 'Looped-Network')));
+ec_ur_expect('the calculation chart says 6 uses from 2 browsers plus 2 uses with no code',
+    strpos($html, 'SAID YES: 6 use(s), from 2 browser(s) plus 2 use(s) with no code') !== false);
+ec_ur_expect('the contact funnel: viewed 0 browsers 1 use; sent 1 browser 2 uses; no page loads',
+    ec_ur_row($xp, 'contact page viewed') === array('contact page viewed', '0', '1', '0')
+    && ec_ur_row($xp, 'message sent') === array('message sent', '1', '2', '0'),
     json_encode(array(ec_ur_row($xp, 'contact page viewed'), ec_ur_row($xp, 'message sent'))));
 
 // ---- 6. THE LEG THAT MATTERS MOST -------------------------------------------------------------
@@ -277,15 +336,18 @@ foreach ($xp->query('//th') as $th) { $heads[strtolower(trim($th->textContent))]
 ec_ur_expect('no table on the page has a total, sum, combined or all column',
     !isset($heads['total']) && !isset($heads['sum']) && !isset($heads['combined'])
     && !isset($heads['all']), implode(' | ', array_keys($heads)));
-// Each row of a bucket table must have the two counts side by side and nothing after them: a third
-// numeric column appearing later would be the sum arriving by the back door.
+// Each row of a bucket table carries the said-yes browsers and uses and the page loads, and nothing
+// after them: a fourth number appearing later would be the sum arriving by the back door.
 $wide = 0;
 foreach ($xp->query('//tbody/tr') as $tr) {
     $cells = 0;
     foreach ($tr->childNodes as $c) { if ($c->nodeName === 'td') { $cells++; } }
-    if ($cells > 3) { $wide++; }
+    if ($cells > 4) { $wide++; }
 }
-ec_ur_expect('no table row carries more than three cells', $wide === 0, "$wide row(s) do");
+ec_ur_expect('no table row carries more than four cells', $wide === 0, "$wide row(s) do");
+ec_ur_expect('the bucket columns are named browsers (said yes), uses (said yes), page loads (everyone else)',
+    isset($heads['browsers (said yes)']) && isset($heads['uses (said yes)'])
+    && isset($heads['page loads (everyone else)']), implode(' | ', array_keys($heads)));
 ec_ur_expect('the page states in words that the two are never added',
     strpos($html, 'never added together') !== false);
 ec_ur_expect('the page names its own source files, so every number is re-derivable',

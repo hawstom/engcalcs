@@ -11,10 +11,12 @@
  * ecLogBucketSuffix() in lib/config.inc.php:
  *
  *   'visitor'  a browser that said yes to the counting question. Those rows are DEDUPLICATED per
- *              page against the ec_seen cookie (per visit until 2026-10-07, per year since), so
- *              they count BROWSERS, each the first time it does that thing on that page.
+ *              (visit, page) against the ec_seen session cookie, so they count USES, once per
+ *              visit. Since 2026-10-08 (Tom, call F01) each also carries the browser's random code,
+ *              so DISTINCT CODES count BROWSERS. Rows from before then have no code: they count as
+ *              uses and never as browsers.
  *   'visit'    everybody else. Nothing may be stored to deduplicate against, so every page load
- *              writes a row. Those rows count PAGE LOADS.
+ *              writes a row. Those rows count PAGE LOADS, and carry no code.
  *
  * THE TWO ARE NEVER SUMMED. A total would have a denominator in two units and a numerator in
  * neither -- the symptom formmail.php's own comment records. So every aggregate here returns the
@@ -28,6 +30,11 @@
  *
  *   * the bucket is the LAST field when it is literally 'visit' or 'visitor'. A last field holding
  *     neither token is a row written before 2026-08-21, which is a legacy PEOPLE row.
+ *   * the browser code (2026-10-08) is the field just before the bucket, on a 'visitor' row only,
+ *     and only when it is exactly 16 lowercase hex characters. No older column can be that: the
+ *     pointer, the naming field and the event are closed sets, a language tag carries no 16-letter
+ *     hex run, and a signal detail always carries ':', '.' or '/'. Taken off the back like the
+ *     bucket, so every column counted from the front stays where it was.
  *   * the pointer (Task 285) is the fifth field of a view or calc row. A row with four fields left
  *     after the bucket predates it and reads as pointer unknown, never as fine.
  *   * the served/asked pair on the reach log is present only on rows with six fields left. A
@@ -52,7 +59,7 @@ function ecUsageLogKinds()
  * is not an ISO-8601 UTC stamp) -- guessing at an unreadable row would describe us rather than the
  * data, which is ec_manifest_row_span()'s reasoning in dev/scripts/log_archive_manifest.inc.php.
  *
- * @return array|null keys: ts, day, bucket, plus the kind's own named fields.
+ * @return array|null keys: ts, day, bucket, code ('' when none), plus the kind's own named fields.
  */
 function ecUsageParseRow($kind, $line)
 {
@@ -72,11 +79,15 @@ function ecUsageParseRow($kind, $line)
     } else {
         $bucket = 'visitor';
     }
+    $code = '';
+    if ($bucket === 'visitor' && count($f) > 2 && preg_match('/^[0-9a-f]{16}$/', $f[count($f) - 1])) {
+        $code = array_pop($f);
+    }
 
     $n = count($f);
     $get = function ($i) use ($f, $n) { return $i < $n ? $f[$i] : ''; };
 
-    $row = array('ts' => $ts, 'day' => substr($ts, 0, 10), 'bucket' => $bucket);
+    $row = array('ts' => $ts, 'day' => substr($ts, 0, 10), 'bucket' => $bucket, 'code' => $code);
 
     switch ($kind) {
         case 'reach':
@@ -202,6 +213,32 @@ function ecUsageBucketTotals(array $rows)
     return $out;
 }
 
+/**
+ * DISTINCT BROWSERS: the number of different codes among the said-yes rows, in total and per value
+ * of one field. Only 'visitor' rows carry a code, so this is a said-yes number by construction and
+ * there is nothing to add it to. Said-yes rows with no code (written before 2026-10-08, or in the
+ * moment before a new yes made its code) are counted in 'uncoded', never guessed at.
+ *
+ * @return array ['total' => n, 'uncoded' => n, 'by' => [value => n]]
+ */
+function ecUsageBrowsers(array $rows, $field = '')
+{
+    $all = array(); $by = array(); $uncoded = 0;
+    foreach ($rows as $r) {
+        if ($r['bucket'] !== 'visitor') { continue; }
+        if ($r['code'] === '') { $uncoded++; continue; }
+        $all[$r['code']] = true;
+        if ($field !== '') {
+            $v = isset($r[$field]) && $r[$field] !== '' ? $r[$field] : '(none)';
+            $by[$v][$r['code']] = true;
+        }
+    }
+    $counts = array();
+    foreach ($by as $v => $codes) { $counts[$v] = count($codes); }
+    arsort($counts);
+    return array('total' => count($all), 'uncoded' => $uncoded, 'by' => $counts);
+}
+
 /** Every day from $from to $to inclusive, as 'YYYY-MM-DD'. */
 function ecUsageDayRange($from, $to)
 {
@@ -313,8 +350,16 @@ function ecUsageNewSeries(array $fields)
         'bucketTotals' => array('visitor' => 0, 'visit' => 0),
         'daily'        => array('visitor' => array(), 'visit' => array()),
         'countBy'      => array(),
+        // Distinct browser codes, said-yes rows only (2026-10-08). Held as code => true sets, so
+        // memory is bounded by distinct browsers x distinct field values, never by rows.
+        'codes'        => array(),
+        'codesBy'      => array(),
+        'uncoded'      => 0,
     );
-    foreach ($fields as $f) { $s['countBy'][$f] = array('visitor' => array(), 'visit' => array()); }
+    foreach ($fields as $f) {
+        $s['countBy'][$f] = array('visitor' => array(), 'visit' => array());
+        $s['codesBy'][$f] = array();
+    }
     return $s;
 }
 
@@ -328,12 +373,24 @@ function ecUsageFeedSeries(array &$s, array $row, $from, $to)
     $s['bucketTotals'][$b]++;
     if (!isset($s['daily'][$b][$row['day']])) { $s['daily'][$b][$row['day']] = 0; }
     $s['daily'][$b][$row['day']]++;
+    $code = ($b === 'visitor' && isset($row['code'])) ? $row['code'] : '';
+    if ($b === 'visitor') {
+        if ($code === '') { $s['uncoded']++; } else { $s['codes'][$code] = true; }
+    }
     foreach (array_keys($s['countBy']) as $field) {
         $v = isset($row[$field]) ? $row[$field] : '';
         if ($v === '') { $v = '(none)'; }
         if (!isset($s['countBy'][$field][$b][$v])) { $s['countBy'][$field][$b][$v] = 0; }
         $s['countBy'][$field][$b][$v]++;
+        if ($code !== '') { $s['codesBy'][$field][$v][$code] = true; }
     }
+}
+
+/** Distinct browsers in a streamed series: in total, or for one value of one field. */
+function ecUsageSeriesBrowsers(array $s, $field = null, $value = null)
+{
+    if ($field === null) { return count($s['codes']); }
+    return isset($s['codesBy'][$field][$value]) ? count($s['codesBy'][$field][$value]) : 0;
 }
 
 /** A series' daily counts over a fixed day list, so a quiet day is a zero rather than a gap --

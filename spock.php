@@ -41,8 +41,9 @@
  * re-derivable by running it.
  *
  * THE TWO BUCKETS ARE NEVER SUMMED. See lib/UsageReport.lib.php for what each one counts. Every
- * table below has a BROWSERS (SAID YES) column and a PAGE LOADS column and no total column, and every chart
- * draws one bucket with its own scale.
+ * table below has two SAID YES columns (browsers: distinct codes; uses: rows) and a PAGE LOADS
+ * column, and no total column; every chart draws one bucket with its own scale. Browsers is a count
+ * inside the said-yes bucket, never added to anything (Tom, call F01, 2026-10-08).
  */
 
 require_once __DIR__ . '/lib/UsageReport.lib.php';
@@ -119,19 +120,18 @@ function ur_charts($series, $range, $caption, $source)
     echo '<h3>' . ur_h($caption) . '</h3>';
     echo '<p class="src">' . ur_h($source) . '</p>';
     echo '<div class="pair">';
-    // Since 2026-10-07 ec_seen lasts a year, so this series counts each said-yes browser the first
-    // time it does the thing on a page. Said so on the chart, so a falling line is not read as a
-    // falling audience.
-    echo '<figure><figcaption>BROWSERS (SAID YES): ' . $tot['visitor'] . ' row(s), each a browser'
-       . '&rsquo;s first time on that page (once a year since 2026-10-07, once a visit before), so a'
-       . ' falling line is fewer new browsers, not fewer users</figcaption>'
-       . ecUsageBarsSvg($daily['visitor'], 'new browsers', 'var(--people)') . '</figure>';
+    echo '<figure><figcaption>SAID YES: ' . $tot['visitor'] . ' use(s), from '
+       . ecUsageSeriesBrowsers($series) . ' browser(s)'
+       . ($series['uncoded'] ? ' plus ' . $series['uncoded'] . ' use(s) with no code' : '')
+       . '</figcaption>'
+       . ecUsageBarsSvg($daily['visitor'], 'uses (said yes)', 'var(--people)') . '</figure>';
     echo '<figure><figcaption>PAGE LOADS: ' . $tot['visit'] . ' row(s), one per page load</figcaption>'
        . ecUsageBarsSvg($daily['visit'], 'page loads', 'var(--loads)') . '</figure>';
     echo '</div>';
 }
 
-/** One table of a pre-built series' field tally, two bucket columns, no total column anywhere. */
+/** One table of a pre-built series' field tally: two said-yes columns (browsers, uses) and the
+ * page-load column. No total column anywhere. */
 function ur_table($series, $field, $caption, $source, $limit = 40)
 {
     $c = $series['countBy'][$field];
@@ -148,12 +148,14 @@ function ur_table($series, $field, $caption, $source, $limit = 40)
     echo '<h3>' . ur_h($caption) . '</h3>';
     echo '<p class="src">' . ur_h($source) . '</p>';
     if (!$keys) { echo '<p class="none">No rows in this window.</p>'; return; }
-    echo '<table><thead><tr><th>' . ur_h($field) . '</th><th>browsers (said yes)</th><th>page loads</th></tr></thead><tbody>';
+    echo '<table><thead><tr><th>' . ur_h($field) . '</th><th>browsers (said yes)</th><th>uses (said yes)</th>'
+       . '<th>page loads (everyone else)</th></tr></thead><tbody>';
     $n = 0;
     foreach ($keys as $k) {
-        if ($limit && $n++ >= $limit) { echo '<tr><td colspan="3" class="none">'
+        if ($limit && $n++ >= $limit) { echo '<tr><td colspan="4" class="none">'
             . (count($keys) - $limit) . ' further value(s) not listed</td></tr>'; break; }
-        echo '<tr><td>' . ur_h($k) . '</td><td>' . (isset($c['visitor'][$k]) ? $c['visitor'][$k] : 0)
+        echo '<tr><td>' . ur_h($k) . '</td><td>' . ecUsageSeriesBrowsers($series, $field, $k)
+           . '</td><td>' . (isset($c['visitor'][$k]) ? $c['visitor'][$k] : 0)
            . '</td><td>' . (isset($c['visit'][$k]) ? $c['visit'][$k] : 0) . '</td></tr>';
     }
     echo '</tbody></table>';
@@ -219,9 +221,11 @@ code { background: #f2f2f2; padding: 0 .2rem; }
 
 <div class="banner">
 <strong>The two columns are two different things and are never added together.</strong>
-<br><strong>BROWSERS (SAID YES)</strong> counts rows marked <code>visitor</code>: a browser that
-agreed to the counting question. Since 2026-10-07 each is counted the first time it does each
-thing on each page and not again for a year, so in any window these are new browsers on that page.
+<br><strong>SAID YES</strong> is the rows marked <code>visitor</code>, from browsers that agreed to
+the counting question. <strong>Uses</strong> counts those rows, once per page per visit.
+<strong>Browsers</strong> counts the different random codes among them, so one browser back on ten
+days is ten uses and one browser. Codes began on 2026-10-08; a said-yes row from before then is a
+use and never a browser.
 <br><strong>PAGE LOADS</strong> counts rows marked <code>visit</code>: everybody else. Nothing may
 be stored to deduplicate against, so every page load writes a row.
 <br>A sum of the two would have a denominator in two units and a numerator in neither. There is no
@@ -312,9 +316,9 @@ ur_charts($contactViews, $range, 'Contact page viewed per day',
 ur_charts($send, $range, 'Messages sent per day',
     'log/engcalcs-contact-send.log, field 1 (timestamp)');
 ?>
-<table><thead><tr><th>step</th><th>browsers (said yes)</th><th>page loads</th></tr></thead><tbody>
-<tr><td>contact page viewed</td><td><?= $contactTot['visitor'] ?></td><td><?= $contactTot['visit'] ?></td></tr>
-<tr><td>message sent</td><td><?= $sends['visitor'] ?></td><td><?= $sends['visit'] ?></td></tr>
+<table><thead><tr><th>step</th><th>browsers (said yes)</th><th>uses (said yes)</th><th>page loads (everyone else)</th></tr></thead><tbody>
+<tr><td>contact page viewed</td><td><?= ecUsageSeriesBrowsers($contactViews) ?></td><td><?= $contactTot['visitor'] ?></td><td><?= $contactTot['visit'] ?></td></tr>
+<tr><td>message sent</td><td><?= ecUsageSeriesBrowsers($send) ?></td><td><?= $sends['visitor'] ?></td><td><?= $sends['visit'] ?></td></tr>
 </tbody></table>
 <p class="none">Divide a column by itself, never across columns: the two buckets count different
 things and a ratio mixing them means nothing.</p>
