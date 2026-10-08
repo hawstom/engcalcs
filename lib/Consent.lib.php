@@ -32,7 +32,7 @@
 // first use of search."*
 //
 // **A SEPARATE RECORD, NOT A CHANGE TO THE BANNER ABOVE, AND THAT IS THE WHOLE POINT.** The banner
-// asks one question about one purpose (a digit per page, so a visit is not counted twice). Sending
+// asks one question about one purpose (counting: a digit per page and a random browser code). Sending
 // what somebody TYPED to a third-party geocoder is a different purpose entirely, and folding it in
 // would make consent_body false, need 26 retranslations, and force an EC_CONSENT_VERSION bump that
 // re-asks every existing visitor about analytics they already answered. So: its own cookie, its own
