@@ -21,7 +21,7 @@ hit takes you to a section and the rest walk its keys. A key already ruled does 
 it, and a fully ruled group says `all ruled` and can be skipped whole.
 Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
-## Questions from the translators  (1 to read @@ NEEDS RULING)
+## Questions from the translators  (5 to read @@ NEEDS RULING)
 
 **These are SHIPPED strings, already translated into 26 languages.** A wave-0
 reading or a translator found each one readable two ways, and no sprint launches while one is
@@ -37,6 +37,42 @@ is the one you meant. "The first one" is a complete answer.
   2. demands must be cut to {m} times what is entered for every junction to keep the pressure (right)
   **What this asks for:** which of the readings above you meant.
   *The proposal:* PROPOSED A: '⚠ At least one junction is below {pressure} at the demands as entered (a demand scale of 1). All junctions keep {pressure} only if demands are cut to a demand scale of {m} or less.' PROPOSED B: '⚠ The demands as entered (a demand scale of 1) leave at least one junction below {pressure}. The largest demand scale that keeps every junction at {pressure} or above is {m}.' B paralle...
+  @@ NEEDS RULING
+
+### from sprint 1008c-wave0
+
+- **`lpn_export_table_current`**
+  > Current
+  *The finding:* 'Current' is a radio option under both Tables and Scenarios (js/looped-network.js:29716-29720). In a hydraulics tool a translator can read it as electric or water current, or as 'present time', rather than 'the one now selected'. 'All' pairs with it.
+  1. the table or scenario now selected
+  2. current, as flow of water or electricity
+  3. up to date, not out of date
+  **What this asks for:** which of the readings above you meant.
+  *The proposal:* PROPOSED syn: 'Current' (this radio, under Tables and Scenarios) means the one now selected, as opposed to All; it is never a flow or electric current. Alternative English: 'Selected only' / 'All'.
+  @@ NEEDS RULING
+- **`lpn_file_export_workspace_tip`**
+  > Download a small file holding where your boxes sit, their sizes, which are open or docked, and your pane and column sizes, plus the reading preferences of this page. Your projects, project settings and cookies (language, consent, units) are not in it. Load it on another screen or browser with File, Import, Workspace.
+  *The finding:* 'the reading preferences of this page' is unexplained jargon: a translator cannot tell whether it means language, text size, or display toggles such as the run box, the area hint and the hover card. Same phrase in lpn_file_import_workspace_tip.
+  1. language or font settings for reading text
+  2. display toggles the visitor set, such as whether help bubbles and the hover card are shown
+  **What this asks for:** a WORDING ruling -- is the English above right, or say what it should say.
+  *The proposal:* PROPOSED English (both keys): replace 'the reading preferences of this page' with 'the display options of this page, such as which help bubbles and the hover card are shown'.
+  @@ NEEDS RULING
+- **`lpn_pane_copy_heads`**
+  > Copy with headings
+  *The finding:* 'headings' does not say which: the column headings the table shows, or row and column headings. Right-click menu item in a Tables pane (js/looped-network.js:28892); paneCopyTsv adds one row, the column headings with unit.
+  1. copy the selected cells with their column headings as a first row
+  2. copy the selected cells with both row and column headings
+  **What this asks for:** a WORDING ruling -- is the English above right, or say what it should say.
+  *The proposal:* PROPOSED English: 'Copy with column headings'
+  @@ NEEDS RULING
+- **`lpn_settings_hover_card_tip`**
+  > Rest the pointer on a node, link or customer to see its label as specified in Settings at any scale, fit or not. This is a setting for this browser, not for the project.
+  *The finding:* 'at any scale, fit or not' leaves 'fit' with no subject: fit what? The setting makes the hover card show the label even when the on-map label was dropped for lack of room (js/looped-network.js:51225). 'fit' also collides with 'zoom to fit'.
+  1. whether or not the label fits on the map at the current zoom
+  2. whether or not the map is zoomed to fit the network
+  **What this asks for:** a WORDING ruling -- is the English above right, or say what it should say.
+  *The proposal:* PROPOSED English: 'Rest the pointer on a node, link or customer to see its label as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project.'
   @@ NEEDS RULING
 
 ## Synonym entries to approve  (12, 10 to read @@ NEEDS RULING)
@@ -190,7 +226,7 @@ never edits a synonym.
   > Download a table as the Tables pane shows it. Several tables come as one zip file of CSV files, with a file for each library their IDs refer to.
   @@ NEEDS RULING
 - **`lpn_file_export_dxf_tip`**
-  > Download this network for AutoCAD and other CAD programs: pipes, pumps, and valves as polylines, and every element as a block whose attributes carry its ID and property values in the project units.
+  > Download this network for AutoCAD and other CAD programs: pipes, pumps, and valves as polylines, and every asset as a block whose attributes carry its ID and property values in the project units.
   @@ NEEDS RULING
 - **`lpn_file_export_item_csv`**
   > CSV file…
@@ -260,7 +296,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**114 still to read**, of 117 new keys across 13 unmerged branch(es).
+**119 still to read**, of 122 new keys across 13 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -271,9 +307,9 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/calls-1008c (`ba4703ae`) — adds no English strings
+### chore/calls-1008c (`4903eff4`) — adds no English strings
 
-### feat/bentley-interop (`2cfebc47`) — 66 new, 66 to read @@ NEEDS RULING
+### feat/bentley-interop (`6b92ff72`) — 71 new, 71 to read @@ NEEDS RULING
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -284,6 +320,9 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_change_type_create_new`**
   > Create new assets
   @@ NEEDS RULING
+- **`lpn_change_type_customers_left`**
+  > A customer cannot be assigned per scenario, so the demand of these customers stays with the old junction and is not in this scenario's solve:
+  @@ NEEDS RULING
 - **`lpn_change_type_line_alternative`**
   > {id}: {property} {value}, in alternative {alternative}
   @@ NEEDS RULING
@@ -291,13 +330,22 @@ build for that would be a gate nobody keeps. Refresh it with
   > The new assets cannot hold these values. The old assets keep them:
   @@ NEEDS RULING
 - **`lpn_change_type_old_controls`**
-  > These controls and rules name an old asset, which is inactive in this scenario, so they are omitted from this scenario's run:
+  > These controls and rules name an old asset, which is inactive in this scenario, so they are left out of this scenario's run and its .inp export:
   @@ NEEDS RULING
 - **`lpn_change_type_scenario_ask`**
   > Current scenario is not Base. Create new assets? The selected assets become inactive in this scenario.
   @@ NEEDS RULING
 - **`lpn_change_type_switch_base`**
   > Switch to Base
+  @@ NEEDS RULING
+- **`lpn_control_inactive_note`**
+  > These controls refer to an asset that is inactive in this scenario, so they were ignored in this run: {ids}
+  @@ NEEDS RULING
+- **`lpn_inp_export_flat_customers_inactive`**
+  > {n} of these customers are assigned to a junction that is inactive in this scenario, so their demand is not in the file.
+  @@ NEEDS RULING
+- **`lpn_inp_export_flat_inactive_controls`**
+  > These controls and rules name an asset that is inactive in this scenario, so they are not in the file: {ids}
   @@ NEEDS RULING
 - **`lpn_pane_inactive_show`**
   > Include inactive topology
@@ -310,6 +358,9 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 - **`lpn_pane_scn_ov_only`**
   > Overrides only
+  @@ NEEDS RULING
+- **`lpn_rule_inactive_note`**
+  > These rules refer to an asset that is inactive in this scenario, so they were ignored in this run: {ids}
   @@ NEEDS RULING
 - **`lpn_scenario_delete_has_children`**
   > The scenario {name} cannot be deleted while other scenarios inherit from it: {list}. Delete those first, or give them another parent.
