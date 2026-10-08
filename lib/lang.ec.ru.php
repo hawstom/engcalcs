@@ -1755,7 +1755,6 @@ $ec_lang['lpn_file_import_inp']='Импорт файла EPANET…';
 $ec_lang['lpn_file_import_inp_tip']='Считывает сеть из файла EPANET — текстового файла .inp или файла .net, который сохраняет EPANET, — и сохраняет её в этом браузере как новый проект.';
 // The other direction (Task 281). A DOWNLOAD, so the word is Export rather than Save: this page
 // keeps no handle on an `.inp` and never writes back to one.
-$ec_lang['lpn_file_export_inp']='Экспортировать файл EPANET…';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_file_export_inp_tip']='Записать эту сеть в виде файла EPANET .inp и скачать его. Введённые вами числа записываются точно так, как вы их ввели. Всё, что формат .inp не может хранить, будет затем перечислено для вас.';
 $ec_lang['lpn_status_inp_exported']='Экспортировано: {file}.';
@@ -2682,9 +2681,7 @@ $ec_lang['lpn_scenario_preset_flow_max_tip']='Калибровка по пров
 $ec_lang['lpn_scenario_preset_average_day']='4. Средние сутки';
 $ec_lang['lpn_scenario_preset_average_day_tip']='Множитель расхода отбора 1: каждый расход отбора берётся как введён, и он считается расходом отбора в средние сутки.';
 $ec_lang['lpn_scenario_preset_max_day']='5. Максимальные сутки';
-$ec_lang['lpn_scenario_preset_max_day_tip']='Множитель расхода отбора 2,0 от среднесуточного, значение-заполнитель. У большинства систем он лежит между 1,2 и 3,0 (National Research Council, 2006). Задайте значение для вашей системы в разделе «Настройки», «Расчёт», «Гидравлика», «Множитель расхода отбора».';
 $ec_lang['lpn_scenario_preset_peak_hour']='6. Час пик';
-$ec_lang['lpn_scenario_preset_peak_hour_tip']='Множитель расхода отбора 3,0 от среднесуточного, значение-заполнитель. У большинства систем он лежит между 3,0 и 6,0 (National Research Council, 2006). Задайте значение для вашей системы в разделе «Настройки», «Расчёт», «Гидравлика», «Множитель расхода отбора».';
 $ec_lang['lpn_scenario_preset_fire_max_day']='7. Пожар плюс максимальные сутки';
 $ec_lang['lpn_scenario_preset_fire_max_day_tip']='Расход отбора в максимальные сутки (множитель 2,0). Запустите в этом сценарии анализ противопожарного расхода: он добавляет противопожарный расход в каждом узле сверх этого расхода отбора.';
 $ec_lang['lpn_delete_drops_overrides']='Удаление этого элемента также удалит {n} значений, которые ваши сценарии хранят для него. Продолжить?';

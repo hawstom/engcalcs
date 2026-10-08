@@ -1757,7 +1757,6 @@ $ec_lang['lpn_file_import_inp']='Impor berkas EPANET…';
 $ec_lang['lpn_file_import_inp_tip']='Membaca jaringan dari berkas EPANET, baik berkas teks .inp maupun berkas .net yang disimpan EPANET, lalu menyimpannya di peramban ini sebagai proyek baru.';
 // The other direction (Task 281). A DOWNLOAD, so the word is Export rather than Save: this page
 // keeps no handle on an `.inp` and never writes back to one.
-$ec_lang['lpn_file_export_inp']='Ekspor berkas EPANET…';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_file_export_inp_tip']='Tulis jaringan ini sebagai berkas EPANET .inp dan unduh. Angka yang Anda ketik ditulis persis seperti saat Anda mengetiknya. Apa pun yang tidak dapat ditampung format .inp akan didaftarkan untuk Anda setelahnya.';
 $ec_lang['lpn_status_inp_exported']='{file} berhasil diekspor.';
@@ -2685,9 +2684,7 @@ $ec_lang['lpn_scenario_preset_flow_max_tip']='Kalibrasi uji aliran untuk jaringa
 $ec_lang['lpn_scenario_preset_average_day']='4. Hari rata-rata';
 $ec_lang['lpn_scenario_preset_average_day_tip']='Pengali kebutuhan 1: setiap kebutuhan sesuai yang dimasukkan, yang dianggap sebagai kebutuhan hari rata-rata.';
 $ec_lang['lpn_scenario_preset_max_day']='5. Hari puncak';
-$ec_lang['lpn_scenario_preset_max_day_tip']='Pengali kebutuhan 2,0 kali hari rata-rata, nilai sementara. Sebagian besar sistem berada di antara 1,2 dan 3,0 (National Research Council, 2006). Atur nilai sistem Anda sendiri di Pengaturan, Perhitungan, Hidrolika, Pengali kebutuhan.';
 $ec_lang['lpn_scenario_preset_peak_hour']='6. Jam puncak';
-$ec_lang['lpn_scenario_preset_peak_hour_tip']='Pengali kebutuhan 3,0 kali hari rata-rata, nilai sementara. Sebagian besar sistem berada di antara 3,0 dan 6,0 (National Research Council, 2006). Atur nilai sistem Anda sendiri di Pengaturan, Perhitungan, Hidrolika, Pengali kebutuhan.';
 $ec_lang['lpn_scenario_preset_fire_max_day']='7. Kebakaran ditambah hari puncak';
 $ec_lang['lpn_scenario_preset_fire_max_day_tip']='Kebutuhan hari puncak (pengali 2,0). Jalankan Analisis debit kebakaran dalam skenario ini: analisis menambahkan debit kebakaran di setiap simpul di atas kebutuhan ini.';
 $ec_lang['lpn_delete_drops_overrides']='Menghapus elemen ini juga akan membuang {n} nilai yang dimiliki skenario Anda untuknya. Lanjutkan?';

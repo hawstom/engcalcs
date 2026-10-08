@@ -1756,7 +1756,6 @@ $ec_lang['lpn_file_import_inp']='Uvezi EPANET datoteku…';
 $ec_lang['lpn_file_import_inp_tip']='Učitajte mrežu iz EPANET datoteke, bilo iz tekstualne .inp datoteke ili .net datoteke koju sprema EPANET, i spremite je u ovom pregledniku kao novi projekt.';
 // The other direction (Task 281). A DOWNLOAD, so the word is Export rather than Save: this page
 // keeps no handle on an `.inp` and never writes back to one.
-$ec_lang['lpn_file_export_inp']='Izvezi EPANET datoteku…';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_file_export_inp_tip']='Zapišite ovu mrežu kao EPANET .inp datoteku i preuzmite je. Brojevi koje ste upisali zapisuju se točno onako kako ste ih upisali. Sve što .inp format ne može sadržavati navedeno je za vas nakon toga.';
 $ec_lang['lpn_status_inp_exported']='Izvezeno {file}.';
@@ -2682,9 +2681,7 @@ $ec_lang['lpn_scenario_preset_flow_max_tip']='Kalibracija testom protoka za proj
 $ec_lang['lpn_scenario_preset_average_day']='4. Prosječan dan';
 $ec_lang['lpn_scenario_preset_average_day_tip']='Množitelj potražnje 1: svaka potražnja onakva kakva je upisana, a pretpostavlja se da je to potražnja prosječnog dana.';
 $ec_lang['lpn_scenario_preset_max_day']='5. Maksimalan dan';
-$ec_lang['lpn_scenario_preset_max_day_tip']='Množitelj potražnje 2,0 puta prosječni dan, privremena vrijednost. Većina sustava nalazi se između 1,2 i 3,0 (National Research Council, 2006). Vrijednost za svoj sustav postavite u Postavke, Izračun, Hidraulika, Množitelj potražnje.';
 $ec_lang['lpn_scenario_preset_peak_hour']='6. Vršni sat';
-$ec_lang['lpn_scenario_preset_peak_hour_tip']='Množitelj potražnje 3,0 puta prosječni dan, privremena vrijednost. Većina sustava nalazi se između 3,0 i 6,0 (National Research Council, 2006). Vrijednost za svoj sustav postavite u Postavke, Izračun, Hidraulika, Množitelj potražnje.';
 $ec_lang['lpn_scenario_preset_fire_max_day']='7. Požar uz maksimalan dan';
 $ec_lang['lpn_scenario_preset_fire_max_day_tip']='Potražnja maksimalnog dana (množitelj 2,0). U ovom scenariju pokrenite Analizu protupožarnog protoka: ona dodaje protupožarni protok na svakom čvoru povrh ove potražnje.';
 $ec_lang['lpn_delete_drops_overrides']='Brisanje ovog elementa također odbacuje {n} vrijednosti koje vaši scenariji imaju za njega. Nastaviti?';

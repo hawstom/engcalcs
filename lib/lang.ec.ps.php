@@ -1756,7 +1756,6 @@ $ec_lang['lpn_file_import_inp']='د EPANET فایل دننه کول…';
 $ec_lang['lpn_file_import_inp_tip']='د EPANET فایل نه یوه شبکه ولولئ، که .inp متني فایل وي یا هغه .net فایل چې EPANET یې ساتي، او یې د نوې پروژې په توګه پدې براوزر کې وساتئ.';
 // The other direction (Task 281). A DOWNLOAD, so the word is Export rather than Save: this page
 // keeps no handle on an `.inp` and never writes back to one.
-$ec_lang['lpn_file_export_inp']='د EPANET فایل صادرول…';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_file_export_inp_tip']='دا شبکه د EPANET .inp فایل په توګه ولیکئ او ډاونلوډ یې کړئ. هغه شمېرې چې تاسو لیکلي، لکه څنګه چې تاسو یې لیکلي هماغسې لیکل کیږي. هرڅه چې .inp فارمېټ نشي ساتلی، وروسته تاسو ته لیست کیږي.';
 $ec_lang['lpn_status_inp_exported']='{file} صادر شو.';
@@ -2682,9 +2681,7 @@ $ec_lang['lpn_scenario_preset_flow_max_tip']='د ډیزاین شبکې لپار�
 $ec_lang['lpn_scenario_preset_average_day']='4. منځنۍ ورځ';
 $ec_lang['lpn_scenario_preset_average_day_tip']='د تقاضا ضریب 1: هره تقاضا لکه څنګه چې داخله شوې، چې د منځنۍ ورځې تقاضا ګڼل کیږي.';
 $ec_lang['lpn_scenario_preset_max_day']='5. اعظمي ورځ';
-$ec_lang['lpn_scenario_preset_max_day_tip']='د تقاضا ضریب د منځنۍ ورځې 2.0 چنده، یو ځای‌ناستی ارزښت. ډیری سیسټمونه د 1.2 او 3.0 ترمنځ وي (National Research Council, 2006). د خپل سیسټم ارزښت په Settings، Calculation، Hydraulics، Demand multiplier کې وټاکئ.';
 $ec_lang['lpn_scenario_preset_peak_hour']='6. د لوړې تقاضا ساعت';
-$ec_lang['lpn_scenario_preset_peak_hour_tip']='د تقاضا ضریب د منځنۍ ورځې 3.0 چنده، یو ځای‌ناستی ارزښت. ډیری سیسټمونه د 3.0 او 6.0 ترمنځ وي (National Research Council, 2006). د خپل سیسټم ارزښت په Settings، Calculation، Hydraulics، Demand multiplier کې وټاکئ.';
 $ec_lang['lpn_scenario_preset_fire_max_day']='7. اور او اعظمي ورځ';
 $ec_lang['lpn_scenario_preset_fire_max_day_tip']='د اعظمي ورځې تقاضا (ضریب 2.0). پدې سناریو کې د اور د بهاو تحلیل چلوئ: دا په هر جنکشن کې د اور بهاو پر دې تقاضا زیاتوي.';
 $ec_lang['lpn_delete_drops_overrides']='د دې عنصر ړنګول هم هغه {n} ارزښتونه غورځوي چې ستاسو سناریوګانې ورته لري. دوام ورکړم؟';

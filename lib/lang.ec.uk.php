@@ -1791,7 +1791,6 @@ $ec_lang['lpn_file_import_inp']='Імпортувати файл EPANET…';
 $ec_lang['lpn_file_import_inp_tip']='Зчитує мережу з файлу EPANET — текстового файлу .inp або файлу .net, який зберігає EPANET, — і зберігає її в цьому браузері як новий проєкт.';
 // The other direction (Task 281). A DOWNLOAD, so the word is Export rather than Save: this page
 // keeps no handle on an `.inp` and never writes back to one.
-$ec_lang['lpn_file_export_inp']='Експортувати файл EPANET…';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_file_export_inp_tip']='Записати цю мережу як файл EPANET .inp і завантажити його. Введені вами числа записуються точно так, як ви їх ввели. Усе, що формат .inp не може зберегти, буде перелічено після цього.';
 $ec_lang['lpn_status_inp_exported']='Експортовано {file}.';
@@ -2737,9 +2736,7 @@ $ec_lang['lpn_scenario_preset_flow_max_tip']='Калібрування за те
 $ec_lang['lpn_scenario_preset_average_day']='4. Середня доба';
 $ec_lang['lpn_scenario_preset_average_day_tip']='Множник споживання 1: кожне споживання таке, як введено, і вважається споживанням середньої доби.';
 $ec_lang['lpn_scenario_preset_max_day']='5. Максимальна доба';
-$ec_lang['lpn_scenario_preset_max_day_tip']='Множник споживання 2,0 від середньої доби, умовне значення. Більшість систем потрапляє між 1,2 і 3,0 (Національна дослідницька рада США, 2006). Задайте власне значення для вашої системи в розділі Налаштування, Розрахунок, Гідравліка, Множник витрати.';
 $ec_lang['lpn_scenario_preset_peak_hour']='6. Пікова година';
-$ec_lang['lpn_scenario_preset_peak_hour_tip']='Множник споживання 3,0 від середньої доби, умовне значення. Більшість систем потрапляє між 3,0 і 6,0 (Національна дослідницька рада США, 2006). Задайте власне значення для вашої системи в розділі Налаштування, Розрахунок, Гідравліка, Множник витрати.';
 $ec_lang['lpn_scenario_preset_fire_max_day']='7. Пожежа плюс максимальна доба';
 $ec_lang['lpn_scenario_preset_fire_max_day_tip']='Споживання максимальної доби (множник 2,0). Запустіть Аналіз витрати на пожежогасіння в цьому сценарії: він додає витрату на пожежогасіння в кожному вузлі до цього споживання.';
 $ec_lang['lpn_delete_drops_overrides']='Видалення цього елемента також відкине {n} значень, які ваші сценарії зберігають для нього. Продовжити?';

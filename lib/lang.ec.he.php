@@ -1756,7 +1756,6 @@ $ec_lang['lpn_file_import_inp']='ייבוא קובץ EPANET…';
 $ec_lang['lpn_file_import_inp_tip']='קוראים רשת מתוך קובץ EPANET, בין אם קובץ הטקסט ‎.inp ובין אם קובץ ה-‎.net ש-EPANET שומר, ושומרים אותה בדפדפן זה כפרויקט חדש.';
 // The other direction (Task 281). A DOWNLOAD, so the word is Export rather than Save: this page
 // keeps no handle on an `.inp` and never writes back to one.
-$ec_lang['lpn_file_export_inp']='ייצוא קובץ EPANET…';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_file_export_inp_tip']='כתיבת רשת זו כקובץ EPANET‏ ‎.inp והורדתו. מספרים שהקלדתם נכתבים בדיוק כפי שהקלדתם אותם. כל מה שתבנית ה-‎.inp אינה יכולה להחזיק מפורט עבורכם לאחר מכן.';
 $ec_lang['lpn_status_inp_exported']='יוצא {file}.';
@@ -2682,9 +2681,7 @@ $ec_lang['lpn_scenario_preset_flow_max_tip']='כיול מבחן ספיקה לר�
 $ec_lang['lpn_scenario_preset_average_day']='4. יום ממוצע';
 $ec_lang['lpn_scenario_preset_average_day_tip']='מכפיל דרישה 1: כל דרישה כפי שהוזנה, הנחשבת לדרישת יום ממוצע.';
 $ec_lang['lpn_scenario_preset_max_day']='5. יום מרבי';
-$ec_lang['lpn_scenario_preset_max_day_tip']='מכפיל דרישה 2.0 כפול יום ממוצע, ערך מציין מקום. רוב המערכות נמצאות בין 1.2 ל-3.0 (National Research Council, 2006). קבעו את הערך של המערכת שלכם בהגדרות, חישוב, הידראוליקה, מכפיל דרישה.';
 $ec_lang['lpn_scenario_preset_peak_hour']='6. שעת שיא';
-$ec_lang['lpn_scenario_preset_peak_hour_tip']='מכפיל דרישה 3.0 כפול יום ממוצע, ערך מציין מקום. רוב המערכות נמצאות בין 3.0 ל-6.0 (National Research Council, 2006). קבעו את הערך של המערכת שלכם בהגדרות, חישוב, הידראוליקה, מכפיל דרישה.';
 $ec_lang['lpn_scenario_preset_fire_max_day']='7. כיבוי אש בתוספת יום מרבי';
 $ec_lang['lpn_scenario_preset_fire_max_day_tip']='דרישת יום מרבי (מכפיל 2.0). הריצו בתרחיש זה ניתוח ספיקת כיבוי אש: הוא מוסיף את ספיקת כיבוי האש בכל צומת על גבי דרישה זו.';
 $ec_lang['lpn_delete_drops_overrides']='מחיקת אלמנט זה מוחקת גם {n} ערכים שהתרחישים שלכם מחזיקים עבורו. להמשיך?';

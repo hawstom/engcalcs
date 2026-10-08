@@ -696,3 +696,6 @@ red builds on 2026-09-15 before anybody wrote it down.
 - 0|770| CLOSED 2026-10-06: a ⚠ on unreasonable values in Tables and Properties, zero false alarms on the seven examples (`dev/value-warning.md`). Tom: "Merge." The D-W 10 mm and H-W C 200 limits are CC's numbers, unruled. `value-warning-browser-harness.js`.
 - 0|774| CLOSED 2026-10-06: Description in Properties trimmed every keystroke (ate spaces) and its commit refreshed nothing; no length limit existed. Defect track. `description-field-browser-harness.js`.
 - 0|769| CLOSED 2026-10-06: Change type for nodes and links, the key line "ID: Lost entry" listing what is lost, one undo. Tom: "Merge." `feat/asset-type`.
+- 0|768| CLOSED 2026-10-07 (`feat/feedback`, Tom: "Merge."): "Something wrong here?" opens a box with canned picks, optional comment and email; Send is the second click.
+- 0|771| CLOSED 2026-10-07 (`feat/survey-code`, Tom: "Merge."): survey points as a script, the Description naming an asset or a pipe vertex; JPN<point> joins a tee.
+- 0|780| CLOSED 2026-10-07 (`feat/epp`, Tom: "Do it"): Save writes `.epp`; Open reads `.epp`, `.lwn` and `.json` forever. The file's content and `format` key are unchanged; `LPN_FILE_EXT` is `.epp`, `LPN_FILE_EXT_LWN` is read-only.

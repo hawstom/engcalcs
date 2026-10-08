@@ -1755,7 +1755,6 @@ $ec_lang['lpn_file_import_inp']='导入 EPANET 文件…';
 $ec_lang['lpn_file_import_inp_tip']='从 EPANET 文件中读取管网，可以是 .inp 文本文件，也可以是 EPANET 保存的 .net 文件，并将其作为新项目保存在本浏览器中。';
 // The other direction (Task 281). A DOWNLOAD, so the word is Export rather than Save: this page
 // keeps no handle on an `.inp` and never writes back to one.
-$ec_lang['lpn_file_export_inp']='导出 EPANET 文件…';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_file_export_inp_tip']='将此管网写入 EPANET .inp 文件并下载。您输入的数字会按原样精确写出。.inp 格式无法保存的内容会在之后列给您看。';
 $ec_lang['lpn_status_inp_exported']='已导出 {file}。';
@@ -2681,9 +2680,7 @@ $ec_lang['lpn_scenario_preset_flow_max_tip']='针对设计管网在所报告的�
 $ec_lang['lpn_scenario_preset_average_day']='4. 平均日';
 $ec_lang['lpn_scenario_preset_average_day_tip']='需水量倍数为 1：每一处需水量均按输入值计，视为平均日需水量。';
 $ec_lang['lpn_scenario_preset_max_day']='5. 最大日';
-$ec_lang['lpn_scenario_preset_max_day_tip']='需水量倍数为平均日的 2.0 倍，仅为占位数值。多数系统介于 1.2 至 3.0 之间（National Research Council, 2006）。请在“设置”“计算”“水力计算”中设置您自己系统的需水量倍数。';
 $ec_lang['lpn_scenario_preset_peak_hour']='6. 高峰时段';
-$ec_lang['lpn_scenario_preset_peak_hour_tip']='需水量倍数为平均日的 3.0 倍，仅为占位数值。多数系统介于 3.0 至 6.0 之间（National Research Council, 2006）。请在“设置”“计算”“水力计算”中设置您自己系统的需水量倍数。';
 $ec_lang['lpn_scenario_preset_fire_max_day']='7. 消防加最大日';
 $ec_lang['lpn_scenario_preset_fire_max_day_tip']='最大日需水量（倍数 2.0）。请在此方案中运行消防流量分析：它会在此需水量之上，在每个节点叠加消防流量。';
 $ec_lang['lpn_delete_drops_overrides']='删除此元件也会丢弃您各方案中为其保存的 {n} 个数值。是否继续？';

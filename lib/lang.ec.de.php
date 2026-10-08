@@ -1756,7 +1756,6 @@ $ec_lang['lpn_file_import_inp']='EPANET-Datei importieren…';
 $ec_lang['lpn_file_import_inp_tip']='Liest ein Netz aus einer EPANET-Datei, entweder der Textdatei .inp oder der von EPANET gespeicherten Datei .net, und speichert es in diesem Browser als neues Projekt.';
 // The other direction (Task 281). A DOWNLOAD, so the word is Export rather than Save: this page
 // keeps no handle on an `.inp` and never writes back to one.
-$ec_lang['lpn_file_export_inp']='EPANET-Datei exportieren…';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_file_export_inp_tip']='Schreibt dieses Netz als EPANET-.inp-Datei und lädt sie herunter. Von Ihnen eingegebene Zahlen werden genau so geschrieben, wie Sie sie eingegeben haben. Alles, was das .inp-Format nicht abbilden kann, wird Ihnen anschließend aufgelistet.';
 $ec_lang['lpn_status_inp_exported']='{file} exportiert.';
@@ -2683,9 +2682,7 @@ $ec_lang['lpn_scenario_preset_flow_max_tip']='Kalibrierung des Durchflusstests f
 $ec_lang['lpn_scenario_preset_average_day']='4. Mittlerer Tag';
 $ec_lang['lpn_scenario_preset_average_day_tip']='Entnahmefaktor 1: jede Entnahme wie eingegeben, die als mittlere Tagesentnahme gilt.';
 $ec_lang['lpn_scenario_preset_max_day']='5. Maximaltag';
-$ec_lang['lpn_scenario_preset_max_day_tip']='Entnahmefaktor 2,0 mal mittlere Tagesentnahme, ein Platzhalterwert. Die meisten Systeme liegen zwischen 1,2 und 3,0 (National Research Council, 2006). Den Wert Ihres eigenen Systems legen Sie unter Einstellungen, Berechnung, Hydraulik, Entnahmefaktor fest.';
 $ec_lang['lpn_scenario_preset_peak_hour']='6. Spitzenstunde';
-$ec_lang['lpn_scenario_preset_peak_hour_tip']='Entnahmefaktor 3,0 mal mittlere Tagesentnahme, ein Platzhalterwert. Die meisten Systeme liegen zwischen 3,0 und 6,0 (National Research Council, 2006). Den Wert Ihres eigenen Systems legen Sie unter Einstellungen, Berechnung, Hydraulik, Entnahmefaktor fest.';
 $ec_lang['lpn_scenario_preset_fire_max_day']='7. Löschwasser plus Maximaltag';
 $ec_lang['lpn_scenario_preset_fire_max_day_tip']='Entnahme am Maximaltag (Faktor 2,0). Führen Sie in diesem Szenario die Löschwasserprüfung aus: Sie addiert die Löschwassermenge an jedem Entnahmeknoten zu dieser Entnahme.';
 $ec_lang['lpn_delete_drops_overrides']='Beim Löschen dieses Elements gehen auch {n} Werte verloren, die Ihre Szenarien dafür enthalten. Fortfahren?';

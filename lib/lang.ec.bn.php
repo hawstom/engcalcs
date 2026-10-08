@@ -1765,7 +1765,6 @@ $ec_lang['lpn_file_import_inp']='EPANET ফাইল আমদানি কর�
 $ec_lang['lpn_file_import_inp_tip']='একটি EPANET ফাইল থেকে একটি নেটওয়ার্ক পড়ুন, .inp টেক্সট ফাইল বা EPANET যে .net ফাইল সংরক্ষণ করে তার যেকোনোটি, এবং এই ব্রাউজারে এটি একটি নতুন প্রকল্প হিসেবে সংরক্ষণ করুন।';
 // The other direction (Task 281). A DOWNLOAD, so the word is Export rather than Save: this page
 // keeps no handle on an `.inp` and never writes back to one.
-$ec_lang['lpn_file_export_inp']='EPANET ফাইল এক্সপোর্ট করুন…';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_file_export_inp_tip']='এই নেটওয়ার্কটি একটি EPANET .inp ফাইল হিসেবে লিখুন এবং ডাউনলোড করুন। আপনি যা লিখেছেন তা ঠিক সেভাবেই লেখা হয়। .inp ফরম্যাট যা ধারণ করতে পারে না তা পরে আপনাকে তালিকা আকারে দেখানো হয়।';
 $ec_lang['lpn_status_inp_exported']='{file} এক্সপোর্ট করা হয়েছে।';
@@ -2692,9 +2691,7 @@ $ec_lang['lpn_scenario_preset_flow_max_tip']='প্রতিবেদিত স
 $ec_lang['lpn_scenario_preset_average_day']='4. গড় দিন';
 $ec_lang['lpn_scenario_preset_average_day_tip']='চাহিদা গুণক ১: প্রতিটি চাহিদা যেমন লেখা হয়েছে তেমনই, যা গড় দিনের চাহিদা বলে ধরা হয়।';
 $ec_lang['lpn_scenario_preset_max_day']='5. সর্বোচ্চ দিন';
-$ec_lang['lpn_scenario_preset_max_day_tip']='চাহিদা গুণক গড় দিনের ২.০ গুণ, একটি অস্থায়ী মান। বেশিরভাগ সিস্টেম ১.২ থেকে ৩.০-এর মধ্যে পড়ে (National Research Council, 2006)। আপনার নিজের সিস্টেমের মান সেটিংস, হিসাব, হাইড্রোলিক্স, চাহিদা গুণক-এ সেট করুন।';
 $ec_lang['lpn_scenario_preset_peak_hour']='6. পিক ঘণ্টা';
-$ec_lang['lpn_scenario_preset_peak_hour_tip']='চাহিদা গুণক গড় দিনের ৩.০ গুণ, একটি অস্থায়ী মান। বেশিরভাগ সিস্টেম ৩.০ থেকে ৬.০-এর মধ্যে পড়ে (National Research Council, 2006)। আপনার নিজের সিস্টেমের মান সেটিংস, হিসাব, হাইড্রোলিক্স, চাহিদা গুণক-এ সেট করুন।';
 $ec_lang['lpn_scenario_preset_fire_max_day']='7. অগ্নিনির্বাপণসহ সর্বোচ্চ দিন';
 $ec_lang['lpn_scenario_preset_fire_max_day_tip']='সর্বোচ্চ দিনের চাহিদা (গুণক ২.০)। এই দৃশ্যকল্পে অগ্নিনির্বাপণ প্রবাহ বিশ্লেষণ রান করুন: এটি এই চাহিদার উপরে প্রতিটি সংযোগস্থলে অগ্নিনির্বাপণ প্রবাহ যোগ করে।';
 $ec_lang['lpn_delete_drops_overrides']='এই উপাদানটি মুছে ফেললে আপনার দৃশ্যকল্পগুলোতে এর জন্য থাকা {n}টি মানও ফেলে দেওয়া হবে। চালিয়ে যাবেন?';

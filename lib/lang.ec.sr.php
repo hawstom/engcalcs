@@ -1755,7 +1755,6 @@ $ec_lang['lpn_file_import_inp']='Увези EPANET датотеку…';
 $ec_lang['lpn_file_import_inp_tip']='Учитава мрежу из EPANET датотеке, било текстуалне .inp датотеке или .net датотеке коју EPANET чува, и чува је у овом прегледачу као нови пројекат.';
 // The other direction (Task 281). A DOWNLOAD, so the word is Export rather than Save: this page
 // keeps no handle on an `.inp` and never writes back to one.
-$ec_lang['lpn_file_export_inp']='Извези EPANET датотеку…';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_file_export_inp_tip']='Запишите ову мрежу као EPANET .inp датотеку и преузмите је. Бројеви које сте уписали записују се тачно онако како сте их уписали. Све што .inp формат не може да сачува биће накнадно наведено.';
 $ec_lang['lpn_status_inp_exported']='Извезено: {file}.';
@@ -2681,9 +2680,7 @@ $ec_lang['lpn_scenario_preset_flow_max_tip']='Калибрација теста 
 $ec_lang['lpn_scenario_preset_average_day']='4. Просечан дан';
 $ec_lang['lpn_scenario_preset_average_day_tip']='Множилац потрошње 1: свака потрошња како је унета, што се узима као потрошња просечног дана.';
 $ec_lang['lpn_scenario_preset_max_day']='5. Максималан дан';
-$ec_lang['lpn_scenario_preset_max_day_tip']='Множилац потрошње 2,0 пута просечан дан, привремена вредност. Већина система је између 1,2 и 3,0 (National Research Council, 2006). Своју вредност поставите у: Подешавања, Прорачун, Хидраулика, Множилац потрошње.';
 $ec_lang['lpn_scenario_preset_peak_hour']='6. Часовни врхунац';
-$ec_lang['lpn_scenario_preset_peak_hour_tip']='Множилац потрошње 3,0 пута просечан дан, привремена вредност. Већина система је између 3,0 и 6,0 (National Research Council, 2006). Своју вредност поставите у: Подешавања, Прорачун, Хидраулика, Множилац потрошње.';
 $ec_lang['lpn_scenario_preset_fire_max_day']='7. Пожар плус максималан дан';
 $ec_lang['lpn_scenario_preset_fire_max_day_tip']='Потрошња максималног дана (множилац 2,0). У овом сценарију покрените Анализу противпожарног протока: она додаје противпожарни проток на сваком чвору преко ове потрошње.';
 $ec_lang['lpn_delete_drops_overrides']='Брисање овог елемента такође одбацује {n} вредности које ваши сценарији чувају за њега. Наставити?';

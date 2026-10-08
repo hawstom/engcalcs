@@ -255,8 +255,10 @@ mismatch; (D) single-quoted values only.
 - **Routing:** an English reader also stumbles → fix the English; English is fine but untranslatable
   → `$ec_lang_syn`; the concept recurs → `glossary.json`.
 - **Never rename a key by hand** — `php dev/scripts/rename_lang_key.php old new --apply`.
-- **English style:** APA 7th for mechanics (American spelling, serial comma), and no em dash in
-  visitor-facing English. No other house style.
+- **English style: standard professional civil-engineering technical English**, the register of
+  FHWA HEC circulars, USACE HEC manuals, the EPA EPANET 2.2 manual, and AWWA M-series manuals. No
+  AI-isms (list in `dev/language-strings.md`). APA 7th for mechanics (American spelling, serial
+  comma); no em dash in visitor-facing English.
 - **Keep sibling keys parallel in name and value across all 27 files.** An unrendered key is not
   automatically debt; decide per key, never bulk-delete (`key_hygiene_check.php` lists candidates).
 

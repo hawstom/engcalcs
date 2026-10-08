@@ -1755,7 +1755,6 @@ $ec_lang['lpn_file_import_inp']='Importa file EPANET…';
 $ec_lang['lpn_file_import_inp_tip']='Legge una rete da un file EPANET, sia il file di testo .inp sia il file .net salvato da EPANET, e la salva in questo browser come nuovo progetto.';
 // The other direction (Task 281). A DOWNLOAD, so the word is Export rather than Save: this page
 // keeps no handle on an `.inp` and never writes back to one.
-$ec_lang['lpn_file_export_inp']='Esporta file EPANET…';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_file_export_inp_tip']='Scrivi questa rete come file EPANET .inp e scaricalo. I numeri che hai digitato vengono scritti esattamente come li hai digitati. Tutto ciò che il formato .inp non può contenere ti viene elencato in seguito.';
 $ec_lang['lpn_status_inp_exported']='Esportato {file}.';
@@ -2681,9 +2680,7 @@ $ec_lang['lpn_scenario_preset_flow_max_tip']='Taratura della prova di portata pe
 $ec_lang['lpn_scenario_preset_average_day']='4. Giorno medio';
 $ec_lang['lpn_scenario_preset_average_day_tip']='Moltiplicatore della richiesta 1: ogni richiesta come inserita, considerata la richiesta del giorno medio.';
 $ec_lang['lpn_scenario_preset_max_day']='5. Giorno di massimo consumo';
-$ec_lang['lpn_scenario_preset_max_day_tip']='Moltiplicatore della richiesta pari a 2,0 volte il giorno medio, un valore provvisorio. La maggior parte dei sistemi rientra fra 1,2 e 3,0 (National Research Council, 2006). Impostalo per il tuo sistema in Impostazioni, Calcolo, Idraulica, Moltiplicatore della richiesta.';
 $ec_lang['lpn_scenario_preset_peak_hour']='6. Ora di punta';
-$ec_lang['lpn_scenario_preset_peak_hour_tip']='Moltiplicatore della richiesta pari a 3,0 volte il giorno medio, un valore provvisorio. La maggior parte dei sistemi rientra fra 3,0 e 6,0 (National Research Council, 2006). Impostalo per il tuo sistema in Impostazioni, Calcolo, Idraulica, Moltiplicatore della richiesta.';
 $ec_lang['lpn_scenario_preset_fire_max_day']='7. Antincendio più giorno di massimo consumo';
 $ec_lang['lpn_scenario_preset_fire_max_day_tip']='Richiesta del giorno di massimo consumo (moltiplicatore 2,0). Esegui l\'analisi della portata antincendio in questo scenario: aggiunge la portata antincendio a ogni nodo sopra questa richiesta.';
 $ec_lang['lpn_delete_drops_overrides']='Eliminare questo elemento butta via anche {n} valori che i tuoi scenari mantengono per esso. Continuare?';

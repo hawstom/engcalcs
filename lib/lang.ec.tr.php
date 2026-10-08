@@ -1754,7 +1754,6 @@ $ec_lang['lpn_file_import_inp']='EPANET dosyası içe aktar…';
 $ec_lang['lpn_file_import_inp_tip']='Bir EPANET dosyasından — ister .inp metin dosyası ister EPANET\'in kaydettiği .net dosyası olsun — bir şebeke okur ve bu tarayıcıda yeni bir proje olarak kaydeder.';
 // The other direction (Task 281). A DOWNLOAD, so the word is Export rather than Save: this page
 // keeps no handle on an `.inp` and never writes back to one.
-$ec_lang['lpn_file_export_inp']='EPANET dosyası dışa aktar…';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_file_export_inp_tip']='Bu şebekeyi bir EPANET .inp dosyası olarak yazıp indirir. Yazdığınız sayılar tam olarak yazdığınız gibi yazılır. .inp biçiminin tutamadığı her şey sonrasında sizin için listelenir.';
 $ec_lang['lpn_status_inp_exported']='{file} dışa aktarıldı.';
@@ -2680,9 +2679,7 @@ $ec_lang['lpn_scenario_preset_flow_max_tip']='Tasarım şebekesi için, bildiril
 $ec_lang['lpn_scenario_preset_average_day']='4. Ortalama gün';
 $ec_lang['lpn_scenario_preset_average_day_tip']='Talep çarpanı 1: girildiği haliyle her talep, ortalama gün talebi olarak kabul edilir.';
 $ec_lang['lpn_scenario_preset_max_day']='5. Maksimum gün';
-$ec_lang['lpn_scenario_preset_max_day_tip']='Talep çarpanı, ortalama günün 2,0 katı; bir yer tutucu değerdir. Çoğu sistem 1,2 ile 3,0 arasında kalır (National Research Council, 2006). Sisteminize ait değeri Ayarlar, Hesaplama, Hidrolik, Talep çarpanı altında girin.';
 $ec_lang['lpn_scenario_preset_peak_hour']='6. Pik saat';
-$ec_lang['lpn_scenario_preset_peak_hour_tip']='Talep çarpanı, ortalama günün 3,0 katı; bir yer tutucu değerdir. Çoğu sistem 3,0 ile 6,0 arasında kalır (National Research Council, 2006). Sisteminize ait değeri Ayarlar, Hesaplama, Hidrolik, Talep çarpanı altında girin.';
 $ec_lang['lpn_scenario_preset_fire_max_day']='7. Yangın artı maksimum gün';
 $ec_lang['lpn_scenario_preset_fire_max_day_tip']='Maksimum gün talebi (çarpan 2,0). Bu senaryoda Yangın debisi analizini çalıştırın: her düğümde yangın debisini bu talebin üzerine ekler.';
 $ec_lang['lpn_delete_drops_overrides']='Bu öğeyi silmek, senaryolarınızın onun için tuttuğu {n} değeri de atar. Devam edilsin mi?';

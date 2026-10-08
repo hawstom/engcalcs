@@ -1755,7 +1755,6 @@ $ec_lang['lpn_file_import_inp']='وارد کردن فایل EPANET…';
 $ec_lang['lpn_file_import_inp_tip']='یک شبکه را از یک فایل EPANET بخوانید، چه فایل متنی .inp و چه فایل .net که EPANET ذخیره می‌کند، و آن را در این مرورگر به‌صورت پروژهٔ تازه ذخیره کنید.';
 // The other direction (Task 281). A DOWNLOAD, so the word is Export rather than Save: this page
 // keeps no handle on an `.inp` and never writes back to one.
-$ec_lang['lpn_file_export_inp']='برون‌بری فایل EPANET…';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_file_export_inp_tip']='این شبکه را به‌صورت یک فایل inp. از EPANET بنویسید و دانلود کنید. عددهایی که تایپ کرده‌اید درست همان‌گونه که نوشته‌اید نوشته می‌شوند. هر چیزی که قالب inp. نمی‌تواند در خود جای دهد، پس از آن برای شما فهرست می‌شود.';
 $ec_lang['lpn_status_inp_exported']='{file} برون‌بری شد.';
@@ -2681,9 +2680,7 @@ $ec_lang['lpn_scenario_preset_flow_max_tip']='کالیبراسیون آزمای�
 $ec_lang['lpn_scenario_preset_average_day']='۴. روز میانگین';
 $ec_lang['lpn_scenario_preset_average_day_tip']='ضریب مصرف ۱: هر مصرف همان‌طور که وارد شده، که مصرف روز میانگین فرض می‌شود.';
 $ec_lang['lpn_scenario_preset_max_day']='۵. روز بیشینه';
-$ec_lang['lpn_scenario_preset_max_day_tip']='ضریب مصرف ۲٫۰ برابر روز میانگین، مقداری موقت. بیشتر سیستم‌ها بین ۱٫۲ و ۳٫۰ هستند (National Research Council, 2006). مقدار سیستم خودتان را در تنظیمات، محاسبه، هیدرولیک، ضریب مصرف وارد کنید.';
 $ec_lang['lpn_scenario_preset_peak_hour']='۶. ساعت اوج';
-$ec_lang['lpn_scenario_preset_peak_hour_tip']='ضریب مصرف ۳٫۰ برابر روز میانگین، مقداری موقت. بیشتر سیستم‌ها بین ۳٫۰ و ۶٫۰ هستند (National Research Council, 2006). مقدار سیستم خودتان را در تنظیمات، محاسبه، هیدرولیک، ضریب مصرف وارد کنید.';
 $ec_lang['lpn_scenario_preset_fire_max_day']='۷. آتش‌سوزی به‌علاوهٔ روز بیشینه';
 $ec_lang['lpn_scenario_preset_fire_max_day_tip']='مصرف روز بیشینه (ضریب ۲٫۰). در این سناریو تحلیل جریان آتش‌نشانی را اجرا کنید: جریان آتش‌نشانی را در هر گره بر این مصرف می‌افزاید.';
 $ec_lang['lpn_delete_drops_overrides']='حذف این المان همچنین {n} مقداری را که سناریوهای شما برای آن نگه داشته‌اند دور می‌ریزد. ادامه می‌دهید؟';

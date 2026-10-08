@@ -1754,7 +1754,6 @@ $ec_lang['lpn_file_import_inp']='የEPANET ፋይል አስገባ…';
 $ec_lang['lpn_file_import_inp_tip']='ከEPANET ፋይል፣ ወይም ከ.inp የጽሑፍ ፋይል ወይም EPANET ከሚያስቀምጠው .net ፋይል፣ መረብ ያንብቡና በዚህ አሳሽ ውስጥ እንደ አዲስ ፕሮጀክት ያስቀምጡ።';
 // The other direction (Task 281). A DOWNLOAD, so the word is Export rather than Save: this page
 // keeps no handle on an `.inp` and never writes back to one.
-$ec_lang['lpn_file_export_inp']='የEPANET ፋይል ላክ…';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_file_export_inp_tip']='ይህን መረብ እንደ EPANET .inp ፋይል ጽፎ ያውርዱት። የተየቡት ቁጥሮች እርስዎ በተየቡት መንገድ በትክክል ይጻፋሉ። የ.inp ቅርጸት መያዝ የማይችለው ማንኛውም ነገር በኋላ ለእርስዎ ይዘረዘራል።';
 $ec_lang['lpn_status_inp_exported']='{file} ተልኳል።';
@@ -2680,9 +2679,7 @@ $ec_lang['lpn_scenario_preset_flow_max_tip']='ለንድፍ መረብ የፍሰ�
 $ec_lang['lpn_scenario_preset_average_day']='4. አማካይ ቀን';
 $ec_lang['lpn_scenario_preset_average_day_tip']='የፍላጎት ማባዣ 1፦ እያንዳንዱ ፍላጎት እንደገባው ነው፣ ይህም እንደ አማካይ ቀን ፍላጎት ይወሰዳል።';
 $ec_lang['lpn_scenario_preset_max_day']='5. ከፍተኛ ቀን';
-$ec_lang['lpn_scenario_preset_max_day_tip']='የፍላጎት ማባዣ ከአማካይ ቀን 2.0 እጥፍ፣ ቦታ ያዥ ዋጋ ነው። አብዛኞቹ ስርዓቶች በ1.2 እና 3.0 መካከል ናቸው (National Research Council, 2006)። የራስዎን ስርዓት ዋጋ በቅንብሮች፣ ስሌት፣ ሃይድሮሊክስ፣ የፍላጎት ማባዣ ውስጥ ያዘጋጁ።';
 $ec_lang['lpn_scenario_preset_peak_hour']='6. ከፍተኛ ሰዓት';
-$ec_lang['lpn_scenario_preset_peak_hour_tip']='የፍላጎት ማባዣ ከአማካይ ቀን 3.0 እጥፍ፣ ቦታ ያዥ ዋጋ ነው። አብዛኞቹ ስርዓቶች በ3.0 እና 6.0 መካከል ናቸው (National Research Council, 2006)። የራስዎን ስርዓት ዋጋ በቅንብሮች፣ ስሌት፣ ሃይድሮሊክስ፣ የፍላጎት ማባዣ ውስጥ ያዘጋጁ።';
 $ec_lang['lpn_scenario_preset_fire_max_day']='7. እሳት ሲደመር ከፍተኛ ቀን';
 $ec_lang['lpn_scenario_preset_fire_max_day_tip']='የከፍተኛ ቀን ፍላጎት (ማባዣ 2.0)። በዚህ ሁኔታ ውስጥ የእሳት ፍሰት ትንተናን ያሩጡ፦ በእያንዳንዱ መገናኛ ላይ የእሳት ፍሰቱን ከዚህ ፍላጎት በላይ ይጨምራል።';
 $ec_lang['lpn_delete_drops_overrides']='ይህን አካል ማጥፋት ሁኔታዎችዎ ለእሱ የያዙትን {n} ዋጋዎችም ይጥላል። ይቀጥሉ?';

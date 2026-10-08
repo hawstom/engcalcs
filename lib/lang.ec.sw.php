@@ -1755,7 +1755,6 @@ $ec_lang['lpn_file_import_inp']='Leta Faili la EPANET…';
 $ec_lang['lpn_file_import_inp_tip']='Soma mtandao kutoka faili la EPANET, iwe faili la maandishi la .inp au faili la .net linalohifadhiwa na EPANET, na ulihifadhi katika kivinjari hiki kama mradi mpya.';
 // The other direction (Task 281). A DOWNLOAD, so the word is Export rather than Save: this page
 // keeps no handle on an `.inp` and never writes back to one.
-$ec_lang['lpn_file_export_inp']='Hamisha faili la EPANET…';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_file_export_inp_tip']='Andika mtandao huu kama faili la EPANET .inp na ulipakue. Namba ulizoandika zinaandikwa kama ulivyoziandika kabisa. Chochote ambacho muundo wa .inp hauwezi kubeba kinaorodheshwa kwako baadaye.';
 $ec_lang['lpn_status_inp_exported']='{file} imehamishwa.';
@@ -2681,9 +2680,7 @@ $ec_lang['lpn_scenario_preset_flow_max_tip']='Urekebishaji wa jaribio la mtiriri
 $ec_lang['lpn_scenario_preset_average_day']='4. Siku ya wastani';
 $ec_lang['lpn_scenario_preset_average_day_tip']='Kizidishi cha mahitaji 1: kila hitaji kama lilivyoingizwa, ambalo huchukuliwa kuwa mahitaji ya siku ya wastani.';
 $ec_lang['lpn_scenario_preset_max_day']='5. Siku ya upeo';
-$ec_lang['lpn_scenario_preset_max_day_tip']='Kizidishi cha mahitaji 2.0 mara siku ya wastani, thamani ya kishikilia nafasi. Mifumo mingi iko kati ya 1.2 na 3.0 (National Research Council, 2006). Weka ya mfumo wako mwenyewe kwenye Mipangilio, Ukokotoaji, Haidroliki, Kizidishi cha mahitaji.';
 $ec_lang['lpn_scenario_preset_peak_hour']='6. Saa ya kilele';
-$ec_lang['lpn_scenario_preset_peak_hour_tip']='Kizidishi cha mahitaji 3.0 mara siku ya wastani, thamani ya kishikilia nafasi. Mifumo mingi iko kati ya 3.0 na 6.0 (National Research Council, 2006). Weka ya mfumo wako mwenyewe kwenye Mipangilio, Ukokotoaji, Haidroliki, Kizidishi cha mahitaji.';
 $ec_lang['lpn_scenario_preset_fire_max_day']='7. Moto pamoja na siku ya upeo';
 $ec_lang['lpn_scenario_preset_fire_max_day_tip']='Mahitaji ya siku ya upeo (kizidishi 2.0). Endesha Uchambuzi wa mtiririko wa moto kwenye senario hii: huongeza mtiririko wa moto kwenye kila muunganiko juu ya mahitaji haya.';
 $ec_lang['lpn_delete_drops_overrides']='Kufuta kipengele hiki pia kunatupa thamani {n} ambazo senario zako zinazishikilia kwa ajili yake. Endelea?';

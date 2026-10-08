@@ -1213,43 +1213,81 @@ EngCalcs.lpnCollide = (function () {
 			if ((a.priority || 0) !== (b.priority || 0)) { return (b.priority || 0) - (a.priority || 0); }
 			return a.id < b.id ? -1 : (a.id > b.id ? 1 : 0);
 		});
-		order.forEach(function (lbl) {
-			var sides = lbl.sides && lbl.sides.length ? lbl.sides : [lbl.home],
-				chosen = null, chosenBox = null, i, c, b, verdict,
-				fallback = null, fallbackBox = null;
+		// **CLEAN GROUND FIRST** (the label bench's rule 1, the first of the three ports agreed on
+		// 2026-10-07; dev/label-trials on feat/label-placer). A side is CLEAN when it is clear of
+		// every hard obstacle, no pipe runs under any of its rows, no pipe label would have to yield
+		// to it, and its leader passes through no other node's symbol. The first sweep seats, in drop
+		// order, every label that has clean ground and nobody else; the last sweep gives the labels
+		// still waiting the old answer (a clear side even with a pipe under it, else a yielding one).
+		// So a pipe crossing goes only to a label that would otherwise hide, and never takes ground a
+		// lower-ranked label could have had clean. Measured on the bench's 64 generated sets (320
+		// views) against master: labels shown 38.2 -> 38.3 in 100 asked, labels on a pipe 32.4 ->
+		// 23.9 per 100 shown, leaders through a node 697 -> 407, the page pass about 8% slower.
+		// `opts.clean === false` is the old single sweep, kept for the harness that measures it.
+		var clean = opts.clean !== false, waiting = [], seat = {};
+		function sidesOf(lbl) { return lbl.sides && lbl.sides.length ? lbl.sides : [lbl.home]; }
+		function commit(lbl, sides, c, b) {
+			// EVERY line box is committed, so the next label sees the staircase this one really
+			// occupies rather than a rectangle around it.
+			b.forEach(function (cb) { index.addBox(obs.boxes.push(cb) - 1); });
+			return { id: lbl.id, x: c.x, y: c.y, dx: c.x - lbl.home.x, dy: c.y - lbl.home.y,
+				dropped: false, side: sides.indexOf(c),
+				// `box` stays the ONE box a reader draws and counts (?debug=boxes, the bench's
+				// overlap count); `boxes` is what the pass actually reserved.
+				box: labelBoxAtEnd(lbl, c), boxes: b, leader: null };
+		}
+		// The first sweep: CLEAN ground only. It also notes the first side that was not blocked
+		// outright, because ground only fills up between the sweeps: every side before that one is
+		// still blocked when the last sweep comes back for this label, so it starts there.
+		var startAt = {};
+		function placeClean(lbl) {
+			var sides = sidesOf(lbl), i, c, b, verdict, first = -1;
 			index.near(lbl.anchor.x, lbl.anchor.y, lbl._reach, local);
 			for (i = 0; i < sides.length; i++) {
+				c = sides[i];
+				b = labelLineBoxes(lbl, c);
+				verdict = boxesClearOf(b, local, pad, lbl.id);
+				if (verdict === 'blocked') { continue; }
+				if (first < 0) { first = i; }
+				if (verdict === 'clear' && !boxesOnLink(b, local, lbl.id) && !leaderThroughSymbol(lbl, c, local)) {
+					return commit(lbl, sides, c, b);
+				}
+			}
+			startAt[lbl.id] = first < 0 ? sides.length : first;
+			return null;
+		}
+		// The last sweep, and the whole of the pass when `clean` is off: the first clear side, a pipe
+		// under it or not, else the first side held only by labels this one outranks, else a drop.
+		function placeAny(lbl, from) {
+			var sides = sidesOf(lbl), i, c, b, verdict, fallback = null, fallbackBox = null;
+			index.near(lbl.anchor.x, lbl.anchor.y, lbl._reach, local);
+			for (i = from || 0; i < sides.length; i++) {
 				c = sides[i];
 				// The STAIRCASE, not the block (Task 406): asking about the block would call a side
 				// occupied because of ground the short rows never cover.
 				b = labelLineBoxes(lbl, c);
 				verdict = lbl.dragged ? 'clear' : boxesClearOf(b, local, pad, lbl.id);
-				if (verdict === 'clear') { chosen = c; chosenBox = b; break; }
+				if (verdict === 'clear') { return commit(lbl, sides, c, b); }
 				// **A SIDE HELD ONLY BY SOMETHING THIS LABEL OUTRANKS IS KEPT AS A FALLBACK, not
 				// taken immediately.** A genuinely clear side on the other hand is still better, so
 				// the preferred-side-first order has to finish before this is used. Dropping while
 				// such a side existed is the ranking working backwards.
 				if (verdict === 'yielding' && !fallback) { fallback = c; fallbackBox = b; }
 			}
-			if (!chosen && fallback) { chosen = fallback; chosenBox = fallbackBox; }
-			if (!chosen) {
-				// **DROPPED: NOTHING IS COMMITTED.** A label nobody can see is not an obstacle, so it
-				// must not go into the index -- otherwise it keeps ground clear for a label that is
-				// not drawn, and the drawing ends up emptier than the conflict warranted.
-				out.push({ id: lbl.id, x: lbl.home.x, y: lbl.home.y, dx: 0, dy: 0,
-					dropped: true, side: -1, box: null, leader: null });
-				return;
-			}
-			// EVERY line box is committed, so the next label sees the staircase this one really
-			// occupies rather than a rectangle around it.
-			chosenBox.forEach(function (cb) { index.addBox(obs.boxes.push(cb) - 1); });
-			out.push({ id: lbl.id, x: chosen.x, y: chosen.y,
-				dx: chosen.x - lbl.home.x, dy: chosen.y - lbl.home.y,
-				dropped: false, side: sides.indexOf(chosen),
-				// `box` stays the ONE box a reader draws and counts (?debug=boxes, the bench's
-				// overlap count); `boxes` is what the pass actually reserved.
-				box: labelBoxAtEnd(lbl, chosen), boxes: chosenBox, leader: null });
+			if (fallback) { return commit(lbl, sides, fallback, fallbackBox); }
+			// **DROPPED: NOTHING IS COMMITTED.** A label nobody can see is not an obstacle, so it
+			// must not go into the index -- otherwise it keeps ground clear for a label that is not
+			// drawn, and the drawing ends up emptier than the conflict warranted.
+			return { id: lbl.id, x: lbl.home.x, y: lbl.home.y, dx: 0, dy: 0,
+				dropped: true, side: -1, box: null, leader: null };
+		}
+		order.forEach(function (lbl) {
+			var r = (clean && !lbl.dragged) ? placeClean(lbl) : placeAny(lbl);
+			if (r) { seat[lbl.id] = r; } else { waiting.push(lbl); }
 		});
+		waiting.forEach(function (lbl) { seat[lbl.id] = placeAny(lbl, startAt[lbl.id]); });
+		// The result keeps the drop order, so a reader of `out` sees the same sequence either way.
+		order.forEach(function (lbl) { out.push(seat[lbl.id]); });
 		// **THE INPUTS COME BACK EXACTLY AS THEY WENT IN.** placeLabels() makes the same promise, and
 		// for the same reason: a pass that scribbles on its arguments cannot be run twice on one
 		// drawing to check that it agrees with itself, which is the cheapest strong assertion there
@@ -1309,6 +1347,36 @@ EngCalcs.lpnCollide = (function () {
 			if (v === 'yielding') { worst = 'yielding'; }
 		}
 		return worst;
+	}
+
+	// Does any row of this staircase lie on a pipe other than its own? The first-fit's CLEAN test
+	// (see placeLabelsFirstFit()). The raw rows, not the padded ones: a pipe that passes within the
+	// pad is not under the text, and the reader sees no crossing.
+	function boxesOnLink(boxes, obs, ownerId) {
+		var i, j, o;
+		for (j = 0; j < obs.segments.length; j++) {
+			o = obs.segments[j];
+			if (o.kind !== 'link') { continue; }
+			if (o.owner !== undefined && o.owner === ownerId) { continue; }
+			for (i = 0; i < boxes.length; i++) {
+				if (segmentInBoxFraction(o, boxes[i]) > 0) { return true; }
+			}
+		}
+		return false;
+	}
+
+	// Does the leader from the anchor to this endpoint pass through a symbol not its own (N3)? The
+	// first-fit draws no leader itself, but the renderer does, so ground reached across another
+	// node's symbol is not clean. The anchor's own symbol is the one that contains the anchor.
+	function leaderThroughSymbol(lbl, c, obs) {
+		var g = segment(lbl.anchor.x, lbl.anchor.y, c.x, c.y, 'leader', lbl.id), i, o;
+		for (i = 0; i < obs.boxes.length; i++) {
+			o = obs.boxes[i];
+			if (o.kind !== 'symbol') { continue; }
+			if (Math.abs(o.cx - lbl.anchor.x) <= o.w / 2 && Math.abs(o.cy - lbl.anchor.y) <= o.h / 2) { continue; }
+			if (segmentInBoxFraction(g, o) > 0) { return true; }
+		}
+		return false;
 	}
 
 	// ---- ROADMAP Task 539, phase one: COUNT the crossings ---------------------------------------

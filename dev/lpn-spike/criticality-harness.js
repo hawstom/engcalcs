@@ -142,7 +142,7 @@ function openNet1() {
 	ok('looped pipe 111: nothing cut off, no demand lost', !!r111 && r111.cutOff.length === 0 && r111.unserved === 0,
 		JSON.stringify(r111));
 	ok('the minimum pressure is fire flow\'s own, as the box shows it', L.minPressureText() === '20', L.minPressureText());
-	ok('the project is unchanged', JSON.stringify(L.getDoc()) === before && L.docGuard());
+	ok('the document is unchanged', JSON.stringify(L.getDoc()) === before && L.docGuard());
 
 	console.log('\n--- 5. Below minimum, at 113 psi (junction 32 sits at about 111 psi intact) ---');
 	L.setMin('113');
@@ -189,7 +189,7 @@ function openNet1() {
 	ok('breaking 121 cuts off 31 and 32, 200 gpm', !!r121 && r121.cutOff.slice().sort().join() === '31,32' &&
 		Math.abs(r121.unserved / GPM - 200) < 1e-6, JSON.stringify(r121));
 	ok('a looped pipe still cuts off nothing', set.byId['111'].cutOff.length === 0);
-	ok('the project is unchanged', JSON.stringify(L.getDoc()) === before && L.docGuard());
+	ok('the document is unchanged', JSON.stringify(L.getDoc()) === before && L.docGuard());
 
 	tr = rows(byId.lpn_crit_report);
 	ok('one row per broken asset', tr.length === 12, tr.length);

@@ -1754,7 +1754,6 @@ $ec_lang['lpn_file_import_inp']='EPANET فائل درآمد کریں…';
 $ec_lang['lpn_file_import_inp_tip']='کسی EPANET فائل سے نیٹ ورک پڑھیں، خواہ وہ .inp متنی فائل ہو یا EPANET کی محفوظ کردہ .net فائل، اور اسے اس براؤزر میں ایک نئے پراجیکٹ کے طور پر محفوظ کریں۔';
 // The other direction (Task 281). A DOWNLOAD, so the word is Export rather than Save: this page
 // keeps no handle on an `.inp` and never writes back to one.
-$ec_lang['lpn_file_export_inp']='EPANET فائل برآمد کریں…';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_file_export_inp_tip']='اس نیٹ ورک کو EPANET .inp فائل کے طور پر لکھیں اور ڈاؤن لوڈ کریں۔ آپ نے جو اعداد ٹائپ کیے وہ بالکل اسی طرح لکھے جاتے ہیں جیسے آپ نے انہیں ٹائپ کیا تھا۔ جو کچھ .inp فارمیٹ نہیں رکھ سکتا وہ بعد میں آپ کے لیے فہرست میں دکھایا جاتا ہے۔';
 $ec_lang['lpn_status_inp_exported']='{file} برآمد ہوئی۔';
@@ -2680,9 +2679,7 @@ $ec_lang['lpn_scenario_preset_flow_max_tip']='ڈیزائن نیٹ ورک کے ل
 $ec_lang['lpn_scenario_preset_average_day']='4. اوسط دن';
 $ec_lang['lpn_scenario_preset_average_day_tip']='طلب ضارب 1: ہر طلب جیسی درج کی گئی ہے، جسے اوسط دن کی طلب مانا جاتا ہے۔';
 $ec_lang['lpn_scenario_preset_max_day']='5. زیادہ سے زیادہ دن';
-$ec_lang['lpn_scenario_preset_max_day_tip']='طلب ضارب اوسط دن کا 2.0 گنا، ایک عارضی قدر۔ زیادہ تر نظام 1.2 اور 3.0 کے درمیان آتے ہیں (National Research Council, 2006)۔ اپنے نظام کی قدر ترتیبات، حساب، ہائیڈرالکس، طلب ضارب میں مقرر کریں۔';
 $ec_lang['lpn_scenario_preset_peak_hour']='6. عروجی گھنٹہ';
-$ec_lang['lpn_scenario_preset_peak_hour_tip']='طلب ضارب اوسط دن کا 3.0 گنا، ایک عارضی قدر۔ زیادہ تر نظام 3.0 اور 6.0 کے درمیان آتے ہیں (National Research Council, 2006)۔ اپنے نظام کی قدر ترتیبات، حساب، ہائیڈرالکس، طلب ضارب میں مقرر کریں۔';
 $ec_lang['lpn_scenario_preset_fire_max_day']='7. فائر اور زیادہ سے زیادہ دن';
 $ec_lang['lpn_scenario_preset_fire_max_day_tip']='زیادہ سے زیادہ دن کی طلب (ضارب 2.0)۔ اس منظرنامے میں فائر فلو تجزیہ چلائیں: یہ اس طلب کے اوپر ہر جنکشن پر فائر فلو شامل کرتا ہے۔';
 $ec_lang['lpn_delete_drops_overrides']='اس عنصر کو حذف کرنے سے وہ {n} قدریں بھی ضائع ہو جائیں گی جو آپ کے منظرنامے اس کے لیے رکھتے ہیں۔ جاری رکھیں؟';
