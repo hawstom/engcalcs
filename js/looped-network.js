@@ -43389,6 +43389,7 @@ var EngCalcs = EngCalcs || {};
 				// Read before the guide opens: opening it moves the focus and clears the selection.
 				var picked = guideSelectedText(), si;
 				if (!hotkeysBoxIsOpen()) { openGuideAt(null); }
+				raisePanel(hotkeysBoxEl());   // open but behind a later box: the same raise a click on it does
 				if (picked) {
 					si = document.getElementById('lpn_guide_search');
 					if (si) { si.value = picked; guideFilter(); }

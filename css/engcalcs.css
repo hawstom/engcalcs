@@ -4478,7 +4478,7 @@ html:has(#lpn_canvas) { overflow: hidden; }
 .lpn-guide-railtoggle:hover, .lpn-guide-railtoggle:focus-visible { background: var(--ec-gray-eee); color: var(--ec-ink-black); }
 html[dir="rtl"] .lpn-guide-railtoggle svg { transform: scaleX(-1); }
 .lpn-guide-railbody { display: flex; flex-direction: column; min-height: 0; flex: 1 1 auto; }
-.lpn-guide-railbody input { width: 100%; box-sizing: border-box; padding: 3px 6px; font: inherit; flex: 0 0 auto; }
+.lpn-guide-railbody input { width: 100%; box-sizing: border-box; padding: 3px 6px; font-size: 1rem; flex: 0 0 auto; }
 .lpn-guide-nav { overflow: auto; flex: 1 1 auto; min-height: 0; padding-top: 6px; touch-action: auto; }
 .lpn-guide-nav a {
 	display: block; padding: 3px 6px; color: inherit; text-decoration: none; border-inline-start: 3px solid transparent;
@@ -4492,7 +4492,7 @@ html[dir="rtl"] .lpn-guide-railtoggle svg { transform: scaleX(-1); }
 .lpn-guide-rail-collapsed .lpn-guide-railtitle, .lpn-guide-rail-collapsed .lpn-guide-railbody { display: none; }
 .lpn-guide-rail-collapsed .lpn-guide-railtoggle svg { transform: scaleX(-1); }
 html[dir="rtl"] .lpn-guide-rail-collapsed .lpn-guide-railtoggle svg { transform: none; }
-.lpn-guide-content { flex: 1 1 auto; min-width: 0; overflow: auto; scroll-padding-top: 4px; touch-action: auto; }
+.lpn-guide-content { flex: 1 1 auto; min-width: 0; overflow: auto; scroll-padding-top: 4px; touch-action: auto; font-size: .9em; }
 .lpn-guide-prose { margin: .3em 0 .6em; }
 .lpn-guide-boxentry { margin: 0 0 .6em; }
 .lpn-guide-boxentry > h3 { margin: .6em 0 .2em; }
@@ -4523,10 +4523,13 @@ html[dir="rtl"] .lpn-guide-rail-collapsed .lpn-guide-railtoggle svg { transform:
    4 px padding + 1 px border) and all text lines up on one edge. */
 .lpn-guide-section > h2, .lpn-guide-section > dl, .lpn-guide-section > .lpn-guide-prose,
 .lpn-guide-menu > h3, .lpn-guide-boxentry { padding-inline: 5px; }
-.lpn-guidebox .lpn-guide-section > h2 { font-size: 1.3rem; font-weight: bold; margin: .9em 0 .3em; }
+.lpn-guidebox .lpn-guide-section > h2 {
+	font-size: 1.15rem; font-weight: bold; margin: .9em 0 .3em; padding-bottom: 4px;
+	border-bottom: 1px solid var(--ec-border-strong);
+}
 .lpn-guidebox .lpn-guide-section:first-of-type > h2 { margin-top: .2em; }
 .lpn-guide-menu > h3, .lpn-guide-section dt {
-	font-size: 1.05rem; font-weight: bold; margin: .9em 0 .3em; padding-bottom: .15em;
+	font-size: 1rem; font-weight: bold; margin: .9em 0 .3em; padding-bottom: .15em;
 	border-bottom: 1px solid var(--ec-border);
 }
 .lpn-guide-section dd { margin: 0 0 .6em; }
