@@ -238,6 +238,8 @@ function ecTrackTapTip(el, tip) {
 		}
 	}, true);
 }
+// The one wait before a name tip opens, in ms; the map's hover card reads it too (Task 773).
+EngCalcs.tipShowDelay = 500;
 // Arms ONE element with the styled tooltip (an explanation behind its "?", or a name tip). Shared
 // by initTips() and by the delegated listener below, so there is exactly one place that decides
 // trigger, delay, long-press and click-to-hide.
@@ -292,7 +294,7 @@ function ecWireTipEl(el) {
 			// delay, since nothing auto-triggers it.
 			// A control may ask for a longer wait before its tip (data-ec-tip-delay, ms): the column
 			// divider in the Looped-Network tables, which the pointer crosses on its way elsewhere.
-			delay: { show: parseInt((el.dataset || {}).ecTipDelay, 10) || 500, hide: 100 }
+			delay: { show: parseInt((el.dataset || {}).ecTipDelay, 10) || EngCalcs.tipShowDelay, hide: 100 }
 		});
 		// A control also hides its tip on click: hide() clears every active trigger at once, so
 		// the tip cannot hang over the panel the button just opened. Kept for the long-press case

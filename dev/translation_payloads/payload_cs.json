@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "cs",
-        "expected_key_count": 2480,
-        "delta_key_count": 36,
+        "expected_key_count": 2482,
+        "delta_key_count": 38,
         "exempt_key_count": 41,
         "exempt_keys": [
             "calc_units_us",
@@ -755,7 +755,9 @@
         "lpn_workspace_refused_format": "This is not a workspace file saved by this page, so nothing was changed.",
         "lpn_workspace_refused_newer": "This workspace file was saved by a newer version of this page (format {version}), so nothing was changed.",
         "lpn_workspace_confirm": "Replace this browser's workspace layout with the one in the file?",
-        "lpn_workspace_refused_storage": "Browser storage is full or unavailable, so the workspace was not applied."
+        "lpn_workspace_refused_storage": "Browser storage is full or unavailable, so the workspace was not applied.",
+        "lpn_settings_hover_card": "Show the full label on hover",
+        "lpn_settings_hover_card_tip": "Rest the pointer on a node, link or customer to see its label as specified in Settings at any scale, fit or not. This is a setting for this browser, not for the project."
     },
     "keys": {
         "lpn_pane_copy_heads": "Copy with headings",
@@ -793,7 +795,9 @@
         "lpn_workspace_refused_format": "This is not a workspace file saved by this page, so nothing was changed.",
         "lpn_workspace_refused_newer": "This workspace file was saved by a newer version of this page (format {version}), so nothing was changed.",
         "lpn_workspace_confirm": "Replace this browser's workspace layout with the one in the file?",
-        "lpn_workspace_refused_storage": "Browser storage is full or unavailable, so the workspace was not applied."
+        "lpn_workspace_refused_storage": "Browser storage is full or unavailable, so the workspace was not applied.",
+        "lpn_settings_hover_card": "Show the full label on hover",
+        "lpn_settings_hover_card_tip": "Rest the pointer on a node, link or customer to see its label as specified in Settings at any scale, fit or not. This is a setting for this browser, not for the project."
     },
     "key_context": {
         "lpn_pane_copy_heads": {
@@ -1369,6 +1373,38 @@
                     "key": "lpn_geojson_refused_local",
                     "value": "Soubor GeoJSON obsahuje pouze zeměpisnou šířku a délku, ale tento projekt je nakreslen v místní souřadnicové síti bez umístění na Zemi. Nejprve jej georeferencujte příkazem Mapa, Mapa světa, Připojit a poté exportujte znovu.",
                     "english": "A GeoJSON file holds latitude and longitude only, and this project is drawn on a local grid with no place on the Earth. Georeference it first with Map, World map, Attach, then export again."
+                }
+            }
+        },
+        "lpn_settings_hover_card": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_area_hint_tip",
+                    "value": "Zobrazí nad mapou výzvu, která uvádí další krok při výběru oblasti.",
+                    "english": "Show the prompt over the map that gives the next step while you are selecting an area."
+                },
+                "next_translated": {
+                    "key": "lpn_settings_id_prefixes",
+                    "value": "Předpony ID",
+                    "english": "ID prefixes"
+                }
+            }
+        },
+        "lpn_settings_hover_card_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_area_hint_tip",
+                    "value": "Zobrazí nad mapou výzvu, která uvádí další krok při výběru oblasti.",
+                    "english": "Show the prompt over the map that gives the next step while you are selecting an area."
+                },
+                "next_translated": {
+                    "key": "lpn_settings_id_prefixes",
+                    "value": "Předpony ID",
+                    "english": "ID prefixes"
                 }
             }
         }

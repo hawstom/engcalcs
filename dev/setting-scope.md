@@ -45,6 +45,7 @@ Derived from `EC_LPN_FURNITURE` in `dev/scripts/lpn_furniture_check.php`; the ch
 | `lpn_panecols` | Column width, order and hidden columns of the Tables (drag a divider or heading, Manage columns) |
 | `lpn_runbox` | Settings > Calculation > Hydraulics > Show the run progress box |
 | `lpn_scnbasic` | Scenarios > Basic mode |
+| `lpn_hovercard` | Settings > Map and page > Page > Show the full label on hover |
 | `lpn_areahint` | Settings > Map and page > Page > Show the selection help, and the bubble's own checkbox |
 | `lpn_survey_format` | The column order last chosen when importing a surveyed point list |
 | `lpn_show_titles` | None: the control is gone (Task 625) |
@@ -80,7 +81,7 @@ rows) are counted only when present. Regenerate with
 | `lpn_set_sub_custLbl` | 8 | 8 | 0 | 0 |
 | `lpn_set_sub_nodeLink` | 2 | 2 | 0 | 0 |
 | `lpn_set_sub_mapDisplay` | 15 | 15 | 0 | 0 |
-| `lpn_set_sub_page` | 1 | 0 | 1 | 0 |
+| `lpn_set_sub_page` | 2 | 0 | 2 | 0 |
 | `lpn_set_sub_idPrefixes` | 7 | 7 | 0 | 0 |
 | `lpn_set_sub_defaults` | 5 | 5 | 0 | 0 |
 | `lpn_set_sub_units` | 8 | 8 | 0 | 0 |
@@ -88,10 +89,11 @@ rows) are counted only when present. Regenerate with
 | `lpn_set_sub_hydraulics` | 17 | 16 | 1 | 0 |
 | `lpn_set_sub_energy` | 5 | 5 | 0 | 0 |
 | `lpn_set_sub_quality` | 2 | 2 | 0 | 0 |
-| **Total** | 115 | 113 | 2 | 0 |
+| **Total** | 116 | 113 | 3 | 0 |
 
 Controls whose home is not their heading's default, as observed:
 
 - `lpn_set_sub_page`: Show the selection help -- browser
+- `lpn_set_sub_page`: Show the full label on hover -- browser
 - `lpn_set_sub_hydraulics`: Show the run progress box -- browser
 <!-- INVENTORY:END -->
