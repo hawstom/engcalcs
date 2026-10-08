@@ -44221,7 +44221,7 @@ var EngCalcs = EngCalcs || {};
 		return true;
 	}
 	function guideNoPoint(card) {
-		var pc = EngCalcs.pageConfig || {}, n = guideSpan('lpn-guide-nopoint', pc.lpn_guide_not_shown || 'Not on screen right now.'), host;
+		var pc = EngCalcs.pageConfig || {}, n = guideSpan('lpn-guide-nopoint', pc.lpn_guide_not_shown || 'This control is not on screen right now.'), host;
 		guideClearPoint();
 		if (card.classList.contains('lpn-guide-boxentry')) { host = card.querySelector('h3'); if (host) { host.parentNode.insertBefore(n, host.nextSibling); } return; }
 		host = card.querySelector('.lpn-guide-desc') || card;
