@@ -169,7 +169,7 @@ ec_urm_expect('the page reports the right classified-row count',
     (bool) preg_match('/(\d+) carrying the served/', $newHtml, $m2) && (int) $m2[1] === $expectClassified,
     isset($m2[1]) ? $m2[1] : '(not found)');
 ec_urm_expect('the two buckets on the page still total to the hand-computed visitor/visit split',
-    strpos($newHtml, 'BROWSERS (SAID YES): ' . $expectVisitor . ' row(s)') !== false
+    strpos($newHtml, 'SAID YES: ' . $expectVisitor . ' use(s)') !== false
     && strpos($newHtml, 'PAGE LOADS: ' . $expectVisit . ' row(s)') !== false,
     "expect visitor=$expectVisitor visit=$expectVisit");
 

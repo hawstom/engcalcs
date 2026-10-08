@@ -322,7 +322,6 @@ if [ -x "$PROD/log/lang-log-stats.sh" ] || [ -r "$PROD/log/lang-log-stats.sh" ];
         echo " $2 (${dur:-?} days, $win):"
         printf '%s\n' "$1" | awk '
             /RANK BY SHOPPING/         {r=1; next}
-            r && /^ +browsers +page loads *$/ {print; next}
             r && /^ *rank[[:space:]]/  {print; next}
             r && /^ *[0-9]+ +[A-Za-z]/ {if (++k<=6) print; next}
             r && k>0 && /^ *$/         {exit}
@@ -340,14 +339,12 @@ if [ -x "$PROD/log/lang-log-stats.sh" ] || [ -r "$PROD/log/lang-log-stats.sh" ];
             # page view. Both columns come from the >=10s-dwell "shopping" beacon, so robots are
             # nearly all excluded by behaviour; there is no robot list in this codebase.
             echo " The two counts are different units; never add them:"
-            echo "   browsers (said yes)         browsers that accepted the consent banner,"
-            echo "                               each counted the first time it opens each"
-            echo "                               page, and not again for a year"
-            echo "   page loads (everyone else)  one row per page view"
+            echo "   browsers    different browsers that accepted the consent banner"
+            echo "               (distinct random codes, since 2026-10-08)"
+            echo "   said yes    their views, counted once per page per visit"
+            echo "   page loads  everyone else, one row per page view"
             echo "   Both count only after 10+ seconds on the page, so robots are"
-            echo "   nearly all excluded. One exception: a said-yes browser that has"
-            echo "   already passed the 10 seconds on any page is counted on a new"
-            echo "   page at once."
+            echo "   nearly all excluded."
             printf '%s\n' "$out" | awk '
                 /reach rows:/ && $NF+0 > 0 {
                     print "   Log check: " $NF " rows of the reach log are in the old format and"

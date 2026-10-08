@@ -57,10 +57,9 @@ echo " RANK BY SHOPPING (fixture)"
 echo "==============================================================================="
 echo "   some explanatory prose a real reader would have to skip past."
 echo ""
-printf "   %-6s %-28s %14s %16s\n" "" "" "browsers" "page loads"
-printf "   %-6s %-28s %14s %16s\n" "rank" "page" "(said yes)" "(everyone else)"
-printf "   %-6d %-28s %14d %16d\n" 1 "Fixture-Calculator" 3 7
-printf "   %-6d %-28s %14d %16d\n" 2 "Second-Calculator" 1 1
+printf "   %-6s %-28s %10s %10s %12s\n" "rank" "page" "browsers" "said yes" "page loads"
+printf "   %-6d %-28s %10d %10d %12d\n" 1 "Fixture-Calculator" 2 3 7
+printf "   %-6d %-28s %10d %10d %12d\n" 2 "Second-Calculator" 1 1 1
 echo ""
 echo "   Rank is by the people bucket, with the page-load bucket printed beside it."
 echo ""
@@ -108,21 +107,22 @@ ec_dr_expect('the USAGE section ran at all', $usageStart !== false,
 
 // ---- R-121: headings. The literal header row lang-log-stats.sh already prints must survive the
 // extraction, not just daily_report.sh's own synthesized label line. ----------------------------
-ec_dr_expect('the rank-by-shopping table keeps its column header row, with the 2026-10-07 names',
-    (bool) preg_match('/browsers\s+page loads\s*\n\s*rank\s+page\s+\(said yes\)\s+\(everyone else\)/', $usage), $usage);
-ec_dr_expect('a data row (Fixture-Calculator, 3, 7) still comes through',
-    (bool) preg_match('/Fixture-Calculator\s+3\s+7/', $usage), $usage);
+ec_dr_expect('the rank-by-shopping table keeps its column header row, browsers column included',
+    (bool) preg_match('/rank\s+page\s+browsers\s+said yes\s+page loads/', $usage), $usage);
+ec_dr_expect('a data row (Fixture-Calculator, 2 browsers, 3 said yes, 7 page loads) still comes through',
+    (bool) preg_match('/Fixture-Calculator\s+2\s+3\s+7/', $usage), $usage);
 
 // ---- R-123: "people" is the consented bucket, never "long-dwell". ------------------------------
-ec_dr_expect('the mail states what "browsers (said yes)" means (consented, first time per page, a year)',
+ec_dr_expect('the mail states what "browsers" and "said yes" mean (distinct codes; once per page per visit)',
     strpos($usage, 'accepted the consent banner') !== false
-    && strpos($usage, 'not again for a year') !== false, $usage);
+    && strpos($usage, 'distinct random codes') !== false
+    && strpos($usage, 'once per page per visit') !== false, $usage);
 ec_dr_expect('the mail says both counts need 10+ seconds on the page',
     strpos($usage, '10+ seconds on the page') !== false, $usage);
 
 // ---- R-122: "page loads" does not silently claim or deny robots without saying why. ------------
-ec_dr_expect('the mail states what "page loads (everyone else)" means (one row per view)',
-    (bool) preg_match('/page loads \(everyone else\)\s+one row per page view/', $usage), $usage);
+ec_dr_expect('the mail states what "page loads" means (everyone else, one row per view)',
+    strpos($usage, 'everyone else, one row per page view') !== false, $usage);
 
 // ---- Tom, 2026-10-07: the side count of tester browsers. ---------------------------------------
 ec_dr_expect('the mail carries a tester-browser side count',
@@ -136,8 +136,6 @@ ec_dr_expect('held-out tester rows are printed per bucket and never summed (1 sa
     && strpos($usage, 'never add them') !== false, $usage);
 ec_dr_expect('the tester count says the mark is per host and that the hosts share one log folder',
     strpos($usage, 'The mark is per host') !== false && strpos($usage, 'share this one log folder') !== false, $usage);
-ec_dr_expect('the mail names the exception to the 10-second gate for returning said-yes browsers',
-    strpos($usage, 'counted on a new') !== false, $usage);
 ec_dr_expect('marks set and cleared are counted from the whole file',
     strpos($usage, 'browsers marked since ' . $yday . ': 2; marks cleared: 0') !== false, $usage);
 ec_dr_expect('the mail gives the true, checked answer on robots (excluded by the dwell gate, '
