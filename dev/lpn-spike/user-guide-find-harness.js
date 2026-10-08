@@ -420,7 +420,7 @@ function englishCopyComplete() {
 	console.log('\n10. Every Find word key has its English copy');
 	const js = fs.readFileSync(path.join(REPO, 'js', 'looped-network.js'), 'utf8');
 	const php = fs.readFileSync(path.join(REPO, 'Looped-Network.php'), 'utf8');
-	const block = (php.match(/lpn_find_en: <\?=json_encode\(\(function[\s\S]*?\)\), JSON_UNESCAPED_UNICODE\)\?>/) || [''])[0];
+	const block = (php.match(/lpn_find_en: <\?=json_encode\(ecEnglishStrings\(array\([\s\S]*?\)\), JSON_UNESCAPED_UNICODE\)\?>/) || [''])[0];
 	const listed = new Set((block.match(/'((?:lpn|bpn)_[a-z0-9_]+)'/g) || []).map(k => k.slice(1, -1)));
 	const names = ['findScopeDefs', 'findPropDefs', 'findConnOpDefs', 'findChoiceDefs', 'findOpDefs', 'findEmptyDef', 'findExtremeTemplate', 'findJoinDefs',
 		'roughnessLabel', 'qualityLabel', 'linkQualityLabel', 'headlossLabelFor', 'axisNames', 'paneColMixingModel', 'paneColSourceType'];
