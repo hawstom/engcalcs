@@ -5616,6 +5616,11 @@
             "on": "Demand multiplier {mult} times average day, a placeholder value. Most systems fall between {lo} and {hi} (National Research Council, 2006). Set the value for the system being modeled in Settings, Calculation, Hydraulics, Demand multiplier.",
             "ruled": "2026-10-07",
             "answer": "Calls page 7 October: Use proposed"
+        },
+        "lpn_workspace_confirm": {
+            "on": "Replace this browser's workspace layout with the one in the file?",
+            "ruled": "2026-10-08",
+            "answer": "Calls page 8 October: his own text, \"Replace this browser's workspace layout with the one in the file?\""
         }
     }
 }

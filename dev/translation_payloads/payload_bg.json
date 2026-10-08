@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "bg",
-        "expected_key_count": 2444,
-        "delta_key_count": 224,
+        "expected_key_count": 2456,
+        "delta_key_count": 236,
         "exempt_key_count": 31,
         "exempt_keys": [
             "calc_units_us",
@@ -817,6 +817,18 @@
         "lpn_status_inp_exported_no_picture": "Exported {file}. The background picture could not be saved, so the .inp names none; in EPANET, add it with View > Backdrop > Load.",
         "lpn_inp_export_difference_one": "One thing the .inp format cannot hold.",
         "lpn_file_export_geojson_tip": "Download this network as a GeoJSON file for QGIS, ArcGIS Pro and other GIS programs. Junctions, tanks and reservoirs are points, and pipes, pumps and valves are lines that follow their vertices. Positions are latitude and longitude. Results are included only when the network has been solved.",
+        "lpn_file_export_item_workspace": "Workspace…",
+        "lpn_file_export_workspace_tip": "Download a small file holding where your boxes sit, their sizes, which are open or docked, and your pane and column sizes, plus the reading preferences of this page. Your projects, project settings and cookies (language, consent, units) are not in it. Load it on another screen or browser with File, Import, Workspace.",
+        "lpn_file_import_workspace": "Workspace…",
+        "lpn_file_import_workspace_tip": "Apply a workspace file saved with File, Export, Workspace: box positions and sizes, docking, pane sizes and the reading preferences of this page. Your projects and cookies are not touched.",
+        "lpn_workspace_exported": "Workspace saved to {file}: {n} settings.",
+        "lpn_workspace_imported": "Workspace applied from {file}. Settings applied: {n}. Returned to their defaults: {r}.",
+        "lpn_workspace_ignored": "Entries ignored because they were not recognized: {u}.",
+        "lpn_workspace_refused_unreadable": "This file could not be read as a workspace, so nothing was changed.",
+        "lpn_workspace_refused_format": "This is not a workspace file saved by this page, so nothing was changed.",
+        "lpn_workspace_refused_newer": "This workspace file was saved by a newer version of this page (format {version}), so nothing was changed.",
+        "lpn_workspace_confirm": "Replace this browser's workspace layout with the one in the file?",
+        "lpn_workspace_refused_storage": "Browser storage is full or unavailable, so the workspace was not applied.",
         "lpn_geojson_refused_local": "A GeoJSON file holds latitude and longitude only, and this project is drawn on a local grid with no place on the Earth. Georeference it first with Map, World map, Attach, then export again.",
         "lpn_geojson_refused_range": "These positions are not valid latitudes and longitudes: {detail}",
         "lpn_geojson_refused_crs": "The coordinate system of this project ({detail}) is not known to this page, so its positions cannot be converted to latitude and longitude. Use Convert as… to copy the project into one this page knows, then export again.",
@@ -1043,6 +1055,18 @@
         "lpn_status_inp_exported_no_picture": "Exported {file}. The background picture could not be saved, so the .inp names none; in EPANET, add it with View > Backdrop > Load.",
         "lpn_inp_export_difference_one": "One thing the .inp format cannot hold.",
         "lpn_file_export_geojson_tip": "Download this network as a GeoJSON file for QGIS, ArcGIS Pro and other GIS programs. Junctions, tanks and reservoirs are points, and pipes, pumps and valves are lines that follow their vertices. Positions are latitude and longitude. Results are included only when the network has been solved.",
+        "lpn_file_export_item_workspace": "Workspace…",
+        "lpn_file_export_workspace_tip": "Download a small file holding where your boxes sit, their sizes, which are open or docked, and your pane and column sizes, plus the reading preferences of this page. Your projects, project settings and cookies (language, consent, units) are not in it. Load it on another screen or browser with File, Import, Workspace.",
+        "lpn_file_import_workspace": "Workspace…",
+        "lpn_file_import_workspace_tip": "Apply a workspace file saved with File, Export, Workspace: box positions and sizes, docking, pane sizes and the reading preferences of this page. Your projects and cookies are not touched.",
+        "lpn_workspace_exported": "Workspace saved to {file}: {n} settings.",
+        "lpn_workspace_imported": "Workspace applied from {file}. Settings applied: {n}. Returned to their defaults: {r}.",
+        "lpn_workspace_ignored": "Entries ignored because they were not recognized: {u}.",
+        "lpn_workspace_refused_unreadable": "This file could not be read as a workspace, so nothing was changed.",
+        "lpn_workspace_refused_format": "This is not a workspace file saved by this page, so nothing was changed.",
+        "lpn_workspace_refused_newer": "This workspace file was saved by a newer version of this page (format {version}), so nothing was changed.",
+        "lpn_workspace_confirm": "Replace this browser's workspace layout with the one in the file?",
+        "lpn_workspace_refused_storage": "Browser storage is full or unavailable, so the workspace was not applied.",
         "lpn_geojson_refused_local": "A GeoJSON file holds latitude and longitude only, and this project is drawn on a local grid with no place on the Earth. Georeference it first with Map, World map, Attach, then export again.",
         "lpn_geojson_refused_range": "These positions are not valid latitudes and longitudes: {detail}",
         "lpn_geojson_refused_crs": "The coordinate system of this project ({detail}) is not known to this page, so its positions cannot be converted to latitude and longitude. Use Convert as… to copy the project into one this page knows, then export again.",
@@ -2394,6 +2418,198 @@
             }
         },
         "lpn_file_export_geojson_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_export_refused",
+                    "value": "Този проект не може да бъде записан като файл на EPANET: {detail}",
+                    "english": "This project cannot be written as an EPANET file: {detail}"
+                },
+                "next_translated": {
+                    "key": "lpn_inp_bad_file",
+                    "value": "Този файл не можа да бъде прочетен като мрежов файл на EPANET.",
+                    "english": "That file could not be read as an EPANET network file."
+                }
+            }
+        },
+        "lpn_file_export_item_workspace": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_export_refused",
+                    "value": "Този проект не може да бъде записан като файл на EPANET: {detail}",
+                    "english": "This project cannot be written as an EPANET file: {detail}"
+                },
+                "next_translated": {
+                    "key": "lpn_inp_bad_file",
+                    "value": "Този файл не можа да бъде прочетен като мрежов файл на EPANET.",
+                    "english": "That file could not be read as an EPANET network file."
+                }
+            }
+        },
+        "lpn_file_export_workspace_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_export_refused",
+                    "value": "Този проект не може да бъде записан като файл на EPANET: {detail}",
+                    "english": "This project cannot be written as an EPANET file: {detail}"
+                },
+                "next_translated": {
+                    "key": "lpn_inp_bad_file",
+                    "value": "Този файл не можа да бъде прочетен като мрежов файл на EPANET.",
+                    "english": "That file could not be read as an EPANET network file."
+                }
+            }
+        },
+        "lpn_file_import_workspace": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_export_refused",
+                    "value": "Този проект не може да бъде записан като файл на EPANET: {detail}",
+                    "english": "This project cannot be written as an EPANET file: {detail}"
+                },
+                "next_translated": {
+                    "key": "lpn_inp_bad_file",
+                    "value": "Този файл не можа да бъде прочетен като мрежов файл на EPANET.",
+                    "english": "That file could not be read as an EPANET network file."
+                }
+            }
+        },
+        "lpn_file_import_workspace_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_export_refused",
+                    "value": "Този проект не може да бъде записан като файл на EPANET: {detail}",
+                    "english": "This project cannot be written as an EPANET file: {detail}"
+                },
+                "next_translated": {
+                    "key": "lpn_inp_bad_file",
+                    "value": "Този файл не можа да бъде прочетен като мрежов файл на EPANET.",
+                    "english": "That file could not be read as an EPANET network file."
+                }
+            }
+        },
+        "lpn_workspace_exported": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_export_refused",
+                    "value": "Този проект не може да бъде записан като файл на EPANET: {detail}",
+                    "english": "This project cannot be written as an EPANET file: {detail}"
+                },
+                "next_translated": {
+                    "key": "lpn_inp_bad_file",
+                    "value": "Този файл не можа да бъде прочетен като мрежов файл на EPANET.",
+                    "english": "That file could not be read as an EPANET network file."
+                }
+            }
+        },
+        "lpn_workspace_imported": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_export_refused",
+                    "value": "Този проект не може да бъде записан като файл на EPANET: {detail}",
+                    "english": "This project cannot be written as an EPANET file: {detail}"
+                },
+                "next_translated": {
+                    "key": "lpn_inp_bad_file",
+                    "value": "Този файл не можа да бъде прочетен като мрежов файл на EPANET.",
+                    "english": "That file could not be read as an EPANET network file."
+                }
+            }
+        },
+        "lpn_workspace_ignored": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_export_refused",
+                    "value": "Този проект не може да бъде записан като файл на EPANET: {detail}",
+                    "english": "This project cannot be written as an EPANET file: {detail}"
+                },
+                "next_translated": {
+                    "key": "lpn_inp_bad_file",
+                    "value": "Този файл не можа да бъде прочетен като мрежов файл на EPANET.",
+                    "english": "That file could not be read as an EPANET network file."
+                }
+            }
+        },
+        "lpn_workspace_refused_unreadable": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_export_refused",
+                    "value": "Този проект не може да бъде записан като файл на EPANET: {detail}",
+                    "english": "This project cannot be written as an EPANET file: {detail}"
+                },
+                "next_translated": {
+                    "key": "lpn_inp_bad_file",
+                    "value": "Този файл не можа да бъде прочетен като мрежов файл на EPANET.",
+                    "english": "That file could not be read as an EPANET network file."
+                }
+            }
+        },
+        "lpn_workspace_refused_format": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_export_refused",
+                    "value": "Този проект не може да бъде записан като файл на EPANET: {detail}",
+                    "english": "This project cannot be written as an EPANET file: {detail}"
+                },
+                "next_translated": {
+                    "key": "lpn_inp_bad_file",
+                    "value": "Този файл не можа да бъде прочетен като мрежов файл на EPANET.",
+                    "english": "That file could not be read as an EPANET network file."
+                }
+            }
+        },
+        "lpn_workspace_refused_newer": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_export_refused",
+                    "value": "Този проект не може да бъде записан като файл на EPANET: {detail}",
+                    "english": "This project cannot be written as an EPANET file: {detail}"
+                },
+                "next_translated": {
+                    "key": "lpn_inp_bad_file",
+                    "value": "Този файл не можа да бъде прочетен като мрежов файл на EPANET.",
+                    "english": "That file could not be read as an EPANET network file."
+                }
+            }
+        },
+        "lpn_workspace_confirm": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_export_refused",
+                    "value": "Този проект не може да бъде записан като файл на EPANET: {detail}",
+                    "english": "This project cannot be written as an EPANET file: {detail}"
+                },
+                "next_translated": {
+                    "key": "lpn_inp_bad_file",
+                    "value": "Този файл не можа да бъде прочетен като мрежов файл на EPANET.",
+                    "english": "That file could not be read as an EPANET network file."
+                }
+            }
+        },
+        "lpn_workspace_refused_storage": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {

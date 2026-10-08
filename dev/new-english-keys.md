@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**129 still to read on master**, of 236 untranslated keys, of 2456 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**128 still to read on master**, of 236 untranslated keys, of 2456 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -196,7 +196,7 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   @@ NEEDS RULING
 
-## lpn_  (234, 127 to read @@ NEEDS RULING)
+## lpn_  (234, 126 to read @@ NEEDS RULING)
 
 - **`lpn_alt_calc_options`**
   > Calculation options
@@ -878,7 +878,7 @@ never edits a synonym.
   @@ NEEDS RULING
 - **`lpn_workspace_confirm`**
   > Replace this browser's workspace layout with the one in the file?
-  @@ NEEDS RULING
+  _Ruled 2026-10-08: Calls page 8 October: his own text, "Replace this browser's workspace layout with the one in the file?"_
 - **`lpn_workspace_exported`**
   > Workspace saved to {file}: {n} settings.
   @@ NEEDS RULING
@@ -914,7 +914,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**134 still to read**, of 137 new keys across 18 unmerged branch(es).
+**134 still to read**, of 137 new keys across 16 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -924,10 +924,6 @@ Each branch carries the commit it was read at. This part is a SNAPSHOT and is no
 fresh by the build — a branch moves whenever anybody commits on it, and failing master's
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
-
-### chore/protect-1008 (`8ed272a8`) — adds no English strings
-
-### chore/sprint-1008 (`c385f6f0`) — adds no English strings
 
 ### feat/bentley-interop (`a053c602`) — 63 new, 63 to read @@ NEEDS RULING
 
@@ -1162,7 +1158,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > DXF file…
   @@ NEEDS RULING
 
-### feat/hover-label (`f8393134`) — 2 new, 2 to read @@ NEEDS RULING
+### feat/hover-label (`944f963d`) — 2 new, 2 to read @@ NEEDS RULING
 
 - **`lpn_settings_hover_card`**
   > Show the full label on hover
@@ -1193,7 +1189,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`2e5e81c4`) — adds no English strings
 
-### feat/message-dismiss (`bfa6517b`) — 5 new, 5 to read @@ NEEDS RULING
+### feat/message-dismiss (`d4c88b12`) — 5 new, 5 to read @@ NEEDS RULING
 
 - **`lpn_hotkeys_zoomwin_def`**
   > Zoom Window: drag a rectangle to zoom to.
@@ -1376,6 +1372,6 @@ build for that would be a gate nobody keeps. Refresh it with
   > Guide
   @@ NEEDS RULING
 
-### feat/visit-dedupe (`22e3c4ca`) — adds no English strings
+### feat/visit-dedupe (`b4a99e9a`) — adds no English strings
 
-### feat/workspace (`9766fee0`) — adds no English strings
+### feat/workspace (`fb8eea71`) — adds no English strings
