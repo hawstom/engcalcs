@@ -796,7 +796,7 @@ EngCalcs.lpnGeom = (function () {
 			// The first ring that can touch the grid at all, and the last that can.
 			rFrom = Math.max(0, -cx, cx - (nx - 1), -cy, cy - (ny - 1)),
 			rTo = Math.max(Math.abs(cx), Math.abs(cx - (nx - 1)), Math.abs(cy), Math.abs(cy - (ny - 1))),
-			r, g;
+			r;
 		for (r = rFrom; r <= rTo; r++) {
 			// **THE STOPPING RULE IS (r - 1), NOT r.** The point sits somewhere inside its own cell,
 			// not at its centre, so a cell r rings out is only guaranteed to be (r - 1) cells away.
@@ -804,10 +804,25 @@ EngCalcs.lpnGeom = (function () {
 			if (best <= (r - 1) * idx.cell) { break; }
 			if (r === 0) { cellAt(cx, cy); continue; }
 			// The perimeter of the ring only; everything inside it was done on an earlier pass.
-			for (g = cx - r; g <= cx + r; g++) { cellAt(g, cy - r); cellAt(g, cy + r); }
-			for (g = cy - r + 1; g <= cy + r - 1; g++) { cellAt(cx - r, g); cellAt(cx + r, g); }
+			// **CUT TO THE GRID BEFORE THE LOOP, NOT CELL BY CELL** (Task 681(b)): a label far from
+			// any other pipe walks many empty rings, and asking each cell of each ring whether it is
+			// on the grid was most of the label pass's side choice in Chrome. The same cells are read.
+			ringRow(cy - r, cx - r, cx + r);
+			ringRow(cy + r, cx - r, cx + r);
+			ringCol(cx - r, cy - r + 1, cy + r - 1);
+			ringCol(cx + r, cy - r + 1, cy + r - 1);
 		}
 		return best;
+		function ringRow(gy, g0, g1) {
+			if (gy < 0 || gy > ny - 1) { return; }
+			var row = gy * nx, list, e = g1 < nx - 1 ? g1 : nx - 1, k;
+			for (k = g0 > 0 ? g0 : 0; k <= e; k++) { list = idx.cells[row + k]; if (list) { consider(list); } }
+		}
+		function ringCol(gx, g0, g1) {
+			if (gx < 0 || gx > nx - 1) { return; }
+			var list, e = g1 < ny - 1 ? g1 : ny - 1, k;
+			for (k = g0 > 0 ? g0 : 0; k <= e; k++) { list = idx.cells[k * nx + gx]; if (list) { consider(list); } }
+		}
 	}
 
 	// ---- WEB MERCATOR: the DISPLAY projection (ROADMAP Task 145's projection seam) ---------------

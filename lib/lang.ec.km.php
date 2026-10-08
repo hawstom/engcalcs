@@ -1795,7 +1795,6 @@ $ec_lang['lpn_file_import_inp']='នាំចូលឯកសារ EPANET…';
 $ec_lang['lpn_file_import_inp_tip']='អានបណ្ដាញចេញពីឯកសារ EPANET ទាំងឯកសារអត្ថបទ .inp ឬឯកសារ .net ដែល EPANET រក្សាទុក រួចរក្សាទុកវានៅក្នុងកម្មវិធីរុករកនេះជាគម្រោងថ្មី។';
 // The other direction (Task 281). A DOWNLOAD, so the word is Export rather than Save: this page
 // keeps no handle on an `.inp` and never writes back to one.
-$ec_lang['lpn_file_export_inp']='នាំចេញឯកសារ EPANET…';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_file_export_inp_tip']='សរសេរបណ្ដាញនេះជាឯកសារ EPANET .inp មួយ ហើយទាញយកវា។ លេខដែលអ្នកបានវាយ ត្រូវបានសរសេរឲ្យដូចអ្វីដែលអ្នកបានវាយបេះបិទ។ អ្វីៗដែលទម្រង់ .inp មិនអាចផ្ទុកបាន ត្រូវបានរាយឲ្យអ្នកឃើញនៅពេលក្រោយ។';
 $ec_lang['lpn_status_inp_exported']='បាននាំចេញ {file}។';
@@ -2742,9 +2741,7 @@ $ec_lang['lpn_scenario_preset_flow_max_tip']='ការក្រិតតាម�
 $ec_lang['lpn_scenario_preset_average_day']='4. ថ្ងៃមធ្យម';
 $ec_lang['lpn_scenario_preset_average_day_tip']='កត្តាគុណតម្រូវការ 1៖ តម្រូវការនីមួយៗដូចដែលបានបញ្ចូល ដែលត្រូវបានចាត់ទុកថាជាតម្រូវការថ្ងៃមធ្យម។';
 $ec_lang['lpn_scenario_preset_max_day']='5. ថ្ងៃអតិបរមា';
-$ec_lang['lpn_scenario_preset_max_day_tip']='កត្តាគុណតម្រូវការ 2.0 ដងនៃថ្ងៃមធ្យម ជាតម្លៃកន្លែងទុក។ ប្រព័ន្ធភាគច្រើននៅចន្លោះ 1.2 និង 3.0 (National Research Council, 2006)។ កំណត់ផ្ទាល់ខ្លួនរបស់អ្នកនៅក្នុង ការកំណត់ ការគណនា ធារាសាស្ត្រ កត្តាគុណតម្រូវការ។';
 $ec_lang['lpn_scenario_preset_peak_hour']='6. ម៉ោងកំពូល';
-$ec_lang['lpn_scenario_preset_peak_hour_tip']='កត្តាគុណតម្រូវការ 3.0 ដងនៃថ្ងៃមធ្យម ជាតម្លៃកន្លែងទុក។ ប្រព័ន្ធភាគច្រើននៅចន្លោះ 3.0 និង 6.0 (National Research Council, 2006)។ កំណត់ផ្ទាល់ខ្លួនរបស់អ្នកនៅក្នុង ការកំណត់ ការគណនា ធារាសាស្ត្រ កត្តាគុណតម្រូវការ។';
 $ec_lang['lpn_scenario_preset_fire_max_day']='7. អគ្គីភ័យបូកថ្ងៃអតិបរមា';
 $ec_lang['lpn_scenario_preset_fire_max_day_tip']='តម្រូវការថ្ងៃអតិបរមា (កត្តាគុណ 2.0)។ ដំណើរការ ការវិភាគលំហូរពន្លត់អគ្គីភ័យ នៅក្នុងសេណារីយ៉ូនេះ៖ វាបន្ថែមលំហូរពន្លត់អគ្គីភ័យនៅថ្នាំងនីមួយៗលើតម្រូវការនេះ។';
 $ec_lang['lpn_delete_drops_overrides']='ការលុបធាតុនេះក៏បោះបង់ចោលតម្លៃ {n} ដែលសេណារីយ៉ូរបស់អ្នកកាន់សម្រាប់វាដែរ។ បន្តទេ?';

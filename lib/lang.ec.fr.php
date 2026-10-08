@@ -1765,7 +1765,6 @@ $ec_lang['lpn_file_import_inp']='Importer un fichier EPANET…';
 $ec_lang['lpn_file_import_inp_tip']='Crée un nouveau projet à partir d\'un fichier EPANET, au format d\'exportation .inp (à privilégier) ou au format natif .net (en dernier recours).';
 // The other direction (Task 281). A DOWNLOAD, so the word is Export rather than Save: this page
 // keeps no handle on an `.inp` and never writes back to one.
-$ec_lang['lpn_file_export_inp']='Exporter le fichier EPANET…';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_file_export_inp_tip']='Télécharger ce réseau sous forme de fichier EPANET .inp. Tout ce que le format .inp ne peut pas contenir vous est ensuite signalé.';
 $ec_lang['lpn_status_inp_exported']='{file} exporté.';
@@ -2693,9 +2692,7 @@ $ec_lang['lpn_scenario_preset_flow_max_tip']='Étalonnage du test de débit pour
 $ec_lang['lpn_scenario_preset_average_day']='4. Jour moyen';
 $ec_lang['lpn_scenario_preset_average_day_tip']='Multiplicateur de demande 1 : chaque demande telle que saisie, considérée comme la demande du jour moyen.';
 $ec_lang['lpn_scenario_preset_max_day']='5. Jour de pointe';
-$ec_lang['lpn_scenario_preset_max_day_tip']='Multiplicateur de demande de 2,0 fois le jour moyen, une valeur provisoire. La plupart des réseaux se situent entre 1,2 et 3,0 (National Research Council, 2006). Réglez celle de votre réseau dans Paramètres, Calcul, Hydraulique, Multiplicateur de demande.';
 $ec_lang['lpn_scenario_preset_peak_hour']='6. Heure de pointe';
-$ec_lang['lpn_scenario_preset_peak_hour_tip']='Multiplicateur de demande de 3,0 fois le jour moyen, une valeur provisoire. La plupart des réseaux se situent entre 3,0 et 6,0 (National Research Council, 2006). Réglez celle de votre réseau dans Paramètres, Calcul, Hydraulique, Multiplicateur de demande.';
 $ec_lang['lpn_scenario_preset_fire_max_day']='7. Incendie plus jour de pointe';
 $ec_lang['lpn_scenario_preset_fire_max_day_tip']='Demande du jour de pointe (multiplicateur 2,0). Lancez l\'analyse du débit d\'incendie dans ce scénario : elle ajoute le débit d\'incendie à chaque jonction en plus de cette demande.';
 $ec_lang['lpn_delete_drops_overrides']='Supprimer cet élément efface aussi {n} valeurs que vos scénarios détiennent pour lui. Continuer ?';

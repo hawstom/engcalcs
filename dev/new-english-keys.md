@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**117 still to read on master**, of 223 untranslated keys, of 2446 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**117 still to read on master**, of 224 untranslated keys, of 2444 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -21,7 +21,7 @@ hit takes you to a section and the rest walk its keys. A key already ruled does 
 it, and a fully ruled group says `all ruled` and can be skipped whole.
 Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
-## Questions from the translators  (1 to read @@ NEEDS RULING)
+## Questions from the translators  (13 to read @@ NEEDS RULING)
 
 **These are SHIPPED strings, already translated into 26 languages.** A wave-0
 reading or a translator found each one readable two ways, and no sprint launches while one is
@@ -39,7 +39,106 @@ is the one you meant. "The first one" is a complete answer.
   *The proposal:* PROPOSED A: '⚠ At least one junction is below {pressure} at the demands as entered (a demand scale of 1). All junctions keep {pressure} only if demands are cut to a demand scale of {m} or less.' PROPOSED B: '⚠ The demands as entered (a demand scale of 1) leave at least one junction below {pressure}. The largest demand scale that keeps every junction at {pressure} or above is {m}.' B paralle...
   @@ NEEDS RULING
 
-## Synonym entries to approve  (3, 1 to read @@ NEEDS RULING)
+### from sprint 1008-wave0
+
+- **`lpn_change_type_born`**
+  > These are new, as on a newly drawn one:
+  *The finding:* 'These are new, as on a newly drawn one:' has no noun for 'these' or for 'one'. It heads a list of values that the changed asset receives as defaults (js/looped-network.js:32833).
+  1. these values are created with their defaults, as on an asset newly drawn
+  2. these assets are new, like a newly drawn asset
+  **What this asks for:** a WORDING ruling -- is the English above right, or say what it should say.
+  *The proposal:* PROPOSED English: 'These values are new, set as on a newly drawn asset:' Cost: 26 retranslations.
+  @@ NEEDS RULING
+- **`lpn_cp_restrict_tip`**
+  > Restrict these characters:
+  *The finding:* Leads the tip in the Restrict mode of a custom property's character rule; the other mode is 'Allow only these characters:' (js/looped-network.js:49645). 'Restrict' can mean forbid or limit to, and the second sense is the Allow mode. The sibling option label lpn_cp_restrict carries the same words and must stay identical, so English is not the route.
+  1. forbid the characters listed
+  2. limit entries to the characters listed (the same as Allow only)
+  **What this asks for:** WRITTEN PERMISSION to add a `$ec_lang_syn` entry for this key (a note to the 26 translators; it changes no English and nothing a visitor reads).
+  *The proposal:* Add $ec_lang_syn PROPOSAL (AI may not write it) on lpn_cp_restrict_tip and its sibling lpn_cp_restrict: 'Forbid these characters; the opposite of Allow only these characters'. English unchanged.
+  @@ NEEDS RULING
+- **`lpn_fb_intro`**
+  > Canned messages (optional). Nothing is sent until you press Send.
+  *The finding:* 'Canned messages' is an English idiom for ready-made messages; read literally it is about tins, and a translator who does not know the idiom has nothing else to go on. Heads the row of pick buttons in the feedback box (js/looped-network.js:61769).
+  1. ready-made messages to pick from
+  2. messages in a can (literal), or discarded messages
+  **What this asks for:** WRITTEN PERMISSION to add a `$ec_lang_syn` entry for this key (a note to the 26 translators; it changes no English and nothing a visitor reads).
+  *The proposal:* Add $ec_lang_syn PROPOSAL (AI may not write it): 'Ready-made messages; preset choices the visitor can pick instead of typing'. English unchanged.
+  @@ NEEDS RULING
+- **`lpn_ff_menu_tip`**
+  > Selection-wide check with collateral effect check
+  *The finding:* 'Selection-wide check with collateral effect check' is a noun stack an English reader also has to decode; 'collateral effect' is not engineering usage, and 'Selection-wide' can read as one check over the whole selection rather than one per junction. The analysis tests each chosen junction in turn and then checks the rest of the system (lpn_ff_intro, lpn_ff_design_tip).
+  1. each selected junction is tested for fire flow in turn, and the effect on other junctions and pipes is checked
+  2. one combined check of the whole selection, plus a check of side effects of some kind
+  **What this asks for:** a WORDING ruling -- is the English above right, or say what it should say.
+  *The proposal:* PROPOSED English: 'Test each selected junction for fire flow, and check the effect on the rest of the system' Cost: 26 retranslations.
+  @@ NEEDS RULING
+- **`lpn_find_filter_tip`**
+  > Filter in Table(s) that match "What to search" above
+  *The finding:* The verb has no object, and 'Filter in' parses two ways: include in the table, or filter the tables. Button 'Filter in table' in Find and replace; it filters the rows of the table searched (applyTableFilter, js/looped-network.js:20610).
+  1. show only the rows that match "What to search" in the table or tables searched
+  2. filter (choose) the tables whose name matches "What to search"
+  **What this asks for:** a WORDING ruling -- is the English above right, or say what it should say.
+  *The proposal:* PROPOSED English: 'Show only the rows that match "What to search" above, in each table searched.' Cost: 26 retranslations.
+  @@ NEEDS RULING
+- **`lpn_mapgeo_dial_help`**
+  > Slide the two bars, or enter numbers in the boxes above them, to make the map bigger or smaller and to rotate it. The middle of each bar keeps the fit from step 1, so 1 and 0 mean no change. Arrow keys work on both.
+  *The finding:* 'so 1 and 0 mean no change' does not pair the numbers with the two bars. The bars are Map size (read as {f} times) and rotation.
+  1. a size of 1 and a rotation of 0 mean no change
+  2. either bar set to 1 or 0 means no change
+  **What this asks for:** a WORDING ruling -- is the English above right, or say what it should say.
+  *The proposal:* PROPOSED English: replace the last clause with 'so a size of 1 and a rotation of 0 mean no change.' Cost: 26 retranslations.
+  @@ NEEDS RULING
+- **`lpn_meter_placed`**
+  > Customer {id} added. Its description and demand are entered in the Customers table, or press it in Select to open its box.
+  *The finding:* 'press it in Select' names neither the mode nor what 'it' is; Select is a mode (lpn_tool_select), and 'press' reads as a keyboard press. 'its box' does not say which box. Notice after placing a customer (js/looped-network.js:45867).
+  1. select the customer on the map while the Select mode is on, to open its properties box
+  2. press a key or a button called Select to open some box
+  **What this asks for:** a WORDING ruling -- is the English above right, or say what it should say.
+  *The proposal:* PROPOSED English: 'Customer {id} added. Enter its description and demand in the Customers table, or select it in Select mode to open its properties box.' Cost: 26 retranslations.
+  @@ NEEDS RULING
+- **`lpn_pane_scn_alt_tip`**
+  > {category} alt.: {alternative}
+  *The finding:* 'alt.' is an English abbreviation for alternative (the scenario alternative holding the override, Tom's wording 2026-10-06, js/looped-network.js:25361). A translator meets it with no expansion; altitude and the Alt key are both plausible.
+  1. alternative: the scenario alternative that holds this value
+  2. altitude, or the Alt key
+  **What this asks for:** WRITTEN PERMISSION to add a `$ec_lang_syn` entry for this key (a note to the 26 translators; it changes no English and nothing a visitor reads).
+  *The proposal:* Add $ec_lang_syn PROPOSAL (AI may not write it): 'alt. abbreviates alternative (the scenario alternative that holds this override); abbreviate it the way your language abbreviates that word'. English unchanged.
+  @@ NEEDS RULING
+- **`lpn_reports_epanet`**
+  > Run
+  *The finding:* Menu item under Water, Reports that opens the EPANET run report (js/looped-network.js:5111). Alone, 'Run' is a verb in most languages' default sense, and a translator will render 'run the model', which is a different command (the toolbar Calculate). English stands: Tom named it in fix/report-names.
+  1. noun: the report of the last run
+  2. verb: start a run
+  **What this asks for:** WRITTEN PERMISSION to add a `$ec_lang_syn` entry for this key (a note to the 26 translators; it changes no English and nothing a visitor reads).
+  *The proposal:* Add $ec_lang_syn PROPOSAL (AI may not write it): 'Run report; a noun, the report EPANET wrote for the last run, not the command to start a run'. English unchanged, no retranslation of English needed beyond the note.
+  @@ NEEDS RULING
+- **`lpn_search_refused`**
+  > Place-name search is off, and nothing was sent. Go to a latitude and longitude still works.
+  *The finding:* 'Go to a latitude and longitude still works' starts with what reads as an imperative; it is the name of the menu item lpn_goto_menu ('Go to a latitude and longitude...'). Low.
+  1. the Go to a latitude and longitude command still works
+  2. an instruction to go to a latitude and longitude, followed by 'still works'
+  **What this asks for:** a WORDING ruling -- is the English above right, or say what it should say.
+  *The proposal:* PROPOSED English: 'Place-name search is off, and nothing was sent. The Go to a latitude and longitude command still works.' Cost: 26 retranslations.
+  @@ NEEDS RULING
+- **`lpn_snip_tip_mode`**
+  > Snip shape
+  *The finding:* Tip on the chevron beside the Snip button that opens a menu of Rectangle or Freehand (js/looped-network.js:42979). 'Snip shape' reads as an imperative (snip a shape) as easily as a noun.
+  1. noun: the shape of the snip, chosen from this menu
+  2. verb: snip a shape
+  **What this asks for:** WRITTEN PERMISSION to add a `$ec_lang_syn` entry for this key (a note to the 26 translators; it changes no English and nothing a visitor reads).
+  *The proposal:* Add $ec_lang_syn PROPOSAL (AI may not write it): 'Snip shape; a noun, the choice of shape (rectangle or freehand) for the next snip, not an instruction'. English unchanged.
+  @@ NEEDS RULING
+- **`lpn_tool_area_tip`**
+  > Follow on-screen wizard. Press again to cycle through window, lasso, and polygon. Hold Shift to keep existing selection set and add or remove (toggle) what you select.
+  *The finding:* 'Hold Shift to keep existing selection set and add or remove' is a garden path: 'set' reads as a verb ('keep ..., set and add') before it reads as the noun 'selection set'. Articles are also dropped ('Follow on-screen wizard').
+  1. keep the current selection set and add to it or remove from it
+  2. keep the existing selection, set something, and add or remove
+  **What this asks for:** a WORDING ruling -- is the English above right, or say what it should say.
+  *The proposal:* PROPOSED English: 'Follow the on-screen prompts. Press again to cycle through window, lasso, and polygon. Hold Shift to keep the current selection and add or remove (toggle) what you select.' Cost: 26 retranslations.
+  @@ NEEDS RULING
+
+## Synonym entries to approve  (6, 4 to read @@ NEEDS RULING)
 
 **These are translator notes (`$ec_lang_syn`), not visitor wording.** Each was written against an
 English string that has since changed, or against a key that no longer exists. Say which: keep it
@@ -73,7 +172,31 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   _Ruled 2026-10-05: Is this _syn needed?_
 
-## lpn_  (221, 115 to read @@ NEEDS RULING)
+- **`lpn_scenario_push_values`**
+  > Values discarded:
+  *Why stale:* the English changed after this synonym was written
+  *Written against:* Values thrown away:
+  *Current synonym:* Values thrown away, Values discarded, Values lost, Values wiped, Values replaced, Values displaced, Values cleared, Custom values cleared | a count follows this label, not a list of values
+  **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
+  @@ NEEDS RULING
+
+- **`rc_Hp`**
+  > <span class="ec-help" title="Ponding (Hp > yn) is desirable because it reduces upstream erosion. (USDA)">Inlet weir head, H<sub>p</sub> <span class="ec-tip">?</span></span>
+  *Why stale:* the English changed after this synonym was written
+  *Written against:* <span class="ec-help" title="Ponding (Hp > yn) is good — reduces upstream erosion. (USDA)">Inlet weir head, H<sub>p</sub> <span class="ec-tip">?</span></span>
+  *Current synonym:* | gloss: weir head
+  **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
+  @@ NEEDS RULING
+
+- **`rc_yn`**
+  > <span class="ec-help" title="Ponding (Hp > yn) is desirable because it reduces upstream erosion. (USDA)">Normal depth in inlet channel, y<sub>n</sub> <span class="ec-tip">?</span></span>
+  *Why stale:* the English changed after this synonym was written
+  *Written against:* <span class="ec-help" title="Ponding (Hp > yn) is good — reduces upstream erosion. (USDA)">Normal depth in inlet channel, y<sub>n</sub> <span class="ec-tip">?</span></span>
+  *Current synonym:* Enter the normal depth in the channel that delivers flow to this chute. | Upstream, not downstream: ponding reduces erosion UPSTREAM of the chute inlet (above/before it, toward the source). Do not flip the direction.
+  **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
+  @@ NEEDS RULING
+
+## lpn_  (222, 115 to read @@ NEEDS RULING)
 
 - **`lpn_alt_calc_options`**
   > Calculation options
@@ -103,7 +226,7 @@ never edits a synonym.
   > These are new, as on a newly drawn one:
   @@ NEEDS RULING
 - **`lpn_change_type_customers`**
-  > Only a pipe serves customers, so these customers are connected instead to the node shown in parentheses, where their demand already lands. They stay where they are drawn, and their demand is unchanged:
+  > Only a pipe serves customers, so these customers are connected instead to the node shown in parentheses, where their demand is already applied. They stay where they are drawn, and their demand is unchanged:
   @@ NEEDS RULING
 - **`lpn_change_type_key`**
   > ID: Lost entry
@@ -154,7 +277,7 @@ never edits a synonym.
   > Clear to hide the fill and the contour lines; select to bring them back as they were. Node colors stay.
   _Ruled OK 2026-10-05._
 - **`lpn_copy_opened_unsaved`**
-  > Opened {file} as a copy, with a new lock of its own that will be saved with the next file save.
+  > Opened {file} as a copy, with a new lock that will be saved with the next file save.
   @@ NEEDS RULING
 - **`lpn_cp_allow_tip`**
   > Allow only these characters:
@@ -250,8 +373,8 @@ never edits a synonym.
   > Demand scale
   _Ruled OK 2026-10-03._
 - **`lpn_ds_multiplier_tip`**
-  > The number each demand is multiplied by: 1.5 is half again as much water. It applies on top of the active scenario's own demand multiplier, which is already in the demands, and it is never saved in your project.
-  _Ruled OK 2026-10-03._
+  > The factor by which each demand is multiplied; 1.5 is a 50% increase. It applies in addition to the demand multiplier of the active scenario, which is already in the demands, and it is never saved in the project.
+  _Ruled 2026-10-07: Technical-English interview: Use proposed_
 - **`lpn_ds_no_junctions`**
   > This project has no junctions yet, so there are no demands to scale.
   _Ruled OK 2026-10-03._
@@ -307,7 +430,7 @@ never edits a synonym.
   > Solved with the EPANET solver, because the demand model is pressure driven.
   _Ruled OK 2026-10-05._
 - **`lpn_engine_unavailable_why`**
-  > Valves that open and close on their own cannot be solved without the EPANET solver. {reason}
+  > Pressure and flow control valves (PRV, PSV, FCV) cannot be solved without the EPANET solver. {reason}
   @@ NEEDS RULING
 - **`lpn_fb_bad_email`**
   > That email address does not look right. Correct it, or leave it empty.
@@ -347,9 +470,6 @@ never edits a synonym.
   @@ NEEDS RULING
 - **`lpn_fb_sends`**
   > What this sends: the name of this page, your language, the version of the site, the code of the message on the map if there is one, and what you picked or typed. Never your drawing or your network. Your email address is used only to reply to you.
-  @@ NEEDS RULING
-- **`lpn_file_export_geojson`**
-  > Export GeoJSON file…
   @@ NEEDS RULING
 - **`lpn_file_export_geojson_tip`**
   > Download this network as a GeoJSON file for QGIS, ArcGIS Pro and other GIS programs. Junctions, tanks and reservoirs are points, and pipes, pumps and valves are lines that follow their vertices. Positions are latitude and longitude. Results are included only when the network has been solved.
@@ -465,6 +585,9 @@ never edits a synonym.
 - **`lpn_pgraph_source_share_from`**
   > Source share from {node}
   _Ruled OK 2026-10-01._
+- **`lpn_popup_none`**
+  > Nothing is selected. Select an asset on the map to see its properties.
+  @@ NEEDS RULING
 - **`lpn_profile_file_done`**
   > Profile read from the file: {used} of {total} nodes found in this network.
   _Ruled OK 2026-10-03._
@@ -490,8 +613,8 @@ never edits a synonym.
   > Demand deficit
   _Ruled OK 2026-10-05._
 - **`lpn_result_demand_deficit_tip`**
-  > The demand this junction asks for and does not receive, because the pressure is below the required pressure.
-  _Ruled OK 2026-10-05._
+  > The demand at this junction that is not delivered, because the pressure is below the required pressure.
+  _Ruled 2026-10-07: Technical-English interview: Use proposed_
 - **`lpn_result_pump_head`**
   > Head
   _Ruled OK 2026-10-03._
@@ -513,6 +636,9 @@ never edits a synonym.
 - **`lpn_scenario_hyd_step_tip`**
   > Leave blank to inherit from parent.
   _Ruled OK 2026-10-05._
+- **`lpn_scenario_preset_mult_tip`**
+  > Demand multiplier {mult} times average day, a placeholder value. Most systems fall between {lo} and {hi} (National Research Council, 2006). Set the value for the system being modeled in Settings, Calculation, Hydraulics, Demand multiplier.
+  _Ruled 2026-10-07: Calls page 7 October: Use proposed_
 - **`lpn_scncmp_at_time`**
   > {value} at {id}, {time}
   _Ruled OK 2026-10-05._
@@ -688,7 +814,7 @@ never edits a synonym.
   > The browser refused to start the EPANET solver. WebAssembly may be turned off by a security setting or an extension.
   @@ NEEDS RULING
 - **`lpn_time_no_engine_why`**
-  > The built-in solver calculates one moment at a time, so this is the network at {time} only: every pattern is read at that moment, and every tank still sits at its starting level instead of filling and draining. {reason}
+  > The built-in solver solves one instant at a time, so this is the network at {time} only: every pattern is read at that instant, and every tank remains at its initial level instead of filling and draining. {reason}
   @@ NEEDS RULING
 - **`lpn_time_scn_overrides`**
   > Scenario overrides:
@@ -730,13 +856,13 @@ never edits a synonym.
   > A Manning n is normally between {min} and {max}. A number outside that range is often a roughness meant for another friction method.
   @@ NEEDS RULING
 - **`lpn_valwarn_negative`**
-  > EPANET refuses a negative number here.
+  > EPANET does not accept a negative number here.
   @@ NEEDS RULING
 - **`lpn_valwarn_positive`**
-  > EPANET refuses zero or a negative number here.
+  > EPANET does not accept zero or a negative number here.
   @@ NEEDS RULING
 - **`lpn_valwarn_tank_levels`**
-  > EPANET refuses this tank. The lowest water depth must not exceed the water depth, and the water depth must not exceed the highest water depth.
+  > EPANET does not accept this tank. The lowest water depth must not exceed the water depth, and the water depth must not exceed the highest water depth.
   @@ NEEDS RULING
 
 ## points_  (2, 2 to read @@ NEEDS RULING)
@@ -752,7 +878,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**109 still to read**, of 112 new keys across 14 unmerged branch(es).
+**144 still to read**, of 147 new keys across 16 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -763,9 +889,9 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/technical-english (`4be0b5b5`) — adds no English strings
+### chore/wave0-1008 (`a9324017`) — adds no English strings
 
-### feat/bentley-interop (`780ecda7`) — 60 new, 60 to read @@ NEEDS RULING
+### feat/bentley-interop (`dff89641`) — 63 new, 63 to read @@ NEEDS RULING
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -773,8 +899,17 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_alt_cat_presentation`**
   > Presentation
   @@ NEEDS RULING
+- **`lpn_change_type_create_overrides`**
+  > Create overrides
+  @@ NEEDS RULING
 - **`lpn_change_type_line_alternative`**
   > {id}: {property} {value}, in alternative {alternative}
+  @@ NEEDS RULING
+- **`lpn_change_type_scenario_ask`**
+  > Current scenario is not Base. Create overrides?
+  @@ NEEDS RULING
+- **`lpn_change_type_switch_base`**
+  > Switch to Base
   @@ NEEDS RULING
 - **`lpn_pane_scn_cur_only`**
   > Current scenario only
@@ -950,7 +1085,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/desktop (`baba0f04`) — adds no English strings
 
-### feat/dxf (`a5db182f`) — 12 new, 12 to read @@ NEEDS RULING
+### feat/dxf (`68495608`) — 12 new, 12 to read @@ NEEDS RULING
 
 - **`lpn_dxf_export_failed`**
   > The DXF file was not written: an error in this page stopped it ({error}).
@@ -965,10 +1100,10 @@ build for that would be a gate nobody keeps. Refresh it with
   > Exported {file}. Its coordinates are {crs}, in meters, not latitude and longitude.
   @@ NEEDS RULING
 - **`lpn_dxf_note_blocks`**
-  > Layers are named {prefix}, the asset code, a hyphen, and the alternative, as in {example}. Each element is a block inserted at scale 1 with attributes 1 unit high; scale the blocks to set the text height. Only the ID attribute is visible; the ATTDISP command shows the others.
+  > Layers are named {prefix}, the asset code, a hyphen, and the alternative, as in {example}. Each element is a block inserted at scale 1 with attributes 1 unit high; scale the blocks to set the text height. Every attribute is visible; the attributes of one element are stacked in a column beside its symbol.
   @@ NEEDS RULING
 - **`lpn_dxf_note_categories`**
-  > {n} junctions have more than one demand category. Their {tag} attribute holds the first category only.
+  > {n} junctions have more than one demand category. Their {tag} attribute holds the sum of the base demands of all categories.
   @@ NEEDS RULING
 - **`lpn_dxf_note_crs`**
   > Coordinates: {crs}, exactly as this project states them.
@@ -982,11 +1117,11 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_dxf_note_shortened`**
   > {n} values were longer than a DXF file allows ({max} characters), so each was shortened and ends in three periods.
   @@ NEEDS RULING
-- **`lpn_file_export_dxf`**
-  > Export DXF file…
-  @@ NEEDS RULING
 - **`lpn_file_export_dxf_tip`**
   > Download this network for AutoCAD and other CAD programs: pipes, pumps, and valves as polylines, and every element as a block whose attributes carry its ID and property values in the project units.
+  @@ NEEDS RULING
+- **`lpn_file_export_item_dxf`**
+  > DXF file…
   @@ NEEDS RULING
 
 ### feat/label-gang-search (`8b31a907`) — 3 new, all ruled
@@ -1011,22 +1146,37 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`2e5e81c4`) — adds no English strings
 
-### feat/section-grid (`0345725c`) — 1 new, 1 to read @@ NEEDS RULING
+### feat/message-dismiss (`f786f69f`) — 5 new, 5 to read @@ NEEDS RULING
+
+- **`lpn_hotkeys_zoomwin_def`**
+  > Zoom Window: drag a rectangle to zoom to.
+  @@ NEEDS RULING
+- **`lpn_msglog_hidden`**
+  > Hidden
+  @@ NEEDS RULING
+- **`lpn_msglog_unhide`**
+  > Show
+  @@ NEEDS RULING
+- **`lpn_status_dismiss`**
+  > Hide this message
+  @@ NEEDS RULING
+- **`lpn_status_hidden_tip`**
+  > Show the hidden message on the map again.
+  @@ NEEDS RULING
+
+### feat/section-grid (`005d4e63`) — 1 new, 1 to read @@ NEEDS RULING
 
 - **`points_data_points_heading`**
   > Points data<br />(use Copy to see format)
   @@ NEEDS RULING
 
-### feat/table-export (`0de5ecbd`) — 10 new, 10 to read @@ NEEDS RULING
+### feat/table-export (`4f04c877`) — 12 new, 12 to read @@ NEEDS RULING
 
 - **`lpn_export_table_all`**
   > All
   @@ NEEDS RULING
 - **`lpn_export_table_current`**
   > Current
-  @@ NEEDS RULING
-- **`lpn_export_table_format`**
-  > Format
   @@ NEEDS RULING
 - **`lpn_export_table_go`**
   > Export
@@ -1035,28 +1185,43 @@ build for that would be a gate nobody keeps. Refresh it with
   > Results are exported only for the scenario last calculated.
   @@ NEEDS RULING
 - **`lpn_export_table_title`**
-  > Export table
+  > Export to {format}
   @@ NEEDS RULING
-- **`lpn_file_export_table`**
-  > Export table…
+- **`lpn_file_export_csv_tip`**
+  > Download a table as the Tables pane shows it. Several tables come as one zip file of CSV files, with a file for each library their IDs refer to.
+  @@ NEEDS RULING
+- **`lpn_file_export_item_csv`**
+  > CSV file…
+  @@ NEEDS RULING
+- **`lpn_file_export_item_ods`**
+  > ODS file…
+  @@ NEEDS RULING
+- **`lpn_file_export_item_xlsx`**
+  > XLSX file…
+  @@ NEEDS RULING
+- **`lpn_file_export_tables_heading`**
+  > Tables and libraries
+  @@ NEEDS RULING
+- **`lpn_file_export_tables_tip`**
+  > Download the tables as the Tables pane shows them, one sheet each, with a sheet for each library their IDs refer to: patterns, curves, pipe types, and fittings.
   @@ NEEDS RULING
 - **`lpn_pane_copy_heads`**
   > Copy with headings
   @@ NEEDS RULING
-- **`lpn_pane_export_csv`**
-  > Export table as CSV
-  @@ NEEDS RULING
-- **`lpn_pane_export_ods`**
-  > Export table as ODS
-  @@ NEEDS RULING
 
-### feat/user-guide (`747fa29b`) — 26 new, 26 to read @@ NEEDS RULING
+### feat/user-guide (`3aa468bd`) — 39 new, 39 to read @@ NEEDS RULING
 
 - **`lpn_guide_also`**
   > Also in {menu}
   @@ NEEDS RULING
 - **`lpn_guide_box_help`**
   > Help for this box
+  @@ NEEDS RULING
+- **`lpn_guide_box_named`**
+  > {box} box
+  @@ NEEDS RULING
+- **`lpn_guide_boxes_autohide`**
+  > Auto-hidden boxes have two modes, active (an input is active) and inactive (no inputs are active), when deciding whether to stay open or to close when the mouse cursor leaves the box. Active boxes require an outside click to close; inactive boxes do not.
   @@ NEEDS RULING
 - **`lpn_guide_boxes_heading`**
   > Boxes
@@ -1067,8 +1232,41 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_guide_contents`**
   > Contents
   @@ NEEDS RULING
+- **`lpn_guide_dimmed`**
+  > A dimmed name is a button that is currently hidden on the toolbar.
+  @@ NEEDS RULING
+- **`lpn_guide_find_examples_def`**
+  > <p>Open the Net3 example to follow these. Pressure is in psi and velocity in ft/s.</p><table class="lpn-notes-table"><tbody><tr><td><code>Everything.ID equal to '60'</code></td><td>Junction 60 and Pipe 60. A junction and a pipe can have the same ID, so an ID search under Everything can return more than one asset.</td></tr><tr><td><code>Junction.Pressure below 40</code></td><td>Junctions 10, 40, 50, 20, and 153, lowest pressure first. Junction 10 is at -0.6 psi, a negative pressure that requires review.</td></tr><tr><td><code>Pipe.Velocity 5 highest</code></td><td>Pipes 60, 329, 125, 123, and 149, highest velocity first. Pipe 60 carries 9.3 ft/s.</td></tr><tr><td><code>Junction.Pressure below 20 OR Pipe.Velocity above 5</code></td><td>Junctions 10, 20, 40, and 50, and Pipes 60, 125, and 329: low pressures and high velocities in one list.</td></tr><tr><td><code>Junction.Pressure below 40 AND Junction.Elevation above 100</code></td><td>Junctions 10, 20, 40, and 50, the low pressures on high ground. Both conditions must name the same kind of asset: <code>Junction.Pressure below 40 AND Pipe.Velocity above 3</code> matches nothing, because no asset is both a junction and a pipe.</td></tr><tr><td><code>Pipe.Closed equal to 'closed'</code></td><td>Pipe 330, the one pipe that is closed in the Net3 file.</td></tr><tr><td><code>Junction.Connectivity no open path to a source</code></td><td>Nothing, as the file is distributed. With Pipe 247 closed (see Replace and Undo), Junctions 215, 217, 219, and 225: the junctions that a break on Pipe 247 would leave without supply. Repeating this for each pipe is a criticality analysis.</td></tr></tbody></table>
+  @@ NEEDS RULING
+- **`lpn_guide_find_examples_term`**
+  > Worked examples on Net3
+  @@ NEEDS RULING
+- **`lpn_guide_find_notes_def`**
+  > <ul><li>Values are compared at full precision and listed to four decimal places. Equal to rarely matches a calculated result; use above and below.</li><li>Pressure, head, flow, velocity, and the other results are those of the last calculation. With the Recalculate automatically setting cleared, they describe the network as it was at the last Calculate.</li><li>Above and below on text use dictionary order, with numbers in numeric order: on Net1, <code>Junction.ID above '20'</code> finds Junctions 21, 22, 23, 31, and 32.</li><li>Under Everything, only ID, Description, Tag, and Connectivity are offered. Choose a kind of asset in the What to search list to see its full list of properties.</li><li>A Text item has no ID. Search it by its words, as in <code>Text.Text contains 'pump'</code>.</li><li>The four Connectivity conditions for a node are no links at node, no open links at node, no link path to a source, and no open path to a source. A source is a reservoir or a tank.</li></ul>
+  @@ NEEDS RULING
+- **`lpn_guide_find_notes_term`**
+  > Points to note
+  @@ NEEDS RULING
+- **`lpn_guide_find_query_def`**
+  > <table class="lpn-notes-table"><tbody><tr><td><code>Scope.Property condition value</code></td><td>One condition. The scope is Everything, Junction, Reservoir, Tank, Pipe, Pump, Valve, Text, Customer, or Source. The property is any entry in the Property list for that scope.</td></tr><tr><td>Conditions</td><td>equal to, above, below, contains, n highest, n lowest, and empty. Contains applies to text only. In n highest and n lowest, n is a count, as in 5 highest. With the letter n itself, as in <code>Pipe.Velocity n highest</code>, or with the Value box empty, 10 assets are listed. Empty finds the assets that have no value for the property. Connectivity has four conditions and takes no value.</td></tr><tr><td>Values</td><td>A number is entered without its unit, in the unit shown in Properties and on the Tables pane: 40, not 40 psi. Text, including an ID, is enclosed in single or double quotes: <code>'60'</code>.</td></tr><tr><td>AND, OR, and parentheses</td><td>AND is evaluated before OR, and parentheses group conditions. NOT is not available.</td></tr><tr><td>Spelling</td><td>Words are not case sensitive. The English words are accepted in every language, so a query copied from this guide runs on a page in any language.</td></tr></tbody></table>
+  @@ NEEDS RULING
+- **`lpn_guide_find_query_term`**
+  > The query language
+  @@ NEEDS RULING
+- **`lpn_guide_find_replace_def`**
+  > <p>The Change what was found part of the box writes one property on every asset the query found. Choose the property in the Property to change list, enter the new value in the New value box in the displayed unit, and press the Replace button. The box then states how many assets would change, not counting those that already have the new value. Press the Change them button to apply the change, or Cancel. One Undo reverses the whole replacement.</p><p>Example on Net1: <code>Pipe.Diameter below 10</code> finds Pipes 31, 122, 113, and 121. Choose Diameter, enter 10, and press Replace; the box shows "Change 4 assets?". Press Change them to set all four pipes to 10 in. One Undo returns them to 6 and 8 in.</p><p>Example on Net3: <code>Pipe.ID equal to '247'</code> finds Pipe 247. Choose Closed, choose Closed again in the New value list, and press Replace, then Change them, to close the pipe for the connectivity example above. Undo opens it again.</p><p>Replace requires one kind of asset, so under Everything, first choose a kind of asset in the What to search list. In a scenario other than Base, a replacement is stored in that scenario, as the same edit in Properties would be. Where Mapbox elevations are available, Elevation can be replaced from the Mapbox DEM instead of a typed value.</p>
+  @@ NEEDS RULING
+- **`lpn_guide_find_replace_term`**
+  > Replace and Undo
+  @@ NEEDS RULING
+- **`lpn_guide_find_results_def`**
+  > <p>The matching assets are listed below the Find button. Above and n highest list the highest value first, below and n lowest the lowest value first, and other conditions list by the value found, then by ID. A query with AND or OR lists nodes, then links, each by ID. A single match is shown on the map immediately. Select a row to center the map on that asset. If nothing is selected, the asset is also selected; if something is, the asset is marked and the selection is not changed. Shift+click or Ctrl+click a row to add it to the selection or remove it. Find does not select all matches by itself.</p><p>The Filter in table button applies the same query to the Tables pane. Each table that the query applies to shows only the matching rows, with the query and the row count above them. To select all matches on the map, select those rows and choose Select on map from the right-click menu. A table filter is not saved with the project and ends when the page is reloaded. A row edited so that it no longer matches stays in the table, dimmed and marked with a warning sign, until the Filter in table button is pressed again.</p>
+  @@ NEEDS RULING
+- **`lpn_guide_find_results_term`**
+  > Results, the selection, and Tables
+  @@ NEEDS RULING
 - **`lpn_guide_keys_def`**
-  > <table class="lpn-notes-table"><tbody><tr><td>?</td><td>Open the guide at the control under the pointer or holding focus.</td></tr><tr><td>F1</td><td>Open the guide at the entry for the box that has focus.</td></tr><tr><td>Ctrl+K</td><td>Open the guide with the search field selected.</td></tr><tr><td>/</td><td>Select the search field while the guide has focus.</td></tr><tr><td>Esc</td><td>Close the guide and return to where you were.</td></tr></tbody></table>
+  > <table class="lpn-notes-table"><tbody><tr><td>?</td><td>Open the guide at the control under the pointer or holding focus.</td></tr><tr><td>F1</td><td>Open the guide at the entry for the box that has focus.</td></tr><tr><td>Ctrl+K</td><td>Open the guide with the current selection in the search field.</td></tr><tr><td>/</td><td>Select the search field while the guide has focus.</td></tr><tr><td>Esc</td><td>Close the guide and return to where you were.</td></tr></tbody></table>
   @@ NEEDS RULING
 - **`lpn_guide_keys_term`**
   > Guide keyboard shortcuts
@@ -1095,31 +1293,31 @@ build for that would be a gate nobody keeps. Refresh it with
   > Reports the energy use, peak power, and cost of each pump over the last extended period simulation, using each pump's efficiency and the energy price set under Settings, Energy. It needs a Total run time in Settings and a solved network. It does not change the network.
   @@ NEEDS RULING
 - **`lpn_guide_text_find_popup`**
-  > Finds the elements whose IDs or property values match what is typed, and can replace a value in the matches. A replacement changes the project and can be reversed with Undo.
+  > Finds the assets that meet a condition, such as every pipe smaller than 8 in. or every junction below 40 psi, and can change one property on all of them in one operation. Use it to check a model before it is solved (a missing elevation, a diameter entered in the wrong unit), to list problem locations after it is solved (low pressure, high velocity), and to make one correction on many assets.\n\nThe What to search, Property, Condition, and Value lists build one condition and write it as a line of text in the Query box. The line can also be edited directly, and the lists follow it. A query that the lists cannot express, such as two conditions joined by OR, hides the lists until the Use the controls instead button is pressed. To search, press Enter in the Query box or press the Find button.
   @@ NEEDS RULING
 - **`lpn_guide_text_full_box`**
-  > Lists every node and every link at every reporting time step, in the units shown on the Tables pane. It is available after Calculate. Download or print carries every time step, and the table shows one at a time.
+  > Lists every node and every link at every reporting time step, in the units shown on the Tables pane. Without an extended period simulation, it shows the current solution at a single instant. Download or print carries every time step, and the table shows one at a time.
   @@ NEEDS RULING
 - **`lpn_guide_text_hotkeys_popup`**
   > Lists every toolbar button and menu row, the keyboard shortcuts, and an entry for each box. Selecting a row shows where that control is; it never runs it. To search, press Ctrl+K from anywhere, or / while the guide has focus.
   @@ NEEDS RULING
 - **`lpn_guide_text_library_box`**
-  > Holds the project's patterns, curves, pipe types, fittings, controls, and rules. An element refers to a pattern, curve, pipe type, or fitting by its ID, and that item is edited here. Controls and rules apply to the whole network. All are saved with the project.
+  > Holds the project's patterns, curves, pipe types, fittings, controls, and rules. An asset refers to a pattern, curve, pipe type, or fitting by its ID, and that item is edited here. Controls and rules apply to the whole network. Rules are applied by the EPANET engine only. All are saved with the project.
   @@ NEEDS RULING
 - **`lpn_guide_text_notes_popup`**
   > Lists notes on how this page behaves and what it does not do, each as a term followed by its definition. It does not change the network.
   @@ NEEDS RULING
 - **`lpn_guide_text_popup`**
-  > Shows the properties of the selected element, or of several selected elements, beside the selection on the map or where the box was last moved. An edited value changes the network at once, and the element's map label and the Tables pane follow. Calculated results appear once the network is solved, automatically when Recalculate automatically is on, or by Calculate.
+  > Shows the properties of the selected asset or text, or of several selected assets, beside the selection, or where the box was last moved. An edited value changes the network at once, and the asset's map label and the Tables pane follow. The results of the last calculation are listed below the inputs and cannot be edited.
   @@ NEEDS RULING
 - **`lpn_guide_text_rptbox`**
-  > Shows the text report written by the EPANET engine for the last run, including its warnings and the network summary. It is replaced each time the network is solved with the EPANET engine.
+  > Shows the text report written by the EPANET engine for the last extended period simulation, including its warnings and the network summary. Each extended period simulation replaces it; a solve at a single instant does not, and an edit leaves the previous report in place.
   @@ NEEDS RULING
 - **`lpn_guide_text_scncmp_box`**
-  > Solves every scenario from a copy of the drawing and tabulates, for each, the number of differences from Base, the lowest pressure, and the highest velocity. It does not change the project, and the scenario that is open is left as it was.
+  > Solves every scenario from a copy of the drawing and tabulates, for each, the number of overrides, the lowest pressure, and the highest velocity. It does not change the project, and the scenario that is open is left as it was.
   @@ NEEDS RULING
 - **`lpn_guide_text_settings_box`**
-  > Holds the project's settings: symbology and labels, the map and page, values and ID prefixes for new assets, custom properties, and calculation options such as units, time, hydraulics, energy, and quality. Each is saved with the project, except Show the run progress box, which is kept in this browser. The position and size of this box are kept in this browser only.
+  > All settings and two reset buttons are in the Settings box. There is no other place to find settings. The box is searchable: type one or more words in Search settings to list only the settings that mention all of them. Settings are saved with the project, except Show the run progress box and those under Page, which are kept in this browser. The position and size of this box are also kept in this browser only.
   @@ NEEDS RULING
 - **`lpn_guide_text_status_box`**
   > Lists, in time order, each change during the last extended period simulation: a pump, valve, or pipe opening or closing, a tank starting to fill or empty or becoming full or empty, and any time step that did not fully converge. Only changes are listed, not every time step.
@@ -1131,4 +1329,43 @@ build for that would be a gate nobody keeps. Refresh it with
   > Guide
   @@ NEEDS RULING
 
-### feat/visit-dedupe (`2de0a88e`) — adds no English strings
+### feat/visit-dedupe (`08c07d31`) — adds no English strings
+
+### feat/workspace (`d14aa77c`) — 12 new, 12 to read @@ NEEDS RULING
+
+- **`lpn_file_export_item_workspace`**
+  > Workspace…
+  @@ NEEDS RULING
+- **`lpn_file_export_workspace_tip`**
+  > Download a small file holding where your boxes sit, their sizes, which are open or docked, and your pane and column sizes, plus the reading preferences of this page. Your projects, project settings and cookies (language, consent, units) are not in it. Load it on another screen or browser with File, Import, Workspace.
+  @@ NEEDS RULING
+- **`lpn_file_import_workspace`**
+  > Workspace…
+  @@ NEEDS RULING
+- **`lpn_file_import_workspace_tip`**
+  > Apply a workspace file saved with File, Export, Workspace: box positions and sizes, docking, pane sizes and the reading preferences of this page. Your projects and cookies are not touched. The page reloads once to lay the boxes out.
+  @@ NEEDS RULING
+- **`lpn_workspace_confirm`**
+  > Replace this browser's layout with the one in the file?
+  @@ NEEDS RULING
+- **`lpn_workspace_exported`**
+  > Workspace saved to {file}: {n} settings.
+  @@ NEEDS RULING
+- **`lpn_workspace_ignored`**
+  > Entries ignored because they were not recognized: {u}.
+  @@ NEEDS RULING
+- **`lpn_workspace_imported`**
+  > Workspace applied from {file}. Settings applied: {n}. Returned to their defaults: {r}. The page reloads now, once, to lay out your boxes.
+  @@ NEEDS RULING
+- **`lpn_workspace_refused_format`**
+  > This is not a workspace file saved by this page, so nothing was changed.
+  @@ NEEDS RULING
+- **`lpn_workspace_refused_newer`**
+  > This workspace file was saved by a newer version of this page (format {version}), so nothing was changed.
+  @@ NEEDS RULING
+- **`lpn_workspace_refused_storage`**
+  > Browser storage is full or unavailable, so the workspace was not applied.
+  @@ NEEDS RULING
+- **`lpn_workspace_refused_unreadable`**
+  > This file could not be read as a workspace, so nothing was changed.
+  @@ NEEDS RULING

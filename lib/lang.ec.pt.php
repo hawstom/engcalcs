@@ -1754,7 +1754,6 @@ $ec_lang['lpn_file_import_inp']='Importar arquivo EPANET…';
 $ec_lang['lpn_file_import_inp_tip']='Lê uma rede a partir de um arquivo EPANET, seja o arquivo de texto .inp ou o arquivo .net salvo pelo EPANET, e a salva neste navegador como um novo projeto.';
 // The other direction (Task 281). A DOWNLOAD, so the word is Export rather than Save: this page
 // keeps no handle on an `.inp` and never writes back to one.
-$ec_lang['lpn_file_export_inp']='Exportar arquivo EPANET…';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_file_export_inp_tip']='Grava esta rede como um arquivo EPANET .inp e faz o download. Os números que você digitou são gravados exatamente como você os digitou. Tudo o que o formato .inp não consegue armazenar é listado para você em seguida.';
 $ec_lang['lpn_status_inp_exported']='{file} exportado.';
@@ -2682,9 +2681,7 @@ $ec_lang['lpn_scenario_preset_flow_max_tip']='Calibração do teste de vazão pa
 $ec_lang['lpn_scenario_preset_average_day']='4. Dia médio';
 $ec_lang['lpn_scenario_preset_average_day_tip']='Multiplicador de demanda 1: toda demanda como inserida, que é tomada como a demanda do dia médio.';
 $ec_lang['lpn_scenario_preset_max_day']='5. Dia máximo';
-$ec_lang['lpn_scenario_preset_max_day_tip']='Multiplicador de demanda 2,0 vezes a demanda média, um valor provisório. A maioria dos sistemas fica entre 1,2 e 3,0 (National Research Council, 2006). Defina o do seu próprio sistema em Configurações, Cálculo, Hidráulica, Multiplicador de demanda.';
 $ec_lang['lpn_scenario_preset_peak_hour']='6. Hora de pico';
-$ec_lang['lpn_scenario_preset_peak_hour_tip']='Multiplicador de demanda 3,0 vezes a demanda média, um valor provisório. A maioria dos sistemas fica entre 3,0 e 6,0 (National Research Council, 2006). Defina o do seu próprio sistema em Configurações, Cálculo, Hidráulica, Multiplicador de demanda.';
 $ec_lang['lpn_scenario_preset_fire_max_day']='7. Incêndio mais dia máximo';
 $ec_lang['lpn_scenario_preset_fire_max_day_tip']='Demanda do dia máximo (multiplicador 2,0). Execute a Análise de vazão de incêndio neste cenário: ela adiciona a vazão de incêndio em cada junção sobre esta demanda.';
 $ec_lang['lpn_delete_drops_overrides']='Excluir este elemento também descarta {n} valores que seus cenários guardam para ele. Continuar?';

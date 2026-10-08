@@ -1756,7 +1756,6 @@ $ec_lang['lpn_file_import_inp']='Import fișier EPANET…';
 $ec_lang['lpn_file_import_inp_tip']='Citește o rețea dintr-un fișier EPANET, fie fișierul text .inp, fie fișierul .net pe care îl salvează EPANET, și o salvează în acest browser ca un proiect nou.';
 // The other direction (Task 281). A DOWNLOAD, so the word is Export rather than Save: this page
 // keeps no handle on an `.inp` and never writes back to one.
-$ec_lang['lpn_file_export_inp']='Export fișier EPANET…';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_file_export_inp_tip']='Scrie această rețea ca fișier EPANET .inp și îl descarcă. Numerele pe care le-ați introdus sunt scrise exact așa cum le-ați scris. Tot ce formatul .inp nu poate păstra este listat pentru dvs. după aceea.';
 $ec_lang['lpn_status_inp_exported']='{file} a fost exportat.';
@@ -2682,9 +2681,7 @@ $ec_lang['lpn_scenario_preset_flow_max_tip']='Calibrarea testului de debit pentr
 $ec_lang['lpn_scenario_preset_average_day']='4. Zi medie';
 $ec_lang['lpn_scenario_preset_average_day_tip']='Multiplicator de cerință 1: fiecare cerință așa cum a fost introdusă, considerată cerința zilei medii.';
 $ec_lang['lpn_scenario_preset_max_day']='5. Zi maximă';
-$ec_lang['lpn_scenario_preset_max_day_tip']='Multiplicator de cerință 2,0 ori cerința zilei medii, o valoare provizorie. Majoritatea sistemelor se situează între 1,2 și 3,0 (National Research Council, 2006). Stabiliți-l pe al sistemului dvs. în Setări, Calcul, Hidraulică, Multiplicator de cerință.';
 $ec_lang['lpn_scenario_preset_peak_hour']='6. Oră de vârf';
-$ec_lang['lpn_scenario_preset_peak_hour_tip']='Multiplicator de cerință 3,0 ori cerința zilei medii, o valoare provizorie. Majoritatea sistemelor se situează între 3,0 și 6,0 (National Research Council, 2006). Stabiliți-l pe al sistemului dvs. în Setări, Calcul, Hidraulică, Multiplicator de cerință.';
 $ec_lang['lpn_scenario_preset_fire_max_day']='7. Incendiu plus zi maximă';
 $ec_lang['lpn_scenario_preset_fire_max_day_tip']='Cerința zilei maxime (multiplicator 2,0). Rulați Analiza debitului de incendiu în acest scenariu: ea adaugă debitul de incendiu la fiecare joncțiune peste această cerință.';
 $ec_lang['lpn_delete_drops_overrides']='Ștergerea acestui element aruncă și {n} valori pe care scenariile dvs. le au pentru el. Continuați?';

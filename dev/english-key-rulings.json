@@ -650,9 +650,9 @@
             "answer": "OK."
         },
         "lpn_convas_units_tip": {
-            "on": "The units the copy is converted to. The original keeps its own numbers and units.",
-            "ruled": "2026-09-26",
-            "answer": "Edited."
+            "on": "The units the copy is converted to.",
+            "ruled": "2026-10-07",
+            "answer": "Technical-English interview: The units the copy is converted to."
         },
         "lpn_convas_unnamed": {
             "on": "Unnamed (local) georeference",
@@ -970,9 +970,9 @@
             "answer": "OK"
         },
         "lpn_cp_validate_tip": {
-            "on": "Validate as: This says what a good value looks like. The case rules read the English alphabet only, which is a stated limit. Choose Do not validate to accept anything.",
-            "ruled": "2026-09-14",
-            "answer": "OK"
+            "on": "Validate as: The format a valid value must have. The case rules apply to the English alphabet only. Choose Do not validate to accept any value.",
+            "ruled": "2026-10-07",
+            "answer": "Technical-English interview: Use proposed"
         },
         "lpn_crit_baseline_below": {
             "on": "Junctions already below it with nothing broken: {n}. They are not counted.",
@@ -1015,9 +1015,9 @@
             "answer": "OK."
         },
         "lpn_crit_menu_tip": {
-            "on": "Take each pipe, pump, and valve out of the network in turn and see what the system loses.",
-            "ruled": "2026-10-01",
-            "answer": "OK."
+            "on": "Remove each pipe, pump, and valve from the network in turn and report the effect on the system.",
+            "ruled": "2026-10-07",
+            "answer": "Technical-English interview: Use proposed"
         },
         "lpn_crit_minpressure": {
             "on": "Lowest pressure allowed",
@@ -1422,9 +1422,9 @@
             "answer": "OK."
         },
         "lpn_ds_multiplier_tip": {
-            "on": "The number each demand is multiplied by: 1.5 is half again as much water. It applies on top of the active scenario's own demand multiplier, which is already in the demands, and it is never saved in your project.",
-            "ruled": "2026-10-03",
-            "answer": "OK."
+            "on": "The factor by which each demand is multiplied; 1.5 is a 50% increase. It applies in addition to the demand multiplier of the active scenario, which is already in the demands, and it is never saved in the project.",
+            "ruled": "2026-10-07",
+            "answer": "Technical-English interview: Use proposed"
         },
         "lpn_ds_no_junctions": {
             "on": "This project has no junctions yet, so there are no demands to scale.",
@@ -1521,8 +1521,9 @@
             "ruled": "2026-09-01"
         },
         "lpn_elev_dem_said": {
-            "on": "Mapbox DEM says {v} {u}.",
-            "ruled": "2026-09-01"
+            "on": "Mapbox DEM elevation: {v} {u}.",
+            "ruled": "2026-10-07",
+            "answer": "Technical-English interview: Use proposed"
         },
         "lpn_elev_dem_sample": {
             "on": "Sample DEM",
@@ -1602,9 +1603,9 @@
             "ruled": "2026-09-04"
         },
         "lpn_energy_efficiency_tip": {
-            "on": "The wire-to-water efficiency used for every pump that does not carry an efficiency curve of its own. EPANET uses 75 percent when nothing is stated.",
-            "ruled": "2026-09-06",
-            "answer": "OK."
+            "on": "The wire-to-water efficiency used for every pump that has no efficiency curve. EPANET uses 75 percent when no value is stated.",
+            "ruled": "2026-10-07",
+            "answer": "Technical-English interview: Use proposed"
         },
         "lpn_energy_kw": {
             "on": "kW",
@@ -1873,8 +1874,9 @@
             "ruled": "2026-09-02"
         },
         "lpn_ff_err_unknown": {
-            "on": "No answer, and the reason given is {id}",
-            "ruled": "2026-09-01"
+            "on": "No result. Error code: {code}",
+            "ruled": "2026-10-07",
+            "answer": "Technical-English interview: No result. Error code: {code}"
         },
         "lpn_ff_intro": {
             "on": "Each junction in turn is asked to draw a fire flow on top of the demand it already has. Nothing in your project is changed; the whole run is made on a copy.",
@@ -2740,8 +2742,9 @@
             "ruled": "2026-09-01"
         },
         "lpn_inp_drop_file_options": {
-            "on": "This file refers to an auxiliary file: Map, which holds coordinates, or Hydraulics, which holds hydraulics already worked out. This page cannot open either, so the lines are kept as they are and written back if you save an EPANET file.",
-            "ruled": "2026-09-02"
+            "on": "This file refers to an auxiliary file: Map, which holds coordinates, or Hydraulics, which holds previously computed hydraulics. This page cannot open either, so the lines are kept as they are and written back if you save an EPANET file.",
+            "ruled": "2026-10-07",
+            "answer": "Technical-English interview: Use proposed"
         },
         "lpn_inp_drop_net_options": {
             "on": "This EPANET .net file states settings that this page has no control for, so their values are listed here rather than carried across. Everything else came over. If you need them, open the file in EPANET and use File, Export, Network to save it as an .inp file, then import that.",
@@ -2779,14 +2782,14 @@
             "ruled": "2026-09-02"
         },
         "lpn_inp_export_flat_coords": {
-            "on": "An EPANET file holds one position for each node. This scenario places {n} of them somewhere else, and those are the positions in the file. Every other scenario keeps its own positions in your project file alone.",
-            "ruled": "2026-09-17",
-            "answer": "This is unclear. Please proofread and reword."
+            "on": "An EPANET file holds one position for each node. This scenario places {n} of them somewhere else, and those are the positions in the file. Every other scenario keeps its positions in the project file only.",
+            "ruled": "2026-10-07",
+            "answer": "Technical-English interview: Use proposed"
         },
         "lpn_inp_export_flat_customers": {
-            "on": "An EPANET file has no customers. The demand of the {n} customers in this project goes into the file as a demand row on the junction each one is added to, and each row is named with the customer’s tag. What the file cannot hold is the customer: where it sits, which pipe serves it, where along that pipe the service connects, and how many services one customer stands for. Your own project file keeps all of that.",
-            "ruled": "2026-09-23",
-            "answer": "OK."
+            "on": "An EPANET file has no customers. The demand of the {n} customers in this project is written as a demand row on the junction each customer is assigned to, named with the customer's tag. The file does not record the customer itself: its location, the pipe that serves it, where along that pipe the service connects, or how many services it represents. That information remains in the project; save the project file to keep it.",
+            "ruled": "2026-10-07",
+            "answer": "Calls page 7 October: Use proposed"
         },
         "lpn_inp_export_flat_fittings": {
             "on": "An EPANET file cannot hold the list of elbows, valves and tees in your project file. The minor loss coefficient of {n} pipes here is added up from a fittings list. The total goes into the file exactly as it stands, so nothing about the answers changes.",
@@ -2804,9 +2807,9 @@
             "answer": "Edited"
         },
         "lpn_inp_export_flat_types": {
-            "on": "{n} pipes here refer to {t} pipe types. In the file each of those pipes carries its own copy of the numbers, so the answers are the same. What the file cannot hold is the pipe type itself, so editing one definition and having every pipe follow is something only your own project file records.",
-            "ruled": "2026-09-09",
-            "answer": "OK"
+            "on": "{n} pipes here refer to {t} pipe types. In the file each of those pipes carries its own copy of the numbers, so the answers are the same. What the file cannot hold is the pipe type itself, so the link between one definition and every pipe that uses it is recorded only in the project file.",
+            "ruled": "2026-10-07",
+            "answer": "Technical-English interview: Use proposed"
         },
         "lpn_inp_report_no_crs": {
             "on": "EPANET files contain no coordinate system, so this file will not initially be georeferenced. To place it on a world map, use Map, World map… To convert its coordinates, use File, Convert as…",
@@ -2893,9 +2896,9 @@
             "ruled": "2026-09-05"
         },
         "lpn_library_curve_in_use": {
-            "on": "This curve is used by {count} elements: {ids}. Point them at another curve first, then delete this one.",
-            "ruled": "2026-09-06",
-            "answer": "OK."
+            "on": "This curve is used by {count} elements: {ids}. Assign another curve to them first, then delete this one.",
+            "ruled": "2026-10-07",
+            "answer": "Technical-English interview: Use proposed"
         },
         "lpn_library_curve_note_label": {
             "on": "Description",
@@ -2947,9 +2950,9 @@
             "answer": "Edited"
         },
         "lpn_library_fittings_note": {
-            "on": "Each project has its own fittings library. A fittings list has fittings with a quantity for each one, and it adds up to a single minor loss coefficient. Both pipes and pipe types may refer to a list.",
-            "ruled": "2026-09-09",
-            "answer": "Edited"
+            "on": "Each project has a separate fittings library. A fittings list has fittings with a quantity for each one, and it adds up to a single minor loss coefficient. Both pipes and pipe types may refer to a list.",
+            "ruled": "2026-10-07",
+            "answer": "Technical-English interview: Use proposed"
         },
         "lpn_library_fittings_source": {
             "on": "The fittings offered here are the thirteen in Table 3.3 of the EPANET 2.2 user manual. Choosing one copies its coefficient into the row, where you can change it. A coefficient depends on the size and the make of the fitting, so treat the table as a starting point rather than as an answer.",
@@ -2997,9 +3000,9 @@
             "answer": "OK."
         },
         "lpn_library_import_curve_shape": {
-            "on": "These curves came across exactly as the file wrote them, and a run cannot use one until its first column rises from each point to the next: {names}",
-            "ruled": "2026-09-17",
-            "answer": "Can you clarify \"first column rises from each point to the next\"?"
+            "on": "These curves were imported exactly as written in the file, and a run cannot use one until its first column rises from each point to the next: {names}",
+            "ruled": "2026-10-07",
+            "answer": "Technical-English interview: Use proposed"
         },
         "lpn_library_import_go": {
             "on": "Import",
@@ -3012,9 +3015,9 @@
             "answer": "OK."
         },
         "lpn_library_import_needs_fittings": {
-            "on": "These pipe types refer to a fittings list this project does not have: {names}. Import the fittings library from the same file and they will find it.",
-            "ruled": "2026-09-17",
-            "answer": "OK."
+            "on": "These pipe types refer to a fittings list this project does not have: {names}. Import the fittings library from the same file to resolve these references.",
+            "ruled": "2026-10-07",
+            "answer": "Technical-English interview: Use proposed"
         },
         "lpn_library_import_no_libraries": {
             "on": "That project file has no libraries to copy.",
@@ -3077,9 +3080,9 @@
             "answer": "OK."
         },
         "lpn_library_pipetypes_note": {
-            "on": "Each project has its own pipe type library. You may leave properties blank in a pipe type definition. For example, a pipe type that specifies a roughness and no diameter is okay. You attach pipe types to pipes in their properties editor. Editing a definition here changes every pipe that references it.",
-            "ruled": "2026-09-07",
-            "answer": "Please note the drastically different style here than what you have been using."
+            "on": "Each project has a separate pipe type library. Properties may be left blank in a pipe type definition; for example, a pipe type may specify a roughness and no diameter. Pipe types are assigned to pipes in the pipe properties. Editing a definition here changes every pipe that references it.",
+            "ruled": "2026-10-07",
+            "answer": "Technical-English interview: Use proposed"
         },
         "lpn_library_pipetypes_tip": {
             "on": "A pipe type is a definition several pipes can refer to for their diameter, roughness and reaction coefficients. Editing the definition edits every pipe that uses it.",
@@ -3149,9 +3152,9 @@
             "answer": "Edited."
         },
         "lpn_lock_ask_prompt": {
-            "on": "Who should we say is asking? Your initials are ideal. They are kept with this file's lock on our server, for whoever has it open, and deleted within 30 days.",
-            "ruled": "2026-09-29",
-            "answer": "Go ahead and make those disclosure fixes."
+            "on": "Who should we say is asking? Enter your initials, for example. They are kept with this file's lock on our server, for whoever has it open, and deleted within 30 days.",
+            "ruled": "2026-10-07",
+            "answer": "Technical-English interview: Who should we say is asking? Enter your initials, for example. They are kept with this file's lock on our server, for whoever has it open, and deleted within 30 days."
         },
         "lpn_lock_ask_sent": {
             "on": "We have asked whoever has this file open to close it. They will see it within a minute, if their page is still open. Nothing else has changed, and the file is still theirs until they close it.",
@@ -3189,9 +3192,9 @@
             "answer": "OK."
         },
         "lpn_map_attach_done": {
-            "on": "The world map is behind your drawing now, and your project is unchanged. Use Map, World map, Detach to take it away again.",
-            "ruled": "2026-09-23",
-            "answer": "OK."
+            "on": "The world map is now displayed behind the drawing, and the project is unchanged. Use Map, World map, Detach to remove it.",
+            "ruled": "2026-10-07",
+            "answer": "Technical-English interview: Use proposed"
         },
         "lpn_map_attach_menu": {
             "on": "World map…",
@@ -3224,14 +3227,14 @@
             "answer": "OK."
         },
         "lpn_map_attach_remove_tip": {
-            "on": "Take the world map away. The drawing and its coordinates are untouched either way.",
-            "ruled": "2026-09-17",
-            "answer": "OK."
+            "on": "Detach the world map. Does not affect the network.",
+            "ruled": "2026-10-07",
+            "answer": "Technical-English interview: Use proposed / Detach the world map. Does not affect the network."
         },
         "lpn_map_attach_removed": {
-            "on": "The world map is gone, and the drawing is exactly as it was.",
-            "ruled": "2026-09-17",
-            "answer": "OK."
+            "on": "The world map is detached, and the network is unaffected.",
+            "ruled": "2026-10-07",
+            "answer": "Technical-English interview: The world map is detached, and the network is unaffected."
         },
         "lpn_map_attach_scale_from": {
             "on": "Scale from the current size…",
@@ -3269,14 +3272,14 @@
             "answer": "OK."
         },
         "lpn_map_unmeasurable": {
-            "on": "This page could not work out the size of the drawing area, so the map is showing the last view it was able to compute. Resizing the window makes it try again. If it keeps happening, a browser extension that blocks page measurements is the usual cause.",
-            "ruled": "2026-09-10",
-            "answer": "OK"
+            "on": "This page could not determine the size of the drawing area, so the map shows the last view it was able to compute. Resizing the window repeats the measurement. If this persists, the usual cause is a browser extension that blocks page measurements.",
+            "ruled": "2026-10-07",
+            "answer": "Technical-English interview: Use proposed"
         },
         "lpn_mapgeo_cancelled": {
-            "on": "The world map is back where it was, and your drawing never moved.",
-            "ruled": "2026-09-23",
-            "answer": "OK."
+            "on": "The world map is restored to its previous position, and the drawing was not moved.",
+            "ruled": "2026-10-07",
+            "answer": "Technical-English interview: Use proposed"
         },
         "lpn_mapgeo_dial_help": {
             "on": "Slide the two bars, or type in the boxes above them, to make the map bigger or smaller and to rotate it. The middle of each bar is the fit step 1 left, so 1 and 0 mean leave it alone. Arrow keys work on both.",
@@ -3349,9 +3352,9 @@
             "answer": "OK."
         },
         "lpn_mapgeo_step1": {
-            "on": "Step 1 of 2: find your place in the world",
-            "ruled": "2026-09-23",
-            "answer": "OK."
+            "on": "Step 1 of 2: find the project location",
+            "ruled": "2026-10-07",
+            "answer": "Technical-English interview: Use proposed"
         },
         "lpn_mapgeo_step2": {
             "on": "Step 2 of 2: fit the map behind your drawing",
@@ -4007,8 +4010,9 @@
             "answer": "OK."
         },
         "lpn_pump_effic_curve_tip": {
-            "on": "The curve in the Libraries box that says how efficient this pump is at each flow. Several pumps can use the same curve, and editing it there changes all of them. This pump holds only the reference; the points themselves are read and edited under Libraries, Curves.",
-            "ruled": "2026-09-06"
+            "on": "The curve in the Libraries box that gives the efficiency of this pump at each flow. Several pumps can use the same curve, and editing it there changes all of them. This pump holds only the reference; the points themselves are read and edited under Libraries, Curves.",
+            "ruled": "2026-10-07",
+            "answer": "Technical-English interview: Use proposed"
         },
         "lpn_pump_effic_global": {
             "on": "This pump has no efficiency curve selected, so it runs at the efficiency set for the whole network, {percent}.",
@@ -4066,9 +4070,9 @@
             "answer": "OK."
         },
         "lpn_quality_mass_units_tip": {
-            "on": "The units half of the quality entry, EPANET's own two choices.",
-            "ruled": "2026-09-28",
-            "answer": "Edited"
+            "on": "The units part of the quality entry, from the two EPANET choices.",
+            "ruled": "2026-10-07",
+            "answer": "Technical-English interview: Use proposed"
         },
         "lpn_quality_named_avg_concentration": {
             "on": "Average {chemical} concentration",
@@ -4255,9 +4259,9 @@
             "answer": "OK."
         },
         "lpn_result_demand_deficit_tip": {
-            "on": "The demand this junction asks for and does not receive, because the pressure is below the required pressure.",
-            "ruled": "2026-10-05",
-            "answer": "OK."
+            "on": "The demand at this junction that is not delivered, because the pressure is below the required pressure.",
+            "ruled": "2026-10-07",
+            "answer": "Technical-English interview: Use proposed"
         },
         "lpn_result_demand_tip": {
             "on": "The flow this node draws at the time step shown: the total of base demands multiplied by their patterns. Worked out, not typed, so it changes with the clock and cannot be edited.",
@@ -4432,20 +4436,10 @@
             "ruled": "2026-10-01",
             "answer": "OK."
         },
-        "lpn_scenario_preset_max_day_tip": {
-            "on": "Demand multiplier 2.0 times average day, a placeholder value. Most systems fall between 1.2 and 3.0 (National Research Council, 2006). Set your own system's in Settings, Calculation, Hydraulics, Demand multiplier.",
-            "ruled": "2026-10-01",
-            "answer": "Edited."
-        },
         "lpn_scenario_preset_peak_hour": {
             "on": "6. Peak hour",
             "ruled": "2026-10-01",
             "answer": "OK."
-        },
-        "lpn_scenario_preset_peak_hour_tip": {
-            "on": "Demand multiplier 3.0 times average day, a placeholder value. Most systems fall between 3.0 and 6.0 (National Research Council, 2006). Set your own system's in Settings, Calculation, Hydraulics, Demand multiplier.",
-            "ruled": "2026-10-01",
-            "answer": "Edited."
         },
         "lpn_scncmp_at": {
             "on": "{value} at {id}",
@@ -4533,9 +4527,9 @@
             "answer": "OK"
         },
         "lpn_settings_custom_props_note": {
-            "on": "Properties you define yourself for your own purposes. They are stored with the project and scenarios like all other properties.",
-            "ruled": "2026-09-14",
-            "answer": "OK"
+            "on": "User-defined properties. Stored with the project and scenarios like all other properties.",
+            "ruled": "2026-10-07",
+            "answer": "Technical-English interview: User-defined properties. Stored with the project and scenarios like all other properties."
         },
         "lpn_settings_damp_limit": {
             "on": "Damping starts at",
@@ -4590,8 +4584,9 @@
             "ruled": "2026-10-04"
         },
         "lpn_settings_emitter_exponent_tip": {
-            "on": "The power in the sprinkler and leak law, flow = coefficient x pressure to this power. It only changes the answer where a node has an emitter, which for now means a network read from an EPANET file.",
-            "ruled": "2026-08-29"
+            "on": "The exponent in EPANET’s emitter equation for sprinklers and leaks: flow = coefficient x pressure raised to this exponent. It affects results only at nodes with an emitter coefficient.",
+            "ruled": "2026-10-07",
+            "answer": "Technical-English interview: Use proposed"
         },
         "lpn_settings_energy": {
             "on": "Energy",
@@ -4706,9 +4701,9 @@
             "answer": "OK"
         },
         "lpn_settings_runbox_tip": {
-            "on": "A box that reports how far a run has got and what it found. With it turned off, a finished run says the same thing in the status line for a few seconds instead. This is a setting for this browser, not for the project.",
-            "ruled": "2026-09-14",
-            "answer": "OK"
+            "on": "A box that reports the progress and outcome of a run. With it turned off, a finished run says the same thing in the status line for a few seconds instead. This is a setting for this browser, not for the project.",
+            "ruled": "2026-10-07",
+            "answer": "Technical-English interview: Use proposed"
         },
         "lpn_settings_show_arrows": {
             "on": "Flow direction arrows",
@@ -4974,9 +4969,9 @@
             "answer": "Under what condition would we know the units of the file?"
         },
         "lpn_survey_err_ambiguous_coord": {
-            "on": "More than one column in that file could be the {axis} ({detail}), and this page will not choose between them. Leave one of them named as the {axis} and try again.",
-            "ruled": "2026-09-23",
-            "answer": "OK."
+            "on": "More than one column in that file could be the {axis} ({detail}), and this page does not choose between them. Leave only one of them named as the {axis} and try again.",
+            "ruled": "2026-10-07",
+            "answer": "Technical-English interview: Use proposed"
         },
         "lpn_survey_err_ambiguous_lon": {
             "on": "More than one column in that file could be the longitude ({detail}), and this page will not choose between them. Leave one of them named as the longitude and try again.",
@@ -5184,9 +5179,9 @@
             "answer": "OK."
         },
         "lpn_survey_report_clean": {
-            "on": "Every point in the file came across, and nothing was changed on the way in.",
-            "ruled": "2026-09-17",
-            "answer": "OK."
+            "on": "Every point in the file was imported without change.",
+            "ruled": "2026-10-07",
+            "answer": "Technical-English interview: Use proposed"
         },
         "lpn_survey_report_counts": {
             "on": "{n} junction(s) created.",
@@ -5325,9 +5320,9 @@
             "answer": "OK."
         },
         "lpn_terrain_rate_limited": {
-            "on": "The terrain service is asking us to slow down (429), so no elevation was changed. Try again in a minute.",
-            "ruled": "2026-09-23",
-            "answer": "OK."
+            "on": "The terrain service has limited the request rate (429), so no elevation was changed. Try again in a minute.",
+            "ruled": "2026-10-07",
+            "answer": "Technical-English interview: Use proposed"
         },
         "lpn_terrain_will_ids": {
             "on": "These are the nodes that will be filled in: {ids}",
@@ -5541,14 +5536,14 @@
             "ruled": "2026-09-04"
         },
         "lpn_wrong_thanks": {
-            "on": "Thank you. That reached us.",
-            "ruled": "2026-09-06",
-            "answer": "OK."
+            "on": "Thank you. Your report was received.",
+            "ruled": "2026-10-07",
+            "answer": "Technical-English interview: Use proposed"
         },
         "lpn_wrong_tip": {
-            "on": "One press tells us that something on this page is wrong. It sends the name of this page, the language you are reading it in, and the message on the map if there is one. It sends nothing you have typed, no address, and nothing at all out of your drawing. Nobody can write back, because this tells us nothing about who you are. Use Help, Fix something when you want to say more.",
-            "ruled": "2026-09-06",
-            "answer": "OK."
+            "on": "Report an error on this page. This opens a box to select the problem, add a comment, and enter an email address if a reply is wanted. All fields are optional, and nothing is sent until you press Send.",
+            "ruled": "2026-10-07",
+            "answer": "Calls page 7 October: Use proposed"
         },
         "lpn_xymap": {
             "on": "local",
@@ -5596,6 +5591,31 @@
             "on": "Is active?",
             "ruled": "2026-10-06",
             "answer": "His own wording: \"Part of network: Change to \\\"Is active?\\\" like Bentley.\""
+        },
+        "about_body_html": {
+            "on": "<h3>Mission</h3><p>HawsEDC Engineering Calculators have been offered freely online since 2010. They exist to serve engineers and field workers around the world — especially those working in water-scarce, low-resource, or underserved regions. These tools are part of a broader humanitarian mission: to tell every human being in the most practical and effective way possible <a target=\"_blank\" href=\"https://tomsthird.blogspot.com/2026/10/why-engineering-calculator-needs-to.html\">that they are loved and cherished forever, that they have nothing to fear, and that they are not going to ruin everything</a>.</p><p>The calculators are the vehicle. The destination is a world free of suffering.</p><h3>Free Libre Open Source License</h3><p>All code is released under the <a target=\"_blank\" href=\"https://www.gnu.org/licenses/gpl-3.0.html\">GNU General Public License v3.0 or later</a> — free as in freedom. You may use, study, modify, and redistribute the code under the same terms.</p><p>The website that serves it is offered freely today and since 2010; if one day it cannot be, the software is still yours to run.</p><p>Copyright © 2009–2026 Thomas Gail Haws.</p><h3>Source Code</h3><p>The full source code is publicly available on GitHub:</p><p><a target=\"_blank\" href=\"https://github.com/hawstom/engcalcs\">github.com/hawstom/engcalcs</a></p><p>You can browse the code, file issues, or fork the repository there.</p><h3>Contributing</h3><p>All help is welcome. <a href=\"contact.php\">Contact Tom Haws</a>.</p><ul><li><strong>Translations:</strong> Suggest better wording. Improve or add a language.</li><li><strong>Bug reports:</strong> Use the feedback form on any calculator page, or file an issue on GitHub.</li><li><strong>New calculators:</strong> Ideas for hydraulic engineering tools that serve field workers and irrigation practitioners are especially welcome.</li><li><strong>Hosting:</strong> If you can mirror these calculators for a region with limited connectivity, please contact me.</li></ul><h3>Offline Use</h3><p>Open any calculator once while you are online and all of them keep working when you are not: your browser stores the whole suite as you go. The mechanism is a <strong>Progressive Web App (PWA)</strong>. After that, all calculators work offline — no internet required.</p><p>On Android or iOS, use your browser’s \"Add to Home Screen\" option to install EngCalcs as an app on your device. On desktop, look for the install icon in your browser’s address bar.</p><p>You can also save any individual calculator using your browser’s \"Save as…\" menu for one-off offline use.</p><h3>Contact</h3><p>Tom Haws, hydraulic engineer and founder of these calculators.<br />Use the feedback form on any calculator page, or reach the source code at <a target=\"_blank\" href=\"https://github.com/hawstom/engcalcs\">GitHub</a>.</p>",
+            "ruled": "2026-10-07",
+            "answer": "Technical-English interview: Use proposed"
+        },
+        "lpn_field_valve_type_tip": {
+            "on": "Valve type. A throttle valve (TCV) applies a fixed loss. PRV, PSV, and FCV maintain a pressure or a flow, and open fully, close, or partly close as hydraulic conditions change. A PBV removes a fixed pressure, and a GPV follows a head loss curve. The types control different hydraulic properties, so settings may be lost when the type is changed.",
+            "ruled": "2026-10-07",
+            "answer": "Technical-English interview: Valve type. A throttle valve (TCV) applies a fixed loss. PRV, PSV, and FCV maintain a pressure or a flow, and open fully, close, or partly close as hydraulic conditions change. A PBV removes a fixed pressure, and a GPV follows a head loss curve. The types control different hydraulic properties, so settings may be lost when the type is changed."
+        },
+        "lpn_inp_drop_headloss": {
+            "on": "This file does not use the Hazen-Williams formula. This page computes Hazen-Williams, so the pipe roughness numbers were kept exactly as written, but the results here will not match the results in EPANET.",
+            "ruled": "2026-10-07",
+            "answer": "Technical-English interview: Use proposed"
+        },
+        "lpn_inp_drop_units": {
+            "on": "The flow unit named in this file is not one this page knows, so every number was read as gallons per minute. Check every value before using the results.",
+            "ruled": "2026-10-07",
+            "answer": "Technical-English interview: Use proposed"
+        },
+        "lpn_scenario_preset_mult_tip": {
+            "on": "Demand multiplier {mult} times average day, a placeholder value. Most systems fall between {lo} and {hi} (National Research Council, 2006). Set the value for the system being modeled in Settings, Calculation, Hydraulics, Demand multiplier.",
+            "ruled": "2026-10-07",
+            "answer": "Calls page 7 October: Use proposed"
         }
     }
 }

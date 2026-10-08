@@ -1791,7 +1791,6 @@ $ec_lang['lpn_file_import_inp']='Importar archivo de EPANET…';
 $ec_lang['lpn_file_import_inp_tip']='Cree un proyecto nuevo a partir de un archivo de EPANET, ya sea el formato de exportación .inp (preferido) o el formato nativo .net (último recurso).';
 // The other direction (Task 281). A DOWNLOAD, so the word is Export rather than Save: this page
 // keeps no handle on an `.inp` and never writes back to one.
-$ec_lang['lpn_file_export_inp']='Exportar archivo EPANET…';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_file_export_inp_tip']='Descargue esta red como un archivo .inp de EPANET. Todo lo que el formato .inp no pueda contener se le indica después.';
 $ec_lang['lpn_status_inp_exported']='Se exportó {file}.';
@@ -2737,9 +2736,7 @@ $ec_lang['lpn_scenario_preset_flow_max_tip']='Calibración con prueba de flujo p
 $ec_lang['lpn_scenario_preset_average_day']='4. Día promedio';
 $ec_lang['lpn_scenario_preset_average_day_tip']='Multiplicador de demanda 1: cada demanda tal como se ingresó, que se toma como la demanda del día promedio.';
 $ec_lang['lpn_scenario_preset_max_day']='5. Día máximo';
-$ec_lang['lpn_scenario_preset_max_day_tip']='Multiplicador de demanda de 2,0 veces el día promedio, un valor provisional. La mayoría de los sistemas están entre 1,2 y 3,0 (National Research Council, 2006). Fije el de su propio sistema en Configuración, Cálculo, Hidráulica, Multiplicador de demanda.';
 $ec_lang['lpn_scenario_preset_peak_hour']='6. Hora pico';
-$ec_lang['lpn_scenario_preset_peak_hour_tip']='Multiplicador de demanda de 3,0 veces el día promedio, un valor provisional. La mayoría de los sistemas están entre 3,0 y 6,0 (National Research Council, 2006). Fije el de su propio sistema en Configuración, Cálculo, Hidráulica, Multiplicador de demanda.';
 $ec_lang['lpn_scenario_preset_fire_max_day']='7. Incendio más día máximo';
 $ec_lang['lpn_scenario_preset_fire_max_day_tip']='Demanda del día máximo (multiplicador 2,0). Ejecute Caudal contra incendios en este escenario: suma el caudal contra incendios en cada nudo a esta demanda.';
 $ec_lang['lpn_delete_drops_overrides']='Eliminar este elemento también descarta {n} valores que sus escenarios tienen para él. ¿Continuar?';

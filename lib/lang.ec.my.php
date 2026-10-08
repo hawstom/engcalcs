@@ -1789,7 +1789,6 @@ $ec_lang['lpn_file_import_inp']='EPANET ဖိုင် တင်သွင်း
 $ec_lang['lpn_file_import_inp_tip']='EPANET ဖိုင်တစ်ခု - .inp စာသားဖိုင် (သို့) EPANET သိမ်းဆည်းသော .net ဖိုင် တစ်ခုခုမှ ကွန်ရက်တစ်ခုကို ဖတ်ယူပြီး၊ ဤဘရောက်ဇာထဲတွင် ပရောဂျက်အသစ်တစ်ခုအဖြစ် သိမ်းဆည်းသည်။';
 // The other direction (Task 281). A DOWNLOAD, so the word is Export rather than Save: this page
 // keeps no handle on an `.inp` and never writes back to one.
-$ec_lang['lpn_file_export_inp']='EPANET ဖိုင် ထုတ်ရန်…';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_file_export_inp_tip']='ဤကွန်ရက်ကို EPANET .inp ဖိုင်အဖြစ် ရေးပြီး ဒေါင်းလုဒ်ဆွဲပါ။ သင်ရိုက်ထည့်ခဲ့သော ဂဏန်းများကို ရိုက်ထည့်ခဲ့သည့်အတိုင်း အတိအကျ ရေးမည်။ .inp ဖော်မတ်က မသိမ်းနိုင်သည့် အရာများကို နောက်ပိုင်းတွင် စာရင်းပြုစုပေးမည်။';
 $ec_lang['lpn_status_inp_exported']='{file} ကို ထုတ်ပြီးပါပြီ။';
@@ -2735,9 +2734,7 @@ $ec_lang['lpn_scenario_preset_flow_max_tip']='အစီရင်ခံထား�
 $ec_lang['lpn_scenario_preset_average_day']='4. ပျမ်းမျှနေ့';
 $ec_lang['lpn_scenario_preset_average_day_tip']='လိုအပ်ချက် မြှောက်ကိန်း 1 - လိုအပ်ချက်တိုင်းကို ထည့်သွင်းထားသည့်အတိုင်း ယူသည်၊ ၎င်းကို ပျမ်းမျှနေ့ လိုအပ်ချက်ဟု မှတ်ယူသည်။';
 $ec_lang['lpn_scenario_preset_max_day']='5. အမြင့်ဆုံးနေ့';
-$ec_lang['lpn_scenario_preset_max_day_tip']='လိုအပ်ချက် မြှောက်ကိန်းသည် ပျမ်းမျှနေ့၏ 2.0 ဆ ဖြစ်ပြီး ယာယီတန်ဖိုးတစ်ခု ဖြစ်သည်။ စနစ်အများစုသည် 1.2 နှင့် 3.0 ကြား ရှိသည် (National Research Council, 2006)။ သင့်စနစ်၏ကို ဆက်တင်များ၊ တွက်ချက်မှု၊ ဟိုက်ဒရောလစ်၊ လိုအပ်ချက် မြှောက်ကိန်း တွင် သတ်မှတ်ပါ။';
 $ec_lang['lpn_scenario_preset_peak_hour']='6. အထွတ်အထိပ်နာရီ';
-$ec_lang['lpn_scenario_preset_peak_hour_tip']='လိုအပ်ချက် မြှောက်ကိန်းသည် ပျမ်းမျှနေ့၏ 3.0 ဆ ဖြစ်ပြီး ယာယီတန်ဖိုးတစ်ခု ဖြစ်သည်။ စနစ်အများစုသည် 3.0 နှင့် 6.0 ကြား ရှိသည် (National Research Council, 2006)။ သင့်စနစ်၏ကို ဆက်တင်များ၊ တွက်ချက်မှု၊ ဟိုက်ဒရောလစ်၊ လိုအပ်ချက် မြှောက်ကိန်း တွင် သတ်မှတ်ပါ။';
 $ec_lang['lpn_scenario_preset_fire_max_day']='7. မီးငြိမ်းသတ်ခြင်းနှင့် အမြင့်ဆုံးနေ့';
 $ec_lang['lpn_scenario_preset_fire_max_day_tip']='အမြင့်ဆုံးနေ့ လိုအပ်ချက် (မြှောက်ကိန်း 2.0)။ ဤအခြေအနေတွင် မီးငြိမ်းသတ်ရေးစီးနှုန်း ခွဲခြမ်းစိတ်ဖြာမှုကို run ပါ - ၎င်းသည် ဤလိုအပ်ချက်ပေါ်တွင် ဆက်စပ်နေရာတစ်ခုစီ၌ မီးငြိမ်းသတ်ရေးစီးနှုန်းကို ထပ်ပေါင်းသည်။';
 $ec_lang['lpn_delete_drops_overrides']='ဤအစိတ်အပိုင်းကို ဖျက်ခြင်းသည် သင်၏ အခြေအနေများ ၎င်းအတွက် ကိုင်ဆောင်ထားသော တန်ဖိုး {n} ခုကိုပါ ပယ်ချမည်။ ဆက်လုပ်မလား?';

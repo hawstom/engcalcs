@@ -491,10 +491,10 @@
 			// away -- the step selector holds one step and that is the whole of what there is to say.
 			// (lpn_time_no_engine is a DIFFERENT thing and stays: "the engine is unreachable, so you
 			// are seeing one instant" is a fact about this session that the user acts on.)
-			running: pageConfig.lpn_time_running || 'Working out the extended period simulation.',
-			noEngine: pageConfig.lpn_time_no_engine || 'The built-in solver calculates one moment at a time, so this is the network at {time} only: every pattern is read at that moment, and every tank still sits at its starting level instead of filling and draining. Connect to the internet one time to fetch the EPANET solver, which runs an extended period simulation.',
+			running: pageConfig.lpn_time_running || 'Running the extended period simulation.',
+			noEngine: pageConfig.lpn_time_no_engine || 'The built-in solver solves one instant at a time, so this is the network at {time} only: every pattern is read at that instant, and every tank remains at its initial level instead of filling and draining. Connect to the internet once to download the EPANET solver, which runs an extended period simulation.',
 			// The same note for a failure that is NOT a missing network: {reason} is one of the three below.
-			noEngineWhy: pageConfig.lpn_time_no_engine_why || 'The built-in solver calculates one moment at a time, so this is the network at {time} only: every pattern is read at that moment, and every tank still sits at its starting level instead of filling and draining. {reason}',
+			noEngineWhy: pageConfig.lpn_time_no_engine_why || 'The built-in solver solves one instant at a time, so this is the network at {time} only: every pattern is read at that instant, and every tank remains at its initial level instead of filling and draining. {reason}',
 			slider: pageConfig.lpn_time_slider || 'Elapsed simulation time',
 			noPeriod: pageConfig.lpn_time_no_period || 'This project has no extended period simulation set, so there is only one moment to show. Set a Total run time in Settings, Calculation, Time to run an extended period simulation.',
 			first: pageConfig.lpn_time_first || 'Go to the start',
@@ -532,12 +532,12 @@
 			// and "it said this" are the same two facts whether one moment was asked for or a whole
 			// period. Only the third differs, because only a RUN has a moment and a tank level to
 			// name -- which is where whole-label reuse stops.
-			runRefused: pageConfig.lpn_engine_refused || 'The EPANET solver would not accept this network, so it did not run.',
+			runRefused: pageConfig.lpn_engine_refused || 'The EPANET solver rejected this network, so the run did not start.',
 			// EPANET's own words, untranslated on purpose -- they name what it choked on, and
 			// nothing of ours could reconstruct that.
-			runRefusedWhy: pageConfig.lpn_engine_refused_why || 'The EPANET solver said: {message}',
-			runFellBack: pageConfig.lpn_time_run_fell_back || 'The numbers on screen came from the built-in solver instead. It calculates one moment at a time, so this is the network at {time} only, with every tank still sitting at its starting level.',
-			runReport: pageConfig.lpn_time_run_report || 'EPANET run report',
+			runRefusedWhy: pageConfig.lpn_engine_refused_why || 'EPANET solver message: {message}',
+			runFellBack: pageConfig.lpn_time_run_fell_back || 'The numbers on screen came from the built-in solver instead. It solves one instant at a time, so this is the network at {time} only, with every tank at its initial level.',
+			runReport: pageConfig.lpn_time_run_report || 'Run report',
 			runSlowAdvice: pageConfig.lpn_time_run_slow || 'This network took {secs} s to calculate, and it is set to recalculate after every change. To stop that and get a Calculate button back, turn off “Recalculate automatically” in Settings, under Calculation, Hydraulics.',
 			close: pageConfig.lpn_close || 'Close',
 			// **THE REPORT IS THE ONE PLACE A REFUSAL NAMES ITS OWN LINE**, so getting it out of the

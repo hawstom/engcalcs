@@ -38,16 +38,15 @@ Never call it "preview". Scope: `dev/looped-network-calculator-scope.md`; ROADMA
     down` for drawdown, `settle` for converge, `Solves` for runs. Tom, twice in one reading: *"why
     are we inventing language that engineers will not recognize?"* and *"we should default... to the
     EPANET terminology."*
-  - **THERE IS NO HOUSE STYLE FOR ENGLISH STRINGS ANY MORE, and that is deliberate** (Tom,
-    2026-09-01: *"Anywhere you find anything addressing the need for a certain kind of English or
-    language, just strike it. Let's trust our synonyms, glossary, scripts, and feedback
-    procedures."*). `dev/language-strings.md` used to carry a "Simple English" rule; it licensed
-    exactly the inventions above three times, survived two written corrections, and is gone rather
-    than qualified a fourth time. **Do not write a new one.** The mechanisms that carry it are
-    `$ec_lang_syn`, `glossary.json`, `plain_english_swap_check.php`, and Tom reading
-    `dev/new-english-keys.md` — each evidence about a specific string, where a house style is a
-    prediction about every future one. **One advisory survived the purge and only one: avoid the em
-    dash in visitor-facing English, until further notice.** It survives because it is not a claim
+  - **THE HOUSE STYLE IS STANDARD PROFESSIONAL CIVIL-ENGINEERING TECHNICAL ENGLISH** (Tom,
+    2026-10-07: *"make standard professional civil engineering technical English the style guide
+    for this project so I don't have to look at these AI-isms any more or be embarrassed by
+    them."*), the register of FHWA, USACE HEC, EPA EPANET, and AWWA manuals. It replaces the "no
+    house style" position of 2026-09-01. **The rejected alternative stays rejected: "Simple
+    English"** licensed exactly the inventions above three times; technical English forbids them,
+    because a technical manual uses the conventional term. The AI-ism list and replacements are in
+    `dev/language-strings.md`. **The em dash advisory stands: avoid it in visitor-facing English,
+    until further notice.** It is not a claim
     about good English — the dash is fine, the reader is not, and a page that leans on it reads as
     AI-written whatever it says. A ratchet on new and edited strings, not a sweep: 60 shipped
     strings carry 69 of them and rewriting those would buy 1,560 retranslations of text whose
