@@ -3307,7 +3307,7 @@ var EngCalcs = EngCalcs || {};
 	// one createScenario() makes -- renamable, deletable, editable -- holding at most a demand
 	// multiplier. The name is written in the visitor's language at birth because it is the user's
 	// data from then on, like a name typed at the New scenario prompt. The id is language-free and
-	// descriptive rather than s1..s7, so it keys the menu tip (lpn_scenario_preset_<id>_tip) and a
+	// descriptive rather than s1..s7, so it keys the menu tip (lpn_scenario_preset_<id>_tip; Max Day and Peak hour share lpn_scenario_preset_mult_tip) and a
 	// scenario the user adds next is still s1.
 	//
 	// **THE MULTIPLIERS: 2.0 FOR MAXIMUM DAY, 3.0 FOR PEAK HOUR**, times average day. National
@@ -3337,8 +3337,8 @@ var EngCalcs = EngCalcs || {};
 		{ id: 'flow_mid', key: 'lpn_scenario_preset_flow_mid', en: '2. Flow test: Mid' },
 		{ id: 'flow_max', key: 'lpn_scenario_preset_flow_max', en: '3. Flow test: Max' },
 		{ id: 'average_day', key: 'lpn_scenario_preset_average_day', en: '4. Average Day', dm: 1 },
-		{ id: 'max_day', key: 'lpn_scenario_preset_max_day', en: '5. Max Day', dm: 2 },
-		{ id: 'peak_hour', key: 'lpn_scenario_preset_peak_hour', en: '6. Peak hour', dm: 3 },
+		{ id: 'max_day', key: 'lpn_scenario_preset_max_day', en: '5. Max Day', dm: 2, range: [1.2, 3.0] },
+		{ id: 'peak_hour', key: 'lpn_scenario_preset_peak_hour', en: '6. Peak hour', dm: 3, range: [3.0, 6.0] },
 		{ id: 'fire_max_day', key: 'lpn_scenario_preset_fire_max_day', en: '7. Fire plus max day', dm: 2 }
 	];
 	function presetScenarios() {
@@ -3355,7 +3355,15 @@ var EngCalcs = EngCalcs || {};
 	function presetScenarioTip(s) {
 		var pc = EngCalcs.pageConfig || {}, i;
 		for (i = 0; i < LPN_PRESET_SCENARIOS.length; i++) {
-			if (LPN_PRESET_SCENARIOS[i].id === s.id) { return pc[LPN_PRESET_SCENARIOS[i].key + '_tip']; }
+			if (LPN_PRESET_SCENARIOS[i].id === s.id) {
+				var p = LPN_PRESET_SCENARIOS[i];
+				// Max day and peak hour share one sentence; the numbers are filled in here.
+				if (p.range) {
+					return (pc.lpn_scenario_preset_mult_tip || 'Demand multiplier {mult} times average day, a placeholder value. Most systems fall between {lo} and {hi} (National Research Council, 2006). Set the value for the system being modeled in Settings, Calculation, Hydraulics, Demand multiplier.')
+						.replace('{mult}', p.dm.toFixed(1)).replace('{lo}', p.range[0].toFixed(1)).replace('{hi}', p.range[1].toFixed(1));
+				}
+				return pc[p.key + '_tip'];
+			}
 		}
 		return undefined;
 	}
@@ -36081,7 +36089,7 @@ var EngCalcs = EngCalcs || {};
 				.replace('{n}', String(types.ids.length)).replace('{t}', String(types.detail || '?')));
 		}
 		if (custs) {
-			said.push((pc.lpn_inp_export_flat_customers || 'An EPANET file has no customers. The demand of the {n} customers in this project goes into the file as a demand row on the junction each one is added to, and each row is named with the customer’s tag. What the file cannot hold is the customer: where it sits, which pipe serves it, where along that pipe the service connects, and how many services one customer stands for. Your own project file keeps all of that.')
+			said.push((pc.lpn_inp_export_flat_customers || 'An EPANET file has no customers. The demand of the {n} customers in this project is written as a demand row on the junction each customer is assigned to, named with the customer\'s tag. The file does not record the customer itself: its location, the pipe that serves it, where along that pipe the service connects, or how many services it represents. That information remains in the project; save the project file to keep it.')
 				.replace('{n}', String(custs.ids.length)));
 		}
 		if (coords) {
