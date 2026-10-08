@@ -4148,3 +4148,11 @@ OBSERVED DEFECT: a box the file stores with no position (left/top null) is place
 OBSERVED minor: Contour box 11 px shorter in place (356 vs 367); map margin variable left "0px" instead of unset; z-index values keep climbing (relative order matches reload).
 Lesson (mine): the page's dialog stub (window.lpnDialogAnswerer) must be deleted, and a probe dialog I left queued made Ctrl+Z "fail" for three runs. Retract before reporting; control against a generic dialog first.
 Not done: mutation test of the harness; contour plot on the map when the contour box is in dst but not the file; Properties box floating position when it stays open.
+
+## 2026-10-08 feat/message-dismiss @ aaedf63e (second pass, x made visible)
+- OBSERVED: both branch harnesses (message-dismiss-x 23 checks, message-dismiss-browser 55 checks) pass on this head.
+- OBSERVED: own probe, Chromium. x present on "Add a reservoir"; Tab-focus + Enter hides it and moves focus to the history glyph; RELOAD brings every hidden message back (in-memory only); no localStorage/cookie key added (grep of diff + key scan).
+- OBSERVED: es and ar at 1400 and 390 px: x 20x20, on screen, not overlapping text or Something wrong, no sideways scroll. aria/title on the x read "Hide this message" in English on es/ar pages (new keys not yet translated, expected).
+- OBSERVED (code only): #lpn_status_notes (engine-difference notes, 2 min) has no x and keeps the box open after the diagnostic text is hidden.
+- NOT EXERCISED: storage full / storage unreadable / unit unknown paths in a browser (my storage-full probe was pre-empted by a diagnostic); covered only by the generic mechanism and the "No solution" harness case.
+- OBSERVED: branch also carries Zoom Window (W key, Map-menu row, corner triangle) unrelated to message hiding.
