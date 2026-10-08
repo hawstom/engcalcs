@@ -208,6 +208,13 @@ the block.
   4 and 5), after advice from every angle (*"Order matters... we are likely to make mistakes"*).
   Stages, answers and code: `dev/scenario-alternatives.md` on `feat/bentley-interop`. Basic mode
   hides it until the Advanced UX is designed. Task 765 (Presentation) is folded in here.
+- 100|781| **Active topology first; then Change type becomes a new asset in the old one's place.**
+  Tom, 2026-10-08, choosing "Active topology first": *"I never wanted what we have anyway. Now that
+  I understand, I want it changed. Change type is to be make a new object at the location of the old
+  object. And that's physically analogous."* Active topology: an element exists only in the
+  scenarios that include it (a new tank, pipe or subdivision). Change type then adds the new asset
+  in this scenario, switches the old one off and carries the values across; the type-per-scenario
+  override built on `feat/bentley-interop` goes. Seam: Task 721.
 - 100|737| **Coined names for interface elements, so every language names each one once.**
   Tom, 2026-09-28: *"The key here is for every language to invent unique words for each interface
   element and to use them consistently... it might be handy to literally make up unique, but memorable
@@ -379,10 +386,8 @@ the block.
   editable translation table (assets, properties, scenarios, alternatives). Mary, same day: Map
   "ADE" object data does not survive DXF; layers and ATTRIBs are visible everywhere; target ASCII
   R2000. Tom, 2026-10-07: his DXF Interface Manager spec, for import AND export, and a rudimentary
-  interim workflow, verbatim in `dev/dxf-interface.md`.
-- 75|776| **Copy a table with its headings; export Tables to CSV and ODS.**
-  Tom, 2026-10-06: *"When copying from a Table, it would be nice to be able to copy the headings
-  somehow. It might also be nice to Export to CSV and ODS the Tables."* Branch `feat/table-export`.
+  interim workflow, verbatim in `dev/dxf-interface.md`. **DXF export merged 2026-10-08**; import is
+  what remains.
 - 75|777| **Station and elevation marks on the mi and wi section sketches.**
   Tom, 2026-10-06: *"it would be very nice to add either an automatic stations and elevations grid
   or the stations and elevations about 4 to 8 points."* Branch `feat/section-grid`.
