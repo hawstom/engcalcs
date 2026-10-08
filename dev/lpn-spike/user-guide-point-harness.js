@@ -139,6 +139,27 @@ async function run(browser, Session, tag, url) {
 	s = await state(page);
 	ok('...and still invokes nothing', s.mode === before.mode && s.sig === before.sig && s.ls === before.ls);
 
+	const menusOpen = () => page.evaluate(() => ({ m: document.getElementById('lpn_menu_popup').style.display, s: document.getElementById('lpn_menu_popup2').style.display }));
+	await page.waitForTimeout(2800);
+	ok('after the ring fades the menu and fly-out the card opened are closed', JSON.stringify(await menusOpen()) === '{"m":"none","s":"none"}', JSON.stringify(await menusOpen()));
+	await clickCard(page, cardSel.basic);
+	await a.settle(200);
+	await clickCard(page, cardSel.select);
+	await a.settle(200);
+	p = await pointed(page);
+	ok('a card of another kind closes the first card\'s menu at once, and rings its own control', JSON.stringify(await menusOpen()) === '{"m":"none","s":"none"}' && p.n === 1 && p.id === 'select', JSON.stringify([await menusOpen(), p]));
+	await page.waitForTimeout(2800);
+
+	console.log('\n2b. Properties and Alternatives preview say how they open');
+	await clickCard(page, "function () { return document.getElementById('lpn_guide_b_lpn_popup'); }");
+	await a.settle(150);
+	const note = await page.evaluate(() => Array.from(document.querySelectorAll('.lpn-guide-nopoint')).map(n => n.textContent));
+	ok('the Properties card shows the note with its pointer', note.length === 1 && note[0].indexOf(await a.lang('lpn_guide_how_popup')) >= 0 && note[0].indexOf(await a.lang('lpn_guide_not_shown')) === 0, JSON.stringify(note));
+	await clickCard(page, "function () { return document.getElementById('lpn_guide_b_lpn_alt_box'); }");
+	await a.settle(150);
+	const note2 = await page.evaluate(() => Array.from(document.querySelectorAll('.lpn-guide-nopoint')).map(n => n.textContent));
+	ok('the Alternatives preview card shows the note with its pointer, and the Properties note is gone', note2.length === 1 && note2[0].indexOf(await a.lang('lpn_guide_how_alt')) >= 0, JSON.stringify(note2));
+
 	console.log('\n3. Find and replace');
 	await page.keyboard.press('Escape');
 	await a.settle(100);
@@ -167,6 +188,11 @@ async function run(browser, Session, tag, url) {
 	ok('the Basic mode hit is listed', !!hit, JSON.stringify(hit));
 	ok('...its path carries Scenarios', !!hit && hit.ctx.indexOf(a.scenariosLabel || 'Scenarios') >= 0 || !!hit && /\S/.test(hit.ctx.replace(/["\s›]/g, '')), JSON.stringify(hit));
 	if (tag === 'en') { ok('...exactly "Scenarios" before the name', !!hit && /Scenarios/.test(hit.ctx), JSON.stringify(hit)); }
+	const navTxt = await page.evaluate(() => Array.from(document.querySelectorAll('#lpn_guide_nav a')).map(x => {
+		const sn = x.querySelector('.lpn-guide-nav-snip');
+		return sn ? x.textContent.indexOf(' ' + sn.textContent) > 0 : true;
+	}));
+	ok('a rail entry\'s name and its snippet are separated by a space', navTxt.length > 0 && navTxt.every(Boolean), JSON.stringify(navTxt));
 	await page.fill('#lpn_guide_search', '');
 	await page.evaluate(() => document.getElementById('lpn_guide_search').dispatchEvent(new Event('input')));
 	await a.settle(150);

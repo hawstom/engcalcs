@@ -44172,7 +44172,7 @@ var EngCalcs = EngCalcs || {};
 			a.setAttribute('data-guide-link', key);
 			if (sub) { a.className = 'lpn-guide-nav-sub'; }
 			a.appendChild(document.createTextNode(text));
-			if (snip) { sn = document.createElement('span'); sn.className = 'lpn-guide-nav-snip'; sn.textContent = snip; a.appendChild(sn); }
+			if (snip) { a.appendChild(document.createTextNode(' ')); sn = document.createElement('span'); sn.className = 'lpn-guide-nav-snip'; sn.textContent = snip; a.appendChild(sn); }
 			if (key === cur) { a.setAttribute('aria-current', 'true'); }
 			nav.appendChild(a);
 		}
@@ -44316,22 +44316,40 @@ var EngCalcs = EngCalcs || {};
 	// (lpn-guide-point: a dashed ring in its own colour, which no control uses for pressed, active,
 	// focused or hover), and never moves keyboard focus onto the control and never runs it. A card whose
 	// control cannot be shown says so on the card (lpn_guide_not_shown), so no card does nothing.
-	var guidePointEl = null, GUIDE_POINT_MS = 2500;
+	var guidePointEl = null, GUIDE_POINT_MS = 2500, guideOpenedMenu = false, guideMenuT = null, guideMenuAnchor = null;
+	// Whatever menu the last card opened is closed before the next card acts and when its ring fades,
+	// unless the reader has moved into it (pointer over it, or focus inside it) in the meantime.
+	function guideCloseOpened(onlyIfUntouched) {
+		var pop = document.getElementById('lpn_menu_popup'), pop2 = document.getElementById('lpn_menu_popup2');
+		clearTimeout(guideMenuT);
+		if (!guideOpenedMenu) { return; }
+		if (onlyIfUntouched && ((pop && pop.matches(':hover')) || (pop2 && pop2.matches(':hover'))
+				|| (pop && pop.contains(document.activeElement)) || (pop2 && pop2.contains(document.activeElement)))) { guideOpenedMenu = false; return; }
+		guideOpenedMenu = false;
+		if (pop && pop.style.display === 'block' && openMenuAnchor === guideMenuAnchor) { closeMenu(); }
+	}
 	function guideClearPoint() {
+		guideCloseOpened(false);
 		if (guidePointEl) { guidePointEl.classList.remove('lpn-guide-point'); clearTimeout(guidePointEl.__lpnPointT); guidePointEl = null; }
 		Array.prototype.forEach.call(document.querySelectorAll('.lpn-guide-nopoint'), function (n) { n.parentNode.removeChild(n); });
 	}
 	function guidePoint(el) {
+		var opened = guideOpenedMenu;
 		if (!el || !el.classList) { return false; }
+		guideOpenedMenu = false;
 		guideClearPoint();
+		guideOpenedMenu = opened;
 		void el.offsetWidth;   // the animation restarts on every click, so every click looks the same
 		el.classList.add('lpn-guide-point');
 		guidePointEl = el;
 		el.__lpnPointT = setTimeout(function () { el.classList.remove('lpn-guide-point'); if (guidePointEl === el) { guidePointEl = null; } }, GUIDE_POINT_MS);
+		guideMenuT = setTimeout(function () { guideCloseOpened(true); }, GUIDE_POINT_MS);
 		return true;
 	}
 	function guideNoPoint(card) {
-		var pc = EngCalcs.pageConfig || {}, n = guideSpan('lpn-guide-nopoint', pc.lpn_guide_not_shown || 'This control is not on screen right now.'), host;
+		var pc = EngCalcs.pageConfig || {}, id = String(card.id || '').replace(/^lpn_guide_b_/, ''),
+			how = id === 'lpn_popup' ? pc.lpn_guide_how_popup : (id === 'lpn_alt_box' ? pc.lpn_guide_how_alt : ''),
+			n = guideSpan('lpn-guide-nopoint', (pc.lpn_guide_not_shown || 'This control is not on screen right now.') + (how ? ' ' + how : '')), host;
 		guideClearPoint();
 		if (card.classList.contains('lpn-guide-boxentry')) { host = card.querySelector('h3'); if (host) { host.parentNode.insertBefore(n, host.nextSibling); } return; }
 		host = card.querySelector('.lpn-guide-desc') || card;
@@ -44346,6 +44364,8 @@ var EngCalcs = EngCalcs || {};
 		closeMenu();
 		btn.click();
 		if (pop.style.display !== 'block') { return false; }
+		guideOpenedMenu = true;
+		guideMenuAnchor = btn;
 		if (e.depth) {
 			opener = guideMenuRowIn('lpn_menu_list', e.parent.row);
 			if (!opener) { return false; }
@@ -44386,6 +44406,7 @@ var EngCalcs = EngCalcs || {};
 			c = guideBoxControl(String(card.id).replace(/^lpn_guide_b_/, ''));
 			if (c) { d = c.kind === 'toolbar' ? { kind: 'toolbar', g: { b: { el: c.el } } } : { kind: 'menu', e: c.e }; }
 		}
+		guideClearPoint();   // the previous card's ring, note and menu, whatever kind this card is
 		if (card) { key = (card.closest && card.closest('[data-guide-key]')); if (key) { guidePinKey = key.getAttribute('data-guide-key'); guidePinTop = guideContentEl().scrollTop; guideSetCurrent(guidePinKey); } }
 		if (!d) { if (card) { guideNoPoint(card); } return; }
 		if (d.kind === 'toolbar') {

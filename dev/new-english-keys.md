@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**74 still to read on master**, of 78 untranslated keys, of 2522 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**76 still to read on master**, of 80 untranslated keys, of 2524 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -139,7 +139,7 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   @@ NEEDS RULING
 
-## lpn_  (78, 74 to read @@ NEEDS RULING)
+## lpn_  (80, 76 to read @@ NEEDS RULING)
 
 - **`lpn_dxf_export_failed`**
   > The DXF file was not written: an error in this page stopped it ({error}).
@@ -276,6 +276,12 @@ never edits a synonym.
 - **`lpn_guide_find_results_term`**
   > Results, the selection, and Tables
   @@ NEEDS RULING
+- **`lpn_guide_how_alt`**
+  > Alternatives preview is listed under Water, Scenarios when Basic mode is off.
+  @@ NEEDS RULING
+- **`lpn_guide_how_popup`**
+  > Properties opens when you select an asset or text.
+  @@ NEEDS RULING
 - **`lpn_guide_keys_def`**
   > <table class="lpn-notes-table"><tbody><tr><td>?</td><td>Open the guide at the control under the pointer or holding focus.</td></tr><tr><td>F1</td><td>Open the guide at the entry for the box that has focus.</td></tr><tr><td>Ctrl+K</td><td>Open the guide with the current selection in the search field.</td></tr><tr><td>/</td><td>Select the search field while the guide has focus.</td></tr><tr><td>Esc</td><td>Close the guide and return to where you were.</td></tr></tbody></table>
   @@ NEEDS RULING
@@ -380,7 +386,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**72 still to read**, of 75 new keys across 12 unmerged branch(es).
+**72 still to read**, of 75 new keys across 13 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -390,6 +396,8 @@ Each branch carries the commit it was read at. This part is a SNAPSHOT and is no
 fresh by the build — a branch moves whenever anybody commits on it, and failing master's
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
+
+### chore/calls-1008c (`ba4703ae`) — adds no English strings
 
 ### feat/bentley-interop (`85dd485e`) — 66 new, 66 to read @@ NEEDS RULING
 
@@ -640,6 +648,6 @@ build for that would be a gate nobody keeps. Refresh it with
   > Points data<br />(use Copy to see format)
   @@ NEEDS RULING
 
-### feat/user-guide (`02d288c4`) — adds no English strings
+### feat/user-guide (`92ce4d1b`) — adds no English strings
 
 ### feat/visit-dedupe (`7b4a84bd`) — adds no English strings
