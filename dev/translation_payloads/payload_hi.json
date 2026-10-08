@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "hi",
-        "expected_key_count": 2444,
-        "delta_key_count": 224,
+        "expected_key_count": 2456,
+        "delta_key_count": 236,
         "exempt_key_count": 38,
         "exempt_keys": [
             "u_imgd",
@@ -786,6 +786,12 @@
         "lpn_pane_scn_show": "Show scenarios",
         "lpn_pane_clear_override": "Clear override",
         "lpn_pane_scn_alt_tip": "{category} alt.: {alternative}",
+        "lpn_pane_copy_heads": "Copy with headings",
+        "lpn_export_table_title": "Export to {format}",
+        "lpn_export_table_current": "Current",
+        "lpn_export_table_all": "All",
+        "lpn_export_table_go": "Export",
+        "lpn_export_table_scn_note": "Results are exported only for the scenario last calculated.",
         "lpn_change_type_menu": "Change type",
         "lpn_change_type_tip": "Change the selected nodes into junctions, reservoirs, or tanks, or the selected links into pipes, pumps, or valves. Each keeps its ID, its place, its connections, and every value the new type also has. If anything would be lost, you are asked first.",
         "lpn_change_type_ok": "Change",
@@ -817,9 +823,15 @@
         "lpn_contour_show_tip": "Clear to hide the fill and the contour lines; select to bring them back as they were. Node colors stay.",
         "lpn_sysflow_title": "Flow balance",
         "lpn_crs_suggested_mark": "(suggested)",
-        "lpn_file_export_menu": "Export…",
+        "lpn_file_export_menu": "Export to…",
         "lpn_file_export_item_inp": "EPANET file…",
         "lpn_file_export_item_geojson": "GeoJSON file…",
+        "lpn_file_export_tables_heading": "Tables and libraries",
+        "lpn_file_export_item_ods": "ODS file…",
+        "lpn_file_export_item_xlsx": "XLSX file…",
+        "lpn_file_export_item_csv": "CSV file…",
+        "lpn_file_export_tables_tip": "Download the tables as the Tables pane shows them, one sheet each, with a sheet for each library their IDs refer to: patterns, curves, pipe types, and fittings.",
+        "lpn_file_export_csv_tip": "Download a table as the Tables pane shows it. Several tables come as one zip file of CSV files, with a file for each library their IDs refer to.",
         "lpn_status_inp_exported_picture": "Exported {zip}, holding the EPANET file {file}, its background picture {picture}, and the world file {world}. Extract all three into one folder, then open the .inp there in EPANET; the picture comes with it.",
         "lpn_status_inp_exported_no_picture": "Exported {file}. The background picture could not be saved, so the .inp names none; in EPANET, add it with View > Backdrop > Load.",
         "lpn_inp_export_difference_one": "One thing the .inp format cannot hold.",
@@ -1012,6 +1024,12 @@
         "lpn_pane_scn_show": "Show scenarios",
         "lpn_pane_clear_override": "Clear override",
         "lpn_pane_scn_alt_tip": "{category} alt.: {alternative}",
+        "lpn_pane_copy_heads": "Copy with headings",
+        "lpn_export_table_title": "Export to {format}",
+        "lpn_export_table_current": "Current",
+        "lpn_export_table_all": "All",
+        "lpn_export_table_go": "Export",
+        "lpn_export_table_scn_note": "Results are exported only for the scenario last calculated.",
         "lpn_change_type_menu": "Change type",
         "lpn_change_type_tip": "Change the selected nodes into junctions, reservoirs, or tanks, or the selected links into pipes, pumps, or valves. Each keeps its ID, its place, its connections, and every value the new type also has. If anything would be lost, you are asked first.",
         "lpn_change_type_ok": "Change",
@@ -1043,9 +1061,15 @@
         "lpn_contour_show_tip": "Clear to hide the fill and the contour lines; select to bring them back as they were. Node colors stay.",
         "lpn_sysflow_title": "Flow balance",
         "lpn_crs_suggested_mark": "(suggested)",
-        "lpn_file_export_menu": "Export…",
+        "lpn_file_export_menu": "Export to…",
         "lpn_file_export_item_inp": "EPANET file…",
         "lpn_file_export_item_geojson": "GeoJSON file…",
+        "lpn_file_export_tables_heading": "Tables and libraries",
+        "lpn_file_export_item_ods": "ODS file…",
+        "lpn_file_export_item_xlsx": "XLSX file…",
+        "lpn_file_export_item_csv": "CSV file…",
+        "lpn_file_export_tables_tip": "Download the tables as the Tables pane shows them, one sheet each, with a sheet for each library their IDs refer to: patterns, curves, pipe types, and fittings.",
+        "lpn_file_export_csv_tip": "Download a table as the Tables pane shows it. Several tables come as one zip file of CSV files, with a file for each library their IDs refer to.",
         "lpn_status_inp_exported_picture": "Exported {zip}, holding the EPANET file {file}, its background picture {picture}, and the world file {world}. Extract all three into one folder, then open the .inp there in EPANET; the picture comes with it.",
         "lpn_status_inp_exported_no_picture": "Exported {file}. The background picture could not be saved, so the .inp names none; in EPANET, add it with View > Backdrop > Load.",
         "lpn_inp_export_difference_one": "One thing the .inp format cannot hold.",
@@ -1808,6 +1832,102 @@
                 }
             }
         },
+        "lpn_pane_copy_heads": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_print",
+                    "value": "तालिका छापें",
+                    "english": "Print table"
+                },
+                "next_translated": {
+                    "key": "lpn_menu_project",
+                    "value": "जल",
+                    "english": "Water"
+                }
+            }
+        },
+        "lpn_export_table_title": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_print",
+                    "value": "तालिका छापें",
+                    "english": "Print table"
+                },
+                "next_translated": {
+                    "key": "lpn_menu_project",
+                    "value": "जल",
+                    "english": "Water"
+                }
+            }
+        },
+        "lpn_export_table_current": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_print",
+                    "value": "तालिका छापें",
+                    "english": "Print table"
+                },
+                "next_translated": {
+                    "key": "lpn_menu_project",
+                    "value": "जल",
+                    "english": "Water"
+                }
+            }
+        },
+        "lpn_export_table_all": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_print",
+                    "value": "तालिका छापें",
+                    "english": "Print table"
+                },
+                "next_translated": {
+                    "key": "lpn_menu_project",
+                    "value": "जल",
+                    "english": "Water"
+                }
+            }
+        },
+        "lpn_export_table_go": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_print",
+                    "value": "तालिका छापें",
+                    "english": "Print table"
+                },
+                "next_translated": {
+                    "key": "lpn_menu_project",
+                    "value": "जल",
+                    "english": "Water"
+                }
+            }
+        },
+        "lpn_export_table_scn_note": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_print",
+                    "value": "तालिका छापें",
+                    "english": "Print table"
+                },
+                "next_translated": {
+                    "key": "lpn_menu_project",
+                    "value": "जल",
+                    "english": "Water"
+                }
+            }
+        },
         "lpn_change_type_menu": {
             "reason": "missing",
             "current_value": null,
@@ -2337,6 +2457,102 @@
             }
         },
         "lpn_file_export_item_geojson": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_inp_tip",
+                    "value": "एक EPANET फ़ाइल से नेटवर्क पढ़ें, चाहे वह .inp टेक्स्ट फ़ाइल हो या EPANET द्वारा सहेजी गई .net फ़ाइल, और उसे इस ब्राउज़र में एक नए प्रोजेक्ट के रूप में सहेजें।",
+                    "english": "Create a new project from an EPANET file, either the .inp export format (preferred) or the native .net format (last resort)."
+                },
+                "next_translated": {
+                    "key": "lpn_file_export_inp_tip",
+                    "value": "इस नेटवर्क को EPANET .inp फ़ाइल के रूप में लिखें और डाउनलोड करें। आपके टाइप किए अंक ठीक वैसे ही लिखे जाते हैं जैसे आपने टाइप किए थे। जो कुछ .inp प्रारूप में नहीं समा सकता, वह बाद में आपको सूचीबद्ध कर दिया जाता है।",
+                    "english": "Download this network as an EPANET .inp file (in a zip file with its image if applicable). Anything the .inp format cannot hold is listed for you afterwards."
+                }
+            }
+        },
+        "lpn_file_export_tables_heading": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_inp_tip",
+                    "value": "एक EPANET फ़ाइल से नेटवर्क पढ़ें, चाहे वह .inp टेक्स्ट फ़ाइल हो या EPANET द्वारा सहेजी गई .net फ़ाइल, और उसे इस ब्राउज़र में एक नए प्रोजेक्ट के रूप में सहेजें।",
+                    "english": "Create a new project from an EPANET file, either the .inp export format (preferred) or the native .net format (last resort)."
+                },
+                "next_translated": {
+                    "key": "lpn_file_export_inp_tip",
+                    "value": "इस नेटवर्क को EPANET .inp फ़ाइल के रूप में लिखें और डाउनलोड करें। आपके टाइप किए अंक ठीक वैसे ही लिखे जाते हैं जैसे आपने टाइप किए थे। जो कुछ .inp प्रारूप में नहीं समा सकता, वह बाद में आपको सूचीबद्ध कर दिया जाता है।",
+                    "english": "Download this network as an EPANET .inp file (in a zip file with its image if applicable). Anything the .inp format cannot hold is listed for you afterwards."
+                }
+            }
+        },
+        "lpn_file_export_item_ods": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_inp_tip",
+                    "value": "एक EPANET फ़ाइल से नेटवर्क पढ़ें, चाहे वह .inp टेक्स्ट फ़ाइल हो या EPANET द्वारा सहेजी गई .net फ़ाइल, और उसे इस ब्राउज़र में एक नए प्रोजेक्ट के रूप में सहेजें।",
+                    "english": "Create a new project from an EPANET file, either the .inp export format (preferred) or the native .net format (last resort)."
+                },
+                "next_translated": {
+                    "key": "lpn_file_export_inp_tip",
+                    "value": "इस नेटवर्क को EPANET .inp फ़ाइल के रूप में लिखें और डाउनलोड करें। आपके टाइप किए अंक ठीक वैसे ही लिखे जाते हैं जैसे आपने टाइप किए थे। जो कुछ .inp प्रारूप में नहीं समा सकता, वह बाद में आपको सूचीबद्ध कर दिया जाता है।",
+                    "english": "Download this network as an EPANET .inp file (in a zip file with its image if applicable). Anything the .inp format cannot hold is listed for you afterwards."
+                }
+            }
+        },
+        "lpn_file_export_item_xlsx": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_inp_tip",
+                    "value": "एक EPANET फ़ाइल से नेटवर्क पढ़ें, चाहे वह .inp टेक्स्ट फ़ाइल हो या EPANET द्वारा सहेजी गई .net फ़ाइल, और उसे इस ब्राउज़र में एक नए प्रोजेक्ट के रूप में सहेजें।",
+                    "english": "Create a new project from an EPANET file, either the .inp export format (preferred) or the native .net format (last resort)."
+                },
+                "next_translated": {
+                    "key": "lpn_file_export_inp_tip",
+                    "value": "इस नेटवर्क को EPANET .inp फ़ाइल के रूप में लिखें और डाउनलोड करें। आपके टाइप किए अंक ठीक वैसे ही लिखे जाते हैं जैसे आपने टाइप किए थे। जो कुछ .inp प्रारूप में नहीं समा सकता, वह बाद में आपको सूचीबद्ध कर दिया जाता है।",
+                    "english": "Download this network as an EPANET .inp file (in a zip file with its image if applicable). Anything the .inp format cannot hold is listed for you afterwards."
+                }
+            }
+        },
+        "lpn_file_export_item_csv": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_inp_tip",
+                    "value": "एक EPANET फ़ाइल से नेटवर्क पढ़ें, चाहे वह .inp टेक्स्ट फ़ाइल हो या EPANET द्वारा सहेजी गई .net फ़ाइल, और उसे इस ब्राउज़र में एक नए प्रोजेक्ट के रूप में सहेजें।",
+                    "english": "Create a new project from an EPANET file, either the .inp export format (preferred) or the native .net format (last resort)."
+                },
+                "next_translated": {
+                    "key": "lpn_file_export_inp_tip",
+                    "value": "इस नेटवर्क को EPANET .inp फ़ाइल के रूप में लिखें और डाउनलोड करें। आपके टाइप किए अंक ठीक वैसे ही लिखे जाते हैं जैसे आपने टाइप किए थे। जो कुछ .inp प्रारूप में नहीं समा सकता, वह बाद में आपको सूचीबद्ध कर दिया जाता है।",
+                    "english": "Download this network as an EPANET .inp file (in a zip file with its image if applicable). Anything the .inp format cannot hold is listed for you afterwards."
+                }
+            }
+        },
+        "lpn_file_export_tables_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_inp_tip",
+                    "value": "एक EPANET फ़ाइल से नेटवर्क पढ़ें, चाहे वह .inp टेक्स्ट फ़ाइल हो या EPANET द्वारा सहेजी गई .net फ़ाइल, और उसे इस ब्राउज़र में एक नए प्रोजेक्ट के रूप में सहेजें।",
+                    "english": "Create a new project from an EPANET file, either the .inp export format (preferred) or the native .net format (last resort)."
+                },
+                "next_translated": {
+                    "key": "lpn_file_export_inp_tip",
+                    "value": "इस नेटवर्क को EPANET .inp फ़ाइल के रूप में लिखें और डाउनलोड करें। आपके टाइप किए अंक ठीक वैसे ही लिखे जाते हैं जैसे आपने टाइप किए थे। जो कुछ .inp प्रारूप में नहीं समा सकता, वह बाद में आपको सूचीबद्ध कर दिया जाता है।",
+                    "english": "Download this network as an EPANET .inp file (in a zip file with its image if applicable). Anything the .inp format cannot hold is listed for you afterwards."
+                }
+            }
+        },
+        "lpn_file_export_csv_tip": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
