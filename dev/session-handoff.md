@@ -99,43 +99,54 @@ lines rather than appending corrections.
   tile counts at a 900 ms settle (basemap.js now waits for a pointable tile). Pre-existing and unrelated: `scale-publish-harness.js` (2 checks). The full `node dev/browser-pass/run.js` is green (1853/1853, 2026-10-04, Task 761); browser-pass specs are not in
   check_all.
 
-## STATE — 2026-10-08 (ninth session, Arizona time)
+## STATE — 2026-10-08 (ninth session, Arizona time, after his merges)
 
-### Master = see `git log -1 master`, pushed. Production: last confirmed pull edc78d01 (2026-10-07); confirm with the About box
+### Master = b1b0ffbd, pushed. Production: last confirmed pull edc78d01 (2026-10-07); confirm with the About box
 
-Merged this session: chore/wave0-apply-1008 (his Wave 0 answers; five $ec_lang_syn notes, two in his
-words, three on his "Use proposed"), chore/sprint-1008 (26 languages, 224 new and 343 resynced keys; only
-consent_body left CHANGED on purpose), fix/mnemonic-han-harness, fix/sw-precache-log (the service worker's
-first install wrote ~23 page-load rows per visit; now one), chore/protect-1008. Deleted keys: none.
+Merged 10-08: wave0-apply, sprint-1008 (26 languages), fix/mnemonic-han-harness, fix/sw-precache-log, and on
+his TYPED words feat/table-export, feat/dxf, feat/workspace (all-clears on file). Their worktrees, branches
+and previews are deleted. Deleted keys: none.
 
-### Awaiting him
+**Tom, 10-08, after the merges: "I thought you were done, and I only asked for a few merges."** CC had
+gone on to apply his calls-page answers unannounced. Do the asked thing, report, and ASK before the next
+pile of work. He then said: let the two builders finish, then /clear.
 
-- **Merge words he must TYPE in the session** (the classifier refused CC writing an all-clear from his
-  pasted 10-08 message, which said "feat/table-export: Merge." and "feat/dxf: Merge."). Pins when he types:
-  table-export at its head after master is merged in; then master into dxf, then dxf. After dxf merges:
-  customers to colour 7 on a fix branch (his F03), and record his lpn_dxf_note_blocks "Use as written"
-  in english-key-rulings.json (not done on the branch, so his pin would not lapse).
-- **Calls page** https://claude.ai/artifact/1eHT8AMCRcRhcbjtsKUzNd, same db collection `answers`; new ids
-  G01-G10, `w2-<key>` (5 strings), `v2-<key>` (3 sprint questions). The F/v/w answers of 10-08 are applied.
-- Browser pass, fix rounds done and Perry-checked where large: feat/message-dismiss (visible x),
-  feat/workspace (import applies in place, no reload; Perry's placement defect fixed, 60879c22), feat/bentley-interop
-  (auto-hide may cover the map, pinned keeps 320 px, every box), feat/user-guide (14.4 px like Settings,
-  Ctrl+K raises, focus sentence), feat/hover-label (NEW, Task 773, port 8110), feat/visit-dedupe (F01 built:
-  ec_code; Safari-safe; waits on G01-G05 and a consent_body translation round BEFORE merge), plus
-  feat/section-grid and feat/desktop from before.
-- **Seam when feat/workspace and feat/bentley-interop both merge:** `if (boxSaveHeld()) { return; }` at
-  the top of `saveAltboxLayout`; add 'lpn_altbox' and 'lpn_hovercard' to the import-site names in
-  storage_inventory_check.php if workspace export should carry them.
-- **Sprint 1008 close-out:** three English questions open (v2- on the page); `friction_check.php
-  --sprint=1008` exits 1 until answered and applied. Branch keys (six branches) join a later delta sprint,
-  with consent_body and the two consent strings first.
+### Not yet on master (all pushed as branches)
+
+- **chore/calls-1008b** (this branch; merge on green, no all-clear needed): DXF customers white (ACI 7,
+  harness fails on 8); his three v2 "Use proposed" English rewrites (lpn_change_type_key,
+  lpn_settings_auto_run_tip, lpn_settings_elev_source_tip) with rulings and friction 1008 closed
+  (`friction_check --sprint=1008` passes); lpn_dxf_note_blocks ruling; Roadmap closes 776, adds 781
+  (G06: active topology first, Change type becomes a new asset in the old one's place). This handoff.
+- **feat/user-guide**: master merged in; lpn_guide_boxes_autohide = his w2 text verbatim.
+- **feat/visit-dedupe**: master merged in (config.inc.php: `ecTesterBrowser()` is the tester cookie;
+  `ecLoggingOptedOut()` = precache OR tester; `ecLogTester()` and the day tally skip precache);
+  `$ec_lang_syn['consent_body']` written on his G02 "syn OK". **The syn notes for consent_current_granted and
+  consent_region_label still describe logging: propose new ones to him (AI may not write them).**
+  G03 privacy text approved, G04 keep ec_seen/ec_blang, w2 consent strings "Use as written" (rulings not
+  yet written). G01 "Translate first": consent_body + the two strings, 26 Sonnet agents, before merge.
+  G05: librewaternet.org branch `visit-code-claim` (0804152) holds his sentence; merge and push it there
+  when visit-dedupe merges.
+- **feat/hover-label** (bbf6c3c3) and **feat/message-dismiss** (aaedf63e): builders FINISHED, pushed.
+  Hover: card = exactly the ticked Settings fields via the map label's own builders, any zoom, ID alone
+  when nothing is ticked; also Delete, Pipe/Pump/Valve/Chain modes; tip his text verbatim. Its full
+  suite was not rerun after its last one-constant fix (touch-radius and hover harnesses pass alone).
+  Ask him: does "Show the full label on hover" (lpn_settings_hover_card) still fit, since "full" now
+  overstates? Message x: on every standing message; a hidden diagnostic returns when its text recurs,
+  a hidden run message at the next run. Ask him: should "storage full/unreadable" and "unit unknown"
+  really be hideable? Both branches: regenerate payloads and new-english-keys on merge; Perry next,
+  then his browser pass.
+- Unchanged: feat/bentley-interop, feat/section-grid, feat/desktop await his browser pass.
+- **Seam, now that workspace is merged:** when bentley-interop next merges master, add
+  `if (boxSaveHeld()) { return; }` at the top of `saveAltboxLayout`; and decide whether workspace export
+  carries lpn_altbox and lpn_hovercard (storage_inventory_check.php import-site names).
+- **A delta translation sprint is owed on master** (new keys from table-export, dxf, workspace; changed:
+  lpn_file_export_menu, the three v2 keys, consent_body). Ask him before launching.
 
 ### Next job
 
-- Read the calls page; apply; merge what he clears (merge master in first, regenerate payloads on the
-  merge, suite on the merge).
-- G01 "Translate first": 26 Sonnet agents on feat/visit-dedupe for consent_body plus the two banner strings.
-- Task 714 (theming) is the next 75 build if nothing of his is waiting.
+Ask him what he wants first. Candidates: merge chore/calls-1008b; finish/review the two builders' branches;
+G01 consent translation; the delta sprint; Task 714 (theming).
 
 ### Traps met 2026-10-08 (ninth session)
 
