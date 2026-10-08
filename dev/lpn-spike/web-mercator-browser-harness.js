@@ -213,19 +213,9 @@ async function main() {
 			await page.click('#lpn_georef_finish'); await a.settle(1500);
 		}
 		async function exportInp() {
-			const label = await S('lpn_file_export_item_inp');
-			await page.click('#lpn_menu_file');
-			await page.waitForSelector('#lpn_menu_popup', { state: 'visible' });
-			// Export is a fly-out of File: open it by its row, then press the row inside it.
-			await page.evaluate((l) => {
-				const r = Array.from(document.querySelectorAll('#lpn_menu_list button.lpn-menu-row')).find((b) => b.textContent.trim().indexOf(l) === 0);
-				if (r) { r.click(); }
-			}, await S('lpn_file_export_menu'));
-			await page.waitForSelector('#lpn_menu_list2 button.lpn-menu-row', { state: 'attached' });
-			const [dl] = await Promise.all([page.waitForEvent('download'), page.evaluate((l) => {
-				const r = Array.from(document.querySelectorAll('#lpn_menu_list2 button.lpn-menu-row')).find((b) => b.textContent.trim().indexOf(l) === 0);
-				if (r) { r.click(); }
-			}, label)]);
+			// File > Export... > EPANET file: the export commands live in a fly-out.
+			const [dl] = await Promise.all([page.waitForEvent('download'),
+				a.menuClickSub(await S('lpn_file_export_menu'), await S('lpn_file_export_item_inp'), 'file')]);
 			const text = fs.readFileSync(await dl.path(), 'utf8');
 			await a.settle(600);
 			// The export lists what the format could not hold (the customer); that dialog is answered

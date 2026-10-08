@@ -943,6 +943,9 @@ the block.
   Tom, 2026-10-05: informative where labels are missing, and a clue to what a click will select. On
   a phone it would need tap for Properties and long-press for the label, which he called
   counter-natural but possibly phone-intuitive.
+  **BUILT 2026-10-08 on `feat/hover-label`**, asked again by outside tester DDN ("whether to show these
+  should be a setting"): Select mode, card on rest, setting in Map and page; Perry passed it. Open: field
+  names in words, and other modes (calls page G07, G08).
 - 25|144| **Diagnose the Hazen-Williams conversion leak — full record in `dev/hazen-williams-leak.md`.**
   **The 11% outlier does not reproduce and the fix it was waiting for already shipped** (2026-07-28,
   `9c47608f`, one day after the snapshot). The 2026-08-21 report gives HW 58% use-of-shopping, ordinary
