@@ -733,13 +733,14 @@ head('12. the wizard has a row in the File menu, beside the rows that open a pro
 	// removal cannot leave the wizard unreachable.
 	check(subRows.filter(t => t.indexOf(String(pc.lpn_library_import)) >= 0).length === 1,
 		'and the submenu row is the one door that remains');
-	// Last of the three import rows, the same order Task 718 built: surveyed points, EPANET file,
-	// libraries.
-	check(subRows.length === 3 &&
+	// Task 718's three import rows in the order it built (surveyed points, EPANET file, libraries),
+	// then Workspace (2026-10-07).
+	check(subRows.length === 4 &&
 		subRows[0].indexOf(String(pc.lpn_file_import_survey)) >= 0 &&
 		subRows[1].indexOf(String(pc.lpn_file_import_inp)) >= 0 &&
-		subRows[2].indexOf(String(pc.lpn_library_import)) >= 0,
-		`the three import rows stand in order: surveyed points, EPANET file, libraries: ${JSON.stringify(subRows)}`);
+		subRows[2].indexOf(String(pc.lpn_library_import)) >= 0 &&
+		subRows[3].indexOf(String(pc.lpn_file_import_workspace)) >= 0,
+		`the import rows stand in order: surveyed points, EPANET file, libraries, workspace: ${JSON.stringify(subRows)}`);
 }());
 
 console.log('\n' + (failures ? failures + ' FAILURE(S)' : 'All library-import checks passed.'));

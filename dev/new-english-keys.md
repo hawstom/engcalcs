@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**24 still to read on master**, of 24 untranslated keys, of 2468 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**35 still to read on master**, of 36 untranslated keys, of 2480 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -222,7 +222,7 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   @@ NEEDS RULING
 
-## lpn_  (24, 24 to read @@ NEEDS RULING)
+## lpn_  (36, 35 to read @@ NEEDS RULING)
 
 - **`lpn_dxf_export_failed`**
   > The DXF file was not written: an error in this page stopped it ({error}).
@@ -284,6 +284,9 @@ never edits a synonym.
 - **`lpn_file_export_item_ods`**
   > ODS file…
   @@ NEEDS RULING
+- **`lpn_file_export_item_workspace`**
+  > Workspace…
+  @@ NEEDS RULING
 - **`lpn_file_export_item_xlsx`**
   > XLSX file…
   @@ NEEDS RULING
@@ -293,15 +296,48 @@ never edits a synonym.
 - **`lpn_file_export_tables_tip`**
   > Download the tables as the Tables pane shows them, one sheet each, with a sheet for each library their IDs refer to: patterns, curves, pipe types, and fittings.
   @@ NEEDS RULING
+- **`lpn_file_export_workspace_tip`**
+  > Download a small file holding where your boxes sit, their sizes, which are open or docked, and your pane and column sizes, plus the reading preferences of this page. Your projects, project settings and cookies (language, consent, units) are not in it. Load it on another screen or browser with File, Import, Workspace.
+  @@ NEEDS RULING
+- **`lpn_file_import_workspace`**
+  > Workspace…
+  @@ NEEDS RULING
+- **`lpn_file_import_workspace_tip`**
+  > Apply a workspace file saved with File, Export, Workspace: box positions and sizes, docking, pane sizes and the reading preferences of this page. Your projects and cookies are not touched.
+  @@ NEEDS RULING
 - **`lpn_pane_copy_heads`**
   > Copy with headings
+  @@ NEEDS RULING
+- **`lpn_workspace_confirm`**
+  > Replace this browser's workspace layout with the one in the file?
+  _Ruled 2026-10-08: Calls page 8 October: his own text, "Replace this browser's workspace layout with the one in the file?"_
+- **`lpn_workspace_exported`**
+  > Workspace saved to {file}: {n} settings.
+  @@ NEEDS RULING
+- **`lpn_workspace_ignored`**
+  > Entries ignored because they were not recognized: {u}.
+  @@ NEEDS RULING
+- **`lpn_workspace_imported`**
+  > Workspace applied from {file}. Settings applied: {n}. Returned to their defaults: {r}.
+  @@ NEEDS RULING
+- **`lpn_workspace_refused_format`**
+  > This is not a workspace file saved by this page, so nothing was changed.
+  @@ NEEDS RULING
+- **`lpn_workspace_refused_newer`**
+  > This workspace file was saved by a newer version of this page (format {version}), so nothing was changed.
+  @@ NEEDS RULING
+- **`lpn_workspace_refused_storage`**
+  > Browser storage is full or unavailable, so the workspace was not applied.
+  @@ NEEDS RULING
+- **`lpn_workspace_refused_unreadable`**
+  > This file could not be read as a workspace, so nothing was changed.
   @@ NEEDS RULING
 
 ---
 
 # Strings waiting on a branch
 
-**122 still to read**, of 125 new keys across 15 unmerged branch(es).
+**110 still to read**, of 113 new keys across 14 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -506,8 +542,6 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/desktop (`baba0f04`) — adds no English strings
 
-### feat/dxf (`dee7a28a`) — adds no English strings
-
 ### feat/hover-label (`944f963d`) — 2 new, 2 to read @@ NEEDS RULING
 
 - **`lpn_settings_hover_card`**
@@ -685,41 +719,4 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/visit-dedupe (`b4a99e9a`) — adds no English strings
 
-### feat/workspace (`60879c22`) — 12 new, 12 to read @@ NEEDS RULING
-
-- **`lpn_file_export_item_workspace`**
-  > Workspace…
-  @@ NEEDS RULING
-- **`lpn_file_export_workspace_tip`**
-  > Download a small file holding where your boxes sit, their sizes, which are open or docked, and your pane and column sizes, plus the reading preferences of this page. Your projects, project settings and cookies (language, consent, units) are not in it. Load it on another screen or browser with File, Import, Workspace.
-  @@ NEEDS RULING
-- **`lpn_file_import_workspace`**
-  > Workspace…
-  @@ NEEDS RULING
-- **`lpn_file_import_workspace_tip`**
-  > Apply a workspace file saved with File, Export, Workspace: box positions and sizes, docking, pane sizes and the reading preferences of this page. Your projects and cookies are not touched.
-  @@ NEEDS RULING
-- **`lpn_workspace_confirm`**
-  > Replace this browser's workspace layout with the one in the file?
-  @@ NEEDS RULING
-- **`lpn_workspace_exported`**
-  > Workspace saved to {file}: {n} settings.
-  @@ NEEDS RULING
-- **`lpn_workspace_ignored`**
-  > Entries ignored because they were not recognized: {u}.
-  @@ NEEDS RULING
-- **`lpn_workspace_imported`**
-  > Workspace applied from {file}. Settings applied: {n}. Returned to their defaults: {r}.
-  @@ NEEDS RULING
-- **`lpn_workspace_refused_format`**
-  > This is not a workspace file saved by this page, so nothing was changed.
-  @@ NEEDS RULING
-- **`lpn_workspace_refused_newer`**
-  > This workspace file was saved by a newer version of this page (format {version}), so nothing was changed.
-  @@ NEEDS RULING
-- **`lpn_workspace_refused_storage`**
-  > Browser storage is full or unavailable, so the workspace was not applied.
-  @@ NEEDS RULING
-- **`lpn_workspace_refused_unreadable`**
-  > This file could not be read as a workspace, so nothing was changed.
-  @@ NEEDS RULING
+### feat/workspace (`60879c22`) — adds no English strings

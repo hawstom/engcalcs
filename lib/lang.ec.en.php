@@ -2133,6 +2133,19 @@ $ec_lang['lpn_dxf_note_categories']='{n} junctions have more than one demand cat
 // file are always longitude and latitude (RFC 7946), so a project with no place on the Earth is
 // refused and told how to get one, never written with an invented coordinate system.
 $ec_lang['lpn_file_export_geojson_tip']='Download this network as a GeoJSON file for QGIS, ArcGIS Pro and other GIS programs. Junctions, tanks and reservoirs are points, and pipes, pumps and valves are lines that follow their vertices. Positions are latitude and longitude. Results are included only when the network has been solved.';
+// Workspace export and import (Tom, 2026-10-07). {file}, {n}, {r}, {u} and {version} are filled in by the page.
+$ec_lang['lpn_file_export_item_workspace']='Workspace…';
+$ec_lang['lpn_file_export_workspace_tip']='Download a small file holding where your boxes sit, their sizes, which are open or docked, and your pane and column sizes, plus the reading preferences of this page. Your projects, project settings and cookies (language, consent, units) are not in it. Load it on another screen or browser with File, Import, Workspace.';
+$ec_lang['lpn_file_import_workspace']='Workspace…';
+$ec_lang['lpn_file_import_workspace_tip']='Apply a workspace file saved with File, Export, Workspace: box positions and sizes, docking, pane sizes and the reading preferences of this page. Your projects and cookies are not touched.';
+$ec_lang['lpn_workspace_exported']='Workspace saved to {file}: {n} settings.';
+$ec_lang['lpn_workspace_imported']='Workspace applied from {file}. Settings applied: {n}. Returned to their defaults: {r}.';
+$ec_lang['lpn_workspace_ignored']='Entries ignored because they were not recognized: {u}.';
+$ec_lang['lpn_workspace_refused_unreadable']='This file could not be read as a workspace, so nothing was changed.';
+$ec_lang['lpn_workspace_refused_format']='This is not a workspace file saved by this page, so nothing was changed.';
+$ec_lang['lpn_workspace_refused_newer']='This workspace file was saved by a newer version of this page (format {version}), so nothing was changed.';
+$ec_lang['lpn_workspace_confirm']='Replace this browser\'s workspace layout with the one in the file?';
+$ec_lang['lpn_workspace_refused_storage']='Browser storage is full or unavailable, so the workspace was not applied.';
 $ec_lang['lpn_geojson_refused_local']='A GeoJSON file holds latitude and longitude only, and this project is drawn on a local grid with no place on the Earth. Georeference it first with Map, World map, Attach, then export again.';
 $ec_lang['lpn_geojson_refused_range']='These positions are not valid latitudes and longitudes: {detail}';
 $ec_lang['lpn_geojson_refused_crs']='The coordinate system of this project ({detail}) is not known to this page, so its positions cannot be converted to latitude and longitude. Use Convert as… to copy the project into one this page knows, then export again.';

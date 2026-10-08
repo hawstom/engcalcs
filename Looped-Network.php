@@ -221,6 +221,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 	      // its Windows UI saves when you press Save. The accept list only filters the PICKER; which
 	      // format a chosen file really is gets decided from its first bytes, not its name. ?>
 	<input type="file" id="lpn_inp_file" accept=".inp,.net,text/plain" style="display:none">
+	<input type="file" id="lpn_workspace_file" accept=".json,application/json" style="display:none">
 	<?php // File > Open as lat/lon… (Task 447). THE ONE PICKER THAT TAKES BOTH KINDS, because the row
 	      // it serves is the recovery path for a lon/lat network in either kind of file. Which reader
 	      // a chosen file goes to is decided from its first character -- a project file is JSON --
@@ -2138,6 +2139,18 @@ EngCalcs.pageConfig = {
 	lpn_file_export_item_csv: <?=json_encode($ec_lang['lpn_file_export_item_csv'])?>,
 	lpn_file_export_tables_tip: <?=json_encode($ec_lang['lpn_file_export_tables_tip'])?>,
 	lpn_file_export_csv_tip: <?=json_encode($ec_lang['lpn_file_export_csv_tip'])?>,
+	lpn_file_export_item_workspace: <?=json_encode($ec_lang['lpn_file_export_item_workspace'])?>,
+	lpn_file_export_workspace_tip: <?=json_encode($ec_lang['lpn_file_export_workspace_tip'])?>,
+	lpn_file_import_workspace: <?=json_encode($ec_lang['lpn_file_import_workspace'])?>,
+	lpn_file_import_workspace_tip: <?=json_encode($ec_lang['lpn_file_import_workspace_tip'])?>,
+	lpn_workspace_exported: <?=json_encode($ec_lang['lpn_workspace_exported'])?>,
+	lpn_workspace_imported: <?=json_encode($ec_lang['lpn_workspace_imported'])?>,
+	lpn_workspace_ignored: <?=json_encode($ec_lang['lpn_workspace_ignored'])?>,
+	lpn_workspace_refused_unreadable: <?=json_encode($ec_lang['lpn_workspace_refused_unreadable'])?>,
+	lpn_workspace_refused_format: <?=json_encode($ec_lang['lpn_workspace_refused_format'])?>,
+	lpn_workspace_refused_newer: <?=json_encode($ec_lang['lpn_workspace_refused_newer'])?>,
+	lpn_workspace_confirm: <?=json_encode($ec_lang['lpn_workspace_confirm'])?>,
+	lpn_workspace_refused_storage: <?=json_encode($ec_lang['lpn_workspace_refused_storage'])?>,
 	lpn_file_export_inp_tip: <?=json_encode($ec_lang['lpn_file_export_inp_tip'])?>,
 	lpn_status_inp_exported: <?=json_encode($ec_lang['lpn_status_inp_exported'])?>,
 	lpn_status_inp_exported_picture: <?=json_encode($ec_lang['lpn_status_inp_exported_picture'])?>,

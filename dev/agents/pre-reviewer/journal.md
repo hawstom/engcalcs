@@ -4111,6 +4111,11 @@ OBSERVED: dxf-export-harness and dxf-export-browser-harness (93/93, en/ar/zh/ru 
 CITED: Autodesk MTEXT reference via search summary: 250-char chunks in group 3, last in group 1; escapes \\ \{ \} are real, so the / ( ) substitution is unnecessary.
 OBSERVED defects: backslash/brace substitution alters user's characters; read-me total cap 2049 with non-Latin escapes at 6 chars each cuts later notes (categories note) silently. Multi-category BASE_DEMAND untested in harness (no grep hit).
 
+## feat/workspace at be1d23ea (OBSERVED, 2026-10-07; re-verify before citing)
+OBSERVED real Chromium 1400x900, net3 example, hand-edited workspace files then import+reload: no page error for wrong-shaped values (arrays, strings, nulls, huge/negative sizes, __proto__) across every box key; the box code falls back to defaults. Out-of-range positions are clamped but leave only a 28px sliver on screen (Settings at bottom right, Find at left edge). Key list: grep of every localStorage write in js/ matches LPN_WORKSPACE_KEYS + EXCLUDED; no sessionStorage; workspace_keys_check passes. Lang keys exist in en only (payload regen expected). File-project dirty path is guarded by the existing beforeunload prompt, not by the import.
+Not done: harness mutation test; how boxes LOOK on a different-size real screen; unit cookie behaviour on other pages.
+Lesson: do not wrap a harness that takes its own flock in an outer flock; it deadlocks against itself.
+
 # Perry, feat/user-guide pre-review, 2026-10-08 (head 00862427)
 OBSERVED: user-guide-find-harness ALL PASS. Net3 worked queries reproduce in en, de, zh, tr, ar, fr, es.
 OBSERVED: the 7th worked query (Junction.Connectivity ...) FAILS on every non-English page tried ("Not a property of X: Connectivity"). English property words are NOT universally accepted: Connectivity, Source share, C, Minor loss, k, Average source share fail on es and de. Chapter says English words accepted in every language.
@@ -4128,3 +4133,10 @@ OBSERVED: first visit, defaults opted in, 1280x720 and 1366x768: 6+8 tabs, fit (
 OBSERVED: one change then 3 reloads: 6+7 stable. Start fresh clears lpn_dockbox, defaults return. Old-format workspace (no lpn_dockbox, no dockOrd) imports, no defaults layered on, stable on reload.
 OBSERVED: Properties flyout text matches the string.
 SPECULATION: defaults gate looks only at box records + lpn_dockbox, not lpn_index; a returning visitor with projects but no box record gets 14 tabs once. navigator.webdriver true under --remote-debugging/automation Chrome.
+
+## 2026-10-08 feat/workspace fb8eea71, in-place import (Perry)
+OBSERVED real Chromium 1400x900 and 390x844: builder harnesses pass bare (inplace 19/19, browser 43/43). My own comparison (UI-arranged file, import into a browser with a different UI-arranged layout, then a real reload, every box's position/size/dock/z/state): no reload happened (window marker kept), no page errors, no duplicate dock tabs, focus on body, one Ctrl+Z undoes the pre-import edit, results kept (pressure in the pane and on map labels), docks and pinned/auto-hide state, pane sizes, right pane all equal a reload. Phone 390: zero differences from a reload, no sideways scroll. Old-style file (no dock fields) and empty file: equal to reload; flyout showing at import time: closed, equal.
+OBSERVED DEFECT: a box the file stores with no position (left/top null) is placed from the map's current width, and the in-place import places it before the old dock margins are cleared. With an old right dock open, Settings landed at left 334 vs 964 on reload, Library 135 vs 691 (t 116 vs 118); with no docks in the old layout the difference vanished. Cause: setboxHomeCorner() reads svg width at placement time (js/looped-network.js, setboxHomeCorner); applyWorkspaceInPlace runs layoutDocks() last.
+OBSERVED minor: Contour box 11 px shorter in place (356 vs 367); map margin variable left "0px" instead of unset; z-index values keep climbing (relative order matches reload).
+Lesson (mine): the page's dialog stub (window.lpnDialogAnswerer) must be deleted, and a probe dialog I left queued made Ctrl+Z "fail" for three runs. Retract before reporting; control against a generic dialog first.
+Not done: mutation test of the harness; contour plot on the map when the contour box is in dst but not the file; Properties box floating position when it stays open.

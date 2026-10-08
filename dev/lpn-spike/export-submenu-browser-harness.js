@@ -41,7 +41,8 @@ if (process.env[LOCK_ENV] !== '1') {
 // to CSV is one .csv file.
 const ROWS = [['lpn_file_export_item_inp', '.inp'], ['lpn_file_export_item_geojson', '.geojson'],
 	['lpn_file_export_item_dxf', '.dxf'],
-	['lpn_file_export_item_ods', '.ods', true], ['lpn_file_export_item_xlsx', '.xlsx', true], ['lpn_file_export_item_csv', '.csv', true]];
+	['lpn_file_export_item_ods', '.ods', true], ['lpn_file_export_item_xlsx', '.xlsx', true], ['lpn_file_export_item_csv', '.csv', true],
+	['lpn_file_export_item_workspace', '.json']];
 let checks = 0, failures = 0, Session;
 function ok(label, cond, detail) {
 	checks++;

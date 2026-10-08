@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "cs",
-        "expected_key_count": 2468,
-        "delta_key_count": 24,
+        "expected_key_count": 2480,
+        "delta_key_count": 36,
         "exempt_key_count": 41,
         "exempt_keys": [
             "calc_units_us",
@@ -743,7 +743,19 @@
         "lpn_dxf_exported_geo": "Exported {file}. Its coordinates are {crs}, in meters, not latitude and longitude.",
         "lpn_dxf_note_blocks": "Layers are named {prefix}, the asset code, a hyphen, and the alternative, as in {example}. Each element is a block inserted at scale 1 with attributes 1 unit high; scale the blocks to set the text height. Every attribute is visible; the attributes of one element are stacked in a column beside its symbol.",
         "lpn_dxf_note_shortened": "{n} values were longer than a DXF file allows ({max} characters), so each was shortened and ends in three periods.",
-        "lpn_dxf_note_categories": "{n} junctions have more than one demand category. Their {tag} attribute holds the sum of the base demands of all categories."
+        "lpn_dxf_note_categories": "{n} junctions have more than one demand category. Their {tag} attribute holds the sum of the base demands of all categories.",
+        "lpn_file_export_item_workspace": "Workspace…",
+        "lpn_file_export_workspace_tip": "Download a small file holding where your boxes sit, their sizes, which are open or docked, and your pane and column sizes, plus the reading preferences of this page. Your projects, project settings and cookies (language, consent, units) are not in it. Load it on another screen or browser with File, Import, Workspace.",
+        "lpn_file_import_workspace": "Workspace…",
+        "lpn_file_import_workspace_tip": "Apply a workspace file saved with File, Export, Workspace: box positions and sizes, docking, pane sizes and the reading preferences of this page. Your projects and cookies are not touched.",
+        "lpn_workspace_exported": "Workspace saved to {file}: {n} settings.",
+        "lpn_workspace_imported": "Workspace applied from {file}. Settings applied: {n}. Returned to their defaults: {r}.",
+        "lpn_workspace_ignored": "Entries ignored because they were not recognized: {u}.",
+        "lpn_workspace_refused_unreadable": "This file could not be read as a workspace, so nothing was changed.",
+        "lpn_workspace_refused_format": "This is not a workspace file saved by this page, so nothing was changed.",
+        "lpn_workspace_refused_newer": "This workspace file was saved by a newer version of this page (format {version}), so nothing was changed.",
+        "lpn_workspace_confirm": "Replace this browser's workspace layout with the one in the file?",
+        "lpn_workspace_refused_storage": "Browser storage is full or unavailable, so the workspace was not applied."
     },
     "keys": {
         "lpn_pane_copy_heads": "Copy with headings",
@@ -769,7 +781,19 @@
         "lpn_dxf_exported_geo": "Exported {file}. Its coordinates are {crs}, in meters, not latitude and longitude.",
         "lpn_dxf_note_blocks": "Layers are named {prefix}, the asset code, a hyphen, and the alternative, as in {example}. Each element is a block inserted at scale 1 with attributes 1 unit high; scale the blocks to set the text height. Every attribute is visible; the attributes of one element are stacked in a column beside its symbol.",
         "lpn_dxf_note_shortened": "{n} values were longer than a DXF file allows ({max} characters), so each was shortened and ends in three periods.",
-        "lpn_dxf_note_categories": "{n} junctions have more than one demand category. Their {tag} attribute holds the sum of the base demands of all categories."
+        "lpn_dxf_note_categories": "{n} junctions have more than one demand category. Their {tag} attribute holds the sum of the base demands of all categories.",
+        "lpn_file_export_item_workspace": "Workspace…",
+        "lpn_file_export_workspace_tip": "Download a small file holding where your boxes sit, their sizes, which are open or docked, and your pane and column sizes, plus the reading preferences of this page. Your projects, project settings and cookies (language, consent, units) are not in it. Load it on another screen or browser with File, Import, Workspace.",
+        "lpn_file_import_workspace": "Workspace…",
+        "lpn_file_import_workspace_tip": "Apply a workspace file saved with File, Export, Workspace: box positions and sizes, docking, pane sizes and the reading preferences of this page. Your projects and cookies are not touched.",
+        "lpn_workspace_exported": "Workspace saved to {file}: {n} settings.",
+        "lpn_workspace_imported": "Workspace applied from {file}. Settings applied: {n}. Returned to their defaults: {r}.",
+        "lpn_workspace_ignored": "Entries ignored because they were not recognized: {u}.",
+        "lpn_workspace_refused_unreadable": "This file could not be read as a workspace, so nothing was changed.",
+        "lpn_workspace_refused_format": "This is not a workspace file saved by this page, so nothing was changed.",
+        "lpn_workspace_refused_newer": "This workspace file was saved by a newer version of this page (format {version}), so nothing was changed.",
+        "lpn_workspace_confirm": "Replace this browser's workspace layout with the one in the file?",
+        "lpn_workspace_refused_storage": "Browser storage is full or unavailable, so the workspace was not applied."
     },
     "key_context": {
         "lpn_pane_copy_heads": {
@@ -1153,6 +1177,198 @@
                     "key": "lpn_file_export_geojson_tip",
                     "value": "Stáhne tuto síť jako soubor GeoJSON pro QGIS, ArcGIS Pro a další programy GIS. Uzly, nádrže a zdroje jsou body, potrubí, čerpadla a ventily jsou čáry sledující své vrcholy. Polohy jsou zeměpisná šířka a délka. Výsledky jsou zahrnuty pouze tehdy, je-li síť vyřešena.",
                     "english": "Download this network as a GeoJSON file for QGIS, ArcGIS Pro and other GIS programs. Junctions, tanks and reservoirs are points, and pipes, pumps and valves are lines that follow their vertices. Positions are latitude and longitude. Results are included only when the network has been solved."
+                }
+            }
+        },
+        "lpn_file_export_item_workspace": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_export_geojson_tip",
+                    "value": "Stáhne tuto síť jako soubor GeoJSON pro QGIS, ArcGIS Pro a další programy GIS. Uzly, nádrže a zdroje jsou body, potrubí, čerpadla a ventily jsou čáry sledující své vrcholy. Polohy jsou zeměpisná šířka a délka. Výsledky jsou zahrnuty pouze tehdy, je-li síť vyřešena.",
+                    "english": "Download this network as a GeoJSON file for QGIS, ArcGIS Pro and other GIS programs. Junctions, tanks and reservoirs are points, and pipes, pumps and valves are lines that follow their vertices. Positions are latitude and longitude. Results are included only when the network has been solved."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_refused_local",
+                    "value": "Soubor GeoJSON obsahuje pouze zeměpisnou šířku a délku, ale tento projekt je nakreslen v místní souřadnicové síti bez umístění na Zemi. Nejprve jej georeferencujte příkazem Mapa, Mapa světa, Připojit a poté exportujte znovu.",
+                    "english": "A GeoJSON file holds latitude and longitude only, and this project is drawn on a local grid with no place on the Earth. Georeference it first with Map, World map, Attach, then export again."
+                }
+            }
+        },
+        "lpn_file_export_workspace_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_export_geojson_tip",
+                    "value": "Stáhne tuto síť jako soubor GeoJSON pro QGIS, ArcGIS Pro a další programy GIS. Uzly, nádrže a zdroje jsou body, potrubí, čerpadla a ventily jsou čáry sledující své vrcholy. Polohy jsou zeměpisná šířka a délka. Výsledky jsou zahrnuty pouze tehdy, je-li síť vyřešena.",
+                    "english": "Download this network as a GeoJSON file for QGIS, ArcGIS Pro and other GIS programs. Junctions, tanks and reservoirs are points, and pipes, pumps and valves are lines that follow their vertices. Positions are latitude and longitude. Results are included only when the network has been solved."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_refused_local",
+                    "value": "Soubor GeoJSON obsahuje pouze zeměpisnou šířku a délku, ale tento projekt je nakreslen v místní souřadnicové síti bez umístění na Zemi. Nejprve jej georeferencujte příkazem Mapa, Mapa světa, Připojit a poté exportujte znovu.",
+                    "english": "A GeoJSON file holds latitude and longitude only, and this project is drawn on a local grid with no place on the Earth. Georeference it first with Map, World map, Attach, then export again."
+                }
+            }
+        },
+        "lpn_file_import_workspace": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_export_geojson_tip",
+                    "value": "Stáhne tuto síť jako soubor GeoJSON pro QGIS, ArcGIS Pro a další programy GIS. Uzly, nádrže a zdroje jsou body, potrubí, čerpadla a ventily jsou čáry sledující své vrcholy. Polohy jsou zeměpisná šířka a délka. Výsledky jsou zahrnuty pouze tehdy, je-li síť vyřešena.",
+                    "english": "Download this network as a GeoJSON file for QGIS, ArcGIS Pro and other GIS programs. Junctions, tanks and reservoirs are points, and pipes, pumps and valves are lines that follow their vertices. Positions are latitude and longitude. Results are included only when the network has been solved."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_refused_local",
+                    "value": "Soubor GeoJSON obsahuje pouze zeměpisnou šířku a délku, ale tento projekt je nakreslen v místní souřadnicové síti bez umístění na Zemi. Nejprve jej georeferencujte příkazem Mapa, Mapa světa, Připojit a poté exportujte znovu.",
+                    "english": "A GeoJSON file holds latitude and longitude only, and this project is drawn on a local grid with no place on the Earth. Georeference it first with Map, World map, Attach, then export again."
+                }
+            }
+        },
+        "lpn_file_import_workspace_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_export_geojson_tip",
+                    "value": "Stáhne tuto síť jako soubor GeoJSON pro QGIS, ArcGIS Pro a další programy GIS. Uzly, nádrže a zdroje jsou body, potrubí, čerpadla a ventily jsou čáry sledující své vrcholy. Polohy jsou zeměpisná šířka a délka. Výsledky jsou zahrnuty pouze tehdy, je-li síť vyřešena.",
+                    "english": "Download this network as a GeoJSON file for QGIS, ArcGIS Pro and other GIS programs. Junctions, tanks and reservoirs are points, and pipes, pumps and valves are lines that follow their vertices. Positions are latitude and longitude. Results are included only when the network has been solved."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_refused_local",
+                    "value": "Soubor GeoJSON obsahuje pouze zeměpisnou šířku a délku, ale tento projekt je nakreslen v místní souřadnicové síti bez umístění na Zemi. Nejprve jej georeferencujte příkazem Mapa, Mapa světa, Připojit a poté exportujte znovu.",
+                    "english": "A GeoJSON file holds latitude and longitude only, and this project is drawn on a local grid with no place on the Earth. Georeference it first with Map, World map, Attach, then export again."
+                }
+            }
+        },
+        "lpn_workspace_exported": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_export_geojson_tip",
+                    "value": "Stáhne tuto síť jako soubor GeoJSON pro QGIS, ArcGIS Pro a další programy GIS. Uzly, nádrže a zdroje jsou body, potrubí, čerpadla a ventily jsou čáry sledující své vrcholy. Polohy jsou zeměpisná šířka a délka. Výsledky jsou zahrnuty pouze tehdy, je-li síť vyřešena.",
+                    "english": "Download this network as a GeoJSON file for QGIS, ArcGIS Pro and other GIS programs. Junctions, tanks and reservoirs are points, and pipes, pumps and valves are lines that follow their vertices. Positions are latitude and longitude. Results are included only when the network has been solved."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_refused_local",
+                    "value": "Soubor GeoJSON obsahuje pouze zeměpisnou šířku a délku, ale tento projekt je nakreslen v místní souřadnicové síti bez umístění na Zemi. Nejprve jej georeferencujte příkazem Mapa, Mapa světa, Připojit a poté exportujte znovu.",
+                    "english": "A GeoJSON file holds latitude and longitude only, and this project is drawn on a local grid with no place on the Earth. Georeference it first with Map, World map, Attach, then export again."
+                }
+            }
+        },
+        "lpn_workspace_imported": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_export_geojson_tip",
+                    "value": "Stáhne tuto síť jako soubor GeoJSON pro QGIS, ArcGIS Pro a další programy GIS. Uzly, nádrže a zdroje jsou body, potrubí, čerpadla a ventily jsou čáry sledující své vrcholy. Polohy jsou zeměpisná šířka a délka. Výsledky jsou zahrnuty pouze tehdy, je-li síť vyřešena.",
+                    "english": "Download this network as a GeoJSON file for QGIS, ArcGIS Pro and other GIS programs. Junctions, tanks and reservoirs are points, and pipes, pumps and valves are lines that follow their vertices. Positions are latitude and longitude. Results are included only when the network has been solved."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_refused_local",
+                    "value": "Soubor GeoJSON obsahuje pouze zeměpisnou šířku a délku, ale tento projekt je nakreslen v místní souřadnicové síti bez umístění na Zemi. Nejprve jej georeferencujte příkazem Mapa, Mapa světa, Připojit a poté exportujte znovu.",
+                    "english": "A GeoJSON file holds latitude and longitude only, and this project is drawn on a local grid with no place on the Earth. Georeference it first with Map, World map, Attach, then export again."
+                }
+            }
+        },
+        "lpn_workspace_ignored": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_export_geojson_tip",
+                    "value": "Stáhne tuto síť jako soubor GeoJSON pro QGIS, ArcGIS Pro a další programy GIS. Uzly, nádrže a zdroje jsou body, potrubí, čerpadla a ventily jsou čáry sledující své vrcholy. Polohy jsou zeměpisná šířka a délka. Výsledky jsou zahrnuty pouze tehdy, je-li síť vyřešena.",
+                    "english": "Download this network as a GeoJSON file for QGIS, ArcGIS Pro and other GIS programs. Junctions, tanks and reservoirs are points, and pipes, pumps and valves are lines that follow their vertices. Positions are latitude and longitude. Results are included only when the network has been solved."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_refused_local",
+                    "value": "Soubor GeoJSON obsahuje pouze zeměpisnou šířku a délku, ale tento projekt je nakreslen v místní souřadnicové síti bez umístění na Zemi. Nejprve jej georeferencujte příkazem Mapa, Mapa světa, Připojit a poté exportujte znovu.",
+                    "english": "A GeoJSON file holds latitude and longitude only, and this project is drawn on a local grid with no place on the Earth. Georeference it first with Map, World map, Attach, then export again."
+                }
+            }
+        },
+        "lpn_workspace_refused_unreadable": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_export_geojson_tip",
+                    "value": "Stáhne tuto síť jako soubor GeoJSON pro QGIS, ArcGIS Pro a další programy GIS. Uzly, nádrže a zdroje jsou body, potrubí, čerpadla a ventily jsou čáry sledující své vrcholy. Polohy jsou zeměpisná šířka a délka. Výsledky jsou zahrnuty pouze tehdy, je-li síť vyřešena.",
+                    "english": "Download this network as a GeoJSON file for QGIS, ArcGIS Pro and other GIS programs. Junctions, tanks and reservoirs are points, and pipes, pumps and valves are lines that follow their vertices. Positions are latitude and longitude. Results are included only when the network has been solved."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_refused_local",
+                    "value": "Soubor GeoJSON obsahuje pouze zeměpisnou šířku a délku, ale tento projekt je nakreslen v místní souřadnicové síti bez umístění na Zemi. Nejprve jej georeferencujte příkazem Mapa, Mapa světa, Připojit a poté exportujte znovu.",
+                    "english": "A GeoJSON file holds latitude and longitude only, and this project is drawn on a local grid with no place on the Earth. Georeference it first with Map, World map, Attach, then export again."
+                }
+            }
+        },
+        "lpn_workspace_refused_format": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_export_geojson_tip",
+                    "value": "Stáhne tuto síť jako soubor GeoJSON pro QGIS, ArcGIS Pro a další programy GIS. Uzly, nádrže a zdroje jsou body, potrubí, čerpadla a ventily jsou čáry sledující své vrcholy. Polohy jsou zeměpisná šířka a délka. Výsledky jsou zahrnuty pouze tehdy, je-li síť vyřešena.",
+                    "english": "Download this network as a GeoJSON file for QGIS, ArcGIS Pro and other GIS programs. Junctions, tanks and reservoirs are points, and pipes, pumps and valves are lines that follow their vertices. Positions are latitude and longitude. Results are included only when the network has been solved."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_refused_local",
+                    "value": "Soubor GeoJSON obsahuje pouze zeměpisnou šířku a délku, ale tento projekt je nakreslen v místní souřadnicové síti bez umístění na Zemi. Nejprve jej georeferencujte příkazem Mapa, Mapa světa, Připojit a poté exportujte znovu.",
+                    "english": "A GeoJSON file holds latitude and longitude only, and this project is drawn on a local grid with no place on the Earth. Georeference it first with Map, World map, Attach, then export again."
+                }
+            }
+        },
+        "lpn_workspace_refused_newer": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_export_geojson_tip",
+                    "value": "Stáhne tuto síť jako soubor GeoJSON pro QGIS, ArcGIS Pro a další programy GIS. Uzly, nádrže a zdroje jsou body, potrubí, čerpadla a ventily jsou čáry sledující své vrcholy. Polohy jsou zeměpisná šířka a délka. Výsledky jsou zahrnuty pouze tehdy, je-li síť vyřešena.",
+                    "english": "Download this network as a GeoJSON file for QGIS, ArcGIS Pro and other GIS programs. Junctions, tanks and reservoirs are points, and pipes, pumps and valves are lines that follow their vertices. Positions are latitude and longitude. Results are included only when the network has been solved."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_refused_local",
+                    "value": "Soubor GeoJSON obsahuje pouze zeměpisnou šířku a délku, ale tento projekt je nakreslen v místní souřadnicové síti bez umístění na Zemi. Nejprve jej georeferencujte příkazem Mapa, Mapa světa, Připojit a poté exportujte znovu.",
+                    "english": "A GeoJSON file holds latitude and longitude only, and this project is drawn on a local grid with no place on the Earth. Georeference it first with Map, World map, Attach, then export again."
+                }
+            }
+        },
+        "lpn_workspace_confirm": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_export_geojson_tip",
+                    "value": "Stáhne tuto síť jako soubor GeoJSON pro QGIS, ArcGIS Pro a další programy GIS. Uzly, nádrže a zdroje jsou body, potrubí, čerpadla a ventily jsou čáry sledující své vrcholy. Polohy jsou zeměpisná šířka a délka. Výsledky jsou zahrnuty pouze tehdy, je-li síť vyřešena.",
+                    "english": "Download this network as a GeoJSON file for QGIS, ArcGIS Pro and other GIS programs. Junctions, tanks and reservoirs are points, and pipes, pumps and valves are lines that follow their vertices. Positions are latitude and longitude. Results are included only when the network has been solved."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_refused_local",
+                    "value": "Soubor GeoJSON obsahuje pouze zeměpisnou šířku a délku, ale tento projekt je nakreslen v místní souřadnicové síti bez umístění na Zemi. Nejprve jej georeferencujte příkazem Mapa, Mapa světa, Připojit a poté exportujte znovu.",
+                    "english": "A GeoJSON file holds latitude and longitude only, and this project is drawn on a local grid with no place on the Earth. Georeference it first with Map, World map, Attach, then export again."
+                }
+            }
+        },
+        "lpn_workspace_refused_storage": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_export_geojson_tip",
+                    "value": "Stáhne tuto síť jako soubor GeoJSON pro QGIS, ArcGIS Pro a další programy GIS. Uzly, nádrže a zdroje jsou body, potrubí, čerpadla a ventily jsou čáry sledující své vrcholy. Polohy jsou zeměpisná šířka a délka. Výsledky jsou zahrnuty pouze tehdy, je-li síť vyřešena.",
+                    "english": "Download this network as a GeoJSON file for QGIS, ArcGIS Pro and other GIS programs. Junctions, tanks and reservoirs are points, and pipes, pumps and valves are lines that follow their vertices. Positions are latitude and longitude. Results are included only when the network has been solved."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_refused_local",
+                    "value": "Soubor GeoJSON obsahuje pouze zeměpisnou šířku a délku, ale tento projekt je nakreslen v místní souřadnicové síti bez umístění na Zemi. Nejprve jej georeferencujte příkazem Mapa, Mapa světa, Připojit a poté exportujte znovu.",
+                    "english": "A GeoJSON file holds latitude and longitude only, and this project is drawn on a local grid with no place on the Earth. Georeference it first with Map, World map, Attach, then export again."
                 }
             }
         }
