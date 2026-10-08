@@ -732,6 +732,7 @@
         "lpn_dock_float": "Float",
         "lpn_dock_autohide": "Auto-hide",
         "lpn_popup_boxtitle": "Properties",
+        "lpn_popup_none": "Nothing is selected. Select an asset on the map to see its properties.",
         "lpn_empty_hint": "Use File, New project to open an example. Or start by adding a reservoir, junction, and pipe from the toolbar.",
         "lpn_offscreen_intact": "Your network is intact.",
         "lpn_examples_welcome": "Welcome to water supply network modelling",
@@ -2446,7 +2447,7 @@
         "lpn_snip_tip_redo": "Redo (Ctrl+Y)",
         "lpn_screenshot_scale_tip": "The picture's size as a multiple of the area on the screen. A larger one is sharper and makes a bigger file."
     },
-    "count": 2444,
+    "count": 2445,
     "active_prefixes": [
         "about",
         "bpn",
