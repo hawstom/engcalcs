@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "ur",
-        "expected_key_count": 2444,
-        "delta_key_count": 222,
+        "expected_key_count": 2445,
+        "delta_key_count": 223,
         "exempt_key_count": 34,
         "exempt_keys": [
             "u_imgd",
@@ -756,6 +756,7 @@
         "lpn_dock_right": "Dock at the right of the map",
         "lpn_dock_float": "Float",
         "lpn_dock_autohide": "Auto-hide",
+        "lpn_popup_none": "Nothing is selected. Select an asset on the map to see its properties.",
         "lpn_hotkeys_snip_heading": "Screenshot",
         "lpn_hotkeys_snip_term": "Screenshot keyboard shortcuts",
         "lpn_hotkeys_snip_def": "<table class=\"lpn-notes-table\"><tbody><tr><td>S<\/td><td>Snip, while Screenshot is open.<\/td><\/tr><tr><td>E<\/td><td>Eraser, in the markup view.<\/td><\/tr><tr><td>Ctrl+Z, Ctrl+Y<\/td><td>Undo and redo, in the markup view.<\/td><\/tr><tr><td>Esc<\/td><td>Cancel a snip, or leave the eraser. In the markup view, close it when nothing is drawn.<\/td><\/tr><\/tbody><\/table>",
@@ -980,6 +981,7 @@
         "lpn_dock_right": "Dock at the right of the map",
         "lpn_dock_float": "Float",
         "lpn_dock_autohide": "Auto-hide",
+        "lpn_popup_none": "Nothing is selected. Select an asset on the map to see its properties.",
         "lpn_hotkeys_snip_heading": "Screenshot",
         "lpn_hotkeys_snip_term": "Screenshot keyboard shortcuts",
         "lpn_hotkeys_snip_def": "<table class=\"lpn-notes-table\"><tbody><tr><td>S<\/td><td>Snip, while Screenshot is open.<\/td><\/tr><tr><td>E<\/td><td>Eraser, in the markup view.<\/td><\/tr><tr><td>Ctrl+Z, Ctrl+Y<\/td><td>Undo and redo, in the markup view.<\/td><\/tr><tr><td>Esc<\/td><td>Cancel a snip, or leave the eraser. In the markup view, close it when nothing is drawn.<\/td><\/tr><\/tbody><\/table>",
@@ -1381,6 +1383,22 @@
                     "key": "lpn_popup_boxtitle",
                     "value": "خصوصیات",
                     "english": "Properties"
+                }
+            }
+        },
+        "lpn_popup_none": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_popup_boxtitle",
+                    "value": "خصوصیات",
+                    "english": "Properties"
+                },
+                "next_translated": {
+                    "key": "lpn_empty_hint",
+                    "value": "فائل، نیا پراجیکٹ استعمال کر کے کوئی مثال کھولیں۔ یا ٹول بار سے ریزروائر، جنکشن، اور پائپ شامل کر کے شروع کریں۔",
+                    "english": "Use File, New project to open an example. Or start by adding a reservoir, junction, and pipe from the toolbar."
                 }
             }
         },

@@ -2885,3 +2885,9 @@ later. If the list ever needs to match a report's table order, only user-set/dra
 deletes and recreates a scenario to rename it (Base can't be renamed, but non-Base scenarios can be, at
 `js/looped-network.js:4800-4810`, and rename-by-delete-recreate is a plausible workaround pattern that
 would scramble creation order unpredictably).
+
+## 2026-10-07 Per-scenario type change vs Active Topology
+- CITED: WaterGEMS Active Topology stores active/inactive per element in an Active Topology alternative; inactive elements stay in file, excluded from calc and from tabular reports unless Include Inactive Topology. https://docs.bentley.com/LiveContent/web/Bentley%20WaterGEMS%20SS6-v1/en/GUID-FFC89998D3C5492094DCB4929D6F05DA.html . That page says nothing of a per-scenario element-type switch (I did not find one; absence on one page, not proof).
+- CITED: InfoWater Pro scenarios are data sets (Tank Sets, Pump Sets...) https://help.innovyze.com/space/infowaterpro/18055598 ; no type switch found.
+- OBSERVED (feat/bentley-interop): js/looped-network.js:35418-35432 askTypeChangeScope; :35132-35136 typeInScenario reads ov.type; :35148 typeMaterialize lays element out as other type; :35385 scenarioTypeChangeKeep writes only carried props as overrides.
+- SPECULATION: recommendation = add active-topology style as the primary; keep type change only if each type-changed field reads as override.
