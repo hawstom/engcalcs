@@ -17551,7 +17551,7 @@ var EngCalcs = EngCalcs || {};
 		mapgeoBarEl('lpn_mapgeo_hint_gestures').textContent = world1 ? '' :
 			(pc.lpn_mapgeo_gestures || 'Zoom moves your drawing and the map together, to show how well they line up. Dragging moves the map only.');
 		mapgeoBarEl('lpn_mapgeo_hint_dial').textContent = world1 ? '' :
-			(pc.lpn_mapgeo_dial_help || 'Slide the two bars, or enter numbers in the boxes above them, to make the map bigger or smaller and to rotate it. The middle of each bar keeps the fit from step 1, so 1 and 0 mean no change. Arrow keys work on both.');
+			(pc.lpn_mapgeo_dial_help || 'Slide the two bars, or enter numbers in the boxes above them, to make the map bigger or smaller and to rotate it. The middle of each bar keeps the fit from step 1, so a size of 1 and a rotation of 0 mean no change. Arrow keys work on both.');
 		mapgeoShow('lpn_mapgeo_search', world1);
 		mapgeoShow('lpn_mapgeo_goto', world1);
 		mapgeoShow('lpn_mapgeo_place', world1);
@@ -20680,7 +20680,7 @@ var EngCalcs = EngCalcs || {};
 		// title anywhere else is dead on touch.
 		btn.className = 'ec-help';
 		btn.title = pc.lpn_find_filter_tip ||
-			'Filter in Table(s) that match "What to search" above';
+			'Show only the rows that match "What to search" above, in each table searched.';
 		btn.textContent = pc.lpn_find_filter_btn || 'Filter in table';
 		btn.addEventListener('click', applyTableFilter);
 		row.appendChild(btn);
@@ -32850,7 +32850,7 @@ var EngCalcs = EngCalcs || {};
 		}
 		if (lost.length) { text.push([pc.lpn_change_type_lost || 'These values will be lost:'].concat(capped(lost)).join('\n')); }
 		if (born.length) {
-			text.push([pc.lpn_change_type_born || 'These are new, as on a newly drawn one:'].concat(capped(born)).join('\n'));
+			text.push([pc.lpn_change_type_born || 'These values are new, set as on a newly drawn asset:'].concat(capped(born)).join('\n'));
 		}
 		if (moved.length) {
 			text.push([pc.lpn_change_type_customers || 'Only a pipe serves customers, so these customers are connected instead to the node shown in parentheses, where their demand is already applied. They stay where they are drawn, and their demand is unchanged:']
@@ -45899,7 +45899,7 @@ var EngCalcs = EngCalcs || {};
 					// so rather than leaving the reader to find it. Selecting a meter still opens
 					// its own box for the one-off case.
 					setNotice(String((EngCalcs.pageConfig || {}).lpn_meter_placed ||
-						'Customer {id} added. Its description and demand are entered in the Customers table, or press it in Select to open its box.')
+						'Customer {id} added. Enter its description and demand in the Customers table, or select it in Select mode to open its properties box.')
 						.split('{id}').join(madeC.id));
 					return;
 				}
