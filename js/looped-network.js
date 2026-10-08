@@ -1087,11 +1087,32 @@ var EngCalcs = EngCalcs || {};
 			if (!shedding.length) { return; }
 			shedding.forEach(function (a) {
 				a.gone++;
+				a.gone = shedRungsCertain(a, fsNow);
 				writeLabelGlyphs(a.le, a.l, keptLines(a.all, shedKeepSet(a.all, a.order, a.gone)), fsNow);
 			});
 			shedding.forEach(function (a) { measureLabelWidths(a.le); });
 			active = shedding;
 		}
+	}
+	// **A RUNG WHOSE ANSWER IS CERTAIN IS NOT DRAWN** (Task 681(b)). The length cascade above writes
+	// and measures every rung, and each rung is a forced layout of the whole drawing: with every link
+	// field on, Novato's pipes shed up to seventeen values, and the cascade was 42% of the label pass
+	// in Chrome. But the run of the next keep-set is known to within shedWidthFor()'s bearing error
+	// (1.8% worst, measured) before it is drawn, so a rung whose priced run clears its room by far
+	// more than that -- SHED_SKIP_REL of the run plus SHED_SKIP_EM of a font size -- would certainly
+	// be measured too long and shed again. Such a rung is passed over; the first rung that is not
+	// certain is drawn and measured exactly as before. So the cascade stops at the same content, and
+	// only the rungs that could not have stopped it are no longer drawn.
+	// `a.gone` is the rung about to be drawn; returns the rung to draw instead.
+	var SHED_SKIP_REL = 0.06, SHED_SKIP_EM = 0.5;
+	function shedRungsCertain(a, fsNow) {
+		var g = a.gone, s = state.s || 1, em = parseFloat(fsNow) || effectiveFontSize(), w;
+		while (g < a.order.length - 1) {
+			w = shedWidthFor(a.le, shedKeepSet(a.all, a.order, g), a.all);
+			if (w === null || !(w / s * (1 - SHED_SKIP_REL) - SHED_SKIP_EM * em > a.room)) { break; }
+			g++;
+		}
+		return g;
 	}
 	// **RE-DECIDE EVERY LINK LABEL'S CONTENT AT THE CURRENT ZOOM.** A shed is a decision about a
 	// RATIO -- the label's run against its segment -- and a label's run in world units is its pixel
@@ -3286,7 +3307,7 @@ var EngCalcs = EngCalcs || {};
 	// one createScenario() makes -- renamable, deletable, editable -- holding at most a demand
 	// multiplier. The name is written in the visitor's language at birth because it is the user's
 	// data from then on, like a name typed at the New scenario prompt. The id is language-free and
-	// descriptive rather than s1..s7, so it keys the menu tip (lpn_scenario_preset_<id>_tip) and a
+	// descriptive rather than s1..s7, so it keys the menu tip (lpn_scenario_preset_<id>_tip; Max Day and Peak hour share lpn_scenario_preset_mult_tip) and a
 	// scenario the user adds next is still s1.
 	//
 	// **THE MULTIPLIERS: 2.0 FOR MAXIMUM DAY, 3.0 FOR PEAK HOUR**, times average day. National
@@ -3316,8 +3337,8 @@ var EngCalcs = EngCalcs || {};
 		{ id: 'flow_mid', key: 'lpn_scenario_preset_flow_mid', en: '2. Flow test: Mid' },
 		{ id: 'flow_max', key: 'lpn_scenario_preset_flow_max', en: '3. Flow test: Max' },
 		{ id: 'average_day', key: 'lpn_scenario_preset_average_day', en: '4. Average Day', dm: 1 },
-		{ id: 'max_day', key: 'lpn_scenario_preset_max_day', en: '5. Max Day', dm: 2 },
-		{ id: 'peak_hour', key: 'lpn_scenario_preset_peak_hour', en: '6. Peak hour', dm: 3 },
+		{ id: 'max_day', key: 'lpn_scenario_preset_max_day', en: '5. Max Day', dm: 2, range: [1.2, 3.0] },
+		{ id: 'peak_hour', key: 'lpn_scenario_preset_peak_hour', en: '6. Peak hour', dm: 3, range: [3.0, 6.0] },
 		{ id: 'fire_max_day', key: 'lpn_scenario_preset_fire_max_day', en: '7. Fire plus max day', dm: 2 }
 	];
 	function presetScenarios() {
@@ -3334,7 +3355,15 @@ var EngCalcs = EngCalcs || {};
 	function presetScenarioTip(s) {
 		var pc = EngCalcs.pageConfig || {}, i;
 		for (i = 0; i < LPN_PRESET_SCENARIOS.length; i++) {
-			if (LPN_PRESET_SCENARIOS[i].id === s.id) { return pc[LPN_PRESET_SCENARIOS[i].key + '_tip']; }
+			if (LPN_PRESET_SCENARIOS[i].id === s.id) {
+				var p = LPN_PRESET_SCENARIOS[i];
+				// Max day and peak hour share one sentence; the numbers are filled in here.
+				if (p.range) {
+					return (pc.lpn_scenario_preset_mult_tip || 'Demand multiplier {mult} times average day, a placeholder value. Most systems fall between {lo} and {hi} (National Research Council, 2006). Set the value for the system being modeled in Settings, Calculation, Hydraulics, Demand multiplier.')
+						.replace('{mult}', p.dm.toFixed(1)).replace('{lo}', p.range[0].toFixed(1)).replace('{hi}', p.range[1].toFixed(1));
+				}
+				return pc[p.key + '_tip'];
+			}
 		}
 		return undefined;
 	}
@@ -5079,7 +5108,7 @@ var EngCalcs = EngCalcs || {};
 				fn: function () { closeMenu(); openScenarioCompareBox(); }
 			},
 			{
-				icon: 'info', label: pc.lpn_reports_epanet || 'Run (EPANET)',
+				icon: 'info', label: pc.lpn_reports_epanet || 'Run',
 				tip: pc.lpn_time_run_report_tip,
 				// **SHOWN, OR EXPLAINED -- never an empty box.** The row is always here rather than
 				// hidden when there is nothing to show: a row that disappears teaches nobody that
@@ -5101,7 +5130,7 @@ var EngCalcs = EngCalcs || {};
 			// carries the word so no row has to, the same rule "EPANET run" (not "EPANET run
 			// report") already follows two rows up. The BOX TITLES keep the full names.
 			{
-				icon: 'info', label: pc.lpn_reports_status || 'Status (EPANET)',
+				icon: 'info', label: pc.lpn_reports_status || 'Status changes',
 				tip: pc.lpn_reports_status_tip,
 				fn: function () { closeMenu(); openStatusReportBox(); }
 			},
@@ -35676,25 +35705,25 @@ var EngCalcs = EngCalcs || {};
 	// than any filename scheme, because a file in a forgotten folder is exactly the file somebody
 	// renamed. With that carried inside, the suffix only has to disambiguate at a glance.
 	//
-	// **THE EXTENSION IS `.lwn`, AND THE NAME IS STABLE** (Task 246). Tom, 2026-08-21: *"I bought
-	// LibreWaterNet.org, and it points to lpn. I feel that is a stable name: lwn"*. That is the
-	// trigger Task 315 was waiting for -- the argument for staying on `.json` was that an extension
-	// would encode a product name that did not exist yet, and now it does.
+	// **THE EXTENSION WE WRITE IS `.epp`** (Tom, 2026-10-07: EPANET++ is the application's name;
+	// Task 780). It replaces `.lwn` (Task 246, 2026-08-21, when LibreWaterNet.org was the name).
 	//
-	// **JSON INSIDE, `.lwn` OUTSIDE.** Nothing about the document changes; serializeProject() still
-	// writes JSON and acceptImportedText() still parses it, so a `.lwn` renamed to `.json` opens in
-	// any text editor exactly as before. The extension is a name for the KIND of document, which is
-	// the one thing a filename can carry that the file's own `format` key cannot: it is what the OS
-	// sorts, filters and (one day) associates on.
-	var LPN_FILE_EXT = '.lwn';
-	// **A FILE SAVED AS `.json` STILL OPENS, FOREVER.** Every project written before this wears it,
-	// and stranding somebody's documents to tidy up an extension would be the worst trade this page
-	// could make. Read on open, never written.
+	// **JSON INSIDE, `.epp` OUTSIDE.** Nothing about the document changes, and nothing in it names
+	// the extension: serializeProject() still writes the same JSON with the same `format` key and
+	// acceptImportedText() still parses it, so an `.epp` renamed to `.json` opens in any text
+	// editor exactly as before. The extension is a name for the KIND of document, which is what the
+	// OS sorts, filters and (one day) associates on.
+	var LPN_FILE_EXT = '.epp';
+	// **A FILE SAVED AS `.lwn` OR `.json` STILL OPENS, FOREVER.** Every project written before
+	// 2026-10-07 wears one of them, and stranding somebody's documents to tidy up an extension would
+	// be the worst trade this page could make. Read on open, never written.
+	var LPN_FILE_EXT_LWN = '.lwn';
 	var LPN_FILE_EXT_LEGACY = '.json';
+	var LPN_FILE_EXTS_READ = [LPN_FILE_EXT, LPN_FILE_EXT_LWN, LPN_FILE_EXT_LEGACY];
 	// **NEW FILES CARRY NO `-lpn` SUFFIX ANY MORE.** It existed for exactly one reason -- with a
 	// generic `.json` extension, something in the NAME had to say what the file was at a glance --
-	// and `.lwn` says it better, in the place an operating system actually looks. `Elm-Street.lwn`
-	// beats `Elm-Street-lpn.json`, and `Elm-Street-lpn.lwn` would be saying it twice.
+	// and `.epp` says it better, in the place an operating system actually looks. `Elm-Street.epp`
+	// beats `Elm-Street-lpn.json`, and `Elm-Street-lpn.epp` would be saying it twice.
 	//
 	// Both suffixes are still STRIPPED on the way in, forever: see projectNameFromFileName(), where
 	// getting this wrong silently renames a user's project on its next save.
@@ -36065,7 +36094,7 @@ var EngCalcs = EngCalcs || {};
 				.replace('{n}', String(types.ids.length)).replace('{t}', String(types.detail || '?')));
 		}
 		if (custs) {
-			said.push((pc.lpn_inp_export_flat_customers || 'An EPANET file has no customers. The demand of the {n} customers in this project goes into the file as a demand row on the junction each one is added to, and each row is named with the customer’s tag. What the file cannot hold is the customer: where it sits, which pipe serves it, where along that pipe the service connects, and how many services one customer stands for. Your own project file keeps all of that.')
+			said.push((pc.lpn_inp_export_flat_customers || 'An EPANET file has no customers. The demand of the {n} customers in this project is written as a demand row on the junction each customer is assigned to, named with the customer\'s tag. The file does not record the customer itself: its location, the pipe that serves it, where along that pipe the service connects, or how many services it represents. That information remains in the project; save the project file to keep it.')
 				.replace('{n}', String(custs.ids.length)));
 		}
 		if (coords) {
@@ -36873,7 +36902,7 @@ var EngCalcs = EngCalcs || {};
 			case 'mixing': return pc.lpn_inp_drop_sources_mixing || 'This file states where a chemical is injected into the network and how water mixes in each tank. Each source is shown on the node where it is applied, and each tank shows its mixing model. Both are used when the network is run over a total run time.';
 			case 'energy': return pc.lpn_inp_drop_energy || 'This EPANET file includes pumping cost modelling data. This page reads it and uses it. Run the model, then open Water, Reports, Pump energy to see how long each pump ran, the power it drew, the energy it used and what that cost. The lines are kept, and they are written back if you save an EPANET file.';
 			case 'tags': return pc.lpn_inp_drop_tags || 'This file assigns tags to some junctions, pipes, or other assets. Every tag was imported and appears in the properties of its asset, where it can be viewed or edited.';
-			case 'report': return pc.lpn_inp_drop_report || 'This file contains EPANET report-format settings. The EPANET run report is available under Reports, EPANET run, but it uses the standard EPANET format rather than the format these settings specify. The lines are kept and are written back if you save an EPANET file.';
+			case 'report': return pc.lpn_inp_drop_report || 'This file contains EPANET report-format settings. The run report is available under Reports, Run, but it uses the standard EPANET format rather than the format these settings specify. The lines are kept and are written back if you save an EPANET file.';
 			// The ids on this one are the SECTION NAMES, which is the only true thing we can say
 			// about a part of the format nobody here has read.
 			case 'other-sections': return pc.lpn_inp_drop_sections || 'This file holds a section that this page does not read at all. Nothing here uses it. It is kept whole, and it is written back if you save an EPANET file.';
@@ -38541,7 +38570,7 @@ var EngCalcs = EngCalcs || {};
 	var fileWriteBusy = false;   // a write is in flight; never start a second one over it
 	var fileError = false;
 	function fileApiAvailable() { return typeof window.showSaveFilePicker === 'function'; }
-	// **WHAT WE WRITE.** One extension, ours, so a Save-as picker offers `.lwn` and nothing else --
+	// **WHAT WE WRITE.** One extension, ours, so a Save-as picker offers `.epp` and nothing else --
 	// a save that can produce two extensions is a library where half the documents are invisible to
 	// the other half's filter.
 	function fileTypes() {
@@ -38556,7 +38585,7 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {};
 		return [{
 			description: pc.lpn_file_type_desc || 'Project file',
-			accept: { 'application/json': [LPN_FILE_EXT, LPN_FILE_EXT_LEGACY] }
+			accept: { 'application/json': LPN_FILE_EXTS_READ }
 		}];
 	}
 	// Same honesty rule setStorageError() follows: a user who thinks they are editing a file must be
@@ -38869,13 +38898,13 @@ var EngCalcs = EngCalcs || {};
 	// is harmless while the strips stay `$`-ANCHORED. dev/lpn-spike/file-naming-harness.js pins both.
 
 	function projectNameFromFileName(fname) {
-		// Either extension, because either can arrive: `.lwn` is what we write now and `.json` is
-		// what every file saved before Task 246 wears. Built from the constants rather than typed,
+		// Any of the three, because any can arrive: `.epp` is what we write now, `.lwn` what files
+		// saved from Task 246 to Task 780 wear, and `.json` what every file before that wears. Built from the constants rather than typed,
 		// so a future extension cannot be added in one place and forgotten in the other.
-		// The dot is escaped: an unescaped `.lwn` would also match `Xalwn`, which is a silent
+		// The dot is escaped: an unescaped `.epp` would also match `Xaepp`, which is a silent
 		// one-character rename of somebody's project rather than a visible bug.
 		var extRe = new RegExp('(' +
-				[LPN_FILE_EXT, LPN_FILE_EXT_LEGACY].join('|').replace(/\./g, '\\.') + ')$', 'i'),
+				LPN_FILE_EXTS_READ.join('|').replace(/\./g, '\\.') + ')$', 'i'),
 			s = String(fname).replace(extRe, ''),
 			lower = s.toLowerCase();
 		if (lower.slice(-LPN_FILE_SUFFIX_LEGACY.length) === LPN_FILE_SUFFIX_LEGACY) {
@@ -46074,19 +46103,10 @@ var EngCalcs = EngCalcs || {};
 				logLpnFirstAction('element');
 				addText(w.x, w.y, nearNode ? nearNode.id : null,
 					nearLink ? { link: nearLink.link.id, t: nearLink.t } : null);
-				// **AND THE TOOL PUTS ITSELF DOWN, WHICH IS WHY A NEW TEXT COULD NOT BE DRAGGED**
-				// (Tom, 2026-09-08: *"I add a Text. It can't be dragged."*). pointerdown returns
-				// before it arms any drag while the mode still begins with `add-`, so the Text you
-				// had just placed was the one Text on the drawing you could not pick up -- until
-				// you noticed the toolbar was still holding the tool. Nothing was wrong with the
-				// element: an OLD Text behaved differently only because reaching one meant leaving
-				// the tool first.
-				//
-				// The branch three lines above already does exactly this when the tap lands on an
-				// existing Text, so this is the two halves of one gesture agreeing rather than a
-				// new rule. A Text is a one-shot placement, unlike a junction, where drawing ten in
-				// a row is the normal way to use the tool.
-				setMode('select');
+				// **THE TOOL STAYS ARMED, LIKE EVERY OTHER INSERTER** (Tom, 2026-10-07: *"All
+				// inserters should be in repeater mode. Text is not."*). A tap on a Text already there
+				// still opens it and leaves the tool (the branch above), which is what keeps a second
+				// tap from stacking a duplicate. Esc or another tool ends the repeat.
 			}
 			else if (mode === 'add-chain') {
 				chainTap(e, w, t);
@@ -66233,7 +66253,7 @@ var EngCalcs = EngCalcs || {};
 		if (!host) { return; }
 		host.innerHTML = '';
 		if (!frames.length) {
-			ffEl('p', 'lpn-ff-note', pc.lpn_status_needs_run || 'The status report lists what changed during an extended period simulation. Set a Total run time in Settings, Calculation, Time, press Calculate, then open Water, Reports, Status report.', host);
+			ffEl('p', 'lpn-ff-note', pc.lpn_status_needs_run || 'The status report lists what changed during an extended period simulation. Set a Total run time in Settings, Calculation, Time, press Calculate, then open Water, Reports, Status changes.', host);
 			return;
 		}
 		events = statusReportEvents();

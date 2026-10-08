@@ -4092,3 +4092,21 @@ Lesson: the harness's projected case used a stub transform; run the real one.
 OBSERVED real Chromium 1400x900, net3 example, hand-edited workspace files then import+reload: no page error for wrong-shaped values (arrays, strings, nulls, huge/negative sizes, __proto__) across every box key; the box code falls back to defaults. Out-of-range positions are clamped but leave only a 28px sliver on screen (Settings at bottom right, Find at left edge). Key list: grep of every localStorage write in js/ matches LPN_WORKSPACE_KEYS + EXCLUDED; no sessionStorage; workspace_keys_check passes. Lang keys exist in en only (payload regen expected). File-project dirty path is guarded by the existing beforeunload prompt, not by the import.
 Not done: harness mutation test; how boxes LOOK on a different-size real screen; unit cookie behaviour on other pages.
 Lesson: do not wrap a harness that takes its own flock in an outer flock; it deadlocks against itself.
+
+# Perry, feat/user-guide pre-review, 2026-10-08 (head 00862427)
+OBSERVED: user-guide-find-harness ALL PASS. Net3 worked queries reproduce in en, de, zh, tr, ar, fr, es.
+OBSERVED: the 7th worked query (Junction.Connectivity ...) FAILS on every non-English page tried ("Not a property of X: Connectivity"). English property words are NOT universally accepted: Connectivity, Source share, C, Minor loss, k, Average source share fail on es and de. Chapter says English words accepted in every language.
+OBSERVED: precedence AND over OR, parentheses, case-insensitive, NOT unsupported, units suffix rejected, quotes both kinds: all as chapter says.
+OBSERVED: "Pipe.Velocity highest" (no n) is an error; "n highest" lists 10.
+OBSERVED: choice fix does not break Tank mixing model or Pipe.Closed typed Open/open/Closed/closed; unknown word matches nothing.
+OBSERVED: phone 390 and desktop: no sideways page scroll, tables fit, rtl ar fine.
+OBSERVED: no change in 0dc0bb62..00862427 touches the report names (item 7); guide entries read EPANET run report / Status report while Reports menu rows read Run (EPANET) / Status (EPANET).
+OBSERVED: register: "asks four questions", "of its own" in new Find strings.
+NOT RUN: mutation test of choice fix; Ctrl+K inside a table cell mid-edit.
+
+## 2026-10-08 feat/workspace d14aa77c (Perry)
+OBSERVED: dock-default (19/19), dock-memory (17/17), workspace-browser (43/43) pass bare.
+OBSERVED: first visit, defaults opted in, 1280x720 and 1366x768: 6+8 tabs, fit (bottom 714 of 720); labels truncated with an ellipsis ("Set…", "Prop…", "Libr…"); consent banner covers the lower tabs until answered; examples wall not obstructed. Short window 560: tabs shrink, no overflow.
+OBSERVED: one change then 3 reloads: 6+7 stable. Start fresh clears lpn_dockbox, defaults return. Old-format workspace (no lpn_dockbox, no dockOrd) imports, no defaults layered on, stable on reload.
+OBSERVED: Properties flyout text matches the string.
+SPECULATION: defaults gate looks only at box records + lpn_dockbox, not lpn_index; a returning visitor with projects but no box record gets 14 tabs once. navigator.webdriver true under --remote-debugging/automation Chrome.

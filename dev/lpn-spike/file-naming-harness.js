@@ -60,9 +60,11 @@ const FORMAT = constant('LPN_FILE_FORMAT');
 const APP = constant('LPN_FILE_APP');
 const EXT = constant('LPN_FILE_EXT');
 const EXT_LEGACY = constant('LPN_FILE_EXT_LEGACY');
+const EXT_LWN = constant('LPN_FILE_EXT_LWN');
 
 const LPN_FILE_SUFFIX = SUFFIX, LPN_FILE_SUFFIX_LEGACY = LEGACY;
-const LPN_FILE_EXT = EXT, LPN_FILE_EXT_LEGACY = EXT_LEGACY;
+const LPN_FILE_EXT = EXT, LPN_FILE_EXT_LEGACY = EXT_LEGACY, LPN_FILE_EXT_LWN = EXT_LWN;
+const LPN_FILE_EXTS_READ = [EXT, EXT_LWN, EXT_LEGACY];
 eval(extract('safeFileName'));
 eval(extract('projectFileName'));
 eval(extract('projectNameFromFileName'));
@@ -77,9 +79,10 @@ function eq(actual, expected, label) {
 	report(actual === expected, label, actual === expected ? '' : `got ${JSON.stringify(actual)}, want ${JSON.stringify(expected)}`);
 }
 
-console.log('\n-- the file identity: `.lwn`, and nothing else in the name (Task 246) --');
+console.log('\n-- the file identity: `.epp`, and nothing else in the name (Task 246) --');
 eq(projectFileName('Elm Street Center'), 'Elm-Street-Center' + EXT, 'a spaced name becomes a dashed filename');
-eq(EXT, '.lwn', 'the extension is the one Tom bought the domain for');
+eq(EXT, '.epp', 'the extension is the application name (Task 780)');
+eq(EXT_LWN, '.lwn', 'and `.lwn` is read, never written');
 // The `-lpn` suffix existed only because a generic `.json` could not say what the file was. It has
 // an extension to say that now, so a new file must not wear BOTH -- that is the same fact twice.
 report(projectFileName('X').indexOf(SUFFIX) < 0, 'a NEW filename carries no -lpn suffix any more', projectFileName('X'));
@@ -102,11 +105,12 @@ console.log('\n-- everything ever written still opens (Task 246 strands nobody) 
 eq(projectNameFromFileName('Elm-Street-Center' + LEGACY + EXT_LEGACY), 'Elm-Street-Center', 'a file saved before 2026-08-14 still opens with its name intact');
 eq(projectNameFromFileName('Elm-Street-Center' + LEGACY + '.JSON'), 'Elm-Street-Center', 'and the extension match is case-insensitive');
 eq(projectNameFromFileName('Elm-Street-Center' + SUFFIX + EXT_LEGACY), 'Elm-Street-Center', 'and so does a `-lpn.json` file, which is what an older save is');
-eq(projectNameFromFileName('Elm-Street-Center' + EXT), 'Elm-Street-Center', 'while a new `.lwn` gives its name back plainly');
+eq(projectNameFromFileName('Elm-Street-Center' + EXT), 'Elm-Street-Center', 'while a new `.epp` gives its name back plainly');
 eq(projectNameFromFileName('Elm-Street-Center' + EXT.toUpperCase()), 'Elm-Street-Center', '...case-insensitively too');
 // An unescaped `.` in the extension pattern would eat the last letter of a name ending in `alwn`.
 // Silent, and it renames the user's project on the next save, which is what this whole function's
 // comment block is about.
+eq(projectNameFromFileName('Elm-Street-Center' + EXT_LWN), 'Elm-Street-Center', 'a `.lwn` gives its name back too');
 eq(projectNameFromFileName('Shoalwn'), 'Shoalwn', 'a name that merely ENDS in the extension letters is left alone');
 
 console.log('\n-- the suffixes overlap, so an UNANCHORED strip mangles --');
@@ -151,14 +155,14 @@ const config = fs.readFileSync(path.join(__dirname, '../../lib/config.inc.php'),
 const origin = (config.match(/define\('EC_EPP_ORIGIN',\s*'([^']+)'\)/) || [])[1];
 report(!!origin && APP.indexOf(origin + '/') === 0, 'the app URL is under EC_EPP_ORIGIN', `${APP} vs ${origin}`);
 
-console.log('\n-- the pickers: write one extension, read both --');
+console.log('\n-- the pickers: write one extension, read three --');
 {
 	const save = extract('fileTypes');
 	const open = extract('fileTypesOpen');
 	report(save.indexOf('LPN_FILE_EXT_LEGACY') < 0 && save.indexOf('LPN_FILE_EXT') >= 0,
-		'Save as offers `.lwn` and only `.lwn`');
-	report(open.indexOf('LPN_FILE_EXT') >= 0 && open.indexOf('LPN_FILE_EXT_LEGACY') >= 0,
-		'Open accepts both, so an existing `.json` project is never stranded');
+		'Save as offers `.epp` and only `.epp`');
+	report(open.indexOf('LPN_FILE_EXTS_READ') >= 0,
+		'Open accepts all three, so an existing `.json` project is never stranded');
 	// The picker for OPEN must not be handed the save list, which is the one-character mistake that
 	// would hide every pre-Task-246 file behind a filter.
 	report(/showOpenFilePicker\(\{ multiple: false, types: fileTypesOpen\(\) \}\)/.test(src),

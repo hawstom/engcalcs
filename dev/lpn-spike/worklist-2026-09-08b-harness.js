@@ -283,12 +283,12 @@ console.log('\n--- adding a Text updates the open pane, and puts the tool down -
 	ok('...rather than borrowing scheduleSolve(), which has nothing here to solve',
 		!/scheduleSolve\(\);/.test(add), add.length + ' chars of addText()');
 
-	// **AND THE TOOL PUTS ITSELF DOWN**, which is why a new Text could not be dragged: pointerdown
-	// returns before arming any drag while the mode still begins with `add-`.
+	// **AND THE TOOL STAYS ARMED** (Tom, 2026-10-07: every inserter repeats, Text included). The
+	// only exit in the gesture is the tap that lands on an existing Text.
 	const up = SRC.slice(SRC.indexOf("else if (mode === 'add-text')"),
 		SRC.indexOf("else if (mode === 'add-text')") + 4200);
-	ok('the add-text gesture ends in Select, so the Text just placed is draggable',
-		/setMode\('select'\);/.test(up.slice(up.indexOf('addText(w.x, w.y'))));
+	ok('the add-text gesture stays armed after placing, like every other inserter',
+		!/setMode\('select'\);/.test(up.slice(up.indexOf('addText(w.x, w.y'), up.indexOf("else if (mode === 'add-chain')"))));
 
 	// The alignment rows are SUPPRESSED on an attached Text and always were. What was missing is
 	// anything on screen saying so, which is why two Texts that look alike offered different rows.
