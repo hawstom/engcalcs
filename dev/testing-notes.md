@@ -8,6 +8,10 @@ Copyright 2009 Thomas Gail Haws. GNU GPL v3 or later.
 **Minimize Tom's browser passes.** They are slow and fatiguing. Write a harness in `dev/lpn-spike/`
 or `dev/calc-spike/` and reserve his time for what genuinely needs a real browser.
 
+- **A HARNESS BROWSER STARTS WITH NO DOCKS.** A real first visit opens the looped-network page with
+  Tom's auto-hide docks on both edges (`LPN_DEFAULT_DOCKS`); a browser with `navigator.webdriver`
+  set does not, because the harnesses were written against a bare first visit. A harness that wants
+  the defaults sets `window.EC_DEFAULT_DOCKS = true` in an init script (`dock-default-harness.js`).
 - **A TEST THAT CAN REPORT ON THE WRONG TREE IS WORSE THAN NO TEST**, because it is green and
   trusted. `dev/browser-pass/lib/env.js` bound a constant port and derived its docroot as `REPO/..`,
   so from a worktree it silently served *another checkout* — and the specs went stale for a whole

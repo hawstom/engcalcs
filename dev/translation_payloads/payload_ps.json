@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "ps",
-        "expected_key_count": 2449,
-        "delta_key_count": 5,
+        "expected_key_count": 2480,
+        "delta_key_count": 36,
         "exempt_key_count": 36,
         "exempt_keys": [
             "u_imgd",
@@ -715,97 +715,655 @@
         ]
     },
     "keys_to_translate": {
-        "lpn_hotkeys_zoomwin_def": "Zoom Window: drag a rectangle to zoom to.",
-        "lpn_status_dismiss": "Hide this message",
-        "lpn_msglog_hidden": "Hidden",
-        "lpn_msglog_unhide": "Show",
-        "lpn_status_hidden_tip": "Show the hidden message on the map again."
+        "lpn_pane_copy_heads": "Copy with headings",
+        "lpn_export_table_title": "Export to {format}",
+        "lpn_export_table_current": "Current",
+        "lpn_export_table_all": "All",
+        "lpn_export_table_go": "Export",
+        "lpn_export_table_scn_note": "Results are exported only for the scenario last calculated.",
+        "lpn_file_export_tables_heading": "Tables and libraries",
+        "lpn_file_export_item_ods": "ODS file…",
+        "lpn_file_export_item_xlsx": "XLSX file…",
+        "lpn_file_export_item_csv": "CSV file…",
+        "lpn_file_export_tables_tip": "Download the tables as the Tables pane shows them, one sheet each, with a sheet for each library their IDs refer to: patterns, curves, pipe types, and fittings.",
+        "lpn_file_export_csv_tip": "Download a table as the Tables pane shows it. Several tables come as one zip file of CSV files, with a file for each library their IDs refer to.",
+        "lpn_file_export_item_dxf": "DXF file…",
+        "lpn_file_export_dxf_tip": "Download this network for AutoCAD and other CAD programs: pipes, pumps, and valves as polylines, and every element as a block whose attributes carry its ID and property values in the project units.",
+        "lpn_dxf_export_no_utm": "The DXF file was not written: this network lies outside the latitudes UTM covers (80° S to 84° N), and a drawing needs a flat grid to be drawn on.",
+        "lpn_dxf_export_refused": "The DXF file was not written: the coordinate conversion it needs did not load. Check the connection and try again.",
+        "lpn_dxf_export_failed": "The DXF file was not written: an error in this page stopped it ({error}).",
+        "lpn_dxf_note_grid": "Coordinates: the X and Y of this project, in {unit}. No coordinate system is stated.",
+        "lpn_dxf_note_crs": "Coordinates: {crs}, exactly as this project states them.",
+        "lpn_dxf_note_geo": "Coordinates: {crs}, in meters, not latitude and longitude. The latitudes and longitudes of the project were converted to that grid.",
+        "lpn_dxf_exported_geo": "Exported {file}. Its coordinates are {crs}, in meters, not latitude and longitude.",
+        "lpn_dxf_note_blocks": "Layers are named {prefix}, the asset code, a hyphen, and the alternative, as in {example}. Each element is a block inserted at scale 1 with attributes 1 unit high; scale the blocks to set the text height. Every attribute is visible; the attributes of one element are stacked in a column beside its symbol.",
+        "lpn_dxf_note_shortened": "{n} values were longer than a DXF file allows ({max} characters), so each was shortened and ends in three periods.",
+        "lpn_dxf_note_categories": "{n} junctions have more than one demand category. Their {tag} attribute holds the sum of the base demands of all categories.",
+        "lpn_file_export_item_workspace": "Workspace…",
+        "lpn_file_export_workspace_tip": "Download a small file holding where your boxes sit, their sizes, which are open or docked, and your pane and column sizes, plus the reading preferences of this page. Your projects, project settings and cookies (language, consent, units) are not in it. Load it on another screen or browser with File, Import, Workspace.",
+        "lpn_file_import_workspace": "Workspace…",
+        "lpn_file_import_workspace_tip": "Apply a workspace file saved with File, Export, Workspace: box positions and sizes, docking, pane sizes and the reading preferences of this page. Your projects and cookies are not touched.",
+        "lpn_workspace_exported": "Workspace saved to {file}: {n} settings.",
+        "lpn_workspace_imported": "Workspace applied from {file}. Settings applied: {n}. Returned to their defaults: {r}.",
+        "lpn_workspace_ignored": "Entries ignored because they were not recognized: {u}.",
+        "lpn_workspace_refused_unreadable": "This file could not be read as a workspace, so nothing was changed.",
+        "lpn_workspace_refused_format": "This is not a workspace file saved by this page, so nothing was changed.",
+        "lpn_workspace_refused_newer": "This workspace file was saved by a newer version of this page (format {version}), so nothing was changed.",
+        "lpn_workspace_confirm": "Replace this browser's workspace layout with the one in the file?",
+        "lpn_workspace_refused_storage": "Browser storage is full or unavailable, so the workspace was not applied."
     },
     "keys": {
-        "lpn_hotkeys_zoomwin_def": "Zoom Window: drag a rectangle to zoom to.",
-        "lpn_status_dismiss": "Hide this message",
-        "lpn_msglog_hidden": "Hidden",
-        "lpn_msglog_unhide": "Show",
-        "lpn_status_hidden_tip": "Show the hidden message on the map again."
+        "lpn_pane_copy_heads": "Copy with headings",
+        "lpn_export_table_title": "Export to {format}",
+        "lpn_export_table_current": "Current",
+        "lpn_export_table_all": "All",
+        "lpn_export_table_go": "Export",
+        "lpn_export_table_scn_note": "Results are exported only for the scenario last calculated.",
+        "lpn_file_export_tables_heading": "Tables and libraries",
+        "lpn_file_export_item_ods": "ODS file…",
+        "lpn_file_export_item_xlsx": "XLSX file…",
+        "lpn_file_export_item_csv": "CSV file…",
+        "lpn_file_export_tables_tip": "Download the tables as the Tables pane shows them, one sheet each, with a sheet for each library their IDs refer to: patterns, curves, pipe types, and fittings.",
+        "lpn_file_export_csv_tip": "Download a table as the Tables pane shows it. Several tables come as one zip file of CSV files, with a file for each library their IDs refer to.",
+        "lpn_file_export_item_dxf": "DXF file…",
+        "lpn_file_export_dxf_tip": "Download this network for AutoCAD and other CAD programs: pipes, pumps, and valves as polylines, and every element as a block whose attributes carry its ID and property values in the project units.",
+        "lpn_dxf_export_no_utm": "The DXF file was not written: this network lies outside the latitudes UTM covers (80° S to 84° N), and a drawing needs a flat grid to be drawn on.",
+        "lpn_dxf_export_refused": "The DXF file was not written: the coordinate conversion it needs did not load. Check the connection and try again.",
+        "lpn_dxf_export_failed": "The DXF file was not written: an error in this page stopped it ({error}).",
+        "lpn_dxf_note_grid": "Coordinates: the X and Y of this project, in {unit}. No coordinate system is stated.",
+        "lpn_dxf_note_crs": "Coordinates: {crs}, exactly as this project states them.",
+        "lpn_dxf_note_geo": "Coordinates: {crs}, in meters, not latitude and longitude. The latitudes and longitudes of the project were converted to that grid.",
+        "lpn_dxf_exported_geo": "Exported {file}. Its coordinates are {crs}, in meters, not latitude and longitude.",
+        "lpn_dxf_note_blocks": "Layers are named {prefix}, the asset code, a hyphen, and the alternative, as in {example}. Each element is a block inserted at scale 1 with attributes 1 unit high; scale the blocks to set the text height. Every attribute is visible; the attributes of one element are stacked in a column beside its symbol.",
+        "lpn_dxf_note_shortened": "{n} values were longer than a DXF file allows ({max} characters), so each was shortened and ends in three periods.",
+        "lpn_dxf_note_categories": "{n} junctions have more than one demand category. Their {tag} attribute holds the sum of the base demands of all categories.",
+        "lpn_file_export_item_workspace": "Workspace…",
+        "lpn_file_export_workspace_tip": "Download a small file holding where your boxes sit, their sizes, which are open or docked, and your pane and column sizes, plus the reading preferences of this page. Your projects, project settings and cookies (language, consent, units) are not in it. Load it on another screen or browser with File, Import, Workspace.",
+        "lpn_file_import_workspace": "Workspace…",
+        "lpn_file_import_workspace_tip": "Apply a workspace file saved with File, Export, Workspace: box positions and sizes, docking, pane sizes and the reading preferences of this page. Your projects and cookies are not touched.",
+        "lpn_workspace_exported": "Workspace saved to {file}: {n} settings.",
+        "lpn_workspace_imported": "Workspace applied from {file}. Settings applied: {n}. Returned to their defaults: {r}.",
+        "lpn_workspace_ignored": "Entries ignored because they were not recognized: {u}.",
+        "lpn_workspace_refused_unreadable": "This file could not be read as a workspace, so nothing was changed.",
+        "lpn_workspace_refused_format": "This is not a workspace file saved by this page, so nothing was changed.",
+        "lpn_workspace_refused_newer": "This workspace file was saved by a newer version of this page (format {version}), so nothing was changed.",
+        "lpn_workspace_confirm": "Replace this browser's workspace layout with the one in the file?",
+        "lpn_workspace_refused_storage": "Browser storage is full or unavailable, so the workspace was not applied."
     },
     "key_context": {
-        "lpn_hotkeys_zoomwin_def": {
+        "lpn_pane_copy_heads": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_hotkeys_map_def",
-                    "value": "<table class=\"lpn-notes-table\"><tbody><tr><td>1 یا Esc<\/td><td>ټاکل.<\/td><\/tr><tr><td>2<\/td><td>یو جنکشن زیاتول.<\/td><\/tr><tr><td>3<\/td><td>یو ذخیره زیاتول.<\/td><\/tr><tr><td>4<\/td><td>یو ټانک زیاتول.<\/td><\/tr><tr><td>5<\/td><td>یو پایپ زیاتول.<\/td><\/tr><tr><td>6<\/td><td>یو پمپ زیاتول.<\/td><\/tr><tr><td>7<\/td><td>یو والو زیاتول.<\/td><\/tr><tr><td>8<\/td><td>یو پیرودونکی زیاتول.<\/td><\/tr><tr><td>9<\/td><td>متن زیاتول.<\/td><\/tr><tr><td>Delete<\/td><td>ټاکنه ړنګول.<\/td><\/tr><tr><td>Ctrl+Z<\/td><td>وروستی بدلون بیرته کول.<\/td><\/tr><tr><td>+ یا =<\/td><td>لوی کول.<\/td><\/tr><tr><td>-<\/td><td>کوچنی کول.<\/td><\/tr><\/tbody><\/table>",
-                    "english": "<table class=\"lpn-notes-table\"><tbody><tr><td>1 or Esc<\/td><td>Select.<\/td><\/tr><tr><td>2<\/td><td>Add a junction.<\/td><\/tr><tr><td>3<\/td><td>Add a reservoir.<\/td><\/tr><tr><td>4<\/td><td>Add a tank.<\/td><\/tr><tr><td>5<\/td><td>Add a pipe.<\/td><\/tr><tr><td>6<\/td><td>Add a pump.<\/td><\/tr><tr><td>7<\/td><td>Add a valve.<\/td><\/tr><tr><td>8<\/td><td>Add a customer.<\/td><\/tr><tr><td>9<\/td><td>Add text.<\/td><\/tr><tr><td>Delete<\/td><td>Delete the selection.<\/td><\/tr><tr><td>Ctrl+Z<\/td><td>Undo the last change.<\/td><\/tr><tr><td>+ or =<\/td><td>Zoom in.<\/td><\/tr><tr><td>-<\/td><td>Zoom out.<\/td><\/tr><\/tbody><\/table>"
+                    "key": "lpn_pane_print",
+                    "value": "جدول چاپ کړئ",
+                    "english": "Print table"
                 },
                 "next_translated": {
-                    "key": "lpn_hotkeys_menu_heading",
-                    "value": "مینوګانې",
-                    "english": "Menus"
+                    "key": "lpn_menu_project",
+                    "value": "اوبه",
+                    "english": "Water"
                 }
             }
         },
-        "lpn_status_dismiss": {
+        "lpn_export_table_title": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_wrong_btn",
-                    "value": "دلته یو شی غلط دی؟",
-                    "english": "Something wrong here?"
+                    "key": "lpn_pane_print",
+                    "value": "جدول چاپ کړئ",
+                    "english": "Print table"
                 },
                 "next_translated": {
-                    "key": "lpn_wrong_tip",
-                    "value": "په دې پاڼه کې یوه تېروتنه راپور کړئ. دا یو بکس پرانیزي چې ستونزه وټاکئ، نظر اضافه کړئ، او که ځواب غواړئ بریښنالیک پته ولیکئ. ټولې ساحې اختیاري دي، او تر هغه چې لیږل نه وي فشار شوي هیڅ شی نه لیږل کیږي.",
-                    "english": "Report an error on this page. This opens a box to select the problem, add a comment, and enter an email address if a reply is wanted. All fields are optional, and nothing is sent until you press Send."
+                    "key": "lpn_menu_project",
+                    "value": "اوبه",
+                    "english": "Water"
                 }
             }
         },
-        "lpn_msglog_hidden": {
+        "lpn_export_table_current": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_wrong_btn",
-                    "value": "دلته یو شی غلط دی؟",
-                    "english": "Something wrong here?"
+                    "key": "lpn_pane_print",
+                    "value": "جدول چاپ کړئ",
+                    "english": "Print table"
                 },
                 "next_translated": {
-                    "key": "lpn_wrong_tip",
-                    "value": "په دې پاڼه کې یوه تېروتنه راپور کړئ. دا یو بکس پرانیزي چې ستونزه وټاکئ، نظر اضافه کړئ، او که ځواب غواړئ بریښنالیک پته ولیکئ. ټولې ساحې اختیاري دي، او تر هغه چې لیږل نه وي فشار شوي هیڅ شی نه لیږل کیږي.",
-                    "english": "Report an error on this page. This opens a box to select the problem, add a comment, and enter an email address if a reply is wanted. All fields are optional, and nothing is sent until you press Send."
+                    "key": "lpn_menu_project",
+                    "value": "اوبه",
+                    "english": "Water"
                 }
             }
         },
-        "lpn_msglog_unhide": {
+        "lpn_export_table_all": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_wrong_btn",
-                    "value": "دلته یو شی غلط دی؟",
-                    "english": "Something wrong here?"
+                    "key": "lpn_pane_print",
+                    "value": "جدول چاپ کړئ",
+                    "english": "Print table"
                 },
                 "next_translated": {
-                    "key": "lpn_wrong_tip",
-                    "value": "په دې پاڼه کې یوه تېروتنه راپور کړئ. دا یو بکس پرانیزي چې ستونزه وټاکئ، نظر اضافه کړئ، او که ځواب غواړئ بریښنالیک پته ولیکئ. ټولې ساحې اختیاري دي، او تر هغه چې لیږل نه وي فشار شوي هیڅ شی نه لیږل کیږي.",
-                    "english": "Report an error on this page. This opens a box to select the problem, add a comment, and enter an email address if a reply is wanted. All fields are optional, and nothing is sent until you press Send."
+                    "key": "lpn_menu_project",
+                    "value": "اوبه",
+                    "english": "Water"
                 }
             }
         },
-        "lpn_status_hidden_tip": {
+        "lpn_export_table_go": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_wrong_btn",
-                    "value": "دلته یو شی غلط دی؟",
-                    "english": "Something wrong here?"
+                    "key": "lpn_pane_print",
+                    "value": "جدول چاپ کړئ",
+                    "english": "Print table"
                 },
                 "next_translated": {
-                    "key": "lpn_wrong_tip",
-                    "value": "په دې پاڼه کې یوه تېروتنه راپور کړئ. دا یو بکس پرانیزي چې ستونزه وټاکئ، نظر اضافه کړئ، او که ځواب غواړئ بریښنالیک پته ولیکئ. ټولې ساحې اختیاري دي، او تر هغه چې لیږل نه وي فشار شوي هیڅ شی نه لیږل کیږي.",
-                    "english": "Report an error on this page. This opens a box to select the problem, add a comment, and enter an email address if a reply is wanted. All fields are optional, and nothing is sent until you press Send."
+                    "key": "lpn_menu_project",
+                    "value": "اوبه",
+                    "english": "Water"
+                }
+            }
+        },
+        "lpn_export_table_scn_note": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_print",
+                    "value": "جدول چاپ کړئ",
+                    "english": "Print table"
+                },
+                "next_translated": {
+                    "key": "lpn_menu_project",
+                    "value": "اوبه",
+                    "english": "Water"
+                }
+            }
+        },
+        "lpn_file_export_tables_heading": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_export_item_geojson",
+                    "value": "د GeoJSON فایل…",
+                    "english": "GeoJSON file…"
+                },
+                "next_translated": {
+                    "key": "lpn_file_export_inp_tip",
+                    "value": "دا شبکه د EPANET .inp فایل په توګه ډاونلوډ کړئ (که تړاو ولري د خپل انځور سره په zip فایل کې). هر هغه څه چې .inp بڼه یې نشي ساتلی وروسته تاسو ته لیست کیږي.",
+                    "english": "Download this network as an EPANET .inp file (in a zip file with its image if applicable). Anything the .inp format cannot hold is listed for you afterwards."
+                }
+            }
+        },
+        "lpn_file_export_item_ods": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_export_item_geojson",
+                    "value": "د GeoJSON فایل…",
+                    "english": "GeoJSON file…"
+                },
+                "next_translated": {
+                    "key": "lpn_file_export_inp_tip",
+                    "value": "دا شبکه د EPANET .inp فایل په توګه ډاونلوډ کړئ (که تړاو ولري د خپل انځور سره په zip فایل کې). هر هغه څه چې .inp بڼه یې نشي ساتلی وروسته تاسو ته لیست کیږي.",
+                    "english": "Download this network as an EPANET .inp file (in a zip file with its image if applicable). Anything the .inp format cannot hold is listed for you afterwards."
+                }
+            }
+        },
+        "lpn_file_export_item_xlsx": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_export_item_geojson",
+                    "value": "د GeoJSON فایل…",
+                    "english": "GeoJSON file…"
+                },
+                "next_translated": {
+                    "key": "lpn_file_export_inp_tip",
+                    "value": "دا شبکه د EPANET .inp فایل په توګه ډاونلوډ کړئ (که تړاو ولري د خپل انځور سره په zip فایل کې). هر هغه څه چې .inp بڼه یې نشي ساتلی وروسته تاسو ته لیست کیږي.",
+                    "english": "Download this network as an EPANET .inp file (in a zip file with its image if applicable). Anything the .inp format cannot hold is listed for you afterwards."
+                }
+            }
+        },
+        "lpn_file_export_item_csv": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_export_item_geojson",
+                    "value": "د GeoJSON فایل…",
+                    "english": "GeoJSON file…"
+                },
+                "next_translated": {
+                    "key": "lpn_file_export_inp_tip",
+                    "value": "دا شبکه د EPANET .inp فایل په توګه ډاونلوډ کړئ (که تړاو ولري د خپل انځور سره په zip فایل کې). هر هغه څه چې .inp بڼه یې نشي ساتلی وروسته تاسو ته لیست کیږي.",
+                    "english": "Download this network as an EPANET .inp file (in a zip file with its image if applicable). Anything the .inp format cannot hold is listed for you afterwards."
+                }
+            }
+        },
+        "lpn_file_export_tables_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_export_item_geojson",
+                    "value": "د GeoJSON فایل…",
+                    "english": "GeoJSON file…"
+                },
+                "next_translated": {
+                    "key": "lpn_file_export_inp_tip",
+                    "value": "دا شبکه د EPANET .inp فایل په توګه ډاونلوډ کړئ (که تړاو ولري د خپل انځور سره په zip فایل کې). هر هغه څه چې .inp بڼه یې نشي ساتلی وروسته تاسو ته لیست کیږي.",
+                    "english": "Download this network as an EPANET .inp file (in a zip file with its image if applicable). Anything the .inp format cannot hold is listed for you afterwards."
+                }
+            }
+        },
+        "lpn_file_export_csv_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_export_item_geojson",
+                    "value": "د GeoJSON فایل…",
+                    "english": "GeoJSON file…"
+                },
+                "next_translated": {
+                    "key": "lpn_file_export_inp_tip",
+                    "value": "دا شبکه د EPANET .inp فایل په توګه ډاونلوډ کړئ (که تړاو ولري د خپل انځور سره په zip فایل کې). هر هغه څه چې .inp بڼه یې نشي ساتلی وروسته تاسو ته لیست کیږي.",
+                    "english": "Download this network as an EPANET .inp file (in a zip file with its image if applicable). Anything the .inp format cannot hold is listed for you afterwards."
+                }
+            }
+        },
+        "lpn_file_export_item_dxf": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_export_refused",
+                    "value": "دا پروژه د EPANET فایل په توګه لیکل کیدی نشي: {detail}",
+                    "english": "This project cannot be written as an EPANET file: {detail}"
+                },
+                "next_translated": {
+                    "key": "lpn_file_export_geojson_tip",
+                    "value": "دا شبکه د QGIS، ArcGIS Pro او نورو GIS پروګرامونو لپاره د GeoJSON فایل په توګه ډاونلوډ کړئ. جنکشنونه، ټانکونه او ذخیرې ټکي دي، او پایپونه، پمپونه او والوونه کرښې دي چې خپلې نقطې تعقیبوي. موقعیتونه عرض البلد او طول البلد دي. پایلې یوازې هغه وخت شاملې دي چې شبکه حل شوې وي.",
+                    "english": "Download this network as a GeoJSON file for QGIS, ArcGIS Pro and other GIS programs. Junctions, tanks and reservoirs are points, and pipes, pumps and valves are lines that follow their vertices. Positions are latitude and longitude. Results are included only when the network has been solved."
+                }
+            }
+        },
+        "lpn_file_export_dxf_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_export_refused",
+                    "value": "دا پروژه د EPANET فایل په توګه لیکل کیدی نشي: {detail}",
+                    "english": "This project cannot be written as an EPANET file: {detail}"
+                },
+                "next_translated": {
+                    "key": "lpn_file_export_geojson_tip",
+                    "value": "دا شبکه د QGIS، ArcGIS Pro او نورو GIS پروګرامونو لپاره د GeoJSON فایل په توګه ډاونلوډ کړئ. جنکشنونه، ټانکونه او ذخیرې ټکي دي، او پایپونه، پمپونه او والوونه کرښې دي چې خپلې نقطې تعقیبوي. موقعیتونه عرض البلد او طول البلد دي. پایلې یوازې هغه وخت شاملې دي چې شبکه حل شوې وي.",
+                    "english": "Download this network as a GeoJSON file for QGIS, ArcGIS Pro and other GIS programs. Junctions, tanks and reservoirs are points, and pipes, pumps and valves are lines that follow their vertices. Positions are latitude and longitude. Results are included only when the network has been solved."
+                }
+            }
+        },
+        "lpn_dxf_export_no_utm": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_export_refused",
+                    "value": "دا پروژه د EPANET فایل په توګه لیکل کیدی نشي: {detail}",
+                    "english": "This project cannot be written as an EPANET file: {detail}"
+                },
+                "next_translated": {
+                    "key": "lpn_file_export_geojson_tip",
+                    "value": "دا شبکه د QGIS، ArcGIS Pro او نورو GIS پروګرامونو لپاره د GeoJSON فایل په توګه ډاونلوډ کړئ. جنکشنونه، ټانکونه او ذخیرې ټکي دي، او پایپونه، پمپونه او والوونه کرښې دي چې خپلې نقطې تعقیبوي. موقعیتونه عرض البلد او طول البلد دي. پایلې یوازې هغه وخت شاملې دي چې شبکه حل شوې وي.",
+                    "english": "Download this network as a GeoJSON file for QGIS, ArcGIS Pro and other GIS programs. Junctions, tanks and reservoirs are points, and pipes, pumps and valves are lines that follow their vertices. Positions are latitude and longitude. Results are included only when the network has been solved."
+                }
+            }
+        },
+        "lpn_dxf_export_refused": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_export_refused",
+                    "value": "دا پروژه د EPANET فایل په توګه لیکل کیدی نشي: {detail}",
+                    "english": "This project cannot be written as an EPANET file: {detail}"
+                },
+                "next_translated": {
+                    "key": "lpn_file_export_geojson_tip",
+                    "value": "دا شبکه د QGIS، ArcGIS Pro او نورو GIS پروګرامونو لپاره د GeoJSON فایل په توګه ډاونلوډ کړئ. جنکشنونه، ټانکونه او ذخیرې ټکي دي، او پایپونه، پمپونه او والوونه کرښې دي چې خپلې نقطې تعقیبوي. موقعیتونه عرض البلد او طول البلد دي. پایلې یوازې هغه وخت شاملې دي چې شبکه حل شوې وي.",
+                    "english": "Download this network as a GeoJSON file for QGIS, ArcGIS Pro and other GIS programs. Junctions, tanks and reservoirs are points, and pipes, pumps and valves are lines that follow their vertices. Positions are latitude and longitude. Results are included only when the network has been solved."
+                }
+            }
+        },
+        "lpn_dxf_export_failed": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_export_refused",
+                    "value": "دا پروژه د EPANET فایل په توګه لیکل کیدی نشي: {detail}",
+                    "english": "This project cannot be written as an EPANET file: {detail}"
+                },
+                "next_translated": {
+                    "key": "lpn_file_export_geojson_tip",
+                    "value": "دا شبکه د QGIS، ArcGIS Pro او نورو GIS پروګرامونو لپاره د GeoJSON فایل په توګه ډاونلوډ کړئ. جنکشنونه، ټانکونه او ذخیرې ټکي دي، او پایپونه، پمپونه او والوونه کرښې دي چې خپلې نقطې تعقیبوي. موقعیتونه عرض البلد او طول البلد دي. پایلې یوازې هغه وخت شاملې دي چې شبکه حل شوې وي.",
+                    "english": "Download this network as a GeoJSON file for QGIS, ArcGIS Pro and other GIS programs. Junctions, tanks and reservoirs are points, and pipes, pumps and valves are lines that follow their vertices. Positions are latitude and longitude. Results are included only when the network has been solved."
+                }
+            }
+        },
+        "lpn_dxf_note_grid": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_export_refused",
+                    "value": "دا پروژه د EPANET فایل په توګه لیکل کیدی نشي: {detail}",
+                    "english": "This project cannot be written as an EPANET file: {detail}"
+                },
+                "next_translated": {
+                    "key": "lpn_file_export_geojson_tip",
+                    "value": "دا شبکه د QGIS، ArcGIS Pro او نورو GIS پروګرامونو لپاره د GeoJSON فایل په توګه ډاونلوډ کړئ. جنکشنونه، ټانکونه او ذخیرې ټکي دي، او پایپونه، پمپونه او والوونه کرښې دي چې خپلې نقطې تعقیبوي. موقعیتونه عرض البلد او طول البلد دي. پایلې یوازې هغه وخت شاملې دي چې شبکه حل شوې وي.",
+                    "english": "Download this network as a GeoJSON file for QGIS, ArcGIS Pro and other GIS programs. Junctions, tanks and reservoirs are points, and pipes, pumps and valves are lines that follow their vertices. Positions are latitude and longitude. Results are included only when the network has been solved."
+                }
+            }
+        },
+        "lpn_dxf_note_crs": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_export_refused",
+                    "value": "دا پروژه د EPANET فایل په توګه لیکل کیدی نشي: {detail}",
+                    "english": "This project cannot be written as an EPANET file: {detail}"
+                },
+                "next_translated": {
+                    "key": "lpn_file_export_geojson_tip",
+                    "value": "دا شبکه د QGIS، ArcGIS Pro او نورو GIS پروګرامونو لپاره د GeoJSON فایل په توګه ډاونلوډ کړئ. جنکشنونه، ټانکونه او ذخیرې ټکي دي، او پایپونه، پمپونه او والوونه کرښې دي چې خپلې نقطې تعقیبوي. موقعیتونه عرض البلد او طول البلد دي. پایلې یوازې هغه وخت شاملې دي چې شبکه حل شوې وي.",
+                    "english": "Download this network as a GeoJSON file for QGIS, ArcGIS Pro and other GIS programs. Junctions, tanks and reservoirs are points, and pipes, pumps and valves are lines that follow their vertices. Positions are latitude and longitude. Results are included only when the network has been solved."
+                }
+            }
+        },
+        "lpn_dxf_note_geo": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_export_refused",
+                    "value": "دا پروژه د EPANET فایل په توګه لیکل کیدی نشي: {detail}",
+                    "english": "This project cannot be written as an EPANET file: {detail}"
+                },
+                "next_translated": {
+                    "key": "lpn_file_export_geojson_tip",
+                    "value": "دا شبکه د QGIS، ArcGIS Pro او نورو GIS پروګرامونو لپاره د GeoJSON فایل په توګه ډاونلوډ کړئ. جنکشنونه، ټانکونه او ذخیرې ټکي دي، او پایپونه، پمپونه او والوونه کرښې دي چې خپلې نقطې تعقیبوي. موقعیتونه عرض البلد او طول البلد دي. پایلې یوازې هغه وخت شاملې دي چې شبکه حل شوې وي.",
+                    "english": "Download this network as a GeoJSON file for QGIS, ArcGIS Pro and other GIS programs. Junctions, tanks and reservoirs are points, and pipes, pumps and valves are lines that follow their vertices. Positions are latitude and longitude. Results are included only when the network has been solved."
+                }
+            }
+        },
+        "lpn_dxf_exported_geo": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_export_refused",
+                    "value": "دا پروژه د EPANET فایل په توګه لیکل کیدی نشي: {detail}",
+                    "english": "This project cannot be written as an EPANET file: {detail}"
+                },
+                "next_translated": {
+                    "key": "lpn_file_export_geojson_tip",
+                    "value": "دا شبکه د QGIS، ArcGIS Pro او نورو GIS پروګرامونو لپاره د GeoJSON فایل په توګه ډاونلوډ کړئ. جنکشنونه، ټانکونه او ذخیرې ټکي دي، او پایپونه، پمپونه او والوونه کرښې دي چې خپلې نقطې تعقیبوي. موقعیتونه عرض البلد او طول البلد دي. پایلې یوازې هغه وخت شاملې دي چې شبکه حل شوې وي.",
+                    "english": "Download this network as a GeoJSON file for QGIS, ArcGIS Pro and other GIS programs. Junctions, tanks and reservoirs are points, and pipes, pumps and valves are lines that follow their vertices. Positions are latitude and longitude. Results are included only when the network has been solved."
+                }
+            }
+        },
+        "lpn_dxf_note_blocks": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_export_refused",
+                    "value": "دا پروژه د EPANET فایل په توګه لیکل کیدی نشي: {detail}",
+                    "english": "This project cannot be written as an EPANET file: {detail}"
+                },
+                "next_translated": {
+                    "key": "lpn_file_export_geojson_tip",
+                    "value": "دا شبکه د QGIS، ArcGIS Pro او نورو GIS پروګرامونو لپاره د GeoJSON فایل په توګه ډاونلوډ کړئ. جنکشنونه، ټانکونه او ذخیرې ټکي دي، او پایپونه، پمپونه او والوونه کرښې دي چې خپلې نقطې تعقیبوي. موقعیتونه عرض البلد او طول البلد دي. پایلې یوازې هغه وخت شاملې دي چې شبکه حل شوې وي.",
+                    "english": "Download this network as a GeoJSON file for QGIS, ArcGIS Pro and other GIS programs. Junctions, tanks and reservoirs are points, and pipes, pumps and valves are lines that follow their vertices. Positions are latitude and longitude. Results are included only when the network has been solved."
+                }
+            }
+        },
+        "lpn_dxf_note_shortened": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_export_refused",
+                    "value": "دا پروژه د EPANET فایل په توګه لیکل کیدی نشي: {detail}",
+                    "english": "This project cannot be written as an EPANET file: {detail}"
+                },
+                "next_translated": {
+                    "key": "lpn_file_export_geojson_tip",
+                    "value": "دا شبکه د QGIS، ArcGIS Pro او نورو GIS پروګرامونو لپاره د GeoJSON فایل په توګه ډاونلوډ کړئ. جنکشنونه، ټانکونه او ذخیرې ټکي دي، او پایپونه، پمپونه او والوونه کرښې دي چې خپلې نقطې تعقیبوي. موقعیتونه عرض البلد او طول البلد دي. پایلې یوازې هغه وخت شاملې دي چې شبکه حل شوې وي.",
+                    "english": "Download this network as a GeoJSON file for QGIS, ArcGIS Pro and other GIS programs. Junctions, tanks and reservoirs are points, and pipes, pumps and valves are lines that follow their vertices. Positions are latitude and longitude. Results are included only when the network has been solved."
+                }
+            }
+        },
+        "lpn_dxf_note_categories": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_export_refused",
+                    "value": "دا پروژه د EPANET فایل په توګه لیکل کیدی نشي: {detail}",
+                    "english": "This project cannot be written as an EPANET file: {detail}"
+                },
+                "next_translated": {
+                    "key": "lpn_file_export_geojson_tip",
+                    "value": "دا شبکه د QGIS، ArcGIS Pro او نورو GIS پروګرامونو لپاره د GeoJSON فایل په توګه ډاونلوډ کړئ. جنکشنونه، ټانکونه او ذخیرې ټکي دي، او پایپونه، پمپونه او والوونه کرښې دي چې خپلې نقطې تعقیبوي. موقعیتونه عرض البلد او طول البلد دي. پایلې یوازې هغه وخت شاملې دي چې شبکه حل شوې وي.",
+                    "english": "Download this network as a GeoJSON file for QGIS, ArcGIS Pro and other GIS programs. Junctions, tanks and reservoirs are points, and pipes, pumps and valves are lines that follow their vertices. Positions are latitude and longitude. Results are included only when the network has been solved."
+                }
+            }
+        },
+        "lpn_file_export_item_workspace": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_export_geojson_tip",
+                    "value": "دا شبکه د QGIS، ArcGIS Pro او نورو GIS پروګرامونو لپاره د GeoJSON فایل په توګه ډاونلوډ کړئ. جنکشنونه، ټانکونه او ذخیرې ټکي دي، او پایپونه، پمپونه او والوونه کرښې دي چې خپلې نقطې تعقیبوي. موقعیتونه عرض البلد او طول البلد دي. پایلې یوازې هغه وخت شاملې دي چې شبکه حل شوې وي.",
+                    "english": "Download this network as a GeoJSON file for QGIS, ArcGIS Pro and other GIS programs. Junctions, tanks and reservoirs are points, and pipes, pumps and valves are lines that follow their vertices. Positions are latitude and longitude. Results are included only when the network has been solved."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_refused_local",
+                    "value": "د GeoJSON فایل یوازې عرض البلد او طول البلد لري، او دا پروژه پر یوه محلي جال رسم شوې ده چې پر ځمکه هیڅ ځای نه لري. لومړی یې د Map، World map، Attach له لارې جغرافیوي کړئ، بیا بیا صادر کړئ.",
+                    "english": "A GeoJSON file holds latitude and longitude only, and this project is drawn on a local grid with no place on the Earth. Georeference it first with Map, World map, Attach, then export again."
+                }
+            }
+        },
+        "lpn_file_export_workspace_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_export_geojson_tip",
+                    "value": "دا شبکه د QGIS، ArcGIS Pro او نورو GIS پروګرامونو لپاره د GeoJSON فایل په توګه ډاونلوډ کړئ. جنکشنونه، ټانکونه او ذخیرې ټکي دي، او پایپونه، پمپونه او والوونه کرښې دي چې خپلې نقطې تعقیبوي. موقعیتونه عرض البلد او طول البلد دي. پایلې یوازې هغه وخت شاملې دي چې شبکه حل شوې وي.",
+                    "english": "Download this network as a GeoJSON file for QGIS, ArcGIS Pro and other GIS programs. Junctions, tanks and reservoirs are points, and pipes, pumps and valves are lines that follow their vertices. Positions are latitude and longitude. Results are included only when the network has been solved."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_refused_local",
+                    "value": "د GeoJSON فایل یوازې عرض البلد او طول البلد لري، او دا پروژه پر یوه محلي جال رسم شوې ده چې پر ځمکه هیڅ ځای نه لري. لومړی یې د Map، World map، Attach له لارې جغرافیوي کړئ، بیا بیا صادر کړئ.",
+                    "english": "A GeoJSON file holds latitude and longitude only, and this project is drawn on a local grid with no place on the Earth. Georeference it first with Map, World map, Attach, then export again."
+                }
+            }
+        },
+        "lpn_file_import_workspace": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_export_geojson_tip",
+                    "value": "دا شبکه د QGIS، ArcGIS Pro او نورو GIS پروګرامونو لپاره د GeoJSON فایل په توګه ډاونلوډ کړئ. جنکشنونه، ټانکونه او ذخیرې ټکي دي، او پایپونه، پمپونه او والوونه کرښې دي چې خپلې نقطې تعقیبوي. موقعیتونه عرض البلد او طول البلد دي. پایلې یوازې هغه وخت شاملې دي چې شبکه حل شوې وي.",
+                    "english": "Download this network as a GeoJSON file for QGIS, ArcGIS Pro and other GIS programs. Junctions, tanks and reservoirs are points, and pipes, pumps and valves are lines that follow their vertices. Positions are latitude and longitude. Results are included only when the network has been solved."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_refused_local",
+                    "value": "د GeoJSON فایل یوازې عرض البلد او طول البلد لري، او دا پروژه پر یوه محلي جال رسم شوې ده چې پر ځمکه هیڅ ځای نه لري. لومړی یې د Map، World map، Attach له لارې جغرافیوي کړئ، بیا بیا صادر کړئ.",
+                    "english": "A GeoJSON file holds latitude and longitude only, and this project is drawn on a local grid with no place on the Earth. Georeference it first with Map, World map, Attach, then export again."
+                }
+            }
+        },
+        "lpn_file_import_workspace_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_export_geojson_tip",
+                    "value": "دا شبکه د QGIS، ArcGIS Pro او نورو GIS پروګرامونو لپاره د GeoJSON فایل په توګه ډاونلوډ کړئ. جنکشنونه، ټانکونه او ذخیرې ټکي دي، او پایپونه، پمپونه او والوونه کرښې دي چې خپلې نقطې تعقیبوي. موقعیتونه عرض البلد او طول البلد دي. پایلې یوازې هغه وخت شاملې دي چې شبکه حل شوې وي.",
+                    "english": "Download this network as a GeoJSON file for QGIS, ArcGIS Pro and other GIS programs. Junctions, tanks and reservoirs are points, and pipes, pumps and valves are lines that follow their vertices. Positions are latitude and longitude. Results are included only when the network has been solved."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_refused_local",
+                    "value": "د GeoJSON فایل یوازې عرض البلد او طول البلد لري، او دا پروژه پر یوه محلي جال رسم شوې ده چې پر ځمکه هیڅ ځای نه لري. لومړی یې د Map، World map، Attach له لارې جغرافیوي کړئ، بیا بیا صادر کړئ.",
+                    "english": "A GeoJSON file holds latitude and longitude only, and this project is drawn on a local grid with no place on the Earth. Georeference it first with Map, World map, Attach, then export again."
+                }
+            }
+        },
+        "lpn_workspace_exported": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_export_geojson_tip",
+                    "value": "دا شبکه د QGIS، ArcGIS Pro او نورو GIS پروګرامونو لپاره د GeoJSON فایل په توګه ډاونلوډ کړئ. جنکشنونه، ټانکونه او ذخیرې ټکي دي، او پایپونه، پمپونه او والوونه کرښې دي چې خپلې نقطې تعقیبوي. موقعیتونه عرض البلد او طول البلد دي. پایلې یوازې هغه وخت شاملې دي چې شبکه حل شوې وي.",
+                    "english": "Download this network as a GeoJSON file for QGIS, ArcGIS Pro and other GIS programs. Junctions, tanks and reservoirs are points, and pipes, pumps and valves are lines that follow their vertices. Positions are latitude and longitude. Results are included only when the network has been solved."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_refused_local",
+                    "value": "د GeoJSON فایل یوازې عرض البلد او طول البلد لري، او دا پروژه پر یوه محلي جال رسم شوې ده چې پر ځمکه هیڅ ځای نه لري. لومړی یې د Map، World map، Attach له لارې جغرافیوي کړئ، بیا بیا صادر کړئ.",
+                    "english": "A GeoJSON file holds latitude and longitude only, and this project is drawn on a local grid with no place on the Earth. Georeference it first with Map, World map, Attach, then export again."
+                }
+            }
+        },
+        "lpn_workspace_imported": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_export_geojson_tip",
+                    "value": "دا شبکه د QGIS، ArcGIS Pro او نورو GIS پروګرامونو لپاره د GeoJSON فایل په توګه ډاونلوډ کړئ. جنکشنونه، ټانکونه او ذخیرې ټکي دي، او پایپونه، پمپونه او والوونه کرښې دي چې خپلې نقطې تعقیبوي. موقعیتونه عرض البلد او طول البلد دي. پایلې یوازې هغه وخت شاملې دي چې شبکه حل شوې وي.",
+                    "english": "Download this network as a GeoJSON file for QGIS, ArcGIS Pro and other GIS programs. Junctions, tanks and reservoirs are points, and pipes, pumps and valves are lines that follow their vertices. Positions are latitude and longitude. Results are included only when the network has been solved."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_refused_local",
+                    "value": "د GeoJSON فایل یوازې عرض البلد او طول البلد لري، او دا پروژه پر یوه محلي جال رسم شوې ده چې پر ځمکه هیڅ ځای نه لري. لومړی یې د Map، World map، Attach له لارې جغرافیوي کړئ، بیا بیا صادر کړئ.",
+                    "english": "A GeoJSON file holds latitude and longitude only, and this project is drawn on a local grid with no place on the Earth. Georeference it first with Map, World map, Attach, then export again."
+                }
+            }
+        },
+        "lpn_workspace_ignored": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_export_geojson_tip",
+                    "value": "دا شبکه د QGIS، ArcGIS Pro او نورو GIS پروګرامونو لپاره د GeoJSON فایل په توګه ډاونلوډ کړئ. جنکشنونه، ټانکونه او ذخیرې ټکي دي، او پایپونه، پمپونه او والوونه کرښې دي چې خپلې نقطې تعقیبوي. موقعیتونه عرض البلد او طول البلد دي. پایلې یوازې هغه وخت شاملې دي چې شبکه حل شوې وي.",
+                    "english": "Download this network as a GeoJSON file for QGIS, ArcGIS Pro and other GIS programs. Junctions, tanks and reservoirs are points, and pipes, pumps and valves are lines that follow their vertices. Positions are latitude and longitude. Results are included only when the network has been solved."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_refused_local",
+                    "value": "د GeoJSON فایل یوازې عرض البلد او طول البلد لري، او دا پروژه پر یوه محلي جال رسم شوې ده چې پر ځمکه هیڅ ځای نه لري. لومړی یې د Map، World map، Attach له لارې جغرافیوي کړئ، بیا بیا صادر کړئ.",
+                    "english": "A GeoJSON file holds latitude and longitude only, and this project is drawn on a local grid with no place on the Earth. Georeference it first with Map, World map, Attach, then export again."
+                }
+            }
+        },
+        "lpn_workspace_refused_unreadable": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_export_geojson_tip",
+                    "value": "دا شبکه د QGIS، ArcGIS Pro او نورو GIS پروګرامونو لپاره د GeoJSON فایل په توګه ډاونلوډ کړئ. جنکشنونه، ټانکونه او ذخیرې ټکي دي، او پایپونه، پمپونه او والوونه کرښې دي چې خپلې نقطې تعقیبوي. موقعیتونه عرض البلد او طول البلد دي. پایلې یوازې هغه وخت شاملې دي چې شبکه حل شوې وي.",
+                    "english": "Download this network as a GeoJSON file for QGIS, ArcGIS Pro and other GIS programs. Junctions, tanks and reservoirs are points, and pipes, pumps and valves are lines that follow their vertices. Positions are latitude and longitude. Results are included only when the network has been solved."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_refused_local",
+                    "value": "د GeoJSON فایل یوازې عرض البلد او طول البلد لري، او دا پروژه پر یوه محلي جال رسم شوې ده چې پر ځمکه هیڅ ځای نه لري. لومړی یې د Map، World map، Attach له لارې جغرافیوي کړئ، بیا بیا صادر کړئ.",
+                    "english": "A GeoJSON file holds latitude and longitude only, and this project is drawn on a local grid with no place on the Earth. Georeference it first with Map, World map, Attach, then export again."
+                }
+            }
+        },
+        "lpn_workspace_refused_format": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_export_geojson_tip",
+                    "value": "دا شبکه د QGIS، ArcGIS Pro او نورو GIS پروګرامونو لپاره د GeoJSON فایل په توګه ډاونلوډ کړئ. جنکشنونه، ټانکونه او ذخیرې ټکي دي، او پایپونه، پمپونه او والوونه کرښې دي چې خپلې نقطې تعقیبوي. موقعیتونه عرض البلد او طول البلد دي. پایلې یوازې هغه وخت شاملې دي چې شبکه حل شوې وي.",
+                    "english": "Download this network as a GeoJSON file for QGIS, ArcGIS Pro and other GIS programs. Junctions, tanks and reservoirs are points, and pipes, pumps and valves are lines that follow their vertices. Positions are latitude and longitude. Results are included only when the network has been solved."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_refused_local",
+                    "value": "د GeoJSON فایل یوازې عرض البلد او طول البلد لري، او دا پروژه پر یوه محلي جال رسم شوې ده چې پر ځمکه هیڅ ځای نه لري. لومړی یې د Map، World map، Attach له لارې جغرافیوي کړئ، بیا بیا صادر کړئ.",
+                    "english": "A GeoJSON file holds latitude and longitude only, and this project is drawn on a local grid with no place on the Earth. Georeference it first with Map, World map, Attach, then export again."
+                }
+            }
+        },
+        "lpn_workspace_refused_newer": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_export_geojson_tip",
+                    "value": "دا شبکه د QGIS، ArcGIS Pro او نورو GIS پروګرامونو لپاره د GeoJSON فایل په توګه ډاونلوډ کړئ. جنکشنونه، ټانکونه او ذخیرې ټکي دي، او پایپونه، پمپونه او والوونه کرښې دي چې خپلې نقطې تعقیبوي. موقعیتونه عرض البلد او طول البلد دي. پایلې یوازې هغه وخت شاملې دي چې شبکه حل شوې وي.",
+                    "english": "Download this network as a GeoJSON file for QGIS, ArcGIS Pro and other GIS programs. Junctions, tanks and reservoirs are points, and pipes, pumps and valves are lines that follow their vertices. Positions are latitude and longitude. Results are included only when the network has been solved."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_refused_local",
+                    "value": "د GeoJSON فایل یوازې عرض البلد او طول البلد لري، او دا پروژه پر یوه محلي جال رسم شوې ده چې پر ځمکه هیڅ ځای نه لري. لومړی یې د Map، World map، Attach له لارې جغرافیوي کړئ، بیا بیا صادر کړئ.",
+                    "english": "A GeoJSON file holds latitude and longitude only, and this project is drawn on a local grid with no place on the Earth. Georeference it first with Map, World map, Attach, then export again."
+                }
+            }
+        },
+        "lpn_workspace_confirm": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_export_geojson_tip",
+                    "value": "دا شبکه د QGIS، ArcGIS Pro او نورو GIS پروګرامونو لپاره د GeoJSON فایل په توګه ډاونلوډ کړئ. جنکشنونه، ټانکونه او ذخیرې ټکي دي، او پایپونه، پمپونه او والوونه کرښې دي چې خپلې نقطې تعقیبوي. موقعیتونه عرض البلد او طول البلد دي. پایلې یوازې هغه وخت شاملې دي چې شبکه حل شوې وي.",
+                    "english": "Download this network as a GeoJSON file for QGIS, ArcGIS Pro and other GIS programs. Junctions, tanks and reservoirs are points, and pipes, pumps and valves are lines that follow their vertices. Positions are latitude and longitude. Results are included only when the network has been solved."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_refused_local",
+                    "value": "د GeoJSON فایل یوازې عرض البلد او طول البلد لري، او دا پروژه پر یوه محلي جال رسم شوې ده چې پر ځمکه هیڅ ځای نه لري. لومړی یې د Map، World map، Attach له لارې جغرافیوي کړئ، بیا بیا صادر کړئ.",
+                    "english": "A GeoJSON file holds latitude and longitude only, and this project is drawn on a local grid with no place on the Earth. Georeference it first with Map, World map, Attach, then export again."
+                }
+            }
+        },
+        "lpn_workspace_refused_storage": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_export_geojson_tip",
+                    "value": "دا شبکه د QGIS، ArcGIS Pro او نورو GIS پروګرامونو لپاره د GeoJSON فایل په توګه ډاونلوډ کړئ. جنکشنونه، ټانکونه او ذخیرې ټکي دي، او پایپونه، پمپونه او والوونه کرښې دي چې خپلې نقطې تعقیبوي. موقعیتونه عرض البلد او طول البلد دي. پایلې یوازې هغه وخت شاملې دي چې شبکه حل شوې وي.",
+                    "english": "Download this network as a GeoJSON file for QGIS, ArcGIS Pro and other GIS programs. Junctions, tanks and reservoirs are points, and pipes, pumps and valves are lines that follow their vertices. Positions are latitude and longitude. Results are included only when the network has been solved."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_refused_local",
+                    "value": "د GeoJSON فایل یوازې عرض البلد او طول البلد لري، او دا پروژه پر یوه محلي جال رسم شوې ده چې پر ځمکه هیڅ ځای نه لري. لومړی یې د Map، World map، Attach له لارې جغرافیوي کړئ، بیا بیا صادر کړئ.",
+                    "english": "A GeoJSON file holds latitude and longitude only, and this project is drawn on a local grid with no place on the Earth. Georeference it first with Map, World map, Attach, then export again."
                 }
             }
         }

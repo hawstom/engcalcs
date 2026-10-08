@@ -325,6 +325,8 @@ run_check "scenario write seam"          blocking php dev/scripts/scenario_seam_
 # direct localStorage writes, not typed: CLAUDE.md names four and the page writes six.
 run_check "lpn project/browser split"    blocking php dev/scripts/lpn_furniture_check.php
 run_check "lpn furniture selftest"       blocking php dev/scripts/lpn_furniture_selftest.php
+# File > Export > Workspace carries a declared list of browser keys; a key written and in neither the list nor the exclusion fails.
+run_check "workspace keys"               blocking php dev/scripts/workspace_keys_check.php
 run_check "setting scope"                blocking php dev/scripts/setting_scope_check.php
 # Task 714 Phase 1. A dark theme is "write the dark values once" only while every chrome colour is a
 # token; one literal left in a rule is a light patch on a dark box that nobody on a light screen can see.
