@@ -589,3 +589,7 @@ Today's answer rests on three half-verified rivals. Worth one session: price and
 
 
 - Verify with screenshots: WaterGEMS/WaterCAD menu hover behaviour, Adobe Illustrator/Acrobat menu rows, VS Code command palette and Windows 11 Settings search descriptions (not checked 2026-10-03).
+
+## Photo capture date on the map: say "no date" honestly now, ask Esri before building anything
+
+2026-10-08, answering Tom. Mapbox publishes no capture date and no history (journal 2026-10-08). The only no-account-looking per-point source is Esri World Imagery layer 4 plus Wayback, but forum answers say World Imagery needs an ArcGIS licence; I did not read the licence itself. Cheapest step: one tip sentence on the satellite basemap saying imagery is a mixed-date mosaic with no published date (about one string, 26 translations). Second: a written question to Esri licensing. Third and optional, US only: USGS NAIP `acquisition_date`, free, public domain, a fifth service. Historical imagery: no evidence our users want it; do not build.
