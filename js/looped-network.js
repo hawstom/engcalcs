@@ -66896,44 +66896,53 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	 * alone -- are read off the element handed in, and a link's ends (linkLive()). A node's own
 	 * links are redrawn with it, so this is still a handful of elements, which is why
 	 * afterPropertyEdit() may call this instead of walking the whole drawing on every committed
-	 * cell. `skipLinks`: the whole-drawing pass, which reaches every link anyway. A Text label has no marks and is not drawn from either question, so it is
+	 * cell. A Text label has no marks and is not drawn from either question, so it is
 	 * simply not in either map and falls through.
 	 */
-	function applyScenarioMarks(el, skipLinks) {
+	function applyScenarioMarks(el) {
 		if (!el) { return; }
 		// **`elGroup()`, NOT A SEARCH OF doc.nodes/doc.links.** A junction and a pipe may legally
 		// share an id (see ovKey()), so the element's own shape is what tells the two apart --
 		// and an indexOf() here would put back exactly the whole-drawing walk this replaces.
-		var group = elGroup(el), ne = nodeEls[el.id], le = linkEls[el.id], off, ov;
-		if (group === 'node' && ne) {
-			off = !isActive(el); ov = hasDisplayedOverride(el);
-			ne.circle.classList.toggle('lpn-override', ov);
-			setOverrideTitle(ne.circle, ov);
-			ne.circle.classList.toggle('lpn-inactive', off);
-			if (ne.symbol) { ne.symbol.classList.toggle('lpn-inactive', off); }
-			ne.text.classList.toggle('lpn-inactive', off);
+		var group = elGroup(el);
+		if (group === 'node') {
+			nodeScenarioMarks(el);
 			// Its links are greyed with it (linkLive()), so an edit of the node redraws theirs.
-			if (!skipLinks) { (incidentLinks[el.id] || []).forEach(function (lid) { applyScenarioMarks(linkById(lid), true); }); }
+			(incidentLinks[el.id] || []).forEach(function (lid) { linkScenarioMarks(linkById(lid)); });
 			return;
 		}
-		if (group === 'link' && le) {
-			// **A LINK WHOSE END IS INACTIVE IS DRAWN INACTIVE** (Task 781): it is out of the solve
-			// (assembleModel()), and Bentley greys what it leaves out.
-			off = !linkLive(el); ov = hasDisplayedOverride(el);
-			if (le.halo) {
-				le.halo.classList.toggle('lpn-override', ov);
-				setOverrideTitle(le.halo, ov);
-			}
-			le.line.classList.toggle('lpn-inactive', off);
-			le.text.classList.toggle('lpn-inactive', off);
-			if (le.symbolG) { le.symbolG.classList.toggle('lpn-inactive', off); }
+		if (group === 'link') { linkScenarioMarks(el); }
+	}
+	function nodeScenarioMarks(el) {
+		var ne = el ? nodeEls[el.id] : null, off, ov;
+		if (!ne) { return; }
+		off = !isActive(el); ov = hasDisplayedOverride(el);
+		ne.circle.classList.toggle('lpn-override', ov);
+		setOverrideTitle(ne.circle, ov);
+		ne.circle.classList.toggle('lpn-inactive', off);
+		if (ne.symbol) { ne.symbol.classList.toggle('lpn-inactive', off); }
+		ne.text.classList.toggle('lpn-inactive', off);
+	}
+	function linkScenarioMarks(el) {
+		var le = el ? linkEls[el.id] : null, off, ov;
+		if (!le) { return; }
+		// **A LINK WHOSE END IS INACTIVE IS DRAWN INACTIVE** (Task 781): it is out of the solve
+		// (assembleModel()), and Bentley greys what it leaves out.
+		off = !linkLive(el); ov = hasDisplayedOverride(el);
+		if (le.halo) {
+			le.halo.classList.toggle('lpn-override', ov);
+			setOverrideTitle(le.halo, ov);
 		}
+		le.line.classList.toggle('lpn-inactive', off);
+		le.text.classList.toggle('lpn-inactive', off);
+		if (le.symbolG) { le.symbolG.classList.toggle('lpn-inactive', off); }
 	}
 	// The whole-drawing pass, for the events that genuinely move every element's answer: switching
 	// scenario, deleting one, pushing to base, rebuilding the DOM. An ordinary property edit is not
 	// one of those -- see applyScenarioMarks().
 	function refreshScenarioMarks() {
-		doc.nodes.forEach(function (n) { applyScenarioMarks(n, true); });
+		// A node's own marks only: every link is marked once, by the second line.
+		doc.nodes.forEach(function (n) { nodeScenarioMarks(n); });
 		doc.links.forEach(function (l) { applyScenarioMarks(l); });
 	}
 	// The layout half of refreshLabelText(), without rebuilding any text. Split out so a DRAG can

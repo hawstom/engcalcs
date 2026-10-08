@@ -249,7 +249,9 @@ async function main() {
 		let st = await strips(b.page);
 		ok('fifteen boxes docked as auto-hide tabs, Alternatives top left and Properties top right', JSON.stringify(st) === fifteen, JSON.stringify(st));
 		const tomFile = (await exportWorkspace(b)).text;
-		ok('the exported file carries the docks of the boxes with no record of their own', /lpn_dockbox/.test(tomFile) && /lpn_alt_box/.test(tomFile) && /lpn_popup/.test(tomFile));
+		ok('the exported file carries the docks of the boxes with no record of their own', /lpn_dockbox/.test(tomFile) && /lpn_calib_box/.test(tomFile) && /lpn_popup/.test(tomFile));
+		// The Alternatives box keeps its own record (lpn_altbox, feat/bentley-interop), which a workspace carries.
+		ok('...and the Alternatives box\'s own record, lpn_altbox', /lpn_altbox/.test(tomFile));
 		// Close the top one on each edge with its own X, from its flown-out tab.
 		for (const [side, id, x] of [['left', 'lpn_alt_box', 'lpn_alt_close'], ['right', 'lpn_popup', 'lpn_popup_close']]) {
 			await b.page.click('#lpn_dock_strip_' + side + ' .lpn-dock-tab[aria-controls="' + id + '"]');
