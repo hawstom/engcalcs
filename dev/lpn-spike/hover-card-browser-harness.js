@@ -62,6 +62,14 @@ const NODE_FIELDS = ['id', 'desc', 'tag', 'demand', 'elev', 'initQuality', 'dema
 const LINK_FIELDS = ['id', 'desc', 'tag', 'length', 'diameter', 'roughness', 'km', 'initStatus', 'bulkCoeff', 'wallCoeff',
 	'flow', 'velocity', 'headloss', 'gradient', 'friction', 'rate', 'quality', 'status'];
 
+// The project this harness loads states the id prefix (N, L); the page prints it on the map label and
+// on the card, so the expected id is that prefix plus the bare id, read from the project, not typed.
+const PFX = (function () {
+	const d = JSON.parse(fs.readFileSync(path.join(REPO, 'dev', 'water-network-examples', 'Net1.lwn'), 'utf8'));
+	const p = ((d.labelSettings || {}).prefix) || {};
+	return { node: (p.node || {}).id || '', link: (p.link || {}).id || '' };
+}());
+
 function projectText(tick, maxW) {
 	const d = JSON.parse(fs.readFileSync(path.join(REPO, 'dev', 'water-network-examples', 'Net1.lwn'), 'utf8'));
 	d.settings = Object.assign({}, d.settings, { labelMaxWidth: maxW === undefined ? null : maxW });
@@ -192,7 +200,7 @@ async function main() {
 				const pl = await cardLines(a.page);
 				const lblText = await a.page.evaluate(() => { const t = document.querySelector('text[data-linklbl="111"]'); return t ? t.textContent.replace(/\s+/g, '') : null; });
 				ok('resting on pipe 111 shows its card: the three ticked rows', !!pl && pl.length === 3, JSON.stringify(pl));
-				ok('...led by the ID the map label shows', pl && pl[0] === '111', JSON.stringify(pl && pl[0]));
+				ok('...led by the ID the map label shows', pl && pl[0] === PFX.link + '111', JSON.stringify(pl && pl[0]));
 				ok('...and its rows are, in order, what the map label prints', pl && lblText === pl.join('').replace(/\s+/g, ''),
 					'card ' + JSON.stringify(pl) + ' label ' + JSON.stringify(lblText));
 				await away(a);
@@ -273,7 +281,7 @@ async function main() {
 			const p0 = await centreOf(n0.page, '#lpn_canvas circle[data-node="11"]');
 			await rest(n0, p0);
 			const l0 = await cardLines(n0.page);
-			ok('a junction with no field ticked still shows a card: its ID alone', JSON.stringify(l0) === '["11"]', JSON.stringify(l0));
+			ok('a junction with no field ticked still shows a card: its ID alone', JSON.stringify(l0) === JSON.stringify([PFX.node + '11']), JSON.stringify(l0));
 			ok('no page errors (none ticked)', !n0.errors.length, (n0.errors[0] || '').slice(0, 200));
 		} finally { await n0.close(); }
 
@@ -286,12 +294,12 @@ async function main() {
 			const ph = await centreOf(hz.page, '#lpn_canvas circle[data-node="11"]');
 			await rest(hz, ph);
 			const lh = await cardLines(hz.page);
-			ok('...yet resting on junction 11 shows the ticked fields', JSON.stringify(lh) === JSON.stringify(['11', 'Qb=150.0', 'Z=710.00']), JSON.stringify(lh));
+			ok('...yet resting on junction 11 shows the ticked fields', JSON.stringify(lh) === JSON.stringify([PFX.node + '11', 'Qb=150.0', 'Z=710.00']), JSON.stringify(lh));
 			await away(hz);
 			const pph = await centreOf(hz.page, '#lpn_canvas [data-link="111"]');
 			await rest(hz, pph);
 			const lph = await cardLines(hz.page);
-			ok('...and on pipe 111', JSON.stringify(lph) === JSON.stringify(['111', "5280'", '10"']), JSON.stringify(lph));
+			ok('...and on pipe 111', JSON.stringify(lph) === JSON.stringify([PFX.link + '111', "5280'", '10"']), JSON.stringify(lph));
 			ok('no page errors (threshold)', !hz.errors.length, (hz.errors[0] || '').slice(0, 200));
 		} finally { await hz.close(); }
 
@@ -306,7 +314,7 @@ async function main() {
 			const pd = await centreOf(dm.page, '#lpn_canvas [data-link="111"]');
 			await rest(dm, pd);
 			const ld = await cardLines(dm.page);
-			ok('in Delete mode, resting on pipe 111 shows its card', JSON.stringify(ld) === JSON.stringify(['111', "5280'", '10"']), JSON.stringify(ld));
+			ok('in Delete mode, resting on pipe 111 shows its card', JSON.stringify(ld) === JSON.stringify([PFX.link + '111', "5280'", '10"']), JSON.stringify(ld));
 			const pe = await dm.page.evaluate(() => { const t = document.querySelector('.tooltip.lpn-hovercard'); return t ? getComputedStyle(t).pointerEvents : null; });
 			ok('...and it takes no pointer events', pe === 'none', pe);
 			await dm.page.mouse.down(); await dm.page.mouse.up();
@@ -320,14 +328,14 @@ async function main() {
 			const pb = await centreOf(dm.page, '#lpn_canvas circle[data-node="13"]');
 			await rest(dm, pa);
 			const lp = await cardLines(dm.page);
-			ok('in Pipe mode, resting on the node about to start a pipe shows its card', JSON.stringify(lp) === JSON.stringify(['11', 'Qb=150.0', 'Z=710.00']), JSON.stringify(lp));
+			ok('in Pipe mode, resting on the node about to start a pipe shows its card', JSON.stringify(lp) === JSON.stringify([PFX.node + '11', 'Qb=150.0', 'Z=710.00']), JSON.stringify(lp));
 			await dm.page.mouse.down(); await dm.page.mouse.up();
 			await dm.page.waitForTimeout(300);
 			ok('...the press starts the pipe (the from-node is marked) and the card is gone',
 				(await dm.page.evaluate(() => !!document.querySelector('#lpn_canvas .lpn-node-pending'))) && (await cardLines(dm.page)) === null);
 			await rest(dm, pb);
 			const lq = await cardLines(dm.page);
-			ok('...then resting on the node about to be joined shows ITS card', !!lq && lq[0] === '13', JSON.stringify(lq));
+			ok('...then resting on the node about to be joined shows ITS card', !!lq && lq[0] === PFX.node + '13', JSON.stringify(lq));
 			const links1 = await linkCount();
 			await dm.page.mouse.down(); await dm.page.mouse.up();
 			await dm.page.waitForTimeout(400);
