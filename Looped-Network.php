@@ -213,7 +213,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 	<?php // Project import (Task 195). Lives here in the page, not inside any popover body, because
 	      // those bodies get rebuilt wholesale and would take the input's wired change handler with
 	      // them -- the same reason lpn_backdrop_file sits here. ?>
-	<input type="file" id="lpn_project_file" accept=".lwn,.json,application/json" style="display:none">
+	<input type="file" id="lpn_project_file" accept=".epp,.lwn,.json,application/json" style="display:none">
 	<?php // EPANET import (Task 196). A SECOND picker rather than another accept type on the one
 	      // above: the two feed different readers, and one input serving both would have to guess
 	      // which from the extension -- a guess whose wrong answer is silent.
@@ -225,7 +225,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 	      // it serves is the recovery path for a lon/lat network in either kind of file. Which reader
 	      // a chosen file goes to is decided from its first character -- a project file is JSON --
 	      // never from its name, so the accept list only tidies the picker. ?>
-	<input type="file" id="lpn_geo_file" accept=".lwn,.json,.inp,.net,application/json,text/plain" style="display:none">
+	<input type="file" id="lpn_geo_file" accept=".epp,.lwn,.json,.inp,.net,application/json,text/plain" style="display:none">
 	<?php // File > Import surveyed points (Task 592). A FOURTH picker, and its own for the reason the
 	      // three above are their own: this one lands points in the OPEN project instead of making a
 	      // new tab, so an input shared with them would have to guess which act was meant. A text
@@ -240,7 +240,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 	      // destination, which is the rule the three above are already on. Here in the page rather
 	      // than in the Libraries box body, because that body is rebuilt wholesale on every add,
 	      // delete and section change and would take a wired change handler with it. ?>
-	<input type="file" id="lpn_library_file" accept=".lwn,.json,application/json" style="display:none">
+	<input type="file" id="lpn_library_file" accept=".epp,.lwn,.json,application/json" style="display:none">
 	<?php // Floating "choose target mode" step of the Position sequence (Task 146 Phase 2) --
 	      // mirrors #lpn_settings_box's static-PHP-plus-JS-clamped-position pattern (position:fixed,
 	      // positioned/clamped by showBackdropTargetPanel() in looped-network.js), not the spike's
@@ -2398,6 +2398,7 @@ EngCalcs.pageConfig = {
 	lpn_dock_right: <?=json_encode($ec_lang['lpn_dock_right'])?>,
 	lpn_dock_float: <?=json_encode($ec_lang['lpn_dock_float'])?>,
 	lpn_dock_autohide: <?=json_encode($ec_lang['lpn_dock_autohide'])?>,
+	lpn_popup_none: <?=json_encode($ec_lang['lpn_popup_none'])?>,
 	lpn_time_speed: <?=json_encode($ec_lang['lpn_time_speed'])?>,
 	lpn_time_speed_tip: <?=json_encode($ec_lang['lpn_time_speed_tip'])?>,
 <?php   // The Settings box (Task 441). Four of its five strings are borrowed from controls that
@@ -3585,9 +3586,8 @@ EngCalcs.pageConfig = {
 	lpn_scenario_preset_average_day: <?=json_encode($ec_lang['lpn_scenario_preset_average_day'])?>,
 	lpn_scenario_preset_average_day_tip: <?=json_encode($ec_lang['lpn_scenario_preset_average_day_tip'])?>,
 	lpn_scenario_preset_max_day: <?=json_encode($ec_lang['lpn_scenario_preset_max_day'])?>,
-	lpn_scenario_preset_max_day_tip: <?=json_encode($ec_lang['lpn_scenario_preset_max_day_tip'])?>,
+	lpn_scenario_preset_mult_tip: <?=json_encode($ec_lang['lpn_scenario_preset_mult_tip'])?>,
 	lpn_scenario_preset_peak_hour: <?=json_encode($ec_lang['lpn_scenario_preset_peak_hour'])?>,
-	lpn_scenario_preset_peak_hour_tip: <?=json_encode($ec_lang['lpn_scenario_preset_peak_hour_tip'])?>,
 	lpn_scenario_preset_fire_max_day: <?=json_encode($ec_lang['lpn_scenario_preset_fire_max_day'])?>,
 	lpn_scenario_preset_fire_max_day_tip: <?=json_encode($ec_lang['lpn_scenario_preset_fire_max_day_tip'])?>,
 	lpn_delete_drops_overrides: <?=json_encode($ec_lang['lpn_delete_drops_overrides'])?>,

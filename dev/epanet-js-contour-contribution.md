@@ -416,8 +416,14 @@ loops were holes. What `js/lpn-contour.js` now does:
   **A fault hides only the part of a pipe behind it**: a pipe it cuts across is narrowed to the part
   on the cell's side, not dropped whole (with 335 off and bypass 330 open, dropping 330 left a bare
   wedge north-west of junction 601). **A break line reaches at most R from its pump, valve or
-  closed link** (Tom: *"its length should match our buffer width"*): a fault is R each side of the
-  link's midpoint, and a traced zone boundary is clipped to within R of the barrier that makes it.
+  closed link** (Tom: *"its length should match our buffer width"*): a traced zone boundary is
+  clipped to within R of the barrier that makes it. **A fault reaches only as far as its own link's
+  break** (Tom, 2026-10-07: *"it should extend to the effective influence of the break"*): laid R
+  each side, it keeps the stretch round its link that is nearer that link than any other and breaks
+  the surface by no more than it does at the link plus half a contour interval, and the field, the
+  contour lines and the drawn line all use the shortened fault. Net3 with 335 off and 330 open: 0.1
+  psi across the pump, 54 psi near the far end of the full-R wall, which drew 1.85 R and now 0.67 R.
+  A rule from the size of the break alone was rejected: there it keeps the 54 psi and drops the pump.
 - **Labelled, smoothed contour lines** (marching squares, Chaikin) at 5 psi or 5 m to start, and the
   fill drawn as one raster. Net3 builds in about 30 ms in Node; a generated 1,600-junction grid in
   about 110 ms.

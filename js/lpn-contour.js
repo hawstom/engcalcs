@@ -28,7 +28,9 @@
 //      line across the corridor at its midpoint through which no pipe is seen: ITRC's fault, the
 //      line "across which the interpolation model does not exchange information". A fault hides
 //      only the part of a pipe behind it, never the whole pipe. Every break line reaches at most R
-//      from its barrier (Tom, 2026-10-03: *"its length should match our buffer width"*).
+//      from its barrier (Tom, 2026-10-03: *"its length should match our buffer width"*), and a
+//      fault only as far as its own link's break (faultReach(); Tom, 2026-10-07: *"it should
+//      extend to the effective influence of the break"*).
 //   4. **WITH A GROUND SURFACE, PRESSURE MAY LEAVE THE NODES' RANGE**, on purpose (§2a, Luke
 //      Butler's proof of concept): head is the field interpolated, and the page subtracts the ground
 //      per cell.
@@ -89,7 +91,7 @@
 
 	// THE FAULT AT A BARRIER LINK: a straight line across the corridor at the midpoint of the link
 	// (by length, along its own vertices), perpendicular to the link there, reaching `half` each
-	// side. `pts` is the link's polyline [{x, y}, ...]. Returns {x0, y0, x1, y1, mx, my} or null.
+	// side. `pts` is the link's polyline [{x, y}, ...]. Returns {x0, y0, x1, y1, mx, my, pts} or null.
 	function faultAcross(pts, half) {
 		var L = 0, i, seg = [];
 		for (i = 0; i + 1 < pts.length; i++) {
@@ -104,7 +106,7 @@
 				var mx = a.x + f * (b.x - a.x), my = a.y + f * (b.y - a.y);
 				var ux = (b.x - a.x) / seg[i], uy = (b.y - a.y) / seg[i];
 				// The normal: the link turned a quarter.
-				return { x0: mx - uy * half, y0: my + ux * half, x1: mx + uy * half, y1: my - ux * half, mx: mx, my: my };
+				return { x0: mx - uy * half, y0: my + ux * half, x1: mx + uy * half, y1: my - ux * half, mx: mx, my: my, pts: pts };
 			}
 			run += seg[i];
 		}
@@ -166,6 +168,167 @@
 		return ((d1 > 0) !== (d2 > 0) || d1 === 0 || d2 === 0) && ((d3 > 0) !== (d4 > 0) || d3 === 0 || d4 === 0);
 	}
 
+	// THE VALUE AT ONE POINT, the rule every cell of corridorField() follows: a closure over the
+	// segments and the faults, bucketed on `grid`. probe(x, y, out) returns false where no pipe is
+	// within R, and otherwise fills out.v (the value), out.z (the zone of the nearest pipe), out.d1
+	// (the distance to it) and out.edge (how much nearer that zone is than any other, capped at R).
+	function corridorProbe(S, F, grid, R) {
+		var faults = F || [], k, b;
+		var SB = bucketIndex(S.n, function (s, bx) {
+			bx[0] = Math.min(S.x0[s], S.x1[s]); bx[1] = Math.min(S.y0[s], S.y1[s]);
+			bx[2] = Math.max(S.x0[s], S.x1[s]); bx[3] = Math.max(S.y0[s], S.y1[s]);
+		}, grid, R, R);
+		var FB = bucketIndex(faults.length, function (f, bx) {
+			var q = faults[f];
+			bx[0] = Math.min(q.x0, q.x1); bx[1] = Math.min(q.y0, q.y1); bx[2] = Math.max(q.x0, q.x1); bx[3] = Math.max(q.y0, q.y1);
+		}, grid, R, R);
+		// Scratch per point, sized for the most crowded bucket.
+		var most = 0;
+		for (b = 0; b + 1 < SB.start.length; b++) { most = Math.max(most, SB.start[b + 1] - SB.start[b]); }
+		var cd = new Float64Array(most), cv = new Float64Array(most), cz = new Int32Array(most);
+		var R2 = R * R, tiny = 1e-9 * R;
+		return function (x, y, out) {
+			b = bucketOf(SB, grid, x, y);
+			if (b < 0) { return false; }
+			var m = 0, fb = bucketOf(FB, grid, x, y), f0 = fb >= 0 ? FB.start[fb] : 0, f1 = fb >= 0 ? FB.start[fb + 1] : 0;
+			for (k = SB.start[b]; k < SB.start[b + 1]; k++) {
+				var s = SB.items[k], ex = S.x1[s] - S.x0[s], ey = S.y1[s] - S.y0[s], L2 = ex * ex + ey * ey;
+				var t0 = L2 > 0 ? ((x - S.x0[s]) * ex + (y - S.y0[s]) * ey) / L2 : 0;
+				// THE WALL: only the part of a pipe on this side of a fault is seen. Its nearest
+				// point may lie through a fault while the rest of it is in plain view (a pipe the
+				// fault cuts across), so the visible part is narrowed and its own nearest point
+				// taken, rather than the whole pipe dropped: dropping it left a bare hole with a
+				// ragged edge beside Net3's pump 335 when the pump was off (Tom, 2026-10-03).
+				var tlo = 0, thi = 1, tries = 0, seen = false, t, px, py, d2;
+				for (;;) {
+					t = t0 < tlo ? tlo : (t0 > thi ? thi : t0);
+					px = S.x0[s] + t * ex; py = S.y0[s] + t * ey; d2 = (x - px) * (x - px) + (y - py) * (y - py);
+					if (d2 >= R2) { break; }
+					var block = null, q;
+					for (q = f0; q < f1 && !block; q++) {
+						var fl = faults[FB.items[q]];
+						if (crosses(x, y, px, py, fl.x0, fl.y0, fl.x1, fl.y1)) { block = fl; }
+					}
+					if (!block) { seen = true; break; }
+					if (++tries > 4 || !(L2 > 0)) { break; }
+					// Where the pipe crosses the fault's line, and which end of it is on this side.
+					var gx = block.x1 - block.x0, gy = block.y1 - block.y0;
+					var sA = gx * (S.y0[s] - block.y0) - gy * (S.x0[s] - block.x0), sB = gx * (S.y1[s] - block.y0) - gy * (S.x1[s] - block.x0);
+					var sC = gx * (y - block.y0) - gy * (x - block.x0);
+					if ((sA > 0) === (sB > 0) || sA === sB || sC === 0) { break; }
+					var tc = sA / (sA - sB), eps = 1e-9;
+					if ((sC > 0) === (sA > 0)) { thi = Math.min(thi, tc - eps); } else { tlo = Math.max(tlo, tc + eps); }
+					if (!(tlo <= thi)) { break; }
+				}
+				if (!seen) { continue; }
+				cd[m] = Math.sqrt(d2); cv[m] = S.v0[s] + t * (S.v1[s] - S.v0[s]); cz[m] = S.zone[s]; m++;
+			}
+			if (!m) { return false; }
+			// The nearest pipe decides the zone; only that zone's pipes are averaged.
+			var best = 0;
+			for (k = 1; k < m; k++) { if (cd[k] < cd[best]) { best = k; } }
+			var z = cz[best], d1 = cd[best], dOther = R;
+			for (k = 0; k < m; k++) { if (cz[k] !== z && cd[k] < dOther) { dOther = cd[k]; } }
+			out.edge = dOther - d1; out.z = z; out.d1 = d1;
+			if (d1 <= tiny) {
+				out.v = cv[best];
+			} else {
+				var sw = 0, sv = 0;
+				for (k = 0; k < m; k++) {
+					if (cz[k] !== z) { continue; }
+					var d = cd[k] > tiny ? cd[k] : tiny, w = (R - d) / (R * d);
+					w *= w; sw += w; sv += w * cv[k];
+				}
+				out.v = sv / sw;
+			}
+			return true;
+		};
+	}
+
+	// ============================================================================================
+	// A FAULT REACHES AS FAR AS ITS OWN LINK'S BREAK, never the whole buffer for its own sake (Tom,
+	// 2026-10-07: *"Instead of literally and always extending the full buffer, it should extend to
+	// the effective influence of the break"*). Laid the reach each side by faultAcross(), it keeps
+	// the one unbroken stretch round its link where BOTH of these hold, and is cut where either
+	// first fails:
+	//
+	//   1. THE LINK IS THE NEAREST THING. A point of the wall is at least as near its own barrier
+	//      link as any other link. Where another pipe is nearer, that pipe's colour governs, and it
+	//      is joined to both sides through the network (that is why a fault, not a zone boundary,
+	//      was laid): a wall there would only hide it from one side. This is the cut Tom drew by
+	//      hand: his wall stops halfway to the pipes on either side of the closed link.
+	//   2. THE BREAK IS THE LINK'S. The surface a hair either side of the wall differs by no more
+	//      than it does at the link itself, plus half a contour interval (`slack`). Farther out a
+	//      bigger difference is not the link's doing but two unrelated stretches of network the
+	//      wall is holding apart, in open ground where nothing else is near enough for rule 1 to
+	//      stop it. Net3 with pump 335 off and bypass 330 open: 0.1 psi across the pump, 54 psi
+	//      near the far end of the full-buffer wall, where every contour line ran into its tip.
+	//
+	// A difference by itself was rejected as the rule ("draw where the wall breaks the surface by
+	// at least half an interval"): on Net3 it keeps exactly the invented 54 psi and drops the pump.
+	//
+	// The shortened fault is what the field is computed with, what cuts the contour lines and what
+	// is drawn, so the line on the map is the wall the surface was built with.
+	//
+	//   faults   [{x0, y0, x1, y1, mx, my, pts}] from faultAcross(), `pts` the barrier link's own
+	//            polyline [{x, y}, ...]
+	//   links    every link drawn, open or closed, as polylines [[{x, y}, ...], ...]; a fault's own
+	//            `pts` (the same array) is skipped
+	//   S, grid, R   as corridorField()
+	//   opts     {slack: rule 2's allowance in the field's units (0 if absent),
+	//             samples: points along each fault, default 64}
+	// Returns [{x0, y0, x1, y1, mx, my, pts, t0, t1, jump}] (t0..t1 the part of the original kept,
+	// jump the difference at the link).
+	// ============================================================================================
+	function faultReach(faults, links, S, grid, R, opts) {
+		var n = Math.max(8, ((opts && opts.samples) | 0) || 64), slack = (opts && opts.slack > 0) ? opts.slack : 0, out = [];
+		if (!faults || !faults.length) { return out; }
+		var probe = corridorProbe(S, faults, grid, R), pa = {}, pb = {};
+		function nearestOther(x, y, own) {
+			var best = Infinity, k;
+			for (k = 0; k < (links || []).length; k++) {
+				if (links[k] !== own) { best = Math.min(best, distToPolyline(x, y, links[k])); }
+			}
+			return best;
+		}
+		faults.forEach(function (f) {
+			var gx = f.x1 - f.x0, gy = f.y1 - f.y0, gl = Math.sqrt(gx * gx + gy * gy);
+			if (!(gl > 0)) { return; }
+			var e = 1e-6 * gl, ex = -gy / gl * e, ey = gx / gl * e;
+			// The surface's difference across the wall at t, or 0 where a side is uncoloured or the
+			// two sides are of different zones (that jump is a zone boundary's, not this wall's).
+			function jumpAt(t) {
+				var x = f.x0 + t * gx, y = f.y0 + t * gy;
+				if (!probe(x + ex, y + ey, pa) || !probe(x - ex, y - ey, pb) || pa.z !== pb.z) { return 0; }
+				return Math.abs(pa.v - pb.v);
+			}
+			var limit = jumpAt(0.5) + slack;
+			function kept(t) {
+				var x = f.x0 + t * gx, y = f.y0 + t * gy;
+				return distToPolyline(x, y, f.pts) <= nearestOther(x, y, f.pts) && jumpAt(t) <= limit;
+			}
+			// Outward from the middle to the first sample not kept, then halved down to where the
+			// change happens between it and the last sample that was.
+			function end(dir) {
+				var k = dir > 0 ? Math.floor(n / 2) + 1 : Math.ceil(n / 2) - 1, last = 0.5, it;
+				for (; k >= 0 && k <= n; k += dir) {
+					if (!kept(k / n)) {
+						var bad = k / n;
+						for (it = 0; it < 24; it++) { var mid = (last + bad) / 2; if (kept(mid)) { last = mid; } else { bad = mid; } }
+						return last;
+					}
+					last = k / n;
+				}
+				return last;
+			}
+			var t0 = end(-1), t1 = end(1);
+			if (!(t1 > t0)) { return; }
+			out.push({ x0: f.x0 + t0 * gx, y0: f.y0 + t0 * gy, x1: f.x0 + t1 * gx, y1: f.y0 + t1 * gy,
+				mx: f.mx, my: f.my, pts: f.pts, t0: t0, t1: t1, jump: limit - slack });
+		});
+		return out;
+	}
+
 	// ============================================================================================
 	// THE FIELD -- at the centre of every cell: the value, how strongly it is coloured (1 inside the
 	// corridor, fading to 0 over its outer `fade` fraction, 0 beyond R), and the zone it belongs to.
@@ -183,81 +346,17 @@
 	function corridorField(S, F, grid, R, opts) {
 		var nx = grid.nx, ny = grid.ny, N = nx * ny, fade = (opts && opts.fade >= 0) ? opts.fade : 0.4;
 		var val = new Float64Array(N), alpha = new Float32Array(N), zone = new Int32Array(N), cut = new Uint8Array(N);
-		var edge = new Float32Array(N), faults = F || [], i, j, k, b;
-		var SB = bucketIndex(S.n, function (s, bx) {
-			bx[0] = Math.min(S.x0[s], S.x1[s]); bx[1] = Math.min(S.y0[s], S.y1[s]);
-			bx[2] = Math.max(S.x0[s], S.x1[s]); bx[3] = Math.max(S.y0[s], S.y1[s]);
-		}, grid, R, R);
-		var FB = bucketIndex(faults.length, function (f, bx) {
-			var q = faults[f];
-			bx[0] = Math.min(q.x0, q.x1); bx[1] = Math.min(q.y0, q.y1); bx[2] = Math.max(q.x0, q.x1); bx[3] = Math.max(q.y0, q.y1);
-		}, grid, R, R);
-		// Scratch per cell, sized for the most crowded bucket.
-		var most = 0;
-		for (b = 0; b + 1 < SB.start.length; b++) { most = Math.max(most, SB.start[b + 1] - SB.start[b]); }
-		var cd = new Float64Array(most), cv = new Float64Array(most), cz = new Int32Array(most);
-		var R2 = R * R, inner = R * (1 - fade), tiny = 1e-9 * R;
+		var edge = new Float32Array(N), faults = F || [], i, j;
+		var probe = corridorProbe(S, faults, grid, R), out = {}, inner = R * (1 - fade);
 		for (j = 0; j < ny; j++) {
 			var y = grid.y0 + (j + 0.5) * grid.dy;
 			for (i = 0; i < nx; i++) {
 				var x = grid.x0 + (i + 0.5) * grid.dx, c = j * nx + i;
 				val[c] = NaN; zone[c] = -1;
-				b = bucketOf(SB, grid, x, y);
-				if (b < 0) { continue; }
-				var m = 0, fb = bucketOf(FB, grid, x, y), f0 = fb >= 0 ? FB.start[fb] : 0, f1 = fb >= 0 ? FB.start[fb + 1] : 0;
-				for (k = SB.start[b]; k < SB.start[b + 1]; k++) {
-					var s = SB.items[k], ex = S.x1[s] - S.x0[s], ey = S.y1[s] - S.y0[s], L2 = ex * ex + ey * ey;
-					var t0 = L2 > 0 ? ((x - S.x0[s]) * ex + (y - S.y0[s]) * ey) / L2 : 0;
-					// THE WALL: only the part of a pipe on this side of a fault is seen. Its nearest
-					// point may lie through a fault while the rest of it is in plain view (a pipe the
-					// fault cuts across), so the visible part is narrowed and its own nearest point
-					// taken, rather than the whole pipe dropped: dropping it left a bare hole with a
-					// ragged edge beside Net3's pump 335 when the pump was off (Tom, 2026-10-03).
-					var tlo = 0, thi = 1, tries = 0, seen = false, t, px, py, d2;
-					for (;;) {
-						t = t0 < tlo ? tlo : (t0 > thi ? thi : t0);
-						px = S.x0[s] + t * ex; py = S.y0[s] + t * ey; d2 = (x - px) * (x - px) + (y - py) * (y - py);
-						if (d2 >= R2) { break; }
-						var block = null, q;
-						for (q = f0; q < f1 && !block; q++) {
-							var fl = faults[FB.items[q]];
-							if (crosses(x, y, px, py, fl.x0, fl.y0, fl.x1, fl.y1)) { block = fl; }
-						}
-						if (!block) { seen = true; break; }
-						if (++tries > 4 || !(L2 > 0)) { break; }
-						// Where the pipe crosses the fault's line, and which end of it is on this side.
-						var gx = block.x1 - block.x0, gy = block.y1 - block.y0;
-						var sA = gx * (S.y0[s] - block.y0) - gy * (S.x0[s] - block.x0), sB = gx * (S.y1[s] - block.y0) - gy * (S.x1[s] - block.x0);
-						var sC = gx * (y - block.y0) - gy * (x - block.x0);
-						if ((sA > 0) === (sB > 0) || sA === sB || sC === 0) { break; }
-						var tc = sA / (sA - sB), eps = 1e-9;
-						if ((sC > 0) === (sA > 0)) { thi = Math.min(thi, tc - eps); } else { tlo = Math.max(tlo, tc + eps); }
-						if (!(tlo <= thi)) { break; }
-					}
-					if (!seen) { continue; }
-					cd[m] = Math.sqrt(d2); cv[m] = S.v0[s] + t * (S.v1[s] - S.v0[s]); cz[m] = S.zone[s]; m++;
-				}
-				if (!m) { continue; }
-				// The nearest pipe decides the zone; only that zone's pipes are averaged.
-				var best = 0;
-				for (k = 1; k < m; k++) { if (cd[k] < cd[best]) { best = k; } }
-				var z = cz[best], d1 = cd[best], dOther = R;
-				for (k = 0; k < m; k++) { if (cz[k] !== z && cd[k] < dOther) { dOther = cd[k]; } }
-				edge[c] = dOther - d1;
-				if (d1 <= tiny) {
-					val[c] = cv[best];
-				} else {
-					var sw = 0, sv = 0;
-					for (k = 0; k < m; k++) {
-						if (cz[k] !== z) { continue; }
-						var d = cd[k] > tiny ? cd[k] : tiny, w = (R - d) / (R * d);
-						w *= w; sw += w; sv += w * cv[k];
-					}
-					val[c] = sv / sw;
-				}
-				zone[c] = z;
-				if (d1 <= inner) { alpha[c] = 1; }
-				else { var u = (R - d1) / (R - inner); alpha[c] = u * u * (3 - 2 * u); }
+				if (!probe(x, y, out)) { continue; }
+				val[c] = out.v; zone[c] = out.z; edge[c] = out.edge;
+				if (out.d1 <= inner) { alpha[c] = 1; }
+				else { var u = (R - out.d1) / (R - inner); alpha[c] = u * u * (3 - 2 * u); }
 			}
 		}
 		// THE SQUARES A FAULT RUNS THROUGH, so no contour line is drawn along the jump. Sampled at a
@@ -688,6 +787,7 @@
 		faultAcross: faultAcross,
 		gridAround: gridAround,
 		corridorField: corridorField,
+		faultReach: faultReach,
 		sampleField: sampleField,
 		cellAt: cellAt,
 		contourLines: contourLines,
