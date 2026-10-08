@@ -1,0 +1,121 @@
+{
+ "sprint": "1008c-wave0",
+ "description": "Adversarial Wave 0 on the 37 keys php dev/scripts/wave0_keyset.php --new-and-changed reports for sprint 1008c (all lpn_: export dialog, DXF export, workspace export/import, hover card); 5 keys Tom has ruled are excluded and 1 with a syn entry skipped. Each string was asked for every plausible reading, and every finding was checked against its call site. 4 are referred to Tom: 3 proposed English rewrites and 1 proposed $ec_lang_syn note. 6 are recorded dismissals; the other 27 keys had one reading and are not listed. No English or $ec_lang_syn was changed.",
+ "entries": [
+  {
+   "key": "lpn_pane_copy_heads",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "'headings' does not say which: the column headings the table shows, or row and column headings. Right-click menu item in a Tables pane (js/looped-network.js:28892); paneCopyTsv adds one row, the column headings with unit.",
+   "readings": [
+    "copy the selected cells with their column headings as a first row",
+    "copy the selected cells with both row and column headings"
+   ],
+   "disposition": "refer-to-human",
+   "resolution": "PROPOSED English: 'Copy with column headings'"
+  },
+  {
+   "key": "lpn_export_table_current",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "'Current' is a radio option under both Tables and Scenarios (js/looped-network.js:29716-29720). In a hydraulics tool a translator can read it as electric or water current, or as 'present time', rather than 'the one now selected'. 'All' pairs with it.",
+   "readings": [
+    "the table or scenario now selected",
+    "current, as flow of water or electricity",
+    "up to date, not out of date"
+   ],
+   "disposition": "refer-to-human",
+   "resolution": "PROPOSED syn: 'Current' (this radio, under Tables and Scenarios) means the one now selected, as opposed to All; it is never a flow or electric current. Alternative English: 'Selected only' / 'All'."
+  },
+  {
+   "key": "lpn_settings_hover_card_tip",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "'at any scale, fit or not' leaves 'fit' with no subject: fit what? The setting makes the hover card show the label even when the on-map label was dropped for lack of room (js/looped-network.js:51225). 'fit' also collides with 'zoom to fit'.",
+   "readings": [
+    "whether or not the label fits on the map at the current zoom",
+    "whether or not the map is zoomed to fit the network"
+   ],
+   "disposition": "refer-to-human",
+   "resolution": "PROPOSED English: 'Rest the pointer on a node, link or customer to see its label as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project.'"
+  },
+  {
+   "key": "lpn_file_export_workspace_tip",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "'the reading preferences of this page' is unexplained jargon: a translator cannot tell whether it means language, text size, or display toggles such as the run box, the area hint and the hover card. Same phrase in lpn_file_import_workspace_tip.",
+   "readings": [
+    "language or font settings for reading text",
+    "display toggles the visitor set, such as whether help bubbles and the hover card are shown"
+   ],
+   "disposition": "refer-to-human",
+   "resolution": "PROPOSED English (both keys): replace 'the reading preferences of this page' with 'the display options of this page, such as which help bubbles and the hover card are shown'."
+  },
+  {
+   "key": "lpn_workspace_imported",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "'Returned to their defaults: {r}' could mean settings that were reset, or settings that were returned to the file.",
+   "readings": [
+    "One reading: the count of stored settings the file did not hold, which were removed so the page uses its defaults (call site js/looped-network.js:42969). 'Settings applied' precedes it."
+   ],
+   "disposition": "dismissed",
+   "resolution": "One reading: the count of stored settings the file did not hold, which were removed so the page uses its defaults (call site js/looped-network.js:42969). 'Settings applied' precedes it."
+  },
+  {
+   "key": "lpn_dxf_note_shortened",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "'ends in three periods' might be read as literal sentence punctuation.",
+   "readings": [
+    "One reading: the shortened value ends in an ellipsis of three characters"
+   ],
+   "disposition": "dismissed",
+   "resolution": "One reading: the shortened value ends in an ellipsis of three characters; the DXF README states the rule plainly."
+  },
+  {
+   "key": "lpn_file_export_tables_heading",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "'Tables and libraries' might mean two separate things.",
+   "readings": [
+    "The tip (lpn_file_export_tables_tip) states that the tables export with a sheet for each library"
+   ],
+   "disposition": "dismissed",
+   "resolution": "The tip (lpn_file_export_tables_tip) states that the tables export with a sheet for each library; one reading."
+  },
+  {
+   "key": "lpn_dxf_note_geo",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "'in meters' could be read as the unit of the project.",
+   "readings": [
+    "The sentence says the lat/lon were converted to the UTM grid, in meters, not latitude and longitude"
+   ],
+   "disposition": "dismissed",
+   "resolution": "The sentence says the lat/lon were converted to the UTM grid, in meters, not latitude and longitude; one reading."
+  },
+  {
+   "key": "lpn_workspace_ignored",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "'Entries ignored because they were not recognized' could be read as the entries of the project.",
+   "readings": [
+    "Follows the workspace-applied message at js/looped-network.js:42971"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Follows the workspace-applied message at js/looped-network.js:42971; entries are those of the workspace file. One reading."
+  },
+  {
+   "key": "lpn_export_table_scn_note",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "'the scenario last calculated' could be the current scenario.",
+   "readings": [
+    "The note is shown only while Scenarios is All and says results exist for the last calculated one only (js/looped-network.js:29726)"
+   ],
+   "disposition": "dismissed",
+   "resolution": "The note is shown only while Scenarios is All and says results exist for the last calculated one only (js/looped-network.js:29726); one reading."
+  }
+ ]
+}
