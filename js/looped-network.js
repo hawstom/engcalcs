@@ -911,7 +911,7 @@ var EngCalcs = EngCalcs || {};
 		});
 		if (!specs.length) { return []; }
 		return Collide.placeLabelsFirstFit(rankNodeLabels(specs), obs,
-			{ pad: fs * LPN_ALIGNED_PAD_FRAC, leaderMin: leaderThreshold() });
+			{ pad: fs * LPN_ALIGNED_PAD_FRAC });
 	}
 	function shedAlignedForConflicts(fsNow, fs) {
 		// **NO PAD HERE.** LPN_ALIGNED_PAD_FRAC is 0.35 of a font size and grows the box on EVERY
@@ -1087,11 +1087,32 @@ var EngCalcs = EngCalcs || {};
 			if (!shedding.length) { return; }
 			shedding.forEach(function (a) {
 				a.gone++;
+				a.gone = shedRungsCertain(a, fsNow);
 				writeLabelGlyphs(a.le, a.l, keptLines(a.all, shedKeepSet(a.all, a.order, a.gone)), fsNow);
 			});
 			shedding.forEach(function (a) { measureLabelWidths(a.le); });
 			active = shedding;
 		}
+	}
+	// **A RUNG WHOSE ANSWER IS CERTAIN IS NOT DRAWN** (Task 681(b)). The length cascade above writes
+	// and measures every rung, and each rung is a forced layout of the whole drawing: with every link
+	// field on, Novato's pipes shed up to seventeen values, and the cascade was 42% of the label pass
+	// in Chrome. But the run of the next keep-set is known to within shedWidthFor()'s bearing error
+	// (1.8% worst, measured) before it is drawn, so a rung whose priced run clears its room by far
+	// more than that -- SHED_SKIP_REL of the run plus SHED_SKIP_EM of a font size -- would certainly
+	// be measured too long and shed again. Such a rung is passed over; the first rung that is not
+	// certain is drawn and measured exactly as before. So the cascade stops at the same content, and
+	// only the rungs that could not have stopped it are no longer drawn.
+	// `a.gone` is the rung about to be drawn; returns the rung to draw instead.
+	var SHED_SKIP_REL = 0.06, SHED_SKIP_EM = 0.5;
+	function shedRungsCertain(a, fsNow) {
+		var g = a.gone, s = state.s || 1, em = parseFloat(fsNow) || effectiveFontSize(), w;
+		while (g < a.order.length - 1) {
+			w = shedWidthFor(a.le, shedKeepSet(a.all, a.order, g), a.all);
+			if (w === null || !(w / s * (1 - SHED_SKIP_REL) - SHED_SKIP_EM * em > a.room)) { break; }
+			g++;
+		}
+		return g;
 	}
 	// **RE-DECIDE EVERY LINK LABEL'S CONTENT AT THE CURRENT ZOOM.** A shed is a decision about a
 	// RATIO -- the label's run against its segment -- and a label's run in world units is its pixel
@@ -2554,7 +2575,7 @@ var EngCalcs = EngCalcs || {};
 				rec.lbl.h = dataLabelBoxHeight(rec.ne.lineCount);
 				rec.lbl.lines = labelRowWidths(rec.ne);
 			});
-			placed = Collide.placeLabelsFirstFit(nodeLabels, obs, { pad: pad, leaderMin: leaderThreshold() });
+			placed = Collide.placeLabelsFirstFit(nodeLabels, obs, { pad: pad });
 			rungs++;
 		}
 		lastNodeShedRungs = rungs;
@@ -2803,7 +2824,7 @@ var EngCalcs = EngCalcs || {};
 		// second, cruder mechanism reaching the same situation by another door, and a reader cannot
 		// tell the two apart. If a node label still cannot fit once link labels have shed, it drops.
 		var pad = fs * LPN_ALIGNED_PAD_FRAC,
-			nodePlaced = Collide.placeLabelsFirstFit(nodeLabels, obs, { pad: pad, leaderMin: leaderThreshold() });
+			nodePlaced = Collide.placeLabelsFirstFit(nodeLabels, obs, { pad: pad });
 		// **AND THEN THE ONES THAT DID NOT FIT GIVE UP A PROPERTY AND TRY AGAIN** (Task 469). This
 		// is the graceful rung the node half never had; the drop above is now its terminal one.
 		//
@@ -3286,7 +3307,7 @@ var EngCalcs = EngCalcs || {};
 	// one createScenario() makes -- renamable, deletable, editable -- holding at most a demand
 	// multiplier. The name is written in the visitor's language at birth because it is the user's
 	// data from then on, like a name typed at the New scenario prompt. The id is language-free and
-	// descriptive rather than s1..s7, so it keys the menu tip (lpn_scenario_preset_<id>_tip) and a
+	// descriptive rather than s1..s7, so it keys the menu tip (lpn_scenario_preset_<id>_tip; Max Day and Peak hour share lpn_scenario_preset_mult_tip) and a
 	// scenario the user adds next is still s1.
 	//
 	// **THE MULTIPLIERS: 2.0 FOR MAXIMUM DAY, 3.0 FOR PEAK HOUR**, times average day. National
@@ -3316,8 +3337,8 @@ var EngCalcs = EngCalcs || {};
 		{ id: 'flow_mid', key: 'lpn_scenario_preset_flow_mid', en: '2. Flow test: Mid' },
 		{ id: 'flow_max', key: 'lpn_scenario_preset_flow_max', en: '3. Flow test: Max' },
 		{ id: 'average_day', key: 'lpn_scenario_preset_average_day', en: '4. Average Day', dm: 1 },
-		{ id: 'max_day', key: 'lpn_scenario_preset_max_day', en: '5. Max Day', dm: 2 },
-		{ id: 'peak_hour', key: 'lpn_scenario_preset_peak_hour', en: '6. Peak hour', dm: 3 },
+		{ id: 'max_day', key: 'lpn_scenario_preset_max_day', en: '5. Max Day', dm: 2, range: [1.2, 3.0] },
+		{ id: 'peak_hour', key: 'lpn_scenario_preset_peak_hour', en: '6. Peak hour', dm: 3, range: [3.0, 6.0] },
 		{ id: 'fire_max_day', key: 'lpn_scenario_preset_fire_max_day', en: '7. Fire plus max day', dm: 2 }
 	];
 	function presetScenarios() {
@@ -3334,7 +3355,15 @@ var EngCalcs = EngCalcs || {};
 	function presetScenarioTip(s) {
 		var pc = EngCalcs.pageConfig || {}, i;
 		for (i = 0; i < LPN_PRESET_SCENARIOS.length; i++) {
-			if (LPN_PRESET_SCENARIOS[i].id === s.id) { return pc[LPN_PRESET_SCENARIOS[i].key + '_tip']; }
+			if (LPN_PRESET_SCENARIOS[i].id === s.id) {
+				var p = LPN_PRESET_SCENARIOS[i];
+				// Max day and peak hour share one sentence; the numbers are filled in here.
+				if (p.range) {
+					return (pc.lpn_scenario_preset_mult_tip || 'Demand multiplier {mult} times average day, a placeholder value. Most systems fall between {lo} and {hi} (National Research Council, 2006). Set the value for the system being modeled in Settings, Calculation, Hydraulics, Demand multiplier.')
+						.replace('{mult}', p.dm.toFixed(1)).replace('{lo}', p.range[0].toFixed(1)).replace('{hi}', p.range[1].toFixed(1));
+				}
+				return pc[p.key + '_tip'];
+			}
 		}
 		return undefined;
 	}
@@ -5079,7 +5108,7 @@ var EngCalcs = EngCalcs || {};
 				fn: function () { closeMenu(); openScenarioCompareBox(); }
 			},
 			{
-				icon: 'info', label: pc.lpn_reports_epanet || 'Run (EPANET)',
+				icon: 'info', label: pc.lpn_reports_epanet || 'Run',
 				tip: pc.lpn_time_run_report_tip,
 				// **SHOWN, OR EXPLAINED -- never an empty box.** The row is always here rather than
 				// hidden when there is nothing to show: a row that disappears teaches nobody that
@@ -5101,7 +5130,7 @@ var EngCalcs = EngCalcs || {};
 			// carries the word so no row has to, the same rule "EPANET run" (not "EPANET run
 			// report") already follows two rows up. The BOX TITLES keep the full names.
 			{
-				icon: 'info', label: pc.lpn_reports_status || 'Status (EPANET)',
+				icon: 'info', label: pc.lpn_reports_status || 'Status changes',
 				tip: pc.lpn_reports_status_tip,
 				fn: function () { closeMenu(); openStatusReportBox(); }
 			},
@@ -9092,7 +9121,7 @@ var EngCalcs = EngCalcs || {};
 		// WHICH LINKS JOIN, AND WHICH ARE WALLS. An open pipe (a check valve is a pipe, closed when it
 		// is shut) and an open throttle control valve, which is a loss like a pipe's, join. A pump,
 		// every other valve and anything closed is a wall: head jumps across it.
-		var joins = [], lens = [], dataLinks = [], walls = [], geomPts = [];
+		var joins = [], lens = [], dataLinks = [], walls = [], geomPts = [], linkPolys = [];
 		doc.links.forEach(function (l) {
 			if (!isActive(l)) { return; }
 			var a = allIdx[l.from], b = allIdx[l.to];
@@ -9102,6 +9131,7 @@ var EngCalcs = EngCalcs || {};
 			var len = 0, i;
 			for (i = 0; i + 1 < pts.length; i++) { len += Math.sqrt(Math.pow(pts[i + 1].x - pts[i].x, 2) + Math.pow(pts[i + 1].y - pts[i].y, 2)); }
 			pts.forEach(function (p) { geomPts.push(p.x, p.y); });
+			linkPolys.push(pts);
 			// The reach's scale is every pipe as drawn, open or closed: how far apart the network's
 			// nodes are does not change when a valve shuts.
 			if (l.type === 'pipe') { lens.push(len); }
@@ -9153,8 +9183,19 @@ var EngCalcs = EngCalcs || {};
 		// nothing else would stop the colour running across it. A fault on every barrier sliced a
 		// pump station's short links into wedges with no pipe visible in them (Net3's pump 335, its
 		// bypass 330 and pipe 333: a bare hole in the one loop they make).
+		//
+		// EACH FAULT IS THEN CUT TO ITS OWN LINK'S BREAK (faultReach() in js/lpn-contour.js, Tom,
+		// 2026-10-07): laid the reach each side, it keeps the stretch nearer its link than any other
+		// link and breaking the surface no more than the link does plus half a contour interval, and
+		// the field, the contour lines and the drawn break line all use that shortened fault. Over
+		// the ground the field is head in metres, so the half interval is turned into head.
 		var faults = walls.filter(function (w) { return zoneOf[allIdx[w.from]] === zoneOf[allIdx[w.to]]; })
 			.map(function (w) { return C.faultAcross(w.pts, R); }).filter(Boolean);
+		if (faults.length && grid && segs.length) {
+			var toShown = useHeads ? contourGroundScale() : 1, vlo = Infinity, vhi = -Infinity;
+			Object.keys(val).forEach(function (id) { vlo = Math.min(vlo, val[id] * toShown); vhi = Math.max(vhi, val[id] * toShown); });
+			faults = C.faultReach(faults, linkPolys, C.segmentSet(segs), grid, R, { slack: contourIntervalOf(field, vlo, vhi) / 2 / toShown });
+		}
 		return { nodes: nVal, pipes: dataLinks.length, segs: segs, faults: faults, R: R, med: med, grid: grid,
 			walls: walls.map(function (w) { return w.pts; }) };
 	}
@@ -9203,19 +9244,22 @@ var EngCalcs = EngCalcs || {};
 		var w = grid.nx * grid.dx, h = grid.ny * grid.dy, cell = Math.max(w, h) / CONTOUR_DEM_CELLS;
 		return { x0: grid.x0, y0: grid.y0, dx: cell, dy: cell, nx: Math.max(2, Math.ceil(w / cell)), ny: Math.max(2, Math.ceil(h / cell)) };
 	}
+	// One metre of head as the displayed pressure: the specific gravity times the unit's factor.
+	function contourGroundScale() {
+		var sg = (settings.hydraulics && typeof settings.hydraulics.specificGravity === 'number' &&
+			isFinite(settings.hydraulics.specificGravity)) ? settings.hydraulics.specificGravity : 1;
+		return sg * toDisplay(1, resultUnit('pressure'));
+	}
 	// The pressure in the display unit at every cell, from head interpolated and ground subtracted.
 	function contourSubtractGround(F, grid, ground) {
-		var C = EngCalcs.lpnContour, i, j,
-			sg = (settings.hydraulics && typeof settings.hydraulics.specificGravity === 'number' &&
-				isFinite(settings.hydraulics.specificGravity)) ? settings.hydraulics.specificGravity : 1,
-			f = toDisplay(1, resultUnit('pressure'));
+		var C = EngCalcs.lpnContour, i, j, k = contourGroundScale();
 		for (j = 0; j < grid.ny; j++) {
 			for (i = 0; i < grid.nx; i++) {
 				var c = j * grid.nx + i;
 				if (!isFinite(F.val[c])) { continue; }
 				var e = C.sampleField(ground.elev, ground.grid, grid.x0 + (i + 0.5) * grid.dx, grid.y0 + (j + 0.5) * grid.dy);
 				if (!isFinite(e)) { var cc = C.cellAt(ground.grid, grid.x0 + (i + 0.5) * grid.dx, grid.y0 + (j + 0.5) * grid.dy); e = cc >= 0 ? ground.elev[cc] : NaN; }
-				F.val[c] = isFinite(e) ? (F.val[c] - e) * sg * f : NaN;
+				F.val[c] = isFinite(e) ? (F.val[c] - e) * k : NaN;
 				if (!isFinite(F.val[c])) { F.alpha[c] = 0; }
 			}
 		}
@@ -9286,21 +9330,23 @@ var EngCalcs = EngCalcs || {};
 		return canvas.toDataURL('image/png');
 	}
 	// The break lines: every boundary between two coloured zones, traced from the field, and each
-	// fault cut to the run of it round the link's midpoint that lies over colour.
+	// fault (already cut to its own link's break by contourNetwork()) cut again to the run of it
+	// round the link that lies over colour.
 	function contourWallLines(grid, F) {
 		// A zone boundary is drawn only within the reach of the pump, valve or closed link that makes
 		// it, so it crosses the corridor there and never runs on across open land.
 		var C = EngCalcs.lpnContour, out = C.clipNear(C.zoneBreaks(F, grid, { minAlpha: 0.2, smooth: 2 }), contourWalls, contourReach);
 		contourFaults.forEach(function (f) {
-			var n = 40, s;
-			// From the middle outward in both directions, while the colour lasts.
+			var n = 40, s, gx = f.x1 - f.x0, gy = f.y1 - f.y0, g2 = gx * gx + gy * gy;
+			// From the link outward in both directions, while the colour lasts. The wall may have
+			// been cut more on one side than the other, so the link is not always its middle.
 			function covered(t) {
-				var x = f.x0 + t * (f.x1 - f.x0), y = f.y0 + t * (f.y1 - f.y0), c = C.cellAt(grid, x, y);
+				var x = f.x0 + t * gx, y = f.y0 + t * gy, c = C.cellAt(grid, x, y);
 				return c >= 0 && F.alpha[c] >= 0.2;
 			}
-			var lo = 0.5, hi = 0.5;
-			for (s = 1; s <= n / 2; s++) { if (covered(0.5 - s / n)) { lo = 0.5 - s / n; } else { break; } }
-			for (s = 1; s <= n / 2; s++) { if (covered(0.5 + s / n)) { hi = 0.5 + s / n; } else { break; } }
+			var tm = g2 > 0 ? Math.max(0, Math.min(1, ((f.mx - f.x0) * gx + (f.my - f.y0) * gy) / g2)) : 0.5, lo = tm, hi = tm;
+			for (s = 1; s <= n; s++) { var a = Math.max(0, tm - s / n); if (covered(a)) { lo = a; } else { break; } if (a === 0) { break; } }
+			for (s = 1; s <= n; s++) { var b = Math.min(1, tm + s / n); if (covered(b)) { hi = b; } else { break; } if (b === 1) { break; } }
 			if (hi - lo < 2 / n) { return; }
 			out.push([f.x0 + lo * (f.x1 - f.x0), f.y0 + lo * (f.y1 - f.y0), f.x0 + hi * (f.x1 - f.x0), f.y0 + hi * (f.y1 - f.y0)]);
 		});
@@ -33824,6 +33870,9 @@ var EngCalcs = EngCalcs || {};
 			'lpn_notesbox', 'lpn_hotkeysbox',
 			// 'lpn_snipbox' (the Screenshot box and its magnification) joined the day it was written.
 			'lpn_snipbox',
+			// 'lpn_statusbox' and 'lpn_fullbox' were missed on the days they were written; 'lpn_dockbox'
+			// (docks of the boxes with no record of their own) joined the day it was.
+			'lpn_statusbox', 'lpn_fullbox', 'lpn_dockbox',
 			// AREA_HINT_KEY joined 2026-09-09, having been missed on the day it was written.
 			// dev/cookie-storage-inventory.md already filed it beside PAGE_TITLES_KEY as a reading
 			// preference set deliberately on this screen, so the document and the code disagreed
@@ -35932,25 +35981,25 @@ var EngCalcs = EngCalcs || {};
 	// than any filename scheme, because a file in a forgotten folder is exactly the file somebody
 	// renamed. With that carried inside, the suffix only has to disambiguate at a glance.
 	//
-	// **THE EXTENSION IS `.lwn`, AND THE NAME IS STABLE** (Task 246). Tom, 2026-08-21: *"I bought
-	// LibreWaterNet.org, and it points to lpn. I feel that is a stable name: lwn"*. That is the
-	// trigger Task 315 was waiting for -- the argument for staying on `.json` was that an extension
-	// would encode a product name that did not exist yet, and now it does.
+	// **THE EXTENSION WE WRITE IS `.epp`** (Tom, 2026-10-07: EPANET++ is the application's name;
+	// Task 780). It replaces `.lwn` (Task 246, 2026-08-21, when LibreWaterNet.org was the name).
 	//
-	// **JSON INSIDE, `.lwn` OUTSIDE.** Nothing about the document changes; serializeProject() still
-	// writes JSON and acceptImportedText() still parses it, so a `.lwn` renamed to `.json` opens in
-	// any text editor exactly as before. The extension is a name for the KIND of document, which is
-	// the one thing a filename can carry that the file's own `format` key cannot: it is what the OS
-	// sorts, filters and (one day) associates on.
-	var LPN_FILE_EXT = '.lwn';
-	// **A FILE SAVED AS `.json` STILL OPENS, FOREVER.** Every project written before this wears it,
-	// and stranding somebody's documents to tidy up an extension would be the worst trade this page
-	// could make. Read on open, never written.
+	// **JSON INSIDE, `.epp` OUTSIDE.** Nothing about the document changes, and nothing in it names
+	// the extension: serializeProject() still writes the same JSON with the same `format` key and
+	// acceptImportedText() still parses it, so an `.epp` renamed to `.json` opens in any text
+	// editor exactly as before. The extension is a name for the KIND of document, which is what the
+	// OS sorts, filters and (one day) associates on.
+	var LPN_FILE_EXT = '.epp';
+	// **A FILE SAVED AS `.lwn` OR `.json` STILL OPENS, FOREVER.** Every project written before
+	// 2026-10-07 wears one of them, and stranding somebody's documents to tidy up an extension would
+	// be the worst trade this page could make. Read on open, never written.
+	var LPN_FILE_EXT_LWN = '.lwn';
 	var LPN_FILE_EXT_LEGACY = '.json';
+	var LPN_FILE_EXTS_READ = [LPN_FILE_EXT, LPN_FILE_EXT_LWN, LPN_FILE_EXT_LEGACY];
 	// **NEW FILES CARRY NO `-lpn` SUFFIX ANY MORE.** It existed for exactly one reason -- with a
 	// generic `.json` extension, something in the NAME had to say what the file was at a glance --
-	// and `.lwn` says it better, in the place an operating system actually looks. `Elm-Street.lwn`
-	// beats `Elm-Street-lpn.json`, and `Elm-Street-lpn.lwn` would be saying it twice.
+	// and `.epp` says it better, in the place an operating system actually looks. `Elm-Street.epp`
+	// beats `Elm-Street-lpn.json`, and `Elm-Street-lpn.epp` would be saying it twice.
 	//
 	// Both suffixes are still STRIPPED on the way in, forever: see projectNameFromFileName(), where
 	// getting this wrong silently renames a user's project on its next save.
@@ -36321,7 +36370,7 @@ var EngCalcs = EngCalcs || {};
 				.replace('{n}', String(types.ids.length)).replace('{t}', String(types.detail || '?')));
 		}
 		if (custs) {
-			said.push((pc.lpn_inp_export_flat_customers || 'An EPANET file has no customers. The demand of the {n} customers in this project goes into the file as a demand row on the junction each one is added to, and each row is named with the customer’s tag. What the file cannot hold is the customer: where it sits, which pipe serves it, where along that pipe the service connects, and how many services one customer stands for. Your own project file keeps all of that.')
+			said.push((pc.lpn_inp_export_flat_customers || 'An EPANET file has no customers. The demand of the {n} customers in this project is written as a demand row on the junction each customer is assigned to, named with the customer\'s tag. The file does not record the customer itself: its location, the pipe that serves it, where along that pipe the service connects, or how many services it represents. That information remains in the project; save the project file to keep it.')
 				.replace('{n}', String(custs.ids.length)));
 		}
 		if (coords) {
@@ -37129,7 +37178,7 @@ var EngCalcs = EngCalcs || {};
 			case 'mixing': return pc.lpn_inp_drop_sources_mixing || 'This file states where a chemical is injected into the network and how water mixes in each tank. Each source is shown on the node where it is applied, and each tank shows its mixing model. Both are used when the network is run over a total run time.';
 			case 'energy': return pc.lpn_inp_drop_energy || 'This EPANET file includes pumping cost modelling data. This page reads it and uses it. Run the model, then open Water, Reports, Pump energy to see how long each pump ran, the power it drew, the energy it used and what that cost. The lines are kept, and they are written back if you save an EPANET file.';
 			case 'tags': return pc.lpn_inp_drop_tags || 'This file assigns tags to some junctions, pipes, or other assets. Every tag was imported and appears in the properties of its asset, where it can be viewed or edited.';
-			case 'report': return pc.lpn_inp_drop_report || 'This file contains EPANET report-format settings. The EPANET run report is available under Reports, EPANET run, but it uses the standard EPANET format rather than the format these settings specify. The lines are kept and are written back if you save an EPANET file.';
+			case 'report': return pc.lpn_inp_drop_report || 'This file contains EPANET report-format settings. The run report is available under Reports, Run, but it uses the standard EPANET format rather than the format these settings specify. The lines are kept and are written back if you save an EPANET file.';
 			// The ids on this one are the SECTION NAMES, which is the only true thing we can say
 			// about a part of the format nobody here has read.
 			case 'other-sections': return pc.lpn_inp_drop_sections || 'This file holds a section that this page does not read at all. Nothing here uses it. It is kept whole, and it is written back if you save an EPANET file.';
@@ -38797,7 +38846,7 @@ var EngCalcs = EngCalcs || {};
 	var fileWriteBusy = false;   // a write is in flight; never start a second one over it
 	var fileError = false;
 	function fileApiAvailable() { return typeof window.showSaveFilePicker === 'function'; }
-	// **WHAT WE WRITE.** One extension, ours, so a Save-as picker offers `.lwn` and nothing else --
+	// **WHAT WE WRITE.** One extension, ours, so a Save-as picker offers `.epp` and nothing else --
 	// a save that can produce two extensions is a library where half the documents are invisible to
 	// the other half's filter.
 	function fileTypes() {
@@ -38812,7 +38861,7 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {};
 		return [{
 			description: pc.lpn_file_type_desc || 'Project file',
-			accept: { 'application/json': [LPN_FILE_EXT, LPN_FILE_EXT_LEGACY] }
+			accept: { 'application/json': LPN_FILE_EXTS_READ }
 		}];
 	}
 	// Same honesty rule setStorageError() follows: a user who thinks they are editing a file must be
@@ -39125,13 +39174,13 @@ var EngCalcs = EngCalcs || {};
 	// is harmless while the strips stay `$`-ANCHORED. dev/lpn-spike/file-naming-harness.js pins both.
 
 	function projectNameFromFileName(fname) {
-		// Either extension, because either can arrive: `.lwn` is what we write now and `.json` is
-		// what every file saved before Task 246 wears. Built from the constants rather than typed,
+		// Any of the three, because any can arrive: `.epp` is what we write now, `.lwn` what files
+		// saved from Task 246 to Task 780 wear, and `.json` what every file before that wears. Built from the constants rather than typed,
 		// so a future extension cannot be added in one place and forgotten in the other.
-		// The dot is escaped: an unescaped `.lwn` would also match `Xalwn`, which is a silent
+		// The dot is escaped: an unescaped `.epp` would also match `Xaepp`, which is a silent
 		// one-character rename of somebody's project rather than a visible bug.
 		var extRe = new RegExp('(' +
-				[LPN_FILE_EXT, LPN_FILE_EXT_LEGACY].join('|').replace(/\./g, '\\.') + ')$', 'i'),
+				LPN_FILE_EXTS_READ.join('|').replace(/\./g, '\\.') + ')$', 'i'),
 			s = String(fname).replace(extRe, ''),
 			lower = s.toLowerCase();
 		if (lower.slice(-LPN_FILE_SUFFIX_LEGACY.length) === LPN_FILE_SUFFIX_LEGACY) {
@@ -41544,7 +41593,7 @@ var EngCalcs = EngCalcs || {};
 		// for Tom's words and the reasoning. Each is asked separately rather than as one group, so
 		// an Escape inside Settings costs Settings and leaves an open Properties box alone: one
 		// press, one thing, which is the rule the rest of this handler already keeps.
-		if (escapeOwnsBox('lpn_popup')) { closePopup(); }
+		if (escapeOwnsBox('lpn_popup')) { closePopup(true); }
 		if (escapeOwnsBox('lpn_settings_box')) { closeSettingsBox(); }
 		if (escapeOwnsBox('lpn_library_box')) { closeLibraryBox(); }
 		// ...and the examples wall, which was the ONE overlay Escape could not reach. Guarded on
@@ -44912,6 +44961,7 @@ var EngCalcs = EngCalcs || {};
 		wireBoxDocking();
 		dockBooting = true;
 		restoreOpenBoxes();
+		restoreDockedShared();
 		dockBooting = false;
 		// **The banner has to be painted on the BOOT path too.** refreshAllFromDocument() ends with
 		// this call but is shared by openProject() and newProject() only, so the one situation the
@@ -46145,19 +46195,10 @@ var EngCalcs = EngCalcs || {};
 				logLpnFirstAction('element');
 				addText(w.x, w.y, nearNode ? nearNode.id : null,
 					nearLink ? { link: nearLink.link.id, t: nearLink.t } : null);
-				// **AND THE TOOL PUTS ITSELF DOWN, WHICH IS WHY A NEW TEXT COULD NOT BE DRAGGED**
-				// (Tom, 2026-09-08: *"I add a Text. It can't be dragged."*). pointerdown returns
-				// before it arms any drag while the mode still begins with `add-`, so the Text you
-				// had just placed was the one Text on the drawing you could not pick up -- until
-				// you noticed the toolbar was still holding the tool. Nothing was wrong with the
-				// element: an OLD Text behaved differently only because reaching one meant leaving
-				// the tool first.
-				//
-				// The branch three lines above already does exactly this when the tap lands on an
-				// existing Text, so this is the two halves of one gesture agreeing rather than a
-				// new rule. A Text is a one-shot placement, unlike a junction, where drawing ten in
-				// a row is the normal way to use the tool.
-				setMode('select');
+				// **THE TOOL STAYS ARMED, LIKE EVERY OTHER INSERTER** (Tom, 2026-10-07: *"All
+				// inserters should be in repeater mode. Text is not."*). A tap on a Text already there
+				// still opens it and leaves the tool (the branch above), which is what keeps a second
+				// tap from stacking a duplicate. Esc or another tool ends the repeat.
 			}
 			else if (mode === 'add-chain') {
 				chainTap(e, w, t);
@@ -51463,7 +51504,7 @@ var EngCalcs = EngCalcs || {};
 		if (!el) { return; }
 		hideTipsIn(el);
 		// A docked box gives its column back to the map once it is closed (Task 441).
-		if (el.__lpnDock) { dockLayoutSoon(); }
+		if (el.__lpnDock) { dockNoteOpen(el.__lpnDock, false); dockLayoutSoon(); }
 		el.style.display = 'none';
 	}
 	function openSettingsBox(section) {
@@ -51608,6 +51649,11 @@ var EngCalcs = EngCalcs || {};
 		if (contourboxLayout.open) { openContourBox(); }
 		if (cmpboxLayout.open) { openScenarioCompareBox(); }
 		if (rptboxLayout.open) { openRunReportBox(true); }
+		// The Status and Full reports kept `open` on their records from the day they were written
+		// and were never asked for it here, so a docked one vanished on every reload (Tom,
+		// 2026-10-07: *"All the docks I make need to be remembered."*).
+		if (statusboxLayout.open) { openStatusReportBox(); }
+		if (fullboxLayout.open) { openFullReportBox(); }
 		// The Notes box (Tom, 2026-09-28), after the reports and before Find for the same stacking
 		// reason: Find is the smallest and ends up on top.
 		if (notesboxLayout.open) { openNotesBox(); }
@@ -52112,13 +52158,13 @@ var EngCalcs = EngCalcs || {};
 	// untouched, so every isOpen() and every rebuild on this page goes on treating it as open -- it
 	// is only invisible and untouchable.
 	//
-	// **STORAGE: NO NEW KEY.** `dock` ('left' or 'right'), `autohide` (true) and `dockW` (the docked
+	// **STORAGE.** `dock` ('left' or 'right'), `autohide` (true) and `dockW` (the docked
 	// width, px) ride on the furniture record each box ALREADY keeps, the way `open` and `ix` joined
 	// theirs: same purpose, same category, the same row of dev/cookie-storage-inventory.md. Each is
 	// absent while it is the default, so a visitor who never docks anything stores nothing new. The
 	// five boxes that keep no record across a reload (Properties, Criticality, Demand scaling,
-	// Alternatives, Calibration) dock for this page load only -- the ruling they already carry for
-	// their corner.
+	// Alternatives, Calibration) keep their docks in one key of their own, `lpn_dockbox` (see
+	// saveDockShared()); where they float still lasts one page load.
 	//
 	// **NOT ON A PHONE.** Below the one breakpoint every box fills the window (placePanelForScreen()),
 	// so there is no column to dock into: the dock buttons are not offered there, and a box that is
@@ -52146,12 +52192,89 @@ var EngCalcs = EngCalcs || {};
 		try { raw = localStorage.getItem(key); } catch (e) { return; }
 		if (!raw) { return; }
 		try { v = JSON.parse(raw); } catch (e) { return; }
+		readDockFields(v, rec);
+	}
+	function readDockFields(v, rec) {
 		if (!v || typeof v !== 'object') { return; }
 		if (v.dock === 'left' || v.dock === 'right') { rec.dock = v.dock; }
 		if (v.autohide === true) { rec.autohide = true; }
 		if (typeof v.dockW === 'number' && isFinite(v.dockW) && v.dockW > 0) { rec.dockW = Math.round(v.dockW); }
 		// Where its flag sits along the bar: a rank among the flags, set by dragging one (or Alt+Arrow).
 		if (typeof v.dockOrd === 'number' && isFinite(v.dockOrd) && v.dockOrd >= 0) { rec.dockOrd = Math.round(v.dockOrd); }
+	}
+	// **A BOX WITH NO RECORD OF ITS OWN KEEPS ITS DOCKING HERE** (Tom, 2026-10-07: *"there seems to
+	// be a limit to the number of docks that are remembered on production. All the docks I make
+	// need to be remembered."*). Properties, Criticality, Demand scaling, Alternatives and
+	// Calibration keep no furniture record, so their docks lasted one page load: of fifteen docked
+	// boxes, five came back as nothing on every reload. One key holds, per box id, only the dock
+	// fields and whether the docked box is open; nothing of where the box floats, which stays the
+	// page-load-only ruling those boxes carry. An entry exists only while that box is docked, and
+	// the key is removed when none is, so a visitor who never docks one of them stores nothing.
+	// A box that gains a record of its own (registerDockBox() given a key) leaves this store by
+	// that fact alone.
+	var LPN_DOCKBOX_KEY = 'lpn_dockbox';
+	var dockShared = null;
+	function dockSharedLoad() {
+		var raw = null, v = null;
+		if (dockShared) { return dockShared; }
+		dockShared = {};
+		try { raw = localStorage.getItem(LPN_DOCKBOX_KEY); } catch (e) { return dockShared; }
+		if (!raw) { return dockShared; }
+		try { v = JSON.parse(raw); } catch (e) { return dockShared; }
+		if (v && typeof v === 'object') { dockShared = v; }
+		return dockShared;
+	}
+	function saveDockShared() {
+		var v = {}, n = 0;
+		dockBoxes.forEach(function (d) {
+			var r;
+			if (!d.shared || !d.rec.dock) { return; }
+			r = { dock: d.rec.dock, open: !!d.open };
+			if (d.rec.autohide) { r.autohide = true; }
+			if (d.rec.dockW) { r.dockW = d.rec.dockW; }
+			if (d.rec.dockOrd !== undefined) { r.dockOrd = d.rec.dockOrd; }
+			v[d.box.id] = r;
+			n++;
+		});
+		dockShared = v;
+		try {
+			if (n) { localStorage.setItem(LPN_DOCKBOX_KEY, JSON.stringify(v)); }
+			else { localStorage.removeItem(LPN_DOCKBOX_KEY); }
+		} catch (e) {}
+	}
+	// Opened or closed while docked: a box with its own record keeps `open` there already.
+	function dockNoteOpen(d, open) {
+		if (!d || !d.shared || !d.rec.dock || d.open === !!open) { return; }
+		d.open = !!open;
+		saveDockShared();
+	}
+	// **A NEWLY DOCKED BOX GOES TO THE BOTTOM OF ITS EDGE** (Tom, 2026-10-07: *"Is there a default
+	// order for docks? I am finding that my docks are not going to the bottom. Contour plot keeps
+	// scooting to the bottom."*). A box docked with no rank sorted after every ranked one, and the
+	// unranked ones among themselves by the order the page happens to wire them in, so a dragged
+	// strip put each new dock last while an undragged one slotted it in by wiring order. Every
+	// docked box now carries its rank from the moment it docks; a closed docked box keeps its slot.
+	function dockNextOrd(side, except) {
+		var m = -1;
+		dockBoxes.forEach(function (d) {
+			if (d !== except && d.rec.dock === side && d.rec.dockOrd !== undefined) { m = Math.max(m, d.rec.dockOrd); }
+		});
+		return m + 1;
+	}
+	function dockByOrd(a, b) {
+		var x = a.rec.dockOrd === undefined ? 1e9 : a.rec.dockOrd, y = b.rec.dockOrd === undefined ? 1e9 : b.rec.dockOrd;
+		return (x - y) || (dockBoxes.indexOf(a) - dockBoxes.indexOf(b));
+	}
+	// A record from before every dock carried a rank: ranked in memory, in the order it was already
+	// being shown, so the next dock lands after it. Stored only when that box is next saved.
+	function dockRankUnranked() {
+		['left', 'right'].forEach(function (s) {
+			var list = dockBoxes.filter(function (d) { return d.rec.dock === s; }).sort(dockByOrd), next = 0;
+			list.forEach(function (d) {
+				if (d.rec.dockOrd === undefined || d.rec.dockOrd < next) { d.rec.dockOrd = next; }
+				next = d.rec.dockOrd + 1;
+			});
+		});
 	}
 	function clampDockW(w, room) {
 		var max = Math.max(LPN_DOCK_MIN_W, Math.floor((window.innerWidth || 1000) * LPN_DOCK_MAX_FRAC));
@@ -52243,10 +52366,13 @@ var EngCalcs = EngCalcs || {};
 				r = d.box.getBoundingClientRect();
 				if (r.width > 0) { d.rec.dockW = Math.round(r.width); }
 			}
+			if (d.rec.dock !== act || d.rec.dockOrd === undefined) { d.rec.dockOrd = dockNextOrd(act, d); }
 			d.rec.dock = act;
+			d.open = true;
 		} else if (act === 'float') {
 			delete d.rec.dock;
 			delete d.rec.autohide;
+			delete d.rec.dockOrd;
 		} else if (act === 'autohide') {
 			if (d.rec.autohide) { delete d.rec.autohide; } else { d.rec.autohide = true; }
 		}
@@ -52265,6 +52391,7 @@ var EngCalcs = EngCalcs || {};
 		was = box.getBoundingClientRect();
 		delete d.rec.dock;
 		delete d.rec.autohide;
+		delete d.rec.dockOrd;
 		if (dockFlyout === d) { dockFlyout = null; }
 		if (d.save) { d.save(); }
 		layoutDocks();
@@ -52280,6 +52407,7 @@ var EngCalcs = EngCalcs || {};
 	function dockPlaced(box) {
 		var d = box && box.__lpnDock;
 		if (!d || !dockSideOf(d)) { return; }
+		dockNoteOpen(d, true);
 		if (d.rec.autohide && !dockBooting) { dockFlyout = d; }
 		layoutDocks();
 	}
@@ -52428,10 +52556,8 @@ var EngCalcs = EngCalcs || {};
 		// Flags lie along the bar in the order the visitor dragged them to (`dockOrd`); a box never
 		// dragged has none and follows, in the order the boxes were registered.
 		['left', 'right'].forEach(function (s) {
-			sides[s].auto.sort(function (a, b) {
-				var x = a.rec.dockOrd === undefined ? 1e9 : a.rec.dockOrd, y = b.rec.dockOrd === undefined ? 1e9 : b.rec.dockOrd;
-				return (x - y) || (dockBoxes.indexOf(a) - dockBoxes.indexOf(b));
-			});
+			sides[s].auto.sort(dockByOrd);
+			sides[s].pinned.sort(dockByOrd);
 		});
 		wr = wrap.getBoundingClientRect();
 		sr = svg.getBoundingClientRect();
@@ -52546,15 +52672,16 @@ var EngCalcs = EngCalcs || {};
 	// of each flag rides on its box's own record as `dockOrd` (no new key). Alt+Arrow does the same
 	// from the keyboard.
 	var LPN_FLAG_SLOP = 6;
+	// The flags on the bar take the ranks they already held, in their new order, so a closed docked
+	// box or a pinned one on the same edge keeps its place among them.
 	function dockCommitOrder(strip) {
-		var seen = [];
-		Array.prototype.forEach.call(strip.children, function (t, i) {
-			var d = t.lpnDock;
-			if (!d) { return; }
-			d.rec.dockOrd = i;
-			seen.push(d);
-		});
-		seen.forEach(function (d) { if (d.save) { d.save(); } });
+		var seen = [], ranks;
+		Array.prototype.forEach.call(strip.children, function (t) { if (t.lpnDock) { seen.push(t.lpnDock); } });
+		ranks = seen.map(function (d, i) { return d.rec.dockOrd === undefined ? 1e9 + i : d.rec.dockOrd; })
+			.sort(function (a, b) { return a - b; });
+		seen.forEach(function (d, i) { d.rec.dockOrd = ranks[i] >= 1e9 ? dockNextOrd(d.rec.dock, d) : ranks[i]; });
+		seen.forEach(function (d) { if (d.save && !d.shared) { d.save(); } });
+		if (seen.some(function (d) { return d.shared; })) { saveDockShared(); }
 	}
 	// The press is remembered here and the rest of the drag is judged on the STRIP, which holds the
 	// pointer capture: moving the flag's own node along the bar drops a capture held on that node, and
@@ -52648,8 +52775,14 @@ var EngCalcs = EngCalcs || {};
 	function registerDockBox(id, rec, save, key, tipKey) {
 		var box = document.getElementById(id), pc = EngCalcs.pageConfig || {}, x, row, d, tip;
 		if (!box || box.__lpnDock) { return; }
-		d = { box: box, rec: rec || {}, save: save || null, help: null, tab: null };
-		readDockRecord(key, d.rec);
+		d = { box: box, rec: rec || {}, save: save || null, help: null, tab: null, shared: !key, open: false };
+		if (d.shared) {
+			readDockFields(dockSharedLoad()[id], d.rec);
+			d.open = !!d.rec.dock && !!(dockSharedLoad()[id] || {}).open;
+			d.save = saveDockShared;
+		} else {
+			readDockRecord(key, d.rec);
+		}
 		row = document.createElement('div');
 		row.className = 'lpn-box-corner';
 		x = box.querySelector('.lpn-popover-x');
@@ -52682,6 +52815,22 @@ var EngCalcs = EngCalcs || {};
 	// whole strings joined in order (Task 759, Tom 2026-10-03: one `?` by the x of each Analyze box).
 	// Fire flow and Demand scaling build theirs (ffBoxTip(), dsBoxTip()): every paragraph that box
 	// used to show is in it, and some of those carry the engine and the units of the moment.
+	// **A DOCKED BOX WITH NO RECORD OF ITS OWN COMES BACK OPEN** if it was open when the page went
+	// away, by its own opener, in the boot restore beside the boxes that keep their own. Not on a
+	// phone, where every box fills the window and none is docked: its docking waits for a wider one.
+	function restoreDockedShared() {
+		var openers = {
+			lpn_popup: openPopupEmpty,
+			lpn_crit_box: openCriticalityBox,
+			lpn_ds_box: openDemandScaleBox,
+			lpn_alt_box: function () { if (!scenarioBasicMode) { openAlternativesBox(); } },
+			lpn_calib_box: openCalibBox
+		};
+		if (smallScreen()) { return; }
+		dockBoxes.slice().sort(dockByOrd).forEach(function (d) {
+			if (d.shared && d.rec.dock && d.open && openers[d.box.id] && !dockBoxShown(d)) { openers[d.box.id](); }
+		});
+	}
 	function wireBoxDocking() {
 		[
 			['lpn_popup', {}, null, null],
@@ -52703,6 +52852,7 @@ var EngCalcs = EngCalcs || {};
 			['lpn_notes_popup', notesboxLayout, saveNotesboxLayout, LPN_NOTESBOX_KEY],
 			['lpn_hotkeys_popup', hotkeysboxLayout, saveHotkeysboxLayout, LPN_HOTKEYSBOX_KEY]
 		].forEach(function (r) { registerDockBox(r[0], r[1], r[2], r[3], r[4]); });
+		dockRankUnranked();
 		document.addEventListener('pointerdown', dockCloseHelpTips, true);
 		dockWasSmall = smallScreen();
 		window.addEventListener('resize', function () {
@@ -55755,8 +55905,19 @@ var EngCalcs = EngCalcs || {};
 	// (Elevation+Demand for a junction, Fixed head for a reservoir, Diameter+Roughness+Length
 	// for a pipe). Pump curve entry isn't implemented -- see the scope doc's design note.
 	var currentPopup = null; // {kind:'node'|'link', id} -- lets a unit-strip change refresh the open popup in place
-	function closePopup() {
+	// **A DOCKED PROPERTIES BOX STAYS IN ITS DOCK WHEN NOTHING IS SELECTED**, saying so, the way a
+	// docked property palette does in every CAD program: Tom's docks are to be remembered, and one
+	// that vanished whenever a selection cleared could not be. Only its own X (or Escape) closes it;
+	// every other caller is a selection going away. A floating box closes as it always did.
+	function closePopup(explicit) {
 		var popup = document.getElementById('lpn_popup');
+		if (explicit !== true && boxIsDocked(popup) && dockBoxShown(popup.__lpnDock)) {
+			if (ghostShieldTimer) { clearTimeout(ghostShieldTimer); ghostShieldTimer = null; }
+			lastMapTapFinger = false;
+			popup.style.pointerEvents = '';
+			renderPopupEmpty();
+			return;
+		}
 		// AND THE GHOST-CLICK SHIELD COMES DOWN WITH THE BOX. A pending timer would otherwise
 		// restore `pointerEvents` on a popup that has since been reopened by a mouse, and a box
 		// closed inside the shield window would come back inert -- the same class of leak as the
@@ -55768,6 +55929,24 @@ var EngCalcs = EngCalcs || {};
 		// a sibling of the popup in document.body rather than a child of it. hidePanel() sweeps.
 		hidePanel(popup);
 		currentPopup = null;
+	}
+	function renderPopupEmpty() {
+		var pc = EngCalcs.pageConfig || {}, popup = document.getElementById('lpn_popup'),
+			title = document.getElementById('lpn_popup_title'), fields = document.getElementById('lpn_popup_fields'), p;
+		hideTipsIn(popup);
+		currentPopup = null;
+		title.textContent = '';
+		clearFields(fields);
+		p = document.createElement('p');
+		p.className = 'lpn-popup-none';
+		p.textContent = pc.lpn_popup_none || 'Nothing is selected. Select an asset on the map to see its properties.';
+		fields.appendChild(p);
+		propGraphSync();
+	}
+	// The docked box brought back by a reload, before anything is selected.
+	function openPopupEmpty() {
+		renderPopupEmpty();
+		openPopupAt(0, 0);
 	}
 	// DRAGGING THE PROPERTY POPUP. The grab surface is the popup's own CHROME -- the padded band
 	// around the body, where `e.target` is the popup element itself -- and never a child, which is
@@ -56037,7 +56216,7 @@ var EngCalcs = EngCalcs || {};
 	}
 	function wirePopup() {
 		var popup = document.getElementById('lpn_popup');
-		document.getElementById('lpn_popup_close').addEventListener('click', closePopup);
+		document.getElementById('lpn_popup_close').addEventListener('click', function () { closePopup(true); });
 		popup.addEventListener('keydown', function (e) { popupArrowKey(e, popup); });
 		makePanelDraggable(popup, function (at) { popupUserPos = at; });
 		popup.addEventListener('dblclick', function (e) {
@@ -66088,7 +66267,7 @@ var EngCalcs = EngCalcs || {};
 		if (!host) { return; }
 		host.innerHTML = '';
 		if (!frames.length) {
-			ffEl('p', 'lpn-ff-note', pc.lpn_status_needs_run || 'The status report lists what changed during an extended period simulation. Set a Total run time in Settings, Calculation, Time, press Calculate, then open Water, Reports, Status report.', host);
+			ffEl('p', 'lpn-ff-note', pc.lpn_status_needs_run || 'The status report lists what changed during an extended period simulation. Set a Total run time in Settings, Calculation, Time, press Calculate, then open Water, Reports, Status changes.', host);
 			return;
 		}
 		events = statusReportEvents();

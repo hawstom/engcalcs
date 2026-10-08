@@ -311,7 +311,9 @@ function extract(name) {
 // the ghost-click shield, which closePopup() lowers on the same line it hides the box -- the same
 // class of leak as a stranded tooltip and therefore the same fix site. hidePanel() comes with it
 // because closing a box now goes through that one seam (Task 562).
+// A floating popup is the case here: a docked one stays open with nothing selected (dock-memory-harness.js).
 vm.runInContext('var currentPopup = null, ghostShieldTimer = null, lastMapTapFinger = false;\n' +
+	'function boxIsDocked() { return false; }\nfunction dockBoxShown() { return false; }\n' +
 	extract('hideTipsIn') + '\n' + extract('hidePanel') + '\n' + extract('closePopup') +
 	'\n' + extract('sweepOrphanTips') + '\n' + extract('initTipsIn') +
 	'\nthis.lpnClosePopup = closePopup;' +

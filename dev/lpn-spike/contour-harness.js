@@ -17,8 +17,11 @@
 //      label the value of the field under it; timing.
 //   7. THE BOX: interval, opacity, fill, lines and labels redraw the layer; the menu row turns it on.
 //   8. RECALCULATE OFF IS A SNAPSHOT.
+//  2b. A WALL REACHES AS FAR AS ITS OWN LINK'S BREAK: halfway to the next pipe (known -1 to 1.5),
+//      and where nothing is near, to where it would break the surface by more than at its link
+//      plus half an interval (known from a hand-written Shepard average).
 //  8b. NET3 WITH PUMP 335 OFF: no bare hole beside the pump station; the break line reaches the
-//      buffer from its pump and no further.
+//      buffer from its pump and no further, and is 0.67 reaches long where it was 1.85.
 //   9. THE GROUND THROUGH THE PAGE (stubbed Mapbox DEM, consent).
 //  10. TWO ARMS THROUGH THE PAGE: a wide gap stays bare; a pump between them is a wall.
 //  11. A LARGER NETWORK: a generated 40 x 40 grid, for the timing.
@@ -107,6 +110,83 @@ head('2. A WALL');
 	const z = fieldOf([{ x0: 0, y0: 0, x1: 10, y1: 0, v0: 10, v1: 10, zone: 1 }, { x0: 0, y0: 2, x1: 10, y1: 2, v0: 90, v1: 90, zone: 2 }], [], 2.5, 300);
 	const z1 = at(z, 5, 0.9), z2 = at(z, 5, 1.1);
 	check(z1.v === 10 && z2.v === 90 && z1.z !== z2.z, `two zones a pipe-length apart: ${z1.v} | ${z2.v}, never a blend`);
+}
+
+head('2b. A WALL REACHES AS FAR AS ITS OWN LINK\'S BREAK (Tom, 2026-10-07)');
+{
+	// The barrier link runs (5, 0) to (6, 0); its fault, laid the reach R = 2.5 each side, is the line
+	// x = 5.5 from y = -2.5 to 2.5. A point (5.5, y) of it is |y| from the link.
+	const R = 2.5, link = [{ x: 5, y: 0 }, { x: 6, y: 0 }];
+	const wallOf = (segs, extra, slack, RR) => {
+		RR = RR || R;
+		const S = C.segmentSet(segs), grid = C.gridAround(S, RR, 300), f = C.faultAcross(link, RR);
+		const polys = [link].concat(segs.map((s) => [{ x: s.x0, y: s.y0 }, { x: s.x1, y: s.y1 }]), extra || []);
+		polys[0] = f.pts;
+		const out = C.faultReach([f], polys, S, grid, RR, { slack: slack || 0 });
+		return { f, w: out[0], S, grid };
+	};
+	const ys = (w) => [Math.min(w.y0, w.y1), Math.max(w.y0, w.y1)];
+	// RULE 1, NEAREST: A at 20 left of the link and B at 80 right of it, plus a pipe at y = 3 and one
+	// at y = -2 (crossing the fault), both 50, all one zone. The link is nearer than the y = 3 pipe
+	// while |y| <= 3 - y, so to y = 1.5; nearer than the y = -2 pipe while |y| <= 2 + y, so to y = -1.
+	// A and B are never nearer: a point of x = 5.5 is |y| from the link and sqrt(0.25 + y^2) from them.
+	const segs1 = [];
+	for (let x = 0; x < 5; x++) { segs1.push({ x0: x, y0: 0, x1: x + 1, y1: 0, v0: 20, v1: 20, zone: 0 }); }
+	for (let x = 6; x < 11; x++) { segs1.push({ x0: x, y0: 0, x1: x + 1, y1: 0, v0: 80, v1: 80, zone: 0 }); }
+	segs1.push({ x0: 0, y0: 3, x1: 11, y1: 3, v0: 50, v1: 50, zone: 0 }, { x0: 0, y0: -2, x1: 11, y1: -2, v0: 50, v1: 50, zone: 0 });
+	const W1 = wallOf(segs1, [], 2.5), [lo1, hi1] = ys(W1.w);
+	check(Math.abs(lo1 + 1) < 1e-4 && Math.abs(hi1 - 1.5) < 1e-4 && Math.abs(Math.abs(W1.w.x0 - 5.5)) < 1e-12,
+		`the wall stops halfway between its link and the next pipe each side: y ${lo1.toFixed(5)} to ${hi1.toFixed(5)}, known -1 to 1.5 (length ${(hi1 - lo1).toFixed(4)} of the full ${2 * R})`);
+	// The field is computed with that wall: a jump across it beside the link, none past its end.
+	const F1 = C.corridorField(W1.S, [W1.w], W1.grid, R, { fade: 0.4 });
+	const fat = (x, y) => F1.val[C.cellAt(W1.grid, x, y)];
+	const g = W1.grid.dx;
+	check(Math.abs(fat(5.5 + g, 0.5) - fat(5.5 - g, 0.5)) > 30, `beside the link the colour still jumps: ${fat(5.5 - g, 0.5).toFixed(1)} | ${fat(5.5 + g, 0.5).toFixed(1)}`);
+	const FN = C.corridorField(W1.S, [], W1.grid, R, { fade: 0.4 }), FW = C.corridorField(W1.S, [W1.f], W1.grid, R, { fade: 0.4 });
+	const at2 = (F, x, y) => F.val[C.cellAt(W1.grid, x, y)];
+	check(Math.abs(at2(F1, 5.5 - g, 2.0) - at2(FN, 5.5 - g, 2.0)) < 1e-9 && Math.abs(at2(F1, 5.5 + g, 2.0) - at2(FN, 5.5 + g, 2.0)) < 1e-9 &&
+		Math.abs(at2(FW, 5.5 - g, 2.0) - at2(FW, 5.5 + g, 2.0)) > 2 * Math.abs(at2(F1, 5.5 - g, 2.0) - at2(F1, 5.5 + g, 2.0)),
+		`a little past the wall's end the surface is the one with no wall at all (${at2(F1, 5.5 - g, 2.0).toFixed(2)} | ${at2(F1, 5.5 + g, 2.0).toFixed(2)}), where the full-buffer wall broke it (${at2(FW, 5.5 - g, 2.0).toFixed(2)} | ${at2(FW, 5.5 + g, 2.0).toFixed(2)})`);
+	const cutRows = [];
+	for (let j = 0; j < W1.grid.ny; j++) { for (let i = 0; i < W1.grid.nx; i++) { if (F1.cut[j * W1.grid.nx + i]) { cutRows.push(W1.grid.y0 + (j + 1) * W1.grid.dy); } } }
+	check(cutRows.length > 0 && Math.min(...cutRows) > -1 - 2 * g && Math.max(...cutRows) < 1.5 + 2 * g,
+		`the contour lines are cut only along the shortened wall: y ${Math.min(...cutRows).toFixed(2)} to ${Math.max(...cutRows).toFixed(2)}`);
+	// The 50 line runs up x = 5.5 between the two sides; past the wall's end it is drawn there, where
+	// the full-buffer wall cut it away.
+	const on50 = (F) => C.contourLines(F, W1.grid, [50], { smooth: 0 })[0].reduce((n, pl) => {
+		for (let m = 0; m < pl.pts.length; m += 2) { if (Math.abs(pl.pts[m] - 5.5) < g && pl.pts[m + 1] > 1.6 && pl.pts[m + 1] < 2.4) { n++; } }
+		return n;
+	}, 0);
+	check(on50(F1) > 0 && on50(FW) === 0, `so a contour line runs on past the wall's end: ${on50(F1)} points of the 50 line beside x = 5.5 above y = 1.6, against ${on50(FW)} with the full-buffer wall`);
+
+	// RULE 2, THE LINK'S OWN BREAK, at a reach of 5: no other pipe anywhere near, so rule 1 never
+	// stops the wall. A's
+	// value rises away from the link (50 at x = 5, plus 10 a unit to the left) and B's falls (50 at
+	// x = 6, less 10 a unit to the right): at the link the nearest pipes, both 50, rule; along the
+	// wall the farther ones count for more and the two sides draw apart. The oracle below is the
+	// Shepard average written out by hand: on the left each piece [k, k + 1] is seen at its end
+	// (k + 1, 0), on the right each [k, k + 1] at (k, 0).
+	const segs2 = [];
+	for (let x = 0; x < 5; x++) { segs2.push({ x0: x, y0: 0, x1: x + 1, y1: 0, v0: 50 + 10 * (5 - x), v1: 50 + 10 * (4 - x), zone: 0 }); }
+	for (let x = 6; x < 11; x++) { segs2.push({ x0: x, y0: 0, x1: x + 1, y1: 0, v0: 50 - 10 * (x - 6), v1: 50 - 10 * (x - 5), zone: 0 }); }
+	const R2 = 5;
+	function side(y, sgn) {
+		let sw = 0, sv = 0;
+		for (let k = 0; k < 5; k++) {
+			const px = sgn < 0 ? k + 1 : 6 + k, v = sgn < 0 ? 50 + 10 * (4 - k) : 50 - 10 * k, d = Math.hypot(5.5 - px, y);
+			if (d >= R2) { continue; }
+			const w = Math.pow((R2 - d) / (R2 * d), 2); sw += w; sv += w * v;
+		}
+		return sv / sw;
+	}
+	const jump = (y) => Math.abs(side(y, -1) - side(y, 1)), slack = 2.5, lim = jump(0) + slack;
+	let a = 0, b = 2;
+	for (let it = 0; it < 60; it++) { const m = (a + b) / 2; if (jump(m) <= lim) { a = m; } else { b = m; } }
+	const W2 = wallOf(segs2, [], slack, R2), [lo2, hi2] = ys(W2.w);
+	check(jump(2) > lim && Math.abs(hi2 - a) < 1e-4 && Math.abs(lo2 + a) < 1e-4,
+		`where nothing else is near, the wall stops where it would break the surface by more than its link does (${jump(0).toFixed(3)}) plus half an interval: |y| ${hi2.toFixed(5)}, known ${a.toFixed(5)}`);
+	const W2b = wallOf(segs2, [], 1000, R2), [lo3, hi3] = ys(W2b.w);
+	check(hi3 - lo3 > 2 * a + 0.5, `...and with no limit on the break it runs on: ${(hi3 - lo3).toFixed(3)} long`);
 }
 
 head('3. CONTOUR LINES AND LABELS');
@@ -548,6 +628,17 @@ byId.lpn_canvas.appendChild(byId.lpn_labels_legend);
 		const bpts = [].concat(...layerOf('lpn-contour-break').map(pathPts));
 		const worst = Math.max(...bpts.map(([x, y]) => dist(x, y, barriers)));
 		check(bpts.length >= 2 && worst <= Rr + g.dx, `the break line reaches at most the buffer from its pump: ${(worst / Rr).toFixed(3)} of the reach (${bpts.length} points)`);
+		// AND NO FARTHER THAN ITS PUMP'S OWN BREAK (Tom, 2026-10-07, on this very view: "The breakline
+		// is too long"). The full-buffer wall here was 1.85 reaches long; across the pump the surface
+		// breaks by 0.1 psi. Every point of the wall now lies at least as near pump 335 as any other
+		// link, so it stops short of bypass 330, and the whole of it is well under the full 2 reaches.
+		const allLinks = d.links.filter((l) => xy[l.from] && xy[l.to]).map((l) => ({ id: l.id, seg: [xy[l.from], xy[l.to]] }));
+		const p335seg = allLinks.find((q) => q.id === '335').seg, others = allLinks.filter((q) => q.id !== '335').map((q) => q.seg);
+		const nearer = bpts.filter(([x, y]) => dist(x, y, [p335seg]) > dist(x, y, others) + g.dx).length;
+		let wallLen = 0;
+		layerOf('lpn-contour-break').forEach((pth) => { const q = pathPts(pth); for (let i = 1; i < q.length; i++) { wallLen += Math.hypot(q[i][0] - q[i - 1][0], q[i][1] - q[i - 1][1]); } });
+		check(nearer === 0 && wallLen > 0.1 * Rr && wallLen < 0.8 * Rr,
+			`the wall at pump 335 is ${(wallLen / Rr).toFixed(2)} reaches long (1.85 before), every point of it nearer the pump than any other link (${nearer} not)`);
 		lk('335')._status = undefined; lk('330')._status = 'closed';
 		delete lk('335')._status;
 	}
