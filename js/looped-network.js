@@ -17966,7 +17966,7 @@ var EngCalcs = EngCalcs || {};
 	}
 	function clearHoverPreview() { setHoverPreview(null); }
 	/**
-	 * **THE HOVER CARD: AN ASSET'S FULL LABEL, AS IF EVERY FIELD WERE TICKED** (Task 773). Tom,
+	 * **THE HOVER CARD: AN ASSET'S LABEL PER SETTINGS, AT ANY SCALE, FIT OR NOT** (Task 773). Tom,
 	 * 2026-10-05: informative where labels are missing, and a clue to what a click will select;
 	 * 2026-10-08, relaying an outside tester: *"when we hover on an element, we see the full label
 	 * (as defined by the user in settings, of course)... Whether to show these should be a
@@ -17979,8 +17979,8 @@ var EngCalcs = EngCalcs || {};
 	 * never calls refreshLabelText() or any placement pass.
 	 *
 	 * **THE LINES COME FROM THE MAP LABEL'S OWN COMPOSERS** (nodeLabelFieldLines(),
-	 * linkLabelFieldLines(), customerLabelLines()), handed a copy of the label settings with every
-	 * field ticked. Same units, same decimals, same order, same prefixes and suffixes; a field with
+	 * linkLabelFieldLines(), customerLabelLines()), handed the live label settings (the fields
+	 * ticked there, and only those; the ID alone if none). Same units, same decimals, same order, same prefixes and suffixes; a field with
 	 * nothing to say (no solve yet, no quality analysis) is left out exactly as the label leaves it
 	 * out. Results show what the label would show, so the stale-snapshot rule holds without a line
 	 * of code of its own. One value to a line, not the link label's one-line concatenation: a card
@@ -18044,25 +18044,65 @@ var EngCalcs = EngCalcs || {};
 		var delay = (window.EngCalcs && EngCalcs.tipShowDelay) || 500;
 		hoverCard.timer = setTimeout(function () {
 			hoverCard.timer = null;
-			if (hoverPreview && hoverPreview.kind === sel.kind && hoverPreview.id === sel.id) { hoverCardShow(sel); }
+			if (hoverCard.sel && hoverCard.sel.kind === sel.kind && hoverCard.sel.id === sel.id) { hoverCardShow(sel); }
 		}, delay);
 	}
-	// A copy of the label settings with every field of every group ticked. The decimals, prefixes,
-	// suffixes and show order are the user's own and are shared, not copied.
-	function allFieldsTicked() {
-		var all = Object.assign({}, labelSettings);
+	// **THE CARD READS THE LABEL SETTINGS AS THEY STAND, NOT A COPY WITH EVERYTHING TICKED** (Tom,
+	// 2026-10-08: *"It should show per Settings. Not more and not less."*). It hands the map label's
+	// own composers the live `labelSettings`, so the fields, show order, decimals, prefixes and
+	// suffixes are the label's by construction. What it does NOT inherit is anything about the
+	// LABEL'S PLACEMENT: the labeling threshold (dataLabelsHidden) and the shed cascade (fit) act on
+	// the drawn glyphs after these composers have run, and the card never calls them, so it shows at
+	// any scale, fit or not. A group with nothing ticked (or nothing to say yet) shows the ID alone:
+	// the card has to name what it is resting on, and an asset's ID is the one field it always has.
+	function idOnlyLabelSettings() {
+		var only = Object.assign({}, labelSettings);
 		['node', 'link', 'customer'].forEach(function (g) {
-			all[g] = {};
-			Object.keys(labelSettings[g] || {}).forEach(function (k) { all[g][k] = true; });
+			only[g] = {};
+			Object.keys(labelSettings[g] || {}).forEach(function (k) { only[g][k] = (k === 'id'); });
 		});
-		return all;
+		return only;
+	}
+	function hoverCardLinesWith(sel, ls) {
+		var e;
+		if (sel.kind === 'node') { e = nodeById(sel.id); return e ? nodeLabelFieldLines(e, ls, null) : []; }
+		if (sel.kind === 'link') { e = linkById(sel.id); return e ? linkLabelFieldLines(e, ls, null) : []; }
+		if (sel.kind === 'customer') { e = customerById(sel.id); return e ? customerLabelLines(e, ls) : []; }
+		return [];
 	}
 	function hoverCardLines(sel) {
-		var all = allFieldsTicked(), e;
-		if (sel.kind === 'node') { e = nodeById(sel.id); return e ? nodeLabelFieldLines(e, all, null) : []; }
-		if (sel.kind === 'link') { e = linkById(sel.id); return e ? linkLabelFieldLines(e, all, null) : []; }
-		if (sel.kind === 'customer') { e = customerById(sel.id); return e ? customerLabelLines(e, all) : []; }
-		return [];
+		var lines = hoverCardLinesWith(sel, labelSettings).filter(function (l) { return l.text !== ''; });
+		return lines.length ? lines : hoverCardLinesWith(sel, idOnlyLabelSettings());
+	}
+	// **THE CARD IN DELETE AND THE LINK-DRAWING MODES** (Tom, 2026-10-08): the same card, for the
+	// thing the next click would act on (what you are about to delete; the node you are about to
+	// join). It paints no highlight (those modes have their own feedback) and takes no pointer
+	// events; a press dismisses it like anywhere else.
+	function hoverCardOtherMode() {
+		return mode === 'delete' || mode === 'add-pipe' || mode === 'add-pump' || mode === 'add-valve' || mode === 'add-chain';
+	}
+	var hoverCardOtherRaf = null, hoverCardOtherAt = null;
+	function hoverCardOtherTarget(x, y) {
+		var t = hoverTargetFromHit(mapHitAt(x, y));
+		if (mode === 'delete') { return t && t.kind !== 'label' ? t : null; }
+		if (t && t.kind === 'node') { return t; }
+		var near = nearestNodeNearScreen(x, y, 12);
+		return near ? { kind: 'node', id: near.id } : null;
+	}
+	function hoverCardOtherMove(e) {
+		if (e.pointerType === 'touch' || !hoverCardOtherMode() || drag) { return; }
+		hoverCardOtherAt = { x: e.clientX, y: e.clientY };
+		hoverCardNudge(e.clientX, e.clientY);
+		if (hoverCardOtherRaf) { return; }
+		hoverCardOtherRaf = requestAnimationFrame(function () {
+			hoverCardOtherRaf = null;
+			if (!hoverCardOtherMode() || drag || !hoverCardOtherAt) { return; }
+			var t = hoverCardOtherTarget(hoverCardOtherAt.x, hoverCardOtherAt.y), cur = hoverCard.sel;
+			if (t && !selectionExists(t)) { t = null; }
+			if ((!t && !cur) || (t && cur && t.kind === cur.kind && t.id === cur.id)) { return; }
+			hoverCard.x = hoverCardOtherAt.x; hoverCard.y = hoverCardOtherAt.y;
+			hoverCardRetarget(t);
+		});
 	}
 	function hoverCardShow(sel) {
 		var lines = hoverCardLines(sel).map(function (l) { return l.text; }).filter(function (t) { return t !== ''; });
@@ -32201,6 +32241,7 @@ var EngCalcs = EngCalcs || {};
 		// for any other tool drops it rather than leaving a highlight nothing will now clear, since
 		// the pointermove listener that maintains it does no work outside 'select'.
 		if (mode === 'select' && newMode !== 'select') { clearHoverPreview(); }
+		if (newMode !== mode) { hoverCardRetarget(null); }
 		mode = newMode; setPendingLinkFrom(null);
 		// **THE GRIPS ARE A CSS STATE, NOT A REDRAW** (Task 567). Every vertex handle already exists
 		// in the drawing -- buildLinkEls() makes one per bend -- so turning the mode on is one class
@@ -46354,6 +46395,8 @@ var EngCalcs = EngCalcs || {};
 		// pointer: either way the card has had its say. The highlight stays as it always did.
 		svg.addEventListener('pointerdown', hoverCardHide, true);
 		svg.addEventListener('wheel', hoverCardHide, true);
+		svg.addEventListener('pointermove', hoverCardOtherMove);
+		svg.addEventListener('pointerleave', function () { hoverCardOtherAt = null; if (hoverCardOtherMode()) { hoverCardRetarget(null); } });
 
 		// **HAS THIS PRESS BECOME A DRAG?** One flag for the whole gesture, set once the pointer has
 		// travelled past `tapMovePx(e)` and never cleared until the next press. It is what makes
@@ -63301,8 +63344,7 @@ var EngCalcs = EngCalcs || {};
 	}
 	// **THE ONE COMPOSER OF AN ELEMENT'S LABEL FIELDS** (Task 773). The full content pass, the
 	// single-label refresh and the hover card all read their lines from here, so they cannot come to
-	// print different things. `ls` is the label settings to read (the hover card passes every field
-	// ticked); `extrema` is the network-wide high/low table, or null for no marks. Returns the lines
+	// print different things. `ls` is the label settings to read; `extrema` is the network-wide high/low table, or null for no marks. Returns the lines
 	// in show order, possibly none: the empty placeholder is the caller's business.
 	function nodeLabelFieldLines(n, ls, extrema) {
 		var nd = ls.decimals.node, ex = extrema || {}, lines = [];

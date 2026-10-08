@@ -1,26 +1,26 @@
-// THE HOVER CARD: AN ASSET'S FULL LABEL, AS IF EVERY FIELD WERE TICKED (ROADMAP Task 773), in a
+// THE HOVER CARD: AN ASSET'S LABEL PER SETTINGS, AT ANY SCALE, FIT OR NOT (ROADMAP Task 773), in a
 // real Chromium. Run with:
 //   node dev/lpn-spike/hover-card-browser-harness.js
 //
 // WHAT IT PROVES.
-//   1. Net1 with ONLY the ID ticked on every node and link: resting the pointer on a junction shows
-//      a card with every field the label can print (not just the ID), and the card is the suite's
-//      one styled tip (a .tooltip), not the browser's native one (the anchor carries no title).
-//   2. THE CARD IS THE MAP LABEL'S OWN TEXT. The same junction in a second page with every field
-//      ticked draws a map label; the card's lines must equal that label's rows. Two formatters
-//      would drift; this is what catches it.
-//   3. A pipe gets a card too, and it comes out in the page's language (?lang=es): the status line
-//      is localized, so the Spanish card differs from the English one.
-//   4. HOVER COSTS NOTHING IN THE LABEL LAYER: no getBBox() call and no child added to or removed
-//      from the drawing between the pointer arriving and the card standing (the label pass writes
-//      glyphs and measures them; the highlight is a class toggle and neither).
-//   5. THE CARD NEVER BLOCKS A CLICK: it is pointer-events:none, a press on the junction selects
-//      it, and the card is gone once the press has landed.
-//   6. THE SETTING: Settings > Map and page > Page > "Show the full label on hover" is the real
-//      control. Unticked, no card appears and the browser holds lpn_hovercard=off (the only thing
-//      stored); ticked again, the key is removed and the card returns. The Settings row is
-//      browser-scoped: the project record is unchanged by the switch.
-//   7. No page errors.
+//   1. Net1 with a NON-DEFAULT tick set (node: ID, Elevation, Demand; pipe: ID, Length, Diameter):
+//      resting the pointer on junction 11 shows a card whose lines equal the map label's rows, and
+//      a field unticked in Settings (Head, Pressure; Roughness, Flow) is absent: not more, not less.
+//      The card is the suite's one styled tip (a .tooltip), not the browser's (no title).
+//   2. The pipe's card carries the same values as its map label, in the same order, and none of
+//      the unticked ones.
+//   3. A group with nothing ticked shows the ID alone on the card.
+//   4. THE LABELING THRESHOLD DOES NOT HIDE THE CARD: with the threshold so low that the map draws
+//      no labels at the fitted view, the card still shows the ticked fields.
+//   5. DELETE AND DRAWING: in Delete mode the card shows on a pipe, and a press still deletes it
+//      and takes the card down; in Pipe mode it shows on the node about to be joined, and the
+//      press still starts / completes the pipe.
+//   6. HOVER COSTS NOTHING IN THE LABEL LAYER (no getBBox, no node added or removed), the card
+//      takes no pointer events, a press selects through it, and sliding waits for rest.
+//   7. THE SETTING: Settings > Map and page > Page > "Show the full label on hover" is the real
+//      control; unticked, no card and lpn_hovercard=off is the only thing stored.
+//   8. ?lang=es: the Spanish card differs from the English one.
+//   9. No page errors.
 //
 // Copyright 2009 Thomas Gail Haws
 // Licensed under GNU GPL v3.0 or later
@@ -62,16 +62,16 @@ const NODE_FIELDS = ['id', 'desc', 'tag', 'demand', 'elev', 'initQuality', 'dema
 const LINK_FIELDS = ['id', 'desc', 'tag', 'length', 'diameter', 'roughness', 'km', 'initStatus', 'bulkCoeff', 'wallCoeff',
 	'flow', 'velocity', 'headloss', 'gradient', 'friction', 'rate', 'quality', 'status'];
 
-function projectText(allOn) {
+function projectText(tick, maxW) {
 	const d = JSON.parse(fs.readFileSync(path.join(REPO, 'dev', 'water-network-examples', 'Net1.lwn'), 'utf8'));
-	d.settings = Object.assign({}, d.settings, { labelMaxWidth: null });
+	d.settings = Object.assign({}, d.settings, { labelMaxWidth: maxW === undefined ? null : maxW });
 	d.labelSettings = d.labelSettings || {};
-	d.labelSettings.node = {}; NODE_FIELDS.forEach((k) => { d.labelSettings.node[k] = allOn || k === 'id'; });
-	d.labelSettings.link = {}; LINK_FIELDS.forEach((k) => { d.labelSettings.link[k] = allOn || k === 'id'; });
+	d.labelSettings.node = {}; NODE_FIELDS.forEach((k) => { d.labelSettings.node[k] = tick.node.indexOf(k) >= 0; });
+	d.labelSettings.link = {}; LINK_FIELDS.forEach((k) => { d.labelSettings.link[k] = tick.link.indexOf(k) >= 0; });
 	return JSON.stringify(d);
 }
 
-async function openNet1(Session, browser, allOn, lang) {
+async function openNet1(Session, browser, tick, lang, maxW) {
 	const a = await Session.open(browser, NAME, { serviceWorkers: 'block' });
 	await a.page.route(/tile\.openstreetmap\.org|api\.mapbox\.com/, (route) => route.abort());
 	// Counts every text measurement from before the page's first script runs.
@@ -82,13 +82,18 @@ async function openNet1(Session, browser, allOn, lang) {
 	});
 	const q = 'Looped-Network.php?ec_nolog=1' + (lang ? '&lang=' + lang : '');
 	await a.goto(q);
-	await a.page.evaluate((txt) => { localStorage.clear(); localStorage.setItem('lpn_project_hover', txt); }, projectText(allOn));
+	await a.page.evaluate((txt) => { localStorage.clear(); localStorage.setItem('lpn_project_hover', txt); }, projectText(tick, maxW));
 	await a.reload();
 	await a.answerTrainingPanel().catch(() => {});
 	await a.page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } });
 	await a.settle(2500);
 	return a;
 }
+
+const TICK = { node: ['id', 'elev', 'demand'], link: ['id', 'length', 'diameter'] };
+const ID_ONLY = { node: ['id'], link: ['id'] };
+const NONE = { node: [], link: [] };
+const TICK_ES = { node: ['id'], link: ['id', 'status', 'length'] };
 
 function centreOf(page, selector) {
 	return page.evaluate((sel) => {
@@ -144,22 +149,12 @@ async function main() {
 	}
 	const browser = await chromium.launch({ executablePath });
 	try {
-		// ---- the reference: every field ticked, and the label the map draws for junction 11 ----
-		console.log('=== reference: every field ticked ===');
-		const ref = await openNet1(Session, browser, true);
-		let refRows;
-		try {
-			refRows = await labelRows(ref.page, '11');
-			ok('the reference map label for junction 11 has several rows', refRows && refRows.length >= 4, JSON.stringify(refRows));
-			ok('(reference) no page errors', !ref.errors.length, (ref.errors[0] || '').slice(0, 200));
-		} finally { await ref.close(); }
-
-		// ---- the subject: ID only on the map ----
-		console.log('=== subject: only the ID ticked ===');
-		const a = await openNet1(Session, browser, false);
+		// ---- the subject: a non-default tick set ----
+		console.log('=== subject: node ID, Elevation, Demand; pipe ID, Length, Diameter ===');
+		const a = await openNet1(Session, browser, TICK);
 		try {
 			const mapRows = await labelRows(a.page, '11');
-			ok('on the map, junction 11 shows its ID alone', mapRows && mapRows.length === 1, JSON.stringify(mapRows));
+			ok('on the map, junction 11 shows exactly its three ticked rows', mapRows && mapRows.length === 3, JSON.stringify(mapRows));
 			const p = await centreOf(a.page, '#lpn_canvas circle[data-node="11"]');
 			ok('junction 11 is on screen', !!p);
 
@@ -171,9 +166,9 @@ async function main() {
 			await rest(a, p);
 			const lines = await cardLines(a.page);
 			ok('resting on junction 11 shows a card', !!lines, JSON.stringify(lines));
-			ok('...with more than the ID: every field the label can print', lines && lines.length >= 4, JSON.stringify(lines));
-			ok('...whose lines equal the all-ticked map label, row for row', lines && JSON.stringify(lines) === JSON.stringify(refRows),
-				'card ' + JSON.stringify(lines) + ' label ' + JSON.stringify(refRows));
+			ok('...whose lines equal the map label rows, row for row (the ticked fields, not more)', lines && JSON.stringify(lines) === JSON.stringify(mapRows),
+				'card ' + JSON.stringify(lines) + ' label ' + JSON.stringify(mapRows));
+			ok('...and so carries none of the unticked fields (Head, Pressure)', lines && lines.length === 3, JSON.stringify(lines));
 			const anchorTitle = await a.page.evaluate(() => { const e = document.querySelector('.lpn-hovercard-anchor'); return e ? (e.getAttribute('title') || '') + (e.getAttribute('data-bs-original-title') || '') : 'none'; });
 			ok('the card is the styled tip on an untitled anchor, so no native tooltip can show', anchorTitle === '', JSON.stringify(anchorTitle));
 			const cost = await a.page.evaluate(() => ({ bbox: window.__bboxCalls, mut: window.__mut }));
@@ -195,8 +190,11 @@ async function main() {
 			if (pp) {
 				await rest(a, pp);
 				const pl = await cardLines(a.page);
-				ok('resting on pipe 111 shows its card', !!pl && pl.length >= 3, JSON.stringify(pl));
+				const lblText = await a.page.evaluate(() => { const t = document.querySelector('text[data-linklbl="111"]'); return t ? t.textContent.replace(/\s+/g, '') : null; });
+				ok('resting on pipe 111 shows its card: the three ticked rows', !!pl && pl.length === 3, JSON.stringify(pl));
 				ok('...led by the ID the map label shows', pl && pl[0] === '111', JSON.stringify(pl && pl[0]));
+				ok('...and its rows are, in order, what the map label prints', pl && lblText === pl.join('').replace(/\s+/g, ''),
+					'card ' + JSON.stringify(pl) + ' label ' + JSON.stringify(lblText));
 				await away(a);
 			}
 
@@ -268,16 +266,86 @@ async function main() {
 			ok('no page errors', !a.errors.length, (a.errors[0] || '').slice(0, 200));
 		} finally { await a.close(); }
 
+		// ---- nothing ticked: the ID alone ----
+		console.log('=== nothing ticked ===');
+		const n0 = await openNet1(Session, browser, NONE);
+		try {
+			const p0 = await centreOf(n0.page, '#lpn_canvas circle[data-node="11"]');
+			await rest(n0, p0);
+			const l0 = await cardLines(n0.page);
+			ok('a junction with no field ticked still shows a card: its ID alone', JSON.stringify(l0) === '["11"]', JSON.stringify(l0));
+			ok('no page errors (none ticked)', !n0.errors.length, (n0.errors[0] || '').slice(0, 200));
+		} finally { await n0.close(); }
+
+		// ---- the labeling threshold hides the map's labels, not the card ----
+		console.log('=== labels hidden by the labeling threshold ===');
+		const hz = await openNet1(Session, browser, TICK, undefined, 1);
+		try {
+			const hidden = await hz.page.evaluate(() => document.getElementById('lpn_canvas').classList.contains('lpn-labels-hidden'));
+			ok('at this view the map draws no labels (the threshold hides them)', hidden);
+			const ph = await centreOf(hz.page, '#lpn_canvas circle[data-node="11"]');
+			await rest(hz, ph);
+			const lh = await cardLines(hz.page);
+			ok('...yet resting on junction 11 shows the ticked fields', JSON.stringify(lh) === JSON.stringify(['11', 'Qb=150.0', 'Z=710.00']), JSON.stringify(lh));
+			await away(hz);
+			const pph = await centreOf(hz.page, '#lpn_canvas [data-link="111"]');
+			await rest(hz, pph);
+			const lph = await cardLines(hz.page);
+			ok('...and on pipe 111', JSON.stringify(lph) === JSON.stringify(['111', "5280'", '10"']), JSON.stringify(lph));
+			ok('no page errors (threshold)', !hz.errors.length, (hz.errors[0] || '').slice(0, 200));
+		} finally { await hz.close(); }
+
+		// ---- Delete mode and drawing ----
+		console.log('=== Delete and Pipe modes ===');
+		const dm = await openNet1(Session, browser, TICK);
+		try {
+			const linkCount = () => dm.page.evaluate(() => new Set(Array.from(document.querySelectorAll('#lpn_canvas [data-link]')).map((e) => e.dataset.link)).size);
+			const links0 = await linkCount();
+			await dm.toolbarClick(await dm.lang('lpn_tool_delete'));
+			await dm.settle(300);
+			const pd = await centreOf(dm.page, '#lpn_canvas [data-link="111"]');
+			await rest(dm, pd);
+			const ld = await cardLines(dm.page);
+			ok('in Delete mode, resting on pipe 111 shows its card', JSON.stringify(ld) === JSON.stringify(['111', "5280'", '10"']), JSON.stringify(ld));
+			const pe = await dm.page.evaluate(() => { const t = document.querySelector('.tooltip.lpn-hovercard'); return t ? getComputedStyle(t).pointerEvents : null; });
+			ok('...and it takes no pointer events', pe === 'none', pe);
+			await dm.page.mouse.down(); await dm.page.mouse.up();
+			await dm.page.waitForTimeout(400);
+			ok('...the press still deletes the pipe', (await linkCount()) === links0 - 1, links0 + ' -> ' + (await linkCount()));
+			ok('...and the card is gone', (await cardLines(dm.page)) === null);
+
+			await dm.toolbarClick(await dm.lang('lpn_tool_add_pipe'));
+			await dm.settle(300);
+			const pa = await centreOf(dm.page, '#lpn_canvas circle[data-node="11"]');
+			const pb = await centreOf(dm.page, '#lpn_canvas circle[data-node="13"]');
+			await rest(dm, pa);
+			const lp = await cardLines(dm.page);
+			ok('in Pipe mode, resting on the node about to start a pipe shows its card', JSON.stringify(lp) === JSON.stringify(['11', 'Qb=150.0', 'Z=710.00']), JSON.stringify(lp));
+			await dm.page.mouse.down(); await dm.page.mouse.up();
+			await dm.page.waitForTimeout(300);
+			ok('...the press starts the pipe (the from-node is marked) and the card is gone',
+				(await dm.page.evaluate(() => !!document.querySelector('#lpn_canvas .lpn-node-pending'))) && (await cardLines(dm.page)) === null);
+			await rest(dm, pb);
+			const lq = await cardLines(dm.page);
+			ok('...then resting on the node about to be joined shows ITS card', !!lq && lq[0] === '13', JSON.stringify(lq));
+			const links1 = await linkCount();
+			await dm.page.mouse.down(); await dm.page.mouse.up();
+			await dm.page.waitForTimeout(400);
+			ok('...and the press completes the pipe', (await linkCount()) === links1 + 1, links1 + ' -> ' + (await linkCount()));
+			ok('...with the card gone', (await cardLines(dm.page)) === null);
+			ok('no page errors (delete/pipe)', !dm.errors.length, (dm.errors[0] || '').slice(0, 200));
+		} finally { await dm.close(); }
+
 		// ---- the other language ----
 		console.log('=== ?lang=es ===');
-		const en = await openNet1(Session, browser, false);
+		const en = await openNet1(Session, browser, TICK_ES);
 		let enPipe;
 		try {
 			const pp = await centreOf(en.page, '#lpn_canvas [data-link="111"]');
 			await rest(en, pp);
 			enPipe = await cardLines(en.page);
 		} finally { await en.close(); }
-		const es = await openNet1(Session, browser, false, 'es');
+		const es = await openNet1(Session, browser, TICK_ES, 'es');
 		try {
 			const pp = await centreOf(es.page, '#lpn_canvas [data-link="111"]');
 			await rest(es, pp);
