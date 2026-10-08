@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**97 still to read on master**, of 99 untranslated keys, of 2539 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**100 still to read on master**, of 102 untranslated keys, of 2542 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -139,7 +139,7 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   @@ NEEDS RULING
 
-## lpn_  (99, 97 to read @@ NEEDS RULING)
+## lpn_  (102, 100 to read @@ NEEDS RULING)
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -147,14 +147,20 @@ never edits a synonym.
 - **`lpn_alt_cat_presentation`**
   > Presentation
   @@ NEEDS RULING
-- **`lpn_change_type_create_overrides`**
-  > Create overrides
+- **`lpn_change_type_create_new`**
+  > Create new assets
   @@ NEEDS RULING
 - **`lpn_change_type_line_alternative`**
   > {id}: {property} {value}, in alternative {alternative}
   @@ NEEDS RULING
+- **`lpn_change_type_not_carried`**
+  > The new assets cannot hold these values. The old assets keep them:
+  @@ NEEDS RULING
+- **`lpn_change_type_old_controls`**
+  > These controls and rules name an old asset, which is inactive in this scenario, so they are omitted from this scenario's run:
+  @@ NEEDS RULING
 - **`lpn_change_type_scenario_ask`**
-  > Current scenario is not Base. Create overrides?
+  > Current scenario is not Base. Create new assets? The selected assets become inactive in this scenario.
   @@ NEEDS RULING
 - **`lpn_change_type_switch_base`**
   > Switch to Base
@@ -242,6 +248,9 @@ never edits a synonym.
   @@ NEEDS RULING
 - **`lpn_pane_copy_heads`**
   > Copy with headings
+  @@ NEEDS RULING
+- **`lpn_pane_inactive_show`**
+  > Include inactive topology
   @@ NEEDS RULING
 - **`lpn_pane_scn_cur_only`**
   > Current scenario only
@@ -443,7 +452,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**47 still to read**, of 50 new keys across 14 unmerged branch(es).
+**48 still to read**, of 51 new keys across 14 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -454,7 +463,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/bentley-interop (`661acc46`) — adds no English strings
+### feat/bentley-interop (`345bc091`) — adds no English strings
 
 ### feat/desktop (`baba0f04`) — adds no English strings
 
@@ -513,7 +522,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Points data<br />(use Copy to see format)
   @@ NEEDS RULING
 
-### feat/user-guide (`468f016d`) — 39 new, 39 to read @@ NEEDS RULING
+### feat/user-guide (`0306ae64`) — 40 new, 40 to read @@ NEEDS RULING
 
 - **`lpn_guide_also`**
   > Also in {menu}
@@ -574,6 +583,9 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 - **`lpn_guide_keys_term`**
   > Guide keyboard shortcuts
+  @@ NEEDS RULING
+- **`lpn_guide_not_shown`**
+  > This control is not on screen right now.
   @@ NEEDS RULING
 - **`lpn_guide_rail_hide`**
   > Hide contents

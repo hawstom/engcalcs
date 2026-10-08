@@ -67,7 +67,7 @@ here. Each property is in exactly one category. The category id is what the code
 |---|---|---|---|
 | Physical (`physical`) | Physical | pipe `diameter`, `roughness`, `k`, `length`, `typeId`, `fittingsId`; pump `curveId`, `efficCurveId`; junction `emitter`; reservoir `head`; node `x`, `y` | **SPECULATION** for `emitter` and `head`: Bentley's reservoir "elevation" and junction emitter coefficient are element attributes we believe sit in Physical; not confirmed from a cited page. **Position has no Bentley home at all**: Bentley's geometry does not vary by scenario. Ours does (Tom, 2026-09-15), so a Physical child alternative holding `x`/`y` is ours alone and has no Bentley translation. |
 | Demand (`demand`) | Demand | junction `demand`, `demands` (the whole breakdown, R-369) | Tom's Peak Hour example. |
-| Asset activation (`topology`; Tom, 2026-09-30) | Active Topology | node `active`, link `active` | Task 753 ("Activation") is Tom's call on the words; the id here is neutral. Drawing inside a scenario (`bornInScenario()`) writes `active: true` there, so it creates that scenario's topology child alternative, exactly as Bentley's own "element added in a child topology" does. |
+| Asset activation (`topology`; Tom, 2026-09-30) | Active Topology | node `active`, link `active` | Task 753 ("Activation") is Tom's call on the words; the id here is neutral. Drawing inside a scenario (`bornInScenario()`) writes `active: true` there, so it creates that scenario's topology child alternative, exactly as Bentley's own "element added in a child topology" does. A link whose end is inactive is itself out (`linkLive()`). See "Active topology, and Change type in a scenario". |
 | Initial settings (`initial`) | Initial Settings | link `status`, valve `setting`, tank `level` | **CITED** for pipe status: *"a pipe can start in an open or closed position and a pump can start in an on or off condition"*, <https://docs.bentley.com/LiveContent/web/Bentley%20WaterGEMS%20SS6-v1/en/31010.html>. Tank level and valve setting: Bentley's SCADAConnect page lists *"initial conditions with regard to such properties as tank water levels, pump status and settings and valve status"*, <https://docs.bentley.com/LiveContent/web/Bentley%20WaterCAD%20CONNECT%20Edition%20Help-v1/en/GUID-E8008FFA-6E0C-4A98-AAF6-C6CC742D5A71.html>, which does not name the alternative; placing them in Initial Settings is SPECULATION on that reading. |
 | Constituent (`constituent`) | Water Quality: Constituent | node `initQuality`, `sourceType`, `sourceQuality`, `sourcePattern`; tank `tankCoeff`; pipe `bulkCoeff`, `wallCoeff` | Bentley splits water quality into Age, Constituent and Trace; everything we let a scenario vary is a chemical's. |
 | Fire flow (`fireflow`) | Fire Flow | junction `fireFlow` | The required fire flow per junction (Task 530). |
@@ -708,7 +708,8 @@ named set and stops pretending to have a parent. Recommendation: keep the column
   **A custom property's design stays the project's in every scenario** (the Excluded table): its
   rows have no category, are never marked, and are read-only in a scenario's row.
 - **(6c, Q11) Clear override, never Reset**: already true of every visitor string.
-- **Asset-type overrides (6a)**: built 2026-10-07, see "Type overrides" below.
+- **Asset-type overrides (6a)**: built 2026-10-07 as type overrides and replaced 2026-10-08 by a new
+  asset in the old one's place; see "Active topology, and Change type in a scenario" below.
 
 Harnesses: `settings-table-owner-browser-harness.js` (real Chromium: Owner, Rank gone, Before/After
 stated or not and typed in a scenario, the box note, both filters and the banner in the Settings
@@ -716,41 +717,107 @@ and Pipes tables, Net3 lat/lon's custom property rows); `pane-clear-override-spe
 (a 117-pipe column cleared under a time bound, Q12's marks, one undo); `settings-table-labels-harness.js`
 (Owner and Setting words on every example, no duplicates, Tom's example rows).
 
-### Type overrides (built 2026-10-07, Tom's 6a)
+### Active topology, and Change type in a scenario (Task 781, 2026-10-08)
 
-Tom, 2026-10-07: *"You make it sound easy, so I guess we should build it out. I just want to
-minimize user confusion. So if Change type is used, with other than Base scenario, put up an alert
-box. 'Current scenario is not Base. Create overrides? [Create overrides] [Switch to Base] [Cancel]'"*
+Tom, 2026-10-08, choosing "Active topology first": *"I never wanted what we have anyway. Now that I
+understand, I want it changed. Change type is to be make a new object at the location of the old
+object. And that's physically analogous."*
 
-- **The question** is the page's own box (`askDialog` kind `choice`), his sentence and his three
-  buttons, asked only outside Base. Switch to Base switches, then makes the ordinary Base change
-  with its own box. Cancel writes nothing. Create overrides is followed by the Change type box only
-  when something is listed (the scenario's own overrides lost, born link values, a water surface).
-- **Stored** as `type` in the scenario's override map for the asset, beside the values the new type
-  needs: an overridable one as its ordinary override (`level`, `setting`, `diameter`), a Base-owned
-  one under its stored name (`minLevel`, `maxLevel`, `tankDiameter`, `valveType`, `lenAuto`,
-  `speed`...). Their categories are `LPN_TYPE_FIELD_CATEGORY_OF` (Physical, the demand storage in
-  Demand); they are not in `LPN_OVERRIDABLE` and cannot be set on their own. Base is untouched.
-- **Every reader sees the scenario's type** because the elements are laid out as the open scenario
-  sees them (`typeViewSync()` at the top of `buildDom()`, and on every temporary swap:
-  `paneInScenario()`, the scenario comparison), and laid back as Base around `serializeProject()`
-  and the undo snapshot (`withBaseTypes()`), so a file, an autosave, an undo step and the dirty
-  signature are always Base's. The `.inp` export asks for the view (`serializeProject(true)`). A
-  Base-owned field typed while laid out (a tank's highest depth in Properties) is written back into
-  the scenario's map when Base is laid back. Controls are re-annotated for the type showing.
-- **Values**: the new type's own come from the scenario's New assets settings, as a drawn one's do;
-  a water surface is carried as in Base; every value both types have keeps what the scenario showed
-  (a library pipe's diameter on a pipe made a valve). Changing back to Base's own type removes the
-  override and what it brought.
-- **A Base change never reaches into a map that states its own type** (`eachElementOverride()`
-  skips it), and `pinTypeOverrideInheritance()` copies into that map what it inherited from Base
-  and Base is about to drop.
-- **Show scenarios**: a row is shown only where the asset is that table's type in that scenario.
-  Known gap: an asset that is this table's type only in another scenario has no row here.
-- Harnesses: `scenario-type-override-harness.js` (Net1: junction 22 a tank in B; Base's heads
-  unchanged to 1e-6 and B's equal to a hand-built Net1 with a real tank 22, both engines; undo;
-  save and reopen; `.inp` of each scenario; the asset-type pre-review's three findings; live
-  mutations) and `scenario-type-override-browser-harness.js` (the real rows and buttons).
+**Active topology is the `topology` category, and nothing new was stored for it.** `active` was
+already an overridable property in that category (Task 184), resolved through the same tree
+(`treeLayers()`, `resolvedOverrides()`), so a child of B inherits B's topology and a stored
+topology alternative can be shared. **CITED** (WaterGEMS help, "Active Topology"): *"While elements
+are inactive, they are not included in any hydraulic equations"*, and *"Inactive elements will not
+appear in the corresponding tabular reports, unless the Include Inactive Topology option is turned
+on."* What this task added or confirmed:
+
+- **An asset drawn in a scenario is active only there** (and in that scenario's children), inactive
+  in Base and every other scenario: `bornInScenario()`. **CITED** (WaterGEMS and SewerGEMS help,
+  "Creating an Active Topology Child Alternative"): *"Add new elements to your model. These
+  elements will be active only in the new child alternative"*, and in Base *"The new elements are
+  shown as inactive (they are grayed out in the drawing pane)."* Kept as it was; nothing Tom ruled
+  contradicts it. Rejected: an asset drawn in a scenario existing in Base too (what an ordinary
+  draw in Base does), which would put every proposed pipe into the existing system.
+- **A link whose end is inactive is inactive** (`linkLive()`): left out of both solvers
+  (`assembleModel()`, which both engines read) and of the scenario's `.inp` export (already, with
+  the `inactive-node-link` difference), and now also drawn greyed and left out of the Tables, so the
+  map, the Tables and the solve agree.
+- **Drawn greyed** (`.lpn-inactive`, opacity 0.3), Bentley's own treatment. Not dashed: a dashed
+  line already means something to a reader of a pipe network (a proposed or abandoned main), and
+  Bentley does not use it for this.
+- **The Tables leave inactive assets out unless "Include inactive topology" is ticked** (Bentley's
+  words and Bentley's default), on the cell and heading menus of the node and link tables
+  (`paneHidesInactive()`, `paneInactiveToggle()`), per table for the life of the page like Overrides
+  only. With Show scenarios on, a row is left out only in the scenarios where its asset is not live
+  (`liveInScenario()`). Offered once anything is inactive in Base or a scenario exists. A Text's
+  `active` is not topology and the Text table is unchanged. **Note:** a Bentley community answer
+  says FlexTables show inactive rows with N/A results; the brief asked for the help page's rule,
+  so that is what is built, and Tom may prefer the FlexTable behaviour.
+- **The toggle** is the existing "Is active?" box in Properties and the Active column of every
+  asset table, both through `setProp()`, so undo, the override marker and the scenario's write
+  target are the ordinary ones. No context-menu row was added: the page's pattern is that a
+  property is edited in Properties and the Tables, and the map's context menu holds commands.
+  **Shown in Basic mode**: drawing and deleting in a scenario already write `active` in Basic mode,
+  so the box is the visible form of what Basic mode already does; hiding it would leave a deleted
+  pipe with no way back but undo. The tree it resolves through stays hidden.
+
+**Change type outside Base makes a new asset in the old one's place**
+(`replaceSelectedTypeInScenario()`, `replaceTypeInScenario()`):
+
+- After the question (below), each selected asset is replaced by a NEW asset of the new type, its
+  ID minted by the ID-prefix rules in effect in the scenario, at the old one's place. The new asset
+  is born in the scenario (`bornInScenario()`: inactive in Base, active here and in this scenario's
+  children); the old one is made inactive in this scenario and is otherwise untouched, in Base and
+  in every other scenario. One undo step. The new assets become the selection.
+- **A node takes its links with it.** A link's ends are Base-owned, so a link left on the old node
+  would leave the network with it. Each live link at the node is replaced the same way, its end on
+  the new node, its type unchanged. Rejected: making link ends overridable, which would be more
+  "the same pipe, reconnected" but touches every reader of `from`/`to` in the page and its modules.
+- **What the new asset carries is what this scenario showed on the old one**: Base's record with the
+  scenario's resolved overrides written in as the new asset's own values (it exists only where this
+  scenario's topology puts it, so its own values are this scenario's, as a drawn asset's are; so it
+  carries no override marks but its own `active`), then the ordinary Base change of type on that
+  copy (`applyNodeTypeChange()`, `applyLinkTypeChange()`): what the new type cannot hold stays with
+  the old asset, what only the new type has comes from the scenario's New assets values, and a
+  water surface stays where it was. A position the scenario moved stays the scenario's override,
+  verbatim, so no coordinate is run through a projection it does not need. An old asset inactive in
+  the scenario gives an inactive new one.
+- **The box** (only when something is listed) says which values the new assets cannot hold (the old
+  assets keep them), the water surface carried, what a new link is born with, and the controls and
+  rules naming an old asset or a replaced link: those are document-wide, still name the old asset,
+  and are left out of this scenario's run (and reported there) because it is inactive.
+- **In Base, Change type is unchanged**: the asset keeps its ID and changes type in every scenario.
+  Tom's words describe a change made in a scenario, where the old asset must survive for the
+  others; in Base there is no other scenario to keep it for, and a new ID would orphan every
+  scenario's overrides, controls and rules naming the asset. Rejected: a new ID in Base too.
+- **Known gaps**, reported and not built: a customer whose demand lands on a replaced node or pipe
+  stays on the old one (customers carry nothing a scenario can change), so in that scenario its
+  demand is not in the solve; a child scenario's own overrides of the old asset are not copied to
+  the new one; replaced assets stay in the file, inactive, as every Bentley topology alternative
+  keeps them.
+
+**The question**, the page's own box (`askDialog` kind `choice`), asked only outside Base, three
+buttons: **Create new assets** (the replacement), **Switch to Base** (switches, then the ordinary
+Base change with its own box), **Cancel** (writes nothing). Tom's 2026-10-07 wording asked *"Create
+overrides?"*; it no longer creates overrides, so the sentence and the first button were reworded
+minimally, for his word.
+
+**The type override is gone** (built 2026-10-07 for Tom's 6a, removed 2026-10-08): `type` in a
+scenario's override map, the elements laid out per scenario (`typeViewSync()`, `withBaseTypes()`),
+`pinTypeOverrideInheritance()`, `LPN_TYPE_FIELD_CATEGORY_OF`, `writeOverrideIn()`, and their three
+harnesses. Rejected for Tom's reason: an asset is one physical object, and a different object in a
+scenario is a different asset. **A file saved with a type override** (only this branch, for one day)
+opens with the type and every value only that type had removed (`dropTypeOverrides()`), so the
+asset is Base's type in that scenario again. Migrating it into new assets would mint IDs the file
+never had, so it is not lossless and was not done.
+
+Harnesses: `scenario-active-topology-harness.js` (Net1, both engines, against hand-built `.inp`
+networks: a pipe drawn in N; pipe 111 deactivated in D and a node's links greyed with it; junction
+22 a tank in B with its four pipes replaced and B's own pipe diameter carried; Base unchanged to
+1e-6 and its export character-identical; C a child of B; undo and redo; save and reopen; each
+scenario's export reopened and solved; pipe 10 a valve in V; a type-override file opened; seven
+live mutations) and `scenario-active-topology-browser-harness.js` (real Chromium: the question and
+its buttons, Cancel, the box, the greying, the Tables and both menus, the Active column, Ctrl+Z, Base).
 
 ## The long burn: from Basic mode to the full model (2026-10-06)
 

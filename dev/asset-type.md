@@ -47,10 +47,13 @@ Links follow under "Links" below.
     `libAnnotateControl()` draws the same line.
   - A rule clause that names the node by a kind it no longer is.
 - **One undo** reverses the whole change, the selection included.
-- **Base's, and a scenario may state its own** (Tom, 2026-10-07). The type is not in
-  `LPN_OVERRIDABLE`. In Base a change applies in every scenario that states no type of its own; in
-  any other scenario Change type first asks "Current scenario is not Base. Create overrides?"
-  (Create overrides, Switch to Base, Cancel). See `dev/scenario-alternatives.md`, "Type overrides".
+- **Base-owned; outside Base, a new asset in the old one's place** (Tom, 2026-10-08, Task 781).
+  The type is not in `LPN_OVERRIDABLE`. In Base a change applies in every scenario. In any other
+  scenario Change type first asks "Current scenario is not Base. Create new assets? The selected
+  assets become inactive in this scenario." (Create new assets, Switch to Base, Cancel), then
+  replaces each asset with a new one, active only in that scenario's topology. The type override
+  of 2026-10-07 is gone. See `dev/scenario-alternatives.md`, "Active topology, and Change type in
+  a scenario".
 
 ## Why Water, at the foot
 
