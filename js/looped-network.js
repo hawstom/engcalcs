@@ -53002,8 +53002,12 @@ var EngCalcs = EngCalcs || {};
 			});
 		});
 	}
-	function clampDockW(w, room) {
-		var max = Math.max(LPN_DOCK_MIN_W, Math.floor((window.innerWidth || 1000) - LPN_DOCK_MAP_MIN));
+	// **AN AUTO-HIDDEN BOX MAY COVER THE WHOLE MAP; ONLY A PINNED ONE KEEPS THE MAP'S MINIMUM** (Tom,
+	// 2026-10-08: *"Why not cover the map entirely when it's an autohide box. A pinned box is
+	// different, of course. It needs its limits."*). A flyout takes no space from the map, so the
+	// 320 px floor protects nothing; `over` lifts it and leaves only `room`.
+	function clampDockW(w, room, over) {
+		var max = over && room > 0 ? room : Math.max(LPN_DOCK_MIN_W, Math.floor((window.innerWidth || 1000) - LPN_DOCK_MAP_MIN));
 		if (!(w > 0)) { w = LPN_DOCK_DEFAULT_W; }
 		if (room > 0) { max = Math.min(max, room); }
 		return Math.round(Math.max(Math.min(LPN_DOCK_MIN_W, max), Math.min(w, max)));
@@ -53105,8 +53109,13 @@ var EngCalcs = EngCalcs || {};
 			if (d.rec.autohide) { delete d.rec.autohide; } else { d.rec.autohide = true; }
 		}
 		if (dockFlyout === d) { dockFlyout = null; }
-		if (d.save) { d.save(); }
 		layoutDocks();
+		// Pinned from a width only a flyout may have, it keeps the map's minimum: store what it got.
+		if (act === 'autohide' && !d.rec.autohide && d.rec.dock) {
+			r = d.box.getBoundingClientRect();
+			if (r.width > 0 && d.rec.dockW > Math.round(r.width)) { d.rec.dockW = Math.round(r.width); }
+		}
+		if (d.save) { d.save(); }
 		renderDockCorner(d);
 		// Turned on from inside the box, auto-hide tucks it at once; the keyboard lands on its tab.
 		if (act === 'autohide' && d.rec.autohide && d.tab) { d.tab.focus(); }
@@ -53225,7 +53234,8 @@ var EngCalcs = EngCalcs || {};
 			var w;
 			if (!from) { return; }
 			w = from.w + (side === 'left' ? e.clientX - from.x : from.x - e.clientX);
-			w = clampDockW(w);
+			var wrap = dockMapWrap(), over = !!from.list[0].rec.autohide;
+			w = clampDockW(w, over && wrap ? Math.floor(wrap.getBoundingClientRect().width + dockMargins.left + dockMargins.right - LPN_DOCK_STRIP_W * 2) : 0, over);
 			from.list.forEach(function (d) { d.rec.dockW = w; });
 			layoutDocks();
 		});
@@ -53317,7 +53327,7 @@ var EngCalcs = EngCalcs || {};
 				dockPlace(d, x, top + y0, c.w, y1 - y0, 'pinned');
 			});
 			S.auto.forEach(function (d) {
-				var w = clampDockW(d.rec.dockW, Math.floor(outerR - outerL - c.strip - LPN_DOCK_STRIP_W)),
+				var w = clampDockW(d.rec.dockW, Math.floor(outerR - outerL - c.strip - LPN_DOCK_STRIP_W), true),
 					ax = s === 'left' ? outerL + c.strip : outerR - c.strip - w;
 				dockPlace(d, ax, top, w, h, d === dockFlyout ? 'out' : 'tucked');
 			});
@@ -53325,7 +53335,7 @@ var EngCalcs = EngCalcs || {};
 			// A box flown out of its tab is the frontmost thing on its side, so its edge is the one a
 			// reader reaches for; otherwise the pinned column's. The flown-out box is alone in its list.
 			if (dockFlyout && S.auto.indexOf(dockFlyout) >= 0) {
-				w = clampDockW(dockFlyout.rec.dockW, Math.floor(outerR - outerL - c.strip - LPN_DOCK_STRIP_W));
+				w = clampDockW(dockFlyout.rec.dockW, Math.floor(outerR - outerL - c.strip - LPN_DOCK_STRIP_W), true);
 				placeDockGrip(s, s === 'left' ? outerL + c.strip + w : outerR - c.strip - w, top, h, [dockFlyout]);
 			} else {
 				placeDockGrip(s, c.w ? (s === 'left' ? outerL + c.strip + c.w : outerR - c.strip - c.w) : null, top, h, S.pinned);
