@@ -127,11 +127,15 @@ pile of work. He then said: let the two builders finish, then /clear.
   yet written). G01 "Translate first": consent_body + the two strings, 26 Sonnet agents, before merge.
   G05: librewaternet.org branch `visit-code-claim` (0804152) holds his sentence; merge and push it there
   when visit-dedupe merges.
-- **feat/hover-label** and **feat/message-dismiss**: Sonnet builders were running at /clear time
-  (G07 as built; G08 also Delete and link drawing; tip = his text verbatim, card shows exactly the
-  ticked Settings fields at any scale / G09 x on every standing message). Check each branch's `git log`
-  and its check_all log in the old scratchpad (hover-check.log, md-checkall.log); if half-done, finish.
-  Then Perry (pre-reviewer) and his browser pass.
+- **feat/hover-label** (bbf6c3c3) and **feat/message-dismiss** (aaedf63e): builders FINISHED, pushed.
+  Hover: card = exactly the ticked Settings fields via the map label's own builders, any zoom, ID alone
+  when nothing is ticked; also Delete, Pipe/Pump/Valve/Chain modes; tip his text verbatim. Its full
+  suite was not rerun after its last one-constant fix (touch-radius and hover harnesses pass alone).
+  Ask him: does "Show the full label on hover" (lpn_settings_hover_card) still fit, since "full" now
+  overstates? Message x: on every standing message; a hidden diagnostic returns when its text recurs,
+  a hidden run message at the next run. Ask him: should "storage full/unreadable" and "unit unknown"
+  really be hideable? Both branches: regenerate payloads and new-english-keys on merge; Perry next,
+  then his browser pass.
 - Unchanged: feat/bentley-interop, feat/section-grid, feat/desktop await his browser pass.
 - **Seam, now that workspace is merged:** when bentley-interop next merges master, add
   `if (boxSaveHeld()) { return; }` at the top of `saveAltboxLayout`; and decide whether workspace export
