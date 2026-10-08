@@ -45867,19 +45867,10 @@ var EngCalcs = EngCalcs || {};
 				logLpnFirstAction('element');
 				addText(w.x, w.y, nearNode ? nearNode.id : null,
 					nearLink ? { link: nearLink.link.id, t: nearLink.t } : null);
-				// **AND THE TOOL PUTS ITSELF DOWN, WHICH IS WHY A NEW TEXT COULD NOT BE DRAGGED**
-				// (Tom, 2026-09-08: *"I add a Text. It can't be dragged."*). pointerdown returns
-				// before it arms any drag while the mode still begins with `add-`, so the Text you
-				// had just placed was the one Text on the drawing you could not pick up -- until
-				// you noticed the toolbar was still holding the tool. Nothing was wrong with the
-				// element: an OLD Text behaved differently only because reaching one meant leaving
-				// the tool first.
-				//
-				// The branch three lines above already does exactly this when the tap lands on an
-				// existing Text, so this is the two halves of one gesture agreeing rather than a
-				// new rule. A Text is a one-shot placement, unlike a junction, where drawing ten in
-				// a row is the normal way to use the tool.
-				setMode('select');
+				// **THE TOOL STAYS ARMED, LIKE EVERY OTHER INSERTER** (Tom, 2026-10-07: *"All
+				// inserters should be in repeater mode. Text is not."*). A tap on a Text already there
+				// still opens it and leaves the tool (the branch above), which is what keeps a second
+				// tap from stacking a duplicate. Esc or another tool ends the repeat.
 			}
 			else if (mode === 'add-chain') {
 				chainTap(e, w, t);
