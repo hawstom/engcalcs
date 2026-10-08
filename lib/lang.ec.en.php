@@ -824,7 +824,7 @@ $ec_lang['lpn_meter_pipe_unknown']='Nothing in this project is named {id}, so th
 // heading is the junction's own whole label reused and only the tip is new: what it says that the
 // junction's does not is that the number the pattern multiplies is the TOTAL, count included.
 $ec_lang['lpn_meter_pattern_unknown']='No pattern in this project is named {id}, so the customer was left as it was.';
-$ec_lang['lpn_meter_placed']='Customer {id} added. Its description and demand are entered in the Customers table, or press it in Select to open its box.';
+$ec_lang['lpn_meter_placed']='Customer {id} added. Enter its description and demand in the Customers table, or select it in Select mode to open its properties box.';
 $ec_lang['lpn_field_meter_pipe_tip']='The asset that this service connects to. Enter another one here or in the Customers table to change it, or drag the connection point to a different asset.';
 $ec_lang['lpn_field_meter_station']='Station along the pipe (%)';
 $ec_lang['lpn_field_meter_station_tip']='Distance along the pipe to the service connection, as a percentage of the pipe from its first node to its second. 0 is at one end and 100 is at the other. The circle on the pipe does the same thing with the pointer.';
@@ -1115,6 +1115,7 @@ $ec_lang['lpn_wrong_thanks']='Thank you. Your report was received.';
 // phrases a visitor may toggle in any combination. lpn_fb_sends must stay true to send-feedback.php
 // and to the "Messages you send us" row of privacy.php.
 $ec_lang['lpn_fb_intro']='Canned messages (optional). Nothing is sent until you press Send.';
+$ec_lang_syn['lpn_fb_intro']='Ready-made messages; preset choices the visitor can pick instead of typing';
 $ec_lang['lpn_fb_pick_numbers']='The numbers look wrong';
 $ec_lang['lpn_fb_pick_broken']='Something did not work';
 $ec_lang['lpn_fb_pick_wording']='The wording or translation is wrong';
@@ -1368,7 +1369,7 @@ $ec_lang['lpn_tool_key_hint_two']='Shortcut: {key} or {key2}';
 $ec_lang['lpn_tool_add_chain_tip']='Chain junctions and pipes: specify a point on the map to add a junction, then specify each next point to add a pipe and a junction. Specify an existing node to continue from it. Press Escape to end the chain.';
 // Edited by TGH 2026-09-07; the Shift sentence rewritten 2026-09-08 on his ruling that Shift keeps
 // the selection and toggles what the shape catches (it used to say "add").
-$ec_lang['lpn_tool_area_tip']='Follow on-screen wizard. Press again to cycle through window, lasso, and polygon. Hold Shift to keep existing selection set and add or remove (toggle) what you select.';
+$ec_lang['lpn_tool_area_tip']='Follow the on-screen prompts. Press again to cycle through window, lasso, and polygon. Hold Shift to keep the current selection and add or remove (toggle) what you select.';
 $ec_lang['lpn_area_selected']='{n} selected.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_area_none']='Nothing found in that area.';
@@ -1520,6 +1521,7 @@ $ec_lang['lpn_pane_clear_override']='Clear override';
 // Max day"). {category} is an lpn_alt_cat_* name; {alternative} is the alternative's name, which
 // in Basic mode is its scenario's.
 $ec_lang['lpn_pane_scn_alt_tip']='{category} alt.: {alternative}';
+$ec_lang_syn['lpn_pane_scn_alt_tip']='alt. abbreviates alternative (the scenario alternative that holds this override); abbreviate it the way your language abbreviates that word';
 // The pin beside the ID in the first column. The ID itself was this control until 2026-09-19,
 // underlined and turning link blue; the ID is an ordinary editable cell now and this is the way
 // back to the map. It is the button's ONLY name, the button having no text, so it is both the tip
@@ -1581,7 +1583,7 @@ $ec_lang['lpn_change_type_more']='And {n} more.';
 $ec_lang['lpn_change_type_surface']='These keep the water surface where it was. A reservoir\'s head is the tank\'s elevation plus its water depth, and a tank\'s water depth is the reservoir\'s head minus its elevation:';
 $ec_lang['lpn_change_type_meaning']='These controls and rules test a node being changed, and will read it differently: a junction is tested by its pressure, and a tank or reservoir by its water level.';
 // The link half (Tom, 2026-10-06: "Proceed."). Each heads a list of "ID: entry" lines.
-$ec_lang['lpn_change_type_born']='These are new, as on a newly drawn one:';
+$ec_lang['lpn_change_type_born']='These values are new, set as on a newly drawn asset:';
 $ec_lang['lpn_change_type_no_curve']='{id}: No pump head curve, so the pump adds no head until one is selected, and an .inp export writes it as a pipe';
 $ec_lang['lpn_change_type_becomes']='{id}: {property} {value}, in scenario {scenario}, becomes {new}';
 $ec_lang['lpn_change_type_customers']='Only a pipe serves customers, so these customers are connected instead to the node shown in parentheses, where their demand is already applied. They stay where they are drawn, and their demand is unchanged:';
@@ -1663,7 +1665,7 @@ $ec_lang['lpn_find_btn']='Find';
 // is selected." One button, no selector; which table(s) it fills follows the scope in
 // buildFilterRow()/applyTableFilter(), never a control of its own.
 $ec_lang['lpn_find_filter_btn']='Filter in table';
-$ec_lang['lpn_find_filter_tip']='Filter in Table(s) that match "What to search" above';
+$ec_lang['lpn_find_filter_tip']='Show only the rows that match "What to search" above, in each table searched.';
 // The multi-table receipt, printed when "Everything" (or a typed compound query) filters more than
 // one table at once: one {table}: {n} of {all} row per table the query could be asked of, joined
 // into {rows} of the summary line below. Every number is a count already shown on the table's own
@@ -2887,7 +2889,7 @@ $ec_lang['lpn_mapgeo_dial_turn']='Rotate the map';
 $ec_lang['lpn_mapgeo_dial_turn_read']='{d} degrees';
 $ec_lang['lpn_mapgeo_dial_size']='Map size';
 $ec_lang['lpn_mapgeo_dial_size_read']='{f} times';
-$ec_lang['lpn_mapgeo_dial_help']='Slide the two bars, or enter numbers in the boxes above them, to make the map bigger or smaller and to rotate it. The middle of each bar keeps the fit from step 1, so 1 and 0 mean no change. Arrow keys work on both.';
+$ec_lang['lpn_mapgeo_dial_help']='Slide the two bars, or enter numbers in the boxes above them, to make the map bigger or smaller and to rotate it. The middle of each bar keeps the fit from step 1, so a size of 1 and a rotation of 0 mean no change. Arrow keys work on both.';
 $ec_lang['lpn_mapgeo_place']='Place approximately';
 $ec_lang['lpn_mapgeo_finish']='Georeference here';
 $ec_lang['lpn_mapgeo_cancelled']='The world map is restored to its previous position, and the drawing was not moved.';
@@ -2969,7 +2971,9 @@ $ec_lang['lpn_cp_applies_tip']='Applies to: Comma separated list of ID prefixes 
 $ec_lang['lpn_cp_validate']='Validate as';
 $ec_lang['lpn_cp_validate_tip']='Validate as: The format a valid value must have. The case rules apply to the English alphabet only. Choose Do not validate to accept any value.';
 $ec_lang['lpn_cp_restrict']='Restrict these characters';
+$ec_lang_syn['lpn_cp_restrict']='Forbid these characters; the opposite of Allow only these characters';
 $ec_lang['lpn_cp_restrict_tip']='Restrict these characters:';
+$ec_lang_syn['lpn_cp_restrict_tip']='Forbid these characters; the opposite of Allow only these characters';
 $ec_lang['lpn_cp_allow_tip']='Allow only these characters:';
 $ec_lang['lpn_cp_characters_tip']='"@" means any letter; "#" means any numeric digit, and you must separately list "-", ".", and "," if they are allowed; and any white space characters must be between other characters.';
 $ec_lang['lpn_cp_restrict_mode']='Allow or restrict';
@@ -3637,6 +3641,7 @@ $ec_lang['lpn_reports_menu']='Reports';
 // Row label only (the box title is lpn_time_run_report). Tom, 2026-10-07: no row carries '(EPANET)';
 // the tips say where a report comes from. Run is EPANET's verbatim report.
 $ec_lang['lpn_reports_epanet']='Run';
+$ec_lang_syn['lpn_reports_epanet']='Run, simulation, computation, or calculation report';
 $ec_lang['lpn_energy_title']='Pump energy report';
 $ec_lang['lpn_energy_menu']='Pump energy';
 $ec_lang['lpn_energy_efficiency']='Pump efficiency (percent)';
@@ -4097,7 +4102,7 @@ $ec_lang['lpn_search_consent_1']='Search by place name sends the words you enter
 $ec_lang['lpn_search_consent_2']='This is a different service from the street map pictures behind your project. The pictures only say where you are looking. A search says what you entered. The place-name service will receive your search words and your IP address. We send nothing else, and we keep no record of your searches.';
 $ec_lang['lpn_search_consent_3']='May we send your searches to the place-name service?';
 $ec_lang['lpn_search_consent_4']='If you say no, everything else on this page keeps working exactly as it does now, including Go to a latitude and longitude. We remember a yes so that we need not ask again. A no is not stored at all.';
-$ec_lang['lpn_search_refused']='Place-name search is off, and nothing was sent. Go to a latitude and longitude still works.';
+$ec_lang['lpn_search_refused']='Place-name search is off, and nothing was sent. The Go to a latitude and longitude command still works.';
 $ec_lang['lpn_search_prompt']='Search for a place by name. A town, a street, a landmark — for example: Petaluma, California';
 $ec_lang['lpn_search_empty']='Enter a place name to search for.';
 $ec_lang['lpn_search_working']='Searching…';
@@ -4172,7 +4177,7 @@ $ec_lang['lpn_terrain_ids_more']='{ids}, and {n} more';
 $ec_lang['lpn_analyze_menu']='Analyze';
 $ec_lang['lpn_analyze_menu_tip']='Analyses that run the network on a copy: fire flow at each junction, the loss of each pipe, pump, and valve, and the demands scaled up or down.';
 $ec_lang['lpn_ff_menu']='Fire flow analysis…';
-$ec_lang['lpn_ff_menu_tip']='Selection-wide check with collateral effect check';
+$ec_lang['lpn_ff_menu_tip']='Test each selected junction for fire flow, and check the effect on the rest of the system';
 $ec_lang['lpn_ff_title']='Fire flow analysis';
 $ec_lang['lpn_ff_intro']='Each junction in turn draws a fire flow on top of its existing demand. The run uses a copy of the network at the time step on screen, so nothing in your project is changed.\n\nFire flow is normally tested at maximum day demand, so set the network to that condition first.\n\nEach junction tested takes about 16 solves of the whole network, so a large system takes minutes: choose the junctions before you run, and stop at any time to keep the partial results.';
 $ec_lang['lpn_ff_scope']='Junctions to test';
@@ -4521,6 +4526,7 @@ $ec_lang['lpn_snip_hint_free']='Drag around the area to snip, or click for the w
 $ec_lang['lpn_snip_tip_rect']='Snip a rectangle (S)';
 $ec_lang['lpn_snip_tip_free']='Snip a freehand shape (S)';
 $ec_lang['lpn_snip_tip_mode']='Snip shape';
+$ec_lang_syn['lpn_snip_tip_mode']='Shape to specify for screenshot';
 $ec_lang['lpn_snip_tip_map']='Screenshot of the whole map';
 $ec_lang['lpn_snip_tip_pen']='Pen';
 $ec_lang['lpn_snip_tip_eraser']='Eraser: click a stroke to remove it (E)';

@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**117 still to read on master**, of 224 untranslated keys, of 2444 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**115 still to read on master**, of 224 untranslated keys, of 2444 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -42,13 +42,13 @@ is the one you meant. "The first one" is a complete answer.
 ### from sprint 1008-wave0
 
 - **`lpn_change_type_born`**
-  > These are new, as on a newly drawn one:
+  > These values are new, set as on a newly drawn asset:
   *The finding:* 'These are new, as on a newly drawn one:' has no noun for 'these' or for 'one'. It heads a list of values that the changed asset receives as defaults (js/looped-network.js:32833).
   1. these values are created with their defaults, as on an asset newly drawn
   2. these assets are new, like a newly drawn asset
   **What this asks for:** a WORDING ruling -- is the English above right, or say what it should say.
   *The proposal:* PROPOSED English: 'These values are new, set as on a newly drawn asset:' Cost: 26 retranslations.
-  @@ NEEDS RULING
+  _Ruled 2026-10-08: Calls page 8 October: Use proposed_
 - **`lpn_cp_restrict_tip`**
   > Restrict these characters:
   *The finding:* Leads the tip in the Restrict mode of a custom property's character rule; the other mode is 'Allow only these characters:' (js/looped-network.js:49645). 'Restrict' can mean forbid or limit to, and the second sense is the Allow mode. The sibling option label lpn_cp_restrict carries the same words and must stay identical, so English is not the route.
@@ -56,7 +56,7 @@ is the one you meant. "The first one" is a complete answer.
   2. limit entries to the characters listed (the same as Allow only)
   **What this asks for:** WRITTEN PERMISSION to add a `$ec_lang_syn` entry for this key (a note to the 26 translators; it changes no English and nothing a visitor reads).
   *The proposal:* Add $ec_lang_syn PROPOSAL (AI may not write it) on lpn_cp_restrict_tip and its sibling lpn_cp_restrict: 'Forbid these characters; the opposite of Allow only these characters'. English unchanged.
-  @@ NEEDS RULING
+  _Ruled 2026-10-08: Calls page 8 October: Use proposed (the $ec_lang_syn note, on it and lpn_cp_restrict)_
 - **`lpn_fb_intro`**
   > Canned messages (optional). Nothing is sent until you press Send.
   *The finding:* 'Canned messages' is an English idiom for ready-made messages; read literally it is about tins, and a translator who does not know the idiom has nothing else to go on. Heads the row of pick buttons in the feedback box (js/looped-network.js:61769).
@@ -64,39 +64,39 @@ is the one you meant. "The first one" is a complete answer.
   2. messages in a can (literal), or discarded messages
   **What this asks for:** WRITTEN PERMISSION to add a `$ec_lang_syn` entry for this key (a note to the 26 translators; it changes no English and nothing a visitor reads).
   *The proposal:* Add $ec_lang_syn PROPOSAL (AI may not write it): 'Ready-made messages; preset choices the visitor can pick instead of typing'. English unchanged.
-  @@ NEEDS RULING
+  _Ruled 2026-10-08: Calls page 8 October: Use proposed (the $ec_lang_syn note)_
 - **`lpn_ff_menu_tip`**
-  > Selection-wide check with collateral effect check
+  > Test each selected junction for fire flow, and check the effect on the rest of the system
   *The finding:* 'Selection-wide check with collateral effect check' is a noun stack an English reader also has to decode; 'collateral effect' is not engineering usage, and 'Selection-wide' can read as one check over the whole selection rather than one per junction. The analysis tests each chosen junction in turn and then checks the rest of the system (lpn_ff_intro, lpn_ff_design_tip).
   1. each selected junction is tested for fire flow in turn, and the effect on other junctions and pipes is checked
   2. one combined check of the whole selection, plus a check of side effects of some kind
   **What this asks for:** a WORDING ruling -- is the English above right, or say what it should say.
   *The proposal:* PROPOSED English: 'Test each selected junction for fire flow, and check the effect on the rest of the system' Cost: 26 retranslations.
-  @@ NEEDS RULING
+  _Ruled 2026-10-08: Calls page 8 October: Use proposed_
 - **`lpn_find_filter_tip`**
-  > Filter in Table(s) that match "What to search" above
+  > Show only the rows that match "What to search" above, in each table searched.
   *The finding:* The verb has no object, and 'Filter in' parses two ways: include in the table, or filter the tables. Button 'Filter in table' in Find and replace; it filters the rows of the table searched (applyTableFilter, js/looped-network.js:20610).
   1. show only the rows that match "What to search" in the table or tables searched
   2. filter (choose) the tables whose name matches "What to search"
   **What this asks for:** a WORDING ruling -- is the English above right, or say what it should say.
   *The proposal:* PROPOSED English: 'Show only the rows that match "What to search" above, in each table searched.' Cost: 26 retranslations.
-  @@ NEEDS RULING
+  _Ruled 2026-10-08: Calls page 8 October: Use proposed_
 - **`lpn_mapgeo_dial_help`**
-  > Slide the two bars, or enter numbers in the boxes above them, to make the map bigger or smaller and to rotate it. The middle of each bar keeps the fit from step 1, so 1 and 0 mean no change. Arrow keys work on both.
+  > Slide the two bars, or enter numbers in the boxes above them, to make the map bigger or smaller and to rotate it. The middle of each bar keeps the fit from step 1, so a size of 1 and a rotation of 0 mean no change. Arrow keys work on both.
   *The finding:* 'so 1 and 0 mean no change' does not pair the numbers with the two bars. The bars are Map size (read as {f} times) and rotation.
   1. a size of 1 and a rotation of 0 mean no change
   2. either bar set to 1 or 0 means no change
   **What this asks for:** a WORDING ruling -- is the English above right, or say what it should say.
   *The proposal:* PROPOSED English: replace the last clause with 'so a size of 1 and a rotation of 0 mean no change.' Cost: 26 retranslations.
-  @@ NEEDS RULING
+  _Ruled 2026-10-08: Calls page 8 October: Use proposed_
 - **`lpn_meter_placed`**
-  > Customer {id} added. Its description and demand are entered in the Customers table, or press it in Select to open its box.
+  > Customer {id} added. Enter its description and demand in the Customers table, or select it in Select mode to open its properties box.
   *The finding:* 'press it in Select' names neither the mode nor what 'it' is; Select is a mode (lpn_tool_select), and 'press' reads as a keyboard press. 'its box' does not say which box. Notice after placing a customer (js/looped-network.js:45867).
   1. select the customer on the map while the Select mode is on, to open its properties box
   2. press a key or a button called Select to open some box
   **What this asks for:** a WORDING ruling -- is the English above right, or say what it should say.
   *The proposal:* PROPOSED English: 'Customer {id} added. Enter its description and demand in the Customers table, or select it in Select mode to open its properties box.' Cost: 26 retranslations.
-  @@ NEEDS RULING
+  _Ruled 2026-10-08: Calls page 8 October: Use proposed. (He added: "Do you need me to review new_english_keys or anything?")_
 - **`lpn_pane_scn_alt_tip`**
   > {category} alt.: {alternative}
   *The finding:* 'alt.' is an English abbreviation for alternative (the scenario alternative holding the override, Tom's wording 2026-10-06, js/looped-network.js:25361). A translator meets it with no expansion; altitude and the Alt key are both plausible.
@@ -104,7 +104,7 @@ is the one you meant. "The first one" is a complete answer.
   2. altitude, or the Alt key
   **What this asks for:** WRITTEN PERMISSION to add a `$ec_lang_syn` entry for this key (a note to the 26 translators; it changes no English and nothing a visitor reads).
   *The proposal:* Add $ec_lang_syn PROPOSAL (AI may not write it): 'alt. abbreviates alternative (the scenario alternative that holds this override); abbreviate it the way your language abbreviates that word'. English unchanged.
-  @@ NEEDS RULING
+  _Ruled 2026-10-08: Calls page 8 October: Use proposed (the $ec_lang_syn note)_
 - **`lpn_reports_epanet`**
   > Run
   *The finding:* Menu item under Water, Reports that opens the EPANET run report (js/looped-network.js:5111). Alone, 'Run' is a verb in most languages' default sense, and a translator will render 'run the model', which is a different command (the toolbar Calculate). English stands: Tom named it in fix/report-names.
@@ -112,15 +112,15 @@ is the one you meant. "The first one" is a complete answer.
   2. verb: start a run
   **What this asks for:** WRITTEN PERMISSION to add a `$ec_lang_syn` entry for this key (a note to the 26 translators; it changes no English and nothing a visitor reads).
   *The proposal:* Add $ec_lang_syn PROPOSAL (AI may not write it): 'Run report; a noun, the report EPANET wrote for the last run, not the command to start a run'. English unchanged, no retranslation of English needed beyond the note.
-  @@ NEEDS RULING
+  _Ruled 2026-10-08: Calls page 8 October: Change: "I would use _syn for synonyms. That's why I invented it. "Run, simulation, computation, or calculation report""_
 - **`lpn_search_refused`**
-  > Place-name search is off, and nothing was sent. Go to a latitude and longitude still works.
+  > Place-name search is off, and nothing was sent. The Go to a latitude and longitude command still works.
   *The finding:* 'Go to a latitude and longitude still works' starts with what reads as an imperative; it is the name of the menu item lpn_goto_menu ('Go to a latitude and longitude...'). Low.
   1. the Go to a latitude and longitude command still works
   2. an instruction to go to a latitude and longitude, followed by 'still works'
   **What this asks for:** a WORDING ruling -- is the English above right, or say what it should say.
   *The proposal:* PROPOSED English: 'Place-name search is off, and nothing was sent. The Go to a latitude and longitude command still works.' Cost: 26 retranslations.
-  @@ NEEDS RULING
+  _Ruled 2026-10-08: Calls page 8 October: Use proposed_
 - **`lpn_snip_tip_mode`**
   > Snip shape
   *The finding:* Tip on the chevron beside the Snip button that opens a menu of Rectangle or Freehand (js/looped-network.js:42979). 'Snip shape' reads as an imperative (snip a shape) as easily as a noun.
@@ -128,17 +128,17 @@ is the one you meant. "The first one" is a complete answer.
   2. verb: snip a shape
   **What this asks for:** WRITTEN PERMISSION to add a `$ec_lang_syn` entry for this key (a note to the 26 translators; it changes no English and nothing a visitor reads).
   *The proposal:* Add $ec_lang_syn PROPOSAL (AI may not write it): 'Snip shape; a noun, the choice of shape (rectangle or freehand) for the next snip, not an instruction'. English unchanged.
-  @@ NEEDS RULING
+  _Ruled 2026-10-08: Calls page 8 October: "I would use _syn for synonyms. That's why I invented it. "Shape to specify for screenshot""_
 - **`lpn_tool_area_tip`**
-  > Follow on-screen wizard. Press again to cycle through window, lasso, and polygon. Hold Shift to keep existing selection set and add or remove (toggle) what you select.
+  > Follow the on-screen prompts. Press again to cycle through window, lasso, and polygon. Hold Shift to keep the current selection and add or remove (toggle) what you select.
   *The finding:* 'Hold Shift to keep existing selection set and add or remove' is a garden path: 'set' reads as a verb ('keep ..., set and add') before it reads as the noun 'selection set'. Articles are also dropped ('Follow on-screen wizard').
   1. keep the current selection set and add to it or remove from it
   2. keep the existing selection, set something, and add or remove
   **What this asks for:** a WORDING ruling -- is the English above right, or say what it should say.
   *The proposal:* PROPOSED English: 'Follow the on-screen prompts. Press again to cycle through window, lasso, and polygon. Hold Shift to keep the current selection and add or remove (toggle) what you select.' Cost: 26 retranslations.
-  @@ NEEDS RULING
+  _Ruled 2026-10-08: Calls page 8 October: Use proposed_
 
-## Synonym entries to approve  (6, 4 to read @@ NEEDS RULING)
+## Synonym entries to approve  (12, 10 to read @@ NEEDS RULING)
 
 **These are translator notes (`$ec_lang_syn`), not visitor wording.** Each was written against an
 English string that has since changed, or against a key that no longer exists. Say which: keep it
@@ -153,6 +153,27 @@ never edits a synonym.
   *Current synonym:* | gloss: lateral, mainline; avoid: "test" read as typical/sample
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   _Ruled 2026-10-05: What's wrong with the way it is? I am confused on this on about what's happening and why a _syn is needed._
+
+- **`lpn_cp_restrict`**
+  > Restrict these characters
+  *Why stale:* no record of the English it was written against
+  *Current synonym:* Forbid these characters; the opposite of Allow only these characters
+  **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
+  @@ NEEDS RULING
+
+- **`lpn_cp_restrict_tip`**
+  > Restrict these characters:
+  *Why stale:* no record of the English it was written against
+  *Current synonym:* Forbid these characters; the opposite of Allow only these characters
+  **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
+  @@ NEEDS RULING
+
+- **`lpn_fb_intro`**
+  > Canned messages (optional). Nothing is sent until you press Send.
+  *Why stale:* no record of the English it was written against
+  *Current synonym:* Ready-made messages; preset choices the visitor can pick instead of typing
+  **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
+  @@ NEEDS RULING
 
 - **`lpn_ff_selected`**
   > Selected junctions
@@ -172,11 +193,32 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   _Ruled 2026-10-05: Is this _syn needed?_
 
+- **`lpn_pane_scn_alt_tip`**
+  > {category} alt.: {alternative}
+  *Why stale:* no record of the English it was written against
+  *Current synonym:* alt. abbreviates alternative (the scenario alternative that holds this override); abbreviate it the way your language abbreviates that word
+  **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
+  @@ NEEDS RULING
+
+- **`lpn_reports_epanet`**
+  > Run
+  *Why stale:* no record of the English it was written against
+  *Current synonym:* Run, simulation, computation, or calculation report
+  **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
+  @@ NEEDS RULING
+
 - **`lpn_scenario_push_values`**
   > Values discarded:
   *Why stale:* the English changed after this synonym was written
   *Written against:* Values thrown away:
   *Current synonym:* Values thrown away, Values discarded, Values lost, Values wiped, Values replaced, Values displaced, Values cleared, Custom values cleared | a count follows this label, not a list of values
+  **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
+  @@ NEEDS RULING
+
+- **`lpn_snip_tip_mode`**
+  > Snip shape
+  *Why stale:* no record of the English it was written against
+  *Current synonym:* Shape to specify for screenshot
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   @@ NEEDS RULING
 
@@ -196,7 +238,7 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   @@ NEEDS RULING
 
-## lpn_  (222, 115 to read @@ NEEDS RULING)
+## lpn_  (222, 113 to read @@ NEEDS RULING)
 
 - **`lpn_alt_calc_options`**
   > Calculation options
@@ -223,8 +265,8 @@ never edits a synonym.
   > {id}: {property} {value}, in scenario {scenario}, becomes {new}
   @@ NEEDS RULING
 - **`lpn_change_type_born`**
-  > These are new, as on a newly drawn one:
-  @@ NEEDS RULING
+  > These values are new, set as on a newly drawn asset:
+  _Ruled 2026-10-08: Calls page 8 October: Use proposed_
 - **`lpn_change_type_customers`**
   > Only a pipe serves customers, so these customers are connected instead to the node shown in parentheses, where their demand is already applied. They stay where they are drawn, and their demand is unchanged:
   @@ NEEDS RULING
@@ -587,7 +629,7 @@ never edits a synonym.
   _Ruled OK 2026-10-01._
 - **`lpn_popup_none`**
   > Nothing is selected. Select an asset on the map to see its properties.
-  @@ NEEDS RULING
+  _Ruled 2026-10-08: Calls page 8 October: Use as written_
 - **`lpn_profile_file_done`**
   > Profile read from the file: {used} of {total} nodes found in this network.
   _Ruled OK 2026-10-03._
@@ -878,7 +920,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**144 still to read**, of 147 new keys across 16 unmerged branch(es).
+**144 still to read**, of 147 new keys across 15 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -889,9 +931,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/wave0-1008 (`a9324017`) — adds no English strings
-
-### feat/bentley-interop (`dff89641`) — 63 new, 63 to read @@ NEEDS RULING
+### feat/bentley-interop (`95843064`) — 63 new, 63 to read @@ NEEDS RULING
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -1085,7 +1125,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/desktop (`baba0f04`) — adds no English strings
 
-### feat/dxf (`68495608`) — 12 new, 12 to read @@ NEEDS RULING
+### feat/dxf (`dee7a28a`) — 12 new, 12 to read @@ NEEDS RULING
 
 - **`lpn_dxf_export_failed`**
   > The DXF file was not written: an error in this page stopped it ({error}).
@@ -1146,7 +1186,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`2e5e81c4`) — adds no English strings
 
-### feat/message-dismiss (`f786f69f`) — 5 new, 5 to read @@ NEEDS RULING
+### feat/message-dismiss (`c382789b`) — 5 new, 5 to read @@ NEEDS RULING
 
 - **`lpn_hotkeys_zoomwin_def`**
   > Zoom Window: drag a rectangle to zoom to.
@@ -1170,7 +1210,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Points data<br />(use Copy to see format)
   @@ NEEDS RULING
 
-### feat/table-export (`4f04c877`) — 12 new, 12 to read @@ NEEDS RULING
+### feat/table-export (`6988ecf1`) — 12 new, 12 to read @@ NEEDS RULING
 
 - **`lpn_export_table_all`**
   > All
@@ -1209,7 +1249,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Copy with headings
   @@ NEEDS RULING
 
-### feat/user-guide (`3aa468bd`) — 39 new, 39 to read @@ NEEDS RULING
+### feat/user-guide (`f6b80d79`) — 39 new, 39 to read @@ NEEDS RULING
 
 - **`lpn_guide_also`**
   > Also in {menu}
@@ -1329,9 +1369,9 @@ build for that would be a gate nobody keeps. Refresh it with
   > Guide
   @@ NEEDS RULING
 
-### feat/visit-dedupe (`08c07d31`) — adds no English strings
+### feat/visit-dedupe (`368c3910`) — adds no English strings
 
-### feat/workspace (`d14aa77c`) — 12 new, 12 to read @@ NEEDS RULING
+### feat/workspace (`bbad2f5c`) — 12 new, 12 to read @@ NEEDS RULING
 
 - **`lpn_file_export_item_workspace`**
   > Workspace…

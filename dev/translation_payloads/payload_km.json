@@ -791,7 +791,7 @@
         "lpn_change_type_more": "And {n} more.",
         "lpn_change_type_surface": "These keep the water surface where it was. A reservoir's head is the tank's elevation plus its water depth, and a tank's water depth is the reservoir's head minus its elevation:",
         "lpn_change_type_meaning": "These controls and rules test a node being changed, and will read it differently: a junction is tested by its pressure, and a tank or reservoir by its water level.",
-        "lpn_change_type_born": "These are new, as on a newly drawn one:",
+        "lpn_change_type_born": "These values are new, set as on a newly drawn asset:",
         "lpn_change_type_no_curve": "{id}: No pump head curve, so the pump adds no head until one is selected, and an .inp export writes it as a pipe",
         "lpn_change_type_becomes": "{id}: {property} {value}, in scenario {scenario}, becomes {new}",
         "lpn_change_type_customers": "Only a pipe serves customers, so these customers are connected instead to the node shown in parentheses, where their demand is already applied. They stay where they are drawn, and their demand is unchanged:",
@@ -1017,7 +1017,7 @@
         "lpn_change_type_more": "And {n} more.",
         "lpn_change_type_surface": "These keep the water surface where it was. A reservoir's head is the tank's elevation plus its water depth, and a tank's water depth is the reservoir's head minus its elevation:",
         "lpn_change_type_meaning": "These controls and rules test a node being changed, and will read it differently: a junction is tested by its pressure, and a tank or reservoir by its water level.",
-        "lpn_change_type_born": "These are new, as on a newly drawn one:",
+        "lpn_change_type_born": "These values are new, set as on a newly drawn asset:",
         "lpn_change_type_no_curve": "{id}: No pump head curve, so the pump adds no head until one is selected, and an .inp export writes it as a pipe",
         "lpn_change_type_becomes": "{id}: {property} {value}, in scenario {scenario}, becomes {new}",
         "lpn_change_type_customers": "Only a pipe serves customers, so these customers are connected instead to the node shown in parentheses, where their demand is already applied. They stay where they are drawn, and their demand is unchanged:",
@@ -1671,7 +1671,7 @@
                 "next_translated": {
                     "key": "lpn_tool_area_tip",
                     "value": "ចុចលើផែនទីតាមការណែនាំ ដើម្បីជ្រើសរើសអ្វីៗទាំងអស់ខាងក្នុងរាងនោះ។ ចុចប៊ូតុងនេះម្ដងទៀតដើម្បីប្ដូររាងរវាងបង្អួច ខ្សែរូបភាព និងពហុកោណ។ សង្កត់គ្រាប់ចុច Shift ខណៈកំពុងជ្រើសរើស ដើម្បីបន្តជាមួយការជ្រើសរើសដែលមានស្រាប់ ដោយបន្ថែម ឬដកអ្វីដែលអ្នកជ្រើសរើស (ត្រឡប់)។",
-                    "english": "Follow on-screen wizard. Press again to cycle through window, lasso, and polygon. Hold Shift to keep existing selection set and add or remove (toggle) what you select."
+                    "english": "Follow the on-screen prompts. Press again to cycle through window, lasso, and polygon. Hold Shift to keep the current selection and add or remove (toggle) what you select."
                 }
             }
         },
@@ -4553,7 +4553,10 @@
         }
     },
     "key_syn": {
-        "lpn_ds_head_search_selected": "What demand can the junctions you choose handle"
+        "lpn_fb_intro": "Ready-made messages; preset choices the visitor can pick instead of typing",
+        "lpn_pane_scn_alt_tip": "alt. abbreviates alternative (the scenario alternative that holds this override); abbreviate it the way your language abbreviates that word",
+        "lpn_ds_head_search_selected": "What demand can the junctions you choose handle",
+        "lpn_snip_tip_mode": "Shape to specify for screenshot"
     },
     "key_concepts": []
 }
