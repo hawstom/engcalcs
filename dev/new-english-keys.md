@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**34 still to read on master**, of 36 untranslated keys, of 2480 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**36 still to read on master**, of 38 untranslated keys, of 2482 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -139,7 +139,7 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   @@ NEEDS RULING
 
-## lpn_  (36, 34 to read @@ NEEDS RULING)
+## lpn_  (38, 36 to read @@ NEEDS RULING)
 
 - **`lpn_dxf_export_failed`**
   > The DXF file was not written: an error in this page stopped it ({error}).
@@ -225,6 +225,12 @@ never edits a synonym.
 - **`lpn_pane_copy_heads`**
   > Copy with headings
   @@ NEEDS RULING
+- **`lpn_settings_hover_card`**
+  > Show the full label on hover
+  @@ NEEDS RULING
+- **`lpn_settings_hover_card_tip`**
+  > Rest the pointer on a node, link or customer to see its label as specified in Settings at any scale, fit or not. This is a setting for this browser, not for the project.
+  @@ NEEDS RULING
 - **`lpn_workspace_confirm`**
   > Replace this browser's workspace layout with the one in the file?
   _Ruled 2026-10-08: Calls page 8 October: his own text, "Replace this browser's workspace layout with the one in the file?"_
@@ -254,7 +260,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**110 still to read**, of 113 new keys across 13 unmerged branch(es).
+**114 still to read**, of 117 new keys across 13 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -265,7 +271,9 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/bentley-interop (`661acc46`) — 63 new, 63 to read @@ NEEDS RULING
+### chore/calls-1008c (`ba4703ae`) — adds no English strings
+
+### feat/bentley-interop (`2cfebc47`) — 66 new, 66 to read @@ NEEDS RULING
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -273,17 +281,26 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_alt_cat_presentation`**
   > Presentation
   @@ NEEDS RULING
-- **`lpn_change_type_create_overrides`**
-  > Create overrides
+- **`lpn_change_type_create_new`**
+  > Create new assets
   @@ NEEDS RULING
 - **`lpn_change_type_line_alternative`**
   > {id}: {property} {value}, in alternative {alternative}
   @@ NEEDS RULING
+- **`lpn_change_type_not_carried`**
+  > The new assets cannot hold these values. The old assets keep them:
+  @@ NEEDS RULING
+- **`lpn_change_type_old_controls`**
+  > These controls and rules name an old asset, which is inactive in this scenario, so they are omitted from this scenario's run:
+  @@ NEEDS RULING
 - **`lpn_change_type_scenario_ask`**
-  > Current scenario is not Base. Create overrides?
+  > Current scenario is not Base. Create new assets? The selected assets become inactive in this scenario.
   @@ NEEDS RULING
 - **`lpn_change_type_switch_base`**
   > Switch to Base
+  @@ NEEDS RULING
+- **`lpn_pane_inactive_show`**
+  > Include inactive topology
   @@ NEEDS RULING
 - **`lpn_pane_scn_cur_only`**
   > Current scenario only
@@ -459,15 +476,6 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/desktop (`baba0f04`) — adds no English strings
 
-### feat/hover-label (`944f963d`) — 2 new, 2 to read @@ NEEDS RULING
-
-- **`lpn_settings_hover_card`**
-  > Show the full label on hover
-  @@ NEEDS RULING
-- **`lpn_settings_hover_card_tip`**
-  > Rest the pointer on a node, link or customer to see its label with every label field shown, ticked or not. This is a setting for this browser, not for the project.
-  @@ NEEDS RULING
-
 ### feat/label-gang-search (`8b31a907`) — 3 new, all ruled
 
 - **`lpn_confirm_labels_restore`**
@@ -490,7 +498,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`2e5e81c4`) — adds no English strings
 
-### feat/message-dismiss (`d4c88b12`) — 5 new, 5 to read @@ NEEDS RULING
+### feat/message-dismiss (`aaedf63e`) — 5 new, 5 to read @@ NEEDS RULING
 
 - **`lpn_hotkeys_zoomwin_def`**
   > Zoom Window: drag a rectangle to zoom to.
@@ -514,7 +522,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Points data<br />(use Copy to see format)
   @@ NEEDS RULING
 
-### feat/user-guide (`a6661944`) — 39 new, 39 to read @@ NEEDS RULING
+### feat/user-guide (`9e0c0ef6`) — 42 new, 42 to read @@ NEEDS RULING
 
 - **`lpn_guide_also`**
   > Also in {menu}
@@ -526,7 +534,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > {box} box
   @@ NEEDS RULING
 - **`lpn_guide_boxes_autohide`**
-  > Auto-hidden boxes have two modes: with focus (a control in the box has focus, even a button just pressed) and without focus (no control in it has focus). When the pointer leaves, a box without focus tucks away behind its tab after a short delay. A box with focus stays until you click outside it, press Esc, or Tab out of it with the pointer elsewhere.
+  > When the pointer leaves, a box without focus hides after a short delay. A box with focus hides when you click outside it, press Esc, or Tab out of it with the pointer elsewhere.
   @@ NEEDS RULING
 - **`lpn_guide_boxes_heading`**
   > Boxes
@@ -570,11 +578,20 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_guide_find_results_term`**
   > Results, the selection, and Tables
   @@ NEEDS RULING
+- **`lpn_guide_how_alt`**
+  > Alternatives preview is listed under Water, Scenarios when Basic mode is off.
+  @@ NEEDS RULING
+- **`lpn_guide_how_popup`**
+  > Properties opens when you select an asset or text.
+  @@ NEEDS RULING
 - **`lpn_guide_keys_def`**
   > <table class="lpn-notes-table"><tbody><tr><td>?</td><td>Open the guide at the control under the pointer or holding focus.</td></tr><tr><td>F1</td><td>Open the guide at the entry for the box that has focus.</td></tr><tr><td>Ctrl+K</td><td>Open the guide with the current selection in the search field.</td></tr><tr><td>/</td><td>Select the search field while the guide has focus.</td></tr><tr><td>Esc</td><td>Close the guide and return to where you were.</td></tr></tbody></table>
   @@ NEEDS RULING
 - **`lpn_guide_keys_term`**
   > Guide keyboard shortcuts
+  @@ NEEDS RULING
+- **`lpn_guide_not_shown`**
+  > This control is not on screen right now.
   @@ NEEDS RULING
 - **`lpn_guide_rail_hide`**
   > Hide contents
@@ -634,4 +651,4 @@ build for that would be a gate nobody keeps. Refresh it with
   > Guide
   @@ NEEDS RULING
 
-### feat/visit-dedupe (`b4a99e9a`) — adds no English strings
+### feat/visit-dedupe (`7b4a84bd`) — adds no English strings

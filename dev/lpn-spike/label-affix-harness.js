@@ -128,7 +128,9 @@ function checkAffix(what, field, prefix, text, bare) {
 	// The number starts where the prefix stops -- no space of the page's own.
 	ok('...and the number follows the prefix immediately', /^-?[\d.]/.test(text.slice(pair[1].length)), text);
 });
-checkAffix('link', 'id', '', onlyLink('id')[0], pipes[0].id);
+// The shipped example states an id prefix (N, L); read what the page applies rather than assuming none.
+const ID_PFX = { link: L.labelPrefixFor('link', 'id'), node: L.labelPrefixFor('node', 'id') };
+checkAffix('link', 'id', ID_PFX.link, onlyLink('id')[0], pipes[0].id);
 // BASE DEMAND IS 'Qb=' AND RESOLVED DEMAND IS 'Q=' (Tom, 2026-08-26). Asserted as a PAIR, in one
 // list, because the whole reason base demand is not plain 'Q=' is that a junction can print both
 // numbers at once; either one drifting back to the other's symbol makes the pair unreadable and is
@@ -138,7 +140,7 @@ checkAffix('link', 'id', '', onlyLink('id')[0], pipes[0].id);
 	checkAffix('node', pair[0], pair[1], text, text.slice(pair[1].length));
 	ok('...and the number follows the prefix immediately', /^-?[\d.]/.test(text.slice(pair[1].length)), text);
 });
-checkAffix('node', 'id', '', onlyNode('id')[0], junctions[0].id);
+checkAffix('node', 'id', ID_PFX.node, onlyNode('id')[0], junctions[0].id);
 // TANK WATER DEPTH DEFAULTS TO 'Y=' (Tom, 2026-09-25).
 ok("tank water depth's default label prefix is 'Y='", L.labelPrefixFor('node', 'level') === 'Y=',
 	L.labelPrefixFor('node', 'level'));
@@ -186,9 +188,9 @@ ok('...and lineCount agrees, so the mask and the collision box are sized for one
 	L.lineCount(P.id) === 1, String(L.lineCount(P.id)));
 ok('...with the values joined by the separator', / /.test(rowText(rows[0])) && /Q=/.test(rowText(rows[0])), rowText(rows[0]));
 // EVERY PREFIX AND EVERY SEPARATOR IS ITS OWN SEGMENT, which is what keeps an extrema mark the
-// length of the number alone: id, sep, 'Q=', value, sep, 'V=', value.
+// length of the number alone: [id prefix, if the project states one], id, sep, 'Q=', value, sep, 'V=', value.
 ok('...and the prefixes and separators are their own segments',
-	rows[0].length === 7, JSON.stringify(rows[0].map(function (s) { return s.text; })));
+	rows[0].length === 7 + (ID_PFX.link ? 1 : 0), JSON.stringify(rows[0].map(function (s) { return s.text; })));
 ok('...so no segment carrying a number also carries a prefix',
 	rows[0].every(function (s) { return !/[A-Za-z]=[\d.]/.test(s.text); }),
 	JSON.stringify(rows[0].map(function (s) { return s.text; })));
@@ -298,8 +300,10 @@ if (markedOneLine) {
 		row.filter(function (t) { return t.dec; }).length === 1, JSON.stringify(row));
 	ok('...and it is the number, not the prefix or the separator beside it',
 		at >= 0 && /^-?[\d.]+$/.test(row[at].text), JSON.stringify(row));
-	ok('...nor the id, which has no extrema of its own -- a string has no max',
-		!row[0].dec && row[0].text === markedOneLine.id, JSON.stringify(row[0]));
+	const idSegs = row.slice(0, ID_PFX.link ? 2 : 1);
+	ok('...nor the id (or its prefix), which has no extrema of its own -- a string has no max',
+		idSegs.every(function (t) { return !t.dec; }) && idSegs.map(function (t) { return t.text; }).join('') === ID_PFX.link + markedOneLine.id,
+		JSON.stringify(idSegs));
 } else {
 	ok('a link with a marked flow exists to check the one-line case', false);
 }

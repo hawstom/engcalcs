@@ -36,6 +36,7 @@ const ROOT = path.join(__dirname, '..', '..') + '/';
 const L = loadLoopedNetwork(
 	EXAMPLE_EXPORTS +
 	"\t\tgetDoc: function () { return doc; },\n" +
+	"\t\tidPrefix: function (g) { return labelPrefixFor(g, 'id'); },\n" +
 	"\t\trunSolve: runSolve, openBox: openCriticalityBox, wireBox: wireCriticalityBox,\n" +
 	"\t\trunCrit: runCriticality, run: function () { return critRun; },\n" +
 	"\t\tmoreLine: ffMoreLine,\n" +
@@ -100,7 +101,11 @@ function trs(el) {
 	return out;
 }
 function rowTint(tr) { return (String(tr.className || '').match(/lpn-ff-(fail|design|error|none)/) || [])[1] || ''; }
-function rowId(tr) { const b = gotoIn(kids(tr)[0])[0]; return b ? b.textContent : ''; }
+// The page prints an id as labelPrefixFor(group, 'id') + id (the shipped examples state N and L);
+// the checks below compare the bare id, so strip exactly the prefix the page applies.
+function bare(group, t) { const p = L.idPrefix(group); t = String(t); return p && t.indexOf(p) === 0 ? t.slice(p.length) : t; }
+function bareText(group, b) { return bare(group, b.textContent); }
+function rowId(tr) { const b = gotoIn(kids(tr)[0])[0]; return b ? bareText('link', b) : ''; }
 function gotoIn(el) {
 	const out = [];
 	(function walk(x) {
@@ -157,8 +162,8 @@ function openNet1() {
 	ok('breaking the pump drops 10 and 11', below('9') === '10,11', below('9'));
 	ok('junction 32, already below, is on no row', set.results.every((r) => !(r.below || []).some((b) => b.id === '32')));
 	let tr = rows(byId.lpn_crit_report);
-	const row111 = tr.filter((r) => gotoIn(r[0])[0] && gotoIn(r[0])[0].textContent === '111')[0];
-	ok('the below-minimum cell names them as links', !!row111 && gotoIn(row111[3]).map((b) => b.textContent).sort().join() === '21,31',
+	const row111 = tr.filter((r) => gotoIn(r[0])[0] && bareText('link', gotoIn(r[0])[0]) === '111')[0];
+	ok('the below-minimum cell names them as links', !!row111 && gotoIn(row111[3]).map((b) => bareText('node', b)).sort().join() === '21,31',
 		row111 && text(row111[3]));
 	ok('the note says how many were already below', text(byId.lpn_crit_report).indexOf(
 		PC.lpn_crit_baseline_below.replace('{n}', '1')) >= 0);
@@ -194,10 +199,10 @@ function openNet1() {
 	tr = rows(byId.lpn_crit_report);
 	ok('one row per broken asset', tr.length === 12, tr.length);
 	const first = tr[0] && gotoIn(tr[0][0])[0];
-	ok('sorted by severity: 121 first, then 31', !!first && first.textContent === '121' &&
-		gotoIn(tr[1][0])[0].textContent === '31', tr.slice(0, 3).map((r) => text(r[0])).join());
+	ok('sorted by severity: 121 first, then 31', !!first && bareText('link', first) === '121' &&
+		bareText('link', gotoIn(tr[1][0])[0]) === '31', tr.slice(0, 3).map((r) => text(r[0])).join());
 	ok('the asset ID is a go-to link', !!first && first.title === PC.lpn_goto_on_map);
-	ok('the cut-off cell names the junctions as links', gotoIn(tr[0][2]).map((b) => b.textContent).sort().join() === '31,32',
+	ok('the cut-off cell names the junctions as links', gotoIn(tr[0][2]).map((b) => bareText('node', b)).sort().join() === '31,32',
 		text(tr[0][2]));
 	ok('the demand cell reads in gpm', /^200 gpm$/.test(text(tr[0][1])), text(tr[0][1]));
 	trEls = trs(byId.lpn_crit_report);
@@ -221,7 +226,7 @@ function openNet1() {
 	const e31 = set.byId['31'];
 	ok('31 is an error row that still knows what it cut off', e31.state === 'error' && e31.cutOff.join() === '32' &&
 		Math.abs(e31.unserved / GPM - 100) < 1e-6, JSON.stringify(e31));
-	const row31 = rows(byId.lpn_crit_report).filter((r) => gotoIn(r[0])[0] && gotoIn(r[0])[0].textContent === '31')[0];
+	const row31 = rows(byId.lpn_crit_report).filter((r) => gotoIn(r[0])[0] && bareText('link', gotoIn(r[0])[0]) === '31')[0];
 	ok('...and its row says the solve failed', !!row31 && text(row31[3]) === PC.lpn_ff_err_solve, row31 && text(row31[3]));
 	trEls = trs(byId.lpn_crit_report);
 	ok('8. an unsolved row that still lost demand is red, not grey: the loss is known',
