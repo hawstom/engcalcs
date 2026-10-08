@@ -12,7 +12,11 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
+<<<<<<< HEAD
 **156 still to read on master**, of 263 untranslated keys, of 2483 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+=======
+**115 still to read on master**, of 224 untranslated keys, of 2444 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+>>>>>>> master
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -21,7 +25,7 @@ hit takes you to a section and the rest walk its keys. A key already ruled does 
 it, and a fully ruled group says `all ruled` and can be skipped whole.
 Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
-## Questions from the translators  (13 to read @@ NEEDS RULING)
+## Questions from the translators  (1 to read @@ NEEDS RULING)
 
 **These are SHIPPED strings, already translated into 26 languages.** A wave-0
 reading or a translator found each one readable two ways, and no sprint launches while one is
@@ -39,6 +43,7 @@ is the one you meant. "The first one" is a complete answer.
   *The proposal:* PROPOSED A: '⚠ At least one junction is below {pressure} at the demands as entered (a demand scale of 1). All junctions keep {pressure} only if demands are cut to a demand scale of {m} or less.' PROPOSED B: '⚠ The demands as entered (a demand scale of 1) leave at least one junction below {pressure}. The largest demand scale that keeps every junction at {pressure} or above is {m}.' B paralle...
   @@ NEEDS RULING
 
+<<<<<<< HEAD
 ### from sprint 1008-wave0
 
 - **`lpn_change_type_born`**
@@ -139,6 +144,9 @@ is the one you meant. "The first one" is a complete answer.
   @@ NEEDS RULING
 
 ## Synonym entries to approve  (6, 4 to read @@ NEEDS RULING)
+=======
+## Synonym entries to approve  (12, 10 to read @@ NEEDS RULING)
+>>>>>>> master
 
 **These are translator notes (`$ec_lang_syn`), not visitor wording.** Each was written against an
 English string that has since changed, or against a key that no longer exists. Say which: keep it
@@ -153,6 +161,27 @@ never edits a synonym.
   *Current synonym:* | gloss: lateral, mainline; avoid: "test" read as typical/sample
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   _Ruled 2026-10-05: What's wrong with the way it is? I am confused on this on about what's happening and why a _syn is needed._
+
+- **`lpn_cp_restrict`**
+  > Restrict these characters
+  *Why stale:* no record of the English it was written against
+  *Current synonym:* Forbid these characters; the opposite of Allow only these characters
+  **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
+  @@ NEEDS RULING
+
+- **`lpn_cp_restrict_tip`**
+  > Restrict these characters:
+  *Why stale:* no record of the English it was written against
+  *Current synonym:* Forbid these characters; the opposite of Allow only these characters
+  **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
+  @@ NEEDS RULING
+
+- **`lpn_fb_intro`**
+  > Canned messages (optional). Nothing is sent until you press Send.
+  *Why stale:* no record of the English it was written against
+  *Current synonym:* Ready-made messages; preset choices the visitor can pick instead of typing
+  **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
+  @@ NEEDS RULING
 
 - **`lpn_ff_selected`**
   > Selected junctions
@@ -172,11 +201,32 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   _Ruled 2026-10-05: Is this _syn needed?_
 
+- **`lpn_pane_scn_alt_tip`**
+  > {category} alt.: {alternative}
+  *Why stale:* no record of the English it was written against
+  *Current synonym:* alt. abbreviates alternative (the scenario alternative that holds this override); abbreviate it the way your language abbreviates that word
+  **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
+  @@ NEEDS RULING
+
+- **`lpn_reports_epanet`**
+  > Run
+  *Why stale:* no record of the English it was written against
+  *Current synonym:* Run, simulation, computation, or calculation report
+  **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
+  @@ NEEDS RULING
+
 - **`lpn_scenario_push_values`**
   > Values discarded:
   *Why stale:* the English changed after this synonym was written
   *Written against:* Values thrown away:
   *Current synonym:* Values thrown away, Values discarded, Values lost, Values wiped, Values replaced, Values displaced, Values cleared, Custom values cleared | a count follows this label, not a list of values
+  **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
+  @@ NEEDS RULING
+
+- **`lpn_snip_tip_mode`**
+  > Snip shape
+  *Why stale:* no record of the English it was written against
+  *Current synonym:* Shape to specify for screenshot
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   @@ NEEDS RULING
 
@@ -196,7 +246,11 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   @@ NEEDS RULING
 
+<<<<<<< HEAD
 ## lpn_  (261, 154 to read @@ NEEDS RULING)
+=======
+## lpn_  (222, 113 to read @@ NEEDS RULING)
+>>>>>>> master
 
 - **`lpn_alt_calc_options`**
   > Calculation options
@@ -223,8 +277,8 @@ never edits a synonym.
   > {id}: {property} {value}, in scenario {scenario}, becomes {new}
   @@ NEEDS RULING
 - **`lpn_change_type_born`**
-  > These are new, as on a newly drawn one:
-  @@ NEEDS RULING
+  > These values are new, set as on a newly drawn asset:
+  _Ruled 2026-10-08: Calls page 8 October: Use proposed_
 - **`lpn_change_type_customers`**
   > Only a pipe serves customers, so these customers are connected instead to the node shown in parentheses, where their demand is already applied. They stay where they are drawn, and their demand is unchanged:
   @@ NEEDS RULING
@@ -704,7 +758,7 @@ never edits a synonym.
   _Ruled OK 2026-10-01._
 - **`lpn_popup_none`**
   > Nothing is selected. Select an asset on the map to see its properties.
-  @@ NEEDS RULING
+  _Ruled 2026-10-08: Calls page 8 October: Use as written_
 - **`lpn_profile_file_done`**
   > Profile read from the file: {used} of {total} nodes found in this network.
   _Ruled OK 2026-10-03._
@@ -995,7 +1049,11 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
+<<<<<<< HEAD
 **107 still to read**, of 110 new keys across 16 unmerged branch(es).
+=======
+**144 still to read**, of 147 new keys across 15 unmerged branch(es).
+>>>>>>> master
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -1006,7 +1064,11 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
+<<<<<<< HEAD
 ### feat/bentley-interop (`8ee43015`) — 63 new, 63 to read @@ NEEDS RULING
+=======
+### feat/bentley-interop (`95843064`) — 63 new, 63 to read @@ NEEDS RULING
+>>>>>>> master
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -1270,7 +1332,11 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`2e5e81c4`) — adds no English strings
 
+<<<<<<< HEAD
 ### feat/message-dismiss (`0cabf5b2`) — 5 new, 5 to read @@ NEEDS RULING
+=======
+### feat/message-dismiss (`c382789b`) — 5 new, 5 to read @@ NEEDS RULING
+>>>>>>> master
 
 - **`lpn_hotkeys_zoomwin_def`**
   > Zoom Window: drag a rectangle to zoom to.
@@ -1333,11 +1399,21 @@ build for that would be a gate nobody keeps. Refresh it with
   > Copy with headings
   @@ NEEDS RULING
 
+<<<<<<< HEAD
 ### feat/user-guide (`75e286c5`) — adds no English strings
+=======
+### feat/user-guide (`f6b80d79`) — 39 new, 39 to read @@ NEEDS RULING
+>>>>>>> master
 
 ### feat/visit-dedupe (`57bebb74`) — adds no English strings
 
+<<<<<<< HEAD
 ### feat/workspace (`9766fee0`) — 12 new, 12 to read @@ NEEDS RULING
+=======
+### feat/visit-dedupe (`368c3910`) — adds no English strings
+
+### feat/workspace (`bbad2f5c`) — 12 new, 12 to read @@ NEEDS RULING
+>>>>>>> master
 
 - **`lpn_file_export_item_workspace`**
   > Workspace…
