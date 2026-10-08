@@ -2787,9 +2787,9 @@
             "answer": "Technical-English interview: Use proposed"
         },
         "lpn_inp_export_flat_customers": {
-            "on": "An EPANET file has no customers. The demand of the {n} customers in this project goes into the file as a demand row on the junction each one is added to, and each row is named with the customer’s tag. What the file cannot hold is the customer: where it sits, which pipe serves it, where along that pipe the service connects, and how many services one customer stands for. Your own project file keeps all of that.",
-            "ruled": "2026-09-23",
-            "answer": "OK."
+            "on": "An EPANET file has no customers. The demand of the {n} customers in this project is written as a demand row on the junction each customer is assigned to, named with the customer's tag. The file does not record the customer itself: its location, the pipe that serves it, where along that pipe the service connects, or how many services it represents. That information remains in the project; save the project file to keep it.",
+            "ruled": "2026-10-07",
+            "answer": "Calls page 7 October: Use proposed"
         },
         "lpn_inp_export_flat_fittings": {
             "on": "An EPANET file cannot hold the list of elbows, valves and tees in your project file. The minor loss coefficient of {n} pipes here is added up from a fittings list. The total goes into the file exactly as it stands, so nothing about the answers changes.",
@@ -5541,9 +5541,9 @@
             "answer": "Technical-English interview: Use proposed"
         },
         "lpn_wrong_tip": {
-            "on": "One press tells us that something on this page is wrong. It sends the name of this page, the language you are reading it in, and the message on the map if there is one. It sends nothing you have typed, no address, and nothing at all out of your drawing. Nobody can write back, because this tells us nothing about who you are. Use Help, Fix something when you want to say more.",
-            "ruled": "2026-09-06",
-            "answer": "OK."
+            "on": "Report an error on this page. This opens a box to select the problem, add a comment, and enter an email address if a reply is wanted. All fields are optional, and nothing is sent until you press Send.",
+            "ruled": "2026-10-07",
+            "answer": "Calls page 7 October: Use proposed"
         },
         "lpn_xymap": {
             "on": "local",
@@ -5611,6 +5611,11 @@
             "on": "The flow unit named in this file is not one this page knows, so every number was read as gallons per minute. Check every value before using the results.",
             "ruled": "2026-10-07",
             "answer": "Technical-English interview: Use proposed"
+        },
+        "lpn_scenario_preset_mult_tip": {
+            "on": "Demand multiplier {mult} times average day, a placeholder value. Most systems fall between {lo} and {hi} (National Research Council, 2006). Set the value for the system being modeled in Settings, Calculation, Hydraulics, Demand multiplier.",
+            "ruled": "2026-10-07",
+            "answer": "Calls page 7 October: Use proposed"
         }
     }
 }

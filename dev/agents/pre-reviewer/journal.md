@@ -4099,3 +4099,10 @@ OBSERVED: phone 390 and desktop: no sideways page scroll, tables fit, rtl ar fin
 OBSERVED: no change in 0dc0bb62..00862427 touches the report names (item 7); guide entries read EPANET run report / Status report while Reports menu rows read Run (EPANET) / Status (EPANET).
 OBSERVED: register: "asks four questions", "of its own" in new Find strings.
 NOT RUN: mutation test of choice fix; Ctrl+K inside a table cell mid-edit.
+
+## 2026-10-08 feat/workspace d14aa77c (Perry)
+OBSERVED: dock-default (19/19), dock-memory (17/17), workspace-browser (43/43) pass bare.
+OBSERVED: first visit, defaults opted in, 1280x720 and 1366x768: 6+8 tabs, fit (bottom 714 of 720); labels truncated with an ellipsis ("Set…", "Prop…", "Libr…"); consent banner covers the lower tabs until answered; examples wall not obstructed. Short window 560: tabs shrink, no overflow.
+OBSERVED: one change then 3 reloads: 6+7 stable. Start fresh clears lpn_dockbox, defaults return. Old-format workspace (no lpn_dockbox, no dockOrd) imports, no defaults layered on, stable on reload.
+OBSERVED: Properties flyout text matches the string.
+SPECULATION: defaults gate looks only at box records + lpn_dockbox, not lpn_index; a returning visitor with projects but no box record gets 14 tabs once. navigator.webdriver true under --remote-debugging/automation Chrome.
