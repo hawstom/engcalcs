@@ -73,12 +73,13 @@ async function main() {
 			await P.mouse.move(5, 5); await a.settle(400);
 			return t;
 		};
-		const tpl = (m, lo, hi) => 'Demand multiplier ' + m + ' times average day, a placeholder value. Most systems fall between ' + lo + ' and ' + hi + ' (National Research Council, 2006). Set the value for the system being modeled in Settings, Calculation, Hydraulics, Demand multiplier.';
-		const md = { tip: await tipOf('5. Max Day') }, ph = { tip: await tipOf('6. Peak hour') }, fm = { tip: await tipOf('7. Fire plus max day') };
+		const raw = await a.lang('lpn_scenario_preset_mult_tip');
+		const tpl = (m, lo, hi) => raw.replace('{mult}', m).replace('{lo}', lo).replace('{hi}', hi).trim();
+		const md = { tip: await tipOf(await a.lang('lpn_scenario_preset_max_day')) }, ph = { tip: await tipOf(await a.lang('lpn_scenario_preset_peak_hour')) }, fm = { tip: await tipOf(await a.lang('lpn_scenario_preset_fire_max_day')) };
 		ok('Max Day tip: 2.0 times, between 1.2 and 3.0', md.tip === tpl('2.0', '1.2', '3.0'), md.tip);
 		ok('Peak hour tip: 3.0 times, between 3.0 and 6.0', ph.tip === tpl('3.0', '3.0', '6.0'), ph.tip);
 		ok('no placeholder left unfilled', !/[{}]/.test((md || {}).tip + (ph || {}).tip));
-		ok('Fire plus max day keeps its own tip', /^Max day demand/.test(fm.tip), fm.tip);
+		ok('Fire plus max day keeps its own tip', fm.tip === (await a.lang('lpn_scenario_preset_fire_max_day_tip')).trim(), fm.tip);
 		ok('no uncaught page errors', a.errors.length === 0, a.errors.slice(0, 2).join(' | '));
 		await a.close();
 	} finally {
