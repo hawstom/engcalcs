@@ -33110,7 +33110,7 @@ var EngCalcs = EngCalcs || {};
 		if (!lost.length && !meaning.length && !surface.length && !moved.length && !rules.length && !setting.length && !born.length) { proceed(); return; }
 		text = [];
 		// The key to the lost lines, first in the box: each is the asset ID, a colon, the entry lost.
-		if (lost.length) { text.push(String(pc.lpn_change_type_key || 'ID: Lost entry')); }
+		if (lost.length) { text.push(String(pc.lpn_change_type_key || 'Each line: ID: the property and value that would be lost')); }
 		if (surface.length) {
 			text.push([pc.lpn_change_type_surface || 'These keep the water surface where it was. A reservoir\'s head is the tank\'s elevation plus its water depth, and a tank\'s water depth is the reservoir\'s head minus its elevation:']
 				.concat(capped(surface)).join('\n'));
