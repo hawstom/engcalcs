@@ -12203,6 +12203,7 @@ var EngCalcs = EngCalcs || {};
 	// an edit lands, with recalculate off and no solve running.
 	function refreshOneLabelInPlace(el) {
 		labelCacheTaint();
+		hoverCardHide();
 		// A pass already owed runs first (Task 653), so this one label is reflowed among neighbours
 		// that are where the owed pass puts them. It is the pass somebody else asked for, not one
 		// this edit triggers: with nothing owed this is a no-op.
@@ -17960,7 +17961,7 @@ var EngCalcs = EngCalcs || {};
 		}
 		var changed = !hoverPreview !== !sel || (sel && (sel.kind !== hoverPreview.kind || sel.id !== hoverPreview.id));
 		hoverPreview = sel;
-		if (changed) { hoverCardRetarget(sel); }
+		if (changed) { hoverCard.x = hoverCard.nx; hoverCard.y = hoverCard.ny; hoverCardRetarget(sel); }
 	}
 	function clearHoverPreview() { setHoverPreview(null); }
 	/**
@@ -18007,14 +18008,35 @@ var EngCalcs = EngCalcs || {};
 		} catch (e) {}
 		if (!on) { hoverCardHide(); }
 	}
-	var hoverCard = { timer: null, anchor: null, tip: null, shown: false, x: 0, y: 0 };
+	var hoverCard = { timer: null, anchor: null, tip: null, shown: false, x: 0, y: 0, nx: 0, ny: 0, sel: null };
+	// Esc, Ctrl+Z and Ctrl+Y can change what the card describes; any label-text change dismisses it
+	// too (refreshLabelText(), refreshOneLabelInPlace()), so it never shows stale text.
+	if (typeof document !== 'undefined' && document.addEventListener) {
+		document.addEventListener('keydown', function (e) {
+			if (e.key === 'Escape' || ((e.ctrlKey || e.metaKey) && /^[zy]$/i.test(e.key || ''))) { hoverCardHide(); }
+		}, true);
+	}
 	function hoverCardHide() {
 		if (hoverCard.timer) { clearTimeout(hoverCard.timer); hoverCard.timer = null; }
 		if (hoverCard.shown && hoverCard.tip) { hoverCard.tip.hide(); }
 		hoverCard.shown = false;
 	}
+	// **THE REST TIMER RUNS FROM THE POINTER COMING TO REST, NOT FROM ENTERING THE TARGET**
+	// (Perry's review). Sliding along a long pipe the card used to open 500 ms in, with the pointer
+	// still moving, and sit behind it. The card is placed at the resting point; a move of more than
+	// HOVERCARD_STILL_PX hides it and starts the wait again, so it is never left behind (a name tip
+	// is anchored to its element and stays while the pointer stays on it; this one is anchored to
+	// a point, so the point moving is the same event).
+	var HOVERCARD_STILL_PX = 4;
+	function hoverCardNudge(x, y) {
+		if (!hoverCard.sel) { return; }
+		if (Math.abs(x - hoverCard.x) <= HOVERCARD_STILL_PX && Math.abs(y - hoverCard.y) <= HOVERCARD_STILL_PX) { return; }
+		hoverCard.x = x; hoverCard.y = y;
+		hoverCardRetarget(hoverCard.sel);
+	}
 	function hoverCardRetarget(sel) {
 		hoverCardHide();
+		hoverCard.sel = (sel && sel.kind !== 'label') ? sel : null;
 		if (!sel || sel.kind === 'label' || !hoverCardOn()) { return; }
 		if (typeof ecCanHover === 'function' && !ecCanHover()) { return; }
 		if (!window.bootstrap || !bootstrap.Tooltip) { return; }
@@ -45369,11 +45391,12 @@ var EngCalcs = EngCalcs || {};
 			if (e.pointerType === 'touch') { return; }
 			if (mode !== 'select' || drag) { return; }
 			hoverPreviewAt = { x: e.clientX, y: e.clientY };
+			hoverCardNudge(e.clientX, e.clientY);
 			if (hoverPreviewRaf) { return; }
 			hoverPreviewRaf = requestAnimationFrame(function () {
 				hoverPreviewRaf = null;
 				if (mode !== 'select' || drag || !hoverPreviewAt) { return; }
-				hoverCard.x = hoverPreviewAt.x; hoverCard.y = hoverPreviewAt.y;
+				hoverCard.nx = hoverPreviewAt.x; hoverCard.ny = hoverPreviewAt.y;
 				setHoverPreview(hoverTargetFromHit(mapHitAt(hoverPreviewAt.x, hoverPreviewAt.y)));
 			});
 		});
@@ -50206,12 +50229,15 @@ var EngCalcs = EngCalcs || {};
 			pc.lpn_settings_area_hint_tip);
 		// The hover card's switch (Task 773). The same section and the same reason as the row above:
 		// a reading aid for the person at this screen, kept in this browser (LPN_HOVERCARD_KEY).
-		var hoverCardInput = document.createElement('input');
-		hoverCardInput.type = 'checkbox';
-		hoverCardInput.checked = hoverCardOn();
-		hoverCardInput.addEventListener('change', function () { setHoverCardOn(hoverCardInput.checked); });
-		row(pageBody, pc.lpn_settings_hover_card || 'Show the full label on hover', hoverCardInput,
-			pc.lpn_settings_hover_card_tip);
+		// Not offered where the card can never appear (a device that cannot hover).
+		if (typeof ecCanHover !== 'function' || ecCanHover()) {
+			var hoverCardInput = document.createElement('input');
+			hoverCardInput.type = 'checkbox';
+			hoverCardInput.checked = hoverCardOn();
+			hoverCardInput.addEventListener('change', function () { setHoverCardOn(hoverCardInput.checked); });
+			row(pageBody, pc.lpn_settings_hover_card || 'Show the full label on hover', hoverCardInput,
+				pc.lpn_settings_hover_card_tip);
+		}
 		var tail = document.createElement('div');
 		tail.style.marginTop = '6px';
 		pageBody.appendChild(tail);
@@ -62243,6 +62269,7 @@ var EngCalcs = EngCalcs || {};
 		// A synchronous pass answers every request made before it (see requestLabelRefresh()).
 		labelRefreshPending = false;
 		labelCacheTaint();
+		hoverCardHide();
 		if (dataLabelsHidden) { labelWorkSkipped = true; refreshLabelPassTail(); return; }
 		perfDebugCount('labelPasses');
 		beginMapBoxHold();

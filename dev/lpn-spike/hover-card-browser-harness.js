@@ -200,6 +200,51 @@ async function main() {
 				await away(a);
 			}
 
+			// 8: sliding along a pipe, the card waits for the pointer to come to REST, then opens at the
+			// resting point; a further move takes it down. (Perry's review.)
+			const pts = await a.page.evaluate(() => {
+				const e = document.querySelector('#lpn_canvas [data-link="111"]');
+				if (!e || !e.getPointAtLength) { return null; }
+				const L = e.getTotalLength(), m = e.getScreenCTM(), out = [];
+				for (let k = 0; k <= 40; k++) {
+					const q = e.getPointAtLength(L * (0.15 + 0.7 * k / 40));
+					out.push({ x: m.a * q.x + m.c * q.y + m.e, y: m.b * q.x + m.d * q.y + m.f });
+				}
+				return out;
+			});
+			ok('pipe 111 can be walked along', !!pts && pts.length > 10);
+			if (pts) {
+				await a.page.mouse.move(pts[0].x, pts[0].y);
+				let seen = false, last = pts[0];
+				for (const q of pts) {
+					await a.page.mouse.move(q.x, q.y);
+					await a.page.waitForTimeout(40);
+					if ((await cardLines(a.page)) !== null) { seen = true; }
+					last = q;
+				}
+				ok('sliding along the pipe (about 1.6 s of steady motion) shows no card', !seen);
+				await a.page.waitForTimeout(900);
+				const rl = await cardLines(a.page);
+				ok('...and once the pointer has rested, the card opens', !!rl);
+				const at = await a.page.evaluate(() => { const e = document.querySelector('.lpn-hovercard-anchor'); const b = e.getBoundingClientRect(); return { x: b.left, y: b.top }; });
+				ok('...at the resting point, not behind', Math.abs(at.x - last.x) <= 6 && Math.abs(at.y - last.y) <= 6, JSON.stringify({ at, last }));
+				const far = pts[Math.max(0, pts.length - 12)];
+				await a.page.mouse.move(far.x, far.y, { steps: 3 });
+				await a.page.waitForTimeout(400);
+				ok('moving again takes the card down', (await cardLines(a.page)) === null);
+				await away(a);
+			}
+
+			// 9: Esc and Ctrl+Z dismiss a standing card
+			for (const key of ['Escape', 'Control+z']) {
+				await rest(a, p);
+				ok('(' + key + ') a card is standing', (await cardLines(a.page)) !== null);
+				await a.page.keyboard.press(key);
+				await a.page.waitForTimeout(400);
+				ok('(' + key + ') ...and the key takes it down', (await cardLines(a.page)) === null);
+				await away(a);
+			}
+
 			// 6: the setting, through the real control
 			await a.toolbarClick(await a.lang('lpn_tool_settings'));
 			await a.settle(500);

@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**0 still to read on master**, of 0 untranslated keys, of 2444 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**2 still to read on master**, of 2 untranslated keys, of 2446 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -222,13 +222,20 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   @@ NEEDS RULING
 
-None on master. Every English key here is present in at least one other language.
+## lpn_  (2, 2 to read @@ NEEDS RULING)
+
+- **`lpn_settings_hover_card`**
+  > Show the full label on hover
+  @@ NEEDS RULING
+- **`lpn_settings_hover_card_tip`**
+  > Rest the pointer on a node, link or customer to see its label with every label field shown, ticked or not. This is a setting for this browser, not for the project.
+  @@ NEEDS RULING
 
 ---
 
 # Strings waiting on a branch
 
-**146 still to read**, of 149 new keys across 18 unmerged branch(es).
+**144 still to read**, of 147 new keys across 16 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -238,10 +245,6 @@ Each branch carries the commit it was read at. This part is a SNAPSHOT and is no
 fresh by the build — a branch moves whenever anybody commits on it, and failing master's
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
-
-### chore/protect-1008 (`8ed272a8`) — adds no English strings
-
-### chore/sprint-1008 (`c385f6f0`) — adds no English strings
 
 ### feat/bentley-interop (`a053c602`) — 63 new, 63 to read @@ NEEDS RULING
 
@@ -476,14 +479,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > DXF file…
   @@ NEEDS RULING
 
-### feat/hover-label (`f8393134`) — 2 new, 2 to read @@ NEEDS RULING
-
-- **`lpn_settings_hover_card`**
-  > Show the full label on hover
-  @@ NEEDS RULING
-- **`lpn_settings_hover_card_tip`**
-  > Rest the pointer on a node, link or customer to see its label with every label field shown, ticked or not. This is a setting for this browser, not for the project.
-  @@ NEEDS RULING
+### feat/hover-label (`e1654254`) — adds no English strings
 
 ### feat/label-gang-search (`8b31a907`) — 3 new, all ruled
 
@@ -690,7 +686,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Guide
   @@ NEEDS RULING
 
-### feat/visit-dedupe (`22e3c4ca`) — adds no English strings
+### feat/visit-dedupe (`6ecd5f61`) — adds no English strings
 
 ### feat/workspace (`7eb9e349`) — 12 new, 12 to read @@ NEEDS RULING
 
