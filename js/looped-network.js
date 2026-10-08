@@ -1087,11 +1087,32 @@ var EngCalcs = EngCalcs || {};
 			if (!shedding.length) { return; }
 			shedding.forEach(function (a) {
 				a.gone++;
+				a.gone = shedRungsCertain(a, fsNow);
 				writeLabelGlyphs(a.le, a.l, keptLines(a.all, shedKeepSet(a.all, a.order, a.gone)), fsNow);
 			});
 			shedding.forEach(function (a) { measureLabelWidths(a.le); });
 			active = shedding;
 		}
+	}
+	// **A RUNG WHOSE ANSWER IS CERTAIN IS NOT DRAWN** (Task 681(b)). The length cascade above writes
+	// and measures every rung, and each rung is a forced layout of the whole drawing: with every link
+	// field on, Novato's pipes shed up to seventeen values, and the cascade was 42% of the label pass
+	// in Chrome. But the run of the next keep-set is known to within shedWidthFor()'s bearing error
+	// (1.8% worst, measured) before it is drawn, so a rung whose priced run clears its room by far
+	// more than that -- SHED_SKIP_REL of the run plus SHED_SKIP_EM of a font size -- would certainly
+	// be measured too long and shed again. Such a rung is passed over; the first rung that is not
+	// certain is drawn and measured exactly as before. So the cascade stops at the same content, and
+	// only the rungs that could not have stopped it are no longer drawn.
+	// `a.gone` is the rung about to be drawn; returns the rung to draw instead.
+	var SHED_SKIP_REL = 0.06, SHED_SKIP_EM = 0.5;
+	function shedRungsCertain(a, fsNow) {
+		var g = a.gone, s = state.s || 1, em = parseFloat(fsNow) || effectiveFontSize(), w;
+		while (g < a.order.length - 1) {
+			w = shedWidthFor(a.le, shedKeepSet(a.all, a.order, g), a.all);
+			if (w === null || !(w / s * (1 - SHED_SKIP_REL) - SHED_SKIP_EM * em > a.room)) { break; }
+			g++;
+		}
+		return g;
 	}
 	// **RE-DECIDE EVERY LINK LABEL'S CONTENT AT THE CURRENT ZOOM.** A shed is a decision about a
 	// RATIO -- the label's run against its segment -- and a label's run in world units is its pixel
