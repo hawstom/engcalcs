@@ -54540,6 +54540,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// 2026-10-07: *"All the docks I make need to be remembered."*).
 		if (statusboxLayout.open) { openStatusReportBox(); }
 		if (fullboxLayout.open) { openFullReportBox(); }
+		// Alternatives keeps `open` on its own record (lpn_altbox) only while docked, and opens only
+		// while basic mode is off, the one state in which the box can be opened at all.
+		if (altboxLayout.open && altboxLayout.dock && !scenarioBasicMode) { openAlternativesBox(); }
 		// The Notes box (Tom, 2026-09-28), after the reports and before Find for the same stacking
 		// reason: Find is the smallest and ends up on top.
 		if (notesboxLayout.open) { openNotesBox(); }
@@ -69494,7 +69497,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// writes nothing (applyBoxSize()).
 	var LPN_ALTBOX_KEY = 'lpn_altbox';
 	var altboxLayout = Object.assign(newBoxLayout(), { userSized: false });
+	// `open` is kept only while the box is docked: a floating Alternatives box opens from the
+	// Scenarios menu, never with the page, but a docked one comes back like every other dock (Tom,
+	// 2026-10-07: *"All the docks I make need to be remembered."*).
 	function saveAltboxLayout() {
+		altboxLayout.open = !!(altboxLayout.dock && altBoxIsOpen());
 		try { localStorage.setItem(LPN_ALTBOX_KEY, JSON.stringify(altboxLayout)); } catch (e) {}
 	}
 	function openAlternativesBox() {
@@ -69506,8 +69513,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		rebuildAlternativesTable();
 		placePanelForScreen(box, function () { placeBoxRemembered(box, altboxLayout); });
 		initTipsIn(box);
+		if (altboxLayout.dock && !altboxLayout.open) { saveAltboxLayout(); }
 	}
-	function closeAlternativesBox() { if (altBoxIsOpen()) { hidePanel(altBoxEl()); } }
+	function closeAlternativesBox() {
+		if (altBoxIsOpen()) { hidePanel(altBoxEl()); }
+		if (altboxLayout.open) { saveAltboxLayout(); }
+	}
 	function wireAlternativesBox() {
 		var box = altBoxEl(), x = document.getElementById('lpn_alt_close');
 		if (!box) { return; }
