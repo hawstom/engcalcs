@@ -442,14 +442,14 @@ $ec_lang['install_desktop_heading']='Escritorio (Chrome / Edge)';
 // Edited by TGH 2026-09-07
 $ec_lang['install_desktop_steps_html']='<li>Abra cualquier página de calculadora.</li><li>Haga clic en el <strong>icono de instalación</strong> (⊕ o un icono de equipo) en la barra de direcciones del navegador, o abra el menú del navegador y elija <strong>Instalar EngCalcs…</strong></li><li>Haga clic en <strong>Instalar</strong>. EngCalcs se abrirá como una aplicación independiente.</li>';
 $ec_lang['install_firefox_heading']='Firefox / Otros navegadores';
-$ec_lang['install_firefox_body']='Si su navegador no ofrece la opción de instalar, no se pierde nada: use las calculadoras normalmente en el navegador, y después de su primera visita las páginas se guardan en caché automáticamente para uso sin conexión. Firefox en el escritorio es el caso común.';
+$ec_lang['install_firefox_body']='Si el navegador no ofrece la opción de instalar, use las calculadoras en el navegador como de costumbre. Después de la primera visita, las páginas se guardan en caché automáticamente para uso sin conexión. Firefox en el escritorio es el caso común.';
 $ec_lang['install_cached_heading']='Qué se guarda en caché';
 $ec_lang['install_cached_body']='La primera vez que instala EngCalcs, todas las páginas de las calculadoras y sus archivos de apoyo (scripts, estilos) se guardan automáticamente en su dispositivo. Después de eso, todo funciona sin conexión a internet. Se recuerda el idioma elegido desde su última visita en línea.';
 $ec_lang['contact_main_menu']='Contacto';
 $ec_lang['about_main_title']='Acerca de las calculadoras de ingeniería HawsEDC';
 $ec_lang['about_main_desc']='Misión, software libre y contribuciones';
 // Edited by TGH 2026-09-07
-$ec_lang['about_body_html']='<h3>Misión</h3><p>Las Calculadoras de Ingeniería HawsEDC se ofrecen gratuitamente en línea desde 2010. Existen para servir a ingenieros y trabajadores de campo en todo el mundo — especialmente a quienes trabajan en regiones con escasez de agua, recursos limitados o poco atendidas. Estas herramientas forman parte de una misión humanitaria más amplia: decirle a cada ser humano de la manera más práctica y efectiva posible <a target="_blank" href="https://tomsthird.blogspot.com/2026/10/why-engineering-calculator-needs-to.html">que es amado y apreciado para siempre, que no tiene nada que temer y que no va a arruinarlo todo</a>.</p><p>Las calculadoras son el vehículo. El destino es un mundo libre de sufrimiento.</p><h3>Licencia libre y de código abierto</h3><p>Todo el código se publica bajo la <a target="_blank" href="https://www.gnu.org/licenses/gpl-3.0.html">Licencia Pública General de GNU v3.0 o posterior</a> — libre como en libertad. Puede usar, estudiar, modificar y redistribuir el código bajo los mismos términos.</p><p>El sitio web que lo sirve se ofrece gratuitamente hoy y desde 2010; si algún día ya no pudiera ser así, el software seguirá siendo suyo para ejecutarlo.</p><p>Copyright © 2009–2026 Thomas Gail Haws.</p><h3>Código Fuente</h3><p>El código fuente completo está disponible públicamente en GitHub:</p><p><a target="_blank" href="https://github.com/hawstom/engcalcs">github.com/hawstom/engcalcs</a></p><p>Puede explorar el código, registrar problemas o bifurcar el repositorio allí.</p><h3>Contribuir</h3><p>Toda ayuda es bienvenida. <a href="contact.php">Comuníquese con Tom Haws</a>.</p><ul><li><strong>Traducciones:</strong> Sugiera una mejor redacción. Mejore o agregue un idioma.</li><li><strong>Informes de errores:</strong> Use el formulario de comentarios en cualquier página de calculadora, o registre un problema en GitHub.</li><li><strong>Nuevas calculadoras:</strong> Las ideas para herramientas de ingeniería hidráulica que sirvan a trabajadores de campo y profesionales del riego son especialmente bienvenidas.</li><li><strong>Alojamiento:</strong> Si puede alojar una réplica de estas calculadoras para una región con conectividad limitada, por favor comuníquese conmigo.</li></ul><h3>Uso sin conexión</h3><p>Abra cualquier calculadora una vez mientras tiene conexión y todas seguirán funcionando cuando no la tenga: su navegador almacena todo el conjunto a medida que avanza. El mecanismo es una <strong>Aplicación Web Progresiva (PWA)</strong>, si quiere leer sobre ello. Después de eso, todas las calculadoras funcionan sin conexión — no se requiere internet.</p><p>En Android o iOS, use la opción "Agregar a pantalla de inicio" de su navegador para instalar EngCalcs como una aplicación en su dispositivo. En el escritorio, busque el ícono de instalación en la barra de direcciones de su navegador.</p><p>También puede guardar cualquier calculadora individual usando el menú "Guardar como…" de su navegador para uso sin conexión puntual.</p><h3>Contacto</h3><p>Tom Haws, ingeniero hidráulico y fundador de estas calculadoras.<br />Use el formulario de comentarios en cualquier página de calculadora, o acceda al código fuente en <a target="_blank" href="https://github.com/hawstom/engcalcs">GitHub</a>.</p>';
+$ec_lang['about_body_html']='<h3>Misión</h3><p>Las Calculadoras de Ingeniería HawsEDC se ofrecen gratuitamente en línea desde 2010. Existen para servir a ingenieros y trabajadores de campo en todo el mundo — especialmente a quienes trabajan en regiones con escasez de agua, recursos limitados o poco atendidas. Estas herramientas forman parte de una misión humanitaria más amplia: decirle a cada ser humano de la manera más práctica y efectiva posible <a target="_blank" href="https://tomsthird.blogspot.com/2026/10/why-engineering-calculator-needs-to.html">que es amado y apreciado para siempre, que no tiene nada que temer y que no va a arruinarlo todo</a>.</p><p>Las calculadoras son el vehículo. El destino es un mundo libre de sufrimiento.</p><h3>Licencia libre y de código abierto</h3><p>Todo el código se publica bajo la <a target="_blank" href="https://www.gnu.org/licenses/gpl-3.0.html">Licencia Pública General de GNU v3.0 o posterior</a> — libre como en libertad. Puede usar, estudiar, modificar y redistribuir el código bajo los mismos términos.</p><p>El sitio web que lo sirve se ofrece gratuitamente hoy y desde 2010; si algún día ya no pudiera ser así, el software seguirá siendo suyo para ejecutarlo.</p><p>Copyright © 2009–2026 Thomas Gail Haws.</p><h3>Código Fuente</h3><p>El código fuente completo está disponible públicamente en GitHub:</p><p><a target="_blank" href="https://github.com/hawstom/engcalcs">github.com/hawstom/engcalcs</a></p><p>Puede explorar el código, registrar problemas o bifurcar el repositorio allí.</p><h3>Contribuir</h3><p>Toda ayuda es bienvenida. <a href="contact.php">Comuníquese con Tom Haws</a>.</p><ul><li><strong>Traducciones:</strong> Sugiera una mejor redacción. Mejore o agregue un idioma.</li><li><strong>Informes de errores:</strong> Use el formulario de comentarios en cualquier página de calculadora, o registre un problema en GitHub.</li><li><strong>Nuevas calculadoras:</strong> Las ideas para herramientas de ingeniería hidráulica que sirvan a trabajadores de campo y profesionales del riego son especialmente bienvenidas.</li><li><strong>Alojamiento:</strong> Si puede alojar una réplica de estas calculadoras para una región con conectividad limitada, por favor comuníquese conmigo.</li></ul><h3>Uso sin conexión</h3><p>Abra cualquier calculadora una vez mientras tiene conexión y todas seguirán funcionando cuando no la tenga: su navegador almacena todo el conjunto a medida que avanza. El mecanismo es una <strong>Aplicación Web Progresiva (PWA)</strong>. Después de eso, todas las calculadoras funcionan sin conexión — no se requiere internet.</p><p>En Android o iOS, use la opción "Agregar a pantalla de inicio" de su navegador para instalar EngCalcs como una aplicación en su dispositivo. En el escritorio, busque el ícono de instalación en la barra de direcciones de su navegador.</p><p>También puede guardar cualquier calculadora individual usando el menú "Guardar como…" de su navegador para uso sin conexión puntual.</p><h3>Contacto</h3><p>Tom Haws, ingeniero hidráulico y fundador de estas calculadoras.<br />Use el formulario de comentarios en cualquier página de calculadora, o acceda al código fuente en <a target="_blank" href="https://github.com/hawstom/engcalcs">GitHub</a>.</p>';
 $ec_lang['contactSendMessage']='Envíe un mensaje a Tom Haws';
 $ec_lang['contactYourName']='Su nombre:';
 $ec_lang['contactYourEmail']='Su dirección de correo electrónico:';
@@ -468,7 +468,7 @@ $ec_lang['rc_qt']='<span class="ec-help" title="Caudal por unidad de ancho en la
 $ec_lang['rc_np']='Porosidad de la escollera, n<sub>p</sub>';
 $ec_lang['rc_sg']='<span class="ec-help" title="Densidad relativa al agua. Típico para granito o basalto triturado ≈ 2,65. Rango válido según Robinson: 2,54 a 2,82.">Gravedad específica de la roca, sg <span class="ec-tip">?</span></span>';
 $ec_lang['rc_SD']='<span class="ec-help" title="Desviación estándar de gradación. Roca uniforme ≈ 1,25. Rango válido Robinson: 1,15 a 1,47.">Gradación SD = D<sub>84.1</sub>/D<sub>50</sub> <span class="ec-tip">?</span></span>';
-$ec_lang['rc_yn']='<span class="ec-help" title="El remanso (Hp > yn) es favorable — reduce la erosión aguas arriba. (USDA)">Tirante normal en el canal de entrada, y<sub>n</sub> <span class="ec-tip">?</span></span>';
+$ec_lang['rc_yn']='<span class="ec-help" title="El remanso (Hp > yn) es conveniente porque reduce la erosión aguas arriba. (USDA)">Tirante normal en el canal de entrada, y<sub>n</sub> <span class="ec-tip">?</span></span>';
 $ec_lang['rc_D50']='<span class="ec-help" title="Ec. 1 (S0 < 0,10) o Ec. 2 (0,10-0,40). Válido: D50 15-278 mm, S0 0,02-0,40. Fuera del rango: extrapolado.">Tamaño mediano de roca requerido, D<sub>50</sub> <span class="ec-tip">?</span></span>';
 $ec_lang['rc_eq_used']='Ecuación aplicada';
 $ec_lang['rc_sg_check']='Verificación de gravedad específica';
@@ -494,10 +494,10 @@ $ec_lang['rc_Vm']='<span class="ec-help" title="Fracción de qt que fluye por lo
 $ec_lang['rc_qm']='Caudal unitario a través del manto, q<sub>m</sub>';
 $ec_lang['rc_qs']='Caudal unitario superficial, q<sub>s</sub> (q<sub>t</sub> − q<sub>m</sub>)';
 $ec_lang['rc_d']='Tirante sobre la superficie de escollera, d';
-$ec_lang['rc_Hp']='<span class="ec-help" title="El remanso (Hp > yn) es favorable — reduce la erosión aguas arriba. (USDA)">Carga en el vertedor de entrada, H<sub>p</sub> <span class="ec-tip">?</span></span>';
+$ec_lang['rc_Hp']='<span class="ec-help" title="El remanso (Hp > yn) es conveniente porque reduce la erosión aguas arriba. (USDA)">Carga en el vertedor de entrada, H<sub>p</sub> <span class="ec-tip">?</span></span>';
 $ec_lang['rc_ponding_check']='Verificación de remanso en entrada';
 $ec_lang['rc_pond_ok']  ='H<sub>p</sub> > y<sub>n</sub> — remanso aguas arriba';
-$ec_lang['rc_pond_ok_tip']='El remanso aguas arriba de la entrada del canal es favorable; reduce la erosión aguas arriba. (USDA)';
+$ec_lang['rc_pond_ok_tip']='El remanso aguas arriba de la entrada del canal empinado es conveniente; reduce la erosión aguas arriba. (USDA)';
 $ec_lang['rc_pond_warn']='H<sub>p</sub> ≤ y<sub>n</sub> — sin remanso — riesgo de erosión en la entrada';
 $ec_lang['rc_pond_warn_tip']='No hay remanso aguas arriba de la entrada del canal; podría producirse erosión aguas arriba. (USDA)';
 $ec_lang['rc_eq1']='Ec. 1 (S<sub>0</sub> < 0,10) — pendiente suave';
@@ -537,7 +537,7 @@ $ec_lang['ip_group_reach']='Tramo';
 $ec_lang['ip_group_upstream']='Aguas arriba';
 $ec_lang['ip_group_downstream']='Aguas abajo';
 $ec_lang['ip_group_loss']='Pérdida';
-$ec_lang['ip_is_lateral']='<span class="ec-help" title="Marcada: este tramo es un segmento de la lateral de prueba, extraído por emisores individuales. Sin marcar: este tramo es una tubería principal, solo pasando caudal a laterales no en la ruta de prueba.">Lat. <span class="ec-tip">?</span></span>';
+$ec_lang['ip_is_lateral']='<span class="ec-help" title="Marcada: este tramo es un segmento de la lateral de prueba, de la cual extraen agua los emisores individuales. Sin marcar: este tramo es una tubería principal, que solo hace pasar caudal a laterales que no están en la ruta de prueba.">Lat. <span class="ec-tip">?</span></span>';
 $ec_lang['ip_count']='<span class="ec-help" title="Filas de laterales: emisores en este tramo solo. Filas de tubería principal: total de emisores en laterales OTROS que este que se ramifican desde este tramo. Para el tramo justo en el punto de extracción de la lateral de prueba, esto también incluye cualquier lateral más abajo en la tubería principal más allá de ese punto, o compartiendo la misma unión (p. ej., una lateral del lado opuesto) — su caudal se ramifica desde este mismo tramo también.">Emisores <span class="ec-tip">?</span></span>';
 $ec_lang['ip_length']='L';
 $ec_lang['ip_diameter']='D';
@@ -619,9 +619,9 @@ $ec_lang['bpn_pressure_warn']='Presión baja o negativa; revise si hay condicion
 $ec_lang['bpn_pressure_warn_short']='Baja';
 $ec_lang['bpn_notes_1_term']='En serie por defecto, ramificada por excepción';
 // Edited by TGH 2026-09-07
-$ec_lang['bpn_notes_1_def']='Deje el ID aguas arriba en blanco y un tramo sigue al de arriba; una tubería en serie simple. Ingrese el ID de un tramo aguas arriba para ramificarse desde él. Así: en serie por defecto, un árbol cuando lo necesite.';
+$ec_lang['bpn_notes_1_def']='Si el ID aguas arriba se deja en blanco, el tramo sigue al tramo anterior como una tubería en serie. Ingrese el ID de un tramo aguas arriba para ramificarse desde él. El valor predeterminado es una tubería en serie; solo se forma un árbol donde se ingresa una ramificación.';
 $ec_lang['bpn_notes_2_term']='Solo redes ramificadas, sin bucles';
-$ec_lang['bpn_notes_2_def']='Cada tramo tiene exactamente un tramo aguas arriba (un árbol). Esta herramienta no resuelve redes con bucles; esas necesitan métodos iterativos (EPANET o similar). Excluir los bucles es lo que la mantiene simple y exacta.';
+$ec_lang['bpn_notes_2_def']='Cada tramo tiene exactamente un tramo aguas arriba (un árbol). Esta herramienta no resuelve redes con bucles, que requieren métodos iterativos (EPANET o similar). Como la red no tiene bucles, la solución es directa y exacta.';
 $ec_lang['bpn_notes_3_term']='Sin controles de presión activos';
 $ec_lang['bpn_notes_3_def']='Puede agregar una válvula de pérdida localizada fija (un valor k), pero no válvulas reductoras o sostenedoras de presión (PRV/PSV). Su estado abierto/cerrado depende del caudal y la presión, lo que forzaría la iteración.';
 $ec_lang['bpn_notes_epanet_term']='Las constantes de Hazen-Williams ahora coinciden con EPANET (agosto de 2026)';
@@ -665,8 +665,8 @@ $ec_lang['lpn_tool_vertices']='Vértices';
 // has been struck here three times. "Station along the pipe" is the survey word for a distance
 // measured along a route, which is what it is.
 $ec_lang['lpn_tool_add_meter']='Cliente';
-$ec_lang['lpn_tool_add_meter_tip']='Haga clic donde está el cliente y luego en la tubería o el nudo que lo abastece. La demanda que asigne al cliente se suma al nudo del extremo más cercano de esa tubería.';
-$ec_lang['lpn_mode_add_meter']='Cliente: haga clic donde está el cliente y luego en la tubería o el nudo que lo abastece. O use Esc para cancelar.';
+$ec_lang['lpn_tool_add_meter_tip']='Especifique el punto del cliente y luego su conexión: una línea o un nodo. La demanda asignada al cliente se suma al nodo del extremo más cercano de esa línea.';
+$ec_lang['lpn_mode_add_meter']='Cliente: especifique dónde está el cliente y luego seleccione la tubería o el nudo que lo abastece. O use Esc para cancelar.';
 $ec_lang['lpn_pane_tab_customers']='Clientes';
 $ec_lang['lpn_customer_heading']='Cliente {id}';
 // ROADMAP Task 247. lpn_field_account and lpn_field_account_tip were DELETED 2026-09-19 (Tom:
@@ -679,7 +679,7 @@ $ec_lang['lpn_customer_heading']='Cliente {id}';
 $ec_lang['lpn_field_meter_demand']='Demanda por servicio';
 $ec_lang['lpn_field_meter_count']='Número de servicios';
 $ec_lang['lpn_field_meter_total']='Demanda total';
-$ec_lang['lpn_field_meter_total_tip']='La demanda por servicio multiplicada por el número de servicios. Este es el número que se suma al nudo indicado abajo.';
+$ec_lang['lpn_field_meter_total_tip']='Total sumado al nudo indicado abajo.';
 $ec_lang['lpn_field_meter_pipe']='Elemento conectado';
 $ec_lang['lpn_field_meter_pipe_suggest']='El elemento más cercano es {id}. Escríbalo aquí para abastecer a este cliente desde él.';
 // Task 247, Tom, 2026-09-25: a service connected exactly to a node reads as a node, never as a
@@ -692,7 +692,7 @@ $ec_lang['lpn_meter_pipe_unknown']='Nada en este proyecto se llama {id}, así qu
 // heading is the junction's own whole label reused and only the tip is new: what it says that the
 // junction's does not is that the number the pattern multiplies is the TOTAL, count included.
 $ec_lang['lpn_meter_pattern_unknown']='Ningún patrón de este proyecto se llama {id}, así que el cliente se dejó como estaba.';
-$ec_lang['lpn_meter_placed']='Se agregó el cliente {id}. Su descripción y demanda se escriben en la tabla Clientes, o presiónelo en Seleccionar para abrir su cuadro.';
+$ec_lang['lpn_meter_placed']='Se agregó el cliente {id}. Ingrese su descripción y su demanda en la tabla Clientes, o selecciónelo en el modo Selección para abrir su cuadro de propiedades.';
 $ec_lang['lpn_field_meter_pipe_tip']='El elemento al que se conecta este servicio. Escriba otro aquí o en la tabla Clientes para cambiarlo, o arrastre el punto de conexión a otro elemento.';
 $ec_lang['lpn_field_meter_station']='Estación a lo largo de la tubería (%)';
 $ec_lang['lpn_field_meter_station_tip']='A qué distancia a lo largo de la tubería se conecta el servicio, como porcentaje de la tubería desde su primer nudo hasta el segundo. 0 está en un extremo y 100 en el otro. El círculo sobre la tubería hace lo mismo con el puntero.';
@@ -701,20 +701,20 @@ $ec_lang['lpn_field_meter_offset_tip']='Positivo es a la derecha de la tubería 
 $ec_lang['lpn_field_meter_lumped']='Agregado al nudo';
 $ec_lang['lpn_field_meter_lumped_tip']='Nudo más cercano; las demandas de este cliente se suman allí.';
 $ec_lang['lpn_node_customers']='Demandas de clientes';
-$ec_lang['lpn_node_customers_tip']='Lista de clientes agregados en este nudo (por ser el más cercano). Las demandas de clientes se suman a las demás demandas indicadas aquí. Un cliente se edita donde está en el mapa o en la tabla Clientes.';
+$ec_lang['lpn_node_customers_tip']='Lista de clientes agregados aquí porque este era su nodo más cercano. Las demandas de los clientes se suman a las demás demandas indicadas aquí. Un cliente se edita donde está en el mapa o en la tabla Clientes.';
 $ec_lang['lpn_node_customers_sum']='{total} {unit} de {n} clientes';
 $ec_lang['lpn_customer_detached']='⚠ Este cliente no está conectado a una tubería, así que su demanda no está en los resultados. Elimínelo, o dibuje una tubería y mueva el cliente sobre ella.';
 $ec_lang['lpn_customer_fixed_head']='⚠ El extremo cercano de esa tubería tiene una superficie de agua fija, así que esta demanda no afecta la simulación.';
 $ec_lang['lpn_customer_detached_count']='{n} clientes no están conectados a una tubería. Su demanda no se contabiliza.';
-$ec_lang['lpn_meter_pick_pipe']='Ahora haga clic en la tubería o el nudo que abastece a este cliente. El cliente permanece donde lo colocó. Presione Escape para cancelar.';
-$ec_lang['lpn_inp_export_flat_customers']='Un archivo EPANET no tiene clientes. La demanda de los {n} clientes de este proyecto pasa al archivo como una fila de demanda en el nudo al que se agregó cada uno, y cada fila se nombra con la etiqueta del cliente. Lo que el archivo no puede conservar es el cliente: dónde está, qué tubería lo abastece, en qué punto de esa tubería se conecta el servicio, y cuántos servicios representa un cliente. Su propio archivo de proyecto conserva todo eso.';
+$ec_lang['lpn_meter_pick_pipe']='Ahora seleccione la tubería o el nudo que abastece a este cliente. El cliente permanece donde lo colocó. Presione Escape para cancelar.';
+$ec_lang['lpn_inp_export_flat_customers']='Un archivo de EPANET no tiene clientes. La demanda de los {n} clientes de este proyecto se escribe como una fila de demanda en el nudo al que está asignado cada cliente, nombrada con la etiqueta del cliente. El archivo no registra el cliente en sí: su ubicación, la tubería que lo abastece, el punto de esa tubería donde se conecta el servicio, ni cuántos servicios representa. Esa información permanece en el proyecto; guarde el archivo de proyecto para conservarla.';
 
-$ec_lang['lpn_area_hint_window_start']='Haga clic en una esquina de la ventana.';
-$ec_lang['lpn_area_hint_window_go']='Haga clic en la esquina opuesta para terminar.';
-$ec_lang['lpn_area_hint_lasso_start']='Haga clic para empezar el contorno.';
-$ec_lang['lpn_area_hint_lasso_go']='Mueva el puntero para dibujar el contorno. Haga clic para terminar.';
-$ec_lang['lpn_area_hint_polygon_start']='Haga clic para dibujar el área del polígono. Haga doble clic para terminar.';
-$ec_lang['lpn_area_hint_polygon_go']='Haga clic en cada esquina. Haga doble clic en la última para terminar.';
+$ec_lang['lpn_area_hint_window_start']='Especifique una esquina de la ventana.';
+$ec_lang['lpn_area_hint_window_go']='Especifique la esquina opuesta para terminar.';
+$ec_lang['lpn_area_hint_lasso_start']='Especifique un punto para empezar el contorno.';
+$ec_lang['lpn_area_hint_lasso_go']='Mueva el puntero para dibujar el contorno. Especifique el último punto para terminar.';
+$ec_lang['lpn_area_hint_polygon_start']='Especifique la primera esquina del área poligonal. Haga doble clic para terminar.';
+$ec_lang['lpn_area_hint_polygon_go']='Especifique cada esquina. Haga doble clic en la última para terminar.';
 // Tom, 2026-09-08, his own sentence: *"Hold Shift during selection to preserve the existing
 // selection set and toggle (add/remove) affected assets."* Reworded so "toggle" needs no gloss.
 $ec_lang['lpn_area_hint_shift']='Mantenga presionada la tecla Mayús mientras selecciona para continuar con la selección existente, agregando o quitando (alternando) lo que selecciona.';
@@ -737,7 +737,7 @@ $ec_lang['lpn_pane_pasted']='Se pegaron {n} celdas. {skipped} no se modificaron.
 $ec_lang['lpn_pane_pasted_rows']='Se pegaron {n} filas y se agregaron {created} de ellas a la red.';
 $ec_lang['lpn_pane_pasted_rows_skipped']='Se pegaron {n} filas y se agregaron {created} de ellas a la red. {skipped} celdas no se modificaron.';
 // Added after "This network has none of these yet." on an empty table, which is where a paste lands.
-$ec_lang['lpn_pane_paste_here']='Haga clic aquí y pegue filas de una hoja de cálculo para agregarlas.';
+$ec_lang['lpn_pane_paste_here']='Seleccione esta área y pegue filas de una hoja de cálculo para agregarlas.';
 // The menu action that adds the clipboard's rows as new elements below the last row (an ordinary
 // paste only ever writes cells). Its shortcut, Ctrl+Shift+V, is shown beside it in the menu. Tom's
 // wording, R-309: "Paste as new rows" was "not quite descriptive of 'Paste append'."
@@ -908,8 +908,8 @@ $ec_lang['lpn_offscreen_intact']='Su red está intacta.';
 // lpn_main_title still names EPANET, which is where a search engine reads it, and that claim is
 // true and stays.
 $ec_lang['lpn_examples_welcome']='Bienvenido al modelado de redes de abastecimiento de agua';
-$ec_lang['lpn_examples_heading']='Abra su propia copia de un ejemplo';
-$ec_lang['lpn_examples_sub']='Cada uno se abre como su propia copia. Cámbielo, guárdelo, o abra una copia nueva y empiece de nuevo.';
+$ec_lang['lpn_examples_heading']='Abra una copia de un ejemplo';
+$ec_lang['lpn_examples_sub']='Cada ejemplo se abre como una copia. Edítela y guárdela, o abra una copia nueva para empezar de nuevo.';
 $ec_lang['lpn_examples_open']='Abrir';
 $ec_lang['lpn_examples_menu']='Abrir ejemplo…';
 $ec_lang['lpn_examples_blank']='O empiece aquí';
@@ -943,9 +943,9 @@ $ec_lang['lpn_hotkeys_menu_heading']='Menús';
 // is the honesty boundary that document draws: a thank-you must never imply an answer.
 $ec_lang['lpn_wrong_btn']='¿Algo está mal aquí?';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_wrong_tip']='Un solo clic nos indica que algo en esta página está mal. Se envía el nombre de esta página, el idioma en que la está leyendo y el mensaje del mapa, si lo hay. No se envía nada de lo que haya escrito, ninguna dirección, ni nada de su dibujo. Nadie puede responderle, porque esto no nos dice nada sobre quién es usted. Use Ayuda, Corregir algo cuando quiera contarnos más.';
-$ec_lang['lpn_wrong_thanks']='Gracias. Eso nos llegó.';
-$ec_lang['lpn_status_example_opened']='Se abrió {name}. Es su copia: guárdela con Archivo, Guardar como.';
+$ec_lang['lpn_wrong_tip']='Informe un error en esta página. Se abre un cuadro para seleccionar el problema, agregar un comentario e ingresar una dirección de correo electrónico si desea una respuesta. Todos los campos son opcionales, y no se envía nada hasta que presione Enviar.';
+$ec_lang['lpn_wrong_thanks']='Gracias. Se recibió su informe.';
+$ec_lang['lpn_status_example_opened']='Se abrió {name} como copia. Guárdela con Archivo, Guardar como.';
 // Stands while the fault stands, rather than expiring like every other notice on the map: it
 // reports a page that cannot lay itself out, which is true until a measurement recovers.
 $ec_lang['lpn_map_unmeasurable']='Esta página no pudo calcular el tamaño del área de dibujo, así que el mapa muestra la última vista que pudo calcular. Cambiar el tamaño de la ventana hace que lo intente de nuevo. Si esto sigue ocurriendo, la causa habitual es una extensión del navegador que bloquea las mediciones de la página.';
@@ -966,13 +966,13 @@ $ec_lang['lpn_ex_basic_us_desc']='La misma red inicial en galones por minuto, co
 // from the gallery; the rules stay, and the name stops claiming to be the sample as EPA ships it.
 $ec_lang['lpn_ex_net1_title']='EPANET Net1 con controles basados en reglas';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_ex_net1_desc']='La más pequeña de las tres redes de ejemplo propias de EPANET: un embalse, una bomba y un solo lazo.';
+$ec_lang['lpn_ex_net1_desc']='La más pequeña de las tres redes de ejemplo de EPANET: un embalse, una bomba y un solo lazo.';
 $ec_lang['lpn_ex_net2_title']='EPANET Net2';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_ex_net2_desc']='Un sistema de distribución ramificado con un depósito, de los ejemplos de EPANET.';
 $ec_lang['lpn_ex_net3_title']='EPANET Net3';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_ex_net3_desc']='El ejemplo grande de EPANET: 92 nudos, 3 depósitos y 2 embalses, uno de ellos un río. Vale la pena abrirlo para ver cómo se ve en el mapa un modelo de tamaño real.';
+$ec_lang['lpn_ex_net3_desc']='El ejemplo grande de EPANET: 92 nudos, tres depósitos y dos embalses, uno de ellos un río. Muestra cómo aparece en el mapa un modelo de tamaño real.';
 $ec_lang['lpn_ex_net3_world_title']='EPANET Net3, lat/lon';
 $ec_lang['lpn_ex_net3_world_desc']='La misma red que EPANET Net3, convertida a coordenadas lat/lon en Novato, California, con el mapa mundial detrás de ella.';
 $ec_lang['lpn_ex_elm_street_title']='Elm Street Center';
@@ -990,7 +990,7 @@ $ec_lang['lpn_demand_tip']='Caudal extraído de la red en este nodo. Ingrese un 
 // built by the page and are no longer a placeholder inside a sentence, which is why the lead is a
 // NEW key rather than an edit of `lpn_units_warn_body`. Editing that one in place would have left
 // 26 translations carrying a {list} the page no longer fills, and a literal "{list}" on the map.
-$ec_lang['lpn_units_warn_title']='Esta unidad decide qué significan sus números';
+$ec_lang['lpn_units_warn_title']='Esta unidad define cómo se leen los datos de entrada';
 $ec_lang['lpn_units_warn_lead']='{unit} es la unidad de lo que escribe para:';
 $ec_lang['lpn_units_options_head']='Al cambiar una unidad:';
 // Each option's sentence opens with the word on its own button, so the button and the explanation
@@ -1022,9 +1022,9 @@ $ec_lang['lpn_units_elevhead']='Elevación y carga';
 $ec_lang['lpn_result_gradient']='Gradiente de pérdida de carga';
 $ec_lang['lpn_result_gradient_tip']='Pérdida de carga dividida entre la longitud de la tubería. Úselo para comparar tuberías de diferente longitud contra un mismo límite de diseño.';
 $ec_lang['lpn_result_water_age']='Edad del agua';
-$ec_lang['lpn_result_water_age_tip']='Cuánto tiempo lleva en el sistema el agua que llega a este punto. Donde se juntan caudales, el agua que llega trae una mezcla de edades, y el número aquí es su promedio ponderado por caudal: un nudo alimentado sobre todo por un tramo nuevo y corto muestra una edad baja aunque también lo alimente un ramal muerto largo. En un depósito es la edad promedio del agua que contiene, por lo que un depósito que se renueva lentamente suele tener el agua más vieja de la red. No hay un límite normativo con el cual compararlo, así que juzgue el número con base en su propio sistema.';
+$ec_lang['lpn_result_water_age_tip']='Tiempo que ha pasado en el sistema el agua que llega a este punto. Donde se juntan caudales, el número es el promedio de las edades que llegan, ponderado por caudal. En un depósito es la edad promedio del agua que contiene, por lo que un depósito que se renueva lentamente suele tener el agua más vieja de una red. No hay un límite normativo con el cual compararlo, así que evalúelo con respecto a las condiciones del sistema que se modela.';
 $ec_lang['lpn_result_source_share']='Aporte de origen';
-$ec_lang['lpn_result_source_share_tip']='Cuánta parte del agua que llega a este punto proviene del nodo de rastreo. Esto es lo que reporta el análisis Rastreo de origen.';
+$ec_lang['lpn_result_source_share_tip']='Parte del agua que llega a este punto y que provino del nodo de rastreo. Esto es lo que reporta el análisis Rastreo de origen.';
 // **THE LINK HALF OF THE THREE QUALITY ANSWERS** (ROADMAP Task 638). EPANET reports a node's own
 // value and a LINK's AVERAGE over the water standing in it, so the two are different quantities and
 // take different words. Three whole names rather than one name built from a word and a heading: a
@@ -1049,7 +1049,7 @@ $ec_lang['lpn_result_status_open']='Abierto';
 $ec_lang['lpn_result_status_closed']='Cerrado';
 $ec_lang['lpn_result_head']='Carga';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_result_head_tip']='Energía del agua en este nodo, expresada como una altura de columna de agua. Es una altura absoluta, mientras que la presión es una medición manométrica.';
+$ec_lang['lpn_result_head_tip']='Energía potencial del agua en este nodo, expresada como una altura de columna de agua. Es una altura absoluta, mientras que la presión es una medición manométrica.';
 $ec_lang['lpn_result_pressure']='Presión';
 $ec_lang['lpn_result_flow']='Caudal';
 $ec_lang['lpn_result_velocity']='Velocidad';
@@ -1062,14 +1062,14 @@ $ec_lang['lpn_result_headloss']='Pérdida de carga';
 // states only its own scope, so none of them can be wrong about the others -- and no tip quotes
 // another button's label, which is the cross-key dependency lpn_empty_hint was fixed for.
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_settings_restore_tip']='Restablece solo la configuración de este proyecto. Su dibujo y sus otros proyectos no cambian. Para guardar su configuración favorita y reutilizarla, guarde un archivo de proyecto que solo contenga la configuración.';
+$ec_lang['lpn_settings_restore_tip']='Restablece solo la configuración de este proyecto. El dibujo y los demás proyectos no cambian. Para reutilizar un conjunto de ajustes, guarde un archivo de proyecto que contenga solo configuración.';
 $ec_lang['lpn_reset_all_tip']='Elimina todos los proyectos, todas las imágenes de fondo, toda la configuración y sus unidades elegidas, y luego recarga la página exactamente como la ve un visitante por primera vez. Este es el único restablecimiento que borra todo.';
 // `lpn_tool_clear`, `lpn_tool_clear_tip` and `lpn_confirm_clear` were REMOVED by Task 211 with the
 // "Clear project" command itself -- see lpn_edit_delete_network for what replaced it and why.
 // Task 263's one-time migration offer. Shown ONCE, on opening a project saved before inputs
 // stopped being converted, and never again whatever the answer. Plain text only -- it is built with
 // textContent into the dialog body.
-$ec_lang['lpn_v2_restore_confirm']='Esta calculadora guarda las unidades del proyecto y los valores tal como se ingresaron, pero antes convertía los números a unidades SI para guardarlos. Este proyecto se guardó antes de ese cambio, así que sus números quedaron guardados en SI. ¿Convertirlos una última vez a las unidades actuales? Para que usted pueda juzgar, aquí hay algunos diámetros que se convertirían, con sus valores antes y después:';
+$ec_lang['lpn_v2_restore_confirm']='Esta calculadora guarda las unidades del proyecto y los datos de entrada tal como se ingresaron, pero antes convertía los números a SI para guardarlos. Este proyecto se guardó antes de ese cambio, así que sus números se guardaron en SI. ¿Convertirlos una última vez a las unidades actuales? Para ayudar a decidir, aquí hay algunos diámetros que se convertirían, con sus valores antes y después:';
 $ec_lang['lpn_v2_restore_yes']='Convertir';
 $ec_lang['lpn_v2_restore_never']='No. No preguntar de nuevo.';
 $ec_lang['lpn_v2_restore_no']='Cerrar para revisar primero las unidades actuales';
@@ -1129,17 +1129,17 @@ $ec_lang['lpn_copy_of']='Copia de {name}';
 // The three coordinate cases are Tom's own (R-155, 2026-09-22): "EPSG, unnamed (local) georeference,
 // and not georeferenced". lat/lon is one EPSG system (EPSG:3857 on this page), not a fourth case.
 $ec_lang['lpn_convas_title']='Convertir como';
-$ec_lang['lpn_convas_coordsys_tip']='El sistema de coordenadas al que se convierte la copia. Cuando difiere del de este proyecto, siguen dos pasos de colocación. Un proyecto que ya sabe dónde está abre ambos pasos ya respondidos, así que puede aceptarlos tal cual o hacer cambios.';
+$ec_lang['lpn_convas_coordsys_tip']='El sistema de coordenadas al que se convierte la copia. Cuando difiere del de este proyecto, siguen dos pasos de colocación. En un proyecto ya georreferenciado, ambos pasos se abren completados, listos para aceptarse o cambiarse.';
 // {crs} is the name the map status strip shows for this project's coordinate system.
 $ec_lang['lpn_convas_from']='Actual: {crs}';
 $ec_lang['lpn_convas_epsg']='Sistema de coordenadas EPSG';
-$ec_lang['lpn_convas_epsg_tip']='Elija un sistema de coordenadas del registro EPSG. Latitud y longitud es WGS 84 (EPSG:4326).';
+$ec_lang['lpn_convas_epsg_tip']='Elija un sistema de coordenadas del registro EPSG. WGS 84 (EPSG:4326), latitud y longitud, es la opción sugerida. WGS 84 / Pseudo-Mercator (EPSG:3857), comúnmente llamado Web Mercator, da x e y en metros, y sus distancias en el mapa exceden las distancias sobre el terreno al alejarse del ecuador. Las longitudes de tubería se calculan como distancias sobre el terreno en cualquiera de los dos sistemas.';
 $ec_lang['lpn_convas_unnamed']='Georreferencia sin nombre (local)';
 $ec_lang['lpn_convas_unnamed_tip']='Coordenadas locales en la unidad de longitud, con el mapa mundial adjunto.';
 $ec_lang['lpn_convas_none_tip']='Coordenadas locales en la unidad de longitud, sin mapa mundial por ahora.';
-$ec_lang['lpn_convas_units_tip']='Las unidades a las que se convierte la copia. El original conserva sus propios números y unidades.';
+$ec_lang['lpn_convas_units_tip']='Las unidades a las que se convierte la copia.';
 $ec_lang['lpn_convas_round']='Redondear los valores convertidos';
-$ec_lang['lpn_convas_round_tip']='Redondea solo los números que reescribe esta conversión, al paso más cercano que elija. Los valores cuya unidad no cambia se dejan tal cual.';
+$ec_lang['lpn_convas_round_tip']='El paso al que se redondea, aplicado solo a los números que reescribe esta conversión. Los valores cuya unidad no cambia se dejan tal cual.';
 $ec_lang['lpn_convas_round_none']='Sin redondeo';
 $ec_lang['lpn_convas_round_flow']='Demanda y caudal';
 $ec_lang['lpn_convas_label_col']='Sufijo';
@@ -1158,11 +1158,11 @@ $ec_lang['lpn_file_convert_as_tip']='Copia este proyecto a una pestaña nueva y 
 // attached world map) opens the placement steps already answered. Tom's own sentence for this case
 // from his 2026-09-16 edits, with the step 1 button added because the wizard opens at step 1.
 $ec_lang['lpn_georef_answered']='Este proyecto ya está georreferenciado, así que la red ya está en el mapa y no se ha movido nada. Compruebe que esté en el lugar correcto, y luego presione el botón Colocar el modelo aquí y el botón Mantener esta ubicación.';
-$ec_lang['lpn_georef_intro']='Colocar el modelo lleva dos pasos. El paso 1 es el rápido: el modelo se queda quieto y usted mueve el mapa detrás de él, hasta que su sitio quede bajo el modelo con aproximadamente el tamaño correcto. Todavía no hay giro. El paso 2 es el preciso: usted arrastra, cambia el tamaño y gira el modelo mismo. Su proyecto empieza sobre un mapa del mundo entero, así que primero encuentre su ubicación, y luego presione el botón Colocar el modelo aquí.';
-$ec_lang['lpn_georef_adjust']='El modelo ya está sobre el terreno, así que se mueve junto con el mapa. Arrastre el modelo para moverlo, arrastre una esquina para cambiar su tamaño, arrastre el tirador redondo encima del modelo para girarlo. O escriba la distancia real y el ángulo de giro abajo.';
+$ec_lang['lpn_georef_intro']='Colocar el modelo lleva dos pasos. El paso 1 es aproximado: el modelo permanece fijo en la pantalla mientras usted desplaza y acerca el mapa detrás de él, hasta que el sitio quede bajo el modelo con aproximadamente la escala correcta. Este paso no tiene giro. El paso 2 es preciso: arrastre, cambie el tamaño y gire el modelo mismo. El proyecto empieza sobre un mapa del mundo entero, así que primero encuentre la ubicación, y luego presione el botón Colocar el modelo aquí.';
+$ec_lang['lpn_georef_adjust']='El modelo ya está adjunto al mapa, así que se mueve con el mapa. Arrastre el modelo para moverlo, arrastre una esquina para cambiar su tamaño, o arrastre el tirador redondo encima del modelo para girarlo. O ingrese abajo la distancia sobre el terreno y el ángulo de giro.';
 $ec_lang['lpn_georef_step1']='Paso 1 de 2 — rápido';
 $ec_lang['lpn_georef_step2']='Paso 2 de 2 — preciso';
-$ec_lang['lpn_georef_step1_hint']='Su proyecto permanece donde está en la pantalla. Desplace y acerque el mapa debajo de él hasta que el terreno detrás quede aproximadamente en el lugar correcto y con el tamaño correcto, y luego presione el botón Colocar el modelo aquí.';
+$ec_lang['lpn_georef_step1_hint']='El proyecto permanece fijo en la pantalla. Desplace y acerque el mapa que está debajo hasta que muestre aproximadamente la ubicación correcta a aproximadamente la escala correcta, y luego presione el botón Colocar el modelo aquí.';
 $ec_lang['lpn_georef_detach']='Volver a levantarlo';
 $ec_lang['lpn_georef_size_prompt']='¿Aproximadamente cuán ancho es el sitio, a lo largo de todo el proyecto?';
 // ---- The icon-only toolbar (dev/toolbar-icons.md) ----
@@ -1176,22 +1176,22 @@ $ec_lang['lpn_tool_key_hint']='Atajo: presione {key}.';
 $ec_lang['lpn_tool_key_hint_two']='Atajo: presione {key} o {key2}.';
 // Edited by TGH 2026-09-07; the Shift sentence rewritten 2026-09-08 on his ruling that Shift keeps
 // the selection and toggles what the shape catches (it used to say "add").
-$ec_lang['lpn_tool_area_tip']='Haga clic en el mapa según se indique para seleccionar todo lo que está dentro de la forma. Presione este botón otra vez para cambiar la forma entre ventana, lazo y polígono. Mantenga presionada la tecla Mayús mientras selecciona para continuar con la selección existente, agregando o quitando (alternando) lo que selecciona.';
+$ec_lang['lpn_tool_area_tip']='Siga las indicaciones en pantalla. Presione de nuevo para alternar entre ventana, lazo y polígono. Mantenga presionada la tecla Mayús para conservar la selección actual y agregar o quitar (alternar) lo que seleccione.';
 $ec_lang['lpn_area_selected']='{n} seleccionados.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_area_none']='No se encontró nada en esa área.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_tool_vertices_tip']='Agregue y quite los vértices que dan forma a una tubería en el mapa. Haga clic en una tubería para agregar un vértice, haga clic en un vértice para quitarlo, y arrastre un vértice para moverlo. Un vértice cambia solo el trazado dibujado, no la hidráulica.';
-$ec_lang['lpn_tool_undo_tip']='Deshacer el último cambio.';
+$ec_lang['lpn_tool_vertices_tip']='Agregue y quite vértices de tubería. Especifique un punto en una tubería para agregar un vértice, seleccione un vértice para quitarlo y arrastre un vértice para moverlo. Un vértice cambia la longitud automática, pero no agrega ni cambia pérdidas menores (localizadas).';
+$ec_lang['lpn_tool_undo_tip']='Longitud del historial de deshacer = 20 acciones';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_tool_zoom_extent_tip']='Ajustar toda la red en la ventana.';
-$ec_lang['lpn_tool_zoom_window_tip']='Haga clic en dos esquinas opuestas de un recuadro, o arrastre uno, en el mapa para acercarse a él. Presione este botón de nuevo para Ver todo.';
+$ec_lang['lpn_tool_zoom_extent_tip']='Ajustar toda la red a la ventana del mapa. Presione de nuevo para Ventana de zoom. Vea también los controles de zoom del mapa en la parte superior derecha.';
+$ec_lang['lpn_tool_zoom_window_tip']='Especifique esquinas o arrastre un rectángulo. Presione de nuevo para Ver todo.';
 // Tom's wording, 2026-09-25.
 $ec_lang['lpn_zoom_in_tip']='Acercar. Atajo: +';
 // Tom's wording, 2026-09-25.
 $ec_lang['lpn_zoom_out_tip']='Alejar. Atajo: -';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_find_menu_tip']='Busque un elemento por su ID, o busque todos los elementos que cumplan una condición, y cámbielos todos a la vez.';
+$ec_lang['lpn_find_menu_tip']='Buscar y reemplazar, simple o complejo';
 // **"Toolbar key", NOT "Toolbar"** (Tom's own name, 2026-09-10; Ida ranked the rename first).
 // The row is not a second toolbar and not a repeat of one -- it is the LEGEND for an icon-only
 // strip, derived from toolbarIconIndex, and on a touch screen it is the only way to read the
@@ -1201,7 +1201,7 @@ $ec_lang['lpn_find_menu_tip']='Busque un elemento por su ID, o busque todos los 
 $ec_lang['lpn_help_icons']='Barra de herramientas';
 // ---- The right panel: Visibility ----
 $ec_lang['lpn_pane_right_toggle']='Visibilidad';
-$ec_lang['lpn_color_legend_open_tip']='Haga clic para abrir el panel Visibilidad y cambiar estos colores.';
+$ec_lang['lpn_color_legend_open_tip']='Seleccione para abrir la configuración de colores y cambiar estos colores.';
 $ec_lang['lpn_color_node_field']='Colorear nodos por';
 $ec_lang['lpn_color_link_field']='Colorear tuberías por';
 $ec_lang['lpn_color_ramp_sequential']='Secuencial';
@@ -1234,10 +1234,10 @@ $ec_lang['lpn_georef_scale']='Distancia real por unidad de dibujo';
 // R-219 (Tom, 2026-09-24, answering R-190): the sentence that replaces the retired "These are
 // already lat/lon" button -- typing 1 here reaches the same result the button used to, for a file
 // whose own numbers should be used unchanged.
-$ec_lang['lpn_georef_scale_tip']='Se calcula automáticamente. Edítelo para cambiarlo. Escriba 1 para usar los números propios del archivo sin cambios como distancia real, por ejemplo uno sin sistema de coordenadas propio.';
+$ec_lang['lpn_georef_scale_tip']='Se calcula automáticamente. Edítelo para cambiarlo. Ingrese 1 para usar las coordenadas del archivo sin cambios como distancia sobre el terreno, por ejemplo en un archivo sin sistema de coordenadas.';
 $ec_lang['lpn_georef_rotation']='Rotación antihoraria (grados)';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_georef_rotation_tip']='Cuánto rotar todo el modelo en sentido antihorario para alinearlo con el nuevo sistema de coordenadas.';
+$ec_lang['lpn_georef_rotation_tip']='Giro antihorario de todo el modelo, para alinearlo con el nuevo sistema de coordenadas.';
 // Tom's own wording for these two, from his 2026-09-16 edits (dev/tom-coordinate-vocabulary-2026-09-16.md):
 // the wizard now ends on whichever coordinate system File, Convert as chose, not always lat/lon.
 $ec_lang['lpn_georef_confirm']='¿Colocar el modelo aquí de forma permanente? Aún podrá arrastrar elementos individuales después, pero continuar ahora convierte todas las coordenadas a la vez. Para recuperar las coordenadas anteriores, vuelva al proyecto original y cierre este sin guardar.';
@@ -1247,7 +1247,7 @@ $ec_lang['lpn_georef_empty']='Ese archivo no tiene ninguna red, así que no hay 
 $ec_lang['lpn_georef_unavailable']='La herramienta de colocación no se cargó. Recargue la página e inténtelo de nuevo.';
 // Switching projects while a model is being placed corrupted BOTH of them (Tom, 2026-09-08),
 // so the strip refuses and says which two commands end the wizard.
-$ec_lang['lpn_georef_tab_locked']='Termine la colocación con el botón "Conservar esta colocación", o presione Cancelar, antes de cambiar de proyecto. La colocación pertenece a este proyecto y no puede seguirlo a otro.';
+$ec_lang['lpn_georef_tab_locked']='Termine la conversión con el botón "Mantener esta ubicación", o presione Cancelar, antes de cambiar de proyecto. La colocación se aplica solo a este proyecto.';
 // Saving during the wizard writes a document whose coordinates are half moved, so Save takes the
 // same refusal (Tom, 2026-09-08: *"Maybe the Save button should be disabled for consistency."*).
 // Its own sentence rather than the one above: the two commands that end the wizard are the same,
@@ -1265,9 +1265,9 @@ $ec_lang['lpn_goto_bad']='No se pueden leer las coordenadas. Inténtelo de nuevo
 $ec_lang['lpn_georef_goto']='Ir a…';
 $ec_lang['lpn_georef_twopt']='Usar dos puntos conocidos';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_georef_twopt_tip']='Coloque el modelo con exactitud, cuando ya sepa dónde están realmente dos puntos de su dibujo. Haga clic en uno de ellos, escriba su latitud y su longitud, y luego haga lo mismo con un segundo punto. La posición, la escala y el giro se calculan a partir de esos dos puntos. Presione este botón de nuevo para dejar de elegir puntos.';
-$ec_lang['lpn_georef_twopt_pick1']='Haga clic en un punto de su dibujo cuya latitud y longitud usted conozca.';
-$ec_lang['lpn_georef_twopt_pick2']='Ahora haga clic en un segundo punto conocido, lo más alejado posible del primero.';
+$ec_lang['lpn_georef_twopt_tip']='Coloque el modelo con exactitud cuando se conocen la latitud y la longitud verdaderas de dos puntos del dibujo. Especifique uno de ellos, ingrese su latitud y su longitud, y luego haga lo mismo con un segundo punto. La posición, la escala y el giro se calculan a partir de esos dos puntos. Presione de nuevo para cancelar, o presione Esc.';
+$ec_lang['lpn_georef_twopt_pick1']='Especifique un punto de su dibujo cuya latitud y longitud conozca.';
+$ec_lang['lpn_georef_twopt_pick2']='Ahora especifique un segundo punto conocido, lo más alejado posible del primero.';
 $ec_lang['lpn_georef_twopt_same']='Ese es el punto que eligió primero. Elija uno diferente.';
 $ec_lang['lpn_georef_twopt_done']='El modelo ahora está colocado sobre los dos puntos que indicó. Compruébelo y luego presione el botón Mantener esta ubicación.';
 
@@ -1276,7 +1276,7 @@ $ec_lang['lpn_georef_twopt_done']='El modelo ahora está colocado sobre los dos 
 // profile first, tables later. The toggle is on the toolbar because it is the strip a reader
 // scans for "what else can this page show me".
 $ec_lang['lpn_pane_toggle']='Panel inferior';
-$ec_lang['lpn_pane_toggle_tip']='Mostrar u ocultar el panel debajo del mapa. Contiene el perfil y una tabla para cada tipo de elemento.';
+$ec_lang['lpn_pane_toggle_tip']='Mostrar u ocultar el panel debajo del mapa. Contiene gráficos y una tabla para cada tipo de elemento.';
 $ec_lang['lpn_pane_resize']='Arrastre para hacer el panel más alto o más bajo';
 $ec_lang['lpn_pane_tab_junctions']='Nudos';
 $ec_lang['lpn_pane_tab_reservoirs']='Embalses';
@@ -1284,7 +1284,7 @@ $ec_lang['lpn_pane_tab_tanks']='Depósitos';
 $ec_lang['lpn_pane_tab_pipes']='Tuberías';
 $ec_lang['lpn_pane_tab_pumps']='Bombas';
 $ec_lang['lpn_pane_tab_valves']='Válvulas';
-$ec_lang['lpn_pane_tab_tip']='Esta pestaña muestra los elementos de este tipo como una tabla tipo hoja de cálculo. Las columnas de resultados no se pueden editar. Vea Ayuda, Notas para los atajos de teclado.';
+$ec_lang['lpn_pane_tab_tip']='Edite los elementos como una tabla tipo hoja de cálculo. Las columnas de resultados no se pueden editar. Vea Ayuda, Notas para los atajos de teclado.';
 $ec_lang['lpn_pane_none']='Esta red todavía no tiene ninguno de estos.';
 // **A PERSISTENT NOTE, NOT A HOVER TIP** (Tom, 2026-09-08, asking for wording "to the effect that
 // 'This table is intended to be ready for asset entry and creation by pasting from a spreadsheet'").
@@ -1347,20 +1347,20 @@ $ec_lang['lpn_menu_project']='Agua';
 // the TOOLBAR, above the map. Do not qualify this sentence again. The rule it states is in
 // dev/looped-network-calculator-scope.md: every command lives in the menu bar, the transport is the
 // one exception, and it is exempt because it is a position in a run rather than a command.
-$ec_lang['lpn_menu_project_tip']='Todo lo relacionado con el modelado de redes de agua está aquí en un solo lugar, excepto los controles de reproducción de la animación. No hace falta adivinar dónde está cada cosa.';
+$ec_lang['lpn_menu_project_tip']='Todo lo específico del modelado de redes de agua (excepto los controles de reproducción de la animación)';
 $ec_lang['lpn_tables_menu']='Tablas';
-$ec_lang['lpn_tables_menu_tip']='Abre, en el panel debajo del mapa, una tabla con las partes de esta red. Hay una tabla para cada tipo de parte, y allí puede ordenarla y editarla.';
+$ec_lang['lpn_tables_menu_tip']='Ver y editar los elementos en tablas en el panel inferior.';
 // The Run row's own tip, NOT lpn_time_run_tip: this row exists partly to answer "where is my Run
 // button?" for somebody whose project recalculates by itself, and that sentence is not true of the
 // toolbar button, which is the one that goes away.
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_run_menu_tip']='Vuelve a calcular esta red ahora. ¿Busca el botón Calcular? Está oculto mientras el ajuste Recalcular automáticamente está activado. Para que el botón vuelva a aparecer, desactive Recalcular automáticamente en Configuración, Cálculo, Hidráulica.';
+$ec_lang['lpn_run_menu_tip']='Ejecutar la simulación. Innecesario cuando "Recalcular automáticamente" está activado en Configuración, Cálculo, Hidráulica. Cuando Recalcular está desactivado, aparece un botón Calcular en la barra de herramientas.';
 // ---- automatic recalculation (Task 467) ----
 // "Simulation" rather than "network" or "results": it is the word EPANET uses for working a network
 // out over time, and this switch is about the run, not about the drawing.
 $ec_lang['lpn_settings_auto_run']='Recalcular automáticamente';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_settings_auto_run_tip']='Cuando esto está activado, este proyecto se recalcula poco después de cada cambio que hace, y el botón Calcular se quita de la barra de herramientas porque ya no tiene nada que hacer. Desactívelo en una red grande donde esperar a que se recalcule cada cambio estorbe al escribir, y el botón Calcular vuelve para que usted elija cuándo ejecutar.';
+$ec_lang['lpn_settings_auto_run_tip']='Desactívelo si el recálculo es demasiado lento. Oculta el botón Calcular.';
 // **AN EDIT SAYS NOTHING AT ALL WHEN THE SWITCH IS OFF** (Tom, 2026-09-19: *"Recalc off Old
 // values: Leave in place stale. Don't clear. Trust the user."*). `lpn_manual_results_cleared`
 // stood here for part of one day and is DELETED, English-only, never translated: it announced a
@@ -1372,7 +1372,7 @@ $ec_lang['lpn_settings_auto_run_tip']='Cuando esto está activado, este proyecto
 // who has just waited a second already knows something is slow and wants it confirmed, not
 // explained. {secs} is one decimal.
 $ec_lang['lpn_time_run_slow']='Esta red tardó {secs} s en calcularse, y está configurada para recalcularse después de cada cambio. Para detener eso y recuperar el botón Calcular, desactive «Recalcular automáticamente» en Configuración, bajo Cálculo, Hidráulica.';
-$ec_lang['lpn_time_no_report']='Todavía no hay informe de ejecución. El informe es el propio texto de EPANET, así que aparece una vez que esta red se haya calculado con el solucionador de EPANET.';
+$ec_lang['lpn_time_no_report']='Todavía no hay informe de ejecución. El informe es el informe de texto de EPANET, así que aparece una vez que se haya calculado esta red.';
 // "Settings" rather than Tools -> Options (Windows) or Preferences (Mac): nobody has ever settled
 // this one, and of the three, Settings is the word a person is most likely to look for first.
 // Moved out of the suite-wide More menu, 2026-08-13 (Tom: "the walkthrough is a little
@@ -1423,7 +1423,7 @@ $ec_lang['lpn_find_btn']='Buscar';
 // is selected." One button, no selector; which table(s) it fills follows the scope in
 // buildFilterRow()/applyTableFilter(), never a control of its own.
 $ec_lang['lpn_find_filter_btn']='Filtrar en la tabla actual';
-$ec_lang['lpn_find_filter_tip']='Muestra solo las partes que coinciden con esta consulta en una de las tablas debajo del mapa. El dibujo no se modifica y no se elimina nada.';
+$ec_lang['lpn_find_filter_tip']='Muestra solo las filas que coinciden con "Qué buscar" de arriba, en cada tabla buscada.';
 // The multi-table receipt, printed when "Everything" (or a typed compound query) filters more than
 // one table at once: one {table}: {n} of {all} row per table the query could be asked of, joined
 // into {rows} of the summary line below. Every number is a count already shown on the table's own
@@ -1450,7 +1450,7 @@ $ec_lang['lpn_find_op_lt']='menor que';
 // A condition that takes no value: it asks whether the asset states this property at all.
 $ec_lang['lpn_find_op_empty']='vacío';
 // {n} is a whole number.
-$ec_lang['lpn_find_count']='{n} encontrados. Haga clic en uno para ir a él.';
+$ec_lang['lpn_find_count']='{n} encontrados. Seleccione uno para ir a él.';
 $ec_lang['lpn_find_shift_hint']='Mayús+clic para alternar: agrega si no está en el conjunto de selección, o quita si ya está en él.';
 $ec_lang['lpn_find_none']='No hubo coincidencias.';
 // The two extremes, as conditions on the same footing as "above" -- the Value box holds how
@@ -1471,7 +1471,7 @@ $ec_lang['lpn_find_op_top']='{n} más altos';
 $ec_lang['lpn_find_op_bottom']='{n} más bajos';
 // EPANET's Map Finder calls this "Adjacent Links". Said plainly here: the pipes, pumps and valves
 // that meet at the node you found.
-$ec_lang['lpn_find_no_value']='Escriba qué buscar.';
+$ec_lang['lpn_find_no_value']='Ingrese qué buscar.';
 // Task 540: the disconnected-node report. "Disconnected" is three different faults and each is
 // said as a CONDITION on one property, so the report is the Find panel with a different condition
 // rather than a second tool. Each op completes the sentence "Junction.Connection ___".
@@ -1498,7 +1498,7 @@ $ec_lang['lpn_find_conn_no_fixed']='Esta red no tiene ningún embalse ni depósi
 // Task 540: the query written as one line, above the Find button -- and typed into. The controls
 // write it and it writes the controls, so it teaches the shape of a search by being operated from
 // either end.
-$ec_lang['lpn_find_query_tip']='La misma búsqueda, escrita en una sola línea. Cambiar los controles reescribe esta línea, y escribir en esta línea actualiza los controles.';
+$ec_lang['lpn_find_query_tip']='La búsqueda dada como consulta de texto. Cambiar la consulta actualiza los controles de arriba.';
 $ec_lang['lpn_find_query_label']='Consulta';
 // Tom's own line, 2026-08-26, and "expandable" is his word: it says the grammar will grow.
 $ec_lang['lpn_find_query_hint']='Combine condiciones con Y, O y ()';
@@ -1535,15 +1535,15 @@ $ec_lang['lpn_replace_title']='Cambiar lo encontrado';
 $ec_lang['lpn_replace_prop']='Propiedad para cambiar';
 $ec_lang['lpn_replace_value']='Nuevo valor';
 $ec_lang['lpn_replace_source']='Origen del valor nuevo';
-$ec_lang['lpn_replace_asked']='Se solicitaron elevaciones para {n} nodos. Los resultados están en camino.';
+$ec_lang['lpn_replace_asked']='Se solicitaron elevaciones para {n} nodos. Los resultados aparecen cuando se reciben.';
 $ec_lang['lpn_replace_btn']='Reemplazar';
 // The count IS the confirmation: a bulk write reaches assets spread over a map the user is not
 // looking at, so it is shown, and answered, before anything is written. {n} is a whole number.
 $ec_lang['lpn_replace_preview']='¿Cambiar {n} elementos?';
 $ec_lang['lpn_replace_apply']='Cambiarlos';
-$ec_lang['lpn_replace_done']='{n} elementos cambiados. Puede deshacer esto en un paso.';
+$ec_lang['lpn_replace_done']='{n} elementos cambiados. Esto se puede deshacer en un solo paso.';
 $ec_lang['lpn_replace_none']='Nada cambiaría.';
-$ec_lang['lpn_replace_no_value']='Escriba el nuevo valor.';
+$ec_lang['lpn_replace_no_value']='Ingrese el nuevo valor.';
 $ec_lang['lpn_replace_scope']='Elija arriba un tipo de elemento para cambiar sus valores.';
 // ---- the profile view (ROADMAP Task 409) ------------------------------------------------------
 // A drawing of the ground and the hydraulic grade line along one chosen route through the network.
@@ -1560,11 +1560,11 @@ $ec_lang['lpn_graphs_menu']='Gráficos';
 $ec_lang['lpn_profile_title']='Perfil a lo largo de una ruta';
 // Task 433 -- the path chooser. The gesture is Google Directions': click the start node, move over
 // the map to see the path, click to add a stop, double-click to finish.
-$ec_lang['lpn_profile_draw_start']='Haga clic en el nodo donde empieza el trazado.';
+$ec_lang['lpn_profile_draw_start']='Seleccione el nodo donde empieza el trazado.';
 $ec_lang['lpn_profile_draw_more']='Mueva el cursor sobre el mapa para ver el trazado. Haga clic en un nodo para agregarlo. Haga doble clic para terminar. Esc cancela.';
 $ec_lang['lpn_profile_draw_blocked']='No hay ruta de {a} a {b}. Elija otro nodo.';
-$ec_lang['lpn_profile_tap_start']='Toque el nodo donde empieza el trazado.';
-$ec_lang['lpn_profile_tap_more']='Toque un nodo para ver el trazado. Mantenga presionado para agregarlo. Toque dos veces para terminar. Presione Perfil de nuevo para cancelar.';
+$ec_lang['lpn_profile_tap_start']='Seleccione el nodo donde empieza el trazado.';
+$ec_lang['lpn_profile_tap_more']='Seleccione un nodo para ver el trazado. Mantenga presionado para agregarlo. Toque dos veces para terminar. Presione Perfil de nuevo para cancelar.';
 $ec_lang['lpn_profile_say_idle']='Presione Perfil de nuevo para elegir un nuevo trazado en el mapa.';
 $ec_lang['lpn_profile_none']='Todavía no hay trazado. Presione Perfil de nuevo para elegir uno en el mapa.';
 $ec_lang['lpn_profile_choose']='Elija un nodo de inicio y un nodo final.';
@@ -1586,8 +1586,8 @@ $ec_lang['lpn_profile_edit_tip']='Cambie un extremo de la ruta, o quite un nodo 
 // Tom read it (2026-08-27: *"What is '_say' supposed to mean? Don't you mean '_click'?"*). He is
 // right: its twin is `_tap`, so the only thing the two names can honestly differ by is the word
 // inside them, and `_say` named nothing at all.
-$ec_lang['lpn_profile_edit_click']='Arrastre cualquier punto de la ruta para moverlo. Haga clic en un punto que usted agregó para quitarlo.';
-$ec_lang['lpn_profile_edit_tap']='Arrastre cualquier punto de la ruta para moverlo. Toque un punto que usted agregó para quitarlo.';
+$ec_lang['lpn_profile_edit_click']='Arrastre cualquier punto de la ruta para moverlo. Seleccione un punto agregado para quitarlo.';
+$ec_lang['lpn_profile_edit_tap']='Arrastre cualquier punto de la ruta para moverlo. Seleccione un punto agregado para quitarlo.';
 $ec_lang['lpn_profile_edit_nowhere']='Un punto de la ruta tiene que ser un nodo. La ruta no cambia.';
 // ---- Task 510: paths kept in the project, by name ---------------------------------------------
 // A client report carries the same three or four profiles every time, so a path is worth keeping.
@@ -1612,13 +1612,13 @@ $ec_lang['lpn_profile_missing']='La ruta guardada {name} usa nodos que no están
 // second place a wording could drift. The quantity labels themselves are the Labels popover's, in
 // every language it already has them in.
 $ec_lang['lpn_ts_menu']='Series de tiempo';
-$ec_lang['lpn_ts_tip']='Grafica uno o más elementos contra el tiempo a lo largo de una simulación de período extendido.';
+$ec_lang['lpn_ts_tip']='Grafica uno o más elementos a lo largo de una simulación de período extendido.';
 $ec_lang['lpn_ts_title']='Valores contra el tiempo';
 $ec_lang['lpn_ts_group_nodes']='Nudos';
 $ec_lang['lpn_ts_group_links']='Líneas';
 $ec_lang['lpn_ts_add']='Agregar los seleccionados';
 // Said out loud rather than ignored: a button that does nothing cannot be told from a broken one.
-$ec_lang['lpn_ts_add_none']='No hay nada de ese tipo elegido en el mapa.';
+$ec_lang['lpn_ts_add_none']='No se encontró nada que agregar.';
 $ec_lang['lpn_ts_clear']='Quitar todo';
 $ec_lang['lpn_ts_chip_tip']='Quitar {id} del gráfico';
 $ec_lang['lpn_ts_none']='Todavía no hay nada que graficar. Seleccione elementos en el mapa y presione Agregar los seleccionados.';
@@ -1629,7 +1629,7 @@ $ec_lang['lpn_ts_no_frames']='Todavía no hay resultados de período extendido. 
 $ec_lang['lpn_ts_summary']='Elementos: {n}, tiempos de informe: {steps}';
 $ec_lang['lpn_ts_axis_time']='Tiempo transcurrido';
 $ec_lang['lpn_freq_menu']='Frecuencia';
-$ec_lang['lpn_freq_tip']='Graficar la distribución de frecuencia de una propiedad en todos los nudos o todas las tuberías, en el paso de tiempo actual.';
+$ec_lang['lpn_freq_tip']='Distribución de frecuencia de una propiedad';
 $ec_lang['lpn_freq_title']='Distribución de valores';
 $ec_lang['lpn_freq_none']='Todavía no hay resultados para este valor, así que no hay nada que graficar.';
 $ec_lang['lpn_freq_summary']='Graficados: {n} de {total}';
@@ -1691,7 +1691,7 @@ $ec_lang['lpn_new_title']='Proyecto nuevo';
 // them), or local and not georeferenced. The keys of the older three-radio box (lpn_new_coords and
 // its five siblings) are gone; Tom called the last of them obsolete on 2026-09-16.
 $ec_lang['lpn_new_coordsys']='Sistema de coordenadas';
-$ec_lang['lpn_new_coordsys_tip']='Seleccione el sistema de coordenadas de su red. Esto es permanente; la única forma de convertir una red a otras coordenadas es con «Archivo, Abrir con nuevas coordenadas», y es aproximada.';
+$ec_lang['lpn_new_coordsys_tip']='Elija el sistema de coordenadas de la red. La única forma de cambiar esta elección es con «Archivo, Convertir como…» a un proyecto nuevo, y esa conversión es aproximada.';
 // **DELETED 2026-09-25: lpn_new_coordsys_geo / lpn_new_coordsys_geo_tip.** Don't expose the word
 // "projection" (dev/session-handoff.md RULINGS); once reworded, both were the identical string
 // lpn_convas_epsg / lpn_convas_epsg_tip already carries, so the radio reuses those keys rather than
@@ -1711,13 +1711,13 @@ $ec_lang['lpn_new_coordsys_local_tip']='Sin georreferenciar. Adjunte su propia i
 // answers most of the question by itself: searching a town in Arizona leaves two UTM zones standing
 // out of a hundred and twenty.
 $ec_lang['lpn_crs_view']='Filtrar por la vista del mapa';
-$ec_lang['lpn_crs_view_tip']='Ofrece solo las proyecciones que cubren el lugar que el mapa está mostrando. Desactívelo para ver la lista completa.';
+$ec_lang['lpn_crs_view_tip']='Ofrece solo los sistemas de coordenadas que cubren el lugar que el mapa está mostrando. Desactívelo para ver la lista completa.';
 $ec_lang['lpn_crs_place']='Búsqueda de nombre de lugar';
-$ec_lang['lpn_crs_place_tip']='Escriba una ciudad, una dirección o un punto de referencia, y la vista del mapa se desplazará allí. Lo que escriba se envía al servicio de nombres de lugares de OpenStreetMap, que le pedirá permiso la primera vez. Un proyecto geográfico nuevo también comienza en el lugar que encuentre aquí.';
+$ec_lang['lpn_crs_place_tip']='Las búsquedas se envían al servicio de nombres de lugares de OpenStreetMap, y se solicita permiso la primera vez. Un proyecto geográfico nuevo también comienza en el lugar que se encuentre aquí.';
 $ec_lang['lpn_crs_search']='Buscar';
 $ec_lang['lpn_crs_name']='Filtro por nombre de proyección';
-$ec_lang['lpn_crs_name_tip']='Muestra solo las proyecciones cuyo nombre o código EPSG contiene lo que escriba. Pruebe con un número de zona, UTM o Mercator.';
-$ec_lang['lpn_crs_list_tip']='Las proyecciones que quedan tras los dos filtros anteriores. Elija una y presione Seleccionar.';
+$ec_lang['lpn_crs_name_tip']='Texto que filtra la lista: solo se muestran los sistemas de coordenadas cuyo nombre o código EPSG lo contiene.';
+$ec_lang['lpn_crs_list_tip']='Los sistemas de coordenadas que pasan los filtros anteriores. Elija uno y luego presione Aceptar.';
 // Said rather than left blank: a filter that is on and filtering nothing looks broken.
 $ec_lang['lpn_crs_noview']='Todavía no se ha buscado ningún lugar, así que se ofrece la lista completa. Busque un lugar arriba o acerque el mapa para acortarla.';
 $ec_lang['lpn_crs_count']='{n} de {total} proyecciones en la lista.';
@@ -1749,7 +1749,7 @@ $ec_lang['lpn_crs_none']='Sin georreferenciar';
 // Task 584: the page-wide rule stated where it is decided. A new project gets the hard-coded
 // defaults; a preference is a template FILE rather than an invisible saved setting.
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_new_units_tip']='Un proyecto conserva sus propias unidades, así que esta elección pertenece solo a este proyecto y no se guarda como ajuste del navegador. Para iniciar proyectos nuevos de una manera particular, guarde un proyecto vacío como su plantilla y haga una copia de él cada vez.';
+$ec_lang['lpn_new_units_tip']='Las unidades y otros ajustes se guardan con cada proyecto, así que esta elección se aplica solo a este proyecto y no se guarda como ajuste del navegador. Para reutilizar preferencias, guarde un proyecto vacío como plantilla e inicie cada proyecto nuevo a partir de él.';
 // A worked example rather than an instruction, in the placeholder where an instruction would be
 // read as the answer. Petaluma is the example js/lpn-search.js already uses.
 $ec_lang['lpn_new_place_hint']='Petaluma, California, EE. UU.';
@@ -1792,7 +1792,7 @@ $ec_lang['lpn_file_import_inp_tip']='Cree un proyecto nuevo a partir de un archi
 // The other direction (Task 281). A DOWNLOAD, so the word is Export rather than Save: this page
 // keeps no handle on an `.inp` and never writes back to one.
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_file_export_inp_tip']='Descargue esta red como un archivo .inp de EPANET. Todo lo que el formato .inp no pueda contener se le indica después.';
+$ec_lang['lpn_file_export_inp_tip']='Descargue esta red como archivo .inp de EPANET (en un archivo zip con su imagen, si corresponde). Todo lo que el formato .inp no pueda contener se enumera después.';
 $ec_lang['lpn_status_inp_exported']='Se exportó {file}.';
 // {n} is a whole number. Said plainly rather than hidden: a file that quietly loses a pump curve is
 // the failure this whole feature exists to prevent.
@@ -1805,7 +1805,7 @@ $ec_lang['lpn_inp_bad_file']='Ese archivo no se pudo leer como un archivo de red
 $ec_lang['lpn_net_bad_file']='Esto parece un archivo .net de EPANET, pero esta página no pudo leerlo. Ábralo en EPANET y use allí el comando Archivo, Exportar, Red para guardarlo como un archivo .inp, y luego importe ese archivo.';
 $ec_lang['lpn_inp_report_heading']='Se importó {file}';
 $ec_lang['lpn_inp_report_counts']='{nodes} nudos, embalses y depósitos, {links} tuberías, bombas y válvulas, en {units}.';
-$ec_lang['lpn_inp_report_clean']='Todo el contenido del archivo se incorporó. No se dejó nada fuera.';
+$ec_lang['lpn_inp_report_clean']='Todos los datos del archivo se importaron. No se omitió nada.';
 $ec_lang['lpn_inp_report_label_anchor']='Las etiquetas de texto se colocan como las coloca EPANET, desde su esquina superior izquierda.';
 // **R-219; Tom, 2026-09-24, answering R-190**: dropping the "These are already lat/lon" button in
 // favor of typing 1 for Step 2's Ground distance field means both Import and Convert as have to say
@@ -1813,46 +1813,46 @@ $ec_lang['lpn_inp_report_label_anchor']='Las etiquetas de texto se colocan como 
 // or no [BACKDROP] line at all, never only "None" -- because none of those states a real coordinate
 // system either. See showInpReport() in js/looped-network.js.
 $ec_lang['lpn_inp_report_no_crs']='Los archivos EPANET no contienen sistema de coordenadas, así que este archivo no estará georreferenciado inicialmente. Para colocarlo en un mapa mundial, use Mapa, Mapa mundial… Para convertir sus coordenadas, use Archivo, Convertir como…';
-$ec_lang['lpn_inp_report_lead']='Esta página no usa todo lo que usa EPANET, pero nada de su archivo se descarta. Abajo está lo que su archivo contiene que esta página conserva sin usar, y lo que se cambió al leer el archivo:';
+$ec_lang['lpn_inp_report_lead']='Esta página no usa todas las funciones de EPANET, pero no se descarta ningún dato del archivo. La lista siguiente muestra los datos del archivo que se conservan pero no se usan, y los cambios hechos durante la importación:';
 $ec_lang['lpn_inp_drop_headloss']='Este archivo no usa la fórmula de Hazen-Williams. Esta página calcula con Hazen-Williams, así que los valores de rugosidad de la tubería se conservaron exactamente como estaban escritos, pero los resultados aquí no coincidirán con los de EPANET.';
-$ec_lang['lpn_inp_drop_tank_curve']='Estos depósitos no tienen paredes rectas: el archivo da su forma como una curva. La curva se conserva en el cuadro Bibliotecas, el depósito sigue indicándola, y una simulación de período extendido llena y vacía el depósito según el programa que da esa curva. Un solo instante es igual de cualquier manera, porque la superficie del agua es el nivel que fija el archivo. El diámetro escrito en el archivo se conserva junto a la curva y es con el que se dibuja y se resuelve un depósito sin curva.';
+$ec_lang['lpn_inp_drop_tank_curve']='Estos depósitos no tienen paredes rectas: el archivo da su forma como una curva de volumen. La curva se conserva en el cuadro Bibliotecas, el depósito sigue haciendo referencia a ella, y una simulación de período extendido la usa para calcular el nivel a medida que el depósito se llena y se vacía. Un análisis de un solo período no se ve afectado, porque la superficie del agua está en el nivel indicado en el archivo. El diámetro del archivo se conserva junto a la curva y se usa para dibujar y resolver un depósito sin curva.';
 // Three outcomes a valve in a file can meet, one string each (Task 248 phase 2). Only the last is
 // a loss; the first two are reported because the reader deserves to know what became of a valve
 // their file states, not because anything was thrown away.
-$ec_lang['lpn_inp_drop_tcv']='Estas válvulas de estrangulamiento se incorporaron como válvulas de estrangulamiento, conservando la misma pérdida que indica el archivo.';
-$ec_lang['lpn_inp_drop_valve_active']='Estas válvulas controlan la presión o el caudal, y se abren y cierran por sí solas a medida que cambia el agua. No se perdió nada de ellas al incorporarlas, y esta página las resuelve con el solucionador de EPANET, activando ese solucionador por sí sola para esta red.';
-$ec_lang['lpn_inp_drop_valve']='Estas válvulas se describen mediante una curva o una caída de presión fija, y esta página no tiene un elemento así. Se incorporaron como tuberías abiertas, así que la red sigue conectada, pero ya nada controla la presión ni el caudal allí.';
-$ec_lang['lpn_inp_drop_cv']='En EPANET estas tuberías dejan pasar el agua en un solo sentido. Se incorporaron como tuberías comunes, así que ahora el agua puede fluir en cualquier sentido por ellas.';
+$ec_lang['lpn_inp_drop_tcv']='Estas válvulas de estrangulamiento se importaron como válvulas de estrangulamiento, con la pérdida indicada en el archivo.';
+$ec_lang['lpn_inp_drop_valve_active']='Estas válvulas controlan la presión o el caudal, y su estado cambia con las condiciones hidráulicas. Se importaron sin pérdida de datos, y esta página las resuelve.';
+$ec_lang['lpn_inp_drop_valve']='Estas válvulas se describen mediante una curva o una caída de presión fija, y esta página no tiene un elemento así. Se importaron como tuberías abiertas, así que la red sigue conectada, pero la presión y el caudal ya no se controlan en esos puntos.';
+$ec_lang['lpn_inp_drop_cv']='En EPANET estas tuberías permiten el flujo en un solo sentido (válvulas de retención). Se importaron como tuberías comunes, así que ahora el flujo puede pasar en cualquier sentido.';
 $ec_lang['lpn_inp_drop_demands']='Estos nudos tenían más de una demanda. Las demandas se sumaron en la única demanda que maneja esta página.';
-$ec_lang['lpn_inp_drop_patterns']='Esta página no leyó los patrones de demanda, porque la parte de ella que ejecuta una simulación de período extendido no se cargó. Cada demanda es el número escrito en el archivo.';
-$ec_lang['lpn_inp_drop_demand_pattern']='Estos nudos cambian su demanda a lo largo de la ejecución. Sus patrones se incorporaron completos, y la demanda que se ve es la correspondiente al momento que muestra el reloj.';
+$ec_lang['lpn_inp_drop_patterns']='Esta página no leyó los patrones de demanda, porque el módulo de simulación de período extendido no se cargó. Cada demanda es el valor indicado en el archivo.';
+$ec_lang['lpn_inp_drop_demand_pattern']='Estos nudos tienen demandas que varían a lo largo de la ejecución. Sus patrones se importaron completos, y la demanda que se muestra es el valor a la hora del reloj.';
 $ec_lang['lpn_inp_drop_emitters']='Estos nudos tienen un coeficiente de aspersor o de fuga. Se conservó, se está resolviendo, y cada uno lo muestra en el cuadro Coeficiente de emisor en sus propiedades.';
 $ec_lang['lpn_inp_drop_curve_long']='Esta curva de bomba tenía más de tres puntos. Se conservaron su punto más bajo, el medio y el más alto, porque esta página ajusta una curva a un máximo de tres puntos.';
-$ec_lang['lpn_inp_drop_curve_missing']='Esta bomba indica una curva que no está en el archivo. La bomba se incorporó sin curva, así que no agrega carga.';
-$ec_lang['lpn_inp_drop_pump_other']='Esta bomba se describe por la potencia que consume, en vez de por una curva. Se incorporó sin curva, así que no agrega carga.';
-$ec_lang['lpn_inp_drop_head_pattern']='Estos embalses suben y bajan a lo largo de la ejecución. Sus patrones se incorporaron completos, y el nivel de agua que se ve es el correspondiente al momento que muestra el reloj.';
-$ec_lang['lpn_inp_drop_pump_speed']='Estas bombas funcionan a una velocidad distinta de aquella con la que se midió su curva, o cambian de velocidad a lo largo de la ejecución. La velocidad y su patrón se incorporaron completos, y la carga que se ve es la correspondiente al momento que muestra el reloj.';
-$ec_lang['lpn_inp_drop_setting']='Estas tuberías, bombas y válvulas llevan un ajuste que esta página no puede guardar. Se incorporaron abiertas.';
-$ec_lang['lpn_inp_drop_rules']='Este archivo tiene controles basados en reglas. Esta página las lee y las usa. Ejecute el modelo con el solucionador de EPANET y las reglas se aplican, con cada nivel, presión y caudal convertidos a las unidades que muestra este proyecto. Abra Reglas en Bibliotecas para leer una o cambiarla. Se conservan exactamente como las indica el archivo, y se vuelven a escribir si guarda un archivo EPANET.';
-$ec_lang['lpn_inp_drop_eps']='Este archivo describe una simulación de período extendido. La parte de esta página que ejecuta una simulación de período extendido no se cargó, así que solo se incorporaron las condiciones iniciales.';
-$ec_lang['lpn_inp_drop_quality']='Este archivo describe cómo cambia la calidad del agua mientras viaja: qué hay en el agua al principio, y qué tan rápido reacciona esa sustancia en las tuberías y en los depósitos. Esta página lee esos números y los usa. Elija un producto químico en Configuración, Cálculo, Calidad, luego ejecute el modelo, y la concentración se calcula a lo largo de la red conforme avanza la ejecución. Las líneas se conservan, y se vuelven a escribir si guarda un archivo EPANET.';
-$ec_lang['lpn_inp_drop_sources_mixing']='Este archivo indica dónde se dosifica un producto químico en la red, y cómo se mezcla el agua en un depósito. Una dosis aparece en el nudo donde se agrega, y un depósito indica qué modelo de mezcla sigue. Tanto la dosis como el modelo de mezcla se calculan solo con el solucionador de EPANET.';
+$ec_lang['lpn_inp_drop_curve_missing']='Esta bomba hace referencia a una curva que no está en el archivo. La bomba se importó sin curva, así que no agrega carga.';
+$ec_lang['lpn_inp_drop_pump_other']='Esta bomba se describe por la potencia que consume, en vez de por una curva. Se importó sin curva, así que no agrega carga.';
+$ec_lang['lpn_inp_drop_head_pattern']='Estos embalses tienen una carga que varía a lo largo de la ejecución. Sus patrones se importaron completos, y el nivel de agua que se muestra es el valor a la hora del reloj.';
+$ec_lang['lpn_inp_drop_pump_speed']='Estas bombas funcionan a una velocidad distinta de aquella con la que se midió su curva, o cambian de velocidad a lo largo de la ejecución. La velocidad y su patrón se importaron completos, y la carga que se muestra es el valor a la hora del reloj.';
+$ec_lang['lpn_inp_drop_setting']='Estas tuberías, bombas y válvulas tienen un ajuste que esta página no puede contener. Se importaron como abiertas.';
+$ec_lang['lpn_inp_drop_rules']='Este archivo tiene controles basados en reglas. Esta página los lee y los aplica. Cuando se ejecuta el modelo, se aplican las reglas, con cada nivel, presión y caudal convertidos a las unidades que muestra este proyecto. Abra Reglas en Bibliotecas para ver o editar una regla. Las reglas se conservan exactamente como se indican en el archivo y se vuelven a escribir si guarda un archivo de EPANET.';
+$ec_lang['lpn_inp_drop_eps']='Este archivo describe una simulación de período extendido. El módulo de simulación de período extendido de esta página no se cargó, así que solo se importaron las condiciones iniciales.';
+$ec_lang['lpn_inp_drop_quality']='Este archivo describe la calidad del agua: concentraciones iniciales y tasas de reacción en tuberías y depósitos. Esta página lee y usa esos valores. Elija un producto químico en Configuración, Cálculo, Calidad, y luego ejecute el modelo para calcular las concentraciones en toda la red a lo largo de la ejecución. Las líneas se conservan y se vuelven a escribir si guarda un archivo de EPANET.';
+$ec_lang['lpn_inp_drop_sources_mixing']='Este archivo indica dónde se inyecta un producto químico en la red y cómo se mezcla el agua en cada depósito. Cada fuente se muestra en el nudo donde se aplica, y cada depósito muestra su modelo de mezcla. Ambos se usan cuando la red se ejecuta durante un tiempo total de simulación.';
 $ec_lang['lpn_inp_drop_energy']='Este archivo EPANET incluye datos para modelar el costo de bombeo. Esta página los lee y los usa. Ejecute el modelo con el solucionador de EPANET, y luego abra Agua, Informes, Energía de las bombas para ver cuánto tiempo funcionó cada bomba, la potencia que consumió, la energía que usó y lo que costó. Las líneas se conservan, y se vuelven a escribir si guarda un archivo EPANET.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_inp_drop_tags']='Este archivo asigna etiquetas a algunos de sus nudos, tuberías u otros elementos. Cada etiqueta se incorporó completa, y cada una está en las propiedades de su propio elemento, donde puede leerla o cambiarla.';
+$ec_lang['lpn_inp_drop_tags']='Este archivo asigna etiquetas a algunos nudos, tuberías u otros elementos. Cada etiqueta se importó y aparece en las propiedades de su elemento, donde se puede ver o editar.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_inp_drop_report']='Este archivo contiene la configuración propia de EPANET para el formato del informe que imprime. Puede leer el informe del solucionador aquí, en Informes, Ejecución de EPANET, pero sale en el formato estándar del solucionador y no en el que piden estos ajustes. Las líneas se conservan, y se vuelven a escribir si guarda un archivo EPANET.';
+$ec_lang['lpn_inp_drop_report']='Este archivo contiene ajustes de formato de informe de EPANET. El informe de ejecución está disponible en Informes, Ejecución, pero usa el formato estándar de EPANET y no el que especifican estos ajustes. Las líneas se conservan y se vuelven a escribir si guarda un archivo de EPANET.';
 $ec_lang['lpn_inp_drop_sections']='Este archivo contiene una sección que esta página no lee en absoluto. Nada aquí la usa. Se conserva completa, y se vuelve a escribir si guarda un archivo EPANET.';
-$ec_lang['lpn_inp_drop_quality_options']='Este archivo indica las opciones de calidad del agua de EPANET: la opción Quality, que nombra el tipo de análisis de calidad del agua, y dos ajustes que van con un producto químico, Relative diffusivity y Quality tolerance. Las tres se conservan y las tres se usan. Aquí se calculan la edad del agua, el rastreo de origen y un producto químico, y los dos ajustes del producto químico se entregan al solucionador de EPANET cuando ejecuta uno. Todas se vuelven a escribir si guarda un archivo EPANET.';
+$ec_lang['lpn_inp_drop_quality_options']='Este archivo indica opciones de calidad del agua de EPANET: la opción Quality, que nombra el tipo de análisis de calidad del agua, y dos ajustes que acompañan a un producto químico, Relative diffusivity y Quality tolerance. Las tres se conservan y se usan. Aquí se calculan la edad del agua, el rastreo de origen y un producto químico, y los dos ajustes del producto químico se usan cuando se ejecuta un producto químico. Todas se vuelven a escribir si guarda un archivo de EPANET.';
 $ec_lang['lpn_inp_drop_file_options']='Este archivo hace referencia a un archivo auxiliar: Map, que contiene coordenadas, o Hydraulics, que contiene resultados hidráulicos ya calculados. Esta página no puede abrir ninguno de los dos, así que esas líneas se conservan tal como están y se vuelven a escribir si guarda un archivo EPANET.';
 $ec_lang['lpn_inp_drop_other_options']='Este archivo indica opciones que esta página no lee. Nada aquí las usa. Se conservan y se vuelven a escribir si guarda un archivo EPANET.';
 $ec_lang['lpn_inp_drop_net_options']='Este archivo .net de EPANET indica ajustes para los que esta página no tiene control, así que sus valores se muestran aquí en lugar de incorporarse. Todo lo demás se incorporó. Si los necesita, abra el archivo en EPANET y use Archivo, Exportar, Network para guardarlo como archivo .inp, luego importe ese.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_net_emergency']='Este era un archivo .net de EPANET. Ese es el propio archivo de proyecto de EPANET, no tiene una descripción publicada, y esta página lo lee deduciendo el formato a partir de archivos de ejemplo, así que úselo solo cuando no tenga otra opción y no como una vía confiable. El archivo .inp es el formato documentado que todo otro programa lee: en EPANET use Archivo, Exportar, Network para escribir uno, e importe ese en su lugar siempre que pueda.';
+$ec_lang['lpn_net_emergency']='Este era un archivo .net de EPANET, el formato de proyecto nativo de EPANET. El formato no tiene especificación publicada; esta página lo lee usando un formato deducido de archivos de ejemplo, así que úselo solo cuando no haya un archivo .inp disponible. El archivo .inp es el formato documentado que leen otros programas: en EPANET use Archivo, Exportar, Network para escribir uno, e importe ese archivo en su lugar siempre que sea posible.';
 $ec_lang['lpn_inp_drop_backdrop']='Este archivo nombra una imagen de fondo pero no contiene la imagen en sí. Agréguela usted mismo con Archivo, Imagen de fondo, Agregar imagen.';
 $ec_lang['lpn_inp_drop_dangling']='Estas tuberías nombran un nudo que no está en el archivo, así que se dejaron fuera.';
-$ec_lang['lpn_inp_drop_units']='No se reconocieron las unidades de caudal de este archivo, así que se supusieron galones por minuto. Revise cada número antes de usar los resultados.';
-$ec_lang['lpn_inp_drop_anchor_missing']='Este texto estaba adjunto a un nudo, embalse o depósito que no está en el archivo. Se incorporó como texto libre en el lugar que indicaba el archivo, y ahora no sigue a nada.';
+$ec_lang['lpn_inp_drop_units']='La unidad de caudal indicada en este archivo no es una que esta página reconozca, así que todos los números se leyeron como galones por minuto. Revise cada valor antes de usar los resultados.';
+$ec_lang['lpn_inp_drop_anchor_missing']='Este texto estaba adjunto a un nudo, embalse o depósito que no está en el archivo. Se importó como texto libre en la ubicación indicada en el archivo y no está adjunto a ningún elemento.';
 $ec_lang['lpn_import_notes_heading']='Este proyecto se leyó de un archivo de EPANET. Parte de lo que contiene ese archivo se conserva pero no se usa en esta página.';
 // {name} is a project name; word order is the translator's to choose. Says where the user landed,
 // the same way lpn_status_deleted_opened does -- an opened file becomes a NEW project here, and
@@ -1881,7 +1881,7 @@ $ec_lang['lpn_file_type_desc']='Archivo de proyecto';
 // to recognise it next time. A user who is not told will reasonably expect Save to go back where the
 // file came from. Explained once per browser by lpn_file_upload_explain, then said every time by
 // lpn_status_uploaded.
-$ec_lang['lpn_file_upload_explain']='Este navegador no puede conectarse a un archivo, así que abrir un archivo aquí es en realidad una carga: el proyecto se copia en este navegador, y la única forma de guardar su trabajo de vuelta al archivo es sobrescribirlo con Archivo, Guardar como.';
+$ec_lang['lpn_file_upload_explain']='Este navegador no puede conectarse a un archivo, así que abrir un archivo aquí es una carga: el proyecto se copia en este navegador, y la única forma de guardar los cambios en el archivo es sobrescribirlo con Archivo, Guardar como.';
 // The tip on the Open button, which reached the toolbar with Task 246. It exists because that
 // button is icon-only: on a menu row the word carries the whole meaning, and on the strip the tip
 // is where the rest of it lives.
@@ -1912,7 +1912,7 @@ $ec_lang['lpn_close_save_confirm']='¿Guardar los cambios de {name} antes de cer
 $ec_lang['lpn_close_browser_confirm']='{name} se conserva solo en este navegador. Si lo cierra sin guardarlo en un archivo, se perderá para siempre.';
 $ec_lang['lpn_close_discard']='Cerrar sin guardar';
 $ec_lang['lpn_cancel']='Cancelar';
-$ec_lang['lpn_revert_confirm']='¿Descartar los cambios que ha hecho y volver a cargar {file} desde el disco?';
+$ec_lang['lpn_revert_confirm']='¿Descartar los cambios realizados y volver a cargar {file} desde el disco?';
 // A file project whose page has been reloaded. Browsers do not stay connected to a file across a
 // page load, so the link is gone even though we still know the name. Says what to do, not just what
 // happened.
@@ -1920,7 +1920,7 @@ $ec_lang['lpn_file_needs_reopen']='Este proyecto proviene de {file}, pero se per
 // Says what is still safe before it says what failed: the reassurance is the part a worried user
 // needs, and it is true -- the browser copy is written on every edit regardless.
 $ec_lang['lpn_file_write_failed']='No se pudo escribir en el archivo. Puede que se haya movido o renombrado, o que se haya retirado el permiso. Su trabajo sigue guardado en este navegador.';
-$ec_lang['lpn_file_changed_elsewhere']='Otra persona guardó en este archivo desde que usted lo abrió, así que guardar ahora sobrescribiría su trabajo. Use Archivo, Guardar como para conservar sus cambios en un archivo propio, o Archivo, Revertir para descartar los suyos y cargar los de ellos.';
+$ec_lang['lpn_file_changed_elsewhere']='Otro usuario guardó en este archivo desde que usted lo abrió, así que guardar ahora sobrescribiría ese trabajo. Use Archivo, Guardar como para guardar sus cambios en un archivo aparte, o Archivo, Revertir para descartar sus cambios y cargar la versión guardada.';
 // Project locks (Task 195 Phase 2) -- who is editing a shared project file right now. {name} is a
 // person as they chose to be known ("Dave T."), never a login; word order is the translator's to
 // choose. A lock never expires on its own, so none of these may suggest waiting will free it.
@@ -1970,14 +1970,14 @@ $ec_lang['lpn_lock_open_choices_ask']='"Preguntar" le indica a quien tenga este 
 $ec_lang['lpn_lock_ask']='Preguntar';
 // Asked at the one moment the name is useful, and SENT rather than stored: nothing new is written to
 // this computer for it, which is the whole point of moving the question here.
-$ec_lang['lpn_lock_ask_prompt']='¿A quién decimos que está preguntando? Sus iniciales son ideales. Se guardan junto con el bloqueo de este archivo en nuestro servidor, para quien lo tenga abierto, y se eliminan dentro de 30 días.';
+$ec_lang['lpn_lock_ask_prompt']='¿A quién se debe indicar como solicitante? Ingrese sus iniciales, por ejemplo. Se guardan con el bloqueo de este archivo en nuestro servidor, para quien lo tenga abierto, y se eliminan en un plazo de 30 días.';
 $ec_lang['lpn_lock_ask_sent']='Le pedimos a quien tenga este archivo abierto que lo cierre. Lo verá dentro de un minuto, si su página sigue abierta. Nada más ha cambiado, y el archivo sigue siendo suyo hasta que lo cierre.';
 $ec_lang['lpn_lock_ask_failed']='Su mensaje no se pudo entregar. O nadie tiene este archivo abierto ahora, o no se pudo contactar al servidor.';
 // **A CANCEL THAT LEAVES NO RESIDUE IS THE DEFECT** (ROADMAP Task 704, Ida's diagnosis). Backing
 // out of the locked-file dialog used to say nothing at all, so a reader who pressed Cancel by
 // reflex had no way to learn what had just been offered. It says what did not happen, and why.
 $ec_lang['lpn_lock_open_cancelled']='Ese archivo no se abrió, y nada aquí cambió. Otra persona todavía lo tiene abierto.';
-$ec_lang['lpn_copy_opened']='Se abrió {file} como una copia, con un bloqueo nuevo propio que se guardará con el próximo guardado del archivo.';
+$ec_lang['lpn_copy_opened']='Se abrió {file} como copia y se guardó, con un bloqueo nuevo.';
 $ec_lang['lpn_copy_kept_link']='Se abrió {name} como el original, movido a otro lugar. Guardar ahora escribe en este archivo.';
 $ec_lang['lpn_copy_copy']='Una copia; crear un bloqueo nuevo';
 $ec_lang['lpn_copy_original']='Original; conservar el mismo bloqueo';
@@ -2005,28 +2005,28 @@ $ec_lang['lpn_msglog_note']='Los más recientes primero. Esta página conserva l
 // at it, and it never offers to save over the other person\'s file. It cannot -- their file has moved
 // on since you opened it, so writing yours over it would destroy their work. What you CAN do is
 // everything else, including changing the network and keeping it as a file of your own.
-$ec_lang['lpn_lock_readonly_banner']='Solo lectura: {name} tiene este archivo abierto. Puede cambiar lo que quiera aquí, pero no puede guardar. Use Archivo, Guardar como para guardar en un archivo diferente.';
+$ec_lang['lpn_lock_readonly_banner']='Solo lectura: {name} tiene este archivo abierto. Se puede cambiar cualquier cosa aquí, pero no guardarla. Use Archivo, Guardar como para guardar en un archivo diferente.';
 // Opening a file we could not lock is the moment of danger (Tom, 2026-08-03): from then on nothing
 // stops a colleague editing the same file. Editing still works -- an unreachable server must never
 // take the calculator away -- so this warns rather than blocks, and promises the follow-up that
 // lpn_lock_restored keeps.
-$ec_lang['lpn_lock_unavailable']='Atención: no se pudo contactar al servidor para verificar o crear un bloqueo en este proyecto, así que nada impide que un colega edite el mismo archivo al mismo tiempo. Se le avisará si el bloqueo vuelve a funcionar.';
-$ec_lang['lpn_lock_storage_error']='Atención: este sitio no puede guardar los registros de bloqueo, así que nada impide que un colega edite el mismo archivo al mismo tiempo. Esto es una falla de configuración del servidor, no algo que usted pueda corregir aquí — la carpeta de bloqueo no tiene permiso de escritura para el servidor web.';
-$ec_lang['lpn_lock_full_error']='Atención: este sitio se quedó sin espacio para registrar quién tiene abierto cada proyecto, así que nada impide que un colega edite el mismo archivo al mismo tiempo. Esto es una falla de configuración del servidor, no algo que usted pueda corregir aquí.';
-$ec_lang['lpn_lock_not_asked']='El bloqueo no está activo para este proyecto, así que nada impide que un colega edite el mismo archivo al mismo tiempo. Este proyecto aún no tiene un identificador, y guardarlo en un archivo le asigna uno.';
-$ec_lang['lpn_lock_restored']='El bloqueo volvió a funcionar, y este archivo ahora es suyo para guardar.';
+$ec_lang['lpn_lock_unavailable']='Advertencia: no se pudo conectar con el servidor para verificar o crear un bloqueo en este proyecto, así que otro usuario puede editar el mismo archivo al mismo tiempo. Aparece un mensaje si el bloqueo se reanuda.';
+$ec_lang['lpn_lock_storage_error']='Advertencia: este sitio no puede guardar los registros de bloqueo, así que otro usuario puede editar el mismo archivo al mismo tiempo. Es una falla de configuración del servidor que no se puede corregir desde esta página: el servidor web no puede escribir en la carpeta de bloqueo.';
+$ec_lang['lpn_lock_full_error']='Advertencia: este sitio no tiene espacio de almacenamiento para registros de bloqueo, así que otro usuario puede editar el mismo archivo al mismo tiempo. Es una falla de configuración del servidor que no se puede corregir desde esta página.';
+$ec_lang['lpn_lock_not_asked']='El bloqueo no está activo para este proyecto, así que otro usuario puede editar el mismo archivo al mismo tiempo. Este proyecto aún no tiene un identificador; al guardarlo en un archivo se le asigna uno.';
+$ec_lang['lpn_lock_restored']='El bloqueo se restableció, y este archivo ya se puede guardar.';
 $ec_lang['lpn_lock_dismiss']='Ocultar este mensaje';
 // Shown once per browser, before the first file picker opens. Three short paragraphs on purpose:
 // this is the one place the whole file-and-lock idea is explained, and it has to survive translation
 // into 26 languages, so it says one thing per sentence and avoids every word of jargon it can.
-$ec_lang['lpn_file_training_1']='Su proyecto se guardará en un archivo en esta computadora. Se guarda cuando usted lo pide, y en ningún otro momento, así que nada se escribe en ese archivo sin su conocimiento.';
-$ec_lang['lpn_file_training_2']='Para que dos personas nunca editen un mismo archivo al mismo tiempo, este sitio lleva registro de quién lo tiene abierto. Si alguien ya lo tiene, usted igual puede abrirlo y mirarlo, o quedarse con una copia propia.';
+$ec_lang['lpn_file_training_1']='El proyecto se guardará en un archivo en esta computadora. Se guarda solo cuando usted lo guarda, y en ningún otro momento.';
+$ec_lang['lpn_file_training_2']='Para que dos personas nunca editen un mismo archivo al mismo tiempo, este sitio registra quién lo tiene abierto. Si alguien ya lo tiene, aún se puede abrir para verlo o copiar para conservarlo.';
 // Said BEFORE it happens, because it is alarming and unexplained when it happens (Tom, 2026-08-04:
 // "hawsedc.com will be able to edit ... is a canned browser warning whose confusing meaning we
 // cannot fix"). He is right that we cannot fix it -- it is the browser asking, in the browser\'s
 // own words, and there is no way to reword it, suppress it, or pre-approve it. What we CAN do is
 // warn that it is coming and say it is normal, which is what this line is for.
-$ec_lang['lpn_file_training_permission']='La primera vez que guarde, su navegador le preguntará si este sitio puede editar el archivo. Esa pregunta viene del navegador, no de nosotros, y decir que sí es lo que permite que Guardar escriba su trabajo de vuelta. Normalmente se pregunta solo una vez por archivo.';
+$ec_lang['lpn_file_training_permission']='La primera vez que guarde, el navegador pregunta si este sitio puede editar el archivo. La solicitud proviene del navegador, no de este sitio, y el permiso es necesario para que Guardar escriba en el archivo. Normalmente se solicita solo una vez por archivo.';
 // Corrected 2026-08-04: the old wording said anyone you SEND THE FILE TO can see this name, which is
 // false -- the name is never written into the project file. It is held in this browser and on this
 // site, and it is shown to whoever opens the SAME file. That is still public enough to be worth
@@ -2091,7 +2091,7 @@ $ec_lang['lpn_notes_1_term']='Cómo se resuelve';
 // lpn_time_no_engine and lpn_engine_unavailable.** A note everybody reads should not carry a
 // failure explanation that the failure itself delivers. Task 605's rule is untouched -- every
 // sentence a reader meets only when something has gone wrong SURVIVES, and those two are it.
-$ec_lang['lpn_notes_1_def']='El solucionador de EPANET resuelve esta red. Configure un tiempo total de simulación y cada paso de informe se calcula por turno: los depósitos se llenan y se vacían, las demandas siguen sus patrones, y la barra de herramientas reproduce la simulación.';
+$ec_lang['lpn_notes_1_def']='El solucionador de EPANET resuelve esta red. Cuando se fija un tiempo total de simulación, cada paso de tiempo de informe se calcula en secuencia: los depósitos se llenan y se vacían, las demandas siguen sus patrones, y la barra de herramientas reproduce la simulación.';
 $ec_lang['lpn_notes_2_term']='Lo que no hace';
 // **"Water quality chemistry is not modeled" WAS FLATLY FALSE** (Tom, 2026-09-10: *"Wrong
 // facts."*). A reacting chemical, bulk and wall reaction coefficients and a limiting
@@ -2103,7 +2103,7 @@ $ec_lang['lpn_notes_2_term']='Lo que no hace';
 // omission is a public claim about scope, and this file's history says those go wrong in the
 // confident direction; the one omission stated here is the one nothing in this tree implements
 // or claims to. Do not lengthen the list without him.
-$ec_lang['lpn_notes_2_def']='Se modela la calidad del agua: la edad del agua, el rastreo de origen, y un producto químico que reacciona en las paredes de la tubería y en el seno del agua. No se modelan el golpe de ariete ni las sobrepresiones transitorias: toda respuesta aquí es para agua que ya fluye de manera estable, no para la onda de presión cuando una válvula se cierra de golpe.';
+$ec_lang['lpn_notes_2_def']='Se modela la calidad del agua: la edad del agua, el rastreo de origen, y un producto químico que reacciona en la pared de la tubería y en el seno del flujo. No se modelan las sobrepresiones transitorias ni el golpe de ariete: todos los resultados corresponden a flujo permanente o de variación lenta, no a la onda de presión transitoria causada por un cierre rápido de una válvula.';
 $ec_lang['lpn_notes_3_term']='Guardado de proyectos';
 $ec_lang['lpn_notes_3_def']='Cada proyecto es una pestaña, y cada pestaña se guarda en este navegador mientras usted trabaja. Borrar los datos de su navegador los elimina todos, así que guarde su trabajo en un archivo: Archivo, Guardar como. Un asterisco en una pestaña indica que contiene cambios que no están en un archivo. Nada se escribe nunca en un archivo a menos que usted lo pida. En algunos navegadores, un proyecto se conecta al archivo en el que lo guarda, y Archivo, Guardar escribe de vuelta a ese mismo archivo de ahí en adelante; en otros no es posible ninguna conexión, así que Guardar está deshabilitado y solo está disponible Guardar como. Cuando un archivo de proyecto se mantiene en una unidad compartida, esta página le indica si un colega ya lo tiene abierto, para que dos personas no escriban una sobre la otra.';
 // Pump curve documentation (Tom, 2026-07-30: "How should we document the curve equations?").
@@ -2115,7 +2115,7 @@ $ec_lang['lpn_notes_3_def']='Cada proyecto es una pestaña, y cada pestaña se g
 // H and Q are symbols -- keep them as they are in every language.
 $ec_lang['lpn_notes_5_term']='Curva de la bomba';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_notes_5_def']='Una bomba sigue H = H₀ − aQ^b, donde H es la carga que agrega la bomba y Q es el caudal que pasa por ella. Ingrese uno, dos o tres puntos de la curva del fabricante. Tres puntos, la carga a caudal cero, el punto normal de trabajo y el punto de caudal más alto, ajustan H₀, a y b directamente, y siguen más de cerca una curva publicada. Dos puntos ajustan una parábola (b = 2) con su pico en caudal cero. Un punto usa una regla común: la carga a caudal cero es 1,33 × la carga que ingresa, y el caudal más alto es 2 × el caudal que ingresa, lo que de nuevo da b = 2. Una bomba sin puntos ingresados no agrega carga alguna. La curva no se corta donde la carga llega a cero, así que pedirle a una bomba más caudal del que su curva puede entregar da una carga negativa. La solución es una bomba más grande o una demanda menor, no un ajuste de curva diferente. Una curva puede tener más de tres puntos, y se lee cada punto que usted dio.';
+$ec_lang['lpn_notes_5_def']='Una bomba sigue H = H₀ − aQ^b, donde H es la carga que agrega la bomba y Q es el caudal que pasa por ella. Ingrese uno, dos o tres puntos de la curva del fabricante. Tres puntos, la carga a caudal cero, el punto normal de trabajo y el punto de caudal más alto, ajustan H₀, a y b directamente, y siguen más de cerca una curva publicada. Dos puntos ajustan una parábola (b = 2) con su máximo en caudal cero. Un punto usa una regla común: la carga a caudal cero es 1,33 × la carga que ingresa, y el caudal más alto es 2 × el caudal que ingresa, lo que de nuevo da b = 2. Una bomba sin puntos ingresados no agrega carga. La curva no se trunca donde la carga llega a cero, así que un caudal mayor que el que la curva puede entregar produce una carga negativa. La solución es una bomba más grande o una demanda menor, no un ajuste de curva diferente. Una curva puede tener más de tres puntos, y se usan todos los puntos ingresados.';
 // WAS "Planned additions", NAMING THREE THINGS THAT NOW SHIP (scenarios, result tables, .inp
 // export). A planned-additions list is stale the moment it is right, and it tells a returning
 // user the tool is less capable than it is, so this slot now points at what is here instead.
@@ -2134,7 +2134,7 @@ $ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>Arrow
 // impression of the system. In this we are ratifying EPANET."* The mechanism is
 // settings.colorFrozenBreaks in js/looped-network.js.
 $ec_lang['lpn_notes_color_term']='Los límites de las bandas de color permanecen iguales';
-$ec_lang['lpn_notes_color_def']='Los límites de las bandas de color se fijan cuando elige un método de Asignación de rangos. No se vuelven a fijar en cada paso de tiempo, porque eso haría que los colores significaran algo distinto en cada paso, y eso no ayuda a visualizar su sistema. EPANET funciona de la misma manera. Para obtener nuevos límites, elija un método de nuevo o escriba los suyos.';
+$ec_lang['lpn_notes_color_def']='Los límites de las bandas de color se fijan cuando se elige un método de Asignación de rangos. No se vuelven a fijar en cada paso de tiempo, porque eso haría que los colores significaran algo nuevo en cada paso, y eso no ayuda a visualizar el sistema. EPANET funciona de la misma manera. Para obtener nuevos límites, elija un método de nuevo o ingrese límites propios.';
 $ec_lang['lpn_notes_epanet_term']='Las constantes de Hazen-Williams coinciden con EPANET';
 $ec_lang['lpn_notes_epanet_def']='En agosto de 2026 se cambiaron el coeficiente y el exponente de Hazen-Williams para coincidir con EPANET. Los resultados de pérdida de carga difieren de los de las versiones anteriores de esta página hasta en un 0,1 por ciento, mucho menos que la incertidumbre del propio valor de C.';
 $ec_lang['lpn_notes_engine_term']='Qué versión de EPANET usa esta página';
@@ -2158,11 +2158,11 @@ $ec_lang['lpn_diag_unreachable']='Estos nodos no tienen ruta hacia un embalse:';
 // Tom turned the solver ON and was told about VALVES he had not created (2026-08-14). The valve
 // pair is right when a valve triggered the fetch; the plain pair is right when the user simply
 // chose the solver.
-$ec_lang['lpn_engine_fetching']='Obteniendo el solucionador de EPANET. Se descarga una vez y luego se guarda en este dispositivo, así que después funciona sin conexión.';
+$ec_lang['lpn_engine_fetching']='Descargando el solucionador de EPANET. Se descarga una vez y luego se guarda en este dispositivo, así que después funciona sin conexión.';
 $ec_lang['lpn_engine_ready']='El solucionador de EPANET ya está en este dispositivo, y funciona sin conexión.';
-$ec_lang['lpn_engine_fetching_valve']='Obteniendo el solucionador de EPANET, para que esta válvula se pueda resolver ahora y sin conexión más adelante.';
-$ec_lang['lpn_engine_ready_valve']='El solucionador de EPANET ya está en este dispositivo. Las válvulas que se abren y cierran por sí solas funcionarán sin conexión.';
-$ec_lang['lpn_engine_unavailable']='No se pudo obtener el solucionador de EPANET, que es lo que resuelve las válvulas que se abren y cierran por sí solas. Conéctese a internet una vez y quedará guardado en este dispositivo de ahí en adelante.';
+$ec_lang['lpn_engine_fetching_valve']='Descargando el solucionador de EPANET, para que esta válvula se pueda resolver ahora y sin conexión más adelante.';
+$ec_lang['lpn_engine_ready_valve']='El solucionador de EPANET ya está guardado en este dispositivo. Las válvulas de control de presión y de caudal (PRV, PSV, FCV) ya se pueden resolver sin conexión.';
+$ec_lang['lpn_engine_unavailable']='No se pudo descargar el solucionador de EPANET, necesario para resolver las válvulas de control de presión y de caudal (PRV, PSV, FCV). Tras una conexión a internet, el solucionador queda guardado en este dispositivo.';
 $ec_lang['lpn_engine_needed_loading']='Cargando el solucionador de EPANET mientras usted construye. Los resultados estarán disponibles cuando termine de cargarse.';
 // **THE WAIT, SAID OUT LOUD, WITH A NUMBER ON IT** (ROADMAP Task 608). The first sentence is Tom's
 // own, 2026-09-08, and "Continue working" is the half that matters: it says the page is not frozen.
@@ -2175,9 +2175,9 @@ $ec_lang['lpn_engine_wait']='Cargando el solucionador. Los resultados se retrasa
 $ec_lang['lpn_engine_wait_pct']='Solucionador cargado al {percent}%.';
 $ec_lang['lpn_engine_wait_bytes']='Solucionador: {kb} KB cargados hasta ahora. El total no está disponible, así que se desconoce el porcentaje completado.';
 $ec_lang['lpn_engine_needed_failed']='El solucionador de EPANET aún no se cargó, no se puede cargar, y esta red solo se puede resolver con él. Se cargará cuando esté conectado a internet.';
-$ec_lang['lpn_diag_valve_needs_epanet']='Estas válvulas se abren y cierran por sí solas, y solo el solucionador de EPANET puede calcularlas. No se pudo cargar el solucionador de EPANET, así que faltan estos resultados:';
-$ec_lang['lpn_diag_valve_on_fixed_head']='Estas válvulas están conectadas directamente a un embalse o a un depósito, que ya fija el nivel de agua allí, así que no queda nada que la válvula pueda controlar. Coloque una tubería corta entre la válvula y el embalse o el depósito:';
-$ec_lang['lpn_diag_not_converged']='No se encontró una solución. Revise si hay valores que no pueden ser reales, como un diámetro de cero.';
+$ec_lang['lpn_diag_valve_needs_epanet']='Estas son válvulas de control de presión o de caudal, y solo el solucionador de EPANET puede calcularlas. No se pudo cargar el solucionador de EPANET, así que faltan estos resultados:';
+$ec_lang['lpn_diag_valve_on_fixed_head']='Estas válvulas se conectan directamente a un embalse o a un depósito, que fija el gradiente hidráulico en ese nodo, así que la válvula no tiene nada que controlar. Inserte una tubería corta entre la válvula y el embalse o el depósito:';
+$ec_lang['lpn_diag_not_converged']='No se encontró una solución. Revise si hay valores físicamente imposibles, como un diámetro de cero.';
 // **THE NUMBERS ARE DRAWN AND MARKED, NOT THROWN AWAY** (ROADMAP Task 565). A solve that did not
 // converge still produced the last iterate, and that is every number this page has -- refusing to
 // draw it leaves nothing on screen and tells the user less, not more. So it is drawn and the status
@@ -2206,7 +2206,7 @@ $ec_lang['lpn_field_to']='Hasta';
 // different units, and one shared label would have to be vague enough to cover all three.
 $ec_lang['lpn_field_valve_type']='Tipo de válvula';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_field_valve_type_tip']='Qué hace la válvula. Una válvula de estrangulamiento mantiene una pérdida fija. Las otras tres mantienen una presión o un caudal, y se abren totalmente, se cierran o se cierran parcialmente a medida que cambia el agua. Cambiar el tipo coloca un número inicial nuevo en el ajuste de abajo, porque una presión no es un caudal y ninguno de los dos es un coeficiente de pérdida.';
+$ec_lang['lpn_field_valve_type_tip']='Tipo de válvula. Una válvula de estrangulamiento (TCV) aplica una pérdida fija. PRV, PSV y FCV mantienen una presión o un caudal, y se abren totalmente, se cierran o se cierran parcialmente a medida que cambian las condiciones hidráulicas. Una PBV quita una presión fija, y una GPV sigue una curva de pérdida de carga. Los tipos controlan propiedades hidráulicas distintas, así que se pueden perder ajustes al cambiar el tipo.';
 // THE ENGLISH IS ELLIPTICAL ON PURPOSE -- the noun "valve" is dropped because the dropdown above
 // already says "Valve type" -- so a translator meets a bare modifier with no head noun, and
 // "throttle" alone pulls hard toward a car accelerator. Each _syn supplies the noun plus alternates
@@ -2223,20 +2223,20 @@ $ec_lang['lpn_valve_type_gpv']='Uso general (GPV)';
 $ec_lang['lpn_field_valve_setting_drop']='Caída de presión';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_field_valve_setting_drop_tip']='La presión que la válvula elimina. Una válvula rompepresión siempre quita exactamente esta cantidad de presión, sin importar hacia dónde vaya el agua. Es una caída a través de la válvula, no una presión que se mantiene.';
-$ec_lang['lpn_inp_drop_gpv_curve']='Esta válvula indica una curva de pérdida de carga que no está en el archivo. La válvula se incorporó sin curva, así que permanece totalmente abierta hasta que le asigne una.';
+$ec_lang['lpn_inp_drop_gpv_curve']='Esta válvula hace referencia a una curva de pérdida de carga que no está en el archivo. La válvula se importó sin curva, así que permanece totalmente abierta hasta que se seleccione una curva.';
 $ec_lang['lpn_gpv_curve_source']='Curva de pérdida de carga de la válvula';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_gpv_curve_source_tip']='La curva del cuadro Bibliotecas que indica cuánta carga pierde esta válvula en cada caudal. Varias válvulas pueden usar la misma curva, y editarla allí cambia todas ellas. Esta válvula solo guarda la referencia; los puntos mismos se leen y se editan en Bibliotecas, Curvas.';
+$ec_lang['lpn_gpv_curve_source_tip']='La curva del cuadro Bibliotecas que da la pérdida de carga a través de esta válvula para cada caudal. Varias válvulas pueden usar la misma curva, y editarla allí cambia todas ellas.';
 $ec_lang['lpn_field_valve_setting_pressure']='Ajuste de presión';
-$ec_lang['lpn_field_valve_setting_pressure_tip']='La presión que mantiene la válvula. Una válvula reductora de presión mantiene la presión en su lado aguas abajo en este valor o por debajo. Una válvula sostenedora de presión mantiene la presión en su lado aguas arriba en este valor o por encima.';
+$ec_lang['lpn_field_valve_setting_pressure_tip']='Una válvula reductora de presión mantiene la presión en su lado aguas abajo en este valor o por debajo. Una válvula sostenedora de presión mantiene la presión en su lado aguas arriba en este valor o por encima.';
 $ec_lang['lpn_field_valve_setting_flow']='Ajuste de caudal';
-$ec_lang['lpn_field_valve_setting_flow_tip']='La mayor cantidad de agua que deja pasar la válvula. Cuando quiere pasar menos agua que esto, la válvula queda totalmente abierta y no añade pérdida.';
+$ec_lang['lpn_field_valve_setting_flow_tip']='Caudal máximo a través de la válvula. Cuando el caudal es menor que este valor, la válvula está totalmente abierta y no agrega pérdida.';
 $ec_lang['lpn_field_valve_setting']='Ajuste';
 $ec_lang['lpn_field_valve_setting_loss']='Coeficiente de pérdida';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_field_valve_setting_loss_tip']='Cuánta carga quita la válvula de estrangulamiento, contada como un múltiplo de la carga de velocidad. Use 0 para una válvula totalmente abierta. Este único número es toda la pérdida de una válvula de estrangulamiento.';
-$ec_lang['lpn_field_valve_diameter_tip']='Ancho de la abertura a través de la válvula. La velocidad del agua a través de la válvula se calcula a partir de este ancho, y la pérdida se deriva de esa velocidad.';
-$ec_lang['lpn_field_valve_km_tip']='Pérdida del cuerpo de la válvula mientras la válvula está totalmente abierta, además de lo que quita el ajuste de la válvula. Se cuenta como un múltiplo de la carga de velocidad. Use 0 para ignorarla.';
+$ec_lang['lpn_field_valve_setting_loss_tip']='Carga que quita la válvula de estrangulamiento, como múltiplo de la carga de velocidad. Use 0 para una válvula totalmente abierta. Este único valor es toda la pérdida de una válvula de estrangulamiento.';
+$ec_lang['lpn_field_valve_diameter_tip']='Diámetro de la abertura de la válvula. La velocidad a través de la válvula se calcula a partir de este diámetro, y la pérdida a partir de esa velocidad.';
+$ec_lang['lpn_field_valve_km_tip']='Pérdida a través del cuerpo de la válvula cuando está totalmente abierta, además de cualquier pérdida debida al ajuste de la válvula. Se expresa como múltiplo de la carga de velocidad. Use 0 para ignorarla.';
 $ec_lang['lpn_field_km']='Coeficiente de pérdida localizada (menor), k';
 // Short form of the same concept, for the two NARROW uses: the Labels checkbox list and the on-map
 // legend beside it. Per CLAUDE.md's rule that a shared label must fit its narrowest use, these get
@@ -2250,7 +2250,7 @@ $ec_lang['lpn_field_km_short']='Pérdida localizada, k';
 // one curve name the same curve now, so there is no borrow to describe.
 $ec_lang['lpn_pump_curve_source']='Curva de carga de la bomba';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_pump_curve_source_tip']='La curva del cuadro Bibliotecas que indica cuánta carga agrega esta bomba en cada caudal. Varias bombas pueden usar la misma curva, y editarla allí cambia todas ellas. Esta bomba solo guarda la referencia; los puntos mismos se leen y se editan en Bibliotecas, Curvas.';
+$ec_lang['lpn_pump_curve_source_tip']='La curva del cuadro Bibliotecas que da la carga que agrega esta bomba para cada caudal. Varias bombas pueden usar la misma curva, y editarla allí cambia todas ellas.';
 // **"THE NOTES BELOW" DO NOT EXIST ON THIS PAGE** (Tom, 2026-09-05: *"There are no notes below.
 // It's in Help, Notes on this page."*). Every other calculator in this suite is a form with its
 // notes printed under it, and this sentence was written in that habit; the map page is a full-window
@@ -2325,32 +2325,32 @@ $ec_lang['lpn_pump_effic_unstated']='Esta bomba indica una curva de eficiencia l
 // from a "Mode:" prefix + the tool's own label, per CLAUDE.md's concept-level label reuse rule --
 // word order/grammar around a mode name varies by language, so each mode gets its own full string.
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_mode_select']='Modo: Selección. Haga clic en un elemento o una etiqueta para verlo o cambiarlo. Arrastre para mover un nodo o una etiqueta. Use la herramienta Vértices para agregar o quitar las curvas de una tubería.';
-$ec_lang['lpn_mode_delete']='Modo: Eliminar. Haga clic en un elemento para quitarlo.';
+$ec_lang['lpn_mode_select']='Modo: Selección. Seleccione un elemento o una etiqueta para verlo o cambiarlo. Arrastre para mover un nodo o una etiqueta. Use la herramienta Vértices para agregar o quitar las curvas de una tubería.';
+$ec_lang['lpn_mode_delete']='Modo: Eliminar. Seleccione un elemento para quitarlo.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_mode_vertices']='Modo: Vértices. Los vértices de cada tubería se muestran como pequeños tiradores cuadrados. Haga clic en una tubería para agregar un vértice, haga clic en un tirador para quitarlo, o arrastre un tirador para moverlo. En este modo no se cambia nada más en el mapa.';
-$ec_lang['lpn_mode_zoom_window']='Modo: Ventana de zoom. Haga clic en dos esquinas opuestas de un recuadro, o arrastre uno, en el mapa para acercarse a él.';
+$ec_lang['lpn_mode_vertices']='Modo: Vértices. Los vértices de cada tubería se muestran como pequeños tiradores cuadrados. Especifique un punto en una tubería para agregar un vértice, seleccione un tirador para quitarlo, o arrastre un tirador para moverlo. En este modo no se puede cambiar nada más en el mapa.';
+$ec_lang['lpn_mode_zoom_window']='Modo: Ventana de zoom. Especifique dos esquinas opuestas de un recuadro, o arrastre uno, en el mapa para acercarse a él.';
 // One-shot notice when the Delete key is pressed with nothing picked (Task 415). It has to name the
 // gesture, because the whole point of the change is that the order is now subject, then verb.
-$ec_lang['lpn_select_first']='No hay nada seleccionado. Haga clic primero en un elemento del mapa y luego presione Eliminar.';
-$ec_lang['lpn_mode_add_junction']='Modo: Agregar nudo. Haga clic en el mapa para colocar un nudo. Cambie al modo Selección para cambiar o mover elementos y etiquetas.';
-$ec_lang['lpn_mode_add_reservoir']='Modo: Agregar embalse. Haga clic en el mapa para colocar un embalse. Cambie al modo Selección para cambiar o mover elementos y etiquetas.';
-$ec_lang['lpn_mode_add_tank']='Modo: Agregar depósito. Haga clic en el mapa para colocar un depósito. Cambie al modo Selección para cambiar o mover elementos y etiquetas.';
-$ec_lang['lpn_mode_add_pipe']='Modo: Agregar tubería. Haga clic en un nodo, y luego en otro nodo, para conectarlos. Haga clic en un espacio vacío entre ellos para curvar la línea, o presione Escape para empezar de nuevo. Cambie al modo Selección para cambiar o mover elementos y etiquetas.';
-$ec_lang['lpn_mode_add_pump']='Modo: Agregar bomba. Haga clic en un nodo, y luego en otro nodo, para conectarlos. Haga clic en un espacio vacío entre ellos para curvar la línea, o presione Escape para empezar de nuevo. Cambie al modo Selección para cambiar o mover elementos y etiquetas.';
-$ec_lang['lpn_mode_add_valve']='Modo: Agregar válvula. Haga clic en un nodo, y luego en otro nodo, para conectarlos. Haga clic en un espacio vacío entre ellos para curvar la línea, o presione Escape para empezar de nuevo. Cambie al modo Selección para cambiar o mover elementos y etiquetas.';
+$ec_lang['lpn_select_first']='No hay nada seleccionado. Primero seleccione un elemento en el mapa y luego presione Eliminar.';
+$ec_lang['lpn_mode_add_junction']='Modo: Agregar nudo. Especifique una ubicación en el mapa para colocar un nudo. Cambie al modo Selección para cambiar o mover elementos y etiquetas.';
+$ec_lang['lpn_mode_add_reservoir']='Modo: Agregar embalse. Especifique una ubicación en el mapa para colocar un embalse. Cambie al modo Selección para cambiar o mover elementos y etiquetas.';
+$ec_lang['lpn_mode_add_tank']='Modo: Agregar depósito. Especifique una ubicación en el mapa para colocar un depósito. Cambie al modo Selección para cambiar o mover elementos y etiquetas.';
+$ec_lang['lpn_mode_add_pipe']='Modo: Agregar tubería. Seleccione un nodo inicial y luego un nodo final para conectarlos. Especifique puntos en espacio abierto entre ellos para curvar la línea, o presione Escape para empezar de nuevo. Cambie al modo Selección para cambiar o mover elementos y etiquetas.';
+$ec_lang['lpn_mode_add_pump']='Modo: Agregar bomba. Seleccione un nodo inicial y luego un nodo final para conectarlos. Especifique puntos en espacio abierto entre ellos para curvar la línea, o presione Escape para empezar de nuevo. Cambie al modo Selección para cambiar o mover elementos y etiquetas.';
+$ec_lang['lpn_mode_add_valve']='Modo: Agregar válvula. Seleccione un nodo inicial y luego un nodo final para conectarlos. Especifique puntos en espacio abierto entre ellos para curvar la línea, o presione Escape para empezar de nuevo. Cambie al modo Selección para cambiar o mover elementos y etiquetas.';
 // Text was wrong (Tom, 2026-07-30): "click a node first to anchor it there" implied a two-click
 // sequence (click node, THEN click to place), but placing near a node anchors it in that ONE click.
-$ec_lang['lpn_mode_add_text']='Modo: Agregar texto. Haga clic en el mapa para colocar un Texto. Haga clic cerca de un nodo para adjuntar el Texto a ese nodo. Cambie al modo Selección para cambiar o mover elementos y etiquetas.';
+$ec_lang['lpn_mode_add_text']='Modo: Agregar texto. Especifique una ubicación en el mapa para colocar un Texto. Especifique una ubicación cerca de un nodo para adjuntar el Texto a ese nodo. Cambie al modo Selección para cambiar o mover elementos y etiquetas.';
 // Toolbar button tips (Tom, 2026-07-30): hover/tap explanations on the two buttons a new user is
 // most likely to miss the point of -- that Select is what you use to edit/move things, and that a
 // label itself can be dragged. Both economize on translation for later, per CLAUDE.md's tip-only
 // whole-label-wrap convention -- the button itself is already the click target (no separate "?"
 // glyph needed), so the tip goes straight on the button as a title, matched to the .ec-help class.
-$ec_lang['lpn_tip_select']='Use este modo para cambiar, mover y arrastrar cosas en el mapa. Este es el modo al que la página vuelve de manera predeterminada: regresa aquí por sí sola después de algunas acciones, como abrir un proyecto. Presionar Esc una segunda vez deselecciona lo que esté seleccionado.';
+$ec_lang['lpn_tip_select']='Use este modo para cambiar, mover y arrastrar elementos del mapa, o para desplazar el mapa. Este es el modo predeterminado del mapa. Presionar Esc una segunda vez deselecciona lo que esté seleccionado.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_field_auto']='Auto';
-$ec_lang['lpn_method_switch_confirm']='Cambiar el método de fricción no cambia los números de rugosidad ya escritos en sus tuberías, y una rugosidad para un método no tiene sentido para otro. Revise cada tubería después de esto. ¿Cambiarlo de todos modos?';
+$ec_lang['lpn_method_switch_confirm']='Cambiar el método de fricción no cambia los números de rugosidad ya ingresados en las tuberías, y una rugosidad para un método no tiene sentido para otro. Revise cada tubería después. ¿Cambiarlo de todos modos?';
 // "Closed", not "Shut" (R-224, Tom, 2026-09-24: "we are using different words Shut and Closed.
 // What are the translators supposed to do? EPANET says Closed. So we purge Shut."). "Shut" had been
 // chosen (2026-08-14) because "closed" is a live polysemy INSIDE hydraulics -- a CLOSED CONDUIT is
@@ -2387,7 +2387,7 @@ $ec_lang['lpn_field_lon_abbr']='Long';
 // INPUT as well as a readout. One tip for both boxes, because one sentence is true of both, and it
 // states the thing a reader cannot see: a position is shared by every scenario, exactly as it is
 // when the node is dragged.
-$ec_lang['lpn_field_coord_tip']='Escriba una ubicación de coordenadas para colocar este nudo con exactitud. En un escenario esta ubicación se aplica solo en ese escenario, igual que arrastrarlo; en Base coloca el nudo en todas partes.';
+$ec_lang['lpn_field_coord_tip']='Ingrese una ubicación de coordenadas para colocar este nudo con exactitud. En un escenario esta ubicación se aplica solo en ese escenario, igual que al arrastrar; en Base coloca el nudo en todos los escenarios.';
 // Refused, and it says what the range is. Only a geographic project has one: Web Mercator has no
 // finite y at the poles, so a latitude past the cut-off would put the node nowhere at all.
 $ec_lang['lpn_coord_off_world']='Eso está fuera del mapa. La latitud de Pseudo Mercator va de -85.05 a 85.05 y la longitud va de -180 a 180.';
@@ -2412,9 +2412,9 @@ $ec_lang['lpn_labels_mark_extrema_tip']='Marca el valor más alto de cada propie
 // you draw from now on, and this is the way to say "I meant the ones already here". {n} and
 // {skipped} are whole numbers; {prefix} is the text the user typed.
 $ec_lang['lpn_settings_apply_to_all']='Aplicar a todos';
-$ec_lang['lpn_settings_apply_to_all_tip']='Cada elemento de este tipo que ya está dibujado recibe un ID que empieza con este texto. Cada uno conserva su número. Un ID que no termina en un número se deja como está.';
+$ec_lang['lpn_settings_apply_to_all_tip']='Cada elemento de este tipo que ya está dibujado recibe un ID que empieza con este texto. Cada uno conserva su número. Un ID que no termina en un número no se cambia.';
 $ec_lang['lpn_confirm_apply_prefix']='¿Renombrar {n} elementos para que sus ID empiecen con {prefix}? Cada uno conserva su número.';
-$ec_lang['lpn_prefix_applied']='Se renombraron {n} elementos. Otros {skipped} se dejaron como estaban.';
+$ec_lang['lpn_prefix_applied']='Se renombraron {n} elementos. Otros {skipped} no se cambiaron.';
 $ec_lang['lpn_labels_suffix_gradient_tip']='Texto que se agrega después del gradiente de pérdida de carga en las etiquetas del mapa. No escriba aquí un signo de porcentaje. Se agrega automáticamente cuando las unidades son porcentaje.';
 $ec_lang['lpn_labels_separator']='Texto entre valores';
 $ec_lang['lpn_labels_separator_tip']='Texto entre una propiedad y la siguiente en una etiqueta. Un espacio de forma predeterminada.';
@@ -2429,7 +2429,7 @@ $ec_lang['lpn_labels_priority']='Prioridad';
 // learn them (Tom, 2026-08-16). His own draft of this sentence said "lowest flow"; a flow is a link
 // value and this box is on a node row, so it reads as demand here.
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_labels_priority_node_tip']='El orden en que se descartan los valores cuando dos etiquetas de nudo se superpondrían. El valor numerado 1 se descarta primero. Cuando queda un solo valor y las etiquetas siguen superponiéndose, se oculta una etiqueta entera: la que tenga la demanda más baja, la presión más cercana a la mitad del rango, o la elevación o carga más parecida a la de los nudos vecinos.';
+$ec_lang['lpn_labels_priority_node_tip']='El orden en que se descartan los valores cuando una etiqueta no cabe. El valor numerado 1 se descarta primero. Cuando queda un solo valor y dos etiquetas siguen superponiéndose, se oculta una de ellas: la que tenga la demanda más baja, la presión más cercana a la mitad del rango, o la elevación o carga numéricamente más cercana a la de los nudos vecinos.';
 // Column headings for the Labels box rows. Short because they sit over boxes 3.5 to 4.5 em wide, and
 // the row's own field name is the wide column beside them.
 $ec_lang['lpn_labels_col_before']='Ant.';
@@ -2444,7 +2444,7 @@ $ec_lang['lpn_labels_show_tip']='El orden en que aparecen los valores en una eti
 // Tom's own words for the control (R-331: "a code or a toggle to 'Use units' for the After string").
 // It heads a narrow column and names each row's tick box.
 $ec_lang['lpn_labels_use_units']='Usar unidades';
-$ec_lang['lpn_labels_use_units_tip']='Marque para mostrar la unidad en el cuadro Después y en la etiqueta, y para mantenerla al día cuando cambien las unidades. Desmarque para escribir su propio texto Después.';
+$ec_lang['lpn_labels_use_units_tip']='Marque para mostrar la unidad en el cuadro Después y en la etiqueta, y para actualizarla cuando cambien las unidades. Desmarque para ingresar un texto personalizado en Después.';
 // EPANET's own name for a link's starting state, beside the Status row, which is the run's answer.
 $ec_lang['lpn_labels_init_status']='Estado inicial';
 // The Symbology index, reworked (Tom, R-333: "Node labels, Node colors, Link labels, Link colors,
@@ -2484,7 +2484,7 @@ $ec_lang['lpn_backdrop_scale_entry']='Escalar por archivo de georreferenciación
 // absolute scale commands above: it changes the size by a factor and holds one point still, which
 // is what the last stage of fitting an aerial photograph actually needs.
 $ec_lang['lpn_backdrop_scale_from']='Escalar desde el tamaño actual, alrededor de un punto que usted elija';
-$ec_lang['lpn_backdrop_scale_from_prompt1']='Haga clic en el punto de la imagen de fondo que debe quedarse donde está.';
+$ec_lang['lpn_backdrop_scale_from_prompt1']='Especifique el punto de la imagen de fondo que debe quedarse donde está.';
 $ec_lang['lpn_backdrop_scale_from_prompt2']='Escale desde su tamaño actual. 1 la deja igual, 1.1 la hace 10% más grande, 0.9 la hace 10% más pequeña.';
 $ec_lang['lpn_backdrop_scale_entry_prompt']='Ingrese el tamaño de un píxel en el mapa, o pegue el contenido completo del archivo de georreferenciación de la imagen';
 $ec_lang['lpn_backdrop_scale_entry_bad']='Escriba un solo número para el tamaño de un píxel en el mapa, o pegue las seis líneas completas de un archivo de georreferenciación.';
@@ -2513,20 +2513,20 @@ $ec_lang['lpn_map_attach_scale_from_bad']='Escriba un solo número mayor que cer
 $ec_lang['lpn_map_attach_scale_from_done']='El mapa se redimensionó, y su dibujo y cada coordenada en él están exactamente como estaban.';
 $ec_lang['lpn_map_attach_none']='Todavía no hay ningún mapa mundial adjunto a este proyecto. Use primero Mapa, Mapa mundial, Adjuntar.';
 $ec_lang['lpn_map_attach_remove']='Separar';
-$ec_lang['lpn_map_attach_remove_tip']='Quita el mapa mundial. El dibujo y sus coordenadas quedan intactos de cualquier manera.';
-$ec_lang['lpn_map_attach_done']='El mapa mundial ahora está detrás de su dibujo, y su proyecto no cambió. Use Mapa, Mapa mundial, Separar para quitarlo de nuevo.';
-$ec_lang['lpn_map_attach_removed']='El mapa mundial desapareció, y el dibujo está exactamente como estaba.';
+$ec_lang['lpn_map_attach_remove_tip']='Separa el mapa mundial. No afecta la red.';
+$ec_lang['lpn_map_attach_done']='El mapa mundial ahora se muestra detrás del dibujo, y el proyecto no cambió. Use Mapa, Mapa mundial, Separar para quitarlo.';
+$ec_lang['lpn_map_attach_removed']='El mapa mundial está separado, y la red no se ve afectada.';
 // **THE CUSTOM GEOREFERENCE WIZARD, IN TOM'S OWN THREE STEPS** (2026-09-18, and
 // dev/tom-coordinate-vocabulary-2026-09-16.md). Georeferencing here means attaching the world map,
 // never converting a coordinate, so every sentence below says what stays still as well as what
 // moves: the drawing does not move, the ground does.
-$ec_lang['lpn_mapgeo_intro']='Su dibujo está sobre un mapa del mundo entero, en el océano en latitud cero y longitud cero. Primero encuentre su propio lugar: desplace y acerque el mapa detrás del dibujo, busque un nombre de lugar, o escriba una latitud y una longitud. El dibujo en sí no se mueve.';
-$ec_lang['lpn_mapgeo_step1']='Paso 1 de 2: encuentre su lugar en el mundo';
+$ec_lang['lpn_mapgeo_intro']='El dibujo está sobre un mapa del mundo entero, en el océano a latitud cero y longitud cero. Primero encuentre la ubicación del proyecto: desplace y acerque el mapa detrás del dibujo, busque un nombre de lugar, o ingrese una latitud y una longitud. El dibujo en sí no se mueve.';
+$ec_lang['lpn_mapgeo_step1']='Paso 1 de 2: encuentre la ubicación del proyecto';
 $ec_lang['lpn_mapgeo_step2']='Paso 2 de 2: ajuste el mapa detrás de su dibujo';
-$ec_lang['lpn_mapgeo_hint1']='Desplace y acerque el mapa detrás de su dibujo, o busque un lugar, o escriba una latitud y una longitud. Luego presione Colocar aproximadamente.';
-$ec_lang['lpn_mapgeo_readjust_intro']='Su dibujo está donde lo colocó por última vez. Para moverlo a otro lugar, desplace y acerque el mapa detrás del dibujo, busque un nombre de lugar, o escriba una latitud y una longitud. El dibujo en sí no se mueve.';
+$ec_lang['lpn_mapgeo_hint1']='Desplace y acerque el mapa detrás del dibujo, o busque un lugar, o ingrese una latitud y una longitud. Luego presione Colocar aproximadamente.';
+$ec_lang['lpn_mapgeo_readjust_intro']='El dibujo está donde lo colocó por última vez. Para moverlo a otro lugar, desplace y acerque el mapa detrás del dibujo, busque un nombre de lugar, o ingrese una latitud y una longitud. El dibujo en sí no se mueve.';
 $ec_lang['lpn_mapgeo_hint2']='Arrastre en cualquier lugar para deslizar el mapa bajo su dibujo. Su dibujo y cada coordenada en él permanecen exactamente donde están. Presione Georreferenciar aquí cuando el mapa esté bien.';
-$ec_lang['lpn_mapgeo_gestures']='El zoom mueve su dibujo y el mapa juntos, para que pueda ver qué tan bien coinciden. Arrastrar mueve solo el mapa.';
+$ec_lang['lpn_mapgeo_gestures']='El zoom mueve el dibujo y el mapa juntos, para mostrar qué tan bien coinciden. Arrastrar mueve solo el mapa.';
 // ---- THE SIZE AND TURN DIAL (Tom, 2026-09-18) -------------------------------------------------
 //
 // **A SLIDER, BECAUSE THERE IS NO DIRECT MANIPULATION HERE TO GIVE UP.** His own refutation of the
@@ -2544,19 +2544,19 @@ $ec_lang['lpn_mapgeo_dial_turn']='Girar el mapa';
 $ec_lang['lpn_mapgeo_dial_turn_read']='{d} grados';
 $ec_lang['lpn_mapgeo_dial_size']='Tamaño del mapa';
 $ec_lang['lpn_mapgeo_dial_size_read']='{f} veces';
-$ec_lang['lpn_mapgeo_dial_help']='Deslice las dos barras, o escriba en los cuadros sobre ellas, para hacer el mapa más grande o más pequeño y para girarlo. El centro de cada barra es lo que dejó el paso 1, así que 1 y 0 significan dejarlo como está. Las teclas de flecha funcionan en ambas.';
+$ec_lang['lpn_mapgeo_dial_help']='Deslice las dos barras, o ingrese números en los cuadros que están sobre ellas, para agrandar o reducir el mapa y para girarlo. El centro de cada barra conserva el ajuste del paso 1, así que un tamaño de 1 y un giro de 0 significan sin cambio. Las teclas de flecha funcionan en ambas.';
 $ec_lang['lpn_mapgeo_place']='Colocar aproximadamente';
 $ec_lang['lpn_mapgeo_finish']='Georreferenciar aquí';
-$ec_lang['lpn_mapgeo_cancelled']='El mapa mundial volvió a donde estaba, y su dibujo nunca se movió.';
+$ec_lang['lpn_mapgeo_cancelled']='El mapa mundial se restauró a su posición anterior, y el dibujo no se movió.';
 $ec_lang['lpn_mapgeo_locked']='Termine con el botón Georreferenciar aquí, o presione Cancelar, antes de cambiar de proyecto o guardar. El mapa mundial todavía se está colocando.';
-$ec_lang['lpn_backdrop_scale_prompt1']='Haga clic en dos puntos de la imagen de fondo, como los dos extremos de una escala gráfica. Luego escriba la distancia real entre ellos.';
+$ec_lang['lpn_backdrop_scale_prompt1']='Especifique dos puntos de la imagen de fondo, como los dos extremos de una escala gráfica. Luego ingrese la distancia real entre ellos.';
 $ec_lang['lpn_backdrop_scale_prompt2']='Distancia real entre los dos puntos';
 // Tom's own wording, 2026-08-16. "Base point" is the drafting term and it is what the second step
 // then has a destination FOR; "any point on the background image" did not say that the two steps are
 // one move. The second names the panel it is about to show, so the alert and the panel read as one
 // step rather than two.
-$ec_lang['lpn_backdrop_position_prompt1']='Haga clic en el punto base (en la imagen) para el movimiento.';
-$ec_lang['lpn_backdrop_position_prompt2']='Elija el método para el punto de destino, y luego haga clic en Continuar.';
+$ec_lang['lpn_backdrop_position_prompt1']='Especifique el punto base (en la imagen) para el movimiento.';
+$ec_lang['lpn_backdrop_position_prompt2']='Elija el método para el punto de destino y luego seleccione Continuar.';
 // The standing "you are in the middle of something" bar, shown while a background-image scale or
 // move is waiting for a click. It carries the only visible way out of that state.
 $ec_lang['lpn_backdrop_busy']='Ajustando la imagen de fondo.';
@@ -2575,7 +2575,7 @@ $ec_lang['lpn_hide_titles']='Ocultar estos títulos';
 // The Settings row that turns the selection bubble back on. Its sibling checkbox lives in the
 // bubble and reads 'Show this'; this one has to name what it is talking about.
 $ec_lang['lpn_settings_area_hint']='Mostrar la ayuda de selección';
-$ec_lang['lpn_settings_area_hint_tip']='Muestra la burbuja sobre el mapa que indica qué hará su próximo clic mientras selecciona un área.';
+$ec_lang['lpn_settings_area_hint_tip']='Muestra sobre el mapa el mensaje que indica el paso siguiente mientras se selecciona un área.';
 $ec_lang['lpn_settings_id_prefixes']='Prefijos de ID';
 // NEVER "Starting values" (Tom, 2026-08-19: "The problem is that it's misleading"). These are what
 // a NEW asset is created with; "starting" reads as the initial condition of a run, which on a
@@ -2587,7 +2587,7 @@ $ec_lang['lpn_settings_defaults']='Valores de creación';
 $ec_lang['lpn_settings_defaults_note']='Se usan para los elementos que cree de ahora en adelante. Los elementos existentes no cambian.';
 $ec_lang['lpn_settings_push_note']='Solo se aplican las propiedades cuyas etiquetas están visibles en este momento.';
 $ec_lang['lpn_settings_push_btn']='Aplicar estos valores de elementos nuevos a todos los elementos existentes';
-$ec_lang['lpn_push_confirm']='¿Reemplazar estas propiedades en todos los elementos existentes con los valores que ahora están fijados para los elementos nuevos? Los valores que haya escrito se sobrescribirán. Puede deshacer esto.';
+$ec_lang['lpn_push_confirm']='¿Reemplazar estas propiedades en todos los elementos existentes con los valores que ahora están fijados para los elementos nuevos? Los valores ingresados se sobrescribirán. Esto se puede deshacer.';
 $ec_lang['lpn_push_properties']='Propiedades:';
 $ec_lang['lpn_push_assets']='Nodos y tuberías:';
 $ec_lang['lpn_push_none_displayed']='Ningún valor inicial se muestra como etiqueta en este momento, así que no hay nada que aplicar. Active las etiquetas de las propiedades que desee en el panel Etiquetas, y luego intente de nuevo.';
@@ -2602,12 +2602,12 @@ $ec_lang['lpn_settings_custom_props']='Propiedades personalizadas';
 // **THE HEADING'S OWN TIP, AND IT IS TOM'S SENTENCE** (2026-09-13, revision 1 of eleven): it says
 // what a custom property is FOR and that it behaves like every other property, which is the whole
 // of what a reader needs before opening the design table.
-$ec_lang['lpn_settings_custom_props_note']='Propiedades que usted mismo define para sus propios fines. Se guardan con el proyecto y los escenarios como todas las demás propiedades.';
+$ec_lang['lpn_settings_custom_props_note']='Propiedades definidas por el usuario. Se guardan con el proyecto y los escenarios como todas las demás propiedades.';
 $ec_lang['lpn_cp_design']='Diseño';
 $ec_lang['lpn_cp_design_tip']='Una fila por cada propiedad personalizada, y cada una se abre para mostrar: Clave, Etiqueta, Aplica a, Validar como, Permitir o restringir, el campo de caracteres nombrado por esa elección, Límite inferior de longitud, Límite superior de longitud, Límite inferior, Límite superior.';
 $ec_lang['lpn_cp_add']='Agregar propiedad personalizada';
 $ec_lang['lpn_cp_add_tip']='Agrega una fila a la tabla de diseño y la abre para editarla.';
-$ec_lang['lpn_cp_remove_tip']='Quita esta propiedad de la tabla de diseño. Los valores ya escritos en sus elementos se conservan en el archivo y vuelven a aparecer si diseña de nuevo la misma clave.';
+$ec_lang['lpn_cp_remove_tip']='Quita esta propiedad de la tabla de diseño. Los valores ya escritos en los elementos se conservan en el archivo y se restauran si se define de nuevo una propiedad con la misma clave.';
 $ec_lang['lpn_cp_none']='Todavía no se ha diseñado ninguna propiedad personalizada.';
 $ec_lang['lpn_cp_unnamed']='Todavía sin nombre';
 // **EVERY COLUMN TIP LEADS WITH THE NAME OF ITS COLUMN** (Tom, 2026-09-13, revision 4). The heading
@@ -2616,18 +2616,18 @@ $ec_lang['lpn_cp_unnamed']='Todavía sin nombre';
 $ec_lang['lpn_cp_key']='Clave';
 $ec_lang['lpn_cp_key_tip']='Clave: una propiedad se guarda bajo este nombre. No se permiten espacios, y se le agrega un prefijo automáticamente para que su clave nunca choque con un campo integrado.';
 $ec_lang['lpn_cp_label']='Etiqueta';
-$ec_lang['lpn_cp_label_tip']='Etiqueta: esto es lo que ve un lector en el cuadro de propiedades, en Buscar y en el encabezado de una columna de tabla.';
+$ec_lang['lpn_cp_label_tip']='Etiqueta: aparece en el cuadro de propiedades, en Buscar y en el encabezado de una columna de tabla.';
 $ec_lang['lpn_cp_applies']='Aplica a';
 $ec_lang['lpn_cp_applies_tip']='Aplica a: lista de prefijos de ID, separados por comas, de los elementos que usan esta propiedad, como J,L,R.';
 $ec_lang['lpn_cp_validate']='Validar como';
-$ec_lang['lpn_cp_validate_tip']='Validar como: esto indica cómo debe verse un valor válido. Las reglas de mayúsculas y minúsculas solo reconocen el alfabeto inglés, una limitación declarada. Elija No validar para aceptar cualquier cosa.';
+$ec_lang['lpn_cp_validate_tip']='Validar como: el formato que debe tener un valor válido. Las reglas de mayúsculas y minúsculas se aplican solo al alfabeto inglés. Elija No validar para aceptar cualquier valor.';
 $ec_lang['lpn_cp_restrict']='Restringir estos caracteres';
-$ec_lang['lpn_cp_restrict_tip']='Restringir estos caracteres: un valor puede usar únicamente los caracteres indicados aquí, o ninguno de ellos, donde "@" significa cualquier letra; "#" significa cualquier dígito numérico, y debe indicar por separado "-", "." y "," si están permitidos; y cualquier espacio en blanco debe ir entre otros caracteres.';
+$ec_lang['lpn_cp_restrict_tip']='Prohibir estos caracteres:';
 $ec_lang['lpn_cp_restrict_mode']='Permitir o restringir';
 $ec_lang['lpn_cp_restrict_mode_tip']='Permitir o restringir: los caracteres indicados son, o bien los únicos que un valor puede usar, o bien los que no puede usar.';
 $ec_lang['lpn_cp_restrict_allow']='Permitir solo estos caracteres';
 $ec_lang['lpn_cp_minlength']='Límite inferior de longitud';
-$ec_lang['lpn_cp_minlength_tip']='Límite inferior de longitud: cualquier entrada más corta se marca, que es la forma de encontrar las entradas vacías y las escritas a medias.';
+$ec_lang['lpn_cp_minlength_tip']='Límite inferior de longitud: toda entrada más corta se marca. Úselo para encontrar entradas vacías e incompletas.';
 $ec_lang['lpn_cp_length']='Límite superior de longitud';
 $ec_lang['lpn_cp_length_tip']='Límite superior de longitud: cualquier entrada más larga se marca.';
 $ec_lang['lpn_cp_low']='Límite inferior';
@@ -2680,14 +2680,14 @@ $ec_lang['lpn_scenario_base']='Base';
 // routed around, and it says ownership without implying difference. Seven languages had already
 // chosen exactly this family unprompted (fr personnalisees, it personalizzati, es exclusivos,
 // pt individuais, ar mukhassasa, fa ekhtesasi, ro specifice).
-$ec_lang['lpn_scenario_overrides']='N.º de valores exclusivos';
+$ec_lang['lpn_scenario_overrides']='N.º de valores propios';
 // ROADMAP Task 512. The amber ring was designed, correct, and silent: two independent users read it
 // as a stuck highlight they could not turn off. These two strings are the ring's own explanation and
 // the readout's, so neither requires clicking the element to find out what is going on.
 // {name} is the active scenario's display name -- the ring is a fact about WHICH SCENARIO is
 // showing, not a state of the element, and naming the scenario is what makes that recoverable.
 $ec_lang['lpn_scenario_mark_tip']='El anillo ámbar indica que este elemento tiene un valor que pertenece solo al escenario {name}.';
-$ec_lang['lpn_scenario_overrides_tip']='Cada uno de esos valores se marca en el mapa con un anillo ámbar. Cambie a {base} para ver el dibujo sin ellos.';
+$ec_lang['lpn_scenario_overrides_tip']='Cada valor propio se marca en el mapa con un anillo ámbar. Cambie a {base} u otro escenario padre para ver el dibujo sin ellos.';
 $ec_lang['lpn_scenario_menu']='Escenarios';
 $ec_lang['lpn_scenario_tip']='El conjunto de valores que el dibujo está mostrando y que la página está resolviendo ahora mismo. Haga clic para cambiar de escenario, o para agregar, renombrar o eliminar uno.';
 $ec_lang['lpn_scenario_new']='Escenario nuevo…';
@@ -2696,16 +2696,16 @@ $ec_lang['lpn_scenario_prompt_name']='Nombre para este escenario';
 $ec_lang['lpn_scenario_rename']='Renombrar escenario…';
 $ec_lang['lpn_scenario_delete']='Eliminar escenario';
 $ec_lang['lpn_scenario_delete_confirm']='¿Eliminar el escenario {name}, y los {n} valores que le pertenecen solo a él? El dibujo en sí no cambia.';
-$ec_lang['lpn_scenario_override']='Solo en este escenario';
+$ec_lang['lpn_scenario_override']='Valor propio de este escenario';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_scenario_override_tip']='Marcado significa que este valor pertenece solo a este escenario, incluso cuando es el mismo número que Base. Desmarque la casilla para volver a usar el valor de Base.';
+$ec_lang['lpn_scenario_override_tip']='Marcado significa que este escenario reemplaza el valor de su padre para este dato, incluso cuando el número es el mismo. Desmarque la casilla para usar el del padre.';
 // "Base scenario", not bare "Base" -- an ENGLISH fix, so this needs no _syn either. This is the one
 // place the polysemy genuinely bites: here the word sits beside a NUMBER, in a field popup with no
 // scenario dropdown nearby to frame it, which is exactly the reading that invites "base amount".
 // The dropdown keeps the short name (lpn_scenario_base); only the exposed use is disambiguated.
 // Same label-versus-sentence distinction that decided the eigenvalue fixes in sprint 316.
 $ec_lang['lpn_scenario_base_value']='Escenario base: {value}';
-$ec_lang['lpn_scenario_deactivated']='{id} está fuera de la red en {scenario}. Sigue estando en el dibujo, y en sus otros escenarios.';
+$ec_lang['lpn_scenario_deactivated']='{id} está excluido de la red en {scenario}. Permanece en el dibujo y en los demás escenarios.';
 $ec_lang['lpn_scenario_push_btn']='Aplicar los valores de Base a todos los escenarios';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_scenario_push_tip']='Todos los escenarios vuelven al valor de Base para las propiedades cuyas etiquetas se muestran ahora mismo. Se descartan los valores que pertenecen solo a esos escenarios.';
@@ -2718,15 +2718,15 @@ $ec_lang['lpn_alt_cat_initial']='Configuración inicial';
 $ec_lang['lpn_alt_cat_topology']='Activación de elementos';
 $ec_lang['lpn_alt_cat_demand']='Demanda';
 $ec_lang['lpn_alt_cat_physical']='Físico';
-$ec_lang['lpn_alt_note']='Solo lectura. Base usa la alternativa Base de cada categoría. Cada escenario recibe su propia alternativa para toda categoría que se cambia, hija de la alternativa Base. El número es cuántos valores cambiados tiene.';
+$ec_lang['lpn_alt_note']='Base usa la alternativa Base de cada categoría. Cada escenario tiene una alternativa propia, hija de la alternativa Base, para cada categoría que se cambia. El número es la cantidad de valores cambiados. Las tres últimas columnas son opciones de cálculo: ingrese un valor para el escenario, o déjelo en blanco para usar el valor del padre. Los valores del proyecto están en Configuración, Cálculo, Tiempo.';
 $ec_lang['lpn_alt_title']='Vista previa de alternativas';
-$ec_lang['lpn_scenario_basic_tip']='Marcado, un escenario es simplemente los valores que usted fija en él. Sin marcar, este menú ofrece además la tabla de vista previa de Alternativas, que muestra cómo esos valores se agrupan por categoría e invita a sus comentarios.';
+$ec_lang['lpn_scenario_basic_tip']='Marcado: un escenario consiste solo en los valores fijados en él. Sin marcar: este menú ofrece además la tabla de vista previa de Alternativas, que muestra cómo se agrupan esos valores por categoría, y permite que un escenario tenga un tiempo total de simulación y un paso de tiempo hidráulico propios. Se agradecen los comentarios sobre esta función.';
 $ec_lang['lpn_scenario_basic']='Modo básico';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_scenario_push_confirm']='¿Hacer que todos los escenarios usen los valores de Base para estas propiedades? Se descartan los valores que pertenecen solo a esos escenarios. Puede deshacer esto.';
 $ec_lang['lpn_scenario_push_scenarios']='Escenarios afectados:';
 $ec_lang['lpn_scenario_push_values']='Valores descartados:';
-$ec_lang['lpn_scenario_push_none']='Ningún escenario tiene un valor exclusivo para ninguna de estas propiedades, así que nada cambiaría. No se descarta nada.';
+$ec_lang['lpn_scenario_push_none']='Ningún escenario reemplaza a Base en ninguna de estas propiedades, así que nada cambiaría. No se descarta nada.';
 $ec_lang['lpn_scenario_preset_flow_static']='1. Prueba de flujo: Estática';
 $ec_lang['lpn_scenario_preset_flow_static_tip']='Calibración con prueba de flujo para una red de diseño con caudal 0. En este escenario, fije la demanda en todos los nudos en 0.';
 $ec_lang['lpn_scenario_preset_flow_mid']='2. Prueba de flujo: Intermedia';
@@ -2739,11 +2739,11 @@ $ec_lang['lpn_scenario_preset_max_day']='5. Día máximo';
 $ec_lang['lpn_scenario_preset_peak_hour']='6. Hora pico';
 $ec_lang['lpn_scenario_preset_fire_max_day']='7. Incendio más día máximo';
 $ec_lang['lpn_scenario_preset_fire_max_day_tip']='Demanda del día máximo (multiplicador 2,0). Ejecute Caudal contra incendios en este escenario: suma el caudal contra incendios en cada nudo a esta demanda.';
-$ec_lang['lpn_delete_drops_overrides']='Eliminar este elemento también descarta {n} valores que sus escenarios tienen para él. ¿Continuar?';
+$ec_lang['lpn_delete_drops_overrides']='Eliminar este elemento también elimina {n} valores propios del escenario que le corresponden. ¿Continuar?';
 $ec_lang['lpn_push_base_only']='Esta acción cambia el dibujo en sí, así que solo se puede hacer en {base}. Cambie a {base} e inténtelo de nuevo.';
-$ec_lang['lpn_field_active']='Parte de esta red';
+$ec_lang['lpn_field_active']='¿Activo?';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_field_active_tip']='Desmarque esta casilla para dejar el elemento en el dibujo pero fuera de la red: se dibuja en gris y el solucionador lo ignora. En un escenario, así es como se activa y desactiva una tubería propuesta.';
+$ec_lang['lpn_field_active_tip']='Desmarque esta casilla para dejar el elemento en el dibujo pero fuera de la red: se dibuja en gris y el solucionador lo ignora. En un escenario, así se activa y desactiva una tubería.';
 // ---- Task 412: a Base-wide property SAYS it is Base-wide ----
 // Shown only inside a scenario, on the rows that have no "Only in this scenario" box, so the two
 // states are read the same way. Before this, a Base-wide row was announced by an ABSENCE, and an
@@ -2754,7 +2754,7 @@ $ec_lang['lpn_field_active_tip']='Desmarque esta casilla para dejar el elemento 
 // cannot compare them.
 $ec_lang['lpn_settings_emitter_exponent']='Exponente del emisor';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_settings_emitter_exponent_tip']='El exponente de la ecuación de emisor de EPANET para aspersores y fugas: caudal = coeficiente x presión elevada a este exponente. Solo cambia el resultado donde un nodo tiene un emisor, lo cual por ahora significa una red leída de un archivo EPANET.';
+$ec_lang['lpn_settings_emitter_exponent_tip']='El exponente de la ecuación de emisor de EPANET para aspersores y fugas: caudal = coeficiente x presión elevada a este exponente. Afecta los resultados solo en nodos con un coeficiente de emisor.';
 // The Settings panel's Computation section (Tom, 2026-08-10). "Computation", not "Solver": what the
 // two rows under it decide is the arithmetic the user gets, and "solver" names the internals.
 $ec_lang['lpn_elev_dem_sample']='Leer DEM';
@@ -2762,10 +2762,10 @@ $ec_lang['lpn_elev_dem_sample_tip']='Lee la elevación del DEM en este nodo y la
 $ec_lang['lpn_elev_dem_use']='Usar DEM';
 $ec_lang['lpn_elev_dem_use_tip']='Coloca la elevación del DEM en este nodo en el cuadro Elevación de arriba, reemplazando lo que había. Primero lee el DEM si todavía no se ha leído. Un solo Deshacer lo restablece.';
 $ec_lang['lpn_elev_dem_none']='El DEM no tiene elevación para este nodo.';
-$ec_lang['lpn_elev_dem_said']='Mapbox DEM indica {v} {u}.';
+$ec_lang['lpn_elev_dem_said']='Elevación del DEM de Mapbox: {v} {u}.';
 $ec_lang['lpn_settings_elev_source']='Origen de la elevación';
-$ec_lang['lpn_settings_elev_source_tip']='De dónde obtiene su elevación un nodo nuevo. La superficie del terreno se lee de Mapbox DEM, que tiene aproximadamente 30 m de resolución en la mayor parte de la Tierra, y más fina donde hay mejores datos.';
-$ec_lang['lpn_settings_elev_source_typed']='La elevación escrita arriba';
+$ec_lang['lpn_settings_elev_source_tip']='La precisión horizontal y vertical del DEM de Mapbox de 2026 va de 1–10 m y <1 m en EE. UU., 2–10 m y 1–3 m en Europa y Japón, 30 m y 10–16 m en el mundo, y 90 m y >16 m en los polos.';
+$ec_lang['lpn_settings_elev_source_typed']='Arriba';
 $ec_lang['lpn_settings_elev_source_dem']='DEM Mapbox';
 $ec_lang['lpn_settings_accuracy']='Precisión';
 // **APPENDED TO EVERY HYDRAULICS TIP, because the box no longer shows the default** (Tom,
@@ -2782,12 +2782,12 @@ $ec_lang['lpn_settings_accuracy']='Precisión';
 // dev/language-strings.md and guarded by dev/scripts/plain_english_swap_check.php.
 $ec_lang['lpn_settings_default_is']='El valor predeterminado es {n}.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_settings_accuracy_tip']='Qué tan cerca debe llegar el solucionador antes de detenerse, medido como la cantidad en que los caudales todavía cambian de una prueba a la siguiente. Un número más pequeño es más exacto y tarda más. Ambos solucionadores leen este mismo cuadro, y cada uno mide ese cambio contra un total distinto: el solucionador incorporado contra la suma de las demandas, EPANET contra la suma de los caudales de las líneas. Si se deja vacío, esta página usa una precisión más estricta que el valor predeterminado propio de EPANET.';
+$ec_lang['lpn_settings_accuracy_tip']='Límite de convergencia que el solucionador debe alcanzar antes de detenerse, medido como el cambio total en el caudal de una prueba a la siguiente, dividido por el caudal total en las líneas. Un número menor es más exacto y tarda más.';
 $ec_lang['lpn_settings_specific_gravity']='Gravedad específica';
 $ec_lang['lpn_settings_viscosity']='Viscosidad relativa';
 $ec_lang['lpn_settings_viscosity_tip']='La viscosidad del fluido en comparación con el agua a 20 grados Celsius. Solo cambia el resultado con el método de Darcy-Weisbach.';
 $ec_lang['lpn_settings_trials']='Máximo de pruebas';
-$ec_lang['lpn_settings_trials_tip']='Cuántas pruebas se permiten antes de que el solucionador se dé por vencido con una red que no converge.';
+$ec_lang['lpn_settings_trials_tip']='Número máximo de pruebas antes de que el solucionador se detenga en una red que no converge.';
 // **THE REST OF EPANET'S HYDRAULIC OPTIONS GET A ROW EACH** (Tom, 2026-08-29: *"every setting from
 // EPANET must be added and implemented unless research says otherwise"*). Written in OUR words and
 // not EPANET's -- there is no "Unbalanced" or "DampLimit" on the page, because a name only a person
@@ -2798,11 +2798,11 @@ $ec_lang['lpn_settings_trials_tip']='Cuántas pruebas se permiten antes de que e
 // not know which engine is answering cannot tell a control that did nothing from a setting that had
 // no effect. Saying it in the tip is cheaper than a second Settings section, and honest.
 $ec_lang['lpn_settings_unbalanced']='Si no converge';
-$ec_lang['lpn_settings_unbalanced_tip']='Qué hacer con una red que ya agotó sus pruebas y todavía no converge. Permitir pruebas adicionales a menudo logra la convergencia. Detenerse reporta la última prueba tal como está, lo cual no es una solución. Solo el solucionador de EPANET lee este cuadro. El solucionador incorporado siempre se detiene y marca la respuesta como no convergida.';
+$ec_lang['lpn_settings_unbalanced_tip']='Acción para una red que agotó sus pruebas y todavía no converge. Permitir pruebas adicionales a menudo logra la convergencia. Detenerse reporta la última prueba tal como está, lo cual no es una solución.';
 $ec_lang['lpn_settings_unbalanced_continue']='Permitir pruebas adicionales';
 $ec_lang['lpn_settings_unbalanced_stop']='Detenerse y reportar la última prueba';
 $ec_lang['lpn_settings_unbalanced_trials']='Pruebas adicionales antes de reportar';
-$ec_lang['lpn_settings_unbalanced_trials_tip']='Cuántas pruebas adicionales permitir después de agotar el máximo de arriba, antes de reportar la última prueba. Solo el solucionador de EPANET lee este cuadro.';
+$ec_lang['lpn_settings_unbalanced_trials_tip']='Número de pruebas adicionales permitidas después de agotar el máximo de arriba, antes de reportar la última prueba.';
 $ec_lang['lpn_settings_head_error']='Límite de error de carga';
 $ec_lang['lpn_settings_head_error_tip']='Una prueba adicional que el solucionador debe superar antes de detenerse: el mayor error de carga que queda en cualquier tubería. Cero significa no aplicar esta prueba. Solo el solucionador de EPANET lee este cuadro.';
 $ec_lang['lpn_settings_flow_change']='Límite de cambio de caudal';
@@ -2812,8 +2812,8 @@ $ec_lang['lpn_settings_damp_limit']='El amortiguamiento empieza en';
 $ec_lang['lpn_settings_damp_limit_tip']='La precisión en la que el solucionador empieza a dar pasos más pequeños, lo cual puede ayudar a que una red oscilante converja. Cero significa que el solucionador nunca amortigua. Solo el solucionador de EPANET lee este cuadro.';
 $ec_lang['lpn_settings_option_unset']='No indicado';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_settings_demand_multiplier_tip']='Un solo factor aplicado a la vez a todas las demandas de la red. Úselo para preguntar qué hace el sistema con un uso mayor o menor que el actual. No cambia los números que usted escribió. Un escenario puede tener el suyo propio, de modo que el día promedio, el día máximo y la hora pico son cada uno un número; déjelo en blanco en un escenario para usar el del proyecto.';
-$ec_lang['lpn_settings_engine_native']='Resolver con el solucionador de EPANET';
+$ec_lang['lpn_settings_demand_multiplier_tip']='Un solo factor aplicado a todas las demandas de la red a la vez. Cada escenario puede tener un valor propio, de modo que el día promedio, el día máximo o la hora pico se pueden crear cambiando solo este ajuste.';
+$ec_lang['lpn_settings_engine_native']='Usar el solucionador incorporado cuando sea posible';
 // **THIS TIP NO LONGER ARGUES THE TWO SOLVERS AGAINST EACH OTHER** (Task 605, Tom 2026-09-06:
 // *"We scrub our tips and alerts for any undue weight on the existence of two solvers."*). It
 // spent three sentences on speed and on the two measured disagreements -- minor losses 0.08%
@@ -2832,22 +2832,22 @@ $ec_lang['lpn_engine_failed']='No se pudo cargar el solucionador de EPANET. Se m
 // Said out loud, never silently: the user picked the built-in solver and this network was sent to
 // the EPANET solver anyway, because it holds a valve the built-in solver does not calculate. The
 // setting is not changed, so removing the valve puts the page straight back on the chosen engine.
-$ec_lang['lpn_engine_valve_route']='Resuelto con el solucionador de EPANET, porque estas válvulas se abren y cierran por sí solas:';
-$ec_lang['lpn_unit_unknown']='Este dibujo indica una unidad que esta página no ofrece: {unit}. Todo se conserva y se muestra exactamente como llegó, y no se cambió nada. No se pueden dar resultados hasta que esta página conozca esa unidad, porque no sabe qué tan grande es una de ellas.';
+$ec_lang['lpn_engine_valve_route']='Resuelto con el solucionador de EPANET, por estas válvulas de control de presión y de caudal:';
+$ec_lang['lpn_unit_unknown']='Este dibujo indica una unidad que esta página no admite: {unit}. Todos los valores se conservan y se muestran exactamente como se importaron, y no se cambió nada. No se puede calcular nada hasta que se admita la unidad, porque su factor de conversión se desconoce.';
 $ec_lang['lpn_engine_manning_note']='Nota: con rugosidad de Manning, EPANET redondea la constante en la ecuación de Manning, así que la pérdida de carga resulta aproximadamente 0,6% menor que la forma exacta.';
 // ---- EPANET said no (ROADMAP Task 471) -------------------------------------------------------
 // Three sentences for three different facts, on the model of lpn_unit_unknown: what would not
 // happen, what the solver itself objected to, and where the numbers on screen actually came from.
 // A user told only the first goes looking for a broken pipe; a user told none of them -- which is
 // what shipped until now -- reads our own solver's answer as EPANET's.
-$ec_lang['lpn_engine_refused']='El solucionador de EPANET no aceptó esta red, así que no se ejecutó.';
+$ec_lang['lpn_engine_refused']='El solucionador de EPANET rechazó esta red, así que la ejecución no se inició.';
 // {message} is EPANET's own text and is NOT translated: it names what the solver choked on, which
 // is the only part a user can act on, and nothing of ours could reconstruct it.
-$ec_lang['lpn_engine_refused_why']='El solucionador de EPANET indicó: {message}';
+$ec_lang['lpn_engine_refused_why']='Mensaje del solucionador de EPANET: {message}';
 $ec_lang['lpn_engine_refused_fallback']='Los números en pantalla provienen en cambio del solucionador incorporado.';
 // The run's own version of that last sentence: a period run has a moment and a tank level to name,
 // and a one-moment solve does not, which is where the shared label stops.
-$ec_lang['lpn_time_run_fell_back']='Los números en pantalla provienen en cambio del solucionador incorporado. Este calcula un momento a la vez, así que esta es la red solo en {time}, con cada depósito todavía en su nivel inicial.';
+$ec_lang['lpn_time_run_fell_back']='Los números en pantalla provienen en cambio del solucionador incorporado. Este resuelve un instante a la vez, así que esto es la red solo en {time}, con cada depósito en su nivel inicial.';
 // ---- controls we could not use (ROADMAP Task 466) ---------------------------------------------
 // A control naming an element that is no longer drawn has to be left out -- EPANET rejects the
 // whole network over one of them -- and {ids} names which, because "a control was ignored" with
@@ -2868,7 +2868,7 @@ $ec_lang['lpn_settings_link_width']='Grosor de la línea de tubería (píxeles)'
 // the label cannot say, which are that the arrows only appear once there are results and that the
 // setting travels with the project.
 $ec_lang['lpn_settings_show_arrows']='Flechas de dirección del caudal';
-$ec_lang['lpn_settings_show_arrows_tip']='Dibuja una flecha en cada tubería que muestra hacia dónde corre el agua. Las flechas aparecen después de un cálculo, y desactivarlas no cambia los resultados. Este ajuste se guarda con el proyecto.';
+$ec_lang['lpn_settings_show_arrows_tip']='Dibuja una flecha en cada tubería que muestra en qué sentido corre el agua. Las flechas aparecen después de una ejecución, y desactivarlas no cambia los resultados.';
 $ec_lang['lpn_settings_align_labels']='Alinear las etiquetas de tubería con las tuberías';
 $ec_lang['lpn_settings_readability_bias']='Voltear una etiqueta boca abajo cuando se inclina más de esta cantidad de grados a la izquierda de la vertical';
 $ec_lang['lpn_settings_readability_bias_tip']='Voltea una etiqueta para mantenerla derecha cuando se inclina más de esta cantidad de grados a la izquierda de la vertical.';
@@ -2904,7 +2904,7 @@ $ec_lang['lpn_settings_label_always']='Mostrar siempre';
 // between the boxes and `_post` follows the second one (which is shown as a percentage, so "20"
 // reads as "20% percentile pipe").
 $ec_lang['lpn_settings_symbol_cap_sentence']='Evitar que los nudos escalen más grandes que {n} veces la longitud de la {p} tubería del percentil';
-$ec_lang['lpn_settings_symbol_cap_tip']='Un nudo deja de crecer sobre el terreno cuando su diámetro llegaría a ser tantas veces la longitud de la tubería en este percentil de todas las longitudes de tubería de la red. Más allá de ese punto en el mapa, los nudos, tuberías y otros símbolos se encogen en la pantalla al alejar el zoom en lugar de crecer sobre el terreno. Los embalses y depósitos son la excepción y mantienen su tamaño en pantalla en cualquier zoom.';
+$ec_lang['lpn_settings_symbol_cap_tip']='Los nudos dejan de mantener su tamaño en pantalla cuando su diámetro en el mapa llegaría a ser tantas veces la longitud de la tubería en este percentil de todas las longitudes de tubería de la red. Pasado ese punto en el mapa, los nudos, las tuberías y otros símbolos se encogen en la pantalla al alejar el zoom. Los embalses y depósitos son la excepción y mantienen su tamaño en pantalla en cualquier zoom.';
 // Fading the symbols (not the labels) is a LAYOUT aid: it lets a backdrop aerial or plan show
 // through the network while you place nodes on top of it (Tom, 2026-07-30).
 $ec_lang['lpn_settings_symbol_opacity']='Opacidad del símbolo (0 a 1)';
@@ -2995,8 +2995,8 @@ $ec_lang['lpn_time_report_start']='Hora de inicio del informe';
 $ec_lang['lpn_time_clock_start']='Hora del reloj al inicio';
 $ec_lang['lpn_time_clock_day']='Día {day}, {clock}';
 $ec_lang['lpn_time_format_tip']='Escriba una hora como horas y minutos, por ejemplo 2:30. Un número simple significa horas, así que 8 son ocho horas. Media hora es 0:30.';
-$ec_lang['lpn_time_running']='Calculando la simulación de período extendido con el solucionador de EPANET.';
-$ec_lang['lpn_time_no_engine']='El solucionador incorporado calcula un momento a la vez, así que esta es la red solo en {time}: cada patrón se lee en ese momento, y cada depósito permanece en su nivel inicial en lugar de llenarse y vaciarse. Conéctese a internet una vez para obtener el solucionador de EPANET, que ejecuta una simulación de período extendido.';
+$ec_lang['lpn_time_running']='Ejecutando la simulación de período extendido.';
+$ec_lang['lpn_time_no_engine']='El solucionador incorporado resuelve un instante a la vez, así que esto es la red solo en {time}: cada patrón se lee en ese instante, y cada depósito permanece en su nivel inicial en lugar de llenarse y vaciarse. Conéctese a internet una vez para descargar el solucionador de EPANET, que ejecuta una simulación de período extendido.';
 $ec_lang['lpn_time_slider']='Tiempo transcurrido de la simulación';
 $ec_lang['lpn_time_no_period']='Este proyecto no tiene una simulación de período extendido configurada, así que hay un solo momento para mostrar. Configure un Tiempo total de simulación en Configuración, Cálculo, Tiempo para ejecutar una simulación de período extendido.';
 $ec_lang['lpn_time_first']='Ir al inicio';
@@ -3026,12 +3026,12 @@ $ec_lang['lpn_time_run']='Calcular';
 $ec_lang['lpn_time_run_done']='La ejecución terminó. Momentos de informe: {frames}. Tiempo empleado: {secs} s.';
 $ec_lang['lpn_time_runbox_hide']='No volver a mostrar este cuadro';
 $ec_lang['lpn_settings_runbox']='Mostrar el cuadro de progreso de la ejecución';
-$ec_lang['lpn_settings_runbox_tip']='Un cuadro que informa cuánto ha avanzado una ejecución y qué encontró. Si está desactivado, una ejecución terminada dice lo mismo en la línea de estado durante unos segundos en su lugar. Este es un ajuste para este navegador, no para el proyecto.';
+$ec_lang['lpn_settings_runbox_tip']='Un cuadro que informa el avance y el resultado de una ejecución. Si está desactivado, una ejecución terminada indica lo mismo en la línea de estado durante unos segundos. Este es un ajuste de este navegador, no del proyecto.';
 $ec_lang['lpn_time_run_failed']='La ejecución no terminó, así que no hay resultados para los momentos posteriores.';
-$ec_lang['lpn_time_run_report']='Informe de ejecución de EPANET';
+$ec_lang['lpn_time_run_report']='Informe de ejecución';
 $ec_lang['lpn_time_run_report_copy']='Copiar';
 $ec_lang['lpn_time_run_report_copied']='Copiado';
-$ec_lang['lpn_time_run_report_tip']='Lo que el propio solucionador de EPANET imprimió sobre la última ejecución: si convergió, y cualquier advertencia que haya dado. Es el texto propio del solucionador, no el nuestro.';
+$ec_lang['lpn_time_run_report_tip']='El informe que EPANET escribió para la última ejecución, textual: si convergió, y cualquier advertencia. El texto lo produce el solucionador de EPANET, no esta página.';
 
 $ec_lang['lpn_time_speed']='Velocidad';
 $ec_lang['lpn_time_speed_tip']='Velocidad de reproducción';
@@ -3108,18 +3108,18 @@ $ec_lang['lpn_quality_needs_run']='La calidad del agua se transporta por las tub
 // key) and a Mass units dropdown (lpn_quality_mass_units) below, matching EPANET's own Parameter
 // and Mass Units fields; the name is optional, exactly as EPANET's own is.
 $ec_lang['lpn_quality_chemical_name']='Producto químico';
-$ec_lang['lpn_quality_chemical_name_tip']='El producto químico que está rastreando, por ejemplo Cloro. Déjelo en blanco para la etiqueta predeterminada de EPANET, Chemical. Se muestra en sus informes, pero no se usa en los cálculos.';
+$ec_lang['lpn_quality_chemical_name_tip']='El producto químico que se rastrea, por ejemplo Cloro. Déjelo en blanco para usar la etiqueta predeterminada de EPANET, Chemical. Se muestra en los informes, pero no se usa en los cálculos.';
 $ec_lang['lpn_quality_mass_units']='Unidades de masa';
-$ec_lang['lpn_quality_mass_units_tip']='La mitad de unidades de la entrada de calidad, las dos opciones propias de EPANET.';
+$ec_lang['lpn_quality_mass_units_tip']='La parte de unidades de la entrada de calidad, de las dos opciones de EPANET.';
 $ec_lang['lpn_quality_unit_ug']='µg/L';
 // R-322: "Quality tolerance: I don't see this in our interface. Is it missing?" "Relative
 // diffusivity: I don't see this in our interface. Is it missing?" Both were carried in the file
 // and handed to the engine with no box to read or change them from; EPANET's own names and its own
 // defaults (0.01 and 1.0), shown only for a chemical, which is all either one means anything to.
 $ec_lang['lpn_quality_tolerance']='Tolerancia de calidad';
-$ec_lang['lpn_quality_tolerance_tip']='Cuánto pueden diferir en concentración dos parcelas de agua contiguas antes de que EPANET las trate como una sola. En blanco usa el valor predeterminado propio de EPANET de 0.01.';
+$ec_lang['lpn_quality_tolerance_tip']='Diferencia de concentración por debajo de la cual EPANET trata dos parcelas de agua contiguas como una sola. En blanco usa el valor predeterminado de EPANET de 0,01.';
 $ec_lang['lpn_quality_diffusivity']='Difusividad relativa';
-$ec_lang['lpn_quality_diffusivity_tip']='Con qué facilidad se dispersa el producto químico en el agua, en relación con el cloro. En blanco usa el valor predeterminado propio de EPANET de 1.0.';
+$ec_lang['lpn_quality_diffusivity_tip']='Difusividad del producto químico en agua, relativa al cloro. En blanco usa el valor predeterminado de EPANET de 1,0.';
 // R-323: "We could put it in Properties, Find, and Tables as '{chemical} concentration', and that
 // would be very cool." One template, read by qualityLabel() everywhere a concentration is named.
 $ec_lang['lpn_quality_named_concentration']='Concentración de {chemical}';
@@ -3128,10 +3128,10 @@ $ec_lang['lpn_quality_named_concentration']='Concentración de {chemical}';
 $ec_lang['lpn_quality_named_avg_concentration']='Concentración promedio de {chemical}';
 $ec_lang['lpn_quality_initial']='Calidad inicial';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_quality_initial_tip']='Cuánto producto químico tiene este nudo cuando comienza la ejecución. Un embalse conserva su propio valor durante toda la ejecución, que es como suele indicarse el residual que sale de una planta de tratamiento. En blanco significa 0.';
+$ec_lang['lpn_quality_initial_tip']='Cantidad del producto químico en este nudo cuando comienza la ejecución. Un embalse conserva este valor durante toda la ejecución, que es como suele indicarse el residual que sale de una planta de tratamiento. En blanco significa 0.';
 $ec_lang['lpn_result_concentration']='Concentración';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_result_concentration_tip']='Cuánto producto químico queda en este punto después de haber viajado y reaccionado. Las unidades son las que usted indicó junto con el nombre del producto químico en Configuración, Cálculo, Calidad.';
+$ec_lang['lpn_result_concentration_tip']='Cantidad del producto químico que queda en este punto después del transporte y la reacción. Las unidades son las ingresadas junto con el nombre del producto químico en Configuración, Cálculo, Calidad.';
 // **THE BOOSTER DOSE AND THE TANK MIXING MODEL** (ROADMAP Task 579), EPANET's `[SOURCES]` and
 // `[MIXING]`. EPANET's own words throughout, and its own four source types and four mixing models,
 // because an engineer choosing between them is choosing between real pieces of equipment and real
@@ -3149,11 +3149,11 @@ $ec_lang['lpn_source_type_setpoint']='Inyector de punto de consigna';
 $ec_lang['lpn_source_type_flowpaced']='Inyector proporcional al caudal';
 $ec_lang['lpn_source_quality']='Calidad de la fuente';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_source_quality_tip']='Qué tan fuerte es la dosis. Para todos los tipos salvo el inyector de masa esto es una concentración, en las unidades indicadas junto al producto químico en Configuración, Cálculo, Calidad; para un inyector de masa es un flujo de masa por minuto. En blanco significa que no hay fuente de producto químico, funcionalmente equivalente a 0.';
+$ec_lang['lpn_source_quality_tip']='Intensidad de la dosis. Para todos los tipos salvo el inyector de masa, esto es una concentración, en las unidades indicadas junto al producto químico en Configuración, Cálculo, Calidad; para un inyector de masa es un flujo de masa por minuto. En blanco significa que no hay fuente de producto químico, funcionalmente equivalente a 0.';
 $ec_lang['lpn_source_pattern']='Patrón de la fuente';
 $ec_lang['lpn_source_pattern_tip']='Un patrón de tiempo que escala la dosis a lo largo de la ejecución, para una fuente que no es constante. Ningún patrón significa que la dosis es la misma en cada paso.';
 $ec_lang['lpn_mixing_model']='Modelo de mezcla';
-$ec_lang['lpn_mixing_model_tip']='Cómo se mezcla el agua ya presente en este depósito con el agua que entra. La mezcla completa agita todo el depósito a la vez. La mezcla en dos compartimentos llena primero una zona de entrada y pasa el resto. El flujo pistón FIFO mueve el agua en el orden en que llegó. El flujo pistón LIFO la apila, así que la última agua en entrar es la primera en salir. La elección cambia la edad del agua y el residual, y no cambia ninguna presión ni caudal.';
+$ec_lang['lpn_mixing_model_tip']='Modelo de cómo se mezcla el agua que ya está en este depósito con el flujo de entrada. La mezcla completa mezcla instantáneamente todo el flujo de entrada con el volumen entero del depósito. La mezcla en dos compartimentos llena primero una zona de entrada y pasa el exceso a la zona principal. El flujo pistón FIFO descarga el agua en el orden en que llegó. El flujo pistón LIFO la apila, así que la última agua en entrar es la primera en salir. La elección afecta la edad del agua y el residual, no la presión ni el caudal.';
 $ec_lang['lpn_mixing_mixed']='Mezcla completa';
 $ec_lang['lpn_mixing_2comp']='Mezcla en dos compartimentos';
 $ec_lang['lpn_mixing_fifo']='Flujo pistón FIFO';
@@ -3163,7 +3163,7 @@ $ec_lang['lpn_mixing_fraction']='Fracción de mezcla';
 $ec_lang['lpn_mixing_fraction_tip']='La parte del volumen del depósito que ocupa la zona de entrada, entre 0 y 1. Solo la usa la mezcla en dos compartimentos. En blanco significa que todo el depósito es la zona de entrada.';
 $ec_lang['lpn_reaction_bulk']='Coeficiente de reacción en el seno del agua';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_reaction_bulk_tip']='Reacción en el seno del agua (vea la Ayuda de EPANET), usada en cada tubería y depósito que no tenga la suya propia. Un número negativo hace decaer el producto químico y uno positivo lo aumenta. En blanco significa que no hay reacción en el seno del agua.';
+$ec_lang['lpn_reaction_bulk_tip']='Reacción en el seno del agua (vea la Ayuda de EPANET), usada en cada tubería y depósito que no tenga un coeficiente individual. Un número negativo hace decaer el producto químico y uno positivo lo aumenta. En blanco significa que no hay reacción en el seno del agua.';
 $ec_lang['lpn_reaction_wall']='Coeficiente de reacción en la pared';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_reaction_wall_tip']='Reacción en la pared de la tubería (vea la Ayuda de EPANET), usada en cada tubería sin valor propio. Un número negativo hace decaer el producto químico. En blanco significa que no hay reacción en la pared.';
@@ -3173,7 +3173,7 @@ $ec_lang['lpn_reaction_pipe_tip']='Reacción en el seno del agua (vea la Ayuda d
 // stands in is a tank's, so the word "tank" would only be said twice.
 $ec_lang['lpn_reaction_tank']='Coeficiente de reacción';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_reaction_tank_tip']='Reacción en el agua que contiene este depósito, como tasa en 1/día. Un número negativo hace decaer el producto químico y uno positivo lo hace crecer. El agua permanece en un depósito mucho más tiempo del que permanece en cualquier tubería, así que aquí suele perderse un residual. En blanco significa usar el coeficiente de reacción en el seno del agua fijado para toda la red en Configuración, Cálculo, Calidad.';
+$ec_lang['lpn_reaction_tank_tip']='Reacción en el agua contenida en este depósito, como tasa en 1/día. Un número negativo hace decaer el producto químico y uno positivo lo aumenta. El agua permanece en un depósito mucho más tiempo que en cualquier tubería, así que aquí suele perderse un residual. En blanco significa usar el coeficiente de reacción en el seno del agua fijado para toda la red en Configuración, Cálculo, Calidad.';
 // Three column headings, in tables whose tab already says what the parts are. Column width is king,
 // so each drops the word "coefficient" that the popup label carries in full.
 $ec_lang['lpn_reaction_bulk_short']='Reacción en el seno';
@@ -3201,7 +3201,7 @@ $ec_lang['lpn_reaction_order_tank']='Orden de reacción en el depósito';
 //
 // The EPANET mention earns its place under the 2026-09-06 rule: a reader standing on this row who
 // went looking for it in EPANET and did not find it is experiencing exactly that right now.
-$ec_lang['lpn_reaction_order_tank_tip']='El exponente al que se eleva la concentración para la reacción en el agua contenida en un depósito, independiente del orden de reacción en el volumen para que un depósito pueda reaccionar con un orden distinto al de las tuberías. Se permite cualquier número real, y 1 es el valor predeterminado. EPANET lo indica como ORDER TANK en un archivo y no ofrece un cuadro para esto en su propia interfaz.';
+$ec_lang['lpn_reaction_order_tank_tip']='El exponente al que se eleva la concentración para la reacción en el agua contenida en un depósito, independiente del orden de reacción en el seno del agua para que un depósito pueda reaccionar con un orden distinto al de las tuberías. Se permite cualquier número real, y 1 es el valor predeterminado. EPANET lo indica como ORDER TANK en un archivo y no tiene un campo para esto en la interfaz de EPANET.';
 $ec_lang['lpn_reaction_order_wall']='Orden de reacción en la pared';
 // Edited by TGH 2026-09-07
 // R-324: "Our Wall reaction order tip is wrong. We need to say '1 means that the wall reaction is
@@ -3220,7 +3220,7 @@ $ec_lang['lpn_reaction_limiting']='Potencial límite';
 $ec_lang['lpn_reaction_limiting_tip']='Una concentración hacia la cual se mueve el producto químico en lugar de decaer hasta nada o crecer sin fin. La reacción se hace más lenta a medida que el agua se acerca a ella y se detiene allí. Use unidades consistentes. Sin límite si se deja en blanco.';
 $ec_lang['lpn_reaction_rough_corr']='Correlación con la rugosidad';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_reaction_rough_corr_tip']='Correlaciona la reacción en la pared con la rugosidad propia de cada tubería, de modo que una tubería más rugosa reaccione más rápido. Cuando está activada, se calcula un coeficiente de pared para cada tubería a partir de la rugosidad de esa tubería, y el coeficiente de pared único de arriba deja de usarse. No se usa si se deja en blanco.';
+$ec_lang['lpn_reaction_rough_corr_tip']='Factor que correlaciona el coeficiente de reacción en la pared con la rugosidad de cada tubería, de modo que una tubería más rugosa reaccione más rápido. Cuando se fija, se calcula un coeficiente de pared para cada tubería a partir de su rugosidad, y el coeficiente de pared único de arriba no se usa. Si se deja en blanco, no se usa.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_reaction_note']='Esta aplicación no ofrece sugerencias de coeficiente de reacción. No hay un ensayo estándar para obtener uno, y los valores de campo publicados para el mismo tipo de agua difieren por un factor de diez. Ingrese uno que haya medido o uno que pueda citar, o deje los cuadros vacíos para un producto químico que no reacciona.';
 // **PUMP ENERGY AND COST** (ROADMAP Task 566, dev/pump-energy.md). EPANET's own words: efficiency,
@@ -3233,24 +3233,24 @@ $ec_lang['lpn_settings_energy']='Energía';
 // lpn_time_run_report keep the word and lpn_energy_menu and lpn_reports_epanet do not.
 $ec_lang['lpn_reports_menu']='Informes';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_reports_epanet']='Ejecución de EPANET';
+$ec_lang['lpn_reports_epanet']='Ejecución';
 $ec_lang['lpn_energy_title']='Informe de energía de las bombas';
 $ec_lang['lpn_energy_menu']='Energía de las bombas';
 $ec_lang['lpn_energy_efficiency']='Eficiencia de la bomba (por ciento)';
-$ec_lang['lpn_energy_efficiency_tip']='La eficiencia de motor a agua usada en cada bomba que no tenga su propia curva de eficiencia. EPANET usa 75 por ciento cuando no se indica nada.';
+$ec_lang['lpn_energy_efficiency_tip']='La eficiencia de motor a agua usada en cada bomba que no tenga curva de eficiencia. EPANET usa 75 por ciento cuando no se indica ningún valor.';
 $ec_lang['lpn_energy_price']='Precio de la energía';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_energy_price_tip']='Cuánto cuesta un kilovatio-hora. Se aplica a cada bomba que no tenga su propio precio. En blanco significa 0.';
+$ec_lang['lpn_energy_price_tip']='Costo de un kilovatio-hora. Se aplica a cada bomba que no tenga un precio individual. En blanco significa 0.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_energy_pump_price_tip']='Cuánto cuesta un kilovatio-hora en esta bomba. En blanco significa usar el precio fijado para toda la red en Configuración, Energía.';
+$ec_lang['lpn_energy_pump_price_tip']='Costo de un kilovatio-hora en esta bomba. En blanco significa usar el precio fijado para toda la red en Configuración, Energía.';
 $ec_lang['lpn_energy_price_pattern']='Patrón de precio';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_energy_price_pattern_tip']='Un patrón que multiplica el precio en cada paso del patrón, que es como se indica una tarifa fuera de horas pico. Déjelo vacío para un precio constante durante toda la ejecución.';
 $ec_lang['lpn_energy_demand_charge']='Cargo por demanda máxima';
-$ec_lang['lpn_energy_demand_charge_tip']='Lo que cobra la empresa de servicios por kW de la carga máxima demandada por las bombas del sistema.';
+$ec_lang['lpn_energy_demand_charge_tip']='Por kW, para la carga máxima demandada por las bombas';
 $ec_lang['lpn_energy_currency']='Moneda';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_energy_currency_tip']='Lo que escriba aquí se imprime junto a cada cifra de dinero. Es solo una etiqueta, pero sea consistente.';
+$ec_lang['lpn_energy_currency_tip']='Texto impreso junto a cada valor de costo. Es solo una etiqueta; use una misma moneda en todo.';
 $ec_lang['lpn_energy_kwh']='kWh';
 $ec_lang['lpn_energy_kw']='kW';
 // Edited by TGH 2026-09-07
@@ -3263,7 +3263,7 @@ $ec_lang['lpn_energy_no_pumps']='Esta red no tiene bombas, así que no hay nada 
 // re-keying are lpn_scenario_label and lpn_scenario_overrides, which already name the same two
 // things in the scenario menu.
 $ec_lang['lpn_scncmp_title']='Comparación de escenarios';
-$ec_lang['lpn_scncmp_menu_tip']='Resuelve todos los escenarios de este proyecto y compárelos lado a lado: la presión más baja y la velocidad más alta de cada uno.';
+$ec_lang['lpn_scncmp_menu_tip']='Tabla de escenarios con el número de diferencias, la presión más baja y la velocidad más alta';
 $ec_lang['lpn_scncmp_running']='Resolviendo todos los escenarios…';
 $ec_lang['lpn_scncmp_empty']='Todavía no se ha dibujado nada, así que no hay nada que resolver.';
 $ec_lang['lpn_scncmp_col_maxvelocity']='Velocidad más alta';
@@ -3293,10 +3293,10 @@ $ec_lang['lpn_energy_total_cost']='Costo total';
 // **THE ROW SAYS "Status", NOT "Status report"** -- the Reports fly-out carries the word so no row
 // has to (js/looped-network.js:4630's own rule, already followed by "EPANET run"). The box title,
 // lpn_status_title, keeps the full name.
-$ec_lang['lpn_reports_status']='Estado';
-$ec_lang['lpn_reports_status_tip']='Qué cambió durante la última simulación de período extendido, en orden de tiempo: bombas y válvulas que abren o cierran, depósitos que se llenan, se vacían, se llenan por completo o se secan, y pasos que no convergieron por completo.';
-$ec_lang['lpn_status_title']='Informe de estado';
-$ec_lang['lpn_status_needs_run']='El informe de estado indica qué cambió durante una simulación de período extendido. Configure un Tiempo total de simulación en Configuración, Cálculo, Tiempo, presione Calcular, y luego abra Agua, Informes, Informe de estado.';
+$ec_lang['lpn_reports_status']='Cambios de estado';
+$ec_lang['lpn_reports_status_tip']='Tabla cronológica de los cambios de estado leídos de los pasos de tiempo de EPANET de la última simulación de período extendido: bombas y válvulas que abren o cierran, depósitos que se llenan, se vacían, se llenan por completo o se secan, y pasos que no convergieron por completo.';
+$ec_lang['lpn_status_title']='Cambios de estado';
+$ec_lang['lpn_status_needs_run']='El informe de estado enumera lo que cambió durante una simulación de período extendido. Fije un Tiempo total de simulación en Configuración, Cálculo, Tiempo, presione Calcular, y luego abra Agua, Informes, Cambios de estado.';
 $ec_lang['lpn_status_empty']='Nada cambió de estado durante esta simulación.';
 $ec_lang['lpn_status_col_event']='Evento';
 $ec_lang['lpn_status_opened']='{type} {id} ahora en estado abierto';
@@ -3310,7 +3310,7 @@ $ec_lang['lpn_status_note']='Se lee de la misma simulación de período extendid
 
 // Same rule as Status above: the row says "Full", the box says "Full report".
 $ec_lang['lpn_reports_full']='Completo';
-$ec_lang['lpn_reports_full_tip']='Cada nudo y cada línea en cada paso de tiempo de informe de la última simulación, como una tabla que puede descargar o imprimir.';
+$ec_lang['lpn_reports_full_tip']='Tabla de todos los nodos y líneas en cada paso de tiempo de informe de la última ejecución';
 $ec_lang['lpn_full_title']='Informe completo';
 $ec_lang['lpn_full_needs_run']='El informe completo enumera cada nudo y cada línea en cada paso de tiempo de informe. Presione Calcular, y luego abra Agua, Informes, Informe completo.';
 $ec_lang['lpn_full_note']='Una fila por nudo o línea por paso de tiempo de informe, en las unidades mostradas en el panel de Tablas. Una celda en blanco es una columna que esa cantidad no tiene. Descargar o imprimir incluye cada paso de tiempo; la tabla de abajo muestra uno a la vez.';
@@ -3414,7 +3414,7 @@ $ec_lang['lpn_library_menu']='Bibliotecas';
 $ec_lang['lpn_library_patterns']='Patrones';
 $ec_lang['lpn_library_patterns_tip']='Un patrón es una lista de multiplicadores que se repite. Cada uno se aplica durante un paso de tiempo del patrón, así que 24 números con un paso de una hora forman un día que se repite. Una demanda de 10 con un multiplicador de 1,5 es 15 en ese momento.';
 $ec_lang['lpn_library_curves']='Curvas';
-$ec_lang['lpn_library_curves_tip']='Una curva es una lista de puntos que indica cómo funciona algo: cuánta carga agrega una bomba en cada caudal, qué tan eficiente es en ese caudal, o cuánta carga pierde una válvula en cada caudal.';
+$ec_lang['lpn_library_curves_tip']='Carga o eficiencia de la bomba frente al caudal, pérdida de la válvula frente al caudal, o volumen del depósito frente a la profundidad';
 // **CURVES IS AN EDITOR** (Task 586). It was a read-only report about pumps until the curves became
 // document objects of their own, and the note said so; it now says what the box does and where a
 // curve is pointed at an element from.
@@ -3437,7 +3437,7 @@ $ec_lang['lpn_library_curve_equation_tip']='La curva ajustada a los puntos dados
 // **NOW A GRID, SO THIS SENTENCE IS ABOUT PASTING INTO ONE** (Tom, 2026-09-05: *"The line given is
 // worse than EPANET, and it really can't take a spreadsheet paste."*). Shown once under the section
 // heading rather than once per curve, so it is a note and no longer a tip.
-$ec_lang['lpn_library_curve_values_tip']='Seleccione una o dos columnas de una hoja de cálculo, cópielas y péguelas en la primera celda donde quiera que caigan. Las filas se agregan a medida que se necesitan. También puede pegar líneas copiadas directamente de un archivo de EPANET, incluido el nombre de la curva.';
+$ec_lang['lpn_library_curve_values_tip']='Seleccione una o dos columnas de una hoja de cálculo, cópielas y péguelas en la primera celda de destino. Las filas se agregan según se necesiten. También se pueden pegar líneas copiadas directamente de un archivo de EPANET, incluido el nombre de la curva.';
 // EPANET states a curve's description in the comment above its rows, and this page has read it and
 // written it back since Task 586 without showing it to anybody.
 $ec_lang['lpn_library_curve_note_label']='Descripción';
@@ -3453,7 +3453,7 @@ $ec_lang['lpn_library_curve_unused']='Nada usa esta curva.';
 // clearing a pattern reference is harmless; a pump with no curve is a lossless connection, so the
 // same gesture would quietly turn a pumped system into an open one. {count} and {ids} are
 // placeholders, not concatenation (Task 193).
-$ec_lang['lpn_library_curve_in_use']='Esta curva la usan {count} elementos: {ids}. Primero apúntelos a otra curva, y después elimine esta.';
+$ec_lang['lpn_library_curve_in_use']='Esta curva la usan {count} elementos: {ids}. Primero asígneles otra curva y después elimine esta.';
 // The two column headings for a curve this page does not compute with -- a tank volume curve, or one
 // a file stated that nothing here reads. Naming a quantity would be inventing one.
 $ec_lang['lpn_library_curve_x']='X';
@@ -3467,7 +3467,7 @@ $ec_lang['lpn_library_pipetypes_tip']='Un tipo de tubería es una definición qu
 // **WHAT A DEFINITION CONTAINS IS THE USER\'S CHOICE**, and the note has to say so: a type that
 // states a roughness and no diameter is the way a real approved-materials table handles two ages of
 // the same material, and it is the half of Tom\'s shape that makes the feature work.
-$ec_lang['lpn_library_pipetypes_note']='Cada proyecto tiene su propia biblioteca de tipos de tubería. Puede dejar propiedades en blanco en una definición de tipo de tubería. Por ejemplo, un tipo de tubería que especifica una rugosidad y ningún diámetro está bien. Los tipos de tubería se asignan a las tuberías en su editor de propiedades. Editar una definición aquí cambia cada tubería que la referencia.';
+$ec_lang['lpn_library_pipetypes_note']='Cada proyecto tiene una biblioteca de tipos de tubería independiente. Las propiedades pueden dejarse en blanco en la definición de un tipo de tubería; por ejemplo, un tipo de tubería puede especificar una rugosidad y ningún diámetro. Los tipos de tubería se asignan a las tuberías en las propiedades de la tubería. Editar una definición aquí cambia todas las tuberías que hacen referencia a ella.';
 $ec_lang['lpn_library_pipetype_add']='Agregar un tipo de tubería';
 $ec_lang['lpn_library_pipetype_blank_tip']='Las propiedades en blanco en una definición de tipo de tubería se dejan para ingresarse individualmente en cada tubería.';
 $ec_lang['lpn_library_pipetype_used_by']='Tuberías que usan este tipo';
@@ -3482,21 +3482,21 @@ $ec_lang['lpn_field_pipetype_tip']='El tipo de tubería de la biblioteca del pro
 $ec_lang['lpn_pipetype_none']='Ningún tipo de tubería seleccionado';
 $ec_lang['lpn_pipetype_detach']='Separar del tipo de tubería';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_pipetype_detach_tip']='Copia en la propia tubería los valores que esta lee de su tipo y deja de usar el tipo. Los valores de la tubería no cambian ahora, y de ahora en adelante puede editar estos valores aquí.';
+$ec_lang['lpn_pipetype_detach_tip']='Copia en la tubería los valores que esta lee de su tipo y deja de usar el tipo. Los valores de la tubería no cambian ahora, y de ahora en adelante estos valores se editan aquí.';
 // ---- THE FITTINGS LIBRARY (ROADMAP Task 590, dev/pipe-library-design.md §3) ----
 // A pipe's minor loss is a SUM of named fittings and quantities -- Crane Technical Paper 410's
 // additive-K method, which is what Bentley's Minor Loss Collection and KYPipe's SigmaM both offer.
 // Bound by id like the pipe types above it, and for the same Bentley finding.
 $ec_lang['lpn_library_fittings']='Accesorios';
-$ec_lang['lpn_library_fittings_tip']='Una lista de accesorios es un conjunto de accesorios y sus cantidades que varias tuberías pueden referenciar. Suma un solo coeficiente de pérdida localizada.';
+$ec_lang['lpn_library_fittings_tip']='Accesorios con coeficientes de pérdida localizada agrupados en listas';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_library_fittings_note']='Cada proyecto tiene su propia biblioteca de accesorios. Una lista de accesorios tiene accesorios con una cantidad para cada uno, y suma en un solo coeficiente de pérdida localizada. Tanto las tuberías como los tipos de tubería pueden referenciar una lista.';
+$ec_lang['lpn_library_fittings_note']='Cada proyecto tiene una biblioteca de accesorios independiente. Una lista de accesorios tiene accesorios con una cantidad para cada uno, y suma un solo coeficiente de pérdida localizada. Tanto las tuberías como los tipos de tubería pueden hacer referencia a una lista.';
 // **WHERE THE OFFERED NUMBERS CAME FROM, STATED TO THE READER RATHER THAN ONLY IN THE SOURCE.** An
 // unsourced coefficient is worse than none, because it looks authoritative; and a coefficient is a
 // starting point, since the real one depends on the size and the make of the fitting. This names
 // EPANET because the reader is looking at its numbers right now, which is the test that mention has
 // to pass (dev/language-strings.md).
-$ec_lang['lpn_library_fittings_source']='Los accesorios que se ofrecen aquí son los trece de la tabla 3.3 del manual de usuario de EPANET 2.2. Elegir uno copia su coeficiente en la fila, donde puede cambiarlo. Un coeficiente depende del tamaño y la marca del accesorio, así que trate la tabla como un punto de partida y no como una respuesta.';
+$ec_lang['lpn_library_fittings_source']='Los accesorios que se ofrecen aquí son los trece de la tabla 3.3 del manual de usuario de EPANET 2.2. Elegir uno copia su coeficiente en la fila, donde se puede cambiar. Un coeficiente depende del tamaño y del fabricante del accesorio, así que considere la tabla un punto de partida y no valores finales.';
 $ec_lang['lpn_library_fittings_add']='Agregar una lista de accesorios';
 $ec_lang['lpn_library_fittings_used_by']='Tuberías que usan esta lista de accesorios';
 $ec_lang['lpn_library_fittings_unused']='Nada usa esta lista de accesorios.';
@@ -3522,8 +3522,8 @@ $ec_lang['lpn_library_import_conflict']='Omitido, porque este proyecto ya tiene 
 // Said under ONE library's heading in the receipt, where 'these' is that library. The whole-file
 // case is lpn_library_import_no_libraries above, which has no heading over it to lean on.
 $ec_lang['lpn_library_import_none']='Ese archivo de proyecto no tiene ninguno de estos para copiar.';
-$ec_lang['lpn_library_import_curve_shape']='Estas curvas se trasladaron exactamente como las escribió el archivo, y una simulación no puede usar una hasta que su primera columna aumente de cada punto al siguiente: {names}';
-$ec_lang['lpn_library_import_needs_fittings']='Estos tipos de tubería hacen referencia a una lista de accesorios que este proyecto no tiene: {names}. Importe la biblioteca de accesorios del mismo archivo y la encontrarán.';
+$ec_lang['lpn_library_import_curve_shape']='Estas curvas se importaron exactamente como están escritas en el archivo, y una ejecución no puede usar una hasta que su primera columna aumente de cada punto al siguiente: {names}';
+$ec_lang['lpn_library_import_needs_fittings']='Estos tipos de tubería hacen referencia a una lista de accesorios que este proyecto no tiene: {names}. Importe la biblioteca de accesorios del mismo archivo para resolver estas referencias.';
 // Said in the CHOOSER, above the Import button, and never in the receipt: it is a fact to weigh
 // before importing, not a note about what has already been done. A DISCLOSURE and not an offer to
 // convert, because changing a unit on this page reinterprets a typed number rather than converting
@@ -3544,7 +3544,7 @@ $ec_lang['lpn_fitting_total']='Coeficiente total de pérdida localizada, k';
 // The pipe popup\'s own selector.
 $ec_lang['lpn_field_fittings']='Lista de accesorios';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_field_fittings_tip']='Una lista de accesorios de la biblioteca del proyecto. Sus cantidades y coeficientes se suman en el coeficiente de pérdida localizada de esta tubería, y el cuadro del coeficiente queda entonces de solo lectura. Deje esto sin seleccionar para escribir usted mismo el coeficiente.';
+$ec_lang['lpn_field_fittings_tip']='Una lista de accesorios de la biblioteca del proyecto. Sus cantidades y coeficientes se suman en el coeficiente de pérdida localizada de esta tubería, y el cuadro del coeficiente queda entonces de solo lectura. Deje esto sin seleccionar para ingresar el coeficiente directamente.';
 $ec_lang['lpn_fittings_none']='Ninguna lista de accesorios seleccionada';
 // EPANET 2.2 user manual, Table 3.3, Minor Loss Coefficients for Selected Fittings. THE MANUAL\'S
 // OWN THIRTEEN NAMES, in its own order. CLAUDE.md: default to the EPANET terminology, since a
@@ -3573,11 +3573,11 @@ $ec_lang['lpn_fitting_other']='Otro accesorio';
 // the reader has just asked for an EPANET file, which is the test a mention has to pass.
 $ec_lang['lpn_inp_export_flat_heading']='Se guardó {file}';
 $ec_lang['lpn_inp_export_flat_lead']='El archivo EPANET exportado es numéricamente equivalente a este proyecto. Pero no tiene lugar para lo siguiente:';
-$ec_lang['lpn_inp_export_flat_types']='{n} tuberías aquí referencian {t} tipos de tubería. En el archivo, cada una de esas tuberías lleva su propia copia de los números, así que las respuestas son las mismas. Lo que el archivo no puede contener es el tipo de tubería en sí, así que editar una definición y que cada tubería la siga es algo que solo registra su propio archivo de proyecto.';
-$ec_lang['lpn_inp_export_flat_coords']='Un archivo EPANET conserva una posición para cada nudo. Este escenario coloca {n} de ellos en otro lugar, y esas son las posiciones en el archivo. Cualquier otro escenario conserva sus propias posiciones solo en su archivo de proyecto.';
+$ec_lang['lpn_inp_export_flat_types']='{n} tuberías de aquí hacen referencia a {t} tipos de tubería. En el archivo, cada una de esas tuberías lleva su propia copia de los números, así que los resultados son los mismos. Lo que el archivo no puede contener es el tipo de tubería en sí, así que el vínculo entre una definición y cada tubería que la usa se registra solo en el archivo de proyecto.';
+$ec_lang['lpn_inp_export_flat_coords']='Un archivo de EPANET contiene una posición para cada nodo. Este escenario coloca {n} de ellos en otro lugar, y esas son las posiciones del archivo. Cualquier otro escenario conserva sus posiciones solo en el archivo del proyecto.';
 $ec_lang['lpn_inp_export_flat_fittings']='Un archivo EPANET no puede contener la lista de codos, válvulas y tés de su archivo de proyecto. El coeficiente de pérdida localizada de {n} tuberías aquí se suma a partir de una lista de accesorios. El total pasa al archivo tal como está, así que nada cambia en las respuestas.';
 $ec_lang['lpn_library_controls']='Controles';
-$ec_lang['lpn_library_controls_tip']='Un control es una sola frase que abre o cierra una línea, o le da un ajuste, cuando un nivel de agua, una presión o una hora lo indican.';
+$ec_lang['lpn_library_controls_tip']='Un control es una sola instrucción que abre o cierra una línea, o cambia su ajuste, según el nivel de agua de un depósito, la presión de un nodo o la hora.';
 // A verb and its object, not a bare "Add": a bare imperative is the hardest kind of string to
 // translate well, and there are two of these buttons a few centimetres apart.
 $ec_lang['lpn_library_pattern_add']='Agregar un patrón';
@@ -3600,10 +3600,10 @@ $ec_lang['lpn_library_control_bad']='⚠ No se entendió';
 $ec_lang['lpn_library_control_missing']='⚠ Esta red no tiene nada llamado {id}';
 $ec_lang['lpn_library_rules']='Reglas';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_library_rules_tip']='Una regla es un párrafo breve que abre o cierra una línea, o le da un ajuste, cuando un nivel de agua, una presión, un caudal o una hora alcanza un valor que usted fija. Las reglas pueden probar más de una cosa a la vez, y pueden indicar qué hacer cuando la prueba falla.';
+$ec_lang['lpn_library_rules_tip']='Una regla abre o cierra una línea, o cambia su ajuste, cuando un nivel de agua, una presión, un caudal o la hora alcanza un valor fijado. Una regla puede evaluar más de una condición y puede especificar la acción que se toma cuando la condición es falsa.';
 $ec_lang['lpn_library_rule_add']='Agregar una regla';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_library_rule_tip']='Una regla, en las palabras que usa EPANET, una cláusula por línea. Una primera línea la nombra: RULE 1. Luego una condición: IF TANK 2 LEVEL BELOW 17.1. Luego qué hacer al respecto: THEN PUMP 9 STATUS IS OPEN. Una última línea puede darle prioridad: PRIORITY 1. Agregue líneas AND u OR para probar más de una cosa, y líneas ELSE para indicar qué hacer cuando la prueba falla. Una condición puede leer LEVEL, HEAD, GRADE, PRESSURE o DEMAND en un nudo, FLOW, STATUS o SETTING en una línea, o TIME y CLOCKTIME en SYSTEM. Escriba los números en las unidades que muestra este proyecto; se convierten por usted. Deje las palabras clave en inglés; son lo que lee esta página y lo que lee EPANET.';
+$ec_lang['lpn_library_rule_tip']='Una cláusula por línea. A continuación se describen las líneas, con ejemplos en "MAYÚSCULAS". Línea 1: nombre de la regla, "RULE 1". Línea 2: una condición, "IF TANK 2 LEVEL BELOW 17.1". Línea 3: una acción, "THEN PUMP 9 STATUS IS OPEN". Línea 4: una prioridad, "PRIORITY 1". Agregue líneas "AND" u "OR" para evaluar más de una condición, y líneas "ELSE" para especificar la acción cuando la condición es falsa. Una condición puede leer LEVEL, HEAD, GRADE, PRESSURE o DEMAND en un nodo, FLOW, STATUS o SETTING en una línea, o TIME y CLOCKTIME en SYSTEM. Use unidades coherentes con el proyecto. Las palabras clave deben estar en inglés.';
 $ec_lang['lpn_library_rule_ok']='✓ Esta regla se leyó';
 $ec_lang['lpn_library_rule_bad']='⚠ Esta regla no se pudo leer';
 // PER JUNCTION, so it is in the property popup and not in this box -- the Settings rule ("if it is
@@ -3621,7 +3621,7 @@ $ec_lang['lpn_field_base_demand']='Demanda base';
 // junction. The first sentence is his wording verbatim; the second is the one that was already
 // there and is untouched, because it says the other thing this tip exists for -- that the number
 // is a RESULT and not a field. The key has never been translated, so the reword cost nothing.
-$ec_lang['lpn_result_demand_tip']='El caudal que este nodo extrae en el paso de tiempo mostrado: cada demanda base multiplicada por su propio patrón, sumadas entre sí. Se calcula, no se escribe, así que cambia con el reloj y no se puede editar.';
+$ec_lang['lpn_result_demand_tip']='El caudal que este nodo extrae en el paso de tiempo mostrado: cada demanda base multiplicada por su propio patrón, sumadas. Es un resultado, no un dato de entrada.';
 $ec_lang['lpn_field_demand_pattern']='Patrón de demanda';
 // A JUNCTION’S DEMAND IS A LIST (Task 468). The PATTERN says what KIND of user this is
 // (“residential”); the CATEGORY says WHO it is (“Elm Acres”). Nothing validates a category and there
@@ -3632,11 +3632,11 @@ $ec_lang['lpn_demand_remove']='Quitar esta demanda';
 // A RESERVOIR AND A PUMP TAKE A PATTERN TOO, on the same rule: whole-project settings live in the
 // Libraries box, one asset’s own choice lives in its property popup.
 $ec_lang['lpn_field_head_pattern']='Patrón de carga';
-$ec_lang['lpn_field_head_pattern_tip']='Cómo sube y baja el nivel de agua de este embalse durante la ejecución. La carga de arriba se multiplica por el patrón.';
+$ec_lang['lpn_field_head_pattern_tip']='Patrón del nivel de agua de este embalse a lo largo de la ejecución. La carga de arriba se multiplica por el patrón.';
 $ec_lang['lpn_field_pump_speed']='Velocidad relativa';
-$ec_lang['lpn_field_pump_speed_tip']='1 es esta bomba girando a la velocidad con la que se midió su curva. 0,9 es la misma bomba girando más lento, lo que reduce la carga que agrega y el caudal que deja pasar. Un patrón de velocidad ocupa el lugar de este número mientras dura la ejecución.';
+$ec_lang['lpn_field_pump_speed_tip']='Relativa a la velocidad de rotación usada para generar su curva de rendimiento publicada. Se ignora (no se escala) si hay un patrón de velocidad.';
 $ec_lang['lpn_field_speed_pattern']='Patrón de velocidad';
-$ec_lang['lpn_field_speed_pattern_tip']='Cómo sube y baja la velocidad de esta bomba durante la ejecución. Cada multiplicador es la velocidad relativa para esa parte de la ejecución, y sustituye el ajuste Velocidad en lugar de escalarlo, así que un multiplicador de 0 detiene la bomba.';
+$ec_lang['lpn_field_speed_pattern_tip']='Cada entrada del patrón da la velocidad relativa para esa parte de la ejecución, en lugar de escalar un valor base.';
 
 // ---- place-name search and terrain elevations (Task 507) ---------------------------------------
 // Both features ask an outside service for something, and each asks its own permission question
@@ -3651,51 +3651,51 @@ $ec_lang['lpn_field_speed_pattern_tip']='Cómo sube y baja la velocidad de esta 
 // one wall, and the order of the paragraphs stays ours rather than the translation's.
 $ec_lang['lpn_search_menu']='Buscar un lugar por nombre…';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_search_tip']='Busca una ciudad, una calle o un punto de referencia por nombre y mueve el mapa hasta allí. El primer uso pide su permiso, porque las palabras que escribe van al servicio de nombres de lugares de OpenStreetMap.';
+$ec_lang['lpn_search_tip']='Se solicita permiso en el primer uso, porque las búsquedas se envían al servicio de nombres de lugares de OpenStreetMap.';
 $ec_lang['lpn_search_bar']='Buscar por nombre…';
 // The four paragraphs of the ask: what is sent and to whom; why this is a separate question from
 // the map pictures; the question itself; and what a no costs (nothing).
-$ec_lang['lpn_search_consent_1']='Buscar por nombre de lugar envía las palabras que escribe a nominatim.openstreetmap.org, el servicio gratuito de nombres de lugares de la Fundación OpenStreetMap.';
-$ec_lang['lpn_search_consent_2']='Este es un servicio distinto de las imágenes del mapa de calles detrás de su proyecto. Las imágenes solo dicen adónde está mirando. Una búsqueda dice lo que escribió. El servicio de nombres de lugares recibirá sus palabras de búsqueda y su dirección IP. No enviamos nada más, y no guardamos ningún registro de sus búsquedas.';
+$ec_lang['lpn_search_consent_1']='La búsqueda por nombre de lugar envía las palabras ingresadas a nominatim.openstreetmap.org, el servicio gratuito de nombres de lugares de la Fundación OpenStreetMap.';
+$ec_lang['lpn_search_consent_2']='Este es un servicio distinto de las imágenes del mapa de calles detrás de su proyecto. Las imágenes solo indican dónde está mirando. Una búsqueda indica lo que ingresó. El servicio de nombres de lugares recibirá sus palabras de búsqueda y su dirección IP. No enviamos nada más, y no conservamos ningún registro de sus búsquedas.';
 $ec_lang['lpn_search_consent_3']='¿Podemos enviar sus búsquedas al servicio de nombres de lugares?';
 $ec_lang['lpn_search_consent_4']='Si dice que no, todo lo demás en esta página sigue funcionando exactamente como ahora, incluido Ir a una latitud y longitud. Recordamos un sí para no tener que volver a preguntar. Un no no se guarda en absoluto.';
-$ec_lang['lpn_search_refused']='La búsqueda por nombre de lugar está desactivada, y no se envió nada. Aún puede usar Ir a una latitud y longitud.';
+$ec_lang['lpn_search_refused']='La búsqueda por nombre de lugar está desactivada, y no se envió nada. El comando Ir a una latitud y longitud sigue funcionando.';
 $ec_lang['lpn_search_prompt']='Busque un lugar por nombre. Una ciudad, una calle, un punto de referencia — por ejemplo: Petaluma, California';
-$ec_lang['lpn_search_empty']='Escriba un nombre de lugar para buscar.';
+$ec_lang['lpn_search_empty']='Ingrese un nombre de lugar para buscar.';
 $ec_lang['lpn_search_working']='Buscando…';
-$ec_lang['lpn_search_busy']='Ya hay una búsqueda en curso. Espere su respuesta.';
+$ec_lang['lpn_search_busy']='Ya hay una búsqueda en curso. Espere a que termine.';
 $ec_lang['lpn_search_choose']='Coinciden varios lugares. ¿Cuál?';
 $ec_lang['lpn_search_nochoice']='No se eligió nada, así que el mapa no se movió.';
 $ec_lang['lpn_search_badchoice']='Ese no es uno de los números de la lista.';
 $ec_lang['lpn_search_none']='No se encontró nada para ese nombre.';
 // Five different failures, five different next actions. Keep them distinct in translation too --
 // "search failed" for all five is exactly what this set exists to avoid.
-$ec_lang['lpn_search_rate']='El servicio de nombres de lugares nos pide reducir la velocidad. Espere un minuto y vuelva a intentarlo.';
-$ec_lang['lpn_search_http']='El servicio de nombres de lugares respondió con un error.';
+$ec_lang['lpn_search_rate']='El servicio de nombres de lugares ha limitado la frecuencia de solicitudes. Espere un minuto y vuelva a intentarlo.';
+$ec_lang['lpn_search_http']='El servicio de nombres de lugares devolvió un error.';
 $ec_lang['lpn_search_timeout']='El servicio de nombres de lugares no respondió a tiempo. Todo lo demás en esta página funciona sin él.';
-$ec_lang['lpn_search_unreadable']='El servicio de nombres de lugares respondió con algo que esta página no pudo leer.';
+$ec_lang['lpn_search_unreadable']='El servicio de nombres de lugares devolvió una respuesta que esta página no pudo leer.';
 $ec_lang['lpn_search_offline']='No pudimos comunicarnos con el servicio de nombres de lugares. Puede que esté sin conexión. Todo lo demás en esta página funciona sin él, incluido Ir a una latitud y longitud.';
-$ec_lang['lpn_search_toofast']='Una búsqueda por segundo — eso es lo que permite el servicio de nombres de lugares. Vuelva a intentarlo en un momento.';
+$ec_lang['lpn_search_toofast']='El servicio de nombres de lugares permite una búsqueda por segundo. Vuelva a intentarlo en un momento.';
 $ec_lang['lpn_search_nofetch']='Este navegador no puede comunicarse con el servicio de nombres de lugares.';
 // Shown three times -- the menu tip, the confirm and the result notice -- so that the three cannot
 // drift into three different claims about the same data. One sentence, translated once.
-$ec_lang['lpn_terrain_accuracy']='Mapbox arma esto a partir de muchos conjuntos de datos de elevación públicos, así que su calidad depende por completo de dónde se encuentre. Donde existe un levantamiento lidar nacional, como USGS 3DEP en gran parte de Estados Unidos y sus equivalentes en otros países, puede ser mejor que un metro en horizontal y unas pocas décimas de metro en vertical. Donde solo existen datos globales, es de unos 30 m en horizontal y varios metros en vertical. Mapbox no nos dice cuál de los dos obtuvo usted. Trátelo como un mapa de curvas de nivel, no como un levantamiento: verifique todo aquello en lo que se apoye.';
+$ec_lang['lpn_terrain_accuracy']='Mapbox compone esto a partir de muchos conjuntos de datos de elevación públicos, así que su precisión depende de la ubicación. Donde existe un levantamiento lidar nacional, como USGS 3DEP en gran parte de Estados Unidos y sus equivalentes en otros países, puede ser mejor que 1 m en horizontal y unas pocas décimas de metro en vertical. Donde solo existen datos globales, es de unos 30 m en horizontal y varios metros en vertical. Mapbox no indica qué fuente corresponde. Trátelo como un mapa de curvas de nivel, no como un levantamiento, y verifique todo valor del que dependa el diseño.';
 $ec_lang['lpn_terrain_consent_1']='Rellenar elevaciones envía la posición de cada nodo que necesita una — su latitud y longitud — a api.mapbox.com, para consultar la altura del terreno allí.';
 $ec_lang['lpn_terrain_consent_2']='Esta es una cuestión distinta de las imágenes del mapa detrás de su proyecto. Las imágenes solo dicen adónde está mirando. Estas posiciones son su red misma. Mapbox recibirá esas coordenadas y su dirección IP. No enviamos nada más: ni nombre, ni tuberías, ni proyecto. No guardamos ningún registro de esto, y nada se almacena en este dispositivo salvo su respuesta a esta pregunta.';
 $ec_lang['lpn_terrain_consent_3']='¿Podemos enviar las posiciones de sus nodos a Mapbox?';
-$ec_lang['lpn_terrain_consent_4']='Si dice que no, todo lo demás en esta página sigue funcionando exactamente como ahora, y puede escribir las elevaciones usted mismo como antes. Recordamos un sí para no tener que volver a preguntar. Un no no se guarda en absoluto.';
-$ec_lang['lpn_terrain_refused']='No se rellenaron las elevaciones, y no se envió nada. Puede escribirlas usted mismo como antes.';
+$ec_lang['lpn_terrain_consent_4']='Si dice que no, todo lo demás en esta página sigue funcionando exactamente como ahora, y las elevaciones se pueden ingresar a mano como antes. Recordamos un sí para no tener que preguntar de nuevo. Un no no se guarda en absoluto.';
+$ec_lang['lpn_terrain_refused']='No se rellenaron las elevaciones, y no se envió nada. Se pueden ingresar a mano como antes.';
 // {n} is a whole number, {k} a whole number, {v} an elevation with its unit, {m} and {f} whole
 // numbers. Substituted, never concatenated.
 $ec_lang['lpn_terrain_confirm']='¿Rellenar la elevación de {n} nodo(s) a partir de Mapbox DEM?';
-$ec_lang['lpn_terrain_confirm_default_1']='Todos los nodos ya tienen una elevación, y {n} de ellos siguen en {v}, que es la elevación con la que empieza un nodo nuevo y no una que usted haya escrito.';
+$ec_lang['lpn_terrain_confirm_default_1']='Todos los nodos ya tienen una elevación, y {n} de ellos siguen en {v}, que es la elevación con la que empieza un nodo nuevo y no una ingresada.';
 $ec_lang['lpn_terrain_confirm_default_2']='¿Reemplazar la elevación de esos {n} nodos con valores de Mapbox DEM?';
-$ec_lang['lpn_terrain_keep']='{k} nodo(s) ya tienen una elevación y no se tocarán.';
+$ec_lang['lpn_terrain_keep']='{k} nodo(s) ya tienen una elevación y no se cambiarán.';
 $ec_lang['lpn_terrain_undo']='Un solo Deshacer (Ctrl-Z) los restablece a todos.';
 $ec_lang['lpn_terrain_requests']='{n} solicitud(es) a api.mapbox.com.';
 $ec_lang['lpn_terrain_busy']='Ya se están rellenando las elevaciones. Espere a que terminen.';
 $ec_lang['lpn_terrain_offmap']='Estas posiciones de nodo no están en el mapa de terreno, así que no se envió nada.';
-$ec_lang['lpn_terrain_too_wide']='Estos nodos están repartidos en demasiada superficie de la Tierra para leerlos de una vez ({n} solicitudes de mosaico). No se envió nada.';
+$ec_lang['lpn_terrain_too_wide']='Estos nodos abarcan demasiada superficie de la Tierra para leerlos en una sola operación ({n} solicitudes de mosaico). No se envió nada.';
 $ec_lang['lpn_terrain_cancelled']='No se cambió nada y no se envió nada.';
 $ec_lang['lpn_terrain_nofetch']='Este navegador no puede comunicarse con el servicio de terreno.';
 $ec_lang['lpn_terrain_working']='Leyendo la superficie del terreno…';
@@ -3704,7 +3704,7 @@ $ec_lang['lpn_terrain_denied']='El servicio de terreno rechazó la solicitud ({s
 $ec_lang['lpn_terrain_failed']='No pudimos comunicarnos con el servicio de terreno, así que no se cambió ninguna elevación. Puede que esté sin conexión. Todo lo demás en esta página funciona sin él.';
 // A 429 is the service asking us to slow down. It is not a refusal and not a lost network, so it
 // gets its own sentence: the same request works in a minute.
-$ec_lang['lpn_terrain_rate_limited']='El servicio de terreno nos pide reducir la velocidad (429), así que no se cambió ninguna elevación. Vuelva a intentarlo en un minuto.';
+$ec_lang['lpn_terrain_rate_limited']='El servicio de terreno ha limitado la frecuencia de solicitudes (429), así que no se cambió ninguna elevación. Vuelva a intentarlo en un minuto.';
 // Any other status the service sent back. {status} is that number.
 $ec_lang['lpn_terrain_http']='El servicio de terreno respondió con un error ({status}), así que no se cambió ninguna elevación. No hay nada mal con su red.';
 // Said when the nodes asked about have no position on the Earth at all, which is what a projected
@@ -3734,27 +3734,27 @@ $ec_lang['lpn_analyze_menu']='Analizar';
 // {id} a junction or pipe name, and {done}, {total}, {n}, {pass}, {fail}, {design} and {solves}
 // are whole numbers. Every one is substituted, never concatenated.
 $ec_lang['lpn_ff_menu']='Caudal contra incendios…';
-$ec_lang['lpn_ff_menu_tip']='Pruebe los nudos uno por uno: cuánto puede entregar cada uno sin dejar de mantener la presión residual que usted fijó, y si extraer allí el caudal requerido saca algo más de sus límites.';
+$ec_lang['lpn_ff_menu_tip']='Pruebe cada nudo seleccionado para caudal contra incendios, y verifique el efecto sobre el resto del sistema';
 $ec_lang['lpn_ff_title']='Caudal contra incendios';
-$ec_lang['lpn_ff_intro']='A cada nudo, por turno, se le pide que extraiga un caudal contra incendios además de la demanda que ya tiene. Nada en su proyecto se cambia; todo el cálculo se hace sobre una copia.';
+$ec_lang['lpn_ff_intro']='Cada nudo, por turno, extrae un caudal contra incendios además de su demanda existente. La ejecución usa una copia de la red en el paso de tiempo que se muestra en pantalla, así que nada de su proyecto cambia.\n\nEl caudal contra incendios normalmente se prueba con la demanda del día máximo, así que primero ajuste la red a esa condición.\n\nCada nudo probado requiere unas 16 soluciones de toda la red, así que un sistema grande tarda minutos: elija los nudos antes de ejecutar, y deténgase en cualquier momento para conservar los resultados parciales.';
 $ec_lang['lpn_ff_scope']='Nudos a probar';
-$ec_lang['lpn_ff_all']='Todos';
-$ec_lang['lpn_ff_selected']='Seleccionados';
+$ec_lang['lpn_ff_all']='Todos los nudos';
+$ec_lang['lpn_ff_selected']='Nudos seleccionados';
 $ec_lang['lpn_ff_no_junctions']='Este proyecto todavía no tiene nudos, así que no hay nada que probar.';
 $ec_lang['lpn_ff_no_selection']='No hay ningún nudo seleccionado. Seleccione nudos o elija Todos los nudos.';
 $ec_lang['lpn_ff_skipped']='{n} elementos seleccionados no son nudos, así que no se probaron.';
 $ec_lang['lpn_ff_required']='Caudal contra incendios requerido';
-$ec_lang['lpn_ff_required_tip']='El caudal que su código de incendios o su autoridad de bomberos exige en un hidrante. Cada nudo se prueba contra este número, a menos que tenga su propio caudal contra incendios requerido.';
-$ec_lang['lpn_ff_required_own']='Los nudos que tienen su propio caudal contra incendios requerido se prueban contra ese en su lugar. Cantidad de ellos: {n}.';
-$ec_lang['lpn_ff_required_node_tip']='El caudal contra incendios requerido en este nudo en particular, según el uso del suelo que atiende, tomado de su código de incendios o de su autoridad de bomberos. Déjelo en blanco y el nudo se prueba contra el número del cuadro Caudal contra incendios.';
+$ec_lang['lpn_ff_required_tip']='El caudal requerido en un hidrante por el código de incendios aplicable o la autoridad de bomberos. Cada nudo se prueba contra este valor, a menos que se ingrese un caudal contra incendios requerido para ese nudo.';
+$ec_lang['lpn_ff_required_own']='Los nudos con un caudal contra incendios requerido individual se prueban contra ese valor en su lugar. Cantidad de ellos: {n}.';
+$ec_lang['lpn_ff_required_node_tip']='El caudal contra incendios requerido en este nudo para el uso del suelo que atiende, según el código de incendios aplicable o la autoridad de bomberos. Déjelo en blanco para probar el nudo contra el valor del cuadro Caudal contra incendios.';
 $ec_lang['lpn_ff_residual']='Presión residual a mantener';
 $ec_lang['lpn_ff_residual_tip']='La presión que el nudo debe seguir manteniendo mientras entrega el caudal contra incendios. AWWA M31 y NFPA 291 usan 20 psi (140 kPa).';
 $ec_lang['lpn_ff_design']='Verificación de diseño (efecto en el sistema)';
-$ec_lang['lpn_ff_design_tip']='Una pregunta aparte de si el nudo puede entregar el caudal: con ese caudal extraído allí, ¿algo más cae por debajo de su presión mínima o supera su límite de velocidad? Elegir verificarlo no cuesta cálculo adicional.';
+$ec_lang['lpn_ff_design_tip']='Una pregunta aparte de si el nudo puede entregar el caudal: con ese caudal extraído allí, ¿algún otro nudo cae por debajo de su presión mínima o alguna tubería excede su límite de velocidad? Esta verificación no requiere cálculo adicional.';
 $ec_lang['lpn_ff_design_selected']='Seleccionados';
 $ec_lang['lpn_ff_design_all']='Todos';
 $ec_lang['lpn_ff_design_off']='Ninguna';
-$ec_lang['lpn_ff_design_no_selection']='La verificación de diseño está configurada para los elementos seleccionados, y no hay ninguno seleccionado. Seleccione elementos o seleccione la opción Todos.';
+$ec_lang['lpn_ff_design_no_selection']='El alcance de la verificación de diseño está fijado en Seleccionados, pero no hay elementos seleccionados. Seleccione elementos en el mapa o elija Todos.';
 $ec_lang['lpn_ff_minpressure']='Presión mínima permitida en el resto';
 $ec_lang['lpn_ff_minpressure_tip']='Un nudo que cae por debajo de esto mientras otro extrae su caudal contra incendios se reporta como un problema de diseño.';
 $ec_lang['lpn_ff_maxvelocity']='Velocidad máxima permitida';
@@ -3764,7 +3764,7 @@ $ec_lang['lpn_ff_maxvelocity_tip']='Una tubería que funciona por encima de esto
 // for hydrant losses beyond the node."). IT LEADS WITH THE METHOD, NOT WITH THE ABSENCE: Tom read
 // the first wording as "no losses are accounted for at the raw node", which is a hole in the tool
 // rather than the deliberate and standard choice it actually is.
-$ec_lang['lpn_ff_accounting']='El caudal contra incendios se extrae en el nudo mismo. Ese es el método usado aquí, y es el habitual. El hidrante, su tubería lateral y su boquilla no se modelan, así que un hidrante real entrega menos que el caudal mostrado aquí.';
+$ec_lang['lpn_ff_accounting']='La presión se modela en el nudo mismo, el método habitual. El hidrante, su lateral y su boquilla no se modelan, y la presión en la boquilla es menor que en el nodo.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_ff_engine_native']='Esto se calcula con el solucionador incorporado.';
 // Edited by TGH 2026-09-07
@@ -3797,7 +3797,7 @@ $ec_lang['lpn_ff_clear']='Borrar anillos';
 // two failure modes are independent -- a junction can miss its fire flow AND pull its neighbours
 // down -- so these three do not add up to the number of junctions, and that is correct rather than
 // a rounding slip. Said as three separate facts for that reason.
-$ec_lang['lpn_ff_summary']='{clean} nudos no tuvieron ningún problema. {fire} nudos fallaron el caudal contra incendios. {design} nudos afectaron al resto del sistema.';
+$ec_lang['lpn_ff_summary']='{clean} nudos pasaron todas las verificaciones. {fire} nudos no cumplieron el caudal contra incendios. {design} nudos afectaron al resto del sistema.';
 $ec_lang['lpn_ff_summary_error']='{n} nudos no se pudieron resolver.';
 // ONE WIDE TABLE, NOT TWO REPORTS (Tom, 2026-08-30, with a competitor's own table in front of him:
 // "Normally they are kind of wide and they include the information from both tables in one table.")
@@ -3851,7 +3851,7 @@ $ec_lang['lpn_ff_more']='y {n} más afectados';
 // agree with one noun and would have been wrong at the other call site.
 $ec_lang['lpn_ff_rows_more']='Nudos no mostrados: {n}.';
 $ec_lang['lpn_ff_rows_more_links']='Líneas no mostradas: {n}.';
-$ec_lang['lpn_ff_design_none']='Nada en el conjunto elegido salió de sus límites mientras cualquier nudo extraía su caudal contra incendios.';
+$ec_lang['lpn_ff_design_none']='Con el caudal contra incendios de cada nudo probado extraído por turno, nada dentro del alcance de la verificación de diseño falló sus límites.';
 $ec_lang['lpn_ff_design_off_note']='El efecto en el resto del sistema no se verificó en este cálculo.';
 // **WHY IT IS SAID AND NEVER APPLIED, in Tom's words (2026-09-02), and the reason is the MODEL, not
 // the arithmetic:** *"These models are not always fine-grained. They don't represent every pipe,
@@ -3867,7 +3867,7 @@ $ec_lang['lpn_ff_design_off_note']='El efecto en el resto del sistema no se veri
 // ISO credits a single hydrant with at most 1,500 gpm whatever the hydraulics say. Said beside the
 // numbers and never applied to them: a number quietly cut down to a credit limit is a lie with a
 // tidy face.
-$ec_lang['lpn_ff_iso']='La Insurance Services Office (ISO) acredita a un solo hidrante como máximo {flow}. Ese límite de crédito no se aplicó aquí porque no sabemos a cuántos hidrantes puede representar un nodo.';
+$ec_lang['lpn_ff_iso']='La Insurance Services Office (ISO) acredita a un solo hidrante como máximo {flow}. Ese límite no se aplica aquí, porque un nudo puede representar más de un hidrante.';
 // Every way a junction can fail to produce a number is named. None of them is ever shown as a flow
 // of zero: "there is no available fire flow" and "the available fire flow is zero" are different
 // facts, and only the first one is ever true.
@@ -3875,7 +3875,7 @@ $ec_lang['lpn_ff_err_at_rest']='Ya está por debajo de la residual antes de extr
 $ec_lang['lpn_ff_err_converge']='La red no convergió.';
 $ec_lang['lpn_ff_err_solve']='El solucionador reportó un error y no dio ninguna respuesta.';
 $ec_lang['lpn_ff_err_not_junction']='No es un nudo';
-$ec_lang['lpn_ff_err_unknown']='Sin respuesta. El código reportado fue {code}.';
+$ec_lang['lpn_ff_err_unknown']='Sin resultado. Código de error: {code}';
 $ec_lang['lpn_crit_skipped_dead']='Líneas de extremo muerto omitidas: {n}. Cada una aísla todo lo que hay después.';
 $ec_lang['lpn_crit_skipdead_tip']='Una línea de extremo muerto es aquella cuya eliminación aísla nudos a los que solo se llega a través de ella, sin embalse ni depósito más allá. Su pérdida es todo lo que hay después, así que no se resuelve. El resumen dice cuántas se omitieron.';
 $ec_lang['lpn_crit_skipdead']='Omitir extremos muertos';
@@ -3900,7 +3900,7 @@ $ec_lang['lpn_crit_scope_tip']='Todas las tuberías, bombas y válvulas, o solo 
 $ec_lang['lpn_crit_scope']='Líneas a interrumpir';
 $ec_lang['lpn_crit_intro']='Cada elemento se saca de la red por turno, y la red se resuelve en el paso de tiempo que se ve en pantalla, en el escenario activo. No se cambia nada en su proyecto; toda la ejecución se hace en una copia.';
 $ec_lang['lpn_crit_title']='Análisis de criticidad';
-$ec_lang['lpn_crit_menu_tip']='Saque de la red, uno por uno, cada tubería, bomba y válvula, y vea qué pierde el sistema.';
+$ec_lang['lpn_crit_menu_tip']='Quite de la red, uno por uno, cada tubería, bomba y válvula, e informe el efecto sobre el sistema.';
 $ec_lang['lpn_crit_menu']='Análisis de criticidad…';
 
 // ---- Settings > New assets > Import surveyed points: CSV and GPX (ROADMAP Task 592) -----------
@@ -3919,7 +3919,7 @@ $ec_lang['lpn_crit_menu']='Análisis de criticidad…';
 // cannot tell a mistake from a place; a file of eastings and northings is refused by name, because
 // a plane coordinate read as a degree is silent and puts a network in the Gulf of Guinea.
 $ec_lang['lpn_file_import_survey']='Importar puntos topográficos…';
-$ec_lang['lpn_file_import_survey_tip']='Lee una lista de puntos topográficos de un archivo de texto y crea un nudo en cada punto, tomando los ajustes de elemento nuevo para todo lo que el archivo no indique. No se dibuja ninguna tubería, y ninguna fila se descarta jamás sin nombrarla. Lee el sistema de coordenadas que este proyecto ya usa, esté georreferenciado o no.';
+$ec_lang['lpn_file_import_survey_tip']='Lee una lista de puntos topográficos de un archivo de texto y crea un nudo en cada punto, tomando los ajustes de elemento nuevo para todo lo que el archivo no indique. No se dibuja ninguna tubería a menos que marque Leer la descripción como códigos de campo, y ninguna fila se descarta sin ser nombrada. Lee el sistema de coordenadas que este proyecto ya usa, esté georreferenciado o no.';
 $ec_lang['lpn_survey_read_error']='Ese archivo no se pudo leer de su disco.';
 $ec_lang['lpn_survey_cancelled']='No se creó nada y no se cambió nada.';
 // What the project calls its two axes, for a sentence js/lpn-survey.js writes about a column. The
@@ -3930,7 +3930,7 @@ $ec_lang['lpn_survey_axis_east']='Este';
 // A column in a file that states no names of its own. Counted from 1, the way a spreadsheet does.
 $ec_lang['lpn_survey_err_empty']='Ese archivo no tiene nada.';
 $ec_lang['lpn_survey_err_unreadable']='Ese archivo no se pudo leer como una lista de puntos topográficos.';
-$ec_lang['lpn_survey_err_ambiguous_coord']='Más de una columna de ese archivo podría ser el {axis} ({detail}), y esta página no elegirá entre ellas. Deje una de ellas nombrada como el {axis} e inténtelo de nuevo.';
+$ec_lang['lpn_survey_err_ambiguous_coord']='Más de una columna de ese archivo podría ser el {axis} ({detail}), y esta página no elige entre ellas. Deje solo una de ellas nombrada como el {axis} e inténtelo de nuevo.';
 $ec_lang['lpn_survey_err_no_points']='Ni una sola fila de ese archivo se pudo leer como un punto topográfico. Filas leídas: {detail}';
 // THE FILE FORMAT CHOOSER (Tom, 2026-09-17: "We will need to include a file format chooser
 // (PNEZD, PENZD, or whatever format is useful for Declan."). PNEZD and PENZD are the same five
@@ -3955,7 +3955,7 @@ $ec_lang['lpn_survey_confirm_tank']='Se encontraron {n} depósito(s). ¿Continua
 $ec_lang['lpn_survey_report_junction']='{n} nudo(s) importado(s), {m} con elevación.';
 $ec_lang['lpn_survey_report_reservoir']='{n} embalse(s) importado(s), {m} con elevación.';
 $ec_lang['lpn_survey_report_tank']='{n} depósito(s) importado(s), {m} con elevación.';
-$ec_lang['lpn_survey_report_clean']='Todos los puntos del archivo se importaron, y nada se cambió al hacerlo.';
+$ec_lang['lpn_survey_report_clean']='Todos los puntos del archivo se importaron sin cambios.';
 $ec_lang['lpn_survey_report_notes']='Errores y notas de importación:';
 $ec_lang['lpn_survey_sev_error']='error';
 $ec_lang['lpn_survey_sev_warning']='advertencia';
@@ -3970,3 +3970,227 @@ $ec_lang['lpn_survey_note_blank_rows']='Líneas en blanco omitidas: {detail}.';
 $ec_lang['lpn_survey_note_id_duplicate']='Nombre ya usado antes en este archivo, se asignó un nombre nuevo.';
 $ec_lang['lpn_survey_note_id_taken']='Nombre ya existente en el proyecto, se asignó un nombre nuevo.';
 $ec_lang['lpn_survey_note_id_invalid']='Nombre no se puede usar aquí, se asignó un nombre nuevo.';
+$ec_lang['points_data_msg_line']='No se pegó nada. La línea {n} no se pudo leer como una estación y una elevación.';
+$ec_lang['points_data_msg_none']='No se pegó nada. No se encontraron pares de estación y elevación.';
+$ec_lang['lpn_tool_add_chain']='Cadena de nudos y tuberías';
+$ec_lang['lpn_pane_delete_element']='Eliminar elemento';
+$ec_lang['lpn_pane_delete_elements']='Eliminar elementos';
+$ec_lang['lpn_pane_sort_desc']='Ordenar de forma descendente';
+$ec_lang['lpn_pane_manage_cols_width']='Ancho (em)';
+$ec_lang['lpn_pane_width_tip']='Los anchos de columna se guardan en este navegador, no en el proyecto. Haga doble clic en el divisor de una columna para restaurar el ancho predeterminado.';
+$ec_lang['lpn_dock_left']='Acoplar a la izquierda del mapa';
+$ec_lang['lpn_dock_right']='Acoplar a la derecha del mapa';
+$ec_lang['lpn_dock_float']='Flotante';
+$ec_lang['lpn_dock_autohide']='Ocultar automáticamente';
+$ec_lang['lpn_popup_none']='No hay nada seleccionado. Seleccione un elemento del mapa para ver sus propiedades.';
+$ec_lang['lpn_hotkeys_snip_heading']='Captura de pantalla';
+$ec_lang['lpn_hotkeys_snip_term']='Atajos de teclado de la captura de pantalla';
+$ec_lang['lpn_hotkeys_snip_def']='<table class="lpn-notes-table"><tbody><tr><td>S</td><td>Recortar, mientras Captura de pantalla está abierta.</td></tr><tr><td>E</td><td>Borrador, en la vista de marcado.</td></tr><tr><td>Ctrl+Z, Ctrl+Y</td><td>Deshacer y rehacer, en la vista de marcado.</td></tr><tr><td>Esc</td><td>Cancelar un recorte, o salir del borrador. En la vista de marcado, ciérrela cuando no haya nada dibujado.</td></tr></tbody></table>';
+$ec_lang['lpn_fb_intro']='Mensajes predefinidos (opcional). No se envía nada hasta que presione Enviar.';
+$ec_lang['lpn_fb_pick_numbers']='Los números parecen incorrectos';
+$ec_lang['lpn_fb_pick_broken']='Algo no funcionó';
+$ec_lang['lpn_fb_pick_wording']='La redacción o la traducción es incorrecta';
+$ec_lang['lpn_fb_pick_confusing']='Esto resulta confuso';
+$ec_lang['lpn_fb_comment']='Comentarios (opcional)';
+$ec_lang['lpn_fb_email']='Correo electrónico (opcional, solo si desea una respuesta)';
+$ec_lang['lpn_fb_sends']='Qué se envía: el nombre de esta página, su idioma, la versión del sitio, el código del mensaje del mapa si hay uno, y lo que usted eligió o escribió. Nunca su dibujo ni su red. Su dirección de correo electrónico se usa solo para responderle.';
+$ec_lang['lpn_fb_send']='Enviar';
+$ec_lang['lpn_fb_sending']='Enviando…';
+$ec_lang['lpn_fb_failed']='El mensaje no nos llegó. Lo que escribió sigue aquí, así que puede intentarlo de nuevo.';
+$ec_lang['lpn_fb_bad_email']='Esa dirección de correo electrónico no parece correcta. Corríjala o déjela vacía.';
+$ec_lang['lpn_fb_busy']='Han llegado demasiados mensajes en los últimos minutos. Lo que escribió sigue aquí, así que puede intentarlo más tarde.';
+$ec_lang['lpn_tool_add_chain_tip']='Encadene nudos y tuberías: especifique un punto del mapa para agregar un nudo, luego especifique cada punto siguiente para agregar una tubería y un nudo. Especifique un nodo existente para continuar desde él. Presione Esc para terminar la cadena.';
+$ec_lang['lpn_pane_filter_sel_note']='Solo la selección. Se muestran {n} de {all}.';
+$ec_lang['lpn_pane_filter_sel_and']='Filtrado por {q} y solo la selección. Se muestran {n} de {all}.';
+$ec_lang['lpn_pane_filter_sel_none']='Ninguno de los elementos seleccionados está en esta tabla.';
+$ec_lang['lpn_pane_sel_only']='Solo la selección';
+$ec_lang['lpn_pane_sel_only_none']='No hay elementos seleccionados. Primero seleccione elementos en el mapa.';
+$ec_lang['lpn_pane_scn_show']='Mostrar escenarios';
+$ec_lang['lpn_pane_clear_override']='Borrar valor del escenario';
+$ec_lang['lpn_pane_scn_alt_tip']='{category}, alternativa: {alternative}';
+$ec_lang['lpn_change_type_menu']='Cambiar tipo';
+$ec_lang['lpn_change_type_tip']='Cambie los nodos seleccionados a nudos, embalses o depósitos, o las líneas seleccionadas a tuberías, bombas o válvulas. Cada uno conserva su ID, su posición, sus conexiones y todo valor que el nuevo tipo también tenga. Si se fuera a perder algo, se le pregunta antes.';
+$ec_lang['lpn_change_type_ok']='Cambiar';
+$ec_lang['lpn_change_type_lost']='Se perderán estos valores:';
+$ec_lang['lpn_change_type_key']='ID: entrada perdida';
+$ec_lang['lpn_change_type_line']='{id}: {property} {value}';
+$ec_lang['lpn_change_type_line_scenario']='{id}: {property} {value}, en el escenario {scenario}';
+$ec_lang['lpn_change_type_more']='Y {n} más.';
+$ec_lang['lpn_change_type_surface']='Estos conservan la superficie del agua donde estaba. La carga de un embalse es la elevación del depósito más su profundidad de agua, y la profundidad de agua de un depósito es la carga del embalse menos su elevación:';
+$ec_lang['lpn_change_type_meaning']='Estos controles y reglas evalúan un nodo que se está cambiando, y lo leerán de otra forma: un nudo se evalúa por su presión, y un depósito o embalse por su nivel de agua.';
+$ec_lang['lpn_change_type_born']='Estos valores son nuevos, fijados como en un elemento recién dibujado:';
+$ec_lang['lpn_change_type_no_curve']='{id}: sin curva de carga de la bomba, así que la bomba no agrega carga hasta que se seleccione una, y una exportación .inp la escribe como una tubería';
+$ec_lang['lpn_change_type_becomes']='{id}: {property} {value}, en el escenario {scenario}, pasa a {new}';
+$ec_lang['lpn_change_type_customers']='Solo una tubería atiende clientes, así que estos clientes se conectan en su lugar al nodo que se muestra entre paréntesis, donde su demanda ya está aplicada. Permanecen donde están dibujados, y su demanda no cambia:';
+$ec_lang['lpn_change_type_setting']='Estos controles y reglas asignan o evalúan el ajuste de una línea que se está cambiando. Un ajuste es una magnitud distinta en una tubería, una bomba y una válvula, así que lo leerán de otra forma:';
+$ec_lang['lpn_change_type_rules']='Estas líneas de reglas nombran una línea por su clase, y pasarán a nombrar su nueva clase:';
+$ec_lang['lpn_find_scope_source']='Fuente';
+$ec_lang['lpn_find_source_no_chemical']='No se está rastreando ningún producto químico, así que ningún nodo tiene una fuente.';
+$ec_lang['lpn_profile_open']='Abrir archivo de perfil de EPANET…';
+$ec_lang['lpn_profile_file_done']='Perfil leído del archivo: se encontraron {used} de {total} nodos en esta red.';
+$ec_lang['lpn_profile_file_missing']='Nombrados en el archivo pero no en esta red: {ids}.';
+$ec_lang['lpn_profile_file_short']='El archivo nombra menos de dos nodos de esta red, así que no hay perfil que dibujar.';
+$ec_lang['lpn_pgraph_none']='Este elemento no tiene resultados en la ejecución actual.';
+$ec_lang['lpn_pgraph_source_share_from']='Aporte de origen desde {node}';
+$ec_lang['lpn_result_pump_head']='Carga';
+$ec_lang['lpn_result_pump_head_tip']='La carga que la bomba agrega de la succión a la descarga, mostrada como número positivo. El solucionador y los archivos de EPANET la manejan como una pérdida de carga negativa.';
+$ec_lang['lpn_report_pump_head']='Carga de la bomba';
+$ec_lang['lpn_contour_show']='Mostrar isolíneas';
+$ec_lang['lpn_contour_show_tip']='Desmarque para ocultar el relleno y las isolíneas; marque para recuperarlos como estaban. Los colores de los nodos se mantienen.';
+$ec_lang['lpn_sysflow_title']='Balance de caudales';
+$ec_lang['lpn_crs_suggested_mark']='(sugerido)';
+$ec_lang['lpn_file_export_menu']='Exportar…';
+$ec_lang['lpn_file_export_item_inp']='Archivo de EPANET…';
+$ec_lang['lpn_file_export_item_geojson']='Archivo GeoJSON…';
+$ec_lang['lpn_status_inp_exported_picture']='Se exportó {zip}, que contiene el archivo de EPANET {file}, su imagen de fondo {picture} y el archivo de mundo {world}. Extraiga los tres a una misma carpeta y luego abra allí el .inp en EPANET; la imagen se carga con él.';
+$ec_lang['lpn_status_inp_exported_no_picture']='Se exportó {file}. No se pudo guardar la imagen de fondo, así que el .inp no nombra ninguna; en EPANET, agréguela con Ver > Fondo > Cargar.';
+$ec_lang['lpn_inp_export_difference_one']='Un elemento que el formato .inp no puede contener.';
+$ec_lang['lpn_file_export_geojson_tip']='Descargue esta red como archivo GeoJSON para QGIS, ArcGIS Pro y otros programas SIG. Los nudos, depósitos y embalses son puntos, y las tuberías, bombas y válvulas son líneas que siguen sus vértices. Las posiciones son latitud y longitud. Los resultados se incluyen solo cuando la red se ha resuelto.';
+$ec_lang['lpn_geojson_refused_local']='Un archivo GeoJSON contiene solo latitud y longitud, y este proyecto está dibujado en una cuadrícula local sin ubicación en la Tierra. Primero georreferencie el proyecto con Mapa, Mapa mundial, Adjuntar, y luego exporte de nuevo.';
+$ec_lang['lpn_geojson_refused_range']='Estas posiciones no son latitudes y longitudes válidas: {detail}';
+$ec_lang['lpn_geojson_refused_crs']='Esta página no reconoce el sistema de coordenadas de este proyecto ({detail}), así que sus posiciones no se pueden convertir a latitud y longitud. Use Convertir como… para copiar el proyecto a un sistema que esta página reconozca, y luego exporte de nuevo.';
+$ec_lang['lpn_geojson_refused_empty']='Todavía no hay nada que exportar. Primero dibuje o abra una red.';
+$ec_lang['lpn_geojson_results_in']='Se incluyen los resultados que se muestran en pantalla.';
+$ec_lang['lpn_geojson_results_out']='No se incluyen resultados, porque la red no está resuelta.';
+$ec_lang['lpn_inp_backdrop_attach']='Adjuntar {file}…';
+$ec_lang['lpn_inp_backdrop_attach_tip']='Una página web no puede abrir la imagen por su nombre. Elíjala en su dispositivo y se coloca donde el archivo indica que va.';
+$ec_lang['lpn_inp_backdrop_attached']='Se adjuntó {file}. Se colocó donde el archivo indica que va.';
+$ec_lang['lpn_inp_backdrop_attached_other']='Se adjuntó {picked}. Se colocó donde el archivo indica que va. El archivo nombra {file}, que es un nombre distinto.';
+$ec_lang['lpn_copy_opened_unsaved']='Se abrió {file} como copia, con un bloqueo nuevo que se guardará con el próximo guardado del archivo.';
+$ec_lang['lpn_engine_unavailable_why']='Las válvulas de control de presión y caudal (PRV, PSV, FCV) no se pueden resolver sin el solucionador de EPANET. {reason}';
+$ec_lang['lpn_engine_needed_failed_why']='Esta red solo se puede resolver con el solucionador de EPANET. {reason}';
+$ec_lang['lpn_mode_add_chain']='Modo: Cadena de nudos y tuberías. Especifique un punto del mapa para agregar un nudo, luego especifique cada punto siguiente para agregar una tubería y un nudo. Especifique un nodo existente para continuar desde él. Presione Esc para terminar la cadena. Cambie al modo Selección para cambiar o mover elementos y etiquetas.';
+$ec_lang['lpn_cp_allow_tip']='Permitir solo estos caracteres:';
+$ec_lang['lpn_cp_characters_tip']='"@" significa cualquier letra; "#" significa cualquier dígito numérico, y debe enumerar por separado "-", "." y "," si se permiten; y cualquier carácter de espacio en blanco debe estar entre otros caracteres.';
+$ec_lang['lpn_valwarn_diameter']='El diámetro de una tubería o válvula normalmente está entre {min} y {max} {unit}. Revise el número y la unidad de diámetro.';
+$ec_lang['lpn_valwarn_hw']='La C de Hazen-Williams normalmente está entre {min} y {max}. Un número fuera de ese intervalo suele ser una rugosidad pensada para otro método de fricción.';
+$ec_lang['lpn_valwarn_manning']='La n de Manning normalmente está entre {min} y {max}. Un número fuera de ese intervalo suele ser una rugosidad pensada para otro método de fricción.';
+$ec_lang['lpn_valwarn_dw']='La rugosidad de Darcy-Weisbach normalmente es mayor que 0 y como máximo {max} {unit}. Un número mayor suele ser una C de Hazen-Williams o una n de Manning.';
+$ec_lang['lpn_valwarn_positive']='EPANET no acepta cero ni un número negativo aquí.';
+$ec_lang['lpn_valwarn_negative']='EPANET no acepta un número negativo aquí.';
+$ec_lang['lpn_valwarn_tank_levels']='EPANET no acepta este depósito. La profundidad de agua mínima no debe exceder la profundidad de agua, y la profundidad de agua no debe exceder la profundidad de agua máxima.';
+$ec_lang['lpn_alt_calc_options']='Opciones de cálculo';
+$ec_lang['lpn_scenario_duration_tip']='Déjelo en blanco para heredar del padre. Un tiempo total de simulación de 0:00 es una simulación en régimen permanente.';
+$ec_lang['lpn_scenario_hyd_step_tip']='Déjelo en blanco para heredar del padre.';
+$ec_lang['lpn_time_scn_overrides']='Valores propios del escenario:';
+$ec_lang['lpn_scenario_preset_mult_tip']='Multiplicador de demanda de {mult} veces el día promedio, un valor provisional. La mayoría de los sistemas se ubica entre {lo} y {hi} (National Research Council, 2006). Fije el valor para el sistema que se modela en Configuración, Cálculo, Hidráulica, Multiplicador de demanda.';
+$ec_lang['lpn_engine_failed_why']='{reason} Se muestra el solucionador incorporado en su lugar.';
+$ec_lang['lpn_settings_basemap_style']='Estilo del mapa base';
+$ec_lang['lpn_basemap_style_normal']='Normal';
+$ec_lang['lpn_basemap_style_muted']='Atenuado';
+$ec_lang['lpn_basemap_style_faded']='Desvanecido';
+$ec_lang['lpn_basemap_style_grayscale']='Escala de grises';
+$ec_lang['lpn_time_statistic']='Estadístico';
+$ec_lang['lpn_time_stat_none']='Ninguno';
+$ec_lang['lpn_time_stat_averaged']='Prom.';
+$ec_lang['lpn_time_stat_minimum']='Mín.';
+$ec_lang['lpn_time_stat_maximum']='Máx.';
+$ec_lang['lpn_time_stat_range']='Rango';
+$ec_lang['lpn_time_no_engine_why']='El solucionador incorporado resuelve un instante a la vez, así que esto es la red solo en {time}: cada patrón se lee en ese instante, y cada depósito permanece en su nivel inicial en lugar de llenarse y vaciarse. {reason}';
+$ec_lang['lpn_time_engine_fetch_failed']='Falló la descarga del solucionador de EPANET. Recargue la página para intentarlo de nuevo; un cortafuegos, un proxy o una extensión del navegador podría estar bloqueándola.';
+$ec_lang['lpn_time_engine_start_failed']='El navegador rechazó iniciar el solucionador de EPANET. Es posible que WebAssembly esté desactivado por una configuración de seguridad o una extensión.';
+$ec_lang['lpn_time_engine_run_failed']='Falló la ejecución de EPANET. Eso es un defecto de esta página; use el enlace {wrong} para informarlo.';
+$ec_lang['lpn_saved_project']='Guardado con el proyecto';
+$ec_lang['lpn_saved_browser']='Guardado en este navegador';
+$ec_lang['lpn_saved_session']='No guardado';
+$ec_lang['lpn_scncmp_at_time']='{value} en {id}, {time}';
+$ec_lang['lpn_scncmp_same']='Igual en todos los escenarios';
+$ec_lang['lpn_scncmp_period_note']='Cuando un escenario tiene un tiempo total de simulación, su presión más baja y su velocidad más alta son los extremos de toda la red, en el momento mostrado.';
+$ec_lang['lpn_choice_default']='Predeterminado';
+$ec_lang['lpn_ds_menu']='Escalado de demanda…';
+$ec_lang['lpn_ds_menu_tip']='Multiplique las demandas en una copia de la red y vea las presiones y velocidades, o encuentre la mayor escala de demanda que el sistema puede soportar.';
+$ec_lang['lpn_ds_title']='Escalado de demanda';
+$ec_lang['lpn_ds_intro']='Seleccione el botón Ejecutar para multiplicar las demandas en los nudos elegidos por la escala de demanda y ver las presiones y velocidades.\n\nSeleccione el botón Buscar para encontrar la mayor escala de demanda, con aproximación de {step}, con la que todos estos nudos mantienen al menos la presión mínima permitida; la búsqueda va de 0 a {max}.\n\nAmbos trabajan sobre una copia de la red, resuelta en el paso de tiempo que se muestra en pantalla en el escenario activo, así que nada de su proyecto cambia. Solo se escala ese paso de tiempo, y los niveles y estados se toman de él; para probar el punto máximo, mueva el reloj a la demanda máxima antes de ejecutar.';
+$ec_lang['lpn_ds_scope']='Nudos a escalar';
+$ec_lang['lpn_ds_scope_all']='Todos los nudos';
+$ec_lang['lpn_ds_scope_selected']='Nudos seleccionados';
+$ec_lang['lpn_ds_minpressure']='Presión mínima permitida';
+$ec_lang['lpn_ds_minpressure_tip']='Es el mismo número que Presión mínima permitida en el resto de Caudal contra incendios. Al cambiarlo aquí, cambia allá.';
+$ec_lang['lpn_ds_head_scale']='Escalar las demandas';
+$ec_lang['lpn_ds_multiplier']='Escala de demanda';
+$ec_lang['lpn_ds_multiplier_tip']='El factor por el que se multiplica cada demanda; 1,5 es un aumento de 50%. Se aplica además del multiplicador de demanda del escenario activo, que ya está en las demandas, y nunca se guarda en el proyecto.';
+$ec_lang['lpn_ds_run']='Ejecutar';
+$ec_lang['lpn_ds_head_search']='¿Qué escala de demanda puede soportar el sistema?';
+$ec_lang['lpn_ds_head_search_selected']='¿Qué escala de demanda pueden soportar estos nudos?';
+$ec_lang['lpn_ds_outside_below']='Con una escala de demanda de {m}, nudos no seleccionados por debajo de {pressure}: {n} ({ids}). No limitan este resultado.';
+$ec_lang['lpn_ds_holds_max']='✓ Todos los nudos mantienen {pressure} hasta una escala de demanda de {max}, el límite superior de la búsqueda.';
+$ec_lang['lpn_ds_below_zero']='⚠ Al menos un nudo está por debajo de {pressure} aun con las demandas escaladas en cero.';
+$ec_lang['lpn_ds_found']='✓ Todos los nudos revisados mantienen al menos {pressure} hasta una escala de demanda de {m}.';
+$ec_lang['lpn_ds_found_below']='⚠ Al menos un nudo está por debajo de {pressure} sin escalar la demanda. La mayor escala de demanda que mantiene todos los nudos en {pressure} o más es {m}.';
+$ec_lang['lpn_ds_search_stopped']='La búsqueda se detuvo antes de encontrar un resultado.';
+$ec_lang['lpn_ds_lowest_at']='Con una escala de demanda de {m}, la presión más baja es {pressure}, en el nudo {id}.';
+$ec_lang['lpn_ds_nosolve_at']='Con una escala de demanda de {m}, la red no produjo resultado. {reason}';
+$ec_lang['lpn_ds_scale_ok']='✓ Con una escala de demanda de {m}, todos los nudos mantienen {pressure}.';
+$ec_lang['lpn_ds_scale_below']='⚠ Con una escala de demanda de {m}, nudos por debajo de {pressure}: {n}.';
+$ec_lang['lpn_ds_scaled_selected']='Nudos escalados y revisados: {n}.';
+$ec_lang['lpn_ds_head_lowest']='Presiones más bajas';
+$ec_lang['lpn_ds_head_velocity']='Velocidades más altas';
+$ec_lang['lpn_ds_col_link']='Línea';
+$ec_lang['lpn_ds_col_scaled']='Escalado';
+$ec_lang['lpn_ds_col_scaled_tip']='Con las demandas multiplicadas por la escala de demanda.';
+$ec_lang['lpn_ds_col_unscaled']='Sin escalar';
+$ec_lang['lpn_ds_col_unscaled_tip']='Con las demandas tal como están en el escenario activo en este paso de tiempo, el mismo valor que muestra el mapa.';
+$ec_lang['lpn_ds_no_junctions']='Este proyecto todavía no tiene nudos, así que no hay demandas que escalar.';
+$ec_lang['lpn_ds_no_selection']='No hay nudos seleccionados. Seleccione nudos o elija Todos los nudos.';
+$ec_lang['lpn_ds_skipped']='Elementos seleccionados que no son nudos, dejados como están: {n}.';
+$ec_lang['lpn_ds_bad_multiplier']='Ingrese una escala de demanda de cero o más, como 1,5.';
+$ec_lang['lpn_ds_stale']='El dibujo cambió, así que se borraron los resultados del escalado de demanda. Vuelva a ejecutarlo.';
+$ec_lang['lpn_analyze_at_time']='Paso de tiempo: {time}.';
+$ec_lang['lpn_analyze_time_moved']='⚠ Esto se calculó en {time}, y el reloj está ahora en {now}. Vuelva a ejecutarlo para el paso de tiempo que se muestra en pantalla.';
+$ec_lang['lpn_survey_codes_toggle']='Leer la descripción como códigos de campo';
+$ec_lang['lpn_survey_codes_tip']='Lea la primera palabra de cada descripción como un código de la tabla. Los puntos con el mismo código de línea se unen en una tubería, en el orden del archivo, y WL1 y WL2 son líneas distintas. +0 inicia una línea, -0 la termina y CLO la cierra. JPN seguido del nombre de un punto se une a ese punto (Carlson), y Civil 3D lo escribe CPN.';
+$ec_lang['lpn_survey_codes_col_code']='Código';
+$ec_lang['lpn_survey_codes_col_type']='Tipo de elemento';
+$ec_lang['lpn_survey_codes_add']='Agregar código';
+$ec_lang['lpn_survey_codes_remove']='Quitar código';
+$ec_lang['lpn_survey_confirm_coded']='Se encontraron {j} nudo(s), {r} embalse(s), {t} depósito(s) y {p} tubería(s). ¿Continuar?';
+$ec_lang['lpn_survey_report_coded']='Se importaron {j} nudo(s), {r} embalse(s), {t} depósito(s) y {p} tubería(s), {m} de los nodos con elevación.';
+$ec_lang['lpn_survey_note_code_unknown']='Código que no está en la tabla de códigos, importado como el tipo de elemento elegido arriba.';
+$ec_lang['lpn_survey_note_code_two_nodes']='Hay más de un código de nodo, se usó el primero.';
+$ec_lang['lpn_survey_note_code_unread']='No todas las palabras son códigos que esta página lee, se conservaron en la descripción.';
+$ec_lang['lpn_survey_note_vertex_text']='No todas las palabras son códigos que esta página lee, y un vértice no conserva descripción.';
+$ec_lang['lpn_survey_note_join_missing']='JPN o CPN nombra un punto que no está en este archivo ni en el proyecto, no se dibujó tubería para él.';
+$ec_lang['lpn_survey_note_join_no_line']='JPN o CPN en un punto sin código de línea, no se dibujó tubería para él.';
+$ec_lang['lpn_survey_note_pipe_one_node']='Esta línea vuelve al mismo nodo sin otro nodo en medio, no se dibujó tubería para ella.';
+$ec_lang['lpn_survey_note_line_one_point']='Único punto de su línea, no se dibujó tubería desde él.';
+$ec_lang['lpn_survey_note_vertices']='Puntos que pasaron a ser vértices de tubería: {detail}. Un vértice no conserva nombre, elevación ni descripción.';
+$ec_lang['lpn_survey_note_no_desc']='Los códigos de campo están activados, pero este archivo no tiene columna de descripción, así que no se leyó ningún código.';
+$ec_lang['lpn_survey_note_ring_junction']='Este punto pasó a ser un nudo para que el anillo pudiera cerrarse.';
+$ec_lang['lpn_survey_note_pipe_zero_length']='Este punto está en el mismo lugar que el nodo anterior, así que la tubería entre ellos no tiene longitud.';
+$ec_lang['lpn_survey_note_node_on_pipe']='Este punto está exactamente sobre una tubería a la que no está unido. Si están conectados, agregue JPN para indicarlo.';
+$ec_lang['lpn_settings_demand_model']='Modelo de demanda';
+$ec_lang['lpn_settings_demand_model_tip']='Elija cómo reciben caudal los nudos. En el modelo impulsado por la demanda (DDA), cada demanda se entrega completa, sea cual sea la presión. En el modelo impulsado por la presión (PDA), se entrega menos que la demanda donde la presión es inferior a la presión requerida, y solo el solucionador de EPANET lo calcula.';
+$ec_lang['lpn_settings_demand_model_dda']='Impulsado por la demanda';
+$ec_lang['lpn_settings_demand_model_pda']='Impulsado por la presión';
+$ec_lang['lpn_settings_min_pressure']='Presión mínima';
+$ec_lang['lpn_settings_min_pressure_tip']='Ingrese la presión igual o inferior a la cual un nudo no recibe caudal. Use la unidad de presión de este proyecto.';
+$ec_lang['lpn_settings_req_pressure']='Presión requerida';
+$ec_lang['lpn_settings_req_pressure_tip']='Ingrese la presión igual o superior a la cual un nudo recibe su demanda completa. Debe ser mayor que la presión mínima. Use la unidad de presión de este proyecto. Déjela en blanco para usar el valor predeterminado de EPANET, que está en psi para unidades de caudal de EE. UU. y en metros en los demás casos.';
+$ec_lang['lpn_settings_pressure_exponent']='Exponente de presión';
+$ec_lang['lpn_settings_pressure_exponent_tip']='Ingrese el exponente de la curva que sube desde caudal nulo a la presión mínima hasta la demanda completa a la presión requerida.';
+$ec_lang['lpn_engine_pda_route']='Resuelto con el solucionador de EPANET, porque el modelo de demanda es impulsado por la presión.';
+$ec_lang['lpn_diag_pda_needs_epanet']='El modelo de demanda es impulsado por la presión, y solo el solucionador de EPANET puede calcularlo. No se pudo cargar el solucionador de EPANET, así que faltan estos resultados.';
+$ec_lang['lpn_result_delivered_demand']='Demanda entregada';
+$ec_lang['lpn_result_delivered_demand_tip']='El caudal que este nudo recibe realmente con el modelo de demanda impulsado por la presión. Es menor que la demanda cuando la presión es inferior a la presión requerida.';
+$ec_lang['lpn_result_demand_deficit']='Déficit de demanda';
+$ec_lang['lpn_result_demand_deficit_tip']='La parte de la demanda de este nudo que no se entrega, porque la presión es inferior a la presión requerida.';
+$ec_lang['lpn_pda_deficit_note']='Nudos que reciben menos que su demanda: {n}.';
+$ec_lang['lpn_diag_pda_pressures']='La presión requerida debe ser mayor que la presión mínima. Cambie una de ellas en Configuración.';
+$ec_lang['lpn_inp_drop_pressure_unit']='Este archivo indica una unidad de presión distinta de la que esta página lee para su unidad de caudal, que es psi para unidades de EE. UU. y metros en los demás casos. Toda presión del archivo se lee así, por lo que debe revisar los ajustes de válvulas, los emisores y los límites del modelo impulsado por la presión que contiene. La línea se conserva y se vuelve a escribir.';
+$ec_lang['lpn_screenshot_menu']='Captura de pantalla';
+$ec_lang['lpn_screenshot_tip']='Copie una imagen más nítida que la pantalla del área del mapa que arrastre, lista para pegar en un informe. Haga clic sin arrastrar para tomar el mapa completo.';
+$ec_lang['lpn_screenshot_hint']='Arrastre un rectángulo sobre el mapa, o haga clic para tomar el mapa completo. Esc cancela.';
+$ec_lang['lpn_screenshot_copied']='Captura de pantalla copiada.';
+$ec_lang['lpn_screenshot_saved']='El portapapeles no está disponible aquí, así que la captura de pantalla se descargó como archivo PNG.';
+$ec_lang['lpn_screenshot_no_basemap']='No se pudo incluir el mapa de calles ni la imagen satelital.';
+$ec_lang['lpn_screenshot_failed']='No se pudo hacer la captura de pantalla.';
+$ec_lang['lpn_snip_hint_free']='Arrastre alrededor del área que desea recortar, o haga clic para tomar el mapa completo. Esc cancela.';
+$ec_lang['lpn_snip_tip_rect']='Recortar un rectángulo (S)';
+$ec_lang['lpn_snip_tip_free']='Recortar una forma libre (S)';
+$ec_lang['lpn_snip_tip_mode']='Forma del recorte';
+$ec_lang['lpn_snip_tip_map']='Captura de pantalla del mapa completo';
+$ec_lang['lpn_snip_tip_pen']='Lápiz';
+$ec_lang['lpn_snip_tip_eraser']='Borrador: haga clic en un trazo para quitarlo (E)';
+$ec_lang['lpn_snip_tip_undo']='Deshacer (Ctrl+Z)';
+$ec_lang['lpn_snip_tip_redo']='Rehacer (Ctrl+Y)';
+$ec_lang['lpn_screenshot_scale_tip']='El tamaño de la imagen como múltiplo del área en pantalla. Una escala mayor es más nítida y produce un archivo más grande.';

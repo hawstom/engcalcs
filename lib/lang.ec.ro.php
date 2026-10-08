@@ -442,14 +442,14 @@ $ec_lang['install_desktop_heading']='Computer (Chrome / Edge)';
 // Edited by TGH 2026-09-07
 $ec_lang['install_desktop_steps_html']='<li>Deschideți orice pagină de calculator.</li><li>Faceți clic pe <strong>pictograma de instalare</strong> (⊕ sau pictograma unui computer) din bara de adrese a browserului sau deschideți meniul browserului și alegeți <strong>Instalare EngCalcs…</strong></li><li>Faceți clic pe <strong>Instalare</strong>. EngCalcs se deschide ca o aplicație independentă.</li>';
 $ec_lang['install_firefox_heading']='Firefox / Alte browsere';
-$ec_lang['install_firefox_body']='Dacă browserul dvs. nu oferă o opțiune de instalare, nu se pierde nimic: folosiți calculatoarele normal în browser, iar după prima vizită paginile sunt stocate automat în cache pentru utilizare offline. Cazul obișnuit este Firefox pe desktop.';
+$ec_lang['install_firefox_body']='Dacă browserul nu oferă o opțiune de instalare, folosiți calculatoarele în browser ca de obicei. După prima vizită, paginile sunt stocate automat în cache pentru utilizare offline. Firefox pe desktop este cazul obișnuit.';
 $ec_lang['install_cached_heading']='Ce este salvat în memoria cache';
 $ec_lang['install_cached_body']='La prima instalare a EngCalcs, toate paginile calculatoarelor și fișierele lor suport (scripturi, stiluri) sunt salvate automat pe dispozitivul dvs. După aceea, totul funcționează fără conexiune la internet. Limba aleasă este reținută de la ultima vizită online.';
 $ec_lang['contact_main_menu']='Contacteaza';
 $ec_lang['about_main_title']='Despre calculatoarele de inginerie HawsEDC';
 $ec_lang['about_main_desc']='Misiune, software liber și contribuții';
 // Edited by TGH 2026-09-07
-$ec_lang['about_body_html']='<h3>Misiune</h3><p>Calculatoarele de Inginerie HawsEDC sunt oferite gratuit online din 2010. Ele există pentru a servi ingineri și muncitori de teren din întreaga lume — în special cei care lucrează în regiuni cu deficit de apă, resurse limitate sau insuficient deservite. Aceste instrumente fac parte dintr-o misiune umanitară mai amplă: să spună fiecărui om în cel mai practic și eficient mod posibil <a target="_blank" href="https://tomsthird.blogspot.com/2026/10/why-engineering-calculator-needs-to.html">că este iubit și prețuit pentru totdeauna, că nu are nimic de care să se teamă și că nu va ruina totul</a>.</p><p>Calculatoarele sunt vehiculul. Destinația este o lume fără suferință.</p><h3>Licență de software liber și cu sursă deschisă</h3><p>Tot codul este publicat sub <a target="_blank" href="https://www.gnu.org/licenses/gpl-3.0.html">GNU General Public License v3.0 sau mai nou</a> — liber ca în libertate. Puteți utiliza, studia, modifica și redistribui codul în aceleași condiții.</p><p>Site-ul care îl găzduiește este oferit gratuit astăzi și din 2010; dacă într-o zi nu va mai putea fi, software-ul rămâne al dumneavoastră, pentru a-l rula.</p><p>Copyright © 2009–2026 Thomas Gail Haws.</p><h3>Cod Sursă</h3><p>Codul sursă complet este disponibil public pe GitHub:</p><p><a target="_blank" href="https://github.com/hawstom/engcalcs">github.com/hawstom/engcalcs</a></p><p>Puteți răsfoi codul, semnala probleme sau face fork la depozit acolo.</p><h3>Contribuție</h3><p>Orice ajutor este binevenit. <a href="contact.php">Contactați-l pe Tom Haws</a>.</p><ul><li><strong>Traduceri:</strong> Sugerați o formulare mai bună. Îmbunătățiți sau adăugați o limbă.</li><li><strong>Rapoarte de erori:</strong> Utilizați formularul de feedback pe orice pagină de calculator sau semnalați o problemă pe GitHub.</li><li><strong>Calculatoare noi:</strong> Ideile pentru instrumente de inginerie hidraulică care servesc lucrătorilor de teren și practicienilor în irigații sunt deosebit de binevenite.</li><li><strong>Găzduire:</strong> Dacă puteți oglindi aceste calculatoare pentru o regiune cu conectivitate limitată, vă rugăm să mă contactați.</li></ul><h3>Utilizare offline</h3><p>Deschideți o dată oricare calculator cât timp sunteți conectat la internet și toate vor continua să funcționeze când nu mai sunteți: browserul dvs. stochează întreaga suită pe măsură ce lucrați. Mecanismul este o <strong>Aplicație Web Progresivă (PWA)</strong>, dacă doriți să citiți despre ea. După aceea, toate calculatoarele funcționează offline — nu este necesar internetul.</p><p>Pe Android sau iOS, folosiți opțiunea „Adaugă pe ecranul principal” din browserul dvs. pentru a instala EngCalcs ca aplicație pe dispozitivul dvs. Pe desktop, căutați pictograma de instalare în bara de adrese a browserului.</p><p>Puteți, de asemenea, să salvați orice calculator individual folosind meniul „Salvare ca…” din browser pentru utilizare offline ocazională.</p><h3>Contact</h3><p>Tom Haws, inginer hidraulic și fondatorul acestor calculatoare.<br />Folosiți formularul de feedback pe orice pagină de calculator sau accesați codul sursă pe <a target="_blank" href="https://github.com/hawstom/engcalcs">GitHub</a>.</p>';
+$ec_lang['about_body_html']='<h3>Misiune</h3><p>Calculatoarele de Inginerie HawsEDC sunt oferite gratuit online din 2010. Ele există pentru a servi ingineri și muncitori de teren din întreaga lume — în special cei care lucrează în regiuni cu deficit de apă, resurse limitate sau insuficient deservite. Aceste instrumente fac parte dintr-o misiune umanitară mai amplă: să spună fiecărui om în cel mai practic și eficient mod posibil <a target="_blank" href="https://tomsthird.blogspot.com/2026/10/why-engineering-calculator-needs-to.html">că este iubit și prețuit pentru totdeauna, că nu are nimic de care să se teamă și că nu va ruina totul</a>.</p><p>Calculatoarele sunt vehiculul. Destinația este o lume fără suferință.</p><h3>Licență de software liber și cu sursă deschisă</h3><p>Tot codul este publicat sub <a target="_blank" href="https://www.gnu.org/licenses/gpl-3.0.html">GNU General Public License v3.0 sau mai nou</a> — liber ca în libertate. Puteți utiliza, studia, modifica și redistribui codul în aceleași condiții.</p><p>Site-ul care îl găzduiește este oferit gratuit astăzi și din 2010; dacă într-o zi nu va mai putea fi, software-ul rămâne al dumneavoastră, pentru a-l rula.</p><p>Copyright © 2009–2026 Thomas Gail Haws.</p><h3>Cod Sursă</h3><p>Codul sursă complet este disponibil public pe GitHub:</p><p><a target="_blank" href="https://github.com/hawstom/engcalcs">github.com/hawstom/engcalcs</a></p><p>Puteți răsfoi codul, semnala probleme sau face fork la depozit acolo.</p><h3>Contribuție</h3><p>Orice ajutor este binevenit. <a href="contact.php">Contactați-l pe Tom Haws</a>.</p><ul><li><strong>Traduceri:</strong> Sugerați o formulare mai bună. Îmbunătățiți sau adăugați o limbă.</li><li><strong>Rapoarte de erori:</strong> Utilizați formularul de feedback pe orice pagină de calculator sau semnalați o problemă pe GitHub.</li><li><strong>Calculatoare noi:</strong> Ideile pentru instrumente de inginerie hidraulică care servesc lucrătorilor de teren și practicienilor în irigații sunt deosebit de binevenite.</li><li><strong>Găzduire:</strong> Dacă puteți oglindi aceste calculatoare pentru o regiune cu conectivitate limitată, vă rugăm să mă contactați.</li></ul><h3>Utilizare offline</h3><p>Deschideți o dată oricare calculator cât timp sunteți conectat la internet și toate vor continua să funcționeze când nu mai sunteți: browserul dvs. stochează întreaga suită pe măsură ce lucrați. Mecanismul este o <strong>Aplicație Web Progresivă (PWA)</strong>. După aceea, toate calculatoarele funcționează offline — nu este necesar internetul.</p><p>Pe Android sau iOS, folosiți opțiunea „Adaugă pe ecranul principal” din browserul dvs. pentru a instala EngCalcs ca aplicație pe dispozitivul dvs. Pe desktop, căutați pictograma de instalare în bara de adrese a browserului.</p><p>Puteți, de asemenea, să salvați orice calculator individual folosind meniul „Salvare ca…” din browser pentru utilizare offline ocazională.</p><h3>Contact</h3><p>Tom Haws, inginer hidraulic și fondatorul acestor calculatoare.<br />Folosiți formularul de feedback pe orice pagină de calculator sau accesați codul sursă pe <a target="_blank" href="https://github.com/hawstom/engcalcs">GitHub</a>.</p>';
 $ec_lang['contactSendMessage']='Trimiteți un mesaj lui Tom Haws';
 $ec_lang['contactYourName']='Numele dumneavoastră:';
 $ec_lang['contactYourEmail']='Adresa dumneavoastră de e-mail:';
@@ -468,7 +468,7 @@ $ec_lang['rc_qt']='<span class="ec-help" title="Debitul pe unitate de lățime l
 $ec_lang['rc_np']='Porozitatea pietrei de protecție, n<sub>p</sub>';
 $ec_lang['rc_sg']='<span class="ec-help" title="Densitate relativă la apă. Granit sau bazalt concasat tipic ≈ 2,65. Interval valid Robinson: 2,54–2,82.">Densitatea relativă a rocii, sg <span class="ec-tip">?</span></span>';
 $ec_lang['rc_SD']='<span class="ec-help" title="Abaterea standard a granulozității. Piatră uniformă ≈ 1,25. Interval valid Robinson: 1,15–1,47.">Granulozitate SD = D<sub>84.1</sub>/D<sub>50</sub> <span class="ec-tip">?</span></span>';
-$ec_lang['rc_yn']='<span class="ec-help" title="Înălțarea (Hp > yn) este benefică — reduce eroziunea în amonte. (USDA)">Adâncimea normală în canalul de intrare, y<sub>n</sub> <span class="ec-tip">?</span></span>';
+$ec_lang['rc_yn']='<span class="ec-help" title="Înălțarea (Hp > yn) este de dorit, deoarece reduce eroziunea în amonte. (USDA)">Adâncimea normală în canalul de intrare, y<sub>n</sub> <span class="ec-tip">?</span></span>';
 $ec_lang['rc_D50']='<span class="ec-help" title="Ec. 1 (S0 < 0.10) sau Ec. 2 (0,10–0,40). Valid: D50 15–278 mm, S0 0,02–0,40. În afara intervalului: extrapolat.">Dimensiunea mediană necesară a pietrei, D<sub>50</sub> <span class="ec-tip">?</span></span>';
 $ec_lang['rc_eq_used']='Ecuație aplicată';
 $ec_lang['rc_sg_check']='Verificare densitate relativă';
@@ -494,10 +494,10 @@ $ec_lang['rc_Vm']='<span class="ec-help" title="Fracțiunea din qt care curge pr
 $ec_lang['rc_qm']='Debit unitar prin mantaua de piatră, q<sub>m</sub>';
 $ec_lang['rc_qs']='Debit unitar la suprafață, q<sub>s</sub> (q<sub>t</sub> − q<sub>m</sub>)';
 $ec_lang['rc_d']='Adâncimea curgerii deasupra suprafeței pietrei, d';
-$ec_lang['rc_Hp']='<span class="ec-help" title="Înălțarea (Hp > yn) este benefică — reduce eroziunea în amonte. (USDA)">Sarcina hidraulică la intrare, H<sub>p</sub> <span class="ec-tip">?</span></span>';
+$ec_lang['rc_Hp']='<span class="ec-help" title="Înălțarea (Hp > yn) este de dorit, deoarece reduce eroziunea în amonte. (USDA)">Sarcina pe deversorul de intrare, H<sub>p</sub> <span class="ec-tip">?</span></span>';
 $ec_lang['rc_ponding_check']='Verificare înălțare la intrare';
 $ec_lang['rc_pond_ok']='H<sub>p</sub> > y<sub>n</sub> — înălțare în amonte';
-$ec_lang['rc_pond_ok_tip']='Înălțarea în amonte de intrarea canalului rapid este benefică; reduce eroziunea în amonte. (USDA)';
+$ec_lang['rc_pond_ok_tip']='Înălțarea în amonte de intrarea canalului rapid este de dorit; reduce eroziunea în amonte. (USDA)';
 $ec_lang['rc_pond_warn']='H<sub>p</sub> ≤ y<sub>n</sub> — fără înălțare — risc de eroziune la intrare';
 $ec_lang['rc_pond_warn_tip']='Nu există înălțare în amonte de intrarea canalului rapid; poate apărea eroziune în amonte. (USDA)';
 $ec_lang['rc_eq1']='Ec. 1 (S<sub>0</sub> < 0,10) — pantă lină';
@@ -619,9 +619,9 @@ $ec_lang['bpn_pressure_warn']='Presiune scăzută/negativă; verificați condiț
 $ec_lang['bpn_pressure_warn_short']='Scăzută';
 $ec_lang['bpn_notes_1_term']='În serie implicit, ramificare prin excepție';
 // Edited by TGH 2026-09-07
-$ec_lang['bpn_notes_1_def']='Lăsați ID amonte necompletat și un tronson îl urmează pe cel de deasupra; o conductă simplă în serie. Introduceți ID-ul unui tronson amonte pentru a ramifica din el. Deci: în serie implicit, un arbore când aveți nevoie.';
+$ec_lang['bpn_notes_1_def']='Dacă ID amonte este lăsat necompletat, tronsonul îl urmează pe cel de deasupra, ca o conductă în serie. Introduceți ID-ul unui tronson amonte pentru a ramifica din el. Implicit este o conductă în serie; un arbore se formează doar acolo unde este introdusă o ramificație.';
 $ec_lang['bpn_notes_2_term']='Doar rețele ramificate, fără bucle';
-$ec_lang['bpn_notes_2_def']='Fiecare tronson are exact un tronson amonte (un arbore). Acest instrument nu rezolvă rețele cu bucle; acestea necesită metode iterative (EPANET sau similar). Excluderea buclelor este ceea ce menține instrumentul simplu și exact.';
+$ec_lang['bpn_notes_2_def']='Fiecare tronson are exact un tronson amonte (un arbore). Acest instrument nu rezolvă rețele cu bucle, care necesită metode iterative (EPANET sau similar). Deoarece rețeaua nu are bucle, soluția este directă și exactă.';
 $ec_lang['bpn_notes_3_term']='Fără controale active de presiune';
 $ec_lang['bpn_notes_3_def']='Puteți adăuga o vană cu pierdere locală fixă (o valoare k), dar nu vane reductoare sau susținătoare de presiune (PRV/PSV). Starea lor deschis/închis depinde de debit și presiune, ceea ce ar forța iterația.';
 
@@ -665,8 +665,8 @@ $ec_lang['lpn_tool_vertices']='Vârfuri';
 // has been struck here three times. "Station along the pipe" is the survey word for a distance
 // measured along a route, which is what it is.
 $ec_lang['lpn_tool_add_meter']='Abonat';
-$ec_lang['lpn_tool_add_meter_tip']='Faceți clic unde se află abonatul, apoi faceți clic pe conducta sau nodul care îl deservește. Cerința pe care o dați abonatului este adăugată joncțiunii de la capătul apropiat al acelei conducte.';
-$ec_lang['lpn_mode_add_meter']='Abonat: faceți clic unde se află abonatul, apoi faceți clic pe conducta sau nodul care îl deservește. Sau folosiți Esc pentru a anula.';
+$ec_lang['lpn_tool_add_meter_tip']='Specificați punctul abonatului, apoi conexiunea lui: o legătură sau un nod. Cerința pe care o atribuiți abonatului este adăugată nodului de la capătul cel mai apropiat al acelei legături.';
+$ec_lang['lpn_mode_add_meter']='Abonat: specificați unde se află abonatul, apoi selectați conducta sau nodul care îl deservește. Sau folosiți Esc pentru a anula.';
 $ec_lang['lpn_pane_tab_customers']='Abonați';
 $ec_lang['lpn_customer_heading']='Abonat {id}';
 // ROADMAP Task 247. lpn_field_account and lpn_field_account_tip were DELETED 2026-09-19 (Tom:
@@ -679,9 +679,9 @@ $ec_lang['lpn_customer_heading']='Abonat {id}';
 $ec_lang['lpn_field_meter_demand']='Cerință per branșament';
 $ec_lang['lpn_field_meter_count']='Numărul de branșamente';
 $ec_lang['lpn_field_meter_total']='Cerință totală';
-$ec_lang['lpn_field_meter_total_tip']='Cerința per branșament înmulțită cu numărul de branșamente. Acesta este numărul adăugat joncțiunii numite mai jos.';
+$ec_lang['lpn_field_meter_total_tip']='Total adăugat joncțiunii numite mai jos.';
 $ec_lang['lpn_field_meter_pipe']='Element conectat';
-$ec_lang['lpn_field_meter_pipe_suggest']='Cel mai apropiat element este {id}. Tastați-l aici pentru a deservi acest abonat de la el.';
+$ec_lang['lpn_field_meter_pipe_suggest']='Cel mai apropiat element este {id}. Introduceți-l aici pentru a deservi acest abonat din el.';
 // Task 247, Tom, 2026-09-25: a service connected exactly to a node reads as a node, never as a
 // pipe at station 0 or 100. Shown in place of lpn_field_meter_pipe/station/offset, never beside
 // them (renderCustomerFields()).
@@ -692,29 +692,29 @@ $ec_lang['lpn_meter_pipe_unknown']='Nimic din acest proiect nu se numește {id},
 // heading is the junction's own whole label reused and only the tip is new: what it says that the
 // junction's does not is that the number the pattern multiplies is the TOTAL, count included.
 $ec_lang['lpn_meter_pattern_unknown']='Niciun model din acest proiect nu se numește {id}, deci abonatul a fost lăsat cum era.';
-$ec_lang['lpn_meter_placed']='Abonatul {id} a fost adăugat. Descrierea și cerința sa se tastează în tabelul Abonați, sau apăsați-l în Selectare pentru a-i deschide caseta.';
-$ec_lang['lpn_field_meter_pipe_tip']='Elementul la care se conectează acest branșament. Tastați altul aici sau în tabelul Abonați pentru a-l schimba, sau trageți punctul de conectare la un alt element.';
+$ec_lang['lpn_meter_placed']='Abonatul {id} a fost adăugat. Introduceți descrierea și cerința lui în tabelul Abonați sau selectați-l în modul Selectare pentru a deschide caseta lui de proprietăți.';
+$ec_lang['lpn_field_meter_pipe_tip']='Elementul la care se conectează acest branșament. Introduceți altul aici sau în tabelul Abonați pentru a-l schimba, sau trageți punctul de conectare la un alt element.';
 $ec_lang['lpn_field_meter_station']='Poziție de-a lungul conductei (%)';
-$ec_lang['lpn_field_meter_station_tip']='Cât de departe de-a lungul conductei se conectează branșamentul, ca procent al conductei de la primul ei nod la al doilea. 0 este la un capăt, iar 100 la celălalt. Cercul de pe conductă face același lucru cu indicatorul.';
+$ec_lang['lpn_field_meter_station_tip']='Distanța de-a lungul conductei până la branșament, ca procent al conductei de la primul ei nod la al doilea. 0 este la un capăt, iar 100 la celălalt. Cercul de pe conductă face același lucru cu indicatorul.';
 $ec_lang['lpn_field_meter_offset']='Decalaj față de conductă';
-$ec_lang['lpn_field_meter_offset_tip']='Pozitiv înseamnă la dreapta conductei, privind de la primul ei nod spre al doilea. Tastarea unei valori aici poate muta abonatul de cealaltă parte a magistralei, iar linia de branșament este întotdeauna perpendiculară pe magistrală.';
+$ec_lang['lpn_field_meter_offset_tip']='Pozitiv înseamnă la dreapta conductei, privind de la primul ei nod spre al doilea. Introducerea unei valori aici poate muta abonatul de cealaltă parte a magistralei și aduce întotdeauna branșamentul perpendicular pe magistrală.';
 $ec_lang['lpn_field_meter_lumped']='Adăugat la nod';
 $ec_lang['lpn_field_meter_lumped_tip']='Cel mai apropiat nod; cerințele acestui abonat sunt adăugate acolo.';
 $ec_lang['lpn_node_customers']='Cerințe ale abonaților';
-$ec_lang['lpn_node_customers_tip']='Lista abonaților adăugați la acest nod (pentru că a fost cel mai apropiat). Cerințele abonaților se adaugă la celelalte cerințe listate aici. Un abonat se editează acolo unde se află pe hartă sau în tabelul Abonați.';
+$ec_lang['lpn_node_customers_tip']='Lista abonaților adăugați aici pentru că acesta a fost cel mai apropiat nod al lor. Cerințele abonaților se adaugă la celelalte cerințe listate aici. Un abonat se editează acolo unde se află pe hartă sau în tabelul Abonați.';
 $ec_lang['lpn_node_customers_sum']='{total} {unit} de la {n} abonați';
 $ec_lang['lpn_customer_detached']='⚠ Acest abonat nu este conectat la nicio conductă, deci cerința sa nu este inclusă în rezultate. Ștergeți-l, sau desenați o conductă și mutați abonatul pe ea.';
 $ec_lang['lpn_customer_fixed_head']='⚠ Capătul apropiat al acelei conducte are o suprafață de apă fixă, deci această cerință nu afectează simularea.';
 $ec_lang['lpn_customer_detached_count']='{n} abonați nu sunt conectați la nicio conductă. Cerința lor nu este luată în calcul.';
-$ec_lang['lpn_meter_pick_pipe']='Acum faceți clic pe conducta sau nodul care deservește acest abonat. Abonatul rămâne unde l-ați pus. Apăsați Escape pentru a anula.';
-$ec_lang['lpn_inp_export_flat_customers']='Un fișier EPANET nu are abonați. Cerința celor {n} abonați din acest proiect intră în fișier ca un rând de cerință pe joncțiunea la care este adăugat fiecare, iar fiecare rând este numit cu marcajul abonatului. Ceea ce fișierul nu poate păstra este abonatul: unde se află, ce conductă îl deservește, unde de-a lungul acelei conducte se conectează branșamentul, și câte branșamente reprezintă un abonat. Propriul dvs. fișier de proiect păstrează toate acestea.';
+$ec_lang['lpn_meter_pick_pipe']='Acum selectați conducta sau nodul care deservește acest abonat. Abonatul rămâne unde l-ați pus. Apăsați Escape pentru a anula.';
+$ec_lang['lpn_inp_export_flat_customers']='Un fișier EPANET nu are abonați. Cerința celor {n} abonați din acest proiect este scrisă ca un rând de cerință pe joncțiunea la care este atribuit fiecare abonat, denumit cu marcajul abonatului. Fișierul nu înregistrează abonatul însuși: locația lui, conducta care îl deservește, locul de-a lungul acelei conducte unde se conectează branșamentul sau câte branșamente reprezintă. Aceste informații rămân în proiect; salvați fișierul de proiect pentru a le păstra.';
 
-$ec_lang['lpn_area_hint_window_start']='Faceți clic pe un colț al ferestrei.';
-$ec_lang['lpn_area_hint_window_go']='Faceți clic pe colțul opus pentru a termina.';
-$ec_lang['lpn_area_hint_lasso_start']='Faceți clic pentru a începe conturul.';
-$ec_lang['lpn_area_hint_lasso_go']='Deplasați pentru a desena conturul. Faceți clic pentru a termina.';
-$ec_lang['lpn_area_hint_polygon_start']='Faceți clic pentru a desena zona poligonală. Faceți dublu clic pentru a termina.';
-$ec_lang['lpn_area_hint_polygon_go']='Faceți clic pe fiecare colț. Faceți dublu clic pe ultimul pentru a termina.';
+$ec_lang['lpn_area_hint_window_start']='Specificați un colț al ferestrei.';
+$ec_lang['lpn_area_hint_window_go']='Specificați colțul opus pentru a termina.';
+$ec_lang['lpn_area_hint_lasso_start']='Specificați un punct pentru a începe conturul.';
+$ec_lang['lpn_area_hint_lasso_go']='Deplasați cursorul pentru a desena conturul. Specificați ultimul punct pentru a termina.';
+$ec_lang['lpn_area_hint_polygon_start']='Specificați primul colț al zonei poligonale. Faceți dublu clic pentru a termina.';
+$ec_lang['lpn_area_hint_polygon_go']='Specificați fiecare colț. Faceți dublu clic pe ultimul pentru a termina.';
 // Tom, 2026-09-08, his own sentence: *"Hold Shift during selection to preserve the existing
 // selection set and toggle (add/remove) affected assets."* Reworded so "toggle" needs no gloss.
 $ec_lang['lpn_area_hint_shift']='Țineți apăsat Shift în timp ce selectați pentru a continua cu selecția existentă, adăugând sau eliminând (comutare) ceea ce selectați.';
@@ -737,7 +737,7 @@ $ec_lang['lpn_pane_pasted']='S-au lipit {n} celule. {skipped} nu au fost modific
 $ec_lang['lpn_pane_pasted_rows']='S-au lipit {n} rânduri și {created} dintre ele au fost adăugate în rețea.';
 $ec_lang['lpn_pane_pasted_rows_skipped']='S-au lipit {n} rânduri și {created} dintre ele au fost adăugate în rețea. {skipped} celule nu au fost modificate.';
 // Added after "This network has none of these yet." on an empty table, which is where a paste lands.
-$ec_lang['lpn_pane_paste_here']='Faceți clic aici și lipiți rânduri dintr-un tabel de calcul pentru a le adăuga.';
+$ec_lang['lpn_pane_paste_here']='Selectați această zonă și lipiți rânduri dintr-un tabel de calcul pentru a le adăuga.';
 // The menu action that adds the clipboard's rows as new elements below the last row (an ordinary
 // paste only ever writes cells). Its shortcut, Ctrl+Shift+V, is shown beside it in the menu. Tom's
 // wording, R-309: "Paste as new rows" was "not quite descriptive of 'Paste append'."
@@ -908,8 +908,8 @@ $ec_lang['lpn_offscreen_intact']='Rețeaua dvs. este intactă.';
 // lpn_main_title still names EPANET, which is where a search engine reads it, and that claim is
 // true and stays.
 $ec_lang['lpn_examples_welcome']='Bun venit la modelarea rețelelor de alimentare cu apă, cu rezolvitorul EPANET';
-$ec_lang['lpn_examples_heading']='Deschideți propria copie a unui exemplu';
-$ec_lang['lpn_examples_sub']='Fiecare se deschide ca o copie proprie. Modificați-o, salvați-o sau deschideți o copie nouă și începeți din nou.';
+$ec_lang['lpn_examples_heading']='Deschideți o copie a unui exemplu';
+$ec_lang['lpn_examples_sub']='Fiecare exemplu se deschide ca o copie. Modificați-o și salvați-o sau deschideți o copie nouă pentru a o lua de la capăt.';
 $ec_lang['lpn_examples_open']='Deschide';
 $ec_lang['lpn_examples_menu']='Deschide exemplu…';
 $ec_lang['lpn_examples_blank']='Sau începeți aici';
@@ -940,9 +940,9 @@ $ec_lang['lpn_hotkeys_map_def']='<table class="lpn-notes-table"><tbody><tr><td>1
 // is the honesty boundary that document draws: a thank-you must never imply an answer.
 $ec_lang['lpn_wrong_btn']='Ceva nu este în regulă aici?';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_wrong_tip']='O singură apăsare ne spune că ceva nu este în regulă pe această pagină. Trimite numele acestei pagini, limba în care o citiți și mesajul de pe hartă, dacă există unul. Nu trimite nimic din ce ați scris, nicio adresă și nimic din desenul dvs. Nimeni nu vă poate răspunde, pentru că aceasta nu spune nimic despre cine sunteți. Folosiți Ajutor, Reparați ceva atunci când doriți să spuneți mai mult.';
-$ec_lang['lpn_wrong_thanks']='Mulțumim. Ne-a ajuns.';
-$ec_lang['lpn_status_example_opened']='{name} a fost deschis. Este copia dvs.: salvați-o cu Fișier, Salvează ca.';
+$ec_lang['lpn_wrong_tip']='Raportați o eroare de pe această pagină. Se deschide o casetă în care puteți selecta problema, adăuga un comentariu și introduce o adresă de e-mail dacă doriți un răspuns. Toate câmpurile sunt opționale, iar nimic nu se trimite până când apăsați Trimite.';
+$ec_lang['lpn_wrong_thanks']='Mulțumim. Raportul dvs. a fost primit.';
+$ec_lang['lpn_status_example_opened']='{name} a fost deschis ca o copie. Salvați-o cu Fișier, Salvare ca.';
 // Stands while the fault stands, rather than expiring like every other notice on the map: it
 // reports a page that cannot lay itself out, which is true until a measurement recovers.
 $ec_lang['lpn_map_unmeasurable']='Această pagină nu a putut determina dimensiunea zonei de desenare, așa că harta arată ultima vizualizare pe care a putut să o calculeze. Redimensionarea ferestrei o face să încerce din nou. Dacă acest lucru continuă, o extensie de browser care blochează măsurătorile paginii este cauza obișnuită.';
@@ -969,7 +969,7 @@ $ec_lang['lpn_ex_net2_title']='EPANET Net2';
 $ec_lang['lpn_ex_net2_desc']='Un sistem de distribuție ramificat cu un bazin, din exemplele EPANET.';
 $ec_lang['lpn_ex_net3_title']='EPANET Net3';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_ex_net3_desc']='Exemplul mare al EPANET: 92 de joncțiuni, 3 bazine și 2 rezervoare, unul dintre ele un râu. Merită deschis pentru a vedea cum arată pe hartă un model de dimensiune reală.';
+$ec_lang['lpn_ex_net3_desc']='Exemplul mare EPANET: 92 de joncțiuni, trei bazine și două rezervoare, unul dintre ele un râu. Arată cum apare pe hartă un model de dimensiune reală.';
 $ec_lang['lpn_ex_net3_world_title']='EPANET Net3, lat/lon';
 $ec_lang['lpn_ex_net3_world_desc']='Rețeaua EPANET Net3 convertită în latitudine/longitudine la Novato, CA, cu harta lumii desenată în spate.';
 $ec_lang['lpn_ex_elm_street_title']='Elm Street Center';
@@ -987,7 +987,7 @@ $ec_lang['lpn_demand_tip']='Debite preluate din rețea în acest nod. Introduce�
 // built by the page and are no longer a placeholder inside a sentence, which is why the lead is a
 // NEW key rather than an edit of `lpn_units_warn_body`. Editing that one in place would have left
 // 26 translations carrying a {list} the page no longer fills, and a literal "{list}" on the map.
-$ec_lang['lpn_units_warn_title']='Această unitate decide ce înseamnă datele dvs. de intrare';
+$ec_lang['lpn_units_warn_title']='Această unitate stabilește cum sunt citite datele dvs. de intrare';
 $ec_lang['lpn_units_warn_lead']='{unit} este unitatea pentru ce introduceți la:';
 $ec_lang['lpn_units_options_head']='Când schimbați o unitate:';
 // Each option's sentence opens with the word on its own button, so the button and the explanation
@@ -1019,9 +1019,9 @@ $ec_lang['lpn_units_elevhead']='Cotă și sarcină';
 $ec_lang['lpn_result_gradient']='Gradient de pierdere de sarcină';
 $ec_lang['lpn_result_gradient_tip']='Pierderea de sarcină împărțită la lungimea conductei. Folosiți-o pentru a compara conducte de lungimi diferite față de o singură limită de proiectare.';
 $ec_lang['lpn_result_water_age']='Vechimea apei';
-$ec_lang['lpn_result_water_age_tip']='Cât timp a stat în sistem apa care ajunge în acest punct. Unde se întâlnesc debite, apa sosită poartă un amestec de vârste, iar numărul de aici este media lor ponderată cu debitul: o joncțiune alimentată mai ales dintr-o magistrală scurtă și nouă arată o vârstă mică, chiar dacă o ramificație înfundată lungă o alimentează și ea. Într-un bazin este vârsta medie a apei reținute, motiv pentru care un bazin cu reînnoire lentă este de obicei apa cea mai veche dintr-o rețea. Nu există o limită de reglementare cu care să o comparați, așa că evaluați numărul în raport cu propria dvs. rețea.';
+$ec_lang['lpn_result_water_age_tip']='Timpul petrecut în sistem de apa care ajunge în acest punct. Unde se întâlnesc debite, numărul este media vârstelor sosite, ponderată cu debitul. Într-un bazin este vârsta medie a apei reținute, deci un bazin cu reînnoire lentă conține de obicei cea mai veche apă dintr-o rețea. Nu există o limită de reglementare cu care să fie comparat, deci evaluați-l în raport cu condițiile din sistemul modelat.';
 $ec_lang['lpn_result_source_share']='Pondere din sursă';
-$ec_lang['lpn_result_source_share_tip']='Cât din apa care ajunge în acest punct provine din nodul de urmărire. Aceasta este ceea ce raportează analiza Urmărire sursă.';
+$ec_lang['lpn_result_source_share_tip']='Ponderea apei care ajunge în acest punct și provine din nodul de urmărire. Aceasta este ceea ce raportează analiza Urmărire sursă.';
 // **THE LINK HALF OF THE THREE QUALITY ANSWERS** (ROADMAP Task 638). EPANET reports a node's own
 // value and a LINK's AVERAGE over the water standing in it, so the two are different quantities and
 // take different words. Three whole names rather than one name built from a word and a heading: a
@@ -1046,7 +1046,7 @@ $ec_lang['lpn_result_status_open']='Deschis';
 $ec_lang['lpn_result_status_closed']='Închis';
 $ec_lang['lpn_result_head']='Sarcină';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_result_head_tip']='Energia apei în acest nod, exprimată ca înălțime a coloanei de apă. Este o înălțime absolută, în timp ce presiunea este o măsurătoare manometrică.';
+$ec_lang['lpn_result_head_tip']='Energia potențială a apei în acest nod, scrisă ca înălțime a coloanei de apă. Este o înălțime absolută, în timp ce presiunea este o măsurătoare manometrică.';
 $ec_lang['lpn_result_pressure']='Presiune';
 $ec_lang['lpn_result_flow']='Debit';
 $ec_lang['lpn_result_velocity']='Viteză';
@@ -1059,14 +1059,14 @@ $ec_lang['lpn_result_headloss']='Pierdere de sarcină';
 // states only its own scope, so none of them can be wrong about the others -- and no tip quotes
 // another button's label, which is the cross-key dependency lpn_empty_hint was fixed for.
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_settings_restore_tip']='Resetează doar setările acestui proiect. Desenul dvs. și celelalte proiecte nu sunt modificate. Pentru a salva setările preferate în vederea reutilizării, salvați un fișier proiect care conține numai setări.';
+$ec_lang['lpn_settings_restore_tip']='Resetează doar setările acestui proiect. Desenul și celelalte proiecte nu sunt modificate. Pentru a reutiliza un set de setări, salvați un fișier de proiect care conține numai setări.';
 $ec_lang['lpn_reset_all_tip']='Șterge fiecare proiect, fiecare imagine de fundal, fiecare setare și alegerile dvs. de unități, apoi reîncarcă pagina exact așa cum o vede un vizitator nou. Aceasta este singura resetare care șterge totul.';
 // `lpn_tool_clear`, `lpn_tool_clear_tip` and `lpn_confirm_clear` were REMOVED by Task 211 with the
 // "Clear project" command itself -- see lpn_edit_delete_network for what replaced it and why.
 // Task 263's one-time migration offer. Shown ONCE, on opening a project saved before inputs
 // stopped being converted, and never again whatever the answer. Plain text only -- it is built with
 // textContent into the dialog body.
-$ec_lang['lpn_v2_restore_confirm']='Acest calculator stochează unitățile și valorile introduse ale proiectului așa cum au fost tastate, dar anterior converta numerele în SI pentru stocare. Acest proiect a fost salvat înainte de această schimbare, deci numerele sale sunt stocate în SI. Le convertim o ultimă dată la unitățile curente? Pentru a vă putea decide, iată câteva diametre care ar fi convertite, cu valorile lor înainte și după:';
+$ec_lang['lpn_v2_restore_confirm']='Acest calculator stochează unitățile și valorile proiectului așa cum au fost introduse, dar anterior convertea numerele în SI pentru stocare. Acest proiect a fost salvat înainte de această schimbare, deci numerele lui au fost stocate în SI. Le convertiți o ultimă dată la unitățile curente? Pentru a vă ajuta să judecați, iată câteva diametre care ar fi convertite, cu valorile lor înainte și după:';
 $ec_lang['lpn_v2_restore_yes']='Conversie';
 $ec_lang['lpn_v2_restore_never']='Nu. Nu mai întrebați niciodată.';
 $ec_lang['lpn_v2_restore_no']='Închide, ca să verific mai întâi unitățile curente';
@@ -1130,11 +1130,11 @@ $ec_lang['lpn_convas_coordsys_tip']='Sistemul de coordonate în care este conver
 // {crs} is the name the map status strip shows for this project's coordinate system.
 $ec_lang['lpn_convas_from']='Actual: {crs}';
 $ec_lang['lpn_convas_epsg']='Sistem de coordonate EPSG';
-$ec_lang['lpn_convas_epsg_tip']='Alegeți un sistem de coordonate din registrul EPSG. Latitudine și longitudine este WGS 84 (EPSG:4326).';
+$ec_lang['lpn_convas_epsg_tip']='Alegeți un sistem de coordonate din registrul EPSG. WGS 84 (EPSG:4326), latitudine și longitudine, este alegerea sugerată. WGS 84 / Pseudo-Mercator (EPSG:3857), numit în mod obișnuit Web Mercator, dă x și y în metri, iar distanțele sale pe hartă depășesc distanțele pe teren la distanță de ecuator. Lungimile conductelor sunt calculate ca distanțe pe teren în oricare dintre sisteme.';
 $ec_lang['lpn_convas_unnamed']='Georeferențiere nedenumită (locală)';
 $ec_lang['lpn_convas_unnamed_tip']='Coordonate locale în unitatea de lungime, cu harta lumii atașată.';
 $ec_lang['lpn_convas_none_tip']='Coordonate locale în unitatea de lungime, fără hartă a lumii deocamdată.';
-$ec_lang['lpn_convas_units_tip']='Unitățile în care este convertită copia. Originalul își păstrează propriile numere și unități.';
+$ec_lang['lpn_convas_units_tip']='Unitățile în care este convertită copia.';
 $ec_lang['lpn_convas_round']='Rotunjește valorile convertite';
 $ec_lang['lpn_convas_round_tip']='Rotunjește doar numerele pe care le rescrie această conversie, la cel mai apropiat pas ales de dvs. Valorile a căror unitate nu se schimbă rămân neschimbate.';
 $ec_lang['lpn_convas_round_none']='Fără rotunjire';
@@ -1155,11 +1155,11 @@ $ec_lang['lpn_file_convert_as_tip']='Copiază acest proiect într-o filă nouă 
 // attached world map) opens the placement steps already answered. Tom's own sentence for this case
 // from his 2026-09-16 edits, with the step 1 button added because the wizard opens at step 1.
 $ec_lang['lpn_georef_answered']='Acest proiect este deja georeferențiat, deci rețeaua se află deja pe hartă și nimic nu a fost mutat. Verificați că se află în locul corect, apoi apăsați butonul Plasează modelul aici și butonul Păstrează acest amplasament.';
-$ec_lang['lpn_georef_intro']='Plasarea modelului se face în doi pași. Pasul 1 este cel rapid: modelul stă pe loc iar dvs. deplasați harta din spatele lui, până când amplasamentul dvs. se află sub model la o dimensiune aproximativ potrivită. Nu există încă nicio rotație. Pasul 2 este cel precis: trageți, redimensionați și rotiți modelul propriu-zis. Proiectul dvs. se află la început pe o hartă a întregii lumi, deci găsiți întâi locația dvs., apoi apăsați butonul Plasează modelul aici.';
-$ec_lang['lpn_georef_adjust']='Modelul este acum pe teren, deci se mișcă odată cu harta. Trageți modelul pentru a-l muta, trageți un colț pentru a-l redimensiona, trageți mânerul rotund de deasupra modelului pentru a-l roti. Sau introduceți mai jos distanța pe teren și unghiul de rotație.';
+$ec_lang['lpn_georef_intro']='Plasarea modelului se face în doi pași. Pasul 1 este aproximativ: modelul rămâne fix pe ecran în timp ce deplasați și măriți harta din spatele lui, până când amplasamentul se află sub model la o scară aproximativ potrivită. Acest pas nu are rotație. Pasul 2 este precis: trageți, redimensionați și rotiți modelul însuși. Proiectul pornește pe o hartă a întregii lumi, deci găsiți mai întâi locația, apoi apăsați butonul Plasează modelul aici.';
+$ec_lang['lpn_georef_adjust']='Modelul este acum atașat la hartă, deci se mișcă odată cu harta. Trageți modelul pentru a-l muta, trageți un colț pentru a-l redimensiona sau trageți mânerul rotund de deasupra modelului pentru a-l roti. Sau introduceți mai jos distanța pe teren și unghiul de rotație.';
 $ec_lang['lpn_georef_step1']='Pasul 1 din 2 — rapid';
 $ec_lang['lpn_georef_step2']='Pasul 2 din 2 — precis';
-$ec_lang['lpn_georef_step1_hint']='Proiectul dvs. rămâne unde este pe ecran. Deplasați și măriți harta de dedesubt până când terenul din spate este aproximativ în locul potrivit și la dimensiunea potrivită, apoi apăsați butonul Plasează modelul aici.';
+$ec_lang['lpn_georef_step1_hint']='Proiectul rămâne fix pe ecran. Deplasați și măriți harta de dedesubt până când harta arată aproximativ locația potrivită la o scară aproximativ potrivită, apoi apăsați butonul Plasează modelul aici.';
 $ec_lang['lpn_georef_detach']='Ridică-l din nou';
 $ec_lang['lpn_georef_size_prompt']='Cam cât de lat este amplasamentul, pe întregul proiect?';
 // ---- The icon-only toolbar (dev/toolbar-icons.md) ----
@@ -1173,22 +1173,22 @@ $ec_lang['lpn_tool_key_hint']='Comandă rapidă: apăsați {key}.';
 $ec_lang['lpn_tool_key_hint_two']='Comandă rapidă: apăsați {key} sau {key2}.';
 // Edited by TGH 2026-09-07; the Shift sentence rewritten 2026-09-08 on his ruling that Shift keeps
 // the selection and toggles what the shape catches (it used to say "add").
-$ec_lang['lpn_tool_area_tip']='Faceți clic pe hartă conform instrucțiunilor pentru a selecta tot ce se află în interiorul formei. Apăsați din nou acest buton pentru a schimba forma între o fereastră, un lasou și un poligon. Țineți apăsat Shift în timp ce selectați pentru a continua cu selecția existentă, adăugând sau eliminând (comutare) ceea ce selectați.';
+$ec_lang['lpn_tool_area_tip']='Urmați indicațiile de pe ecran. Apăsați din nou pentru a parcurge pe rând fereastra, lasoul și poligonul. Țineți apăsat Shift pentru a păstra selecția curentă și a adăuga sau elimina (comuta) ceea ce selectați.';
 $ec_lang['lpn_area_selected']='{n} selectate.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_area_none']='Nu s-a găsit nimic în acea zonă.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_tool_vertices_tip']='Adăugați și eliminați vârfurile care dau forma unei conducte pe hartă. Faceți clic pe o conductă pentru a adăuga un vârf, faceți clic pe un vârf pentru a-l elimina și trageți un vârf pentru a-l muta. Un vârf schimbă doar traseul desenat, nu hidraulica.';
-$ec_lang['lpn_tool_undo_tip']='Anulează ultima modificare.';
+$ec_lang['lpn_tool_vertices_tip']='Adăugați și eliminați vârfurile conductelor. Specificați un punct pe o conductă pentru a adăuga un vârf, selectați un vârf pentru a-l elimina și trageți un vârf pentru a-l muta. Un vârf modifică lungimea automată, dar nu adaugă și nu modifică pierderile locale (minore).';
+$ec_lang['lpn_tool_undo_tip']='Lungimea istoricului de anulare = 20 de acțiuni';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_tool_zoom_extent_tip']='Încadrează întreaga rețea în fereastră.';
-$ec_lang['lpn_tool_zoom_window_tip']='Faceți clic pe două colțuri opuse ale unui dreptunghi, sau trageți unul, pe hartă pentru a mări pe el. Apăsați din nou acest buton pentru Încadrează tot.';
+$ec_lang['lpn_tool_zoom_extent_tip']='Încadrează întreaga rețea în fereastra hărții. Apăsați din nou pentru Zoom fereastră. Vedeți și comenzile de zoom ale hărții din dreapta sus.';
+$ec_lang['lpn_tool_zoom_window_tip']='Specificați colțurile sau trageți un dreptunghi. Apăsați din nou pentru Încadrează tot.';
 // Tom's wording, 2026-09-25.
 $ec_lang['lpn_zoom_in_tip']='Mărire. Comandă rapidă: +';
 // Tom's wording, 2026-09-25.
 $ec_lang['lpn_zoom_out_tip']='Micșorare. Comandă rapidă: -';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_find_menu_tip']='Găsiți un element după ID-ul lui, sau găsiți fiecare element care îndeplinește o condiție, și schimbați-le pe toate deodată.';
+$ec_lang['lpn_find_menu_tip']='Găsire și înlocuire simplă sau complexă';
 // **"Toolbar key", NOT "Toolbar"** (Tom's own name, 2026-09-10; Ida ranked the rename first).
 // The row is not a second toolbar and not a repeat of one -- it is the LEGEND for an icon-only
 // strip, derived from toolbarIconIndex, and on a touch screen it is the only way to read the
@@ -1198,7 +1198,7 @@ $ec_lang['lpn_find_menu_tip']='Găsiți un element după ID-ul lui, sau găsiți
 $ec_lang['lpn_help_icons']='Legenda barei de instrumente';
 // ---- The right panel: Visibility ----
 $ec_lang['lpn_pane_right_toggle']='Vizibilitate';
-$ec_lang['lpn_color_legend_open_tip']='Faceți clic pentru a deschide panoul Vizibilitate și a modifica aceste culori.';
+$ec_lang['lpn_color_legend_open_tip']='Selectați pentru a deschide setările de colorare și a modifica aceste culori.';
 $ec_lang['lpn_color_node_field']='Colorează nodurile după';
 $ec_lang['lpn_color_link_field']='Colorează conductele după';
 $ec_lang['lpn_color_ramp_sequential']='Secvențială';
@@ -1231,20 +1231,20 @@ $ec_lang['lpn_georef_scale']='Distanța pe teren per unitate de desen';
 // R-219 (Tom, 2026-09-24, answering R-190): the sentence that replaces the retired "These are
 // already lat/lon" button -- typing 1 here reaches the same result the button used to, for a file
 // whose own numbers should be used unchanged.
-$ec_lang['lpn_georef_scale_tip']='Cât de departe ajunge pe teren o unitate din desenul dvs. Un desen realizat pe o grilă simplă de obicei nu spune nimic despre aceasta, deci stabiliți-o aici — sau lăsați Mergi la… să vă întrebe cât de lat este amplasamentul și să o calculeze.';
+$ec_lang['lpn_georef_scale_tip']='Calculat automat. Editați pentru a schimba. Introduceți 1 pentru a folosi coordonatele fișierului neschimbate ca distanță pe teren, de exemplu pentru un fișier fără sistem de coordonate.';
 $ec_lang['lpn_georef_rotation']='Rotire în sens antiorar (grade)';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_georef_rotation_tip']='Cât de mult să rotiți întregul model, în sens antiorar, astfel încât nordul lui să indice nordul.';
+$ec_lang['lpn_georef_rotation_tip']='Rotația în sens antiorar a întregului model, pentru a-l alinia cu noul sistem de coordonate.';
 // Tom's own wording for these two, from his 2026-09-16 edits (dev/tom-coordinate-vocabulary-2026-09-16.md):
 // the wizard now ends on whichever coordinate system File, Convert as chose, not always lat/lon.
-$ec_lang['lpn_georef_confirm']='Plasați modelul aici definitiv? Puteți încă trage elemente individuale ulterior, dar desenul încetează să mai fie un proiect xy. Pentru a reveni la xy, închideți acest proiect fără să îl salvați.';
+$ec_lang['lpn_georef_confirm']='Plasați modelul aici definitiv? Elementele pot fi trase în continuare pe rând după aceea, dar continuarea acum convertește toate coordonatele deodată. Pentru a recăpăta coordonatele vechi, reveniți la proiectul original și închideți-l pe acesta fără să îl salvați.';
 $ec_lang['lpn_georef_done']='Acesta este acum un proiect lat/lon. Trageți orice element pentru a-l apropia de locul unde se află cu adevărat.';
 $ec_lang['lpn_georef_backdrop_unrotated']='Imaginea de fundal a fost mutată și redimensionată odată cu modelul, dar nu a putut fi rotită. Folosiți Hartă, Imagine de fundal, Mutare pentru a o alinia.';
 $ec_lang['lpn_georef_empty']='Acel fișier nu are nicio rețea în el, deci nu este nimic de plasat.';
 $ec_lang['lpn_georef_unavailable']='Instrumentul de plasare nu s-a încărcat. Reîncărcați pagina și încercați din nou.';
 // Switching projects while a model is being placed corrupted BOTH of them (Tom, 2026-09-08),
 // so the strip refuses and says which two commands end the wizard.
-$ec_lang['lpn_georef_tab_locked']='Terminați plasarea cu butonul „Păstrează această plasare” sau apăsați Anulare, înainte de a schimba proiectele. Plasarea aparține acestui proiect și nu vă poate urma către altul.';
+$ec_lang['lpn_georef_tab_locked']='Terminați conversia cu butonul „Păstrează acest amplasament” sau apăsați Anulare, înainte de a schimba proiectele. Plasarea se aplică numai acestui proiect.';
 // Saving during the wizard writes a document whose coordinates are half moved, so Save takes the
 // same refusal (Tom, 2026-09-08: *"Maybe the Save button should be disabled for consistency."*).
 // Its own sentence rather than the one above: the two commands that end the wizard are the same,
@@ -1262,9 +1262,9 @@ $ec_lang['lpn_goto_bad']='Aceasta nu este o latitudine și o longitudine. Încer
 $ec_lang['lpn_georef_goto']='Mergi la…';
 $ec_lang['lpn_georef_twopt']='Folosește două puncte cunoscute';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_georef_twopt_tip']='Plasați modelul exact, atunci când știți deja unde se află cu adevărat două puncte de pe desenul dvs. Faceți clic pe unul dintre ele, introduceți latitudinea și longitudinea sa, apoi faceți la fel pentru un al doilea punct. Poziția, scara și rotația rezultă toate din aceste două puncte. Apăsați din nou acest buton pentru a opri selectarea.';
-$ec_lang['lpn_georef_twopt_pick1']='Faceți clic pe un punct de pe desenul dvs. a cărui latitudine și longitudine le cunoașteți.';
-$ec_lang['lpn_georef_twopt_pick2']='Acum faceți clic pe un al doilea punct cunoscut, cât mai departe posibil de primul.';
+$ec_lang['lpn_georef_twopt_tip']='Plasați modelul exact atunci când latitudinea și longitudinea reale a două puncte de pe desen sunt cunoscute. Specificați unul dintre ele, introduceți latitudinea și longitudinea sa, apoi faceți la fel pentru un al doilea punct. Poziția, scara și rotația sunt calculate din aceste două puncte. Apăsați din nou pentru a anula sau apăsați Esc.';
+$ec_lang['lpn_georef_twopt_pick1']='Specificați un punct pe desenul dvs. a cărui latitudine și longitudine le cunoașteți.';
+$ec_lang['lpn_georef_twopt_pick2']='Acum specificați un al doilea punct cunoscut, cât mai departe posibil de primul.';
 $ec_lang['lpn_georef_twopt_same']='Acesta este punctul pe care l-ați ales primul. Alegeți unul diferit.';
 $ec_lang['lpn_georef_twopt_done']='Modelul este acum plasat pe cele două puncte pe care le-ați dat. Verificați-l, apoi apăsați butonul Păstrează acest amplasament.';
 
@@ -1273,7 +1273,7 @@ $ec_lang['lpn_georef_twopt_done']='Modelul este acum plasat pe cele două puncte
 // profile first, tables later. The toggle is on the toolbar because it is the strip a reader
 // scans for "what else can this page show me".
 $ec_lang['lpn_pane_toggle']='Panou inferior';
-$ec_lang['lpn_pane_toggle_tip']='Afișează sau ascunde panoul de sub hartă. Acesta conține profilul și un tabel pentru fiecare tip de element.';
+$ec_lang['lpn_pane_toggle_tip']='Afișează sau ascunde panoul de sub hartă. Conține grafice și un tabel pentru fiecare tip de element.';
 $ec_lang['lpn_pane_resize']='Trageți pentru a face panoul mai înalt sau mai scund';
 $ec_lang['lpn_pane_tab_junctions']='Joncțiuni';
 $ec_lang['lpn_pane_tab_reservoirs']='Rezervoare';
@@ -1281,7 +1281,7 @@ $ec_lang['lpn_pane_tab_tanks']='Bazine';
 $ec_lang['lpn_pane_tab_pipes']='Conducte';
 $ec_lang['lpn_pane_tab_pumps']='Pompe';
 $ec_lang['lpn_pane_tab_valves']='Vane';
-$ec_lang['lpn_pane_tab_tip']='Acest tab arată elementele de acest tip ca un tabel pe care îl puteți sorta și edita. Coloanele de rezultate nu pot fi editate.';
+$ec_lang['lpn_pane_tab_tip']='Editați elementele ca într-un tabel de tip foaie de calcul. Coloanele de rezultate nu pot fi editate. Vedeți Ajutor, Note pentru comenzile rapide de la tastatură.';
 $ec_lang['lpn_pane_none']='Această rețea nu are încă niciunul dintre acestea.';
 // **A PERSISTENT NOTE, NOT A HOVER TIP** (Tom, 2026-09-08, asking for wording "to the effect that
 // 'This table is intended to be ready for asset entry and creation by pasting from a spreadsheet'").
@@ -1344,20 +1344,20 @@ $ec_lang['lpn_menu_project']='Apă';
 // the TOOLBAR, above the map. Do not qualify this sentence again. The rule it states is in
 // dev/looped-network-calculator-scope.md: every command lives in the menu bar, the transport is the
 // one exception, and it is exempt because it is a position in a run rather than a command.
-$ec_lang['lpn_menu_project_tip']='Tot ce ține de modelarea rețelei de apă se află aici, într-un singur loc, cu excepția comenzilor de redare a animației. Nu trebuie să ghiciți unde se află lucrurile.';
+$ec_lang['lpn_menu_project_tip']='Tot ce este specific modelării rețelelor de apă (cu excepția comenzilor de redare a animației)';
 $ec_lang['lpn_tables_menu']='Tabele';
-$ec_lang['lpn_tables_menu_tip']='Deschide, sub hartă, un panou cu un tabel al elementelor din această rețea. Există câte un tabel pentru fiecare tip de element, iar acolo îl puteți sorta și edita.';
+$ec_lang['lpn_tables_menu_tip']='Vizualizați și editați elementele în tabele în panoul de jos.';
 // The Run row's own tip, NOT lpn_time_run_tip: this row exists partly to answer "where is my Run
 // button?" for somebody whose project recalculates by itself, and that sentence is not true of the
 // toolbar button, which is the one that goes away.
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_run_menu_tip']='Recalculează acum această rețea. Căutați butonul Calculează? Este ascuns cât timp setarea Recalculează automat este activă. Pentru a readuce butonul, dezactivați Recalculează automat din Setări, Calcul, Hidraulică.';
+$ec_lang['lpn_run_menu_tip']='Rulează simularea. Inutil când Recalculează automat este activ la Setări, Calcul, Hidraulică. Când Recalculează este dezactivat, apare butonul Calculează în bara de instrumente.';
 // ---- automatic recalculation (Task 467) ----
 // "Simulation" rather than "network" or "results": it is the word EPANET uses for working a network
 // out over time, and this switch is about the run, not about the drawing.
 $ec_lang['lpn_settings_auto_run']='Recalculează automat';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_settings_auto_run_tip']='Când este activ, acest proiect se recalculează la scurt timp după fiecare modificare pe care o faceți, iar butonul Calculează este scos din bara de instrumente deoarece nu mai are ce să facă. Dezactivați-l pe o rețea mare, unde așteptarea recalculării după fiecare modificare încurcă tastarea, iar butonul Calculează reapare pentru a alege dvs. când se rulează.';
+$ec_lang['lpn_settings_auto_run_tip']='Dezactivați dacă recalcularea este prea lentă. Ascunde butonul Calculează.';
 // **AN EDIT SAYS NOTHING AT ALL WHEN THE SWITCH IS OFF** (Tom, 2026-09-19: *"Recalc off Old
 // values: Leave in place stale. Don't clear. Trust the user."*). `lpn_manual_results_cleared`
 // stood here for part of one day and is DELETED, English-only, never translated: it announced a
@@ -1369,7 +1369,7 @@ $ec_lang['lpn_settings_auto_run_tip']='Când este activ, acest proiect se recalc
 // who has just waited a second already knows something is slow and wants it confirmed, not
 // explained. {secs} is one decimal.
 $ec_lang['lpn_time_run_slow']='Calculul acestei rețele a durat {secs} s, iar rețeaua este setată să se recalculeze după fiecare modificare. Pentru a opri asta și a readuce butonul Calculează, dezactivați „Recalculează automat” din Setări, la Calcul, Hidraulică.';
-$ec_lang['lpn_time_no_report']='Nu există încă un raport de rulare. Raportul este textul propriu al EPANET, deci apare doar după ce această rețea a fost calculată cu rezolvitorul EPANET.';
+$ec_lang['lpn_time_no_report']='Nu există încă un raport de rulare. Raportul este raportul text EPANET, deci apare după ce această rețea a fost calculată.';
 // "Settings" rather than Tools -> Options (Windows) or Preferences (Mac): nobody has ever settled
 // this one, and of the three, Settings is the word a person is most likely to look for first.
 // Moved out of the suite-wide More menu, 2026-08-13 (Tom: "the walkthrough is a little
@@ -1420,7 +1420,7 @@ $ec_lang['lpn_find_btn']='Găsire';
 // is selected." One button, no selector; which table(s) it fills follows the scope in
 // buildFilterRow()/applyTableFilter(), never a control of its own.
 $ec_lang['lpn_find_filter_btn']='Filtrează în tabelul curent';
-$ec_lang['lpn_find_filter_tip']='Afișează doar părțile care corespund acestei interogări într-unul dintre tabelele de sub hartă. Desenul nu este modificat și nimic nu este șters.';
+$ec_lang['lpn_find_filter_tip']='Afișează doar rândurile care corespund câmpului Ce se caută de mai sus, în fiecare tabel căutat.';
 // The multi-table receipt, printed when "Everything" (or a typed compound query) filters more than
 // one table at once: one {table}: {n} of {all} row per table the query could be asked of, joined
 // into {rows} of the summary line below. Every number is a count already shown on the table's own
@@ -1447,7 +1447,7 @@ $ec_lang['lpn_find_op_lt']='mai mic decât';
 // A condition that takes no value: it asks whether the asset states this property at all.
 $ec_lang['lpn_find_op_empty']='gol';
 // {n} is a whole number.
-$ec_lang['lpn_find_count']='{n} găsite. Faceți clic pe unul pentru a merge la el.';
+$ec_lang['lpn_find_count']='{n} găsite. Selectați unul pentru a merge la el.';
 $ec_lang['lpn_find_shift_hint']='Shift+clic pentru a comuta: adaugă dacă elementul nu este în selecție, sau elimină dacă este deja în selecție.';
 $ec_lang['lpn_find_none']='Nimic nu s-a potrivit.';
 // The two extremes, as conditions on the same footing as "above" -- the Value box holds how
@@ -1495,7 +1495,7 @@ $ec_lang['lpn_find_conn_no_fixed']='Această rețea nu are niciun rezervor sau b
 // Task 540: the query written as one line, above the Find button -- and typed into. The controls
 // write it and it writes the controls, so it teaches the shape of a search by being operated from
 // either end.
-$ec_lang['lpn_find_query_tip']='Aceeași căutare, scrisă pe o singură linie. Modificarea comenzilor rescrie această linie, iar scrierea în această linie actualizează comenzile.';
+$ec_lang['lpn_find_query_tip']='Căutarea dată, ca interogare text. Modificarea interogării actualizează controalele de mai sus.';
 $ec_lang['lpn_find_query_label']='Interogare';
 // Tom's own line, 2026-08-26, and "expandable" is his word: it says the grammar will grow.
 $ec_lang['lpn_find_query_hint']='Combinați condițiile cu ȘI, SAU și ()';
@@ -1532,13 +1532,13 @@ $ec_lang['lpn_replace_title']='Modifică ce a fost găsit';
 $ec_lang['lpn_replace_prop']='Proprietatea de modificat';
 $ec_lang['lpn_replace_value']='Valoare nouă';
 $ec_lang['lpn_replace_source']='Sursa valorii noi';
-$ec_lang['lpn_replace_asked']='Cote solicitate pentru {n} noduri. Rezultatele sunt pe drum.';
+$ec_lang['lpn_replace_asked']='Cotele au fost solicitate pentru {n} noduri. Rezultatele apar când sunt primite.';
 $ec_lang['lpn_replace_btn']='Înlocuiește';
 // The count IS the confirmation: a bulk write reaches assets spread over a map the user is not
 // looking at, so it is shown, and answered, before anything is written. {n} is a whole number.
 $ec_lang['lpn_replace_preview']='Modificați {n} elemente?';
 $ec_lang['lpn_replace_apply']='Modifică-le';
-$ec_lang['lpn_replace_done']='{n} elemente modificate. Puteți anula aceasta într-un singur pas.';
+$ec_lang['lpn_replace_done']='{n} elemente modificate. Aceasta poate fi anulată într-un singur pas.';
 $ec_lang['lpn_replace_none']='Nimic nu s-ar schimba.';
 $ec_lang['lpn_replace_no_value']='Introduceți valoarea nouă.';
 $ec_lang['lpn_replace_scope']='Alegeți mai sus un tip de element pentru a-i modifica valorile.';
@@ -1556,11 +1556,11 @@ $ec_lang['lpn_profile_menu']='Profil';
 $ec_lang['lpn_profile_title']='Profil de-a lungul unui traseu';
 // Task 433 -- the path chooser. The gesture is Google Directions': click the start node, move over
 // the map to see the path, click to add a stop, double-click to finish.
-$ec_lang['lpn_profile_draw_start']='Faceți clic pe nodul de unde începe traseul.';
-$ec_lang['lpn_profile_draw_more']='Deplasați cursorul pe hartă pentru a vedea traseul. Faceți clic pe un nod pentru a-l adăuga. Dublu clic pentru a termina. Esc anulează.';
+$ec_lang['lpn_profile_draw_start']='Selectați nodul de unde începe traseul.';
+$ec_lang['lpn_profile_draw_more']='Deplasați cursorul peste hartă pentru a vedea traseul. Selectați un nod pentru a-l adăuga. Dublu clic pentru a termina. Esc anulează.';
 $ec_lang['lpn_profile_draw_blocked']='Nu există rută de la {a} la {b}. Alegeți alt nod.';
-$ec_lang['lpn_profile_tap_start']='Atingeți nodul de unde începe traseul.';
-$ec_lang['lpn_profile_tap_more']='Atingeți un nod pentru a vedea traseul. Apăsați și țineți pentru a-l adăuga. Atingeți de două ori pentru a termina. Apăsați din nou Profil pentru a anula.';
+$ec_lang['lpn_profile_tap_start']='Selectați nodul de unde începe traseul.';
+$ec_lang['lpn_profile_tap_more']='Selectați un nod pentru a vedea traseul. Apăsați și țineți pentru a-l adăuga. Atingeți de două ori pentru a termina. Apăsați din nou Profil pentru a anula.';
 $ec_lang['lpn_profile_say_idle']='Apăsați din nou Profil pentru a alege un traseu nou pe hartă.';
 $ec_lang['lpn_profile_none']='Niciun traseu încă. Apăsați din nou Profil pentru a alege unul pe hartă.';
 $ec_lang['lpn_profile_choose']='Alegeți un nod de start și un nod de final.';
@@ -1582,8 +1582,8 @@ $ec_lang['lpn_profile_edit_tip']='Schimbați un capăt al traseului, sau elimina
 // Tom read it (2026-08-27: *"What is '_say' supposed to mean? Don't you mean '_click'?"*). He is
 // right: its twin is `_tap`, so the only thing the two names can honestly differ by is the word
 // inside them, and `_say` named nothing at all.
-$ec_lang['lpn_profile_edit_click']='Trageți orice punct de pe traseu pentru a-l muta. Faceți clic pe un punct pe care l-ați adăugat pentru a-l elimina.';
-$ec_lang['lpn_profile_edit_tap']='Trageți orice punct de pe traseu pentru a-l muta. Atingeți un punct pe care l-ați adăugat pentru a-l elimina.';
+$ec_lang['lpn_profile_edit_click']='Trageți orice punct de pe traseu pentru a-l muta. Selectați un punct pe care l-ați adăugat pentru a-l elimina.';
+$ec_lang['lpn_profile_edit_tap']='Trageți orice punct de pe traseu pentru a-l muta. Selectați un punct pe care l-ați adăugat pentru a-l elimina.';
 $ec_lang['lpn_profile_edit_nowhere']='Un punct de pe traseu trebuie să fie un nod. Traseul rămâne neschimbat.';
 // ---- Task 510: paths kept in the project, by name ---------------------------------------------
 // A client report carries the same three or four profiles every time, so a path is worth keeping.
@@ -1614,7 +1614,7 @@ $ec_lang['lpn_ts_group_nodes']='Noduri';
 $ec_lang['lpn_ts_group_links']='Legături';
 $ec_lang['lpn_ts_add']='Adaugă selecția';
 // Said out loud rather than ignored: a button that does nothing cannot be told from a broken one.
-$ec_lang['lpn_ts_add_none']='Nimic de acest fel nu este ales pe hartă.';
+$ec_lang['lpn_ts_add_none']='Nu s-a găsit nimic de adăugat.';
 $ec_lang['lpn_ts_clear']='Elimină tot';
 $ec_lang['lpn_ts_chip_tip']='Scoate {id} de pe grafic';
 $ec_lang['lpn_ts_none']='Încă nimic de reprezentat grafic. Selectați elemente pe hartă și apăsați Adaugă selecția.';
@@ -1625,7 +1625,7 @@ $ec_lang['lpn_ts_no_frames']='Încă niciun rezultat pe perioadă extinsă. Apă
 $ec_lang['lpn_ts_summary']='Elemente: {n}, momente de raportare: {steps}';
 $ec_lang['lpn_ts_axis_time']='Timp scurs';
 $ec_lang['lpn_freq_menu']='Frecvență';
-$ec_lang['lpn_freq_tip']='Reprezintă grafic distribuția de frecvență a unei proprietăți pentru toate joncțiunile sau toate conductele, la pasul de timp curent.';
+$ec_lang['lpn_freq_tip']='Distribuția de frecvență pentru o proprietate';
 $ec_lang['lpn_freq_title']='Distribuția valorilor';
 $ec_lang['lpn_freq_none']='Încă niciun rezultat pentru această valoare, așa că nu este nimic de reprezentat grafic.';
 $ec_lang['lpn_freq_summary']='Reprezentate: {n} din {total}';
@@ -1656,7 +1656,7 @@ $ec_lang['lpn_new_title']='Proiect nou';
 // them), or local and not georeferenced. The keys of the older three-radio box (lpn_new_coords and
 // its five siblings) are gone; Tom called the last of them obsolete on 2026-09-16.
 $ec_lang['lpn_new_coordsys']='Sistem de coordonate';
-$ec_lang['lpn_new_coordsys_tip']='Selectați sistemul de coordonate al rețelei dvs. Aceasta este permanentă; singura modalitate de a converti o rețea la alte coordonate este cu „Fișier, Deschide la coordonate noi”, iar aceasta este aproximativă.';
+$ec_lang['lpn_new_coordsys_tip']='Alegeți sistemul de coordonate al rețelei. Singura modalitate de a schimba această alegere este cu „Fișier, Convertește ca…” într-un proiect nou, iar acea conversie este aproximativă.';
 // **DELETED 2026-09-25: lpn_new_coordsys_geo / lpn_new_coordsys_geo_tip.** Don't expose the word
 // "projection" (dev/session-handoff.md RULINGS); once reworded, both were the identical string
 // lpn_convas_epsg / lpn_convas_epsg_tip already carries, so the radio reuses those keys rather than
@@ -1676,13 +1676,13 @@ $ec_lang['lpn_new_coordsys_local_tip']='Fără georeferențiere. Atașați propr
 // answers most of the question by itself: searching a town in Arizona leaves two UTM zones standing
 // out of a hundred and twenty.
 $ec_lang['lpn_crs_view']='Filtrează după vizualizarea hărții';
-$ec_lang['lpn_crs_view_tip']='Oferă doar proiecțiile care acoperă locul spre care este orientată harta. Dezactivați pentru a citi lista completă.';
+$ec_lang['lpn_crs_view_tip']='Oferă doar sistemele de coordonate care acoperă locul spre care este orientată harta. Debifați pentru a citi lista completă.';
 $ec_lang['lpn_crs_place']='Căutare după nume de loc';
-$ec_lang['lpn_crs_place_tip']='Introduceți un oraș, o adresă sau un reper, iar vizualizarea hărții se mută acolo. Cuvintele pe care le introduceți sunt trimise serviciului de denumiri de locuri al OpenStreetMap, care vă cere permisiunea prima dată. Un proiect geografic nou pornește de asemenea din locul găsit aici.';
+$ec_lang['lpn_crs_place_tip']='Căutările sunt trimise serviciului de denumiri de locuri OpenStreetMap, iar permisiunea este cerută prima dată. Un proiect geografic nou pornește și el din locul găsit aici.';
 $ec_lang['lpn_crs_search']='Caută';
 $ec_lang['lpn_crs_name']='Filtru după numele proiecției';
-$ec_lang['lpn_crs_name_tip']='Arată doar proiecțiile al căror nume sau cod EPSG conține ceea ce introduceți. Încercați un număr de zonă, sau UTM, sau Mercator.';
-$ec_lang['lpn_crs_list_tip']='Proiecțiile rămase după cele două filtre de mai sus. Alegeți una și apăsați Selectează.';
+$ec_lang['lpn_crs_name_tip']='Text care filtrează lista: sunt afișate doar sistemele de coordonate al căror nume sau cod EPSG îl conține.';
+$ec_lang['lpn_crs_list_tip']='Sistemele de coordonate care trec de filtrele de mai sus. Alegeți unul, apoi apăsați OK.';
 // Said rather than left blank: a filter that is on and filtering nothing looks broken.
 $ec_lang['lpn_crs_noview']='Niciun loc nu a fost căutat încă, deci este oferită lista completă. Căutați un loc mai sus sau măriți harta pentru a o restrânge.';
 $ec_lang['lpn_crs_count']='{n} din {total} proiecții listate.';
@@ -1714,7 +1714,7 @@ $ec_lang['lpn_crs_none']='Fără georeferențiere';
 // Task 584: the page-wide rule stated where it is decided. A new project gets the hard-coded
 // defaults; a preference is a template FILE rather than an invisible saved setting.
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_new_units_tip']='Un proiect își păstrează propriile unități, deci această alegere aparține doar acestui proiect și nimic de aici nu este salvat ca setare a browserului. Pentru a începe proiecte noi într-un anumit fel, salvați un proiect gol ca șablon și faceți o copie a lui de fiecare dată.';
+$ec_lang['lpn_new_units_tip']='Unitățile și alte setări sunt stocate cu fiecare proiect, deci această alegere se aplică doar acestui proiect și nu este salvată ca setare a browserului. Pentru a reutiliza preferințele, salvați un proiect gol ca șablon și începeți fiecare proiect nou de la el.';
 // A worked example rather than an instruction, in the placeholder where an instruction would be
 // read as the answer. Petaluma is the example js/lpn-search.js already uses.
 $ec_lang['lpn_new_place_hint']='Sibiu, România';
@@ -1757,7 +1757,7 @@ $ec_lang['lpn_file_import_inp_tip']='Citește o rețea dintr-un fișier EPANET, 
 // The other direction (Task 281). A DOWNLOAD, so the word is Export rather than Save: this page
 // keeps no handle on an `.inp` and never writes back to one.
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_file_export_inp_tip']='Scrie această rețea ca fișier EPANET .inp și îl descarcă. Numerele pe care le-ați introdus sunt scrise exact așa cum le-ați scris. Tot ce formatul .inp nu poate păstra este listat pentru dvs. după aceea.';
+$ec_lang['lpn_file_export_inp_tip']='Descărcați această rețea ca fișier EPANET .inp (într-un fișier zip împreună cu imaginea, dacă este cazul). Tot ce formatul .inp nu poate păstra este listat după aceea.';
 $ec_lang['lpn_status_inp_exported']='{file} a fost exportat.';
 // {n} is a whole number. Said plainly rather than hidden: a file that quietly loses a pump curve is
 // the failure this whole feature exists to prevent.
@@ -1778,46 +1778,46 @@ $ec_lang['lpn_inp_report_label_anchor']='Etichetele de text sunt plasate așa cu
 // or no [BACKDROP] line at all, never only "None" -- because none of those states a real coordinate
 // system either. See showInpReport() in js/looped-network.js.
 $ec_lang['lpn_inp_report_no_crs']='Fișierele EPANET nu conțin niciun sistem de coordonate, deci acest fișier nu va fi georeferențiat inițial. Pentru a-l plasa pe o hartă a lumii, folosiți Hartă, Harta lumii… Pentru a converti coordonatele sale, folosiți Fișier, Convertește ca…';
-$ec_lang['lpn_inp_report_lead']='Această pagină nu folosește tot ce folosește EPANET, dar nimic din fișierul dvs. nu este aruncat. Mai jos este ce conține fișierul dvs. și este păstrat fără a fi folosit, și ce a fost schimbat la citirea fișierului:';
+$ec_lang['lpn_inp_report_lead']='Această pagină nu folosește toate funcțiile EPANET, dar nicio dată din fișier nu este eliminată. Lista de mai jos arată datele din fișier care sunt păstrate fără a fi folosite și orice modificări făcute la import:';
 $ec_lang['lpn_inp_drop_headloss']='Acest fișier nu folosește formula Hazen-Williams. Această pagină calculează cu Hazen-Williams, deci numerele de rugozitate ale conductelor au fost păstrate exact așa cum au fost scrise, dar rezultatele de aici nu vor coincide cu cele din EPANET.';
-$ec_lang['lpn_inp_drop_tank_curve']='Aceste bazine nu au pereți drepți: fișierul dă forma lor ca o curbă. Curba este păstrată în caseta Biblioteci, bazinul continuă să o indice, iar o simulare pe o perioadă extinsă umple și golește bazinul după programul dat de acea curbă. Un singur moment este identic în ambele cazuri, deoarece suprafața apei este nivelul stabilit de fișier. Diametrul scris în fișier este păstrat alături de curbă și este cel cu care este desenat și rezolvat un bazin fără curbă.';
+$ec_lang['lpn_inp_drop_tank_curve']='Aceste bazine nu au pereți drepți: fișierul dă forma lor ca o curbă de volum. Curba este păstrată în caseta Biblioteci, bazinul continuă să o indice, iar o simulare pe perioadă extinsă o folosește pentru a calcula nivelul pe măsură ce bazinul se umple și se golește. O analiză pe o singură perioadă nu este afectată, deoarece suprafața apei este la nivelul stabilit în fișier. Diametrul din fișier este păstrat alături de curbă și este folosit pentru a desena și rezolva un bazin fără curbă.';
 // Three outcomes a valve in a file can meet, one string each (Task 248 phase 2). Only the last is
 // a loss; the first two are reported because the reader deserves to know what became of a valve
 // their file states, not because anything was thrown away.
-$ec_lang['lpn_inp_drop_tcv']='Aceste vane de reglare au fost importate ca vane de reglare, păstrând pierderea pe care le-o dă fișierul. Oricare dintre cei doi rezolvitori le poate calcula.';
-$ec_lang['lpn_inp_drop_valve_active']='Aceste vane controlează presiunea sau debitul și se deschid și se închid singure pe măsură ce apa se schimbă. Nimic din ele nu s-a pierdut la import, iar această pagină le rezolvă cu rezolvitorul EPANET, activând singură acel rezolvitor pentru această rețea.';
-$ec_lang['lpn_inp_drop_valve']='Aceste vane sunt descrise printr-o curbă sau printr-o cădere de presiune fixă, iar această pagină nu are un astfel de element. Au intrat ca și conducte deschise, deci rețeaua este încă legată, dar nimic nu mai controlează presiunea sau debitul acolo.';
-$ec_lang['lpn_inp_drop_cv']='În EPANET aceste conducte lasă apa să treacă într-un singur sens. Au fost importate ca și conducte obișnuite, deci apa poate curge acum în ambele sensuri prin ele.';
+$ec_lang['lpn_inp_drop_tcv']='Aceste vane de reglaj au fost importate ca vane de reglaj, cu pierderea stabilită în fișier.';
+$ec_lang['lpn_inp_drop_valve_active']='Aceste vane controlează presiunea sau debitul, iar starea lor se schimbă odată cu condițiile hidraulice. Au fost importate fără pierdere de date, iar această pagină le rezolvă.';
+$ec_lang['lpn_inp_drop_valve']='Aceste vane sunt descrise printr-o curbă sau printr-o cădere de presiune fixă, iar această pagină nu are un astfel de element. Au fost importate ca conducte deschise, deci rețeaua rămâne conectată, dar presiunea și debitul nu mai sunt controlate în acele locuri.';
+$ec_lang['lpn_inp_drop_cv']='În EPANET aceste conducte permit curgerea într-un singur sens (clapete de reținere). Au fost importate ca conducte obișnuite, deci acum apa poate curge în ambele sensuri.';
 $ec_lang['lpn_inp_drop_demands']='Aceste joncțiuni aveau mai mult de o cerință. Cerințele au fost însumate într-o singură cerință, pe care o păstrează această pagină.';
 $ec_lang['lpn_inp_drop_patterns']='Această pagină nu a citit modelele de cerință, deoarece partea ei care rulează o simulare pe o perioadă extinsă nu s-a încărcat. Fiecare cerință este numărul scris în fișier.';
 $ec_lang['lpn_inp_drop_demand_pattern']='Aceste joncțiuni își schimbă cerința pe parcursul rulării. Modelele lor au fost importate integral, iar cerința afișată este cea pentru momentul indicat de ceas.';
 $ec_lang['lpn_inp_drop_emitters']='Aceste joncțiuni au un coeficient de aspersor sau scurgere. A fost păstrat și este luat în calcul, dar deocamdată nu există un loc pe această pagină unde să îl vedeți sau să îl modificați.';
 $ec_lang['lpn_inp_drop_curve_long']='Această curbă de pompă avea mai mult de trei puncte. Au fost păstrate punctul cel mai jos, punctul din mijloc și punctul cel mai înalt, deoarece această pagină ajustează o curbă la cel mult trei puncte.';
 $ec_lang['lpn_inp_drop_curve_missing']='Această pompă indică o curbă care nu se află în fișier. Pompa a fost importată fără curbă, deci nu adaugă nicio sarcină.';
-$ec_lang['lpn_inp_drop_pump_other']='Această pompă este descrisă prin puterea pe care o consumă, nu printr-o curbă. A intrat fără nicio curbă, deci nu adaugă nicio sarcină.';
-$ec_lang['lpn_inp_drop_head_pattern']='Aceste rezervoare urcă și coboară pe parcursul rulării. Modelele lor au fost importate integral, iar nivelul de apă afișat este cel pentru momentul indicat de ceas.';
+$ec_lang['lpn_inp_drop_pump_other']='Această pompă este descrisă prin puterea pe care o consumă, nu printr-o curbă. A fost importată fără curbă, deci nu adaugă nicio sarcină.';
+$ec_lang['lpn_inp_drop_head_pattern']='Aceste rezervoare au o sarcină care variază pe parcursul rulării. Modelele lor au fost importate integral, iar nivelul de apă afișat este valoarea la momentul indicat de ceas.';
 $ec_lang['lpn_inp_drop_pump_speed']='Aceste pompe funcționează la o turație diferită de cea la care a fost măsurată curba lor, sau își schimbă turația pe parcursul rulării. Turația și modelul ei au fost importate integral, iar sarcina afișată este cea pentru momentul indicat de ceas.';
 $ec_lang['lpn_inp_drop_setting']='Aceste conducte, pompe și vane au o setare pe care această pagină nu o poate păstra. Au fost importate deschise.';
-$ec_lang['lpn_inp_drop_rules']='Acest fișier conține comenzi bazate pe reguli. Această pagină le citește și le folosește. Rulați modelul cu motorul EPANET și regulile sunt aplicate, fiecare nivel, presiune și debit din ele fiind convertite în unitățile pe care le arată acest proiect. Deschideți Reguli la Biblioteci pentru a citi sau modifica una. Sunt păstrate exact așa cum le precizează fișierul și sunt scrise înapoi dacă salvați un fișier EPANET.';
+$ec_lang['lpn_inp_drop_rules']='Acest fișier conține controale bazate pe reguli. Această pagină le citește și le aplică. Când modelul este rulat, regulile sunt aplicate, fiecare nivel, presiune și debit din ele fiind convertit în unitățile pe care le afișează acest proiect. Deschideți Reguli la Biblioteci pentru a vizualiza sau edita o regulă. Regulile sunt păstrate exact așa cum le precizează fișierul și sunt scrise înapoi dacă salvați un fișier EPANET.';
 $ec_lang['lpn_inp_drop_eps']='Acest fișier descrie o simulare pe o perioadă extinsă. Partea acestei pagini care rulează o simulare pe o perioadă extinsă nu s-a încărcat, deci au fost importate doar condițiile inițiale.';
-$ec_lang['lpn_inp_drop_quality']='Acest fișier descrie cum se schimbă calitatea apei pe măsură ce călătorește: ce se află inițial în apă și cât de repede reacționează acea substanță în conducte și în bazine. Această pagină citește aceste numere și le folosește. Alegeți o substanță chimică la Setări, Calcul, Calitatea apei, apoi rulați modelul cu motorul EPANET, iar concentrația este calculată de-a lungul rețelei pe măsură ce rularea avansează. Liniile sunt păstrate și sunt scrise înapoi dacă salvați un fișier EPANET.';
-$ec_lang['lpn_inp_drop_sources_mixing']='Acest fișier spune unde este dozată o substanță chimică în rețea și cum se amestecă apa dintr-un bazin. O doză apare la nodul unde este adăugată, iar un bazin indică ce model de amestecare urmează. Atât doza, cât și modelul de amestecare sunt calculate doar de motorul EPANET.';
+$ec_lang['lpn_inp_drop_quality']='Acest fișier descrie calitatea apei: concentrațiile inițiale și ratele de reacție în conducte și bazine. Această pagină citește și folosește aceste valori. Alegeți o substanță chimică la Setări, Calcul, Calitatea apei, apoi rulați modelul pentru a calcula concentrațiile în întreaga rețea pe durata rulării. Liniile sunt păstrate și sunt scrise înapoi dacă salvați un fișier EPANET.';
+$ec_lang['lpn_inp_drop_sources_mixing']='Acest fișier precizează unde este injectată o substanță chimică în rețea și cum se amestecă apa din fiecare bazin. Fiecare sursă este afișată la nodul unde este aplicată, iar fiecare bazin își arată modelul de amestecare. Ambele sunt folosite când rețeaua este rulată pe o durată totală de rulare.';
 $ec_lang['lpn_inp_drop_energy']='Acest fișier EPANET include date de modelare a costului pompării. Această pagină le citește și le folosește. Rulați modelul cu motorul EPANET, apoi deschideți Apă, Rapoarte, Energie pompe pentru a vedea cât a funcționat fiecare pompă, ce putere a consumat, ce energie a folosit și cât a costat. Liniile sunt păstrate și sunt scrise înapoi dacă salvați un fișier EPANET.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_inp_drop_tags']='Acest fișier atribuie etichete unora dintre joncțiunile, conductele sau alte elemente ale sale. Fiecare etichetă a fost importată integral și se află în proprietățile propriului element, unde o puteți citi sau modifica.';
+$ec_lang['lpn_inp_drop_tags']='Acest fișier atribuie marcaje unor joncțiuni, conducte sau altor elemente. Fiecare marcaj a fost importat și apare în proprietățile elementului său, unde poate fi vizualizat sau editat.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_inp_drop_report']='Acest fișier conține propriile setări ale EPANET pentru formatul raportului pe care îl tipărește. Puteți citi raportul motorului aici, la Rapoarte, Rulare EPANET, dar acesta apare în formatul standard al motorului, nu în cel cerut de aceste setări. Liniile sunt păstrate și sunt scrise înapoi dacă salvați un fișier EPANET.';
+$ec_lang['lpn_inp_drop_report']='Acest fișier conține setări EPANET pentru formatul raportului. Raportul de rulare este disponibil la Rapoarte, Rulare, dar folosește formatul standard EPANET, nu formatul specificat de aceste setări. Liniile sunt păstrate și sunt scrise înapoi dacă salvați un fișier EPANET.';
 $ec_lang['lpn_inp_drop_sections']='Acest fișier conține o secțiune pe care această pagină nu o citește deloc. Nimic aici nu o folosește. Este păstrată în întregime și este scrisă înapoi dacă salvați un fișier EPANET.';
-$ec_lang['lpn_inp_drop_quality_options']='Acest fișier precizează opțiunile EPANET pentru calitatea apei: opțiunea Quality, care numește tipul de analiză a calității apei, și două setări legate de o substanță chimică, Relative diffusivity și Quality tolerance. Toate trei sunt păstrate și toate trei sunt folosite. Vechimea apei, urmărirea sursei și o substanță chimică sunt fiecare calculate aici, iar cele două setări chimice sunt transmise motorului EPANET când rulați o substanță chimică. Toate sunt scrise înapoi dacă salvați un fișier EPANET.';
+$ec_lang['lpn_inp_drop_quality_options']='Acest fișier precizează opțiunile EPANET pentru calitatea apei: opțiunea Quality, care numește tipul de analiză a calității apei, și două setări legate de o substanță chimică, Relative diffusivity și Quality tolerance. Toate trei sunt păstrate și folosite. Vechimea apei, urmărirea sursei și o substanță chimică sunt calculate fiecare aici, iar cele două setări chimice sunt folosite când se rulează o substanță chimică. Toate sunt scrise înapoi dacă salvați un fișier EPANET.';
 $ec_lang['lpn_inp_drop_file_options']='Acest fișier face trimitere la un fișier auxiliar: Map, care conține coordonate, sau Hydraulics, care conține hidraulica deja calculată. Această pagină nu poate deschide niciunul dintre ele, deci liniile sunt păstrate așa cum sunt și scrise înapoi dacă salvați un fișier EPANET.';
 $ec_lang['lpn_inp_drop_other_options']='Acest fișier stabilește opțiuni pe care această pagină nu le citește. Nimic aici nu le folosește. Ele sunt păstrate și sunt scrise înapoi dacă salvați un fișier EPANET.';
 $ec_lang['lpn_inp_drop_net_options']='Acest fișier .net EPANET precizează setări pentru care această pagină nu are niciun control, deci valorile lor sunt listate aici, în loc să fie preluate. Tot restul a fost preluat. Dacă aveți nevoie de ele, deschideți fișierul în EPANET și folosiți Fișier, Export, Rețea pentru a-l salva ca fișier .inp, apoi importați-l pe acela.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_net_emergency']='Acesta a fost un fișier .net EPANET. Acela este propriul fișier de proiect al EPANET, nu are o descriere publicată, iar această pagină îl citește deducând formatul din fișiere exemplu, deci folosiți-l doar atunci când nu aveți altă opțiune, nu ca o cale sigură. Fișierul .inp este formatul documentat pe care îl citește orice alt program: în EPANET folosiți Fișier, Export, Rețea pentru a scrie unul, și importați-l pe acela ori de câte ori puteți.';
+$ec_lang['lpn_net_emergency']='Acesta a fost un fișier .net EPANET, formatul nativ de proiect EPANET. Formatul nu are o specificație publicată; această pagină îl citește folosind un format dedus din fișiere exemplu, deci folosiți-l doar atunci când nu este disponibil un fișier .inp. Fișierul .inp este formatul documentat pe care îl citesc alte programe: în EPANET folosiți Fișier, Export, Rețea pentru a scrie unul și importați acel fișier în schimb, ori de câte ori este posibil.';
 $ec_lang['lpn_inp_drop_backdrop']='Acest fișier indică o imagine de fundal, dar nu conține imaginea propriu-zisă. Adăugați-o dvs. cu Fișier, Imagine de fundal, Adaugă imagine.';
 $ec_lang['lpn_inp_drop_dangling']='Aceste conducte indică o joncțiune care nu se află în fișier, deci au fost omise.';
 $ec_lang['lpn_inp_drop_units']='Unitatea de debit numită în acest fișier nu este cunoscută de această pagină, deci fiecare număr a fost citit ca galoane pe minut. Verificați fiecare număr înainte de a folosi rezultatele.';
-$ec_lang['lpn_inp_drop_anchor_missing']='Acest text era atașat unei joncțiuni, unui rezervor sau unui bazin care nu se află în fișier. A fost importat ca text liber, în locul indicat de fișier, și nu mai urmărește nimic.';
+$ec_lang['lpn_inp_drop_anchor_missing']='Acest text era atașat unei joncțiuni, unui rezervor sau unui bazin care nu se află în fișier. A fost importat ca text liber în locul indicat de fișier și nu este atașat niciunui element.';
 $ec_lang['lpn_import_notes_heading']='Acest proiect a fost citit dintr-un fișier EPANET. O parte din ce conține acel fișier este păstrată, dar nu este folosită pe această pagină.';
 // {name} is a project name; word order is the translator's to choose. Says where the user landed,
 // the same way lpn_status_deleted_opened does -- an opened file becomes a NEW project here, and
@@ -1859,7 +1859,7 @@ $ec_lang['lpn_file_upload_explain']='Acest browser nu se poate conecta la un fi�
 // from. It belongs in this tip rather than in a dialog: it answers a question asked at the moment
 // the user is choosing where their work goes.
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_file_saveas_tip_download']='Salvează folosind setările de Descărcare ale browserului dvs. Acest browser nu se poate conecta la un fișier, deci Salvare este dezactivată și este disponibilă doar Salvare ca. Dacă activați setarea browserului \'Întreabă unde să salvezi fiecare fișier\', puteți alege fișierul original și îl puteți suprascrie.';
+$ec_lang['lpn_file_saveas_tip_download']='Salvează folosind setările de Descărcare ale browserului. Acest browser nu se poate conecta la un fișier, deci Salvare este dezactivată și este disponibilă doar Salvare ca. Dacă setarea browserului „Întreabă unde să salvezi fiecare fișier” este activată, fișierul original poate fi ales și suprascris.';
 $ec_lang['lpn_status_uploaded']='Fișierul proiect a fost încărcat. Nu se poate menține nicio conexiune la el, deci singurul mod de a salva înapoi în el este folosind Fișier, Salvare ca.';
 $ec_lang['lpn_status_downloaded']='S-a descărcat {file}. Acest browser nu se poate conecta la un fișier, deci acest proiect rămâne marcat ca nesalvat într-un fișier.';
 $ec_lang['lpn_status_file_opened']='S-a deschis {file}.';
@@ -1885,7 +1885,7 @@ $ec_lang['lpn_file_needs_reopen']='Acest proiect provine din {file}, dar conexiu
 // Says what is still safe before it says what failed: the reassurance is the part a worried user
 // needs, and it is true -- the browser copy is written on every edit regardless.
 $ec_lang['lpn_file_write_failed']='Nu s-a putut scrie în fișier. Este posibil să fi fost mutat sau redenumit, sau permisiunea să fi fost retrasă. Munca dvs. este în continuare salvată în acest browser.';
-$ec_lang['lpn_file_changed_elsewhere']='Altcineva a salvat în acest fișier de când l-ați deschis, deci salvarea acum ar suprascrie munca lor. Folosiți Fișier, Salvare ca pentru a vă păstra modificările într-un fișier propriu, sau Fișier, Revenire pentru a renunța la ale dvs. și a le încărca pe ale lor.';
+$ec_lang['lpn_file_changed_elsewhere']='Alt utilizator a salvat în acest fișier de când l-ați deschis, deci salvarea acum ar suprascrie munca lui. Folosiți Fișier, Salvare ca pentru a salva modificările într-un fișier separat, sau Fișier, Revenire pentru a renunța la modificările dvs. și a încărca versiunea salvată.';
 // Project locks (Task 195 Phase 2) -- who is editing a shared project file right now. {name} is a
 // person as they chose to be known ("Dave T."), never a login; word order is the translator's to
 // choose. A lock never expires on its own, so none of these may suggest waiting will free it.
@@ -1935,7 +1935,7 @@ $ec_lang['lpn_lock_open_choices_ask']='„Întreabă” anunță pe oricine are 
 $ec_lang['lpn_lock_ask']='Întreabă';
 // Asked at the one moment the name is useful, and SENT rather than stored: nothing new is written to
 // this computer for it, which is the whole point of moving the question here.
-$ec_lang['lpn_lock_ask_prompt']='Cine să spunem că întreabă? Inițialele dvs. sunt ideale. Sunt păstrate împreună cu blocarea acestui fișier pe serverul nostru, pentru oricine îl are deschis, și sunt șterse în cel mult 30 de zile.';
+$ec_lang['lpn_lock_ask_prompt']='Cine să spunem că întreabă? Introduceți, de exemplu, inițialele dvs. Sunt păstrate împreună cu blocarea acestui fișier pe serverul nostru, pentru oricine îl are deschis, și sunt șterse în cel mult 30 de zile.';
 $ec_lang['lpn_lock_ask_sent']='Am cerut oricui are acest fișier deschis să îl închidă. Va vedea cererea în decurs de un minut, dacă pagina lui este încă deschisă. Nimic altceva nu s-a schimbat, iar fișierul este încă al lui până când îl închide.';
 $ec_lang['lpn_lock_ask_failed']='Mesajul dvs. nu a putut fi livrat. Fie nimeni nu are acest fișier deschis acum, fie serverul nu a putut fi contactat.';
 // **A CANCEL THAT LEAVES NO RESIDUE IS THE DEFECT** (ROADMAP Task 704, Ida's diagnosis). Backing
@@ -1963,28 +1963,28 @@ $ec_lang['lpn_msglog_note']='Cele mai noi primele. Această pagină păstrează 
 // at it, and it never offers to save over the other person\'s file. It cannot -- their file has moved
 // on since you opened it, so writing yours over it would destroy their work. What you CAN do is
 // everything else, including changing the network and keeping it as a file of your own.
-$ec_lang['lpn_lock_readonly_banner']='Doar-citire: {name} are acest fișier deschis. Puteți modifica orice doriți aici, dar nu puteți salva. Folosiți Fișier, Salvare ca pentru a salva într-un alt fișier.';
+$ec_lang['lpn_lock_readonly_banner']='Doar-citire: {name} are acest fișier deschis. Orice de aici poate fi modificat, dar nu salvat. Folosiți Fișier, Salvare ca pentru a salva într-un alt fișier.';
 // Opening a file we could not lock is the moment of danger (Tom, 2026-08-03): from then on nothing
 // stops a colleague editing the same file. Editing still works -- an unreachable server must never
 // take the calculator away -- so this warns rather than blocks, and promises the follow-up that
 // lpn_lock_restored keeps.
-$ec_lang['lpn_lock_unavailable']='Atenție: nu s-a putut contacta serverul pentru a verifica sau crea o blocare pe acest proiect, deci nimic nu împiedică un coleg să editeze același fișier în același timp. Veți fi anunțat dacă blocarea începe din nou să funcționeze.';
-$ec_lang['lpn_lock_storage_error']='Atenție: acest site nu poate salva înregistrările de blocare, deci nimic nu împiedică un coleg să editeze același fișier în același timp. Aceasta este o eroare de configurare pe server, nu ceva ce puteți remedia aici — folderul de blocare nu poate fi scris de serverul web.';
-$ec_lang['lpn_lock_full_error']='Atenție: acest site a rămas fără spațiu pentru a înregistra cine are ce proiect deschis, deci nimic nu împiedică un coleg să editeze același fișier în același timp. Aceasta este o eroare de configurare pe server, nu ceva ce puteți remedia aici.';
-$ec_lang['lpn_lock_not_asked']='Blocarea nu funcționează pentru acest proiect, deci nimic nu împiedică un coleg să editeze același fișier în același timp. Acest proiect nu are încă niciun identificator, iar salvarea lui într-un fișier îi atribuie unul.';
-$ec_lang['lpn_lock_restored']='Blocarea funcționează din nou, iar acest fișier este acum al dvs. pentru a salva în el.';
+$ec_lang['lpn_lock_unavailable']='Atenție: serverul nu a putut fi contactat pentru a verifica sau crea o blocare pe acest proiect, deci un alt utilizator poate edita același fișier în același timp. Apare un mesaj dacă blocarea este reluată.';
+$ec_lang['lpn_lock_storage_error']='Atenție: acest site nu poate salva înregistrările de blocare, deci un alt utilizator poate edita același fișier în același timp. Aceasta este o eroare de configurare a serverului care nu poate fi remediată din această pagină: folderul de blocare nu poate fi scris de serverul web.';
+$ec_lang['lpn_lock_full_error']='Atenție: acest site nu mai are spațiu de stocare pentru înregistrările de blocare, deci un alt utilizator poate edita același fișier în același timp. Aceasta este o eroare de configurare a serverului care nu poate fi remediată din această pagină.';
+$ec_lang['lpn_lock_not_asked']='Blocarea nu este activă pentru acest proiect, deci un alt utilizator poate edita același fișier în același timp. Acest proiect nu are încă un identificator; salvarea lui într-un fișier îi atribuie unul.';
+$ec_lang['lpn_lock_restored']='Blocarea a fost restabilită, iar acest fișier poate fi acum salvat.';
 $ec_lang['lpn_lock_dismiss']='Ascunde acest mesaj';
 // Shown once per browser, before the first file picker opens. Three short paragraphs on purpose:
 // this is the one place the whole file-and-lock idea is explained, and it has to survive translation
 // into 26 languages, so it says one thing per sentence and avoids every word of jargon it can.
-$ec_lang['lpn_file_training_1']='Proiectul dvs. va fi salvat într-un fișier pe acest calculator. Este salvat atunci când solicitați, și în niciun alt moment, deci nimic nu este scris în acel fișier fără știrea dvs.';
-$ec_lang['lpn_file_training_2']='Pentru ca două persoane să nu editeze niciodată un fișier în același timp, acest site urmărește cine îl are deschis. Dacă cineva îl are deja deschis, îl puteți totuși deschide și vizualiza, sau puteți păstra propria dvs. copie.';
+$ec_lang['lpn_file_training_1']='Proiectul va fi salvat într-un fișier pe acest calculator. Este salvat doar când îl salvați dvs. și în niciun alt moment.';
+$ec_lang['lpn_file_training_2']='Pentru ca două persoane să nu editeze niciodată un fișier în același timp, acest site urmărește cine îl are deschis. Dacă îl are deja cineva, poate fi totuși deschis pentru vizualizare sau copiat pentru a fi păstrat.';
 // Said BEFORE it happens, because it is alarming and unexplained when it happens (Tom, 2026-08-04:
 // "hawsedc.com will be able to edit ... is a canned browser warning whose confusing meaning we
 // cannot fix"). He is right that we cannot fix it -- it is the browser asking, in the browser\'s
 // own words, and there is no way to reword it, suppress it, or pre-approve it. What we CAN do is
 // warn that it is coming and say it is normal, which is what this line is for.
-$ec_lang['lpn_file_training_permission']='Prima dată când salvați, browserul dvs. vă va întreba dacă acest site poate edita fișierul. Această întrebare vine de la browser, nu de la noi, iar răspunsul afirmativ este ceea ce permite funcției Salvare să scrie munca dvs. înapoi. De obicei este întrebată o singură dată per fișier.';
+$ec_lang['lpn_file_training_permission']='Prima dată când salvați, browserul întreabă dacă acest site poate edita fișierul. Cererea vine de la browser, nu de la acest site, iar permisiunea este necesară pentru ca Salvare să scrie în fișier. De obicei este cerută o singură dată per fișier.';
 // Corrected 2026-08-04: the old wording said anyone you SEND THE FILE TO can see this name, which is
 // false -- the name is never written into the project file. It is held in this browser and on this
 // site, and it is shown to whoever opens the SAME file. That is still public enough to be worth
@@ -2116,11 +2116,11 @@ $ec_lang['lpn_diag_unreachable']='Aceste noduri nu au niciun traseu către un re
 // Tom turned the solver ON and was told about VALVES he had not created (2026-08-14). The valve
 // pair is right when a valve triggered the fetch; the plain pair is right when the user simply
 // chose the solver.
-$ec_lang['lpn_engine_fetching']='Se obține rezolvitorul EPANET. Este descărcat o singură dată și apoi păstrat pe acest dispozitiv, astfel încât funcționează ulterior offline.';
+$ec_lang['lpn_engine_fetching']='Se descarcă rezolvitorul EPANET. Este descărcat o singură dată și apoi stocat pe acest dispozitiv, deci funcționează ulterior offline.';
 $ec_lang['lpn_engine_ready']='Rezolvitorul EPANET se află acum pe acest dispozitiv și funcționează offline.';
-$ec_lang['lpn_engine_fetching_valve']='Se obține rezolvitorul EPANET, astfel încât această vană poate fi rezolvată acum și offline mai târziu.';
-$ec_lang['lpn_engine_ready_valve']='Rezolvitorul EPANET se află acum pe acest dispozitiv. Vanele care se deschid și se închid singure vor funcționa offline.';
-$ec_lang['lpn_engine_unavailable']='Rezolvitorul EPANET nu a putut fi obținut; acesta este cel care rezolvă vanele care se deschid și se închid singure. Conectați-vă la internet o singură dată, iar apoi rămâne pe acest dispozitiv.';
+$ec_lang['lpn_engine_fetching_valve']='Se descarcă rezolvitorul EPANET, astfel încât această vană poate fi rezolvată acum și offline mai târziu.';
+$ec_lang['lpn_engine_ready_valve']='Rezolvitorul EPANET se află acum pe acest dispozitiv. Vanele de control al presiunii și al debitului (PRV, PSV, FCV) pot fi acum rezolvate offline.';
+$ec_lang['lpn_engine_unavailable']='Rezolvitorul EPANET, necesar pentru rezolvarea vanelor de control al presiunii și al debitului (PRV, PSV, FCV), nu a putut fi descărcat. După o conectare la internet, rezolvitorul este stocat pe acest dispozitiv.';
 $ec_lang['lpn_engine_needed_loading']='Se încarcă rezolvitorul EPANET în timp ce construiți. Rezultatele vor fi disponibile după încărcarea completă.';
 // **THE WAIT, SAID OUT LOUD, WITH A NUMBER ON IT** (ROADMAP Task 608). The first sentence is Tom's
 // own, 2026-09-08, and "Continue working" is the half that matters: it says the page is not frozen.
@@ -2133,8 +2133,8 @@ $ec_lang['lpn_engine_wait']='Se încarcă rezolvitorul. Rezultatele sunt întâr
 $ec_lang['lpn_engine_wait_pct']='Rezolvitor încărcat {percent}%.';
 $ec_lang['lpn_engine_wait_bytes']='Rezolvitor: {kb} KB încărcați până acum. Totalul nu este disponibil, deci procentul de finalizare este necunoscut.';
 $ec_lang['lpn_engine_needed_failed']='Rezolvitorul EPANET nu a fost încă încărcat, nu poate fi încărcat, iar această rețea poate fi rezolvată doar de el. Va fi încărcat atunci când sunteți conectat la internet.';
-$ec_lang['lpn_diag_valve_needs_epanet']='Aceste vane se deschid și se închid singure, iar numai rezolvitorul EPANET le poate calcula. Rezolvitorul EPANET nu a putut fi încărcat, deci aceste rezultate lipsesc:';
-$ec_lang['lpn_diag_valve_on_fixed_head']='Aceste vane sunt conectate direct la un rezervor sau la un bazin, care deja stabilește nivelul apei acolo, așa că nu mai rămâne nimic de controlat pentru vană. Introduceți o conductă scurtă între vană și rezervor sau bazin:';
+$ec_lang['lpn_diag_valve_needs_epanet']='Acestea sunt vane de control al presiunii sau al debitului, iar numai rezolvitorul EPANET le poate calcula. Rezolvitorul EPANET nu a putut fi încărcat, deci aceste rezultate lipsesc:';
+$ec_lang['lpn_diag_valve_on_fixed_head']='Aceste vane sunt conectate direct la un rezervor sau la un bazin, care fixează linia piezometrică în acel nod, deci vana nu are nimic de controlat. Introduceți o conductă scurtă între vană și rezervor sau bazin:';
 $ec_lang['lpn_diag_not_converged']='Nu s-a găsit nicio soluție. Verificați dacă există valori imposibile în realitate, cum ar fi un diametru zero.';
 // **THE NUMBERS ARE DRAWN AND MARKED, NOT THROWN AWAY** (ROADMAP Task 565). A solve that did not
 // converge still produced the last iterate, and that is every number this page has -- refusing to
@@ -2164,7 +2164,7 @@ $ec_lang['lpn_field_to']='La';
 // different units, and one shared label would have to be vague enough to cover all three.
 $ec_lang['lpn_field_valve_type']='Tipul vanei';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_field_valve_type_tip']='Ce face vana. O vană de reglaj menține o pierdere fixă. Celelalte trei mențin o presiune sau un debit și se deschid complet, se închid sau se închid parțial pe măsură ce apa se schimbă. Tipurile controlează proprietăți hidraulice diferite, deci setările pot fi pierdute la schimbare.';
+$ec_lang['lpn_field_valve_type_tip']='Tipul vanei. O vană de reglaj (TCV) aplică o pierdere fixă. PRV, PSV și FCV mențin o presiune sau un debit și se deschid complet, se închid sau se închid parțial pe măsură ce condițiile hidraulice se schimbă. O PBV elimină o presiune fixă, iar o GPV urmează o curbă de pierdere de sarcină. Tipurile controlează proprietăți hidraulice diferite, deci setările pot fi pierdute la schimbarea tipului.';
 // THE ENGLISH IS ELLIPTICAL ON PURPOSE -- the noun "valve" is dropped because the dropdown above
 // already says "Valve type" -- so a translator meets a bare modifier with no head noun, and
 // "throttle" alone pulls hard toward a car accelerator. Each _syn supplies the noun plus alternates
@@ -2181,20 +2181,20 @@ $ec_lang['lpn_valve_type_gpv']='Uz general (GPV)';
 $ec_lang['lpn_field_valve_setting_drop']='Cădere de presiune';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_field_valve_setting_drop_tip']='Presiunea pe care o elimină vana. O vană cu cădere fixă de presiune elimină întotdeauna exact această presiune, indiferent de sensul de curgere a apei. Este o cădere pe vană, nu o presiune de menținut.';
-$ec_lang['lpn_inp_drop_gpv_curve']='Această vană indică o curbă de pierdere de sarcină care nu se află în fișier. Vana a fost importată fără curbă, deci rămâne complet deschisă până când îi dați una.';
+$ec_lang['lpn_inp_drop_gpv_curve']='Această vană indică o curbă de pierdere de sarcină care nu se află în fișier. Vana a fost importată fără curbă, deci rămâne complet deschisă până când este selectată o curbă.';
 $ec_lang['lpn_gpv_curve_source']='Curbă de pierdere de sarcină a vanei';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_gpv_curve_source_tip']='Curba din caseta Biblioteci care arată câtă sarcină pierde această vană la fiecare debit. Mai multe vane pot folosi aceeași curbă, iar modificarea ei acolo le schimbă pe toate. Această vană păstrează doar referința; punctele în sine sunt citite și editate la Biblioteci, Curbe.';
+$ec_lang['lpn_gpv_curve_source_tip']='Curba din caseta Biblioteci care dă pierderea de sarcină prin această vană la fiecare debit. Mai multe vane pot folosi aceeași curbă, iar editarea ei acolo le schimbă pe toate.';
 $ec_lang['lpn_field_valve_setting_pressure']='Presiune de reglare';
-$ec_lang['lpn_field_valve_setting_pressure_tip']='Presiunea pe care o menține vana. O vană reducătoare de presiune menține presiunea pe partea aval la sau sub această valoare. O vană susținătoare de presiune menține presiunea pe partea amonte la sau peste această valoare.';
+$ec_lang['lpn_field_valve_setting_pressure_tip']='O vană reducătoare de presiune menține presiunea pe partea aval la sau sub această valoare. O vană susținătoare de presiune menține presiunea pe partea amonte la sau peste această valoare.';
 $ec_lang['lpn_field_valve_setting_flow']='Debit de reglare';
-$ec_lang['lpn_field_valve_setting_flow_tip']='Debitul maxim pe care vana îl lasă să treacă. Când vrea să treacă mai puțină apă decât atât, vana stă complet deschisă și nu adaugă nicio pierdere.';
+$ec_lang['lpn_field_valve_setting_flow_tip']='Debitul maxim prin vană. Când debitul este mai mic decât această valoare, vana este complet deschisă și nu adaugă nicio pierdere.';
 $ec_lang['lpn_field_valve_setting']='Setare';
 $ec_lang['lpn_field_valve_setting_loss']='Coeficient de pierdere';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_field_valve_setting_loss_tip']='Câtă sarcină elimină vana de reglaj, exprimată ca multiplu al sarcinii de viteză. Folosiți 0 pentru o vană complet deschisă. Acest singur număr reprezintă întreaga pierdere a unei vane de reglaj.';
-$ec_lang['lpn_field_valve_diameter_tip']='Lățimea deschiderii prin vană. Viteza apei prin vană este calculată din această lățime, iar pierderea rezultă din acea viteză.';
-$ec_lang['lpn_field_valve_km_tip']='Pierderea corpului vanei atunci când vana stă complet deschisă, pe lângă orice elimină setarea vanei. Este exprimată ca multiplu al sarcinii de viteză. Folosiți 0 pentru a o ignora.';
+$ec_lang['lpn_field_valve_setting_loss_tip']='Sarcina eliminată de vana de reglaj, ca multiplu al sarcinii de viteză. Folosiți 0 pentru o vană complet deschisă. Această singură valoare reprezintă întreaga pierdere a unei vane de reglaj.';
+$ec_lang['lpn_field_valve_diameter_tip']='Diametrul deschiderii vanei. Viteza prin vană este calculată din acest diametru, iar pierderea din acea viteză.';
+$ec_lang['lpn_field_valve_km_tip']='Pierderea prin corpul vanei când vana este complet deschisă, în plus față de orice pierdere dată de setarea vanei. Este exprimată ca multiplu al sarcinii de viteză. Folosiți 0 pentru a o ignora.';
 $ec_lang['lpn_field_km']='Coeficient de pierdere locală, k';
 // Short form of the same concept, for the two NARROW uses: the Labels checkbox list and the on-map
 // legend beside it. Per CLAUDE.md's rule that a shared label must fit its narrowest use, these get
@@ -2208,7 +2208,7 @@ $ec_lang['lpn_field_km_short']='Pierdere locală, k';
 // one curve name the same curve now, so there is no borrow to describe.
 $ec_lang['lpn_pump_curve_source']='Curbă de sarcină a pompei';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_pump_curve_source_tip']='Curba din caseta Biblioteci care arată câtă sarcină adaugă această pompă la fiecare debit. Mai multe pompe pot folosi aceeași curbă, iar modificarea ei acolo le schimbă pe toate. Această pompă păstrează doar referința; punctele în sine sunt citite și editate la Biblioteci, Curbe.';
+$ec_lang['lpn_pump_curve_source_tip']='Curba din caseta Biblioteci care dă sarcina pe care această pompă o adaugă la fiecare debit. Mai multe pompe pot folosi aceeași curbă, iar editarea ei acolo le schimbă pe toate.';
 // **"THE NOTES BELOW" DO NOT EXIST ON THIS PAGE** (Tom, 2026-09-05: *"There are no notes below.
 // It's in Help, Notes on this page."*). Every other calculator in this suite is a form with its
 // notes printed under it, and this sentence was written in that habit; the map page is a full-window
@@ -2283,29 +2283,29 @@ $ec_lang['lpn_pump_effic_unstated']='Această pompă indică o curbă de eficien
 // from a "Mode:" prefix + the tool's own label, per CLAUDE.md's concept-level label reuse rule --
 // word order/grammar around a mode name varies by language, so each mode gets its own full string.
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_mode_select']='Mod: Selectare. Faceți clic pe un element sau pe o etichetă pentru a-l vedea sau modifica. Trageți pentru a muta un nod, un vârf sau o etichetă. Folosiți instrumentul Vârfuri pentru a adăuga sau elimina îndoiturile unei conducte.';
-$ec_lang['lpn_mode_delete']='Mod: Ștergere. Faceți clic pe un element pentru a-l elimina.';
+$ec_lang['lpn_mode_select']='Mod: Selectare. Selectați un element sau o etichetă pentru a-l vedea sau modifica. Trageți pentru a muta un nod sau o etichetă. Folosiți instrumentul Vârfuri pentru a adăuga sau elimina îndoiturile unei conducte.';
+$ec_lang['lpn_mode_delete']='Mod: Ștergere. Selectați un element pentru a-l elimina.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_mode_vertices']='Mod: Vârfuri. Vârfurile fiecărei conducte sunt afișate ca mici mânere pătrate. Faceți clic pe o conductă pentru a adăuga un vârf, faceți clic pe un mâner pentru a-l elimina, sau trageți un mâner pentru a-l muta. Nimic altceva de pe hartă nu se schimbă în acest mod.';
-$ec_lang['lpn_mode_zoom_window']='Mod: Zoom fereastră. Faceți clic pe două colțuri opuse ale unui dreptunghi, sau trageți unul, pe hartă pentru a mări pe el.';
+$ec_lang['lpn_mode_vertices']='Mod: Vârfuri. Vârfurile fiecărei conducte sunt afișate ca mici mânere pătrate. Specificați un punct pe o conductă pentru a adăuga un vârf, selectați un mâner pentru a-l elimina sau trageți un mâner pentru a-l muta. Nimic altceva de pe hartă nu poate fi modificat în acest mod.';
+$ec_lang['lpn_mode_zoom_window']='Mod: Zoom fereastră. Specificați două colțuri opuse ale unui dreptunghi pe hartă, sau trageți unul, pentru a mări zona respectivă.';
 // One-shot notice when the Delete key is pressed with nothing picked (Task 415). It has to name the
 // gesture, because the whole point of the change is that the order is now subject, then verb.
-$ec_lang['lpn_select_first']='Nimic nu este selectat. Faceți mai întâi clic pe un element de pe hartă, apoi apăsați Delete.';
-$ec_lang['lpn_mode_add_junction']='Mod: Adăugare joncțiune. Faceți clic pe hartă pentru a plasa o joncțiune. Comutați la modul Selectare pentru a modifica sau muta elemente și etichete.';
-$ec_lang['lpn_mode_add_reservoir']='Mod: Adăugare rezervor. Faceți clic pe hartă pentru a plasa un rezervor. Comutați la modul Selectare pentru a modifica sau muta elemente și etichete.';
-$ec_lang['lpn_mode_add_tank']='Mod: Adăugare bazin. Faceți clic pe hartă pentru a plasa un bazin. Comutați la modul Selectare pentru a modifica sau muta elemente și etichete.';
-$ec_lang['lpn_mode_add_pipe']='Mod: Adăugare conductă. Faceți clic pe un nod, apoi pe alt nod, pentru a le conecta. Faceți clic în spațiu liber între ele pentru a îndoi linia, sau apăsați Escape pentru a începe din nou. Comutați la modul Selectare pentru a modifica sau muta elemente și etichete.';
-$ec_lang['lpn_mode_add_pump']='Mod: Adăugare pompă. Faceți clic pe un nod, apoi pe alt nod, pentru a le conecta. Faceți clic în spațiu liber între ele pentru a îndoi linia, sau apăsați Escape pentru a începe din nou. Comutați la modul Selectare pentru a modifica sau muta elemente și etichete.';
-$ec_lang['lpn_mode_add_valve']='Mod: Adăugare vană. Faceți clic pe un nod, apoi pe alt nod, pentru a le conecta. Faceți clic în spațiu liber între ele pentru a îndoi linia, sau apăsați Escape pentru a începe din nou. Comutați la modul Selectare pentru a modifica sau muta elemente și etichete.';
+$ec_lang['lpn_select_first']='Nu este selectat nimic. Selectați mai întâi un element pe hartă, apoi apăsați Delete.';
+$ec_lang['lpn_mode_add_junction']='Mod: Adăugare joncțiune. Specificați o locație pe hartă pentru a plasa o joncțiune. Comutați la modul Selectare pentru a modifica sau muta elemente și etichete.';
+$ec_lang['lpn_mode_add_reservoir']='Mod: Adăugare rezervor. Specificați o locație pe hartă pentru a plasa un rezervor. Comutați la modul Selectare pentru a modifica sau muta elemente și etichete.';
+$ec_lang['lpn_mode_add_tank']='Mod: Adăugare bazin. Specificați o locație pe hartă pentru a plasa un bazin. Comutați la modul Selectare pentru a modifica sau muta elemente și etichete.';
+$ec_lang['lpn_mode_add_pipe']='Mod: Adăugare conductă. Selectați un nod de start, apoi un nod de final, pentru a le conecta. Specificați puncte în spațiu liber între ele pentru a îndoi linia, sau apăsați Escape pentru a începe din nou. Comutați la modul Selectare pentru a modifica sau muta elemente și etichete.';
+$ec_lang['lpn_mode_add_pump']='Mod: Adăugare pompă. Selectați un nod de start, apoi un nod de final, pentru a le conecta. Specificați puncte în spațiu liber între ele pentru a îndoi linia, sau apăsați Escape pentru a începe din nou. Comutați la modul Selectare pentru a modifica sau muta elemente și etichete.';
+$ec_lang['lpn_mode_add_valve']='Mod: Adăugare vană. Selectați un nod de start, apoi un nod de final, pentru a le conecta. Specificați puncte în spațiu liber între ele pentru a îndoi linia, sau apăsați Escape pentru a începe din nou. Comutați la modul Selectare pentru a modifica sau muta elemente și etichete.';
 // Text was wrong (Tom, 2026-07-30): "click a node first to anchor it there" implied a two-click
 // sequence (click node, THEN click to place), but placing near a node anchors it in that ONE click.
-$ec_lang['lpn_mode_add_text']='Mod: Adăugare Text. Faceți clic pe hartă pentru a plasa un Text. Faceți clic lângă un nod pentru a atașa Textul la acel nod. Comutați la modul Selectare pentru a modifica sau muta elemente și etichete.';
+$ec_lang['lpn_mode_add_text']='Mod: Adăugare Text. Specificați o locație pe hartă pentru a plasa un Text. Specificați o locație lângă un nod pentru a atașa Textul la acel nod. Comutați la modul Selectare pentru a modifica sau muta elemente și etichete.';
 // Toolbar button tips (Tom, 2026-07-30): hover/tap explanations on the two buttons a new user is
 // most likely to miss the point of -- that Select is what you use to edit/move things, and that a
 // label itself can be dragged. Both economize on translation for later, per CLAUDE.md's tip-only
 // whole-label-wrap convention -- the button itself is already the click target (no separate "?"
 // glyph needed), so the tip goes straight on the button as a title, matched to the .ec-help class.
-$ec_lang['lpn_tip_select']='Folosiți acest mod pentru a modifica, muta și trage elemente pe hartă. Este modul implicit la care revine pagina: revine singură aici după unele acțiuni, cum ar fi deschiderea unui proiect. Apăsarea tastei Esc a doua oară deselectează orice este selectat.';
+$ec_lang['lpn_tip_select']='Folosiți acest mod pentru a modifica, muta și trage elemente de pe hartă sau pentru a deplasa harta. Acesta este modul implicit al hărții. Apăsarea tastei Esc a doua oară anulează selecția a tot ce este selectat.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_field_auto']='Automat';
 $ec_lang['lpn_method_switch_confirm']='Schimbarea metodei de frecare nu modifică numerele de rugozitate deja introduse pe conductele dvs., iar o rugozitate pentru o metodă nu are sens pentru alta. Verificați fiecare conductă după aceasta. Schimbați oricum?';
@@ -2320,7 +2320,7 @@ $ec_lang['lpn_method_switch_confirm']='Schimbarea metodei de frecare nu modific�
 // Active, which is a different question -- whether the scenario contains the link at all
 // (paneColClosed() in js/looped-network.js) -- and stays "Active".
 $ec_lang['lpn_field_closed']='Închisă';
-$ec_lang['lpn_field_closed_tip']='Închideți această conductă astfel încât apa să nu poată trece prin ea. Conducta rămâne pe hartă și își păstrează toate numerele, iar dvs. o puteți redeschide oricând.';
+$ec_lang['lpn_field_closed_tip']='Închideți această conductă pentru ca apa să nu poată trece prin ea. Conducta rămâne pe hartă și își păstrează toate numerele și poate fi deschisă din nou oricând.';
 $ec_lang['lpn_field_x']='X';
 $ec_lang['lpn_field_y']='Y';
 // A geographic project's coordinates (Task 145). The SAME two rows as X and Y, in the vocabulary
@@ -2345,7 +2345,7 @@ $ec_lang['lpn_field_lon_abbr']='Long';
 // INPUT as well as a readout. One tip for both boxes, because one sentence is true of both, and it
 // states the thing a reader cannot see: a position is shared by every scenario, exactly as it is
 // when the node is dragged.
-$ec_lang['lpn_field_coord_tip']='Tastați o locație de coordonate pentru a amplasa exact acest nod. Într-un scenariu, această locație se aplică doar în acel scenariu, la fel ca tragerea lui; în Bază, amplasează nodul peste tot.';
+$ec_lang['lpn_field_coord_tip']='Introduceți o locație în coordonate pentru a amplasa exact acest nod. Într-un scenariu, această locație se aplică doar în acel scenariu, ca la tragere; în Bază, amplasează nodul în fiecare scenariu.';
 // Refused, and it says what the range is. Only a geographic project has one: Web Mercator has no
 // finite y at the poles, so a latitude past the cut-off would put the node nowhere at all.
 $ec_lang['lpn_coord_off_world']='Aceasta este în afara hărții. Latitudinea Pseudo Mercator variază de la -85,05 la 85,05, iar longitudinea de la -180 la 180.';
@@ -2354,7 +2354,7 @@ $ec_lang['lpn_field_text_size']='Factor de mărime';
 // from the labeling threshold and this switch is how a note is made to fade out with the generated
 // labels instead. Unticking it is the only way a Text object has ever hidden because of the zoom.
 $ec_lang['lpn_field_text_all_zoom']='Arată la toate nivelurile de zoom';
-$ec_lang['lpn_field_text_all_zoom_tip']='Păstrează acest text pe desen oricât de mult micșorați. Debifați și textul se ascunde împreună cu celelalte etichete de îndată ce vizualizarea devine mai largă decât pragul de etichetare stabilit la Hartă și pagină.';
+$ec_lang['lpn_field_text_all_zoom_tip']='Păstrează acest text pe desen oricât de mult micșorați. Debifați pentru a ascunde textul împreună cu celelalte etichete de îndată ce vizualizarea este mai largă decât pragul de etichetare stabilit la Hartă și pagină.';
 $ec_lang['lpn_tool_labels']='Etichete';
 $ec_lang['lpn_labels_heading_node']='Etichete noduri';
 $ec_lang['lpn_labels_heading_link']='Etichete legături';
@@ -2387,7 +2387,7 @@ $ec_lang['lpn_labels_priority']='Prioritate';
 // learn them (Tom, 2026-08-16). His own draft of this sentence said "lowest flow"; a flow is a link
 // value and this box is on a node row, so it reads as demand here.
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_labels_priority_node_tip']='Ordinea în care valorile sunt eliminate atunci când două etichete de nod s-ar suprapune. Valoarea numerotată 1 este eliminată prima. Când rămâne o singură valoare și etichetele tot se suprapun, o etichetă întreagă este ascunsă: cea cu cererea mai mică, presiunea mai apropiată de mijlocul intervalului, sau cota ori sarcina mai apropiată numeric de nodurile vecine.';
+$ec_lang['lpn_labels_priority_node_tip']='Ordinea în care valorile sunt eliminate atunci când o etichetă nu încape. Valoarea numerotată 1 este eliminată prima. Când rămâne o singură valoare și două etichete tot se suprapun, una dintre ele este ascunsă: cea cu cerința mai mică, cu presiunea mai apropiată de mijlocul intervalului sau cu cota ori sarcina mai apropiată numeric de nodurile vecine.';
 // Column headings for the Labels box rows. Short because they sit over boxes 3.5 to 4.5 em wide, and
 // the row's own field name is the wide column beside them.
 $ec_lang['lpn_labels_col_before']='Pref.';
@@ -2402,7 +2402,7 @@ $ec_lang['lpn_labels_show_tip']='Ordinea în care apar valorile pe o etichetă. 
 // Tom's own words for the control (R-331: "a code or a toggle to 'Use units' for the After string").
 // It heads a narrow column and names each row's tick box.
 $ec_lang['lpn_labels_use_units']='Folosește unități';
-$ec_lang['lpn_labels_use_units_tip']='Bifați pentru a arăta unitatea în caseta După și pe etichetă, și pentru a o menține la zi când unitățile se schimbă. Debifați pentru a tasta propriul text După.';
+$ec_lang['lpn_labels_use_units_tip']='Selectați pentru a arăta unitatea în caseta După și pe etichetă și pentru a o actualiza când unitățile se schimbă. Debifați pentru a introduce un text După personalizat.';
 // EPANET's own name for a link's starting state, beside the Status row, which is the run's answer.
 $ec_lang['lpn_labels_init_status']='Stare inițială';
 // The Symbology index, reworked (Tom, R-333: "Node labels, Node colors, Link labels, Link colors,
@@ -2442,7 +2442,7 @@ $ec_lang['lpn_backdrop_scale_entry']='Scalare din fișier de georeferențiere sa
 // absolute scale commands above: it changes the size by a factor and holds one point still, which
 // is what the last stage of fitting an aerial photograph actually needs.
 $ec_lang['lpn_backdrop_scale_from']='Scalează din dimensiunea actuală, în jurul unui punct ales de dvs.';
-$ec_lang['lpn_backdrop_scale_from_prompt1']='Faceți clic pe punctul din imaginea de fundal care trebuie să rămână pe loc.';
+$ec_lang['lpn_backdrop_scale_from_prompt1']='Specificați punctul de pe imaginea de fundal care trebuie să rămână pe loc.';
 $ec_lang['lpn_backdrop_scale_from_prompt2']='Scalați față de dimensiunea actuală. 1 o păstrează neschimbată, 1.1 o mărește cu 10%, 0.9 o micșorează cu 10%.';
 $ec_lang['lpn_backdrop_scale_entry_prompt']='Introduceți dimensiunea unui pixel de pe hartă sau lipiți conținutul complet al fișierului de georeferențiere al imaginii';
 $ec_lang['lpn_backdrop_scale_entry_bad']='Introduceți un singur număr pentru dimensiunea unui pixel de pe hartă, sau lipiți toate cele șase linii ale unui fișier de georeferențiere.';
@@ -2467,24 +2467,24 @@ $ec_lang['lpn_map_attach_readjust']='Reajustează';
 $ec_lang['lpn_map_attach_readjust_tip']='Revino la Pasul 2 al procesului de atașare a hărții.';
 $ec_lang['lpn_map_attach_scale_from']='Scalează de la dimensiunea actuală…';
 $ec_lang['lpn_map_attach_scale_from_prompt']='Scalează harta de la dimensiunea sa actuală, în jurul mijlocului desenului dvs. 1 o păstrează la fel, 1,1 o face cu 10% mai mare, 0,9 o face cu 10% mai mică.';
-$ec_lang['lpn_map_attach_scale_from_bad']='Tastați un singur număr mai mare decât zero.';
+$ec_lang['lpn_map_attach_scale_from_bad']='Introduceți un singur număr mai mare decât zero.';
 $ec_lang['lpn_map_attach_scale_from_done']='Harta este redimensionată, iar desenul dvs. și fiecare coordonată din el rămân exact cum erau.';
 $ec_lang['lpn_map_attach_none']='Nu există încă nicio hartă a lumii atașată la acest proiect. Folosiți mai întâi Hartă, Harta lumii, Atașează.';
 $ec_lang['lpn_map_attach_remove']='Detașează';
-$ec_lang['lpn_map_attach_remove_tip']='Îndepărtează harta lumii. Desenul și coordonatele sale rămân neatinse în ambele cazuri.';
-$ec_lang['lpn_map_attach_done']='Harta lumii se află acum în spatele desenului dvs., iar proiectul rămâne neschimbat. Folosiți Hartă, Harta lumii, Detașează pentru a o îndepărta din nou.';
-$ec_lang['lpn_map_attach_removed']='Harta lumii a dispărut, iar desenul este exact cum era.';
+$ec_lang['lpn_map_attach_remove_tip']='Detașează harta lumii. Nu afectează rețeaua.';
+$ec_lang['lpn_map_attach_done']='Harta lumii este acum afișată în spatele desenului, iar proiectul rămâne neschimbat. Folosiți Hartă, Harta lumii, Detașează pentru a o elimina.';
+$ec_lang['lpn_map_attach_removed']='Harta lumii este detașată, iar rețeaua nu este afectată.';
 // **THE CUSTOM GEOREFERENCE WIZARD, IN TOM'S OWN THREE STEPS** (2026-09-18, and
 // dev/tom-coordinate-vocabulary-2026-09-16.md). Georeferencing here means attaching the world map,
 // never converting a coordinate, so every sentence below says what stays still as well as what
 // moves: the drawing does not move, the ground does.
-$ec_lang['lpn_mapgeo_intro']='Desenul dvs. se află pe o hartă a întregii lumi, în ocean, la latitudine zero și longitudine zero. Găsiți-vă mai întâi locul: deplasați și măriți harta din spatele desenului, căutați un nume de loc, sau tastați o latitudine și o longitudine. Desenul propriu-zis nu se mișcă.';
-$ec_lang['lpn_mapgeo_step1']='Pasul 1 din 2: găsiți-vă locul în lume';
+$ec_lang['lpn_mapgeo_intro']='Desenul se află pe o hartă a întregii lumi, în ocean, la latitudine zero și longitudine zero. Găsiți mai întâi locația proiectului: deplasați și măriți harta din spatele desenului, căutați un nume de loc sau introduceți o latitudine și o longitudine. Desenul în sine nu se mișcă.';
+$ec_lang['lpn_mapgeo_step1']='Pasul 1 din 2: găsiți locația proiectului';
 $ec_lang['lpn_mapgeo_step2']='Pasul 2 din 2: potriviți harta din spatele desenului dvs.';
-$ec_lang['lpn_mapgeo_hint1']='Deplasați și măriți harta din spatele desenului dvs., sau căutați un loc, sau tastați o latitudine și o longitudine. Apoi apăsați Plasează aproximativ.';
-$ec_lang['lpn_mapgeo_readjust_intro']='Desenul dvs. se află acolo unde l-ați plasat ultima dată. Pentru a-l muta în altă parte, deplasați și măriți harta din spatele desenului, căutați un nume de loc, sau tastați o latitudine și o longitudine. Desenul propriu-zis nu se mișcă.';
+$ec_lang['lpn_mapgeo_hint1']='Deplasați și măriți harta din spatele desenului, căutați un loc sau introduceți o latitudine și o longitudine. Apoi apăsați Plasează aproximativ.';
+$ec_lang['lpn_mapgeo_readjust_intro']='Desenul se află unde l-ați plasat ultima dată. Pentru a-l muta în altă parte, deplasați și măriți harta din spatele desenului, căutați un nume de loc sau introduceți o latitudine și o longitudine. Desenul în sine nu se mișcă.';
 $ec_lang['lpn_mapgeo_hint2']='Trageți oriunde pentru a glisa harta sub desenul dvs. Desenul dvs. și fiecare coordonată din el rămân exact unde sunt. Apăsați Georeferențiază aici când harta este corectă.';
-$ec_lang['lpn_mapgeo_gestures']='Zoom mișcă desenul dvs. și harta împreună, astfel încât puteți vedea cât de bine se aliniază. Tragerea mișcă doar harta.';
+$ec_lang['lpn_mapgeo_gestures']='Zoom mișcă desenul și harta împreună, pentru a arăta cât de bine se aliniază. Tragerea mișcă doar harta.';
 // ---- THE SIZE AND TURN DIAL (Tom, 2026-09-18) -------------------------------------------------
 //
 // **A SLIDER, BECAUSE THERE IS NO DIRECT MANIPULATION HERE TO GIVE UP.** His own refutation of the
@@ -2502,19 +2502,19 @@ $ec_lang['lpn_mapgeo_dial_turn']='Rotește harta';
 $ec_lang['lpn_mapgeo_dial_turn_read']='{d} grade';
 $ec_lang['lpn_mapgeo_dial_size']='Dimensiunea hărții';
 $ec_lang['lpn_mapgeo_dial_size_read']='de {f} ori';
-$ec_lang['lpn_mapgeo_dial_help']='Glisați cele două bare, sau tastați în casetele de deasupra lor, pentru a face harta mai mare sau mai mică și pentru a o roti. Mijlocul fiecărei bare este pasul „lăsat neschimbat”: 1, respectiv 0 — adică 1 și 0 înseamnă să nu modificați nimic. Tastele săgeți funcționează pentru ambele.';
+$ec_lang['lpn_mapgeo_dial_help']='Glisați cele două bare sau introduceți numere în casetele de deasupra lor, pentru a mări sau micșora harta și pentru a o roti. Mijlocul fiecărei bare păstrează potrivirea din pasul 1, deci o dimensiune de 1 și o rotație de 0 înseamnă nicio schimbare. Tastele săgeți funcționează pentru ambele.';
 $ec_lang['lpn_mapgeo_place']='Plasează aproximativ';
 $ec_lang['lpn_mapgeo_finish']='Georeferențiază aici';
-$ec_lang['lpn_mapgeo_cancelled']='Harta lumii este înapoi unde era, iar desenul dvs. nu s-a mișcat niciodată.';
+$ec_lang['lpn_mapgeo_cancelled']='Harta lumii este restabilită la poziția anterioară, iar desenul nu a fost mutat.';
 $ec_lang['lpn_mapgeo_locked']='Finalizați cu butonul Georeferențiază aici, sau apăsați Anulare, înainte de a schimba proiectele sau de a salva. Harta lumii este încă în curs de plasare.';
-$ec_lang['lpn_backdrop_scale_prompt1']='Faceți clic pe două puncte de pe imaginea de fundal, cum ar fi cele două capete ale unei scări grafice. Apoi introduceți distanța reală dintre ele.';
+$ec_lang['lpn_backdrop_scale_prompt1']='Specificați două puncte pe imaginea de fundal, cum ar fi cele două capete ale unei scări grafice. Apoi introduceți distanța reală dintre ele.';
 $ec_lang['lpn_backdrop_scale_prompt2']='Distanța reală dintre cele două puncte';
 // Tom's own wording, 2026-08-16. "Base point" is the drafting term and it is what the second step
 // then has a destination FOR; "any point on the background image" did not say that the two steps are
 // one move. The second names the panel it is about to show, so the alert and the panel read as one
 // step rather than two.
-$ec_lang['lpn_backdrop_position_prompt1']='Faceți clic pe punctul de bază (pe imagine) pentru mutare.';
-$ec_lang['lpn_backdrop_position_prompt2']='Alegeți metoda pentru punctul de destinație, apoi faceți clic pe Continuare.';
+$ec_lang['lpn_backdrop_position_prompt1']='Specificați punctul de bază (pe imagine) pentru mutare.';
+$ec_lang['lpn_backdrop_position_prompt2']='Alegeți metoda pentru punctul de destinație, apoi selectați Continuare.';
 // The standing "you are in the middle of something" bar, shown while a background-image scale or
 // move is waiting for a click. It carries the only visible way out of that state.
 $ec_lang['lpn_backdrop_busy']='Se ajustează imaginea de fundal.';
@@ -2533,7 +2533,7 @@ $ec_lang['lpn_hide_titles']='Ascunde aceste titluri';
 // The Settings row that turns the selection bubble back on. Its sibling checkbox lives in the
 // bubble and reads 'Show this'; this one has to name what it is talking about.
 $ec_lang['lpn_settings_area_hint']='Afișează ajutorul de selecție';
-$ec_lang['lpn_settings_area_hint_tip']='Afișează balonul de peste hartă care spune ce va face următorul dvs. clic în timp ce selectați o zonă.';
+$ec_lang['lpn_settings_area_hint_tip']='Afișează indicația de pe hartă care dă pasul următor în timp ce selectați o zonă.';
 $ec_lang['lpn_settings_id_prefixes']='Prefixe ID';
 // NEVER "Starting values" (Tom, 2026-08-19: "The problem is that it's misleading"). These are what
 // a NEW asset is created with; "starting" reads as the initial condition of a run, which on a
@@ -2560,7 +2560,7 @@ $ec_lang['lpn_settings_custom_props']='Proprietăți personalizate';
 // **THE HEADING'S OWN TIP, AND IT IS TOM'S SENTENCE** (2026-09-13, revision 1 of eleven): it says
 // what a custom property is FOR and that it behaves like every other property, which is the whole
 // of what a reader needs before opening the design table.
-$ec_lang['lpn_settings_custom_props_note']='Proprietăți pe care le definiți dvs. înșivă, pentru propriile scopuri. Sunt stocate împreună cu proiectul și scenariile, la fel ca toate celelalte proprietăți.';
+$ec_lang['lpn_settings_custom_props_note']='Proprietăți definite de utilizator. Stocate cu proiectul și scenariile, ca toate celelalte proprietăți.';
 $ec_lang['lpn_cp_design']='Proiectare';
 $ec_lang['lpn_cp_design_tip']='Un rând pentru fiecare proprietate personalizată, iar fiecare se deschide pentru a arăta: Cheie, Etichetă, Se aplică la, Validează ca, Permite sau restricționează, câmpul de caractere numit de această alegere, Limită inferioară a lungimii, Limită superioară a lungimii, Limită inferioară, Limită superioară.';
 $ec_lang['lpn_cp_add']='Adaugă proprietate personalizată';
@@ -2574,18 +2574,18 @@ $ec_lang['lpn_cp_unnamed']='Nedenumită încă';
 $ec_lang['lpn_cp_key']='Cheie';
 $ec_lang['lpn_cp_key_tip']='Cheie: O proprietate este stocată sub acest nume. Spațiile nu sunt permise, iar un prefix este adăugat automat pentru ca cheia dvs. să nu poată intra niciodată în coliziune cu un câmp predefinit.';
 $ec_lang['lpn_cp_label']='Etichetă';
-$ec_lang['lpn_cp_label_tip']='Etichetă: Aceasta este ceea ce vede un cititor în caseta de proprietăți, în Găsire și în capul unei coloane de tabel.';
+$ec_lang['lpn_cp_label_tip']='Etichetă: Apare în caseta de proprietăți, în Găsire și la capul unei coloane de tabel.';
 $ec_lang['lpn_cp_applies']='Se aplică la';
 $ec_lang['lpn_cp_applies_tip']='Se aplică la: Listă de prefixe de ID separate prin virgulă, pentru elementele care folosesc această proprietate, de exemplu J,L,R.';
 $ec_lang['lpn_cp_validate']='Validează ca';
-$ec_lang['lpn_cp_validate_tip']='Validează ca: Aceasta spune cum arată o valoare corectă. Regulile de scriere citesc doar alfabetul englez, ceea ce este o limitare declarată. Alegeți Nu valida pentru a accepta orice.';
+$ec_lang['lpn_cp_validate_tip']='Validează ca: Formatul pe care trebuie să-l aibă o valoare validă. Regulile de scriere se aplică doar alfabetului englez. Alegeți Nu valida pentru a accepta orice valoare.';
 $ec_lang['lpn_cp_restrict']='Restricționează aceste caractere';
-$ec_lang['lpn_cp_restrict_tip']='Restricționează aceste caractere: O valoare poate folosi doar caracterele listate aici, sau niciunul dintre ele, unde „@” înseamnă orice literă; „#” înseamnă orice cifră numerică, iar „-”, „.” și „,” trebuie listate separat dacă sunt permise; iar orice caracter de spațiu alb trebuie să fie între alte caractere.';
+$ec_lang['lpn_cp_restrict_tip']='Restricționează aceste caractere:';
 $ec_lang['lpn_cp_restrict_mode']='Permite sau restricționează';
 $ec_lang['lpn_cp_restrict_mode_tip']='Permite sau restricționează: Caracterele date sunt fie singurele pe care o valoare le poate folosi, fie cele pe care nu le poate folosi.';
 $ec_lang['lpn_cp_restrict_allow']='Permite doar aceste caractere';
 $ec_lang['lpn_cp_minlength']='Limită inferioară a lungimii';
-$ec_lang['lpn_cp_minlength_tip']='Limită inferioară a lungimii: Orice intrare mai scurtă este semnalată, astfel găsiți intrările goale și pe cele introduse pe jumătate.';
+$ec_lang['lpn_cp_minlength_tip']='Limită inferioară a lungimii: Orice intrare mai scurtă este semnalată. Folosiți-o pentru a găsi intrările goale și incomplete.';
 $ec_lang['lpn_cp_length']='Limită superioară a lungimii';
 $ec_lang['lpn_cp_length_tip']='Limită superioară a lungimii: Orice intrare mai lungă este semnalată.';
 $ec_lang['lpn_cp_low']='Limită inferioară';
@@ -2644,8 +2644,8 @@ $ec_lang['lpn_scenario_overrides']='Nr. de valori specifice';
 // the readout's, so neither requires clicking the element to find out what is going on.
 // {name} is the active scenario's display name -- the ring is a fact about WHICH SCENARIO is
 // showing, not a state of the element, and naming the scenario is what makes that recoverable.
-$ec_lang['lpn_scenario_mark_tip']='Inelul auriu înseamnă că acest element are o valoare care aparține exclusiv scenariului {name}.';
-$ec_lang['lpn_scenario_overrides_tip']='Fiecare dintre acele valori este marcată pe hartă cu un inel auriu. Comutați la {base} pentru a vedea desenul fără ele.';
+$ec_lang['lpn_scenario_mark_tip']='Inelul auriu înseamnă că acest element are o valoare specifică în scenariul {name}.';
+$ec_lang['lpn_scenario_overrides_tip']='Fiecare valoare specifică este marcată pe hartă cu un inel auriu. Comutați la {base} sau la alt scenariu părinte pentru a vedea desenul fără ele.';
 $ec_lang['lpn_scenario_menu']='Scenarii';
 $ec_lang['lpn_scenario_tip']='Setul de valori pe care desenul le arată și pe care pagina le rezolvă acum. Faceți clic pentru a schimba scenariile, sau pentru a adăuga, redenumi sau șterge unul.';
 $ec_lang['lpn_scenario_new']='Scenariu nou…';
@@ -2653,17 +2653,17 @@ $ec_lang['lpn_scenario_new_name']='Scenariul {n}';
 $ec_lang['lpn_scenario_prompt_name']='Nume pentru acest scenariu';
 $ec_lang['lpn_scenario_rename']='Redenumire scenariu…';
 $ec_lang['lpn_scenario_delete']='Ștergere scenariu';
-$ec_lang['lpn_scenario_delete_confirm']='Ștergeți scenariul {name} și cele {n} valori care îi aparțin exclusiv? Desenul propriu-zis nu este modificat.';
-$ec_lang['lpn_scenario_override']='Doar în acest scenariu';
+$ec_lang['lpn_scenario_delete_confirm']='Ștergeți scenariul {name} și cele {n} valori specifice ale lui? Desenul propriu-zis nu este modificat.';
+$ec_lang['lpn_scenario_override']='Valoare specifică în acest scenariu';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_scenario_override_tip']='Bifat înseamnă că acest scenariu are o valoare proprie pentru acest câmp, chiar dacă este același număr ca la Bază. Debifați pentru a folosi din nou valoarea de Bază.';
+$ec_lang['lpn_scenario_override_tip']='Selectat înseamnă că acest scenariu înlocuiește valoarea părintelui pentru această valoare, chiar dacă numărul este același. Debifați caseta pentru a folosi valoarea părintelui.';
 // "Base scenario", not bare "Base" -- an ENGLISH fix, so this needs no _syn either. This is the one
 // place the polysemy genuinely bites: here the word sits beside a NUMBER, in a field popup with no
 // scenario dropdown nearby to frame it, which is exactly the reading that invites "base amount".
 // The dropdown keeps the short name (lpn_scenario_base); only the exposed use is disambiguated.
 // Same label-versus-sentence distinction that decided the eigenvalue fixes in sprint 316.
 $ec_lang['lpn_scenario_base_value']='Scenariul de bază: {value}';
-$ec_lang['lpn_scenario_deactivated']='{id} este în afara rețelei în {scenario}. Rămâne pe desen și în celelalte scenarii ale dvs.';
+$ec_lang['lpn_scenario_deactivated']='{id} este exclus din rețea în {scenario}. Rămâne pe desen și în celelalte scenarii.';
 $ec_lang['lpn_scenario_push_btn']='Aplică valorile de Bază la toate scenariile';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_scenario_push_tip']='Fiecare scenariu revine la valoarea de Bază pentru proprietățile ale căror etichete sunt afișate acum. Valorile introduse pentru ele în orice scenariu sunt eliminate.';
@@ -2671,7 +2671,7 @@ $ec_lang['lpn_scenario_push_tip']='Fiecare scenariu revine la valoarea de Bază 
 $ec_lang['lpn_scenario_push_confirm']='Faceți ca fiecare scenariu să folosească valorile de Bază pentru aceste proprietăți? Valorile introduse pentru ele în orice scenariu sunt eliminate. Puteți anula această acțiune.';
 $ec_lang['lpn_scenario_push_scenarios']='Scenarii afectate:';
 $ec_lang['lpn_scenario_push_values']='Valori eliminate:';
-$ec_lang['lpn_scenario_push_none']='Niciun scenariu nu are o valoare specifică pentru vreuna dintre aceste proprietăți, deci nimic nu s-ar schimba. Nimic nu este eliminat.';
+$ec_lang['lpn_scenario_push_none']='Niciun scenariu nu înlocuiește Baza pentru vreuna dintre aceste proprietăți, deci nimic nu s-ar schimba. Nimic nu este eliminat.';
 $ec_lang['lpn_scenario_preset_flow_static']='1. Test de debit: Static';
 $ec_lang['lpn_scenario_preset_flow_static_tip']='Calibrarea testului de debit pentru o rețea de proiectare la debit 0. În acest scenariu, setați cerința tuturor joncțiunilor la 0.';
 $ec_lang['lpn_scenario_preset_flow_mid']='2. Test de debit: Mediu';
@@ -2684,9 +2684,9 @@ $ec_lang['lpn_scenario_preset_max_day']='5. Zi maximă';
 $ec_lang['lpn_scenario_preset_peak_hour']='6. Oră de vârf';
 $ec_lang['lpn_scenario_preset_fire_max_day']='7. Incendiu plus zi maximă';
 $ec_lang['lpn_scenario_preset_fire_max_day_tip']='Cerința zilei maxime (multiplicator 2,0). Rulați Analiza debitului de incendiu în acest scenariu: ea adaugă debitul de incendiu la fiecare joncțiune peste această cerință.';
-$ec_lang['lpn_delete_drops_overrides']='Ștergerea acestui element aruncă și {n} valori pe care scenariile dvs. le au pentru el. Continuați?';
+$ec_lang['lpn_delete_drops_overrides']='Ștergerea acestui element șterge și {n} valori specifice scenariilor pentru el. Continuați?';
 $ec_lang['lpn_push_base_only']='Această acțiune modifică desenul propriu-zis, deci poate fi făcută doar în {base}. Comutați la {base} și încercați din nou.';
-$ec_lang['lpn_field_active']='Parte din rețea';
+$ec_lang['lpn_field_active']='Activ?';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_field_active_tip']='Debifați această casetă pentru a lăsa elementul pe desen dar în afara rețelei: este desenat gri, iar rezolvitorul îl ignoră. Într-un scenariu, așa se pornește și se oprește o conductă.';
 // ---- Task 412: a Base-wide property SAYS it is Base-wide ----
@@ -2699,18 +2699,18 @@ $ec_lang['lpn_field_active_tip']='Debifați această casetă pentru a lăsa elem
 // cannot compare them.
 $ec_lang['lpn_settings_emitter_exponent']='Exponent emițător';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_settings_emitter_exponent_tip']='Exponentul din ecuația de emițător a EPANET pentru aspersoare și scurgeri: debit = coeficient x presiune ridicată la această putere. Schimbă răspunsul doar acolo unde un nod are un emițător, ceea ce deocamdată înseamnă o rețea citită dintr-un fișier EPANET.';
+$ec_lang['lpn_settings_emitter_exponent_tip']='Exponentul din ecuația emițătorului EPANET pentru aspersoare și scurgeri: debit = coeficient x presiune ridicată la acest exponent. Afectează rezultatele doar la nodurile cu un coeficient de emițător.';
 // The Settings panel's Computation section (Tom, 2026-08-10). "Computation", not "Solver": what the
 // two rows under it decide is the arithmetic the user gets, and "solver" names the internals.
 $ec_lang['lpn_elev_dem_sample']='Citește DEM';
 $ec_lang['lpn_elev_dem_sample_tip']='Citește cota din DEM la acest nod și o afișează mai jos. Nimic din caseta Cotă nu este schimbat. Rezoluția orizontală a DEM este de circa 30 m pentru cea mai mare parte a Pământului, și mai fină acolo unde există date mai bune.';
 $ec_lang['lpn_elev_dem_use']='Folosește DEM';
-$ec_lang['lpn_elev_dem_use_tip']='Pune cota din DEM la acest nod în caseta Cotă de mai sus, înlocuind ce se află acolo. Citește DEM mai întâi dacă nu a fost încă citit. Un singur Undo o readuce la loc.';
+$ec_lang['lpn_elev_dem_use_tip']='Plasează cota din DEM la acest nod în caseta Cotă de mai sus, înlocuind valoarea de acolo. DEM este citit mai întâi dacă nu a fost citit încă. O singură Anulare o readuce.';
 $ec_lang['lpn_elev_dem_none']='DEM nu are nicio cotă pentru acest nod.';
-$ec_lang['lpn_elev_dem_said']='Mapbox DEM spune {v} {u}.';
+$ec_lang['lpn_elev_dem_said']='Cota Mapbox DEM: {v} {u}.';
 $ec_lang['lpn_settings_elev_source']='Sursa cotei';
-$ec_lang['lpn_settings_elev_source_tip']='De unde primește un nod nou cota sa. Suprafața terenului este citită din Mapbox DEM, care are circa 30 m pe cea mai mare parte a Pământului și mai fin acolo unde există date mai bune.';
-$ec_lang['lpn_settings_elev_source_typed']='Cota introdusă mai sus';
+$ec_lang['lpn_settings_elev_source_tip']='Intervalele de acuratețe orizontală și verticală ale Mapbox DEM din 2026 sunt: 1–10 m și <1 m în SUA, 2–10 m și 1–3 m în Europa și Japonia, 30 m și 10–16 m la nivel global și 90 m și >16 m la poli.';
+$ec_lang['lpn_settings_elev_source_typed']='Mai sus';
 $ec_lang['lpn_settings_elev_source_dem']='DEM Mapbox';
 $ec_lang['lpn_settings_accuracy']='Precizie';
 // **APPENDED TO EVERY HYDRAULICS TIP, because the box no longer shows the default** (Tom,
@@ -2727,12 +2727,12 @@ $ec_lang['lpn_settings_accuracy']='Precizie';
 // dev/language-strings.md and guarded by dev/scripts/plain_english_swap_check.php.
 $ec_lang['lpn_settings_default_is']='Valoarea implicită este {n}.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_settings_accuracy_tip']='Cât de aproape trebuie să ajungă rezolvitorul înainte de a se opri, măsurat ca mărimea cu care debitele încă se schimbă de la o încercare la următoarea. Un număr mai mic este mai exact și durează mai mult. Ambele rezolvitoare citesc această singură casetă, dar fiecare măsoară acea schimbare față de un total diferit: rezolvitorul intern față de suma cerințelor, EPANET față de suma debitelor din legături. Lăsată goală, această pagină folosește o precizie mai strictă decât valoarea implicită a EPANET.';
+$ec_lang['lpn_settings_accuracy_tip']='Limita de convergență pe care rezolvitorul trebuie s-o atingă înainte de a se opri, măsurată ca variația totală a debitului de la o încercare la următoarea, împărțită la debitul total din legături. Un număr mai mic este mai exact și durează mai mult.';
 $ec_lang['lpn_settings_specific_gravity']='Densitate relativă';
 $ec_lang['lpn_settings_viscosity']='Vâscozitate relativă';
 $ec_lang['lpn_settings_viscosity_tip']='Vâscozitatea fluidului comparată cu a apei la 20 de grade Celsius. Schimbă răspunsul doar la metoda Darcy-Weisbach.';
 $ec_lang['lpn_settings_trials']='Încercări maxime';
-$ec_lang['lpn_settings_trials_tip']='Câte încercări sunt permise înainte ca rezolvitorul să renunțe la o rețea care nu converge.';
+$ec_lang['lpn_settings_trials_tip']='Numărul maxim de încercări înainte ca rezolvitorul să se oprească pe o rețea care nu converge.';
 // **THE REST OF EPANET'S HYDRAULIC OPTIONS GET A ROW EACH** (Tom, 2026-08-29: *"every setting from
 // EPANET must be added and implemented unless research says otherwise"*). Written in OUR words and
 // not EPANET's -- there is no "Unbalanced" or "DampLimit" on the page, because a name only a person
@@ -2743,11 +2743,11 @@ $ec_lang['lpn_settings_trials_tip']='Câte încercări sunt permise înainte ca 
 // not know which engine is answering cannot tell a control that did nothing from a setting that had
 // no effect. Saying it in the tip is cheaper than a second Settings section, and honest.
 $ec_lang['lpn_settings_unbalanced']='Dacă nu converge';
-$ec_lang['lpn_settings_unbalanced_tip']='Ce se face cu o rețea care și-a epuizat încercările și tot nu a convers. Permiterea unor încercări suplimentare ajunge adesea la convergență. Oprirea raportează ultima încercare așa cum este, ceea ce nu este o soluție. Doar rezolvitorul EPANET citește această casetă. Rezolvitorul intern se oprește întotdeauna și marchează răspunsul ca neconvergent.';
+$ec_lang['lpn_settings_unbalanced_tip']='Acțiunea pentru o rețea care și-a epuizat încercările și tot nu a convergit. Permiterea unor încercări suplimentare duce adesea la convergență. Oprirea raportează ultima încercare așa cum este, ceea ce nu este o soluție.';
 $ec_lang['lpn_settings_unbalanced_continue']='Permite încercări suplimentare';
 $ec_lang['lpn_settings_unbalanced_stop']='Oprește și raportează ultima încercare';
 $ec_lang['lpn_settings_unbalanced_trials']='Încercări suplimentare înainte de raportare';
-$ec_lang['lpn_settings_unbalanced_trials_tip']='Câte încercări suplimentare sunt permise după ce cele maxime de mai sus sunt epuizate, înainte de a raporta ultima încercare. Doar rezolvitorul EPANET citește această casetă.';
+$ec_lang['lpn_settings_unbalanced_trials_tip']='Numărul de încercări suplimentare permise după ce maximul de mai sus este epuizat, înainte ca ultima încercare să fie raportată.';
 $ec_lang['lpn_settings_head_error']='Limita erorii de sarcină';
 $ec_lang['lpn_settings_head_error_tip']='Un test suplimentar pe care rezolvitorul trebuie să îl treacă înainte de a se opri: cea mai mare eroare de sarcină rămasă în orice conductă. Zero înseamnă că acest test nu se aplică. Doar rezolvitorul EPANET citește această casetă.';
 $ec_lang['lpn_settings_flow_change']='Limita schimbării de debit';
@@ -2757,8 +2757,8 @@ $ec_lang['lpn_settings_damp_limit']='Amortizarea începe la';
 $ec_lang['lpn_settings_damp_limit_tip']='Precizia la care rezolvitorul începe să facă pași mai mici, ceea ce poate ajuta o rețea oscilantă să converge. Zero înseamnă că rezolvitorul nu amortizează niciodată. Doar rezolvitorul EPANET citește această casetă.';
 $ec_lang['lpn_settings_option_unset']='Nestabilit';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_settings_demand_multiplier_tip']='Un singur factor aplicat simultan tuturor cerințelor din rețea. Folosiți-l pentru a întreba ce face sistemul la o utilizare mai mare sau mai mică decât cea actuală. Nu schimbă numerele pe care le-ați introdus. Un scenariu poate avea propriul său multiplicator, astfel încât ziua medie, ziua maximă și ora de vârf sunt fiecare un singur număr; lăsați-l gol într-un scenariu pentru a folosi valoarea proiectului.';
-$ec_lang['lpn_settings_engine_native']='Rezolvă cu rezolvitorul EPANET';
+$ec_lang['lpn_settings_demand_multiplier_tip']='Un singur factor aplicat simultan tuturor cerințelor din rețea. Fiecare scenariu poate avea o valoare separată, deci ziua medie, ziua maximă sau ora de vârf pot fi create schimbând doar această setare.';
+$ec_lang['lpn_settings_engine_native']='Folosește rezolvitorul integrat când este posibil';
 // **THIS TIP NO LONGER ARGUES THE TWO SOLVERS AGAINST EACH OTHER** (Task 605, Tom 2026-09-06:
 // *"We scrub our tips and alerts for any undue weight on the existence of two solvers."*). It
 // spent three sentences on speed and on the two measured disagreements -- minor losses 0.08%
@@ -2771,24 +2771,24 @@ $ec_lang['lpn_settings_engine_native']='Rezolvă cu rezolvitorul EPANET';
 // EPANET whatever the box says, and the one-time download, which is the cost a visitor on a slow
 // connection actually pays.
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_settings_engine_native_tip']='Activați această opțiune pentru a folosi rezolvitorul intern acolo unde este posibil. În caz contrar, este folosit întotdeauna rezolvitorul EPANET de la US EPA. Rezolvitorul intern nu este folosit pentru simulări pe perioadă extinsă sau pentru o vană PRV, PSV sau FCV activă. Prima dată când este folosit rezolvitorul EPANET, se descarcă aproximativ 650 KB, care rămân apoi pe acest dispozitiv. Acolo unde o conductă are o pierdere locală (minoră), cele două rezolvitoare diferă în ultimele cifre: EPANET rotunjește valoarea folosită pentru gravitație, astfel încât pierderile sale locale ies puțin mai mici decât forma exactă.';
+$ec_lang['lpn_settings_engine_native_tip']='Activați pentru a folosi rezolvitorul integrat acolo unde este posibil. În caz contrar, este folosit întotdeauna rezolvitorul EPANET de la US EPA. Rezolvitorul integrat nu este folosit pentru simulări pe perioadă extinsă sau pentru vane PRV, PSV ori FCV active. Prima dată când este folosit rezolvitorul EPANET, se descarcă aproximativ 650 KB, care rămân apoi pe acest dispozitiv. Acolo unde o conductă are o pierdere locală (minoră), cele două rezolvitoare diferă în ultimele cifre: EPANET folosește o valoare rotunjită a accelerației gravitaționale, deci pierderile sale locale sunt foarte puțin mai mici decât forma exactă.';
 $ec_lang['lpn_engine_loading']='Se încarcă rezolvitorul EPANET…';
 $ec_lang['lpn_engine_failed']='Rezolvitorul EPANET nu a putut fi încărcat. Se afișează în schimb rezolvitorul integrat.';
 // Said out loud, never silently: the user picked the built-in solver and this network was sent to
 // the EPANET solver anyway, because it holds a valve the built-in solver does not calculate. The
 // setting is not changed, so removing the valve puts the page straight back on the chosen engine.
-$ec_lang['lpn_engine_valve_route']='Rezolvat cu rezolvitorul EPANET, deoarece aceste vane se deschid și se închid singure:';
-$ec_lang['lpn_unit_unknown']='Acest desen indică o unitate pe care această pagină nu o oferă: {unit}. Totul este păstrat și afișat exact așa cum a fost primit, iar nimic nu a fost modificat. Nu se poate calcula nimic până când această pagină nu învață unitatea respectivă, deoarece nu știe cât de mare este aceasta.';
-$ec_lang['lpn_engine_manning_note']='Notă: cu rugozitate Manning, EPANET rotunjește constanta din ecuația Manning, astfel încât pierderea de sarcină iese cu aproximativ 0,6% mai mică decât forma exactă.';
+$ec_lang['lpn_engine_valve_route']='Rezolvat cu rezolvitorul EPANET, din cauza acestor vane de control al presiunii și al debitului:';
+$ec_lang['lpn_unit_unknown']='Acest desen indică o unitate pe care această pagină nu o acceptă: {unit}. Toate valorile sunt păstrate și afișate exact așa cum au fost importate, iar nimic nu a fost modificat. Nu se poate calcula nimic până când unitatea este acceptată, deoarece factorul ei de conversie este necunoscut.';
+$ec_lang['lpn_engine_manning_note']='Notă: cu rugozitate Manning, EPANET rotunjește constanta din ecuația Manning, astfel încât pierderea de sarcină este cu aproximativ 0,6% mai mică decât forma exactă.';
 // ---- EPANET said no (ROADMAP Task 471) -------------------------------------------------------
 // Three sentences for three different facts, on the model of lpn_unit_unknown: what would not
 // happen, what the solver itself objected to, and where the numbers on screen actually came from.
 // A user told only the first goes looking for a broken pipe; a user told none of them -- which is
 // what shipped until now -- reads our own solver's answer as EPANET's.
-$ec_lang['lpn_engine_refused']='Rezolvitorul EPANET nu a acceptat această rețea, deci nu a rulat.';
+$ec_lang['lpn_engine_refused']='Rezolvitorul EPANET a respins această rețea, deci rularea nu a pornit.';
 // {message} is EPANET's own text and is NOT translated: it names what the solver choked on, which
 // is the only part a user can act on, and nothing of ours could reconstruct it.
-$ec_lang['lpn_engine_refused_why']='Rezolvitorul EPANET a spus: {message}';
+$ec_lang['lpn_engine_refused_why']='Mesajul rezolvitorului EPANET: {message}';
 $ec_lang['lpn_engine_refused_fallback']='În schimb, numerele de pe ecran provin din rezolvitorul integrat.';
 // The run's own version of that last sentence: a period run has a moment and a tank level to name,
 // and a one-moment solve does not, which is where the shared label stops.
@@ -2813,7 +2813,7 @@ $ec_lang['lpn_settings_link_width']='Lățimea liniei legăturii (pixeli)';
 // the label cannot say, which are that the arrows only appear once there are results and that the
 // setting travels with the project.
 $ec_lang['lpn_settings_show_arrows']='Săgeți de direcție a debitului';
-$ec_lang['lpn_settings_show_arrows_tip']='Desenează o săgeată pe fiecare conductă arătând în ce sens curge apa. Săgețile apar după o rulare, iar dezactivarea lor lasă rezultatele neschimbate. Această setare este salvată odată cu proiectul.';
+$ec_lang['lpn_settings_show_arrows_tip']='Desenează o săgeată pe fiecare conductă care arată în ce sens curge apa. Săgețile apar după o rulare, iar dezactivarea lor lasă rezultatele neschimbate.';
 $ec_lang['lpn_settings_align_labels']='Aliniază etichetele conductelor cu conductele';
 $ec_lang['lpn_settings_readability_bias']='Întoarce o etichetă cu susul în jos când se înclină la stânga verticalei cu mai mult de acest număr de grade';
 $ec_lang['lpn_settings_readability_bias_tip']='Întoarce o etichetă pentru a o menține cu susul în sus atunci când se înclină la stânga verticalei cu mai mult de acest număr de grade.';
@@ -2838,7 +2838,7 @@ $ec_lang['lpn_settings_label_max_width']='Arată etichetele când sunteți mări
 // **LAST SENTENCE REMOVED** (Tom, 2026-09-23 (c): "similar to the all labels tip, but with the
 // last sentence removed since it's misleading") -- "Text you placed yourself stays, and your label
 // choices are kept either way" implied this row decides what survives, which it does not.
-$ec_lang['lpn_settings_label_max_width_tip']='Etichetele sunt desenate doar cât timp vizualizarea hărții are această lățime sau mai puțin. Lăsați caseta necompletată pentru a le desena la orice nivel de zoom. Tastați 0 pentru a nu desena niciodată o etichetă, la niciun nivel de zoom.';
+$ec_lang['lpn_settings_label_max_width_tip']='Etichetele sunt desenate doar cât timp vizualizarea hărții are această lățime sau mai puțin. Lăsați caseta goală pentru a le desena la orice nivel de zoom. Introduceți 0 pentru a nu desena niciodată o etichetă, la niciun nivel de zoom.';
 // **"ALWAYS SHOW", NOT "ALWAYS SHOW LABELS"** (Tom, 2026-09-23 (a)) -- shared as the placeholder
 // for both the all-labels row above and the customer row (lpn_labels_customer_width_tip's row),
 // so a word this generic does not need "labels" or "customer labels" to say what a blank box means.
@@ -2849,7 +2849,7 @@ $ec_lang['lpn_settings_label_always']='Arată întotdeauna';
 // between the boxes and `_post` follows the second one (which is shown as a percentage, so "20"
 // reads as "20% percentile pipe").
 $ec_lang['lpn_settings_symbol_cap_sentence']='Împiedică nodurile să se scaleze mai mari decât {n} ori lungimea {p} conductei de percentila';
-$ec_lang['lpn_settings_symbol_cap_tip']='O joncțiune încetează să crească pe teren odată ce diametrul ei ar ajunge de atâtea ori lungimea conductei la această percentilă a tuturor lungimilor de conductă din rețea. Dincolo de acel punct pe hartă, joncțiunile, conductele și celelalte simboluri se micșorează pe ecran pe măsură ce micșorați, în loc să crească pe teren. Rezervoarele și bazinele fac excepție și își păstrează dimensiunea pe ecran la orice nivel de zoom.';
+$ec_lang['lpn_settings_symbol_cap_tip']='Joncțiunile încetează să își păstreze dimensiunea pe ecran odată ce diametrul lor pe hartă ar ajunge de atâtea ori lungimea conductei la acest percentil al tuturor lungimilor de conductă din rețea. Dincolo de acel punct de pe hartă, joncțiunile, conductele și celelalte simboluri se micșorează pe ecran pe măsură ce micșorați harta. Rezervoarele și bazinele fac excepție și își păstrează dimensiunea pe ecran la orice nivel de zoom.';
 // Fading the symbols (not the labels) is a LAYOUT aid: it lets a backdrop aerial or plan show
 // through the network while you place nodes on top of it (Tom, 2026-07-30).
 $ec_lang['lpn_settings_symbol_opacity']='Opacitate simbol (0 până la 1)';
@@ -2940,8 +2940,8 @@ $ec_lang['lpn_time_report_start']='Ora de start a raportării';
 $ec_lang['lpn_time_clock_start']='Ora ceasului la start';
 $ec_lang['lpn_time_clock_day']='Ziua {day}, {clock}';
 $ec_lang['lpn_time_format_tip']='Scrieți o oră ca ore și minute, de exemplu 2:30. Un număr simplu înseamnă ore, deci 8 înseamnă opt ore. O jumătate de oră este 0:30.';
-$ec_lang['lpn_time_running']='Se calculează simularea pe o perioadă extinsă cu rezolvitorul EPANET.';
-$ec_lang['lpn_time_no_engine']='Rezolvitorul intern calculează un singur moment o dată, deci aceasta este rețeaua doar la {time}: fiecare model este citit la acel moment, iar fiecare bazin rămâne încă la nivelul lui de pornire, în loc să se umple și să se golească. Conectați-vă la internet o singură dată pentru a obține rezolvitorul EPANET, care rulează o simulare pe o perioadă extinsă.';
+$ec_lang['lpn_time_running']='Se rulează simularea pe perioadă extinsă.';
+$ec_lang['lpn_time_no_engine']='Rezolvitorul integrat rezolvă un singur moment la un moment dat, deci aceasta este rețeaua doar la {time}: fiecare model este citit la acel moment, iar fiecare bazin rămâne la nivelul inițial în loc să se umple și să se golească. Conectați-vă o dată la internet pentru a descărca rezolvitorul EPANET, care rulează o simulare pe perioadă extinsă.';
 $ec_lang['lpn_time_slider']='Timp de simulare scurs';
 $ec_lang['lpn_time_no_period']='Acest proiect nu are stabilită o simulare pe o perioadă extinsă, deci există un singur moment de arătat. Stabiliți o Durată totală de rulare la Setări, Calcul, Timp pentru a rula o simulare pe o perioadă extinsă.';
 $ec_lang['lpn_time_first']='Mergi la început';
@@ -2973,10 +2973,10 @@ $ec_lang['lpn_time_runbox_hide']='Nu mai afișa această casetă';
 $ec_lang['lpn_settings_runbox']='Afișează caseta de progres a rulării';
 $ec_lang['lpn_settings_runbox_tip']='O casetă care raportează cât de departe a ajuns o rulare și ce a găsit. Cu ea dezactivată, o rulare terminată spune același lucru în linia de stare, timp de câteva secunde. Aceasta este o setare pentru acest browser, nu pentru proiect.';
 $ec_lang['lpn_time_run_failed']='Rularea nu s-a încheiat, deci nu există rezultate pentru momentele ulterioare.';
-$ec_lang['lpn_time_run_report']='Raport de rulare EPANET';
+$ec_lang['lpn_time_run_report']='Raport de rulare';
 $ec_lang['lpn_time_run_report_copy']='Copiază';
 $ec_lang['lpn_time_run_report_copied']='Copiat';
-$ec_lang['lpn_time_run_report_tip']='Ce a tipărit chiar rezolvitorul EPANET despre ultima rulare: dacă a convers, și orice a avertizat. Este textul propriu al rezolvitorului, nu al nostru.';
+$ec_lang['lpn_time_run_report_tip']='Raportul scris de EPANET pentru ultima rulare, textual: dacă a convergit și orice avertismente. Textul este produs de rezolvitorul EPANET, nu de această pagină.';
 
 $ec_lang['lpn_time_speed']='Viteză';
 $ec_lang['lpn_time_speed_tip']='Viteza de redare';
@@ -3018,14 +3018,14 @@ $ec_lang['lpn_settings_sec_calculation']='Calcul';
 // would follow Node styles"), so this section has one control and no checkboxes: how close the
 // view has to be before a service is worth lettering.
 $ec_lang['lpn_settings_sym_customer']='Abonat';
-$ec_lang['lpn_labels_customer_note']='O etichetă de abonat arată valorile bifate aici. Este desenată la aceeași dimensiune de text ca orice altă etichetă de pe hartă.';
+$ec_lang['lpn_labels_customer_note']='O etichetă de abonat arată valorile selectate aici. Este desenată la aceeași dimensiune a textului ca orice altă etichetă de pe hartă.';
 // **THE ROW NAME IS lpn_settings_label_max_width NOW, NOT A KEY OF ITS OWN** (Tom, 2026-09-23:
 // "Make the Customer labels and All labels zoom limits settings interfaces identical... Both to
 // say 'Show labels when zoomed to this map width or less'"). KEY DELETED: lpn_labels_customer_width
 // -- nothing renders it and nothing checks it; it was untranslated in every other language, so
 // deleting it costs no translation. The tip stays its own key, since its WORDS differ from the
 // all-labels tip (this row's own gate, plus the (e) qualifier that the all-labels limit wins).
-$ec_lang['lpn_labels_customer_width_tip']='Etichetele de abonat sunt desenate doar cât timp vizualizarea hărții are această lățime sau mai puțin. Lăsați caseta necompletată pentru a le desena la orice nivel de zoom. Tastați 0 pentru a nu desena niciodată o etichetă de abonat, la niciun nivel de zoom. Aceasta nu are niciun efect dacă este mai mare decât setarea similară pentru toate etichetele.';
+$ec_lang['lpn_labels_customer_width_tip']='Etichetele de abonat sunt desenate doar cât timp vizualizarea hărții are această lățime sau mai puțin. Lăsați caseta goală pentru a le desena la orice nivel de zoom. Introduceți 0 pentru a nu desena niciodată o etichetă de abonat, la niciun nivel de zoom. Nu are efect dacă este mai mare decât setarea similară pentru toate etichetele.';
 // ROADMAP Task 247. The capture button beside the width above (Tom, 2026-09-19: "Widest view: Add a
 // 'Use current view' button like the other one we restored in a different branch."). The SAME key
 // name and the same words as that control, deliberately: it is one idea and a reader who has met it
@@ -3053,18 +3053,18 @@ $ec_lang['lpn_quality_needs_run']='Calitatea apei este purtată de-a lungul cond
 // key) and a Mass units dropdown (lpn_quality_mass_units) below, matching EPANET's own Parameter
 // and Mass Units fields; the name is optional, exactly as EPANET's own is.
 $ec_lang['lpn_quality_chemical_name']='Substanța chimică și unitățile';
-$ec_lang['lpn_quality_chemical_name_tip']='Substanța chimică pe care o urmăriți, de exemplu Clor. Lăsați necompletat pentru eticheta implicită proprie a EPANET, Chemical. Apare în rapoartele dumneavoastră, dar nu este utilizată în calcule.';
+$ec_lang['lpn_quality_chemical_name_tip']='Substanța chimică urmărită, de exemplu Clor. Lăsați necompletat pentru a folosi eticheta implicită EPANET, Chemical. Apare în rapoarte, dar nu este folosită în calcule.';
 $ec_lang['lpn_quality_mass_units']='Unități de masă';
-$ec_lang['lpn_quality_mass_units_tip']='Jumătatea de unități a intrării de calitate, cele două opțiuni proprii ale EPANET.';
+$ec_lang['lpn_quality_mass_units_tip']='Partea de unități a intrării de calitate, dintre cele două opțiuni EPANET.';
 $ec_lang['lpn_quality_unit_ug']='µg/L';
 // R-322: "Quality tolerance: I don't see this in our interface. Is it missing?" "Relative
 // diffusivity: I don't see this in our interface. Is it missing?" Both were carried in the file
 // and handed to the engine with no box to read or change them from; EPANET's own names and its own
 // defaults (0.01 and 1.0), shown only for a chemical, which is all either one means anything to.
 $ec_lang['lpn_quality_tolerance']='Toleranță de calitate';
-$ec_lang['lpn_quality_tolerance_tip']='Cât de mult pot diferi în concentrație două parcele de apă alăturate înainte ca EPANET să le trateze ca una singură. Necompletat folosește valoarea implicită proprie a EPANET, 0,01.';
+$ec_lang['lpn_quality_tolerance_tip']='Diferența de concentrație sub care EPANET tratează două parcele de apă alăturate ca una singură. Necompletat folosește valoarea implicită EPANET de 0,01.';
 $ec_lang['lpn_quality_diffusivity']='Difuzivitate relativă';
-$ec_lang['lpn_quality_diffusivity_tip']='Cât de ușor se răspândește substanța chimică prin apă, relativ la clor. Necompletat folosește valoarea implicită proprie a EPANET, 1,0.';
+$ec_lang['lpn_quality_diffusivity_tip']='Difuzivitatea substanței chimice în apă, relativ la clor. Necompletat folosește valoarea implicită EPANET de 1,0.';
 // R-323: "We could put it in Properties, Find, and Tables as '{chemical} concentration', and that
 // would be very cool." One template, read by qualityLabel() everywhere a concentration is named.
 $ec_lang['lpn_quality_named_concentration']='Concentrație {chemical}';
@@ -3073,10 +3073,10 @@ $ec_lang['lpn_quality_named_concentration']='Concentrație {chemical}';
 $ec_lang['lpn_quality_named_avg_concentration']='Concentrație medie {chemical}';
 $ec_lang['lpn_quality_initial']='Calitate inițială';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_quality_initial_tip']='Cât de multă substanță chimică deține acest nod la începutul rulării. Un rezervor își păstrează propria valoare pe toată durata rulării, așa cum este de obicei exprimat reziduul la ieșirea dintr-o stație de tratare. Lăsați-l gol și nodul pornește fără nicio urmă de substanță chimică.';
+$ec_lang['lpn_quality_initial_tip']='Cantitatea de substanță chimică la acest nod la începutul rulării. Un rezervor își păstrează această valoare pe toată durata rulării, așa cum se exprimă de obicei concentrația reziduală la ieșirea dintr-o stație de tratare. Gol înseamnă 0.';
 $ec_lang['lpn_result_concentration']='Concentrație';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_result_concentration_tip']='Cât de multă substanță chimică mai rămâne în acest punct după ce a călătorit și a reacționat. Unitățile sunt cele indicate lângă substanța chimică la Setări, Calitatea apei.';
+$ec_lang['lpn_result_concentration_tip']='Cantitatea de substanță chimică rămasă în acest punct după transport și reacție. Unitățile sunt cele introduse împreună cu numele substanței chimice la Setări, Calcul, Calitatea apei.';
 // **THE BOOSTER DOSE AND THE TANK MIXING MODEL** (ROADMAP Task 579), EPANET's `[SOURCES]` and
 // `[MIXING]`. EPANET's own words throughout, and its own four source types and four mixing models,
 // because an engineer choosing between them is choosing between real pieces of equipment and real
@@ -3094,11 +3094,11 @@ $ec_lang['lpn_source_type_setpoint']='Doză cu valoare fixă';
 $ec_lang['lpn_source_type_flowpaced']='Doză proporțională cu debitul';
 $ec_lang['lpn_source_quality']='Calitate sursă';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_source_quality_tip']='Cât de puternică este doza. Pentru fiecare tip, în afară de doza de masă, aceasta este o concentrație, în unitățile indicate lângă substanța chimică la Setări, Calitatea apei; pentru o doză de masă este o masă de substanță chimică pe minut. Lăsați-l gol și nimic nu este adăugat aici, ceea ce nu este același lucru cu zero: un zero înseamnă o alimentare care funcționează și nu adaugă nimic.';
+$ec_lang['lpn_source_quality_tip']='Intensitatea dozei. Pentru orice tip în afară de doza de masă, aceasta este o concentrație, în unitățile indicate lângă substanța chimică la Setări, Calcul, Calitatea apei; pentru o doză de masă este un debit masic pe minut. Gol înseamnă nicio sursă de substanță chimică, funcțional echivalent cu 0.';
 $ec_lang['lpn_source_pattern']='Model sursă';
 $ec_lang['lpn_source_pattern_tip']='Un model temporal care scalează doza pe parcursul rulării, pentru o alimentare care nu este constantă. Fără model înseamnă că doza este aceeași la fiecare pas.';
 $ec_lang['lpn_mixing_model']='Model de amestecare';
-$ec_lang['lpn_mixing_model_tip']='Cum se amestecă apa deja aflată în acest bazin cu apa care intră. Amestecarea completă agită tot bazinul deodată. Amestecarea în două compartimente umple mai întâi o zonă de admisie și trece restul mai departe. Curgerea de tip FIFO deplasează apa în ordinea în care a sosit. Curgerea de tip LIFO o stivuiește, deci ultima apă intrată este prima ieșită. Alegerea schimbă vârsta apei și reziduul, dar nu schimbă nicio presiune sau niciun debit.';
+$ec_lang['lpn_mixing_model_tip']='Modelul de amestecare a apei deja aflate în acest bazin cu apa care intră. Amestecarea completă amestecă instantaneu toată apa care intră cu întregul volum al bazinului. Amestecarea în două compartimente umple mai întâi o zonă de admisie și trece surplusul în zona principală. Curgerea de tip piston FIFO evacuează apa în ordinea sosirii. Curgerea de tip piston LIFO o stivuiește, deci ultima apă intrată este prima ieșită. Alegerea afectează vârsta apei și concentrația reziduală, nu presiunea sau debitul.';
 $ec_lang['lpn_mixing_mixed']='Amestecare completă';
 $ec_lang['lpn_mixing_2comp']='Amestecare în două compartimente';
 $ec_lang['lpn_mixing_fifo']='Curgere de tip FIFO';
@@ -3108,7 +3108,7 @@ $ec_lang['lpn_mixing_fraction']='Fracție de amestecare';
 $ec_lang['lpn_mixing_fraction_tip']='Ponderea din volumul bazinului pe care o ocupă zona de admisie, între 0 și 1. Doar amestecarea în două compartimente o folosește. Lăsați-o goală și tot bazinul este zona de admisie, ceea ce presupune EPANET.';
 $ec_lang['lpn_reaction_bulk']='Coeficient de reacție în masă';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_reaction_bulk_tip']='Reacția din masa apei, folosită pentru orice conductă care nu are propriul coeficient. Un număr negativ descompune substanța chimică, iar unul pozitiv o mărește. Reacția este de ordinul întâi, cu excepția cazului în care un fișier EPANET importat precizează alt ordin, deci coeficientul este o rată în 1/zi. O casetă goală înseamnă nicio reacție în masă.';
+$ec_lang['lpn_reaction_bulk_tip']='Reacția în masa apei (vedeți Ajutorul EPANET), folosită pentru fiecare conductă și bazin care nu are un coeficient individual. Un număr negativ descompune substanța chimică, iar unul pozitiv o mărește. Necompletat înseamnă nicio reacție în masă.';
 $ec_lang['lpn_reaction_wall']='Coeficient de reacție la perete';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_reaction_wall_tip']='Reacția la peretele conductei, folosită pentru orice conductă care nu are propriul coeficient. Un număr negativ descompune substanța chimică. Reacția este de ordinul întâi, cu excepția cazului în care un fișier EPANET importat precizează alt ordin, deci coeficientul este o lungime pe zi, scrisă în unitatea de lungime a proiectului. O casetă goală înseamnă nicio reacție la perete.';
@@ -3118,7 +3118,7 @@ $ec_lang['lpn_reaction_pipe_tip']='Doar această conductă. Lăsați-o goală ș
 // stands in is a tank's, so the word "tank" would only be said twice.
 $ec_lang['lpn_reaction_tank']='Coeficient de reacție';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_reaction_tank_tip']='Reacția din apa reținută în acest bazin, ca o rată în 1/zi. Un număr negativ descompune substanța chimică, iar unul pozitiv o mărește. Apa stă într-un bazin mult mai mult timp decât stă în orice conductă, deci aici se pierde adesea un reziduu. Lăsați-l gol și bazinul folosește coeficientul de reacție în masă stabilit pentru întreaga rețea la Setări, Calitatea apei.';
+$ec_lang['lpn_reaction_tank_tip']='Reacția din apa reținută în acest bazin, ca rată în 1/zi. Un număr negativ descompune substanța chimică, iar unul pozitiv o mărește. Apa stă într-un bazin mult mai mult decât în orice conductă, deci aici se pierde adesea concentrația reziduală. Gol înseamnă a folosi coeficientul de reacție în masă stabilit pentru întreaga rețea la Setări, Calcul, Calitatea apei.';
 // Three column headings, in tables whose tab already says what the parts are. Column width is king,
 // so each drops the word "coefficient" that the popup label carries in full.
 $ec_lang['lpn_reaction_bulk_short']='Reacție în masă';
@@ -3165,7 +3165,7 @@ $ec_lang['lpn_reaction_limiting']='Potențial limitativ';
 $ec_lang['lpn_reaction_limiting_tip']='O concentrație spre care se îndreaptă substanța chimică în loc să se descompună până la nimic sau să crească fără limită. Reacția încetinește pe măsură ce apa se apropie de aceasta și se oprește acolo. Folosiți unități consecvente. Fără limită dacă este necompletat.';
 $ec_lang['lpn_reaction_rough_corr']='Corelație cu rugozitatea';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_reaction_rough_corr_tip']='Corelează reacția la perete cu rugozitatea proprie a fiecărei conducte, astfel încât o conductă mai rugoasă reacționează mai repede. Când este activată, un coeficient de perete este calculat pentru fiecare conductă din rugozitatea acelei conducte, iar coeficientul unic de perete de mai sus nu mai este folosit. Nu este folosit dacă este necompletat.';
+$ec_lang['lpn_reaction_rough_corr_tip']='Factor care corelează coeficientul de reacție la perete cu rugozitatea fiecărei conducte, astfel încât o conductă mai rugoasă reacționează mai repede. Când este stabilit, un coeficient de perete este calculat pentru fiecare conductă din rugozitatea ei, iar coeficientul unic de perete de mai sus nu este folosit. Nu este folosit dacă este necompletat.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_reaction_note']='Această pagină nu oferă niciun coeficient de reacție propriu. Nu există un test standard pentru unul, iar valorile de teren publicate pentru același tip de apă diferă cu un factor de zece, deci un număr furnizat aici ar fi citit ca o recomandare. Introduceți unul pe care l-ați măsurat sau pe care îl puteți cita, sau lăsați casetele goale pentru o substanță chimică ce nu reacționează.';
 // **PUMP ENERGY AND COST** (ROADMAP Task 566, dev/pump-energy.md). EPANET's own words: efficiency,
@@ -3178,24 +3178,24 @@ $ec_lang['lpn_settings_energy']='Energie';
 // lpn_time_run_report keep the word and lpn_energy_menu and lpn_reports_epanet do not.
 $ec_lang['lpn_reports_menu']='Rapoarte';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_reports_epanet']='Rulare EPANET';
+$ec_lang['lpn_reports_epanet']='Rulare';
 $ec_lang['lpn_energy_title']='Raport de energie a pompelor';
 $ec_lang['lpn_energy_menu']='Energie pompe';
 $ec_lang['lpn_energy_efficiency']='Eficiența pompei (procent)';
 $ec_lang['lpn_energy_efficiency_tip']='Eficiența globală (de la rețeaua electrică la apă) folosită pentru orice pompă care nu are propria curbă de eficiență. EPANET folosește 75 la sută atunci când nu se precizează nimic.';
 $ec_lang['lpn_energy_price']='Prețul energiei';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_energy_price_tip']='Cât costă un kilowatt-oră. Se aplică oricărei pompe care nu are propriul preț. Lăsați-l gol și fiecare cost din raport este zero.';
+$ec_lang['lpn_energy_price_tip']='Costul unui kilowatt-oră. Se aplică oricărei pompe care nu are un preț individual. Gol înseamnă 0.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_energy_pump_price_tip']='Cât costă un kilowatt-oră la această pompă. Lăsați-l gol și pompa plătește prețul stabilit pentru întreaga rețea la Setări, Energie.';
+$ec_lang['lpn_energy_pump_price_tip']='Costul unui kilowatt-oră la această pompă. Gol înseamnă a folosi prețul stabilit pentru întreaga rețea la Setări, Energie.';
 $ec_lang['lpn_energy_price_pattern']='Model de preț';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_energy_price_pattern_tip']='Un model care multiplică prețul la fiecare pas al modelului, așa se precizează un tarif redus în afara orelor de vârf. Lăsați-l gol pentru un preț constant pe toată rularea.';
 $ec_lang['lpn_energy_demand_charge']='Tarif de vârf de sarcină';
-$ec_lang['lpn_energy_demand_charge_tip']='Cât percepe furnizorul pe kW pentru sarcina de vârf cerută de pompele din sistem.';
+$ec_lang['lpn_energy_demand_charge_tip']='Pe kW, pentru sarcina de vârf cerută de pompe';
 $ec_lang['lpn_energy_currency']='Monedă';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_energy_currency_tip']='Orice scrieți aici este tipărit lângă fiecare valoare bănească. Este o etichetă. Prețurile și costurile nu sunt niciodată convertite, deci scrieți prețurile în moneda pe care ați scris-o aici.';
+$ec_lang['lpn_energy_currency_tip']='Text tipărit lângă fiecare valoare de cost. Este doar o etichetă; folosiți o singură monedă peste tot.';
 $ec_lang['lpn_energy_kwh']='kWh';
 $ec_lang['lpn_energy_kw']='kW';
 // Edited by TGH 2026-09-07
@@ -3208,7 +3208,7 @@ $ec_lang['lpn_energy_no_pumps']='Această rețea nu are pompe, deci nu există n
 // re-keying are lpn_scenario_label and lpn_scenario_overrides, which already name the same two
 // things in the scenario menu.
 $ec_lang['lpn_scncmp_title']='Comparație scenarii';
-$ec_lang['lpn_scncmp_menu_tip']='Rezolvă fiecare scenariu din acest proiect și le arată unul lângă altul: presiunea cea mai mică și viteza cea mai mare din fiecare.';
+$ec_lang['lpn_scncmp_menu_tip']='Tabel de scenarii cu numărul de diferențe, cea mai mică presiune și cea mai mare viteză';
 $ec_lang['lpn_scncmp_running']='Se rezolvă fiecare scenariu…';
 $ec_lang['lpn_scncmp_empty']='Nu a fost desenat încă nimic, deci nu este nimic de rezolvat.';
 $ec_lang['lpn_scncmp_col_maxvelocity']='Viteză maximă';
@@ -3238,10 +3238,10 @@ $ec_lang['lpn_energy_total_cost']='Cost total';
 // **THE ROW SAYS "Status", NOT "Status report"** -- the Reports fly-out carries the word so no row
 // has to (js/looped-network.js:4630's own rule, already followed by "EPANET run"). The box title,
 // lpn_status_title, keeps the full name.
-$ec_lang['lpn_reports_status']='Stare';
-$ec_lang['lpn_reports_status_tip']='Ce s-a schimbat pe parcursul ultimei simulări pe perioadă extinsă, în ordine cronologică: pompe și vane care se deschid sau se închid, bazine care se umplu, se golesc, se umplu complet sau rămân fără apă, și pași care nu au convers complet.';
-$ec_lang['lpn_status_title']='Raport de stare';
-$ec_lang['lpn_status_needs_run']='Raportul de stare listează ce s-a schimbat pe parcursul unei simulări pe perioadă extinsă. Stabiliți o Durată totală de rulare la Setări, Calcul, Timp, apăsați Calculează, apoi deschideți Apă, Rapoarte, Raport de stare.';
+$ec_lang['lpn_reports_status']='Modificări de stare';
+$ec_lang['lpn_reports_status_tip']='Tabel cronologic al modificărilor de stare citite din pașii de timp EPANET ai ultimei simulări pe perioadă extinsă: pompe și vane care se deschid sau se închid, bazine care se umplu, se golesc, ajung pline sau rămân fără apă, și pași care nu au convergit complet.';
+$ec_lang['lpn_status_title']='Modificări de stare';
+$ec_lang['lpn_status_needs_run']='Raportul de stare listează ce s-a schimbat în timpul unei simulări pe perioadă extinsă. Stabiliți o Durată totală de rulare la Setări, Calcul, Timp, apăsați Calculează, apoi deschideți Apă, Rapoarte, Modificări de stare.';
 $ec_lang['lpn_status_empty']='Nimic nu și-a schimbat starea în această rulare.';
 $ec_lang['lpn_status_col_event']='Eveniment';
 $ec_lang['lpn_status_opened']='{type} {id} s-a deschis acum';
@@ -3255,7 +3255,7 @@ $ec_lang['lpn_status_note']='Citit din aceeași rulare pe perioadă extinsă ca 
 
 // Same rule as Status above: the row says "Full", the box says "Full report".
 $ec_lang['lpn_reports_full']='Complet';
-$ec_lang['lpn_reports_full_tip']='Fiecare nod și fiecare legătură la fiecare pas de raportare al ultimei rulări, ca un singur tabel pe care îl puteți descărca sau tipări.';
+$ec_lang['lpn_reports_full_tip']='Tabel cu toate nodurile și legăturile la fiecare pas de raportare al ultimei rulări';
 $ec_lang['lpn_full_title']='Raport complet';
 $ec_lang['lpn_full_needs_run']='Raportul complet listează fiecare nod și fiecare legătură la fiecare pas de raportare. Apăsați Calculează, apoi deschideți Apă, Rapoarte, Raport complet.';
 $ec_lang['lpn_full_note']='Un rând per nod sau legătură per pas de raportare, în unitățile arătate în panoul Tabele. O celulă goală este o coloană pe care acea mărime nu o are. Descărcarea sau tipărirea cuprinde fiecare pas de timp; tabelul de mai jos arată câte unul pe rând.';
@@ -3318,7 +3318,7 @@ $ec_lang['lpn_library_menu']='Biblioteci';
 $ec_lang['lpn_library_patterns']='Modele';
 $ec_lang['lpn_library_patterns_tip']='Un model este o listă de multiplicatori care se repetă. Fiecare se aplică pentru un pas de timp al modelului, deci 24 de numere cu un pas de o oră alcătuiesc o zi care se repetă. O cerință de 10 cu un multiplicator de 1,5 este 15 în acel moment.';
 $ec_lang['lpn_library_curves']='Curbe';
-$ec_lang['lpn_library_curves_tip']='O curbă este o listă de puncte care arată cum se comportă ceva: câtă sarcină adaugă o pompă la fiecare debit, cât de eficientă este la acel debit, sau câtă sarcină pierde o vană la fiecare debit.';
+$ec_lang['lpn_library_curves_tip']='Sarcina sau eficiența pompei în funcție de debit, pierderea vanei în funcție de debit, sau volumul bazinului în funcție de adâncime';
 // **CURVES IS AN EDITOR** (Task 586). It was a read-only report about pumps until the curves became
 // document objects of their own, and the note said so; it now says what the box does and where a
 // curve is pointed at an element from.
@@ -3357,7 +3357,7 @@ $ec_lang['lpn_library_curve_unused']='Nimic nu folosește această curbă.';
 // clearing a pattern reference is harmless; a pump with no curve is a lossless connection, so the
 // same gesture would quietly turn a pumped system into an open one. {count} and {ids} are
 // placeholders, not concatenation (Task 193).
-$ec_lang['lpn_library_curve_in_use']='Această curbă este folosită de {count} elemente: {ids}. Îndreptați-le mai întâi spre altă curbă, apoi ștergeți-o pe aceasta.';
+$ec_lang['lpn_library_curve_in_use']='Această curbă este folosită de {count} elemente: {ids}. Atribuiți-le mai întâi altă curbă, apoi ștergeți-o pe aceasta.';
 // The two column headings for a curve this page does not compute with -- a tank volume curve, or one
 // a file stated that nothing here reads. Naming a quantity would be inventing one.
 $ec_lang['lpn_library_curve_x']='X';
@@ -3371,7 +3371,7 @@ $ec_lang['lpn_library_pipetypes_tip']='Un tip de conductă este o definiție la 
 // **WHAT A DEFINITION CONTAINS IS THE USER\'S CHOICE**, and the note has to say so: a type that
 // states a roughness and no diameter is the way a real approved-materials table handles two ages of
 // the same material, and it is the half of Tom\'s shape that makes the feature work.
-$ec_lang['lpn_library_pipetypes_note']='Fiecare proiect are propria bibliotecă de tipuri de conductă. Puteți lăsa proprietăți necompletate într-o definiție de tip de conductă. De exemplu, un tip de conductă care specifică o rugozitate și niciun diametru este în regulă. Atașați tipurile de conductă la conducte în editorul lor de proprietăți. Editarea unei definiții aici modifică fiecare conductă care o referențiază.';
+$ec_lang['lpn_library_pipetypes_note']='Fiecare proiect are o bibliotecă separată de tipuri de conductă. Proprietățile pot fi lăsate necompletate într-o definiție de tip de conductă; de exemplu, un tip de conductă poate specifica o rugozitate și niciun diametru. Tipurile de conductă sunt atribuite conductelor în proprietățile conductei. Editarea unei definiții aici modifică fiecare conductă care o referențiază.';
 $ec_lang['lpn_library_pipetype_add']='Adaugă un tip de conductă';
 $ec_lang['lpn_library_pipetype_blank_tip']='Proprietățile necompletate dintr-o definiție de tip de conductă sunt lăsate să fie introduse individual pentru fiecare conductă.';
 $ec_lang['lpn_library_pipetype_used_by']='Conducte care folosesc acest tip';
@@ -3386,21 +3386,21 @@ $ec_lang['lpn_field_pipetype_tip']='Tipul de conductă din biblioteca proiectulu
 $ec_lang['lpn_pipetype_none']='Niciun tip de conductă selectat';
 $ec_lang['lpn_pipetype_detach']='Detașează de tipul de conductă';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_pipetype_detach_tip']='Copiază valorile pe care această conductă le citește din tipul ei direct în conductă și încetează să mai folosească tipul. Valorile conductei nu se schimbă acum, iar de acum înainte le puteți edita aici.';
+$ec_lang['lpn_pipetype_detach_tip']='Copiază în conductă valorile pe care aceasta le citește din tipul ei și încetează să mai folosească tipul. Valorile conductei nu se schimbă acum, iar de acum înainte aceste valori se editează aici.';
 // ---- THE FITTINGS LIBRARY (ROADMAP Task 590, dev/pipe-library-design.md §3) ----
 // A pipe's minor loss is a SUM of named fittings and quantities -- Crane Technical Paper 410's
 // additive-K method, which is what Bentley's Minor Loss Collection and KYPipe's SigmaM both offer.
 // Bound by id like the pipe types above it, and for the same Bentley finding.
 $ec_lang['lpn_library_fittings']='Fitinguri';
-$ec_lang['lpn_library_fittings_tip']='O listă de fitinguri este un set de fitinguri și cantitățile lor la care se pot referi mai multe conducte. Aceasta se însumează într-un singur coeficient de pierdere locală.';
+$ec_lang['lpn_library_fittings_tip']='Fitinguri cu coeficienți de pierdere locală grupate în liste';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_library_fittings_note']='Fiecare proiect are propria bibliotecă de fitinguri. O listă de fitinguri conține fitinguri cu o cantitate pentru fiecare, iar aceasta se însumează într-un singur coeficient de pierdere locală. Atât conductele, cât și tipurile de conductă se pot referi la o listă.';
+$ec_lang['lpn_library_fittings_note']='Fiecare proiect are o bibliotecă separată de fitinguri. O listă de fitinguri conține fitinguri cu o cantitate pentru fiecare și se însumează într-un singur coeficient de pierdere locală. Atât conductele, cât și tipurile de conductă se pot referi la o listă.';
 // **WHERE THE OFFERED NUMBERS CAME FROM, STATED TO THE READER RATHER THAN ONLY IN THE SOURCE.** An
 // unsourced coefficient is worse than none, because it looks authoritative; and a coefficient is a
 // starting point, since the real one depends on the size and the make of the fitting. This names
 // EPANET because the reader is looking at its numbers right now, which is the test that mention has
 // to pass (dev/language-strings.md).
-$ec_lang['lpn_library_fittings_source']='Fitingurile oferite aici sunt cele treisprezece din Tabelul 3.3 al manualului utilizatorului EPANET 2.2. Alegerea unuia îi copiază coeficientul în rând, unde îl puteți modifica. Un coeficient depinde de dimensiunea și marca fitingului, deci tratați tabelul ca pe un punct de plecare, nu ca pe un răspuns.';
+$ec_lang['lpn_library_fittings_source']='Fitingurile oferite aici sunt cele treisprezece din Tabelul 3.3 al manualului utilizatorului EPANET 2.2. Alegerea unuia copiază coeficientul său în rând, unde poate fi modificat. Un coeficient depinde de dimensiunea și de marca fitingului, deci tratați tabelul ca punct de plecare, nu ca valori finale.';
 $ec_lang['lpn_library_fittings_add']='Adaugă o listă de fitinguri';
 $ec_lang['lpn_library_fittings_used_by']='Conducte care folosesc această listă de fitinguri';
 $ec_lang['lpn_library_fittings_unused']='Nimic nu folosește această listă de fitinguri.';
@@ -3427,7 +3427,7 @@ $ec_lang['lpn_library_import_conflict']='Omise, pentru că acest proiect are dej
 // case is lpn_library_import_no_libraries above, which has no heading over it to lean on.
 $ec_lang['lpn_library_import_none']='Acel fișier proiect nu are niciuna dintre acestea de copiat.';
 $ec_lang['lpn_library_import_curve_shape']='Aceste curbe au fost preluate exact așa cum le-a scris fișierul, iar o rulare nu poate folosi una dintre ele până când prima ei coloană crește de la un punct la următorul: {names}';
-$ec_lang['lpn_library_import_needs_fittings']='Aceste tipuri de conducte se referă la o listă de fitinguri pe care acest proiect nu o are: {names}. Importați biblioteca de fitinguri din același fișier și o vor găsi.';
+$ec_lang['lpn_library_import_needs_fittings']='Aceste tipuri de conductă se referă la o listă de fitinguri pe care acest proiect nu o are: {names}. Importați biblioteca de fitinguri din același fișier pentru a rezolva aceste referințe.';
 // Said in the CHOOSER, above the Import button, and never in the receipt: it is a fact to weigh
 // before importing, not a note about what has already been done. A DISCLOSURE and not an offer to
 // convert, because changing a unit on this page reinterprets a typed number rather than converting
@@ -3448,7 +3448,7 @@ $ec_lang['lpn_fitting_total']='Coeficient total de pierdere locală (minoră), k
 // The pipe popup\'s own selector.
 $ec_lang['lpn_field_fittings']='Listă de fitinguri';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_field_fittings_tip']='O listă de fitinguri din biblioteca proiectului. Cantitățile și coeficienții ei se însumează în coeficientul de pierdere locală al acestei conducte, iar caseta coeficientului devine apoi doar pentru citire. Lăsați aceasta neselectată pentru a introduce coeficientul dvs. înșivă.';
+$ec_lang['lpn_field_fittings_tip']='O listă de fitinguri din biblioteca proiectului. Cantitățile și coeficienții ei sunt însumați în coeficientul de pierdere locală al acestei conducte, iar caseta coeficientului devine apoi doar pentru citire. Lăsați neselectat pentru a introduce direct coeficientul.';
 $ec_lang['lpn_fittings_none']='Nicio listă de fitinguri selectată';
 // EPANET 2.2 user manual, Table 3.3, Minor Loss Coefficients for Selected Fittings. THE MANUAL\'S
 // OWN THIRTEEN NAMES, in its own order. CLAUDE.md: default to the EPANET terminology, since a
@@ -3477,11 +3477,11 @@ $ec_lang['lpn_fitting_other']='Alt fiting';
 // the reader has just asked for an EPANET file, which is the test a mention has to pass.
 $ec_lang['lpn_inp_export_flat_heading']='S-a salvat {file}';
 $ec_lang['lpn_inp_export_flat_lead']='Fișierul EPANET exportat este echivalent numeric cu acest proiect. Dar nu are loc pentru următoarele lucruri:';
-$ec_lang['lpn_inp_export_flat_types']='{n} conducte de aici se referă la {t} tipuri de conductă. În fișier, fiecare dintre acele conducte poartă propria copie a numerelor, deci răspunsurile sunt aceleași. Ce nu poate reține fișierul este tipul de conductă în sine, deci editarea unei definiții cu urmarea ei de către fiecare conductă este ceva ce doar propriul dvs. fișier de proiect înregistrează.';
+$ec_lang['lpn_inp_export_flat_types']='{n} conducte de aici se referă la {t} tipuri de conductă. În fișier, fiecare dintre acele conducte poartă propria copie a numerelor, deci răspunsurile sunt aceleași. Ce nu poate păstra fișierul este tipul de conductă în sine, deci legătura dintre o definiție și fiecare conductă care o folosește este înregistrată doar în fișierul de proiect.';
 $ec_lang['lpn_inp_export_flat_coords']='Un fișier EPANET păstrează o singură poziție pentru fiecare nod. Acest scenariu plasează {n} dintre ele în altă parte, iar acestea sunt pozițiile din fișier. Fiecare alt scenariu își păstrează propriile poziții doar în fișierul dvs. de proiect.';
 $ec_lang['lpn_inp_export_flat_fittings']='Un fișier EPANET nu poate reține lista de coturi, vane și teuri din fișierul dvs. de proiect. Coeficientul de pierdere locală al {n} conducte de aici este însumat dintr-o listă de fitinguri. Totalul intră în fișier exact așa cum este, deci nimic din răspunsuri nu se schimbă.';
 $ec_lang['lpn_library_controls']='Comenzi';
-$ec_lang['lpn_library_controls_tip']='O comandă este o propoziție care deschide sau închide o legătură, sau îi dă o setare, atunci când un nivel de apă, o presiune sau un moment de timp o cere.';
+$ec_lang['lpn_library_controls_tip']='Un control este o instrucțiune care deschide sau închide o legătură, sau îi schimbă setarea, pe baza nivelului apei dintr-un bazin, a presiunii dintr-un nod sau a timpului.';
 // A verb and its object, not a bare "Add": a bare imperative is the hardest kind of string to
 // translate well, and there are two of these buttons a few centimetres apart.
 $ec_lang['lpn_library_pattern_add']='Adaugă un model';
@@ -3504,10 +3504,10 @@ $ec_lang['lpn_library_control_bad']='⚠ Neînțeleasă';
 $ec_lang['lpn_library_control_missing']='⚠ Această rețea nu are nimic numit {id}';
 $ec_lang['lpn_library_rules']='Reguli';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_library_rules_tip']='O regulă este un scurt paragraf care deschide sau închide o legătură, sau îi dă o setare, atunci când un nivel de apă, o presiune, un debit sau un timp ajunge la o valoare pe care ați stabilit-o. Regulile pot testa mai multe lucruri deodată și pot spune ce trebuie făcut atunci când testul eșuează.';
+$ec_lang['lpn_library_rules_tip']='O regulă deschide sau închide o legătură, sau îi schimbă setarea, atunci când un nivel de apă, o presiune, un debit sau timpul atinge o valoare stabilită. O regulă poate testa mai multe condiții și poate specifica acțiunea de întreprins când condiția este falsă.';
 $ec_lang['lpn_library_rule_add']='Adaugă o regulă';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_library_rule_tip']='O regulă, în cuvintele folosite de EPANET, o clauză pe linie. Prima linie o numește: RULE 1. Apoi o condiție: IF TANK 2 LEVEL BELOW 17.1. Apoi ce trebuie făcut: THEN PUMP 9 STATUS IS OPEN. O ultimă linie îi poate stabili rangul: PRIORITY 1. Adăugați linii AND sau OR pentru a testa mai multe lucruri, și linii ELSE pentru a spune ce trebuie făcut atunci când testul eșuează. O condiție poate citi LEVEL, HEAD, GRADE, PRESSURE sau DEMAND pe un nod, FLOW, STATUS sau SETTING pe o legătură, sau TIME și CLOCKTIME pe SYSTEM. Scrieți numerele în unitățile pe care le arată acest proiect; sunt convertite pentru dvs. Lăsați cuvintele cheie în engleză; sunt cele pe care le citesc pagina și EPANET.';
+$ec_lang['lpn_library_rule_tip']='O clauză pe linie. Urmează descrieri cu exemple în MAJUSCULE. Linia 1: Numele regulii, „RULE 1”. Linia 2: O condiție, „IF TANK 2 LEVEL BELOW 17.1”. Linia 3: O acțiune, „THEN PUMP 9 STATUS IS OPEN”. Linia 4: O prioritate, „PRIORITY 1”. Adăugați linii „AND” sau „OR” pentru a testa mai multe condiții și linii „ELSE” pentru a specifica acțiunea când condiția este falsă. O condiție poate citi LEVEL, HEAD, GRADE, PRESSURE sau DEMAND pe un nod, FLOW, STATUS sau SETTING pe o legătură, sau TIME și CLOCKTIME pe SYSTEM. Folosiți unități de proiect consecvente. Cuvintele cheie trebuie să fie în engleză.';
 $ec_lang['lpn_library_rule_ok']='✓ Această regulă a fost citită';
 $ec_lang['lpn_library_rule_bad']='⚠ Această regulă nu a putut fi citită';
 // PER JUNCTION, so it is in the property popup and not in this box -- the Settings rule ("if it is
@@ -3525,7 +3525,7 @@ $ec_lang['lpn_field_base_demand']='Cerință de bază';
 // junction. The first sentence is his wording verbatim; the second is the one that was already
 // there and is untouched, because it says the other thing this tip exists for -- that the number
 // is a RESULT and not a field. The key has never been translated, so the reword cost nothing.
-$ec_lang['lpn_result_demand_tip']='Debitul pe care îl preia acest nod la pasul de timp afișat: fiecare cerință de bază înmulțită cu propriul ei model, adunate. Este calculat, nu introdus, deci se schimbă odată cu ceasul și nu poate fi editat.';
+$ec_lang['lpn_result_demand_tip']='Debitul pe care îl preia acest nod la pasul de timp afișat: fiecare cerință de bază înmulțită cu propriul model, însumate. Este un rezultat, nu o intrare.';
 $ec_lang['lpn_field_demand_pattern']='Model de cerință';
 // A JUNCTION’S DEMAND IS A LIST (Task 468). The PATTERN says what KIND of user this is
 // (“residential”); the CATEGORY says WHO it is (“Elm Acres”). Nothing validates a category and there
@@ -3536,11 +3536,11 @@ $ec_lang['lpn_demand_remove']='Elimină această cerință';
 // A RESERVOIR AND A PUMP TAKE A PATTERN TOO, on the same rule: whole-project settings live in the
 // Libraries box, one asset’s own choice lives in its property popup.
 $ec_lang['lpn_field_head_pattern']='Model de sarcină';
-$ec_lang['lpn_field_head_pattern_tip']='Cum urcă și coboară nivelul de apă al acestui rezervor de-a lungul rulării. Sarcina de mai sus este înmulțită cu modelul.';
+$ec_lang['lpn_field_head_pattern_tip']='Modelul nivelului de apă al acestui rezervor pe durata rulării. Sarcina de mai sus este înmulțită cu modelul.';
 $ec_lang['lpn_field_pump_speed']='Turație relativă';
-$ec_lang['lpn_field_pump_speed_tip']='1 înseamnă că această pompă se învârte la turația la care i-a fost măsurată curba. 0,9 înseamnă aceeași pompă învârtindu-se mai încet, ceea ce scade sarcina pe care o adaugă și debitul pe care îl trece. Un model de turație ia locul acestui număr cât timp rulează.';
+$ec_lang['lpn_field_pump_speed_tip']='Relativă la turația folosită pentru a genera curba de performanță publicată a pompei. Ignorată (nescalată) dacă există un model de turație.';
 $ec_lang['lpn_field_speed_pattern']='Model de turație';
-$ec_lang['lpn_field_speed_pattern_tip']='Cum urcă și coboară turația acestei pompe pe parcursul rulării. Fiecare multiplicator este turația relativă pentru acea parte a rulării și înlocuiește setarea Turație, nu o scalează, deci un multiplicator de 0 oprește pompa.';
+$ec_lang['lpn_field_speed_pattern_tip']='Fiecare intrare a modelului dă turația relativă pentru acea parte a rulării, în loc să scaleze o valoare de bază.';
 
 // ---- place-name search and terrain elevations (Task 507) ---------------------------------------
 // Both features ask an outside service for something, and each asks its own permission question
@@ -3555,51 +3555,51 @@ $ec_lang['lpn_field_speed_pattern_tip']='Cum urcă și coboară turația acestei
 // one wall, and the order of the paragraphs stays ours rather than the translation's.
 $ec_lang['lpn_search_menu']='Căutați un loc după nume…';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_search_tip']='Găsiți un oraș, o stradă sau un reper după nume și mutați harta acolo. La prima utilizare vi se cere permisiunea, deoarece cuvintele pe care le introduceți ajung la serviciul de nume de locuri al OpenStreetMap.';
+$ec_lang['lpn_search_tip']='Permisiunea este cerută la prima utilizare, deoarece căutările sunt trimise serviciului de nume de locuri OpenStreetMap.';
 $ec_lang['lpn_search_bar']='Căutați după nume…';
 // The four paragraphs of the ask: what is sent and to whom; why this is a separate question from
 // the map pictures; the question itself; and what a no costs (nothing).
 $ec_lang['lpn_search_consent_1']='Căutarea după numele locului trimite cuvintele pe care le introduceți către nominatim.openstreetmap.org, serviciul gratuit de nume de locuri al OpenStreetMap Foundation.';
-$ec_lang['lpn_search_consent_2']='Acesta este un serviciu diferit de imaginile hărții stradale din spatele proiectului dvs. Imaginile arată doar unde priviți. O căutare arată ce ați scris. Serviciul de nume de locuri va primi cuvintele dvs. de căutare și adresa dvs. IP. Nu trimitem nimic altceva și nu păstrăm nicio evidență a căutărilor dvs.';
+$ec_lang['lpn_search_consent_2']='Acesta este un serviciu diferit de imaginile hărții stradale din spatele proiectului. Imaginile arată doar unde priviți. O căutare arată ce ați introdus. Serviciul de nume de locuri va primi cuvintele de căutare și adresa dvs. IP. Nu trimitem nimic altceva și nu păstrăm nicio evidență a căutărilor dvs.';
 $ec_lang['lpn_search_consent_3']='Ne permiteți să trimitem căutările dvs. către serviciul de nume de locuri?';
 $ec_lang['lpn_search_consent_4']='Dacă răspundeți nu, totul altceva de pe această pagină continuă să funcționeze exact ca acum, inclusiv Mergi la o latitudine și o longitudine. Reținem un da, pentru a nu mai fi nevoie să întrebăm din nou. Un nu nu este stocat deloc.';
-$ec_lang['lpn_search_refused']='Căutarea după numele locului este dezactivată și nu s-a trimis nimic. Puteți folosi în continuare Mergi la o latitudine și o longitudine.';
+$ec_lang['lpn_search_refused']='Căutarea după nume de loc este dezactivată și nu s-a trimis nimic. Comanda Mergi la o latitudine și o longitudine funcționează în continuare.';
 $ec_lang['lpn_search_prompt']='Căutați un loc după nume. Un oraș, o stradă, un reper — de exemplu: Petaluma, California';
-$ec_lang['lpn_search_empty']='Introduceți numele unui loc de căutat.';
+$ec_lang['lpn_search_empty']='Introduceți un nume de loc de căutat.';
 $ec_lang['lpn_search_working']='Se caută…';
-$ec_lang['lpn_search_busy']='O căutare este deja în curs. Așteptați răspunsul.';
+$ec_lang['lpn_search_busy']='O căutare rulează deja. Așteptați să se termine.';
 $ec_lang['lpn_search_choose']='Mai multe locuri se potrivesc. Care dintre ele?';
 $ec_lang['lpn_search_nochoice']='Nimic nu a fost ales, deci harta nu s-a mutat.';
 $ec_lang['lpn_search_badchoice']='Acesta nu este unul dintre numerele din listă.';
 $ec_lang['lpn_search_none']='Nu s-a găsit nimic pentru acest nume.';
 // Five different failures, five different next actions. Keep them distinct in translation too --
 // "search failed" for all five is exactly what this set exists to avoid.
-$ec_lang['lpn_search_rate']='Serviciul de nume de locuri ne cere să încetinim. Așteptați un minut și încercați din nou.';
-$ec_lang['lpn_search_http']='Serviciul de nume de locuri a răspuns cu o eroare.';
-$ec_lang['lpn_search_timeout']='Serviciul de nume de locuri nu a răspuns la timp. Tot restul acestei pagini funcționează fără el.';
-$ec_lang['lpn_search_unreadable']='Serviciul de nume de locuri a răspuns cu ceva ce această pagină nu a putut citi.';
+$ec_lang['lpn_search_rate']='Serviciul de nume de locuri a limitat rata cererilor. Așteptați un minut și încercați din nou.';
+$ec_lang['lpn_search_http']='Serviciul de nume de locuri a returnat o eroare.';
+$ec_lang['lpn_search_timeout']='Serviciul de nume de locuri nu a răspuns la timp. Restul acestei pagini funcționează fără el.';
+$ec_lang['lpn_search_unreadable']='Serviciul de nume de locuri a returnat un răspuns pe care această pagină nu l-a putut citi.';
 $ec_lang['lpn_search_offline']='Nu am putut contacta serviciul de nume de locuri. Este posibil să fiți offline. Tot restul acestei pagini funcționează fără el, inclusiv Mergi la o latitudine și o longitudine.';
-$ec_lang['lpn_search_toofast']='O căutare pe secundă — atât permite serviciul de nume de locuri. Încercați din nou peste puțin timp.';
+$ec_lang['lpn_search_toofast']='Serviciul de nume de locuri permite o căutare pe secundă. Încercați din nou peste puțin timp.';
 $ec_lang['lpn_search_nofetch']='Acest browser nu poate contacta serviciul de nume de locuri.';
 // Shown three times -- the menu tip, the confirm and the result notice -- so that the three cannot
 // drift into three different claims about the same data. One sentence, translated once.
-$ec_lang['lpn_terrain_accuracy']='Mapbox asamblează aceasta din multe seturi de date publice de cotă, deci cât de bună este depinde în întregime de locul unde vă aflați. Acolo unde există o ridicare lidar națională, precum USGS 3DEP în cea mai mare parte a Statelor Unite și echivalentele ei în alte părți, poate fi mai precisă decât un metru pe orizontală și câteva zecimi de metru pe verticală. Acolo unde există doar date globale, este de circa 30 m pe orizontală și câțiva metri pe verticală. Mapbox nu ne spune pe care ați primit-o. Tratați-o ca pe o hartă cu curbe de nivel, nu ca pe o ridicare topografică: verificați tot ce contează pentru dvs.';
+$ec_lang['lpn_terrain_accuracy']='Mapbox asamblează aceste date din multe seturi publice de date de cotă, deci acuratețea depinde de locație. Acolo unde există o ridicare lidar națională, cum ar fi USGS 3DEP în cea mai mare parte a Statelor Unite și echivalentele ei în alte părți, poate fi mai bună de 1 m pe orizontală și de câteva zecimi de metru pe verticală. Acolo unde există doar date globale, este de circa 30 m pe orizontală și câțiva metri pe verticală. Mapbox nu raportează care sursă se aplică. Tratați-o ca pe o hartă cu curbe de nivel, nu ca pe o ridicare topografică, și verificați orice valoare de care depinde proiectul.';
 $ec_lang['lpn_terrain_consent_1']='Completarea cotelor trimite poziția fiecărui nod care are nevoie de una — latitudinea și longitudinea sa — către api.mapbox.com, pentru a afla înălțimea terenului acolo.';
 $ec_lang['lpn_terrain_consent_2']='Aceasta este o întrebare diferită de imaginile hărții din spatele proiectului dvs. Imaginile arată doar unde priviți. Aceste poziții sunt chiar rețeaua dvs. Mapbox va primi acele coordonate și adresa dvs. IP. Nu trimitem nimic altceva: niciun nume, nicio conductă, niciun proiect. Nu păstrăm nicio evidență a acestui lucru, și nimic nu este stocat pe acest dispozitiv în afară de răspunsul dvs. la această întrebare.';
 $ec_lang['lpn_terrain_consent_3']='Ne permiteți să trimitem pozițiile nodurilor dvs. către Mapbox?';
-$ec_lang['lpn_terrain_consent_4']='Dacă răspundeți nu, totul altceva de pe această pagină continuă să funcționeze exact ca acum, iar dvs. puteți introduce cotele singur ca înainte. Reținem un da, pentru a nu mai fi nevoie să întrebăm din nou. Un nu nu este stocat deloc.';
-$ec_lang['lpn_terrain_refused']='Cotele nu au fost completate și nu s-a trimis nimic. Le puteți introduce ca înainte.';
+$ec_lang['lpn_terrain_consent_4']='Dacă răspundeți nu, tot restul acestei pagini continuă să funcționeze exact ca acum, iar cotele pot fi introduse manual ca înainte. Reținem un da, pentru a nu mai întreba din nou. Un nu nu este stocat deloc.';
+$ec_lang['lpn_terrain_refused']='Cotele nu au fost completate și nu s-a trimis nimic. Ele pot fi introduse manual ca înainte.';
 // {n} is a whole number, {k} a whole number, {v} an elevation with its unit, {m} and {f} whole
 // numbers. Substituted, never concatenated.
 $ec_lang['lpn_terrain_confirm']='Completați cota a {n} nod(uri) din Mapbox DEM?';
 $ec_lang['lpn_terrain_confirm_default_1']='Fiecare nod are deja o cotă, iar {n} dintre ele sunt încă la {v}, care este cota cu care începe un nod nou, nu una introdusă de dvs.';
 $ec_lang['lpn_terrain_confirm_default_2']='Înlocuiți cota acelor {n} noduri cu valori din Mapbox DEM?';
-$ec_lang['lpn_terrain_keep']='{k} noduri au deja o cotă și nu vor fi atinse.';
+$ec_lang['lpn_terrain_keep']='{k} noduri au deja o cotă și nu vor fi modificate.';
 $ec_lang['lpn_terrain_undo']='Un singur Undo (Ctrl-Z) le readuce pe toate.';
 $ec_lang['lpn_terrain_requests']='{n} cereri către api.mapbox.com.';
-$ec_lang['lpn_terrain_busy']='Cotele sunt deja în curs de completare. Așteptați.';
+$ec_lang['lpn_terrain_busy']='Cotele sunt deja în curs de completare. Așteptați să se termine.';
 $ec_lang['lpn_terrain_offmap']='Aceste poziții de noduri nu se află pe harta de teren, deci nu s-a trimis nimic.';
-$ec_lang['lpn_terrain_too_wide']='Aceste noduri sunt răspândite pe o suprafață prea mare a Pământului pentru a fi citite dintr-o dată ({n} cereri de dale). Nu s-a trimis nimic.';
+$ec_lang['lpn_terrain_too_wide']='Aceste noduri acoperă o parte prea mare din Pământ pentru a fi citite într-o singură operație ({n} cereri de dale). Nu s-a trimis nimic.';
 $ec_lang['lpn_terrain_cancelled']='Nimic nu a fost schimbat și nimic nu a fost trimis.';
 $ec_lang['lpn_terrain_nofetch']='Acest browser nu poate contacta serviciul de teren.';
 $ec_lang['lpn_terrain_working']='Se citește suprafața terenului…';
@@ -3608,7 +3608,7 @@ $ec_lang['lpn_terrain_denied']='Serviciul de teren a refuzat cererea ({status}),
 $ec_lang['lpn_terrain_failed']='Nu am putut contacta serviciul de teren, deci nicio cotă nu a fost schimbată. Este posibil să fiți offline. Tot restul acestei pagini funcționează fără el.';
 // A 429 is the service asking us to slow down. It is not a refusal and not a lost network, so it
 // gets its own sentence: the same request works in a minute.
-$ec_lang['lpn_terrain_rate_limited']='Serviciul de teren ne cere să încetinim (429), deci nicio cotă nu a fost schimbată. Încercați din nou peste un minut.';
+$ec_lang['lpn_terrain_rate_limited']='Serviciul de teren a limitat rata cererilor (429), deci nicio cotă nu a fost schimbată. Încercați din nou peste un minut.';
 // Any other status the service sent back. {status} is that number.
 $ec_lang['lpn_terrain_http']='Serviciul de teren a răspuns cu o eroare ({status}), deci nicio cotă nu a fost schimbată. Nimic nu este în neregulă cu rețeaua dvs.';
 // Said when the nodes asked about have no position on the Earth at all, which is what a projected
@@ -3636,24 +3636,24 @@ $ec_lang['lpn_terrain_ids_more']='{ids}, și încă {n}';
 // {id} a junction or pipe name, and {done}, {total}, {n}, {pass}, {fail}, {design} and {solves}
 // are whole numbers. Every one is substituted, never concatenated.
 $ec_lang['lpn_ff_menu']='Analiza debitului de incendiu…';
-$ec_lang['lpn_ff_menu_tip']='Testați joncțiunile pe rând: cât poate livra fiecare menținând totuși presiunea reziduală pe care ați stabilit-o, și dacă preluarea debitului necesar acolo scoate altceva din limite?';
+$ec_lang['lpn_ff_menu_tip']='Testați fiecare joncțiune selectată pentru debitul de incendiu și verificați efectul asupra restului sistemului';
 $ec_lang['lpn_ff_title']='Analiza debitului de incendiu';
-$ec_lang['lpn_ff_intro']='Fiecărei joncțiuni, pe rând, i se cere să preia un debit de incendiu peste cerința pe care o are deja. Nimic din proiectul dvs. nu este schimbat; toată rularea se face pe o copie.';
+$ec_lang['lpn_ff_intro']='Fiecare joncțiune, pe rând, preia un debit de incendiu peste cerința ei existentă. Rularea folosește o copie a rețelei la pasul de timp de pe ecran, deci nimic din proiectul dvs. nu se schimbă.\\n\\nDebitul de incendiu se testează în mod normal la cerința zilei maxime, deci stabiliți mai întâi rețeaua în această condiție.\\n\\nFiecare joncțiune testată necesită aproximativ 16 rezolvări ale întregii rețele, deci un sistem mare durează minute: alegeți joncțiunile înainte de rulare și opriți oricând pentru a păstra rezultatele parțiale.';
 $ec_lang['lpn_ff_scope']='Joncțiuni de testat';
-$ec_lang['lpn_ff_all']='Toate';
-$ec_lang['lpn_ff_selected']='Selectate';
+$ec_lang['lpn_ff_all']='Toate joncțiunile';
+$ec_lang['lpn_ff_selected']='Joncțiunile selectate';
 $ec_lang['lpn_ff_no_junctions']='Acest proiect nu are încă nicio joncțiune, deci nu este nimic de testat.';
 $ec_lang['lpn_ff_no_selection']='Nicio joncțiune nu este selectată. Selectați joncțiuni sau alegeți opțiunea Toate.';
 $ec_lang['lpn_ff_skipped']='{n} elemente selectate nu sunt joncțiuni, deci nu au fost testate.';
 $ec_lang['lpn_ff_required']='Debit de incendiu necesar';
-$ec_lang['lpn_ff_required_tip']='Debitul pe care codul dvs. de incendiu sau autoritatea dvs. pentru incendii îl cere la un hidrant. Fiecare joncțiune este testată față de acest număr, dacă nu are propriul ei debit de incendiu necesar.';
-$ec_lang['lpn_ff_required_own']='Joncțiunile care au propriul lor debit de incendiu necesar sunt testate față de acela în schimb. Numărul lor: {n}.';
-$ec_lang['lpn_ff_required_node_tip']='Debitul de incendiu necesar la această joncțiune anume, pentru destinația terenului pe care îl deservește, conform normativului dvs. de incendiu sau autorității competente. Lăsați-l gol și joncțiunea este testată față de numărul din caseta Analiza debitului de incendiu.';
+$ec_lang['lpn_ff_required_tip']='Debitul necesar la un hidrant conform codului de incendiu aplicabil sau autorității pentru incendii. Fiecare joncțiune este testată față de această valoare, cu excepția cazului în care pentru ea este introdus un debit de incendiu necesar.';
+$ec_lang['lpn_ff_required_own']='Joncțiunile cu un debit de incendiu necesar individual sunt testate față de acea valoare. Numărul lor: {n}.';
+$ec_lang['lpn_ff_required_node_tip']='Debitul de incendiu necesar la această joncțiune pentru destinația terenului pe care o deservește, conform codului de incendiu aplicabil sau autorității pentru incendii. Lăsați gol pentru a testa joncțiunea față de valoarea din caseta Analiza debitului de incendiu.';
 $ec_lang['lpn_ff_residual']='Presiune reziduală de menținut';
 $ec_lang['lpn_ff_residual_tip']='Presiunea pe care joncțiunea trebuie să o mențină în continuare în timp ce livrează debitul de incendiu. AWWA M31 și NFPA 291 folosesc 20 psi (140 kPa).';
 $ec_lang['lpn_ff_design']='Verificare de proiectare (efect asupra sistemului)';
-$ec_lang['lpn_ff_design_tip']='O întrebare separată de dacă joncțiunea poate livra debitul: cu acel debit preluat acolo, scade altceva sub presiunea sa minimă sau depășește limita sa de viteză? Alegerea de a verifica aceasta nu costă niciun calcul suplimentar.';
-$ec_lang['lpn_ff_design_no_selection']='Domeniul verificării de proiectare este setat pe Selectate, dar niciun element nu este selectat. Selectați elemente sau selectați opțiunea Toate.';
+$ec_lang['lpn_ff_design_tip']='O întrebare separată de dacă joncțiunea poate livra debitul: cu acel debit preluat acolo, scade vreo altă joncțiune sub presiunea sa minimă sau depășește vreo conductă limita sa de viteză? Această verificare nu necesită niciun calcul suplimentar.';
+$ec_lang['lpn_ff_design_no_selection']='Domeniul verificării de proiectare este setat pe Selectate, dar niciun element nu este selectat. Selectați elemente pe hartă sau alegeți Toate.';
 $ec_lang['lpn_ff_minpressure']='Cea mai mică presiune permisă în altă parte';
 $ec_lang['lpn_ff_minpressure_tip']='O joncțiune care scade sub aceasta în timp ce alta își preia debitul de incendiu este raportată ca o problemă de proiectare.';
 $ec_lang['lpn_ff_maxvelocity']='Cea mai mare viteză permisă';
@@ -3663,7 +3663,7 @@ $ec_lang['lpn_ff_maxvelocity_tip']='O conductă care depășește aceasta în ti
 // for hydrant losses beyond the node."). IT LEADS WITH THE METHOD, NOT WITH THE ABSENCE: Tom read
 // the first wording as "no losses are accounted for at the raw node", which is a hole in the tool
 // rather than the deliberate and standard choice it actually is.
-$ec_lang['lpn_ff_accounting']='Debitul de incendiu este preluat chiar la joncțiune. Aceasta este metoda folosită aici, și este cea obișnuită. Hidrantul, conducta lui laterală și ajutajul lui nu sunt modelate, deci un hidrant real livrează mai puțin decât debitul arătat aici.';
+$ec_lang['lpn_ff_accounting']='Presiunea este modelată chiar la joncțiune, metoda obișnuită. Hidrantul, lateralul și ajutajul lui nu sunt modelate, iar presiunea la ajutaj este mai mică decât la nod.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_ff_engine_native']='Este folosit rezolvitorul intern.';
 // Edited by TGH 2026-09-07
@@ -3696,8 +3696,8 @@ $ec_lang['lpn_ff_clear']='Șterge inelele';
 // two failure modes are independent -- a junction can miss its fire flow AND pull its neighbours
 // down -- so these three do not add up to the number of junctions, and that is correct rather than
 // a rounding slip. Said as three separate facts for that reason.
-$ec_lang['lpn_ff_summary']='{clean} joncțiuni nu au avut nimic greșit. {fire} joncțiuni au eșuat la debitul de incendiu. {design} joncțiuni au afectat restul sistemului.';
-$ec_lang['lpn_ff_summary_error']='{n} joncțiuni nu au putut primi un răspuns.';
+$ec_lang['lpn_ff_summary']='{clean} joncțiuni au trecut toate verificările. {fire} joncțiuni nu au satisfăcut debitul de incendiu. {design} joncțiuni au afectat restul sistemului.';
+$ec_lang['lpn_ff_summary_error']='{n} joncțiuni nu au putut fi rezolvate.';
 // ONE WIDE TABLE, NOT TWO REPORTS (Tom, 2026-08-30, with a competitor's own table in front of him:
 // "Normally they are kind of wide and they include the information from both tables in one table.")
 // One run has always produced one result set holding both answers per junction, so two headings
@@ -3749,7 +3749,7 @@ $ec_lang['lpn_ff_more']='și încă {n} afectate';
 // the Worst effect cell and undisplayed junctions under the table; a gendered language must
 // agree with one noun and would have been wrong at the other call site.
 $ec_lang['lpn_ff_rows_more']='Încă {n} joncțiuni nu sunt afișate.';
-$ec_lang['lpn_ff_design_none']='Nimic din setul ales nu a ieșit din limitele sale în timp ce vreo joncțiune și-a preluat debitul de incendiu.';
+$ec_lang['lpn_ff_design_none']='Cu debitul de incendiu al fiecărei joncțiuni testate preluat pe rând, nimic din domeniul verificării de proiectare nu și-a depășit limitele.';
 $ec_lang['lpn_ff_design_off_note']='Efectul asupra restului sistemului nu a fost verificat în această rulare.';
 // **WHY IT IS SAID AND NEVER APPLIED, in Tom's words (2026-09-02), and the reason is the MODEL, not
 // the arithmetic:** *"These models are not always fine-grained. They don't represent every pipe,
@@ -3765,7 +3765,7 @@ $ec_lang['lpn_ff_design_off_note']='Efectul asupra restului sistemului nu a fost
 // ISO credits a single hydrant with at most 1,500 gpm whatever the hydraulics say. Said beside the
 // numbers and never applied to them: a number quietly cut down to a credit limit is a lie with a
 // tidy face.
-$ec_lang['lpn_ff_iso']='Insurance Services Office (ISO) creditează un singur hidrant cu cel mult {flow}. Această limită de credit nu a fost aplicată aici pentru că nu știm câți hidranți poate reprezenta un nod.';
+$ec_lang['lpn_ff_iso']='Insurance Services Office (ISO) creditează un singur hidrant cu cel mult {flow}. Această limită nu este aplicată aici, deoarece o joncțiune poate reprezenta mai mult de un hidrant.';
 // Every way a junction can fail to produce a number is named. None of them is ever shown as a flow
 // of zero: "there is no available fire flow" and "the available fire flow is zero" are different
 // facts, and only the first one is ever true.
@@ -3773,7 +3773,7 @@ $ec_lang['lpn_ff_err_at_rest']='Deja sub presiunea reziduală înainte de a se p
 $ec_lang['lpn_ff_err_converge']='Rețeaua nu a convers.';
 $ec_lang['lpn_ff_err_solve']='Rezolvitorul a raportat o eroare și nu a dat niciun răspuns.';
 $ec_lang['lpn_ff_err_not_junction']='Nu este o joncțiune';
-$ec_lang['lpn_ff_err_unknown']='Niciun răspuns. Codul raportat a fost {code}.';
+$ec_lang['lpn_ff_err_unknown']='Niciun rezultat. Cod de eroare: {code}';
 
 // ---- Settings > New assets > Import surveyed points: CSV and GPX (ROADMAP Task 592) -----------
 //
@@ -3791,7 +3791,7 @@ $ec_lang['lpn_ff_err_unknown']='Niciun răspuns. Codul raportat a fost {code}.';
 // cannot tell a mistake from a place; a file of eastings and northings is refused by name, because
 // a plane coordinate read as a degree is silent and puts a network in the Gulf of Guinea.
 $ec_lang['lpn_file_import_survey']='Importă puncte topografice…';
-$ec_lang['lpn_file_import_survey_tip']='Citește o listă de puncte topografice dintr-un fișier text și creează câte o joncțiune la fiecare punct, preluând valorile implicite pentru elemente noi pentru tot ce fișierul nu precizează. Nu se desenează nicio conductă, iar niciun rând nu este vreodată omis fără a fi numit. Citește sistemul de coordonate pe care acest proiect îl folosește deja, georeferențiat sau nu.';
+$ec_lang['lpn_file_import_survey_tip']='Citește o listă de puncte topografice dintr-un fișier text și creează câte o joncțiune la fiecare punct, preluând setările pentru elemente noi pentru tot ce fișierul nu precizează. Nu se desenează nicio conductă decât dacă selectați Citește descrierea ca pe coduri de teren, iar niciun rând nu este omis fără a fi numit. Citește sistemul de coordonate pe care acest proiect îl folosește deja, georeferențiat sau nu.';
 $ec_lang['lpn_survey_read_error']='Acel fișier nu a putut fi citit de pe disc.';
 $ec_lang['lpn_survey_cancelled']='Nimic nu a fost creat și nimic nu a fost schimbat.';
 // What the project calls its two axes, for a sentence js/lpn-survey.js writes about a column. The
@@ -3802,7 +3802,7 @@ $ec_lang['lpn_survey_axis_east']='Est';
 // A column in a file that states no names of its own. Counted from 1, the way a spreadsheet does.
 $ec_lang['lpn_survey_err_empty']='Acel fișier nu conține nimic.';
 $ec_lang['lpn_survey_err_unreadable']='Acel fișier nu a putut fi citit ca o listă de puncte topografice.';
-$ec_lang['lpn_survey_err_ambiguous_coord']='Mai multe coloane din acel fișier ar putea fi {axis} ({detail}), iar această pagină nu va alege între ele. Lăsați doar una dintre ele numită {axis} și încercați din nou.';
+$ec_lang['lpn_survey_err_ambiguous_coord']='Mai multe coloane din acel fișier ar putea fi {axis} ({detail}), iar această pagină nu alege între ele. Lăsați doar una dintre ele denumită {axis} și încercați din nou.';
 $ec_lang['lpn_survey_err_no_points']='Niciun rând din acel fișier nu a putut fi citit ca punct topografic. Rânduri citite: {detail}';
 // THE FILE FORMAT CHOOSER (Tom, 2026-09-17: "We will need to include a file format chooser
 // (PNEZD, PENZD, or whatever format is useful for Declan."). PNEZD and PENZD are the same five
@@ -3827,7 +3827,7 @@ $ec_lang['lpn_survey_confirm_tank']='{n} bazin(e) găsit(e). Continuați?';
 $ec_lang['lpn_survey_report_junction']='{n} joncțiune(i) importată(e), {m} cu cotă.';
 $ec_lang['lpn_survey_report_reservoir']='{n} rezervor(oare) importat(e), {m} cu cotă.';
 $ec_lang['lpn_survey_report_tank']='{n} bazin(e) importat(e), {m} cu cotă.';
-$ec_lang['lpn_survey_report_clean']='Fiecare punct din fișier a fost preluat, și nimic nu a fost schimbat la import.';
+$ec_lang['lpn_survey_report_clean']='Fiecare punct din fișier a fost importat fără modificări.';
 $ec_lang['lpn_survey_report_notes']='Erori și note de import:';
 $ec_lang['lpn_survey_sev_error']='eroare';
 $ec_lang['lpn_survey_sev_warning']='avertisment';
@@ -3883,11 +3883,11 @@ $ec_lang['lpn_copy_body_nodate']='Acest browser nu recunoaște acest fișier. Es
 $ec_lang['lpn_copy_original']='Original; păstrează aceeași blocare';
 $ec_lang['lpn_copy_copy']='O copie; creează o blocare nouă';
 $ec_lang['lpn_copy_kept_link']='{name} a fost deschis ca original, mutat într-un loc nou. Salvează scrie acum în acest fișier.';
-$ec_lang['lpn_copy_opened']='{file} a fost deschis ca o copie, cu o blocare nouă proprie, care va fi salvată la următoarea salvare a fișierului.';
+$ec_lang['lpn_copy_opened']='{file} a fost deschis ca o copie și salvat, cu o blocare nouă.';
 $ec_lang['lpn_scenario_basic']='Mod de bază';
-$ec_lang['lpn_scenario_basic_tip']='Bifat, un scenariu este pur și simplu valorile pe care le stabiliți în el. Debifat, acest meniu oferă și tabelul de previzualizare a Alternativelor, care arată cum sunt grupate acele valori pe categorii și vă invită feedbackul.';
+$ec_lang['lpn_scenario_basic_tip']='Selectat: un scenariu constă doar din valorile stabilite în el. Debifat: acest meniu oferă și tabelul de previzualizare a Alternativelor, care arată cum sunt grupate acele valori pe categorii, și permite unui scenariu să aibă o durată totală de rulare și un pas de timp hidraulic separate. Opiniile despre această funcție sunt binevenite.';
 $ec_lang['lpn_alt_title']='Previzualizare Alternative';
-$ec_lang['lpn_alt_note']='Doar citire. Baza folosește alternativa Bază a fiecărei categorii. Fiecare scenariu primește propria alternativă pentru orice categorie modificată, subordonată celei de Bază. Numărul indică câte valori modificate are.';
+$ec_lang['lpn_alt_note']='Baza folosește alternativa Bază a fiecărei categorii. Fiecare scenariu are o alternativă separată, subordonată alternativei Bază, pentru orice categorie modificată. Numărul este numărul de valori modificate. Ultimele trei coloane sunt opțiuni de calcul: introduceți o valoare pentru scenariu sau lăsați gol pentru a folosi valoarea părinte. Valorile proiectului se află în Setări, Calcul, Timp.';
 $ec_lang['lpn_alt_cat_physical']='Fizic';
 $ec_lang['lpn_alt_cat_demand']='Cerință';
 $ec_lang['lpn_alt_cat_topology']='Activarea elementelor';
@@ -3945,7 +3945,7 @@ $ec_lang['lpn_ff_design_all']='Toate';
 $ec_lang['lpn_ff_design_selected']='Selectate';
 $ec_lang['lpn_ff_rows_more_links']='Legături neafișate: {n}.';
 $ec_lang['lpn_crit_menu']='Analiza criticității…';
-$ec_lang['lpn_crit_menu_tip']='Scoateți pe rând din rețea fiecare conductă, pompă și vană și vedeți ce pierde sistemul.';
+$ec_lang['lpn_crit_menu_tip']='Scoateți pe rând din rețea fiecare conductă, pompă și vană și raportați efectul asupra sistemului.';
 $ec_lang['lpn_crit_title']='Analiza criticității';
 $ec_lang['lpn_crit_intro']='Fiecare element este scos pe rând din rețea, iar rețeaua este rezolvată la pasul de timp de pe ecran, în scenariul activ. Nimic din proiectul dvs. nu este modificat; întreaga rulare se face pe o copie.';
 $ec_lang['lpn_crit_scope']='Legături de întrerupt';
@@ -3970,3 +3970,227 @@ $ec_lang['lpn_crit_stale']='Desenul s-a schimbat, deci rezultatele criticități
 $ec_lang['lpn_crit_skipdead']='Omite capetele moarte';
 $ec_lang['lpn_crit_skipdead_tip']='O legătură de capăt mort este una a cărei scoatere izolează joncțiuni care pot fi atinse doar prin ea, fără niciun rezervor sau bazin dincolo. Pierderea ei înseamnă tot ce se află dincolo de ea, deci nu este rezolvată. Sumarul spune câte au fost omise.';
 $ec_lang['lpn_crit_skipped_dead']='Legături de capăt mort omise: {n}. Fiecare izolează tot ce se află dincolo de ea.';
+$ec_lang['points_data_msg_line']='Nu a fost lipit nimic. Rândul {n} nu a putut fi citit ca stație și cotă.';
+$ec_lang['points_data_msg_none']='Nu a fost lipit nimic. Nu s-a găsit nicio pereche stație-cotă.';
+$ec_lang['lpn_tool_add_chain']='Lanț joncțiune-conductă';
+$ec_lang['lpn_pane_delete_element']='Ștergere element';
+$ec_lang['lpn_pane_delete_elements']='Ștergere elemente';
+$ec_lang['lpn_pane_sort_desc']='Sortare descrescătoare';
+$ec_lang['lpn_pane_manage_cols_width']='Lățime (em)';
+$ec_lang['lpn_pane_width_tip']='Lățimile coloanelor sunt salvate în acest browser, nu în proiect. Faceți dublu clic pe separatorul unei coloane pentru a restabili lățimea implicită.';
+$ec_lang['lpn_dock_left']='Ancorare în stânga hărții';
+$ec_lang['lpn_dock_right']='Ancorare în dreapta hărții';
+$ec_lang['lpn_dock_float']='Flotant';
+$ec_lang['lpn_dock_autohide']='Ascundere automată';
+$ec_lang['lpn_popup_none']='Nu este selectat nimic. Selectați un element pe hartă pentru a vedea proprietățile lui.';
+$ec_lang['lpn_hotkeys_snip_heading']='Captură de ecran';
+$ec_lang['lpn_hotkeys_snip_term']='Comenzi rapide de la tastatură pentru captura de ecran';
+$ec_lang['lpn_hotkeys_snip_def']='<table class="lpn-notes-table"><tbody><tr><td>S</td><td>Decupare, cât timp Captura de ecran este deschisă.</td></tr><tr><td>E</td><td>Radieră, în vizualizarea de adnotare.</td></tr><tr><td>Ctrl+Z, Ctrl+Y</td><td>Anulare și refacere, în vizualizarea de adnotare.</td></tr><tr><td>Esc</td><td>Anulează o decupare sau părăsește radiera. În vizualizarea de adnotare, o închide când nu este desenat nimic.</td></tr></tbody></table>';
+$ec_lang['lpn_fb_intro']='Mesaje predefinite (opțional). Nu se trimite nimic până când apăsați Trimite.';
+$ec_lang['lpn_fb_pick_numbers']='Numerele par greșite';
+$ec_lang['lpn_fb_pick_broken']='Ceva nu a funcționat';
+$ec_lang['lpn_fb_pick_wording']='Formularea sau traducerea este greșită';
+$ec_lang['lpn_fb_pick_confusing']='Aceasta este neclară';
+$ec_lang['lpn_fb_comment']='Comentarii (opțional)';
+$ec_lang['lpn_fb_email']='E-mail (opțional, doar dacă doriți un răspuns)';
+$ec_lang['lpn_fb_sends']='Ce se trimite: numele acestei pagini, limba dvs., versiunea site-ului, codul mesajului de pe hartă, dacă există unul, și ceea ce ați ales sau ați scris. Niciodată desenul sau rețeaua dvs. Adresa dvs. de e-mail este folosită doar pentru a vă răspunde.';
+$ec_lang['lpn_fb_send']='Trimite';
+$ec_lang['lpn_fb_sending']='Se trimite…';
+$ec_lang['lpn_fb_failed']='Mesajul nu a ajuns la noi. Ce ați scris este încă aici, deci puteți încerca din nou.';
+$ec_lang['lpn_fb_bad_email']='Această adresă de e-mail nu pare corectă. Corectați-o sau lăsați câmpul gol.';
+$ec_lang['lpn_fb_busy']='Au sosit prea multe mesaje în ultimele minute. Ce ați scris este încă aici, deci puteți încerca din nou mai târziu.';
+$ec_lang['lpn_tool_add_chain_tip']='Înlănțuiți joncțiuni și conducte: specificați un punct pe hartă pentru a adăuga o joncțiune, apoi specificați fiecare punct următor pentru a adăuga o conductă și o joncțiune. Specificați un nod existent pentru a continua de la el. Apăsați Escape pentru a încheia lanțul.';
+$ec_lang['lpn_pane_filter_sel_note']='Doar selecția. Se afișează {n} din {all}.';
+$ec_lang['lpn_pane_filter_sel_and']='Filtrat după {q} și doar selecția. Se afișează {n} din {all}.';
+$ec_lang['lpn_pane_filter_sel_none']='Niciunul dintre elementele selectate nu se află în acest tabel.';
+$ec_lang['lpn_pane_sel_only']='Doar selecția';
+$ec_lang['lpn_pane_sel_only_none']='Nu este selectat niciun element. Selectați mai întâi elemente pe hartă.';
+$ec_lang['lpn_pane_scn_show']='Afișează scenariile';
+$ec_lang['lpn_pane_clear_override']='Șterge valoarea specifică';
+$ec_lang['lpn_pane_scn_alt_tip']='{category}, alt.: {alternative}';
+$ec_lang['lpn_change_type_menu']='Schimbare tip';
+$ec_lang['lpn_change_type_tip']='Schimbați nodurile selectate în joncțiuni, rezervoare sau bazine, ori legăturile selectate în conducte, pompe sau vane. Fiecare își păstrează ID-ul, poziția, conexiunile și fiecare valoare pe care o are și noul tip. Dacă s-ar pierde ceva, vi se cere mai întâi confirmarea.';
+$ec_lang['lpn_change_type_ok']='Schimbă';
+$ec_lang['lpn_change_type_lost']='Aceste valori se vor pierde:';
+$ec_lang['lpn_change_type_key']='ID: Intrare pierdută';
+$ec_lang['lpn_change_type_line']='{id}: {property} {value}';
+$ec_lang['lpn_change_type_line_scenario']='{id}: {property} {value}, în scenariul {scenario}';
+$ec_lang['lpn_change_type_more']='Și încă {n}.';
+$ec_lang['lpn_change_type_surface']='Acestea păstrează suprafața apei unde era. Sarcina unui rezervor este cota bazinului plus adâncimea apei din el, iar adâncimea apei dintr-un bazin este sarcina rezervorului minus cota lui:';
+$ec_lang['lpn_change_type_meaning']='Aceste controale și reguli testează un nod care se schimbă și îl vor citi diferit: o joncțiune este testată după presiunea ei, iar un bazin sau un rezervor după nivelul apei.';
+$ec_lang['lpn_change_type_born']='Aceste valori sunt noi, stabilite ca la un element desenat nou:';
+$ec_lang['lpn_change_type_no_curve']='{id}: Nicio curbă de sarcină a pompei, deci pompa nu adaugă sarcină până când este selectată una, iar un export .inp o scrie ca o conductă';
+$ec_lang['lpn_change_type_becomes']='{id}: {property} {value}, în scenariul {scenario}, devine {new}';
+$ec_lang['lpn_change_type_customers']='Doar o conductă deservește abonați, deci acești abonați sunt conectați în schimb la nodul afișat între paranteze, unde cerința lor este deja aplicată. Rămân unde sunt desenați, iar cerința lor nu se schimbă:';
+$ec_lang['lpn_change_type_setting']='Aceste controale și reguli dau sau testează setarea unei legături care se schimbă. O setare este o mărime diferită la o conductă, la o pompă și la o vană, deci o vor citi diferit:';
+$ec_lang['lpn_change_type_rules']='Aceste linii de reguli denumesc o legătură după tipul ei și o vor denumi după noul ei tip:';
+$ec_lang['lpn_find_scope_source']='Sursă';
+$ec_lang['lpn_find_source_no_chemical']='Nicio substanță chimică nu este urmărită, deci niciun nod nu are o sursă.';
+$ec_lang['lpn_profile_open']='Deschidere fișier de profil EPANET…';
+$ec_lang['lpn_profile_file_done']='Profil citit din fișier: {used} din {total} noduri găsite în această rețea.';
+$ec_lang['lpn_profile_file_missing']='Denumite în fișier, dar absente din această rețea: {ids}.';
+$ec_lang['lpn_profile_file_short']='Fișierul denumește mai puțin de două noduri din această rețea, deci nu există un profil de desenat.';
+$ec_lang['lpn_pgraph_none']='Acest element nu are rezultate în rularea curentă.';
+$ec_lang['lpn_pgraph_source_share_from']='Ponderea sursei din {node}';
+$ec_lang['lpn_result_pump_head']='Sarcină';
+$ec_lang['lpn_result_pump_head_tip']='Sarcina pe care pompa o adaugă de la aspirație la refulare, afișată ca număr pozitiv. Rezolvitorul și fișierele EPANET o păstrează ca pierdere de sarcină negativă.';
+$ec_lang['lpn_report_pump_head']='Sarcina pompei';
+$ec_lang['lpn_contour_show']='Afișează curbele de nivel';
+$ec_lang['lpn_contour_show_tip']='Debifați pentru a ascunde umplerea și liniile curbelor de nivel; bifați pentru a le readuce așa cum erau. Culorile nodurilor rămân.';
+$ec_lang['lpn_sysflow_title']='Bilanț de debit';
+$ec_lang['lpn_crs_suggested_mark']='(sugerat)';
+$ec_lang['lpn_file_export_menu']='Export…';
+$ec_lang['lpn_file_export_item_inp']='Fișier EPANET…';
+$ec_lang['lpn_file_export_item_geojson']='Fișier GeoJSON…';
+$ec_lang['lpn_status_inp_exported_picture']='S-a exportat {zip}, care conține fișierul EPANET {file}, imaginea sa de fundal {picture} și fișierul de georeferențiere {world}. Extrageți toate trei într-un singur dosar, apoi deschideți acolo fișierul .inp în EPANET; imaginea vine odată cu el.';
+$ec_lang['lpn_status_inp_exported_no_picture']='S-a exportat {file}. Imaginea de fundal nu a putut fi salvată, deci fișierul .inp nu indică niciuna; în EPANET, adăugați-o cu Vizualizare, Fundal, Încărcare.';
+$ec_lang['lpn_inp_export_difference_one']='Un lucru pe care formatul .inp nu îl poate păstra.';
+$ec_lang['lpn_file_export_geojson_tip']='Descărcați această rețea ca fișier GeoJSON pentru QGIS, ArcGIS Pro și alte programe GIS. Joncțiunile, bazinele și rezervoarele sunt puncte, iar conductele, pompele și vanele sunt linii care urmează vârfurile lor. Pozițiile sunt latitudine și longitudine. Rezultatele sunt incluse doar când rețeaua a fost rezolvată.';
+$ec_lang['lpn_geojson_refused_local']='Un fișier GeoJSON conține doar latitudine și longitudine, iar acest proiect este desenat pe o grilă locală, fără un loc pe Pământ. Georeferențiați-l mai întâi cu Hartă, Harta lumii, Atașează, apoi exportați din nou.';
+$ec_lang['lpn_geojson_refused_range']='Aceste poziții nu sunt latitudini și longitudini valide: {detail}';
+$ec_lang['lpn_geojson_refused_crs']='Sistemul de coordonate al acestui proiect ({detail}) nu este cunoscut de această pagină, deci pozițiile lui nu pot fi convertite în latitudine și longitudine. Folosiți Convertește ca… pentru a copia proiectul într-unul pe care această pagină îl cunoaște, apoi exportați din nou.';
+$ec_lang['lpn_geojson_refused_empty']='Nu există încă nimic de exportat. Desenați sau deschideți mai întâi o rețea.';
+$ec_lang['lpn_geojson_results_in']='Rezultatele de pe ecran sunt incluse.';
+$ec_lang['lpn_geojson_results_out']='Nu sunt incluse rezultate, deoarece rețeaua nu este rezolvată.';
+$ec_lang['lpn_inp_backdrop_attach']='Atașare {file}…';
+$ec_lang['lpn_inp_backdrop_attach_tip']='O pagină web nu poate deschide imaginea după nume. Alegeți-o pe dispozitivul dvs. și este plasată unde spune fișierul că îi este locul.';
+$ec_lang['lpn_inp_backdrop_attached']='{file} a fost atașat, plasat unde spune fișierul că îi este locul.';
+$ec_lang['lpn_inp_backdrop_attached_other']='{picked} a fost atașat, plasat unde spune fișierul că îi este locul. Fișierul denumește {file}, care este un alt nume.';
+$ec_lang['lpn_copy_opened_unsaved']='{file} a fost deschis ca o copie, cu o blocare nouă care va fi salvată la următoarea salvare a fișierului.';
+$ec_lang['lpn_engine_unavailable_why']='Vanele de control al presiunii și al debitului (PRV, PSV, FCV) nu pot fi rezolvate fără rezolvitorul EPANET. {reason}';
+$ec_lang['lpn_engine_needed_failed_why']='Această rețea poate fi rezolvată doar de rezolvitorul EPANET. {reason}';
+$ec_lang['lpn_mode_add_chain']='Mod: Lanț joncțiune-conductă. Specificați un punct pe hartă pentru a adăuga o joncțiune, apoi specificați fiecare punct următor pentru a adăuga o conductă și o joncțiune. Specificați un nod existent pentru a continua de la el. Apăsați Escape pentru a încheia lanțul. Comutați la modul Selectare pentru a modifica sau muta elemente și etichete.';
+$ec_lang['lpn_cp_allow_tip']='Permite doar aceste caractere:';
+$ec_lang['lpn_cp_characters_tip']='„@” înseamnă orice literă; „#” înseamnă orice cifră, iar „-”, „.” și „,” trebuie enumerate separat dacă sunt permise; iar orice spațiu alb trebuie să se afle între alte caractere.';
+$ec_lang['lpn_valwarn_diameter']='Diametrul unei conducte sau al unei vane este în mod normal între {min} și {max} {unit}. Verificați numărul și unitatea diametrului.';
+$ec_lang['lpn_valwarn_hw']='Un C Hazen-Williams este în mod normal între {min} și {max}. Un număr în afara acestui interval este adesea o rugozitate destinată altei metode de frecare.';
+$ec_lang['lpn_valwarn_manning']='Un n Manning este în mod normal între {min} și {max}. Un număr în afara acestui interval este adesea o rugozitate destinată altei metode de frecare.';
+$ec_lang['lpn_valwarn_dw']='Rugozitatea Darcy-Weisbach este în mod normal mai mare decât 0 și cel mult {max} {unit}. Un număr mai mare este adesea un C Hazen-Williams sau un n Manning.';
+$ec_lang['lpn_valwarn_positive']='EPANET nu acceptă aici zero sau un număr negativ.';
+$ec_lang['lpn_valwarn_negative']='EPANET nu acceptă aici un număr negativ.';
+$ec_lang['lpn_valwarn_tank_levels']='EPANET nu acceptă acest bazin. Cea mai mică adâncime a apei nu trebuie să depășească adâncimea apei, iar adâncimea apei nu trebuie să depășească cea mai mare adâncime a apei.';
+$ec_lang['lpn_alt_calc_options']='Opțiuni de calcul';
+$ec_lang['lpn_scenario_duration_tip']='Lăsați gol pentru a moșteni de la părinte. O durată totală de rulare de 0:00 este o rulare în regim permanent.';
+$ec_lang['lpn_scenario_hyd_step_tip']='Lăsați gol pentru a moșteni de la părinte.';
+$ec_lang['lpn_time_scn_overrides']='Valori specifice scenariului:';
+$ec_lang['lpn_scenario_preset_mult_tip']='Multiplicator de cerință {mult} ori ziua medie, o valoare provizorie. Majoritatea sistemelor se încadrează între {lo} și {hi} (National Research Council, 2006). Stabiliți valoarea pentru sistemul modelat în Setări, Calcul, Hidraulică, Multiplicator de cerință.';
+$ec_lang['lpn_engine_failed_why']='{reason} Se afișează în schimb rezolvitorul integrat.';
+$ec_lang['lpn_settings_basemap_style']='Stilul hărții de bază';
+$ec_lang['lpn_basemap_style_normal']='Normal';
+$ec_lang['lpn_basemap_style_muted']='Estompat';
+$ec_lang['lpn_basemap_style_faded']='Șters';
+$ec_lang['lpn_basemap_style_grayscale']='Tonuri de gri';
+$ec_lang['lpn_time_statistic']='Statistică';
+$ec_lang['lpn_time_stat_none']='Niciuna';
+$ec_lang['lpn_time_stat_averaged']='Med.';
+$ec_lang['lpn_time_stat_minimum']='Min.';
+$ec_lang['lpn_time_stat_maximum']='Max.';
+$ec_lang['lpn_time_stat_range']='Interval';
+$ec_lang['lpn_time_no_engine_why']='Rezolvitorul integrat rezolvă un singur moment la un moment dat, deci aceasta este rețeaua doar la {time}: fiecare model este citit în acel moment, iar fiecare bazin rămâne la nivelul inițial în loc să se umple și să se golească. {reason}';
+$ec_lang['lpn_time_engine_fetch_failed']='Descărcarea rezolvitorului EPANET a eșuat. Reîncărcați pagina pentru a încerca din nou; un firewall, un proxy sau o extensie a browserului o poate bloca.';
+$ec_lang['lpn_time_engine_start_failed']='Browserul a refuzat pornirea rezolvitorului EPANET. WebAssembly poate fi dezactivat de o setare de securitate sau de o extensie.';
+$ec_lang['lpn_time_engine_run_failed']='Rularea EPANET a eșuat. Aceasta este un defect al acestei pagini; folosiți legătura {wrong} pentru a-l raporta.';
+$ec_lang['lpn_saved_project']='Salvat cu proiectul';
+$ec_lang['lpn_saved_browser']='Salvat în acest browser';
+$ec_lang['lpn_saved_session']='Nesalvat';
+$ec_lang['lpn_scncmp_at_time']='{value} la {id}, {time}';
+$ec_lang['lpn_scncmp_same']='La fel în fiecare scenariu';
+$ec_lang['lpn_scncmp_period_note']='Acolo unde un scenariu are o durată totală de rulare, presiunea sa cea mai mică și viteza cea mai mare sunt extremele întregii rețele, la momentul afișat.';
+$ec_lang['lpn_choice_default']='Implicit';
+$ec_lang['lpn_ds_menu']='Scalarea cerinței…';
+$ec_lang['lpn_ds_menu_tip']='Înmulțiți cerințele pe o copie a rețelei și vedeți presiunile și vitezele, sau găsiți cel mai mare factor de scalare a cerinței pe care sistemul îl poate susține.';
+$ec_lang['lpn_ds_title']='Scalarea cerinței';
+$ec_lang['lpn_ds_intro']='Selectați butonul Rulează pentru a înmulți cerințele la joncțiunile alese cu factorul de scalare a cerinței și a vedea presiunile și vitezele.\n\nSelectați butonul Găsește pentru a găsi cel mai mare factor de scalare a cerinței, cu aproximație de {step}, la care toate aceste joncțiuni păstrează cel puțin cea mai mică presiune permisă; căutarea se face de la 0 la {max}.\n\nAmbele lucrează pe o copie a rețelei, rezolvată la pasul de timp de pe ecran, în scenariul activ, deci nimic din proiectul dvs. nu se schimbă. Doar acel pas de timp este scalat, iar nivelurile și stările sunt preluate din el; pentru a testa vârful, mutați ceasul la cerința de vârf înainte de a rula.';
+$ec_lang['lpn_ds_scope']='Joncțiuni de scalat';
+$ec_lang['lpn_ds_scope_all']='Toate joncțiunile';
+$ec_lang['lpn_ds_scope_selected']='Joncțiunile selectate';
+$ec_lang['lpn_ds_minpressure']='Cea mai mică presiune permisă';
+$ec_lang['lpn_ds_minpressure_tip']='Este același număr ca Cea mai mică presiune permisă din altă parte a Analizei debitului de incendiu. Dacă îl schimbați aici, se schimbă și acolo.';
+$ec_lang['lpn_ds_head_scale']='Scalarea cerințelor';
+$ec_lang['lpn_ds_multiplier']='Factor de scalare a cerinței';
+$ec_lang['lpn_ds_multiplier_tip']='Factorul cu care este înmulțită fiecare cerință; 1,5 înseamnă o creștere de 50%. Se aplică suplimentar față de multiplicatorul de cerință al scenariului activ, care este deja în cerințe, și nu este niciodată salvat în proiect.';
+$ec_lang['lpn_ds_run']='Rulează';
+$ec_lang['lpn_ds_head_search']='Ce factor de scalare a cerinței poate suporta sistemul?';
+$ec_lang['lpn_ds_head_search_selected']='Ce factor de scalare a cerinței pot suporta aceste joncțiuni?';
+$ec_lang['lpn_ds_outside_below']='La un factor de scalare a cerinței de {m}, joncțiunile neselectate aflate sub {pressure}: {n} ({ids}). Ele nu limitează acest răspuns.';
+$ec_lang['lpn_ds_holds_max']='✓ Fiecare joncțiune păstrează {pressure} până la un factor de scalare a cerinței de {max}, limita superioară a căutării.';
+$ec_lang['lpn_ds_below_zero']='⚠ Cel puțin o joncțiune este sub {pressure} chiar și cu cerințele scalate la zero.';
+$ec_lang['lpn_ds_found']='✓ Fiecare joncțiune verificată păstrează cel puțin {pressure} până la un factor de scalare a cerinței de {m}.';
+$ec_lang['lpn_ds_found_below']='⚠ Cel puțin o joncțiune este sub {pressure} fără nicio scalare a cerinței. Cel mai mare factor de scalare a cerinței care păstrează fiecare joncțiune la {pressure} sau peste este {m}.';
+$ec_lang['lpn_ds_search_stopped']='Căutarea a fost oprită înainte de a găsi un răspuns.';
+$ec_lang['lpn_ds_lowest_at']='La un factor de scalare a cerinței de {m}, cea mai mică presiune este {pressure}, la joncțiunea {id}.';
+$ec_lang['lpn_ds_nosolve_at']='La un factor de scalare a cerinței de {m}, rețeaua nu a dat niciun răspuns. {reason}';
+$ec_lang['lpn_ds_scale_ok']='✓ La un factor de scalare a cerinței de {m}, fiecare joncțiune păstrează {pressure}.';
+$ec_lang['lpn_ds_scale_below']='⚠ La un factor de scalare a cerinței de {m}, joncțiuni sub {pressure}: {n}.';
+$ec_lang['lpn_ds_scaled_selected']='Joncțiuni scalate și verificate: {n}.';
+$ec_lang['lpn_ds_head_lowest']='Cele mai mici presiuni';
+$ec_lang['lpn_ds_head_velocity']='Cele mai mari viteze';
+$ec_lang['lpn_ds_col_link']='Legătură';
+$ec_lang['lpn_ds_col_scaled']='Scalat';
+$ec_lang['lpn_ds_col_scaled_tip']='Cu cerințele înmulțite cu factorul de scalare a cerinței.';
+$ec_lang['lpn_ds_col_unscaled']='Nescalat';
+$ec_lang['lpn_ds_col_unscaled_tip']='Cu cerințele așa cum sunt în scenariul activ la acest pas de timp, aceeași valoare pe care o arată harta.';
+$ec_lang['lpn_ds_no_junctions']='Acest proiect nu are încă joncțiuni, deci nu există cerințe de scalat.';
+$ec_lang['lpn_ds_no_selection']='Nu este selectată nicio joncțiune. Selectați joncțiuni sau alegeți Toate joncțiunile.';
+$ec_lang['lpn_ds_skipped']='Elemente selectate care nu sunt joncțiuni, lăsate neschimbate: {n}.';
+$ec_lang['lpn_ds_bad_multiplier']='Introduceți un factor de scalare a cerinței de zero sau mai mare, de exemplu 1,5.';
+$ec_lang['lpn_ds_stale']='Desenul s-a schimbat, deci rezultatele scalării cerinței au fost șterse. Rulați din nou.';
+$ec_lang['lpn_analyze_at_time']='Pas de timp: {time}.';
+$ec_lang['lpn_analyze_time_moved']='⚠ Aceasta a fost calculată la {time}, iar ceasul este acum la {now}. Rulați din nou pentru pasul de timp de pe ecran.';
+$ec_lang['lpn_survey_codes_toggle']='Citește descrierea ca pe coduri de teren';
+$ec_lang['lpn_survey_codes_tip']='Citiți primul cuvânt din fiecare descriere ca pe un cod din tabel. Punctele cu același cod de linie se unesc într-o singură conductă în ordinea din fișier, iar WL1 și WL2 sunt linii separate. +0 începe o linie, -0 o încheie, iar CLO o închide. JPN urmat de numele unui punct se unește cu acel punct (Carlson), iar Civil 3D îl scrie CPN.';
+$ec_lang['lpn_survey_codes_col_code']='Cod';
+$ec_lang['lpn_survey_codes_col_type']='Tip de element';
+$ec_lang['lpn_survey_codes_add']='Adaugă cod';
+$ec_lang['lpn_survey_codes_remove']='Elimină codul';
+$ec_lang['lpn_survey_confirm_coded']='Au fost găsite {j} joncțiune(i), {r} rezervor(oare), {t} bazin(e) și {p} conductă(e). Continuați?';
+$ec_lang['lpn_survey_report_coded']='Au fost importate {j} joncțiune(i), {r} rezervor(oare), {t} bazin(e) și {p} conductă(e), {m} dintre noduri cu cotă.';
+$ec_lang['lpn_survey_note_code_unknown']='Cod absent din tabelul de coduri, importat ca tipul de element ales mai sus.';
+$ec_lang['lpn_survey_note_code_two_nodes']='Mai mult de un cod de nod, a fost folosit primul.';
+$ec_lang['lpn_survey_note_code_unread']='Nu fiecare cuvânt este un cod pe care această pagină îl citește, păstrat în descriere.';
+$ec_lang['lpn_survey_note_vertex_text']='Nu fiecare cuvânt este un cod pe care această pagină îl citește, iar un vârf nu păstrează descriere.';
+$ec_lang['lpn_survey_note_join_missing']='JPN sau CPN denumește un punct care nu se află în acest fișier sau proiect, nu s-a desenat nicio conductă pentru el.';
+$ec_lang['lpn_survey_note_join_no_line']='JPN sau CPN la un punct fără cod de linie, nu s-a desenat nicio conductă pentru el.';
+$ec_lang['lpn_survey_note_pipe_one_node']='Această linie revine la același nod fără alt nod între ele, nu s-a desenat nicio conductă pentru ea.';
+$ec_lang['lpn_survey_note_line_one_point']='Singurul punct de pe linia sa, nu s-a desenat nicio conductă din el.';
+$ec_lang['lpn_survey_note_vertices']='Puncte care au devenit vârfuri de conductă: {detail}. Un vârf nu păstrează nume, cotă sau descriere.';
+$ec_lang['lpn_survey_note_no_desc']='Codurile de teren sunt activate, dar acest fișier nu are coloană de descriere, deci nu s-a citit niciun cod.';
+$ec_lang['lpn_survey_note_ring_junction']='Acest punct a devenit joncțiune pentru ca inelul să se poată închide.';
+$ec_lang['lpn_survey_note_pipe_zero_length']='Acest punct se află în același loc cu nodul dinaintea lui, deci conducta dintre ele nu are lungime.';
+$ec_lang['lpn_survey_note_node_on_pipe']='Acest punct se află exact pe o conductă cu care nu este unit. Dacă se conectează, adăugați JPN pentru a o spune.';
+$ec_lang['lpn_settings_demand_model']='Model de cerință';
+$ec_lang['lpn_settings_demand_model_tip']='Alegeți cum primesc debit joncțiunile. Cerința impusă (DDA) livrează integral fiecare cerință, indiferent de presiune. Cerința dependentă de presiune (PDA) livrează mai puțin decât cerința acolo unde presiunea este sub presiunea necesară, și este calculată doar de rezolvitorul EPANET.';
+$ec_lang['lpn_settings_demand_model_dda']='Cerință impusă';
+$ec_lang['lpn_settings_demand_model_pda']='Cerință dependentă de presiune';
+$ec_lang['lpn_settings_min_pressure']='Presiune minimă';
+$ec_lang['lpn_settings_min_pressure_tip']='Introduceți presiunea la care sau sub care o joncțiune nu primește debit. Folosiți unitatea de presiune a acestui proiect.';
+$ec_lang['lpn_settings_req_pressure']='Presiune necesară';
+$ec_lang['lpn_settings_req_pressure_tip']='Introduceți presiunea la care sau peste care o joncțiune primește cerința integrală. Trebuie să fie mai mare decât presiunea minimă. Folosiți unitatea de presiune a acestui proiect. Lăsați gol pentru a folosi valoarea implicită EPANET, care este în psi pentru unitățile de debit din SUA și în metri în caz contrar.';
+$ec_lang['lpn_settings_pressure_exponent']='Exponent de presiune';
+$ec_lang['lpn_settings_pressure_exponent_tip']='Introduceți exponentul curbei care crește de la debit nul la presiunea minimă până la cerința integrală la presiunea necesară.';
+$ec_lang['lpn_engine_pda_route']='Rezolvat cu rezolvitorul EPANET, deoarece modelul de cerință este dependent de presiune.';
+$ec_lang['lpn_diag_pda_needs_epanet']='Modelul de cerință este dependent de presiune și doar rezolvitorul EPANET îl poate calcula. Rezolvitorul EPANET nu a putut fi încărcat, deci aceste rezultate lipsesc.';
+$ec_lang['lpn_result_delivered_demand']='Cerință livrată';
+$ec_lang['lpn_result_delivered_demand_tip']='Debitul pe care această joncțiune îl primește efectiv în modelul de cerință dependentă de presiune. Este mai mic decât cerința atunci când presiunea este sub presiunea necesară.';
+$ec_lang['lpn_result_demand_deficit']='Deficit de cerință';
+$ec_lang['lpn_result_demand_deficit_tip']='Partea din cerința acestei joncțiuni care nu este livrată, deoarece presiunea este sub presiunea necesară.';
+$ec_lang['lpn_pda_deficit_note']='Joncțiuni care primesc mai puțin decât cerința lor: {n}.';
+$ec_lang['lpn_diag_pda_pressures']='Presiunea necesară trebuie să fie mai mare decât Presiunea minimă. Schimbați una dintre ele în Setări.';
+$ec_lang['lpn_inp_drop_pressure_unit']='Acest fișier indică o unitate de presiune diferită de cea pe care această pagină o citește pentru unitatea sa de debit, care este psi pentru unitățile din SUA și metri în caz contrar. Fiecare presiune din fișier este citită astfel, deci verificați setările vanelor, emițătorii și limitele de cerință dependentă de presiune pe care le conține. Linia este păstrată și este scrisă înapoi.';
+$ec_lang['lpn_screenshot_menu']='Captură de ecran';
+$ec_lang['lpn_screenshot_tip']='Copiați o imagine mai clară decât ecranul a zonei hărții pe care o trageți, gata de lipit într-un raport. Faceți clic fără a trage pentru a captura toată harta.';
+$ec_lang['lpn_screenshot_hint']='Trageți un dreptunghi peste hartă sau faceți clic pentru toată harta. Esc anulează.';
+$ec_lang['lpn_screenshot_copied']='Captura de ecran a fost copiată.';
+$ec_lang['lpn_screenshot_saved']='Clipboardul nu este disponibil aici, deci captura de ecran a fost descărcată ca fișier PNG.';
+$ec_lang['lpn_screenshot_no_basemap']='Harta stradală sau imaginea din satelit nu au putut fi incluse.';
+$ec_lang['lpn_screenshot_failed']='Captura de ecran nu a putut fi realizată.';
+$ec_lang['lpn_snip_hint_free']='Trageți în jurul zonei de decupat sau faceți clic pentru toată harta. Esc anulează.';
+$ec_lang['lpn_snip_tip_rect']='Decupați un dreptunghi (S)';
+$ec_lang['lpn_snip_tip_free']='Decupați o formă liberă (S)';
+$ec_lang['lpn_snip_tip_mode']='Forma decupării';
+$ec_lang['lpn_snip_tip_map']='Captură de ecran a întregii hărți';
+$ec_lang['lpn_snip_tip_pen']='Creion';
+$ec_lang['lpn_snip_tip_eraser']='Radieră: faceți clic pe un trasaj pentru a-l elimina (E)';
+$ec_lang['lpn_snip_tip_undo']='Anulare (Ctrl+Z)';
+$ec_lang['lpn_snip_tip_redo']='Refacere (Ctrl+Y)';
+$ec_lang['lpn_screenshot_scale_tip']='Dimensiunea imaginii ca multiplu al zonei de pe ecran. O valoare mai mare dă o imagine mai clară și un fișier mai mare.';

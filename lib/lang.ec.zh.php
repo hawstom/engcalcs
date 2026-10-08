@@ -442,14 +442,14 @@ $ec_lang['install_desktop_heading']='桌面版（Chrome / Edge）';
 // Edited by TGH 2026-09-07
 $ec_lang['install_desktop_steps_html']='<li>打开任意计算器页面。</li><li>点击浏览器地址栏中的<strong>安装图标</strong>（⊕ 或电脑图标），或打开浏览器菜单并选择<strong>安装 EngCalcs…</strong></li><li>点击<strong>安装</strong>。EngCalcs 将作为独立应用窗口打开。</li>';
 $ec_lang['install_firefox_heading']='Firefox / 其他浏览器';
-$ec_lang['install_firefox_body']='Firefox 桌面版不支持安装 PWA。您仍可在浏览器中正常使用所有计算器——首次访问后，页面会自动缓存以供离线使用。';
+$ec_lang['install_firefox_body']='如果浏览器未提供安装选项，请照常在浏览器中使用这些计算器。首次访问后，页面会自动缓存以供离线使用。桌面版 Firefox 就属于这种常见情况。';
 $ec_lang['install_cached_heading']='缓存的内容';
 $ec_lang['install_cached_body']='首次安装 EngCalcs 时，所有计算器页面及其相关文件（脚本、样式）会自动保存到您的设备上。此后，一切功能均可在无网络连接的情况下使用。您的语言选择会根据上次在线访问时的设置自动记住。';
 $ec_lang['contact_main_menu']='联系';
 $ec_lang['about_main_title']='关于 HawsEDC 工程计算器';
 $ec_lang['about_main_desc']='使命、自由软件与贡献';
 // Edited by TGH 2026-09-07
-$ec_lang['about_body_html']='<h3>使命</h3><p>HawsEDC 工程计算器旨在为全球工程师和现场工作者服务——尤其是在缺水、资源匮乏或服务不足地区工作的人。这些工具是更广泛人道主义使命的一部分：以最实际、最有效的方式告诉每一个人，<a target="_blank" href="https://tomsthird.blogspot.com/2026/10/why-engineering-calculator-needs-to.html">他们永远是被爱和珍视的，他们不必害怕，也不会毁掉一切</a>。</p><p>计算器是载体，目标是一个没有苦难的世界。</p><h3>自由开源许可证</h3><p>所有代码均在 <a target="_blank" href="https://www.gnu.org/licenses/gpl-3.0.html">GNU 通用公共许可证 v3.0 或更高版本</a>下发布——自由，如同"言论自由"中的自由，而非"免费啤酒"中的免费。您可以在相同条款下使用、研究、修改和再分发代码。</p><p>提供它的网站自 2010 年起一直免费开放；即使有一天无法继续，这套软件仍归您自己运行。</p><p>版权所有 © 2009–2026 Thomas Gail Haws。</p><h3>源代码</h3><p>完整源代码在 GitHub 上公开提供：</p><p><a target="_blank" href="https://github.com/hawstom/engcalcs">github.com/hawstom/engcalcs</a></p><p>您可以在那里浏览代码、提交问题或 fork 仓库。</p><h3>参与贡献</h3><p>欢迎任何形式的帮助。<a href="contact.php">联系 Tom Haws</a>。</p><ul><li><strong>翻译：</strong>提出更好的措辞建议，改进或新增语言。</li><li><strong>错误报告：</strong>使用任意计算器页面上的反馈表单，或在 GitHub 上提交问题。</li><li><strong>新计算器：</strong>特别欢迎为现场工作者和灌溉从业者服务的水力工程工具创意。</li><li><strong>托管镜像：</strong>如果您能为连接受限地区镜像这些计算器，请联系我。</li></ul><h3>离线使用</h3><p>联网时打开任意一个计算器一次，之后断网时所有计算器仍可继续使用：您的浏览器会随着使用把整套工具存储下来。其机制是<strong>渐进式网络应用（PWA）</strong>，如果您想了解的话。此后，所有计算器均可离线使用——无需网络连接。</p><p>在 Android 或 iOS 上，使用浏览器的"添加到主屏幕"功能，将 EngCalcs 作为应用安装到您的设备上。在桌面端，请在浏览器地址栏中找到安装图标。</p><p>您也可以使用浏览器的"另存为…"菜单保存任意单个计算器，以便临时离线使用。</p><h3>联系方式</h3><p>Tom Haws——水力工程师，这些计算器的创始人。<br />请使用任意计算器页面上的反馈表单，或访问 <a target="_blank" href="https://github.com/hawstom/engcalcs">GitHub</a> 上的源代码。</p>';
+$ec_lang['about_body_html']='<h3>使命</h3><p>HawsEDC 工程计算器旨在为全球工程师和现场工作者服务——尤其是在缺水、资源匮乏或服务不足地区工作的人。这些工具是更广泛人道主义使命的一部分：以最实际、最有效的方式告诉每一个人，<a target="_blank" href="https://tomsthird.blogspot.com/2026/10/why-engineering-calculator-needs-to.html">他们永远是被爱和珍视的，他们不必害怕，也不会毁掉一切</a>。</p><p>计算器是载体，目标是一个没有苦难的世界。</p><h3>自由开源许可证</h3><p>所有代码均在 <a target="_blank" href="https://www.gnu.org/licenses/gpl-3.0.html">GNU 通用公共许可证 v3.0 或更高版本</a>下发布——自由，是 freedom 意义上的自由。您可以在相同条款下使用、研究、修改和再分发代码。</p><p>提供它的网站自 2010 年起一直免费开放；即使有一天无法继续，这套软件仍归您自己运行。</p><p>版权所有 © 2009–2026 Thomas Gail Haws。</p><h3>源代码</h3><p>完整源代码在 GitHub 上公开提供：</p><p><a target="_blank" href="https://github.com/hawstom/engcalcs">github.com/hawstom/engcalcs</a></p><p>您可以在那里浏览代码、提交问题或 fork 仓库。</p><h3>参与贡献</h3><p>欢迎任何形式的帮助。<a href="contact.php">联系 Tom Haws</a>。</p><ul><li><strong>翻译：</strong>提出更好的措辞建议，改进或新增语言。</li><li><strong>错误报告：</strong>使用任意计算器页面上的反馈表单，或在 GitHub 上提交问题。</li><li><strong>新计算器：</strong>特别欢迎为现场工作者和灌溉从业者服务的水力工程工具创意。</li><li><strong>托管镜像：</strong>如果您能为连接受限地区镜像这些计算器，请联系我。</li></ul><h3>离线使用</h3><p>联网时打开任意一个计算器一次，之后断网时所有计算器仍可继续使用：您的浏览器会随着使用把整套工具存储下来。其机制是<strong>渐进式网络应用（PWA）</strong>。此后，所有计算器均可离线使用——无需网络连接。</p><p>在 Android 或 iOS 上，使用浏览器的"添加到主屏幕"功能，将 EngCalcs 作为应用安装到您的设备上。在桌面端，请在浏览器地址栏中找到安装图标。</p><p>您也可以使用浏览器的"另存为…"菜单保存任意单个计算器，以便临时离线使用。</p><h3>联系方式</h3><p>Tom Haws——水力工程师，这些计算器的创始人。<br />请使用任意计算器页面上的反馈表单，或访问 <a target="_blank" href="https://github.com/hawstom/engcalcs">GitHub</a> 上的源代码。</p>';
 $ec_lang['contactSendMessage']='给 Tom Haws 发送消息';
 $ec_lang['contactYourName']='您的姓名：';
 $ec_lang['contactYourEmail']='您的电子邮件地址：';
@@ -621,7 +621,7 @@ $ec_lang['bpn_notes_1_term']='默认串联，特殊情况才分支';
 // Edited by TGH 2026-09-07
 $ec_lang['bpn_notes_1_def']='上游编号留空时，管线默认衔接其正上方的管线，即简单的串联管道。填写上游管线编号即可从该管线分支。因此：默认串联，需要时才形成树状分支。';
 $ec_lang['bpn_notes_2_term']='仅支持分支管网，不支持环路';
-$ec_lang['bpn_notes_2_def']='每条管线都只有一条上游管线（呈树状结构）。本工具不求解带环路的管网；环路管网需要迭代方法（如 EPANET 等）求解。不含环路正是本工具保持简单且精确的原因。';
+$ec_lang['bpn_notes_2_def']='每条管线都只有一条上游管线（呈树状结构）。本工具不求解带环路的管网；环路管网需要迭代方法（如 EPANET 等）求解。由于管网没有环路，因此解是直接且精确的。';
 $ec_lang['bpn_notes_3_term']='不含主动压力控制装置';
 $ec_lang['bpn_notes_3_def']='可以添加固定局部损失阀门（k 值），但不能添加减压阀或维压阀（PRV/PSV）。这类阀门的开闭状态取决于流量和压力，会导致需要迭代求解。';
 
@@ -665,7 +665,7 @@ $ec_lang['lpn_tool_vertices']='折点';
 // has been struck here three times. "Station along the pipe" is the survey word for a distance
 // measured along a route, which is what it is.
 $ec_lang['lpn_tool_add_meter']='用户';
-$ec_lang['lpn_tool_add_meter_tip']='点击用户所在的位置，然后点击为其供水的管道或节点。您为该用户设定的需水量会加到该管道靠近该处一端的节点上。';
+$ec_lang['lpn_tool_add_meter_tip']='指定用户所在的点，再指定其连接：一条连接线或一个节点。您为该用户设定的需水量会加到该连接线最近一端的节点上。';
 $ec_lang['lpn_mode_add_meter']='模式：用户。点击用户所在的位置，然后点击为其供水的管道或节点。或按 Esc 取消。';
 $ec_lang['lpn_pane_tab_customers']='用户';
 $ec_lang['lpn_customer_heading']='用户 {id}';
@@ -679,7 +679,7 @@ $ec_lang['lpn_customer_heading']='用户 {id}';
 $ec_lang['lpn_field_meter_demand']='每户需水量';
 $ec_lang['lpn_field_meter_count']='户数';
 $ec_lang['lpn_field_meter_total']='合计需水量';
-$ec_lang['lpn_field_meter_total_tip']='每户需水量乘以户数。这就是加到下方所列节点上的数值。';
+$ec_lang['lpn_field_meter_total_tip']='加到下方所列节点上的总量。';
 $ec_lang['lpn_field_meter_pipe']='连接元件';
 $ec_lang['lpn_field_meter_pipe_suggest']='最近的元件是 {id}。在此输入即可让该用户由它供水。';
 // Task 247, Tom, 2026-09-25: a service connected exactly to a node reads as a node, never as a
@@ -707,13 +707,13 @@ $ec_lang['lpn_customer_detached']='⚠ 该用户未连接到任何管道，因�
 $ec_lang['lpn_customer_fixed_head']='⚠ 该管道靠近的一端是固定水位，因此该需水量不影响模拟结果。';
 $ec_lang['lpn_customer_detached_count']='有 {n} 个用户未连接到管道，其需水量未被计入。';
 $ec_lang['lpn_meter_pick_pipe']='现在点击为该用户供水的管道或节点。该用户会保持在您放置的位置。按 Escape 取消。';
-$ec_lang['lpn_inp_export_flat_customers']='EPANET 文件不含用户。本项目中 {n} 个用户的需水量会作为一行需水量数据写入其各自所加节点，每行都以该用户的标记命名。文件无法保存的是用户本身：它所在的位置、由哪条管道供水、沿该管道接入的位置，以及一个用户代表多少户。这些信息都保留在您自己的项目文件中。';
+$ec_lang['lpn_inp_export_flat_customers']='EPANET 文件不含用户。本项目中 {n} 个用户的需水量会作为一行需水量数据，写入各用户所分配到的节点，并以该用户的标记命名。文件不记录用户本身：它的位置、为其供水的管道、供水接入沿该管道的位置，或它代表多少个接户。这些信息保留在项目中；请保存项目文件以保留它们。';
 
 $ec_lang['lpn_area_hint_window_start']='点击窗口选框的一个角。';
 $ec_lang['lpn_area_hint_window_go']='点击对角以完成选择。';
 $ec_lang['lpn_area_hint_lasso_start']='点击以开始绘制轮廓线。';
 $ec_lang['lpn_area_hint_lasso_go']='移动鼠标以绘制轮廓线，点击以完成。';
-$ec_lang['lpn_area_hint_polygon_start']='点击以绘制多边形区域，双击以完成。';
+$ec_lang['lpn_area_hint_polygon_start']='指定多边形区域的第一个顶点。双击以完成。';
 $ec_lang['lpn_area_hint_polygon_go']='依次点击各个顶点，双击最后一个顶点以完成。';
 // Tom, 2026-09-08, his own sentence: *"Hold Shift during selection to preserve the existing
 // selection set and toggle (add/remove) affected assets."* Reworded so "toggle" needs no gloss.
@@ -737,7 +737,7 @@ $ec_lang['lpn_pane_pasted']='已粘贴 {n} 个单元格，{skipped} 个未作更
 $ec_lang['lpn_pane_pasted_rows']='已粘贴 {n} 行，其中 {created} 行已添加到管网中。';
 $ec_lang['lpn_pane_pasted_rows_skipped']='已粘贴 {n} 行，其中 {created} 行已添加到管网中。{skipped} 个单元格未被更改。';
 // Added after "This network has none of these yet." on an empty table, which is where a paste lands.
-$ec_lang['lpn_pane_paste_here']='点击此处，粘贴电子表格中的行以添加它们。';
+$ec_lang['lpn_pane_paste_here']='选择此区域并粘贴电子表格中的行，即可添加它们。';
 // The menu action that adds the clipboard's rows as new elements below the last row (an ordinary
 // paste only ever writes cells). Its shortcut, Ctrl+Shift+V, is shown beside it in the menu. Tom's
 // wording, R-309: "Paste as new rows" was "not quite descriptive of 'Paste append'."
@@ -908,7 +908,7 @@ $ec_lang['lpn_offscreen_intact']='您的管网完好无损。';
 // true and stays.
 $ec_lang['lpn_examples_welcome']='欢迎使用基于 EPANET 求解器的供水管网建模工具';
 $ec_lang['lpn_examples_heading']='打开示例的副本';
-$ec_lang['lpn_examples_sub']='每个示例都会作为您自己的副本打开。您可以修改并保存它，也可以打开一份全新的副本重新开始。';
+$ec_lang['lpn_examples_sub']='每个示例都作为副本打开。可修改并保存，或打开新副本重新开始。';
 $ec_lang['lpn_examples_open']='打开';
 $ec_lang['lpn_examples_menu']='打开示例…';
 $ec_lang['lpn_examples_blank']='或从此处开始';
@@ -939,9 +939,9 @@ $ec_lang['lpn_hotkeys_map_def']='<table class="lpn-notes-table"><tbody><tr><td>1
 // is the honesty boundary that document draws: a thank-you must never imply an answer.
 $ec_lang['lpn_wrong_btn']='这里有问题吗？';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_wrong_tip']='点击一次即可告诉我们本页面存在问题。它会发送本页面名称、您正在阅读的语言，以及地图上的提示信息（如果有）。它不会发送您输入的任何内容、任何地址，也不会发送您绘图中的任何内容。没有人能够回复您，因为这不会告诉我们您是谁。如果您想说明更多情况，请使用“帮助”、“提出更正”。';
-$ec_lang['lpn_wrong_thanks']='谢谢，我们已收到。';
-$ec_lang['lpn_status_example_opened']='已打开 {name}。这是您自己的副本：请使用"文件"菜单中的"另存为"保存它。';
+$ec_lang['lpn_wrong_tip']='报告本页面的错误。这会打开一个对话框，可在其中选择问题、添加意见，并在需要回复时输入电子邮件地址。所有字段均为可选，按“发送”之前不会发送任何内容。';
+$ec_lang['lpn_wrong_thanks']='谢谢。已收到您的报告。';
+$ec_lang['lpn_status_example_opened']='已将 {name} 作为副本打开。请使用“文件”、“另存为”保存。';
 // Stands while the fault stands, rather than expiring like every other notice on the map: it
 // reports a page that cannot lay itself out, which is true until a measurement recovers.
 $ec_lang['lpn_map_unmeasurable']='本页面无法确定绘图区域的尺寸，因此地图显示的是上一次能够计算出的视图。调整窗口大小会让它重新尝试。如果这种情况持续出现，通常是因为某个浏览器扩展程序阻止了页面尺寸的测量。';
@@ -968,7 +968,7 @@ $ec_lang['lpn_ex_net2_title']='EPANET Net2';
 $ec_lang['lpn_ex_net2_desc']='来自 EPANET 示例、带有一个水箱的分支配水系统。';
 $ec_lang['lpn_ex_net3_title']='EPANET Net3';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_ex_net3_desc']='EPANET 的大型示例：92 个节点、3 个水箱和 2 个水库（其中一个为河流水源）。值得打开看看真实规模的模型在地图上是什么样子。';
+$ec_lang['lpn_ex_net3_desc']='EPANET 的大型示例：92 个节点、3 个水箱和 2 个水库（其中一个为河流水源）。它展示了全尺寸模型在地图上的样子。';
 $ec_lang['lpn_ex_net3_world_title']='EPANET Net3，经纬度';
 $ec_lang['lpn_ex_net3_world_desc']='与 EPANET Net3 相同的管网，被放置在地球上一个任意位置：其坐标为经度和纬度，并在其后绘有街道地图。';
 $ec_lang['lpn_ex_elm_street_title']='Elm Street Center';
@@ -1018,9 +1018,9 @@ $ec_lang['lpn_units_elevhead']='高程与水头';
 $ec_lang['lpn_result_gradient']='水力坡降';
 $ec_lang['lpn_result_gradient_tip']='水头损失除以管道长度。用于比较不同长度管道相对于同一设计限值的表现。';
 $ec_lang['lpn_result_water_age']='水龄';
-$ec_lang['lpn_result_water_age_tip']='到达该点的水在系统中已停留的时长。在水流交汇处，到达的水混合了不同水龄的水，此处的数值是按流量加权得到的平均值：即使还有一条长的死端管道也在为该节点供水，只要主要由一条较短的新主管供水，该节点显示的水龄仍然较低。对于水箱，该数值是箱内所存水的平均水龄，这也是为什么周转缓慢的水箱通常是管网中水龄最老的水。此项没有可比照的法定限值，请根据自己管网的实际情况判断该数值。';
+$ec_lang['lpn_result_water_age_tip']='到达该点的水在系统中已停留的时间。在水流交汇处，该数值是到达水流水龄的平均值，按流量加权。在水箱中，它是所存水的平均水龄，因此周转缓慢的水箱通常存有管网中最老的水。没有可与之比较的法定限值，因此请对照所建模系统的实际情况进行评估。';
 $ec_lang['lpn_result_source_share']='来源占比';
-$ec_lang['lpn_result_source_share_tip']='到达该点的水中，有多少来自追踪节点。这正是“来源追踪”分析所给出的结果。';
+$ec_lang['lpn_result_source_share_tip']='到达该点的水中来自追踪节点的份额。这正是“来源追踪”分析所报告的结果。';
 // **THE LINK HALF OF THE THREE QUALITY ANSWERS** (ROADMAP Task 638). EPANET reports a node's own
 // value and a LINK's AVERAGE over the water standing in it, so the two are different quantities and
 // take different words. Three whole names rather than one name built from a word and a heading: a
@@ -1045,7 +1045,7 @@ $ec_lang['lpn_result_status_open']='开启';
 $ec_lang['lpn_result_status_closed']='关闭';
 $ec_lang['lpn_result_head']='水头';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_result_head_tip']='该节点处水的能量，以水柱高度表示。它是一个绝对高度，而压力是相对测量值（表压）。';
+$ec_lang['lpn_result_head_tip']='该节点处水的势能，以水柱高度表示。它是绝对高度，而压力是表压测量值。';
 $ec_lang['lpn_result_pressure']='压力';
 $ec_lang['lpn_result_flow']='流量';
 $ec_lang['lpn_result_velocity']='流速';
@@ -1125,15 +1125,15 @@ $ec_lang['lpn_copy_of']='{name} 的副本';
 // The three coordinate cases are Tom's own (R-155, 2026-09-22): "EPSG, unnamed (local) georeference,
 // and not georeferenced". lat/lon is one EPSG system (EPSG:3857 on this page), not a fourth case.
 $ec_lang['lpn_convas_title']='转换为';
-$ec_lang['lpn_convas_coordsys_tip']='副本要转换到的坐标系。若与本项目不同，随后会出现两个定位步骤。若项目已经知道自己的位置，这两个步骤会预先给出答案，您可以直接接受，也可以更改。';
+$ec_lang['lpn_convas_coordsys_tip']='副本要转换到的坐标系。若与本项目的坐标系不同，随后会出现两个定位步骤。对于已完成地理配准的项目，这两个步骤打开时已填好，可直接接受或更改。';
 // {crs} is the name the map status strip shows for this project's coordinate system.
 $ec_lang['lpn_convas_from']='当前：{crs}';
 $ec_lang['lpn_convas_epsg']='EPSG 坐标系';
-$ec_lang['lpn_convas_epsg_tip']='从 EPSG 注册库中选择一个坐标系。纬度和经度对应 WGS 84（EPSG:4326）。';
+$ec_lang['lpn_convas_epsg_tip']='从 EPSG 注册库中选择一个坐标系。建议选择 WGS 84（EPSG:4326），即纬度和经度。WGS 84 / Pseudo-Mercator（EPSG:3857）通常称为 Web Mercator，其 x 和 y 以米为单位，在远离赤道处其地图距离大于地面距离。在这两种坐标系中，管道长度均按地面距离计算。';
 $ec_lang['lpn_convas_unnamed']='未命名（本地）配准';
 $ec_lang['lpn_convas_unnamed_tip']='以长度单位表示的本地坐标，并附有世界地图。';
 $ec_lang['lpn_convas_none_tip']='以长度单位表示的本地坐标，暂不附有世界地图。';
-$ec_lang['lpn_convas_units_tip']='副本要转换到的单位。原项目保留其自身的数值和单位。';
+$ec_lang['lpn_convas_units_tip']='副本要转换到的单位。';
 $ec_lang['lpn_convas_round']='对转换后的数值取整';
 $ec_lang['lpn_convas_round_tip']='仅对此次转换所改写的数值取整，舍入到您选择的步长。单位未改变的数值保持不变。';
 $ec_lang['lpn_convas_round_none']='不取整';
@@ -1155,7 +1155,7 @@ $ec_lang['lpn_file_convert_as_tip']='将本项目复制到一个新标签页，�
 // from his 2026-09-16 edits, with the step 1 button added because the wizard opens at step 1.
 $ec_lang['lpn_georef_answered']='本项目已经过配准，因此管网已经在地图上，未移动任何内容。请检查其位置是否正确，然后依次按“将模型放在此处”按钮和“保留此位置”按钮。';
 $ec_lang['lpn_georef_intro']='放置模型分两个步骤。第 1 步是粗略的：模型保持不动，您移动其下方的地图，直到现场大致位于模型下方、大小大致相符为止，这一步暂不涉及旋转。第 2 步是精确的：您直接拖动、缩放和旋转模型本身。项目一开始位于整个世界地图上，因此请先找到您的位置，然后点击“将模型放在此处”。';
-$ec_lang['lpn_georef_adjust']='模型现在已经固定在地面上，会跟随地图一起移动。拖动模型可移动它，拖动一角可调整其大小，拖动模型上方的圆形手柄可旋转它。也可以在下方直接输入地面距离和旋转角度。';
+$ec_lang['lpn_georef_adjust']='模型现在已附加到地图上，因此会随地图一起移动。拖动模型可移动它，拖动一角可调整其大小，拖动模型上方的圆形手柄可旋转它。也可以在下方输入地面距离和旋转角度。';
 $ec_lang['lpn_georef_step1']='第 1 步（共 2 步）——快速';
 $ec_lang['lpn_georef_step2']='第 2 步（共 2 步）——精确';
 $ec_lang['lpn_georef_step1_hint']='您的项目会保持在屏幕上原来的位置不动。请平移和缩放其下方的地图，直到背景大致位于正确的位置、大小大致正确，然后点击“将模型放在此处”。';
@@ -1172,22 +1172,22 @@ $ec_lang['lpn_tool_key_hint']='快捷键：按 {key}。';
 $ec_lang['lpn_tool_key_hint_two']='快捷键：按 {key} 或 {key2}。';
 // Edited by TGH 2026-09-07; the Shift sentence rewritten 2026-09-08 on his ruling that Shift keeps
 // the selection and toggles what the shape catches (it used to say "add").
-$ec_lang['lpn_tool_area_tip']='按照提示在地图上点击，以选中形状内的所有内容。再次点击此按钮可在窗口、套索和多边形之间切换选择形状。选择时按住 Shift 键可在现有选择基础上继续操作，将所选内容加入或移出（切换）选择集。';
+$ec_lang['lpn_tool_area_tip']='按照屏幕提示操作。再次点击可在窗口、套索和多边形之间切换。按住 Shift 键可保留当前选择，并将所选内容加入或移出（切换）选择。';
 $ec_lang['lpn_area_selected']='已选择 {n} 个。';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_area_none']='该区域内未找到任何内容。';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_tool_vertices_tip']='添加或删除塑造管道形状的折点。点击管道可添加折点，点击折点可删除它，拖动折点可移动它。折点只改变绘制的路径，不改变水力计算结果。';
-$ec_lang['lpn_tool_undo_tip']='撤销上一次更改。';
+$ec_lang['lpn_tool_vertices_tip']='添加和删除管道折点。在管道上指定一点可添加折点，选择折点可删除它，拖动折点可移动它。折点会改变自动计算的长度，但不会增加或改变局部（次要）损失。';
+$ec_lang['lpn_tool_undo_tip']='撤销历史长度 = 20 步操作';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_tool_zoom_extent_tip']='将整个管网缩放至窗口大小。';
-$ec_lang['lpn_tool_zoom_window_tip']='在地图上点击一个方框的两个对角，或拖出一个方框，即可放大到该区域。再次按此按钮可执行“缩放至全图”。';
+$ec_lang['lpn_tool_zoom_extent_tip']='将整个管网缩放至适合地图窗口。再按一次可使用“窗口缩放”。另见地图右上角的缩放控件。';
+$ec_lang['lpn_tool_zoom_window_tip']='指定两个对角，或拖出一个矩形。再按一次可“缩放至全图”。';
 // Tom's wording, 2026-09-25.
 $ec_lang['lpn_zoom_in_tip']='放大。快捷键：+';
 // Tom's wording, 2026-09-25.
 $ec_lang['lpn_zoom_out_tip']='缩小。快捷键：-';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_find_menu_tip']='按 ID 查找元件，或查找所有满足条件的元件，并一次性全部更改。';
+$ec_lang['lpn_find_menu_tip']='简单或复杂的查找与替换';
 // **"Toolbar key", NOT "Toolbar"** (Tom's own name, 2026-09-10; Ida ranked the rename first).
 // The row is not a second toolbar and not a repeat of one -- it is the LEGEND for an icon-only
 // strip, derived from toolbarIconIndex, and on a touch screen it is the only way to read the
@@ -1197,7 +1197,7 @@ $ec_lang['lpn_find_menu_tip']='按 ID 查找元件，或查找所有满足条件
 $ec_lang['lpn_help_icons']='工具栏';
 // ---- The right panel: Visibility ----
 $ec_lang['lpn_pane_right_toggle']='可见性';
-$ec_lang['lpn_color_legend_open_tip']='点击可打开"可见性"面板并更改这些颜色。';
+$ec_lang['lpn_color_legend_open_tip']='选择以打开着色设置并更改这些颜色。';
 $ec_lang['lpn_color_node_field']='节点着色依据';
 $ec_lang['lpn_color_link_field']='管道着色依据';
 $ec_lang['lpn_color_ramp_sequential']='顺序渐变';
@@ -1230,13 +1230,13 @@ $ec_lang['lpn_georef_scale']='每绘图单位对应的地面距离';
 // R-219 (Tom, 2026-09-24, answering R-190): the sentence that replaces the retired "These are
 // already lat/lon" button -- typing 1 here reaches the same result the button used to, for a file
 // whose own numbers should be used unchanged.
-$ec_lang['lpn_georef_scale_tip']='您绘图上的一个单位在地面上对应多远的距离。在普通网格上绘制的图纸通常不带有这个信息，因此请在此处设置——也可以让"前往…"询问场地宽度，由系统计算出来。';
+$ec_lang['lpn_georef_scale_tip']='自动计算。编辑可更改。输入 1 则将文件坐标原样用作地面距离，例如用于没有坐标系的文件。';
 $ec_lang['lpn_georef_rotation']='逆时针旋转角度（度）';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_georef_rotation_tip']='整个模型需要逆时针旋转多少度，才能使其北向正对正北。';
+$ec_lang['lpn_georef_rotation_tip']='整个模型的逆时针旋转角度，用于使其与新坐标系对齐。';
 // Tom's own wording for these two, from his 2026-09-16 edits (dev/tom-coordinate-vocabulary-2026-09-16.md):
 // the wizard now ends on whichever coordinate system File, Convert as chose, not always lat/lon.
-$ec_lang['lpn_georef_confirm']='要永久将模型放置在此处吗？之后您仍可以拖动单个元件，但该图纸将不再是 xy 项目。如需恢复为 xy，请在不保存的情况下关闭本项目。';
+$ec_lang['lpn_georef_confirm']='要永久将模型放置在此处吗？之后仍可逐个拖动元件，但现在继续将一次性转换所有坐标。如需恢复旧坐标，请返回原项目，并在不保存的情况下关闭本项目。';
 $ec_lang['lpn_georef_done']='此项目现在是经纬度项目。拖动任意元件，可将其移动到更接近实际位置的地方。';
 $ec_lang['lpn_georef_backdrop_unrotated']='背景图片已随模型一起移动和缩放，但无法随之旋转。请使用“地图”、“背景图片”、“移动”来对齐它。';
 $ec_lang['lpn_georef_empty']='该文件中没有管网，因此没有可放置的内容。';
@@ -1261,7 +1261,7 @@ $ec_lang['lpn_goto_bad']='这不是一组有效的纬度和经度。请尝试 38
 $ec_lang['lpn_georef_goto']='前往…';
 $ec_lang['lpn_georef_twopt']='使用两个已知点';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_georef_twopt_tip']='当您已知道图纸上两个点的真实位置时，可借此精确放置模型。点击其中一点，输入其纬度和经度，然后对第二个点做同样操作。位置、比例和旋转角度都将由这两个点推算得出。再次点击此按钮可停止选取。';
+$ec_lang['lpn_georef_twopt_tip']='当已知图纸上两个点的真实纬度和经度时，可借此精确放置模型。指定其中一点，输入其纬度和经度，然后对第二个点做同样操作。位置、比例和旋转角度由这两个点算出。再次点击此按钮或按 Esc 可取消。';
 $ec_lang['lpn_georef_twopt_pick1']='点击图纸上一个您知道纬度和经度的点。';
 $ec_lang['lpn_georef_twopt_pick2']='现在点击第二个已知点，与第一个点尽量远。';
 $ec_lang['lpn_georef_twopt_same']='这就是您先前点击的那个点。请选择另一个点。';
@@ -1272,7 +1272,7 @@ $ec_lang['lpn_georef_twopt_done']='模型现在已定位在您给出的这两个
 // profile first, tables later. The toggle is on the toolbar because it is the strip a reader
 // scans for "what else can this page show me".
 $ec_lang['lpn_pane_toggle']='底部面板';
-$ec_lang['lpn_pane_toggle_tip']='显示或隐藏地图下方的面板。其中包含剖面图和各类元件的表格。';
+$ec_lang['lpn_pane_toggle_tip']='显示或隐藏地图下方的面板。其中包含图形以及各类元件的表格。';
 $ec_lang['lpn_pane_resize']='拖动可调整面板高度';
 $ec_lang['lpn_pane_tab_junctions']='节点';
 $ec_lang['lpn_pane_tab_reservoirs']='水库';
@@ -1343,20 +1343,20 @@ $ec_lang['lpn_menu_project']='水务';
 // the TOOLBAR, above the map. Do not qualify this sentence again. The rule it states is in
 // dev/looped-network-calculator-scope.md: every command lives in the menu bar, the transport is the
 // one exception, and it is exempt because it is a position in a run rather than a command.
-$ec_lang['lpn_menu_project_tip']='有关水网建模的所有内容都集中在这里，动画播放控制除外。您无需猜测各项功能的位置。';
+$ec_lang['lpn_menu_project_tip']='所有专属于供水管网建模的内容（动画播放控制除外）';
 $ec_lang['lpn_tables_menu']='表格';
-$ec_lang['lpn_tables_menu_tip']='在地图下方打开面板，显示此管网中各部件的表格。每种部件对应一个表格，您可以在其中排序和编辑。';
+$ec_lang['lpn_tables_menu_tip']='在底部面板的表格中查看和编辑元件。';
 // The Run row's own tip, NOT lpn_time_run_tip: this row exists partly to answer "where is my Run
 // button?" for somebody whose project recalculates by itself, and that sentence is not true of the
 // toolbar button, which is the one that goes away.
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_run_menu_tip']='立即重新计算此管网。找不到“计算”按钮？开启“自动重新计算”设置时，该按钮会被隐藏。请在“设置”的“计算”下“水力计算”中关闭“自动重新计算”，使按钮重新出现。';
+$ec_lang['lpn_run_menu_tip']='运行模拟。当“设置”、“计算”、“水力计算”中开启“自动重新计算”时无需使用。关闭“重新计算”后，工具栏中会出现“计算”按钮。';
 // ---- automatic recalculation (Task 467) ----
 // "Simulation" rather than "network" or "results": it is the word EPANET uses for working a network
 // out over time, and this switch is about the run, not about the drawing.
 $ec_lang['lpn_settings_auto_run']='自动重新计算';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_settings_auto_run_tip']='开启此项后，本项目会在您每次更改后不久自动重新计算，工具栏上的"计算"按钮也会随之移除，因为它已无事可做。在大型管网中，如果每次更改都要等待重新计算会妨碍输入，可关闭此项，"计算"按钮便会恢复，由您自行选择运行时机。';
+$ec_lang['lpn_settings_auto_run_tip']='如果重新计算太慢，请关闭此项。此项会隐藏“计算”按钮。';
 // **AN EDIT SAYS NOTHING AT ALL WHEN THE SWITCH IS OFF** (Tom, 2026-09-19: *"Recalc off Old
 // values: Leave in place stale. Don't clear. Trust the user."*). `lpn_manual_results_cleared`
 // stood here for part of one day and is DELETED, English-only, never translated: it announced a
@@ -1368,7 +1368,7 @@ $ec_lang['lpn_settings_auto_run_tip']='开启此项后，本项目会在您每�
 // who has just waited a second already knows something is slow and wants it confirmed, not
 // explained. {secs} is one decimal.
 $ec_lang['lpn_time_run_slow']='此管网计算耗时 {secs} 秒，且设置为每次更改后自动重新计算。要停止这一行为并恢复"计算"按钮，请在"设置"的"计算"下"水力计算"中关闭"自动重新计算"。';
-$ec_lang['lpn_time_no_report']='目前还没有运行报告。该报告是 EPANET 自身生成的文本，只有在本管网使用 EPANET 求解器计算之后才会出现。';
+$ec_lang['lpn_time_no_report']='尚无运行报告。该报告是 EPANET 文本报告，因此在本管网计算之后才会出现。';
 // "Settings" rather than Tools -> Options (Windows) or Preferences (Mac): nobody has ever settled
 // this one, and of the three, Settings is the word a person is most likely to look for first.
 // Moved out of the suite-wide More menu, 2026-08-13 (Tom: "the walkthrough is a little
@@ -1419,7 +1419,7 @@ $ec_lang['lpn_find_btn']='查找';
 // is selected." One button, no selector; which table(s) it fills follows the scope in
 // buildFilterRow()/applyTableFilter(), never a control of its own.
 $ec_lang['lpn_find_filter_btn']='在当前表格中过滤';
-$ec_lang['lpn_find_filter_tip']='只在地图下方的某个表格中显示与此查询匹配的部分。绘图内容不会改变，也不会删除任何内容。';
+$ec_lang['lpn_find_filter_tip']='在所搜索的每个表格中，仅显示与上方“搜索内容”匹配的行。';
 // The multi-table receipt, printed when "Everything" (or a typed compound query) filters more than
 // one table at once: one {table}: {n} of {all} row per table the query could be asked of, joined
 // into {rows} of the summary line below. Every number is a count already shown on the table's own
@@ -1494,7 +1494,7 @@ $ec_lang['lpn_find_conn_no_fixed']='此管网没有水库或水箱，因此没�
 // Task 540: the query written as one line, above the Find button -- and typed into. The controls
 // write it and it writes the controls, so it teaches the shape of a search by being operated from
 // either end.
-$ec_lang['lpn_find_query_tip']='同一个搜索，写成一行文字。更改上方的控件会重写这一行，而在这里输入内容也会更新那些控件。';
+$ec_lang['lpn_find_query_tip']='给定的搜索，以文字查询形式表示。更改查询会更新上方的控件。';
 $ec_lang['lpn_find_query_label']='查询';
 // Tom's own line, 2026-08-26, and "expandable" is his word: it says the grammar will grow.
 $ec_lang['lpn_find_query_hint']='用 AND、OR 和 () 组合条件';
@@ -1531,13 +1531,13 @@ $ec_lang['lpn_replace_title']='更改查找到的内容';
 $ec_lang['lpn_replace_prop']='要更改的属性';
 $ec_lang['lpn_replace_value']='新数值';
 $ec_lang['lpn_replace_source']='新值来源';
-$ec_lang['lpn_replace_asked']='已为 {n} 个节点请求高程。结果正在返回中。';
+$ec_lang['lpn_replace_asked']='已请求 {n} 个节点的高程。收到后会显示结果。';
 $ec_lang['lpn_replace_btn']='替换';
 // The count IS the confirmation: a bulk write reaches assets spread over a map the user is not
 // looking at, so it is shown, and answered, before anything is written. {n} is a whole number.
 $ec_lang['lpn_replace_preview']='要更改 {n} 个元件吗？';
 $ec_lang['lpn_replace_apply']='更改它们';
-$ec_lang['lpn_replace_done']='已更改 {n} 个元件。您可以一步撤销此操作。';
+$ec_lang['lpn_replace_done']='已更改 {n} 个元件。可一步撤销。';
 $ec_lang['lpn_replace_none']='不会有任何更改。';
 $ec_lang['lpn_replace_no_value']='请输入新数值。';
 $ec_lang['lpn_replace_scope']='请在上方选择要更改数值的一种元件。';
@@ -1613,7 +1613,7 @@ $ec_lang['lpn_ts_group_nodes']='节点';
 $ec_lang['lpn_ts_group_links']='连接线';
 $ec_lang['lpn_ts_add']='添加所选';
 // Said out loud rather than ignored: a button that does nothing cannot be told from a broken one.
-$ec_lang['lpn_ts_add_none']='地图上未选中该类元件。';
+$ec_lang['lpn_ts_add_none']='未找到可添加的内容。';
 $ec_lang['lpn_ts_clear']='全部移除';
 $ec_lang['lpn_ts_chip_tip']='将 {id} 从图中移除';
 $ec_lang['lpn_ts_none']='目前没有可绘制的内容。请在地图上选择元件，然后按“添加所选”。';
@@ -1624,7 +1624,7 @@ $ec_lang['lpn_ts_no_frames']='尚无延时模拟结果。请按“计算”运�
 $ec_lang['lpn_ts_summary']='元件数：{n}，报告时刻数：{steps}';
 $ec_lang['lpn_ts_axis_time']='经过时间';
 $ec_lang['lpn_freq_menu']='频率';
-$ec_lang['lpn_freq_tip']='绘制某一属性在当前时间步下，所有节点或所有管道上的频率分布图。';
+$ec_lang['lpn_freq_tip']='某一属性的频率分布';
 $ec_lang['lpn_freq_title']='数值分布';
 $ec_lang['lpn_freq_none']='该数值尚无结果，因此无内容可绘制。';
 $ec_lang['lpn_freq_summary']='已绘制：{n}（共 {total}）';
@@ -1655,7 +1655,7 @@ $ec_lang['lpn_new_title']='新建项目';
 // them), or local and not georeferenced. The keys of the older three-radio box (lpn_new_coords and
 // its five siblings) are gone; Tom called the last of them obsolete on 2026-09-16.
 $ec_lang['lpn_new_coordsys']='坐标系';
-$ec_lang['lpn_new_coordsys_tip']='选择您管网的坐标系。此选择是永久性的；将管网转换为不同坐标的唯一方法是使用"文件"、"在地图上打开 xy 文件…"，且转换结果是近似值。';
+$ec_lang['lpn_new_coordsys_tip']='选择管网的坐标系。更改此选择的唯一方法是通过“文件”、“转换为…”转换到新项目，且该转换是近似的。';
 // **DELETED 2026-09-25: lpn_new_coordsys_geo / lpn_new_coordsys_geo_tip.** Don't expose the word
 // "projection" (dev/session-handoff.md RULINGS); once reworded, both were the identical string
 // lpn_convas_epsg / lpn_convas_epsg_tip already carries, so the radio reuses those keys rather than
@@ -1677,11 +1677,11 @@ $ec_lang['lpn_new_coordsys_local_tip']='未配准。可附加您自己的背景�
 $ec_lang['lpn_crs_view']='按地图视图筛选';
 $ec_lang['lpn_crs_view_tip']='仅显示覆盖当前地图所显示位置的投影。关闭此项可查看完整列表。';
 $ec_lang['lpn_crs_place']='地名搜索';
-$ec_lang['lpn_crs_place_tip']='输入城镇、地址或地标名称，地图视图会移动到该处。您输入的文字会发送到 OpenStreetMap 的地名服务，首次使用时会请求您的许可。新建的地理项目也会从这里查找到的地点开始。';
+$ec_lang['lpn_crs_place_tip']='搜索内容会发送到 OpenStreetMap 地名服务，首次使用时会请求许可。新建的地理项目也从此处找到的地点开始。';
 $ec_lang['lpn_crs_search']='搜索';
 $ec_lang['lpn_crs_name']='投影名称筛选';
-$ec_lang['lpn_crs_name_tip']='仅显示名称或 EPSG 代码中包含您所输入内容的投影。可以尝试输入带号、UTM 或 Mercator。';
-$ec_lang['lpn_crs_list_tip']='经过以上两项筛选后剩下的投影。选择一项后点击"选择"。';
+$ec_lang['lpn_crs_name_tip']='用于过滤列表的文字：仅显示名称或 EPSG 代码包含该文字的坐标系。';
+$ec_lang['lpn_crs_list_tip']='通过以上筛选条件的坐标系。选择一项，然后按“确定”。';
 // Said rather than left blank: a filter that is on and filtering nothing looks broken.
 $ec_lang['lpn_crs_noview']='尚未搜索任何地点，因此显示完整列表。请在上方搜索地点，或缩放地图以缩小范围。';
 $ec_lang['lpn_crs_count']='已列出 {total} 个投影中的 {n} 个。';
@@ -1713,7 +1713,7 @@ $ec_lang['lpn_crs_none']='未配准';
 // Task 584: the page-wide rule stated where it is decided. A new project gets the hard-coded
 // defaults; a preference is a template FILE rather than an invisible saved setting.
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_new_units_tip']='项目会保留自己的单位设置，因此这一选择只属于该项目本身，不会作为浏览器设置保存。若要让新项目按特定方式开始，请将一个空项目保存为模板，并在每次需要时复制它。';
+$ec_lang['lpn_new_units_tip']='单位和其他设置随每个项目保存，因此这一选择仅适用于本项目，不会保存为浏览器设置。若要重复使用偏好设置，请将一个空项目保存为模板，并从它开始每个新项目。';
 // A worked example rather than an instruction, in the placeholder where an instruction would be
 // read as the answer. Petaluma is the example js/lpn-search.js already uses.
 $ec_lang['lpn_new_place_hint']='杭州市西湖区';
@@ -1756,7 +1756,7 @@ $ec_lang['lpn_file_import_inp_tip']='从 EPANET 文件中读取管网，可以�
 // The other direction (Task 281). A DOWNLOAD, so the word is Export rather than Save: this page
 // keeps no handle on an `.inp` and never writes back to one.
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_file_export_inp_tip']='将此管网写入 EPANET .inp 文件并下载。您输入的数字会按原样精确写出。.inp 格式无法保存的内容会在之后列给您看。';
+$ec_lang['lpn_file_export_inp_tip']='将此管网下载为 EPANET .inp 文件（如有图片，则与图片一起打包为 zip 文件）。.inp 格式无法保存的内容随后会列出。';
 $ec_lang['lpn_status_inp_exported']='已导出 {file}。';
 // {n} is a whole number. Said plainly rather than hidden: a file that quietly loses a pump curve is
 // the failure this whole feature exists to prevent.
@@ -1777,16 +1777,16 @@ $ec_lang['lpn_inp_report_label_anchor']='文字标签的定位方式与 EPANET �
 // or no [BACKDROP] line at all, never only "None" -- because none of those states a real coordinate
 // system either. See showInpReport() in js/looped-network.js.
 $ec_lang['lpn_inp_report_no_crs']='EPANET 文件不含坐标系，因此该文件起初不会经过配准。要将其放到世界地图上，请使用“地图”、“世界地图…”；要转换其坐标，请使用“文件”、“转换为…”';
-$ec_lang['lpn_inp_report_lead']='本页面并未使用 EPANET 的全部功能，但您文件中的内容都不会被丢弃。以下是您文件中被保留但未被使用的内容，以及文件读入时发生的更改：';
+$ec_lang['lpn_inp_report_lead']='本页面并未使用 EPANET 的全部功能，但文件中的任何数据都不会被丢弃。以下列出文件中被保留但未被使用的数据，以及导入时所做的更改：';
 $ec_lang['lpn_inp_drop_headloss']='该文件未使用 Hazen-Williams 公式。本页面按 Hazen-Williams 公式计算，因此管道糙率数值已按原样保留，但这里得到的结果将与 EPANET 中的结果不一致。';
 $ec_lang['lpn_inp_drop_tank_curve']='这些水箱不是直壁的：文件以曲线形式给出其形状。该曲线被保存在“库”框中，水箱仍引用它，延时模拟会按该曲线给出的规律为水箱充水和放水。单一时刻的结果两种情况相同，因为水面标高就是文件设定的水位。文件中所写的直径会与曲线一同保留，并作为该水箱在没有曲线时的绘制和求解依据。';
 // Three outcomes a valve in a file can meet, one string each (Task 248 phase 2). Only the last is
 // a loss; the first two are reported because the reader deserves to know what became of a valve
 // their file states, not because anything was thrown away.
-$ec_lang['lpn_inp_drop_tcv']='这些节流阀（TCV）已作为节流阀导入，保留了文件中给定的相同损失。两种求解器均可对其求解。';
-$ec_lang['lpn_inp_drop_valve_active']='这些阀门用于控制压力或流量，会随水流变化自行开闭。导入过程中未丢失任何设定，本页面将使用 EPANET 求解器对其求解，并为该管网自动启用该求解器。';
+$ec_lang['lpn_inp_drop_tcv']='这些节流阀已作为节流阀导入，保留了文件中给定的损失。';
+$ec_lang['lpn_inp_drop_valve_active']='这些阀门控制压力或流量，其状态随水力条件变化。导入时未丢失任何数据，本页面可对其求解。';
 $ec_lang['lpn_inp_drop_valve']='这些阀门是按曲线或固定压降来描述的，而本页面没有这样的元件类型。它们被作为开放管道导入，因此管网仍然连通，但那里不再有任何东西控制压力或流量。';
-$ec_lang['lpn_inp_drop_cv']='在 EPANET 中，这些管道只允许水单向流动。它们已作为普通管道导入，因此水现在可能双向流动。';
+$ec_lang['lpn_inp_drop_cv']='在 EPANET 中，这些管道只允许单向流动（止回阀）。它们已作为普通管道导入，因此现在水流可以沿任一方向通过。';
 $ec_lang['lpn_inp_drop_demands']='这些节点原有多个需水量。这些需水量已合并为本页面所支持的单一需水量。';
 $ec_lang['lpn_inp_drop_patterns']='本页面未读取需水模式，因为其中用于运行延时模拟的部分未能加载。每个需水量均为文件中写明的数值。';
 $ec_lang['lpn_inp_drop_demand_pattern']='这些节点的需水量会在运行过程中变化。它们的模式已完整导入，您看到的需水量是时钟当前所指时刻对应的数值。';
@@ -1797,22 +1797,22 @@ $ec_lang['lpn_inp_drop_pump_other']='此水泵是按其消耗的功率来描述�
 $ec_lang['lpn_inp_drop_head_pattern']='这些水库的水位会在运行过程中升降变化。它们的模式已完整导入，您看到的水位是时钟当前所示时刻的水位。';
 $ec_lang['lpn_inp_drop_pump_speed']='这些水泵的运行转速与其曲线测定时的转速不同，或在运行过程中转速会发生变化。转速及其模式已完整导入，您看到的水头是时钟当前所示时刻的水头。';
 $ec_lang['lpn_inp_drop_setting']='这些管道、水泵和阀门带有本页面无法保存的设定值。它们已被导入为开放状态。';
-$ec_lang['lpn_inp_drop_rules']='此文件包含基于规则的控制。本页面会读取并使用它们。使用 EPANET 引擎运行模型后，这些规则会被执行，其中的每一个水位、压力和流量都会换算为本项目当前显示的单位。请在“库”下打开“规则”来查看或修改其中一条。它们会按文件中原本的写法完整保留，如果您保存为 EPANET 文件，也会被写回。';
+$ec_lang['lpn_inp_drop_rules']='此文件包含基于规则的控制。本页面会读取并应用它们。运行模型时会应用这些规则，其中的每个水位、压力和流量都会换算为本项目显示所用的单位。请在“库”下打开“规则”来查看或编辑某条规则。规则按文件中的原样保留，如果您保存为 EPANET 文件，也会被写回。';
 $ec_lang['lpn_inp_drop_eps']='此文件描述了一次延时模拟。本页面用于运行延时模拟的部分未能加载，因此只导入了初始条件。';
-$ec_lang['lpn_inp_drop_quality']='此文件描述了水质在传输过程中如何变化：水中最初含有什么，以及该物质在管道和水箱中反应的速度。本页面会读取并使用这些数值。请在“设置”、“计算”、“水质”下选择一种化学物质，然后使用 EPANET 引擎运行模型，浓度就会随着运行沿管网被逐步计算出来。这些内容会被保留，如果您保存为 EPANET 文件，也会被写回。';
-$ec_lang['lpn_inp_drop_sources_mixing']='此文件说明了化学物质在管网中投加的位置，以及水箱中水的混合方式。投加量显示在被投加的节点上，水箱则说明其采用的混合模型。投加量和混合模型均只能由 EPANET 引擎计算。';
+$ec_lang['lpn_inp_drop_quality']='此文件描述了水质：管道和水箱中的初始浓度和反应速率。本页面会读取并使用这些数值。请在“设置”、“计算”、“水质”下选择一种化学物质，然后运行模型，即可在运行期间计算整个管网的浓度。这些行会被保留，如果您保存为 EPANET 文件，也会被写回。';
+$ec_lang['lpn_inp_drop_sources_mixing']='此文件说明了化学物质在管网中的注入位置，以及水在每个水箱中的混合方式。每个水源显示在其所施加的节点上，每个水箱显示其混合模型。在设有总运行时长的情况下运行管网时，二者均会被使用。';
 $ec_lang['lpn_inp_drop_energy']='此 EPANET 文件包含水泵运行成本模型数据。本页面会读取并使用这些数据。使用 EPANET 引擎运行模型后，打开“水务”、“报告”、“水泵能耗”，即可查看每台水泵的运行时长、所耗功率、用电量及相应费用。这些内容会被保留，如果您保存为 EPANET 文件，也会被写回。';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_inp_drop_tags']='此文件为部分节点、管道或其他元件设置了标记。每个标记都已完整导入，并保存在各自元件的属性中，您可以在那里查看或修改它。';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_inp_drop_report']='此文件包含 EPANET 自身用于设置其打印报告格式的选项。您可以在此处的“报告”、“EPANET 运行”下查看引擎的报告，但它会按引擎的标准格式输出，而不是按这些设置所要求的格式。这些内容会被保留，如果您保存为 EPANET 文件，也会被写回。';
+$ec_lang['lpn_inp_drop_report']='此文件包含 EPANET 报告格式设置。运行报告可在“报告”、“EPANET 运行”下查看，但它采用标准 EPANET 格式，而不是这些设置所指定的格式。这些行会被保留，如果您保存为 EPANET 文件，也会被写回。';
 $ec_lang['lpn_inp_drop_sections']='此文件包含一个本页面完全不读取的部分。这里不会用到它。它会被完整保留，如果您保存为 EPANET 文件，会被写回。';
-$ec_lang['lpn_inp_drop_quality_options']='此文件设置了 EPANET 的水质选项：Quality 选项（指定水质分析的种类），以及两项与化学物质相关的设置——相对扩散系数和水质容差。这三项均会被保留并被使用。水龄、来源追踪和化学物质均在本页面计算，其中两项化学物质设置会在您运行化学物质分析时交给 EPANET 引擎。如果您保存为 EPANET 文件，全部内容都会被写回。';
+$ec_lang['lpn_inp_drop_quality_options']='此文件给出了 EPANET 水质选项：Quality 选项（指明水质分析的种类），以及与化学物质相关的两项设置，即相对扩散系数和水质容差。这三项均会被保留并使用。水龄、来源追踪和化学物质均在本页面计算，运行化学物质时会使用其中两项化学物质设置。如果您保存为 EPANET 文件，全部内容都会被写回。';
 $ec_lang['lpn_inp_drop_file_options']='此文件引用了一个辅助文件：Map（保存坐标），或 Hydraulics（保存已经算好的水力结果）。本页面无法打开这两种文件，因此这些行会保持原样，并在您保存为 EPANET 文件时被写回。';
 $ec_lang['lpn_inp_drop_other_options']='此文件设置了本页面不读取的选项。这里不会用到它们。它们会被保留，并在您保存为 EPANET 文件时被写回。';
 $ec_lang['lpn_inp_drop_net_options']='此 EPANET .net 文件设置了本页面没有对应控件的选项，因此它们的数值列在此处，而不会被本页面采用。其余内容均已导入。如果您需要这些设置，请在 EPANET 中打开该文件，使用“文件”、“导出”、“网络”将其另存为 .inp 文件，然后导入该文件。';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_net_emergency']='这是一个 EPANET .net 文件。这是 EPANET 自己的项目文件格式，没有公开的说明文档，本页面是通过分析示例文件摸索出该格式来读取它的，因此只应在别无选择时使用，而非作为可靠途径。.inp 文件才是有文档记录、每个程序都能读取的格式：请在 EPANET 中使用“文件”、“导出”、“网络”生成一个 .inp 文件，并尽量改为导入该文件。';
+$ec_lang['lpn_net_emergency']='这是一个 EPANET .net 文件，即 EPANET 原生的项目格式。该格式没有公开发布的规范；本页面是按照从示例文件推断出的格式来读取它的，因此仅在没有 .inp 文件时使用。.inp 文件是其他程序可以读取的、有文档记载的格式：请在 EPANET 中使用“文件”、“导出”、“网络”生成一个 .inp 文件，并尽可能改为导入该文件。';
 $ec_lang['lpn_inp_drop_backdrop']='该文件指定了一张背景图片，但未包含图片本身。请使用"文件"、"背景图片"、"添加图片"自行添加。';
 $ec_lang['lpn_inp_drop_dangling']='这些管道所指定的节点不在文件中，因此未被导入。';
 $ec_lang['lpn_inp_drop_units']='该文件中标明的流量单位不是本页面已知的单位，因此所有数值均按加仑每分钟读取。请在使用结果前核对每一个数值。';
@@ -1934,7 +1934,7 @@ $ec_lang['lpn_lock_open_choices_ask']='“询问”会告诉正在打开此文�
 $ec_lang['lpn_lock_ask']='询问';
 // Asked at the one moment the name is useful, and SENT rather than stored: nothing new is written to
 // this computer for it, which is the whole point of moving the question here.
-$ec_lang['lpn_lock_ask_prompt']='应该说是谁在询问？使用您的姓名缩写最为合适。它会随此文件的锁一起保存在我们的服务器上，供正在打开此文件的人查看，并在 30 天内删除。';
+$ec_lang['lpn_lock_ask_prompt']='应以谁的名义提出请求？例如输入您的姓名缩写。它会随此文件的锁一起保存在我们的服务器上，供打开该文件的人查看，并在 30 天内删除。';
 $ec_lang['lpn_lock_ask_sent']='我们已请求正在打开此文件的人将其关闭。如果对方的页面仍处于打开状态，他们会在一分钟内看到请求。其他一切均未改变，在对方关闭之前，此文件仍归他们使用。';
 $ec_lang['lpn_lock_ask_failed']='您的消息未能送达。可能目前没有人打开此文件，也可能是无法连接到服务器。';
 // **A CANCEL THAT LEAVES NO RESIDUE IS THE DEFECT** (ROADMAP Task 704, Ida's diagnosis). Backing
@@ -1967,16 +1967,16 @@ $ec_lang['lpn_lock_readonly_banner']='只读：{name} 已打开此文件。您�
 // stops a colleague editing the same file. Editing still works -- an unreachable server must never
 // take the calculator away -- so this warns rather than blocks, and promises the follow-up that
 // lpn_lock_restored keeps.
-$ec_lang['lpn_lock_unavailable']='请注意：无法连接服务器以检查或创建此项目的锁定，因此没有任何机制阻止同事同时编辑同一文件。若锁定功能恢复正常，系统会通知您。';
-$ec_lang['lpn_lock_storage_error']='请注意：本站点无法保存锁定记录，因此没有任何机制阻止同事同时编辑同一文件。这是服务器端的配置问题，您在此处无法修复——锁定文件夹对 Web 服务器不可写。';
-$ec_lang['lpn_lock_full_error']='请注意：本站点记录项目打开状态的空间已用尽，因此没有任何机制阻止同事同时编辑同一文件。这是服务器端的配置问题，您在此处无法修复。';
-$ec_lang['lpn_lock_not_asked']='此项目未启用锁定功能，因此没有任何机制阻止同事同时编辑同一文件。该项目尚无标识符，将其保存到文件即可获得一个。';
+$ec_lang['lpn_lock_unavailable']='警告：无法连接服务器以检查或创建此项目的锁，因此其他用户可以同时编辑同一文件。若锁定恢复，会显示一条消息。';
+$ec_lang['lpn_lock_storage_error']='警告：本站点无法保存锁定记录，因此其他用户可以同时编辑同一文件。这是服务器配置故障，无法在本页面纠正：Web 服务器对锁定文件夹没有写入权限。';
+$ec_lang['lpn_lock_full_error']='警告：本站点没有剩余的存储空间用于保存锁定记录，因此其他用户可以同时编辑同一文件。这是服务器配置故障，无法在本页面纠正。';
+$ec_lang['lpn_lock_not_asked']='此项目未启用锁定，因此其他用户可以同时编辑同一文件。此项目尚无标识符；将其保存到文件即会分配一个。';
 $ec_lang['lpn_lock_restored']='锁定功能已恢复正常，此文件现在可供您保存。';
 $ec_lang['lpn_lock_dismiss']='隐藏此消息';
 // Shown once per browser, before the first file picker opens. Three short paragraphs on purpose:
 // this is the one place the whole file-and-lock idea is explained, and it has to survive translation
 // into 26 languages, so it says one thing per sentence and avoids every word of jargon it can.
-$ec_lang['lpn_file_training_1']='您的项目将保存在本电脑上的一个文件中。它只在您主动要求时才会保存，其他任何时候都不会，因此不会有内容在您不知情的情况下被写入该文件。';
+$ec_lang['lpn_file_training_1']='项目将保存在本计算机上的一个文件中。仅在您保存时才会保存，其他任何时候都不会。';
 $ec_lang['lpn_file_training_2']='为避免两人同时编辑同一文件，本站点会记录该文件当前是谁打开的。若已有人打开，您仍可以打开并查看，或保留一份自己的副本。';
 // Said BEFORE it happens, because it is alarming and unexplained when it happens (Tom, 2026-08-04:
 // "hawsedc.com will be able to edit ... is a canned browser warning whose confusing meaning we
@@ -2048,7 +2048,7 @@ $ec_lang['lpn_notes_1_term']='求解方式';
 // lpn_time_no_engine and lpn_engine_unavailable.** A note everybody reads should not carry a
 // failure explanation that the failure itself delivers. Task 605's rule is untouched -- every
 // sentence a reader meets only when something has gone wrong SURVIVES, and those two are it.
-$ec_lang['lpn_notes_1_def']='每个时刻都采用与 EPANET 相同的全局梯度算法求解。设置总运行时长后，EPANET 求解器会依次算出每个报告时刻：水箱充放水，需水量随各自的模式变化，工具栏可播放整个运行过程。内置求解器一次只计算一个时刻，并让每个水箱保持在其起始水位。';
+$ec_lang['lpn_notes_1_def']='此管网由 EPANET 求解器求解。设置总运行时长后，每个报告时间步依次计算：水箱充水和放水，需水量随其模式变化，工具栏可回放该运行。';
 $ec_lang['lpn_notes_2_term']='本工具不做的事';
 // **"Water quality chemistry is not modeled" WAS FLATLY FALSE** (Tom, 2026-09-10: *"Wrong
 // facts."*). A reacting chemical, bulk and wall reaction coefficients and a limiting
@@ -2060,7 +2060,7 @@ $ec_lang['lpn_notes_2_term']='本工具不做的事';
 // omission is a public claim about scope, and this file's history says those go wrong in the
 // confident direction; the one omission stated here is the one nothing in this tree implements
 // or claims to. Do not lengthen the list without him.
-$ec_lang['lpn_notes_2_def']='水质化学反应未建模；水龄和来源追踪已建模。关于阀门：节流阀（TCV）在两种求解器下均可使用，而能自行设定开度的阀门（PRV、PSV、FCV）由 EPANET 求解器求解，当管网中含有此类阀门时，本页面会自动启用该求解器。';
+$ec_lang['lpn_notes_2_def']='已对水质建模：水龄、来源追踪，以及在管壁和主体水流中发生反应的化学物质。未对涌浪和水锤建模：所有结果均针对恒定流或缓变流，而不是阀门快速关闭引起的瞬态压力波。';
 $ec_lang['lpn_notes_3_term']='保存项目';
 $ec_lang['lpn_notes_3_def']='每个项目对应一个标签页，且在您操作时即保存在本浏览器中。清除浏览器数据会将它们全部删除，因此请把成果保存到文件中：使用"文件"、"另存为"。标签页上的星号表示其中含有尚未保存到文件的更改。除非您主动要求，否则不会有任何内容写入文件。在部分浏览器中，项目会连接到您保存的文件，此后"文件"、"保存"会写回该文件；在另一些浏览器中无法建立此连接，因此"保存"不可用，只能使用"另存为"。当项目文件保存在共享磁盘上时，本页面会提示您该文件是否已被同事打开，以避免两人互相覆盖成果。';
 // Pump curve documentation (Tom, 2026-07-30: "How should we document the curve equations?").
@@ -2118,8 +2118,8 @@ $ec_lang['lpn_diag_unreachable']='以下节点没有通往水库的路径：';
 $ec_lang['lpn_engine_fetching']='正在获取 EPANET 求解器。它只需下载一次，此后会保存在本设备上，因此之后可以离线使用。';
 $ec_lang['lpn_engine_ready']='EPANET 求解器现已保存在本设备上，可以离线使用。';
 $ec_lang['lpn_engine_fetching_valve']='正在获取 EPANET 求解器，以便现在求解此阀门，并在以后离线使用。';
-$ec_lang['lpn_engine_ready_valve']='EPANET 求解器现已保存在本设备上。能够自动开闭的阀门此后可以离线求解。';
-$ec_lang['lpn_engine_unavailable']='无法获取 EPANET 求解器，而它正是用于求解能够自动开闭的阀门。请连接一次互联网，此后它就会保存在本设备上。';
+$ec_lang['lpn_engine_ready_valve']='EPANET 求解器现已保存在本设备上。压力和流量控制阀（PRV、PSV、FCV）此后可以离线求解。';
+$ec_lang['lpn_engine_unavailable']='无法下载 EPANET 求解器，而求解压力和流量控制阀（PRV、PSV、FCV）必须使用它。联网一次后，求解器即保存在本设备上。';
 $ec_lang['lpn_engine_needed_loading']='正在加载 EPANET 求解器，您可以继续绘制。加载完成后即可获得结果。';
 // **THE WAIT, SAID OUT LOUD, WITH A NUMBER ON IT** (ROADMAP Task 608). The first sentence is Tom's
 // own, 2026-09-08, and "Continue working" is the half that matters: it says the page is not frozen.
@@ -2132,8 +2132,8 @@ $ec_lang['lpn_engine_wait']='正在加载求解器。结果会稍有延迟。您
 $ec_lang['lpn_engine_wait_pct']='求解器已加载 {percent}%。';
 $ec_lang['lpn_engine_wait_bytes']='求解器目前已加载 {kb} KB。总大小未知，因此无法得知完成百分比。';
 $ec_lang['lpn_engine_needed_failed']='EPANET 求解器尚未加载，目前也无法加载，而此管网只能由它求解。连接互联网后即可加载。';
-$ec_lang['lpn_diag_valve_needs_epanet']='以下阀门会自行开闭，只有 EPANET 求解器才能计算它们。由于无法加载 EPANET 求解器，缺少这些结果：';
-$ec_lang['lpn_diag_valve_on_fixed_head']='以下阀门直接连接在水库或水箱上，而水库或水箱已经确定了该处的水位，因此阀门无可控制的对象。请在阀门与水库或水箱之间加入一段短管：';
+$ec_lang['lpn_diag_valve_needs_epanet']='以下为压力或流量控制阀，只有 EPANET 求解器才能计算。由于无法加载 EPANET 求解器，缺少这些结果：';
+$ec_lang['lpn_diag_valve_on_fixed_head']='以下阀门直接连接在水库或水箱上，而水库或水箱固定了该节点处的水力坡降线，因此阀门无可控制之处。请在阀门与水库或水箱之间加入一段短管：';
 $ec_lang['lpn_diag_not_converged']='未找到解。请检查是否存在现实中不可能出现的数值，例如管径为零。';
 // **THE NUMBERS ARE DRAWN AND MARKED, NOT THROWN AWAY** (ROADMAP Task 565). A solve that did not
 // converge still produced the last iterate, and that is every number this page has -- refusing to
@@ -2163,7 +2163,7 @@ $ec_lang['lpn_field_to']='终点';
 // different units, and one shared label would have to be vague enough to cover all three.
 $ec_lang['lpn_field_valve_type']='阀门类型';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_field_valve_type_tip']='阀门的作用方式。节流阀维持固定的损失。其余三种维持某一压力或流量，会随水流变化而全开、关闭或部分关闭。更改类型会将下方设定值重置为新的初始数值，因为压力、流量与损失系数彼此并非同一物理量。';
+$ec_lang['lpn_field_valve_type_tip']='阀门类型。节流阀（TCV）施加固定的损失。PRV、PSV 和 FCV 维持某一压力或流量，并随水力条件变化而全开、关闭或部分关闭。PBV 消除固定的压力，GPV 遵循水头损失曲线。各类型控制不同的水力特性，因此更改类型时设定值可能丢失。';
 // THE ENGLISH IS ELLIPTICAL ON PURPOSE -- the noun "valve" is dropped because the dropdown above
 // already says "Valve type" -- so a translator meets a bare modifier with no head noun, and
 // "throttle" alone pulls hard toward a car accelerator. Each _syn supplies the noun plus alternates
@@ -2183,17 +2183,17 @@ $ec_lang['lpn_field_valve_setting_drop_tip']='该阀门带走的压力。减压�
 $ec_lang['lpn_inp_drop_gpv_curve']='此阀门引用了一条不在文件中的水头损失曲线。该阀门已导入为无曲线，因此在您给它指定曲线之前将保持全开状态。';
 $ec_lang['lpn_gpv_curve_source']='阀门水头损失曲线';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_gpv_curve_source_tip']='“库”框中说明该阀门在各流量下损失多少水头的曲线。多个阀门可以使用同一条曲线，在那里编辑会同时改变它们全部。此阀门只保存对该曲线的引用；各数据点本身在“库”、“曲线”中读取和编辑。';
+$ec_lang['lpn_gpv_curve_source_tip']='“库”框中给出此阀门在各流量下水头损失的曲线。多个阀门可以使用同一条曲线，在那里编辑会同时更改它们全部。';
 $ec_lang['lpn_field_valve_setting_pressure']='压力设定值';
 $ec_lang['lpn_field_valve_setting_pressure_tip']='阀门维持的压力。减压阀（PRV）将其下游侧压力维持在此数值或以下；维压阀（PSV）将其上游侧压力维持在此数值或以上。';
 $ec_lang['lpn_field_valve_setting_flow']='流量设定值';
-$ec_lang['lpn_field_valve_setting_flow_tip']='阀门允许通过的最大流量。当所需通过的水量小于该值时，阀门保持全开，不产生任何损失。';
+$ec_lang['lpn_field_valve_setting_flow_tip']='通过阀门的最大流量。流量小于此值时，阀门全开，不增加损失。';
 $ec_lang['lpn_field_valve_setting']='设定值';
 $ec_lang['lpn_field_valve_setting_loss']='损失系数';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_field_valve_setting_loss_tip']='节流阀（TCV）消除的水头，以流速水头的倍数计。阀门全开时取 0。该数值即为节流阀损失的全部。';
-$ec_lang['lpn_field_valve_diameter_tip']='阀门通道开口的宽度。水流经过阀门的速度由此宽度算出，损失则由该流速决定。';
-$ec_lang['lpn_field_valve_km_tip']='阀门全开时阀体本身造成的损失，叠加在阀门设定值所消除的损失之上，以流速水头的倍数计。忽略该项时取 0。';
+$ec_lang['lpn_field_valve_diameter_tip']='阀门开口的直径。流经阀门的流速由此直径算出，损失由该流速算出。';
+$ec_lang['lpn_field_valve_km_tip']='阀门全开时阀体造成的损失，叠加在阀门设定值造成的任何损失之上。以流速水头的倍数表示。取 0 则忽略。';
 $ec_lang['lpn_field_km']='局部损失系数，k';
 // Short form of the same concept, for the two NARROW uses: the Labels checkbox list and the on-map
 // legend beside it. Per CLAUDE.md's rule that a shared label must fit its narrowest use, these get
@@ -2207,7 +2207,7 @@ $ec_lang['lpn_field_km_short']='局部损失，k';
 // one curve name the same curve now, so there is no borrow to describe.
 $ec_lang['lpn_pump_curve_source']='水泵水头曲线';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_pump_curve_source_tip']='“库”框中说明该水泵在各流量下增加多少水头的曲线。多个水泵可以使用同一条曲线，在那里编辑会同时改变它们全部。此水泵只保存对该曲线的引用；各数据点本身在“库”、“曲线”中读取和编辑。';
+$ec_lang['lpn_pump_curve_source_tip']='“库”框中给出此水泵在各流量下所增加水头的曲线。多个水泵可以使用同一条曲线，在那里编辑会同时更改它们全部。此水泵只保存对该曲线的引用；各数据点本身在“库”、“曲线”中读取和编辑。';
 // **"THE NOTES BELOW" DO NOT EXIST ON THIS PAGE** (Tom, 2026-09-05: *"There are no notes below.
 // It's in Help, Notes on this page."*). Every other calculator in this suite is a form with its
 // notes printed under it, and this sentence was written in that habit; the map page is a full-window
@@ -2282,7 +2282,7 @@ $ec_lang['lpn_pump_effic_unstated']='此水泵引用了名为 {name} 的效率�
 // from a "Mode:" prefix + the tool's own label, per CLAUDE.md's concept-level label reuse rule --
 // word order/grammar around a mode name varies by language, so each mode gets its own full string.
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_mode_select']='模式：选择。点击某个元件或标签以查看或更改它。拖动可移动节点、折点或标签。使用“折点”工具可添加或删除管道上的弯折。';
+$ec_lang['lpn_mode_select']='模式：选择。选择某个元件或标签以查看或更改它。拖动可移动节点或标签。使用“折点”工具可添加或删除管道上的弯折。';
 $ec_lang['lpn_mode_delete']='模式：删除。点击某个元件即可将其移除。';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_mode_vertices']='模式：折点。每条管道的所有折点都以小方块手柄的形式显示在地图上。点击管道可添加折点，点击手柄可删除它，或拖动手柄以移动它。此模式下地图上的其他内容不会改变。';
@@ -2304,7 +2304,7 @@ $ec_lang['lpn_mode_add_text']='模式：添加文字。点击地图以放置一�
 // label itself can be dragged. Both economize on translation for later, per CLAUDE.md's tip-only
 // whole-label-wrap convention -- the button itself is already the click target (no separate "?"
 // glyph needed), so the tip goes straight on the button as a title, matched to the .ec-help class.
-$ec_lang['lpn_tip_select']='使用此模式可在地图上更改、移动和拖动内容。这是本页面默认返回的模式：在打开项目等某些操作之后，会自动回到此模式；在任何其他模式下按 [Esc] 键也会返回此模式。';
+$ec_lang['lpn_tip_select']='使用此模式可更改、移动和拖动地图元素，或平移地图。这是地图的默认模式。再按一次 Esc 将取消选择当前所选内容。';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_field_auto']='自动';
 $ec_lang['lpn_method_switch_confirm']='更改摩擦计算方法不会改变您已在管道中输入的糙率数值，而某一方法下的糙率对另一方法而言没有意义。更改后请检查每条管道。仍要更改吗？';
@@ -2344,7 +2344,7 @@ $ec_lang['lpn_field_lon_abbr']='经';
 // INPUT as well as a readout. One tip for both boxes, because one sentence is true of both, and it
 // states the thing a reader cannot see: a position is shared by every scenario, exactly as it is
 // when the node is dragged.
-$ec_lang['lpn_field_coord_tip']='输入一个坐标位置可精确放置此节点。在某个方案中，此位置仅适用于该方案，与拖动的效果相同；在“基础”方案中，则会将该节点放置到所有位置。';
+$ec_lang['lpn_field_coord_tip']='输入坐标位置可精确放置此节点。在某个方案中，此位置仅适用于该方案，与拖动的效果相同；在“基础”方案中，则会将该节点放置在每个方案中。';
 // Refused, and it says what the range is. Only a geographic project has one: Web Mercator has no
 // finite y at the poles, so a latitude past the cut-off would put the node nowhere at all.
 $ec_lang['lpn_coord_off_world']='该位置超出地图范围。伪墨卡托投影的纬度范围为 -85.05 至 85.05，经度范围为 -180 至 180。';
@@ -2364,7 +2364,7 @@ $ec_lang['lpn_labels_mark_extrema']='标出最高值和最低值';
 // word not on the page is a word the search cannot reach -- and $ec_lang_syn, the other place the
 // terms could have gone, is invisible to it. Plain English leads and the term is the gloss, which is
 // the same shape as "Minor (local) loss".
-$ec_lang['lpn_labels_mark_extrema_tip']='在地图上为每个已标注属性的最高值画一条线（上划线），为其最低值画一条线（下划线），使您无需逐一读数即可看出最高值和最低值。';
+$ec_lang['lpn_labels_mark_extrema_tip']='在地图上，用一条线标出每个已标注属性的最高值（上划线），并用一条线标出最低值（下划线）。';
 // "Apply to all" beside each ID prefix (ROADMAP Task 345): an ID prefix normally governs only the assets
 // you draw from now on, and this is the way to say "I meant the ones already here". {n} and
 // {skipped} are whole numbers; {prefix} is the text the user typed.
@@ -2386,7 +2386,7 @@ $ec_lang['lpn_labels_priority']='优先级';
 // learn them (Tom, 2026-08-16). His own draft of this sentence said "lowest flow"; a flow is a link
 // value and this box is on a node row, so it reads as demand here.
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_labels_priority_node_tip']='当两个节点标签重叠时，各属性被放弃显示的先后顺序。编号为 1 的属性在两个标签上都最先被放弃。当只剩一个属性、两者仍然重叠时，会整体隐藏其中一个标签：隐藏的是剩余数值最不值得显示的那个标签，也就是需水量最低、压力最接近区间中值，或高程或水头与相邻节点最接近的那个。';
+$ec_lang['lpn_labels_priority_node_tip']='标签放不下时舍弃数值的先后顺序。编号为 1 的数值最先被舍弃。当只剩一个数值而两个标签仍然重叠时，会隐藏其中一个：隐藏需水量较低、压力更接近区间中间值，或高程或水头与相邻节点更相近的那个。';
 // Column headings for the Labels box rows. Short because they sit over boxes 3.5 to 4.5 em wide, and
 // the row's own field name is the wide column beside them.
 $ec_lang['lpn_labels_col_before']='前';
@@ -2470,15 +2470,15 @@ $ec_lang['lpn_map_attach_scale_from_bad']='请输入一个大于零的数字。'
 $ec_lang['lpn_map_attach_scale_from_done']='地图大小已调整，您的管网图及其中每个坐标均保持不变。';
 $ec_lang['lpn_map_attach_none']='本项目尚未附加世界地图。请先使用“地图”、“世界地图”、“附加”。';
 $ec_lang['lpn_map_attach_remove']='分离';
-$ec_lang['lpn_map_attach_remove_tip']='移除世界地图。无论如何，管网图及其坐标都不受影响。';
+$ec_lang['lpn_map_attach_remove_tip']='分离世界地图。不影响管网。';
 $ec_lang['lpn_map_attach_done']='世界地图现在位于您的管网图后面，本项目未发生改变。可使用“地图”、“世界地图”、“分离”再次将其移除。';
-$ec_lang['lpn_map_attach_removed']='世界地图已移除，管网图保持不变。';
+$ec_lang['lpn_map_attach_removed']='世界地图已分离，管网未受影响。';
 // **THE CUSTOM GEOREFERENCE WIZARD, IN TOM'S OWN THREE STEPS** (2026-09-18, and
 // dev/tom-coordinate-vocabulary-2026-09-16.md). Georeferencing here means attaching the world map,
 // never converting a coordinate, so every sentence below says what stays still as well as what
 // moves: the drawing does not move, the ground does.
 $ec_lang['lpn_mapgeo_intro']='您的管网图目前位于世界地图上纬度为零、经度为零的海洋中。请先找到您自己的位置：平移和缩放管网图背后的地图、搜索地名，或输入纬度和经度。管网图本身不会移动。';
-$ec_lang['lpn_mapgeo_step1']='第 1 步（共 2 步）：找到您在世界上的位置';
+$ec_lang['lpn_mapgeo_step1']='第 1 步（共 2 步）：找到项目位置';
 $ec_lang['lpn_mapgeo_step2']='第 2 步（共 2 步）：使地图与您的管网图对齐';
 $ec_lang['lpn_mapgeo_hint1']='平移和缩放管网图背后的地图，或搜索地点，或输入纬度和经度，然后按“大致放置”。';
 $ec_lang['lpn_mapgeo_readjust_intro']='您的管网图位于上次放置的位置。要将其移到别处，请平移和缩放管网图背后的地图、搜索地名，或输入纬度和经度。管网图本身不会移动。';
@@ -2532,7 +2532,7 @@ $ec_lang['lpn_hide_titles']='隐藏这些标题';
 // The Settings row that turns the selection bubble back on. Its sibling checkbox lives in the
 // bubble and reads 'Show this'; this one has to name what it is talking about.
 $ec_lang['lpn_settings_area_hint']='显示选择提示';
-$ec_lang['lpn_settings_area_hint_tip']='在选择区域时，于地图上方显示气泡提示，说明下一次点击的作用。';
+$ec_lang['lpn_settings_area_hint_tip']='选择区域时，在地图上方显示给出下一步操作的提示。';
 $ec_lang['lpn_settings_id_prefixes']='ID 前缀';
 // NEVER "Starting values" (Tom, 2026-08-19: "The problem is that it's misleading"). These are what
 // a NEW asset is created with; "starting" reads as the initial condition of a run, which on a
@@ -2544,7 +2544,7 @@ $ec_lang['lpn_settings_defaults']='创建值';
 $ec_lang['lpn_settings_defaults_note']='适用于您此后新建的元件。已有元件不受影响。';
 $ec_lang['lpn_settings_push_note']='仅应用当前正在显示标签的属性。';
 $ec_lang['lpn_settings_push_btn']='将这些新元件的默认值应用到每一个已有元件';
-$ec_lang['lpn_push_confirm']='将这些属性的数值应用到每一个已有元件，替换所有方案下的现有数值？您手动输入的数值将被覆盖。此操作可撤销。';
+$ec_lang['lpn_push_confirm']='将每个已有元件上的这些属性替换为现在为新元件设置的数值？您输入的数值将被覆盖。此操作可撤销。';
 $ec_lang['lpn_push_properties']='属性：';
 $ec_lang['lpn_push_assets']='节点和管道：';
 $ec_lang['lpn_push_none_displayed']='当前没有任何起始值以标签形式显示，因此没有可应用的内容。请先在"标签"面板中开启所需属性的标签，然后重试。';
@@ -2559,12 +2559,12 @@ $ec_lang['lpn_settings_custom_props']='自定义属性';
 // **THE HEADING'S OWN TIP, AND IT IS TOM'S SENTENCE** (2026-09-13, revision 1 of eleven): it says
 // what a custom property is FOR and that it behaves like every other property, which is the whole
 // of what a reader needs before opening the design table.
-$ec_lang['lpn_settings_custom_props_note']='由您自己定义、用于自身目的的属性。它们与所有其他属性一样，随项目和方案一起存储。';
+$ec_lang['lpn_settings_custom_props_note']='用户定义的属性。与所有其他属性一样，随项目和方案一起存储。';
 $ec_lang['lpn_cp_design']='设计';
 $ec_lang['lpn_cp_design_tip']='每个自定义属性占一行，展开后显示：键、标签、适用于、验证方式、允许或限制、由该选择命名的字符字段、长度下限、长度上限、下限、上限。';
 $ec_lang['lpn_cp_add']='添加自定义属性';
 $ec_lang['lpn_cp_add_tip']='在设计表格中添加一行，并将其打开以供编辑。';
-$ec_lang['lpn_cp_remove_tip']='从设计表格中移除此属性。已在您的元件上输入的数值仍保留在文件中，如果您再次设计相同的键，这些数值会重新出现。';
+$ec_lang['lpn_cp_remove_tip']='从设计表格中移除此属性。已在元件上输入的数值仍保留在文件中，如果再次定义具有相同键的属性，这些数值会恢复。';
 $ec_lang['lpn_cp_none']='尚未设计任何自定义属性。';
 $ec_lang['lpn_cp_unnamed']='尚未命名';
 // **EVERY COLUMN TIP LEADS WITH THE NAME OF ITS COLUMN** (Tom, 2026-09-13, revision 4). The heading
@@ -2573,13 +2573,13 @@ $ec_lang['lpn_cp_unnamed']='尚未命名';
 $ec_lang['lpn_cp_key']='键';
 $ec_lang['lpn_cp_key_tip']='键：属性以此名称存储。不允许使用空格，系统会自动为您添加前缀，确保您的键不会与内置字段冲突。';
 $ec_lang['lpn_cp_label']='标签';
-$ec_lang['lpn_cp_label_tip']='标签：这是读者在属性框、"查找"以及表格列标题中看到的文字。';
+$ec_lang['lpn_cp_label_tip']='标签：显示在属性框、“查找”以及表格列标题中。';
 $ec_lang['lpn_cp_applies']='适用于';
 $ec_lang['lpn_cp_applies_tip']='适用于：使用该属性的元件的 ID 前缀列表，以逗号分隔，例如 J,L,R。';
 $ec_lang['lpn_cp_validate']='验证方式';
-$ec_lang['lpn_cp_validate_tip']='验证方式：说明合格数值应具备的形式。大小写规则仅识别英文字母，这是一项已声明的限制。选择"不验证"可接受任何内容。';
+$ec_lang['lpn_cp_validate_tip']='验证方式：有效数值必须具备的格式。大小写规则仅适用于英文字母。选择“不验证”可接受任何数值。';
 $ec_lang['lpn_cp_restrict']='限制这些字符';
-$ec_lang['lpn_cp_restrict_tip']='限制这些字符：数值只能使用此处列出的字符，或者不能使用其中任何字符，其中 "@" 表示任意字母；"#" 表示任意数字，若要允许使用 "-"、"." 和 ","，必须单独列出；空白字符必须夹在其他字符之间。';
+$ec_lang['lpn_cp_restrict_tip']='限制这些字符：';
 $ec_lang['lpn_cp_restrict_mode']='允许或限制';
 $ec_lang['lpn_cp_restrict_mode_tip']='允许或限制：给定的字符要么是数值唯一可以使用的字符，要么是数值不能使用的字符。';
 $ec_lang['lpn_cp_restrict_allow']='仅允许这些字符';
@@ -2637,14 +2637,14 @@ $ec_lang['lpn_scenario_base']='基础';
 // routed around, and it says ownership without implying difference. Seven languages had already
 // chosen exactly this family unprompted (fr personnalisees, it personalizzati, es exclusivos,
 // pt individuais, ar mukhassasa, fa ekhtesasi, ro specifice).
-$ec_lang['lpn_scenario_overrides']='自有数值数';
+$ec_lang['lpn_scenario_overrides']='覆盖值个数';
 // ROADMAP Task 512. The amber ring was designed, correct, and silent: two independent users read it
 // as a stuck highlight they could not turn off. These two strings are the ring's own explanation and
 // the readout's, so neither requires clicking the element to find out what is going on.
 // {name} is the active scenario's display name -- the ring is a fact about WHICH SCENARIO is
 // showing, not a state of the element, and naming the scenario is what makes that recoverable.
-$ec_lang['lpn_scenario_mark_tip']='琥珀色圆环表示此元件持有仅属于方案“{name}”的数值。';
-$ec_lang['lpn_scenario_overrides_tip']='每一个这样的数值都会在地图上以琥珀色圆环标出。切换到{base}即可查看没有这些数值的图纸。';
+$ec_lang['lpn_scenario_mark_tip']='琥珀色圆环表示此元件在方案 {name} 中有覆盖值。';
+$ec_lang['lpn_scenario_overrides_tip']='每个覆盖值在地图上以琥珀色圆环标出。切换到{base}或另一个父方案，即可查看没有这些覆盖值的图纸。';
 $ec_lang['lpn_scenario_menu']='情景';
 $ec_lang['lpn_scenario_tip']='图中当前显示、页面正在求解的这套数值。点击可切换方案，或新建、重命名、删除方案。';
 $ec_lang['lpn_scenario_new']='新建方案…';
@@ -2652,25 +2652,25 @@ $ec_lang['lpn_scenario_new_name']='方案 {n}';
 $ec_lang['lpn_scenario_prompt_name']='该方案的名称';
 $ec_lang['lpn_scenario_rename']='重命名方案…';
 $ec_lang['lpn_scenario_delete']='删除方案';
-$ec_lang['lpn_scenario_delete_confirm']='删除方案"{name}"及其专属的 {n} 个数值？图形本身不会改变。';
-$ec_lang['lpn_scenario_override']='仅限本方案';
+$ec_lang['lpn_scenario_delete_confirm']='删除方案 {name} 及其 {n} 个覆盖值？图纸本身不会更改。';
+$ec_lang['lpn_scenario_override']='在本方案中覆盖';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_scenario_override_tip']='勾选表示该数值仅属于本方案，即使其数值与基础方案相同。取消勾选可重新使用基础方案的数值。';
+$ec_lang['lpn_scenario_override_tip']='勾选表示本方案对此数值覆盖其父方案，即使数字相同。取消勾选则使用其父方案的数值。';
 // "Base scenario", not bare "Base" -- an ENGLISH fix, so this needs no _syn either. This is the one
 // place the polysemy genuinely bites: here the word sits beside a NUMBER, in a field popup with no
 // scenario dropdown nearby to frame it, which is exactly the reading that invites "base amount".
 // The dropdown keeps the short name (lpn_scenario_base); only the exposed use is disambiguated.
 // Same label-versus-sentence distinction that decided the eigenvalue fixes in sprint 316.
 $ec_lang['lpn_scenario_base_value']='基础情景：{value}';
-$ec_lang['lpn_scenario_deactivated']='{id} 在方案"{scenario}"中已移出管网，但仍保留在图中，也仍存在于您的其他方案中。';
+$ec_lang['lpn_scenario_deactivated']='{id} 在 {scenario} 中被排除在管网之外。它仍保留在图纸和其他方案中。';
 $ec_lang['lpn_scenario_push_btn']='将基础方案数值应用于所有方案';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_scenario_push_tip']='所有方案中当前显示标签的属性都将恢复为基础方案的数值，各方案专属的数值将被舍弃。';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_scenario_push_confirm']='使所有方案对这些属性都采用基础方案的数值？各方案专属的数值将被舍弃。此操作可撤销。';
 $ec_lang['lpn_scenario_push_scenarios']='受影响的方案：';
-$ec_lang['lpn_scenario_push_values']='将被舍弃的数值：';
-$ec_lang['lpn_scenario_push_none']='没有任何方案对这些属性拥有自有数值，因此不会有任何变化，也不会舍弃任何数值。';
+$ec_lang['lpn_scenario_push_values']='被舍弃的数值：';
+$ec_lang['lpn_scenario_push_none']='没有任何方案对这些属性覆盖基础方案，因此不会有任何变化。不会舍弃任何内容。';
 $ec_lang['lpn_scenario_preset_flow_static']='1. 流量测试：静态';
 $ec_lang['lpn_scenario_preset_flow_static_tip']='针对设计管网在零流量下的流量测试校准。在此方案中，将所有节点的需水量设为 0。';
 $ec_lang['lpn_scenario_preset_flow_mid']='2. 流量测试：中等';
@@ -2683,11 +2683,11 @@ $ec_lang['lpn_scenario_preset_max_day']='5. 最大日';
 $ec_lang['lpn_scenario_preset_peak_hour']='6. 高峰时段';
 $ec_lang['lpn_scenario_preset_fire_max_day']='7. 消防加最大日';
 $ec_lang['lpn_scenario_preset_fire_max_day_tip']='最大日需水量（倍数 2.0）。请在此方案中运行消防流量分析：它会在此需水量之上，在每个节点叠加消防流量。';
-$ec_lang['lpn_delete_drops_overrides']='删除此元件也会丢弃您各方案中为其保存的 {n} 个数值。是否继续？';
+$ec_lang['lpn_delete_drops_overrides']='删除此元件时，也会删除为其设置的 {n} 个方案覆盖值。是否继续？';
 $ec_lang['lpn_push_base_only']='此操作会更改图形本身，因此只能在"{base}"中执行。请切换到"{base}"后重试。';
-$ec_lang['lpn_field_active']='属于本管网';
+$ec_lang['lpn_field_active']='启用？';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_field_active_tip']='取消勾选此项可使该元件保留在图纸上，但不参与管网：它会以灰色绘制，求解器会忽略它。在方案中，这正是开启或关闭一条拟建管道的方式。';
+$ec_lang['lpn_field_active_tip']='取消勾选此框，元件保留在图纸上但不属于管网：它以灰色绘制，求解器将忽略它。在方案中，管道就是这样开启和关闭的。';
 // ---- Task 412: a Base-wide property SAYS it is Base-wide ----
 // Shown only inside a scenario, on the rows that have no "Only in this scenario" box, so the two
 // states are read the same way. Before this, a Base-wide row was announced by an ABSENCE, and an
@@ -2698,7 +2698,7 @@ $ec_lang['lpn_field_active_tip']='取消勾选此项可使该元件保留在图�
 // cannot compare them.
 $ec_lang['lpn_settings_emitter_exponent']='喷射（漏损）指数';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_settings_emitter_exponent_tip']='EPANET 喷射（漏损）方程中的指数：流量 = 系数 × 压力的该指数次方。它只在某节点带有喷射（漏损）时才会影响结果，目前这意味着该管网是从 EPANET 文件读入的。';
+$ec_lang['lpn_settings_emitter_exponent_tip']='EPANET 用于喷头和漏损的扩散器方程中的指数：流量 = 系数 × 压力的该指数次方。它只影响带有扩散器系数的节点。';
 // The Settings panel's Computation section (Tom, 2026-08-10). "Computation", not "Solver": what the
 // two rows under it decide is the arithmetic the user gets, and "solver" names the internals.
 $ec_lang['lpn_elev_dem_sample']='读取 DEM';
@@ -2706,10 +2706,10 @@ $ec_lang['lpn_elev_dem_sample_tip']='读取此节点处 DEM 的高程，并显�
 $ec_lang['lpn_elev_dem_use']='使用 DEM';
 $ec_lang['lpn_elev_dem_use_tip']='将此节点处 DEM 的高程填入上方的“高程”框，替换其中原有的数值。如果尚未读取 DEM，会先读取。撤销一次即可恢复原值。';
 $ec_lang['lpn_elev_dem_none']='DEM 中没有此节点的高程数据。';
-$ec_lang['lpn_elev_dem_said']='Mapbox DEM 给出的值为 {v} {u}。';
+$ec_lang['lpn_elev_dem_said']='Mapbox DEM 高程：{v} {u}。';
 $ec_lang['lpn_settings_elev_source']='高程来源';
-$ec_lang['lpn_settings_elev_source_tip']='新节点的高程从何而来。地面高程读取自 Mapbox DEM，其分辨率在地球大部分地区约为 30 米，在有更好数据的地方会更精细。';
-$ec_lang['lpn_settings_elev_source_typed']='上方输入的高程';
+$ec_lang['lpn_settings_elev_source_tip']='2026 年 Mapbox DEM 的水平和垂直精度范围：美国为 1–10 米和 <1 米，欧洲和日本为 2–10 米和 1–3 米，全球为 30 米和 10–16 米，两极为 90 米和 >16 米。';
+$ec_lang['lpn_settings_elev_source_typed']='上方';
 $ec_lang['lpn_settings_elev_source_dem']='Mapbox 高程模型（DEM）';
 $ec_lang['lpn_settings_accuracy']='精度';
 // **APPENDED TO EVERY HYDRAULICS TIP, because the box no longer shows the default** (Tom,
@@ -2726,12 +2726,12 @@ $ec_lang['lpn_settings_accuracy']='精度';
 // dev/language-strings.md and guarded by dev/scripts/plain_english_swap_check.php.
 $ec_lang['lpn_settings_default_is']='默认值为 {n}。';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_settings_accuracy_tip']='求解器必须达到多接近才会停止，以流量在相邻两次试算之间仍在变化的幅度衡量。数值越小越精确，耗时也越长。两种求解器都读取同一个框，但各自用不同的总量来衡量这个变化：内置求解器用需水量之和，EPANET 用管道流量之和。留空时，本页面使用比 EPANET 自身默认值更严格的精度。';
+$ec_lang['lpn_settings_accuracy_tip']='求解器停止前必须达到的收敛限值，以相邻两次试算之间流量的总变化量除以连接线中的总流量来衡量。数值越小越精确，耗时越长。';
 $ec_lang['lpn_settings_specific_gravity']='比重';
 $ec_lang['lpn_settings_viscosity']='相对粘度';
 $ec_lang['lpn_settings_viscosity_tip']='流体相对于 20 摄氏度水的粘度。只有在使用达西-韦斯巴赫方法时才会影响结果。';
 $ec_lang['lpn_settings_trials']='最大试算次数';
-$ec_lang['lpn_settings_trials_tip']='求解器在放弃一个无法收敛的管网之前，允许进行的最大试算次数。';
+$ec_lang['lpn_settings_trials_tip']='对无法收敛的管网，求解器停止之前的最大试算次数。';
 // **THE REST OF EPANET'S HYDRAULIC OPTIONS GET A ROW EACH** (Tom, 2026-08-29: *"every setting from
 // EPANET must be added and implemented unless research says otherwise"*). Written in OUR words and
 // not EPANET's -- there is no "Unbalanced" or "DampLimit" on the page, because a name only a person
@@ -2742,11 +2742,11 @@ $ec_lang['lpn_settings_trials_tip']='求解器在放弃一个无法收敛的管�
 // not know which engine is answering cannot tell a control that did nothing from a setting that had
 // no effect. Saying it in the tip is cheaper than a second Settings section, and honest.
 $ec_lang['lpn_settings_unbalanced']='未收敛时的处理方式';
-$ec_lang['lpn_settings_unbalanced_tip']='当管网用完试算次数仍未收敛时该如何处理。允许额外试算通常能够达到收敛。停止会按当前状态报告最后一次试算的结果，这并不是一个解。只有 EPANET 求解器会读取此框。内置求解器总是会停止，并将结果标记为未收敛。';
+$ec_lang['lpn_settings_unbalanced_tip']='对用完试算次数仍未收敛的管网所采取的操作。允许额外试算通常能够达到收敛。停止则按原样报告最后一次试算，这并不是一个解。';
 $ec_lang['lpn_settings_unbalanced_continue']='允许额外试算';
 $ec_lang['lpn_settings_unbalanced_stop']='停止并报告最后一次试算';
 $ec_lang['lpn_settings_unbalanced_trials']='报告前的额外试算次数';
-$ec_lang['lpn_settings_unbalanced_trials_tip']='在用完上方的最大试算次数后，报告最后一次试算结果之前，还允许进行多少次试算。只有 EPANET 求解器会读取此框。';
+$ec_lang['lpn_settings_unbalanced_trials_tip']='用完上方的最大次数后，在报告最后一次试算之前还允许的试算次数。';
 $ec_lang['lpn_settings_head_error']='水头误差限值';
 $ec_lang['lpn_settings_head_error_tip']='求解器停止前必须通过的附加检验：任意一条管道中剩余的最大水头误差。设为零表示不进行此项检验。只有 EPANET 求解器会读取此框。';
 $ec_lang['lpn_settings_flow_change']='流量变化限值';
@@ -2756,8 +2756,8 @@ $ec_lang['lpn_settings_damp_limit']='阻尼启动精度';
 $ec_lang['lpn_settings_damp_limit_tip']='求解器开始采用更小步长的精度阈值，这有助于振荡的管网收敛。设为零表示求解器永不启用阻尼。只有 EPANET 求解器会读取此框。';
 $ec_lang['lpn_settings_option_unset']='未设置';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_settings_demand_multiplier_tip']='同时应用于管网中每一处需水量的单一系数。用它来考察系统在高于或低于当前用水量时的表现。它不会改变您输入的数字。一个方案可以拥有自己的倍数，因此平均日、最大日和高峰小时可以各自对应一个数字；在方案中将其留空即表示沿用本项目的数值。';
-$ec_lang['lpn_settings_engine_native']='使用 EPANET 求解器计算';
+$ec_lang['lpn_settings_demand_multiplier_tip']='同时应用于管网中每项需水量的单一系数。每个方案可以有单独的数值，因此只需更改此设置，即可建立平均日、最大日或高峰小时工况。';
+$ec_lang['lpn_settings_engine_native']='尽可能使用内置求解器';
 // **THIS TIP NO LONGER ARGUES THE TWO SOLVERS AGAINST EACH OTHER** (Task 605, Tom 2026-09-06:
 // *"We scrub our tips and alerts for any undue weight on the existence of two solvers."*). It
 // spent three sentences on speed and on the two measured disagreements -- minor losses 0.08%
@@ -2776,9 +2776,9 @@ $ec_lang['lpn_engine_failed']='无法加载 EPANET 求解器，改用内置求�
 // Said out loud, never silently: the user picked the built-in solver and this network was sent to
 // the EPANET solver anyway, because it holds a valve the built-in solver does not calculate. The
 // setting is not changed, so removing the valve puts the page straight back on the chosen engine.
-$ec_lang['lpn_engine_valve_route']='因以下阀门会自行开闭，本次求解使用了 EPANET 求解器：';
-$ec_lang['lpn_unit_unknown']='此图纸中标明的单位 {unit} 不是本页面提供的单位。所有内容均按原样保留和显示，未作任何更改。在本页面识别该单位之前无法给出结果，因为无法判断其大小。';
-$ec_lang['lpn_engine_manning_note']='注意：使用曼宁糙率时，EPANET 计算出的水头损失比内置求解器约低 0.6%。';
+$ec_lang['lpn_engine_valve_route']='因以下压力和流量控制阀，本次使用 EPANET 求解器求解：';
+$ec_lang['lpn_unit_unknown']='此图纸中标明的单位 {unit} 本页面不支持。所有数值均按导入时的原样保留和显示，未作任何更改。在本页面支持该单位之前无法进行任何计算，因为其换算系数未知。';
+$ec_lang['lpn_engine_manning_note']='注意：使用曼宁糙率时，EPANET 对曼宁方程中的常数取整，因此水头损失比精确形式约低 0.6%。';
 // ---- EPANET said no (ROADMAP Task 471) -------------------------------------------------------
 // Three sentences for three different facts, on the model of lpn_unit_unknown: what would not
 // happen, what the solver itself objected to, and where the numbers on screen actually came from.
@@ -2812,7 +2812,7 @@ $ec_lang['lpn_settings_link_width']='管道线宽（像素）';
 // the label cannot say, which are that the arrows only appear once there are results and that the
 // setting travels with the project.
 $ec_lang['lpn_settings_show_arrows']='流向箭头';
-$ec_lang['lpn_settings_show_arrows_tip']='在每条管道上绘制箭头，显示水流方向。箭头会在运行后出现，关闭此项不会改变计算结果。此设置会随项目一起保存。';
+$ec_lang['lpn_settings_show_arrows_tip']='在每条管道上绘制箭头，显示水流方向。箭头在运行后出现，关闭箭头不会改变结果。';
 $ec_lang['lpn_settings_align_labels']='管道标签与管道对齐';
 $ec_lang['lpn_settings_readability_bias']='标签向左偏离竖直方向超过多少度时上下翻转（度）';
 $ec_lang['lpn_settings_readability_bias_tip']='当标签向左偏离竖直方向超过此角度时，将其上下翻转，使其保持正向朝上。';
@@ -2939,8 +2939,8 @@ $ec_lang['lpn_time_report_start']='报告起始时间';
 $ec_lang['lpn_time_clock_start']='起始时刻的时钟时间';
 $ec_lang['lpn_time_clock_day']='第 {day} 天，{clock}';
 $ec_lang['lpn_time_format_tip']='请以小时和分钟的形式输入时间，例如 2:30。单独一个数字表示小时，例如 8 表示 8 小时。半小时可写作 0:30。';
-$ec_lang['lpn_time_running']='正在使用 EPANET 求解器计算延时模拟。';
-$ec_lang['lpn_time_no_engine']='内置求解器一次只能算出一个时刻，因此这里显示的仅是 {time} 时刻的管网状态：每个模式都按该时刻取值，每个水箱仍处于起始水位，而不会随时间充放水。请连接一次互联网以获取 EPANET 求解器，它可以运行延时模拟。';
+$ec_lang['lpn_time_running']='正在运行延时模拟。';
+$ec_lang['lpn_time_no_engine']='内置求解器一次只求解一个时刻，因此这仅是 {time} 时刻的管网：所有模式都按该时刻读取，所有水箱都保持初始水位，而不会充水和放水。联网一次以下载可运行延时模拟的 EPANET 求解器。';
 $ec_lang['lpn_time_slider']='已用模拟时间';
 $ec_lang['lpn_time_no_period']='此项目未设置延时模拟，因此只有一个时刻可以显示。请在“设置”、“计算”、“时间”中设置总运行时长，以运行延时模拟。';
 $ec_lang['lpn_time_first']='跳到开始';
@@ -2972,10 +2972,10 @@ $ec_lang['lpn_time_runbox_hide']='不再显示此框';
 $ec_lang['lpn_settings_runbox']='显示运行进度框';
 $ec_lang['lpn_settings_runbox_tip']='一个用于报告运行进度及其结果的框。关闭此项后，运行完成时会改为在状态栏中显示相同的信息，持续几秒钟。这是针对本浏览器的设置，而非项目的设置。';
 $ec_lang['lpn_time_run_failed']='运行未能完成，因此没有后续时刻的结果。';
-$ec_lang['lpn_time_run_report']='EPANET 运行报告';
+$ec_lang['lpn_time_run_report']='运行报告';
 $ec_lang['lpn_time_run_report_copy']='复制';
 $ec_lang['lpn_time_run_report_copied']='已复制';
-$ec_lang['lpn_time_run_report_tip']='EPANET 求解器就上一次运行自行输出的内容：是否收敛，以及它给出的任何警告。这是求解器自己的原文，并非本页面撰写。';
+$ec_lang['lpn_time_run_report_tip']='EPANET 为上一次运行写出的报告原文：是否收敛，以及任何警告。该文本由 EPANET 求解器生成，而非本页面。';
 
 $ec_lang['lpn_time_speed']='速度';
 $ec_lang['lpn_time_speed_tip']='回放速度';
@@ -3054,14 +3054,14 @@ $ec_lang['lpn_quality_needs_run']='水质会随着水流沿管道传播，因此
 $ec_lang['lpn_quality_chemical_name']='化学物质及单位';
 $ec_lang['lpn_quality_chemical_name_tip']='您正在追踪的化学物质，例如氯。留空则使用 EPANET 自身的默认标签 Chemical。会显示在您的报告中，但不用于计算。';
 $ec_lang['lpn_quality_mass_units']='质量单位';
-$ec_lang['lpn_quality_mass_units_tip']='水质输入中的单位部分，是 EPANET 自身提供的两种选择。';
+$ec_lang['lpn_quality_mass_units_tip']='水质输入的单位部分，取自 EPANET 的两种选择。';
 $ec_lang['lpn_quality_unit_ug']='µg/L';
 // R-322: "Quality tolerance: I don't see this in our interface. Is it missing?" "Relative
 // diffusivity: I don't see this in our interface. Is it missing?" Both were carried in the file
 // and handed to the engine with no box to read or change them from; EPANET's own names and its own
 // defaults (0.01 and 1.0), shown only for a chemical, which is all either one means anything to.
 $ec_lang['lpn_quality_tolerance']='水质容差';
-$ec_lang['lpn_quality_tolerance_tip']='两个相邻水体在浓度上相差多少之内，EPANET 仍会将它们视为同一个。留空则使用 EPANET 自身的默认值 0.01。';
+$ec_lang['lpn_quality_tolerance_tip']='低于该浓度差时，EPANET 将两个相邻水体视为一个。留空则使用 EPANET 的默认值 0.01。';
 $ec_lang['lpn_quality_diffusivity']='相对扩散系数';
 $ec_lang['lpn_quality_diffusivity_tip']='该化学物质在水中扩散的难易程度，相对于氯而言。留空则使用 EPANET 自身的默认值 1.0。';
 // R-323: "We could put it in Properties, Find, and Tables as '{chemical} concentration', and that
@@ -3072,10 +3072,10 @@ $ec_lang['lpn_quality_named_concentration']='{chemical} 浓度';
 $ec_lang['lpn_quality_named_avg_concentration']='平均 {chemical} 浓度';
 $ec_lang['lpn_quality_initial']='初始水质';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_quality_initial_tip']='运行开始时该节点所含化学物质的量。水库在整个运行期间保持自己设定的数值不变，这通常用于表示水厂出水口的余量。留空则该节点在运行开始时不含该化学物质。';
+$ec_lang['lpn_quality_initial_tip']='运行开始时该节点处化学物质的量。水库在整个运行期间保持该值，水厂出水的余量通常就是这样表述的。留空表示 0。';
 $ec_lang['lpn_result_concentration']='浓度';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_result_concentration_tip']='该化学物质经过传输和反应后，在此处剩余的量。单位与“设置”、“水质”中该化学物质旁标注的单位相同。';
+$ec_lang['lpn_result_concentration_tip']='该化学物质经过传输和反应后，在此处剩余的量。单位与“设置”、“计算”、“水质”中随化学物质名称输入的单位相同。';
 // **THE BOOSTER DOSE AND THE TANK MIXING MODEL** (ROADMAP Task 579), EPANET's `[SOURCES]` and
 // `[MIXING]`. EPANET's own words throughout, and its own four source types and four mixing models,
 // because an engineer choosing between them is choosing between real pieces of equipment and real
@@ -3093,7 +3093,7 @@ $ec_lang['lpn_source_type_setpoint']='设定值投加';
 $ec_lang['lpn_source_type_flowpaced']='随流投加';
 $ec_lang['lpn_source_quality']='投加浓度';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_source_quality_tip']='投加强度。除质量投加外，其余类型均为浓度，单位与“设置”、“水质”中该化学物质旁标注的单位相同；质量投加则为每分钟投加的化学物质质量。留空表示此处不投加，这与数值为零不同：数值为零表示投加装置在运行，只是投加量为零。';
+$ec_lang['lpn_source_quality_tip']='投加强度。除质量投加外，其余类型均为浓度，单位与“设置”、“计算”、“水质”中该化学物质旁标注的单位相同；质量投加则为每分钟的质量流量。留空表示没有化学物质水源，在功能上等同于 0。';
 $ec_lang['lpn_source_pattern']='投加模式';
 $ec_lang['lpn_source_pattern_tip']='在运行过程中调整投加量的时间模式，用于投加量并非恒定的情形。不设置模式表示每个时间步的投加量都相同。';
 $ec_lang['lpn_mixing_model']='混合模型';
@@ -3107,7 +3107,7 @@ $ec_lang['lpn_mixing_fraction']='混合分区比例';
 $ec_lang['lpn_mixing_fraction_tip']='进水区占水箱容积的比例，取值在 0 到 1 之间。只有“两分区混合”会用到它。留空则整个水箱都是进水区，这也是 EPANET 的默认假设。';
 $ec_lang['lpn_reaction_bulk']='水体反应系数';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_reaction_bulk_tip']='水体本身发生的反应，用于所有未单独设置该系数的管道。负值表示化学物质衰减，正值表示其增加。除非导入的 EPANET 文件另行说明反应级数，否则反应按一级反应处理，因此该系数是以 1/天 为单位的速率。留空表示没有水体反应。';
+$ec_lang['lpn_reaction_bulk_tip']='水体本身的反应（见 EPANET 帮助），用于所有没有单独系数的管道和水箱。负值表示化学物质衰减，正值表示其增加。留空表示没有水体反应。';
 $ec_lang['lpn_reaction_wall']='管壁反应系数';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_reaction_wall_tip']='在管壁处发生的反应，用于所有未单独设置该系数的管道。负值表示化学物质衰减。除非导入的 EPANET 文件另行说明反应级数，否则反应按一级反应处理，因此该系数以项目所用长度单位表示的“长度/天”为单位。留空表示没有管壁反应。';
@@ -3117,7 +3117,7 @@ $ec_lang['lpn_reaction_pipe_tip']='仅适用于此管道。留空则该管道采
 // stands in is a tank's, so the word "tank" would only be said twice.
 $ec_lang['lpn_reaction_tank']='反应系数';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_reaction_tank_tip']='此水箱中所存水的反应，以 1/天 为单位的速率表示。负值表示化学物质衰减，正值表示其增长。水在水箱中停留的时间远长于在任何管道中的停留时间，因此余量往往在这里损失。留空则该水箱采用“设置”、“水质”中为全网设置的水体反应系数。';
+$ec_lang['lpn_reaction_tank_tip']='此水箱中所存水的反应，以 1/天 为单位的速率表示。负值表示化学物质衰减，正值表示其增加。水在水箱中停留的时间远长于在任何管道中的停留时间，因此余量往往在这里损失。留空则采用“设置”、“计算”、“水质”中为整个管网设置的水体反应系数。';
 // Three column headings, in tables whose tab already says what the parts are. Column width is king,
 // so each drops the word "coefficient" that the popup label carries in full.
 $ec_lang['lpn_reaction_bulk_short']='水体反应';
@@ -3177,24 +3177,24 @@ $ec_lang['lpn_settings_energy']='能耗';
 // lpn_time_run_report keep the word and lpn_energy_menu and lpn_reports_epanet do not.
 $ec_lang['lpn_reports_menu']='报告';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_reports_epanet']='EPANET 运行';
+$ec_lang['lpn_reports_epanet']='运行';
 $ec_lang['lpn_energy_title']='水泵能耗报告';
 $ec_lang['lpn_energy_menu']='水泵能耗';
 $ec_lang['lpn_energy_efficiency']='水泵效率（百分比）';
 $ec_lang['lpn_energy_efficiency_tip']='用于所有未自带效率曲线的水泵的线到水效率。若未设置，EPANET 使用 75%。';
 $ec_lang['lpn_energy_price']='电价';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_energy_price_tip']='每千瓦时的电费。适用于所有未单独设置电价的水泵。留空则报告中的所有费用均为零。';
+$ec_lang['lpn_energy_price_tip']='每千瓦时的费用。适用于所有没有单独价格的水泵。留空表示 0。';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_energy_pump_price_tip']='此水泵所用的每千瓦时电费。留空则该水泵采用“设置”、“能耗”中为全网设置的电价。';
 $ec_lang['lpn_energy_price_pattern']='电价模式';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_energy_price_pattern_tip']='在每个模式时间步对电价进行倍乘的模式，用于表示低谷电价等情形。留空则整个运行期间使用同一电价。';
 $ec_lang['lpn_energy_demand_charge']='峰值需量电费';
-$ec_lang['lpn_energy_demand_charge_tip']='供电单位针对系统中水泵所需峰值负荷，按每千瓦收取的费用。';
+$ec_lang['lpn_energy_demand_charge_tip']='每千瓦的费用，按水泵所需的峰值负荷计';
 $ec_lang['lpn_energy_currency']='货币';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_energy_currency_tip']='您在此处填写的内容会显示在每个金额数字旁边，仅作为标签使用。价格和费用不会被换算，因此请按您在此处填写的货币单位书写价格。';
+$ec_lang['lpn_energy_currency_tip']='印在每个费用数值旁的文字，仅作标签；全程使用同一种货币。';
 $ec_lang['lpn_energy_kwh']='千瓦时';
 $ec_lang['lpn_energy_kw']='千瓦';
 // Edited by TGH 2026-09-07
@@ -3207,7 +3207,7 @@ $ec_lang['lpn_energy_no_pumps']='此管网中没有水泵，因此没有任何�
 // re-keying are lpn_scenario_label and lpn_scenario_overrides, which already name the same two
 // things in the scenario menu.
 $ec_lang['lpn_scncmp_title']='方案对比';
-$ec_lang['lpn_scncmp_menu_tip']='求解本项目中的每一个方案，并将它们并排显示：各方案中的最低压力和最高流速。';
+$ec_lang['lpn_scncmp_menu_tip']='方案表，列出差异个数、最低压力和最高流速';
 $ec_lang['lpn_scncmp_running']='正在求解每一个方案…';
 $ec_lang['lpn_scncmp_empty']='尚未绘制任何内容，因此没有可求解的对象。';
 $ec_lang['lpn_scncmp_col_maxvelocity']='最高流速';
@@ -3237,10 +3237,10 @@ $ec_lang['lpn_energy_total_cost']='总费用';
 // **THE ROW SAYS "Status", NOT "Status report"** -- the Reports fly-out carries the word so no row
 // has to (js/looped-network.js:4630's own rule, already followed by "EPANET run"). The box title,
 // lpn_status_title, keeps the full name.
-$ec_lang['lpn_reports_status']='状态';
-$ec_lang['lpn_reports_status_tip']='上一次延时模拟期间按时间顺序发生的变化：水泵和阀门的开启或关闭，水箱的充水、放水、充满或排空，以及未能完全收敛的步骤。';
-$ec_lang['lpn_status_title']='状态报告';
-$ec_lang['lpn_status_needs_run']='状态报告列出延时模拟期间发生的变化。请在“设置”、“计算”、“时间”中设定“总运行时长”，按“计算”，然后打开“水力”、“报告”、“状态报告”。';
+$ec_lang['lpn_reports_status']='状态变化';
+$ec_lang['lpn_reports_status_tip']='按时间顺序列出的状态变化，读取自上一次延时模拟的 EPANET 时间步：水泵和阀门的开启或关闭，水箱的充水、放空、充满或排干，以及未完全收敛的步骤。';
+$ec_lang['lpn_status_title']='状态变化';
+$ec_lang['lpn_status_needs_run']='状态报告列出延时模拟期间发生的变化。请在“设置”、“计算”、“时间”中设定总运行时长，按“计算”，然后打开“水务”、“报告”、“状态变化”。';
 $ec_lang['lpn_status_empty']='本次运行期间没有状态发生变化。';
 $ec_lang['lpn_status_col_event']='事件';
 $ec_lang['lpn_status_opened']='{type} {id} 刚刚开启';
@@ -3254,7 +3254,7 @@ $ec_lang['lpn_status_note']='读取自与“表格”面板和“完整报告”
 
 // Same rule as Status above: the row says "Full", the box says "Full report".
 $ec_lang['lpn_reports_full']='完整';
-$ec_lang['lpn_reports_full_tip']='上一次运行中每个报告时刻下的每个节点和每条连接线，汇总为一个可下载或打印的表格。';
+$ec_lang['lpn_reports_full_tip']='上一次运行中每个报告时间步下所有节点和连接线的表格';
 $ec_lang['lpn_full_title']='完整报告';
 $ec_lang['lpn_full_needs_run']='完整报告列出每个报告时刻下的每个节点和每条连接线。请按“计算”，然后打开“水力”、“报告”、“完整报告”。';
 $ec_lang['lpn_full_note']='每个报告时刻下的每个节点或连接线各占一行，单位与“表格”面板中显示的相同。空白单元格表示该量没有此列的数值。下载或打印包含所有时刻；下方表格一次只显示一个时刻。';
@@ -3317,7 +3317,7 @@ $ec_lang['lpn_library_menu']='库';
 $ec_lang['lpn_library_patterns']='模式';
 $ec_lang['lpn_library_patterns_tip']='模式是一组循环重复的乘数。每个乘数适用于一个模式时间步；例如以 1 小时为步长的 24 个数字构成一个循环的一天。需水量为 10、乘数为 1.5 时，该时刻的需水量即为 15。';
 $ec_lang['lpn_library_curves']='曲线';
-$ec_lang['lpn_library_curves_tip']='曲线是一组说明某项性能的数据点：例如水泵在各流量下增加多少水头、在该流量下效率多高，或阀门在各流量下损失多少水头。';
+$ec_lang['lpn_library_curves_tip']='水泵水头或效率与流量的关系、阀门损失与流量的关系，或水箱容积与水深的关系';
 // **CURVES IS AN EDITOR** (Task 586). It was a read-only report about pumps until the curves became
 // document objects of their own, and the note said so; it now says what the box does and where a
 // curve is pointed at an element from.
@@ -3391,7 +3391,7 @@ $ec_lang['lpn_pipetype_detach_tip']='将此管道从其类型读取的数值复�
 // additive-K method, which is what Bentley's Minor Loss Collection and KYPipe's SigmaM both offer.
 // Bound by id like the pipe types above it, and for the same Bentley finding.
 $ec_lang['lpn_library_fittings']='管件';
-$ec_lang['lpn_library_fittings_tip']='管件清单是一组管件及其数量，多条管道均可引用。它们汇总为一个局部水头损失系数。';
+$ec_lang['lpn_library_fittings_tip']='带有局部损失系数的管件，按清单分组';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_library_fittings_note']='每个项目都有自己的管件库。管件清单中每种管件都有对应的数量，并汇总为一个局部水头损失系数。管道和管道类型均可引用同一份清单。';
 // **WHERE THE OFFERED NUMBERS CAME FROM, STATED TO THE READER RATHER THAN ONLY IN THE SOURCE.** An
@@ -3477,10 +3477,10 @@ $ec_lang['lpn_fitting_other']='其他管件';
 $ec_lang['lpn_inp_export_flat_heading']='已保存 {file}';
 $ec_lang['lpn_inp_export_flat_lead']='导出的 EPANET 文件在数值上与本项目等效，但它无法容纳以下内容：';
 $ec_lang['lpn_inp_export_flat_types']='此处有 {n} 条管道引用了 {t} 种管道类型。在文件中，每条管道都会各自携带一份完整的数值副本，因此计算结果不变。文件无法保留管道类型本身，因此“编辑一个定义即可让所有引用它的管道随之改变”这一特性，只有您自己的项目文件才能记录。';
-$ec_lang['lpn_inp_export_flat_coords']='EPANET 文件为每个节点只保存一个位置。本方案将其中 {n} 个节点放在了别处，文件中保存的就是这些位置。其他每个方案的位置仅保留在您自己的项目文件中。';
+$ec_lang['lpn_inp_export_flat_coords']='EPANET 文件为每个节点只保存一个位置。本方案将其中 {n} 个节点放在了别处，文件中保存的就是这些位置。其他每个方案的位置仅保留在项目文件中。';
 $ec_lang['lpn_inp_export_flat_fittings']='EPANET 文件无法保留项目文件中弯头、阀门和三通的清单。此处有 {n} 条管道的局部损失系数是由管件清单汇总得出的。汇总值会原样写入文件，因此计算结果不受影响。';
 $ec_lang['lpn_library_controls']='控制规则';
-$ec_lang['lpn_library_controls_tip']='控制规则是一句话：当水位、压力或时间达到指定条件时，开启或关闭某条连接线，或为其设定数值。';
+$ec_lang['lpn_library_controls_tip']='控制是一条语句，根据水箱水位、节点压力或时间，开启或关闭某条连接线，或更改其设定值。';
 // A verb and its object, not a bare "Add": a bare imperative is the hardest kind of string to
 // translate well, and there are two of these buttons a few centimetres apart.
 $ec_lang['lpn_library_pattern_add']='添加模式';
@@ -3503,10 +3503,10 @@ $ec_lang['lpn_library_control_bad']='⚠ 未能理解';
 $ec_lang['lpn_library_control_missing']='⚠ 此管网中没有名为 {id} 的对象';
 $ec_lang['lpn_library_rules']='规则';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_library_rules_tip']='规则是一小段文字，当水位、压力、流量或时间达到您设定的数值时，用来打开或关闭一条连接线，或为其设定一个数值。规则可以同时测试多个条件，也可以说明测试失败时该怎么做。';
+$ec_lang['lpn_library_rules_tip']='规则在水位、压力、流量或时间达到设定值时，开启或关闭某条连接线，或更改其设定值。规则可以测试多个条件，并可指明条件为假时应采取的操作。';
 $ec_lang['lpn_library_rule_add']='添加规则';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_library_rule_tip']='使用 EPANET 的写法书写一条规则，每行一个子句。第一行为其命名：RULE 1。接着是条件：IF TANK 2 LEVEL BELOW 17.1。然后是应采取的操作：THEN PUMP 9 STATUS IS OPEN。最后一行可以设定优先级：PRIORITY 1。使用 AND 或 OR 行来测试多个条件，使用 ELSE 行来说明测试失败时该怎么做。条件可以读取节点上的 LEVEL、HEAD、GRADE、PRESSURE 或 DEMAND，连接线上的 FLOW、STATUS 或 SETTING，或者 SYSTEM 上的 TIME 和 CLOCKTIME。数值请按本项目当前显示的单位书写，会自动为您换算。关键字请保留英文原样，它们是本页面和 EPANET 所识别的内容。';
+$ec_lang['lpn_library_rule_tip']='每行一个子句。下面说明并附有以大写字母书写的示例。第 1 行：规则名称，“RULE 1”。第 2 行：条件，“IF TANK 2 LEVEL BELOW 17.1”。第 3 行：操作，“THEN PUMP 9 STATUS IS OPEN”。第 4 行：优先级，“PRIORITY 1”。添加“AND”或“OR”行可测试多个条件，添加“ELSE”行可指明条件为假时的操作。条件可以读取节点上的 LEVEL、HEAD、GRADE、PRESSURE 或 DEMAND，连接线上的 FLOW、STATUS 或 SETTING，或者 SYSTEM 上的 TIME 和 CLOCKTIME。请使用一致的项目单位。关键字必须使用英文。';
 $ec_lang['lpn_library_rule_ok']='✓ 已读取此规则';
 $ec_lang['lpn_library_rule_bad']='⚠ 无法读取此规则';
 // PER JUNCTION, so it is in the property popup and not in this box -- the Settings rule ("if it is
@@ -3524,7 +3524,7 @@ $ec_lang['lpn_field_base_demand']='基本需水量';
 // junction. The first sentence is his wording verbatim; the second is the one that was already
 // there and is untouched, because it says the other thing this tip exists for -- that the number
 // is a RESULT and not a field. The key has never been translated, so the reword cost nothing.
-$ec_lang['lpn_result_demand_tip']='此节点在当前时间步的取水流量：每个基本需水量乘以其各自的模式值后相加得出。该数值是计算得出的，不能手动输入，因此会随时钟变化，也无法编辑。';
+$ec_lang['lpn_result_demand_tip']='此节点在所示时间步的取水流量：每个基本需水量乘以其各自的模式后相加得出。它是结果，而不是输入。';
 $ec_lang['lpn_field_demand_pattern']='需水模式';
 // A JUNCTION’S DEMAND IS A LIST (Task 468). The PATTERN says what KIND of user this is
 // (“residential”); the CATEGORY says WHO it is (“Elm Acres”). Nothing validates a category and there
@@ -3537,9 +3537,9 @@ $ec_lang['lpn_demand_remove']='删除此项需水量';
 $ec_lang['lpn_field_head_pattern']='水头模式';
 $ec_lang['lpn_field_head_pattern_tip']='此水库的水位在运行期间如何升降变化。上方的水头会乘以该模式的乘数。';
 $ec_lang['lpn_field_pump_speed']='相对转速';
-$ec_lang['lpn_field_pump_speed_tip']='1 表示此水泵以其曲线测定时的转速运转。0.9 表示同一水泵转速较慢，因而降低其增加的水头和通过的流量。运行期间，转速模式会取代此处的数值。';
+$ec_lang['lpn_field_pump_speed_tip']='相对于生成其公布性能曲线时所用的转速。如果有转速模式，则忽略此值（不按其缩放）。';
 $ec_lang['lpn_field_speed_pattern']='转速模式';
-$ec_lang['lpn_field_speed_pattern_tip']='此水泵的转速在运行期间如何升降。每个乘数就是该时段的相对转速，它会取代“转速设定值”而非按比例缩放，因此乘数为 0 时水泵停止运转。';
+$ec_lang['lpn_field_speed_pattern_tip']='模式的每个条目给出运行中相应时段的相对转速，而不是按比例缩放某个基准值。';
 
 // ---- place-name search and terrain elevations (Task 507) ---------------------------------------
 // Both features ask an outside service for something, and each asks its own permission question
@@ -3554,7 +3554,7 @@ $ec_lang['lpn_field_speed_pattern_tip']='此水泵的转速在运行期间如何
 // one wall, and the order of the paragraphs stays ours rather than the translation's.
 $ec_lang['lpn_search_menu']='按名称搜索地点…';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_search_tip']='按名称查找城镇、地址或地标，并将地图移动到该处。首次使用时会请求您的许可，因为您输入的文字会发送到 OpenStreetMap 的地名服务。';
+$ec_lang['lpn_search_tip']='首次使用时会请求许可，因为搜索内容会发送到 OpenStreetMap 地名服务。';
 $ec_lang['lpn_search_bar']='按名称搜索…';
 // The four paragraphs of the ask: what is sent and to whom; why this is a separate question from
 // the map pictures; the question itself; and what a no costs (nothing).
@@ -3573,7 +3573,7 @@ $ec_lang['lpn_search_badchoice']='该数字不在列表之中。';
 $ec_lang['lpn_search_none']='未找到该名称对应的地点。';
 // Five different failures, five different next actions. Keep them distinct in translation too --
 // "search failed" for all five is exactly what this set exists to avoid.
-$ec_lang['lpn_search_rate']='地名服务要求我们放慢请求速度。请稍候一分钟后重试。';
+$ec_lang['lpn_search_rate']='地名服务已限制请求速率。请等待一分钟后重试。';
 $ec_lang['lpn_search_http']='地名服务返回了一个错误。';
 $ec_lang['lpn_search_timeout']='地名服务未能及时响应。本页面的其他功能不受影响，仍可正常使用。';
 $ec_lang['lpn_search_unreadable']='地名服务返回的内容本页面无法解析。';
@@ -3582,7 +3582,7 @@ $ec_lang['lpn_search_toofast']='地名服务限制每秒最多一次搜索。请
 $ec_lang['lpn_search_nofetch']='此浏览器无法连接到地名服务。';
 // Shown three times -- the menu tip, the confirm and the result notice -- so that the three cannot
 // drift into three different claims about the same data. One sentence, translated once.
-$ec_lang['lpn_terrain_accuracy']='Mapbox 是从许多公开的高程数据集拼合而成的，因此其精度完全取决于您所在的位置。在存在国家级激光雷达测量的地区，例如美国大部分地区的 USGS 3DEP 及其他地区的同类数据，精度可以优于水平 1 米、垂直几十厘米。而在只有全球数据的地区，精度约为水平 30 米、垂直数米。Mapbox 并不会告诉我们您得到的是哪一种。请将其当作等高线图而非实测成果：对任何您要依赖的数值都请自行核实。';
+$ec_lang['lpn_terrain_accuracy']='Mapbox 是从许多公开的高程数据集拼合而成的，因此其精度取决于位置。在存在国家级激光雷达测量的地区，例如美国大部分地区的 USGS 3DEP 及其他地区的同类数据，精度可以优于水平 1 米、垂直零点几米。而在只有全球数据的地区，精度约为水平 30 米、垂直数米。Mapbox 不会说明适用哪一种数据源。请将其视为等高线图而非测量成果，并对设计所依赖的任何数值进行核实。';
 $ec_lang['lpn_terrain_consent_1']='填入高程会将每个需要高程的节点位置——其纬度和经度——发送到 api.mapbox.com，以查询该处的地面高度。';
 $ec_lang['lpn_terrain_consent_2']='这与您项目背后的地图图片是不同的问题。图片只显示您在查看哪里，而这些位置本身就是您的管网。Mapbox 将会收到这些坐标和您的 IP 地址。我们不会发送任何其他内容：没有名称、没有管道数据、没有项目内容。我们不保留任何记录，除了您对本问题的回答之外，本设备上不会保存任何内容。';
 $ec_lang['lpn_terrain_consent_3']='我们可以将您的节点位置发送给 Mapbox 吗？';
@@ -3596,7 +3596,7 @@ $ec_lang['lpn_terrain_confirm_default_2']='要用 Mapbox DEM 的数值替换这 
 $ec_lang['lpn_terrain_keep']='{k} 个节点已有高程，将不会被改动。';
 $ec_lang['lpn_terrain_undo']='一次撤销（Ctrl-Z）即可将它们全部恢复。';
 $ec_lang['lpn_terrain_requests']='{n} 次请求发往 api.mapbox.com。';
-$ec_lang['lpn_terrain_busy']='正在填入高程，请稍候。';
+$ec_lang['lpn_terrain_busy']='正在填入高程。请等待其完成。';
 $ec_lang['lpn_terrain_offmap']='这些节点的位置不在地形图范围内，因此未发送任何内容。';
 $ec_lang['lpn_terrain_too_wide']='这些节点分布范围过大，无法一次性读取（需要 {n} 次图块请求）。未发送任何内容。';
 $ec_lang['lpn_terrain_cancelled']='未作任何更改，也未发送任何内容。';
@@ -3607,7 +3607,7 @@ $ec_lang['lpn_terrain_denied']='地形服务拒绝了此请求（{status}），�
 $ec_lang['lpn_terrain_failed']='无法连接到地形服务，因此未更改任何高程。您可能已离线。本页面的其他功能不受影响，仍可正常使用。';
 // A 429 is the service asking us to slow down. It is not a refusal and not a lost network, so it
 // gets its own sentence: the same request works in a minute.
-$ec_lang['lpn_terrain_rate_limited']='地形服务要求我们放慢请求速度（429），因此未更改任何高程。请稍后再试。';
+$ec_lang['lpn_terrain_rate_limited']='地形服务已限制请求速率（429），因此未更改任何高程。请一分钟后重试。';
 // Any other status the service sent back. {status} is that number.
 $ec_lang['lpn_terrain_http']='地形服务返回了一个错误（{status}），因此未更改任何高程。您的管网本身没有问题。';
 // Said when the nodes asked about have no position on the Earth at all, which is what a projected
@@ -3635,23 +3635,23 @@ $ec_lang['lpn_terrain_ids_more']='{ids}，以及另外 {n} 个';
 // {id} a junction or pipe name, and {done}, {total}, {n}, {pass}, {fail}, {design} and {solves}
 // are whole numbers. Every one is substituted, never concatenated.
 $ec_lang['lpn_ff_menu']='消防流量分析…';
-$ec_lang['lpn_ff_menu_tip']='逐个测试节点：每个节点在维持您设定的余压前提下，最多能提供多少流量；若在该节点抽取所需流量，是否会使其他部位超出限值？';
+$ec_lang['lpn_ff_menu_tip']='逐个测试所选节点的消防流量，并检查对系统其余部分的影响';
 $ec_lang['lpn_ff_title']='消防流量分析';
-$ec_lang['lpn_ff_intro']='依次让管网中的每个节点在其现有需水量之外再抽取一份消防流量。您的项目不会被更改；整个运行都在一份副本上进行。';
+$ec_lang['lpn_ff_intro']='依次让每个节点在其现有需水量之外再抽取一份消防流量。运行使用屏幕上所示时间步的管网副本，因此项目中的任何内容都不会改变。\n\n消防流量通常在最大日需水量下检验，因此请先将管网设置为该工况。\n\n每个受测节点需对整个管网求解约 16 次，因此大型系统需要数分钟：请在运行前选择节点，并可随时停止以保留部分结果。';
 $ec_lang['lpn_ff_scope']='要测试的节点';
-$ec_lang['lpn_ff_all']='全部';
-$ec_lang['lpn_ff_selected']='所选';
+$ec_lang['lpn_ff_all']='所有节点';
+$ec_lang['lpn_ff_selected']='所选节点';
 $ec_lang['lpn_ff_no_junctions']='此项目目前还没有节点，因此没有可测试的对象。';
 $ec_lang['lpn_ff_no_selection']='未选中任何节点。请选择节点，或选择“全部”选项。';
 $ec_lang['lpn_ff_skipped']='所选元素中有 {n} 个不是节点，因此未进行测试。';
 $ec_lang['lpn_ff_required']='所需消防流量';
-$ec_lang['lpn_ff_required_tip']='您的消防规范或消防部门要求消火栓提供的流量。除非某节点自带所需消防流量，否则都按此数值进行测试。';
-$ec_lang['lpn_ff_required_own']='有 {n} 个节点自带所需消防流量，将按其自身数值进行测试。';
+$ec_lang['lpn_ff_required_tip']='消火栓按适用的消防规范或消防部门要求所需的流量。除非为某节点另行输入所需消防流量，否则每个节点都按此值测试。';
+$ec_lang['lpn_ff_required_own']='有单独所需消防流量的节点将改按该值测试。此类节点数：{n}。';
 $ec_lang['lpn_ff_required_node_tip']='该特定节点根据其所服务用地性质，按您的消防规范或消防部门要求所需的消防流量。留空则按“消防流量分析”框中的数值对该节点进行测试。';
 $ec_lang['lpn_ff_residual']='需维持的余压';
 $ec_lang['lpn_ff_residual_tip']='节点在提供消防流量的同时必须维持的压力。AWWA M31 和 NFPA 291 采用 20 psi（140 kPa）。';
 $ec_lang['lpn_ff_design']='设计校核（对系统的影响）';
-$ec_lang['lpn_ff_design_tip']='这是一个独立的问题：抽取该流量后，是否有其他部位的压力低于其下限，或流速超过其限值？勾选此项不会增加额外的计算量。';
+$ec_lang['lpn_ff_design_tip']='这是一个独立的问题：在该处抽取该流量后，是否有其他节点的压力低于最小压力，或有管道的流速超过流速限值？此校核不需要额外计算。';
 $ec_lang['lpn_ff_design_no_selection']='设计校核范围已设置为“所选”，但目前未选中任何元件。请选择元件，或选择“全部”选项。';
 $ec_lang['lpn_ff_minpressure']='其他部位允许的最低压力';
 $ec_lang['lpn_ff_minpressure_tip']='当某个节点正在抽取其消防流量时，若其他节点的压力低于此值，则报告为设计问题。';
@@ -3662,7 +3662,7 @@ $ec_lang['lpn_ff_maxvelocity_tip']='当抽取消防流量时，若某条管道�
 // for hydrant losses beyond the node."). IT LEADS WITH THE METHOD, NOT WITH THE ABSENCE: Tom read
 // the first wording as "no losses are accounted for at the raw node", which is a hole in the tool
 // rather than the deliberate and standard choice it actually is.
-$ec_lang['lpn_ff_accounting']='消防流量在节点本身抽取。这是本页面采用的方法，也是常规做法。消火栓、其支管和喷嘴均未建模，因此实际消火栓能提供的流量会小于此处显示的数值。';
+$ec_lang['lpn_ff_accounting']='压力在节点本身建模，这是常规方法。消火栓、其支管和喷嘴均未建模，喷嘴处的压力小于节点处的压力。';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_ff_engine_native']='使用内置求解器。';
 // Edited by TGH 2026-09-07
@@ -3695,8 +3695,8 @@ $ec_lang['lpn_ff_clear']='清除环带';
 // two failure modes are independent -- a junction can miss its fire flow AND pull its neighbours
 // down -- so these three do not add up to the number of junctions, and that is correct rather than
 // a rounding slip. Said as three separate facts for that reason.
-$ec_lang['lpn_ff_summary']='{clean} 个节点一切正常。{fire} 个节点未能满足消防流量。{design} 个节点影响了系统的其他部位。';
-$ec_lang['lpn_ff_summary_error']='{n} 个节点未能得出结果。';
+$ec_lang['lpn_ff_summary']='{clean} 个节点通过了全部检验。{fire} 个节点未满足消防流量。{design} 个节点影响了系统其余部分。';
+$ec_lang['lpn_ff_summary_error']='有 {n} 个节点无法求解。';
 // ONE WIDE TABLE, NOT TWO REPORTS (Tom, 2026-08-30, with a competitor's own table in front of him:
 // "Normally they are kind of wide and they include the information from both tables in one table.")
 // One run has always produced one result set holding both answers per junction, so two headings
@@ -3748,7 +3748,7 @@ $ec_lang['lpn_ff_more']='另有 {n} 个受影响';
 // the Worst effect cell and undisplayed junctions under the table; a gendered language must
 // agree with one noun and would have been wrong at the other call site.
 $ec_lang['lpn_ff_rows_more']='还有 {n} 个节点未显示。';
-$ec_lang['lpn_ff_design_none']='在任何节点抽取其消防流量期间，所选范围内没有任何部位超出限值。';
+$ec_lang['lpn_ff_design_none']='依次抽取各受测节点的消防流量时，设计校核范围内没有任何部位超出限值。';
 $ec_lang['lpn_ff_design_off_note']='本次运行未检查对系统其他部位的影响。';
 // **WHY IT IS SAID AND NEVER APPLIED, in Tom's words (2026-09-02), and the reason is the MODEL, not
 // the arithmetic:** *"These models are not always fine-grained. They don't represent every pipe,
@@ -3764,7 +3764,7 @@ $ec_lang['lpn_ff_design_off_note']='本次运行未检查对系统其他部位�
 // ISO credits a single hydrant with at most 1,500 gpm whatever the hydraulics say. Said beside the
 // numbers and never applied to them: a number quietly cut down to a credit limit is a lie with a
 // tidy face.
-$ec_lang['lpn_ff_iso']='美国保险服务局（ISO）为单个消火栓认可的流量上限为 {flow}。由于我们不知道一个节点可能代表多少个消火栓，此处未应用该上限。';
+$ec_lang['lpn_ff_iso']='保险服务局（ISO）对单个消火栓认可的流量上限为 {flow}。由于一个节点可能代表多个消火栓，此处未应用该上限。';
 // Every way a junction can fail to produce a number is named. None of them is ever shown as a flow
 // of zero: "there is no available fire flow" and "the available fire flow is zero" are different
 // facts, and only the first one is ever true.
@@ -3772,7 +3772,7 @@ $ec_lang['lpn_ff_err_at_rest']='在抽取任何消防流量之前，压力已低
 $ec_lang['lpn_ff_err_converge']='管网未能收敛。';
 $ec_lang['lpn_ff_err_solve']='求解器报告了错误，未给出结果。';
 $ec_lang['lpn_ff_err_not_junction']='不是节点';
-$ec_lang['lpn_ff_err_unknown']='没有结果。返回的代码为 {code}。';
+$ec_lang['lpn_ff_err_unknown']='没有结果。错误代码：{code}';
 
 // ---- Settings > New assets > Import surveyed points: CSV and GPX (ROADMAP Task 592) -----------
 //
@@ -3790,7 +3790,7 @@ $ec_lang['lpn_ff_err_unknown']='没有结果。返回的代码为 {code}。';
 // cannot tell a mistake from a place; a file of eastings and northings is refused by name, because
 // a plane coordinate read as a degree is silent and puts a network in the Gulf of Guinea.
 $ec_lang['lpn_file_import_survey']='导入测量点…';
-$ec_lang['lpn_file_import_survey_tip']='从文本文件中读取测量点列表，并在每个点创建一个节点，文件未说明的内容一律采用新建元件的设置。不会绘制管道，也不会有任何行在未被指明的情况下被丢弃。读取时使用本项目已在使用的坐标系，无论是否已配准。';
+$ec_lang['lpn_file_import_survey_tip']='从文本文件中读取测量点列表，并在每个点创建一个节点，文件未说明的内容一律采用新建元件的设置。除非勾选“将说明读取为现场代码”，否则不会绘制管道，也不会有任何行在未被指明的情况下被丢弃。读取时使用本项目已在使用的坐标系，无论是否已地理配准。';
 $ec_lang['lpn_survey_read_error']='无法从您的磁盘读取该文件。';
 $ec_lang['lpn_survey_cancelled']='未创建任何内容，也未更改任何内容。';
 // What the project calls its two axes, for a sentence js/lpn-survey.js writes about a column. The
@@ -3826,7 +3826,7 @@ $ec_lang['lpn_survey_confirm_tank']='找到 {n} 个水箱。是否继续？';
 $ec_lang['lpn_survey_report_junction']='已导入 {n} 个节点，其中 {m} 个含有高程。';
 $ec_lang['lpn_survey_report_reservoir']='已导入 {n} 个水库，其中 {m} 个含有高程。';
 $ec_lang['lpn_survey_report_tank']='已导入 {n} 个水箱，其中 {m} 个含有高程。';
-$ec_lang['lpn_survey_report_clean']='文件中的每个点都已成功导入，导入过程中未做任何更改。';
+$ec_lang['lpn_survey_report_clean']='文件中的每个点都已原样导入。';
 $ec_lang['lpn_survey_report_notes']='导入错误和说明：';
 $ec_lang['lpn_survey_sev_error']='错误';
 $ec_lang['lpn_survey_sev_warning']='警告';
@@ -3882,11 +3882,11 @@ $ec_lang['lpn_copy_body_nodate']='本浏览器不认识此文件。这是原始�
 $ec_lang['lpn_copy_original']='原始文件；保留同一把锁';
 $ec_lang['lpn_copy_copy']='副本；生成新锁';
 $ec_lang['lpn_copy_kept_link']='已将 {name} 作为原始文件打开，它已被移到新位置。现在“保存”会写入此文件。';
-$ec_lang['lpn_copy_opened']='已将 {file} 作为副本打开，它带有自己的新锁，将在下次保存文件时一并保存。';
+$ec_lang['lpn_copy_opened']='已将 {file} 作为副本打开并保存，并带有新的锁。';
 $ec_lang['lpn_scenario_basic']='基本模式';
-$ec_lang['lpn_scenario_basic_tip']='勾选时，方案就是您在其中设置的数值。取消勾选时，此菜单还会提供“备选方案预览”表，显示这些数值如何按类别分组，并欢迎您提出反馈。';
+$ec_lang['lpn_scenario_basic_tip']='勾选时，方案仅由在其中设置的数值构成。取消勾选时，此菜单还会提供“备选方案预览”表，显示这些数值如何按类别分组，并允许方案具有单独的总运行时长和水力时间步长。欢迎对此功能提出反馈。';
 $ec_lang['lpn_alt_title']='备选方案预览';
-$ec_lang['lpn_alt_note']='只读。基础方案对每个类别都使用基础备选方案。每个方案对任何有更改的类别都有自己的备选方案，它是基础备选方案的子项。数字是其更改过的数值个数。';
+$ec_lang['lpn_alt_note']='基础方案对每个类别都使用基础备选方案。每个方案对任何有更改的类别都有一个单独的备选方案，它是基础备选方案的子项。数字是已更改数值的个数。最后三列是计算选项：为该方案输入一个值，或留空以使用父方案的值。项目的值位于“设置”、“计算”、“时间”中。';
 $ec_lang['lpn_alt_cat_physical']='物理';
 $ec_lang['lpn_alt_cat_demand']='需水量';
 $ec_lang['lpn_alt_cat_topology']='元件启用';
@@ -3944,7 +3944,7 @@ $ec_lang['lpn_ff_design_all']='全部';
 $ec_lang['lpn_ff_design_selected']='所选';
 $ec_lang['lpn_ff_rows_more_links']='还有 {n} 条连接线未显示。';
 $ec_lang['lpn_crit_menu']='关键性分析…';
-$ec_lang['lpn_crit_menu_tip']='依次将每条管道、水泵和阀门从管网中移除，看看系统会损失什么。';
+$ec_lang['lpn_crit_menu_tip']='依次将每条管道、水泵和阀门从管网中移除，并报告对系统的影响。';
 $ec_lang['lpn_crit_title']='关键性分析';
 $ec_lang['lpn_crit_intro']='依次将每个元件从管网中移除，并在当前方案下、屏幕上所显示的时间步求解管网。您的项目不会被更改；整个运行都在一份副本上进行。';
 $ec_lang['lpn_crit_scope']='要断开的连接线';
@@ -3969,3 +3969,227 @@ $ec_lang['lpn_crit_stale']='图形已更改，因此关键性分析结果已被�
 $ec_lang['lpn_crit_skipdead']='跳过死端';
 $ec_lang['lpn_crit_skipdead_tip']='死端连接线是指：移除它会切断只能经由它到达的节点，且其后没有水库或水池。它的损失就是其后的一切，因此不进行求解。摘要会说明跳过了多少条。';
 $ec_lang['lpn_crit_skipped_dead']='已跳过的死端连接线：{n}。每一条都会切断其后的一切。';
+$ec_lang['points_data_msg_line']='未粘贴任何内容。第 {n} 行无法读取为桩号和高程。';
+$ec_lang['points_data_msg_none']='未粘贴任何内容。未找到桩号和高程数据对。';
+$ec_lang['lpn_tool_add_chain']='节点管道链';
+$ec_lang['lpn_pane_delete_element']='删除元件';
+$ec_lang['lpn_pane_delete_elements']='删除元件';
+$ec_lang['lpn_pane_sort_desc']='降序排序';
+$ec_lang['lpn_pane_manage_cols_width']='宽度 (em)';
+$ec_lang['lpn_pane_width_tip']='列宽保存在本浏览器中，而不是保存在项目中。双击列分隔线可恢复默认宽度。';
+$ec_lang['lpn_dock_left']='停靠在地图左侧';
+$ec_lang['lpn_dock_right']='停靠在地图右侧';
+$ec_lang['lpn_dock_float']='浮动';
+$ec_lang['lpn_dock_autohide']='自动隐藏';
+$ec_lang['lpn_popup_none']='未选择任何对象。请在地图上选择一个元件以查看其属性。';
+$ec_lang['lpn_hotkeys_snip_heading']='屏幕截图';
+$ec_lang['lpn_hotkeys_snip_term']='屏幕截图键盘快捷键';
+$ec_lang['lpn_hotkeys_snip_def']='<table class="lpn-notes-table"><tbody><tr><td>S</td><td>截取，在“屏幕截图”打开时。</td></tr><tr><td>E</td><td>橡皮擦，在标注视图中。</td></tr><tr><td>Ctrl+Z, Ctrl+Y</td><td>撤销和重做，在标注视图中。</td></tr><tr><td>Esc</td><td>取消截取，或退出橡皮擦。在标注视图中，未绘制任何内容时将其关闭。</td></tr></tbody></table>';
+$ec_lang['lpn_fb_intro']='预设消息（可选）。按“发送”之前不会发送任何内容。';
+$ec_lang['lpn_fb_pick_numbers']='数值似乎有误';
+$ec_lang['lpn_fb_pick_broken']='某项功能无法使用';
+$ec_lang['lpn_fb_pick_wording']='措辞或翻译有误';
+$ec_lang['lpn_fb_pick_confusing']='内容令人困惑';
+$ec_lang['lpn_fb_comment']='意见（可选）';
+$ec_lang['lpn_fb_email']='电子邮件（可选，仅在需要回复时填写）';
+$ec_lang['lpn_fb_sends']='发送的内容：本页面的名称、您的语言、网站版本、地图上的消息代码（如果有），以及您选择或输入的内容。绝不包含您的绘图或管网。您的电子邮件地址仅用于回复您。';
+$ec_lang['lpn_fb_send']='发送';
+$ec_lang['lpn_fb_sending']='正在发送…';
+$ec_lang['lpn_fb_failed']='消息未能送达。您所写的内容仍保留在此，可以重试。';
+$ec_lang['lpn_fb_bad_email']='该电子邮件地址似乎不正确。请更正，或留空。';
+$ec_lang['lpn_fb_busy']='最近几分钟内收到的消息过多。您所写的内容仍保留在此，可以稍后重试。';
+$ec_lang['lpn_tool_add_chain_tip']='连续添加节点和管道：在地图上指定一个点以添加节点，然后依次指定下一个点以添加一根管道和一个节点。指定已有节点可从该节点继续。按 Escape 键结束连续添加。';
+$ec_lang['lpn_pane_filter_sel_note']='仅限所选内容。显示 {all} 项中的 {n} 项。';
+$ec_lang['lpn_pane_filter_sel_and']='已按 {q} 过滤，且仅限所选内容。显示 {all} 项中的 {n} 项。';
+$ec_lang['lpn_pane_filter_sel_none']='所选元件均不在此表中。';
+$ec_lang['lpn_pane_sel_only']='仅限所选内容';
+$ec_lang['lpn_pane_sel_only_none']='未选择任何元件。请先在地图上选择元件。';
+$ec_lang['lpn_pane_scn_show']='显示方案';
+$ec_lang['lpn_pane_clear_override']='清除覆盖值';
+$ec_lang['lpn_pane_scn_alt_tip']='{category}备选：{alternative}';
+$ec_lang['lpn_change_type_menu']='更改类型';
+$ec_lang['lpn_change_type_tip']='将所选节点更改为节点、水库或水箱，或将所选连接线更改为管道、水泵或阀门。每个元件都保留其 ID、位置、连接关系，以及新类型同样具有的所有数值。如果有内容会丢失，会先询问您。';
+$ec_lang['lpn_change_type_ok']='更改';
+$ec_lang['lpn_change_type_lost']='这些数值将会丢失：';
+$ec_lang['lpn_change_type_key']='ID：丢失的项';
+$ec_lang['lpn_change_type_line']='{id}：{property} {value}';
+$ec_lang['lpn_change_type_line_scenario']='{id}：{property} {value}，在方案 {scenario} 中';
+$ec_lang['lpn_change_type_more']='另有 {n} 项。';
+$ec_lang['lpn_change_type_surface']='这些保持水面位置不变。水库的水头等于水箱的高程加其水深，而水箱的水深等于水库的水头减去其高程：';
+$ec_lang['lpn_change_type_meaning']='这些控制和规则会检验正在更改的节点，且读取方式会有所不同：节点按其压力检验，水箱或水库按其水位检验。';
+$ec_lang['lpn_change_type_born']='这些数值是新设的，其设置与新绘制的元件相同：';
+$ec_lang['lpn_change_type_no_curve']='{id}：无水泵水头曲线，因此在选择曲线之前水泵不增加水头，且导出 .inp 时会将其写为管道';
+$ec_lang['lpn_change_type_becomes']='{id}：{property} {value}，在方案 {scenario} 中，变为 {new}';
+$ec_lang['lpn_change_type_customers']='只有管道才能为用户供水，因此这些用户改为连接到括号中所示的节点，其需水量已计入该节点。它们仍位于所绘制的位置，需水量不变：';
+$ec_lang['lpn_change_type_setting']='这些控制和规则给出或检验正在更改的连接线的设定值。设定值在管道、水泵和阀门上是不同的量，因此读取方式会有所不同：';
+$ec_lang['lpn_change_type_rules']='这些规则行按类别指称某条连接线，将改为指称其新类别：';
+$ec_lang['lpn_find_scope_source']='水源';
+$ec_lang['lpn_find_source_no_chemical']='未追踪任何化学物，因此没有节点带有水源。';
+$ec_lang['lpn_profile_open']='打开 EPANET 剖面文件…';
+$ec_lang['lpn_profile_file_done']='已从文件读取剖面：在本管网中找到 {total} 个节点中的 {used} 个。';
+$ec_lang['lpn_profile_file_missing']='文件中列出但本管网中不存在：{ids}。';
+$ec_lang['lpn_profile_file_short']='文件中列出的本管网节点少于两个，因此没有可绘制的剖面。';
+$ec_lang['lpn_pgraph_none']='此元件在当前运行中没有结果。';
+$ec_lang['lpn_pgraph_source_share_from']='来自 {node} 的水源占比';
+$ec_lang['lpn_result_pump_head']='水头';
+$ec_lang['lpn_result_pump_head_tip']='水泵从吸水侧到出水侧增加的水头，以正数显示。求解器和 EPANET 文件将其记为负的水头损失。';
+$ec_lang['lpn_report_pump_head']='水泵水头';
+$ec_lang['lpn_contour_show']='显示等值线';
+$ec_lang['lpn_contour_show_tip']='取消勾选可隐藏填充和等值线；勾选可按原样恢复。节点颜色保持不变。';
+$ec_lang['lpn_sysflow_title']='流量平衡';
+$ec_lang['lpn_crs_suggested_mark']='（建议）';
+$ec_lang['lpn_file_export_menu']='导出…';
+$ec_lang['lpn_file_export_item_inp']='EPANET 文件…';
+$ec_lang['lpn_file_export_item_geojson']='GeoJSON 文件…';
+$ec_lang['lpn_status_inp_exported_picture']='已导出 {zip}，其中包含 EPANET 文件 {file}、其背景图片 {picture} 和世界文件 {world}。请将这三个文件解压到同一个文件夹，然后在 EPANET 中打开该处的 .inp；图片会随之一并载入。';
+$ec_lang['lpn_status_inp_exported_no_picture']='已导出 {file}。背景图片无法保存，因此 .inp 未指定背景图片；请在 EPANET 中通过“视图”>“背景”>“加载”添加。';
+$ec_lang['lpn_inp_export_difference_one']='.inp 格式无法保存的一项内容。';
+$ec_lang['lpn_file_export_geojson_tip']='将此管网下载为 GeoJSON 文件，供 QGIS、ArcGIS Pro 和其他 GIS 程序使用。节点、水箱和水库为点，管道、水泵和阀门为沿其折点延伸的线。位置为纬度和经度。仅当管网已求解时才包含结果。';
+$ec_lang['lpn_geojson_refused_local']='GeoJSON 文件只保存纬度和经度，而本项目绘制在没有地球位置的局部网格上。请先通过“地图”、“世界地图”、“附加”进行地理配准，然后再次导出。';
+$ec_lang['lpn_geojson_refused_range']='这些位置不是有效的纬度和经度：{detail}';
+$ec_lang['lpn_geojson_refused_crs']='本页面无法识别本项目的坐标系（{detail}），因此无法将其位置转换为纬度和经度。请使用“转换为…”将项目复制为本页面可识别的坐标系，然后再次导出。';
+$ec_lang['lpn_geojson_refused_empty']='尚无可导出的内容。请先绘制或打开一个管网。';
+$ec_lang['lpn_geojson_results_in']='包含屏幕上显示的结果。';
+$ec_lang['lpn_geojson_results_out']='不包含结果，因为管网尚未求解。';
+$ec_lang['lpn_inp_backdrop_attach']='附加 {file}…';
+$ec_lang['lpn_inp_backdrop_attach_tip']='网页无法按名称打开该图片。请在您的设备上选择它，它会被放置在文件所指定的位置。';
+$ec_lang['lpn_inp_backdrop_attached']='已附加 {file}，并放置在文件所指定的位置。';
+$ec_lang['lpn_inp_backdrop_attached_other']='已附加 {picked}，并放置在文件所指定的位置。文件中指定的是 {file}，名称不同。';
+$ec_lang['lpn_copy_opened_unsaved']='已将 {file} 作为副本打开，并带有一个新的锁，该锁将在下次保存文件时一并保存。';
+$ec_lang['lpn_engine_unavailable_why']='没有 EPANET 求解器就无法求解压力和流量控制阀（PRV、PSV、FCV）。{reason}';
+$ec_lang['lpn_engine_needed_failed_why']='此管网只能由 EPANET 求解器求解。{reason}';
+$ec_lang['lpn_mode_add_chain']='模式：节点管道链。在地图上指定一个点以添加节点，然后依次指定下一个点以添加一根管道和一个节点。指定已有节点可从该节点继续。按 Escape 键结束连续添加。切换到“选择”模式可更改或移动元件和标签。';
+$ec_lang['lpn_cp_allow_tip']='仅允许这些字符：';
+$ec_lang['lpn_cp_characters_tip']='“@”表示任意字母；“#”表示任意数字，如果允许“-”、“.”和“,”，必须另行列出；任何空白字符必须位于其他字符之间。';
+$ec_lang['lpn_valwarn_diameter']='管道或阀门直径通常在 {min} 至 {max} {unit} 之间。请检查数值和直径单位。';
+$ec_lang['lpn_valwarn_hw']='Hazen-Williams C 值通常在 {min} 至 {max} 之间。超出此范围的数值往往是为另一种摩阻方法而设的糙率。';
+$ec_lang['lpn_valwarn_manning']='曼宁 n 值通常在 {min} 至 {max} 之间。超出此范围的数值往往是为另一种摩阻方法而设的糙率。';
+$ec_lang['lpn_valwarn_dw']='Darcy-Weisbach 糙率通常大于 0 且不超过 {max} {unit}。更大的数值往往是 Hazen-Williams C 值或曼宁 n 值。';
+$ec_lang['lpn_valwarn_positive']='EPANET 不接受此处为零或负数。';
+$ec_lang['lpn_valwarn_negative']='EPANET 不接受此处为负数。';
+$ec_lang['lpn_valwarn_tank_levels']='EPANET 不接受此水箱。最低水深不得超过水深，水深不得超过最高水深。';
+$ec_lang['lpn_alt_calc_options']='计算选项';
+$ec_lang['lpn_scenario_duration_tip']='留空则继承自父方案。总运行时长为 0:00 即为稳态运行。';
+$ec_lang['lpn_scenario_hyd_step_tip']='留空则继承自父方案。';
+$ec_lang['lpn_time_scn_overrides']='方案覆盖值：';
+$ec_lang['lpn_scenario_preset_mult_tip']='需水量倍数为平均日的 {mult} 倍，这是一个占位值。大多数系统介于 {lo} 和 {hi} 之间（National Research Council, 2006）。请在“设置”、“计算”、“水力计算”、“需水量倍数”中为所建模的系统设定该值。';
+$ec_lang['lpn_engine_failed_why']='{reason} 改为显示内置求解器的结果。';
+$ec_lang['lpn_settings_basemap_style']='底图样式';
+$ec_lang['lpn_basemap_style_normal']='标准';
+$ec_lang['lpn_basemap_style_muted']='柔和';
+$ec_lang['lpn_basemap_style_faded']='淡化';
+$ec_lang['lpn_basemap_style_grayscale']='灰度';
+$ec_lang['lpn_time_statistic']='统计量';
+$ec_lang['lpn_time_stat_none']='无';
+$ec_lang['lpn_time_stat_averaged']='平均';
+$ec_lang['lpn_time_stat_minimum']='最小';
+$ec_lang['lpn_time_stat_maximum']='最大';
+$ec_lang['lpn_time_stat_range']='极差';
+$ec_lang['lpn_time_no_engine_why']='内置求解器一次只求解一个时刻，因此这仅是 {time} 时刻的管网：所有模式都按该时刻读取，所有水箱都保持初始水位，而不会充水和放水。{reason}';
+$ec_lang['lpn_time_engine_fetch_failed']='EPANET 求解器下载失败。请重新加载页面后重试；防火墙、代理或浏览器扩展程序可能正在阻止下载。';
+$ec_lang['lpn_time_engine_start_failed']='浏览器拒绝启动 EPANET 求解器。WebAssembly 可能已被安全设置或扩展程序关闭。';
+$ec_lang['lpn_time_engine_run_failed']='EPANET 运行失败。这是本页面的缺陷；请使用 {wrong} 链接报告。';
+$ec_lang['lpn_saved_project']='随项目保存';
+$ec_lang['lpn_saved_browser']='保存在本浏览器中';
+$ec_lang['lpn_saved_session']='未保存';
+$ec_lang['lpn_scncmp_at_time']='{id} 处为 {value}，{time}';
+$ec_lang['lpn_scncmp_same']='在每个方案中都相同';
+$ec_lang['lpn_scncmp_period_note']='方案设有总运行时长时，其最低压力和最高流速是整个管网的极值，出现在所示时刻。';
+$ec_lang['lpn_choice_default']='默认';
+$ec_lang['lpn_ds_menu']='需水量缩放…';
+$ec_lang['lpn_ds_menu_tip']='在管网副本上将需水量乘以一个系数并查看压力和流速，或求出系统所能承载的最大需水量缩放系数。';
+$ec_lang['lpn_ds_title']='需水量缩放';
+$ec_lang['lpn_ds_intro']='选择“运行”按钮，将所选节点的需水量乘以需水量缩放系数，并查看压力和流速。\n\n选择“查找”按钮，求出最大的需水量缩放系数（精确到 {step}），使所有这些节点都至少保持允许的最低压力；搜索范围为 0 至 {max}。\n\n两者都在管网副本上进行，按屏幕上显示的时间步、在当前方案中求解，因此项目中的任何内容都不会改变。仅对该时间步进行缩放，水位和状态均取自该时间步；若要检验高峰，请在运行前将时钟移到高峰需水量时刻。';
+$ec_lang['lpn_ds_scope']='要缩放的节点';
+$ec_lang['lpn_ds_scope_all']='所有节点';
+$ec_lang['lpn_ds_scope_selected']='所选节点';
+$ec_lang['lpn_ds_minpressure']='允许的最低压力';
+$ec_lang['lpn_ds_minpressure_tip']='这与“消防流量分析”中其他位置的“允许的最低压力”是同一个数值。在此处更改，就会在彼处更改。';
+$ec_lang['lpn_ds_head_scale']='缩放需水量';
+$ec_lang['lpn_ds_multiplier']='需水量缩放系数';
+$ec_lang['lpn_ds_multiplier_tip']='每项需水量所乘的系数；1.5 表示增加 50%。它叠加在当前方案的需水量倍数之上（该倍数已包含在需水量中），且绝不会保存到项目中。';
+$ec_lang['lpn_ds_run']='运行';
+$ec_lang['lpn_ds_head_search']='系统能承受多大的需水量缩放系数？';
+$ec_lang['lpn_ds_head_search_selected']='这些节点能承受多大的需水量缩放系数？';
+$ec_lang['lpn_ds_outside_below']='在需水量缩放系数为 {m} 时，未选择的节点中低于 {pressure} 的有：{n} 个（{ids}）。它们不限制本结果。';
+$ec_lang['lpn_ds_holds_max']='✓ 在需水量缩放系数达到 {max}（搜索上限）之前，每个节点都保持 {pressure}。';
+$ec_lang['lpn_ds_below_zero']='⚠ 即使缩放后的需水量为零，至少仍有一个节点低于 {pressure}。';
+$ec_lang['lpn_ds_found']='✓ 在需水量缩放系数达到 {m} 之前，所检查的每个节点都至少保持 {pressure}。';
+$ec_lang['lpn_ds_found_below']='⚠ 即使不缩放需水量，至少也有一个节点低于 {pressure}。使每个节点保持在 {pressure} 或以上的最大需水量缩放系数为 {m}。';
+$ec_lang['lpn_ds_search_stopped']='搜索在得出结果之前已被停止。';
+$ec_lang['lpn_ds_lowest_at']='在需水量缩放系数为 {m} 时，最低压力为 {pressure}，位于节点 {id}。';
+$ec_lang['lpn_ds_nosolve_at']='在需水量缩放系数为 {m} 时，管网无解。{reason}';
+$ec_lang['lpn_ds_scale_ok']='✓ 在需水量缩放系数为 {m} 时，每个节点都保持 {pressure}。';
+$ec_lang['lpn_ds_scale_below']='⚠ 在需水量缩放系数为 {m} 时，低于 {pressure} 的节点有：{n} 个。';
+$ec_lang['lpn_ds_scaled_selected']='已缩放并检查的节点数：{n}。';
+$ec_lang['lpn_ds_head_lowest']='最低压力';
+$ec_lang['lpn_ds_head_velocity']='最高流速';
+$ec_lang['lpn_ds_col_link']='连接线';
+$ec_lang['lpn_ds_col_scaled']='缩放后';
+$ec_lang['lpn_ds_col_scaled_tip']='需水量已乘以需水量缩放系数。';
+$ec_lang['lpn_ds_col_unscaled']='缩放前';
+$ec_lang['lpn_ds_col_unscaled_tip']='需水量保持当前方案在此时间步的原值，与地图上显示的数值相同。';
+$ec_lang['lpn_ds_no_junctions']='本项目尚无节点，因此没有可缩放的需水量。';
+$ec_lang['lpn_ds_no_selection']='未选择任何节点。请选择节点，或选择“所有节点”。';
+$ec_lang['lpn_ds_skipped']='所选元件中不是节点而保持原样的：{n} 个。';
+$ec_lang['lpn_ds_bad_multiplier']='请输入大于或等于零的需水量缩放系数，例如 1.5。';
+$ec_lang['lpn_ds_stale']='图纸已更改，因此需水量缩放结果已被清除。请重新运行。';
+$ec_lang['lpn_analyze_at_time']='时间步：{time}。';
+$ec_lang['lpn_analyze_time_moved']='⚠ 此结果是在 {time} 计算的，而时钟现在位于 {now}。请针对屏幕上显示的时间步重新运行。';
+$ec_lang['lpn_survey_codes_toggle']='将说明读取为现场代码';
+$ec_lang['lpn_survey_codes_tip']='将每条说明的第一个词读取为代码表中的代码。线代码相同的点按文件顺序连成一根管道，WL1 和 WL2 是不同的线。+0 开始一条线，-0 结束一条线，CLO 使线闭合。JPN 后接点名，表示连接到该点（Carlson），Civil 3D 将其写作 CPN。';
+$ec_lang['lpn_survey_codes_col_code']='代码';
+$ec_lang['lpn_survey_codes_col_type']='元件类型';
+$ec_lang['lpn_survey_codes_add']='添加代码';
+$ec_lang['lpn_survey_codes_remove']='删除代码';
+$ec_lang['lpn_survey_confirm_coded']='找到 {j} 个节点、{r} 个水库、{t} 个水箱和 {p} 根管道。是否继续？';
+$ec_lang['lpn_survey_report_coded']='已导入 {j} 个节点、{r} 个水库、{t} 个水箱和 {p} 根管道，其中 {m} 个节点含有高程。';
+$ec_lang['lpn_survey_note_code_unknown']='代码不在代码表中，已按上方选择的元件类型导入。';
+$ec_lang['lpn_survey_note_code_two_nodes']='节点代码多于一个，使用了第一个。';
+$ec_lang['lpn_survey_note_code_unread']='并非每个词都是本页面能读取的代码，已保留在说明中。';
+$ec_lang['lpn_survey_note_vertex_text']='并非每个词都是本页面能读取的代码，且折点不保留说明。';
+$ec_lang['lpn_survey_note_join_missing']='JPN 或 CPN 所指的点不在本文件或本项目中，因此未为其绘制管道。';
+$ec_lang['lpn_survey_note_join_no_line']='带有 JPN 或 CPN 的点没有线代码，因此未为其绘制管道。';
+$ec_lang['lpn_survey_note_pipe_one_node']='这条线回到同一个节点，中间没有其他节点，因此未为其绘制管道。';
+$ec_lang['lpn_survey_note_line_one_point']='该线上只有这一个点，因此未从它绘制管道。';
+$ec_lang['lpn_survey_note_vertices']='成为管道折点的点：{detail}。折点不保留名称、高程或说明。';
+$ec_lang['lpn_survey_note_no_desc']='已开启现场代码，但此文件没有说明列，因此未读取任何代码。';
+$ec_lang['lpn_survey_note_ring_junction']='该点成为了节点，以便环路能够闭合。';
+$ec_lang['lpn_survey_note_pipe_zero_length']='该点与前一个节点位于同一位置，因此二者之间的管道长度为零。';
+$ec_lang['lpn_survey_note_node_on_pipe']='该点恰好位于一根未与之连接的管道上。如果二者相连，请添加 JPN 予以说明。';
+$ec_lang['lpn_settings_demand_model']='需水量模型';
+$ec_lang['lpn_settings_demand_model_tip']='选择节点如何获得流量。需水量驱动（DDA）无论压力如何都足额供给每项需水量。压力驱动（PDA）在压力低于所需压力处供给的流量小于需水量，且只有 EPANET 求解器能够计算。';
+$ec_lang['lpn_settings_demand_model_dda']='需水量驱动';
+$ec_lang['lpn_settings_demand_model_pda']='压力驱动';
+$ec_lang['lpn_settings_min_pressure']='最小压力';
+$ec_lang['lpn_settings_min_pressure_tip']='输入节点压力等于或低于该值时即得不到任何流量的压力。使用本项目的压力单位。';
+$ec_lang['lpn_settings_req_pressure']='所需压力';
+$ec_lang['lpn_settings_req_pressure_tip']='输入节点压力等于或高于该值时即获得全部需水量的压力。它必须大于最小压力。使用本项目的压力单位。留空则使用 EPANET 的默认值：美制流量单位时以 psi 为单位，否则以米为单位。';
+$ec_lang['lpn_settings_pressure_exponent']='压力指数';
+$ec_lang['lpn_settings_pressure_exponent_tip']='输入曲线的指数，该曲线从最小压力处的零流量上升到所需压力处的全部需水量。';
+$ec_lang['lpn_engine_pda_route']='已使用 EPANET 求解器求解，因为需水量模型为压力驱动。';
+$ec_lang['lpn_diag_pda_needs_epanet']='需水量模型为压力驱动，只有 EPANET 求解器能够计算。EPANET 求解器未能加载，因此缺少这些结果。';
+$ec_lang['lpn_result_delivered_demand']='实际供水量';
+$ec_lang['lpn_result_delivered_demand_tip']='在压力驱动需水量模型下，此节点实际获得的流量。压力低于所需压力时，它小于需水量。';
+$ec_lang['lpn_result_demand_deficit']='需水量缺口';
+$ec_lang['lpn_result_demand_deficit_tip']='此节点上因压力低于所需压力而未能供给的需水量。';
+$ec_lang['lpn_pda_deficit_note']='获得的流量小于其需水量的节点：{n} 个。';
+$ec_lang['lpn_diag_pda_pressures']='所需压力必须大于最小压力。请在“设置”中更改其中之一。';
+$ec_lang['lpn_inp_drop_pressure_unit']='此文件标明的压力单位与本页面按其流量单位读取的单位不同（美制单位为 psi，否则为米）。文件中的所有压力均按后者读取，因此请检查其中的阀门设定值、扩散器和压力驱动限值。该行予以保留并会写回。';
+$ec_lang['lpn_screenshot_menu']='屏幕截图';
+$ec_lang['lpn_screenshot_tip']='复制所拖选地图区域的一张比屏幕更清晰的图片，可直接粘贴到报告中。不拖动而直接点击则截取整幅地图。';
+$ec_lang['lpn_screenshot_hint']='在地图上拖出一个矩形，或点击以截取整幅地图。按 Esc 取消。';
+$ec_lang['lpn_screenshot_copied']='屏幕截图已复制。';
+$ec_lang['lpn_screenshot_saved']='此处无法使用剪贴板，因此屏幕截图已作为 PNG 文件下载。';
+$ec_lang['lpn_screenshot_no_basemap']='无法包含街道地图或卫星影像。';
+$ec_lang['lpn_screenshot_failed']='无法生成屏幕截图。';
+$ec_lang['lpn_snip_hint_free']='围绕要截取的区域拖动，或点击以截取整幅地图。按 Esc 取消。';
+$ec_lang['lpn_snip_tip_rect']='截取矩形 (S)';
+$ec_lang['lpn_snip_tip_free']='截取自由形状 (S)';
+$ec_lang['lpn_snip_tip_mode']='截取形状';
+$ec_lang['lpn_snip_tip_map']='整幅地图的屏幕截图';
+$ec_lang['lpn_snip_tip_pen']='画笔';
+$ec_lang['lpn_snip_tip_eraser']='橡皮擦：点击笔画将其删除 (E)';
+$ec_lang['lpn_snip_tip_undo']='撤销 (Ctrl+Z)';
+$ec_lang['lpn_snip_tip_redo']='重做 (Ctrl+Y)';
+$ec_lang['lpn_screenshot_scale_tip']='图片大小相对于屏幕上该区域大小的倍数。倍数越大越清晰，文件也越大。';
