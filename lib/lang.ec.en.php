@@ -1584,7 +1584,7 @@ $ec_lang['lpn_change_type_tip']='Change the selected nodes into junctions, reser
 $ec_lang['lpn_change_type_ok']='Change';
 $ec_lang['lpn_change_type_lost']='These values will be lost:';
 // The key to the lines under it (Tom, 2026-10-06: *"Provide a key for the loss report. 'ID: Lost entry'."*).
-$ec_lang['lpn_change_type_key']='ID: Lost entry';
+$ec_lang['lpn_change_type_key']='Each line: ID: the property and value that would be lost';
 $ec_lang['lpn_change_type_line']='{id}: {property} {value}';
 $ec_lang['lpn_change_type_line_scenario']='{id}: {property} {value}, in scenario {scenario}';
 $ec_lang['lpn_change_type_more']='And {n} more.';
@@ -1610,7 +1610,7 @@ $ec_lang['lpn_run_menu_tip']='Run simulation. Unnecessary when "Recalculate auto
 // out over time, and this switch is about the run, not about the drawing.
 $ec_lang['lpn_settings_auto_run']='Recalculate automatically';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_settings_auto_run_tip']='Turn off if recalculation is too slow. Hides the Calculate button.';
+$ec_lang['lpn_settings_auto_run_tip']='Turn off if recalculation is too slow. While this is on, the Calculate button is hidden.';
 // **AN EDIT SAYS NOTHING AT ALL WHEN THE SWITCH IS OFF** (Tom, 2026-09-19: *"Recalc off Old
 // values: Leave in place stale. Don't clear. Trust the user."*). `lpn_manual_results_cleared`
 // stood here for part of one day and is DELETED, English-only, never translated: it announced a
@@ -3185,7 +3185,7 @@ $ec_lang['lpn_elev_dem_use_tip']='Put the elevation of the DEM at this node into
 $ec_lang['lpn_elev_dem_none']='The DEM has no elevation for this node.';
 $ec_lang['lpn_elev_dem_said']='Mapbox DEM elevation: {v} {u}.';
 $ec_lang['lpn_settings_elev_source']='Elevation source';
-$ec_lang['lpn_settings_elev_source_tip']='2026 Mapbox DEM horizontal and vertical accuracy ranges through 1–10 m and <1 m in the US, 2–10 m and 1–3 m in Europe and Japan, 30 m and 10–16 m globally, and 90 m and >16 m at the poles.';
+$ec_lang['lpn_settings_elev_source_tip']='Mapbox DEM accuracy in 2026, horizontal then vertical: 1–10 m and under 1 m in the US, 2–10 m and 1–3 m in Europe and Japan, 30 m and 10–16 m globally, and 90 m and over 16 m at the poles.';
 $ec_lang['lpn_settings_elev_source_typed']='Above';
 $ec_lang['lpn_settings_elev_source_dem']='Mapbox DEM';
 $ec_lang['lpn_settings_accuracy']='Accuracy';

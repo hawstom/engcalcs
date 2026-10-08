@@ -57,11 +57,12 @@
 	var DEFAULT_PREFIX = { J: 'J', R: 'R', T: 'T', L: 'L', P: 'P', V: 'V', M: 'C' };
 	// Layer order and ACI colours (1-9 only, so every program shows the same colour). Never 5, blue,
 	// which is unreadable on a dark screen (Tom, 2026-10-07: choose among 1, 2, 3, 4, 6 and 7); the
-	// pipe is yellow (2) because cyan (4) is the junction's.
+	// pipe is yellow (2) because cyan (4) is the junction's; the customer is white (7; Tom,
+	// 2026-10-08: "Customers white (7)").
 	var TYPES = [
 		{ type: 'pipe', color: 2 }, { type: 'pump', color: 6 }, { type: 'valve', color: 1 },
 		{ type: 'junction', color: 4 }, { type: 'tank', color: 3 }, { type: 'reservoir', color: 3 },
-		{ type: 'customer', color: 8 }
+		{ type: 'customer', color: 7 }
 	];
 	// **THE READ-ME IS OUTSIDE THE MODEL PREFIX**, so an import of C-WATR-MODL-* never reads it as an
 	// asset. White (ACI 7; Tom: *"Make the README layer white."*) and not plotted.

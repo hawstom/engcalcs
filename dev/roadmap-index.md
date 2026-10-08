@@ -7,9 +7,9 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**91 open tasks.** Next (100): 8 · Soon (75): 13 · Someday (50): 35 · Maybe (25): 16 · Parked (5): 19
+**91 open tasks.** Next (100): 9 · Soon (75): 12 · Someday (50): 35 · Maybe (25): 16 · Parked (5): 19
 
-## 100 — Next (8)
+## 100 — Next (9)
 
 - Task 539 — Gang the neighbour labels so their leaders stop crossing.
 - Task 676 — Watch the sites, and send a derived weekly report.
@@ -19,8 +19,9 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 741 — The infinite map: generated networks for the label bench.
 - ! Task 759 — One word for the map selection, another for a menu choice; tips that earn their place.
 - Task 775 — File, Convert as: what is left of the Fotobi, Ghana session.
+- ! Task 781 — Active topology first; then Change type becomes a new asset in the old one's place.
 
-## 75 — Soon (13)
+## 75 — Soon (12)
 
 - Task 578 — Fire flow: the EPS frame and the Run concept, extracted from 530.
 - Task 617 — More map view options, the opacity one having shipped.
@@ -32,7 +33,6 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 756 — Cross-platform: the suite as a desktop application, beyond the web folder.
 - Task 763 — A searchable help manual, built from the tips Tom cut.
 - Task 772 — AutoCAD: import, export, and perhaps sync, on a long-lived branch.
-- Task 776 — Copy a table with its headings; export Tables to CSV and ODS.
 - Task 777 — Station and elevation marks on the mi and wi section sketches.
 - Task 779 — Shape: a simple drawn element, point, polyline or polygon, with snapping.
 
@@ -119,5 +119,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-83 of 91 titles are within 4–12 words. `!` marks the rest;
+82 of 91 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.
