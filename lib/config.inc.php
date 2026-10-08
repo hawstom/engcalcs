@@ -512,9 +512,21 @@ if (isset($_GET['ec_nolog']) && !headers_sent()) {
         $_COOKIE[EC_NOLOG_COOKIE] = '1';
     }
 }
-/** True when this browser has opted out of being counted. Checked by every log writer. */
+/**
+ * True when this request is the service worker's background precache fetch (sw.php sends the
+ * header X-EC-Precache: 1 on every one). It carries the visitor's cookies but is no view: the
+ * visitor asked for one page and the worker fetched twenty more. No log row, no ec_seen mark and
+ * no ec_blang cookie may come of it, or the real view that follows is deduplicated away.
+ */
+function ecIsPrecacheRequest() {
+    return isset($_SERVER['HTTP_X_EC_PRECACHE']) && $_SERVER['HTTP_X_EC_PRECACHE'] === '1';
+}
+/**
+ * True when this request must not be counted: the browser opted out of being counted, or the
+ * request is a service worker precache fetch. Checked by every log writer.
+ */
 function ecLoggingOptedOut() {
-    return isset($_COOKIE[EC_NOLOG_COOKIE]) && $_COOKIE[EC_NOLOG_COOKIE] === '1';
+    return ecIsPrecacheRequest() || (isset($_COOKIE[EC_NOLOG_COOKIE]) && $_COOKIE[EC_NOLOG_COOKIE] === '1');
 }
 
 // ---- Consent for the storage that is NOT strictly necessary (ROADMAP Task 286) ----
@@ -722,7 +734,7 @@ function ecSeen($page, $flag) {
  * visitor who returns tomorrow is counted again, which is what "visits" has always meant here.
  */
 function ecMarkSeen($page, $flag) {
-    if (!ecAnalyticsConsented() || headers_sent()) return;
+    if (!ecAnalyticsConsented() || headers_sent() || ecIsPrecacheRequest()) return;
     $page = preg_replace('/[^A-Za-z0-9_-]/', '', (string) $page);
     if ($page === '') return;
     $map = ecSeenMap();

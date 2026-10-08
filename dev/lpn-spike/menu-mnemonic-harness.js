@@ -205,7 +205,7 @@ async function rowSuite(page, label, opts) {
 			// A Han label never yields its own character (an input method types it); it falls back to a
 			// digit, then a Latin letter. A Latin word inside the label (Cookie, EPANET) keeps its letter.
 			ok(L + ': no mnemonic is a character typed through an input method', ms.every((m) => /^[0-9a-z]$/.test(m)), ms.join(''));
-			ok(L + ': an all-Han label gets a digit first', act.filter((r) => /^[\u3400-\u9fff\s]+$/.test(r.t)).slice(0, 10).every((r) => /^[0-9]$/.test(r.m)), ms.join(''));
+			ok(L + ': a label with no Latin letter (Han and punctuation) gets a digit first', act.filter((r) => /[\u3400-\u9fff]/.test(r.t) && !/[A-Za-z0-9]/.test(r.t)).slice(0, 10).every((r) => /^[0-9]$/.test(r.m)), ms.join(''));
 		}
 		await page.keyboard.press('Escape'); await page.keyboard.press('Escape');
 	}

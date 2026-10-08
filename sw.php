@@ -86,7 +86,12 @@ self.addEventListener('install', event => {
 
 async function precache(cacheName, urls) {
   const cache = await caches.open(cacheName);
-  await Promise.allSettled(urls.map(url => cache.add(new Request(url, { cache: 'reload' }))));
+  // X-EC-Precache marks the fetch as the worker's own, so the server logs no page view for it
+  // (ecIsPrecacheRequest() in lib/config.inc.php). A header, not a query parameter, so the cache
+  // key stays the page's own URL. Same-origin, so no CORS preflight.
+  await Promise.allSettled(urls.map(url => cache.add(
+    new Request(url, { cache: 'reload', headers: { 'X-EC-Precache': '1' } })
+  )));
 }
 
 // Activate: drop caches from older schemes, then prune entries this build has superseded.

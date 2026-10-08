@@ -826,6 +826,76 @@
                 "pt"
             ],
             "reason": "Menus is the ordinary plural in French and Portuguese (sprint 1004-lpn friction)."
+        },
+        "lpn_change_type_line": {
+            "category": "symbol",
+            "languages": "*",
+            "reason": "Placeholders and punctuation only ('{id}: {property} {value}'); nothing to translate. Sprint 1008, filed by 20 translators."
+        },
+        "lpn_basemap_style_normal": {
+            "category": "cognate",
+            "languages": [
+                "de",
+                "es",
+                "fr",
+                "id",
+                "pt",
+                "ro",
+                "tr"
+            ],
+            "reason": "'Normal' is the ordinary word for the default map style in these languages. Sprint 1008."
+        },
+        "lpn_survey_codes_col_code": {
+            "category": "cognate",
+            "languages": [
+                "de",
+                "fr"
+            ],
+            "reason": "'Code' is the natural column heading in German and French. Sprint 1008."
+        },
+        "lpn_find_scope_source": {
+            "category": "cognate",
+            "languages": [
+                "fr"
+            ],
+            "reason": "'Source' is the French hydraulics term (EPANET source). Sprint 1008."
+        },
+        "lpn_hotkeys_snip_heading": {
+            "category": "cognate",
+            "languages": [
+                "de"
+            ],
+            "reason": "'Screenshot' is the standard German word. Sprint 1008."
+        },
+        "lpn_screenshot_menu": {
+            "category": "cognate",
+            "languages": [
+                "de"
+            ],
+            "reason": "'Screenshot' is the standard German word. Sprint 1008."
+        },
+        "lpn_pane_scn_alt_tip": {
+            "category": "cognate",
+            "languages": [
+                "hr",
+                "it",
+                "pt"
+            ],
+            "reason": "'alt.' is also the abbreviation of alternative in Croatian, Italian and Portuguese. Sprint 1008."
+        },
+        "lpn_choice_default": {
+            "category": "cognate",
+            "languages": [
+                "id"
+            ],
+            "reason": "'Default' is the established Indonesian loanword; the id file uses it 29 times. Sprint 1008."
+        },
+        "lpn_file_export_menu": {
+            "category": "cognate",
+            "languages": [
+                "ro"
+            ],
+            "reason": "'Export…' is the Romanian word. Sprint 1008."
         }
     }
 }
