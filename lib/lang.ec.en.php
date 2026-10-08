@@ -2143,7 +2143,7 @@ $ec_lang['lpn_inp_drop_energy']='This EPANET file includes pumping cost modellin
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_inp_drop_tags']='This file assigns tags to some junctions, pipes, or other assets. Every tag was imported and appears in the properties of its asset, where it can be viewed or edited.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_inp_drop_report']='This file contains EPANET report-format settings. The EPANET run report is available under Reports, EPANET run, but it uses the standard EPANET format rather than the format these settings specify. The lines are kept and are written back if you save an EPANET file.';
+$ec_lang['lpn_inp_drop_report']='This file contains EPANET report-format settings. The run report is available under Reports, Run, but it uses the standard EPANET format rather than the format these settings specify. The lines are kept and are written back if you save an EPANET file.';
 $ec_lang['lpn_inp_drop_sections']='This file holds a section that this page does not read at all. Nothing here uses it. It is kept whole, and it is written back if you save an EPANET file.';
 $ec_lang['lpn_inp_drop_quality_options']='This file states EPANET water quality options: the Quality option, which names the kind of water quality analysis, and two settings that go with a chemical, Relative diffusivity and Quality tolerance. All three are kept and used. Water age, source trace, and a chemical are each computed here, and the two chemical settings are used when a chemical is run. All of them are written back if you save an EPANET file.';
 $ec_lang['lpn_inp_drop_file_options']='This file refers to an auxiliary file: Map, which holds coordinates, or Hydraulics, which holds previously computed hydraulics. This page cannot open either, so the lines are kept as they are and written back if you save an EPANET file.';
@@ -3423,7 +3423,7 @@ $ec_lang['lpn_time_runbox_hide']='Do not show this box again';
 $ec_lang['lpn_settings_runbox']='Show the run progress box';
 $ec_lang['lpn_settings_runbox_tip']='A box that reports the progress and outcome of a run. With it turned off, a finished run says the same thing in the status line for a few seconds instead. This is a setting for this browser, not for the project.';
 $ec_lang['lpn_time_run_failed']='The run did not finish, so there are no results for the later times.';
-$ec_lang['lpn_time_run_report']='EPANET run report';
+$ec_lang['lpn_time_run_report']='Run report';
 $ec_lang['lpn_time_run_report_copy']='Copy';
 $ec_lang['lpn_time_run_report_copied']='Copied';
 $ec_lang['lpn_time_run_report_tip']='The report EPANET wrote for the last run, verbatim: whether it converged, and any warnings. The text is produced by the EPANET solver, not by this page.';

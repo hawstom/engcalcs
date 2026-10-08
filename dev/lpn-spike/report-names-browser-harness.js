@@ -100,6 +100,7 @@ async function main() {
 			} else {
 				ok(row + ' opens ' + box, info.shown, JSON.stringify(info));
 			}
+			if (title) { ok(row + ' box title does not say EPANET', !/EPANET/.test(info.title || ''), info.title); }
 			if (title) { ok(row + ' box title is "' + title + '"', info.title === title, info.title); }
 		}
 		ok('no uncaught page errors', a.errors.length === 0, a.errors.slice(0, 2).join(' | '));
