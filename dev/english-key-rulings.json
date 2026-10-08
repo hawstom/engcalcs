@@ -4562,8 +4562,9 @@
             "ruled": "2026-08-29"
         },
         "lpn_settings_elev_source_tip": {
-            "on": "2026 Mapbox DEM horizontal and vertical accuracy ranges through 1–10 m and <1 m in the US, 2–10 m and 1–3 m in Europe and Japan, 30 m and 10–16 m globally, and 90 m and >16 m at the poles.",
-            "ruled": "2026-10-04"
+            "on": "Mapbox DEM accuracy in 2026, horizontal then vertical: 1–10 m and under 1 m in the US, 2–10 m and 1–3 m in Europe and Japan, 30 m and 10–16 m globally, and 90 m and over 16 m at the poles.",
+            "ruled": "2026-10-08",
+            "answer": "Calls page 8 October (round 2): Use proposed"
         },
         "lpn_settings_elev_source_typed": {
             "on": "Above",
@@ -5615,6 +5616,26 @@
         },
         "lpn_popup_none": {
             "on": "Nothing is selected. Select an asset on the map to see its properties.",
+            "ruled": "2026-10-08",
+            "answer": "Calls page 8 October: Use as written"
+        },
+        "lpn_workspace_confirm": {
+            "on": "Replace this browser's workspace layout with the one in the file?",
+            "ruled": "2026-10-08",
+            "answer": "Calls page 8 October: his own text, \"Replace this browser's workspace layout with the one in the file?\""
+        },
+        "lpn_change_type_key": {
+            "on": "Each line: ID: the property and value that would be lost",
+            "ruled": "2026-10-08",
+            "answer": "Calls page 8 October (round 2): Use proposed"
+        },
+        "lpn_settings_auto_run_tip": {
+            "on": "Turn off if recalculation is too slow. While this is on, the Calculate button is hidden.",
+            "ruled": "2026-10-08",
+            "answer": "Calls page 8 October (round 2): Use proposed"
+        },
+        "lpn_dxf_note_blocks": {
+            "on": "Layers are named {prefix}, the asset code, a hyphen, and the alternative, as in {example}. Each element is a block inserted at scale 1 with attributes 1 unit high; scale the blocks to set the text height. Every attribute is visible; the attributes of one element are stacked in a column beside its symbol.",
             "ruled": "2026-10-08",
             "answer": "Calls page 8 October: Use as written"
         }

@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "am",
-        "expected_key_count": 2503,
-        "delta_key_count": 63,
+        "expected_key_count": 2480,
+        "delta_key_count": 36,
         "exempt_key_count": 36,
         "exempt_keys": [
             "u_imgd",
@@ -715,1141 +715,655 @@
         ]
     },
     "keys_to_translate": {
-        "lpn_pane_scn_ov_only": "Overrides only",
-        "lpn_pane_scn_cur_only": "Current scenario only",
-        "lpn_pane_scn_filter_note": "{filters}. Showing {n} of {all}.",
-        "lpn_change_type_line_alternative": "{id}: {property} {value}, in alternative {alternative}",
-        "lpn_change_type_scenario_ask": "Current scenario is not Base. Create overrides?",
-        "lpn_change_type_create_overrides": "Create overrides",
-        "lpn_change_type_switch_base": "Switch to Base",
-        "lpn_scenario_delete_has_children": "The scenario {name} cannot be deleted while other scenarios inherit from it: {list}. Delete those first, or give them another parent.",
-        "lpn_settings_table_major": "Major heading",
-        "lpn_settings_table_minor": "Minor heading",
-        "lpn_settings_table_category": "Category",
-        "lpn_settings_table_owner": "Owner",
-        "lpn_settings_table_setting": "Setting",
-        "lpn_settings_table_yes": "Yes",
-        "lpn_settings_table_no": "No",
-        "lpn_settings_row_of": "{setting}, {member}",
-        "lpn_settings_row_labels_field": "{labels}: {field}",
-        "lpn_settings_row_labels_part": "{labels}: {field}, {part}",
-        "lpn_settings_row_labels_customer": "Customer labels",
-        "lpn_settings_row_label_before": "Text before",
-        "lpn_settings_row_label_after": "Text after",
-        "lpn_settings_row_label_on": "Is active",
-        "lpn_settings_row_label_show": "Show order",
-        "lpn_settings_row_label_drop": "Drop order",
-        "lpn_settings_row_id_prefix": "ID prefix",
-        "lpn_settings_row_symbol_cap_multiple": "Largest symbol, as a multiple of a typical pipe length",
-        "lpn_settings_row_symbol_cap_percentile": "Typical pipe length, as a percentile of all pipe lengths",
-        "lpn_settings_row_contour_labels": "Contour labels",
-        "lpn_settings_row_check_freq": "Status check frequency",
-        "lpn_settings_row_max_check": "Maximum status checks",
-        "lpn_settings_row_status_report": "Status report",
-        "lpn_settings_row_pda_src": "Pressure driven options stated in the file",
-        "lpn_settings_row_quality_option": "Quality option as the file states it",
-        "lpn_settings_row_tolerance": "Accuracy (older projects)",
-        "lpn_settings_row_emitter_exponent_old": "Emitter exponent (older projects)",
-        "lpn_settings_row_elev_source_old": "Elevation source (older projects)",
-        "lpn_settings_row_basemap": "Basemap",
-        "lpn_settings_row_basemap_last": "Basemap to return to",
-        "lpn_settings_row_customer_max_width": "Show customer labels when zoomed to this map width or less",
-        "lpn_settings_row_quality_step": "Quality time step",
-        "lpn_settings_row_view": "Map view (center and scale)",
-        "lpn_settings_row_contour_fill": "Contour fill",
-        "lpn_settings_row_contour_opacity": "Contour fill opacity",
-        "lpn_settings_row_contour_interval": "Contour interval",
-        "lpn_settings_row_contour_buffer": "Contour buffer",
-        "lpn_settings_row_contour_terrain": "Contour ground between nodes from Mapbox DEM",
-        "lpn_settings_row_new_asset": "New assets: {setting}",
-        "lpn_settings_row_default": "{value} (default)",
-        "lpn_settings_row_view_value": "Center {x}, {y}; scale {s}",
-        "lpn_settings_held_base": "{base}: {value}",
-        "lpn_settings_view_center": "Map center",
-        "lpn_settings_view_scale": "Map scale",
-        "lpn_settings_view_scale_tip": "The scale at the center of the map, as 1:N. Type 1:2000, or just 2000, to zoom to that scale.",
-        "lpn_settings_view_top_left": "Top left corner",
-        "lpn_settings_view_bottom_right": "Bottom right corner",
-        "lpn_settings_view_save": "Save this view in this scenario",
-        "lpn_settings_view_save_tip": "Stores this map center and scale in the open scenario, so opening that scenario moves the map here. Moving the map afterward changes nothing until you press this again. Clear the override to follow the {base} view again.",
-        "lpn_settings_row_basemap_osm": "Street map",
-        "lpn_settings_row_basemap_satellite": "Satellite images",
-        "lpn_settings_units_one_project": "Units are the same in every scenario.",
-        "lpn_settings_restore_base_only": "Switch to Base to restore the defaults.",
-        "lpn_alt_cat_presentation": "Presentation",
-        "lpn_alt_cat_calculation": "Calculation"
+        "lpn_pane_copy_heads": "Copy with headings",
+        "lpn_export_table_title": "Export to {format}",
+        "lpn_export_table_current": "Current",
+        "lpn_export_table_all": "All",
+        "lpn_export_table_go": "Export",
+        "lpn_export_table_scn_note": "Results are exported only for the scenario last calculated.",
+        "lpn_file_export_tables_heading": "Tables and libraries",
+        "lpn_file_export_item_ods": "ODS file…",
+        "lpn_file_export_item_xlsx": "XLSX file…",
+        "lpn_file_export_item_csv": "CSV file…",
+        "lpn_file_export_tables_tip": "Download the tables as the Tables pane shows them, one sheet each, with a sheet for each library their IDs refer to: patterns, curves, pipe types, and fittings.",
+        "lpn_file_export_csv_tip": "Download a table as the Tables pane shows it. Several tables come as one zip file of CSV files, with a file for each library their IDs refer to.",
+        "lpn_file_export_item_dxf": "DXF file…",
+        "lpn_file_export_dxf_tip": "Download this network for AutoCAD and other CAD programs: pipes, pumps, and valves as polylines, and every element as a block whose attributes carry its ID and property values in the project units.",
+        "lpn_dxf_export_no_utm": "The DXF file was not written: this network lies outside the latitudes UTM covers (80° S to 84° N), and a drawing needs a flat grid to be drawn on.",
+        "lpn_dxf_export_refused": "The DXF file was not written: the coordinate conversion it needs did not load. Check the connection and try again.",
+        "lpn_dxf_export_failed": "The DXF file was not written: an error in this page stopped it ({error}).",
+        "lpn_dxf_note_grid": "Coordinates: the X and Y of this project, in {unit}. No coordinate system is stated.",
+        "lpn_dxf_note_crs": "Coordinates: {crs}, exactly as this project states them.",
+        "lpn_dxf_note_geo": "Coordinates: {crs}, in meters, not latitude and longitude. The latitudes and longitudes of the project were converted to that grid.",
+        "lpn_dxf_exported_geo": "Exported {file}. Its coordinates are {crs}, in meters, not latitude and longitude.",
+        "lpn_dxf_note_blocks": "Layers are named {prefix}, the asset code, a hyphen, and the alternative, as in {example}. Each element is a block inserted at scale 1 with attributes 1 unit high; scale the blocks to set the text height. Every attribute is visible; the attributes of one element are stacked in a column beside its symbol.",
+        "lpn_dxf_note_shortened": "{n} values were longer than a DXF file allows ({max} characters), so each was shortened and ends in three periods.",
+        "lpn_dxf_note_categories": "{n} junctions have more than one demand category. Their {tag} attribute holds the sum of the base demands of all categories.",
+        "lpn_file_export_item_workspace": "Workspace…",
+        "lpn_file_export_workspace_tip": "Download a small file holding where your boxes sit, their sizes, which are open or docked, and your pane and column sizes, plus the reading preferences of this page. Your projects, project settings and cookies (language, consent, units) are not in it. Load it on another screen or browser with File, Import, Workspace.",
+        "lpn_file_import_workspace": "Workspace…",
+        "lpn_file_import_workspace_tip": "Apply a workspace file saved with File, Export, Workspace: box positions and sizes, docking, pane sizes and the reading preferences of this page. Your projects and cookies are not touched.",
+        "lpn_workspace_exported": "Workspace saved to {file}: {n} settings.",
+        "lpn_workspace_imported": "Workspace applied from {file}. Settings applied: {n}. Returned to their defaults: {r}.",
+        "lpn_workspace_ignored": "Entries ignored because they were not recognized: {u}.",
+        "lpn_workspace_refused_unreadable": "This file could not be read as a workspace, so nothing was changed.",
+        "lpn_workspace_refused_format": "This is not a workspace file saved by this page, so nothing was changed.",
+        "lpn_workspace_refused_newer": "This workspace file was saved by a newer version of this page (format {version}), so nothing was changed.",
+        "lpn_workspace_confirm": "Replace this browser's workspace layout with the one in the file?",
+        "lpn_workspace_refused_storage": "Browser storage is full or unavailable, so the workspace was not applied."
     },
     "keys": {
-        "lpn_pane_scn_ov_only": "Overrides only",
-        "lpn_pane_scn_cur_only": "Current scenario only",
-        "lpn_pane_scn_filter_note": "{filters}. Showing {n} of {all}.",
-        "lpn_change_type_line_alternative": "{id}: {property} {value}, in alternative {alternative}",
-        "lpn_change_type_scenario_ask": "Current scenario is not Base. Create overrides?",
-        "lpn_change_type_create_overrides": "Create overrides",
-        "lpn_change_type_switch_base": "Switch to Base",
-        "lpn_scenario_delete_has_children": "The scenario {name} cannot be deleted while other scenarios inherit from it: {list}. Delete those first, or give them another parent.",
-        "lpn_settings_table_major": "Major heading",
-        "lpn_settings_table_minor": "Minor heading",
-        "lpn_settings_table_category": "Category",
-        "lpn_settings_table_owner": "Owner",
-        "lpn_settings_table_setting": "Setting",
-        "lpn_settings_table_yes": "Yes",
-        "lpn_settings_table_no": "No",
-        "lpn_settings_row_of": "{setting}, {member}",
-        "lpn_settings_row_labels_field": "{labels}: {field}",
-        "lpn_settings_row_labels_part": "{labels}: {field}, {part}",
-        "lpn_settings_row_labels_customer": "Customer labels",
-        "lpn_settings_row_label_before": "Text before",
-        "lpn_settings_row_label_after": "Text after",
-        "lpn_settings_row_label_on": "Is active",
-        "lpn_settings_row_label_show": "Show order",
-        "lpn_settings_row_label_drop": "Drop order",
-        "lpn_settings_row_id_prefix": "ID prefix",
-        "lpn_settings_row_symbol_cap_multiple": "Largest symbol, as a multiple of a typical pipe length",
-        "lpn_settings_row_symbol_cap_percentile": "Typical pipe length, as a percentile of all pipe lengths",
-        "lpn_settings_row_contour_labels": "Contour labels",
-        "lpn_settings_row_check_freq": "Status check frequency",
-        "lpn_settings_row_max_check": "Maximum status checks",
-        "lpn_settings_row_status_report": "Status report",
-        "lpn_settings_row_pda_src": "Pressure driven options stated in the file",
-        "lpn_settings_row_quality_option": "Quality option as the file states it",
-        "lpn_settings_row_tolerance": "Accuracy (older projects)",
-        "lpn_settings_row_emitter_exponent_old": "Emitter exponent (older projects)",
-        "lpn_settings_row_elev_source_old": "Elevation source (older projects)",
-        "lpn_settings_row_basemap": "Basemap",
-        "lpn_settings_row_basemap_last": "Basemap to return to",
-        "lpn_settings_row_customer_max_width": "Show customer labels when zoomed to this map width or less",
-        "lpn_settings_row_quality_step": "Quality time step",
-        "lpn_settings_row_view": "Map view (center and scale)",
-        "lpn_settings_row_contour_fill": "Contour fill",
-        "lpn_settings_row_contour_opacity": "Contour fill opacity",
-        "lpn_settings_row_contour_interval": "Contour interval",
-        "lpn_settings_row_contour_buffer": "Contour buffer",
-        "lpn_settings_row_contour_terrain": "Contour ground between nodes from Mapbox DEM",
-        "lpn_settings_row_new_asset": "New assets: {setting}",
-        "lpn_settings_row_default": "{value} (default)",
-        "lpn_settings_row_view_value": "Center {x}, {y}; scale {s}",
-        "lpn_settings_held_base": "{base}: {value}",
-        "lpn_settings_view_center": "Map center",
-        "lpn_settings_view_scale": "Map scale",
-        "lpn_settings_view_scale_tip": "The scale at the center of the map, as 1:N. Type 1:2000, or just 2000, to zoom to that scale.",
-        "lpn_settings_view_top_left": "Top left corner",
-        "lpn_settings_view_bottom_right": "Bottom right corner",
-        "lpn_settings_view_save": "Save this view in this scenario",
-        "lpn_settings_view_save_tip": "Stores this map center and scale in the open scenario, so opening that scenario moves the map here. Moving the map afterward changes nothing until you press this again. Clear the override to follow the {base} view again.",
-        "lpn_settings_row_basemap_osm": "Street map",
-        "lpn_settings_row_basemap_satellite": "Satellite images",
-        "lpn_settings_units_one_project": "Units are the same in every scenario.",
-        "lpn_settings_restore_base_only": "Switch to Base to restore the defaults.",
-        "lpn_alt_cat_presentation": "Presentation",
-        "lpn_alt_cat_calculation": "Calculation"
+        "lpn_pane_copy_heads": "Copy with headings",
+        "lpn_export_table_title": "Export to {format}",
+        "lpn_export_table_current": "Current",
+        "lpn_export_table_all": "All",
+        "lpn_export_table_go": "Export",
+        "lpn_export_table_scn_note": "Results are exported only for the scenario last calculated.",
+        "lpn_file_export_tables_heading": "Tables and libraries",
+        "lpn_file_export_item_ods": "ODS file…",
+        "lpn_file_export_item_xlsx": "XLSX file…",
+        "lpn_file_export_item_csv": "CSV file…",
+        "lpn_file_export_tables_tip": "Download the tables as the Tables pane shows them, one sheet each, with a sheet for each library their IDs refer to: patterns, curves, pipe types, and fittings.",
+        "lpn_file_export_csv_tip": "Download a table as the Tables pane shows it. Several tables come as one zip file of CSV files, with a file for each library their IDs refer to.",
+        "lpn_file_export_item_dxf": "DXF file…",
+        "lpn_file_export_dxf_tip": "Download this network for AutoCAD and other CAD programs: pipes, pumps, and valves as polylines, and every element as a block whose attributes carry its ID and property values in the project units.",
+        "lpn_dxf_export_no_utm": "The DXF file was not written: this network lies outside the latitudes UTM covers (80° S to 84° N), and a drawing needs a flat grid to be drawn on.",
+        "lpn_dxf_export_refused": "The DXF file was not written: the coordinate conversion it needs did not load. Check the connection and try again.",
+        "lpn_dxf_export_failed": "The DXF file was not written: an error in this page stopped it ({error}).",
+        "lpn_dxf_note_grid": "Coordinates: the X and Y of this project, in {unit}. No coordinate system is stated.",
+        "lpn_dxf_note_crs": "Coordinates: {crs}, exactly as this project states them.",
+        "lpn_dxf_note_geo": "Coordinates: {crs}, in meters, not latitude and longitude. The latitudes and longitudes of the project were converted to that grid.",
+        "lpn_dxf_exported_geo": "Exported {file}. Its coordinates are {crs}, in meters, not latitude and longitude.",
+        "lpn_dxf_note_blocks": "Layers are named {prefix}, the asset code, a hyphen, and the alternative, as in {example}. Each element is a block inserted at scale 1 with attributes 1 unit high; scale the blocks to set the text height. Every attribute is visible; the attributes of one element are stacked in a column beside its symbol.",
+        "lpn_dxf_note_shortened": "{n} values were longer than a DXF file allows ({max} characters), so each was shortened and ends in three periods.",
+        "lpn_dxf_note_categories": "{n} junctions have more than one demand category. Their {tag} attribute holds the sum of the base demands of all categories.",
+        "lpn_file_export_item_workspace": "Workspace…",
+        "lpn_file_export_workspace_tip": "Download a small file holding where your boxes sit, their sizes, which are open or docked, and your pane and column sizes, plus the reading preferences of this page. Your projects, project settings and cookies (language, consent, units) are not in it. Load it on another screen or browser with File, Import, Workspace.",
+        "lpn_file_import_workspace": "Workspace…",
+        "lpn_file_import_workspace_tip": "Apply a workspace file saved with File, Export, Workspace: box positions and sizes, docking, pane sizes and the reading preferences of this page. Your projects and cookies are not touched.",
+        "lpn_workspace_exported": "Workspace saved to {file}: {n} settings.",
+        "lpn_workspace_imported": "Workspace applied from {file}. Settings applied: {n}. Returned to their defaults: {r}.",
+        "lpn_workspace_ignored": "Entries ignored because they were not recognized: {u}.",
+        "lpn_workspace_refused_unreadable": "This file could not be read as a workspace, so nothing was changed.",
+        "lpn_workspace_refused_format": "This is not a workspace file saved by this page, so nothing was changed.",
+        "lpn_workspace_refused_newer": "This workspace file was saved by a newer version of this page (format {version}), so nothing was changed.",
+        "lpn_workspace_confirm": "Replace this browser's workspace layout with the one in the file?",
+        "lpn_workspace_refused_storage": "Browser storage is full or unavailable, so the workspace was not applied."
     },
     "key_context": {
-        "lpn_pane_scn_ov_only": {
+        "lpn_pane_copy_heads": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_pane_scn_show",
-                    "value": "ሁኔታዎችን አሳይ",
-                    "english": "Show scenarios"
+                    "key": "lpn_pane_print",
+                    "value": "ሠንጠረዥ አትም",
+                    "english": "Print table"
                 },
                 "next_translated": {
-                    "key": "lpn_pane_clear_override",
-                    "value": "የራስ ዋጋን አጽዳ",
-                    "english": "Clear override"
+                    "key": "lpn_menu_project",
+                    "value": "ውሃ",
+                    "english": "Water"
                 }
             }
         },
-        "lpn_pane_scn_cur_only": {
+        "lpn_export_table_title": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_pane_scn_show",
-                    "value": "ሁኔታዎችን አሳይ",
-                    "english": "Show scenarios"
+                    "key": "lpn_pane_print",
+                    "value": "ሠንጠረዥ አትም",
+                    "english": "Print table"
                 },
                 "next_translated": {
-                    "key": "lpn_pane_clear_override",
-                    "value": "የራስ ዋጋን አጽዳ",
-                    "english": "Clear override"
+                    "key": "lpn_menu_project",
+                    "value": "ውሃ",
+                    "english": "Water"
                 }
             }
         },
-        "lpn_pane_scn_filter_note": {
+        "lpn_export_table_current": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_pane_scn_show",
-                    "value": "ሁኔታዎችን አሳይ",
-                    "english": "Show scenarios"
+                    "key": "lpn_pane_print",
+                    "value": "ሠንጠረዥ አትም",
+                    "english": "Print table"
                 },
                 "next_translated": {
-                    "key": "lpn_pane_clear_override",
-                    "value": "የራስ ዋጋን አጽዳ",
-                    "english": "Clear override"
+                    "key": "lpn_menu_project",
+                    "value": "ውሃ",
+                    "english": "Water"
                 }
             }
         },
-        "lpn_change_type_line_alternative": {
+        "lpn_export_table_all": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_change_type_line_scenario",
-                    "value": "{id}፦ {property} {value}፣ በሁኔታ {scenario}",
-                    "english": "{id}: {property} {value}, in scenario {scenario}"
+                    "key": "lpn_pane_print",
+                    "value": "ሠንጠረዥ አትም",
+                    "english": "Print table"
                 },
                 "next_translated": {
-                    "key": "lpn_change_type_more",
-                    "value": "እና {n} ተጨማሪ።",
-                    "english": "And {n} more."
+                    "key": "lpn_menu_project",
+                    "value": "ውሃ",
+                    "english": "Water"
                 }
             }
         },
-        "lpn_change_type_scenario_ask": {
+        "lpn_export_table_go": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_change_type_rules",
-                    "value": "እነዚህ የደንብ መስመሮች ግንኙነትን በዓይነቱ ይሰይማሉ፣ በምትኩ አዲሱን ዓይነቱን ይሰይማሉ፦",
-                    "english": "These rule lines name a link by its kind, and will name its new kind instead:"
+                    "key": "lpn_pane_print",
+                    "value": "ሠንጠረዥ አትም",
+                    "english": "Print table"
                 },
                 "next_translated": {
-                    "key": "lpn_tables_menu_tip",
-                    "value": "በታችኛው ፓነል ውስጥ ንብረቶችን በሠንጠረዦች ይመልከቱና ያስተካክሉ።",
-                    "english": "View and edit assets in tables in bottom panel."
+                    "key": "lpn_menu_project",
+                    "value": "ውሃ",
+                    "english": "Water"
                 }
             }
         },
-        "lpn_change_type_create_overrides": {
+        "lpn_export_table_scn_note": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_change_type_rules",
-                    "value": "እነዚህ የደንብ መስመሮች ግንኙነትን በዓይነቱ ይሰይማሉ፣ በምትኩ አዲሱን ዓይነቱን ይሰይማሉ፦",
-                    "english": "These rule lines name a link by its kind, and will name its new kind instead:"
+                    "key": "lpn_pane_print",
+                    "value": "ሠንጠረዥ አትም",
+                    "english": "Print table"
                 },
                 "next_translated": {
-                    "key": "lpn_tables_menu_tip",
-                    "value": "በታችኛው ፓነል ውስጥ ንብረቶችን በሠንጠረዦች ይመልከቱና ያስተካክሉ።",
-                    "english": "View and edit assets in tables in bottom panel."
+                    "key": "lpn_menu_project",
+                    "value": "ውሃ",
+                    "english": "Water"
                 }
             }
         },
-        "lpn_change_type_switch_base": {
+        "lpn_file_export_tables_heading": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_change_type_rules",
-                    "value": "እነዚህ የደንብ መስመሮች ግንኙነትን በዓይነቱ ይሰይማሉ፣ በምትኩ አዲሱን ዓይነቱን ይሰይማሉ፦",
-                    "english": "These rule lines name a link by its kind, and will name its new kind instead:"
+                    "key": "lpn_file_export_item_geojson",
+                    "value": "የGeoJSON ፋይል…",
+                    "english": "GeoJSON file…"
                 },
                 "next_translated": {
-                    "key": "lpn_tables_menu_tip",
-                    "value": "በታችኛው ፓነል ውስጥ ንብረቶችን በሠንጠረዦች ይመልከቱና ያስተካክሉ።",
-                    "english": "View and edit assets in tables in bottom panel."
+                    "key": "lpn_file_export_inp_tip",
+                    "value": "ይህን መረብ እንደ EPANET .inp ፋይል ያውርዱ (የሚመለከት ከሆነ ከምስሉ ጋር በዚፕ ፋይል ውስጥ)። የ.inp ቅርጸት መያዝ የማይችለው ማንኛውም ነገር በኋላ ይዘረዘራል።",
+                    "english": "Download this network as an EPANET .inp file (in a zip file with its image if applicable). Anything the .inp format cannot hold is listed for you afterwards."
                 }
             }
         },
-        "lpn_scenario_delete_has_children": {
+        "lpn_file_export_item_ods": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_scenario_delete_confirm",
-                    "value": "ሁኔታ {name}ን እና {n} የራስ ዋጋዎቹን ይሰርዙ? ስዕሉ ራሱ አይለወጥም።",
-                    "english": "Delete the scenario {name}, and its {n} overrides? The drawing itself is not changed."
+                    "key": "lpn_file_export_item_geojson",
+                    "value": "የGeoJSON ፋይል…",
+                    "english": "GeoJSON file…"
                 },
                 "next_translated": {
-                    "key": "lpn_scenario_override",
-                    "value": "በዚህ ሁኔታ ውስጥ የራስ ዋጋ",
-                    "english": "Override in this scenario"
+                    "key": "lpn_file_export_inp_tip",
+                    "value": "ይህን መረብ እንደ EPANET .inp ፋይል ያውርዱ (የሚመለከት ከሆነ ከምስሉ ጋር በዚፕ ፋይል ውስጥ)። የ.inp ቅርጸት መያዝ የማይችለው ማንኛውም ነገር በኋላ ይዘረዘራል።",
+                    "english": "Download this network as an EPANET .inp file (in a zip file with its image if applicable). Anything the .inp format cannot hold is listed for you afterwards."
                 }
             }
         },
-        "lpn_settings_table_major": {
+        "lpn_file_export_item_xlsx": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_time_scn_overrides",
-                    "value": "የሁኔታ የራስ ዋጋዎች፦",
-                    "english": "Scenario overrides:"
+                    "key": "lpn_file_export_item_geojson",
+                    "value": "የGeoJSON ፋይል…",
+                    "english": "GeoJSON file…"
                 },
                 "next_translated": {
-                    "key": "lpn_alt_cat_physical",
-                    "value": "አካላዊ",
-                    "english": "Physical"
+                    "key": "lpn_file_export_inp_tip",
+                    "value": "ይህን መረብ እንደ EPANET .inp ፋይል ያውርዱ (የሚመለከት ከሆነ ከምስሉ ጋር በዚፕ ፋይል ውስጥ)። የ.inp ቅርጸት መያዝ የማይችለው ማንኛውም ነገር በኋላ ይዘረዘራል።",
+                    "english": "Download this network as an EPANET .inp file (in a zip file with its image if applicable). Anything the .inp format cannot hold is listed for you afterwards."
                 }
             }
         },
-        "lpn_settings_table_minor": {
+        "lpn_file_export_item_csv": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_time_scn_overrides",
-                    "value": "የሁኔታ የራስ ዋጋዎች፦",
-                    "english": "Scenario overrides:"
+                    "key": "lpn_file_export_item_geojson",
+                    "value": "የGeoJSON ፋይል…",
+                    "english": "GeoJSON file…"
                 },
                 "next_translated": {
-                    "key": "lpn_alt_cat_physical",
-                    "value": "አካላዊ",
-                    "english": "Physical"
+                    "key": "lpn_file_export_inp_tip",
+                    "value": "ይህን መረብ እንደ EPANET .inp ፋይል ያውርዱ (የሚመለከት ከሆነ ከምስሉ ጋር በዚፕ ፋይል ውስጥ)። የ.inp ቅርጸት መያዝ የማይችለው ማንኛውም ነገር በኋላ ይዘረዘራል።",
+                    "english": "Download this network as an EPANET .inp file (in a zip file with its image if applicable). Anything the .inp format cannot hold is listed for you afterwards."
                 }
             }
         },
-        "lpn_settings_table_category": {
+        "lpn_file_export_tables_tip": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_time_scn_overrides",
-                    "value": "የሁኔታ የራስ ዋጋዎች፦",
-                    "english": "Scenario overrides:"
+                    "key": "lpn_file_export_item_geojson",
+                    "value": "የGeoJSON ፋይል…",
+                    "english": "GeoJSON file…"
                 },
                 "next_translated": {
-                    "key": "lpn_alt_cat_physical",
-                    "value": "አካላዊ",
-                    "english": "Physical"
+                    "key": "lpn_file_export_inp_tip",
+                    "value": "ይህን መረብ እንደ EPANET .inp ፋይል ያውርዱ (የሚመለከት ከሆነ ከምስሉ ጋር በዚፕ ፋይል ውስጥ)። የ.inp ቅርጸት መያዝ የማይችለው ማንኛውም ነገር በኋላ ይዘረዘራል።",
+                    "english": "Download this network as an EPANET .inp file (in a zip file with its image if applicable). Anything the .inp format cannot hold is listed for you afterwards."
                 }
             }
         },
-        "lpn_settings_table_owner": {
+        "lpn_file_export_csv_tip": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_time_scn_overrides",
-                    "value": "የሁኔታ የራስ ዋጋዎች፦",
-                    "english": "Scenario overrides:"
+                    "key": "lpn_file_export_item_geojson",
+                    "value": "የGeoJSON ፋይል…",
+                    "english": "GeoJSON file…"
                 },
                 "next_translated": {
-                    "key": "lpn_alt_cat_physical",
-                    "value": "አካላዊ",
-                    "english": "Physical"
+                    "key": "lpn_file_export_inp_tip",
+                    "value": "ይህን መረብ እንደ EPANET .inp ፋይል ያውርዱ (የሚመለከት ከሆነ ከምስሉ ጋር በዚፕ ፋይል ውስጥ)። የ.inp ቅርጸት መያዝ የማይችለው ማንኛውም ነገር በኋላ ይዘረዘራል።",
+                    "english": "Download this network as an EPANET .inp file (in a zip file with its image if applicable). Anything the .inp format cannot hold is listed for you afterwards."
                 }
             }
         },
-        "lpn_settings_table_setting": {
+        "lpn_file_export_item_dxf": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_time_scn_overrides",
-                    "value": "የሁኔታ የራስ ዋጋዎች፦",
-                    "english": "Scenario overrides:"
+                    "key": "lpn_inp_export_refused",
+                    "value": "ይህ ፕሮጀክት እንደ EPANET ፋይል ሊጻፍ አይችልም፦ {detail}",
+                    "english": "This project cannot be written as an EPANET file: {detail}"
                 },
                 "next_translated": {
-                    "key": "lpn_alt_cat_physical",
-                    "value": "አካላዊ",
-                    "english": "Physical"
+                    "key": "lpn_file_export_geojson_tip",
+                    "value": "ይህን መረብ ለQGIS፣ ለArcGIS Pro እና ለሌሎች የጂአይኤስ ፕሮግራሞች እንደ GeoJSON ፋይል ያውርዱት። መገናኛዎች፣ ታንኮችና ማጠራቀሚያዎች ነጥቦች ናቸው፣ ቧንቧዎች፣ ፓምፖችና ቫልቮች ደግሞ መታጠፊያዎቻቸውን የሚከተሉ መስመሮች ናቸው። ቦታዎች በኬንትሮስና በኬክሮስ ናቸው። ውጤቶች የሚካተቱት መረቡ ሲፈታ ብቻ ነው።",
+                    "english": "Download this network as a GeoJSON file for QGIS, ArcGIS Pro and other GIS programs. Junctions, tanks and reservoirs are points, and pipes, pumps and valves are lines that follow their vertices. Positions are latitude and longitude. Results are included only when the network has been solved."
                 }
             }
         },
-        "lpn_settings_table_yes": {
+        "lpn_file_export_dxf_tip": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_time_scn_overrides",
-                    "value": "የሁኔታ የራስ ዋጋዎች፦",
-                    "english": "Scenario overrides:"
+                    "key": "lpn_inp_export_refused",
+                    "value": "ይህ ፕሮጀክት እንደ EPANET ፋይል ሊጻፍ አይችልም፦ {detail}",
+                    "english": "This project cannot be written as an EPANET file: {detail}"
                 },
                 "next_translated": {
-                    "key": "lpn_alt_cat_physical",
-                    "value": "አካላዊ",
-                    "english": "Physical"
+                    "key": "lpn_file_export_geojson_tip",
+                    "value": "ይህን መረብ ለQGIS፣ ለArcGIS Pro እና ለሌሎች የጂአይኤስ ፕሮግራሞች እንደ GeoJSON ፋይል ያውርዱት። መገናኛዎች፣ ታንኮችና ማጠራቀሚያዎች ነጥቦች ናቸው፣ ቧንቧዎች፣ ፓምፖችና ቫልቮች ደግሞ መታጠፊያዎቻቸውን የሚከተሉ መስመሮች ናቸው። ቦታዎች በኬንትሮስና በኬክሮስ ናቸው። ውጤቶች የሚካተቱት መረቡ ሲፈታ ብቻ ነው።",
+                    "english": "Download this network as a GeoJSON file for QGIS, ArcGIS Pro and other GIS programs. Junctions, tanks and reservoirs are points, and pipes, pumps and valves are lines that follow their vertices. Positions are latitude and longitude. Results are included only when the network has been solved."
                 }
             }
         },
-        "lpn_settings_table_no": {
+        "lpn_dxf_export_no_utm": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_time_scn_overrides",
-                    "value": "የሁኔታ የራስ ዋጋዎች፦",
-                    "english": "Scenario overrides:"
+                    "key": "lpn_inp_export_refused",
+                    "value": "ይህ ፕሮጀክት እንደ EPANET ፋይል ሊጻፍ አይችልም፦ {detail}",
+                    "english": "This project cannot be written as an EPANET file: {detail}"
                 },
                 "next_translated": {
-                    "key": "lpn_alt_cat_physical",
-                    "value": "አካላዊ",
-                    "english": "Physical"
+                    "key": "lpn_file_export_geojson_tip",
+                    "value": "ይህን መረብ ለQGIS፣ ለArcGIS Pro እና ለሌሎች የጂአይኤስ ፕሮግራሞች እንደ GeoJSON ፋይል ያውርዱት። መገናኛዎች፣ ታንኮችና ማጠራቀሚያዎች ነጥቦች ናቸው፣ ቧንቧዎች፣ ፓምፖችና ቫልቮች ደግሞ መታጠፊያዎቻቸውን የሚከተሉ መስመሮች ናቸው። ቦታዎች በኬንትሮስና በኬክሮስ ናቸው። ውጤቶች የሚካተቱት መረቡ ሲፈታ ብቻ ነው።",
+                    "english": "Download this network as a GeoJSON file for QGIS, ArcGIS Pro and other GIS programs. Junctions, tanks and reservoirs are points, and pipes, pumps and valves are lines that follow their vertices. Positions are latitude and longitude. Results are included only when the network has been solved."
                 }
             }
         },
-        "lpn_settings_row_of": {
+        "lpn_dxf_export_refused": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_time_scn_overrides",
-                    "value": "የሁኔታ የራስ ዋጋዎች፦",
-                    "english": "Scenario overrides:"
+                    "key": "lpn_inp_export_refused",
+                    "value": "ይህ ፕሮጀክት እንደ EPANET ፋይል ሊጻፍ አይችልም፦ {detail}",
+                    "english": "This project cannot be written as an EPANET file: {detail}"
                 },
                 "next_translated": {
-                    "key": "lpn_alt_cat_physical",
-                    "value": "አካላዊ",
-                    "english": "Physical"
+                    "key": "lpn_file_export_geojson_tip",
+                    "value": "ይህን መረብ ለQGIS፣ ለArcGIS Pro እና ለሌሎች የጂአይኤስ ፕሮግራሞች እንደ GeoJSON ፋይል ያውርዱት። መገናኛዎች፣ ታንኮችና ማጠራቀሚያዎች ነጥቦች ናቸው፣ ቧንቧዎች፣ ፓምፖችና ቫልቮች ደግሞ መታጠፊያዎቻቸውን የሚከተሉ መስመሮች ናቸው። ቦታዎች በኬንትሮስና በኬክሮስ ናቸው። ውጤቶች የሚካተቱት መረቡ ሲፈታ ብቻ ነው።",
+                    "english": "Download this network as a GeoJSON file for QGIS, ArcGIS Pro and other GIS programs. Junctions, tanks and reservoirs are points, and pipes, pumps and valves are lines that follow their vertices. Positions are latitude and longitude. Results are included only when the network has been solved."
                 }
             }
         },
-        "lpn_settings_row_labels_field": {
+        "lpn_dxf_export_failed": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_time_scn_overrides",
-                    "value": "የሁኔታ የራስ ዋጋዎች፦",
-                    "english": "Scenario overrides:"
+                    "key": "lpn_inp_export_refused",
+                    "value": "ይህ ፕሮጀክት እንደ EPANET ፋይል ሊጻፍ አይችልም፦ {detail}",
+                    "english": "This project cannot be written as an EPANET file: {detail}"
                 },
                 "next_translated": {
-                    "key": "lpn_alt_cat_physical",
-                    "value": "አካላዊ",
-                    "english": "Physical"
+                    "key": "lpn_file_export_geojson_tip",
+                    "value": "ይህን መረብ ለQGIS፣ ለArcGIS Pro እና ለሌሎች የጂአይኤስ ፕሮግራሞች እንደ GeoJSON ፋይል ያውርዱት። መገናኛዎች፣ ታንኮችና ማጠራቀሚያዎች ነጥቦች ናቸው፣ ቧንቧዎች፣ ፓምፖችና ቫልቮች ደግሞ መታጠፊያዎቻቸውን የሚከተሉ መስመሮች ናቸው። ቦታዎች በኬንትሮስና በኬክሮስ ናቸው። ውጤቶች የሚካተቱት መረቡ ሲፈታ ብቻ ነው።",
+                    "english": "Download this network as a GeoJSON file for QGIS, ArcGIS Pro and other GIS programs. Junctions, tanks and reservoirs are points, and pipes, pumps and valves are lines that follow their vertices. Positions are latitude and longitude. Results are included only when the network has been solved."
                 }
             }
         },
-        "lpn_settings_row_labels_part": {
+        "lpn_dxf_note_grid": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_time_scn_overrides",
-                    "value": "የሁኔታ የራስ ዋጋዎች፦",
-                    "english": "Scenario overrides:"
+                    "key": "lpn_inp_export_refused",
+                    "value": "ይህ ፕሮጀክት እንደ EPANET ፋይል ሊጻፍ አይችልም፦ {detail}",
+                    "english": "This project cannot be written as an EPANET file: {detail}"
                 },
                 "next_translated": {
-                    "key": "lpn_alt_cat_physical",
-                    "value": "አካላዊ",
-                    "english": "Physical"
+                    "key": "lpn_file_export_geojson_tip",
+                    "value": "ይህን መረብ ለQGIS፣ ለArcGIS Pro እና ለሌሎች የጂአይኤስ ፕሮግራሞች እንደ GeoJSON ፋይል ያውርዱት። መገናኛዎች፣ ታንኮችና ማጠራቀሚያዎች ነጥቦች ናቸው፣ ቧንቧዎች፣ ፓምፖችና ቫልቮች ደግሞ መታጠፊያዎቻቸውን የሚከተሉ መስመሮች ናቸው። ቦታዎች በኬንትሮስና በኬክሮስ ናቸው። ውጤቶች የሚካተቱት መረቡ ሲፈታ ብቻ ነው።",
+                    "english": "Download this network as a GeoJSON file for QGIS, ArcGIS Pro and other GIS programs. Junctions, tanks and reservoirs are points, and pipes, pumps and valves are lines that follow their vertices. Positions are latitude and longitude. Results are included only when the network has been solved."
                 }
             }
         },
-        "lpn_settings_row_labels_customer": {
+        "lpn_dxf_note_crs": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_time_scn_overrides",
-                    "value": "የሁኔታ የራስ ዋጋዎች፦",
-                    "english": "Scenario overrides:"
+                    "key": "lpn_inp_export_refused",
+                    "value": "ይህ ፕሮጀክት እንደ EPANET ፋይል ሊጻፍ አይችልም፦ {detail}",
+                    "english": "This project cannot be written as an EPANET file: {detail}"
                 },
                 "next_translated": {
-                    "key": "lpn_alt_cat_physical",
-                    "value": "አካላዊ",
-                    "english": "Physical"
+                    "key": "lpn_file_export_geojson_tip",
+                    "value": "ይህን መረብ ለQGIS፣ ለArcGIS Pro እና ለሌሎች የጂአይኤስ ፕሮግራሞች እንደ GeoJSON ፋይል ያውርዱት። መገናኛዎች፣ ታንኮችና ማጠራቀሚያዎች ነጥቦች ናቸው፣ ቧንቧዎች፣ ፓምፖችና ቫልቮች ደግሞ መታጠፊያዎቻቸውን የሚከተሉ መስመሮች ናቸው። ቦታዎች በኬንትሮስና በኬክሮስ ናቸው። ውጤቶች የሚካተቱት መረቡ ሲፈታ ብቻ ነው።",
+                    "english": "Download this network as a GeoJSON file for QGIS, ArcGIS Pro and other GIS programs. Junctions, tanks and reservoirs are points, and pipes, pumps and valves are lines that follow their vertices. Positions are latitude and longitude. Results are included only when the network has been solved."
                 }
             }
         },
-        "lpn_settings_row_label_before": {
+        "lpn_dxf_note_geo": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_time_scn_overrides",
-                    "value": "የሁኔታ የራስ ዋጋዎች፦",
-                    "english": "Scenario overrides:"
+                    "key": "lpn_inp_export_refused",
+                    "value": "ይህ ፕሮጀክት እንደ EPANET ፋይል ሊጻፍ አይችልም፦ {detail}",
+                    "english": "This project cannot be written as an EPANET file: {detail}"
                 },
                 "next_translated": {
-                    "key": "lpn_alt_cat_physical",
-                    "value": "አካላዊ",
-                    "english": "Physical"
+                    "key": "lpn_file_export_geojson_tip",
+                    "value": "ይህን መረብ ለQGIS፣ ለArcGIS Pro እና ለሌሎች የጂአይኤስ ፕሮግራሞች እንደ GeoJSON ፋይል ያውርዱት። መገናኛዎች፣ ታንኮችና ማጠራቀሚያዎች ነጥቦች ናቸው፣ ቧንቧዎች፣ ፓምፖችና ቫልቮች ደግሞ መታጠፊያዎቻቸውን የሚከተሉ መስመሮች ናቸው። ቦታዎች በኬንትሮስና በኬክሮስ ናቸው። ውጤቶች የሚካተቱት መረቡ ሲፈታ ብቻ ነው።",
+                    "english": "Download this network as a GeoJSON file for QGIS, ArcGIS Pro and other GIS programs. Junctions, tanks and reservoirs are points, and pipes, pumps and valves are lines that follow their vertices. Positions are latitude and longitude. Results are included only when the network has been solved."
                 }
             }
         },
-        "lpn_settings_row_label_after": {
+        "lpn_dxf_exported_geo": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_time_scn_overrides",
-                    "value": "የሁኔታ የራስ ዋጋዎች፦",
-                    "english": "Scenario overrides:"
+                    "key": "lpn_inp_export_refused",
+                    "value": "ይህ ፕሮጀክት እንደ EPANET ፋይል ሊጻፍ አይችልም፦ {detail}",
+                    "english": "This project cannot be written as an EPANET file: {detail}"
                 },
                 "next_translated": {
-                    "key": "lpn_alt_cat_physical",
-                    "value": "አካላዊ",
-                    "english": "Physical"
+                    "key": "lpn_file_export_geojson_tip",
+                    "value": "ይህን መረብ ለQGIS፣ ለArcGIS Pro እና ለሌሎች የጂአይኤስ ፕሮግራሞች እንደ GeoJSON ፋይል ያውርዱት። መገናኛዎች፣ ታንኮችና ማጠራቀሚያዎች ነጥቦች ናቸው፣ ቧንቧዎች፣ ፓምፖችና ቫልቮች ደግሞ መታጠፊያዎቻቸውን የሚከተሉ መስመሮች ናቸው። ቦታዎች በኬንትሮስና በኬክሮስ ናቸው። ውጤቶች የሚካተቱት መረቡ ሲፈታ ብቻ ነው።",
+                    "english": "Download this network as a GeoJSON file for QGIS, ArcGIS Pro and other GIS programs. Junctions, tanks and reservoirs are points, and pipes, pumps and valves are lines that follow their vertices. Positions are latitude and longitude. Results are included only when the network has been solved."
                 }
             }
         },
-        "lpn_settings_row_label_on": {
+        "lpn_dxf_note_blocks": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_time_scn_overrides",
-                    "value": "የሁኔታ የራስ ዋጋዎች፦",
-                    "english": "Scenario overrides:"
+                    "key": "lpn_inp_export_refused",
+                    "value": "ይህ ፕሮጀክት እንደ EPANET ፋይል ሊጻፍ አይችልም፦ {detail}",
+                    "english": "This project cannot be written as an EPANET file: {detail}"
                 },
                 "next_translated": {
-                    "key": "lpn_alt_cat_physical",
-                    "value": "አካላዊ",
-                    "english": "Physical"
+                    "key": "lpn_file_export_geojson_tip",
+                    "value": "ይህን መረብ ለQGIS፣ ለArcGIS Pro እና ለሌሎች የጂአይኤስ ፕሮግራሞች እንደ GeoJSON ፋይል ያውርዱት። መገናኛዎች፣ ታንኮችና ማጠራቀሚያዎች ነጥቦች ናቸው፣ ቧንቧዎች፣ ፓምፖችና ቫልቮች ደግሞ መታጠፊያዎቻቸውን የሚከተሉ መስመሮች ናቸው። ቦታዎች በኬንትሮስና በኬክሮስ ናቸው። ውጤቶች የሚካተቱት መረቡ ሲፈታ ብቻ ነው።",
+                    "english": "Download this network as a GeoJSON file for QGIS, ArcGIS Pro and other GIS programs. Junctions, tanks and reservoirs are points, and pipes, pumps and valves are lines that follow their vertices. Positions are latitude and longitude. Results are included only when the network has been solved."
                 }
             }
         },
-        "lpn_settings_row_label_show": {
+        "lpn_dxf_note_shortened": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_time_scn_overrides",
-                    "value": "የሁኔታ የራስ ዋጋዎች፦",
-                    "english": "Scenario overrides:"
+                    "key": "lpn_inp_export_refused",
+                    "value": "ይህ ፕሮጀክት እንደ EPANET ፋይል ሊጻፍ አይችልም፦ {detail}",
+                    "english": "This project cannot be written as an EPANET file: {detail}"
                 },
                 "next_translated": {
-                    "key": "lpn_alt_cat_physical",
-                    "value": "አካላዊ",
-                    "english": "Physical"
+                    "key": "lpn_file_export_geojson_tip",
+                    "value": "ይህን መረብ ለQGIS፣ ለArcGIS Pro እና ለሌሎች የጂአይኤስ ፕሮግራሞች እንደ GeoJSON ፋይል ያውርዱት። መገናኛዎች፣ ታንኮችና ማጠራቀሚያዎች ነጥቦች ናቸው፣ ቧንቧዎች፣ ፓምፖችና ቫልቮች ደግሞ መታጠፊያዎቻቸውን የሚከተሉ መስመሮች ናቸው። ቦታዎች በኬንትሮስና በኬክሮስ ናቸው። ውጤቶች የሚካተቱት መረቡ ሲፈታ ብቻ ነው።",
+                    "english": "Download this network as a GeoJSON file for QGIS, ArcGIS Pro and other GIS programs. Junctions, tanks and reservoirs are points, and pipes, pumps and valves are lines that follow their vertices. Positions are latitude and longitude. Results are included only when the network has been solved."
                 }
             }
         },
-        "lpn_settings_row_label_drop": {
+        "lpn_dxf_note_categories": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_time_scn_overrides",
-                    "value": "የሁኔታ የራስ ዋጋዎች፦",
-                    "english": "Scenario overrides:"
+                    "key": "lpn_inp_export_refused",
+                    "value": "ይህ ፕሮጀክት እንደ EPANET ፋይል ሊጻፍ አይችልም፦ {detail}",
+                    "english": "This project cannot be written as an EPANET file: {detail}"
                 },
                 "next_translated": {
-                    "key": "lpn_alt_cat_physical",
-                    "value": "አካላዊ",
-                    "english": "Physical"
+                    "key": "lpn_file_export_geojson_tip",
+                    "value": "ይህን መረብ ለQGIS፣ ለArcGIS Pro እና ለሌሎች የጂአይኤስ ፕሮግራሞች እንደ GeoJSON ፋይል ያውርዱት። መገናኛዎች፣ ታንኮችና ማጠራቀሚያዎች ነጥቦች ናቸው፣ ቧንቧዎች፣ ፓምፖችና ቫልቮች ደግሞ መታጠፊያዎቻቸውን የሚከተሉ መስመሮች ናቸው። ቦታዎች በኬንትሮስና በኬክሮስ ናቸው። ውጤቶች የሚካተቱት መረቡ ሲፈታ ብቻ ነው።",
+                    "english": "Download this network as a GeoJSON file for QGIS, ArcGIS Pro and other GIS programs. Junctions, tanks and reservoirs are points, and pipes, pumps and valves are lines that follow their vertices. Positions are latitude and longitude. Results are included only when the network has been solved."
                 }
             }
         },
-        "lpn_settings_row_id_prefix": {
+        "lpn_file_export_item_workspace": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_time_scn_overrides",
-                    "value": "የሁኔታ የራስ ዋጋዎች፦",
-                    "english": "Scenario overrides:"
+                    "key": "lpn_file_export_geojson_tip",
+                    "value": "ይህን መረብ ለQGIS፣ ለArcGIS Pro እና ለሌሎች የጂአይኤስ ፕሮግራሞች እንደ GeoJSON ፋይል ያውርዱት። መገናኛዎች፣ ታንኮችና ማጠራቀሚያዎች ነጥቦች ናቸው፣ ቧንቧዎች፣ ፓምፖችና ቫልቮች ደግሞ መታጠፊያዎቻቸውን የሚከተሉ መስመሮች ናቸው። ቦታዎች በኬንትሮስና በኬክሮስ ናቸው። ውጤቶች የሚካተቱት መረቡ ሲፈታ ብቻ ነው።",
+                    "english": "Download this network as a GeoJSON file for QGIS, ArcGIS Pro and other GIS programs. Junctions, tanks and reservoirs are points, and pipes, pumps and valves are lines that follow their vertices. Positions are latitude and longitude. Results are included only when the network has been solved."
                 },
                 "next_translated": {
-                    "key": "lpn_alt_cat_physical",
-                    "value": "አካላዊ",
-                    "english": "Physical"
+                    "key": "lpn_geojson_refused_local",
+                    "value": "የGeoJSON ፋይል የሚይዘው ኬክሮስንና ኬንትሮስን ብቻ ነው፣ ይህ ፕሮጀክት ግን በምድር ላይ ቦታ በሌለው አካባቢያዊ ፍርግርግ ላይ ተሳሏል። መጀመሪያ በካርታ፣ የዓለም ካርታ፣ አያይዝ ጂዮ-ማጣቀሻ ያድርጉት፣ ከዚያም እንደገና ይላኩ።",
+                    "english": "A GeoJSON file holds latitude and longitude only, and this project is drawn on a local grid with no place on the Earth. Georeference it first with Map, World map, Attach, then export again."
                 }
             }
         },
-        "lpn_settings_row_symbol_cap_multiple": {
+        "lpn_file_export_workspace_tip": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_time_scn_overrides",
-                    "value": "የሁኔታ የራስ ዋጋዎች፦",
-                    "english": "Scenario overrides:"
+                    "key": "lpn_file_export_geojson_tip",
+                    "value": "ይህን መረብ ለQGIS፣ ለArcGIS Pro እና ለሌሎች የጂአይኤስ ፕሮግራሞች እንደ GeoJSON ፋይል ያውርዱት። መገናኛዎች፣ ታንኮችና ማጠራቀሚያዎች ነጥቦች ናቸው፣ ቧንቧዎች፣ ፓምፖችና ቫልቮች ደግሞ መታጠፊያዎቻቸውን የሚከተሉ መስመሮች ናቸው። ቦታዎች በኬንትሮስና በኬክሮስ ናቸው። ውጤቶች የሚካተቱት መረቡ ሲፈታ ብቻ ነው።",
+                    "english": "Download this network as a GeoJSON file for QGIS, ArcGIS Pro and other GIS programs. Junctions, tanks and reservoirs are points, and pipes, pumps and valves are lines that follow their vertices. Positions are latitude and longitude. Results are included only when the network has been solved."
                 },
                 "next_translated": {
-                    "key": "lpn_alt_cat_physical",
-                    "value": "አካላዊ",
-                    "english": "Physical"
+                    "key": "lpn_geojson_refused_local",
+                    "value": "የGeoJSON ፋይል የሚይዘው ኬክሮስንና ኬንትሮስን ብቻ ነው፣ ይህ ፕሮጀክት ግን በምድር ላይ ቦታ በሌለው አካባቢያዊ ፍርግርግ ላይ ተሳሏል። መጀመሪያ በካርታ፣ የዓለም ካርታ፣ አያይዝ ጂዮ-ማጣቀሻ ያድርጉት፣ ከዚያም እንደገና ይላኩ።",
+                    "english": "A GeoJSON file holds latitude and longitude only, and this project is drawn on a local grid with no place on the Earth. Georeference it first with Map, World map, Attach, then export again."
                 }
             }
         },
-        "lpn_settings_row_symbol_cap_percentile": {
+        "lpn_file_import_workspace": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_time_scn_overrides",
-                    "value": "የሁኔታ የራስ ዋጋዎች፦",
-                    "english": "Scenario overrides:"
+                    "key": "lpn_file_export_geojson_tip",
+                    "value": "ይህን መረብ ለQGIS፣ ለArcGIS Pro እና ለሌሎች የጂአይኤስ ፕሮግራሞች እንደ GeoJSON ፋይል ያውርዱት። መገናኛዎች፣ ታንኮችና ማጠራቀሚያዎች ነጥቦች ናቸው፣ ቧንቧዎች፣ ፓምፖችና ቫልቮች ደግሞ መታጠፊያዎቻቸውን የሚከተሉ መስመሮች ናቸው። ቦታዎች በኬንትሮስና በኬክሮስ ናቸው። ውጤቶች የሚካተቱት መረቡ ሲፈታ ብቻ ነው።",
+                    "english": "Download this network as a GeoJSON file for QGIS, ArcGIS Pro and other GIS programs. Junctions, tanks and reservoirs are points, and pipes, pumps and valves are lines that follow their vertices. Positions are latitude and longitude. Results are included only when the network has been solved."
                 },
                 "next_translated": {
-                    "key": "lpn_alt_cat_physical",
-                    "value": "አካላዊ",
-                    "english": "Physical"
+                    "key": "lpn_geojson_refused_local",
+                    "value": "የGeoJSON ፋይል የሚይዘው ኬክሮስንና ኬንትሮስን ብቻ ነው፣ ይህ ፕሮጀክት ግን በምድር ላይ ቦታ በሌለው አካባቢያዊ ፍርግርግ ላይ ተሳሏል። መጀመሪያ በካርታ፣ የዓለም ካርታ፣ አያይዝ ጂዮ-ማጣቀሻ ያድርጉት፣ ከዚያም እንደገና ይላኩ።",
+                    "english": "A GeoJSON file holds latitude and longitude only, and this project is drawn on a local grid with no place on the Earth. Georeference it first with Map, World map, Attach, then export again."
                 }
             }
         },
-        "lpn_settings_row_contour_labels": {
+        "lpn_file_import_workspace_tip": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_time_scn_overrides",
-                    "value": "የሁኔታ የራስ ዋጋዎች፦",
-                    "english": "Scenario overrides:"
+                    "key": "lpn_file_export_geojson_tip",
+                    "value": "ይህን መረብ ለQGIS፣ ለArcGIS Pro እና ለሌሎች የጂአይኤስ ፕሮግራሞች እንደ GeoJSON ፋይል ያውርዱት። መገናኛዎች፣ ታንኮችና ማጠራቀሚያዎች ነጥቦች ናቸው፣ ቧንቧዎች፣ ፓምፖችና ቫልቮች ደግሞ መታጠፊያዎቻቸውን የሚከተሉ መስመሮች ናቸው። ቦታዎች በኬንትሮስና በኬክሮስ ናቸው። ውጤቶች የሚካተቱት መረቡ ሲፈታ ብቻ ነው።",
+                    "english": "Download this network as a GeoJSON file for QGIS, ArcGIS Pro and other GIS programs. Junctions, tanks and reservoirs are points, and pipes, pumps and valves are lines that follow their vertices. Positions are latitude and longitude. Results are included only when the network has been solved."
                 },
                 "next_translated": {
-                    "key": "lpn_alt_cat_physical",
-                    "value": "አካላዊ",
-                    "english": "Physical"
+                    "key": "lpn_geojson_refused_local",
+                    "value": "የGeoJSON ፋይል የሚይዘው ኬክሮስንና ኬንትሮስን ብቻ ነው፣ ይህ ፕሮጀክት ግን በምድር ላይ ቦታ በሌለው አካባቢያዊ ፍርግርግ ላይ ተሳሏል። መጀመሪያ በካርታ፣ የዓለም ካርታ፣ አያይዝ ጂዮ-ማጣቀሻ ያድርጉት፣ ከዚያም እንደገና ይላኩ።",
+                    "english": "A GeoJSON file holds latitude and longitude only, and this project is drawn on a local grid with no place on the Earth. Georeference it first with Map, World map, Attach, then export again."
                 }
             }
         },
-        "lpn_settings_row_check_freq": {
+        "lpn_workspace_exported": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_time_scn_overrides",
-                    "value": "የሁኔታ የራስ ዋጋዎች፦",
-                    "english": "Scenario overrides:"
+                    "key": "lpn_file_export_geojson_tip",
+                    "value": "ይህን መረብ ለQGIS፣ ለArcGIS Pro እና ለሌሎች የጂአይኤስ ፕሮግራሞች እንደ GeoJSON ፋይል ያውርዱት። መገናኛዎች፣ ታንኮችና ማጠራቀሚያዎች ነጥቦች ናቸው፣ ቧንቧዎች፣ ፓምፖችና ቫልቮች ደግሞ መታጠፊያዎቻቸውን የሚከተሉ መስመሮች ናቸው። ቦታዎች በኬንትሮስና በኬክሮስ ናቸው። ውጤቶች የሚካተቱት መረቡ ሲፈታ ብቻ ነው።",
+                    "english": "Download this network as a GeoJSON file for QGIS, ArcGIS Pro and other GIS programs. Junctions, tanks and reservoirs are points, and pipes, pumps and valves are lines that follow their vertices. Positions are latitude and longitude. Results are included only when the network has been solved."
                 },
                 "next_translated": {
-                    "key": "lpn_alt_cat_physical",
-                    "value": "አካላዊ",
-                    "english": "Physical"
+                    "key": "lpn_geojson_refused_local",
+                    "value": "የGeoJSON ፋይል የሚይዘው ኬክሮስንና ኬንትሮስን ብቻ ነው፣ ይህ ፕሮጀክት ግን በምድር ላይ ቦታ በሌለው አካባቢያዊ ፍርግርግ ላይ ተሳሏል። መጀመሪያ በካርታ፣ የዓለም ካርታ፣ አያይዝ ጂዮ-ማጣቀሻ ያድርጉት፣ ከዚያም እንደገና ይላኩ።",
+                    "english": "A GeoJSON file holds latitude and longitude only, and this project is drawn on a local grid with no place on the Earth. Georeference it first with Map, World map, Attach, then export again."
                 }
             }
         },
-        "lpn_settings_row_max_check": {
+        "lpn_workspace_imported": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_time_scn_overrides",
-                    "value": "የሁኔታ የራስ ዋጋዎች፦",
-                    "english": "Scenario overrides:"
+                    "key": "lpn_file_export_geojson_tip",
+                    "value": "ይህን መረብ ለQGIS፣ ለArcGIS Pro እና ለሌሎች የጂአይኤስ ፕሮግራሞች እንደ GeoJSON ፋይል ያውርዱት። መገናኛዎች፣ ታንኮችና ማጠራቀሚያዎች ነጥቦች ናቸው፣ ቧንቧዎች፣ ፓምፖችና ቫልቮች ደግሞ መታጠፊያዎቻቸውን የሚከተሉ መስመሮች ናቸው። ቦታዎች በኬንትሮስና በኬክሮስ ናቸው። ውጤቶች የሚካተቱት መረቡ ሲፈታ ብቻ ነው።",
+                    "english": "Download this network as a GeoJSON file for QGIS, ArcGIS Pro and other GIS programs. Junctions, tanks and reservoirs are points, and pipes, pumps and valves are lines that follow their vertices. Positions are latitude and longitude. Results are included only when the network has been solved."
                 },
                 "next_translated": {
-                    "key": "lpn_alt_cat_physical",
-                    "value": "አካላዊ",
-                    "english": "Physical"
+                    "key": "lpn_geojson_refused_local",
+                    "value": "የGeoJSON ፋይል የሚይዘው ኬክሮስንና ኬንትሮስን ብቻ ነው፣ ይህ ፕሮጀክት ግን በምድር ላይ ቦታ በሌለው አካባቢያዊ ፍርግርግ ላይ ተሳሏል። መጀመሪያ በካርታ፣ የዓለም ካርታ፣ አያይዝ ጂዮ-ማጣቀሻ ያድርጉት፣ ከዚያም እንደገና ይላኩ።",
+                    "english": "A GeoJSON file holds latitude and longitude only, and this project is drawn on a local grid with no place on the Earth. Georeference it first with Map, World map, Attach, then export again."
                 }
             }
         },
-        "lpn_settings_row_status_report": {
+        "lpn_workspace_ignored": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_time_scn_overrides",
-                    "value": "የሁኔታ የራስ ዋጋዎች፦",
-                    "english": "Scenario overrides:"
+                    "key": "lpn_file_export_geojson_tip",
+                    "value": "ይህን መረብ ለQGIS፣ ለArcGIS Pro እና ለሌሎች የጂአይኤስ ፕሮግራሞች እንደ GeoJSON ፋይል ያውርዱት። መገናኛዎች፣ ታንኮችና ማጠራቀሚያዎች ነጥቦች ናቸው፣ ቧንቧዎች፣ ፓምፖችና ቫልቮች ደግሞ መታጠፊያዎቻቸውን የሚከተሉ መስመሮች ናቸው። ቦታዎች በኬንትሮስና በኬክሮስ ናቸው። ውጤቶች የሚካተቱት መረቡ ሲፈታ ብቻ ነው።",
+                    "english": "Download this network as a GeoJSON file for QGIS, ArcGIS Pro and other GIS programs. Junctions, tanks and reservoirs are points, and pipes, pumps and valves are lines that follow their vertices. Positions are latitude and longitude. Results are included only when the network has been solved."
                 },
                 "next_translated": {
-                    "key": "lpn_alt_cat_physical",
-                    "value": "አካላዊ",
-                    "english": "Physical"
+                    "key": "lpn_geojson_refused_local",
+                    "value": "የGeoJSON ፋይል የሚይዘው ኬክሮስንና ኬንትሮስን ብቻ ነው፣ ይህ ፕሮጀክት ግን በምድር ላይ ቦታ በሌለው አካባቢያዊ ፍርግርግ ላይ ተሳሏል። መጀመሪያ በካርታ፣ የዓለም ካርታ፣ አያይዝ ጂዮ-ማጣቀሻ ያድርጉት፣ ከዚያም እንደገና ይላኩ።",
+                    "english": "A GeoJSON file holds latitude and longitude only, and this project is drawn on a local grid with no place on the Earth. Georeference it first with Map, World map, Attach, then export again."
                 }
             }
         },
-        "lpn_settings_row_pda_src": {
+        "lpn_workspace_refused_unreadable": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_time_scn_overrides",
-                    "value": "የሁኔታ የራስ ዋጋዎች፦",
-                    "english": "Scenario overrides:"
+                    "key": "lpn_file_export_geojson_tip",
+                    "value": "ይህን መረብ ለQGIS፣ ለArcGIS Pro እና ለሌሎች የጂአይኤስ ፕሮግራሞች እንደ GeoJSON ፋይል ያውርዱት። መገናኛዎች፣ ታንኮችና ማጠራቀሚያዎች ነጥቦች ናቸው፣ ቧንቧዎች፣ ፓምፖችና ቫልቮች ደግሞ መታጠፊያዎቻቸውን የሚከተሉ መስመሮች ናቸው። ቦታዎች በኬንትሮስና በኬክሮስ ናቸው። ውጤቶች የሚካተቱት መረቡ ሲፈታ ብቻ ነው።",
+                    "english": "Download this network as a GeoJSON file for QGIS, ArcGIS Pro and other GIS programs. Junctions, tanks and reservoirs are points, and pipes, pumps and valves are lines that follow their vertices. Positions are latitude and longitude. Results are included only when the network has been solved."
                 },
                 "next_translated": {
-                    "key": "lpn_alt_cat_physical",
-                    "value": "አካላዊ",
-                    "english": "Physical"
+                    "key": "lpn_geojson_refused_local",
+                    "value": "የGeoJSON ፋይል የሚይዘው ኬክሮስንና ኬንትሮስን ብቻ ነው፣ ይህ ፕሮጀክት ግን በምድር ላይ ቦታ በሌለው አካባቢያዊ ፍርግርግ ላይ ተሳሏል። መጀመሪያ በካርታ፣ የዓለም ካርታ፣ አያይዝ ጂዮ-ማጣቀሻ ያድርጉት፣ ከዚያም እንደገና ይላኩ።",
+                    "english": "A GeoJSON file holds latitude and longitude only, and this project is drawn on a local grid with no place on the Earth. Georeference it first with Map, World map, Attach, then export again."
                 }
             }
         },
-        "lpn_settings_row_quality_option": {
+        "lpn_workspace_refused_format": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_time_scn_overrides",
-                    "value": "የሁኔታ የራስ ዋጋዎች፦",
-                    "english": "Scenario overrides:"
+                    "key": "lpn_file_export_geojson_tip",
+                    "value": "ይህን መረብ ለQGIS፣ ለArcGIS Pro እና ለሌሎች የጂአይኤስ ፕሮግራሞች እንደ GeoJSON ፋይል ያውርዱት። መገናኛዎች፣ ታንኮችና ማጠራቀሚያዎች ነጥቦች ናቸው፣ ቧንቧዎች፣ ፓምፖችና ቫልቮች ደግሞ መታጠፊያዎቻቸውን የሚከተሉ መስመሮች ናቸው። ቦታዎች በኬንትሮስና በኬክሮስ ናቸው። ውጤቶች የሚካተቱት መረቡ ሲፈታ ብቻ ነው።",
+                    "english": "Download this network as a GeoJSON file for QGIS, ArcGIS Pro and other GIS programs. Junctions, tanks and reservoirs are points, and pipes, pumps and valves are lines that follow their vertices. Positions are latitude and longitude. Results are included only when the network has been solved."
                 },
                 "next_translated": {
-                    "key": "lpn_alt_cat_physical",
-                    "value": "አካላዊ",
-                    "english": "Physical"
+                    "key": "lpn_geojson_refused_local",
+                    "value": "የGeoJSON ፋይል የሚይዘው ኬክሮስንና ኬንትሮስን ብቻ ነው፣ ይህ ፕሮጀክት ግን በምድር ላይ ቦታ በሌለው አካባቢያዊ ፍርግርግ ላይ ተሳሏል። መጀመሪያ በካርታ፣ የዓለም ካርታ፣ አያይዝ ጂዮ-ማጣቀሻ ያድርጉት፣ ከዚያም እንደገና ይላኩ።",
+                    "english": "A GeoJSON file holds latitude and longitude only, and this project is drawn on a local grid with no place on the Earth. Georeference it first with Map, World map, Attach, then export again."
                 }
             }
         },
-        "lpn_settings_row_tolerance": {
+        "lpn_workspace_refused_newer": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_time_scn_overrides",
-                    "value": "የሁኔታ የራስ ዋጋዎች፦",
-                    "english": "Scenario overrides:"
+                    "key": "lpn_file_export_geojson_tip",
+                    "value": "ይህን መረብ ለQGIS፣ ለArcGIS Pro እና ለሌሎች የጂአይኤስ ፕሮግራሞች እንደ GeoJSON ፋይል ያውርዱት። መገናኛዎች፣ ታንኮችና ማጠራቀሚያዎች ነጥቦች ናቸው፣ ቧንቧዎች፣ ፓምፖችና ቫልቮች ደግሞ መታጠፊያዎቻቸውን የሚከተሉ መስመሮች ናቸው። ቦታዎች በኬንትሮስና በኬክሮስ ናቸው። ውጤቶች የሚካተቱት መረቡ ሲፈታ ብቻ ነው።",
+                    "english": "Download this network as a GeoJSON file for QGIS, ArcGIS Pro and other GIS programs. Junctions, tanks and reservoirs are points, and pipes, pumps and valves are lines that follow their vertices. Positions are latitude and longitude. Results are included only when the network has been solved."
                 },
                 "next_translated": {
-                    "key": "lpn_alt_cat_physical",
-                    "value": "አካላዊ",
-                    "english": "Physical"
+                    "key": "lpn_geojson_refused_local",
+                    "value": "የGeoJSON ፋይል የሚይዘው ኬክሮስንና ኬንትሮስን ብቻ ነው፣ ይህ ፕሮጀክት ግን በምድር ላይ ቦታ በሌለው አካባቢያዊ ፍርግርግ ላይ ተሳሏል። መጀመሪያ በካርታ፣ የዓለም ካርታ፣ አያይዝ ጂዮ-ማጣቀሻ ያድርጉት፣ ከዚያም እንደገና ይላኩ።",
+                    "english": "A GeoJSON file holds latitude and longitude only, and this project is drawn on a local grid with no place on the Earth. Georeference it first with Map, World map, Attach, then export again."
                 }
             }
         },
-        "lpn_settings_row_emitter_exponent_old": {
+        "lpn_workspace_confirm": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_time_scn_overrides",
-                    "value": "የሁኔታ የራስ ዋጋዎች፦",
-                    "english": "Scenario overrides:"
+                    "key": "lpn_file_export_geojson_tip",
+                    "value": "ይህን መረብ ለQGIS፣ ለArcGIS Pro እና ለሌሎች የጂአይኤስ ፕሮግራሞች እንደ GeoJSON ፋይል ያውርዱት። መገናኛዎች፣ ታንኮችና ማጠራቀሚያዎች ነጥቦች ናቸው፣ ቧንቧዎች፣ ፓምፖችና ቫልቮች ደግሞ መታጠፊያዎቻቸውን የሚከተሉ መስመሮች ናቸው። ቦታዎች በኬንትሮስና በኬክሮስ ናቸው። ውጤቶች የሚካተቱት መረቡ ሲፈታ ብቻ ነው።",
+                    "english": "Download this network as a GeoJSON file for QGIS, ArcGIS Pro and other GIS programs. Junctions, tanks and reservoirs are points, and pipes, pumps and valves are lines that follow their vertices. Positions are latitude and longitude. Results are included only when the network has been solved."
                 },
                 "next_translated": {
-                    "key": "lpn_alt_cat_physical",
-                    "value": "አካላዊ",
-                    "english": "Physical"
+                    "key": "lpn_geojson_refused_local",
+                    "value": "የGeoJSON ፋይል የሚይዘው ኬክሮስንና ኬንትሮስን ብቻ ነው፣ ይህ ፕሮጀክት ግን በምድር ላይ ቦታ በሌለው አካባቢያዊ ፍርግርግ ላይ ተሳሏል። መጀመሪያ በካርታ፣ የዓለም ካርታ፣ አያይዝ ጂዮ-ማጣቀሻ ያድርጉት፣ ከዚያም እንደገና ይላኩ።",
+                    "english": "A GeoJSON file holds latitude and longitude only, and this project is drawn on a local grid with no place on the Earth. Georeference it first with Map, World map, Attach, then export again."
                 }
             }
         },
-        "lpn_settings_row_elev_source_old": {
+        "lpn_workspace_refused_storage": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_time_scn_overrides",
-                    "value": "የሁኔታ የራስ ዋጋዎች፦",
-                    "english": "Scenario overrides:"
+                    "key": "lpn_file_export_geojson_tip",
+                    "value": "ይህን መረብ ለQGIS፣ ለArcGIS Pro እና ለሌሎች የጂአይኤስ ፕሮግራሞች እንደ GeoJSON ፋይል ያውርዱት። መገናኛዎች፣ ታንኮችና ማጠራቀሚያዎች ነጥቦች ናቸው፣ ቧንቧዎች፣ ፓምፖችና ቫልቮች ደግሞ መታጠፊያዎቻቸውን የሚከተሉ መስመሮች ናቸው። ቦታዎች በኬንትሮስና በኬክሮስ ናቸው። ውጤቶች የሚካተቱት መረቡ ሲፈታ ብቻ ነው።",
+                    "english": "Download this network as a GeoJSON file for QGIS, ArcGIS Pro and other GIS programs. Junctions, tanks and reservoirs are points, and pipes, pumps and valves are lines that follow their vertices. Positions are latitude and longitude. Results are included only when the network has been solved."
                 },
                 "next_translated": {
-                    "key": "lpn_alt_cat_physical",
-                    "value": "አካላዊ",
-                    "english": "Physical"
-                }
-            }
-        },
-        "lpn_settings_row_basemap": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_time_scn_overrides",
-                    "value": "የሁኔታ የራስ ዋጋዎች፦",
-                    "english": "Scenario overrides:"
-                },
-                "next_translated": {
-                    "key": "lpn_alt_cat_physical",
-                    "value": "አካላዊ",
-                    "english": "Physical"
-                }
-            }
-        },
-        "lpn_settings_row_basemap_last": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_time_scn_overrides",
-                    "value": "የሁኔታ የራስ ዋጋዎች፦",
-                    "english": "Scenario overrides:"
-                },
-                "next_translated": {
-                    "key": "lpn_alt_cat_physical",
-                    "value": "አካላዊ",
-                    "english": "Physical"
-                }
-            }
-        },
-        "lpn_settings_row_customer_max_width": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_time_scn_overrides",
-                    "value": "የሁኔታ የራስ ዋጋዎች፦",
-                    "english": "Scenario overrides:"
-                },
-                "next_translated": {
-                    "key": "lpn_alt_cat_physical",
-                    "value": "አካላዊ",
-                    "english": "Physical"
-                }
-            }
-        },
-        "lpn_settings_row_quality_step": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_time_scn_overrides",
-                    "value": "የሁኔታ የራስ ዋጋዎች፦",
-                    "english": "Scenario overrides:"
-                },
-                "next_translated": {
-                    "key": "lpn_alt_cat_physical",
-                    "value": "አካላዊ",
-                    "english": "Physical"
-                }
-            }
-        },
-        "lpn_settings_row_view": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_time_scn_overrides",
-                    "value": "የሁኔታ የራስ ዋጋዎች፦",
-                    "english": "Scenario overrides:"
-                },
-                "next_translated": {
-                    "key": "lpn_alt_cat_physical",
-                    "value": "አካላዊ",
-                    "english": "Physical"
-                }
-            }
-        },
-        "lpn_settings_row_contour_fill": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_time_scn_overrides",
-                    "value": "የሁኔታ የራስ ዋጋዎች፦",
-                    "english": "Scenario overrides:"
-                },
-                "next_translated": {
-                    "key": "lpn_alt_cat_physical",
-                    "value": "አካላዊ",
-                    "english": "Physical"
-                }
-            }
-        },
-        "lpn_settings_row_contour_opacity": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_time_scn_overrides",
-                    "value": "የሁኔታ የራስ ዋጋዎች፦",
-                    "english": "Scenario overrides:"
-                },
-                "next_translated": {
-                    "key": "lpn_alt_cat_physical",
-                    "value": "አካላዊ",
-                    "english": "Physical"
-                }
-            }
-        },
-        "lpn_settings_row_contour_interval": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_time_scn_overrides",
-                    "value": "የሁኔታ የራስ ዋጋዎች፦",
-                    "english": "Scenario overrides:"
-                },
-                "next_translated": {
-                    "key": "lpn_alt_cat_physical",
-                    "value": "አካላዊ",
-                    "english": "Physical"
-                }
-            }
-        },
-        "lpn_settings_row_contour_buffer": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_time_scn_overrides",
-                    "value": "የሁኔታ የራስ ዋጋዎች፦",
-                    "english": "Scenario overrides:"
-                },
-                "next_translated": {
-                    "key": "lpn_alt_cat_physical",
-                    "value": "አካላዊ",
-                    "english": "Physical"
-                }
-            }
-        },
-        "lpn_settings_row_contour_terrain": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_time_scn_overrides",
-                    "value": "የሁኔታ የራስ ዋጋዎች፦",
-                    "english": "Scenario overrides:"
-                },
-                "next_translated": {
-                    "key": "lpn_alt_cat_physical",
-                    "value": "አካላዊ",
-                    "english": "Physical"
-                }
-            }
-        },
-        "lpn_settings_row_new_asset": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_time_scn_overrides",
-                    "value": "የሁኔታ የራስ ዋጋዎች፦",
-                    "english": "Scenario overrides:"
-                },
-                "next_translated": {
-                    "key": "lpn_alt_cat_physical",
-                    "value": "አካላዊ",
-                    "english": "Physical"
-                }
-            }
-        },
-        "lpn_settings_row_default": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_time_scn_overrides",
-                    "value": "የሁኔታ የራስ ዋጋዎች፦",
-                    "english": "Scenario overrides:"
-                },
-                "next_translated": {
-                    "key": "lpn_alt_cat_physical",
-                    "value": "አካላዊ",
-                    "english": "Physical"
-                }
-            }
-        },
-        "lpn_settings_row_view_value": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_time_scn_overrides",
-                    "value": "የሁኔታ የራስ ዋጋዎች፦",
-                    "english": "Scenario overrides:"
-                },
-                "next_translated": {
-                    "key": "lpn_alt_cat_physical",
-                    "value": "አካላዊ",
-                    "english": "Physical"
-                }
-            }
-        },
-        "lpn_settings_held_base": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_time_scn_overrides",
-                    "value": "የሁኔታ የራስ ዋጋዎች፦",
-                    "english": "Scenario overrides:"
-                },
-                "next_translated": {
-                    "key": "lpn_alt_cat_physical",
-                    "value": "አካላዊ",
-                    "english": "Physical"
-                }
-            }
-        },
-        "lpn_settings_view_center": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_time_scn_overrides",
-                    "value": "የሁኔታ የራስ ዋጋዎች፦",
-                    "english": "Scenario overrides:"
-                },
-                "next_translated": {
-                    "key": "lpn_alt_cat_physical",
-                    "value": "አካላዊ",
-                    "english": "Physical"
-                }
-            }
-        },
-        "lpn_settings_view_scale": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_time_scn_overrides",
-                    "value": "የሁኔታ የራስ ዋጋዎች፦",
-                    "english": "Scenario overrides:"
-                },
-                "next_translated": {
-                    "key": "lpn_alt_cat_physical",
-                    "value": "አካላዊ",
-                    "english": "Physical"
-                }
-            }
-        },
-        "lpn_settings_view_scale_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_time_scn_overrides",
-                    "value": "የሁኔታ የራስ ዋጋዎች፦",
-                    "english": "Scenario overrides:"
-                },
-                "next_translated": {
-                    "key": "lpn_alt_cat_physical",
-                    "value": "አካላዊ",
-                    "english": "Physical"
-                }
-            }
-        },
-        "lpn_settings_view_top_left": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_time_scn_overrides",
-                    "value": "የሁኔታ የራስ ዋጋዎች፦",
-                    "english": "Scenario overrides:"
-                },
-                "next_translated": {
-                    "key": "lpn_alt_cat_physical",
-                    "value": "አካላዊ",
-                    "english": "Physical"
-                }
-            }
-        },
-        "lpn_settings_view_bottom_right": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_time_scn_overrides",
-                    "value": "የሁኔታ የራስ ዋጋዎች፦",
-                    "english": "Scenario overrides:"
-                },
-                "next_translated": {
-                    "key": "lpn_alt_cat_physical",
-                    "value": "አካላዊ",
-                    "english": "Physical"
-                }
-            }
-        },
-        "lpn_settings_view_save": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_time_scn_overrides",
-                    "value": "የሁኔታ የራስ ዋጋዎች፦",
-                    "english": "Scenario overrides:"
-                },
-                "next_translated": {
-                    "key": "lpn_alt_cat_physical",
-                    "value": "አካላዊ",
-                    "english": "Physical"
-                }
-            }
-        },
-        "lpn_settings_view_save_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_time_scn_overrides",
-                    "value": "የሁኔታ የራስ ዋጋዎች፦",
-                    "english": "Scenario overrides:"
-                },
-                "next_translated": {
-                    "key": "lpn_alt_cat_physical",
-                    "value": "አካላዊ",
-                    "english": "Physical"
-                }
-            }
-        },
-        "lpn_settings_row_basemap_osm": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_time_scn_overrides",
-                    "value": "የሁኔታ የራስ ዋጋዎች፦",
-                    "english": "Scenario overrides:"
-                },
-                "next_translated": {
-                    "key": "lpn_alt_cat_physical",
-                    "value": "አካላዊ",
-                    "english": "Physical"
-                }
-            }
-        },
-        "lpn_settings_row_basemap_satellite": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_time_scn_overrides",
-                    "value": "የሁኔታ የራስ ዋጋዎች፦",
-                    "english": "Scenario overrides:"
-                },
-                "next_translated": {
-                    "key": "lpn_alt_cat_physical",
-                    "value": "አካላዊ",
-                    "english": "Physical"
-                }
-            }
-        },
-        "lpn_settings_units_one_project": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_time_scn_overrides",
-                    "value": "የሁኔታ የራስ ዋጋዎች፦",
-                    "english": "Scenario overrides:"
-                },
-                "next_translated": {
-                    "key": "lpn_alt_cat_physical",
-                    "value": "አካላዊ",
-                    "english": "Physical"
-                }
-            }
-        },
-        "lpn_settings_restore_base_only": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_time_scn_overrides",
-                    "value": "የሁኔታ የራስ ዋጋዎች፦",
-                    "english": "Scenario overrides:"
-                },
-                "next_translated": {
-                    "key": "lpn_alt_cat_physical",
-                    "value": "አካላዊ",
-                    "english": "Physical"
-                }
-            }
-        },
-        "lpn_alt_cat_presentation": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_alt_cat_text",
-                    "value": "ጽሑፍ",
-                    "english": "Text"
-                },
-                "next_translated": {
-                    "key": "lpn_scenario_push_confirm",
-                    "value": "እያንዳንዱ ሁኔታ ለእነዚህ ንብረቶች የመሠረት ዋጋዎችን እንዲጠቀም ማድረግ? ለእነዚያ ሁኔታዎች ብቻ የሆኑ ዋጋዎች ይጣላሉ። ይህን መልሰው መቀልበስ ይችላሉ።",
-                    "english": "Make every scenario use the Base values for these properties? Values entered for them in any scenario are discarded. You can undo this."
-                }
-            }
-        },
-        "lpn_alt_cat_calculation": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_alt_cat_text",
-                    "value": "ጽሑፍ",
-                    "english": "Text"
-                },
-                "next_translated": {
-                    "key": "lpn_scenario_push_confirm",
-                    "value": "እያንዳንዱ ሁኔታ ለእነዚህ ንብረቶች የመሠረት ዋጋዎችን እንዲጠቀም ማድረግ? ለእነዚያ ሁኔታዎች ብቻ የሆኑ ዋጋዎች ይጣላሉ። ይህን መልሰው መቀልበስ ይችላሉ።",
-                    "english": "Make every scenario use the Base values for these properties? Values entered for them in any scenario are discarded. You can undo this."
+                    "key": "lpn_geojson_refused_local",
+                    "value": "የGeoJSON ፋይል የሚይዘው ኬክሮስንና ኬንትሮስን ብቻ ነው፣ ይህ ፕሮጀክት ግን በምድር ላይ ቦታ በሌለው አካባቢያዊ ፍርግርግ ላይ ተሳሏል። መጀመሪያ በካርታ፣ የዓለም ካርታ፣ አያይዝ ጂዮ-ማጣቀሻ ያድርጉት፣ ከዚያም እንደገና ይላኩ።",
+                    "english": "A GeoJSON file holds latitude and longitude only, and this project is drawn on a local grid with no place on the Earth. Georeference it first with Map, World map, Attach, then export again."
                 }
             }
         }

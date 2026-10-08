@@ -101,6 +101,20 @@ const EC_DYNAMIC_STORAGE_SITES = [
                    . 'lists as `lpn_project_<id>`. The other keys (lpn_pane, lpn_rpane, lpn_setbox, '
                    . 'lpn_show_titles) write through setItem directly and are read from the source.',
     ],
+    'js/looped-network.js|k' => [
+        'names'   => ['lpn_pane', 'lpn_rpane', 'lpn_panecols', 'lpn_setbox', 'lpn_findbox', 'lpn_libbox',
+            'lpn_ffbox', 'lpn_energybox', 'lpn_cmpbox', 'lpn_reportbox', 'lpn_statusbox', 'lpn_fullbox',
+            'lpn_contourbox', 'lpn_notesbox', 'lpn_hotkeysbox', 'lpn_snipbox', 'lpn_runbox',
+            'lpn_scnbasic', 'lpn_areahint', 'lpn_survey_format', 'bpn_sketch_toggles', 'lpn_dockbox',
+            'lpn_altbox'],
+        'literal' => true,
+        'workspace' => true,
+        'why'     => 'File > Import > Workspace writes back, only on the visitor\'s command and only '
+                   . 'from a file they chose, the browser-scoped keys the page already keeps '
+                   . '(every lpn_ key not in LPN_WORKSPACE_EXCLUDED, plus LPN_WORKSPACE_EXTRA). It adds '
+                   . 'no key of its own; a new furniture key joins this list when it is written. workspace_keys_check.php '
+                   . 'does not count this site as a writer of those keys.',
+    ],
 ];
 
 /**

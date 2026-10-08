@@ -99,63 +99,67 @@ lines rather than appending corrections.
   tile counts at a 900 ms settle (basemap.js now waits for a pointable tile). Pre-existing and unrelated: `scale-publish-harness.js` (2 checks). The full `node dev/browser-pass/run.js` is green (1853/1853, 2026-10-04, Task 761); browser-pass specs are not in
   check_all.
 
-## STATE — 2026-10-08 (eighth session, Arizona time)
+## STATE — 2026-10-08 (ninth session, Arizona time, after his merges)
 
-### Master = see `git log -1 master`, pushed. Production: last confirmed pull edc78d01 (2026-10-07); confirm with the About box
+### Master = b1b0ffbd, pushed. Production: last confirmed pull edc78d01 (2026-10-07); confirm with the About box
 
-Merged this session: fix/contour-breakline (his "Merge"), fix/label-rule2-off (rule 2 out: "Too
-expensive"), fix/text-repeat (Text stays armed), feat/epp (his "Do it": writes .epp, reads .epp/.lwn/.json;
-Task 780 closed), perf/label-pass (label pass 254 -> 98 ms, identical placements; Task 681(b)),
-fix/dock-memory (every dock survives reloads; new dock goes to the bottom; NEW localStorage key
-`lpn_dockbox`, window furniture, reported to him), fix/report-names (rows "Run", "Status changes"; box
-titles "Run report", "Status changes"; his "remove EPANET from all", CC read Run as included: F04),
-chore/wording-1007 (his three "Use proposed", ruled; max-day/peak-hour now one key
-lpn_scenario_preset_mult_tip; old two keys deleted, so 26 languages show English there until the sprint).
-Deleted keys: lpn_scenario_preset_max_day_tip, lpn_scenario_preset_peak_hour_tip (master);
-lpn_pane_export_csv, lpn_pane_export_ods (on feat/table-export).
+Merged 10-08: wave0-apply, sprint-1008 (26 languages), fix/mnemonic-han-harness, fix/sw-precache-log, and on
+his TYPED words feat/table-export, feat/dxf, feat/workspace (all-clears on file). Their worktrees, branches
+and previews are deleted. Deleted keys: none.
 
-### Awaiting him
+**Tom, 10-08, after the merges: "I thought you were done, and I only asked for a few merges."** CC had
+gone on to apply his calls-page answers unannounced. Do the asked thing, report, and ASK before the next
+pile of work. He then said: let the two builders finish, then /clear.
 
-- **Calls page** https://claude.ai/artifact/1eHT8AMCRcRhcbjtsKUzNd (db collection `answers`; ids F01-F06,
-  `v-<key>` for the 12 Wave 0 questions, `w-<key>` for new English). Old page J8dPJK2nX4Fs6xkH3yWwr3 is
-  fully read and applied.
-- Browser pass (Branch previews page): `feat/table-export` (no spaces in any file/sheet name; right-click
-  Export to CSV/ODS/XLSX), `feat/dxf` (pipes yellow 2, attributes all visible; customers still grey 8: F03),
-  `feat/message-dismiss` (hidden message leaves the map, top of history with Show; corner triangle of Zoom
-  to fit enters Zoom Window with no fit; W and Map menu row too), `feat/workspace` (confirm before import;
-  import replaces; first-visit default docks per his screenshots; Perry: no defect, tabs truncate with "…"
-  at 720 px high, consent banner covers the lowest tabs until answered), `feat/bentley-interop` (every
-  tank-only field of a type-changed junction marked; Alternatives width to map 320 px; `lpn_altbox` key, his
-  E02 yes; Change type direction is F02), `feat/user-guide` (his seven notes; Find chapter rewritten; Perry
-  round fixed: English property words on every language page, choice properties default to "equal to",
-  six false sentences in other chapters corrected), `feat/section-grid`, `feat/desktop` (from before).
-- `feat/visit-dedupe` waits on F01 (random browser code under consent; draft consent_body on the page;
-  $ec_lang_syn needs his "syn OK").
-- **Seam to apply when feat/workspace and feat/bentley-interop both merge:** `if (boxSaveHeld()) { return; }`
-  at the top of `saveAltboxLayout`; add 'lpn_altbox' to the import-site names in storage_inventory_check.php.
+### Not yet on master (all pushed as branches)
 
-### Translation sprint 1008
-
-- Wave 0 done on `chore/wave0-1008` (not yet merged): `dev/english-friction/1008-wave0.json`, 413 keys
-  read, 12 refer-to-human (7 English rewrites, 5 syn notes), all on the calls page as `v-<key>`. Gate:
-  `friction_check.php --sprint=1008-wave0` (the id carries the suffix). Harvest his answers into that file
-  (`human_answer`), apply the rewrites he takes, regenerate payloads, then launch: 26 Sonnet agents, 20 + 6.
-- Six branches still awaiting his pass carry new keys; their strings join a later delta sprint.
-
-### Label port (Task 539)
-
-- Rule 1 kept. Rule 2 removed. Rule 3 measured, not ported (+0.24 labels per 100 for ~11%). The pass is
-  now ~98 ms on Novato all-fields. Bigger gains sit in bench rule 6 (looser pad for would-be-hidden labels),
-  to measure against his price. Bench work: /home/haws/label-trials-work/{cleanground,rescue,perf}.
+- **chore/calls-1008b** (this branch; merge on green, no all-clear needed): DXF customers white (ACI 7,
+  harness fails on 8); his three v2 "Use proposed" English rewrites (lpn_change_type_key,
+  lpn_settings_auto_run_tip, lpn_settings_elev_source_tip) with rulings and friction 1008 closed
+  (`friction_check --sprint=1008` passes); lpn_dxf_note_blocks ruling; Roadmap closes 776, adds 781
+  (G06: active topology first, Change type becomes a new asset in the old one's place). This handoff.
+- **feat/user-guide**: master merged in; lpn_guide_boxes_autohide = his w2 text verbatim.
+- **feat/visit-dedupe**: master merged in (config.inc.php: `ecTesterBrowser()` is the tester cookie;
+  `ecLoggingOptedOut()` = precache OR tester; `ecLogTester()` and the day tally skip precache);
+  `$ec_lang_syn['consent_body']` written on his G02 "syn OK". **The syn notes for consent_current_granted and
+  consent_region_label still describe logging: propose new ones to him (AI may not write them).**
+  G03 privacy text approved, G04 keep ec_seen/ec_blang, w2 consent strings "Use as written" (rulings not
+  yet written). G01 "Translate first": consent_body + the two strings, 26 Sonnet agents, before merge.
+  G05: librewaternet.org branch `visit-code-claim` (0804152) holds his sentence; merge and push it there
+  when visit-dedupe merges.
+- **feat/hover-label** (bbf6c3c3) and **feat/message-dismiss** (aaedf63e): builders FINISHED, pushed.
+  Hover: card = exactly the ticked Settings fields via the map label's own builders, any zoom, ID alone
+  when nothing is ticked; also Delete, Pipe/Pump/Valve/Chain modes; tip his text verbatim. Its full
+  suite was not rerun after its last one-constant fix (touch-radius and hover harnesses pass alone).
+  Ask him: does "Show the full label on hover" (lpn_settings_hover_card) still fit, since "full" now
+  overstates? Message x: on every standing message; a hidden diagnostic returns when its text recurs,
+  a hidden run message at the next run. Ask him: should "storage full/unreadable" and "unit unknown"
+  really be hideable? Both branches: regenerate payloads and new-english-keys on merge; Perry next,
+  then his browser pass.
+- Unchanged: feat/bentley-interop, feat/section-grid, feat/desktop await his browser pass.
+- **Seam, now that workspace is merged:** when bentley-interop next merges master, add
+  `if (boxSaveHeld()) { return; }` at the top of `saveAltboxLayout`; and decide whether workspace export
+  carries lpn_altbox and lpn_hovercard (storage_inventory_check.php import-site names).
+- **A delta translation sprint is owed on master** (new keys from table-export, dxf, workspace; changed:
+  lpn_file_export_menu, the three v2 keys, consent_body). Ask him before launching.
 
 ### Next job
 
-- Read the calls page. Merge what he clears (merge master in first, regenerate payloads on the merge,
-  suite on the merge). table-export and dxf both edit File > Export to...: merge one, then master into the
-  other.
-- Wave 0 answers -> sprint 1008.
-- Sue's recommendation (F02): active topology before more Change type. If he agrees, that is a new task
-  under 721.
+Ask him what he wants first. Candidates: merge chore/calls-1008b; finish/review the two builders' branches;
+G01 consent translation; the delta sprint; Task 714 (theming).
+
+### Traps met 2026-10-08 (ninth session)
+
+- **A key renamed when its meaning flipped kept its old translations under a baselined hash**:
+  lpn_settings_engine_native ("Use the built-in solver when possible") said "Solve with the EPANET solver"
+  in all 26 languages since 09-06, invisible to the drift check. Found by the pt translator, fixed in the
+  sprint. A rename that changes meaning must delete the translations, never carry them.
+- **The drift list is much bigger than the payload**: 224 missing keys, but 343 CHANGED. Build a resync
+  file per language from `detect_english_drift.php --json` and brief both jobs in one sprint.
+- **A sprint changes harness inputs**: Chinese menus gained "…" rows and menu-mnemonic-harness's all-Han
+  regex broke. Run the suite on the sprint merge before pushing.
+- **Merging master into a branch conflicts in english_string_hashes.json** when both sides re-baselined:
+  take master's, then redo the branch's own --update entries and drop hashes of keys the branch deleted.
 
 ### Traps met 2026-10-08 (eighth session)
 

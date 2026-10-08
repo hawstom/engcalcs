@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**63 still to read on master**, of 63 untranslated keys, of 2503 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**97 still to read on master**, of 99 untranslated keys, of 2539 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -21,7 +21,7 @@ hit takes you to a section and the rest walk its keys. A key already ruled does 
 it, and a fully ruled group says `all ruled` and can be skipped whole.
 Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
-## Questions from the translators  (11 to read @@ NEEDS RULING)
+## Questions from the translators  (1 to read @@ NEEDS RULING)
 
 **These are SHIPPED strings, already translated into 26 languages.** A wave-0
 reading or a translator found each one readable two ways, and no sprint launches while one is
@@ -37,89 +37,6 @@ is the one you meant. "The first one" is a complete answer.
   2. demands must be cut to {m} times what is entered for every junction to keep the pressure (right)
   **What this asks for:** which of the readings above you meant.
   *The proposal:* PROPOSED A: '⚠ At least one junction is below {pressure} at the demands as entered (a demand scale of 1). All junctions keep {pressure} only if demands are cut to a demand scale of {m} or less.' PROPOSED B: '⚠ The demands as entered (a demand scale of 1) leave at least one junction below {pressure}. The largest demand scale that keeps every junction at {pressure} or above is {m}.' B paralle...
-  @@ NEEDS RULING
-
-### from sprint 1008
-
-- **`lpn_change_type_key`**
-  > ID: Lost entry
-  *The finding:* 'ID: Lost entry' reads like a column-header pair; unclear whether 'Lost entry' means a lost value or a lost record.
-  1. ID: Загубена стойност (lost value)
-  2. lost record
-  **What this asks for:** a WORDING ruling -- is the English above right, or say what it should say.
-  *The proposal:* PROPOSED English for Tom: 'Each line: ID: the property and value that would be lost'. 'ID: Lost entry' is a legend over the lines listing what a type change loses; seven translators could not tell lost value from lost record.
-  @@ NEEDS RULING
-- **`lpn_change_type_key`**
-  > ID: Lost entry
-  *The finding:* 'ID: Lost entry' reads as a column-heading pair with no stated structure.
-  1. column headings: ID, then the lost entry
-  2. a sentence
-  **What this asks for:** a WORDING ruling -- is the English above right, or say what it should say.
-  *The proposal:* PROPOSED English for Tom: 'Each line: ID: the property and value that would be lost'. 'ID: Lost entry' is a legend over the lines listing what a type change loses; seven translators could not tell lost value from lost record.
-  @@ NEEDS RULING
-- **`lpn_change_type_key`**
-  > ID: Lost entry
-  *The finding:* 'ID: Lost entry' reads as a legend for the lines below, but 'Lost entry' has no stated object; guessed it labels the line format {id}: {property} {value} of a lost value.
-  1. legend: ID then the lost entry (property and value)
-  2. a status label
-  **What this asks for:** a WORDING ruling -- is the English above right, or say what it should say.
-  *The proposal:* PROPOSED English for Tom: 'Each line: ID: the property and value that would be lost'. 'ID: Lost entry' is a legend over the lines listing what a type change loses; seven translators could not tell lost value from lost record.
-  @@ NEEDS RULING
-- **`lpn_change_type_key`**
-  > ID: Lost entry
-  *The finding:* 'ID: Lost entry' is not clear whether 'Lost entry' names a lost row or a key label; guessed a heading for a lost item.
-  1. ID - lost entry (item lost in conversion)
-  2. ID: entry that is lost
-  **What this asks for:** a WORDING ruling -- is the English above right, or say what it should say.
-  *The proposal:* PROPOSED English for Tom: 'Each line: ID: the property and value that would be lost'. 'ID: Lost entry' is a legend over the lines listing what a type change loses; seven translators could not tell lost value from lost record.
-  @@ NEEDS RULING
-- **`lpn_change_type_key`**
-  > ID: Lost entry
-  *The finding:* 'ID: Lost entry' has no verb or object; unclear whether 'Lost entry' names the thing lost or labels a column of lost entries.
-  1. ID: потерянная запись (label of a lost-entry line)
-  2. ID: the entry that is lost on conversion
-  **What this asks for:** a WORDING ruling -- is the English above right, or say what it should say.
-  *The proposal:* PROPOSED English for Tom: 'Each line: ID: the property and value that would be lost'. 'ID: Lost entry' is a legend over the lines listing what a type change loses; seven translators could not tell lost value from lost record.
-  @@ NEEDS RULING
-- **`lpn_change_type_key`**
-  > ID: Lost entry
-  *The finding:* 'ID: Lost entry' is ambiguous: unclear whether it is a heading, a line label, or a fragment, and what 'Lost entry' refers to.
-  1. Kitambulisho: Kiingizo kilichopotea (the ID/key entry that is lost)
-  2. a lost row or record
-  **What this asks for:** a WORDING ruling -- is the English above right, or say what it should say.
-  *The proposal:* PROPOSED English for Tom: 'Each line: ID: the property and value that would be lost'. 'ID: Lost entry' is a legend over the lines listing what a type change loses; seven translators could not tell lost value from lost record.
-  @@ NEEDS RULING
-- **`lpn_change_type_key`**
-  > ID: Lost entry
-  *The finding:* 'ID: Lost entry' reads as a column header, but 'Lost entry' has no stated object (a value? a property?).
-  1. a table key: the ID followed by the lost value
-  2. a status label saying the ID itself was lost
-  **What this asks for:** a WORDING ruling -- is the English above right, or say what it should say.
-  *The proposal:* PROPOSED English for Tom: 'Each line: ID: the property and value that would be lost'. 'ID: Lost entry' is a legend over the lines listing what a type change loses; seven translators could not tell lost value from lost record.
-  @@ NEEDS RULING
-- **`lpn_settings_auto_run_tip`**
-  > Turn off if recalculation is too slow. Hides the Calculate button.
-  *The finding:* 'Hides the Calculate button' has no stated condition: does it hide the button when the setting is on or when it is turned off?
-  1. The button is hidden while the setting is on (automatic recalculation)
-  2. The button is hidden when the user turns the setting off
-  **What this asks for:** a WORDING ruling -- is the English above right, or say what it should say.
-  *The proposal:* PROPOSED English for Tom: 'Turn off if recalculation is too slow. While this is on, the Calculate button is hidden.' Two translators could not tell which state hides the button.
-  @@ NEEDS RULING
-- **`lpn_settings_auto_run_tip`**
-  > Turn off if recalculation is too slow. Hides the Calculate button.
-  *The finding:* 'Hides the Calculate button' has no stated subject: does turning the setting off or on hide the button?
-  1. the setting being on hides the button (translated literally, ambiguous)
-  2. turning it off hides the button
-  **What this asks for:** a WORDING ruling -- is the English above right, or say what it should say.
-  *The proposal:* PROPOSED English for Tom: 'Turn off if recalculation is too slow. While this is on, the Calculate button is hidden.' Two translators could not tell which state hides the button.
-  @@ NEEDS RULING
-- **`lpn_settings_elev_source_tip`**
-  > 2026 Mapbox DEM horizontal and vertical accuracy ranges through 1–10 m and <1 m in the US, 2–10 m and 1–3 m in Europe and Japan, 30 m and 10–16 m globally, and 90 m and >16 m at the poles.
-  *The finding:* 'ranges through 1-10 m and <1 m' pairs horizontal and vertical accuracy without saying which figure is which; the pairing is inferred from the order 'horizontal and vertical'.
-  1. first figure horizontal, second vertical
-  2. ranges as an interval from one region to the next
-  **What this asks for:** a WORDING ruling -- is the English above right, or say what it should say.
-  *The proposal:* PROPOSED English for Tom: 'Mapbox DEM accuracy in 2026, horizontal then vertical: 1–10 m and under 1 m in the US, 2–10 m and 1–3 m in Europe and Japan, 30 m and 10–16 m globally, and 90 m and over 16 m at the poles.'
   @@ NEEDS RULING
 
 ## Synonym entries to approve  (12, 10 to read @@ NEEDS RULING)
@@ -222,7 +139,7 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   @@ NEEDS RULING
 
-## lpn_  (63, 63 to read @@ NEEDS RULING)
+## lpn_  (99, 97 to read @@ NEEDS RULING)
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -241,6 +158,90 @@ never edits a synonym.
   @@ NEEDS RULING
 - **`lpn_change_type_switch_base`**
   > Switch to Base
+  @@ NEEDS RULING
+- **`lpn_dxf_export_failed`**
+  > The DXF file was not written: an error in this page stopped it ({error}).
+  @@ NEEDS RULING
+- **`lpn_dxf_export_no_utm`**
+  > The DXF file was not written: this network lies outside the latitudes UTM covers (80° S to 84° N), and a drawing needs a flat grid to be drawn on.
+  @@ NEEDS RULING
+- **`lpn_dxf_export_refused`**
+  > The DXF file was not written: the coordinate conversion it needs did not load. Check the connection and try again.
+  @@ NEEDS RULING
+- **`lpn_dxf_exported_geo`**
+  > Exported {file}. Its coordinates are {crs}, in meters, not latitude and longitude.
+  @@ NEEDS RULING
+- **`lpn_dxf_note_blocks`**
+  > Layers are named {prefix}, the asset code, a hyphen, and the alternative, as in {example}. Each element is a block inserted at scale 1 with attributes 1 unit high; scale the blocks to set the text height. Every attribute is visible; the attributes of one element are stacked in a column beside its symbol.
+  _Ruled 2026-10-08: Calls page 8 October: Use as written_
+- **`lpn_dxf_note_categories`**
+  > {n} junctions have more than one demand category. Their {tag} attribute holds the sum of the base demands of all categories.
+  @@ NEEDS RULING
+- **`lpn_dxf_note_crs`**
+  > Coordinates: {crs}, exactly as this project states them.
+  @@ NEEDS RULING
+- **`lpn_dxf_note_geo`**
+  > Coordinates: {crs}, in meters, not latitude and longitude. The latitudes and longitudes of the project were converted to that grid.
+  @@ NEEDS RULING
+- **`lpn_dxf_note_grid`**
+  > Coordinates: the X and Y of this project, in {unit}. No coordinate system is stated.
+  @@ NEEDS RULING
+- **`lpn_dxf_note_shortened`**
+  > {n} values were longer than a DXF file allows ({max} characters), so each was shortened and ends in three periods.
+  @@ NEEDS RULING
+- **`lpn_export_table_all`**
+  > All
+  @@ NEEDS RULING
+- **`lpn_export_table_current`**
+  > Current
+  @@ NEEDS RULING
+- **`lpn_export_table_go`**
+  > Export
+  @@ NEEDS RULING
+- **`lpn_export_table_scn_note`**
+  > Results are exported only for the scenario last calculated.
+  @@ NEEDS RULING
+- **`lpn_export_table_title`**
+  > Export to {format}
+  @@ NEEDS RULING
+- **`lpn_file_export_csv_tip`**
+  > Download a table as the Tables pane shows it. Several tables come as one zip file of CSV files, with a file for each library their IDs refer to.
+  @@ NEEDS RULING
+- **`lpn_file_export_dxf_tip`**
+  > Download this network for AutoCAD and other CAD programs: pipes, pumps, and valves as polylines, and every element as a block whose attributes carry its ID and property values in the project units.
+  @@ NEEDS RULING
+- **`lpn_file_export_item_csv`**
+  > CSV file…
+  @@ NEEDS RULING
+- **`lpn_file_export_item_dxf`**
+  > DXF file…
+  @@ NEEDS RULING
+- **`lpn_file_export_item_ods`**
+  > ODS file…
+  @@ NEEDS RULING
+- **`lpn_file_export_item_workspace`**
+  > Workspace…
+  @@ NEEDS RULING
+- **`lpn_file_export_item_xlsx`**
+  > XLSX file…
+  @@ NEEDS RULING
+- **`lpn_file_export_tables_heading`**
+  > Tables and libraries
+  @@ NEEDS RULING
+- **`lpn_file_export_tables_tip`**
+  > Download the tables as the Tables pane shows them, one sheet each, with a sheet for each library their IDs refer to: patterns, curves, pipe types, and fittings.
+  @@ NEEDS RULING
+- **`lpn_file_export_workspace_tip`**
+  > Download a small file holding where your boxes sit, their sizes, which are open or docked, and your pane and column sizes, plus the reading preferences of this page. Your projects, project settings and cookies (language, consent, units) are not in it. Load it on another screen or browser with File, Import, Workspace.
+  @@ NEEDS RULING
+- **`lpn_file_import_workspace`**
+  > Workspace…
+  @@ NEEDS RULING
+- **`lpn_file_import_workspace_tip`**
+  > Apply a workspace file saved with File, Export, Workspace: box positions and sizes, docking, pane sizes and the reading preferences of this page. Your projects and cookies are not touched.
+  @@ NEEDS RULING
+- **`lpn_pane_copy_heads`**
+  > Copy with headings
   @@ NEEDS RULING
 - **`lpn_pane_scn_cur_only`**
   > Current scenario only
@@ -413,12 +414,36 @@ never edits a synonym.
 - **`lpn_settings_view_top_left`**
   > Top left corner
   @@ NEEDS RULING
+- **`lpn_workspace_confirm`**
+  > Replace this browser's workspace layout with the one in the file?
+  _Ruled 2026-10-08: Calls page 8 October: his own text, "Replace this browser's workspace layout with the one in the file?"_
+- **`lpn_workspace_exported`**
+  > Workspace saved to {file}: {n} settings.
+  @@ NEEDS RULING
+- **`lpn_workspace_ignored`**
+  > Entries ignored because they were not recognized: {u}.
+  @@ NEEDS RULING
+- **`lpn_workspace_imported`**
+  > Workspace applied from {file}. Settings applied: {n}. Returned to their defaults: {r}.
+  @@ NEEDS RULING
+- **`lpn_workspace_refused_format`**
+  > This is not a workspace file saved by this page, so nothing was changed.
+  @@ NEEDS RULING
+- **`lpn_workspace_refused_newer`**
+  > This workspace file was saved by a newer version of this page (format {version}), so nothing was changed.
+  @@ NEEDS RULING
+- **`lpn_workspace_refused_storage`**
+  > Browser storage is full or unavailable, so the workspace was not applied.
+  @@ NEEDS RULING
+- **`lpn_workspace_refused_unreadable`**
+  > This file could not be read as a workspace, so nothing was changed.
+  @@ NEEDS RULING
 
 ---
 
 # Strings waiting on a branch
 
-**83 still to read**, of 86 new keys across 16 unmerged branch(es).
+**47 still to read**, of 50 new keys across 14 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -429,56 +454,17 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/bentley-interop (`a053c602`) — adds no English strings
+### feat/bentley-interop (`661acc46`) — adds no English strings
 
 ### feat/desktop (`baba0f04`) — adds no English strings
 
-### feat/dxf (`dee7a28a`) — 12 new, 12 to read @@ NEEDS RULING
-
-- **`lpn_dxf_export_failed`**
-  > The DXF file was not written: an error in this page stopped it ({error}).
-  @@ NEEDS RULING
-- **`lpn_dxf_export_no_utm`**
-  > The DXF file was not written: this network lies outside the latitudes UTM covers (80° S to 84° N), and a drawing needs a flat grid to be drawn on.
-  @@ NEEDS RULING
-- **`lpn_dxf_export_refused`**
-  > The DXF file was not written: the coordinate conversion it needs did not load. Check the connection and try again.
-  @@ NEEDS RULING
-- **`lpn_dxf_exported_geo`**
-  > Exported {file}. Its coordinates are {crs}, in meters, not latitude and longitude.
-  @@ NEEDS RULING
-- **`lpn_dxf_note_blocks`**
-  > Layers are named {prefix}, the asset code, a hyphen, and the alternative, as in {example}. Each element is a block inserted at scale 1 with attributes 1 unit high; scale the blocks to set the text height. Every attribute is visible; the attributes of one element are stacked in a column beside its symbol.
-  @@ NEEDS RULING
-- **`lpn_dxf_note_categories`**
-  > {n} junctions have more than one demand category. Their {tag} attribute holds the sum of the base demands of all categories.
-  @@ NEEDS RULING
-- **`lpn_dxf_note_crs`**
-  > Coordinates: {crs}, exactly as this project states them.
-  @@ NEEDS RULING
-- **`lpn_dxf_note_geo`**
-  > Coordinates: {crs}, in meters, not latitude and longitude. The latitudes and longitudes of the project were converted to that grid.
-  @@ NEEDS RULING
-- **`lpn_dxf_note_grid`**
-  > Coordinates: the X and Y of this project, in {unit}. No coordinate system is stated.
-  @@ NEEDS RULING
-- **`lpn_dxf_note_shortened`**
-  > {n} values were longer than a DXF file allows ({max} characters), so each was shortened and ends in three periods.
-  @@ NEEDS RULING
-- **`lpn_file_export_dxf_tip`**
-  > Download this network for AutoCAD and other CAD programs: pipes, pumps, and valves as polylines, and every element as a block whose attributes carry its ID and property values in the project units.
-  @@ NEEDS RULING
-- **`lpn_file_export_item_dxf`**
-  > DXF file…
-  @@ NEEDS RULING
-
-### feat/hover-label (`944f963d`) — 2 new, 2 to read @@ NEEDS RULING
+### feat/hover-label (`31b137e5`) — 2 new, 2 to read @@ NEEDS RULING
 
 - **`lpn_settings_hover_card`**
   > Show the full label on hover
   @@ NEEDS RULING
 - **`lpn_settings_hover_card_tip`**
-  > Rest the pointer on a node, link or customer to see its label with every label field shown, ticked or not. This is a setting for this browser, not for the project.
+  > Rest the pointer on a node, link or customer to see its label as specified in Settings at any scale, fit or not. This is a setting for this browser, not for the project.
   @@ NEEDS RULING
 
 ### feat/label-gang-search (`8b31a907`) — 3 new, all ruled
@@ -503,7 +489,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`2e5e81c4`) — adds no English strings
 
-### feat/message-dismiss (`d4c88b12`) — 5 new, 5 to read @@ NEEDS RULING
+### feat/message-dismiss (`aaedf63e`) — 5 new, 5 to read @@ NEEDS RULING
 
 - **`lpn_hotkeys_zoomwin_def`**
   > Zoom Window: drag a rectangle to zoom to.
@@ -527,46 +513,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Points data<br />(use Copy to see format)
   @@ NEEDS RULING
 
-### feat/table-export (`6988ecf1`) — 12 new, 12 to read @@ NEEDS RULING
-
-- **`lpn_export_table_all`**
-  > All
-  @@ NEEDS RULING
-- **`lpn_export_table_current`**
-  > Current
-  @@ NEEDS RULING
-- **`lpn_export_table_go`**
-  > Export
-  @@ NEEDS RULING
-- **`lpn_export_table_scn_note`**
-  > Results are exported only for the scenario last calculated.
-  @@ NEEDS RULING
-- **`lpn_export_table_title`**
-  > Export to {format}
-  @@ NEEDS RULING
-- **`lpn_file_export_csv_tip`**
-  > Download a table as the Tables pane shows it. Several tables come as one zip file of CSV files, with a file for each library their IDs refer to.
-  @@ NEEDS RULING
-- **`lpn_file_export_item_csv`**
-  > CSV file…
-  @@ NEEDS RULING
-- **`lpn_file_export_item_ods`**
-  > ODS file…
-  @@ NEEDS RULING
-- **`lpn_file_export_item_xlsx`**
-  > XLSX file…
-  @@ NEEDS RULING
-- **`lpn_file_export_tables_heading`**
-  > Tables and libraries
-  @@ NEEDS RULING
-- **`lpn_file_export_tables_tip`**
-  > Download the tables as the Tables pane shows them, one sheet each, with a sheet for each library their IDs refer to: patterns, curves, pipe types, and fittings.
-  @@ NEEDS RULING
-- **`lpn_pane_copy_heads`**
-  > Copy with headings
-  @@ NEEDS RULING
-
-### feat/user-guide (`a6661944`) — 39 new, 39 to read @@ NEEDS RULING
+### feat/user-guide (`468f016d`) — 39 new, 39 to read @@ NEEDS RULING
 
 - **`lpn_guide_also`**
   > Also in {menu}
@@ -578,7 +525,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > {box} box
   @@ NEEDS RULING
 - **`lpn_guide_boxes_autohide`**
-  > Auto-hidden boxes have two modes: with focus (a control in the box has focus, even a button just pressed) and without focus (no control in it has focus). When the pointer leaves, a box without focus tucks away behind its tab after a short delay. A box with focus stays until you click outside it, press Esc, or Tab out of it with the pointer elsewhere.
+  > When the pointer leaves, a box without focus hides after a short delay. A box with focus hides when you click outside it, press Esc, or Tab out of it with the pointer elsewhere.
   @@ NEEDS RULING
 - **`lpn_guide_boxes_heading`**
   > Boxes
@@ -686,43 +633,6 @@ build for that would be a gate nobody keeps. Refresh it with
   > Guide
   @@ NEEDS RULING
 
-### feat/visit-dedupe (`b4a99e9a`) — adds no English strings
+### feat/visit-dedupe (`7b4a84bd`) — adds no English strings
 
-### feat/workspace (`a809e425`) — 12 new, 12 to read @@ NEEDS RULING
-
-- **`lpn_file_export_item_workspace`**
-  > Workspace…
-  @@ NEEDS RULING
-- **`lpn_file_export_workspace_tip`**
-  > Download a small file holding where your boxes sit, their sizes, which are open or docked, and your pane and column sizes, plus the reading preferences of this page. Your projects, project settings and cookies (language, consent, units) are not in it. Load it on another screen or browser with File, Import, Workspace.
-  @@ NEEDS RULING
-- **`lpn_file_import_workspace`**
-  > Workspace…
-  @@ NEEDS RULING
-- **`lpn_file_import_workspace_tip`**
-  > Apply a workspace file saved with File, Export, Workspace: box positions and sizes, docking, pane sizes and the reading preferences of this page. Your projects and cookies are not touched.
-  @@ NEEDS RULING
-- **`lpn_workspace_confirm`**
-  > Replace this browser's workspace layout with the one in the file?
-  @@ NEEDS RULING
-- **`lpn_workspace_exported`**
-  > Workspace saved to {file}: {n} settings.
-  @@ NEEDS RULING
-- **`lpn_workspace_ignored`**
-  > Entries ignored because they were not recognized: {u}.
-  @@ NEEDS RULING
-- **`lpn_workspace_imported`**
-  > Workspace applied from {file}. Settings applied: {n}. Returned to their defaults: {r}.
-  @@ NEEDS RULING
-- **`lpn_workspace_refused_format`**
-  > This is not a workspace file saved by this page, so nothing was changed.
-  @@ NEEDS RULING
-- **`lpn_workspace_refused_newer`**
-  > This workspace file was saved by a newer version of this page (format {version}), so nothing was changed.
-  @@ NEEDS RULING
-- **`lpn_workspace_refused_storage`**
-  > Browser storage is full or unavailable, so the workspace was not applied.
-  @@ NEEDS RULING
-- **`lpn_workspace_refused_unreadable`**
-  > This file could not be read as a workspace, so nothing was changed.
-  @@ NEEDS RULING
+### fix/dock-box-width (`a6d2fd3e`) — adds no English strings
