@@ -99,53 +99,75 @@ lines rather than appending corrections.
   tile counts at a 900 ms settle (basemap.js now waits for a pointable tile). Pre-existing and unrelated: `scale-publish-harness.js` (2 checks). The full `node dev/browser-pass/run.js` is green (1853/1853, 2026-10-04, Task 761); browser-pass specs are not in
   check_all.
 
-## STATE — 2026-10-07 (seventh session, Arizona time)
+## STATE — 2026-10-08 (eighth session, Arizona time)
 
-### Master = see `git log -1 master`, pushed. Production: Tom wrote "Pulling" 2026-10-07 (master was edc78d01); confirm with the About box
+### Master = see `git log -1 master`, pushed. Production: last confirmed pull edc78d01 (2026-10-07); confirm with the About box
 
-Merged this session: feat/web-mercator, feat/screenshot, feat/survey-code, feat/geojson,
-feat/backdrop-attach, feat/feedback (his typed "Merge"), chore/technical-english (his "Done", plus his
-41 interview answers applied: 38 ruled in english-key-rulings.json), fix/menu-and-repeat (Libraries
-off Edit; Reports "Run (EPANET)", "Status (EPANET)"; inserters already repeat), fix/label-clean-ground
-(label rule 1), fix/merge-1007 (two harnesses followed geojson's File > Export submenu). Deleted keys:
-lpn_file_export_inp, lpn_file_export_geojson (nothing rendered them).
+Merged this session: fix/contour-breakline (his "Merge"), fix/label-rule2-off (rule 2 out: "Too
+expensive"), fix/text-repeat (Text stays armed), feat/epp (his "Do it": writes .epp, reads .epp/.lwn/.json;
+Task 780 closed), perf/label-pass (label pass 254 -> 98 ms, identical placements; Task 681(b)),
+fix/dock-memory (every dock survives reloads; new dock goes to the bottom; NEW localStorage key
+`lpn_dockbox`, window furniture, reported to him), fix/report-names (rows "Run", "Status changes"; box
+titles "Run report", "Status changes"; his "remove EPANET from all", CC read Run as included: F04),
+chore/wording-1007 (his three "Use proposed", ruled; max-day/peak-hour now one key
+lpn_scenario_preset_mult_tip; old two keys deleted, so 26 languages show English there until the sprint).
+Deleted keys: lpn_scenario_preset_max_day_tip, lpn_scenario_preset_peak_hour_tip (master);
+lpn_pane_export_csv, lpn_pane_export_ods (on feat/table-export).
 
-### Awaiting him (all on the Branch previews page with click lists)
+### Awaiting him
 
-- Browser pass, each Perry-reviewed and fixed: `feat/table-export` (Export to... submenu, freeze, library
-  sheets; never opened in Excel/LibreOffice here), `feat/dxf` (MTEXT read-me, demand sum, real MTEXT
-  escapes), `feat/user-guide` (one column + Ida's audit), `feat/message-dismiss` (x + chip, Zoom Window row
-  and W), `feat/workspace` (File > Export/Import > Workspace), `feat/bentley-interop` (type overrides per
-  scenario with his three-button box; docked width uncapped), `fix/contour-breakline` (shorter fault line;
-  CC's own picture still shows a long east arm: his eye decides), `feat/section-grid` (code already copies
-  point rows only; could not reproduce his "header inputs": ask for the copied text).
-- `feat/visit-dedupe` BLOCKED ON HIM: counting each browser once per window (his D01 rule) needs a date per
-  page in ec_seen, which makes consent_body ("one-digit cookie") false: consent-version bump, 26
-  retranslations, $ec_lang_syn change. Or keep one digit and accept inexact counts. Builder's design and
-  cookie before/after in its report (this session's final report to Tom).
-- **His answers go in the interview page** https://claude.ai/artifact/J8dPJK2nX4Fs6xkH3yWwr3 (db
-  collection `answers`, ids E01-E08 and `w-<key>`). Read with ArtifactData list.
-- Wording questions: lpn_inp_export_flat_customers ("What are we talking about here?"), max-day/peak-hour
-  tips "Can these be combined?" (yes: one key with placeholders), lpn_wrong_tip rewritten by CC for the new
-  feedback box in his "new tone" (not ruled), Task 780 `.epp`.
-- Still from before: `feat/desktop`.
+- **Calls page** https://claude.ai/artifact/1eHT8AMCRcRhcbjtsKUzNd (db collection `answers`; ids F01-F06,
+  `v-<key>` for the 12 Wave 0 questions, `w-<key>` for new English). Old page J8dPJK2nX4Fs6xkH3yWwr3 is
+  fully read and applied.
+- Browser pass (Branch previews page): `feat/table-export` (no spaces in any file/sheet name; right-click
+  Export to CSV/ODS/XLSX), `feat/dxf` (pipes yellow 2, attributes all visible; customers still grey 8: F03),
+  `feat/message-dismiss` (hidden message leaves the map, top of history with Show; corner triangle of Zoom
+  to fit enters Zoom Window with no fit; W and Map menu row too), `feat/workspace` (confirm before import;
+  import replaces; first-visit default docks per his screenshots; Perry: no defect, tabs truncate with "…"
+  at 720 px high, consent banner covers the lowest tabs until answered), `feat/bentley-interop` (every
+  tank-only field of a type-changed junction marked; Alternatives width to map 320 px; `lpn_altbox` key, his
+  E02 yes; Change type direction is F02), `feat/user-guide` (his seven notes; Find chapter rewritten; Perry
+  round fixed: English property words on every language page, choice properties default to "equal to",
+  six false sentences in other chapters corrected), `feat/section-grid`, `feat/desktop` (from before).
+- `feat/visit-dedupe` waits on F01 (random browser code under consent; draft consent_body on the page;
+  $ec_lang_syn needs his "syn OK").
+- **Seam to apply when feat/workspace and feat/bentley-interop both merge:** `if (boxSaveHeld()) { return; }`
+  at the top of `saveAltboxLayout`; add 'lpn_altbox' to the import-site names in storage_inventory_check.php.
+
+### Translation sprint 1008
+
+- Wave 0 done on `chore/wave0-1008` (not yet merged): `dev/english-friction/1008-wave0.json`, 413 keys
+  read, 12 refer-to-human (7 English rewrites, 5 syn notes), all on the calls page as `v-<key>`. Gate:
+  `friction_check.php --sprint=1008-wave0` (the id carries the suffix). Harvest his answers into that file
+  (`human_answer`), apply the rewrites he takes, regenerate payloads, then launch: 26 Sonnet agents, 20 + 6.
+- Six branches still awaiting his pass carry new keys; their strings join a later delta sprint.
 
 ### Label port (Task 539)
 
-- Rules 1 and 2 merged 2026-10-07. Rule 2 (rescue search): labels shown 38.3 -> 39.3 per 100 asked,
-  ~+7% pass time; its pipe fallback lifts labels-on-a-pipe 23.9 -> 26.2 per 100 shown. Clean-only is two
-  lines in `rescueDropped()` (js/lpn-collide.js): his call. Next: rule 3 (eviction). Bigger gains sit in
-  bench rule 6 (looser pad for would-be-hidden labels). Method: /home/haws/label-trials-work/{cleanground,rescue}.
+- Rule 1 kept. Rule 2 removed. Rule 3 measured, not ported (+0.24 labels per 100 for ~11%). The pass is
+  now ~98 ms on Novato all-fields. Bigger gains sit in bench rule 6 (looser pad for would-be-hidden labels),
+  to measure against his price. Bench work: /home/haws/label-trials-work/{cleanground,rescue,perf}.
 
 ### Next job
 
-- Merge what he clears (merge master in first, regenerate payloads on the merge, suite on the merge).
-  table-export and dxf both edit the File > Export submenu (table-export renames it "Export to..."): merge
-  one, then merge master into the other.
-- Then ONE translation sprint (Wave 0 first). Deferred this session on purpose: technical English changed
-  ~190 English strings, and six branches with new keys are waiting on his pass.
-- The feedback box strings merged today (lpn_fb_*) predate the technical-English style ("That did not
-  reach us"); give them the same pass before the sprint.
+- Read the calls page. Merge what he clears (merge master in first, regenerate payloads on the merge,
+  suite on the merge). table-export and dxf both edit File > Export to...: merge one, then master into the
+  other.
+- Wave 0 answers -> sprint 1008.
+- Sue's recommendation (F02): active topology before more Change type. If he agrees, that is a new task
+  under 721.
+
+### Traps met 2026-10-08 (eighth session)
+
+- **Nine agents' suites at once ran ~60 min each** (slots full, the rest queued). Brief builders to run
+  check_all once, at the end, and merge master's batch while slots are free.
+- **Agents symlinked node_modules at the worktree ROOT** as well as dev/browser-pass/; the stray
+  `node_modules` shows as untracked and blocks `git worktree remove`. `rm` the symlink first.
+- **A Wave 0 file named `<id>-wave0.json` needs `--sprint=<id>-wave0`**; `--sprint=<id>` exits 2.
+- **After feat/workspace merges, a browser with `navigator.webdriver` gets no default docks**; a harness
+  that wants them sets `window.EC_DEFAULT_DOCKS = true` in an init script (dev/testing-notes.md).
+- **Perry caught what the builder's English-only harness could not**: the Guide's showpiece query failed on
+  every non-English page. Brief builders of anything language-sensitive to test one non-English page.
 
 ### Traps met 2026-10-07 (seventh session)
 
