@@ -726,8 +726,8 @@ const MUTATIONS = [
 	['a converted node shows freshly derived results', src => src.replace(
 		"\t\tvar held = heldTypeChange(n, 'pressure');\n\t\tif (held !== undefined) { return held; }\n", "")],
 	['a stored alternative\'s overrides are not walked', src => src.replace(
-		"\t\t\tif (owner.isBase || !plainObject(map[key]) || typeof map[key].type === 'string') { return; }\n\t\t\tfn(map[key], owner, map);",
-		"\t\t\tif (owner.isBase || !plainObject(map[key]) || typeof map[key].type === 'string' || scenarios.indexOf(owner) < 0) { return; }\n\t\t\tfn(map[key], owner, map);")],
+		"\t\t\tif (owner.isBase || !plainObject(map[key])) { return; }\n\t\t\tfn(map[key], owner, map);",
+		"\t\t\tif (owner.isBase || !plainObject(map[key]) || scenarios.indexOf(owner) < 0) { return; }\n\t\t\tfn(map[key], owner, map);")],
 	['scenario overrides survive', src => src.replace(
 		"spec.props.forEach(function (p) { delete ov[p]; });", "spec.props.forEach(function (p) { void ov[p]; });")],
 	// The link half (sections 12-17).

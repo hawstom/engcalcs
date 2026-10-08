@@ -1518,6 +1518,7 @@ $ec_lang['lpn_pane_scn_show']='Show scenarios';
 // scenario holds a value of its own in this table, and keep only the open scenario's rows.
 $ec_lang['lpn_pane_scn_ov_only']='Overrides only';
 $ec_lang['lpn_pane_scn_cur_only']='Current scenario only';
+$ec_lang['lpn_pane_inactive_show']='Include inactive topology';
 // The line above a table while either switch is on, beside the filter's own Show all. {filters} is one
 // or both of the two switch names, joined by a comma; {n} the rows showing, {all} the rows without them.
 $ec_lang['lpn_pane_scn_filter_note']='{filters}. Showing {n} of {all}.';
@@ -1607,8 +1608,10 @@ $ec_lang['lpn_change_type_becomes']='{id}: {property} {value}, in scenario {scen
 $ec_lang['lpn_change_type_customers']='Only a pipe serves customers, so these customers are connected instead to the node shown in parentheses, where their demand is already applied. They stay where they are drawn, and their demand is unchanged:';
 $ec_lang['lpn_change_type_setting']='These controls and rules give or test the setting of a link being changed. A setting is a different quantity on a pipe, a pump, and a valve, so these will read it differently:';
 $ec_lang['lpn_change_type_rules']='These rule lines name a link by its kind, and will name its new kind instead:';
-$ec_lang['lpn_change_type_scenario_ask']='Current scenario is not Base. Create overrides?';
-$ec_lang['lpn_change_type_create_overrides']='Create overrides';
+$ec_lang['lpn_change_type_scenario_ask']='Current scenario is not Base. Create new assets? The selected assets become inactive in this scenario.';
+$ec_lang['lpn_change_type_create_new']='Create new assets';
+$ec_lang['lpn_change_type_not_carried']='The new assets cannot hold these values. The old assets keep them:';
+$ec_lang['lpn_change_type_old_controls']='These controls and rules name an old asset, which is inactive in this scenario, so they are omitted from this scenario\'s run:';
 $ec_lang['lpn_change_type_switch_base']='Switch to Base';
 $ec_lang['lpn_tables_menu_tip']='View and edit assets in tables in bottom panel.';
 // The Run row's own tip, NOT lpn_time_run_tip: this row exists partly to answer "where is my Run

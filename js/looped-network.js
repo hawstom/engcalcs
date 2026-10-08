@@ -4828,23 +4828,10 @@ var EngCalcs = EngCalcs || {};
 	};
 	// group 'setting': `prop` is a setting's path, answered by categoryOfSetting() -- null for one
 	// that may never vary by scenario, undefined for one no table names.
-	// **WHAT A TYPE OVERRIDE CARRIES BESIDE ITS OVERRIDABLE VALUES** (Tom, 2026-10-07, 6a: a node
-	// may be a junction in Base and a tank in a scenario). The type itself, and every value the new
-	// type stores Base-owned on an asset Base built as that type -- a tank's depths and diameter, a
-	// valve's type, a pump's speed -- sit in the same override map under their stored names. They
-	// are not overridable on their own (LPN_OVERRIDABLE is untouched): they exist in a scenario only
-	// beside a `type` that needs them. Physical, as the type is, save the demand storage.
-	var LPN_TYPE_FIELD_CATEGORY_OF = {
-		node: { type: 'physical', minLevel: 'physical', maxLevel: 'physical', tankDiameter: 'physical',
-			volCurve: 'physical', mixingModel: 'physical', mixingFraction: 'physical', headPattern: 'physical',
-			demandPattern: 'demand', demandCategory: 'demand', extraDemands: 'demand', demandItemized: 'demand' },
-		link: { type: 'physical', valveType: 'physical', lenAuto: 'physical', speed: 'physical', speedPattern: 'physical' }
-	};
 	function categoryOf(prop, group) {
 		if (group === 'setting') { return categoryOfSetting(prop); }
-		var g = LPN_ALT_CATEGORY_OF[group || 'node'] || {}, t = LPN_TYPE_FIELD_CATEGORY_OF[group || 'node'] || {};
-		if (Object.prototype.hasOwnProperty.call(g, prop)) { return g[prop]; }
-		return Object.prototype.hasOwnProperty.call(t, prop) ? t[prop] : 'userdata';
+		var g = LPN_ALT_CATEGORY_OF[group || 'node'] || {};
+		return Object.prototype.hasOwnProperty.call(g, prop) ? g[prop] : 'userdata';
 	}
 	// The group an override KEY belongs to, asked of ovKeyFor() itself so the key format is still
 	// spelled in one place (dev/scripts/scenario_seam_check.php).
@@ -5225,6 +5212,36 @@ var EngCalcs = EngCalcs || {};
 	 * that is not there, or not of that category, goes (it inherits again). Empty lists and maps go.
 	 * A calculation set's options are cleaned exactly as a scenario's are.
 	 */
+	// **A TYPE OVERRIDE IS NO LONGER READ** (Task 781). For one day (2026-10-07/08) this branch could
+	// store an asset's type per scenario: `type` in a scenario's override map, beside fields such as
+	// `minLevel` or `valveType` stored under their own names. Change type in a scenario now makes a
+	// new asset instead, and nothing reads those keys. A file written that day opens with them
+	// removed, so the asset is Base's type in that scenario again; it was never public, and turning
+	// it into new assets would mint IDs the file never had. Only maps naming a `type` are touched.
+	var LPN_RETIRED_TYPE_KEYS = ['type', 'minLevel', 'maxLevel', 'tankDiameter', 'volCurve', 'mixingModel', 'mixingFraction',
+		'headPattern', 'demandPattern', 'demandCategory', 'extraDemands', 'demandItemized', 'valveType', 'lenAuto', 'speed', 'speedPattern'];
+	function dropTypeOverrides() {
+		eachOverrideMap(function (map) {
+			Object.keys(map).forEach(function (key) {
+				var ov = map[key];
+				var g = ovKeyGroup(key), id = String(key).slice(ovKeyFor(g, '').length),
+					el = g === 'node' ? nodeById(id) : g === 'link' ? linkById(id) : null;
+				if (!plainObject(ov) || typeof ov.type !== 'string') { return; }
+				LPN_RETIRED_TYPE_KEYS.forEach(function (k) { delete ov[k]; });
+				// And the values only that type had (a tank's water depth on what Base has as a junction).
+				if (el && g === 'node') {
+					typeOwnedNodeSpecs().forEach(function (spec) {
+						if (!spec.custom && spec.types.indexOf(el.type) < 0) { spec.props.forEach(function (name) { delete ov[name]; }); }
+					});
+				} else if (el) {
+					typeOwnedLinkSpecs(el).forEach(function (spec) {
+						if (!spec.custom && !spec.has(linkTypeDesc(el))) { spec.props.forEach(function (name) { delete ov[name]; }); }
+					});
+				}
+				if (!Object.keys(ov).length) { delete map[key]; }
+			});
+		}, null, true);
+	}
 	function sanitizeScenarioTree() {
 		['alternatives', 'calcSets'].forEach(function (k) {
 			var seen = {}, list = doc[k];
@@ -12873,8 +12890,6 @@ var EngCalcs = EngCalcs || {};
 	var labelPassDeferred = false;
 	function buildDom() {
 		var i;
-		// The elements laid out as the scenario showing sees them (type overrides) before any is drawn.
-		typeViewSync();
 		linksLayer.innerHTML = ''; nodesLayer.innerHTML = ''; labelsLayer.innerHTML = '';
 		// **THE SYMBOL LAYER IS THE FOURTH ONE AND IT WAS NOT BEING EMPTIED** (Tom, 2026-09-12:
 		// *"I drew two junctions and a pump on a blank Project1 map. Then I closed the project
@@ -26406,11 +26421,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var was = project.activeScenario, todo;
 		if (!scn || scn.id === was) { return fn(); }
 		project.activeScenario = scn.id;
-		typeViewFollow();
 		paneScnSwapDepth++;
 		try { return fn(); } finally {
 			project.activeScenario = was;
-			typeViewFollow();
 			if (--paneScnSwapDepth === 0 && paneScnSwapPending.length) {
 				todo = paneScnSwapPending; paneScnSwapPending = [];
 				todo.forEach(function (f) { f(); });
@@ -26429,8 +26442,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	// The table's rows: its elements, or each element once per scenario, element by element.
 	function paneTableRowList(spec) {
-		var els = paneTableElements(spec), info, list = [];
-		if (!spec.scnRows) { return els; }
+		var els = paneTableElements(spec), info, list = [], topo = paneHidesInactive(spec);
+		if (!spec.scnRows) {
+			if (!topo) { return els; }
+			info = activeScenario();
+			return els.filter(function (el) { return liveInScenario(el, info); });
+		}
 		info = paneScnInfo();
 		// **A SCENARIO ADDED OR DELETED WHILE SHOWN PUTS THE TABLE BACK IN ITS NATURAL ORDER** (ID,
 		// then Scenario), as switching the view on does. Kept, the remembered order would hold every
@@ -26445,15 +26462,37 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				// alone, and rows whose scenario holds at least one value of its own in a column of
 				// this table (the same rule that marks a cell amber, so Base's rows never qualify).
 				if (spec.scnCurOnly && sc.id !== activeScenario().id) { return; }
-				// **A ROW ONLY WHERE THE ASSET IS THIS TABLE'S TYPE** (type overrides): a junction that is
-				// a tank in one scenario has no junction row there, as it has no junction columns.
-				if (typeOvAny && typeInScenario(el, sc) !== el.type) { return; }
+				// An asset not in this scenario's network has no row of this scenario's.
+				if (topo && !liveInScenario(el, sc)) { return; }
 				row = { id: paneScnRowKey(el.id, sc.id), _lpnScn: { el: el, scn: sc, info: info } };
 				if (spec.scnOvOnly && !paneScnRowHoldsOverride(spec, row)) { return; }
 				list.push(row);
 			});
 		});
 		return list;
+	}
+	// **INACTIVE ASSETS ARE LEFT OUT OF AN ASSET TABLE UNLESS "INCLUDE INACTIVE TOPOLOGY" IS ON**
+	// (Task 781; Bentley's own words and default: *"Inactive elements will not appear in the
+	// corresponding tabular reports, unless the Include Inactive Topology option is turned on"*,
+	// WaterGEMS help, "Active Topology"). Inactive is linkLive()'s rule, so a link whose end is
+	// inactive is left out with it, as it is left out of the solve. Node and link tables only: a
+	// Text's `active` takes nothing out of the network, and a customer has none.
+	function paneHidesInactive(spec) {
+		return (spec.group === 'node' || spec.group === 'link') && !spec.incInactive;
+	}
+	// The switch is offered where it can change something: once anything is inactive in Base, or a
+	// scenario exists that could make it so, or while it is on so it can be turned off.
+	function paneOffersInactive(spec) {
+		if (spec.group !== 'node' && spec.group !== 'link') { return false; }
+		return !!spec.incInactive || scenarios.length > 1 ||
+			doc.nodes.some(function (n) { return n._active === false; }) || doc.links.some(function (l) { return l._active === false; });
+	}
+	function paneInactiveToggle(spec) {
+		spec.incInactive = !spec.incInactive;
+		spec.sel = null;
+		spec.lastOrderIds = null;
+		paneTableReset(spec);
+		renderPaneTable(spec);
 	}
 	function paneScnRowHoldsOverride(spec, row) {
 		var x = row._lpnScn;
@@ -26554,33 +26593,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (row && row._lpnScn) { return row._lpnScn; }
 		return row ? { el: row, scn: activeScenario() } : null;
 	}
-	// **A FIELD ONLY THE SCENARIO'S TYPE HAS IS THE SCENARIO'S, STORED OR NOT** (Tom, 2026-10-07:
-	// *"I changed a Junction to a Tank, and in the Tanks table, only the Water depth appears as an
-	// override."*). Where this scenario states its own type for the asset, every column the new type
-	// has and Base's type lacks -- a tank's depths, diameter, mixing, reaction -- has no Base value
-	// behind it, so it wears the mark. What both types share (ID, coordinates, elevation, tag)
-	// still comes from Base and is marked only where the scenario holds its own value.
-	function paneTypeOwnedCellIsLocal(c, el, scn) {
-		var group = elGroup(el), name = paneColProp(c) || c.key, ov, e, baseDesc, scnDesc, hit = false;
-		if (!name || c.result || !typeOvAny) { return false; }
-		ov = localOverrideMap(scn, categoryOf('type', group))[ovKey(el)];
-		if (!plainObject(ov) || typeof ov.type !== 'string' || !typeIsValidFor(el, ov.type)) { return false; }
-		e = typeView.byEl.get(el);
-		baseDesc = group === 'link' ? linkTypeDesc(e ? e.stash : el) : { type: baseTypeOf(el) };
-		if (ov.type === baseDesc.type) { return false; }
-		scnDesc = typeDescFor(el, ov.type, ov.valveType !== undefined ? ov.valveType : (baseDesc.type === 'valve' ? baseDesc.valveType : undefined));
-		typeSpecsOf(el).forEach(function (spec) {
-			if (hit || spec.custom) { return; }
-			if (spec.props.indexOf(name) < 0 && spec.keys.indexOf(name) < 0 && spec.keys.indexOf('_' + name) < 0) { return; }
-			if (typeSpecHas(spec, scnDesc) && !typeSpecHas(spec, baseDesc)) { hit = true; }
-		});
-		return hit;
-	}
 	function paneScnCellIsLocal(c, row) {
 		var x = paneScnRowOf(row), ov, p, has = Object.prototype.hasOwnProperty;
 		if (!x || x.scn.isBase) { return false; }
 		if (c.scnLocal) { return !!c.scnLocal(x.el, x.scn); }
-		if (paneTypeOwnedCellIsLocal(c, x.el, x.scn)) { return true; }
 		p = paneColProp(c);
 		// Local where this scenario WRITES (hasOverride()'s rule), so a stored alternative it names
 		// marks the cell and a value it only inherits does not.
@@ -31018,6 +31034,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				mk((spec.scnCurOnly ? '\u2713 ' : '') + (pc.lpn_pane_scn_cur_only || 'Current scenario only'), function () { paneScnFilterToggle(spec, 'scnCurOnly'); });
 			}
 		}
+		// **INCLUDE INACTIVE TOPOLOGY** (Task 781, Bentley's words): see paneHidesInactive().
+		if (paneOffersInactive(spec)) {
+			mk((spec.incInactive ? '\u2713 ' : '') + (pc.lpn_pane_inactive_show || 'Include inactive topology'), function () { paneInactiveToggle(spec); });
+		}
 		// **CLEAR OVERRIDE** (Tom, 2026-10-06: *"Would it be good UI design to add a 'Clear override'
 		// item to the right-click menu in Tables? I think I would love that."*). HIDDEN (Tom,
 		// 2026-10-05) when no selected cell holds an override, as Select and Fill down are; never greyed.
@@ -31131,6 +31151,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			mk('\u2713 ' + (pc.lpn_pane_scn_show || 'Show scenarios'), function () { paneScnToggle(spec); });
 			mk((spec.scnOvOnly ? '\u2713 ' : '') + (pc.lpn_pane_scn_ov_only || 'Overrides only'), function () { paneScnFilterToggle(spec, 'scnOvOnly'); });
 			mk((spec.scnCurOnly ? '\u2713 ' : '') + (pc.lpn_pane_scn_cur_only || 'Current scenario only'), function () { paneScnFilterToggle(spec, 'scnCurOnly'); });
+		}
+		// Include inactive topology, here too: a table whose every row is inactive has no cell.
+		if (paneOffersInactive(spec)) {
+			mk((spec.incInactive ? '\u2713 ' : '') + (pc.lpn_pane_inactive_show || 'Include inactive topology'), function () { paneInactiveToggle(spec); });
 		}
 		document.body.appendChild(menu);
 		paneCtxMenuEl = menu;
@@ -34686,11 +34710,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	//
 	// **LINKS TOO**, under the same rule and the same box: see the link half below.
 	//
-	// **THE TYPE IS BASE'S, AND A SCENARIO MAY STATE ITS OWN** (Tom, 2026-10-07, 6a): the type is not
-	// in LPN_OVERRIDABLE, so a change made in Base changes the asset in every scenario that does not
-	// state a type of its own, and their overrides of what the old type alone had go with it. A
-	// change made in another scenario asks first, and may become that scenario's type override
-	// (askTypeChangeScope(), "TYPE OVERRIDES" below).
+	// **THE TYPE IS BASE-OWNED**, like a valve's type (renderValveFields()): it is not in
+	// LPN_OVERRIDABLE, so a change made in Base changes the asset in every scenario, and the
+	// scenario overrides of what the old type alone had go with it. **OUTSIDE BASE, CHANGE TYPE
+	// MAKES A NEW ASSET IN THE OLD ONE'S PLACE** (Tom, 2026-10-08: *"Change type is to be make a new
+	// object at the location of the old object. And that's physically analogous."*): see
+	// replaceTypeInScenario() below, and dev/scenario-alternatives.md, "Change type in a scenario".
 	var LPN_NODE_TYPES = ['junction', 'reservoir', 'tank'];
 	/**
 	 * Every node property that belongs to SOME node types and not to others. A key named in no row
@@ -34810,12 +34835,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// dev/asset-type.md): every scenario's own and every stored alternative's, through
 	// eachOverrideMap(), so a type change reaches an alternative's values too and never leaves a
 	// tank's water depth on a junction in one. fn(ov, owner, map).
-	// **A MAP THAT STATES ITS OWN TYPE FOR THE ASSET IS SKIPPED** (type overrides, Tom 2026-10-07):
-	// its values are that type's, so a Base change neither lists nor strips them;
-	// pinTypeOverrideInheritance() keeps what it inherited from Base.
 	function eachElementOverride(key, fn, readOnly) {
 		eachOverrideMap(function (map, owner) {
-			if (owner.isBase || !plainObject(map[key]) || typeof map[key].type === 'string') { return; }
+			if (owner.isBase || !plainObject(map[key])) { return; }
 			fn(map[key], owner, map);
 		}, null, readOnly);
 	}
@@ -35261,7 +35283,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (!isNode && !isLink) { return; }
 		if (!changeTypeTargets(to).length) { return; }
 		// Tom's question first, in any scenario but Base (askTypeChangeScope()); in Base it is not asked.
-		askTypeChangeScope(function (mode) { changeSelectedTypeIn(to, mode === 'scenario' ? activeScenario() : null); });
+		askTypeChangeScope(function (mode) {
+			if (mode === 'scenario') { replaceSelectedTypeInScenario(to); } else { changeSelectedTypeIn(to); }
+		});
 	}
 	// Every selected asset of the right kind that is not already `to` in the scenario showing.
 	function changeTypeTargets(to) {
@@ -35270,24 +35294,15 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			.map(function (s) { return isNode ? nodeById(s.id) : linkById(s.id); })
 			.filter(function (el) { return el && el.type !== to; });
 	}
-	// `scn`: null for the Base change (every scenario follows it), or the scenario whose override it
-	// is (Base and every other scenario untouched).
-	function changeSelectedTypeIn(to, scn) {
+	// The Base change: every scenario follows it.
+	function changeSelectedTypeIn(to) {
 		var pc = EngCalcs.pageConfig || {}, isNode = LPN_NODE_TYPES.indexOf(to) >= 0,
 			targets, lost = [], meaning = [], surface = [],
 			born = [], moved = [], rules = [], setting = [], text, MAX = 20;
-		if (scn && scn.isBase) { scn = null; }
 		targets = changeTypeTargets(to);
 		if (!targets.length) { return; }
 		targets.forEach(function (el) {
-			var r;
-			if (scn) {
-				r = scenarioTypeChangeReport(el, to, scn);
-				lost = lost.concat(r.lost); surface = surface.concat(r.surface); born = born.concat(r.born);
-				if (isNode) { meaning = meaning.concat(r.meaning); } else { setting = setting.concat(r.meaning); }
-				return;
-			}
-			r = isNode ? nodeTypeChangeReport(el, to) : linkTypeChangeReport(el, to);
+			var r = isNode ? nodeTypeChangeReport(el, to) : linkTypeChangeReport(el, to);
 			lost = lost.concat(r.lost);
 			if (isNode) { meaning = meaning.concat(r.meaning); surface = surface.concat(r.surface); }
 			else {
@@ -35304,31 +35319,17 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			saveUndoSnapshot();
 			// What each node's head and pressure read on screen NOW, held until the next solve
 			// (heldTypeChange()). Read before the change, through the same reader the map uses.
-			var was = {}, ids = {}, pres = new Map();
+			var was = {}, ids = {};
 			if (isNode && lastSolveResult) {
 				targets.forEach(function (n) {
 					was[n.id] = { head: colorNodeValue(n, 'head'), pressure: colorNodeValue(n, 'pressure') };
 				});
 			}
-			if (scn) {
-				// Read as the scenario sees each asset, written with Base laid back, laid out again.
-				targets.forEach(function (el) { pres.set(el, scenarioTypeChangePre(el, to)); });
-				typeViewUnapply();
-				targets.forEach(function (el) {
-					ids[el.id] = true;
-					if ((isNode ? nodeById(el.id) : linkById(el.id)) === el) { applyScenarioTypeChange(el, to, scn, pres.get(el)); }
-				});
-				touchTree('changeSelectedTypeIn');
-				typeOvAny = true;
-				typeViewApply();
-				targets.forEach(function (el) { scenarioTypeChangeKeep(el, scn, pres.get(el)); });
-			} else {
-				targets.forEach(function (el) {
-					ids[el.id] = true;
-					if (isNode && nodeById(el.id) === el) { pinTypeOverrideInheritance(el, to); applyNodeTypeChange(el, to); }
-					if (!isNode && linkById(el.id) === el) { pinTypeOverrideInheritance(el, to); applyLinkTypeChange(el, to); }
-				});
-			}
+			targets.forEach(function (el) {
+				ids[el.id] = true;
+				if (isNode && nodeById(el.id) === el) { applyNodeTypeChange(el, to); }
+				if (!isNode && linkById(el.id) === el) { applyLinkTypeChange(el, to); }
+			});
 			if (!isNode && lastSolveResult) {
 				targets.forEach(function (l) { typeChangeHeldLink[l.id] = { result: lastSolveResult, type: l.type }; });
 			}
@@ -35352,7 +35353,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			refreshScenarioStatus();
 			refreshPaneIfOpen();
 			refreshPopupIfOpen();
-			refreshAlternativesBoxIfOpen();
 			scheduleSolve();
 			scheduleSave();
 		}
@@ -35410,377 +35410,223 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			.concat([{ separator: true }])
 			.concat(LPN_LINK_TYPES.map(function (t) { return row(t, links); }));
 	}
-	// ---- TYPE OVERRIDES: AN ASSET THAT IS ANOTHER TYPE IN ONE SCENARIO (Tom, 2026-10-07, 6a) ------
+	// ---- CHANGE TYPE IN A SCENARIO: A NEW ASSET IN THE OLD ONE'S PLACE (Task 781) ---------------
 	//
-	// *"You make it sound easy, so I guess we should build it out. I just want to minimize user
-	// confusion. So if Change type is used, with other than Base scenario, put up an alert box.
-	// 'Current scenario is not Base. Create overrides? [Create overrides] [Switch to Base] [Cancel]'"*
+	// Tom, 2026-10-08, choosing "Active topology first": *"I never wanted what we have anyway. Now
+	// that I understand, I want it changed. Change type is to be make a new object at the location of
+	// the old object. And that's physically analogous."* It replaced the type override (a scenario
+	// stating its own `type` for an asset), which is gone with everything that served it.
 	//
-	// **THE OVERRIDE.** `type` in the scenario's override map for the asset, beside the values the new
-	// type needs: an overridable one (a tank's water depth, `level`) as that property's ordinary
-	// override, a Base-owned one (its depths, its diameter, a valve's type) under its stored name
-	// (LPN_TYPE_FIELD_CATEGORY_OF). Base is untouched. dev/scenario-alternatives.md, "Type overrides".
+	// **OUTSIDE BASE, EACH SELECTED ASSET IS REPLACED.** A NEW asset of the new type, its ID minted by
+	// the ID-prefix rules, at the old one's place, active only where this scenario's topology puts it
+	// (bornInScenario(), Bentley's rule for an element added in a child Active Topology alternative);
+	// the old asset is made inactive in this scenario and kept, untouched, for Base and every other
+	// scenario. Both are ordinary Active Topology values, so the scenario tree, the Alternatives
+	// table, undo, the file and both solvers need nothing new.
 	//
-	// **EVERY READER ASKS THE ASSET, AND THE ASSET ANSWERS FOR THE SCENARIO SHOWING.** About three
-	// hundred lines across this file and its modules read `n.type`, `n.minLevel` and their kin off
-	// the element: the map symbol, the tables, Properties, the labels, both solvers' model, the
-	// analyses. Rather than route each through a resolver (and miss one), the elements are laid out
-	// as the open scenario sees them -- its type, the new type's own values, the old type's hidden --
-	// and laid back as Base before anything is written down. typeViewSync() lays them out for the
-	// scenario showing; withBaseTypes() puts Base back around serializeProject() and the undo
-	// snapshot, so a file, an autosave, an undo step and the dirty signature are always Base's.
-	// The same objects are edited in place, so a reference held across either keeps working.
+	// **A NODE TAKES ITS LINKS WITH IT.** A link's ends are Base-owned, so a link left on the old node
+	// would leave the network with it (a link whose end is inactive is out of the solve). Each live
+	// link at the node is replaced the same way, its end moved to the new node, its type unchanged.
 	//
-	// **AN EDIT MADE TO A BASE-OWNED FIELD WHILE IT IS LAID OUT IS THE SCENARIO'S** (a tank's
-	// highest depth typed in Properties writes `n.maxLevel`, as it always has): laying Base back
-	// compares each such field with what was laid out and writes a change into the scenario's map.
-	// An overridable value never needs this: it goes through setProp() into the override already.
-	function typeSpecsOf(el) { return elGroup(el) === 'link' ? typeOwnedLinkSpecs(el) : typeOwnedNodeSpecs(); }
-	function typeDescFor(el, type, valveType) {
-		if (elGroup(el) !== 'link') { return { type: type }; }
-		return { type: type, valveType: type === 'valve' ? String(valveType || CHANGE_TYPE_NEW_VALVE).toUpperCase() : null };
+	// **WHAT THE NEW ASSET CARRIES is what this scenario showed on the old one**: Base's record with
+	// this scenario's resolved overrides written in as the new asset's own values (it exists only
+	// where this scenario's topology puts it, so its own values are this scenario's, as a drawn
+	// one's are), then the ordinary Base change of type on that copy (applyNodeTypeChange(),
+	// applyLinkTypeChange()), so what the new type cannot hold is left behind on the old asset, what
+	// only the new type has comes from New assets, and a water surface stays where it was. A position
+	// this scenario moved stays this scenario's override, verbatim, so no coordinate is run through
+	// a projection it does not need.
+	function replaceSelectedTypeInScenario(to) {
+		var pc = EngCalcs.pageConfig || {}, isNode = LPN_NODE_TYPES.indexOf(to) >= 0,
+			targets = changeTypeTargets(to), notCarried = [], surface = [], born = [], old = [], text, MAX = 20;
+		if (!targets.length || inBaseScenario()) { return; }
+		targets.forEach(function (el) {
+			var r = replaceTypeReport(el, to);
+			notCarried = notCarried.concat(r.notCarried); surface = surface.concat(r.surface);
+			born = born.concat(r.born); old = old.concat(r.old);
+		});
+		function capped(lines) {
+			if (lines.length <= MAX) { return lines; }
+			return lines.slice(0, MAX).concat([String(pc.lpn_change_type_more || 'And {n} more.')
+				.replace('{n}', String(lines.length - MAX))]);
+		}
+		function proceed() {
+			var made = [];
+			saveUndoSnapshot();
+			targets.forEach(function (el) {
+				if ((isNode ? nodeById(el.id) : linkById(el.id)) !== el) { return; }
+				made.push(replaceTypeInScenario(el, to));
+			});
+			touchTree('replaceSelectedTypeInScenario');
+			// The symbols are new, so the drawing is rebuilt; the new assets are the selection.
+			buildDom();
+			setSelectionList(made.filter(Boolean).map(function (m) { return { kind: isNode ? 'node' : 'link', id: m.id }; }));
+			refreshScenarioMarks();
+			refreshScenarioStatus();
+			refreshPaneIfOpen();
+			refreshPopupIfOpen();
+			refreshAlternativesBoxIfOpen();
+			scheduleSolve();
+			scheduleSave();
+		}
+		if (!notCarried.length && !surface.length && !born.length && !old.length) { proceed(); return; }
+		text = [];
+		if (surface.length) {
+			text.push([pc.lpn_change_type_surface || 'These keep the water surface where it was. A reservoir\'s head is the tank\'s elevation plus its water depth, and a tank\'s water depth is the reservoir\'s head minus its elevation:']
+				.concat(capped(surface)).join('\n'));
+		}
+		if (notCarried.length) {
+			text.push([pc.lpn_change_type_not_carried || 'The new assets cannot hold these values. The old assets keep them:']
+				.concat(capped(notCarried)).join('\n'));
+		}
+		if (born.length) {
+			text.push([pc.lpn_change_type_born || 'These values are new, set as on a newly drawn asset:'].concat(capped(born)).join('\n'));
+		}
+		if (old.length) {
+			text.push([pc.lpn_change_type_old_controls || 'These controls and rules name an old asset, which is inactive in this scenario, so they are omitted from this scenario\'s run:']
+				.concat(capped(old)).join('\n'));
+		}
+		askDialog({ kind: 'confirm', title: pc.lpn_change_type_menu || 'Change type',
+			ok: pc.lpn_change_type_ok || 'Change', text: text.join('\n\n') }, function (yes) {
+			if (yes) { proceed(); }
+		});
 	}
-	function typeSpecHas(spec, desc) { return spec.has ? spec.has(desc) : spec.types.indexOf(desc.type) >= 0; }
-	// The property a stored key is overridden by, or null for a key a scenario holds under its own
-	// name (Base-owned on an asset of that type).
-	function typeKeyProp(spec, k) { return (k.charAt(0) === '_' && spec.props.indexOf(k.slice(1)) >= 0) ? k.slice(1) : null; }
-	function typeOwnedKeySet(el) {
-		var out = {};
-		typeSpecsOf(el).forEach(function (spec) { spec.keys.forEach(function (k) { out[k] = true; }); });
+	// **WHAT REPLACING `el` WITH A NEW `to` WOULD SAY**, in the scenario showing and in its terms:
+	// the values the new type cannot hold (kept by the old asset, so not lost), the water surface
+	// carried, what a new link is born with, and the controls and rules that name the old asset or a
+	// link replaced with it.
+	function replaceTypeReport(el, to) {
+		var pc = EngCalcs.pageConfig || {}, isLink = elGroup(el) === 'link', LINE = pc.lpn_change_type_line || '{id}: {property} {value}',
+			out = { notCarried: [], surface: [], born: [], old: [] }, carry = null, names = {}, from, dest;
+		if (isLink) {
+			from = linkTypeDesc(el); dest = linkTargetDesc(to, el);
+			typeOwnedLinkSpecs(el).forEach(function (spec) {
+				var v;
+				if (!linkChangeDrops(spec, from, dest) || (!spec.custom && !spec.has(from))) { return; }
+				v = spec.props.length ? effective(el, spec.props[0]) : el[spec.keys[0]];
+				if (changeTypeSays(spec, v)) { out.notCarried.push(changeTypeLine(LINE, el.id, spec.label, changeTypeValueText(spec, v))); }
+			});
+			out.born = linkTypeChangeReport(el, to).born;
+			names[el.id] = true;
+		} else {
+			carry = replaceSurfaceCarry(el, to);
+			typeOwnedNodeSpecs().forEach(function (spec) {
+				var v;
+				if (!changeTypeDrops(spec, el.type, to) || (!spec.custom && spec.types.indexOf(el.type) < 0)) { return; }
+				if (carry && spec.props.indexOf(carry.prop) >= 0) { return; }
+				v = spec.props.length ? effective(el, spec.props[0]) : el[spec.keys[0]];
+				// A demand is its whole list, as the Base report says it (typeOwnedNodeSpecs()).
+				if (spec.props.indexOf('demands') >= 0) {
+					v = effective(el, 'demands');
+					v = (v.length === 1 && !v[0].category && !changeTypeSays({ none: [0] }, v[0].base)) ? undefined
+						: v.map(function (r) { return r.base; });
+				}
+				if (changeTypeSays(spec, v)) { out.notCarried.push(changeTypeLine(LINE, el.id, spec.label, changeTypeValueText(spec, v))); }
+			});
+			if (carry) {
+				typeOwnedNodeSpecs().forEach(function (spec) {
+					if (!spec.custom && spec.props.indexOf(carry.newProp) >= 0) {
+						out.surface.push(changeTypeLine(LINE, el.id, spec.label, changeTypeValueText(spec, carry.value)));
+					}
+				});
+			}
+			names[el.id] = true;
+			replacedLinksAt(el).forEach(function (l) { names[l.id] = true; });
+		}
+		libControlsRead().forEach(function (c) {
+			if (!c) { return; }
+			if ((isLink && names[c.link]) || (!isLink && (names[c.link] || (c.condition && c.condition.kind === 'node' && c.condition.node === el.id)))) {
+				out.old.push(libControlText(c));
+			}
+		});
+		(doc.rules || []).forEach(function (line) {
+			var t = String(line).replace(/;.*$/, '').trim().split(/\s+/), i;
+			for (i = 1; i < t.length; i++) {
+				if (names[t[i]] && /^(NODE|JUNCTION|RESERVOIR|TANK|LINK|PIPE|PUMP|VALVE)$/i.test(t[i - 1])) { out.old.push(String(line).trim()); return; }
+			}
+		});
 		return out;
 	}
-	function typeElementByKey(key) {
-		var g = ovKeyGroup(key), id = String(key).slice(2), el;
-		if (g === 'node') { el = nodeById(id); return (el && ovKey(el) === key) ? el : null; }
-		if (g === 'link') { el = linkById(id); return (el && ovKey(el) === key) ? el : null; }
-		return null;
-	}
-	function typeIsValidFor(el, t) {
-		return (elGroup(el) === 'link' ? LPN_LINK_TYPES : LPN_NODE_TYPES).indexOf(t) >= 0;
-	}
-	function sameJSON(a, b) { return JSON.stringify(a) === JSON.stringify(b); }
-	/**
-	 * **WRITE ONE NAME INTO A SCENARIO'S OVERRIDE OF ONE ASSET**, where an edit of its category in
-	 * that scenario lands (writeTargetFor(), as setOverride() does), for a scenario that need not be
-	 * the one showing. `undefined` removes it. The type override's own door: it writes names
-	 * LPN_OVERRIDABLE does not hold, which setOverride() rightly refuses.
-	 */
-	function writeOverrideIn(scn, el, name, value) {
-		var key = ovKey(el), t = writeTargetFor(scn, categoryOf(name, elGroup(el))), map;
-		if (!t || t.kind === 'calc') { return; }
-		if (t.kind === 'alt') { map = plainObject(t.obj.values) ? t.obj.values : (t.obj.values = {}); }
-		else { map = plainObject(t.obj.overrides) ? t.obj.overrides : (t.obj.overrides = {}); }
-		if (value === undefined) {
-			if (!plainObject(map[key])) { return; }
-			delete map[key][name];
-			if (!Object.keys(map[key]).length) { delete map[key]; }
-		} else {
-			if (!plainObject(map[key])) { map[key] = {}; }
-			map[key][name] = altCopy(value);
-		}
-		touchTreeKey('writeOverrideIn', (t.kind === 'alt' ? 'alt' : 'scn') + '\u0000' + t.obj.id, map, key);
-	}
-	// What a name holds in the map this scenario writes to, for one asset: {has, value}.
-	function overrideHeldIn(scn, el, name) {
-		var ov = localOverrideMap(scn, categoryOf(name, elGroup(el)))[ovKey(el)];
-		return (plainObject(ov) && Object.prototype.hasOwnProperty.call(ov, name)) ? { has: true, value: ov[name] } : { has: false };
-	}
-	// The type an asset is in a scenario: its override there, else Base's.
-	function typeInScenario(el, scn) {
-		var ov = (!scn || scn.isBase) ? null : resolvedOverrides(scn)[ovKey(el)];
-		if (ov && typeof ov.type === 'string' && typeIsValidFor(el, ov.type)) { return ov.type; }
-		return baseTypeOf(el);
-	}
-	// Is this asset laid out as another type than Base's, in the scenario showing? Then every edit of
-	// a value its type owns belongs to that scenario's map, never to the element.
-	function typeOverriddenHere(el) { return !!el && typeView.byEl.has(el) && !inBaseScenario(); }
-	// Base's type of an asset, laid out or not.
-	function baseTypeOf(el) {
-		var e = typeView.byEl.get(el);
-		return e ? e.stash.type : el.type;
-	}
-	// ---- laying the elements out, and back ----
-	var typeView = { doc: null, list: [], byEl: new Map() }, typeOvAny = false;
-	function typeMaterialize(el, ov, scn) {
-		var base = el.type, to = ov.type, stash = Object.assign({}, el), keep = {}, raw = {}, applied = {}, props = {},
-			view = typeDescFor(el, to, ov.valveType !== undefined ? ov.valveType : (base === 'valve' ? el.valveType : undefined)),
-			from = elGroup(el) === 'link' ? linkTypeDesc(el) : { type: base };
-		typeSpecsOf(el).forEach(function (spec) {
-			var vh = typeSpecHas(spec, view), bh = typeSpecHas(spec, from);
-			spec.keys.forEach(function (k) {
-				// A key two rows share (a pump's curve and a GPV's) is kept if either keeps it.
-				if (vh && (bh || spec.custom)) { keep[k] = true; } else if (keep[k] === undefined) { keep[k] = false; }
-				if (vh && typeKeyProp(spec, k) === null) { raw[k] = true; }
-				if (vh && typeKeyProp(spec, k) !== null && !spec.custom) { props[k] = typeKeyProp(spec, k); }
-			});
-		});
-		Object.keys(keep).forEach(function (k) { if (!keep[k]) { delete el[k]; } });
-		Object.keys(raw).forEach(function (k) {
-			if (Object.prototype.hasOwnProperty.call(ov, k)) {
-				if (ov[k] === null || ov[k] === undefined) { delete el[k]; } else { el[k] = altCopy(ov[k]); }
-			}
-			applied[k] = altCopy(el[k]);
-		});
-		el.type = to;
-		Object.keys(props).forEach(function (k) { applied[k] = altCopy(el[k]); });
-		return { el: el, scn: scn, stash: stash, raw: raw, props: props, applied: applied };
-	}
-	function typeUnmaterialize(e, writeBack) {
-		var el = e.el, owned = typeOwnedKeySet(el), out = {}, has = Object.prototype.hasOwnProperty;
-		owned.type = true;
-		if (writeBack) {
-			Object.keys(e.raw).forEach(function (k) {
-				if (!sameJSON(el[k], e.applied[k])) { writeOverrideIn(e.scn, el, k, el[k] === undefined ? null : el[k]); }
-			});
-			// **AND A STORED VALUE WRITTEN STRAIGHT ONTO THE ELEMENT** (an editor's Base write, `_setting`,
-			// `_length`) while it was laid out: it is the scenario's override of that property, since
-			// Base laid back would otherwise discard it (Perry, 2026-10-07).
-			Object.keys(e.props || {}).forEach(function (k) {
-				if (has.call(el, k) && !sameJSON(el[k], e.applied[k])) { writeOverrideIn(e.scn, el, e.props[k], el[k] === undefined ? null : el[k]); }
-			});
-		}
-		// Base's own keys in Base's own order, so a file, a signature and a guard read the same bytes.
-		Object.keys(e.stash).forEach(function (k) {
-			if (owned[k]) { out[k] = e.stash[k]; } else if (has.call(el, k)) { out[k] = el[k]; }
-		});
-		Object.keys(el).forEach(function (k) { if (!has.call(out, k) && !owned[k] && !has.call(e.stash, k)) { out[k] = el[k]; } });
-		Object.keys(el).forEach(function (k) { delete el[k]; });
-		Object.keys(out).forEach(function (k) { el[k] = out[k]; });
-	}
-	function typeViewUnapply(writeBack) {
-		var list = typeView.list, sameDoc = typeView.doc === doc;
-		typeView.list = [];
-		typeView.byEl = new Map();
-		// A document swapped whole (an undo, an open) came in as Base; the old objects are gone.
-		if (!sameDoc) { return; }
-		list.forEach(function (e) {
-			var live = elGroup(e.el) === 'link' ? linkById(e.el.id) : nodeById(e.el.id);
-			if (live === e.el) { typeUnmaterialize(e, writeBack !== false); }
-		});
-		typeViewAnnotateControls(list);
-	}
-	// **A CONTROL CARRIES WHAT ITS NUMBERS MEASURE, READ FROM THE TYPES** (libAnnotateControl()): a
-	// valve's setting unit, a node's pressure or level. Read again for every control naming an asset
-	// laid out or laid back, so the scenario's run converts by the scenario's type and Base's by Base's.
-	function typeViewAnnotateControls(list) {
-		var nodes = {}, links = {};
-		if (!list.length) { return; }
-		list.forEach(function (e) { (elGroup(e.el) === 'link' ? links : nodes)[e.el.id] = true; });
-		libControlsRead().forEach(function (c) {
-			if (c && (links[c.link] || (c.condition && c.condition.kind === 'node' && nodes[c.condition.node]))) { libAnnotateControl(c); }
-		});
-	}
-	function typeViewApply() {
-		var scn = activeScenario(), R, key, el;
-		typeView.doc = doc;
-		if (!scn || scn.isBase) { return; }
-		R = resolvedOverrides(scn);
-		for (key in R) {
-			if (!Object.prototype.hasOwnProperty.call(R, key) || !R[key] || typeof R[key].type !== 'string') { continue; }
-			el = typeElementByKey(key);
-			if (!el || !typeIsValidFor(el, R[key].type) || typeView.byEl.has(el)) { continue; }
-			var e = typeMaterialize(el, R[key], scn);
-			typeView.list.push(e);
-			typeView.byEl.set(el, e);
-		}
-		typeViewAnnotateControls(typeView.list);
-	}
-	// Whether any map anywhere states a type: measured at each full sync, so the hot temporary
-	// swaps (a table cell read in another scenario) cost nothing in a project that has none.
-	function typeOverridesExist() {
-		var any = false;
-		eachOverrideMap(function (map) {
-			if (any) { return; }
-			Object.keys(map).forEach(function (k) { if (plainObject(map[k]) && typeof map[k].type === 'string') { any = true; } });
-		}, null, true);
-		return any;
-	}
-	/** **LAY THE ELEMENTS OUT FOR THE SCENARIO SHOWING**, Base's first put back. buildDom() calls it. */
-	function typeViewSync() {
-		typeViewUnapply();
-		typeOvAny = typeOverridesExist();
-		if (typeOvAny) { typeViewApply(); } else { typeView.doc = doc; }
-	}
-	// The cheap form, for a temporary swap of the scenario showing: nothing at all without a type
-	// override anywhere.
-	function typeViewFollow() {
-		if (!typeOvAny && !typeView.list.length) { return; }
-		typeViewUnapply();
-		typeViewApply();
-	}
-	/** Run `fn` with every element as Base has it, and lay them out again after. */
-	function withBaseTypes(fn) {
-		if (!typeView.list.length) { return fn(); }
-		typeViewUnapply();
-		try { return fn(); } finally { typeViewApply(); }
-	}
-	// ---- the command, in a scenario ----
-	/**
-	 * **WHAT CHANGING `el` TO `to` IN SCENARIO `scn` WOULD COST**, in the Base report's shape, read
-	 * while the element is laid out as `scn` sees it. Base loses nothing: what goes is what the
-	 * scenario itself holds for the old type, each line ending "in scenario NAME". What is born is
-	 * listed for a link, as in Base; a water surface is carried, as in Base.
-	 */
-	function scenarioTypeChangeReport(el, to, scn) {
-		var pc = EngCalcs.pageConfig || {}, isLink = elGroup(el) === 'link', from = isLink ? linkTypeDesc(el) : { type: el.type },
-			dest = isLink ? linkTargetDesc(to, el) : { type: to }, lost = [], born = [], surface = [], meaning = [],
-			LINE = pc.lpn_change_type_line || '{id}: {property} {value}',
-			LINE_S = pc.lpn_change_type_line_scenario || '{id}: {property} {value}, in scenario {scenario}',
-			carry = scenarioSurfaceCarry(el, to), toBase = to === baseTypeOf(el);
-		typeSpecsOf(el).forEach(function (spec) {
-			if (!typeSpecHas(spec, from) || typeSpecHas(spec, dest)) { return; }
-			spec.props.forEach(function (p) {
-				var h = overrideHeldIn(scn, el, p);
-				if (!h.has || h.value === undefined || (carry && p === carry.prop)) { return; }
-				lost.push(changeTypeOwnerLine(LINE_S, el.id, spec.label, changeTypeValueText(spec, h.value), scn));
-			});
-			// A row stored Base-owned (a tank's depths, a pump's speed) is held by its one key.
-			if (!spec.props.length) {
-				var h0 = overrideHeldIn(scn, el, spec.keys[0]);
-				if (h0.has && changeTypeSays(spec, h0.value)) {
-					lost.push(changeTypeOwnerLine(LINE_S, el.id, spec.label, changeTypeValueText(spec, h0.value), scn));
-				}
-			}
-		});
-		if (carry && !toBase) {
-			typeSpecsOf(el).forEach(function (spec) {
-				if (!spec.custom && spec.props.indexOf(carry.newProp) >= 0) {
-					surface.push(changeTypeOwnerLine(LINE_S, el.id, spec.label, changeTypeValueText(spec, carry.value), scn));
-				}
-			});
-		}
-		if (isLink && !toBase) {
-			var birth = linkBirthFields(to, el);
-			typeOwnedLinkSpecs({ type: to, valveType: dest.valveType, lenAuto: to === 'pipe' }).forEach(function (spec) {
-				var k0 = spec.keys[0];
-				if (spec.custom || !spec.has(dest) || birth[k0] === undefined || spec.has(from)) { return; }
-				born.push(changeTypeLine(LINE, el.id, spec.label, changeTypeValueText(spec, birth[k0])));
-			});
-			if (to === 'pump') {
-				born.push(String(pc.lpn_change_type_no_curve || '{id}: No pump head curve, so the pump adds no head until one is selected, and an .inp export writes it as a pipe')
-					.replace('{id}', function () { return String(el.id); }));
-			}
-			meaning = linkTypeChangeReport(el, to).meaning;
-		} else if (!isLink) {
-			meaning = nodeTypeChangeReport(el, to).meaning;
-		}
-		return { lost: lost, born: born, surface: surface, meaning: meaning };
-	}
-	// A tank and a reservoir are both a water surface, and in a scenario too the surface stays where
-	// that scenario has it (waterSurfaceCarry() is Base's half). Read in the scenario's own terms.
-	function scenarioSurfaceCarry(el, to) {
-		var e = el.elev, from = el.type, h;
-		if (elGroup(el) === 'link' || typeof e !== 'number') { return null; }
-		if (from === 'tank' && to === 'reservoir') {
-			return { prop: 'level', newProp: 'head', value: e + (effective(el, 'level') || 0) };
-		}
-		if (from === 'reservoir' && to === 'tank') {
-			h = effective(el, 'head');
-			if (h === undefined || h === null || h === '') { return { prop: 'head', newProp: 'level', value: 0 }; }
+	// The water surface a tank or reservoir made from the other keeps, in the scenario's own terms
+	// (waterSurfaceCarry() is the same rule on Base's values, and does the carrying).
+	function replaceSurfaceCarry(n, to) {
+		var e = n.elev, h;
+		if (typeof e !== 'number') { return null; }
+		if (n.type === 'tank' && to === 'reservoir') { return { prop: 'level', newProp: 'head', value: e + (effective(n, 'level') || 0) }; }
+		if (n.type === 'reservoir' && to === 'tank') {
+			h = effective(n, 'head');
+			if (h === undefined || h === null || h === '') { return null; }
 			return h >= e ? { prop: 'head', newProp: 'level', value: h - e } : null;
 		}
 		return null;
 	}
+	// The links at node `n` that are live in the scenario showing: the ones replaced with it.
+	function replacedLinksAt(n) {
+		return (incidentLinks[n.id] || []).map(linkById).filter(function (l) { return l && linkLive(l); });
+	}
 	/**
-	 * **THE CHANGE ITSELF, IN SCENARIO `scn`.** `pre` is what scenarioTypeChangePre() read while the
-	 * element was laid out as `scn` sees it; this runs with Base laid back, writes only `scn`'s
-	 * override maps, and leaves the laying out to its caller. Back to Base's own type, the type
-	 * override goes, with what it brought; any other type is written with the values it needs:
-	 * the New assets values a newly drawn one gets, the water surface, and every value both types
-	 * have, at what the scenario had (a library pipe's diameter included, which pre-review found
-	 * reverting to Base's on a pipe made a valve).
+	 * **THE REPLACEMENT ITSELF**, for one asset, in the scenario showing. No snapshot and no redraw:
+	 * replaceSelectedTypeInScenario() takes one of each for the whole selection. Returns the new
+	 * asset.
 	 */
-	function scenarioTypeChangePre(el, to) {
-		var isLink = elGroup(el) === 'link', from = isLink ? linkTypeDesc(el) : { type: el.type },
-			dest = isLink ? linkTargetDesc(to, el) : { type: to }, kept = {};
-		typeSpecsOf(el).forEach(function (spec) {
-			if (spec.custom || !typeSpecHas(spec, from) || !typeSpecHas(spec, dest)) { return; }
-			spec.props.forEach(function (p) { kept[p] = effective(el, p); });
+	function replaceTypeInScenario(el, to) {
+		var isNode = elGroup(el) === 'node', links = isNode ? replacedLinksAt(el) : [], nu;
+		nu = scenarioCopyOf(el, mintId(LPN_ID_KEY[to] || (isNode ? 'J' : 'L')), null);
+		if (isNode) { applyNodeTypeChange(nu, to); } else { applyLinkTypeChange(nu, to); }
+		scenarioCopyBorn(el, nu);
+		links.forEach(function (l) {
+			var lc = scenarioCopyOf(l, mintId(LPN_ID_KEY[l.type] || 'L'),
+				{ from: l.from === el.id ? nu.id : l.from, to: l.to === el.id ? nu.id : l.to });
+			scenarioCopyBorn(l, lc);
 		});
-		return { from: from, dest: dest, kept: kept, carry: scenarioSurfaceCarry(el, to), birthLink: isLink ? linkBirthFields(to, el) : null };
+		return nu;
 	}
-	function applyScenarioTypeChange(el, to, scn, pre) {
-		var isLink = elGroup(el) === 'link', base = el.type, baseDesc = isLink ? linkTypeDesc(el) : { type: base },
-			dest = pre.dest, birth = isLink ? pre.birthLink : nodeBirthFields(to), specs = typeSpecsOf(el);
-		function drop(name) { if (overrideHeldIn(scn, el, name).has) { writeOverrideIn(scn, el, name, undefined); } }
-		// What the new type does not have goes from the scenario: the old type's values, and any
-		// left from an earlier type. Base keeps its own.
-		specs.forEach(function (spec) {
-			if (typeSpecHas(spec, dest)) { return; }
-			spec.props.forEach(drop);
-			spec.keys.forEach(function (k) { if (typeKeyProp(spec, k) === null) { drop(k); } });
-		});
-		if (to === base) {
-			// Back to Base's own type: the override goes, and with it every Base-owned value it carried.
-			drop('type');
-			specs.forEach(function (spec) { spec.keys.forEach(function (k) { if (typeKeyProp(spec, k) === null) { drop(k); } }); });
-			return;
+	// A copy of `el` under `id`, holding what the scenario showing shows on it as its own values
+	// (see the section note). `ends` moves a link's ends. Pushed into the document, not yet drawn.
+	function scenarioCopyOf(el, id, ends) {
+		var ov = resolvedOverrides(activeScenario())[ovKey(el)] || {}, c = altCopy(el), rows = null;
+		c.id = id;
+		delete c._active;
+		if (ends) { c.from = ends.from; c.to = ends.to; }
+		if (elGroup(el) === 'node' && (Object.prototype.hasOwnProperty.call(ov, 'demands') || Object.prototype.hasOwnProperty.call(ov, 'demand'))) {
+			rows = effective(el, 'demands');
 		}
-		writeOverrideIn(scn, el, 'type', to);
-		// Born: what the new type has and the type it was in this scenario did not.
-		specs.forEach(function (spec) {
-			if (spec.custom || !typeSpecHas(spec, dest) || typeSpecHas(spec, pre.from)) { return; }
-			spec.keys.forEach(function (k) {
-				var name = typeKeyProp(spec, k) || k;
-				if (birth[k] === undefined) { return; }
-				// A value the scenario already states for this name (from an earlier visit) is replaced:
-				// a newly drawn one starts from New assets.
-				writeOverrideIn(scn, el, name, birth[k]);
+		(elGroup(el) === 'node' ? doc.nodes : doc.links).push(c);
+		paneInScenario(baseScenario(), function () {
+			Object.keys(ov).forEach(function (p) {
+				if (p === 'active' || LPN_COORD_PROP[p] || p === 'demand' || p === 'demands') { return; }
+				if (c.tok) { delete c.tok['_' + p]; }
+				setProp(c, p, altCopy(ov[p]));
 			});
+			if (rows) { setProp(c, 'demands', rows); }
 		});
-		if (pre.carry) {
-			writeOverrideIn(scn, el, pre.carry.newProp, pre.carry.value);
-			if (to === 'tank') {
-				var top = overrideHeldIn(scn, el, 'maxLevel'), mx = top.has ? top.value : (baseDesc.type === 'tank' ? el.maxLevel : birth.maxLevel);
-				if (!(typeof mx === 'number' && mx >= pre.carry.value)) { writeOverrideIn(scn, el, 'maxLevel', pre.carry.value); }
-			}
-		}
+		if (c.tok && !Object.keys(c.tok).length) { delete c.tok; }
+		return c;
 	}
-	// After the scenario is laid out again: every value both types have reads what it read before
-	// the change, or the scenario is given it as its own.
-	function scenarioTypeChangeKeep(el, scn, pre) {
-		Object.keys(pre.kept).forEach(function (p) {
-			if (pre.kept[p] === undefined || sameJSON(effective(el, p), pre.kept[p])) { return; }
-			writeOverrideIn(scn, el, p, pre.kept[p]);
+	// The copy joins this scenario's topology, as a drawn asset does, and the old asset leaves it.
+	// A position the scenario moved stays its own override, verbatim.
+	function scenarioCopyBorn(el, c) {
+		var ov = resolvedOverrides(activeScenario())[ovKey(el)] || {}, live = isActive(el);
+		Object.keys(LPN_COORD_PROP).forEach(function (p) {
+			if (Object.prototype.hasOwnProperty.call(ov, p)) { setOverride(c, p, ov[p]); }
 		});
-	}
-	// **A BASE CHANGE NEVER REACHES INTO A SCENARIO THAT STATES ITS OWN TYPE FOR THE ASSET**, and
-	// what that scenario inherited from Base and still needs is written into its map before Base
-	// lets it go: a scenario keeping a Base junction a junction, while Base becomes a tank, keeps the
-	// demand it showed.
-	function pinTypeOverrideInheritance(el, to) {
-		var key = ovKey(el), isLink = elGroup(el) === 'link', from = isLink ? linkTypeDesc(el) : { type: el.type },
-			dest = isLink ? linkTargetDesc(to, el) : { type: to }, specs = typeSpecsOf(el), wrote = false;
-		eachOverrideMap(function (map) {
-			var ov = map[key], view;
-			if (!plainObject(ov) || typeof ov.type !== 'string') { return; }
-			view = typeDescFor(el, ov.type, ov.valveType !== undefined ? ov.valveType : (el.type === 'valve' ? el.valveType : undefined));
-			specs.forEach(function (spec) {
-				if (spec.custom || !typeSpecHas(spec, view) || !typeSpecHas(spec, from) || typeSpecHas(spec, dest)) { return; }
-				spec.keys.forEach(function (k) {
-					var name = typeKeyProp(spec, k) || k;
-					if (el[k] === undefined || Object.prototype.hasOwnProperty.call(ov, name)) { return; }
-					ov[name] = altCopy(el[k]);
-					wrote = true;
-				});
-			});
-		}, null, true);
-		if (wrote) { touchTree('pinTypeOverrideInheritance'); }
+		bornInScenario(c);
+		if (!live) { setOverride(c, 'active', false); }
+		setOverride(el, 'active', false);
 	}
 	/**
 	 * **THE QUESTION, IN TOM'S WORDS, BEFORE ANY OTHER**: in a scenario other than Base, Change
-	 * type asks *"Current scenario is not Base. Create overrides?"* with exactly three answers.
-	 * Create overrides changes the type in this scenario only; Switch to Base switches, then makes
-	 * the ordinary Base change (its own box included); Cancel does nothing. `go(mode)` is handed
-	 * 'scenario' or 'base'.
+	 * type asks first, with exactly three answers. Replace makes the new assets in this scenario
+	 * (replaceSelectedTypeInScenario()); Switch to Base switches, then makes the ordinary Base
+	 * change (its own box included); Cancel does nothing. `go(mode)` is handed 'scenario' or 'base'.
 	 */
 	function askTypeChangeScope(go) {
 		var pc = EngCalcs.pageConfig || {};
 		if (inBaseScenario()) { go('base'); return; }
 		askDialog({ kind: 'choice', title: pc.lpn_change_type_menu || 'Change type',
-			text: pc.lpn_change_type_scenario_ask || 'Current scenario is not Base. Create overrides?',
+			text: pc.lpn_change_type_scenario_ask || 'Current scenario is not Base. Create new assets? The selected assets become inactive in this scenario.',
 			choices: [
-				{ value: 'scenario', label: pc.lpn_change_type_create_overrides || 'Create overrides', isDefault: true },
+				{ value: 'scenario', label: pc.lpn_change_type_create_new || 'Create new assets', isDefault: true },
 				{ value: 'base', label: pc.lpn_change_type_switch_base || 'Switch to Base' },
 				{ value: null, label: pc.lpn_cancel || 'Cancel', cancel: true }
 			] }, function (v) {
@@ -36622,13 +36468,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// dev/lpn-spike/file-naming-harness.js holds it against the config.
 	var LPN_FILE_APP = 'https://epanet-plus-plus.org/app/';
 	var LPN_TREE_KEYS = ['alternatives', 'calcSets'];
-	// **BASE'S TYPES, ALWAYS, UNLESS `asSeen`** (type overrides): a file, an autosave and the dirty
-	// signature are the document, never a scenario's view of it. Only the .inp export, which writes
-	// the scenario showing (inpExportDocument()), asks for the view, and nothing keeps that one.
-	function serializeProject(asSeen) {
-		if (!asSeen && typeView.list.length) {
-			return withBaseTypes(function () { return JSON.parse(JSON.stringify(serializeProject(true))); });
-		}
+	function serializeProject() {
 		var out = {
 			format: LPN_FILE_FORMAT, app: LPN_FILE_APP,
 			v: openDocVersion, project: project, scenarios: scenarios,
@@ -37809,6 +37649,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// verbatim; a scenario's own tree keys already do, on the scenario object.
 		LPN_TREE_KEYS.forEach(function (k) { if (saved[k] !== undefined) { doc[k] = saved[k]; } else { delete doc[k]; } });
 		sanitizeScenarioTree();
+		dropTypeOverrides();
 		touchTree('applySaved');
 		// Task 510's saved paths, taken VERBATIM. An id naming a node this document does not have
 		// is the user's data and is reported where it is used, never pruned here -- see
@@ -38676,7 +38517,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// it always was, character for character. [TIMES] goes by inpExportOptions().times instead,
 	// beside the run time and time step that were there first.
 	function inpExportDocument() {
-		var snap = serializeProject(true), block = scenarioSettingsBlock(activeScenario()), out;
+		var snap = serializeProject(), block = scenarioSettingsBlock(activeScenario()), out;
 		if (!block || (!plainObject(block.settings) && block.defaultPattern === undefined)) { return snap; }
 		out = Object.assign({}, snap);
 		if (plainObject(block.settings)) { out.settings = settingOverlay(snap.settings, block.settings, ['settings']); }
@@ -60862,12 +60703,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// geometry is Base-owned (a node cannot be in two places at once in one rendered map),
 			// so "follow the drawing" is a statement about the drawing, which every scenario shares.
 			// `lenAuto` itself is that same kind of flag and is deliberately not overridable.
-			if (l.lenAuto && typeOverriddenHere(l)) {
-				// A pipe only this scenario has (a type override): its drawn length is this scenario's.
-				writeOverrideIn(activeScenario(), l, 'length', linkGeomLength(l));
-				input.value = effective(l, 'length').toFixed(2);
-				refreshPopupIfOpen();
-			} else if (l.lenAuto) {
+			if (l.lenAuto) {
 				l._length = linkGeomLength(l);   // base-write: Auto reverts to the drawing, which every scenario shares; the override is cleared on the next line
 				if (!inBaseScenario()) { clearOverride(l, 'length'); }
 				input.value = effective(l, 'length').toFixed(2);
@@ -63224,20 +63060,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// belongs to a type must be Base-wide too. The overrides are the part easy to miss: 60 psi
 			// read as a loss coefficient of 60 is as wrong in a scenario as in Base, and an override
 			// would SURVIVE silently as a stale pressure under a valve that now wants a flow.
-			// **A VALVE ONLY THIS SCENARIO HAS (a type override) IS THIS SCENARIO'S, type and setting
-			// alike** (Perry, 2026-10-07: the new setting showed, then vanished when Base was laid
-			// back). `l.valveType` above is written back into the scenario's map; the setting goes
-			// there directly, and Base and every other scenario are left alone.
-			if (typeOverriddenHere(l)) {
-				writeOverrideIn(activeScenario(), l, 'setting', defaultValveSetting(v));
-			} else {
-				l._setting = defaultValveSetting(v);   // base-write: valveType is Base-owned, so the setting that belongs to it is too
-				// A map stating its own type for this asset keeps its own valve and setting.
-				eachOverrideMap(function (map) {
-					var ovv = map[ovKey(l)];
-					if (ovv && typeof ovv.type !== 'string') { delete ovv.setting; }
-				});
-			}
+			l._setting = defaultValveSetting(v);   // base-write: valveType is Base-owned, so the setting that belongs to it is too
+			eachOverrideMap(function (map) {
+				var ovv = map[ovKey(l)];
+				if (ovv) { delete ovv.setting; }
+			});
 			refreshPopupIfOpen();
 			scheduleSolve();
 		}, pc.lpn_field_valve_type_tip);
@@ -64190,7 +64017,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// must push it only if the user actually commits.
 	function makeUndoSnapshot() {
 		return {
-			state: withBaseTypes(function () { return JSON.parse(JSON.stringify({ doc: doc, scenarios: scenarios, active: project.activeScenario })); }),
+			state: JSON.parse(JSON.stringify({ doc: doc, scenarios: scenarios, active: project.activeScenario })),
 			// **THE BACKDROP IS SHALLOW-COPIED, AND THAT IS NOT A SHORTCUT.** Its `href` is a base64
 			// data URI -- 1.7 MB on Net2, 2.5 MB on Net3 -- so deep-cloning it into every one of
 			// twenty snapshots costs fifty megabytes to make a Move undoable. A shallow copy
@@ -64601,6 +64428,27 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// own diagnostics exist to complain about -- and a "delete this node" in a scenario would report
 	// an error instead of doing what it said.
 	function isActive(el) { return effective(el, 'active') !== false; }
+	// **A LINK IS LIVE WHEN IT AND BOTH ITS ENDS ARE ACTIVE** (Bentley: an element whose node is not
+	// in the network is not in it either). The one rule the solve, the map's greying and the Tables
+	// share for "is this link in the network".
+	function linkLive(l) {
+		if (!isActive(l)) { return false; }
+		var a = nodeById(l.from), b = nodeById(l.to);
+		return !!a && !!b && isActive(a) && isActive(b);
+	}
+	// The same two questions asked of any scenario, not only the one showing (the Tables' scenario
+	// rows): an asset is active there unless its resolved Active Topology says otherwise.
+	function activeInScenario(el, scn) {
+		var ov = (!scn || scn.isBase) ? null : resolvedOverrides(scn)[ovKey(el)];
+		if (ov && Object.prototype.hasOwnProperty.call(ov, 'active')) { return ov.active !== false; }
+		return el._active !== false;
+	}
+	function liveInScenario(el, scn) {
+		if (!activeInScenario(el, scn)) { return false; }
+		if (elGroup(el) !== 'link') { return true; }
+		var a = nodeById(el.from), b = nodeById(el.to);
+		return !!a && !!b && activeInScenario(a, scn) && activeInScenario(b, scn);
+	}
 	// **THE MOMENT THIS PAGE SOLVES** (Task 423). Zero -- the start of the run -- and written as a
 	// function rather than a literal so that Task 248's clock has ONE place to become real. EPANET
 	// itself reports t=0 as a hydraulic result like any other, so a steady-state page and an
@@ -67045,12 +66893,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	/**
 	 * **ONE ELEMENT'S MARKS, WHICH IS ALL AN EDIT CAN EVER CHANGE** (ROADMAP Task 706). Both
 	 * questions this asks -- is the asset active, does it hold a value belonging to this scenario
-	 * alone -- are read off the element handed in. Nothing here consults another element, which is
-	 * why afterPropertyEdit() may call this instead of walking the whole drawing on every
-	 * committed cell. A Text label has no marks and is not drawn from either question, so it is
+	 * alone -- are read off the element handed in, and a link's ends (linkLive()). A node's own
+	 * links are redrawn with it, so this is still a handful of elements, which is why
+	 * afterPropertyEdit() may call this instead of walking the whole drawing on every committed
+	 * cell. `skipLinks`: the whole-drawing pass, which reaches every link anyway. A Text label has no marks and is not drawn from either question, so it is
 	 * simply not in either map and falls through.
 	 */
-	function applyScenarioMarks(el) {
+	function applyScenarioMarks(el, skipLinks) {
 		if (!el) { return; }
 		// **`elGroup()`, NOT A SEARCH OF doc.nodes/doc.links.** A junction and a pipe may legally
 		// share an id (see ovKey()), so the element's own shape is what tells the two apart --
@@ -67063,10 +66912,14 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			ne.circle.classList.toggle('lpn-inactive', off);
 			if (ne.symbol) { ne.symbol.classList.toggle('lpn-inactive', off); }
 			ne.text.classList.toggle('lpn-inactive', off);
+			// Its links are greyed with it (linkLive()), so an edit of the node redraws theirs.
+			if (!skipLinks) { (incidentLinks[el.id] || []).forEach(function (lid) { applyScenarioMarks(linkById(lid), true); }); }
 			return;
 		}
 		if (group === 'link' && le) {
-			off = !isActive(el); ov = hasDisplayedOverride(el);
+			// **A LINK WHOSE END IS INACTIVE IS DRAWN INACTIVE** (Task 781): it is out of the solve
+			// (assembleModel()), and Bentley greys what it leaves out.
+			off = !linkLive(el); ov = hasDisplayedOverride(el);
 			if (le.halo) {
 				le.halo.classList.toggle('lpn-override', ov);
 				setOverrideTitle(le.halo, ov);
@@ -67080,7 +66933,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// scenario, deleting one, pushing to base, rebuilding the DOM. An ordinary property edit is not
 	// one of those -- see applyScenarioMarks().
 	function refreshScenarioMarks() {
-		doc.nodes.forEach(function (n) { applyScenarioMarks(n); });
+		doc.nodes.forEach(function (n) { applyScenarioMarks(n, true); });
 		doc.links.forEach(function (l) { applyScenarioMarks(l); });
 	}
 	// The layout half of refreshLabelText(), without rebuilding any text. Split out so a DRAG can
@@ -69806,7 +69659,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		try {
 			scenariosForDisplay().forEach(function (s) {
 				project.activeScenario = s.id;
-				typeViewFollow();
 				// **AND THE OPTIONS IT RAN UNDER, read during the same swap** (Task 755): the
 				// multiplier and the clock are the scenario's own or the project's, and the report
 				// states them per row rather than leaving the reader to look each one up.
@@ -69817,7 +69669,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			});
 		} finally {
 			project.activeScenario = was;
-			typeViewFollow();
 		}
 		return out;
 	}
