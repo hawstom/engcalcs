@@ -5100,7 +5100,7 @@ var EngCalcs = EngCalcs || {};
 				fn: function () { closeMenu(); openScenarioCompareBox(); }
 			},
 			{
-				icon: 'info', label: pc.lpn_reports_epanet || 'Run (EPANET)',
+				icon: 'info', label: pc.lpn_reports_epanet || 'Run',
 				tip: pc.lpn_time_run_report_tip,
 				// **SHOWN, OR EXPLAINED -- never an empty box.** The row is always here rather than
 				// hidden when there is nothing to show: a row that disappears teaches nobody that
@@ -5122,7 +5122,7 @@ var EngCalcs = EngCalcs || {};
 			// carries the word so no row has to, the same rule "EPANET run" (not "EPANET run
 			// report") already follows two rows up. The BOX TITLES keep the full names.
 			{
-				icon: 'info', label: pc.lpn_reports_status || 'Status (EPANET)',
+				icon: 'info', label: pc.lpn_reports_status || 'Status changes',
 				tip: pc.lpn_reports_status_tip,
 				fn: function () { closeMenu(); openStatusReportBox(); }
 			},
@@ -36889,7 +36889,7 @@ var EngCalcs = EngCalcs || {};
 			case 'mixing': return pc.lpn_inp_drop_sources_mixing || 'This file states where a chemical is injected into the network and how water mixes in each tank. Each source is shown on the node where it is applied, and each tank shows its mixing model. Both are used when the network is run over a total run time.';
 			case 'energy': return pc.lpn_inp_drop_energy || 'This EPANET file includes pumping cost modelling data. This page reads it and uses it. Run the model, then open Water, Reports, Pump energy to see how long each pump ran, the power it drew, the energy it used and what that cost. The lines are kept, and they are written back if you save an EPANET file.';
 			case 'tags': return pc.lpn_inp_drop_tags || 'This file assigns tags to some junctions, pipes, or other assets. Every tag was imported and appears in the properties of its asset, where it can be viewed or edited.';
-			case 'report': return pc.lpn_inp_drop_report || 'This file contains EPANET report-format settings. The EPANET run report is available under Reports, EPANET run, but it uses the standard EPANET format rather than the format these settings specify. The lines are kept and are written back if you save an EPANET file.';
+			case 'report': return pc.lpn_inp_drop_report || 'This file contains EPANET report-format settings. The run report is available under Reports, Run, but it uses the standard EPANET format rather than the format these settings specify. The lines are kept and are written back if you save an EPANET file.';
 			// The ids on this one are the SECTION NAMES, which is the only true thing we can say
 			// about a part of the format nobody here has read.
 			case 'other-sections': return pc.lpn_inp_drop_sections || 'This file holds a section that this page does not read at all. Nothing here uses it. It is kept whole, and it is written back if you save an EPANET file.';
@@ -65964,7 +65964,7 @@ var EngCalcs = EngCalcs || {};
 		if (!host) { return; }
 		host.innerHTML = '';
 		if (!frames.length) {
-			ffEl('p', 'lpn-ff-note', pc.lpn_status_needs_run || 'The status report lists what changed during an extended period simulation. Set a Total run time in Settings, Calculation, Time, press Calculate, then open Water, Reports, Status report.', host);
+			ffEl('p', 'lpn-ff-note', pc.lpn_status_needs_run || 'The status report lists what changed during an extended period simulation. Set a Total run time in Settings, Calculation, Time, press Calculate, then open Water, Reports, Status changes.', host);
 			return;
 		}
 		events = statusReportEvents();
