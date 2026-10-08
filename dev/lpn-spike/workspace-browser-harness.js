@@ -7,8 +7,7 @@
 //   1. Two boxes (Settings, Find) are moved and resized by the mouse. File > Export > Workspace
 //      downloads a JSON file carrying them, and carrying NO project, identity or consent record.
 //   2. Every workspace key is removed and the page reloaded: the boxes are gone. File > Import >
-//      Workspace with that file brings both back, in the same place and at the same size, after one
-//      reload the dialog announces. Nothing new appears in localStorage.
+//      Workspace with that file brings both back, in the same place and at the same size, with no reload. Nothing new appears in localStorage.
 //   3. A bad file (not JSON, wrong format, a newer version) is refused with a message, changes no
 //      stored key and does not reload. A good file with entries it does not know applies what it
 //      knows, ignores the rest, reports the count, and never writes a project or index key.
@@ -170,8 +169,8 @@ async function main() {
 		ok('with the keys cleared, neither box comes back', (await rect(a, 'lpn_settings_box')) === null && (await rect(a, 'lpn_find_popup')) === null);
 		const keysCleared = await allKeys(a);
 		const dlg = await importWorkspace(a, out.text);
-		ok('a report dialog says what was applied and that the page reloads', !!dlg && /Workspace applied/.test(dlg.text) && !/records/i.test(dlg.text) && /reload/.test(dlg.text), dlg && dlg.text);
-		await Promise.all([a.page.waitForNavigation({ timeout: 10000 }), a.dialogClick('OK')]);
+		ok('a report dialog says what was applied, and no reload is announced', !!dlg && /Workspace applied/.test(dlg.text) && !/records/i.test(dlg.text) && !/reload/i.test(dlg.text), dlg && dlg.text);
+		await a.dialogClick('OK');
 		await a.page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } delete window.lpnDialogAnswerer; });
 		await a.settle(2000);
 		const setAfter = await rect(a, 'lpn_settings_box'), findAfter = await rect(a, 'lpn_find_popup');
@@ -204,7 +203,7 @@ async function main() {
 			lpn_setbox: 'not json {' } });
 		const d = await importWorkspace(a, mixed, 'mixed.json');
 		ok('a file with strangers applies what it knows and reports the rest', !!d && /Settings applied: 1\./.test(d.text) && /recognized: 6\./.test(d.text), d && d.text);
-		await Promise.all([a.page.waitForNavigation({ timeout: 10000 }), a.dialogClick('OK')]);
+		await a.dialogClick('OK');
 		await a.page.evaluate(() => { delete window.lpnDialogAnswerer; });
 		await a.settle(1500);
 		const fin = await snapshot(a);
@@ -219,7 +218,7 @@ async function main() {
 			lpn_findbox: JSON.stringify({ left: -3000, top: -50, w: 400, h: 300, open: true }) } });
 		const d5 = await importWorkspace(a, big, 'big.json');
 		ok('the big-screen file is accepted', !!d5 && /Workspace applied/.test(d5.text), d5 && d5.text);
-		await Promise.all([a.page.waitForNavigation({ timeout: 10000 }), a.dialogClick('OK')]);
+		await a.dialogClick('OK');
 		await a.page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } delete window.lpnDialogAnswerer; });
 		await a.settle(2000);
 		for (const id of ['lpn_settings_box', 'lpn_find_popup']) {
@@ -280,8 +279,8 @@ async function main() {
 			JSON.stringify(conf));
 		await b.dialogClick(await b.lang('lpn_replace_btn'));
 		const rep = await b.waitDialog(6000);
-		ok('Replace applies it and says the page reloads', !!rep && /reload/.test(rep.text), rep && rep.text);
-		await Promise.all([b.page.waitForNavigation({ timeout: 10000 }), b.dialogClick('OK')]);
+		ok('Replace applies it and reports it', !!rep && /Workspace applied/.test(rep.text) && !/reload/i.test(rep.text), rep && rep.text);
+		await b.dialogClick('OK');
 		await quiet();
 		await b.settle(2000);
 		st = await strips(b.page);

@@ -24516,13 +24516,14 @@ var EngCalcs = EngCalcs || {};
 	// the front. A new column therefore shows up, which is the failure that matters; where it shows
 	// up is then one drag away.
 	var LPN_PANECOLS_KEY = 'lpn_panecols';
-	var paneColPrefs = (function () {
+	function readPaneColPrefs() {
 		var raw = null, v;
 		try { raw = localStorage.getItem(LPN_PANECOLS_KEY); } catch (e) { return {}; }
 		if (!raw) { return {}; }
 		try { v = JSON.parse(raw); } catch (e) { return {}; }
 		return (v && typeof v === 'object') ? v : {};
-	}());
+	}
+	var paneColPrefs = readPaneColPrefs();
 	function paneColPrefFor(specId) {
 		if (!paneColPrefs[specId]) { paneColPrefs[specId] = {}; }
 		return paneColPrefs[specId];
@@ -42222,18 +42223,16 @@ var EngCalcs = EngCalcs || {};
 				return;
 			}
 			// **ASK FIRST** (Tom, 2026-10-07: *"Add a confirm"*). Cancel changes nothing.
-			askDialog({ kind: 'confirm', text: pc.lpn_workspace_confirm || "Replace this browser's layout with the one in the file?",
+			askDialog({ kind: 'confirm', text: pc.lpn_workspace_confirm || "Replace this browser's workspace layout with the one in the file?",
 				ok: pc.lpn_replace_btn || 'Replace' }, function (yes) { if (yes) { applyWorkspacePlan(plan, file); } });
 		};
 		reader.readAsText(file);
 	}
 	function applyWorkspacePlan(plan, file) {
 		var pc = EngCalcs.pageConfig || {}, nSet = 0, nDrop = 0, msg;
-		// The open project is autosaved before the page reloads, so the reload loses nothing.
-		saveToStorage();
-		// **AND NOTHING ON THIS PAGE MAY WRITE ITS LAYOUT AGAIN BEFORE THE RELOAD**: a box closed by
-		// the dialog, a resize observer, a pane settling would each put this page's own record back
-		// over the one just imported.
+		// **NOTHING ON THIS PAGE MAY WRITE ITS LAYOUT WHILE IT IS BEING REPLACED**: a box closed to
+		// make room, a resize observer, a pane settling would each put this page's own record back
+		// over the one just imported. Released a moment after the layout has settled.
 		furnitureFrozen = true;
 		try {
 			Object.keys(plan.set).forEach(function (k) { localStorage.setItem(k, plan.set[k]); nSet++; });
@@ -42245,13 +42244,125 @@ var EngCalcs = EngCalcs || {};
 			tellNotice(pc.lpn_workspace_refused_storage || 'Browser storage is full or unavailable, so the workspace was not applied.');
 			return;
 		}
-		msg = (pc.lpn_workspace_imported || 'Workspace applied from {file}. Settings applied: {n}. Returned to their defaults: {r}. The page reloads now, once, to lay out your boxes.')
+		try {
+			applyWorkspaceInPlace();
+		} catch (e) {
+			// Never expected. A half-laid-out page is worse than a reload, which reads the same
+			// storage from the top; the harness fails if this path is ever taken.
+			window.location.reload();
+			return;
+		}
+		setTimeout(function () { furnitureFrozen = false; }, 600);
+		msg = (pc.lpn_workspace_imported || 'Workspace applied from {file}. Settings applied: {n}. Returned to their defaults: {r}.')
 			.split('{file}').join(file.name || '').split('{n}').join(String(nSet)).split('{r}').join(String(nDrop));
 		if (plan.ignored) {
 			msg += ' ' + (pc.lpn_workspace_ignored || 'Entries ignored because they were not recognized: {u}.').split('{u}').join(String(plan.ignored));
 		}
 		logMessage(msg, 'notice');
-		askDialog({ kind: 'alert', text: msg }, function () { window.location.reload(); });
+		askDialog({ kind: 'alert', text: msg }, function () {});
+	}
+	// **THE STORED LAYOUT, LAID OUT AGAIN ON THE PAGE THAT IS OPEN** (Tom, 2026-10-08: *"Why does it
+	// reload the page?"*). This is the page's own boot sequence run a second time and nothing else:
+	// close every box, forget every in-memory record of where one was, read the records from storage
+	// again by the same loaders the boot uses, and open and dock whatever those records say, in the
+	// boot's order. So the result is what a reload of the same storage gives, by construction, and
+	// the project, the selection, the results and the undo history are never touched. The one box
+	// left as it is is the Properties box while it shows a selection: a reload drops the selection,
+	// this does not.
+	// The closers are each box's own, because several undo something more than a display
+	// (the contour plot on the map, a screenshot in progress, a running analysis).
+	function workspaceBoxClosers() {
+		return {
+			lpn_settings_box: closeSettingsBox, lpn_library_box: closeLibraryBox, lpn_find_popup: closeFindPopup,
+			lpn_ff_box: closeFireFlowBox, lpn_crit_box: closeCriticalityBox, lpn_ds_box: closeDemandScaleBox,
+			lpn_energy_box: closeEnergyBox, lpn_contour_box: closeContourBox, lpn_snip_box: closeSnipBox,
+			lpn_scncmp_box: closeScenarioCompareBox, lpn_rptbox: closeRunReportBox, lpn_status_box: closeStatusReportBox,
+			lpn_alt_box: closeAlternativesBox, lpn_full_box: closeFullReportBox, lpn_calib_box: closeCalibBox,
+			lpn_notes_popup: closeNotesPopup, lpn_hotkeys_popup: closeHotkeysBox
+		};
+	}
+	// A record as it is before any storage has been read.
+	function workspaceResetRecord(rec) {
+		['dock', 'autohide', 'dockW', 'dockOrd'].forEach(function (k) { delete rec[k]; });
+		['left', 'top', 'w', 'h', 'ix'].forEach(function (k) { if (rec.hasOwnProperty(k)) { rec[k] = null; } });
+		if (rec.hasOwnProperty('open')) { rec.open = false; }
+		if (rec.hasOwnProperty('userSized')) { rec.userSized = false; }
+	}
+	function applyWorkspaceInPlace() {
+		var closers = workspaceBoxClosers(), popupD = null, keepPopup = false, tab, ix;
+		// 1. Everything closed, and the in-memory records forgotten.
+		dockFlyout = null;
+		dockBoxes.forEach(function (d) {
+			var id = d.box.id;
+			if (id === 'lpn_popup') {
+				popupD = d;
+				keepPopup = dockBoxShown(d) && !!currentPopup;
+				if (!keepPopup && dockBoxShown(d)) { closePopup(true); }
+			} else if (closers[id]) {
+				closers[id]();
+			}
+			if (!(id === 'lpn_popup' && keepPopup)) {
+				['left', 'top', 'width', 'height', 'maxHeight'].forEach(function (p) { d.box.style[p] = ''; });
+			}
+			workspaceResetRecord(d.rec);
+			d.open = false;
+			d.byDefault = false;
+		});
+		findUserPos = null;
+		findUserSize = null;
+		findUserOpen = false;
+		ix = document.getElementById('lpn_setbox_index');
+		if (ix) { ix.style.flexBasis = ''; }
+		// 2. The records again, by the loaders the boot uses.
+		loadFindLayout();
+		loadSetboxLayout();
+		loadLibboxLayout();
+		dockShared = null;
+		dockBoxes.forEach(function (d) {
+			var id = d.box.id;
+			if (d.shared) {
+				readDockFields(dockSharedLoad()[id], d.rec);
+				d.open = !!d.rec.dock && !!(dockSharedLoad()[id] || {}).open;
+			} else {
+				if (id !== 'lpn_find_popup' && id !== 'lpn_settings_box' && id !== 'lpn_library_box') { loadBoxLayout(d.key, d.rec); }
+				readDockRecord(d.key, d.rec);
+			}
+		});
+		if (popupD && keepPopup) { popupD.open = !!popupD.rec.dock; }
+		// 3. Browser preferences, then the two panes, in the boot's order.
+		loadRunBoxPref();
+		loadScenarioBasicPref();
+		syncAreaHintChecks();
+		updateAreaHint();
+		tab = activePaneTab();
+		if (paneState.open && tab && tab.hide) { tab.hide(); }
+		paneState.open = false;
+		paneState.h = LPN_PANE_DEFAULT;
+		paneState.tab = paneTabs[0].id;
+		loadPaneState();
+		if (document.getElementById('lpn_pane_body')) { document.getElementById('lpn_pane_body').style.height = ''; }
+		Object.keys(paneColPrefs).forEach(function (k) { delete paneColPrefs[k]; });
+		(function (v) { Object.keys(v).forEach(function (k) { paneColPrefs[k] = v[k]; }); }(readPaneColPrefs()));
+		applyPaneLayout();
+		if (paneState.open && activePaneTab().show) { activePaneTab().show(); }
+		rpaneState.open = false;
+		rpaneState.w = LPN_RPANE_DEFAULT;
+		loadRPaneState();
+		applyRPaneLayout();
+		// 4. The boxes: first-visit docks if no record is left, then the boot's own restore.
+		dockDefaultHold = false;
+		dockRankUnranked();
+		applyDefaultDocks();
+		dockBooting = true;
+		try {
+			restoreOpenBoxes();
+			restoreDockedShared();
+			restoreDefaultDocks();
+		} finally {
+			dockBooting = false;
+		}
+		dockBoxes.forEach(renderDockCorner);
+		layoutDocks();
 	}
 	EngCalcs.lpnWorkspacePlan = workspacePlan;
 	EngCalcs.lpnWorkspaceCarries = workspaceCarries;
