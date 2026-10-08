@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "bg",
-        "expected_key_count": 2444,
-        "delta_key_count": 224,
+        "expected_key_count": 2449,
+        "delta_key_count": 229,
         "exempt_key_count": 31,
         "exempt_keys": [
             "calc_units_us",
@@ -754,9 +754,14 @@
         "lpn_dock_float": "Float",
         "lpn_dock_autohide": "Auto-hide",
         "lpn_popup_none": "Nothing is selected. Select an asset on the map to see its properties.",
+        "lpn_hotkeys_zoomwin_def": "Zoom Window: drag a rectangle to zoom to.",
         "lpn_hotkeys_snip_heading": "Screenshot",
         "lpn_hotkeys_snip_term": "Screenshot keyboard shortcuts",
         "lpn_hotkeys_snip_def": "<table class=\"lpn-notes-table\"><tbody><tr><td>S<\/td><td>Snip, while Screenshot is open.<\/td><\/tr><tr><td>E<\/td><td>Eraser, in the markup view.<\/td><\/tr><tr><td>Ctrl+Z, Ctrl+Y<\/td><td>Undo and redo, in the markup view.<\/td><\/tr><tr><td>Esc<\/td><td>Cancel a snip, or leave the eraser. In the markup view, close it when nothing is drawn.<\/td><\/tr><\/tbody><\/table>",
+        "lpn_status_dismiss": "Hide this message",
+        "lpn_msglog_hidden": "Hidden",
+        "lpn_msglog_unhide": "Show",
+        "lpn_status_hidden_tip": "Show the hidden message on the map again.",
         "lpn_fb_intro": "Canned messages (optional). Nothing is sent until you press Send.",
         "lpn_fb_pick_numbers": "The numbers look wrong",
         "lpn_fb_pick_broken": "Something did not work",
@@ -980,9 +985,14 @@
         "lpn_dock_float": "Float",
         "lpn_dock_autohide": "Auto-hide",
         "lpn_popup_none": "Nothing is selected. Select an asset on the map to see its properties.",
+        "lpn_hotkeys_zoomwin_def": "Zoom Window: drag a rectangle to zoom to.",
         "lpn_hotkeys_snip_heading": "Screenshot",
         "lpn_hotkeys_snip_term": "Screenshot keyboard shortcuts",
         "lpn_hotkeys_snip_def": "<table class=\"lpn-notes-table\"><tbody><tr><td>S<\/td><td>Snip, while Screenshot is open.<\/td><\/tr><tr><td>E<\/td><td>Eraser, in the markup view.<\/td><\/tr><tr><td>Ctrl+Z, Ctrl+Y<\/td><td>Undo and redo, in the markup view.<\/td><\/tr><tr><td>Esc<\/td><td>Cancel a snip, or leave the eraser. In the markup view, close it when nothing is drawn.<\/td><\/tr><\/tbody><\/table>",
+        "lpn_status_dismiss": "Hide this message",
+        "lpn_msglog_hidden": "Hidden",
+        "lpn_msglog_unhide": "Show",
+        "lpn_status_hidden_tip": "Show the hidden message on the map again.",
         "lpn_fb_intro": "Canned messages (optional). Nothing is sent until you press Send.",
         "lpn_fb_pick_numbers": "The numbers look wrong",
         "lpn_fb_pick_broken": "Something did not work",
@@ -1401,6 +1411,22 @@
                 }
             }
         },
+        "lpn_hotkeys_zoomwin_def": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_hotkeys_map_def",
+                    "value": "<table class=\"lpn-notes-table\"><tbody><tr><td>1 или Esc<\/td><td>Избор.<\/td><\/tr><tr><td>2<\/td><td>Добавя възел.<\/td><\/tr><tr><td>3<\/td><td>Добавя резервоар.<\/td><\/tr><tr><td>4<\/td><td>Добавя цистерна.<\/td><\/tr><tr><td>5<\/td><td>Добавя тръба.<\/td><\/tr><tr><td>6<\/td><td>Добавя помпа.<\/td><\/tr><tr><td>7<\/td><td>Добавя вентил.<\/td><\/tr><tr><td>8<\/td><td>Добавя абонат.<\/td><\/tr><tr><td>9<\/td><td>Добавя текст.<\/td><\/tr><tr><td>Delete<\/td><td>Изтрива избраното.<\/td><\/tr><tr><td>Ctrl+Z<\/td><td>Отменя последната промяна.<\/td><\/tr><tr><td>+ или =<\/td><td>Увеличава мащаба.<\/td><\/tr><tr><td>-<\/td><td>Намалява мащаба.<\/td><\/tr><\/tbody><\/table>",
+                    "english": "<table class=\"lpn-notes-table\"><tbody><tr><td>1 or Esc<\/td><td>Select.<\/td><\/tr><tr><td>2<\/td><td>Add a junction.<\/td><\/tr><tr><td>3<\/td><td>Add a reservoir.<\/td><\/tr><tr><td>4<\/td><td>Add a tank.<\/td><\/tr><tr><td>5<\/td><td>Add a pipe.<\/td><\/tr><tr><td>6<\/td><td>Add a pump.<\/td><\/tr><tr><td>7<\/td><td>Add a valve.<\/td><\/tr><tr><td>8<\/td><td>Add a customer.<\/td><\/tr><tr><td>9<\/td><td>Add text.<\/td><\/tr><tr><td>Delete<\/td><td>Delete the selection.<\/td><\/tr><tr><td>Ctrl+Z<\/td><td>Undo the last change.<\/td><\/tr><tr><td>+ or =<\/td><td>Zoom in.<\/td><\/tr><tr><td>-<\/td><td>Zoom out.<\/td><\/tr><\/tbody><\/table>"
+                },
+                "next_translated": {
+                    "key": "lpn_hotkeys_menu_heading",
+                    "value": "Менюта",
+                    "english": "Menus"
+                }
+            }
+        },
         "lpn_hotkeys_snip_heading": {
             "reason": "missing",
             "current_value": null,
@@ -1446,6 +1472,70 @@
                     "key": "lpn_wrong_btn",
                     "value": "Нещо не е наред тук?",
                     "english": "Something wrong here?"
+                }
+            }
+        },
+        "lpn_status_dismiss": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_wrong_btn",
+                    "value": "Нещо не е наред тук?",
+                    "english": "Something wrong here?"
+                },
+                "next_translated": {
+                    "key": "lpn_wrong_tip",
+                    "value": "Едно натискане ни казва, че нещо на тази страница не е наред. То изпраща името на тази страница, езика, на който я четете, и съобщението на картата, ако има такова. Не изпраща нищо от въведеното от вас, никакъв адрес и нищо от вашия чертеж. Никой не може да ви отговори, защото това не ни казва нищо за това кой сте. Използвайте Помощ, Поправи нещо, когато искате да кажете повече.",
+                    "english": "Report an error on this page. This opens a box to select the problem, add a comment, and enter an email address if a reply is wanted. All fields are optional, and nothing is sent until you press Send."
+                }
+            }
+        },
+        "lpn_msglog_hidden": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_wrong_btn",
+                    "value": "Нещо не е наред тук?",
+                    "english": "Something wrong here?"
+                },
+                "next_translated": {
+                    "key": "lpn_wrong_tip",
+                    "value": "Едно натискане ни казва, че нещо на тази страница не е наред. То изпраща името на тази страница, езика, на който я четете, и съобщението на картата, ако има такова. Не изпраща нищо от въведеното от вас, никакъв адрес и нищо от вашия чертеж. Никой не може да ви отговори, защото това не ни казва нищо за това кой сте. Използвайте Помощ, Поправи нещо, когато искате да кажете повече.",
+                    "english": "Report an error on this page. This opens a box to select the problem, add a comment, and enter an email address if a reply is wanted. All fields are optional, and nothing is sent until you press Send."
+                }
+            }
+        },
+        "lpn_msglog_unhide": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_wrong_btn",
+                    "value": "Нещо не е наред тук?",
+                    "english": "Something wrong here?"
+                },
+                "next_translated": {
+                    "key": "lpn_wrong_tip",
+                    "value": "Едно натискане ни казва, че нещо на тази страница не е наред. То изпраща името на тази страница, езика, на който я четете, и съобщението на картата, ако има такова. Не изпраща нищо от въведеното от вас, никакъв адрес и нищо от вашия чертеж. Никой не може да ви отговори, защото това не ни казва нищо за това кой сте. Използвайте Помощ, Поправи нещо, когато искате да кажете повече.",
+                    "english": "Report an error on this page. This opens a box to select the problem, add a comment, and enter an email address if a reply is wanted. All fields are optional, and nothing is sent until you press Send."
+                }
+            }
+        },
+        "lpn_status_hidden_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_wrong_btn",
+                    "value": "Нещо не е наред тук?",
+                    "english": "Something wrong here?"
+                },
+                "next_translated": {
+                    "key": "lpn_wrong_tip",
+                    "value": "Едно натискане ни казва, че нещо на тази страница не е наред. То изпраща името на тази страница, езика, на който я четете, и съобщението на картата, ако има такова. Не изпраща нищо от въведеното от вас, никакъв адрес и нищо от вашия чертеж. Никой не може да ви отговори, защото това не ни казва нищо за това кой сте. Използвайте Помощ, Поправи нещо, когато искате да кажете повече.",
+                    "english": "Report an error on this page. This opens a box to select the problem, add a comment, and enter an email address if a reply is wanted. All fields are optional, and nothing is sent until you press Send."
                 }
             }
         },

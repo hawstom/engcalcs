@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**115 still to read on master**, of 224 untranslated keys, of 2444 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**120 still to read on master**, of 229 untranslated keys, of 2449 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -139,7 +139,7 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   @@ NEEDS RULING
 
-## lpn_  (222, 113 to read @@ NEEDS RULING)
+## lpn_  (227, 118 to read @@ NEEDS RULING)
 
 - **`lpn_alt_calc_options`**
   > Calculation options
@@ -459,6 +459,9 @@ never edits a synonym.
 - **`lpn_hotkeys_snip_term`**
   > Screenshot keyboard shortcuts
   @@ NEEDS RULING
+- **`lpn_hotkeys_zoomwin_def`**
+  > Zoom Window: drag a rectangle to zoom to.
+  @@ NEEDS RULING
 - **`lpn_inp_backdrop_attach`**
   > Attach {file}…
   @@ NEEDS RULING
@@ -480,6 +483,12 @@ never edits a synonym.
 - **`lpn_mode_add_chain`**
   > Mode: Junction Pipe Chain. Specify a point on the map to add a junction, then specify each next point to add a pipe and a junction. Specify an existing node to continue from it. Press Escape to end the chain. Switch to Select mode to change or move assets and labels.
   _Ruled OK 2026-10-05._
+- **`lpn_msglog_hidden`**
+  > Hidden
+  @@ NEEDS RULING
+- **`lpn_msglog_unhide`**
+  > Show
+  @@ NEEDS RULING
 - **`lpn_pane_clear_override`**
   > Clear override
   @@ NEEDS RULING
@@ -675,6 +684,12 @@ never edits a synonym.
 - **`lpn_snip_tip_undo`**
   > Undo (Ctrl+Z)
   @@ NEEDS RULING
+- **`lpn_status_dismiss`**
+  > Hide this message
+  @@ NEEDS RULING
+- **`lpn_status_hidden_tip`**
+  > Show the hidden message on the map again.
+  @@ NEEDS RULING
 - **`lpn_status_inp_exported_no_picture`**
   > Exported {file}. The background picture could not be saved, so the .inp names none; in EPANET, add it with View > Backdrop > Load.
   @@ NEEDS RULING
@@ -821,7 +836,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**144 still to read**, of 147 new keys across 15 unmerged branch(es).
+**141 still to read**, of 144 new keys across 16 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -832,7 +847,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/bentley-interop (`95843064`) — 63 new, 63 to read @@ NEEDS RULING
+### feat/bentley-interop (`8ee43015`) — 63 new, 63 to read @@ NEEDS RULING
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -1065,6 +1080,15 @@ build for that would be a gate nobody keeps. Refresh it with
   > DXF file…
   @@ NEEDS RULING
 
+### feat/hover-label (`8cf41407`) — 2 new, 2 to read @@ NEEDS RULING
+
+- **`lpn_settings_hover_card`**
+  > Show the full label on hover
+  @@ NEEDS RULING
+- **`lpn_settings_hover_card_tip`**
+  > Rest the pointer on a node, link or customer to see its label with every label field shown, ticked or not. This is a setting for this browser, not for the project.
+  @@ NEEDS RULING
+
 ### feat/label-gang-search (`8b31a907`) — 3 new, all ruled
 
 - **`lpn_confirm_labels_restore`**
@@ -1087,23 +1111,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`2e5e81c4`) — adds no English strings
 
-### feat/message-dismiss (`c382789b`) — 5 new, 5 to read @@ NEEDS RULING
-
-- **`lpn_hotkeys_zoomwin_def`**
-  > Zoom Window: drag a rectangle to zoom to.
-  @@ NEEDS RULING
-- **`lpn_msglog_hidden`**
-  > Hidden
-  @@ NEEDS RULING
-- **`lpn_msglog_unhide`**
-  > Show
-  @@ NEEDS RULING
-- **`lpn_status_dismiss`**
-  > Hide this message
-  @@ NEEDS RULING
-- **`lpn_status_hidden_tip`**
-  > Show the hidden message on the map again.
-  @@ NEEDS RULING
+### feat/message-dismiss (`e66e2304`) — adds no English strings
 
 ### feat/section-grid (`005d4e63`) — 1 new, 1 to read @@ NEEDS RULING
 
@@ -1150,7 +1158,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Copy with headings
   @@ NEEDS RULING
 
-### feat/user-guide (`f6b80d79`) — 39 new, 39 to read @@ NEEDS RULING
+### feat/user-guide (`7a76ca8f`) — 39 new, 39 to read @@ NEEDS RULING
 
 - **`lpn_guide_also`**
   > Also in {menu}
@@ -1162,7 +1170,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > {box} box
   @@ NEEDS RULING
 - **`lpn_guide_boxes_autohide`**
-  > Auto-hidden boxes have two modes, active (an input is active) and inactive (no inputs are active), when deciding whether to stay open or to close when the mouse cursor leaves the box. Active boxes require an outside click to close; inactive boxes do not.
+  > Auto-hidden boxes have two modes: with focus (a control in the box has focus, even a button just pressed) and without focus (no control in it has focus). When the pointer leaves, a box without focus tucks away behind its tab after a short delay. A box with focus stays until you click outside it, press Esc, or Tab out of it with the pointer elsewhere.
   @@ NEEDS RULING
 - **`lpn_guide_boxes_heading`**
   > Boxes
@@ -1270,9 +1278,9 @@ build for that would be a gate nobody keeps. Refresh it with
   > Guide
   @@ NEEDS RULING
 
-### feat/visit-dedupe (`368c3910`) — adds no English strings
+### feat/visit-dedupe (`57bebb74`) — adds no English strings
 
-### feat/workspace (`bbad2f5c`) — 12 new, 12 to read @@ NEEDS RULING
+### feat/workspace (`9766fee0`) — 12 new, 12 to read @@ NEEDS RULING
 
 - **`lpn_file_export_item_workspace`**
   > Workspace…
@@ -1284,10 +1292,10 @@ build for that would be a gate nobody keeps. Refresh it with
   > Workspace…
   @@ NEEDS RULING
 - **`lpn_file_import_workspace_tip`**
-  > Apply a workspace file saved with File, Export, Workspace: box positions and sizes, docking, pane sizes and the reading preferences of this page. Your projects and cookies are not touched. The page reloads once to lay the boxes out.
+  > Apply a workspace file saved with File, Export, Workspace: box positions and sizes, docking, pane sizes and the reading preferences of this page. Your projects and cookies are not touched.
   @@ NEEDS RULING
 - **`lpn_workspace_confirm`**
-  > Replace this browser's layout with the one in the file?
+  > Replace this browser's workspace layout with the one in the file?
   @@ NEEDS RULING
 - **`lpn_workspace_exported`**
   > Workspace saved to {file}: {n} settings.
@@ -1296,7 +1304,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Entries ignored because they were not recognized: {u}.
   @@ NEEDS RULING
 - **`lpn_workspace_imported`**
-  > Workspace applied from {file}. Settings applied: {n}. Returned to their defaults: {r}. The page reloads now, once, to lay out your boxes.
+  > Workspace applied from {file}. Settings applied: {n}. Returned to their defaults: {r}.
   @@ NEEDS RULING
 - **`lpn_workspace_refused_format`**
   > This is not a workspace file saved by this page, so nothing was changed.

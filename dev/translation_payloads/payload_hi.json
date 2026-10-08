@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "hi",
-        "expected_key_count": 2444,
-        "delta_key_count": 224,
+        "expected_key_count": 2449,
+        "delta_key_count": 229,
         "exempt_key_count": 38,
         "exempt_keys": [
             "u_imgd",
@@ -761,9 +761,14 @@
         "lpn_dock_float": "Float",
         "lpn_dock_autohide": "Auto-hide",
         "lpn_popup_none": "Nothing is selected. Select an asset on the map to see its properties.",
+        "lpn_hotkeys_zoomwin_def": "Zoom Window: drag a rectangle to zoom to.",
         "lpn_hotkeys_snip_heading": "Screenshot",
         "lpn_hotkeys_snip_term": "Screenshot keyboard shortcuts",
         "lpn_hotkeys_snip_def": "<table class=\"lpn-notes-table\"><tbody><tr><td>S<\/td><td>Snip, while Screenshot is open.<\/td><\/tr><tr><td>E<\/td><td>Eraser, in the markup view.<\/td><\/tr><tr><td>Ctrl+Z, Ctrl+Y<\/td><td>Undo and redo, in the markup view.<\/td><\/tr><tr><td>Esc<\/td><td>Cancel a snip, or leave the eraser. In the markup view, close it when nothing is drawn.<\/td><\/tr><\/tbody><\/table>",
+        "lpn_status_dismiss": "Hide this message",
+        "lpn_msglog_hidden": "Hidden",
+        "lpn_msglog_unhide": "Show",
+        "lpn_status_hidden_tip": "Show the hidden message on the map again.",
         "lpn_fb_intro": "Canned messages (optional). Nothing is sent until you press Send.",
         "lpn_fb_pick_numbers": "The numbers look wrong",
         "lpn_fb_pick_broken": "Something did not work",
@@ -987,9 +992,14 @@
         "lpn_dock_float": "Float",
         "lpn_dock_autohide": "Auto-hide",
         "lpn_popup_none": "Nothing is selected. Select an asset on the map to see its properties.",
+        "lpn_hotkeys_zoomwin_def": "Zoom Window: drag a rectangle to zoom to.",
         "lpn_hotkeys_snip_heading": "Screenshot",
         "lpn_hotkeys_snip_term": "Screenshot keyboard shortcuts",
         "lpn_hotkeys_snip_def": "<table class=\"lpn-notes-table\"><tbody><tr><td>S<\/td><td>Snip, while Screenshot is open.<\/td><\/tr><tr><td>E<\/td><td>Eraser, in the markup view.<\/td><\/tr><tr><td>Ctrl+Z, Ctrl+Y<\/td><td>Undo and redo, in the markup view.<\/td><\/tr><tr><td>Esc<\/td><td>Cancel a snip, or leave the eraser. In the markup view, close it when nothing is drawn.<\/td><\/tr><\/tbody><\/table>",
+        "lpn_status_dismiss": "Hide this message",
+        "lpn_msglog_hidden": "Hidden",
+        "lpn_msglog_unhide": "Show",
+        "lpn_status_hidden_tip": "Show the hidden message on the map again.",
         "lpn_fb_intro": "Canned messages (optional). Nothing is sent until you press Send.",
         "lpn_fb_pick_numbers": "The numbers look wrong",
         "lpn_fb_pick_broken": "Something did not work",
@@ -1408,6 +1418,22 @@
                 }
             }
         },
+        "lpn_hotkeys_zoomwin_def": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_hotkeys_map_def",
+                    "value": "<table class=\"lpn-notes-table\"><tbody><tr><td>1 या Esc<\/td><td>चुनें।<\/td><\/tr><tr><td>2<\/td><td>जंक्शन जोड़ें।<\/td><\/tr><tr><td>3<\/td><td>जलाशय जोड़ें।<\/td><\/tr><tr><td>4<\/td><td>टैंक जोड़ें।<\/td><\/tr><tr><td>5<\/td><td>पाइप जोड़ें।<\/td><\/tr><tr><td>6<\/td><td>पंप जोड़ें।<\/td><\/tr><tr><td>7<\/td><td>वाल्व जोड़ें।<\/td><\/tr><tr><td>8<\/td><td>ग्राहक जोड़ें।<\/td><\/tr><tr><td>9<\/td><td>टेक्स्ट जोड़ें।<\/td><\/tr><tr><td>Delete<\/td><td>चयन हटाएँ।<\/td><\/tr><tr><td>Ctrl+Z<\/td><td>पिछला बदलाव पूर्ववत करें।<\/td><\/tr><tr><td>+ या =<\/td><td>ज़ूम इन।<\/td><\/tr><tr><td>-<\/td><td>ज़ूम आउट।<\/td><\/tr><\/tbody><\/table>",
+                    "english": "<table class=\"lpn-notes-table\"><tbody><tr><td>1 or Esc<\/td><td>Select.<\/td><\/tr><tr><td>2<\/td><td>Add a junction.<\/td><\/tr><tr><td>3<\/td><td>Add a reservoir.<\/td><\/tr><tr><td>4<\/td><td>Add a tank.<\/td><\/tr><tr><td>5<\/td><td>Add a pipe.<\/td><\/tr><tr><td>6<\/td><td>Add a pump.<\/td><\/tr><tr><td>7<\/td><td>Add a valve.<\/td><\/tr><tr><td>8<\/td><td>Add a customer.<\/td><\/tr><tr><td>9<\/td><td>Add text.<\/td><\/tr><tr><td>Delete<\/td><td>Delete the selection.<\/td><\/tr><tr><td>Ctrl+Z<\/td><td>Undo the last change.<\/td><\/tr><tr><td>+ or =<\/td><td>Zoom in.<\/td><\/tr><tr><td>-<\/td><td>Zoom out.<\/td><\/tr><\/tbody><\/table>"
+                },
+                "next_translated": {
+                    "key": "lpn_hotkeys_menu_heading",
+                    "value": "मेनू",
+                    "english": "Menus"
+                }
+            }
+        },
         "lpn_hotkeys_snip_heading": {
             "reason": "missing",
             "current_value": null,
@@ -1453,6 +1479,70 @@
                     "key": "lpn_wrong_btn",
                     "value": "यहाँ कुछ गड़बड़ है?",
                     "english": "Something wrong here?"
+                }
+            }
+        },
+        "lpn_status_dismiss": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_wrong_btn",
+                    "value": "यहाँ कुछ गड़बड़ है?",
+                    "english": "Something wrong here?"
+                },
+                "next_translated": {
+                    "key": "lpn_wrong_tip",
+                    "value": "एक बार दबाने पर हमें पता चलता है कि इस पृष्ठ पर कुछ गड़बड़ है। यह इस पृष्ठ का नाम, जिस भाषा में आप इसे पढ़ रहे हैं, और यदि मानचित्र पर कोई संदेश है तो वह भेजता है। यह आपके टाइप किए हुए कुछ भी नहीं, कोई पता नहीं, और आपकी ड्रॉइंग में से कुछ भी नहीं भेजता। कोई जवाब नहीं दे सकता, क्योंकि यह हमें आपके बारे में कुछ नहीं बताता। अधिक कहना हो तो सहायता, कुछ ठीक करें उपयोग करें।",
+                    "english": "Report an error on this page. This opens a box to select the problem, add a comment, and enter an email address if a reply is wanted. All fields are optional, and nothing is sent until you press Send."
+                }
+            }
+        },
+        "lpn_msglog_hidden": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_wrong_btn",
+                    "value": "यहाँ कुछ गड़बड़ है?",
+                    "english": "Something wrong here?"
+                },
+                "next_translated": {
+                    "key": "lpn_wrong_tip",
+                    "value": "एक बार दबाने पर हमें पता चलता है कि इस पृष्ठ पर कुछ गड़बड़ है। यह इस पृष्ठ का नाम, जिस भाषा में आप इसे पढ़ रहे हैं, और यदि मानचित्र पर कोई संदेश है तो वह भेजता है। यह आपके टाइप किए हुए कुछ भी नहीं, कोई पता नहीं, और आपकी ड्रॉइंग में से कुछ भी नहीं भेजता। कोई जवाब नहीं दे सकता, क्योंकि यह हमें आपके बारे में कुछ नहीं बताता। अधिक कहना हो तो सहायता, कुछ ठीक करें उपयोग करें।",
+                    "english": "Report an error on this page. This opens a box to select the problem, add a comment, and enter an email address if a reply is wanted. All fields are optional, and nothing is sent until you press Send."
+                }
+            }
+        },
+        "lpn_msglog_unhide": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_wrong_btn",
+                    "value": "यहाँ कुछ गड़बड़ है?",
+                    "english": "Something wrong here?"
+                },
+                "next_translated": {
+                    "key": "lpn_wrong_tip",
+                    "value": "एक बार दबाने पर हमें पता चलता है कि इस पृष्ठ पर कुछ गड़बड़ है। यह इस पृष्ठ का नाम, जिस भाषा में आप इसे पढ़ रहे हैं, और यदि मानचित्र पर कोई संदेश है तो वह भेजता है। यह आपके टाइप किए हुए कुछ भी नहीं, कोई पता नहीं, और आपकी ड्रॉइंग में से कुछ भी नहीं भेजता। कोई जवाब नहीं दे सकता, क्योंकि यह हमें आपके बारे में कुछ नहीं बताता। अधिक कहना हो तो सहायता, कुछ ठीक करें उपयोग करें।",
+                    "english": "Report an error on this page. This opens a box to select the problem, add a comment, and enter an email address if a reply is wanted. All fields are optional, and nothing is sent until you press Send."
+                }
+            }
+        },
+        "lpn_status_hidden_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_wrong_btn",
+                    "value": "यहाँ कुछ गड़बड़ है?",
+                    "english": "Something wrong here?"
+                },
+                "next_translated": {
+                    "key": "lpn_wrong_tip",
+                    "value": "एक बार दबाने पर हमें पता चलता है कि इस पृष्ठ पर कुछ गड़बड़ है। यह इस पृष्ठ का नाम, जिस भाषा में आप इसे पढ़ रहे हैं, और यदि मानचित्र पर कोई संदेश है तो वह भेजता है। यह आपके टाइप किए हुए कुछ भी नहीं, कोई पता नहीं, और आपकी ड्रॉइंग में से कुछ भी नहीं भेजता। कोई जवाब नहीं दे सकता, क्योंकि यह हमें आपके बारे में कुछ नहीं बताता। अधिक कहना हो तो सहायता, कुछ ठीक करें उपयोग करें।",
+                    "english": "Report an error on this page. This opens a box to select the problem, add a comment, and enter an email address if a reply is wanted. All fields are optional, and nothing is sent until you press Send."
                 }
             }
         },
