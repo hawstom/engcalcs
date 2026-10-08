@@ -43857,7 +43857,7 @@ var EngCalcs = EngCalcs || {};
 		});
 		mn.innerHTML = '';
 		entries.forEach(function (e) {
-			var row;
+			var row, anc, ctx;
 			if (e.menuId !== curMenu) {
 				if (block) { guideTrimRule(block); }
 				curMenu = e.menuId;
@@ -43871,7 +43871,13 @@ var EngCalcs = EngCalcs || {};
 			}
 			if (e.separator) { if (e.depth === 0) { guideRule(block); } return; }
 			row = guideRow(e.row.icon, e.row.label, e.row.tip, e.row.hotkey ? [menuHotkeyText(e.row.hotkey)] : []);
-			if (e.depth) { row.classList.add('lpn-guide-sub'); }
+			if (e.depth) {
+				row.classList.add('lpn-guide-sub');
+				// The ancestors' names, drawn before the name only while a search is active (CSS), so a
+				// hit shows its whole path: Menus > Water > Scenarios > Basic mode.
+				for (anc = e.parent, ctx = []; anc; anc = anc.parent) { ctx.unshift(anc.row.label); }
+				row.querySelector('.lpn-guide-name').setAttribute('data-guide-ctx', ctx.join(' \u203a '));
+			}
 			row.__lpnGuide = { kind: 'menu', e: e };
 			block.appendChild(row);
 		});
@@ -43946,6 +43952,7 @@ var EngCalcs = EngCalcs || {};
 			q = input ? guideFold(String(input.value || '').trim()) : '', any = false;
 		if (!box) { return; }
 		function guideShowEl(el, on) { el.style.display = on ? '' : 'none'; return on; }
+		box.classList.toggle('lpn-guide-filtering', !!q);
 		box.querySelectorAll('.lpn-guide-section').forEach(function (sec) {
 			var hit = false;
 			sec.querySelectorAll('.lpn-guide-rule').forEach(function (r) { guideShowEl(r, !q); });
@@ -44070,7 +44077,7 @@ var EngCalcs = EngCalcs || {};
 			});
 		});
 	}
-	var guideIO = null;
+	var guideIO = null, guidePinKey = null, guidePinTop = 0;
 	function guideSetCurrent(key) {
 		var nav = document.getElementById('lpn_guide_nav'), cur = null;
 		if (!nav) { return; }
@@ -44101,6 +44108,9 @@ var EngCalcs = EngCalcs || {};
 				if (first === null) { first = el.getAttribute('data-guide-key'); }
 				if (el.getBoundingClientRect().top <= top) { key = el.getAttribute('data-guide-key'); }
 			});
+			// A card just clicked holds the highlight until the reader scrolls away from where it was.
+			if (guidePinKey && Math.abs(content.scrollTop - guidePinTop) < 2) { return; }
+			guidePinKey = null;
 			if (key || first) { guideSetCurrent(key || first); }
 		}, { root: content, rootMargin: '0px 0px -70% 0px', threshold: [0, 1] });
 		content.querySelectorAll('[data-guide-key]').forEach(function (el) { guideIO.observe(el); });
@@ -44111,6 +44121,7 @@ var EngCalcs = EngCalcs || {};
 		el = content.querySelector('[data-guide-key="' + String(key).replace(/"/g, '') + '"]');
 		if (!el || el.style.display === 'none') { return false; }
 		content.scrollTop = Math.max(0, el.getBoundingClientRect().top - content.getBoundingClientRect().top + content.scrollTop);
+		guidePinKey = null;
 		guideSetCurrent(key);
 		pulseEl = el.classList.contains('lpn-guide-boxentry') ? el : null;
 		if (pulseEl) { guidePulse(pulseEl); }
@@ -44190,8 +44201,35 @@ var EngCalcs = EngCalcs || {};
 			return x.__lpnRow && x.__lpnRow.label === row.label && x.__lpnRow.icon === row.icon;
 		})[0] || null;
 	}
-	// Opens the menu the entry lives in, and its fly-out, through the menu bar's own button, with
-	// the row focused (a disabled row cannot take focus, so it only pulses). The command is not run.
+	// **ONE RULE FOR EVERY CARD** (Tom, 2026-10-08: *"Things need to have a predictable behavior."*):
+	// a card POINTS. It opens whatever menu holds its control, draws the pointer ring on that control
+	// (lpn-guide-point: a dashed ring in its own colour, which no control uses for pressed, active,
+	// focused or hover), and never moves keyboard focus onto the control and never runs it. A card whose
+	// control cannot be shown says so on the card (lpn_guide_not_shown), so no card does nothing.
+	var guidePointEl = null, GUIDE_POINT_MS = 2500;
+	function guideClearPoint() {
+		if (guidePointEl) { guidePointEl.classList.remove('lpn-guide-point'); clearTimeout(guidePointEl.__lpnPointT); guidePointEl = null; }
+		Array.prototype.forEach.call(document.querySelectorAll('.lpn-guide-nopoint'), function (n) { n.parentNode.removeChild(n); });
+	}
+	function guidePoint(el) {
+		if (!el || !el.classList) { return false; }
+		guideClearPoint();
+		void el.offsetWidth;   // the animation restarts on every click, so every click looks the same
+		el.classList.add('lpn-guide-point');
+		guidePointEl = el;
+		el.__lpnPointT = setTimeout(function () { el.classList.remove('lpn-guide-point'); if (guidePointEl === el) { guidePointEl = null; } }, GUIDE_POINT_MS);
+		return true;
+	}
+	function guideNoPoint(card) {
+		var pc = EngCalcs.pageConfig || {}, n = guideSpan('lpn-guide-nopoint', pc.lpn_guide_not_shown || 'Not on screen right now.'), host;
+		guideClearPoint();
+		if (card.classList.contains('lpn-guide-boxentry')) { host = card.querySelector('h3'); if (host) { host.parentNode.insertBefore(n, host.nextSibling); } return; }
+		host = card.querySelector('.lpn-guide-desc') || card;
+		host.appendChild(n);
+	}
+	// Opens the menu the entry lives in, and its fly-out, through the menu bar's own button, and
+	// points at the row. Focus is not moved onto the row (a focused row looks selected), and the
+	// command is not run.
 	function guideShowMenuEntry(e) {
 		var btn = document.getElementById(e.menuId), pop = document.getElementById('lpn_menu_popup'), opener, target;
 		if (!btn || !btn.getClientRects().length || !pop) { return false; }
@@ -44201,28 +44239,53 @@ var EngCalcs = EngCalcs || {};
 		if (e.depth) {
 			opener = guideMenuRowIn('lpn_menu_list', e.parent.row);
 			if (!opener) { return false; }
-			if (opener.disabled || !opener.__lpnRow.submenu) { opener.focus(); guidePulse(opener); return true; }
+			if (opener.disabled || !opener.__lpnRow.submenu) { return guidePoint(opener); }
 			openMenu(opener, opener.__lpnRow.submenu(), 1);
 			target = guideMenuRowIn('lpn_menu_list2', e.row);
 		} else {
 			target = guideMenuRowIn('lpn_menu_list', e.row);
 		}
-		if (target) {
-			if (!target.disabled) { target.focus(); }
-			guidePulse(target);
-		}
-		return true;
+		if (document.activeElement && pop.contains(document.activeElement)) { document.activeElement.blur(); }
+		return guidePoint(target);
 	}
-	function guideShow(row) {
-		var d = row && row.__lpnGuide, el;
-		if (!d) { return; }
+	// A box's card points at the control that opens the box: the menu row or toolbar button that
+	// carries the box's title as its name (a trailing ellipsis ignored).
+	// Where the menu row is not named like the box (the Reports submenu says "Run", the box "Run report").
+	var GUIDE_BOX_ROW_KEY = {
+		lpn_rptbox: 'lpn_reports_epanet', lpn_full_box: 'lpn_reports_full', lpn_calib_box: 'lpn_reports_calib',
+		lpn_energy_box: 'lpn_energy_menu', lpn_contour_box: 'lpn_contour_menu'
+	};
+	function guideBoxControl(boxId) {
+		var pc = EngCalcs.pageConfig || {}, item = guideBoxList().filter(function (b) { return b.id === boxId; })[0], t, found = null;
+		function norm(x) { return guideFold(String(x || '')).replace(/[\u2026.]+\s*$/, '').replace(/\s+/g, ' ').trim(); }
+		if (!item) { return null; }
+		t = norm(GUIDE_BOX_ROW_KEY[boxId] && pc[GUIDE_BOX_ROW_KEY[boxId]] || item.title);
+		guideToolbarRows().forEach(function (g) {
+			if (!found && g.shown && norm(g.b.name) === t) { found = { kind: 'toolbar', el: g.b.el }; }
+		});
+		if (found && !smallScreen()) { return found; }
+		found = null;
+		guideMenuEntries().forEach(function (e) {
+			if (!found && !e.separator && norm(e.row.label) === t) { found = { kind: 'menu', e: e }; }
+		});
+		return found;
+	}
+	function guideShow(card) {
+		var d = card && card.__lpnGuide, el, ok = false, c, key;
+		if (!d && card && card.classList.contains('lpn-guide-boxentry')) {
+			c = guideBoxControl(String(card.id).replace(/^lpn_guide_b_/, ''));
+			if (c) { d = c.kind === 'toolbar' ? { kind: 'toolbar', g: { b: { el: c.el } } } : { kind: 'menu', e: c.e }; }
+		}
+		if (card) { key = (card.closest && card.closest('[data-guide-key]')); if (key) { guidePinKey = key.getAttribute('data-guide-key'); guidePinTop = guideContentEl().scrollTop; guideSetCurrent(guidePinKey); } }
+		if (!d) { if (card) { guideNoPoint(card); } return; }
 		if (d.kind === 'toolbar') {
 			el = d.g.b.el;
-			if (!smallScreen() && el && el.isConnected && el.getClientRects().length > 0) { guidePulse(el); return; }
-			if (d.g.twin) { guideShowMenuEntry(d.g.twin); }
-			return;
+			if (!smallScreen() && el && el.isConnected && el.getClientRects().length > 0) { ok = guidePoint(el); }
+			else if (d.g.twin) { ok = guideShowMenuEntry(d.g.twin); }
+		} else {
+			ok = guideShowMenuEntry(d.e);
 		}
-		guideShowMenuEntry(d.e);
+		if (!ok) { guideNoPoint(card); }
 	}
 	// ---- `?` opens the guide at the control under the pointer or holding focus ----
 	var guideHoverEl = null;
@@ -44338,8 +44401,12 @@ var EngCalcs = EngCalcs || {};
 		window.addEventListener('resize', guideQueueDimming);
 		if (hotkeysBoxIsOpen()) { renderGuide(); }   // reopened from memory before the menu bar existed
 		box.addEventListener('click', function (e) {
-			var row = e.target && e.target.closest ? e.target.closest('.lpn-guide-row') : null;
+			var row = e.target && e.target.closest ? e.target.closest('.lpn-guide-row, .lpn-guide-boxentry') : null;
 			if (!row) { return; }
+			// A box's card holds prose: a click that ends a text selection, or lands on a link or a
+			// field inside it, is not a request to point.
+			if (row.classList.contains('lpn-guide-boxentry')
+					&& (String(window.getSelection ? window.getSelection() : '') || e.target.closest('a, button, input, select, textarea'))) { return; }
 			// Stopped, so the page's click-away dismissal does not close the menu this opens.
 			e.stopPropagation();
 			guideShow(row);

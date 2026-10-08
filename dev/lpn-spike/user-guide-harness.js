@@ -173,13 +173,13 @@ async function desktop(browser, Session) {
 	await a.settle(150);
 	const pulsed = await page.evaluate(() => {
 		const b = document.querySelector('#lpn_toolbar button[data-tool="add-junction"]');
-		return !!b && b.classList.contains('lpn-guide-pulse');
+		return !!b && b.classList.contains('lpn-guide-point');
 	});
-	ok('a toolbar row pulses the real button', pulsed);
+	ok('a toolbar row rings the real button with the pointer', pulsed);
 	let after = await probe(page);
 	ok('...and the tool is not switched on', after.mode === before.mode, before.mode + ' -> ' + after.mode);
-	await page.waitForTimeout(1700);
-	ok('...and the pulse ends after about 1.5 s', !(await page.evaluate(() => document.querySelector('#lpn_toolbar button[data-tool="add-junction"]').classList.contains('lpn-guide-pulse'))));
+	await page.waitForTimeout(2800);
+	ok('...and the ring fades after about 2.5 s', !(await page.evaluate(() => document.querySelector('#lpn_toolbar button[data-tool="add-junction"]').classList.contains('lpn-guide-point'))));
 	// Delete network: the row whose running would be loudest.
 	await page.evaluate((t) => {
 		const r = Array.from(document.querySelectorAll('#lpn_guide_menus [data-guide-menu="lpn_menu_edit"] .lpn-guide-row')).filter(x => x.querySelector('.lpn-guide-name').textContent === t)[0];
@@ -189,10 +189,11 @@ async function desktop(browser, Session) {
 	const shown = await page.evaluate(() => {
 		const pop = document.getElementById('lpn_menu_popup'), ae = document.activeElement;
 		return { open: pop.style.display === 'block', anchor: document.getElementById('lpn_menu_edit').getAttribute('aria-expanded'),
-			focus: ae && ae.__lpnRow ? ae.__lpnRow.label : null, pulse: !!(ae && ae.classList.contains('lpn-guide-pulse')) };
+			focus: (document.querySelector('#lpn_menu_list .lpn-guide-point') || {}).__lpnRow ? document.querySelector('#lpn_menu_list .lpn-guide-point').__lpnRow.label : null,
+			pulse: !!(ae && ae.closest && ae.closest('#lpn_menu_popup')) };
 	});
 	ok('a menu row opens its menu', shown.open && shown.anchor === 'true', JSON.stringify(shown));
-	ok('...with that row focused and pulsing', shown.focus === L.delnet && shown.pulse, JSON.stringify(shown));
+	ok('...with that row ringed and no menu row focused', shown.focus === L.delnet && !shown.pulse, JSON.stringify(shown));
 	after = await probe(page);
 	ok('...and the network is NOT deleted: the document is unchanged', after.sig === before.sig);
 	ok('...and no undo entry was made', after.undo === before.undo, before.undo + ' -> ' + after.undo);
@@ -206,10 +207,10 @@ async function desktop(browser, Session) {
 	}, L.junction);
 	await a.settle(200);
 	const fly = await page.evaluate(() => {
-		const sub = document.getElementById('lpn_menu_popup2'), ae = document.activeElement;
-		return { open: !!sub && sub.style.display === 'block', inSub: !!(ae && sub.contains(ae)), focus: ae && ae.__lpnRow ? ae.__lpnRow.label : null };
+		const sub = document.getElementById('lpn_menu_popup2'), ae = document.activeElement, t = sub.querySelector('.lpn-guide-point');
+		return { open: !!sub && sub.style.display === 'block', inSub: !!t && !(ae && sub.contains(ae)), focus: t && t.__lpnRow ? t.__lpnRow.label : null };
 	});
-	ok('a fly-out row opens the menu AND its fly-out, at the row', fly.open && fly.inSub && fly.focus === L.junction, JSON.stringify(fly));
+	ok('a fly-out row opens the menu AND its fly-out, ringing the row', fly.open && fly.inSub && fly.focus === L.junction, JSON.stringify(fly));
 	after = await probe(page);
 	ok('...and runs nothing', after.mode === before.mode && after.sig === before.sig && after.undo === before.undo);
 	await page.keyboard.press('Escape');
@@ -420,8 +421,8 @@ async function phone(browser, Session) {
 	}, junction);
 	await a.settle(300);
 	const fly = await page.evaluate(() => {
-		const sub = document.getElementById('lpn_menu_popup2'), ae = document.activeElement;
-		const target = ae && sub.contains(ae) ? ae : null, r = target ? target.getBoundingClientRect() : null;
+		const sub = document.getElementById('lpn_menu_popup2');
+		const target = sub.querySelector('.lpn-guide-point'), r = target ? target.getBoundingClientRect() : null;
 		const top = r ? document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2) : null;
 		return { open: sub.style.display === 'block', focus: target && target.__lpnRow ? target.__lpnRow.label : null,
 			onTop: !!(top && target && (top === target || target.contains(top))) };

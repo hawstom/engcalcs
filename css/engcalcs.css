@@ -17,6 +17,8 @@
 	--ec-border-strong: #ccc;
 	/* Accent: links, outlined buttons, menu bar */
 	--ec-accent: #0645ad;
+	/* The Guide's pointer ring: the one colour no control uses for pressed, active, focused or hover. */
+	--ec-point: #c2185b;
 	--ec-accent-hover: #1f58b5;
 	--ec-accent-open: #05378a;
 	--ec-accent-hover-bg: #eaf1fc;
@@ -4597,6 +4599,24 @@ html[dir="rtl"] .lpn-guide-chev { transform: scaleX(-1); }
 }
 .lpn-guide-pulse { animation: lpn-guide-pulse 1.5s ease-in-out 1; outline: 2px solid var(--ec-accent); outline-offset: 1px; }
 @media (prefers-reduced-motion: reduce) { .lpn-guide-pulse { animation: none; } }
+/* THE POINTER: what every Guide card does. A dashed ring in --ec-point round the control the card
+   describes, pulsing and then fading out (~2.5 s, GUIDE_POINT_MS). Not a fill and not the accent
+   outline, so it cannot be read as the control's own pressed, active, focused or hover state. */
+@keyframes lpn-guide-point {
+	0% { outline-color: var(--ec-point); outline-offset: 5px; }
+	20% { outline-color: var(--ec-point); outline-offset: 2px; }
+	40% { outline-color: var(--ec-point); outline-offset: 5px; }
+	60% { outline-color: var(--ec-point); outline-offset: 2px; }
+	100% { outline-color: transparent; outline-offset: 2px; }
+}
+.lpn-guide-point { outline: 3px dashed var(--ec-point); outline-offset: 2px; animation: lpn-guide-point 2.5s ease-in-out 1 forwards; }
+@media (prefers-reduced-motion: reduce) { .lpn-guide-point { animation: none; } }
+/* A card whose control is not on screen says so on the card. */
+.lpn-guide-nopoint { display: block; color: var(--ec-point); font-style: italic; }
+.lpn-guide-boxentry { cursor: pointer; }
+.lpn-guide-boxentry a, .lpn-guide-boxentry table, .lpn-guide-boxentry input { cursor: auto; }
+/* While a search is active a nested row shows its ancestors before its name, so a hit reads as a path. */
+.lpn-guide-filtering .lpn-guide-name[data-guide-ctx]::before { content: attr(data-guide-ctx) " \203A "; font-weight: normal; color: var(--ec-ink-muted); }
 /* ---- THE FIRE FLOW BOX (ROADMAP Task 530) -----------------------------------------------------
    It borrows .lpn-setbox's whole shell -- moveable by its chrome, resizeable by `resize: both` and
    by the touch grabber, capped to the viewport, body scrolling inside itself. Only the width is its
