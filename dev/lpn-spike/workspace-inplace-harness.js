@@ -242,6 +242,35 @@ async function main() {
 		ok('equal to a reload', d3.length === 0, d3.slice(0, 8).join(' ; '));
 		ok('no uncaught page errors (3)', dst.errors.length === 0, dst.errors.slice(0, 2).join(' | '));
 		await dst.close();
+
+		console.log('\n--- 4. boxes with NO stored position are placed against the map as a reload sees it ---');
+		const NULLS = { left: null, top: null, w: null, h: null, open: true };
+		const nullFile = JSON.stringify({ format: 'engcalcs-lpn-workspace', version: 1, settings: {
+			lpn_setbox: JSON.stringify(NULLS), lpn_libbox: JSON.stringify(NULLS),
+			lpn_contourbox: JSON.stringify(Object.assign({ userSized: false }, NULLS)) } });
+		const d4 = await openNet3(browser, NAME + '-null');
+		await boot(d4, {
+			lpn_energybox: { left: null, top: null, w: null, h: null, open: true, dock: 'right', dockW: 420, dockOrd: 0 },
+			lpn_reportbox: { left: null, top: null, w: null, h: null, open: true, dock: 'right', dockW: 420, dockOrd: 1 },
+			lpn_setbox: { left: 120, top: 120, w: 400, h: 350, open: true },
+			lpn_libbox: { left: 200, top: 160, w: 400, h: 350, open: true }
+		});
+		await d4.page.evaluate(() => { window.__marker = 'same page'; });
+		const pre4 = await layoutSnapshot(d4, false);
+		ok('before: a right dock squeezes the map', pre4.margins && parseInt(pre4.margins[1], 10) > 0, JSON.stringify(pre4.margins));
+		const dlg4 = await importFile(d4, nullFile, 'null.json');
+		ok('the null-position file is accepted', !!dlg4 && /Workspace applied/.test(dlg4.text), dlg4 && dlg4.text);
+		await d4.dialogClick('OK');
+		await d4.settle(1500);
+		ok('no reload', await d4.page.evaluate(() => window.__marker === 'same page'));
+		const inPlace4 = await layoutSnapshot(d4, false);
+		await d4.reload();
+		await quiet(d4);
+		await d4.settle(2200);
+		const dd4 = diff(inPlace4, await layoutSnapshot(d4, false));
+		ok('Settings, Library, Contour, the margins and the map equal a reload', dd4.length === 0, dd4.slice(0, 8).join(' ; '));
+		ok('no uncaught page errors (4)', d4.errors.length === 0, d4.errors.slice(0, 2).join(' | '));
+		await d4.close();
 	} finally {
 		await browser.close();
 		env.stopServer();

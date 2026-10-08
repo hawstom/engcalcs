@@ -42308,6 +42308,10 @@ var EngCalcs = EngCalcs || {};
 			d.open = false;
 			d.byDefault = false;
 		});
+		// **THE MAP TAKES ITS WIDTH BACK BEFORE ANY BOX IS PLACED**: the closers only queue the
+		// layout, and a box with no stored position is placed from the map's edges as they are now.
+		// Placed against the old dock columns it lands where no reload would put it.
+		layoutDocks();
 		findUserPos = null;
 		findUserSize = null;
 		findUserOpen = false;
@@ -42363,6 +42367,11 @@ var EngCalcs = EngCalcs || {};
 		}
 		dockBoxes.forEach(renderDockCorner);
 		layoutDocks();
+		// A page that never docked anything has no margin properties at all.
+		if (!dockMargins.left && !dockMargins.right && dockMapWrap()) {
+			dockMapWrap().style.removeProperty('--lpn-dock-ml');
+			dockMapWrap().style.removeProperty('--lpn-dock-mr');
+		}
 	}
 	EngCalcs.lpnWorkspacePlan = workspacePlan;
 	EngCalcs.lpnWorkspaceCarries = workspaceCarries;
