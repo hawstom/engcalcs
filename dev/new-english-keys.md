@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**0 still to read on master**, of 0 untranslated keys, of 2444 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**12 still to read on master**, of 12 untranslated keys, of 2456 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -222,13 +222,50 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   @@ NEEDS RULING
 
-None on master. Every English key here is present in at least one other language.
+## lpn_  (12, 12 to read @@ NEEDS RULING)
+
+- **`lpn_export_table_all`**
+  > All
+  @@ NEEDS RULING
+- **`lpn_export_table_current`**
+  > Current
+  @@ NEEDS RULING
+- **`lpn_export_table_go`**
+  > Export
+  @@ NEEDS RULING
+- **`lpn_export_table_scn_note`**
+  > Results are exported only for the scenario last calculated.
+  @@ NEEDS RULING
+- **`lpn_export_table_title`**
+  > Export to {format}
+  @@ NEEDS RULING
+- **`lpn_file_export_csv_tip`**
+  > Download a table as the Tables pane shows it. Several tables come as one zip file of CSV files, with a file for each library their IDs refer to.
+  @@ NEEDS RULING
+- **`lpn_file_export_item_csv`**
+  > CSV file…
+  @@ NEEDS RULING
+- **`lpn_file_export_item_ods`**
+  > ODS file…
+  @@ NEEDS RULING
+- **`lpn_file_export_item_xlsx`**
+  > XLSX file…
+  @@ NEEDS RULING
+- **`lpn_file_export_tables_heading`**
+  > Tables and libraries
+  @@ NEEDS RULING
+- **`lpn_file_export_tables_tip`**
+  > Download the tables as the Tables pane shows them, one sheet each, with a sheet for each library their IDs refer to: patterns, curves, pipe types, and fittings.
+  @@ NEEDS RULING
+- **`lpn_pane_copy_heads`**
+  > Copy with headings
+  @@ NEEDS RULING
 
 ---
 
 # Strings waiting on a branch
 
-**146 still to read**, of 149 new keys across 18 unmerged branch(es).
+**134 still to read**, of 137 new keys across 16 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -239,11 +276,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/protect-1008 (`8ed272a8`) — adds no English strings
-
-### chore/sprint-1008 (`c385f6f0`) — adds no English strings
-
-### feat/bentley-interop (`a053c602`) — 63 new, 63 to read @@ NEEDS RULING
+### feat/bentley-interop (`661acc46`) — 63 new, 63 to read @@ NEEDS RULING
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -476,7 +509,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > DXF file…
   @@ NEEDS RULING
 
-### feat/hover-label (`f8393134`) — 2 new, 2 to read @@ NEEDS RULING
+### feat/hover-label (`944f963d`) — 2 new, 2 to read @@ NEEDS RULING
 
 - **`lpn_settings_hover_card`**
   > Show the full label on hover
@@ -507,7 +540,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`2e5e81c4`) — adds no English strings
 
-### feat/message-dismiss (`bfa6517b`) — 5 new, 5 to read @@ NEEDS RULING
+### feat/message-dismiss (`d4c88b12`) — 5 new, 5 to read @@ NEEDS RULING
 
 - **`lpn_hotkeys_zoomwin_def`**
   > Zoom Window: drag a rectangle to zoom to.
@@ -531,46 +564,9 @@ build for that would be a gate nobody keeps. Refresh it with
   > Points data<br />(use Copy to see format)
   @@ NEEDS RULING
 
-### feat/table-export (`6988ecf1`) — 12 new, 12 to read @@ NEEDS RULING
+### feat/table-export (`6988ecf1`) — adds no English strings
 
-- **`lpn_export_table_all`**
-  > All
-  @@ NEEDS RULING
-- **`lpn_export_table_current`**
-  > Current
-  @@ NEEDS RULING
-- **`lpn_export_table_go`**
-  > Export
-  @@ NEEDS RULING
-- **`lpn_export_table_scn_note`**
-  > Results are exported only for the scenario last calculated.
-  @@ NEEDS RULING
-- **`lpn_export_table_title`**
-  > Export to {format}
-  @@ NEEDS RULING
-- **`lpn_file_export_csv_tip`**
-  > Download a table as the Tables pane shows it. Several tables come as one zip file of CSV files, with a file for each library their IDs refer to.
-  @@ NEEDS RULING
-- **`lpn_file_export_item_csv`**
-  > CSV file…
-  @@ NEEDS RULING
-- **`lpn_file_export_item_ods`**
-  > ODS file…
-  @@ NEEDS RULING
-- **`lpn_file_export_item_xlsx`**
-  > XLSX file…
-  @@ NEEDS RULING
-- **`lpn_file_export_tables_heading`**
-  > Tables and libraries
-  @@ NEEDS RULING
-- **`lpn_file_export_tables_tip`**
-  > Download the tables as the Tables pane shows them, one sheet each, with a sheet for each library their IDs refer to: patterns, curves, pipe types, and fittings.
-  @@ NEEDS RULING
-- **`lpn_pane_copy_heads`**
-  > Copy with headings
-  @@ NEEDS RULING
-
-### feat/user-guide (`cbaf2032`) — 39 new, 39 to read @@ NEEDS RULING
+### feat/user-guide (`a6661944`) — 39 new, 39 to read @@ NEEDS RULING
 
 - **`lpn_guide_also`**
   > Also in {menu}
@@ -690,9 +686,9 @@ build for that would be a gate nobody keeps. Refresh it with
   > Guide
   @@ NEEDS RULING
 
-### feat/visit-dedupe (`22e3c4ca`) — adds no English strings
+### feat/visit-dedupe (`b4a99e9a`) — adds no English strings
 
-### feat/workspace (`7eb9e349`) — 12 new, 12 to read @@ NEEDS RULING
+### feat/workspace (`60879c22`) — 12 new, 12 to read @@ NEEDS RULING
 
 - **`lpn_file_export_item_workspace`**
   > Workspace…

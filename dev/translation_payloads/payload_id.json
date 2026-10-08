@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "id",
-        "expected_key_count": 2444,
-        "delta_key_count": 1,
+        "expected_key_count": 2456,
+        "delta_key_count": 13,
         "exempt_key_count": 51,
         "exempt_keys": [
             "u_imgd",
@@ -730,12 +730,228 @@
         ]
     },
     "keys_to_translate": {
+        "lpn_pane_copy_heads": "Copy with headings",
+        "lpn_export_table_title": "Export to {format}",
+        "lpn_export_table_current": "Current",
+        "lpn_export_table_all": "All",
+        "lpn_export_table_go": "Export",
+        "lpn_export_table_scn_note": "Results are exported only for the scenario last calculated.",
+        "lpn_file_export_tables_heading": "Tables and libraries",
+        "lpn_file_export_item_ods": "ODS file…",
+        "lpn_file_export_item_xlsx": "XLSX file…",
+        "lpn_file_export_item_csv": "CSV file…",
+        "lpn_file_export_tables_tip": "Download the tables as the Tables pane shows them, one sheet each, with a sheet for each library their IDs refer to: patterns, curves, pipe types, and fittings.",
+        "lpn_file_export_csv_tip": "Download a table as the Tables pane shows it. Several tables come as one zip file of CSV files, with a file for each library their IDs refer to.",
         "lpn_time_stat_minimum": "Min"
     },
     "keys": {
+        "lpn_pane_copy_heads": "Copy with headings",
+        "lpn_export_table_title": "Export to {format}",
+        "lpn_export_table_current": "Current",
+        "lpn_export_table_all": "All",
+        "lpn_export_table_go": "Export",
+        "lpn_export_table_scn_note": "Results are exported only for the scenario last calculated.",
+        "lpn_file_export_tables_heading": "Tables and libraries",
+        "lpn_file_export_item_ods": "ODS file…",
+        "lpn_file_export_item_xlsx": "XLSX file…",
+        "lpn_file_export_item_csv": "CSV file…",
+        "lpn_file_export_tables_tip": "Download the tables as the Tables pane shows them, one sheet each, with a sheet for each library their IDs refer to: patterns, curves, pipe types, and fittings.",
+        "lpn_file_export_csv_tip": "Download a table as the Tables pane shows it. Several tables come as one zip file of CSV files, with a file for each library their IDs refer to.",
         "lpn_time_stat_minimum": "Min"
     },
     "key_context": {
+        "lpn_pane_copy_heads": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_print",
+                    "value": "Cetak tabel",
+                    "english": "Print table"
+                },
+                "next_translated": {
+                    "key": "lpn_menu_project",
+                    "value": "Air",
+                    "english": "Water"
+                }
+            }
+        },
+        "lpn_export_table_title": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_print",
+                    "value": "Cetak tabel",
+                    "english": "Print table"
+                },
+                "next_translated": {
+                    "key": "lpn_menu_project",
+                    "value": "Air",
+                    "english": "Water"
+                }
+            }
+        },
+        "lpn_export_table_current": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_print",
+                    "value": "Cetak tabel",
+                    "english": "Print table"
+                },
+                "next_translated": {
+                    "key": "lpn_menu_project",
+                    "value": "Air",
+                    "english": "Water"
+                }
+            }
+        },
+        "lpn_export_table_all": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_print",
+                    "value": "Cetak tabel",
+                    "english": "Print table"
+                },
+                "next_translated": {
+                    "key": "lpn_menu_project",
+                    "value": "Air",
+                    "english": "Water"
+                }
+            }
+        },
+        "lpn_export_table_go": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_print",
+                    "value": "Cetak tabel",
+                    "english": "Print table"
+                },
+                "next_translated": {
+                    "key": "lpn_menu_project",
+                    "value": "Air",
+                    "english": "Water"
+                }
+            }
+        },
+        "lpn_export_table_scn_note": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_print",
+                    "value": "Cetak tabel",
+                    "english": "Print table"
+                },
+                "next_translated": {
+                    "key": "lpn_menu_project",
+                    "value": "Air",
+                    "english": "Water"
+                }
+            }
+        },
+        "lpn_file_export_tables_heading": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_export_item_geojson",
+                    "value": "Berkas GeoJSON…",
+                    "english": "GeoJSON file…"
+                },
+                "next_translated": {
+                    "key": "lpn_file_export_inp_tip",
+                    "value": "Unduh jaringan ini sebagai berkas EPANET .inp (dalam berkas zip bersama gambarnya bila ada). Apa pun yang tidak dapat ditampung format .inp didaftarkan setelahnya.",
+                    "english": "Download this network as an EPANET .inp file (in a zip file with its image if applicable). Anything the .inp format cannot hold is listed for you afterwards."
+                }
+            }
+        },
+        "lpn_file_export_item_ods": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_export_item_geojson",
+                    "value": "Berkas GeoJSON…",
+                    "english": "GeoJSON file…"
+                },
+                "next_translated": {
+                    "key": "lpn_file_export_inp_tip",
+                    "value": "Unduh jaringan ini sebagai berkas EPANET .inp (dalam berkas zip bersama gambarnya bila ada). Apa pun yang tidak dapat ditampung format .inp didaftarkan setelahnya.",
+                    "english": "Download this network as an EPANET .inp file (in a zip file with its image if applicable). Anything the .inp format cannot hold is listed for you afterwards."
+                }
+            }
+        },
+        "lpn_file_export_item_xlsx": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_export_item_geojson",
+                    "value": "Berkas GeoJSON…",
+                    "english": "GeoJSON file…"
+                },
+                "next_translated": {
+                    "key": "lpn_file_export_inp_tip",
+                    "value": "Unduh jaringan ini sebagai berkas EPANET .inp (dalam berkas zip bersama gambarnya bila ada). Apa pun yang tidak dapat ditampung format .inp didaftarkan setelahnya.",
+                    "english": "Download this network as an EPANET .inp file (in a zip file with its image if applicable). Anything the .inp format cannot hold is listed for you afterwards."
+                }
+            }
+        },
+        "lpn_file_export_item_csv": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_export_item_geojson",
+                    "value": "Berkas GeoJSON…",
+                    "english": "GeoJSON file…"
+                },
+                "next_translated": {
+                    "key": "lpn_file_export_inp_tip",
+                    "value": "Unduh jaringan ini sebagai berkas EPANET .inp (dalam berkas zip bersama gambarnya bila ada). Apa pun yang tidak dapat ditampung format .inp didaftarkan setelahnya.",
+                    "english": "Download this network as an EPANET .inp file (in a zip file with its image if applicable). Anything the .inp format cannot hold is listed for you afterwards."
+                }
+            }
+        },
+        "lpn_file_export_tables_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_export_item_geojson",
+                    "value": "Berkas GeoJSON…",
+                    "english": "GeoJSON file…"
+                },
+                "next_translated": {
+                    "key": "lpn_file_export_inp_tip",
+                    "value": "Unduh jaringan ini sebagai berkas EPANET .inp (dalam berkas zip bersama gambarnya bila ada). Apa pun yang tidak dapat ditampung format .inp didaftarkan setelahnya.",
+                    "english": "Download this network as an EPANET .inp file (in a zip file with its image if applicable). Anything the .inp format cannot hold is listed for you afterwards."
+                }
+            }
+        },
+        "lpn_file_export_csv_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_export_item_geojson",
+                    "value": "Berkas GeoJSON…",
+                    "english": "GeoJSON file…"
+                },
+                "next_translated": {
+                    "key": "lpn_file_export_inp_tip",
+                    "value": "Unduh jaringan ini sebagai berkas EPANET .inp (dalam berkas zip bersama gambarnya bila ada). Apa pun yang tidak dapat ditampung format .inp didaftarkan setelahnya.",
+                    "english": "Download this network as an EPANET .inp file (in a zip file with its image if applicable). Anything the .inp format cannot hold is listed for you afterwards."
+                }
+            }
+        },
         "lpn_time_stat_minimum": {
             "reason": "equal_to_english",
             "current_value": "Min",
