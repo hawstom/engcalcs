@@ -4030,22 +4030,31 @@ label > .lpn-valwarn { margin-inline-start: .3em; }
 	color: var(--ec-ink-muted);
 	cursor: pointer;
 }
+/* THE HIDE x ON A STANDING MESSAGE (Tom, 2026-10-08: "I can't find how to hide a message. There was a
+   little x before."). It was 18x15 px in the muted ink of the amber box's own fine print, so it read as
+   punctuation. It now has the weight of the page's other close x (.lpn-popover-x: --ec-ink, a square
+   target, a grey fill on hover and focus), scaled to sit in a line of 11 px text without growing the box. */
 .lpn-status-x {
 	pointer-events: auto;
-	background: none;
-	border: 1px solid transparent;
+	background: transparent;
+	border: 0;
 	border-radius: 3px;
-	padding: 0 4px;
-	margin-left: 2px;
+	padding: 0;
+	margin-inline-start: 4px;
+	margin-block: -1px;
+	width: 20px;
+	height: 20px;
+	vertical-align: middle;
 	font: inherit;
-	font-size: 11px;
-	color: var(--ec-ink-muted);
+	font-size: 20px;
+	line-height: 1;
+	color: var(--ec-ink);
 	cursor: pointer;
+	position: relative;
 }
-.lpn-status-x { font-size: 13px; line-height: 1; position: relative; }
 /* A finger needs about 32 px: widen the hit area without moving the text or the neighbouring button. */
 @media (pointer: coarse) { .lpn-status-x::after { content: ""; position: absolute; top: -9px; bottom: -9px; left: -8px; right: -8px; } }
-.lpn-status-x:hover, .lpn-status-x:focus { border-color: var(--ec-gray-bbb); color: var(--ec-ink-strong); }
+.lpn-status-x:hover, .lpn-status-x:focus { background: var(--ec-gray-eee); color: var(--ec-ink-black); }
 .lpn-wrong-btn:hover, .lpn-wrong-btn:focus { border-color: var(--ec-gray-bbb); color: var(--ec-ink-strong); }
 /* Once tapped it is no longer a control, and it must not keep looking like one: the label is the
    thank-you, so a hover border on it would invite a second press that posts nothing. */
