@@ -9490,6 +9490,7 @@ var EngCalcs = EngCalcs || {};
 	var contourboxLayout = newBoxLayout();
 	contourboxLayout.userSized = false;
 	function saveContourboxLayout() {
+		if (boxSaveHeld()) { return; }
 		try { localStorage.setItem(LPN_CONTOURBOX_KEY, JSON.stringify(contourboxLayout)); } catch (e) {}
 	}
 	function wireContourBox() {
@@ -21731,6 +21732,7 @@ var EngCalcs = EngCalcs || {};
 		if (findDockRec.autohide) { v.autohide = true; }
 		if (findDockRec.dockW) { v.dockW = findDockRec.dockW; }
 		if (findDockRec.dockOrd !== undefined) { v.dockOrd = findDockRec.dockOrd; }
+		if (boxSaveHeld()) { return; }
 		try { localStorage.setItem(LPN_FINDBOX_KEY, JSON.stringify(v)); } catch (e) {}
 	}
 	function loadFindLayout() {
@@ -22097,6 +22099,7 @@ var EngCalcs = EngCalcs || {};
 	}
 	function activePaneTab() { return paneTabById(paneState.tab) || paneTabs[0]; }
 	function savePaneState() {
+		if (furnitureFrozen) { return; }
 		try { localStorage.setItem(LPN_PANE_KEY, JSON.stringify(paneState)); } catch (e) {}
 	}
 	function loadPaneState() {
@@ -22380,6 +22383,7 @@ var EngCalcs = EngCalcs || {};
 	function rpaneEl() { return document.getElementById('lpn_rpane'); }
 	function rpaneIsOpen() { return !!rpaneState.open; }
 	function saveRPaneState() {
+		if (furnitureFrozen) { return; }
 		try { localStorage.setItem(LPN_RPANE_KEY, JSON.stringify(rpaneState)); } catch (e) {}
 	}
 	function loadRPaneState() {
@@ -24567,18 +24571,20 @@ var EngCalcs = EngCalcs || {};
 	// the front. A new column therefore shows up, which is the failure that matters; where it shows
 	// up is then one drag away.
 	var LPN_PANECOLS_KEY = 'lpn_panecols';
-	var paneColPrefs = (function () {
+	function readPaneColPrefs() {
 		var raw = null, v;
 		try { raw = localStorage.getItem(LPN_PANECOLS_KEY); } catch (e) { return {}; }
 		if (!raw) { return {}; }
 		try { v = JSON.parse(raw); } catch (e) { return {}; }
 		return (v && typeof v === 'object') ? v : {};
-	}());
+	}
+	var paneColPrefs = readPaneColPrefs();
 	function paneColPrefFor(specId) {
 		if (!paneColPrefs[specId]) { paneColPrefs[specId] = {}; }
 		return paneColPrefs[specId];
 	}
 	function savePaneColPrefs() {
+		if (furnitureFrozen) { return; }
 		try { localStorage.setItem(LPN_PANECOLS_KEY, JSON.stringify(paneColPrefs)); } catch (e) {}
 	}
 	// The width a column is drawn at: what the reader dragged it to, else the rule-based initial
@@ -26934,8 +26940,18 @@ var EngCalcs = EngCalcs || {};
 	 * on screen. Excel makes you ask for that with Alt+semicolon and silently includes hidden rows
 	 * if you forget; here it is true by construction.
 	 */
-	function paneCopyTsv(spec, rows, cols, box) {
+	function paneCopyTsv(spec, rows, cols, box, withHeads) {
 		var out = [], r, c, line;
+		// **HEADINGS ONLY WHEN ASKED FOR, BY NAME** (Tom, 2026-10-06: *"it would be nice
+		// to be able to copy the headings somehow"*). Ctrl+C and Copy stay as R-310 left them, so a
+		// range copied and pasted back lands on values, never on a heading row; "Copy with
+		// headings" on the right-click menu is the one door, and the heading is the one the table
+		// shows, unit included.
+		if (withHeads) {
+			line = [];
+			for (c = box.c0; c <= box.c1; c++) { line.push(paneHeadingText(cols[c])); }
+			out.push(line.join('\t'));
+		}
 		for (r = box.r0; r <= box.r1; r++) {
 			line = [];
 			for (c = box.c0; c <= box.c1; c++) { line.push(paneCellText(cols[c], rows[r])); }
@@ -28819,6 +28835,9 @@ var EngCalcs = EngCalcs || {};
 		mk(pc.points_data_copy || 'Copy', function () {
 			libCopyOut(paneCopyTsv(spec, rows, cols, box));
 		}, 'Ctrl+C');
+		mk(pc.lpn_pane_copy_heads || 'Copy with headings', function () {
+			libCopyOut(paneCopyTsv(spec, rows, cols, box, true));
+		});
 		mk(pc.points_data_paste || 'Paste', function () {
 			// A synthetic 'paste' event cannot be raised, so this is the one place the page reads
 			// the clipboard directly -- and the one place it can be denied permission to. Silence
@@ -28883,6 +28902,11 @@ var EngCalcs = EngCalcs || {};
 		}
 		// **PRINT TABLE, THE ONLY DOOR TO IT** (Tom, 2026-10-04: the button left the pane head).
 		mk(pc.lpn_pane_print || 'Print table', function () { printPaneTable(spec); });
+		// **EXPORT THE TABLE, NEXT TO PRINT IT** (Tom, 2026-10-06). The whole table as it is shown: its
+		// visible columns, its sort, its filter. One file per click.
+		['csv', 'ods', 'xlsx'].forEach(function (kind) {
+			mk((pc.lpn_export_table_title || 'Export to {format}').replace('{format}', kind.toUpperCase()), function () { paneExportTable(spec, kind); });
+		});
 		// **FILL DOWN, ON THE SAME MENU, FOR THE SAME RANGE.** Offered only when the selection
 		// spans more than one row -- a single row has nothing below it to fill, and an item that
 		// does nothing when clicked is worse than an absent one.
@@ -29360,6 +29384,11 @@ var EngCalcs = EngCalcs || {};
 	function paneSanitizeFileName(s) {
 		return String(s || '').replace(/[\\/:*?"<>|]/g, '_').replace(/\s+/g, ' ').replace(/^\s+|\s+$/g, '');
 	}
+	// A name for a file, a zip entry or a sheet: no spaces (Tom, 2026-10-07). A spaced hyphen becomes
+	// a bare one and any other run of white space one underscore.
+	function paneNoSpace(s) {
+		return String(s || '').replace(/\s+-\s+/g, '-').replace(/\s+/g, '_');
+	}
 	function paneEndPrint() {
 		if (document.body) { document.body.classList.remove('lpn-printing-table'); }
 		if (panePrintArea && panePrintArea.parentNode) {
@@ -29393,6 +29422,264 @@ var EngCalcs = EngCalcs || {};
 		return paneTableById(paneState.tab);
 	}
 
+	// **THE TABLE AS A FILE** (Tom, 2026-10-06). Cells read through paneCellDisplayText(), the same reader
+	// the printed sheet uses, so a file says what the screen says -- a choice column its label, a
+	// result its two decimals. A column is numeric to a spreadsheet only when it is a number column
+	// (no text, choice or yes/no flag) and not the ID.
+	function paneColIsNumeric(c) {
+		return c.key !== 'id' && !c.refTo && !c.str && !c.choices && !c.bool && !c.plainWord;
+	}
+	function paneTableLabel(spec) {
+		var pc = EngCalcs.pageConfig || {};
+		return paneSanitizeFileName(pc[spec.label] || spec.id);
+	}
+	function paneProjectPrefix() {
+		var proj = paneSanitizeFileName((typeof project === 'object' && project && project.name) || '');
+		return proj ? paneNoSpace(proj) + '-' : '';
+	}
+	// One table as the three arrays a file writer takes. With `scn` the table is read as Show scenarios
+	// reads it -- its scenario-wrapped columns, so a result that belongs to a scenario that is not the
+	// one solved stays blank -- and cut down to that scenario's rows, without the Scenario column.
+	// The spec's own view state is put back, so exporting is invisible on screen.
+	function paneSheetData(spec, scn) {
+		var save = { scnRows: spec.scnRows, scnSet: spec.scnSet, sort: spec.sort, orderIds: spec.orderIds, lastOrderIds: spec.lastOrderIds },
+			cols, rows, out;
+		try {
+			if (scn) {
+				spec.scnRows = true;
+				if (!save.scnRows) { spec.sort = { col: 'id', dir: 1 }; }
+				spec.orderIds = null;
+				spec.lastOrderIds = null;
+			}
+			cols = paneCols(spec);
+			rows = paneTableRowsInOrder(spec);
+			if (scn) {
+				cols = cols.filter(function (c) { return c.key !== 'scn_name'; });
+				rows = rows.filter(function (r) { return r._lpnScn && r._lpnScn.scn.id === scn.id; });
+			}
+			out = {
+				heads: cols.map(paneHeadingText),
+				cells: rows.map(function (el) { return cols.map(function (c) { return paneCellDisplayText(c, el, true); }); }),
+				numeric: cols.map(paneColIsNumeric)
+			};
+		} finally {
+			spec.scnRows = save.scnRows; spec.scnSet = save.scnSet; spec.sort = save.sort;
+			spec.orderIds = save.orderIds; spec.lastOrderIds = save.lastOrderIds;
+		}
+		return out;
+	}
+	var PANE_EXPORT_MIME = {
+		csv: 'text/csv;charset=utf-8',
+		ods: 'application/vnd.oasis.opendocument.spreadsheet',
+		xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+		zip: 'application/zip'
+	};
+	function paneExportTable(spec, kind) {
+		var pc = EngCalcs.pageConfig || {}, d = paneSheetData(spec), table = paneTableLabel(spec),
+			name = paneProjectPrefix() + paneNoSpace(table) + '.' + kind, data;
+		if (!EngCalcs.lpnTableCsv) { return; }
+		data = kind === 'csv' ? EngCalcs.lpnTableCsv(d.heads, d.cells) : kind === 'xlsx'
+			? EngCalcs.lpnTableXlsx(d.heads, d.cells, table, d.numeric)
+			: EngCalcs.lpnTableOds(d.heads, d.cells, table, d.numeric);
+		downloadTextFile(name, data, PANE_EXPORT_MIME[kind]);
+		setNotice((pc.lpn_status_inp_exported || 'Exported {file}.').replace('{file}', name));
+	}
+	// **FILE > EXPORT > TABLE** (Tom, 2026-10-07: *"CSV possibly with a followup box to ask Tables and
+	// Scenarios, current or all to zip, ODS etc with same questions."*). Format, which tables, which
+	// scenarios. Several CSV files go into one zip; several ODS or XLSX tables become one workbook
+	// with a sheet apiece, named for the table and, when scenarios are in play, the scenario.
+	// Scenarios are offered only when the project has one besides Base. A table with no rows is left
+	// out of "all". Scenario results exist only for the scenario solved (the rule Show scenarios
+	// follows), so the others' result columns are blank.
+	function paneExportItems(allTables, allScenarios) {
+		var cur = activePaneTableSpec(), specs, scns, items = [], withScn = scenarios.length > 1;
+		specs = allTables ? paneTables() : (cur ? [cur] : []);
+		scns = (withScn && allScenarios) ? scenariosForDisplay() : [activeScenario()];
+		specs.forEach(function (spec) {
+			var use = (withScn && paneScnAvailable(spec)) ? scns : [null];
+			use.forEach(function (scn) {
+				var d = paneSheetData(spec, scn);
+				if (allTables && !d.cells.length) { return; }
+				items.push({ table: paneTableLabel(spec), scn: scn ? scenarioDisplayName(scn) : '', data: d });
+			});
+		});
+		return items;
+	}
+	// **THE LIBRARIES GO WITH THE TABLES** (Tom, 2026-10-07: *"And we include Libraries so that we
+	// can include Curve, Pattern, etc references."*). A pump's Curve column or a junction's Pattern
+	// column holds an ID, and an ID is worth something in a spreadsheet only when the thing it names
+	// is in the same workbook. One sheet per library that has any entry, ID first so the frozen
+	// column and a lookup both key on it, the numbers as the Library box holds them (what the user
+	// typed, in the project's units, which the headings name). Controls and rules are left out: they
+	// refer to assets, not the other way round.
+	//   Patterns: one row a pattern, its multipliers across, headed by period number 1, 2, 3...
+	//   Curves: one sheet per curve type present, one row a point, headed as the Library heads it.
+	//   Pipe types: one row a type, one column a property it may state; blank where it states none.
+	//   Fittings: one row a fitting of a list, so a list's coefficients can be summed in place.
+	function libraryExportSheets() {
+		var pc = EngCalcs.pageConfig || {}, out = [], idH = pc.lpn_field_id || 'ID',
+			descH = pc.lpn_library_curve_note_label || 'Description', libName = pc.lpn_library_curves || 'Curves';
+		function txt(v) { return v === undefined || v === null ? '' : String(v); }
+		var pats = libPatternsRead().filter(function (p) { return p && p.id !== undefined && p.id !== null && p.id !== ''; });
+		if (pats.length) {
+			var n = 0, heads = [idH], numeric = [false], k;
+			pats.forEach(function (p) { n = Math.max(n, (p.multipliers || []).length); });
+			for (k = 1; k <= n; k++) { heads.push(String(k)); numeric.push(true); }
+			out.push({ name: pc.lpn_library_patterns || 'Patterns', heads: heads, numeric: numeric,
+				rows: pats.map(function (p) { return [txt(p.id)].concat((p.multipliers || []).map(txt)); }) });
+		}
+		var curves = libCurvesRead(), kinds = CURVE_KINDS.map(function (o) { return o[0]; });
+		curves.forEach(function (c) { if (kinds.indexOf(c.kind) < 0) { kinds.push(c.kind); } });
+		kinds.forEach(function (kind) {
+			var mine = curves.filter(function (c) { return c.kind === kind; }), ax, rows = [], label;
+			if (!mine.length) { return; }
+			ax = curveAxisLabels(kind);
+			label = CURVE_KINDS.filter(function (o) { return o[0] === kind; })[0];
+			label = label ? (pc[label[1]] || label[2]) : (pc.lpn_curve_kind_generic || 'Kind not stated');
+			mine.forEach(function (c) {
+				var pts = c.points || [];
+				if (!pts.length) { rows.push([txt(c.id), txt(c.note), '', '']); }
+				pts.forEach(function (pt) { rows.push([txt(c.id), txt(c.note), txt(pt[0]), txt(pt[1])]); });
+			});
+			out.push({ name: libName + ' - ' + label, heads: [idH, descH, ax.x, ax.y], rows: rows, numeric: [false, false, true, true] });
+		});
+		var types = libPipeTypesRead();
+		if (types.length) {
+			out.push({ name: pc.lpn_library_pipetypes || 'Pipe types',
+				heads: [idH, descH].concat(LPN_TYPE_PROPS.map(function (d) { return pipeTypePropLabel(d.prop); })),
+				numeric: [false, false].concat(LPN_TYPE_PROPS.map(function (d) { return !d.ref; })),
+				rows: types.map(function (t) {
+					return [txt(t.id), txt(t.note)].concat(LPN_TYPE_PROPS.map(function (d) { return txt(t.props ? t.props[d.prop] : ''); }));
+				}) });
+		}
+		var sets = libFittingSetsRead(), names = fittingNames(), frows = [];
+		sets.forEach(function (set) {
+			var items = set.items || [];
+			if (!items.length) { frows.push([txt(set.id), txt(set.note), '', '', '']); }
+			items.forEach(function (it) {
+				frows.push([txt(set.id), txt(set.note), names[it.fit] || txt(it.fit), txt(it.qty), txt(it.k)]);
+			});
+		});
+		if (sets.length) {
+			out.push({ name: pc.lpn_library_fittings || 'Fittings', rows: frows, numeric: [false, false, false, true, true],
+				heads: [idH, descH, pc.lpn_fitting_name || 'Fitting', pc.lpn_fitting_qty || 'Quantity', pc.lpn_fitting_k || 'Coefficient'] });
+		}
+		return out;
+	}
+	function paneExportDownload(format, allTables, allScenarios) {
+		var pc = EngCalcs.pageConfig || {}, items = paneExportItems(allTables, allScenarios), pre = paneProjectPrefix(),
+			tables = {}, name, data, mime, multiTables, E = EngCalcs, libs;
+		if (!items.length) { return; }
+		items.forEach(function (it) { tables[it.table] = true; });
+		multiTables = Object.keys(tables).length > 1;
+		// A file name, so the scenario's own name (free text: "A/B: C?") is made safe like the table's.
+		function part(it, sep) { return paneNoSpace(paneSanitizeFileName(it.table)) + (it.scn ? sep + paneNoSpace(paneSanitizeFileName(it.scn)) : ''); }
+		// A sheet name, 31 characters at most: the scenario first, the table shortened before it, so
+		// two scenarios of one table stay distinguishable. Trailing spaces are trimmed.
+		function sheetPart(it) {
+			var scn = it.scn, tab = it.table, room;
+			if (!scn) { return tab; }
+			room = 31 - 3;
+			if (scn.length + tab.length > room) { tab = tab.slice(0, Math.max(8, room - scn.length)); }
+			if (scn.length + tab.length > room) { scn = scn.slice(0, room - tab.length); }
+			return scn.replace(/\s+$/, '') + ' - ' + tab.replace(/\s+$/, '');
+		}
+		// **ONE CSV STAYS ONE CSV.** A single table to CSV is the one file it always was, with no
+		// library beside it, because a CSV holds one table and turning a click into a zip would be a
+		// surprise. Whenever the export is a zip anyway, and in every workbook, the libraries ride along.
+		libs = (format === 'csv' && items.length === 1) ? [] : libraryExportSheets();
+		if (format === 'csv' && items.length === 1) {
+			name = pre + part(items[0], '-') + '.csv';
+			data = E.lpnTableCsv(items[0].data.heads, items[0].data.cells);
+			mime = PANE_EXPORT_MIME.csv;
+		} else {
+			name = pre + (multiTables ? paneNoSpace(pc.lpn_tables_menu || 'Tables') : (items.length === 1 ? part(items[0], '-') : paneNoSpace(paneSanitizeFileName(items[0].table))));
+			if (format === 'csv') {
+				var used = {};
+				name += '.zip';
+				mime = PANE_EXPORT_MIME.zip;
+				data = E.lpnZipStore(items.map(function (it) {
+					return { base: part(it, '-'), heads: it.data.heads, rows: it.data.cells };
+				}).concat(libs.map(function (l) {
+					return { base: paneNoSpace(paneSanitizeFileName(l.name)), heads: l.heads, rows: l.rows };
+				})).map(function (f) {
+					var n = f.base, k = 1;
+					while (used[n.toLowerCase()]) { k++; n = f.base + '_' + k; }
+					used[n.toLowerCase()] = true;
+					return { name: n + '.csv', data: new TextEncoder().encode(E.lpnTableCsv(f.heads, f.rows)) };
+				}));
+			} else {
+				name += '.' + format;
+				mime = PANE_EXPORT_MIME[format];
+				data = (format === 'ods' ? E.lpnTableOdsBook : E.lpnTableXlsxBook)(items.map(function (it) {
+					return { name: multiTables ? sheetPart(it) : (items.length > 1 ? (it.scn || it.table) : sheetPart(it)),
+						heads: it.data.heads, rows: it.data.cells, numeric: it.data.numeric };
+				}).concat(libs));
+			}
+		}
+		downloadTextFile(name, data, mime);
+		setNotice((pc.lpn_status_inp_exported || 'Exported {file}.').replace('{file}', name));
+	}
+	// **FILE, EXPORT TO, ODS / XLSX / CSV** (Tom, 2026-10-07: *"File, Export should not say 'Export
+	// table'. It should say File, Export to, and we are adding ODS/XLSX/CSV."*). The format is the row
+	// that was chosen; the box asks only which tables and, when the project has a scenario besides
+	// Base, which scenarios. Several CSV files go into one zip; several ODS or XLSX tables become one
+	// workbook with a sheet apiece, named for the table and, when scenarios are in play, the
+	// scenario. A table with no rows is left out of "all". Scenario results exist only for the
+	// scenario solved (the rule Show scenarios follows), so the others' result columns are blank.
+	function openExportTableBox(format) {
+		var pc = EngCalcs.pageConfig || {}, cur = activePaneTableSpec(), withScn = scenarios.length > 1, groups = {};
+		if (!EngCalcs.lpnTableCsv) { return; }
+		closeMenu();
+		function radioGroup(body, key, label, options) {
+			var wrap = document.createElement('div'), head = document.createElement('div');
+			wrap.className = 'lpn-export-group';
+			head.style.fontWeight = 'bold';
+			head.textContent = label;
+			wrap.appendChild(head);
+			options.forEach(function (o, i) {
+				var lab = document.createElement('label'), inp = document.createElement('input');
+				lab.style.display = 'block';
+				inp.type = 'radio';
+				inp.name = 'lpn_export_' + key;
+				inp.value = o[0];
+				inp.id = 'lpn_export_' + key + '_' + o[0];
+				inp.checked = i === 0 || !!o[2];
+				if (o[2] === 'off') { inp.disabled = true; inp.checked = false; }
+				lab.appendChild(inp);
+				lab.appendChild(document.createTextNode(' ' + o[1]));
+				wrap.appendChild(lab);
+			});
+			body.appendChild(wrap);
+			groups[key] = wrap;
+		}
+		function picked(key) {
+			var el = groups[key] && groups[key].querySelector('input:checked');
+			return el ? el.value : '';
+		}
+		openDialog(function (body) {
+			radioGroup(body, 'tables', pc.lpn_tables_menu || 'Tables', cur
+				? [['current', pc.lpn_export_table_current || 'Current'], ['all', pc.lpn_export_table_all || 'All']]
+				: [['current', pc.lpn_export_table_current || 'Current', 'off'], ['all', pc.lpn_export_table_all || 'All', 'on']]);
+			if (withScn) {
+				radioGroup(body, 'scenarios', pc.lpn_scenario_menu || 'Scenarios',
+					[['current', pc.lpn_export_table_current || 'Current'], ['all', pc.lpn_export_table_all || 'All']]);
+			}
+			// Shown only while Scenarios is All: results exist for the scenario last calculated only.
+			if (withScn) {
+				var note = document.createElement('div');
+				note.id = 'lpn_export_scn_note';
+				var noteText = pc.lpn_export_table_scn_note || 'Results are exported only for the scenario last calculated.';
+				body.appendChild(note);
+				groups.scenarios.addEventListener('change', function () { note.textContent = picked('scenarios') === 'all' ? noteText : ''; });
+			}
+		}, [
+			{ label: pc.lpn_export_table_go || 'Export', isDefault: true, fn: function () {
+				paneExportDownload(format, picked('tables') === 'all', withScn && picked('scenarios') === 'all');
+			} },
+			{ label: pc.lpn_cancel || 'Cancel', cancel: true, fn: function () { } }
+		], { title: (pc.lpn_export_table_title || 'Export to {format}').replace('{format}', format.toUpperCase()) });
+	}
 	// ---- the PROFILE panel (ROADMAP Task 409) ------------------------------
 	//
 	// Pick a start node and an end node; the app suggests the shortest route by LINK LENGTH; the
@@ -36106,6 +36393,328 @@ var EngCalcs = EngCalcs || {};
 					: (pcX.lpn_geojson_results_out || 'No results are included, because the network is not solved.')));
 		});
 	}
+	// ---- EXPORT DXF FILE (ROADMAP Task 772) ---------------------------------------------------------
+	//
+	// **THE MODEL'S DATA, AS ATTRIBUTED BLOCKS** (Tom's DXF Interface Manager specification,
+	// dev/dxf-interface.md): links as polylines, every element a block whose attributes carry its
+	// ID and properties, tagged with the property labels and valued verbatim in the project units.
+	// No annotation. js/lpn-dxf.js writes the file; this half GATHERS. Rules: dev/dxf.md.
+	//
+	// **THE FRAME, AND WHAT THE FILE MAY CLAIM ABOUT IT.** A grid project goes out in its own X and
+	// Y, number for number. A project with a stated coordinate system goes out in it, unchanged. A
+	// latitude-and-longitude project is converted to the UTM zone that holds its centre (WGS 84,
+	// metres), because a CAD drawing is a plane and degrees are not a length; the page's own Web
+	// Mercator frame is not used, since its scale is wrong by 1 / cos(latitude). The read-me says
+	// which of the three it is, and nothing else claims a coordinate system.
+	function dxfFrame(done) {
+		var pc = EngCalcs.pageConfig || {}, code, u;
+		if (isLatLonProject()) {
+			var b = null;
+			doc.nodes.forEach(function (n) {
+				var X = effective(n, 'x'), Y = effective(n, 'y');
+				if (!isFinite(X) || !isFinite(Y)) { return; }
+				if (!b) { b = { w: X, e: X, s: Y, n: Y }; return; }
+				b.w = Math.min(b.w, X); b.e = Math.max(b.e, X); b.s = Math.min(b.s, Y); b.n = Math.max(b.n, Y);
+			});
+			code = crsUtmCodeFor(b ? { lon: (b.w + b.e) / 2, lat: (b.s + b.n) / 2 } : { lon: 0, lat: 0 });
+			// UTM stops at 80 S and 84 N, and the drawing has no other plane to go to; that is a
+			// fact about where the network is, not a failed download, so it is said differently.
+			if (!code) { done({ ok: false, reason: 'utm' }); return; }
+			if (!EngCalcs.lpnCrsLoad) { done({ ok: false, reason: 'load' }); return; }
+			EngCalcs.lpnCrsLoad(function () {
+				if (!EngCalcs.lpnCrsHas(code)) { done({ ok: false, reason: 'load' }); return; }
+				done({
+					ok: true, kind: 'geo', code: code, insunits: 6, measurement: 1, unitLabel: pc.u_m || 'm',
+					fwd: function (X, Y) { return EngCalcs.lpnCrsForward(code, { lon: X, lat: Y }); },
+					note: (pc.lpn_dxf_note_geo || 'Coordinates: {crs}, in meters, not latitude and longitude. The latitudes and longitudes of the project were converted to that grid.')
+						.replace('{crs}', dxfCrsName(code))
+				});
+			});
+			return;
+		}
+		function identity(X, Y) { return { x: X, y: Y }; }
+		if (isProjectedProject()) {
+			code = projectCrsCode();
+			var finish = function () {
+				var cu = EngCalcs.lpnCrsUnit ? EngCalcs.lpnCrsUnit(code) : null,
+					unit = cu && cu.units ? cu.units : (cu && cu.toMeter === 1 ? 'm' : '');
+				done({
+					ok: true, kind: 'projected', code: code, fwd: identity, unitLabel: unit === 'm' ? (pc.u_m || 'm') : unit,
+					insunits: EngCalcs.lpnDxfInsUnits(unit), measurement: unit === 'm' ? 1 : 0,
+					note: (pc.lpn_dxf_note_crs || 'Coordinates: {crs}, exactly as this project states them.')
+						.replace('{crs}', dxfCrsName(code))
+				});
+			};
+			if (EngCalcs.lpnCrsLoad) { EngCalcs.lpnCrsLoad(finish); } else { finish(); }
+			return;
+		}
+		u = unitKey('lpn_u_length');
+		done({
+			ok: true, kind: 'grid', fwd: identity, unitLabel: unitSymbol('lpn_u_length'),
+			insunits: EngCalcs.lpnDxfInsUnits(u), measurement: u === 'm' ? 1 : 0,
+			// {unit} is the unit's own name (ft, m), not the page's translated symbol: the read-me is
+			// for a CAD program, and a translated symbol in a capitalized sentence read "IN 英尺".
+			note: (pc.lpn_dxf_note_grid || 'Coordinates: the X and Y of this project, in {unit}. No coordinate system is stated.')
+				.replace('{unit}', u)
+		});
+	}
+	function dxfCrsName(code) {
+		var name = crsLabel(code);
+		return (name && name !== String(code)) ? name + ' (' + code + ')' : String(code);
+	}
+	// A value for an attribute: the effective (scenario) value where the property is overridable,
+	// the stored one otherwise, and '' for nothing at all. **VERBATIM** (dev/dxf-interface.md:
+	// *"values match the current project units and are imported verbatim"*): a number is stored in
+	// the displayed unit, so it goes out as stored, unrounded and unconverted.
+	//
+	// **AND AS TYPED** (pre-review 2026-10-07: Net3's 220.0 went out as 220, .1 as 0.1): a number
+	// read from a file keeps its own text beside it, and EngCalcs.lpnNumText() hands that text
+	// back while it still states this number, exactly as the .inp export writes it. The token is
+	// kept under the stored field's name, `_diameter` for an overridable property, `elev` for one
+	// that is not.
+	function dxfNum(rec, key, v) {
+		if (typeof v !== 'number' || !isFinite(v)) { return v === undefined || v === null || typeof v === 'number' ? '' : v; }
+		return EngCalcs.lpnNumText ? EngCalcs.lpnNumText(rec, key, v) : String(v);
+	}
+	function dxfVal(el, prop) {
+		var v = effective(el, prop);
+		if (v === undefined || v === null) { v = el[prop]; }
+		return dxfNum(el, ('_' + prop) in el ? '_' + prop : prop, v);
+	}
+	// **BASE DEMAND IS THE AGGREGATE OF EVERY CATEGORY'S BASE** (Tom, 2026-10-07: *"If we aren't
+	// exporting the full list of demand categories, we must export the aggregate base demand."*),
+	// the same sum baseDemandTotal() puts in the table, the label and the popup. One category is
+	// written as typed; several are added and written as a plain number (rounded to 12 significant
+	// digits so 0.1 + 0.2 reads 0.3). dxfModel() counts the junctions that have more than one.
+	function dxfBaseDemand(n) {
+		var rows = EngCalcs.lpnDemandRows ? EngCalcs.lpnDemandRows(n, effective(n, 'demand')) : null, t;
+		if (!rows || rows.length < 2) { return { text: dxfVal(n, 'demand'), more: false }; }
+		t = baseDemandTotal(n);
+		return { text: String(parseFloat(t.toPrecision(12))), more: true };
+	}
+	// The properties each block carries, by internal key. Data only: no solve results, which an
+	// import would have no property to put back into.
+	var LPN_DXF_KEYS = {
+		junction: ['ID', 'ELEV', 'DEMAND', 'TAG', 'DESC'],
+		reservoir: ['ID', 'HEAD', 'TAG', 'DESC'],
+		tank: ['ID', 'ELEV', 'LEVEL', 'MINLEVEL', 'MAXLEVEL', 'DIAMETER', 'TAG', 'DESC'],
+		pipe: ['ID', 'DIAMETER', 'LENGTH', 'ROUGHNESS', 'TAG', 'DESC'],
+		pump: ['ID', 'TAG', 'DESC'],
+		valve: ['ID', 'VALVETYPE', 'DIAMETER', 'SETTING', 'TAG', 'DESC'],
+		customer: ['ID', 'DEMAND', 'COUNT', 'TAG', 'DESC']
+	};
+	// **A TAG IS THE PROPERTY'S LABEL** in the page's language (dev/dxf-interface.md: *"attributes
+	// have tags that match EPANET++ property labels ... spaces can be replaced with underscores"*),
+	// upper case: "Base demand" is BASE_DEMAND. The prompt AutoCAD shows in Edit Attributes is the
+	// label with its unit.
+	function dxfLabels() {
+		var pc = EngCalcs.pageConfig || {};
+		return {
+			ID: [pc.lpn_field_id || 'ID'],
+			ELEV: [pc.lpn_field_elev || 'Elevation', 'lpn_u_elevhead'],
+			DEMAND: [pc.lpn_field_base_demand || 'Base demand', 'lpn_u_flow'],
+			HEAD: [pc.lpn_field_head || 'Head', 'lpn_u_elevhead'],
+			LEVEL: [pc.lpn_field_tank_level || 'Water depth', 'lpn_u_elevhead'],
+			MINLEVEL: [pc.lpn_field_tank_minlevel || 'Lowest water depth', 'lpn_u_elevhead'],
+			MAXLEVEL: [pc.lpn_field_tank_maxlevel || 'Highest water depth', 'lpn_u_elevhead'],
+			DIAMETER: [pc.lpn_field_diameter || 'Diameter', 'lpn_u_diameter'],
+			'tank.DIAMETER': [pc.lpn_field_tank_diameter || 'Tank diameter', 'lpn_u_length'],
+			LENGTH: [pc.lpn_field_length || 'Length', 'lpn_u_length'],
+			ROUGHNESS: [pc.lpn_field_roughness || 'Roughness'],
+			VALVETYPE: [pc.lpn_field_valve_type || 'Valve type'],
+			SETTING: [pc.lpn_field_valve_setting || 'Setting'],
+			COUNT: [pc.lpn_field_meter_count || 'Number of services'],
+			TAG: [pc.lpn_field_tag || 'Tag'],
+			DESC: [pc.lpn_field_desc || 'Description']
+		};
+	}
+	/** { tags: { type: [TAG...] }, prompts: { 'type.TAG': prompt }, tagOf(type, key) }. */
+	function dxfLocale() { return (document.documentElement && document.documentElement.lang) || ''; }
+	function dxfTagTable() {
+		var labels = dxfLabels(), tags = {}, prompts = {}, byKey = {}, loc = dxfLocale();
+		Object.keys(LPN_DXF_KEYS).forEach(function (t) {
+			var used = {};
+			byKey[t] = {};
+			tags[t] = LPN_DXF_KEYS[t].map(function (key) {
+				var L = labels[t + '.' + key] || labels[key], tag = EngCalcs.lpnDxfTag(L[0], loc) || key, n = 2, base = tag;
+				// Two labels can read alike in a translation; a tag must be unique in its block.
+				while (used[tag]) { tag = base + '_' + (n++); }
+				used[tag] = true;
+				byKey[t][key] = tag;
+				prompts[t + '.' + tag] = L[1] ? L[0] + ' (' + unitSymbol(L[1]) + ')' : L[0];
+				return tag;
+			});
+		});
+		var idTags = {};
+		Object.keys(byKey).forEach(function (t) { idTags[t] = byKey[t].ID; });
+		return { tags: tags, prompts: prompts, idTags: idTags, tagOf: function (t, key) { return byKey[t][key]; } };
+	}
+	function dxfNodeAttrs(n) {
+		var a = [['ID', n.id]];
+		if (n.type === 'junction') {
+			a.push(['ELEV', dxfVal(n, 'elev')], ['DEMAND', dxfBaseDemand(n).text]);
+		} else if (n.type === 'reservoir') {
+			a.push(['HEAD', dxfNum(n, '_head', nodeFixedHead(n))]);
+		} else if (n.type === 'tank') {
+			a.push(['ELEV', dxfVal(n, 'elev')], ['LEVEL', dxfVal(n, 'level')], ['MINLEVEL', dxfVal(n, 'minLevel')],
+				['MAXLEVEL', dxfVal(n, 'maxLevel')], ['DIAMETER', dxfVal(n, 'tankDiameter')]);
+		}
+		a.push(['TAG', dxfVal(n, 'tag')], ['DESC', dxfVal(n, 'desc')]);
+		return a;
+	}
+	function dxfLinkAttrs(l) {
+		var a = [['ID', l.id]];
+		if (l.type === 'pipe') {
+			a.push(['DIAMETER', dxfVal(l, 'diameter')], ['LENGTH', dxfVal(l, 'length')], ['ROUGHNESS', dxfVal(l, 'roughness')]);
+		}
+		if (l.type === 'valve') {
+			a.push(['VALVETYPE', l.valveType || ''], ['DIAMETER', dxfVal(l, 'diameter')], ['SETTING', dxfVal(l, 'setting')]);
+		}
+		a.push(['TAG', dxfVal(l, 'tag')], ['DESC', dxfVal(l, 'desc')]);
+		return a;
+	}
+	// A point of the DRAWING FRAME (where a customer lives) through the outward boundary and on
+	// into the drawing by `G`. The DXF export's one crossing of that boundary, so
+	// dev/lpn-spike/local-origin-harness.js counts it once.
+	function dxfDrawnToFile(G, x, y) { return G(outwardX(x), outwardY(y)); }
+	/**
+	 * **A SCENARIO'S LAYER CODE, ONE PER SCENARIO, AND NEVER BASE FOR ANOTHER** (pre-review
+	 * 2026-10-07). Every scenario is coded in the project's order so two names that encode alike
+	 * ("Fire flow" and "Fire-flow") are told apart: the later one takes _2, _3. A name with nothing
+	 * left after encoding takes its scenario ID.
+	 */
+	function dxfAlternative(sc) {
+		var used = { BASE: true }, out = 'BASE', loc = dxfLocale();
+		if (!sc || sc.isBase) { return 'BASE'; }
+		scenarios.forEach(function (x) {
+			if (x.isBase) { return; }
+			var base = EngCalcs.lpnDxfAlternative(x.name, loc) || EngCalcs.lpnDxfAlternative(x.id, loc) || 'S',
+				code = base, k = 2;
+			while (used[code]) { code = base + '_' + (k++); }
+			used[code] = true;
+			if (x.id === sc.id) { out = code; }
+		});
+		return out;
+	}
+	/** The whole model as js/lpn-dxf.js's plain model, in `frame`'s coordinates. */
+	function dxfModel(frame) {
+		var pc = EngCalcs.pageConfig || {}, G = frame.fwd, snap = serializeProject(),
+			geo = isLatLonProject(), tt = dxfTagTable(),
+			org = (!geo && snap.origin && isFinite(snap.origin.x)) ? snap.origin : { x: 0, y: 0 },
+			fileNode = {}, nodes = [], links = [], customers = [];
+		function attrs(type, pairs) { return pairs.map(function (p) { return { tag: tt.tagOf(type, p[0]), value: p[1] }; }); }
+		snap.nodes.forEach(function (n) { fileNode[n.id] = n; });
+		// A node's OUTWARD position: this scenario's own if it moved the node, else the file's
+		// number plus the origin -- the same arithmetic the .inp export uses, so the two agree.
+		function nodeOut(id) {
+			var fn = fileNode[id], live = nodeById(id), ov = live ? coordOverridesOf(live) : null;
+			if (!fn) { return null; }
+			return G(ov && typeof ov.x === 'number' ? ov.x : fn.x + org.x,
+				ov && typeof ov.y === 'number' ? ov.y : fn.y + org.y);
+		}
+		doc.nodes.forEach(function (n) {
+			var p = nodeOut(n.id);
+			if (!p) { return; }
+			nodes.push({ id: n.id, type: n.type, x: p.x, y: p.y, attrs: attrs(n.type, dxfNodeAttrs(n)) });
+		});
+		snap.links.forEach(function (fl) {
+			var l = linkById(fl.id), pts = [], a = nodeOut(fl.from), b = nodeOut(fl.to);
+			if (!l || !a || !b) { return; }
+			pts.push(a);
+			(fl.verts || []).forEach(function (v) {
+				var q = G(v.x + org.x, v.y + org.y);
+				if (q) { pts.push(q); }
+			});
+			pts.push(b);
+			links.push({ id: l.id, type: l.type, pts: pts, attrs: attrs(l.type, dxfLinkAttrs(l)) });
+		});
+		(doc.customers || []).forEach(function (c) {
+			var pt = customerPoint(c), an = customerAttachPoint(c),
+				P = pt ? dxfDrawnToFile(G, pt.x, pt.y) : null,
+				A = an ? dxfDrawnToFile(G, an.x, an.y) : null;
+			if (!P) { return; }
+			customers.push({ id: c.id, x: P.x, y: P.y, from: A, attrs: attrs('customer', [
+				['ID', c.id], ['DEMAND', dxfVal(c, 'demand')], ['COUNT', dxfVal(c, 'count')],
+				['TAG', c.tag || ''], ['DESC', c.desc || '']]) });
+		});
+		// **THE LAYER NAMES**: js/lpn-dxf.js's one prefix, the project's own ID prefixes as asset
+		// codes, and the scenario on screen as the alternative (BASE for Base). The whole network
+		// as that scenario has it is written; an overrides-only layer per alternative waits on
+		// Task 721, which owns the alternatives model.
+		var alternative = dxfAlternative(activeScenario()),
+			codes = EngCalcs.lpnDxfAssetCodes(settings.idPrefixes),
+			readme = [projectDisplayName(project), frame.note,
+				(pc.lpn_dxf_note_blocks || 'Layers are named {prefix}, the asset code, a hyphen, and the alternative, as in {example}. Each element is a block inserted at scale 1 with attributes 1 unit high; scale the blocks to set the text height. Every attribute is visible; the attributes of one element are stacked in a column beside its symbol.')
+					.replace('{prefix}', EngCalcs.lpnDxfModelPrefix)
+					.replace('{example}', EngCalcs.lpnDxfModelPrefix + codes.junction + '-' + alternative)];
+		// **A VALUE TOO LONG FOR ONE DXF STRING IS SHORTENED, AND THE READ-ME SAYS SO** -- the writer
+		// cuts it and ends it in three periods (js/lpn-dxf.js, LIMIT_CHARS).
+		var longOnes = 0;
+		nodes.concat(links, customers).forEach(function (el) {
+			(el.attrs || []).forEach(function (a) { if (EngCalcs.lpnDxfTooLong(a.value)) { longOnes++; } });
+		});
+		// More than one demand category: BASE_DEMAND holds their sum, and the read-me says so.
+		var multi = doc.nodes.filter(function (n) { return n.type === 'junction' && dxfBaseDemand(n).more; }).length;
+		if (multi) {
+			readme.push((pc.lpn_dxf_note_categories || '{n} junctions have more than one demand category. Their {tag} attribute holds the sum of the base demands of all categories.')
+				.replace('{n}', String(multi)).replace('{tag}', tt.tagOf('junction', 'DEMAND')));
+		}
+		if (longOnes) {
+			readme.push((pc.lpn_dxf_note_shortened || '{n} values were longer than a DXF file allows ({max} characters), so each was shortened and ends in three periods.')
+				.replace('{n}', String(longOnes)).replace('{max}', String(EngCalcs.lpnDxfLimit)));
+		}
+		return {
+			insunits: frame.insunits, measurement: frame.measurement,
+			codes: codes, alternative: alternative, locale: dxfLocale(), idTags: tt.idTags,
+			nodes: nodes, links: links, customers: customers, readme: readme,
+			tags: tt.tags, prompts: tt.prompts
+		};
+	}
+	/** frame -> {ok, text}; the synchronous half, which is what a harness drives. */
+	function dxfExportText(frame) {
+		if (!frame || !frame.ok || !EngCalcs.lpnDxfWrite) { return { ok: false, reason: frame && frame.reason }; }
+		return { ok: true, frame: frame, text: EngCalcs.lpnDxfWrite(dxfModel(frame)) };
+	}
+	function exportDxfFile() {
+		var pcX = EngCalcs.pageConfig || {};
+		saveToStorage();   // export what is on screen, including edits not yet saved
+		dxfFrame(function (frame) {
+			// **A FAILURE SAYS SO.** On a lat/lon project this runs inside the coordinate loader's
+			// promise, which swallows a throw; uncaught, the click did nothing at all (2026-10-06).
+			try { dxfExportFinish(frame); } catch (err) {
+				if (window.console && console.error) { console.error(err); }
+				setNotice((pcX.lpn_dxf_export_failed || 'The DXF file was not written: an error in this page stopped it ({error}).')
+					.replace('{error}', String(err && err.message ? err.message : err)));
+			}
+		});
+	}
+	function dxfExportFinish(frame) {
+		var pcX = EngCalcs.pageConfig || {};
+		var out = dxfExportText(frame);
+		if (!out.ok) {
+			setNotice(out.reason === 'utm'
+				? (pcX.lpn_dxf_export_no_utm || 'The DXF file was not written: this network lies outside the latitudes UTM covers (80° S to 84° N), and a drawing needs a flat grid to be drawn on.')
+				: (pcX.lpn_dxf_export_refused || 'The DXF file was not written: the coordinate conversion it needs did not load. Check the connection and try again.'));
+			return;
+		}
+		// A BYTE string in Windows-1252 (js/lpn-dxf.js), so it goes out as bytes: a Blob of the
+		// string itself would be UTF-8 and turn every accented letter into two wrong ones.
+		var blob = new Blob([EngCalcs.lpnDxfBytes(out.text)], { type: 'application/dxf' }),
+			url = URL.createObjectURL(blob), a = document.createElement('a');
+		a.href = url;
+		a.download = safeFileName(projectDisplayName(project)) + '.dxf';
+		document.body.appendChild(a);
+		a.click();
+		document.body.removeChild(a);
+		setTimeout(function () { URL.revokeObjectURL(url); }, 10000);
+		// Exporting is not saving, for the reason exportInpFile() gives. A lat/lon project's
+		// drawing is in UTM metres, and the status line says so, since a reader expecting the
+		// project's degrees would otherwise look for them (Tom, 2026-10-06).
+		setNotice(frame.kind === 'geo'
+			? (pcX.lpn_dxf_exported_geo || 'Exported {file}. Its coordinates are {crs}, in meters, not latitude and longitude.')
+				.replace('{file}', a.download).replace('{crs}', dxfCrsName(frame.code))
+			: (pcX.lpn_status_inp_exported || 'Exported {file}.').replace('{file}', a.download));
+	}
 	/**
 	 * **THE EXPORT ALERT** (ROADMAP Task 465 slice 5; Tom, 2026-09-06, on a library pipe being
 	 * something a round trip loses: *"Yes. And we have to start showing an export alert."*). It is
@@ -42131,6 +42740,302 @@ var EngCalcs = EngCalcs || {};
 		// only fires while focus is inside it -- and because a place is the first thing to type.
 		if (field && field.focus) { field.focus(); }
 	}
+	// ---- Workspace export and import (Tom, 2026-10-07) ---------------------------------------
+	//
+	// Tom: *"It would be really cool to be able to export and import my workspace (profile), mainly
+	// all my dockable boxes, but anything else also that is a browser-saved user setting."*
+	//
+	// **A WORKSPACE IS THE BROWSER-SCOPED HALF OF THE RULE THAT SPLITS EVERY lpn_ SETTING, AND ONLY
+	// THAT HALF.** CLAUDE.md: a setting belongs to the PROJECT or to the BROWSER, never both. Project
+	// settings ride in the project file already and are NOT here; this file carries where the boxes
+	// sit, how big they are, which are open or docked, the pane sizes, the column widths and the
+	// reading preferences, so a laptop and a desktop (or Tom and his own screen-recording machine)
+	// can be given the same layout. **It adds no storage**: it reads and writes only keys this page
+	// already keeps, and a person has to choose the command to make either happen.
+	//
+	// **EVERY `lpn_` KEY RIDES, EXCEPT THE ONES DECLARED NOT TO.** A workspace carries every
+	// localStorage key that begins `lpn_`, plus the few named in LPN_WORKSPACE_EXTRA, and leaves out
+	// what LPN_WORKSPACE_EXCLUDED names (an entry ending in `_` names a prefix). So a box that gains
+	// its own furniture key tomorrow rides in the workspace with no edit here; only a key that is NOT
+	// window furniture or a preference -- a document, an identity -- has to be declared, in
+	// LPN_WORKSPACE_EXCLUDED. dev/scripts/workspace_keys_check.php fails on a key written anywhere in
+	// js/ that neither rule reaches. Keep both as plain arrays of string literals: the check reads
+	// them from the source text.
+	var LPN_WORKSPACE_FORMAT = 'engcalcs-lpn-workspace';
+	var LPN_WORKSPACE_VERSION = 1;
+	var LPN_WORKSPACE_EXTRA = [
+		// The Branched-Network sketch's five checkboxes: a browser preference on a sibling page.
+		'bpn_sketch_toggles'
+	];
+	var LPN_WORKSPACE_EXCLUDED = [
+		// Documents, not preferences: the project library, its index, and the pre-library document.
+		'lpn_index', 'lpn_document', 'lpn_project_',
+		// An opaque token naming this browser to the file-lock broker: identity, not a layout.
+		'lpn_identity',
+		// Legacy keys nothing writes any more; a workspace must not resurrect them.
+		'lpn_show_titles', 'lpn_menucue'
+	];
+	function workspaceCarries(k) {
+		if (typeof k !== 'string') { return false; }
+		if (LPN_WORKSPACE_EXTRA.indexOf(k) >= 0) { return true; }
+		if (k.indexOf('lpn_') !== 0) { return false; }
+		return !LPN_WORKSPACE_EXCLUDED.some(function (x) {
+			return x === k || (x.charAt(x.length - 1) === '_' && k.indexOf(x) === 0);
+		});
+	}
+	// Every carried key this browser holds now.
+	function workspaceKeysHeld() {
+		var out = [], i, k;
+		try {
+			for (i = 0; i < localStorage.length; i++) {
+				k = localStorage.key(i);
+				if (workspaceCarries(k)) { out.push(k); }
+			}
+		} catch (e) { /* private mode: nothing held */ }
+		return out.sort();
+	}
+	// What is read off the device for a workspace file, as {key: raw string}. A key that is absent
+	// stays absent: several of these exist only while they differ from the default.
+	function workspaceCollect() {
+		var out = {}, raw;
+		workspaceKeysHeld().forEach(function (k) {
+			try { raw = localStorage.getItem(k); } catch (e) { raw = null; }
+			if (typeof raw === 'string') { out[k] = raw; }
+		});
+		return out;
+	}
+	function workspaceFileText() {
+		var settings = workspaceCollect();
+		return JSON.stringify({
+			format: LPN_WORKSPACE_FORMAT, version: LPN_WORKSPACE_VERSION,
+			saved: new Date().toISOString(), settings: settings
+		}, null, '\t') + '\n';
+	}
+	function exportWorkspaceFile() {
+		var pc = EngCalcs.pageConfig || {}, text = workspaceFileText(), n, name = 'lpn-workspace.json';
+		n = Object.keys(JSON.parse(text).settings).length;
+		downloadBlob(new Blob([text], { type: 'application/json' }), name);
+		setNotice((pc.lpn_workspace_exported || 'Workspace saved to {file}: {n} settings.')
+			.split('{file}').join(name).split('{n}').join(String(n)));
+	}
+	function pickWorkspaceFile() {
+		var input = document.getElementById('lpn_workspace_file');
+		if (input) { input.click(); }
+	}
+	// A value is usable when it is a string a loader here could have written: a JSON object or array
+	// that parses, or a short plain word (`off`, `0`, a column-order name such as `PNEZD`).
+	function workspaceValueOk(key, v) {
+		var j;
+		if (typeof v !== 'string' || v.length > 20000) { return false; }
+		if (!/^\s*[\[{]/.test(v)) { return v.length <= 40 && /^[A-Za-z0-9_.-]*$/.test(v); }
+		try { j = JSON.parse(v); } catch (e) { return false; }
+		return !!j && typeof j === 'object';
+	}
+	// **A BOX FROM A BIGGER SCREEN MUST LAND WHERE ITS TITLE BAR CAN BE GRABBED.** A box stored at
+	// left 5000 or top 4000 would otherwise come back with a sliver showing. Only the imported
+	// value is moved, into this window: the bar fully inside, below the menu and toolbar.
+	function workspaceClampBox(key, raw) {
+		var v, w, floor, maxLeft, maxTop;
+		if (!/^\s*\{/.test(raw)) { return raw; }
+		try { v = JSON.parse(raw); } catch (e) { return raw; }
+		if (!v || typeof v.left !== 'number' || typeof v.top !== 'number') { return raw; }
+		w = typeof v.w === 'number' && isFinite(v.w) ? v.w : 0;
+		floor = typeof chromeFloor === 'function' ? chromeFloor() : 0;
+		maxLeft = Math.max(0, window.innerWidth - Math.min(w, window.innerWidth));
+		maxTop = Math.max(floor, window.innerHeight - 48);
+		v.left = Math.round(Math.min(Math.max(0, v.left), maxLeft));
+		v.top = Math.round(Math.min(Math.max(floor, v.top), maxTop));
+		return JSON.stringify(v);
+	}
+	/** Pure: what a workspace file's text would do, with nothing applied. `ok:false` carries the
+	 * language key of the refusal. Exported for the harness. */
+	function workspacePlan(text, held) {
+		var doc, set = {}, drop = [], ignored = 0, k;
+		try { doc = JSON.parse(text); } catch (e) { return { ok: false, why: 'lpn_workspace_refused_unreadable' }; }
+		if (!doc || typeof doc !== 'object' || doc.format !== LPN_WORKSPACE_FORMAT
+			|| !doc.settings || typeof doc.settings !== 'object' || Array.isArray(doc.settings)) {
+			return { ok: false, why: 'lpn_workspace_refused_format' };
+		}
+		if (typeof doc.version !== 'number' || doc.version < 1 || doc.version !== Math.floor(doc.version)) {
+			return { ok: false, why: 'lpn_workspace_refused_format' };
+		}
+		if (doc.version > LPN_WORKSPACE_VERSION) {
+			return { ok: false, why: 'lpn_workspace_refused_newer', version: doc.version };
+		}
+		for (k in doc.settings) {
+			if (!Object.prototype.hasOwnProperty.call(doc.settings, k)) { continue; }
+			if (!workspaceCarries(k) || !workspaceValueOk(k, doc.settings[k])) { ignored++; continue; }
+			set[k] = workspaceClampBox(k, doc.settings[k]);
+		}
+		// **THE FILE REPLACES THE LAYOUT; IT IS NOT MERGED OVER IT** (Tom, 2026-10-07: boxes he closed
+		// after exporting did not come back on import). A carried key this browser holds that the
+		// file does not is a key at its default, so it is cleared: a box closed or docked since the
+		// export, or a flag that exists only while it is OFF, goes back to what the file says.
+		(held || workspaceKeysHeld()).forEach(function (key) { if (!Object.prototype.hasOwnProperty.call(set, key)) { drop.push(key); } });
+		return { ok: true, set: set, drop: drop, ignored: ignored };
+	}
+	function importWorkspaceFromFile(file) {
+		var pc = EngCalcs.pageConfig || {}, reader = new FileReader();
+		reader.onerror = function () { tellNotice(pc.lpn_workspace_refused_unreadable || 'This file could not be read as a workspace, so nothing was changed.'); };
+		reader.onload = function () {
+			var plan = workspacePlan(String(reader.result || ''));
+			if (!plan.ok) {
+				tellNotice((pc[plan.why] || 'This is not a workspace file saved by this page.').split('{version}').join(String(plan.version || '')));
+				return;
+			}
+			// **ASK FIRST** (Tom, 2026-10-07: *"Add a confirm"*). Cancel changes nothing.
+			askDialog({ kind: 'confirm', text: pc.lpn_workspace_confirm || "Replace this browser's workspace layout with the one in the file?",
+				ok: pc.lpn_replace_btn || 'Replace' }, function (yes) { if (yes) { applyWorkspacePlan(plan, file); } });
+		};
+		reader.readAsText(file);
+	}
+	function applyWorkspacePlan(plan, file) {
+		var pc = EngCalcs.pageConfig || {}, nSet = 0, nDrop = 0, msg;
+		// **NOTHING ON THIS PAGE MAY WRITE ITS LAYOUT WHILE IT IS BEING REPLACED**: a box closed to
+		// make room, a resize observer, a pane settling would each put this page's own record back
+		// over the one just imported. Released a moment after the layout has settled.
+		furnitureFrozen = true;
+		try {
+			Object.keys(plan.set).forEach(function (k) { localStorage.setItem(k, plan.set[k]); nSet++; });
+			plan.drop.forEach(function (k) {
+				if (localStorage.getItem(k) !== null) { localStorage.removeItem(k); nDrop++; }
+			});
+		} catch (e) {
+			furnitureFrozen = false;
+			tellNotice(pc.lpn_workspace_refused_storage || 'Browser storage is full or unavailable, so the workspace was not applied.');
+			return;
+		}
+		try {
+			applyWorkspaceInPlace();
+		} catch (e) {
+			// Never expected. A half-laid-out page is worse than a reload, which reads the same
+			// storage from the top; the harness fails if this path is ever taken.
+			window.location.reload();
+			return;
+		}
+		setTimeout(function () { furnitureFrozen = false; }, 600);
+		msg = (pc.lpn_workspace_imported || 'Workspace applied from {file}. Settings applied: {n}. Returned to their defaults: {r}.')
+			.split('{file}').join(file.name || '').split('{n}').join(String(nSet)).split('{r}').join(String(nDrop));
+		if (plan.ignored) {
+			msg += ' ' + (pc.lpn_workspace_ignored || 'Entries ignored because they were not recognized: {u}.').split('{u}').join(String(plan.ignored));
+		}
+		logMessage(msg, 'notice');
+		askDialog({ kind: 'alert', text: msg }, function () {});
+	}
+	// **THE STORED LAYOUT, LAID OUT AGAIN ON THE PAGE THAT IS OPEN** (Tom, 2026-10-08: *"Why does it
+	// reload the page?"*). This is the page's own boot sequence run a second time and nothing else:
+	// close every box, forget every in-memory record of where one was, read the records from storage
+	// again by the same loaders the boot uses, and open and dock whatever those records say, in the
+	// boot's order. So the result is what a reload of the same storage gives, by construction, and
+	// the project, the selection, the results and the undo history are never touched. The one box
+	// left as it is is the Properties box while it shows a selection: a reload drops the selection,
+	// this does not.
+	// The closers are each box's own, because several undo something more than a display
+	// (the contour plot on the map, a screenshot in progress, a running analysis).
+	function workspaceBoxClosers() {
+		return {
+			lpn_settings_box: closeSettingsBox, lpn_library_box: closeLibraryBox, lpn_find_popup: closeFindPopup,
+			lpn_ff_box: closeFireFlowBox, lpn_crit_box: closeCriticalityBox, lpn_ds_box: closeDemandScaleBox,
+			lpn_energy_box: closeEnergyBox, lpn_contour_box: closeContourBox, lpn_snip_box: closeSnipBox,
+			lpn_scncmp_box: closeScenarioCompareBox, lpn_rptbox: closeRunReportBox, lpn_status_box: closeStatusReportBox,
+			lpn_alt_box: closeAlternativesBox, lpn_full_box: closeFullReportBox, lpn_calib_box: closeCalibBox,
+			'lpn_notes_popup': closeNotesPopup, 'lpn_hotkeys_popup': closeHotkeysBox
+		};
+	}
+	// A record as it is before any storage has been read.
+	function workspaceResetRecord(rec) {
+		['dock', 'autohide', 'dockW', 'dockOrd'].forEach(function (k) { delete rec[k]; });
+		['left', 'top', 'w', 'h', 'ix'].forEach(function (k) { if (rec.hasOwnProperty(k)) { rec[k] = null; } });
+		if (rec.hasOwnProperty('open')) { rec.open = false; }
+		if (rec.hasOwnProperty('userSized')) { rec.userSized = false; }
+	}
+	function applyWorkspaceInPlace() {
+		var closers = workspaceBoxClosers(), popupD = null, keepPopup = false, ix;
+		// 1. Everything closed, and the in-memory records forgotten.
+		dockFlyout = null;
+		dockBoxes.forEach(function (d) {
+			var id = d.box.id;
+			if (id === 'lpn_popup') {
+				popupD = d;
+				keepPopup = dockBoxShown(d) && !!currentPopup;
+				if (!keepPopup && dockBoxShown(d)) { closePopup(true); }
+			} else if (closers[id]) {
+				closers[id]();
+			}
+			if (!(id === 'lpn_popup' && keepPopup)) {
+				['left', 'top', 'width', 'height', 'maxHeight'].forEach(function (p) { d.box.style[p] = ''; });
+			}
+			workspaceResetRecord(d.rec);
+			d.open = false;
+			d.byDefault = false;
+		});
+		// **THE MAP TAKES ITS WIDTH BACK BEFORE ANY BOX IS PLACED**: the closers only queue the
+		// layout, and a box with no stored position is placed from the map's edges as they are now.
+		// Placed against the old dock columns it lands where no reload would put it.
+		layoutDocks();
+		findUserPos = null;
+		findUserSize = null;
+		findUserOpen = false;
+		ix = document.getElementById('lpn_setbox_index');
+		if (ix) { ix.style.flexBasis = ''; }
+		// 2. The records again, by the loaders the boot uses.
+		loadFindLayout();
+		loadSetboxLayout();
+		loadLibboxLayout();
+		dockShared = null;
+		dockBoxes.forEach(function (d) {
+			var id = d.box.id;
+			if (d.shared) {
+				readDockFields(dockSharedLoad()[id], d.rec);
+				d.open = !!d.rec.dock && !!(dockSharedLoad()[id] || {}).open;
+			} else {
+				if (id !== 'lpn_find_popup' && id !== 'lpn_settings_box' && id !== 'lpn_library_box') { loadBoxLayout(d.key, d.rec); }
+				readDockRecord(d.key, d.rec);
+			}
+		});
+		if (popupD && keepPopup) { popupD.open = !!popupD.rec.dock; }
+		// 3. Browser preferences, then the two panes, in the boot's order.
+		loadRunBoxPref();
+		loadScenarioBasicPref();
+		syncAreaHintChecks();
+		updateAreaHint();
+		// Closed through the panes' own closers (the only code that may say whether a pane is open),
+		// then the birth values for what a stored record may leave unsaid.
+		if (paneState.open) { closePane(); }
+		paneState.h = LPN_PANE_DEFAULT;
+		paneState.tab = paneTabs[0].id;
+		loadPaneState();
+		if (document.getElementById('lpn_pane_body')) { document.getElementById('lpn_pane_body').style.height = ''; }
+		Object.keys(paneColPrefs).forEach(function (k) { delete paneColPrefs[k]; });
+		(function (v) { Object.keys(v).forEach(function (k) { paneColPrefs[k] = v[k]; }); }(readPaneColPrefs()));
+		applyPaneLayout();
+		if (paneState.open && activePaneTab().show) { activePaneTab().show(); }
+		if (rpaneState.open) { closeRightPane(); }
+		rpaneState.w = LPN_RPANE_DEFAULT;
+		loadRPaneState();
+		applyRPaneLayout();
+		// 4. The boxes: first-visit docks if no record is left, then the boot's own restore.
+		dockDefaultHold = false;
+		dockRankUnranked();
+		applyDefaultDocks();
+		dockBooting = true;
+		try {
+			restoreOpenBoxes();
+			restoreDockedShared();
+			restoreDefaultDocks();
+		} finally {
+			dockBooting = false;
+		}
+		dockBoxes.forEach(renderDockCorner);
+		layoutDocks();
+		// A page that never docked anything has no margin properties at all.
+		if (!dockMargins.left && !dockMargins.right && dockMapWrap()) {
+			dockMapWrap().style.removeProperty('--lpn-dock-ml');
+			dockMapWrap().style.removeProperty('--lpn-dock-mr');
+		}
+	}
+	EngCalcs.lpnWorkspacePlan = workspacePlan;
+	EngCalcs.lpnWorkspaceCarries = workspaceCarries;
 	// **THE THREE IMPORT ROWS, APART FROM THE MENU THAT SHOWS THEM** (Task 718), the same split
 	// mapMenuRows() takes from openMapMenu(): a harness can ask what the submenu offers without
 	// driving a popup. Each row is unchanged from the flat list it moved out of -- same icon, same
@@ -42156,7 +43061,12 @@ var EngCalcs = EngCalcs || {};
 			// and the earlier one should have been questioned rather than built. **Do not put a
 			// button back in the Libraries box.**
 			{ icon: 'open', label: pc.lpn_library_import || 'Import libraries…',
-			  tip: pc.lpn_library_import_tip, fn: libImportPick }
+			  tip: pc.lpn_library_import_tip, fn: libImportPick },
+			// **WORKSPACE (Tom, 2026-10-07)**: the browser-scoped layout and preferences, from a file.
+			// Under File > Import because it comes from a file, by the same vote that put surveyed
+			// points here; Settings holds the settings themselves and this is a file command.
+			{ icon: 'open', label: pc.lpn_file_import_workspace || 'Workspace…',
+			  tip: pc.lpn_file_import_workspace_tip, fn: pickWorkspaceFile }
 		];
 	}
 	// The Export fly-out, a function of its own for the reason importMenuRows() is: a harness can ask
@@ -42170,7 +43080,27 @@ var EngCalcs = EngCalcs || {};
 			  tip: pc.lpn_file_export_inp_tip, fn: exportInpFile },
 			// GeoJSON (Task 728): same verb, same kind of file.
 			{ icon: 'save', label: pc.lpn_file_export_item_geojson || 'GeoJSON file…',
-			  tip: pc.lpn_file_export_geojson_tip, fn: exportGeoJsonFile }
+			  tip: pc.lpn_file_export_geojson_tip, fn: exportGeoJsonFile },
+			// THE MODEL'S DATA for AutoCAD and every other DWG program (Task 772). Reading a DXF back
+			// is the DXF Interface Manager's import half, not built.
+			{ icon: 'save', label: pc.lpn_file_export_item_dxf || 'DXF file…',
+			  tip: pc.lpn_file_export_dxf_tip, fn: exportDxfFile },
+			// **THE TABLES, BY FORMAT** (Tom, 2026-10-07: *"File, Export to, and we are adding
+			// ODS/XLSX/CSV. And we include Libraries"*). Each row opens the box that asks which tables
+			// and which scenarios; the format is the row. Rows are named for the file, like the three
+			// above, under a heading that says what goes into it.
+			{ separator: true },
+			{ heading: true, label: pc.lpn_file_export_tables_heading || 'Tables and libraries' },
+			{ icon: 'save', label: pc.lpn_file_export_item_ods || 'ODS file…',
+			  tip: pc.lpn_file_export_tables_tip, fn: function () { openExportTableBox('ods'); } },
+			{ icon: 'save', label: pc.lpn_file_export_item_xlsx || 'XLSX file…',
+			  tip: pc.lpn_file_export_tables_tip, fn: function () { openExportTableBox('xlsx'); } },
+			{ icon: 'save', label: pc.lpn_file_export_item_csv || 'CSV file…',
+			  tip: pc.lpn_file_export_csv_tip, fn: function () { openExportTableBox('csv'); } },
+			{ separator: true },
+			// Workspace (Tom, 2026-10-07): the twin of File > Import > Workspace.
+			{ icon: 'save', label: pc.lpn_file_export_item_workspace || 'Workspace…',
+			  tip: pc.lpn_file_export_workspace_tip, fn: exportWorkspaceFile }
 		];
 	}
 	function openFileMenu(anchor) {
@@ -42244,7 +43174,7 @@ var EngCalcs = EngCalcs || {};
 			// **AN EXPORT SUBMENU (Tom, 2026-10-06: "it's time to put all the exports into a
 			// submenu")**, the twin of Import above it and built the same way. Each row keeps its
 			// handler and tip; see exportMenuRows(), where a new export is one line.
-			{ icon: 'save', label: pc.lpn_file_export_menu || 'Export…', submenu: exportMenuRows },
+			{ icon: 'save', label: pc.lpn_file_export_menu || 'Export to…', submenu: exportMenuRows },
 		].concat([
 			{ separator: true },
 			// **The menu says Save and Save as… in every browser**, never "Download a copy": the
@@ -42603,6 +43533,7 @@ var EngCalcs = EngCalcs || {};
 	var LPN_NOTESBOX_KEY = 'lpn_notesbox';
 	var notesboxLayout = newBoxLayout();
 	function saveNotesboxLayout() {
+		if (boxSaveHeld()) { return; }
 		try { localStorage.setItem(LPN_NOTESBOX_KEY, JSON.stringify(notesboxLayout)); } catch (e) {}
 	}
 	// **OPENS AT THE MAP'S TOP-RIGHT, NOT CENTRED, THE FIRST TIME** (setboxHomeCorner() -- the same
@@ -42689,6 +43620,7 @@ var EngCalcs = EngCalcs || {};
 	var LPN_HOTKEYSBOX_KEY = 'lpn_hotkeysbox';
 	var hotkeysboxLayout = newBoxLayout();
 	function saveHotkeysboxLayout() {
+		if (boxSaveHeld()) { return; }
 		try { localStorage.setItem(LPN_HOTKEYSBOX_KEY, JSON.stringify(hotkeysboxLayout)); } catch (e) {}
 	}
 	// Where focus was when the Guide opened, so that closing it puts the reader back there.
@@ -43618,6 +44550,7 @@ var EngCalcs = EngCalcs || {};
 	snipboxLayout.scale = SNIP_SCALE;
 	delete snipboxLayout.open;   // openness is not recorded (see above); the key is never written
 	function saveSnipboxLayout() {
+		if (boxSaveHeld()) { return; }
 		try { localStorage.setItem(LPN_SNIPBOX_KEY, JSON.stringify(snipboxLayout)); } catch (e) {}
 	}
 	function wireSnipBox() {
@@ -45021,6 +45954,15 @@ var EngCalcs = EngCalcs || {};
 			var inMenu = from.closest && from.closest('#lpn_menu_popup, #lpn_menu_popup2');
 			if (!inside && !onOpener && !inMenu) { closeViewPopovers(); }
 		});
+		// The workspace picker, wired ahead of the rest for the same reason the library one is.
+		var wsFileInput = document.getElementById('lpn_workspace_file');
+		if (wsFileInput) {
+			wsFileInput.addEventListener('change', function () {
+				var f = wsFileInput.files[0];
+				wsFileInput.value = '';
+				if (f) { importWorkspaceFromFile(f); }
+			});
+		}
 		// The hidden picker lives in the page, not in a popup body that gets replaced wholesale --
 		// the same reason lpn_backdrop_file does. Cleared after every pick so re-choosing the SAME
 		// file still fires a change event.
@@ -45413,6 +46355,7 @@ var EngCalcs = EngCalcs || {};
 		dockBooting = true;
 		restoreOpenBoxes();
 		restoreDockedShared();
+		restoreDefaultDocks();
 		dockBooting = false;
 		// **The banner has to be painted on the BOOT path too.** refreshAllFromDocument() ends with
 		// this call but is shared by openProject() and newProject() only, so the one situation the
@@ -51427,6 +52370,7 @@ var EngCalcs = EngCalcs || {};
 	// to stop treating every field as a number; that is the one thing this addition costs.
 	var setboxLayout = { left: null, top: null, w: null, h: null, ix: null, open: false };
 	function saveSetboxLayout() {
+		if (boxSaveHeld()) { return; }
 		try { localStorage.setItem(LPN_SETBOX_KEY, JSON.stringify(setboxLayout)); } catch (e) {}
 	}
 	function loadSetboxLayout() {
@@ -52389,6 +53333,7 @@ var EngCalcs = EngCalcs || {};
 	var LPN_LIBBOX_KEY = 'lpn_libbox';
 	var libboxLayout = { left: null, top: null, w: null, h: null, open: false };
 	function saveLibboxLayout() {
+		if (boxSaveHeld()) { return; }
 		try { localStorage.setItem(LPN_LIBBOX_KEY, JSON.stringify(libboxLayout)); } catch (e) {}
 	}
 	function loadLibboxLayout() {
@@ -52667,6 +53612,76 @@ var EngCalcs = EngCalcs || {};
 	// that fact alone.
 	var LPN_DOCKBOX_KEY = 'lpn_dockbox';
 	var dockShared = null;
+	// **EVERY BOX'S SAVER ASKS THIS FIRST.** Two things hold a write back. A workspace import sets
+	// `furnitureFrozen` between writing the imported layout and the reload, so nothing this page
+	// still has open can put its own record back over the one just imported. And the first-visit
+	// docks below (`dockDefaultHold`) are shown without being stored: the boot restore's own saves
+	// are swallowed, and the first save after it -- the visitor changing something -- writes every
+	// dock at once, so a reload after that keeps the whole layout and not just the one box touched.
+	var furnitureFrozen = false, dockDefaultHold = false;
+	function boxSaveHeld() {
+		if (furnitureFrozen) { return true; }
+		if (!dockDefaultHold) { return false; }
+		if (dockBooting) { return true; }
+		dockDefaultHold = false;
+		dockBoxes.forEach(function (d) { if (d.save && d.rec.dock) { d.save(); } });
+		return false;
+	}
+	// **A FIRST VISIT STARTS WITH TOM'S DOCKS** (Tom, 2026-10-07, card E02: *"I want to give the
+	// initial user default my auto-hidden docks ... It's cheap discoverability"*). Auto-hide tabs,
+	// top to bottom, named by box and not by label so a renamed report row changes nothing here.
+	// Only a browser that holds NO box record and no `lpn_dockbox` gets them; any saved layout is
+	// the visitor's own and is left alone. Not on a phone, where nothing docks: a phone opens as it
+	// always did. Nothing is stored until the visitor changes something (boxSaveHeld()).
+	var LPN_DEFAULT_DOCKS = {
+		left: ['lpn_energy_box', 'lpn_scncmp_box', 'lpn_rptbox', 'lpn_status_box', 'lpn_calib_box', 'lpn_full_box'],
+		right: ['lpn_settings_box', 'lpn_popup', 'lpn_find_popup', 'lpn_library_box', 'lpn_contour_box',
+			'lpn_ff_box', 'lpn_crit_box', 'lpn_ds_box']
+	};
+	// **A BROWSER DRIVEN BY A TEST HARNESS STARTS WITHOUT THEM** (navigator.webdriver), because two
+	// hundred harnesses were written against a first visit with no docks; a harness that wants them
+	// says so with `window.EC_DEFAULT_DOCKS = true` in an init script (dock-default-harness.js).
+	function defaultDocksWanted() {
+		if (window.EC_DEFAULT_DOCKS === true) { return true; }
+		if (window.EC_DEFAULT_DOCKS === false) { return false; }
+		return !(navigator && navigator.webdriver);
+	}
+	function applyDefaultDocks() {
+		var byId = {};
+		if (!defaultDocksWanted() || smallScreen()) { return; }
+		try {
+			if (localStorage.getItem(LPN_DOCKBOX_KEY) !== null) { return; }
+			if (dockBoxes.some(function (d) { return d.key && localStorage.getItem(d.key) !== null; })) { return; }
+		} catch (e) { return; }
+		dockBoxes.forEach(function (d) { byId[d.box.id] = d; });
+		['left', 'right'].forEach(function (side) {
+			LPN_DEFAULT_DOCKS[side].forEach(function (id, i) {
+				var d = byId[id];
+				if (!d) { return; }
+				d.rec.dock = side;
+				d.rec.autohide = true;
+				d.rec.dockOrd = i;
+				d.open = true;
+				d.byDefault = true;
+			});
+		});
+		dockDefaultHold = true;
+	}
+	function restoreDefaultDocks() {
+		var openers = {
+			lpn_energy_box: openEnergyBox, lpn_scncmp_box: openScenarioCompareBox,
+			lpn_rptbox: function () { openRunReportBox(true); }, lpn_status_box: openStatusReportBox,
+			lpn_calib_box: openCalibBox, lpn_full_box: openFullReportBox,
+			lpn_settings_box: function () { openSettingsBox(); }, lpn_popup: openPopupEmpty,
+			lpn_find_popup: function () { toggleFindPopup(null, true); }, lpn_library_box: openLibraryBox,
+			lpn_contour_box: openContourBox, lpn_ff_box: openFireFlowBox,
+			lpn_crit_box: openCriticalityBox, lpn_ds_box: openDemandScaleBox
+		};
+		if (!dockDefaultHold) { return; }
+		dockBoxes.slice().sort(dockByOrd).forEach(function (d) {
+			if (d.byDefault && !dockBoxShown(d) && openers[d.box.id]) { openers[d.box.id](); }
+		});
+	}
 	function dockSharedLoad() {
 		var raw = null, v = null;
 		if (dockShared) { return dockShared; }
@@ -52679,6 +53694,7 @@ var EngCalcs = EngCalcs || {};
 	}
 	function saveDockShared() {
 		var v = {}, n = 0;
+		if (boxSaveHeld()) { return; }
 		dockBoxes.forEach(function (d) {
 			var r;
 			if (!d.shared || !d.rec.dock) { return; }
@@ -53243,7 +54259,7 @@ var EngCalcs = EngCalcs || {};
 	function registerDockBox(id, rec, save, key, tipKey) {
 		var box = document.getElementById(id), pc = EngCalcs.pageConfig || {}, x, row, d, tip;
 		if (!box || box.__lpnDock) { return; }
-		d = { box: box, rec: rec || {}, save: save || null, help: null, tab: null, shared: !key, open: false };
+		d = { box: box, rec: rec || {}, save: save || null, help: null, tab: null, shared: !key, open: false, key: key || null };
 		if (d.shared) {
 			readDockFields(dockSharedLoad()[id], d.rec);
 			d.open = !!d.rec.dock && !!(dockSharedLoad()[id] || {}).open;
@@ -53333,6 +54349,7 @@ var EngCalcs = EngCalcs || {};
 			['lpn_notes_popup', notesboxLayout, saveNotesboxLayout, LPN_NOTESBOX_KEY],
 			['lpn_hotkeys_popup', hotkeysboxLayout, saveHotkeysboxLayout, LPN_HOTKEYSBOX_KEY]
 		].forEach(function (r) { registerDockBox(r[0], r[1], r[2], r[3], r[4]); });
+		applyDefaultDocks();
 		dockRankUnranked();
 		document.addEventListener('pointerdown', dockCloseHelpTips, true);
 		dockWasSmall = smallScreen();
@@ -65168,6 +66185,7 @@ var EngCalcs = EngCalcs || {};
 	var LPN_FFBOX_KEY = 'lpn_ffbox';
 	var ffboxLayout = newBoxLayout();
 	function saveFfboxLayout() {
+		if (boxSaveHeld()) { return; }
 		try { localStorage.setItem(LPN_FFBOX_KEY, JSON.stringify(ffboxLayout)); } catch (e) {}
 	}
 	function wireFireFlowBox() {
@@ -66439,6 +67457,7 @@ var EngCalcs = EngCalcs || {};
 	var LPN_CMPBOX_KEY = 'lpn_cmpbox';
 	var cmpboxLayout = newBoxLayout();
 	function saveCmpboxLayout() {
+		if (boxSaveHeld()) { return; }
 		try { localStorage.setItem(LPN_CMPBOX_KEY, JSON.stringify(cmpboxLayout)); } catch (e) {}
 	}
 	function wireScenarioCompareBox() {
@@ -66477,6 +67496,7 @@ var EngCalcs = EngCalcs || {};
 	var LPN_ENERGYBOX_KEY = 'lpn_energybox';
 	var energyboxLayout = newBoxLayout();
 	function saveEnergyboxLayout() {
+		if (boxSaveHeld()) { return; }
 		try { localStorage.setItem(LPN_ENERGYBOX_KEY, JSON.stringify(energyboxLayout)); } catch (e) {}
 	}
 	// ---- THE EPANET RUN REPORT, THE SIXTH BOX (ROADMAP Task 570) --------------------------------
@@ -66567,6 +67587,7 @@ var EngCalcs = EngCalcs || {};
 	var LPN_RPTBOX_KEY = 'lpn_reportbox';
 	var rptboxLayout = newBoxLayout();
 	function saveRptboxLayout() {
+		if (boxSaveHeld()) { return; }
 		try { localStorage.setItem(LPN_RPTBOX_KEY, JSON.stringify(rptboxLayout)); } catch (e) {}
 	}
 	function wireRunReportBox() {
@@ -66782,6 +67803,7 @@ var EngCalcs = EngCalcs || {};
 	var LPN_STATUSBOX_KEY = 'lpn_statusbox';
 	var statusboxLayout = newBoxLayout();
 	function saveStatusboxLayout() {
+		if (boxSaveHeld()) { return; }
 		try { localStorage.setItem(LPN_STATUSBOX_KEY, JSON.stringify(statusboxLayout)); } catch (e) {}
 	}
 	function wireStatusReportBox() {
@@ -67272,6 +68294,7 @@ var EngCalcs = EngCalcs || {};
 	var LPN_FULLBOX_KEY = 'lpn_fullbox';
 	var fullboxLayout = newBoxLayout();
 	function saveFullboxLayout() {
+		if (boxSaveHeld()) { return; }
 		try { localStorage.setItem(LPN_FULLBOX_KEY, JSON.stringify(fullboxLayout)); } catch (e) {}
 	}
 	function wireFullReportBox() {

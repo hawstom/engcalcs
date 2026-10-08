@@ -114,6 +114,8 @@ const EC_REQUEST_PURPOSES = [
 const EC_NON_REQUEST_HOSTS = [
     'www.w3.org'             => 'the SVG namespace URI. A string handed to createElementNS(); '
                               . 'nothing is ever fetched from it.',
+    'schemas.openxmlformats.org' => 'the Office Open XML namespace and relationship URIs written into an XLSX export. '
+                              . 'Strings inside a file we hand over; nothing is ever fetched from them.',
     'en.wikipedia.org'       => 'Darcy-Weisbach cites the friction-factor derivations as <a> links '
                               . 'in a result string. The visitor chooses to follow them.',
     'hawsedc.com'            => 'our own origin, written absolute for a share link and for the '

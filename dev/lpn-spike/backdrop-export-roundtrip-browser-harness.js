@@ -160,19 +160,8 @@ async function exportAll(a) {
 	const onDl = (d) => got.push(d);
 	a.page.on('download', onDl);
 	await closeDialog(a);
-	const label = await a.lang('lpn_file_export_item_inp');
-	await a.page.click('#lpn_menu_file');
-	await a.page.waitForSelector('#lpn_menu_popup', { state: 'visible' });
-	// Export is a fly-out of File: open it by its row, then press the row inside it.
-	await a.page.evaluate((l) => {
-		const r = Array.from(document.querySelectorAll('#lpn_menu_list button.lpn-menu-row')).find((b) => b.textContent.trim().indexOf(l) === 0);
-		if (r) { r.click(); }
-	}, await a.lang('lpn_file_export_menu'));
-	await a.page.waitForSelector('#lpn_menu_list2 button.lpn-menu-row', { state: 'attached' });
-	await a.page.evaluate((l) => {
-		const r = Array.from(document.querySelectorAll('#lpn_menu_list2 button.lpn-menu-row')).find((b) => b.textContent.trim().indexOf(l) === 0);
-		if (r) { r.click(); }
-	}, label);
+	// File > Export... > EPANET file: the export commands live in a fly-out.
+	await a.menuClickSub(await a.lang('lpn_file_export_menu'), await a.lang('lpn_file_export_item_inp'), 'file');
 	for (let i = 0; i < 60 && got.length < 1; i++) { await a.page.waitForTimeout(100); }
 	await a.page.waitForTimeout(1200);   // long enough for a second download, if one were sent
 	a.page.off('download', onDl);
@@ -293,9 +282,10 @@ async function realChromeExport(exe, url) {
 		await waitFor(`!!(EngCalcs.lpnBackdropProbe && EngCalcs.lpnBackdropProbe() && EngCalcs.lpnBackdropProbe().corners)`, 15000);
 		await sleep(1500); await ev(closeDialogs);
 		await click(`document.getElementById('lpn_menu_file')`); await sleep(500);
+		// The export commands are in the Export... fly-out: its parent row, then the row in it.
 		await click(`Array.from(document.querySelectorAll('#lpn_menu_list button.lpn-menu-row')).find((b) => b.textContent.trim().indexOf(EngCalcs.pageConfig.lpn_file_export_menu) === 0)`); await sleep(500);
 		const clicked = await click(`Array.from(document.querySelectorAll('#lpn_menu_list2 button.lpn-menu-row')).find((b) => b.textContent.trim().indexOf(EngCalcs.pageConfig.lpn_file_export_item_inp) === 0)`);
-		ok('real Chrome: File > Export > EPANET file was clicked with a real mouse event', clicked);
+		ok('real Chrome: File > Export EPANET file was clicked with a real mouse event', clicked);
 		for (let i = 0; i < 100; i++) { const f = fs.readdirSync(dl); if (f.length && !f.some((n) => /crdownload$/.test(n))) { break; } await sleep(100); }
 		await sleep(2500);   // room for any further download to arrive, or to be held by the limit
 		const got = fs.readdirSync(dl);
