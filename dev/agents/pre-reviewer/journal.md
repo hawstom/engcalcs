@@ -3918,6 +3918,15 @@ SPECULATION: how the glyph looks (zero-width inset over the input end) not judge
 OBSERVED real Chromium, Net1 solved: CSV and ODS download once per click from Junctions, Pipes, Pumps, and from a Show-scenarios Junctions table; results columns carry the displayed numbers; sorted order and Selection-only filter honoured; headings clean (no soft hyphens), units present. ODS passes zipfile/unzip -t and XML parse; office:value always dot-decimal, also under ?lang=fr and de (cell text is never localized). Copy with headings and plain Copy read back from the real clipboard correctly. Menu fits at 390x900 and 390x640. Harness 3 mutations all caught. No LibreOffice/soffice on this box: a real office suite NOT run.
 OBSERVED limits: an empty table (Valves, 0 rows) has no cell to right-click, so it cannot be exported; yes/no columns export 1/0; a From/To value like 007 would be a float cell with office:value="007" (office suite behaviour unverified); fr/de menus show the three new rows in English until translated.
 Lesson: pressing a menu row by text prefix hit a different "Copy" button elsewhere; match inside the menu only.
+
+## 2026-10-06 feat/dxf (Task 772), pre-review
+
+- OBSERVED: ezdxf 1.4.4 recover+audit+strict read: 0 errors on Net1, Net3-World, a nasty project (spaces, accents, CJK, 5000-char DESC, caret and percent sequences, 1.2e9 coordinate, customer) and Net3-World with a customer. dxf and dxf-parser (npm) also read them. LibreCAD 2.2.1.5 AppImage extracted but needs an X display (only xcb plugin; no Xvfb), so it did not read them. No gcc to build LibreDWG. AutoCAD/BricsCAD/ODA: not run.
+- OBSERVED: a literal "^" is written as "^" (DXF Reference: caret must be written "^ "); strings over 2049 characters are written whole (limit 2049 for group codes 0-9, 1); "%%" is escaped in TEXT but not in ATTRIB/ATTDEF values; a user's own "\U+XXXX" is not escaped.
+- OBSERVED: text height and symbol size follow the map zoom at export: Net1 at zoom 0.5 text 17.2 units, at saved zoom 1.2, at zoom 200 0.043 on a 70-unit-wide drawing.
+- OBSERVED: the layer table matches the Duke-hosted AIA CAD Layer Guidelines text for EQPM, VALV, TANK, LABL, TEXT, RDME; NODE is a prescribed minor group there, not user-defined. That PDF is an older edition than v5; v5 itself was not fetchable.
+- OBSERVED: dxf-export-harness.js passes and has no assertion on %% escaping, zoom, zone boundary or long strings.
+
 ## 2026-10-06 feat/asset-type, link half (tree 4c26066b)
 
 OBSERVED (real Chrome on a scratch copy with a test hook, this tree; re-verify before citing):
@@ -4096,6 +4105,11 @@ Lesson: the harness's projected case used a stub transform; run the real one.
 CITED: XlsxWriter worksheet.py _write_panes (same pane/3-selection shape as ours); openpyxl 3.1.5 own output (same minimal workbookView, sheetView/pane); ECMA XSD t-yuki/ooxml-xsd sml-sheet.xsd, sml-workbook.xsd (CT_Worksheet, CT_Workbook sequence); Tom's LibreOffice-saved gnu/sdnet.ods settings.xml.
 OBSERVED: generated XLSX children are in CT_Worksheet/CT_Workbook order; openpyxl reads freeze B2/A2 on every sheet; zip testzip clean; odfpy loads ODS; ODS freeze items match sdnet.ods names and value semantics. Builder's three harnesses pass; mutation (delete bookViews) makes exactly one check fail, restored. No Excel/LibreOffice here: the freeze has still never been seen working in a real program.
 DOUBTS: right-click "Export table as CSV/ODS" remains (no XLSX, no libraries); empty project + All exports nothing and says nothing.
+
+## feat/dxf round at d578b129 (OBSERVED, 2026-10-07; re-verify before citing)
+OBSERVED: dxf-export-harness and dxf-export-browser-harness (93/93, en/ar/zh/ru incl.) pass bare; ID tag still visible in ar/zh. Chunks <=250, never split inside \P or \U+XXXX (parts are atomic, ASCII/CP1252 only; no multibyte hazard). ezdxf audit 0 errors on a ru/zh/ar/600+ char read-me.
+CITED: Autodesk MTEXT reference via search summary: 250-char chunks in group 3, last in group 1; escapes \\ \{ \} are real, so the / ( ) substitution is unnecessary.
+OBSERVED defects: backslash/brace substitution alters user's characters; read-me total cap 2049 with non-Latin escapes at 6 chars each cuts later notes (categories note) silently. Multi-category BASE_DEMAND untested in harness (no grep hit).
 
 # Perry, feat/user-guide pre-review, 2026-10-08 (head 00862427)
 OBSERVED: user-guide-find-harness ALL PASS. Net3 worked queries reproduce in en, de, zh, tr, ar, fr, es.

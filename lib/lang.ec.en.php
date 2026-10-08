@@ -2108,6 +2108,27 @@ $ec_lang['lpn_status_inp_exported_no_picture']='Exported {file}. The background 
 $ec_lang['lpn_inp_export_differences']='{n} things the .inp format cannot hold.';
 $ec_lang['lpn_inp_export_difference_one']='One thing the .inp format cannot hold.';
 $ec_lang['lpn_inp_export_refused']='This project cannot be written as an EPANET file: {detail}';
+// Task 772: File > Export DXF file. The model's data for AutoCAD and other CAD programs.
+$ec_lang['lpn_file_export_item_dxf']='DXF file…';
+$ec_lang['lpn_file_export_dxf_tip']='Download this network for AutoCAD and other CAD programs: pipes, pumps, and valves as polylines, and every element as a block whose attributes carry its ID and property values in the project units.';
+$ec_lang['lpn_dxf_export_no_utm']='The DXF file was not written: this network lies outside the latitudes UTM covers (80° S to 84° N), and a drawing needs a flat grid to be drawn on.';
+$ec_lang['lpn_dxf_export_refused']='The DXF file was not written: the coordinate conversion it needs did not load. Check the connection and try again.';
+$ec_lang['lpn_dxf_export_failed']='The DXF file was not written: an error in this page stopped it ({error}).';
+// The read-me written into the file as a block of attributes, on a layer that does not plot; the
+// file writes it in capital letters. Each says what
+// the coordinates are and claims no coordinate system the file does not have. {unit} is a length
+// unit as written in English (ft, m), not translated; {crs} is a coordinate system name with its EPSG code.
+$ec_lang['lpn_dxf_note_grid']='Coordinates: the X and Y of this project, in {unit}. No coordinate system is stated.';
+$ec_lang['lpn_dxf_note_crs']='Coordinates: {crs}, exactly as this project states them.';
+$ec_lang['lpn_dxf_note_geo']='Coordinates: {crs}, in meters, not latitude and longitude. The latitudes and longitudes of the project were converted to that grid.';
+$ec_lang['lpn_dxf_exported_geo']='Exported {file}. Its coordinates are {crs}, in meters, not latitude and longitude.';
+// {prefix} is the layer-name prefix, C-WATR-MODL-; {example} is a whole layer name such as
+// C-WATR-MODL-J___-BASE.
+$ec_lang['lpn_dxf_note_blocks']='Layers are named {prefix}, the asset code, a hyphen, and the alternative, as in {example}. Each element is a block inserted at scale 1 with attributes 1 unit high; scale the blocks to set the text height. Every attribute is visible; the attributes of one element are stacked in a column beside its symbol.';
+// {n} is a whole number; {max} is 2049. Each shortened value ends in three periods (...).
+$ec_lang['lpn_dxf_note_shortened']='{n} values were longer than a DXF file allows ({max} characters), so each was shortened and ends in three periods.';
+// {n} is a whole number; {tag} is an attribute tag in capitals, BASE_DEMAND in English.
+$ec_lang['lpn_dxf_note_categories']='{n} junctions have more than one demand category. Their {tag} attribute holds the sum of the base demands of all categories.';
 // GeoJSON export (Task 728). The command is worded like Export EPANET file. Positions in a GeoJSON
 // file are always longitude and latitude (RFC 7946), so a project with no place on the Earth is
 // refused and told how to get one, never written with an invented coordinate system.

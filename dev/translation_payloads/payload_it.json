@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "it",
-        "expected_key_count": 2456,
-        "delta_key_count": 14,
+        "expected_key_count": 2468,
+        "delta_key_count": 26,
         "exempt_key_count": 45,
         "exempt_keys": [
             "calc_units_us",
@@ -736,6 +736,18 @@
         "lpn_file_export_item_csv": "CSV file…",
         "lpn_file_export_tables_tip": "Download the tables as the Tables pane shows them, one sheet each, with a sheet for each library their IDs refer to: patterns, curves, pipe types, and fittings.",
         "lpn_file_export_csv_tip": "Download a table as the Tables pane shows it. Several tables come as one zip file of CSV files, with a file for each library their IDs refer to.",
+        "lpn_file_export_item_dxf": "DXF file…",
+        "lpn_file_export_dxf_tip": "Download this network for AutoCAD and other CAD programs: pipes, pumps, and valves as polylines, and every element as a block whose attributes carry its ID and property values in the project units.",
+        "lpn_dxf_export_no_utm": "The DXF file was not written: this network lies outside the latitudes UTM covers (80° S to 84° N), and a drawing needs a flat grid to be drawn on.",
+        "lpn_dxf_export_refused": "The DXF file was not written: the coordinate conversion it needs did not load. Check the connection and try again.",
+        "lpn_dxf_export_failed": "The DXF file was not written: an error in this page stopped it ({error}).",
+        "lpn_dxf_note_grid": "Coordinates: the X and Y of this project, in {unit}. No coordinate system is stated.",
+        "lpn_dxf_note_crs": "Coordinates: {crs}, exactly as this project states them.",
+        "lpn_dxf_note_geo": "Coordinates: {crs}, in meters, not latitude and longitude. The latitudes and longitudes of the project were converted to that grid.",
+        "lpn_dxf_exported_geo": "Exported {file}. Its coordinates are {crs}, in meters, not latitude and longitude.",
+        "lpn_dxf_note_blocks": "Layers are named {prefix}, the asset code, a hyphen, and the alternative, as in {example}. Each element is a block inserted at scale 1 with attributes 1 unit high; scale the blocks to set the text height. Every attribute is visible; the attributes of one element are stacked in a column beside its symbol.",
+        "lpn_dxf_note_shortened": "{n} values were longer than a DXF file allows ({max} characters), so each was shortened and ends in three periods.",
+        "lpn_dxf_note_categories": "{n} junctions have more than one demand category. Their {tag} attribute holds the sum of the base demands of all categories.",
         "lpn_time_stat_minimum": "Min",
         "lpn_time_stat_maximum": "Max"
     },
@@ -752,6 +764,18 @@
         "lpn_file_export_item_csv": "CSV file…",
         "lpn_file_export_tables_tip": "Download the tables as the Tables pane shows them, one sheet each, with a sheet for each library their IDs refer to: patterns, curves, pipe types, and fittings.",
         "lpn_file_export_csv_tip": "Download a table as the Tables pane shows it. Several tables come as one zip file of CSV files, with a file for each library their IDs refer to.",
+        "lpn_file_export_item_dxf": "DXF file…",
+        "lpn_file_export_dxf_tip": "Download this network for AutoCAD and other CAD programs: pipes, pumps, and valves as polylines, and every element as a block whose attributes carry its ID and property values in the project units.",
+        "lpn_dxf_export_no_utm": "The DXF file was not written: this network lies outside the latitudes UTM covers (80° S to 84° N), and a drawing needs a flat grid to be drawn on.",
+        "lpn_dxf_export_refused": "The DXF file was not written: the coordinate conversion it needs did not load. Check the connection and try again.",
+        "lpn_dxf_export_failed": "The DXF file was not written: an error in this page stopped it ({error}).",
+        "lpn_dxf_note_grid": "Coordinates: the X and Y of this project, in {unit}. No coordinate system is stated.",
+        "lpn_dxf_note_crs": "Coordinates: {crs}, exactly as this project states them.",
+        "lpn_dxf_note_geo": "Coordinates: {crs}, in meters, not latitude and longitude. The latitudes and longitudes of the project were converted to that grid.",
+        "lpn_dxf_exported_geo": "Exported {file}. Its coordinates are {crs}, in meters, not latitude and longitude.",
+        "lpn_dxf_note_blocks": "Layers are named {prefix}, the asset code, a hyphen, and the alternative, as in {example}. Each element is a block inserted at scale 1 with attributes 1 unit high; scale the blocks to set the text height. Every attribute is visible; the attributes of one element are stacked in a column beside its symbol.",
+        "lpn_dxf_note_shortened": "{n} values were longer than a DXF file allows ({max} characters), so each was shortened and ends in three periods.",
+        "lpn_dxf_note_categories": "{n} junctions have more than one demand category. Their {tag} attribute holds the sum of the base demands of all categories.",
         "lpn_time_stat_minimum": "Min",
         "lpn_time_stat_maximum": "Max"
     },
@@ -945,6 +969,198 @@
                     "key": "lpn_file_export_inp_tip",
                     "value": "Scarica questa rete come file EPANET .inp (in un file zip con la sua immagine, se presente). Tutto ciò che il formato .inp non può contenere viene elencato in seguito.",
                     "english": "Download this network as an EPANET .inp file (in a zip file with its image if applicable). Anything the .inp format cannot hold is listed for you afterwards."
+                }
+            }
+        },
+        "lpn_file_export_item_dxf": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_export_refused",
+                    "value": "Questo progetto non può essere scritto come file EPANET: {detail}",
+                    "english": "This project cannot be written as an EPANET file: {detail}"
+                },
+                "next_translated": {
+                    "key": "lpn_file_export_geojson_tip",
+                    "value": "Scarica questa rete come file GeoJSON per QGIS, ArcGIS Pro e altri programmi GIS. Nodi, vasche e serbatoi sono punti, mentre tubazioni, pompe e valvole sono linee che seguono i loro vertici. Le posizioni sono in latitudine e longitudine. I risultati sono inclusi solo quando la rete è stata risolta.",
+                    "english": "Download this network as a GeoJSON file for QGIS, ArcGIS Pro and other GIS programs. Junctions, tanks and reservoirs are points, and pipes, pumps and valves are lines that follow their vertices. Positions are latitude and longitude. Results are included only when the network has been solved."
+                }
+            }
+        },
+        "lpn_file_export_dxf_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_export_refused",
+                    "value": "Questo progetto non può essere scritto come file EPANET: {detail}",
+                    "english": "This project cannot be written as an EPANET file: {detail}"
+                },
+                "next_translated": {
+                    "key": "lpn_file_export_geojson_tip",
+                    "value": "Scarica questa rete come file GeoJSON per QGIS, ArcGIS Pro e altri programmi GIS. Nodi, vasche e serbatoi sono punti, mentre tubazioni, pompe e valvole sono linee che seguono i loro vertici. Le posizioni sono in latitudine e longitudine. I risultati sono inclusi solo quando la rete è stata risolta.",
+                    "english": "Download this network as a GeoJSON file for QGIS, ArcGIS Pro and other GIS programs. Junctions, tanks and reservoirs are points, and pipes, pumps and valves are lines that follow their vertices. Positions are latitude and longitude. Results are included only when the network has been solved."
+                }
+            }
+        },
+        "lpn_dxf_export_no_utm": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_export_refused",
+                    "value": "Questo progetto non può essere scritto come file EPANET: {detail}",
+                    "english": "This project cannot be written as an EPANET file: {detail}"
+                },
+                "next_translated": {
+                    "key": "lpn_file_export_geojson_tip",
+                    "value": "Scarica questa rete come file GeoJSON per QGIS, ArcGIS Pro e altri programmi GIS. Nodi, vasche e serbatoi sono punti, mentre tubazioni, pompe e valvole sono linee che seguono i loro vertici. Le posizioni sono in latitudine e longitudine. I risultati sono inclusi solo quando la rete è stata risolta.",
+                    "english": "Download this network as a GeoJSON file for QGIS, ArcGIS Pro and other GIS programs. Junctions, tanks and reservoirs are points, and pipes, pumps and valves are lines that follow their vertices. Positions are latitude and longitude. Results are included only when the network has been solved."
+                }
+            }
+        },
+        "lpn_dxf_export_refused": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_export_refused",
+                    "value": "Questo progetto non può essere scritto come file EPANET: {detail}",
+                    "english": "This project cannot be written as an EPANET file: {detail}"
+                },
+                "next_translated": {
+                    "key": "lpn_file_export_geojson_tip",
+                    "value": "Scarica questa rete come file GeoJSON per QGIS, ArcGIS Pro e altri programmi GIS. Nodi, vasche e serbatoi sono punti, mentre tubazioni, pompe e valvole sono linee che seguono i loro vertici. Le posizioni sono in latitudine e longitudine. I risultati sono inclusi solo quando la rete è stata risolta.",
+                    "english": "Download this network as a GeoJSON file for QGIS, ArcGIS Pro and other GIS programs. Junctions, tanks and reservoirs are points, and pipes, pumps and valves are lines that follow their vertices. Positions are latitude and longitude. Results are included only when the network has been solved."
+                }
+            }
+        },
+        "lpn_dxf_export_failed": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_export_refused",
+                    "value": "Questo progetto non può essere scritto come file EPANET: {detail}",
+                    "english": "This project cannot be written as an EPANET file: {detail}"
+                },
+                "next_translated": {
+                    "key": "lpn_file_export_geojson_tip",
+                    "value": "Scarica questa rete come file GeoJSON per QGIS, ArcGIS Pro e altri programmi GIS. Nodi, vasche e serbatoi sono punti, mentre tubazioni, pompe e valvole sono linee che seguono i loro vertici. Le posizioni sono in latitudine e longitudine. I risultati sono inclusi solo quando la rete è stata risolta.",
+                    "english": "Download this network as a GeoJSON file for QGIS, ArcGIS Pro and other GIS programs. Junctions, tanks and reservoirs are points, and pipes, pumps and valves are lines that follow their vertices. Positions are latitude and longitude. Results are included only when the network has been solved."
+                }
+            }
+        },
+        "lpn_dxf_note_grid": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_export_refused",
+                    "value": "Questo progetto non può essere scritto come file EPANET: {detail}",
+                    "english": "This project cannot be written as an EPANET file: {detail}"
+                },
+                "next_translated": {
+                    "key": "lpn_file_export_geojson_tip",
+                    "value": "Scarica questa rete come file GeoJSON per QGIS, ArcGIS Pro e altri programmi GIS. Nodi, vasche e serbatoi sono punti, mentre tubazioni, pompe e valvole sono linee che seguono i loro vertici. Le posizioni sono in latitudine e longitudine. I risultati sono inclusi solo quando la rete è stata risolta.",
+                    "english": "Download this network as a GeoJSON file for QGIS, ArcGIS Pro and other GIS programs. Junctions, tanks and reservoirs are points, and pipes, pumps and valves are lines that follow their vertices. Positions are latitude and longitude. Results are included only when the network has been solved."
+                }
+            }
+        },
+        "lpn_dxf_note_crs": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_export_refused",
+                    "value": "Questo progetto non può essere scritto come file EPANET: {detail}",
+                    "english": "This project cannot be written as an EPANET file: {detail}"
+                },
+                "next_translated": {
+                    "key": "lpn_file_export_geojson_tip",
+                    "value": "Scarica questa rete come file GeoJSON per QGIS, ArcGIS Pro e altri programmi GIS. Nodi, vasche e serbatoi sono punti, mentre tubazioni, pompe e valvole sono linee che seguono i loro vertici. Le posizioni sono in latitudine e longitudine. I risultati sono inclusi solo quando la rete è stata risolta.",
+                    "english": "Download this network as a GeoJSON file for QGIS, ArcGIS Pro and other GIS programs. Junctions, tanks and reservoirs are points, and pipes, pumps and valves are lines that follow their vertices. Positions are latitude and longitude. Results are included only when the network has been solved."
+                }
+            }
+        },
+        "lpn_dxf_note_geo": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_export_refused",
+                    "value": "Questo progetto non può essere scritto come file EPANET: {detail}",
+                    "english": "This project cannot be written as an EPANET file: {detail}"
+                },
+                "next_translated": {
+                    "key": "lpn_file_export_geojson_tip",
+                    "value": "Scarica questa rete come file GeoJSON per QGIS, ArcGIS Pro e altri programmi GIS. Nodi, vasche e serbatoi sono punti, mentre tubazioni, pompe e valvole sono linee che seguono i loro vertici. Le posizioni sono in latitudine e longitudine. I risultati sono inclusi solo quando la rete è stata risolta.",
+                    "english": "Download this network as a GeoJSON file for QGIS, ArcGIS Pro and other GIS programs. Junctions, tanks and reservoirs are points, and pipes, pumps and valves are lines that follow their vertices. Positions are latitude and longitude. Results are included only when the network has been solved."
+                }
+            }
+        },
+        "lpn_dxf_exported_geo": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_export_refused",
+                    "value": "Questo progetto non può essere scritto come file EPANET: {detail}",
+                    "english": "This project cannot be written as an EPANET file: {detail}"
+                },
+                "next_translated": {
+                    "key": "lpn_file_export_geojson_tip",
+                    "value": "Scarica questa rete come file GeoJSON per QGIS, ArcGIS Pro e altri programmi GIS. Nodi, vasche e serbatoi sono punti, mentre tubazioni, pompe e valvole sono linee che seguono i loro vertici. Le posizioni sono in latitudine e longitudine. I risultati sono inclusi solo quando la rete è stata risolta.",
+                    "english": "Download this network as a GeoJSON file for QGIS, ArcGIS Pro and other GIS programs. Junctions, tanks and reservoirs are points, and pipes, pumps and valves are lines that follow their vertices. Positions are latitude and longitude. Results are included only when the network has been solved."
+                }
+            }
+        },
+        "lpn_dxf_note_blocks": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_export_refused",
+                    "value": "Questo progetto non può essere scritto come file EPANET: {detail}",
+                    "english": "This project cannot be written as an EPANET file: {detail}"
+                },
+                "next_translated": {
+                    "key": "lpn_file_export_geojson_tip",
+                    "value": "Scarica questa rete come file GeoJSON per QGIS, ArcGIS Pro e altri programmi GIS. Nodi, vasche e serbatoi sono punti, mentre tubazioni, pompe e valvole sono linee che seguono i loro vertici. Le posizioni sono in latitudine e longitudine. I risultati sono inclusi solo quando la rete è stata risolta.",
+                    "english": "Download this network as a GeoJSON file for QGIS, ArcGIS Pro and other GIS programs. Junctions, tanks and reservoirs are points, and pipes, pumps and valves are lines that follow their vertices. Positions are latitude and longitude. Results are included only when the network has been solved."
+                }
+            }
+        },
+        "lpn_dxf_note_shortened": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_export_refused",
+                    "value": "Questo progetto non può essere scritto come file EPANET: {detail}",
+                    "english": "This project cannot be written as an EPANET file: {detail}"
+                },
+                "next_translated": {
+                    "key": "lpn_file_export_geojson_tip",
+                    "value": "Scarica questa rete come file GeoJSON per QGIS, ArcGIS Pro e altri programmi GIS. Nodi, vasche e serbatoi sono punti, mentre tubazioni, pompe e valvole sono linee che seguono i loro vertici. Le posizioni sono in latitudine e longitudine. I risultati sono inclusi solo quando la rete è stata risolta.",
+                    "english": "Download this network as a GeoJSON file for QGIS, ArcGIS Pro and other GIS programs. Junctions, tanks and reservoirs are points, and pipes, pumps and valves are lines that follow their vertices. Positions are latitude and longitude. Results are included only when the network has been solved."
+                }
+            }
+        },
+        "lpn_dxf_note_categories": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_export_refused",
+                    "value": "Questo progetto non può essere scritto come file EPANET: {detail}",
+                    "english": "This project cannot be written as an EPANET file: {detail}"
+                },
+                "next_translated": {
+                    "key": "lpn_file_export_geojson_tip",
+                    "value": "Scarica questa rete come file GeoJSON per QGIS, ArcGIS Pro e altri programmi GIS. Nodi, vasche e serbatoi sono punti, mentre tubazioni, pompe e valvole sono linee che seguono i loro vertici. Le posizioni sono in latitudine e longitudine. I risultati sono inclusi solo quando la rete è stata risolta.",
+                    "english": "Download this network as a GeoJSON file for QGIS, ArcGIS Pro and other GIS programs. Junctions, tanks and reservoirs are points, and pipes, pumps and valves are lines that follow their vertices. Positions are latitude and longitude. Results are included only when the network has been solved."
                 }
             }
         },

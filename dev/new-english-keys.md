@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**12 still to read on master**, of 12 untranslated keys, of 2456 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**24 still to read on master**, of 24 untranslated keys, of 2468 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -222,8 +222,38 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   @@ NEEDS RULING
 
-## lpn_  (12, 12 to read @@ NEEDS RULING)
+## lpn_  (24, 24 to read @@ NEEDS RULING)
 
+- **`lpn_dxf_export_failed`**
+  > The DXF file was not written: an error in this page stopped it ({error}).
+  @@ NEEDS RULING
+- **`lpn_dxf_export_no_utm`**
+  > The DXF file was not written: this network lies outside the latitudes UTM covers (80° S to 84° N), and a drawing needs a flat grid to be drawn on.
+  @@ NEEDS RULING
+- **`lpn_dxf_export_refused`**
+  > The DXF file was not written: the coordinate conversion it needs did not load. Check the connection and try again.
+  @@ NEEDS RULING
+- **`lpn_dxf_exported_geo`**
+  > Exported {file}. Its coordinates are {crs}, in meters, not latitude and longitude.
+  @@ NEEDS RULING
+- **`lpn_dxf_note_blocks`**
+  > Layers are named {prefix}, the asset code, a hyphen, and the alternative, as in {example}. Each element is a block inserted at scale 1 with attributes 1 unit high; scale the blocks to set the text height. Every attribute is visible; the attributes of one element are stacked in a column beside its symbol.
+  @@ NEEDS RULING
+- **`lpn_dxf_note_categories`**
+  > {n} junctions have more than one demand category. Their {tag} attribute holds the sum of the base demands of all categories.
+  @@ NEEDS RULING
+- **`lpn_dxf_note_crs`**
+  > Coordinates: {crs}, exactly as this project states them.
+  @@ NEEDS RULING
+- **`lpn_dxf_note_geo`**
+  > Coordinates: {crs}, in meters, not latitude and longitude. The latitudes and longitudes of the project were converted to that grid.
+  @@ NEEDS RULING
+- **`lpn_dxf_note_grid`**
+  > Coordinates: the X and Y of this project, in {unit}. No coordinate system is stated.
+  @@ NEEDS RULING
+- **`lpn_dxf_note_shortened`**
+  > {n} values were longer than a DXF file allows ({max} characters), so each was shortened and ends in three periods.
+  @@ NEEDS RULING
 - **`lpn_export_table_all`**
   > All
   @@ NEEDS RULING
@@ -242,8 +272,14 @@ never edits a synonym.
 - **`lpn_file_export_csv_tip`**
   > Download a table as the Tables pane shows it. Several tables come as one zip file of CSV files, with a file for each library their IDs refer to.
   @@ NEEDS RULING
+- **`lpn_file_export_dxf_tip`**
+  > Download this network for AutoCAD and other CAD programs: pipes, pumps, and valves as polylines, and every element as a block whose attributes carry its ID and property values in the project units.
+  @@ NEEDS RULING
 - **`lpn_file_export_item_csv`**
   > CSV file…
+  @@ NEEDS RULING
+- **`lpn_file_export_item_dxf`**
+  > DXF file…
   @@ NEEDS RULING
 - **`lpn_file_export_item_ods`**
   > ODS file…
@@ -265,7 +301,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**134 still to read**, of 137 new keys across 16 unmerged branch(es).
+**122 still to read**, of 125 new keys across 15 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -470,44 +506,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/desktop (`baba0f04`) — adds no English strings
 
-### feat/dxf (`dee7a28a`) — 12 new, 12 to read @@ NEEDS RULING
-
-- **`lpn_dxf_export_failed`**
-  > The DXF file was not written: an error in this page stopped it ({error}).
-  @@ NEEDS RULING
-- **`lpn_dxf_export_no_utm`**
-  > The DXF file was not written: this network lies outside the latitudes UTM covers (80° S to 84° N), and a drawing needs a flat grid to be drawn on.
-  @@ NEEDS RULING
-- **`lpn_dxf_export_refused`**
-  > The DXF file was not written: the coordinate conversion it needs did not load. Check the connection and try again.
-  @@ NEEDS RULING
-- **`lpn_dxf_exported_geo`**
-  > Exported {file}. Its coordinates are {crs}, in meters, not latitude and longitude.
-  @@ NEEDS RULING
-- **`lpn_dxf_note_blocks`**
-  > Layers are named {prefix}, the asset code, a hyphen, and the alternative, as in {example}. Each element is a block inserted at scale 1 with attributes 1 unit high; scale the blocks to set the text height. Every attribute is visible; the attributes of one element are stacked in a column beside its symbol.
-  @@ NEEDS RULING
-- **`lpn_dxf_note_categories`**
-  > {n} junctions have more than one demand category. Their {tag} attribute holds the sum of the base demands of all categories.
-  @@ NEEDS RULING
-- **`lpn_dxf_note_crs`**
-  > Coordinates: {crs}, exactly as this project states them.
-  @@ NEEDS RULING
-- **`lpn_dxf_note_geo`**
-  > Coordinates: {crs}, in meters, not latitude and longitude. The latitudes and longitudes of the project were converted to that grid.
-  @@ NEEDS RULING
-- **`lpn_dxf_note_grid`**
-  > Coordinates: the X and Y of this project, in {unit}. No coordinate system is stated.
-  @@ NEEDS RULING
-- **`lpn_dxf_note_shortened`**
-  > {n} values were longer than a DXF file allows ({max} characters), so each was shortened and ends in three periods.
-  @@ NEEDS RULING
-- **`lpn_file_export_dxf_tip`**
-  > Download this network for AutoCAD and other CAD programs: pipes, pumps, and valves as polylines, and every element as a block whose attributes carry its ID and property values in the project units.
-  @@ NEEDS RULING
-- **`lpn_file_export_item_dxf`**
-  > DXF file…
-  @@ NEEDS RULING
+### feat/dxf (`dee7a28a`) — adds no English strings
 
 ### feat/hover-label (`944f963d`) — 2 new, 2 to read @@ NEEDS RULING
 
@@ -563,8 +562,6 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`points_data_points_heading`**
   > Points data<br />(use Copy to see format)
   @@ NEEDS RULING
-
-### feat/table-export (`6988ecf1`) — adds no English strings
 
 ### feat/user-guide (`a6661944`) — 39 new, 39 to read @@ NEEDS RULING
 

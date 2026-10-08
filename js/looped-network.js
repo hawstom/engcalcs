@@ -36332,6 +36332,328 @@ var EngCalcs = EngCalcs || {};
 					: (pcX.lpn_geojson_results_out || 'No results are included, because the network is not solved.')));
 		});
 	}
+	// ---- EXPORT DXF FILE (ROADMAP Task 772) ---------------------------------------------------------
+	//
+	// **THE MODEL'S DATA, AS ATTRIBUTED BLOCKS** (Tom's DXF Interface Manager specification,
+	// dev/dxf-interface.md): links as polylines, every element a block whose attributes carry its
+	// ID and properties, tagged with the property labels and valued verbatim in the project units.
+	// No annotation. js/lpn-dxf.js writes the file; this half GATHERS. Rules: dev/dxf.md.
+	//
+	// **THE FRAME, AND WHAT THE FILE MAY CLAIM ABOUT IT.** A grid project goes out in its own X and
+	// Y, number for number. A project with a stated coordinate system goes out in it, unchanged. A
+	// latitude-and-longitude project is converted to the UTM zone that holds its centre (WGS 84,
+	// metres), because a CAD drawing is a plane and degrees are not a length; the page's own Web
+	// Mercator frame is not used, since its scale is wrong by 1 / cos(latitude). The read-me says
+	// which of the three it is, and nothing else claims a coordinate system.
+	function dxfFrame(done) {
+		var pc = EngCalcs.pageConfig || {}, code, u;
+		if (isLatLonProject()) {
+			var b = null;
+			doc.nodes.forEach(function (n) {
+				var X = effective(n, 'x'), Y = effective(n, 'y');
+				if (!isFinite(X) || !isFinite(Y)) { return; }
+				if (!b) { b = { w: X, e: X, s: Y, n: Y }; return; }
+				b.w = Math.min(b.w, X); b.e = Math.max(b.e, X); b.s = Math.min(b.s, Y); b.n = Math.max(b.n, Y);
+			});
+			code = crsUtmCodeFor(b ? { lon: (b.w + b.e) / 2, lat: (b.s + b.n) / 2 } : { lon: 0, lat: 0 });
+			// UTM stops at 80 S and 84 N, and the drawing has no other plane to go to; that is a
+			// fact about where the network is, not a failed download, so it is said differently.
+			if (!code) { done({ ok: false, reason: 'utm' }); return; }
+			if (!EngCalcs.lpnCrsLoad) { done({ ok: false, reason: 'load' }); return; }
+			EngCalcs.lpnCrsLoad(function () {
+				if (!EngCalcs.lpnCrsHas(code)) { done({ ok: false, reason: 'load' }); return; }
+				done({
+					ok: true, kind: 'geo', code: code, insunits: 6, measurement: 1, unitLabel: pc.u_m || 'm',
+					fwd: function (X, Y) { return EngCalcs.lpnCrsForward(code, { lon: X, lat: Y }); },
+					note: (pc.lpn_dxf_note_geo || 'Coordinates: {crs}, in meters, not latitude and longitude. The latitudes and longitudes of the project were converted to that grid.')
+						.replace('{crs}', dxfCrsName(code))
+				});
+			});
+			return;
+		}
+		function identity(X, Y) { return { x: X, y: Y }; }
+		if (isProjectedProject()) {
+			code = projectCrsCode();
+			var finish = function () {
+				var cu = EngCalcs.lpnCrsUnit ? EngCalcs.lpnCrsUnit(code) : null,
+					unit = cu && cu.units ? cu.units : (cu && cu.toMeter === 1 ? 'm' : '');
+				done({
+					ok: true, kind: 'projected', code: code, fwd: identity, unitLabel: unit === 'm' ? (pc.u_m || 'm') : unit,
+					insunits: EngCalcs.lpnDxfInsUnits(unit), measurement: unit === 'm' ? 1 : 0,
+					note: (pc.lpn_dxf_note_crs || 'Coordinates: {crs}, exactly as this project states them.')
+						.replace('{crs}', dxfCrsName(code))
+				});
+			};
+			if (EngCalcs.lpnCrsLoad) { EngCalcs.lpnCrsLoad(finish); } else { finish(); }
+			return;
+		}
+		u = unitKey('lpn_u_length');
+		done({
+			ok: true, kind: 'grid', fwd: identity, unitLabel: unitSymbol('lpn_u_length'),
+			insunits: EngCalcs.lpnDxfInsUnits(u), measurement: u === 'm' ? 1 : 0,
+			// {unit} is the unit's own name (ft, m), not the page's translated symbol: the read-me is
+			// for a CAD program, and a translated symbol in a capitalized sentence read "IN 英尺".
+			note: (pc.lpn_dxf_note_grid || 'Coordinates: the X and Y of this project, in {unit}. No coordinate system is stated.')
+				.replace('{unit}', u)
+		});
+	}
+	function dxfCrsName(code) {
+		var name = crsLabel(code);
+		return (name && name !== String(code)) ? name + ' (' + code + ')' : String(code);
+	}
+	// A value for an attribute: the effective (scenario) value where the property is overridable,
+	// the stored one otherwise, and '' for nothing at all. **VERBATIM** (dev/dxf-interface.md:
+	// *"values match the current project units and are imported verbatim"*): a number is stored in
+	// the displayed unit, so it goes out as stored, unrounded and unconverted.
+	//
+	// **AND AS TYPED** (pre-review 2026-10-07: Net3's 220.0 went out as 220, .1 as 0.1): a number
+	// read from a file keeps its own text beside it, and EngCalcs.lpnNumText() hands that text
+	// back while it still states this number, exactly as the .inp export writes it. The token is
+	// kept under the stored field's name, `_diameter` for an overridable property, `elev` for one
+	// that is not.
+	function dxfNum(rec, key, v) {
+		if (typeof v !== 'number' || !isFinite(v)) { return v === undefined || v === null || typeof v === 'number' ? '' : v; }
+		return EngCalcs.lpnNumText ? EngCalcs.lpnNumText(rec, key, v) : String(v);
+	}
+	function dxfVal(el, prop) {
+		var v = effective(el, prop);
+		if (v === undefined || v === null) { v = el[prop]; }
+		return dxfNum(el, ('_' + prop) in el ? '_' + prop : prop, v);
+	}
+	// **BASE DEMAND IS THE AGGREGATE OF EVERY CATEGORY'S BASE** (Tom, 2026-10-07: *"If we aren't
+	// exporting the full list of demand categories, we must export the aggregate base demand."*),
+	// the same sum baseDemandTotal() puts in the table, the label and the popup. One category is
+	// written as typed; several are added and written as a plain number (rounded to 12 significant
+	// digits so 0.1 + 0.2 reads 0.3). dxfModel() counts the junctions that have more than one.
+	function dxfBaseDemand(n) {
+		var rows = EngCalcs.lpnDemandRows ? EngCalcs.lpnDemandRows(n, effective(n, 'demand')) : null, t;
+		if (!rows || rows.length < 2) { return { text: dxfVal(n, 'demand'), more: false }; }
+		t = baseDemandTotal(n);
+		return { text: String(parseFloat(t.toPrecision(12))), more: true };
+	}
+	// The properties each block carries, by internal key. Data only: no solve results, which an
+	// import would have no property to put back into.
+	var LPN_DXF_KEYS = {
+		junction: ['ID', 'ELEV', 'DEMAND', 'TAG', 'DESC'],
+		reservoir: ['ID', 'HEAD', 'TAG', 'DESC'],
+		tank: ['ID', 'ELEV', 'LEVEL', 'MINLEVEL', 'MAXLEVEL', 'DIAMETER', 'TAG', 'DESC'],
+		pipe: ['ID', 'DIAMETER', 'LENGTH', 'ROUGHNESS', 'TAG', 'DESC'],
+		pump: ['ID', 'TAG', 'DESC'],
+		valve: ['ID', 'VALVETYPE', 'DIAMETER', 'SETTING', 'TAG', 'DESC'],
+		customer: ['ID', 'DEMAND', 'COUNT', 'TAG', 'DESC']
+	};
+	// **A TAG IS THE PROPERTY'S LABEL** in the page's language (dev/dxf-interface.md: *"attributes
+	// have tags that match EPANET++ property labels ... spaces can be replaced with underscores"*),
+	// upper case: "Base demand" is BASE_DEMAND. The prompt AutoCAD shows in Edit Attributes is the
+	// label with its unit.
+	function dxfLabels() {
+		var pc = EngCalcs.pageConfig || {};
+		return {
+			ID: [pc.lpn_field_id || 'ID'],
+			ELEV: [pc.lpn_field_elev || 'Elevation', 'lpn_u_elevhead'],
+			DEMAND: [pc.lpn_field_base_demand || 'Base demand', 'lpn_u_flow'],
+			HEAD: [pc.lpn_field_head || 'Head', 'lpn_u_elevhead'],
+			LEVEL: [pc.lpn_field_tank_level || 'Water depth', 'lpn_u_elevhead'],
+			MINLEVEL: [pc.lpn_field_tank_minlevel || 'Lowest water depth', 'lpn_u_elevhead'],
+			MAXLEVEL: [pc.lpn_field_tank_maxlevel || 'Highest water depth', 'lpn_u_elevhead'],
+			DIAMETER: [pc.lpn_field_diameter || 'Diameter', 'lpn_u_diameter'],
+			'tank.DIAMETER': [pc.lpn_field_tank_diameter || 'Tank diameter', 'lpn_u_length'],
+			LENGTH: [pc.lpn_field_length || 'Length', 'lpn_u_length'],
+			ROUGHNESS: [pc.lpn_field_roughness || 'Roughness'],
+			VALVETYPE: [pc.lpn_field_valve_type || 'Valve type'],
+			SETTING: [pc.lpn_field_valve_setting || 'Setting'],
+			COUNT: [pc.lpn_field_meter_count || 'Number of services'],
+			TAG: [pc.lpn_field_tag || 'Tag'],
+			DESC: [pc.lpn_field_desc || 'Description']
+		};
+	}
+	/** { tags: { type: [TAG...] }, prompts: { 'type.TAG': prompt }, tagOf(type, key) }. */
+	function dxfLocale() { return (document.documentElement && document.documentElement.lang) || ''; }
+	function dxfTagTable() {
+		var labels = dxfLabels(), tags = {}, prompts = {}, byKey = {}, loc = dxfLocale();
+		Object.keys(LPN_DXF_KEYS).forEach(function (t) {
+			var used = {};
+			byKey[t] = {};
+			tags[t] = LPN_DXF_KEYS[t].map(function (key) {
+				var L = labels[t + '.' + key] || labels[key], tag = EngCalcs.lpnDxfTag(L[0], loc) || key, n = 2, base = tag;
+				// Two labels can read alike in a translation; a tag must be unique in its block.
+				while (used[tag]) { tag = base + '_' + (n++); }
+				used[tag] = true;
+				byKey[t][key] = tag;
+				prompts[t + '.' + tag] = L[1] ? L[0] + ' (' + unitSymbol(L[1]) + ')' : L[0];
+				return tag;
+			});
+		});
+		var idTags = {};
+		Object.keys(byKey).forEach(function (t) { idTags[t] = byKey[t].ID; });
+		return { tags: tags, prompts: prompts, idTags: idTags, tagOf: function (t, key) { return byKey[t][key]; } };
+	}
+	function dxfNodeAttrs(n) {
+		var a = [['ID', n.id]];
+		if (n.type === 'junction') {
+			a.push(['ELEV', dxfVal(n, 'elev')], ['DEMAND', dxfBaseDemand(n).text]);
+		} else if (n.type === 'reservoir') {
+			a.push(['HEAD', dxfNum(n, '_head', nodeFixedHead(n))]);
+		} else if (n.type === 'tank') {
+			a.push(['ELEV', dxfVal(n, 'elev')], ['LEVEL', dxfVal(n, 'level')], ['MINLEVEL', dxfVal(n, 'minLevel')],
+				['MAXLEVEL', dxfVal(n, 'maxLevel')], ['DIAMETER', dxfVal(n, 'tankDiameter')]);
+		}
+		a.push(['TAG', dxfVal(n, 'tag')], ['DESC', dxfVal(n, 'desc')]);
+		return a;
+	}
+	function dxfLinkAttrs(l) {
+		var a = [['ID', l.id]];
+		if (l.type === 'pipe') {
+			a.push(['DIAMETER', dxfVal(l, 'diameter')], ['LENGTH', dxfVal(l, 'length')], ['ROUGHNESS', dxfVal(l, 'roughness')]);
+		}
+		if (l.type === 'valve') {
+			a.push(['VALVETYPE', l.valveType || ''], ['DIAMETER', dxfVal(l, 'diameter')], ['SETTING', dxfVal(l, 'setting')]);
+		}
+		a.push(['TAG', dxfVal(l, 'tag')], ['DESC', dxfVal(l, 'desc')]);
+		return a;
+	}
+	// A point of the DRAWING FRAME (where a customer lives) through the outward boundary and on
+	// into the drawing by `G`. The DXF export's one crossing of that boundary, so
+	// dev/lpn-spike/local-origin-harness.js counts it once.
+	function dxfDrawnToFile(G, x, y) { return G(outwardX(x), outwardY(y)); }
+	/**
+	 * **A SCENARIO'S LAYER CODE, ONE PER SCENARIO, AND NEVER BASE FOR ANOTHER** (pre-review
+	 * 2026-10-07). Every scenario is coded in the project's order so two names that encode alike
+	 * ("Fire flow" and "Fire-flow") are told apart: the later one takes _2, _3. A name with nothing
+	 * left after encoding takes its scenario ID.
+	 */
+	function dxfAlternative(sc) {
+		var used = { BASE: true }, out = 'BASE', loc = dxfLocale();
+		if (!sc || sc.isBase) { return 'BASE'; }
+		scenarios.forEach(function (x) {
+			if (x.isBase) { return; }
+			var base = EngCalcs.lpnDxfAlternative(x.name, loc) || EngCalcs.lpnDxfAlternative(x.id, loc) || 'S',
+				code = base, k = 2;
+			while (used[code]) { code = base + '_' + (k++); }
+			used[code] = true;
+			if (x.id === sc.id) { out = code; }
+		});
+		return out;
+	}
+	/** The whole model as js/lpn-dxf.js's plain model, in `frame`'s coordinates. */
+	function dxfModel(frame) {
+		var pc = EngCalcs.pageConfig || {}, G = frame.fwd, snap = serializeProject(),
+			geo = isLatLonProject(), tt = dxfTagTable(),
+			org = (!geo && snap.origin && isFinite(snap.origin.x)) ? snap.origin : { x: 0, y: 0 },
+			fileNode = {}, nodes = [], links = [], customers = [];
+		function attrs(type, pairs) { return pairs.map(function (p) { return { tag: tt.tagOf(type, p[0]), value: p[1] }; }); }
+		snap.nodes.forEach(function (n) { fileNode[n.id] = n; });
+		// A node's OUTWARD position: this scenario's own if it moved the node, else the file's
+		// number plus the origin -- the same arithmetic the .inp export uses, so the two agree.
+		function nodeOut(id) {
+			var fn = fileNode[id], live = nodeById(id), ov = live ? coordOverridesOf(live) : null;
+			if (!fn) { return null; }
+			return G(ov && typeof ov.x === 'number' ? ov.x : fn.x + org.x,
+				ov && typeof ov.y === 'number' ? ov.y : fn.y + org.y);
+		}
+		doc.nodes.forEach(function (n) {
+			var p = nodeOut(n.id);
+			if (!p) { return; }
+			nodes.push({ id: n.id, type: n.type, x: p.x, y: p.y, attrs: attrs(n.type, dxfNodeAttrs(n)) });
+		});
+		snap.links.forEach(function (fl) {
+			var l = linkById(fl.id), pts = [], a = nodeOut(fl.from), b = nodeOut(fl.to);
+			if (!l || !a || !b) { return; }
+			pts.push(a);
+			(fl.verts || []).forEach(function (v) {
+				var q = G(v.x + org.x, v.y + org.y);
+				if (q) { pts.push(q); }
+			});
+			pts.push(b);
+			links.push({ id: l.id, type: l.type, pts: pts, attrs: attrs(l.type, dxfLinkAttrs(l)) });
+		});
+		(doc.customers || []).forEach(function (c) {
+			var pt = customerPoint(c), an = customerAttachPoint(c),
+				P = pt ? dxfDrawnToFile(G, pt.x, pt.y) : null,
+				A = an ? dxfDrawnToFile(G, an.x, an.y) : null;
+			if (!P) { return; }
+			customers.push({ id: c.id, x: P.x, y: P.y, from: A, attrs: attrs('customer', [
+				['ID', c.id], ['DEMAND', dxfVal(c, 'demand')], ['COUNT', dxfVal(c, 'count')],
+				['TAG', c.tag || ''], ['DESC', c.desc || '']]) });
+		});
+		// **THE LAYER NAMES**: js/lpn-dxf.js's one prefix, the project's own ID prefixes as asset
+		// codes, and the scenario on screen as the alternative (BASE for Base). The whole network
+		// as that scenario has it is written; an overrides-only layer per alternative waits on
+		// Task 721, which owns the alternatives model.
+		var alternative = dxfAlternative(activeScenario()),
+			codes = EngCalcs.lpnDxfAssetCodes(settings.idPrefixes),
+			readme = [projectDisplayName(project), frame.note,
+				(pc.lpn_dxf_note_blocks || 'Layers are named {prefix}, the asset code, a hyphen, and the alternative, as in {example}. Each element is a block inserted at scale 1 with attributes 1 unit high; scale the blocks to set the text height. Every attribute is visible; the attributes of one element are stacked in a column beside its symbol.')
+					.replace('{prefix}', EngCalcs.lpnDxfModelPrefix)
+					.replace('{example}', EngCalcs.lpnDxfModelPrefix + codes.junction + '-' + alternative)];
+		// **A VALUE TOO LONG FOR ONE DXF STRING IS SHORTENED, AND THE READ-ME SAYS SO** -- the writer
+		// cuts it and ends it in three periods (js/lpn-dxf.js, LIMIT_CHARS).
+		var longOnes = 0;
+		nodes.concat(links, customers).forEach(function (el) {
+			(el.attrs || []).forEach(function (a) { if (EngCalcs.lpnDxfTooLong(a.value)) { longOnes++; } });
+		});
+		// More than one demand category: BASE_DEMAND holds their sum, and the read-me says so.
+		var multi = doc.nodes.filter(function (n) { return n.type === 'junction' && dxfBaseDemand(n).more; }).length;
+		if (multi) {
+			readme.push((pc.lpn_dxf_note_categories || '{n} junctions have more than one demand category. Their {tag} attribute holds the sum of the base demands of all categories.')
+				.replace('{n}', String(multi)).replace('{tag}', tt.tagOf('junction', 'DEMAND')));
+		}
+		if (longOnes) {
+			readme.push((pc.lpn_dxf_note_shortened || '{n} values were longer than a DXF file allows ({max} characters), so each was shortened and ends in three periods.')
+				.replace('{n}', String(longOnes)).replace('{max}', String(EngCalcs.lpnDxfLimit)));
+		}
+		return {
+			insunits: frame.insunits, measurement: frame.measurement,
+			codes: codes, alternative: alternative, locale: dxfLocale(), idTags: tt.idTags,
+			nodes: nodes, links: links, customers: customers, readme: readme,
+			tags: tt.tags, prompts: tt.prompts
+		};
+	}
+	/** frame -> {ok, text}; the synchronous half, which is what a harness drives. */
+	function dxfExportText(frame) {
+		if (!frame || !frame.ok || !EngCalcs.lpnDxfWrite) { return { ok: false, reason: frame && frame.reason }; }
+		return { ok: true, frame: frame, text: EngCalcs.lpnDxfWrite(dxfModel(frame)) };
+	}
+	function exportDxfFile() {
+		var pcX = EngCalcs.pageConfig || {};
+		saveToStorage();   // export what is on screen, including edits not yet saved
+		dxfFrame(function (frame) {
+			// **A FAILURE SAYS SO.** On a lat/lon project this runs inside the coordinate loader's
+			// promise, which swallows a throw; uncaught, the click did nothing at all (2026-10-06).
+			try { dxfExportFinish(frame); } catch (err) {
+				if (window.console && console.error) { console.error(err); }
+				setNotice((pcX.lpn_dxf_export_failed || 'The DXF file was not written: an error in this page stopped it ({error}).')
+					.replace('{error}', String(err && err.message ? err.message : err)));
+			}
+		});
+	}
+	function dxfExportFinish(frame) {
+		var pcX = EngCalcs.pageConfig || {};
+		var out = dxfExportText(frame);
+		if (!out.ok) {
+			setNotice(out.reason === 'utm'
+				? (pcX.lpn_dxf_export_no_utm || 'The DXF file was not written: this network lies outside the latitudes UTM covers (80° S to 84° N), and a drawing needs a flat grid to be drawn on.')
+				: (pcX.lpn_dxf_export_refused || 'The DXF file was not written: the coordinate conversion it needs did not load. Check the connection and try again.'));
+			return;
+		}
+		// A BYTE string in Windows-1252 (js/lpn-dxf.js), so it goes out as bytes: a Blob of the
+		// string itself would be UTF-8 and turn every accented letter into two wrong ones.
+		var blob = new Blob([EngCalcs.lpnDxfBytes(out.text)], { type: 'application/dxf' }),
+			url = URL.createObjectURL(blob), a = document.createElement('a');
+		a.href = url;
+		a.download = safeFileName(projectDisplayName(project)) + '.dxf';
+		document.body.appendChild(a);
+		a.click();
+		document.body.removeChild(a);
+		setTimeout(function () { URL.revokeObjectURL(url); }, 10000);
+		// Exporting is not saving, for the reason exportInpFile() gives. A lat/lon project's
+		// drawing is in UTM metres, and the status line says so, since a reader expecting the
+		// project's degrees would otherwise look for them (Tom, 2026-10-06).
+		setNotice(frame.kind === 'geo'
+			? (pcX.lpn_dxf_exported_geo || 'Exported {file}. Its coordinates are {crs}, in meters, not latitude and longitude.')
+				.replace('{file}', a.download).replace('{crs}', dxfCrsName(frame.code))
+			: (pcX.lpn_status_inp_exported || 'Exported {file}.').replace('{file}', a.download));
+	}
 	/**
 	 * **THE EXPORT ALERT** (ROADMAP Task 465 slice 5; Tom, 2026-09-06, on a library pipe being
 	 * something a round trip loses: *"Yes. And we have to start showing an export alert."*). It is
@@ -42394,11 +42716,13 @@ var EngCalcs = EngCalcs || {};
 			// GeoJSON (Task 728): same verb, same kind of file.
 			{ icon: 'save', label: pc.lpn_file_export_item_geojson || 'GeoJSON file…',
 			  tip: pc.lpn_file_export_geojson_tip, fn: exportGeoJsonFile },
-			// **SEAM WITH feat/dxf**: its DXF row goes HERE, after GeoJSON and before the separator --
-			// the drawing formats together above, the table formats below.
+			// THE MODEL'S DATA for AutoCAD and every other DWG program (Task 772). Reading a DXF back
+			// is the DXF Interface Manager's import half, not built.
+			{ icon: 'save', label: pc.lpn_file_export_item_dxf || 'DXF file…',
+			  tip: pc.lpn_file_export_dxf_tip, fn: exportDxfFile },
 			// **THE TABLES, BY FORMAT** (Tom, 2026-10-07: *"File, Export to, and we are adding
 			// ODS/XLSX/CSV. And we include Libraries"*). Each row opens the box that asks which tables
-			// and which scenarios; the format is the row. Rows are named for the file, like the two
+			// and which scenarios; the format is the row. Rows are named for the file, like the three
 			// above, under a heading that says what goes into it.
 			{ separator: true },
 			{ heading: true, label: pc.lpn_file_export_tables_heading || 'Tables and libraries' },

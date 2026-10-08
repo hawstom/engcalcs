@@ -2145,6 +2145,18 @@ EngCalcs.pageConfig = {
 	lpn_inp_export_differences: <?=json_encode($ec_lang['lpn_inp_export_differences'])?>,
 	lpn_inp_export_difference_one: <?=json_encode($ec_lang['lpn_inp_export_difference_one'])?>,
 	lpn_inp_export_refused: <?=json_encode($ec_lang['lpn_inp_export_refused'])?>,
+	lpn_file_export_item_dxf: <?=json_encode($ec_lang['lpn_file_export_item_dxf'])?>,
+	lpn_file_export_dxf_tip: <?=json_encode($ec_lang['lpn_file_export_dxf_tip'])?>,
+	lpn_dxf_export_refused: <?=json_encode($ec_lang['lpn_dxf_export_refused'])?>,
+	lpn_dxf_note_grid: <?=json_encode($ec_lang['lpn_dxf_note_grid'])?>,
+	lpn_dxf_note_crs: <?=json_encode($ec_lang['lpn_dxf_note_crs'])?>,
+	lpn_dxf_note_geo: <?=json_encode($ec_lang['lpn_dxf_note_geo'])?>,
+	lpn_dxf_note_shortened: <?=json_encode($ec_lang['lpn_dxf_note_shortened'])?>,
+	lpn_dxf_export_no_utm: <?=json_encode($ec_lang['lpn_dxf_export_no_utm'])?>,
+	lpn_dxf_export_failed: <?=json_encode($ec_lang['lpn_dxf_export_failed'])?>,
+	lpn_dxf_exported_geo: <?=json_encode($ec_lang['lpn_dxf_exported_geo'])?>,
+	lpn_dxf_note_blocks: <?=json_encode($ec_lang['lpn_dxf_note_blocks'])?>,
+	lpn_dxf_note_categories: <?=json_encode($ec_lang['lpn_dxf_note_categories'])?>,
 	lpn_file_export_geojson_tip: <?=json_encode($ec_lang['lpn_file_export_geojson_tip'])?>,
 	lpn_geojson_refused_local: <?=json_encode($ec_lang['lpn_geojson_refused_local'])?>,
 	lpn_geojson_refused_range: <?=json_encode($ec_lang['lpn_geojson_refused_range'])?>,
@@ -3941,6 +3953,9 @@ EngCalcs.pageConfig = {
       // DOM. BEFORE looped-network.js, which reads EngCalcs.lpnCalib when the Calibration report
       // opens; absent, the report draws nothing. ?>
 <script src="/engcalcs/js/lpn-calib.js?v=<?=filemtime(__DIR__.'/js/lpn-calib.js')?>"></script>
+<?php // Writing a DXF file of the model (ROADMAP Task 772). Pure text, no DOM, no request. BEFORE
+      // looped-network.js, which calls EngCalcs.lpnDxfWrite() when File > Export DXF file is chosen. ?>
+<script src="/engcalcs/js/lpn-dxf.js?v=<?=filemtime(__DIR__.'/js/lpn-dxf.js')?>"></script>
 <script src="/engcalcs/js/looped-network.js?v=<?=filemtime(__DIR__.'/js/looped-network.js')?>"></script>
 <script>
 <?php echoCookieScript(); ?>
