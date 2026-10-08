@@ -122,7 +122,7 @@ is the one you meant. "The first one" is a complete answer.
   *The proposal:* PROPOSED English for Tom: 'Mapbox DEM accuracy in 2026, horizontal then vertical: 1–10 m and under 1 m in the US, 2–10 m and 1–3 m in Europe and Japan, 30 m and 10–16 m globally, and 90 m and over 16 m at the poles.'
   @@ NEEDS RULING
 
-## Synonym entries to approve  (13, 11 to read @@ NEEDS RULING)
+## Synonym entries to approve  (15, 13 to read @@ NEEDS RULING)
 
 **These are translator notes (`$ec_lang_syn`), not visitor wording.** Each was written against an
 English string that has since changed, or against a key that no longer exists. Say which: keep it
@@ -135,6 +135,22 @@ never edits a synonym.
   *Why stale:* the English changed after this synonym was written
   *Written against:* May we save a one-digit cookie in this browser to remember that we have already counted this page? It records nothing about you and nothing you enter. Without it we cannot tell your second visit from somebody else’s first.
   *Current synonym:* May we save (store, keep, put) a one-digit cookie (a tiny stored marker) in this browser to remember that we have already counted this page? It records nothing about you and nothing you enter. Without it we cannot tell your second visit from somebody else’s first.
+  **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
+  @@ NEEDS RULING
+
+- **`consent_current_granted`**
+  > You allowed this. This browser keeps a random code so that we can count it.
+  *Why stale:* the English changed after this synonym was written
+  *Written against:* You allowed this. We limit logging for this browser profile.
+  *Current synonym:* You allowed this. We limit logging (recording) for this browser profile.
+  **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
+  @@ NEEDS RULING
+
+- **`consent_region_label`**
+  > Your choice about the counting code.
+  *Why stale:* the English changed after this synonym was written
+  *Written against:* Your choice about limiting logging.
+  *Current synonym:* Your choice about limiting logging (recording).
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   @@ NEEDS RULING
 
@@ -694,7 +710,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Guide
   @@ NEEDS RULING
 
-### feat/visit-dedupe (`6ecd5f61`) — adds no English strings
+### feat/visit-dedupe (`129f59ee`) — adds no English strings
 
 ### feat/workspace (`7eb9e349`) — 12 new, 12 to read @@ NEEDS RULING
 
