@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**100 still to read on master**, of 102 untranslated keys, of 2542 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**105 still to read on master**, of 107 untranslated keys, of 2547 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -139,7 +139,7 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   @@ NEEDS RULING
 
-## lpn_  (102, 100 to read @@ NEEDS RULING)
+## lpn_  (107, 105 to read @@ NEEDS RULING)
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -150,6 +150,9 @@ never edits a synonym.
 - **`lpn_change_type_create_new`**
   > Create new assets
   @@ NEEDS RULING
+- **`lpn_change_type_customers_left`**
+  > A customer cannot be assigned per scenario, so the demand of these customers stays with the old junction and is not in this scenario's solve:
+  @@ NEEDS RULING
 - **`lpn_change_type_line_alternative`**
   > {id}: {property} {value}, in alternative {alternative}
   @@ NEEDS RULING
@@ -157,13 +160,16 @@ never edits a synonym.
   > The new assets cannot hold these values. The old assets keep them:
   @@ NEEDS RULING
 - **`lpn_change_type_old_controls`**
-  > These controls and rules name an old asset, which is inactive in this scenario, so they are omitted from this scenario's run:
+  > These controls and rules name an old asset, which is inactive in this scenario, so they are left out of this scenario's run and its .inp export:
   @@ NEEDS RULING
 - **`lpn_change_type_scenario_ask`**
   > Current scenario is not Base. Create new assets? The selected assets become inactive in this scenario.
   @@ NEEDS RULING
 - **`lpn_change_type_switch_base`**
   > Switch to Base
+  @@ NEEDS RULING
+- **`lpn_control_inactive_note`**
+  > These controls refer to an asset that is inactive in this scenario, so they were ignored in this run: {ids}
   @@ NEEDS RULING
 - **`lpn_dxf_export_failed`**
   > The DXF file was not written: an error in this page stopped it ({error}).
@@ -246,6 +252,12 @@ never edits a synonym.
 - **`lpn_file_import_workspace_tip`**
   > Apply a workspace file saved with File, Export, Workspace: box positions and sizes, docking, pane sizes and the reading preferences of this page. Your projects and cookies are not touched.
   @@ NEEDS RULING
+- **`lpn_inp_export_flat_customers_inactive`**
+  > {n} of these customers are assigned to a junction that is inactive in this scenario, so their demand is not in the file.
+  @@ NEEDS RULING
+- **`lpn_inp_export_flat_inactive_controls`**
+  > These controls and rules name an asset that is inactive in this scenario, so they are not in the file: {ids}
+  @@ NEEDS RULING
 - **`lpn_pane_copy_heads`**
   > Copy with headings
   @@ NEEDS RULING
@@ -260,6 +272,9 @@ never edits a synonym.
   @@ NEEDS RULING
 - **`lpn_pane_scn_ov_only`**
   > Overrides only
+  @@ NEEDS RULING
+- **`lpn_rule_inactive_note`**
+  > These rules refer to an asset that is inactive in this scenario, so they were ignored in this run: {ids}
   @@ NEEDS RULING
 - **`lpn_scenario_delete_has_children`**
   > The scenario {name} cannot be deleted while other scenarios inherit from it: {list}. Delete those first, or give them another parent.
@@ -452,7 +467,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**48 still to read**, of 51 new keys across 14 unmerged branch(es).
+**52 still to read**, of 55 new keys across 13 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -463,11 +478,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/bentley-interop (`345bc091`) — adds no English strings
-
-### feat/desktop (`baba0f04`) — adds no English strings
-
-### feat/hover-label (`31b137e5`) — 2 new, 2 to read @@ NEEDS RULING
+### chore/calls-1008c (`ba4703ae`) — 2 new, 2 to read @@ NEEDS RULING
 
 - **`lpn_settings_hover_card`**
   > Show the full label on hover
@@ -475,6 +486,10 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_settings_hover_card_tip`**
   > Rest the pointer on a node, link or customer to see its label as specified in Settings at any scale, fit or not. This is a setting for this browser, not for the project.
   @@ NEEDS RULING
+
+### feat/bentley-interop (`2cfebc47`) — adds no English strings
+
+### feat/desktop (`baba0f04`) — adds no English strings
 
 ### feat/label-gang-search (`8b31a907`) — 3 new, all ruled
 
@@ -522,7 +537,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Points data<br />(use Copy to see format)
   @@ NEEDS RULING
 
-### feat/user-guide (`0306ae64`) — 40 new, 40 to read @@ NEEDS RULING
+### feat/user-guide (`9e0c0ef6`) — 44 new, 44 to read @@ NEEDS RULING
 
 - **`lpn_guide_also`**
   > Also in {menu}
@@ -577,6 +592,12 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 - **`lpn_guide_find_results_term`**
   > Results, the selection, and Tables
+  @@ NEEDS RULING
+- **`lpn_guide_how_alt`**
+  > Alternatives preview is listed under Water, Scenarios when Basic mode is off.
+  @@ NEEDS RULING
+- **`lpn_guide_how_popup`**
+  > Properties opens when you select an asset or text.
   @@ NEEDS RULING
 - **`lpn_guide_keys_def`**
   > <table class="lpn-notes-table"><tbody><tr><td>?</td><td>Open the guide at the control under the pointer or holding focus.</td></tr><tr><td>F1</td><td>Open the guide at the entry for the box that has focus.</td></tr><tr><td>Ctrl+K</td><td>Open the guide with the current selection in the search field.</td></tr><tr><td>/</td><td>Select the search field while the guide has focus.</td></tr><tr><td>Esc</td><td>Close the guide and return to where you were.</td></tr></tbody></table>
@@ -644,7 +665,11 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_help_manual`**
   > Guide
   @@ NEEDS RULING
+- **`lpn_settings_hover_card`**
+  > Show the full label on hover
+  @@ NEEDS RULING
+- **`lpn_settings_hover_card_tip`**
+  > Rest the pointer on a node, link or customer to see its label as specified in Settings at any scale, fit or not. This is a setting for this browser, not for the project.
+  @@ NEEDS RULING
 
 ### feat/visit-dedupe (`7b4a84bd`) — adds no English strings
-
-### fix/dock-box-width (`a6d2fd3e`) — adds no English strings

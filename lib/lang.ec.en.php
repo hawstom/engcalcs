@@ -1611,7 +1611,8 @@ $ec_lang['lpn_change_type_rules']='These rule lines name a link by its kind, and
 $ec_lang['lpn_change_type_scenario_ask']='Current scenario is not Base. Create new assets? The selected assets become inactive in this scenario.';
 $ec_lang['lpn_change_type_create_new']='Create new assets';
 $ec_lang['lpn_change_type_not_carried']='The new assets cannot hold these values. The old assets keep them:';
-$ec_lang['lpn_change_type_old_controls']='These controls and rules name an old asset, which is inactive in this scenario, so they are omitted from this scenario\'s run:';
+$ec_lang['lpn_change_type_old_controls']='These controls and rules name an old asset, which is inactive in this scenario, so they are left out of this scenario\'s run and its .inp export:';
+$ec_lang['lpn_change_type_customers_left']='A customer cannot be assigned per scenario, so the demand of these customers stays with the old junction and is not in this scenario\'s solve:';
 $ec_lang['lpn_change_type_switch_base']='Switch to Base';
 $ec_lang['lpn_tables_menu_tip']='View and edit assets in tables in bottom panel.';
 // The Run row's own tip, NOT lpn_time_run_tip: this row exists partly to answer "where is my Run
@@ -2119,6 +2120,8 @@ $ec_lang['lpn_status_inp_exported_picture']='Exported {zip}, holding the EPANET 
 $ec_lang['lpn_status_inp_exported_no_picture']='Exported {file}. The background picture could not be saved, so the .inp names none; in EPANET, add it with View > Backdrop > Load.';
 // {n} is a whole number. Said plainly rather than hidden: a file that quietly loses a pump curve is
 // the failure this whole feature exists to prevent.
+$ec_lang['lpn_inp_export_flat_customers_inactive']='{n} of these customers are assigned to a junction that is inactive in this scenario, so their demand is not in the file.';
+$ec_lang['lpn_inp_export_flat_inactive_controls']='These controls and rules name an asset that is inactive in this scenario, so they are not in the file: {ids}';
 $ec_lang['lpn_inp_export_differences']='{n} things the .inp format cannot hold.';
 $ec_lang['lpn_inp_export_difference_one']='One thing the .inp format cannot hold.';
 $ec_lang['lpn_inp_export_refused']='This project cannot be written as an EPANET file: {detail}';
@@ -3361,6 +3364,8 @@ $ec_lang['lpn_time_run_fell_back']='The numbers on screen came from the built-in
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_control_dangling_note']='These controls refer to an element that is no longer in this project, so they were ignored: {ids}';
 $ec_lang['lpn_control_unreadable_note']='These controls could not be read, so they were left out: {ids}';
+$ec_lang['lpn_control_inactive_note']='These controls refer to an asset that is inactive in this scenario, so they were ignored in this run: {ids}';
+$ec_lang['lpn_rule_inactive_note']='These rules refer to an asset that is inactive in this scenario, so they were ignored in this run: {ids}';
 $ec_lang['lpn_rule_dangling_note']='These rules refer to an element that is no longer in this project, so they were ignored in this run: {ids}';
 $ec_lang['lpn_rule_unreadable_note']='These rules could not be read, so they were ignored in this run: {ids}';
 $ec_lang['lpn_settings_text_size']='Text size (pixels)';

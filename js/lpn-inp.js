@@ -2565,7 +2565,7 @@
 		var junctions = [], reservoirs = [], tanks = [], pipes = [], pumps = [], valves = [],
 			curves = [], emitters = [], statuses = [], coords = [], verts = [], labelRows = [],
 			demandRows = [],
-			nodeById = {}, linkById = {}, omitted = {}, i, j, nd, lk, lb;
+			nodeById = {}, linkById = {}, omitted = {}, offLink = {}, i, j, nd, lk, lb;
 		// **THE CURVE LIBRARY** (Task 586), indexed by name so a reference resolves in one step.
 		// **EVERY CURVE IS WRITTEN, REFERENCED OR NOT**, which is why there is no "used" set here to
 		// filter by: a curve nothing points at is a legitimate document object now (the Library makes
@@ -2739,11 +2739,12 @@
 		for (i = 0; i < (doc.links || []).length; i++) {
 			lk = doc.links[i];
 			linkById[lk.id] = lk;
-			if (!isActive(lk)) { continue; }
+			if (!isActive(lk)) { offLink[lk.id] = 1; continue; }
 			if (omitted[lk.from] || omitted[lk.to]) {
 				// A link to a node this scenario switched off has nowhere to land, and EPANET rejects
 				// a file naming a node it does not contain.
 				diff('inactive-node-link', [lk.id]);
+				offLink[lk.id] = 1;
 				continue;
 			}
 			var status = eff(lk, 'status') === 'closed' ? 'Closed' : 'Open',
@@ -2990,9 +2991,32 @@
 		// its own text is exactly right and composing a sentence from the record could only differ
 		// from it. THE DAY A CONTROL EDITOR EXISTS this must compose from the record instead, and
 		// `raw` becomes a fallback -- an edited control would otherwise be written back unedited.
+		// **EXCEPT ONE NAMING AN ASSET THIS SCENARIO LEAVES OUT** (Task 781): EPANET rejects a file
+		// whose control names a link or node it does not contain, so the line is not written and the
+		// difference says which.
+		var offControls = [];
 		(doc.controls || []).forEach(function (ctl) {
-			if (ctl && ctl.raw) { controlRows.push(ctl.raw); }
+			if (!ctl || !ctl.raw) { return; }
+			var cn = ctl.condition && ctl.condition.kind === 'node' ? ctl.condition.node : null;
+			if ((ctl.link !== undefined && ctl.link !== null && offLink[ctl.link]) || (cn !== null && omitted[cn])) {
+				offControls.push(String(ctl.raw).trim());
+				return;
+			}
+			controlRows.push(ctl.raw);
 		});
+		if (offControls.length) { diff('inactive-control', offControls); }
+		// The same for a [RULES] block (EngCalcs.lpnRuleBlocks() reads the ids it names). Only when a
+		// block is left out is the section rebuilt from the kept blocks' lines; otherwise it goes out
+		// as the text it came in as.
+		var ruleLines = doc.rules || [], offRules = [];
+		if (ruleLines.length && (Object.keys(offLink).length || Object.keys(omitted).length)) {
+			var keptRules = [];
+			EngCalcs.lpnRuleBlocks(ruleLines).forEach(function (b) {
+				var off = b.nodes.some(function (id) { return omitted[id]; }) || b.links.some(function (id) { return offLink[id]; });
+				if (off) { offRules.push(b.name || '?'); } else { keptRules = keptRules.concat(b.lines); }
+			});
+			if (offRules.length) { diff('inactive-rule', offRules); ruleLines = keptRules; }
+		}
 		// **THE OPEN SCENARIO'S OWN RUN TIME AND TIME STEP** (Task 755), when it states them, on the
 		// rule the demand multiplier follows: the export writes the scenario the user is looking at.
 		// Laid over the document's block on a COPY, so the document is not written; and where the
@@ -3298,7 +3322,7 @@
 			// the file's own characters are the only honest form. The section is omitted entirely
 			// when the document holds none -- an empty `[RULES]` is a statement the source never
 			// made, the same rule `[OPTIONS] Pattern` follows.
-			((doc.rules && doc.rules.length) ? '[RULES]\n' + doc.rules.join('\n') + '\n\n' : '') +
+			(ruleLines.length ? '[RULES]\n' + ruleLines.join('\n') + '\n\n' : '') +
 			// **THE ENERGY AND WATER-QUALITY SECTIONS**, in EPANET's own writer order. What is left
 			// carried here this page really does not work out, and that is exactly why those have
 			// to be written back untouched: a value we cannot use is still the user's.
@@ -3376,6 +3400,13 @@
 		if ((doc.customers || []).length) {
 			diff('customer-geometry', (doc.customers || []).map(function (c) { return c.id; }),
 				String((doc.customers || []).length));
+			// A customer whose demand lands on a junction this scenario leaves out has no row in the
+			// file (Task 781), so the export alert must not say every customer's demand is written.
+			var offCust = [];
+			Object.keys(custByNode).forEach(function (nid) {
+				if (omitted[nid]) { custByNode[nid].forEach(function (r) { offCust.push(r.customer.id); }); }
+			});
+			if (offCust.length) { diff('customer-inactive-node', offCust, String(offCust.length)); }
 		}
 		return { ok: true, inp: inp, differences: differences };
 	};

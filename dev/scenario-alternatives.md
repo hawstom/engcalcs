@@ -783,17 +783,32 @@ on."* What this task added or confirmed:
   verbatim, so no coordinate is run through a projection it does not need. An old asset inactive in
   the scenario gives an inactive new one.
 - **The box** (only when something is listed) says which values the new assets cannot hold (the old
-  assets keep them), the water surface carried, what a new link is born with, and the controls and
-  rules naming an old asset or a replaced link: those are document-wide, still name the old asset,
-  and are left out of this scenario's run (and reported there) because it is inactive.
+  assets keep them), the water surface carried, each customer whose demand stays with the old
+  junction, what a new link is born with, and the controls and rules naming an old asset or a
+  replaced link.
+- **A control or rule naming an asset inactive in a scenario is left out of that scenario's run and
+  of its `.inp` export, and said** (Perry, 2026-10-08: EPANET refused the input, Error 200, and the
+  page fell back to the built-in solver). Controls and rules are document-wide and still name the
+  old asset; in the run, `dropInactiveControls()` and `modelRules()` drop them under the codes
+  `control-inactive` and `rule-inactive` (status-line notes of their own, since "no longer in this
+  project" would be false); in the export, js/lpn-inp.js drops them as `inactive-control` and
+  `inactive-rule`, rebuilding `[RULES]` only when a block is dropped, and the export alert names
+  them. Base, where the assets are active, runs and writes them as before.
+- **Properties follows the new asset**: open on a replaced asset, it moves to its replacement.
 - **In Base, Change type is unchanged**: the asset keeps its ID and changes type in every scenario.
   Tom's words describe a change made in a scenario, where the old asset must survive for the
   others; in Base there is no other scenario to keep it for, and a new ID would orphan every
   scenario's overrides, controls and rules naming the asset. Rejected: a new ID in Base too.
-- **Known gaps**, reported and not built: a customer whose demand lands on a replaced node or pipe
-  stays on the old one (customers carry nothing a scenario can change), so in that scenario its
-  demand is not in the solve; a child scenario's own overrides of the old asset are not copied to
-  the new one; replaced assets stay in the file, inactive, as every Bentley topology alternative
+- **Customers stay with the old junction.** A customer carries nothing a scenario can change
+  (Task 247), so moving one to a replacement would move it in Base too. A pipe changed in type keeps
+  its ends, so a customer on it still lands on a live node. A junction replaced in a scenario takes
+  the demand of its customers (assigned to it, or landing on it from a pipe) out of that scenario's
+  solve: the box lists each with its demand, and the `.inp` export alert says how many customers'
+  demand is not in the file (`customer-inactive-node`). Rejected: reassigning the customer, which
+  is a Base edit.
+- **Known gaps**, reported and not built: a child scenario's own overrides of the old asset are not
+  copied to the new one; the new assets are copies, so a later Base edit to an old asset does not
+  reach them; replaced assets stay in the file, inactive, as every Bentley topology alternative
   keeps them.
 
 **The question**, the page's own box (`askDialog` kind `choice`), asked only outside Base, three

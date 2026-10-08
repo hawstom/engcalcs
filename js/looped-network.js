@@ -35438,12 +35438,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// a projection it does not need.
 	function replaceSelectedTypeInScenario(to) {
 		var pc = EngCalcs.pageConfig || {}, isNode = LPN_NODE_TYPES.indexOf(to) >= 0,
-			targets = changeTypeTargets(to), notCarried = [], surface = [], born = [], old = [], text, MAX = 20;
+			targets = changeTypeTargets(to), notCarried = [], surface = [], born = [], old = [], custs = [], text, MAX = 20;
 		if (!targets.length || inBaseScenario()) { return; }
 		targets.forEach(function (el) {
 			var r = replaceTypeReport(el, to);
 			notCarried = notCarried.concat(r.notCarried); surface = surface.concat(r.surface);
-			born = born.concat(r.born); old = old.concat(r.old);
+			born = born.concat(r.born); old = old.concat(r.old); custs = custs.concat(r.customers);
 		});
 		function capped(lines) {
 			if (lines.length <= MAX) { return lines; }
@@ -35451,16 +35451,23 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				.replace('{n}', String(lines.length - MAX))]);
 		}
 		function proceed() {
-			var made = [];
+			var made = [], swap = {};
 			saveUndoSnapshot();
 			targets.forEach(function (el) {
 				if ((isNode ? nodeById(el.id) : linkById(el.id)) !== el) { return; }
-				made.push(replaceTypeInScenario(el, to));
+				made.push(replaceTypeInScenario(el, to, swap));
 			});
 			touchTree('replaceSelectedTypeInScenario');
 			// The symbols are new, so the drawing is rebuilt; the new assets are the selection.
 			buildDom();
 			setSelectionList(made.filter(Boolean).map(function (m) { return { kind: isNode ? 'node' : 'link', id: m.id }; }));
+			// **PROPERTIES FOLLOWS THE NEW ASSET** (Perry, 2026-10-08): left on the old one, it showed
+			// an inactive asset beside a selection of its replacement, and a typed value edited the
+			// asset that is out of this scenario's network.
+			if (currentPopup && (currentPopup.kind === 'node' || currentPopup.kind === 'link') &&
+					swap[currentPopup.kind + ':' + currentPopup.id]) {
+				currentPopup.id = swap[currentPopup.kind + ':' + currentPopup.id];
+			}
 			refreshScenarioMarks();
 			refreshScenarioStatus();
 			refreshPaneIfOpen();
@@ -35469,7 +35476,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			scheduleSolve();
 			scheduleSave();
 		}
-		if (!notCarried.length && !surface.length && !born.length && !old.length) { proceed(); return; }
+		if (!notCarried.length && !surface.length && !born.length && !old.length && !custs.length) { proceed(); return; }
 		text = [];
 		if (surface.length) {
 			text.push([pc.lpn_change_type_surface || 'These keep the water surface where it was. A reservoir\'s head is the tank\'s elevation plus its water depth, and a tank\'s water depth is the reservoir\'s head minus its elevation:']
@@ -35479,11 +35486,15 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			text.push([pc.lpn_change_type_not_carried || 'The new assets cannot hold these values. The old assets keep them:']
 				.concat(capped(notCarried)).join('\n'));
 		}
+		if (custs.length) {
+			text.push([pc.lpn_change_type_customers_left || 'A customer cannot be assigned per scenario, so the demand of these customers stays with the old junction and is not in this scenario\'s solve:']
+				.concat(capped(custs)).join('\n'));
+		}
 		if (born.length) {
 			text.push([pc.lpn_change_type_born || 'These values are new, set as on a newly drawn asset:'].concat(capped(born)).join('\n'));
 		}
 		if (old.length) {
-			text.push([pc.lpn_change_type_old_controls || 'These controls and rules name an old asset, which is inactive in this scenario, so they are omitted from this scenario\'s run:']
+			text.push([pc.lpn_change_type_old_controls || 'These controls and rules name an old asset, which is inactive in this scenario, so they are left out of this scenario\'s run and its .inp export:']
 				.concat(capped(old)).join('\n'));
 		}
 		askDialog({ kind: 'confirm', title: pc.lpn_change_type_menu || 'Change type',
@@ -35497,7 +35508,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// link replaced with it.
 	function replaceTypeReport(el, to) {
 		var pc = EngCalcs.pageConfig || {}, isLink = elGroup(el) === 'link', LINE = pc.lpn_change_type_line || '{id}: {property} {value}',
-			out = { notCarried: [], surface: [], born: [], old: [] }, carry = null, names = {}, from, dest;
+			out = { notCarried: [], surface: [], born: [], old: [], customers: [] }, carry = null, names = {}, from, dest;
 		if (isLink) {
 			from = linkTypeDesc(el); dest = linkTargetDesc(to, el);
 			typeOwnedLinkSpecs(el).forEach(function (spec) {
@@ -35532,6 +35543,18 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			}
 			names[el.id] = true;
 			replacedLinksAt(el).forEach(function (l) { names[l.id] = true; });
+			// **A CUSTOMER STAYS WITH THE OLD JUNCTION** (Perry, 2026-10-08). A customer carries nothing
+			// a scenario can change (Task 247), so it cannot follow the replacement into one scenario
+			// alone; moving it would move it in Base too. Its demand, assigned to this junction or
+			// landing on it from a pipe, leaves this scenario's solve with the junction, and each is
+			// listed with its demand. A pipe changed in type keeps its ends, so a customer on it still
+			// lands on a live node and needs no line.
+			if (el.type === 'junction') {
+				customerRowsOf(el.id).forEach(function (r) {
+					out.customers.push(changeTypeLine(LINE, el.id, (pc.lpn_tool_add_meter || 'Customer') + ' ' + r.customer.id,
+						changeTypeValueText({ unit: 'lpn_u_flow' }, r.base)));
+				});
+			}
 		}
 		libControlsRead().forEach(function (c) {
 			if (!c) { return; }
@@ -35569,15 +35592,19 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	 * replaceSelectedTypeInScenario() takes one of each for the whole selection. Returns the new
 	 * asset.
 	 */
-	function replaceTypeInScenario(el, to) {
+	// `swap` collects 'node:old' / 'link:old' -> new id for every asset replaced.
+	function replaceTypeInScenario(el, to, swap) {
 		var isNode = elGroup(el) === 'node', links = isNode ? replacedLinksAt(el) : [], nu;
+		swap = swap || {};
 		nu = scenarioCopyOf(el, mintId(LPN_ID_KEY[to] || (isNode ? 'J' : 'L')), null);
 		if (isNode) { applyNodeTypeChange(nu, to); } else { applyLinkTypeChange(nu, to); }
 		scenarioCopyBorn(el, nu);
+		swap[(isNode ? 'node:' : 'link:') + el.id] = nu.id;
 		links.forEach(function (l) {
 			var lc = scenarioCopyOf(l, mintId(LPN_ID_KEY[l.type] || 'L'),
 				{ from: l.from === el.id ? nu.id : l.from, to: l.to === el.id ? nu.id : l.to });
 			scenarioCopyBorn(l, lc);
+			swap['link:' + l.id] = lc.id;
 		});
 		return nu;
 	}
@@ -39178,7 +39205,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	 * the status line and are deliberately not raised to a dialog here.
 	 */
 	function showInpExportFlattening(differences, fileName) {
-		var pc = EngCalcs.pageConfig || {}, types = null, fittings = null, custs = null, coords = null, said = [];
+		var pc = EngCalcs.pageConfig || {}, types = null, fittings = null, custs = null, coords = null, said = [],
+			offCust = null, offNames = [];
 		(differences || []).forEach(function (d) {
 			if (d.code === 'pipe-type-flattened') { types = d; }
 			if (d.code === 'fittings-flattened') { fittings = d; }
@@ -39188,15 +39216,25 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// fittings list loses its itemisation, and a customer loses its PLACE. One sentence
 			// covering all three would say something untrue of each.
 			if (d.code === 'customer-geometry') { custs = d; }
+			// **AND WHAT AN INACTIVE ASSET TAKES WITH IT** (Task 781): a control or rule naming it is
+			// not written, and a customer whose demand lands on it has no row.
+			if (d.code === 'customer-inactive-node') { offCust = d; }
+			if (d.code === 'inactive-control' || d.code === 'inactive-rule') { offNames = offNames.concat(d.ids); }
 		});
-		if (!types && !fittings && !coords && !custs) { return; }
+		if (!types && !fittings && !coords && !custs && !offNames.length) { return; }
 		if (types) {
 			said.push((pc.lpn_inp_export_flat_types || '{n} pipes here refer to {t} pipe types. In the file each of those pipes carries its own copy of the numbers, so the answers are the same. What the file cannot hold is the pipe type itself, so the link between one definition and every pipe that uses it is recorded only in the project file.')
 				.replace('{n}', String(types.ids.length)).replace('{t}', String(types.detail || '?')));
 		}
 		if (custs) {
 			said.push((pc.lpn_inp_export_flat_customers || 'An EPANET file has no customers. The demand of the {n} customers in this project is written as a demand row on the junction each customer is assigned to, named with the customer\'s tag. The file does not record the customer itself: its location, the pipe that serves it, where along that pipe the service connects, or how many services it represents. That information remains in the project; save the project file to keep it.')
-				.replace('{n}', String(custs.ids.length)));
+				.replace('{n}', String(custs.ids.length)) +
+				(offCust ? ' ' + (pc.lpn_inp_export_flat_customers_inactive || '{n} of these customers are assigned to a junction that is inactive in this scenario, so their demand is not in the file.')
+					.replace('{n}', String(offCust.ids.length)) : ''));
+		}
+		if (offNames.length) {
+			said.push((pc.lpn_inp_export_flat_inactive_controls || 'These controls and rules name an asset that is inactive in this scenario, so they are not in the file: {ids}')
+				.replace('{ids}', offNames.join('; ')));
 		}
 		if (coords) {
 			said.push((pc.lpn_inp_export_flat_coords || 'An EPANET file holds one position for each node. This scenario places {n} of them somewhere else, and those are the positions in the file. Every other scenario keeps its positions in the project file only.')
@@ -65022,6 +65060,24 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		return (typeof l.speed === 'number' && isFinite(l.speed)) ? l.speed : 1;
 	}
 
+	// **A CONTROL NAMING AN ASSET OUT OF THIS SCENARIO'S NETWORK IS LEFT OUT OF ITS RUN** (Task 781;
+	// Perry, 2026-10-08: EPANET refused the input, Error 200, and the page fell back to the built-in
+	// solver). js/lpn-time.js already drops a control naming an element the DOCUMENT lacks; one
+	// naming an asset that is only inactive here is dropped against the model's own lists and said
+	// under its own code, so the note does not claim the asset is gone from the project.
+	function dropInactiveControls(model) {
+		var t = model && model.time, nodes = {}, links = {}, ids = [];
+		if (!t || !Array.isArray(t.controls) || !t.controls.length) { return; }
+		model.nodes.forEach(function (n) { nodes[n.id] = true; });
+		model.links.forEach(function (l) { links[l.id] = true; });
+		t.controls = t.controls.filter(function (c) {
+			var cond = c && c.condition;
+			if (links[String(c.link)] && !(cond && cond.kind === 'node' && !nodes[String(cond.node)])) { return true; }
+			ids.push(String(c.link));
+			return false;
+		});
+		if (ids.length) { t.warnings = (t.warnings || []).concat([{ code: 'control-inactive', ids: ids }]); }
+	}
 	function assembleModel() {
 		var live = {};
 		doc.nodes.forEach(function (n) { if (isActive(n)) { live[n.id] = true; } });
@@ -65284,6 +65340,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// The clock, the patterns and the controls, converted to SI (js/lpn-time.js). Absent that
 		// file the model is exactly the pre-Task-248 one and the page solves one instant.
 		if (EngCalcs.lpnTimeAttach) { EngCalcs.lpnTimeAttach(model); }
+		dropInactiveControls(model);
 		return model;
 	}
 	/**
@@ -65317,16 +65374,20 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	 * use rather than a second one.
 	 */
 	function modelRules() {
-		var text = doc.rules || [], blocks, out = [], dropped = [], warn = [], unread = [];
+		var text = doc.rules || [], blocks, out = [], dropped = [], warn = [], unread = [], inactive = [];
 		ruleWarningsOut = [];
 		EngCalcs.lpnRuleDrops = [];
 		if (!text.length || !EngCalcs.lpnRuleParse) { return []; }
 		blocks = EngCalcs.lpnRuleParse(text);
 		blocks.forEach(function (b) {
-			var missing = [];
-			b.nodes.forEach(function (id) { if (!nodeById(id)) { missing.push(id); } });
-			b.links.forEach(function (id) { if (!linkById(id)) { missing.push(id); } });
+			var missing = [], off = false;
+			b.nodes.forEach(function (id) { var n = nodeById(id); if (!n) { missing.push(id); } else if (!isActive(n)) { off = true; } });
+			b.links.forEach(function (id) { var l = linkById(id); if (!l) { missing.push(id); } else if (!linkLive(l)) { off = true; } });
 			if (missing.length) { dropped.push({ name: b.name, missing: missing }); return; }
+			// **A RULE NAMING AN ASSET INACTIVE IN THIS SCENARIO IS LEFT OUT OF ITS RUN** (Task 781):
+			// the asset is not in the engine's input, and EPANET rejects the whole input over one
+			// rule naming an element it does not hold. Said, under its own code.
+			if (off) { inactive.push(b.name); return; }
 			// A chunk with no RULE header is the text before the first rule, which no valid file
 			// states and nothing can be said about. It is carried and it is not reported as a loss.
 			if (!b.ok) { if (b.name) { unread.push(b.name); } return; }
@@ -65337,6 +65398,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			warn.push({ code: 'rule-dangling', ids: dropped.map(function (d) { return d.name; }) });
 		}
 		if (unread.length) { warn.push({ code: 'rule-unreadable', ids: unread }); }
+		if (inactive.length) { warn.push({ code: 'rule-inactive', ids: inactive }); }
 		ruleWarningsOut = warn;
 		return out;
 	}
@@ -71264,6 +71326,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				'These rules name an element that is no longer in this project, so they were ignored in this run: {ids}'),
 			droppedNote('rule-unreadable', 'lpn_rule_unreadable_note',
 				'These rules could not be read, so they were ignored in this run: {ids}'),
+			// Task 781: an asset inactive in this scenario is still in the project, so its own words.
+			droppedNote('control-inactive', 'lpn_control_inactive_note',
+				'These controls refer to an asset that is inactive in this scenario, so they were ignored in this run: {ids}'),
+			droppedNote('rule-inactive', 'lpn_rule_inactive_note',
+				'These rules refer to an asset that is inactive in this scenario, so they were ignored in this run: {ids}'),
 			// (A note about the later times being out of date used to be composed here. It is gone:
 			// off means off now, so there is no state in which SOME of a run is up to date --
 			// see EC.lpnTimeStandDown() in js/lpn-time.js.)

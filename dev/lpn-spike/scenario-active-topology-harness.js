@@ -326,6 +326,54 @@ async function run(mutate, quiet) {
 		ok('8.2 12 is a junction in B', M.nodeById('12').type === 'junction');
 	}
 
+	say('\n--- 10. Perry\'s case: a control and a rule naming what B replaces, and a customer on 22 ---');
+	{
+		const text = NET1.replace(/\[CONTROLS\]\n/, '[CONTROLS]\n LINK 21 CLOSED IF NODE 2 BELOW 100\n')
+			.replace(/\[RULES\]\n/, '[RULES]\nRULE R1\nIF NODE 22 PRESSURE BELOW 1\nTHEN LINK 112 STATUS IS CLOSED\n');
+		const P = page();
+		P.importInp({ name: 'Net1-perry.inp', _text: text });
+		P.getDoc().customers.push({ id: 'M9', demand: 25, count: 1, link: null, node: '22', x: 0, y: 0 });
+		P.buildDom();
+		const ctlLinks = (m) => ((m.time && m.time.controls) || []).map((c) => String(c.link));
+		const ruleCount = (m) => (m.rules || []).length;
+		const m0 = P.assembleModel();
+		ok('10.1 Base hands the engine the control on 21 and rule R1', ctlLinks(m0).indexOf('21') >= 0 && ruleCount(m0) === 1, JSON.stringify(ctlLinks(m0)) + ' rules ' + ruleCount(m0));
+		const r0 = await global.EngCalcs.lpnSolveEpanet(m0);
+		ok('10.2 Base runs on EPANET', !!r0 && r0.ok === true, r0 && (r0.error || r0.message));
+		const inp0 = P.exportInp().inp;
+		ok('10.3 Base\'s export writes both', /LINK 21 CLOSED IF NODE 2 BELOW 100/.test(inp0) && /RULE R1/.test(inp0));
+		const PB = P.createScenario('B');
+		P.switchScenario(PB.id);
+		asked = []; answers = { choice: ['scenario'], confirm: [true] };
+		P.setSelectionList([{ kind: 'node', id: '22' }]);
+		P.changeSelectedType('tank');
+		const box = (asked[1] || {}).text || '';
+		ok('10.4 the box lists the control and the rule as left out', box.indexOf(PC.lpn_change_type_old_controls) >= 0 && /LINK 21/.test(box) && /RULE R1|IF NODE 22/.test(box), box.slice(0, 400));
+		ok('10.5 ...and customer M9 with its demand, as staying with the old junction', box.indexOf(PC.lpn_change_type_customers_left) >= 0 && /M9/.test(box) && /25/.test(box));
+		const m1 = P.assembleModel();
+		ok('10.6 B hands the engine neither the control nor the rule', ctlLinks(m1).indexOf('21') < 0 && ruleCount(m1) === 0, JSON.stringify(ctlLinks(m1)) + ' rules ' + ruleCount(m1));
+		const r1 = await global.EngCalcs.lpnSolveEpanet(m1);
+		ok('10.7 B runs on EPANET itself (no refusal, so no fallback)', !!r1 && r1.ok === true, r1 && JSON.stringify(r1.issues || r1.error || r1.message));
+		// The rule's drop rides on every solve's warnings; a control's on the run's (an EPS input),
+		// so it is read where the run reads it, on the model's time block.
+		const codes = ((r1 && r1.warnings) || []).concat((m1.time && m1.time.warnings) || []).map((w) => w.code + ':' + (w.ids || []).join(','));
+		ok('10.8 ...and its warnings say which were left out, as inactive', codes.indexOf('control-inactive:21') >= 0 && codes.indexOf('rule-inactive:R1') >= 0, JSON.stringify(codes));
+		const ex = P.exportInp();
+		ok('10.9 B\'s export writes neither line', !/LINK 21 CLOSED/.test(ex.inp) && !/RULE R1/.test(ex.inp));
+		const dcodes = ex.differences.map((d) => d.code);
+		ok('10.10 ...and says so, and says M9\'s demand is not in the file', dcodes.indexOf('inactive-control') >= 0 && dcodes.indexOf('inactive-rule') >= 0 &&
+			dcodes.indexOf('customer-inactive-node') >= 0, JSON.stringify(dcodes));
+		P.switchScenario(P.baseScenario().id);
+		const m2 = P.assembleModel();
+		ok('10.12 back in Base the control and the rule are handed to the engine again', ctlLinks(m2).indexOf('21') >= 0 && ruleCount(m2) === 1, JSON.stringify(ctlLinks(m2)) + ' rules ' + ruleCount(m2));
+		ok('10.13 ...and Base\'s export is what it was', P.exportInp().inp === inp0);
+		// Last: a page loaded later becomes the clock's host (js/lpn-time.js), so P is done with first.
+		const Q = page();
+		Q.importInp({ name: 'B-perry.inp', _text: ex.inp });
+		const rq = await global.EngCalcs.lpnSolveEpanet(Q.assembleModel());
+		ok('10.11 B\'s export, opened again, runs on EPANET', !!rq && rq.ok === true, rq && JSON.stringify(rq.issues || rq.error));
+	}
+
 	global.EngCalcs.lpnTimeRun = timeRunWas;
 	return fails;
 }
@@ -345,7 +393,9 @@ const MUTATIONS = [
 	['the solve keeps a link whose end is inactive', (src) => src.replace(
 		"\t\tvar links = doc.links.filter(function (l) {\n\t\t\treturn isActive(l) && live[l.from] && live[l.to];",
 		"\t\tvar links = doc.links.filter(function (l) {\n\t\t\treturn isActive(l);")],
-	['a type override is still read on open', (src) => src.replace("\t\tdropTypeOverrides();\n", "")]
+	['a type override is still read on open', (src) => src.replace("\t\tdropTypeOverrides();\n", "")],
+	['a control naming an inactive asset reaches the engine', (src) => src.replace("\t\tdropInactiveControls(model);\n", "")],
+	['a rule naming an inactive asset reaches the engine', (src) => src.replace("\t\t\tif (off) { inactive.push(b.name); return; }", "")]
 ];
 
 (async function main() {

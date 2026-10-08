@@ -151,6 +151,17 @@ async function main() {
 
 		console.log('\n--- 2. Create new assets ---');
 		await clickNode('22');
+		// Properties opened on 22 the way a person opens it: a double-click on the node.
+		const at = await page.evaluate(() => {
+			const c = document.querySelector('.lpn-node-hit[data-node="22"]'), b = c.getBoundingClientRect();
+			return { x: b.left + b.width / 2, y: b.top + b.height / 2 };
+		});
+		await page.mouse.dblclick(at.x, at.y);
+		await settle(800);
+		const popText = () => page.evaluate(() => { const p = document.getElementById('lpn_popup'); return p && getComputedStyle(p).display !== 'none' ? p.textContent : ''; });
+		const before = await popText();
+		const BD = await L('lpn_field_base_demand');
+		ok('2.0 Properties is open on junction 22', !!BD && before.indexOf(BD) >= 0, before.replace(/\s+/g, ' ').trim().slice(0, 120));
 		await changeTo('lpn_tool_add_tank');
 		ok('2.1 Create new assets is pressed', await press(await L('lpn_change_type_create_new')));
 		const d2 = await a.dialog();
@@ -159,6 +170,9 @@ async function main() {
 		await settle(1200);
 		const T = await selectedNode();
 		ok('2.4 a new tank is selected, under a new ID', !!T && T !== '22' && /lpn-node-tank/.test(await nodeClass(T) || ''), T + ' ' + await nodeClass(T));
+		const popup = await popText(), MX = await L('lpn_field_tank_maxlevel');
+		ok('2.4b Properties, open on 22 before, now shows the new tank (Perry, 2026-10-08)', !!MX && popup.indexOf(MX) >= 0 &&
+			popup.indexOf(T) >= 0 && popup.indexOf(BD) < 0, popup.replace(/\s+/g, ' ').trim().slice(0, 160));
 		ok('2.5 22 is drawn greyed', /lpn-inactive/.test(await nodeClass('22') || ''), await nodeClass('22'));
 		ok('2.6 ...and so are its four pipes', (await Promise.all(['21', '22', '112', '122'].map(linkClass))).every((c) => /lpn-inactive/.test(c || '')));
 
