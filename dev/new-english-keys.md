@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**117 still to read on master**, of 223 untranslated keys, of 2445 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**117 still to read on master**, of 224 untranslated keys, of 2444 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -97,7 +97,7 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   @@ NEEDS RULING
 
-## lpn_  (221, 115 to read @@ NEEDS RULING)
+## lpn_  (222, 115 to read @@ NEEDS RULING)
 
 - **`lpn_alt_calc_options`**
   > Calculation options
@@ -537,6 +537,9 @@ never edits a synonym.
 - **`lpn_scenario_hyd_step_tip`**
   > Leave blank to inherit from parent.
   _Ruled OK 2026-10-05._
+- **`lpn_scenario_preset_mult_tip`**
+  > Demand multiplier {mult} times average day, a placeholder value. Most systems fall between {lo} and {hi} (National Research Council, 2006). Set the value for the system being modeled in Settings, Calculation, Hydraulics, Demand multiplier.
+  _Ruled 2026-10-07: Calls page 7 October: Use proposed_
 - **`lpn_scncmp_at_time`**
   > {value} at {id}, {time}
   _Ruled OK 2026-10-05._
@@ -776,7 +779,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**145 still to read**, of 148 new keys across 17 unmerged branch(es).
+**144 still to read**, of 147 new keys across 15 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -786,12 +789,6 @@ Each branch carries the commit it was read at. This part is a SNAPSHOT and is no
 fresh by the build — a branch moves whenever anybody commits on it, and failing master's
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
-
-### chore/wording-1007 (`86c4f306`) — 1 new, 1 to read @@ NEEDS RULING
-
-- **`lpn_scenario_preset_mult_tip`**
-  > Demand multiplier {mult} times average day, a placeholder value. Most systems fall between {lo} and {hi} (National Research Council, 2006). Set the value for the system being modeled in Settings, Calculation, Hydraulics, Demand multiplier.
-  @@ NEEDS RULING
 
 ### feat/bentley-interop (`dff89641`) — 63 new, 63 to read @@ NEEDS RULING
 
@@ -1111,7 +1108,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Copy with headings
   @@ NEEDS RULING
 
-### feat/user-guide (`3e65778a`) — 39 new, 39 to read @@ NEEDS RULING
+### feat/user-guide (`3aa468bd`) — 39 new, 39 to read @@ NEEDS RULING
 
 - **`lpn_guide_also`**
   > Also in {menu}
@@ -1271,5 +1268,3 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_workspace_refused_unreadable`**
   > This file could not be read as a workspace, so nothing was changed.
   @@ NEEDS RULING
-
-### fix/report-names (`750d3c18`) — adds no English strings
