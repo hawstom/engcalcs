@@ -4,7 +4,8 @@ Tom's browser pass on `feat/user-guide` asked what the Guide's chapters leave ou
 was rewritten as the exemplar (query language, worked examples measured on Net1 and Net3 by
 `dev/lpn-spike/user-guide-find-harness.js`, results and Tables, Replace and Undo, points to note).
 Every other chapter was audited from the source code, not from earlier docs, and is recorded here
-for a later rewrite. Each section has (a) what the code does that the chapter omits, (b) statements
+for a later rewrite. The six (b) contradictions marked FIXED were corrected in place on 2026-10-07
+(minimal edits); the rest of each section is still open. Each section has (a) what the code does that the chapter omits, (b) statements
 the code contradicts, and (c) one engineering example of why the feature matters.
 
 Function names are in `js/looped-network.js` unless another file is named.
@@ -90,7 +91,7 @@ service in that scenario only, so the low pressures it causes can be compared wi
 - Markup strokes are never saved; the X or a new snip discards them without a question.
 - Where the clipboard is unavailable, Copy downloads `<project>-screenshot.png` instead.
 
-(b) Contradicts: `lpn_screenshot_tip` says the picture is copied "ready to paste". The snip opens the
+(b) FIXED. Contradicted: `lpn_screenshot_tip` says the picture is copied "ready to paste". The snip opens the
 markup view, and nothing reaches the clipboard until Copy is pressed there (`openSnipEditor()`).
 
 (c) Example: for a fire flow memorandum, lasso the low-pressure zone with the pressure contour shown,
@@ -109,7 +110,7 @@ circle the deficient hydrants, and paste a 3x picture into the report.
   filter is applied again.
 - Ctrl+D skips the ID column and read-only cells and reports the counts (`paneFillDown()`).
 
-(b) Contradicts: "Delete: Clear a cell" holds for one cell only; with a range selected, Delete still
+(b) FIXED. Contradicted: "Delete: Clear a cell" holds for one cell only; with a range selected, Delete still
 clears only the active cell (right-click, Delete clears the range), and it does nothing on checkbox or
 list cells. The first Esc cancels a pending paste as new rows, not the edit.
 
@@ -215,7 +216,7 @@ flow shortfall and set Diameter to 8 once; Base stays unchanged for comparison.
 - Controls and rules use EPANET syntax with English keywords, numbers in project units.
 - A rule or control that names a missing or inactive element is dropped from the run with a warning.
 
-(b) Contradicts: "Controls and rules apply to the whole network": rules are applied by the EPANET
+(b) FIXED. Contradicted: "Controls and rules apply to the whole network": rules are applied by the EPANET
 engine only, and are dropped in a scenario where an element they name is inactive (`modelRules()`).
 
 (c) Example: LINK PUMP1 OPEN IF NODE T1 BELOW 8 and LINK PUMP1 CLOSED IF NODE T1 ABOVE 22, run over
@@ -293,7 +294,7 @@ still hold 40 psi: the build-out headroom before a main must be upsized.
 - It also shows demand multiplier, total run time, hydraulic time step, and a block of options that
   are the same in every scenario. A failed scenario shows the reason.
 
-(b) Contradicts: "the number of differences from Base". The column is the number of overrides
+(b) FIXED. Contradicted: "the number of differences from Base". The column is the number of overrides
 (`overrideCount()`): element overrides plus any calculation option that differs from the project
 value. An override equal to Base's value is still counted.
 
@@ -367,7 +368,7 @@ nodes that node colors alone miss: where a zone boundary or booster belongs.
 - Opening it with no report gives a notice, not the box. The text is EPANET's, untranslated.
 - Copy works on plain http; no download or print.
 
-(b) Contradicts: "It is replaced each time the network is solved with the EPANET engine": only
+(b) FIXED. Contradicted: "It is replaced each time the network is solved with the EPANET engine": only
 extended-period runs replace it, and edits leave the old text.
 
 (c) Example: after importing a utility's .inp, warnings such as negative pressures or a pump that
@@ -397,7 +398,7 @@ not keep up with the morning peak.
 - Download is a CSV named `<project>-Full report.csv`; values are rounded to 2 decimals.
 - The time step choice resets on each page load.
 
-(b) Contradicts: "It is available after Calculate": with no run it shows the live single-instant
+(b) FIXED. Contradicted: "It is available after Calculate": with no run it shows the live single-instant
 solve without Calculate being pressed.
 
 (c) Example: download the CSV of a 24-hour run and filter it for nodes below 40 psi at peak hour as
