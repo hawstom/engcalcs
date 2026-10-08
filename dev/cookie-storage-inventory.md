@@ -68,7 +68,8 @@ languages, is not a plausible candidate for "we do not target the EU."
 | `ec_geosearch` | `js/lpn-search.js` (JS only) | 1 year, readable by JS | **A second, purpose-specific consent record** (Task 437): the visitor said yes to place-name search on the Looped-Network map, which sends what they typed to `nominatim.openstreetmap.org`. Same `<state>.<unix-ts>.<policy-version>` shape as `ec_consent`, and **`1` is the only state that exists** — a refusal writes nothing at all. Version-pinned to `EC_GEOSEARCH_VERSION` (`lib/Consent.lib.php`), which is **separate from `EC_CONSENT_VERSION` on purpose**: changing what we send, or who we send it to, must re-ask exactly the people who said yes to the old ask and must NOT re-ask everybody about analytics | **Exempt** — the answer the visitor gave in order to get a service they explicitly requested, holding no identifier, no query and no result. Removed by Settings > Erase everything (`EngCalcs.lpnSearchForget()`, called from `wipeAllStorage()`) |
 | `ec_terrain` | `js/lpn-terrain.js` (JS only) | 1 year, readable by JS | **A third, purpose-specific consent record** (Task 497): the visitor said yes to reading ground elevations for the Looped-Network map, which sends the latitude and longitude of each node that needs one to `api.mapbox.com`. Same `<state>.<unix-ts>.<policy-version>` shape, and **`1` is the only state that exists** — a refusal writes nothing at all. Version-pinned to `EC_TERRAIN_VERSION` (`lib/config.inc.php`, beside `EC_MAPBOX_TOKEN`, because the token is what decides whether the feature exists at all). Separate from `ec_geosearch` because a search says *what the visitor typed* and this says *where their nodes are* — which is the model itself | **Exempt** — the answer the visitor gave in order to get a service they explicitly requested, holding no identifier, no coordinate and no result. Removed by Settings > Erase everything (`EngCalcs.lpnTerrainForget()`, called from `wipeAllStorage()`) |
 | `ec_blang` | `lib/Language.lib.php` | 1 year, HttpOnly | **Analytics only.** The literal value `1`, meaning the browser-language row has been written. Was the language tag until Task 288; every use site is `isset()`, so the value was written and never once read | **Requires consent.** Not written otherwise, deleted on withdrawal (`ecForgetAnalyticsStorage()`) and on Looped-Network.php's Start fresh (same function, via `ecConsentForget()`) |
-| `ec_seen` | `ecMarkSeen()`, `lib/config.inc.php` | **1 year, renewed on every write**, HttpOnly (a session cookie until 2026-10-07) | **Analytics only.** One base-32 digit per page, five bits: language view, human view, calculation, title, subtitle. Plus one reserved `_v` entry for the single demand row. **No identifier of any kind.** Since it lasts a year, a browser that said yes is counted the first time it does each thing on each page and not again, so the said-yes bucket counts BROWSERS per page (Tom, 2026-10-07: *"if we are collecting consent anyway, let's collect it for remembering for a year that they've been here"*) | **Requires consent.** Not written otherwise, deleted on withdrawal (`ecForgetAnalyticsStorage()`) and on Looped-Network.php's Start fresh (same function, via `ecConsentForget()`) |
+| `ec_seen` | `ecMarkSeen()`, `lib/config.inc.php` | Session (no expiry), HttpOnly. It lasted one year for one day (2026-10-07); `ec_code` answers the question that was for, so it went back | **Analytics only.** One base-32 digit per page, five bits: language view, human view, calculation, title, subtitle. Plus one reserved `_v` entry for the single demand row. **No identifier of any kind.** Said-yes rows are therefore de-duplicated per (visit, page): they count uses, once per visit | **Requires consent.** Not written otherwise, deleted on withdrawal (`ecForgetAnalyticsStorage()`) and on Looped-Network.php's Start fresh (same function, via `ecConsentForget()`) |
+| `ec_code` | `ecCountCodeRenew()`, `lib/config.inc.php` (every page view), and `EngCalcs.countCodeEnsure()`, `js/Cookies.lib.js` (at the moment of the yes, and on each page load) | **400 days** (the most a browser keeps any cookie), written again on every page view, so it lapses 400 days after the last visit. Readable by JS, so the banner can make it at the yes and delete it at the no | **Analytics only. A RANDOM IDENTIFIER, the first this suite has stored** (Tom, 2026-10-08, call F01: *"Go (random code, new consent text)"*). 16 lowercase hex characters from `random_bytes()` / `crypto.getRandomValues()`, derived from nothing about the person, device or visit. Every said-yes log row carries it just before the bucket, so distinct codes count BROWSERS per page in any window and rows count uses. A refuser gets none | **Requires consent** (it serves a statistic, so it fails the exemption test). Made only after a yes (`ecAnalyticsConsented()` / `EngCalcs.analyticsConsented()`); deleted on Refuse all (in the browser at once, and by the server), on withdrawal, on an out-of-date "Allow this" after `EC_CONSENT_VERSION` moved, and by Start fresh / Erase everything (`ecConsentForget()`). Named in `consent_body` and in `privacy.php` |
 | ~~`PHPSESSID`~~ | — | — | **GONE as of Task 288.** It was a 32-hex unique identifier plus a server-side session file, and everything it held was "have we already counted this" — which needs no identifier to answer | — |
 
 `PHPSESSID` used to be the hard case: it carried `$_SESSION['CLANGUAGE']` (service) *and* the log
@@ -145,9 +146,9 @@ such button and is not reached by this one.
 
 **And, since the fix for "Start fresh isn't giving me the cookies banner" (Tom, 2026-09-29),
 `wipeEverything()` also submits a hidden form to `consent.php`'s `ec_wipe`, which erases
-`ec_consent`, `ec_blang` and `ec_seen` server-side** — `wipeAllStorage()` cannot reach any of the
-three itself: `ec_consent`'s own JS mirror only ever WRITES an answer, and `ec_blang`/`ec_seen` are
-HttpOnly. Without that round trip the confirm's "the page reloads exactly as a brand-new visitor
+`ec_consent`, `ec_blang`, `ec_seen` and (since 2026-10-08) `ec_code` server-side** —
+`wipeAllStorage()` reaches none of the first three itself: `ec_consent`'s own JS mirror only ever
+WRITES an answer, and `ec_blang`/`ec_seen` are HttpOnly. Without that round trip the confirm's "the page reloads exactly as a brand-new visitor
 would see it" was false — the banner stayed answered. The redirect back from `consent.php` is also
 the reload the confirm promises, so there is no separate one racing it.
 
@@ -267,7 +268,7 @@ visitor's IP and user-agent on every page load; it is now served from this origi
 
 | Log | Fields | Personal data? |
 |---|---|---|
-| `LANG_LOG` | page, language, source | No IP, no session id, no identifier |
+| `LANG_LOG` | page, language, source | No IP, no session id. **Since 2026-10-08 a said-yes row carries that browser's random `ec_code`**, as does a said-yes row of every log below; a page-load (`visit`) row carries no identifier |
 | `HUMAN_VIEW_LOG` | page, language, timestamp | Same |
 | `CALC_USAGE_LOG` | page, language, timestamp | Same |
 | `TITLE_LOG` | page title event | Same |
@@ -278,7 +279,13 @@ visitor's IP and user-agent on every page load; it is now served from this origi
 
 The usage logs carrying **no IP and no session id** is a deliberate design already recorded in
 `lib/config.inc.php`, and it is the single strongest fact in this whole file: it is what keeps the
-analytics question a *cookie* question rather than a *personal data* question. Re-verified writer by
+analytics question a *cookie* question rather than a *personal data* question. **Since 2026-10-08
+that is true only of the page-load rows.** A said-yes row carries the browser's random code, and a
+code that recognises one browser across visits is an "online identifier" in GDPR's sense (Recital
+30) even though it is derived from nothing: the said-yes rows are pseudonymous personal data. What
+keeps it small is that nothing here can connect a code to a person — the logs hold no IP, and the
+server's access log, which does, is never joined to them. `privacy.php` says so, and offers to find
+or delete the rows carrying a code a visitor sends us. Re-verified writer by
 writer 2026-08-23 across all six: no `REMOTE_ADDR`, no `HTTP_USER_AGENT`, no session id, and nothing
 the visitor typed — every visitor-supplied column passes `ecBrowserLangTag()` or an explicit
 allowlist first. (The `CONTACT_SEND_LOG` row above is a combined entry: the **email** carries name,

@@ -42,11 +42,18 @@ Full inventory: `dev/cookie-storage-inventory.md`.
 - **Never restyle one consent button to stand out.** `.ec-consent-btn` styles both answers identically
   on purpose; a coloured Accept beside a grey Reject is the dark pattern this design avoids.
 - **Cookie lifetimes are defensible out loud.** One year is the house default.
-- **`ec_seen` lasts one year, not one session** (Tom, 2026-10-07: *"if we are collecting consent
-  anyway, let's collect it for remembering for a year that they've been here"*). A session lifetime
-  spent the banner's interruption on a per-visit count; a year makes the said-yes bucket count
-  browsers, per page. `consent_body` names no lifetime, so it stays true and the version does not
-  move.
+- **The browser code (`ec_code`) is the unique-browser identifier** (Tom, 2026-10-08, call F01:
+  *"Go (random code, new consent text)"*). After a yes the browser makes a random code of 16
+  characters, derived from nothing about the person or device; every said-yes log row carries it,
+  so distinct codes count browsers in any window and rows count uses. A refuser gets no code, and
+  their rows count as page loads, never as browsers. 400 days, renewed on every page view; deleted
+  on Refuse all, on withdrawal and by Start fresh. It is the reason `consent_body` was rewritten and
+  `EC_CONSENT_VERSION` went to 2. **It makes said-yes rows pseudonymous personal data** (an online
+  identifier), which `privacy.php` now says.
+- **`ec_seen` is a session cookie.** It lasted a year for one day (2026-10-07), so that said-yes
+  rows would count browsers. The code does that directly, and a year-long de-duplication would have
+  left the rows unable to count uses, so it went back. The rejected alternative: keep the year and
+  drop the code; that counts first sightings per page and nothing else.
 - **The tester mark (`ec_nolog`) is exempt, day stamp included.** The visitor asks to be held
   out of the counts by typing `?ec_nolog=1`; there is no other door, and the mark does nothing but
   carry out that request. The date in it exists to give the side count of tester browsers per day:
