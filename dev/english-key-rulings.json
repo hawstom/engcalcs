@@ -1898,8 +1898,9 @@
             "ruled": "2026-09-01"
         },
         "lpn_ff_menu_tip": {
-            "on": "Test every junction: how much can it deliver while it still holds its residual pressure, and does drawing the required flow there create unacceptable drawdown anywhere else?",
-            "ruled": "2026-09-01"
+            "on": "Test each selected junction for fire flow, and check the effect on the rest of the system",
+            "ruled": "2026-10-08",
+            "answer": "Calls page 8 October: Use proposed"
         },
         "lpn_ff_minpressure": {
             "on": "Lowest pressure allowed elsewhere",
@@ -2305,9 +2306,9 @@
             "answer": "OK."
         },
         "lpn_find_filter_tip": {
-            "on": "Show only the parts that match this query in one of the tables below the map. The drawing is not changed and nothing is deleted.",
-            "ruled": "2026-09-07",
-            "answer": "OK."
+            "on": "Show only the rows that match \"What to search\" above, in each table searched.",
+            "ruled": "2026-10-08",
+            "answer": "Calls page 8 October: Use proposed"
         },
         "lpn_find_op_conn_nolinksource": {
             "on": "no link path to a source",
@@ -3277,9 +3278,9 @@
             "answer": "Technical-English interview: Use proposed"
         },
         "lpn_mapgeo_dial_help": {
-            "on": "Slide the two bars, or type in the boxes above them, to make the map bigger or smaller and to rotate it. The middle of each bar is the fit step 1 left, so 1 and 0 mean leave it alone. Arrow keys work on both.",
-            "ruled": "2026-09-23",
-            "answer": "Edited."
+            "on": "Slide the two bars, or enter numbers in the boxes above them, to make the map bigger or smaller and to rotate it. The middle of each bar keeps the fit from step 1, so a size of 1 and a rotation of 0 mean no change. Arrow keys work on both.",
+            "ruled": "2026-10-08",
+            "answer": "Calls page 8 October: Use proposed"
         },
         "lpn_mapgeo_dial_size": {
             "on": "Map size",
@@ -3376,9 +3377,9 @@
             "answer": "OK."
         },
         "lpn_meter_placed": {
-            "on": "Customer {id} added. Its description and demand are typed in the Customers table, or press it in Select to open its box.",
-            "ruled": "2026-09-23",
-            "answer": "OK."
+            "on": "Customer {id} added. Enter its description and demand in the Customers table, or select it in Select mode to open its properties box.",
+            "ruled": "2026-10-08",
+            "answer": "Calls page 8 October: Use proposed"
         },
         "lpn_mixing_2comp": {
             "on": "Two-compartment mixing",
@@ -5407,9 +5408,9 @@
             "answer": "OK"
         },
         "lpn_tool_area_tip": {
-            "on": "Click on the map as instructed to select everything inside the shape. Press this button again to change the shape between a window, a lasso and a polygon. Hold Shift while selecting to continue with the existing selection, adding or removing (toggle) what you select.",
-            "ruled": "2026-09-09",
-            "answer": "Edited"
+            "on": "Follow the on-screen prompts. Press again to cycle through window, lasso, and polygon. Hold Shift to keep the current selection and add or remove (toggle) what you select.",
+            "ruled": "2026-10-08",
+            "answer": "Calls page 8 October: Use proposed"
         },
         "lpn_tool_area_window": {
             "on": "Select a window",
@@ -5601,6 +5602,21 @@
             "on": "Demand multiplier {mult} times average day, a placeholder value. Most systems fall between {lo} and {hi} (National Research Council, 2006). Set the value for the system being modeled in Settings, Calculation, Hydraulics, Demand multiplier.",
             "ruled": "2026-10-07",
             "answer": "Calls page 7 October: Use proposed"
+        },
+        "lpn_change_type_born": {
+            "on": "These values are new, set as on a newly drawn asset:",
+            "ruled": "2026-10-08",
+            "answer": "Calls page 8 October: Use proposed"
+        },
+        "lpn_search_refused": {
+            "on": "Place-name search is off, and nothing was sent. The Go to a latitude and longitude command still works.",
+            "ruled": "2026-10-08",
+            "answer": "Calls page 8 October: Use proposed"
+        },
+        "lpn_popup_none": {
+            "on": "Nothing is selected. Select an asset on the map to see its properties.",
+            "ruled": "2026-10-08",
+            "answer": "Calls page 8 October: Use as written"
         }
     }
 }
