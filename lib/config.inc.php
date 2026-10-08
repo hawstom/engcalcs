@@ -697,7 +697,9 @@ define('EC_SEEN_DEMAND', 1);
 //             in JS). Deleted on Refuse all, on withdrawal, on a stale "Allow this" and by Start
 //             fresh / Erase everything (all through ecForgetAnalyticsStorage()).
 //   READABLE  by JavaScript, unlike ec_seen: the banner makes the code at the moment of the yes,
-//             without a page load, and deletes it at the moment of a no.
+//             without a page load, and deletes it at the moment of a no. That is the ONLY script
+//             write: every renewal is this file's Set-Cookie, because Safari caps a cookie written
+//             by script at 7 days (WebKit ITP) and would otherwise make the 400 days false.
 //
 // Visitors who refuse get no code; their rows still count as page loads, never as browsers.
 define('EC_CODE_COOKIE', 'ec_code');

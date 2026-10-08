@@ -114,10 +114,20 @@ async function main() {
 	try {
 		console.log('\n--- 1. a first visit: no code before a yes ---');
 		// SERVICE WORKERS BLOCKED in this one context, and only because of the faked clock: the
-		// worker's install fetches every calculator page in the background, each of those is a
-		// page view, and the server renews the code on a page view by its own (real) clock --
-		// which is correct, and would hide whether the PAGE renewed it by its (faked) one.
+		// worker's install fetches every calculator page in the background, each a page view the
+		// server renews the code on, which would blur which response did the renewing below.
 		const ctx = await browser.newContext({ serviceWorkers: 'block' });
+		// Every script write of the code is recorded, page by page. Safari caps a cookie written by
+		// script at 7 days (WebKit ITP), so the page may write it ONCE, at the yes, and never renew it.
+		await ctx.addInitScript(() => {
+			const d = Object.getOwnPropertyDescriptor(Document.prototype, 'cookie');
+			window.__codeWrites = [];
+			Object.defineProperty(document, 'cookie', {
+				configurable: true,
+				get() { return d.get.call(document); },
+				set(v) { if (/^\s*ec_code=/.test(String(v))) { window.__codeWrites.push(String(v)); } d.set.call(document, v); }
+			});
+		});
 		const realNow = Date.now();
 		// The yes happens "yesterday" by the page's clock, so the next step can be the next day.
 		await ctx.clock.install({ time: new Date(realNow - DAY * 1000) });
@@ -130,6 +140,8 @@ async function main() {
 		console.log('\n--- 2. "Allow this" makes the code, at once and without a page load ---');
 		await answer(page, '1');
 		ok('the banner closes', !(await bannerVisible(page)));
+		const yesWrites = await page.evaluate(() => window.__codeWrites.length);
+		ok('the page wrote the code exactly once, at the yes', yesWrites === 1, String(yesWrites));
 		const first = await codeOf(ctx);
 		ok('a code exists right after the yes', !!first, (await jarOf(ctx)).map((c) => c.name).join(','));
 		ok('it is 16 lowercase hex characters', !!first && /^[0-9a-f]{16}$/.test(first.value), first && first.value);
@@ -146,8 +158,13 @@ async function main() {
 		const rowsBefore = langRows().length;
 		// ?lang=en, an explicit language choice, is the reach row written on every page load; the
 		// automatic one is written once per browser, so it would prove nothing here.
-		await page.goto(env.pageUrl(PAGE + '?lang=en'), { waitUntil: 'load' });
-		await page.waitForTimeout(200);
+		const resp = await page.goto(env.pageUrl(PAGE + '?lang=en'), { waitUntil: 'load' });
+		await page.waitForTimeout(300);
+		const setCookies = (await resp.headersArray()).filter((h) => h.name.toLowerCase() === 'set-cookie').map((h) => h.value);
+		ok('the server\'s response to that page view renews the code (Set-Cookie ec_code, 400 days)',
+			setCookies.some((v) => new RegExp('^ec_code=' + (first && first.value) + ';').test(v) && /max-age=34560000/i.test(v)), setCookies.join(' | '));
+		const laterWrites = await page.evaluate(() => window.__codeWrites);
+		ok('the page itself does not touch the code on a later load', laterWrites.length === 0, JSON.stringify(laterWrites));
 		const second = await codeOf(ctx);
 		ok('the same code, not a new one', !!second && !!first && second.value === first.value, second && second.value);
 		ok('its expiry moved a day later', !!second && !!first && Math.abs((second.expires - first.expires) - DAY) < 120,

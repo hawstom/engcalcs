@@ -144,7 +144,7 @@ function echoConsentBanner() {
 		if (answer === '0') forget();
 		// The browser code (call F01, 2026-10-08) is made at the moment of the yes, so the counts
 		// this page sends from now on already carry it.
-		if (answer !== '0' && window.EngCalcs && typeof EngCalcs.countCodeEnsure === 'function') EngCalcs.countCodeEnsure();
+		if (answer !== '0' && window.EngCalcs && typeof EngCalcs.countCodeMake === 'function') EngCalcs.countCodeMake();
 		if (current) current.textContent = texts[answer] || '';
 	}
 

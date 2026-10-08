@@ -32,21 +32,22 @@ EngCalcs.analyticsConsented = function () {
 // THE BROWSER CODE (Tom, 2026-10-08, call F01). Sixteen lowercase hex characters from the
 // browser's cryptographic random source, made only for a browser that said yes, so that the usage
 // report can count distinct browsers as well as uses. lib/config.inc.php (EC_CODE_COOKIE) carries
-// the full argument; the server makes and renews the same cookie on every page view, and this is
-// its twin for the moment of the yes, which happens without a page load. Written again on every
-// call so its 400 days restart from today, which is the renewal on each day's first visit.
+// the full argument.
+//
+// **THE PAGE WRITES IT ONCE, AT THE MOMENT OF THE YES, AND ONLY IF THERE IS NONE.** Every renewal
+// is the server's Set-Cookie on a page view (ecCountCodeRenew()). Safari caps a cookie written by
+// script at 7 days (WebKit ITP), so a page that rewrote it on every load would have kept it at 7
+// days there and made privacy.php's "400 days" false. Written once, it lives 7 days at worst
+// until the next page view, whose server response gives it the full 400.
 var EC_CODE_COOKIE = 'ec_code';
-EngCalcs.countCodeEnsure = function () {
+EngCalcs.countCodeMake = function () {
 	"use strict";
 	if (!this.analyticsConsented()) { return; }
-	var match = /(?:^|;\s*)ec_code=([0-9a-f]{16})(?:;|$)/.exec(document.cookie);
-	var code = match ? match[1] : '';
-	if (!code) {
-		if (!window.crypto || !window.crypto.getRandomValues) { return; } // no strong source: no code
-		var bytes = new Uint8Array(8), i;
-		window.crypto.getRandomValues(bytes);
-		for (i = 0; i < bytes.length; i++) { code += (bytes[i] < 16 ? '0' : '') + bytes[i].toString(16); }
-	}
+	if (/(?:^|;\s*)ec_code=[0-9a-f]{16}(?:;|$)/.test(document.cookie)) { return; }
+	if (!window.crypto || !window.crypto.getRandomValues) { return; } // no strong source: no code
+	var bytes = new Uint8Array(8), i, code = '';
+	window.crypto.getRandomValues(bytes);
+	for (i = 0; i < bytes.length; i++) { code += (bytes[i] < 16 ? '0' : '') + bytes[i].toString(16); }
 	var expires = new Date(Date.now() + 400 * 86400000).toUTCString();
 	var secure = (location.protocol === 'https:') ? '; Secure' : '';
 	document.cookie = EC_CODE_COOKIE + '=' + code + '; expires=' + expires + '; path=/; SameSite=Lax' + secure;
@@ -57,12 +58,6 @@ EngCalcs.countCodeForget = function () {
 	"use strict";
 	document.cookie = EC_CODE_COOKIE + '=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/';
 };
-// A said-yes browser on a page the service worker served from its cache never reached the server's
-// renewal, so the page renews it itself once the page's own settings are in.
-document.addEventListener('DOMContentLoaded', function () {
-	"use strict";
-	EngCalcs.countCodeEnsure();
-});
 
 EngCalcs.createCookie = function () {
 	"use strict";
