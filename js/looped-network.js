@@ -19134,6 +19134,8 @@ var EngCalcs = EngCalcs || {};
 	function findChoiceCodeOf(prop, word) {
 		var defs = findChoiceDefs(prop), w = String(word === undefined || word === null ? '' : word).trim().toLowerCase(), i;
 		if (!defs) { return null; }
+		// The English word for a choice is accepted on every page, as every other word is.
+		defs = defs.concat(findEnglishDefs(function () { return findChoiceDefs(prop); }) || []);
 		for (i = 0; i < defs.length; i++) {
 			if (String(defs[i][0]).toLowerCase() === w || String(defs[i][1]).toLowerCase() === w) { return defs[i][0]; }
 		}
@@ -19207,6 +19209,12 @@ var EngCalcs = EngCalcs || {};
 	function findOpDefs() {
 		var pc = EngCalcs.pageConfig || {};
 		if (findPropIsConnection(findState.prop)) { return findConnOpDefs(); }
+		// **A CHOICE IS EQUAL TO ONE OF ITS WORDS, OR EMPTY** (Perry's review, 2026-10-07): choosing
+		// Closed once defaulted to `contains` and wrote `Pipe.Closed contains 'open'`. Ranking or a
+		// part of a word means nothing for a list of fixed codes, so equal to comes first.
+		if (findPropIsChoice(findState.prop)) {
+			return [['equals', pc.lpn_find_op_equals || 'equal to', 'equal to'], findEmptyDef()];
+		}
 		// **THE EXTREMES ARE A STANDARD CONDITION ON EVERY PROPERTY THAT HAS AN ORDER** (Tom,
 		// 2026-08-26: *"One reason it's confusing is that it should be a standard condition, but
 		// it's not. Make it a condition for all assets and numerical or alphanumerical
@@ -20003,6 +20011,28 @@ var EngCalcs = EngCalcs || {};
 		findState.scope = save.s; findState.prop = save.p;
 		return out;
 	}
+	// **THE SAME LISTS, WORDED IN ENGLISH** (Perry's review, 2026-10-07): the def lists are built
+	// again with the English values of their keys (pageConfig.lpn_find_en) standing in, so every
+	// label, composed ones included ("Roughness, C", "Average source share"), has its English
+	// spelling. Null on a page without the English copy.
+	function findEnglishDefs(fn) {
+		var pc = EngCalcs.pageConfig || {}, en = pc.lpn_find_en, merged = {}, k;
+		if (!en) { return null; }
+		for (k in pc) { if (Object.prototype.hasOwnProperty.call(pc, k)) { merged[k] = pc[k]; } }
+		for (k in en) { if (Object.prototype.hasOwnProperty.call(en, k)) { merged[k] = en[k]; } }
+		EngCalcs.pageConfig = merged;
+		try { return fn(); } finally { EngCalcs.pageConfig = pc; }
+	}
+	// `defs` with each row's English label added to the spellings in its third slot.
+	function findWithEnglish(defs, enDefs) {
+		var byKey = {};
+		(enDefs || []).forEach(function (d) { byKey[d[0]] = d[1]; });
+		return defs.map(function (d) {
+			var en = byKey[d[0]];
+			if (!en || en === d[1]) { return d; }
+			return [d[0], d[1], [en].concat(d[2] === undefined || d[2] === null ? [] : d[2])];
+		});
+	}
 	// The word that could not be understood, for the message. Up to the next space, dot or bracket.
 	function findBadWord(text, at) {
 		var m = /^[^\s().]+/.exec(text.substring(at));
@@ -20056,7 +20086,7 @@ var EngCalcs = EngCalcs || {};
 			}
 			i += 1; ws();
 			propDefs = findDefsFor(scope).props;
-			propAlts = findAlts(propDefs);
+			propAlts = findAlts(findWithEnglish(propDefs, findEnglishDefs(function () { return findDefsFor(scope).props; })));
 			at = i;
 			m = findMatchAlt(s, i, propAlts);
 			if (!m) {
@@ -20065,7 +20095,7 @@ var EngCalcs = EngCalcs || {};
 			}
 			prop = m.key; i += m.len;
 			opDefs = findDefsFor(scope, prop).ops;
-			opAlts = findAlts(opDefs);
+			opAlts = findAlts(findWithEnglish(opDefs, findEnglishDefs(function () { return findDefsFor(scope, prop).ops; })));
 			ws();
 			at = i;
 			// **AN EXTREME IS MATCHED AS A WHOLE PHRASE, COUNT INCLUDED**, because its count is

@@ -105,6 +105,16 @@ async function runQuery(a, q) {
 }
 // "Pipe 60 9.3315" -> "Pipe 60": the kind and the ID, without the value.
 const idOf = (row) => row.split(' ').slice(0, 2).join(' ');
+// In any language: the result rows as group:id ('node:60'), read off the rows' own references.
+async function runRefs(a, q) {
+	await a.page.fill('#lpn_find_popup .lpn-find-query', q);
+	await a.page.press('#lpn_find_popup .lpn-find-query', 'Enter');
+	await a.settle(250);
+	return a.page.evaluate(() => ({ refs: Array.from(document.querySelectorAll('#lpn_find_results .lpn-find-row'))
+		.map(r => r._lpnFindRef ? r._lpnFindRef.kind + ':' + r._lpnFindRef.id : '?'),
+		msg: (document.querySelector('#lpn_find_popup .lpn-find-msg') || {}).textContent || '' }));
+}
+const refOf = (name) => (/^(Pipe|Pump|Valve) /.test(name) ? 'link:' : 'node:') + name.split(' ')[1];
 const sameSet = (a, b) => a.length === b.length && a.slice().sort().join('|') === b.slice().sort().join('|');
 
 // A labelled control in the Change what was found part of the box, by its label's text.
@@ -283,6 +293,147 @@ async function net1(browser, Session) {
 	await a.context.close().catch(() => {});
 }
 
+// Perry's review, 2026-10-07: the English words run on a page in another language, so the
+// chapter's worked queries run on es, de, zh, and ar pages exactly as on an English one.
+async function languages(browser, Session) {
+	console.log('\n7. The worked queries on pages in other languages');
+	const ex = exampleQueries(), connQ = ex[ex.length - 1].q, rq = codesIn('lpn_guide_find_replace_def');
+	for (const lang of ['es', 'de', 'zh', 'ar']) {
+		const a = await Session.open(browser, 'gfind-' + lang, { locale: lang });
+		await a.goto('Looped-Network.php?lang=' + lang);
+		await a.page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } });
+		await a.openExampleCard(await a.lang('lpn_ex_net3_title'));
+		await a.settle(800);
+		await openFind(a);
+		for (let i = 0; i < ex.length; i++) {
+			const want = ROWS[i].ids.map(refOf), r = await runRefs(a, ex[i].q);
+			const pass = ROWS[i].ordered ? r.refs.join('|') === want.join('|') : sameSet(r.refs, want);
+			ok(lang + ': ' + ex[i].q, pass && !r.msg.trim(), r.msg.trim() || r.refs.join(', '));
+		}
+		// The criticality example, end to end: Replace closes Pipe 247 with the controls in this language.
+		await runRefs(a, rq[1]);
+		const propSel = await replaceControl(a, 'lpn_replace_prop', 'select');
+		await propSel.asElement().selectOption('status');
+		await a.settle(200);
+		const valSel = await replaceControl(a, 'lpn_replace_value', 'select');
+		await valSel.asElement().selectOption('closed');
+		await pressButton(a, 'lpn_replace_btn');
+		await pressButton(a, 'lpn_replace_apply');
+		const r = await runRefs(a, connQ);
+		ok(lang + ': with Pipe 247 closed, the four junctions are cut off', sameSet(r.refs, ['node:215', 'node:217', 'node:219', 'node:225']), r.msg.trim() || r.refs.join(', '));
+		// Every English property and condition word for a pipe parses here, composed ones included.
+		const words = await a.page.evaluate(() => {
+			const en = EngCalcs.pageConfig.lpn_find_en;
+			return [en.lpn_tool_add_pipe + '.' + en.lpn_field_roughness + ', C ' + en.lpn_find_op_gt + ' 100',
+				en.lpn_tool_add_pipe + '.' + en.lpn_field_km_short + ' ' + en.lpn_find_op_gt + ' 0',
+				en.lpn_tool_add_pipe + '.' + en.lpn_result_avg_source_share + ' ' + en.lpn_find_op_empty,
+				en.lpn_tool_add_junction + '.' + en.lpn_find_prop_connection + ' ' + en.lpn_find_op_conn_unlinked];
+		});
+		for (const w of words) {
+			const rr = await runRefs(a, w);
+			ok(lang + ': ' + w + ' parses', !rr.msg.trim(), rr.msg.trim());
+		}
+		ok(lang + ': no page errors', a.errors.length === 0, a.errors.slice(0, 2).join(' | '));
+		await a.context.close().catch(() => {});
+	}
+}
+
+// The pull-downs: choosing a choice property (Closed) gives equal to, never contains.
+async function choiceControls(browser, Session) {
+	console.log('\n8. A choice property in the controls is equal to, and n highest is ten');
+	const a = await boot(Session, browser, 'choice', 'lpn_ex_net3_title');
+	await openFind(a);
+	const pick = async (labelKey, value) => {
+		const label = await a.lang(labelKey);
+		const sel = await a.page.evaluateHandle((l) => {
+			const lab = Array.from(document.querySelectorAll('#lpn_find_popup label')).filter(x => x.textContent.trim().indexOf(l) === 0 && x.querySelector('select'))[0];
+			return lab ? lab.querySelector('select') : null;
+		}, label);
+		await sel.asElement().selectOption(value);
+		await a.settle(200);
+	};
+	await pick('lpn_find_scope', 'pipe');
+	await pick('lpn_find_property', 'status');
+	const st = await a.page.evaluate(() => {
+		const q = document.querySelector('#lpn_find_popup .lpn-find-query').value;
+		const ops = Array.from(document.querySelectorAll('#lpn_find_popup select')).map(s => Array.from(s.options).map(o => o.value));
+		return { q: q, ops: ops };
+	});
+	const eq = await a.lang('lpn_find_op_equals'), contains = await a.lang('lpn_find_op_contains');
+	ok('choosing Closed writes an equal to query', st.q.indexOf(' ' + eq + ' ') > 0 && st.q.indexOf(' ' + contains + ' ') < 0, st.q);
+	ok('...and contains is not offered for it', !st.ops.some(o => o.indexOf('contains') >= 0 && o.indexOf('equals') >= 0), JSON.stringify(st.ops.slice(0, 3)));
+	await a.page.press('#lpn_find_popup .lpn-find-query', 'Enter');
+	await a.settle(250);
+	const rows = await a.page.evaluate(() => document.querySelectorAll('#lpn_find_results .lpn-find-row').length);
+	ok('...and it runs', rows > 0, String(rows));
+	// The query-language sentence's own example: n highest with the letter n lists ten.
+	const nq = codesIn('lpn_guide_find_query_def').filter(c => / n /.test(c))[0];
+	const r = await runRefs(a, nq);
+	ok(nq + ' lists 10 pipes', r.refs.length === 10 && !r.msg.trim(), r.msg.trim() || String(r.refs.length));
+	ok('no page errors', a.errors.length === 0, a.errors.slice(0, 2).join(' | '));
+	await a.context.close().catch(() => {});
+}
+
+// Ctrl+K while a Tables cell is being typed in: the typed text is kept, then the guide opens.
+async function tableCell(browser, Session) {
+	console.log('\n9. Ctrl+K in a Tables cell keeps what was typed');
+	const a = await boot(Session, browser, 'cell', 'lpn_ex_net1_title');
+	const page = a.page;
+	await page.evaluate(() => document.getElementById('lpn_pane_btn').click());
+	await a.settle(800);
+	await page.evaluate(() => { const t = document.getElementById('lpn_pane_tab_junctions'); if (t) { t.click(); } });
+	await a.settle(600);
+	const descLabel = await a.lang('lpn_field_desc');
+	const where = await page.evaluate((lab) => {
+		const tb = document.querySelector('#lpn_pane_junctions table');
+		const ths = Array.from(tb.querySelectorAll('thead th'));
+		const col = ths.findIndex(th => th.textContent.replace(/\u00ad/g, '').trim().indexOf(lab) === 0);
+		const tr = tb.querySelector('tbody tr');
+		const td = tr && tr.children[col];
+		if (!td) { return null; }
+		const id = tr.children[0].querySelector('input') ? tr.children[0].querySelector('input').value : tr.children[0].textContent.trim();
+		td.setAttribute('data-gfind-cell', '1');
+		return { col: col, id: id };
+	}, descLabel);
+	ok('the Junctions table has a Description cell', !!where, JSON.stringify(where));
+	if (where) {
+		await page.click('[data-gfind-cell="1"]');
+		await page.keyboard.press('F2');
+		await page.keyboard.type('Hydrant at Elm');
+		await page.keyboard.press('Control+k');
+		await a.settle(400);
+		const st = await page.evaluate(() => ({ open: document.getElementById('lpn_hotkeys_popup').style.display === 'flex',
+			focus: document.activeElement && document.activeElement.id }));
+		ok('Ctrl+K opens the guide from a cell being edited', st.open && st.focus === 'lpn_guide_search', JSON.stringify(st));
+		await page.keyboard.press('Escape');
+		await a.settle(400);
+		await openFind(a);
+		const r = await runRefs(a, (await a.lang('lpn_tool_add_junction')) + '.' + descLabel + ' ' + (await a.lang('lpn_find_op_contains')) + " 'Hydrant at Elm'");
+		ok('...and the typed description was kept on that junction', r.refs.length === 1 && r.refs[0] === 'node:' + where.id, r.msg.trim() || r.refs.join(', '));
+	}
+	ok('no page errors', a.errors.length === 0, a.errors.slice(0, 2).join(' | '));
+	await a.context.close().catch(() => {});
+}
+
+// Every key the Find word lists read has its English copy in pageConfig.lpn_find_en.
+function englishCopyComplete() {
+	console.log('\n10. Every Find word key has its English copy');
+	const js = fs.readFileSync(path.join(REPO, 'js', 'looped-network.js'), 'utf8');
+	const php = fs.readFileSync(path.join(REPO, 'Looped-Network.php'), 'utf8');
+	const block = (php.match(/lpn_find_en: <\?=json_encode\(\(function[\s\S]*?\)\), JSON_UNESCAPED_UNICODE\)\?>/) || [''])[0];
+	const listed = new Set((block.match(/'((?:lpn|bpn)_[a-z0-9_]+)'/g) || []).map(k => k.slice(1, -1)));
+	const names = ['findScopeDefs', 'findPropDefs', 'findConnOpDefs', 'findChoiceDefs', 'findOpDefs', 'findEmptyDef', 'findExtremeTemplate', 'findJoinDefs',
+		'roughnessLabel', 'qualityLabel', 'linkQualityLabel', 'headlossLabelFor', 'axisNames', 'paneColMixingModel', 'paneColSourceType'];
+	const missing = [];
+	for (const n of names) {
+		const m = js.match(new RegExp('\\n\\tfunction ' + n + '\\([\\s\\S]*?\\n\\t}\\n'));
+		if (!m) { missing.push('(no function ' + n + ')'); continue; }
+		const keys = (m[0].match(/pc\.([a-z][a-z0-9_]*)/g) || []).map(k => k.slice(3)).concat((m[0].match(/'((?:lpn|bpn)_[a-z0-9_]+)'/g) || []).map(k => k.slice(1, -1)));
+		keys.forEach(k => { if (!listed.has(k) && missing.indexOf(k) < 0) { missing.push(k); } });
+	}
+	ok('lpn_find_en lists every key the Find word lists read', listed.size > 50 && missing.length === 0, missing.join(', ') || listed.size + ' keys');
+}
+
 async function main() {
 	const env = require(path.join(REPO, 'dev', 'browser-pass', 'lib', 'env.js'));
 	const { Session } = require(path.join(REPO, 'dev', 'browser-pass', 'lib', 'session.js'));
@@ -295,6 +446,10 @@ async function main() {
 		await orderAndKeys(browser, Session);
 		await net3(browser, Session);
 		await net1(browser, Session);
+		await languages(browser, Session);
+		await choiceControls(browser, Session);
+		await tableCell(browser, Session);
+		englishCopyComplete();
 	} catch (e) {
 		console.error(e && e.stack || e);
 		fails++;
