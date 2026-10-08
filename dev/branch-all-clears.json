@@ -623,6 +623,13 @@
    "words": "Merge feat/dxf",
    "context": "Typed by Tom in the session on 2026-10-08, after his pasted message of the same day said 'Merge.' for this branch and the classifier asked for the words typed directly.",
    "pin_note": "Pinned to the branch head as it stood when he typed the words."
+  },
+  "feat/workspace": {
+   "head": "60879c221df2aaab61ee168e1c1e054992ab8582",
+   "date": "2026-10-08",
+   "words": "feat/workspace Merge",
+   "context": "Typed by Tom in the session on 2026-10-08, after his browser pass of the no-reload import ('It works now').",
+   "pin_note": "Pinned to the branch head as it stood when he typed the words."
   }
  }
 }
