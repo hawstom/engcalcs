@@ -70,7 +70,10 @@ the block.
   **PORTING THE BENCH TO MASTER, 2026-10-07** (Tom agreed D09: rules 1-3 as three defect branches;
   stability is a criterion of low weight). Rule 1, clean ground first, MERGED (`fix/label-clean-ground`):
   node labels over pipes -26%, leaders through node symbols -42%, labels shown flat, pass ~8% slower.
-  Rule 2, rescue search, MERGED: labels shown 38.3 -> 39.3 per 100 asked, ~7% slower. Next: rule 3.
+  Rule 2, rescue search: TAKEN OUT 2026-10-07 (Tom: *"Too expensive. Don't keep it."*; +1.0 label per
+  100 for ~7% time). Rule 3, eviction, measured and NOT ported: +0.24 per 100 for ~11% (one neighbour).
+  His price: a rule must buy a large gain per percent of pass time. The pass is now ~98 ms on Novato
+  all-fields (Task 681(b), 2026-10-08, was ~254), so later percentages are of the smaller number.
   **REBUILD FROM RULES, 2026-09-28:** rules reviewed (`dev/label-placement-rules.md`), bench and
   seam built, two clean-room placers done and both fail R-075; state in the handoff.
   **DROPPED TO 75 BY TOM, 2026-09-17** (*"Task 539: Demote to 75"*). Built on
@@ -343,6 +346,8 @@ the block.
   `.inp`, waits on finding one. Presentation never travels through a Bentley file (Bentley keeps
   display in the `.wtg`); the project file is its only home.
 - 75|752| **Google Sheets: sync the scenarios and their alternatives out and in.**
+  **Direction, Tom 2026-10-07, on Bentley's Connection** (a saved, re-runnable set of directions from
+  a source to a model, run for Sync In and Sync Out, not a live link): *"Nice. That's where we should head."*
   Tom, 2026-09-30, on a master-spreadsheet layout (a Scenarios tab naming each scenario's
   alternatives, then one tab per data kind keyed by element ID): *"Spreadsheet structure: I love
   this."* and *"Sync in/out: Could we do this with GSheets?"*; 2026-10-06, it is half of the interop
@@ -360,6 +365,9 @@ the block.
 - 75|763| **A searchable help manual, built from the tips Tom cut.** Tom, 2026-10-04: *"Almost all
   the deletes could be turned into a searchable help manual."* The cut tips' English is kept in
   `dev/help-manual-source.md` (feat/tip-verdict) as its first material.
+  **2026-10-08 on `feat/user-guide`:** Find and replace rewritten from the source as the model chapter
+  (Tom: *"says nothing about our query language (!!!)"*); every other chapter audited, not yet rewritten:
+  `dev/user-guide-audit.md`. Rewrite them one by one to that model.
 - 75|772| **AutoCAD: import, export, and perhaps sync, on a long-lived branch.**
   Tom, 2026-10-05: *"I am an AutoCAD power user and developer... I would like to know what's already
   been done first."* Mary's survey of prior art: `dev/agents/market-researcher/autocad-interop.md`.
