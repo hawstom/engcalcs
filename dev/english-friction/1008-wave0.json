@@ -11,8 +11,10 @@
     "select the customer on the map while the Select mode is on, to open its properties box",
     "press a key or a button called Select to open some box"
    ],
-   "disposition": "refer-to-human",
-   "resolution": "PROPOSED English: 'Customer {id} added. Enter its description and demand in the Customers table, or select it in Select mode to open its properties box.' Cost: 26 retranslations."
+   "disposition": "english",
+   "resolution": "APPLIED 2026-10-08 on Tom's \"Use proposed\": 'Customer {id} added. Enter its description and demand in the Customers table, or select it in Select mode to open its properties box.' Cost: 26 retranslations.",
+   "human_answer": "Calls page 8 October: Use proposed. (He added: \"Do you need me to review new_english_keys or anything?\")",
+   "human_answered": "2026-10-08"
   },
   {
    "key": "lpn_change_type_born",
@@ -23,8 +25,10 @@
     "these values are created with their defaults, as on an asset newly drawn",
     "these assets are new, like a newly drawn asset"
    ],
-   "disposition": "refer-to-human",
-   "resolution": "PROPOSED English: 'These values are new, set as on a newly drawn asset:' Cost: 26 retranslations."
+   "disposition": "english",
+   "resolution": "APPLIED 2026-10-08 on Tom's \"Use proposed\": 'These values are new, set as on a newly drawn asset:' Cost: 26 retranslations.",
+   "human_answer": "Calls page 8 October: Use proposed",
+   "human_answered": "2026-10-08"
   },
   {
    "key": "lpn_find_filter_tip",
@@ -35,8 +39,10 @@
     "show only the rows that match \"What to search\" in the table or tables searched",
     "filter (choose) the tables whose name matches \"What to search\""
    ],
-   "disposition": "refer-to-human",
-   "resolution": "PROPOSED English: 'Show only the rows that match \"What to search\" above, in each table searched.' Cost: 26 retranslations."
+   "disposition": "english",
+   "resolution": "APPLIED 2026-10-08 on Tom's \"Use proposed\": 'Show only the rows that match \"What to search\" above, in each table searched.' Cost: 26 retranslations.",
+   "human_answer": "Calls page 8 October: Use proposed",
+   "human_answered": "2026-10-08"
   },
   {
    "key": "lpn_mapgeo_dial_help",
@@ -47,8 +53,10 @@
     "a size of 1 and a rotation of 0 mean no change",
     "either bar set to 1 or 0 means no change"
    ],
-   "disposition": "refer-to-human",
-   "resolution": "PROPOSED English: replace the last clause with 'so a size of 1 and a rotation of 0 mean no change.' Cost: 26 retranslations."
+   "disposition": "english",
+   "resolution": "APPLIED 2026-10-08 on Tom's \"Use proposed\": replace the last clause with 'so a size of 1 and a rotation of 0 mean no change.' Cost: 26 retranslations.",
+   "human_answer": "Calls page 8 October: Use proposed",
+   "human_answered": "2026-10-08"
   },
   {
    "key": "lpn_ff_menu_tip",
@@ -59,8 +67,10 @@
     "each selected junction is tested for fire flow in turn, and the effect on other junctions and pipes is checked",
     "one combined check of the whole selection, plus a check of side effects of some kind"
    ],
-   "disposition": "refer-to-human",
-   "resolution": "PROPOSED English: 'Test each selected junction for fire flow, and check the effect on the rest of the system' Cost: 26 retranslations."
+   "disposition": "english",
+   "resolution": "APPLIED 2026-10-08 on Tom's \"Use proposed\": 'Test each selected junction for fire flow, and check the effect on the rest of the system' Cost: 26 retranslations.",
+   "human_answer": "Calls page 8 October: Use proposed",
+   "human_answered": "2026-10-08"
   },
   {
    "key": "lpn_tool_area_tip",
@@ -71,8 +81,10 @@
     "keep the current selection set and add to it or remove from it",
     "keep the existing selection, set something, and add or remove"
    ],
-   "disposition": "refer-to-human",
-   "resolution": "PROPOSED English: 'Follow the on-screen prompts. Press again to cycle through window, lasso, and polygon. Hold Shift to keep the current selection and add or remove (toggle) what you select.' Cost: 26 retranslations."
+   "disposition": "english",
+   "resolution": "APPLIED 2026-10-08 on Tom's \"Use proposed\": 'Follow the on-screen prompts. Press again to cycle through window, lasso, and polygon. Hold Shift to keep the current selection and add or remove (toggle) what you select.' Cost: 26 retranslations.",
+   "human_answer": "Calls page 8 October: Use proposed",
+   "human_answered": "2026-10-08"
   },
   {
    "key": "lpn_search_refused",
@@ -83,8 +95,10 @@
     "the Go to a latitude and longitude command still works",
     "an instruction to go to a latitude and longitude, followed by 'still works'"
    ],
-   "disposition": "refer-to-human",
-   "resolution": "PROPOSED English: 'Place-name search is off, and nothing was sent. The Go to a latitude and longitude command still works.' Cost: 26 retranslations."
+   "disposition": "english",
+   "resolution": "APPLIED 2026-10-08 on Tom's \"Use proposed\": 'Place-name search is off, and nothing was sent. The Go to a latitude and longitude command still works.' Cost: 26 retranslations.",
+   "human_answer": "Calls page 8 October: Use proposed",
+   "human_answered": "2026-10-08"
   },
   {
    "key": "lpn_reports_epanet",
@@ -95,8 +109,10 @@
     "noun: the report of the last run",
     "verb: start a run"
    ],
-   "disposition": "refer-to-human",
-   "resolution": "Add $ec_lang_syn PROPOSAL (AI may not write it): 'Run report; a noun, the report EPANET wrote for the last run, not the command to start a run'. English unchanged, no retranslation of English needed beyond the note."
+   "disposition": "intent",
+   "resolution": "APPLIED 2026-10-08: $ec_lang_syn written in Tom's words: 'Run, simulation, computation, or calculation report'. English unchanged.",
+   "human_answer": "Calls page 8 October: Change: \"I would use _syn for synonyms. That's why I invented it. \"Run, simulation, computation, or calculation report\"\"",
+   "human_answered": "2026-10-08"
   },
   {
    "key": "lpn_snip_tip_mode",
@@ -107,8 +123,10 @@
     "noun: the shape of the snip, chosen from this menu",
     "verb: snip a shape"
    ],
-   "disposition": "refer-to-human",
-   "resolution": "Add $ec_lang_syn PROPOSAL (AI may not write it): 'Snip shape; a noun, the choice of shape (rectangle or freehand) for the next snip, not an instruction'. English unchanged."
+   "disposition": "intent",
+   "resolution": "APPLIED 2026-10-08: $ec_lang_syn written in Tom's words: 'Shape to specify for screenshot'. English unchanged.",
+   "human_answer": "Calls page 8 October: \"I would use _syn for synonyms. That's why I invented it. \"Shape to specify for screenshot\"\"",
+   "human_answered": "2026-10-08"
   },
   {
    "key": "lpn_pane_scn_alt_tip",
@@ -119,8 +137,10 @@
     "alternative: the scenario alternative that holds this value",
     "altitude, or the Alt key"
    ],
-   "disposition": "refer-to-human",
-   "resolution": "Add $ec_lang_syn PROPOSAL (AI may not write it): 'alt. abbreviates alternative (the scenario alternative that holds this override); abbreviate it the way your language abbreviates that word'. English unchanged."
+   "disposition": "intent",
+   "resolution": "APPLIED 2026-10-08 on Tom's \"Use proposed\": $ec_lang_syn written: 'alt. abbreviates alternative (the scenario alternative that holds this override); abbreviate it the way your language abbreviates that word'. English unchanged.",
+   "human_answer": "Calls page 8 October: Use proposed (the $ec_lang_syn note)",
+   "human_answered": "2026-10-08"
   },
   {
    "key": "lpn_cp_restrict_tip",
@@ -131,8 +151,10 @@
     "forbid the characters listed",
     "limit entries to the characters listed (the same as Allow only)"
    ],
-   "disposition": "refer-to-human",
-   "resolution": "Add $ec_lang_syn PROPOSAL (AI may not write it) on lpn_cp_restrict_tip and its sibling lpn_cp_restrict: 'Forbid these characters; the opposite of Allow only these characters'. English unchanged."
+   "disposition": "intent",
+   "resolution": "APPLIED 2026-10-08 on Tom's \"Use proposed\": $ec_lang_syn written on lpn_cp_restrict_tip and its sibling lpn_cp_restrict: 'Forbid these characters; the opposite of Allow only these characters'. English unchanged.",
+   "human_answer": "Calls page 8 October: Use proposed (the $ec_lang_syn note, on it and lpn_cp_restrict)",
+   "human_answered": "2026-10-08"
   },
   {
    "key": "lpn_fb_intro",
@@ -143,8 +165,10 @@
     "ready-made messages to pick from",
     "messages in a can (literal), or discarded messages"
    ],
-   "disposition": "refer-to-human",
-   "resolution": "Add $ec_lang_syn PROPOSAL (AI may not write it): 'Ready-made messages; preset choices the visitor can pick instead of typing'. English unchanged."
+   "disposition": "intent",
+   "resolution": "APPLIED 2026-10-08 on Tom's \"Use proposed\": $ec_lang_syn written: 'Ready-made messages; preset choices the visitor can pick instead of typing'. English unchanged.",
+   "human_answer": "Calls page 8 October: Use proposed (the $ec_lang_syn note)",
+   "human_answered": "2026-10-08"
   },
   {
    "key": "lpn_scenario_overrides",

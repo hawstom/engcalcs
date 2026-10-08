@@ -1,0 +1,870 @@
+{
+ "sprint": "1008",
+ "description": "Translator friction from sprint 1008 (224 new keys and 343 resynced keys, 26 languages, 2026-10-08).",
+ "entries": [
+  {
+   "key": "lpn_settings_elev_source_typed",
+   "source": "translator",
+   "lang": "am",
+   "complaint": "The one-word label Above names no object; it is unclear what is above.",
+   "readings": [
+    "The elevation typed in the field above (chosen)",
+    "Above in the sense of higher altitude"
+   ],
+   "disposition": "intent",
+   "resolution": "Tom's ruled word: the option means the elevation typed in the box above. Every translator rendered that reading."
+  },
+  {
+   "key": "lpn_scenario_mark_tip",
+   "source": "translator",
+   "lang": "am",
+   "complaint": "English now says amber ring while the visible ring color was rendered gold elsewhere in this file; unsure whether a distinct color word is intended.",
+   "readings": [
+    "gold/amber ring, rendered with the existing gold word (chosen)",
+    "a distinct amber (orange-yellow) word"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Amber vs gold for the scenario ring colour: either names the colour on screen."
+  },
+  {
+   "key": "lpn_pane_scn_alt_tip",
+   "source": "translator",
+   "lang": "am",
+   "complaint": "alt. is an abbreviation with no established Amharic short form, so the full word was used.",
+   "readings": [
+    "write the full word alternative (chosen)",
+    "invent an abbreviation"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Writing the full word, or the language's own abbreviation, is what the $ec_lang_syn note asks for."
+  },
+  {
+   "key": "lpn_change_type_line",
+   "source": "translator",
+   "lang": "ar",
+   "complaint": "Value is only placeholders {id}: {property} {value}; no words to translate, so it is byte-identical to English",
+   "readings": [
+    "keep identical (chosen)",
+    "insert extra punctuation, rejected as invention"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Correctly identical to English in this language; exempted per key and language in translation_exempt_keys.json at sprint close."
+  },
+  {
+   "key": "lpn_change_type_line",
+   "source": "translator",
+   "lang": "bg",
+   "complaint": "Value is only placeholders and punctuation, so it is byte-identical to English by necessity.",
+   "readings": [
+    "keep as is",
+    "none"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Correctly identical to English in this language; exempted per key and language in translation_exempt_keys.json at sprint close."
+  },
+  {
+   "key": "lpn_change_type_key",
+   "source": "translator",
+   "lang": "bg",
+   "complaint": "'ID: Lost entry' reads like a column-header pair; unclear whether 'Lost entry' means a lost value or a lost record.",
+   "readings": [
+    "ID: Загубена стойност (lost value)",
+    "lost record"
+   ],
+   "disposition": "refer-to-human",
+   "resolution": "PROPOSED English for Tom: 'Each line: ID: the property and value that would be lost'. 'ID: Lost entry' is a legend over the lines listing what a type change loses; seven translators could not tell lost value from lost record."
+  },
+  {
+   "key": "lpn_change_type_line",
+   "source": "translator",
+   "lang": "bn",
+   "complaint": "Value is only placeholders and a colon, so any translation is byte-identical to English and trips the identical-to-English check.",
+   "readings": [
+    "added a comma between property and value to differ from English",
+    "keep identical (rejected by the check)"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Correctly identical to English in this language; exempted per key and language in translation_exempt_keys.json at sprint close."
+  },
+  {
+   "key": "lpn_change_type_line",
+   "source": "translator",
+   "lang": "cs",
+   "complaint": "The value is only placeholders and spaces ('{id}: {property} {value}'), so the correct Czech is byte-identical to English and fails the identical-to-English check; it likely belongs in the exempt list.",
+   "readings": [
+    "identical placeholder string, kept",
+    "invent a differing punctuation to dodge the check (rejected)"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Correctly identical to English in this language; exempted per key and language in translation_exempt_keys.json at sprint close."
+  },
+  {
+   "key": "lpn_pane_scn_alt_tip",
+   "source": "translator",
+   "lang": "cs",
+   "complaint": "Czech abbreviates alternative as 'alt.' exactly as English does, so a faithful translation is byte-identical; I added a comma after the category to differ.",
+   "readings": [
+    "'{category}, alt.: {alternative}'",
+    "'{category} alt.: {alternative}' (identical to English)"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Writing the full word, or the language's own abbreviation, is what the $ec_lang_syn note asks for."
+  },
+  {
+   "key": "lpn_settings_auto_run_tip",
+   "source": "translator",
+   "lang": "de",
+   "complaint": "'Hides the Calculate button' has no stated condition: does it hide the button when the setting is on or when it is turned off?",
+   "readings": [
+    "The button is hidden while the setting is on (automatic recalculation)",
+    "The button is hidden when the user turns the setting off"
+   ],
+   "disposition": "refer-to-human",
+   "resolution": "PROPOSED English for Tom: 'Turn off if recalculation is too slow. While this is on, the Calculate button is hidden.' Two translators could not tell which state hides the button."
+  },
+  {
+   "key": "lpn_hotkeys_snip_heading",
+   "source": "translator",
+   "lang": "de",
+   "complaint": "German uses the loanword Screenshot; the validator flags it as identical to English",
+   "readings": [
+    "Screenshot (the standard German word, matches existing lpn_help_screenshots)",
+    "Bildschirmfoto (rejected as a rarer word)"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Correctly identical to English in this language; exempted per key and language in translation_exempt_keys.json at sprint close."
+  },
+  {
+   "key": "lpn_change_type_line",
+   "source": "translator",
+   "lang": "de",
+   "complaint": "The value consists only of placeholders and punctuation, so any correct translation is byte-identical to English",
+   "readings": [
+    "Keep as is",
+    "No translatable words exist"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Correctly identical to English in this language; exempted per key and language in translation_exempt_keys.json at sprint close."
+  },
+  {
+   "key": "lpn_basemap_style_normal",
+   "source": "translator",
+   "lang": "de",
+   "complaint": "Normal is also the German word; the validator flags it as identical to English",
+   "readings": [
+    "Keep the shared word",
+    "A forced distinct word would be worse"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Correctly identical to English in this language; exempted per key and language in translation_exempt_keys.json at sprint close."
+  },
+  {
+   "key": "lpn_survey_codes_col_code",
+   "source": "translator",
+   "lang": "de",
+   "complaint": "Code is also the German word for a field code; flagged as identical to English",
+   "readings": [
+    "Keep the shared word",
+    "A forced distinct word would be worse"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Correctly identical to English in this language; exempted per key and language in translation_exempt_keys.json at sprint close."
+  },
+  {
+   "key": "lpn_screenshot_menu",
+   "source": "translator",
+   "lang": "de",
+   "complaint": "Screenshot is the German loanword; flagged as identical to English",
+   "readings": [
+    "Keep the shared word",
+    "A forced distinct word would be worse"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Correctly identical to English in this language; exempted per key and language in translation_exempt_keys.json at sprint close."
+  },
+  {
+   "key": "lpn_change_type_line",
+   "source": "translator",
+   "lang": "es",
+   "complaint": "The value is only placeholders and punctuation, so it is byte-identical to English and trips the identical-to-english check; no word to translate.",
+   "readings": [
+    "keep the placeholder pattern unchanged",
+    "reorder placeholders"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Correctly identical to English in this language; exempted per key and language in translation_exempt_keys.json at sprint close."
+  },
+  {
+   "key": "lpn_basemap_style_normal",
+   "source": "translator",
+   "lang": "es",
+   "complaint": "Normal is a true cognate and the correct Spanish word for the default basemap style, but it is byte-identical to English.",
+   "readings": [
+    "Normal (cognate, kept)",
+    "Estándar (rejected, a worse fit for a default style)"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Correctly identical to English in this language; exempted per key and language in translation_exempt_keys.json at sprint close."
+  },
+  {
+   "key": "lpn_status_inp_exported_no_picture",
+   "source": "translator",
+   "lang": "es",
+   "complaint": "The EPANET menu path View > Backdrop > Load has no verified Spanish rendering in the EPANET Spanish interface.",
+   "readings": [
+    "Ver > Fondo > Cargar",
+    "Ver > Imagen de fondo > Cargar"
+   ],
+   "disposition": "dismissed",
+   "resolution": "EPANET's own menu path; translated EPANET builds exist, so either the translated path or the English one is acceptable."
+  },
+  {
+   "key": "lpn_ds_intro",
+   "source": "translator",
+   "lang": "es",
+   "complaint": "The intro names a Find button, but no key in the sprint gives its label, so the Spanish button name was guessed.",
+   "readings": [
+    "Buscar",
+    "Encontrar"
+   ],
+   "disposition": "intent",
+   "resolution": "The Find button in that box is labelled with lpn_ds_find; the translator's rendering matches it."
+  },
+  {
+   "key": "lpn_change_type_line",
+   "source": "translator",
+   "lang": "fa",
+   "complaint": "A pure placeholder pattern; any Persian rendering would be identical to the English.",
+   "readings": [
+    "kept identical (placeholders only)",
+    "insert a Persian word between the placeholders"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Correctly identical to English in this language; exempted per key and language in translation_exempt_keys.json at sprint close."
+  },
+  {
+   "key": "lpn_settings_elev_source_typed",
+   "source": "translator",
+   "lang": "fa",
+   "complaint": "The single word 'Above' is an option label with no stated referent.",
+   "readings": [
+    "the elevation typed in the box above",
+    "a position (higher)"
+   ],
+   "disposition": "intent",
+   "resolution": "Tom's ruled word: the option means the elevation typed in the box above. Every translator rendered that reading."
+  },
+  {
+   "key": "lpn_change_type_key",
+   "source": "translator",
+   "lang": "fa",
+   "complaint": "'ID: Lost entry' reads as a column-heading pair with no stated structure.",
+   "readings": [
+    "column headings: ID, then the lost entry",
+    "a sentence"
+   ],
+   "disposition": "refer-to-human",
+   "resolution": "PROPOSED English for Tom: 'Each line: ID: the property and value that would be lost'. 'ID: Lost entry' is a legend over the lines listing what a type change loses; seven translators could not tell lost value from lost record."
+  },
+  {
+   "key": "lpn_pane_scn_alt_tip",
+   "source": "translator",
+   "lang": "fa",
+   "complaint": "'alt.' is an abbreviation with no standard Persian abbreviation, so the full word was written.",
+   "readings": [
+    "full word",
+    "an invented abbreviation"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Writing the full word, or the language's own abbreviation, is what the $ec_lang_syn note asks for."
+  },
+  {
+   "key": "lpn_find_scope_source",
+   "source": "translator",
+   "lang": "fr",
+   "complaint": "The French word is the English word (true cognate); the identical-to-English check will flag it.",
+   "readings": [
+    "Source (cognate, hydraulics term)",
+    "Origine (rejected, not the EPANET term)"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Correctly identical to English in this language; exempted per key and language in translation_exempt_keys.json at sprint close."
+  },
+  {
+   "key": "lpn_basemap_style_normal",
+   "source": "translator",
+   "lang": "fr",
+   "complaint": "Normal is a true cognate and the natural French word for a default map style.",
+   "readings": [
+    "Normal",
+    "Standard (rejected, no better)"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Correctly identical to English in this language; exempted per key and language in translation_exempt_keys.json at sprint close."
+  },
+  {
+   "key": "lpn_survey_codes_col_code",
+   "source": "translator",
+   "lang": "fr",
+   "complaint": "Code is a true cognate and the natural French column heading.",
+   "readings": [
+    "Code",
+    "Codification (rejected)"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Correctly identical to English in this language; exempted per key and language in translation_exempt_keys.json at sprint close."
+  },
+  {
+   "key": "lpn_settings_elev_source_tip",
+   "source": "translator",
+   "lang": "fr",
+   "complaint": "'ranges through 1-10 m and <1 m' pairs horizontal and vertical accuracy without saying which figure is which; the pairing is inferred from the order 'horizontal and vertical'.",
+   "readings": [
+    "first figure horizontal, second vertical",
+    "ranges as an interval from one region to the next"
+   ],
+   "disposition": "refer-to-human",
+   "resolution": "PROPOSED English for Tom: 'Mapbox DEM accuracy in 2026, horizontal then vertical: 1–10 m and under 1 m in the US, 2–10 m and 1–3 m in Europe and Japan, 30 m and 10–16 m globally, and 90 m and over 16 m at the poles.'"
+  },
+  {
+   "key": "lpn_change_type_line",
+   "source": "translator",
+   "lang": "he",
+   "complaint": "Value is only placeholders and punctuation, so it is necessarily byte-identical to English.",
+   "readings": [
+    "identical to English is correct",
+    "no translatable words exist"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Correctly identical to English in this language; exempted per key and language in translation_exempt_keys.json at sprint close."
+  },
+  {
+   "key": "lpn_scenario_override",
+   "source": "translator",
+   "lang": "he",
+   "complaint": "Glossary preferred_translation for 'override (scenario value)' is 'ערכים משלו' (a plural noun phrase), which does not fit as a checkbox label, a column heading or a verb in a sentence.",
+   "readings": [
+    "ערך מותאם / ערכים מותאמים, as the file already uses in neighbors",
+    "ערכים משלו, the glossary rendering"
+   ],
+   "disposition": "glossary",
+   "resolution": "\"Override\" as an adjective/column label: the translator's form matches neighbouring keys; glossary note to follow in write-back."
+  },
+  {
+   "key": "lpn_change_type_line",
+   "source": "translator",
+   "lang": "hi",
+   "complaint": "The string is only placeholders and punctuation; no word of Hindi belongs in it, so it is byte-identical to English.",
+   "readings": [
+    "identical to English is correct",
+    "invent a punctuation variant just to differ"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Correctly identical to English in this language; exempted per key and language in translation_exempt_keys.json at sprint close."
+  },
+  {
+   "key": "lpn_change_type_key",
+   "source": "translator",
+   "lang": "hi",
+   "complaint": "'ID: Lost entry' reads as a legend for the lines below, but 'Lost entry' has no stated object; guessed it labels the line format {id}: {property} {value} of a lost value.",
+   "readings": [
+    "legend: ID then the lost entry (property and value)",
+    "a status label"
+   ],
+   "disposition": "refer-to-human",
+   "resolution": "PROPOSED English for Tom: 'Each line: ID: the property and value that would be lost'. 'ID: Lost entry' is a legend over the lines listing what a type change loses; seven translators could not tell lost value from lost record."
+  },
+  {
+   "key": "lpn_pane_scn_alt_tip",
+   "source": "translator",
+   "lang": "hr",
+   "complaint": "Croatian abbreviation of alternativa is also alt., so the string is identical to English",
+   "readings": [
+    "kept alt. (correct abbreviation)",
+    "invent a different abbreviation"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Correctly identical to English in this language; exempted per key and language in translation_exempt_keys.json at sprint close."
+  },
+  {
+   "key": "lpn_change_type_line",
+   "source": "translator",
+   "lang": "hr",
+   "complaint": "Value is only placeholders; nothing to translate",
+   "readings": [
+    "kept as is",
+    "reordered placeholders"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Correctly identical to English in this language; exempted per key and language in translation_exempt_keys.json at sprint close."
+  },
+  {
+   "key": "lpn_settings_elev_source_typed",
+   "source": "translator",
+   "lang": "hr",
+   "complaint": "English is the bare word Above; the intended referent (the elevation typed in the box above) is implied",
+   "readings": [
+    "option meaning the elevation typed in the box above",
+    "literal position word"
+   ],
+   "disposition": "intent",
+   "resolution": "Tom's ruled word: the option means the elevation typed in the box above. Every translator rendered that reading."
+  },
+  {
+   "key": "lpn_change_type_line",
+   "source": "translator",
+   "lang": "id",
+   "complaint": "Value is only placeholders and a space, so it cannot differ from English; flagged identical-to-english.",
+   "readings": [
+    "keep as English placeholders",
+    "add punctuation to differ (rejected, alters format)"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Correctly identical to English in this language; exempted per key and language in translation_exempt_keys.json at sprint close."
+  },
+  {
+   "key": "lpn_basemap_style_normal",
+   "source": "translator",
+   "lang": "id",
+   "complaint": "Indonesian 'Normal' is the same word as English (true cognate).",
+   "readings": [
+    "Normal",
+    "Biasa (rejected, less standard)"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Correctly identical to English in this language; exempted per key and language in translation_exempt_keys.json at sprint close."
+  },
+  {
+   "key": "lpn_choice_default",
+   "source": "translator",
+   "lang": "id",
+   "complaint": "'Default' is the established loanword in Indonesian software and this file already uses it (29 times); alternative 'Bawaan' used in other places.",
+   "readings": [
+    "Default",
+    "Bawaan"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Correctly identical to English in this language; exempted per key and language in translation_exempt_keys.json at sprint close."
+  },
+  {
+   "key": "lpn_change_type_tip",
+   "source": "translator",
+   "lang": "id",
+   "complaint": "Junction and node both render as 'simpul' in this file (lpn_tool_add_junction='Simpul'), so 'change nodes into junctions' reads as a tautology.",
+   "readings": [
+    "simpul for both, per existing file usage",
+    "distinct term for junction (rejected, would break consistency)"
+   ],
+   "disposition": "glossary",
+   "resolution": "junction and node share one word in this language's glossary rendering; the sentence still reads correctly (nodes become junctions, reservoirs or tanks). A distinct junction word would contradict the rest of the file."
+  },
+  {
+   "key": "lpn_pane_scn_alt_tip",
+   "source": "translator",
+   "lang": "it",
+   "complaint": "The abbreviation alt. is also the correct Italian abbreviation of alternativa, so the value is identical to English.",
+   "readings": [
+    "kept {category} alt.: {alternative} (true cognate abbreviation)",
+    "altern. (rejected: not a standard abbreviation)"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Correctly identical to English in this language; exempted per key and language in translation_exempt_keys.json at sprint close."
+  },
+  {
+   "key": "lpn_change_type_line",
+   "source": "translator",
+   "lang": "it",
+   "complaint": "The value is only placeholders and punctuation, so it is necessarily identical to English.",
+   "readings": [
+    "kept as is",
+    "none; nothing to translate"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Correctly identical to English in this language; exempted per key and language in translation_exempt_keys.json at sprint close."
+  },
+  {
+   "key": "lpn_status_inp_exported_no_picture",
+   "source": "translator",
+   "lang": "it",
+   "complaint": "The EPANET menu path View > Backdrop > Load names a third-party UI whose Italian labels are unverified.",
+   "readings": [
+    "kept the English EPANET menu names",
+    "translate as Visualizza > Sfondo > Carica (rejected, unverified)"
+   ],
+   "disposition": "dismissed",
+   "resolution": "EPANET's own menu path; translated EPANET builds exist, so either the translated path or the English one is acceptable."
+  },
+  {
+   "key": "lpn_reports_epanet",
+   "source": "translator",
+   "lang": "it",
+   "complaint": "English changed to Run, but the Italian label Calcolo EPANET is used as a menu name in other strings (lpn_inp_drop_report), and ff and ds Run buttons are Calcola in the file; left unchanged for consistency.",
+   "readings": [
+    "kept Calcolo EPANET",
+    "Simulazione"
+   ],
+   "disposition": "english",
+   "resolution": "Tom removed EPANET from the Reports rows (fix/report-names); the Italian row is now Calcolo, fixed at sprint close."
+  },
+  {
+   "key": "lpn_change_type_tip",
+   "source": "translator",
+   "lang": "km",
+   "complaint": "The glossary renders both junction and node as the same Khmer word, so 'Change the selected nodes into junctions, reservoirs, or tanks' loses the node/junction distinction.",
+   "readings": [
+    "both rendered as ថ្នាំង per glossary",
+    "a distinct Khmer word for junction (rejected: contradicts glossary and the rest of the file)"
+   ],
+   "disposition": "glossary",
+   "resolution": "junction and node share one word in this language's glossary rendering; the sentence still reads correctly (nodes become junctions, reservoirs or tanks). A distinct junction word would contradict the rest of the file."
+  },
+  {
+   "key": "lpn_tool_add_chain_tip",
+   "source": "translator",
+   "lang": "km",
+   "complaint": "'Specify a point on the map' (also used in the mode_add_* and area hint strings) does not say whether the point is clicked or typed.",
+   "readings": [
+    "click the point (ចុច)",
+    "type coordinates"
+   ],
+   "disposition": "intent",
+   "resolution": "\"Specify\" is deliberately device-neutral (Tom, 2026-10-04): click, tap, or type. The translator's neutral verb is right."
+  },
+  {
+   "key": "lpn_pane_scn_alt_tip",
+   "source": "translator",
+   "lang": "km",
+   "complaint": "'alt.' abbreviates 'alternative'; Khmer has no conventional abbreviation for the corresponding word, so the full word was used.",
+   "readings": [
+    "full word ជម្រើសជំនួស",
+    "invented abbreviation"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Writing the full word, or the language's own abbreviation, is what the $ec_lang_syn note asks for."
+  },
+  {
+   "key": "lpn_change_type_line",
+   "source": "translator",
+   "lang": "my",
+   "complaint": "Value is only placeholders ({id}: {property} {value}); no translatable words, so it is identical to English by necessity.",
+   "readings": [
+    "keep as is, placeholders only",
+    "invent extra words"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Correctly identical to English in this language; exempted per key and language in translation_exempt_keys.json at sprint close."
+  },
+  {
+   "key": "lpn_change_type_key",
+   "source": "translator",
+   "lang": "my",
+   "complaint": "'ID: Lost entry' is not clear whether 'Lost entry' names a lost row or a key label; guessed a heading for a lost item.",
+   "readings": [
+    "ID - lost entry (item lost in conversion)",
+    "ID: entry that is lost"
+   ],
+   "disposition": "refer-to-human",
+   "resolution": "PROPOSED English for Tom: 'Each line: ID: the property and value that would be lost'. 'ID: Lost entry' is a legend over the lines listing what a type change loses; seven translators could not tell lost value from lost record."
+  },
+  {
+   "key": "lpn_ds_col_link",
+   "source": "translator",
+   "lang": "my",
+   "complaint": "'Link' could be EPANET link (pipe/pump/valve) or hyperlink; chose EPANET link.",
+   "readings": [
+    "EPANET link (pipe, pump, valve)",
+    "hyperlink"
+   ],
+   "disposition": "intent",
+   "resolution": "EPANET link (pipe, pump or valve), as the translator chose: a column of the demand-scaling results table."
+  },
+  {
+   "key": "lpn_ds_head_scale",
+   "source": "translator",
+   "lang": "my",
+   "complaint": "Key name says head but value is 'Scale the demands', a heading; imperative vs noun phrase unclear.",
+   "readings": [
+    "heading: scale the demands (command)",
+    "noun heading"
+   ],
+   "disposition": "intent",
+   "resolution": "A box heading naming the action, as the translator chose."
+  },
+  {
+   "key": "lpn_pane_scn_alt_tip",
+   "source": "translator",
+   "lang": "my",
+   "complaint": "'alt.' is an abbreviation of alternative; Burmese has no standard abbreviation so it is written out.",
+   "readings": [
+    "write out in full",
+    "invent abbreviation"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Writing the full word, or the language's own abbreviation, is what the $ec_lang_syn note asks for."
+  },
+  {
+   "key": "lpn_change_type_line",
+   "source": "translator",
+   "lang": "ps",
+   "complaint": "The string is only placeholders ({id}: {property} {value}), so it is necessarily byte-identical to English; should be exempt.",
+   "readings": [
+    "kept identical",
+    "reordered placeholders"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Correctly identical to English in this language; exempted per key and language in translation_exempt_keys.json at sprint close."
+  },
+  {
+   "key": "lpn_pane_scn_alt_tip",
+   "source": "translator",
+   "lang": "pt",
+   "complaint": "The Portuguese abbreviation of alternativa is also alt., so the value is byte-identical to the English; correct, not a dodge.",
+   "readings": [
+    "alt. (true abbreviation of alternativa)",
+    "alt. as another word"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Correctly identical to English in this language; exempted per key and language in translation_exempt_keys.json at sprint close."
+  },
+  {
+   "key": "lpn_change_type_line",
+   "source": "translator",
+   "lang": "pt",
+   "complaint": "The string is only three placeholders and punctuation, so no translation can differ from the English.",
+   "readings": [
+    "identical to English",
+    "reordered placeholders (rejected)"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Correctly identical to English in this language; exempted per key and language in translation_exempt_keys.json at sprint close."
+  },
+  {
+   "key": "lpn_basemap_style_normal",
+   "source": "translator",
+   "lang": "pt",
+   "complaint": "Normal is a true cognate in Portuguese and is the correct word for the unmodified basemap style.",
+   "readings": [
+    "Normal",
+    "Padrão (rejected, collides with default)"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Correctly identical to English in this language; exempted per key and language in translation_exempt_keys.json at sprint close."
+  },
+  {
+   "key": "lpn_change_type_line",
+   "source": "translator",
+   "lang": "ro",
+   "complaint": "The string is only placeholders and punctuation, so it is necessarily identical to English; the identical-to-english check fires on it.",
+   "readings": [
+    "identical to English is correct (placeholders only)",
+    "add a Romanian word to dodge the check (rejected)"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Correctly identical to English in this language; exempted per key and language in translation_exempt_keys.json at sprint close."
+  },
+  {
+   "key": "lpn_file_export_menu",
+   "source": "translator",
+   "lang": "ro",
+   "complaint": "Export is a true cognate in Romanian (Export), so the translation is byte-identical to English.",
+   "readings": [
+    "Export… (true cognate, the standard Romanian menu word)",
+    "Exportare… (rejected: longer, not the menu convention in this file)"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Correctly identical to English in this language; exempted per key and language in translation_exempt_keys.json at sprint close."
+  },
+  {
+   "key": "lpn_basemap_style_normal",
+   "source": "translator",
+   "lang": "ro",
+   "complaint": "Normal is a true cognate in Romanian, so the value is byte-identical to English.",
+   "readings": [
+    "Normal (true cognate)",
+    "Standard (rejected: different sense, not a basemap style name)"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Correctly identical to English in this language; exempted per key and language in translation_exempt_keys.json at sprint close."
+  },
+  {
+   "key": "lpn_change_type_line",
+   "source": "translator",
+   "lang": "ru",
+   "complaint": "The value is only placeholders ({id}: {property} {value}), so it is necessarily byte-identical to English.",
+   "readings": [
+    "identity string, keep as is",
+    "insert a Russian separator, which would change the layout"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Correctly identical to English in this language; exempted per key and language in translation_exempt_keys.json at sprint close."
+  },
+  {
+   "key": "lpn_pane_scn_alt_tip",
+   "source": "translator",
+   "lang": "ru",
+   "complaint": "'alt.' abbreviates alternative; Russian has no established short form for the scenario alternative, so I used 'вар.' (вариант).",
+   "readings": [
+    "вар. (вариант) as the abbreviation of alternative",
+    "альт. (альтернатива)"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Writing the full word, or the language's own abbreviation, is what the $ec_lang_syn note asks for."
+  },
+  {
+   "key": "lpn_change_type_key",
+   "source": "translator",
+   "lang": "ru",
+   "complaint": "'ID: Lost entry' has no verb or object; unclear whether 'Lost entry' names the thing lost or labels a column of lost entries.",
+   "readings": [
+    "ID: потерянная запись (label of a lost-entry line)",
+    "ID: the entry that is lost on conversion"
+   ],
+   "disposition": "refer-to-human",
+   "resolution": "PROPOSED English for Tom: 'Each line: ID: the property and value that would be lost'. 'ID: Lost entry' is a legend over the lines listing what a type change loses; seven translators could not tell lost value from lost record."
+  },
+  {
+   "key": "lpn_hotkeys_snip_def",
+   "source": "translator",
+   "lang": "ru",
+   "complaint": "'Snip' (cutting a region out of a screenshot) has no fixed Russian term; I used 'вырезка' for snip and 'Снимок экрана' for Screenshot.",
+   "readings": [
+    "вырезка (snip a region)",
+    "фрагмент"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Translator's term for snip is consistent with its Screenshot rendering."
+  },
+  {
+   "key": "lpn_change_type_line",
+   "source": "translator",
+   "lang": "sr",
+   "complaint": "Value is only placeholders; identical to English by necessity",
+   "readings": [
+    "keep as is",
+    "reorder placeholders"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Correctly identical to English in this language; exempted per key and language in translation_exempt_keys.json at sprint close."
+  },
+  {
+   "key": "lpn_settings_auto_run_tip",
+   "source": "translator",
+   "lang": "sr",
+   "complaint": "'Hides the Calculate button' has no stated subject: does turning the setting off or on hide the button?",
+   "readings": [
+    "the setting being on hides the button (translated literally, ambiguous)",
+    "turning it off hides the button"
+   ],
+   "disposition": "refer-to-human",
+   "resolution": "PROPOSED English for Tom: 'Turn off if recalculation is too slow. While this is on, the Calculate button is hidden.' Two translators could not tell which state hides the button."
+  },
+  {
+   "key": "lpn_change_type_line",
+   "source": "translator",
+   "lang": "sw",
+   "complaint": "The string consists only of placeholders ({id}: {property} {value}), so it is byte-identical to English; nothing to translate.",
+   "readings": [
+    "kept identical (placeholders only)",
+    "translate the colon-separated pattern"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Correctly identical to English in this language; exempted per key and language in translation_exempt_keys.json at sprint close."
+  },
+  {
+   "key": "lpn_change_type_key",
+   "source": "translator",
+   "lang": "sw",
+   "complaint": "'ID: Lost entry' is ambiguous: unclear whether it is a heading, a line label, or a fragment, and what 'Lost entry' refers to.",
+   "readings": [
+    "Kitambulisho: Kiingizo kilichopotea (the ID/key entry that is lost)",
+    "a lost row or record"
+   ],
+   "disposition": "refer-to-human",
+   "resolution": "PROPOSED English for Tom: 'Each line: ID: the property and value that would be lost'. 'ID: Lost entry' is a legend over the lines listing what a type change loses; seven translators could not tell lost value from lost record."
+  },
+  {
+   "key": "lpn_change_type_line",
+   "source": "translator",
+   "lang": "tr",
+   "complaint": "The value is only placeholders joined by punctuation, so it is necessarily identical to English and the identical-to-english check flags it.",
+   "readings": [
+    "keep as '{id}: {property} {value}'",
+    "none: no words to translate"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Correctly identical to English in this language; exempted per key and language in translation_exempt_keys.json at sprint close."
+  },
+  {
+   "key": "lpn_basemap_style_normal",
+   "source": "translator",
+   "lang": "tr",
+   "complaint": "'Normal' is a true Turkish cognate, so the identical-to-english check flags it.",
+   "readings": [
+    "Normal (default look of the basemap)",
+    "Olağan"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Correctly identical to English in this language; exempted per key and language in translation_exempt_keys.json at sprint close."
+  },
+  {
+   "key": "lpn_settings_elev_source_typed",
+   "source": "translator",
+   "lang": "tr",
+   "complaint": "The value 'Above' has no stated object; it is an option meaning the elevation typed in the field above.",
+   "readings": [
+    "Yukarıdaki (the elevation typed above)",
+    "position word only"
+   ],
+   "disposition": "intent",
+   "resolution": "Tom's ruled word: the option means the elevation typed in the box above. Every translator rendered that reading."
+  },
+  {
+   "key": "lpn_change_type_line",
+   "source": "translator",
+   "lang": "uk",
+   "complaint": "String is only placeholders and punctuation, so it is byte-identical to English; identical-to-english finding is unavoidable. Probably should be exempt.",
+   "readings": [
+    "kept identical",
+    "invent a different separator"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Correctly identical to English in this language; exempted per key and language in translation_exempt_keys.json at sprint close."
+  },
+  {
+   "key": "lpn_change_type_line",
+   "source": "translator",
+   "lang": "ur",
+   "complaint": "Value is only placeholders; identical to English is correct",
+   "readings": [
+    "keep as is",
+    "reorder placeholders"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Correctly identical to English in this language; exempted per key and language in translation_exempt_keys.json at sprint close."
+  },
+  {
+   "key": "lpn_change_type_key",
+   "source": "translator",
+   "lang": "zh",
+   "complaint": "'ID: Lost entry' reads as a column header, but 'Lost entry' has no stated object (a value? a property?).",
+   "readings": [
+    "a table key: the ID followed by the lost value",
+    "a status label saying the ID itself was lost"
+   ],
+   "disposition": "refer-to-human",
+   "resolution": "PROPOSED English for Tom: 'Each line: ID: the property and value that would be lost'. 'ID: Lost entry' is a legend over the lines listing what a type change loses; seven translators could not tell lost value from lost record."
+  },
+  {
+   "key": "lpn_change_type_tip",
+   "source": "translator",
+   "lang": "zh",
+   "complaint": "'junctions' and 'nodes' both appear; in zh the file renders both as 节点, so 'change nodes into junctions' cannot be told apart.",
+   "readings": [
+    "junction = 节点, same word as node",
+    "a distinct word for junction"
+   ],
+   "disposition": "glossary",
+   "resolution": "junction and node share one word in this language's glossary rendering; the sentence still reads correctly (nodes become junctions, reservoirs or tanks). A distinct junction word would contradict the rest of the file."
+  }
+ ]
+}
