@@ -2976,6 +2976,8 @@ $ec_lang['lpn_hide_titles']='Hide these titles';
 // bubble and reads 'Show this'; this one has to name what it is talking about.
 $ec_lang['lpn_settings_area_hint']='Show the selection help';
 $ec_lang['lpn_settings_area_hint_tip']='Show the prompt over the map that gives the next step while you are selecting an area.';
+$ec_lang['lpn_settings_hover_card']='Show the full label on hover';
+$ec_lang['lpn_settings_hover_card_tip']='Rest the pointer on a node, link or customer to see its label as specified in Settings at any scale, fit or not. This is a setting for this browser, not for the project.';
 $ec_lang['lpn_settings_id_prefixes']='ID prefixes';
 // NEVER "Starting values" (Tom, 2026-08-19: "The problem is that it's misleading"). These are what
 // a NEW asset is created with; "starting" reads as the initial condition of a run, which on a

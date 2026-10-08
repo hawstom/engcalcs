@@ -630,6 +630,13 @@
    "words": "feat/workspace Merge",
    "context": "Typed by Tom in the session on 2026-10-08, after his browser pass of the no-reload import ('It works now').",
    "pin_note": "Pinned to the branch head as it stood when he typed the words."
+  },
+  "feat/hover-label": {
+   "head": "31b137e53149efc247f22309ae8bae31647af398",
+   "date": "2026-10-08",
+   "words": "feat/hover-label: (1) Peripherally, change all of our EPANET examples to put N and L as label prefix for nodes and links respectively. (3) Merge.",
+   "context": "In his pasted session message of 2026-10-08 (his own message, per his global CLAUDE.md), after his browser pass. Item (1) was built first, as 31b137e5.",
+   "pin_note": "Pinned to the head that carries his item (1), the condition he set before the merge."
   }
  }
 }
