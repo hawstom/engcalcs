@@ -118,7 +118,7 @@ first install wrote ~23 page-load rows per visit; now one), chore/protect-1008. 
 - **Calls page** https://claude.ai/artifact/1eHT8AMCRcRhcbjtsKUzNd, same db collection `answers`; new ids
   G01-G10, `w2-<key>` (5 strings), `v2-<key>` (3 sprint questions). The F/v/w answers of 10-08 are applied.
 - Browser pass, fix rounds done and Perry-checked where large: feat/message-dismiss (visible x),
-  feat/workspace (import applies in place, no reload; Perry reviewing at handoff), feat/bentley-interop
+  feat/workspace (import applies in place, no reload; Perry's placement defect fixed, 60879c22), feat/bentley-interop
   (auto-hide may cover the map, pinned keeps 320 px, every box), feat/user-guide (14.4 px like Settings,
   Ctrl+K raises, focus sentence), feat/hover-label (NEW, Task 773, port 8110), feat/visit-dedupe (F01 built:
   ec_code; Safari-safe; waits on G01-G05 and a consent_body translation round BEFORE merge), plus
