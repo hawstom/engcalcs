@@ -442,14 +442,14 @@ $ec_lang['install_desktop_heading']='سطح المكتب (Chrome / Edge)';
 // Edited by TGH 2026-09-07
 $ec_lang['install_desktop_steps_html']='<li>افتح أي صفحة حاسبة.</li><li>انقر على <strong>أيقونة التثبيت</strong> (⊕ أو أيقونة الحاسوب) في شريط عنوان المتصفح، أو افتح قائمة المتصفح واختر <strong>تثبيت EngCalcs…</strong></li><li>انقر على <strong>تثبيت</strong>. يفتح EngCalcs في نافذة تطبيق مستقلة.</li>';
 $ec_lang['install_firefox_heading']='فَيَرفُكس ومتصفحات أخرى';
-$ec_lang['install_firefox_body']='إذا كان متصفحك لا يقدّم خيار التثبيت، فلا شيء يُفقد: استخدم الحاسبات بشكل طبيعي في المتصفح، وبعد زيارتك الأولى تُخزَّن الصفحات تلقائياً للاستخدام دون اتصال. Firefox على سطح المكتب هو الحالة الشائعة.';
+$ec_lang['install_firefox_body']='إذا لم يعرض المتصفح خيار تثبيت، فاستخدم الحاسبات في المتصفح كالمعتاد. بعد الزيارة الأولى تُخزَّن الصفحات تلقائياً للاستخدام دون اتصال. Firefox على سطح المكتب هو الحالة الشائعة.';
 $ec_lang['install_cached_heading']='ما الذي يتم حفظه';
 $ec_lang['install_cached_body']='في المرة الأولى التي تثبّت فيها EngCalcs، يتم حفظ جميع صفحات الحاسبات وملفاتها المساعدة (البرمجيات النصية وأنماط التنسيق) تلقائياً على جهازك. بعد ذلك، يعمل كل شيء دون الحاجة لاتصال بالإنترنت. يتم تذكّر اختيارك للغة من آخر زيارة لك وأنت متصل بالإنترنت.';
 $ec_lang['contact_main_menu']='تواصل';
 $ec_lang['about_main_title']='حول حاسبات HawsEDC الهندسية';
 $ec_lang['about_main_desc']='الرسالة، والبرمجيات الحرة، والمساهمة';
 // Edited by TGH 2026-09-07
-$ec_lang['about_body_html']='<h3>الرسالة</h3><p>تُقدَّم حاسبات HawsEDC الهندسية مجاناً عبر الإنترنت منذ عام 2010. وُجدت لخدمة المهندسين والعاملين الميدانيين حول العالم — ولا سيما أولئك الذين يعملون في المناطق الشحيحة المياه أو المحدودة الموارد أو المحرومة. هذه الأدوات جزء من رسالة إنسانية أشمل: إخبار كل إنسان بأكثر الطرق عملية وفاعلية <a target="_blank" href="https://tomsthird.blogspot.com/2026/10/why-engineering-calculator-needs-to.html">أنه محبوب وعزيز إلى الأبد، وأنه لا يخشى شيئاً، وأنه لن يدمّر كل شيء</a>.</p><p>الحاسبات هي الوسيلة، والهدف عالم خالٍ من المعاناة.</p><h3>ترخيص البرمجيات الحرة ومفتوحة المصدر</h3><p>يُصدَر الكود بالكامل تحت <a target="_blank" href="https://www.gnu.org/licenses/gpl-3.0.html">رخصة GNU العامة الشاملة الإصدار 3.0 أو أحدث</a> — حرة كما هي الحرية. يمكنك استخدام الكود ودراسته وتعديله وإعادة توزيعه وفق الشروط ذاتها.</p><p>يُقدَّم الموقع الذي يخدمه مجاناً اليوم ومنذ عام 2010؛ وإن تعذّر ذلك يوماً، فالبرنامج يظل ملكك لتشغّله.</p><p>حقوق النشر © 2009–2026 Thomas Gail Haws.</p><h3>الكود المصدري</h3><p>الكود المصدري الكامل متاح للعموم على GitHub:</p><p><a target="_blank" href="https://github.com/hawstom/engcalcs">github.com/hawstom/engcalcs</a></p><p>يمكنك تصفح الكود وتسجيل المشكلات أو تفريع المستودع هناك.</p><h3>المساهمة</h3><p>كل مساعدة مرحَّب بها. <a href="contact.php">تواصل مع Tom Haws</a>.</p><ul><li><strong>الترجمة:</strong> اقترح صياغة أفضل. حسِّن لغة أو أضف لغة جديدة.</li><li><strong>تقارير الأخطاء:</strong> استخدم نموذج الملاحظات في أي صفحة حاسبة، أو سجّل مشكلة على GitHub.</li><li><strong>حاسبات جديدة:</strong> أفكار لأدوات هندسة هيدروليكية تخدم العاملين الميدانيين وممارسي الري مرحَّب بها بشكل خاص.</li><li><strong>الاستضافة:</strong> إن كنت تستطيع استضافة نسخة مطابقة من هذه الحاسبات لمنطقة ذات اتصال محدود، يُرجى التواصل معي.</li></ul><h3>الاستخدام دون اتصال</h3><p>افتح أي حاسبة مرة واحدة أثناء اتصالك بالإنترنت وستواصل جميعها العمل حين لا تكون متصلاً: يخزّن متصفحك المجموعة كلها أثناء تصفحك. الآلية هي <strong>تطبيق ويب تقدمي (PWA)</strong>، إن أردت أن تقرأ عنه. بعد ذلك تعمل جميع الحاسبات دون اتصال — لا حاجة للإنترنت.</p><p>على Android أو iOS، استخدم خيار "إضافة إلى الشاشة الرئيسية" في متصفحك لتثبيت EngCalcs كتطبيق على جهازك. على سطح المكتب، ابحث عن أيقونة التثبيت في شريط عنوان متصفحك.</p><p>يمكنك أيضاً حفظ أي حاسبة منفردة باستخدام قائمة "حفظ باسم…" في متصفحك للاستخدام غير المتصل لمرة واحدة.</p><h3>التواصل</h3><p>Tom Haws، مهندس هيدروليكي ومؤسس هذه الحاسبات.<br />استخدم نموذج الملاحظات في أي صفحة حاسبة، أو تصفح الكود المصدري على <a target="_blank" href="https://github.com/hawstom/engcalcs">GitHub</a>.</p>';
+$ec_lang['about_body_html']='<h3>الرسالة</h3><p>تُقدَّم حاسبات HawsEDC الهندسية مجاناً عبر الإنترنت منذ عام 2010. وُجدت لخدمة المهندسين والعاملين الميدانيين حول العالم — ولا سيما أولئك الذين يعملون في المناطق الشحيحة المياه أو المحدودة الموارد أو المحرومة. هذه الأدوات جزء من رسالة إنسانية أشمل: إخبار كل إنسان بأكثر الطرق عملية وفاعلية <a target="_blank" href="https://tomsthird.blogspot.com/2026/10/why-engineering-calculator-needs-to.html">أنه محبوب وعزيز إلى الأبد، وأنه لا يخشى شيئاً، وأنه لن يدمّر كل شيء</a>.</p><p>الحاسبات هي الوسيلة، والهدف عالم خالٍ من المعاناة.</p><h3>ترخيص البرمجيات الحرة ومفتوحة المصدر</h3><p>يُصدَر الكود بالكامل تحت <a target="_blank" href="https://www.gnu.org/licenses/gpl-3.0.html">رخصة GNU العامة الشاملة الإصدار 3.0 أو أحدث</a> — حرة كما هي الحرية. يمكنك استخدام الكود ودراسته وتعديله وإعادة توزيعه وفق الشروط ذاتها.</p><p>يُقدَّم الموقع الذي يخدمه مجاناً اليوم ومنذ عام 2010؛ وإن تعذّر ذلك يوماً، فالبرنامج يظل ملكك لتشغّله.</p><p>حقوق النشر © 2009–2026 Thomas Gail Haws.</p><h3>الكود المصدري</h3><p>الكود المصدري الكامل متاح للعموم على GitHub:</p><p><a target="_blank" href="https://github.com/hawstom/engcalcs">github.com/hawstom/engcalcs</a></p><p>يمكنك تصفح الكود وتسجيل المشكلات أو تفريع المستودع هناك.</p><h3>المساهمة</h3><p>كل مساعدة مرحَّب بها. <a href="contact.php">تواصل مع Tom Haws</a>.</p><ul><li><strong>الترجمة:</strong> اقترح صياغة أفضل. حسِّن لغة أو أضف لغة جديدة.</li><li><strong>تقارير الأخطاء:</strong> استخدم نموذج الملاحظات في أي صفحة حاسبة، أو سجّل مشكلة على GitHub.</li><li><strong>حاسبات جديدة:</strong> أفكار لأدوات هندسة هيدروليكية تخدم العاملين الميدانيين وممارسي الري مرحَّب بها بشكل خاص.</li><li><strong>الاستضافة:</strong> إن كنت تستطيع استضافة نسخة مطابقة من هذه الحاسبات لمنطقة ذات اتصال محدود، يُرجى التواصل معي.</li></ul><h3>الاستخدام دون اتصال</h3><p>افتح أي حاسبة مرة واحدة أثناء اتصالك بالإنترنت وستواصل جميعها العمل حين لا تكون متصلاً: يخزّن متصفحك المجموعة كلها أثناء تصفحك. الآلية هي <strong>تطبيق ويب تقدمي (PWA)</strong>. بعد ذلك تعمل جميع الحاسبات دون اتصال — لا حاجة للإنترنت.</p><p>على Android أو iOS، استخدم خيار "إضافة إلى الشاشة الرئيسية" في متصفحك لتثبيت EngCalcs كتطبيق على جهازك. على سطح المكتب، ابحث عن أيقونة التثبيت في شريط عنوان متصفحك.</p><p>يمكنك أيضاً حفظ أي حاسبة منفردة باستخدام قائمة "حفظ باسم…" في متصفحك للاستخدام غير المتصل لمرة واحدة.</p><h3>التواصل</h3><p>Tom Haws، مهندس هيدروليكي ومؤسس هذه الحاسبات.<br />استخدم نموذج الملاحظات في أي صفحة حاسبة، أو تصفح الكود المصدري على <a target="_blank" href="https://github.com/hawstom/engcalcs">GitHub</a>.</p>';
 $ec_lang['contactSendMessage']='أرسل رسالة إلى Tom Haws';
 $ec_lang['contactYourName']='اسمك:';
 $ec_lang['contactYourEmail']='عنوان بريدك الإلكتروني:';
@@ -468,7 +468,7 @@ $ec_lang['rc_qt']='<span class="ec-help" title="التدفق لكل وحدة ع�
 $ec_lang['rc_np']='مسامية الحجارة، n<sub>p</sub>';
 $ec_lang['rc_sg']='<span class="ec-help" title="الكثافة النسبية إلى الماء. القيمة النموذجية للجرانيت أو البازلت المكسور ≈ 2.65. نطاق Robinson الصحيح: 2.54 إلى 2.82.">الكثافة النسبية للصخر، sg <span class="ec-tip">؟</span></span>';
 $ec_lang['rc_SD']='<span class="ec-help" title="الانحراف المعياري للتدرج. الصخر المنتظم ≈ 1.25. نطاق Robinson الصحيح: 1.15 إلى 1.47.">انحراف التدرج SD = D<sub>84.1</sub>/D<sub>50</sub> <span class="ec-tip">?</span></span>';
-$ec_lang['rc_yn']='<span class="ec-help" title="تجمّع المياه (Hp > yn) جيد — يقلل التآكل في أعلى المجرى. (USDA)">العمق الطبيعي في قناة المدخل، y<sub>n</sub> <span class="ec-tip">?</span></span>';
+$ec_lang['rc_yn']='<span class="ec-help" title="التجمّع (Hp > yn) مرغوب لأنه يقلل التآكل في أعلى المجرى. (USDA)">العمق الطبيعي في قناة المدخل، y<sub>n</sub> <span class="ec-tip">?</span></span>';
 $ec_lang['rc_D50']='<span class="ec-help" title="المعادلة 1 (S0 < 0.10) أو المعادلة 2 (0.10-0.40). الصحيح: D50 من 15 إلى 278 مم، S0 من 0.02 إلى 0.40. خارج النطاق: قيم خارج المعايرة.">حجم الصخر الوسيط المطلوب، D<sub>50</sub> <span class="ec-tip">?</span></span>';
 $ec_lang['rc_eq_used']='المعادلة المطبّقة';
 $ec_lang['rc_sg_check']='فحص الكثافة النسبية';
@@ -494,10 +494,10 @@ $ec_lang['rc_Vm']='<span class="ec-help" title="نسبة من qt تتدفق عب
 $ec_lang['rc_qm']='التدفق الوحدوي عبر الغطاء، q<sub>m</sub>';
 $ec_lang['rc_qs']='التدفق الوحدوي السطحي، q<sub>s</sub> (q<sub>t</sub> − q<sub>m</sub>)';
 $ec_lang['rc_d']='عمق التدفق فوق سطح الحجارة، d';
-$ec_lang['rc_Hp']='<span class="ec-help" title="تجمّع المياه (Hp > yn) جيد — يقلل التآكل في أعلى المجرى. (USDA)">علو المياه فوق الهدار عند المدخل، H<sub>p</sub> <span class="ec-tip">?</span></span>';
+$ec_lang['rc_Hp']='<span class="ec-help" title="التجمّع (Hp > yn) مرغوب لأنه يقلل التآكل في أعلى المجرى. (USDA)">علو المياه فوق الهدار عند المدخل، H<sub>p</sub> <span class="ec-tip">?</span></span>';
 $ec_lang['rc_ponding_check']='فحص تجمّع المياه عند المدخل';
 $ec_lang['rc_pond_ok']  ='H<sub>p</sub> > y<sub>n</sub> — تجمّع مياه في أعلى المجرى';
-$ec_lang['rc_pond_ok_tip']='تجمّع المياه في أعلى مدخل المزلق أمر جيد؛ فهو يقلل التآكل في أعلى المجرى. (USDA)';
+$ec_lang['rc_pond_ok_tip']='التجمّع في أعلى مدخل القناة الشديدة الانحدار مرغوب؛ فهو يقلل التآكل في أعلى المجرى. (USDA)';
 $ec_lang['rc_pond_warn']='H<sub>p</sub> ≤ y<sub>n</sub> — لا يوجد تجمّع للمياه — احتمال تآكل عند المدخل';
 $ec_lang['rc_pond_warn_tip']='لا يوجد تجمّع للمياه في أعلى مدخل المزلق؛ قد يحدث تآكل في أعلى المجرى. (USDA)';
 $ec_lang['rc_eq1']='المعادلة 1 (S<sub>0</sub> < 0.10) — انحدار لطيف';
@@ -619,9 +619,9 @@ $ec_lang['bpn_pressure_warn']='ضغط منخفض/سالب؛ تحقق من احت
 $ec_lang['bpn_pressure_warn_short']='منخفض';
 $ec_lang['bpn_notes_1_term']='التسلسل هو الافتراضي، والتفرع هو الاستثناء';
 // Edited by TGH 2026-09-07
-$ec_lang['bpn_notes_1_def']='اترك معرّف المنبع فارغاً ليتبع الخط الذي يعلوه؛ أي خط أنابيب متسلسل بسيط. أدخل معرّف خط علوي للتفرع منه. إذاً: تسلسل بشكل افتراضي، وشجرة متفرعة عند الحاجة إليها.';
+$ec_lang['bpn_notes_1_def']='إذا تُرك معرّف المنبع فارغاً، فإن الخط يتبع الخط الذي يعلوه كخط أنابيب متسلسل. أدخل معرّف خط منبع للتفرع منه. الافتراضي خط أنابيب متسلسل؛ ولا تتكوّن شجرة إلا حيث يُدخَل فرع.';
 $ec_lang['bpn_notes_2_term']='شبكات متفرعة فقط، بلا حلقات';
-$ec_lang['bpn_notes_2_def']='لكل خط خط منبع واحد فقط بالضبط (شجرة). لا تحل هذه الأداة الشبكات الحلقية؛ فتلك تحتاج إلى طرائق تكرارية (مثل EPANET أو ما شابهها). استبعاد الحلقات هو ما يجعل الحل بسيطاً ودقيقاً.';
+$ec_lang['bpn_notes_2_def']='لكل خط خط منبع واحد بالضبط (شجرة). لا تحل هذه الأداة الشبكات الحلقية، التي تتطلب طرائق تكرارية (EPANET أو ما يماثله). ولأن الشبكة لا تحتوي حلقات، فالحل مباشر ودقيق.';
 $ec_lang['bpn_notes_3_term']='بلا عناصر تحكم فعّالة بالضغط';
 $ec_lang['bpn_notes_3_def']='يمكنك إضافة صمام ذي فاقد موضعي ثابت (قيمة k)، ولكن ليس صمامات تخفيض الضغط أو مواصلة الضغط (PRV/PSV). فحالة فتحها أو إغلاقها تعتمد على التدفق والضغط، مما يفرض الحل التكراري.';
 
@@ -665,8 +665,8 @@ $ec_lang['lpn_tool_vertices']='نقاط الانعطاف';
 // has been struck here three times. "Station along the pipe" is the survey word for a distance
 // measured along a route, which is what it is.
 $ec_lang['lpn_tool_add_meter']='مشترك';
-$ec_lang['lpn_tool_add_meter_tip']='انقر حيث يقع المشترك، ثم انقر الأنبوب أو العقدة التي تخدمه. يُضاف الطلب الذي تعطيه للمشترك إلى الملتقى عند الطرف الأقرب لذلك الأنبوب.';
-$ec_lang['lpn_mode_add_meter']='الوضع: مشترك. انقر حيث يقع المشترك، ثم انقر الأنبوب أو العقدة التي تخدمه. أو استخدم Esc للإلغاء.';
+$ec_lang['lpn_tool_add_meter_tip']='حدّد نقطة المشترك، ثم اتصاله: رابطاً أو عقدة. يُضاف الطلب الذي تعطيه للمشترك إلى العقدة عند أقرب طرف لذلك الرابط.';
+$ec_lang['lpn_mode_add_meter']='مشترك: حدّد موقع المشترك، ثم حدّد الأنبوب أو العقدة التي تخدمه. أو استخدم Esc للإلغاء.';
 $ec_lang['lpn_pane_tab_customers']='المشتركون';
 $ec_lang['lpn_customer_heading']='المشترك {id}';
 // ROADMAP Task 247. lpn_field_account and lpn_field_account_tip were DELETED 2026-09-19 (Tom:
@@ -679,9 +679,9 @@ $ec_lang['lpn_customer_heading']='المشترك {id}';
 $ec_lang['lpn_field_meter_demand']='الطلب لكل توصيلة';
 $ec_lang['lpn_field_meter_count']='عدد التوصيلات';
 $ec_lang['lpn_field_meter_total']='إجمالي الطلب';
-$ec_lang['lpn_field_meter_total_tip']='الطلب لكل توصيلة مضروباً بعدد التوصيلات. هذا هو الرقم المضاف إلى الملتقى المسمّى أدناه.';
+$ec_lang['lpn_field_meter_total_tip']='الإجمالي المضاف إلى الملتقى المسمّى أدناه.';
 $ec_lang['lpn_field_meter_pipe']='العنصر المتصل';
-$ec_lang['lpn_field_meter_pipe_suggest']='أقرب عنصر هو {id}. اكتبه هنا لتغذية هذا المشترك منه.';
+$ec_lang['lpn_field_meter_pipe_suggest']='أقرب عنصر هو {id}. أدخله هنا لتغذية هذا المشترك منه.';
 // Task 247, Tom, 2026-09-25: a service connected exactly to a node reads as a node, never as a
 // pipe at station 0 or 100. Shown in place of lpn_field_meter_pipe/station/offset, never beside
 // them (renderCustomerFields()).
@@ -692,29 +692,29 @@ $ec_lang['lpn_meter_pipe_unknown']='لا شيء في هذا المشروع اس�
 // heading is the junction's own whole label reused and only the tip is new: what it says that the
 // junction's does not is that the number the pattern multiplies is the TOTAL, count included.
 $ec_lang['lpn_meter_pattern_unknown']='لا يوجد في هذا المشروع نمط اسمه {id}، فتُرك المشترك كما كان.';
-$ec_lang['lpn_meter_placed']='أُضيف المشترك {id}. يُكتب وصفه وطلبه في جدول المشتركين، أو اضغط عليه في وضع التحديد لفتح مربعه.';
-$ec_lang['lpn_field_meter_pipe_tip']='العنصر الذي تتصل به هذه التوصيلة. اكتب عنصراً آخر هنا أو في جدول المشتركين لتغييره، أو اسحب نقطة الاتصال إلى عنصر مختلف.';
+$ec_lang['lpn_meter_placed']='أُضيف المشترك {id}. أدخل وصفه وطلبه في جدول المشتركين، أو حدّده في وضع التحديد لفتح مربع خصائصه.';
+$ec_lang['lpn_field_meter_pipe_tip']='العنصر الذي تتصل به هذه التوصيلة. أدخل عنصراً آخر هنا أو في جدول المشتركين لتغييره، أو اسحب نقطة الاتصال إلى عنصر مختلف.';
 $ec_lang['lpn_field_meter_station']='الموضع على طول الأنبوب (%)';
-$ec_lang['lpn_field_meter_station_tip']='إلى أي مدى على طول الأنبوب تتصل التوصيلة، كنسبة مئوية من الأنبوب من عقدته الأولى إلى الثانية. 0 عند أحد الطرفين و100 عند الآخر. تفعل الدائرة على الأنبوب الشيء نفسه بالمؤشر.';
+$ec_lang['lpn_field_meter_station_tip']='المسافة على طول الأنبوب إلى وصلة الخدمة، كنسبة مئوية من الأنبوب من عقدته الأولى إلى الثانية. 0 عند أحد الطرفين و100 عند الآخر. تؤدي الدائرة على الأنبوب الوظيفة نفسها بالمؤشر.';
 $ec_lang['lpn_field_meter_offset']='الإزاحة عن الأنبوب';
 $ec_lang['lpn_field_meter_offset_tip']='الموجب إلى يمين الأنبوب عند النظر من عقدته الأولى نحو الثانية. كتابة قيمة هنا قد تنقل المشترك إلى الجانب الآخر من الخط الرئيسي، وهي دائماً تجعل خط التوصيلة عمودياً على الخط الرئيسي.';
 $ec_lang['lpn_field_meter_lumped']='أُضيف إلى العقدة';
 $ec_lang['lpn_field_meter_lumped_tip']='أقرب عقدة؛ تُضاف طلبات هذا المشترك إليها.';
 $ec_lang['lpn_node_customers']='طلبات المشتركين';
-$ec_lang['lpn_node_customers_tip']='قائمة المشتركين المضافين عند هذه العقدة (لأنها كانت الأقرب). طلبات المشتركين إضافة إلى الطلبات الأخرى المدرجة هنا. يُحرَّر المشترك حيث يقع على الخريطة أو في جدول المشتركين.';
+$ec_lang['lpn_node_customers_tip']='قائمة المشتركين المضافين هنا لأن هذه كانت أقرب عقدة إليهم. طلبات المشتركين إضافة إلى الطلبات الأخرى المدرجة هنا. يُحرَّر المشترك حيث يقع على الخريطة أو في جدول المشتركين.';
 $ec_lang['lpn_node_customers_sum']='{total} {unit} من {n} مشترك';
 $ec_lang['lpn_customer_detached']='⚠ هذا المشترك غير متصل بأنبوب، فطلبه غير مدرَج في الإجابات. احذفه، أو ارسم أنبوباً وانقل المشترك إليه.';
 $ec_lang['lpn_customer_fixed_head']='⚠ الطرف الأقرب لذلك الأنبوب يحمل سطح ماء ثابتاً، فلا يؤثر هذا الطلب في المحاكاة.';
 $ec_lang['lpn_customer_detached_count']='{n} مشتركين غير متصلين بأنبوب. طلبهم غير محتسَب.';
-$ec_lang['lpn_meter_pick_pipe']='الآن انقر الأنبوب أو العقدة التي تخدم هذا المشترك. يبقى المشترك حيث وضعته. اضغط Escape للإلغاء.';
-$ec_lang['lpn_inp_export_flat_customers']='لا تحتوي ملفات EPANET على مشتركين. يدخل طلب {n} مشتركين في هذا المشروع إلى الملف كصف طلب على الملتقى الذي أُضيف كل منهم إليه، ويُسمّى كل صف بوسم المشترك. ما لا يستطيع الملف الاحتفاظ به هو المشترك نفسه: أين يقع، وأي أنبوب يخدمه، وأين على طول ذلك الأنبوب تتصل التوصيلة، وكم توصيلة يمثّلها مشترك واحد. يحتفظ ملف مشروعك الخاص بكل ذلك.';
+$ec_lang['lpn_meter_pick_pipe']='حدّد الآن الأنبوب أو العقدة التي تخدم هذا المشترك. يبقى المشترك حيث وضعته. اضغط Escape للإلغاء.';
+$ec_lang['lpn_inp_export_flat_customers']='لا يحتوي ملف EPANET على مشتركين. يُكتب طلب {n} من المشتركين في هذا المشروع صف طلب على الملتقى المعيَّن لكل مشترك، ويُسمّى بوسم المشترك. لا يسجّل الملف المشترك نفسه: موقعه، والأنبوب الذي يخدمه، وموضع وصلة الخدمة على طول ذلك الأنبوب، وعدد التوصيلات التي يمثلها. تبقى هذه المعلومات في المشروع؛ احفظ ملف المشروع للاحتفاظ بها.';
 
-$ec_lang['lpn_area_hint_window_start']='انقر زاوية واحدة من النافذة.';
-$ec_lang['lpn_area_hint_window_go']='انقر الزاوية المقابلة للإنهاء.';
-$ec_lang['lpn_area_hint_lasso_start']='انقر لبدء الخط الحدودي.';
-$ec_lang['lpn_area_hint_lasso_go']='حرّك المؤشر لرسم الخط الحدودي. انقر للإنهاء.';
-$ec_lang['lpn_area_hint_polygon_start']='انقر لرسم المضلع. انقر نقراً مزدوجاً للإنهاء.';
-$ec_lang['lpn_area_hint_polygon_go']='انقر كل زاوية. انقر نقراً مزدوجاً على الزاوية الأخيرة للإنهاء.';
+$ec_lang['lpn_area_hint_window_start']='حدّد إحدى زوايا النافذة.';
+$ec_lang['lpn_area_hint_window_go']='حدّد الزاوية المقابلة للإنهاء.';
+$ec_lang['lpn_area_hint_lasso_start']='حدّد نقطة لبدء الخط الحدودي.';
+$ec_lang['lpn_area_hint_lasso_go']='حرّك المؤشر لرسم الخط الحدودي. حدّد النقطة الأخيرة للإنهاء.';
+$ec_lang['lpn_area_hint_polygon_start']='حدّد الزاوية الأولى لمنطقة المضلع. انقر نقراً مزدوجاً للإنهاء.';
+$ec_lang['lpn_area_hint_polygon_go']='حدّد كل زاوية. انقر نقراً مزدوجاً على الأخيرة للإنهاء.';
 // Tom, 2026-09-08, his own sentence: *"Hold Shift during selection to preserve the existing
 // selection set and toggle (add/remove) affected assets."* Reworded so "toggle" needs no gloss.
 $ec_lang['lpn_area_hint_shift']='اضغط مع الاستمرار على Shift أثناء التحديد لتتابع التحديد الحالي، فتضيف إليه أو تزيل منه (تبديل) ما تحدده.';
@@ -737,7 +737,7 @@ $ec_lang['lpn_pane_pasted']='جرى لصق {n} خلية. لم يتغيّر {skip
 $ec_lang['lpn_pane_pasted_rows']='لُصق {n} صفاً وأُضيف {created} منها إلى الشبكة.';
 $ec_lang['lpn_pane_pasted_rows_skipped']='لُصق {n} صفاً وأُضيف {created} منها إلى الشبكة. لم تتغيّر {skipped} خلية.';
 // Added after "This network has none of these yet." on an empty table, which is where a paste lands.
-$ec_lang['lpn_pane_paste_here']='انقر هنا والصق صفوفاً من جدول بيانات لإضافتها.';
+$ec_lang['lpn_pane_paste_here']='حدّد هذه المنطقة والصق صفوفاً من جدول بيانات لإضافتها.';
 // The menu action that adds the clipboard's rows as new elements below the last row (an ordinary
 // paste only ever writes cells). Its shortcut, Ctrl+Shift+V, is shown beside it in the menu. Tom's
 // wording, R-309: "Paste as new rows" was "not quite descriptive of 'Paste append'."
@@ -908,8 +908,8 @@ $ec_lang['lpn_offscreen_intact']='شبكتك سليمة.';
 // lpn_main_title still names EPANET, which is where a search engine reads it, and that claim is
 // true and stays.
 $ec_lang['lpn_examples_welcome']='مرحباً بك في نمذجة شبكات إمداد المياه، بحلّال EPANET';
-$ec_lang['lpn_examples_heading']='افتح نسختك الخاصة من مثال';
-$ec_lang['lpn_examples_sub']='يُفتح كل مثال كنسخة خاصة بك. عدّلها واحفظها، أو افتح نسخة جديدة وابدأ من جديد.';
+$ec_lang['lpn_examples_heading']='فتح نسخة من مثال';
+$ec_lang['lpn_examples_sub']='يُفتح كل مثال نسخةً. عدّلها واحفظها، أو افتح نسخة جديدة للبدء من جديد.';
 $ec_lang['lpn_examples_open']='فتح';
 $ec_lang['lpn_examples_menu']='فتح مثال…';
 $ec_lang['lpn_examples_blank']='أو ابدأ من هنا';
@@ -972,11 +972,11 @@ $ec_lang['lpn_copy_body_nodate']='لا يتعرّف هذا المتصفح على
 $ec_lang['lpn_copy_original']='الأصل؛ إبقاء القفل نفسه';
 $ec_lang['lpn_copy_copy']='نسخة؛ إنشاء قفل جديد';
 $ec_lang['lpn_copy_kept_link']='فُتح {name} بوصفه الأصل، بعد نقله إلى مكان جديد. يكتب الحفظ الآن إلى هذا الملف.';
-$ec_lang['lpn_copy_opened']='فُتح {file} بوصفه نسخة، بقفل جديد خاص به سيُحفظ مع الحفظ التالي للملف.';
+$ec_lang['lpn_copy_opened']='فُتح {file} نسخةً وحُفظ، بقفل جديد.';
 $ec_lang['lpn_scenario_basic']='الوضع الأساسي';
-$ec_lang['lpn_scenario_basic_tip']='عند التحديد، يكون السيناريو ببساطة القيم التي تضبطها فيه. وعند عدم التحديد، تعرض هذه القائمة أيضاً جدول معاينة البدائل، الذي يبيّن كيف تُجمَّع تلك القيم حسب الفئة، وندعوك إلى إرسال ملاحظاتك.';
+$ec_lang['lpn_scenario_basic_tip']='محدَّد: يتكون السيناريو من القيم المضبوطة فيه فقط. غير محدَّد: تعرض هذه القائمة أيضاً جدول معاينة البدائل، الذي يبيّن كيف تُجمَّع تلك القيم حسب الفئة، وتتيح أن تكون لسيناريو مدة تشغيل كلية وخطوة زمنية هيدروليكية منفصلتان. الملاحظات على هذه الميزة مرحَّب بها.';
 $ec_lang['lpn_alt_title']='معاينة البدائل';
-$ec_lang['lpn_alt_note']='للقراءة فقط. يستخدم الأساس بديل الأساس في كل فئة. ويحصل كل سيناريو على بديل خاص به لأي فئة تتغير، وهو فرع من بديل الأساس. الرقم هو عدد القيم المتغيّرة فيه.';
+$ec_lang['lpn_alt_note']='للقراءة فقط. يستخدم الأساس بديل الأساس في كل فئة. ولكل سيناريو بديل منفصل، هو فرع من بديل الأساس، لأي فئة تتغير. الرقم هو عدد القيم المتغيّرة. الأعمدة الثلاثة الأخيرة خيارات حساب: أدخل قيمة للسيناريو، أو اتركها فارغة لاستخدام قيمة الأصل. قيم المشروع في الإعدادات، الحساب، الزمن.';
 $ec_lang['lpn_alt_cat_physical']='فيزيائي';
 $ec_lang['lpn_alt_cat_demand']='الطلب';
 $ec_lang['lpn_alt_cat_topology']='تفعيل العناصر';
@@ -1011,12 +1011,12 @@ $ec_lang['lpn_calib_no_value']='قياسات بلا قيمة محسوبة في �
 // is the honesty boundary that document draws: a thank-you must never imply an answer.
 $ec_lang['lpn_wrong_btn']='هل هناك خطأ هنا؟';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_wrong_tip']='ضغطة واحدة تخبرنا أن شيئاً في هذه الصفحة خاطئ. تُرسل اسم هذه الصفحة، واللغة التي تقرؤها بها، ورسالة الخريطة إن وُجدت. لا تُرسل شيئاً كتبته، ولا عنواناً، ولا أي شيء من رسمك. لا يمكن لأحد أن يرد عليك، لأن هذا لا يخبرنا شيئاً عن هويتك. استخدم المساعدة، إصلاح شيء ما حين تريد أن تقول المزيد.';
-$ec_lang['lpn_wrong_thanks']='شكراً لك. وصلتنا رسالتك.';
-$ec_lang['lpn_status_example_opened']='تم فتح {name}. هذه نسختك الخاصة: احفظها باستخدام ملف، حفظ باسم.';
+$ec_lang['lpn_wrong_tip']='أبلغ عن خطأ في هذه الصفحة. يفتح هذا مربعاً لاختيار المشكلة وإضافة تعليق وإدخال عنوان بريد إلكتروني إذا أُريد رد. كل الحقول اختيارية، ولا يُرسل شيء حتى تضغط إرسال.';
+$ec_lang['lpn_wrong_thanks']='شكراً لك. وصل بلاغك.';
+$ec_lang['lpn_status_example_opened']='فُتح {name} نسخةً. احفظه عبر ملف، حفظ باسم.';
 // Stands while the fault stands, rather than expiring like every other notice on the map: it
 // reports a page that cannot lay itself out, which is true until a measurement recovers.
-$ec_lang['lpn_map_unmeasurable']='تعذّر على هذه الصفحة تحديد حجم منطقة الرسم، فالخريطة تعرض آخر منظر تمكّنت من حسابه. تغيير حجم النافذة يجعلها تحاول مجدداً. إذا استمر حدوث ذلك، فالسبب المعتاد هو إضافة متصفح تمنع قياسات الصفحة.';
+$ec_lang['lpn_map_unmeasurable']='تعذّر على هذه الصفحة تحديد حجم منطقة الرسم، لذا تعرض الخريطة آخر عرض أمكنها حسابه. تكرر إعادة تحجيم النافذة القياس. إذا استمر ذلك، فالسبب المعتاد امتداد متصفح يحجب قياسات الصفحة.';
 // Each example's own card text. These live here, and NOT in the examples folder's own JSON, for one
 // reason: a string that is not in a lang file is a string no translator will ever see. The manifest
 // carries the English as a fallback for an example that has no keys yet, so a new example still
@@ -1040,7 +1040,7 @@ $ec_lang['lpn_ex_net2_title']='EPANET Net2';
 $ec_lang['lpn_ex_net2_desc']='شبكة توزيع متفرعة تحتوي على صهريج، من أمثلة EPANET.';
 $ec_lang['lpn_ex_net3_title']='EPANET Net3';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_ex_net3_desc']='أكبر أمثلة EPANET: 92 ملتقى، و3 صهاريج، وخزانان أحدهما نهر. تستحق الفتح لرؤية شكل نموذج بحجم حقيقي على الخريطة.';
+$ec_lang['lpn_ex_net3_desc']='أكبر أمثلة EPANET: 92 ملتقى، وثلاثة صهاريج، وخزانان أحدهما نهر. يبيّن شكل نموذج بحجم كامل على الخريطة.';
 $ec_lang['lpn_ex_net3_world_title']='EPANET Net3، خط العرض وخط الطول';
 $ec_lang['lpn_ex_net3_world_desc']='شبكة EPANET Net3 نفسها، محوَّلة إلى خط عرض/خط طول عند نوفاتو، كاليفورنيا، مع خريطة العالم خلفها.';
 $ec_lang['lpn_ex_elm_street_title']='مركز شارع إلم';
@@ -1090,9 +1090,9 @@ $ec_lang['lpn_units_elevhead']='المنسوب والعلو';
 $ec_lang['lpn_result_gradient']='تدرج فقدان الضغط';
 $ec_lang['lpn_result_gradient_tip']='فقدان الضغط مقسوماً على طول الأنبوب. استخدمه لمقارنة الأنابيب ذات الأطوال المختلفة بحد تصميم واحد.';
 $ec_lang['lpn_result_water_age']='عمر الماء';
-$ec_lang['lpn_result_water_age_tip']='المدة التي قضاها الماء الواصل إلى هذه النقطة داخل الشبكة. حيث تلتقي التدفقات، يحمل الماء الوارد مزيجاً من الأعمار، والرقم هنا هو متوسطها مرجَّحاً بالتدفق: فالملتقى الذي يغذيه في الغالب خط رئيسي قصير وحديث يُظهر عمراً منخفضاً حتى لو غذّاه أيضاً طرف ميت طويل. في الصهريج هو متوسط عمر الماء المحفوظ فيه، ولهذا يكون الصهريج البطيء التبدّل عادة أقدم ماء في الشبكة. لا يوجد حدّ تنظيمي تقارن به هذا الرقم، فاحكم عليه وفق شبكتك أنت.';
+$ec_lang['lpn_result_water_age_tip']='المدة التي قضاها الماء الواصل إلى هذه النقطة في النظام. حيث تلتقي التدفقات، الرقم هو متوسط الأعمار الواصلة مرجَّحاً بالتدفق. في الصهريج هو متوسط عمر الماء المحفوظ فيه، لذا فإن الصهريج بطيء التجدد يحتوي عادةً أقدم ماء في الشبكة. لا يوجد حد تنظيمي للمقارنة به، لذا قيّمه وفق الظروف في النظام الذي يجري نمذجته.';
 $ec_lang['lpn_result_source_share']='حصة المصدر';
-$ec_lang['lpn_result_source_share_tip']='مقدار الماء الواصل إلى هذه النقطة الذي جاء من عقدة التتبع. هذا ما يبلّغه تحليل تتبع المصدر.';
+$ec_lang['lpn_result_source_share_tip']='حصة الماء الواصل إلى هذه النقطة التي جاءت من عقدة التتبع. هذا ما يبلّغه تحليل تتبع المصدر.';
 // **THE LINK HALF OF THE THREE QUALITY ANSWERS** (ROADMAP Task 638). EPANET reports a node's own
 // value and a LINK's AVERAGE over the water standing in it, so the two are different quantities and
 // take different words. Three whole names rather than one name built from a word and a heading: a
@@ -1117,7 +1117,7 @@ $ec_lang['lpn_result_status_open']='مفتوح';
 $ec_lang['lpn_result_status_closed']='مغلق';
 $ec_lang['lpn_result_head']='العلو';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_result_head_tip']='طاقة الماء عند هذه العقدة، معبَّراً عنها كارتفاع عمود ماء. هذا ارتفاع مطلق، أما الضغط فهو قياس بمقياس الضغط (نسبي).';
+$ec_lang['lpn_result_head_tip']='الطاقة الكامنة للماء عند هذه العقدة، معبَّراً عنها كارتفاع عمود ماء. هذا ارتفاع مطلق، أما الضغط فهو قياس بمقياس الضغط.';
 $ec_lang['lpn_result_pressure']='الضغط';
 $ec_lang['lpn_result_flow']='التدفق';
 $ec_lang['lpn_result_velocity']='السرعة';
@@ -1130,14 +1130,14 @@ $ec_lang['lpn_result_headloss']='فقدان الضغط';
 // states only its own scope, so none of them can be wrong about the others -- and no tip quotes
 // another button's label, which is the cross-key dependency lpn_empty_hint was fixed for.
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_settings_restore_tip']='يعيد ضبط إعدادات هذا المشروع فقط. لا يتغيّر رسمك ولا مشاريعك الأخرى. لحفظ إعداداتك المفضّلة لإعادة استخدامها، احفظ ملف مشروع لا يحتوي إلا على الإعدادات.';
-$ec_lang['lpn_reset_all_tip']='يحذف كل مشروع، وكل صورة خلفية، وكل إعداد، واختياراتك للوحدات، ثم يعيد تحميل الصفحة تماماً كما يراها زائر لأول مرة. هذا هو إعادة الضبط الوحيدة التي تمسح كل شيء.';
+$ec_lang['lpn_settings_restore_tip']='أعد ضبط إعدادات هذا المشروع فقط. لا يتغير الرسم ولا المشاريع الأخرى. لإعادة استخدام مجموعة إعدادات، احفظ ملف مشروع لا يحتوي إلا على الإعدادات.';
+$ec_lang['lpn_reset_all_tip']='احذف كل مشروع، وكل صورة خلفية، وكل إعداد، واختيارات الوحدات، ثم أعد تحميل الصفحة تماماً كما يراها زائر لأول مرة. هذا هو الضبط الوحيد الذي يمسح كل شيء.';
 // `lpn_tool_clear`, `lpn_tool_clear_tip` and `lpn_confirm_clear` were REMOVED by Task 211 with the
 // "Clear project" command itself -- see lpn_edit_delete_network for what replaced it and why.
 // Task 263's one-time migration offer. Shown ONCE, on opening a project saved before inputs
 // stopped being converted, and never again whatever the answer. Plain text only -- it is built with
 // textContent into the dialog body.
-$ec_lang['lpn_v2_restore_confirm']='تخزّن هذه الحاسبة وحدات المشروع ومدخلاته كما أُدخلت، لكنها كانت سابقاً تحوّل الأرقام إلى النظام الدولي للوحدات (SI) عند التخزين. حُفظ هذا المشروع قبل ذلك التغيير، لذا كانت أرقامه مخزَّنة بالنظام الدولي. هل تريد تحويلها مرة أخيرة إلى الوحدات الحالية؟ لتتمكّن من الحكم، إليك بعض الأقطار التي ستُحوَّل، بقيمها قبل التحويل وبعده:';
+$ec_lang['lpn_v2_restore_confirm']='تخزّن هذه الحاسبة وحدات المشروع ومدخلاته كما أُدخلت، لكنها كانت تحوّل الأرقام سابقاً إلى النظام الدولي للوحدات (SI) للتخزين. حُفظ هذا المشروع قبل ذلك التغيير، لذا خُزِّنت أرقامه بالنظام الدولي. هل تريد تحويلها مرة أخيرة إلى الوحدات الحالية؟ للمساعدة في التقدير، فيما يلي بعض الأقطار التي ستُحوَّل، بقيمها قبل التحويل وبعده:';
 $ec_lang['lpn_v2_restore_yes']='تحويل';
 $ec_lang['lpn_v2_restore_never']='لا. لا تسألني مرة أخرى.';
 $ec_lang['lpn_v2_restore_no']='إغلاق لأتحقق أولاً من الوحدات الحالية';
@@ -1201,11 +1201,11 @@ $ec_lang['lpn_convas_coordsys_tip']='نظام الإحداثيات الذي تُ
 // {crs} is the name the map status strip shows for this project's coordinate system.
 $ec_lang['lpn_convas_from']='الحالي: {crs}';
 $ec_lang['lpn_convas_epsg']='نظام إحداثيات EPSG';
-$ec_lang['lpn_convas_epsg_tip']='اختر نظام إحداثيات من سجل EPSG. خط العرض وخط الطول هو WGS 84 (EPSG:4326).';
+$ec_lang['lpn_convas_epsg_tip']='اختر نظام إحداثيات من سجل EPSG. نظام WGS 84 (EPSG:4326)، بخطي العرض والطول، هو الاختيار المقترح. يعطي WGS 84 / Pseudo-Mercator (EPSG:3857)، المسمى عادةً Web Mercator، الإحداثيين x وy بالأمتار، وتزيد مسافاته على الخريطة عن المسافات على الأرض كلما ابتعدنا عن خط الاستواء. تُحسب أطوال الأنابيب مسافاتٍ على الأرض في كلا النظامين.';
 $ec_lang['lpn_convas_unnamed']='إسناد جغرافي محلي بلا اسم';
 $ec_lang['lpn_convas_unnamed_tip']='إحداثيات محلية بوحدة الطول، مع إرفاق خريطة العالم.';
 $ec_lang['lpn_convas_none_tip']='إحداثيات محلية بوحدة الطول، دون خريطة عالم حالياً.';
-$ec_lang['lpn_convas_units_tip']='الوحدات التي تُحوَّل إليها النسخة. تحتفظ الأصلية بأرقامها ووحداتها الخاصة.';
+$ec_lang['lpn_convas_units_tip']='الوحدات التي تُحوَّل إليها النسخة.';
 $ec_lang['lpn_convas_round']='تقريب القيم المحوَّلة';
 $ec_lang['lpn_convas_round_tip']='يقرّب فقط الأرقام التي تعيد هذه العملية كتابتها، إلى أقرب خطوة تختارها. تُترك القيم التي لا تتغيّر وحدتها كما هي.';
 $ec_lang['lpn_convas_round_none']='بلا تقريب';
@@ -1226,11 +1226,11 @@ $ec_lang['lpn_file_convert_as_tip']='ينسخ هذا المشروع إلى تب�
 // attached world map) opens the placement steps already answered. Tom's own sentence for this case
 // from his 2026-09-16 edits, with the step 1 button added because the wizard opens at step 1.
 $ec_lang['lpn_georef_answered']='هذا المشروع مُسند جغرافياً بالفعل، فالشبكة موجودة على الخريطة بالفعل ولم يتحرك شيء. تحقق من أنها في المكان الصحيح، ثم اضغط زر ضع النموذج هنا وزر احتفظ بهذا الوضع.';
-$ec_lang['lpn_georef_intro']='يتطلّب وضع النموذج خطوتين. الخطوة 1 هي السريعة: يبقى النموذج ثابتاً وتحرّك الخريطة خلفه، حتى يصبح موقعك تحت النموذج بالحجم التقريبي الصحيح. لا يوجد دوران بعد. الخطوة 2 هي الدقيقة: تسحب النموذج نفسه وتغيّر حجمه وتدوّره. يكون مشروعك في البداية على خريطة العالم كله، فابحث عن موقعك أولاً، ثم اضغط زر ضع النموذج هنا.';
-$ec_lang['lpn_georef_adjust']='النموذج الآن على الأرض، فهو يتحرك مع الخريطة. اسحب النموذج لتحريكه، واسحب زاوية لتغيير حجمه، واسحب المقبض الدائري فوق النموذج لتدويره. أو اكتب المسافة الأرضية وزاوية الدوران أدناه.';
+$ec_lang['lpn_georef_intro']='يتطلّب وضع النموذج خطوتين. الخطوة 1 تقريبية: يبقى النموذج ثابتاً على الشاشة بينما تحرّك الخريطة خلفه وتكبّرها أو تصغّرها، حتى يصبح الموقع تحت النموذج بمقياس صحيح تقريباً. لا يوجد دوران في هذه الخطوة. الخطوة 2 دقيقة: اسحب النموذج نفسه وغيّر حجمه ودوّره. يبدأ المشروع على خريطة العالم كله، فابحث عن الموقع أولاً، ثم اضغط زر ضع النموذج هنا.';
+$ec_lang['lpn_georef_adjust']='النموذج الآن مرتبط بالخريطة، فيتحرك معها. اسحب النموذج لتحريكه، أو اسحب زاوية لتغيير حجمه، أو اسحب المقبض الدائري فوق النموذج لتدويره. أو أدخل المسافة الأرضية وزاوية الدوران أدناه.';
 $ec_lang['lpn_georef_step1']='الخطوة 1 من 2 — سريعة';
 $ec_lang['lpn_georef_step2']='الخطوة 2 من 2 — دقيقة';
-$ec_lang['lpn_georef_step1_hint']='يبقى مشروعك في مكانه على الشاشة. حرّك وقرّب الخريطة تحته حتى تصبح الأرض خلفه في المكان الصحيح تقريباً وبالحجم الصحيح تقريباً، ثم اضغط زر ضع النموذج هنا.';
+$ec_lang['lpn_georef_step1_hint']='يبقى المشروع ثابتاً على الشاشة. حرّك الخريطة تحته وكبّرها أو صغّرها حتى تعرض الخريطة الموقع الصحيح تقريباً بالمقياس الصحيح تقريباً، ثم اضغط زر ضع النموذج هنا.';
 $ec_lang['lpn_georef_detach']='التقطه مرة أخرى';
 $ec_lang['lpn_georef_size_prompt']='ما هو عرض الموقع تقريباً، عبر المشروع كله؟';
 // ---- The icon-only toolbar (dev/toolbar-icons.md) ----
@@ -1244,22 +1244,22 @@ $ec_lang['lpn_tool_key_hint']='اختصار: اضغط {key}.';
 $ec_lang['lpn_tool_key_hint_two']='اختصار: اضغط {key} أو {key2}.';
 // Edited by TGH 2026-09-07; the Shift sentence rewritten 2026-09-08 on his ruling that Shift keeps
 // the selection and toggles what the shape catches (it used to say "add").
-$ec_lang['lpn_tool_area_tip']='انقر على الخريطة كما هو موضح لتحديد كل ما يقع داخل الشكل. اضغط هذا الزر مرة أخرى لتغيير الشكل بين نافذة وتحديد حر ومضلع. اضغط مع الاستمرار على Shift أثناء التحديد لتتابع التحديد الحالي، فتضيف إليه أو تزيل منه (تبديل) ما تحدده.';
+$ec_lang['lpn_tool_area_tip']='اتبع المطالبات على الشاشة. اضغط مرة أخرى للتنقل بين النافذة والتحديد الحر والمضلع. اضغط Shift للإبقاء على التحديد الحالي وإضافة ما تحدده أو إزالته (تبديل).';
 $ec_lang['lpn_area_selected']='{n} محدد.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_area_none']='لم يُعثر على شيء في تلك المنطقة.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_tool_vertices_tip']='إضافة نقاط الانعطاف التي تحدّد شكل الأنبوب على الخريطة وإزالتها. انقر على الأنبوب لإضافة نقطة انعطاف، وانقر على نقطة انعطاف لإزالتها، واسحب نقطة الانعطاف لتحريكها. نقطة الانعطاف تغيّر مسار الرسم فقط، لا الحسابات الهيدروليكية.';
-$ec_lang['lpn_tool_undo_tip']='تراجع عن آخر تغيير.';
+$ec_lang['lpn_tool_vertices_tip']='أضف نقاط انعطاف الأنبوب وأزلها. حدّد نقطة على أنبوب لإضافة نقطة انعطاف، وحدّد نقطة انعطاف لإزالتها، واسحب نقطة انعطاف لتحريكها. تغيّر نقطة الانعطاف الطول التلقائي، لكنها لا تضيف فواقد موضعية (محلية) ولا تغيّرها.';
+$ec_lang['lpn_tool_undo_tip']='طول سجل التراجع = 20 إجراءً';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_tool_zoom_extent_tip']='إظهار الشبكة كلها داخل النافذة.';
-$ec_lang['lpn_tool_zoom_window_tip']='انقر زاويتين متقابلتين لمربع، أو اسحب واحداً، على الخريطة للتكبير عليه. اضغط هذا الزر مرة أخرى لإظهار الكل.';
+$ec_lang['lpn_tool_zoom_extent_tip']='ملاءمة الشبكة كلها مع نافذة الخريطة. اضغط مرة أخرى لتكبير منطقة. انظر أيضاً عناصر التحكم في تكبير الخريطة أعلى اليمين.';
+$ec_lang['lpn_tool_zoom_window_tip']='حدّد زاويتين أو اسحب مستطيلاً. اضغط مرة أخرى لملاءمة العرض.';
 // Tom's wording, 2026-09-25.
 $ec_lang['lpn_zoom_in_tip']='تكبير. الاختصار: +';
 // Tom's wording, 2026-09-25.
 $ec_lang['lpn_zoom_out_tip']='تصغير. الاختصار: -';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_find_menu_tip']='ابحث عن عنصر بمعرّفه، أو ابحث عن كل عنصر يحقق شرطاً، وغيّرها كلها دفعة واحدة.';
+$ec_lang['lpn_find_menu_tip']='بحث واستبدال بسيط أو معقد';
 // **"Toolbar key", NOT "Toolbar"** (Tom's own name, 2026-09-10; Ida ranked the rename first).
 // The row is not a second toolbar and not a repeat of one -- it is the LEGEND for an icon-only
 // strip, derived from toolbarIconIndex, and on a touch screen it is the only way to read the
@@ -1269,7 +1269,7 @@ $ec_lang['lpn_find_menu_tip']='ابحث عن عنصر بمعرّفه، أو اب
 $ec_lang['lpn_help_icons']='شريط الأدوات';
 // ---- The right panel: Visibility ----
 $ec_lang['lpn_pane_right_toggle']='الظهور';
-$ec_lang['lpn_color_legend_open_tip']='انقر لفتح لوحة "الظهور" وتغيير هذه الألوان.';
+$ec_lang['lpn_color_legend_open_tip']='اخترها لفتح إعدادات التلوين وتغيير هذه الألوان.';
 $ec_lang['lpn_color_node_field']='تلوين العقد حسب';
 $ec_lang['lpn_color_link_field']='تلوين الأنابيب حسب';
 $ec_lang['lpn_color_ramp_sequential']='تسلسلي';
@@ -1302,20 +1302,20 @@ $ec_lang['lpn_georef_scale']='المسافة الأرضية لكل وحدة رس
 // R-219 (Tom, 2026-09-24, answering R-190): the sentence that replaces the retired "These are
 // already lat/lon" button -- typing 1 here reaches the same result the button used to, for a file
 // whose own numbers should be used unchanged.
-$ec_lang['lpn_georef_scale_tip']='إلى أي مدى تمتد وحدة واحدة من رسمك على الأرض. الرسم على شبكة عادية عادة لا يذكر شيئاً عن هذا، فاضبطه هنا — أو دع "الانتقال إلى…" يسألك عن عرض الموقع ويحسبه.';
+$ec_lang['lpn_georef_scale_tip']='يُحسب تلقائياً. حرّره للتغيير. أدخل 1 لاستخدام إحداثيات الملف دون تغيير كمسافة أرضية، مثلاً لملف بلا نظام إحداثيات.';
 $ec_lang['lpn_georef_rotation']='الدوران عكس عقارب الساعة (بالدرجات)';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_georef_rotation_tip']='مقدار دوران النموذج كله، عكس عقارب الساعة، بحيث يشير شماله إلى الشمال.';
+$ec_lang['lpn_georef_rotation_tip']='دوران النموذج كله عكس عقارب الساعة، لمحاذاته مع نظام الإحداثيات الجديد.';
 // Tom's own wording for these two, from his 2026-09-16 edits (dev/tom-coordinate-vocabulary-2026-09-16.md):
 // the wizard now ends on whichever coordinate system File, Convert as chose, not always lat/lon.
-$ec_lang['lpn_georef_confirm']='هل تريد وضع النموذج هنا بشكل دائم؟ ما زال بإمكانك سحب عناصر منفردة بعد ذلك، لكن الرسم يتوقف عن كونه مشروع xy. لاستعادة xy، أغلق هذا المشروع دون حفظ.';
+$ec_lang['lpn_georef_confirm']='هل تريد وضع النموذج هنا بشكل دائم؟ يمكن بعد ذلك سحب العناصر واحداً واحداً، لكن المتابعة الآن تحوّل كل الإحداثيات دفعة واحدة. لاستعادة الإحداثيات القديمة، ارجع إلى المشروع الأصلي وأغلق هذا المشروع دون حفظ.';
 $ec_lang['lpn_georef_done']='هذا الآن مشروع على خط العرض وخط الطول. اسحب أي عنصر لتقريبه من موقعه الحقيقي.';
 $ec_lang['lpn_georef_backdrop_unrotated']='تحرّكت الصورة الخلفية وتغيّر حجمها مع النموذج، لكن تعذّر تدويرها. استخدم الخريطة، صورة خلفية، نقل لمحاذاتها.';
 $ec_lang['lpn_georef_empty']='لا يحتوي هذا الملف على شبكة، فلا يوجد ما يمكن وضعه.';
 $ec_lang['lpn_georef_unavailable']='لم تُحمَّل أداة الوضع. أعد تحميل الصفحة وحاول مرة أخرى.';
 // Switching projects while a model is being placed corrupted BOTH of them (Tom, 2026-09-08),
 // so the strip refuses and says which two commands end the wizard.
-$ec_lang['lpn_georef_tab_locked']='أنهِ عملية الوضع بزر "احتفظ بهذا الوضع"، أو اضغط إلغاء، قبل التبديل بين المشاريع. فالوضع يخص هذا المشروع ولا يمكن أن ينتقل معك إلى مشروع آخر.';
+$ec_lang['lpn_georef_tab_locked']='أنهِ التحويل بزر "احتفظ بهذا الوضع"، أو اضغط إلغاء، قبل التبديل بين المشاريع. ينطبق الوضع على هذا المشروع فقط.';
 // Saving during the wizard writes a document whose coordinates are half moved, so Save takes the
 // same refusal (Tom, 2026-09-08: *"Maybe the Save button should be disabled for consistency."*).
 // Its own sentence rather than the one above: the two commands that end the wizard are the same,
@@ -1333,9 +1333,9 @@ $ec_lang['lpn_goto_bad']='هذا ليس خط عرض وخط طول واحداً. 
 $ec_lang['lpn_georef_goto']='الانتقال إلى…';
 $ec_lang['lpn_georef_twopt']='استخدام نقطتين معروفتين';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_georef_twopt_tip']='ضع النموذج بدقة عندما تعرف مسبقاً أين يقع فعلياً نقطتان على رسمك. انقر إحداهما، واكتب خط عرضها وخط طولها، ثم افعل الشيء نفسه لنقطة ثانية. يُشتق الموضع والمقياس والدوران كلها من هاتين النقطتين. اضغط هذا الزر مرة أخرى لإيقاف الاختيار.';
-$ec_lang['lpn_georef_twopt_pick1']='انقر نقطة على رسمك تعرف خط عرضها وخط طولها.';
-$ec_lang['lpn_georef_twopt_pick2']='الآن انقر نقطة معروفة ثانية، بأبعد ما يمكن عن الأولى.';
+$ec_lang['lpn_georef_twopt_tip']='ضع النموذج بدقة عندما يكون خطا العرض والطول الحقيقيان لنقطتين على الرسم معروفين. حدّد إحداهما، وأدخل خط عرضها وخط طولها، ثم افعل الشيء نفسه لنقطة ثانية. يُحسب الموضع والمقياس والدوران من هاتين النقطتين. اضغط مرة أخرى للإلغاء، أو اضغط Esc.';
+$ec_lang['lpn_georef_twopt_pick1']='حدّد نقطة على رسمك تعرف خط عرضها وخط طولها.';
+$ec_lang['lpn_georef_twopt_pick2']='حدّد الآن نقطة ثانية معروفة، بأبعد ما يمكن عن الأولى.';
 $ec_lang['lpn_georef_twopt_same']='هذه هي النقطة التي اخترتها أولاً. اختر نقطة مختلفة.';
 $ec_lang['lpn_georef_twopt_done']='أصبح النموذج الآن قائماً على النقطتين اللتين أدخلتهما. تحقّق منه، ثم اضغط زر احتفظ بهذا الوضع.';
 
@@ -1344,7 +1344,7 @@ $ec_lang['lpn_georef_twopt_done']='أصبح النموذج الآن قائماً
 // profile first, tables later. The toggle is on the toolbar because it is the strip a reader
 // scans for "what else can this page show me".
 $ec_lang['lpn_pane_toggle']='اللوحة السفلية';
-$ec_lang['lpn_pane_toggle_tip']='أظهر أو أخفِ اللوحة أسفل الخريطة. تحمل المقطع الطولي وجدولاً لكل نوع من الأجزاء.';
+$ec_lang['lpn_pane_toggle_tip']='أظهر اللوحة أسفل الخريطة أو أخفها. تحتوي على رسوم بيانية وجدول لكل نوع من العناصر.';
 $ec_lang['lpn_pane_resize']='اسحب لجعل اللوحة أطول أو أقصر';
 $ec_lang['lpn_pane_tab_junctions']='الملتقيات';
 $ec_lang['lpn_pane_tab_reservoirs']='الخزانات';
@@ -1352,7 +1352,7 @@ $ec_lang['lpn_pane_tab_tanks']='الصهاريج';
 $ec_lang['lpn_pane_tab_pipes']='الأنابيب';
 $ec_lang['lpn_pane_tab_pumps']='المضخات';
 $ec_lang['lpn_pane_tab_valves']='الصمامات';
-$ec_lang['lpn_pane_tab_tip']='يعرض هذا التبويب عناصر هذا النوع كجدول يمكنك فرزه وتحريره. لا يمكن تحرير أعمدة النتائج.';
+$ec_lang['lpn_pane_tab_tip']='حرّر العناصر كجدول يشبه جدول البيانات. لا يمكن تحرير أعمدة النتائج. راجع المساعدة، الملاحظات للاطلاع على اختصارات لوحة المفاتيح.';
 $ec_lang['lpn_pane_none']='لا تحتوي هذه الشبكة على أي منها بعد.';
 // **A PERSISTENT NOTE, NOT A HOVER TIP** (Tom, 2026-09-08, asking for wording "to the effect that
 // 'This table is intended to be ready for asset entry and creation by pasting from a spreadsheet'").
@@ -1415,20 +1415,20 @@ $ec_lang['lpn_menu_project']='المياه';
 // the TOOLBAR, above the map. Do not qualify this sentence again. The rule it states is in
 // dev/looped-network-calculator-scope.md: every command lives in the menu bar, the transport is the
 // one exception, and it is exempt because it is a position in a run rather than a command.
-$ec_lang['lpn_menu_project_tip']='كل ما يخص نمذجة شبكة المياه موجود هنا في مكان واحد، ما عدا أزرار تشغيل الرسوم المتحركة. لا حاجة لتخمين مكان أي شيء.';
+$ec_lang['lpn_menu_project_tip']='كل ما يخص نمذجة شبكات المياه (عدا أزرار تشغيل الرسوم المتحركة)';
 $ec_lang['lpn_tables_menu']='الجداول';
-$ec_lang['lpn_tables_menu_tip']='يفتح اللوحة أسفل الخريطة على جدول لعناصر هذه الشبكة. يوجد جدول واحد لكل نوع من العناصر، ويمكنك فرزه وتعديله هناك.';
+$ec_lang['lpn_tables_menu_tip']='عرض العناصر وتحريرها في جداول في اللوحة السفلية.';
 // The Run row's own tip, NOT lpn_time_run_tip: this row exists partly to answer "where is my Run
 // button?" for somebody whose project recalculates by itself, and that sentence is not true of the
 // toolbar button, which is the one that goes away.
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_run_menu_tip']='أعد حساب هذه الشبكة الآن. تبحث عن زر احسب؟ إنه مخفي بينما إعداد إعادة الحساب تلقائياً مفعّل. لإعادة الزر، أوقف إعادة الحساب تلقائياً في الإعدادات، الحساب، الهيدروليكا.';
+$ec_lang['lpn_run_menu_tip']='تشغيل المحاكاة. غير ضروري عندما يكون "إعادة الحساب تلقائياً" مفعّلاً في الإعدادات، الحساب، الهيدروليكا. عند إيقاف إعادة الحساب، يظهر زر احسب في شريط الأدوات.';
 // ---- automatic recalculation (Task 467) ----
 // "Simulation" rather than "network" or "results": it is the word EPANET uses for working a network
 // out over time, and this switch is about the run, not about the drawing.
 $ec_lang['lpn_settings_auto_run']='إعادة الحساب تلقائياً';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_settings_auto_run_tip']='عند تفعيل هذا، يُعاد حساب المشروع بعد وقت قصير من كل تغيير تُجريه، ويُزال زر احسب من شريط الأدوات لأنه لم يعد له عمل. أوقف تفعيله في شبكة كبيرة حيث يعطّل انتظار إعادة الحساب بعد كل تغيير الكتابة، فيعود زر احسب لتختار متى تُشغّله.';
+$ec_lang['lpn_settings_auto_run_tip']='أوقفه إذا كانت إعادة الحساب بطيئة جداً. يُخفي زر احسب.';
 // **AN EDIT SAYS NOTHING AT ALL WHEN THE SWITCH IS OFF** (Tom, 2026-09-19: *"Recalc off Old
 // values: Leave in place stale. Don't clear. Trust the user."*). `lpn_manual_results_cleared`
 // stood here for part of one day and is DELETED, English-only, never translated: it announced a
@@ -1440,7 +1440,7 @@ $ec_lang['lpn_settings_auto_run_tip']='عند تفعيل هذا، يُعاد ح�
 // who has just waited a second already knows something is slow and wants it confirmed, not
 // explained. {secs} is one decimal.
 $ec_lang['lpn_time_run_slow']='استغرقت هذه الشبكة {secs} ث لحسابها، وهي مضبوطة لإعادة الحساب بعد كل تغيير. لإيقاف ذلك واستعادة زر احسب، أوقف تفعيل "إعادة الحساب تلقائياً" في الإعدادات، تحت الحساب، الهيدروليكا.';
-$ec_lang['lpn_time_no_report']='لا يوجد تقرير تشغيل بعد. التقرير هو نص EPANET نفسه، فيظهر بعد حساب هذه الشبكة باستخدام حلّال EPANET.';
+$ec_lang['lpn_time_no_report']='لا يوجد تقرير تشغيل بعد. التقرير هو التقرير النصي لـEPANET، لذا يظهر بعد حساب هذه الشبكة.';
 // "Settings" rather than Tools -> Options (Windows) or Preferences (Mac): nobody has ever settled
 // this one, and of the three, Settings is the word a person is most likely to look for first.
 // Moved out of the suite-wide More menu, 2026-08-13 (Tom: "the walkthrough is a little
@@ -1491,7 +1491,7 @@ $ec_lang['lpn_find_btn']='بحث';
 // is selected." One button, no selector; which table(s) it fills follows the scope in
 // buildFilterRow()/applyTableFilter(), never a control of its own.
 $ec_lang['lpn_find_filter_btn']='تصفية في الجدول الحالي';
-$ec_lang['lpn_find_filter_tip']='إظهار الأجزاء المطابقة لهذا الاستعلام فقط في أحد الجداول أسفل الخريطة. لا يتغيّر الرسم ولا يُحذف شيء.';
+$ec_lang['lpn_find_filter_tip']='إظهار الصفوف المطابقة لـ"ما الذي تبحث فيه" أعلاه فقط، في كل جدول جرى البحث فيه.';
 // The multi-table receipt, printed when "Everything" (or a typed compound query) filters more than
 // one table at once: one {table}: {n} of {all} row per table the query could be asked of, joined
 // into {rows} of the summary line below. Every number is a count already shown on the table's own
@@ -1518,7 +1518,7 @@ $ec_lang['lpn_find_op_lt']='أصغر من';
 // A condition that takes no value: it asks whether the asset states this property at all.
 $ec_lang['lpn_find_op_empty']='فارغ';
 // {n} is a whole number.
-$ec_lang['lpn_find_count']='تم العثور على {n}. انقر على واحد للانتقال إليه.';
+$ec_lang['lpn_find_count']='عُثر على {n}. اختر واحداً للانتقال إليه.';
 $ec_lang['lpn_find_shift_hint']='Shift+click للتبديل: يُضيف العنصر إذا لم يكن ضمن مجموعة التحديد، أو يُزيله إذا كان ضمنها بالفعل.';
 $ec_lang['lpn_find_none']='لم يُطابق شيء.';
 // The two extremes, as conditions on the same footing as "above" -- the Value box holds how
@@ -1539,7 +1539,7 @@ $ec_lang['lpn_find_op_top']='أعلى {n}';
 $ec_lang['lpn_find_op_bottom']='أدنى {n}';
 // EPANET's Map Finder calls this "Adjacent Links". Said plainly here: the pipes, pumps and valves
 // that meet at the node you found.
-$ec_lang['lpn_find_no_value']='اكتب ما تريد البحث عنه.';
+$ec_lang['lpn_find_no_value']='أدخل ما تبحث عنه.';
 // Task 540: the disconnected-node report. "Disconnected" is three different faults and each is
 // said as a CONDITION on one property, so the report is the Find panel with a different condition
 // rather than a second tool. Each op completes the sentence "Junction.Connection ___".
@@ -1566,7 +1566,7 @@ $ec_lang['lpn_find_conn_no_fixed']='لا تملك هذه الشبكة خزانا
 // Task 540: the query written as one line, above the Find button -- and typed into. The controls
 // write it and it writes the controls, so it teaches the shape of a search by being operated from
 // either end.
-$ec_lang['lpn_find_query_tip']='البحث نفسه، مكتوباً في سطر واحد. تغيير عناصر التحكم يعيد كتابة هذا السطر، والكتابة في هذا السطر يحدّث عناصر التحكم.';
+$ec_lang['lpn_find_query_tip']='البحث المعطى كاستعلام نصي. تغيير الاستعلام يحدّث عناصر التحكم أعلاه.';
 $ec_lang['lpn_find_query_label']='الاستعلام';
 // Tom's own line, 2026-08-26, and "expandable" is his word: it says the grammar will grow.
 $ec_lang['lpn_find_query_hint']='اجمع الشروط بواسطة و، أو، و ()';
@@ -1603,15 +1603,15 @@ $ec_lang['lpn_replace_title']='تغيير ما تم العثور عليه';
 $ec_lang['lpn_replace_prop']='الخاصية المراد تغييرها';
 $ec_lang['lpn_replace_value']='القيمة الجديدة';
 $ec_lang['lpn_replace_source']='مصدر القيمة الجديدة';
-$ec_lang['lpn_replace_asked']='طُلبت مناسيب {n} عقدة. النتائج في طريقها.';
+$ec_lang['lpn_replace_asked']='طُلبت مناسيب {n} عقدة. تظهر النتائج عند استلامها.';
 $ec_lang['lpn_replace_btn']='استبدال';
 // The count IS the confirmation: a bulk write reaches assets spread over a map the user is not
 // looking at, so it is shown, and answered, before anything is written. {n} is a whole number.
 $ec_lang['lpn_replace_preview']='تغيير {n} عنصراً؟';
 $ec_lang['lpn_replace_apply']='تغييرها';
-$ec_lang['lpn_replace_done']='{n} عنصراً تم تغييره. يمكنك التراجع عن هذا بخطوة واحدة.';
+$ec_lang['lpn_replace_done']='تغيّر {n} عنصراً. يمكن التراجع عن هذا بخطوة واحدة.';
 $ec_lang['lpn_replace_none']='لن يتغيّر شيء.';
-$ec_lang['lpn_replace_no_value']='اكتب القيمة الجديدة.';
+$ec_lang['lpn_replace_no_value']='أدخل القيمة الجديدة.';
 $ec_lang['lpn_replace_scope']='اختر نوعاً واحداً من العناصر أعلاه لتغيير قيمه.';
 // ---- the profile view (ROADMAP Task 409) ------------------------------------------------------
 // A drawing of the ground and the hydraulic grade line along one chosen route through the network.
@@ -1627,11 +1627,11 @@ $ec_lang['lpn_profile_menu']='المقطع الطولي';
 $ec_lang['lpn_profile_title']='المقطع الطولي على طول مسار';
 // Task 433 -- the path chooser. The gesture is Google Directions': click the start node, move over
 // the map to see the path, click to add a stop, double-click to finish.
-$ec_lang['lpn_profile_draw_start']='انقر العقدة التي يبدأ منها المسار.';
-$ec_lang['lpn_profile_draw_more']='حرّك المؤشر فوق الخريطة لرؤية المسار. انقر عقدة لإضافتها. انقر نقراً مزدوجاً للإنهاء. يلغي Esc العملية.';
+$ec_lang['lpn_profile_draw_start']='حدّد العقدة التي يبدأ منها المسار.';
+$ec_lang['lpn_profile_draw_more']='حرّك المؤشر فوق الخريطة لرؤية المسار. حدّد عقدة لإضافتها. انقر نقراً مزدوجاً للإنهاء. يلغي Esc العملية.';
 $ec_lang['lpn_profile_draw_blocked']='لا يوجد مسار من {a} إلى {b}. اختر عقدة أخرى.';
-$ec_lang['lpn_profile_tap_start']='اضغط العقدة التي يبدأ منها المسار.';
-$ec_lang['lpn_profile_tap_more']='اضغط عقدة لرؤية المسار. اضغط مطوّلاً لإضافتها. اضغط ضغطاً مزدوجاً للإنهاء. اضغط المقطع الطولي مرة أخرى للإلغاء.';
+$ec_lang['lpn_profile_tap_start']='حدّد العقدة التي يبدأ منها المسار.';
+$ec_lang['lpn_profile_tap_more']='حدّد عقدة لرؤية المسار. اضغط مطوّلاً لإضافتها. اضغط ضغطاً مزدوجاً للإنهاء. اضغط المقطع الطولي مرة أخرى للإلغاء.';
 $ec_lang['lpn_profile_say_idle']='اضغط المقطع الطولي مرة أخرى لاختيار مسار جديد على الخريطة.';
 $ec_lang['lpn_profile_none']='لا يوجد مسار بعد. اضغط المقطع الطولي مرة أخرى لاختيار واحد على الخريطة.';
 $ec_lang['lpn_profile_choose']='اختر عقدة بداية وعقدة نهاية.';
@@ -1653,8 +1653,8 @@ $ec_lang['lpn_profile_edit_tip']='غيّر أحد طرفي المسار، أو �
 // Tom read it (2026-08-27: *"What is '_say' supposed to mean? Don't you mean '_click'?"*). He is
 // right: its twin is `_tap`, so the only thing the two names can honestly differ by is the word
 // inside them, and `_say` named nothing at all.
-$ec_lang['lpn_profile_edit_click']='اسحب أي نقطة على المسار لتحريكها. انقر نقطة أضفتها لإزالتها منه.';
-$ec_lang['lpn_profile_edit_tap']='اسحب أي نقطة على المسار لتحريكها. اضغط نقطة أضفتها لإزالتها منه.';
+$ec_lang['lpn_profile_edit_click']='اسحب أي نقطة على المسار لتحريكها. حدّد نقطة أضفتها لإزالتها.';
+$ec_lang['lpn_profile_edit_tap']='اسحب أي نقطة على المسار لتحريكها. حدّد نقطة أضفتها لإزالتها.';
 $ec_lang['lpn_profile_edit_nowhere']='يجب أن تكون أي نقطة على المسار عقدة. المسار لم يتغيّر.';
 // ---- Task 510: paths kept in the project, by name ---------------------------------------------
 // A client report carries the same three or four profiles every time, so a path is worth keeping.
@@ -1679,13 +1679,13 @@ $ec_lang['lpn_profile_missing']='يستخدم المسار المحفوظ {name}
 // second place a wording could drift. The quantity labels themselves are the Labels popover's, in
 // every language it already has them in.
 $ec_lang['lpn_ts_menu']='السلاسل الزمنية';
-$ec_lang['lpn_ts_tip']='ارسم عنصراً واحداً أو أكثر مقابل الزمن عبر محاكاة ممتدة الفترة.';
+$ec_lang['lpn_ts_tip']='ارسم رسماً بيانياً لعنصر واحد أو أكثر عبر محاكاة ممتدة الفترة.';
 $ec_lang['lpn_ts_title']='القيم مقابل الزمن';
 $ec_lang['lpn_ts_group_nodes']='العُقَد';
 $ec_lang['lpn_ts_group_links']='الروابط';
 $ec_lang['lpn_ts_add']='إضافة المحدَّد';
 // Said out loud rather than ignored: a button that does nothing cannot be told from a broken one.
-$ec_lang['lpn_ts_add_none']='لا شيء من هذا النوع محدَّد على الخريطة.';
+$ec_lang['lpn_ts_add_none']='لم يُعثر على شيء للإضافة.';
 $ec_lang['lpn_ts_clear']='إزالة الكل';
 $ec_lang['lpn_ts_chip_tip']='إزالة {id} من الرسم';
 $ec_lang['lpn_ts_none']='لا شيء لرسمه بعد. اختر عناصر على الخريطة واضغط إضافة المحدَّد.';
@@ -1696,7 +1696,7 @@ $ec_lang['lpn_ts_no_frames']='لا توجد نتائج ممتدة الفترة �
 $ec_lang['lpn_ts_summary']='العناصر: {n}، أوقات التقرير: {steps}';
 $ec_lang['lpn_ts_axis_time']='الزمن المنقضي';
 $ec_lang['lpn_freq_menu']='التكرار';
-$ec_lang['lpn_freq_tip']='ارسم التوزيع التكراري لخاصية واحدة عبر جميع الملتقيات أو جميع الأنابيب عند الخطوة الزمنية الحالية.';
+$ec_lang['lpn_freq_tip']='التوزيع التكراري لخاصية';
 $ec_lang['lpn_freq_title']='توزيع القيم';
 $ec_lang['lpn_freq_none']='لا توجد نتائج لهذه القيمة بعد، فلا شيء لرسمه.';
 $ec_lang['lpn_freq_summary']='المرسوم: {n} من {total}';
@@ -1727,7 +1727,7 @@ $ec_lang['lpn_new_title']='مشروع جديد';
 // them), or local and not georeferenced. The keys of the older three-radio box (lpn_new_coords and
 // its five siblings) are gone; Tom called the last of them obsolete on 2026-09-16.
 $ec_lang['lpn_new_coordsys']='نظام الإحداثيات';
-$ec_lang['lpn_new_coordsys_tip']='اختر نظام إحداثيات شبكتك. هذا الاختيار دائم؛ الطريقة الوحيدة لتحويل الشبكة إلى إحداثيات مختلفة هي "ملف، فتح بإحداثيات جديدة"، وهي تقريبية.';
+$ec_lang['lpn_new_coordsys_tip']='اختر نظام إحداثيات شبكتك. الطريقة الوحيدة لتغيير هذا الاختيار هي "ملف، تحويل باسم…" إلى مشروع جديد، وهذا التحويل تقريبي.';
 // **DELETED 2026-09-25: lpn_new_coordsys_geo / lpn_new_coordsys_geo_tip.** Don't expose the word
 // "projection" (dev/session-handoff.md RULINGS); once reworded, both were the identical string
 // lpn_convas_epsg / lpn_convas_epsg_tip already carries, so the radio reuses those keys rather than
@@ -1747,13 +1747,13 @@ $ec_lang['lpn_new_coordsys_local_tip']='غير مُسند جغرافياً. أر
 // answers most of the question by itself: searching a town in Arizona leaves two UTM zones standing
 // out of a hundred and twenty.
 $ec_lang['lpn_crs_view']='التصفية حسب منظور الخريطة';
-$ec_lang['lpn_crs_view_tip']='يعرض فقط الإسقاطات التي تغطي المكان الذي تنظر إليه الخريطة. أوقفه لقراءة القائمة كاملة.';
+$ec_lang['lpn_crs_view_tip']='لا يعرض إلا أنظمة الإحداثيات التي تغطي المكان الذي تعرضه الخريطة. ألغِ التحديد لقراءة القائمة كاملة.';
 $ec_lang['lpn_crs_place']='البحث باسم المكان';
-$ec_lang['lpn_crs_place_tip']='اكتب اسم بلدة أو عنواناً أو معلماً، وينتقل منظور الخريطة إلى هناك. تُرسَل الكلمات التي تكتبها إلى خدمة أسماء الأماكن في OpenStreetMap، التي تطلب إذنك في المرة الأولى. يبدأ المشروع الجغرافي الجديد أيضاً من المكان الذي تجده هنا.';
+$ec_lang['lpn_crs_place_tip']='تُرسَل عمليات البحث إلى خدمة أسماء الأماكن في OpenStreetMap، ويُطلب الإذن في المرة الأولى. يبدأ المشروع الجغرافي الجديد أيضاً عند المكان الموجود هنا.';
 $ec_lang['lpn_crs_search']='بحث';
 $ec_lang['lpn_crs_name']='تصفية باسم الإسقاط';
-$ec_lang['lpn_crs_name_tip']='يعرض فقط الإسقاطات التي يحتوي اسمها أو رمز EPSG الخاص بها على ما تكتبه. جرّب رقم منطقة، أو UTM، أو Mercator.';
-$ec_lang['lpn_crs_list_tip']='الإسقاطات المتبقية بعد عاملي التصفية أعلاه. اختر واحداً واضغط تحديد.';
+$ec_lang['lpn_crs_name_tip']='نص يصفّي القائمة: لا تُعرض إلا أنظمة الإحداثيات التي يحتوي اسمها أو رمز EPSG الخاص بها عليه.';
+$ec_lang['lpn_crs_list_tip']='أنظمة الإحداثيات التي تجتاز عوامل التصفية أعلاه. اختر واحداً، ثم اضغط تحديد.';
 // Said rather than left blank: a filter that is on and filtering nothing looks broken.
 $ec_lang['lpn_crs_noview']='لم يُبحث عن أي مكان بعد، لذا تُعرض القائمة كاملة. ابحث عن مكان أعلاه أو قرّب الخريطة لتضييقها.';
 $ec_lang['lpn_crs_count']='{n} من {total} إسقاطاً مدرَجاً.';
@@ -1785,7 +1785,7 @@ $ec_lang['lpn_crs_none']='غير مُسند جغرافياً';
 // Task 584: the page-wide rule stated where it is decided. A new project gets the hard-coded
 // defaults; a preference is a template FILE rather than an invisible saved setting.
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_new_units_tip']='يحتفظ المشروع بوحداته الخاصة، فهذا الاختيار يخص هذا المشروع وحده ولا يُحفظ هنا شيء كإعداد للمتصفح. لبدء مشاريع جديدة بطريقة معينة، احفظ مشروعاً فارغاً كقالب لك وانسخه في كل مرة.';
+$ec_lang['lpn_new_units_tip']='تُخزَّن الوحدات والإعدادات الأخرى مع كل مشروع، لذا ينطبق هذا الاختيار على هذا المشروع فقط ولا يُحفظ كإعداد للمتصفح. لإعادة استخدام التفضيلات، احفظ مشروعاً فارغاً كقالب وابدأ كل مشروع جديد منه.';
 // A worked example rather than an instruction, in the placeholder where an instruction would be
 // read as the answer. Petaluma is the example js/lpn-search.js already uses.
 $ec_lang['lpn_new_place_hint']='بترالوما، كاليفورنيا';
@@ -1828,7 +1828,7 @@ $ec_lang['lpn_file_import_inp_tip']='اقرأ شبكة من ملف EPANET، سو
 // The other direction (Task 281). A DOWNLOAD, so the word is Export rather than Save: this page
 // keeps no handle on an `.inp` and never writes back to one.
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_file_export_inp_tip']='اكتب هذه الشبكة كملف EPANET بصيغة .inp وحمّله. تُكتب الأرقام التي أدخلتها تماماً كما كتبتها. يُسرد لاحقاً كل ما لا تستطيع صيغة .inp تخزينه.';
+$ec_lang['lpn_file_export_inp_tip']='نزّل هذه الشبكة ملف EPANET بصيغة .inp (في ملف مضغوط zip مع صورتها إن وُجدت). يُسرد لاحقاً كل ما لا تستطيع صيغة .inp حمله.';
 $ec_lang['lpn_status_inp_exported']='تم تصدير {file}.';
 // {n} is a whole number. Said plainly rather than hidden: a file that quietly loses a pump curve is
 // the failure this whole feature exists to prevent.
@@ -1841,7 +1841,7 @@ $ec_lang['lpn_inp_bad_file']='تعذّرت قراءة ذلك الملف كملف
 $ec_lang['lpn_net_bad_file']='يبدو هذا ملف .net من EPANET، لكن هذه الصفحة تعذّر عليها قراءته. افتحه في EPANET واستخدم أمر ملف، تصدير، شبكة هناك لحفظه كملف .inp، ثم استورد ذلك الملف.';
 $ec_lang['lpn_inp_report_heading']='تم استيراد {file}';
 $ec_lang['lpn_inp_report_counts']='{nodes} من الملتقيات والخزانات والصهاريج، و{links} من الأنابيب والمضخات والصمامات، بوحدات {units}.';
-$ec_lang['lpn_inp_report_clean']='انتقل كل شيء في الملف بنجاح. لم يُستبعد شيء.';
+$ec_lang['lpn_inp_report_clean']='استُوردت كل البيانات في الملف. لم يُغفل شيء.';
 $ec_lang['lpn_inp_report_label_anchor']='توضع التسميات النصية كما يضعها EPANET، من زاويتها العلوية اليسرى.';
 // **R-219; Tom, 2026-09-24, answering R-190**: dropping the "These are already lat/lon" button in
 // favor of typing 1 for Step 2's Ground distance field means both Import and Convert as have to say
@@ -1849,46 +1849,46 @@ $ec_lang['lpn_inp_report_label_anchor']='توضع التسميات النصية 
 // or no [BACKDROP] line at all, never only "None" -- because none of those states a real coordinate
 // system either. See showInpReport() in js/looped-network.js.
 $ec_lang['lpn_inp_report_no_crs']='لا تحتوي ملفات EPANET على نظام إحداثيات، فلن يكون هذا الملف مُسنداً جغرافياً في البداية. لوضعه على خريطة العالم، استخدم الخريطة، خريطة العالم… ولتحويل إحداثياته، استخدم ملف، تحويل باسم…';
-$ec_lang['lpn_inp_report_lead']='لا تستخدم هذه الصفحة كل ما يستخدمه EPANET، لكن لا شيء في ملفك يُطرح. فيما يلي ما يحمله ملفك وتحتفظ به هذه الصفحة دون استخدامه، وما تغيّر عند قراءة الملف:';
+$ec_lang['lpn_inp_report_lead']='لا تستخدم هذه الصفحة كل ميزات EPANET، لكن لا يُطرح أي بيان في الملف. تعرض القائمة أدناه البيانات الموجودة في الملف التي جرى الاحتفاظ بها دون استخدامها، وأي تغييرات أُجريت أثناء الاستيراد:';
 $ec_lang['lpn_inp_drop_headloss']='لا يستخدم هذا الملف معادلة هيزن-وليامز. تحسب هذه الصفحة هيزن-وليامز، لذا أُبقيت أرقام خشونة الأنابيب كما كُتبت تماماً، لكن النتائج هنا لن تطابق نتائج EPANET.';
-$ec_lang['lpn_inp_drop_tank_curve']='هذه الصهاريج ليست مستقيمة الجوانب: يعطي الملف شكلها كمنحنى. يُحفظ المنحنى في المكتبات، ولا يزال الصهريج يشير إليه، وتملأ محاكاة ممتدة الفترة الصهريج وتفرغه وفق الجدول الذي يعطيه ذلك المنحنى. اللحظة الواحدة هي نفسها في الحالتين، لأن سطح الماء هو المنسوب الذي يحدده الملف. يُحفظ القطر المكتوب في الملف بجانب المنحنى، وهو ما يُرسم به الصهريج الذي لا منحنى له ويُحل على أساسه.';
+$ec_lang['lpn_inp_drop_tank_curve']='هذه الصهاريج ليست مستقيمة الجوانب: يعطي الملف شكلها منحنى حجم. يُحفظ المنحنى في مربع المكتبات، ولا يزال الصهريج يشير إليه، وتستخدمه المحاكاة ممتدة الفترة لحساب المنسوب أثناء امتلاء الصهريج وتفريغه. لا يتأثر التحليل ذو الفترة الواحدة، لأن سطح الماء عند المنسوب المذكور في الملف. يُحفظ القطر المذكور في الملف بجانب المنحنى ويُستخدم لرسم صهريج بلا منحنى وحلّه.';
 // Three outcomes a valve in a file can meet, one string each (Task 248 phase 2). Only the last is
 // a loss; the first two are reported because the reader deserves to know what became of a valve
 // their file states, not because anything was thrown away.
-$ec_lang['lpn_inp_drop_tcv']='دخلت صمامات التخنيق هذه كصمامات تخنيق، تحمل الفاقد نفسه الذي يحدده الملف. يستطيع أي من الحلّالين حسابها.';
-$ec_lang['lpn_inp_drop_valve_active']='تتحكم هذه الصمامات في الضغط أو التدفق، وتفتح وتغلق من تلقاء نفسها مع تغيّر الماء. لم يُفقد شيء منها أثناء الاستيراد، وتحل هذه الصفحة لها بحلّال EPANET، فيُشغَّل هذا الحلّال تلقائياً لهذه الشبكة.';
-$ec_lang['lpn_inp_drop_valve']='تُوصف هذه الصمامات بمنحنى أو بانخفاض ضغط ثابت، ولا تملك هذه الصفحة عنصراً كهذا. وصلت كأنابيب مفتوحة، فتبقى الشبكة متصلة، لكن لم يعد شيء يتحكم بالضغط أو التدفق هناك.';
-$ec_lang['lpn_inp_drop_cv']='في EPANET، تسمح هذه الأنابيب بمرور الماء في اتجاه واحد فقط. دخلت كأنابيب عادية، فقد يتدفق الماء الآن في أي من الاتجاهين خلالها.';
+$ec_lang['lpn_inp_drop_tcv']='استُوردت صمامات التخنيق هذه صمامات تخنيق، بالفاقد المذكور في الملف.';
+$ec_lang['lpn_inp_drop_valve_active']='تتحكم هذه الصمامات في الضغط أو التدفق، وتتغير حالتها مع الظروف الهيدروليكية. استُوردت دون فقد أي بيانات، وتحلها هذه الصفحة.';
+$ec_lang['lpn_inp_drop_valve']='توصف هذه الصمامات بمنحنى أو بهبوط ضغط ثابت، وليس في هذه الصفحة عنصر كهذا. استُوردت أنابيب مفتوحة، فتبقى الشبكة متصلة، لكن الضغط والتدفق لم يعودا مضبوطين عند تلك المواقع.';
+$ec_lang['lpn_inp_drop_cv']='في EPANET، تسمح هذه الأنابيب بالتدفق في اتجاه واحد فقط (صمامات عدم رجوع). استُوردت أنابيب عادية، لذا قد يمر التدفق الآن في أي من الاتجاهين.';
 $ec_lang['lpn_inp_drop_demands']='كان لهذه الملتقيات أكثر من طلب واحد. جُمعت الطلبات معاً في الطلب الواحد الذي تحمله هذه الصفحة.';
-$ec_lang['lpn_inp_drop_patterns']='لم تقرأ هذه الصفحة أنماط الطلب، لأن جزء هذه الصفحة الذي يشغّل محاكاة ممتدة الفترة لم يُحمَّل. كل طلب هو الرقم المكتوب في الملف.';
-$ec_lang['lpn_inp_drop_demand_pattern']='تُغيّر هذه الملتقيات طلبها خلال التشغيل. وردت أنماطها كاملة، والطلب الذي تراه هو طلب اللحظة التي تُظهرها الساعة.';
+$ec_lang['lpn_inp_drop_patterns']='لم تقرأ هذه الصفحة أنماط الطلب، لأن وحدة المحاكاة ممتدة الفترة لم تُحمَّل. كل طلب هو القيمة المذكورة في الملف.';
+$ec_lang['lpn_inp_drop_demand_pattern']='لهذه الملتقيات طلبات تتغير خلال التشغيل. استُوردت أنماطها كاملة، والطلب المعروض هو القيمة عند الوقت الذي تعرضه الساعة.';
 $ec_lang['lpn_inp_drop_emitters']='لهذه الملتقيات معامل رشاش أو تسرّب. أُبقي عليه ويُحسب ضمن الحل، لكن لا يوجد بعد مكان في هذه الصفحة لعرضه أو تغييره.';
 $ec_lang['lpn_inp_drop_curve_long']='كان لمنحنى هذه المضخة أكثر من ثلاث نقاط. أُبقي على أدنى نقطة وأوسطها وأعلاها، لأن هذه الصفحة توائم منحنى بثلاث نقاط على الأكثر.';
-$ec_lang['lpn_inp_drop_curve_missing']='تشير هذه المضخة إلى منحنى غير موجود في الملف. دخلت المضخة دون منحنى، فهي لا تضيف أي علو.';
-$ec_lang['lpn_inp_drop_pump_other']='تُوصف هذه المضخة بالقدرة التي تسحبها، لا بمنحنى. وصلت بلا منحنى، فهي لا تضيف أي علو.';
-$ec_lang['lpn_inp_drop_head_pattern']='ترتفع هذه الخزانات وتنخفض خلال التشغيل. وردت أنماطها كاملة، ومنسوب الماء الذي تراه هو منسوب اللحظة التي تُظهرها الساعة.';
-$ec_lang['lpn_inp_drop_pump_speed']='تعمل هذه المضخات بسرعة تختلف عن السرعة التي قيست عندها منحنياتها، أو تتغيّر سرعتها خلال التشغيل. وردت السرعة ونمطها كاملين، والعلو الذي تراه هو علو اللحظة التي تُظهرها الساعة.';
-$ec_lang['lpn_inp_drop_setting']='تحمل هذه الأنابيب والمضخات والصمامات إعداداً لا يمكن لهذه الصفحة الاحتفاظ به. دخلت مفتوحة.';
-$ec_lang['lpn_inp_drop_rules']='يحتوي هذا الملف على عناصر تحكم قائمة على قواعد. تقرأ هذه الصفحة هذه القواعد وتستخدمها. شغّل النموذج بمحرك EPANET فتُطبَّق القواعد، مع تحويل كل منسوب وضغط وتدفق فيها إلى الوحدات التي يعرضها هذا المشروع. افتح القواعد تحت المكتبات لقراءة إحداها أو تغييرها. تُحفظ كما ذكرها الملف تماماً، وتُكتب مرة أخرى إذا حفظت ملف EPANET.';
-$ec_lang['lpn_inp_drop_eps']='يصف هذا الملف محاكاة ممتدة الفترة. لم يُحمَّل جزء هذه الصفحة الذي يشغّل محاكاة ممتدة الفترة، فدخلت الظروف الابتدائية فقط.';
-$ec_lang['lpn_inp_drop_quality']='يصف هذا الملف كيف تتغيّر جودة المياه أثناء انتقالها: ما الموجود في الماء ابتداءً، وبأي سرعة تتفاعل تلك المادة في الأنابيب وفي الصهاريج. تقرأ هذه الصفحة هذه الأرقام وتستخدمها. اختر مادة كيميائية تحت الإعدادات، الحساب، جودة المياه، ثم شغّل النموذج بمحرك EPANET، فيُحسب التركيز على طول الشبكة مع تقدّم التشغيل. تُحفظ هذه السطور، وتُكتب مرة أخرى إذا حفظت ملف EPANET.';
-$ec_lang['lpn_inp_drop_sources_mixing']='يذكر هذا الملف أين تُضاف مادة كيميائية إلى الشبكة، وكيف يختلط الماء في الصهريج. تظهر الجرعة عند العقدة التي أُضيفت عندها، ويحدد الصهريج نموذج الاختلاط الذي يتبعه. تُحسب الجرعة ونموذج الاختلاط كلاهما بمحرك EPANET فقط.';
+$ec_lang['lpn_inp_drop_curve_missing']='تشير هذه المضخة إلى منحنى غير موجود في الملف. استُوردت المضخة بلا منحنى، فلا تضيف أي علو.';
+$ec_lang['lpn_inp_drop_pump_other']='توصف هذه المضخة بالقدرة التي تسحبها بدلاً من منحنى. استُوردت بلا منحنى، فلا تضيف أي علو.';
+$ec_lang['lpn_inp_drop_head_pattern']='لهذه الخزانات علو يتغير خلال التشغيل. استُوردت أنماطها كاملة، ومنسوب الماء المعروض هو القيمة عند الوقت الذي تعرضه الساعة.';
+$ec_lang['lpn_inp_drop_pump_speed']='تعمل هذه المضخات بسرعة غير السرعة التي قيس عندها منحناها، أو تتغير سرعتها خلال التشغيل. استُوردت السرعة ونمطها كاملين، والعلو المعروض هو القيمة عند الوقت الذي تعرضه الساعة.';
+$ec_lang['lpn_inp_drop_setting']='لهذه الأنابيب والمضخات والصمامات ضبط لا تستطيع هذه الصفحة حمله. استُوردت مفتوحة.';
+$ec_lang['lpn_inp_drop_rules']='يحتوي هذا الملف على ضوابط قائمة على قواعد. تقرأ هذه الصفحة هذه القواعد وتطبقها. عند تشغيل النموذج تُطبَّق القواعد، مع تحويل كل منسوب وضغط وتدفق فيها إلى الوحدات التي يعرضها هذا المشروع. افتح القواعد في المكتبات لعرض قاعدة أو تحريرها. تُحفظ القواعد كما هي مذكورة في الملف تماماً وتُكتب مرة أخرى إذا حفظت ملف EPANET.';
+$ec_lang['lpn_inp_drop_eps']='يصف هذا الملف محاكاة ممتدة الفترة. لم تُحمَّل وحدة المحاكاة ممتدة الفترة في هذه الصفحة، فاستُوردت الشروط الابتدائية فقط.';
+$ec_lang['lpn_inp_drop_quality']='يصف هذا الملف جودة المياه: التراكيز الابتدائية ومعدلات التفاعل في الأنابيب والصهاريج. تقرأ هذه الصفحة هذه القيم وتستخدمها. اختر مادة كيميائية في الإعدادات، الحساب، جودة المياه، ثم شغّل النموذج لحساب التراكيز في أنحاء الشبكة خلال التشغيل. تُحفظ السطور وتُكتب مرة أخرى إذا حفظت ملف EPANET.';
+$ec_lang['lpn_inp_drop_sources_mixing']='يذكر هذا الملف أين تُحقن مادة كيميائية في الشبكة وكيف يختلط الماء في كل صهريج. يظهر كل مصدر على العقدة التي يُطبَّق عندها، ويعرض كل صهريج نموذج اختلاطه. يُستخدم كلاهما عند تشغيل الشبكة بمدة تشغيل كلية.';
 $ec_lang['lpn_inp_drop_energy']='يتضمن ملف EPANET هذا بيانات نمذجة تكلفة الضخ. تقرأ هذه الصفحة تلك البيانات وتستخدمها. شغّل النموذج بمحرك EPANET، ثم افتح المياه، التقارير، طاقة المضخة لترى مدة تشغيل كل مضخة، والقدرة التي استمدتها، والطاقة التي استخدمتها، وما تكلفه ذلك. تُحفظ هذه السطور، وتُكتب مرة أخرى إذا حفظت ملف EPANET.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_inp_drop_tags']='يمنح هذا الملف وسوماً لبعض ملتقياته أو أنابيبه أو عناصره الأخرى. دخل كل وسم كاملاً، ويقع كل منها ضمن خصائص عنصره الخاص، حيث يمكنك قراءته أو تغييره.';
+$ec_lang['lpn_inp_drop_tags']='يعيّن هذا الملف وسوماً لبعض الملتقيات أو الأنابيب أو العناصر الأخرى. استُوردت كل الوسوم وتظهر في خصائص عنصرها، حيث يمكن عرضها أو تحريرها.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_inp_drop_report']='يحمل هذا الملف إعدادات EPANET الخاصة بتنسيق التقرير الذي يطبعه. يمكنك قراءة تقرير المحرك هنا، تحت التقارير، تشغيل EPANET، لكنه يظهر بالتنسيق القياسي للمحرك بدلاً من التنسيق الذي تطلبه هذه الإعدادات. تُحفظ السطور، وتُكتب مرة أخرى إذا حفظت ملف EPANET.';
+$ec_lang['lpn_inp_drop_report']='يحتوي هذا الملف على إعدادات تنسيق تقرير EPANET. يتوفر تقرير التشغيل في التقارير، التشغيل، لكنه يستخدم تنسيق EPANET القياسي لا التنسيق الذي تحدده هذه الإعدادات. تُحفظ السطور وتُكتب مرة أخرى إذا حفظت ملف EPANET.';
 $ec_lang['lpn_inp_drop_sections']='يحمل هذا الملف قسماً لا تقرأه هذه الصفحة إطلاقاً. لا يُستخدم شيء هنا منه. يُحفظ كاملاً، ويُكتب مرة أخرى إذا حفظت ملف EPANET.';
-$ec_lang['lpn_inp_drop_quality_options']='يذكر هذا الملف خيارات جودة مياه EPANET: خيار Quality، الذي يسمّي نوع تحليل جودة المياه، وإعدادين يخصان مادة كيميائية، هما الانتشارية النسبية وسماحية الجودة. تُحفظ الخيارات الثلاثة كلها وتُستخدم. يُحسب هنا عمر الماء وتتبع المصدر ومادة كيميائية كل على حدة، ويُسلَّم الإعدادان الكيميائيان إلى محرك EPANET عند تشغيل مادة كيميائية. تُكتب جميعها مرة أخرى إذا حفظت ملف EPANET.';
-$ec_lang['lpn_inp_drop_file_options']='يشير هذا الملف إلى ملف مساعد: Map، الذي يحمل الإحداثيات، أو Hydraulics، الذي يحمل حسابات هيدروليكية جاهزة. لا يمكن لهذه الصفحة فتح أيّ منهما، فتُحفظ السطور كما هي وتُكتب مرة أخرى إذا حفظت ملف EPANET.';
+$ec_lang['lpn_inp_drop_quality_options']='يذكر هذا الملف خيارات جودة المياه في EPANET: خيار Quality، الذي يسمّي نوع تحليل جودة المياه، وإعدادين يتعلقان بمادة كيميائية، هما الانتشارية النسبية وسماحية الجودة. تُحفظ الثلاثة كلها وتُستخدم. يُحسب هنا كل من عمر الماء وتتبع المصدر ومادة كيميائية، ويُستخدم إعدادا المادة الكيميائية عند تشغيل مادة كيميائية. تُكتب جميعها مرة أخرى إذا حفظت ملف EPANET.';
+$ec_lang['lpn_inp_drop_file_options']='يشير هذا الملف إلى ملف مساعد: Map، الذي يحمل الإحداثيات، أو Hydraulics، الذي يحمل حسابات هيدروليكية سبق حسابها. لا تستطيع هذه الصفحة فتح أي منهما، فتُحفظ السطور كما هي وتُكتب مرة أخرى إذا حفظت ملف EPANET.';
 $ec_lang['lpn_inp_drop_other_options']='يذكر هذا الملف خيارات لا تقرأها هذه الصفحة. لا يُستخدم شيء هنا منها. تُحفظ وتُكتب مرة أخرى إذا حفظت ملف EPANET.';
 $ec_lang['lpn_inp_drop_net_options']='يذكر ملف EPANET ‎.net هذا إعدادات لا تملك هذه الصفحة عنصر تحكم لها، فتُعرض قيمها هنا بدلاً من نقلها. جاء كل شيء آخر. إذا احتجتها، افتح الملف في EPANET واستخدم File، Export، Network لحفظه كملف ‎.inp، ثم استورد ذلك الملف.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_net_emergency']='كان هذا ملف EPANET ‎.net. هذا هو ملف مشروع EPANET الخاص به، وليس له وصف منشور، وتقرأ هذه الصفحة تنسيقه باستنتاجه من ملفات أمثلة، فاستخدمه فقط حين لا تملك غيره لا كطريق يُعتمد عليه. أما ملف ‎.inp فهو التنسيق الموثَّق الذي تقرؤه كل البرامج الأخرى: في EPANET استخدم File، Export، Network لكتابة واحد، واستورد ذلك بدلاً منه كلما استطعت.';
+$ec_lang['lpn_net_emergency']='كان هذا ملف EPANET بصيغة ‎.net، وهي صيغة مشروع EPANET الأصلية. لا توجد مواصفات منشورة لهذه الصيغة؛ وتقرؤها هذه الصفحة باستخدام صيغة استُنتجت من ملفات أمثلة، لذا استخدمها فقط عندما لا يتوفر ملف ‎.inp. ملف ‎.inp هو الصيغة الموثقة التي تقرؤها البرامج الأخرى: في EPANET استخدم File، Export، Network لكتابة واحد، واستورد ذلك الملف بدلاً منه كلما أمكن.';
 $ec_lang['lpn_inp_drop_backdrop']='يشير هذا الملف إلى صورة خلفية لكنه لا يحتوي على الصورة نفسها. أضفها بنفسك عبر ملف، صورة خلفية، إضافة صورة.';
 $ec_lang['lpn_inp_drop_dangling']='تشير هذه الأنابيب إلى ملتقى غير موجود في الملف، لذا استُبعدت.';
 $ec_lang['lpn_inp_drop_units']='وحدة التدفق المذكورة في هذا الملف ليست معروفة لدى هذه الصفحة، لذا قُرئ كل رقم على أنه بالغالون في الدقيقة. تحقق من كل رقم قبل استخدام النتائج.';
-$ec_lang['lpn_inp_drop_anchor_missing']='كان هذا النص مرتبطاً بملتقى أو خزان أو صهريج غير موجود في الملف. وصل كنص حر في المكان الذي وضعه الملف فيه، ولم يعد مرتبطاً بشيء.';
+$ec_lang['lpn_inp_drop_anchor_missing']='كان هذا النص مرتبطاً بملتقى أو خزان أو صهريج غير موجود في الملف. استُورد نصاً حراً عند الموقع المذكور في الملف، وهو غير مرتبط بأي عنصر.';
 $ec_lang['lpn_import_notes_heading']='قُرئ هذا المشروع من ملف EPANET. بعض ما يحمله ذلك الملف محفوظ لكنه غير مستخدَم في هذه الصفحة.';
 // {name} is a project name; word order is the translator's to choose. Says where the user landed,
 // the same way lpn_status_deleted_opened does -- an opened file becomes a NEW project here, and
@@ -1948,7 +1948,7 @@ $ec_lang['lpn_close_save_confirm']='هل تريد حفظ تغييراتك في {
 $ec_lang['lpn_close_browser_confirm']='يُحفظ {name} في هذا المتصفح فقط. إذا أغلقته دون حفظه في ملف، فسيضيع نهائياً.';
 $ec_lang['lpn_close_discard']='إغلاق دون حفظ';
 $ec_lang['lpn_cancel']='إلغاء';
-$ec_lang['lpn_revert_confirm']='هل تريد التخلص من التغييرات التي أجريتها وإعادة تحميل {file} من القرص؟';
+$ec_lang['lpn_revert_confirm']='هل تريد تجاهل التغييرات التي أجريتها وإعادة تحميل {file} من القرص؟';
 // A file project whose page has been reloaded. Browsers do not stay connected to a file across a
 // page load, so the link is gone even though we still know the name. Says what to do, not just what
 // happened.
@@ -2006,7 +2006,7 @@ $ec_lang['lpn_lock_open_choices_ask']='"اسأل" يُخبر من فتح هذا 
 $ec_lang['lpn_lock_ask']='اسأل';
 // Asked at the one moment the name is useful, and SENT rather than stored: nothing new is written to
 // this computer for it, which is the whole point of moving the question here.
-$ec_lang['lpn_lock_ask_prompt']='من نقول إنه يسأل؟ الأحرف الأولى من اسمك مثالية. تُحفَظ مع قفل هذا الملف على خادمنا، لمن يكون قد فتحه، وتُحذَف خلال 30 يوماً.';
+$ec_lang['lpn_lock_ask_prompt']='من نقول إنه يطلب الفتح؟ أدخل أحرفك الأولى مثلاً. تُحفظ مع قفل هذا الملف على خادمنا، لمن يفتحه، وتُحذف خلال 30 يوماً.';
 $ec_lang['lpn_lock_ask_sent']='طلبنا ممن فتح هذا الملف إغلاقه. سيرونه خلال دقيقة، إذا كانت صفحتهم لا تزال مفتوحة. لم يتغيّر شيء آخر، والملف لا يزال لهم حتى يغلقوه.';
 $ec_lang['lpn_lock_ask_failed']='تعذّر تسليم رسالتك. إما أنه لا أحد يفتح هذا الملف الآن، أو تعذّر الوصول إلى الخادم.';
 // **A CANCEL THAT LEAVES NO RESIDUE IS THE DEFECT** (ROADMAP Task 704, Ida's diagnosis). Backing
@@ -2034,28 +2034,28 @@ $ec_lang['lpn_msglog_note']='الأحدث أولاً. تحتفظ هذه الصف
 // at it, and it never offers to save over the other person\'s file. It cannot -- their file has moved
 // on since you opened it, so writing yours over it would destroy their work. What you CAN do is
 // everything else, including changing the network and keeping it as a file of your own.
-$ec_lang['lpn_lock_readonly_banner']='للقراءة فقط: {name} فتح هذا الملف. يمكنك تغيير أي شيء تريده هنا، لكن لا يمكنك الحفظ. استخدم ملف، حفظ باسم للحفظ في ملف آخر.';
+$ec_lang['lpn_lock_readonly_banner']='للقراءة فقط: {name} فاتح هذا الملف. يمكن تغيير أي شيء هنا، لكن لا يمكن حفظه. استخدم ملف، حفظ باسم للحفظ في ملف آخر.';
 // Opening a file we could not lock is the moment of danger (Tom, 2026-08-03): from then on nothing
 // stops a colleague editing the same file. Editing still works -- an unreachable server must never
 // take the calculator away -- so this warns rather than blocks, and promises the follow-up that
 // lpn_lock_restored keeps.
-$ec_lang['lpn_lock_unavailable']='تنبيه: تعذّر الوصول إلى الخادم للتحقق من قفل هذا المشروع أو إنشائه، فلا شيء يمنع زميلاً من تعديل الملف نفسه في الوقت نفسه. ستُبلَّغ إذا عاد القفل للعمل.';
-$ec_lang['lpn_lock_storage_error']='تنبيه: لا يستطيع هذا الموقع حفظ سجلات القفل، فلا شيء يمنع زميلاً من تعديل الملف نفسه في الوقت نفسه. هذا خلل في إعداد الخادم، وليس شيئاً يمكنك إصلاحه هنا — مجلد القفل غير قابل للكتابة من قبل خادم الويب.';
-$ec_lang['lpn_lock_full_error']='تنبيه: نفدت مساحة هذا الموقع لتسجيل من فتح أي مشروع، فلا شيء يمنع زميلاً من تعديل الملف نفسه في الوقت نفسه. هذا خلل في إعداد الخادم، وليس شيئاً يمكنك إصلاحه هنا.';
-$ec_lang['lpn_lock_not_asked']='لا يعمل القفل لهذا المشروع، فلا شيء يمنع زميلاً من تعديل الملف نفسه في الوقت نفسه. ليس لهذا المشروع معرّف بعد، وحفظه في ملف يمنحه واحداً.';
-$ec_lang['lpn_lock_restored']='عاد القفل للعمل، وأصبح هذا الملف الآن لك لتحفظ فيه.';
+$ec_lang['lpn_lock_unavailable']='تنبيه: تعذّر الوصول إلى الخادم للتحقق من قفل هذا المشروع أو إنشائه، لذا يمكن لمستخدم آخر تعديل الملف نفسه في الوقت نفسه. تظهر رسالة إذا استؤنف القفل.';
+$ec_lang['lpn_lock_storage_error']='تنبيه: لا يستطيع هذا الموقع حفظ سجلات القفل، لذا يمكن لمستخدم آخر تعديل الملف نفسه في الوقت نفسه. هذا خلل في إعداد الخادم لا يمكن تصحيحه من هذه الصفحة: مجلد القفل غير قابل للكتابة من خادم الويب.';
+$ec_lang['lpn_lock_full_error']='تنبيه: لم يبقَ لهذا الموقع مساحة تخزين لسجلات القفل، لذا يمكن لمستخدم آخر تعديل الملف نفسه في الوقت نفسه. هذا خلل في إعداد الخادم لا يمكن تصحيحه من هذه الصفحة.';
+$ec_lang['lpn_lock_not_asked']='القفل غير مفعَّل لهذا المشروع، لذا يمكن لمستخدم آخر تعديل الملف نفسه في الوقت نفسه. ليس لهذا المشروع معرّف بعد؛ ويمنحه حفظه في ملف واحداً.';
+$ec_lang['lpn_lock_restored']='عاد القفل، ويمكن الآن حفظ هذا الملف.';
 $ec_lang['lpn_lock_dismiss']='إخفاء هذه الرسالة';
 // Shown once per browser, before the first file picker opens. Three short paragraphs on purpose:
 // this is the one place the whole file-and-lock idea is explained, and it has to survive translation
 // into 26 languages, so it says one thing per sentence and avoids every word of jargon it can.
-$ec_lang['lpn_file_training_1']='سيُحفظ مشروعك في ملف على هذا الجهاز. يُحفظ عندما تطلب ذلك، ولا يُحفظ في أي وقت آخر، فلا يُكتب في ذلك الملف شيء دون علمك.';
-$ec_lang['lpn_file_training_2']='لكي لا يعدّل شخصان ملفاً واحداً في الوقت نفسه، يتتبّع هذا الموقع من فتحه. إذا كان شخص ما قد فتحه بالفعل، لا يزال بإمكانك فتحه ومشاهدته، أو الاحتفاظ بنسخة خاصة بك.';
+$ec_lang['lpn_file_training_1']='سيُحفظ المشروع في ملف على هذا الجهاز. لا يُحفظ إلا عند حفظك له، ولا في أي وقت آخر.';
+$ec_lang['lpn_file_training_2']='لكي لا يحرر شخصان ملفاً واحداً في الوقت نفسه، يتتبّع هذا الموقع من فتحه. إذا كان شخص ما قد فتحه بالفعل، فلا يزال بالإمكان فتحه للاطلاع عليه، أو نسخه للاحتفاظ بنسخة.';
 // Said BEFORE it happens, because it is alarming and unexplained when it happens (Tom, 2026-08-04:
 // "hawsedc.com will be able to edit ... is a canned browser warning whose confusing meaning we
 // cannot fix"). He is right that we cannot fix it -- it is the browser asking, in the browser\'s
 // own words, and there is no way to reword it, suppress it, or pre-approve it. What we CAN do is
 // warn that it is coming and say it is normal, which is what this line is for.
-$ec_lang['lpn_file_training_permission']='في أول مرة تحفظ فيها، سيسألك متصفحك عمّا إذا كان يجوز لهذا الموقع تعديل الملف. هذا السؤال يأتي من المتصفح لا منّا، والموافقة عليه هي ما يسمح لأمر الحفظ بكتابة عملك مرة أخرى في الملف. عادةً ما يُسأل مرة واحدة فقط لكل ملف.';
+$ec_lang['lpn_file_training_permission']='عند أول حفظ، يسأل المتصفح عمّا إذا كان يجوز لهذا الموقع تعديل الملف. يصدر الطلب عن المتصفح لا عن هذا الموقع، والإذن مطلوب لكي يكتب أمر الحفظ في الملف. يُطلب عادةً مرة واحدة فقط لكل ملف.';
 // Corrected 2026-08-04: the old wording said anyone you SEND THE FILE TO can see this name, which is
 // false -- the name is never written into the project file. It is held in this browser and on this
 // site, and it is shown to whoever opens the SAME file. That is still public enough to be worth
@@ -2120,7 +2120,7 @@ $ec_lang['lpn_notes_1_term']='كيف تُحل';
 // lpn_time_no_engine and lpn_engine_unavailable.** A note everybody reads should not carry a
 // failure explanation that the failure itself delivers. Task 605's rule is untouched -- every
 // sentence a reader meets only when something has gone wrong SURVIVES, and those two are it.
-$ec_lang['lpn_notes_1_def']='يحسب حلّال EPANET هذه الشبكة. اضبط مدة تشغيل كلية ليُحسب كل خطوة إبلاغ بالتتابع: تمتلئ الصهاريج وتُفرَّغ، وتتبع الطلبات أنماطها، ويعيد شريط الأدوات تشغيل التسلسل.';
+$ec_lang['lpn_notes_1_def']='تُحَلّ هذه الشبكة بحلّال EPANET. عند ضبط مدة تشغيل كلية، تُحسب كل خطوة زمنية للإبلاغ بالتتابع: تمتلئ الصهاريج وتفرغ، وتتبع الطلبات أنماطها، ويعيد شريط الأدوات عرض التشغيل.';
 $ec_lang['lpn_notes_2_term']='ما لا يقوم به';
 // **"Water quality chemistry is not modeled" WAS FLATLY FALSE** (Tom, 2026-09-10: *"Wrong
 // facts."*). A reacting chemical, bulk and wall reaction coefficients and a limiting
@@ -2132,7 +2132,7 @@ $ec_lang['lpn_notes_2_term']='ما لا يقوم به';
 // omission is a public claim about scope, and this file's history says those go wrong in the
 // confident direction; the one omission stated here is the one nothing in this tree implements
 // or claims to. Do not lengthen the list without him.
-$ec_lang['lpn_notes_2_def']='تُنمذَج جودة المياه: عمر الماء، وتتبع المصدر، ومادة كيميائية تتفاعل في جدران الأنابيب وفي جسم الماء. أما الاندفاع المائي (المطرقة المائية) فلا يُنمذَج: كل إجابة هنا هي لماء يتدفق بثبات بالفعل، لا لموجة الضغط عند إغلاق صمام فجأة.';
+$ec_lang['lpn_notes_2_def']='تُنمذَج جودة المياه: عمر الماء، وتتبع المصدر، ومادة كيميائية تتفاعل عند جدار الأنبوب وفي متن التدفق. لا تُنمذَج الاندفاعات المائية والمطرقة المائية: كل النتائج للتدفق الثابت أو بطيء التغير، لا لموجة الضغط العابرة الناتجة عن الإغلاق السريع للصمامات.';
 $ec_lang['lpn_notes_3_term']='حفظ المشاريع';
 $ec_lang['lpn_notes_3_def']='كل مشروع هو تبويب، وكل تبويب يُحفظ في هذا المتصفح أثناء عملك. يؤدي مسح بيانات متصفحك إلى حذفها جميعاً، فاحتفظ بعملك في ملف: ملف، حفظ باسم. تعني علامة النجمة على تبويب أنه يحمل تغييرات غير موجودة في ملف. لا يُكتب شيء في ملف أبداً ما لم تطلب ذلك. في بعض المتصفحات يتصل المشروع بالملف الذي تحفظه فيه، ويكتب أمر ملف، حفظ في ذلك الملف نفسه من حينها؛ وفي متصفحات أخرى لا يمكن الاتصال، فيكون الحفظ معطّلاً ولا يتوفر إلا حفظ باسم. عندما يُحفظ ملف مشروع على قرص مشترك، تخبرك هذه الصفحة إذا كان زميل قد فتحه بالفعل، حتى لا يكتب شخصان فوق عمل بعضهما.';
 // Pump curve documentation (Tom, 2026-07-30: "How should we document the curve equations?").
@@ -2190,8 +2190,8 @@ $ec_lang['lpn_diag_unreachable']='لا يوجد مسار من هذه العقد 
 $ec_lang['lpn_engine_fetching']='جارٍ تحميل حلّال EPANET. يُنزَّل مرة واحدة ثم يُحفظ على هذا الجهاز، ليعمل لاحقاً دون اتصال بالإنترنت.';
 $ec_lang['lpn_engine_ready']='حلّال EPANET موجود الآن على هذا الجهاز، ويعمل دون اتصال بالإنترنت.';
 $ec_lang['lpn_engine_fetching_valve']='جارٍ تحميل حلّال EPANET، ليتم حل هذا الصمام الآن ودون اتصال بالإنترنت لاحقاً.';
-$ec_lang['lpn_engine_ready_valve']='حلّال EPANET موجود الآن على هذا الجهاز. الصمامات التي تفتح وتغلق من تلقاء نفسها ستعمل دون اتصال بالإنترنت.';
-$ec_lang['lpn_engine_unavailable']='تعذّر تحميل حلّال EPANET، وهو ما يحل الصمامات التي تفتح وتغلق من تلقاء نفسها. اتصل بالإنترنت مرة واحدة ليُحفظ على هذا الجهاز بعد ذلك.';
+$ec_lang['lpn_engine_ready_valve']='حلّال EPANET موجود الآن على هذا الجهاز. يمكن الآن حلّ صمامات التحكم في الضغط والتدفق (PRV وPSV وFCV) دون اتصال بالإنترنت.';
+$ec_lang['lpn_engine_unavailable']='تعذّر تحميل حلّال EPANET، المطلوب لحلّ صمامات التحكم في الضغط والتدفق (PRV وPSV وFCV). بعد اتصال واحد بالإنترنت، يُحفظ الحلّال على هذا الجهاز.';
 $ec_lang['lpn_engine_needed_loading']='يجري تحميل حلّال EPANET أثناء بنائك للشبكة. ستتوفر النتائج عند اكتمال التحميل.';
 // **THE WAIT, SAID OUT LOUD, WITH A NUMBER ON IT** (ROADMAP Task 608). The first sentence is Tom's
 // own, 2026-09-08, and "Continue working" is the half that matters: it says the page is not frozen.
@@ -2204,8 +2204,8 @@ $ec_lang['lpn_engine_wait']='جارٍ تحميل الحلّال. تتأخر ال
 $ec_lang['lpn_engine_wait_pct']='تم تحميل الحلّال بنسبة {percent}%.';
 $ec_lang['lpn_engine_wait_bytes']='تم تحميل {kb} كيلوبايت من الحلّال حتى الآن. الإجمالي غير متاح، فنسبة الاكتمال غير معروفة.';
 $ec_lang['lpn_engine_needed_failed']='لم يُحمَّل حلّال EPANET بعد، ولا يمكن تحميله الآن، وهذه الشبكة لا يمكن حلّها إلا به. سيُحمَّل عندما تكون متصلاً بالإنترنت.';
-$ec_lang['lpn_diag_valve_needs_epanet']='تفتح هذه الصمامات وتغلق من تلقاء نفسها، ولا يمكن حسابها إلا بحلّال EPANET. تعذّر تحميل حلّال EPANET، لذا هذه النتائج مفقودة:';
-$ec_lang['lpn_diag_valve_on_fixed_head']='هذه الصمامات موصولة مباشرة بخزان أو صهريج يحدد منسوب الماء هناك أصلاً، فلا يبقى للصمام ما يتحكم به. ضع أنبوباً قصيراً بين الصمام والخزان أو الصهريج:';
+$ec_lang['lpn_diag_valve_needs_epanet']='هذه صمامات تحكم في الضغط أو التدفق، ولا يمكن حسابها إلا بحلّال EPANET. تعذّر تحميل حلّال EPANET، لذا هذه النتائج مفقودة:';
+$ec_lang['lpn_diag_valve_on_fixed_head']='هذه الصمامات موصولة مباشرة بخزان أو صهريج يثبّت الخط المتدرج الهيدروليكي عند تلك العقدة، فلا يبقى للصمام ما يتحكم به. ضع أنبوباً قصيراً بين الصمام والخزان أو الصهريج:';
 $ec_lang['lpn_diag_not_converged']='لم يُعثر على حل. تحقق من وجود قيم مستحيلة في الواقع، مثل قطر يساوي صفراً.';
 // **THE NUMBERS ARE DRAWN AND MARKED, NOT THROWN AWAY** (ROADMAP Task 565). A solve that did not
 // converge still produced the last iterate, and that is every number this page has -- refusing to
@@ -2235,7 +2235,7 @@ $ec_lang['lpn_field_to']='إلى';
 // different units, and one shared label would have to be vague enough to cover all three.
 $ec_lang['lpn_field_valve_type']='نوع الصمام';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_field_valve_type_tip']='وظيفة الصمام. يحافظ صمام التخنيق على فاقد ثابت. أما الأنواع الثلاثة الأخرى فتحافظ على ضغط أو تدفق، وتفتح بالكامل أو تغلق أو تنغلق جزئياً مع تغيّر الماء. يضع تغيير النوع رقماً بدئياً جديداً في الإعداد أدناه، لأن الضغط ليس تدفقاً، ولا أيّ منهما معامل فاقد.';
+$ec_lang['lpn_field_valve_type_tip']='نوع الصمام. يطبّق صمام التخنيق (TCV) فاقداً ثابتاً. وتحافظ PRV وPSV وFCV على ضغط أو تدفق، وتفتح بالكامل أو تغلق أو تنغلق جزئياً مع تغيّر الظروف الهيدروليكية. يزيل PBV ضغطاً ثابتاً، ويتبع GPV منحنى فقدان الضغط. تتحكم الأنواع في خصائص هيدروليكية مختلفة، لذا قد تضيع الإعدادات عند تغيير النوع.';
 // THE ENGLISH IS ELLIPTICAL ON PURPOSE -- the noun "valve" is dropped because the dropdown above
 // already says "Valve type" -- so a translator meets a bare modifier with no head noun, and
 // "throttle" alone pulls hard toward a car accelerator. Each _syn supplies the noun plus alternates
@@ -2252,19 +2252,19 @@ $ec_lang['lpn_valve_type_gpv']='للأغراض العامة (GPV)';
 $ec_lang['lpn_field_valve_setting_drop']='انخفاض الضغط';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_field_valve_setting_drop_tip']='الضغط الذي يزيله الصمام. يزيل صمام كاسر الضغط دائماً هذا المقدار بالضبط من الضغط، أياً كان اتجاه سريان الماء. إنه انخفاض عبر الصمام، لا ضغط يُحافظ عليه.';
-$ec_lang['lpn_inp_drop_gpv_curve']='يشير هذا الصمام إلى منحنى فقدان ضغط غير موجود في الملف. دخل الصمام دون منحنى، فيبقى مفتوحاً بالكامل حتى تمنحه واحداً.';
+$ec_lang['lpn_inp_drop_gpv_curve']='يشير هذا الصمام إلى منحنى فقدان ضغط غير موجود في الملف. استُورد الصمام بلا منحنى، فيبقى مفتوحاً بالكامل حتى يُختار منحنى.';
 $ec_lang['lpn_gpv_curve_source']='منحنى فقدان ضغط الصمام';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_gpv_curve_source_tip']='المنحنى في مربع المكتبات الذي يحدد كم علواً يفقده هذا الصمام عند كل تدفق. يمكن لعدة صمامات أن تستخدم المنحنى نفسه، وتعديله هناك يغيّرها كلها. لا يحمل هذا الصمام سوى الإشارة إليه؛ أما النقاط نفسها فتُقرأ وتُعدَّل تحت المكتبات، المنحنيات.';
+$ec_lang['lpn_gpv_curve_source_tip']='المنحنى في مربع المكتبات الذي يعطي فقدان الضغط عبر هذا الصمام عند كل تدفق. يمكن لعدة صمامات استخدام المنحنى نفسه، وتعديله هناك يغيّرها كلها.';
 $ec_lang['lpn_field_valve_setting_pressure']='إعداد الضغط';
-$ec_lang['lpn_field_valve_setting_pressure_tip']='الضغط الذي يحافظ عليه الصمام. يحافظ صمام تخفيض الضغط على ضغط الجانب المصبّي عند هذه القيمة أو أقل منها. ويحافظ صمام مواصلة الضغط على ضغط الجانب المنبعي عند هذه القيمة أو أكثر منها.';
+$ec_lang['lpn_field_valve_setting_pressure_tip']='يُبقي صمام تخفيض الضغط الضغط على جانبه المصبّي عند هذه القيمة أو دونها. ويُبقي صمام مواصلة الضغط الضغط على جانبه المنبعي عند هذه القيمة أو فوقها.';
 $ec_lang['lpn_field_valve_setting_flow']='إعداد التدفق';
-$ec_lang['lpn_field_valve_setting_flow_tip']='أقصى كمية ماء يسمح الصمام بمرورها. عندما يكون التدفق المطلوب أقل من هذا، يبقى الصمام مفتوحاً بالكامل ولا يضيف أي فاقد.';
+$ec_lang['lpn_field_valve_setting_flow_tip']='أقصى تدفق عبر الصمام. عندما يقل التدفق عن هذه القيمة، يكون الصمام مفتوحاً بالكامل ولا يضيف أي فاقد.';
 $ec_lang['lpn_field_valve_setting']='الإعداد';
 $ec_lang['lpn_field_valve_setting_loss']='معامل الفاقد';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_field_valve_setting_loss_tip']='مقدار العلو الذي يزيله صمام التخنيق، ويُحتسب كمضاعف لعلو السرعة. استخدم 0 لصمام مفتوح بالكامل. هذا الرقم وحده هو كامل فاقد صمام التخنيق.';
-$ec_lang['lpn_field_valve_diameter_tip']='عرض الفتحة داخل الصمام. تُحسب سرعة الماء خلال الصمام من هذا العرض، ويُشتق الفاقد من تلك السرعة.';
+$ec_lang['lpn_field_valve_diameter_tip']='قطر فتحة الصمام. تُحسب السرعة عبر الصمام من هذا القطر، ويُحسب الفاقد من تلك السرعة.';
 $ec_lang['lpn_field_valve_km_tip']='الفاقد من جسم الصمام عندما يكون مفتوحاً بالكامل، إضافة إلى ما يزيله إعداد الصمام. يُحتسب كمضاعف لعلو السرعة. استخدم 0 لتجاهله.';
 $ec_lang['lpn_field_km']='معامل الفاقد الموضعي، k';
 // Short form of the same concept, for the two NARROW uses: the Labels checkbox list and the on-map
@@ -2279,7 +2279,7 @@ $ec_lang['lpn_field_km_short']='الفاقد الموضعي، k';
 // one curve name the same curve now, so there is no borrow to describe.
 $ec_lang['lpn_pump_curve_source']='منحنى علو المضخة';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_pump_curve_source_tip']='المنحنى في مربع المكتبات الذي يحدد كم علواً تضيفه هذه المضخة عند كل تدفق. يمكن لعدة مضخات أن تستخدم المنحنى نفسه، وتعديله هناك يغيّرها كلها. لا تحمل هذه المضخة سوى الإشارة إليه؛ أما النقاط نفسها فتُقرأ وتُعدَّل تحت المكتبات، المنحنيات.';
+$ec_lang['lpn_pump_curve_source_tip']='المنحنى في مربع المكتبات الذي يعطي العلو الذي تضيفه هذه المضخة عند كل تدفق. يمكن لعدة مضخات استخدام المنحنى نفسه، وتعديله هناك يغيّرها كلها.';
 // **"THE NOTES BELOW" DO NOT EXIST ON THIS PAGE** (Tom, 2026-09-05: *"There are no notes below.
 // It's in Help, Notes on this page."*). Every other calculator in this suite is a form with its
 // notes printed under it, and this sentence was written in that habit; the map page is a full-window
@@ -2354,32 +2354,32 @@ $ec_lang['lpn_pump_effic_unstated']='تشير هذه المضخة إلى منح�
 // from a "Mode:" prefix + the tool's own label, per CLAUDE.md's concept-level label reuse rule --
 // word order/grammar around a mode name varies by language, so each mode gets its own full string.
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_mode_select']='الوضع: تحديد. انقر عنصراً أو تسمية لعرضه أو تغييره. اسحب لتحريك عقدة أو نقطة انعطاف أو تسمية. استخدم أداة نقاط الانعطاف لإضافة انحناءات الأنبوب أو إزالتها.';
-$ec_lang['lpn_mode_delete']='الوضع: حذف. انقر عنصراً لإزالته.';
+$ec_lang['lpn_mode_select']='الوضع: تحديد. حدّد عنصراً أو تسمية لعرضه أو تغييره. اسحب لتحريك عقدة أو تسمية. استخدم أداة نقاط الانعطاف لإضافة انحناءات الأنبوب أو إزالتها.';
+$ec_lang['lpn_mode_delete']='الوضع: حذف. حدّد عنصراً لإزالته.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_mode_vertices']='الوضع: نقاط الانعطاف. تظهر نقاط انعطاف كل أنبوب كمقابض مربعة صغيرة. انقر على أنبوب لإضافة نقطة انعطاف، أو انقر على مقبض لإزالتها، أو اسحب مقبضاً لتحريكه. لا يتغيّر أي شيء آخر على الخريطة في هذا الوضع.';
-$ec_lang['lpn_mode_zoom_window']='الوضع: تكبير منطقة. انقر زاويتين متقابلتين لمربع، أو اسحب واحداً، على الخريطة للتكبير عليه.';
+$ec_lang['lpn_mode_vertices']='الوضع: نقاط الانعطاف. تظهر نقاط انعطاف كل أنبوب مقابض مربعة صغيرة. حدّد نقطة على أنبوب لإضافة نقطة انعطاف، أو حدّد مقبضاً لإزالتها، أو اسحب مقبضاً لتحريكه. لا يمكن تغيير أي شيء آخر على الخريطة في هذا الوضع.';
+$ec_lang['lpn_mode_zoom_window']='الوضع: تكبير منطقة. حدّد زاويتين متقابلتين لمربع، أو اسحب واحداً، على الخريطة للتكبير عليه.';
 // One-shot notice when the Delete key is pressed with nothing picked (Task 415). It has to name the
 // gesture, because the whole point of the change is that the order is now subject, then verb.
-$ec_lang['lpn_select_first']='لا شيء محدد. انقر عنصراً على الخريطة أولاً، ثم اضغط حذف.';
-$ec_lang['lpn_mode_add_junction']='الوضع: إضافة ملتقى. انقر على الخريطة لوضع ملتقى. انتقل إلى وضع التحديد لتغيير العناصر والتسميات أو تحريكها.';
-$ec_lang['lpn_mode_add_reservoir']='الوضع: إضافة خزان. انقر على الخريطة لوضع خزان. انتقل إلى وضع التحديد لتغيير العناصر والتسميات أو تحريكها.';
-$ec_lang['lpn_mode_add_tank']='الوضع: إضافة صهريج. انقر على الخريطة لوضع صهريج. انتقل إلى وضع التحديد لتغيير العناصر والتسميات أو تحريكها.';
-$ec_lang['lpn_mode_add_pipe']='الوضع: إضافة أنبوب. انقر عقدة، ثم عقدة أخرى، لتوصيلهما. انقر مساحة فارغة بينهما لثني الخط، أو اضغط Escape للبدء من جديد. انتقل إلى وضع التحديد لتغيير العناصر والتسميات أو تحريكها.';
-$ec_lang['lpn_mode_add_pump']='الوضع: إضافة مضخة. انقر عقدة، ثم عقدة أخرى، لتوصيلهما. انقر مساحة فارغة بينهما لثني الخط، أو اضغط Escape للبدء من جديد. انتقل إلى وضع التحديد لتغيير العناصر والتسميات أو تحريكها.';
-$ec_lang['lpn_mode_add_valve']='الوضع: إضافة صمام. انقر عقدة، ثم عقدة أخرى، لتوصيلهما. انقر مساحة فارغة بينهما لثني الخط، أو اضغط Escape للبدء من جديد. انتقل إلى وضع التحديد لتغيير العناصر والتسميات أو تحريكها.';
+$ec_lang['lpn_select_first']='لم يُحدَّد شيء. حدّد عنصراً على الخريطة أولاً، ثم اضغط حذف.';
+$ec_lang['lpn_mode_add_junction']='الوضع: إضافة ملتقى. حدّد موقعاً على الخريطة لوضع ملتقى. انتقل إلى وضع التحديد لتغيير العناصر والتسميات أو تحريكها.';
+$ec_lang['lpn_mode_add_reservoir']='الوضع: إضافة خزان. حدّد موقعاً على الخريطة لوضع خزان. انتقل إلى وضع التحديد لتغيير العناصر والتسميات أو تحريكها.';
+$ec_lang['lpn_mode_add_tank']='الوضع: إضافة صهريج. حدّد موقعاً على الخريطة لوضع صهريج. انتقل إلى وضع التحديد لتغيير العناصر والتسميات أو تحريكها.';
+$ec_lang['lpn_mode_add_pipe']='الوضع: إضافة أنبوب. حدّد عقدة بداية ثم عقدة نهاية لتوصيلهما. حدّد نقاطاً في المساحة الفارغة بينهما لثني الخط، أو اضغط Escape للبدء من جديد. انتقل إلى وضع التحديد لتغيير العناصر والتسميات أو تحريكها.';
+$ec_lang['lpn_mode_add_pump']='الوضع: إضافة مضخة. حدّد عقدة بداية ثم عقدة نهاية لتوصيلهما. حدّد نقاطاً في المساحة الفارغة بينهما لثني الخط، أو اضغط Escape للبدء من جديد. انتقل إلى وضع التحديد لتغيير العناصر والتسميات أو تحريكها.';
+$ec_lang['lpn_mode_add_valve']='الوضع: إضافة صمام. حدّد عقدة بداية ثم عقدة نهاية لتوصيلهما. حدّد نقاطاً في المساحة الفارغة بينهما لثني الخط، أو اضغط Escape للبدء من جديد. انتقل إلى وضع التحديد لتغيير العناصر والتسميات أو تحريكها.';
 // Text was wrong (Tom, 2026-07-30): "click a node first to anchor it there" implied a two-click
 // sequence (click node, THEN click to place), but placing near a node anchors it in that ONE click.
-$ec_lang['lpn_mode_add_text']='الوضع: إضافة نص. انقر على الخريطة لوضع نص. انقر بالقرب من عقدة لإلحاق النص بتلك العقدة. انتقل إلى وضع التحديد لتغيير العناصر والتسميات أو تحريكها.';
+$ec_lang['lpn_mode_add_text']='الوضع: إضافة نص. حدّد موقعاً على الخريطة لوضع نص. حدّد موقعاً قرب عقدة لإلحاق النص بتلك العقدة. انتقل إلى وضع التحديد لتغيير العناصر والتسميات أو تحريكها.';
 // Toolbar button tips (Tom, 2026-07-30): hover/tap explanations on the two buttons a new user is
 // most likely to miss the point of -- that Select is what you use to edit/move things, and that a
 // label itself can be dragged. Both economize on translation for later, per CLAUDE.md's tip-only
 // whole-label-wrap convention -- the button itself is already the click target (no separate "?"
 // glyph needed), so the tip goes straight on the button as a title, matched to the .ec-help class.
-$ec_lang['lpn_tip_select']='استخدم هذا الوضع لتغيير الأشياء على الخريطة وتحريكها وسحبها. هذا هو الوضع الذي تعود إليه الصفحة تلقائياً: فهي تعود إليه من تلقاء نفسها بعد بعض الإجراءات، مثل فتح مشروع. الضغط على [Esc] مرة ثانية يُلغي تحديد أي شيء محدد.';
+$ec_lang['lpn_tip_select']='استخدم هذا الوضع لتغيير عناصر الخريطة وتحريكها وسحبها أو لتحريك الخريطة. هذا هو الوضع الافتراضي للخريطة. الضغط على Esc مرة ثانية يلغي تحديد أي شيء محدد.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_field_auto']='تلقائي';
-$ec_lang['lpn_method_switch_confirm']='لا يغيّر تغيير طريقة الاحتكاك أرقام الخشونة المكتوبة أصلاً على أنابيبك، وخشونة طريقة ما لا معنى لها في طريقة أخرى. تحقّق من كل أنبوب بعد هذا. أتريد تغييرها رغم ذلك؟';
+$ec_lang['lpn_method_switch_confirm']='لا يغيّر تغيير طريقة الاحتكاك أرقام الخشونة المدخلة أصلاً على أنابيبك، وخشونة طريقة ما لا معنى لها في طريقة أخرى. تحقق من كل أنبوب بعد ذلك. هل تريد التغيير على أي حال؟';
 // "Closed", not "Shut" (R-224, Tom, 2026-09-24: "we are using different words Shut and Closed.
 // What are the translators supposed to do? EPANET says Closed. So we purge Shut."). "Shut" had been
 // chosen (2026-08-14) because "closed" is a live polysemy INSIDE hydraulics -- a CLOSED CONDUIT is
@@ -2416,7 +2416,7 @@ $ec_lang['lpn_field_lon_abbr']='ط';
 // INPUT as well as a readout. One tip for both boxes, because one sentence is true of both, and it
 // states the thing a reader cannot see: a position is shared by every scenario, exactly as it is
 // when the node is dragged.
-$ec_lang['lpn_field_coord_tip']='اكتب موقع إحداثي لوضع هذه العقدة بدقة. في سيناريو، ينطبق هذا الموقع في ذلك السيناريو وحده، تماماً كسحبها؛ وفي الأساس، يضع العقدة في كل مكان.';
+$ec_lang['lpn_field_coord_tip']='أدخل موقع إحداثي لوضع هذه العقدة بدقة. في سيناريو، ينطبق هذا الموقع في ذلك السيناريو وحده، كما في السحب؛ وفي الأساس، يضع العقدة في كل سيناريو.';
 // Refused, and it says what the range is. Only a geographic project has one: Web Mercator has no
 // finite y at the poles, so a latitude past the cut-off would put the node nowhere at all.
 $ec_lang['lpn_coord_off_world']='هذا خارج الخريطة. يتراوح خط العرض في إسقاط مركاتور الزائف من -85.05 إلى 85.05 ويتراوح خط الطول من -180 إلى 180.';
@@ -2425,7 +2425,7 @@ $ec_lang['lpn_field_text_size']='مضاعف الحجم';
 // from the labeling threshold and this switch is how a note is made to fade out with the generated
 // labels instead. Unticking it is the only way a Text object has ever hidden because of the zoom.
 $ec_lang['lpn_field_text_all_zoom']='إظهار عند كل مستويات التكبير';
-$ec_lang['lpn_field_text_all_zoom_tip']='أبقِ هذا النص على الرسم مهما صغّرت. ألغِ التحديد ليختفي النص مع التسميات الأخرى بمجرد أن يصبح المنظور أوسع من عتبة التسمية المضبوطة تحت الخريطة والصفحة.';
+$ec_lang['lpn_field_text_all_zoom_tip']='أبقِ هذا النص على الرسم مهما صغّرت العرض. ألغِ التحديد لإخفاء النص مع التسميات الأخرى متى اتسع العرض عن عتبة وضع التسميات المضبوطة تحت الخريطة والصفحة.';
 $ec_lang['lpn_tool_labels']='التسميات';
 $ec_lang['lpn_labels_heading_node']='تسميات العقد';
 $ec_lang['lpn_labels_heading_link']='تسميات الوصلات';
@@ -2436,15 +2436,15 @@ $ec_lang['lpn_labels_mark_extrema']='تمييز أعلى القيم وأدناه
 // word not on the page is a word the search cannot reach -- and $ec_lang_syn, the other place the
 // terms could have gone, is invisible to it. Plain English leads and the term is the gloss, which is
 // the same shape as "Minor (local) loss".
-$ec_lang['lpn_labels_mark_extrema_tip']='يرسم خطاً فوق أعلى قيمة لكل خاصية مُسمّاة على الخريطة (خط علوي)، وخطاً تحت أدنى قيمة لتلك الخاصية (خط سفلي)، بحيث تستطيع تمييز الأعلى والأدنى دون قراءة الأرقام.';
+$ec_lang['lpn_labels_mark_extrema_tip']='يعلّم أعلى قيمة لكل خاصية موسومة على الخريطة بخط فوقها (خط علوي)، وأدنى قيمة بخط تحتها (خط سفلي).';
 // "Apply to all" beside each ID prefix (ROADMAP Task 345): an ID prefix normally governs only the assets
 // you draw from now on, and this is the way to say "I meant the ones already here". {n} and
 // {skipped} are whole numbers; {prefix} is the text the user typed.
 $ec_lang['lpn_settings_apply_to_all']='تطبيق على الكل';
 $ec_lang['lpn_settings_apply_to_all_tip']='يحصل كل عنصر من هذا النوع مرسوم بالفعل على معرّف يبدأ بهذا النص. يحتفظ كل عنصر برقمه. يُترك المعرّف الذي لا ينتهي برقم كما هو.';
 $ec_lang['lpn_confirm_apply_prefix']='هل تريد إعادة تسمية {n} عنصراً لتبدأ معرّفاتها بـ {prefix}؟ يحتفظ كل عنصر برقمه.';
-$ec_lang['lpn_prefix_applied']='أُعيدت تسمية {n} عنصراً. تُرك {skipped} غيرها كما هي.';
-$ec_lang['lpn_labels_suffix_gradient_tip']='نص يُضاف بعد تدرّج فقدان الضغط في تسميات الخريطة. لا تكتب علامة النسبة المئوية هنا؛ تُضاف لك عندما تكون الوحدات نسبة مئوية.';
+$ec_lang['lpn_prefix_applied']='أُعيدت تسمية {n} عنصراً. لم يتغير {skipped} غيرها.';
+$ec_lang['lpn_labels_suffix_gradient_tip']='نص يُضاف بعد تدرّج فقدان الضغط في تسميات الخريطة. لا تدخل علامة النسبة المئوية هنا. تُضاف تلقائياً عندما تكون الوحدات نسبة مئوية.';
 $ec_lang['lpn_labels_separator']='نص بين القيم';
 $ec_lang['lpn_labels_separator_tip']='نص بين خاصية والتي تليها في التسمية. مسافة بشكل افتراضي.';
 // The Drop column in the Labels box (ROADMAP Task 397; inverted by Task 445). Both tips say "1 is
@@ -2458,7 +2458,7 @@ $ec_lang['lpn_labels_priority']='الأولوية';
 // learn them (Tom, 2026-08-16). His own draft of this sentence said "lowest flow"; a flow is a link
 // value and this box is on a node row, so it reads as demand here.
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_labels_priority_node_tip']='الترتيب الذي تُترك فيه القيم عندما تتداخل تسميتا عقدتين. تُترك القيمة المرقّمة 1 أولاً. عندما تبقى قيمة واحدة ويظل هناك تداخل، تُخفى تسمية كاملة: التسمية ذات الطلب الأدنى، أو الضغط الأقرب إلى منتصف المدى، أو المنسوب أو العلو الأقرب رقمياً إلى العقد المجاورة.';
+$ec_lang['lpn_labels_priority_node_tip']='الترتيب الذي تُسقَط به القيم عندما لا تتسع التسمية. تُسقَط القيمة المرقّمة 1 أولاً. عندما تبقى قيمة واحدة وتظل تسميتان متداخلتين، تُخفى إحداهما: التي طلبها أقل، أو ضغطها أقرب إلى منتصف المدى، أو منسوبها أو علوها أقرب رقمياً إلى قيم العقد المجاورة.';
 // Column headings for the Labels box rows. Short because they sit over boxes 3.5 to 4.5 em wide, and
 // the row's own field name is the wide column beside them.
 $ec_lang['lpn_labels_col_before']='قبل';
@@ -2473,7 +2473,7 @@ $ec_lang['lpn_labels_show_tip']='الترتيب الذي تظهر فيه الق�
 // Tom's own words for the control (R-331: "a code or a toggle to 'Use units' for the After string").
 // It heads a narrow column and names each row's tick box.
 $ec_lang['lpn_labels_use_units']='استخدام الوحدات';
-$ec_lang['lpn_labels_use_units_tip']='حدّد لإظهار الوحدة في مربع بعد وعلى التسمية، ولإبقائها متوافقة عند تغيّر الوحدات. ألغِ التحديد لكتابة نص بعد خاص بك.';
+$ec_lang['lpn_labels_use_units_tip']='حدّد لإظهار الوحدة في مربع بعد وعلى التسمية، ولتحديثها عند تغيّر الوحدات. ألغِ التحديد لإدخال نص بعد مخصص.';
 // EPANET's own name for a link's starting state, beside the Status row, which is the run's answer.
 $ec_lang['lpn_labels_init_status']='الحالة الابتدائية';
 // The Symbology index, reworked (Tom, R-333: "Node labels, Node colors, Link labels, Link colors,
@@ -2513,7 +2513,7 @@ $ec_lang['lpn_backdrop_scale_entry']='معايرة بملف الإسناد ال�
 // absolute scale commands above: it changes the size by a factor and holds one point still, which
 // is what the last stage of fitting an aerial photograph actually needs.
 $ec_lang['lpn_backdrop_scale_from']='تحجيم من الحجم الحالي، حول نقطة تختارها';
-$ec_lang['lpn_backdrop_scale_from_prompt1']='انقر النقطة على الصورة الخلفية التي يجب أن تبقى في مكانها.';
+$ec_lang['lpn_backdrop_scale_from_prompt1']='حدّد النقطة على الصورة الخلفية التي يجب أن تبقى في مكانها.';
 $ec_lang['lpn_backdrop_scale_from_prompt2']='التحجيم من حجمها الحالي. 1 يبقيها كما هي، 1.1 يكبّرها 10٪، 0.9 يصغّرها 10٪.';
 $ec_lang['lpn_backdrop_scale_entry_prompt']='أدخل حجم البكسل الواحد على الخريطة، أو الصق المحتوى الكامل لملف الإسناد الجغرافي الخاص بالصورة';
 $ec_lang['lpn_backdrop_scale_entry_bad']='اكتب رقماً واحداً لحجم البكسل الواحد على الخريطة، أو الصق كل الأسطر الستة لملف الإسناد الجغرافي.';
@@ -2538,24 +2538,24 @@ $ec_lang['lpn_map_attach_readjust']='إعادة الضبط';
 $ec_lang['lpn_map_attach_readjust_tip']='العودة إلى الخطوة 2 من عملية إرفاق الخريطة.';
 $ec_lang['lpn_map_attach_scale_from']='تغيير الحجم من الحجم الحالي…';
 $ec_lang['lpn_map_attach_scale_from_prompt']='غيّر حجم الخريطة من حجمها الحالي، حول منتصف رسمك. 1 يبقيها كما هي، و1.1 تجعلها أكبر بنسبة 10%، و0.9 تجعلها أصغر بنسبة 10%.';
-$ec_lang['lpn_map_attach_scale_from_bad']='اكتب رقماً واحداً أكبر من الصفر.';
+$ec_lang['lpn_map_attach_scale_from_bad']='أدخل رقماً واحداً أكبر من الصفر.';
 $ec_lang['lpn_map_attach_scale_from_done']='أُعيد تحديد حجم الخريطة، ورسمك وكل إحداثي فيه بقي تماماً كما كان.';
 $ec_lang['lpn_map_attach_none']='لا توجد خريطة عالم مرفقة بهذا المشروع بعد. استخدم الخريطة، خريطة العالم، إرفاق أولاً.';
 $ec_lang['lpn_map_attach_remove']='فصل';
-$ec_lang['lpn_map_attach_remove_tip']='أزل خريطة العالم. يبقى الرسم وإحداثياته دون تغيير في الحالتين.';
+$ec_lang['lpn_map_attach_remove_tip']='افصل خريطة العالم. لا يؤثر ذلك في الشبكة.';
 $ec_lang['lpn_map_attach_done']='أصبحت خريطة العالم الآن خلف رسمك، ومشروعك لم يتغيّر. استخدم الخريطة، خريطة العالم، فصل لإزالتها مرة أخرى.';
-$ec_lang['lpn_map_attach_removed']='زالت خريطة العالم، والرسم تماماً كما كان.';
+$ec_lang['lpn_map_attach_removed']='فُصلت خريطة العالم، ولا تتأثر الشبكة.';
 // **THE CUSTOM GEOREFERENCE WIZARD, IN TOM'S OWN THREE STEPS** (2026-09-18, and
 // dev/tom-coordinate-vocabulary-2026-09-16.md). Georeferencing here means attaching the world map,
 // never converting a coordinate, so every sentence below says what stays still as well as what
 // moves: the drawing does not move, the ground does.
-$ec_lang['lpn_mapgeo_intro']='رسمك على خريطة العالم كله، في المحيط عند خط عرض صفر وخط طول صفر. جِد موقعك أولاً: حرّك وقرّب الخريطة خلف الرسم، أو ابحث باسم مكان، أو اكتب خط عرض وخط طول. الرسم نفسه لا يتحرك.';
-$ec_lang['lpn_mapgeo_step1']='الخطوة 1 من 2: جِد موقعك في العالم';
+$ec_lang['lpn_mapgeo_intro']='الرسم على خريطة العالم كله، في المحيط عند خط العرض صفر وخط الطول صفر. ابحث عن موقع المشروع أولاً: حرّك الخريطة خلف الرسم وكبّرها أو صغّرها، أو ابحث عن اسم مكان، أو أدخل خط عرض وخط طول. الرسم نفسه لا يتحرك.';
+$ec_lang['lpn_mapgeo_step1']='الخطوة 1 من 2: تحديد موقع المشروع';
 $ec_lang['lpn_mapgeo_step2']='الخطوة 2 من 2: لائم الخريطة خلف رسمك';
-$ec_lang['lpn_mapgeo_hint1']='حرّك وقرّب الخريطة خلف رسمك، أو ابحث عن مكان، أو اكتب خط عرض وخط طول. ثم اضغط ضع تقريباً.';
-$ec_lang['lpn_mapgeo_readjust_intro']='رسمك حيث وضعته آخر مرة. لنقله إلى مكان آخر، حرّك وقرّب الخريطة خلف الرسم، أو ابحث باسم مكان، أو اكتب خط عرض وخط طول. الرسم نفسه لا يتحرك.';
+$ec_lang['lpn_mapgeo_hint1']='حرّك الخريطة خلف رسمك وكبّرها أو صغّرها، أو ابحث عن مكان، أو أدخل خط عرض وخط طول. ثم اضغط ضع تقريباً.';
+$ec_lang['lpn_mapgeo_readjust_intro']='الرسم حيث وضعته آخر مرة. لنقله إلى مكان آخر، حرّك الخريطة خلف الرسم وكبّرها أو صغّرها، أو ابحث عن اسم مكان، أو أدخل خط عرض وخط طول. الرسم نفسه لا يتحرك.';
 $ec_lang['lpn_mapgeo_hint2']='اسحب في أي مكان لتحريك الخريطة تحت رسمك. يبقى رسمك وكل إحداثي فيه في مكانه تماماً. اضغط إسناد جغرافي هنا عندما تكون الخريطة صحيحة.';
-$ec_lang['lpn_mapgeo_gestures']='التكبير يحرّك رسمك والخريطة معاً، حتى ترى مدى تطابقهما. السحب يحرّك الخريطة فقط.';
+$ec_lang['lpn_mapgeo_gestures']='يحرّك التكبير الرسم والخريطة معاً، لإظهار مدى انطباقهما. أما السحب فيحرّك الخريطة فقط.';
 // ---- THE SIZE AND TURN DIAL (Tom, 2026-09-18) -------------------------------------------------
 //
 // **A SLIDER, BECAUSE THERE IS NO DIRECT MANIPULATION HERE TO GIVE UP.** His own refutation of the
@@ -2573,19 +2573,19 @@ $ec_lang['lpn_mapgeo_dial_turn']='تدوير الخريطة';
 $ec_lang['lpn_mapgeo_dial_turn_read']='{d} درجة';
 $ec_lang['lpn_mapgeo_dial_size']='حجم الخريطة';
 $ec_lang['lpn_mapgeo_dial_size_read']='{f} ضعف';
-$ec_lang['lpn_mapgeo_dial_help']='حرّك الشريطين، أو اكتب في المربعين أعلاهما، لجعل الخريطة أكبر أو أصغر ولتدويرها. منتصف كل شريط هو خطوة الملاءمة 1 المتروكة، فـ1 و0 تعنيان تركها كما هي. تعمل مفاتيح الأسهم على كليهما.';
+$ec_lang['lpn_mapgeo_dial_help']='حرّك الشريطين، أو أدخل أرقاماً في المربعين فوقهما، لتكبير الخريطة أو تصغيرها وتدويرها. منتصف كل شريط يحتفظ بالملاءمة من الخطوة 1، لذا فالحجم 1 والدوران 0 يعنيان عدم التغيير. تعمل مفاتيح الأسهم على كليهما.';
 $ec_lang['lpn_mapgeo_place']='ضع تقريباً';
 $ec_lang['lpn_mapgeo_finish']='إسناد جغرافي هنا';
-$ec_lang['lpn_mapgeo_cancelled']='عادت خريطة العالم إلى مكانها، ولم يتحرك رسمك أبداً.';
+$ec_lang['lpn_mapgeo_cancelled']='استُعيد موضع الخريطة السابق، ولم يُحرَّك الرسم.';
 $ec_lang['lpn_mapgeo_locked']='أنهِ بزر إسناد جغرافي هنا، أو اضغط إلغاء، قبل تبديل المشاريع أو الحفظ. لا تزال خريطة العالم قيد الوضع.';
-$ec_lang['lpn_backdrop_scale_prompt1']='انقر نقطتين على الصورة الخلفية، مثل طرفي مقياس رسم. ثم اكتب المسافة الحقيقية بينهما.';
+$ec_lang['lpn_backdrop_scale_prompt1']='حدّد نقطتين على الصورة الخلفية، مثل طرفي مقياس رسم. ثم أدخل المسافة الحقيقية بينهما.';
 $ec_lang['lpn_backdrop_scale_prompt2']='المسافة الحقيقية بين النقطتين';
 // Tom's own wording, 2026-08-16. "Base point" is the drafting term and it is what the second step
 // then has a destination FOR; "any point on the background image" did not say that the two steps are
 // one move. The second names the panel it is about to show, so the alert and the panel read as one
 // step rather than two.
-$ec_lang['lpn_backdrop_position_prompt1']='انقر نقطة الأساس (على الصورة) لعملية النقل.';
-$ec_lang['lpn_backdrop_position_prompt2']='اختر طريقة تحديد نقطة الوجهة، ثم انقر متابعة.';
+$ec_lang['lpn_backdrop_position_prompt1']='حدّد نقطة الأساس (على الصورة) للنقل.';
+$ec_lang['lpn_backdrop_position_prompt2']='اختر طريقة تحديد نقطة الوجهة، ثم اختر متابعة.';
 // The standing "you are in the middle of something" bar, shown while a background-image scale or
 // move is waiting for a click. It carries the only visible way out of that state.
 $ec_lang['lpn_backdrop_busy']='جارٍ تعديل الصورة الخلفية.';
@@ -2593,7 +2593,7 @@ $ec_lang['lpn_backdrop_target_label']='حرّك تلك النقطة إلى:';
 $ec_lang['lpn_backdrop_target_node']='عقدة';
 $ec_lang['lpn_backdrop_target_free']='أي نقطة على الخريطة';
 $ec_lang['lpn_backdrop_target_coords']='إحداثيات تكتبها';
-$ec_lang['lpn_backdrop_coords_prompt']='اكتب الإحداثيات X,Y التي يجب أن تنتقل إليها تلك النقطة';
+$ec_lang['lpn_backdrop_coords_prompt']='أدخل الإحداثيات X,Y التي يجب أن تنتقل إليها تلك النقطة';
 $ec_lang['lpn_backdrop_continue']='متابعة';
 $ec_lang['lpn_tool_settings']='الإعدادات';
 $ec_lang['lpn_settings_show_titles']='إظهار عناوين الصفحة';
@@ -2604,7 +2604,7 @@ $ec_lang['lpn_hide_titles']='إخفاء هذه العناوين';
 // The Settings row that turns the selection bubble back on. Its sibling checkbox lives in the
 // bubble and reads 'Show this'; this one has to name what it is talking about.
 $ec_lang['lpn_settings_area_hint']='إظهار مساعدة التحديد';
-$ec_lang['lpn_settings_area_hint_tip']='يُظهر الفقاعة فوق الخريطة التي تبيّن ما ستفعله نقرتك التالية أثناء تحديد منطقة.';
+$ec_lang['lpn_settings_area_hint_tip']='أظهر المطالبة فوق الخريطة التي تبيّن الخطوة التالية أثناء تحديد منطقة.';
 $ec_lang['lpn_settings_id_prefixes']='بادئات المعرّفات';
 // NEVER "Starting values" (Tom, 2026-08-19: "The problem is that it's misleading"). These are what
 // a NEW asset is created with; "starting" reads as the initial condition of a run, which on a
@@ -2616,7 +2616,7 @@ $ec_lang['lpn_settings_defaults']='قيم الإنشاء';
 $ec_lang['lpn_settings_defaults_note']='تُستخدم للعناصر التي تنشئها من الآن فصاعداً. لا تتغيّر العناصر الموجودة.';
 $ec_lang['lpn_settings_push_note']='تُطبَّق فقط الخصائص التي تظهر تسمياتها الآن.';
 $ec_lang['lpn_settings_push_btn']='تطبيق قيم العناصر الجديدة هذه على جميع العناصر الموجودة';
-$ec_lang['lpn_push_confirm']='هل تريد استبدال هذه الخصائص في كل عنصر موجود بالقيم المضبوطة الآن للعناصر الجديدة؟ ستُستبدل القيم التي كتبتها. يمكنك التراجع عن هذا.';
+$ec_lang['lpn_push_confirm']='هل تريد استبدال هذه الخصائص في كل عنصر موجود بالقيم المضبوطة الآن للعناصر الجديدة؟ ستُستبدل القيم التي أدخلتها. يمكن التراجع عن هذا.';
 $ec_lang['lpn_push_properties']='الخصائص:';
 $ec_lang['lpn_push_assets']='العقد والأنابيب:';
 $ec_lang['lpn_push_none_displayed']='لا تظهر أي قيمة ابتدائية كتسمية الآن، فلا يوجد ما يُطبَّق. فعّل تسميات الخصائص التي تريدها في لوحة التسميات، ثم حاول مرة أخرى.';
@@ -2631,7 +2631,7 @@ $ec_lang['lpn_settings_custom_props']='خصائص مخصصة';
 // **THE HEADING'S OWN TIP, AND IT IS TOM'S SENTENCE** (2026-09-13, revision 1 of eleven): it says
 // what a custom property is FOR and that it behaves like every other property, which is the whole
 // of what a reader needs before opening the design table.
-$ec_lang['lpn_settings_custom_props_note']='خصائص تحدّدها بنفسك لأغراضك الخاصة. تُخزَّن مع المشروع والسيناريوهات كسائر الخصائص الأخرى.';
+$ec_lang['lpn_settings_custom_props_note']='خصائص يعرّفها المستخدم. تُخزَّن مع المشروع والسيناريوهات كسائر الخصائص الأخرى.';
 $ec_lang['lpn_cp_design']='تصميم';
 $ec_lang['lpn_cp_design_tip']='صف واحد لكل خاصية مخصصة، ويُفتح كل صف ليعرض: المفتاح، التسمية، ينطبق على، التحقق كـ، سماح أو تقييد، حقل الأحرف الذي يسميه ذلك الاختيار، الحد الأدنى للطول، الحد الأقصى للطول، الحد الأدنى، الحد الأقصى.';
 $ec_lang['lpn_cp_add']='إضافة خاصية مخصصة';
@@ -2645,18 +2645,18 @@ $ec_lang['lpn_cp_unnamed']='غير مسمّاة بعد';
 $ec_lang['lpn_cp_key']='المفتاح';
 $ec_lang['lpn_cp_key_tip']='المفتاح: تُخزَّن الخاصية تحت هذا الاسم. لا يُسمح بالمسافات، وتُضاف بادئة تلقائياً حتى لا يتعارض مفتاحك أبداً مع حقل مدمج.';
 $ec_lang['lpn_cp_label']='التسمية';
-$ec_lang['lpn_cp_label_tip']='التسمية: يرى القارئ هذا في صندوق الخصائص، وفي البحث، وفي رأس عمود الجدول.';
+$ec_lang['lpn_cp_label_tip']='التسمية: تظهر في صندوق الخصائص، وفي البحث، وفي رأس عمود الجدول.';
 $ec_lang['lpn_cp_applies']='ينطبق على';
 $ec_lang['lpn_cp_applies_tip']='ينطبق على: قائمة بادئات معرّفات مفصولة بفواصل للعناصر التي تستخدم هذه الخاصية، مثل J,L,R.';
 $ec_lang['lpn_cp_validate']='التحقق كـ';
 $ec_lang['lpn_cp_validate_tip']='التحقق كـ: يحدد هذا شكل القيمة الصحيحة. تقرأ قواعد حالة الأحرف الأبجدية الإنجليزية فقط، وهذا قيد معلن. اختر عدم التحقق لقبول أي شيء.';
 $ec_lang['lpn_cp_restrict']='تقييد هذه الأحرف';
-$ec_lang['lpn_cp_restrict_tip']='تقييد هذه الأحرف: يجوز أن تستخدم القيمة الأحرف المدرَجة هنا فقط، أو ألا تستخدم أياً منها، حيث يعني "@" أي حرف؛ ويعني "#" أي رقم، ويجب إدراج "-" و"." و"," كلاً على حدة إذا كانت مسموحة؛ ويجب أن تقع أي أحرف مسافة بيضاء بين أحرف أخرى.';
+$ec_lang['lpn_cp_restrict_tip']='تقييد هذه الأحرف:';
 $ec_lang['lpn_cp_restrict_mode']='سماح أو تقييد';
 $ec_lang['lpn_cp_restrict_mode_tip']='سماح أو تقييد: الأحرف المعطاة إما أن تكون الوحيدة التي يجوز أن تستخدمها القيمة أو تلك التي لا يجوز أن تستخدمها.';
 $ec_lang['lpn_cp_restrict_allow']='السماح بهذه الأحرف فقط';
 $ec_lang['lpn_cp_minlength']='الحد الأدنى للطول';
-$ec_lang['lpn_cp_minlength_tip']='الحد الأدنى للطول: يُعلَّم أي إدخال أقصر من ذلك، وهذه طريقتك لإيجاد الإدخالات الفارغة والمكتوبة جزئياً.';
+$ec_lang['lpn_cp_minlength_tip']='الحد الأدنى للطول: يُعلَّم أي إدخال أقصر منه. استخدمه لإيجاد الإدخالات الفارغة وغير المكتملة.';
 $ec_lang['lpn_cp_length']='الحد الأقصى للطول';
 $ec_lang['lpn_cp_length_tip']='الحد الأقصى للطول: يُعلَّم أي إدخال أطول من ذلك.';
 $ec_lang['lpn_cp_low']='الحد الأدنى';
@@ -2709,14 +2709,14 @@ $ec_lang['lpn_scenario_base']='الأساس';
 // routed around, and it says ownership without implying difference. Seven languages had already
 // chosen exactly this family unprompted (fr personnalisees, it personalizzati, es exclusivos,
 // pt individuais, ar mukhassasa, fa ekhtesasi, ro specifice).
-$ec_lang['lpn_scenario_overrides']='عدد القيم المخصصة';
+$ec_lang['lpn_scenario_overrides']='عدد التجاوزات';
 // ROADMAP Task 512. The amber ring was designed, correct, and silent: two independent users read it
 // as a stuck highlight they could not turn off. These two strings are the ring's own explanation and
 // the readout's, so neither requires clicking the element to find out what is going on.
 // {name} is the active scenario's display name -- the ring is a fact about WHICH SCENARIO is
 // showing, not a state of the element, and naming the scenario is what makes that recoverable.
-$ec_lang['lpn_scenario_mark_tip']='تعني الحلقة الكهرمانية أن هذا العنصر يحمل قيمة تخص السيناريو {name} وحده.';
-$ec_lang['lpn_scenario_overrides_tip']='كل قيمة من تلك القيم مُعلَّمة على الخريطة بحلقة كهرمانية. انتقل إلى {base} لرؤية الرسم بدونها.';
+$ec_lang['lpn_scenario_mark_tip']='تعني الحلقة الكهرمانية أن لهذا العنصر تجاوزاً في السيناريو {name}.';
+$ec_lang['lpn_scenario_overrides_tip']='يُعلَّم كل تجاوز على الخريطة بحلقة كهرمانية. انتقل إلى {base} أو إلى سيناريو أصل آخر لرؤية الرسم بدونها.';
 $ec_lang['lpn_scenario_menu']='السيناريوهات';
 $ec_lang['lpn_scenario_tip']='مجموعة القيم التي يعرضها الرسم وتحلّها الصفحة الآن. انقر للتبديل بين السيناريوهات، أو لإضافة سيناريو أو إعادة تسميته أو حذفه.';
 $ec_lang['lpn_scenario_new']='سيناريو جديد…';
@@ -2724,25 +2724,25 @@ $ec_lang['lpn_scenario_new_name']='سيناريو {n}';
 $ec_lang['lpn_scenario_prompt_name']='اسم هذا السيناريو';
 $ec_lang['lpn_scenario_rename']='إعادة تسمية السيناريو…';
 $ec_lang['lpn_scenario_delete']='حذف السيناريو';
-$ec_lang['lpn_scenario_delete_confirm']='هل تريد حذف السيناريو {name}، والقيم البالغ عددها {n} التي تخصه وحده؟ لن يتغيّر الرسم نفسه.';
-$ec_lang['lpn_scenario_override']='في هذا السيناريو فقط';
+$ec_lang['lpn_scenario_delete_confirm']='هل تريد حذف السيناريو {name} وتجاوزاته البالغ عددها {n}؟ لا يتغير الرسم نفسه.';
+$ec_lang['lpn_scenario_override']='تجاوز في هذا السيناريو';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_scenario_override_tip']='التحديد يعني أن هذه القيمة تخص هذا السيناريو وحده، حتى لو كانت نفس رقم الأساس. أزل التحديد لاستخدام قيمة الأساس مرة أخرى.';
+$ec_lang['lpn_scenario_override_tip']='يعني التحديد أن هذا السيناريو يتجاوز الأصل لهذه القيمة، حتى لو كان الرقم نفسه. ألغِ تحديد المربع لاستخدام قيمة الأصل.';
 // "Base scenario", not bare "Base" -- an ENGLISH fix, so this needs no _syn either. This is the one
 // place the polysemy genuinely bites: here the word sits beside a NUMBER, in a field popup with no
 // scenario dropdown nearby to frame it, which is exactly the reading that invites "base amount".
 // The dropdown keeps the short name (lpn_scenario_base); only the exposed use is disambiguated.
 // Same label-versus-sentence distinction that decided the eigenvalue fixes in sprint 316.
 $ec_lang['lpn_scenario_base_value']='سيناريو الأساس: {value}';
-$ec_lang['lpn_scenario_deactivated']='{id} خارج الشبكة في {scenario}. لا يزال في الرسم، وفي سيناريوهاتك الأخرى.';
+$ec_lang['lpn_scenario_deactivated']='يُستثنى {id} من الشبكة في {scenario}. يبقى في الرسم وفي السيناريوهات الأخرى.';
 $ec_lang['lpn_scenario_push_btn']='تطبيق قيم الأساس على جميع السيناريوهات';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_scenario_push_tip']='تعود جميع السيناريوهات إلى قيمة الأساس للخصائص التي تظهر تسمياتها الآن. تُلغى القيم التي تخص تلك السيناريوهات وحدها.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_scenario_push_confirm']='هل تريد جعل جميع السيناريوهات تستخدم قيم الأساس لهذه الخصائص؟ تُلغى القيم التي تخص تلك السيناريوهات وحدها. يمكنك التراجع عن هذا.';
 $ec_lang['lpn_scenario_push_scenarios']='السيناريوهات المتأثرة:';
-$ec_lang['lpn_scenario_push_values']='القيم الملغاة:';
-$ec_lang['lpn_scenario_push_none']='لا يملك أي سيناريو قيمة خاصة به لأي من هذه الخصائص، فلن يتغيّر شيء. لن تُلغى أي قيمة.';
+$ec_lang['lpn_scenario_push_values']='القيم المهمَلة:';
+$ec_lang['lpn_scenario_push_none']='لا يتجاوز أي سيناريو الأساس في أي من هذه الخصائص، فلن يتغير شيء. لا تُهمَل أي قيمة.';
 $ec_lang['lpn_scenario_preset_flow_static']='1. اختبار التدفق: ساكن';
 $ec_lang['lpn_scenario_preset_flow_static_tip']='معايرة اختبار التدفق لشبكة تصميمية عند تدفق صفر. في هذا السيناريو، اضبط الطلب عند جميع الملتقيات على 0.';
 $ec_lang['lpn_scenario_preset_flow_mid']='2. اختبار التدفق: وسطي';
@@ -2755,11 +2755,11 @@ $ec_lang['lpn_scenario_preset_max_day']='5. اليوم الأقصى';
 $ec_lang['lpn_scenario_preset_peak_hour']='6. ساعة الذروة';
 $ec_lang['lpn_scenario_preset_fire_max_day']='7. الحريق مع اليوم الأقصى';
 $ec_lang['lpn_scenario_preset_fire_max_day_tip']='طلب اليوم الأقصى (المضاعف 2.0). شغّل تحليل تدفق الحريق في هذا السيناريو: فهو يضيف تدفق الحريق عند كل ملتقى فوق هذا الطلب.';
-$ec_lang['lpn_delete_drops_overrides']='يؤدي حذف هذا العنصر أيضاً إلى إلغاء {n} قيمة تحملها سيناريوهاتك له. هل تريد المتابعة؟';
+$ec_lang['lpn_delete_drops_overrides']='يؤدي حذف هذا العنصر أيضاً إلى حذف {n} من تجاوزات السيناريوهات الخاصة به. هل تريد المتابعة؟';
 $ec_lang['lpn_push_base_only']='يغيّر هذا الإجراء الرسم نفسه، لذا لا يمكن تنفيذه إلا في {base}. انتقل إلى {base} وحاول مرة أخرى.';
-$ec_lang['lpn_field_active']='جزء من هذه الشبكة';
+$ec_lang['lpn_field_active']='نشط؟';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_field_active_tip']='أزل التحديد لترك العنصر على الرسم لكن خارج الشبكة: يُرسم باللون الرمادي ويتجاهله الحلّال. في السيناريو، هذه هي طريقة تشغيل أنبوب مقترح أو إيقافه.';
+$ec_lang['lpn_field_active_tip']='أزل التحديد من هذا المربع لترك العنصر على الرسم وخارج الشبكة: يُرسم باللون الرمادي ويتجاهله الحلّال. في السيناريو، هكذا يُشغَّل الأنبوب ويُوقف.';
 // ---- Task 412: a Base-wide property SAYS it is Base-wide ----
 // Shown only inside a scenario, on the rows that have no "Only in this scenario" box, so the two
 // states are read the same way. Before this, a Base-wide row was announced by an ABSENCE, and an
@@ -2770,7 +2770,7 @@ $ec_lang['lpn_field_active_tip']='أزل التحديد لترك العنصر ع
 // cannot compare them.
 $ec_lang['lpn_settings_emitter_exponent']='أسّ الرشاش';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_settings_emitter_exponent_tip']='الأس في معادلة الرشاش في EPANET للرشاشات والتسربات: التدفق = المعامل × الضغط مرفوعاً لهذا الأس. لا يغيّر الإجابة إلا حيث تحمل عقدة رشاشاً، وهو الآن يعني شبكة مقروءة من ملف EPANET.';
+$ec_lang['lpn_settings_emitter_exponent_tip']='الأس في معادلة القطّارة في EPANET للرشاشات والتسربات: التدفق = المعامل × الضغط مرفوعاً إلى هذا الأس. يؤثر في النتائج فقط عند العقد التي لها معامل قطّارة.';
 // The Settings panel's Computation section (Tom, 2026-08-10). "Computation", not "Solver": what the
 // two rows under it decide is the arithmetic the user gets, and "solver" names the internals.
 $ec_lang['lpn_elev_dem_sample']='قراءة نموذج الارتفاع الرقمي';
@@ -2778,10 +2778,10 @@ $ec_lang['lpn_elev_dem_sample_tip']='يقرأ منسوب نموذج الارتف
 $ec_lang['lpn_elev_dem_use']='استخدام نموذج الارتفاع الرقمي';
 $ec_lang['lpn_elev_dem_use_tip']='يضع منسوب نموذج الارتفاع الرقمي عند هذه العقدة في مربع المنسوب أعلاه، محلاً محل ما فيه. يقرأ نموذج الارتفاع الرقمي أولاً إن لم يكن قد قُرئ بعد. يعيده تراجع واحد إلى ما كان عليه.';
 $ec_lang['lpn_elev_dem_none']='لا يملك نموذج الارتفاع الرقمي منسوباً لهذه العقدة.';
-$ec_lang['lpn_elev_dem_said']='يقول Mapbox DEM إن القيمة {v} {u}.';
+$ec_lang['lpn_elev_dem_said']='منسوب Mapbox DEM: {v} {u}.';
 $ec_lang['lpn_settings_elev_source']='مصدر المنسوب';
-$ec_lang['lpn_settings_elev_source_tip']='من أين تحصل العقدة الجديدة على منسوبها. يُقرأ سطح الأرض من Mapbox DEM، الذي يبلغ عرضه نحو 30 م لمعظم الأرض، وأدق حيث تتوفر بيانات أفضل.';
-$ec_lang['lpn_settings_elev_source_typed']='المنسوب المكتوب أعلاه';
+$ec_lang['lpn_settings_elev_source_tip']='تتراوح الدقة الأفقية والرأسية لنموذج Mapbox DEM لعام 2026 بين 1 و10 م وأقل من 1 م في الولايات المتحدة، وبين 2 و10 م وبين 1 و3 م في أوروبا واليابان، و30 م وبين 10 و16 م عالمياً، و90 م وأكثر من 16 م عند القطبين.';
+$ec_lang['lpn_settings_elev_source_typed']='أعلاه';
 $ec_lang['lpn_settings_elev_source_dem']='نموذج Mapbox الرقمي (DEM)';
 $ec_lang['lpn_settings_accuracy']='الدقة';
 // **APPENDED TO EVERY HYDRAULICS TIP, because the box no longer shows the default** (Tom,
@@ -2798,12 +2798,12 @@ $ec_lang['lpn_settings_accuracy']='الدقة';
 // dev/language-strings.md and guarded by dev/scripts/plain_english_swap_check.php.
 $ec_lang['lpn_settings_default_is']='الافتراضي هو {n}.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_settings_accuracy_tip']='مدى القرب الذي يجب أن يصل إليه الحلّال قبل أن يتوقف، مقاساً بمقدار التغيّر الذي لا تزال عليه التدفقات من محاولة إلى التالية. الرقم الأصغر أدق ويستغرق وقتاً أطول. يقرأ كلا الحلّالين هذا المربع نفسه، ويقيس كل منهما ذلك التغيّر مقابل مجموع مختلف: الحلّال المدمج مقابل مجموع الطلبات، وEPANET مقابل مجموع تدفقات الروابط. إن تُرك فارغاً، تستخدم هذه الصفحة دقة أشد صرامة من افتراضي EPANET نفسه.';
+$ec_lang['lpn_settings_accuracy_tip']='حد التقارب الذي يجب أن يبلغه الحلّال قبل أن يتوقف، ويُقاس بالتغير الكلي في التدفق من محاولة إلى التالية مقسوماً على التدفق الكلي في الروابط. الرقم الأصغر أدق ويستغرق وقتاً أطول.';
 $ec_lang['lpn_settings_specific_gravity']='الكثافة النوعية';
 $ec_lang['lpn_settings_viscosity']='اللزوجة النسبية';
 $ec_lang['lpn_settings_viscosity_tip']='لزوجة السائل مقارنة بالماء عند 20 درجة مئوية. لا تغيّر الإجابة إلا في طريقة دارسي-فايسباخ.';
 $ec_lang['lpn_settings_trials']='أقصى عدد للمحاولات';
-$ec_lang['lpn_settings_trials_tip']='عدد المحاولات المسموح بها قبل أن يتخلى الحلّال عن شبكة لن تتقارب.';
+$ec_lang['lpn_settings_trials_tip']='أقصى عدد من المحاولات قبل أن يتوقف الحلّال في شبكة لا تتقارب.';
 // **THE REST OF EPANET'S HYDRAULIC OPTIONS GET A ROW EACH** (Tom, 2026-08-29: *"every setting from
 // EPANET must be added and implemented unless research says otherwise"*). Written in OUR words and
 // not EPANET's -- there is no "Unbalanced" or "DampLimit" on the page, because a name only a person
@@ -2814,11 +2814,11 @@ $ec_lang['lpn_settings_trials_tip']='عدد المحاولات المسموح ب
 // not know which engine is answering cannot tell a control that did nothing from a setting that had
 // no effect. Saying it in the tip is cheaper than a second Settings section, and honest.
 $ec_lang['lpn_settings_unbalanced']='إذا لم تتقارب';
-$ec_lang['lpn_settings_unbalanced_tip']='ماذا تفعل بشبكة استنفدت محاولاتها ولم تتقارب بعد. غالباً ما يؤدي السماح بمحاولات إضافية إلى الوصول إلى التقارب. أما التوقف فيُبلّغ عن المحاولة الأخيرة كما هي، وهذا ليس حلاً. يقرأ هذا المربع حلّال EPANET فقط. يتوقف الحلّال المدمج دائماً ويعلّم الإجابة بأنها غير متقاربة.';
+$ec_lang['lpn_settings_unbalanced_tip']='الإجراء المتخذ لشبكة استنفدت محاولاتها ولم تتقارب بعد. غالباً ما يؤدي السماح بمحاولات إضافية إلى التقارب. أما التوقف فيبلّغ عن المحاولة الأخيرة كما هي، وهذه ليست حلاً.';
 $ec_lang['lpn_settings_unbalanced_continue']='السماح بمحاولات إضافية';
 $ec_lang['lpn_settings_unbalanced_stop']='التوقف والإبلاغ عن المحاولة الأخيرة';
 $ec_lang['lpn_settings_unbalanced_trials']='محاولات إضافية قبل الإبلاغ';
-$ec_lang['lpn_settings_unbalanced_trials_tip']='عدد المحاولات الإضافية المسموح بها بعد استنفاد الحد الأقصى أعلاه، قبل الإبلاغ عن المحاولة الأخيرة. يقرأ هذا المربع حلّال EPANET فقط.';
+$ec_lang['lpn_settings_unbalanced_trials_tip']='عدد المحاولات الإضافية المسموح بها بعد استنفاد الحد الأقصى أعلاه، قبل الإبلاغ عن المحاولة الأخيرة.';
 $ec_lang['lpn_settings_head_error']='حدّ خطأ العلو';
 $ec_lang['lpn_settings_head_error_tip']='اختبار إضافي يجب أن يجتازه الحلّال قبل أن يتوقف: أكبر خطأ في العلو متبقٍّ في أي أنبوب واحد. الصفر يعني عدم تطبيق هذا الاختبار. يقرأ هذا المربع حلّال EPANET فقط.';
 $ec_lang['lpn_settings_flow_change']='حدّ تغيّر التدفق';
@@ -2828,8 +2828,8 @@ $ec_lang['lpn_settings_damp_limit']='يبدأ التخميد عند';
 $ec_lang['lpn_settings_damp_limit_tip']='الدقة التي يبدأ عندها الحلّال باتخاذ خطوات أصغر، وهو ما قد يساعد شبكة متذبذبة على التقارب. الصفر يعني أن الحلّال لا يخمّد أبداً. يقرأ هذا المربع حلّال EPANET فقط.';
 $ec_lang['lpn_settings_option_unset']='غير مذكور';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_settings_demand_multiplier_tip']='معامل واحد يُطبَّق على كل طلب في الشبكة دفعة واحدة. استخدمه لمعرفة ما يفعله النظام عند استخدام أكثر أو أقل من استخدام اليوم الحالي. لا يغيّر الأرقام التي كتبتها. يمكن أن يحمل كل سيناريو معامله الخاص، بحيث يكون متوسط اليوم وأقصى يوم وذروة الساعة كل واحد منها رقماً واحداً؛ اتركه فارغاً في سيناريو لاستخدام معامل المشروع.';
-$ec_lang['lpn_settings_engine_native']='الحل بحلّال EPANET';
+$ec_lang['lpn_settings_demand_multiplier_tip']='معامل واحد يُطبَّق على كل طلب في الشبكة دفعة واحدة. يمكن أن تكون لكل سيناريو قيمة منفصلة، لذا يمكن إنشاء متوسط اليوم أو أقصى يوم أو ذروة الساعة بتغيير هذا الإعداد وحده.';
+$ec_lang['lpn_settings_engine_native']='استخدم الحلّال المدمج حيثما أمكن';
 // **THIS TIP NO LONGER ARGUES THE TWO SOLVERS AGAINST EACH OTHER** (Task 605, Tom 2026-09-06:
 // *"We scrub our tips and alerts for any undue weight on the existence of two solvers."*). It
 // spent three sentences on speed and on the two measured disagreements -- minor losses 0.08%
@@ -2842,15 +2842,15 @@ $ec_lang['lpn_settings_engine_native']='الحل بحلّال EPANET';
 // EPANET whatever the box says, and the one-time download, which is the cost a visitor on a slow
 // connection actually pays.
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_settings_engine_native_tip']='فعّل هذا لاستخدام الحلّال المدمج حيثما أمكن. وإلا، يُستخدم دائماً حلّال EPANET من وكالة حماية البيئة الأمريكية. لا يُستخدم الحلّال المدمج لمحاكاة الفترة الممتدة أو عند وجود صمام PRV أو PSV أو FCV نشط. أول مرة يُستخدم فيها حلّال EPANET، يُنزَّل نحو 650 كيلوبايت ثم يُحفظ على هذا الجهاز. عندما يحمل أنبوب فاقداً موضعياً (محلياً)، يختلف الحلّالان في المنازل العشرية الأخيرة: يقرّب EPANET القيمة التي يستخدمها للجاذبية، فتخرج فواقده الموضعية أقل قليلاً جداً من الصيغة الدقيقة.';
+$ec_lang['lpn_settings_engine_native_tip']='فعّل هذا لاستخدام الحلّال المدمج حيثما أمكن. وإلا يُستخدم دائماً حلّال EPANET من وكالة حماية البيئة الأمريكية. لا يُستخدم الحلّال المدمج في المحاكاة ممتدة الفترة أو مع صمامات PRV أو PSV أو FCV النشطة. عند أول استخدام لحلّال EPANET يُنزَّل نحو 650 كيلوبايت ثم يُحفظ على هذا الجهاز. حيث يكون لأنبوب فقد موضعي (محلي)، يختلف الحلّالان في الأرقام الأخيرة: يستخدم EPANET قيمة مقرَّبة لتسارع الجاذبية، فتكون فواقده الموضعية أقل قليلاً جداً من الصيغة الدقيقة.';
 $ec_lang['lpn_engine_loading']='جارٍ تحميل حلّال EPANET…';
 $ec_lang['lpn_engine_failed']='تعذّر تحميل حلّال EPANET. يُعرض الحلّال المدمج بدلاً منه.';
 // Said out loud, never silently: the user picked the built-in solver and this network was sent to
 // the EPANET solver anyway, because it holds a valve the built-in solver does not calculate. The
 // setting is not changed, so removing the valve puts the page straight back on the chosen engine.
-$ec_lang['lpn_engine_valve_route']='حُلَّت بحلّال EPANET، لأن هذه الصمامات تفتح وتغلق من تلقاء نفسها:';
-$ec_lang['lpn_unit_unknown']='يذكر هذا الرسم وحدة لا تقدّمها هذه الصفحة: {unit}. كل شيء محفوظ ومعروض تماماً كما ورد، ولم يتغيّر شيء. لا يمكن حساب أي شيء حتى تتعرّف هذه الصفحة على تلك الوحدة، لأنها لا تعرف مقدار الوحدة.';
-$ec_lang['lpn_engine_manning_note']='ملاحظة: مع خشونة مانينج، يحسب EPANET فقدان الضغط أقل بنحو 0.6٪ من الحلّال المدمج.';
+$ec_lang['lpn_engine_valve_route']='حُلَّت بحلّال EPANET، بسبب صمامات التحكم في الضغط والتدفق هذه:';
+$ec_lang['lpn_unit_unknown']='يذكر هذا الرسم وحدة لا تدعمها هذه الصفحة: {unit}. تُحفظ كل القيم وتُعرض تماماً كما استُوردت، ولم يتغير شيء. لا يمكن حساب أي شيء حتى تُدعم الوحدة، لأن معامل تحويلها غير معروف.';
+$ec_lang['lpn_engine_manning_note']='ملاحظة: مع خشونة مانينغ، يقرّب EPANET الثابت في معادلة مانينغ، فيكون فقدان الضغط أقل بنحو 0.6٪ من الصيغة الدقيقة.';
 // ---- EPANET said no (ROADMAP Task 471) -------------------------------------------------------
 // Three sentences for three different facts, on the model of lpn_unit_unknown: what would not
 // happen, what the solver itself objected to, and where the numbers on screen actually came from.
@@ -2859,11 +2859,11 @@ $ec_lang['lpn_engine_manning_note']='ملاحظة: مع خشونة مانينج�
 $ec_lang['lpn_engine_refused']='لم يقبل حلّال EPANET هذه الشبكة، فلم يُشغَّل.';
 // {message} is EPANET's own text and is NOT translated: it names what the solver choked on, which
 // is the only part a user can act on, and nothing of ours could reconstruct it.
-$ec_lang['lpn_engine_refused_why']='قال حلّال EPANET: {message}';
+$ec_lang['lpn_engine_refused_why']='رسالة حلّال EPANET: {message}';
 $ec_lang['lpn_engine_refused_fallback']='جاءت الأرقام المعروضة على الشاشة من الحلّال المدمج بدلاً من ذلك.';
 // The run's own version of that last sentence: a period run has a moment and a tank level to name,
 // and a one-moment solve does not, which is where the shared label stops.
-$ec_lang['lpn_time_run_fell_back']='جاءت الأرقام المعروضة على الشاشة من الحلّال المدمج بدلاً من ذلك. يحسب لحظة واحدة في كل مرة، فهذه هي الشبكة في {time} فقط، وكل صهريج لا يزال عند منسوبه الابتدائي.';
+$ec_lang['lpn_time_run_fell_back']='جاءت الأرقام المعروضة على الشاشة من الحلّال المدمج بدلاً من ذلك. يحلّ لحظة واحدة في كل مرة، فهذه هي الشبكة عند {time} فقط، مع كل صهريج عند منسوبه الابتدائي.';
 // ---- controls we could not use (ROADMAP Task 466) ---------------------------------------------
 // A control naming an element that is no longer drawn has to be left out -- EPANET rejects the
 // whole network over one of them -- and {ids} names which, because "a control was ignored" with
@@ -2884,7 +2884,7 @@ $ec_lang['lpn_settings_link_width']='سُمك خط الوصلة (بكسلات)';
 // the label cannot say, which are that the arrows only appear once there are results and that the
 // setting travels with the project.
 $ec_lang['lpn_settings_show_arrows']='أسهم اتجاه التدفق';
-$ec_lang['lpn_settings_show_arrows_tip']='ارسم سهماً على كل أنبوب يبيّن الاتجاه الذي يجري فيه الماء. تظهر الأسهم بعد التشغيل، وإيقافها لا يغيّر النتائج. يُحفظ هذا الإعداد مع المشروع.';
+$ec_lang['lpn_settings_show_arrows_tip']='ارسم سهماً على كل أنبوب يبيّن اتجاه جريان الماء. تظهر الأسهم بعد التشغيل، وإيقافها لا يغيّر النتائج.';
 $ec_lang['lpn_settings_align_labels']='محاذاة تسميات الأنابيب مع الأنابيب';
 $ec_lang['lpn_settings_readability_bias']='اقلب التسمية رأساً على عقب عندما تميل أكثر من هذا العدد من الدرجات إلى يسار الخط العمودي';
 $ec_lang['lpn_settings_readability_bias_tip']='يقلب التسمية ليبقيها معتدلة عندما تميل أكثر من هذا العدد من الدرجات إلى يسار الخط الرأسي.';
@@ -2920,7 +2920,7 @@ $ec_lang['lpn_settings_label_always']='إظهار دائماً';
 // between the boxes and `_post` follows the second one (which is shown as a percentage, so "20"
 // reads as "20% percentile pipe").
 $ec_lang['lpn_settings_symbol_cap_sentence']='منع العُقَد من التكبّر أكثر من {n} ضعف طول {p} الأنبوب عند المئين';
-$ec_lang['lpn_settings_symbol_cap_tip']='يتوقف الملتقى عن التكبّر على الأرض بمجرد أن يصبح قطره بهذا العدد من الأضعاف لطول الأنبوب عند هذا المئين من كل أطوال الأنابيب في الشبكة. بعد تلك النقطة على الخريطة، تتقلص الملتقيات والأنابيب والرموز الأخرى على الشاشة عند التصغير بدلاً من التكبّر على الأرض. الخزانات والصهاريج استثناء، وتحتفظ بحجمها على الشاشة عند كل تكبير.';
+$ec_lang['lpn_settings_symbol_cap_tip']='يتوقف الملتقى عن الاحتفاظ بحجمه على الشاشة متى صار قطره على الخريطة هذا العدد من أضعاف طول الأنبوب عند هذا المئين من أطوال كل الأنابيب في الشبكة. بعد تلك النقطة على الخريطة، تتقلص الملتقيات والأنابيب والرموز الأخرى على الشاشة عند التصغير. الخزانات والصهاريج استثناء وتحتفظ بحجمها على الشاشة عند كل تكبير.';
 // Fading the symbols (not the labels) is a LAYOUT aid: it lets a backdrop aerial or plan show
 // through the network while you place nodes on top of it (Tom, 2026-07-30).
 $ec_lang['lpn_settings_symbol_opacity']='عتامة الرمز (0 إلى 1)';
@@ -3011,8 +3011,8 @@ $ec_lang['lpn_time_report_start']='وقت بدء التقرير';
 $ec_lang['lpn_time_clock_start']='وقت الساعة عند البداية';
 $ec_lang['lpn_time_clock_day']='اليوم {day}، {clock}';
 $ec_lang['lpn_time_format_tip']='اكتب الوقت بالساعات والدقائق، مثل 2:30. الرقم المجرد يعني ساعات، فمثلاً 8 يعني ثماني ساعات. نصف الساعة هو 0:30.';
-$ec_lang['lpn_time_running']='يجري حساب محاكاة ممتدة الفترة بحلّال EPANET.';
-$ec_lang['lpn_time_no_engine']='يحسب الحلّال المدمج لحظة واحدة في كل مرة، لذا هذه هي الشبكة عند {time} فقط: تُقرأ كل الأنماط عند تلك اللحظة، ولا يزال كل صهريج عند منسوبه الابتدائي بدلاً من الامتلاء والتفريغ. اتصل بالإنترنت مرة واحدة لجلب حلّال EPANET، الذي يشغّل محاكاة ممتدة الفترة.';
+$ec_lang['lpn_time_running']='جارٍ تشغيل المحاكاة ممتدة الفترة.';
+$ec_lang['lpn_time_no_engine']='يحلّ الحلّال المدمج لحظة واحدة في كل مرة، فهذه هي الشبكة عند {time} فقط: يُقرأ كل نمط عند تلك اللحظة، ويبقى كل صهريج عند منسوبه الابتدائي بدلاً من أن يمتلئ ويفرغ. اتصل بالإنترنت مرة واحدة لتنزيل حلّال EPANET، الذي يشغّل محاكاة ممتدة الفترة.';
 $ec_lang['lpn_time_slider']='الوقت المنقضي من المحاكاة';
 $ec_lang['lpn_time_no_period']='لا يضبط هذا المشروع محاكاة ممتدة الفترة، لذا توجد لحظة واحدة فقط لعرضها. اضبط مدة التشغيل الكلية في الإعدادات، الحساب، الوقت لتشغيل محاكاة ممتدة الفترة.';
 $ec_lang['lpn_time_first']='الانتقال إلى البداية';
@@ -3042,12 +3042,12 @@ $ec_lang['lpn_time_run']='احسب';
 $ec_lang['lpn_time_run_done']='انتهى التشغيل. أوقات الإبلاغ: {frames}. الوقت المستغرق: {secs} ث.';
 $ec_lang['lpn_time_runbox_hide']='عدم إظهار هذا الصندوق مرة أخرى';
 $ec_lang['lpn_settings_runbox']='إظهار صندوق تقدم التشغيل';
-$ec_lang['lpn_settings_runbox_tip']='صندوق يبلّغ عن مدى تقدم التشغيل وما وجده. عند إيقافه، يذكر التشغيل المنتهي الشيء نفسه في شريط الحالة لبضع ثوانٍ بدلاً من ذلك. هذا إعداد لهذا المتصفح، وليس للمشروع.';
+$ec_lang['lpn_settings_runbox_tip']='صندوق يبلّغ عن تقدم التشغيل ونتيجته. مع إيقافه، يذكر التشغيل المنتهي الشيء نفسه في سطر الحالة لبضع ثوانٍ بدلاً من ذلك. هذا إعداد لهذا المتصفح لا للمشروع.';
 $ec_lang['lpn_time_run_failed']='لم يكتمل التشغيل، فلا توجد نتائج للأوقات اللاحقة.';
-$ec_lang['lpn_time_run_report']='تقرير تشغيل EPANET';
+$ec_lang['lpn_time_run_report']='تقرير التشغيل';
 $ec_lang['lpn_time_run_report_copy']='نسخ';
 $ec_lang['lpn_time_run_report_copied']='نُسخ';
-$ec_lang['lpn_time_run_report_tip']='ما طبعه حلّال EPANET نفسه عن التشغيل الأخير: هل تقارب، وأي شيء حذّر منه. هذا نص الحلّال نفسه، لا نصنا.';
+$ec_lang['lpn_time_run_report_tip']='التقرير الذي كتبه EPANET للتشغيل الأخير، حرفياً: هل تقارب، وأي تحذيرات. النص من إنتاج حلّال EPANET لا من هذه الصفحة.';
 
 $ec_lang['lpn_time_speed']='السرعة';
 $ec_lang['lpn_time_speed_tip']='سرعة التشغيل';
@@ -3124,18 +3124,18 @@ $ec_lang['lpn_quality_needs_run']='تُنقل جودة المياه عبر ال�
 // key) and a Mass units dropdown (lpn_quality_mass_units) below, matching EPANET's own Parameter
 // and Mass Units fields; the name is optional, exactly as EPANET's own is.
 $ec_lang['lpn_quality_chemical_name']='المادة الكيميائية ووحداتها';
-$ec_lang['lpn_quality_chemical_name_tip']='المادة الكيميائية التي تتعقبها، مثلاً الكلور. اتركه فارغاً لاستخدام التسمية الافتراضية الخاصة بـ EPANET، وهي Chemical. تظهر في تقاريرك، لكنها لا تُستخدم في الحسابات.';
+$ec_lang['lpn_quality_chemical_name_tip']='المادة الكيميائية المتتبَّعة، مثلاً الكلور. اتركه فارغاً لاستخدام التسمية الافتراضية في EPANET، وهي Chemical. تظهر في التقارير، لكنها لا تُستخدم في الحسابات.';
 $ec_lang['lpn_quality_mass_units']='وحدات الكتلة';
-$ec_lang['lpn_quality_mass_units_tip']='شق الوحدات من إدخال الجودة، خياري EPANET نفسه.';
+$ec_lang['lpn_quality_mass_units_tip']='جزء الوحدات من إدخال الجودة، من خياري EPANET.';
 $ec_lang['lpn_quality_unit_ug']='µg/L';
 // R-322: "Quality tolerance: I don't see this in our interface. Is it missing?" "Relative
 // diffusivity: I don't see this in our interface. Is it missing?" Both were carried in the file
 // and handed to the engine with no box to read or change them from; EPANET's own names and its own
 // defaults (0.01 and 1.0), shown only for a chemical, which is all either one means anything to.
 $ec_lang['lpn_quality_tolerance']='سماحية الجودة';
-$ec_lang['lpn_quality_tolerance_tip']='مقدار الاختلاف المسموح به في التركيز بين طردين متجاورين من الماء قبل أن يعاملهما EPANET كطرد واحد. الفراغ يستخدم القيمة الافتراضية لـEPANET نفسه وهي 0.01.';
+$ec_lang['lpn_quality_tolerance_tip']='فرق التركيز الذي يعامل EPANET دونه كتلتين متجاورتين من الماء ككتلة واحدة. تستخدم القيمة الفارغة القيمة الافتراضية في EPANET وهي 0.01.';
 $ec_lang['lpn_quality_diffusivity']='الانتشارية النسبية';
-$ec_lang['lpn_quality_diffusivity_tip']='مدى سهولة انتشار المادة الكيميائية خلال الماء، نسبةً إلى الكلور. الفراغ يستخدم القيمة الافتراضية لـEPANET نفسه وهي 1.0.';
+$ec_lang['lpn_quality_diffusivity_tip']='انتشارية المادة الكيميائية في الماء، نسبةً إلى الكلور. تستخدم القيمة الفارغة القيمة الافتراضية في EPANET وهي 1.0.';
 // R-323: "We could put it in Properties, Find, and Tables as '{chemical} concentration', and that
 // would be very cool." One template, read by qualityLabel() everywhere a concentration is named.
 $ec_lang['lpn_quality_named_concentration']='تركيز {chemical}';
@@ -3144,10 +3144,10 @@ $ec_lang['lpn_quality_named_concentration']='تركيز {chemical}';
 $ec_lang['lpn_quality_named_avg_concentration']='متوسط تركيز {chemical}';
 $ec_lang['lpn_quality_initial']='الجودة الابتدائية';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_quality_initial_tip']='كمية المادة الكيميائية التي تحملها هذه العقدة عند بدء التشغيل. يحتفظ الخزان بقيمته الخاصة طوال التشغيل، وهذه هي الطريقة المعتادة لبيان المتبقي الخارج من محطة معالجة. اتركها فارغة لتبدأ العقدة بلا شيء من المادة الكيميائية.';
+$ec_lang['lpn_quality_initial_tip']='كمية المادة الكيميائية عند هذه العقدة عند بدء التشغيل. يحتفظ الخزان بهذه القيمة طوال التشغيل، وهكذا يُذكر عادةً المتبقي الخارج من محطة معالجة. تعني القيمة الفارغة 0.';
 $ec_lang['lpn_result_concentration']='التركيز';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_result_concentration_tip']='كمية المادة الكيميائية المتبقية عند هذه النقطة بعد انتقالها وتفاعلها. الوحدات هي التي سُمِّيت بجانب المادة الكيميائية تحت الإعدادات، جودة المياه.';
+$ec_lang['lpn_result_concentration_tip']='كمية المادة الكيميائية المتبقية عند هذه النقطة بعد النقل والتفاعل. الوحدات هي التي أُدخلت مع اسم المادة الكيميائية في الإعدادات، الحساب، جودة المياه.';
 // **THE BOOSTER DOSE AND THE TANK MIXING MODEL** (ROADMAP Task 579), EPANET's `[SOURCES]` and
 // `[MIXING]`. EPANET's own words throughout, and its own four source types and four mixing models,
 // because an engineer choosing between them is choosing between real pieces of equipment and real
@@ -3165,11 +3165,11 @@ $ec_lang['lpn_source_type_setpoint']='معزِّز نقطة الضبط';
 $ec_lang['lpn_source_type_flowpaced']='معزِّز متناسب مع التدفق';
 $ec_lang['lpn_source_quality']='جودة المصدر';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_source_quality_tip']='قوة الجرعة. في كل الأنواع باستثناء معزِّز الكتلة هذه تركيز، بالوحدات المسمّاة بجانب المادة الكيميائية تحت الإعدادات، جودة المياه؛ أما في معزِّز الكتلة فهي كتلة من المادة الكيميائية في الدقيقة. اتركها فارغة فلا يُضاف هنا شيء، وهذا ليس كالصفر: فالصفر تغذية تعمل ولا تضيف شيئاً.';
+$ec_lang['lpn_source_quality_tip']='قوة الجرعة. في كل الأنواع عدا معزز الكتلة هي تركيز، بالوحدات المسمّاة بجانب المادة الكيميائية في الإعدادات، الحساب، جودة المياه؛ وفي معزز الكتلة هي تدفق كتلة في الدقيقة. تعني القيمة الفارغة عدم وجود مصدر مادة كيميائية، وهو مكافئ وظيفياً للصفر.';
 $ec_lang['lpn_source_pattern']='نمط المصدر';
 $ec_lang['lpn_source_pattern_tip']='نمط زمني يُضرَب في الجرعة طوال التشغيل، لتغذية غير ثابتة. لا نمط يعني أن الجرعة واحدة في كل خطوة.';
 $ec_lang['lpn_mixing_model']='نموذج الاختلاط';
-$ec_lang['lpn_mixing_model_tip']='كيف يختلط الماء الموجود بالفعل في هذا الصهريج بالماء الوارد. الاختلاط الكامل يحرّك الصهريج كله دفعة واحدة. اختلاط الحجرتين يملأ منطقة المدخل أولاً ثم يمرر الباقي. التدفق الانسيابي FIFO يحرّك الماء بترتيب وصوله. التدفق الانسيابي LIFO يكدّسه، فآخر ماء يدخل هو أول ماء يخرج. يغيّر هذا الاختيار عمر الماء والمتبقي، ولا يغيّر أي ضغط أو تدفق.';
+$ec_lang['lpn_mixing_model_tip']='نموذج لكيفية اختلاط الماء الموجود في هذا الصهريج بالتدفق الداخل. يخلط الاختلاط الكامل كل التدفق الداخل فوراً مع حجم الصهريج كله. ويملأ اختلاط الحجرتين منطقة المدخل أولاً ثم يمرر الفائض إلى المنطقة الرئيسية. ويصرّف التدفق الانسدادي FIFO الماء بترتيب وصوله. ويكدّسه التدفق الانسدادي LIFO، فآخر ماء يدخل هو أول ماء يخرج. يؤثر الاختيار في عمر الماء والمتبقي، لا في الضغط أو التدفق.';
 $ec_lang['lpn_mixing_mixed']='الاختلاط الكامل';
 $ec_lang['lpn_mixing_2comp']='اختلاط الحجرتين';
 $ec_lang['lpn_mixing_fifo']='تدفق انسيابي FIFO';
@@ -3179,7 +3179,7 @@ $ec_lang['lpn_mixing_fraction']='نسبة الاختلاط';
 $ec_lang['lpn_mixing_fraction_tip']='حصة حجم الصهريج التي تشغلها منطقة المدخل، بين 0 و1. يستخدمها اختلاط الحجرتين فقط. اتركها فارغة ليكون الصهريج كله منطقة مدخل، وهذا ما يفترضه EPANET.';
 $ec_lang['lpn_reaction_bulk']='معامل تفاعل الكتلة';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_reaction_bulk_tip']='التفاعل في متن الماء، يُستخدم لكل أنبوب لا يحمل معامله الخاص. الرقم السالب يُحلِّل المادة الكيميائية والرقم الموجب يزيدها. التفاعل من الرتبة الأولى ما لم يذكر ملف EPANET مستورَد رتبة أخرى، فالمعامل معدّل بوحدة 1/يوم. المربع الفارغ يعني عدم وجود تفاعل كتلة.';
+$ec_lang['lpn_reaction_bulk_tip']='التفاعل في متن الماء (انظر مساعدة EPANET)، ويُستخدم لكل أنبوب وصهريج لا يملك معاملاً منفرداً. الرقم السالب يحلّل المادة الكيميائية والرقم الموجب يزيدها. تعني القيمة الفارغة عدم وجود تفاعل في المتن.';
 $ec_lang['lpn_reaction_wall']='معامل تفاعل الجدار';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_reaction_wall_tip']='التفاعل عند جدار الأنبوب، يُستخدم لكل أنبوب لا يحمل معامله الخاص. الرقم السالب يُحلِّل المادة الكيميائية. التفاعل من الرتبة الأولى ما لم يذكر ملف EPANET مستورَد رتبة أخرى، فالمعامل طول في اليوم، مكتوب بوحدة طول المشروع. المربع الفارغ يعني عدم وجود تفاعل جدار.';
@@ -3189,7 +3189,7 @@ $ec_lang['lpn_reaction_pipe_tip']='هذا الأنبوب وحده. اتركه ف
 // stands in is a tank's, so the word "tank" would only be said twice.
 $ec_lang['lpn_reaction_tank']='معامل التفاعل';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_reaction_tank_tip']='التفاعل في الماء المحفوظ في هذا الصهريج، بمعدّل بوحدة 1/يوم. الرقم السالب يُحلِّل المادة الكيميائية والرقم الموجب يزيدها. يبقى الماء في الصهريج أطول بكثير مما يبقى في أي أنبوب، فهذا غالباً حيث يُفقد المتبقي. اتركه فارغاً ليستخدم الصهريج معامل تفاعل الكتلة المحدد للشبكة كلها تحت الإعدادات، جودة المياه.';
+$ec_lang['lpn_reaction_tank_tip']='التفاعل في الماء المحفوظ في هذا الصهريج، كمعدل بوحدة 1/يوم. الرقم السالب يحلّل المادة الكيميائية والرقم الموجب يزيدها. يبقى الماء في الصهريج أطول بكثير مما يبقى في أي أنبوب، لذا فهنا غالباً يُفقد المتبقي. تعني القيمة الفارغة استخدام معامل التفاعل في المتن المضبوط للشبكة كلها في الإعدادات، الحساب، جودة المياه.';
 // Three column headings, in tables whose tab already says what the parts are. Column width is king,
 // so each drops the word "coefficient" that the popup label carries in full.
 $ec_lang['lpn_reaction_bulk_short']='تفاعل الكتلة';
@@ -3217,7 +3217,7 @@ $ec_lang['lpn_reaction_order_tank']='رتبة تفاعل الصهريج';
 //
 // The EPANET mention earns its place under the 2026-09-06 rule: a reader standing on this row who
 // went looking for it in EPANET and did not find it is experiencing exactly that right now.
-$ec_lang['lpn_reaction_order_tank_tip']='الأس الذي يُرفع إليه التركيز للتفاعل في الماء المحفوظ داخل صهريج، منفصل عن رتبة تفاعل المتن ليتفاعل الصهريج برتبة مختلفة عن الأنابيب. يُسمح بأي عدد حقيقي، والقيمة الافتراضية 1. يذكرها EPANET في الملف باسم ORDER TANK، ولا يوفر له صندوقاً في واجهته الخاصة.';
+$ec_lang['lpn_reaction_order_tank_tip']='الأس الذي يُرفع إليه التركيز للتفاعل في الماء المحفوظ في صهريج، وهو منفصل عن رتبة تفاعل المتن ليتفاعل الصهريج برتبة تختلف عن الأنابيب. يُسمح بأي عدد حقيقي، والقيمة الافتراضية 1. يذكره EPANET في الملف باسم ORDER TANK ولا يوفر له مُدخلاً في واجهة EPANET.';
 $ec_lang['lpn_reaction_order_wall']='رتبة تفاعل الجدار';
 // Edited by TGH 2026-09-07
 // R-324: "Our Wall reaction order tip is wrong. We need to say '1 means that the wall reaction is
@@ -3236,7 +3236,7 @@ $ec_lang['lpn_reaction_limiting']='التركيز الحدّي';
 $ec_lang['lpn_reaction_limiting_tip']='تركيز تتجه إليه المادة الكيميائية بدلاً من أن تتحلل إلى لا شيء أو تنمو بلا نهاية. يتباطأ التفاعل مع اقتراب الماء منه ويتوقف عنده. استخدم وحدات متسقة. لا حد إذا تُرك فارغاً.';
 $ec_lang['lpn_reaction_rough_corr']='ارتباط الخشونة';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_reaction_rough_corr_tip']='يربط تفاعل الجدار بخشونة كل أنبوب على حدة، فيتفاعل الأنبوب الأخشن أسرع. عند ضبطه، يُحسب معامل جدار لكل أنبوب من خشونته، ولا يُستخدم عندئذ معامل الجدار الواحد أعلاه. لا يُستخدم إذا تُرك فارغاً.';
+$ec_lang['lpn_reaction_rough_corr_tip']='عامل يربط معامل تفاعل الجدار بخشونة كل أنبوب، فيتفاعل الأنبوب الأخشن أسرع. عند ضبطه، يُحسب معامل جدار لكل أنبوب من خشونته، ولا يُستخدم معامل الجدار الواحد أعلاه. لا يُستخدم إذا تُرك فارغاً.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_reaction_note']='لا تقدّم هذه الصفحة معامل تفاعل خاصاً بها. لا يوجد اختبار قياسي لمعامل كهذا، وتختلف القيم الميدانية المنشورة لنفس نوع الماء بمقدار عشرة أضعاف، فأي رقم يُقدَّم هنا سيُقرأ على أنه توصية. أدخل رقماً قِسته أو رقماً يمكنك الاستشهاد به، أو اترك المربعات فارغة لمادة كيميائية لا تتفاعل.';
 // **PUMP ENERGY AND COST** (ROADMAP Task 566, dev/pump-energy.md). EPANET's own words: efficiency,
@@ -3249,24 +3249,24 @@ $ec_lang['lpn_settings_energy']='الطاقة';
 // lpn_time_run_report keep the word and lpn_energy_menu and lpn_reports_epanet do not.
 $ec_lang['lpn_reports_menu']='التقارير';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_reports_epanet']='تشغيل EPANET';
+$ec_lang['lpn_reports_epanet']='التشغيل';
 $ec_lang['lpn_energy_title']='تقرير طاقة المضخة';
 $ec_lang['lpn_energy_menu']='طاقة المضخة';
 $ec_lang['lpn_energy_efficiency']='كفاءة المضخة (بالمئة)';
 $ec_lang['lpn_energy_efficiency_tip']='الكفاءة الكهرومائية المستخدمة لكل مضخة لا تحمل منحنى كفاءة خاصاً بها. يستخدم EPANET 75 بالمئة إن لم يُذكر شيء.';
 $ec_lang['lpn_energy_price']='سعر الطاقة';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_energy_price_tip']='تكلفة كيلوواط ساعة واحد. ينطبق على كل مضخة لا تحمل سعراً خاصاً بها. اتركه فارغاً لتكون كل تكلفة في التقرير صفراً.';
+$ec_lang['lpn_energy_price_tip']='تكلفة كيلوواط ساعة واحد. تنطبق على كل مضخة لا يخصها سعر منفرد. تعني القيمة الفارغة 0.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_energy_pump_price_tip']='تكلفة كيلوواط ساعة واحد عند هذه المضخة. اتركه فارغاً لتدفع المضخة السعر المحدد للشبكة كلها تحت الإعدادات، الطاقة.';
+$ec_lang['lpn_energy_pump_price_tip']='تكلفة كيلوواط ساعة واحد عند هذه المضخة. تعني القيمة الفارغة استخدام السعر المضبوط للشبكة كلها في الإعدادات، الطاقة.';
 $ec_lang['lpn_energy_price_pattern']='نمط السعر';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_energy_price_pattern_tip']='نمط يُضرَب في السعر عند كل خطوة، وبهذا يُحدَّد سعر خارج أوقات الذروة. اتركه فارغاً ليبقى سعر واحد طوال التشغيل.';
 $ec_lang['lpn_energy_demand_charge']='رسم ذروة الطلب';
-$ec_lang['lpn_energy_demand_charge_tip']='ما تفرضه شركة المياه لكل كيلوواط من ذروة الحمل الذي تطلبه المضخات في النظام.';
+$ec_lang['lpn_energy_demand_charge_tip']='لكل كيلوواط من ذروة الحمل التي تطلبها المضخات';
 $ec_lang['lpn_energy_currency']='العملة';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_energy_currency_tip']='أي شيء تكتبه هنا يُطبع بجانب كل رقم مالي. هذه تسمية فقط. لا تُحوَّل الأسعار والتكاليف أبداً، فاكتب الأسعار بالعملة التي كتبتها هنا.';
+$ec_lang['lpn_energy_currency_tip']='نص يُطبع بجانب كل قيمة تكلفة. هو تسمية فقط؛ استخدم عملة واحدة في كل مكان.';
 $ec_lang['lpn_energy_kwh']='kWh';
 $ec_lang['lpn_energy_kw']='kW';
 // Edited by TGH 2026-09-07
@@ -3279,7 +3279,7 @@ $ec_lang['lpn_energy_no_pumps']='لا تحتوي هذه الشبكة على مض
 // re-keying are lpn_scenario_label and lpn_scenario_overrides, which already name the same two
 // things in the scenario menu.
 $ec_lang['lpn_scncmp_title']='مقارنة السيناريوهات';
-$ec_lang['lpn_scncmp_menu_tip']='حلّ كل سيناريو في هذا المشروع واقرأها جنباً إلى جنب: أدنى ضغط وأعلى سرعة في كل منها.';
+$ec_lang['lpn_scncmp_menu_tip']='جدول السيناريوهات مع عدد الاختلافات وأدنى ضغط وأعلى سرعة';
 $ec_lang['lpn_scncmp_running']='جارٍ حل كل سيناريو…';
 $ec_lang['lpn_scncmp_empty']='لم يُرسم شيء بعد، فلا شيء ليُحل.';
 $ec_lang['lpn_scncmp_col_maxvelocity']='أعلى سرعة';
@@ -3309,10 +3309,10 @@ $ec_lang['lpn_energy_total_cost']='التكلفة الإجمالية';
 // **THE ROW SAYS "Status", NOT "Status report"** -- the Reports fly-out carries the word so no row
 // has to (js/looped-network.js:4630's own rule, already followed by "EPANET run"). The box title,
 // lpn_status_title, keeps the full name.
-$ec_lang['lpn_reports_status']='الحالة';
-$ec_lang['lpn_reports_status_tip']='ما الذي تغيّر خلال آخر محاكاة ممتدة الفترة، بترتيب زمني: فتح المضخات والصمامات أو إغلاقها، وامتلاء الصهاريج أو تفريغها أو امتلاؤها كلياً أو نفادها، والخطوات التي لم تتقارب تماماً.';
-$ec_lang['lpn_status_title']='تقرير الحالة';
-$ec_lang['lpn_status_needs_run']='يسرد تقرير الحالة ما تغيّر خلال محاكاة ممتدة الفترة. اضبط إجمالي زمن التشغيل في الإعدادات، الحساب، الزمن، ثم اضغط احسب، ثم افتح الماء، التقارير، تقرير الحالة.';
+$ec_lang['lpn_reports_status']='تغيّرات الحالة';
+$ec_lang['lpn_reports_status_tip']='جدول زمني متسلسل لتغيّرات الحالة المقروءة من خطوات EPANET الزمنية لآخر محاكاة ممتدة الفترة: فتح المضخات والصمامات أو إغلاقها، وامتلاء الصهاريج أو تفريغها أو امتلاؤها كلياً أو نفادها، والخطوات التي لم تتقارب تماماً.';
+$ec_lang['lpn_status_title']='تغيّرات الحالة';
+$ec_lang['lpn_status_needs_run']='يسرد تقرير الحالة ما تغيّر خلال محاكاة ممتدة الفترة. اضبط مدة التشغيل الكلية في الإعدادات، الحساب، الزمن، ثم اضغط احسب، ثم افتح المياه، التقارير، تغيّرات الحالة.';
 $ec_lang['lpn_status_empty']='لم تتغيّر حالة أي شيء خلال هذا التشغيل.';
 $ec_lang['lpn_status_col_event']='الحدث';
 $ec_lang['lpn_status_opened']='{type} {id} مفتوح الآن';
@@ -3326,7 +3326,7 @@ $ec_lang['lpn_status_note']='مقروء من التشغيل الممتد الف�
 
 // Same rule as Status above: the row says "Full", the box says "Full report".
 $ec_lang['lpn_reports_full']='الكامل';
-$ec_lang['lpn_reports_full_tip']='كل عقدة وكل رابط عند كل خطوة زمن تقرير في آخر تشغيل، كجدول واحد يمكنك تنزيله أو طباعته.';
+$ec_lang['lpn_reports_full_tip']='جدول بكل العقد والروابط عند كل خطوة زمنية للإبلاغ في آخر تشغيل';
 $ec_lang['lpn_full_title']='التقرير الكامل';
 $ec_lang['lpn_full_needs_run']='يسرد التقرير الكامل كل عقدة وكل رابط عند كل خطوة زمن تقرير. اضغط احسب، ثم افتح الماء، التقارير، التقرير الكامل.';
 $ec_lang['lpn_full_note']='صف واحد لكل عقدة أو رابط لكل خطوة زمن تقرير، بالوحدات المعروضة في لوحة الجداول. الخلية الفارغة عمود لا تملكه تلك الكمية. يحمل التنزيل أو الطباعة كل خطوة زمنية؛ يعرض الجدول أدناه خطوة واحدة في كل مرة.';
@@ -3369,7 +3369,7 @@ $ec_lang['lpn_ff_design_all']='الكل';
 $ec_lang['lpn_ff_design_selected']='المحددة';
 $ec_lang['lpn_ff_rows_more_links']='الروابط غير المعروضة: {n}.';
 $ec_lang['lpn_crit_menu']='تحليل الأهمية الحرجة…';
-$ec_lang['lpn_crit_menu_tip']='أخرج كل أنبوب ومضخة وصمام من الشبكة بالتناوب وانظر ماذا يخسر النظام.';
+$ec_lang['lpn_crit_menu_tip']='أزل كل أنبوب ومضخة وصمام من الشبكة بالتناوب وأبلغ عن الأثر في النظام.';
 $ec_lang['lpn_crit_title']='تحليل الأهمية الحرجة';
 $ec_lang['lpn_crit_intro']='يُخرَج كل عنصر من الشبكة بالتناوب، وتُحَل الشبكة عند الخطوة الزمنية المعروضة في السيناريو النشط. لا يتغيّر شيء في مشروعك؛ يُجرى التشغيل كله على نسخة.';
 $ec_lang['lpn_crit_scope']='الروابط المراد كسرها';
@@ -3448,7 +3448,7 @@ $ec_lang['lpn_library_menu']='المكتبات';
 $ec_lang['lpn_library_patterns']='الأنماط';
 $ec_lang['lpn_library_patterns_tip']='النمط قائمة مضاعِفات تتكرر. يُطبَّق كل مضاعِف لخطوة زمنية واحدة من النمط، فتصنع 24 رقماً بخطوة ساعة واحدة يوماً يتكرر. الطلب 10 بمضاعِف 1.5 يصبح 15 في تلك اللحظة.';
 $ec_lang['lpn_library_curves']='المنحنيات';
-$ec_lang['lpn_library_curves_tip']='المنحنى قائمة من النقاط تصف كيف يؤدي شيء ما: كم علواً تضيفه المضخة عند كل تدفق، أو ما كفاءتها عند ذلك التدفق، أو كم علواً يفقده الصمام عند كل تدفق.';
+$ec_lang['lpn_library_curves_tip']='علو المضخة أو كفاءتها مقابل التدفق، وفاقد الصمام مقابل التدفق، أو حجم الصهريج مقابل العمق';
 // **CURVES IS AN EDITOR** (Task 586). It was a read-only report about pumps until the curves became
 // document objects of their own, and the note said so; it now says what the box does and where a
 // curve is pointed at an element from.
@@ -3501,7 +3501,7 @@ $ec_lang['lpn_library_pipetypes_tip']='نوع الأنبوب تعريف يمكن
 // **WHAT A DEFINITION CONTAINS IS THE USER\'S CHOICE**, and the note has to say so: a type that
 // states a roughness and no diameter is the way a real approved-materials table handles two ages of
 // the same material, and it is the half of Tom\'s shape that makes the feature work.
-$ec_lang['lpn_library_pipetypes_note']='لكل مشروع مكتبة أنواع أنابيب خاصة به. يمكنك ترك خصائص فارغة في تعريف نوع الأنبوب. فمثلاً، نوع أنبوب يحدد الخشونة دون القطر أمر مقبول. تُلحق أنواع الأنابيب بالأنابيب من محرر خصائصها. تعديل تعريف هنا يغيّر كل أنبوب يستند إليه.';
+$ec_lang['lpn_library_pipetypes_note']='لكل مشروع مكتبة أنواع أنابيب منفصلة. يمكن ترك الخصائص فارغة في تعريف نوع الأنبوب؛ فمثلاً قد يحدد نوع الأنبوب خشونة دون قطر. تُعيَّن أنواع الأنابيب للأنابيب في خصائص الأنبوب. تعديل تعريف هنا يغيّر كل أنبوب يشير إليه.';
 $ec_lang['lpn_library_pipetype_add']='إضافة نوع أنبوب';
 $ec_lang['lpn_library_pipetype_blank_tip']='الخصائص الفارغة في تعريف نوع الأنبوب تُترك لتُدخَل لكل أنبوب على حدة.';
 $ec_lang['lpn_library_pipetype_used_by']='الأنابيب التي تستخدم هذا النوع';
@@ -3516,13 +3516,13 @@ $ec_lang['lpn_field_pipetype_tip']='نوع الأنبوب من مكتبة الم
 $ec_lang['lpn_pipetype_none']='لم يُحدَّد نوع أنبوب';
 $ec_lang['lpn_pipetype_detach']='فصل عن نوع الأنبوب';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_pipetype_detach_tip']='ينسخ القيم التي يقرؤها هذا الأنبوب من نوعه إلى الأنبوب نفسه ويتوقف عن استخدام النوع. لا تتغيّر قيم الأنبوب الآن، ومن الآن فصاعداً يمكنك تعديل هذه القيم هنا.';
+$ec_lang['lpn_pipetype_detach_tip']='انسخ القيم التي يقرؤها هذا الأنبوب من نوعه إلى الأنبوب نفسه وتوقف عن استخدام النوع. لا تتغير قيم الأنبوب الآن، وتُحرَّر هذه القيم هنا من الآن فصاعداً.';
 // ---- THE FITTINGS LIBRARY (ROADMAP Task 590, dev/pipe-library-design.md §3) ----
 // A pipe's minor loss is a SUM of named fittings and quantities -- Crane Technical Paper 410's
 // additive-K method, which is what Bentley's Minor Loss Collection and KYPipe's SigmaM both offer.
 // Bound by id like the pipe types above it, and for the same Bentley finding.
 $ec_lang['lpn_library_fittings']='التجهيزات';
-$ec_lang['lpn_library_fittings_tip']='قائمة التجهيزات مجموعة من التجهيزات وكمياتها يمكن أن تستند إليها عدة أنابيب. تُجمع في معامل فقد موضعي واحد.';
+$ec_lang['lpn_library_fittings_tip']='تجهيزات ذات معاملات فقد موضعي مجمّعة في قوائم';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_library_fittings_note']='لكل مشروع مكتبة تجهيزات خاصة به. تحتوي قائمة التجهيزات على تجهيزات لكل منها كمية، وتُجمع في معامل فقد موضعي واحد. يمكن للأنابيب وأنواع الأنابيب أن تستند إلى قائمة.';
 // **WHERE THE OFFERED NUMBERS CAME FROM, STATED TO THE READER RATHER THAN ONLY IN THE SOURCE.** An
@@ -3530,7 +3530,7 @@ $ec_lang['lpn_library_fittings_note']='لكل مشروع مكتبة تجهيزا
 // starting point, since the real one depends on the size and the make of the fitting. This names
 // EPANET because the reader is looking at its numbers right now, which is the test that mention has
 // to pass (dev/language-strings.md).
-$ec_lang['lpn_library_fittings_source']='التجهيزات المعروضة هنا هي الثلاثة عشر الواردة في الجدول 3.3 من دليل مستخدم EPANET 2.2. اختيار واحد منها ينسخ معامله إلى الصف، حيث يمكنك تغييره. يعتمد المعامل على حجم التجهيزة وصانعها، فعامل الجدول نقطة بداية لا إجابة نهائية.';
+$ec_lang['lpn_library_fittings_source']='التجهيزات المعروضة هنا هي الثلاثة عشر الواردة في الجدول 3.3 من دليل مستخدم EPANET 2.2. اختيار واحد منها ينسخ معامله إلى الصف، حيث يمكن تغييره. يعتمد المعامل على حجم التجهيزة وصنعها، فاعتبر الجدول نقطة بداية لا قيماً نهائية.';
 $ec_lang['lpn_library_fittings_add']='إضافة قائمة تجهيزات';
 $ec_lang['lpn_library_fittings_used_by']='الأنابيب التي تستخدم قائمة التجهيزات هذه';
 $ec_lang['lpn_library_fittings_unused']='لا شيء يستخدم قائمة التجهيزات هذه.';
@@ -3556,8 +3556,8 @@ $ec_lang['lpn_library_import_conflict']='تُخُطِّي، لأن هذا الم
 // Said under ONE library's heading in the receipt, where 'these' is that library. The whole-file
 // case is lpn_library_import_no_libraries above, which has no heading over it to lean on.
 $ec_lang['lpn_library_import_none']='لا يملك ملف المشروع ذلك شيئاً من هذه لنسخه.';
-$ec_lang['lpn_library_import_curve_shape']='وصلت هذه المنحنيات تماماً كما كتبها الملف، ولا يمكن للتشغيل استخدام أي منها حتى يرتفع عمودها الأول من كل نقطة إلى التالية: {names}';
-$ec_lang['lpn_library_import_needs_fittings']='تشير أنواع الأنابيب هذه إلى قائمة تجهيزات لا يملكها هذا المشروع: {names}. استورد مكتبة التجهيزات من الملف نفسه وستجدها.';
+$ec_lang['lpn_library_import_curve_shape']='استُوردت هذه المنحنيات تماماً كما كُتبت في الملف، ولا يمكن لتشغيل استخدام أي منها حتى يرتفع عمودها الأول من كل نقطة إلى التي تليها: {names}';
+$ec_lang['lpn_library_import_needs_fittings']='تشير أنواع الأنابيب هذه إلى قائمة تجهيزات ليست في هذا المشروع: {names}. استورد مكتبة التجهيزات من الملف نفسه لحل هذه الإشارات.';
 // Said in the CHOOSER, above the Import button, and never in the receipt: it is a fact to weigh
 // before importing, not a note about what has already been done. A DISCLOSURE and not an offer to
 // convert, because changing a unit on this page reinterprets a typed number rather than converting
@@ -3578,7 +3578,7 @@ $ec_lang['lpn_fitting_total']='إجمالي معامل الفقد الموضعي
 // The pipe popup\'s own selector.
 $ec_lang['lpn_field_fittings']='قائمة التجهيزات';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_field_fittings_tip']='قائمة تجهيزات من مكتبة المشروع. تُجمع كمياتها ومعاملاتها في معامل الفقد الموضعي لهذا الأنبوب، ويصبح صندوق المعامل عندئذ للقراءة فقط. اترك هذا دون تحديد لتكتب المعامل بنفسك.';
+$ec_lang['lpn_field_fittings_tip']='قائمة تجهيزات من مكتبة المشروع. تُجمع كمياتها ومعاملاتها في معامل الفقد الموضعي لهذا الأنبوب، ثم يصبح مربع المعامل للقراءة فقط. اترك هذا دون تحديد لإدخال المعامل بنفسك.';
 $ec_lang['lpn_fittings_none']='لم تُحدَّد قائمة تجهيزات';
 // EPANET 2.2 user manual, Table 3.3, Minor Loss Coefficients for Selected Fittings. THE MANUAL\'S
 // OWN THIRTEEN NAMES, in its own order. CLAUDE.md: default to the EPANET terminology, since a
@@ -3607,11 +3607,11 @@ $ec_lang['lpn_fitting_other']='تجهيزة أخرى';
 // the reader has just asked for an EPANET file, which is the test a mention has to pass.
 $ec_lang['lpn_inp_export_flat_heading']='حُفظ {file}';
 $ec_lang['lpn_inp_export_flat_lead']='ملف EPANET المُصدَّر معادل رقمياً لهذا المشروع. لكن لا مكان فيه للأمور التالية:';
-$ec_lang['lpn_inp_export_flat_types']='يستند {n} أنابيب هنا إلى {t} أنواع أنابيب. في الملف يحمل كل من هذه الأنابيب نسخته الخاصة من الأرقام، فالإجابات نفسها. ما لا يستطيع الملف الاحتفاظ به هو نوع الأنبوب نفسه، فتعديل تعريف واحد وجعل كل أنبوب يتبعه أمر يسجله ملف مشروعك وحده.';
-$ec_lang['lpn_inp_export_flat_coords']='يحمل ملف EPANET موضعاً واحداً لكل عقدة. يضع هذا السيناريو {n} منها في مكان آخر، وتلك هي المواضع في الملف. يحتفظ كل سيناريو آخر بمواضعه الخاصة في ملف مشروعك وحده.';
+$ec_lang['lpn_inp_export_flat_types']='تشير {n} من الأنابيب هنا إلى {t} من أنواع الأنابيب. في الملف يحمل كل من هذه الأنابيب نسخته الخاصة من الأرقام، فالنتائج واحدة. ما لا يستطيع الملف حمله هو نوع الأنبوب نفسه، لذا لا تُسجَّل الصلة بين تعريف واحد وكل أنبوب يستخدمه إلا في ملف المشروع.';
+$ec_lang['lpn_inp_export_flat_coords']='يحمل ملف EPANET موضعاً واحداً لكل عقدة. يضع هذا السيناريو {n} منها في مكان آخر، وتلك هي المواضع في الملف. يحتفظ كل سيناريو آخر بمواضعه في ملف المشروع فقط.';
 $ec_lang['lpn_inp_export_flat_fittings']='لا يمكن لملف EPANET أن يحتفظ بقائمة الأكواع والصمامات ووصلات التي في ملف مشروعك. معامل الفقد الموضعي لـ{n} أنابيب هنا مجموع من قائمة تجهيزات. يدخل الإجمالي في الملف كما هو تماماً، فلا يتغيّر شيء في الإجابات.';
 $ec_lang['lpn_library_controls']='القواعد';
-$ec_lang['lpn_library_controls_tip']='القاعدة جملة واحدة تفتح رابطاً أو تغلقه، أو تعطيه إعداداً، عندما يقول منسوب ماء أو ضغط أو وقت بذلك.';
+$ec_lang['lpn_library_controls_tip']='القاعدة جملة واحدة تفتح رابطاً أو تغلقه، أو تغيّر ضبطه، استناداً إلى منسوب ماء في صهريج أو ضغط عقدة أو الزمن.';
 // A verb and its object, not a bare "Add": a bare imperative is the hardest kind of string to
 // translate well, and there are two of these buttons a few centimetres apart.
 $ec_lang['lpn_library_pattern_add']='إضافة نمط';
@@ -3634,10 +3634,10 @@ $ec_lang['lpn_library_control_bad']='⚠ غير مفهومة';
 $ec_lang['lpn_library_control_missing']='⚠ لا يوجد في هذه الشبكة أي شيء اسمه {id}';
 $ec_lang['lpn_library_rules']='القواعد';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_library_rules_tip']='القاعدة فقرة قصيرة تفتح رابطاً أو تغلقه، أو تعطيه إعداداً، عندما يصل منسوب ماء أو ضغط أو تدفق أو وقت إلى قيمة تحددها. يمكن للقواعد أن تختبر أكثر من شيء في آن واحد، وأن تقول ما يجب فعله عند فشل الاختبار.';
+$ec_lang['lpn_library_rules_tip']='تفتح القاعدة رابطاً أو تغلقه، أو تغيّر ضبطه، عندما يبلغ منسوب ماء أو ضغط أو تدفق أو الزمن قيمة محددة. يمكن للقاعدة اختبار أكثر من شرط، ويمكنها تحديد الإجراء المتخذ عندما يكون الشرط خاطئاً.';
 $ec_lang['lpn_library_rule_add']='إضافة قاعدة';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_library_rule_tip']='قاعدة واحدة، بالكلمات التي يستخدمها EPANET، جملة واحدة في كل سطر. يسمّيها سطر أول: RULE 1. ثم شرط: IF TANK 2 LEVEL BELOW 17.1. ثم ما يجب فعله حياله: THEN PUMP 9 STATUS IS OPEN. قد يرتّبها سطر أخير: PRIORITY 1. أضف أسطر AND أو OR لاختبار أكثر من شيء، وأسطر ELSE لبيان ما يُفعل عند فشل الاختبار. يمكن للشرط أن يقرأ LEVEL أو HEAD أو GRADE أو PRESSURE أو DEMAND عند عقدة، أو FLOW أو STATUS أو SETTING عند وصلة، أو TIME وCLOCKTIME عند SYSTEM. اكتب الأرقام بالوحدات التي يعرضها هذا المشروع؛ فهي تُحوَّل لك. اترك الكلمات المفتاحية بالإنجليزية؛ فهي ما تقرؤه الصفحة وEPANET.';
+$ec_lang['lpn_library_rule_tip']='سطر واحد لكل جملة. فيما يلي أوصاف مع أمثلة بالأحرف الكبيرة. السطر 1: اسم القاعدة، "RULE 1". السطر 2: شرط، "IF TANK 2 LEVEL BELOW 17.1". السطر 3: إجراء، "THEN PUMP 9 STATUS IS OPEN". السطر 4: أولوية، "PRIORITY 1". أضف أسطر "AND" أو "OR" لاختبار أكثر من شرط، وأسطر "ELSE" لتحديد الإجراء عندما يكون الشرط خاطئاً. يمكن للشرط أن يقرأ LEVEL أو HEAD أو GRADE أو PRESSURE أو DEMAND عند عقدة، أو FLOW أو STATUS أو SETTING عند رابط، أو TIME وCLOCKTIME عند SYSTEM. استخدم وحدات المشروع نفسها دائماً. يجب أن تكون الكلمات المفتاحية بالإنجليزية.';
 $ec_lang['lpn_library_rule_ok']='✓ قُرئت هذه القاعدة';
 $ec_lang['lpn_library_rule_bad']='⚠ تعذّرت قراءة هذه القاعدة';
 // PER JUNCTION, so it is in the property popup and not in this box -- the Settings rule ("if it is
@@ -3655,7 +3655,7 @@ $ec_lang['lpn_field_base_demand']='الطلب الأساسي';
 // junction. The first sentence is his wording verbatim; the second is the one that was already
 // there and is untouched, because it says the other thing this tip exists for -- that the number
 // is a RESULT and not a field. The key has never been translated, so the reword cost nothing.
-$ec_lang['lpn_result_demand_tip']='التدفق الذي تسحبه هذه العقدة عند الخطوة الزمنية المعروضة: كل طلب أساسي مضروباً في نمطه الخاص، مجموعة معاً. إنه محسوب لا مكتوب، فيتغيّر مع الساعة ولا يمكن تحريره.';
+$ec_lang['lpn_result_demand_tip']='التدفق الذي تسحبه هذه العقدة عند الخطوة الزمنية المعروضة: كل طلب أساسي مضروباً في نمطه الخاص، ومجموعة معاً. هو نتيجة لا مُدخَل.';
 $ec_lang['lpn_field_demand_pattern']='نمط الطلب';
 // A JUNCTION’S DEMAND IS A LIST (Task 468). The PATTERN says what KIND of user this is
 // (“residential”); the CATEGORY says WHO it is (“Elm Acres”). Nothing validates a category and there
@@ -3666,11 +3666,11 @@ $ec_lang['lpn_demand_remove']='إزالة هذا الطلب';
 // A RESERVOIR AND A PUMP TAKE A PATTERN TOO, on the same rule: whole-project settings live in the
 // Libraries box, one asset’s own choice lives in its property popup.
 $ec_lang['lpn_field_head_pattern']='نمط المنسوب';
-$ec_lang['lpn_field_head_pattern_tip']='كيف يرتفع منسوب ماء هذا الخزان وينخفض خلال التشغيل. يُضرب المنسوب أعلاه في النمط.';
+$ec_lang['lpn_field_head_pattern_tip']='نمط منسوب ماء هذا الخزان خلال التشغيل. يُضرب العلو أعلاه في النمط.';
 $ec_lang['lpn_field_pump_speed']='السرعة النسبية';
-$ec_lang['lpn_field_pump_speed_tip']='1 تعني أن هذه المضخة تدور بالسرعة التي قيس عندها منحناها. 0.9 تعني أن المضخة نفسها تدور أبطأ، مما يخفّض المنسوب الذي تضيفه والتدفق الذي تمرّره. يحلّ نمط السرعة محل هذا الرقم أثناء سير التشغيل.';
+$ec_lang['lpn_field_pump_speed_tip']='نسبةً إلى سرعة الدوران المستخدمة لتوليد منحنى أداء المضخة المنشور. تُتجاهل (دون تحجيم) إذا وُجد نمط سرعة.';
 $ec_lang['lpn_field_speed_pattern']='نمط السرعة';
-$ec_lang['lpn_field_speed_pattern_tip']='كيف ترتفع سرعة هذه المضخة وتنخفض خلال التشغيل. كل مضاعِف هو السرعة النسبية لذلك الجزء من التشغيل، ويحلّ محل إعداد السرعة بدلاً من أن يُطبَّق عليه، فالمضاعِف صفر يوقف المضخة.';
+$ec_lang['lpn_field_speed_pattern_tip']='يعطي كل مُدخَل في النمط السرعة النسبية لذلك الجزء من التشغيل بدلاً من تحجيم قيمة أساسية.';
 
 // ---- place-name search and terrain elevations (Task 507) ---------------------------------------
 // Both features ask an outside service for something, and each asks its own permission question
@@ -3685,51 +3685,51 @@ $ec_lang['lpn_field_speed_pattern_tip']='كيف ترتفع سرعة هذه ال�
 // one wall, and the order of the paragraphs stays ours rather than the translation's.
 $ec_lang['lpn_search_menu']='البحث عن مكان بالاسم…';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_search_tip']='ابحث عن بلدة أو عنوان أو معلَم بالاسم وانقل الخريطة إليه. يطلب أول استخدام إذنك، لأن الكلمات التي تكتبها تُرسل إلى خدمة أسماء الأماكن التابعة لـOpenStreetMap.';
+$ec_lang['lpn_search_tip']='يُطلب الإذن عند أول استخدام، لأن عمليات البحث تُرسل إلى خدمة أسماء الأماكن في OpenStreetMap.';
 $ec_lang['lpn_search_bar']='البحث بالاسم…';
 // The four paragraphs of the ask: what is sent and to whom; why this is a separate question from
 // the map pictures; the question itself; and what a no costs (nothing).
-$ec_lang['lpn_search_consent_1']='البحث باسم المكان يرسل الكلمات التي تكتبها إلى nominatim.openstreetmap.org، خدمة أسماء الأماكن المجانية التابعة لمؤسسة OpenStreetMap.';
-$ec_lang['lpn_search_consent_2']='هذه خدمة مختلفة عن صور خريطة الشوارع خلف مشروعك. الصور تقول فقط أين تنظر. البحث يقول ماذا كتبت. ستتلقى خدمة أسماء الأماكن كلمات بحثك وعنوان IP الخاص بك. لا نرسل شيئاً آخر، ولا نحتفظ بأي سجل لعمليات بحثك.';
+$ec_lang['lpn_search_consent_1']='يرسل البحث باسم المكان الكلمات التي تدخلها إلى nominatim.openstreetmap.org، خدمة أسماء الأماكن المجانية التابعة لمؤسسة OpenStreetMap.';
+$ec_lang['lpn_search_consent_2']='هذه خدمة مختلفة عن صور خريطة الشوارع خلف مشروعك. تحدد الصور فقط موضع ما تنظر إليه. أما البحث فيرسل ما أدخلته. ستتلقى خدمة أسماء الأماكن كلمات البحث وعنوان IP الخاص بك. لا نرسل شيئاً آخر، ولا نحتفظ بأي سجل لعمليات بحثك.';
 $ec_lang['lpn_search_consent_3']='هل تسمح لنا بإرسال عمليات بحثك إلى خدمة أسماء الأماكن؟';
 $ec_lang['lpn_search_consent_4']='إذا قلت لا، يستمر كل شيء آخر في هذه الصفحة في العمل تماماً كما هو الآن، بما في ذلك الانتقال إلى خط عرض وخط طول. نتذكّر إجابة نعم حتى لا نحتاج إلى السؤال مرة أخرى. أما لا فلا تُخزَّن على الإطلاق.';
-$ec_lang['lpn_search_refused']='البحث بأسماء الأماكن معطّل، ولم يُرسل شيء. لا يزال بإمكانك استخدام الانتقال إلى خط عرض وخط طول.';
+$ec_lang['lpn_search_refused']='بحث أسماء الأماكن معطّل، ولم يُرسل شيء. لا يزال الأمر الانتقال إلى خط عرض وخط طول يعمل.';
 $ec_lang['lpn_search_prompt']='ابحث عن مكان بالاسم. بلدة أو شارع أو معلَم — على سبيل المثال: Petaluma, California';
-$ec_lang['lpn_search_empty']='اكتب اسم مكان للبحث عنه.';
+$ec_lang['lpn_search_empty']='أدخل اسم مكان للبحث عنه.';
 $ec_lang['lpn_search_working']='جارٍ البحث…';
-$ec_lang['lpn_search_busy']='يوجد بحث قيد التشغيل بالفعل. انتظر حتى يُجيب.';
+$ec_lang['lpn_search_busy']='يجري بحث بالفعل. انتظر حتى ينتهي.';
 $ec_lang['lpn_search_choose']='هناك أكثر من مكان مطابق. أيهم؟';
 $ec_lang['lpn_search_nochoice']='لم يُختر شيء، فلم تتحرك الخريطة.';
 $ec_lang['lpn_search_badchoice']='هذا ليس أحد الأرقام في القائمة.';
 $ec_lang['lpn_search_none']='لم يُعثر على شيء بهذا الاسم.';
 // Five different failures, five different next actions. Keep them distinct in translation too --
 // "search failed" for all five is exactly what this set exists to avoid.
-$ec_lang['lpn_search_rate']='تطلب خدمة أسماء الأماكن منا أن نبطئ. انتظر دقيقة وحاول مرة أخرى.';
-$ec_lang['lpn_search_http']='أجابت خدمة أسماء الأماكن بخطأ.';
-$ec_lang['lpn_search_timeout']='لم تُجب خدمة أسماء الأماكن في الوقت المحدد. كل شيء آخر في هذه الصفحة يعمل بدونها.';
-$ec_lang['lpn_search_unreadable']='أجابت خدمة أسماء الأماكن بشيء تعذّر على هذه الصفحة قراءته.';
+$ec_lang['lpn_search_rate']='قيّدت خدمة أسماء الأماكن معدل الطلبات. انتظر دقيقة وحاول مرة أخرى.';
+$ec_lang['lpn_search_http']='أعادت خدمة أسماء الأماكن خطأ.';
+$ec_lang['lpn_search_timeout']='لم تستجب خدمة أسماء الأماكن في الوقت المناسب. كل ما عدا ذلك في هذه الصفحة يعمل بدونها.';
+$ec_lang['lpn_search_unreadable']='أعادت خدمة أسماء الأماكن استجابة تعذّر على هذه الصفحة قراءتها.';
 $ec_lang['lpn_search_offline']='تعذّر الوصول إلى خدمة أسماء الأماكن. قد تكون غير متصل بالإنترنت. كل شيء آخر في هذه الصفحة يعمل بدونها، بما في ذلك الانتقال إلى خط عرض وخط طول.';
-$ec_lang['lpn_search_toofast']='بحث واحد في الثانية — هذا ما تسمح به خدمة أسماء الأماكن. حاول مرة أخرى بعد لحظة.';
+$ec_lang['lpn_search_toofast']='تسمح خدمة أسماء الأماكن ببحث واحد في الثانية. حاول مرة أخرى بعد لحظة.';
 $ec_lang['lpn_search_nofetch']='لا يستطيع هذا المتصفح الوصول إلى خدمة أسماء الأماكن.';
 // Shown three times -- the menu tip, the confirm and the result notice -- so that the three cannot
 // drift into three different claims about the same data. One sentence, translated once.
-$ec_lang['lpn_terrain_accuracy']='يجمع Mapbox هذا من مجموعات بيانات ارتفاع عامة كثيرة، لذا تعتمد جودته كلياً على مكانك. حيث يوجد مسح ليدار وطني، مثل USGS 3DEP في معظم الولايات المتحدة ونظائره في أماكن أخرى، يمكن أن يكون أدق من متر أفقياً وبضعة أعشار من المتر رأسياً. حيث لا توجد إلا بيانات عالمية، فهو نحو 30 م أفقياً وعدة أمتار رأسياً. لا يخبرنا Mapbox أياً منهما حصلت عليه. تعامل معه كخريطة كنتورية، لا كمسح ميداني: تحقّق من أي شيء تعتمد عليه.';
+$ec_lang['lpn_terrain_accuracy']='يجمع Mapbox هذه البيانات من مجموعات بيانات ارتفاع عامة كثيرة، لذا تعتمد دقتها على الموقع. حيث يوجد مسح ليدار وطني، مثل USGS 3DEP في معظم الولايات المتحدة وما يماثله في أماكن أخرى، يمكن أن تكون الدقة أفضل من 1 م أفقياً وبضعة أعشار المتر رأسياً. وحيث لا توجد إلا بيانات عالمية، فهي نحو 30 م أفقياً وعدة أمتار رأسياً. لا يبيّن Mapbox أي مصدر ينطبق. تعامل معها كخريطة كنتورية لا كمسح ميداني، وتحقق من أي قيمة يعتمد عليها التصميم.';
 $ec_lang['lpn_terrain_consent_1']='ملء المناسيب يرسل موضع كل عقدة تحتاج منسوباً — خط عرضها وخط طولها — إلى api.mapbox.com، للاستعلام عن ارتفاع الأرض هناك.';
 $ec_lang['lpn_terrain_consent_2']='هذا سؤال مختلف عن صور الخريطة خلف مشروعك. الصور تقول فقط أين تنظر. هذه المواضع هي شبكتك نفسها. ستتلقى Mapbox هذه الإحداثيات وعنوان IP الخاص بك. لا نرسل شيئاً آخر: لا اسماً ولا أنابيب ولا مشروعاً. لا نحتفظ بأي سجل لذلك، ولا يُخزَّن شيء على هذا الجهاز سوى إجابتك عن هذا السؤال.';
 $ec_lang['lpn_terrain_consent_3']='هل تسمح لنا بإرسال مواضع عقدك إلى Mapbox؟';
-$ec_lang['lpn_terrain_consent_4']='إذا قلت لا، يستمر كل شيء آخر في هذه الصفحة في العمل تماماً كما هو الآن، ويمكنك كتابة المناسيب بنفسك كما كنت تفعل. نتذكّر إجابة نعم حتى لا نحتاج إلى السؤال مرة أخرى. أما لا فلا تُخزَّن على الإطلاق.';
-$ec_lang['lpn_terrain_refused']='لم تُملأ المناسيب، ولم يُرسل شيء. يمكنك كتابتها كما كنت تفعل.';
+$ec_lang['lpn_terrain_consent_4']='إذا اخترت لا، يستمر كل شيء آخر في هذه الصفحة بالعمل تماماً كما هو الآن، ويمكن إدخال المناسيب يدوياً كما في السابق. نتذكر الموافقة حتى لا نضطر إلى السؤال مرة أخرى. أما الرفض فلا يُخزَّن إطلاقاً.';
+$ec_lang['lpn_terrain_refused']='لم تُعبَّأ المناسيب، ولم يُرسل شيء. يمكن إدخالها يدوياً كما في السابق.';
 // {n} is a whole number, {k} a whole number, {v} an elevation with its unit, {m} and {f} whole
 // numbers. Substituted, never concatenated.
 $ec_lang['lpn_terrain_confirm']='هل تريد ملء منسوب {n} عقدة (عقد) من Mapbox DEM؟';
-$ec_lang['lpn_terrain_confirm_default_1']='تملك كل عقدة منسوباً بالفعل، ولا يزال {n} منها عند {v}، وهو المنسوب الذي تبدأ به العقدة الجديدة وليس منسوباً كتبته أنت.';
+$ec_lang['lpn_terrain_confirm_default_1']='لكل عقدة منسوب بالفعل، ولا يزال {n} منها عند {v}، وهو المنسوب الذي تبدأ به العقدة الجديدة لا منسوباً أدخلته.';
 $ec_lang['lpn_terrain_confirm_default_2']='هل تريد استبدال منسوب تلك الـ{n} عقدة بقيم من Mapbox DEM؟';
-$ec_lang['lpn_terrain_keep']='{k} عقدة (عقد) تملك منسوباً بالفعل ولن تُمس.';
+$ec_lang['lpn_terrain_keep']='{k} عقدة (عقد) لها منسوب بالفعل ولن تتغير.';
 $ec_lang['lpn_terrain_undo']='تراجع واحد (Ctrl-Z) يعيدها جميعاً كما كانت.';
 $ec_lang['lpn_terrain_requests']='{n} طلب (طلبات) إلى api.mapbox.com.';
-$ec_lang['lpn_terrain_busy']='يجري ملء المناسيب بالفعل. انتظرها.';
+$ec_lang['lpn_terrain_busy']='تجري تعبئة المناسيب بالفعل. انتظر انتهاءها.';
 $ec_lang['lpn_terrain_offmap']='مواضع هذه العقد ليست على خريطة التضاريس، فلم يُرسل شيء.';
-$ec_lang['lpn_terrain_too_wide']='تنتشر هذه العقد على مساحة واسعة جداً من الأرض لقراءتها دفعة واحدة ({n} طلب بلاطة). لم يُرسل شيء.';
+$ec_lang['lpn_terrain_too_wide']='تمتد هذه العقد على جزء كبير جداً من الأرض لا يمكن قراءته في عملية واحدة ({n} طلب بلاطة). لم يُرسل شيء.';
 $ec_lang['lpn_terrain_cancelled']='لم يتغيّر شيء ولم يُرسل شيء.';
 $ec_lang['lpn_terrain_nofetch']='لا يستطيع هذا المتصفح الوصول إلى خدمة التضاريس.';
 $ec_lang['lpn_terrain_working']='جارٍ قراءة سطح الأرض…';
@@ -3738,7 +3738,7 @@ $ec_lang['lpn_terrain_denied']='رفضت خدمة التضاريس الطلب ({
 $ec_lang['lpn_terrain_failed']='تعذّر الوصول إلى خدمة التضاريس، فلم يتغيّر أي منسوب. قد تكون غير متصل بالإنترنت. كل شيء آخر في هذه الصفحة يعمل بدونها.';
 // A 429 is the service asking us to slow down. It is not a refusal and not a lost network, so it
 // gets its own sentence: the same request works in a minute.
-$ec_lang['lpn_terrain_rate_limited']='تطلب خدمة التضاريس منا أن نبطئ (429)، فلم يتغيّر أي منسوب. حاول مرة أخرى خلال دقيقة.';
+$ec_lang['lpn_terrain_rate_limited']='قيّدت خدمة التضاريس معدل الطلبات (429)، فلم يتغير أي منسوب. حاول مرة أخرى بعد دقيقة.';
 // Any other status the service sent back. {status} is that number.
 $ec_lang['lpn_terrain_http']='أجابت خدمة التضاريس بخطأ ({status})، فلم يتغيّر أي منسوب. لا شيء خاطئ في شبكتك.';
 // Said when the nodes asked about have no position on the Earth at all, which is what a projected
@@ -3746,7 +3746,7 @@ $ec_lang['lpn_terrain_http']='أجابت خدمة التضاريس بخطأ ({st
 $ec_lang['lpn_terrain_no_place']='لا تملك أي من تلك العُقَد موضعاً على الأرض، فلم يُرسَل شيء ولم يتغيّر أي منسوب. تحتاج قراءة سطح الأرض إلى مشروع بخط عرض وخط طول، أو مشروع على إسقاط يمكن لهذه الصفحة وضعه.';
 $ec_lang['lpn_terrain_done']='{n} منسوباً (مناسيب) تم ملؤها.';
 $ec_lang['lpn_terrain_missed']='تعذّرت قراءة {m}، ولا تزال فارغة.';
-$ec_lang['lpn_terrain_partial']='{f} بلاطة تضاريس (بلاطات) لم تُجب.';
+$ec_lang['lpn_terrain_partial']='لم تستجب {f} من بلاطات التضاريس.';
 $ec_lang['lpn_terrain_will_ids']='ستحصل هذه العقد على منسوب: {ids}';
 $ec_lang['lpn_terrain_keep_ids']='تلك العقد هي: {ids}';
 $ec_lang['lpn_terrain_filled_ids']='حصلت هذه العقد على منسوب: {ids}';
@@ -3766,24 +3766,24 @@ $ec_lang['lpn_terrain_ids_more']='{ids}، و{n} أخرى';
 // {id} a junction or pipe name, and {done}, {total}, {n}, {pass}, {fail}, {design} and {solves}
 // are whole numbers. Every one is substituted, never concatenated.
 $ec_lang['lpn_ff_menu']='تحليل تدفق الحريق…';
-$ec_lang['lpn_ff_menu_tip']='اختبر الملتقيات واحداً تلو الآخر: كم يستطيع كل منها أن يوصّل مع الحفاظ على الضغط المتبقي الذي حددته، وهل يؤدي سحب التدفق المطلوب هناك إلى دفع أي شيء آخر خارج حدوده؟';
+$ec_lang['lpn_ff_menu_tip']='اختبر كل ملتقى محدد لتدفق الحريق، وافحص الأثر في بقية النظام';
 $ec_lang['lpn_ff_title']='تحليل تدفق الحريق';
-$ec_lang['lpn_ff_intro']='يُطلب من كل ملتقى بالتناوب سحب تدفق حريق إضافة إلى الطلب الذي يحمله بالفعل. لا يتغيّر أي شيء في مشروعك؛ يُجرى التشغيل بأكمله على نسخة.';
+$ec_lang['lpn_ff_intro']='يسحب كل ملتقى بالتناوب تدفق حريق فوق طلبه القائم. يستخدم التشغيل نسخة من الشبكة عند الخطوة الزمنية المعروضة، فلا يتغيّر شيء في مشروعك.\n\nيُختبر تدفق الحريق عادةً عند طلب اليوم الأقصى، لذا اضبط الشبكة على هذه الحالة أولاً.\n\nيستغرق كل ملتقى مختبَر نحو 16 حلاً للشبكة كلها، لذا يستغرق النظام الكبير دقائق: اختر الملتقيات قبل التشغيل، وأوقفه في أي وقت للاحتفاظ بالنتائج الجزئية.';
 $ec_lang['lpn_ff_scope']='الملتقيات المراد اختبارها';
-$ec_lang['lpn_ff_all']='الكل';
-$ec_lang['lpn_ff_selected']='المحددة';
+$ec_lang['lpn_ff_all']='كل الملتقيات';
+$ec_lang['lpn_ff_selected']='الملتقيات المحددة';
 $ec_lang['lpn_ff_no_junctions']='لا يحتوي هذا المشروع على ملتقيات بعد، فلا يوجد ما يُختبر.';
 $ec_lang['lpn_ff_no_selection']='لا يوجد ملتقى محدد. حدد ملتقيات أو اختر كل الملتقيات.';
 $ec_lang['lpn_ff_skipped']='{n} عنصراً محدَّداً ليست ملتقيات، فلم تُختبر.';
 $ec_lang['lpn_ff_required']='تدفق الحريق المطلوب';
-$ec_lang['lpn_ff_required_tip']='التدفق الذي يشترطه كود الحريق لديك أو جهة الإطفاء عند الحنفية. يُختبر كل ملتقى مقابل هذا الرقم ما لم يحمل تدفق حريق مطلوباً خاصاً به.';
+$ec_lang['lpn_ff_required_tip']='التدفق المطلوب عند الحنفية وفق كود الحريق المنطبق أو جهة الإطفاء. يُختبر كل ملتقى مقابل هذه القيمة ما لم يُدخَل تدفق حريق مطلوب لذلك الملتقى.';
 $ec_lang['lpn_ff_required_own']='تُختبر الملتقيات التي تحمل تدفق حريق مطلوباً خاصاً بها مقابل ذلك التدفق بدلاً منه. عددها: {n}.';
-$ec_lang['lpn_ff_required_node_tip']='تدفق الحريق المطلوب عند هذا الملتقى تحديداً لاستخدام الأرض الذي يخدمه، حسب كود الحريق لديك أو جهة الإطفاء. اتركه فارغاً ليُختبر الملتقى مقابل الرقم في مربع تحليل تدفق الحريق.';
+$ec_lang['lpn_ff_required_node_tip']='تدفق الحريق المطلوب عند هذا الملتقى لاستخدام الأرض الذي يخدمه، وفق كود الحريق المنطبق أو جهة الإطفاء. اتركه فارغاً لاختبار الملتقى مقابل القيمة في مربع تحليل تدفق الحريق.';
 $ec_lang['lpn_ff_residual']='الضغط المتبقي الواجب الحفاظ عليه';
 $ec_lang['lpn_ff_residual_tip']='الضغط الذي يجب أن يحافظ عليه الملتقى أثناء توصيل تدفق الحريق. يستخدم كل من AWWA M31 و NFPA 291 قيمة 20 psi (140 kPa).';
 $ec_lang['lpn_ff_design']='فحص التصميم (الأثر على النظام)';
-$ec_lang['lpn_ff_design_tip']='سؤال منفصل عن قدرة الملتقى على توصيل التدفق: مع سحب ذلك التدفق هناك، هل ينخفض أي شيء آخر دون حده الأدنى للضغط أو يتجاوز حد سرعته؟ اختيار فحص هذا لا يكلّف حساباً إضافياً.';
-$ec_lang['lpn_ff_design_no_selection']='نطاق فحص التصميم مضبوط على المحددة، ولا يوجد عنصر محدد. حدد عناصر أو اختر خيار الكل.';
+$ec_lang['lpn_ff_design_tip']='سؤال منفصل عن قدرة الملتقى على توصيل التدفق: مع سحب ذلك التدفق هناك، هل ينخفض أي ملتقى آخر دون أدنى ضغط له أو يتجاوز أي أنبوب حد سرعته؟ لا يتطلب هذا الفحص حساباً إضافياً.';
+$ec_lang['lpn_ff_design_no_selection']='نطاق فحص التصميم مضبوط على الملتقيات المحددة، لكن لا عناصر محددة. حدّد عناصر على الخريطة أو اختر كل الملتقيات.';
 $ec_lang['lpn_ff_minpressure']='أدنى ضغط مسموح به في أي مكان آخر';
 $ec_lang['lpn_ff_minpressure_tip']='يُبلَّغ عن أي ملتقى ينخفض دون هذا الحد بينما يسحب ملتقى آخر تدفق حريقه على أنه مشكلة تصميم.';
 $ec_lang['lpn_ff_maxvelocity']='أقصى سرعة مسموح بها';
@@ -3793,7 +3793,7 @@ $ec_lang['lpn_ff_maxvelocity_tip']='يُبلَّغ عن أي أنبوب يعمل
 // for hydrant losses beyond the node."). IT LEADS WITH THE METHOD, NOT WITH THE ABSENCE: Tom read
 // the first wording as "no losses are accounted for at the raw node", which is a hole in the tool
 // rather than the deliberate and standard choice it actually is.
-$ec_lang['lpn_ff_accounting']='يُسحب تدفق الحريق عند الملتقى نفسه. هذه هي الطريقة المستخدمة هنا، وهي الطريقة المعتادة. لا تُنمذَج الحنفية ولا أنبوبها الجانبي ولا فوهتها، فتوصّل الحنفية الحقيقية أقل من التدفق المعروض هنا.';
+$ec_lang['lpn_ff_accounting']='يُنمذَج الضغط عند الملتقى نفسه، وهي الطريقة المعتادة. لا تُنمذَج الحنفية ولا خطها الجانبي ولا فوهتها، والضغط عند الفوهة أقل منه عند العقدة.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_ff_engine_native']='يُستخدم الحلّال المدمج.';
 // Edited by TGH 2026-09-07
@@ -3826,8 +3826,8 @@ $ec_lang['lpn_ff_clear']='مسح الحلقات';
 // two failure modes are independent -- a junction can miss its fire flow AND pull its neighbours
 // down -- so these three do not add up to the number of junctions, and that is correct rather than
 // a rounding slip. Said as three separate facts for that reason.
-$ec_lang['lpn_ff_summary']='{clean} ملتقى لم يكن فيه خلل. {fire} ملتقى فشل في تدفق الحريق. {design} ملتقى أثّر في بقية النظام.';
-$ec_lang['lpn_ff_summary_error']='تعذّرت الإجابة عن {n} ملتقى.';
+$ec_lang['lpn_ff_summary']='{clean} ملتقى اجتاز كل الفحوص. {fire} ملتقى أخفق في تدفق الحريق. {design} ملتقى أثّر في بقية النظام.';
+$ec_lang['lpn_ff_summary_error']='تعذّر حلّ {n} ملتقى.';
 // ONE WIDE TABLE, NOT TWO REPORTS (Tom, 2026-08-30, with a competitor's own table in front of him:
 // "Normally they are kind of wide and they include the information from both tables in one table.")
 // One run has always produced one result set holding both answers per junction, so two headings
@@ -3879,7 +3879,7 @@ $ec_lang['lpn_ff_more']='و{n} أخرى متأثرة';
 // the Worst effect cell and undisplayed junctions under the table; a gendered language must
 // agree with one noun and would have been wrong at the other call site.
 $ec_lang['lpn_ff_rows_more']='الملتقيات غير المعروضة: {n}.';
-$ec_lang['lpn_ff_design_none']='لم يتجاوز أي شيء في المجموعة المختارة حدوده أثناء سحب أي ملتقى تدفق حريقه.';
+$ec_lang['lpn_ff_design_none']='مع سحب تدفق الحريق لكل ملتقى مختبَر بالتناوب، لم يتجاوز أي شيء في نطاق فحص التصميم حدوده.';
 $ec_lang['lpn_ff_design_off_note']='لم يُفحص الأثر على بقية النظام في هذا التشغيل.';
 // **WHY IT IS SAID AND NEVER APPLIED, in Tom's words (2026-09-02), and the reason is the MODEL, not
 // the arithmetic:** *"These models are not always fine-grained. They don't represent every pipe,
@@ -3895,7 +3895,7 @@ $ec_lang['lpn_ff_design_off_note']='لم يُفحص الأثر على بقية �
 // ISO credits a single hydrant with at most 1,500 gpm whatever the hydraulics say. Said beside the
 // numbers and never applied to them: a number quietly cut down to a credit limit is a lie with a
 // tidy face.
-$ec_lang['lpn_ff_iso']='يمنح مكتب خدمات التأمين (ISO) الحنفية الواحدة حداً أقصى قدره {flow}. لم يُطبَّق حد الاعتماد هذا هنا لأننا لا نعرف كم حنفية قد تمثّلها العقدة.';
+$ec_lang['lpn_ff_iso']='يعتمد مكتب خدمات التأمين (ISO) للحنفية الواحدة حداً أقصى قدره {flow}. لا يُطبَّق هذا الحد هنا، لأن الملتقى قد يمثّل أكثر من حنفية واحدة.';
 // Every way a junction can fail to produce a number is named. None of them is ever shown as a flow
 // of zero: "there is no available fire flow" and "the available fire flow is zero" are different
 // facts, and only the first one is ever true.
@@ -3903,7 +3903,7 @@ $ec_lang['lpn_ff_err_at_rest']='دون الضغط المتبقي بالفعل ق
 $ec_lang['lpn_ff_err_converge']='لم تتقارب الشبكة.';
 $ec_lang['lpn_ff_err_solve']='أبلغ الحلّال عن خطأ ولم يقدّم إجابة.';
 $ec_lang['lpn_ff_err_not_junction']='ليس ملتقى';
-$ec_lang['lpn_ff_err_unknown']='لا إجابة. الرمز المبلَّغ عنه هو {code}.';
+$ec_lang['lpn_ff_err_unknown']='لا نتيجة. رمز الخطأ: {code}';
 
 // ---- Settings > New assets > Import surveyed points: CSV and GPX (ROADMAP Task 592) -----------
 //
@@ -3921,7 +3921,7 @@ $ec_lang['lpn_ff_err_unknown']='لا إجابة. الرمز المبلَّغ ع�
 // cannot tell a mistake from a place; a file of eastings and northings is refused by name, because
 // a plane coordinate read as a degree is silent and puts a network in the Gulf of Guinea.
 $ec_lang['lpn_file_import_survey']='استيراد نقاط مساحية…';
-$ec_lang['lpn_file_import_survey_tip']='اقرأ قائمة نقاط مساحية من ملف نصي واصنع ملتقى واحداً عند كل نقطة، آخذاً إعدادات العنصر الجديد لكل ما لا يذكره الملف. لا تُرسم أنابيب، ولا يُسقَط أي صف أبداً دون تسميته. يقرأ نظام الإحداثيات الذي يستخدمه هذا المشروع بالفعل، مُسنداً جغرافياً أو لا.';
+$ec_lang['lpn_file_import_survey_tip']='اقرأ قائمة نقاط مساحية من ملف نصي وأنشئ ملتقى واحداً عند كل نقطة، مع أخذ إعدادات العنصر الجديد لكل ما لا يذكره الملف. لا تُرسم أنابيب ما لم تحدّد قراءة الوصف كرموز ميدانية، ولا يُسقَط أي صف دون تسميته. يقرأ نظام الإحداثيات الذي يستخدمه هذا المشروع بالفعل، مُسنداً جغرافياً أو لا.';
 $ec_lang['lpn_survey_read_error']='تعذّرت قراءة ذلك الملف من قرصك.';
 $ec_lang['lpn_survey_cancelled']='لم يُنشَأ شيء ولم يتغيّر شيء.';
 // What the project calls its two axes, for a sentence js/lpn-survey.js writes about a column. The
@@ -3932,7 +3932,7 @@ $ec_lang['lpn_survey_axis_east']='الإحداثي الشرقي';
 // A column in a file that states no names of its own. Counted from 1, the way a spreadsheet does.
 $ec_lang['lpn_survey_err_empty']='لا يحتوي ذلك الملف على شيء.';
 $ec_lang['lpn_survey_err_unreadable']='تعذّرت قراءة ذلك الملف كقائمة نقاط مساحية.';
-$ec_lang['lpn_survey_err_ambiguous_coord']='قد يكون أكثر من عمود في ذلك الملف هو {axis} ({detail})، ولن تختار هذه الصفحة بينها. اترك واحداً منها مسمّى باسم {axis} وحاول مرة أخرى.';
+$ec_lang['lpn_survey_err_ambiguous_coord']='يمكن أن يكون أكثر من عمود في ذلك الملف هو {axis} ({detail})، ولا تختار هذه الصفحة بينها. اترك واحداً منها فقط مسمّى {axis} وحاول مرة أخرى.';
 $ec_lang['lpn_survey_err_no_points']='لم يُقرَأ ولا صف واحد من ذلك الملف كنقطة مساحية. الصفوف المقروءة: {detail}';
 // THE FILE FORMAT CHOOSER (Tom, 2026-09-17: "We will need to include a file format chooser
 // (PNEZD, PENZD, or whatever format is useful for Declan."). PNEZD and PENZD are the same five
@@ -3957,7 +3957,7 @@ $ec_lang['lpn_survey_confirm_tank']='وُجد {n} صهريج (صهاريج). ه�
 $ec_lang['lpn_survey_report_junction']='استُورد {n} ملتقى (ملتقيات)، منها {m} بمنسوب.';
 $ec_lang['lpn_survey_report_reservoir']='استُورد {n} خزان (خزانات)، منها {m} بمنسوب.';
 $ec_lang['lpn_survey_report_tank']='استُورد {n} صهريج (صهاريج)، منها {m} بمنسوب.';
-$ec_lang['lpn_survey_report_clean']='وصلت كل نقطة في الملف، ولم يتغيّر شيء أثناء الاستيراد.';
+$ec_lang['lpn_survey_report_clean']='استُوردت كل نقطة في الملف دون تغيير.';
 $ec_lang['lpn_survey_report_notes']='أخطاء الاستيراد وملاحظاته:';
 $ec_lang['lpn_survey_sev_error']='خطأ';
 $ec_lang['lpn_survey_sev_warning']='تحذير';
@@ -3972,3 +3972,227 @@ $ec_lang['lpn_survey_note_blank_rows']='سطور فارغة جرى تخطّيه�
 $ec_lang['lpn_survey_note_id_duplicate']='الاسم مستخدَم بالفعل سابقاً في هذا الملف، عُيِّن اسم جديد.';
 $ec_lang['lpn_survey_note_id_taken']='الاسم موجود بالفعل في المشروع، عُيِّن اسم جديد.';
 $ec_lang['lpn_survey_note_id_invalid']='لا يمكن استخدام هذا الاسم هنا، عُيِّن اسم جديد.';
+$ec_lang['points_data_msg_line']='لم يُلصَق شيء. تعذّرت قراءة السطر {n} على أنه محطة ومنسوب.';
+$ec_lang['points_data_msg_none']='لم يُلصَق شيء. لم يُعثر على أي أزواج من المحطة والمنسوب.';
+$ec_lang['lpn_tool_add_chain']='سلسلة ملتقيات وأنابيب';
+$ec_lang['lpn_pane_delete_element']='حذف العنصر';
+$ec_lang['lpn_pane_delete_elements']='حذف العناصر';
+$ec_lang['lpn_pane_sort_desc']='الفرز تنازلياً';
+$ec_lang['lpn_pane_manage_cols_width']='العرض (em)';
+$ec_lang['lpn_pane_width_tip']='تُحفظ عروض الأعمدة في هذا المتصفح لا في المشروع. انقر نقراً مزدوجاً على فاصل العمود لاستعادة العرض الافتراضي.';
+$ec_lang['lpn_dock_left']='تثبيت على يسار الخريطة';
+$ec_lang['lpn_dock_right']='تثبيت على يمين الخريطة';
+$ec_lang['lpn_dock_float']='عائم';
+$ec_lang['lpn_dock_autohide']='إخفاء تلقائي';
+$ec_lang['lpn_popup_none']='لم يُحدَّد أي عنصر. حدّد عنصراً على الخريطة لعرض خصائصه.';
+$ec_lang['lpn_hotkeys_snip_heading']='لقطة الشاشة';
+$ec_lang['lpn_hotkeys_snip_term']='اختصارات لوحة المفاتيح للقطة الشاشة';
+$ec_lang['lpn_hotkeys_snip_def']='<table class="lpn-notes-table"><tbody><tr><td>S</td><td>اقتصاص، أثناء فتح لقطة الشاشة.</td></tr><tr><td>E</td><td>ممحاة، في عرض التعليم.</td></tr><tr><td>Ctrl+Z, Ctrl+Y</td><td>تراجع وإعادة، في عرض التعليم.</td></tr><tr><td>Esc</td><td>إلغاء الاقتصاص أو مغادرة الممحاة. في عرض التعليم، يغلقه عند عدم رسم شيء.</td></tr></tbody></table>';
+$ec_lang['lpn_fb_intro']='رسائل جاهزة (اختيارية). لا يُرسَل شيء حتى تضغط إرسال.';
+$ec_lang['lpn_fb_pick_numbers']='الأرقام تبدو خاطئة';
+$ec_lang['lpn_fb_pick_broken']='لم يعمل شيء ما';
+$ec_lang['lpn_fb_pick_wording']='الصياغة أو الترجمة خاطئة';
+$ec_lang['lpn_fb_pick_confusing']='هذا مُربك';
+$ec_lang['lpn_fb_comment']='تعليقات (اختيارية)';
+$ec_lang['lpn_fb_email']='البريد الإلكتروني (اختياري، فقط إذا أردت رداً)';
+$ec_lang['lpn_fb_sends']='ما يُرسَل: اسم هذه الصفحة، ولغتك، ونسخة الموقع، ورمز الرسالة على الخريطة إن وُجد، وما اخترته أو كتبته. لا يُرسَل رسمك ولا شبكتك أبداً. يُستخدم بريدك الإلكتروني للرد عليك فقط.';
+$ec_lang['lpn_fb_send']='إرسال';
+$ec_lang['lpn_fb_sending']='جارٍ الإرسال…';
+$ec_lang['lpn_fb_failed']='لم تصلنا الرسالة. ما كتبته لا يزال هنا، فيمكنك المحاولة مرة أخرى.';
+$ec_lang['lpn_fb_bad_email']='عنوان البريد الإلكتروني هذا غير صحيح. صحّحه أو اتركه فارغاً.';
+$ec_lang['lpn_fb_busy']='وصل عدد كبير من الرسائل في الدقائق الأخيرة. ما كتبته لا يزال هنا، فيمكنك المحاولة لاحقاً.';
+$ec_lang['lpn_tool_add_chain_tip']='سلسلة من الملتقيات والأنابيب: حدّد نقطة على الخريطة لإضافة ملتقى، ثم حدّد كل نقطة تالية لإضافة أنبوب وملتقى. حدّد عقدة موجودة للمتابعة منها. اضغط Escape لإنهاء السلسلة.';
+$ec_lang['lpn_pane_filter_sel_note']='التحديد فقط. عرض {n} من {all}.';
+$ec_lang['lpn_pane_filter_sel_and']='تمت التصفية حسب {q} والتحديد فقط. عرض {n} من {all}.';
+$ec_lang['lpn_pane_filter_sel_none']='لا يوجد أي من العناصر المحددة في هذا الجدول.';
+$ec_lang['lpn_pane_sel_only']='التحديد فقط';
+$ec_lang['lpn_pane_sel_only_none']='لم يُحدَّد أي عنصر. حدّد العناصر على الخريطة أولاً.';
+$ec_lang['lpn_pane_scn_show']='إظهار السيناريوهات';
+$ec_lang['lpn_pane_clear_override']='مسح التجاوز';
+$ec_lang['lpn_pane_scn_alt_tip']='{category} بديل: {alternative}';
+$ec_lang['lpn_change_type_menu']='تغيير النوع';
+$ec_lang['lpn_change_type_tip']='يحوّل العقد المحددة إلى ملتقيات أو خزانات أو صهاريج، أو الروابط المحددة إلى أنابيب أو مضخات أو صمامات. يحتفظ كل عنصر بمعرّفه ومكانه واتصالاته وكل قيمة يملكها النوع الجديد أيضاً. إذا كان سيضيع شيء، يُطلب إليك التأكيد أولاً.';
+$ec_lang['lpn_change_type_ok']='تغيير';
+$ec_lang['lpn_change_type_lost']='ستضيع هذه القيم:';
+$ec_lang['lpn_change_type_key']='المعرّف: المُدخَل الضائع';
+$ec_lang['lpn_change_type_line']='{id}: {property} {value}';
+$ec_lang['lpn_change_type_line_scenario']='{id}: {property} {value}، في السيناريو {scenario}';
+$ec_lang['lpn_change_type_more']='و{n} أخرى.';
+$ec_lang['lpn_change_type_surface']='تُبقي هذه سطح الماء حيث كان. علو الخزان هو منسوب الصهريج مضافاً إليه عمق مائه، وعمق ماء الصهريج هو علو الخزان مطروحاً منه منسوبه:';
+$ec_lang['lpn_change_type_meaning']='تختبر هذه الضوابط والقواعد عقدة يجري تغييرها، وستقرؤها قراءة مختلفة: يُختبر الملتقى بضغطه، ويُختبر الصهريج أو الخزان بمنسوب مائه.';
+$ec_lang['lpn_change_type_born']='هذه القيم جديدة، وهي مضبوطة كما في عنصر مرسوم حديثاً:';
+$ec_lang['lpn_change_type_no_curve']='{id}: لا منحنى علو للمضخة، فلا تضيف المضخة أي علو حتى يُختار منحنى، ويكتبها تصدير .inp أنبوباً';
+$ec_lang['lpn_change_type_becomes']='{id}: {property} {value}، في السيناريو {scenario}، يصبح {new}';
+$ec_lang['lpn_change_type_customers']='لا يخدم المشتركين إلا الأنبوب، لذا يُوصَل هؤلاء المشتركون بدلاً من ذلك بالعقدة المعروضة بين قوسين، حيث طلبهم مطبَّق بالفعل. يبقون حيث رُسموا، ولا يتغيّر طلبهم:';
+$ec_lang['lpn_change_type_setting']='تعطي هذه الضوابط والقواعد ضبط رابط يجري تغييره أو تختبره. الضبط كمية مختلفة في الأنبوب والمضخة والصمام، لذا ستقرؤه قراءة مختلفة:';
+$ec_lang['lpn_change_type_rules']='تسمّي أسطر القواعد هذه رابطاً بنوعه، وستسميه بنوعه الجديد بدلاً من ذلك:';
+$ec_lang['lpn_find_scope_source']='المصدر';
+$ec_lang['lpn_find_source_no_chemical']='لا تُتتبَّع أي مادة كيميائية، فلا مصدر لأي عقدة.';
+$ec_lang['lpn_profile_open']='فتح ملف المقطع الطولي من EPANET…';
+$ec_lang['lpn_profile_file_done']='قُرئ المقطع الطولي من الملف: عُثر على {used} من {total} عقدة في هذه الشبكة.';
+$ec_lang['lpn_profile_file_missing']='مسمّاة في الملف لكنها غير موجودة في هذه الشبكة: {ids}.';
+$ec_lang['lpn_profile_file_short']='يسمّي الملف أقل من عقدتين في هذه الشبكة، فلا مقطع طولي ليُرسم.';
+$ec_lang['lpn_pgraph_none']='لا نتائج لهذا العنصر في التشغيل الحالي.';
+$ec_lang['lpn_pgraph_source_share_from']='حصة المصدر من {node}';
+$ec_lang['lpn_result_pump_head']='العلو';
+$ec_lang['lpn_result_pump_head_tip']='العلو الذي تضيفه المضخة من السحب إلى التفريغ، ويُعرض رقماً موجباً. يحمله الحلّال وملفات EPANET فقداناً سالباً للضغط.';
+$ec_lang['lpn_report_pump_head']='علو المضخة';
+$ec_lang['lpn_contour_show']='إظهار الكنتورات';
+$ec_lang['lpn_contour_show_tip']='ألغِ التحديد لإخفاء التعبئة وخطوط الكنتور؛ وحدّد لإعادتها كما كانت. تبقى ألوان العقد.';
+$ec_lang['lpn_sysflow_title']='توازن التدفق';
+$ec_lang['lpn_crs_suggested_mark']='(مقترح)';
+$ec_lang['lpn_file_export_menu']='تصدير…';
+$ec_lang['lpn_file_export_item_inp']='ملف EPANET…';
+$ec_lang['lpn_file_export_item_geojson']='ملف GeoJSON…';
+$ec_lang['lpn_status_inp_exported_picture']='جرى تصدير {zip}، ويحتوي على ملف EPANET {file} وصورته الخلفية {picture} وملف الإسناد الجغرافي {world}. استخرج الملفات الثلاثة إلى مجلد واحد، ثم افتح ملف .inp هناك في EPANET؛ فتأتي الصورة معه.';
+$ec_lang['lpn_status_inp_exported_no_picture']='جرى تصدير {file}. تعذّر حفظ الصورة الخلفية، لذا لا يذكر ملف .inp أي صورة؛ وفي EPANET، أضفها عبر View > Backdrop > Load.';
+$ec_lang['lpn_inp_export_difference_one']='شيء واحد لا تستطيع صيغة .inp حمله.';
+$ec_lang['lpn_file_export_geojson_tip']='نزّل هذه الشبكة ملف GeoJSON لاستخدامه في QGIS وArcGIS Pro وبرامج نظم المعلومات الجغرافية الأخرى. الملتقيات والصهاريج والخزانات نقاط، والأنابيب والمضخات والصمامات خطوط تتبع رؤوسها. المواقع بخطوط العرض والطول. تُدرَج النتائج فقط عند حلّ الشبكة.';
+$ec_lang['lpn_geojson_refused_local']='يحتوي ملف GeoJSON على خطوط العرض والطول فقط، وهذا المشروع مرسوم على شبكة محلية بلا موقع على الأرض. أسنده جغرافياً أولاً عبر الخريطة، خريطة العالم، إرفاق، ثم صدّر مرة أخرى.';
+$ec_lang['lpn_geojson_refused_range']='هذه المواقع ليست خطوط عرض وطول صالحة: {detail}';
+$ec_lang['lpn_geojson_refused_crs']='نظام الإحداثيات لهذا المشروع ({detail}) غير معروف لهذه الصفحة، فلا يمكن تحويل مواقعه إلى خطوط عرض وطول. استخدم تحويل باسم… لنسخ المشروع إلى نظام تعرفه هذه الصفحة، ثم صدّر مرة أخرى.';
+$ec_lang['lpn_geojson_refused_empty']='لا شيء للتصدير بعد. ارسم شبكة أو افتح واحدة أولاً.';
+$ec_lang['lpn_geojson_results_in']='النتائج المعروضة على الشاشة مُدرَجة.';
+$ec_lang['lpn_geojson_results_out']='لا نتائج مُدرَجة، لأن الشبكة لم تُحلّ.';
+$ec_lang['lpn_inp_backdrop_attach']='إرفاق {file}…';
+$ec_lang['lpn_inp_backdrop_attach_tip']='لا تستطيع صفحة ويب فتح الصورة باسمها. اخترها على جهازك فتوضع حيث يقول الملف إن مكانها.';
+$ec_lang['lpn_inp_backdrop_attached']='جرى إرفاق {file}، ووُضع حيث يقول الملف إن مكانه.';
+$ec_lang['lpn_inp_backdrop_attached_other']='جرى إرفاق {picked}، ووُضع حيث يقول الملف إن مكانه. يسمّي الملف {file}، وهو اسم مختلف.';
+$ec_lang['lpn_copy_opened_unsaved']='فُتح {file} نسخةً، بقفل جديد سيُحفظ مع الحفظ التالي للملف.';
+$ec_lang['lpn_engine_unavailable_why']='لا يمكن حلّ صمامات التحكم في الضغط والتدفق (PRV وPSV وFCV) من دون حلّال EPANET. {reason}';
+$ec_lang['lpn_engine_needed_failed_why']='لا يمكن حلّ هذه الشبكة إلا بحلّال EPANET. {reason}';
+$ec_lang['lpn_mode_add_chain']='الوضع: سلسلة ملتقيات وأنابيب. حدّد نقطة على الخريطة لإضافة ملتقى، ثم حدّد كل نقطة تالية لإضافة أنبوب وملتقى. حدّد عقدة موجودة للمتابعة منها. اضغط Escape لإنهاء السلسلة. انتقل إلى وضع التحديد لتغيير العناصر والتسميات أو تحريكها.';
+$ec_lang['lpn_cp_allow_tip']='السماح بهذه الأحرف فقط:';
+$ec_lang['lpn_cp_characters_tip']='يعني "@" أي حرف؛ ويعني "#" أي رقم، ويجب إدراج "-" و"." و"," بشكل منفصل إذا كانت مسموحاً بها؛ ويجب أن تقع أي أحرف مسافة بيضاء بين أحرف أخرى.';
+$ec_lang['lpn_valwarn_diameter']='يقع قطر الأنبوب أو الصمام عادةً بين {min} و{max} {unit}. تحقق من الرقم ومن وحدة القطر.';
+$ec_lang['lpn_valwarn_hw']='تقع قيمة C لهيزن-وليامز عادةً بين {min} و{max}. غالباً ما يكون الرقم خارج هذا النطاق خشونة مقصودة لطريقة احتكاك أخرى.';
+$ec_lang['lpn_valwarn_manning']='يقع معامل n لمانينغ عادةً بين {min} و{max}. غالباً ما يكون الرقم خارج هذا النطاق خشونة مقصودة لطريقة احتكاك أخرى.';
+$ec_lang['lpn_valwarn_dw']='تكون خشونة دارسي-فايسباخ عادةً أكبر من 0 وحتى {max} {unit} على الأكثر. غالباً ما يكون الرقم الأكبر قيمة C لهيزن-وليامز أو معامل n لمانينغ.';
+$ec_lang['lpn_valwarn_positive']='لا يقبل EPANET الصفر أو الرقم السالب هنا.';
+$ec_lang['lpn_valwarn_negative']='لا يقبل EPANET رقماً سالباً هنا.';
+$ec_lang['lpn_valwarn_tank_levels']='لا يقبل EPANET هذا الصهريج. يجب ألا يزيد أدنى عمق للماء على عمق الماء، وألا يزيد عمق الماء على أقصى عمق للماء.';
+$ec_lang['lpn_alt_calc_options']='خيارات الحساب';
+$ec_lang['lpn_scenario_duration_tip']='اتركه فارغاً للوراثة من الأصل. مدة التشغيل الكلية 0:00 تعني تشغيلاً في الحالة المستقرة.';
+$ec_lang['lpn_scenario_hyd_step_tip']='اتركه فارغاً للوراثة من الأصل.';
+$ec_lang['lpn_time_scn_overrides']='تجاوزات السيناريو:';
+$ec_lang['lpn_scenario_preset_mult_tip']='مضاعف الطلب {mult} مرة طلب اليوم المتوسط، وهو قيمة مؤقتة. تقع معظم الأنظمة بين {lo} و{hi} (National Research Council, 2006). اضبط القيمة للنظام الذي يجري نمذجته في الإعدادات، الحساب، الهيدروليكا، مضاعف الطلب.';
+$ec_lang['lpn_engine_failed_why']='{reason} يجري عرض الحلّال المدمج بدلاً منه.';
+$ec_lang['lpn_settings_basemap_style']='نمط الخريطة الأساسية';
+$ec_lang['lpn_basemap_style_normal']='عادي';
+$ec_lang['lpn_basemap_style_muted']='خافت';
+$ec_lang['lpn_basemap_style_faded']='باهت';
+$ec_lang['lpn_basemap_style_grayscale']='تدرّج رمادي';
+$ec_lang['lpn_time_statistic']='الإحصاء';
+$ec_lang['lpn_time_stat_none']='بلا';
+$ec_lang['lpn_time_stat_averaged']='متوسط';
+$ec_lang['lpn_time_stat_minimum']='أدنى';
+$ec_lang['lpn_time_stat_maximum']='أقصى';
+$ec_lang['lpn_time_stat_range']='المدى';
+$ec_lang['lpn_time_no_engine_why']='يحلّ الحلّال المدمج لحظة واحدة في كل مرة، فهذه هي الشبكة عند {time} فقط: يُقرأ كل نمط عند تلك اللحظة، ويبقى كل صهريج عند منسوبه الابتدائي بدلاً من أن يمتلئ ويفرغ. {reason}';
+$ec_lang['lpn_time_engine_fetch_failed']='فشل تنزيل حلّال EPANET. أعد تحميل الصفحة للمحاولة مرة أخرى؛ فقد يكون جدار حماية أو وكيل شبكة أو امتداد متصفح يحجبه.';
+$ec_lang['lpn_time_engine_start_failed']='رفض المتصفح تشغيل حلّال EPANET. قد يكون WebAssembly معطَّلاً بإعداد أمني أو بامتداد.';
+$ec_lang['lpn_time_engine_run_failed']='فشل تشغيل EPANET. هذا عيب في هذه الصفحة؛ استخدم الرابط {wrong} للإبلاغ عنه.';
+$ec_lang['lpn_saved_project']='محفوظ مع المشروع';
+$ec_lang['lpn_saved_browser']='محفوظ في هذا المتصفح';
+$ec_lang['lpn_saved_session']='غير محفوظ';
+$ec_lang['lpn_scncmp_at_time']='{value} عند {id}، {time}';
+$ec_lang['lpn_scncmp_same']='متطابق في كل سيناريو';
+$ec_lang['lpn_scncmp_period_note']='حيث يكون للسيناريو مدة تشغيل كلية، فإن أدنى ضغط وأعلى سرعة فيه هما القيمتان القصويان للشبكة كلها، عند الزمن المعروض.';
+$ec_lang['lpn_choice_default']='افتراضي';
+$ec_lang['lpn_ds_menu']='تحجيم الطلب…';
+$ec_lang['lpn_ds_menu_tip']='اضرب الطلبات في نسخة من الشبكة وشاهد الضغوط والسرعات، أو أوجد أكبر معامل تحجيم للطلب يتحمله النظام.';
+$ec_lang['lpn_ds_title']='تحجيم الطلب';
+$ec_lang['lpn_ds_intro']='اختر زر التشغيل لضرب الطلبات عند الملتقيات المحددة في معامل تحجيم الطلب ومشاهدة الضغوط والسرعات.\n\nاختر زر البحث لإيجاد أكبر معامل تحجيم للطلب، لأقرب {step}، تحافظ عنده كل هذه الملتقيات على أدنى ضغط مسموح به على الأقل؛ ويبحث من 0 إلى {max}.\n\nكلاهما يعمل على نسخة من الشبكة، تُحلّ عند الخطوة الزمنية المعروضة في السيناريو النشط، فلا يتغيّر شيء في مشروعك. لا تُحجَّم إلا تلك الخطوة الزمنية، وتؤخذ المناسيب والحالات منها؛ ولاختبار الذروة، حرّك الساعة إلى طلب الذروة قبل التشغيل.';
+$ec_lang['lpn_ds_scope']='الملتقيات المراد تحجيمها';
+$ec_lang['lpn_ds_scope_all']='كل الملتقيات';
+$ec_lang['lpn_ds_scope_selected']='الملتقيات المحددة';
+$ec_lang['lpn_ds_minpressure']='أدنى ضغط مسموح به';
+$ec_lang['lpn_ds_minpressure_tip']='هذا هو الرقم نفسه لأدنى ضغط مسموح به في موضع آخر من تحليل تدفق الحريق. تغييره هنا يغيّره هناك.';
+$ec_lang['lpn_ds_head_scale']='تحجيم الطلبات';
+$ec_lang['lpn_ds_multiplier']='معامل تحجيم الطلب';
+$ec_lang['lpn_ds_multiplier_tip']='العامل الذي يُضرب فيه كل طلب؛ 1.5 تعني زيادة 50٪. ويُطبَّق إضافة إلى مضاعف الطلب للسيناريو النشط، وهو مدرج بالفعل في الطلبات، ولا يُحفظ في المشروع أبداً.';
+$ec_lang['lpn_ds_run']='تشغيل';
+$ec_lang['lpn_ds_head_search']='ما معامل تحجيم الطلب الذي يتحمله النظام؟';
+$ec_lang['lpn_ds_head_search_selected']='ما معامل تحجيم الطلب الذي تتحمله هذه الملتقيات؟';
+$ec_lang['lpn_ds_outside_below']='عند معامل تحجيم للطلب {m}، الملتقيات غير المحددة التي ضغطها دون {pressure}: {n} ({ids}). لا تحدّ من هذه الإجابة.';
+$ec_lang['lpn_ds_holds_max']='✓ يحافظ كل ملتقى على {pressure} حتى معامل تحجيم للطلب {max}، وهو أعلى حد للبحث.';
+$ec_lang['lpn_ds_below_zero']='⚠ ملتقى واحد على الأقل دون {pressure} حتى مع جعل الطلبات المحجَّمة صفراً.';
+$ec_lang['lpn_ds_found']='✓ يحافظ كل ملتقى جرى فحصه على {pressure} على الأقل حتى معامل تحجيم للطلب {m}.';
+$ec_lang['lpn_ds_found_below']='⚠ ملتقى واحد على الأقل دون {pressure} من دون تحجيم للطلب. أكبر معامل تحجيم للطلب يُبقي كل ملتقى عند {pressure} أو أعلى هو {m}.';
+$ec_lang['lpn_ds_search_stopped']='أُوقف البحث قبل أن يجد إجابة.';
+$ec_lang['lpn_ds_lowest_at']='عند معامل تحجيم للطلب {m}، أدنى ضغط هو {pressure}، عند الملتقى {id}.';
+$ec_lang['lpn_ds_nosolve_at']='عند معامل تحجيم للطلب {m}، لم تعطِ الشبكة حلاً. {reason}';
+$ec_lang['lpn_ds_scale_ok']='✓ عند معامل تحجيم للطلب {m}، يحافظ كل ملتقى على {pressure}.';
+$ec_lang['lpn_ds_scale_below']='⚠ عند معامل تحجيم للطلب {m}، الملتقيات دون {pressure}: {n}.';
+$ec_lang['lpn_ds_scaled_selected']='الملتقيات المحجَّمة والمفحوصة: {n}.';
+$ec_lang['lpn_ds_head_lowest']='أدنى الضغوط';
+$ec_lang['lpn_ds_head_velocity']='أعلى السرعات';
+$ec_lang['lpn_ds_col_link']='الرابط';
+$ec_lang['lpn_ds_col_scaled']='محجَّم';
+$ec_lang['lpn_ds_col_scaled_tip']='مع ضرب الطلبات في معامل تحجيم الطلب.';
+$ec_lang['lpn_ds_col_unscaled']='غير محجَّم';
+$ec_lang['lpn_ds_col_unscaled_tip']='مع الطلبات كما هي في السيناريو النشط عند هذه الخطوة الزمنية، وهي القيمة نفسها التي تعرضها الخريطة.';
+$ec_lang['lpn_ds_no_junctions']='لا ملتقيات في هذا المشروع بعد، فلا طلبات لتحجيمها.';
+$ec_lang['lpn_ds_no_selection']='لم تُحدَّد أي ملتقيات. حدّد ملتقيات أو اختر كل الملتقيات.';
+$ec_lang['lpn_ds_skipped']='العناصر المحددة التي ليست ملتقيات وتُركت كما هي: {n}.';
+$ec_lang['lpn_ds_bad_multiplier']='أدخل معامل تحجيم للطلب يساوي صفراً أو أكثر، مثل 1.5.';
+$ec_lang['lpn_ds_stale']='تغيّر الرسم، فمُسحت نتائج تحجيم الطلب. شغّله مرة أخرى.';
+$ec_lang['lpn_analyze_at_time']='الخطوة الزمنية: {time}.';
+$ec_lang['lpn_analyze_time_moved']='⚠ حُسب هذا عند {time}، والساعة الآن عند {now}. شغّله مرة أخرى للخطوة الزمنية المعروضة.';
+$ec_lang['lpn_survey_codes_toggle']='قراءة الوصف كرموز ميدانية';
+$ec_lang['lpn_survey_codes_tip']='تُقرأ أول كلمة في كل وصف على أنها رمز من الجدول. تنضم النقاط ذات رمز الخط نفسه في أنبوب واحد بترتيب الملف، ويُعدّ WL1 وWL2 خطين منفصلين. يبدأ +0 خطاً، وينهيه -0، ويغلقه CLO. تنضم JPN متبوعة باسم نقطة إلى تلك النقطة (Carlson)، ويكتبها Civil 3D بصيغة CPN.';
+$ec_lang['lpn_survey_codes_col_code']='الرمز';
+$ec_lang['lpn_survey_codes_col_type']='نوع العنصر';
+$ec_lang['lpn_survey_codes_add']='إضافة رمز';
+$ec_lang['lpn_survey_codes_remove']='إزالة الرمز';
+$ec_lang['lpn_survey_confirm_coded']='عُثر على {j} من الملتقيات و{r} من الخزانات و{t} من الصهاريج و{p} من الأنابيب. هل تتابع؟';
+$ec_lang['lpn_survey_report_coded']='استُورد {j} من الملتقيات و{r} من الخزانات و{t} من الصهاريج و{p} من الأنابيب، منها {m} من العقد ذات منسوب.';
+$ec_lang['lpn_survey_note_code_unknown']='الرمز غير موجود في جدول الرموز، فاستُورد بنوع العنصر المختار أعلاه.';
+$ec_lang['lpn_survey_note_code_two_nodes']='أكثر من رمز عقدة واحد، واستُخدم الأول.';
+$ec_lang['lpn_survey_note_code_unread']='ليست كل كلمة رمزاً تقرؤه هذه الصفحة، فبقيت في الوصف.';
+$ec_lang['lpn_survey_note_vertex_text']='ليست كل كلمة رمزاً تقرؤه هذه الصفحة، ولا تحتفظ الرأس بوصف.';
+$ec_lang['lpn_survey_note_join_missing']='تسمّي JPN أو CPN نقطة غير موجودة في هذا الملف أو المشروع، فلم يُرسم لها أنبوب.';
+$ec_lang['lpn_survey_note_join_no_line']='JPN أو CPN على نقطة بلا رمز خط، فلم يُرسم لها أنبوب.';
+$ec_lang['lpn_survey_note_pipe_one_node']='يعود هذا الخط إلى العقدة نفسها دون أي عقدة أخرى بينهما، فلم يُرسم له أنبوب.';
+$ec_lang['lpn_survey_note_line_one_point']='نقطة وحيدة على خطها، فلم يُرسم منها أنبوب.';
+$ec_lang['lpn_survey_note_vertices']='النقاط التي أصبحت رؤوساً للأنابيب: {detail}. لا يحتفظ الرأس باسم ولا منسوب ولا وصف.';
+$ec_lang['lpn_survey_note_no_desc']='الرموز الميدانية مفعَّلة، لكن هذا الملف لا يحتوي على عمود وصف، فلم تُقرأ أي رموز.';
+$ec_lang['lpn_survey_note_ring_junction']='أصبحت هذه النقطة ملتقى حتى تُغلق الحلقة.';
+$ec_lang['lpn_survey_note_pipe_zero_length']='هذه النقطة في الموضع نفسه الذي توجد فيه العقدة السابقة لها، فلا طول للأنبوب بينهما.';
+$ec_lang['lpn_survey_note_node_on_pipe']='تقع هذه النقطة تماماً على أنبوب غير متصل بها. إذا كانا متصلين، أضف JPN لبيان ذلك.';
+$ec_lang['lpn_settings_demand_model']='نموذج الطلب';
+$ec_lang['lpn_settings_demand_model_tip']='اختر كيف تتلقى الملتقيات التدفق. يوفّر النموذج المعتمد على الطلب (DDA) كل طلب بالكامل مهما كان الضغط. ويوفّر النموذج المعتمد على الضغط (PDA) أقل من الطلب حيث يكون الضغط دون الضغط المطلوب، ولا يحسبه إلا حلّال EPANET.';
+$ec_lang['lpn_settings_demand_model_dda']='معتمد على الطلب';
+$ec_lang['lpn_settings_demand_model_pda']='معتمد على الضغط';
+$ec_lang['lpn_settings_min_pressure']='أدنى ضغط';
+$ec_lang['lpn_settings_min_pressure_tip']='أدخل الضغط الذي لا يتلقى الملتقى عنده أو دونه أي تدفق. استخدم وحدة ضغط هذا المشروع.';
+$ec_lang['lpn_settings_req_pressure']='الضغط المطلوب';
+$ec_lang['lpn_settings_req_pressure_tip']='أدخل الضغط الذي يتلقى الملتقى عنده أو فوقه طلبه الكامل. يجب أن يكون أكبر من أدنى ضغط. استخدم وحدة ضغط هذا المشروع. اتركه فارغاً لاستخدام القيمة الافتراضية في EPANET، وهي بوحدة psi لوحدات التدفق الأمريكية وبالأمتار فيما عدا ذلك.';
+$ec_lang['lpn_settings_pressure_exponent']='أس الضغط';
+$ec_lang['lpn_settings_pressure_exponent_tip']='أدخل أس المنحنى الذي يرتفع من تدفق صفري عند أدنى ضغط إلى الطلب الكامل عند الضغط المطلوب.';
+$ec_lang['lpn_engine_pda_route']='حُلّت الشبكة بحلّال EPANET، لأن نموذج الطلب معتمد على الضغط.';
+$ec_lang['lpn_diag_pda_needs_epanet']='نموذج الطلب معتمد على الضغط، ولا يحسبه إلا حلّال EPANET. تعذّر تحميل حلّال EPANET، لذا فهذه النتائج مفقودة.';
+$ec_lang['lpn_result_delivered_demand']='الطلب المُسلَّم';
+$ec_lang['lpn_result_delivered_demand_tip']='التدفق الذي يتلقاه هذا الملتقى فعلاً في نموذج الطلب المعتمد على الضغط. وهو أقل من الطلب عندما يكون الضغط دون الضغط المطلوب.';
+$ec_lang['lpn_result_demand_deficit']='عجز الطلب';
+$ec_lang['lpn_result_demand_deficit_tip']='الجزء من الطلب عند هذا الملتقى الذي لا يُسلَّم، لأن الضغط دون الضغط المطلوب.';
+$ec_lang['lpn_pda_deficit_note']='الملتقيات التي تتلقى أقل من طلبها: {n}.';
+$ec_lang['lpn_diag_pda_pressures']='يجب أن يكون الضغط المطلوب أكبر من أدنى ضغط. غيّر أحدهما في الإعدادات.';
+$ec_lang['lpn_inp_drop_pressure_unit']='يذكر هذا الملف وحدة ضغط غير التي تقرؤها هذه الصفحة لوحدة التدفق فيه، وهي psi للوحدات الأمريكية وبالأمتار فيما عدا ذلك. يُقرأ كل ضغط في الملف على هذا الأساس، فتحقق من ضبط الصمامات ومعاملات القطارة وحدود الطلب المعتمد على الضغط التي يحتويها. السطر محفوظ ويُكتب عند التصدير.';
+$ec_lang['lpn_screenshot_menu']='لقطة الشاشة';
+$ec_lang['lpn_screenshot_tip']='انسخ صورة أوضح من الشاشة لمنطقة الخريطة التي تسحبها، جاهزة للصق في تقرير. انقر دون سحب لالتقاط الخريطة كاملة.';
+$ec_lang['lpn_screenshot_hint']='اسحب مستطيلاً فوق الخريطة، أو انقر لالتقاط الخريطة كاملة. يلغي Esc العملية.';
+$ec_lang['lpn_screenshot_copied']='نُسخت لقطة الشاشة.';
+$ec_lang['lpn_screenshot_saved']='الحافظة غير متاحة هنا، لذا نُزِّلت لقطة الشاشة ملف PNG.';
+$ec_lang['lpn_screenshot_no_basemap']='تعذّر تضمين خريطة الشوارع أو الصورة الفضائية.';
+$ec_lang['lpn_screenshot_failed']='تعذّر التقاط لقطة الشاشة.';
+$ec_lang['lpn_snip_hint_free']='اسحب حول المنطقة المراد اقتصاصها، أو انقر لالتقاط الخريطة كاملة. يلغي Esc العملية.';
+$ec_lang['lpn_snip_tip_rect']='اقتصاص مستطيل (S)';
+$ec_lang['lpn_snip_tip_free']='اقتصاص شكل حر (S)';
+$ec_lang['lpn_snip_tip_mode']='شكل الاقتصاص';
+$ec_lang['lpn_snip_tip_map']='لقطة شاشة للخريطة كاملة';
+$ec_lang['lpn_snip_tip_pen']='قلم';
+$ec_lang['lpn_snip_tip_eraser']='ممحاة: انقر ضربة لإزالتها (E)';
+$ec_lang['lpn_snip_tip_undo']='تراجع (Ctrl+Z)';
+$ec_lang['lpn_snip_tip_redo']='إعادة (Ctrl+Y)';
+$ec_lang['lpn_screenshot_scale_tip']='حجم الصورة كمضاعف لمنطقة الشاشة. كلما كبر كانت الصورة أوضح وأكبر حجماً.';

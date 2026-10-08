@@ -449,7 +449,7 @@ $ec_lang['contact_main_menu']='Контакт';
 $ec_lang['about_main_title']='О инжењерским калкулаторима HawsEDC';
 $ec_lang['about_main_desc']='Мисија, слободни софтвер и доприноси';
 // Edited by TGH 2026-09-07
-$ec_lang['about_body_html']='<h3>Мисија</h3><p>Инжењерски калкулатори HawsEDC постоје да служе инжењерима и теренским радницима широм света — посебно онима који раде у регионима са недостатком воде, ограниченим ресурсима или недовољном покривеношћу услугама. Ови алати су део шире хуманитарне мисије: рећи сваком човеку, на најпрактичнији и најефикаснији могући начин, <a target="_blank" href="https://tomsthird.blogspot.com/2026/10/why-engineering-calculator-needs-to.html">да је вољен и цењен заувек, да нема ничега чега треба да се боји и да неће упропастити све</a>.</p><p>Калкулатори су средство. Циљ је свет без патње.</p><h3>Слободни софтвер отвореног кода</h3><p>Сав код је објављен под <a target="_blank" href="https://www.gnu.org/licenses/gpl-3.0.html">GNU General Public License v3.0 or later</a> — слободан у смислу слободе. Можете користити, проучавати, мењати и даље дистрибуирати код под истим условима.</p><p>Веб-сајт који га послужује бесплатно је доступан данас и од 2010; ако једног дана то више не буде могуће, софтвер је и даље ваш да га покренете.</p><p>Copyright © 2009–2026 Thomas Gail Haws.</p><h3>Изворни код</h3><p>Пун изворни код јавно је доступан на GitHub-у:</p><p><a target="_blank" href="https://github.com/hawstom/engcalcs">github.com/hawstom/engcalcs</a></p><p>Тамо можете прегледати код, пријавити проблеме или направити fork репозиторијума.</p><h3>Допринос</h3><p>Свака помоћ је добродошла. <a href="contact.php">Контактирајте Tom Haws</a>.</p><ul><li><strong>Преводи:</strong> Предложите боље формулације. Побољшајте или додајте језик.</li><li><strong>Пријаве грешака:</strong> Користите формулар за повратне информације на било којој страници калкулатора, или пријавите проблем на GitHub-у.</li><li><strong>Нови калкулатори:</strong> Идеје за хидротехничке алате који служе теренским радницима и стручњацима за наводњавање су посебно добродошле.</li><li><strong>Хостинг:</strong> Ако можете да поставите огледало ових калкулатора за регион са ограниченом повезаношћу, јавите ми се.</li></ul><h3>Коришћење без интернета</h3><p>Отворите било који калкулатор једном док сте на вези и сви ће наставити да раде кад нисте: ваш прегледач чува цео пакет док радите. Механизам је <strong>прогресивна веб апликација (PWA)</strong>, ако желите да читате о томе. Након тога сви калкулатори раде без интернета — интернет веза није потребна.</p><p>На Android-у или iOS-у, користите опцију прегледача „Додај на почетни екран“ да бисте инсталирали EngCalcs као апликацију на свом уређају. На рачунару потражите икону за инсталацију у адресној траци прегледача.</p><p>Такође можете сачувати сваки појединачни калкулатор помоћу менија прегледача „Сачувај као…“ за повремену употребу без интернета.</p><h3>Контакт</h3><p>Tom Haws, хидраулички инжењер и оснивач ових калкулатора.<br />Користите формулар за повратне информације на било којој страници калкулатора, или приступите изворном коду на <a target="_blank" href="https://github.com/hawstom/engcalcs">GitHub-у</a>.</p>';
+$ec_lang['about_body_html']='<h3>Мисија</h3><p>Инжењерски калкулатори HawsEDC постоје да служе инжењерима и теренским радницима широм света — посебно онима који раде у регионима са недостатком воде, ограниченим ресурсима или недовољном покривеношћу услугама. Ови алати су део шире хуманитарне мисије: рећи сваком човеку, на најпрактичнији и најефикаснији могући начин, <a target="_blank" href="https://tomsthird.blogspot.com/2026/10/why-engineering-calculator-needs-to.html">да је вољен и цењен заувек, да нема ничега чега треба да се боји и да неће упропастити све</a>.</p><p>Калкулатори су средство. Циљ је свет без патње.</p><h3>Слободни софтвер отвореног кода</h3><p>Сав код је објављен под <a target="_blank" href="https://www.gnu.org/licenses/gpl-3.0.html">GNU General Public License v3.0 or later</a> — слободан у смислу слободе. Можете користити, проучавати, мењати и даље дистрибуирати код под истим условима.</p><p>Веб-сајт који га послужује бесплатно је доступан данас и од 2010; ако једног дана то више не буде могуће, софтвер је и даље ваш да га покренете.</p><p>Copyright © 2009–2026 Thomas Gail Haws.</p><h3>Изворни код</h3><p>Пун изворни код јавно је доступан на GitHub-у:</p><p><a target="_blank" href="https://github.com/hawstom/engcalcs">github.com/hawstom/engcalcs</a></p><p>Тамо можете прегледати код, пријавити проблеме или направити fork репозиторијума.</p><h3>Допринос</h3><p>Свака помоћ је добродошла. <a href="contact.php">Контактирајте Tom Haws</a>.</p><ul><li><strong>Преводи:</strong> Предложите боље формулације. Побољшајте или додајте језик.</li><li><strong>Пријаве грешака:</strong> Користите формулар за повратне информације на било којој страници калкулатора, или пријавите проблем на GitHub-у.</li><li><strong>Нови калкулатори:</strong> Идеје за хидротехничке алате који служе теренским радницима и стручњацима за наводњавање су посебно добродошле.</li><li><strong>Хостинг:</strong> Ако можете да поставите огледало ових калкулатора за регион са ограниченом повезаношћу, јавите ми се.</li></ul><h3>Коришћење без интернета</h3><p>Отворите било који калкулатор једном док сте на вези и сви ће наставити да раде кад нисте: ваш прегледач чува цео пакет док радите. Механизам је <strong>прогресивна веб апликација (PWA)</strong>. Након тога сви калкулатори раде без интернета — интернет веза није потребна.</p><p>На Android-у или iOS-у користите опцију „Додај на почетни екран“ у свом прегледачу да бисте инсталирали EngCalcs као апликацију на свом уређају. На рачунару потражите икону за инсталацију у адресној траци свог прегледача.</p><p>Такође можете сачувати сваки појединачни калкулатор помоћу менија прегледача „Сачувај као…“ за повремену употребу без интернета.</p><h3>Контакт</h3><p>Tom Haws, хидраулички инжењер и оснивач ових калкулатора.<br />Користите формулар за повратне информације на било којој страници калкулатора, или приступите изворном коду на <a target="_blank" href="https://github.com/hawstom/engcalcs">GitHub-у</a>.</p>';
 $ec_lang['contactSendMessage']='Пошаљите поруку Тому Хоусу';
 $ec_lang['contactYourName']='Ваше име:';
 $ec_lang['contactYourEmail']='Ваша е-маил адреса:';
@@ -468,7 +468,7 @@ $ec_lang['rc_qt']='<span class="ec-help" title="Проток по јединиц
 $ec_lang['rc_np']='Порозност каменог поплочавања, n<sub>p</sub>';
 $ec_lang['rc_sg']='<span class="ec-help" title="Густина у односу на воду. Типичан дробљени гранит или базалт ≈ 2,65. Опсег по Robinson: 2,54 до 2,82.">Релативна густина камена, sg <span class="ec-tip">?</span></span>';
 $ec_lang['rc_SD']='<span class="ec-help" title="Стандардна девијација гранулометријског састава. Уједначен камен ≈ 1,25. Опсег по Robinson: 1,15 до 1,47.">Гранулометрија SD = D<sub>84.1</sub>/D<sub>50</sub> <span class="ec-tip">?</span></span>';
-$ec_lang['rc_yn']='<span class="ec-help" title="Успор (Hp > yn) је пожељан — смањује ерозију узводно. (USDA)">Нормална дубина у улазном каналу, y<sub>n</sub> <span class="ec-tip">?</span></span>';
+$ec_lang['rc_yn']='<span class="ec-help" title="Успор (Hp > yn) је пожељан јер смањује ерозију узводно. (USDA)">Нормална дубина у улазном каналу, y<sub>n</sub> <span class="ec-tip">?</span></span>';
 $ec_lang['rc_D50']='<span class="ec-help" title="Јед. 1 (S0 < 0,10) или Јед. 2 (0,10–0,40). Важи: D50 15–278 мм, S0 0,02–0,40. Ван опсега: екстраполација.">Потребна медијанска величина камена, D<sub>50</sub> <span class="ec-tip">?</span></span>';
 $ec_lang['rc_eq_used']='Примењена једначина';
 $ec_lang['rc_sg_check']='Провера релативне густине';
@@ -494,10 +494,10 @@ $ec_lang['rc_Vm']='<span class="ec-help" title="Део qt који тече кр
 $ec_lang['rc_qm']='Јединични проток кроз мантију, q<sub>m</sub>';
 $ec_lang['rc_qs']='Површински јединични проток, q<sub>s</sub> (q<sub>t</sub> − q<sub>m</sub>)';
 $ec_lang['rc_d']='Дубина тока изнад површине поплочавања, d';
-$ec_lang['rc_Hp']='<span class="ec-help" title="Успор (Hp > yn) је пожељан — смањује ерозију узводно. (USDA)">Преливна висина на улазу, H<sub>p</sub> <span class="ec-tip">?</span></span>';
+$ec_lang['rc_Hp']='<span class="ec-help" title="Успор (Hp > yn) је пожељан јер смањује ерозију узводно. (USDA)">Преливна висина на улазу, H<sub>p</sub> <span class="ec-tip">?</span></span>';
 $ec_lang['rc_ponding_check']='Провера успора на улазу';
 $ec_lang['rc_pond_ok']  ='H<sub>p</sub> > y<sub>n</sub> — успор узводно';
-$ec_lang['rc_pond_ok_tip']='Успор узводно од улаза у брзоток је пожељан — смањује ерозију узводно. (USDA)';
+$ec_lang['rc_pond_ok_tip']='Успор узводно од улаза у брзоток је пожељан; смањује ерозију узводно. (USDA)';
 $ec_lang['rc_pond_warn']='H<sub>p</sub> ≤ y<sub>n</sub> — нема успора — могућа ерозија на улазу';
 $ec_lang['rc_pond_warn_tip']='Нема успора узводно од улаза у брзоток; може доћи до ерозије узводно. (USDA)';
 $ec_lang['rc_eq1']='Јед. 1 (S<sub>0</sub> < 0,10) — благи пад';
@@ -665,8 +665,8 @@ $ec_lang['lpn_tool_vertices']='Тачке прегиба';
 // has been struck here three times. "Station along the pipe" is the survey word for a distance
 // measured along a route, which is what it is.
 $ec_lang['lpn_tool_add_meter']='Потрошач';
-$ec_lang['lpn_tool_add_meter_tip']='Кликните где се потрошач налази, а затим кликните на цев или чвор који га опслужује. Потрошња коју унесете за потрошача додаје се чвору на ближем крају те цеви.';
-$ec_lang['lpn_mode_add_meter']='Потрошач: кликните где се потрошач налази, а затим кликните на цев или чвор који га опслужује. Или притисните Esc да откажете.';
+$ec_lang['lpn_tool_add_meter_tip']='Одредите тачку потрошача, а затим његову везу: веза или чвор. Потрошња коју задате потрошачу додаје се чвору на ближем крају те везе.';
+$ec_lang['lpn_mode_add_meter']='Потрошач: одредите где се потрошач налази, а затим изаберите цев или чвор који га опслужује. Или притисните Esc да откажете.';
 $ec_lang['lpn_pane_tab_customers']='Потрошачи';
 $ec_lang['lpn_customer_heading']='Потрошач {id}';
 // ROADMAP Task 247. lpn_field_account and lpn_field_account_tip were DELETED 2026-09-19 (Tom:
@@ -679,7 +679,7 @@ $ec_lang['lpn_customer_heading']='Потрошач {id}';
 $ec_lang['lpn_field_meter_demand']='Потрошња по услузи';
 $ec_lang['lpn_field_meter_count']='Број услуга';
 $ec_lang['lpn_field_meter_total']='Укупна потрошња';
-$ec_lang['lpn_field_meter_total_tip']='Потрошња по услузи помножена бројем услуга. Ово је број који се додаје чвору наведеном испод.';
+$ec_lang['lpn_field_meter_total_tip']='Укупно додато чвору наведеном испод.';
 $ec_lang['lpn_field_meter_pipe']='Повезани елемент';
 $ec_lang['lpn_field_meter_pipe_suggest']='Најближи елемент је {id}. Упишите га овде да бисте овог потрошача опслужили из њега.';
 // Task 247, Tom, 2026-09-25: a service connected exactly to a node reads as a node, never as a
@@ -692,7 +692,7 @@ $ec_lang['lpn_meter_pipe_unknown']='Ништа у овом пројекту се
 // heading is the junction's own whole label reused and only the tip is new: what it says that the
 // junction's does not is that the number the pattern multiplies is the TOTAL, count included.
 $ec_lang['lpn_meter_pattern_unknown']='Ниједан образац у овом пројекту се не зове {id}, па је потрошач остављен какав је био.';
-$ec_lang['lpn_meter_placed']='Потрошач {id} додат. Његов опис и потрошња се уписују у табели Потрошачи, или га притисните у режиму Избор да отворите његов оквир.';
+$ec_lang['lpn_meter_placed']='Потрошач {id} је додат. Унесите његов опис и потрошњу у табели Потрошачи, или га изаберите у режиму Избор да отворите оквир његових својстава.';
 $ec_lang['lpn_field_meter_pipe_tip']='Елемент на који се ова услуга прикључује. Упишите други овде или у табели Потрошачи да бисте га променили, или превуците прикључну тачку на други елемент.';
 $ec_lang['lpn_field_meter_station']='Стационажа дуж цеви (%)';
 $ec_lang['lpn_field_meter_station_tip']='Колико далеко дуж цеви се услуга прикључује, изражено као проценат цеви од њеног првог чвора до другог. 0 је на једном крају, а 100 на другом. Кружић на цеви ради исто то показивачем.';
@@ -706,15 +706,15 @@ $ec_lang['lpn_node_customers_sum']='{total} {unit} од {n} потрошача';
 $ec_lang['lpn_customer_detached']='⚠ Овај потрошач није повезан са цеви, па његова потрошња није у резултатима. Обришите га, или нацртајте цев и преместите потрошача на њу.';
 $ec_lang['lpn_customer_fixed_head']='⚠ Ближи крај те цеви има фиксну водену површину, па ова потрошња не утиче на прорачун.';
 $ec_lang['lpn_customer_detached_count']='{n} потрошача није повезано са цеви. Њихова потрошња није урачуната.';
-$ec_lang['lpn_meter_pick_pipe']='Сада кликните на цев или чвор који опслужује овог потрошача. Потрошач остаје тамо где сте га поставили. Притисните Esc да откажете.';
+$ec_lang['lpn_meter_pick_pipe']='Сада изаберите цев или чвор који опслужује овог потрошача. Потрошач остаје тамо где сте га поставили. Притисните Esc да откажете.';
 $ec_lang['lpn_inp_export_flat_customers']='EPANET датотека нема потрошаче. Потрошња {n} потрошача у овом пројекту улази у датотеку као ред потрошње на чвору коме је сваки од њих додат, а сваки ред се именује тагом потрошача. Оно што датотека не може да сачува јесте сам потрошач: где стоји, која цев га опслужује, где дуж те цеви се услуга прикључује, и колико услуга један потрошач представља. Ваша сопствена пројектна датотека чува све то.';
 
-$ec_lang['lpn_area_hint_window_start']='Кликните на један угао прозора.';
-$ec_lang['lpn_area_hint_window_go']='Кликните на супротан угао да завршите.';
-$ec_lang['lpn_area_hint_lasso_start']='Кликните да започнете обрис.';
-$ec_lang['lpn_area_hint_lasso_go']='Померајте да нацртате обрис. Кликните да завршите.';
-$ec_lang['lpn_area_hint_polygon_start']='Кликните да нацртате полигонску површину. Двоструки клик да завршите.';
-$ec_lang['lpn_area_hint_polygon_go']='Кликните сваки угао. Двоструки клик на последњем да завршите.';
+$ec_lang['lpn_area_hint_window_start']='Одредите један угао прозора.';
+$ec_lang['lpn_area_hint_window_go']='Одредите супротан угао да завршите.';
+$ec_lang['lpn_area_hint_lasso_start']='Одредите тачку да започнете обрис.';
+$ec_lang['lpn_area_hint_lasso_go']='Померајте да нацртате обрис. Одредите последњу тачку да завршите.';
+$ec_lang['lpn_area_hint_polygon_start']='Одредите први угао полигонске површине. Двоструки клик да завршите.';
+$ec_lang['lpn_area_hint_polygon_go']='Одредите сваки угао. Двоструки клик на последњем да завршите.';
 // Tom, 2026-09-08, his own sentence: *"Hold Shift during selection to preserve the existing
 // selection set and toggle (add/remove) affected assets."* Reworded so "toggle" needs no gloss.
 $ec_lang['lpn_area_hint_shift']='Држите Shift док бирате да наставите са постојећим избором, додајући или уклањајући (пребацујући) оно што бирате.';
@@ -737,7 +737,7 @@ $ec_lang['lpn_pane_pasted']='Налепљено {n} ћелија. {skipped} ни
 $ec_lang['lpn_pane_pasted_rows']='Налепљено {n} редова, а {created} од њих додато у мрежу.';
 $ec_lang['lpn_pane_pasted_rows_skipped']='Налепљено {n} редова, а {created} од њих додато у мрежу. {skipped} ћелија није промењено.';
 // Added after "This network has none of these yet." on an empty table, which is where a paste lands.
-$ec_lang['lpn_pane_paste_here']='Кликните овде и налепите редове из табеларног прорачуна да их додате.';
+$ec_lang['lpn_pane_paste_here']='Изаберите ову област и налепите редове из табеларног прорачуна да их додате.';
 // The menu action that adds the clipboard's rows as new elements below the last row (an ordinary
 // paste only ever writes cells). Its shortcut, Ctrl+Shift+V, is shown beside it in the menu. Tom's
 // wording, R-309: "Paste as new rows" was "not quite descriptive of 'Paste append'."
@@ -907,8 +907,8 @@ $ec_lang['lpn_offscreen_intact']='Ваша мрежа је нетакнута.';
 // lpn_main_title still names EPANET, which is where a search engine reads it, and that claim is
 // true and stays.
 $ec_lang['lpn_examples_welcome']='Добродошли у моделирање водоводне мреже, са EPANET решавачем';
-$ec_lang['lpn_examples_heading']='Отворите сопствену копију примера';
-$ec_lang['lpn_examples_sub']='Сваки се отвара као ваша сопствена копија. Измените је, сачувајте је, или отворите нову копију и почните изнова.';
+$ec_lang['lpn_examples_heading']='Отворите копију примера';
+$ec_lang['lpn_examples_sub']='Сваки пример се отвара као копија. Измените је и сачувајте, или отворите нову копију да почнете изнова.';
 $ec_lang['lpn_examples_open']='Отвори';
 $ec_lang['lpn_examples_menu']='Отвори пример…';
 $ec_lang['lpn_examples_blank']='Или почните овде';
@@ -939,9 +939,9 @@ $ec_lang['lpn_hotkeys_map_def']='<table class="lpn-notes-table"><tbody><tr><td>1
 // is the honesty boundary that document draws: a thank-you must never imply an answer.
 $ec_lang['lpn_wrong_btn']='Нешто није у реду овде?';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_wrong_tip']='Један притисак нам говори да нешто на овој страници није у реду. Шаље назив ове странице, језик на коме је читате и поруку на мапи ако постоји. Не шаље ништа што сте укуцали, ниједну адресу, нити ишта из вашег цртежа. Нико не може да вам одговори, јер ово нам не говори ништа о томе ко сте. Користите Помоћ, Поправи нешто када желите да кажете више.';
-$ec_lang['lpn_wrong_thanks']='Хвала. То је стигло до нас.';
-$ec_lang['lpn_status_example_opened']='Отворено {name}. Ово је ваша копија: сачувајте је помоћу Датотека, Сачувај као.';
+$ec_lang['lpn_wrong_tip']='Пријавите грешку на овој страници. Отвара се оквир у коме бирате проблем, додајете коментар и уносите имејл адресу ако желите одговор. Сва поља су необавезна, а ништа се не шаље док не притиснете Пошаљи.';
+$ec_lang['lpn_wrong_thanks']='Хвала. Ваша пријава је примљена.';
+$ec_lang['lpn_status_example_opened']='Отворено {name} као копија. Сачувајте је помоћу Датотека, Сачувај као.';
 // Stands while the fault stands, rather than expiring like every other notice on the map: it
 // reports a page that cannot lay itself out, which is true until a measurement recovers.
 $ec_lang['lpn_map_unmeasurable']='Ова страница није успела да одреди величину површине за цртање, па карта приказује последњи приказ који је успела да израчуна. Промена величине прозора наводи је да поново покуша. Ако се то стално понавља, узрок је обично екстензија прегледача која блокира мерења странице.';
@@ -962,13 +962,13 @@ $ec_lang['lpn_ex_basic_us_desc']='Иста почетна мрежа у гало
 // from the gallery; the rules stay, and the name stops claiming to be the sample as EPA ships it.
 $ec_lang['lpn_ex_net1_title']='EPANET Net1 и управљања заснована на правилима';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_ex_net1_desc']='Најмања од три сопствене EPANET примерне мреже: један резервоар, пумпа и једна петља.';
+$ec_lang['lpn_ex_net1_desc']='Најмања од три EPANET примерне мреже: један резервоар, пумпа и једна петља.';
 $ec_lang['lpn_ex_net2_title']='EPANET Net2';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_ex_net2_desc']='Разгранати дистрибутивни систем са тенком, из EPANET примера.';
 $ec_lang['lpn_ex_net3_title']='EPANET Net3';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_ex_net3_desc']='EPANET-ов велики пример: 92 чвора, 3 тенка и 2 резервоара, један од њих река. Вреди отворити да видите како модел реалне величине изгледа на мапи.';
+$ec_lang['lpn_ex_net3_desc']='Велики EPANET пример: 92 чвора, три тенка и два резервоара, један од њих река. Показује како модел пуне величине изгледа на мапи.';
 $ec_lang['lpn_ex_net3_world_title']='EPANET Net3, геогр. шир./дуж.';
 $ec_lang['lpn_ex_net3_world_desc']='Мрежа EPANET Net3 претворена у географску ширину и дужину у Новату (Novato), Калифорнија, са светском мапом у позадини.';
 $ec_lang['lpn_ex_elm_street_title']='Elm Street Center';
@@ -1018,7 +1018,7 @@ $ec_lang['lpn_units_elevhead']='Кота и напор';
 $ec_lang['lpn_result_gradient']='Градијент губитка напора';
 $ec_lang['lpn_result_gradient_tip']='Губитак напора подељен дужином цеви. Користите га за поређење цеви различитих дужина у односу на једно пројектно ограничење.';
 $ec_lang['lpn_result_water_age']='Старост воде';
-$ec_lang['lpn_result_water_age_tip']='Колико дуго је вода која стиже до ове тачке већ у систему. Тамо где се токови спајају, дошла вода носи мешавину старости, а овде приказан број је њихов просек пондерисан протоком: чвор који већином напаја кратак нов вод показује ниску старост чак и ако га напаја и дугачак слепи крак. У тенку то је просечна старост воде коју садржи, због чега је тенк који се споро обнавља обично место с најстаријом водом у мрежи. Не постоји прописано ограничење са којим би се то поредило, па овај број процените у односу на сопствени систем.';
+$ec_lang['lpn_result_water_age_tip']='Време које је вода која стиже до ове тачке провела у систему. Тамо где се токови спајају, број је просек старости воде која стиже, пондерисан протоком. У тенку је то просечна старост воде коју садржи, па тенк који се споро обнавља обично садржи најстарију воду у мрежи. Не постоји прописано ограничење са којим би се то поредило, па га процените у односу на стања у систему који се моделује.';
 $ec_lang['lpn_result_source_share']='Удео извора';
 $ec_lang['lpn_result_source_share_tip']='Колики део воде која стиже до ове тачке потиче из чвора праћења. То је оно што приказује анализа Праћење извора.';
 // **THE LINK HALF OF THE THREE QUALITY ANSWERS** (ROADMAP Task 638). EPANET reports a node's own
@@ -1045,7 +1045,7 @@ $ec_lang['lpn_result_status_open']='Отворено';
 $ec_lang['lpn_result_status_closed']='Затворено';
 $ec_lang['lpn_result_head']='Напор';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_result_head_tip']='Енергија воде у овом чвору, изражена као висина водног стуба. То је апсолутна висина, док је притисак манометарско мерење.';
+$ec_lang['lpn_result_head_tip']='Потенцијална енергија воде у овом чвору, исказана као висина водног стуба. То је апсолутна висина, док је притисак манометарско мерење.';
 $ec_lang['lpn_result_pressure']='Притисак';
 $ec_lang['lpn_result_flow']='Проток';
 $ec_lang['lpn_result_velocity']='Брзина';
@@ -1129,11 +1129,11 @@ $ec_lang['lpn_convas_coordsys_tip']='Координатни систем у ко
 // {crs} is the name the map status strip shows for this project's coordinate system.
 $ec_lang['lpn_convas_from']='Тренутно: {crs}';
 $ec_lang['lpn_convas_epsg']='EPSG координатни систем';
-$ec_lang['lpn_convas_epsg_tip']='Изаберите координатни систем из EPSG регистра. Географска ширина и дужина је WGS 84 (EPSG:4326).';
+$ec_lang['lpn_convas_epsg_tip']='Изаберите координатни систем из EPSG регистра. WGS 84 (EPSG:4326), географска ширина и дужина, је предложени избор. WGS 84 / Pseudo-Mercator (EPSG:3857), обично назван Web Mercator, даје x и y у метрима, а његова растојања на мапи премашују растојања на терену даље од екватора. Дужине цеви се у оба система рачунају као растојања на терену.';
 $ec_lang['lpn_convas_unnamed']='Неименована (локална) геореференца';
 $ec_lang['lpn_convas_unnamed_tip']='Локалне координате у јединици дужине, са мапом света прикаченом.';
 $ec_lang['lpn_convas_none_tip']='Локалне координате у јединици дужине, засад без мапе света.';
-$ec_lang['lpn_convas_units_tip']='Јединице у које се копија конвертује. Оригинал задржава своје сопствене бројеве и јединице.';
+$ec_lang['lpn_convas_units_tip']='Јединице у које се копија конвертује.';
 $ec_lang['lpn_convas_round']='Заокружи конвертоване вредности';
 $ec_lang['lpn_convas_round_tip']='Заокружује само бројеве које ова конверзија преписује, на најближи корак који изаберете. Вредности чија се јединица не мења остају какве јесу.';
 $ec_lang['lpn_convas_round_none']='Без заокруживања';
@@ -1172,22 +1172,22 @@ $ec_lang['lpn_tool_key_hint']='Пречица: притисните {key}.';
 $ec_lang['lpn_tool_key_hint_two']='Пречица: притисните {key} или {key2}.';
 // Edited by TGH 2026-09-07; the Shift sentence rewritten 2026-09-08 on his ruling that Shift keeps
 // the selection and toggles what the shape catches (it used to say "add").
-$ec_lang['lpn_tool_area_tip']='Кликните на мапу како је наведено да бисте изабрали све унутар облика. Притисните ово дугме поново да промените облик између прозора, ласоа и полигона. Држите Shift док бирате да наставите са постојећим избором, додајући или уклањајући (пребацујући) оно што бирате.';
+$ec_lang['lpn_tool_area_tip']='Пратите упутства на екрану. Притисните поново да мењате између прозора, ласоа и полигона. Држите Shift да задржите тренутни избор и додате или уклоните (пребаците) оно што бирате.';
 $ec_lang['lpn_area_selected']='{n} изабрано.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_area_none']='Ништа није пронађено у том подручју.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_tool_vertices_tip']='Додајте и уклоните тачке прегиба које обликују цев на мапи. Кликните на цев да бисте додали тачку прегиба, кликните на тачку прегиба да бисте је уклонили, а превуците тачку прегиба да бисте је померили. Тачка прегиба мења само нацртану трасу, не и хидраулику.';
-$ec_lang['lpn_tool_undo_tip']='Опозови последњу измену.';
+$ec_lang['lpn_tool_vertices_tip']='Додајте и уклоните тачке прегиба цеви. Одредите тачку на цеви да бисте додали тачку прегиба, изаберите тачку прегиба да бисте је уклонили, а превуците тачку прегиба да бисте је померили. Тачка прегиба мења аутоматску дужину, али не додаје нити мења локалне (минорне) губитке.';
+$ec_lang['lpn_tool_undo_tip']='Дужина историје поништавања = 20 радњи';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_tool_zoom_extent_tip']='Прикажи целу мрежу у прозору.';
-$ec_lang['lpn_tool_zoom_window_tip']='Кликните два наспрамна угла оквира, или превуците један, на мапи да увећате то подручје. Притисните ово дугме поново за Уклопи у приказ.';
+$ec_lang['lpn_tool_zoom_extent_tip']='Уклопите целу мрежу у прозор мапе. Притисните поново за Увећавање подручја. Погледајте и контроле зумирања мапе горе десно.';
+$ec_lang['lpn_tool_zoom_window_tip']='Одредите углове или превуците правоугаоник. Притисните поново за Уклопи у приказ.';
 // Tom's wording, 2026-09-25.
 $ec_lang['lpn_zoom_in_tip']='Увећај. Пречица: +';
 // Tom's wording, 2026-09-25.
 $ec_lang['lpn_zoom_out_tip']='Умањи. Пречица: -';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_find_menu_tip']='Пронађите елемент по његовом ID-у, или пронађите сваки елемент који испуњава услов, и измените их све одједном.';
+$ec_lang['lpn_find_menu_tip']='Једноставно или сложено проналажење и замена';
 // **"Toolbar key", NOT "Toolbar"** (Tom's own name, 2026-09-10; Ida ranked the rename first).
 // The row is not a second toolbar and not a repeat of one -- it is the LEGEND for an icon-only
 // strip, derived from toolbarIconIndex, and on a touch screen it is the only way to read the
@@ -1197,7 +1197,7 @@ $ec_lang['lpn_find_menu_tip']='Пронађите елемент по његов
 $ec_lang['lpn_help_icons']='Трака алата';
 // ---- The right panel: Visibility ----
 $ec_lang['lpn_pane_right_toggle']='Видљивост';
-$ec_lang['lpn_color_legend_open_tip']='Кликните да отворите панел Видљивост и промените ове боје.';
+$ec_lang['lpn_color_legend_open_tip']='Изаберите да отворите подешавања бојења и промените ове боје.';
 $ec_lang['lpn_color_node_field']='Обој чворове према';
 $ec_lang['lpn_color_link_field']='Обој цеви према';
 $ec_lang['lpn_color_ramp_sequential']='Секвенцијална';
@@ -1230,13 +1230,13 @@ $ec_lang['lpn_georef_scale']='Стварно растојање по једин�
 // R-219 (Tom, 2026-09-24, answering R-190): the sentence that replaces the retired "These are
 // already lat/lon" button -- typing 1 here reaches the same result the button used to, for a file
 // whose own numbers should be used unchanged.
-$ec_lang['lpn_georef_scale_tip']='Колико далеко на терену досеже једна јединица вашег цртежа. Цртеж направљен на обичној мрежи обично о томе ништа не говори, па то поставите овде — или пустите да вас Иди на… пита колико је локација широка и сам то израчуна.';
+$ec_lang['lpn_georef_scale_tip']='Израчунава се аутоматски. Измените да бисте је променили. Унесите 1 да бисте координате из датотеке користили непромењене као растојање на терену, на пример за датотеку без координатног система.';
 $ec_lang['lpn_georef_rotation']='Окрени супротно казаљци на сату (степени)';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_georef_rotation_tip']='Колико да окренете цео модел, супротно казаљки на сату, тако да његов север показује ка северу.';
+$ec_lang['lpn_georef_rotation_tip']='Заокретање целог модела супротно казаљки на сату, ради усклађивања са новим координатним системом.';
 // Tom's own wording for these two, from his 2026-09-16 edits (dev/tom-coordinate-vocabulary-2026-09-16.md):
 // the wizard now ends on whichever coordinate system File, Convert as chose, not always lat/lon.
-$ec_lang['lpn_georef_confirm']='Трајно поставити модел овде? Појединачне елементе и даље можете превлачити после овога, али цртеж престаје да буде xy пројекат. Да бисте вратили xy, затворите овај пројекат без чувања.';
+$ec_lang['lpn_georef_confirm']='Трајно поставити модел овде? Појединачне елементе и даље можете превлачити после тога, али наставак сада претвара све координате одједном. Да бисте вратили старе координате, вратите се на изворни пројекат и затворите овај без чувања.';
 $ec_lang['lpn_georef_done']='Ово је сада пројекат са геогр. шир./дуж. координатама. Превуците било који елемент да га померите ближе месту где стварно јесте.';
 $ec_lang['lpn_georef_backdrop_unrotated']='Позадинска слика је премештена и промењене су јој димензије заједно са моделом, али није могла да се заокрене. Користите Мапа, Позадинска слика, Помери да бисте је поравнали.';
 $ec_lang['lpn_georef_empty']='Та датотека нема мрежу у себи, па нема шта да се постави.';
@@ -1261,9 +1261,9 @@ $ec_lang['lpn_goto_bad']='То није једна географска шири
 $ec_lang['lpn_georef_goto']='Иди на…';
 $ec_lang['lpn_georef_twopt']='Користи две познате тачке';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_georef_twopt_tip']='Поставите модел тачно, када већ знате где се две тачке на вашем цртежу заиста налазе. Кликните на једну од њих, упишите њену географску ширину и дужину, а затим урадите исто за другу тачку. Положај, размера и заокрет модела произлазе из те две тачке. Притисните ово дугме поново да бисте зауставили бирање.';
-$ec_lang['lpn_georef_twopt_pick1']='Кликните на тачку на свом цртежу чију географску ширину и дужину знате.';
-$ec_lang['lpn_georef_twopt_pick2']='Сада кликните на другу познату тачку, што даље од прве.';
+$ec_lang['lpn_georef_twopt_tip']='Поставите модел тачно када су познате праве географске ширине и дужине две тачке на цртежу. Одредите једну од њих, унесите њену географску ширину и дужину, а затим урадите исто за другу тачку. Положај, размера и заокрет израчунавају се из те две тачке. Притисните поново да откажете, или притисните Esc.';
+$ec_lang['lpn_georef_twopt_pick1']='Одредите тачку на свом цртежу чију географску ширину и дужину знате.';
+$ec_lang['lpn_georef_twopt_pick2']='Сада одредите другу познату тачку, што даље од прве.';
 $ec_lang['lpn_georef_twopt_same']='То је тачка коју сте прво изабрали. Изаберите другу.';
 $ec_lang['lpn_georef_twopt_done']='Модел сада стоји на две тачке које сте задали. Проверите га, а затим притисните дугме Задржи овај положај.';
 
@@ -1272,7 +1272,7 @@ $ec_lang['lpn_georef_twopt_done']='Модел сада стоји на две т
 // profile first, tables later. The toggle is on the toolbar because it is the strip a reader
 // scans for "what else can this page show me".
 $ec_lang['lpn_pane_toggle']='Доњи панел';
-$ec_lang['lpn_pane_toggle_tip']='Прикажите или сакријте панел испод мапе. Он садржи профил и табелу за сваку врсту елемента.';
+$ec_lang['lpn_pane_toggle_tip']='Прикажите или сакријте панел испод мапе. Садржи графиконе и табелу за сваку врсту елемента.';
 $ec_lang['lpn_pane_resize']='Превуците да панел учините вишим или нижим';
 $ec_lang['lpn_pane_tab_junctions']='Чворови';
 $ec_lang['lpn_pane_tab_reservoirs']='Резервоари';
@@ -1280,7 +1280,7 @@ $ec_lang['lpn_pane_tab_tanks']='Тенкови';
 $ec_lang['lpn_pane_tab_pipes']='Цеви';
 $ec_lang['lpn_pane_tab_pumps']='Пумпе';
 $ec_lang['lpn_pane_tab_valves']='Вентили';
-$ec_lang['lpn_pane_tab_tip']='Ова картица приказује елементе ове врсте као табелу коју можете сортирати и уређивати. Колоне резултата се не могу уређивати.';
+$ec_lang['lpn_pane_tab_tip']='Уређујте елементе као табелу налик табеларном прорачуну. Колоне резултата се не могу уређивати. Пречице на тастатури погледајте у Помоћ, Напомене.';
 $ec_lang['lpn_pane_none']='Ова мрежа још нема ниједан од ових.';
 // **A PERSISTENT NOTE, NOT A HOVER TIP** (Tom, 2026-09-08, asking for wording "to the effect that
 // 'This table is intended to be ready for asset entry and creation by pasting from a spreadsheet'").
@@ -1343,20 +1343,20 @@ $ec_lang['lpn_menu_project']='Вода';
 // the TOOLBAR, above the map. Do not qualify this sentence again. The rule it states is in
 // dev/looped-network-calculator-scope.md: every command lives in the menu bar, the transport is the
 // one exception, and it is exempt because it is a position in a run rather than a command.
-$ec_lang['lpn_menu_project_tip']='Све о моделирању водоводне мреже налази се овде на једном месту, осим контрола за пуштање анимације. Нема потребе нагађати где се шта налази.';
+$ec_lang['lpn_menu_project_tip']='Све што је специфично за моделирање водоводне мреже (осим контрола за пуштање анимације)';
 $ec_lang['lpn_tables_menu']='Табеле';
-$ec_lang['lpn_tables_menu_tip']='Отворите панел испод мапе на табели делова ове мреже. За сваку врсту дела постоји по једна табела, коју можете сортирати и уређивати ту.';
+$ec_lang['lpn_tables_menu_tip']='Прегледајте и уређујте елементе у табелама у доњем панелу.';
 // The Run row's own tip, NOT lpn_time_run_tip: this row exists partly to answer "where is my Run
 // button?" for somebody whose project recalculates by itself, and that sentence is not true of the
 // toolbar button, which is the one that goes away.
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_run_menu_tip']='Поново израчунајте ову мрежу сада. Тражите дугме Израчунај? Скривено је док је укључено подешавање Аутоматски израчунавај. Да бисте вратили дугме, искључите Аутоматски израчунавај у Подешавања, Прорачун, Хидраулика.';
+$ec_lang['lpn_run_menu_tip']='Покрени симулацију. Није потребно када је у Подешавања, Прорачун, Хидраулика укључено „Аутоматски израчунавај“. Када је израчунавање искључено, на траци алата се појављује дугме Израчунај.';
 // ---- automatic recalculation (Task 467) ----
 // "Simulation" rather than "network" or "results": it is the word EPANET uses for working a network
 // out over time, and this switch is about the run, not about the drawing.
 $ec_lang['lpn_settings_auto_run']='Аутоматски израчунавај';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_settings_auto_run_tip']='Када је ово укључено, овај пројекат се поново израчунава убрзо после сваке измене коју направите, а дугме Израчунај се уклања са траке алатки јер за њега нема више шта да ради. Искључите на великој мрежи где чекање да се свака измена израчуна омета куцање, и дугме Израчунај се враћа тако да сами бирате када да покренете прорачун.';
+$ec_lang['lpn_settings_auto_run_tip']='Искључите ако је поновно израчунавање пресполо. Сакрива дугме Израчунај.';
 // **AN EDIT SAYS NOTHING AT ALL WHEN THE SWITCH IS OFF** (Tom, 2026-09-19: *"Recalc off Old
 // values: Leave in place stale. Don't clear. Trust the user."*). `lpn_manual_results_cleared`
 // stood here for part of one day and is DELETED, English-only, never translated: it announced a
@@ -1368,7 +1368,7 @@ $ec_lang['lpn_settings_auto_run_tip']='Када је ово укључено, о
 // who has just waited a second already knows something is slow and wants it confirmed, not
 // explained. {secs} is one decimal.
 $ec_lang['lpn_time_run_slow']='Ова мрежа је требало {secs} s да се израчуна, а подешена је да се поново израчунава после сваке измене. Да бисте то зауставили и вратили дугме Израчунај, искључите „Аутоматски израчунавај” у Подешавањима, под Прорачун, Хидраулика.';
-$ec_lang['lpn_time_no_report']='Још нема извештаја о прорачуну. Извештај је сопствени текст EPANET-а, па се појављује тек када се ова мрежа израчуна EPANET решавачем.';
+$ec_lang['lpn_time_no_report']='Још нема извештаја о прорачуну. Извештај је текстуални извештај EPANET-а, па се појављује пошто се ова мрежа израчуна.';
 // "Settings" rather than Tools -> Options (Windows) or Preferences (Mac): nobody has ever settled
 // this one, and of the three, Settings is the word a person is most likely to look for first.
 // Moved out of the suite-wide More menu, 2026-08-13 (Tom: "the walkthrough is a little
@@ -1419,7 +1419,7 @@ $ec_lang['lpn_find_btn']='Пронађи';
 // is selected." One button, no selector; which table(s) it fills follows the scope in
 // buildFilterRow()/applyTableFilter(), never a control of its own.
 $ec_lang['lpn_find_filter_btn']='Филтер у тренутној табели';
-$ec_lang['lpn_find_filter_tip']='Прикажи само делове који одговарају овом упиту у једној од табела испод мапе. Цртеж се не мења и ништа се не брише.';
+$ec_lang['lpn_find_filter_tip']='Прикажи само редове који одговарају пољу „Шта претражити“ изнад, у свакој претраженој табели.';
 // The multi-table receipt, printed when "Everything" (or a typed compound query) filters more than
 // one table at once: one {table}: {n} of {all} row per table the query could be asked of, joined
 // into {rows} of the summary line below. Every number is a count already shown on the table's own
@@ -1446,7 +1446,7 @@ $ec_lang['lpn_find_op_lt']='мање од';
 // A condition that takes no value: it asks whether the asset states this property at all.
 $ec_lang['lpn_find_op_empty']='празно';
 // {n} is a whole number.
-$ec_lang['lpn_find_count']='Пронађено: {n}. Кликните на један да одете до њега.';
+$ec_lang['lpn_find_count']='Пронађено: {n}. Изаберите један да одете до њега.';
 $ec_lang['lpn_find_shift_hint']='Shift+клик за укључивање или искључивање: додаје у избор ако тамо није, а уклања ако већ јесте.';
 $ec_lang['lpn_find_none']='Ништа се не поклапа.';
 // The two extremes, as conditions on the same footing as "above" -- the Value box holds how
@@ -1494,7 +1494,7 @@ $ec_lang['lpn_find_conn_no_fixed']='Ова мрежа нема резервоа�
 // Task 540: the query written as one line, above the Find button -- and typed into. The controls
 // write it and it writes the controls, so it teaches the shape of a search by being operated from
 // either end.
-$ec_lang['lpn_find_query_tip']='Иста претрага, записана у једном реду. Промена контрола преписује овај ред, а куцање у овом реду ажурира контроле.';
+$ec_lang['lpn_find_query_tip']='Дата претрага као текстуални упит. Промена упита ажурира контроле изнад.';
 $ec_lang['lpn_find_query_label']='Упит';
 // Tom's own line, 2026-08-26, and "expandable" is his word: it says the grammar will grow.
 $ec_lang['lpn_find_query_hint']='Комбинујте услове помоћу И, ИЛИ и ()';
@@ -1555,8 +1555,8 @@ $ec_lang['lpn_profile_menu']='Профил';
 $ec_lang['lpn_profile_title']='Профил дуж путање';
 // Task 433 -- the path chooser. The gesture is Google Directions': click the start node, move over
 // the map to see the path, click to add a stop, double-click to finish.
-$ec_lang['lpn_profile_draw_start']='Кликните на чвор где траса почиње.';
-$ec_lang['lpn_profile_draw_more']='Пређите преко мапе да видите трасу. Кликните на чвор да га додате. Двоструки клик завршава. Esc отказује.';
+$ec_lang['lpn_profile_draw_start']='Изаберите чвор где траса почиње.';
+$ec_lang['lpn_profile_draw_more']='Пређите преко мапе да видите трасу. Изаберите чвор да га додате. Двоструки клик завршава. Esc отказује.';
 $ec_lang['lpn_profile_draw_blocked']='Нема трасе од {a} до {b}. Изаберите други чвор.';
 $ec_lang['lpn_profile_tap_start']='Додирните чвор где траса почиње.';
 $ec_lang['lpn_profile_tap_more']='Додирните чвор да видите трасу. Притисните и држите да га додате. Двоструки додир завршава. Притисните Профил поново да откажете.';
@@ -1581,7 +1581,7 @@ $ec_lang['lpn_profile_edit_tip']='Промените један крај пут�
 // Tom read it (2026-08-27: *"What is '_say' supposed to mean? Don't you mean '_click'?"*). He is
 // right: its twin is `_tap`, so the only thing the two names can honestly differ by is the word
 // inside them, and `_say` named nothing at all.
-$ec_lang['lpn_profile_edit_click']='Превуците било коју тачку на путањи да бисте је померили. Кликните на тачку коју сте додали да бисте је уклонили.';
+$ec_lang['lpn_profile_edit_click']='Превуците било коју тачку на путањи да бисте је померили. Изаберите тачку коју сте додали да бисте је уклонили.';
 $ec_lang['lpn_profile_edit_tap']='Превуците било коју тачку на путањи да бисте је померили. Додирните тачку коју сте додали да бисте је уклонили.';
 $ec_lang['lpn_profile_edit_nowhere']='Тачка на путањи мора бити чвор. Путања је непромењена.';
 // ---- Task 510: paths kept in the project, by name ---------------------------------------------
@@ -1613,7 +1613,7 @@ $ec_lang['lpn_ts_group_nodes']='Чворови';
 $ec_lang['lpn_ts_group_links']='Везе';
 $ec_lang['lpn_ts_add']='Додај изабрано';
 // Said out loud rather than ignored: a button that does nothing cannot be told from a broken one.
-$ec_lang['lpn_ts_add_none']='Ништа те врсте није изабрано на мапи.';
+$ec_lang['lpn_ts_add_none']='Није пронађено ништа за додавање.';
 $ec_lang['lpn_ts_clear']='Уклони све';
 $ec_lang['lpn_ts_chip_tip']='Уклони {id} са графикона';
 $ec_lang['lpn_ts_none']='Још ништа за приказ на графикону. Изаберите елементе на мапи и притисните Додај изабрано.';
@@ -1624,7 +1624,7 @@ $ec_lang['lpn_ts_no_frames']='Још нема резултата продуже�
 $ec_lang['lpn_ts_summary']='Елемената: {n}, извештајних тренутака: {steps}';
 $ec_lang['lpn_ts_axis_time']='Протекло време';
 $ec_lang['lpn_freq_menu']='Учесталост';
-$ec_lang['lpn_freq_tip']='Прикажите графикон расподеле учесталости једне особине за све чворове или све цеви у тренутном временском кораку.';
+$ec_lang['lpn_freq_tip']='Расподела учесталости за једно својство';
 $ec_lang['lpn_freq_title']='Расподела вредности';
 $ec_lang['lpn_freq_none']='Још нема резултата за ову вредност, па нема шта да се прикаже на графикону.';
 $ec_lang['lpn_freq_summary']='Приказано: {n} од {total}';
@@ -1655,7 +1655,7 @@ $ec_lang['lpn_new_title']='Нови пројекат';
 // them), or local and not georeferenced. The keys of the older three-radio box (lpn_new_coords and
 // its five siblings) are gone; Tom called the last of them obsolete on 2026-09-16.
 $ec_lang['lpn_new_coordsys']='Координатни систем';
-$ec_lang['lpn_new_coordsys_tip']='Изаберите координатни систем ваше мреже. Ово је трајно; једини начин да претворите мрежу у другачије координате јесте „Датотека, Отвори у новим координатама“, и то је приближно.';
+$ec_lang['lpn_new_coordsys_tip']='Изаберите координатни систем ваше мреже. Једини начин да промените овај избор је „Датотека, Конвертуј као…“ у нови пројекат, а та конверзија је приближна.';
 // **DELETED 2026-09-25: lpn_new_coordsys_geo / lpn_new_coordsys_geo_tip.** Don't expose the word
 // "projection" (dev/session-handoff.md RULINGS); once reworded, both were the identical string
 // lpn_convas_epsg / lpn_convas_epsg_tip already carries, so the radio reuses those keys rather than
@@ -1675,13 +1675,13 @@ $ec_lang['lpn_new_coordsys_local_tip']='Није геореференциран�
 // answers most of the question by itself: searching a town in Arizona leaves two UTM zones standing
 // out of a hundred and twenty.
 $ec_lang['lpn_crs_view']='Филтрирај по приказу карте';
-$ec_lang['lpn_crs_view_tip']='Нуди само пројекције које покривају место на које карта тренутно гледа. Искључите ово да бисте видели читав списак.';
+$ec_lang['lpn_crs_view_tip']='Нуди само координатне системе који покривају место на које мапа тренутно гледа. Искључите ово да бисте прочитали читав списак.';
 $ec_lang['lpn_crs_place']='Претрага по називу места';
-$ec_lang['lpn_crs_place_tip']='Упишите град, адресу или знаменитост, и приказ карте ће се преместити тамо. Речи које уписујете шаљу се сервису за називе места OpenStreetMap-а, који вас пита за дозволу први пут. Нови географски пројекат такође почиње на месту које овде пронађете.';
+$ec_lang['lpn_crs_place_tip']='Претраге се шаљу сервису за називе места OpenStreetMap-а, а дозвола се тражи први пут. Нови географски пројекат такође почиње на месту пронађеном овде.';
 $ec_lang['lpn_crs_search']='Претражи';
 $ec_lang['lpn_crs_name']='Филтер по називу пројекције';
-$ec_lang['lpn_crs_name_tip']='Приказује само пројекције чији назив или EPSG код садржи оно што уписујете. Пробајте број зоне, или UTM, или Меркатор.';
-$ec_lang['lpn_crs_list_tip']='Пројекције преостале након два филтера изнад. Изаберите једну и притисните Изабери.';
+$ec_lang['lpn_crs_name_tip']='Текст који филтрира списак: приказују се само координатни системи чији назив или EPSG код га садржи.';
+$ec_lang['lpn_crs_list_tip']='Координатни системи који пролазе филтере изнад. Изаберите један, па притисните OK.';
 // Said rather than left blank: a filter that is on and filtering nothing looks broken.
 $ec_lang['lpn_crs_noview']='Још није претражено ниједно место, па се нуди читав списак. Претражите место изнад или зумирајте карту да бисте га сузили.';
 $ec_lang['lpn_crs_count']='Приказано {n} од {total} пројекција.';
@@ -1756,7 +1756,7 @@ $ec_lang['lpn_file_import_inp_tip']='Учитава мрежу из EPANET да�
 // The other direction (Task 281). A DOWNLOAD, so the word is Export rather than Save: this page
 // keeps no handle on an `.inp` and never writes back to one.
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_file_export_inp_tip']='Запишите ову мрежу као EPANET .inp датотеку и преузмите је. Бројеви које сте уписали записују се тачно онако како сте их уписали. Све што .inp формат не може да сачува биће накнадно наведено.';
+$ec_lang['lpn_file_export_inp_tip']='Преузмите ову мрежу као EPANET .inp датотеку (у zip датотеци са својом сликом, ако је има). Све што .inp формат не може да сачува биће накнадно наведено.';
 $ec_lang['lpn_status_inp_exported']='Извезено: {file}.';
 // {n} is a whole number. Said plainly rather than hidden: a file that quietly loses a pump curve is
 // the failure this whole feature exists to prevent.
@@ -1783,8 +1783,8 @@ $ec_lang['lpn_inp_drop_tank_curve']='Ови тенкови немају прав
 // Three outcomes a valve in a file can meet, one string each (Task 248 phase 2). Only the last is
 // a loss; the first two are reported because the reader deserves to know what became of a valve
 // their file states, not because anything was thrown away.
-$ec_lang['lpn_inp_drop_tcv']='Ови пригушни вентили су пренети као пригушни вентили, задржавајући исти губитак који им додељује датотека. Било који решавач може да их израчуна.';
-$ec_lang['lpn_inp_drop_valve_active']='Ови вентили регулишу притисак или проток и сами се отварају и затварају како се вода мења. Ништа код њих није изгубљено приликом уноса, а ова страница их решава помоћу EPANET решавача, укључујући тај решавач самостално за ову мрежу.';
+$ec_lang['lpn_inp_drop_tcv']='Ови пригушни вентили су пренети као пригушни вентили, са губитком наведеним у датотеци.';
+$ec_lang['lpn_inp_drop_valve_active']='Ови вентили регулишу притисак или проток, а њихово стање се мења са хидрауличким условима. Пренети су без губитка података, а ова страница их решава.';
 $ec_lang['lpn_inp_drop_valve']='Ови вентили су описани кривом или фиксним падом притиска, а ова страница нема такав елемент. Учитани су као отворене цеви, па је мрежа и даље повезана, али ништа тамо више не контролише притисак ни проток.';
 $ec_lang['lpn_inp_drop_cv']='У EPANET-у ове цеви пропуштају воду само у једном смеру. Пренете су као обичне цеви, па сада вода може да тече у оба смера кроз њих.';
 $ec_lang['lpn_inp_drop_demands']='Ови чворови су имали више од једне потрошње. Потрошње су сабране у једну потрошњу коју ова страница чува.';
@@ -1799,8 +1799,8 @@ $ec_lang['lpn_inp_drop_pump_speed']='Ове пумпе раде брзином �
 $ec_lang['lpn_inp_drop_setting']='Ове цеви, пумпе и вентили носе подешавање које ова страница не може да сачува. Пренети су у отвореном стању.';
 $ec_lang['lpn_inp_drop_rules']='Ова датотека садржи контроле засноване на правилима. Ова страница их чита и користи. Покрените прорачун помоћу EPANET решавача и правила ће бити примењена, при чему се сваки ниво, притисак и проток у њима претварају у јединице које овај пројекат приказује. Отворите Правила под Библиотеке да бисте прочитали или изменили правило. Чувају се тачно онако како их датотека наводи и биће поново уписана ако сачувате EPANET датотеку.';
 $ec_lang['lpn_inp_drop_eps']='Ова датотека описује симулацију током продуженог периода. Део ове странице који покреће такву симулацију није учитан, па су пренети само почетни услови.';
-$ec_lang['lpn_inp_drop_quality']='Ова датотека описује како се квалитет воде мења док путује: шта се у води налази на почетку и колико брзо та супстанца реагује у цевима и у тенковима. Ова страница чита те бројеве и користи их. Изаберите хемикалију под Подешавања, Прорачун, Квалитет воде, а затим покрените прорачун помоћу EPANET решавача, и концентрација ће бити израчуната дуж мреже током прорачуна. Редови се чувају и биће поново уписани ако сачувате EPANET датотеку.';
-$ec_lang['lpn_inp_drop_sources_mixing']='Ова датотека наводи где се хемикалија дозира у мрежу и како се вода у тенку меша. Доза се појављује на чвору на коме је додата, а тенк наводи који модел мешања прати. И дозу и модел мешања израчунава искључиво EPANET решавач.';
+$ec_lang['lpn_inp_drop_quality']='Ова датотека описује квалитет воде: почетне концентрације и брзине реакција у цевима и тенковима. Ова страница чита и користи те вредности. Изаберите хемикалију под Подешавања, Прорачун, Квалитет, а затим покрените модел да бисте израчунали концентрације дуж мреже током прорачуна. Редови се чувају и записују назад ако сачувате EPANET датотеку.';
+$ec_lang['lpn_inp_drop_sources_mixing']='Ова датотека наводи где се хемикалија убризгава у мрежу и како се вода меша у сваком тенку. Сваки извор је приказан на чвору на коме се примењује, а сваки тенк приказује свој модел мешања. И једно и друго се користе када се мрежа покреће током укупног времена рада.';
 $ec_lang['lpn_inp_drop_energy']='Ова EPANET датотека садржи податке за моделовање трошкова пумпања. Ова страница их чита и користи. Покрените прорачун помоћу EPANET решавача, а затим отворите Вода, Извештаји, Енергија пумпи да видите колико дуго је свака пумпа радила, коју снагу је трошила, коју енергију је потрошила и колико је то коштало. Редови се чувају и биће поново уписани ако сачувате EPANET датотеку.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_inp_drop_tags']='Ова датотека даје тагове неким од својих чворова, цеви или других елемената. Сваки таг је у потпуности пренет и налази се у својствима свог елемента, где га можете прочитати или изменити.';
@@ -1934,7 +1934,7 @@ $ec_lang['lpn_lock_open_choices_ask']='„Питај” јавља ономе к
 $ec_lang['lpn_lock_ask']='Питај';
 // Asked at the one moment the name is useful, and SENT rather than stored: nothing new is written to
 // this computer for it, which is the whole point of moving the question here.
-$ec_lang['lpn_lock_ask_prompt']='Кога да наведемо као онога ко пита? Ваши иницијали су идеални. Чувају се уз закључавање ове датотеке на нашем серверу, за онога ко је има отворену, и бришу се у року од 30 дана.';
+$ec_lang['lpn_lock_ask_prompt']='Кога да наведемо као онога ко тражи? Унесите, на пример, своје иницијале. Чувају се уз закључавање ове датотеке на нашем серверу, за онога ко је има отворену, и бришу се у року од 30 дана.';
 $ec_lang['lpn_lock_ask_sent']='Питали смо онога ко има ову датотеку отворену да је затвори. Видеће то за мање од минута, ако му је страница још отворена. Ништа друго се није променило, а датотека је и даље његова док је не затвори.';
 $ec_lang['lpn_lock_ask_failed']='Ваша порука није могла да буде испоручена. Или нико тренутно нема ову датотеку отворену, или сервер није могао да буде достигнут.';
 // **A CANCEL THAT LEAVES NO RESIDUE IS THE DEFECT** (ROADMAP Task 704, Ida's diagnosis). Backing
@@ -1971,12 +1971,12 @@ $ec_lang['lpn_lock_unavailable']='Пажња: није успело повези
 $ec_lang['lpn_lock_storage_error']='Пажња: ова страница не може да сачува записе закључавања, па ништа не спречава колегу да истовремено уређује исту датотеку. Ово је грешка у подешавању на серверу, коју овде не можете исправити — фасцикла закључавања није уписива за веб сервер.';
 $ec_lang['lpn_lock_full_error']='Пажња: овој страници је понестало простора за бележење ко има који пројекат отворен, па ништа не спречава колегу да истовремено уређује исту датотеку. Ово је грешка у подешавању на серверу, коју овде не можете исправити.';
 $ec_lang['lpn_lock_not_asked']='Закључавање не ради за овај пројекат, па ништа не спречава колегу да истовремено уређује исту датотеку. Овај пројекат још нема идентификатор, а чување у датотеку му га додељује.';
-$ec_lang['lpn_lock_restored']='Закључавање поново ради, и ова датотека сада је ваша за чување.';
+$ec_lang['lpn_lock_restored']='Закључавање је поново успостављено и ова датотека сада може да се сачува.';
 $ec_lang['lpn_lock_dismiss']='Сакриј ову поруку';
 // Shown once per browser, before the first file picker opens. Three short paragraphs on purpose:
 // this is the one place the whole file-and-lock idea is explained, and it has to survive translation
 // into 26 languages, so it says one thing per sentence and avoids every word of jargon it can.
-$ec_lang['lpn_file_training_1']='Ваш пројекат ће бити сачуван у датотеци на овом рачунару. Чува се када затражите, и ни у једном другом тренутку, тако да се ништа не уписује у ту датотеку без вашег знања.';
+$ec_lang['lpn_file_training_1']='Пројекат ће бити сачуван у датотеци на овом рачунару. Чува се само када га сачувате, и ни у једном другом тренутку.';
 $ec_lang['lpn_file_training_2']='Да две особе никада не би истовремено уређивале једну датотеку, ова страница прати ко је има отворену. Ако је неко други већ има, и даље можете да је отворите и погледате, или да задржите сопствену копију.';
 // Said BEFORE it happens, because it is alarming and unexplained when it happens (Tom, 2026-08-04:
 // "hawsedc.com will be able to edit ... is a canned browser warning whose confusing meaning we
@@ -2118,8 +2118,8 @@ $ec_lang['lpn_diag_unreachable']='Ови чворови немају пут до
 $ec_lang['lpn_engine_fetching']='Преузимање EPANET решавача. Преузима се једном и потом чува на овом уређају, тако да након тога ради и без интернета.';
 $ec_lang['lpn_engine_ready']='EPANET решавач је сада на овом уређају и ради без интернета.';
 $ec_lang['lpn_engine_fetching_valve']='Преузимање EPANET решавача, како би овај вентил могао да се реши сада и без интернета касније.';
-$ec_lang['lpn_engine_ready_valve']='EPANET решавач је сада на овом уређају. Вентили који се сами отварају и затварају радиће и без интернета.';
-$ec_lang['lpn_engine_unavailable']='EPANET решавач није могао да се преузме, а он је тај који решава вентиле који се сами отварају и затварају. Повежите се на интернет једном и он ће остати сачуван на овом уређају убудуће.';
+$ec_lang['lpn_engine_ready_valve']='EPANET решавач је сада на овом уређају. Вентили за регулацију притиска и протока (PRV, PSV, FCV) сада могу да се решавају и без интернета.';
+$ec_lang['lpn_engine_unavailable']='EPANET решавач није могао да се преузме, а потребан је за решавање вентила за регулацију притиска и протока (PRV, PSV, FCV). После једног повезивања на интернет, решавач се чува на овом уређају.';
 $ec_lang['lpn_engine_needed_loading']='Учитавање EPANET решавача док градите. Резултати ће бити доступни када се потпуно учита.';
 // **THE WAIT, SAID OUT LOUD, WITH A NUMBER ON IT** (ROADMAP Task 608). The first sentence is Tom's
 // own, 2026-09-08, and "Continue working" is the half that matters: it says the page is not frozen.
@@ -2132,7 +2132,7 @@ $ec_lang['lpn_engine_wait']='Учитавање решавача. Резулта
 $ec_lang['lpn_engine_wait_pct']='Решавач учитан {percent}%.';
 $ec_lang['lpn_engine_wait_bytes']='Решавач учитан {kb} KB до сада. Укупна величина није доступна, па проценат завршетка није познат.';
 $ec_lang['lpn_engine_needed_failed']='EPANET решавач још није учитан, не може да се учита, а ова мрежа може да се реши само помоћу њега. Биће учитан када будете повезани на интернет.';
-$ec_lang['lpn_diag_valve_needs_epanet']='Ови вентили се сами отварају и затварају, а само их EPANET решавач може израчунати. EPANET решавач није могао да се учита, па следећи резултати недостају:';
+$ec_lang['lpn_diag_valve_needs_epanet']='Ово су вентили за регулацију притиска или протока, а само их EPANET решавач може израчунати. EPANET решавач није могао да се учита, па следећи резултати недостају:';
 $ec_lang['lpn_diag_valve_on_fixed_head']='Ови вентили су директно повезани на резервоар или тенк, који већ одређује ниво воде тамо, па вентилу не остаје ништа да регулише. Поставите кратку цев између вентила и резервоара или тенка:';
 $ec_lang['lpn_diag_not_converged']='Решење није пронађено. Проверите да ли постоје вредности које су у стварности немогуће, попут пречника нула.';
 // **THE NUMBERS ARE DRAWN AND MARKED, NOT THROWN AWAY** (ROADMAP Task 565). A solve that did not
@@ -2163,7 +2163,7 @@ $ec_lang['lpn_field_to']='До';
 // different units, and one shared label would have to be vague enough to cover all three.
 $ec_lang['lpn_field_valve_type']='Тип вентила';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_field_valve_type_tip']='Шта вентил ради. Пригушни вентил задржава фиксан губитак. Остала три задржавају притисак или проток и потпуно се отварају, затварају или делимично затварају како се вода мења. Типови контролишу различита хидрауличка својства, па се поставке при промени типа могу изгубити.';
+$ec_lang['lpn_field_valve_type_tip']='Тип вентила. Пригушни вентил (TCV) примењује фиксан губитак. PRV, PSV и FCV одржавају притисак или проток, и потпуно се отварају, затварају или делимично затварају како се хидрауличке околности мењају. PBV уклања фиксан притисак, а GPV прати криву губитка напора. Типови контролишу различита хидрауличка својства, па се подешавања могу изгубити при промени типа.';
 // THE ENGLISH IS ELLIPTICAL ON PURPOSE -- the noun "valve" is dropped because the dropdown above
 // already says "Valve type" -- so a translator meets a bare modifier with no head noun, and
 // "throttle" alone pulls hard toward a car accelerator. Each _syn supplies the noun plus alternates
@@ -2183,16 +2183,16 @@ $ec_lang['lpn_field_valve_setting_drop_tip']='Притисак који вент
 $ec_lang['lpn_inp_drop_gpv_curve']='Овај вентил упућује на криву губитка напора која се не налази у датотеци. Вентил је пренет без криве, па остаје потпуно отворен док му је не доделите.';
 $ec_lang['lpn_gpv_curve_source']='Крива губитка напора вентила';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_gpv_curve_source_tip']='Крива у оквиру Библиотеке која говори колики напор овај вентил губи при сваком протоку. Више вентила може користити исту криву, а измена тамо мења све њих. Овај вентил чува само упућивање; саме тачке се читају и мењају под Библиотеке, Криве.';
+$ec_lang['lpn_gpv_curve_source_tip']='Крива у оквиру Библиотеке која даје губитак напора кроз овај вентил при сваком протоку. Више вентила може користити исту криву, а њено мењање тамо мења све њих.';
 $ec_lang['lpn_field_valve_setting_pressure']='Подешавање притиска';
-$ec_lang['lpn_field_valve_setting_pressure_tip']='Притисак који вентил одржава. Вентил за смањење притиска одржава притисак на низводној страни на овој вредности или испод ње. Вентил за одржавање притиска одржава притисак на узводној страни на овој вредности или изнад ње.';
+$ec_lang['lpn_field_valve_setting_pressure_tip']='Вентил за смањење притиска одржава притисак на низводној страни на овој вредности или испод ње. Вентил за одржавање притиска одржава притисак на узводној страни на овој вредности или изнад ње.';
 $ec_lang['lpn_field_valve_setting_flow']='Подешавање протока';
-$ec_lang['lpn_field_valve_setting_flow_tip']='Највећа количина воде коју вентил пропушта. Када мања количина воде од ове жели да прође, вентил остаје потпуно отворен и не додаје губитак.';
+$ec_lang['lpn_field_valve_setting_flow_tip']='Највећи проток кроз вентил. Када је проток мањи од ове вредности, вентил је потпуно отворен и не додаје губитак.';
 $ec_lang['lpn_field_valve_setting']='Подешавање';
 $ec_lang['lpn_field_valve_setting_loss']='Коефицијент губитка';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_field_valve_setting_loss_tip']='Колико напора пригушни вентил одузима, изражено као умножак брзинског напора. Користите 0 за вентил који стоји потпуно отворен. Овај један број представља цео губитак пригушног вентила.';
-$ec_lang['lpn_field_valve_diameter_tip']='Ширина отвора кроз вентил. Брзина воде кроз вентил се рачуна из ове ширине, а губитак произлази из те брзине.';
+$ec_lang['lpn_field_valve_diameter_tip']='Пречник отвора вентила. Брзина кроз вентил рачуна се из овог пречника, а губитак из те брзине.';
 $ec_lang['lpn_field_valve_km_tip']='Губитак услед тела вентила док вентил стоји потпуно отворен, поред онога што одузима подешавање вентила. Изражава се као умножак брзинског напора. Користите 0 да га занемарите.';
 $ec_lang['lpn_field_km']='Коефицијент мањег (локалног) губитка, k';
 // Short form of the same concept, for the two NARROW uses: the Labels checkbox list and the on-map
@@ -2207,7 +2207,7 @@ $ec_lang['lpn_field_km_short']='Локални губитак, k';
 // one curve name the same curve now, so there is no borrow to describe.
 $ec_lang['lpn_pump_curve_source']='Крива напора пумпе';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_pump_curve_source_tip']='Крива у оквиру Библиотеке која говори колики напор ова пумпа додаје при сваком протоку. Више пумпи може користити исту криву, а измена тамо мења све њих. Ова пумпа чува само упућивање; саме тачке се читају и мењају под Библиотеке, Криве.';
+$ec_lang['lpn_pump_curve_source_tip']='Крива у оквиру Библиотеке која даје напор који ова пумпа додаје при сваком протоку. Више пумпи може користити исту криву, а њено мењање тамо мења све њих.';
 // **"THE NOTES BELOW" DO NOT EXIST ON THIS PAGE** (Tom, 2026-09-05: *"There are no notes below.
 // It's in Help, Notes on this page."*). Every other calculator in this suite is a form with its
 // notes printed under it, and this sentence was written in that habit; the map page is a full-window
@@ -2282,29 +2282,29 @@ $ec_lang['lpn_pump_effic_unstated']='Ова пумпа упућује на кр�
 // from a "Mode:" prefix + the tool's own label, per CLAUDE.md's concept-level label reuse rule --
 // word order/grammar around a mode name varies by language, so each mode gets its own full string.
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_mode_select']='Режим: Избор. Кликните елемент или ознаку да бисте је видели или изменили. Превуците да бисте померили чвор, тачку прегиба или ознаку. Користите алат Тачке прегиба да бисте додали или уклонили превоје цеви.';
-$ec_lang['lpn_mode_delete']='Режим: Брисање. Кликните елемент да бисте га уклонили.';
+$ec_lang['lpn_mode_select']='Режим: Избор. Изаберите елемент или ознаку да бисте је видели или изменили. Превуците да бисте померили чвор или ознаку. Користите алат Тачке прегиба да бисте додали или уклонили превоје цеви.';
+$ec_lang['lpn_mode_delete']='Режим: Брисање. Изаберите елемент да бисте га уклонили.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_mode_vertices']='Режим: Тачке прегиба. Тачке прегиба сваке цеви приказане су као мали квадратни маркери. Кликните на цев да бисте додали тачку прегиба, кликните на маркер да бисте га уклонили, или га превуците да бисте га померили. Ништа друго на мапи се не мења у овом режиму.';
-$ec_lang['lpn_mode_zoom_window']='Режим: Увећавање подручја. Кликните два наспрамна угла оквира, или превуците један, на мапи да увећате то подручје.';
+$ec_lang['lpn_mode_vertices']='Режим: Тачке прегиба. Тачке прегиба сваке цеви приказане су као мали квадратни маркери. Одредите тачку на цеви да бисте додали тачку прегиба, изаберите маркер да бисте је уклонили, или превуците маркер да бисте је померили. Ништа друго на мапи се не мења у овом режиму.';
+$ec_lang['lpn_mode_zoom_window']='Режим: Увећавање подручја. Одредите два наспрамна угла оквира на мапи, или превуците један, да увећате то подручје.';
 // One-shot notice when the Delete key is pressed with nothing picked (Task 415). It has to name the
 // gesture, because the whole point of the change is that the order is now subject, then verb.
-$ec_lang['lpn_select_first']='Ништа није изабрано. Прво кликните на елемент на мапи, а затим притисните тастер Delete.';
-$ec_lang['lpn_mode_add_junction']='Режим: Додавање чвора. Кликните на мапу да бисте поставили чвор. Пређите у режим Избор да бисте мењали или померали елементе и ознаке.';
-$ec_lang['lpn_mode_add_reservoir']='Режим: Додавање резервоара. Кликните на мапу да бисте поставили резервоар. Пређите у режим Избор да бисте мењали или померали елементе и ознаке.';
-$ec_lang['lpn_mode_add_tank']='Режим: Додавање тенка. Кликните на мапу да бисте поставили тенк. Пређите у режим Избор да бисте мењали или померали елементе и ознаке.';
-$ec_lang['lpn_mode_add_pipe']='Режим: Додавање цеви. Кликните на чвор, па на други чвор, да бисте их повезали. Кликните на празан простор између да бисте савили линију, или притисните тастер Esc да бисте почели изнова. Пређите у режим Избор да бисте мењали или померали елементе и ознаке.';
-$ec_lang['lpn_mode_add_pump']='Режим: Додавање пумпе. Кликните на чвор, па на други чвор, да бисте их повезали. Кликните на празан простор између да бисте савили линију, или притисните тастер Esc да бисте почели изнова. Пређите у режим Избор да бисте мењали или померали елементе и ознаке.';
-$ec_lang['lpn_mode_add_valve']='Режим: Додавање вентила. Кликните на чвор, па на други чвор, да бисте их повезали. Кликните на празан простор између да бисте савили линију, или притисните тастер Esc да бисте почели изнова. Пређите у режим Избор да бисте мењали или померали елементе и ознаке.';
+$ec_lang['lpn_select_first']='Ништа није изабрано. Прво изаберите елемент на мапи, а затим притисните Delete.';
+$ec_lang['lpn_mode_add_junction']='Режим: Додавање чвора. Одредите место на мапи да бисте поставили чвор. Пређите у режим Избор да бисте мењали или померали елементе и ознаке.';
+$ec_lang['lpn_mode_add_reservoir']='Режим: Додавање резервоара. Одредите место на мапи да бисте поставили резервоар. Пређите у режим Избор да бисте мењали или померали елементе и ознаке.';
+$ec_lang['lpn_mode_add_tank']='Режим: Додавање тенка. Одредите место на мапи да бисте поставили тенк. Пређите у режим Избор да бисте мењали или померали елементе и ознаке.';
+$ec_lang['lpn_mode_add_pipe']='Режим: Додавање цеви. Изаберите почетни, а затим крајњи чвор да бисте их повезали. Одредите тачке на празном простору између да бисте савили линију, или притисните Escape да почнете изнова. Пређите у режим Избор да бисте мењали или померали елементе и ознаке.';
+$ec_lang['lpn_mode_add_pump']='Режим: Додавање пумпе. Изаберите почетни, а затим крајњи чвор да бисте их повезали. Одредите тачке на празном простору између да бисте савили линију, или притисните Escape да почнете изнова. Пређите у режим Избор да бисте мењали или померали елементе и ознаке.';
+$ec_lang['lpn_mode_add_valve']='Режим: Додавање вентила. Изаберите почетни, а затим крајњи чвор да бисте их повезали. Одредите тачке на празном простору између да бисте савили линију, или притисните Escape да почнете изнова. Пређите у режим Избор да бисте мењали или померали елементе и ознаке.';
 // Text was wrong (Tom, 2026-07-30): "click a node first to anchor it there" implied a two-click
 // sequence (click node, THEN click to place), but placing near a node anchors it in that ONE click.
-$ec_lang['lpn_mode_add_text']='Режим: Додавање текста. Кликните на мапу да бисте поставили текст. Кликните близу чвора да бисте везали текст за тај чвор. Пређите у режим Избор да бисте мењали или померали елементе и ознаке.';
+$ec_lang['lpn_mode_add_text']='Режим: Додавање текста. Одредите место на мапи да бисте поставили текст. Одредите место близу чвора да бисте везали текст за тај чвор. Пређите у режим Избор да бисте мењали или померали елементе и ознаке.';
 // Toolbar button tips (Tom, 2026-07-30): hover/tap explanations on the two buttons a new user is
 // most likely to miss the point of -- that Select is what you use to edit/move things, and that a
 // label itself can be dragged. Both economize on translation for later, per CLAUDE.md's tip-only
 // whole-label-wrap convention -- the button itself is already the click target (no separate "?"
 // glyph needed), so the tip goes straight on the button as a title, matched to the .ec-help class.
-$ec_lang['lpn_tip_select']='Користите овај режим да бисте мењали, померали и превлачили ствари на мапи. Ово је режим у који се страница подразумевано враћа: сама се враћа овде после неких радњи, као што је отварање пројекта. Двоструки притисак тастера Esc уклања избор свега што је тренутно изабрано.';
+$ec_lang['lpn_tip_select']='Користите овај режим да бисте мењали, померали и превлачили елементе на мапи или померали саму мапу. Ово је подразумевани режим мапе. Други притисак тастера Esc уклања избор свега што је изабрано.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_field_auto']='Аутоматски';
 $ec_lang['lpn_method_switch_confirm']='Промена методе трења не мења бројеве храпавости који су већ уписани на вашим цевима, а храпавост за једну методу је бесмислена за другу. Проверите сваку цев након ове промене. Да ли ипак желите да је промените?';
@@ -2371,7 +2371,7 @@ $ec_lang['lpn_labels_mark_extrema_tip']='Исцртава линију изна�
 $ec_lang['lpn_settings_apply_to_all']='Примени на све';
 $ec_lang['lpn_settings_apply_to_all_tip']='Сваки већ нацртани елемент ове врсте добија ID који почиње овим текстом. Сваки задржава свој број. ID који се не завршава бројем остаје непромењен.';
 $ec_lang['lpn_confirm_apply_prefix']='Преименовати {n} елемената тако да њихови ID-јеви почињу са {prefix}? Сваки задржава свој број.';
-$ec_lang['lpn_prefix_applied']='Преименовано {n} елемената. {skipped} других је остављено непромењено.';
+$ec_lang['lpn_prefix_applied']='Преименовано елемената: {n}. Остало није промењено: {skipped}.';
 $ec_lang['lpn_labels_suffix_gradient_tip']='Текст додат после градијента губитка напора на ознакама мапе. Овде не уписујте знак процента. Он се додаје аутоматски када су јединице проценти.';
 $ec_lang['lpn_labels_separator']='Текст између вредности';
 $ec_lang['lpn_labels_separator_tip']='Текст између једне особине и следеће на ознаци. Подразумевано је размак.';
@@ -2441,7 +2441,7 @@ $ec_lang['lpn_backdrop_scale_entry']='Размера према ворлд-фа�
 // absolute scale commands above: it changes the size by a factor and holds one point still, which
 // is what the last stage of fitting an aerial photograph actually needs.
 $ec_lang['lpn_backdrop_scale_from']='Размера од тренутне величине, око тачке коју изаберете';
-$ec_lang['lpn_backdrop_scale_from_prompt1']='Кликните тачку на позадинској слици која треба да остане на свом месту.';
+$ec_lang['lpn_backdrop_scale_from_prompt1']='Одредите тачку на позадинској слици која треба да остане на свом месту.';
 $ec_lang['lpn_backdrop_scale_from_prompt2']='Размера од тренутне величине. 1 је задржава истом, 1,1 је увећава за 10%, 0,9 је умањује за 10%.';
 $ec_lang['lpn_backdrop_scale_entry_prompt']='Унесите величину једног пиксела на мапи, или налепите цео садржај ворлд-фајла за слику';
 $ec_lang['lpn_backdrop_scale_entry_bad']='Унесите један број за величину пиксела на мапи, или налепите свих шест редова ворлд-фајла.';
@@ -2470,15 +2470,15 @@ $ec_lang['lpn_map_attach_scale_from_bad']='Унесите један број в
 $ec_lang['lpn_map_attach_scale_from_done']='Мапа је промењене величине, а ваш цртеж и свака координата у њему остају потпуно исти.';
 $ec_lang['lpn_map_attach_none']='Мапа света још није прикачена на овај пројекат. Прво користите Мапа, Мапа света, Прикачи.';
 $ec_lang['lpn_map_attach_remove']='Одвоји';
-$ec_lang['lpn_map_attach_remove_tip']='Уклони мапу света. Цртеж и његове координате остају нетакнути у сваком случају.';
+$ec_lang['lpn_map_attach_remove_tip']='Одвоји мапу света. Не утиче на мрежу.';
 $ec_lang['lpn_map_attach_done']='Мапа света је сада иза вашег цртежа, а ваш пројекат је непромењен. Користите Мапа, Мапа света, Одвоји да је поново уклоните.';
-$ec_lang['lpn_map_attach_removed']='Мапа света је уклоњена, а цртеж је потпуно исти какав је био.';
+$ec_lang['lpn_map_attach_removed']='Мапа света је одвојена, а мрежа није погођена.';
 // **THE CUSTOM GEOREFERENCE WIZARD, IN TOM'S OWN THREE STEPS** (2026-09-18, and
 // dev/tom-coordinate-vocabulary-2026-09-16.md). Georeferencing here means attaching the world map,
 // never converting a coordinate, so every sentence below says what stays still as well as what
 // moves: the drawing does not move, the ground does.
 $ec_lang['lpn_mapgeo_intro']='Ваш цртеж се налази на мапи целог света, у океану на нултој географској ширини и нултој дужини. Прво пронађите своје место: померајте и зумирајте мапу иза цртежа, потражите назив места, или упишите географску ширину и дужину. Сам цртеж се не помера.';
-$ec_lang['lpn_mapgeo_step1']='Корак 1 од 2: пронађите своје место у свету';
+$ec_lang['lpn_mapgeo_step1']='Корак 1 од 2: пронађите место пројекта';
 $ec_lang['lpn_mapgeo_step2']='Корак 2 од 2: уклопите мапу иза свог цртежа';
 $ec_lang['lpn_mapgeo_hint1']='Померајте и зумирајте мапу иза свог цртежа, или потражите место, или упишите географску ширину и дужину. Затим притисните Постави приближно.';
 $ec_lang['lpn_mapgeo_readjust_intro']='Ваш цртеж је тамо где сте га последњи пут поставили. Да бисте га преместили негде другде, померајте и зумирајте мапу иза цртежа, потражите назив места, или упишите географску ширину и дужину. Сам цртеж се не помера.';
@@ -2506,14 +2506,14 @@ $ec_lang['lpn_mapgeo_place']='Постави приближно';
 $ec_lang['lpn_mapgeo_finish']='Геореференцирај овде';
 $ec_lang['lpn_mapgeo_cancelled']='Мапа света је враћена тамо где је била, а ваш цртеж се никада није померио.';
 $ec_lang['lpn_mapgeo_locked']='Завршите дугметом Геореференцирај овде, или притисните Откажи, пре него што промените пројекат или сачувате. Мапа света се још увек поставља.';
-$ec_lang['lpn_backdrop_scale_prompt1']='Кликните две тачке на позадинској слици, на пример два краја размерне траке. Затим упишите стварно растојање између њих.';
+$ec_lang['lpn_backdrop_scale_prompt1']='Одредите две тачке на позадинској слици, на пример два краја размерне траке. Затим упишите стварно растојање између њих.';
 $ec_lang['lpn_backdrop_scale_prompt2']='Стварно растојање између те две тачке';
 // Tom's own wording, 2026-08-16. "Base point" is the drafting term and it is what the second step
 // then has a destination FOR; "any point on the background image" did not say that the two steps are
 // one move. The second names the panel it is about to show, so the alert and the panel read as one
 // step rather than two.
-$ec_lang['lpn_backdrop_position_prompt1']='Кликните базну тачку (на слици) за померање.';
-$ec_lang['lpn_backdrop_position_prompt2']='Изаберите метод за одредишну тачку, па кликните Настави.';
+$ec_lang['lpn_backdrop_position_prompt1']='Одредите базну тачку (на слици) за померање.';
+$ec_lang['lpn_backdrop_position_prompt2']='Изаберите метод за одредишну тачку, па изаберите Настави.';
 // The standing "you are in the middle of something" bar, shown while a background-image scale or
 // move is waiting for a click. It carries the only visible way out of that state.
 $ec_lang['lpn_backdrop_busy']='Подешавање позадинске слике.';
@@ -2532,7 +2532,7 @@ $ec_lang['lpn_hide_titles']='Сакриј ове наслове';
 // The Settings row that turns the selection bubble back on. Its sibling checkbox lives in the
 // bubble and reads 'Show this'; this one has to name what it is talking about.
 $ec_lang['lpn_settings_area_hint']='Прикажи помоћ за избор';
-$ec_lang['lpn_settings_area_hint_tip']='Приказује облачић изнад мапе који каже шта ће урадити ваш следећи клик док бирате подручје.';
+$ec_lang['lpn_settings_area_hint_tip']='Приказује поруку изнад мапе која даје следећи корак док бирате подручје.';
 $ec_lang['lpn_settings_id_prefixes']='Префикси ID-а';
 // NEVER "Starting values" (Tom, 2026-08-19: "The problem is that it's misleading"). These are what
 // a NEW asset is created with; "starting" reads as the initial condition of a run, which on a
@@ -2559,7 +2559,7 @@ $ec_lang['lpn_settings_custom_props']='Прилагођена својства';
 // **THE HEADING'S OWN TIP, AND IT IS TOM'S SENTENCE** (2026-09-13, revision 1 of eleven): it says
 // what a custom property is FOR and that it behaves like every other property, which is the whole
 // of what a reader needs before opening the design table.
-$ec_lang['lpn_settings_custom_props_note']='Својства која сами дефинишете за сопствене потребе. Чувају се уз пројекат и сценарије као и сва остала својства.';
+$ec_lang['lpn_settings_custom_props_note']='Својства која дефинише корисник. Чувају се уз пројекат и сценарије као и сва остала својства.';
 $ec_lang['lpn_cp_design']='Дизајн';
 $ec_lang['lpn_cp_design_tip']='По један ред за свако прилагођено својство, и сваки се отвара да прикаже: Кључ, Ознака, Односи се на, Провери као, Дозволи или ограничи, поље за карактере именовано тим избором, Доњу границу дужине, Горњу границу дужине, Доњу границу, Горњу границу.';
 $ec_lang['lpn_cp_add']='Додај прилагођено својство';
@@ -2579,7 +2579,7 @@ $ec_lang['lpn_cp_applies_tip']='Односи се на: Списак префи�
 $ec_lang['lpn_cp_validate']='Провери као';
 $ec_lang['lpn_cp_validate_tip']='Провери као: Ово говори како изгледа исправна вредност. Правила о величини слова важе само за енглески алфабет, што је наведено ограничење. Изаберите Не проверавај да бисте прихватили било шта.';
 $ec_lang['lpn_cp_restrict']='Ограничи ове карактере';
-$ec_lang['lpn_cp_restrict_tip']='Ограничи ове карактере: Вредност сме да користи само наведене карактере, или ниједан од њих, где „@“ означава било које слово; „#“ означава било коју цифру, а „-“, „.“ и „,“ морате посебно навести ако су дозвољени; сваки размак мора бити између других карактера.';
+$ec_lang['lpn_cp_restrict_tip']='Ограничи ове карактере:';
 $ec_lang['lpn_cp_restrict_mode']='Дозволи или ограничи';
 $ec_lang['lpn_cp_restrict_mode_tip']='Дозволи или ограничи: Наведени карактери су или једини које вредност сме да користи, или они које не сме да користи.';
 $ec_lang['lpn_cp_restrict_allow']='Дозволи само ове карактере';
@@ -2683,9 +2683,9 @@ $ec_lang['lpn_scenario_preset_max_day']='5. Максималан дан';
 $ec_lang['lpn_scenario_preset_peak_hour']='6. Часовни врхунац';
 $ec_lang['lpn_scenario_preset_fire_max_day']='7. Пожар плус максималан дан';
 $ec_lang['lpn_scenario_preset_fire_max_day_tip']='Потрошња максималног дана (множилац 2,0). У овом сценарију покрените Анализу противпожарног протока: она додаје противпожарни проток на сваком чвору преко ове потрошње.';
-$ec_lang['lpn_delete_drops_overrides']='Брисање овог елемента такође одбацује {n} вредности које ваши сценарији чувају за њега. Наставити?';
+$ec_lang['lpn_delete_drops_overrides']='Брисање овог елемента брише и {n} сопствених вредности сценарија за њега. Наставити?';
 $ec_lang['lpn_push_base_only']='Ова радња мења сам цртеж, па се може извршити само у {base}. Пређите на {base} и покушајте поново.';
-$ec_lang['lpn_field_active']='Део ове мреже';
+$ec_lang['lpn_field_active']='Активно?';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_field_active_tip']='Искључите ову кућицу да бисте оставили елемент на цртежу, али ван мреже: приказује се сиво, а решавач га игнорише. У сценарију се овако цев укључује и искључује.';
 // ---- Task 412: a Base-wide property SAYS it is Base-wide ----
@@ -2698,7 +2698,7 @@ $ec_lang['lpn_field_active_tip']='Искључите ову кућицу да б
 // cannot compare them.
 $ec_lang['lpn_settings_emitter_exponent']='Експонент прскалице';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_settings_emitter_exponent_tip']='Изложилац у EPANET-овој једначини емитера за прскалице и цурења: проток = коефицијент × притисак степенован овим изложиоцем. Мења резултат само тамо где чвор има емитер, што за сада значи мрежу учитану из EPANET датотеке.';
+$ec_lang['lpn_settings_emitter_exponent_tip']='Изложилац у EPANET-овој једначини емитера за прскалице и цурења: проток = коефицијент × притисак степенован овим изложиоцем. Мења резултате само у чворовима са коефицијентом емитера.';
 // The Settings panel's Computation section (Tom, 2026-08-10). "Computation", not "Solver": what the
 // two rows under it decide is the arithmetic the user gets, and "solver" names the internals.
 $ec_lang['lpn_elev_dem_sample']='Очитај DEM';
@@ -2706,10 +2706,10 @@ $ec_lang['lpn_elev_dem_sample_tip']='Очитава коту из DEM-а за о
 $ec_lang['lpn_elev_dem_use']='Користи DEM';
 $ec_lang['lpn_elev_dem_use_tip']='Уписује коту из DEM-а за овај чвор у поље Кота изнад, замењујући оно што тамо стоји. Прво очитава DEM ако то још није урађено. Једно Опозови враћа претходну вредност.';
 $ec_lang['lpn_elev_dem_none']='DEM нема коту за овај чвор.';
-$ec_lang['lpn_elev_dem_said']='Mapbox DEM каже {v} {u}.';
+$ec_lang['lpn_elev_dem_said']='Mapbox DEM кота: {v} {u}.';
 $ec_lang['lpn_settings_elev_source']='Извор коте';
-$ec_lang['lpn_settings_elev_source_tip']='Одакле нови чвор добија своју коту. Површина терена се очитава из Mapbox DEM-а, који је широк око 30 m на већем делу Земље, а финији тамо где постоје бољи подаци.';
-$ec_lang['lpn_settings_elev_source_typed']='Кота уписана изнад';
+$ec_lang['lpn_settings_elev_source_tip']='2026 Mapbox DEM хоризонтална и вертикална тачност износе 1–10 m и <1 m у САД, 2–10 m и 1–3 m у Европи и Јапану, 30 m и 10–16 m глобално, и 90 m и >16 m на половима.';
+$ec_lang['lpn_settings_elev_source_typed']='Изнад';
 $ec_lang['lpn_settings_elev_source_dem']='DEM (Mapbox)';
 $ec_lang['lpn_settings_accuracy']='Тачност';
 // **APPENDED TO EVERY HYDRAULICS TIP, because the box no longer shows the default** (Tom,
@@ -2726,7 +2726,7 @@ $ec_lang['lpn_settings_accuracy']='Тачност';
 // dev/language-strings.md and guarded by dev/scripts/plain_english_swap_check.php.
 $ec_lang['lpn_settings_default_is']='Подразумевана вредност је {n}.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_settings_accuracy_tip']='Колико близу решавач мора да дође пре него што стане, мерено количином за коју се протоци још увек мењају од једног покушаја до следећег. Мањи број значи прецизније, али и дуже трајање. Оба решавача читају ово исто поље, а сваки мери ту промену у односу на другачији укупан збир: уграђени решавач у односу на збир потрошњи, EPANET у односу на збир протока у везама. Ако се остави празно, ова страница користи строжу тачност него што је EPANET-ова сопствена подразумевана вредност.';
+$ec_lang['lpn_settings_accuracy_tip']='Граница конвергенције коју решавач мора достићи пре него што стане, мерена као укупна промена протока од једног покушаја до следећег, подељена укупним протоком у везама. Мањи број је тачнији и дуже траје.';
 $ec_lang['lpn_settings_specific_gravity']='Специфична тежина';
 $ec_lang['lpn_settings_viscosity']='Релативна вискозност';
 $ec_lang['lpn_settings_viscosity_tip']='Вискозност флуида у поређењу са водом на 20 степени Целзијуса. Мења резултат само код методе Darcy-Weisbach.';
@@ -2742,11 +2742,11 @@ $ec_lang['lpn_settings_trials_tip']='Колико покушаја је дозв
 // not know which engine is answering cannot tell a control that did nothing from a setting that had
 // no effect. Saying it in the tip is cheaper than a second Settings section, and honest.
 $ec_lang['lpn_settings_unbalanced']='Ако не конвергира';
-$ec_lang['lpn_settings_unbalanced_tip']='Шта урадити са мрежом која је потрошила своје покушаје и још увек није конвергирала. Дозвољавање додатних покушаја често доводи до конвергенције. Заустављање пријављује последњи покушај онаквим какав јесте, што није решење. Само EPANET решавач чита ово поље. Уграђени решавач се увек зауставља и означава резултат као неконвергиран.';
+$ec_lang['lpn_settings_unbalanced_tip']='Радња за мрежу која је потрошила своје покушаје и још увек није конвергирала. Дозвољавање додатних покушаја често доводи до конвергенције. Заустављање пријављује последњи покушај онаквим какав јесте, што није решење.';
 $ec_lang['lpn_settings_unbalanced_continue']='Дозволи додатне покушаје';
 $ec_lang['lpn_settings_unbalanced_stop']='Заустави и пријави последњи покушај';
 $ec_lang['lpn_settings_unbalanced_trials']='Додатни покушаји пре пријављивања';
-$ec_lang['lpn_settings_unbalanced_trials_tip']='Колико још покушаја дозволити пошто се максимум изнад потроши, пре него што се пријави последњи покушај. Само EPANET решавач чита ово поље.';
+$ec_lang['lpn_settings_unbalanced_trials_tip']='Број додатних покушаја дозвољених пошто се потроши максимум изнад, пре него што се пријави последњи покушај.';
 $ec_lang['lpn_settings_head_error']='Граница грешке напора';
 $ec_lang['lpn_settings_head_error_tip']='Додатни тест који решавач мора да прође пре него што стане: највећа преостала грешка напора у било којој цеви. Нула значи да се овај тест не примењује. Само EPANET решавач чита ово поље.';
 $ec_lang['lpn_settings_flow_change']='Граница промене протока';
@@ -2756,8 +2756,8 @@ $ec_lang['lpn_settings_damp_limit']='Пригушење почиње на';
 $ec_lang['lpn_settings_damp_limit_tip']='Тачност при којој решавач почиње да прави мање кораке, што може помоћи мрежи која осцилује да конвергира. Нула значи да решавач никада не пригушује. Само EPANET решавач чита ово поље.';
 $ec_lang['lpn_settings_option_unset']='Није наведено';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_settings_demand_multiplier_tip']='Један фактор који се примењује на сваку потрошњу у мрежи одједном. Користите га да бисте испитали шта систем ради при потрошњи већој или мањој од данашње. Не мења бројеве које сте укуцали. Сценарио може имати сопствени, тако да просечан дан, максималан дан и врхунски час имају по један број; оставите празно у сценарију да би се користио множилац пројекта.';
-$ec_lang['lpn_settings_engine_native']='Реши помоћу EPANET решавача';
+$ec_lang['lpn_settings_demand_multiplier_tip']='Један фактор који се примењује на сваку потрошњу у мрежи одједном. Сваки сценарио може имати засебну вредност, па се просечан дан, максималан дан или врхунски час могу направити променом само овог подешавања.';
+$ec_lang['lpn_settings_engine_native']='Користи уграђени решавач када је могуће';
 // **THIS TIP NO LONGER ARGUES THE TWO SOLVERS AGAINST EACH OTHER** (Task 605, Tom 2026-09-06:
 // *"We scrub our tips and alerts for any undue weight on the existence of two solvers."*). It
 // spent three sentences on speed and on the two measured disagreements -- minor losses 0.08%
@@ -2776,7 +2776,7 @@ $ec_lang['lpn_engine_failed']='EPANET решавач није могао да с
 // Said out loud, never silently: the user picked the built-in solver and this network was sent to
 // the EPANET solver anyway, because it holds a valve the built-in solver does not calculate. The
 // setting is not changed, so removing the valve puts the page straight back on the chosen engine.
-$ec_lang['lpn_engine_valve_route']='Решено помоћу EPANET решавача, јер се ови вентили сами отварају и затварају:';
+$ec_lang['lpn_engine_valve_route']='Решено помоћу EPANET решавача, због ових вентила за регулацију притиска и протока:';
 $ec_lang['lpn_unit_unknown']='Овај цртеж наводи јединицу коју ова страница не нуди: {unit}. Све је сачувано и приказано тачно онако како је унето, и ништа није промењено. Одговори не могу да се дају док ова страница не препозна ту јединицу, јер не постоји начин да се утврди колика је.';
 $ec_lang['lpn_engine_manning_note']='Напомена: са Манинговом храпавошћу, EPANET заокружује константу у Манинговој једначини, па губитак напора испадне за око 0,6% нижи него у тачном облику.';
 // ---- EPANET said no (ROADMAP Task 471) -------------------------------------------------------
@@ -2787,7 +2787,7 @@ $ec_lang['lpn_engine_manning_note']='Напомена: са Манинговом
 $ec_lang['lpn_engine_refused']='EPANET решавач није прихватио ову мрежу, па се прорачун није покренуо.';
 // {message} is EPANET's own text and is NOT translated: it names what the solver choked on, which
 // is the only part a user can act on, and nothing of ours could reconstruct it.
-$ec_lang['lpn_engine_refused_why']='EPANET решавач је рекао: {message}';
+$ec_lang['lpn_engine_refused_why']='Порука EPANET решавача: {message}';
 $ec_lang['lpn_engine_refused_fallback']='Бројеви на екрану потичу од уграђеног решавача уместо тога.';
 // The run's own version of that last sentence: a period run has a moment and a tank level to name,
 // and a one-moment solve does not, which is where the shared label stops.
@@ -2812,7 +2812,7 @@ $ec_lang['lpn_settings_link_width']='Дебљина линије цеви (пи�
 // the label cannot say, which are that the arrows only appear once there are results and that the
 // setting travels with the project.
 $ec_lang['lpn_settings_show_arrows']='Стрелице смера протока';
-$ec_lang['lpn_settings_show_arrows_tip']='Исцртава стрелицу на свакој цеви која показује на коју страну вода тече. Стрелице се појављују после израчунавања, а њихово искључивање не мења резултате. Ово подешавање се чува уз пројекат.';
+$ec_lang['lpn_settings_show_arrows_tip']='Исцртава стрелицу на свакој цеви која показује на коју страну вода тече. Стрелице се појављују после прорачуна, а њихово искључивање не мења резултате.';
 $ec_lang['lpn_settings_align_labels']='Поравнај ознаке цеви са цевима';
 $ec_lang['lpn_settings_readability_bias']='Окрени ознаку наопако када се нагне више од овог броја степени лево од вертикале';
 $ec_lang['lpn_settings_readability_bias_tip']='Окреће ознаку да остане усправна када се нагне више од овог броја степени лево од вертикале.';
@@ -2939,7 +2939,7 @@ $ec_lang['lpn_time_report_start']='Почетно време извештаја'
 $ec_lang['lpn_time_clock_start']='Време на сату на почетку';
 $ec_lang['lpn_time_clock_day']='Дан {day}, {clock}';
 $ec_lang['lpn_time_format_tip']='Упишите време као часове и минуте, на пример 2:30. Обичан број значи часове, тако да 8 значи осам часова. Пола сата је 0:30.';
-$ec_lang['lpn_time_running']='Обрада симулације током продуженог периода помоћу EPANET решавача.';
+$ec_lang['lpn_time_running']='Извршава се симулација током продуженог периода.';
 $ec_lang['lpn_time_no_engine']='Уграђени решавач израчунава један тренутак истовремено, па је ово мрежа само у тренутку {time}: сваки образац се чита у том тренутку, а сваки тенк и даље стоји на свом почетном нивоу уместо да се пуни и празни. Повежите се једном на интернет да бисте преузели EPANET решавач, који покреће симулацију током продуженог периода.';
 $ec_lang['lpn_time_slider']='Протекло време симулације';
 $ec_lang['lpn_time_no_period']='Овај пројекат нема постављену симулацију током продуженог периода, па постоји само један тренутак за приказ. Поставите Укупно време рада у Подешавања, Прорачун, Време да бисте покренули симулацију током продуженог периода.';
@@ -2972,7 +2972,7 @@ $ec_lang['lpn_time_runbox_hide']='Не приказуј овај прозор п
 $ec_lang['lpn_settings_runbox']='Прикажи прозор напретка прорачуна';
 $ec_lang['lpn_settings_runbox_tip']='Прозор који извештава колико је прорачун одмакао и шта је пронашао. Када је искључен, завршен прорачун исту поруку приказује у статусној линији на неколико секунди уместо тога. Ово је подешавање за овај прегледач, а не за пројекат.';
 $ec_lang['lpn_time_run_failed']='Прорачун се није завршио, па нема резултата за касније тренутке.';
-$ec_lang['lpn_time_run_report']='EPANET извештај о прорачуну';
+$ec_lang['lpn_time_run_report']='Извештај о прорачуну';
 $ec_lang['lpn_time_run_report_copy']='Копирај';
 $ec_lang['lpn_time_run_report_copied']='Копирано';
 $ec_lang['lpn_time_run_report_tip']='Оно што је сам EPANET решавач исписао о последњем прорачуну: да ли је конвергирао, и на шта год је упозорио. То је текст самог решавача, не наш.';
@@ -3075,7 +3075,7 @@ $ec_lang['lpn_quality_initial']='Почетни квалитет';
 $ec_lang['lpn_quality_initial_tip']='Колико хемикалије овај чвор садржи када прорачун почне. Резервоар чува своју вредност током целог прорачуна, што је уобичајен начин да се искаже резидуал који напушта постројење за пречишћавање. Оставите празно и чвор почиње без хемикалије.';
 $ec_lang['lpn_result_concentration']='Концентрација';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_result_concentration_tip']='Колико хемикалије је остало у овој тачки пошто је путовала и реаговала. Јединице су оне наведене уз хемикалију под Подешавања, Квалитет воде.';
+$ec_lang['lpn_result_concentration_tip']='Количина хемикалије која је остала у овој тачки после транспорта и реакције. Јединице су оне унете уз назив хемикалије под Подешавања, Прорачун, Квалитет.';
 // **THE BOOSTER DOSE AND THE TANK MIXING MODEL** (ROADMAP Task 579), EPANET's `[SOURCES]` and
 // `[MIXING]`. EPANET's own words throughout, and its own four source types and four mixing models,
 // because an engineer choosing between them is choosing between real pieces of equipment and real
@@ -3093,7 +3093,7 @@ $ec_lang['lpn_source_type_setpoint']='Појачивач задате вредн
 $ec_lang['lpn_source_type_flowpaced']='Појачивач сразмеран протоку';
 $ec_lang['lpn_source_quality']='Квалитет извора';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_source_quality_tip']='Колико је доза јака. За сваку врсту осим појачивача масе ово је концентрација, у јединицама наведеним уз хемикалију под Подешавања, Квалитет воде; за појачивач масе то је маса хемикалије по минуту. Оставите празно и овде се ништа не додаје, што није исто што и нула: нула је довод који ради и не додаје ништа.';
+$ec_lang['lpn_source_quality_tip']='Јачина дозе. За сваку врсту осим појачивача масе ово је концентрација, у јединицама наведеним уз хемикалију под Подешавања, Прорачун, Квалитет; за појачивач масе то је проток масе по минуту. Празно значи без извора хемикалије, функционално једнако 0.';
 $ec_lang['lpn_source_pattern']='Образац извора';
 $ec_lang['lpn_source_pattern_tip']='Временски образац који сразмерно мења дозу током прорачуна, за довод који није константан. Без обрасца доза је иста у сваком кораку.';
 $ec_lang['lpn_mixing_model']='Модел мешања';
@@ -3107,7 +3107,7 @@ $ec_lang['lpn_mixing_fraction']='Удео мешања';
 $ec_lang['lpn_mixing_fraction_tip']='Удео запремине тенка који заузима улазна зона, између 0 и 1. Користи га само мешање са две коморе. Оставите празно и цео тенк је улазна зона, што EPANET подразумева.';
 $ec_lang['lpn_reaction_bulk']='Коефицијент реакције у маси';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_reaction_bulk_tip']='Реакција у самој маси воде, коришћена за сваку цев која нема сопствену. Негативан број разграђује хемикалију, а позитиван је повећава. Реакција је првог реда осим ако увезена EPANET датотека не наведе други ред, па је коефицијент брзина у 1/дан. Празно поље значи без реакције у маси.';
+$ec_lang['lpn_reaction_bulk_tip']='Реакција у маси воде (погледајте EPANET помоћ), коришћена за сваку цев и сваки тенк који нема појединачни коефицијент. Негативан број разграђује хемикалију, а позитиван је повећава. Празно поље значи без реакције у маси.';
 $ec_lang['lpn_reaction_wall']='Коефицијент реакције на зиду';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_reaction_wall_tip']='Реакција на зиду цеви, коришћена за сваку цев која нема сопствену. Негативан број разграђује хемикалију. Реакција је првог реда осим ако увезена EPANET датотека не наведе други ред, па је коефицијент дужина по дану, уписана у пројектној јединици дужине. Празно поље значи без реакције на зиду.';
@@ -3177,7 +3177,7 @@ $ec_lang['lpn_settings_energy']='Енергија';
 // lpn_time_run_report keep the word and lpn_energy_menu and lpn_reports_epanet do not.
 $ec_lang['lpn_reports_menu']='Извештаји';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_reports_epanet']='EPANET прорачун';
+$ec_lang['lpn_reports_epanet']='Прорачун';
 $ec_lang['lpn_energy_title']='Извештај о енергији пумпи';
 $ec_lang['lpn_energy_menu']='Енергија пумпи';
 $ec_lang['lpn_energy_efficiency']='Ефикасност пумпе (проценат)';
@@ -3191,10 +3191,10 @@ $ec_lang['lpn_energy_price_pattern']='Образац цене';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_energy_price_pattern_tip']='Образац који множи цену у сваком кораку обрасца, чиме се наводи нижа тарифа ван врхунца потрошње. Оставите празно за једну цену током целог прорачуна.';
 $ec_lang['lpn_energy_demand_charge']='Накнада за врхунску потрошњу';
-$ec_lang['lpn_energy_demand_charge_tip']='Колико комунално предузеће наплаћује по kW за врхунско оптерећење које траже пумпе у систему.';
+$ec_lang['lpn_energy_demand_charge_tip']='По kW, за врхунско оптерећење које траже пумпе';
 $ec_lang['lpn_energy_currency']='Валута';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_energy_currency_tip']='Шта год овде упишете исписује се уз сваки новчани износ. Ово је ознака. Цене и трошкови се никада не претварају, па цене упишите у валути коју сте овде навели.';
+$ec_lang['lpn_energy_currency_tip']='Текст исписан уз сваку вредност трошка. Ово је само ознака; користите једну валуту у целом пројекту.';
 $ec_lang['lpn_energy_kwh']='kWh';
 $ec_lang['lpn_energy_kw']='kW';
 // Edited by TGH 2026-09-07
@@ -3207,7 +3207,7 @@ $ec_lang['lpn_energy_no_pumps']='Ова мрежа нема пумпи, па н�
 // re-keying are lpn_scenario_label and lpn_scenario_overrides, which already name the same two
 // things in the scenario menu.
 $ec_lang['lpn_scncmp_title']='Поређење сценарија';
-$ec_lang['lpn_scncmp_menu_tip']='Реши сваки сценарио у овом пројекту и упореди их један поред другог: најнижи притисак и највећу брзину у сваком.';
+$ec_lang['lpn_scncmp_menu_tip']='Табела сценарија са бројем разлика, најнижим притиском и највећом брзином';
 $ec_lang['lpn_scncmp_running']='Решавање сваког сценарија…';
 $ec_lang['lpn_scncmp_empty']='Још ништа није нацртано, па нема шта да се реши.';
 $ec_lang['lpn_scncmp_col_maxvelocity']='Највећа брзина';
@@ -3237,10 +3237,10 @@ $ec_lang['lpn_energy_total_cost']='Укупан трошак';
 // **THE ROW SAYS "Status", NOT "Status report"** -- the Reports fly-out carries the word so no row
 // has to (js/looped-network.js:4630's own rule, already followed by "EPANET run"). The box title,
 // lpn_status_title, keeps the full name.
-$ec_lang['lpn_reports_status']='Стање';
+$ec_lang['lpn_reports_status']='Промене стања';
 $ec_lang['lpn_reports_status_tip']='Шта се променило током последње симулације продуженог периода, временским редоследом: пумпе и вентили који се отварају или затварају, тенкови који се пуне, празне, напуне или пресуше, и кораци који нису у потпуности конвергирали.';
-$ec_lang['lpn_status_title']='Извештај о стању';
-$ec_lang['lpn_status_needs_run']='Извештај о стању наводи шта се променило током симулације продуженог периода. Поставите Укупно време рада у Подешавања, Прорачун, Време, притисните Израчунај, а затим отворите Вода, Извештаји, Извештај о стању.';
+$ec_lang['lpn_status_title']='Промене стања';
+$ec_lang['lpn_status_needs_run']='Извештај о стању наводи шта се променило током симулације продуженог периода. Поставите Укупно време рада у Подешавања, Прорачун, Време, притисните Израчунај, а затим отворите Вода, Извештаји, Промене стања.';
 $ec_lang['lpn_status_empty']='Ништа није променило стање током овог прорачуна.';
 $ec_lang['lpn_status_col_event']='Догађај';
 $ec_lang['lpn_status_opened']='{type} {id}: сада отворено';
@@ -3254,7 +3254,7 @@ $ec_lang['lpn_status_note']='Читано из истог прорачуна п�
 
 // Same rule as Status above: the row says "Full", the box says "Full report".
 $ec_lang['lpn_reports_full']='Пун';
-$ec_lang['lpn_reports_full_tip']='Сваки чвор и свака веза у сваком извештајном временском кораку последњег прорачуна, као једна табела коју можете преузети или одштампати.';
+$ec_lang['lpn_reports_full_tip']='Табела свих чворова и веза у сваком извештајном временском кораку последњег прорачуна';
 $ec_lang['lpn_full_title']='Пун извештај';
 $ec_lang['lpn_full_needs_run']='Пун извештај наводи сваки чвор и сваку везу у сваком извештајном временском кораку. Притисните Израчунај, а затим отворите Вода, Извештаји, Пун извештај.';
 $ec_lang['lpn_full_note']='Један ред по чвору или вези по извештајном временском кораку, у јединицама приказаним у панелу Табеле. Празна ћелија је колона коју та величина нема. Преузимање или штампа носи сваки временски корак; табела испод приказује један по један.';
@@ -3319,7 +3319,7 @@ $ec_lang['lpn_library_menu']='Библиотеке';
 $ec_lang['lpn_library_patterns']='Обрасци';
 $ec_lang['lpn_library_patterns_tip']='Образац је списак умножака који се понавља. Сваки важи за један временски корак обрасца, па 24 броја са кораком од једног часа дају дан који се понавља. Потрошња од 10 са умношком од 1,5 је 15 у том тренутку.';
 $ec_lang['lpn_library_curves']='Криве';
-$ec_lang['lpn_library_curves_tip']='Крива је списак тачака који говори како нешто ради: колики напор пумпа додаје при сваком протоку, колика је њена ефикасност при том протоку, или колики напор вентил губи при сваком протоку.';
+$ec_lang['lpn_library_curves_tip']='Напор или ефикасност пумпе у односу на проток, губитак вентила у односу на проток, или запремина тенка у односу на дубину';
 // **CURVES IS AN EDITOR** (Task 586). It was a read-only report about pumps until the curves became
 // document objects of their own, and the note said so; it now says what the box does and where a
 // curve is pointed at an element from.
@@ -3393,7 +3393,7 @@ $ec_lang['lpn_pipetype_detach_tip']='Копира вредности које о
 // additive-K method, which is what Bentley's Minor Loss Collection and KYPipe's SigmaM both offer.
 // Bound by id like the pipe types above it, and for the same Bentley finding.
 $ec_lang['lpn_library_fittings']='Фитинзи';
-$ec_lang['lpn_library_fittings_tip']='Списак фитинга је скуп фитинга и њихових количина на који више цеви може да се позове. Он се сабира у један коефицијент локалног (минорног) губитка.';
+$ec_lang['lpn_library_fittings_tip']='Фитинзи са коефицијентима локалних губитака груписани у спискове';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_library_fittings_note']='Сваки пројекат има сопствену библиотеку фитинга. Списак фитинга садржи фитинге са количином за сваки, и сабира се у јединствени коефицијент локалног (минорног) губитка. И цеви и типови цеви могу да се позову на списак.';
 // **WHERE THE OFFERED NUMBERS CAME FROM, STATED TO THE READER RATHER THAN ONLY IN THE SOURCE.** An
@@ -3428,7 +3428,7 @@ $ec_lang['lpn_library_import_conflict']='Прескочено, јер овај �
 // case is lpn_library_import_no_libraries above, which has no heading over it to lean on.
 $ec_lang['lpn_library_import_none']='Та пројектна датотека нема ништа од овога за копирање.';
 $ec_lang['lpn_library_import_curve_shape']='Ове криве су пренете тачно онако како их је датотека записала, а прорачун не може да користи ону чија прва колона не расте од сваке тачке до следеће: {names}';
-$ec_lang['lpn_library_import_needs_fittings']='Ови типови цеви упућују на списак фитинга који овај пројекат нема: {names}. Увезите библиотеку фитинга из исте датотеке и они ће је пронаћи.';
+$ec_lang['lpn_library_import_needs_fittings']='Ови типови цеви упућују на списак фитинга који овај пројекат нема: {names}. Увезите библиотеку фитинга из исте датотеке да бисте разрешили ове референце.';
 // Said in the CHOOSER, above the Import button, and never in the receipt: it is a fact to weigh
 // before importing, not a note about what has already been done. A DISCLOSURE and not an offer to
 // convert, because changing a unit on this page reinterprets a typed number rather than converting
@@ -3505,10 +3505,10 @@ $ec_lang['lpn_library_control_bad']='⚠ Неразумљиво';
 $ec_lang['lpn_library_control_missing']='⚠ Ова мрежа нема ништа што се зове {id}';
 $ec_lang['lpn_library_rules']='Правила';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_library_rules_tip']='Правило је кратак пасус који отвара или затвара везу, или јој даје подешавање, када ниво воде, притисак, проток или време достигне вредност коју поставите. Правила могу да провере више ствари одједном и могу да наведу шта треба урадити када провера не успе.';
+$ec_lang['lpn_library_rules_tip']='Правило отвара или затвара везу, или мења њено подешавање, када ниво воде, притисак, проток или време достигне задату вредност. Правило може да проверава више услова и може да одреди радњу када услов није испуњен.';
 $ec_lang['lpn_library_rule_add']='Додај правило';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_library_rule_tip']='Једно правило, речима које користи EPANET, по једна клауза у реду. Први ред га именује: RULE 1. Затим услов: IF TANK 2 LEVEL BELOW 17.1. Затим шта урадити поводом тога: THEN PUMP 9 STATUS IS OPEN. Последњи ред може да му одреди ранг: PRIORITY 1. Додајте AND или OR редове да бисте проверили више ствари, и ELSE редове да наведете шта урадити када провера не успе. Услов може читати LEVEL, HEAD, GRADE, PRESSURE или DEMAND на чвору, FLOW, STATUS или SETTING на вези, или TIME и CLOCKTIME на SYSTEM. Бројеве пишите у јединицама које овај пројекат приказује; они се за вас претварају. Кључне речи оставите на енглеском; њих читају и ова страница и EPANET.';
+$ec_lang['lpn_library_rule_tip']='Једна клауза по реду. Следе описи са примерима великим словима. Ред 1: назив правила, „RULE 1“. Ред 2: услов, „IF TANK 2 LEVEL BELOW 17.1“. Ред 3: радња, „THEN PUMP 9 STATUS IS OPEN“. Ред 4: приоритет, „PRIORITY 1“. Додајте редове „AND“ или „OR“ да бисте проверили више услова, и редове „ELSE“ да одредите радњу када услов није испуњен. Услов може читати LEVEL, HEAD, GRADE, PRESSURE или DEMAND на чвору, FLOW, STATUS или SETTING на вези, или TIME и CLOCKTIME на SYSTEM. Користите доследне јединице пројекта. Кључне речи морају бити на енглеском.';
 $ec_lang['lpn_library_rule_ok']='✓ Ово правило је прочитано';
 $ec_lang['lpn_library_rule_bad']='⚠ Ово правило није могло да се прочита';
 // PER JUNCTION, so it is in the property popup and not in this box -- the Settings rule ("if it is
@@ -3526,7 +3526,7 @@ $ec_lang['lpn_field_base_demand']='Основна потрошња';
 // junction. The first sentence is his wording verbatim; the second is the one that was already
 // there and is untouched, because it says the other thing this tip exists for -- that the number
 // is a RESULT and not a field. The key has never been translated, so the reword cost nothing.
-$ec_lang['lpn_result_demand_tip']='Проток који овај чвор узима у приказаном временском кораку: свака основна потрошња помножена сопственим обрасцем, све сабрано. Ово се израчунава, не уписује, па се мења са временом и не може се уређивати.';
+$ec_lang['lpn_result_demand_tip']='Проток који овај чвор узима у приказаном временском кораку: свака основна потрошња помножена својим обрасцем, све сабрано. Ово је резултат, а не улазни податак.';
 $ec_lang['lpn_field_demand_pattern']='Образац потрошње';
 // A JUNCTION’S DEMAND IS A LIST (Task 468). The PATTERN says what KIND of user this is
 // (“residential”); the CATEGORY says WHO it is (“Elm Acres”). Nothing validates a category and there
@@ -3539,9 +3539,9 @@ $ec_lang['lpn_demand_remove']='Уклони ову потрошњу';
 $ec_lang['lpn_field_head_pattern']='Образац напора';
 $ec_lang['lpn_field_head_pattern_tip']='Како се водени ниво овог резервоара диже и спушта током прорачуна. Напор изнад се множи обрасцем.';
 $ec_lang['lpn_field_pump_speed']='Релативна брзина';
-$ec_lang['lpn_field_pump_speed_tip']='1 је ова пумпа која ради брзином при којој је измерена њена крива. 0,9 је иста пумпа која ради спорије, што снижава напор који додаје и проток који пропушта. Образац брзине заузима место овог броја док прорачун траје.';
+$ec_lang['lpn_field_pump_speed_tip']='Релативно у односу на брзину обртања којом је добијена његова објављена крива перформанси. Занемарује се (не скалира) ако постоји образац брзине.';
 $ec_lang['lpn_field_speed_pattern']='Образац брзине';
-$ec_lang['lpn_field_speed_pattern_tip']='Како се брзина ове пумпе диже и спушта током прорачуна. Сваки умножак је релативна брзина за тај део прорачуна и заузима место подешавања Брзина уместо да га скалира, па умножак 0 зауставља пумпу.';
+$ec_lang['lpn_field_speed_pattern_tip']='Сваки унос обрасца даје релативну брзину за тај део прорачуна, уместо да скалира основну вредност.';
 
 // ---- place-name search and terrain elevations (Task 507) ---------------------------------------
 // Both features ask an outside service for something, and each asks its own permission question
@@ -3556,7 +3556,7 @@ $ec_lang['lpn_field_speed_pattern_tip']='Како се брзина ове пу�
 // one wall, and the order of the paragraphs stays ours rather than the translation's.
 $ec_lang['lpn_search_menu']='Тражи место по имену…';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_search_tip']='Пронађите град, улицу или знаменитост по имену и померите мапу до ње. Прва употреба тражи вашу дозволу, јер речи које укуцате иду сервису OpenStreetMap-а за имена места.';
+$ec_lang['lpn_search_tip']='Дозвола се тражи при првој употреби, јер се претраге шаљу OpenStreetMap сервису за називе места.';
 $ec_lang['lpn_search_bar']='Тражи по имену…';
 // The four paragraphs of the ask: what is sent and to whom; why this is a separate question from
 // the map pictures; the question itself; and what a no costs (nothing).
@@ -3580,7 +3580,7 @@ $ec_lang['lpn_search_http']='Сервис за имена места је одг
 $ec_lang['lpn_search_timeout']='Сервис за имена места није одговорио на време. Све остало на овој страници ради без њега.';
 $ec_lang['lpn_search_unreadable']='Сервис за имена места је одговорио нечим што ова страница није могла да прочита.';
 $ec_lang['lpn_search_offline']='Нисмо могли да досегнемо сервис за имена места. Можда сте офлајн. Све остало на овој страници ради без њега, укључујући Иди на географску ширину и дужину.';
-$ec_lang['lpn_search_toofast']='Једна претрага у секунди — то је оно што сервис за имена места дозвољава. Покушајте поново за тренутак.';
+$ec_lang['lpn_search_toofast']='Сервис за називе места дозвољава једну претрагу у секунди. Покушајте поново за тренутак.';
 $ec_lang['lpn_search_nofetch']='Овај прегледач не може да досегне сервис за имена места.';
 // Shown three times -- the menu tip, the confirm and the result notice -- so that the three cannot
 // drift into three different claims about the same data. One sentence, translated once.
@@ -3637,12 +3637,12 @@ $ec_lang['lpn_terrain_ids_more']='{ids}, и још {n}';
 // {id} a junction or pipe name, and {done}, {total}, {n}, {pass}, {fail}, {design} and {solves}
 // are whole numbers. Every one is substituted, never concatenated.
 $ec_lang['lpn_ff_menu']='Анализа противпожарног протока…';
-$ec_lang['lpn_ff_menu_tip']='Тестира чворове један по један: колико сваки може да испоручи уз одржавање резидуалног притиска који сте поставили, и да ли повлачење потребног протока тамо гура нешто друго изван граница?';
+$ec_lang['lpn_ff_menu_tip']='Тестира сваки изабрани чвор на противпожарни проток и проверава утицај на остатак система';
 $ec_lang['lpn_ff_title']='Анализа противпожарног протока';
-$ec_lang['lpn_ff_intro']='Од сваког чвора се редом тражи да повуче противпожарни проток поред потрошње коју већ има. Ништа у вашем пројекту се не мења; цео прорачун се обавља на копији.';
+$ec_lang['lpn_ff_intro']='Сваки чвор редом повлачи противпожарни проток поред своје постојеће потрошње. Прорачун користи копију мреже у временском кораку на екрану, па се ништа у вашем пројекту не мења.\n\nПротивпожарни проток се обично тестира при потрошњи максималног дана, зато прво подесите мрежу на то стање.\n\nСвако тестирање једног чвора захтева око 16 решавања целе мреже, па велики систем траје минутима: изаберите чворове пре покретања, а заустављањем у било ком тренутку задржавате делимичне резултате.';
 $ec_lang['lpn_ff_scope']='Чворови за тестирање';
-$ec_lang['lpn_ff_all']='Сви';
-$ec_lang['lpn_ff_selected']='Изабрани';
+$ec_lang['lpn_ff_all']='Сви чворови';
+$ec_lang['lpn_ff_selected']='Изабрани чворови';
 $ec_lang['lpn_ff_no_junctions']='Овај пројекат још нема чворова, па нема шта да се тестира.';
 $ec_lang['lpn_ff_no_selection']='Ниједан чвор није изабран. Изаберите чворове или изаберите опцију Сви.';
 $ec_lang['lpn_ff_skipped']='{n} изабраних елемената нису чворови, па нису тестирани.';
@@ -3664,7 +3664,7 @@ $ec_lang['lpn_ff_maxvelocity_tip']='Цев која ради изнад овог
 // for hydrant losses beyond the node."). IT LEADS WITH THE METHOD, NOT WITH THE ABSENCE: Tom read
 // the first wording as "no losses are accounted for at the raw node", which is a hole in the tool
 // rather than the deliberate and standard choice it actually is.
-$ec_lang['lpn_ff_accounting']='Противпожарни проток се повлачи на самом чвору. То је метода коришћена овде, и то је уобичајена метода. Хидрант, његова бочна цев и његов млазник нису моделовани, па стварни хидрант испоручује мање него што показује проток приказан овде.';
+$ec_lang['lpn_ff_accounting']='Притисак се моделује у самом чвору, што је уобичајена метода. Хидрант, његова бочна цев и његов млазник нису моделовани, а притисак на млазнику је мањи него у чвору.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_ff_engine_native']='Користи се уграђени решавач.';
 // Edited by TGH 2026-09-07
@@ -3750,7 +3750,7 @@ $ec_lang['lpn_ff_more']='и још {n} погођених';
 // the Worst effect cell and undisplayed junctions under the table; a gendered language must
 // agree with one noun and would have been wrong at the other call site.
 $ec_lang['lpn_ff_rows_more']='Чворови који нису приказани: {n}.';
-$ec_lang['lpn_ff_design_none']='Ништа у изабраном скупу није прекорачило своје границе док је било који чвор повлачио свој противпожарни проток.';
+$ec_lang['lpn_ff_design_none']='Када се проток сваког тестираног чвора повлачи редом, ништа у обиму провере пројекта није прекорачило своје границе.';
 $ec_lang['lpn_ff_design_off_note']='Утицај на остатак система није проверен у овом прорачуну.';
 // **WHY IT IS SAID AND NEVER APPLIED, in Tom's words (2026-09-02), and the reason is the MODEL, not
 // the arithmetic:** *"These models are not always fine-grained. They don't represent every pipe,
@@ -3766,7 +3766,7 @@ $ec_lang['lpn_ff_design_off_note']='Утицај на остатак систе�
 // ISO credits a single hydrant with at most 1,500 gpm whatever the hydraulics say. Said beside the
 // numbers and never applied to them: a number quietly cut down to a credit limit is a lie with a
 // tidy face.
-$ec_lang['lpn_ff_iso']='Insurance Services Office (ISO) признаје једном хидранту највише {flow}. То ограничење није примењено овде јер не знамо колико хидраната један чвор може да представља.';
+$ec_lang['lpn_ff_iso']='Insurance Services Office (ISO) признаје једном хидранту највише {flow}. То ограничење овде није примењено јер један чвор може да представља више од једног хидранта.';
 // Every way a junction can fail to produce a number is named. None of them is ever shown as a flow
 // of zero: "there is no available fire flow" and "the available fire flow is zero" are different
 // facts, and only the first one is ever true.
@@ -3774,7 +3774,7 @@ $ec_lang['lpn_ff_err_at_rest']='Већ испод резидуала пре по
 $ec_lang['lpn_ff_err_converge']='Мрежа није конвергирала.';
 $ec_lang['lpn_ff_err_solve']='Решавач је пријавио грешку и није дао резултат.';
 $ec_lang['lpn_ff_err_not_junction']='Није чвор';
-$ec_lang['lpn_ff_err_unknown']='Нема резултата. Пријављен је код {code}.';
+$ec_lang['lpn_ff_err_unknown']='Нема резултата. Шифра грешке: {code}';
 
 // ---- Settings > New assets > Import surveyed points: CSV and GPX (ROADMAP Task 592) -----------
 //
@@ -3792,7 +3792,7 @@ $ec_lang['lpn_ff_err_unknown']='Нема резултата. Пријављен 
 // cannot tell a mistake from a place; a file of eastings and northings is refused by name, because
 // a plane coordinate read as a degree is silent and puts a network in the Gulf of Guinea.
 $ec_lang['lpn_file_import_survey']='Увези снимљене тачке…';
-$ec_lang['lpn_file_import_survey_tip']='Прочитајте списак снимљених тачака из текстуалне датотеке и направите по један чвор на свакој тачки, преузимајући подешавања за нове елементе за све што датотека не наводи. Ниједна цев се не црта, а ниједан ред никада није одбачен без именовања. Чита координатни систем који овај пројекат већ користи, геореференциран или не.';
+$ec_lang['lpn_file_import_survey_tip']='Прочитајте списак снимљених тачака из текстуалне датотеке и направите по један чвор на свакој тачки, преузимајући подешавања за нове елементе за све што датотека не наводи. Ниједна цев се не црта осим ако означите Читај опис као теренске шифре, а ниједан ред никада није одбачен без именовања. Чита координатни систем који овај пројекат већ користи, геореференциран или не.';
 $ec_lang['lpn_survey_read_error']='Та датотека није могла да се прочита са вашег диска.';
 $ec_lang['lpn_survey_cancelled']='Ништа није направљено и ништа није промењено.';
 // What the project calls its two axes, for a sentence js/lpn-survey.js writes about a column. The
@@ -3886,11 +3886,11 @@ $ec_lang['lpn_copy_body_nodate']='Овај прегледач не препоз�
 $ec_lang['lpn_copy_original']='Оригинал; задржи исто закључавање';
 $ec_lang['lpn_copy_copy']='Копија; направи ново закључавање';
 $ec_lang['lpn_copy_kept_link']='Отворено {name} као оригинал, премештен на ново место. Сачувај сада уписује у ову датотеку.';
-$ec_lang['lpn_copy_opened']='Отворено {file} као копија, са сопственим новим закључавањем које ће бити сачувано при следећем чувању датотеке.';
+$ec_lang['lpn_copy_opened']='Отворено {file} као копија и сачувано, са новим закључавањем.';
 $ec_lang['lpn_scenario_basic']='Основни режим';
-$ec_lang['lpn_scenario_basic_tip']='Означено, сценарио су једноставно вредности које у њему поставите. Неозначено, овај мени нуди и табелу Преглед алтернатива, која показује како су те вредности груписане по категоријама и позива на ваше повратне информације.';
+$ec_lang['lpn_scenario_basic_tip']='Означено: сценарио се састоји само од вредности постављених у њему. Неозначено: овај мени нуди и табелу Преглед алтернатива, која показује како су те вредности груписане по категоријама, и омогућава да сценарио има засебно укупно време рада и хидраулички временски корак. Повратне информације о овој функцији су добродошле.';
 $ec_lang['lpn_alt_title']='Преглед алтернатива';
-$ec_lang['lpn_alt_note']='Само за читање. Основа користи Основну алтернативу сваке категорије. Сваки сценарио добија сопствену алтернативу за сваку категорију која је измењена, као дете Основне. Број је колико има измењених вредности.';
+$ec_lang['lpn_alt_note']='Основа користи Основну алтернативу сваке категорије. Сваки сценарио има засебну алтернативу, дете Основне алтернативе, за сваку категорију која је измењена. Број је колико има измењених вредности. Последње три колоне су опције прорачуна: унесите вредност за сценарио или оставите празно да користи вредност родитеља. Вредности пројекта су у Подешавања, Прорачун, Време.';
 $ec_lang['lpn_alt_cat_physical']='Физичко';
 $ec_lang['lpn_alt_cat_demand']='Потрошња';
 $ec_lang['lpn_alt_cat_topology']='Активација елемената';
@@ -3973,3 +3973,227 @@ $ec_lang['lpn_crit_stale']='Цртеж је измењен, па су резул
 $ec_lang['lpn_crit_skipdead']='Прескочи слепе крајеве';
 $ec_lang['lpn_crit_skipdead_tip']='Веза слепог краја је она чијим се уклањањем одсецају чворови до којих се може доћи само преко ње, без резервоара или тенка иза. Њен губитак је све иза ње, па се не решава. Сажетак каже колико их је прескочено.';
 $ec_lang['lpn_crit_skipped_dead']='Прескочене везе слепог краја: {n}. Свака одсеца све иза себе.';
+$ec_lang['points_data_msg_line']='Ништа није налепљено. Ред {n} није могао да се прочита као станица и кота.';
+$ec_lang['points_data_msg_none']='Ништа није налепљено. Нису пронађени парови станица и кота.';
+$ec_lang['lpn_tool_add_chain']='Ланац чворова и цеви';
+$ec_lang['lpn_pane_delete_element']='Обриши елемент';
+$ec_lang['lpn_pane_delete_elements']='Обриши елементе';
+$ec_lang['lpn_pane_sort_desc']='Сортирај опадајуће';
+$ec_lang['lpn_pane_manage_cols_width']='Ширина (em)';
+$ec_lang['lpn_pane_width_tip']='Ширине колона се чувају у овом прегледачу, а не у пројекту. Двоструки клик на разделник колоне враћа подразумевану ширину.';
+$ec_lang['lpn_dock_left']='Прикачи лево од мапе';
+$ec_lang['lpn_dock_right']='Прикачи десно од мапе';
+$ec_lang['lpn_dock_float']='Плутајуће';
+$ec_lang['lpn_dock_autohide']='Аутоматско скривање';
+$ec_lang['lpn_popup_none']='Ништа није изабрано. Изаберите елемент на мапи да бисте видели његова својства.';
+$ec_lang['lpn_hotkeys_snip_heading']='Снимак екрана';
+$ec_lang['lpn_hotkeys_snip_term']='Пречице на тастатури за снимак екрана';
+$ec_lang['lpn_hotkeys_snip_def']='<table class="lpn-notes-table"><tbody><tr><td>S</td><td>Исечак, док је снимак екрана отворен.</td></tr><tr><td>E</td><td>Гумица, у приказу за означавање.</td></tr><tr><td>Ctrl+Z, Ctrl+Y</td><td>Поништи и понови, у приказу за означавање.</td></tr><tr><td>Esc</td><td>Откажи исечак или напусти гумицу. У приказу за означавање затвара га када ништа није нацртано.</td></tr></tbody></table>';
+$ec_lang['lpn_fb_intro']='Готове поруке (необавезно). Ништа се не шаље док не притиснете Пошаљи.';
+$ec_lang['lpn_fb_pick_numbers']='Бројеви делују погрешно';
+$ec_lang['lpn_fb_pick_broken']='Нешто није функционисало';
+$ec_lang['lpn_fb_pick_wording']='Формулација или превод су погрешни';
+$ec_lang['lpn_fb_pick_confusing']='Ово је збуњујуће';
+$ec_lang['lpn_fb_comment']='Коментари (необавезно)';
+$ec_lang['lpn_fb_email']='Имејл (необавезно, само ако желите одговор)';
+$ec_lang['lpn_fb_sends']='Шта се шаље: назив ове странице, ваш језик, верзија сајта, шифра поруке на мапи ако је има, и оно што сте изабрали или откуцали. Никада ваш цртеж или ваша мрежа. Ваша имејл адреса користи се само да вам се одговори.';
+$ec_lang['lpn_fb_send']='Пошаљи';
+$ec_lang['lpn_fb_sending']='Слање…';
+$ec_lang['lpn_fb_failed']='Ово до нас није стигло. Оно што сте написали је и даље овде, па можете покушати поново.';
+$ec_lang['lpn_fb_bad_email']='Та имејл адреса не изгледа исправно. Исправите је или оставите празно.';
+$ec_lang['lpn_fb_busy']='У последњих неколико минута стигло је превише порука. Оно што сте написали је и даље овде, па можете покушати касније.';
+$ec_lang['lpn_tool_add_chain_tip']='Ланац чворова и цеви: одредите тачку на мапи да бисте додали чвор, а затим одредите сваку следећу тачку да бисте додали цев и чвор. Одредите постојећи чвор да бисте наставили од њега. Притисните Escape да завршите ланац.';
+$ec_lang['lpn_pane_filter_sel_note']='Само избор. Приказано {n} од {all}.';
+$ec_lang['lpn_pane_filter_sel_and']='Филтрирано по {q} и само избор. Приказано {n} од {all}.';
+$ec_lang['lpn_pane_filter_sel_none']='Ниједан од изабраних елемената није у овој табели.';
+$ec_lang['lpn_pane_sel_only']='Само избор';
+$ec_lang['lpn_pane_sel_only_none']='Ниједан елемент није изабран. Прво изаберите елементе на мапи.';
+$ec_lang['lpn_pane_scn_show']='Прикажи сценарије';
+$ec_lang['lpn_pane_clear_override']='Уклони сопствену вредност';
+$ec_lang['lpn_pane_scn_alt_tip']='{category} алт.: {alternative}';
+$ec_lang['lpn_change_type_menu']='Промени врсту';
+$ec_lang['lpn_change_type_tip']='Претворите изабране чворове у чворове потрошње, резервоаре или тенкове, или изабране везе у цеви, пумпе или вентиле. Сваки задржава свој ID, своје место, своје везе и сваку вредност коју има и нова врста. Ако би нешто било изгубљено, прво ћете бити упитани.';
+$ec_lang['lpn_change_type_ok']='Промени';
+$ec_lang['lpn_change_type_lost']='Ове вредности ће бити изгубљене:';
+$ec_lang['lpn_change_type_key']='ID: Изгубљени унос';
+$ec_lang['lpn_change_type_line']='{id}: {property} {value}';
+$ec_lang['lpn_change_type_line_scenario']='{id}: {property} {value}, у сценарију {scenario}';
+$ec_lang['lpn_change_type_more']='И још {n}.';
+$ec_lang['lpn_change_type_surface']='Ови задржавају површину воде тамо где је била. Напор резервоара је кота тенка плус дубина воде у њему, а дубина воде у тенку је напор резервоара минус његова кота:';
+$ec_lang['lpn_change_type_meaning']='Ове контроле и правила проверавају чвор који се мења и читаће га другачије: чвор потрошње се проверава по притиску, а тенк или резервоар по нивоу воде.';
+$ec_lang['lpn_change_type_born']='Ове вредности су нове и постављене као на новоцртаном елементу:';
+$ec_lang['lpn_change_type_no_curve']='{id}: Нема криве напора пумпе, па пумпа не додаје напор док се не изабере, а извоз у .inp је записује као цев';
+$ec_lang['lpn_change_type_becomes']='{id}: {property} {value}, у сценарију {scenario}, постаје {new}';
+$ec_lang['lpn_change_type_customers']='Само цев опслужује потрошаче, па се ови потрошачи уместо тога повезују са чвором приказаним у загради, где је њихова потрошња већ примењена. Остају тамо где су нацртани, а њихова потрошња се не мења:';
+$ec_lang['lpn_change_type_setting']='Ове контроле и правила задају или проверавају подешавање везе која се мења. Подешавање је друга величина на цеви, пумпи и вентилу, па ће ове читати другачије:';
+$ec_lang['lpn_change_type_rules']='Ови редови правила именују везу по њеној врсти, а именоваће је по њеној новој врсти:';
+$ec_lang['lpn_find_scope_source']='Извор';
+$ec_lang['lpn_find_source_no_chemical']='Ниједна хемикалија се не прати, па ниједан чвор нема извор.';
+$ec_lang['lpn_profile_open']='Отвори EPANET датотеку профила…';
+$ec_lang['lpn_profile_file_done']='Профил је прочитан из датотеке: у овој мрежи је пронађено {used} од {total} чворова.';
+$ec_lang['lpn_profile_file_missing']='Наведено у датотеци, али није у овој мрежи: {ids}.';
+$ec_lang['lpn_profile_file_short']='Датотека именује мање од два чвора у овој мрежи, па нема профила за цртање.';
+$ec_lang['lpn_pgraph_none']='Овај елемент нема резултата у тренутном прорачуну.';
+$ec_lang['lpn_pgraph_source_share_from']='Удео извора из {node}';
+$ec_lang['lpn_result_pump_head']='Напор';
+$ec_lang['lpn_result_pump_head_tip']='Напор који пумпа додаје од усиса до потиса, приказан као позитиван број. Решавач и EPANET датотеке га воде као негативан губитак напора.';
+$ec_lang['lpn_report_pump_head']='Напор пумпе';
+$ec_lang['lpn_contour_show']='Прикажи изолиније';
+$ec_lang['lpn_contour_show_tip']='Уклоните ознаку да сакријете попуну и изолиније; означите је да их вратите какве су биле. Боје чворова остају.';
+$ec_lang['lpn_sysflow_title']='Биланс протока';
+$ec_lang['lpn_crs_suggested_mark']='(предложено)';
+$ec_lang['lpn_file_export_menu']='Извези…';
+$ec_lang['lpn_file_export_item_inp']='EPANET датотека…';
+$ec_lang['lpn_file_export_item_geojson']='GeoJSON датотека…';
+$ec_lang['lpn_status_inp_exported_picture']='Извезено: {zip}, који садржи EPANET датотеку {file}, њену позадинску слику {picture} и ворлд-фајл {world}. Распакујте сва три у исти фолдер, а затим тамо отворите .inp у EPANET-у; слика долази уз њега.';
+$ec_lang['lpn_status_inp_exported_no_picture']='Извезено: {file}. Позадинска слика није могла да се сачува, па .inp не именује ниједну; у EPANET-у је додајте преко View > Backdrop > Load.';
+$ec_lang['lpn_inp_export_difference_one']='Једна ствар коју .inp формат не може да сачува.';
+$ec_lang['lpn_file_export_geojson_tip']='Преузмите ову мрежу као GeoJSON датотеку за QGIS, ArcGIS Pro и друге ГИС програме. Чворови, тенкови и резервоари су тачке, а цеви, пумпе и вентили су линије које прате своје тачке прегиба. Положаји су у географској ширини и дужини. Резултати су укључени само када је мрежа решена.';
+$ec_lang['lpn_geojson_refused_local']='GeoJSON датотека садржи само географску ширину и дужину, а овај пројекат је нацртан на локалној мрежи без места на Земљи. Прво га геореференцирајте преко Мапа, Мапа света, Прикачи, а затим поново извезите.';
+$ec_lang['lpn_geojson_refused_range']='Ови положаји нису исправне географске ширине и дужине: {detail}';
+$ec_lang['lpn_geojson_refused_crs']='Координатни систем овог пројекта ({detail}) овој страници није познат, па се његови положаји не могу претворити у географску ширину и дужину. Користите Конвертуј као… да копирате пројекат у систем који ова страница познаје, а затим поново извезите.';
+$ec_lang['lpn_geojson_refused_empty']='Још нема шта да се извезе. Прво нацртајте или отворите мрежу.';
+$ec_lang['lpn_geojson_results_in']='Резултати са екрана су укључени.';
+$ec_lang['lpn_geojson_results_out']='Резултати нису укључени, јер мрежа није решена.';
+$ec_lang['lpn_inp_backdrop_attach']='Прикачи {file}…';
+$ec_lang['lpn_inp_backdrop_attach_tip']='Веб страница не може да отвори слику по њеном називу. Изаберите је на свом уређају и биће постављена тамо где датотека каже да припада.';
+$ec_lang['lpn_inp_backdrop_attached']='Прикачено: {file}, постављено тамо где датотека каже да припада.';
+$ec_lang['lpn_inp_backdrop_attached_other']='Прикачено: {picked}, постављено тамо где датотека каже да припада. Датотека именује {file}, што је другачији назив.';
+$ec_lang['lpn_copy_opened_unsaved']='Отворено {file} као копија, са новим закључавањем које ће бити сачувано при следећем чувању датотеке.';
+$ec_lang['lpn_engine_unavailable_why']='Вентили за регулацију притиска и протока (PRV, PSV, FCV) не могу се решити без EPANET решавача. {reason}';
+$ec_lang['lpn_engine_needed_failed_why']='Ова мрежа се може решити само EPANET решавачем. {reason}';
+$ec_lang['lpn_mode_add_chain']='Режим: Ланац чворова и цеви. Одредите тачку на мапи да бисте додали чвор, а затим одредите сваку следећу тачку да бисте додали цев и чвор. Одредите постојећи чвор да бисте наставили од њега. Притисните Escape да завршите ланац. Пређите у режим Избор да бисте мењали или померали елементе и ознаке.';
+$ec_lang['lpn_cp_allow_tip']='Дозволи само ове карактере:';
+$ec_lang['lpn_cp_characters_tip']='„@“ означава било које слово; „#“ означава било коју цифру, а „-“, „.“ и „,“ морате посебно навести ако су дозвољени; и сви празни карактери морају бити између других карактера.';
+$ec_lang['lpn_valwarn_diameter']='Пречник цеви или вентила обично је између {min} и {max} {unit}. Проверите број и јединицу пречника.';
+$ec_lang['lpn_valwarn_hw']='Hazen-Williams C обично је између {min} и {max}. Број ван тог опсега често је храпавост намењена другој методи за трење.';
+$ec_lang['lpn_valwarn_manning']='Манингово n обично је између {min} и {max}. Број ван тог опсега често је храпавост намењена другој методи за трење.';
+$ec_lang['lpn_valwarn_dw']='Храпавост по Darcy-Weisbachу обично је већа од 0 и највише {max} {unit}. Већи број је често Hazen-Williams C или Манингово n.';
+$ec_lang['lpn_valwarn_positive']='EPANET овде не прихвата нулу ни негативан број.';
+$ec_lang['lpn_valwarn_negative']='EPANET овде не прихвата негативан број.';
+$ec_lang['lpn_valwarn_tank_levels']='EPANET не прихвата овај тенк. Најнижа дубина воде не сме бити већа од дубине воде, а дубина воде не сме бити већа од највише дубине воде.';
+$ec_lang['lpn_alt_calc_options']='Опције прорачуна';
+$ec_lang['lpn_scenario_duration_tip']='Оставите празно да наследи од родитеља. Укупно време рада од 0:00 је прорачун у устаљеном стању.';
+$ec_lang['lpn_scenario_hyd_step_tip']='Оставите празно да наследи од родитеља.';
+$ec_lang['lpn_time_scn_overrides']='Сопствене вредности сценарија:';
+$ec_lang['lpn_scenario_preset_mult_tip']='Множилац потрошње {mult} пута просечан дан, привремена вредност. Већина система је између {lo} и {hi} (National Research Council, 2006). Вредност за систем који се моделира поставите у Подешавања, Прорачун, Хидраулика, Множилац потрошње.';
+$ec_lang['lpn_engine_failed_why']='{reason} Уместо тога се приказује уграђени решавач.';
+$ec_lang['lpn_settings_basemap_style']='Стил подлоге мапе';
+$ec_lang['lpn_basemap_style_normal']='Нормално';
+$ec_lang['lpn_basemap_style_muted']='Пригушено';
+$ec_lang['lpn_basemap_style_faded']='Избледело';
+$ec_lang['lpn_basemap_style_grayscale']='Сиве нијансе';
+$ec_lang['lpn_time_statistic']='Статистика';
+$ec_lang['lpn_time_stat_none']='Ништа';
+$ec_lang['lpn_time_stat_averaged']='Просек';
+$ec_lang['lpn_time_stat_minimum']='Мин.';
+$ec_lang['lpn_time_stat_maximum']='Макс.';
+$ec_lang['lpn_time_stat_range']='Опсег';
+$ec_lang['lpn_time_no_engine_why']='Уграђени решавач израчунава један тренутак истовремено, па је ово мрежа само у тренутку {time}: сваки образац се чита у том тренутку, а сваки тенк остаје на свом почетном нивоу уместо да се пуни и празни. {reason}';
+$ec_lang['lpn_time_engine_fetch_failed']='Преузимање EPANET решавача није успело. Поново учитајте страницу да покушате опет; можда га блокира заштитни зид, прокси или проширење прегледача.';
+$ec_lang['lpn_time_engine_start_failed']='Прегледач је одбио да покрене EPANET решавач. WebAssembly је можда искључен безбедносним подешавањем или проширењем.';
+$ec_lang['lpn_time_engine_run_failed']='EPANET прорачун није успео. То је грешка у овој страници; користите везу {wrong} да је пријавите.';
+$ec_lang['lpn_saved_project']='Сачувано уз пројекат';
+$ec_lang['lpn_saved_browser']='Сачувано у овом прегледачу';
+$ec_lang['lpn_saved_session']='Није сачувано';
+$ec_lang['lpn_scncmp_at_time']='{value} у {id}, {time}';
+$ec_lang['lpn_scncmp_same']='Исто у сваком сценарију';
+$ec_lang['lpn_scncmp_period_note']='Где сценарио има укупно време рада, његов најнижи притисак и највећа брзина су екстреми целе мреже, у приказаном тренутку.';
+$ec_lang['lpn_choice_default']='Подразумевано';
+$ec_lang['lpn_ds_menu']='Скалирање потрошње…';
+$ec_lang['lpn_ds_menu_tip']='Помножите потрошњу на копији мреже и погледајте притиске и брзине, или пронађите највећу размеру потрошње коју систем може да поднесе.';
+$ec_lang['lpn_ds_title']='Скалирање потрошње';
+$ec_lang['lpn_ds_intro']='Притисните дугме Покрени да бисте помножили потрошњу у изабраним чворовима размером потрошње и видели притиске и брзине.\n\nПритисните дугме Пронађи да бисте пронашли највећу размеру потрошње, на најближих {step}, при којој сви ови чворови задржавају бар најнижи дозвољени притисак; претражује се од 0 до {max}.\n\nОба раде на копији мреже, решеној у временском кораку на екрану у активном сценарију, па се ништа у вашем пројекту не мења. Скалира се само тај временски корак, а нивои и стања се узимају из њега; да бисте испитали врхунац, пре покретања померите сат на време највеће потрошње.';
+$ec_lang['lpn_ds_scope']='Чворови за скалирање';
+$ec_lang['lpn_ds_scope_all']='Сви чворови';
+$ec_lang['lpn_ds_scope_selected']='Изабрани чворови';
+$ec_lang['lpn_ds_minpressure']='Најнижи дозвољени притисак';
+$ec_lang['lpn_ds_minpressure_tip']='Ово је исти број као Најнижи дозвољени притисак на другом месту у анализи противпожарног протока. Промена овде мења и тамо.';
+$ec_lang['lpn_ds_head_scale']='Скалирај потрошњу';
+$ec_lang['lpn_ds_multiplier']='Размера потрошње';
+$ec_lang['lpn_ds_multiplier_tip']='Фактор којим се множи свака потрошња; 1,5 је повећање од 50%. Примењује се поред множиоца потрошње активног сценарија, који је већ у потрошњи, и никада се не чува у пројекту.';
+$ec_lang['lpn_ds_run']='Покрени';
+$ec_lang['lpn_ds_head_search']='Коју размеру потрошње систем може да поднесе?';
+$ec_lang['lpn_ds_head_search_selected']='Коју размеру потрошње ови чворови могу да поднесу?';
+$ec_lang['lpn_ds_outside_below']='При размери потрошње {m}, неизабрани чворови испод {pressure}: {n} ({ids}). Они не ограничавају овај одговор.';
+$ec_lang['lpn_ds_holds_max']='✓ Сваки чвор задржава {pressure} до размере потрошње {max}, врха претраге.';
+$ec_lang['lpn_ds_below_zero']='⚠ Бар један чвор је испод {pressure} чак и када је скалирана потрошња нула.';
+$ec_lang['lpn_ds_found']='✓ Сваки проверени чвор задржава бар {pressure} до размере потрошње {m}.';
+$ec_lang['lpn_ds_found_below']='⚠ Бар један чвор је испод {pressure} без икаквог скалирања потрошње. Највећа размера потрошње која држи сваки чвор на {pressure} или изнад је {m}.';
+$ec_lang['lpn_ds_search_stopped']='Претрага је заустављена пре него што је нашла одговор.';
+$ec_lang['lpn_ds_lowest_at']='При размери потрошње {m}, најнижи притисак је {pressure}, у чвору {id}.';
+$ec_lang['lpn_ds_nosolve_at']='При размери потрошње {m}, мрежа није дала решење. {reason}';
+$ec_lang['lpn_ds_scale_ok']='✓ При размери потрошње {m}, сваки чвор задржава {pressure}.';
+$ec_lang['lpn_ds_scale_below']='⚠ При размери потрошње {m}, чворови испод {pressure}: {n}.';
+$ec_lang['lpn_ds_scaled_selected']='Скалирани и проверени чворови: {n}.';
+$ec_lang['lpn_ds_head_lowest']='Најнижи притисци';
+$ec_lang['lpn_ds_head_velocity']='Највеће брзине';
+$ec_lang['lpn_ds_col_link']='Веза';
+$ec_lang['lpn_ds_col_scaled']='Скалирано';
+$ec_lang['lpn_ds_col_scaled_tip']='Са потрошњом помноженом размером потрошње.';
+$ec_lang['lpn_ds_col_unscaled']='Нескалирано';
+$ec_lang['lpn_ds_col_unscaled_tip']='Са потрошњом каква је у активном сценарију у овом временском кораку, иста вредност коју приказује мапа.';
+$ec_lang['lpn_ds_no_junctions']='Овај пројекат још нема чворова, па нема потрошње за скалирање.';
+$ec_lang['lpn_ds_no_selection']='Ниједан чвор није изабран. Изаберите чворове или изаберите опцију Сви чворови.';
+$ec_lang['lpn_ds_skipped']='Изабрани елементи који нису чворови, остављени како јесу: {n}.';
+$ec_lang['lpn_ds_bad_multiplier']='Унесите размеру потрошње нула или већу, на пример 1,5.';
+$ec_lang['lpn_ds_stale']='Цртеж је промењен, па су резултати скалирања потрошње обрисани. Покрените поново.';
+$ec_lang['lpn_analyze_at_time']='Временски корак: {time}.';
+$ec_lang['lpn_analyze_time_moved']='⚠ Ово је израчунато у {time}, а сат је сада на {now}. Покрените поново за временски корак на екрану.';
+$ec_lang['lpn_survey_codes_toggle']='Читај опис као теренске шифре';
+$ec_lang['lpn_survey_codes_tip']='Прочитајте прву реч сваког описа као шифру из табеле. Тачке са истом шифром линије спајају се у једну цев по редоследу у датотеци, а WL1 и WL2 су засебне линије. +0 започиње линију, -0 је завршава, а CLO је затвара. JPN иза којег следи назив тачке спаја се са том тачком (Carlson), а Civil 3D га записује као CPN.';
+$ec_lang['lpn_survey_codes_col_code']='Шифра';
+$ec_lang['lpn_survey_codes_col_type']='Врста елемента';
+$ec_lang['lpn_survey_codes_add']='Додај шифру';
+$ec_lang['lpn_survey_codes_remove']='Уклони шифру';
+$ec_lang['lpn_survey_confirm_coded']='Пронађено: чворова потрошње {j}, резервоара {r}, тенкова {t} и цеви {p}. Наставити?';
+$ec_lang['lpn_survey_report_coded']='Увезено: чворова потрошње {j}, резервоара {r}, тенкова {t} и цеви {p}, од чворова са котом {m}.';
+$ec_lang['lpn_survey_note_code_unknown']='Шифра није у табели шифара, увезено као врста елемента изабрана изнад.';
+$ec_lang['lpn_survey_note_code_two_nodes']='Више од једне шифре чвора, употребљена је прва.';
+$ec_lang['lpn_survey_note_code_unread']='Није свака реч шифра коју ова страница чита, задржано у опису.';
+$ec_lang['lpn_survey_note_vertex_text']='Није свака реч шифра коју ова страница чита, а тачка прегиба не чува опис.';
+$ec_lang['lpn_survey_note_join_missing']='JPN или CPN именује тачку која није у овој датотеци или пројекту, цев за њу није нацртана.';
+$ec_lang['lpn_survey_note_join_no_line']='JPN или CPN на тачки без шифре линије, цев за њу није нацртана.';
+$ec_lang['lpn_survey_note_pipe_one_node']='Ова линија се враћа у исти чвор без иједног другог чвора између, цев за њу није нацртана.';
+$ec_lang['lpn_survey_note_line_one_point']='Једина тачка на својој линији, из ње није нацртана цев.';
+$ec_lang['lpn_survey_note_vertices']='Тачке које су постале тачке прегиба цеви: {detail}. Тачка прегиба не чува назив, коту ни опис.';
+$ec_lang['lpn_survey_note_no_desc']='Теренске шифре су укључене, али ова датотека нема колону описа, па ниједна шифра није прочитана.';
+$ec_lang['lpn_survey_note_ring_junction']='Ова тачка је постала чвор да би прстен могао да се затвори.';
+$ec_lang['lpn_survey_note_pipe_zero_length']='Ова тачка је на истом месту као чвор пре ње, па цев између њих нема дужину.';
+$ec_lang['lpn_survey_note_node_on_pipe']='Ова тачка лежи тачно на цеви са којом није спојена. Ако су повезане, додајте JPN да то кажете.';
+$ec_lang['lpn_settings_demand_model']='Модел потрошње';
+$ec_lang['lpn_settings_demand_model_tip']='Изаберите како чворови добијају проток. Вођен потрошњом (DDA) испоручује сваку потрошњу у целости, без обзира на притисак. Вођен притиском (PDA) испоручује мање од потрошње тамо где је притисак испод потребног притиска, а рачуна га само EPANET решавач.';
+$ec_lang['lpn_settings_demand_model_dda']='Вођен потрошњом';
+$ec_lang['lpn_settings_demand_model_pda']='Вођен притиском';
+$ec_lang['lpn_settings_min_pressure']='Минимални притисак';
+$ec_lang['lpn_settings_min_pressure_tip']='Унесите притисак на коме или испод кога чвор не добија проток. Користите јединицу притиска овог пројекта.';
+$ec_lang['lpn_settings_req_pressure']='Потребан притисак';
+$ec_lang['lpn_settings_req_pressure_tip']='Унесите притисак на коме или изнад кога чвор добија пуну потрошњу. Мора бити већи од минималног притиска. Користите јединицу притиска овог пројекта. Оставите празно да користите подразумеване вредности EPANET-а, у psi за америчке јединице протока, а иначе у метрима.';
+$ec_lang['lpn_settings_pressure_exponent']='Експонент притиска';
+$ec_lang['lpn_settings_pressure_exponent_tip']='Унесите експонент криве која расте од нултог протока при минималном притиску до пуне потрошње при потребном притиску.';
+$ec_lang['lpn_engine_pda_route']='Решено EPANET решавачем, јер је модел потрошње вођен притиском.';
+$ec_lang['lpn_diag_pda_needs_epanet']='Модел потрошње је вођен притиском, а рачуна га само EPANET решавач. EPANET решавач није могао да се учита, па ови резултати недостају.';
+$ec_lang['lpn_result_delivered_demand']='Испоручена потрошња';
+$ec_lang['lpn_result_delivered_demand_tip']='Проток који овај чвор заиста добија по моделу потрошње вођеном притиском. Мањи је од потрошње када је притисак испод потребног притиска.';
+$ec_lang['lpn_result_demand_deficit']='Мањак потрошње';
+$ec_lang['lpn_result_demand_deficit_tip']='Потрошња у овом чвору која није испоручена, јер је притисак испод потребног притиска.';
+$ec_lang['lpn_pda_deficit_note']='Чворови који добијају мање од своје потрошње: {n}.';
+$ec_lang['lpn_diag_pda_pressures']='Потребан притисак мора бити већи од минималног притиска. Промените један од њих у Подешавањима.';
+$ec_lang['lpn_inp_drop_pressure_unit']='Ова датотека наводи јединицу притиска другачију од оне коју ова страница чита за њену јединицу протока, а то је psi за америчке јединице, а иначе метри. Сваки притисак у датотеци чита се на тај начин, па проверите подешавања вентила, емитере и границе вођене притиском које садржи. Ред је задржан и записује се назад.';
+$ec_lang['lpn_screenshot_menu']='Снимак екрана';
+$ec_lang['lpn_screenshot_tip']='Копирајте оштрију слику од екрана за област мапе коју превучете, спремну за лепљење у извештај. Кликните без превлачења да узмете целу мапу.';
+$ec_lang['lpn_screenshot_hint']='Превуците правоугаоник преко мапе или кликните за целу мапу. Esc отказује.';
+$ec_lang['lpn_screenshot_copied']='Снимак екрана је копиран.';
+$ec_lang['lpn_screenshot_saved']='Привремена меморија овде није доступна, па је снимак екрана преузет као PNG датотека.';
+$ec_lang['lpn_screenshot_no_basemap']='Мапа улица или сателитски снимак нису могли да буду укључени.';
+$ec_lang['lpn_screenshot_failed']='Снимак екрана није могао да се направи.';
+$ec_lang['lpn_snip_hint_free']='Превуците око области коју исецате или кликните за целу мапу. Esc отказује.';
+$ec_lang['lpn_snip_tip_rect']='Исеци правоугаоник (S)';
+$ec_lang['lpn_snip_tip_free']='Исеци слободноручни облик (S)';
+$ec_lang['lpn_snip_tip_mode']='Облик исечка';
+$ec_lang['lpn_snip_tip_map']='Снимак екрана целе мапе';
+$ec_lang['lpn_snip_tip_pen']='Оловка';
+$ec_lang['lpn_snip_tip_eraser']='Гумица: кликните на потез да га уклоните (E)';
+$ec_lang['lpn_snip_tip_undo']='Поништи (Ctrl+Z)';
+$ec_lang['lpn_snip_tip_redo']='Понови (Ctrl+Y)';
+$ec_lang['lpn_screenshot_scale_tip']='Величина слике као умножак области на екрану. Већа је оштрија и прави већу датотеку.';

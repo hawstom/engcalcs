@@ -5632,6 +5632,11 @@
             "on": "Nothing is selected. Select an asset on the map to see its properties.",
             "ruled": "2026-10-08",
             "answer": "Calls page 8 October: Use as written"
+        },
+        "lpn_guide_dimmed": {
+            "on": "A dimmed name is a button that is currently hidden on the toolbar.",
+            "ruled": "2026-10-08",
+            "answer": "Calls page 8 October: Use as written"
         }
     }
 }
