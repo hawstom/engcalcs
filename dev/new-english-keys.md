@@ -21,7 +21,7 @@ hit takes you to a section and the rest walk its keys. A key already ruled does 
 it, and a fully ruled group says `all ruled` and can be skipped whole.
 Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
-## Questions from the translators  (13 to read @@ NEEDS RULING)
+## Questions from the translators  (1 to read @@ NEEDS RULING)
 
 **These are SHIPPED strings, already translated into 26 languages.** A wave-0
 reading or a translator found each one readable two ways, and no sprint launches while one is
@@ -38,105 +38,6 @@ is the one you meant. "The first one" is a complete answer.
   **What this asks for:** which of the readings above you meant.
   *The proposal:* PROPOSED A: '⚠ At least one junction is below {pressure} at the demands as entered (a demand scale of 1). All junctions keep {pressure} only if demands are cut to a demand scale of {m} or less.' PROPOSED B: '⚠ The demands as entered (a demand scale of 1) leave at least one junction below {pressure}. The largest demand scale that keeps every junction at {pressure} or above is {m}.' B paralle...
   @@ NEEDS RULING
-
-### from sprint 1008-wave0
-
-- **`lpn_change_type_born`**
-  > These values are new, set as on a newly drawn asset:
-  *The finding:* 'These are new, as on a newly drawn one:' has no noun for 'these' or for 'one'. It heads a list of values that the changed asset receives as defaults (js/looped-network.js:32833).
-  1. these values are created with their defaults, as on an asset newly drawn
-  2. these assets are new, like a newly drawn asset
-  **What this asks for:** a WORDING ruling -- is the English above right, or say what it should say.
-  *The proposal:* PROPOSED English: 'These values are new, set as on a newly drawn asset:' Cost: 26 retranslations.
-  _Ruled 2026-10-08: Calls page 8 October: Use proposed_
-- **`lpn_cp_restrict_tip`**
-  > Restrict these characters:
-  *The finding:* Leads the tip in the Restrict mode of a custom property's character rule; the other mode is 'Allow only these characters:' (js/looped-network.js:49645). 'Restrict' can mean forbid or limit to, and the second sense is the Allow mode. The sibling option label lpn_cp_restrict carries the same words and must stay identical, so English is not the route.
-  1. forbid the characters listed
-  2. limit entries to the characters listed (the same as Allow only)
-  **What this asks for:** WRITTEN PERMISSION to add a `$ec_lang_syn` entry for this key (a note to the 26 translators; it changes no English and nothing a visitor reads).
-  *The proposal:* Add $ec_lang_syn PROPOSAL (AI may not write it) on lpn_cp_restrict_tip and its sibling lpn_cp_restrict: 'Forbid these characters; the opposite of Allow only these characters'. English unchanged.
-  _Ruled 2026-10-08: Calls page 8 October: Use proposed (the $ec_lang_syn note, on it and lpn_cp_restrict)_
-- **`lpn_fb_intro`**
-  > Canned messages (optional). Nothing is sent until you press Send.
-  *The finding:* 'Canned messages' is an English idiom for ready-made messages; read literally it is about tins, and a translator who does not know the idiom has nothing else to go on. Heads the row of pick buttons in the feedback box (js/looped-network.js:61769).
-  1. ready-made messages to pick from
-  2. messages in a can (literal), or discarded messages
-  **What this asks for:** WRITTEN PERMISSION to add a `$ec_lang_syn` entry for this key (a note to the 26 translators; it changes no English and nothing a visitor reads).
-  *The proposal:* Add $ec_lang_syn PROPOSAL (AI may not write it): 'Ready-made messages; preset choices the visitor can pick instead of typing'. English unchanged.
-  _Ruled 2026-10-08: Calls page 8 October: Use proposed (the $ec_lang_syn note)_
-- **`lpn_ff_menu_tip`**
-  > Test each selected junction for fire flow, and check the effect on the rest of the system
-  *The finding:* 'Selection-wide check with collateral effect check' is a noun stack an English reader also has to decode; 'collateral effect' is not engineering usage, and 'Selection-wide' can read as one check over the whole selection rather than one per junction. The analysis tests each chosen junction in turn and then checks the rest of the system (lpn_ff_intro, lpn_ff_design_tip).
-  1. each selected junction is tested for fire flow in turn, and the effect on other junctions and pipes is checked
-  2. one combined check of the whole selection, plus a check of side effects of some kind
-  **What this asks for:** a WORDING ruling -- is the English above right, or say what it should say.
-  *The proposal:* PROPOSED English: 'Test each selected junction for fire flow, and check the effect on the rest of the system' Cost: 26 retranslations.
-  _Ruled 2026-10-08: Calls page 8 October: Use proposed_
-- **`lpn_find_filter_tip`**
-  > Show only the rows that match "What to search" above, in each table searched.
-  *The finding:* The verb has no object, and 'Filter in' parses two ways: include in the table, or filter the tables. Button 'Filter in table' in Find and replace; it filters the rows of the table searched (applyTableFilter, js/looped-network.js:20610).
-  1. show only the rows that match "What to search" in the table or tables searched
-  2. filter (choose) the tables whose name matches "What to search"
-  **What this asks for:** a WORDING ruling -- is the English above right, or say what it should say.
-  *The proposal:* PROPOSED English: 'Show only the rows that match "What to search" above, in each table searched.' Cost: 26 retranslations.
-  _Ruled 2026-10-08: Calls page 8 October: Use proposed_
-- **`lpn_mapgeo_dial_help`**
-  > Slide the two bars, or enter numbers in the boxes above them, to make the map bigger or smaller and to rotate it. The middle of each bar keeps the fit from step 1, so a size of 1 and a rotation of 0 mean no change. Arrow keys work on both.
-  *The finding:* 'so 1 and 0 mean no change' does not pair the numbers with the two bars. The bars are Map size (read as {f} times) and rotation.
-  1. a size of 1 and a rotation of 0 mean no change
-  2. either bar set to 1 or 0 means no change
-  **What this asks for:** a WORDING ruling -- is the English above right, or say what it should say.
-  *The proposal:* PROPOSED English: replace the last clause with 'so a size of 1 and a rotation of 0 mean no change.' Cost: 26 retranslations.
-  _Ruled 2026-10-08: Calls page 8 October: Use proposed_
-- **`lpn_meter_placed`**
-  > Customer {id} added. Enter its description and demand in the Customers table, or select it in Select mode to open its properties box.
-  *The finding:* 'press it in Select' names neither the mode nor what 'it' is; Select is a mode (lpn_tool_select), and 'press' reads as a keyboard press. 'its box' does not say which box. Notice after placing a customer (js/looped-network.js:45867).
-  1. select the customer on the map while the Select mode is on, to open its properties box
-  2. press a key or a button called Select to open some box
-  **What this asks for:** a WORDING ruling -- is the English above right, or say what it should say.
-  *The proposal:* PROPOSED English: 'Customer {id} added. Enter its description and demand in the Customers table, or select it in Select mode to open its properties box.' Cost: 26 retranslations.
-  _Ruled 2026-10-08: Calls page 8 October: Use proposed. (He added: "Do you need me to review new_english_keys or anything?")_
-- **`lpn_pane_scn_alt_tip`**
-  > {category} alt.: {alternative}
-  *The finding:* 'alt.' is an English abbreviation for alternative (the scenario alternative holding the override, Tom's wording 2026-10-06, js/looped-network.js:25361). A translator meets it with no expansion; altitude and the Alt key are both plausible.
-  1. alternative: the scenario alternative that holds this value
-  2. altitude, or the Alt key
-  **What this asks for:** WRITTEN PERMISSION to add a `$ec_lang_syn` entry for this key (a note to the 26 translators; it changes no English and nothing a visitor reads).
-  *The proposal:* Add $ec_lang_syn PROPOSAL (AI may not write it): 'alt. abbreviates alternative (the scenario alternative that holds this override); abbreviate it the way your language abbreviates that word'. English unchanged.
-  _Ruled 2026-10-08: Calls page 8 October: Use proposed (the $ec_lang_syn note)_
-- **`lpn_reports_epanet`**
-  > Run
-  *The finding:* Menu item under Water, Reports that opens the EPANET run report (js/looped-network.js:5111). Alone, 'Run' is a verb in most languages' default sense, and a translator will render 'run the model', which is a different command (the toolbar Calculate). English stands: Tom named it in fix/report-names.
-  1. noun: the report of the last run
-  2. verb: start a run
-  **What this asks for:** WRITTEN PERMISSION to add a `$ec_lang_syn` entry for this key (a note to the 26 translators; it changes no English and nothing a visitor reads).
-  *The proposal:* Add $ec_lang_syn PROPOSAL (AI may not write it): 'Run report; a noun, the report EPANET wrote for the last run, not the command to start a run'. English unchanged, no retranslation of English needed beyond the note.
-  _Ruled 2026-10-08: Calls page 8 October: Change: "I would use _syn for synonyms. That's why I invented it. "Run, simulation, computation, or calculation report""_
-- **`lpn_search_refused`**
-  > Place-name search is off, and nothing was sent. The Go to a latitude and longitude command still works.
-  *The finding:* 'Go to a latitude and longitude still works' starts with what reads as an imperative; it is the name of the menu item lpn_goto_menu ('Go to a latitude and longitude...'). Low.
-  1. the Go to a latitude and longitude command still works
-  2. an instruction to go to a latitude and longitude, followed by 'still works'
-  **What this asks for:** a WORDING ruling -- is the English above right, or say what it should say.
-  *The proposal:* PROPOSED English: 'Place-name search is off, and nothing was sent. The Go to a latitude and longitude command still works.' Cost: 26 retranslations.
-  _Ruled 2026-10-08: Calls page 8 October: Use proposed_
-- **`lpn_snip_tip_mode`**
-  > Snip shape
-  *The finding:* Tip on the chevron beside the Snip button that opens a menu of Rectangle or Freehand (js/looped-network.js:42979). 'Snip shape' reads as an imperative (snip a shape) as easily as a noun.
-  1. noun: the shape of the snip, chosen from this menu
-  2. verb: snip a shape
-  **What this asks for:** WRITTEN PERMISSION to add a `$ec_lang_syn` entry for this key (a note to the 26 translators; it changes no English and nothing a visitor reads).
-  *The proposal:* Add $ec_lang_syn PROPOSAL (AI may not write it): 'Snip shape; a noun, the choice of shape (rectangle or freehand) for the next snip, not an instruction'. English unchanged.
-  _Ruled 2026-10-08: Calls page 8 October: "I would use _syn for synonyms. That's why I invented it. "Shape to specify for screenshot""_
-- **`lpn_tool_area_tip`**
-  > Follow the on-screen prompts. Press again to cycle through window, lasso, and polygon. Hold Shift to keep the current selection and add or remove (toggle) what you select.
-  *The finding:* 'Hold Shift to keep existing selection set and add or remove' is a garden path: 'set' reads as a verb ('keep ..., set and add') before it reads as the noun 'selection set'. Articles are also dropped ('Follow on-screen wizard').
-  1. keep the current selection set and add to it or remove from it
-  2. keep the existing selection, set something, and add or remove
-  **What this asks for:** a WORDING ruling -- is the English above right, or say what it should say.
-  *The proposal:* PROPOSED English: 'Follow the on-screen prompts. Press again to cycle through window, lasso, and polygon. Hold Shift to keep the current selection and add or remove (toggle) what you select.' Cost: 26 retranslations.
-  _Ruled 2026-10-08: Calls page 8 October: Use proposed_
 
 ## Synonym entries to approve  (12, 10 to read @@ NEEDS RULING)
 
