@@ -18086,7 +18086,7 @@ var EngCalcs = EngCalcs || {};
 		var t = hoverTargetFromHit(mapHitAt(x, y));
 		if (mode === 'delete') { return t && t.kind !== 'label' ? t : null; }
 		if (t && t.kind === 'node') { return t; }
-		var near = nearestNodeNearScreen(x, y, 12);
+		var near = nearestNodeNearScreen(x, y, POINTER_REACH_PX);
 		return near ? { kind: 'node', id: near.id } : null;
 	}
 	function hoverCardOtherMove(e) {
