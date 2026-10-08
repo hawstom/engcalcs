@@ -22049,11 +22049,6 @@ var EngCalcs = EngCalcs || {};
 	}
 	function loadPaneState() {
 		var raw = null, v;
-		// Back to the birth values first, so a second reading (a workspace imported into the open
-		// page) gives what a first reading of the same storage would.
-		paneState.open = false;
-		paneState.h = LPN_PANE_DEFAULT;
-		paneState.tab = paneTabs[0].id;
 		try { raw = localStorage.getItem(LPN_PANE_KEY); } catch (e) { return; }
 		if (!raw) { return; }
 		try { v = JSON.parse(raw); } catch (e) { return; }
@@ -22338,8 +22333,6 @@ var EngCalcs = EngCalcs || {};
 	}
 	function loadRPaneState() {
 		var raw = null, v;
-		rpaneState.open = false;
-		rpaneState.w = LPN_RPANE_DEFAULT;
 		try { raw = localStorage.getItem(LPN_RPANE_KEY); } catch (e) { return; }
 		if (!raw) { return; }
 		try { v = JSON.parse(raw); } catch (e) { return; }
@@ -42296,7 +42289,7 @@ var EngCalcs = EngCalcs || {};
 		if (rec.hasOwnProperty('userSized')) { rec.userSized = false; }
 	}
 	function applyWorkspaceInPlace() {
-		var closers = workspaceBoxClosers(), popupD = null, keepPopup = false, tab, ix;
+		var closers = workspaceBoxClosers(), popupD = null, keepPopup = false, ix;
 		// 1. Everything closed, and the in-memory records forgotten.
 		dockFlyout = null;
 		dockBoxes.forEach(function (d) {
@@ -42341,14 +42334,19 @@ var EngCalcs = EngCalcs || {};
 		loadScenarioBasicPref();
 		syncAreaHintChecks();
 		updateAreaHint();
-		tab = activePaneTab();
-		if (paneState.open && tab && tab.hide) { tab.hide(); }
+		// Closed through the panes' own closers (the only code that may say whether a pane is open),
+		// then the birth values for what a stored record may leave unsaid.
+		if (paneState.open) { closePane(); }
+		paneState.h = LPN_PANE_DEFAULT;
+		paneState.tab = paneTabs[0].id;
 		loadPaneState();
 		if (document.getElementById('lpn_pane_body')) { document.getElementById('lpn_pane_body').style.height = ''; }
 		Object.keys(paneColPrefs).forEach(function (k) { delete paneColPrefs[k]; });
 		(function (v) { Object.keys(v).forEach(function (k) { paneColPrefs[k] = v[k]; }); }(readPaneColPrefs()));
 		applyPaneLayout();
 		if (paneState.open && activePaneTab().show) { activePaneTab().show(); }
+		if (rpaneState.open) { closeRightPane(); }
+		rpaneState.w = LPN_RPANE_DEFAULT;
 		loadRPaneState();
 		applyRPaneLayout();
 		// 4. The boxes: first-visit docks if no record is left, then the boot's own restore.
