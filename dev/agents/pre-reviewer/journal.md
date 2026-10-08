@@ -4142,3 +4142,21 @@ OBSERVED headless probes on Net1 (both scenarios, built-in solver, Base byte-com
 OBSERVED DEFECT: Properties "Valve type" edit on a B-only valve (pipe made valve in B) writes l._setting directly and deletes B's setting override; _setting has an overridable name so it is not written back, and lay-back restores Base's (absent) value: B's valve ends with setting undefined. Base unharmed. Probe scratch only; not a repo file.
 OBSERVED: first dock of Alternatives still lands at 45% (864 px at 1920) by design; grip then widens to ~1300 and stops at the map's 320 px.
 Not done: Properties by real clicks for the valve case, appearance of anything, Find and replace, criticality/fire-flow runs while in B.
+
+# Perry, feat/user-guide pre-review, 2026-10-08 (head 00862427)
+OBSERVED: user-guide-find-harness ALL PASS. Net3 worked queries reproduce in en, de, zh, tr, ar, fr, es.
+OBSERVED: the 7th worked query (Junction.Connectivity ...) FAILS on every non-English page tried ("Not a property of X: Connectivity"). English property words are NOT universally accepted: Connectivity, Source share, C, Minor loss, k, Average source share fail on es and de. Chapter says English words accepted in every language.
+OBSERVED: precedence AND over OR, parentheses, case-insensitive, NOT unsupported, units suffix rejected, quotes both kinds: all as chapter says.
+OBSERVED: "Pipe.Velocity highest" (no n) is an error; "n highest" lists 10.
+OBSERVED: choice fix does not break Tank mixing model or Pipe.Closed typed Open/open/Closed/closed; unknown word matches nothing.
+OBSERVED: phone 390 and desktop: no sideways page scroll, tables fit, rtl ar fine.
+OBSERVED: no change in 0dc0bb62..00862427 touches the report names (item 7); guide entries read EPANET run report / Status report while Reports menu rows read Run (EPANET) / Status (EPANET).
+OBSERVED: register: "asks four questions", "of its own" in new Find strings.
+NOT RUN: mutation test of choice fix; Ctrl+K inside a table cell mid-edit.
+
+## 2026-10-08 feat/workspace d14aa77c (Perry)
+OBSERVED: dock-default (19/19), dock-memory (17/17), workspace-browser (43/43) pass bare.
+OBSERVED: first visit, defaults opted in, 1280x720 and 1366x768: 6+8 tabs, fit (bottom 714 of 720); labels truncated with an ellipsis ("Set…", "Prop…", "Libr…"); consent banner covers the lower tabs until answered; examples wall not obstructed. Short window 560: tabs shrink, no overflow.
+OBSERVED: one change then 3 reloads: 6+7 stable. Start fresh clears lpn_dockbox, defaults return. Old-format workspace (no lpn_dockbox, no dockOrd) imports, no defaults layered on, stable on reload.
+OBSERVED: Properties flyout text matches the string.
+SPECULATION: defaults gate looks only at box records + lpn_dockbox, not lpn_index; a returning visitor with projects but no box record gets 14 tabs once. navigator.webdriver true under --remote-debugging/automation Chrome.

@@ -151,7 +151,8 @@ the block.
 - 100|681| **Economize the label layout: it is half the cost of a project switch.**
   **(c)/(d) MERGED 2026-10-03** (`feat/label-cache`, Tom: *"I am impressed. This is a major efficiency
   feature. Done."*): a bank per wheel notch, rounded outward, final; revisits run no pass (Novato ~85 -> ~13 ms). (e) already existed (one pass per wheel
-  burst). (b) is still open.
+  burst). **(b) on `perf/label-pass`, 2026-10-07:** the same layout, labelPass 254 -> 98 ms (Novato, every field
+  on, Chrome); certain shed rungs not drawn, ring search cut to the grid. `label-pass-economy-browser-harness.js`.
   Tom, 2026-09-16: *"if laying out the labels takes 2 sec, we have to figure out how to economize."*
   - **THE NUMBER IS HIS: the label pass is 56% of `buildDom`**, which is about 1.9 s of his 4.6 s
     switch into a geographic Net3 with every field on. Here, on a machine 6x faster, the same pass is
@@ -242,9 +243,6 @@ the block.
   (`convert-as-fotobi-harness.js`, four paths, master and production 9c71d54f); ask which surface.
   MERGED 2026-10-07 (`feat/web-mercator`, Tom: "Merge."): EPSG:3857 is a real projected project in
   metres, lengths on the ground, 4326 marked suggested. Open: only the unreproduced symbol loss.
-- 75|780| **Write `.epp` project files; keep reading `.lwn` and `.json`.** Tom, 2026-10-07: *"I guess
-  it's time to start saving as .epp What's your advice? We'll support .epp, .lwn, and .json?"* Advice
-  given: yes, once he says so; `LPN_FILE_EXT` and the open filters. Awaiting his word.
 - 75|578| **Fire flow: the EPS frame and the Run concept, extracted from 530.**
   Everything else in Task 530 shipped and that task is closed. Two phases were never built and are
   kept here so they are not lost in a closed block.

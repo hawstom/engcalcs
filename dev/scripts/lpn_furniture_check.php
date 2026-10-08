@@ -126,6 +126,8 @@ const EC_LPN_FURNITURE = [
     'lpn_reportbox'   => 'position, size and openness of the EPANET run report box',
     'lpn_statusbox'   => 'position, size and openness of the Status report box (Task 716)',
     'lpn_fullbox'     => 'position, size and openness of the Full report box (Task 715)',
+    'lpn_dockbox'     => 'where the boxes that keep no record of their own are docked, in what order, '
+        . 'and whether each docked one is open (Tom, 2026-10-07: all docks remembered)',
     // The Notes box joined the standing-box shell on Tom's word (2026-09-28: *"Draggable non-hog
     // box for Help, Notes."*) after being a centred, click-away-dismissed popover until then.
     'lpn_notesbox'    => 'position, size and openness of the Notes box',

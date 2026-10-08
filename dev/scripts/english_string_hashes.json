@@ -1,7 +1,7 @@
 {
     "description": "sha1 of each lang.ec.en.php $ec_lang value as of the last full translation sync. Maintained by detect_english_drift.php --update. A current-vs-manifest hash mismatch means that key's English changed and translations may be stale. Do not hand-edit.",
     "updated": "2026-09-30",
-    "count": 2226,
+    "count": 2224,
     "partial_updates": [
         {
             "date": "2026-08-08",
@@ -4169,9 +4169,7 @@
         "lpn_scenario_preset_flow_static": "a50f26a5f160bd9e01c2ef4284e27eda062c6a55",
         "lpn_scenario_preset_flow_static_tip": "4ad9b9e55d141d7a923ceeaefa6d42db907b4727",
         "lpn_scenario_preset_max_day": "70f824ba95e8654f577ca0a5967594273755d704",
-        "lpn_scenario_preset_max_day_tip": "13f01877d312710b9d3877d1c4ac8dae5285245b",
         "lpn_scenario_preset_peak_hour": "e601dcacc8af2f2538b6b1d406e93522b54afd31",
-        "lpn_scenario_preset_peak_hour_tip": "3fb3664f8628b0070a847322c195d87c117177d1",
         "lpn_scenario_prompt_name": "f05ee5e127dbbf90ad0cde70708c2f2d84110677",
         "lpn_scenario_push_btn": "a6395ef6908a852924ef3e6a960cee547c57bc90",
         "lpn_scenario_push_confirm": "590e6acf48c9097bb958d8aef261fcc398053a08",
@@ -10867,17 +10865,9 @@
             "words": 3,
             "ends_sentence": false
         },
-        "lpn_scenario_preset_max_day_tip": {
-            "words": 30,
-            "ends_sentence": true
-        },
         "lpn_scenario_preset_peak_hour": {
             "words": 3,
             "ends_sentence": false
-        },
-        "lpn_scenario_preset_peak_hour_tip": {
-            "words": 30,
-            "ends_sentence": true
         },
         "lpn_scenario_prompt_name": {
             "words": 4,
