@@ -1093,7 +1093,7 @@ $ec_lang['lpn_guide_search']='Search the guide';
 $ec_lang['lpn_guide_boxes_heading']='Boxes';
 $ec_lang['lpn_guide_boxes_intro']='Each box can be moved, resized, docked at the left or right of the map, or closed. The ? in a box\'s title bar opens its help.';
 // Tom's own wording, 2026-10-07 (his typo "to not" corrected). Below lpn_guide_boxes_intro.
-$ec_lang['lpn_guide_boxes_autohide']='Auto-hidden boxes have two modes: with focus (a control in the box has focus, even a button just pressed) and without focus (no control in it has focus). When the pointer leaves, a box without focus tucks away behind its tab after a short delay. A box with focus stays until you click outside it, press Esc, or Tab out of it with the pointer elsewhere.';
+$ec_lang['lpn_guide_boxes_autohide']='When the pointer leaves, a box without focus hides after a short delay. A box with focus hides when you click outside it, press Esc, or Tab out of it with the pointer elsewhere.';
 $ec_lang['lpn_guide_box_help']='Help for this box';
 // A Boxes entry whose box shares its name with a section of the Guide ("Screenshot"), in the Guide
 // only, so its Contents list does not show one word twice. Keep {box} as it is.
