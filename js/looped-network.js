@@ -52820,7 +52820,12 @@ var EngCalcs = EngCalcs || {};
 	// so there is no column to dock into: the dock buttons are not offered there, and a box that is
 	// docked on the desktop opens as it always did. Its docking is kept and comes back on a wider
 	// window.
-	var LPN_DOCK_MIN_W = 240, LPN_DOCK_MAX_FRAC = 0.45, LPN_DOCK_MAP_MIN = 320, LPN_DOCK_DEFAULT_W = 360,
+	// **NO SHARE OF THE WINDOW CAPS A DOCKED BOX; ONLY THE MAP'S OWN MINIMUM DOES** (Tom, 2026-10-07,
+	// on the Alternatives preview stopping at about 860 px: *"Is there any reason not to give the user
+	// control and freedom?"*). There was not. A column used to stop at 45% of the window, which on a
+	// 1920 screen held a docked table to 864 px while the map beside it had a thousand to spare. The
+	// map keeps LPN_DOCK_MAP_MIN, and that was always the reason the cap existed.
+	var LPN_DOCK_MIN_W = 240, LPN_DOCK_MAP_MIN = 320, LPN_DOCK_DEFAULT_W = 360, LPN_DOCK_FIRST_FRAC = 0.45,
 		LPN_DOCK_STRIP_W = 24, LPN_DOCK_TUCK_MS = 400, LPN_DOCK_HOVER_MS = 150, LPN_CORNER_BTN_W = 28,
 		LPN_UNDOCK_SLOP = 6;
 	var dockBoxes = [], dockFlyout = null, dockTimer = null, dockBooting = false, dockQueued = false,
@@ -52997,8 +53002,12 @@ var EngCalcs = EngCalcs || {};
 			});
 		});
 	}
-	function clampDockW(w, room) {
-		var max = Math.max(LPN_DOCK_MIN_W, Math.floor((window.innerWidth || 1000) * LPN_DOCK_MAX_FRAC));
+	// **AN AUTO-HIDDEN BOX MAY COVER THE WHOLE MAP; ONLY A PINNED ONE KEEPS THE MAP'S MINIMUM** (Tom,
+	// 2026-10-08: *"Why not cover the map entirely when it's an autohide box. A pinned box is
+	// different, of course. It needs its limits."*). A flyout takes no space from the map, so the
+	// 320 px floor protects nothing; `over` lifts it and leaves only `room`.
+	function clampDockW(w, room, over) {
+		var max = over && room > 0 ? room : Math.max(LPN_DOCK_MIN_W, Math.floor((window.innerWidth || 1000) - LPN_DOCK_MAP_MIN));
 		if (!(w > 0)) { w = LPN_DOCK_DEFAULT_W; }
 		if (room > 0) { max = Math.min(max, room); }
 		return Math.round(Math.max(Math.min(LPN_DOCK_MIN_W, max), Math.min(w, max)));
@@ -53082,10 +53091,12 @@ var EngCalcs = EngCalcs || {};
 	function dockAct(d, act) {
 		var r, wasSide = dockSideOf(d);
 		if (act === 'left' || act === 'right') {
-			// The width it floats at is the width it docks at, the first time.
+			// The width it floats at is the width it docks at, the first time, up to 45% of the
+			// window, so a box that floats wide (Alternatives, 1500 px) does not dock over most of
+			// the map. That is the first width only: the grip takes it anywhere the map allows.
 			if (!wasSide && !d.rec.dockW) {
 				r = d.box.getBoundingClientRect();
-				if (r.width > 0) { d.rec.dockW = Math.round(r.width); }
+				if (r.width > 0) { d.rec.dockW = Math.round(Math.min(r.width, Math.max(LPN_DOCK_MIN_W, (window.innerWidth || 1000) * LPN_DOCK_FIRST_FRAC))); }
 			}
 			if (d.rec.dock !== act || d.rec.dockOrd === undefined) { d.rec.dockOrd = dockNextOrd(act, d); }
 			d.rec.dock = act;
@@ -53098,8 +53109,13 @@ var EngCalcs = EngCalcs || {};
 			if (d.rec.autohide) { delete d.rec.autohide; } else { d.rec.autohide = true; }
 		}
 		if (dockFlyout === d) { dockFlyout = null; }
-		if (d.save) { d.save(); }
 		layoutDocks();
+		// Pinned from a width only a flyout may have, it keeps the map's minimum: store what it got.
+		if (act === 'autohide' && !d.rec.autohide && d.rec.dock) {
+			r = d.box.getBoundingClientRect();
+			if (r.width > 0 && d.rec.dockW > Math.round(r.width)) { d.rec.dockW = Math.round(r.width); }
+		}
+		if (d.save) { d.save(); }
 		renderDockCorner(d);
 		// Turned on from inside the box, auto-hide tucks it at once; the keyboard lands on its tab.
 		if (act === 'autohide' && d.rec.autohide && d.tab) { d.tab.focus(); }
@@ -53191,9 +53207,12 @@ var EngCalcs = EngCalcs || {};
 		el.lpnDockList = list;
 		el.classList.toggle('lpn-dock-grip-live', x !== null);
 		if (x === null) { return; }
-		// In front of a flown-out box, whose own stacking number is above the strip's.
-		el.style.zIndex = String((list.length === 1 && list[0].box.classList.contains('lpn-dock-out'))
-			? (Number(list[0].box.style.zIndex) || 0) + 1 : '');
+		// In front of the boxes it sizes, whose own stacking numbers rise each time one is brought
+		// forward: under a raised docked box the grip's inner half was the box's own edge, so a press
+		// there did nothing a reader could see (found 2026-10-07, docking Alternatives).
+		var zTop = 0;
+		list.forEach(function (d) { zTop = Math.max(zTop, Number(d.box.style.zIndex) || 0); });
+		el.style.zIndex = zTop ? String(zTop + 1) : '';
 		el.style.left = Math.round(x) + 'px';
 		el.style.top = Math.round(y) + 'px';
 		el.style.height = Math.round(h) + 'px';
@@ -53215,7 +53234,8 @@ var EngCalcs = EngCalcs || {};
 			var w;
 			if (!from) { return; }
 			w = from.w + (side === 'left' ? e.clientX - from.x : from.x - e.clientX);
-			w = clampDockW(w);
+			var wrap = dockMapWrap(), over = !!from.list[0].rec.autohide;
+			w = clampDockW(w, over && wrap ? Math.floor(wrap.getBoundingClientRect().width + dockMargins.left + dockMargins.right - LPN_DOCK_STRIP_W * 2) : 0, over);
 			from.list.forEach(function (d) { d.rec.dockW = w; });
 			layoutDocks();
 		});
@@ -53307,7 +53327,7 @@ var EngCalcs = EngCalcs || {};
 				dockPlace(d, x, top + y0, c.w, y1 - y0, 'pinned');
 			});
 			S.auto.forEach(function (d) {
-				var w = clampDockW(d.rec.dockW, Math.floor(outerR - outerL - c.strip - LPN_DOCK_STRIP_W)),
+				var w = clampDockW(d.rec.dockW, Math.floor(outerR - outerL - c.strip - LPN_DOCK_STRIP_W), true),
 					ax = s === 'left' ? outerL + c.strip : outerR - c.strip - w;
 				dockPlace(d, ax, top, w, h, d === dockFlyout ? 'out' : 'tucked');
 			});
@@ -53315,7 +53335,7 @@ var EngCalcs = EngCalcs || {};
 			// A box flown out of its tab is the frontmost thing on its side, so its edge is the one a
 			// reader reaches for; otherwise the pinned column's. The flown-out box is alone in its list.
 			if (dockFlyout && S.auto.indexOf(dockFlyout) >= 0) {
-				w = clampDockW(dockFlyout.rec.dockW, Math.floor(outerR - outerL - c.strip - LPN_DOCK_STRIP_W));
+				w = clampDockW(dockFlyout.rec.dockW, Math.floor(outerR - outerL - c.strip - LPN_DOCK_STRIP_W), true);
 				placeDockGrip(s, s === 'left' ? outerL + c.strip + w : outerR - c.strip - w, top, h, [dockFlyout]);
 			} else {
 				placeDockGrip(s, c.w ? (s === 'left' ? outerL + c.strip + c.w : outerR - c.strip - c.w) : null, top, h, S.pinned);
