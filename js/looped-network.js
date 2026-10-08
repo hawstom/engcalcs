@@ -20041,11 +20041,11 @@ var EngCalcs = EngCalcs || {};
 		return out;
 	}
 	// **THE SAME LISTS, WORDED IN ENGLISH** (Perry's review, 2026-10-07): the def lists are built
-	// again with the English values of their keys (pageConfig.lpn_find_en) standing in, so every
+	// again with the English values of their keys (pageConfig.findEnglishWords) standing in, so every
 	// label, composed ones included ("Roughness, C", "Average source share"), has its English
 	// spelling. Null on a page without the English copy.
 	function findEnglishDefs(fn) {
-		var pc = EngCalcs.pageConfig || {}, en = pc.lpn_find_en, merged = {}, k;
+		var pc = EngCalcs.pageConfig || {}, en = pc.findEnglishWords, merged = {}, k;
 		if (!en) { return null; }
 		for (k in pc) { if (Object.prototype.hasOwnProperty.call(pc, k)) { merged[k] = pc[k]; } }
 		for (k in en) { if (Object.prototype.hasOwnProperty.call(en, k)) { merged[k] = en[k]; } }

@@ -2605,7 +2605,7 @@ EngCalcs.pageConfig = {
 	      // findEnglishDefs() reads these. The list is every key the Find word lists read
 	      // (findPropDefs() and the label functions it calls); user-guide-find-harness.js holds it
 	      // to the code, so a new property key that is missing here fails there. ?>
-	lpn_find_en: <?=json_encode(ecEnglishStrings(array(
+	findEnglishWords: <?=json_encode(ecEnglishStrings(array(
 		'bpn_demand',
 		'lpn_energy_price',
 		'lpn_energy_price_pattern',

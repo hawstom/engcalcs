@@ -323,7 +323,7 @@ async function languages(browser, Session) {
 		ok(lang + ': with Pipe 247 closed, the four junctions are cut off', sameSet(r.refs, ['node:215', 'node:217', 'node:219', 'node:225']), r.msg.trim() || r.refs.join(', '));
 		// Every English property and condition word for a pipe parses here, composed ones included.
 		const words = await a.page.evaluate(() => {
-			const en = EngCalcs.pageConfig.lpn_find_en;
+			const en = EngCalcs.pageConfig.findEnglishWords;
 			return [en.lpn_tool_add_pipe + '.' + en.lpn_field_roughness + ', C ' + en.lpn_find_op_gt + ' 100',
 				en.lpn_tool_add_pipe + '.' + en.lpn_field_km_short + ' ' + en.lpn_find_op_gt + ' 0',
 				en.lpn_tool_add_pipe + '.' + en.lpn_result_avg_source_share + ' ' + en.lpn_find_op_empty,
@@ -415,12 +415,12 @@ async function tableCell(browser, Session) {
 	await a.context.close().catch(() => {});
 }
 
-// Every key the Find word lists read has its English copy in pageConfig.lpn_find_en.
+// Every key the Find word lists read has its English copy in pageConfig.findEnglishWords.
 function englishCopyComplete() {
 	console.log('\n10. Every Find word key has its English copy');
 	const js = fs.readFileSync(path.join(REPO, 'js', 'looped-network.js'), 'utf8');
 	const php = fs.readFileSync(path.join(REPO, 'Looped-Network.php'), 'utf8');
-	const block = (php.match(/lpn_find_en: <\?=json_encode\(ecEnglishStrings\(array\([\s\S]*?\)\), JSON_UNESCAPED_UNICODE\)\?>/) || [''])[0];
+	const block = (php.match(/findEnglishWords: <\?=json_encode\(ecEnglishStrings\(array\([\s\S]*?\)\), JSON_UNESCAPED_UNICODE\)\?>/) || [''])[0];
 	const listed = new Set((block.match(/'((?:lpn|bpn)_[a-z0-9_]+)'/g) || []).map(k => k.slice(1, -1)));
 	const names = ['findScopeDefs', 'findPropDefs', 'findConnOpDefs', 'findChoiceDefs', 'findOpDefs', 'findEmptyDef', 'findExtremeTemplate', 'findJoinDefs',
 		'roughnessLabel', 'qualityLabel', 'linkQualityLabel', 'headlossLabelFor', 'axisNames', 'paneColMixingModel', 'paneColSourceType'];
@@ -431,7 +431,7 @@ function englishCopyComplete() {
 		const keys = (m[0].match(/pc\.([a-z][a-z0-9_]*)/g) || []).map(k => k.slice(3)).concat((m[0].match(/'((?:lpn|bpn)_[a-z0-9_]+)'/g) || []).map(k => k.slice(1, -1)));
 		keys.forEach(k => { if (!listed.has(k) && missing.indexOf(k) < 0) { missing.push(k); } });
 	}
-	ok('lpn_find_en lists every key the Find word lists read', listed.size > 50 && missing.length === 0, missing.join(', ') || listed.size + ' keys');
+	ok('findEnglishWords lists every key the Find word lists read', listed.size > 50 && missing.length === 0, missing.join(', ') || listed.size + ' keys');
 }
 
 async function main() {
