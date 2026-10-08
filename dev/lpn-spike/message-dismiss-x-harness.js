@@ -130,6 +130,66 @@ async function main() {
 		ok('it is the top row of the history, marked Hidden, with Show', log.length > 0 && log[0].hidden && log[0].text === first && log[0].mark === mark && log[0].show, JSON.stringify(log[0]));
 		await page.click('#lpn_msglog_panel button.lpn-msglog-unhide'); await a.settle(400);
 		ok('Show puts it back on the map', (await text()) === first);
+
+		console.log('\n--- EVERY standing message has the x (Tom, 2026-10-08, G09) ---');
+		// (a) "Add a reservoir", the first message of a new project: hidden by the x, back when its text
+		// recurs (the condition is fixed and then broken again).
+		await a.newProject('us');
+		await place('Junction', 0.3, 0.4);
+		await a.settle(1200);
+		const noRes = await a.lang('lpn_diag_no_fixed_head');
+		const openLogTop = async () => {
+			if (!(await page.evaluate(() => getComputedStyle(document.getElementById('lpn_msglog_panel')).display !== 'none'))) { await page.click('#lpn_msglog_btn'); await a.settle(400); }
+			const t = await page.evaluate(() => { const r = document.querySelector('#lpn_msglog_panel .lpn-msglog-panel-row.lpn-msglog-panel-hidden .lpn-msglog-panel-text'); return r ? r.textContent : ''; });
+			await page.keyboard.press('Escape'); await a.settle(300);
+			return t;
+		};
+		const visX = () => page.evaluate(() => { const e = document.getElementById('lpn_status_dismiss'); return !!e && getComputedStyle(e).display !== 'none' && e.getBoundingClientRect().width > 0; });
+		ok('"Add a reservoir" is standing', (await text()).indexOf(noRes) === 0, await text());
+		ok('...and carries the x', await visX());
+		await page.click('#lpn_status_dismiss'); await a.settle(400);
+		ok('...clicking it hides the message', (await text()) === '');
+		ok('...and it waits as the top Hidden row of the history', (await openLogTop()) === noRes);
+		await place('Reservoir', 0.6, 0.6);
+		await a.settle(1200);
+		ok('fixing the problem shows the next message', (await text()).indexOf(unreach) === 0, await text());
+		// Break it again: undo the reservoir, and "Add a reservoir" is said again though it was hidden.
+		await page.keyboard.press('Control+z'); await a.settle(1500);
+		ok('the same problem recurring brings "Add a reservoir" back', (await text()).indexOf(noRes) === 0, await text());
+		ok('...with its x', await visX());
+
+		// (b) a run message: a connected network whose solver gives up. Hidden by the x; the next run
+		// (Calculate) says it again.
+		await a.newProject('us');
+		await place('Junction', 0.3, 0.4);
+		await place('Reservoir', 0.6, 0.6);
+		await a.dismissGallery();
+		await a.toolbarClick('Pipe');
+		const cv = await page.evaluate(() => { const b = document.getElementById('lpn_canvas').getBoundingClientRect(); return { x: b.x, y: b.y, w: b.width, h: b.height }; });
+		await page.mouse.click(cv.x + cv.w * 0.3, cv.y + cv.h * 0.4); await a.settle(300);
+		await page.mouse.click(cv.x + cv.w * 0.6, cv.y + cv.h * 0.6); await a.settle(600);
+		await a.toolbarClick('Select');
+		// Calculate is hidden while Recalculate automatically is on, so a run is asked for the way a
+		// visitor does: nudge the junction on the map. The pipe keeps it connected, so the same
+		// message is said again by the new run.
+		let nudge = 0;
+		const rerun = async () => {
+			nudge++;
+			const fx = 0.3 - 0.02 * nudge, fy = 0.4 + 0.02 * nudge;
+			await page.mouse.move(cv.x + cv.w * (0.3 - 0.02 * (nudge - 1)), cv.y + cv.h * (0.4 + 0.02 * (nudge - 1)));
+			await page.mouse.down(); await page.mouse.move(cv.x + cv.w * fx, cv.y + cv.h * fy, { steps: 6 }); await page.mouse.up();
+			await a.settle(1500);
+		};
+		await page.evaluate(() => { window.EngCalcs.lpnSolve = function () { return { ok: false, issues: [] }; };
+			window.EngCalcs.lpnSolveEpanet = function () { return Promise.resolve({ ok: false, issues: [] }); }; });
+		await rerun();
+		const nc = await a.lang('lpn_diag_not_converged');
+		ok('a run message ("No solution was found") is standing', (await text()).indexOf(nc) === 0, await text());
+		ok('...and carries the x', await visX());
+		await page.click('#lpn_status_dismiss'); await a.settle(400);
+		ok('...the x hides it', (await text()) === '');
+		await rerun();
+		ok('the next run says it again', (await text()).indexOf(nc) === 0, await text());
 		ok('no uncaught page errors', a.errors.length === 0, a.errors.slice(0, 2).join(' | '));
 	} finally {
 		await browser.close();

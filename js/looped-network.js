@@ -62592,24 +62592,24 @@ var EngCalcs = EngCalcs || {};
 	// that brings it back. No count, badge or highlight on the history glyph either: that glyph sits
 	// on the map too, and lighting it would be the chip again in another place.
 	//
-	// **ONLY A DIAGNOSTIC THE USER CAN WORK PAST IS HIDEABLE**, and the line is drawn by CODE here
-	// because nothing upstream draws it (every lpnDiagnose() issue withholds the solve). Hideable:
-	// unreachable (the message in Tom's own words), dangling-link and valve-on-fixed-head -- each names
-	// particular assets and is about the drawing, not about whether the model can run at all. NOT
-	// hideable: no-fixed-head ("Add a reservoir"), valve-needs-epanet, pda-pressures and
-	// pda-needs-epanet (the model or its engine cannot run), and every message with no code of its own:
-	// unit-unknown, not-converged, storage-full, engine loading and failure, run summaries.
-	var LPN_STATUS_HIDEABLE = { 'unreachable': true, 'dangling-link': true, 'valve-on-fixed-head': true };
-	function issuesHideable(issues) {
-		return !!issues && issues.length > 0 && issues.every(function (i) { return LPN_STATUS_HIDEABLE[i.code] === true; });
-	}
+	// **EVERY STANDING MESSAGE IS HIDEABLE** (Tom, 2026-10-08, G09: "Every standing message"). One
+	// mechanism, no per-message exceptions. A hidden message comes back by two doors only: (1) its
+	// text stops being the standing one (fix the problem, break it again: a diagnostic from
+	// lpnDiagnose() is seen again), and (2) for a run message (anything not a diagnostic: run
+	// summaries, not-converged, engine loading and failure, storage full, unit unknown) the start of
+	// the next run, since the same sentence after a new run is a new fact. `diag` is true only for
+	// a diagnostic.
 	var statusHidden = {};      // message text -> true, for the texts the user has hidden
-	var statusLast = { text: '', code: '', hideable: false };
+	var statusLast = { text: '', code: '', diag: false };
 	function clearStatusHidden() { statusHidden = {}; }
+	// A new run forgets the hidden RUN messages (door 2 above); hidden diagnostics stay hidden.
+	function forgetHiddenRunMessages() {
+		Object.keys(statusHidden).forEach(function (k) { if (statusHidden[k] === 'run') { delete statusHidden[k]; } });
+	}
 	// The text the user has hidden and that is still the standing message, or '' -- what the history
 	// panel pins at its top.
 	function statusHiddenText() {
-		return (statusLast.text && statusLast.hideable && statusHidden[statusLast.text]) ? statusLast.text : '';
+		return (statusLast.text && statusHidden[statusLast.text]) ? statusLast.text : '';
 	}
 	// Paints what setStatus() last stated, honouring the hidden set. Called by setStatus(), and by
 	// the x and the history row's Show, which must not re-log a message that has not changed.
@@ -62623,7 +62623,7 @@ var EngCalcs = EngCalcs || {};
 		// and textContent on the parent would delete it on the first solve. Falls back to the <p>
 		// where the span is absent, so a harness or a page that has not been updated still works.
 		(textEl || el).textContent = hide ? '' : (statusLast.text || '');
-		if (xEl) { xEl.style.display = (statusLast.text && statusLast.hideable && !hide) ? '' : 'none'; }
+		if (xEl) { xEl.style.display = (statusLast.text && !hide) ? '' : 'none'; }
 		// An open history panel follows: a hidden message forgotten by an edit leaves its top row.
 		if (msglogPanelOpen) { renderMsglogPanel(); }
 	}
@@ -62633,10 +62633,10 @@ var EngCalcs = EngCalcs || {};
 		paintStatus();
 		syncStatusBoxVisibility();
 	}
-	function setStatus(text, code, hideable) {
+	function setStatus(text, code, diag) {
 		var el = document.getElementById('lpn_status');
 		if (!el) { return; }
-		statusLast = { text: text || '', code: code || '', hideable: !!(text && hideable) };
+		statusLast = { text: text || '', code: code || '', diag: !!(text && diag) };
 		// A hidden text is FORGOTTEN the moment it is no longer the one showing: fix the problem,
 		// break it again (undo, redo, an edit) and the message must be seen again.
 		Object.keys(statusHidden).forEach(function (k) { if (k !== statusLast.text) { delete statusHidden[k]; } });
@@ -63000,8 +63000,8 @@ var EngCalcs = EngCalcs || {};
 		var xEl = document.getElementById('lpn_status_dismiss');
 		if (xEl) {
 			xEl.addEventListener('click', function () {
-				if (!statusLast.text || !statusLast.hideable) { return; }
-				statusHidden[statusLast.text] = true;
+				if (!statusLast.text) { return; }
+				statusHidden[statusLast.text] = statusLast.diag ? 'diag' : 'run';
 				paintStatus();
 				syncStatusBoxVisibility();
 				var logBtn = document.getElementById('lpn_msglog_btn');
@@ -63910,6 +63910,7 @@ var EngCalcs = EngCalcs || {};
 		// of it is committed, and saveToStorage() already refuses a placement in progress for the
 		// same reason. Finish and Cancel both schedule a solve on the way out.
 		if (georefActive()) { return; }
+		forgetHiddenRunMessages();
 		// Autosave piggybacks on the same debounce as the solve, not a separate timer -- one
 		// mutation, one save, regardless of solve outcome (a manual delete-to-empty must persist
 		// too, or a reload would resurrect the stale pre-delete network).
@@ -63948,7 +63949,7 @@ var EngCalcs = EngCalcs || {};
 		if (issues.length > 0) {
 			lastSolveResult = null;
 			issues.forEach(function (issue) { logLpnDiag(issue.code); });
-			setStatus(issues.map(diagIssueText).join(' '), issues[0].code, issuesHideable(issues));
+			setStatus(issues.map(diagIssueText).join(' '), issues[0].code, true);
 			refreshLabelText();
 			return;
 		}
@@ -68104,7 +68105,7 @@ var EngCalcs = EngCalcs || {};
 			// diameter that is not there.
 			if (result.issues && result.issues.length > 0) {
 				result.issues.forEach(function (issue) { logLpnDiag(issue.code); });
-				setStatus(result.issues.map(diagIssueText).join(' '), result.issues[0].code, issuesHideable(result.issues));
+				setStatus(result.issues.map(diagIssueText).join(' '), result.issues[0].code, true);
 				refreshLabelText();
 				refreshValueColors();   // Task 384: the colours came from results that no longer exist
 				refreshPaneIfOpen();    // Task 409: and so did the grade line and the result columns

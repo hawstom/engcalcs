@@ -7,7 +7,7 @@
 // intervening". Covers: x on a hideable message; hiding leaves no trace on the map (status box, its
 // buttons, the history glyph's highlight, and the canvas SVG unchanged); the hidden message is the top
 // row of the message history, marked, and Show there restores it; different text shows again; same
-// text stays hidden across solves; opening another network clears it; no x on "Add a reservoir";
+// text stays hidden across solves; opening another network clears it; the x on "Add a reservoir" too;
 // nothing in localStorage; and the toolbar corner triangle, the Map menu row and the W key entering
 // Zoom Window with the view transform untouched, then a drag zooming.
 'use strict';
@@ -113,13 +113,13 @@ async function main() {
 		};
 		const wait = () => a.settle(1200);
 
-		console.log('\n--- a message that means no result has no x ---');
+		console.log('\n--- "Add a reservoir" has the x too ---');
 		await place('Junction', 0.3, 0.4);
 		await wait();
 		let s = await st();
 		const noRes = await a.lang('lpn_diag_no_fixed_head');
 		ok('"Add a reservoir" is on screen', s.box && s.text.indexOf(noRes) === 0, s.text);
-		ok('...and has no x', !s.x);
+		ok('...and has the x too (every standing message is hideable)', s.x);
 
 		console.log('\n--- a hideable message ---');
 		await place('Reservoir', 0.6, 0.6);
