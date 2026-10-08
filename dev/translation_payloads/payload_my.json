@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "my",
-        "expected_key_count": 2444,
-        "delta_key_count": 224,
+        "expected_key_count": 2503,
+        "delta_key_count": 284,
         "exempt_key_count": 40,
         "exempt_keys": [
             "u_imgd",
@@ -786,6 +786,9 @@
         "lpn_pane_sel_only": "Selection only",
         "lpn_pane_sel_only_none": "No elements are selected. Select elements on the map first.",
         "lpn_pane_scn_show": "Show scenarios",
+        "lpn_pane_scn_ov_only": "Overrides only",
+        "lpn_pane_scn_cur_only": "Current scenario only",
+        "lpn_pane_scn_filter_note": "{filters}. Showing {n} of {all}.",
         "lpn_pane_clear_override": "Clear override",
         "lpn_pane_scn_alt_tip": "{category} alt.: {alternative}",
         "lpn_change_type_menu": "Change type",
@@ -795,6 +798,7 @@
         "lpn_change_type_key": "ID: Lost entry",
         "lpn_change_type_line": "{id}: {property} {value}",
         "lpn_change_type_line_scenario": "{id}: {property} {value}, in scenario {scenario}",
+        "lpn_change_type_line_alternative": "{id}: {property} {value}, in alternative {alternative}",
         "lpn_change_type_more": "And {n} more.",
         "lpn_change_type_surface": "These keep the water surface where it was. A reservoir's head is the tank's elevation plus its water depth, and a tank's water depth is the reservoir's head minus its elevation:",
         "lpn_change_type_meaning": "These controls and rules test a node being changed, and will read it differently: a junction is tested by its pressure, and a tank or reservoir by its water level.",
@@ -804,6 +808,9 @@
         "lpn_change_type_customers": "Only a pipe serves customers, so these customers are connected instead to the node shown in parentheses, where their demand is already applied. They stay where they are drawn, and their demand is unchanged:",
         "lpn_change_type_setting": "These controls and rules give or test the setting of a link being changed. A setting is a different quantity on a pipe, a pump, and a valve, so these will read it differently:",
         "lpn_change_type_rules": "These rule lines name a link by its kind, and will name its new kind instead:",
+        "lpn_change_type_scenario_ask": "Current scenario is not Base. Create overrides?",
+        "lpn_change_type_create_overrides": "Create overrides",
+        "lpn_change_type_switch_base": "Switch to Base",
         "lpn_find_scope_source": "Source",
         "lpn_find_source_no_chemical": "No chemical is being tracked, so no node has a source.",
         "lpn_profile_open": "Open EPANET profile file…",
@@ -849,10 +856,63 @@
         "lpn_valwarn_positive": "EPANET does not accept zero or a negative number here.",
         "lpn_valwarn_negative": "EPANET does not accept a negative number here.",
         "lpn_valwarn_tank_levels": "EPANET does not accept this tank. The lowest water depth must not exceed the water depth, and the water depth must not exceed the highest water depth.",
-        "lpn_alt_calc_options": "Calculation options",
-        "lpn_scenario_duration_tip": "Leave blank to inherit from parent. A total run time of 0:00 is a steady-state run.",
-        "lpn_scenario_hyd_step_tip": "Leave blank to inherit from parent.",
+        "lpn_scenario_delete_has_children": "The scenario {name} cannot be deleted while other scenarios inherit from it: {list}. Delete those first, or give them another parent.",
         "lpn_time_scn_overrides": "Scenario overrides:",
+        "lpn_settings_table_major": "Major heading",
+        "lpn_settings_table_minor": "Minor heading",
+        "lpn_settings_table_category": "Category",
+        "lpn_settings_table_owner": "Owner",
+        "lpn_settings_table_setting": "Setting",
+        "lpn_settings_table_yes": "Yes",
+        "lpn_settings_table_no": "No",
+        "lpn_settings_row_of": "{setting}, {member}",
+        "lpn_settings_row_labels_field": "{labels}: {field}",
+        "lpn_settings_row_labels_part": "{labels}: {field}, {part}",
+        "lpn_settings_row_labels_customer": "Customer labels",
+        "lpn_settings_row_label_before": "Text before",
+        "lpn_settings_row_label_after": "Text after",
+        "lpn_settings_row_label_on": "Is active",
+        "lpn_settings_row_label_show": "Show order",
+        "lpn_settings_row_label_drop": "Drop order",
+        "lpn_settings_row_id_prefix": "ID prefix",
+        "lpn_settings_row_symbol_cap_multiple": "Largest symbol, as a multiple of a typical pipe length",
+        "lpn_settings_row_symbol_cap_percentile": "Typical pipe length, as a percentile of all pipe lengths",
+        "lpn_settings_row_contour_labels": "Contour labels",
+        "lpn_settings_row_check_freq": "Status check frequency",
+        "lpn_settings_row_max_check": "Maximum status checks",
+        "lpn_settings_row_status_report": "Status report",
+        "lpn_settings_row_pda_src": "Pressure driven options stated in the file",
+        "lpn_settings_row_quality_option": "Quality option as the file states it",
+        "lpn_settings_row_tolerance": "Accuracy (older projects)",
+        "lpn_settings_row_emitter_exponent_old": "Emitter exponent (older projects)",
+        "lpn_settings_row_elev_source_old": "Elevation source (older projects)",
+        "lpn_settings_row_basemap": "Basemap",
+        "lpn_settings_row_basemap_last": "Basemap to return to",
+        "lpn_settings_row_customer_max_width": "Show customer labels when zoomed to this map width or less",
+        "lpn_settings_row_quality_step": "Quality time step",
+        "lpn_settings_row_view": "Map view (center and scale)",
+        "lpn_settings_row_contour_fill": "Contour fill",
+        "lpn_settings_row_contour_opacity": "Contour fill opacity",
+        "lpn_settings_row_contour_interval": "Contour interval",
+        "lpn_settings_row_contour_buffer": "Contour buffer",
+        "lpn_settings_row_contour_terrain": "Contour ground between nodes from Mapbox DEM",
+        "lpn_settings_row_new_asset": "New assets: {setting}",
+        "lpn_settings_row_default": "{value} (default)",
+        "lpn_settings_row_view_value": "Center {x}, {y}; scale {s}",
+        "lpn_settings_held_base": "{base}: {value}",
+        "lpn_settings_view_center": "Map center",
+        "lpn_settings_view_scale": "Map scale",
+        "lpn_settings_view_scale_tip": "The scale at the center of the map, as 1:N. Type 1:2000, or just 2000, to zoom to that scale.",
+        "lpn_settings_view_top_left": "Top left corner",
+        "lpn_settings_view_bottom_right": "Bottom right corner",
+        "lpn_settings_view_save": "Save this view in this scenario",
+        "lpn_settings_view_save_tip": "Stores this map center and scale in the open scenario, so opening that scenario moves the map here. Moving the map afterward changes nothing until you press this again. Clear the override to follow the {base} view again.",
+        "lpn_settings_row_basemap_osm": "Street map",
+        "lpn_settings_row_basemap_satellite": "Satellite images",
+        "lpn_settings_units_one_project": "Units are the same in every scenario.",
+        "lpn_settings_restore_base_only": "Switch to Base to restore the defaults.",
+        "lpn_alt_cat_presentation": "Presentation",
+        "lpn_alt_cat_calculation": "Calculation",
         "lpn_scenario_preset_mult_tip": "Demand multiplier {mult} times average day, a placeholder value. Most systems fall between {lo} and {hi} (National Research Council, 2006). Set the value for the system being modeled in Settings, Calculation, Hydraulics, Demand multiplier.",
         "lpn_engine_failed_why": "{reason} Showing the built-in solver instead.",
         "lpn_settings_basemap_style": "Basemap style",
@@ -1012,6 +1072,9 @@
         "lpn_pane_sel_only": "Selection only",
         "lpn_pane_sel_only_none": "No elements are selected. Select elements on the map first.",
         "lpn_pane_scn_show": "Show scenarios",
+        "lpn_pane_scn_ov_only": "Overrides only",
+        "lpn_pane_scn_cur_only": "Current scenario only",
+        "lpn_pane_scn_filter_note": "{filters}. Showing {n} of {all}.",
         "lpn_pane_clear_override": "Clear override",
         "lpn_pane_scn_alt_tip": "{category} alt.: {alternative}",
         "lpn_change_type_menu": "Change type",
@@ -1021,6 +1084,7 @@
         "lpn_change_type_key": "ID: Lost entry",
         "lpn_change_type_line": "{id}: {property} {value}",
         "lpn_change_type_line_scenario": "{id}: {property} {value}, in scenario {scenario}",
+        "lpn_change_type_line_alternative": "{id}: {property} {value}, in alternative {alternative}",
         "lpn_change_type_more": "And {n} more.",
         "lpn_change_type_surface": "These keep the water surface where it was. A reservoir's head is the tank's elevation plus its water depth, and a tank's water depth is the reservoir's head minus its elevation:",
         "lpn_change_type_meaning": "These controls and rules test a node being changed, and will read it differently: a junction is tested by its pressure, and a tank or reservoir by its water level.",
@@ -1030,6 +1094,9 @@
         "lpn_change_type_customers": "Only a pipe serves customers, so these customers are connected instead to the node shown in parentheses, where their demand is already applied. They stay where they are drawn, and their demand is unchanged:",
         "lpn_change_type_setting": "These controls and rules give or test the setting of a link being changed. A setting is a different quantity on a pipe, a pump, and a valve, so these will read it differently:",
         "lpn_change_type_rules": "These rule lines name a link by its kind, and will name its new kind instead:",
+        "lpn_change_type_scenario_ask": "Current scenario is not Base. Create overrides?",
+        "lpn_change_type_create_overrides": "Create overrides",
+        "lpn_change_type_switch_base": "Switch to Base",
         "lpn_find_scope_source": "Source",
         "lpn_find_source_no_chemical": "No chemical is being tracked, so no node has a source.",
         "lpn_profile_open": "Open EPANET profile file…",
@@ -1075,10 +1142,63 @@
         "lpn_valwarn_positive": "EPANET does not accept zero or a negative number here.",
         "lpn_valwarn_negative": "EPANET does not accept a negative number here.",
         "lpn_valwarn_tank_levels": "EPANET does not accept this tank. The lowest water depth must not exceed the water depth, and the water depth must not exceed the highest water depth.",
-        "lpn_alt_calc_options": "Calculation options",
-        "lpn_scenario_duration_tip": "Leave blank to inherit from parent. A total run time of 0:00 is a steady-state run.",
-        "lpn_scenario_hyd_step_tip": "Leave blank to inherit from parent.",
+        "lpn_scenario_delete_has_children": "The scenario {name} cannot be deleted while other scenarios inherit from it: {list}. Delete those first, or give them another parent.",
         "lpn_time_scn_overrides": "Scenario overrides:",
+        "lpn_settings_table_major": "Major heading",
+        "lpn_settings_table_minor": "Minor heading",
+        "lpn_settings_table_category": "Category",
+        "lpn_settings_table_owner": "Owner",
+        "lpn_settings_table_setting": "Setting",
+        "lpn_settings_table_yes": "Yes",
+        "lpn_settings_table_no": "No",
+        "lpn_settings_row_of": "{setting}, {member}",
+        "lpn_settings_row_labels_field": "{labels}: {field}",
+        "lpn_settings_row_labels_part": "{labels}: {field}, {part}",
+        "lpn_settings_row_labels_customer": "Customer labels",
+        "lpn_settings_row_label_before": "Text before",
+        "lpn_settings_row_label_after": "Text after",
+        "lpn_settings_row_label_on": "Is active",
+        "lpn_settings_row_label_show": "Show order",
+        "lpn_settings_row_label_drop": "Drop order",
+        "lpn_settings_row_id_prefix": "ID prefix",
+        "lpn_settings_row_symbol_cap_multiple": "Largest symbol, as a multiple of a typical pipe length",
+        "lpn_settings_row_symbol_cap_percentile": "Typical pipe length, as a percentile of all pipe lengths",
+        "lpn_settings_row_contour_labels": "Contour labels",
+        "lpn_settings_row_check_freq": "Status check frequency",
+        "lpn_settings_row_max_check": "Maximum status checks",
+        "lpn_settings_row_status_report": "Status report",
+        "lpn_settings_row_pda_src": "Pressure driven options stated in the file",
+        "lpn_settings_row_quality_option": "Quality option as the file states it",
+        "lpn_settings_row_tolerance": "Accuracy (older projects)",
+        "lpn_settings_row_emitter_exponent_old": "Emitter exponent (older projects)",
+        "lpn_settings_row_elev_source_old": "Elevation source (older projects)",
+        "lpn_settings_row_basemap": "Basemap",
+        "lpn_settings_row_basemap_last": "Basemap to return to",
+        "lpn_settings_row_customer_max_width": "Show customer labels when zoomed to this map width or less",
+        "lpn_settings_row_quality_step": "Quality time step",
+        "lpn_settings_row_view": "Map view (center and scale)",
+        "lpn_settings_row_contour_fill": "Contour fill",
+        "lpn_settings_row_contour_opacity": "Contour fill opacity",
+        "lpn_settings_row_contour_interval": "Contour interval",
+        "lpn_settings_row_contour_buffer": "Contour buffer",
+        "lpn_settings_row_contour_terrain": "Contour ground between nodes from Mapbox DEM",
+        "lpn_settings_row_new_asset": "New assets: {setting}",
+        "lpn_settings_row_default": "{value} (default)",
+        "lpn_settings_row_view_value": "Center {x}, {y}; scale {s}",
+        "lpn_settings_held_base": "{base}: {value}",
+        "lpn_settings_view_center": "Map center",
+        "lpn_settings_view_scale": "Map scale",
+        "lpn_settings_view_scale_tip": "The scale at the center of the map, as 1:N. Type 1:2000, or just 2000, to zoom to that scale.",
+        "lpn_settings_view_top_left": "Top left corner",
+        "lpn_settings_view_bottom_right": "Bottom right corner",
+        "lpn_settings_view_save": "Save this view in this scenario",
+        "lpn_settings_view_save_tip": "Stores this map center and scale in the open scenario, so opening that scenario moves the map here. Moving the map afterward changes nothing until you press this again. Clear the override to follow the {base} view again.",
+        "lpn_settings_row_basemap_osm": "Street map",
+        "lpn_settings_row_basemap_satellite": "Satellite images",
+        "lpn_settings_units_one_project": "Units are the same in every scenario.",
+        "lpn_settings_restore_base_only": "Switch to Base to restore the defaults.",
+        "lpn_alt_cat_presentation": "Presentation",
+        "lpn_alt_cat_calculation": "Calculation",
         "lpn_scenario_preset_mult_tip": "Demand multiplier {mult} times average day, a placeholder value. Most systems fall between {lo} and {hi} (National Research Council, 2006). Set the value for the system being modeled in Settings, Calculation, Hydraulics, Demand multiplier.",
         "lpn_engine_failed_why": "{reason} Showing the built-in solver instead.",
         "lpn_settings_basemap_style": "Basemap style",
@@ -1778,6 +1898,54 @@
                 }
             }
         },
+        "lpn_pane_scn_ov_only": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_filter_none",
+                    "value": "ဤဇယားတွင် စစ်ထုတ်မှုနှင့် ကိုက်ညီသော အရာ တစ်ခုမျှ မရှိပါ။",
+                    "english": "Nothing in this table matches the filter."
+                },
+                "next_translated": {
+                    "key": "lpn_pane_goto_tip",
+                    "value": "ဇူးမ်ပြီး ရွေးချယ်ရန်",
+                    "english": "Zoom & select"
+                }
+            }
+        },
+        "lpn_pane_scn_cur_only": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_filter_none",
+                    "value": "ဤဇယားတွင် စစ်ထုတ်မှုနှင့် ကိုက်ညီသော အရာ တစ်ခုမျှ မရှိပါ။",
+                    "english": "Nothing in this table matches the filter."
+                },
+                "next_translated": {
+                    "key": "lpn_pane_goto_tip",
+                    "value": "ဇူးမ်ပြီး ရွေးချယ်ရန်",
+                    "english": "Zoom & select"
+                }
+            }
+        },
+        "lpn_pane_scn_filter_note": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_filter_none",
+                    "value": "ဤဇယားတွင် စစ်ထုတ်မှုနှင့် ကိုက်ညီသော အရာ တစ်ခုမျှ မရှိပါ။",
+                    "english": "Nothing in this table matches the filter."
+                },
+                "next_translated": {
+                    "key": "lpn_pane_goto_tip",
+                    "value": "ဇူးမ်ပြီး ရွေးချယ်ရန်",
+                    "english": "Zoom & select"
+                }
+            }
+        },
         "lpn_pane_clear_override": {
             "reason": "missing",
             "current_value": null,
@@ -1922,6 +2090,22 @@
                 }
             }
         },
+        "lpn_change_type_line_alternative": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tables_menu",
+                    "value": "ဇယားများ",
+                    "english": "Tables"
+                },
+                "next_translated": {
+                    "key": "lpn_tables_menu_tip",
+                    "value": "ဤကွန်ရက်ရှိ အစိတ်အပိုင်းများ၏ ဇယားကို မြေပုံအောက်ရှိ ဘောင်ထဲတွင် ဖွင့်သည်။ အစိတ်အပိုင်း အမျိုးအစားတစ်ခုစီအတွက် ဇယားတစ်ခုစီ ရှိပြီး၊ ထိုနေရာတွင် စီပြီး တည်းဖြတ်နိုင်သည်။",
+                    "english": "View and edit assets in tables in bottom panel."
+                }
+            }
+        },
         "lpn_change_type_more": {
             "reason": "missing",
             "current_value": null,
@@ -2051,6 +2235,54 @@
             }
         },
         "lpn_change_type_rules": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tables_menu",
+                    "value": "ဇယားများ",
+                    "english": "Tables"
+                },
+                "next_translated": {
+                    "key": "lpn_tables_menu_tip",
+                    "value": "ဤကွန်ရက်ရှိ အစိတ်အပိုင်းများ၏ ဇယားကို မြေပုံအောက်ရှိ ဘောင်ထဲတွင် ဖွင့်သည်။ အစိတ်အပိုင်း အမျိုးအစားတစ်ခုစီအတွက် ဇယားတစ်ခုစီ ရှိပြီး၊ ထိုနေရာတွင် စီပြီး တည်းဖြတ်နိုင်သည်။",
+                    "english": "View and edit assets in tables in bottom panel."
+                }
+            }
+        },
+        "lpn_change_type_scenario_ask": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tables_menu",
+                    "value": "ဇယားများ",
+                    "english": "Tables"
+                },
+                "next_translated": {
+                    "key": "lpn_tables_menu_tip",
+                    "value": "ဤကွန်ရက်ရှိ အစိတ်အပိုင်းများ၏ ဇယားကို မြေပုံအောက်ရှိ ဘောင်ထဲတွင် ဖွင့်သည်။ အစိတ်အပိုင်း အမျိုးအစားတစ်ခုစီအတွက် ဇယားတစ်ခုစီ ရှိပြီး၊ ထိုနေရာတွင် စီပြီး တည်းဖြတ်နိုင်သည်။",
+                    "english": "View and edit assets in tables in bottom panel."
+                }
+            }
+        },
+        "lpn_change_type_create_overrides": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tables_menu",
+                    "value": "ဇယားများ",
+                    "english": "Tables"
+                },
+                "next_translated": {
+                    "key": "lpn_tables_menu_tip",
+                    "value": "ဤကွန်ရက်ရှိ အစိတ်အပိုင်းများ၏ ဇယားကို မြေပုံအောက်ရှိ ဘောင်ထဲတွင် ဖွင့်သည်။ အစိတ်အပိုင်း အမျိုးအစားတစ်ခုစီအတွက် ဇယားတစ်ခုစီ ရှိပြီး၊ ထိုနေရာတွင် စီပြီး တည်းဖြတ်နိုင်သည်။",
+                    "english": "View and edit assets in tables in bottom panel."
+                }
+            }
+        },
+        "lpn_change_type_switch_base": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
@@ -2786,51 +3018,19 @@
                 }
             }
         },
-        "lpn_alt_calc_options": {
+        "lpn_scenario_delete_has_children": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_alt_title",
-                    "value": "အခြားရွေးစရာများ ကြိုတင်ကြည့်ရှုမှု",
-                    "english": "Alternatives preview"
+                    "key": "lpn_scenario_delete_confirm",
+                    "value": "အခြေအနေ {name} နှင့် ၎င်းတစ်ခုတည်း ပိုင်ဆိုင်သော တန်ဖိုး {n} ခုကို ဖျက်မလား။ ပုံကိုယ်တိုင်ကို မပြောင်းလဲပါ။",
+                    "english": "Delete the scenario {name}, and its {n} overrides? The drawing itself is not changed."
                 },
                 "next_translated": {
-                    "key": "lpn_alt_note",
-                    "value": "ဖတ်ရန်သာ။ အခြေခံသည် အမျိုးအစားတိုင်း၏ အခြေခံ အခြားရွေးစရာကို သုံးသည်။ အခြေအနေတစ်ခုစီသည် ပြောင်းလဲထားသော အမျိုးအစားတိုင်းအတွက် ကိုယ်ပိုင် အခြားရွေးစရာတစ်ခု ရရှိပြီး၊ ၎င်းသည် အခြေခံတစ်ခု၏ သားစဉ်ဖြစ်သည်။ ကိန်းဂဏန်းသည် ၎င်းတွင် ပြောင်းလဲထားသော တန်ဖိုး မည်မျှ ရှိသည်ကို ဆိုလိုသည်။",
-                    "english": "Base uses the Base alternative of every category. Each scenario has a separate alternative, a child of the Base alternative, for any category that is changed. The number is the count of changed values. The last three columns are calculation options: enter a value for the scenario, or leave it blank to use the parent value. The project values are in Settings, Calculation, Time."
-                }
-            }
-        },
-        "lpn_scenario_duration_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_alt_note",
-                    "value": "ဖတ်ရန်သာ။ အခြေခံသည် အမျိုးအစားတိုင်း၏ အခြေခံ အခြားရွေးစရာကို သုံးသည်။ အခြေအနေတစ်ခုစီသည် ပြောင်းလဲထားသော အမျိုးအစားတိုင်းအတွက် ကိုယ်ပိုင် အခြားရွေးစရာတစ်ခု ရရှိပြီး၊ ၎င်းသည် အခြေခံတစ်ခု၏ သားစဉ်ဖြစ်သည်။ ကိန်းဂဏန်းသည် ၎င်းတွင် ပြောင်းလဲထားသော တန်ဖိုး မည်မျှ ရှိသည်ကို ဆိုလိုသည်။",
-                    "english": "Base uses the Base alternative of every category. Each scenario has a separate alternative, a child of the Base alternative, for any category that is changed. The number is the count of changed values. The last three columns are calculation options: enter a value for the scenario, or leave it blank to use the parent value. The project values are in Settings, Calculation, Time."
-                },
-                "next_translated": {
-                    "key": "lpn_alt_cat_physical",
-                    "value": "ရုပ်ပိုင်းဆိုင်ရာ",
-                    "english": "Physical"
-                }
-            }
-        },
-        "lpn_scenario_hyd_step_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_alt_note",
-                    "value": "ဖတ်ရန်သာ။ အခြေခံသည် အမျိုးအစားတိုင်း၏ အခြေခံ အခြားရွေးစရာကို သုံးသည်။ အခြေအနေတစ်ခုစီသည် ပြောင်းလဲထားသော အမျိုးအစားတိုင်းအတွက် ကိုယ်ပိုင် အခြားရွေးစရာတစ်ခု ရရှိပြီး၊ ၎င်းသည် အခြေခံတစ်ခု၏ သားစဉ်ဖြစ်သည်။ ကိန်းဂဏန်းသည် ၎င်းတွင် ပြောင်းလဲထားသော တန်ဖိုး မည်မျှ ရှိသည်ကို ဆိုလိုသည်။",
-                    "english": "Base uses the Base alternative of every category. Each scenario has a separate alternative, a child of the Base alternative, for any category that is changed. The number is the count of changed values. The last three columns are calculation options: enter a value for the scenario, or leave it blank to use the parent value. The project values are in Settings, Calculation, Time."
-                },
-                "next_translated": {
-                    "key": "lpn_alt_cat_physical",
-                    "value": "ရုပ်ပိုင်းဆိုင်ရာ",
-                    "english": "Physical"
+                    "key": "lpn_scenario_override",
+                    "value": "ဤအခြေအနေတွင်သာ",
+                    "english": "Override in this scenario"
                 }
             }
         },
@@ -2841,12 +3041,892 @@
                 "previous_translated": {
                     "key": "lpn_alt_note",
                     "value": "ဖတ်ရန်သာ။ အခြေခံသည် အမျိုးအစားတိုင်း၏ အခြေခံ အခြားရွေးစရာကို သုံးသည်။ အခြေအနေတစ်ခုစီသည် ပြောင်းလဲထားသော အမျိုးအစားတိုင်းအတွက် ကိုယ်ပိုင် အခြားရွေးစရာတစ်ခု ရရှိပြီး၊ ၎င်းသည် အခြေခံတစ်ခု၏ သားစဉ်ဖြစ်သည်။ ကိန်းဂဏန်းသည် ၎င်းတွင် ပြောင်းလဲထားသော တန်ဖိုး မည်မျှ ရှိသည်ကို ဆိုလိုသည်။",
-                    "english": "Base uses the Base alternative of every category. Each scenario has a separate alternative, a child of the Base alternative, for any category that is changed. The number is the count of changed values. The last three columns are calculation options: enter a value for the scenario, or leave it blank to use the parent value. The project values are in Settings, Calculation, Time."
+                    "english": "Base uses the Base alternative of every category. Each scenario has a separate alternative, a child of the Base alternative, for any category that is changed. The number is the count of changed values. A scenario's own settings are shown and changed in the Settings table."
                 },
                 "next_translated": {
                     "key": "lpn_alt_cat_physical",
                     "value": "ရုပ်ပိုင်းဆိုင်ရာ",
                     "english": "Physical"
+                }
+            }
+        },
+        "lpn_settings_table_major": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_alt_note",
+                    "value": "ဖတ်ရန်သာ။ အခြေခံသည် အမျိုးအစားတိုင်း၏ အခြေခံ အခြားရွေးစရာကို သုံးသည်။ အခြေအနေတစ်ခုစီသည် ပြောင်းလဲထားသော အမျိုးအစားတိုင်းအတွက် ကိုယ်ပိုင် အခြားရွေးစရာတစ်ခု ရရှိပြီး၊ ၎င်းသည် အခြေခံတစ်ခု၏ သားစဉ်ဖြစ်သည်။ ကိန်းဂဏန်းသည် ၎င်းတွင် ပြောင်းလဲထားသော တန်ဖိုး မည်မျှ ရှိသည်ကို ဆိုလိုသည်။",
+                    "english": "Base uses the Base alternative of every category. Each scenario has a separate alternative, a child of the Base alternative, for any category that is changed. The number is the count of changed values. A scenario's own settings are shown and changed in the Settings table."
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "ရုပ်ပိုင်းဆိုင်ရာ",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_settings_table_minor": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_alt_note",
+                    "value": "ဖတ်ရန်သာ။ အခြေခံသည် အမျိုးအစားတိုင်း၏ အခြေခံ အခြားရွေးစရာကို သုံးသည်။ အခြေအနေတစ်ခုစီသည် ပြောင်းလဲထားသော အမျိုးအစားတိုင်းအတွက် ကိုယ်ပိုင် အခြားရွေးစရာတစ်ခု ရရှိပြီး၊ ၎င်းသည် အခြေခံတစ်ခု၏ သားစဉ်ဖြစ်သည်။ ကိန်းဂဏန်းသည် ၎င်းတွင် ပြောင်းလဲထားသော တန်ဖိုး မည်မျှ ရှိသည်ကို ဆိုလိုသည်။",
+                    "english": "Base uses the Base alternative of every category. Each scenario has a separate alternative, a child of the Base alternative, for any category that is changed. The number is the count of changed values. A scenario's own settings are shown and changed in the Settings table."
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "ရုပ်ပိုင်းဆိုင်ရာ",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_settings_table_category": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_alt_note",
+                    "value": "ဖတ်ရန်သာ။ အခြေခံသည် အမျိုးအစားတိုင်း၏ အခြေခံ အခြားရွေးစရာကို သုံးသည်။ အခြေအနေတစ်ခုစီသည် ပြောင်းလဲထားသော အမျိုးအစားတိုင်းအတွက် ကိုယ်ပိုင် အခြားရွေးစရာတစ်ခု ရရှိပြီး၊ ၎င်းသည် အခြေခံတစ်ခု၏ သားစဉ်ဖြစ်သည်။ ကိန်းဂဏန်းသည် ၎င်းတွင် ပြောင်းလဲထားသော တန်ဖိုး မည်မျှ ရှိသည်ကို ဆိုလိုသည်။",
+                    "english": "Base uses the Base alternative of every category. Each scenario has a separate alternative, a child of the Base alternative, for any category that is changed. The number is the count of changed values. A scenario's own settings are shown and changed in the Settings table."
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "ရုပ်ပိုင်းဆိုင်ရာ",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_settings_table_owner": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_alt_note",
+                    "value": "ဖတ်ရန်သာ။ အခြေခံသည် အမျိုးအစားတိုင်း၏ အခြေခံ အခြားရွေးစရာကို သုံးသည်။ အခြေအနေတစ်ခုစီသည် ပြောင်းလဲထားသော အမျိုးအစားတိုင်းအတွက် ကိုယ်ပိုင် အခြားရွေးစရာတစ်ခု ရရှိပြီး၊ ၎င်းသည် အခြေခံတစ်ခု၏ သားစဉ်ဖြစ်သည်။ ကိန်းဂဏန်းသည် ၎င်းတွင် ပြောင်းလဲထားသော တန်ဖိုး မည်မျှ ရှိသည်ကို ဆိုလိုသည်။",
+                    "english": "Base uses the Base alternative of every category. Each scenario has a separate alternative, a child of the Base alternative, for any category that is changed. The number is the count of changed values. A scenario's own settings are shown and changed in the Settings table."
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "ရုပ်ပိုင်းဆိုင်ရာ",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_settings_table_setting": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_alt_note",
+                    "value": "ဖတ်ရန်သာ။ အခြေခံသည် အမျိုးအစားတိုင်း၏ အခြေခံ အခြားရွေးစရာကို သုံးသည်။ အခြေအနေတစ်ခုစီသည် ပြောင်းလဲထားသော အမျိုးအစားတိုင်းအတွက် ကိုယ်ပိုင် အခြားရွေးစရာတစ်ခု ရရှိပြီး၊ ၎င်းသည် အခြေခံတစ်ခု၏ သားစဉ်ဖြစ်သည်။ ကိန်းဂဏန်းသည် ၎င်းတွင် ပြောင်းလဲထားသော တန်ဖိုး မည်မျှ ရှိသည်ကို ဆိုလိုသည်။",
+                    "english": "Base uses the Base alternative of every category. Each scenario has a separate alternative, a child of the Base alternative, for any category that is changed. The number is the count of changed values. A scenario's own settings are shown and changed in the Settings table."
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "ရုပ်ပိုင်းဆိုင်ရာ",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_settings_table_yes": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_alt_note",
+                    "value": "ဖတ်ရန်သာ။ အခြေခံသည် အမျိုးအစားတိုင်း၏ အခြေခံ အခြားရွေးစရာကို သုံးသည်။ အခြေအနေတစ်ခုစီသည် ပြောင်းလဲထားသော အမျိုးအစားတိုင်းအတွက် ကိုယ်ပိုင် အခြားရွေးစရာတစ်ခု ရရှိပြီး၊ ၎င်းသည် အခြေခံတစ်ခု၏ သားစဉ်ဖြစ်သည်။ ကိန်းဂဏန်းသည် ၎င်းတွင် ပြောင်းလဲထားသော တန်ဖိုး မည်မျှ ရှိသည်ကို ဆိုလိုသည်။",
+                    "english": "Base uses the Base alternative of every category. Each scenario has a separate alternative, a child of the Base alternative, for any category that is changed. The number is the count of changed values. A scenario's own settings are shown and changed in the Settings table."
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "ရုပ်ပိုင်းဆိုင်ရာ",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_settings_table_no": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_alt_note",
+                    "value": "ဖတ်ရန်သာ။ အခြေခံသည် အမျိုးအစားတိုင်း၏ အခြေခံ အခြားရွေးစရာကို သုံးသည်။ အခြေအနေတစ်ခုစီသည် ပြောင်းလဲထားသော အမျိုးအစားတိုင်းအတွက် ကိုယ်ပိုင် အခြားရွေးစရာတစ်ခု ရရှိပြီး၊ ၎င်းသည် အခြေခံတစ်ခု၏ သားစဉ်ဖြစ်သည်။ ကိန်းဂဏန်းသည် ၎င်းတွင် ပြောင်းလဲထားသော တန်ဖိုး မည်မျှ ရှိသည်ကို ဆိုလိုသည်။",
+                    "english": "Base uses the Base alternative of every category. Each scenario has a separate alternative, a child of the Base alternative, for any category that is changed. The number is the count of changed values. A scenario's own settings are shown and changed in the Settings table."
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "ရုပ်ပိုင်းဆိုင်ရာ",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_settings_row_of": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_alt_note",
+                    "value": "ဖတ်ရန်သာ။ အခြေခံသည် အမျိုးအစားတိုင်း၏ အခြေခံ အခြားရွေးစရာကို သုံးသည်။ အခြေအနေတစ်ခုစီသည် ပြောင်းလဲထားသော အမျိုးအစားတိုင်းအတွက် ကိုယ်ပိုင် အခြားရွေးစရာတစ်ခု ရရှိပြီး၊ ၎င်းသည် အခြေခံတစ်ခု၏ သားစဉ်ဖြစ်သည်။ ကိန်းဂဏန်းသည် ၎င်းတွင် ပြောင်းလဲထားသော တန်ဖိုး မည်မျှ ရှိသည်ကို ဆိုလိုသည်။",
+                    "english": "Base uses the Base alternative of every category. Each scenario has a separate alternative, a child of the Base alternative, for any category that is changed. The number is the count of changed values. A scenario's own settings are shown and changed in the Settings table."
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "ရုပ်ပိုင်းဆိုင်ရာ",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_settings_row_labels_field": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_alt_note",
+                    "value": "ဖတ်ရန်သာ။ အခြေခံသည် အမျိုးအစားတိုင်း၏ အခြေခံ အခြားရွေးစရာကို သုံးသည်။ အခြေအနေတစ်ခုစီသည် ပြောင်းလဲထားသော အမျိုးအစားတိုင်းအတွက် ကိုယ်ပိုင် အခြားရွေးစရာတစ်ခု ရရှိပြီး၊ ၎င်းသည် အခြေခံတစ်ခု၏ သားစဉ်ဖြစ်သည်။ ကိန်းဂဏန်းသည် ၎င်းတွင် ပြောင်းလဲထားသော တန်ဖိုး မည်မျှ ရှိသည်ကို ဆိုလိုသည်။",
+                    "english": "Base uses the Base alternative of every category. Each scenario has a separate alternative, a child of the Base alternative, for any category that is changed. The number is the count of changed values. A scenario's own settings are shown and changed in the Settings table."
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "ရုပ်ပိုင်းဆိုင်ရာ",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_settings_row_labels_part": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_alt_note",
+                    "value": "ဖတ်ရန်သာ။ အခြေခံသည် အမျိုးအစားတိုင်း၏ အခြေခံ အခြားရွေးစရာကို သုံးသည်။ အခြေအနေတစ်ခုစီသည် ပြောင်းလဲထားသော အမျိုးအစားတိုင်းအတွက် ကိုယ်ပိုင် အခြားရွေးစရာတစ်ခု ရရှိပြီး၊ ၎င်းသည် အခြေခံတစ်ခု၏ သားစဉ်ဖြစ်သည်။ ကိန်းဂဏန်းသည် ၎င်းတွင် ပြောင်းလဲထားသော တန်ဖိုး မည်မျှ ရှိသည်ကို ဆိုလိုသည်။",
+                    "english": "Base uses the Base alternative of every category. Each scenario has a separate alternative, a child of the Base alternative, for any category that is changed. The number is the count of changed values. A scenario's own settings are shown and changed in the Settings table."
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "ရုပ်ပိုင်းဆိုင်ရာ",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_settings_row_labels_customer": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_alt_note",
+                    "value": "ဖတ်ရန်သာ။ အခြေခံသည် အမျိုးအစားတိုင်း၏ အခြေခံ အခြားရွေးစရာကို သုံးသည်။ အခြေအနေတစ်ခုစီသည် ပြောင်းလဲထားသော အမျိုးအစားတိုင်းအတွက် ကိုယ်ပိုင် အခြားရွေးစရာတစ်ခု ရရှိပြီး၊ ၎င်းသည် အခြေခံတစ်ခု၏ သားစဉ်ဖြစ်သည်။ ကိန်းဂဏန်းသည် ၎င်းတွင် ပြောင်းလဲထားသော တန်ဖိုး မည်မျှ ရှိသည်ကို ဆိုလိုသည်။",
+                    "english": "Base uses the Base alternative of every category. Each scenario has a separate alternative, a child of the Base alternative, for any category that is changed. The number is the count of changed values. A scenario's own settings are shown and changed in the Settings table."
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "ရုပ်ပိုင်းဆိုင်ရာ",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_settings_row_label_before": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_alt_note",
+                    "value": "ဖတ်ရန်သာ။ အခြေခံသည် အမျိုးအစားတိုင်း၏ အခြေခံ အခြားရွေးစရာကို သုံးသည်။ အခြေအနေတစ်ခုစီသည် ပြောင်းလဲထားသော အမျိုးအစားတိုင်းအတွက် ကိုယ်ပိုင် အခြားရွေးစရာတစ်ခု ရရှိပြီး၊ ၎င်းသည် အခြေခံတစ်ခု၏ သားစဉ်ဖြစ်သည်။ ကိန်းဂဏန်းသည် ၎င်းတွင် ပြောင်းလဲထားသော တန်ဖိုး မည်မျှ ရှိသည်ကို ဆိုလိုသည်။",
+                    "english": "Base uses the Base alternative of every category. Each scenario has a separate alternative, a child of the Base alternative, for any category that is changed. The number is the count of changed values. A scenario's own settings are shown and changed in the Settings table."
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "ရုပ်ပိုင်းဆိုင်ရာ",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_settings_row_label_after": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_alt_note",
+                    "value": "ဖတ်ရန်သာ။ အခြေခံသည် အမျိုးအစားတိုင်း၏ အခြေခံ အခြားရွေးစရာကို သုံးသည်။ အခြေအနေတစ်ခုစီသည် ပြောင်းလဲထားသော အမျိုးအစားတိုင်းအတွက် ကိုယ်ပိုင် အခြားရွေးစရာတစ်ခု ရရှိပြီး၊ ၎င်းသည် အခြေခံတစ်ခု၏ သားစဉ်ဖြစ်သည်။ ကိန်းဂဏန်းသည် ၎င်းတွင် ပြောင်းလဲထားသော တန်ဖိုး မည်မျှ ရှိသည်ကို ဆိုလိုသည်။",
+                    "english": "Base uses the Base alternative of every category. Each scenario has a separate alternative, a child of the Base alternative, for any category that is changed. The number is the count of changed values. A scenario's own settings are shown and changed in the Settings table."
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "ရုပ်ပိုင်းဆိုင်ရာ",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_settings_row_label_on": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_alt_note",
+                    "value": "ဖတ်ရန်သာ။ အခြေခံသည် အမျိုးအစားတိုင်း၏ အခြေခံ အခြားရွေးစရာကို သုံးသည်။ အခြေအနေတစ်ခုစီသည် ပြောင်းလဲထားသော အမျိုးအစားတိုင်းအတွက် ကိုယ်ပိုင် အခြားရွေးစရာတစ်ခု ရရှိပြီး၊ ၎င်းသည် အခြေခံတစ်ခု၏ သားစဉ်ဖြစ်သည်။ ကိန်းဂဏန်းသည် ၎င်းတွင် ပြောင်းလဲထားသော တန်ဖိုး မည်မျှ ရှိသည်ကို ဆိုလိုသည်။",
+                    "english": "Base uses the Base alternative of every category. Each scenario has a separate alternative, a child of the Base alternative, for any category that is changed. The number is the count of changed values. A scenario's own settings are shown and changed in the Settings table."
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "ရုပ်ပိုင်းဆိုင်ရာ",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_settings_row_label_show": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_alt_note",
+                    "value": "ဖတ်ရန်သာ။ အခြေခံသည် အမျိုးအစားတိုင်း၏ အခြေခံ အခြားရွေးစရာကို သုံးသည်။ အခြေအနေတစ်ခုစီသည် ပြောင်းလဲထားသော အမျိုးအစားတိုင်းအတွက် ကိုယ်ပိုင် အခြားရွေးစရာတစ်ခု ရရှိပြီး၊ ၎င်းသည် အခြေခံတစ်ခု၏ သားစဉ်ဖြစ်သည်။ ကိန်းဂဏန်းသည် ၎င်းတွင် ပြောင်းလဲထားသော တန်ဖိုး မည်မျှ ရှိသည်ကို ဆိုလိုသည်။",
+                    "english": "Base uses the Base alternative of every category. Each scenario has a separate alternative, a child of the Base alternative, for any category that is changed. The number is the count of changed values. A scenario's own settings are shown and changed in the Settings table."
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "ရုပ်ပိုင်းဆိုင်ရာ",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_settings_row_label_drop": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_alt_note",
+                    "value": "ဖတ်ရန်သာ။ အခြေခံသည် အမျိုးအစားတိုင်း၏ အခြေခံ အခြားရွေးစရာကို သုံးသည်။ အခြေအနေတစ်ခုစီသည် ပြောင်းလဲထားသော အမျိုးအစားတိုင်းအတွက် ကိုယ်ပိုင် အခြားရွေးစရာတစ်ခု ရရှိပြီး၊ ၎င်းသည် အခြေခံတစ်ခု၏ သားစဉ်ဖြစ်သည်။ ကိန်းဂဏန်းသည် ၎င်းတွင် ပြောင်းလဲထားသော တန်ဖိုး မည်မျှ ရှိသည်ကို ဆိုလိုသည်။",
+                    "english": "Base uses the Base alternative of every category. Each scenario has a separate alternative, a child of the Base alternative, for any category that is changed. The number is the count of changed values. A scenario's own settings are shown and changed in the Settings table."
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "ရုပ်ပိုင်းဆိုင်ရာ",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_settings_row_id_prefix": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_alt_note",
+                    "value": "ဖတ်ရန်သာ။ အခြေခံသည် အမျိုးအစားတိုင်း၏ အခြေခံ အခြားရွေးစရာကို သုံးသည်။ အခြေအနေတစ်ခုစီသည် ပြောင်းလဲထားသော အမျိုးအစားတိုင်းအတွက် ကိုယ်ပိုင် အခြားရွေးစရာတစ်ခု ရရှိပြီး၊ ၎င်းသည် အခြေခံတစ်ခု၏ သားစဉ်ဖြစ်သည်။ ကိန်းဂဏန်းသည် ၎င်းတွင် ပြောင်းလဲထားသော တန်ဖိုး မည်မျှ ရှိသည်ကို ဆိုလိုသည်။",
+                    "english": "Base uses the Base alternative of every category. Each scenario has a separate alternative, a child of the Base alternative, for any category that is changed. The number is the count of changed values. A scenario's own settings are shown and changed in the Settings table."
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "ရုပ်ပိုင်းဆိုင်ရာ",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_settings_row_symbol_cap_multiple": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_alt_note",
+                    "value": "ဖတ်ရန်သာ။ အခြေခံသည် အမျိုးအစားတိုင်း၏ အခြေခံ အခြားရွေးစရာကို သုံးသည်။ အခြေအနေတစ်ခုစီသည် ပြောင်းလဲထားသော အမျိုးအစားတိုင်းအတွက် ကိုယ်ပိုင် အခြားရွေးစရာတစ်ခု ရရှိပြီး၊ ၎င်းသည် အခြေခံတစ်ခု၏ သားစဉ်ဖြစ်သည်။ ကိန်းဂဏန်းသည် ၎င်းတွင် ပြောင်းလဲထားသော တန်ဖိုး မည်မျှ ရှိသည်ကို ဆိုလိုသည်။",
+                    "english": "Base uses the Base alternative of every category. Each scenario has a separate alternative, a child of the Base alternative, for any category that is changed. The number is the count of changed values. A scenario's own settings are shown and changed in the Settings table."
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "ရုပ်ပိုင်းဆိုင်ရာ",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_settings_row_symbol_cap_percentile": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_alt_note",
+                    "value": "ဖတ်ရန်သာ။ အခြေခံသည် အမျိုးအစားတိုင်း၏ အခြေခံ အခြားရွေးစရာကို သုံးသည်။ အခြေအနေတစ်ခုစီသည် ပြောင်းလဲထားသော အမျိုးအစားတိုင်းအတွက် ကိုယ်ပိုင် အခြားရွေးစရာတစ်ခု ရရှိပြီး၊ ၎င်းသည် အခြေခံတစ်ခု၏ သားစဉ်ဖြစ်သည်။ ကိန်းဂဏန်းသည် ၎င်းတွင် ပြောင်းလဲထားသော တန်ဖိုး မည်မျှ ရှိသည်ကို ဆိုလိုသည်။",
+                    "english": "Base uses the Base alternative of every category. Each scenario has a separate alternative, a child of the Base alternative, for any category that is changed. The number is the count of changed values. A scenario's own settings are shown and changed in the Settings table."
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "ရုပ်ပိုင်းဆိုင်ရာ",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_settings_row_contour_labels": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_alt_note",
+                    "value": "ဖတ်ရန်သာ။ အခြေခံသည် အမျိုးအစားတိုင်း၏ အခြေခံ အခြားရွေးစရာကို သုံးသည်။ အခြေအနေတစ်ခုစီသည် ပြောင်းလဲထားသော အမျိုးအစားတိုင်းအတွက် ကိုယ်ပိုင် အခြားရွေးစရာတစ်ခု ရရှိပြီး၊ ၎င်းသည် အခြေခံတစ်ခု၏ သားစဉ်ဖြစ်သည်။ ကိန်းဂဏန်းသည် ၎င်းတွင် ပြောင်းလဲထားသော တန်ဖိုး မည်မျှ ရှိသည်ကို ဆိုလိုသည်။",
+                    "english": "Base uses the Base alternative of every category. Each scenario has a separate alternative, a child of the Base alternative, for any category that is changed. The number is the count of changed values. A scenario's own settings are shown and changed in the Settings table."
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "ရုပ်ပိုင်းဆိုင်ရာ",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_settings_row_check_freq": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_alt_note",
+                    "value": "ဖတ်ရန်သာ။ အခြေခံသည် အမျိုးအစားတိုင်း၏ အခြေခံ အခြားရွေးစရာကို သုံးသည်။ အခြေအနေတစ်ခုစီသည် ပြောင်းလဲထားသော အမျိုးအစားတိုင်းအတွက် ကိုယ်ပိုင် အခြားရွေးစရာတစ်ခု ရရှိပြီး၊ ၎င်းသည် အခြေခံတစ်ခု၏ သားစဉ်ဖြစ်သည်။ ကိန်းဂဏန်းသည် ၎င်းတွင် ပြောင်းလဲထားသော တန်ဖိုး မည်မျှ ရှိသည်ကို ဆိုလိုသည်။",
+                    "english": "Base uses the Base alternative of every category. Each scenario has a separate alternative, a child of the Base alternative, for any category that is changed. The number is the count of changed values. A scenario's own settings are shown and changed in the Settings table."
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "ရုပ်ပိုင်းဆိုင်ရာ",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_settings_row_max_check": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_alt_note",
+                    "value": "ဖတ်ရန်သာ။ အခြေခံသည် အမျိုးအစားတိုင်း၏ အခြေခံ အခြားရွေးစရာကို သုံးသည်။ အခြေအနေတစ်ခုစီသည် ပြောင်းလဲထားသော အမျိုးအစားတိုင်းအတွက် ကိုယ်ပိုင် အခြားရွေးစရာတစ်ခု ရရှိပြီး၊ ၎င်းသည် အခြေခံတစ်ခု၏ သားစဉ်ဖြစ်သည်။ ကိန်းဂဏန်းသည် ၎င်းတွင် ပြောင်းလဲထားသော တန်ဖိုး မည်မျှ ရှိသည်ကို ဆိုလိုသည်။",
+                    "english": "Base uses the Base alternative of every category. Each scenario has a separate alternative, a child of the Base alternative, for any category that is changed. The number is the count of changed values. A scenario's own settings are shown and changed in the Settings table."
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "ရုပ်ပိုင်းဆိုင်ရာ",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_settings_row_status_report": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_alt_note",
+                    "value": "ဖတ်ရန်သာ။ အခြေခံသည် အမျိုးအစားတိုင်း၏ အခြေခံ အခြားရွေးစရာကို သုံးသည်။ အခြေအနေတစ်ခုစီသည် ပြောင်းလဲထားသော အမျိုးအစားတိုင်းအတွက် ကိုယ်ပိုင် အခြားရွေးစရာတစ်ခု ရရှိပြီး၊ ၎င်းသည် အခြေခံတစ်ခု၏ သားစဉ်ဖြစ်သည်။ ကိန်းဂဏန်းသည် ၎င်းတွင် ပြောင်းလဲထားသော တန်ဖိုး မည်မျှ ရှိသည်ကို ဆိုလိုသည်။",
+                    "english": "Base uses the Base alternative of every category. Each scenario has a separate alternative, a child of the Base alternative, for any category that is changed. The number is the count of changed values. A scenario's own settings are shown and changed in the Settings table."
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "ရုပ်ပိုင်းဆိုင်ရာ",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_settings_row_pda_src": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_alt_note",
+                    "value": "ဖတ်ရန်သာ။ အခြေခံသည် အမျိုးအစားတိုင်း၏ အခြေခံ အခြားရွေးစရာကို သုံးသည်။ အခြေအနေတစ်ခုစီသည် ပြောင်းလဲထားသော အမျိုးအစားတိုင်းအတွက် ကိုယ်ပိုင် အခြားရွေးစရာတစ်ခု ရရှိပြီး၊ ၎င်းသည် အခြေခံတစ်ခု၏ သားစဉ်ဖြစ်သည်။ ကိန်းဂဏန်းသည် ၎င်းတွင် ပြောင်းလဲထားသော တန်ဖိုး မည်မျှ ရှိသည်ကို ဆိုလိုသည်။",
+                    "english": "Base uses the Base alternative of every category. Each scenario has a separate alternative, a child of the Base alternative, for any category that is changed. The number is the count of changed values. A scenario's own settings are shown and changed in the Settings table."
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "ရုပ်ပိုင်းဆိုင်ရာ",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_settings_row_quality_option": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_alt_note",
+                    "value": "ဖတ်ရန်သာ။ အခြေခံသည် အမျိုးအစားတိုင်း၏ အခြေခံ အခြားရွေးစရာကို သုံးသည်။ အခြေအနေတစ်ခုစီသည် ပြောင်းလဲထားသော အမျိုးအစားတိုင်းအတွက် ကိုယ်ပိုင် အခြားရွေးစရာတစ်ခု ရရှိပြီး၊ ၎င်းသည် အခြေခံတစ်ခု၏ သားစဉ်ဖြစ်သည်။ ကိန်းဂဏန်းသည် ၎င်းတွင် ပြောင်းလဲထားသော တန်ဖိုး မည်မျှ ရှိသည်ကို ဆိုလိုသည်။",
+                    "english": "Base uses the Base alternative of every category. Each scenario has a separate alternative, a child of the Base alternative, for any category that is changed. The number is the count of changed values. A scenario's own settings are shown and changed in the Settings table."
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "ရုပ်ပိုင်းဆိုင်ရာ",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_settings_row_tolerance": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_alt_note",
+                    "value": "ဖတ်ရန်သာ။ အခြေခံသည် အမျိုးအစားတိုင်း၏ အခြေခံ အခြားရွေးစရာကို သုံးသည်။ အခြေအနေတစ်ခုစီသည် ပြောင်းလဲထားသော အမျိုးအစားတိုင်းအတွက် ကိုယ်ပိုင် အခြားရွေးစရာတစ်ခု ရရှိပြီး၊ ၎င်းသည် အခြေခံတစ်ခု၏ သားစဉ်ဖြစ်သည်။ ကိန်းဂဏန်းသည် ၎င်းတွင် ပြောင်းလဲထားသော တန်ဖိုး မည်မျှ ရှိသည်ကို ဆိုလိုသည်။",
+                    "english": "Base uses the Base alternative of every category. Each scenario has a separate alternative, a child of the Base alternative, for any category that is changed. The number is the count of changed values. A scenario's own settings are shown and changed in the Settings table."
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "ရုပ်ပိုင်းဆိုင်ရာ",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_settings_row_emitter_exponent_old": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_alt_note",
+                    "value": "ဖတ်ရန်သာ။ အခြေခံသည် အမျိုးအစားတိုင်း၏ အခြေခံ အခြားရွေးစရာကို သုံးသည်။ အခြေအနေတစ်ခုစီသည် ပြောင်းလဲထားသော အမျိုးအစားတိုင်းအတွက် ကိုယ်ပိုင် အခြားရွေးစရာတစ်ခု ရရှိပြီး၊ ၎င်းသည် အခြေခံတစ်ခု၏ သားစဉ်ဖြစ်သည်။ ကိန်းဂဏန်းသည် ၎င်းတွင် ပြောင်းလဲထားသော တန်ဖိုး မည်မျှ ရှိသည်ကို ဆိုလိုသည်။",
+                    "english": "Base uses the Base alternative of every category. Each scenario has a separate alternative, a child of the Base alternative, for any category that is changed. The number is the count of changed values. A scenario's own settings are shown and changed in the Settings table."
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "ရုပ်ပိုင်းဆိုင်ရာ",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_settings_row_elev_source_old": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_alt_note",
+                    "value": "ဖတ်ရန်သာ။ အခြေခံသည် အမျိုးအစားတိုင်း၏ အခြေခံ အခြားရွေးစရာကို သုံးသည်။ အခြေအနေတစ်ခုစီသည် ပြောင်းလဲထားသော အမျိုးအစားတိုင်းအတွက် ကိုယ်ပိုင် အခြားရွေးစရာတစ်ခု ရရှိပြီး၊ ၎င်းသည် အခြေခံတစ်ခု၏ သားစဉ်ဖြစ်သည်။ ကိန်းဂဏန်းသည် ၎င်းတွင် ပြောင်းလဲထားသော တန်ဖိုး မည်မျှ ရှိသည်ကို ဆိုလိုသည်။",
+                    "english": "Base uses the Base alternative of every category. Each scenario has a separate alternative, a child of the Base alternative, for any category that is changed. The number is the count of changed values. A scenario's own settings are shown and changed in the Settings table."
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "ရုပ်ပိုင်းဆိုင်ရာ",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_settings_row_basemap": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_alt_note",
+                    "value": "ဖတ်ရန်သာ။ အခြေခံသည် အမျိုးအစားတိုင်း၏ အခြေခံ အခြားရွေးစရာကို သုံးသည်။ အခြေအနေတစ်ခုစီသည် ပြောင်းလဲထားသော အမျိုးအစားတိုင်းအတွက် ကိုယ်ပိုင် အခြားရွေးစရာတစ်ခု ရရှိပြီး၊ ၎င်းသည် အခြေခံတစ်ခု၏ သားစဉ်ဖြစ်သည်။ ကိန်းဂဏန်းသည် ၎င်းတွင် ပြောင်းလဲထားသော တန်ဖိုး မည်မျှ ရှိသည်ကို ဆိုလိုသည်။",
+                    "english": "Base uses the Base alternative of every category. Each scenario has a separate alternative, a child of the Base alternative, for any category that is changed. The number is the count of changed values. A scenario's own settings are shown and changed in the Settings table."
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "ရုပ်ပိုင်းဆိုင်ရာ",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_settings_row_basemap_last": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_alt_note",
+                    "value": "ဖတ်ရန်သာ။ အခြေခံသည် အမျိုးအစားတိုင်း၏ အခြေခံ အခြားရွေးစရာကို သုံးသည်။ အခြေအနေတစ်ခုစီသည် ပြောင်းလဲထားသော အမျိုးအစားတိုင်းအတွက် ကိုယ်ပိုင် အခြားရွေးစရာတစ်ခု ရရှိပြီး၊ ၎င်းသည် အခြေခံတစ်ခု၏ သားစဉ်ဖြစ်သည်။ ကိန်းဂဏန်းသည် ၎င်းတွင် ပြောင်းလဲထားသော တန်ဖိုး မည်မျှ ရှိသည်ကို ဆိုလိုသည်။",
+                    "english": "Base uses the Base alternative of every category. Each scenario has a separate alternative, a child of the Base alternative, for any category that is changed. The number is the count of changed values. A scenario's own settings are shown and changed in the Settings table."
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "ရုပ်ပိုင်းဆိုင်ရာ",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_settings_row_customer_max_width": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_alt_note",
+                    "value": "ဖတ်ရန်သာ။ အခြေခံသည် အမျိုးအစားတိုင်း၏ အခြေခံ အခြားရွေးစရာကို သုံးသည်။ အခြေအနေတစ်ခုစီသည် ပြောင်းလဲထားသော အမျိုးအစားတိုင်းအတွက် ကိုယ်ပိုင် အခြားရွေးစရာတစ်ခု ရရှိပြီး၊ ၎င်းသည် အခြေခံတစ်ခု၏ သားစဉ်ဖြစ်သည်။ ကိန်းဂဏန်းသည် ၎င်းတွင် ပြောင်းလဲထားသော တန်ဖိုး မည်မျှ ရှိသည်ကို ဆိုလိုသည်။",
+                    "english": "Base uses the Base alternative of every category. Each scenario has a separate alternative, a child of the Base alternative, for any category that is changed. The number is the count of changed values. A scenario's own settings are shown and changed in the Settings table."
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "ရုပ်ပိုင်းဆိုင်ရာ",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_settings_row_quality_step": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_alt_note",
+                    "value": "ဖတ်ရန်သာ။ အခြေခံသည် အမျိုးအစားတိုင်း၏ အခြေခံ အခြားရွေးစရာကို သုံးသည်။ အခြေအနေတစ်ခုစီသည် ပြောင်းလဲထားသော အမျိုးအစားတိုင်းအတွက် ကိုယ်ပိုင် အခြားရွေးစရာတစ်ခု ရရှိပြီး၊ ၎င်းသည် အခြေခံတစ်ခု၏ သားစဉ်ဖြစ်သည်။ ကိန်းဂဏန်းသည် ၎င်းတွင် ပြောင်းလဲထားသော တန်ဖိုး မည်မျှ ရှိသည်ကို ဆိုလိုသည်။",
+                    "english": "Base uses the Base alternative of every category. Each scenario has a separate alternative, a child of the Base alternative, for any category that is changed. The number is the count of changed values. A scenario's own settings are shown and changed in the Settings table."
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "ရုပ်ပိုင်းဆိုင်ရာ",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_settings_row_view": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_alt_note",
+                    "value": "ဖတ်ရန်သာ။ အခြေခံသည် အမျိုးအစားတိုင်း၏ အခြေခံ အခြားရွေးစရာကို သုံးသည်။ အခြေအနေတစ်ခုစီသည် ပြောင်းလဲထားသော အမျိုးအစားတိုင်းအတွက် ကိုယ်ပိုင် အခြားရွေးစရာတစ်ခု ရရှိပြီး၊ ၎င်းသည် အခြေခံတစ်ခု၏ သားစဉ်ဖြစ်သည်။ ကိန်းဂဏန်းသည် ၎င်းတွင် ပြောင်းလဲထားသော တန်ဖိုး မည်မျှ ရှိသည်ကို ဆိုလိုသည်။",
+                    "english": "Base uses the Base alternative of every category. Each scenario has a separate alternative, a child of the Base alternative, for any category that is changed. The number is the count of changed values. A scenario's own settings are shown and changed in the Settings table."
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "ရုပ်ပိုင်းဆိုင်ရာ",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_settings_row_contour_fill": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_alt_note",
+                    "value": "ဖတ်ရန်သာ။ အခြေခံသည် အမျိုးအစားတိုင်း၏ အခြေခံ အခြားရွေးစရာကို သုံးသည်။ အခြေအနေတစ်ခုစီသည် ပြောင်းလဲထားသော အမျိုးအစားတိုင်းအတွက် ကိုယ်ပိုင် အခြားရွေးစရာတစ်ခု ရရှိပြီး၊ ၎င်းသည် အခြေခံတစ်ခု၏ သားစဉ်ဖြစ်သည်။ ကိန်းဂဏန်းသည် ၎င်းတွင် ပြောင်းလဲထားသော တန်ဖိုး မည်မျှ ရှိသည်ကို ဆိုလိုသည်။",
+                    "english": "Base uses the Base alternative of every category. Each scenario has a separate alternative, a child of the Base alternative, for any category that is changed. The number is the count of changed values. A scenario's own settings are shown and changed in the Settings table."
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "ရုပ်ပိုင်းဆိုင်ရာ",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_settings_row_contour_opacity": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_alt_note",
+                    "value": "ဖတ်ရန်သာ။ အခြေခံသည် အမျိုးအစားတိုင်း၏ အခြေခံ အခြားရွေးစရာကို သုံးသည်။ အခြေအနေတစ်ခုစီသည် ပြောင်းလဲထားသော အမျိုးအစားတိုင်းအတွက် ကိုယ်ပိုင် အခြားရွေးစရာတစ်ခု ရရှိပြီး၊ ၎င်းသည် အခြေခံတစ်ခု၏ သားစဉ်ဖြစ်သည်။ ကိန်းဂဏန်းသည် ၎င်းတွင် ပြောင်းလဲထားသော တန်ဖိုး မည်မျှ ရှိသည်ကို ဆိုလိုသည်။",
+                    "english": "Base uses the Base alternative of every category. Each scenario has a separate alternative, a child of the Base alternative, for any category that is changed. The number is the count of changed values. A scenario's own settings are shown and changed in the Settings table."
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "ရုပ်ပိုင်းဆိုင်ရာ",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_settings_row_contour_interval": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_alt_note",
+                    "value": "ဖတ်ရန်သာ။ အခြေခံသည် အမျိုးအစားတိုင်း၏ အခြေခံ အခြားရွေးစရာကို သုံးသည်။ အခြေအနေတစ်ခုစီသည် ပြောင်းလဲထားသော အမျိုးအစားတိုင်းအတွက် ကိုယ်ပိုင် အခြားရွေးစရာတစ်ခု ရရှိပြီး၊ ၎င်းသည် အခြေခံတစ်ခု၏ သားစဉ်ဖြစ်သည်။ ကိန်းဂဏန်းသည် ၎င်းတွင် ပြောင်းလဲထားသော တန်ဖိုး မည်မျှ ရှိသည်ကို ဆိုလိုသည်။",
+                    "english": "Base uses the Base alternative of every category. Each scenario has a separate alternative, a child of the Base alternative, for any category that is changed. The number is the count of changed values. A scenario's own settings are shown and changed in the Settings table."
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "ရုပ်ပိုင်းဆိုင်ရာ",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_settings_row_contour_buffer": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_alt_note",
+                    "value": "ဖတ်ရန်သာ။ အခြေခံသည် အမျိုးအစားတိုင်း၏ အခြေခံ အခြားရွေးစရာကို သုံးသည်။ အခြေအနေတစ်ခုစီသည် ပြောင်းလဲထားသော အမျိုးအစားတိုင်းအတွက် ကိုယ်ပိုင် အခြားရွေးစရာတစ်ခု ရရှိပြီး၊ ၎င်းသည် အခြေခံတစ်ခု၏ သားစဉ်ဖြစ်သည်။ ကိန်းဂဏန်းသည် ၎င်းတွင် ပြောင်းလဲထားသော တန်ဖိုး မည်မျှ ရှိသည်ကို ဆိုလိုသည်။",
+                    "english": "Base uses the Base alternative of every category. Each scenario has a separate alternative, a child of the Base alternative, for any category that is changed. The number is the count of changed values. A scenario's own settings are shown and changed in the Settings table."
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "ရုပ်ပိုင်းဆိုင်ရာ",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_settings_row_contour_terrain": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_alt_note",
+                    "value": "ဖတ်ရန်သာ။ အခြေခံသည် အမျိုးအစားတိုင်း၏ အခြေခံ အခြားရွေးစရာကို သုံးသည်။ အခြေအနေတစ်ခုစီသည် ပြောင်းလဲထားသော အမျိုးအစားတိုင်းအတွက် ကိုယ်ပိုင် အခြားရွေးစရာတစ်ခု ရရှိပြီး၊ ၎င်းသည် အခြေခံတစ်ခု၏ သားစဉ်ဖြစ်သည်။ ကိန်းဂဏန်းသည် ၎င်းတွင် ပြောင်းလဲထားသော တန်ဖိုး မည်မျှ ရှိသည်ကို ဆိုလိုသည်။",
+                    "english": "Base uses the Base alternative of every category. Each scenario has a separate alternative, a child of the Base alternative, for any category that is changed. The number is the count of changed values. A scenario's own settings are shown and changed in the Settings table."
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "ရုပ်ပိုင်းဆိုင်ရာ",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_settings_row_new_asset": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_alt_note",
+                    "value": "ဖတ်ရန်သာ။ အခြေခံသည် အမျိုးအစားတိုင်း၏ အခြေခံ အခြားရွေးစရာကို သုံးသည်။ အခြေအနေတစ်ခုစီသည် ပြောင်းလဲထားသော အမျိုးအစားတိုင်းအတွက် ကိုယ်ပိုင် အခြားရွေးစရာတစ်ခု ရရှိပြီး၊ ၎င်းသည် အခြေခံတစ်ခု၏ သားစဉ်ဖြစ်သည်။ ကိန်းဂဏန်းသည် ၎င်းတွင် ပြောင်းလဲထားသော တန်ဖိုး မည်မျှ ရှိသည်ကို ဆိုလိုသည်။",
+                    "english": "Base uses the Base alternative of every category. Each scenario has a separate alternative, a child of the Base alternative, for any category that is changed. The number is the count of changed values. A scenario's own settings are shown and changed in the Settings table."
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "ရုပ်ပိုင်းဆိုင်ရာ",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_settings_row_default": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_alt_note",
+                    "value": "ဖတ်ရန်သာ။ အခြေခံသည် အမျိုးအစားတိုင်း၏ အခြေခံ အခြားရွေးစရာကို သုံးသည်။ အခြေအနေတစ်ခုစီသည် ပြောင်းလဲထားသော အမျိုးအစားတိုင်းအတွက် ကိုယ်ပိုင် အခြားရွေးစရာတစ်ခု ရရှိပြီး၊ ၎င်းသည် အခြေခံတစ်ခု၏ သားစဉ်ဖြစ်သည်။ ကိန်းဂဏန်းသည် ၎င်းတွင် ပြောင်းလဲထားသော တန်ဖိုး မည်မျှ ရှိသည်ကို ဆိုလိုသည်။",
+                    "english": "Base uses the Base alternative of every category. Each scenario has a separate alternative, a child of the Base alternative, for any category that is changed. The number is the count of changed values. A scenario's own settings are shown and changed in the Settings table."
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "ရုပ်ပိုင်းဆိုင်ရာ",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_settings_row_view_value": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_alt_note",
+                    "value": "ဖတ်ရန်သာ။ အခြေခံသည် အမျိုးအစားတိုင်း၏ အခြေခံ အခြားရွေးစရာကို သုံးသည်။ အခြေအနေတစ်ခုစီသည် ပြောင်းလဲထားသော အမျိုးအစားတိုင်းအတွက် ကိုယ်ပိုင် အခြားရွေးစရာတစ်ခု ရရှိပြီး၊ ၎င်းသည် အခြေခံတစ်ခု၏ သားစဉ်ဖြစ်သည်။ ကိန်းဂဏန်းသည် ၎င်းတွင် ပြောင်းလဲထားသော တန်ဖိုး မည်မျှ ရှိသည်ကို ဆိုလိုသည်။",
+                    "english": "Base uses the Base alternative of every category. Each scenario has a separate alternative, a child of the Base alternative, for any category that is changed. The number is the count of changed values. A scenario's own settings are shown and changed in the Settings table."
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "ရုပ်ပိုင်းဆိုင်ရာ",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_settings_held_base": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_alt_note",
+                    "value": "ဖတ်ရန်သာ။ အခြေခံသည် အမျိုးအစားတိုင်း၏ အခြေခံ အခြားရွေးစရာကို သုံးသည်။ အခြေအနေတစ်ခုစီသည် ပြောင်းလဲထားသော အမျိုးအစားတိုင်းအတွက် ကိုယ်ပိုင် အခြားရွေးစရာတစ်ခု ရရှိပြီး၊ ၎င်းသည် အခြေခံတစ်ခု၏ သားစဉ်ဖြစ်သည်။ ကိန်းဂဏန်းသည် ၎င်းတွင် ပြောင်းလဲထားသော တန်ဖိုး မည်မျှ ရှိသည်ကို ဆိုလိုသည်။",
+                    "english": "Base uses the Base alternative of every category. Each scenario has a separate alternative, a child of the Base alternative, for any category that is changed. The number is the count of changed values. A scenario's own settings are shown and changed in the Settings table."
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "ရုပ်ပိုင်းဆိုင်ရာ",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_settings_view_center": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_alt_note",
+                    "value": "ဖတ်ရန်သာ။ အခြေခံသည် အမျိုးအစားတိုင်း၏ အခြေခံ အခြားရွေးစရာကို သုံးသည်။ အခြေအနေတစ်ခုစီသည် ပြောင်းလဲထားသော အမျိုးအစားတိုင်းအတွက် ကိုယ်ပိုင် အခြားရွေးစရာတစ်ခု ရရှိပြီး၊ ၎င်းသည် အခြေခံတစ်ခု၏ သားစဉ်ဖြစ်သည်။ ကိန်းဂဏန်းသည် ၎င်းတွင် ပြောင်းလဲထားသော တန်ဖိုး မည်မျှ ရှိသည်ကို ဆိုလိုသည်။",
+                    "english": "Base uses the Base alternative of every category. Each scenario has a separate alternative, a child of the Base alternative, for any category that is changed. The number is the count of changed values. A scenario's own settings are shown and changed in the Settings table."
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "ရုပ်ပိုင်းဆိုင်ရာ",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_settings_view_scale": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_alt_note",
+                    "value": "ဖတ်ရန်သာ။ အခြေခံသည် အမျိုးအစားတိုင်း၏ အခြေခံ အခြားရွေးစရာကို သုံးသည်။ အခြေအနေတစ်ခုစီသည် ပြောင်းလဲထားသော အမျိုးအစားတိုင်းအတွက် ကိုယ်ပိုင် အခြားရွေးစရာတစ်ခု ရရှိပြီး၊ ၎င်းသည် အခြေခံတစ်ခု၏ သားစဉ်ဖြစ်သည်။ ကိန်းဂဏန်းသည် ၎င်းတွင် ပြောင်းလဲထားသော တန်ဖိုး မည်မျှ ရှိသည်ကို ဆိုလိုသည်။",
+                    "english": "Base uses the Base alternative of every category. Each scenario has a separate alternative, a child of the Base alternative, for any category that is changed. The number is the count of changed values. A scenario's own settings are shown and changed in the Settings table."
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "ရုပ်ပိုင်းဆိုင်ရာ",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_settings_view_scale_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_alt_note",
+                    "value": "ဖတ်ရန်သာ။ အခြေခံသည် အမျိုးအစားတိုင်း၏ အခြေခံ အခြားရွေးစရာကို သုံးသည်။ အခြေအနေတစ်ခုစီသည် ပြောင်းလဲထားသော အမျိုးအစားတိုင်းအတွက် ကိုယ်ပိုင် အခြားရွေးစရာတစ်ခု ရရှိပြီး၊ ၎င်းသည် အခြေခံတစ်ခု၏ သားစဉ်ဖြစ်သည်။ ကိန်းဂဏန်းသည် ၎င်းတွင် ပြောင်းလဲထားသော တန်ဖိုး မည်မျှ ရှိသည်ကို ဆိုလိုသည်။",
+                    "english": "Base uses the Base alternative of every category. Each scenario has a separate alternative, a child of the Base alternative, for any category that is changed. The number is the count of changed values. A scenario's own settings are shown and changed in the Settings table."
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "ရုပ်ပိုင်းဆိုင်ရာ",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_settings_view_top_left": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_alt_note",
+                    "value": "ဖတ်ရန်သာ။ အခြေခံသည် အမျိုးအစားတိုင်း၏ အခြေခံ အခြားရွေးစရာကို သုံးသည်။ အခြေအနေတစ်ခုစီသည် ပြောင်းလဲထားသော အမျိုးအစားတိုင်းအတွက် ကိုယ်ပိုင် အခြားရွေးစရာတစ်ခု ရရှိပြီး၊ ၎င်းသည် အခြေခံတစ်ခု၏ သားစဉ်ဖြစ်သည်။ ကိန်းဂဏန်းသည် ၎င်းတွင် ပြောင်းလဲထားသော တန်ဖိုး မည်မျှ ရှိသည်ကို ဆိုလိုသည်။",
+                    "english": "Base uses the Base alternative of every category. Each scenario has a separate alternative, a child of the Base alternative, for any category that is changed. The number is the count of changed values. A scenario's own settings are shown and changed in the Settings table."
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "ရုပ်ပိုင်းဆိုင်ရာ",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_settings_view_bottom_right": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_alt_note",
+                    "value": "ဖတ်ရန်သာ။ အခြေခံသည် အမျိုးအစားတိုင်း၏ အခြေခံ အခြားရွေးစရာကို သုံးသည်။ အခြေအနေတစ်ခုစီသည် ပြောင်းလဲထားသော အမျိုးအစားတိုင်းအတွက် ကိုယ်ပိုင် အခြားရွေးစရာတစ်ခု ရရှိပြီး၊ ၎င်းသည် အခြေခံတစ်ခု၏ သားစဉ်ဖြစ်သည်။ ကိန်းဂဏန်းသည် ၎င်းတွင် ပြောင်းလဲထားသော တန်ဖိုး မည်မျှ ရှိသည်ကို ဆိုလိုသည်။",
+                    "english": "Base uses the Base alternative of every category. Each scenario has a separate alternative, a child of the Base alternative, for any category that is changed. The number is the count of changed values. A scenario's own settings are shown and changed in the Settings table."
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "ရုပ်ပိုင်းဆိုင်ရာ",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_settings_view_save": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_alt_note",
+                    "value": "ဖတ်ရန်သာ။ အခြေခံသည် အမျိုးအစားတိုင်း၏ အခြေခံ အခြားရွေးစရာကို သုံးသည်။ အခြေအနေတစ်ခုစီသည် ပြောင်းလဲထားသော အမျိုးအစားတိုင်းအတွက် ကိုယ်ပိုင် အခြားရွေးစရာတစ်ခု ရရှိပြီး၊ ၎င်းသည် အခြေခံတစ်ခု၏ သားစဉ်ဖြစ်သည်။ ကိန်းဂဏန်းသည် ၎င်းတွင် ပြောင်းလဲထားသော တန်ဖိုး မည်မျှ ရှိသည်ကို ဆိုလိုသည်။",
+                    "english": "Base uses the Base alternative of every category. Each scenario has a separate alternative, a child of the Base alternative, for any category that is changed. The number is the count of changed values. A scenario's own settings are shown and changed in the Settings table."
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "ရုပ်ပိုင်းဆိုင်ရာ",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_settings_view_save_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_alt_note",
+                    "value": "ဖတ်ရန်သာ။ အခြေခံသည် အမျိုးအစားတိုင်း၏ အခြေခံ အခြားရွေးစရာကို သုံးသည်။ အခြေအနေတစ်ခုစီသည် ပြောင်းလဲထားသော အမျိုးအစားတိုင်းအတွက် ကိုယ်ပိုင် အခြားရွေးစရာတစ်ခု ရရှိပြီး၊ ၎င်းသည် အခြေခံတစ်ခု၏ သားစဉ်ဖြစ်သည်။ ကိန်းဂဏန်းသည် ၎င်းတွင် ပြောင်းလဲထားသော တန်ဖိုး မည်မျှ ရှိသည်ကို ဆိုလိုသည်။",
+                    "english": "Base uses the Base alternative of every category. Each scenario has a separate alternative, a child of the Base alternative, for any category that is changed. The number is the count of changed values. A scenario's own settings are shown and changed in the Settings table."
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "ရုပ်ပိုင်းဆိုင်ရာ",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_settings_row_basemap_osm": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_alt_note",
+                    "value": "ဖတ်ရန်သာ။ အခြေခံသည် အမျိုးအစားတိုင်း၏ အခြေခံ အခြားရွေးစရာကို သုံးသည်။ အခြေအနေတစ်ခုစီသည် ပြောင်းလဲထားသော အမျိုးအစားတိုင်းအတွက် ကိုယ်ပိုင် အခြားရွေးစရာတစ်ခု ရရှိပြီး၊ ၎င်းသည် အခြေခံတစ်ခု၏ သားစဉ်ဖြစ်သည်။ ကိန်းဂဏန်းသည် ၎င်းတွင် ပြောင်းလဲထားသော တန်ဖိုး မည်မျှ ရှိသည်ကို ဆိုလိုသည်။",
+                    "english": "Base uses the Base alternative of every category. Each scenario has a separate alternative, a child of the Base alternative, for any category that is changed. The number is the count of changed values. A scenario's own settings are shown and changed in the Settings table."
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "ရုပ်ပိုင်းဆိုင်ရာ",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_settings_row_basemap_satellite": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_alt_note",
+                    "value": "ဖတ်ရန်သာ။ အခြေခံသည် အမျိုးအစားတိုင်း၏ အခြေခံ အခြားရွေးစရာကို သုံးသည်။ အခြေအနေတစ်ခုစီသည် ပြောင်းလဲထားသော အမျိုးအစားတိုင်းအတွက် ကိုယ်ပိုင် အခြားရွေးစရာတစ်ခု ရရှိပြီး၊ ၎င်းသည် အခြေခံတစ်ခု၏ သားစဉ်ဖြစ်သည်။ ကိန်းဂဏန်းသည် ၎င်းတွင် ပြောင်းလဲထားသော တန်ဖိုး မည်မျှ ရှိသည်ကို ဆိုလိုသည်။",
+                    "english": "Base uses the Base alternative of every category. Each scenario has a separate alternative, a child of the Base alternative, for any category that is changed. The number is the count of changed values. A scenario's own settings are shown and changed in the Settings table."
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "ရုပ်ပိုင်းဆိုင်ရာ",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_settings_units_one_project": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_alt_note",
+                    "value": "ဖတ်ရန်သာ။ အခြေခံသည် အမျိုးအစားတိုင်း၏ အခြေခံ အခြားရွေးစရာကို သုံးသည်။ အခြေအနေတစ်ခုစီသည် ပြောင်းလဲထားသော အမျိုးအစားတိုင်းအတွက် ကိုယ်ပိုင် အခြားရွေးစရာတစ်ခု ရရှိပြီး၊ ၎င်းသည် အခြေခံတစ်ခု၏ သားစဉ်ဖြစ်သည်။ ကိန်းဂဏန်းသည် ၎င်းတွင် ပြောင်းလဲထားသော တန်ဖိုး မည်မျှ ရှိသည်ကို ဆိုလိုသည်။",
+                    "english": "Base uses the Base alternative of every category. Each scenario has a separate alternative, a child of the Base alternative, for any category that is changed. The number is the count of changed values. A scenario's own settings are shown and changed in the Settings table."
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "ရုပ်ပိုင်းဆိုင်ရာ",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_settings_restore_base_only": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_alt_note",
+                    "value": "ဖတ်ရန်သာ။ အခြေခံသည် အမျိုးအစားတိုင်း၏ အခြေခံ အခြားရွေးစရာကို သုံးသည်။ အခြေအနေတစ်ခုစီသည် ပြောင်းလဲထားသော အမျိုးအစားတိုင်းအတွက် ကိုယ်ပိုင် အခြားရွေးစရာတစ်ခု ရရှိပြီး၊ ၎င်းသည် အခြေခံတစ်ခု၏ သားစဉ်ဖြစ်သည်။ ကိန်းဂဏန်းသည် ၎င်းတွင် ပြောင်းလဲထားသော တန်ဖိုး မည်မျှ ရှိသည်ကို ဆိုလိုသည်။",
+                    "english": "Base uses the Base alternative of every category. Each scenario has a separate alternative, a child of the Base alternative, for any category that is changed. The number is the count of changed values. A scenario's own settings are shown and changed in the Settings table."
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "ရုပ်ပိုင်းဆိုင်ရာ",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_alt_cat_presentation": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_alt_cat_text",
+                    "value": "စာသား",
+                    "english": "Text"
+                },
+                "next_translated": {
+                    "key": "lpn_scenario_push_confirm",
+                    "value": "ဤဂုဏ်သတ္တိများအတွက် အခြေအနေအားလုံးကို အခြေခံ တန်ဖိုးများ သုံးစေမလား။ ထိုအခြေအနေများ တစ်ခုတည်း ပိုင်ဆိုင်သော တန်ဖိုးများကို ပယ်ချမည်။ ဤလုပ်ဆောင်ချက်ကို နောက်ပြန်ဆွဲနိုင်ပါသည်။",
+                    "english": "Make every scenario use the Base values for these properties? Values entered for them in any scenario are discarded. You can undo this."
+                }
+            }
+        },
+        "lpn_alt_cat_calculation": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_alt_cat_text",
+                    "value": "စာသား",
+                    "english": "Text"
+                },
+                "next_translated": {
+                    "key": "lpn_scenario_push_confirm",
+                    "value": "ဤဂုဏ်သတ္တိများအတွက် အခြေအနေအားလုံးကို အခြေခံ တန်ဖိုးများ သုံးစေမလား။ ထိုအခြေအနေများ တစ်ခုတည်း ပိုင်ဆိုင်သော တန်ဖိုးများကို ပယ်ချမည်။ ဤလုပ်ဆောင်ချက်ကို နောက်ပြန်ဆွဲနိုင်ပါသည်။",
+                    "english": "Make every scenario use the Base values for these properties? Values entered for them in any scenario are discarded. You can undo this."
                 }
             }
         },
