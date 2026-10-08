@@ -2,7 +2,7 @@
     "meta": {
         "language": "bn",
         "expected_key_count": 2444,
-        "delta_key_count": 222,
+        "delta_key_count": 224,
         "exempt_key_count": 40,
         "exempt_keys": [
             "u_imgd",
@@ -762,6 +762,7 @@
         "lpn_dock_right": "Dock at the right of the map",
         "lpn_dock_float": "Float",
         "lpn_dock_autohide": "Auto-hide",
+        "lpn_popup_none": "Nothing is selected. Select an asset on the map to see its properties.",
         "lpn_hotkeys_snip_heading": "Screenshot",
         "lpn_hotkeys_snip_term": "Screenshot keyboard shortcuts",
         "lpn_hotkeys_snip_def": "<table class=\"lpn-notes-table\"><tbody><tr><td>S<\/td><td>Snip, while Screenshot is open.<\/td><\/tr><tr><td>E<\/td><td>Eraser, in the markup view.<\/td><\/tr><tr><td>Ctrl+Z, Ctrl+Y<\/td><td>Undo and redo, in the markup view.<\/td><\/tr><tr><td>Esc<\/td><td>Cancel a snip, or leave the eraser. In the markup view, close it when nothing is drawn.<\/td><\/tr><\/tbody><\/table>",
@@ -852,6 +853,7 @@
         "lpn_scenario_duration_tip": "Leave blank to inherit from parent. A total run time of 0:00 is a steady-state run.",
         "lpn_scenario_hyd_step_tip": "Leave blank to inherit from parent.",
         "lpn_time_scn_overrides": "Scenario overrides:",
+        "lpn_scenario_preset_mult_tip": "Demand multiplier {mult} times average day, a placeholder value. Most systems fall between {lo} and {hi} (National Research Council, 2006). Set the value for the system being modeled in Settings, Calculation, Hydraulics, Demand multiplier.",
         "lpn_engine_failed_why": "{reason} Showing the built-in solver instead.",
         "lpn_settings_basemap_style": "Basemap style",
         "lpn_basemap_style_normal": "Normal",
@@ -986,6 +988,7 @@
         "lpn_dock_right": "Dock at the right of the map",
         "lpn_dock_float": "Float",
         "lpn_dock_autohide": "Auto-hide",
+        "lpn_popup_none": "Nothing is selected. Select an asset on the map to see its properties.",
         "lpn_hotkeys_snip_heading": "Screenshot",
         "lpn_hotkeys_snip_term": "Screenshot keyboard shortcuts",
         "lpn_hotkeys_snip_def": "<table class=\"lpn-notes-table\"><tbody><tr><td>S<\/td><td>Snip, while Screenshot is open.<\/td><\/tr><tr><td>E<\/td><td>Eraser, in the markup view.<\/td><\/tr><tr><td>Ctrl+Z, Ctrl+Y<\/td><td>Undo and redo, in the markup view.<\/td><\/tr><tr><td>Esc<\/td><td>Cancel a snip, or leave the eraser. In the markup view, close it when nothing is drawn.<\/td><\/tr><\/tbody><\/table>",
@@ -1076,6 +1079,7 @@
         "lpn_scenario_duration_tip": "Leave blank to inherit from parent. A total run time of 0:00 is a steady-state run.",
         "lpn_scenario_hyd_step_tip": "Leave blank to inherit from parent.",
         "lpn_time_scn_overrides": "Scenario overrides:",
+        "lpn_scenario_preset_mult_tip": "Demand multiplier {mult} times average day, a placeholder value. Most systems fall between {lo} and {hi} (National Research Council, 2006). Set the value for the system being modeled in Settings, Calculation, Hydraulics, Demand multiplier.",
         "lpn_engine_failed_why": "{reason} Showing the built-in solver instead.",
         "lpn_settings_basemap_style": "Basemap style",
         "lpn_basemap_style_normal": "Normal",
@@ -1387,6 +1391,22 @@
                     "key": "lpn_popup_boxtitle",
                     "value": "বৈশিষ্ট্যসমূহ",
                     "english": "Properties"
+                }
+            }
+        },
+        "lpn_popup_none": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_popup_boxtitle",
+                    "value": "বৈশিষ্ট্যসমূহ",
+                    "english": "Properties"
+                },
+                "next_translated": {
+                    "key": "lpn_empty_hint",
+                    "value": "একটি উদাহরণ খুলতে ফাইল, নতুন প্রকল্প ব্যবহার করুন। অথবা টুলবার থেকে একটি জলাধার, জাংশন এবং পাইপ যোগ করে শুরু করুন।",
+                    "english": "Use File, New project to open an example. Or start by adding a reservoir, junction, and pipe from the toolbar."
                 }
             }
         },
@@ -2827,6 +2847,22 @@
                     "key": "lpn_alt_cat_physical",
                     "value": "ভৌত",
                     "english": "Physical"
+                }
+            }
+        },
+        "lpn_scenario_preset_mult_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scenario_preset_max_day",
+                    "value": "5. সর্বোচ্চ দিন",
+                    "english": "5. Max Day"
+                },
+                "next_translated": {
+                    "key": "lpn_scenario_preset_peak_hour",
+                    "value": "6. পিক ঘণ্টা",
+                    "english": "6. Peak hour"
                 }
             }
         },

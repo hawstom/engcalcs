@@ -98,6 +98,7 @@ on a visitor's device at all, and no server-side session state anywhere in the s
 | `lpn_reportbox` | same | The same record for the EPANET run report box (same ruling) |
 | `lpn_statusbox` | same | The same record for the Status report box (Task 716, same ruling) |
 | `lpn_fullbox` | same | The same record for the Full report box (Task 715, same ruling) |
+| `lpn_dockbox` | same | Where the five boxes that keep no record of their own (Properties, Criticality analysis, Demand scaling, Alternatives, Calibration report) are docked: per box, its edge, whether it auto-hides, its docked width, its rank along the edge, and whether it is open. Nothing about where those boxes float, which still lasts one page load. An entry exists only while that box is docked, and the key is removed when none is (Tom, 2026-10-07: *"All the docks I make need to be remembered."*). Same purpose and category as the box records above |
 | `lpn_contourbox` | same | The same record for the Contour plot box (Task 600, same ruling). Where it sits and whether it is open only; every contour setting is the project's |
 | `lpn_notesbox` | same | Where the Notes box was left, how big it was made, and whether it was open (Tom, 2026-09-28: *"Draggable non-hog box for Help, Notes. I need it open for my spreadsheet editing video."*). It was a centred, click-away-dismissed popover until then; it now keeps the same kind of record as the boxes above it, for the same reason: a panel layout the visitor set deliberately |
 | `lpn_hotkeysbox` | same | Where the Help > Guide box (the Tables and Hotkeys box until 2026-10-06) was left, how big it was made, and whether it was open, and whether its Contents rail was collapsed (Task 745, 2026-09-29; the rail flag added 2026-10-07 inside the same record). Same shell, same memory and same category as `lpn_notesbox` immediately above it |
@@ -110,16 +111,16 @@ on a visitor's device at all, and no server-side session state anywhere in the s
 | `lpn_survey_format` | same | Which column order was last chosen when importing a surveyed point list, so the next file opens on the same answer (Task 592). One of eight names such as `PNEZD`, and nothing from the file itself: the coordinates it described have already become junctions by the time it is written. A preference the visitor set deliberately, on this screen, and a fact about the instrument their files come out of rather than about any network |
 | `bpn_sketch_toggles` | `js/branched-network.js` | Which of the five data fields (length, diameter, flow, elevation, pressure) the Branched-Network topology sketch shows. The checkboxes live outside the form, so the page's own input cookie never captures them |
 
-**Docking rides on the box records above, with no new key (Task 441, 2026-10-03).** `lpn_findbox`,
+**Docking rides on the box records above (Task 441, 2026-10-03); the five boxes with no record of their own keep theirs in `lpn_dockbox`.** `lpn_findbox`,
 `lpn_setbox`, `lpn_libbox`, `lpn_ffbox`, `lpn_energybox`, `lpn_cmpbox`, `lpn_reportbox`,
 `lpn_statusbox`, `lpn_fullbox`, `lpn_contourbox`, `lpn_notesbox`, `lpn_hotkeysbox` and `lpn_snipbox` may each also
 hold `dock` (`left` or `right`: the box is docked beside the map on that side), `autohide` (`true`:
 it tucks into a tab at the map's edge), `dockW` (its docked width in pixels) and `dockOrd` (its
-tab's rank along the bar, set when the visitor drags the tab or presses Alt+Arrow on it). Each field is
+rank along its edge, set when the box is docked and when the visitor drags its tab or presses Alt+Arrow on it). Each field is
 absent while it is the default, so a visitor who never docks a box stores nothing new. Same purpose
 and category as the position and size beside them: a panel layout the visitor set deliberately.
-The Properties, Criticality, Demand scaling, Alternatives and Calibration boxes keep no record, so
-their docking lasts for the page load only.
+The Properties, Criticality, Demand scaling, Alternatives and Calibration boxes keep no record of
+their own, so the same fields for them, plus whether each docked one is open, sit in `lpn_dockbox`.
 
 The first three are **exempt** — they hold the document the user made in order to give it back to
 them. So are the rest, on the second limb of the same test: `lpn_identity` is strictly necessary for

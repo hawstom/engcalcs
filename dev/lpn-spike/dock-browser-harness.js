@@ -11,7 +11,7 @@
 //      brings it back docked. Find docked on the same side shares the column, stacked. Float hands
 //      the box back to the corner it floated at and the map its width, and the fields go. A drag on a
 //      docked box's title band floats it; a click there does not.
-//   2b. Properties docks too (a page-load choice), and a click on a node fills the column.
+//   2b. Properties docks too (its dock kept in lpn_dockbox), and a click on a node fills the column.
 //   3. AUTO-HIDE. The pin tucks the box into a tab on a strip at the map's edge (the box is still
 //      open, only invisible), the map keeps the strip's width, hovering the tab flies it out over the
 //      map, leaving tucks it, a click on the tab flies it out with the keyboard inside, Escape tucks
@@ -238,7 +238,7 @@ async function sectionDock(Session, browser) {
 
 // ---------------------------------------------------------------------------------------------
 async function sectionProperties(Session, browser) {
-	console.log('\n--- 2e. the Properties box docks, for this page load ---');
+	console.log('\n--- 2e. the Properties box docks, and its dock is remembered ---');
 	const a = await openNet3(Session, browser);
 	try {
 		const keysBefore = await storageKeys(a.page);
@@ -262,7 +262,12 @@ async function sectionProperties(Session, browser) {
 		g = await geom(a.page, 'lpn_popup');
 		await shot(a.page, 'dock-properties');
 		ok('...and the next junction clicked opens in the column, not beside the junction', g.open && g.docked && g.box.l <= 2);
-		ok('...with nothing written to storage for it', (await storageKeys(a.page)).filter((k) => keysBefore.indexOf(k) < 0 && !/^lpn_(project_|index)/.test(k)).length === 0);
+		// Properties keeps no record of its own; its dock alone is kept in `lpn_dockbox` (Tom, 2026-10-07:
+		// "All the docks I make need to be remembered."), and nothing else is written for it.
+		const added = (await storageKeys(a.page)).filter((k) => keysBefore.indexOf(k) < 0 && !/^lpn_(project_|index)/.test(k));
+		const kept = await stored(a.page, 'lpn_dockbox');
+		ok('...with only its dock written to storage, in lpn_dockbox', JSON.stringify(added) === '["lpn_dockbox"]' &&
+			kept && kept.lpn_popup && kept.lpn_popup.dock === 'left' && Object.keys(kept).length === 1, JSON.stringify({ added, kept }));
 		ok('no uncaught page errors', a.errors.length === 0, a.errors.slice(0, 2).join(' | '));
 	} finally {
 		await a.close();

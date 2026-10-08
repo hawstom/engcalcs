@@ -698,3 +698,4 @@ red builds on 2026-09-15 before anybody wrote it down.
 - 0|769| CLOSED 2026-10-06: Change type for nodes and links, the key line "ID: Lost entry" listing what is lost, one undo. Tom: "Merge." `feat/asset-type`.
 - 0|768| CLOSED 2026-10-07 (`feat/feedback`, Tom: "Merge."): "Something wrong here?" opens a box with canned picks, optional comment and email; Send is the second click.
 - 0|771| CLOSED 2026-10-07 (`feat/survey-code`, Tom: "Merge."): survey points as a script, the Description naming an asset or a pipe vertex; JPN<point> joins a tee.
+- 0|780| CLOSED 2026-10-07 (`feat/epp`, Tom: "Do it"): Save writes `.epp`; Open reads `.epp`, `.lwn` and `.json` forever. The file's content and `format` key are unchanged; `LPN_FILE_EXT` is `.epp`, `LPN_FILE_EXT_LWN` is read-only.

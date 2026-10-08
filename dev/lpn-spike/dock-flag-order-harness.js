@@ -142,7 +142,8 @@ async function keyboardCase(Session, browser) {
 		await a.page.keyboard.press('Escape');
 		await a.settle(300);
 		ok('...Escape tucks it, and the order is unchanged', JSON.stringify(await tabs(a.page)) === JSON.stringify(t0) && (await boxes(a.page, IDS)).every((v) => !v));
-		ok('no order is stored until a flag is moved', (await stored(a.page, 'lpn_setbox')).dockOrd === undefined);
+		// Every dock carries its rank from the moment it docks (Tom, 2026-10-07: new docks go to the bottom).
+		ok('each box stores its rank from the moment it docks (Settings second)', (await stored(a.page, 'lpn_setbox')).dockOrd === 1);
 		await a.page.focus(SEL);
 		await a.page.keyboard.press('Alt+ArrowDown');
 		await a.page.keyboard.press('Alt+ArrowDown');
@@ -162,7 +163,7 @@ async function keyboardCase(Session, browser) {
 }
 
 async function mixedCase(Session, browser) {
-	console.log('\n--- a box with no layout record among the flags ---');
+	console.log('\n--- a box with no layout record of its own among the flags ---');
 	const a = await openNet3(Session, browser);
 	try {
 		await threeFlags(a);
@@ -179,17 +180,16 @@ async function mixedCase(Session, browser) {
 		if (propsOpen) {
 			await hideBox(a, 'lpn_popup');
 			let t = await tabs(a.page);
-			ok('four flags, Properties among them', t.length === 4, JSON.stringify(t));
-			await drag(a, t.length - 1, -400, 'mouse');
+			ok('four flags, Properties docked last and so last', t.length === 4 && t[3] === 'Properties', JSON.stringify(t));
+			await drag(a, 2, -300, 'mouse');
 			t = await tabs(a.page);
-			ok('Libraries dragged to the front is first, Properties second', t[0] === 'Libraries' && t[1] === 'Properties', JSON.stringify(t));
+			ok('Libraries dragged to the front is first, Properties still last', t[0] === 'Libraries' && t[3] === 'Properties', JSON.stringify(t));
 			ok('...no drag mark left stuck', (await stuck(a.page)) === 0);
-			const rest = t.filter((x) => x !== 'Properties');
 			await reload(a);
 			const after = await tabs(a.page);
-			// Properties' docking is for the page load only (it keeps no record), so after a reload the
-			// three recorded boxes remain, in the order the drag left them.
-			ok('after a reload the recorded boxes keep their dragged order and Properties is not a flag', JSON.stringify(after) === JSON.stringify(rest), JSON.stringify({ after, rest }));
+			// Properties keeps no record of its own; its dock lives in `lpn_dockbox` (Tom, 2026-10-07:
+			// "All the docks I make need to be remembered."), so all four come back in the dragged order.
+			ok('after a reload all four flags, Properties among them, keep their dragged order', JSON.stringify(after) === JSON.stringify(t), JSON.stringify({ after, t }));
 		}
 		ok('no uncaught page errors', a.errors.length === 0, a.errors.slice(0, 2).join(' | '));
 	} finally { await a.close(); }
