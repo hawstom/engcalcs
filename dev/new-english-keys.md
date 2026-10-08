@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**72 still to read on master**, of 76 untranslated keys, of 2520 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**74 still to read on master**, of 78 untranslated keys, of 2522 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -139,7 +139,7 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   @@ NEEDS RULING
 
-## lpn_  (76, 72 to read @@ NEEDS RULING)
+## lpn_  (78, 74 to read @@ NEEDS RULING)
 
 - **`lpn_dxf_export_failed`**
   > The DXF file was not written: an error in this page stopped it ({error}).
@@ -345,6 +345,12 @@ never edits a synonym.
 - **`lpn_pane_copy_heads`**
   > Copy with headings
   @@ NEEDS RULING
+- **`lpn_settings_hover_card`**
+  > Show the full label on hover
+  @@ NEEDS RULING
+- **`lpn_settings_hover_card_tip`**
+  > Rest the pointer on a node, link or customer to see its label as specified in Settings at any scale, fit or not. This is a setting for this browser, not for the project.
+  @@ NEEDS RULING
 - **`lpn_workspace_confirm`**
   > Replace this browser's workspace layout with the one in the file?
   _Ruled 2026-10-08: Calls page 8 October: his own text, "Replace this browser's workspace layout with the one in the file?"_
@@ -374,7 +380,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**71 still to read**, of 74 new keys across 14 unmerged branch(es).
+**72 still to read**, of 75 new keys across 12 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -385,7 +391,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/bentley-interop (`07ca4206`) — 63 new, 63 to read @@ NEEDS RULING
+### feat/bentley-interop (`85dd485e`) — 66 new, 66 to read @@ NEEDS RULING
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -393,17 +399,26 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_alt_cat_presentation`**
   > Presentation
   @@ NEEDS RULING
-- **`lpn_change_type_create_overrides`**
-  > Create overrides
+- **`lpn_change_type_create_new`**
+  > Create new assets
   @@ NEEDS RULING
 - **`lpn_change_type_line_alternative`**
   > {id}: {property} {value}, in alternative {alternative}
   @@ NEEDS RULING
+- **`lpn_change_type_not_carried`**
+  > The new assets cannot hold these values. The old assets keep them:
+  @@ NEEDS RULING
+- **`lpn_change_type_old_controls`**
+  > These controls and rules name an old asset, which is inactive in this scenario, so they are omitted from this scenario's run:
+  @@ NEEDS RULING
 - **`lpn_change_type_scenario_ask`**
-  > Current scenario is not Base. Create overrides?
+  > Current scenario is not Base. Create new assets? The selected assets become inactive in this scenario.
   @@ NEEDS RULING
 - **`lpn_change_type_switch_base`**
   > Switch to Base
+  @@ NEEDS RULING
+- **`lpn_pane_inactive_show`**
+  > Include inactive topology
   @@ NEEDS RULING
 - **`lpn_pane_scn_cur_only`**
   > Current scenario only
@@ -579,15 +594,6 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/desktop (`baba0f04`) — adds no English strings
 
-### feat/hover-label (`31b137e5`) — 2 new, 2 to read @@ NEEDS RULING
-
-- **`lpn_settings_hover_card`**
-  > Show the full label on hover
-  @@ NEEDS RULING
-- **`lpn_settings_hover_card_tip`**
-  > Rest the pointer on a node, link or customer to see its label as specified in Settings at any scale, fit or not. This is a setting for this browser, not for the project.
-  @@ NEEDS RULING
-
 ### feat/label-gang-search (`8b31a907`) — 3 new, all ruled
 
 - **`lpn_confirm_labels_restore`**
@@ -634,8 +640,6 @@ build for that would be a gate nobody keeps. Refresh it with
   > Points data<br />(use Copy to see format)
   @@ NEEDS RULING
 
-### feat/user-guide (`468f016d`) — adds no English strings
+### feat/user-guide (`02d288c4`) — adds no English strings
 
 ### feat/visit-dedupe (`7b4a84bd`) — adds no English strings
-
-### fix/dock-box-width (`a6d2fd3e`) — adds no English strings
