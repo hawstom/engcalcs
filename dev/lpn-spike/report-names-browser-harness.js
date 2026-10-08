@@ -76,7 +76,11 @@ async function main() {
 		const reps = await rowTexts(a, '#lpn_menu_list2');
 		ok('rows read Run, Status changes, Calibration, Full', JSON.stringify(reps.slice(2)) === JSON.stringify(['Run', 'Status changes', 'Calibration', 'Full']), reps.join(' | '));
 		ok('no row says EPANET', !reps.some((t) => /EPANET/.test(t)), reps.join(' | '));
-		const cases = [['Run', 'lpn_rptbox', 'EPANET run report'], ['Status changes', 'lpn_status_box', 'Status changes'], ['Full', 'lpn_full_box', null], ['Calibration', 'lpn_calib_box', null]];
+		const L = async (k) => (await a.lang(k)).trim();
+		const names = { run: await L('lpn_reports_epanet'), status: await L('lpn_reports_status'), calib: await L('lpn_reports_calib'), full: await L('lpn_reports_full') };
+		ok('row texts are the language strings, none naming EPANET', JSON.stringify(reps.slice(2)) === JSON.stringify([names.run, names.status, names.calib, names.full]) && !/EPANET/.test(names.run + names.status));
+		const cases = [[names.run, 'lpn_rptbox', await L('lpn_time_run_report')], [names.status, 'lpn_status_box', await L('lpn_status_title')], [names.full, 'lpn_full_box', null], [names.calib, 'lpn_calib_box', null]];
+		const noReport = await L('lpn_time_no_report');
 		for (const [row, box, title] of cases) {
 			await openReports();
 			await P.evaluate((t) => {
@@ -89,9 +93,9 @@ async function main() {
 				const t = document.getElementById(id.replace('_box','box') + '_title');
 				return { shown: !!b && b.style.display !== 'none', title: t ? t.textContent.trim() : null };
 			}, box);
-			if (row === 'Run') {
+			if (row === names.run) {
 				// No run yet: the row answers with a notice instead of an empty box.
-				const said = await P.evaluate(() => /no run report yet/i.test(document.body.innerText));
+				const said = await P.evaluate((nr) => document.body.innerText.indexOf(nr) >= 0, noReport);
 				ok('Run answers with the no-report notice (nothing calculated yet)', info.shown || said, JSON.stringify(info));
 			} else {
 				ok(row + ' opens ' + box, info.shown, JSON.stringify(info));
