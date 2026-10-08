@@ -13,11 +13,56 @@ EngCalcs.cookieFormatVersion = 1;
 // the session cookie server-side, the offline beacon queue in IndexedDB client-side -- is
 // allowed only on an explicit yes. Everything this file itself writes is exempt and needs no
 // consent: a cookie holding the numbers the visitor typed, written only after they typed them.
+//
+// THE SAME RULE AS ecConsentState() in lib/config.inc.php, and it must stay in step: '2' (Allow all)
+// is a yes for every version, '1' (Allow this) only for the version it was given for, anything else
+// is no. Until 2026-10-08 this read only the first character, so Allow all read as NO here and an
+// out-of-date Allow this read as yes. EngCalcs.consentVersion is written into every page by
+// lib/HeadersFooters.lib.php; without it an Allow this cannot be checked, so it reads as no.
 EngCalcs.analyticsConsented = function () {
 	"use strict";
 	var match = /(?:^|;\s*)ec_consent=([^;]*)/.exec(document.cookie);
-	return !!match && decodeURIComponent(match[1]).charAt(0) === '1';
+	if (!match) { return false; }
+	var parts = decodeURIComponent(match[1]).split('.');
+	if (parts[0] === '2') { return true; }
+	return parts[0] === '1' && typeof EngCalcs.consentVersion === 'string'
+		&& (parts[2] || '') === EngCalcs.consentVersion;
 };
+
+// THE BROWSER CODE (Tom, 2026-10-08, call F01). Sixteen lowercase hex characters from the
+// browser's cryptographic random source, made only for a browser that said yes, so that the usage
+// report can count distinct browsers as well as uses. lib/config.inc.php (EC_CODE_COOKIE) carries
+// the full argument; the server makes and renews the same cookie on every page view, and this is
+// its twin for the moment of the yes, which happens without a page load. Written again on every
+// call so its 400 days restart from today, which is the renewal on each day's first visit.
+var EC_CODE_COOKIE = 'ec_code';
+EngCalcs.countCodeEnsure = function () {
+	"use strict";
+	if (!this.analyticsConsented()) { return; }
+	var match = /(?:^|;\s*)ec_code=([0-9a-f]{16})(?:;|$)/.exec(document.cookie);
+	var code = match ? match[1] : '';
+	if (!code) {
+		if (!window.crypto || !window.crypto.getRandomValues) { return; } // no strong source: no code
+		var bytes = new Uint8Array(8), i;
+		window.crypto.getRandomValues(bytes);
+		for (i = 0; i < bytes.length; i++) { code += (bytes[i] < 16 ? '0' : '') + bytes[i].toString(16); }
+	}
+	var expires = new Date(Date.now() + 400 * 86400000).toUTCString();
+	var secure = (location.protocol === 'https:') ? '; Secure' : '';
+	document.cookie = EC_CODE_COOKIE + '=' + code + '; expires=' + expires + '; path=/; SameSite=Lax' + secure;
+};
+// Called on a no (Refuse all, or a withdrawal from the banner). The server deletes it too, on the
+// next request, for every other way consent can end.
+EngCalcs.countCodeForget = function () {
+	"use strict";
+	document.cookie = EC_CODE_COOKIE + '=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/';
+};
+// A said-yes browser on a page the service worker served from its cache never reached the server's
+// renewal, so the page renews it itself once the page's own settings are in.
+document.addEventListener('DOMContentLoaded', function () {
+	"use strict";
+	EngCalcs.countCodeEnsure();
+});
 
 EngCalcs.createCookie = function () {
 	"use strict";

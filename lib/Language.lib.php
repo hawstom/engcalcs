@@ -21,7 +21,7 @@
   *
   */
 // $source: 'get' = explicit ?lang=XX (every occurrence)
-//          'cookie' = returning user with saved preference (once per ec_seen year)
+//          'cookie' = returning user with saved preference (once per visit, via ec_seen)
 //          'browser' = Accept-Language auto-detection (once per browser, via ec_blang)
 //          'view' = a later page in a session whose language was already pinned by one of the
 //                   above (once per session per page). Exists purely so LANG_LOG's page/lang

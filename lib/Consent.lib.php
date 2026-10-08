@@ -142,6 +142,9 @@ function echoConsentBanner() {
 		var secure = (location.protocol === 'https:') ? '; Secure' : '';
 		document.cookie = 'ec_consent=' + value + '; expires=' + expires + '; path=/; SameSite=Lax' + secure;
 		if (answer === '0') forget();
+		// The browser code (call F01, 2026-10-08) is made at the moment of the yes, so the counts
+		// this page sends from now on already carry it.
+		if (answer !== '0' && window.EngCalcs && typeof EngCalcs.countCodeEnsure === 'function') EngCalcs.countCodeEnsure();
 		if (current) current.textContent = texts[answer] || '';
 	}
 
@@ -151,6 +154,8 @@ function echoConsentBanner() {
 	// offline beacon queue.
 	function forget() {
 		if (window.EngCalcs && typeof EngCalcs.flushQueue === 'function') EngCalcs.flushQueue();
+		// The browser code is readable by JS on purpose, so it goes now rather than on the next request.
+		if (window.EngCalcs && typeof EngCalcs.countCodeForget === 'function') EngCalcs.countCodeForget();
 	}
 
 	if (form) {

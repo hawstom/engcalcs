@@ -338,7 +338,7 @@ unset($ec_canonical_host, $ec_colon, $ec_canonical_dev_alias, $ec_canonical_dev_
 // Language demand log — stored in log/ at the project root, blocked from HTTP by log/.htaccess.
 // Each line: ISO-8601 UTC timestamp TAB lang-code TAB source TAB page-basename
 //   source='get'     explicit ?lang=XX selection — logged every occurrence
-//   source='cookie'  returning user with saved preference — logged once per browser while its ec_seen cookie lasts (one year)
+//   source='cookie'  returning user with saved preference — logged once per visit (ec_seen)
 //   source='browser' raw first Accept-Language tag (e.g. es-MX, zh-TW) — logged once ever per browser via ec_blang cookie
 //   source='anon'    a page load by somebody who has not consented to being counted once rather
 //                    than every time (Task 286). Carries the same raw Accept-Language tag as
@@ -349,6 +349,10 @@ unset($ec_canonical_host, $ec_colon, $ec_canonical_dev_alias, $ec_canonical_dev_
 // below for why it is not the optional marker it used to be. Rows written before 2026-08-21 carry
 // 'visit' or no column at all, and a last field holding neither token is a legacy 'visitor' row.
 // THE TWO ARE NEVER SUMMED: one counts people, the other counts page loads.
+// THE BROWSER CODE (Tom, 2026-10-08, call F01). Since then a 'visitor' row also carries this
+// browser's random code (EC_CODE_COOKIE below) as the field just before the bucket, so the report
+// can count distinct browsers. Rows before that date have no code; a code is recognised only on a
+// 'visitor' row and only as exactly 16 lowercase hex characters, which no older column can be.
 // Run log/lang-log-stats.sh to analyze.
 // The directory every usage log is written in. ONE override, for harnesses only: under PHP's own
 // development server (`php -S`, SAPI 'cli-server', which no production host runs) the environment
@@ -532,7 +536,9 @@ function ecLogTester($event, $page = '') {
     if (!is_dir($dir)) {
         @mkdir($dir, 0750, true);
     }
-    $line = gmdate('Y-m-d\TH:i:s\Z') . "\t" . $event . "\t" . $page . ecLogBucketSuffix() . "\n";
+    // No browser code here: a tester is counted on the side, never as a browser.
+    $bucket = ecLogBucketSuffix(false);
+    $line = gmdate('Y-m-d\TH:i:s\Z') . "\t" . $event . "\t" . $page . $bucket . "\n";
     @file_put_contents(TESTER_LOG, $line, FILE_APPEND | LOCK_EX);
 }
 
@@ -607,6 +613,7 @@ function ecTesterDayTally() {
 // to localStorage exactly as to cookies. Two things here fail that test and one is mixed:
 //
 //   ec_blang   analytics only; exists so a browser-language statistic is counted once per browser.
+//   ec_code    analytics only; the random browser code (EC_CODE_COOKIE below, since 2026-10-08).
 //   PHPSESSID  MIXED — after this task it is analytics ONLY. Its other job (remembering a chosen
 //              language) moved to the ec_language cookie, which the visitor set deliberately and
 //              which is therefore exempt on its own footing. See lib/Language.lib.php.
@@ -623,7 +630,10 @@ function ecTesterDayTally() {
 // cannot evidence is not much of a consent, and because bumping EC_CONSENT_VERSION is how a
 // materially changed notice re-asks everybody without a second mechanism.
 define('EC_CONSENT_COOKIE', 'ec_consent');
-define('EC_CONSENT_VERSION', '1');
+// '2' since 2026-10-08 (Tom, call F01): the ask changed from "a one-digit cookie" to "a random
+// code", so everybody who chose "Allow this" under version 1 is asked again. "Allow all" ('2') and
+// "Refuse all" ('0') are answered for every version and are not.
+define('EC_CONSENT_VERSION', '2');
 define('EC_CONSENT_DAYS', 365);
 
 // The de-duplication store: ONE DIGIT PER PAGE, and no identifier of any kind (ROADMAP Task 288).
@@ -638,7 +648,7 @@ define('EC_CONSENT_DAYS', 365);
 // HUMAN_VIEW_LOGGED[page|lang], CALC_USAGE_LOGGED[page] and TITLE_LOGGED[page|field]. Every one of
 // those is the same question — "have we already counted this?" — and none of them needed an
 // identifier to answer it. So there is no session any more, no server-side state, and nothing
-// stored that could single a visitor out. What remains is a one-year cookie holding, per page
+// stored that could single a visitor out. What remains is a session cookie holding, per page
 // visited, one base-32 digit whose bits are:
 //
 //   1  the language 'view' row for this page                (was LANG_VIEW_LOGGED)
@@ -656,7 +666,6 @@ define('EC_CONSENT_DAYS', 365);
 // better: if ANY page carries it, this browser has already dwelt somewhere, so no timestamp needs
 // storing at all. One less thing on the device, and one less thing to explain.
 define('EC_SEEN_COOKIE', 'ec_seen');
-define('EC_SEEN_DAYS', 365);
 define('EC_SEEN_LANG_VIEW', 1);
 define('EC_SEEN_HUMAN_VIEW', 2);
 define('EC_SEEN_CALC', 4);
@@ -669,6 +678,56 @@ define('EC_SEEN_SUBTITLE', 16);
 // because every page would log 'view' and nothing would ever log 'cookie'.
 define('EC_SEEN_VISIT', '_v');
 define('EC_SEEN_DEMAND', 1);
+
+// THE BROWSER CODE (Tom, 2026-10-08, call F01: "Go (random code, new consent text)").
+//
+// The question it answers: how many BROWSERS use each part of the site, in any window, and not
+// only how many times it was used. Something has to recognise a browser again across days to
+// answer that, and the proposal Tom approved is a code kept in the browser: *"after a visitor says
+// yes, the browser makes a random code (16 characters, derived from nothing about the person or
+// device). Every log row carries it."* Distinct codes are browsers; rows are uses.
+//
+//   VALUE     16 lowercase hex characters (64 bits) from a cryptographic random source:
+//             random_bytes() here, crypto.getRandomValues() in js/Cookies.lib.js. Nothing about
+//             the visitor, the device or the visit goes into it.
+//   LIFETIME  400 days, the most a browser will keep any cookie, written again on every page view
+//             (so on each day's first visit too). Doing it only once a day would need the date
+//             stored beside the code; renewing every time stores nothing more.
+//   WHO       Only a browser that said yes (ecAnalyticsConsented() here, EngCalcs.analyticsConsented()
+//             in JS). Deleted on Refuse all, on withdrawal, on a stale "Allow this" and by Start
+//             fresh / Erase everything (all through ecForgetAnalyticsStorage()).
+//   READABLE  by JavaScript, unlike ec_seen: the banner makes the code at the moment of the yes,
+//             without a page load, and deletes it at the moment of a no.
+//
+// Visitors who refuse get no code; their rows still count as page loads, never as browsers.
+define('EC_CODE_COOKIE', 'ec_code');
+define('EC_CODE_DAYS', 400);
+
+/** This browser's code, or '' when it has none (or carries something we did not write). */
+function ecCountCode() {
+    if (!ecAnalyticsConsented() || empty($_COOKIE[EC_CODE_COOKIE])) return '';
+    $code = (string) $_COOKIE[EC_CODE_COOKIE];
+    return preg_match('/^[0-9a-f]{16}$/', $code) === 1 ? $code : '';
+}
+
+/**
+ * Makes the code if a said-yes browser has none, and renews its 400 days either way. Called on
+ * every PAGE VIEW from lib/base.inc.php (never from a beacon). A browser that has not said yes is
+ * left alone: nothing is written for it.
+ */
+function ecCountCodeRenew() {
+    if (!ecAnalyticsConsented() || headers_sent()) return;
+    $code = ecCountCode();
+    if ($code === '') $code = bin2hex(random_bytes(8));
+    setcookie(EC_CODE_COOKIE, $code, [
+        'expires'  => time() + EC_CODE_DAYS * 86400,
+        'path'     => '/',
+        'samesite' => 'Lax',
+        'secure'   => ecCookieSecure(),
+        'httponly' => false, // the banner makes and deletes it from JS; see above
+    ]);
+    $_COOKIE[EC_CODE_COOKIE] = $code;
+}
 
 /**
  * Whether cookies should carry the Secure attribute on THIS request.
@@ -739,7 +798,7 @@ function ecConsentSet($answer) {
  */
 function ecForgetAnalyticsStorage() {
     if (headers_sent()) return;
-    foreach (['ec_blang', EC_SEEN_COOKIE] as $name) {
+    foreach (['ec_blang', EC_SEEN_COOKIE, EC_CODE_COOKIE] as $name) {
         if (isset($_COOKIE[$name])) {
             setcookie($name, '', ['expires' => time() - 86400, 'path' => '/']);
             unset($_COOKIE[$name]);
@@ -793,7 +852,7 @@ function ecSeenMap() {
     return $map;
 }
 
-/** Has this event already been counted for this page in this browser (within the cookie's year)? */
+/** Has this event already been counted for this page in this browser session? */
 function ecSeen($page, $flag) {
     $map = ecSeenMap();
     return isset($map[$page]) && ($map[$page] & $flag) === $flag;
@@ -802,12 +861,12 @@ function ecSeen($page, $flag) {
 /**
  * Records that it has been, and writes the cookie back.
  *
- * ONE YEAR, renewed on every write (Tom, 2026-10-07: *"if we are collecting consent anyway, let's
- * collect it for remembering for a year that they've been here"*). It was a session cookie until
- * then, so a browser that said yes was counted again on every new browser session, and the consent
- * question bought little more than a per-visit count. Now a browser that said yes is counted the
- * FIRST time it does each thing on each page, and not again while the cookie lasts: the consented
- * bucket counts BROWSERS, per page. Withdrawal still deletes it (ecForgetAnalyticsStorage()).
+ * A SESSION COOKIE — no expiry — so it lasts exactly as long as the visit it de-duplicates, and a
+ * visitor who returns tomorrow is counted again, which is what "visits" has always meant here.
+ *
+ * It lasted a year for one day (2026-10-07), so that said-yes rows would count browsers. The
+ * browser code (EC_CODE_COOKIE, Tom's call F01 of 2026-10-08) answers that question directly, as
+ * distinct codes, and a year-long de-duplication would have left the rows unable to count uses.
  */
 function ecMarkSeen($page, $flag) {
     if (!ecAnalyticsConsented() || headers_sent()) return;
@@ -820,7 +879,7 @@ function ecMarkSeen($page, $flag) {
     foreach ($map as $p => $d) { $pairs[] = $p . ':' . base_convert((string) $d, 10, 32); }
     $value = implode(',', $pairs);
     setcookie(EC_SEEN_COOKIE, $value, [
-        'expires'  => time() + EC_SEEN_DAYS * 86400,
+        'expires'  => 0,
         'path'     => '/',
         'samesite' => 'Lax',
         'secure'   => ecCookieSecure(),
@@ -953,13 +1012,18 @@ function ecNamingFieldBit($field) {
  * a legacy visitor row, and log/lang-log-stats.sh reads it as one. The format is otherwise
  * unchanged, so a mixed-vintage log still reports correctly.
  */
-function ecLogBucketSuffix() {
-    return ecAnalyticsConsented() ? "\tvisitor" : "\tvisit";
+function ecLogBucketSuffix($withCode = true) {
+    if (!ecAnalyticsConsented()) return "\tvisit";
+    // The browser code (call F01, 2026-10-08) rides here, immediately before the bucket, so every
+    // writer that writes a said-yes row carries it without a second call to forget. A said-yes
+    // browser whose code is not made yet writes the row without one; it still counts as a use.
+    $code = $withCode ? ecCountCode() : '';
+    return ($code !== '' ? "\t" . $code : '') . "\tvisitor";
 }
 
 // A visitor who has withdrawn consent, or refused it, must not keep carrying the storage it
 // covered. Checked on every page load because withdrawal can happen in another tab.
-if (!ecAnalyticsConsented() && (isset($_COOKIE['ec_blang']) || isset($_COOKIE[EC_SEEN_COOKIE]))) {
+if (!ecAnalyticsConsented() && (isset($_COOKIE['ec_blang']) || isset($_COOKIE[EC_SEEN_COOKIE]) || isset($_COOKIE[EC_CODE_COOKIE]))) {
     ecForgetAnalyticsStorage();
 }
 

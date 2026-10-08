@@ -24,7 +24,7 @@ echoHeader("EngCalcs", $html_title, "", false);
 ?>
 <div class="ec-legal">
 
-<p><em>Last updated: 7 October 2026. This notice covers hawsedc.com, including the EngCalcs
+<p><em>Last updated: 8 October 2026. This notice covers hawsedc.com, including the EngCalcs
 engineering calculators at hawsedc.com/engcalcs.</em></p>
 
 <h2>The short version</h2>
@@ -33,7 +33,8 @@ engineering calculators at hawsedc.com/engcalcs.</em></p>
 	<li>We do not sell anything, advertise, or profile you. No analytics vendor, no tag manager, no
 		advertising network, no social media pixel.</li>
 	<li><strong>The calculators run in your browser. The numbers you type are never sent to us.</strong></li>
-	<li>Our usage counts hold no IP address and no identifier of any kind.</li>
+	<li>Our usage counts hold no IP address. If you say yes to the counting question, they carry a
+		random code your browser made up; if you say no, they carry no identifier of any kind.</li>
 	<li>The web server keeps an ordinary access log, and that log does record IP addresses. The two
 		are separate and we never join them.</li>
 	<li>Four optional features on one page can fetch something from OpenStreetMap or Mapbox. The
@@ -58,8 +59,8 @@ USA.</p>
 			you chose, that this browser had used this calculator before, that you copied the page
 			link, that you saved or renamed a pipe-network project, or which drawing tool and which
 			error message you met on the pipe-network map. <strong>Never anything you type.</strong>
-			No IP address, no account, no identifier, and no description of your browser or
-			device beyond that one finger-or-mouse fact</td>
+			No IP address, no account, and no description of your browser or device beyond that
+			one finger-or-mouse fact. If you said yes, the random code described below</td>
 		<td>To decide which calculators to improve and which languages to translate into</td>
 		<td>Your consent</td>
 	</tr>
@@ -95,10 +96,19 @@ USA.</p>
 
 <h3>The counting question</h3>
 
-<p>To count you once per page rather than every time you open it, we keep one digit per page in
-your browser for a year, which is why we ask first. You can answer in three ways: <em>Refuse
+<p>To count each page once per visit rather than on every load, we keep one digit per page in your
+browser until you close it, which is why we ask first. You can answer in three ways: <em>Refuse
 all</em> and we store nothing and never ask again; <em>Allow this</em> covers what is described here, and we ask again only if we ever want
 to do something different; <em>Allow all</em> covers that too.</p>
+
+<p>If you say yes, your browser also makes up a random code of 16 characters and keeps it in a
+cookie named <code>ec_code</code>. It is made from nothing about you, your device or your visit, and
+it records nothing you enter. Every count your browser sends us after that carries the code, which
+is what lets us count how many different browsers use each calculator, and not only how many times
+it was used. The code lasts 400 days from your most recent visit, the longest a browser keeps any
+cookie. <em>Refuse all</em>, or changing your answer to no, deletes it, and so does <em>Start
+fresh</em> on the pipe-network map. We never join the code to the web server&rsquo;s access log, so
+it does not tell us who you are or where you are.</p>
 
 <p>If you say no we keep nothing in your browser, and we still count the page load itself, in a more
 limited way than a typical web server records that a page was served: the page name, the language
@@ -117,7 +127,8 @@ that did agree, because they are a different kind of number.</p>
 	<tr><td><code>ec_geosearch</code></td><td>Your yes to place-name search. Only a yes is stored</td><td>1 year</td><td>No</td></tr>
 	<tr><td><code>ec_terrain</code></td><td>Your yes to elevation lookup. Only a yes is stored</td><td>1 year</td><td>No</td></tr>
 	<tr><td><code>ec_blang</code></td><td>One digit: we have already recorded which language your browser asks for</td><td>1 year</td><td><strong>Yes</strong></td></tr>
-	<tr><td><code>ec_seen</code></td><td>One digit per page: which counts we have already made. No identifier</td><td>1 year</td><td><strong>Yes</strong></td></tr>
+	<tr><td><code>ec_seen</code></td><td>One digit per page: which counts we have already made. No identifier</td><td>Until you close your browser</td><td><strong>Yes</strong></td></tr>
+	<tr><td><code>ec_code</code></td><td>A random code, so that we can count browsers rather than only page loads</td><td>400 days from your most recent visit</td><td><strong>Yes</strong></td></tr>
 	<tr><td>Saved networks (browser storage)</td><td>The pipe networks you draw</td><td>Until you delete them</td><td>No</td></tr>
 	<tr><td>Lock token and page layout (browser storage)</td><td>A random code that tells the lock server which locks are yours, and how you left the panels</td><td>Until you delete them</td><td>No</td></tr>
 	<tr><td>Offline copy of the suite (browser cache)</td><td>This site&rsquo;s own pages, scripts, styles, and icons, kept so the calculators open without a connection. It holds no identifier and nothing you entered, and it is sent nowhere. On the Looped Pipe Network page it also keeps our own EPANET engine, fetched quietly in advance so that solver starts at once. To remove it, clear this site&rsquo;s data in your browser; the next visit rebuilds it</td><td>Until you clear it. Files are replaced when we publish a new version</td><td>No</td></tr>
@@ -177,8 +188,11 @@ messages you send us, on the transfer being necessary to do what you asked (Arti
 
 <p>If you are in the EEA or the UK you can ask us to show you the data we hold about you, correct it,
 delete it, restrict or object to our using it, or send it to you in a portable form. In practice we
-hold almost nothing that is about you: the usage counts contain no identifier, so there is nothing in
-them to find or delete on your behalf.</p>
+hold almost nothing that is about you. The usage counts from a browser that said no contain no
+identifier, so there is nothing in them to find. Those from a browser that said yes carry its random
+code, which we cannot connect to you by ourselves; if you send us the code (your browser lists it
+among this site&rsquo;s cookies as <code>ec_code</code>), we will find or delete the counts that
+carry it.</p>
 
 <p>Where we rely on your consent you can <strong>withdraw it at any time</strong>, as easily as you
 gave it, using the <strong><?=htmlspecialchars($ec_lang['consent_settings_link'], ENT_QUOTES, 'UTF-8')?></strong> link at the foot of every page. You can also complain
