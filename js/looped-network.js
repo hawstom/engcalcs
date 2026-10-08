@@ -22049,6 +22049,11 @@ var EngCalcs = EngCalcs || {};
 	}
 	function loadPaneState() {
 		var raw = null, v;
+		// Back to the birth values first, so a second reading (a workspace imported into the open
+		// page) gives what a first reading of the same storage would.
+		paneState.open = false;
+		paneState.h = LPN_PANE_DEFAULT;
+		paneState.tab = paneTabs[0].id;
 		try { raw = localStorage.getItem(LPN_PANE_KEY); } catch (e) { return; }
 		if (!raw) { return; }
 		try { v = JSON.parse(raw); } catch (e) { return; }
@@ -22333,6 +22338,8 @@ var EngCalcs = EngCalcs || {};
 	}
 	function loadRPaneState() {
 		var raw = null, v;
+		rpaneState.open = false;
+		rpaneState.w = LPN_RPANE_DEFAULT;
 		try { raw = localStorage.getItem(LPN_RPANE_KEY); } catch (e) { return; }
 		if (!raw) { return; }
 		try { v = JSON.parse(raw); } catch (e) { return; }
@@ -42278,7 +42285,7 @@ var EngCalcs = EngCalcs || {};
 			lpn_energy_box: closeEnergyBox, lpn_contour_box: closeContourBox, lpn_snip_box: closeSnipBox,
 			lpn_scncmp_box: closeScenarioCompareBox, lpn_rptbox: closeRunReportBox, lpn_status_box: closeStatusReportBox,
 			lpn_alt_box: closeAlternativesBox, lpn_full_box: closeFullReportBox, lpn_calib_box: closeCalibBox,
-			lpn_notes_popup: closeNotesPopup, lpn_hotkeys_popup: closeHotkeysBox
+			'lpn_notes_popup': closeNotesPopup, 'lpn_hotkeys_popup': closeHotkeysBox
 		};
 	}
 	// A record as it is before any storage has been read.
@@ -42336,17 +42343,12 @@ var EngCalcs = EngCalcs || {};
 		updateAreaHint();
 		tab = activePaneTab();
 		if (paneState.open && tab && tab.hide) { tab.hide(); }
-		paneState.open = false;
-		paneState.h = LPN_PANE_DEFAULT;
-		paneState.tab = paneTabs[0].id;
 		loadPaneState();
 		if (document.getElementById('lpn_pane_body')) { document.getElementById('lpn_pane_body').style.height = ''; }
 		Object.keys(paneColPrefs).forEach(function (k) { delete paneColPrefs[k]; });
 		(function (v) { Object.keys(v).forEach(function (k) { paneColPrefs[k] = v[k]; }); }(readPaneColPrefs()));
 		applyPaneLayout();
 		if (paneState.open && activePaneTab().show) { activePaneTab().show(); }
-		rpaneState.open = false;
-		rpaneState.w = LPN_RPANE_DEFAULT;
 		loadRPaneState();
 		applyRPaneLayout();
 		// 4. The boxes: first-visit docks if no record is left, then the boot's own restore.
