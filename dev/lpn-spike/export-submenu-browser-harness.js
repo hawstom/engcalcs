@@ -2,7 +2,10 @@
 //
 //   flock /tmp/engcalcs-browser.lock node dev/lpn-spike/export-submenu-browser-harness.js
 //
-// The rows are File > Export > EPANET file and GeoJSON file (Tom, 2026-10-06). The submenu opens by
+// The rows are File > Export to > EPANET file and GeoJSON file (Tom, 2026-10-06), then, under a
+// Tables and libraries heading, ODS file, XLSX file and CSV file (Tom, 2026-10-07: "It should say
+// File, Export to, and we are adding ODS/XLSX/CSV"). A table row opens its box first; its Export
+// button is pressed with a real mouse click. The submenu opens by
 // mouse (click the row) and by keyboard (Down into File, onto Export, Right), lists every export,
 // and each row still downloads exactly one file with the right extension. A new export added to
 // exportMenuRows() must be added to ROWS below, or the "every export row" check fails.
@@ -34,7 +37,12 @@ if (process.env[LOCK_ENV] !== '1') {
 	console.error(NAME + ': no `flock` binary found -- running WITHOUT the browser lock.');
 }
 
-const ROWS = [['lpn_file_export_item_inp', '.inp'], ['lpn_file_export_item_geojson', '.geojson']];
+// [key, extension, opens a box first]. The box opens on the Current table (Junctions), and one table
+// to CSV is one .csv file.
+const ROWS = [['lpn_file_export_item_inp', '.inp'], ['lpn_file_export_item_geojson', '.geojson'],
+	['lpn_file_export_item_dxf', '.dxf'],
+	['lpn_file_export_item_ods', '.ods', true], ['lpn_file_export_item_xlsx', '.xlsx', true], ['lpn_file_export_item_csv', '.csv', true],
+	['lpn_file_export_item_workspace', '.json']];
 let checks = 0, failures = 0, Session;
 function ok(label, cond, detail) {
 	checks++;
@@ -100,6 +108,8 @@ async function main() {
 			const got = await subTexts(a);
 			ok('it holds every export row, in order', JSON.stringify(got) === JSON.stringify(want), got.join(' | '));
 			ok('no row repeats the word Export', got.every((t) => !/^Export/i.test(t)));
+			const heading = await a.page.$$eval('#lpn_menu_list2 .lpn-menu-heading', (els) => els.map((e) => e.textContent.trim()));
+			ok('the table rows sit under the Tables and libraries heading', JSON.stringify(heading) === JSON.stringify([(await a.lang('lpn_file_export_tables_heading')).trim()]), JSON.stringify(heading));
 			for (let i = 0; i < ROWS.length; i++) {
 				if (i > 0) { await a.page.keyboard.press('Escape'); await a.settle(200); await openFile(); await openSub(); }
 				let dl = null;
@@ -112,6 +122,13 @@ async function main() {
 				} else {
 					for (let k = 0; k < i; k++) { await a.page.keyboard.press('ArrowDown'); }
 					await a.page.keyboard.press('Enter');
+				}
+				if (ROWS[i][2]) {
+					await a.page.waitForSelector('#lpn_dialog', { state: 'visible' });
+					await a.page.evaluate(() => {
+						const b = document.querySelector('#lpn_dialog_buttons button');
+						b.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, detail: 1 }));
+					});
 				}
 				await p;
 				ok(want[i] + ' downloads one file ending ' + ROWS[i][1], !!dl && dl.suggestedFilename().endsWith(ROWS[i][1]), dl && dl.suggestedFilename());

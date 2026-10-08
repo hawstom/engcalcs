@@ -221,6 +221,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 	      // its Windows UI saves when you press Save. The accept list only filters the PICKER; which
 	      // format a chosen file really is gets decided from its first bytes, not its name. ?>
 	<input type="file" id="lpn_inp_file" accept=".inp,.net,text/plain" style="display:none">
+	<input type="file" id="lpn_workspace_file" accept=".json,application/json" style="display:none">
 	<?php // File > Open as lat/lon… (Task 447). THE ONE PICKER THAT TAKES BOTH KINDS, because the row
 	      // it serves is the recovery path for a lon/lat network in either kind of file. Which reader
 	      // a chosen file goes to is decided from its first character -- a project file is JSON --
@@ -2132,6 +2133,24 @@ EngCalcs.pageConfig = {
 	lpn_file_export_menu: <?=json_encode($ec_lang['lpn_file_export_menu'])?>,
 	lpn_file_export_item_inp: <?=json_encode($ec_lang['lpn_file_export_item_inp'])?>,
 	lpn_file_export_item_geojson: <?=json_encode($ec_lang['lpn_file_export_item_geojson'])?>,
+	lpn_file_export_tables_heading: <?=json_encode($ec_lang['lpn_file_export_tables_heading'])?>,
+	lpn_file_export_item_ods: <?=json_encode($ec_lang['lpn_file_export_item_ods'])?>,
+	lpn_file_export_item_xlsx: <?=json_encode($ec_lang['lpn_file_export_item_xlsx'])?>,
+	lpn_file_export_item_csv: <?=json_encode($ec_lang['lpn_file_export_item_csv'])?>,
+	lpn_file_export_tables_tip: <?=json_encode($ec_lang['lpn_file_export_tables_tip'])?>,
+	lpn_file_export_csv_tip: <?=json_encode($ec_lang['lpn_file_export_csv_tip'])?>,
+	lpn_file_export_item_workspace: <?=json_encode($ec_lang['lpn_file_export_item_workspace'])?>,
+	lpn_file_export_workspace_tip: <?=json_encode($ec_lang['lpn_file_export_workspace_tip'])?>,
+	lpn_file_import_workspace: <?=json_encode($ec_lang['lpn_file_import_workspace'])?>,
+	lpn_file_import_workspace_tip: <?=json_encode($ec_lang['lpn_file_import_workspace_tip'])?>,
+	lpn_workspace_exported: <?=json_encode($ec_lang['lpn_workspace_exported'])?>,
+	lpn_workspace_imported: <?=json_encode($ec_lang['lpn_workspace_imported'])?>,
+	lpn_workspace_ignored: <?=json_encode($ec_lang['lpn_workspace_ignored'])?>,
+	lpn_workspace_refused_unreadable: <?=json_encode($ec_lang['lpn_workspace_refused_unreadable'])?>,
+	lpn_workspace_refused_format: <?=json_encode($ec_lang['lpn_workspace_refused_format'])?>,
+	lpn_workspace_refused_newer: <?=json_encode($ec_lang['lpn_workspace_refused_newer'])?>,
+	lpn_workspace_confirm: <?=json_encode($ec_lang['lpn_workspace_confirm'])?>,
+	lpn_workspace_refused_storage: <?=json_encode($ec_lang['lpn_workspace_refused_storage'])?>,
 	lpn_file_export_inp_tip: <?=json_encode($ec_lang['lpn_file_export_inp_tip'])?>,
 	lpn_status_inp_exported: <?=json_encode($ec_lang['lpn_status_inp_exported'])?>,
 	lpn_status_inp_exported_picture: <?=json_encode($ec_lang['lpn_status_inp_exported_picture'])?>,
@@ -2139,6 +2158,18 @@ EngCalcs.pageConfig = {
 	lpn_inp_export_differences: <?=json_encode($ec_lang['lpn_inp_export_differences'])?>,
 	lpn_inp_export_difference_one: <?=json_encode($ec_lang['lpn_inp_export_difference_one'])?>,
 	lpn_inp_export_refused: <?=json_encode($ec_lang['lpn_inp_export_refused'])?>,
+	lpn_file_export_item_dxf: <?=json_encode($ec_lang['lpn_file_export_item_dxf'])?>,
+	lpn_file_export_dxf_tip: <?=json_encode($ec_lang['lpn_file_export_dxf_tip'])?>,
+	lpn_dxf_export_refused: <?=json_encode($ec_lang['lpn_dxf_export_refused'])?>,
+	lpn_dxf_note_grid: <?=json_encode($ec_lang['lpn_dxf_note_grid'])?>,
+	lpn_dxf_note_crs: <?=json_encode($ec_lang['lpn_dxf_note_crs'])?>,
+	lpn_dxf_note_geo: <?=json_encode($ec_lang['lpn_dxf_note_geo'])?>,
+	lpn_dxf_note_shortened: <?=json_encode($ec_lang['lpn_dxf_note_shortened'])?>,
+	lpn_dxf_export_no_utm: <?=json_encode($ec_lang['lpn_dxf_export_no_utm'])?>,
+	lpn_dxf_export_failed: <?=json_encode($ec_lang['lpn_dxf_export_failed'])?>,
+	lpn_dxf_exported_geo: <?=json_encode($ec_lang['lpn_dxf_exported_geo'])?>,
+	lpn_dxf_note_blocks: <?=json_encode($ec_lang['lpn_dxf_note_blocks'])?>,
+	lpn_dxf_note_categories: <?=json_encode($ec_lang['lpn_dxf_note_categories'])?>,
 	lpn_file_export_geojson_tip: <?=json_encode($ec_lang['lpn_file_export_geojson_tip'])?>,
 	lpn_geojson_refused_local: <?=json_encode($ec_lang['lpn_geojson_refused_local'])?>,
 	lpn_geojson_refused_range: <?=json_encode($ec_lang['lpn_geojson_refused_range'])?>,
@@ -2337,6 +2368,12 @@ EngCalcs.pageConfig = {
 	points_data_copy: <?=json_encode($ec_lang['points_data_copy'])?>,
 	points_data_paste: <?=json_encode($ec_lang['points_data_paste'])?>,
 	lpn_pane_print: <?=json_encode($ec_lang['lpn_pane_print'])?>,
+	lpn_pane_copy_heads: <?=json_encode($ec_lang['lpn_pane_copy_heads'])?>,
+	lpn_export_table_title: <?=json_encode($ec_lang['lpn_export_table_title'])?>,
+	lpn_export_table_current: <?=json_encode($ec_lang['lpn_export_table_current'])?>,
+	lpn_export_table_all: <?=json_encode($ec_lang['lpn_export_table_all'])?>,
+	lpn_export_table_go: <?=json_encode($ec_lang['lpn_export_table_go'])?>,
+	lpn_export_table_scn_note: <?=json_encode($ec_lang['lpn_export_table_scn_note'])?>,
 	lpn_time_menu: <?=json_encode($ec_lang['lpn_time_menu'])?>,
 	lpn_time_duration: <?=json_encode($ec_lang['lpn_time_duration'])?>,
 	lpn_time_hyd_step: <?=json_encode($ec_lang['lpn_time_hyd_step'])?>,
@@ -3917,6 +3954,9 @@ EngCalcs.pageConfig = {
       // looped-network.js for the same reason; absent, the Run button does nothing. ?>
 <script src="/engcalcs/js/lpn-criticality.js?v=<?=filemtime(__DIR__.'/js/lpn-criticality.js')?>"></script>
 <script src="/engcalcs/js/lpn-demandscale.js?v=<?=filemtime(__DIR__.'/js/lpn-demandscale.js')?>"></script>
+<?php // A table as TSV, CSV or ODS (Tom, 2026-10-06). Pure, no DOM; BEFORE looped-network.js, whose Tables
+      // pane menu calls EngCalcs.lpnTableCsv() and lpnTableOds(). ?>
+<script src="/engcalcs/js/lpn-tablefile.js?v=<?=filemtime(__DIR__.'/js/lpn-tablefile.js')?>"></script>
 <?php // Reading a surveyed point list from a text file (ROADMAP Task 592). Pure parsing and column
       // mapping, no DOM, and no request of any kind. BEFORE looped-network.js, which calls
       // EngCalcs.lpnSurveyParse() when somebody picks a file; absent, the button reports that the
@@ -3926,6 +3966,9 @@ EngCalcs.pageConfig = {
       // DOM. BEFORE looped-network.js, which reads EngCalcs.lpnCalib when the Calibration report
       // opens; absent, the report draws nothing. ?>
 <script src="/engcalcs/js/lpn-calib.js?v=<?=filemtime(__DIR__.'/js/lpn-calib.js')?>"></script>
+<?php // Writing a DXF file of the model (ROADMAP Task 772). Pure text, no DOM, no request. BEFORE
+      // looped-network.js, which calls EngCalcs.lpnDxfWrite() when File > Export DXF file is chosen. ?>
+<script src="/engcalcs/js/lpn-dxf.js?v=<?=filemtime(__DIR__.'/js/lpn-dxf.js')?>"></script>
 <script src="/engcalcs/js/looped-network.js?v=<?=filemtime(__DIR__.'/js/looped-network.js')?>"></script>
 <script>
 <?php echoCookieScript(); ?>

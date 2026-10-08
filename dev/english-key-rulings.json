@@ -5632,6 +5632,11 @@
             "on": "Nothing is selected. Select an asset on the map to see its properties.",
             "ruled": "2026-10-08",
             "answer": "Calls page 8 October: Use as written"
+        },
+        "lpn_workspace_confirm": {
+            "on": "Replace this browser's workspace layout with the one in the file?",
+            "ruled": "2026-10-08",
+            "answer": "Calls page 8 October: his own text, \"Replace this browser's workspace layout with the one in the file?\""
         }
     }
 }

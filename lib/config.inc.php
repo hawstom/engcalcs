@@ -515,8 +515,8 @@ define('EC_NOLOG_COOKIE', 'ec_nolog');
 define('EC_NOLOG_DAYS', 365);
 define('TESTER_LOG', EC_LOG_DIR . '/engcalcs-tester.log');
 
-/** True when this browser is marked as a tester. Checked by every log writer. */
-function ecLoggingOptedOut() {
+/** True when this browser is marked as a tester. */
+function ecTesterBrowser() {
     return isset($_COOKIE[EC_NOLOG_COOKIE])
         && preg_match('/^1(\.[0-9]{8})?$/', (string) $_COOKIE[EC_NOLOG_COOKIE]) === 1;
 }
@@ -528,7 +528,7 @@ function ecLoggingOptedOut() {
  * logLanguageSelection().
  */
 function ecLogTester($event, $page = '') {
-    if (PHP_SAPI === 'cli') return;
+    if (PHP_SAPI === 'cli' || ecIsPrecacheRequest()) return;
     $event = preg_replace('/[^a-z]/', '', (string) $event);
     if ($event === '') return;
     $page = substr(preg_replace('/[^A-Za-z0-9_-]/', '', (string) $page), 0, 64);
@@ -566,7 +566,7 @@ function ecTesterStamp($day) {
  * consent constants, which are defined further down this file than this function.
  */
 function ecTesterRequest() {
-    $was = ecLoggingOptedOut();
+    $was = ecTesterBrowser();
     $page = isset($_SERVER['SCRIPT_NAME']) ? basename($_SERVER['SCRIPT_NAME'], '.php') : '';
     if (isset($_GET['ec_nolog'])) {
         if ($_GET['ec_nolog'] === '0') {
@@ -600,10 +600,27 @@ function ecTesterRequest() {
  * beacons, the lock heartbeat and other background requests never count as a day's use.
  */
 function ecTesterDayTally() {
-    if (!ecLoggingOptedOut()) return;
+    if (ecIsPrecacheRequest() || !ecTesterBrowser()) return;
     if (substr((string) $_COOKIE[EC_NOLOG_COOKIE], 2) === gmdate('Ymd')) return;
     ecTesterStamp(gmdate('Ymd'));
     ecLogTester('day', isset($_SERVER['SCRIPT_NAME']) ? basename($_SERVER['SCRIPT_NAME'], '.php') : '');
+}
+
+/**
+ * True when this request is the service worker's background precache fetch (sw.php sends the
+ * header X-EC-Precache: 1 on every one). It carries the visitor's cookies but is no view: the
+ * visitor asked for one page and the worker fetched twenty more. No log row, no ec_seen mark and
+ * no ec_blang cookie may come of it, or the real view that follows is deduplicated away.
+ */
+function ecIsPrecacheRequest() {
+    return isset($_SERVER['HTTP_X_EC_PRECACHE']) && $_SERVER['HTTP_X_EC_PRECACHE'] === '1';
+}
+/**
+ * True when this request must not reach the main logs: the browser is a tester's, or the request
+ * is a service worker precache fetch. Checked by every log writer.
+ */
+function ecLoggingOptedOut() {
+    return ecIsPrecacheRequest() || ecTesterBrowser();
 }
 
 // ---- Consent for the storage that is NOT strictly necessary (ROADMAP Task 286) ----
@@ -871,7 +888,7 @@ function ecSeen($page, $flag) {
  * distinct codes, and a year-long de-duplication would have left the rows unable to count uses.
  */
 function ecMarkSeen($page, $flag) {
-    if (!ecAnalyticsConsented() || headers_sent()) return;
+    if (!ecAnalyticsConsented() || headers_sent() || ecIsPrecacheRequest()) return;
     $page = preg_replace('/[^A-Za-z0-9_-]/', '', (string) $page);
     if ($page === '') return;
     $map = ecSeenMap();

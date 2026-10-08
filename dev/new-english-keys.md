@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**0 still to read on master**, of 0 untranslated keys, of 2444 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**35 still to read on master**, of 36 untranslated keys, of 2480 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -122,37 +122,13 @@ is the one you meant. "The first one" is a complete answer.
   *The proposal:* PROPOSED English for Tom: 'Mapbox DEM accuracy in 2026, horizontal then vertical: 1–10 m and under 1 m in the US, 2–10 m and 1–3 m in Europe and Japan, 30 m and 10–16 m globally, and 90 m and over 16 m at the poles.'
   @@ NEEDS RULING
 
-## Synonym entries to approve  (15, 13 to read @@ NEEDS RULING)
+## Synonym entries to approve  (12, 10 to read @@ NEEDS RULING)
 
 **These are translator notes (`$ec_lang_syn`), not visitor wording.** Each was written against an
 English string that has since changed, or against a key that no longer exists. Say which: keep it
 as is, change it (a proposal may follow), or remove it. **Your answer on the flag line is the
 written permission** the rule requires; CC then applies it by hand and re-records it. A script
 never edits a synonym.
-
-- **`consent_body`**
-  > May we save a random code in this browser so that we can count how many browsers use each part of this site? The code is made up on the spot, says nothing about you or your device, and records nothing you enter. Without it we cannot tell your second visit from somebody else's first.
-  *Why stale:* the English changed after this synonym was written
-  *Written against:* May we save a one-digit cookie in this browser to remember that we have already counted this page? It records nothing about you and nothing you enter. Without it we cannot tell your second visit from somebody else’s first.
-  *Current synonym:* May we save (store, keep, put) a one-digit cookie (a tiny stored marker) in this browser to remember that we have already counted this page? It records nothing about you and nothing you enter. Without it we cannot tell your second visit from somebody else’s first.
-  **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
-  @@ NEEDS RULING
-
-- **`consent_current_granted`**
-  > You allowed this. This browser keeps a random code so that we can count it.
-  *Why stale:* the English changed after this synonym was written
-  *Written against:* You allowed this. We limit logging for this browser profile.
-  *Current synonym:* You allowed this. We limit logging (recording) for this browser profile.
-  **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
-  @@ NEEDS RULING
-
-- **`consent_region_label`**
-  > Your choice about the counting code.
-  *Why stale:* the English changed after this synonym was written
-  *Written against:* Your choice about limiting logging.
-  *Current synonym:* Your choice about limiting logging (recording).
-  **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
-  @@ NEEDS RULING
 
 - **`ip_is_lateral`**
   > <span class="ec-help" title="Selected: this reach is a segment of the test lateral, from which individual emitters withdraw water. Cleared: this reach is a main, only passing flow along to laterals not on the test path.">Lat. <span class="ec-tip">?</span></span>
@@ -246,13 +222,122 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   @@ NEEDS RULING
 
-None on master. Every English key here is present in at least one other language.
+## lpn_  (36, 35 to read @@ NEEDS RULING)
+
+- **`lpn_dxf_export_failed`**
+  > The DXF file was not written: an error in this page stopped it ({error}).
+  @@ NEEDS RULING
+- **`lpn_dxf_export_no_utm`**
+  > The DXF file was not written: this network lies outside the latitudes UTM covers (80° S to 84° N), and a drawing needs a flat grid to be drawn on.
+  @@ NEEDS RULING
+- **`lpn_dxf_export_refused`**
+  > The DXF file was not written: the coordinate conversion it needs did not load. Check the connection and try again.
+  @@ NEEDS RULING
+- **`lpn_dxf_exported_geo`**
+  > Exported {file}. Its coordinates are {crs}, in meters, not latitude and longitude.
+  @@ NEEDS RULING
+- **`lpn_dxf_note_blocks`**
+  > Layers are named {prefix}, the asset code, a hyphen, and the alternative, as in {example}. Each element is a block inserted at scale 1 with attributes 1 unit high; scale the blocks to set the text height. Every attribute is visible; the attributes of one element are stacked in a column beside its symbol.
+  @@ NEEDS RULING
+- **`lpn_dxf_note_categories`**
+  > {n} junctions have more than one demand category. Their {tag} attribute holds the sum of the base demands of all categories.
+  @@ NEEDS RULING
+- **`lpn_dxf_note_crs`**
+  > Coordinates: {crs}, exactly as this project states them.
+  @@ NEEDS RULING
+- **`lpn_dxf_note_geo`**
+  > Coordinates: {crs}, in meters, not latitude and longitude. The latitudes and longitudes of the project were converted to that grid.
+  @@ NEEDS RULING
+- **`lpn_dxf_note_grid`**
+  > Coordinates: the X and Y of this project, in {unit}. No coordinate system is stated.
+  @@ NEEDS RULING
+- **`lpn_dxf_note_shortened`**
+  > {n} values were longer than a DXF file allows ({max} characters), so each was shortened and ends in three periods.
+  @@ NEEDS RULING
+- **`lpn_export_table_all`**
+  > All
+  @@ NEEDS RULING
+- **`lpn_export_table_current`**
+  > Current
+  @@ NEEDS RULING
+- **`lpn_export_table_go`**
+  > Export
+  @@ NEEDS RULING
+- **`lpn_export_table_scn_note`**
+  > Results are exported only for the scenario last calculated.
+  @@ NEEDS RULING
+- **`lpn_export_table_title`**
+  > Export to {format}
+  @@ NEEDS RULING
+- **`lpn_file_export_csv_tip`**
+  > Download a table as the Tables pane shows it. Several tables come as one zip file of CSV files, with a file for each library their IDs refer to.
+  @@ NEEDS RULING
+- **`lpn_file_export_dxf_tip`**
+  > Download this network for AutoCAD and other CAD programs: pipes, pumps, and valves as polylines, and every element as a block whose attributes carry its ID and property values in the project units.
+  @@ NEEDS RULING
+- **`lpn_file_export_item_csv`**
+  > CSV file…
+  @@ NEEDS RULING
+- **`lpn_file_export_item_dxf`**
+  > DXF file…
+  @@ NEEDS RULING
+- **`lpn_file_export_item_ods`**
+  > ODS file…
+  @@ NEEDS RULING
+- **`lpn_file_export_item_workspace`**
+  > Workspace…
+  @@ NEEDS RULING
+- **`lpn_file_export_item_xlsx`**
+  > XLSX file…
+  @@ NEEDS RULING
+- **`lpn_file_export_tables_heading`**
+  > Tables and libraries
+  @@ NEEDS RULING
+- **`lpn_file_export_tables_tip`**
+  > Download the tables as the Tables pane shows them, one sheet each, with a sheet for each library their IDs refer to: patterns, curves, pipe types, and fittings.
+  @@ NEEDS RULING
+- **`lpn_file_export_workspace_tip`**
+  > Download a small file holding where your boxes sit, their sizes, which are open or docked, and your pane and column sizes, plus the reading preferences of this page. Your projects, project settings and cookies (language, consent, units) are not in it. Load it on another screen or browser with File, Import, Workspace.
+  @@ NEEDS RULING
+- **`lpn_file_import_workspace`**
+  > Workspace…
+  @@ NEEDS RULING
+- **`lpn_file_import_workspace_tip`**
+  > Apply a workspace file saved with File, Export, Workspace: box positions and sizes, docking, pane sizes and the reading preferences of this page. Your projects and cookies are not touched.
+  @@ NEEDS RULING
+- **`lpn_pane_copy_heads`**
+  > Copy with headings
+  @@ NEEDS RULING
+- **`lpn_workspace_confirm`**
+  > Replace this browser's workspace layout with the one in the file?
+  _Ruled 2026-10-08: Calls page 8 October: his own text, "Replace this browser's workspace layout with the one in the file?"_
+- **`lpn_workspace_exported`**
+  > Workspace saved to {file}: {n} settings.
+  @@ NEEDS RULING
+- **`lpn_workspace_ignored`**
+  > Entries ignored because they were not recognized: {u}.
+  @@ NEEDS RULING
+- **`lpn_workspace_imported`**
+  > Workspace applied from {file}. Settings applied: {n}. Returned to their defaults: {r}.
+  @@ NEEDS RULING
+- **`lpn_workspace_refused_format`**
+  > This is not a workspace file saved by this page, so nothing was changed.
+  @@ NEEDS RULING
+- **`lpn_workspace_refused_newer`**
+  > This workspace file was saved by a newer version of this page (format {version}), so nothing was changed.
+  @@ NEEDS RULING
+- **`lpn_workspace_refused_storage`**
+  > Browser storage is full or unavailable, so the workspace was not applied.
+  @@ NEEDS RULING
+- **`lpn_workspace_refused_unreadable`**
+  > This file could not be read as a workspace, so nothing was changed.
+  @@ NEEDS RULING
 
 ---
 
 # Strings waiting on a branch
 
-**146 still to read**, of 149 new keys across 16 unmerged branch(es).
+**110 still to read**, of 113 new keys across 14 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -263,7 +348,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/bentley-interop (`a053c602`) — 63 new, 63 to read @@ NEEDS RULING
+### feat/bentley-interop (`661acc46`) — 63 new, 63 to read @@ NEEDS RULING
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -457,46 +542,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/desktop (`baba0f04`) — adds no English strings
 
-### feat/dxf (`dee7a28a`) — 12 new, 12 to read @@ NEEDS RULING
-
-- **`lpn_dxf_export_failed`**
-  > The DXF file was not written: an error in this page stopped it ({error}).
-  @@ NEEDS RULING
-- **`lpn_dxf_export_no_utm`**
-  > The DXF file was not written: this network lies outside the latitudes UTM covers (80° S to 84° N), and a drawing needs a flat grid to be drawn on.
-  @@ NEEDS RULING
-- **`lpn_dxf_export_refused`**
-  > The DXF file was not written: the coordinate conversion it needs did not load. Check the connection and try again.
-  @@ NEEDS RULING
-- **`lpn_dxf_exported_geo`**
-  > Exported {file}. Its coordinates are {crs}, in meters, not latitude and longitude.
-  @@ NEEDS RULING
-- **`lpn_dxf_note_blocks`**
-  > Layers are named {prefix}, the asset code, a hyphen, and the alternative, as in {example}. Each element is a block inserted at scale 1 with attributes 1 unit high; scale the blocks to set the text height. Every attribute is visible; the attributes of one element are stacked in a column beside its symbol.
-  @@ NEEDS RULING
-- **`lpn_dxf_note_categories`**
-  > {n} junctions have more than one demand category. Their {tag} attribute holds the sum of the base demands of all categories.
-  @@ NEEDS RULING
-- **`lpn_dxf_note_crs`**
-  > Coordinates: {crs}, exactly as this project states them.
-  @@ NEEDS RULING
-- **`lpn_dxf_note_geo`**
-  > Coordinates: {crs}, in meters, not latitude and longitude. The latitudes and longitudes of the project were converted to that grid.
-  @@ NEEDS RULING
-- **`lpn_dxf_note_grid`**
-  > Coordinates: the X and Y of this project, in {unit}. No coordinate system is stated.
-  @@ NEEDS RULING
-- **`lpn_dxf_note_shortened`**
-  > {n} values were longer than a DXF file allows ({max} characters), so each was shortened and ends in three periods.
-  @@ NEEDS RULING
-- **`lpn_file_export_dxf_tip`**
-  > Download this network for AutoCAD and other CAD programs: pipes, pumps, and valves as polylines, and every element as a block whose attributes carry its ID and property values in the project units.
-  @@ NEEDS RULING
-- **`lpn_file_export_item_dxf`**
-  > DXF file…
-  @@ NEEDS RULING
-
-### feat/hover-label (`e1654254`) — 2 new, 2 to read @@ NEEDS RULING
+### feat/hover-label (`944f963d`) — 2 new, 2 to read @@ NEEDS RULING
 
 - **`lpn_settings_hover_card`**
   > Show the full label on hover
@@ -527,7 +573,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`2e5e81c4`) — adds no English strings
 
-### feat/message-dismiss (`bfa6517b`) — 5 new, 5 to read @@ NEEDS RULING
+### feat/message-dismiss (`d4c88b12`) — 5 new, 5 to read @@ NEEDS RULING
 
 - **`lpn_hotkeys_zoomwin_def`**
   > Zoom Window: drag a rectangle to zoom to.
@@ -551,46 +597,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Points data<br />(use Copy to see format)
   @@ NEEDS RULING
 
-### feat/table-export (`6988ecf1`) — 12 new, 12 to read @@ NEEDS RULING
-
-- **`lpn_export_table_all`**
-  > All
-  @@ NEEDS RULING
-- **`lpn_export_table_current`**
-  > Current
-  @@ NEEDS RULING
-- **`lpn_export_table_go`**
-  > Export
-  @@ NEEDS RULING
-- **`lpn_export_table_scn_note`**
-  > Results are exported only for the scenario last calculated.
-  @@ NEEDS RULING
-- **`lpn_export_table_title`**
-  > Export to {format}
-  @@ NEEDS RULING
-- **`lpn_file_export_csv_tip`**
-  > Download a table as the Tables pane shows it. Several tables come as one zip file of CSV files, with a file for each library their IDs refer to.
-  @@ NEEDS RULING
-- **`lpn_file_export_item_csv`**
-  > CSV file…
-  @@ NEEDS RULING
-- **`lpn_file_export_item_ods`**
-  > ODS file…
-  @@ NEEDS RULING
-- **`lpn_file_export_item_xlsx`**
-  > XLSX file…
-  @@ NEEDS RULING
-- **`lpn_file_export_tables_heading`**
-  > Tables and libraries
-  @@ NEEDS RULING
-- **`lpn_file_export_tables_tip`**
-  > Download the tables as the Tables pane shows them, one sheet each, with a sheet for each library their IDs refer to: patterns, curves, pipe types, and fittings.
-  @@ NEEDS RULING
-- **`lpn_pane_copy_heads`**
-  > Copy with headings
-  @@ NEEDS RULING
-
-### feat/user-guide (`cbaf2032`) — 39 new, 39 to read @@ NEEDS RULING
+### feat/user-guide (`a6661944`) — 39 new, 39 to read @@ NEEDS RULING
 
 - **`lpn_guide_also`**
   > Also in {menu}
@@ -710,43 +717,6 @@ build for that would be a gate nobody keeps. Refresh it with
   > Guide
   @@ NEEDS RULING
 
-### feat/visit-dedupe (`129f59ee`) — adds no English strings
+### feat/visit-dedupe (`b4a99e9a`) — adds no English strings
 
-### feat/workspace (`7eb9e349`) — 12 new, 12 to read @@ NEEDS RULING
-
-- **`lpn_file_export_item_workspace`**
-  > Workspace…
-  @@ NEEDS RULING
-- **`lpn_file_export_workspace_tip`**
-  > Download a small file holding where your boxes sit, their sizes, which are open or docked, and your pane and column sizes, plus the reading preferences of this page. Your projects, project settings and cookies (language, consent, units) are not in it. Load it on another screen or browser with File, Import, Workspace.
-  @@ NEEDS RULING
-- **`lpn_file_import_workspace`**
-  > Workspace…
-  @@ NEEDS RULING
-- **`lpn_file_import_workspace_tip`**
-  > Apply a workspace file saved with File, Export, Workspace: box positions and sizes, docking, pane sizes and the reading preferences of this page. Your projects and cookies are not touched.
-  @@ NEEDS RULING
-- **`lpn_workspace_confirm`**
-  > Replace this browser's workspace layout with the one in the file?
-  @@ NEEDS RULING
-- **`lpn_workspace_exported`**
-  > Workspace saved to {file}: {n} settings.
-  @@ NEEDS RULING
-- **`lpn_workspace_ignored`**
-  > Entries ignored because they were not recognized: {u}.
-  @@ NEEDS RULING
-- **`lpn_workspace_imported`**
-  > Workspace applied from {file}. Settings applied: {n}. Returned to their defaults: {r}.
-  @@ NEEDS RULING
-- **`lpn_workspace_refused_format`**
-  > This is not a workspace file saved by this page, so nothing was changed.
-  @@ NEEDS RULING
-- **`lpn_workspace_refused_newer`**
-  > This workspace file was saved by a newer version of this page (format {version}), so nothing was changed.
-  @@ NEEDS RULING
-- **`lpn_workspace_refused_storage`**
-  > Browser storage is full or unavailable, so the workspace was not applied.
-  @@ NEEDS RULING
-- **`lpn_workspace_refused_unreadable`**
-  > This file could not be read as a workspace, so nothing was changed.
-  @@ NEEDS RULING
+### feat/workspace (`60879c22`) — adds no English strings

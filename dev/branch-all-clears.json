@@ -609,6 +609,27 @@
    "words": "Merge.",
    "context": "Typed in his pasted session message of 2026-10-07 (his own message, per his global CLAUDE.md), under 'Merge words. Please type these' and 'Browser passes'. Said after his browser pass; on the interview page he also chose \"Approve both\" for the two EPSG:3857 strings (D06).",
    "pin_note": "Pinned to the branch head as it stood when he wrote the word (master merges included)."
+  },
+  "feat/table-export": {
+   "head": "6988ecf1cac140d16b5993047ec4ff90fce8ab26",
+   "date": "2026-10-08",
+   "words": "Merge feat/table-export",
+   "context": "Typed by Tom in the session on 2026-10-08, after his pasted message of the same day said 'Merge.' for this branch and the classifier asked for the words typed directly.",
+   "pin_note": "Pinned to the branch head as it stood when he typed the words."
+  },
+  "feat/dxf": {
+   "head": "dee7a28a525709150c15006ac0da9399b53f7bce",
+   "date": "2026-10-08",
+   "words": "Merge feat/dxf",
+   "context": "Typed by Tom in the session on 2026-10-08, after his pasted message of the same day said 'Merge.' for this branch and the classifier asked for the words typed directly.",
+   "pin_note": "Pinned to the branch head as it stood when he typed the words."
+  },
+  "feat/workspace": {
+   "head": "60879c221df2aaab61ee168e1c1e054992ab8582",
+   "date": "2026-10-08",
+   "words": "feat/workspace Merge",
+   "context": "Typed by Tom in the session on 2026-10-08, after his browser pass of the no-reload import ('It works now').",
+   "pin_note": "Pinned to the branch head as it stood when he typed the words."
   }
  }
 }

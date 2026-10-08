@@ -3914,6 +3914,19 @@ OBSERVED DEFECT: touch (hover none): tapping the glyph in the Properties box ope
 OBSERVED: Basic-example-SI-units opens with roughness unit ft (pre-existing); under D-W its tip reads ft in an SI project.
 SPECULATION: how the glyph looks (zero-width inset over the input end) not judged.
 
+## feat/table-export (Task 776) at 9dd3bc32 (OBSERVED, 2026-10-06; re-verify before citing)
+OBSERVED real Chromium, Net1 solved: CSV and ODS download once per click from Junctions, Pipes, Pumps, and from a Show-scenarios Junctions table; results columns carry the displayed numbers; sorted order and Selection-only filter honoured; headings clean (no soft hyphens), units present. ODS passes zipfile/unzip -t and XML parse; office:value always dot-decimal, also under ?lang=fr and de (cell text is never localized). Copy with headings and plain Copy read back from the real clipboard correctly. Menu fits at 390x900 and 390x640. Harness 3 mutations all caught. No LibreOffice/soffice on this box: a real office suite NOT run.
+OBSERVED limits: an empty table (Valves, 0 rows) has no cell to right-click, so it cannot be exported; yes/no columns export 1/0; a From/To value like 007 would be a float cell with office:value="007" (office suite behaviour unverified); fr/de menus show the three new rows in English until translated.
+Lesson: pressing a menu row by text prefix hit a different "Copy" button elsewhere; match inside the menu only.
+
+## 2026-10-06 feat/dxf (Task 772), pre-review
+
+- OBSERVED: ezdxf 1.4.4 recover+audit+strict read: 0 errors on Net1, Net3-World, a nasty project (spaces, accents, CJK, 5000-char DESC, caret and percent sequences, 1.2e9 coordinate, customer) and Net3-World with a customer. dxf and dxf-parser (npm) also read them. LibreCAD 2.2.1.5 AppImage extracted but needs an X display (only xcb plugin; no Xvfb), so it did not read them. No gcc to build LibreDWG. AutoCAD/BricsCAD/ODA: not run.
+- OBSERVED: a literal "^" is written as "^" (DXF Reference: caret must be written "^ "); strings over 2049 characters are written whole (limit 2049 for group codes 0-9, 1); "%%" is escaped in TEXT but not in ATTRIB/ATTDEF values; a user's own "\U+XXXX" is not escaped.
+- OBSERVED: text height and symbol size follow the map zoom at export: Net1 at zoom 0.5 text 17.2 units, at saved zoom 1.2, at zoom 200 0.043 on a 70-unit-wide drawing.
+- OBSERVED: the layer table matches the Duke-hosted AIA CAD Layer Guidelines text for EQPM, VALV, TANK, LABL, TEXT, RDME; NODE is a prescribed minor group there, not user-defined. That PDF is an older edition than v5; v5 itself was not fetchable.
+- OBSERVED: dxf-export-harness.js passes and has no assertion on %% escaping, zoom, zone boundary or long strings.
+
 ## 2026-10-06 feat/asset-type, link half (tree 4c26066b)
 
 OBSERVED (real Chrome on a scratch copy with a test hook, this tree; re-verify before citing):
@@ -4088,6 +4101,20 @@ OBSERVED GDAL 3.12 (pyogrio in a venv, no sudo): exported Net3 world loads, EPSG
 OBSERVED DEFECTS: (1) projected export before the CRS table is loaded (basemap off) or for a CRS outside the 5,240 gets the "not valid latitudes" refusal naming an easting; the `crs` message is unreachable and not in lang. (2) Gusnet reads demand_pattern/head_pattern/speed_pattern as multiplier STRINGS and pump_curve/vol_curve as point lists; we write names. A pattern named 3 reads as a constant x3 in Gusnet, silently; pump_curve 1 errors. (3) Gusnet REQUIRES tank min_vol; we omit it. (4) D-W roughness in ft vs Gusnet 1e-3 ft; gradient in percent vs m/1000m. (5) result values carry float noise (56.999999999999744).
 OBSERVED harness gaps by mutation on a scratch copy: a scenario switching an element off, a scenario-moved node, and the document origin are all unasserted (mutants passed). Swap lon/lat, drop vertices, results-without-solve, tank diameter unit are caught. I verified scenario and origin by hand: correct.
 Lesson: the harness's projected case used a stub transform; run the real one.
+## feat/table-export, freeze + File > Export to at 3c0c093e (OBSERVED, 2026-10-07; re-verify before citing)
+CITED: XlsxWriter worksheet.py _write_panes (same pane/3-selection shape as ours); openpyxl 3.1.5 own output (same minimal workbookView, sheetView/pane); ECMA XSD t-yuki/ooxml-xsd sml-sheet.xsd, sml-workbook.xsd (CT_Worksheet, CT_Workbook sequence); Tom's LibreOffice-saved gnu/sdnet.ods settings.xml.
+OBSERVED: generated XLSX children are in CT_Worksheet/CT_Workbook order; openpyxl reads freeze B2/A2 on every sheet; zip testzip clean; odfpy loads ODS; ODS freeze items match sdnet.ods names and value semantics. Builder's three harnesses pass; mutation (delete bookViews) makes exactly one check fail, restored. No Excel/LibreOffice here: the freeze has still never been seen working in a real program.
+DOUBTS: right-click "Export table as CSV/ODS" remains (no XLSX, no libraries); empty project + All exports nothing and says nothing.
+
+## feat/dxf round at d578b129 (OBSERVED, 2026-10-07; re-verify before citing)
+OBSERVED: dxf-export-harness and dxf-export-browser-harness (93/93, en/ar/zh/ru incl.) pass bare; ID tag still visible in ar/zh. Chunks <=250, never split inside \P or \U+XXXX (parts are atomic, ASCII/CP1252 only; no multibyte hazard). ezdxf audit 0 errors on a ru/zh/ar/600+ char read-me.
+CITED: Autodesk MTEXT reference via search summary: 250-char chunks in group 3, last in group 1; escapes \\ \{ \} are real, so the / ( ) substitution is unnecessary.
+OBSERVED defects: backslash/brace substitution alters user's characters; read-me total cap 2049 with non-Latin escapes at 6 chars each cuts later notes (categories note) silently. Multi-category BASE_DEMAND untested in harness (no grep hit).
+
+## feat/workspace at be1d23ea (OBSERVED, 2026-10-07; re-verify before citing)
+OBSERVED real Chromium 1400x900, net3 example, hand-edited workspace files then import+reload: no page error for wrong-shaped values (arrays, strings, nulls, huge/negative sizes, __proto__) across every box key; the box code falls back to defaults. Out-of-range positions are clamped but leave only a 28px sliver on screen (Settings at bottom right, Find at left edge). Key list: grep of every localStorage write in js/ matches LPN_WORKSPACE_KEYS + EXCLUDED; no sessionStorage; workspace_keys_check passes. Lang keys exist in en only (payload regen expected). File-project dirty path is guarded by the existing beforeunload prompt, not by the import.
+Not done: harness mutation test; how boxes LOOK on a different-size real screen; unit cookie behaviour on other pages.
+Lesson: do not wrap a harness that takes its own flock in an outer flock; it deadlocks against itself.
 
 # Perry, feat/user-guide pre-review, 2026-10-08 (head 00862427)
 OBSERVED: user-guide-find-harness ALL PASS. Net3 worked queries reproduce in en, de, zh, tr, ar, fr, es.
@@ -4114,3 +4141,10 @@ OBSERVED non-English banners (Spanish checked) still say "cookie de un solo díg
 OBSERVED librewaternet.org/features.html:177 says "no visitor identifier"; false for a yes-sayer once deployed.
 CITED WebKit ITP 2.1: cookies written by document.cookie are capped at 7 days; the page rewrites ec_code by script on every DOMContentLoaded, so in Safari the "400 days" is probably 7. Not testable here (no WebKit).
 NOT RUN: mutation test of the harnesses (would require editing the worktree); full check_all; the Safari point; appearance of spock with coded rows (its selftest drives the real page).
+
+## 2026-10-08 feat/workspace fb8eea71, in-place import (Perry)
+OBSERVED real Chromium 1400x900 and 390x844: builder harnesses pass bare (inplace 19/19, browser 43/43). My own comparison (UI-arranged file, import into a browser with a different UI-arranged layout, then a real reload, every box's position/size/dock/z/state): no reload happened (window marker kept), no page errors, no duplicate dock tabs, focus on body, one Ctrl+Z undoes the pre-import edit, results kept (pressure in the pane and on map labels), docks and pinned/auto-hide state, pane sizes, right pane all equal a reload. Phone 390: zero differences from a reload, no sideways scroll. Old-style file (no dock fields) and empty file: equal to reload; flyout showing at import time: closed, equal.
+OBSERVED DEFECT: a box the file stores with no position (left/top null) is placed from the map's current width, and the in-place import places it before the old dock margins are cleared. With an old right dock open, Settings landed at left 334 vs 964 on reload, Library 135 vs 691 (t 116 vs 118); with no docks in the old layout the difference vanished. Cause: setboxHomeCorner() reads svg width at placement time (js/looped-network.js, setboxHomeCorner); applyWorkspaceInPlace runs layoutDocks() last.
+OBSERVED minor: Contour box 11 px shorter in place (356 vs 367); map margin variable left "0px" instead of unset; z-index values keep climbing (relative order matches reload).
+Lesson (mine): the page's dialog stub (window.lpnDialogAnswerer) must be deleted, and a probe dialog I left queued made Ctrl+Z "fail" for three runs. Retract before reporting; control against a generic dialog first.
+Not done: mutation test of the harness; contour plot on the map when the contour box is in dst but not the file; Properties box floating position when it stays open.

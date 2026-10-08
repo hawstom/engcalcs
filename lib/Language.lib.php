@@ -283,7 +283,7 @@ function chooseLanguage($all_language_settings) {
     // bucket instead: the same raw tag, once per page load rather than once per browser, with
     // nothing stored anywhere.
     if ($dedupe) {
-        if (!isset($_COOKIE['ec_blang']) && isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
+        if (!isset($_COOKIE['ec_blang']) && isset($_SERVER['HTTP_ACCEPT_LANGUAGE']) && !(function_exists('ecIsPrecacheRequest') && ecIsPrecacheRequest())) {
             // Filtered -- see the note on the 'anon' call above. Same defect, same fix.
             $rawLang = ecBrowserLangTag();
             logLanguageSelection($rawLang, 'browser', isset($winningLanguage) ? $winningLanguage : '');

@@ -402,8 +402,9 @@ console.log('\n--- one home for the concept ---');
 	// INWARD** (placeBackdropByDimensions() brings the file's DIMENSIONS into the local frame).
 	// **AND TWO MORE PER AXIS FOR THE EXPORTED PICTURE'S WORLD FILE** (backdropExportPicture(): its
 	// left/right and top/bottom edges in the frame the .inp is written in).
-	ok('outwardX has one definition and 40 call sites', count(/outwardX\(/g) === 41, count(/outwardX\(/g));
-	ok('outwardY has one definition and 40 call sites', count(/outwardY\(/g) === 41, count(/outwardY\(/g));
+	ok('outwardX has one definition and 41 call sites', count(/outwardX\(/g) === 42, count(/outwardX\(/g));
+	ok('outwardY has one definition and 41 call sites', count(/outwardY\(/g) === 42, count(/outwardY\(/g));
+	// **TASK 772 ADDED ONE SITE PER AXIS: THE DXF EXPORT.**
 	// The inward pair gained one site each with Task 145's geographic home view: a longitude and a
 	// latitude the code states in WORLD terms have to be converted into the document's local frame
 	// like any other outside number, or a project with a local origin opens on the wrong continent.
