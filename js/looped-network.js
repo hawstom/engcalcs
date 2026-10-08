@@ -35668,25 +35668,25 @@ var EngCalcs = EngCalcs || {};
 	// than any filename scheme, because a file in a forgotten folder is exactly the file somebody
 	// renamed. With that carried inside, the suffix only has to disambiguate at a glance.
 	//
-	// **THE EXTENSION IS `.lwn`, AND THE NAME IS STABLE** (Task 246). Tom, 2026-08-21: *"I bought
-	// LibreWaterNet.org, and it points to lpn. I feel that is a stable name: lwn"*. That is the
-	// trigger Task 315 was waiting for -- the argument for staying on `.json` was that an extension
-	// would encode a product name that did not exist yet, and now it does.
+	// **THE EXTENSION WE WRITE IS `.epp`** (Tom, 2026-10-07: EPANET++ is the application's name;
+	// Task 780). It replaces `.lwn` (Task 246, 2026-08-21, when LibreWaterNet.org was the name).
 	//
-	// **JSON INSIDE, `.lwn` OUTSIDE.** Nothing about the document changes; serializeProject() still
-	// writes JSON and acceptImportedText() still parses it, so a `.lwn` renamed to `.json` opens in
-	// any text editor exactly as before. The extension is a name for the KIND of document, which is
-	// the one thing a filename can carry that the file's own `format` key cannot: it is what the OS
-	// sorts, filters and (one day) associates on.
-	var LPN_FILE_EXT = '.lwn';
-	// **A FILE SAVED AS `.json` STILL OPENS, FOREVER.** Every project written before this wears it,
-	// and stranding somebody's documents to tidy up an extension would be the worst trade this page
-	// could make. Read on open, never written.
+	// **JSON INSIDE, `.epp` OUTSIDE.** Nothing about the document changes, and nothing in it names
+	// the extension: serializeProject() still writes the same JSON with the same `format` key and
+	// acceptImportedText() still parses it, so an `.epp` renamed to `.json` opens in any text
+	// editor exactly as before. The extension is a name for the KIND of document, which is what the
+	// OS sorts, filters and (one day) associates on.
+	var LPN_FILE_EXT = '.epp';
+	// **A FILE SAVED AS `.lwn` OR `.json` STILL OPENS, FOREVER.** Every project written before
+	// 2026-10-07 wears one of them, and stranding somebody's documents to tidy up an extension would
+	// be the worst trade this page could make. Read on open, never written.
+	var LPN_FILE_EXT_LWN = '.lwn';
 	var LPN_FILE_EXT_LEGACY = '.json';
+	var LPN_FILE_EXTS_READ = [LPN_FILE_EXT, LPN_FILE_EXT_LWN, LPN_FILE_EXT_LEGACY];
 	// **NEW FILES CARRY NO `-lpn` SUFFIX ANY MORE.** It existed for exactly one reason -- with a
 	// generic `.json` extension, something in the NAME had to say what the file was at a glance --
-	// and `.lwn` says it better, in the place an operating system actually looks. `Elm-Street.lwn`
-	// beats `Elm-Street-lpn.json`, and `Elm-Street-lpn.lwn` would be saying it twice.
+	// and `.epp` says it better, in the place an operating system actually looks. `Elm-Street.epp`
+	// beats `Elm-Street-lpn.json`, and `Elm-Street-lpn.epp` would be saying it twice.
 	//
 	// Both suffixes are still STRIPPED on the way in, forever: see projectNameFromFileName(), where
 	// getting this wrong silently renames a user's project on its next save.
@@ -38533,7 +38533,7 @@ var EngCalcs = EngCalcs || {};
 	var fileWriteBusy = false;   // a write is in flight; never start a second one over it
 	var fileError = false;
 	function fileApiAvailable() { return typeof window.showSaveFilePicker === 'function'; }
-	// **WHAT WE WRITE.** One extension, ours, so a Save-as picker offers `.lwn` and nothing else --
+	// **WHAT WE WRITE.** One extension, ours, so a Save-as picker offers `.epp` and nothing else --
 	// a save that can produce two extensions is a library where half the documents are invisible to
 	// the other half's filter.
 	function fileTypes() {
@@ -38548,7 +38548,7 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {};
 		return [{
 			description: pc.lpn_file_type_desc || 'Project file',
-			accept: { 'application/json': [LPN_FILE_EXT, LPN_FILE_EXT_LEGACY] }
+			accept: { 'application/json': LPN_FILE_EXTS_READ }
 		}];
 	}
 	// Same honesty rule setStorageError() follows: a user who thinks they are editing a file must be
@@ -38861,13 +38861,13 @@ var EngCalcs = EngCalcs || {};
 	// is harmless while the strips stay `$`-ANCHORED. dev/lpn-spike/file-naming-harness.js pins both.
 
 	function projectNameFromFileName(fname) {
-		// Either extension, because either can arrive: `.lwn` is what we write now and `.json` is
-		// what every file saved before Task 246 wears. Built from the constants rather than typed,
+		// Any of the three, because any can arrive: `.epp` is what we write now, `.lwn` what files
+		// saved from Task 246 to Task 780 wear, and `.json` what every file before that wears. Built from the constants rather than typed,
 		// so a future extension cannot be added in one place and forgotten in the other.
-		// The dot is escaped: an unescaped `.lwn` would also match `Xalwn`, which is a silent
+		// The dot is escaped: an unescaped `.epp` would also match `Xaepp`, which is a silent
 		// one-character rename of somebody's project rather than a visible bug.
 		var extRe = new RegExp('(' +
-				[LPN_FILE_EXT, LPN_FILE_EXT_LEGACY].join('|').replace(/\./g, '\\.') + ')$', 'i'),
+				LPN_FILE_EXTS_READ.join('|').replace(/\./g, '\\.') + ')$', 'i'),
 			s = String(fname).replace(extRe, ''),
 			lower = s.toLowerCase();
 		if (lower.slice(-LPN_FILE_SUFFIX_LEGACY.length) === LPN_FILE_SUFFIX_LEGACY) {
