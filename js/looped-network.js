@@ -33959,13 +33959,16 @@ var EngCalcs = EngCalcs || {};
 	function setStorageError(on, kind) {
 		var pc = EngCalcs.pageConfig || {};
 		kind = on ? (kind || '') : '';
+		// A write that took ends "storage full", whether or not it was flagged (H11). Unreadable ends
+		// where the open document is read, not here: a sibling's write must not end it.
+		if (!on) { clearHiddenCond('storage-full'); }
 		if (on === storageError && kind === storageErrorKind) { return; }
 		storageError = on;
 		storageErrorKind = kind;
 		if (!on) { return; }
 		if (kind === 'unreadable') {
 			var said = pc.lpn_storage_unreadable || 'Not saved. This project could not be read from browser storage. Its stored copy is left exactly as it is and will not be written over, so nothing on this tab is being saved. Open a file or create a new project to keep working.';
-			setStatus(said);
+			setStatus(said, '', false, 'storage-unreadable');
 			// **AND A MODAL, because the status line is not durable enough for THIS one.** The first
 			// solve on the empty document runs `if (!doc.nodes.length) { setStatus(''); return; }`
 			// and the sentence is gone -- which is the exact silence this defect is made of, a named
@@ -33976,7 +33979,7 @@ var EngCalcs = EngCalcs || {};
 			if (!unreadableTold) { unreadableTold = true; askDialog({ kind: 'alert', text: said }); }
 			return;
 		}
-		setStatus(pc.lpn_storage_full || 'Not saved. Browser storage is full or unavailable, so your recent changes will be lost when you close this tab.');
+		setStatus(pc.lpn_storage_full || 'Not saved. Browser storage is full or unavailable, so your recent changes will be lost when you close this tab.', '', false, 'storage-full');
 	}
 	function projectKey(id) { return LPN_PROJECT_PREFIX + id; }
 	// The full reset behind "?lpn_wipe=1" and the Wipe memory button. Clears EVERY project key plus
@@ -33997,7 +34000,7 @@ var EngCalcs = EngCalcs || {};
 		// same reason.
 		var i, key, doomed = [LPN_LEGACY_KEY, LPN_INDEX_KEY, LPN_IDENTITY_KEY,
 			LPN_PANE_KEY, LPN_RPANE_KEY, LPN_SETBOX_KEY, LPN_FINDBOX_KEY, LPN_LIBBOX_KEY,
-			LPN_FFBOX_KEY, LPN_ENERGYBOX_KEY, LPN_CMPBOX_KEY, LPN_RPTBOX_KEY, LPN_CONTOURBOX_KEY,
+			LPN_FFBOX_KEY, LPN_ENERGYBOX_KEY, LPN_CMPBOX_KEY, LPN_RPTBOX_KEY, LPN_CONTOURBOX_KEY, LPN_MSGHIDDEN_KEY,
 			// 'lpn_notesbox' and 'lpn_hotkeysbox' join the list here rather than a day later, for the
 			// same reason every entry above states its own miss: window furniture left out of this
 			// list makes "exactly as a brand-new visitor would see it" false for that one key. Named
@@ -35692,6 +35695,7 @@ var EngCalcs = EngCalcs || {};
 		// two branches, since `indexEntry(library.openId)` is true by construction two lines above.
 		if (!doc2) { unreadableOpenId = library.openId; unreadableTold = false; return null; }
 		unreadableOpenId = null;
+		clearHiddenCond('storage-unreadable');
 		return doc2;
 	}
 	// Everything a freshly-installed document has to push back out to the UI. Shared by
@@ -42843,6 +42847,8 @@ var EngCalcs = EngCalcs || {};
 	var LPN_WORKSPACE_EXCLUDED = [
 		// Documents, not preferences: the project library, its index, and the pre-library document.
 		'lpn_index', 'lpn_document', 'lpn_project_',
+		// Which messages this reader hid, keyed to a project id of THIS browser: meaningless elsewhere.
+		'lpn_msghidden',
 		// An opaque token naming this browser to the file-lock broker: identity, not a layout.
 		'lpn_identity',
 		// Legacy keys nothing writes any more; a workspace must not resurrect them.
@@ -45478,7 +45484,7 @@ var EngCalcs = EngCalcs || {};
 			closePopup();
 			buildDom();
 			updateEmptyHint();
-			clearStatusHidden();
+			clearStatusHidden(true);
 			setStatus('');
 			setMode('select');
 			refreshScenarioStatus();
@@ -62475,7 +62481,8 @@ var EngCalcs = EngCalcs || {};
 		// at the top of the expando history"). Pinned above the newest-first list, and its own entry in
 		// that list is left out below so the same words never appear twice.
 		var hiddenText = statusHiddenText();
-		if (hiddenText) {
+		var hiddenNotes = (notesLast && notesHidden) ? notesLast : '';
+		function hiddenRow(text, restore) {
 			var hrow = document.createElement('div');
 			hrow.className = 'lpn-msglog-panel-row lpn-msglog-panel-hidden';
 			var mark = document.createElement('span');
@@ -62484,7 +62491,7 @@ var EngCalcs = EngCalcs || {};
 			hrow.appendChild(mark);
 			var htext = document.createElement('span');
 			htext.className = 'lpn-msglog-panel-text';
-			htext.textContent = hiddenText;
+			htext.textContent = text;
 			hrow.appendChild(htext);
 			var show = document.createElement('button');
 			show.type = 'button';
@@ -62492,14 +62499,16 @@ var EngCalcs = EngCalcs || {};
 			show.textContent = pc.lpn_msglog_unhide || 'Show';
 			show.title = pc.lpn_status_hidden_tip || 'Show the hidden message on the map again.';
 			show.addEventListener('click', function () {
-				unhideStatus();
+				restore();
 				var xEl = document.getElementById('lpn_status_dismiss');
 				if (xEl && xEl.focus) { xEl.focus(); }
 			});
 			hrow.appendChild(show);
 			panel.appendChild(hrow);
 		}
-		if (!noticeLog.length && !hiddenText) {
+		if (hiddenText) { hiddenRow(hiddenText, unhideStatus); }
+		if (hiddenNotes) { hiddenRow(hiddenNotes, unhideEngineNotes); }
+		if (!noticeLog.length && !hiddenText && !hiddenNotes) {
 			// A DIFFERENT CLASS FROM A REAL ROW ON PURPOSE: "no messages yet" is not itself a
 			// kept message, so it must not count as one to anything reading .lpn-msglog-panel-row.
 			var none = document.createElement('div');
@@ -62511,7 +62520,7 @@ var EngCalcs = EngCalcs || {};
 		// Newest first, matching noticeLog's own order (Tom: "oldest at the bottom") -- no
 		// re-sorting at render time, so the panel can never disagree with the log it is reading.
 		noticeLog.forEach(function (row) {
-			if (hiddenText && row.text === hiddenText) { return; }
+			if ((hiddenText && row.text === hiddenText) || (hiddenNotes && row.text === hiddenNotes)) { return; }
 			var pill = document.createElement('div');
 			pill.className = 'lpn-msglog-panel-row' + (row.severity === 'warning' ? ' lpn-msglog-panel-warn' : '');
 			var when = document.createElement('span');
@@ -62748,9 +62757,75 @@ var EngCalcs = EngCalcs || {};
 	// summaries, not-converged, engine loading and failure, storage full, unit unknown) the start of
 	// the next run, since the same sentence after a new run is a new fact. `diag` is true only for
 	// a diagnostic.
-	var statusHidden = {};      // message text -> true, for the texts the user has hidden
-	var statusLast = { text: '', code: '', diag: false };
-	function clearStatusHidden() { statusHidden = {}; }
+	//
+	// **REMEMBERED ACROSS A RELOAD, IN THIS BROWSER** (Tom, 2026-10-09, H09: "this should not be lost on
+	// reload."). A reading preference the visitor asked for, the class of `lpn_hovercard`, so it is
+	// `localStorage` only and never in serializeProject(). What is stored is as little as can do the
+	// job: the open project's id and, per hidden message, a short hash of its words with its kind
+	// (`diag` or `cond:<name>`). Never the words. A hidden RUN message is not stored at all: the next
+	// run, which a reload is, forgets it anyway.
+	//
+	// **THREE MESSAGES STAY HIDDEN UNTIL THEIR CONDITION CHANGES** (Tom, 2026-10-09, H11): storage full,
+	// storage unreadable and unit unknown. They are neither a diagnostic nor a run summary, since an
+	// edit or a run says the same sentence again and no one fixed anything. A `cond:` entry survives
+	// edits and runs; clearHiddenCond() removes it when the condition clears (storage takes a write,
+	// the document reads, the unit is recognised), so a recurrence after that shows again.
+	var LPN_MSGHIDDEN_KEY = 'lpn_msghidden';
+	// Words to a short key: the identity of a message, which cannot be turned back into the words.
+	function statusKey(text) {
+		var h = 5381, i;
+		for (i = 0; i < text.length; i++) { h = ((h * 33) ^ text.charCodeAt(i)) >>> 0; }
+		return h.toString(36) + '.' + text.length;
+	}
+	var statusHiddenOwner = '';   // the project id the hidden set belongs to
+	function loadStatusHidden() {
+		var out = {};
+		try {
+			var o = JSON.parse(localStorage.getItem(LPN_MSGHIDDEN_KEY) || 'null');
+			if (o && typeof o.o === 'string' && o.h && typeof o.h === 'object') {
+				Object.keys(o.h).forEach(function (k) {
+					if (/^(diag|cond:[a-z-]+)$/.test(String(o.h[k]))) { out[k] = o.h[k]; statusHiddenOwner = o.o; }
+				});
+			}
+		} catch (e) { out = {}; }
+		return out;
+	}
+	var statusHidden = loadStatusHidden();   // statusKey(text) -> 'diag' | 'run' | 'cond:<name>'
+	// A restored hidden set is not judged by the empty statements a page load makes on its way to its
+	// first real message; the grace ends at the first non-empty one.
+	var statusHiddenGrace = Object.keys(statusHidden).length > 0;
+	var statusLast = { text: '', code: '', diag: false, cond: '' };
+	function saveStatusHidden() {
+		var keep = {}, n = 0;
+		Object.keys(statusHidden).forEach(function (k) {
+			if (statusHidden[k] !== 'run' && n < 40) { keep[k] = statusHidden[k]; n++; }
+		});
+		try {
+			if (n) { localStorage.setItem(LPN_MSGHIDDEN_KEY, JSON.stringify({ o: statusHiddenOwner, h: keep })); }
+			else { localStorage.removeItem(LPN_MSGHIDDEN_KEY); }
+		} catch (e) { /* private mode or full: hidden for this page view only */ }
+	}
+	// Opening a different network, or clearing this one, ends the set. Opening the SAME project (a
+	// reload) keeps what was restored.
+	function clearStatusHidden(force) {
+		if (!force && statusHiddenOwner && statusHiddenOwner === library.openId) { return; }
+		statusHidden = {};
+		statusHiddenGrace = false;
+		saveStatusHidden();
+	}
+	function hideStatusMessage() {
+		statusHiddenOwner = library.openId || '';
+		statusHidden[statusKey(statusLast.text)] = statusLast.cond ? 'cond:' + statusLast.cond : (statusLast.diag ? 'diag' : 'run');
+		saveStatusHidden();
+	}
+	// The condition behind a `cond:` message has cleared, so a recurrence is news again.
+	function clearHiddenCond(name) {
+		var any = false;
+		Object.keys(statusHidden).forEach(function (k) { if (statusHidden[k] === 'cond:' + name) { delete statusHidden[k]; any = true; } });
+		if (!any) { return; }
+		saveStatusHidden();
+		if (statusLast.cond === name) { paintStatus(); syncStatusBoxVisibility(); }
+	}
 	// A new run forgets the hidden RUN messages (door 2 above); hidden diagnostics stay hidden.
 	function forgetHiddenRunMessages() {
 		Object.keys(statusHidden).forEach(function (k) { if (statusHidden[k] === 'run') { delete statusHidden[k]; } });
@@ -62758,7 +62833,7 @@ var EngCalcs = EngCalcs || {};
 	// The text the user has hidden and that is still the standing message, or '' -- what the history
 	// panel pins at its top.
 	function statusHiddenText() {
-		return (statusLast.text && statusHidden[statusLast.text]) ? statusLast.text : '';
+		return (statusLast.text && statusHidden[statusKey(statusLast.text)]) ? statusLast.text : '';
 	}
 	// Paints what setStatus() last stated, honouring the hidden set. Called by setStatus(), and by
 	// the x and the history row's Show, which must not re-log a message that has not changed.
@@ -62772,23 +62847,33 @@ var EngCalcs = EngCalcs || {};
 		// and textContent on the parent would delete it on the first solve. Falls back to the <p>
 		// where the span is absent, so a harness or a page that has not been updated still works.
 		(textEl || el).textContent = hide ? '' : (statusLast.text || '');
-		if (xEl) { xEl.style.display = (statusLast.text && !hide) ? '' : 'none'; }
+		// The x serves the notes beside the text too (H10): shown while either has something on the map.
+		if (xEl) { xEl.style.display = ((statusLast.text && !hide) || (notesLast && !notesHidden)) ? '' : 'none'; }
 		// An open history panel follows: a hidden message forgotten by an edit leaves its top row.
 		if (msglogPanelOpen) { renderMsglogPanel(); }
 	}
 	// Brings the hidden message back onto the map. The one restore door, on the history row.
 	function unhideStatus() {
-		delete statusHidden[statusLast.text];
+		delete statusHidden[statusKey(statusLast.text)];
+		saveStatusHidden();
 		paintStatus();
 		syncStatusBoxVisibility();
 	}
-	function setStatus(text, code, diag) {
+	function setStatus(text, code, diag, cond) {
 		var el = document.getElementById('lpn_status');
 		if (!el) { return; }
-		statusLast = { text: text || '', code: code || '', diag: !!(text && diag) };
+		statusLast = { text: text || '', code: code || '', diag: !!(text && diag), cond: text ? (cond || '') : '' };
 		// A hidden text is FORGOTTEN the moment it is no longer the one showing: fix the problem,
-		// break it again (undo, redo, an edit) and the message must be seen again.
-		Object.keys(statusHidden).forEach(function (k) { if (k !== statusLast.text) { delete statusHidden[k]; } });
+		// break it again (undo, redo, an edit) and the message must be seen again. A `cond:` entry is
+		// the exception, kept until clearHiddenCond().
+		if (!statusHiddenGrace || statusLast.text) {
+			var cur = statusLast.text ? statusKey(statusLast.text) : '', pruned = false;
+			Object.keys(statusHidden).forEach(function (k) {
+				if (k !== cur && statusHidden[k].indexOf('cond:') !== 0) { delete statusHidden[k]; pruned = true; }
+			});
+			if (pruned) { saveStatusHidden(); }
+			statusHiddenGrace = false;
+		}
 		paintStatus();
 		// Hidden when empty, or an empty amber box sits on the drawing saying nothing. It is an
 		// overlay now, so this changes what is COVERED, never what is laid out.
@@ -62873,6 +62958,25 @@ var EngCalcs = EngCalcs || {};
 	// grievance button beside it.
 	var LPN_ENGINE_NOTE_MS = 120000, LPN_ENGINE_NOTE_FADE_MS = 800;
 	var engineNoteTimer = 0, engineNoteFadeTimer = 0;
+	// **THE x HIDES THE NOTES TOO** (Tom, 2026-10-09, H10: "hidden means hidden"). Their text is kept
+	// here while hidden so the history can show it with Show; it is not stored on the device, because
+	// a note lives two minutes and its next showing is a new fact.
+	var notesLast = '', notesHidden = false;
+	function hideEngineNotes() {
+		var el = document.getElementById('lpn_status_notes');
+		if (!notesLast || notesHidden || !el) { return; }
+		notesHidden = true;
+		el.textContent = '';
+	}
+	function unhideEngineNotes() {
+		var el = document.getElementById('lpn_status_notes');
+		if (!notesLast || !notesHidden || !el) { return; }
+		notesHidden = false;
+		el.textContent = ' ' + notesLast;
+		el.style.opacity = '';
+		paintStatus();
+		syncStatusBoxVisibility();
+	}
 	function clearEngineNoteTimers() {
 		if (engineNoteTimer) { clearTimeout(engineNoteTimer); engineNoteTimer = 0; }
 		if (engineNoteFadeTimer) { clearTimeout(engineNoteFadeTimer); engineNoteFadeTimer = 0; }
@@ -62886,20 +62990,30 @@ var EngCalcs = EngCalcs || {};
 		// A leading space because this span abuts #lpn_status_text with no whitespace between the
 		// two tags -- the markup cannot carry one without it showing when the note is absent.
 		el.textContent = text ? ' ' + text : '';
+		notesLast = text || '';
+		notesHidden = false;
 		// **ALL MESSAGES GO THROUGH ONE DOOR** (ROADMAP Task 704; Perry's review, 2026-09-22:
 		// setEngineNotes() was the one writer of on-map text this branch had missed -- it stands
 		// for two minutes and then fades, exactly the "read it, then it is gone" shape the whole
 		// task exists to fix). Shown for two minutes, never a flash, so it needs no delay guard --
 		// logged the moment it is set, same as setStatus() beside it.
 		if (text) { logMessage(text, 'notice'); }
+		paintStatus();
 		if (text) {
 			engineNoteTimer = setTimeout(function () {
 				engineNoteTimer = 0;
+				if (notesHidden) {   // hidden notes just expire, with their history row
+					notesLast = ''; notesHidden = false;
+					paintStatus(); syncStatusBoxVisibility();
+					return;
+				}
 				el.style.opacity = '0';
 				engineNoteFadeTimer = setTimeout(function () {
 					engineNoteFadeTimer = 0;
 					el.textContent = '';
 					el.style.opacity = '';
+					notesLast = '';
+					paintStatus();
 					syncStatusBoxVisibility();
 				}, LPN_ENGINE_NOTE_FADE_MS);
 			}, LPN_ENGINE_NOTE_MS);
@@ -63149,8 +63263,9 @@ var EngCalcs = EngCalcs || {};
 		var xEl = document.getElementById('lpn_status_dismiss');
 		if (xEl) {
 			xEl.addEventListener('click', function () {
-				if (!statusLast.text) { return; }
-				statusHidden[statusLast.text] = statusLast.diag ? 'diag' : 'run';
+				if (!statusLast.text && !(notesLast && !notesHidden)) { return; }
+				if (statusLast.text && !statusHiddenText()) { hideStatusMessage(); }
+				hideEngineNotes();
 				paintStatus();
 				syncStatusBoxVisibility();
 				var logBtn = document.getElementById('lpn_msglog_btn');
@@ -64095,10 +64210,11 @@ var EngCalcs = EngCalcs || {};
 			lastSolveResult = null;
 			setStatus(((EngCalcs.pageConfig || {}).lpn_unit_unknown ||
 				'This drawing states a unit this page does not offer: {unit}. Everything is kept and shown exactly as it came in, and nothing was changed. No answers can be given until this page knows that unit, because there is no way to tell how big it is.')
-				.replace('{unit}', unknownUnits.join(', ')), 'unit-unknown');
+				.replace('{unit}', unknownUnits.join(', ')), 'unit-unknown', false, 'unit-unknown');
 			refreshLabelText();
 			return;
 		}
+		clearHiddenCond('unit-unknown');
 		var model = assembleModel();
 		// **THE EPANET FETCH STARTS HERE, BEFORE ANY OPINION ABOUT THE NETWORK IS FORMED** (Task
 		// 608). This is the one function every edit's debounce and every Calculate demand arrive at,

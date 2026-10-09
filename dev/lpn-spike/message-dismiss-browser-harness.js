@@ -8,7 +8,7 @@
 // buttons, the history glyph's highlight, and the canvas SVG unchanged); the hidden message is the top
 // row of the message history, marked, and Show there restores it; different text shows again; same
 // text stays hidden across solves; opening another network clears it; the x on "Add a reservoir" too;
-// nothing in localStorage; and the toolbar corner triangle, the Map menu row and the W key entering
+// no message words in localStorage (only hashes, in lpn_msghidden); and the toolbar corner triangle, the Map menu row and the W key entering
 // Zoom Window with the view transform untouched, then a drag zooming.
 'use strict';
 
@@ -216,13 +216,13 @@ async function main() {
 		s = await st();
 		ok('redo brings the broken state back SHOWING, not hidden', /J1, J2, J3/.test(s.text) && s.x && s.box, JSON.stringify(s));
 
-		console.log('\n--- nothing is stored ---');
+		console.log('\n--- no message words are stored ---');
 		const stored = await page.evaluate(() => {
 			const all = [];
 			for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); all.push(k + '=' + localStorage.getItem(k)); }
 			return all.join('\n') + '\n' + document.cookie;
 		});
-		ok('no storage mentions the message', !/status_hidden|statusHidden|lpn_status_dismiss/i.test(stored));
+		ok('no storage holds a message\'s words', !/status_hidden|statusHidden|lpn_status_dismiss|Add a reservoir|J1, J2/i.test(stored));
 
 		console.log('\n--- Zoom Window by the Map menu row ---');
 		const mode = () => page.evaluate(() => {

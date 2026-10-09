@@ -158,6 +158,26 @@ async function main() {
 		ok('the same problem recurring brings "Add a reservoir" back', (await text()).indexOf(noRes) === 0, await text());
 		ok('...with its x', await visX());
 
+		// (c) A RELOAD (Tom, 2026-10-09, H09: "this should not be lost on reload."): the same message
+		// is still hidden, only a hash of it is stored, and fixing then breaking it shows it again.
+		await page.click('#lpn_status_dismiss'); await a.settle(400);
+		ok('"Add a reservoir" hidden again before the reload', (await text()) === '');
+		await a.settle(1500);   // the autosave
+		const held = await page.evaluate(() => localStorage.getItem('lpn_msghidden'));
+		ok('the browser holds a record, not the words', !!held && held.indexOf('reservoir') < 0 && held.indexOf('J1') < 0 && /"diag"/.test(held), String(held));
+		await page.evaluate(() => { try { sessionStorage.clear(); } catch (e) {} });
+		await a.reload();
+		await a.answerTrainingPanel().catch(() => {});
+		await page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } });
+		await a.settle(1500);
+		ok('after a reload the message is still hidden', (await text()) === '' && !(await visX()), await text());
+		ok('...and it waits as the top Hidden row of the history', (await openLogTop()) === noRes);
+		await place('Reservoir', 0.6, 0.6);
+		await a.settle(1200);
+		await page.keyboard.press('Control+z'); await a.settle(1500);
+		ok('fixed and broken again after the reload, it shows again', (await text()).indexOf(noRes) === 0, await text());
+		ok('...and the browser forgot the old hiding', (await page.evaluate(() => localStorage.getItem('lpn_msghidden'))) === null);
+
 		// (b) a run message: a connected network whose solver gives up. Hidden by the x; the next run
 		// (Calculate) says it again.
 		await a.newProject('us');
