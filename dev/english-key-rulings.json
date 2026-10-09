@@ -2262,6 +2262,16 @@
             "ruled": "2026-09-28",
             "answer": "OK."
         },
+        "lpn_file_export_menu": {
+            "on": "Export…",
+            "ruled": "2026-10-09",
+            "answer": "Change File, 'Export to...' to 'Export...'."
+        },
+        "lpn_file_export_workspace_tip": {
+            "on": "Download a small file holding where your boxes sit, their sizes, which are open or docked, and your pane and column sizes, plus the display options of this page, such as which help bubbles and the hover card are shown. Your projects, project settings and cookies (language, consent, units) are not in it. Load it on another screen or browser with File, Import, Workspace.",
+            "ruled": "2026-10-09",
+            "answer": "Use proposed (Tom, calls page round 3)."
+        },
         "lpn_file_import_menu": {
             "on": "Import…",
             "ruled": "2026-10-01",
@@ -2276,6 +2286,11 @@
             "on": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not.",
             "ruled": "2026-09-23",
             "answer": "OK."
+        },
+        "lpn_file_import_workspace_tip": {
+            "on": "Apply a workspace file saved with File, Export, Workspace: box positions and sizes, docking, pane sizes and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched.",
+            "ruled": "2026-10-09",
+            "answer": "Use proposed (Tom, calls page round 3)."
         },
         "lpn_find_conn_no_fixed": {
             "on": "This network has no reservoir or tank, so it has no source to reach. Only \"no links\" and \"no open links\" can be searched.",
@@ -3571,6 +3586,11 @@
             "ruled": "2026-09-28",
             "answer": "OK."
         },
+        "lpn_pane_copy_heads": {
+            "on": "Copy with column headings",
+            "ruled": "2026-10-09",
+            "answer": "Use proposed (Tom, calls page round 3)."
+        },
         "lpn_pane_ctrlenter_filled": {
             "on": "Filled {n} cells. {skipped} were not changed.",
             "ruled": "2026-09-28",
@@ -4609,6 +4629,11 @@
         "lpn_settings_head_error_tip": {
             "on": "An additional test the solver must pass before it stops: the largest head any one pipe is still out by. Zero means do not apply this test. Only the EPANET solver reads this box.",
             "ruled": "2026-09-02"
+        },
+        "lpn_settings_hover_card_tip": {
+            "on": "Rest the pointer on a node, link or customer to see its label as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project.",
+            "ruled": "2026-10-09",
+            "answer": "Use proposed (Tom, calls page round 3)."
         },
         "lpn_settings_label_always": {
             "on": "Always show",

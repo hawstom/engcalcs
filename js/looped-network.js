@@ -28889,7 +28889,7 @@ var EngCalcs = EngCalcs || {};
 		mk(pc.points_data_copy || 'Copy', function () {
 			libCopyOut(paneCopyTsv(spec, rows, cols, box));
 		}, 'Ctrl+C');
-		mk(pc.lpn_pane_copy_heads || 'Copy with headings', function () {
+		mk(pc.lpn_pane_copy_heads || 'Copy with column headings', function () {
 			libCopyOut(paneCopyTsv(spec, rows, cols, box, true));
 		});
 		mk(pc.points_data_paste || 'Paste', function () {
@@ -43140,9 +43140,8 @@ var EngCalcs = EngCalcs || {};
 			// **THE TABLES, BY FORMAT** (Tom, 2026-10-07: *"File, Export to, and we are adding
 			// ODS/XLSX/CSV. And we include Libraries"*). Each row opens the box that asks which tables
 			// and which scenarios; the format is the row. Rows are named for the file, like the three
-			// above, under a heading that says what goes into it.
+			// above, each tip says what it carries.
 			{ separator: true },
-			{ heading: true, label: pc.lpn_file_export_tables_heading || 'Tables and libraries' },
 			{ icon: 'save', label: pc.lpn_file_export_item_ods || 'ODS file…',
 			  tip: pc.lpn_file_export_tables_tip, fn: function () { openExportTableBox('ods'); } },
 			{ icon: 'save', label: pc.lpn_file_export_item_xlsx || 'XLSX file…',
@@ -43221,7 +43220,7 @@ var EngCalcs = EngCalcs || {};
 			// **AN EXPORT SUBMENU (Tom, 2026-10-06: "it's time to put all the exports into a
 			// submenu")**, the twin of Import above it and built the same way. Each row keeps its
 			// handler and tip; see exportMenuRows(), where a new export is one line.
-			{ icon: 'save', label: pc.lpn_file_export_menu || 'Export to…', submenu: exportMenuRows },
+			{ icon: 'save', label: pc.lpn_file_export_menu || 'Export…', submenu: exportMenuRows },
 		].concat([
 			{ separator: true },
 			// **The menu says Save and Save as… in every browser**, never "Download a copy": the

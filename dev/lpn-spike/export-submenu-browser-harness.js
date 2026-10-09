@@ -109,7 +109,8 @@ async function main() {
 			ok('it holds every export row, in order', JSON.stringify(got) === JSON.stringify(want), got.join(' | '));
 			ok('no row repeats the word Export', got.every((t) => !/^Export/i.test(t)));
 			const heading = await a.page.$$eval('#lpn_menu_list2 .lpn-menu-heading', (els) => els.map((e) => e.textContent.trim()));
-			ok('the table rows sit under the Tables and libraries heading', JSON.stringify(heading) === JSON.stringify([(await a.lang('lpn_file_export_tables_heading')).trim()]), JSON.stringify(heading));
+			ok('the Export submenu has no heading row (Tom, 2026-10-09)', heading.length === 0, JSON.stringify(heading));
+			ok('the File row says Export… and not Export to…', menuLabel === 'Export…', menuLabel);
 			for (let i = 0; i < ROWS.length; i++) {
 				if (i > 0) { await a.page.keyboard.press('Escape'); await a.settle(200); await openFile(); await openSub(); }
 				let dl = null;
