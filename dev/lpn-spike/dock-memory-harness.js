@@ -46,7 +46,7 @@ const reload = async (a) => { await a.reload(); await noConsent(a); await a.sett
 const { strips, clickNode, openBox, dockHidden } = require('./dock-boxes.js');
 
 // Deliberately not the order wireBoxDocking() registers them in.
-const LEFT = ['lpn_full_box', 'lpn_calib_box', 'lpn_energy_box', 'lpn_alt_box', 'lpn_status_box', 'lpn_rptbox', 'lpn_scncmp_box'];
+const LEFT = ['lpn_full_box', 'lpn_calib_box', 'lpn_energy_box', 'lpn_sm_box', 'lpn_status_box', 'lpn_rptbox', 'lpn_scncmp_box'];
 const RIGHT = ['lpn_contour_box', 'lpn_ds_box', 'lpn_settings_box', 'lpn_popup', 'lpn_crit_box', 'lpn_find_popup', 'lpn_ff_box', 'lpn_library_box'];
 
 async function main() {

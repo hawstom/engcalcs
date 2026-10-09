@@ -463,7 +463,7 @@ are the asset tables' own.
   run time or step, and its button opens the Settings table on that row.
 - **Visible in Basic mode: CC's call, for Tom to judge.** Show scenarios already is, it is a table,
   and in Basic mode it is now the only table where a scenario's own settings are audited. The
-  alternative is to show the tab only with Basic mode off, as the Alternatives preview is.
+  alternative is to show the tab only with Basic mode off, as the Scenarios table is.
 
 Harnesses: `dev/lpn-spike/settings-table-browser-harness.js` (real Chromium: Net1 and Net3 lat/lon;
 Base edits and their undo, a child scenario's friction method, demand multiplier and text size,
@@ -945,9 +945,54 @@ that holds none shows Base's live view.
 **No UI obligation left from seeding:** a new scenario is no longer seeded with the project's
 demand multiplier (stage 3b), so assigning it a calculation set meets no local value to refuse.
 
-**Not yet:** no screen for any of it; the Alternatives table and the override count still show
+**Not yet at stage 5:** no screen for any of it (stage 6, below, adds one); the override count still shows
 each scenario's own values; a unit change converts element values in stored alternatives but, as
 in stage 3, not unit-bearing values held in any settings block.
+
+### Stage 6: the Scenario manager and the Scenarios table (built 2026-10-09)
+
+Tom's calls of 2026-10-09 (H01-H08), in his words where they govern:
+
+- **One narrow tree pane per tree, doing little**: *"a tree is needed for every alternative category and
+  for scenarios ... you don't do much in that pane other than name, rename, add, delete, and move
+  children and branches."* The box is `#lpn_sm_box`, "Scenario manager", docked by the page's dock
+  machinery; a selector chooses Scenarios or one of the eleven categories. An alternative's contents
+  are edited in Properties and Settings under the current scenario; there is no Alternatives editor
+  and no Alternatives table (the read-only preview box this replaced, `lpn_alt_box`, is gone).
+- **The Scenarios table** (Tables pane, shown with Basic mode off): one row per scenario, one column per
+  category, each cell a pick-list of that category's alternatives only. The cell text is the
+  alternative the scenario uses; `inherited` marks one it takes from its parent; `Own values (n)` is a
+  scenario holding values of its own. Picking one assigns it; choosing another while the scenario holds
+  its own values first keeps them as a stored alternative named for the scenario. A blank pick
+  (Clear override, Delete) inherits again. Fill, paste and the cell menu are the pane's own.
+- **The menu row is always present**; choosing it with Basic mode ticked turns Basic mode off and says so.
+- **Gestures**: drag a leaf or branch onto an item to re-parent it (the row is outlined); drag between
+  two items to reorder (a line); a cycle is refused. Click a selected item or F2 renames, Delete or the
+  minus button or the context menu deletes, the plus button or the context menu adds a child
+  (`Child_<n>_of_<parent>`), Enter or a double-click makes a scenario current. **Delete is refused while
+  the item is in use, naming who uses it.**
+- **Several Bases** (H08): "Add Base" names `Base2`, `Base3`. A Base of its own is a record flagged
+  `root: true` with no parent. It resolves exactly as a child of Base does (Base's values are the
+  elements' own), so the flag is only which row it hangs from. A stage-4 record with parent null and no
+  flag hangs from Base.
+- **Order** (Tom asked for it): `project.scenarioOrdered` is set by the first reorder and freezes the
+  order then shown into the stored array; until then scenarios sort by name, so a file that never
+  reorders opens as it did. The stored order is shown everywhere scenarios are listed.
+- **Copy asks each time** (H05): own copies of the stored alternatives it names, or share them. Its own
+  values are always copied.
+- **Compare** solves a checked set kept in `project.compareSet`; absent means every scenario, and
+  checking everything deletes the key.
+- **Used by** (the market researcher): each alternative shows the number of scenarios using it (naming
+  it or inheriting it) with the list in its tip, and an override written into an alternative other
+  scenarios use says so in its existing note (Properties and the Settings box).
+- Known limit: a child cannot choose Base while its parent uses another alternative, because choosing
+  nothing inherits. Re-parent the scenario to Base instead.
+
+Code: `smTrees()` ... `smCopyScenario()`, `compareScenarios()`, `smSharedText()` in the section "THE SCENARIO
+MANAGER'S MODEL"; the box and the table in "SCENARIOS > BASIC MODE, AND THE SCENARIO MANAGER". Harnesses:
+`scenario-manager-harness.js` (model, headless) and `scenario-manager-browser-harness.js` (the box and the
+table in Chromium). Storage: the box keeps its place on `lpn_smbox` (window furniture); `lpn_altbox` is
+removed when the page opens.
 
 ### Next stage: what the advisers said (recorded, not built)
 
@@ -995,8 +1040,8 @@ The held mark in the Settings box: `setboxTag()`, `labelRowPaths()`, `markHeldSe
 `clearHeldSetboxRows()`, beside `wireSetboxScenarioSeam()`; the view's rows, `settingsViewRows()`,
 `refreshSetboxViewRows()`, `holdScenarioView()`, `releaseScenarioView()`.
 
-Basic mode and the table: same file, section "SCENARIOS > BASIC MODE" (`setScenarioBasicMode()`,
-`rebuildAlternativesTable()`); the box is `#lpn_alt_box` in `Looped-Network.php`. The box's
-position and size are not remembered, so the only new thing a browser stores is `lpn_scnbasic`
-(registered in `lpn_furniture_check.php`, `dev/cookie-storage-inventory.md` and Erase everything).
+Basic mode and the manager: same file, section "SCENARIOS > BASIC MODE, AND THE SCENARIO MANAGER"
+(`setScenarioBasicMode()`, `rebuildScenarioManager()`); the box is `#lpn_sm_box` in `Looped-Network.php`
+(see Stage 6). `lpn_scnbasic` is registered in `lpn_furniture_check.php`,
+`dev/cookie-storage-inventory.md` and Erase everything.
 Harness: `dev/lpn-spike/scenario-alternatives-harness.js`.

@@ -39,8 +39,8 @@ const L = loadLoopedNetwork(
 	"\t\tSETTING_CATEGORY_OF: LPN_SETTING_CATEGORY_OF, settingFor: settingFor, effectiveSetting: effectiveSetting,\n" +
 	"\t\tsetScenarioSetting: setScenarioSetting, overrideCount: overrideCount,\n" +
 	"\t\tgetSettings: function () { return settings; }, getProject: function () { return project; },\n" +
-	"\t\tscenarioMenuRows: scenarioMenuRows, openAlternativesBox: openAlternativesBox,\n" +
-	"\t\taltBoxIsOpen: altBoxIsOpen, wireAlternativesBox: wireAlternativesBox,\n" +
+	"\t\tscenarioMenuRows: scenarioMenuRows, openScenarioManager: openScenarioManager, smCellText: smCellText,\n" +
+	"\t\tsmBoxIsOpen: smBoxIsOpen, wireScenarioManager: wireScenarioManager,\n" +
 	"\t\tbasicMode: function () { return scenarioBasicMode; },\n" +
 	"\t\tbuildLayers: function () { svg = document.getElementById('lpn_canvas');\n" +
 	"\t\t\tworld = el('g', {}, svg);\n" +
@@ -252,52 +252,41 @@ console.log('\n--- Basic mode ---');
 	const pk = L.createScenario('Peak Hour');
 	L.setProp(L.getDoc().nodes.filter(function (n) { return n.type === 'junction'; })[0], 'demand', 999);
 	// The page's markup, which the stub builds only on request (Looped-Network.php holds the real one).
-	ensure('lpn_alt_box'); ensure('lpn_alt_report'); ensure('lpn_alt_close');
-	L.wireAlternativesBox();
+	ensure('lpn_sm_box'); ensure('lpn_sm_body'); ensure('lpn_sm_close');
+	L.wireScenarioManager();
 	function rows() { return L.scenarioMenuRows().filter(function (r) { return !r.separator; }); }
 	function basicRow() { return rows().filter(function (r) { return r.label.indexOf(PC.lpn_scenario_basic) >= 0; })[0]; }
-	function altRow() { return rows().filter(function (r) { return r.label === PC.lpn_alt_title; })[0]; }
+	function mgrRow() { return rows().filter(function (r) { return r.label === PC.lpn_sm_menu; })[0]; }
 	let store = null;
 	try { store = global.localStorage.getItem('lpn_scnbasic'); } catch (e) {}
 	ok('Basic mode is on for a browser that never touched it, and nothing is stored', L.basicMode() && store === null);
 	ok('the Scenarios menu carries the row, ticked', basicRow() && basicRow().label.indexOf('✓') === 0);
-	ok('...and no Alternatives row while it is ticked', !altRow());
+	ok('...and the Scenario manager row is there while it is ticked (Tom, 2026-10-09)', !!mgrRow());
 	const fileBefore = L.projectFileText();
 	basicRow().fn();
 	ok('unticking it turns Basic mode off', !L.basicMode() && basicRow().label.indexOf('✓') !== 0);
 	ok('...stored in the browser as off', global.localStorage.getItem('lpn_scnbasic') === 'off');
 	ok('...and not in the project: the saved file is byte-identical', L.projectFileText() === fileBefore);
-	ok('the Alternatives row appears', !!altRow());
-	altRow().fn();
-	ok('it opens the Alternatives box', L.altBoxIsOpen());
-	const text = (function walk(el) { return (el.textContent || '') + (el.children || []).map(walk).join('|'); })(ensure('lpn_alt_report'));
-	ok('the table names every category', L.CATS.every(function (c) { return text.indexOf(PC['lpn_alt_cat_' + c]) >= 0; }));
-	ok('...and shows Peak Hour with its own Demand alternative of one value', text.indexOf(pk.name + ' (1)') >= 0);
+	mgrRow().fn();
+	ok('the Scenario manager row opens the box', L.smBoxIsOpen());
+	// The Scenarios table's cell for a scenario holding its own demand value.
+	ok('...and the Scenarios table reads Peak Hour\'s Demand as its own values, counted', L.smCellText(pk, 'demand') === PC.lpn_sm_own_values + ' (1)', L.smCellText(pk, 'demand'));
+	ok('...and Base\'s other categories as Base', L.smCellText(pk, 'physical') === PC.lpn_scenario_base, L.smCellText(pk, 'physical'));
 	// Q7 (Tom, 2026-10-05): the demand multiplier, run time and time step are calculation options,
-	// counted in the Calculation column; their own three columns retired with the Settings table.
+	// counted in the Calculation category.
 	{
-		const rowsOf = () => (function walkRows(el, out) { if (el.tagName === 'TR') { out.push(el); } (el.children || []).forEach(function (c) { walkRows(c, out); }); return out; })(ensure('lpn_alt_report'), []);
-		const cells = (tr) => tr.children.map((c) => String(c.textContent || '').replace(/[^\x20-\x7e]/g, '').trim());
-		const head = cells(rowsOf()[0]);
-		ok('one column per category and nothing after them', head.length === L.CATS.length + 1, JSON.stringify(head));
-		ok('...the last two headed Presentation and Calculation', head[head.length - 2] === PC.lpn_alt_cat_presentation &&
-			head[head.length - 1] === PC.lpn_alt_cat_calculation, JSON.stringify(head.slice(-2)));
-		ok('no input is left in the table', !(function walk(el) { return el.tagName === 'INPUT' || (el.children || []).some(walk); })(ensure('lpn_alt_report')));
-		const CALC = head.length - 1;
 		const seeded = L.createScenario('Seeded');
 		const ownMult = L.createScenario('Max Day'); ownMult.demandMultiplier = 2;
-		L.openAlternativesBox();
-		const byName = {}; rowsOf().slice(1).forEach(function (tr) { byName[cells(tr)[0]] = cells(tr); });
 		ok('a multiplier seeded equal to the project\'s counts nothing: Calculation is Base\'s',
-			byName.Seeded && byName.Seeded[CALC] === PC.lpn_scenario_base, JSON.stringify(byName.Seeded));
-		ok('a scenario with its own multiplier counts it in Calculation', byName['Max Day'] && byName['Max Day'][CALC] === 'Max Day (1)',
-			JSON.stringify(byName['Max Day']));
+			L.smCellText(seeded, 'calculation') === PC.lpn_scenario_base, L.smCellText(seeded, 'calculation'));
+		ok('a scenario with its own multiplier counts it in Calculation', L.smCellText(ownMult, 'calculation') === PC.lpn_sm_own_values + ' (1)',
+			L.smCellText(ownMult, 'calculation'));
 		ok('...and that count is the number beside its name', L.overrideCount(ownMult) === 1, L.overrideCount(ownMult));
 		L.deleteScenario(ownMult.id); L.deleteScenario(seeded.id);
 	}
 	basicRow().fn();
 	ok('ticking it again removes the stored key and closes the box',
-		L.basicMode() && global.localStorage.getItem('lpn_scnbasic') === null && !L.altBoxIsOpen());
+		L.basicMode() && global.localStorage.getItem('lpn_scnbasic') === null && !L.smBoxIsOpen());
 }
 
 // ---------------------------------------------------------------------------

@@ -241,7 +241,7 @@ async function main() {
 		await quiet();
 		await b.openExampleCard(await b.lang('lpn_ex_net3_title'));
 		await b.settle(800);
-		const L = ['lpn_alt_box', 'lpn_energy_box', 'lpn_scncmp_box', 'lpn_rptbox', 'lpn_status_box', 'lpn_calib_box', 'lpn_full_box'];
+		const L = ['lpn_sm_box', 'lpn_energy_box', 'lpn_scncmp_box', 'lpn_rptbox', 'lpn_status_box', 'lpn_calib_box', 'lpn_full_box'];
 		const R = ['lpn_popup', 'lpn_settings_box', 'lpn_find_popup', 'lpn_library_box', 'lpn_contour_box', 'lpn_ff_box', 'lpn_crit_box', 'lpn_ds_box'];
 		for (const id of L) { await dockHidden(b, id, 'left'); }
 		for (const id of R) { await dockHidden(b, id, 'right'); }
@@ -250,17 +250,17 @@ async function main() {
 		ok('fifteen boxes docked as auto-hide tabs, Alternatives top left and Properties top right', JSON.stringify(st) === fifteen, JSON.stringify(st));
 		const tomFile = (await exportWorkspace(b)).text;
 		ok('the exported file carries the docks of the boxes with no record of their own', /lpn_dockbox/.test(tomFile) && /lpn_calib_box/.test(tomFile) && /lpn_popup/.test(tomFile));
-		// The Alternatives box keeps its own record (lpn_altbox, feat/bentley-interop), which a workspace carries.
-		ok('...and the Alternatives box\'s own record, lpn_altbox', /lpn_altbox/.test(tomFile));
+		// The Scenario manager keeps its own record (lpn_smbox, feat/bentley-interop), which a workspace carries.
+		ok('...and the Alternatives box\'s own record, lpn_smbox', /lpn_smbox/.test(tomFile));
 		// Close the top one on each edge with its own X, from its flown-out tab.
-		for (const [side, id, x] of [['left', 'lpn_alt_box', 'lpn_alt_close'], ['right', 'lpn_popup', 'lpn_popup_close']]) {
+		for (const [side, id, x] of [['left', 'lpn_sm_box', 'lpn_sm_close'], ['right', 'lpn_popup', 'lpn_popup_close']]) {
 			await b.page.click('#lpn_dock_strip_' + side + ' .lpn-dock-tab[aria-controls="' + id + '"]');
 			await b.settle(400);
 			await b.page.click('#' + x);
 			await b.settle(400);
 		}
 		st = await strips(b.page);
-		ok('Alternatives and Properties closed: thirteen tabs', st[0].length + st[1].length === 13 && !st[0].includes('lpn_alt_box') && !st[1].includes('lpn_popup'), JSON.stringify(st));
+		ok('Scenario manager and Properties closed: thirteen tabs', st[0].length + st[1].length === 13 && !st[0].includes('lpn_sm_box') && !st[1].includes('lpn_popup'), JSON.stringify(st));
 		const before = await snapshot(b);
 		await b.page.evaluate(() => { window.__noReload = true; });
 		const cancelled = await importWorkspace(b, tomFile, 'tom.json', await b.lang('lpn_cancel'));

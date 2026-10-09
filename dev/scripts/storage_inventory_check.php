@@ -106,7 +106,7 @@ const EC_DYNAMIC_STORAGE_SITES = [
             'lpn_ffbox', 'lpn_energybox', 'lpn_cmpbox', 'lpn_reportbox', 'lpn_statusbox', 'lpn_fullbox',
             'lpn_contourbox', 'lpn_notesbox', 'lpn_hotkeysbox', 'lpn_snipbox', 'lpn_runbox',
             'lpn_scnbasic', 'lpn_areahint', 'lpn_survey_format', 'bpn_sketch_toggles', 'lpn_dockbox',
-            'lpn_altbox'],
+            'lpn_smbox'],
         'literal' => true,
         'workspace' => true,
         'why'     => 'File > Import > Workspace writes back, only on the visitor\'s command and only '

@@ -62,7 +62,7 @@ async function shot(page, name) {
 	await page.screenshot({ path: path.join(process.env.DOCK_SHOT, name + '.png') });
 }
 const BOXES = ['lpn_popup', 'lpn_find_popup', 'lpn_settings_box', 'lpn_library_box', 'lpn_ff_box', 'lpn_crit_box',
-	'lpn_ds_box', 'lpn_energy_box', 'lpn_contour_box', 'lpn_scncmp_box', 'lpn_rptbox', 'lpn_status_box', 'lpn_alt_box',
+	'lpn_ds_box', 'lpn_energy_box', 'lpn_contour_box', 'lpn_scncmp_box', 'lpn_rptbox', 'lpn_status_box', 'lpn_sm_box',
 	'lpn_full_box', 'lpn_calib_box', 'lpn_notes_popup', 'lpn_hotkeys_popup'];
 const HELP = { lpn_ff_box: ['lpn_ff_intro'], lpn_crit_box: ['lpn_crit_intro', 'lpn_crit_scope_tip'],
 	lpn_ds_box: ['lpn_ds_intro'] };

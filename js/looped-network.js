@@ -5921,6 +5921,22 @@ var EngCalcs = EngCalcs || {};
 		touchTree('smCopyScenario');
 		return s;
 	}
+	// **WHEN AN OVERRIDE IS WRITTEN INTO A SHARED ALTERNATIVE, THE NOTE SAYS WHO ELSE USES IT** (the
+	// market researcher's call, 2026-10-09; Tom, 2026-10-05: *editing a shared alternative changes
+	// every scenario that uses it*). Names the other scenarios using what the open scenario writes
+	// to, in the given categories; '' when it writes to its own values or nobody else uses it.
+	function smSharedText(cats) {
+		var scn = activeScenario(), names = [], seen = {}, pc = EngCalcs.pageConfig || {};
+		if (!scn || scn.isBase) { return ''; }
+		cats.forEach(function (cat) {
+			var t = writeTargetFor(scn, cat);
+			if (!t || t.kind === 'scn') { return; }
+			smUsedBy(cat, t.obj.id).forEach(function (u) {
+				if (u.id !== scn.id && !seen[u.id]) { seen[u.id] = true; names.push(scenarioDisplayName(u)); }
+			});
+		});
+		return names.length ? (pc.lpn_sm_shared_note || 'Shared with: {list}').replace('{list}', names.join(', ')) : '';
+	}
 	// **THE SCENARIOS A COMPARISON SOLVES** (H06): the checked set stored in the project; with none
 	// stored, every scenario, so an old file behaves as before.
 	function compareScenarios() {
@@ -55153,7 +55169,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		Array.prototype.forEach.call(box.querySelectorAll('.lpn-setbox-link-held'), function (el) { el.classList.remove('lpn-setbox-link-held'); });
 		if (!scn || scn.isBase) { return; }
 		Array.prototype.forEach.call(box.querySelectorAll('[data-lpn-setting]'), function (el) {
-			var paths, held, note, text, btn, many;
+			var paths, held, note, text, btn, many, shared;
 			try { paths = JSON.parse(el.getAttribute('data-lpn-setting')) || []; } catch (e) { paths = []; }
 			if (!paths.length) { return; }
 			if (!rows) { rows = settingTableRows(); }
@@ -55176,6 +55192,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				note.appendChild(document.createTextNode((pc.lpn_settings_held_base || '{base}: {value}')
 					.split('{base}').join(pc.lpn_scenario_base || 'Base').split('{value}').join(text.join('; ')) + ' '));
 			}
+			shared = smSharedText(held.map(function (r) { return r.cat; }).filter(function (c) { return !!c; }));
+			if (shared) { note.appendChild(document.createTextNode(shared + ' ')); }
 			btn = document.createElement('button');
 			btn.type = 'button';
 			btn.className = 'lpn-set-heldclear';
@@ -60784,7 +60802,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// in git at 33b5c0f if that is ever reconsidered.
 		if (!el || inBaseScenario() || !isOverridable(el, prop)) { return; }
 		var label = document.createElement('label'), box = document.createElement('input'),
-			text = document.createElement('span'), on = hasOverride(el, prop);
+			text = document.createElement('span'), on = hasOverride(el, prop), shared;
 		label.className = 'lpn-ov-marker';
 		box.type = 'checkbox';
 		box.checked = on;
@@ -60807,6 +60825,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			base.textContent = (pc.lpn_scenario_base_value || 'Base scenario: {value}')
 				.replace('{value}', (format || formatPropValue)(baseValue(el, prop)));
 			label.appendChild(base);
+			shared = smSharedText([categoryOf(prop, elGroup(el))]);
+			if (shared) {
+				base = document.createElement('span');
+				base.className = 'lpn-ov-base lpn-ov-shared';
+				base.textContent = ' ' + shared;
+				label.appendChild(base);
+			}
 		}
 		fields.appendChild(label);
 		fields.appendChild(document.createElement('br'));
@@ -60849,6 +60874,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			base.textContent = (pc.lpn_scenario_base_value || 'Base scenario: {value}')
 				.replace('{value}', parts.map(function (v) { return formatPropValue(v); }).join(' + '));
 			label.appendChild(base);
+			if (smSharedText(['demand'])) {
+				base = document.createElement('span');
+				base.className = 'lpn-ov-base lpn-ov-shared';
+				base.textContent = ' ' + smSharedText(['demand']);
+				label.appendChild(base);
+			}
 		}
 		fields.appendChild(label);
 		fields.appendChild(document.createElement('br'));

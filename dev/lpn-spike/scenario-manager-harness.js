@@ -58,7 +58,7 @@ const INJECT =
 	"\t\tbasicMode: function () { return scenarioBasicMode; }, setBasicMode: setScenarioBasicMode,\n" +
 	"\t\tlastNotice: function () { return lastNoticeText; }, promote: promoteImplicitAlternative,\n" +
 	"\t\talternativeFor: alternativeFor, libInactiveIds: libInactiveIds, smInUseBy: smInUseBy,\n" +
-	"\t\tscenarioTableCols: scenarioTableCols, scenarioTableRows: scenarioTableRows,\n" +
+	"\t\tsmSharedText: smSharedText, scenarioTableCols: scenarioTableCols, scenarioTableRows: scenarioTableRows,\n" +
 	"\t\tbuildLayers: function () { svg = document.getElementById('lpn_canvas');\n" +
 	"\t\t\tworld = el('g', {}, svg);\n" +
 	"\t\t\tbackdropLayer = el('g', {}, world); gridLayer = el('g', {}, world);\n" +
@@ -273,12 +273,54 @@ async function run(mutate, quiet) {
 	ok('10.2 the Base item counts the scenarios on Base', L.smUsedBy('demand', 'base').length > 0);
 	ok('10.3 the label and tip', /\d/.test(L.smUsedByText('demand', kept.id).text) && /Q/.test(L.smUsedByText('demand', kept.id).tip));
 	ok('10.4 nothing is inactive, so no standing control note', L.libInactiveIds('control').length === 0);
+	L.switchScenario(Q.id);
+	ok('10.5 an override written into a shared alternative says who else uses it', /Copy_of_Q_2/.test(L.smSharedText(['demand'])) && !/\bQ\b/.test(L.smSharedText(['demand']).replace('Copy_of_Q_2', '')), L.smSharedText(['demand']));
+	ok('10.6 ...nothing for a category it does not share, nor in Base', L.smSharedText(['physical']) === '' && (L.switchScenario(BASE), L.smSharedText(['demand']) === ''));
+	ok('10.7 ...and nothing for a scenario writing to its own values', (L.switchScenario(R.id), L.smAssign(R.id, 'demand', ''), L.smSharedText(['demand']) === ''));
+	L.switchScenario(BASE);
 
+	say('--- 10b. controls and rules naming an inactive asset: a standing note, never a message ---');
+	{
+		const text = NET1.replace(/\[CONTROLS\]\n/, '[CONTROLS]\n LINK 21 CLOSED IF NODE 2 BELOW 100\n')
+			.replace(/\[RULES\]\n/, '[RULES]\nRULE R1\nIF NODE 22 PRESSURE BELOW 1\nTHEN LINK 112 STATUS IS CLOSED\n');
+		const P = page();
+		P.importInp({ name: 'Net1-controls.inp', _text: text });
+		ok('10.8 in Base nothing is left out', P.libInactiveIds('control').length === 0 && P.libInactiveIds('rule').length === 0);
+		const N = P.createScenario('N');
+		P.switchScenario(N.id);
+		P.setProp(P.nodeById('22'), 'active', false);
+		ok('10.9 in a scenario that switches 22 off, the control and the rule are listed', P.libInactiveIds('control').join() === '21' && P.libInactiveIds('rule').join() === 'R1',
+			P.libInactiveIds('control').join() + ' / ' + P.libInactiveIds('rule').join());
+		ok('10.10 and the run says nothing of them (no per-run message): the strings are the note\'s', /ignored in its run/.test(PC.lpn_control_inactive_note) && /ignored in its run/.test(PC.lpn_rule_inactive_note));
+		ok('10.11 the words are "refer to", not "name"', /refer to/.test(PC.lpn_inp_export_flat_inactive_controls) && /refer to an old asset/.test(PC.lpn_change_type_old_controls));
+	}
 	return fails;
 }
 
+// **LIVE MUTATIONS: EACH MUST TURN THIS HARNESS RED** (dev/testing-notes.md).
+const MUTATIONS = [
+	['a delete is not refused while in use', (src) => src.replace("		who = smInUseBy(tree, key);\n		if (who.length) {", "		who = smInUseBy(tree, key);\n		if (false) {")],
+	['a cycle is allowed', (src) => src.replace("if (p === s || scenarioParentLoops(s.id, p.id)) { return treeRefuse('parent'); }", "")],
+	['a reorder is not stored', (src) => src.replace("		project.scenarioOrdered = true;\n	}", "	}")],
+	['the compare set is ignored', (src) => src.replace("return scenariosForDisplay().filter(function (s) { return !Array.isArray(set) || set.indexOf(s.id) >= 0; });", "return scenariosForDisplay();")],
+	['a copy always shares', (src) => src.replace("				if (mode === 'own') {", "				if (false) {")],
+	['an assignment drops the values the scenario held', (src) => src.replace("			kept = promoteStored(s.id, cat, smUniqueName(cat, s.name || s.id));\n			if (kept.refused) { return kept; }", "			kept = { name: 'x' };\n			takeScenarioLocals(s, cat);")],
+	['a new child is not named for its parent', (src) => src.replace("name = 'Child_' + n + '_of_' + parent;", "name = 'Child_' + n;")],
+	['Basic mode stays on when the manager is chosen', (src) => src.replace("		if (scenarioBasicMode) {\n			setScenarioBasicMode(false);\n			setNotice(", "		if (false) {\n			setScenarioBasicMode(false);\n			setNotice(")]
+];
 (async function main() {
-	const fails = await run(null, false);
-	if (fails) { console.log('\n' + fails + ' FAILED'); process.exit(1); }
-	console.log('\nall ok');
-}());
+	let fails = await run(null, false);
+	console.log('\n--- 11. live mutations: each must turn this harness red ---');
+	for (const m of MUTATIONS) {
+		let red;
+		try { red = await run(m[1], true); } catch (e) {
+			if (/the mutation changed nothing/.test(String(e && e.message))) { fails++; console.log('  FAIL mutation no longer applies: ' + m[0]); continue; }
+			red = 'a thrown error (' + (e && e.message) + '), so it';
+		}
+		const isRed = typeof red === 'string' || red > 0;
+		if (!isRed) { fails++; }
+		console.log((isRed ? '  ok   ' : '  FAIL ') + 'mutation "' + m[0] + '" turns ' + red + ' check(s) red');
+	}
+	console.log(fails ? '\n' + fails + ' FAILED' : '\nall ok');
+	process.exit(fails ? 1 : 0);
+}()).catch((e) => { console.error(e); process.exit(1); });

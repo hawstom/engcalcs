@@ -329,23 +329,30 @@ async function main() {
 		await page.keyboard.press('Control+y');
 		await a.settle(1000);
 		ok('...and Ctrl+Y puts it back', (await H.findRow(TS, 'Peak')).local);
-		// Basic mode off reveals the Alternatives preview.
-		await H.scenarioMenu(await L('lpn_scenario_basic'));
-		await H.scenarioMenu(await L('lpn_alt_title'));
+		// The Scenario manager row turns Basic mode off and reveals the Scenarios table.
+		await H.scenarioMenu(await L('lpn_sm_menu'));
+		await page.evaluate(() => { const x = document.getElementById('lpn_sm_close'); if (x) { x.click(); } });
+		await page.evaluate(() => { const b = document.getElementById('lpn_pane_tab_scenarios'); if (b) { b.click(); } });
+		await a.settle(900);
 		const alt = await page.evaluate(() => {
-			const trs = Array.from(document.querySelectorAll('#lpn_alt_report tr'));
-			return trs.map((tr) => Array.from(tr.children).map((c) => c.textContent.trim()));
+			const trs = Array.from(document.querySelectorAll('#lpn_pane_scenarios tr'));
+			return trs.map((tr) => Array.from(tr.children).map((c) => {
+				const s = c.querySelector('select');
+				return (s && s.selectedOptions[0] ? s.selectedOptions[0].textContent : c.textContent).replace(/[\u00ad\u200b]/g, '').trim();
+			}));
 		});
 		const ah = alt[0] || [];
-		ok('the Alternatives table ends with Presentation and Calculation, and no option columns',
+		ok('the Scenarios table ends with Presentation and Calculation, and no option columns',
 			ah[ah.length - 2] === PRES && ah[ah.length - 1] === CALC && ah.indexOf(DM) < 0 && ah.indexOf(DUR) < 0, JSON.stringify(ah));
 		const peakRow = alt.filter((r) => r[0] === 'Peak')[0] || [];
-		ok('Peak: Presentation (1) for its text size, Calculation (1) for its multiplier',
-			peakRow[ah.length - 2] === 'Peak (1)' && peakRow[ah.length - 1] === 'Peak (1)', JSON.stringify(peakRow));
-		ok('no input is left in it', await page.evaluate(() => !document.querySelector('#lpn_alt_report input')));
-		await page.evaluate(() => { const x = document.getElementById('lpn_alt_close'); if (x) { x.click(); } });
+		const OWN = await L('lpn_sm_own_values');
+		ok('Peak: own values (1) for its text size, own values (1) for its multiplier',
+			peakRow[ah.length - 2] === OWN + ' (1)' && peakRow[ah.length - 1] === OWN + ' (1)', JSON.stringify(peakRow));
 		await H.scenarioMenu('  ' + await L('lpn_scenario_basic')).catch(() => {});
 		await page.evaluate(() => { try { localStorage.removeItem('lpn_scnbasic'); } catch (e) {} });
+		// Basic mode ticked again moved the pane off the hidden Scenarios tab; back to the Settings table.
+		await page.evaluate(() => { const b = document.getElementById('lpn_pane_tab_settings'); if (b) { b.click(); } });
+		await a.settle(600);
 
 		console.log('\n--- 7. the Settings box writes the open scenario (Tom, Q4) ---');
 		// The session answers a confirm with OK (dev/browser-pass/lib/session.js), so the friction

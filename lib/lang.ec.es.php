@@ -2718,8 +2718,6 @@ $ec_lang['lpn_alt_cat_initial']='Configuración inicial';
 $ec_lang['lpn_alt_cat_topology']='Activación de elementos';
 $ec_lang['lpn_alt_cat_demand']='Demanda';
 $ec_lang['lpn_alt_cat_physical']='Físico';
-$ec_lang['lpn_alt_note']='Base usa la alternativa Base de cada categoría. Cada escenario tiene una alternativa propia, hija de la alternativa Base, para cada categoría que se cambia. El número es la cantidad de valores cambiados. Las tres últimas columnas son opciones de cálculo: ingrese un valor para el escenario, o déjelo en blanco para usar el valor del padre. Los valores del proyecto están en Configuración, Cálculo, Tiempo.';
-$ec_lang['lpn_alt_title']='Vista previa de alternativas';
 $ec_lang['lpn_scenario_basic_tip']='Marcado: un escenario consiste solo en los valores fijados en él. Sin marcar: este menú ofrece además la tabla de vista previa de Alternativas, que muestra cómo se agrupan esos valores por categoría, y permite que un escenario tenga un tiempo total de simulación y un paso de tiempo hidráulico propios. Se agradecen los comentarios sobre esta función.';
 $ec_lang['lpn_scenario_basic']='Modo básico';
 // Edited by TGH 2026-09-07
