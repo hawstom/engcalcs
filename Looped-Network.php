@@ -2644,6 +2644,11 @@ EngCalcs.pageConfig = {
 	lpn_roughness_urls: <?=json_encode(ecRefRoughnessUrls())?>,
 	lpn_field_length: <?=json_encode($ec_lang['lpn_field_length'])?>,
 	lpn_field_from: <?=json_encode($ec_lang['lpn_field_from'])?>,
+	lpn_link_end_unknown: <?=json_encode($ec_lang['lpn_link_end_unknown'])?>,
+	lpn_link_end_same: <?=json_encode($ec_lang['lpn_link_end_same'])?>,
+	lpn_break_pipe_ask: <?=json_encode($ec_lang['lpn_break_pipe_ask'])?>,
+	lpn_break_yes: <?=json_encode($ec_lang['lpn_break_yes'])?>,
+	lpn_break_no: <?=json_encode($ec_lang['lpn_break_no'])?>,
 	lpn_field_to: <?=json_encode($ec_lang['lpn_field_to'])?>,
 	// The minor-loss table, the same one mphl, hw, dw, mhp, bpn and ip all link to. One URL rather
 	// than three: k is one quantity whatever friction method carries the pipe alongside it. The
@@ -2760,6 +2765,7 @@ EngCalcs.pageConfig = {
 	lpn_diag_no_fixed_head: <?=json_encode($ec_lang['lpn_diag_no_fixed_head'])?>,
 	lpn_diag_dangling_link: <?=json_encode($ec_lang['lpn_diag_dangling_link'])?>,
 	lpn_diag_unreachable: <?=json_encode($ec_lang['lpn_diag_unreachable'])?>,
+	lpn_omitted_note: <?=json_encode($ec_lang['lpn_omitted_note'])?>,
 	lpn_engine_fetching: <?=json_encode($ec_lang['lpn_engine_fetching'])?>,
 	lpn_engine_ready: <?=json_encode($ec_lang['lpn_engine_ready'])?>,
 	lpn_engine_fetching_valve: <?=json_encode($ec_lang['lpn_engine_fetching_valve'])?>,

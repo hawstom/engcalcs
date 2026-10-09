@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**34 still to read on master**, of 42 untranslated keys, of 2486 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**40 still to read on master**, of 48 untranslated keys, of 2492 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -175,8 +175,17 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   @@ NEEDS RULING
 
-## lpn_  (42, 34 to read @@ NEEDS RULING)
+## lpn_  (48, 40 to read @@ NEEDS RULING)
 
+- **`lpn_break_no`**
+  > No
+  @@ NEEDS RULING
+- **`lpn_break_pipe_ask`**
+  > Break pipe {id} at this node?
+  @@ NEEDS RULING
+- **`lpn_break_yes`**
+  > Yes
+  @@ NEEDS RULING
 - **`lpn_dxf_export_failed`**
   > The DXF file was not written: an error in this page stopped it ({error}).
   @@ NEEDS RULING
@@ -258,12 +267,21 @@ never edits a synonym.
 - **`lpn_hotkeys_zoomwin_def`**
   > Zoom Window: drag a rectangle to zoom to.
   @@ NEEDS RULING
+- **`lpn_link_end_same`**
+  > From and To must be different nodes.
+  @@ NEEDS RULING
+- **`lpn_link_end_unknown`**
+  > No node has the ID {id}.
+  @@ NEEDS RULING
 - **`lpn_msglog_hidden`**
   > Hidden
   _Ruled 2026-10-08: Calls page 8 October: Use as written_
 - **`lpn_msglog_unhide`**
   > Show
   _Ruled 2026-10-08: Calls page 8 October: Use as written_
+- **`lpn_omitted_note`**
+  > Left out of this run because no path leads from them to a reservoir or tank: {ids}
+  @@ NEEDS RULING
 - **`lpn_pane_copy_heads`**
   > Copy with column headings
   _Ruled 2026-10-09: Use proposed (Tom, calls page round 3)._
@@ -308,7 +326,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**153 still to read**, of 156 new keys across 13 unmerged branch(es).
+**147 still to read**, of 150 new keys across 12 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -319,7 +337,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/bentley-interop (`fe2028f4`) — 101 new, 101 to read @@ NEEDS RULING
+### feat/bentley-interop (`43043b60`) — 101 new, 101 to read @@ NEEDS RULING
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -355,7 +373,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > These controls refer to an asset that is inactive in this scenario, so they are ignored in its run: {ids}
   @@ NEEDS RULING
 - **`lpn_customer_node_inactive`**
-  > This customer is assigned to a junction that is inactive in this scenario, so its demand is not in the solve.
+  > This customer is assigned to a junction that is inactive in this scenario, so its demand is not part of the solve.
   @@ NEEDS RULING
 - **`lpn_inp_export_flat_customers_inactive`**
   > {n} of these customers are assigned to a junction that is inactive in this scenario, so their demand is not in the file.
@@ -580,7 +598,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > {name} cannot be moved under one of its own children.
   @@ NEEDS RULING
 - **`lpn_sm_delete`**
-  > Delete the selected item. It is refused while anything uses it.
+  > Delete the selected item. A used item is not deleted.
   @@ NEEDS RULING
 - **`lpn_sm_hint`**
   > Drag an item onto another to make it a child of that item. Drag between two items to reorder them. Click a selected item or press F2 to rename it, Delete to delete it, Enter to make a scenario current. Right-click for more.
@@ -648,8 +666,6 @@ build for that would be a gate nobody keeps. Refresh it with
 ### feat/label-placer-c (`4dc27ea1`) — adds no English strings
 
 ### feat/label-placer-d (`2e5e81c4`) — adds no English strings
-
-### feat/message-dismiss (`26e1afc8`) — adds no English strings
 
 ### feat/section-grid (`005d4e63`) — 1 new, 1 to read @@ NEEDS RULING
 
@@ -797,23 +813,4 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/visit-dedupe (`7b4a84bd`) — adds no English strings
 
-### fix/ewb-meeting (`4953af70`) — 6 new, 6 to read @@ NEEDS RULING
-
-- **`lpn_break_no`**
-  > No
-  @@ NEEDS RULING
-- **`lpn_break_pipe_ask`**
-  > Break pipe {id} at this node?
-  @@ NEEDS RULING
-- **`lpn_break_yes`**
-  > Yes
-  @@ NEEDS RULING
-- **`lpn_link_end_same`**
-  > From and To must be different nodes.
-  @@ NEEDS RULING
-- **`lpn_link_end_unknown`**
-  > No node has the ID {id}.
-  @@ NEEDS RULING
-- **`lpn_omitted_note`**
-  > Left out of this run because no path leads from them to a reservoir or tank: {ids}
-  @@ NEEDS RULING
+### fix/ewb-meeting (`4953af70`) — adds no English strings

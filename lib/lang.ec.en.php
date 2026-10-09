@@ -2517,7 +2517,11 @@ $ec_lang['lpn_id_invalid']='Enter an ID with no spaces and no quotation marks.';
 $ec_lang['lpn_id_taken']='That ID is already in use.';
 $ec_lang['lpn_diag_no_fixed_head']='Add a reservoir or a tank. The network needs at least one known water level before it can be solved.';
 $ec_lang['lpn_diag_dangling_link']='A pipe or pump connects to a node that no longer exists:';
-$ec_lang['lpn_diag_unreachable']='These nodes have no path to a reservoir:';
+$ec_lang['lpn_diag_unreachable']='These nodes have no path to a reservoir or tank:';
+// Tom, 2026-10-09: a node nothing connects to a source is left out of the run, not refused. The
+// ids stand in the status bar until the network changes. Said in EPANET's own terms (junction,
+// reservoir, tank) and never as an error, because the run happened.
+$ec_lang['lpn_omitted_note']='Left out of this run because no path leads from them to a reservoir or tank: {ids}';
 // BOTH OF THESE NAME THE VALVES. The page ends each one with a list of IDs, which is the reason
 // this calculator writes its own messages instead of showing EPANET\'s numbered errors: a person
 // looking at a drawing can act on \'V3\' and can do nothing at all with \'error 110\'.
@@ -2575,6 +2579,14 @@ $ec_lang['lpn_field_roughness_tip']='Hazen-Williams C. A higher number means a s
 $ec_lang['lpn_field_length']='Length';
 $ec_lang['lpn_field_from']='From';
 $ec_lang['lpn_field_to']='To';
+// Tom, 2026-10-09: From and To are editable text. Said in the box a refused ID is said in.
+$ec_lang['lpn_link_end_unknown']='No node has the ID {id}.';
+$ec_lang['lpn_link_end_same']='From and To must be different nodes.';
+// Tom, 2026-10-09: "Break link for node?", adapted to name the pipe. The two answers are Yes and No
+// because No is not a cancel: it places the node where it was pressed, joined to nothing.
+$ec_lang['lpn_break_pipe_ask']='Break pipe {id} at this node?';
+$ec_lang['lpn_break_yes']='Yes';
+$ec_lang['lpn_break_no']='No';
 // Plain-text wording of the concept mphl_total_junction_k/mphl_junction_loss already own (their
 // values carry k<sub>m</sub> markup, incompatible with this popup's textContent-only fields) --
 // Tom, 2026-07-30, "default to 2" matches mphl_total_junction_k_tip's own stated default exactly.

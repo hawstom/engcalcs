@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "sw",
-        "expected_key_count": 2486,
-        "delta_key_count": 42,
+        "expected_key_count": 2492,
+        "delta_key_count": 48,
         "exempt_key_count": 38,
         "exempt_keys": [
             "u_imgd",
@@ -757,6 +757,12 @@
         "lpn_workspace_refused_newer": "This workspace file was saved by a newer version of this page (format {version}), so nothing was changed.",
         "lpn_workspace_confirm": "Replace this browser's workspace layout with the one in the file?",
         "lpn_workspace_refused_storage": "Browser storage is full or unavailable, so the workspace was not applied.",
+        "lpn_omitted_note": "Left out of this run because no path leads from them to a reservoir or tank: {ids}",
+        "lpn_link_end_unknown": "No node has the ID {id}.",
+        "lpn_link_end_same": "From and To must be different nodes.",
+        "lpn_break_pipe_ask": "Break pipe {id} at this node?",
+        "lpn_break_yes": "Yes",
+        "lpn_break_no": "No",
         "lpn_settings_hover_card": "Show the full label on hover",
         "lpn_settings_hover_card_tip": "Rest the pointer on a node, link or customer to see its label as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project."
     },
@@ -801,6 +807,12 @@
         "lpn_workspace_refused_newer": "This workspace file was saved by a newer version of this page (format {version}), so nothing was changed.",
         "lpn_workspace_confirm": "Replace this browser's workspace layout with the one in the file?",
         "lpn_workspace_refused_storage": "Browser storage is full or unavailable, so the workspace was not applied.",
+        "lpn_omitted_note": "Left out of this run because no path leads from them to a reservoir or tank: {ids}",
+        "lpn_link_end_unknown": "No node has the ID {id}.",
+        "lpn_link_end_same": "From and To must be different nodes.",
+        "lpn_break_pipe_ask": "Break pipe {id} at this node?",
+        "lpn_break_yes": "Yes",
+        "lpn_break_no": "No",
         "lpn_settings_hover_card": "Show the full label on hover",
         "lpn_settings_hover_card_tip": "Rest the pointer on a node, link or customer to see its label as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project."
     },
@@ -1442,6 +1454,102 @@
                     "key": "lpn_geojson_refused_local",
                     "value": "Faili la GeoJSON lina latitudo na longitudo pekee, na mradi huu umechorwa kwenye gridi ya ndani isiyo na mahali duniani. Uwekee marejeleo ya kijiografia kwanza kwa Ramani, Ramani ya dunia, Ambatisha, kisha uhamishe tena.",
                     "english": "A GeoJSON file holds latitude and longitude only, and this project is drawn on a local grid with no place on the Earth. Georeference it first with Map, World map, Attach, then export again."
+                }
+            }
+        },
+        "lpn_omitted_note": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_diag_unreachable",
+                    "value": "Vifundo hivi havina njia ya kufika kwenye hifadhi ya maji:",
+                    "english": "These nodes have no path to a reservoir or tank:"
+                },
+                "next_translated": {
+                    "key": "lpn_engine_fetching",
+                    "value": "Inapakua kitatuzi cha EPANET. Kinapakuliwa mara moja kisha kuhifadhiwa kwenye kifaa hiki, hivyo kinafanya kazi bila mtandao baadaye.",
+                    "english": "Downloading the EPANET solver. It is downloaded once and then stored on this device, so it works offline afterward."
+                }
+            }
+        },
+        "lpn_link_end_unknown": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_field_to",
+                    "value": "Hadi",
+                    "english": "To"
+                },
+                "next_translated": {
+                    "key": "lpn_field_valve_type",
+                    "value": "Aina ya vali",
+                    "english": "Valve type"
+                }
+            }
+        },
+        "lpn_link_end_same": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_field_to",
+                    "value": "Hadi",
+                    "english": "To"
+                },
+                "next_translated": {
+                    "key": "lpn_field_valve_type",
+                    "value": "Aina ya vali",
+                    "english": "Valve type"
+                }
+            }
+        },
+        "lpn_break_pipe_ask": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_field_to",
+                    "value": "Hadi",
+                    "english": "To"
+                },
+                "next_translated": {
+                    "key": "lpn_field_valve_type",
+                    "value": "Aina ya vali",
+                    "english": "Valve type"
+                }
+            }
+        },
+        "lpn_break_yes": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_field_to",
+                    "value": "Hadi",
+                    "english": "To"
+                },
+                "next_translated": {
+                    "key": "lpn_field_valve_type",
+                    "value": "Aina ya vali",
+                    "english": "Valve type"
+                }
+            }
+        },
+        "lpn_break_no": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_field_to",
+                    "value": "Hadi",
+                    "english": "To"
+                },
+                "next_translated": {
+                    "key": "lpn_field_valve_type",
+                    "value": "Aina ya vali",
+                    "english": "Valve type"
                 }
             }
         },
