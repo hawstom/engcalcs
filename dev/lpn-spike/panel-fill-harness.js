@@ -157,7 +157,7 @@ console.log('\n--- one seam decides how a standing box opens (rule 2) ---');
 		['openCriticalityBox', 'Criticality analysis'],
 		// The Scenario manager (dev/scenario-alternatives.md): a tree box that must still fill a phone;
 		// a phone wants the whole window for it, as for every standing box.
-		['openScenarioManager', 'the Scenario manager'],
+		['openScenarioManager', 'the scenario box'],
 		// The Tables and Hotkeys box (Task 745): the same non-hog shell and memory as Notes, built
 		// the same way and for the same reason -- reference prose a reader keeps open beside the
 		// work, so a phone wants the same fill.

@@ -185,7 +185,7 @@ async function main() {
 		await page.keyboard.press('Delete');
 		await settle(400);
 		const bn = await page.evaluate(() => (document.getElementById('lpn_map_notice') || {}).textContent || '');
-		ok('2.14 Del on Base is refused with its own sentence, not "Nothing is selected"', bn.indexOf(await L('lpn_sm_base_kept')) >= 0 && bn.indexOf('Nothing is selected') < 0, bn);
+		ok('2.14 Del on Base is refused with its own sentence, not "Nothing is selected"', bn.indexOf(await L('lpn_sm_base_kept')) >= 0 && bn.indexOf((await L('lpn_select_first')).slice(0, 14)) < 0, bn);
 		await click('#lpn_sm_del');
 		ok('2.15 "-" on Base gives the same sentence', (await page.evaluate(() => (document.getElementById('lpn_map_notice') || {}).textContent || '')).indexOf(await L('lpn_sm_base_kept')) >= 0);
 		await clickRow('Base2');
