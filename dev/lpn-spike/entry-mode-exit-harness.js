@@ -119,11 +119,15 @@ const ADD_MODES = ['add-junction', 'add-reservoir', 'add-tank', 'add-pipe', 'add
 // 1. A CLICK ON A LINK ENDS THE MODE, AND OPENS THE LINK.
 // ---------------------------------------------------------------------------
 console.log('\n--- clicking a link ends entry mode ---');
+// **THE THREE NODE TOOLS ON A PIPE NOW ASK TO BREAK IT** (Tom, 2026-10-09; section 4 below), so they
+// are pressed on the PUMP here, which still ends the mode. The other three tools still take the pipe.
 ADD_MODES.forEach(function (m) {
 	const n = build();
 	const nodes0 = L.getDoc().nodes.length, links0 = L.getDoc().links.length;
+	const nodeTool = m === 'add-junction' || m === 'add-reservoir' || m === 'add-tank';
+	if (nodeTool) { n.ab = n.pump; }
 	L.setMode(m);
-	click(hit({ link: n.ab }), MIDX, MIDY);
+	if (nodeTool) { click(hit({ link: n.ab }), 600, 300); } else { click(hit({ link: n.ab }), MIDX, MIDY); }
 	ok(m + ': the tool is put away', L.getMode() === 'select', L.getMode());
 	ok(m + ': ...the pipe is selected',
 		!!L.selectedRef() && L.selectedRef().kind === 'link' && L.selectedRef().id === n.ab,
@@ -145,11 +149,36 @@ ADD_MODES.forEach(function (m) {
 	// A link's own DATA LABEL is that link's data, and opens the same box in Select.
 	const n2 = build();
 	L.setMode('add-tank');
-	click(hit({ linklbl: n2.ab }), MIDX, MIDY + 8);
+	click(hit({ linklbl: n2.pump }), 600, 308);
 	ok('a click on a link\'s data label does the same',
-		L.getMode() === 'select' && !!L.openPopupRef() && L.openPopupRef().id === n2.ab,
+		L.getMode() === 'select' && !!L.openPopupRef() && L.openPopupRef().id === n2.pump,
 		L.getMode() + ' ' + JSON.stringify(L.openPopupRef()));
 }
+
+// ---------------------------------------------------------------------------
+// 1b. A NODE TOOL PRESSED ON A PIPE ASKS TO BREAK IT (Tom, 2026-10-09).
+// ---------------------------------------------------------------------------
+console.log('\n--- a node tool on a pipe asks, and Yes breaks it, and No places the node alone ---');
+['add-junction', 'add-reservoir', 'add-tank'].forEach(function (m) {
+	let asked = null;
+	global.window.confirm = function (text) { asked = text; return true; };
+	let n = build();
+	L.setMode(m);
+	click(hit({ link: n.ab }), MIDX, MIDY);
+	ok(m + ': the question names the pipe', asked === 'Break pipe ' + n.ab + ' at this node?', asked);
+	ok(m + ': Yes cuts the pipe in two at a new node',
+		L.getDoc().nodes.length === 4 && L.getDoc().links.length === 3 && L.linkById(n.ab).to !== n.b,
+		L.getDoc().nodes.length + '/' + L.getDoc().links.length);
+	ok(m + ': ...and the tool stays armed', L.getMode() === m, L.getMode());
+	global.window.confirm = function () { return false; };
+	n = build();
+	L.setMode(m);
+	click(hit({ link: n.ab }), MIDX, MIDY);
+	ok(m + ': No places the node joined to nothing',
+		L.getDoc().nodes.length === 4 && L.getDoc().links.length === 2 && L.linkById(n.ab).to === n.b,
+		L.getDoc().nodes.length + '/' + L.getDoc().links.length);
+});
+delete global.window.confirm;
 
 // ---------------------------------------------------------------------------
 // 2. A HALF-DRAWN PIPE IS ABANDONED CLEANLY.

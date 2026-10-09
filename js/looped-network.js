@@ -23313,8 +23313,8 @@ var EngCalcs = EngCalcs || {};
 	// that asset instead of the row's asset"*). A column declares the element its VALUE names, and
 	// the right-click menu's Select in map reads it; every other column has none and the menu falls
 	// back to the row's own element, which is what it has always done.
-	function paneColEnd(end) {
-		return { key: end, label: end === 'from' ? 'lpn_field_from' : 'lpn_field_to', str: true, reread: true, em: 5,
+	function paneColEnd(end, labelKey) {
+		return { key: end, label: labelKey, str: true, reread: true, em: 5,
 			get: function (l) { return l[end]; },
 			set: function (l, v) {
 				var newId = String(v === undefined || v === null ? '' : v).trim(), why;
@@ -23325,7 +23325,7 @@ var EngCalcs = EngCalcs || {};
 			},
 			refTo: function (l) { return { group: 'node', id: l[end] }; } };
 	}
-	function paneColEnds() { return [paneColEnd('from'), paneColEnd('to')]; }
+	function paneColEnds() { return [paneColEnd('from', 'lpn_field_from'), paneColEnd('to', 'lpn_field_to')]; }
 	/**
 	 * **A LINK'S VERTICES AS ONE CELL** (ROADMAP Task 610), in the format the data-entry clerk
 	 * specified before anything was built (dev/agents/data-entry-clerk/task-610-vertex-cell-spec.md):
@@ -60151,7 +60151,8 @@ var EngCalcs = EngCalcs || {};
 			reconnectLinkEnd(l, end, newId);
 			refreshPopupIfOpen();
 		});
-		setFieldLabel(label, end === 'from' ? (pc.lpn_field_from || 'From') : (pc.lpn_field_to || 'To'));
+		if (end === 'from') { setFieldLabel(label, pc.lpn_field_from || 'From'); }
+		else { setFieldLabel(label, pc.lpn_field_to || 'To'); }
 		label.appendChild(input);
 		fields.appendChild(label);
 		fields.appendChild(document.createElement('br'));

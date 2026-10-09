@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**36 still to read on master**, of 38 untranslated keys, of 2482 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**42 still to read on master**, of 44 untranslated keys, of 2488 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -175,8 +175,17 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   @@ NEEDS RULING
 
-## lpn_  (38, 36 to read @@ NEEDS RULING)
+## lpn_  (44, 42 to read @@ NEEDS RULING)
 
+- **`lpn_break_no`**
+  > No
+  @@ NEEDS RULING
+- **`lpn_break_pipe_ask`**
+  > Break pipe {id} at this node?
+  @@ NEEDS RULING
+- **`lpn_break_yes`**
+  > Yes
+  @@ NEEDS RULING
 - **`lpn_dxf_export_failed`**
   > The DXF file was not written: an error in this page stopped it ({error}).
   @@ NEEDS RULING
@@ -258,6 +267,15 @@ never edits a synonym.
 - **`lpn_file_import_workspace_tip`**
   > Apply a workspace file saved with File, Export, Workspace: box positions and sizes, docking, pane sizes and the reading preferences of this page. Your projects and cookies are not touched.
   @@ NEEDS RULING
+- **`lpn_link_end_same`**
+  > From and To must be different nodes.
+  @@ NEEDS RULING
+- **`lpn_link_end_unknown`**
+  > No node has the ID {id}.
+  @@ NEEDS RULING
+- **`lpn_omitted_note`**
+  > Left out of this run because no path leads from them to a reservoir or tank: {ids}
+  @@ NEEDS RULING
 - **`lpn_pane_copy_heads`**
   > Copy with headings
   @@ NEEDS RULING
@@ -296,7 +314,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**119 still to read**, of 122 new keys across 13 unmerged branch(es).
+**120 still to read**, of 123 new keys across 15 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -307,9 +325,9 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/calls-1008c (`4903eff4`) — adds no English strings
+### chore/calls-1009 (`efd0dbb7`) — adds no English strings
 
-### feat/bentley-interop (`6b92ff72`) — 71 new, 71 to read @@ NEEDS RULING
+### feat/bentley-interop (`fffa2291`) — 72 new, 72 to read @@ NEEDS RULING
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -330,7 +348,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > The new assets cannot hold these values. The old assets keep them:
   @@ NEEDS RULING
 - **`lpn_change_type_old_controls`**
-  > These controls and rules name an old asset, which is inactive in this scenario, so they are left out of this scenario's run and its .inp export:
+  > These controls and rules refer to an old asset, which is inactive in this scenario, so they are left out of this scenario's run and its .inp export:
   @@ NEEDS RULING
 - **`lpn_change_type_scenario_ask`**
   > Current scenario is not Base. Create new assets? The selected assets become inactive in this scenario.
@@ -339,13 +357,16 @@ build for that would be a gate nobody keeps. Refresh it with
   > Switch to Base
   @@ NEEDS RULING
 - **`lpn_control_inactive_note`**
-  > These controls refer to an asset that is inactive in this scenario, so they were ignored in this run: {ids}
+  > These controls refer to an asset that is inactive in this scenario, so they are ignored in its run: {ids}
+  @@ NEEDS RULING
+- **`lpn_customer_node_inactive`**
+  > This customer is assigned to a junction that is inactive in this scenario, so its demand is not in the solve.
   @@ NEEDS RULING
 - **`lpn_inp_export_flat_customers_inactive`**
   > {n} of these customers are assigned to a junction that is inactive in this scenario, so their demand is not in the file.
   @@ NEEDS RULING
 - **`lpn_inp_export_flat_inactive_controls`**
-  > These controls and rules name an asset that is inactive in this scenario, so they are not in the file: {ids}
+  > These controls and rules refer to an asset that is inactive in this scenario, so they are not in the file: {ids}
   @@ NEEDS RULING
 - **`lpn_pane_inactive_show`**
   > Include inactive topology
@@ -360,7 +381,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Overrides only
   @@ NEEDS RULING
 - **`lpn_rule_inactive_note`**
-  > These rules refer to an asset that is inactive in this scenario, so they were ignored in this run: {ids}
+  > These rules refer to an asset that is inactive in this scenario, so they are ignored in its run: {ids}
   @@ NEEDS RULING
 - **`lpn_scenario_delete_has_children`**
   > The scenario {name} cannot be deleted while other scenarios inherit from it: {list}. Delete those first, or give them another parent.
@@ -549,7 +570,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`2e5e81c4`) — adds no English strings
 
-### feat/message-dismiss (`aaedf63e`) — 5 new, 5 to read @@ NEEDS RULING
+### feat/message-dismiss (`686b7052`) — 5 new, 5 to read @@ NEEDS RULING
 
 - **`lpn_hotkeys_zoomwin_def`**
   > Zoom Window: drag a rectangle to zoom to.
@@ -573,7 +594,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Points data<br />(use Copy to see format)
   @@ NEEDS RULING
 
-### feat/user-guide (`9e0c0ef6`) — 42 new, 42 to read @@ NEEDS RULING
+### feat/user-guide (`e4a9ca56`) — 42 new, 42 to read @@ NEEDS RULING
 
 - **`lpn_guide_also`**
   > Also in {menu}
@@ -703,3 +724,7 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 
 ### feat/visit-dedupe (`7b4a84bd`) — adds no English strings
+
+### fix/ewb-meeting (`62202a66`) — adds no English strings
+
+### fix/export-wording (`3bfea843`) — adds no English strings
