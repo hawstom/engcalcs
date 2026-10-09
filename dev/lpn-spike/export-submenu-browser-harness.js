@@ -2,9 +2,9 @@
 //
 //   flock /tmp/engcalcs-browser.lock node dev/lpn-spike/export-submenu-browser-harness.js
 //
-// The rows are File > Export to > EPANET file and GeoJSON file (Tom, 2026-10-06), then, under a
-// Tables and libraries heading, ODS file, XLSX file and CSV file (Tom, 2026-10-07: "It should say
-// File, Export to, and we are adding ODS/XLSX/CSV"). A table row opens its box first; its Export
+// The rows are File > Export > EPANET file and GeoJSON file (Tom, 2026-10-06), then, after a
+// separator and with no heading (Tom, 2026-10-09), ODS file, XLSX file and CSV file (Tom,
+// 2026-10-07: "It should say File, Export to, and we are adding ODS/XLSX/CSV"). A table row opens its box first; its Export
 // button is pressed with a real mouse click. The submenu opens by
 // mouse (click the row) and by keyboard (Down into File, onto Export, Right), lists every export,
 // and each row still downloads exactly one file with the right extension. A new export added to
