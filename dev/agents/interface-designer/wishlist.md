@@ -542,3 +542,9 @@ N+5. **A check that flags one English string holding both a select word and an o
 N. **One in-page "User guide" box replaces Help > Tables and Hotkeys and Help > Toolbar** (Tom, 2026-10-06). The toolbar section is derived from toolbarIconIndex, tips shown in full (no hover, so touch is fixed), each row naming its menu twin ("Edit > Delete") and pulsing the real control on click; a Menus index; the existing hotkey tables; one search box; '?' opens it, landing on the hovered or focused control. Cost: 1 new key x 26, a refactor of the File/Edit/Water openers into *Rows() functions, no storage change if the box keeps `lpn_hotkeysbox`. It also becomes the home for Task 763's prose. Precedents: Excalidraw '?', Figma shortcuts panel, VS Code Keyboard Shortcuts editor. See journal, 2026-10-06.
 
 - (2026-10-06) Check whether every title-bar glyph has a keyboard path and a tip in all 27 languages (RTL mirroring of the contents rail).
+
+
+## 2026-10-08 (Ida)
+- Ranked 1: a populated-scenario example (Net3 with Peak hour, Fire plus max day, one shared alternative, one grandchild) so a manager can be photographed and measured; today every example opens with Base only.
+- Ranked 2: an unchecked-Basic probe that opens the box at 1400x900 and 390x844 and reports box area / window area (measured 2026-10-08: preview box is about 75% of the drawing region, for one row).
+- Ranked 3: check the Basic-mode tick glyph renders (empty box in headless Chromium, 2026-10-08).

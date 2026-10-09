@@ -4157,3 +4157,29 @@ OBSERVED DEFECT: a box the file stores with no position (left/top null) is place
 OBSERVED minor: Contour box 11 px shorter in place (356 vs 367); map margin variable left "0px" instead of unset; z-index values keep climbing (relative order matches reload).
 Lesson (mine): the page's dialog stub (window.lpnDialogAnswerer) must be deleted, and a probe dialog I left queued made Ctrl+Z "fail" for three runs. Retract before reporting; control against a generic dialog first.
 Not done: mutation test of the harness; contour plot on the map when the contour box is in dst but not the file; Properties box floating position when it stays open.
+
+## 2026-10-08 feat/message-dismiss @ aaedf63e (second pass, x made visible)
+- OBSERVED: both branch harnesses (message-dismiss-x 23 checks, message-dismiss-browser 55 checks) pass on this head.
+- OBSERVED: own probe, Chromium. x present on "Add a reservoir"; Tab-focus + Enter hides it and moves focus to the history glyph; RELOAD brings every hidden message back (in-memory only); no localStorage/cookie key added (grep of diff + key scan).
+- OBSERVED: es and ar at 1400 and 390 px: x 20x20, on screen, not overlapping text or Something wrong, no sideways scroll. aria/title on the x read "Hide this message" in English on es/ar pages (new keys not yet translated, expected).
+- OBSERVED (code only): #lpn_status_notes (engine-difference notes, 2 min) has no x and keeps the box open after the diagnostic text is hidden.
+- NOT EXERCISED: storage full / storage unreadable / unit unknown paths in a browser (my storage-full probe was pre-empted by a diagnostic); covered only by the generic mechanism and the "No solution" harness case.
+- OBSERVED: branch also carries Zoom Window (W key, Map-menu row, corner triangle) unrelated to message hiding.
+
+# Perry journal, feat/user-guide @ 92ce4d1b, 2026-10-08
+OBSERVED (real Chromium, php -S via env.startServer, en/es/ar, 1280 and 390 px):
+- Ring: dashed #c2185b, solid-ish 1.5 s then fades to gone by ~2.5 s; never covered by the Guide (menus stack above it). Same in es, ar (RTL ring placed correctly), phone.
+- After ring fades, Water menu + Scenarios fly-out stay open indefinitely (5.8 s+). Clicking Guide text closes only the fly-out, not Water.
+- Clicking Select card while Water menu open from a prior card: Water menu stays open, ring on Select -> stale menu.
+- Desktop: the fly-out sits on top of the Basic mode card in the Guide itself (card partly hidden). Phone: menus cover most of the Guide.
+- Properties card: note shown in magenta italic above the text; no hint where Properties opens.
+- Search "mode": hit shows heading Water, then "Scenarios > [state glyph] Basic mode". Glyph is the menu row's check icon (tofu box in this headless font).
+- Dark theme: prefers-color-scheme emulation changed nothing visible (page has no dark chrome here); --ec-point has no dark override. UNVERIFIED.
+- Not checked: Esc behaviour was ambiguous (Esc closed the Guide with menus left "block" in my probe).
+
+## 2026-10-08 Task 781 (feat/bentley-interop 07ca4206..2cfebc47) -- Perry
+OBSERVED (real Chromium, php -S, this tree): Net1+1 customer, scenario B, junction 22 -> tank. EPANET tables equal a hand-edited Net1.inp (tank at 22) to the printed digit; Base-only save byte-identical to 07ca4206; B save/reopen reopens on B with same heads; B .inp export has new tank + L1..L4, no 22.
+OBSERVED defect 1: a control/rule naming the old asset is NOT omitted from B's run (still in B's .inp export); EPANET Error 200, run falls back to built-in solver. Box text lpn_change_type_old_controls says it is omitted: false.
+OBSERVED defect 2: after Create new assets, Properties box still shows old junction 22 while map selection is new tank T1.
+OBSERVED: customer 100 gpm on 22 vanishes in B with no word; same as Base change-to-tank (pre-existing), box lists only "Base demand 200".
+Native engine and undo taken from builder's harness, not re-run by me (headless harness re-run: all ok, incl. 7 mutations).

@@ -115,11 +115,13 @@ ok('rows the page cannot label are declared, not silently skipped: ' + q(NOT_BUI
 
 // ---- 1. a fresh project prints the table, in US and SI ---------------------------------------
 function expectRow(r, sys, ctx) {
+	// ctx.idPrefix: an example may state the prefix on the ID row alone (N before node IDs, L before link IDs).
 	const g = r.group, f = r.field, ls = L.ls();
 	if (r.mode) { L.setQuality(MODES[r.mode]); } else { L.setQuality(MODES.age); }
 	const pre = L.prefixFor(g, f), suf = L.suffixFor(g, f);
 	const bad = [];
-	if (pre !== r.before) { bad.push('Before ' + q(pre) + ' want ' + q(r.before)); }
+	const wantPre = (f === 'id' && ctx.idPrefix && typeof ctx.idPrefix[g] === 'string') ? ctx.idPrefix[g] : r.before;
+	if (pre !== wantPre) { bad.push('Before ' + q(pre) + ' want ' + q(wantPre)); }
 	if (suf !== r.after[sys]) { bad.push('After ' + q(suf) + ' want ' + q(r.after[sys])); }
 	if (L.rank('show', g, f) !== r.show) { bad.push('Show ' + L.rank('show', g, f) + ' want ' + r.show); }
 	if (L.rank('priority', g, f) !== r.drop) { bad.push('Drop ' + L.rank('priority', g, f) + ' want ' + r.drop); }
@@ -153,15 +155,20 @@ manifest.examples.forEach((ex) => {
 	L.migrateSaved(saved);
 	L.applySaved(saved);
 	const bad = [];
+	// The only symbology a file may state is the ID prefix of nodes and links, as the examples do.
+	const pfxFile = ((saved.labelSettings || {}).prefix) || {};
+	const idPrefix = {};
+	['node', 'link'].forEach((g) => { if (pfxFile[g] && typeof pfxFile[g].id === 'string') { idPrefix[g] = pfxFile[g].id; } });
 	rows.filter((r) => r.key !== '-').forEach((r) => {
-		const b = expectRow(r, ex.system === 'si' ? 'si' : 'us', { checkOn: false });
+		const b = expectRow(r, ex.system === 'si' ? 'si' : 'us', { checkOn: false, idPrefix: idPrefix });
 		if (b.length) { bad.push(r.key + ': ' + b.join('; ')); }
 	});
 	ok(ex.file + ' (' + ex.system + ')', bad.length === 0, bad.slice(0, 4).join(' | '));
 	// The file itself states none of it, so the next change to the table reaches it for free.
 	const lsFile = saved.labelSettings || {};
 	ok(ex.file + ' stores no symbology of its own beyond what it shows',
-		['decimals', 'prefix', 'suffix', 'priority', 'show', 'useUnits'].every((k) => !(k in lsFile)),
+		['decimals', 'suffix', 'priority', 'show', 'useUnits'].every((k) => !(k in lsFile)) &&
+		Object.keys(pfxFile).every((g) => Object.keys(pfxFile[g] || {}).every((f) => f === 'id')),
 		q(Object.keys(lsFile)));
 });
 L.setQuality(MODES.age);
