@@ -4753,6 +4753,23 @@ var EngCalcs = EngCalcs || {};
 		// **AND EACH SETTING IT HOLDS OF ITS OWN** (Tom, 2026-10-05), one per value, by presence
 		// as an element override counts: nothing seeds a scenario's settings block.
 		total += scenarioSettingLeaves(scn).length;
+		// **AND WHAT IT TAKES FROM THE ALTERNATIVES IT USES** (Perry, 2026-10-09: Horse via Dry year read
+		// 0): each stored alternative or calculation set in the chain of each category, folded as it
+		// resolves, so a value an alternative and its parent both state counts once. Only when a tree
+		// is stored, so a project without one counts exactly as before.
+		if (isExplicitTree() && !scn.isBase) {
+			LPN_ALT_CATEGORIES.forEach(function (cat) {
+				var layers = treeLayers(scn, cat).filter(function (l) { return l.kind !== 'scn'; }).map(function (l) { return l.obj; }), m;
+				if (!layers.length) { return; }
+				m = combineHolders(layers);
+				Object.keys(m.values).forEach(function (k) { total += Object.keys(m.values[k]).length; });
+				total += settingLeaves(m.settings).length;
+				if (cat === 'calculation') {
+					if (layers.some(function (r) { return typeof r.demandMultiplier === 'number'; })) { total++; }
+					LPN_SCENARIO_TIME_KEYS.forEach(function (k) { if (layers.some(function (r) { return r.times && r.times[k] !== undefined; })) { total++; } });
+				}
+			});
+		}
 		return total;
 	}
 	// The three calculation options with homes of their own that this scenario COUNTS: each only
@@ -71286,7 +71303,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	function smActDelete(key) {
 		var tree = smState.tree, pc = EngCalcs.pageConfig || {}, name, res, wasCurrent = key === project.activeScenario, from = activeScenario();
-		if (key === null || key === undefined || smIsBaseKey(tree, key)) { return; }
+		if (key === null || key === undefined) { return; }
+		if (smIsBaseKey(tree, key)) {
+			setNotice((pc.lpn_sm_base_kept || 'The Base of a tree is not deleted. Another Base added with Add Base is deleted when nothing uses it.'));
+			return;
+		}
 		name = smName(tree, key);
 		res = smTry(function () { return smDelete(tree, key); });
 		if (res !== true) {
@@ -71354,6 +71375,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			if (smState.sel !== null) { smStartRename(smState.sel); }
 		} else if (k === 'Delete') {
 			if (e.preventDefault) { e.preventDefault(); }
+			if (e.stopPropagation) { e.stopPropagation(); }
 			smActDelete(smState.sel);
 		} else if (k === 'Enter') {
 			if (e.preventDefault) { e.preventDefault(); }
@@ -71452,7 +71474,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			{ key: 'sc_name', label: 'lpn_scenario_label', str: true, em: 9,
 				get: function (r) { return scenarioDisplayName(r.scn); } },
 			{ key: 'sc_parent', label: 'lpn_sm_col_parent', str: true, em: 9,
-				get: function (r) { var p = parentScenarioOf(r.scn); return p ? scenarioDisplayName(p) : ''; } }
+				get: function (r) { var p = r.scn.root === true ? null : parentScenarioOf(r.scn); return p ? scenarioDisplayName(p) : ''; } }
 		];
 		LPN_ALT_CATEGORIES.forEach(function (cat) {
 			cols.push({

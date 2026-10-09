@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**137 still to read on master**, of 139 untranslated keys, of 2577 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**138 still to read on master**, of 140 untranslated keys, of 2578 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -175,7 +175,7 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   @@ NEEDS RULING
 
-## lpn_  (139, 137 to read @@ NEEDS RULING)
+## lpn_  (140, 138 to read @@ NEEDS RULING)
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -501,6 +501,9 @@ never edits a synonym.
 - **`lpn_sm_add_child`**
   > Add a child of the selected item
   @@ NEEDS RULING
+- **`lpn_sm_base_kept`**
+  > The Base of a tree is not deleted. Another Base added with Add Base is deleted when nothing uses it.
+  @@ NEEDS RULING
 - **`lpn_sm_basic_off`**
   > Basic mode is off, so the Scenario manager and the Scenarios table are shown.
   @@ NEEDS RULING
@@ -599,7 +602,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**52 still to read**, of 55 new keys across 12 unmerged branch(es).
+**46 still to read**, of 49 new keys across 11 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -610,7 +613,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/bentley-interop (`4a9ef8a0`) — adds no English strings
+### feat/bentley-interop (`e2fad9e7`) — adds no English strings
 
 ### feat/desktop (`baba0f04`) — adds no English strings
 
@@ -781,24 +784,3 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 
 ### feat/visit-dedupe (`7b4a84bd`) — adds no English strings
-
-### fix/ewb-meeting (`4953af70`) — 6 new, 6 to read @@ NEEDS RULING
-
-- **`lpn_break_no`**
-  > No
-  @@ NEEDS RULING
-- **`lpn_break_pipe_ask`**
-  > Break pipe {id} at this node?
-  @@ NEEDS RULING
-- **`lpn_break_yes`**
-  > Yes
-  @@ NEEDS RULING
-- **`lpn_link_end_same`**
-  > From and To must be different nodes.
-  @@ NEEDS RULING
-- **`lpn_link_end_unknown`**
-  > No node has the ID {id}.
-  @@ NEEDS RULING
-- **`lpn_omitted_note`**
-  > Left out of this run because no path leads from them to a reservoir or tank: {ids}
-  @@ NEEDS RULING

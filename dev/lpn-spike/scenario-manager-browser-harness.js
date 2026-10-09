@@ -109,8 +109,9 @@ async function main() {
 		console.log('--- 1. the menu row, and Basic mode ---');
 		await page.click('#lpn_scenario_btn');
 		await page.waitForSelector('#lpn_menu_popup', { state: 'visible' });
+		const SMMENU = await L('lpn_sm_menu');
 		const menuRows = await page.evaluate(() => Array.from(document.querySelectorAll('#lpn_menu_list button.lpn-menu-row')).map((r) => r.textContent.trim()));
-		ok('1.1 the Scenario manager row is in the menu with Basic mode ticked', menuRows.some((t) => t.indexOf(PCsm) >= 0) || true);
+		ok('1.1 the Scenario manager row is in the menu with Basic mode ticked', menuRows.some((t) => t.indexOf(SMMENU) >= 0), JSON.stringify(menuRows));
 		await page.keyboard.press('Escape');
 		await page.evaluate(() => { document.body.click(); });
 		ok('1.2 the Scenarios tab is not shown in Basic mode', await page.evaluate(() => { const b = document.getElementById('lpn_pane_tab_scenarios'); return !b || getComputedStyle(b).display === 'none'; }));
@@ -130,7 +131,7 @@ async function main() {
 		console.log('\n--- 2. add, rename, delete ---');
 		await clickRow(await L('lpn_scenario_base'));
 		await click('#lpn_sm_add');
-		ok('2.1 "+" adds Child_1_of_Base and opens its name for editing', JSON.stringify(await names()) === JSON.stringify(['Base', '-EDIT:Child_1_of_Base'].map((t, i) => i ? t : t)) || (await names())[1] === '-EDIT:Child_1_of_Base', JSON.stringify(await names()));
+		ok('2.1 "+" adds Child_1_of_Base and opens its name for editing', JSON.stringify(await names()) === JSON.stringify(['Base', '-EDIT:Child_1_of_Base']), JSON.stringify(await names()));
 		await page.keyboard.type('Peak');
 		await page.keyboard.press('Enter');
 		await settle(500);
@@ -180,6 +181,20 @@ async function main() {
 		await settle(800);
 		ok('2.13 Ctrl+Z puts it back', (await names()).length === 4, JSON.stringify(await names()));
 
+		await clickRow('Base');
+		await page.keyboard.press('Delete');
+		await settle(400);
+		const bn = await page.evaluate(() => (document.getElementById('lpn_map_notice') || {}).textContent || '');
+		ok('2.14 Del on Base is refused with its own sentence, not "Nothing is selected"', bn.indexOf(await L('lpn_sm_base_kept')) >= 0 && bn.indexOf('Nothing is selected') < 0, bn);
+		await click('#lpn_sm_del');
+		ok('2.15 "-" on Base gives the same sentence', (await page.evaluate(() => (document.getElementById('lpn_map_notice') || {}).textContent || '')).indexOf(await L('lpn_sm_base_kept')) >= 0);
+		await clickRow('Base2');
+		await click('#lpn_sm_del');
+		ok('2.16 an unused Base of its own can be deleted', !(await names()).some((n) => n === 'Base2'), JSON.stringify(await names()));
+		await page.keyboard.press('Control+z');
+		await settle(600);
+		ok('2.17 ...and Ctrl+Z brings it back', (await names()).some((n) => n === 'Base2'), JSON.stringify(await names()));
+
 		console.log('\n--- 3. drag ---');
 		// make a second scenario to drag
 		await clickRow('Base');
@@ -207,7 +222,7 @@ async function main() {
 		await settle(700);
 		const re = await names();
 		ok('3.3 a drop on the top edge puts Night BEFORE Peak Hour, as a sibling', re.indexOf('-Night') >= 0 && re.indexOf('-Night') < re.indexOf('-Peak Hour'), JSON.stringify(re));
-		ok('3.4 the order is stored in the project', await page.evaluate(async () => !!JSON.stringify(window.localStorage).indexOf('scenarioOrdered') + 1 || true));
+		ok('3.4 the order is stored in the project', await page.evaluate(() => { for (let i = 0; i < localStorage.length; i++) { if ((localStorage.getItem(localStorage.key(i)) || '').indexOf('"scenarioOrdered":true') >= 0) { return true; } } return false; }));
 		await clickRow('Base2');
 		await clickRow('Night');
 		await page.keyboard.press('Enter');
@@ -236,7 +251,7 @@ async function main() {
 		await page.click('#lpn_pane_tab_scenarios');
 		await settle(900);
 		const hdr = await page.evaluate(() => Array.from(document.querySelectorAll('#lpn_pane_scenarios thead th')).map((t) => t.textContent.replace(/[­​]/g, '').trim()));
-		ok('5.1 a column per category after Scenario and Parent', hdr.length === 13 && hdr[0].indexOf(' ') < 0 || hdr.length === 13, JSON.stringify(hdr));
+		ok('5.1 a column per category after Scenario and Parent', hdr.length === 13, JSON.stringify(hdr));
 		const trs = await page.evaluate(() => Array.from(document.querySelectorAll('#lpn_pane_scenarios tbody tr')).map((tr) => tr.querySelector('td').textContent.trim()));
 		ok('5.2 a row per scenario, in the stored order (Base first, Night before Peak Hour)', trs[0] === await L('lpn_scenario_base') && trs.length === 5 && trs.indexOf('Night') < trs.indexOf('Peak Hour'), JSON.stringify(trs));
 		const cellSel = (row, cat) => page.evaluate(([row, cat]) => {
@@ -248,6 +263,24 @@ async function main() {
 		const baseCell = await cellSel(0, 'demand');
 		ok('5.3 the Base row has no pick-list', !!baseCell.text, JSON.stringify(baseCell));
 		const peakRow = trs.indexOf('Peak Hour');
+		const parentOf = (name) => page.evaluate((n) => { const tr = Array.from(document.querySelectorAll('#lpn_pane_scenarios tbody tr')).filter((r) => r.querySelector('td').textContent.trim() === n)[0]; return tr ? tr.children[1].textContent.trim() : null; }, name);
+		ok('5.2b a Base of its own has a blank Parent; a child shows its parent', (await parentOf('Base2')) === '' && (await parentOf('Peak Hour')) === 'Base', String(await parentOf('Base2')) + ' / ' + String(await parentOf('Peak Hour')));
+		// Peak Hour is the open scenario: give it a demand of its own, so the solve differs from Base's.
+		const pressure = () => page.evaluate(() => { const td = document.querySelector('#lpn_pane_junctions tbody tr td.lpn-pane-col-pressure'); return td ? td.textContent.trim() : null; });
+		await page.click('#lpn_pane_tab_junctions');
+		await settle(700);
+		const pBase = await pressure();
+		const di = page.locator('#lpn_pane_junctions tbody tr').nth(2).locator('td.lpn-pane-col-demand input').first();
+		await di.click();
+		await settle(200);
+		await page.keyboard.press('Control+a');
+		await page.keyboard.type('2500');
+		await di.press('Enter');
+		await settle(2500);
+		const pPeak = await pressure();
+		ok('5.4a Peak Hour\'s own demand changes the solve (pressure at the first junction)', !!pBase && !!pPeak && pBase !== pPeak, pBase + ' -> ' + pPeak);
+		await page.click('#lpn_pane_tab_scenarios');
+		await settle(700);
 		const pc = await cellSel(peakRow, 'demand');
 		ok('5.4 a scenario\'s Demand cell is a pick-list with the alternatives', pc.options && pc.options.some((o) => o === 'Dry year=Dry year') && pc.value === '', JSON.stringify(pc));
 		await page.evaluate(([row]) => {
@@ -259,6 +292,12 @@ async function main() {
 		await settle(1000);
 		const pc2 = await cellSel(peakRow, 'demand');
 		ok('5.5 picking Dry year assigns it', pc2.value === 'Dry year', JSON.stringify(pc2));
+		await page.click('#lpn_pane_tab_junctions');
+		await settle(1500);
+		const pDry = await pressure();
+		ok('5.5b ...and the solve changes: Peak Hour\'s own demand is set aside, so the pressure is Base\'s again', pDry === pBase && pDry !== pPeak, pPeak + ' -> ' + pDry);
+		await page.click('#lpn_pane_tab_scenarios');
+		await settle(700);
 		await page.selectOption('#lpn_sm_tree_select', 'demand');
 		await settle(400);
 		ok('5.6 the manager now shows Dry year used by Peak Hour and the child that inherits it', (await rows())[1].meta.indexOf('2') >= 0 && (await rows())[1].metaTip.indexOf('Peak Hour') >= 0, JSON.stringify(await rows()));

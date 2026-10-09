@@ -985,6 +985,20 @@ Tom's calls of 2026-10-09 (H01-H08), in his words where they govern:
 - **Used by** (the market researcher): each alternative shows the number of scenarios using it (naming
   it or inheriting it) with the list in its tip, and an override written into an alternative other
   scenarios use says so in its existing note (Properties and the Settings box).
+- **Decisions made by CC that Tom may overturn** (his words govern where he gave them):
+  1. A Base added with Add Base is deleted like any record when nothing uses it; only each tree's built-in
+     Base is never deleted, with its own sentence (`lpn_sm_base_kept`).
+  2. A child cannot choose Base while its parent uses another alternative (choosing nothing inherits);
+     re-parent the scenario to Base instead.
+  3. Picking an alternative for a scenario that holds its own values in that category first keeps them as
+     a stored alternative named for the scenario; nothing is lost, and that alternative then shows in the tree.
+  4. "Used by" counts scenarios that inherit an alternative as well as those that name it.
+  5. The Scenarios tab is hidden, not removed, in Basic mode, and Ctrl+Shift+PageDown skips it.
+  6. A Base of its own resolves exactly as a child of Base does; `root: true` only says which row it hangs
+     from. Its Parent column is blank.
+  7. The override count (badge, menu, Compare column) also counts what a scenario takes from the stored
+     alternatives it uses, folded as they resolve, so a value an alternative and its parent both state
+     counts once. It does not count values inherited from a parent scenario's own implicit values.
 - Known limit: a child cannot choose Base while its parent uses another alternative, because choosing
   nothing inherits. Re-parent the scenario to Base instead.
 

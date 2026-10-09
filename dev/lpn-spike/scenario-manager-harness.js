@@ -58,7 +58,7 @@ const INJECT =
 	"\t\tbasicMode: function () { return scenarioBasicMode; }, setBasicMode: setScenarioBasicMode,\n" +
 	"\t\tlastNotice: function () { return lastNoticeText; }, promote: promoteImplicitAlternative,\n" +
 	"\t\talternativeFor: alternativeFor, libInactiveIds: libInactiveIds, smInUseBy: smInUseBy,\n" +
-	"\t\tsmSharedText: smSharedText, scenarioTableCols: scenarioTableCols, scenarioTableRows: scenarioTableRows,\n" +
+	"\t\toverrideCount: overrideCount, smSharedText: smSharedText, scenarioTableCols: scenarioTableCols, scenarioTableRows: scenarioTableRows,\n" +
 	"\t\tbuildLayers: function () { svg = document.getElementById('lpn_canvas');\n" +
 	"\t\t\tworld = el('g', {}, svg);\n" +
 	"\t\t\tbackdropLayer = el('g', {}, world); gridLayer = el('g', {}, world);\n" +
@@ -278,6 +278,33 @@ async function run(mutate, quiet) {
 	ok('10.6 ...nothing for a category it does not share, nor in Base', L.smSharedText(['physical']) === '' && (L.switchScenario(BASE), L.smSharedText(['demand']) === ''));
 	ok('10.7 ...and nothing for a scenario writing to its own values', (L.switchScenario(R.id), L.smAssign(R.id, 'demand', ''), L.smSharedText(['demand']) === ''));
 	L.switchScenario(BASE);
+
+	say('--- 10a. the override count includes what an assigned alternative brings ---');
+	{
+		const P2 = page();
+		P2.importInp({ name: 'Net1.inp', _text: NET1 });
+		const Pk = P2.createScenario('Peak');
+		P2.switchScenario(Pk.id);
+		P2.setProp(P2.nodeById('22'), 'demand', 900);
+		P2.setProp(P2.nodeById('12'), 'demand', 300);
+		P2.promote(Pk.id, 'demand', 'DryYear');
+		P2.switchScenario(P2.baseScenario().id);
+		const Hs = P2.createScenario('Horse');
+		ok('10.12 before assigning, Horse counts 0', P2.overrideCount(Hs) === 0);
+		P2.smAssign(Hs.id, 'demand', 'DryYear');
+		ok('10.13 Horse via DryYear counts the two demands the alternative holds', P2.overrideCount(Hs) === 2, String(P2.overrideCount(Hs)));
+		ok('10.14 ...and Peak, which names the same alternative, counts the same', P2.overrideCount(Pk) === 2, String(P2.overrideCount(Pk)));
+		const Ch = P2.smAdd('demand', 'base', false);
+		P2.smMove('demand', Ch.id, 'base', 'into');
+		P2.smMove('demand', P2.smRecords('demand').filter((r) => r.name === 'DryYear')[0].id, Ch.id, 'into');
+		ok('10.15 a value the alternative and its parent both state counts once', P2.overrideCount(Hs) === 2, String(P2.overrideCount(Hs)));
+		ok('10.16 Base counts 0', P2.overrideCount(P2.baseScenario()) === 0);
+		const Rt = P2.smAdd('scenarios', null, true);
+		ok('10.17 a Base of its own shows a blank Parent in the Scenarios table', (() => {
+			const col = P2.scenarioTableCols().filter((c) => c.key === 'sc_parent')[0];
+			return col.get({ scn: Rt }) === '' && col.get({ scn: Hs }) === 'Base';
+		})());
+	}
 
 	say('--- 10b. controls and rules naming an inactive asset: a standing note, never a message ---');
 	{

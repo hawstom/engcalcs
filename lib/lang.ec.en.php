@@ -3154,6 +3154,7 @@ $ec_lang['lpn_sm_add_child']='Add a child of the selected item';
 $ec_lang['lpn_sm_add_base']='Add Base';
 $ec_lang['lpn_sm_add_base_tip']='Add another Base to this tree. A Base has no parent.';
 $ec_lang['lpn_sm_delete']='Delete the selected item. A used item is not deleted.';
+$ec_lang['lpn_sm_base_kept']='The Base of a tree is not deleted. Another Base added with Add Base is deleted when nothing uses it.';
 $ec_lang['lpn_sm_rename']='Rename';
 $ec_lang['lpn_sm_make_current']='Make current';
 $ec_lang['lpn_sm_copy']='Copy scenario…';
