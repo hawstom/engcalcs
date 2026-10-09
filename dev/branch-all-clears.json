@@ -637,6 +637,13 @@
    "words": "feat/hover-label: (1) Peripherally, change all of our EPANET examples to put N and L as label prefix for nodes and links respectively. (3) Merge.",
    "context": "In his pasted session message of 2026-10-08 (his own message, per his global CLAUDE.md), after his browser pass. Item (1) was built first, as 31b137e5.",
    "pin_note": "Pinned to the head that carries his item (1), the condition he set before the merge."
+  },
+  "feat/message-dismiss": {
+   "head": "26e1afc84ed56251608ac35e2c3dae071169af15",
+   "date": "2026-10-09",
+   "words": "feat/message-dismiss: merge",
+   "context": "In his pasted session message of 2026-10-09 (his own message, per his global CLAUDE.md), after answering H09-H11 on the calls page: H09 \"this should not be lost on reload\", H10 \"Give them the ×\", H11 \"Until the condition changes\".",
+   "pin_note": "Pinned to the head that carries his H09-H11 calls, applied after his word, plus one truthful edit to lpn_msglog_note that H09 made necessary."
   }
  }
 }
