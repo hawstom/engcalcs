@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "sr",
-        "expected_key_count": 2482,
-        "delta_key_count": 38,
+        "expected_key_count": 2481,
+        "delta_key_count": 37,
         "exempt_key_count": 34,
         "exempt_keys": [
             "calc_units_us",
@@ -713,20 +713,19 @@
         ]
     },
     "keys_to_translate": {
-        "lpn_pane_copy_heads": "Copy with headings",
+        "lpn_pane_copy_heads": "Copy with column headings",
         "lpn_export_table_title": "Export to {format}",
         "lpn_export_table_current": "Current",
         "lpn_export_table_all": "All",
         "lpn_export_table_go": "Export",
         "lpn_export_table_scn_note": "Results are exported only for the scenario last calculated.",
-        "lpn_file_export_tables_heading": "Tables and libraries",
         "lpn_file_export_item_ods": "ODS file…",
         "lpn_file_export_item_xlsx": "XLSX file…",
         "lpn_file_export_item_csv": "CSV file…",
-        "lpn_file_export_tables_tip": "Download the tables as the Tables pane shows them, one sheet each, with a sheet for each library their IDs refer to: patterns, curves, pipe types, and fittings.",
-        "lpn_file_export_csv_tip": "Download a table as the Tables pane shows it. Several tables come as one zip file of CSV files, with a file for each library their IDs refer to.",
+        "lpn_file_export_tables_tip": "Download the tables as the Tables pane shows them, in one workbook with a sheet for each table (and for each scenario you choose), plus a sheet for each library their IDs refer to: patterns, curves, pipe types, and fittings. Results are included for the scenario last calculated only.",
+        "lpn_file_export_csv_tip": "Download a table as the Tables pane shows it. One table comes as a single CSV file with no libraries. Several tables or scenarios come as one zip file of CSV files, with a file for each library their IDs refer to. Results are included for the scenario last calculated only.",
         "lpn_file_export_item_dxf": "DXF file…",
-        "lpn_file_export_dxf_tip": "Download this network for AutoCAD and other CAD programs: pipes, pumps, and valves as polylines, and every asset as a block whose attributes carry its ID and property values in the project units.",
+        "lpn_file_export_dxf_tip": "Download this network for AutoCAD and other CAD programs: nodes as symbol blocks, pipes, pumps, and valves as polylines, and every asset as a block whose attributes carry its ID and property values in the project units.",
         "lpn_dxf_export_no_utm": "The DXF file was not written: this network lies outside the latitudes UTM covers (80° S to 84° N), and a drawing needs a flat grid to be drawn on.",
         "lpn_dxf_export_refused": "The DXF file was not written: the coordinate conversion it needs did not load. Check the connection and try again.",
         "lpn_dxf_export_failed": "The DXF file was not written: an error in this page stopped it ({error}).",
@@ -738,9 +737,9 @@
         "lpn_dxf_note_shortened": "{n} values were longer than a DXF file allows ({max} characters), so each was shortened and ends in three periods.",
         "lpn_dxf_note_categories": "{n} junctions have more than one demand category. Their {tag} attribute holds the sum of the base demands of all categories.",
         "lpn_file_export_item_workspace": "Workspace…",
-        "lpn_file_export_workspace_tip": "Download a small file holding where your boxes sit, their sizes, which are open or docked, and your pane and column sizes, plus the reading preferences of this page. Your projects, project settings and cookies (language, consent, units) are not in it. Load it on another screen or browser with File, Import, Workspace.",
+        "lpn_file_export_workspace_tip": "Download a small file holding where your boxes sit, their sizes, which are open or docked, and your pane and column sizes, plus the display options of this page, such as which help bubbles and the hover card are shown. Your projects, project settings and cookies (language, consent, units) are not in it. Load it on another screen or browser with File, Import, Workspace.",
         "lpn_file_import_workspace": "Workspace…",
-        "lpn_file_import_workspace_tip": "Apply a workspace file saved with File, Export, Workspace: box positions and sizes, docking, pane sizes and the reading preferences of this page. Your projects and cookies are not touched.",
+        "lpn_file_import_workspace_tip": "Apply a workspace file saved with File, Export, Workspace: box positions and sizes, docking, pane sizes and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched.",
         "lpn_workspace_exported": "Workspace saved to {file}: {n} settings.",
         "lpn_workspace_imported": "Workspace applied from {file}. Settings applied: {n}. Returned to their defaults: {r}.",
         "lpn_workspace_ignored": "Entries ignored because they were not recognized: {u}.",
@@ -750,23 +749,22 @@
         "lpn_workspace_confirm": "Replace this browser's workspace layout with the one in the file?",
         "lpn_workspace_refused_storage": "Browser storage is full or unavailable, so the workspace was not applied.",
         "lpn_settings_hover_card": "Show the full label on hover",
-        "lpn_settings_hover_card_tip": "Rest the pointer on a node, link or customer to see its label as specified in Settings at any scale, fit or not. This is a setting for this browser, not for the project."
+        "lpn_settings_hover_card_tip": "Rest the pointer on a node, link or customer to see its label as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project."
     },
     "keys": {
-        "lpn_pane_copy_heads": "Copy with headings",
+        "lpn_pane_copy_heads": "Copy with column headings",
         "lpn_export_table_title": "Export to {format}",
         "lpn_export_table_current": "Current",
         "lpn_export_table_all": "All",
         "lpn_export_table_go": "Export",
         "lpn_export_table_scn_note": "Results are exported only for the scenario last calculated.",
-        "lpn_file_export_tables_heading": "Tables and libraries",
         "lpn_file_export_item_ods": "ODS file…",
         "lpn_file_export_item_xlsx": "XLSX file…",
         "lpn_file_export_item_csv": "CSV file…",
-        "lpn_file_export_tables_tip": "Download the tables as the Tables pane shows them, one sheet each, with a sheet for each library their IDs refer to: patterns, curves, pipe types, and fittings.",
-        "lpn_file_export_csv_tip": "Download a table as the Tables pane shows it. Several tables come as one zip file of CSV files, with a file for each library their IDs refer to.",
+        "lpn_file_export_tables_tip": "Download the tables as the Tables pane shows them, in one workbook with a sheet for each table (and for each scenario you choose), plus a sheet for each library their IDs refer to: patterns, curves, pipe types, and fittings. Results are included for the scenario last calculated only.",
+        "lpn_file_export_csv_tip": "Download a table as the Tables pane shows it. One table comes as a single CSV file with no libraries. Several tables or scenarios come as one zip file of CSV files, with a file for each library their IDs refer to. Results are included for the scenario last calculated only.",
         "lpn_file_export_item_dxf": "DXF file…",
-        "lpn_file_export_dxf_tip": "Download this network for AutoCAD and other CAD programs: pipes, pumps, and valves as polylines, and every asset as a block whose attributes carry its ID and property values in the project units.",
+        "lpn_file_export_dxf_tip": "Download this network for AutoCAD and other CAD programs: nodes as symbol blocks, pipes, pumps, and valves as polylines, and every asset as a block whose attributes carry its ID and property values in the project units.",
         "lpn_dxf_export_no_utm": "The DXF file was not written: this network lies outside the latitudes UTM covers (80° S to 84° N), and a drawing needs a flat grid to be drawn on.",
         "lpn_dxf_export_refused": "The DXF file was not written: the coordinate conversion it needs did not load. Check the connection and try again.",
         "lpn_dxf_export_failed": "The DXF file was not written: an error in this page stopped it ({error}).",
@@ -778,9 +776,9 @@
         "lpn_dxf_note_shortened": "{n} values were longer than a DXF file allows ({max} characters), so each was shortened and ends in three periods.",
         "lpn_dxf_note_categories": "{n} junctions have more than one demand category. Their {tag} attribute holds the sum of the base demands of all categories.",
         "lpn_file_export_item_workspace": "Workspace…",
-        "lpn_file_export_workspace_tip": "Download a small file holding where your boxes sit, their sizes, which are open or docked, and your pane and column sizes, plus the reading preferences of this page. Your projects, project settings and cookies (language, consent, units) are not in it. Load it on another screen or browser with File, Import, Workspace.",
+        "lpn_file_export_workspace_tip": "Download a small file holding where your boxes sit, their sizes, which are open or docked, and your pane and column sizes, plus the display options of this page, such as which help bubbles and the hover card are shown. Your projects, project settings and cookies (language, consent, units) are not in it. Load it on another screen or browser with File, Import, Workspace.",
         "lpn_file_import_workspace": "Workspace…",
-        "lpn_file_import_workspace_tip": "Apply a workspace file saved with File, Export, Workspace: box positions and sizes, docking, pane sizes and the reading preferences of this page. Your projects and cookies are not touched.",
+        "lpn_file_import_workspace_tip": "Apply a workspace file saved with File, Export, Workspace: box positions and sizes, docking, pane sizes and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched.",
         "lpn_workspace_exported": "Workspace saved to {file}: {n} settings.",
         "lpn_workspace_imported": "Workspace applied from {file}. Settings applied: {n}. Returned to their defaults: {r}.",
         "lpn_workspace_ignored": "Entries ignored because they were not recognized: {u}.",
@@ -790,7 +788,7 @@
         "lpn_workspace_confirm": "Replace this browser's workspace layout with the one in the file?",
         "lpn_workspace_refused_storage": "Browser storage is full or unavailable, so the workspace was not applied.",
         "lpn_settings_hover_card": "Show the full label on hover",
-        "lpn_settings_hover_card_tip": "Rest the pointer on a node, link or customer to see its label as specified in Settings at any scale, fit or not. This is a setting for this browser, not for the project."
+        "lpn_settings_hover_card_tip": "Rest the pointer on a node, link or customer to see its label as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project."
     },
     "key_context": {
         "lpn_pane_copy_heads": {
@@ -886,22 +884,6 @@
                     "key": "lpn_menu_project",
                     "value": "Вода",
                     "english": "Water"
-                }
-            }
-        },
-        "lpn_file_export_tables_heading": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_file_export_item_geojson",
-                    "value": "GeoJSON датотека…",
-                    "english": "GeoJSON file…"
-                },
-                "next_translated": {
-                    "key": "lpn_file_export_inp_tip",
-                    "value": "Преузмите ову мрежу као EPANET .inp датотеку (у zip датотеци са својом сликом, ако је има). Све што .inp формат не може да сачува биће накнадно наведено.",
-                    "english": "Download this network as an EPANET .inp file (in a zip file with its image if applicable). Anything the .inp format cannot hold is listed for you afterwards."
                 }
             }
         },
