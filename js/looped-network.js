@@ -62998,7 +62998,6 @@ var EngCalcs = EngCalcs || {};
 		// task exists to fix). Shown for two minutes, never a flash, so it needs no delay guard --
 		// logged the moment it is set, same as setStatus() beside it.
 		if (text) { logMessage(text, 'notice'); }
-		paintStatus();
 		if (text) {
 			engineNoteTimer = setTimeout(function () {
 				engineNoteTimer = 0;
@@ -63018,6 +63017,7 @@ var EngCalcs = EngCalcs || {};
 				}, LPN_ENGINE_NOTE_FADE_MS);
 			}, LPN_ENGINE_NOTE_MS);
 		}
+		paintStatus();   // the x serves the notes too
 		syncStatusBoxVisibility();
 	}
 	// The box shows while EITHER half has something to say. Before the notes moved out this was one

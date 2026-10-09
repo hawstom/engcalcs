@@ -36,6 +36,7 @@ const notes = () => byId.lpn_status_notes.textContent || '';
 const xShown = () => byId.lpn_status_dismiss.style.display !== 'none';
 const boxShown = () => byId.lpn_status.style.display === 'block';
 function clickX() { (byId.lpn_status_dismiss._listeners.click || []).slice().forEach((f) => f({})); }
+const PC = () => global.EngCalcs.pageConfig;
 const stored = () => global.localStorage.getItem('lpn_msghidden');
 
 function oneJunction(L) {
@@ -124,7 +125,7 @@ async function main() {
 	};
 	L.setStorageError(true);
 	const full = text();
-	ok('"storage is full" is standing', /storage is full/i.test(full), full);
+	ok('the storage-full message is standing', full === PC().lpn_storage_full, full);
 	clickX();
 	ok('hidden', text() === '');
 	L.runSolve();   // a run forgets run messages...
@@ -145,7 +146,7 @@ async function main() {
 	L.initLibrary();
 	L.setStorageError(true, 'unreadable');   // what init() does next
 	const unread = text();
-	ok('"could not be read" is standing', /could not be read/i.test(unread), unread);
+	ok('the storage-unreadable message is standing', unread === PC().lpn_storage_unreadable, unread);
 	clickX();
 	ok('hidden', text() === '');
 	L.runSolve(); L.setStatus('');
