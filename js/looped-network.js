@@ -35604,7 +35604,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			text.push([pc.lpn_change_type_born || 'These values are new, set as on a newly drawn asset:'].concat(capped(born)).join('\n'));
 		}
 		if (old.length) {
-			text.push([pc.lpn_change_type_old_controls || 'These controls and rules name an old asset, which is inactive in this scenario, so they are left out of this scenario\'s run and its .inp export:']
+			text.push([pc.lpn_change_type_old_controls || 'These controls and rules refer to an old asset, which is inactive in this scenario, so they are left out of this scenario\'s run and its .inp export:']
 				.concat(capped(old)).join('\n'));
 		}
 		askDialog({ kind: 'confirm', title: pc.lpn_change_type_menu || 'Change type',
@@ -39343,7 +39343,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 					.replace('{n}', String(offCust.ids.length)) : ''));
 		}
 		if (offNames.length) {
-			said.push((pc.lpn_inp_export_flat_inactive_controls || 'These controls and rules name an asset that is inactive in this scenario, so they are not in the file: {ids}')
+			said.push((pc.lpn_inp_export_flat_inactive_controls || 'These controls and rules refer to an asset that is inactive in this scenario, so they are not in the file: {ids}')
 				.replace('{ids}', offNames.join('; ')));
 		}
 		if (coords) {
@@ -58355,6 +58355,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			libCommit();
 			rebuildLibraryBox();
 		}));
+		libInactiveNote(host, 'control');
 		if (!list.length) {
 			host.appendChild(libEl('p', 'lpn-lib-note', pc.lpn_pane_none || 'This network has none of these yet.'));
 			return;
@@ -59540,6 +59541,37 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		tr.appendChild(xCell); tr.appendChild(yCell); tr.appendChild(dCell);
 		tbody.appendChild(tr);
 	}
+	// **A STANDING NOTE, NOT A MESSAGE** (Task 781; Tom, 2026-10-09: *"The problem with this message is
+	// that it will be continually firing under some circumstances. Is it just in the Libraries as a
+	// standing status note like all other override notes?"*). Which controls or rules the open
+	// scenario leaves out of its run because they refer to an asset inactive here. Read from the
+	// library and the scenario every time the Libraries box is built; it fires on nothing.
+	function libInactiveIds(kind) {
+		var out = [];
+		if (kind === 'control') {
+			libControlsRead().forEach(function (c) {
+				var l = c && c.link !== '' && c.link !== undefined ? linkById(String(c.link)) : null,
+					cond = c && c.condition, n = cond && cond.kind === 'node' ? nodeById(String(cond.node)) : null;
+				if ((l && !linkLive(l)) || (n && !isActive(n))) { out.push(String(c.link)); }
+			});
+			return out;
+		}
+		if (!(doc.rules || []).length || !EngCalcs.lpnRuleParse) { return out; }
+		EngCalcs.lpnRuleParse(doc.rules).forEach(function (b) {
+			var off = false, missing = false;
+			b.nodes.forEach(function (id) { var n = nodeById(id); if (!n) { missing = true; } else if (!isActive(n)) { off = true; } });
+			b.links.forEach(function (id) { var l = linkById(id); if (!l) { missing = true; } else if (!linkLive(l)) { off = true; } });
+			if (off && !missing && b.ok) { out.push(b.name); }
+		});
+		return out;
+	}
+	function libInactiveNote(host, kind) {
+		var pc = EngCalcs.pageConfig || {}, ids = libInactiveIds(kind), key = kind === 'control' ? 'lpn_control_inactive_note' : 'lpn_rule_inactive_note';
+		if (!ids.length) { return; }
+		host.appendChild(libEl('p', 'lpn-lib-note', (pc[key] || (kind === 'control'
+			? 'These controls refer to an asset that is inactive in this scenario, so they are ignored in its run: {ids}'
+			: 'These rules refer to an asset that is inactive in this scenario, so they are ignored in its run: {ids}')).replace('{ids}', ids.join(', '))));
+	}
 	function buildControlSection(host) {
 		var pc = EngCalcs.pageConfig || {}, list = libControlsRead();
 		host.appendChild(libButton(pc.lpn_library_control_add || 'Add a control', function () {
@@ -59699,6 +59731,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			libCommit();
 			rebuildLibraryBox();
 		}));
+		libInactiveNote(host, 'rule');
 		if (!chunks.length) {
 			host.appendChild(libEl('p', 'lpn-lib-note', pc.lpn_pane_none || 'This network has none of these yet.'));
 			return;
@@ -63941,6 +63974,15 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				warn.className = 'lpn-set-note';
 				warn.textContent = pc.lpn_customer_fixed_head ||
 					'⚠ The near end of that pipe holds a fixed water surface, so this demand does not affect the simulation.';
+				fields.appendChild(warn);
+			}
+			// **A STANDING NOTE, NOT A MESSAGE** (Task 781; Tom, 2026-10-09): the junction this
+			// customer's demand lands on is inactive in the open scenario.
+			if (nd && !isActive(nd)) {
+				warn = document.createElement('p');
+				warn.className = 'lpn-set-note';
+				warn.textContent = pc.lpn_customer_node_inactive ||
+					'This customer is assigned to a junction that is inactive in this scenario, so its demand is not in the solve.';
 				fields.appendChild(warn);
 			}
 		} else {
@@ -71467,11 +71509,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				'These rules name an element that is no longer in this project, so they were ignored in this run: {ids}'),
 			droppedNote('rule-unreadable', 'lpn_rule_unreadable_note',
 				'These rules could not be read, so they were ignored in this run: {ids}'),
-			// Task 781: an asset inactive in this scenario is still in the project, so its own words.
-			droppedNote('control-inactive', 'lpn_control_inactive_note',
-				'These controls refer to an asset that is inactive in this scenario, so they were ignored in this run: {ids}'),
-			droppedNote('rule-inactive', 'lpn_rule_inactive_note',
-				'These rules refer to an asset that is inactive in this scenario, so they were ignored in this run: {ids}'),
+			// Task 781: a control or rule referring to an asset inactive in this scenario is NOT said
+			// here, where it would fire on every run (Tom, 2026-10-09). It is a standing note in the
+			// Libraries box, beside the controls and rules themselves (libInactiveNote()).
 			// (A note about the later times being out of date used to be composed here. It is gone:
 			// off means off now, so there is no state in which SOME of a run is up to date --
 			// see EC.lpnTimeStandDown() in js/lpn-time.js.)

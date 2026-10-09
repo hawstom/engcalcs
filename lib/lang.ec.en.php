@@ -837,6 +837,7 @@ $ec_lang['lpn_node_customers_tip']='List of customers added here because this wa
 $ec_lang['lpn_node_customers_sum']='{total} {unit} from {n} Customers';
 $ec_lang['lpn_customer_detached']='⚠ This customer is not connected to a pipe, so its demand is not in the answers. Delete it, or draw a pipe and move the customer onto it.';
 $ec_lang['lpn_customer_fixed_head']='⚠ The near end of that pipe holds a fixed water surface, so this demand does not affect the simulation.';
+$ec_lang['lpn_customer_node_inactive']='This customer is assigned to a junction that is inactive in this scenario, so its demand is not in the solve.';
 $ec_lang['lpn_customer_detached_count']='{n} customers are not connected to a pipe. Their demand is not accounted for.';
 $ec_lang['lpn_meter_pick_pipe']='Now select the pipe or the node that serves this customer. The customer stays where you put it. Press Escape to cancel.';
 $ec_lang['lpn_inp_export_flat_customers']='An EPANET file has no customers. The demand of the {n} customers in this project is written as a demand row on the junction each customer is assigned to, named with the customer\'s tag. The file does not record the customer itself: its location, the pipe that serves it, where along that pipe the service connects, or how many services it represents. That information remains in the project; save the project file to keep it.';
@@ -1611,7 +1612,7 @@ $ec_lang['lpn_change_type_rules']='These rule lines name a link by its kind, and
 $ec_lang['lpn_change_type_scenario_ask']='Current scenario is not Base. Create new assets? The selected assets become inactive in this scenario.';
 $ec_lang['lpn_change_type_create_new']='Create new assets';
 $ec_lang['lpn_change_type_not_carried']='The new assets cannot hold these values. The old assets keep them:';
-$ec_lang['lpn_change_type_old_controls']='These controls and rules name an old asset, which is inactive in this scenario, so they are left out of this scenario\'s run and its .inp export:';
+$ec_lang['lpn_change_type_old_controls']='These controls and rules refer to an old asset, which is inactive in this scenario, so they are left out of this scenario\'s run and its .inp export:';
 $ec_lang['lpn_change_type_customers_left']='A customer cannot be assigned per scenario, so the demand of these customers stays with the old junction and is not in this scenario\'s solve:';
 $ec_lang['lpn_change_type_switch_base']='Switch to Base';
 $ec_lang['lpn_tables_menu_tip']='View and edit assets in tables in bottom panel.';
@@ -2121,7 +2122,7 @@ $ec_lang['lpn_status_inp_exported_no_picture']='Exported {file}. The background 
 // {n} is a whole number. Said plainly rather than hidden: a file that quietly loses a pump curve is
 // the failure this whole feature exists to prevent.
 $ec_lang['lpn_inp_export_flat_customers_inactive']='{n} of these customers are assigned to a junction that is inactive in this scenario, so their demand is not in the file.';
-$ec_lang['lpn_inp_export_flat_inactive_controls']='These controls and rules name an asset that is inactive in this scenario, so they are not in the file: {ids}';
+$ec_lang['lpn_inp_export_flat_inactive_controls']='These controls and rules refer to an asset that is inactive in this scenario, so they are not in the file: {ids}';
 $ec_lang['lpn_inp_export_differences']='{n} things the .inp format cannot hold.';
 $ec_lang['lpn_inp_export_difference_one']='One thing the .inp format cannot hold.';
 $ec_lang['lpn_inp_export_refused']='This project cannot be written as an EPANET file: {detail}';
@@ -3366,8 +3367,8 @@ $ec_lang['lpn_time_run_fell_back']='The numbers on screen came from the built-in
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_control_dangling_note']='These controls refer to an element that is no longer in this project, so they were ignored: {ids}';
 $ec_lang['lpn_control_unreadable_note']='These controls could not be read, so they were left out: {ids}';
-$ec_lang['lpn_control_inactive_note']='These controls refer to an asset that is inactive in this scenario, so they were ignored in this run: {ids}';
-$ec_lang['lpn_rule_inactive_note']='These rules refer to an asset that is inactive in this scenario, so they were ignored in this run: {ids}';
+$ec_lang['lpn_control_inactive_note']='These controls refer to an asset that is inactive in this scenario, so they are ignored in its run: {ids}';
+$ec_lang['lpn_rule_inactive_note']='These rules refer to an asset that is inactive in this scenario, so they are ignored in its run: {ids}';
 $ec_lang['lpn_rule_dangling_note']='These rules refer to an element that is no longer in this project, so they were ignored in this run: {ids}';
 $ec_lang['lpn_rule_unreadable_note']='These rules could not be read, so they were ignored in this run: {ids}';
 $ec_lang['lpn_settings_text_size']='Text size (pixels)';

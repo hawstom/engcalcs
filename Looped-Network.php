@@ -1983,6 +1983,7 @@ EngCalcs.pageConfig = {
 	lpn_node_customers_sum: <?=json_encode($ec_lang['lpn_node_customers_sum'])?>,
 	lpn_customer_detached: <?=json_encode($ec_lang['lpn_customer_detached'])?>,
 	lpn_customer_fixed_head: <?=json_encode($ec_lang['lpn_customer_fixed_head'])?>,
+	lpn_customer_node_inactive: <?=json_encode($ec_lang['lpn_customer_node_inactive'])?>,
 	lpn_customer_detached_count: <?=json_encode($ec_lang['lpn_customer_detached_count'])?>,
 	lpn_meter_pick_pipe: <?=json_encode($ec_lang['lpn_meter_pick_pipe'])?>,
 	lpn_inp_export_flat_customers: <?=json_encode($ec_lang['lpn_inp_export_flat_customers'])?>,
