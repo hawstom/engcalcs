@@ -2133,7 +2133,6 @@ EngCalcs.pageConfig = {
 	lpn_file_export_menu: <?=json_encode($ec_lang['lpn_file_export_menu'])?>,
 	lpn_file_export_item_inp: <?=json_encode($ec_lang['lpn_file_export_item_inp'])?>,
 	lpn_file_export_item_geojson: <?=json_encode($ec_lang['lpn_file_export_item_geojson'])?>,
-	lpn_file_export_tables_heading: <?=json_encode($ec_lang['lpn_file_export_tables_heading'])?>,
 	lpn_file_export_item_ods: <?=json_encode($ec_lang['lpn_file_export_item_ods'])?>,
 	lpn_file_export_item_xlsx: <?=json_encode($ec_lang['lpn_file_export_item_xlsx'])?>,
 	lpn_file_export_item_csv: <?=json_encode($ec_lang['lpn_file_export_item_csv'])?>,
