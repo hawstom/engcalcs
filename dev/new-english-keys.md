@@ -311,7 +311,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**150 still to read**, of 153 new keys across 15 unmerged branch(es).
+**153 still to read**, of 156 new keys across 13 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -321,8 +321,6 @@ Each branch carries the commit it was read at. This part is a SNAPSHOT and is no
 fresh by the build — a branch moves whenever anybody commits on it, and failing master's
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
-
-### chore/calls-1009 (`efd0dbb7`) — adds no English strings
 
 ### feat/bentley-interop (`fe2028f4`) — 101 new, 101 to read @@ NEEDS RULING
 
@@ -654,7 +652,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`2e5e81c4`) — adds no English strings
 
-### feat/message-dismiss (`686b7052`) — adds no English strings
+### feat/message-dismiss (`e1223076`) — adds no English strings
 
 ### feat/section-grid (`005d4e63`) — 1 new, 1 to read @@ NEEDS RULING
 
@@ -662,8 +660,11 @@ build for that would be a gate nobody keeps. Refresh it with
   > Points data<br />(use Copy to see format)
   @@ NEEDS RULING
 
-### feat/user-guide (`e4a9ca56`) — 42 new, 42 to read @@ NEEDS RULING
+### feat/user-guide (`8fb6434e`) — 45 new, 45 to read @@ NEEDS RULING
 
+- **`lpn_guide_about_heading`**
+  > About this calculator
+  @@ NEEDS RULING
 - **`lpn_guide_also`**
   > Also in {menu}
   @@ NEEDS RULING
@@ -718,6 +719,9 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_guide_find_results_term`**
   > Results, the selection, and Tables
   @@ NEEDS RULING
+- **`lpn_guide_group_from`**
+  > From {menu}
+  @@ NEEDS RULING
 - **`lpn_guide_how_alt`**
   > Alternatives preview is listed under Water, Scenarios when Basic mode is off.
   @@ NEEDS RULING
@@ -729,6 +733,9 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 - **`lpn_guide_keys_term`**
   > Guide keyboard shortcuts
+  @@ NEEDS RULING
+- **`lpn_guide_menu_named`**
+  > {menu} menu
   @@ NEEDS RULING
 - **`lpn_guide_not_shown`**
   > This control is not on screen right now.
@@ -793,7 +800,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/visit-dedupe (`7b4a84bd`) — adds no English strings
 
-### fix/ewb-meeting (`0fcb63bf`) — 6 new, 6 to read @@ NEEDS RULING
+### fix/ewb-meeting (`4953af70`) — 6 new, 6 to read @@ NEEDS RULING
 
 - **`lpn_break_no`**
   > No
@@ -813,5 +820,3 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_omitted_note`**
   > Left out of this run because no path leads from them to a reservoir or tank: {ids}
   @@ NEEDS RULING
-
-### fix/export-wording (`3bfea843`) — adds no English strings

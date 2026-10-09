@@ -2377,7 +2377,7 @@ $ec_lang['lpn_msglog_empty']='No messages yet.';
 // The wrapper around lpn_ago_seconds and its siblings, so a language can put the word for "ago"
 // wherever its own grammar wants it.
 $ec_lang['lpn_msglog_ago']='{x} ago';
-$ec_lang['lpn_msglog_note']='Newest first. This page keeps the last {n} messages while it is open, and nothing is stored on your computer.';
+$ec_lang['lpn_msglog_note']='Newest first. This page keeps the last {n} messages while it is open and does not store them on your computer.';
 // Read-only means read-only: it never turns itself back into an editable file while you are looking
 // at it, and it never offers to save over the other person\'s file. It cannot -- their file has moved
 // on since you opened it, so writing yours over it would destroy their work. What you CAN do is

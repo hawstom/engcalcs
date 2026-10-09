@@ -62539,7 +62539,7 @@ var EngCalcs = EngCalcs || {};
 		// as the last row rather than dropped along with the dialog chrome around it.
 		var note = document.createElement('div');
 		note.className = 'lpn-msglog-panel-note';
-		note.textContent = (pc.lpn_msglog_note || 'Newest first. This page keeps the last {n} messages while it is open, and nothing is stored on your computer.')
+		note.textContent = (pc.lpn_msglog_note || 'Newest first. This page keeps the last {n} messages while it is open and does not store them on your computer.')
 			.replace('{n}', NOTICE_LOG_MAX);
 		panel.appendChild(note);
 	}
