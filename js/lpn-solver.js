@@ -608,7 +608,7 @@ EngCalcs.lpnOmitDisconnected = function (model) {
 	if (queue.length === 0) { return model; }
 	for (i = 0; i < model.links.length; i++) {
 		link = model.links[i];
-		st = link.statusBase !== undefined ? link.statusBase : link.status;
+		st = Object.prototype.hasOwnProperty.call(link, 'statusBase') ? link.statusBase : link.status;
 		if (st === 'closed' || !byId[link.from] || !byId[link.to]) { continue; }
 		adj[link.from].push(link.to);
 		adj[link.to].push(link.from);

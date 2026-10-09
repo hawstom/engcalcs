@@ -19073,7 +19073,7 @@ var EngCalcs = EngCalcs || {};
 	var findConnCache = null;
 	function findConnectionMap() {
 		if (findConnCache) { return findConnCache; }
-		var model = assembleModel(), nodeById2 = {}, fixed = [], adjAll = {}, adjOpen = {},
+		var model = assembleModel(true), nodeById2 = {}, fixed = [], adjAll = {}, adjOpen = {},
 			facts = {}, seenAll, seenOpen, i, link, n;
 		for (i = 0; i < model.nodes.length; i++) {
 			n = model.nodes[i];
@@ -60168,8 +60168,6 @@ var EngCalcs = EngCalcs || {};
 		// order.
 		descField(fields, l);
 		tagField(fields, l);
-		endField(fields, l, 'from');
-		endField(fields, l, 'to');
 		if (l.type === 'valve') {
 			renderValveFields(fields, l, linkId);
 		} else if (l.type === 'pump') {
@@ -60243,6 +60241,10 @@ var EngCalcs = EngCalcs || {};
 				});
 			}
 		}
+		// From and To (Tom, 2026-10-09), after everything the link is: the identity band is ID,
+		// Description and Tag, and the pipe type selector stands immediately after it.
+		endField(fields, l, 'from');
+		endField(fields, l, 'to');
 		closedField(fields, l, linkId);
 		customPropFields(fields, l);
 		activeField(fields, l);
@@ -62146,7 +62148,9 @@ var EngCalcs = EngCalcs || {};
 		return (typeof l.speed === 'number' && isFinite(l.speed)) ? l.speed : 1;
 	}
 
-	function assembleModel() {
+	// `keepDisconnected` is for the one reader that asks WHICH nodes have no path to a source (Find's
+	// Connectivity): it must see the whole network, not the one the solver is handed.
+	function assembleModel(keepDisconnected) {
 		var live = {};
 		doc.nodes.forEach(function (n) { if (isActive(n)) { live[n.id] = true; } });
 		var nodes = doc.nodes.filter(isActive).map(function (n) {
@@ -62413,7 +62417,7 @@ var EngCalcs = EngCalcs || {};
 		// period run, fire flow, scenario compare -- sees the same network, and never in the
 		// document: nothing is marked inactive and an .inp export writes what is stored. The ids
 		// ride on `model.omitted`; runSolve() turns them into the standing note.
-		if (EngCalcs.lpnOmitDisconnected) { EngCalcs.lpnOmitDisconnected(model); }
+		if (EngCalcs.lpnOmitDisconnected && !keepDisconnected) { EngCalcs.lpnOmitDisconnected(model); }
 		return model;
 	}
 	/**

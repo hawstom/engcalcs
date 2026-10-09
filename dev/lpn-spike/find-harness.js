@@ -117,7 +117,7 @@ const L = loadLoopedNetwork(
 	"\t\tresultsBox: function () { return document.getElementById('lpn_find_results'); },\n" +
 	// The solver's OWN structural verdict, so the report can be checked against it rather than
 	// against itself.
-	"\t\tdiagnose: function () { return EngCalcs.lpnDiagnose(assembleModel()); },\n" +
+	"\t\tdiagnose: function () { return EngCalcs.lpnDiagnose(assembleModel(true)); },\n" +
 	"\t\tsetState: function (scope, prop, op, value) {\n" +
 	"\t\t\tfindState.scope = scope; findState.prop = prop; findState.op = op;\n" +
 	"\t\t\tfindState.value = value === undefined ? '' : value; findNormalize(); },\n" +
