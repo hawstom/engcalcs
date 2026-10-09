@@ -23301,22 +23301,31 @@ var EngCalcs = EngCalcs || {};
 				if (t) { el.tag = t; } else { delete el.tag; }   // base-write: identity, as in the popup -- see tagField()
 			} };
 	}
-	// A link's two ends, read-only and as TEXT: which node a pipe lands on is identity, and identity
-	// is never overridable (a node cannot be in two places at once in one rendered map). Re-drawing
-	// the pipe is how it changes.
+	// A link's two ends, as TEXT and editable (Tom, 2026-10-09: *"I got caught by the inability to
+	// edit the from and to nodes for a link. Can these be editable? I see them in table."*). Which
+	// node a pipe lands on is identity, and identity is never overridable (a node cannot be in two
+	// places in one rendered map), so a write here is Base's and a scenario is unaffected. The new
+	// ID must name an existing node and not be the link's other end; a refusal is said in place, in
+	// the same box as an ID that is taken, and `reread` puts the old node back in the cell.
+	// reconnectLinkEnd() is the one door, shared with the Properties box.
 	// **`refTo` IS WHAT MAKES A SUPPORT COLUMN POINT SOMEWHERE ELSE** (Tom, 2026-09-21: *"when we
 	// right-click on a support column (like From and To) that contains an asset, we can Show on map
 	// that asset instead of the row's asset"*). A column declares the element its VALUE names, and
 	// the right-click menu's Select in map reads it; every other column has none and the menu falls
 	// back to the row's own element, which is what it has always done.
-	function paneColEnds() {
-		return [
-			{ key: 'from', label: 'lpn_field_from', get: function (l) { return l.from; },
-				refTo: function (l) { return { group: 'node', id: l.from }; } },
-			{ key: 'to', label: 'lpn_field_to', get: function (l) { return l.to; },
-				refTo: function (l) { return { group: 'node', id: l.to }; } }
-		];
+	function paneColEnd(end) {
+		return { key: end, label: end === 'from' ? 'lpn_field_from' : 'lpn_field_to', str: true, reread: true, em: 5,
+			get: function (l) { return l[end]; },
+			set: function (l, v) {
+				var newId = String(v === undefined || v === null ? '' : v).trim(), why;
+				if (newId === l[end]) { return; }
+				why = linkEndProblem(l, end, newId);
+				if (why) { setWarning(why); return; }
+				reconnectLinkEnd(l, end, newId);
+			},
+			refTo: function (l) { return { group: 'node', id: l[end] }; } };
 	}
+	function paneColEnds() { return [paneColEnd('from'), paneColEnd('to')]; }
 	/**
 	 * **A LINK'S VERTICES AS ONE CELL** (ROADMAP Task 610), in the format the data-entry clerk
 	 * specified before anything was built (dev/agents/data-entry-clerk/task-610-vertex-cell-spec.md):
@@ -32427,6 +32436,159 @@ var EngCalcs = EngCalcs || {};
 		// A GPV's behaviour is its CURVE; the setting is not a number the user ever types.
 		if (type === 'GPV') { return 0; }
 		return 2;
+	}
+	/**
+	 * **BREAK A PIPE AT A NODE PLACED ON IT** (Tom, 2026-10-09, after an Engineers Without Borders
+	 * meeting: *"Could we offer to break a link when a node is placed on it? 'Break link for
+	 * node?'"*). The pipe becomes two pipes meeting at a new node of the kind the tool places.
+	 *
+	 * **WHICH HALF KEEPS WHAT.** The original keeps its ID, its From node and everything it carries,
+	 * and now ends at the new node; the new pipe runs from the new node to the old To node and takes
+	 * the next free ID with the project's link prefix (mintId). Diameter, roughness, status,
+	 * description, pipe type and the rest are copied. **The minor loss coefficient and its fittings
+	 * list stay on the original only**, because a fitting is one thing at one place, and a Tag is not
+	 * copied either: it is the join key to an asset register and two pipes cannot both be that
+	 * asset. A control or rule that names the pipe keeps naming the original, which is the one the
+	 * ID still belongs to.
+	 *
+	 * **THE NODE IS PLACED ON THE PIPE'S LINE**, at the foot of the press, so the two halves are
+	 * exactly the old polyline cut in two rather than the old polyline with a kink in it. Interior
+	 * vertices go to the half they lie on.
+	 *
+	 * **LENGTH.** A pipe whose length is drawn (Auto) stays drawn: each half measures itself. A pipe
+	 * with a TYPED length is divided in proportion to the drawn length of the halves. Those are new
+	 * numbers the user did not type, and that is acceptable only because the user asked for the split
+	 * (CLAUDE.md: only the user touches a file's numbers); the typed characters of both are dropped.
+	 * A scenario's override of the length is divided the same way.
+	 *
+	 * **A METER OR A TEXT ATTACHED BY STATION KEEPS ITS PHYSICAL PLACE**: its fraction along the old
+	 * pipe is restated along whichever half now holds that point, and one that falls on the new half
+	 * moves to it.
+	 *
+	 * Offered in Base only. A scenario varies topology by switching elements on and off, and cutting a
+	 * Base pipe from inside one would change the other scenarios under it.
+	 * dev/lpn-spike/ewb-meeting-harness.js.
+	 */
+	function breakPipeAtPoint(l, nodeType, wx, wy) {
+		var pts = linkPointList(l), r = Geom.nearestFractionOnPolyline(pts, wx, wy),
+			total = Geom.polylineLength(pts), splitAlong = r.f * total,
+			oldTo = l.to, oldId = l.id, cum = [0], i, keepVerts = [], newVerts = [], node, nl, clone,
+			lenOrig, lenNew, frac, wasTyped = !l.lenAuto, typedLen = l._length;
+		for (i = 0; i + 1 < pts.length; i++) {
+			cum.push(cum[i] + Math.hypot(pts[i + 1].x - pts[i].x, pts[i + 1].y - pts[i].y));
+		}
+		// A vertex travels with its typed geographic characters, so it is copied whole.
+		(l.verts || []).forEach(function (v, k) {
+			if (cum[k + 1] < splitAlong - 1e-12) { keepVerts.push(v); }
+			else { newVerts.push(Object.assign({}, v)); }
+		});
+		clone = JSON.parse(JSON.stringify(l));
+		node = addNode(nodeType, r.x, r.y);
+		nl = addLink('pipe', node.id, oldTo, newVerts);
+		nl.verts = newVerts;   // base-write: construction: whole copies, so a vertex keeps its typed characters
+		// Everything the pipe carries comes across, except what is its own place or identity.
+		Object.keys(clone).forEach(function (k) {
+			if (k === 'id' || k === 'from' || k === 'to' || k === 'verts' || k === 'lx' || k === 'ly' ||
+				k === 'tag' || k === '_k' || k === 'fittingsId' || k === '_fittingsId') { return; }
+			nl[k] = clone[k];   // base-write: construction: the new half is born in Base as a copy of the pipe it came from
+		});
+		nl._k = 0;   // base-write: construction: a minor loss stays on the original only
+		if (nl.tok) {
+			delete nl.tok._k;
+			if (!Object.keys(nl.tok).length) { delete nl.tok; }
+		}
+		// The original now ends at the new node.
+		incidentLinks[oldTo] = incidentLinks[oldTo].filter(function (x) { return x !== oldId; });
+		l.to = node.id;   // base-write: identity -- Base is showing (the offer is made in Base only)
+		l.verts = keepVerts;   // base-write: identity, as above
+		incidentLinks[node.id].push(oldId);
+		// Lengths: each half measured, then the typed length shared out in proportion.
+		lenOrig = linkGeomLength(l); lenNew = linkGeomLength(nl);
+		frac = (lenOrig + lenNew) > 0 ? lenOrig / (lenOrig + lenNew) : 0.5;
+		if (wasTyped) {
+			l._length = typedLen * frac;   // base-write: the visitor asked for the split; see this function's note
+			nl._length = typedLen * (1 - frac);   // base-write: as above
+			if (l.tok) { delete l.tok._length; if (!Object.keys(l.tok).length) { delete l.tok; } }
+			if (nl.tok) { delete nl.tok._length; if (!Object.keys(nl.tok).length) { delete nl.tok; } }
+		}
+		// Scenario overrides: copied to both, the minor loss to the original only, a length divided.
+		scenarios.forEach(function (sc) {
+			var key = ovKeyFor('link', oldId), ov = sc.overrides[key], c2;
+			if (!ov) { return; }
+			c2 = JSON.parse(JSON.stringify(ov));
+			delete c2.k; delete c2.fittingsId;
+			if (typeof ov.length === 'number') {
+				ov.length = ov.length * frac;
+				c2.length = c2.length * (1 - frac);
+			}
+			if (Object.keys(c2).length) { sc.overrides[ovKeyFor('link', nl.id)] = c2; }
+		});
+		// Meters and Texts attached by station on the old pipe.
+		(customersByLink[oldId] || []).slice().forEach(function (cid) {
+			var c = (doc.customers || []).filter(function (x) { return x.id === cid; })[0], along;
+			if (!c || typeof c.t !== 'number') { return; }
+			along = c.t * total;
+			if (along <= splitAlong) { c.t = splitAlong > 0 ? along / splitAlong : 0; return; }
+			c.t = (total - splitAlong) > 0 ? (along - splitAlong) / (total - splitAlong) : 1;
+			c.link = nl.id;
+			customersByLink[oldId] = customersByLink[oldId].filter(function (x) { return x !== cid; });
+			(customersByLink[nl.id] = customersByLink[nl.id] || []).push(cid);
+		});
+		(labelsByLinkAnchor[oldId] || []).slice().forEach(function (lid) {
+			var lb = labelById(lid), along;
+			if (!lb || typeof lb.anchorT !== 'number') { return; }
+			along = lb.anchorT * total;
+			if (along <= splitAlong) { lb.anchorT = splitAlong > 0 ? along / splitAlong : 0; return; }
+			lb.anchorT = (total - splitAlong) > 0 ? (along - splitAlong) / (total - splitAlong) : 1;
+			lb.anchorLink = nl.id;
+			labelsByLinkAnchor[oldId] = labelsByLinkAnchor[oldId].filter(function (x) { return x !== lid; });
+			(labelsByLinkAnchor[nl.id] = labelsByLinkAnchor[nl.id] || []).push(lid);
+		});
+		rebuildLink(l);
+		rebuildLink(nl);
+		updateLinkGeometry(oldId);
+		updateLinkGeometry(nl.id);
+		updateNode(node.id, true);
+		refreshPaneIfOpen();
+		scheduleSolve();
+		return { node: node, original: l, added: nl };
+	}
+	/**
+	 * **RECONNECTING A LINK'S END** (Tom, 2026-10-09: *"I got caught by the inability to edit the
+	 * from and to nodes for a link."*). Returns '' when the new node is acceptable, else the words
+	 * to say why, in the order the visitor can act on them.
+	 * dev/lpn-spike/ewb-meeting-harness.js.
+	 */
+	function linkEndProblem(l, end, newId) {
+		var pc = EngCalcs.pageConfig || {}, other = end === 'from' ? l.to : l.from;
+		if (!newId || !nodeById(newId)) {
+			return (pc.lpn_link_end_unknown || 'No node has the ID {id}.').replace('{id}', newId);
+		}
+		if (newId === other) { return pc.lpn_link_end_same || 'From and To must be different nodes.'; }
+		return '';
+	}
+	// **THE LINK KEEPS ITS ID, ITS VERTICES AND EVERY VALUE THE USER TYPED** -- a typed length stays
+	// exactly as typed (only the user touches numbers). Vertices are kept even though the pipe's
+	// ends move, because they are the user's drawing and a polyline from the new node through them
+	// is the honest reading of what was asked; the user removes a bend in Vertices mode. An Auto
+	// length is derived from the drawing, so it follows the new geometry. From and To are identity,
+	// never overridable, so a scenario is unaffected. The caller has taken the one undo snapshot.
+	function reconnectLinkEnd(l, end, newId) {
+		var old = l[end], touched;
+		if (old === newId) { return; }
+		l[end] = newId;   // base-write: identity -- a link's ends are not overridable, like its ID
+		incidentLinks[old] = (incidentLinks[old] || []).filter(function (x) { return x !== l.id; });
+		(incidentLinks[newId] = incidentLinks[newId] || []).push(l.id);
+		touched = [old, newId];
+		beginMapBoxHold();
+		beginLinkGeomHold();
+		try {
+			updateLinkGeometry(l.id);
+			touched.forEach(function (nid) { if (nodeEls[nid]) { layoutNodeLabel(nid); } });
+		} finally { endMapBoxHold(); endLinkGeomHold(); }
+		refreshOneLabelInPlace(l);
+		refreshPaneIfOpen();
+		scheduleSolve();
 	}
 	// anchorNode, if given, anchors the new Text to that node with a leader -- lb.x/lb.y become an
 	// OFFSET from the node (matching buildLabelEls'/updateLabelGeometry's model), computed here so
@@ -46841,6 +47003,30 @@ var EngCalcs = EngCalcs || {};
 			// die together. Nothing was written to the document, so there is nothing to undo.
 			var exitLinkId = LINK_CLICK_EXITS_MODE[mode] &&
 				!nearestNodeNearScreen(e.clientX, e.clientY, reachPx(e)) ? tapLinkId(t) : null;
+			// **A NODE TOOL PRESSED ON A PIPE ASKS TO BREAK IT** (Tom, 2026-10-09: *"Could we offer to
+			// break a link when a node is placed on it?"*). That replaces the exit-and-open the three
+			// node tools used to make on a pipe, for a pipe in Base only: Yes cuts the pipe in two at
+			// the node (breakPipeAtPoint), No places the node where it was pressed, joined to nothing.
+			// A pump or valve, a scenario, and every other tool keep the exit-and-open below.
+			var breakLink = exitLinkId !== null && exitLinkId !== undefined && inBaseScenario() &&
+				(mode === 'add-junction' || mode === 'add-reservoir' || mode === 'add-tank')
+				? linkById(exitLinkId) : null;
+			if (breakLink && breakLink.type === 'pipe' && nodeById(breakLink.from) && nodeById(breakLink.to) &&
+				(function () {
+					var f = Geom.nearestFractionOnPolyline(linkPointList(breakLink), w.x, w.y).f;
+					return f > 1e-9 && f < 1 - 1e-9;
+				}())) {
+				var breakType = mode.slice('add-'.length), breakPc = EngCalcs.pageConfig || {};
+				askDialog({ kind: 'confirm',
+					text: (breakPc.lpn_break_pipe_ask || 'Break pipe {id} at this node?').replace('{id}', breakLink.id),
+					ok: breakPc.lpn_break_yes || 'Yes', cancel: breakPc.lpn_break_no || 'No' }, function (yes) {
+					saveUndoSnapshot();
+					logLpnFirstAction('element');
+					if (yes) { breakPipeAtPoint(breakLink, breakType, w.x, w.y); }
+					else { addNode(breakType, w.x, w.y); }
+				});
+				return;
+			}
 			if (exitLinkId !== null && exitLinkId !== undefined && linkById(exitLinkId)) {
 				setMode('select');
 				// Selected AND opened, because that is what this press would have done in Select and
@@ -59948,6 +60134,28 @@ var EngCalcs = EngCalcs || {};
 		curveChooser(fields, l, 'curveId', 'headloss', pc.lpn_gpv_curve_source || 'Valve head loss curve',
 			pc.lpn_gpv_curve_source_tip);
 	}
+	// **A LINK'S FROM AND TO NODE AS EDITABLE TEXT** (Tom, 2026-10-09), the Tables pane's two cells
+	// in the Properties box. A refused ID is said out loud and the old one put back; an accepted one
+	// is one undo step. See reconnectLinkEnd().
+	function endField(fields, l, end) {
+		var pc = EngCalcs.pageConfig || {}, label = document.createElement('label'),
+			input = document.createElement('input');
+		input.type = 'text';
+		input.value = l[end];
+		input.addEventListener('change', function () {
+			var newId = String(input.value).trim(), why;
+			if (newId === l[end]) { input.value = l[end]; return; }
+			why = linkEndProblem(l, end, newId);
+			if (why) { setWarning(why); input.value = l[end]; return; }
+			saveUndoSnapshot();
+			reconnectLinkEnd(l, end, newId);
+			refreshPopupIfOpen();
+		});
+		setFieldLabel(label, end === 'from' ? (pc.lpn_field_from || 'From') : (pc.lpn_field_to || 'To'));
+		label.appendChild(input);
+		fields.appendChild(label);
+		fields.appendChild(document.createElement('br'));
+	}
 	function renderLinkFields(linkId) {
 		var l = linkById(linkId), fields = document.getElementById('lpn_popup_fields'), pc = EngCalcs.pageConfig || {};
 		idField(l.id, function (newId) { renameLink(linkId, newId); }, 'link');
@@ -59959,6 +60167,8 @@ var EngCalcs = EngCalcs || {};
 		// order.
 		descField(fields, l);
 		tagField(fields, l);
+		endField(fields, l, 'from');
+		endField(fields, l, 'to');
 		if (l.type === 'valve') {
 			renderValveFields(fields, l, linkId);
 		} else if (l.type === 'pump') {
@@ -62197,6 +62407,12 @@ var EngCalcs = EngCalcs || {};
 		// The clock, the patterns and the controls, converted to SI (js/lpn-time.js). Absent that
 		// file the model is exactly the pre-Task-248 one and the page solves one instant.
 		if (EngCalcs.lpnTimeAttach) { EngCalcs.lpnTimeAttach(model); }
+		// **A NODE WITH NO PATH TO A RESERVOIR OR TANK IS LEFT OUT OF THE RUN, NOT REFUSED** (Tom,
+		// 2026-10-09). Done HERE so that every reader of the model -- both engines, the extended-
+		// period run, fire flow, scenario compare -- sees the same network, and never in the
+		// document: nothing is marked inactive and an .inp export writes what is stored. The ids
+		// ride on `model.omitted`; runSolve() turns them into the standing note.
+		if (EngCalcs.lpnOmitDisconnected) { EngCalcs.lpnOmitDisconnected(model); }
 		return model;
 	}
 	/**
@@ -62287,7 +62503,7 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {};
 		if (issue.code === 'no-fixed-head') { return pc.lpn_diag_no_fixed_head || 'Add a reservoir or a tank. The network needs at least one known water level before it can be solved.'; }
 		if (issue.code === 'dangling-link') { return (pc.lpn_diag_dangling_link || 'A pipe or pump connects to a node that no longer exists:') + ' ' + issue.ids.join(', '); }
-		if (issue.code === 'unreachable') { return (pc.lpn_diag_unreachable || 'These nodes have no path to a reservoir:') + ' ' + issue.ids.join(', '); }
+		if (issue.code === 'unreachable') { return (pc.lpn_diag_unreachable || 'These nodes have no path to a reservoir or tank:') + ' ' + issue.ids.join(', '); }
 		// NAMES THE VALVES, which is the entire reason this page keeps its own diagnostics instead
 		// of surfacing EPANET's numeric error codes. A user staring at a drawing can act on "V3".
 		if (issue.code === 'valve-needs-epanet') { return (pc.lpn_diag_valve_needs_epanet || 'These are pressure or flow control valves, and only the EPANET solver can compute them. The EPANET solver could not be loaded, so these results are missing:') + ' ' + issue.ids.join(', '); }
@@ -63955,6 +64171,7 @@ var EngCalcs = EngCalcs || {};
 		// are silent and both are cheap; the state machine makes the fetch itself once-only.
 		maybeWarmEpanetInBackground(model);
 		syncEpanetNeed(model);
+		omittedNote = omittedNoteText(model);
 		var issues = EngCalcs.lpnDiagnose(model);
 		if (issues.length > 0) {
 			lastSolveResult = null;
@@ -64001,6 +64218,24 @@ var EngCalcs = EngCalcs || {};
 	// Set by runSolve() when a network was routed to EPANET by its own contents rather than by the
 	// user's choice; read by applySolveResult(), which owns the status bar after a successful solve.
 	var valveRouteNote = '';
+	// **THE STANDING NOTE FOR NODES LEFT OUT OF THE RUN** because no path reaches a reservoir or a
+	// tank (Tom, 2026-10-09). Set by runSolve() from the model's `omitted` list, said in the status
+	// bar with the other run notes by applySolveResult() and by the extended-period run's own
+	// status writes (the seam's `status`), and gone the moment a run has nothing left out. Never a
+	// modal and never a toast: it stays true until the network changes.
+	var omittedNote = '';
+	function omittedNoteText(model) {
+		var ids = (model && model.omitted) || [];
+		if (ids.length === 0) { return ''; }
+		return ((EngCalcs.pageConfig || {}).lpn_omitted_note ||
+			'Left out of this run because no path leads from them to a reservoir or tank: {ids}')
+			.replace('{ids}', ids.join(', '));
+	}
+	// A status line with the standing note beneath it, unless it is already there.
+	function withOmittedNote(text) {
+		if (!text || !omittedNote || text.indexOf(omittedNote) >= 0) { return text; }
+		return text + ' ' + omittedNote;
+	}
 
 	// ---- Warming the EPANET engine ----
 	//
@@ -68244,7 +68479,7 @@ var EngCalcs = EngCalcs || {};
 		var pdaNote = pdaShort > 0
 			? (pc.lpn_pda_deficit_note || 'Junctions receiving less than their demand: {n}.').replace('{n}', String(pdaShort))
 			: '';
-		setStatus([notConvergedNote, valveRouteNote, pdaNote,
+		setStatus([notConvergedNote, valveRouteNote, pdaNote, omittedNote,
 			droppedNote('control-dangling', 'lpn_control_dangling_note',
 				'These controls name an element that is no longer in this project, so they were left out: {ids}'),
 			droppedNote('control-unreadable', 'lpn_control_unreadable_note',
@@ -68371,7 +68606,7 @@ var EngCalcs = EngCalcs || {};
 			// Which scenarios state their own value of each, for the note under Settings > Time.
 			timeOverrides: scenarioTimeOverrides,
 			openScenarioOptions: function () { openAlternativesBox(); },
-			apply: applySolveResult, status: setStatus, notice: showSlowAdvice, solve: scheduleSolve,
+			apply: applySolveResult, status: function (t, c) { setStatus(withOmittedNote(t), c); }, notice: showSlowAdvice, solve: scheduleSolve,
 			// **AND THE UNDEBOUNCED ONE, which is what asking for a run needs** (Task 248,
 			// 2026-08-19). A period run is provoked by a deliberate act -- the Run button, or a
 			// quiet moment that has already been waited out -- and going through the 300 ms
