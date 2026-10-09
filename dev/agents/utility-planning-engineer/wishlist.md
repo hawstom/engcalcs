@@ -1001,3 +1001,11 @@ see reasoning above):
   wanted, I would rank a one-way CSV/Sheets *export/import* of the tabular scenario inputs (demands,
   pipe-replacement lists) above a two-way live sync, for the same reason EngCalcs already treats every
   other file exchange as explicit, reported, and user-triggered rather than ambient.
+
+### 2026-10-08 -- Stage 6 manager, my order (SPECULATION on use; CITED on Bentley's command lists, see journal)
+
+1. Scenario manager first, as the existing scenario-by-category table made writable: new child, rename, delete (with the refusal), make current, parent visible, click a cell to assign an alternative. Ship before the alternative manager.
+2. A saved, named set of scenarios to compare (Bentley's batch-run list is stored with the model). At 30 scenarios, "solve all" is the wrong default. Small.
+3. "Only what is local in this alternative" filter in the alternative editor. At 2,000 nodes the full-element checkbox table is unusable; our Overrides only filter is already most of it.
+4. Merge and reparent last. I found no Bentley merge; this is ours and the least-evidenced.
+Disagreement with the roadmap order: none known. I ranked Active Topology (Task 781) high because a CIP is a set of projects that turn assets on, one alternative each.

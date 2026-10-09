@@ -152,6 +152,9 @@ const EC_LPN_FURNITURE = [
     // lpn_show_titles above and for the same reason: whether one reader still wants an instruction
     // they have read a hundred times is a fact about that reader, and carried in the file it would
     // take the instruction away from a colleague who has never used the tool.
+    // The hover card (Task 773): whether the full-label card appears when the pointer rests on an
+    // asset. A reading aid for the person at the screen; written only when OFF.
+    'lpn_hovercard'   => 'whether the full-label hover card is shown, for this browser',
     'lpn_areahint'    => 'whether the area-selection help bubble is shown',
     // **WHICH WAY ROUND THE LAST SURVEY FILE WAS WRITTEN IS A FACT ABOUT THAT PERSON'S DATA
     // COLLECTOR, not about this network** (Task 592). It is the remembered answer to the import

@@ -543,3 +543,9 @@ N+5. **A check that flags one English string holding both a select word and an o
 - (2026-10-05) Feedback usage data: how often does `lpn wrong:*` fire vs contact sends per week (log/lang-log-stats.sh)? Decides whether the in-page dialog is worth ~310 strings.
 
 - (2026-10-06) Check whether every title-bar glyph has a keyboard path and a tip in all 27 languages (RTL mirroring of the contents rail).
+
+
+## 2026-10-08 (Ida)
+- Ranked 1: a populated-scenario example (Net3 with Peak hour, Fire plus max day, one shared alternative, one grandchild) so a manager can be photographed and measured; today every example opens with Base only.
+- Ranked 2: an unchecked-Basic probe that opens the box at 1400x900 and 390x844 and reports box area / window area (measured 2026-10-08: preview box is about 75% of the drawing region, for one row).
+- Ranked 3: check the Basic-mode tick glyph renders (empty box in headless Chromium, 2026-10-08).

@@ -99,54 +99,64 @@ lines rather than appending corrections.
   tile counts at a 900 ms settle (basemap.js now waits for a pointable tile). Pre-existing and unrelated: `scale-publish-harness.js` (2 checks). The full `node dev/browser-pass/run.js` is green (1853/1853, 2026-10-04, Task 761); browser-pass specs are not in
   check_all.
 
-## STATE — 2026-10-08 (ninth session, Arizona time, after his merges)
+## STATE — 2026-10-08 (tenth session, Arizona time)
 
-### Master = b1b0ffbd, pushed. Production: last confirmed pull edc78d01 (2026-10-07); confirm with the About box
+### Master = 4ebfdbf6, pushed. Production: last confirmed pull edc78d01 (2026-10-07); confirm with the About box
 
-Merged 10-08: wave0-apply, sprint-1008 (26 languages), fix/mnemonic-han-harness, fix/sw-precache-log, and on
-his TYPED words feat/table-export, feat/dxf, feat/workspace (all-clears on file). Their worktrees, branches
-and previews are deleted. Deleted keys: none.
+Merged 10-08 (tenth): feat/hover-label on his words (all-clear on file, pinned 31b137e5; his item (1),
+every example labels node IDs N and link IDs L, built first); fix/dock-box-width (bentley-interop's two
+general dock commits, 364a8757 and 8ee43015, cherry-picked; the two Alternatives-box ones stay there);
+fix/example-prefix-harnesses (six harnesses expected bare IDs; no page defect). Deleted keys: none
+(key_hygiene_check: 0 unrendered on master and on bentley-interop). New on a visitor's device:
+`lpn_hovercard` (the literal `off` only when the hover card is switched off; inventory row added).
 
-**Tom, 10-08, after the merges: "I thought you were done, and I only asked for a few merges."** CC had
-gone on to apply his calls-page answers unannounced. Do the asked thing, report, and ASK before the next
-pile of work. He then said: let the two builders finish, then /clear.
+**His answers this session, already applied:** "full" in "Show the full label on hover" still fits
+(yes); storage full / unreadable / unit unknown stay hideable (yes).
+
+### Calls page round 3: https://claude.ai/artifact/Y9kwZdxhLkAse2dFqmDtHq (answers in its db)
+
+H01-H08 the Scenario manager (stage 6 of Task 721: Ida, Sue, Declan disagree on its shape; journals
+committed); H09-H11 message-dismiss; H12 Shapes (Task 779, point drawn as ×?); H13-H16 Task 781;
+w3-* the 781 English; v3-* four Wave 0 referrals that block the delta sprint. Read it with ArtifactData
+list `answers`; write rules from his free text, never the option label.
 
 ### Not yet on master (all pushed as branches)
 
-- **chore/calls-1008b** (this branch; merge on green, no all-clear needed): DXF customers white (ACI 7,
-  harness fails on 8); his three v2 "Use proposed" English rewrites (lpn_change_type_key,
-  lpn_settings_auto_run_tip, lpn_settings_elev_source_tip) with rulings and friction 1008 closed
-  (`friction_check --sprint=1008` passes); lpn_dxf_note_blocks ruling; Roadmap closes 776, adds 781
-  (G06: active topology first, Change type becomes a new asset in the old one's place). This handoff.
-- **feat/user-guide**: master merged in; lpn_guide_boxes_autohide = his w2 text verbatim.
-- **feat/visit-dedupe**: master merged in (config.inc.php: `ecTesterBrowser()` is the tester cookie;
-  `ecLoggingOptedOut()` = precache OR tester; `ecLogTester()` and the day tally skip precache);
-  `$ec_lang_syn['consent_body']` written on his G02 "syn OK". **The syn notes for consent_current_granted and
-  consent_region_label still describe logging: propose new ones to him (AI may not write them).**
-  G03 privacy text approved, G04 keep ec_seen/ec_blang, w2 consent strings "Use as written" (rulings not
-  yet written). G01 "Translate first": consent_body + the two strings, 26 Sonnet agents, before merge.
-  G05: librewaternet.org branch `visit-code-claim` (0804152) holds his sentence; merge and push it there
-  when visit-dedupe merges.
-- **feat/hover-label** (bbf6c3c3) and **feat/message-dismiss** (aaedf63e): builders FINISHED, pushed.
-  Hover: card = exactly the ticked Settings fields via the map label's own builders, any zoom, ID alone
-  when nothing is ticked; also Delete, Pipe/Pump/Valve/Chain modes; tip his text verbatim. Its full
-  suite was not rerun after its last one-constant fix (touch-radius and hover harnesses pass alone).
-  Ask him: does "Show the full label on hover" (lpn_settings_hover_card) still fit, since "full" now
-  overstates? Message x: on every standing message; a hidden diagnostic returns when its text recurs,
-  a hidden run message at the next run. Ask him: should "storage full/unreadable" and "unit unknown"
-  really be hideable? Both branches: regenerate payloads and new-english-keys on merge; Perry next,
-  then his browser pass.
-- Unchanged: feat/bentley-interop, feat/section-grid, feat/desktop await his browser pass.
-- **Seam, now that workspace is merged:** when bentley-interop next merges master, add
-  `if (boxSaveHeld()) { return; }` at the top of `saveAltboxLayout`; and decide whether workspace export
-  carries lpn_altbox and lpn_hovercard (storage_inventory_check.php import-site names).
-- **A delta translation sprint is owed on master** (new keys from table-export, dxf, workspace; changed:
-  lpn_file_export_menu, the three v2 keys, consent_body). Ask him before launching.
+- **chore/calls-1008c** (merge on green): adviser and Perry journals; `dev/english-friction/1008c-wave0.json`
+  (37 keys passed, 4 referred, 6 dismissed); DXF tip says "asset", not "element" (his 10-07 call; it
+  had broken user-guide-column-harness); this handoff.
+- **feat/user-guide**: his 10-08 browser pass fixed (9e0c0ef6): a card never runs its control; it
+  opens what holds it, rings it in `--ec-point` for 2.5 s, then closes it; any card click closes the
+  previous card's menu; search hits show the full path (Scenarios › Basic mode); Properties and
+  Alternatives preview say how they open (new keys lpn_guide_not_shown, lpn_guide_how_popup,
+  lpn_guide_how_alt). Perry's review drove the second round. Needs his browser pass.
+- **feat/message-dismiss**: Perry: ready for his browser pass. Also carries Zoom Window (W key).
+  His H09-H11 answers may change it first.
+- **feat/bentley-interop** (6b92ff72): Task 781 built (active topology; Change type outside Base makes a
+  new asset, its links replaced with it; the type-per-scenario override removed). Perry confirmed the
+  hydraulics against a hand-made Net1 and found a false promise (controls naming a replaced asset were
+  NOT left out; EPANET Error 200, silent fallback) and Properties stuck on the old asset; both fixed,
+  harness section 10 holds his case. Open by design, on his H15: customers cannot move per scenario;
+  new assets are copies (proposed box sentence); a child's own overrides not copied. Needs his calls
+  (H13-H16, w3-*) and the stage 6 manager before a merge ask. Trap: a page loaded later in one harness
+  process becomes lpn-time.js's clock host for every earlier page.
+- **feat/visit-dedupe**: unchanged; G01 consent translation still owed before merge; syn notes for
+  consent_current_granted and consent_region_label still describe logging (propose; AI may not write).
+- Unchanged: feat/section-grid, feat/desktop await his browser pass; label-placer branches bench only.
 
 ### Next job
 
-Ask him what he wants first. Candidates: merge chore/calls-1008b; finish/review the two builders' branches;
-G01 consent translation; the delta sprint; Task 714 (theming).
+Read his calls-page answers. Then: the delta sprint (`1008c`, ~40 keys plus whatever merges), on his
+four Wave 0 answers (authorized: "Proceed with a translation sprint whenever you deem it prudent");
+stage 6 build on his H01-H08; the 781 gaps on H15.
+
+### Traps met 2026-10-08 (tenth session)
+
+- **A builder reported "all lpn harnesses passed" and six failed on master** after its merge (the N/L
+  example prefixes; harnesses expected bare IDs). Run the suite on the merge commit before pushing, always.
+- **`git commit --amend` on a merge commit is refused on master** (pre-commit sees a non-merge commit).
+  Put a forgotten generated file on a fix branch and merge it.
+- **`new_english_keys.php` without `--write` only prints**; check_all then fails "new english keys listed".
 
 ### Traps met 2026-10-08 (ninth session)
 

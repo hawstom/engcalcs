@@ -4187,9 +4187,43 @@ OBSERVED: one change then 3 reloads: 6+7 stable. Start fresh clears lpn_dockbox,
 OBSERVED: Properties flyout text matches the string.
 SPECULATION: defaults gate looks only at box records + lpn_dockbox, not lpn_index; a returning visitor with projects but no box record gets 14 tabs once. navigator.webdriver true under --remote-debugging/automation Chrome.
 
+## 2026-10-08 feat/hover-label f8393134 (Perry)
+OBSERVED: dev/lpn-spike/hover-card-browser-harness.js 26/26. Mutation (card composed from the user's own ticks instead of all-ticked) fails 5 checks, so the harness has teeth.
+OBSERVED (label bench, headless, scratch archives of master a871d194 and HEAD): scenes for Net1, Net2, Net3, Novato zoom+seq identical byte for byte, with default fields AND with every node and link field ticked (the all-ticked run differs from the default run, so the compare is not vacuous). Placements unchanged.
+OBSERVED: single-label refresh vs full pass, every field on, Net1/Net3: master differs on 13/24 and 119/216 elements (no Initial status, Cb, Cw, and the show order wrong: diameter before length); branch 0 differences. The builder said "three fields"; it is also the order.
+OBSERVED real Chromium: card appears in Select mode only. Delete, Pipe, Vertices, Junction... modes: no card and no highlight (the pre-existing highlight is Select-only). Net3/Novato all fields on: sweep of 240 moves, frames p95 17.5 ms, no long tasks; 10 rests per net, no long tasks. Card never covers the pointer, never clipped (Net1, Net3, Novato). Card text via text nodes, a desc of <img onerror> stays inert. Dark scheme: card is the suite's black tip regardless. ar page: rtl, left aligned, "Init. مفتوح". de, zh words localized. Touch (hasTouch, 390 px): ecCanHover false, tap shows no card. Customer card OK. Setting survives reload; key removed returns the card.
+OBSERVED defects: (1) card fires 500 ms after ENTERING a target, not after the pointer stops: moving steadily along a pipe, it appears mid-move and stays pinned where it appeared while the pointer goes on (110 px away after a sweep). (2) Esc and Ctrl+Z leave it up. (3) lines are the map's own abbreviations (Qb=, Hl=, a bare "0%"), no field names; with prefixes cleared the card is bare numbers. (4) setting row shows on a phone where it does nothing.
+NOT CHECKED: Tom's eye on the look; recalc-off stale snapshot; scenarios.
+
 ## 2026-10-08 feat/workspace fb8eea71, in-place import (Perry)
 OBSERVED real Chromium 1400x900 and 390x844: builder harnesses pass bare (inplace 19/19, browser 43/43). My own comparison (UI-arranged file, import into a browser with a different UI-arranged layout, then a real reload, every box's position/size/dock/z/state): no reload happened (window marker kept), no page errors, no duplicate dock tabs, focus on body, one Ctrl+Z undoes the pre-import edit, results kept (pressure in the pane and on map labels), docks and pinned/auto-hide state, pane sizes, right pane all equal a reload. Phone 390: zero differences from a reload, no sideways scroll. Old-style file (no dock fields) and empty file: equal to reload; flyout showing at import time: closed, equal.
 OBSERVED DEFECT: a box the file stores with no position (left/top null) is placed from the map's current width, and the in-place import places it before the old dock margins are cleared. With an old right dock open, Settings landed at left 334 vs 964 on reload, Library 135 vs 691 (t 116 vs 118); with no docks in the old layout the difference vanished. Cause: setboxHomeCorner() reads svg width at placement time (js/looped-network.js, setboxHomeCorner); applyWorkspaceInPlace runs layoutDocks() last.
 OBSERVED minor: Contour box 11 px shorter in place (356 vs 367); map margin variable left "0px" instead of unset; z-index values keep climbing (relative order matches reload).
 Lesson (mine): the page's dialog stub (window.lpnDialogAnswerer) must be deleted, and a probe dialog I left queued made Ctrl+Z "fail" for three runs. Retract before reporting; control against a generic dialog first.
 Not done: mutation test of the harness; contour plot on the map when the contour box is in dst but not the file; Properties box floating position when it stays open.
+
+## 2026-10-08 feat/message-dismiss @ aaedf63e (second pass, x made visible)
+- OBSERVED: both branch harnesses (message-dismiss-x 23 checks, message-dismiss-browser 55 checks) pass on this head.
+- OBSERVED: own probe, Chromium. x present on "Add a reservoir"; Tab-focus + Enter hides it and moves focus to the history glyph; RELOAD brings every hidden message back (in-memory only); no localStorage/cookie key added (grep of diff + key scan).
+- OBSERVED: es and ar at 1400 and 390 px: x 20x20, on screen, not overlapping text or Something wrong, no sideways scroll. aria/title on the x read "Hide this message" in English on es/ar pages (new keys not yet translated, expected).
+- OBSERVED (code only): #lpn_status_notes (engine-difference notes, 2 min) has no x and keeps the box open after the diagnostic text is hidden.
+- NOT EXERCISED: storage full / storage unreadable / unit unknown paths in a browser (my storage-full probe was pre-empted by a diagnostic); covered only by the generic mechanism and the "No solution" harness case.
+- OBSERVED: branch also carries Zoom Window (W key, Map-menu row, corner triangle) unrelated to message hiding.
+
+# Perry journal, feat/user-guide @ 92ce4d1b, 2026-10-08
+OBSERVED (real Chromium, php -S via env.startServer, en/es/ar, 1280 and 390 px):
+- Ring: dashed #c2185b, solid-ish 1.5 s then fades to gone by ~2.5 s; never covered by the Guide (menus stack above it). Same in es, ar (RTL ring placed correctly), phone.
+- After ring fades, Water menu + Scenarios fly-out stay open indefinitely (5.8 s+). Clicking Guide text closes only the fly-out, not Water.
+- Clicking Select card while Water menu open from a prior card: Water menu stays open, ring on Select -> stale menu.
+- Desktop: the fly-out sits on top of the Basic mode card in the Guide itself (card partly hidden). Phone: menus cover most of the Guide.
+- Properties card: note shown in magenta italic above the text; no hint where Properties opens.
+- Search "mode": hit shows heading Water, then "Scenarios > [state glyph] Basic mode". Glyph is the menu row's check icon (tofu box in this headless font).
+- Dark theme: prefers-color-scheme emulation changed nothing visible (page has no dark chrome here); --ec-point has no dark override. UNVERIFIED.
+- Not checked: Esc behaviour was ambiguous (Esc closed the Guide with menus left "block" in my probe).
+
+## 2026-10-08 Task 781 (feat/bentley-interop 07ca4206..2cfebc47) -- Perry
+OBSERVED (real Chromium, php -S, this tree): Net1+1 customer, scenario B, junction 22 -> tank. EPANET tables equal a hand-edited Net1.inp (tank at 22) to the printed digit; Base-only save byte-identical to 07ca4206; B save/reopen reopens on B with same heads; B .inp export has new tank + L1..L4, no 22.
+OBSERVED defect 1: a control/rule naming the old asset is NOT omitted from B's run (still in B's .inp export); EPANET Error 200, run falls back to built-in solver. Box text lpn_change_type_old_controls says it is omitted: false.
+OBSERVED defect 2: after Create new assets, Properties box still shows old junction 22 while map selection is new tank T1.
+OBSERVED: customer 100 gpm on 22 vanishes in B with no word; same as Base change-to-tank (pre-existing), box lists only "Base demand 200".
+Native engine and undo taken from builder's harness, not re-run by me (headless harness re-run: all ok, incl. 7 mutations).

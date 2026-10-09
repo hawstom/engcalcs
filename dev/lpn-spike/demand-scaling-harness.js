@@ -34,6 +34,7 @@ const ROOT = path.join(__dirname, '..', '..') + '/';
 const L = loadLoopedNetwork(
 	EXAMPLE_EXPORTS +
 	"\t\tgetDoc: function () { return doc; },\n" +
+	"\t\tidPrefix: function (g) { return labelPrefixFor(g, 'id'); },\n" +
 	"\t\trunSolve: runSolve, openBox: openDemandScaleBox, wireBox: wireDemandScaleBox,\n" +
 	"\t\trunScale: runDemandScale, runFind: runDemandScaleSearch,\n" +
 	"\t\tscaleRun: function () { return dsRun; }, searchRun: function () { return dsSearch; },\n" +
@@ -73,6 +74,9 @@ function text(n) {
 	const k = kids(n);
 	return k.length ? k.map(text).join('') : String(n.textContent || '');
 }
+// The page prints an id as labelPrefixFor(group, 'id') + id (the shipped examples state N and L);
+// strip exactly the prefix the page applies to compare the bare id.
+function bare(group, t) { const p = L.idPrefix(group); t = String(t); return p && t.indexOf(p) === 0 ? t.slice(p.length) : t; }
 function rows(el) {
 	const out = [];
 	(function walk(x) {
@@ -161,10 +165,10 @@ async function minPsiAt(m) {
 		.replace('{m}', '2').replace('{n}', String(nBelow)).replace('{pressure}', '110 psi')) >= 0, text(byId.lpn_ds_controls).slice(0, 200));
 	let tr = rows(byId.lpn_ds_controls);
 	ok('two tables: nine junctions and the top velocities', tr.length === 9 + Math.min(10, set.velocities.length), tr.length);
-	ok('the first row is the lowest junction, as a go-to link', gotoIn(tr[0][0])[0] && gotoIn(tr[0][0])[0].textContent === set.pressures[0].id);
+	ok('the first row is the lowest junction, as a go-to link', gotoIn(tr[0][0])[0] && bare('node', gotoIn(tr[0][0])[0].textContent) === set.pressures[0].id);
 	L.sortDs('p', 0);
 	tr = rows(byId.lpn_ds_controls);
-	const ids = tr.slice(0, 9).map((r) => gotoIn(r[0])[0].textContent);
+	const ids = tr.slice(0, 9).map((r) => bare('node', gotoIn(r[0])[0].textContent));
 	ok('a heading re-sorts the same rows: by junction', ids.join() === ids.slice().sort((x, y) => x.localeCompare(y, undefined, { numeric: true })).join() &&
 		ids.slice().sort().join() === set.pressures.map((x) => x.id).sort().join(), ids.join());
 	L.sortDs('p', 0);
@@ -189,7 +193,7 @@ async function minPsiAt(m) {
 	const rep = text(byId.lpn_ds_controls);
 	ok('the verdict says so', rep.indexOf(PC.lpn_ds_found.replace('{pressure}', '100 psi').replace('{m}', String(m))) >= 0, rep.slice(0, 160));
 	const links = gotoIn(dsHost('search'));
-	ok('the limiting junction is a go-to link', links.length >= 1 && links[0].textContent === s.holding.lowest.id &&
+	ok('the limiting junction is a go-to link', links.length >= 1 && bare('node', links[0].textContent) === s.holding.lowest.id &&
 		links[0].title === PC.lpn_goto_on_map);
 	ok('the document is unchanged', JSON.stringify(L.getDoc()) === before && L.docGuard());
 

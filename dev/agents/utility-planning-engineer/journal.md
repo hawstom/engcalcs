@@ -2938,3 +2938,18 @@ would scramble creation order unpredictably).
 - CITED: InfoWater Pro scenarios are data sets (Tank Sets, Pump Sets...) https://help.innovyze.com/space/infowaterpro/18055598 ; no type switch found.
 - OBSERVED (feat/bentley-interop): js/looped-network.js:35418-35432 askTypeChangeScope; :35132-35136 typeInScenario reads ov.type; :35148 typeMaterialize lays element out as other type; :35385 scenarioTypeChangeKeep writes only carried props as overrides.
 - SPECULATION: recommendation = add active-topology style as the primary; keep type change only if each type-changed field reads as override.
+
+## 2026-10-08 -- Sue: stage 6 of Task 721, the Advanced UX (scenario manager, alternative manager)
+
+Read-only: dev/scenario-alternatives.md in the feat-bentley-interop worktree (921 lines). Edited nothing there.
+
+- CITED, docs.bentley.com WaterGEMS SS6 "Scenarios Manager" (en/35002.html): Scenarios Manager commands are New Scenario (Child Scenario / Base Scenario), Delete (greyed on Base), Rename, Compute Scenario, Make Current, Expand All, Collapse All, Help. No batch run, compare or alternative assignment in that list. Bentley allows MORE THAN ONE Base scenario ("Base Scenario - creates a new Base scenario"); ours is one Base root.
+- CITED, WaterGEMS SS6 "Editing Alternatives" (GUID-876CBE85...): open by double-click or Open button in the Alternatives Manager; editor has a first column of checkboxes: unchecked = inherited from parent, checked = local.
+- CITED, SewerGEMS SS5 "Local and Inherited Values" (GUID-ED4AA69B...): inherited gray text, local black; yellow+check = base data, white no check = inherited, white+check = local. The page points to "Overriding Inheritance" for resetting; I did not fetch it, so how Bentley resets a local value is NOT confirmed by me.
+- CITED, WaterGEMS SS6 "Base and Child Alternatives" (GUID-067F08A8...): "All data inherited from the base alternative are changed when the base alternative changes. Only local data specific to a child alternative remain unchanged." Says nothing on deleting a child.
+- CITED, HAMMER SS6 "Running Multiple Scenarios at Once (Batch Runs)" (en/35072.html): Batch Run Editor, checkbox per scenario; the selected list is kept with the model; the previously active scenario stays active afterward; results are read by picking a scenario in the toolbar dropdown. HAMMER, not WaterGEMS: same family, same wording in the search snippets for WaterGEMS, but I did not fetch the WaterGEMS page.
+- CITED (search snippet only, secondary): Alternatives Manager creates via right-click New > Child Alternative, then Rename.
+- NOT FOUND: any Bentley "merge alternatives" command. Our merge came from Perry's review, not from Bentley. I do not know whether WaterGEMS has one.
+- OBSERVED, scenario-alternatives.md:778-779: stage 6 is "design first (Ida, Sue, Declan), then Tom's interview". :851-853 delete refused while used. :854-857 merge rules.
+- OBSERVED, :70: our Active Topology category is named "Asset activation" (Tom, 2026-09-30), id `topology`; Bentley's name is Active Topology.
+- SPECULATION: which operations a planner uses weekly. I have never run WaterGEMS. The ranking below comes from the docs' own command lists and master-plan structure (many scenarios on one base), not from use. Re-derive or ask IOD before relying on it.
