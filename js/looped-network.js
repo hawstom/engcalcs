@@ -5256,6 +5256,8 @@ var EngCalcs = EngCalcs || {};
 			list.forEach(function (r) {
 				var p = r.parent === undefined ? null : r.parent, pr = p === null ? null : storedById(list, p);
 				if (p !== null && (!pr || (k === 'alternatives' && pr.category !== r.category) || storedParentLoops(list, r.id, p))) { r.parent = null; }
+				// `root`: a Base of its own (Add Base). Only true means anything, and only with no parent.
+				if (r.root !== undefined && (r.root !== true || r.parent !== null && r.parent !== undefined)) { delete r.root; }
 				if (k === 'alternatives') {
 					if (r.values !== undefined && !plainObject(r.values)) { delete r.values; }
 					if (r.settings !== undefined && !plainObject(r.settings)) { delete r.settings; }
@@ -5270,11 +5272,12 @@ var EngCalcs = EngCalcs || {};
 			if (list.length) { doc[k] = list; } else { delete doc[k]; }
 		});
 		scenarios.forEach(function (s) {
-			if (s.isBase) { delete s.parent; delete s.alternatives; delete s.calc; return; }
+			if (s.isBase) { delete s.parent; delete s.alternatives; delete s.calc; delete s.root; return; }
 			if (s.parent !== undefined) {
 				var ps = scenarioById(s.parent);
 				if (!ps || ps === s || scenarioParentLoops(s.id, s.parent)) { delete s.parent; }
 			}
+			if (s.root !== undefined && (s.root !== true || s.parent !== undefined)) { delete s.root; }
 			if (s.alternatives !== undefined) {
 				if (!plainObject(s.alternatives)) { delete s.alternatives; }
 				else {
@@ -5581,6 +5584,359 @@ var EngCalcs = EngCalcs || {};
 		touchTree('setScenarioParent');
 		return true;
 	}
+	// ---- THE SCENARIO MANAGER'S MODEL (stage 6; Tom, 2026-10-09, calls H01-H08) ----------------------
+	//
+	// **ONE TREE PER CATEGORY AND ONE FOR SCENARIOS**, each a tree of items: the Base item first
+	// (the scenario Base, or the category's derived Base alternative), then every record whose
+	// parent is it, and so on. Nothing here is a new store: a tree is read off `scenario.parent`,
+	// `doc.alternatives[].parent` and `doc.calcSets[].parent`, and every act below goes through the
+	// stage 4 and 5 mutations. Two fields are new, both written only on an explicit act:
+	//   root: true      on a scenario, alternative or calculation set that is a Base of its own
+	//                   ("Add Base", Tom H08). It resolves exactly as a child of Base does, since
+	//                   Base's values are the elements' own; the flag is only which row it sits on.
+	//   project.scenarioOrdered, project.compareSet   (see scenariosForDisplay(), compareScenarios()).
+	// A tree is addressed by `tree`: 'scenarios', or a category id ('physical' ... 'calculation').
+	// An item is addressed by `key`: a scenario id, a stored record id, or the Base item's own key
+	// (smBaseKey()). dev/lpn-spike/scenario-manager-harness.js holds the whole of it.
+	function smTrees() { return ['scenarios'].concat(LPN_ALT_CATEGORIES); }
+	function smKind(tree) { return tree === 'scenarios' ? 'scn' : (tree === 'calculation' ? 'calc' : 'alt'); }
+	function smBaseKey(tree) { return tree === 'scenarios' ? baseScenario().id : 'base'; }
+	function smTreeLabel(tree) {
+		var pc = EngCalcs.pageConfig || {};
+		return tree === 'scenarios' ? (pc.lpn_pane_tab_scenarios || 'Scenarios') : altCategoryLabel(tree);
+	}
+	// The records of one tree in stored order, the Base item excluded.
+	function smRecords(tree) {
+		var kind = smKind(tree);
+		if (kind === 'scn') { return scenarios.filter(function (s) { return !s.isBase; }); }
+		if (kind === 'calc') { return (doc.calcSets || []).slice(); }
+		return (doc.alternatives || []).filter(function (a) { return a.category === tree; });
+	}
+	function smRecord(tree, key) {
+		var kind = smKind(tree);
+		if (key === smBaseKey(tree)) { return null; }
+		return kind === 'scn' ? scenarioById(key) : storedById(kind === 'calc' ? doc.calcSets : doc.alternatives, key);
+	}
+	function smIsBaseKey(tree, key) { return key === smBaseKey(tree); }
+	function smName(tree, key) {
+		var r;
+		if (smIsBaseKey(tree, key)) { return (EngCalcs.pageConfig || {}).lpn_scenario_base || 'Base'; }
+		r = smRecord(tree, key);
+		return r ? String(r.name || '') : '';
+	}
+	// The key an item hangs from, or null for a root (the Base item, and any record flagged `root`).
+	function smParentKey(tree, key) {
+		var kind = smKind(tree), r, p;
+		if (smIsBaseKey(tree, key)) { return null; }
+		r = smRecord(tree, key);
+		if (!r || r.root === true) { return null; }
+		if (kind === 'scn') {
+			p = r.parent !== undefined ? scenarioById(r.parent) : null;
+			return (p && p !== r) ? p.id : baseScenario().id;
+		}
+		return (r.parent === null || r.parent === undefined || !storedById(kind === 'calc' ? doc.calcSets : doc.alternatives, r.parent)) ? 'base' : r.parent;
+	}
+	// The order siblings are shown in: scenarios by scenariosForDisplay() (sorted by name until a
+	// reorder is stored), everything else by stored order.
+	function smOrdered(tree) {
+		return tree === 'scenarios' ? scenariosForDisplay().filter(function (s) { return !s.isBase; }) : smRecords(tree);
+	}
+	function smChildren(tree, parentKey) {
+		return smOrdered(tree).filter(function (r) { return smParentKey(tree, r.id) === parentKey; }).map(function (r) { return r.id; });
+	}
+	// The roots, Base item first: [{key}].
+	function smRoots(tree) {
+		var out = [smBaseKey(tree)];
+		smOrdered(tree).forEach(function (r) { if (smParentKey(tree, r.id) === null) { out.push(r.id); } });
+		return out;
+	}
+	// Depth-first rows for drawing: [{key, depth, name, isBase}].
+	function smRows(tree) {
+		var out = [], seen = {};
+		function walk(key, depth) {
+			if (seen[key]) { return; }
+			seen[key] = true;
+			out.push({ key: key, depth: depth, name: smName(tree, key), isBase: smIsBaseKey(tree, key) });
+			smChildren(tree, key).forEach(function (k) { walk(k, depth + 1); });
+		}
+		smRoots(tree).forEach(function (k) { walk(k, 0); });
+		return out;
+	}
+	function smNameTaken(tree, name, exceptKey) {
+		var low = String(name).toLowerCase(), taken = false;
+		if (low === smName(tree, smBaseKey(tree)).toLowerCase()) { return true; }
+		smRecords(tree).forEach(function (r) { if (r.id !== exceptKey && String(r.name || '').toLowerCase() === low) { taken = true; } });
+		return taken;
+	}
+	function smUniqueName(tree, stem) {
+		var name = stem, n = 2;
+		while (smNameTaken(tree, name)) { name = stem + '_' + n; n++; }
+		return name;
+	}
+	// **A NEW CHILD IS NAMED LIKE "Child_2_of_Horse"** (Tom's own example, H08): its place among the
+	// parent's children, then the parent's name.
+	function smChildName(tree, parentKey) {
+		var n = smChildren(tree, parentKey).length + 1, parent = smName(tree, parentKey), name;
+		do { name = 'Child_' + n + '_of_' + parent; n++; } while (smNameTaken(tree, name));
+		return name;
+	}
+	// **"Add Base" NAMES IT Base2, Base3...** (H08): the Base item is the first.
+	function smBaseName(tree) {
+		var n = smRoots(tree).length + 1, name;
+		do { name = 'Base' + n; n++; } while (smNameTaken(tree, name));
+		return name;
+	}
+	function smPutAt(list, rec, target, after) {
+		var i = list.indexOf(rec), j;
+		if (i >= 0) { list.splice(i, 1); }
+		j = target ? list.indexOf(target) : -1;
+		if (j < 0) { list.push(rec); } else { list.splice(after ? j + 1 : j, 0, rec); }
+	}
+	function smList(tree) {
+		var kind = smKind(tree);
+		return kind === 'scn' ? scenarios : (kind === 'calc' ? doc.calcSets : doc.alternatives);
+	}
+	// New item under `parentKey` (null: a Base of its own). Answers the record, or {refused}.
+	function smAdd(tree, parentKey, asBase) {
+		var kind = smKind(tree), name, r, root = !!asBase || parentKey === null, pk = root ? null : (parentKey || smBaseKey(tree));
+		if (!root && !smIsBaseKey(tree, pk) && !smRecord(tree, pk)) { return treeRefuse('missing'); }
+		name = root ? smBaseName(tree) : smChildName(tree, pk);
+		if (kind === 'scn') {
+			r = { id: newScenarioId(), name: name, overrides: {} };
+			if (!root && !smIsBaseKey(tree, pk)) { r.parent = pk; }
+			if (root) { r.root = true; }
+			scenarios.push(r);
+		} else {
+			r = kind === 'calc' ? createCalcSet(name, root || smIsBaseKey(tree, pk) ? null : pk)
+				: createAlternative(tree, name, root || smIsBaseKey(tree, pk) ? null : pk);
+			if (r.refused) { return r; }
+			if (root) { r.root = true; }
+		}
+		touchTree('smAdd');
+		return r;
+	}
+	function smRename(tree, key, name) {
+		var r = smRecord(tree, key), v = String(name === undefined || name === null ? '' : name).trim();
+		if (smIsBaseKey(tree, key)) { return treeRefuse('base'); }
+		if (!r) { return treeRefuse('missing'); }
+		if (!v) { return treeRefuse('empty'); }
+		if (smNameTaken(tree, v, key)) { return treeRefuse('duplicate'); }
+		r.name = v;
+		touchTree('smRename');
+		return true;
+	}
+	// Who stands in the way of deleting an item, as names: its children, and for a stored record the
+	// scenarios naming it. Empty means it may go.
+	function smInUseBy(tree, key) {
+		var kind = smKind(tree), who = [];
+		if (kind === 'scn') {
+			scenarios.forEach(function (x) { if (x.parent === key) { who.push(scenarioDisplayName(x)); } });
+			return who;
+		}
+		storedUsers(kind, key).scenarios.forEach(function (sid) { who.push(scenarioDisplayName(scenarioById(sid))); });
+		storedUsers(kind, key).children.forEach(function (cid) { who.push(smName(tree, cid)); });
+		return who;
+	}
+	// **REFUSED WHILE IN USE, NAMING WHO** (H04). Base items never go.
+	function smDelete(tree, key) {
+		var kind = smKind(tree), who, res, r = smRecord(tree, key);
+		if (smIsBaseKey(tree, key)) { return treeRefuse('base'); }
+		if (!r) { return treeRefuse('missing'); }
+		who = smInUseBy(tree, key);
+		if (who.length) { return treeRefuse('in use', { who: who }); }
+		if (kind === 'scn') {
+			scenarios.splice(scenarios.indexOf(r), 1);
+			if (Array.isArray(project.compareSet)) {
+				project.compareSet = project.compareSet.filter(function (id) { return id !== key; });
+			}
+			touchTree('smDelete');
+			if (project.activeScenario === key) { project.activeScenario = baseScenario().id; }
+			return true;
+		}
+		res = deleteStored(kind, key);
+		return res;
+	}
+	/**
+	 * **MOVE AN ITEM** (H04: *"Drag a child leaf or branch anywhere to change inheritance"*; reorder
+	 * siblings). mode 'into' makes it the last child of `targetKey`; 'before' and 'after' put it
+	 * beside the target, under the target's own parent (a root's sibling becomes a Base of its own).
+	 * A cycle is refused. Its own values travel with it; what it inherits follows the new parent.
+	 */
+	function smMove(tree, key, targetKey, mode) {
+		var kind = smKind(tree), r = smRecord(tree, key), target = smRecord(tree, targetKey), newParent, list, res;
+		if (smIsBaseKey(tree, key)) { return treeRefuse('base'); }
+		if (!r) { return treeRefuse('missing'); }
+		if (key === targetKey) { return treeRefuse('self'); }
+		if (!target && !smIsBaseKey(tree, targetKey)) { return treeRefuse('missing'); }
+		if (mode !== 'into' && smIsBaseKey(tree, targetKey)) { return treeRefuse('base'); }
+		newParent = mode === 'into' ? targetKey : smParentKey(tree, targetKey);
+		if (kind === 'scn') {
+			if (newParent === null) { delete r.parent; r.root = true; }
+			else {
+				res = setScenarioParent(key, smIsBaseKey(tree, newParent) ? null : newParent);
+				if (res !== true) { return res; }
+				delete r.root;
+			}
+		} else {
+			res = storedParentOk(kind, key, smIsBaseKey(tree, newParent) || newParent === null ? null : newParent, tree)
+				? true : treeRefuse('parent');
+			if (res !== true) { return res; }
+			r.parent = (newParent === null || smIsBaseKey(tree, newParent)) ? null : newParent;
+			if (newParent === null) { r.root = true; } else { delete r.root; }
+		}
+		list = smList(tree);
+		if (mode === 'into') {
+			smPutAt(list, r, null, false);
+		} else {
+			if (kind === 'scn') { smStoreScenarioOrder(); }
+			smPutAt(list, r, target, mode === 'after');
+		}
+		touchTree('smMove');
+		return true;
+	}
+	// The first stored reorder freezes the order scenarios are SHOWN in at that moment into the
+	// stored array and sets the flag, so a project that never reorders stays sorted by name and
+	// opens exactly as before.
+	function smStoreScenarioOrder() {
+		var shown;
+		if (project.scenarioOrdered === true) { return; }
+		shown = scenariosForDisplay();
+		scenarios.length = 0;
+		shown.forEach(function (s) { scenarios.push(s); });
+		project.scenarioOrdered = true;
+	}
+	// The alternative (or calculation set) a scenario uses for a category, as it would resolve:
+	// {id: stored id or null, base: true when Base's, own: true when it holds values of its own,
+	// via: the scenario it is inherited from, or null when it is the scenario's own choice}.
+	function smChoice(s, cat) {
+		var p = s, seen = {}, named, inherited = false;
+		while (p && !p.isBase && !seen[p.id]) {
+			seen[p.id] = true;
+			named = storedChoiceOf(p, cat);
+			if (named !== undefined) { return { id: named, via: inherited ? p : null }; }
+			if (scenarioHoldsLocal(p, cat)) { return { id: null, own: true, via: inherited ? p : null }; }
+			inherited = true;
+			p = parentScenarioOf(p);
+		}
+		return { id: null, base: true, via: null };
+	}
+	// The scenarios that use an item (naming it, or inheriting it): the Base item's users are those
+	// resolving to Base, and a scenario using values of its own uses none of the tree's items.
+	function smUsedBy(tree, key) {
+		var out = [];
+		if (tree === 'scenarios') { return out; }
+		scenarios.forEach(function (s) {
+			var c = smChoice(s, tree);
+			if (smIsBaseKey(tree, key) ? c.base === true : c.id === key) { out.push(s); }
+		});
+		return out;
+	}
+	// The cell a scenario and a category make in the Scenarios table: the text of the item it uses.
+	function smCellText(s, cat) {
+		var c = smChoice(s, cat), pc = EngCalcs.pageConfig || {}, name;
+		if (c.id !== null && c.id !== undefined) { name = smName(cat, c.id); }
+		else if (c.own) { name = (pc.lpn_sm_own_values || 'Own values') + ' (' + alternativeFor(c.via || s, cat).count + ')'; }
+		else { name = smName(cat, smBaseKey(cat)); }
+		return c.via ? name + ' (' + (pc.lpn_sm_inherited || 'inherited') + ')' : name;
+	}
+	// The pick-list of one cell: ['' inherits / Base, then every item of the category by name].
+	function smCellChoices(s, cat) {
+		var out = [['', smCellText(s, cat)]], c = smChoice(s, cat);
+		if (c.own && !c.via) { out = [['', smCellText(s, cat)]]; }
+		smRecords(cat).forEach(function (r) { out.push([String(r.name || ''), String(r.name || '')]); });
+		return out;
+	}
+	function smCellValue(s, cat) {
+		var c = smChoice(s, cat);
+		return (c.id !== null && c.id !== undefined && !c.via) ? smName(cat, c.id) : '';
+	}
+	/**
+	 * **A SCENARIO PICKS AN ALTERNATIVE FOR A CATEGORY** (Declan's Scenarios table). `name` is the
+	 * item's name; '' makes the scenario inherit again. Values the scenario holds of its own in the
+	 * category are never lost: they are kept first as a stored alternative named for the scenario,
+	 * which then stays in the category's tree. Answers true, or {refused}; `kept` names that one.
+	 */
+	function smAssign(scnId, cat, name) {
+		var s = scenarioById(scnId), kind = cat === 'calculation' ? 'calc' : 'alt', rec = null, kept = null, res;
+		if (!s || s.isBase) { return treeRefuse('base'); }
+		if (name !== '' && name !== null && name !== undefined) {
+			smRecords(cat).forEach(function (r) { if (String(r.name || '') === name) { rec = r; } });
+			if (!rec) { return treeRefuse('missing'); }
+		}
+		if (rec === null && !storedChoiceOf(s, cat)) { return true; }
+		if (rec !== null && scenarioHoldsLocal(s, cat)) {
+			kept = promoteStored(s.id, cat, smUniqueName(cat, s.name || s.id));
+			if (kept.refused) { return kept; }
+		}
+		res = kind === 'calc' ? assignCalcSet(scnId, rec ? rec.id : null) : assignAlternative(scnId, cat, rec ? rec.id : null);
+		if (res !== true) { return res; }
+		return kept ? { kept: kept.name } : true;
+	}
+	/**
+	 * **COPY A SCENARIO** (H05: *"copying a scenario asks each time: make its own copies of the
+	 * alternatives, or share them"*). mode 'own' copies each stored alternative the scenario names
+	 * (as a sibling of the original, named for the copy); 'share' names the same ones, so an edit
+	 * made in either changes both. The scenario's own values are always copied. The copy sits beside
+	 * the original and has its parent.
+	 */
+	function smCopyScenario(srcId, mode) {
+		var src = scenarioById(srcId), s, name, copies = {};
+		if (!src) { return treeRefuse('missing'); }
+		name = smUniqueName('scenarios', 'Copy_of_' + scenarioDisplayName(src));
+		s = altCopy(src);
+		s.id = newScenarioId();
+		s.name = name;
+		delete s.isBase;
+		delete s.parent;
+		delete s.root;
+		delete s.alternatives;
+		delete s.calc;
+		if (src.isBase) { s.overrides = {}; }
+		if (src.parent !== undefined) { s.parent = src.parent; }
+		else if (src.root === true) { s.root = true; }
+		else if (src.isBase) { /* a copy of Base is a child of Base */ }
+		(['alternatives', 'calc']).forEach(function (field) {
+			var held = src[field];
+			if (held === undefined) { return; }
+			if (field === 'calc') { held = { calculation: src.calc }; }
+			Object.keys(held).forEach(function (cat) {
+				var kind = cat === 'calculation' ? 'calc' : 'alt', orig = storedById(storedList(kind), held[cat]), c;
+				if (!orig) { return; }
+				if (mode === 'own') {
+					c = altCopy(orig);
+					c.id = treeNewId(storedList(kind), kind === 'calc' ? 'c' : 'a');
+					c.name = smUniqueName(cat, String(orig.name || '') + '_copy_for_' + name);
+					storedList(kind).push(c);
+					copies[cat] = c.id;
+				} else {
+					copies[cat] = orig.id;
+				}
+			});
+		});
+		Object.keys(copies).forEach(function (cat) {
+			if (cat === 'calculation') { s.calc = copies[cat]; }
+			else { (s.alternatives = s.alternatives || {})[cat] = copies[cat]; }
+		});
+		smPutAt(scenarios, s, src, true);
+		touchTree('smCopyScenario');
+		return s;
+	}
+	// **THE SCENARIOS A COMPARISON SOLVES** (H06): the checked set stored in the project; with none
+	// stored, every scenario, so an old file behaves as before.
+	function compareScenarios() {
+		var set = project.compareSet;
+		return scenariosForDisplay().filter(function (s) { return !Array.isArray(set) || set.indexOf(s.id) >= 0; });
+	}
+	function smCompareChecked(id) { return !Array.isArray(project.compareSet) || project.compareSet.indexOf(id) >= 0; }
+	function smCompareSet(id, on) {
+		var all = scenariosForDisplay().map(function (s) { return s.id; });
+		var cur = Array.isArray(project.compareSet) ? project.compareSet.slice() : all;
+		cur = cur.filter(function (x) { return x !== id; });
+		if (on) { cur.push(id); }
+		cur = all.filter(function (x) { return cur.indexOf(x) >= 0; });
+		// Everything checked is the default, and a default is not stored (an old file stays itself).
+		if (cur.length === all.length) { delete project.compareSet; } else { project.compareSet = cur; }
+	}
 	/**
 	 * **EVERY OVERRIDE MAP IN THE DOCUMENT**, for the maintenance that must reach all of them: an
 	 * element renamed or deleted, a unit converted, a pattern, curve, type or fittings list renamed,
@@ -5634,6 +5990,8 @@ var EngCalcs = EngCalcs || {};
 		// -- identity, and which scenario is open
 		'project.name': null, 'project.docId': null, 'project.gallery': null,
 		'project.activeScenario': null,
+		// The scenario manager's two project-level facts: the order set by hand, and the checked set Compare solves.
+		'project.scenarioOrdered': null, 'project.compareSet': null,
 		// -- document objects: an element's reference varies, the object does not (CLAUDE.md)
 		patterns: null, curves: null, pipeTypes: null, fittingSets: null, profiles: null,
 		controls: null, rules: null, inpSections: null,
@@ -6009,6 +6367,10 @@ var EngCalcs = EngCalcs || {};
 	function scenariosForDisplay() {
 		var base = [], rest = [];
 		scenarios.forEach(function (s) { (s.isBase ? base : rest).push(s); });
+		// **ONCE THE ORDER HAS BEEN SET BY HAND IT IS THE STORED ONE, EVERYWHERE SCENARIOS ARE
+		// LISTED** (Tom, 2026-10-09: *"Can there be a way to change the order of scenarios?"*).
+		// Until then, by name, so a file that never reordered shows what it always did.
+		if (project.scenarioOrdered === true) { return base.concat(rest); }
 		rest.sort(function (a, b) {
 			var byName = scenarioDisplayName(a).localeCompare(scenarioDisplayName(b), undefined, { numeric: true, sensitivity: 'base' });
 			return byName !== 0 ? byName : (a.id < b.id ? -1 : (a.id > b.id ? 1 : 0));
@@ -6033,7 +6395,7 @@ var EngCalcs = EngCalcs || {};
 		refreshScenarioTip(btn);
 		// Every override written or cleared lands here, so the Alternatives table follows it,
 		// and so does the note under Settings > Time that names the scenarios overriding it.
-		refreshAlternativesBoxIfOpen();
+		refreshScenarioManagerIfOpen();
 		if (EngCalcs.lpnTimeRenderOverrides) { EngCalcs.lpnTimeRenderOverrides(); }
 		// The scenario name is user-typed and can be long, so the bottom band's width is not knowable
 		// in advance -- a bottom legend re-dodges around whatever it now measures.
@@ -6130,6 +6492,7 @@ var EngCalcs = EngCalcs || {};
 		// In place, so the list keeps its identity and the epoch bump below is what the resolver's
 		// cache answers to (not the identity guard, which is for a whole document swapped in).
 		scenarios.splice(scenarios.indexOf(s), 1);
+		if (Array.isArray(project.compareSet)) { project.compareSet = project.compareSet.filter(function (x) { return x !== id; }); }
 		touchTree('deleteScenario');
 		if (project.activeScenario === id) { project.activeScenario = baseScenario().id; }
 		applyScenarioChange();
@@ -6325,21 +6688,19 @@ var EngCalcs = EngCalcs || {};
 			// push into a push against whatever it happened to hand over.
 			fn: function () { pushBaseToScenarios(); }
 		});
-		// **BASIC MODE** (Tom, 2026-09-30), ticked by default. Unticked reveals the one thing the
-		// Advanced scenarios view has so far: the read-only Alternatives table. See
-		// setScenarioBasicMode() for why the answer lives in the browser.
+		// **THE SCENARIO MANAGER ROW IS ALWAYS HERE** (Tom, 2026-10-09, H03); choosing it while
+		// Basic mode is ticked turns Basic mode off and says so in one line (openScenarioManager()).
+		// **BASIC MODE** (Tom, 2026-09-30), ticked by default: see setScenarioBasicMode().
 		rows.push({ separator: true });
+		rows.push({
+			icon: 'scenarios', label: pc.lpn_sm_menu || 'Scenario manager…',
+			fn: function () { openScenarioManager(); }
+		});
 		rows.push({
 			label: (scenarioBasicMode ? '✓ ' : '  ') + (pc.lpn_scenario_basic || 'Basic mode'),
 			tip: pc.lpn_scenario_basic_tip,
 			fn: function () { setScenarioBasicMode(!scenarioBasicMode); }
 		});
-		if (!scenarioBasicMode) {
-			rows.push({
-				icon: 'scenarios', label: pc.lpn_alt_title || 'Alternatives preview',
-				fn: function () { openAlternativesBox(); }
-			});
-		}
 		return rows;
 	}
 	function openScenarioMenu(anchor) { openMenu(anchor, scenarioMenuRows()); }
@@ -23506,6 +23867,7 @@ var EngCalcs = EngCalcs || {};
 				}());
 			});
 		}
+		refreshScenariosTab();
 		if (x) { x.addEventListener('click', closePane); }
 		// **SELECTION ONLY AND PRINT TABLE ARE NOT BUTTONS HERE** (Tom, 2026-10-04, port 8109: "I
 		// lean toward releasing with a cleaner UI"). Both live on the Tables pane's right-click
@@ -25515,11 +25877,20 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				id: 'settings', panel: 'lpn_pane_settings', label: 'lpn_tool_settings',
 				group: 'setting', type: 'setting', scnAfter: 'st_setting',
 				cols: settingTableCols()
+			},
+			// **THE SCENARIOS TABLE** (Tom, 2026-10-09, H02: *"Scenarios for the table (One row per
+			// scenario and one column per alt. cat. with view and override assignments)"*): last, and
+			// shown only with Basic mode off. Each cell is a pick-list of that category's alternatives.
+			{
+				id: 'scenarios', panel: 'lpn_pane_scenarios', label: 'lpn_pane_tab_scenarios',
+				group: 'scenario', type: 'scenario',
+				cols: scenarioTableCols()
 			}
 		].map(function (spec) {
 			// The per-type view state. On the SPEC, so six tables genuinely have six of everything
 			// and no map keyed by id can be reached with the wrong one.
-			spec.sort = { col: 'id', dir: 1 };
+			// The Scenarios table is in the order scenarios are listed everywhere (stored order), not by name.
+			spec.sort = { col: spec.group === 'scenario' ? '' : 'id', dir: 1 };
 			spec.cells = null;
 			spec.tds = null;
 			// The spreadsheet selection (Task 186), anchor and focus as (element id, column key).
@@ -25728,6 +26099,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function paneTableAllElements(spec) {
 		var pool = spec.group === 'link' ? doc.links : doc.nodes;
 		if (spec.group === 'setting') { return settingTableRows(); }
+		if (spec.group === 'scenario') { return scenarioTableRows(); }
 		// A Text object has no `type` of its own: every label is a Text, so the Text table is all
 		// of them (Tom, 2026-09-08). A customer is the same shape (Task 247).
 		if (spec.group === 'label') { return (doc.labels || []).slice(); }
@@ -25738,7 +26110,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// `spec.filterStale` is the rows kept only for having been edited -- what the table dims and
 	// marks and the banner counts.
 	function paneTableElements(spec) {
-		var rows = paneTableAllElements(spec), keys = spec.group === 'setting' ? null : paneFilterKeys(spec),
+		var rows = paneTableAllElements(spec), keys = (spec.group === 'setting' || spec.group === 'scenario') ? null : paneFilterKeys(spec),
 			seen, kept, stale = {}, n = 0;
 		// The Settings table is never filtered: Find's queries and the map's selection are about assets.
 		if (!keys) { spec.filterStale = null; spec.filterStaleCount = 0; return rows; }
@@ -26522,7 +26894,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		return x ? name + ' ' + scenarioDisplayName(x.scn) : name;
 	}
 	// A customer carries nothing a scenario can change (Task 247), so its table has no such view.
-	function paneScnAvailable(spec) { return spec.group !== 'customer'; }
+	function paneScnAvailable(spec) { return spec.group !== 'customer' && spec.group !== 'scenario'; }
 	// **A REDRAW ASKED FOR DURING THE SWAP WAITS FOR ITS END** (paneAfterScenarioSwap()), so it
 	// draws the scenario actually showing, not the row's.
 	var paneScnSwapDepth = 0, paneScnSwapPending = [];
@@ -28216,7 +28588,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	function paneFilterBanner(spec, rows, withClear) {
 		var pc = EngCalcs.pageConfig || {}, q = paneFilterQuery(spec), wrap, text, btn;
-		if ((!q && !paneSelFilter) || spec.group === 'setting') { return null; }
+		if ((!q && !paneSelFilter) || spec.group === 'setting' || spec.group === 'scenario') { return null; }
 		wrap = document.createElement('div');
 		wrap.className = 'lpn-pane-filter';
 		text = document.createElement('span');
@@ -31110,7 +31482,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// Each ADDS TO or TAKES FROM the map's selection and never replaces it, which is the whole
 		// of his selection-set complaint. Select and Unselect are offered only when they would do
 		// something, the same rule Fill down follows.
-		targets = spec.group === 'setting' ? []   // a setting is not on the map
+		targets = (spec.group === 'setting' || spec.group === 'scenario') ? []   // a setting, a scenario: not on the map
 			: box.r1 > box.r0
 			? rows.slice(box.r0, box.r1 + 1).map(function (el) { return { group: spec.group, id: paneRowEl(el).id }; })
 				.filter(function (t, i, all) { return !all.slice(0, i).some(function (u) { return u.id === t.id; }); })
@@ -31170,13 +31542,15 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			mk(pc.lpn_pane_filldown || 'Fill down', function () { paneFillDown(spec); }, 'Ctrl+D');
 		}
 		// Not on the Settings table: a setting is never blank, and "unstate" is not this menu's to offer.
-		if (spec.group !== 'setting') { mk(pc.lpn_tool_delete || 'Delete', function () { paneDeleteSelection(spec); }); }
+		if (spec.group !== 'setting' && spec.group !== 'scenario') { mk(pc.lpn_tool_delete || 'Delete', function () { paneDeleteSelection(spec); }); }
+		// A Scenarios table cell has no value to delete: clearing it makes the scenario inherit again.
+		if (spec.group === 'scenario') { mk(pc.lpn_pane_clear_override || 'Clear override', function () { paneDeleteSelection(spec); }); }
 		// **DELETE ELEMENT IS SEPARATE FROM DELETE, ON PURPOSE** (Tom, 2026-10-05: *"Table delete
 		// needs to delete the element if you are on the ID cell or there needs to be a separate
 		// Delete element menu item."*). Delete clears values, as a spreadsheet's does; this removes
 		// the rows' own elements through the map's path.
 		// Not while scenarios are shown: the map's delete acts in the scenario SHOWING, not the row's.
-		if (!spec.scnRows && spec.group !== 'setting') {
+		if (!spec.scnRows && spec.group !== 'setting' && spec.group !== 'scenario') {
 			mk(box.r1 > box.r0 ? (pc.lpn_pane_delete_elements || 'Delete elements') : (pc.lpn_pane_delete_element || 'Delete element'),
 				function () { paneDeleteElements(spec); });
 		}
@@ -35582,7 +35956,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			refreshScenarioStatus();
 			refreshPaneIfOpen();
 			refreshPopupIfOpen();
-			refreshAlternativesBoxIfOpen();
+			refreshScenarioManagerIfOpen();
 			scheduleSolve();
 			scheduleSave();
 		}
@@ -36486,8 +36860,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			'lpn_notesbox', 'lpn_hotkeysbox',
 			// 'lpn_snipbox' (the Screenshot box and its magnification) joined the day it was written.
 			'lpn_snipbox',
-			// 'lpn_altbox' (the Alternatives box, Tom 2026-10-07) joined the day it was written.
-			'lpn_altbox',
+			// 'lpn_altbox' (the Alternatives box, Tom 2026-10-07) joined the day it was written; it was
+			// replaced by 'lpn_smbox' (the Scenario manager, 2026-10-09), and both are cleared.
+			'lpn_altbox', 'lpn_smbox',
 			// 'lpn_statusbox' and 'lpn_fullbox' were missed on the days they were written; 'lpn_dockbox'
 			// (docks of the boxes with no record of their own) joined the day it was.
 			'lpn_statusbox', 'lpn_fullbox', 'lpn_dockbox',
@@ -37730,6 +38105,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		sanitizeScenarioTimes();
 		sanitizeScenarioSettings();
 		if (!scenarios.some(function (s) { return s.id === project.activeScenario; })) { project.activeScenario = baseScenario().id; }
+		// The manager's two project facts, read and never trusted: a flag, and a list of scenarios that exist.
+		if (project.scenarioOrdered !== true) { delete project.scenarioOrdered; }
+		if (project.compareSet !== undefined) {
+			if (Array.isArray(project.compareSet)) {
+				project.compareSet = project.compareSet.filter(function (id) { return scenarios.some(function (x) { return x.id === id; }); });
+			} else { delete project.compareSet; }
+		}
 		doc.nodes = saved.nodes || []; doc.links = saved.links || []; doc.labels = saved.labels || [];
 		// The customers (Task 247). A file written before they existed has none, and every
 		// junction in it draws exactly what it always did -- there is no migration step and no
@@ -45524,7 +45906,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			lpn_ff_box: closeFireFlowBox, lpn_crit_box: closeCriticalityBox, lpn_ds_box: closeDemandScaleBox,
 			lpn_energy_box: closeEnergyBox, lpn_contour_box: closeContourBox, lpn_snip_box: closeSnipBox,
 			lpn_scncmp_box: closeScenarioCompareBox, lpn_rptbox: closeRunReportBox, lpn_status_box: closeStatusReportBox,
-			lpn_alt_box: closeAlternativesBox, lpn_full_box: closeFullReportBox, lpn_calib_box: closeCalibBox,
+			lpn_sm_box: closeScenarioManager, lpn_full_box: closeFullReportBox, lpn_calib_box: closeCalibBox,
 			'lpn_notes_popup': closeNotesPopup, 'lpn_hotkeys_popup': closeHotkeysBox
 		};
 	}
@@ -48232,7 +48614,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		wireScenarioCompareBox();
 		wireRunReportBox();
 		wireStatusReportBox();
-		wireAlternativesBox();
+		wireScenarioManager();
 		wireFullReportBox();
 		wireCalibBox();
 		buildMenuBar();
@@ -55492,9 +55874,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// 2026-10-07: *"All the docks I make need to be remembered."*).
 		if (statusboxLayout.open) { openStatusReportBox(); }
 		if (fullboxLayout.open) { openFullReportBox(); }
-		// Alternatives keeps `open` on its own record (lpn_altbox) only while docked, and opens only
-		// while basic mode is off, the one state in which the box can be opened at all.
-		if (altboxLayout.open && altboxLayout.dock && !scenarioBasicMode) { openAlternativesBox(); }
+		// The Scenario manager keeps `open` on its own record (lpn_smbox) only while docked, and opens
+		// only while Basic mode is off, the one state in which it is shown at all.
+		if (smboxLayout.open && smboxLayout.dock && !scenarioBasicMode) { openScenarioManager(); }
 		// The Notes box (Tom, 2026-09-28), after the reports and before Find for the same stacking
 		// reason: Find is the smallest and ends up on top.
 		if (notesboxLayout.open) { openNotesBox(); }
@@ -56054,7 +56436,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// be a limit to the number of docks that are remembered on production. All the docks I make
 	// need to be remembered."*). Properties, Criticality, Demand scaling and Calibration keep no
 	// furniture record, so their docks lasted one page load: of fifteen docked boxes, five came back
-	// as nothing on every reload (Alternatives, the fifth, has since gained `lpn_altbox`). One key holds, per box id, only the dock
+	// as nothing on every reload (Alternatives, the fifth, has since gained a record, now `lpn_smbox`). One key holds, per box id, only the dock
 	// fields and whether the docked box is open; nothing of where the box floats, which stays the
 	// page-load-only ruling those boxes carry. An entry exists only while that box is docked, and
 	// the key is removed when none is, so a visitor who never docks one of them stores nothing.
@@ -56792,7 +57174,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			['lpn_scncmp_box', cmpboxLayout, saveCmpboxLayout, LPN_CMPBOX_KEY],
 			['lpn_rptbox', rptboxLayout, saveRptboxLayout, LPN_RPTBOX_KEY],
 			['lpn_status_box', statusboxLayout, saveStatusboxLayout, LPN_STATUSBOX_KEY],
-			['lpn_alt_box', altboxLayout, saveAltboxLayout, LPN_ALTBOX_KEY],
+			['lpn_sm_box', smboxLayout, saveSmboxLayout, LPN_SMBOX_KEY],
 			['lpn_full_box', fullboxLayout, saveFullboxLayout, LPN_FULLBOX_KEY],
 			['lpn_calib_box', calibboxLayout, null, null],
 			['lpn_notes_popup', notesboxLayout, saveNotesboxLayout, LPN_NOTESBOX_KEY],
@@ -69911,7 +70293,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function scenarioCompareModels() {
 		var was = project.activeScenario, out = [];
 		try {
-			scenariosForDisplay().forEach(function (s) {
+			compareScenarios().forEach(function (s) {
 				project.activeScenario = s.id;
 				// **AND THE OPTIONS IT RAN UNDER, read during the same swap** (Task 755): the
 				// multiplier and the clock are the scenario's own or the project's, and the report
@@ -70558,17 +70940,20 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (statusBoxIsOpen()) { rebuildStatusReport(); }
 	}
 
-	// ---- SCENARIOS > BASIC MODE, AND THE ALTERNATIVES TABLE (dev/scenario-alternatives.md) -----
+	// ---- SCENARIOS > BASIC MODE, AND THE SCENARIO MANAGER (dev/scenario-alternatives.md) -------
 	//
 	// Tom, 2026-09-30: *"In our Scenarios menu, we have an 'Basic mode' command/row that is checked
-	// by default. If they uncheck it, our full Advanced (Bentley) Scenarios UX (to be designed later)
-	// is revealed."* The Advanced UX is NOT designed, so unticking reveals one thing only: a
-	// read-only table of which alternative each scenario uses in each category. Tom may strike it.
+	// by default. If they uncheck it, our full Advanced (Bentley) Scenarios UX is revealed."* The
+	// Advanced UX is the Scenario manager (a narrow docked box holding an inheritance tree for the
+	// scenarios and one for each alternatives category) and the Scenarios table in the Tables pane
+	// (one row per scenario, one column per category). Tom, 2026-10-09 (H03): *the menu row is
+	// always present; choosing it while Basic mode is ticked turns Basic mode off and says so in
+	// one line.*
 	//
-	// **A BROWSER SETTING, NOT A PROJECT ONE.** The alternatives are derived from the overrides, so
-	// the mode changes no value, no solve and no stored byte -- only how much machinery the person at
-	// this screen wants shown, which a colleague opening the file must not inherit. Written only
-	// when OFF, like lpn_runbox, so a browser that never touched it holds nothing.
+	// **A BROWSER SETTING, NOT A PROJECT ONE.** The mode changes no value, no solve and no stored
+	// byte -- only how much machinery the person at this screen wants shown, which a colleague
+	// opening the file must not inherit. Written only when OFF, like lpn_runbox, so a browser that
+	// never touched it holds nothing.
 	var LPN_SCNBASIC_KEY = 'lpn_scnbasic';
 	var scenarioBasicMode = true;
 	function loadScenarioBasicPref() {
@@ -70580,15 +70965,23 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			if (scenarioBasicMode) { localStorage.removeItem(LPN_SCNBASIC_KEY); }
 			else { localStorage.setItem(LPN_SCNBASIC_KEY, 'off'); }
 		} catch (e) {}
-		if (scenarioBasicMode) { closeAlternativesBox(); }
+		if (scenarioBasicMode) { closeScenarioManager(); }
+		refreshScenariosTab();
 	}
 	loadScenarioBasicPref();
+	// The Scenarios tab of the Tables pane is shown only with Basic mode off. A tab left on show
+	// when Basic mode is ticked again gives way to the first table.
+	function refreshScenariosTab() {
+		var b = document.getElementById('lpn_pane_tab_scenarios');
+		if (b) { b.hidden = scenarioBasicMode; b.style.display = scenarioBasicMode ? 'none' : ''; }
+		if (scenarioBasicMode && paneState && paneState.tab === 'scenarios') { setPaneTab(paneTabs[0].id); }
+	}
 	function altCategoryLabel(cat) {
 		var pc = EngCalcs.pageConfig || {};
 		return {
 			physical: pc.lpn_alt_cat_physical || 'Physical',
 			demand: pc.lpn_alt_cat_demand || 'Demand',
-			topology: pc.lpn_alt_cat_topology || 'Asset activation',
+			topology: pc.lpn_alt_cat_topology || 'Active topology',
 			initial: pc.lpn_alt_cat_initial || 'Initial settings',
 			constituent: pc.lpn_alt_cat_constituent || 'Constituent',
 			fireflow: pc.lpn_alt_cat_fireflow || 'Fire flow',
@@ -70599,72 +70992,447 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			calculation: pc.lpn_alt_cat_calculation || 'Calculation'
 		}[cat] || cat;
 	}
-	function altBoxEl() { return document.getElementById('lpn_alt_box'); }
-	function altBoxIsOpen() {
-		var box = altBoxEl();
+	// ---- the box -------------------------------------------------------------------------------
+	function smBoxEl() { return document.getElementById('lpn_sm_box'); }
+	function smBoxIsOpen() {
+		var box = smBoxEl();
 		return !!box && box.style.display !== 'none' && box.style.display !== '';
 	}
-	// One row per scenario, one column per category. A cell names the alternative: Base's own word
-	// for a Base alternative, the scenario's name and its count of local values for its own.
-	function rebuildAlternativesTable() {
-		var pc = EngCalcs.pageConfig || {}, host = document.getElementById('lpn_alt_report'), body,
-			baseWord = pc.lpn_scenario_base || 'Base';
+	// What the box is showing: the tree, the selected item's key, the key being renamed, the drag.
+	var smState = { tree: 'scenarios', sel: null, editing: null, drag: null, clickAt: 0 };
+	function smSelValid() {
+		return smState.sel !== null && (smIsBaseKey(smState.tree, smState.sel) || !!smRecord(smState.tree, smState.sel));
+	}
+	function smTip(key) { return (EngCalcs.pageConfig || {})[key] || ''; }
+	function smButton(host, text, tip, fn) {
+		var b = document.createElement('button');
+		b.type = 'button';
+		b.textContent = text;
+		if (tip) { b.title = tip; b.setAttribute('aria-label', tip); }
+		b.addEventListener('click', fn);
+		host.appendChild(b);
+		return b;
+	}
+	function rebuildScenarioManager() {
+		var host = document.getElementById('lpn_sm_body'), pc = EngCalcs.pageConfig || {}, tools, sel, tree, head,
+			scroll = 0, old;
 		if (!host) { return; }
+		old = host.querySelector('.lpn-sm-tree');
+		if (old) { scroll = old.scrollTop; }
 		host.innerHTML = '';
-		// **ONE COLUMN PER CATEGORY, AND NOTHING ELSE** (Tom, Q7, 2026-10-05: the demand multiplier,
-		// the run time and the time step are calculation options like any other, counted in the
-		// Calculation column; their own three columns retired once the Settings table existed,
-		// which is where every option, these three included, is typed and audited).
-		body = ffTable(host, [pc.lpn_scenario_label || 'Scenario'].concat(LPN_ALT_CATEGORIES.map(altCategoryLabel)));
-		body.parentNode.className += ' lpn-alt-table';
-		scenariosForDisplay().forEach(function (s) {
-			var tr = ffEl('tr', null, null, body), alts = alternativesOf(s);
-			ffCell(tr, scenarioDisplayName(s));
-			LPN_ALT_CATEGORIES.forEach(function (cat) {
-				var a = alts[cat];
-				ffCell(tr, a.isBase ? baseWord : scenarioDisplayName(s) + ' (' + a.count + ')');
-			});
+		if (!smSelValid()) { smState.sel = null; }
+		tools = document.createElement('div');
+		tools.className = 'lpn-sm-tools';
+		sel = document.createElement('select');
+		sel.id = 'lpn_sm_tree_select';
+		sel.setAttribute('aria-label', pc.lpn_sm_title || 'Scenario manager');
+		smTrees().forEach(function (t) {
+			var o = document.createElement('option');
+			o.value = t;
+			o.textContent = smTreeLabel(t);
+			if (t === 'topology' && pc.lpn_alt_cat_topology_tip) { o.title = pc.lpn_alt_cat_topology_tip; }
+			if (t === smState.tree) { o.selected = true; }
+			sel.appendChild(o);
 		});
-		ffEl('p', 'lpn-ff-note', pc.lpn_alt_note, host);
+		sel.addEventListener('change', function () { smState.tree = sel.value; smState.sel = null; smState.editing = null; rebuildScenarioManager(); });
+		tools.appendChild(sel);
+		host.appendChild(tools);
+		tools = document.createElement('div');
+		tools.className = 'lpn-sm-tools';
+		smButton(tools, '+', pc.lpn_sm_add_child || 'Add a child of the selected item', function () { smActAdd(smState.sel === null ? smBaseKey(smState.tree) : smState.sel); }).id = 'lpn_sm_add';
+		smButton(tools, '−', pc.lpn_sm_delete || 'Delete the selected item', function () { smActDelete(smState.sel); }).id = 'lpn_sm_del';
+		smButton(tools, pc.lpn_sm_add_base || 'Add Base', pc.lpn_sm_add_base_tip, function () { smActAdd(null); }).id = 'lpn_sm_addbase';
+		if (smState.tree === 'scenarios') {
+			smButton(tools, pc.lpn_sm_make_current || 'Make current', null, function () { smActCurrent(smState.sel); }).id = 'lpn_sm_current';
+			smButton(tools, pc.lpn_sm_copy || 'Copy scenario…', null, function () { smActCopy(smState.sel); }).id = 'lpn_sm_copy';
+		}
+		host.appendChild(tools);
+		head = document.createElement('h3');
+		head.className = 'lpn-sm-head';
+		head.textContent = smTreeLabel(smState.tree);
+		if (smState.tree === 'topology' && pc.lpn_alt_cat_topology_tip) { head.title = pc.lpn_alt_cat_topology_tip; head.className += ' ec-help'; }
+		host.appendChild(head);
+		tree = document.createElement('div');
+		tree.className = 'lpn-sm-tree';
+		tree.id = 'lpn_sm_tree';
+		tree.setAttribute('role', 'tree');
+		tree.setAttribute('aria-label', smTreeLabel(smState.tree));
+		tree.tabIndex = 0;
+		smRows(smState.tree).forEach(function (r) { tree.appendChild(smRowEl(r)); });
+		tree.addEventListener('keydown', smKeydown);
+		tree.addEventListener('contextmenu', function (e) {
+			if (e.preventDefault) { e.preventDefault(); }
+			smOpenMenu(smState.sel === null ? smBaseKey(smState.tree) : smState.sel, e.clientX || 0, e.clientY || 0);
+		});
+		host.appendChild(tree);
+		tree.scrollTop = scroll;
+		old = document.createElement('p');
+		old.className = 'lpn-sm-hint';
+		old.textContent = pc.lpn_sm_hint || '';
+		host.appendChild(old);
+		initTipsIn(host);
+		if (smState.editing !== null) { smFocusEditor(); }
 	}
-	// **POSITION, SIZE AND DOCK SURVIVE A RELOAD, ON ONE KEY** (Tom, 2026-10-07, card E02: *"Add the
-	// key, no first-dock limit"*): the record every standing box keeps (wireBoxMemory(),
-	// readDockRecord()). Window furniture: never in the project file.
+	function smUsedByText(tree, key) {
+		var pc = EngCalcs.pageConfig || {}, users = smUsedBy(tree, key);
+		return {
+			text: users.length ? (pc.lpn_sm_used_by || 'Used by scenarios: {n}').replace('{n}', String(users.length)) : (pc.lpn_sm_used_by_none || 'Not used by any scenario'),
+			tip: users.length ? (pc.lpn_sm_used_by_tip || 'Used by: {list}').replace('{list}', users.map(scenarioDisplayName).join(', ')) : ''
+		};
+	}
+	function smRowEl(r) {
+		var pc = EngCalcs.pageConfig || {}, tree = smState.tree, row = document.createElement('div'), name = document.createElement('span'),
+			meta = document.createElement('span'), cb, used;
+		row.className = 'lpn-sm-row' + (smState.sel === r.key ? ' lpn-sm-sel' : '');
+		row.setAttribute('role', 'treeitem');
+		row.setAttribute('aria-level', String(r.depth + 1));
+		row.setAttribute('aria-selected', smState.sel === r.key ? 'true' : 'false');
+		row.setAttribute('data-key', r.key);
+		row.style.paddingInlineStart = (6 + r.depth * 16) + 'px';
+		name.className = 'lpn-sm-name';
+		if (smState.editing === r.key) {
+			cb = document.createElement('input');
+			cb.type = 'text';
+			cb.id = 'lpn_sm_editor';
+			cb.value = smName(tree, r.key);
+			cb.addEventListener('keydown', function (e) {
+				if (e.stopPropagation) { e.stopPropagation(); }
+				if (e.key === 'Enter') { if (e.preventDefault) { e.preventDefault(); } smCommitRename(cb.value); }
+				else if (e.key === 'Escape') { if (e.preventDefault) { e.preventDefault(); } smState.editing = null; rebuildScenarioManager(); }
+			});
+			cb.addEventListener('blur', function () { if (smState.editing === r.key) { smCommitRename(cb.value); } });
+			name.appendChild(cb);
+		} else {
+			name.textContent = r.name;
+			name.title = r.name;
+		}
+		row.appendChild(name);
+		meta.className = 'lpn-sm-meta';
+		if (tree === 'scenarios') {
+			if (r.key === project.activeScenario) {
+				row.setAttribute('aria-current', 'true');
+				name.style.fontWeight = 'bold';
+				meta.textContent = pc.lpn_scncmp_current || '(currently open)';
+			}
+			cb = document.createElement('input');
+			cb.type = 'checkbox';
+			cb.className = 'lpn-sm-compare';
+			cb.checked = smCompareChecked(r.key);
+			cb.title = pc.lpn_sm_compare_tip || 'Include in Scenario comparison';
+			cb.setAttribute('aria-label', cb.title);
+			cb.addEventListener('click', function (e) { if (e.stopPropagation) { e.stopPropagation(); } });
+			cb.addEventListener('change', function () { smActCompare(r.key, cb.checked); });
+			row.appendChild(meta);
+			row.appendChild(cb);
+		} else {
+			used = smUsedByText(tree, r.key);
+			meta.textContent = used.text;
+			if (used.tip) { meta.title = used.tip; }
+			row.appendChild(meta);
+		}
+		row.addEventListener('click', function (e) { smRowClick(r.key, e); });
+		row.addEventListener('dblclick', function () { if (tree === 'scenarios') { smActCurrent(r.key); } });
+		row.addEventListener('contextmenu', function (e) {
+			if (e.preventDefault) { e.preventDefault(); }
+			if (e.stopPropagation) { e.stopPropagation(); }
+			smSelect(r.key);
+			smOpenMenu(r.key, e.clientX || 0, e.clientY || 0);
+		});
+		if (!r.isBase) {
+			row.draggable = true;
+			row.addEventListener('dragstart', function (e) {
+				smState.drag = r.key;
+				try { e.dataTransfer.setData('text/plain', r.key); e.dataTransfer.effectAllowed = 'move'; } catch (err) { /* a harness event */ }
+			});
+			row.addEventListener('dragend', function () { smState.drag = null; smClearDropMarks(); });
+		}
+		row.addEventListener('dragover', function (e) {
+			var zone;
+			if (smState.drag === null) { return; }
+			if (e.preventDefault) { e.preventDefault(); }
+			zone = smDropZone(row, e, r.isBase);
+			smClearDropMarks();
+			row.classList.add('lpn-sm-' + zone);
+		});
+		row.addEventListener('dragleave', function () { row.classList.remove('lpn-sm-into', 'lpn-sm-before', 'lpn-sm-after'); });
+		row.addEventListener('drop', function (e) {
+			var zone, from = smState.drag;
+			if (from === null) { return; }
+			if (e.preventDefault) { e.preventDefault(); }
+			zone = smDropZone(row, e, r.isBase);
+			smState.drag = null;
+			smClearDropMarks();
+			smActMove(from, r.key, zone);
+		});
+		return row;
+	}
+	// **ON AN ITEM RE-PARENTS; BETWEEN TWO REORDERS, AND THE TWO LOOK DIFFERENT** (the market
+	// researcher's call, 2026-10-09): the middle half of a row is "onto it", the top and bottom
+	// quarters are the line before or after it. The Base item takes only a drop onto it.
+	function smDropZone(row, e, isBase) {
+		var b = row.getBoundingClientRect(), y = (e.clientY || 0) - b.top, h = b.height || 1;
+		if (isBase) { return 'into'; }
+		return y < h * 0.25 ? 'before' : (y > h * 0.75 ? 'after' : 'into');
+	}
+	function smClearDropMarks() {
+		Array.prototype.forEach.call(document.querySelectorAll('.lpn-sm-row'), function (r) { r.classList.remove('lpn-sm-into', 'lpn-sm-before', 'lpn-sm-after'); });
+	}
+	function smSelect(key) {
+		smState.sel = key;
+		rebuildScenarioManager();
+		var t = document.querySelector('.lpn-sm-sel');
+		if (t && t.scrollIntoView) { try { t.scrollIntoView({ block: 'nearest' }); } catch (e) { /* none */ } }
+	}
+	// A click on an unselected row selects it; a slow click on the selected one renames it
+	// (Tom, H04: "click or F2 to rename"), and a quick second click is a double-click, which makes
+	// a scenario current.
+	function smRowClick(key, e) {
+		var now = Date.now(), slow = now - smState.clickAt > 500, was = smState.sel === key;
+		smState.clickAt = now;
+		if (was && slow && !smIsBaseKey(smState.tree, key) && !(e && (e.ctrlKey || e.shiftKey))) { smStartRename(key); return; }
+		if (!was) { smSelect(key); }
+	}
+	function smStartRename(key) {
+		if (smIsBaseKey(smState.tree, key) || !key) { return; }
+		smState.sel = key;
+		smState.editing = key;
+		rebuildScenarioManager();
+	}
+	function smFocusEditor() {
+		var ed = document.getElementById('lpn_sm_editor');
+		if (ed) { ed.focus(); if (ed.select) { ed.select(); } }
+	}
+	function smCommitRename(text) {
+		var key = smState.editing, tree = smState.tree, pc = EngCalcs.pageConfig || {}, res, v = String(text).trim();
+		smState.editing = null;
+		if (key === null || v === smName(tree, key)) { rebuildScenarioManager(); return; }
+		res = smTry(function () { return smRename(tree, key, v); });
+		if (res !== true) {
+			if (res.refused === 'duplicate') { setNotice((pc.lpn_sm_name_taken || 'The name {name} is already used in this tree.').replace('{name}', v)); }
+			rebuildScenarioManager();
+			return;
+		}
+		smAfter(false, tree === 'scenarios');
+	}
+	// An act on the tree: one undo step, taken first and dropped again if the act is refused. The
+	// two project-level facts the manager owns ride in the same step.
+	function smTry(fn) {
+		var depth = undoStack.length, res;
+		saveUndoSnapshot();
+		undoTopHoldsSettingPaths([['project', 'scenarioOrdered'], ['project', 'compareSet']]);
+		res = fn();
+		if (!(res === true || (res && !res.refused))) {
+			if (undoStack.length > depth) { undoStack.length = depth; }
+			return res || treeRefuse('failed');
+		}
+		return res;
+	}
+	// After an act. `values`: it can change what a scenario resolves, so the drawing and the solve
+	// are redone (applyScenarioChange); otherwise only the lists that show it.
+	function smAfter(values, renamedScenario) {
+		var tab = paneTableById('scenarios');
+		if (values) { applyScenarioChange(); }
+		else { refreshScenarioStatus(); saveToStorage(); }
+		if (renamedScenario) { paneScnScenarioRenamed(); }
+		if (tab) { paneTableReset(tab); if (document.getElementById(tab.panel)) { renderPaneTable(tab); } }
+		dropScenarioCompareRun();
+		rebuildScenarioManager();
+	}
+	function smActAdd(parentKey) {
+		var tree = smState.tree, res;
+		if (parentKey === undefined) { return; }
+		res = smTry(function () { return smAdd(tree, parentKey, parentKey === null); });
+		if (!res || res.refused) { return; }
+		smState.sel = res.id;
+		smState.editing = res.id;
+		smAfter(false, false);
+	}
+	function smActDelete(key) {
+		var tree = smState.tree, pc = EngCalcs.pageConfig || {}, name, res, wasCurrent = key === project.activeScenario, from = activeScenario();
+		if (key === null || key === undefined || smIsBaseKey(tree, key)) { return; }
+		name = smName(tree, key);
+		res = smTry(function () { return smDelete(tree, key); });
+		if (res !== true) {
+			if (res.refused === 'in use') {
+				tellNotice((pc.lpn_sm_in_use || '{name} cannot be deleted while it is used by: {list}.').replace('{name}', name).replace('{list}', res.who.join(', ')));
+			}
+			return;
+		}
+		smState.sel = null;
+		smAfter(true, false);
+		if (wasCurrent) { followScenarioView(from, activeScenario()); }
+	}
+	function smActMove(from, targetKey, zone) {
+		var tree = smState.tree, pc = EngCalcs.pageConfig || {}, res;
+		res = smTry(function () { return smMove(tree, from, targetKey, zone); });
+		if (res !== true) {
+			if (res.refused === 'parent') { setNotice((pc.lpn_sm_cycle || '{name} cannot be moved under one of its own children.').replace('{name}', smName(tree, from))); }
+			rebuildScenarioManager();
+			return;
+		}
+		smState.sel = from;
+		smAfter(true, false);
+	}
+	function smActCurrent(key) {
+		if (smState.tree !== 'scenarios' || key === null || key === undefined || !scenarioById(key)) { return; }
+		switchScenario(key);
+		rebuildScenarioManager();
+	}
+	function smActCompare(id, on) {
+		smTry(function () { smCompareSet(id, on); return true; });
+		saveToStorage();
+		dropScenarioCompareRun();
+	}
+	function smActCopy(key) {
+		var pc = EngCalcs.pageConfig || {}, src = key ? scenarioById(key) : null;
+		if (!src) { return; }
+		askDialog({
+			kind: 'choice',
+			text: (pc.lpn_sm_copy_ask || 'Copy the scenario {name}. Make its own copies of the alternatives it uses, or share them?').replace('{name}', scenarioDisplayName(src)),
+			choices: [
+				{ label: pc.lpn_sm_copy_own || 'Make copies', value: 'own', isDefault: true },
+				{ label: pc.lpn_sm_copy_share || 'Share them', value: 'share' },
+				{ label: pc.lpn_cancel || 'Cancel', value: null, cancel: true }
+			]
+		}, function (answer) {
+			var res;
+			if (answer !== 'own' && answer !== 'share') { return; }
+			res = smTry(function () { return smCopyScenario(key, answer); });
+			if (!res || res.refused) { return; }
+			smState.sel = res.id;
+			smAfter(true, true);
+		});
+	}
+	function smKeydown(e) {
+		var rows = smRows(smState.tree), i = -1, k = e.key;
+		rows.forEach(function (r, n) { if (r.key === smState.sel) { i = n; } });
+		if (k === 'ArrowDown' || k === 'ArrowUp') {
+			if (e.preventDefault) { e.preventDefault(); }
+			i = Math.max(0, Math.min(rows.length - 1, i + (k === 'ArrowDown' ? 1 : -1)));
+			smSelect(rows[i].key);
+			var t = document.getElementById('lpn_sm_tree');
+			if (t && t.focus) { t.focus(); }
+		} else if (k === 'F2') {
+			if (e.preventDefault) { e.preventDefault(); }
+			if (smState.sel !== null) { smStartRename(smState.sel); }
+		} else if (k === 'Delete') {
+			if (e.preventDefault) { e.preventDefault(); }
+			smActDelete(smState.sel);
+		} else if (k === 'Enter') {
+			if (e.preventDefault) { e.preventDefault(); }
+			smActCurrent(smState.sel);
+		}
+	}
+	function smOpenMenu(key, x, y) {
+		var pc = EngCalcs.pageConfig || {}, menu, tree = smState.tree, isBase = smIsBaseKey(tree, key);
+		function mk(text, fn) {
+			var b = document.createElement('button');
+			b.type = 'button';
+			b.setAttribute('role', 'menuitem');
+			b.textContent = text;
+			b.addEventListener('click', function () { paneCloseContextMenu(); fn(); });
+			menu.appendChild(b);
+		}
+		paneCloseContextMenu();
+		menu = document.createElement('div');
+		menu.className = 'lpn-pane-ctxmenu lpn-sm-menu';
+		menu.setAttribute('role', 'menu');
+		menu.style.left = x + 'px';
+		menu.style.top = y + 'px';
+		mk(pc.lpn_sm_add_child || 'Add a child of the selected item', function () { smActAdd(key); });
+		mk(pc.lpn_sm_add_base || 'Add Base', function () { smActAdd(null); });
+		if (!isBase) { mk(pc.lpn_sm_rename || 'Rename', function () { smStartRename(key); }); }
+		if (tree === 'scenarios') {
+			mk(pc.lpn_sm_make_current || 'Make current', function () { smActCurrent(key); });
+			mk(pc.lpn_sm_copy || 'Copy scenario…', function () { smActCopy(key); });
+		}
+		if (!isBase) { mk(pc.lpn_tool_delete || 'Delete', function () { smActDelete(key); }); }
+		document.body.appendChild(menu);
+		paneCtxMenuEl = menu;
+		paneClampMenu(menu, x, y);
+	}
+	// ---- open, close, furniture -----------------------------------------------------------------
 	// `userSized`: only a drag of its corner makes a size the reader's, so merely opening the box
-	// writes nothing (applyBoxSize()).
-	var LPN_ALTBOX_KEY = 'lpn_altbox';
-	var altboxLayout = Object.assign(newBoxLayout(), { userSized: false });
-	// `open` is kept only while the box is docked: a floating Alternatives box opens from the
-	// Scenarios menu, never with the page, but a docked one comes back like every other dock (Tom,
-	// 2026-10-07: *"All the docks I make need to be remembered."*).
-	function saveAltboxLayout() {
+	// writes nothing (applyBoxSize()). Window furniture, on one key, never in the project file
+	// (Tom, 2026-10-07, card E02: "Add the key, no first-dock limit"). `open` is kept only while
+	// the box is docked: a floating manager opens from the Scenarios menu, a docked one comes back
+	// like every other dock.
+	var LPN_SMBOX_KEY = 'lpn_smbox';
+	var smboxLayout = Object.assign(newBoxLayout(), { userSized: false });
+	function saveSmboxLayout() {
 		if (boxSaveHeld()) { return; }
-		altboxLayout.open = !!(altboxLayout.dock && altBoxIsOpen());
-		try { localStorage.setItem(LPN_ALTBOX_KEY, JSON.stringify(altboxLayout)); } catch (e) {}
+		smboxLayout.open = !!(smboxLayout.dock && smBoxIsOpen());
+		try { localStorage.setItem(LPN_SMBOX_KEY, JSON.stringify(smboxLayout)); } catch (e) {}
 	}
-	function openAlternativesBox() {
-		var box = altBoxEl();
-		if (!box) { return; }
+	function openScenarioManager() {
+		var box = smBoxEl();
 		closeMenu();
 		hideOpenTips();
-		box.style.display = 'flex';
-		rebuildAlternativesTable();
-		placePanelForScreen(box, function () { placeBoxRemembered(box, altboxLayout); });
-		initTipsIn(box);
-		if (altboxLayout.dock && !altboxLayout.open) { saveAltboxLayout(); }
-	}
-	function closeAlternativesBox() {
-		if (altBoxIsOpen()) { hidePanel(altBoxEl()); }
-		if (altboxLayout.open) { saveAltboxLayout(); }
-	}
-	function wireAlternativesBox() {
-		var box = altBoxEl(), x = document.getElementById('lpn_alt_close');
+		// **THE ROW IS ALWAYS THERE; CHOOSING IT TURNS BASIC MODE OFF AND SAYS SO** (H03).
+		if (scenarioBasicMode) {
+			setScenarioBasicMode(false);
+			setNotice((EngCalcs.pageConfig || {}).lpn_sm_basic_off || 'Basic mode is off, so the Scenario manager and the Scenarios table are shown.');
+		}
 		if (!box) { return; }
-		if (x) { x.addEventListener('click', closeAlternativesBox); }
-		wireBoxMemory(box, LPN_ALTBOX_KEY, altboxLayout, saveAltboxLayout, altBoxIsOpen);
+		box.style.display = 'flex';
+		rebuildScenarioManager();
+		placePanelForScreen(box, function () { placeBoxRemembered(box, smboxLayout); });
+		initTipsIn(box);
+		if (smboxLayout.dock && !smboxLayout.open) { saveSmboxLayout(); }
 	}
-	function refreshAlternativesBoxIfOpen() {
-		if (altBoxIsOpen()) { rebuildAlternativesTable(); }
+	function closeScenarioManager() {
+		if (smBoxIsOpen()) { hidePanel(smBoxEl()); }
+		if (smboxLayout.open) { saveSmboxLayout(); }
+	}
+	function wireScenarioManager() {
+		var box = smBoxEl(), x = document.getElementById('lpn_sm_close');
+		if (!box) { return; }
+		if (x) { x.addEventListener('click', closeScenarioManager); }
+		wireBoxMemory(box, LPN_SMBOX_KEY, smboxLayout, saveSmboxLayout, smBoxIsOpen);
+		// The Alternatives preview box this replaced kept `lpn_altbox`; nothing reads it now.
+		try { localStorage.removeItem('lpn_altbox'); } catch (e) { /* storage refused */ }
+		refreshScenariosTab();
+	}
+	function refreshScenarioManagerIfOpen() {
+		if (smBoxIsOpen() && smState.editing === null) { rebuildScenarioManager(); }
+	}
+	// ---- the Scenarios table: one row per scenario, one column per category -------------------
+	function scenarioTableRows() {
+		return scenariosForDisplay().map(function (s) { return { id: s.id, _lpnScenario: true, scn: s }; });
+	}
+	function smSetCell(scn, cat, name) {
+		var pc = EngCalcs.pageConfig || {}, res = smAssign(scn.id, cat, name);
+		if (res && res.refused) { return false; }
+		if (res && res.kept) {
+			setNotice((pc.lpn_sm_kept || 'The values this scenario held in {category} were kept as the alternative {name}.')
+				.replace('{category}', altCategoryLabel(cat)).replace('{name}', res.kept));
+		}
+		smAfter(true, false);
+		return true;
+	}
+	function scenarioTableCols() {
+		var cols = [
+			{ key: 'id', label: 'lpn_scenario_label', str: true, em: 9,
+				get: function (r) { return scenarioDisplayName(r.scn); } },
+			{ key: 'sc_parent', label: 'lpn_sm_col_parent', str: true, em: 9,
+				get: function (r) { var p = parentScenarioOf(r.scn); return p ? scenarioDisplayName(p) : ''; } }
+		];
+		LPN_ALT_CATEGORIES.forEach(function (cat) {
+			cols.push({
+				key: 'sc_' + cat, label: function () { return altCategoryLabel(cat); }, str: true, em: 9,
+				get: function (r) { return r.scn.isBase ? smName(cat, smBaseKey(cat)) : smCellValue(r.scn, cat); },
+				plainFor: function (r) { return !!r.scn.isBase; },
+				choicesFor: function (r) { return !r.scn.isBase; },
+				choices: function (r) { return (r && r.scn && !r.scn.isBase) ? smCellChoices(r.scn, cat) : []; },
+				parse: function (t) {
+					return { ok: t === '' || smRecords(cat).some(function (x) { return String(x.name || '') === t; }), v: t };
+				},
+				set: function (r, v) { smSetCell(r.scn, cat, v); },
+				reread: true,
+				smCat: cat
+			});
+		});
+		return cols;
 	}
 
 	// ---- THE FULL REPORT: every node and every link, at every reporting time step -----------------

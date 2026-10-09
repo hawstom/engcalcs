@@ -962,6 +962,9 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 		<?php // The Settings table (Tom, 2026-10-05: "there will have to be a settings Table"): one row
 		      // per setting a scenario may hold, a row of paneTables() like the others. ?>
 		<div id="lpn_pane_settings" class="lpn-pane-panel lpn-pane-scroll" role="tabpanel" aria-labelledby="lpn_pane_tab_settings"></div>
+		<?php // The Scenarios table (Tom, 2026-10-09, H02): one row per scenario, one column per
+		      // alternatives category, each cell a pick-list of that category's alternatives. ?>
+		<div id="lpn_pane_scenarios" class="lpn-pane-panel lpn-pane-scroll" role="tabpanel" aria-labelledby="lpn_pane_tab_scenarios"></div>
 	</div>
 </div>
 <?php // position:fixed, not absolute: the popup is positioned from pointer-event clientX/clientY
@@ -1457,15 +1460,16 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 		<div id="lpn_status_report" class="lpn-ff-report"></div>
 	</div>
 </div>
-<?php // THE ALTERNATIVES TABLE (dev/scenario-alternatives.md). Offered only with Scenarios > Basic
-      // mode unticked: for each scenario, which alternative it uses in each category, read-only.
-      // The minimum honest view of a model that otherwise has no screen; the Advanced UX is not
-      // designed. Its position is NOT remembered, so it adds nothing to what a browser stores. ?>
-<div id="lpn_alt_box" class="d-print-none lpn-popover lpn-setbox lpn-ffbox" style="display:none;position:fixed;background:var(--ec-bg);border:1px solid var(--ec-ink);padding:40px 8px 8px;box-shadow:2px 2px 6px var(--ec-a-0-0-0-3)" role="dialog" aria-labelledby="lpn_altbox_title">
-	<div id="lpn_altbox_title" class="lpn-setbox-title"><?=$ec_lang['lpn_alt_title']?></div>
-	<button type="button" id="lpn_alt_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
+<?php // THE SCENARIO MANAGER (dev/scenario-alternatives.md, stage 6; Tom, 2026-10-09). A narrow
+      // docked box holding the inheritance tree of the scenarios and of each alternatives category:
+      // name, rename, add, delete and move children and branches, and nothing else. Its position is
+      // window furniture (localStorage `lpn_smbox`), never in the project file. The tree itself is
+      // built in JS (rebuildScenarioManager). ?>
+<div id="lpn_sm_box" class="d-print-none lpn-popover lpn-setbox lpn-ffbox" style="display:none;position:fixed;background:var(--ec-bg);border:1px solid var(--ec-ink);padding:40px 8px 8px;box-shadow:2px 2px 6px var(--ec-a-0-0-0-3)" role="dialog" aria-labelledby="lpn_smbox_title">
+	<div id="lpn_smbox_title" class="lpn-setbox-title"><?=$ec_lang['lpn_sm_title']?></div>
+	<button type="button" id="lpn_sm_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
 	<div class="lpn-popover-body lpn-setbox-body">
-		<div id="lpn_alt_report" class="lpn-ff-report"></div>
+		<div id="lpn_sm_body" class="lpn-sm-body"></div>
 	</div>
 </div>
 <?php // THE FULL REPORT (ROADMAP Task 715). EPANET's Report > Full: every node and every link at
@@ -3603,8 +3607,35 @@ EngCalcs.pageConfig = {
 	lpn_scenario_push_tip: <?=json_encode($ec_lang['lpn_scenario_push_tip'])?>,
 	lpn_scenario_basic: <?=json_encode($ec_lang['lpn_scenario_basic'])?>,
 	lpn_scenario_basic_tip: <?=json_encode($ec_lang['lpn_scenario_basic_tip'])?>,
-	lpn_alt_title: <?=json_encode($ec_lang['lpn_alt_title'])?>,
-	lpn_alt_note: <?=json_encode($ec_lang['lpn_alt_note'])?>,
+	lpn_sm_title: <?=json_encode($ec_lang['lpn_sm_title'])?>,
+	lpn_sm_menu: <?=json_encode($ec_lang['lpn_sm_menu'])?>,
+	lpn_sm_basic_off: <?=json_encode($ec_lang['lpn_sm_basic_off'])?>,
+	lpn_pane_tab_scenarios: <?=json_encode($ec_lang['lpn_pane_tab_scenarios'])?>,
+	lpn_sm_col_parent: <?=json_encode($ec_lang['lpn_sm_col_parent'])?>,
+	lpn_sm_hint: <?=json_encode($ec_lang['lpn_sm_hint'])?>,
+	lpn_sm_add_child: <?=json_encode($ec_lang['lpn_sm_add_child'])?>,
+	lpn_sm_add_base: <?=json_encode($ec_lang['lpn_sm_add_base'])?>,
+	lpn_sm_add_base_tip: <?=json_encode($ec_lang['lpn_sm_add_base_tip'])?>,
+	lpn_sm_delete: <?=json_encode($ec_lang['lpn_sm_delete'])?>,
+	lpn_sm_rename: <?=json_encode($ec_lang['lpn_sm_rename'])?>,
+	lpn_sm_make_current: <?=json_encode($ec_lang['lpn_sm_make_current'])?>,
+	lpn_sm_copy: <?=json_encode($ec_lang['lpn_sm_copy'])?>,
+	lpn_sm_copy_ask: <?=json_encode($ec_lang['lpn_sm_copy_ask'])?>,
+	lpn_sm_copy_own: <?=json_encode($ec_lang['lpn_sm_copy_own'])?>,
+	lpn_sm_copy_share: <?=json_encode($ec_lang['lpn_sm_copy_share'])?>,
+	lpn_sm_in_use: <?=json_encode($ec_lang['lpn_sm_in_use'])?>,
+	lpn_sm_name_taken: <?=json_encode($ec_lang['lpn_sm_name_taken'])?>,
+	lpn_sm_cycle: <?=json_encode($ec_lang['lpn_sm_cycle'])?>,
+	lpn_sm_used_by: <?=json_encode($ec_lang['lpn_sm_used_by'])?>,
+	lpn_sm_used_by_tip: <?=json_encode($ec_lang['lpn_sm_used_by_tip'])?>,
+	lpn_sm_used_by_none: <?=json_encode($ec_lang['lpn_sm_used_by_none'])?>,
+	lpn_sm_compare_tip: <?=json_encode($ec_lang['lpn_sm_compare_tip'])?>,
+	lpn_sm_own_values: <?=json_encode($ec_lang['lpn_sm_own_values'])?>,
+	lpn_sm_inherited: <?=json_encode($ec_lang['lpn_sm_inherited'])?>,
+	lpn_sm_kept: <?=json_encode($ec_lang['lpn_sm_kept'])?>,
+	lpn_sm_shared_note: <?=json_encode($ec_lang['lpn_sm_shared_note'])?>,
+	lpn_scncmp_none_checked: <?=json_encode($ec_lang['lpn_scncmp_none_checked'])?>,
+	lpn_alt_cat_topology_tip: <?=json_encode($ec_lang['lpn_alt_cat_topology_tip'])?>,
 	lpn_settings_table_major: <?=json_encode($ec_lang['lpn_settings_table_major'])?>,
 	lpn_settings_table_minor: <?=json_encode($ec_lang['lpn_settings_table_minor'])?>,
 	lpn_settings_table_category: <?=json_encode($ec_lang['lpn_settings_table_category'])?>,
