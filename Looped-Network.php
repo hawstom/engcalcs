@@ -1848,15 +1848,9 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 		<h2 class="lpn-about-name"><img class="lpn-about-mark" src="/engcalcs/icons/favicon.svg" alt="" width="24" height="24" /><a href="<?=htmlspecialchars(ecAppSiteUrl(), ENT_QUOTES, 'UTF-8')?>" target="_blank" rel="noopener"><?=htmlspecialchars(ecAppBrandName(), ENT_QUOTES, 'UTF-8')?></a></h2>
 		<p class="lpn-about-dedication" lang="en"><a href="https://tomsthird.blogspot.com/2026/10/why-engineering-calculator-needs-to.html" target="_blank" rel="noopener">You are loved and cherished forever, you have nothing to fear, and you are not ruining everything.</a></p>
 		<p><?=$ec_lang['lpn_about_license']?><br />Copyright &copy; 2009&ndash;2026 Thomas Gail Haws</p>
-<?php   // HOW IT IS SOLVED and WHAT IT DOES NOT DO live here, not in the Notes box (Tom,
-        // 2026-10-06: "Move 'How it is solved' and 'What it does not do' into the About rewrite,
-        // as Ida's wish list proposes"). They are statements of what the application is, which is
-        // About's genre; the Notes box keeps task-context advisories. Keys kept as lpn_notes_1/2
-        // so the translations carry. ?>
-		<dl class="lpn-about-scope" id="lpn_about_scope">
-			<dt><?=$ec_lang['lpn_notes_1_term']?></dt><dd><?=$ec_lang['lpn_notes_1_def']?></dd>
-			<dt><?=$ec_lang['lpn_notes_2_term']?></dt><dd><?=$ec_lang['lpn_notes_2_def']?></dd>
-		</dl>
+<?php   // How it is solved and What it does not do, and the page notes, are in the Guide (Tom,
+        // 2026-10-09: *"It's not conventional to include notes in Help, About."*); About keeps the
+        // conventional content: name, licence, credits, build. ?>
 <?php   // Credits, which an About box conventionally carries (MAH's own observation) and which
         // this one can finally honour: credits.html is the About-EPANET page that survived
         // not-epanet.org, and naming what this is built on belongs here.
@@ -1876,29 +1870,6 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 <?php   endif; ?>
 	</div>
 </div>
-<?php // **A NON-HOGGING BOX, LIKE SETTINGS, FIND AND THE FOUR REPORT BOXES** (Tom, 2026-09-28: *"I
-      // need it open for my spreadsheet editing video."*). It used to be a centred, modal-feeling
-      // popover that a click anywhere away from it would close (VIEW_POPOVERS in
-      // js/looped-network.js) -- fine for a column of prose read once, wrong for a box Tom wants
-      // to leave open while he works the Tables pane on camera. It now borrows the Settings box's
-      // whole shell (`.lpn-setbox` for the drag band, the resize grabber and the viewport caps),
-      // is wired through wireBoxMemory() like the report boxes, and is no longer in VIEW_POPOVERS:
-      // nothing closes it but its own × or an Escape pressed while focus is inside it. ?>
-<div id="lpn_notes_popup" class="d-print-none lpn-popover lpn-setbox lpn-notesbox" style="display:none;position:fixed;background:var(--ec-bg);border:1px solid var(--ec-ink);padding:40px 8px 8px;box-shadow:2px 2px 6px var(--ec-a-0-0-0-3)" role="dialog" aria-labelledby="lpn_notes_title">
-	<div id="lpn_notes_title" class="lpn-setbox-title"><?=$ec_lang['lpn_help_notes']?></div>
-	<button type="button" id="lpn_notes_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
-	<div class="lpn-popover-body lpn-setbox-body">
-<h2><?=$ec_lang['ws_notes_heading']?></h2>
-<dl>
-	<dt><?=$ec_lang['lpn_notes_3_term']?></dt><dd><?=$ec_lang['lpn_notes_3_def']?></dd>
-	<dt><?=$ec_lang['lpn_notes_5_term']?></dt><dd><?=$ec_lang['lpn_notes_5_def']?></dd>
-	<dt><?=$ec_lang['lpn_notes_color_term']?></dt><dd><?=$ec_lang['lpn_notes_color_def']?></dd>
-	<dt><?=$ec_lang['lpn_notes_epanet_term']?></dt><dd><?=$ec_lang['lpn_notes_epanet_def']?></dd>
-	<dt><?=$ec_lang['lpn_notes_engine_term']?></dt><dd><?=$ec_lang['lpn_notes_engine_def']?></dd>
-</dl>
-	</div>
-</div>
-
 <?php // ---- THE USER GUIDE (Tom, 2026-10-06; Ida's design; was the Tables and Hotkeys box, Task 745) ----
       //
       // ONE BOX where Help > "Tables and Hotkeys" and the Help > "Toolbar" fly-out stood. Four
@@ -1971,6 +1942,23 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 <p class="lpn-guide-prose"><?=$ec_lang['lpn_guide_boxes_intro']?></p>
 <p class="lpn-guide-prose"><?=$ec_lang['lpn_guide_boxes_autohide']?></p>
 <div id="lpn_guide_boxes" class="lpn-guide-list"></div>
+</section>
+<section class="lpn-guide-section" data-guide-section="about">
+<h2><?=$ec_lang['lpn_guide_about_heading']?></h2>
+<dl>
+	<dt><?=$ec_lang['lpn_notes_1_term']?></dt><dd><?=$ec_lang['lpn_notes_1_def']?></dd>
+	<dt><?=$ec_lang['lpn_notes_2_term']?></dt><dd><?=$ec_lang['lpn_notes_2_def']?></dd>
+</dl>
+</section>
+<section class="lpn-guide-section" data-guide-section="notes">
+<h2><?=$ec_lang['lpn_help_notes']?></h2>
+<dl>
+	<dt><?=$ec_lang['lpn_notes_3_term']?></dt><dd><?=$ec_lang['lpn_notes_3_def']?></dd>
+	<dt><?=$ec_lang['lpn_notes_5_term']?></dt><dd><?=$ec_lang['lpn_notes_5_def']?></dd>
+	<dt><?=$ec_lang['lpn_notes_color_term']?></dt><dd><?=$ec_lang['lpn_notes_color_def']?></dd>
+	<dt><?=$ec_lang['lpn_notes_epanet_term']?></dt><dd><?=$ec_lang['lpn_notes_epanet_def']?></dd>
+	<dt><?=$ec_lang['lpn_notes_engine_term']?></dt><dd><?=$ec_lang['lpn_notes_engine_def']?></dd>
+</dl>
 </section>
 <?php // The Find and replace chapter beyond its opening paragraphs (lpn_guide_text_find_popup):
       // renderGuideBoxes() copies this template into the box's entry. Tom, 2026-10-07: *"The Find
@@ -2614,7 +2602,6 @@ EngCalcs.pageConfig = {
 	lpn_field_speed_pattern: <?=json_encode($ec_lang['lpn_field_speed_pattern'])?>,
 	lpn_field_speed_pattern_tip: <?=json_encode($ec_lang['lpn_field_speed_pattern_tip'])?>,
 	lpn_help_fix: <?=json_encode($ec_lang['lpn_help_fix'])?>,
-	lpn_help_notes: <?=json_encode($ec_lang['lpn_help_notes'])?>,
 	lpn_help_manual: <?=json_encode($ec_lang['lpn_help_manual'])?>,
 	lpn_guide_also: <?=json_encode($ec_lang['lpn_guide_also'])?>,
 	lpn_guide_how_popup: <?=json_encode($ec_lang['lpn_guide_how_popup'])?>,
@@ -2622,6 +2609,8 @@ EngCalcs.pageConfig = {
 	lpn_guide_not_shown: <?=json_encode($ec_lang['lpn_guide_not_shown'])?>,
 	lpn_guide_box_help: <?=json_encode($ec_lang['lpn_guide_box_help'])?>,
 	lpn_guide_contents: <?=json_encode($ec_lang['lpn_guide_contents'])?>,
+	lpn_guide_menu_named: <?=json_encode($ec_lang['lpn_guide_menu_named'])?>,
+	lpn_guide_group_from: <?=json_encode($ec_lang['lpn_guide_group_from'])?>,
 	lpn_guide_box_named: <?=json_encode($ec_lang['lpn_guide_box_named'])?>,
 	lpn_guide_text_popup: <?=json_encode($ec_lang['lpn_guide_text_popup'])?>,
 	lpn_guide_text_find_popup: <?=json_encode($ec_lang['lpn_guide_text_find_popup'])?>,

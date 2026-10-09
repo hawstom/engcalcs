@@ -34035,8 +34035,9 @@ var EngCalcs = EngCalcs || {};
 			LPN_FFBOX_KEY, LPN_ENERGYBOX_KEY, LPN_CMPBOX_KEY, LPN_RPTBOX_KEY, LPN_CONTOURBOX_KEY,
 			// 'lpn_notesbox' and 'lpn_hotkeysbox' join the list here rather than a day later, for the
 			// same reason every entry above states its own miss: window furniture left out of this
-			// list makes "exactly as a brand-new visitor would see it" false for that one key. Named
-			// as literals because LPN_NOTESBOX_KEY and LPN_HOTKEYSBOX_KEY are declared later in this
+			// list makes "exactly as a brand-new visitor would see it" false for that one key. ('lpn_notesbox'
+			// is a retired key, still swept so an old browser's copy goes.) Named
+			// as literals because LPN_HOTKEYSBOX_KEY is declared later in this
 			// file, the same reason 'lpn_show_titles' below is a literal.
 			'lpn_notesbox', 'lpn_hotkeysbox',
 			// 'lpn_snipbox' (the Screenshot box and its magnification) joined the day it was written.
@@ -43049,7 +43050,7 @@ var EngCalcs = EngCalcs || {};
 			lpn_energy_box: closeEnergyBox, lpn_contour_box: closeContourBox, lpn_snip_box: closeSnipBox,
 			lpn_scncmp_box: closeScenarioCompareBox, lpn_rptbox: closeRunReportBox, lpn_status_box: closeStatusReportBox,
 			lpn_alt_box: closeAlternativesBox, lpn_full_box: closeFullReportBox, lpn_calib_box: closeCalibBox,
-			'lpn_notes_popup': closeNotesPopup, 'lpn_hotkeys_popup': closeHotkeysBox
+			'lpn_hotkeys_popup': closeHotkeysBox
 		};
 	}
 	// A record as it is before any storage has been read.
@@ -43574,12 +43575,7 @@ var EngCalcs = EngCalcs || {};
 				fn: function () { if (window.ecReopenConsent) { window.ecReopenConsent(); } } },
 			{ separator: true },
 			// ---- Group 3: true about ----
-			// The page's own Notes, which used to sit below the map (Tom, 2026-08-14). This is the
-			// ONE row in this menu that does not open a new tab, because it does not leave the page
-			// at all -- the notes are still in this document, hidden, and this reveals them. See the
-			// comment on #lpn_notes_popup in Looped-Network.php for why the markup stayed in the
-			// page rather than becoming a JS string.
-			{ icon: 'help', label: pc.lpn_help_notes || 'Notes on this page', fn: toggleNotesPopup },
+			// (Notes on this page moved into the Guide, Tom 2026-10-09.)
 			// **THE WAY BACK TO THE SITE, AND IT IS ONE ROW** (Tom, 2026-09-11: *"Help menu to
 			// include Welcome Page ... as last item in top group"* -- true of ITS group, now group
 			// 3, since Task 745 split the one group into three).
@@ -43628,61 +43624,6 @@ var EngCalcs = EngCalcs || {};
 		openMenu(anchor, rows);
 	}
 
-	// **THE NOTES BOX** (Tom, 2026-09-28: *"Draggable non-hog box for Help, Notes. I need it open
-	// for my spreadsheet editing video."*). Until now this was a centred popover in VIEW_POPOVERS --
-	// a click anywhere away from it, or a bare Escape, closed it, which is exactly what "non-hog"
-	// rules out. It is now the same shell and the same memory as Settings, Find and the four report
-	// boxes: draggable by its title bar, resizable, remembered per browser as window furniture
-	// (`lpn_notesbox`), and dismissed only by its own × or an Escape pressed while focus is inside
-	// it -- see wireNotesBox().
-	function notesBoxEl() { return document.getElementById('lpn_notes_popup'); }
-	function notesBoxIsOpen() {
-		var b = notesBoxEl();
-		return !!b && b.style.display === 'flex';
-	}
-	var LPN_NOTESBOX_KEY = 'lpn_notesbox';
-	var notesboxLayout = newBoxLayout();
-	function saveNotesboxLayout() {
-		if (boxSaveHeld()) { return; }
-		try { localStorage.setItem(LPN_NOTESBOX_KEY, JSON.stringify(notesboxLayout)); } catch (e) {}
-	}
-	// **OPENS AT THE MAP'S TOP-RIGHT, NOT CENTRED, THE FIRST TIME** (setboxHomeCorner() -- the same
-	// corner Settings opens at). Centring is what the old popover did, and centring a box tall
-	// enough to hold every term in this list lands squarely on top of the Tables pane docked under
-	// the map, which is the one thing this box must not do on a first open.
-	function openNotesBox() {
-		var box = notesBoxEl(), r, at, home, floor;
-		if (!box) { return; }
-		closeMenu();
-		closeViewPopovers();
-		hideOpenTips();
-		box.style.display = 'flex';
-		placePanelForScreen(box, function () {
-			applyBoxSize(box, notesboxLayout);
-			floor = chromeFloor();
-			capPanelToRoomBelow(box, floor);
-			r = box.getBoundingClientRect();
-			if (notesboxLayout.left === null || notesboxLayout.top === null) {
-				home = setboxHomeCorner(r.width, r.height);
-				at = clampPanel(home.left, home.top, r.width, r.height,
-					window.innerWidth, window.innerHeight, floor);
-			} else {
-				at = restoreBounds(notesboxLayout.left, notesboxLayout.top, r.width, r.height,
-					window.innerWidth, window.innerHeight);
-			}
-			box.style.left = at.left + 'px';
-			box.style.top = at.top + 'px';
-		});
-		if (!notesboxLayout.open) { notesboxLayout.open = true; saveNotesboxLayout(); }
-	}
-	function closeNotesPopup() {
-		hidePanel(notesBoxEl());
-		if (notesboxLayout.open) { notesboxLayout.open = false; saveNotesboxLayout(); }
-	}
-	function toggleNotesPopup() {
-		if (notesBoxIsOpen() && !boxIsTucked(notesBoxEl())) { closeNotesPopup(); return; }
-		openNotesBox();
-	}
 	// The About box. Still a centred, click-away-dismissed popover -- unlike Notes since Tom's
 	// 2026-09-28 ruling, this is read once and closed, not a reference kept open beside the work.
 	function toggleAboutPopup() {
@@ -43701,21 +43642,9 @@ var EngCalcs = EngCalcs || {};
 		popup.style.top = top + 'px';
 	}
 	function closeAboutPopup() { hidePanel(document.getElementById('lpn_about_popup')); }
-	function wireNotesPopup() {
+	function wireAboutPopup() {
 		var ax = document.getElementById('lpn_about_close');
 		if (ax) { ax.addEventListener('click', closeAboutPopup); }
-		var box = notesBoxEl(), x = document.getElementById('lpn_notes_close');
-		if (!box) { return; }
-		if (x) { x.addEventListener('click', closeNotesPopup); }
-		// **ESCAPE CLOSES IT ONLY WHEN FOCUS IS INSIDE IT** -- bound on the box itself rather than on
-		// `document`, exactly like the CRS convert-as box (closeConvasBox()). The page-wide Escape
-		// handler no longer knows about this box at all (VIEW_POPOVERS above), which is the point:
-		// pressing Escape to back out of an edit elsewhere on the page must not also sweep this box
-		// away, and a table cell or the map must keep taking Escape for its own undo.
-		box.addEventListener('keydown', function (e) {
-			if (e.key === 'Escape') { e.preventDefault(); closeNotesPopup(); }
-		});
-		wireBoxMemory(box, LPN_NOTESBOX_KEY, notesboxLayout, saveNotesboxLayout, notesBoxIsOpen);
 	}
 
 	// **THE USER GUIDE BOX** (Tables and Hotkeys until 2026-10-06, Task 745; see renderGuide()
@@ -43944,6 +43873,8 @@ var EngCalcs = EngCalcs || {};
 			mn = document.getElementById('lpn_guide_menus'), entries, lastGroup = null, curMenu = null, block = null;
 		if (!tb || !mn) { return; }
 		entries = guideMenuEntries();
+		var secNames = Array.prototype.map.call(document.querySelectorAll('#lpn_hotkeys_popup .lpn-guide-section > h2'),
+			function (h2) { return String(h2.textContent || '').replace(/\s+/g, ' ').trim().toLowerCase(); });
 		tb.innerHTML = '';
 		guideToolbarRows().forEach(function (g, i) {
 			var row, twin, also, at;
@@ -43974,8 +43905,14 @@ var EngCalcs = EngCalcs || {};
 				block = document.createElement('div');
 				block.className = 'lpn-guide-menu';
 				block.setAttribute('data-guide-menu', e.menuId);
+				// A second level of the index: the menu is a sub-heading of Menus, in the rail too.
+				block.setAttribute('data-guide-key', 'menu-' + e.menuId);
 				var h = document.createElement('h3');
-				h.textContent = e.menuLabel;
+				// A menu named like a section of the Guide ("Map") is told apart as "Map menu", so the rail
+				// does not list one word twice (the same rule the Boxes entries follow).
+				h.textContent = secNames.indexOf(String(e.menuLabel).toLowerCase()) >= 0 ?
+					(pc.lpn_guide_menu_named || '{menu} menu').replace('{menu}', e.menuLabel) : e.menuLabel;
+				h.tabIndex = -1;
 				block.appendChild(h);
 				mn.appendChild(block);
 			}
@@ -44093,6 +44030,16 @@ var EngCalcs = EngCalcs || {};
 			sec.querySelectorAll('.lpn-guide-boxentry').forEach(function (en) {
 				if (guideShowEl(en, !q || guideMatch(en, q))) { hit = true; }
 			});
+			sec.querySelectorAll('.lpn-guide-group').forEach(function (g) {
+				var all = !q || guideMatch(g.querySelector('h3'), q), ghit = false;
+				g.querySelectorAll('.lpn-guide-boxentry').forEach(function (en) {
+					if (guideShowEl(en, all || guideMatch(en, q))) { ghit = true; }
+				});
+				if (guideShowEl(g, ghit)) { hit = true; }
+			});
+			// A collapsed section that holds a hit is opened for the search, and put back after it.
+			if (q && hit) { guideAutoExpand(sec); }
+			else if (!q) { guideAutoRestore(sec); }
 			sec.querySelectorAll('.lpn-guide-prose').forEach(function (pr) {
 				guideShowEl(pr, !q || guideMatch(pr, q));
 				if (!q || guideMatch(pr, q)) { hit = true; }
@@ -44118,8 +44065,9 @@ var EngCalcs = EngCalcs || {};
 		while (host.firstChild) { host.removeChild(host.firstChild); }
 		var sectionNames = Array.prototype.map.call(document.querySelectorAll('#lpn_hotkeys_popup .lpn-guide-section > h2'),
 			function (h2) { return String(h2.textContent || '').replace(/\s+/g, ' ').trim().toLowerCase(); });
+		var groups = {}, groupOrder = [];
 		guideBoxList().forEach(function (e) {
-			var en = document.createElement('div'), h = document.createElement('h3'), p;
+			var en = document.createElement('div'), h = document.createElement('h3'), p, ctl, gk = '', gl = '', grp;
 			en.className = 'lpn-guide-boxentry';
 			en.id = 'lpn_guide_b_' + e.id;
 			en.setAttribute('data-guide-key', 'box-' + e.id);
@@ -44140,8 +44088,26 @@ var EngCalcs = EngCalcs || {};
 			// the page as <template id="lpn_guide_more_<box id>"> and copied in under its paragraphs.
 			var more = document.getElementById('lpn_guide_more_' + e.id);
 			if (more && more.content) { en.appendChild(document.importNode(more.content, true)); }
-			host.appendChild(en);
+			// Seventeen cards under one heading are too many to scan: each sits under the menu that
+			// opens it, named from the menu bar itself (Tom, 2026-10-09: "more index hierarchy").
+			// A box no menu opens (Properties opens on a click in the map) stays ungrouped, first.
+			ctl = guideBoxControl(e.id, true);
+			if (ctl && ctl.e) { gk = ctl.e.menuId; gl = ctl.e.menuLabel; }
+			if (!gk) { host.appendChild(en); return; }
+			grp = groups[gk];
+			if (!grp) {
+				grp = groups[gk] = document.createElement('div');
+				grp.className = 'lpn-guide-group';
+				grp.setAttribute('data-guide-key', 'boxgroup-' + gk);
+				var gh = document.createElement('h3');
+				gh.textContent = (pc.lpn_guide_group_from || 'From {menu}').replace('{menu}', gl);
+				gh.tabIndex = -1;
+				grp.appendChild(gh);
+				groupOrder.push(gk);
+			}
+			grp.appendChild(en);
 		});
+		groupOrder.forEach(function (k) { host.appendChild(groups[k]); });
 	}
 	function guideContentEl() { return document.getElementById('lpn_guide_content'); }
 	function guideVisible(el) { return !!el && el.style.display !== 'none' && (!el.closest || !el.closest('[style*="display: none"]')); }
@@ -44181,9 +44147,15 @@ var EngCalcs = EngCalcs || {};
 			if (!h || sec.style.display === 'none') { return; }
 			sec.setAttribute('data-guide-key', key);
 			add(key, String(h.textContent || '').trim(), false, q ? guideSnippet(sec, q) : '');
-			sec.querySelectorAll('.lpn-guide-boxentry').forEach(function (en) {
-				if (en.style.display === 'none') { return; }
-				add(en.getAttribute('data-guide-key'), String(en.querySelector('h3').textContent || '').trim(), true, '');
+			// Menus, box groups and boxes, in reading order: a second level (a menu, a group) and, under
+			// a box group, a third (the box).
+			sec.querySelectorAll('.lpn-guide-menu, .lpn-guide-group, .lpn-guide-boxentry').forEach(function (el) {
+				var grouped = !!el.parentNode.closest('.lpn-guide-group'), a;
+				if (el.style.display === 'none') { return; }
+				if (grouped && el.parentNode.style.display === 'none') { return; }
+				add(el.getAttribute('data-guide-key'), String(el.querySelector('h3').textContent || '').trim(), true, '');
+				a = nav.lastChild;
+				if (grouped) { a.className = 'lpn-guide-nav-sub lpn-guide-nav-sub2'; }
 			});
 		});
 	}
@@ -44225,11 +44197,66 @@ var EngCalcs = EngCalcs || {};
 		}, { root: content, rootMargin: '0px 0px -70% 0px', threshold: [0, 1] });
 		content.querySelectorAll('[data-guide-key]').forEach(function (el) { guideIO.observe(el); });
 	}
+	// ---- Main headings collapse (Tom, 2026-10-09; Ida: a double-click is undiscoverable, so the
+	// heading carries a disclosure chevron and a single click, Enter or Space toggles, and a
+	// double-click toggles too, which is Tom's gesture). Nothing is remembered, not even in the
+	// browser: every opening of the page starts with every section open.
+	function guideSetCollapsed(sec, collapsed) {
+		var b;
+		if (!sec || !sec.classList || !sec.classList.contains('lpn-guide-section')) { return; }
+		b = sec.querySelector('h2 > .lpn-guide-disc');
+		sec.classList.toggle('lpn-guide-collapsed', !!collapsed);
+		if (b) { b.setAttribute('aria-expanded', collapsed ? 'false' : 'true'); }
+	}
+	function guideAutoExpand(sec) {
+		if (!sec.classList.contains('lpn-guide-collapsed')) { return; }
+		sec.setAttribute('data-guide-pre', '1');
+		guideSetCollapsed(sec, false);
+	}
+	function guideAutoRestore(sec) {
+		if (sec.getAttribute('data-guide-pre') !== '1') { return; }
+		sec.removeAttribute('data-guide-pre');
+		guideSetCollapsed(sec, true);
+	}
+	function guideWireDisclosure(box) {
+		box.querySelectorAll('.lpn-guide-section').forEach(function (sec) {
+			var h = sec.querySelector(':scope > h2'), b, label, id, svgEl;
+			if (!h || h.querySelector('.lpn-guide-disc')) { return; }
+			label = document.createElement('span');
+			while (h.firstChild) { label.appendChild(h.firstChild); }
+			b = document.createElement('button');
+			b.type = 'button';
+			b.className = 'lpn-guide-disc';
+			b.setAttribute('aria-expanded', 'true');
+			id = 'lpn_guide_sec_' + sec.getAttribute('data-guide-section');
+			sec.id = sec.id || id;
+			b.setAttribute('aria-controls', sec.id);
+			svgEl = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+			svgEl.setAttribute('class', 'lpn-guide-disc-chev');
+			svgEl.setAttribute('viewBox', '0 0 16 16');
+			svgEl.setAttribute('aria-hidden', 'true');
+			svgEl.innerHTML = '<path d="M4 6l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.8"/>';
+			b.appendChild(svgEl);
+			b.appendChild(label);
+			h.appendChild(b);
+			function flip(e) {
+				if (e && e.target && e.target.closest && e.target.closest('a')) { return; }
+				sec.removeAttribute('data-guide-pre');   // a deliberate choice outlasts the search
+				guideSetCollapsed(sec, !sec.classList.contains('lpn-guide-collapsed'));
+			}
+			// The whole heading row is the target, not only the words; a button's own Enter/Space
+			// arrives as a click. A double-click is click, click, dblclick: three flips, one net change.
+			h.addEventListener('click', flip);
+			h.addEventListener('dblclick', flip);
+		});
+	}
 	function guideGoto(key, focusIn) {
 		var content = guideContentEl(), el, pulseEl, heading;
 		if (!content) { return false; }
 		el = content.querySelector('[data-guide-key="' + String(key).replace(/"/g, '') + '"]');
 		if (!el || el.style.display === 'none') { return false; }
+		// A reader who goes to something inside a collapsed section wants to read it: open it first.
+		guideSetCollapsed(el.closest('.lpn-guide-section'), false);
 		content.scrollTop = Math.max(0, el.getBoundingClientRect().top - content.getBoundingClientRect().top + content.scrollTop);
 		guidePinKey = null;
 		guideSetCurrent(key);
@@ -44385,14 +44412,16 @@ var EngCalcs = EngCalcs || {};
 		lpn_rptbox: 'lpn_reports_epanet', lpn_full_box: 'lpn_reports_full', lpn_calib_box: 'lpn_reports_calib',
 		lpn_energy_box: 'lpn_energy_menu', lpn_contour_box: 'lpn_contour_menu'
 	};
-	function guideBoxControl(boxId) {
+	function guideBoxControl(boxId, menuOnly) {
 		var pc = EngCalcs.pageConfig || {}, item = guideBoxList().filter(function (b) { return b.id === boxId; })[0], t, found = null;
 		function norm(x) { return guideFold(String(x || '')).replace(/[\u2026.]+\s*$/, '').replace(/\s+/g, ' ').trim(); }
 		if (!item) { return null; }
 		t = norm(GUIDE_BOX_ROW_KEY[boxId] && pc[GUIDE_BOX_ROW_KEY[boxId]] || item.title);
-		guideToolbarRows().forEach(function (g) {
-			if (!found && g.shown && norm(g.b.name) === t) { found = { kind: 'toolbar', el: g.b.el }; }
-		});
+		if (!menuOnly) {
+			guideToolbarRows().forEach(function (g) {
+				if (!found && g.shown && norm(g.b.name) === t) { found = { kind: 'toolbar', el: g.b.el }; }
+			});
+		}
 		if (found && !smallScreen()) { return found; }
 		found = null;
 		guideMenuEntries().forEach(function (e) {
@@ -44484,6 +44513,7 @@ var EngCalcs = EngCalcs || {};
 		var box = hotkeysBoxEl(), input = document.getElementById('lpn_guide_search');
 		if (!box) { return; }
 		if (input) { input.addEventListener('input', guideFilter); }
+		guideWireDisclosure(box);
 		var toggle = document.getElementById('lpn_guide_railtoggle'), head = box.querySelector('.lpn-guide-railhead'),
 			nav = document.getElementById('lpn_guide_nav');
 		try { hotkeysboxLayout.rail = (JSON.parse(localStorage.getItem(LPN_HOTKEYSBOX_KEY) || '{}') || {}).rail === 'closed' ? 'closed' : 'open'; }
@@ -46461,7 +46491,7 @@ var EngCalcs = EngCalcs || {};
 			bornClean = true;
 			saveIndex();
 		}
-		wireNotesPopup();
+		wireAboutPopup();
 		wireHotkeysBox();
 		// **THE MAP STATUS STRIP HAS TO BE RE-READ HERE, AND THIS IS THE ONLY PLACE THAT DOES IT ON
 		// BOOT** (ROADMAP Task 521, Tom 2026-08-24 with a screenshot of the strip disagreeing with
@@ -53268,9 +53298,6 @@ var EngCalcs = EngCalcs || {};
 		// 2026-10-07: *"All the docks I make need to be remembered."*).
 		if (statusboxLayout.open) { openStatusReportBox(); }
 		if (fullboxLayout.open) { openFullReportBox(); }
-		// The Notes box (Tom, 2026-09-28), after the reports and before Find for the same stacking
-		// reason: Find is the smallest and ends up on top.
-		if (notesboxLayout.open) { openNotesBox(); }
 		if (hotkeysboxLayout.open) { openHotkeysBox(); }
 		if (findUserOpen) { toggleFindPopup(null, true); }
 	}
@@ -54583,7 +54610,6 @@ var EngCalcs = EngCalcs || {};
 			['lpn_alt_box', altboxLayout, null, null],
 			['lpn_full_box', fullboxLayout, saveFullboxLayout, LPN_FULLBOX_KEY],
 			['lpn_calib_box', calibboxLayout, null, null],
-			['lpn_notes_popup', notesboxLayout, saveNotesboxLayout, LPN_NOTESBOX_KEY],
 			['lpn_hotkeys_popup', hotkeysboxLayout, saveHotkeysboxLayout, LPN_HOTKEYSBOX_KEY]
 		].forEach(function (r) { registerDockBox(r[0], r[1], r[2], r[3], r[4]); });
 		applyDefaultDocks();

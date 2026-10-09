@@ -2060,7 +2060,7 @@ $ec_lang['lpn_notes_2_term']='本工具不做的事';
 // omission is a public claim about scope, and this file's history says those go wrong in the
 // confident direction; the one omission stated here is the one nothing in this tree implements
 // or claims to. Do not lengthen the list without him.
-$ec_lang['lpn_notes_2_def']='已对水质建模：水龄、来源追踪，以及在管壁和主体水流中发生反应的化学物质。未对涌浪和水锤建模：所有结果均针对恒定流或缓变流，而不是阀门快速关闭引起的瞬态压力波。';
+$ec_lang['lpn_notes_2_def']='未对涌浪和水锤建模：所有结果均针对恒定流或缓变流，而不是阀门快速关闭引起的瞬态压力波。';
 $ec_lang['lpn_notes_3_term']='保存项目';
 $ec_lang['lpn_notes_3_def']='每个项目对应一个标签页，且在您操作时即保存在本浏览器中。清除浏览器数据会将它们全部删除，因此请把成果保存到文件中：使用"文件"、"另存为"。标签页上的星号表示其中含有尚未保存到文件的更改。除非您主动要求，否则不会有任何内容写入文件。在部分浏览器中，项目会连接到您保存的文件，此后"文件"、"保存"会写回该文件；在另一些浏览器中无法建立此连接，因此"保存"不可用，只能使用"另存为"。当项目文件保存在共享磁盘上时，本页面会提示您该文件是否已被同事打开，以避免两人互相覆盖成果。';
 // Pump curve documentation (Tom, 2026-07-30: "How should we document the curve equations?").

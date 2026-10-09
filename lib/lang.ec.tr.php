@@ -2059,7 +2059,7 @@ $ec_lang['lpn_notes_2_term']='Ne yapmadığı';
 // omission is a public claim about scope, and this file's history says those go wrong in the
 // confident direction; the one omission stated here is the one nothing in this tree implements
 // or claims to. Do not lengthen the list without him.
-$ec_lang['lpn_notes_2_def']='Su kalitesi modellenir: su yaşı, kaynak izleme ve boru cidarında ve akışın kütlesinde tepkimeye giren bir kimyasal. Dalgalanma ve su darbesi modellenmez: tüm sonuçlar daimi veya yavaş değişen akış içindir, vananın hızla kapanmasının neden olduğu geçici basınç dalgası için değildir.';
+$ec_lang['lpn_notes_2_def']='Dalgalanma ve su darbesi modellenmez: tüm sonuçlar daimi veya yavaş değişen akış içindir, vananın hızla kapanmasının neden olduğu geçici basınç dalgası için değildir.';
 $ec_lang['lpn_notes_3_term']='Projeleri kaydetme';
 $ec_lang['lpn_notes_3_def']='Her proje bir sekmedir ve çalışırken her sekme bu tarayıcıya kaydedilir. Tarayıcı verilerinizi temizlemek hepsini siler, bu yüzden çalışmanızı bir dosyada tutun: Dosya, Farklı Kaydet. Bir sekmedeki yıldız işareti, bir dosyada olmayan değişiklikler taşıdığı anlamına gelir. Siz istemedikçe hiçbir şey bir dosyaya yazılmaz. Bazı tarayıcılarda bir proje, kaydettiğiniz dosyaya bağlanır ve Dosya, Kaydet bundan sonra o aynı dosyaya geri yazar; diğerlerinde bağlantı mümkün değildir, bu yüzden Kaydet devre dışıdır ve yalnızca Farklı Kaydet kullanılabilir. Bir proje dosyası paylaşılan bir sürücüde tutulduğunda, bu sayfa bir meslektaşınızın onu zaten açık tutup tutmadığını size söyler, böylece iki kişi birbirinin üzerine yazmaz.';
 // Pump curve documentation (Tom, 2026-07-30: "How should we document the curve equations?").

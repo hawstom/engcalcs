@@ -2061,7 +2061,7 @@ $ec_lang['lpn_notes_2_term']='Co se nedělá';
 // omission is a public claim about scope, and this file's history says those go wrong in the
 // confident direction; the one omission stated here is the one nothing in this tree implements
 // or claims to. Do not lengthen the list without him.
-$ec_lang['lpn_notes_2_def']='Kvalita vody se modeluje: stáří vody, sledování zdroje a chemická látka, která reaguje ve stěnách potrubí i v těle vody. Ráz a vodní kladivo se nemodelují: všechny výsledky platí pro ustálené nebo pomalu se měnící proudění, nikoli pro tlakovou vlnu při prudkém uzavření ventilu.';
+$ec_lang['lpn_notes_2_def']='Ráz a vodní kladivo se nemodelují: všechny výsledky platí pro ustálené nebo pomalu se měnící proudění, nikoli pro tlakovou vlnu při prudkém uzavření ventilu.';
 $ec_lang['lpn_notes_3_term']='Ukládání projektů';
 $ec_lang['lpn_notes_3_def']='Každý projekt je karta a každá karta se během práce ukládá do tohoto prohlížeče. Vymazání dat prohlížeče je všechny smaže, proto si práci ukládejte do souboru: Soubor, Uložit jako. Hvězdička na kartě znamená, že obsahuje změny, které nejsou v souboru. Do souboru se nikdy nic nezapíše, pokud o to nepožádáte. V některých prohlížečích se projekt připojí k souboru, do kterého jej uložíte, a Soubor, Uložit od té chvíle zapisuje zpět do stejného souboru; v jiných spojení možné není, proto je Uložit zakázáno a dostupné je pouze Uložit jako. Když je soubor projektu uložen na sdíleném disku, tato stránka vám sdělí, pokud jej má kolega už otevřený, aby si dva lidé navzájem nepřepsali práci.';
 // Pump curve documentation (Tom, 2026-07-30: "How should we document the curve equations?").

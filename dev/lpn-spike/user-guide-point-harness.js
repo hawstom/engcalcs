@@ -129,7 +129,7 @@ async function run(browser, Session, tag, url) {
 	ok('...and the ring is on Basic mode', p.id.indexOf(await a.lang('lpn_scenario_basic')) >= 0, JSON.stringify(p));
 	s = await state(page);
 	ok('nothing invoked', s.mode === before.mode && s.sig === before.sig && s.undo === before.undo && s.ls === before.ls);
-	ok('the index highlight moved to Menus', (await cur(page)) === 'menus', await cur(page));
+	ok('the index highlight moved to Menus', /^menus$|^menu-/.test(await cur(page)), await cur(page));
 	const first = { p, open1 };
 	await clickCard(page, cardSel.basic);
 	await a.settle(250);

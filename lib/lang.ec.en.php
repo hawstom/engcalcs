@@ -1075,6 +1075,9 @@ $ec_lang['lpn_examples_loading']='Loading examples…';
 $ec_lang['lpn_help_fix']='Fix something';
 $ec_lang_syn['lpn_help_fix']='Fix something, Report a mistake, Tell us what is wrong, Send a correction, Suggest a fix | avoid: fix as fasten or attach; avoid: fix as prepare';
 $ec_lang['lpn_help_notes']='Notes on this page';
+$ec_lang['lpn_guide_about_heading']='About this calculator';
+$ec_lang['lpn_guide_group_from']='From {menu}';
+$ec_lang['lpn_guide_menu_named']='{menu} menu';
 // **THE NEW BOX, TASK 745** (Tom, 2026-09-29: reorganize Help into three groups, with a new
 // "Tables and Hotkeys" box gathering all table help and all keyboard shortcuts). One key names
 // both the Help row and the box's own title bar, the same pattern lpn_help_notes already carries
@@ -2533,7 +2536,7 @@ $ec_lang['lpn_notes_2_term']='What it does not do';
 // omission is a public claim about scope, and this file's history says those go wrong in the
 // confident direction; the one omission stated here is the one nothing in this tree implements
 // or claims to. Do not lengthen the list without him.
-$ec_lang['lpn_notes_2_def']='Water quality is modeled: water age, source trace, and a chemical that reacts at the pipe wall and in the bulk flow. Surge and water hammer are not modeled: all results are for steady or slowly varying flow, not for the transient pressure wave caused by rapid valve closure.';
+$ec_lang['lpn_notes_2_def']='Surge and water hammer are not modeled: all results are for steady or slowly varying flow, not for the transient pressure wave caused by rapid valve closure.';
 $ec_lang['lpn_notes_3_term']='Saving projects';
 $ec_lang['lpn_notes_3_def']='Every project is a tab, and every tab is saved in this browser as you work. Clearing your browser data deletes them all, so keep your work in a file: File, Save as. An asterisk on a tab means it holds changes that are not in a file. Nothing is ever written to a file unless you ask. In some browsers a project connects to the file you save it to, and File, Save writes back to that same file from then on; in others no connection is possible, so Save is disabled and only Save as is available. When a project file is kept on a shared drive, this page tells you if a colleague already has it open, so that two people do not write over each other.';
 // Pump curve documentation (Tom, 2026-07-30: "How should we document the curve equations?").

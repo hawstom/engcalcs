@@ -167,7 +167,8 @@ async function pass(browser, Session, tag, extra) {
 	const audit = await page.evaluate(() => {
 		const pane = document.getElementById('lpn_guide_content');
 		const dups = Array.from(pane.querySelectorAll('dt.lpn-guide-dup'));
-		const en = Array.from(pane.querySelectorAll('.lpn-guide-boxentry')).map((e) => getComputedStyle(e));
+		// The first card under a group's heading needs no hairline: the heading's own rule is above it.
+		const en = Array.from(pane.querySelectorAll('.lpn-guide-boxentry')).filter((e) => !(e.parentNode.classList.contains('lpn-guide-group') && e === e.parentNode.querySelector('.lpn-guide-boxentry'))).map((e) => getComputedStyle(e));
 		const actX = Array.from(pane.querySelectorAll('[data-guide-section]:not([data-guide-section="tables"]) dd td:nth-child(2), [data-guide-section="tables"] dd:not(:first-of-type) td:nth-child(2)'))
 			.filter((td) => td.getClientRects().length).map((td) => Math.round(td.getBoundingClientRect().left));
 		const rail = Array.from(document.querySelectorAll('#lpn_guide_nav a')).map((a) => a.firstChild ? a.firstChild.textContent.trim() : '');

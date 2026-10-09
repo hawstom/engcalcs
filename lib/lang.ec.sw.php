@@ -2060,7 +2060,7 @@ $ec_lang['lpn_notes_2_term']='Kisichofanya';
 // omission is a public claim about scope, and this file's history says those go wrong in the
 // confident direction; the one omission stated here is the one nothing in this tree implements
 // or claims to. Do not lengthen the list without him.
-$ec_lang['lpn_notes_2_def']='Ubora wa maji umeigwa: umri wa maji, ufuatiliaji wa chanzo, na kemikali inayoitikia ukutani wa bomba na kwenye mtiririko mkuu. Msukumo wa ghafla na nyundo ya maji havijaigwa: matokeo yote ni ya mtiririko thabiti au unaobadilika polepole, si ya wimbi la shinikizo la muda mfupi linalosababishwa na kufunga vali haraka.';
+$ec_lang['lpn_notes_2_def']='Msukumo wa ghafla na nyundo ya maji havijaigwa: matokeo yote ni ya mtiririko thabiti au unaobadilika polepole, si ya wimbi la shinikizo la muda mfupi linalosababishwa na kufunga vali haraka.';
 $ec_lang['lpn_notes_3_term']='Kuhifadhi miradi';
 $ec_lang['lpn_notes_3_def']='Kila mradi ni kichupo, na kila kichupo kinahifadhiwa kwenye kivinjari hiki unapofanya kazi. Kufuta data ya kivinjari chako kunafuta yote, hivyo weka kazi yako kwenye faili: Faili, Hifadhi kama. Alama ya nyota kwenye kichupo inamaanisha kina mabadiliko ambayo hayamo kwenye faili. Hakuna kinachoandikwa kwenye faili isipokuwa uombe. Katika baadhi ya vivinjari, mradi huunganika na faili ulilolihifadhia, na Faili, Hifadhi huandika kwenye faili hilo hilo tangu wakati huo; katika vingine muunganiko hauwezekani, hivyo Hifadhi imezimwa na Hifadhi kama pekee inapatikana. Wakati faili la mradi linahifadhiwa kwenye diski inayoshirikiwa, ukurasa huu unakuambia ikiwa mwenzako tayari analo wazi, ili watu wawili wasiandikiane kazi.';
 // Pump curve documentation (Tom, 2026-07-30: "How should we document the curve equations?").

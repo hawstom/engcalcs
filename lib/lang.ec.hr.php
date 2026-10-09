@@ -2061,7 +2061,7 @@ $ec_lang['lpn_notes_2_term']='Što ne radi';
 // omission is a public claim about scope, and this file's history says those go wrong in the
 // confident direction; the one omission stated here is the one nothing in this tree implements
 // or claims to. Do not lengthen the list without him.
-$ec_lang['lpn_notes_2_def']='Kvaliteta vode je modelirana: starost vode, praćenje izvora i kemikalija koja reagira na stijenci cijevi i u masi toka. Udarni val i vodeni udar nisu modelirani: svi rezultati vrijede za stacionarni ili sporo promjenjiv protok, a ne za prijelazni tlačni val uzrokovan naglim zatvaranjem ventila.';
+$ec_lang['lpn_notes_2_def']='Udarni val i vodeni udar nisu modelirani: svi rezultati vrijede za stacionarni ili sporo promjenjiv protok, a ne za prijelazni tlačni val uzrokovan naglim zatvaranjem ventila.';
 $ec_lang['lpn_notes_3_term']='Spremanje projekata';
 $ec_lang['lpn_notes_3_def']='Svaki projekt je kartica, a svaka kartica se sprema u ovaj preglednik dok radite. Brisanje podataka preglednika briše ih sve, pa svoj rad čuvajte u datoteci: Datoteka, Spremi kao. Zvjezdica na kartici znači da sadrži promjene koje nisu u datoteci. Ništa se nikada ne zapisuje u datoteku osim ako to ne zatražite. U nekim preglednicima projekt se povezuje s datotekom u koju ga spremite, i Datoteka, Spremi od tada zapisuje natrag u tu istu datoteku; u drugima veza nije moguća, pa je Spremi onemogućeno i dostupno je samo Spremi kao. Kada je projektna datoteka na dijeljenom disku, ova stranica vas obavještava ako je kolega već ima otvorenu, tako da dvoje ljudi ne prepisuju jedno preko drugoga.';
 // Pump curve documentation (Tom, 2026-07-30: "How should we document the curve equations?").

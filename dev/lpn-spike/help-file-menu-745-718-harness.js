@@ -72,10 +72,10 @@ console.log('\n-- Task 745: the Help menu is three groups, divided by two separa
 	report(group2At.every((v, i) => i === 0 || v > group2At[i - 1]), 'group 2 stands in Tom\'s order');
 
 	// Group 3, true about.
-	const group3 = ['lpn_help_notes', 'lpn_help_welcome', 'lpn_help_screenshots', 'privacy_link',
+	const group3 = ['lpn_help_welcome', 'lpn_help_screenshots', 'privacy_link',
 		'terms_link', 'about_main_menu'];
 	const group3At = group3.map(k => rows.indexOf('pc.' + k));
-	report(group3At.every(i => i > sep2), 'group 3 (Notes, Welcome, Screenshot, Privacy, Terms, About) is entirely after the second separator');
+	report(group3At.every(i => i > sep2), 'group 3 (Welcome, Screenshot, Privacy, Terms, About) is entirely after the second separator');
 	report(group3At.every((v, i) => i === 0 || v > group3At[i - 1]), 'group 3 stands in Tom\'s order');
 
 	// Every row named by Tom is present; every row NOT named by him that Help used to carry (there
@@ -105,11 +105,7 @@ console.log('\n-- Task 745: the Tables and Hotkeys box exists and opens from Hel
 	// Moved, not duplicated: the Notes popover (which ends where this box begins) no longer shows
 	// either. Sliced narrowly so a coincidental substring match elsewhere on the page cannot pass
 	// this by accident.
-	const notesAt = page.indexOf('id="lpn_notes_popup"');
-	const notesBlock = page.slice(notesAt, at);
-	report(notesBlock.indexOf("$ec_lang['lpn_notes_6_term']") < 0 &&
-		notesBlock.indexOf("$ec_lang['lpn_notes_7_term']") < 0,
-		'and the Notes popover no longer shows either -- moved, not duplicated');
+	report(page.indexOf('id="lpn_notes_popup"') < 0, 'and there is no Notes popover to duplicate them (it moved into the Guide, 2026-10-09)');
 
 	console.log('\n-- Task 745: the box carries ALL keyboard shortcuts, by context --');
 	report(boxBlock.indexOf("$ec_lang['lpn_hotkeys_map_term']") > 0, 'a Map context is in the box');

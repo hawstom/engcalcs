@@ -4489,6 +4489,7 @@ html[dir="rtl"] .lpn-guide-railtoggle svg { transform: scaleX(-1); }
 .lpn-guide-nav a:hover { background: var(--ec-hover-bg); }
 .lpn-guide-nav a[aria-current="true"] { border-inline-start-color: var(--ec-accent); font-weight: bold; background: var(--ec-hover-bg); }
 .lpn-guide-nav a.lpn-guide-nav-sub { padding-inline-start: 18px; }
+.lpn-guide-nav a.lpn-guide-nav-sub2 { padding-inline-start: 30px; }
 .lpn-guide-nav-snip { display: block; font-weight: normal; color: var(--ec-ink-muted); font-size: .9em; }
 .lpn-guide-rail-collapsed .lpn-guide-rail { flex-basis: 34px; padding-inline-end: 2px; }
 .lpn-guide-rail-collapsed .lpn-guide-railtitle, .lpn-guide-rail-collapsed .lpn-guide-railbody { display: none; }
@@ -4534,6 +4535,25 @@ html[dir="rtl"] .lpn-guide-rail-collapsed .lpn-guide-railtoggle svg { transform:
 	font-size: 1rem; font-weight: bold; margin: .9em 0 .3em; padding-bottom: .15em;
 	border-bottom: 1px solid var(--ec-border);
 }
+/* The second level of the hierarchy (a menu under Menus, a menu's boxes under Boxes): heavier than
+   an entry name, lighter than the section. */
+.lpn-guide-menu > h3, .lpn-guide-group > h3 {
+	font-size: 1.05rem; margin-top: 1.1em; border-bottom-color: var(--ec-border-strong);
+}
+.lpn-guide-group > h3 { padding-inline: 5px; }
+.lpn-guide-group > .lpn-guide-boxentry:first-of-type { border-top: 0; }
+/* A main heading is a disclosure: the whole row toggles; the chevron says so. */
+.lpn-guide-section > h2 { cursor: pointer; }
+.lpn-guide-disc {
+	display: inline-flex; align-items: center; gap: .35em; margin: 0; padding: 0; border: 0; background: none;
+	font: inherit; color: inherit; cursor: pointer; text-align: start; user-select: none;
+}
+.lpn-guide-disc:focus-visible { outline: 2px solid var(--ec-accent); outline-offset: 2px; }
+.lpn-guide-disc-chev { width: .9em; height: .9em; flex: 0 0 auto; transition: transform .12s; }
+.lpn-guide-collapsed .lpn-guide-disc-chev { transform: rotate(-90deg); }
+html[dir="rtl"] .lpn-guide-collapsed .lpn-guide-disc-chev { transform: rotate(90deg); }
+@media (prefers-reduced-motion: reduce) { .lpn-guide-disc-chev { transition: none; } }
+.lpn-guide-section.lpn-guide-collapsed > :not(h2) { display: none; }
 .lpn-guide-section dd { margin: 0 0 .6em; }
 .lpn-guide-boxentry > h3 { font-size: 1rem; font-weight: bold; }
 /* A Boxes entry is separated as a toolbar row group is: 12 px of air and the same hairline. */

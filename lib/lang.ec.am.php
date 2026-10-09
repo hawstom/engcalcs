@@ -2059,7 +2059,7 @@ $ec_lang['lpn_notes_2_term']='የማያደርገው';
 // omission is a public claim about scope, and this file's history says those go wrong in the
 // confident direction; the one omission stated here is the one nothing in this tree implements
 // or claims to. Do not lengthen the list without him.
-$ec_lang['lpn_notes_2_def']='የውሃ ጥራት ይመሰላል፦ የውሃ እድሜ፣ የምንጭ ፍለጋ፣ እና በቧንቧ ግድግዳ ላይና በጅምላ ፍሰት ውስጥ ምላሽ የሚሰጥ ኬሚካል። ሰርጅና የውሃ መዶሻ አይመሰሉም፦ ሁሉም ውጤቶች ለተረጋጋ ወይም ቀስ ብሎ ለሚለዋወጥ ፍሰት ናቸው፣ ቫልቭ በፍጥነት በመዘጋቱ ለሚፈጠረው ጊዜያዊ የግፊት ማዕበል አይደሉም።';
+$ec_lang['lpn_notes_2_def']='ሰርጅና የውሃ መዶሻ አይመሰሉም፦ ሁሉም ውጤቶች ለተረጋጋ ወይም ቀስ ብሎ ለሚለዋወጥ ፍሰት ናቸው፣ ቫልቭ በፍጥነት በመዘጋቱ ለሚፈጠረው ጊዜያዊ የግፊት ማዕበል አይደሉም።';
 $ec_lang['lpn_notes_3_term']='ፕሮጀክቶችን ማስቀመጥ';
 $ec_lang['lpn_notes_3_def']='እያንዳንዱ ፕሮጀክት አንድ ትር ነው፣ እያንዳንዱ ትርም ሲሰሩ በዚህ አሳሽ ውስጥ ይቀመጣል። የአሳሽዎን መረጃ ማጽዳት ሁሉንም ይሰርዛል፣ ስለዚህ ስራዎን በፋይል ውስጥ ያቆዩ፦ ፋይል፣ እንደ አስቀምጥ። በትር ላይ ያለ ኮከብ ምልክት ወደ ፋይል ያልገቡ ለውጦችን እንደያዘ ያሳያል። እርስዎ ካልጠየቁ በስተቀር ምንም ነገር ወደ ፋይል አይጻፍም። በአንዳንድ አሳሾች ፕሮጀክት ካስቀመጡበት ፋይል ጋር ይገናኛል፣ ከዚያ በኋላ ፋይል፣ አስቀምጥ ወደዚያው ፋይል መልሶ ይጽፋል፤ በሌሎች ደግሞ ግንኙነት አይቻልም፣ ስለዚህ አስቀምጥ ተሰናክሎ እንደ አስቀምጥ ብቻ ይገኛል። የፕሮጀክት ፋይል በጋራ ድራይቭ ላይ ሲቀመጥ፣ ይህ ገጽ ባልደረባ ቀድሞውኑ ከፍቶት እንደሆነ ይነግርዎታል፣ ስለዚህ ሁለት ሰዎች እርስ በእርስ አይተካኩም።';
 // Pump curve documentation (Tom, 2026-07-30: "How should we document the curve equations?").

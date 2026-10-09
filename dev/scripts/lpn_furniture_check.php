@@ -128,9 +128,9 @@ const EC_LPN_FURNITURE = [
     'lpn_fullbox'     => 'position, size and openness of the Full report box (Task 715)',
     'lpn_dockbox'     => 'where the boxes that keep no record of their own are docked, in what order, '
         . 'and whether each docked one is open (Tom, 2026-10-07: all docks remembered)',
-    // The Notes box joined the standing-box shell on Tom's word (2026-09-28: *"Draggable non-hog
-    // box for Help, Notes."*) after being a centred, click-away-dismissed popover until then.
-    'lpn_notesbox'    => 'position, size and openness of the Notes box',
+    // RETIRED 2026-10-09 (the Notes moved into the Guide): nothing writes it any more; the erase-all
+    // list still sweeps an old browser's copy.
+    'lpn_notesbox'    => 'retired record of the Notes box, swept by Erase everything',
     'lpn_hotkeysbox'  => 'position, size, openness and Contents-rail collapse of the Guide box (Task 745)',
     'lpn_contourbox'  => 'position, size and openness of the Contour plot box (Task 600)',
     // The Screenshot box (Tom, 2026-10-05). Its magnification rides here too: how sharp a picture

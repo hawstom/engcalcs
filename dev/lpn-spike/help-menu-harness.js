@@ -39,12 +39,13 @@ function report(ok, label, detail) {
 
 console.log('\n-- the Notes are still CONTENT, not a JS string --');
 {
-	report(page.indexOf('id="lpn_notes_popup"') > 0, 'the notes popover exists in the page');
+	// Moved into the Guide (Tom, 2026-10-09: "Shouldn't this also go in the guide now?"): no popover.
+	report(page.indexOf('id="lpn_notes_popup"') < 0, 'there is no notes popover: the notes live in the Guide');
 	// Every note is still a real <dt>/<dd> pair emitted by PHP from a lang key. If these ever move
 	// into JS they leave the indexable document, and no other check would notice.
 	const dts = (page.match(/<dt><\?=\$ec_lang\['lpn_notes_/g) || []).length;
 	report(dts >= 9, 'every note is still PHP-rendered markup in the page', `${dts} terms`);
-	report(page.indexOf("$ec_lang['ws_notes_heading']") > 0, 'and it keeps the suite-wide Notes heading');
+	report(page.indexOf('data-guide-section="notes"') > 0, 'and the Guide has a Notes section');
 	// **THE TABLE NOTE SPLIT INTO TWO TABLES** (Tom, 2026-09-26: reorganize the one list into two
 	// two-column tables, "Table columns help" and "Table keyboard shortcuts"). lpn_notes_6 is the
 	// columns table, lpn_notes_7 the keyboard-shortcuts table, and the page must show both.
@@ -77,40 +78,13 @@ console.log('\n-- the Notes are still CONTENT, not a JS string --');
 	report(!!colsDefMatch && colsDefMatch[1].indexOf('lpn-notes-table') > 0 &&
 		!!keysDefMatch && keysDefMatch[1].indexOf('lpn-notes-table') > 0,
 		'both are real <table class="lpn-notes-table">, not a styled list');
-	// Inside the popover, not floating loose: the popover opens with display:none, so the content
-	// is present but not occupying the page.
-	const at = page.indexOf('id="lpn_notes_popup"');
-	const block = page.slice(at, at + 4000);
-	report(/display:none/.test(block.slice(0, 300)), 'the popover starts hidden');
-	report(block.indexOf("$ec_lang['lpn_notes_3_term']") > 0, 'and the notes live inside it');
 	report(!/lpn_notes_\w+ *:/.test(src), 'no note text was smuggled into pageConfig as a JS string');
 }
 
-console.log('\n-- the Notes box is a non-hog reference box, not a pull-down (Tom, 2026-09-28) --');
+console.log('\n-- the Notes box is gone (Tom, 2026-10-09) --');
 {
-	// **NOT IN VIEW_POPOVERS ANY MORE.** Tom, 2026-09-28: "Draggable non-hog box for Help, Notes.
-	// I need it open for my spreadsheet editing video." A box he leaves open through an editing
-	// session must not vanish because a click landed on the map or a table.
-	report(!/VIEW_POPOVERS = \[[^\]]*'lpn_notes_popup'/.test(src),
-		'it is NOT in VIEW_POPOVERS -- a click on the map or a table must not close it');
-	report(/function toggleNotesPopup/.test(src), 'it toggles rather than only opening');
-	report(/wireNotesPopup\(\);/.test(src), 'its close button and drag/resize memory are wired at init');
-	report(page.indexOf('id="lpn_notes_close"') > 0, 'and it has a close button');
-	report(/lpn-popover-body/.test(page.slice(page.indexOf('id="lpn_notes_popup"'), page.indexOf('id="lpn_notes_popup"') + 1500)),
-		'its body scrolls, since prose can be taller than the map it covers');
-	// Draggable, resizable and remembered per browser, the same shell as Settings and the report
-	// boxes -- see dev/lpn-spike/box-open-memory-harness.js for the drag/reopen/keystroke proof.
-	{
-		const notesAt = page.indexOf('id="lpn_notes_popup"');
-		const tagStart = page.lastIndexOf('<div', notesAt);
-		const tagEnd = page.indexOf('>', notesAt);
-		report(page.slice(tagStart, tagEnd).indexOf('lpn-setbox') > 0,
-			'it wears the standing-box shell (lpn-setbox)');
-	}
-	report(/id="lpn_notes_title"/.test(page), 'it has a title bar to drag by');
-	report(/LPN_NOTESBOX_KEY *= *'lpn_notesbox'/.test(src), 'its layout is remembered under lpn_notesbox');
-	report(/box\.addEventListener\('keydown', function \(e\) \{\s*if \(e\.key === 'Escape'\) \{ e\.preventDefault\(\); closeNotesPopup\(\); \}/.test(src),
-		'Escape closes it only when bound to the box itself, i.e. only when focus is inside it');
+	report(!/toggleNotesPopup|openNotesBox|closeNotesPopup|LPN_NOTESBOX_KEY/.test(src), 'no code is left for a Notes box');
+	report(page.indexOf('id="lpn_notes_close"') < 0, 'and no close button for one');
 }
 
 console.log('\n-- the invitation landed somewhere real before the page dropped it --');
@@ -165,7 +139,7 @@ console.log('\n-- the Help menu rows --');
 	// "Leave site?" dialog mid-edit.
 	report(/ext\(LPN_SCREENSHOTS_URL\)/.test(body),
 		'both go through ext(), so neither can navigate this tab away from a dirty project');
-	report(/pc\.lpn_help_notes/.test(body), 'Notes');
+	report(!/pc\.lpn_help_notes/.test(body), 'no Notes row: the notes are in the Guide');
 	report(/pc\.lpn_help_fix/.test(body), 'Fix something');
 	// **ABOUT IS BACK IN HELP, AND THE MARK IS A LINK AGAIN** (Ida's reversal, 2026-09-11). It
 	// spent an hour in a menu hanging off the product mark; macOS keeps About in a BOLD APP-NAME
@@ -197,7 +171,7 @@ console.log('\n-- the Help menu rows --');
 	// *"Maybe items 2 and 3 combined into a simple User Manual"*), still in group 1.
 	const order = ['lpn_help_walkthroughs', 'lpn_help_manual',
 		'lpn_help_fix', 'install_main_menu', 'consent_settings_link',
-		'lpn_help_notes', 'lpn_help_welcome', 'lpn_help_screenshots', 'privacy_link', 'terms_link',
+		'lpn_help_welcome', 'lpn_help_screenshots', 'privacy_link', 'terms_link',
 		'about_main_menu'];
 	const at = order.map(k => body.indexOf('pc.' + k));
 	report(at.every(i => i >= 0), 'every row Help kept is in Help');
@@ -213,11 +187,11 @@ console.log('\n-- the Help menu rows --');
 		const iconsAt = rowsList.indexOf('pc.lpn_help_manual'),
 			fixAt = rowsList.indexOf('pc.lpn_help_fix'),
 			cookiesAt = rowsList.indexOf('pc.consent_settings_link'),
-			notesAt = rowsList.indexOf('pc.lpn_help_notes'),
+			notesAt = rowsList.indexOf('pc.lpn_help_welcome'),
 			sep1 = rowsList.indexOf('{ separator: true }'),
 			sep2 = rowsList.indexOf('{ separator: true }', sep1 + 1);
 		report(sep1 > iconsAt && sep1 < fixAt, 'the first separator falls between User guide and Fix something');
-		report(sep2 > cookiesAt && sep2 < notesAt, 'the second separator falls between Cookie settings and Notes');
+		report(sep2 > cookiesAt && sep2 < notesAt, 'the second separator falls between Cookie settings and the Welcome page');
 	}
 	// Everything the mark's menu had borrowed is back where it started.
 	['about_main_menu', 'install_main_menu', 'privacy_link', 'terms_link', 'consent_settings_link']
@@ -251,12 +225,6 @@ console.log('\n-- the Help menu rows --');
 	});
 	// About last, where every other Help menu in the world puts it.
 	report(body.indexOf('about_main_menu') > body.indexOf('lpn_help_fix'), 'About is last');
-	// Notes is the one row that does not leave the page, so it must NOT be an ext().
-	// Matched on the KEY and the handler, never on the fallback English between them: Wave 0
-	// renamed that fallback to 'Notes on this page' (2026-08-17) and a literal match turned red
-	// for a wording change, which is not what this check is about.
-	report(/label: pc\.lpn_help_notes \|\| '[^']*', fn: toggleNotesPopup/.test(body),
-		'Notes reveals in place rather than opening a tab');
 }
 
 console.log('\n-- the footer gives up its navigation and keeps its notice --');
@@ -382,15 +350,16 @@ console.log('\n-- the strings exist --');
 console.log('\n-- the Notes trim (Tom, 2026-10-06): five advisories stay, two scope notes move to About, the tour is gone --');
 {
 	const grab = (id, len) => { const at = page.indexOf('id="' + id + '"'); return page.slice(at, at + len); };
-	const notesAt = page.indexOf('id="lpn_notes_popup"');
+	const notesAt = page.indexOf('data-guide-section="notes"');
 	const notes = page.slice(notesAt, page.indexOf('</dl>', notesAt));
 	const keys = (notes.match(/<dt><\?=\$ec_lang\['(lpn_notes_\w+?)_term'\]/g) || []).map(m => m.replace(/.*\['|_term.*/g, ''));
 	report(JSON.stringify(keys) === JSON.stringify(['lpn_notes_3', 'lpn_notes_5', 'lpn_notes_color', 'lpn_notes_epanet', 'lpn_notes_engine']),
-		'the Notes box shows exactly the five kept sections', keys.join(','));
+		'the Guide\'s Notes section shows exactly the five kept notes', keys.join(','));
 	const aboutAt = page.indexOf('id="lpn_about_popup"');
-	const about = page.slice(aboutAt, page.indexOf('id="lpn_notes_popup"'));
-	report(about.indexOf("$ec_lang['lpn_notes_1_term']") > 0 && about.indexOf("$ec_lang['lpn_notes_2_term']") > 0,
-		'the About box shows How it is solved and What it does not do');
+	const about = page.slice(aboutAt, page.indexOf('<div id="lpn_hotkeys_popup"'));
+	const guideAbout = page.indexOf('data-guide-section="about"');
+	report(about.slice(0, guideAbout - aboutAt).indexOf("$ec_lang['lpn_notes_1_term']") < 0 && page.slice(guideAbout, guideAbout + 600).indexOf("$ec_lang['lpn_notes_1_term']") > 0,
+		'How it is solved and What it does not do are in the Guide, not the About box (Tom, 2026-10-09)');
 	report(!/lpn_notes_4/.test(page) && !/lpn_notes_4_/.test(en), 'Also on this page is gone from the page and the English file');
 	const priv = require('fs').readFileSync(require('path').join(__dirname, '..', '..', 'privacy.php'), 'utf8');
 	report(/Offline copy of the suite \(browser cache\)/.test(priv) && /sent nowhere/.test(priv) && /no identifier/.test(priv),
