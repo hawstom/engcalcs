@@ -207,7 +207,8 @@ the block.
   user's to edit. **First item: the full alternatives and inheritance model under the hood** (stages
   4 and 5), after advice from every angle (*"Order matters... we are likely to make mistakes"*).
   Stages, answers and code: `dev/scenario-alternatives.md` on `feat/bentley-interop`. Basic mode
-  hides it until the Advanced UX is designed. Task 765 (Presentation) is folded in here.
+  hides it until the Advanced UX is designed. Task 765 (Presentation) is folded in here. Stage 6 (the
+  Scenario manager and the Scenarios table, Tom's calls of 2026-10-09) is built on the branch.
 - 100|781| **Active topology first; then Change type becomes a new asset in the old one's place.**
   Tom, 2026-10-08, choosing "Active topology first": *"I never wanted what we have anyway. Now that
   I understand, I want it changed. Change type is to be make a new object at the location of the old

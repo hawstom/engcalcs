@@ -52,7 +52,6 @@ const L = loadLoopedNetwork(
 	"\t\texportInp: function () { return EngCalcs.lpnExportInp(serializeProject(), inpExportOptions()); },\n" +
 	"\t\tcompare: runScenarioCompare, rebuildReport: rebuildScenarioCompareReport,\n" +
 	"\t\topenCmp: function () { document.getElementById('lpn_scncmp_box').style.display = 'flex'; },\n" +
-	"\t\trebuildAlt: rebuildAlternativesTable,\n" +
 	"\t\trefreshStatus: refreshScenarioStatus,\n" +
 	"\t\tsetEngine: function (e) { settings.engine = e; },\n" +
 	"\t\tbuildLayers: function () { svg = document.getElementById('lpn_canvas');\n" +
