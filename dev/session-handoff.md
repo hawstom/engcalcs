@@ -99,43 +99,64 @@ lines rather than appending corrections.
   tile counts at a 900 ms settle (basemap.js now waits for a pointable tile). Pre-existing and unrelated: `scale-publish-harness.js` (2 checks). The full `node dev/browser-pass/run.js` is green (1853/1853, 2026-10-04, Task 761); browser-pass specs are not in
   check_all.
 
-## STATE — 2026-10-08 (ninth session, Arizona time)
+## STATE — 2026-10-08 (tenth session, Arizona time)
 
-### Master = see `git log -1 master`, pushed. Production: last confirmed pull edc78d01 (2026-10-07); confirm with the About box
+### Master = 4ebfdbf6, pushed. Production: last confirmed pull edc78d01 (2026-10-07); confirm with the About box
 
-Merged this session: chore/wave0-apply-1008 (his Wave 0 answers; five $ec_lang_syn notes, two in his
-words, three on his "Use proposed"), chore/sprint-1008 (26 languages, 224 new and 343 resynced keys; only
-consent_body left CHANGED on purpose), fix/mnemonic-han-harness, fix/sw-precache-log (the service worker's
-first install wrote ~23 page-load rows per visit; now one), chore/protect-1008. Deleted keys: none.
+Merged 10-08 (tenth): feat/hover-label on his words (all-clear on file, pinned 31b137e5; his item (1),
+every example labels node IDs N and link IDs L, built first); fix/dock-box-width (bentley-interop's two
+general dock commits, 364a8757 and 8ee43015, cherry-picked; the two Alternatives-box ones stay there);
+fix/example-prefix-harnesses (six harnesses expected bare IDs; no page defect). Deleted keys: none
+(key_hygiene_check: 0 unrendered on master and on bentley-interop). New on a visitor's device:
+`lpn_hovercard` (the literal `off` only when the hover card is switched off; inventory row added).
 
-### Awaiting him
+**His answers this session, already applied:** "full" in "Show the full label on hover" still fits
+(yes); storage full / unreadable / unit unknown stay hideable (yes).
 
-- **Merge words he must TYPE in the session** (the classifier refused CC writing an all-clear from his
-  pasted 10-08 message, which said "feat/table-export: Merge." and "feat/dxf: Merge."). Pins when he types:
-  table-export at its head after master is merged in; then master into dxf, then dxf. After dxf merges:
-  customers to colour 7 on a fix branch (his F03), and record his lpn_dxf_note_blocks "Use as written"
-  in english-key-rulings.json (not done on the branch, so his pin would not lapse).
-- **Calls page** https://claude.ai/artifact/1eHT8AMCRcRhcbjtsKUzNd, same db collection `answers`; new ids
-  G01-G10, `w2-<key>` (5 strings), `v2-<key>` (3 sprint questions). The F/v/w answers of 10-08 are applied.
-- Browser pass, fix rounds done and Perry-checked where large: feat/message-dismiss (visible x),
-  feat/workspace (import applies in place, no reload; Perry's placement defect fixed, 60879c22), feat/bentley-interop
-  (auto-hide may cover the map, pinned keeps 320 px, every box), feat/user-guide (14.4 px like Settings,
-  Ctrl+K raises, focus sentence), feat/hover-label (NEW, Task 773, port 8110), feat/visit-dedupe (F01 built:
-  ec_code; Safari-safe; waits on G01-G05 and a consent_body translation round BEFORE merge), plus
-  feat/section-grid and feat/desktop from before.
-- **Seam when feat/workspace and feat/bentley-interop both merge:** `if (boxSaveHeld()) { return; }` at
-  the top of `saveAltboxLayout`; add 'lpn_altbox' and 'lpn_hovercard' to the import-site names in
-  storage_inventory_check.php if workspace export should carry them.
-- **Sprint 1008 close-out:** three English questions open (v2- on the page); `friction_check.php
-  --sprint=1008` exits 1 until answered and applied. Branch keys (six branches) join a later delta sprint,
-  with consent_body and the two consent strings first.
+### Calls page round 3: https://claude.ai/artifact/Y9kwZdxhLkAse2dFqmDtHq (answers in its db)
+
+H01-H08 the Scenario manager (stage 6 of Task 721: Ida, Sue, Declan disagree on its shape; journals
+committed); H09-H11 message-dismiss; H12 Shapes (Task 779, point drawn as ×?); H13-H16 Task 781;
+w3-* the 781 English; v3-* four Wave 0 referrals that block the delta sprint. Read it with ArtifactData
+list `answers`; write rules from his free text, never the option label.
+
+### Not yet on master (all pushed as branches)
+
+- **chore/calls-1008c** (merge on green): adviser and Perry journals; `dev/english-friction/1008c-wave0.json`
+  (37 keys passed, 4 referred, 6 dismissed); DXF tip says "asset", not "element" (his 10-07 call; it
+  had broken user-guide-column-harness); this handoff.
+- **feat/user-guide**: his 10-08 browser pass fixed (9e0c0ef6): a card never runs its control; it
+  opens what holds it, rings it in `--ec-point` for 2.5 s, then closes it; any card click closes the
+  previous card's menu; search hits show the full path (Scenarios › Basic mode); Properties and
+  Alternatives preview say how they open (new keys lpn_guide_not_shown, lpn_guide_how_popup,
+  lpn_guide_how_alt). Perry's review drove the second round. Needs his browser pass.
+- **feat/message-dismiss**: Perry: ready for his browser pass. Also carries Zoom Window (W key).
+  His H09-H11 answers may change it first.
+- **feat/bentley-interop** (6b92ff72): Task 781 built (active topology; Change type outside Base makes a
+  new asset, its links replaced with it; the type-per-scenario override removed). Perry confirmed the
+  hydraulics against a hand-made Net1 and found a false promise (controls naming a replaced asset were
+  NOT left out; EPANET Error 200, silent fallback) and Properties stuck on the old asset; both fixed,
+  harness section 10 holds his case. Open by design, on his H15: customers cannot move per scenario;
+  new assets are copies (proposed box sentence); a child's own overrides not copied. Needs his calls
+  (H13-H16, w3-*) and the stage 6 manager before a merge ask. Trap: a page loaded later in one harness
+  process becomes lpn-time.js's clock host for every earlier page.
+- **feat/visit-dedupe**: unchanged; G01 consent translation still owed before merge; syn notes for
+  consent_current_granted and consent_region_label still describe logging (propose; AI may not write).
+- Unchanged: feat/section-grid, feat/desktop await his browser pass; label-placer branches bench only.
 
 ### Next job
 
-- Read the calls page; apply; merge what he clears (merge master in first, regenerate payloads on the
-  merge, suite on the merge).
-- G01 "Translate first": 26 Sonnet agents on feat/visit-dedupe for consent_body plus the two banner strings.
-- Task 714 (theming) is the next 75 build if nothing of his is waiting.
+Read his calls-page answers. Then: the delta sprint (`1008c`, ~40 keys plus whatever merges), on his
+four Wave 0 answers (authorized: "Proceed with a translation sprint whenever you deem it prudent");
+stage 6 build on his H01-H08; the 781 gaps on H15.
+
+### Traps met 2026-10-08 (tenth session)
+
+- **A builder reported "all lpn harnesses passed" and six failed on master** after its merge (the N/L
+  example prefixes; harnesses expected bare IDs). Run the suite on the merge commit before pushing, always.
+- **`git commit --amend` on a merge commit is refused on master** (pre-commit sees a non-merge commit).
+  Put a forgotten generated file on a fix branch and merge it.
+- **`new_english_keys.php` without `--write` only prints**; check_all then fails "new english keys listed".
 
 ### Traps met 2026-10-08 (ninth session)
 

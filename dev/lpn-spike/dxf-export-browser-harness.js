@@ -162,7 +162,7 @@ function checkDrawing(label, out, geo) {
 		ids.length + rest.length === attribs.length && attribs.concat(attdefs).every((e) => (+get(e, 70) & 1) === 0), (ids.length + rest.length) + ' ATTRIBs, ' + attdefs.length + ' ATTDEFs');
 	// Tom 2026-10-07: blue is unreadable on a dark screen. No ACI 5 on any layer or entity.
 	ok(label + ': no colour 62/420 value of 5 (blue) in the whole file', !P.some((p) => (p[0] === 62 || p[0] === 420) && String(p[1]).trim() === '5'), 'layer colours: ' + tables.filter((e) => e.type === 'LAYER').map((e) => get(e, 2) + '=' + get(e, 62)).join(' '));
-	ok(label + ': layer colours are all among 1, 2, 3, 4, 6, 7 (customer 8 aside)', tables.filter((e) => e.type === 'LAYER').every((e) => [1, 2, 3, 4, 6, 7, 8].includes(Math.abs(+get(e, 62)))));
+	ok(label + ': layer colours are all among 1, 2, 3, 4, 6, 7', tables.filter((e) => e.type === 'LAYER').every((e) => [1, 2, 3, 4, 6, 7].includes(Math.abs(+get(e, 62)))));
 	// Stacked, not overprinted: within one INSERT the attributes sit at distinct places.
 	let grp = [], overlap = 0;
 	ents.forEach((e) => { if (e.type === 'INSERT' || e.type === 'SEQEND') { const k = grp.map((a) => get(a, 10) + '/' + get(a, 20)); if (new Set(k).size !== k.length) { overlap++; } grp = []; } else if (e.type === 'ATTRIB') { grp.push(e); } });

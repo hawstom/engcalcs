@@ -5378,3 +5378,9 @@ tr.lpn-ff-error { background: var(--ec-gray-f2f2f2); }
 /* Paragraphs inside an explanation (EngCalcs.tipHtml()). */
 .tooltip.ec-explain .tooltip-inner p { margin: 0 0 0.6em; }
 .tooltip.ec-explain .tooltip-inner p:last-child { margin-bottom: 0; }
+
+/* The map's hover card (Task 773): the suite's name tip, parked on a one-pixel anchor at the
+   pointer. It must never take a click. */
+.lpn-hovercard-anchor { position: fixed; width: 1px; height: 1px; pointer-events: none; }
+.tooltip.lpn-hovercard { pointer-events: none; }
+.tooltip.lpn-hovercard .tooltip-inner { text-align: left; }

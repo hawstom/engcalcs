@@ -11015,8 +11015,8 @@ var EngCalcs = EngCalcs || {};
 	// defaultLabelSettings().customer for why that changed). The ORDER is the order of
 	// customerFieldDefs(), which is the order the checkboxes are drawn in, so what a reader ticks
 	// top to bottom is what they get left to right.
-	function customerLabelLines(c) {
-		var ls = labelSettings, cd = ls.decimals.customer, lines = [];
+	function customerLabelLines(c, lsOverride) {
+		var ls = lsOverride || labelSettings, cd = ls.decimals.customer, lines = [];
 		if (ls.customer.id) { lines.push(affix('customer', 'id', { text: c.id })); }
 		// Demand over Base demand, which is refreshLabelTextPass()'s own order for a junction.
 		// rawLine() for both: a customer's numbers are already in the displayed flow unit, because
@@ -12204,6 +12204,7 @@ var EngCalcs = EngCalcs || {};
 	// an edit lands, with recalculate off and no solve running.
 	function refreshOneLabelInPlace(el) {
 		labelCacheTaint();
+		hoverCardHide();
 		// A pass already owed runs first (Task 653), so this one label is reflowed among neighbours
 		// that are where the owed pass puts them. It is the pass somebody else asked for, not one
 		// this edit triggers: with nothing owed this is a no-op.
@@ -12213,42 +12214,9 @@ var EngCalcs = EngCalcs || {};
 		if (group === 'node') {
 			var n = el, ne = nodeEls[n.id];
 			if (!ne) { return; }
-			lines = [];
-			if (ls.node.id) { lines.push(affix('node', 'id', { text: n.id })); }
-			// The two identity words, as the full pass prints them (Task 774): this single-label
-			// path left them out, so a Description just typed did not reach its own label.
-			if (ls.node.desc && n.desc) { lines.push(affix('node', 'desc', { text: String(n.desc) })); }
-			if (ls.node.tag && n.tag) { lines.push(affix('node', 'tag', { text: String(n.tag) })); }
-			// **GUARDED, WHERE THE FULL PASS IS NOT.** A junction with no demand stated at all
-			// resolves to `undefined` (resolvedDemand()/baseDemandTotal() hand back `rows[0].base`
-			// verbatim), and rawLine() has no guard of its own -- plainRound() returns undefined for
-			// a non-number and `.toFixed()` on that throws. refreshLabelTextPass() carries the same
-			// unguarded call and has simply never been driven at this one node with demandActual on;
-			// a single-element refresh reaches combinations a whole-document pass may not have, so
-			// it cannot rely on that silence. Same treatment elev/quality/initQuality already get.
-			var demandActualVal = resolvedDemand(n), demandVal = baseDemandTotal(n);
-			if (!isFixedHeadNode(n) && ls.node.demandActual && typeof demandActualVal === 'number') { lines.push(affix('node', 'demandActual', rawLine(demandActualVal, null, nd.demandActual))); }
-			if (!isFixedHeadNode(n) && ls.node.demand && typeof demandVal === 'number') { lines.push(affix('node', 'demand', rawLine(demandVal, null, nd.demand))); }
-			var headVal = isFixedHeadNode(n)
-				? fixedHeadDisplay(n)
-				: (lastSolveResult ? toDisplay(lastSolveResult.heads[n.id], resultUnit('elevhead')) : undefined);
-			var pressVal = isFixedHeadNode(n)
-				? fixedHeadPressure(n)
-				: (lastSolveResult ? toDisplay(lastSolveResult.pressures[n.id], resultUnit('pressure')) : undefined);
-			if (ls.node.head && headVal !== undefined) { lines.push(affix('node', 'head', rawLine(headVal, null, nd.head))); }
-			if (ls.node.pressure && pressVal !== undefined) { lines.push(affix('node', 'pressure', rawLine(pressVal, null, nd.pressure))); }
-			if (ls.node.elev && typeof n.elev === 'number') { lines.push(affix('node', 'elev', rawLine(n.elev, null, nd.elev))); }
-			// **TANK WATER DEPTH, TANK ONLY** (Task 696), same treatment elev/quality/initQuality
-			// get above: guarded, and with no extrema mark (null) since this is one label, not a pass.
-			var levelVal = n.type === 'tank' ? effective(n, 'level') : undefined;
-			if (ls.node.level && typeof levelVal === 'number') { lines.push(affix('node', 'level', rawLine(levelVal, null, nd.level))); }
-			var qualVal = nodeQualityValue(n);
-			if (ls.node.quality && qualVal !== undefined) { lines.push(affix('node', 'quality', rawLine(qualVal, null, qualityDecimals(nd)))); }
-			var initQualVal = nodeInitQuality(n);
-			if (ls.node.initQuality && initQualVal !== undefined) { lines.push(affix('node', 'initQuality', rawLine(initQualVal, null, nd.initQuality))); }
+			lines = nodeLabelFieldLines(n, ls, null);
 			ne.empty = lines.length === 0;
 			if (lines.length === 0) { lines.push({ text: '' }); }
-			lines = nodeDisplayOrder(lines);
 			ne.allLines = lines;
 			writeNodeLabelGlyphs(ne, n, lines, fsNow);
 			measureLabelWidths(ne);
@@ -12256,31 +12224,7 @@ var EngCalcs = EngCalcs || {};
 		} else if (group === 'link') {
 			var l = el, le = linkEls[l.id];
 			if (!le) { return; }
-			lines = [];
-			if (ls.link.id) { lines.push(affix('link', 'id', { text: l.id })); }
-			if (ls.link.desc && l.desc) { lines.push(affix('link', 'desc', { text: String(l.desc) })); }
-			if (ls.link.tag && l.tag) { lines.push(affix('link', 'tag', { text: String(l.tag) })); }
-			if (l.type === 'pipe') {
-				if (ls.link.diameter) { lines.push(affix('link', 'diameter', rawLine(effective(l, 'diameter'), null, ld.diameter))); }
-				if (ls.link.length) { lines.push(affix('link', 'length', rawLine(effective(l, 'length'), null, ld.length))); }
-				if (ls.link.roughness) { lines.push(affix('link', 'roughness', rawLine(effective(l, 'roughness'), null, ld.roughness))); }
-				if (ls.link.km) { lines.push(affix('link', 'km', rawLine(pipeK(l), null, ld.km))); }
-			} else if (l.type === 'valve') {
-				if (ls.link.diameter) { lines.push(affix('link', 'diameter', rawLine(effective(l, 'diameter'), null, ld.diameter))); }
-			}
-			if (lastSolveResult && !linkResultHeld(l) && lastSolveResult.flows[l.id] !== undefined) {
-				if (ls.link.flow) { lines.push(affix('link', 'flow', numLine(shownFlow(lastSolveResult.flows[l.id]), resultUnit('flow'), null, ld.flow))); }
-				if (ls.link.velocity && l.type !== 'pump') { lines.push(affix('link', 'velocity', numLine(lastSolveResult.velocities[l.id], resultUnit('velocity'), null, ld.velocity))); }
-				if (ls.link.headloss) { lines.push(affix('link', 'headloss', numLine(shownHeadloss(l, lastSolveResult.headlosses[l.id]), resultUnit('elevhead'), null, ld.headloss), l)); }
-				if (ls.link.gradient && l.type !== 'pump' && linkLengthSI(l)) { lines.push(affix('link', 'gradient', numLine(shownHeadloss(l, lastSolveResult.headlosses[l.id]) / linkLengthSI(l), resultUnit('gradient'), null, ld.gradient, gradientSuffix()))); }
-				var fricVal = linkFrictionFactor(l);
-				if (ls.link.friction && fricVal !== undefined) { lines.push(affix('link', 'friction', rawLine(fricVal, null, ld.friction))); }
-			}
-			if (ls.link.status) { lines.push(affix('link', 'status', { text: linkStatusText(l) })); }
-			var lqVal = linkQualityValue(l);
-			if (ls.link.quality && lqVal !== undefined) { lines.push(affix('link', 'quality', rawLine(lqVal, null, qualityDecimals(ld)))); }
-			var lrVal = linkReactionRate(l);
-			if (ls.link.rate && lrVal !== undefined) { lines.push(affix('link', 'rate', rawLine(lrVal, null, ld.rate))); }
+			lines = linkLabelFieldLines(l, ls, null);
 			le.empty = lines.length === 0;
 			if (lines.length === 0) { lines.push({ text: '' }); }
 			le.allLines = lines;
@@ -18016,9 +17960,174 @@ var EngCalcs = EngCalcs || {};
 		if (sel && (!hoverPreview || sel.kind !== hoverPreview.kind || sel.id !== hoverPreview.id)) {
 			paintHoverPreview(sel, true);
 		}
+		var changed = !hoverPreview !== !sel || (sel && (sel.kind !== hoverPreview.kind || sel.id !== hoverPreview.id));
 		hoverPreview = sel;
+		if (changed) { hoverCard.x = hoverCard.nx; hoverCard.y = hoverCard.ny; hoverCardRetarget(sel); }
 	}
 	function clearHoverPreview() { setHoverPreview(null); }
+	/**
+	 * **THE HOVER CARD: AN ASSET'S LABEL PER SETTINGS, AT ANY SCALE, FIT OR NOT** (Task 773). Tom,
+	 * 2026-10-05: informative where labels are missing, and a clue to what a click will select;
+	 * 2026-10-08, relaying an outside tester: *"when we hover on an element, we see the full label
+	 * (as defined by the user in settings, of course)... Whether to show these should be a
+	 * setting."*
+	 *
+	 * **IT RIDES THE HOVER HIGHLIGHT.** The element wearing `.lpn-hover` is the element the card
+	 * describes, from the same hit test a click uses, so the card cannot name one thing while a
+	 * click selects another. It is armed from setHoverPreview() whenever the target CHANGES, and
+	 * composed only when the 500 ms rest has run out: nothing here runs per pointer move, and it
+	 * never calls refreshLabelText() or any placement pass.
+	 *
+	 * **THE LINES COME FROM THE MAP LABEL'S OWN COMPOSERS** (nodeLabelFieldLines(),
+	 * linkLabelFieldLines(), customerLabelLines()), handed the live label settings (the fields
+	 * ticked there, and only those; the ID alone if none). Same units, same decimals, same order, same prefixes and suffixes; a field with
+	 * nothing to say (no solve yet, no quality analysis) is left out exactly as the label leaves it
+	 * out. Results show what the label would show, so the stale-snapshot rule holds without a line
+	 * of code of its own. One value to a line, not the link label's one-line concatenation: a card
+	 * has the room, and a stack reads faster.
+	 *
+	 * **THE LOOK IS THE SUITE'S ONE NAME TIP**: a Bootstrap tooltip on a one-pixel anchor parked at
+	 * the pointer, opened after EngCalcs.tipShowDelay. The anchor carries no `title`, so the
+	 * browser's own tooltip never gets a say. `.lpn-hovercard` makes it click-through.
+	 *
+	 * **NOTHING NEW ON TOUCH**: a hover-less device never moves a pointer over the map, and
+	 * ecCanHover() is asked again here. A long-press is not built (Tom, 2026-10-05, thought it
+	 * counter-natural and possibly phone-intuitive; left for a decision).
+	 *
+	 * **A BROWSER PREFERENCE, NOT THE PROJECT'S** (LPN_HOVERCARD_KEY): whether one reader wants a
+	 * card to appear is a fact about the person at the screen.
+	 */
+	var LPN_HOVERCARD_KEY = 'lpn_hovercard';
+	function hoverCardOn() {
+		try { return localStorage.getItem(LPN_HOVERCARD_KEY) !== 'off'; } catch (e) { return true; }
+	}
+	function setHoverCardOn(on) {
+		// Written only when OFF, like lpn_runbox: a browser that never touched it holds nothing.
+		try {
+			if (on) { localStorage.removeItem(LPN_HOVERCARD_KEY); }
+			else { localStorage.setItem(LPN_HOVERCARD_KEY, 'off'); }
+		} catch (e) {}
+		if (!on) { hoverCardHide(); }
+	}
+	var hoverCard = { timer: null, anchor: null, tip: null, shown: false, x: 0, y: 0, nx: 0, ny: 0, sel: null };
+	// Esc, Ctrl+Z and Ctrl+Y can change what the card describes; any label-text change dismisses it
+	// too (refreshLabelText(), refreshOneLabelInPlace()), so it never shows stale text.
+	if (typeof document !== 'undefined' && document.addEventListener) {
+		document.addEventListener('keydown', function (e) {
+			if (e.key === 'Escape' || ((e.ctrlKey || e.metaKey) && /^[zy]$/i.test(e.key || ''))) { hoverCardHide(); }
+		}, true);
+	}
+	function hoverCardHide() {
+		if (hoverCard.timer) { clearTimeout(hoverCard.timer); hoverCard.timer = null; }
+		if (hoverCard.shown && hoverCard.tip) { hoverCard.tip.hide(); }
+		hoverCard.shown = false;
+	}
+	// **THE REST TIMER RUNS FROM THE POINTER COMING TO REST, NOT FROM ENTERING THE TARGET**
+	// (Perry's review). Sliding along a long pipe the card used to open 500 ms in, with the pointer
+	// still moving, and sit behind it. The card is placed at the resting point; a move of more than
+	// HOVERCARD_STILL_PX hides it and starts the wait again, so it is never left behind (a name tip
+	// is anchored to its element and stays while the pointer stays on it; this one is anchored to
+	// a point, so the point moving is the same event).
+	var HOVERCARD_STILL_PX = 4;
+	function hoverCardNudge(x, y) {
+		if (!hoverCard.sel) { return; }
+		if (Math.abs(x - hoverCard.x) <= HOVERCARD_STILL_PX && Math.abs(y - hoverCard.y) <= HOVERCARD_STILL_PX) { return; }
+		hoverCard.x = x; hoverCard.y = y;
+		hoverCardRetarget(hoverCard.sel);
+	}
+	function hoverCardRetarget(sel) {
+		hoverCardHide();
+		hoverCard.sel = (sel && sel.kind !== 'label') ? sel : null;
+		if (!sel || sel.kind === 'label' || !hoverCardOn()) { return; }
+		if (typeof ecCanHover === 'function' && !ecCanHover()) { return; }
+		if (!window.bootstrap || !bootstrap.Tooltip) { return; }
+		var delay = (window.EngCalcs && EngCalcs.tipShowDelay) || 500;
+		hoverCard.timer = setTimeout(function () {
+			hoverCard.timer = null;
+			if (hoverCard.sel && hoverCard.sel.kind === sel.kind && hoverCard.sel.id === sel.id) { hoverCardShow(sel); }
+		}, delay);
+	}
+	// **THE CARD READS THE LABEL SETTINGS AS THEY STAND, NOT A COPY WITH EVERYTHING TICKED** (Tom,
+	// 2026-10-08: *"It should show per Settings. Not more and not less."*). It hands the map label's
+	// own composers the live `labelSettings`, so the fields, show order, decimals, prefixes and
+	// suffixes are the label's by construction. What it does NOT inherit is anything about the
+	// LABEL'S PLACEMENT: the labeling threshold (dataLabelsHidden) and the shed cascade (fit) act on
+	// the drawn glyphs after these composers have run, and the card never calls them, so it shows at
+	// any scale, fit or not. A group with nothing ticked (or nothing to say yet) shows the ID alone:
+	// the card has to name what it is resting on, and an asset's ID is the one field it always has.
+	function idOnlyLabelSettings() {
+		var only = Object.assign({}, labelSettings);
+		['node', 'link', 'customer'].forEach(function (g) {
+			only[g] = {};
+			Object.keys(labelSettings[g] || {}).forEach(function (k) { only[g][k] = (k === 'id'); });
+		});
+		return only;
+	}
+	function hoverCardLinesWith(sel, ls) {
+		var e;
+		if (sel.kind === 'node') { e = nodeById(sel.id); return e ? nodeLabelFieldLines(e, ls, null) : []; }
+		if (sel.kind === 'link') { e = linkById(sel.id); return e ? linkLabelFieldLines(e, ls, null) : []; }
+		if (sel.kind === 'customer') { e = customerById(sel.id); return e ? customerLabelLines(e, ls) : []; }
+		return [];
+	}
+	function hoverCardLines(sel) {
+		var lines = hoverCardLinesWith(sel, labelSettings).filter(function (l) { return l.text !== ''; });
+		return lines.length ? lines : hoverCardLinesWith(sel, idOnlyLabelSettings());
+	}
+	// **THE CARD IN DELETE AND THE LINK-DRAWING MODES** (Tom, 2026-10-08): the same card, for the
+	// thing the next click would act on (what you are about to delete; the node you are about to
+	// join). It paints no highlight (those modes have their own feedback) and takes no pointer
+	// events; a press dismisses it like anywhere else.
+	function hoverCardOtherMode() {
+		return mode === 'delete' || mode === 'add-pipe' || mode === 'add-pump' || mode === 'add-valve' || mode === 'add-chain';
+	}
+	var hoverCardOtherRaf = null, hoverCardOtherAt = null;
+	function hoverCardOtherTarget(x, y) {
+		var t = hoverTargetFromHit(mapHitAt(x, y));
+		if (mode === 'delete') { return t && t.kind !== 'label' ? t : null; }
+		if (t && t.kind === 'node') { return t; }
+		var near = nearestNodeNearScreen(x, y, POINTER_REACH_PX);
+		return near ? { kind: 'node', id: near.id } : null;
+	}
+	function hoverCardOtherMove(e) {
+		if (e.pointerType === 'touch' || !hoverCardOtherMode() || drag) { return; }
+		hoverCardOtherAt = { x: e.clientX, y: e.clientY };
+		hoverCardNudge(e.clientX, e.clientY);
+		if (hoverCardOtherRaf) { return; }
+		hoverCardOtherRaf = requestAnimationFrame(function () {
+			hoverCardOtherRaf = null;
+			if (!hoverCardOtherMode() || drag || !hoverCardOtherAt) { return; }
+			var t = hoverCardOtherTarget(hoverCardOtherAt.x, hoverCardOtherAt.y), cur = hoverCard.sel;
+			if (t && !selectionExists(t)) { t = null; }
+			if ((!t && !cur) || (t && cur && t.kind === cur.kind && t.id === cur.id)) { return; }
+			hoverCard.x = hoverCardOtherAt.x; hoverCard.y = hoverCardOtherAt.y;
+			hoverCardRetarget(t);
+		});
+	}
+	function hoverCardShow(sel) {
+		var lines = hoverCardLines(sel).map(function (l) { return l.text; }).filter(function (t) { return t !== ''; });
+		perfDebugCount('hoverCards');
+		if (!lines.length) { return; }
+		var host = document.createElement('div');
+		lines.forEach(function (t, i) {
+			if (i) { host.appendChild(document.createElement('br')); }
+			host.appendChild(document.createTextNode(t));
+		});
+		if (!hoverCard.anchor) {
+			hoverCard.anchor = document.createElement('div');
+			hoverCard.anchor.className = 'lpn-hovercard-anchor';
+			document.body.appendChild(hoverCard.anchor);
+		}
+		hoverCard.anchor.style.left = hoverCard.x + 'px';
+		hoverCard.anchor.style.top = hoverCard.y + 'px';
+		if (hoverCard.tip) { hoverCard.tip.dispose(); }
+		hoverCard.tip = bootstrap.Tooltip.getOrCreateInstance(hoverCard.anchor, {
+			trigger: 'manual', html: true, placement: 'top', customClass: 'lpn-hovercard',
+			title: host.innerHTML
+		});
+		hoverCard.tip.show();
+		hoverCard.shown = true;
+	}
 	// The VERB. Reads the subject once, drops it, then deletes -- deleteElement() may cascade,
 	// confirm, or (inside a scenario) deactivate rather than destroy, and none of those should find
 	// a selection still pointing at what they are working on.
@@ -32152,6 +32261,7 @@ var EngCalcs = EngCalcs || {};
 		// for any other tool drops it rather than leaving a highlight nothing will now clear, since
 		// the pointermove listener that maintains it does no work outside 'select'.
 		if (mode === 'select' && newMode !== 'select') { clearHoverPreview(); }
+		if (newMode !== mode) { hoverCardRetarget(null); }
 		mode = newMode; setPendingLinkFrom(null);
 		// **THE GRIPS ARE A CSS STATE, NOT A REDRAW** (Task 567). Every vertex handle already exists
 		// in the drawing -- buildLinkEls() makes one per bend -- so turning the mode on is one class
@@ -33130,7 +33240,7 @@ var EngCalcs = EngCalcs || {};
 		if (!lost.length && !meaning.length && !surface.length && !moved.length && !rules.length && !setting.length && !born.length) { proceed(); return; }
 		text = [];
 		// The key to the lost lines, first in the box: each is the asset ID, a colon, the entry lost.
-		if (lost.length) { text.push(String(pc.lpn_change_type_key || 'ID: Lost entry')); }
+		if (lost.length) { text.push(String(pc.lpn_change_type_key || 'Each line: ID: the property and value that would be lost')); }
 		if (surface.length) {
 			text.push([pc.lpn_change_type_surface || 'These keep the water surface where it was. A reservoir\'s head is the tank\'s elevation plus its water depth, and a tank\'s water depth is the reservoir\'s head minus its elevation:']
 				.concat(capped(surface)).join('\n'));
@@ -33910,7 +34020,7 @@ var EngCalcs = EngCalcs || {};
 			// page-title toggle went with the titles; a browser that used it before still carries
 			// the key, and "exactly as a brand-new visitor would see it" has to mean that too.
 			// Erasing a key we no longer write is the one direction that is always safe.
-			'lpn_show_titles', 'lpn_menucue', AREA_HINT_KEY, LPN_RUNBOX_KEY, LPN_SCNBASIC_KEY];
+			'lpn_show_titles', 'lpn_menucue', AREA_HINT_KEY, LPN_RUNBOX_KEY, LPN_SCNBASIC_KEY, LPN_HOVERCARD_KEY];
 		try {
 			for (i = 0; i < localStorage.length; i++) {
 				key = localStorage.key(i);
@@ -34469,7 +34579,7 @@ var EngCalcs = EngCalcs || {};
 	// "just moved" flash. The selection is already gone (applySaved() clears it while this drawing
 	// is still the one on screen), and everything document-derived stays, which is the point.
 	function unmarkLeavingDrawing() {
-		if (hoverPreview) { paintHoverPreview(hoverPreview, false); hoverPreview = null; }
+		if (hoverPreview) { paintHoverPreview(hoverPreview, false); hoverPreview = null; hoverCardHide(); }
 		if (pendingLinkFrom && nodeEls[pendingLinkFrom] && nodeEls[pendingLinkFrom].circle) {
 			nodeEls[pendingLinkFrom].circle.classList.remove('lpn-node-pending');
 		}
@@ -46299,10 +46409,12 @@ var EngCalcs = EngCalcs || {};
 			if (e.pointerType === 'touch') { return; }
 			if (mode !== 'select' || drag) { return; }
 			hoverPreviewAt = { x: e.clientX, y: e.clientY };
+			hoverCardNudge(e.clientX, e.clientY);
 			if (hoverPreviewRaf) { return; }
 			hoverPreviewRaf = requestAnimationFrame(function () {
 				hoverPreviewRaf = null;
 				if (mode !== 'select' || drag || !hoverPreviewAt) { return; }
+				hoverCard.nx = hoverPreviewAt.x; hoverCard.ny = hoverPreviewAt.y;
 				setHoverPreview(hoverTargetFromHit(mapHitAt(hoverPreviewAt.x, hoverPreviewAt.y)));
 			});
 		});
@@ -46313,6 +46425,12 @@ var EngCalcs = EngCalcs || {};
 			hoverPreviewAt = null;
 			clearHoverPreview();
 		});
+		// A press is a click or a drag beginning and a wheel notch moves the map from under the
+		// pointer: either way the card has had its say. The highlight stays as it always did.
+		svg.addEventListener('pointerdown', hoverCardHide, true);
+		svg.addEventListener('wheel', hoverCardHide, true);
+		svg.addEventListener('pointermove', hoverCardOtherMove);
+		svg.addEventListener('pointerleave', function () { hoverCardOtherAt = null; if (hoverCardOtherMode()) { hoverCardRetarget(null); } });
 
 		// **HAS THIS PRESS BECOME A DRAG?** One flag for the whole gesture, set once the pointer has
 		// travelled past `tapMovePx(e)` and never cleared until the next press. It is what makes
@@ -51129,6 +51247,17 @@ var EngCalcs = EngCalcs || {};
 		areaHintInput.addEventListener('change', function () { setAreaHintShown(areaHintInput.checked); });
 		row(pageBody, pc.lpn_settings_area_hint || 'Show the selection help', areaHintInput,
 			pc.lpn_settings_area_hint_tip);
+		// The hover card's switch (Task 773). The same section and the same reason as the row above:
+		// a reading aid for the person at this screen, kept in this browser (LPN_HOVERCARD_KEY).
+		// Not offered where the card can never appear (a device that cannot hover).
+		if (typeof ecCanHover !== 'function' || ecCanHover()) {
+			var hoverCardInput = document.createElement('input');
+			hoverCardInput.type = 'checkbox';
+			hoverCardInput.checked = hoverCardOn();
+			hoverCardInput.addEventListener('change', function () { setHoverCardOn(hoverCardInput.checked); });
+			row(pageBody, pc.lpn_settings_hover_card || 'Show the full label on hover', hoverCardInput,
+				pc.lpn_settings_hover_card_tip);
+		}
 		var tail = document.createElement('div');
 		tail.style.marginTop = '6px';
 		pageBody.appendChild(tail);
@@ -52854,7 +52983,12 @@ var EngCalcs = EngCalcs || {};
 	// so there is no column to dock into: the dock buttons are not offered there, and a box that is
 	// docked on the desktop opens as it always did. Its docking is kept and comes back on a wider
 	// window.
-	var LPN_DOCK_MIN_W = 240, LPN_DOCK_MAX_FRAC = 0.45, LPN_DOCK_MAP_MIN = 320, LPN_DOCK_DEFAULT_W = 360,
+	// **NO SHARE OF THE WINDOW CAPS A DOCKED BOX; ONLY THE MAP'S OWN MINIMUM DOES** (Tom, 2026-10-07,
+	// on the Alternatives preview stopping at about 860 px: *"Is there any reason not to give the user
+	// control and freedom?"*). There was not. A column used to stop at 45% of the window, which on a
+	// 1920 screen held a docked table to 864 px while the map beside it had a thousand to spare. The
+	// map keeps LPN_DOCK_MAP_MIN, and that was always the reason the cap existed.
+	var LPN_DOCK_MIN_W = 240, LPN_DOCK_MAP_MIN = 320, LPN_DOCK_DEFAULT_W = 360, LPN_DOCK_FIRST_FRAC = 0.45,
 		LPN_DOCK_STRIP_W = 24, LPN_DOCK_TUCK_MS = 400, LPN_DOCK_HOVER_MS = 150, LPN_CORNER_BTN_W = 28,
 		LPN_UNDOCK_SLOP = 6;
 	var dockBoxes = [], dockFlyout = null, dockTimer = null, dockBooting = false, dockQueued = false,
@@ -53031,8 +53165,12 @@ var EngCalcs = EngCalcs || {};
 			});
 		});
 	}
-	function clampDockW(w, room) {
-		var max = Math.max(LPN_DOCK_MIN_W, Math.floor((window.innerWidth || 1000) * LPN_DOCK_MAX_FRAC));
+	// **AN AUTO-HIDDEN BOX MAY COVER THE WHOLE MAP; ONLY A PINNED ONE KEEPS THE MAP'S MINIMUM** (Tom,
+	// 2026-10-08: *"Why not cover the map entirely when it's an autohide box. A pinned box is
+	// different, of course. It needs its limits."*). A flyout takes no space from the map, so the
+	// 320 px floor protects nothing; `over` lifts it and leaves only `room`.
+	function clampDockW(w, room, over) {
+		var max = over && room > 0 ? room : Math.max(LPN_DOCK_MIN_W, Math.floor((window.innerWidth || 1000) - LPN_DOCK_MAP_MIN));
 		if (!(w > 0)) { w = LPN_DOCK_DEFAULT_W; }
 		if (room > 0) { max = Math.min(max, room); }
 		return Math.round(Math.max(Math.min(LPN_DOCK_MIN_W, max), Math.min(w, max)));
@@ -53116,10 +53254,12 @@ var EngCalcs = EngCalcs || {};
 	function dockAct(d, act) {
 		var r, wasSide = dockSideOf(d);
 		if (act === 'left' || act === 'right') {
-			// The width it floats at is the width it docks at, the first time.
+			// The width it floats at is the width it docks at, the first time, up to 45% of the
+			// window, so a box that floats wide (Alternatives, 1500 px) does not dock over most of
+			// the map. That is the first width only: the grip takes it anywhere the map allows.
 			if (!wasSide && !d.rec.dockW) {
 				r = d.box.getBoundingClientRect();
-				if (r.width > 0) { d.rec.dockW = Math.round(r.width); }
+				if (r.width > 0) { d.rec.dockW = Math.round(Math.min(r.width, Math.max(LPN_DOCK_MIN_W, (window.innerWidth || 1000) * LPN_DOCK_FIRST_FRAC))); }
 			}
 			if (d.rec.dock !== act || d.rec.dockOrd === undefined) { d.rec.dockOrd = dockNextOrd(act, d); }
 			d.rec.dock = act;
@@ -53132,8 +53272,13 @@ var EngCalcs = EngCalcs || {};
 			if (d.rec.autohide) { delete d.rec.autohide; } else { d.rec.autohide = true; }
 		}
 		if (dockFlyout === d) { dockFlyout = null; }
-		if (d.save) { d.save(); }
 		layoutDocks();
+		// Pinned from a width only a flyout may have, it keeps the map's minimum: store what it got.
+		if (act === 'autohide' && !d.rec.autohide && d.rec.dock) {
+			r = d.box.getBoundingClientRect();
+			if (r.width > 0 && d.rec.dockW > Math.round(r.width)) { d.rec.dockW = Math.round(r.width); }
+		}
+		if (d.save) { d.save(); }
 		renderDockCorner(d);
 		// Turned on from inside the box, auto-hide tucks it at once; the keyboard lands on its tab.
 		if (act === 'autohide' && d.rec.autohide && d.tab) { d.tab.focus(); }
@@ -53225,9 +53370,12 @@ var EngCalcs = EngCalcs || {};
 		el.lpnDockList = list;
 		el.classList.toggle('lpn-dock-grip-live', x !== null);
 		if (x === null) { return; }
-		// In front of a flown-out box, whose own stacking number is above the strip's.
-		el.style.zIndex = String((list.length === 1 && list[0].box.classList.contains('lpn-dock-out'))
-			? (Number(list[0].box.style.zIndex) || 0) + 1 : '');
+		// In front of the boxes it sizes, whose own stacking numbers rise each time one is brought
+		// forward: under a raised docked box the grip's inner half was the box's own edge, so a press
+		// there did nothing a reader could see (found 2026-10-07, docking Alternatives).
+		var zTop = 0;
+		list.forEach(function (d) { zTop = Math.max(zTop, Number(d.box.style.zIndex) || 0); });
+		el.style.zIndex = zTop ? String(zTop + 1) : '';
 		el.style.left = Math.round(x) + 'px';
 		el.style.top = Math.round(y) + 'px';
 		el.style.height = Math.round(h) + 'px';
@@ -53249,7 +53397,8 @@ var EngCalcs = EngCalcs || {};
 			var w;
 			if (!from) { return; }
 			w = from.w + (side === 'left' ? e.clientX - from.x : from.x - e.clientX);
-			w = clampDockW(w);
+			var wrap = dockMapWrap(), over = !!from.list[0].rec.autohide;
+			w = clampDockW(w, over && wrap ? Math.floor(wrap.getBoundingClientRect().width + dockMargins.left + dockMargins.right - LPN_DOCK_STRIP_W * 2) : 0, over);
 			from.list.forEach(function (d) { d.rec.dockW = w; });
 			layoutDocks();
 		});
@@ -53341,7 +53490,7 @@ var EngCalcs = EngCalcs || {};
 				dockPlace(d, x, top + y0, c.w, y1 - y0, 'pinned');
 			});
 			S.auto.forEach(function (d) {
-				var w = clampDockW(d.rec.dockW, Math.floor(outerR - outerL - c.strip - LPN_DOCK_STRIP_W)),
+				var w = clampDockW(d.rec.dockW, Math.floor(outerR - outerL - c.strip - LPN_DOCK_STRIP_W), true),
 					ax = s === 'left' ? outerL + c.strip : outerR - c.strip - w;
 				dockPlace(d, ax, top, w, h, d === dockFlyout ? 'out' : 'tucked');
 			});
@@ -53349,7 +53498,7 @@ var EngCalcs = EngCalcs || {};
 			// A box flown out of its tab is the frontmost thing on its side, so its edge is the one a
 			// reader reaches for; otherwise the pinned column's. The flown-out box is alone in its list.
 			if (dockFlyout && S.auto.indexOf(dockFlyout) >= 0) {
-				w = clampDockW(dockFlyout.rec.dockW, Math.floor(outerR - outerL - c.strip - LPN_DOCK_STRIP_W));
+				w = clampDockW(dockFlyout.rec.dockW, Math.floor(outerR - outerL - c.strip - LPN_DOCK_STRIP_W), true);
 				placeDockGrip(s, s === 'left' ? outerL + c.strip + w : outerR - c.strip - w, top, h, [dockFlyout]);
 			} else {
 				placeDockGrip(s, c.w ? (s === 'left' ? outerL + c.strip + c.w : outerR - c.strip - c.w) : null, top, h, S.pinned);
@@ -63350,6 +63499,7 @@ var EngCalcs = EngCalcs || {};
 		// A synchronous pass answers every request made before it (see requestLabelRefresh()).
 		labelRefreshPending = false;
 		labelCacheTaint();
+		hoverCardHide();
 		if (dataLabelsHidden) { labelWorkSkipped = true; refreshLabelPassTail(); return; }
 		perfDebugCount('labelPasses');
 		beginMapBoxHold();
@@ -63362,6 +63512,129 @@ var EngCalcs = EngCalcs || {};
 		renderLabelsLegend();
 		refreshScenarioMarks();
 	}
+	// **THE ONE COMPOSER OF AN ELEMENT'S LABEL FIELDS** (Task 773). The full content pass, the
+	// single-label refresh and the hover card all read their lines from here, so they cannot come to
+	// print different things. `ls` is the label settings to read; `extrema` is the network-wide high/low table, or null for no marks. Returns the lines
+	// in show order, possibly none: the empty placeholder is the caller's business.
+	function nodeLabelFieldLines(n, ls, extrema) {
+		var nd = ls.decimals.node, ex = extrema || {}, lines = [];
+			// Order (Tom, 2026-07-30, thinking physically): ID, Demand, Head, Pressure, Elevation --
+			// demand is the thing the user set as a design target, head/pressure are what the solve
+			// produced from it, and elevation (the input least likely to change page to page) trails.
+			if (ls.node.id) { lines.push(affix('node', 'id', { text: n.id })); }
+			// **THE TWO IDENTITY WORDS** (Tom's table, R-327), printed as the words they are and only
+			// where one is stated -- a customer's own rule (customerLabelLines()): a blank slot where
+			// a description would be reads as a defect on every node that has none.
+			if (ls.node.desc && n.desc) { lines.push(affix('node', 'desc', { text: String(n.desc) })); }
+			if (ls.node.tag && n.tag) { lines.push(affix('node', 'tag', { text: String(n.tag) })); }
+			// **DEMAND FIRST, BASE DEMAND UNDER IT.** Two quantities and two rows -- see
+			// resolvedDemand(). rawLine() for both: neither number ever crossed into SI.
+			if (!isFixedHeadNode(n) && ls.node.demandActual && typeof resolvedDemand(n) === 'number') { lines.push(affix('node', 'demandActual', rawLine(resolvedDemand(n), ex.demandActual, nd.demandActual))); }
+			if (!isFixedHeadNode(n) && ls.node.demand && typeof baseDemandTotal(n) === 'number') { lines.push(affix('node', 'demand', rawLine(baseDemandTotal(n), ex.demand, nd.demand))); }
+			// Both are already IN Elevation/Head and Pressure units by the time they get here -- the
+			// fixed-head branch because those are declared inputs, the junction branch because the
+			// solve result is converted on the spot. rawLine() then prints what it is given, so the
+			// two halves of each field agree with the extrema computed above. A TANK's pressure is
+			// the depth of water standing in it, which is the same head-minus-elevation subtraction
+			// a reservoir makes -- see nodeFixedHead().
+			// **HEAD IS A RESULT COLUMN, so a fixed head is read in the RESULT unit too** (Task 422).
+			// A tank's or reservoir's head is DERIVED from typed numbers, so it arrives in the INPUT
+			// elevation unit and has to cross; a junction's comes from the solver in SI. Two sources,
+			// one column, and if they did not both end in the result unit the same map label would
+			// print two different quantities under one heading.
+			var headVal = isFixedHeadNode(n)
+				? fixedHeadDisplay(n)
+				: (lastSolveResult ? toDisplay(lastSolveResult.heads[n.id], resultUnit('elevhead')) : undefined);
+			var pressVal = isFixedHeadNode(n)
+				? fixedHeadPressure(n)
+				: (lastSolveResult ? toDisplay(lastSolveResult.pressures[n.id], resultUnit('pressure')) : undefined);
+			if (ls.node.head && headVal !== undefined) { lines.push(affix('node', 'head', rawLine(headVal, ex.head, nd.head))); }
+			if (ls.node.pressure && pressVal !== undefined) { lines.push(affix('node', 'pressure', rawLine(pressVal, ex.pressure, nd.pressure))); }
+			// An elevation nobody stated prints nothing, exactly as an unsolved pressure does -- an
+			// imported reservoir has none (Task 390) and rawLine() would have thrown on it.
+			if (ls.node.elev && typeof n.elev === 'number') { lines.push(affix('node', 'elev', rawLine(n.elev, ex.elev, nd.elev))); }
+			// **TANK WATER DEPTH, TANK ONLY** (Task 696): a junction or reservoir has no 'level',
+			// exactly as neither has a diameter, and prints nothing rather than a stray zero. The
+			// raw effective() value, matching how elev above hands rawLine() its own raw n.elev --
+			// nodeVal.level exists only to feed ex.level above, the same division every other
+			// field on this list keeps.
+			var levelVal = n.type === 'tank' ? effective(n, 'level') : undefined;
+			if (ls.node.level && typeof levelVal === 'number') { lines.push(affix('node', 'level', rawLine(levelVal, ex.level, nd.level))); }
+			// **LAST, AND ONLY WHERE THERE IS ONE.** A network with the analysis off, or one that has
+			// not been run since it was switched on, prints nothing here rather than a zero -- the
+			// same rule an unsolved pressure and an unstated elevation already follow.
+			var qualVal = nodeQualityValue(n);
+			if (ls.node.quality && qualVal !== undefined) { lines.push(affix('node', 'quality', rawLine(qualVal, ex.quality, qualityDecimals(nd)))); }
+			// **AND ONLY WHERE ONE IS TYPED.** Blank means EPANET's own zero and prints nothing:
+			// "nobody stated a starting concentration" and "the starting concentration is zero" are
+			// different facts, and printing 0.00 for the first is the same defect an unsolved
+			// pressure printed as a zero would be.
+			var initQualVal = nodeInitQuality(n);
+			if (ls.node.initQuality && initQualVal !== undefined) { lines.push(affix('node', 'initQuality', rawLine(initQualVal, ex.initQuality, nd.initQuality))); }
+		return nodeDisplayOrder(lines);
+	}
+	function linkLabelFieldLines(l, ls, extrema) {
+		var ld = ls.decimals.link, ex = extrema || {}, lines = [];
+			if (ls.link.id) { lines.push(affix('link', 'id', { text: l.id })); }
+			if (ls.link.desc && l.desc) { lines.push(affix('link', 'desc', { text: String(l.desc) })); }
+			if (ls.link.tag && l.tag) { lines.push(affix('link', 'tag', { text: String(l.tag) })); }
+			// **THE STATUS THE DOCUMENT STATES, BEFORE ANY RUN** (Tom's table, R-327: "Initial
+			// status"), beside the Status row below, which is the run's answer where there is one.
+			// EPANET's own pair of words for a link's starting state.
+			if (ls.link.initStatus) { lines.push(affix('link', 'initStatus', { text: linkInitialStatusText(l) })); }
+			if (l.type === 'pipe') {
+				if (ls.link.diameter) { lines.push(affix('link', 'diameter', rawLine(effective(l, 'diameter'), ex.diameter, ld.diameter))); }
+				if (ls.link.length) { lines.push(affix('link', 'length', rawLine(effective(l, 'length'), ex.length, ld.length))); }
+				if (ls.link.roughness) { lines.push(affix('link', 'roughness', rawLine(effective(l, 'roughness'), ex.roughness, ld.roughness))); }
+				if (ls.link.km) { lines.push(affix('link', 'km', rawLine(pipeK(l), ex.km, ld.km))); }
+				// **THE TWO REACTION COEFFICIENTS** (Tom's table, R-327), under the gate every other
+				// place that shows them already asks (reactionFieldsShown()): a coefficient changes
+				// nothing unless a chemical is being tracked. The one in force: the pipe's own, or the
+				// network-wide one it inherits. Typed numbers, so rawLine(), with no high/low mark.
+				if (reactionFieldsShown()) {
+					var bulkVal = linkReactionCoeff(l, 'bulkCoeff'), wallVal = linkReactionCoeff(l, 'wallCoeff');
+					if (ls.link.bulkCoeff && bulkVal !== undefined) { lines.push(affix('link', 'bulkCoeff', rawLine(bulkVal, null, ld.bulkCoeff))); }
+					if (ls.link.wallCoeff && wallVal !== undefined) { lines.push(affix('link', 'wallCoeff', rawLine(wallVal, null, ld.wallCoeff))); }
+				}
+			} else if (l.type === 'valve') {
+				// A VALVE PRINTS ITS DIAMETER AND NOTHING ELSE FROM THIS GROUP. Length and
+				// roughness do not exist on it, and its loss lives in a SETTING whose meaning
+				// changes with the type -- so a bare number beside a pipe's k would be read as the
+				// same quantity when it is a pressure or a flow. The setting belongs in the popup,
+				// where it is labelled, until a label toggle of its own is worth 26 translations.
+				if (ls.link.diameter) { lines.push(affix('link', 'diameter', rawLine(effective(l, 'diameter'), ex.diameter, ld.diameter))); }
+			}
+			if (lastSolveResult && !linkResultHeld(l) && lastSolveResult.flows[l.id] !== undefined) {
+				if (ls.link.flow) { lines.push(affix('link', 'flow', numLine(shownFlow(lastSolveResult.flows[l.id]), resultUnit('flow'), ex.flow, ld.flow))); }
+				// Velocity is meaningless for a pump (no diameter -- see renderLinkFields() above).
+				if (ls.link.velocity && l.type !== 'pump') { lines.push(affix('link', 'velocity', numLine(lastSolveResult.velocities[l.id], resultUnit('velocity'), ex.velocity, ld.velocity))); }
+				if (ls.link.headloss) { lines.push(affix('link', 'headloss', numLine(shownHeadloss(l, lastSolveResult.headlosses[l.id]), resultUnit('elevhead'), ex.headloss, ld.headloss), l)); }
+				// The '%' is read from the SELECT, not assumed: this family offers rise/run too, and
+				// a "%" on a ratio would be a lie rather than a redundancy. Blank in that form --
+				// there is no token for a bare ratio that is shorter than the ambiguity it fixes.
+				if (ls.link.gradient && l.type !== 'pump' && linkLengthSI(l)) { lines.push(affix('link', 'gradient', numLine(shownHeadloss(l, lastSolveResult.headlosses[l.id]) / linkLengthSI(l), resultUnit('gradient'), ex.gradient, ld.gradient, gradientSuffix()))); }
+				// rawLine(), not numLine(): linkFrictionFactor() is already a dimensionless number
+				// and running it through a unit factor would scale it by whatever the unit strip
+				// happened to be showing (Task 638).
+				var fricVal = linkFrictionFactor(l);
+				if (ls.link.friction && fricVal !== undefined) { lines.push(affix('link', 'friction', rawLine(fricVal, ex.friction, ld.friction))); }
+			}
+			// **OUTSIDE THE FLOW GUARD, for the reason colorLinkValue() gives**: a status is a fact
+			// about the link whether or not anything has been solved, and an average quality asks
+			// its own two questions rather than the flow's. A status is TEXT, like an ID -- which is
+			// why it has no entry in the decimals map and gets no spinner.
+			if (ls.link.status) { lines.push(affix('link', 'status', { text: linkStatusText(l) })); }
+			var lqVal = linkQualityValue(l);
+			if (ls.link.quality && lqVal !== undefined) { lines.push(affix('link', 'quality', rawLine(lqVal, ex.linkQuality, qualityDecimals(ld)))); }
+			// rawLine() for the third time on this block, and for the third reason: the number is
+			// already in the unit its heading names and there is no factor to run it through.
+			var lrVal = linkReactionRate(l);
+			if (ls.link.rate && lrVal !== undefined) { lines.push(affix('link', 'rate', rawLine(lrVal, ex.rate, ld.rate))); }
+			// **SHOW ORDER** (R-329), before the full list is banked: the shed cascade and the drawn
+			// label are then the one order, exactly as a node label's are.
+		return labelShowOrder('link', lines);
+	}
+
 	function refreshLabelTextPass() {
 		var ls = labelSettings, nd = ls.decimals.node, ld = ls.decimals.link,
 			// One string, computed once for the whole pass -- see the measurement comment below.
@@ -63499,60 +63772,7 @@ var EngCalcs = EngCalcs || {};
 		var nodeLines = {}, linkLines = {};
 		doc.nodes.forEach(function (n) {
 			var ne = nodeEls[n.id]; if (!ne) { return; }
-			var lines = [];
-			// Order (Tom, 2026-07-30, thinking physically): ID, Demand, Head, Pressure, Elevation --
-			// demand is the thing the user set as a design target, head/pressure are what the solve
-			// produced from it, and elevation (the input least likely to change page to page) trails.
-			if (ls.node.id) { lines.push(affix('node', 'id', { text: n.id })); }
-			// **THE TWO IDENTITY WORDS** (Tom's table, R-327), printed as the words they are and only
-			// where one is stated -- a customer's own rule (customerLabelLines()): a blank slot where
-			// a description would be reads as a defect on every node that has none.
-			if (ls.node.desc && n.desc) { lines.push(affix('node', 'desc', { text: String(n.desc) })); }
-			if (ls.node.tag && n.tag) { lines.push(affix('node', 'tag', { text: String(n.tag) })); }
-			// **DEMAND FIRST, BASE DEMAND UNDER IT.** Two quantities and two rows -- see
-			// resolvedDemand(). rawLine() for both: neither number ever crossed into SI.
-			if (!isFixedHeadNode(n) && ls.node.demandActual) { lines.push(affix('node', 'demandActual', rawLine(resolvedDemand(n), extrema.demandActual, nd.demandActual))); }
-			if (!isFixedHeadNode(n) && ls.node.demand) { lines.push(affix('node', 'demand', rawLine(baseDemandTotal(n), extrema.demand, nd.demand))); }
-			// Both are already IN Elevation/Head and Pressure units by the time they get here -- the
-			// fixed-head branch because those are declared inputs, the junction branch because the
-			// solve result is converted on the spot. rawLine() then prints what it is given, so the
-			// two halves of each field agree with the extrema computed above. A TANK's pressure is
-			// the depth of water standing in it, which is the same head-minus-elevation subtraction
-			// a reservoir makes -- see nodeFixedHead().
-			// **HEAD IS A RESULT COLUMN, so a fixed head is read in the RESULT unit too** (Task 422).
-			// A tank's or reservoir's head is DERIVED from typed numbers, so it arrives in the INPUT
-			// elevation unit and has to cross; a junction's comes from the solver in SI. Two sources,
-			// one column, and if they did not both end in the result unit the same map label would
-			// print two different quantities under one heading.
-			var headVal = isFixedHeadNode(n)
-				? fixedHeadDisplay(n)
-				: (lastSolveResult ? toDisplay(lastSolveResult.heads[n.id], resultUnit('elevhead')) : undefined);
-			var pressVal = isFixedHeadNode(n)
-				? fixedHeadPressure(n)
-				: (lastSolveResult ? toDisplay(lastSolveResult.pressures[n.id], resultUnit('pressure')) : undefined);
-			if (ls.node.head && headVal !== undefined) { lines.push(affix('node', 'head', rawLine(headVal, extrema.head, nd.head))); }
-			if (ls.node.pressure && pressVal !== undefined) { lines.push(affix('node', 'pressure', rawLine(pressVal, extrema.pressure, nd.pressure))); }
-			// An elevation nobody stated prints nothing, exactly as an unsolved pressure does -- an
-			// imported reservoir has none (Task 390) and rawLine() would have thrown on it.
-			if (ls.node.elev && typeof n.elev === 'number') { lines.push(affix('node', 'elev', rawLine(n.elev, extrema.elev, nd.elev))); }
-			// **TANK WATER DEPTH, TANK ONLY** (Task 696): a junction or reservoir has no 'level',
-			// exactly as neither has a diameter, and prints nothing rather than a stray zero. The
-			// raw effective() value, matching how elev above hands rawLine() its own raw n.elev --
-			// nodeVal.level exists only to feed extrema.level above, the same division every other
-			// field on this list keeps.
-			var levelVal = n.type === 'tank' ? effective(n, 'level') : undefined;
-			if (ls.node.level && typeof levelVal === 'number') { lines.push(affix('node', 'level', rawLine(levelVal, extrema.level, nd.level))); }
-			// **LAST, AND ONLY WHERE THERE IS ONE.** A network with the analysis off, or one that has
-			// not been run since it was switched on, prints nothing here rather than a zero -- the
-			// same rule an unsolved pressure and an unstated elevation already follow.
-			var qualVal = nodeQualityValue(n);
-			if (ls.node.quality && qualVal !== undefined) { lines.push(affix('node', 'quality', rawLine(qualVal, extrema.quality, qualityDecimals(nd)))); }
-			// **AND ONLY WHERE ONE IS TYPED.** Blank means EPANET's own zero and prints nothing:
-			// "nobody stated a starting concentration" and "the starting concentration is zero" are
-			// different facts, and printing 0.00 for the first is the same defect an unsolved
-			// pressure printed as a zero would be.
-			var initQualVal = nodeInitQuality(n);
-			if (ls.node.initQuality && initQualVal !== undefined) { lines.push(affix('node', 'initQuality', rawLine(initQualVal, extrema.initQuality, nd.initQuality))); }
+			var lines = nodeLabelFieldLines(n, ls, extrema);
 			// EMPTY IS CAPTURED BEFORE THE PLACEHOLDER BELOW: a label with no fields toggled on still gets
 			// an empty line pushed so getBBox() never throws, and everything downstream (the leader, the
 			// collision box) must know it is really empty rather than really one blank line.
@@ -63562,7 +63782,6 @@ var EngCalcs = EngCalcs || {};
 			// and before it is banked, so the shed cascade and the drawn label are the one order:
 			// keptLines() preserves relative order, so a label sheds from the bottom of what is on
 			// the screen rather than from somewhere in the middle of it.
-			lines = nodeDisplayOrder(lines);
 			// **THE FULL LIST IS KEPT BESIDE THE DRAWN ONE, exactly as a link label's is** (Task
 			// 469). The node shed cascade starts from the whole label every time; shedding down from
 			// whatever survived last pass is a ratchet, and a label that gave up a value at one
@@ -63590,65 +63809,7 @@ var EngCalcs = EngCalcs || {};
 		var linkWork = [];
 		doc.links.forEach(function (l) {
 			var le = linkEls[l.id]; if (!le) { return; }
-			var lines = [];
-			if (ls.link.id) { lines.push(affix('link', 'id', { text: l.id })); }
-			if (ls.link.desc && l.desc) { lines.push(affix('link', 'desc', { text: String(l.desc) })); }
-			if (ls.link.tag && l.tag) { lines.push(affix('link', 'tag', { text: String(l.tag) })); }
-			// **THE STATUS THE DOCUMENT STATES, BEFORE ANY RUN** (Tom's table, R-327: "Initial
-			// status"), beside the Status row below, which is the run's answer where there is one.
-			// EPANET's own pair of words for a link's starting state.
-			if (ls.link.initStatus) { lines.push(affix('link', 'initStatus', { text: linkInitialStatusText(l) })); }
-			if (l.type === 'pipe') {
-				if (ls.link.diameter) { lines.push(affix('link', 'diameter', rawLine(effective(l, 'diameter'), extrema.diameter, ld.diameter))); }
-				if (ls.link.length) { lines.push(affix('link', 'length', rawLine(effective(l, 'length'), extrema.length, ld.length))); }
-				if (ls.link.roughness) { lines.push(affix('link', 'roughness', rawLine(effective(l, 'roughness'), extrema.roughness, ld.roughness))); }
-				if (ls.link.km) { lines.push(affix('link', 'km', rawLine(pipeK(l), extrema.km, ld.km))); }
-				// **THE TWO REACTION COEFFICIENTS** (Tom's table, R-327), under the gate every other
-				// place that shows them already asks (reactionFieldsShown()): a coefficient changes
-				// nothing unless a chemical is being tracked. The one in force: the pipe's own, or the
-				// network-wide one it inherits. Typed numbers, so rawLine(), with no high/low mark.
-				if (reactionFieldsShown()) {
-					var bulkVal = linkReactionCoeff(l, 'bulkCoeff'), wallVal = linkReactionCoeff(l, 'wallCoeff');
-					if (ls.link.bulkCoeff && bulkVal !== undefined) { lines.push(affix('link', 'bulkCoeff', rawLine(bulkVal, null, ld.bulkCoeff))); }
-					if (ls.link.wallCoeff && wallVal !== undefined) { lines.push(affix('link', 'wallCoeff', rawLine(wallVal, null, ld.wallCoeff))); }
-				}
-			} else if (l.type === 'valve') {
-				// A VALVE PRINTS ITS DIAMETER AND NOTHING ELSE FROM THIS GROUP. Length and
-				// roughness do not exist on it, and its loss lives in a SETTING whose meaning
-				// changes with the type -- so a bare number beside a pipe's k would be read as the
-				// same quantity when it is a pressure or a flow. The setting belongs in the popup,
-				// where it is labelled, until a label toggle of its own is worth 26 translations.
-				if (ls.link.diameter) { lines.push(affix('link', 'diameter', rawLine(effective(l, 'diameter'), extrema.diameter, ld.diameter))); }
-			}
-			if (lastSolveResult && !linkResultHeld(l) && lastSolveResult.flows[l.id] !== undefined) {
-				if (ls.link.flow) { lines.push(affix('link', 'flow', numLine(shownFlow(lastSolveResult.flows[l.id]), resultUnit('flow'), extrema.flow, ld.flow))); }
-				// Velocity is meaningless for a pump (no diameter -- see renderLinkFields() above).
-				if (ls.link.velocity && l.type !== 'pump') { lines.push(affix('link', 'velocity', numLine(lastSolveResult.velocities[l.id], resultUnit('velocity'), extrema.velocity, ld.velocity))); }
-				if (ls.link.headloss) { lines.push(affix('link', 'headloss', numLine(shownHeadloss(l, lastSolveResult.headlosses[l.id]), resultUnit('elevhead'), extrema.headloss, ld.headloss), l)); }
-				// The '%' is read from the SELECT, not assumed: this family offers rise/run too, and
-				// a "%" on a ratio would be a lie rather than a redundancy. Blank in that form --
-				// there is no token for a bare ratio that is shorter than the ambiguity it fixes.
-				if (ls.link.gradient && l.type !== 'pump' && linkLengthSI(l)) { lines.push(affix('link', 'gradient', numLine(shownHeadloss(l, lastSolveResult.headlosses[l.id]) / linkLengthSI(l), resultUnit('gradient'), extrema.gradient, ld.gradient, gradientSuffix()))); }
-				// rawLine(), not numLine(): linkFrictionFactor() is already a dimensionless number
-				// and running it through a unit factor would scale it by whatever the unit strip
-				// happened to be showing (Task 638).
-				var fricVal = linkFrictionFactor(l);
-				if (ls.link.friction && fricVal !== undefined) { lines.push(affix('link', 'friction', rawLine(fricVal, extrema.friction, ld.friction))); }
-			}
-			// **OUTSIDE THE FLOW GUARD, for the reason colorLinkValue() gives**: a status is a fact
-			// about the link whether or not anything has been solved, and an average quality asks
-			// its own two questions rather than the flow's. A status is TEXT, like an ID -- which is
-			// why it has no entry in the decimals map and gets no spinner.
-			if (ls.link.status) { lines.push(affix('link', 'status', { text: linkStatusText(l) })); }
-			var lqVal = linkQualityValue(l);
-			if (ls.link.quality && lqVal !== undefined) { lines.push(affix('link', 'quality', rawLine(lqVal, extrema.linkQuality, qualityDecimals(ld)))); }
-			// rawLine() for the third time on this block, and for the third reason: the number is
-			// already in the unit its heading names and there is no factor to run it through.
-			var lrVal = linkReactionRate(l);
-			if (ls.link.rate && lrVal !== undefined) { lines.push(affix('link', 'rate', rawLine(lrVal, extrema.rate, ld.rate))); }
-			// **SHOW ORDER** (R-329), before the full list is banked: the shed cascade and the drawn
-			// label are then the one order, exactly as a node label's are.
-			lines = labelShowOrder('link', lines);
+			var lines = linkLabelFieldLines(l, ls, extrema);
 			le.empty = lines.length === 0;
 			if (lines.length === 0) { lines.push({ text: '' }); }
 			// **DRAW IT, MEASURE IT, AND IF IT DOES NOT FIT, DROP A VALUE AND DO IT AGAIN.** One

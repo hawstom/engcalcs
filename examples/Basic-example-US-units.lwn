@@ -274,6 +274,14 @@
 			"headloss": false,
 			"gradient": false
 		},
+		"prefix": {
+			"node": {
+				"id": "N"
+			},
+			"link": {
+				"id": "L"
+			}
+		},
 		"separator": " ",
 		"markExtrema": true
 	},

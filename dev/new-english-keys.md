@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**35 still to read on master**, of 36 untranslated keys, of 2480 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**36 still to read on master**, of 38 untranslated keys, of 2482 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -21,7 +21,7 @@ hit takes you to a section and the rest walk its keys. A key already ruled does 
 it, and a fully ruled group says `all ruled` and can be skipped whole.
 Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
-## Questions from the translators  (11 to read @@ NEEDS RULING)
+## Questions from the translators  (5 to read @@ NEEDS RULING)
 
 **These are SHIPPED strings, already translated into 26 languages.** A wave-0
 reading or a translator found each one readable two ways, and no sprint launches while one is
@@ -39,87 +39,40 @@ is the one you meant. "The first one" is a complete answer.
   *The proposal:* PROPOSED A: '⚠ At least one junction is below {pressure} at the demands as entered (a demand scale of 1). All junctions keep {pressure} only if demands are cut to a demand scale of {m} or less.' PROPOSED B: '⚠ The demands as entered (a demand scale of 1) leave at least one junction below {pressure}. The largest demand scale that keeps every junction at {pressure} or above is {m}.' B paralle...
   @@ NEEDS RULING
 
-### from sprint 1008
+### from sprint 1008c-wave0
 
-- **`lpn_change_type_key`**
-  > ID: Lost entry
-  *The finding:* 'ID: Lost entry' reads like a column-header pair; unclear whether 'Lost entry' means a lost value or a lost record.
-  1. ID: Загубена стойност (lost value)
-  2. lost record
-  **What this asks for:** a WORDING ruling -- is the English above right, or say what it should say.
-  *The proposal:* PROPOSED English for Tom: 'Each line: ID: the property and value that would be lost'. 'ID: Lost entry' is a legend over the lines listing what a type change loses; seven translators could not tell lost value from lost record.
+- **`lpn_export_table_current`**
+  > Current
+  *The finding:* 'Current' is a radio option under both Tables and Scenarios (js/looped-network.js:29716-29720). In a hydraulics tool a translator can read it as electric or water current, or as 'present time', rather than 'the one now selected'. 'All' pairs with it.
+  1. the table or scenario now selected
+  2. current, as flow of water or electricity
+  3. up to date, not out of date
+  **What this asks for:** which of the readings above you meant.
+  *The proposal:* PROPOSED syn: 'Current' (this radio, under Tables and Scenarios) means the one now selected, as opposed to All; it is never a flow or electric current. Alternative English: 'Selected only' / 'All'.
   @@ NEEDS RULING
-- **`lpn_change_type_key`**
-  > ID: Lost entry
-  *The finding:* 'ID: Lost entry' reads as a column-heading pair with no stated structure.
-  1. column headings: ID, then the lost entry
-  2. a sentence
+- **`lpn_file_export_workspace_tip`**
+  > Download a small file holding where your boxes sit, their sizes, which are open or docked, and your pane and column sizes, plus the reading preferences of this page. Your projects, project settings and cookies (language, consent, units) are not in it. Load it on another screen or browser with File, Import, Workspace.
+  *The finding:* 'the reading preferences of this page' is unexplained jargon: a translator cannot tell whether it means language, text size, or display toggles such as the run box, the area hint and the hover card. Same phrase in lpn_file_import_workspace_tip.
+  1. language or font settings for reading text
+  2. display toggles the visitor set, such as whether help bubbles and the hover card are shown
   **What this asks for:** a WORDING ruling -- is the English above right, or say what it should say.
-  *The proposal:* PROPOSED English for Tom: 'Each line: ID: the property and value that would be lost'. 'ID: Lost entry' is a legend over the lines listing what a type change loses; seven translators could not tell lost value from lost record.
+  *The proposal:* PROPOSED English (both keys): replace 'the reading preferences of this page' with 'the display options of this page, such as which help bubbles and the hover card are shown'.
   @@ NEEDS RULING
-- **`lpn_change_type_key`**
-  > ID: Lost entry
-  *The finding:* 'ID: Lost entry' reads as a legend for the lines below, but 'Lost entry' has no stated object; guessed it labels the line format {id}: {property} {value} of a lost value.
-  1. legend: ID then the lost entry (property and value)
-  2. a status label
+- **`lpn_pane_copy_heads`**
+  > Copy with headings
+  *The finding:* 'headings' does not say which: the column headings the table shows, or row and column headings. Right-click menu item in a Tables pane (js/looped-network.js:28892); paneCopyTsv adds one row, the column headings with unit.
+  1. copy the selected cells with their column headings as a first row
+  2. copy the selected cells with both row and column headings
   **What this asks for:** a WORDING ruling -- is the English above right, or say what it should say.
-  *The proposal:* PROPOSED English for Tom: 'Each line: ID: the property and value that would be lost'. 'ID: Lost entry' is a legend over the lines listing what a type change loses; seven translators could not tell lost value from lost record.
+  *The proposal:* PROPOSED English: 'Copy with column headings'
   @@ NEEDS RULING
-- **`lpn_change_type_key`**
-  > ID: Lost entry
-  *The finding:* 'ID: Lost entry' is not clear whether 'Lost entry' names a lost row or a key label; guessed a heading for a lost item.
-  1. ID - lost entry (item lost in conversion)
-  2. ID: entry that is lost
+- **`lpn_settings_hover_card_tip`**
+  > Rest the pointer on a node, link or customer to see its label as specified in Settings at any scale, fit or not. This is a setting for this browser, not for the project.
+  *The finding:* 'at any scale, fit or not' leaves 'fit' with no subject: fit what? The setting makes the hover card show the label even when the on-map label was dropped for lack of room (js/looped-network.js:51225). 'fit' also collides with 'zoom to fit'.
+  1. whether or not the label fits on the map at the current zoom
+  2. whether or not the map is zoomed to fit the network
   **What this asks for:** a WORDING ruling -- is the English above right, or say what it should say.
-  *The proposal:* PROPOSED English for Tom: 'Each line: ID: the property and value that would be lost'. 'ID: Lost entry' is a legend over the lines listing what a type change loses; seven translators could not tell lost value from lost record.
-  @@ NEEDS RULING
-- **`lpn_change_type_key`**
-  > ID: Lost entry
-  *The finding:* 'ID: Lost entry' has no verb or object; unclear whether 'Lost entry' names the thing lost or labels a column of lost entries.
-  1. ID: потерянная запись (label of a lost-entry line)
-  2. ID: the entry that is lost on conversion
-  **What this asks for:** a WORDING ruling -- is the English above right, or say what it should say.
-  *The proposal:* PROPOSED English for Tom: 'Each line: ID: the property and value that would be lost'. 'ID: Lost entry' is a legend over the lines listing what a type change loses; seven translators could not tell lost value from lost record.
-  @@ NEEDS RULING
-- **`lpn_change_type_key`**
-  > ID: Lost entry
-  *The finding:* 'ID: Lost entry' is ambiguous: unclear whether it is a heading, a line label, or a fragment, and what 'Lost entry' refers to.
-  1. Kitambulisho: Kiingizo kilichopotea (the ID/key entry that is lost)
-  2. a lost row or record
-  **What this asks for:** a WORDING ruling -- is the English above right, or say what it should say.
-  *The proposal:* PROPOSED English for Tom: 'Each line: ID: the property and value that would be lost'. 'ID: Lost entry' is a legend over the lines listing what a type change loses; seven translators could not tell lost value from lost record.
-  @@ NEEDS RULING
-- **`lpn_change_type_key`**
-  > ID: Lost entry
-  *The finding:* 'ID: Lost entry' reads as a column header, but 'Lost entry' has no stated object (a value? a property?).
-  1. a table key: the ID followed by the lost value
-  2. a status label saying the ID itself was lost
-  **What this asks for:** a WORDING ruling -- is the English above right, or say what it should say.
-  *The proposal:* PROPOSED English for Tom: 'Each line: ID: the property and value that would be lost'. 'ID: Lost entry' is a legend over the lines listing what a type change loses; seven translators could not tell lost value from lost record.
-  @@ NEEDS RULING
-- **`lpn_settings_auto_run_tip`**
-  > Turn off if recalculation is too slow. Hides the Calculate button.
-  *The finding:* 'Hides the Calculate button' has no stated condition: does it hide the button when the setting is on or when it is turned off?
-  1. The button is hidden while the setting is on (automatic recalculation)
-  2. The button is hidden when the user turns the setting off
-  **What this asks for:** a WORDING ruling -- is the English above right, or say what it should say.
-  *The proposal:* PROPOSED English for Tom: 'Turn off if recalculation is too slow. While this is on, the Calculate button is hidden.' Two translators could not tell which state hides the button.
-  @@ NEEDS RULING
-- **`lpn_settings_auto_run_tip`**
-  > Turn off if recalculation is too slow. Hides the Calculate button.
-  *The finding:* 'Hides the Calculate button' has no stated subject: does turning the setting off or on hide the button?
-  1. the setting being on hides the button (translated literally, ambiguous)
-  2. turning it off hides the button
-  **What this asks for:** a WORDING ruling -- is the English above right, or say what it should say.
-  *The proposal:* PROPOSED English for Tom: 'Turn off if recalculation is too slow. While this is on, the Calculate button is hidden.' Two translators could not tell which state hides the button.
-  @@ NEEDS RULING
-- **`lpn_settings_elev_source_tip`**
-  > 2026 Mapbox DEM horizontal and vertical accuracy ranges through 1–10 m and <1 m in the US, 2–10 m and 1–3 m in Europe and Japan, 30 m and 10–16 m globally, and 90 m and >16 m at the poles.
-  *The finding:* 'ranges through 1-10 m and <1 m' pairs horizontal and vertical accuracy without saying which figure is which; the pairing is inferred from the order 'horizontal and vertical'.
-  1. first figure horizontal, second vertical
-  2. ranges as an interval from one region to the next
-  **What this asks for:** a WORDING ruling -- is the English above right, or say what it should say.
-  *The proposal:* PROPOSED English for Tom: 'Mapbox DEM accuracy in 2026, horizontal then vertical: 1–10 m and under 1 m in the US, 2–10 m and 1–3 m in Europe and Japan, 30 m and 10–16 m globally, and 90 m and over 16 m at the poles.'
+  *The proposal:* PROPOSED English: 'Rest the pointer on a node, link or customer to see its label as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project.'
   @@ NEEDS RULING
 
 ## Synonym entries to approve  (12, 10 to read @@ NEEDS RULING)
@@ -222,7 +175,7 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   @@ NEEDS RULING
 
-## lpn_  (36, 35 to read @@ NEEDS RULING)
+## lpn_  (38, 36 to read @@ NEEDS RULING)
 
 - **`lpn_dxf_export_failed`**
   > The DXF file was not written: an error in this page stopped it ({error}).
@@ -238,7 +191,7 @@ never edits a synonym.
   @@ NEEDS RULING
 - **`lpn_dxf_note_blocks`**
   > Layers are named {prefix}, the asset code, a hyphen, and the alternative, as in {example}. Each element is a block inserted at scale 1 with attributes 1 unit high; scale the blocks to set the text height. Every attribute is visible; the attributes of one element are stacked in a column beside its symbol.
-  @@ NEEDS RULING
+  _Ruled 2026-10-08: Calls page 8 October: Use as written_
 - **`lpn_dxf_note_categories`**
   > {n} junctions have more than one demand category. Their {tag} attribute holds the sum of the base demands of all categories.
   @@ NEEDS RULING
@@ -273,7 +226,7 @@ never edits a synonym.
   > Download a table as the Tables pane shows it. Several tables come as one zip file of CSV files, with a file for each library their IDs refer to.
   @@ NEEDS RULING
 - **`lpn_file_export_dxf_tip`**
-  > Download this network for AutoCAD and other CAD programs: pipes, pumps, and valves as polylines, and every element as a block whose attributes carry its ID and property values in the project units.
+  > Download this network for AutoCAD and other CAD programs: pipes, pumps, and valves as polylines, and every asset as a block whose attributes carry its ID and property values in the project units.
   @@ NEEDS RULING
 - **`lpn_file_export_item_csv`**
   > CSV file…
@@ -308,6 +261,12 @@ never edits a synonym.
 - **`lpn_pane_copy_heads`**
   > Copy with headings
   @@ NEEDS RULING
+- **`lpn_settings_hover_card`**
+  > Show the full label on hover
+  @@ NEEDS RULING
+- **`lpn_settings_hover_card_tip`**
+  > Rest the pointer on a node, link or customer to see its label as specified in Settings at any scale, fit or not. This is a setting for this browser, not for the project.
+  @@ NEEDS RULING
 - **`lpn_workspace_confirm`**
   > Replace this browser's workspace layout with the one in the file?
   _Ruled 2026-10-08: Calls page 8 October: his own text, "Replace this browser's workspace layout with the one in the file?"_
@@ -337,7 +296,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**110 still to read**, of 113 new keys across 14 unmerged branch(es).
+**119 still to read**, of 122 new keys across 13 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -348,7 +307,9 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/bentley-interop (`661acc46`) — 63 new, 63 to read @@ NEEDS RULING
+### chore/calls-1008c (`4903eff4`) — adds no English strings
+
+### feat/bentley-interop (`6b92ff72`) — 71 new, 71 to read @@ NEEDS RULING
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -356,17 +317,38 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_alt_cat_presentation`**
   > Presentation
   @@ NEEDS RULING
-- **`lpn_change_type_create_overrides`**
-  > Create overrides
+- **`lpn_change_type_create_new`**
+  > Create new assets
+  @@ NEEDS RULING
+- **`lpn_change_type_customers_left`**
+  > A customer cannot be assigned per scenario, so the demand of these customers stays with the old junction and is not in this scenario's solve:
   @@ NEEDS RULING
 - **`lpn_change_type_line_alternative`**
   > {id}: {property} {value}, in alternative {alternative}
   @@ NEEDS RULING
+- **`lpn_change_type_not_carried`**
+  > The new assets cannot hold these values. The old assets keep them:
+  @@ NEEDS RULING
+- **`lpn_change_type_old_controls`**
+  > These controls and rules name an old asset, which is inactive in this scenario, so they are left out of this scenario's run and its .inp export:
+  @@ NEEDS RULING
 - **`lpn_change_type_scenario_ask`**
-  > Current scenario is not Base. Create overrides?
+  > Current scenario is not Base. Create new assets? The selected assets become inactive in this scenario.
   @@ NEEDS RULING
 - **`lpn_change_type_switch_base`**
   > Switch to Base
+  @@ NEEDS RULING
+- **`lpn_control_inactive_note`**
+  > These controls refer to an asset that is inactive in this scenario, so they were ignored in this run: {ids}
+  @@ NEEDS RULING
+- **`lpn_inp_export_flat_customers_inactive`**
+  > {n} of these customers are assigned to a junction that is inactive in this scenario, so their demand is not in the file.
+  @@ NEEDS RULING
+- **`lpn_inp_export_flat_inactive_controls`**
+  > These controls and rules name an asset that is inactive in this scenario, so they are not in the file: {ids}
+  @@ NEEDS RULING
+- **`lpn_pane_inactive_show`**
+  > Include inactive topology
   @@ NEEDS RULING
 - **`lpn_pane_scn_cur_only`**
   > Current scenario only
@@ -376,6 +358,9 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 - **`lpn_pane_scn_ov_only`**
   > Overrides only
+  @@ NEEDS RULING
+- **`lpn_rule_inactive_note`**
+  > These rules refer to an asset that is inactive in this scenario, so they were ignored in this run: {ids}
   @@ NEEDS RULING
 - **`lpn_scenario_delete_has_children`**
   > The scenario {name} cannot be deleted while other scenarios inherit from it: {list}. Delete those first, or give them another parent.
@@ -542,15 +527,6 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/desktop (`baba0f04`) — adds no English strings
 
-### feat/hover-label (`944f963d`) — 2 new, 2 to read @@ NEEDS RULING
-
-- **`lpn_settings_hover_card`**
-  > Show the full label on hover
-  @@ NEEDS RULING
-- **`lpn_settings_hover_card_tip`**
-  > Rest the pointer on a node, link or customer to see its label with every label field shown, ticked or not. This is a setting for this browser, not for the project.
-  @@ NEEDS RULING
-
 ### feat/label-gang-search (`8b31a907`) — 3 new, all ruled
 
 - **`lpn_confirm_labels_restore`**
@@ -573,7 +549,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`2e5e81c4`) — adds no English strings
 
-### feat/message-dismiss (`d4c88b12`) — 5 new, 5 to read @@ NEEDS RULING
+### feat/message-dismiss (`aaedf63e`) — 5 new, 5 to read @@ NEEDS RULING
 
 - **`lpn_hotkeys_zoomwin_def`**
   > Zoom Window: drag a rectangle to zoom to.
@@ -597,7 +573,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Points data<br />(use Copy to see format)
   @@ NEEDS RULING
 
-### feat/user-guide (`a6661944`) — 39 new, 39 to read @@ NEEDS RULING
+### feat/user-guide (`9e0c0ef6`) — 42 new, 42 to read @@ NEEDS RULING
 
 - **`lpn_guide_also`**
   > Also in {menu}
@@ -609,7 +585,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > {box} box
   @@ NEEDS RULING
 - **`lpn_guide_boxes_autohide`**
-  > Auto-hidden boxes have two modes: with focus (a control in the box has focus, even a button just pressed) and without focus (no control in it has focus). When the pointer leaves, a box without focus tucks away behind its tab after a short delay. A box with focus stays until you click outside it, press Esc, or Tab out of it with the pointer elsewhere.
+  > When the pointer leaves, a box without focus hides after a short delay. A box with focus hides when you click outside it, press Esc, or Tab out of it with the pointer elsewhere.
   @@ NEEDS RULING
 - **`lpn_guide_boxes_heading`**
   > Boxes
@@ -653,11 +629,20 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_guide_find_results_term`**
   > Results, the selection, and Tables
   @@ NEEDS RULING
+- **`lpn_guide_how_alt`**
+  > Alternatives preview is listed under Water, Scenarios when Basic mode is off.
+  @@ NEEDS RULING
+- **`lpn_guide_how_popup`**
+  > Properties opens when you select an asset or text.
+  @@ NEEDS RULING
 - **`lpn_guide_keys_def`**
   > <table class="lpn-notes-table"><tbody><tr><td>?</td><td>Open the guide at the control under the pointer or holding focus.</td></tr><tr><td>F1</td><td>Open the guide at the entry for the box that has focus.</td></tr><tr><td>Ctrl+K</td><td>Open the guide with the current selection in the search field.</td></tr><tr><td>/</td><td>Select the search field while the guide has focus.</td></tr><tr><td>Esc</td><td>Close the guide and return to where you were.</td></tr></tbody></table>
   @@ NEEDS RULING
 - **`lpn_guide_keys_term`**
   > Guide keyboard shortcuts
+  @@ NEEDS RULING
+- **`lpn_guide_not_shown`**
+  > This control is not on screen right now.
   @@ NEEDS RULING
 - **`lpn_guide_rail_hide`**
   > Hide contents
@@ -717,6 +702,4 @@ build for that would be a gate nobody keeps. Refresh it with
   > Guide
   @@ NEEDS RULING
 
-### feat/visit-dedupe (`b4a99e9a`) — adds no English strings
-
-### feat/workspace (`60879c22`) — adds no English strings
+### feat/visit-dedupe (`7b4a84bd`) — adds no English strings

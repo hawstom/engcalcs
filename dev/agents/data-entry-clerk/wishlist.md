@@ -574,3 +574,20 @@ own merits.
 **Why it ranks high for my seat:** it composes with the shipped Ctrl+Enter, fill handle and row paste, which all act on rendered rows, so a map box-select becomes a bulk-edit scope in about 6 gestures total. Edits cannot make a row leave it.
 
 **Ranking:** just below paste-creates-rows confirmation, above polish items.
+
+## New wishlist rows -- 2026-10-08, Task 721 stage 6 (append to dev/agents/data-entry-clerk/wishlist.md)
+
+### A. Scenarios and Alternatives as TABLES-PANE TABS, not modal managers
+Grid rows = scenarios, columns = categories (the read-only Alternatives table already is this); cells become select-from-list, fill/paste/sort/filter/Overrides-only inherited free from the Tables pane. Rename in place = edit the Name cell. Ranked high: it is the only design whose cost at 72+ cells is already paid for. Size: medium. CITED contrast: Bentley uses two modal managers + an editor (docs.bentley.com 35002 / GUID-630A2475...).
+
+### B. Copy scenario: deep copy by default (clone stored alternatives), "share" a deliberate second command
+Silent sharing means a later edit changes the other scenario. Cost of a wrong default is a bug hunt, not a keystroke. Size: small once promoteImplicitAlternative exists.
+
+### C. Filter "uses its own / overrides only" on every alternative view; inherited cells shown grey, never blank
+Reuses Overrides only. Size: small.
+
+### D. Multi-select scenarios, assign one alternative to all selected (one gesture)
+Ctrl+Enter shape from Task 690 applied to the assignment column. Size: small on the grid in A.
+
+### E. Keyboard tree: arrows move, Enter/F2 rename, Ctrl+Up/Down reparent (or Tab/Shift+Tab to indent/outdent), Delete refuses with named users (already specced).
+Ranked below A; muffle: no confirmation on rename/reparent, undo covers it (doc.alternatives is under undo).

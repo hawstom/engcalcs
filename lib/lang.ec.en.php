@@ -1593,7 +1593,7 @@ $ec_lang['lpn_change_type_tip']='Change the selected nodes into junctions, reser
 $ec_lang['lpn_change_type_ok']='Change';
 $ec_lang['lpn_change_type_lost']='These values will be lost:';
 // The key to the lines under it (Tom, 2026-10-06: *"Provide a key for the loss report. 'ID: Lost entry'."*).
-$ec_lang['lpn_change_type_key']='ID: Lost entry';
+$ec_lang['lpn_change_type_key']='Each line: ID: the property and value that would be lost';
 $ec_lang['lpn_change_type_line']='{id}: {property} {value}';
 $ec_lang['lpn_change_type_line_scenario']='{id}: {property} {value}, in scenario {scenario}';
 $ec_lang['lpn_change_type_more']='And {n} more.';
@@ -1619,7 +1619,7 @@ $ec_lang['lpn_run_menu_tip']='Run simulation. Unnecessary when "Recalculate auto
 // out over time, and this switch is about the run, not about the drawing.
 $ec_lang['lpn_settings_auto_run']='Recalculate automatically';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_settings_auto_run_tip']='Turn off if recalculation is too slow. Hides the Calculate button.';
+$ec_lang['lpn_settings_auto_run_tip']='Turn off if recalculation is too slow. While this is on, the Calculate button is hidden.';
 // **AN EDIT SAYS NOTHING AT ALL WHEN THE SWITCH IS OFF** (Tom, 2026-09-19: *"Recalc off Old
 // values: Leave in place stale. Don't clear. Trust the user."*). `lpn_manual_results_cleared`
 // stood here for part of one day and is DELETED, English-only, never translated: it announced a
@@ -2119,7 +2119,7 @@ $ec_lang['lpn_inp_export_difference_one']='One thing the .inp format cannot hold
 $ec_lang['lpn_inp_export_refused']='This project cannot be written as an EPANET file: {detail}';
 // Task 772: File > Export DXF file. The model's data for AutoCAD and other CAD programs.
 $ec_lang['lpn_file_export_item_dxf']='DXF file…';
-$ec_lang['lpn_file_export_dxf_tip']='Download this network for AutoCAD and other CAD programs: pipes, pumps, and valves as polylines, and every element as a block whose attributes carry its ID and property values in the project units.';
+$ec_lang['lpn_file_export_dxf_tip']='Download this network for AutoCAD and other CAD programs: pipes, pumps, and valves as polylines, and every asset as a block whose attributes carry its ID and property values in the project units.';
 $ec_lang['lpn_dxf_export_no_utm']='The DXF file was not written: this network lies outside the latitudes UTM covers (80° S to 84° N), and a drawing needs a flat grid to be drawn on.';
 $ec_lang['lpn_dxf_export_refused']='The DXF file was not written: the coordinate conversion it needs did not load. Check the connection and try again.';
 $ec_lang['lpn_dxf_export_failed']='The DXF file was not written: an error in this page stopped it ({error}).';
@@ -2985,6 +2985,8 @@ $ec_lang['lpn_hide_titles']='Hide these titles';
 // bubble and reads 'Show this'; this one has to name what it is talking about.
 $ec_lang['lpn_settings_area_hint']='Show the selection help';
 $ec_lang['lpn_settings_area_hint_tip']='Show the prompt over the map that gives the next step while you are selecting an area.';
+$ec_lang['lpn_settings_hover_card']='Show the full label on hover';
+$ec_lang['lpn_settings_hover_card_tip']='Rest the pointer on a node, link or customer to see its label as specified in Settings at any scale, fit or not. This is a setting for this browser, not for the project.';
 $ec_lang['lpn_settings_id_prefixes']='ID prefixes';
 // NEVER "Starting values" (Tom, 2026-08-19: "The problem is that it's misleading"). These are what
 // a NEW asset is created with; "starting" reads as the initial condition of a run, which on a
@@ -3194,7 +3196,7 @@ $ec_lang['lpn_elev_dem_use_tip']='Put the elevation of the DEM at this node into
 $ec_lang['lpn_elev_dem_none']='The DEM has no elevation for this node.';
 $ec_lang['lpn_elev_dem_said']='Mapbox DEM elevation: {v} {u}.';
 $ec_lang['lpn_settings_elev_source']='Elevation source';
-$ec_lang['lpn_settings_elev_source_tip']='2026 Mapbox DEM horizontal and vertical accuracy ranges through 1–10 m and <1 m in the US, 2–10 m and 1–3 m in Europe and Japan, 30 m and 10–16 m globally, and 90 m and >16 m at the poles.';
+$ec_lang['lpn_settings_elev_source_tip']='Mapbox DEM accuracy in 2026, horizontal then vertical: 1–10 m and under 1 m in the US, 2–10 m and 1–3 m in Europe and Japan, 30 m and 10–16 m globally, and 90 m and over 16 m at the poles.';
 $ec_lang['lpn_settings_elev_source_typed']='Above';
 $ec_lang['lpn_settings_elev_source_dem']='Mapbox DEM';
 $ec_lang['lpn_settings_accuracy']='Accuracy';
