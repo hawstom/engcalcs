@@ -139,11 +139,11 @@ L.addLink('pipe', jIds[2], jIds[3]);
 // tables" and "the no-wrap boundary is now a genuinely EMPTY last table", not a stand-in for one.
 
 L.openPane('junctions');
-['junctions', 'reservoirs', 'tanks', 'pipes', 'pumps', 'valves', 'text', 'customers', 'settings']
+['junctions', 'reservoirs', 'tanks', 'pipes', 'pumps', 'valves', 'text', 'customers', 'settings', 'scenarios']
 	.forEach((id) => L.renderTable(id));
 
 const order = L.tableIds();
-report(order.join(',') === 'junctions,reservoirs,tanks,pipes,pumps,valves,text,customers,settings',
+report(order.join(',') === 'junctions,reservoirs,tanks,pipes,pumps,valves,text,customers,settings,scenarios',
 	'the table order this harness assumes is the real one', JSON.stringify(order));
 
 console.log('\n--- 1. Ctrl+Shift+PageDown moves to the NEXT table; plain Ctrl+PageDown does not ---');

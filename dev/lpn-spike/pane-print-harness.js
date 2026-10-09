@@ -176,7 +176,8 @@ console.log('\n--- one printer, seven tables ---');
 	// Eight since 2026-09-15: Customers (Task 247), which prints through the one printer exactly
 	// as the seven before it do, and is the assertion that says so.
 	// Nine since 2026-10-06: the Settings table prints through the same printer.
-	report(TABLES.length === 9, 'there are nine tables to print', TABLES.join(','));
+	// Ten since 2026-10-09: the Scenarios table prints through it too.
+	report(TABLES.length === 10, 'there are ten tables to print', TABLES.join(','));
 	// No per-type print code. The cheap guard is that the per-type names never appear -- the same
 	// guard pane-harness.js keeps over the renderer, for the same reason.
 	report(!/function print(Junctions|Reservoirs|Tanks|Pipes|Pumps|Valves)\b/.test(src),

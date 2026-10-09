@@ -338,15 +338,16 @@ console.log('\n--- six tabs, one renderer ---');
 	// the notes. Order within the six water assets is unchanged and is still asserted.
 	// **NINE SINCE 2026-10-06: Settings** (Tom: *"there will have to be a settings Table"*), last of
 	// the tables: one row per setting, not an asset, so after Customers.
-	report(ids.join(',') === 'junctions,reservoirs,tanks,pipes,pumps,valves,text,customers,settings',
-		'eight asset tables, the six water assets in the toolbar’s Add order, nodes before links, then Settings',
+	// **TEN SINCE 2026-10-09: Scenarios** (Tom, H02), after Settings; its tab is shown only with Basic mode off.
+	report(ids.join(',') === 'junctions,reservoirs,tanks,pipes,pumps,valves,text,customers,settings,scenarios',
+		'eight asset tables, the six water assets in the toolbar’s Add order, nodes before links, then Settings and Scenarios',
 		ids.join(','));
 	// **PROFILE FOLLOWS TIME SERIES** (Tom, 2026-10-04: the graph tabs match the Graphs menu):
 	// after the eight tables, Time series, Profile, Frequency, Flow balance. It was last until
 	// then (2026-08-21). Asserted so a reorder cannot drop it among the tables.
 	report(L.paneTabIds().indexOf('profile') === L.paneTabIds().indexOf('timeseries') + 1
 		&& L.paneTabIds().indexOf('profile') >= 8,
-		'Profile follows Time series, after the eight tables',
+		'Profile follows Time series, after the tables',
 		L.paneTabIds().join(','));
 	report(L.paneTabIds()[0] === 'junctions',
 		'...so the strip OPENS on a table, which is what the Print table menu row acts on',
@@ -360,10 +361,10 @@ console.log('\n--- six tabs, one renderer ---');
 	// **ELEVEN SINCE TASK 600**: Frequency joined the drawings, between Time series and Profile.
 	// **TWELVE SINCE TASK 600's flow balance**: System flow joined them, after Frequency.
 	// **THIRTEEN SINCE 2026-10-06**: the Settings table joined the tables.
-	report(L.paneTabIds().length === 13, 'thirteen tabs in all', String(L.paneTabIds().length));
+	report(L.paneTabIds().length === 14, 'fourteen tabs in all', String(L.paneTabIds().length));
 	report(L.paneTabIds().indexOf('text') === 6 && ids.indexOf('text') === 6,
 		'Text IS a tab since 2026-09-08 (Tom), after the six that solve and before the drawings');
-	report(L.paneTabIds().indexOf('timeseries') === 9,
+	report(L.paneTabIds().indexOf('timeseries') === 10,
 		'Time series is the drawing BEFORE Profile (Task 599)', L.paneTabIds().join(','));
 	// Every table has a panel div of its own in the page, which is also what gives each its own
 	// scroll offset for nothing.

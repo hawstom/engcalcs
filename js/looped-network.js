@@ -5891,10 +5891,8 @@ var EngCalcs = EngCalcs || {};
 		delete s.root;
 		delete s.alternatives;
 		delete s.calc;
-		if (src.isBase) { s.overrides = {}; }
 		if (src.parent !== undefined) { s.parent = src.parent; }
 		else if (src.root === true) { s.root = true; }
-		else if (src.isBase) { /* a copy of Base is a child of Base */ }
 		(['alternatives', 'calc']).forEach(function (field) {
 			var held = src[field];
 			if (held === undefined) { return; }
@@ -30666,7 +30664,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// way is a future case this already answers, without a second door for "unavailable."
 	function paneTabIsHidden(tab) {
 		var btn = document.getElementById('lpn_pane_tab_' + tab.id);
-		return !!(btn && btn.style && btn.style.display === 'none');
+		return !!(btn && btn.style && btn.style.display === 'none') || (tab.id === 'scenarios' && scenarioBasicMode);
 	}
 	function paneTabIndex(id) {
 		var i;
@@ -64398,7 +64396,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				warn = document.createElement('p');
 				warn.className = 'lpn-set-note';
 				warn.textContent = pc.lpn_customer_node_inactive ||
-					'This customer is assigned to a junction that is inactive in this scenario, so its demand is not in the solve.';
+					'This customer is assigned to a junction that is inactive in this scenario, so its demand is not part of the solve.';
 				fields.appendChild(warn);
 			}
 		} else {
@@ -71007,7 +71005,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// when Basic mode is ticked again gives way to the first table.
 	function refreshScenariosTab() {
 		var b = document.getElementById('lpn_pane_tab_scenarios');
-		if (b) { b.hidden = scenarioBasicMode; b.style.display = scenarioBasicMode ? 'none' : ''; }
+		if (b) { b.style.display = scenarioBasicMode ? 'none' : ''; }
 		if (scenarioBasicMode && paneState && paneState.tab === 'scenarios') { setPaneTab(paneTabs[0].id); }
 	}
 	function altCategoryLabel(cat) {
@@ -71078,7 +71076,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		tools = document.createElement('div');
 		tools.className = 'lpn-sm-tools';
 		smButton(tools, '+', pc.lpn_sm_add_child || 'Add a child of the selected item', function () { smActAdd(smState.sel === null ? smBaseKey(smState.tree) : smState.sel); }).id = 'lpn_sm_add';
-		smButton(tools, '−', pc.lpn_sm_delete || 'Delete the selected item', function () { smActDelete(smState.sel); }).id = 'lpn_sm_del';
+		smButton(tools, '−', pc.lpn_sm_delete || 'Delete the selected item. A used item is not deleted.', function () { smActDelete(smState.sel); }).id = 'lpn_sm_del';
 		smButton(tools, pc.lpn_sm_add_base || 'Add Base', pc.lpn_sm_add_base_tip, function () { smActAdd(null); }).id = 'lpn_sm_addbase';
 		if (smState.tree === 'scenarios') {
 			smButton(tools, pc.lpn_sm_make_current || 'Make current', null, function () { smActCurrent(smState.sel); }).id = 'lpn_sm_current';
@@ -71106,7 +71104,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		tree.scrollTop = scroll;
 		old = document.createElement('p');
 		old.className = 'lpn-sm-hint';
-		old.textContent = pc.lpn_sm_hint || '';
+		old.textContent = pc.lpn_sm_hint || 'Drag an item onto another to make it a child of that item. Drag between two items to reorder them. Click a selected item or press F2 to rename it, Delete to delete it, Enter to make a scenario current. Right-click for more.';
 		host.appendChild(old);
 		initTipsIn(host);
 		if (smState.editing !== null) { smFocusEditor(); }
@@ -71327,7 +71325,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (!src) { return; }
 		askDialog({
 			kind: 'choice',
-			text: (pc.lpn_sm_copy_ask || 'Copy the scenario {name}. Make its own copies of the alternatives it uses, or share them?').replace('{name}', scenarioDisplayName(src)),
+			text: (pc.lpn_sm_copy_ask || 'Copy the scenario {name}. Make its own copies of the alternatives it uses, or share them? A shared alternative changes in every scenario that uses it.').replace('{name}', scenarioDisplayName(src)),
 			choices: [
 				{ label: pc.lpn_sm_copy_own || 'Make copies', value: 'own', isDefault: true },
 				{ label: pc.lpn_sm_copy_share || 'Share them', value: 'share' },
@@ -71451,7 +71449,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	function scenarioTableCols() {
 		var cols = [
-			{ key: 'id', label: 'lpn_scenario_label', str: true, em: 9,
+			{ key: 'sc_name', label: 'lpn_scenario_label', str: true, em: 9,
 				get: function (r) { return scenarioDisplayName(r.scn); } },
 			{ key: 'sc_parent', label: 'lpn_sm_col_parent', str: true, em: 9,
 				get: function (r) { var p = parentScenarioOf(r.scn); return p ? scenarioDisplayName(p) : ''; } }

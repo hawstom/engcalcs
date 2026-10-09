@@ -503,7 +503,7 @@ async function main() {
 		r = await runExport('xlsx', 'all', 'all');
 		f = inspect(r.file, 'xlsx');
 		f.sheets = f.sheets.filter((x) => !LIBS.test(x.name));
-		ok('workbook sheet names keep the scenario and stay within 31 characters, unique', f.sheets.every((x) => x.name.length <= 31 && /Peak/.test(x.name) || /Base/.test(x.name)) && new Set(f.sheets.map((x) => x.name.toLowerCase())).size === f.sheets.length, f.sheets.map((x) => x.name).join(' | '));
+		ok('workbook sheet names keep the scenario (the Scenarios table is one sheet of its own) and stay within 31 characters, unique', f.sheets.every((x) => x.name.length <= 31 && /Peak/.test(x.name) || /Base/.test(x.name) || x.name === 'Scenarios') && new Set(f.sheets.map((x) => x.name.toLowerCase())).size === f.sheets.length, f.sheets.map((x) => x.name).join(' | '));
 		r = await runExport('csv', 'all', 'all');
 		f = inspect(r.file, 'zip');
 		const nJ = f.names.filter((n) => /Junctions-/.test(n));

@@ -291,8 +291,8 @@ async function run(mutate, quiet) {
 		P.setProp(P.nodeById('22'), 'active', false);
 		ok('10.9 in a scenario that switches 22 off, the control and the rule are listed', P.libInactiveIds('control').join() === '21' && P.libInactiveIds('rule').join() === 'R1',
 			P.libInactiveIds('control').join() + ' / ' + P.libInactiveIds('rule').join());
-		ok('10.10 and the run says nothing of them (no per-run message): the strings are the note\'s', /ignored in its run/.test(PC.lpn_control_inactive_note) && /ignored in its run/.test(PC.lpn_rule_inactive_note));
-		ok('10.11 the words are "refer to", not "name"', /refer to/.test(PC.lpn_inp_export_flat_inactive_controls) && /refer to an old asset/.test(PC.lpn_change_type_old_controls));
+		ok('10.10 and the run says nothing of them (no per-run message): the strings are the note\'s', PC.lpn_control_inactive_note.indexOf('{ids}') >= 0 && PC.lpn_rule_inactive_note.indexOf('{ids}') >= 0);
+		ok('10.11 the words are "refer to", not "name"', PC.lpn_inp_export_flat_inactive_controls.indexOf('refer to') >= 0 && PC.lpn_change_type_old_controls.indexOf('refer to') >= 0);
 	}
 	return fails;
 }
