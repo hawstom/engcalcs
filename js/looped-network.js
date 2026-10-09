@@ -26841,6 +26841,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// and a filter all clear `orderIds`; none of them clears this.
 	function paneTableRowsInOrder(spec) {
 		var list = paneTableRowList(spec), pool = {}, out = [], rest = [];
+		// The Scenarios table is always in the order scenarios are listed everywhere; no sort or
+		// last-shown order is kept for it.
+		if (spec.group === 'scenario') { spec.orderIds = null; spec.lastOrderIds = null; }
 		list.forEach(function (el) { pool[el.id] = el; });
 		(spec.orderIds || []).forEach(function (id) {
 			if (pool[id]) { out.push(pool[id]); delete pool[id]; }
@@ -71015,10 +71018,14 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	function rebuildScenarioManager() {
 		var host = document.getElementById('lpn_sm_body'), pc = EngCalcs.pageConfig || {}, tools, sel, tree, head,
-			scroll = 0, old;
+			scroll = 0, old, hadFocus;
 		if (!host) { return; }
 		old = host.querySelector('.lpn-sm-tree');
 		if (old) { scroll = old.scrollTop; }
+		// A rebuild replaces the tree the keyboard was in; focus goes back to the new one, so F2,
+		// Delete and Enter keep working after a click.
+		hadFocus = !!document.activeElement && host.contains(document.activeElement) && document.activeElement.tagName !== 'SELECT' &&
+			document.activeElement.type !== 'text';
 		host.innerHTML = '';
 		if (!smSelValid()) { smState.sel = null; }
 		tools = document.createElement('div');
@@ -71072,6 +71079,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		host.appendChild(old);
 		initTipsIn(host);
 		if (smState.editing !== null) { smFocusEditor(); }
+		else if (hadFocus && tree.focus) { tree.focus(); }
 	}
 	function smUsedByText(tree, key) {
 		var pc = EngCalcs.pageConfig || {}, users = smUsedBy(tree, key);
@@ -71082,7 +71090,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	function smRowEl(r) {
 		var pc = EngCalcs.pageConfig || {}, tree = smState.tree, row = document.createElement('div'), name = document.createElement('span'),
-			meta = document.createElement('span'), cb, used;
+			meta = document.createElement('span'), cb, ed, used;
 		row.className = 'lpn-sm-row' + (smState.sel === r.key ? ' lpn-sm-sel' : '');
 		row.setAttribute('role', 'treeitem');
 		row.setAttribute('aria-level', String(r.depth + 1));
@@ -71091,17 +71099,17 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		row.style.paddingInlineStart = (6 + r.depth * 16) + 'px';
 		name.className = 'lpn-sm-name';
 		if (smState.editing === r.key) {
-			cb = document.createElement('input');
-			cb.type = 'text';
-			cb.id = 'lpn_sm_editor';
-			cb.value = smName(tree, r.key);
-			cb.addEventListener('keydown', function (e) {
+			ed = document.createElement('input');
+			ed.type = 'text';
+			ed.id = 'lpn_sm_editor';
+			ed.value = smName(tree, r.key);
+			ed.addEventListener('keydown', function (e) {
 				if (e.stopPropagation) { e.stopPropagation(); }
-				if (e.key === 'Enter') { if (e.preventDefault) { e.preventDefault(); } smCommitRename(cb.value); }
+				if (e.key === 'Enter') { if (e.preventDefault) { e.preventDefault(); } smCommitRename(ed.value); }
 				else if (e.key === 'Escape') { if (e.preventDefault) { e.preventDefault(); } smState.editing = null; rebuildScenarioManager(); }
 			});
-			cb.addEventListener('blur', function () { if (smState.editing === r.key) { smCommitRename(cb.value); } });
-			name.appendChild(cb);
+			ed.addEventListener('blur', function () { if (smState.editing === r.key) { smCommitRename(ed.value); } });
+			name.appendChild(ed);
 		} else {
 			name.textContent = r.name;
 			name.title = r.name;
