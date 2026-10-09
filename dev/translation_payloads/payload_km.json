@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "km",
-        "expected_key_count": 2481,
-        "delta_key_count": 37,
+        "expected_key_count": 2486,
+        "delta_key_count": 42,
         "exempt_key_count": 33,
         "exempt_keys": [
             "u_imgd",
@@ -712,6 +712,11 @@
         ]
     },
     "keys_to_translate": {
+        "lpn_hotkeys_zoomwin_def": "Zoom Window: drag a rectangle to zoom to.",
+        "lpn_status_dismiss": "Hide this message",
+        "lpn_msglog_hidden": "Hidden",
+        "lpn_msglog_unhide": "Show",
+        "lpn_status_hidden_tip": "Show the hidden message on the map again.",
         "lpn_pane_copy_heads": "Copy with column headings",
         "lpn_export_table_title": "Export to {format}",
         "lpn_export_table_current": "Current",
@@ -751,6 +756,11 @@
         "lpn_settings_hover_card_tip": "Rest the pointer on a node, link or customer to see its label as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project."
     },
     "keys": {
+        "lpn_hotkeys_zoomwin_def": "Zoom Window: drag a rectangle to zoom to.",
+        "lpn_status_dismiss": "Hide this message",
+        "lpn_msglog_hidden": "Hidden",
+        "lpn_msglog_unhide": "Show",
+        "lpn_status_hidden_tip": "Show the hidden message on the map again.",
         "lpn_pane_copy_heads": "Copy with column headings",
         "lpn_export_table_title": "Export to {format}",
         "lpn_export_table_current": "Current",
@@ -790,6 +800,86 @@
         "lpn_settings_hover_card_tip": "Rest the pointer on a node, link or customer to see its label as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project."
     },
     "key_context": {
+        "lpn_hotkeys_zoomwin_def": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_hotkeys_map_def",
+                    "value": "<table class=\"lpn-notes-table\"><tbody><tr><td>1 ឬ Esc<\/td><td>ជ្រើសរើស។<\/td><\/tr><tr><td>2<\/td><td>បន្ថែមថ្នាំង។<\/td><\/tr><tr><td>3<\/td><td>បន្ថែមអាងស្តុក។<\/td><\/tr><tr><td>4<\/td><td>បន្ថែមធុងទឹក។<\/td><\/tr><tr><td>5<\/td><td>បន្ថែមបំពង់។<\/td><\/tr><tr><td>6<\/td><td>បន្ថែមម៉ាស៊ីនបូម។<\/td><\/tr><tr><td>7<\/td><td>បន្ថែមវ៉ាល់។<\/td><\/tr><tr><td>8<\/td><td>បន្ថែមអតិថិជន។<\/td><\/tr><tr><td>9<\/td><td>បន្ថែមអត្ថបទ។<\/td><\/tr><tr><td>Delete<\/td><td>លុបអ្វីដែលបានជ្រើសរើស។<\/td><\/tr><tr><td>Ctrl+Z<\/td><td>ត្រឡប់ការផ្លាស់ប្ដូរចុងក្រោយ។<\/td><\/tr><tr><td>+ ឬ =<\/td><td>ពង្រីក។<\/td><\/tr><tr><td>-<\/td><td>បង្រួម។<\/td><\/tr><\/tbody><\/table>",
+                    "english": "<table class=\"lpn-notes-table\"><tbody><tr><td>1 or Esc<\/td><td>Select.<\/td><\/tr><tr><td>2<\/td><td>Add a junction.<\/td><\/tr><tr><td>3<\/td><td>Add a reservoir.<\/td><\/tr><tr><td>4<\/td><td>Add a tank.<\/td><\/tr><tr><td>5<\/td><td>Add a pipe.<\/td><\/tr><tr><td>6<\/td><td>Add a pump.<\/td><\/tr><tr><td>7<\/td><td>Add a valve.<\/td><\/tr><tr><td>8<\/td><td>Add a customer.<\/td><\/tr><tr><td>9<\/td><td>Add text.<\/td><\/tr><tr><td>Delete<\/td><td>Delete the selection.<\/td><\/tr><tr><td>Ctrl+Z<\/td><td>Undo the last change.<\/td><\/tr><tr><td>+ or =<\/td><td>Zoom in.<\/td><\/tr><tr><td>-<\/td><td>Zoom out.<\/td><\/tr><\/tbody><\/table>"
+                },
+                "next_translated": {
+                    "key": "lpn_hotkeys_menu_heading",
+                    "value": "ម៉ឺនុយ",
+                    "english": "Menus"
+                }
+            }
+        },
+        "lpn_status_dismiss": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_wrong_btn",
+                    "value": "មានអ្វីខុសនៅទីនេះ?",
+                    "english": "Something wrong here?"
+                },
+                "next_translated": {
+                    "key": "lpn_wrong_tip",
+                    "value": "រាយការណ៍កំហុសមួយនៅលើទំព័រនេះ។ វាបើកប្រអប់មួយដើម្បីជ្រើសរើសបញ្ហា បន្ថែមមតិយោបល់ និងបញ្ចូលអាសយដ្ឋានអ៊ីមែលប្រសិនបើចង់បានចម្លើយតប។ គ្រប់វាលទាំងអស់ជាស្រេចចិត្ត ហើយគ្មានអ្វីត្រូវបានផ្ញើទេ រហូតដល់អ្នកចុច ផ្ញើ។",
+                    "english": "Report an error on this page. This opens a box to select the problem, add a comment, and enter an email address if a reply is wanted. All fields are optional, and nothing is sent until you press Send."
+                }
+            }
+        },
+        "lpn_msglog_hidden": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_wrong_btn",
+                    "value": "មានអ្វីខុសនៅទីនេះ?",
+                    "english": "Something wrong here?"
+                },
+                "next_translated": {
+                    "key": "lpn_wrong_tip",
+                    "value": "រាយការណ៍កំហុសមួយនៅលើទំព័រនេះ។ វាបើកប្រអប់មួយដើម្បីជ្រើសរើសបញ្ហា បន្ថែមមតិយោបល់ និងបញ្ចូលអាសយដ្ឋានអ៊ីមែលប្រសិនបើចង់បានចម្លើយតប។ គ្រប់វាលទាំងអស់ជាស្រេចចិត្ត ហើយគ្មានអ្វីត្រូវបានផ្ញើទេ រហូតដល់អ្នកចុច ផ្ញើ។",
+                    "english": "Report an error on this page. This opens a box to select the problem, add a comment, and enter an email address if a reply is wanted. All fields are optional, and nothing is sent until you press Send."
+                }
+            }
+        },
+        "lpn_msglog_unhide": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_wrong_btn",
+                    "value": "មានអ្វីខុសនៅទីនេះ?",
+                    "english": "Something wrong here?"
+                },
+                "next_translated": {
+                    "key": "lpn_wrong_tip",
+                    "value": "រាយការណ៍កំហុសមួយនៅលើទំព័រនេះ។ វាបើកប្រអប់មួយដើម្បីជ្រើសរើសបញ្ហា បន្ថែមមតិយោបល់ និងបញ្ចូលអាសយដ្ឋានអ៊ីមែលប្រសិនបើចង់បានចម្លើយតប។ គ្រប់វាលទាំងអស់ជាស្រេចចិត្ត ហើយគ្មានអ្វីត្រូវបានផ្ញើទេ រហូតដល់អ្នកចុច ផ្ញើ។",
+                    "english": "Report an error on this page. This opens a box to select the problem, add a comment, and enter an email address if a reply is wanted. All fields are optional, and nothing is sent until you press Send."
+                }
+            }
+        },
+        "lpn_status_hidden_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_wrong_btn",
+                    "value": "មានអ្វីខុសនៅទីនេះ?",
+                    "english": "Something wrong here?"
+                },
+                "next_translated": {
+                    "key": "lpn_wrong_tip",
+                    "value": "រាយការណ៍កំហុសមួយនៅលើទំព័រនេះ។ វាបើកប្រអប់មួយដើម្បីជ្រើសរើសបញ្ហា បន្ថែមមតិយោបល់ និងបញ្ចូលអាសយដ្ឋានអ៊ីមែលប្រសិនបើចង់បានចម្លើយតប។ គ្រប់វាលទាំងអស់ជាស្រេចចិត្ត ហើយគ្មានអ្វីត្រូវបានផ្ញើទេ រហូតដល់អ្នកចុច ផ្ញើ។",
+                    "english": "Report an error on this page. This opens a box to select the problem, add a comment, and enter an email address if a reply is wanted. All fields are optional, and nothing is sent until you press Send."
+                }
+            }
+        },
         "lpn_pane_copy_heads": {
             "reason": "missing",
             "current_value": null,

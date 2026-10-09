@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**31 still to read on master**, of 37 untranslated keys, of 2481 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**34 still to read on master**, of 42 untranslated keys, of 2486 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -175,7 +175,7 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   @@ NEEDS RULING
 
-## lpn_  (37, 31 to read @@ NEEDS RULING)
+## lpn_  (42, 34 to read @@ NEEDS RULING)
 
 - **`lpn_dxf_export_failed`**
   > The DXF file was not written: an error in this page stopped it ({error}).
@@ -255,6 +255,15 @@ never edits a synonym.
 - **`lpn_file_import_workspace_tip`**
   > Apply a workspace file saved with File, Export, Workspace: box positions and sizes, docking, pane sizes and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched.
   _Ruled 2026-10-09: Use proposed (Tom, calls page round 3)._
+- **`lpn_hotkeys_zoomwin_def`**
+  > Zoom Window: drag a rectangle to zoom to.
+  @@ NEEDS RULING
+- **`lpn_msglog_hidden`**
+  > Hidden
+  _Ruled 2026-10-08: Calls page 8 October: Use as written_
+- **`lpn_msglog_unhide`**
+  > Show
+  _Ruled 2026-10-08: Calls page 8 October: Use as written_
 - **`lpn_pane_copy_heads`**
   > Copy with column headings
   _Ruled 2026-10-09: Use proposed (Tom, calls page round 3)._
@@ -264,6 +273,12 @@ never edits a synonym.
 - **`lpn_settings_hover_card_tip`**
   > Rest the pointer on a node, link or customer to see its label as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project.
   _Ruled 2026-10-09: Use proposed (Tom, calls page round 3)._
+- **`lpn_status_dismiss`**
+  > Hide this message
+  @@ NEEDS RULING
+- **`lpn_status_hidden_tip`**
+  > Show the hidden message on the map again.
+  @@ NEEDS RULING
 - **`lpn_workspace_confirm`**
   > Replace this browser's workspace layout with the one in the file?
   _Ruled 2026-10-08: Calls page 8 October: his own text, "Replace this browser's workspace layout with the one in the file?"_
@@ -293,7 +308,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**119 still to read**, of 122 new keys across 13 unmerged branch(es).
+**153 still to read**, of 156 new keys across 13 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -304,15 +319,16 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/calls-1009 (`2fe50ab1`) — adds no English strings
-
-### feat/bentley-interop (`6b92ff72`) — 71 new, 71 to read @@ NEEDS RULING
+### feat/bentley-interop (`fe2028f4`) — 101 new, 101 to read @@ NEEDS RULING
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
   @@ NEEDS RULING
 - **`lpn_alt_cat_presentation`**
   > Presentation
+  @@ NEEDS RULING
+- **`lpn_alt_cat_topology_tip`**
+  > Asset activation
   @@ NEEDS RULING
 - **`lpn_change_type_create_new`**
   > Create new assets
@@ -327,7 +343,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > The new assets cannot hold these values. The old assets keep them:
   @@ NEEDS RULING
 - **`lpn_change_type_old_controls`**
-  > These controls and rules name an old asset, which is inactive in this scenario, so they are left out of this scenario's run and its .inp export:
+  > These controls and rules refer to an old asset, which is inactive in this scenario, so they are left out of this scenario's run and its .inp export:
   @@ NEEDS RULING
 - **`lpn_change_type_scenario_ask`**
   > Current scenario is not Base. Create new assets? The selected assets become inactive in this scenario.
@@ -336,13 +352,16 @@ build for that would be a gate nobody keeps. Refresh it with
   > Switch to Base
   @@ NEEDS RULING
 - **`lpn_control_inactive_note`**
-  > These controls refer to an asset that is inactive in this scenario, so they were ignored in this run: {ids}
+  > These controls refer to an asset that is inactive in this scenario, so they are ignored in its run: {ids}
+  @@ NEEDS RULING
+- **`lpn_customer_node_inactive`**
+  > This customer is assigned to a junction that is inactive in this scenario, so its demand is not in the solve.
   @@ NEEDS RULING
 - **`lpn_inp_export_flat_customers_inactive`**
   > {n} of these customers are assigned to a junction that is inactive in this scenario, so their demand is not in the file.
   @@ NEEDS RULING
 - **`lpn_inp_export_flat_inactive_controls`**
-  > These controls and rules name an asset that is inactive in this scenario, so they are not in the file: {ids}
+  > These controls and rules refer to an asset that is inactive in this scenario, so they are not in the file: {ids}
   @@ NEEDS RULING
 - **`lpn_pane_inactive_show`**
   > Include inactive topology
@@ -356,11 +375,17 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_pane_scn_ov_only`**
   > Overrides only
   @@ NEEDS RULING
+- **`lpn_pane_tab_scenarios`**
+  > Scenarios
+  @@ NEEDS RULING
 - **`lpn_rule_inactive_note`**
-  > These rules refer to an asset that is inactive in this scenario, so they were ignored in this run: {ids}
+  > These rules refer to an asset that is inactive in this scenario, so they are ignored in its run: {ids}
   @@ NEEDS RULING
 - **`lpn_scenario_delete_has_children`**
   > The scenario {name} cannot be deleted while other scenarios inherit from it: {list}. Delete those first, or give them another parent.
+  @@ NEEDS RULING
+- **`lpn_scncmp_none_checked`**
+  > No scenario is checked for comparison. Check scenarios in the Scenario manager.
   @@ NEEDS RULING
 - **`lpn_settings_held_base`**
   > {base}: {value}
@@ -521,6 +546,84 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_settings_view_top_left`**
   > Top left corner
   @@ NEEDS RULING
+- **`lpn_sm_add_base`**
+  > Add Base
+  @@ NEEDS RULING
+- **`lpn_sm_add_base_tip`**
+  > Add another Base to this tree. A Base has no parent.
+  @@ NEEDS RULING
+- **`lpn_sm_add_child`**
+  > Add a child of the selected item
+  @@ NEEDS RULING
+- **`lpn_sm_basic_off`**
+  > Basic mode is off, so the Scenario manager and the Scenarios table are shown.
+  @@ NEEDS RULING
+- **`lpn_sm_col_parent`**
+  > Parent
+  @@ NEEDS RULING
+- **`lpn_sm_compare_tip`**
+  > Include in Scenario comparison
+  @@ NEEDS RULING
+- **`lpn_sm_copy`**
+  > Copy scenario…
+  @@ NEEDS RULING
+- **`lpn_sm_copy_ask`**
+  > Copy the scenario {name}. Make its own copies of the alternatives it uses, or share them? A shared alternative changes in every scenario that uses it.
+  @@ NEEDS RULING
+- **`lpn_sm_copy_own`**
+  > Make copies
+  @@ NEEDS RULING
+- **`lpn_sm_copy_share`**
+  > Share them
+  @@ NEEDS RULING
+- **`lpn_sm_cycle`**
+  > {name} cannot be moved under one of its own children.
+  @@ NEEDS RULING
+- **`lpn_sm_delete`**
+  > Delete the selected item. It is refused while anything uses it.
+  @@ NEEDS RULING
+- **`lpn_sm_hint`**
+  > Drag an item onto another to make it a child of that item. Drag between two items to reorder them. Click a selected item or press F2 to rename it, Delete to delete it, Enter to make a scenario current. Right-click for more.
+  @@ NEEDS RULING
+- **`lpn_sm_in_use`**
+  > {name} cannot be deleted while it is used by: {list}.
+  @@ NEEDS RULING
+- **`lpn_sm_inherited`**
+  > inherited
+  @@ NEEDS RULING
+- **`lpn_sm_kept`**
+  > The values this scenario held in {category} were kept as the alternative {name}.
+  @@ NEEDS RULING
+- **`lpn_sm_make_current`**
+  > Make current
+  @@ NEEDS RULING
+- **`lpn_sm_menu`**
+  > Scenario manager…
+  @@ NEEDS RULING
+- **`lpn_sm_name_taken`**
+  > The name {name} is already used in this tree.
+  @@ NEEDS RULING
+- **`lpn_sm_own_values`**
+  > Own values
+  @@ NEEDS RULING
+- **`lpn_sm_rename`**
+  > Rename
+  @@ NEEDS RULING
+- **`lpn_sm_shared_note`**
+  > Shared with: {list}
+  @@ NEEDS RULING
+- **`lpn_sm_title`**
+  > Scenario manager
+  @@ NEEDS RULING
+- **`lpn_sm_used_by`**
+  > Used by scenarios: {n}
+  @@ NEEDS RULING
+- **`lpn_sm_used_by_none`**
+  > Not used by any scenario
+  @@ NEEDS RULING
+- **`lpn_sm_used_by_tip`**
+  > Used by: {list}
+  @@ NEEDS RULING
 
 ### feat/desktop (`baba0f04`) — adds no English strings
 
@@ -546,23 +649,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`2e5e81c4`) — adds no English strings
 
-### feat/message-dismiss (`5ab39136`) — 5 new, 5 to read @@ NEEDS RULING
-
-- **`lpn_hotkeys_zoomwin_def`**
-  > Zoom Window: drag a rectangle to zoom to.
-  @@ NEEDS RULING
-- **`lpn_msglog_hidden`**
-  > Hidden
-  @@ NEEDS RULING
-- **`lpn_msglog_unhide`**
-  > Show
-  @@ NEEDS RULING
-- **`lpn_status_dismiss`**
-  > Hide this message
-  @@ NEEDS RULING
-- **`lpn_status_hidden_tip`**
-  > Show the hidden message on the map again.
-  @@ NEEDS RULING
+### feat/message-dismiss (`26e1afc8`) — adds no English strings
 
 ### feat/section-grid (`005d4e63`) — 1 new, 1 to read @@ NEEDS RULING
 
@@ -570,8 +657,11 @@ build for that would be a gate nobody keeps. Refresh it with
   > Points data<br />(use Copy to see format)
   @@ NEEDS RULING
 
-### feat/user-guide (`e4a9ca56`) — 42 new, 42 to read @@ NEEDS RULING
+### feat/user-guide (`8fb6434e`) — 45 new, 45 to read @@ NEEDS RULING
 
+- **`lpn_guide_about_heading`**
+  > About this calculator
+  @@ NEEDS RULING
 - **`lpn_guide_also`**
   > Also in {menu}
   @@ NEEDS RULING
@@ -626,6 +716,9 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_guide_find_results_term`**
   > Results, the selection, and Tables
   @@ NEEDS RULING
+- **`lpn_guide_group_from`**
+  > From {menu}
+  @@ NEEDS RULING
 - **`lpn_guide_how_alt`**
   > Alternatives preview is listed under Water, Scenarios when Basic mode is off.
   @@ NEEDS RULING
@@ -637,6 +730,9 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 - **`lpn_guide_keys_term`**
   > Guide keyboard shortcuts
+  @@ NEEDS RULING
+- **`lpn_guide_menu_named`**
+  > {menu} menu
   @@ NEEDS RULING
 - **`lpn_guide_not_shown`**
   > This control is not on screen right now.
@@ -700,3 +796,24 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 
 ### feat/visit-dedupe (`7b4a84bd`) — adds no English strings
+
+### fix/ewb-meeting (`4953af70`) — 6 new, 6 to read @@ NEEDS RULING
+
+- **`lpn_break_no`**
+  > No
+  @@ NEEDS RULING
+- **`lpn_break_pipe_ask`**
+  > Break pipe {id} at this node?
+  @@ NEEDS RULING
+- **`lpn_break_yes`**
+  > Yes
+  @@ NEEDS RULING
+- **`lpn_link_end_same`**
+  > From and To must be different nodes.
+  @@ NEEDS RULING
+- **`lpn_link_end_unknown`**
+  > No node has the ID {id}.
+  @@ NEEDS RULING
+- **`lpn_omitted_note`**
+  > Left out of this run because no path leads from them to a reservoir or tank: {ids}
+  @@ NEEDS RULING

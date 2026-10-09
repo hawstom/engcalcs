@@ -5659,6 +5659,21 @@
             "ruled": "2026-10-08",
             "answer": "Calls page 8 October: Use as written"
         },
+        "lpn_tool_zoom_extent_tip": {
+            "on": "Fit the whole network to the map window. For Zoom Window with no fit first, press W or click the small triangle in the corner of the Zoom to fit toolbar button. See also upper right map zoom controls.",
+            "ruled": "2026-10-08",
+            "answer": "Calls page 8 October: Use as written"
+        },
+        "lpn_msglog_hidden": {
+            "on": "Hidden",
+            "ruled": "2026-10-08",
+            "answer": "Calls page 8 October: Use as written"
+        },
+        "lpn_msglog_unhide": {
+            "on": "Show",
+            "ruled": "2026-10-08",
+            "answer": "Calls page 8 October: Use as written"
+        },
         "lpn_workspace_confirm": {
             "on": "Replace this browser's workspace layout with the one in the file?",
             "ruled": "2026-10-08",

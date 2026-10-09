@@ -18450,6 +18450,26 @@ var EngCalcs = EngCalcs || {};
 	// straight to Zoom Window with no drag or click-click ever asked for. Tom's rule is "click
 	// TWICE IN A ROW", and a click on the map in between is not that.
 	var zoomToolArmed = false;
+	// Straight into Zoom Window, from the Map menu row and the W key. The toolbar button is painted
+	// as Zoom Window for the duration, exactly as its own second press does, and setMode() puts it
+	// back when the mode ends. Pressed again while already in the mode, it leaves it.
+	function enterZoomWindow() {
+		if (mode === 'zoom-window') { setMode('select'); return; }
+		zoomToolArmed = false;
+		zoomToolShape = 'window';
+		setMode('zoom-window');
+		if (repaintZoomTool) { repaintZoomTool(); }
+	}
+	// The corner target of the Zoom to fit button: a square at its lower-right corner, about 14 px for
+	// a mouse and 22 px for a finger, never more than half the button either way.
+	function zoomCornerHit(btn, e) {
+		var r = btn.getBoundingClientRect();
+		var coarse = !!(window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
+		var side = coarse ? 22 : 14;
+		var w = Math.min(side, r.width / 2), h = Math.min(side, r.height / 2);
+		// Physical right in every language, because the CSS triangle is drawn at `right: 2px`.
+		return e.clientX >= r.right - w && e.clientX <= r.right && e.clientY >= r.bottom - h && e.clientY <= r.bottom;
+	}
 	// The button itself, held the same way `openToolButton`/`saveToolButton` below are, so
 	// `wireZoomArmReset()`'s one, wired-once listener can always test against the CURRENT button
 	// even though wireToolbar() rebuilds the strip (language switch, unit switch) and would
@@ -33939,13 +33959,16 @@ var EngCalcs = EngCalcs || {};
 	function setStorageError(on, kind) {
 		var pc = EngCalcs.pageConfig || {};
 		kind = on ? (kind || '') : '';
+		// A write that took ends "storage full", whether or not it was flagged (H11). Unreadable ends
+		// where the open document is read, not here: a sibling's write must not end it.
+		if (!on) { clearHiddenCond('storage-full'); }
 		if (on === storageError && kind === storageErrorKind) { return; }
 		storageError = on;
 		storageErrorKind = kind;
 		if (!on) { return; }
 		if (kind === 'unreadable') {
 			var said = pc.lpn_storage_unreadable || 'Not saved. This project could not be read from browser storage. Its stored copy is left exactly as it is and will not be written over, so nothing on this tab is being saved. Open a file or create a new project to keep working.';
-			setStatus(said);
+			setStatus(said, '', false, 'storage-unreadable');
 			// **AND A MODAL, because the status line is not durable enough for THIS one.** The first
 			// solve on the empty document runs `if (!doc.nodes.length) { setStatus(''); return; }`
 			// and the sentence is gone -- which is the exact silence this defect is made of, a named
@@ -33956,7 +33979,7 @@ var EngCalcs = EngCalcs || {};
 			if (!unreadableTold) { unreadableTold = true; askDialog({ kind: 'alert', text: said }); }
 			return;
 		}
-		setStatus(pc.lpn_storage_full || 'Not saved. Browser storage is full or unavailable, so your recent changes will be lost when you close this tab.');
+		setStatus(pc.lpn_storage_full || 'Not saved. Browser storage is full or unavailable, so your recent changes will be lost when you close this tab.', '', false, 'storage-full');
 	}
 	function projectKey(id) { return LPN_PROJECT_PREFIX + id; }
 	// The full reset behind "?lpn_wipe=1" and the Wipe memory button. Clears EVERY project key plus
@@ -33977,7 +34000,7 @@ var EngCalcs = EngCalcs || {};
 		// same reason.
 		var i, key, doomed = [LPN_LEGACY_KEY, LPN_INDEX_KEY, LPN_IDENTITY_KEY,
 			LPN_PANE_KEY, LPN_RPANE_KEY, LPN_SETBOX_KEY, LPN_FINDBOX_KEY, LPN_LIBBOX_KEY,
-			LPN_FFBOX_KEY, LPN_ENERGYBOX_KEY, LPN_CMPBOX_KEY, LPN_RPTBOX_KEY, LPN_CONTOURBOX_KEY,
+			LPN_FFBOX_KEY, LPN_ENERGYBOX_KEY, LPN_CMPBOX_KEY, LPN_RPTBOX_KEY, LPN_CONTOURBOX_KEY, LPN_MSGHIDDEN_KEY,
 			// 'lpn_notesbox' and 'lpn_hotkeysbox' join the list here rather than a day later, for the
 			// same reason every entry above states its own miss: window furniture left out of this
 			// list makes "exactly as a brand-new visitor would see it" false for that one key. Named
@@ -35672,6 +35695,7 @@ var EngCalcs = EngCalcs || {};
 		// two branches, since `indexEntry(library.openId)` is true by construction two lines above.
 		if (!doc2) { unreadableOpenId = library.openId; unreadableTold = false; return null; }
 		unreadableOpenId = null;
+		clearHiddenCond('storage-unreadable');
 		return doc2;
 	}
 	// Everything a freshly-installed document has to push back out to the UI. Shared by
@@ -35751,6 +35775,7 @@ var EngCalcs = EngCalcs || {};
 		renderLabelsLegend();
 		applyMaskLabels();   // the setting belongs to the project, so opening one can change it
 		updateEmptyHint();
+		clearStatusHidden();   // hidden messages belong to the network that was on screen
 		setStatus('');
 		setMode('select');
 		refreshMapStatus();   // units belong to the project now, so switching projects can change this
@@ -42822,6 +42847,8 @@ var EngCalcs = EngCalcs || {};
 	var LPN_WORKSPACE_EXCLUDED = [
 		// Documents, not preferences: the project library, its index, and the pre-library document.
 		'lpn_index', 'lpn_document', 'lpn_project_',
+		// Which messages this reader hid, keyed to a project id of THIS browser: meaningless elsewhere.
+		'lpn_msghidden',
 		// An opaque token naming this browser to the file-lock broker: identity, not a layout.
 		'lpn_identity',
 		// Legacy keys nothing writes any more; a workspace must not resurrect them.
@@ -43736,6 +43763,11 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {};
 		return [
 			{ icon: 'zoom', label: pc.lpn_tool_zoom_extent || 'Zoom to fit', tip: pc.lpn_tool_zoom_extent_tip, fn: zoomExtent },
+			// **A DOOR TO ZOOM WINDOW THAT NEEDS NO ZOOM TO FIT FIRST** (Tom, 2026-10-07: "We need a way to
+			// zoom window without Zoom to Fit first."). The toolbar button still reaches it by a second
+			// press; this row and the W key enter it directly. Pointer-only, like every tool that
+			// needs a drag.
+			{ icon: 'zoom-window', pointerOnly: true, label: pc.lpn_tool_zoom_window || 'Zoom Window', tip: pc.lpn_tool_zoom_window_tip, hotkey: 'W', fn: enterZoomWindow },
 			// **A SNIPPING TOOL, IN THE MAP MENU BECAUSE IT IS NOT ABOUT WATER** (Tom, 2026-10-05). Beside
 			// Zoom to fit: both are about the view of the drawing, and the one frames what the other takes.
 			{ icon: 'image', pointerOnly: true, label: pc.lpn_screenshot_menu || 'Screenshot', tip: pc.lpn_screenshot_tip, fn: function () { startScreenshot(); } },
@@ -45451,6 +45483,7 @@ var EngCalcs = EngCalcs || {};
 			closePopup();
 			buildDom();
 			updateEmptyHint();
+			clearStatusHidden(true);
 			setStatus('');
 			setMode('select');
 			refreshScenarioStatus();
@@ -46086,7 +46119,14 @@ var EngCalcs = EngCalcs || {};
 			extentBtn.dataset.tool = 'zoom-window';
 			extentBtn.setAttribute('aria-pressed', mode === 'zoom-window' ? 'true' : 'false');
 		}
-		extentBtn.addEventListener('click', function () {
+		extentBtn.addEventListener('click', function (e) {
+			// **THE CORNER TRIANGLE IS A DOOR NOW** (Tom, 2026-10-07: "Maybe the little triangle really
+			// means something if you click there", and "We need to access Zoom Window without any view
+			// change intervening"). A pointer click in the button's lower-right corner enters Zoom Window
+			// at once, with no fit; anywhere else on the button keeps the press-twice behaviour below.
+			// Measured from the click's own coordinates because the triangle is a CSS ::after with
+			// nothing in the DOM to click; a keyboard press (detail 0) has no position and is never one.
+			if (e && e.detail > 0 && zoomCornerHit(extentBtn, e)) { enterZoomWindow(); return; }
 			// Already drawing a Zoom Window: a second press exits it and shows Zoom to fit again,
 			// mirroring select-area's "press again to cycle" -- except this cycle has one member to
 			// come back to, because Zoom to fit is what the button shows by default.
@@ -61369,6 +61409,21 @@ var EngCalcs = EngCalcs || {};
 		setMode(m);
 	});
 
+	// **W IS ZOOM WINDOW** (Tom, 2026-10-07). Free of every other plain key on this page (the digits,
+	// Esc, Delete, +, =, -, and the menu mnemonics, which answer only inside an open menu). Same
+	// guard as the digit picker: never with a modifier, never while typing.
+	document.addEventListener('keydown', function (e) {
+		if (e.ctrlKey || e.metaKey || e.altKey) { return; }
+		if (isTextEntry(e.target)) { return; }
+		// By character, and by physical key so a layout that types something else there (Russian: key
+		// 'ц', code KeyW) still answers, as the menu chords' own e.code rule does.
+		if (e.key !== 'w' && e.key !== 'W' && e.code !== 'KeyW') { return; }
+		// An open menu owns the letters (its rows answer to mnemonics), and it checks defaultPrevented.
+		if (openMenuAnchor) { return; }
+		if (e.preventDefault) { e.preventDefault(); }
+		enterZoomWindow();
+	});
+
 	/**
 	 * **PLAIN `+`/`-`, NEVER Ctrl/Cmd** (ROADMAP Task 682; Tom, 2026-09-17: "How would a person
 	 * zoom on a PC without a mouse wheel or, for that matter, with a keyboard"). Read the ROADMAP
@@ -62421,7 +62476,38 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {}, panel = document.getElementById('lpn_msglog_panel');
 		if (!panel) { return; }
 		panel.innerHTML = '';
-		if (!noticeLog.length) {
+		// **A HIDDEN MESSAGE IS THE TOP ROW, MARKED, WITH ITS RESTORE** (Tom, 2026-10-07: "Put the hidden
+		// at the top of the expando history"). Pinned above the newest-first list, and its own entry in
+		// that list is left out below so the same words never appear twice.
+		var hiddenText = statusHiddenText();
+		var hiddenNotes = (notesLast && notesHidden) ? notesLast : '';
+		function hiddenRow(text, restore) {
+			var hrow = document.createElement('div');
+			hrow.className = 'lpn-msglog-panel-row lpn-msglog-panel-hidden';
+			var mark = document.createElement('span');
+			mark.className = 'lpn-msglog-panel-when lpn-msglog-hidden-mark';
+			mark.textContent = pc.lpn_msglog_hidden || 'Hidden';
+			hrow.appendChild(mark);
+			var htext = document.createElement('span');
+			htext.className = 'lpn-msglog-panel-text';
+			htext.textContent = text;
+			hrow.appendChild(htext);
+			var show = document.createElement('button');
+			show.type = 'button';
+			show.className = 'lpn-msglog-unhide';
+			show.textContent = pc.lpn_msglog_unhide || 'Show';
+			show.title = pc.lpn_status_hidden_tip || 'Show the hidden message on the map again.';
+			show.addEventListener('click', function () {
+				restore();
+				var xEl = document.getElementById('lpn_status_dismiss');
+				if (xEl && xEl.focus) { xEl.focus(); }
+			});
+			hrow.appendChild(show);
+			panel.appendChild(hrow);
+		}
+		if (hiddenText) { hiddenRow(hiddenText, unhideStatus); }
+		if (hiddenNotes) { hiddenRow(hiddenNotes, unhideEngineNotes); }
+		if (!noticeLog.length && !hiddenText && !hiddenNotes) {
 			// A DIFFERENT CLASS FROM A REAL ROW ON PURPOSE: "no messages yet" is not itself a
 			// kept message, so it must not count as one to anything reading .lpn-msglog-panel-row.
 			var none = document.createElement('div');
@@ -62433,6 +62519,7 @@ var EngCalcs = EngCalcs || {};
 		// Newest first, matching noticeLog's own order (Tom: "oldest at the bottom") -- no
 		// re-sorting at render time, so the panel can never disagree with the log it is reading.
 		noticeLog.forEach(function (row) {
+			if ((hiddenText && row.text === hiddenText) || (hiddenNotes && row.text === hiddenNotes)) { return; }
 			var pill = document.createElement('div');
 			pill.className = 'lpn-msglog-panel-row' + (row.severity === 'warning' ? ' lpn-msglog-panel-warn' : '');
 			var when = document.createElement('span');
@@ -62451,7 +62538,7 @@ var EngCalcs = EngCalcs || {};
 		// as the last row rather than dropped along with the dialog chrome around it.
 		var note = document.createElement('div');
 		note.className = 'lpn-msglog-panel-note';
-		note.textContent = (pc.lpn_msglog_note || 'Newest first. This page keeps the last {n} messages while it is open, and nothing is stored on your computer.')
+		note.textContent = (pc.lpn_msglog_note || 'Newest first. This page keeps the last {n} messages while it is open and does not store them on your computer.')
 			.replace('{n}', NOTICE_LOG_MAX);
 		panel.appendChild(note);
 	}
@@ -62647,14 +62734,149 @@ var EngCalcs = EngCalcs || {};
 	// the text -- diagIssueText() already turned the code into the sentence. A caller with no code
 	// gets 'status', which is honest: something was said, and it was not one of the diagnoses.
 	var statusWrongCode = '';
-	function setStatus(text, code) {
+	// **HIDING A STANDING MESSAGE** (Tom, 2026-10-07: "I wish there were a way to dismiss error
+	// messages that I no longer want to see like 'no path to a reservoir'. After about a minute or
+	// two it's just an annoyance."). Ida's design: a small x beside the text (never in the grievance
+	// button's element), hiding exactly that TEXT -- the same words stay hidden, different words (another
+	// node list) show again. IN MEMORY ONLY: the set lives as long as the page and is emptied when a
+	// different network opens, so nothing is stored on the device.
+	//
+	// **HIDDEN MEANS HIDDEN** (Tom, 2026-10-07, of a "1 hidden" chip left in the amber box: "Put the
+	// hidden at the top of the expando history instead of still on the map. Hidden means hidden, and
+	// it's not hidden."). Nothing of a hidden message stays on the map: the box goes with it, its
+	// grievance button included (the bottom strip keeps the standing one). The message waits as the
+	// TOP row of the message history panel (renderMsglogPanel()), marked Hidden, with the one control
+	// that brings it back. No count, badge or highlight on the history glyph either: that glyph sits
+	// on the map too, and lighting it would be the chip again in another place.
+	//
+	// **EVERY STANDING MESSAGE IS HIDEABLE** (Tom, 2026-10-08, G09: "Every standing message"). One
+	// mechanism, no per-message exceptions. A hidden message comes back by two doors only: (1) its
+	// text stops being the standing one (fix the problem, break it again: a diagnostic from
+	// lpnDiagnose() is seen again), and (2) for a run message (anything not a diagnostic: run
+	// summaries, not-converged, engine loading and failure, storage full, unit unknown) the start of
+	// the next run, since the same sentence after a new run is a new fact. `diag` is true only for
+	// a diagnostic.
+	//
+	// **REMEMBERED ACROSS A RELOAD, IN THIS BROWSER** (Tom, 2026-10-09, H09: "this should not be lost on
+	// reload."). A reading preference the visitor asked for, the class of `lpn_hovercard`, so it is
+	// `localStorage` only and never in serializeProject(). What is stored is as little as can do the
+	// job: the open project's id and, per hidden message, a short hash of its words with its kind
+	// (`diag` or `cond:<name>`). Never the words. A hidden RUN message is not stored at all: the next
+	// run, which a reload is, forgets it anyway.
+	//
+	// **THREE MESSAGES STAY HIDDEN UNTIL THEIR CONDITION CHANGES** (Tom, 2026-10-09, H11): storage full,
+	// storage unreadable and unit unknown. They are neither a diagnostic nor a run summary, since an
+	// edit or a run says the same sentence again and no one fixed anything. A `cond:` entry survives
+	// edits and runs; clearHiddenCond() removes it when the condition clears (storage takes a write,
+	// the document reads, the unit is recognised), so a recurrence after that shows again.
+	var LPN_MSGHIDDEN_KEY = 'lpn_msghidden';
+	// Words to a short key: the identity of a message, which cannot be turned back into the words.
+	function statusKey(text) {
+		var h = 5381, i;
+		for (i = 0; i < text.length; i++) { h = ((h * 33) ^ text.charCodeAt(i)) >>> 0; }
+		return h.toString(36) + '.' + text.length;
+	}
+	var statusHiddenOwner = '';   // the project id the hidden set belongs to
+	function loadStatusHidden() {
+		var out = {};
+		try {
+			var o = JSON.parse(localStorage.getItem(LPN_MSGHIDDEN_KEY) || 'null');
+			if (o && typeof o.o === 'string' && o.h && typeof o.h === 'object') {
+				Object.keys(o.h).forEach(function (k) {
+					if (/^(diag|cond:[a-z-]+)$/.test(String(o.h[k]))) { out[k] = o.h[k]; statusHiddenOwner = o.o; }
+				});
+			}
+		} catch (e) { out = {}; }
+		return out;
+	}
+	var statusHidden = loadStatusHidden();   // statusKey(text) -> 'diag' | 'run' | 'cond:<name>'
+	// A restored hidden set is not judged by the empty statements a page load makes on its way to its
+	// first real message; the grace ends at the first non-empty one.
+	var statusHiddenGrace = Object.keys(statusHidden).length > 0;
+	var statusLast = { text: '', code: '', diag: false, cond: '' };
+	function saveStatusHidden() {
+		var keep = {}, n = 0;
+		Object.keys(statusHidden).forEach(function (k) {
+			if (statusHidden[k] !== 'run' && n < 40) { keep[k] = statusHidden[k]; n++; }
+		});
+		try {
+			if (n) { localStorage.setItem(LPN_MSGHIDDEN_KEY, JSON.stringify({ o: statusHiddenOwner, h: keep })); }
+			else { localStorage.removeItem(LPN_MSGHIDDEN_KEY); }
+		} catch (e) { /* private mode or full: hidden for this page view only */ }
+	}
+	// Opening a different network, or clearing this one, ends the set. Opening the SAME project (a
+	// reload) keeps what was restored.
+	function clearStatusHidden(force) {
+		if (!force && statusHiddenOwner && statusHiddenOwner === library.openId) { return; }
+		statusHidden = {};
+		statusHiddenGrace = false;
+		saveStatusHidden();
+	}
+	function hideStatusMessage() {
+		statusHiddenOwner = library.openId || '';
+		statusHidden[statusKey(statusLast.text)] = statusLast.cond ? 'cond:' + statusLast.cond : (statusLast.diag ? 'diag' : 'run');
+		saveStatusHidden();
+	}
+	// The condition behind a `cond:` message has cleared, so a recurrence is news again.
+	function clearHiddenCond(name) {
+		var any = false;
+		Object.keys(statusHidden).forEach(function (k) { if (statusHidden[k] === 'cond:' + name) { delete statusHidden[k]; any = true; } });
+		if (!any) { return; }
+		saveStatusHidden();
+		if (statusLast.cond === name) { paintStatus(); syncStatusBoxVisibility(); }
+	}
+	// A new run forgets the hidden RUN messages (door 2 above); hidden diagnostics stay hidden.
+	function forgetHiddenRunMessages() {
+		Object.keys(statusHidden).forEach(function (k) { if (statusHidden[k] === 'run') { delete statusHidden[k]; } });
+	}
+	// The text the user has hidden and that is still the standing message, or '' -- what the history
+	// panel pins at its top.
+	function statusHiddenText() {
+		return (statusLast.text && statusHidden[statusKey(statusLast.text)]) ? statusLast.text : '';
+	}
+	// Paints what setStatus() last stated, honouring the hidden set. Called by setStatus(), and by
+	// the x and the history row's Show, which must not re-log a message that has not changed.
+	function paintStatus() {
 		var el = document.getElementById('lpn_status');
 		var textEl = document.getElementById('lpn_status_text');
+		var xEl = document.getElementById('lpn_status_dismiss');
 		if (!el) { return; }
+		var hide = !!statusHiddenText();
 		// WRITTEN INTO THE INNER SPAN, not into the <p>: the <p> also holds the grievance button,
 		// and textContent on the parent would delete it on the first solve. Falls back to the <p>
 		// where the span is absent, so a harness or a page that has not been updated still works.
-		(textEl || el).textContent = text || '';
+		(textEl || el).textContent = hide ? '' : (statusLast.text || '');
+		// The x serves the notes beside the text too (H10): shown while either has something on the map.
+		if (xEl) { xEl.style.display = ((statusLast.text && !hide) || (notesLast && !notesHidden)) ? '' : 'none'; }
+		// An open history panel follows: a hidden message forgotten by an edit leaves its top row.
+		if (msglogPanelOpen) { renderMsglogPanel(); }
+	}
+	// Brings the hidden message back onto the map. The one restore door, on the history row.
+	function unhideStatus() {
+		delete statusHidden[statusKey(statusLast.text)];
+		saveStatusHidden();
+		paintStatus();
+		syncStatusBoxVisibility();
+	}
+	function setStatus(text, code, diag, cond) {
+		var el = document.getElementById('lpn_status');
+		if (!el) { return; }
+		statusLast = { text: text || '', code: code || '', diag: !!(text && diag), cond: text ? (cond || '') : '' };
+		// A hidden text is FORGOTTEN the moment it is no longer the one showing: fix the problem,
+		// break it again (undo, redo, an edit) and the message must be seen again. A `cond:` entry is
+		// the exception, kept until clearHiddenCond().
+		if (!statusHiddenGrace || statusLast.text) {
+			var cur = statusLast.text ? statusKey(statusLast.text) : '', pruned = false;
+			Object.keys(statusHidden).forEach(function (k) {
+				if (k !== cur && statusHidden[k].indexOf('cond:') !== 0) { delete statusHidden[k]; pruned = true; }
+			});
+			if (pruned) { saveStatusHidden(); }
+			statusHiddenGrace = false;
+		}
+		paintStatus();
+		// Hidden when empty, or an empty amber box sits on the drawing saying nothing. It is an
+		// overlay now, so this changes what is COVERED, never what is laid out.
+		syncStatusBoxVisibility();
 		// **THE DIAGNOSTIC IS A MESSAGE TOO** (Task 704, Tom 2026-09-22: "**All** messages now
 		// need to go through this messenger system"). This is the SAME door js/lpn-time.js's
 		// progress box writes through (`host.status`) -- "Working out the extended period
@@ -62669,9 +62891,6 @@ var EngCalcs = EngCalcs || {};
 		// sentence, and refusing to hear about that one would be the instrument measuring itself.
 		if (next !== statusWrongCode) { resetWrongButton('lpn_wrong_status_btn'); }
 		statusWrongCode = next;
-		// Hidden when empty, or an empty amber box sits on the drawing saying nothing. It is an
-		// overlay now, so this changes what is COVERED, never what is laid out.
-		syncStatusBoxVisibility();
 	}
 
 	/**
@@ -62738,6 +62957,25 @@ var EngCalcs = EngCalcs || {};
 	// grievance button beside it.
 	var LPN_ENGINE_NOTE_MS = 120000, LPN_ENGINE_NOTE_FADE_MS = 800;
 	var engineNoteTimer = 0, engineNoteFadeTimer = 0;
+	// **THE x HIDES THE NOTES TOO** (Tom, 2026-10-09, H10: "hidden means hidden"). Their text is kept
+	// here while hidden so the history can show it with Show; it is not stored on the device, because
+	// a note lives two minutes and its next showing is a new fact.
+	var notesLast = '', notesHidden = false;
+	function hideEngineNotes() {
+		var el = document.getElementById('lpn_status_notes');
+		if (!notesLast || notesHidden || !el) { return; }
+		notesHidden = true;
+		el.textContent = '';
+	}
+	function unhideEngineNotes() {
+		var el = document.getElementById('lpn_status_notes');
+		if (!notesLast || !notesHidden || !el) { return; }
+		notesHidden = false;
+		el.textContent = ' ' + notesLast;
+		el.style.opacity = '';
+		paintStatus();
+		syncStatusBoxVisibility();
+	}
 	function clearEngineNoteTimers() {
 		if (engineNoteTimer) { clearTimeout(engineNoteTimer); engineNoteTimer = 0; }
 		if (engineNoteFadeTimer) { clearTimeout(engineNoteFadeTimer); engineNoteFadeTimer = 0; }
@@ -62751,6 +62989,8 @@ var EngCalcs = EngCalcs || {};
 		// A leading space because this span abuts #lpn_status_text with no whitespace between the
 		// two tags -- the markup cannot carry one without it showing when the note is absent.
 		el.textContent = text ? ' ' + text : '';
+		notesLast = text || '';
+		notesHidden = false;
 		// **ALL MESSAGES GO THROUGH ONE DOOR** (ROADMAP Task 704; Perry's review, 2026-09-22:
 		// setEngineNotes() was the one writer of on-map text this branch had missed -- it stands
 		// for two minutes and then fades, exactly the "read it, then it is gone" shape the whole
@@ -62760,15 +63000,23 @@ var EngCalcs = EngCalcs || {};
 		if (text) {
 			engineNoteTimer = setTimeout(function () {
 				engineNoteTimer = 0;
+				if (notesHidden) {   // hidden notes just expire, with their history row
+					notesLast = ''; notesHidden = false;
+					paintStatus(); syncStatusBoxVisibility();
+					return;
+				}
 				el.style.opacity = '0';
 				engineNoteFadeTimer = setTimeout(function () {
 					engineNoteFadeTimer = 0;
 					el.textContent = '';
 					el.style.opacity = '';
+					notesLast = '';
+					paintStatus();
 					syncStatusBoxVisibility();
 				}, LPN_ENGINE_NOTE_FADE_MS);
 			}, LPN_ENGINE_NOTE_MS);
 		}
+		paintStatus();   // the x serves the notes too
 		syncStatusBoxVisibility();
 	}
 	// The box shows while EITHER half has something to say. Before the notes moved out this was one
@@ -63006,6 +63254,23 @@ var EngCalcs = EngCalcs || {};
 		// empty one would be indistinguishable in the log from a row whose detail was dropped.
 		wireWrongButton('lpn_wrong_btn', 'none');
 		wireWrongButton('lpn_wrong_status_btn', function () { return statusWrongCode || 'status'; });
+		wireStatusHide();
+	}
+	// The x. Focus moves to the history glyph, which is where the message went, so a keyboard user is
+	// never dropped onto the page and is one Enter away from bringing it back.
+	function wireStatusHide() {
+		var xEl = document.getElementById('lpn_status_dismiss');
+		if (xEl) {
+			xEl.addEventListener('click', function () {
+				if (!statusLast.text && !(notesLast && !notesHidden)) { return; }
+				if (statusLast.text && !statusHiddenText()) { hideStatusMessage(); }
+				hideEngineNotes();
+				paintStatus();
+				syncStatusBoxVisibility();
+				var logBtn = document.getElementById('lpn_msglog_btn');
+				if (logBtn && logBtn.focus) { logBtn.focus(); }
+			});
+		}
 	}
 	// Rounds to the same number of decimals the label actually displays, in the DISPLAY unit --
 	// extrema and decoration MUST compare on this, not the raw SI value. Two series links carrying
@@ -63920,6 +64185,7 @@ var EngCalcs = EngCalcs || {};
 		// of it is committed, and saveToStorage() already refuses a placement in progress for the
 		// same reason. Finish and Cancel both schedule a solve on the way out.
 		if (georefActive()) { return; }
+		forgetHiddenRunMessages();
 		// Autosave piggybacks on the same debounce as the solve, not a separate timer -- one
 		// mutation, one save, regardless of solve outcome (a manual delete-to-empty must persist
 		// too, or a reload would resurrect the stale pre-delete network).
@@ -63943,10 +64209,11 @@ var EngCalcs = EngCalcs || {};
 			lastSolveResult = null;
 			setStatus(((EngCalcs.pageConfig || {}).lpn_unit_unknown ||
 				'This drawing states a unit this page does not offer: {unit}. Everything is kept and shown exactly as it came in, and nothing was changed. No answers can be given until this page knows that unit, because there is no way to tell how big it is.')
-				.replace('{unit}', unknownUnits.join(', ')), 'unit-unknown');
+				.replace('{unit}', unknownUnits.join(', ')), 'unit-unknown', false, 'unit-unknown');
 			refreshLabelText();
 			return;
 		}
+		clearHiddenCond('unit-unknown');
 		var model = assembleModel();
 		// **THE EPANET FETCH STARTS HERE, BEFORE ANY OPINION ABOUT THE NETWORK IS FORMED** (Task
 		// 608). This is the one function every edit's debounce and every Calculate demand arrive at,
@@ -63958,7 +64225,7 @@ var EngCalcs = EngCalcs || {};
 		if (issues.length > 0) {
 			lastSolveResult = null;
 			issues.forEach(function (issue) { logLpnDiag(issue.code); });
-			setStatus(issues.map(diagIssueText).join(' '), issues[0].code);
+			setStatus(issues.map(diagIssueText).join(' '), issues[0].code, true);
 			refreshLabelText();
 			return;
 		}
@@ -68114,7 +68381,7 @@ var EngCalcs = EngCalcs || {};
 			// diameter that is not there.
 			if (result.issues && result.issues.length > 0) {
 				result.issues.forEach(function (issue) { logLpnDiag(issue.code); });
-				setStatus(result.issues.map(diagIssueText).join(' '), result.issues[0].code);
+				setStatus(result.issues.map(diagIssueText).join(' '), result.issues[0].code, true);
 				refreshLabelText();
 				refreshValueColors();   // Task 384: the colours came from results that no longer exist
 				refreshPaneIfOpen();    // Task 409: and so did the grade line and the result columns

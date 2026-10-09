@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "ru",
-        "expected_key_count": 2481,
-        "delta_key_count": 37,
+        "expected_key_count": 2486,
+        "delta_key_count": 42,
         "exempt_key_count": 27,
         "exempt_keys": [
             "calc_units_us",
@@ -706,6 +706,11 @@
         ]
     },
     "keys_to_translate": {
+        "lpn_hotkeys_zoomwin_def": "Zoom Window: drag a rectangle to zoom to.",
+        "lpn_status_dismiss": "Hide this message",
+        "lpn_msglog_hidden": "Hidden",
+        "lpn_msglog_unhide": "Show",
+        "lpn_status_hidden_tip": "Show the hidden message on the map again.",
         "lpn_pane_copy_heads": "Copy with column headings",
         "lpn_export_table_title": "Export to {format}",
         "lpn_export_table_current": "Current",
@@ -745,6 +750,11 @@
         "lpn_settings_hover_card_tip": "Rest the pointer on a node, link or customer to see its label as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project."
     },
     "keys": {
+        "lpn_hotkeys_zoomwin_def": "Zoom Window: drag a rectangle to zoom to.",
+        "lpn_status_dismiss": "Hide this message",
+        "lpn_msglog_hidden": "Hidden",
+        "lpn_msglog_unhide": "Show",
+        "lpn_status_hidden_tip": "Show the hidden message on the map again.",
         "lpn_pane_copy_heads": "Copy with column headings",
         "lpn_export_table_title": "Export to {format}",
         "lpn_export_table_current": "Current",
@@ -784,6 +794,86 @@
         "lpn_settings_hover_card_tip": "Rest the pointer on a node, link or customer to see its label as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project."
     },
     "key_context": {
+        "lpn_hotkeys_zoomwin_def": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_hotkeys_map_def",
+                    "value": "<table class=\"lpn-notes-table\"><tbody><tr><td>1 или Esc<\/td><td>Выбрать.<\/td><\/tr><tr><td>2<\/td><td>Добавить узел.<\/td><\/tr><tr><td>3<\/td><td>Добавить резервуар.<\/td><\/tr><tr><td>4<\/td><td>Добавить бак.<\/td><\/tr><tr><td>5<\/td><td>Добавить трубу.<\/td><\/tr><tr><td>6<\/td><td>Добавить насос.<\/td><\/tr><tr><td>7<\/td><td>Добавить клапан.<\/td><\/tr><tr><td>8<\/td><td>Добавить потребителя.<\/td><\/tr><tr><td>9<\/td><td>Добавить текст.<\/td><\/tr><tr><td>Delete<\/td><td>Удалить выделенное.<\/td><\/tr><tr><td>Ctrl+Z<\/td><td>Отменить последнее изменение.<\/td><\/tr><tr><td>+ или =<\/td><td>Приблизить.<\/td><\/tr><tr><td>-<\/td><td>Отдалить.<\/td><\/tr><\/tbody><\/table>",
+                    "english": "<table class=\"lpn-notes-table\"><tbody><tr><td>1 or Esc<\/td><td>Select.<\/td><\/tr><tr><td>2<\/td><td>Add a junction.<\/td><\/tr><tr><td>3<\/td><td>Add a reservoir.<\/td><\/tr><tr><td>4<\/td><td>Add a tank.<\/td><\/tr><tr><td>5<\/td><td>Add a pipe.<\/td><\/tr><tr><td>6<\/td><td>Add a pump.<\/td><\/tr><tr><td>7<\/td><td>Add a valve.<\/td><\/tr><tr><td>8<\/td><td>Add a customer.<\/td><\/tr><tr><td>9<\/td><td>Add text.<\/td><\/tr><tr><td>Delete<\/td><td>Delete the selection.<\/td><\/tr><tr><td>Ctrl+Z<\/td><td>Undo the last change.<\/td><\/tr><tr><td>+ or =<\/td><td>Zoom in.<\/td><\/tr><tr><td>-<\/td><td>Zoom out.<\/td><\/tr><\/tbody><\/table>"
+                },
+                "next_translated": {
+                    "key": "lpn_hotkeys_menu_heading",
+                    "value": "Меню",
+                    "english": "Menus"
+                }
+            }
+        },
+        "lpn_status_dismiss": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_wrong_btn",
+                    "value": "Что-то не так?",
+                    "english": "Something wrong here?"
+                },
+                "next_translated": {
+                    "key": "lpn_wrong_tip",
+                    "value": "Сообщить об ошибке на этой странице. Откроется окно, в котором можно выбрать проблему, добавить комментарий и ввести адрес электронной почты, если нужен ответ. Все поля необязательны, и ничего не отправляется, пока вы не нажмёте «Отправить».",
+                    "english": "Report an error on this page. This opens a box to select the problem, add a comment, and enter an email address if a reply is wanted. All fields are optional, and nothing is sent until you press Send."
+                }
+            }
+        },
+        "lpn_msglog_hidden": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_wrong_btn",
+                    "value": "Что-то не так?",
+                    "english": "Something wrong here?"
+                },
+                "next_translated": {
+                    "key": "lpn_wrong_tip",
+                    "value": "Сообщить об ошибке на этой странице. Откроется окно, в котором можно выбрать проблему, добавить комментарий и ввести адрес электронной почты, если нужен ответ. Все поля необязательны, и ничего не отправляется, пока вы не нажмёте «Отправить».",
+                    "english": "Report an error on this page. This opens a box to select the problem, add a comment, and enter an email address if a reply is wanted. All fields are optional, and nothing is sent until you press Send."
+                }
+            }
+        },
+        "lpn_msglog_unhide": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_wrong_btn",
+                    "value": "Что-то не так?",
+                    "english": "Something wrong here?"
+                },
+                "next_translated": {
+                    "key": "lpn_wrong_tip",
+                    "value": "Сообщить об ошибке на этой странице. Откроется окно, в котором можно выбрать проблему, добавить комментарий и ввести адрес электронной почты, если нужен ответ. Все поля необязательны, и ничего не отправляется, пока вы не нажмёте «Отправить».",
+                    "english": "Report an error on this page. This opens a box to select the problem, add a comment, and enter an email address if a reply is wanted. All fields are optional, and nothing is sent until you press Send."
+                }
+            }
+        },
+        "lpn_status_hidden_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_wrong_btn",
+                    "value": "Что-то не так?",
+                    "english": "Something wrong here?"
+                },
+                "next_translated": {
+                    "key": "lpn_wrong_tip",
+                    "value": "Сообщить об ошибке на этой странице. Откроется окно, в котором можно выбрать проблему, добавить комментарий и ввести адрес электронной почты, если нужен ответ. Все поля необязательны, и ничего не отправляется, пока вы не нажмёте «Отправить».",
+                    "english": "Report an error on this page. This opens a box to select the problem, add a comment, and enter an email address if a reply is wanted. All fields are optional, and nothing is sent until you press Send."
+                }
+            }
+        },
         "lpn_pane_copy_heads": {
             "reason": "missing",
             "current_value": null,
