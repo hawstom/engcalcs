@@ -4181,3 +4181,10 @@ OBSERVED defect 1: a control/rule naming the old asset is NOT omitted from B's r
 OBSERVED defect 2: after Create new assets, Properties box still shows old junction 22 while map selection is new tank T1.
 OBSERVED: customer 100 gpm on 22 vanishes in B with no word; same as Base change-to-tank (pre-existing), box lists only "Base demand 200".
 Native engine and undo taken from builder's harness, not re-run by me (headless harness re-run: all ok, incl. 7 mutations).
+
+
+# Perry journal 2026-10-09: feat/bentley-interop stage 6 Scenario manager (head e2fad9e7)
+OBSERVED (decays): driven in real Chromium on Net1, own scripts in scratchpad (p3..p10).
+- Works: add/rename/F2/slow-click rename, Child_1/2_of_Horse numbering, Base2/Base3, drag reparent+reorder, cycle refusal, delete-in-use refusal naming users, Demand alt assigned in Scenarios table -> junction edit lands in alt, Base untouched, solve differs; copy own/share; Compare honours unchecked; save/reopen keeps tree, alternatives, compareSet; es shows menu/headings, new strings English.
+- Defects: Delete on Base: misleading map message; Base2 Parent column says Base while tip says Base has no parent; scenario override count 0 though holds Dry year demand edit; builder harness has `|| true` assertions (1.1, 3.4, 2.1) and weak 5.5/6.4.
+- Could not find the builder's "six self-declared calls" in git log or dev/*.md.
