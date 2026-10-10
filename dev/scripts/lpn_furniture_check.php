@@ -154,6 +154,11 @@ const EC_LPN_FURNITURE = [
     // asset. A reading aid for the person at the screen; written only when OFF.
     'lpn_hovercard'   => 'whether the full-label hover card is shown, for this browser',
     'lpn_areahint'    => 'whether the area-selection help bubble is shown',
+    // Hidden amber messages (Tom, 2026-10-09, H09: "this should not be lost on reload."). Which
+    // messages this reader hid is a fact about the person at the screen: the open project's id and a
+    // short hash of each hidden message's words, never the words. A colleague opening the file must
+    // not inherit it.
+    'lpn_msghidden'   => 'which standing messages this reader hid (hashes, never the words), for this browser',
     // **WHICH WAY ROUND THE LAST SURVEY FILE WAS WRITTEN IS A FACT ABOUT THAT PERSON'S DATA
     // COLLECTOR, not about this network** (Task 592). It is the remembered answer to the import
     // chooser's one question -- northing first or easting first -- and a file read from it has

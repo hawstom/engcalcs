@@ -2,9 +2,9 @@
 //
 //   flock /tmp/engcalcs-browser.lock node dev/lpn-spike/export-submenu-browser-harness.js
 //
-// The rows are File > Export to > EPANET file and GeoJSON file (Tom, 2026-10-06), then, under a
-// Tables and libraries heading, ODS file, XLSX file and CSV file (Tom, 2026-10-07: "It should say
-// File, Export to, and we are adding ODS/XLSX/CSV"). A table row opens its box first; its Export
+// The rows are File > Export > EPANET file and GeoJSON file (Tom, 2026-10-06), then, after a
+// separator and with no heading (Tom, 2026-10-09), ODS file, XLSX file and CSV file (Tom,
+// 2026-10-07: "It should say File, Export to, and we are adding ODS/XLSX/CSV"). A table row opens its box first; its Export
 // button is pressed with a real mouse click. The submenu opens by
 // mouse (click the row) and by keyboard (Down into File, onto Export, Right), lists every export,
 // and each row still downloads exactly one file with the right extension. A new export added to
@@ -109,7 +109,8 @@ async function main() {
 			ok('it holds every export row, in order', JSON.stringify(got) === JSON.stringify(want), got.join(' | '));
 			ok('no row repeats the word Export', got.every((t) => !/^Export/i.test(t)));
 			const heading = await a.page.$$eval('#lpn_menu_list2 .lpn-menu-heading', (els) => els.map((e) => e.textContent.trim()));
-			ok('the table rows sit under the Tables and libraries heading', JSON.stringify(heading) === JSON.stringify([(await a.lang('lpn_file_export_tables_heading')).trim()]), JSON.stringify(heading));
+			ok('the Export submenu has no heading row (Tom, 2026-10-09)', heading.length === 0, JSON.stringify(heading));
+			ok('the File row says Export… and not Export to…', menuLabel === 'Export…', menuLabel);
 			for (let i = 0; i < ROWS.length; i++) {
 				if (i > 0) { await a.page.keyboard.press('Escape'); await a.settle(200); await openFile(); await openSub(); }
 				let dl = null;

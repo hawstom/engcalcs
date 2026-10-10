@@ -99,56 +99,60 @@ lines rather than appending corrections.
   tile counts at a 900 ms settle (basemap.js now waits for a pointable tile). Pre-existing and unrelated: `scale-publish-harness.js` (2 checks). The full `node dev/browser-pass/run.js` is green (1853/1853, 2026-10-04, Task 761); browser-pass specs are not in
   check_all.
 
-## STATE — 2026-10-08 (tenth session, Arizona time)
+## STATE — 2026-10-09 (eleventh session, Arizona time)
 
-### Master = 4ebfdbf6, pushed. Production: last confirmed pull edc78d01 (2026-10-07); confirm with the About box
+### Master = 939f5242, pushed. Production: last confirmed pull edc78d01 (2026-10-07); confirm with the About box
 
-Merged 10-08 (tenth): feat/hover-label on his words (all-clear on file, pinned 31b137e5; his item (1),
-every example labels node IDs N and link IDs L, built first); fix/dock-box-width (bentley-interop's two
-general dock commits, 364a8757 and 8ee43015, cherry-picked; the two Alternatives-box ones stay there);
-fix/example-prefix-harnesses (six harnesses expected bare IDs; no page defect). Deleted keys: none
-(key_hygiene_check: 0 unrendered on master and on bentley-interop). New on a visitor's device:
-`lpn_hovercard` (the literal `off` only when the hover card is switched off; inventory row added).
+Merged 10-09: fix/export-wording (File > "Export…", the "Tables and libraries" heading gone, format
+tips say what each carries, DXF tip opens with symbol blocks, his three v3 rewrites); feat/message-dismiss
+on his "merge" (all-clear on file, pinned 26e1afc8) with his H09-H11: hidden messages survive a reload
+(new `lpn_msghidden`, localStorage, hashes not text; inventory row added), engine notes get the ×,
+storage full / unreadable / unit unknown stay hidden until the condition changes; lpn_msglog_note
+reworded to stay true ("...does not store them on your computer"). fix/ewb-meeting (his EWB meeting):
+nodes with no path to a reservoir or tank are left out of the run with a standing note; a tank alone
+suffices; From/To editable in Properties and tables; a node tool pressed on a pipe asks
+'Break pipe {id} at this node?' (his wording was "Break link for node?"; Bentley: "split").
+Deleted keys: lpn_file_export_tables_heading. Roadmap: Task 779 to 100 (point Shape drawn ×); Task 781
+Change type ON HOLD for planning (his H13-H15 words in its block).
 
-**His answers this session, already applied:** "full" in "Show the full label on hover" still fits
-(yes); storage full / unreadable / unit unknown stay hideable (yes).
+### Calls page round 3 answered (https://claude.ai/artifact/Y9kwZdxhLkAse2dFqmDtHq) and applied
 
-### Calls page round 3: https://claude.ai/artifact/Y9kwZdxhLkAse2dFqmDtHq (answers in its db)
-
-H01-H08 the Scenario manager (stage 6 of Task 721: Ida, Sue, Declan disagree on its shape; journals
-committed); H09-H11 message-dismiss; H12 Shapes (Task 779, point drawn as ×?); H13-H16 Task 781;
-w3-* the 781 English; v3-* four Wave 0 referrals that block the delta sprint. Read it with ArtifactData
-list `answers`; write rules from his free text, never the option label.
+Still open from it: H09 he asked whether every box position needs a privacy disclosure (answered in the
+session report: our own inventory lists each, the consent banner does not change for exempt
+preferences); v3 lpn_export_table_current he asked "Where can I see this?" (File > Export… > ODS/XLSX/CSV,
+the Current/All radios): re-ask with the location.
 
 ### Not yet on master (all pushed as branches)
 
-- **chore/calls-1008c** (merge on green): adviser and Perry journals; `dev/english-friction/1008c-wave0.json`
-  (37 keys passed, 4 referred, 6 dismissed); DXF tip says "asset", not "element" (his 10-07 call; it
-  had broken user-guide-column-harness); this handoff.
-- **feat/user-guide**: his 10-08 browser pass fixed (9e0c0ef6): a card never runs its control; it
-  opens what holds it, rings it in `--ec-point` for 2.5 s, then closes it; any card click closes the
-  previous card's menu; search hits show the full path (Scenarios › Basic mode); Properties and
-  Alternatives preview say how they open (new keys lpn_guide_not_shown, lpn_guide_how_popup,
-  lpn_guide_how_alt). Perry's review drove the second round. Needs his browser pass.
-- **feat/message-dismiss**: Perry: ready for his browser pass. Also carries Zoom Window (W key).
-  His H09-H11 answers may change it first.
-- **feat/bentley-interop** (6b92ff72): Task 781 built (active topology; Change type outside Base makes a
-  new asset, its links replaced with it; the type-per-scenario override removed). Perry confirmed the
-  hydraulics against a hand-made Net1 and found a false promise (controls naming a replaced asset were
-  NOT left out; EPANET Error 200, silent fallback) and Properties stuck on the old asset; both fixed,
-  harness section 10 holds his case. Open by design, on his H15: customers cannot move per scenario;
-  new assets are copies (proposed box sentence); a child's own overrides not copied. Needs his calls
-  (H13-H16, w3-*) and the stage 6 manager before a merge ask. Trap: a page loaded later in one harness
-  process becomes lpn-time.js's clock host for every earlier page.
-- **feat/visit-dedupe**: unchanged; G01 consent translation still owed before merge; syn notes for
+- **feat/bentley-interop**: stage 6 Scenario manager built on H01-H08 (tree box `lpn_smbox`, Scenarios
+  tab in the Tables pane, drag ONTO re-parents / BETWEEN reorders, several Bases, copy asks, Compare
+  checked set `project.compareSet`, "Active topology" + tip "Asset activation", "used by N"). The
+  Alternatives preview box is gone (`lpn_altbox` removed on open; keys lpn_alt_title, lpn_alt_note
+  deleted). The 781 inactive-control notes stand in the Libraries box, not per run. Perry: READY
+  (real Chrome, Net1: an assigned Demand alternative changes the solve); his three defects (Del on Base,
+  Base2 parent shown as Base, override count 0 through an assigned alternative) sent back to the builder.
+  Builder's six calls for Tom are in its last commits' roadmap note. Change type: no more work.
+- **feat/user-guide**: Guide index hierarchy (sub-heading per menu, Boxes "From Water"), collapsible
+  main headings (chevron, click, double-click, Enter/Space), About's notes and "Notes on this page" moved
+  into the Guide (the Notes box and `lpn_notesbox` retired); "What it does not do" lost its first
+  sentence in all 27 files. Green. Needs his browser pass.
+- **feat/visit-dedupe**: unchanged; G01 consent translation still owed; syn notes for
   consent_current_granted and consent_region_label still describe logging (propose; AI may not write).
 - Unchanged: feat/section-grid, feat/desktop await his browser pass; label-placer branches bench only.
 
 ### Next job
 
-Read his calls-page answers. Then: the delta sprint (`1008c`, ~40 keys plus whatever merges), on his
-four Wave 0 answers (authorized: "Proceed with a translation sprint whenever you deem it prudent");
-stage 6 build on his H01-H08; the 781 gaps on H15.
+His browser passes (master's EWB fixes, feat/user-guide, feat/bentley-interop). Then the delta sprint
+(`1008c`, plus every English change since; authorized: "Proceed with a translation sprint whenever you
+deem it prudent") — held this session because the Scenario manager's ~30 keys are not on master yet.
+
+### Traps met 2026-10-09 (eleventh session)
+
+- **Merging two branches that each regenerated payloads conflicts in all 27 payloads and new-english-keys.md**:
+  take either side, then `new_english_keys.php --write --force` (both sides were generated, so --force loses
+  nothing) and regenerate payloads, all in the merge commit.
+- **The all-clear must be in master's working tree when the merge runs** (branch_gate reads the file there):
+  write it uncommitted, merge, set it aside for the suite's clean tree, then commit it on a chore branch.
 
 ### Traps met 2026-10-08 (tenth session)
 

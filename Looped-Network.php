@@ -428,6 +428,11 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 			      // of this box. setStatus() used to write the <p>'s textContent, which would wipe
 			      // any sibling control on every solve; it writes #lpn_status_text instead, so the
 			      // grievance button beside it survives. setStatus() is still the ONE writer here. ?><span id="lpn_status_text"></span><?php
+			      // HIDE THIS MESSAGE (Tom, 2026-10-07: "I wish there were a way to dismiss error messages that I
+			      // no longer want to see"). Its own sibling, so setStatus()'s write of the text cannot wipe it
+			      // and it never touches the grievance button below. Shown only for a message the user can work
+			      // past. A hidden message leaves NOTHING on the map (Tom, 2026-10-07: "Hidden means hidden"); it
+			      // waits as the top row of the message history instead, where it is restored. In memory only. ?><button type="button" id="lpn_status_dismiss" class="lpn-status-x d-print-none" style="display:none" title="<?=htmlspecialchars($ec_lang['lpn_status_dismiss'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_status_dismiss'])?>">&times;</button><?php
 			      // AND THE ENGINE-DIFFERENCE NOTES ARE THEIR OWN SPAN, because they are the only
 			      // part of this box that EXPIRES on a clock of its own (Tom, 2026-09-05, of the
 			      // gravity note: "Give it a timer, maybe 2 minutes and maybe fading if that's
@@ -1921,7 +1926,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 <section class="lpn-guide-section" data-guide-section="map">
 <h2><?=$ec_lang['lpn_hotkeys_map_heading']?></h2>
 <dl>
-	<dt class="lpn-guide-dup"><?=$ec_lang['lpn_hotkeys_map_term']?></dt><dd><?=$ec_lang['lpn_hotkeys_map_def']?></dd>
+	<dt class="lpn-guide-dup"><?=$ec_lang['lpn_hotkeys_map_term']?></dt><dd><?=str_replace('</tbody></table>', '<tr><td>W</td><td>' . $ec_lang['lpn_hotkeys_zoomwin_def'] . '</td></tr></tbody></table>', $ec_lang['lpn_hotkeys_map_def'])?></dd>
 </dl>
 </section>
 <section class="lpn-guide-section" data-guide-section="snip">
@@ -2168,7 +2173,6 @@ EngCalcs.pageConfig = {
 	lpn_file_export_menu: <?=json_encode($ec_lang['lpn_file_export_menu'])?>,
 	lpn_file_export_item_inp: <?=json_encode($ec_lang['lpn_file_export_item_inp'])?>,
 	lpn_file_export_item_geojson: <?=json_encode($ec_lang['lpn_file_export_item_geojson'])?>,
-	lpn_file_export_tables_heading: <?=json_encode($ec_lang['lpn_file_export_tables_heading'])?>,
 	lpn_file_export_item_ods: <?=json_encode($ec_lang['lpn_file_export_item_ods'])?>,
 	lpn_file_export_item_xlsx: <?=json_encode($ec_lang['lpn_file_export_item_xlsx'])?>,
 	lpn_file_export_item_csv: <?=json_encode($ec_lang['lpn_file_export_item_csv'])?>,
@@ -2432,6 +2436,9 @@ EngCalcs.pageConfig = {
 	lpn_time_engine_start_failed: <?=json_encode($ec_lang['lpn_time_engine_start_failed'])?>,
 	lpn_time_engine_run_failed: <?=json_encode($ec_lang['lpn_time_engine_run_failed'])?>,
 	lpn_wrong_btn: <?=json_encode($ec_lang['lpn_wrong_btn'])?>,
+	lpn_msglog_hidden: <?=json_encode($ec_lang['lpn_msglog_hidden'])?>,
+	lpn_msglog_unhide: <?=json_encode($ec_lang['lpn_msglog_unhide'])?>,
+	lpn_status_hidden_tip: <?=json_encode($ec_lang['lpn_status_hidden_tip'])?>,
 	lpn_time_slider: <?=json_encode($ec_lang['lpn_time_slider'])?>,
 	lpn_time_no_period: <?=json_encode($ec_lang['lpn_time_no_period'])?>,
 	lpn_time_first: <?=json_encode($ec_lang['lpn_time_first'])?>,
@@ -2800,6 +2807,11 @@ EngCalcs.pageConfig = {
 	lpn_roughness_urls: <?=json_encode(ecRefRoughnessUrls())?>,
 	lpn_field_length: <?=json_encode($ec_lang['lpn_field_length'])?>,
 	lpn_field_from: <?=json_encode($ec_lang['lpn_field_from'])?>,
+	lpn_link_end_unknown: <?=json_encode($ec_lang['lpn_link_end_unknown'])?>,
+	lpn_link_end_same: <?=json_encode($ec_lang['lpn_link_end_same'])?>,
+	lpn_break_pipe_ask: <?=json_encode($ec_lang['lpn_break_pipe_ask'])?>,
+	lpn_break_yes: <?=json_encode($ec_lang['lpn_break_yes'])?>,
+	lpn_break_no: <?=json_encode($ec_lang['lpn_break_no'])?>,
 	lpn_field_to: <?=json_encode($ec_lang['lpn_field_to'])?>,
 	// The minor-loss table, the same one mphl, hw, dw, mhp, bpn and ip all link to. One URL rather
 	// than three: k is one quantity whatever friction method carries the pipe alongside it. The
@@ -2916,6 +2928,7 @@ EngCalcs.pageConfig = {
 	lpn_diag_no_fixed_head: <?=json_encode($ec_lang['lpn_diag_no_fixed_head'])?>,
 	lpn_diag_dangling_link: <?=json_encode($ec_lang['lpn_diag_dangling_link'])?>,
 	lpn_diag_unreachable: <?=json_encode($ec_lang['lpn_diag_unreachable'])?>,
+	lpn_omitted_note: <?=json_encode($ec_lang['lpn_omitted_note'])?>,
 	lpn_engine_fetching: <?=json_encode($ec_lang['lpn_engine_fetching'])?>,
 	lpn_engine_ready: <?=json_encode($ec_lang['lpn_engine_ready'])?>,
 	lpn_engine_fetching_valve: <?=json_encode($ec_lang['lpn_engine_fetching_valve'])?>,

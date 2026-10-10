@@ -612,9 +612,9 @@ console.log('  8f. every element this branch\'s own top-left column writes user-
 	// whether that writer logs (or why it need not).
 	const ELEMENTS = [
 		{ id: 'lpn_map_notice', writers: ['showNotice', 'noteMapUnmeasurable', 'msglogPanelTopCompensation'] },
-		{ id: 'lpn_status', writers: ['setStatus', 'syncStatusBoxVisibility'] },
-		{ id: 'lpn_status_text', writers: ['setStatus', 'syncStatusBoxVisibility'] },
-		{ id: 'lpn_status_notes', writers: ['setEngineNotes', 'syncStatusBoxVisibility'] },
+		{ id: 'lpn_status', writers: ['setStatus', 'paintStatus', 'syncStatusBoxVisibility'] },
+		{ id: 'lpn_status_text', writers: ['paintStatus', 'syncStatusBoxVisibility'] },
+		{ id: 'lpn_status_notes', writers: ['setEngineNotes', 'syncStatusBoxVisibility', 'hideEngineNotes', 'unhideEngineNotes'] },
 		{ id: 'lpn_engine_banner', writers: ['refreshEpanetBanner', 'paintEngineBanner', 'showEngineBannerNow', 'hideEngineBannerNow'] },
 		{ id: 'lpn_lock_banner', writers: ['renderBanner'] }
 	];
