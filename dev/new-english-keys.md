@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**40 still to read on master**, of 48 untranslated keys, of 2492 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**39 still to read on master**, of 48 untranslated keys, of 2492 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -175,17 +175,8 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   @@ NEEDS RULING
 
-## lpn_  (48, 40 to read @@ NEEDS RULING)
+## lpn_  (48, 39 to read @@ NEEDS RULING)
 
-- **`lpn_break_no`**
-  > No
-  @@ NEEDS RULING
-- **`lpn_break_pipe_ask`**
-  > Break pipe {id} at this node?
-  @@ NEEDS RULING
-- **`lpn_break_yes`**
-  > Yes
-  @@ NEEDS RULING
 - **`lpn_dxf_export_failed`**
   > The DXF file was not written: an error in this page stopped it ({error}).
   @@ NEEDS RULING
@@ -291,6 +282,15 @@ never edits a synonym.
 - **`lpn_settings_hover_card_tip`**
   > Rest the pointer on a node, link or customer to see its label as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project.
   _Ruled 2026-10-09: Use proposed (Tom, calls page round 3)._
+- **`lpn_split_no`**
+  > No
+  @@ NEEDS RULING
+- **`lpn_split_pipe_ask`**
+  > Split pipe {id} at this node?
+  _Ruled 2026-10-10: I agree with Bentley that "split" is better than "break"._
+- **`lpn_split_yes`**
+  > Yes
+  @@ NEEDS RULING
 - **`lpn_status_dismiss`**
   > Hide this message
   @@ NEEDS RULING
@@ -326,7 +326,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**147 still to read**, of 150 new keys across 12 unmerged branch(es).
+**149 still to read**, of 152 new keys across 13 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -337,7 +337,9 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/bentley-interop (`43043b60`) — 101 new, 101 to read @@ NEEDS RULING
+### chore/roadmap-1010 (`1ea15e85`) — adds no English strings
+
+### feat/bentley-interop (`2f17711a`) — 102 new, 102 to read @@ NEEDS RULING
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -573,6 +575,9 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_sm_add_child`**
   > Add a child of the selected item
   @@ NEEDS RULING
+- **`lpn_sm_base_kept`**
+  > The Base of a tree is not deleted. Another Base added with Add Base is deleted when nothing uses it.
+  @@ NEEDS RULING
 - **`lpn_sm_basic_off`**
   > Basic mode is off, so the Scenario manager and the Scenarios table are shown.
   @@ NEEDS RULING
@@ -673,7 +678,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Points data<br />(use Copy to see format)
   @@ NEEDS RULING
 
-### feat/user-guide (`8fb6434e`) — 45 new, 45 to read @@ NEEDS RULING
+### feat/user-guide (`f141e735`) — 45 new, 45 to read @@ NEEDS RULING
 
 - **`lpn_guide_about_heading`**
   > About this calculator
@@ -813,4 +818,8 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/visit-dedupe (`7b4a84bd`) — adds no English strings
 
-### fix/ewb-meeting (`4953af70`) — adds no English strings
+### fix/demand-pattern (`d75c9ec2`) — 1 new, 1 to read @@ NEEDS RULING
+
+- **`lpn_settings_default_pattern_implied`**
+  > None stated (pattern {id} is used)
+  @@ NEEDS RULING

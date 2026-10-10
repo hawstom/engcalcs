@@ -5693,6 +5693,11 @@
             "on": "Layers are named {prefix}, the asset code, a hyphen, and the alternative, as in {example}. Each element is a block inserted at scale 1 with attributes 1 unit high; scale the blocks to set the text height. Every attribute is visible; the attributes of one element are stacked in a column beside its symbol.",
             "ruled": "2026-10-08",
             "answer": "Calls page 8 October: Use as written"
+        },
+        "lpn_split_pipe_ask": {
+            "on": "Split pipe {id} at this node?",
+            "ruled": "2026-10-10",
+            "answer": "I agree with Bentley that \"split\" is better than \"break\"."
         }
     }
 }

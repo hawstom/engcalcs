@@ -165,7 +165,7 @@ console.log('\n--- a node tool on a pipe asks, and Yes breaks it, and No places 
 	let n = build();
 	L.setMode(m);
 	click(hit({ link: n.ab }), MIDX, MIDY);
-	ok(m + ': the question names the pipe', asked === 'Break pipe ' + n.ab + ' at this node?', asked);
+	ok(m + ': the question names the pipe', asked === 'Split pipe ' + n.ab + ' at this node?', asked);
 	ok(m + ': Yes cuts the pipe in two at a new node',
 		L.getDoc().nodes.length === 4 && L.getDoc().links.length === 3 && L.linkById(n.ab).to !== n.b,
 		L.getDoc().nodes.length + '/' + L.getDoc().links.length);

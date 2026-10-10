@@ -111,7 +111,7 @@ storage full / unreadable / unit unknown stay hidden until the condition changes
 reworded to stay true ("...does not store them on your computer"). fix/ewb-meeting (his EWB meeting):
 nodes with no path to a reservoir or tank are left out of the run with a standing note; a tank alone
 suffices; From/To editable in Properties and tables; a node tool pressed on a pipe asks
-'Break pipe {id} at this node?' (his wording was "Break link for node?"; Bentley: "split").
+'Split pipe {id} at this node?' (his wording was "Break link for node?"; he then took Bentley's "split", 2026-10-10).
 Deleted keys: lpn_file_export_tables_heading. Roadmap: Task 779 to 100 (point Shape drawn ×); Task 781
 Change type ON HOLD for planning (his H13-H15 words in its block).
 
