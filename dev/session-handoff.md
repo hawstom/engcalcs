@@ -99,52 +99,47 @@ lines rather than appending corrections.
   tile counts at a 900 ms settle (basemap.js now waits for a pointable tile). Pre-existing and unrelated: `scale-publish-harness.js` (2 checks). The full `node dev/browser-pass/run.js` is green (1853/1853, 2026-10-04, Task 761); browser-pass specs are not in
   check_all.
 
-## STATE — 2026-10-09 (eleventh session, Arizona time)
+## STATE — 2026-10-10 (twelfth session, Arizona time)
 
-### Master = 939f5242, pushed. Production: last confirmed pull edc78d01 (2026-10-07); confirm with the About box
+### Master = 90091ac2, pushed. Production: d8b345e1 per a 10-09 feedback report; confirm with the About box
 
-Merged 10-09: fix/export-wording (File > "Export…", the "Tables and libraries" heading gone, format
-tips say what each carries, DXF tip opens with symbol blocks, his three v3 rewrites); feat/message-dismiss
-on his "merge" (all-clear on file, pinned 26e1afc8) with his H09-H11: hidden messages survive a reload
-(new `lpn_msghidden`, localStorage, hashes not text; inventory row added), engine notes get the ×,
-storage full / unreadable / unit unknown stay hidden until the condition changes; lpn_msglog_note
-reworded to stay true ("...does not store them on your computer"). fix/ewb-meeting (his EWB meeting):
-nodes with no path to a reservoir or tank are left out of the run with a standing note; a tank alone
-suffices; From/To editable in Properties and tables; a node tool pressed on a pipe asks
-'Split pipe {id} at this node?' (his wording was "Break link for node?"; he then took Bentley's "split", 2026-10-10).
-Deleted keys: lpn_file_export_tables_heading. Roadmap: Task 779 to 100 (point Shape drawn ×); Task 781
-Change type ON HOLD for planning (his H13-H15 words in its block).
+Merged 10-10: fix/demand-pattern (EPANET's default-pattern rule via `effDefaultPattern()`: stated
+default, else pattern "1", else constant; selector refills; Junctions table Demand pattern column, also in
+multi-select Properties; Net3 EPS matches EPA's Net3.rpt); fix/split-and-hide ("Split pipe {id} at this
+node?", keys renamed lpn_break_* to lpn_split_*; a hidden RUN message now survives a reload too, as a
+`run` hash in `lpn_msghidden`; send-feedback.php excused in dev/host/check.exclude). Roadmap: Tasks 782
+(snap, match properties, 100), 783 (tank depth/volume, 75), 784 (graph bubble, 50); 781 Change type
+decided Base only. Deleted keys: none on master.
 
-### Calls page round 3 answered (https://claude.ai/artifact/Y9kwZdxhLkAse2dFqmDtHq) and applied
+**Owed by Tom on the server after his pull:** `sh dev/host/install.sh` from the production checkout
+(copies the new check.exclude to ~/; the uptime check's send-feedback.php 405 stops).
 
-Still open from it: H09 he asked whether every box position needs a privacy disclosure (answered in the
-session report: our own inventory lists each, the consent banner does not change for exempt
-preferences); v3 lpn_export_table_current he asked "Where can I see this?" (File > Export… > ODS/XLSX/CSV,
-the Current/All radios): re-ask with the location.
+### Not yet on master (pushed as branches)
 
-### Not yet on master (all pushed as branches)
-
-- **feat/bentley-interop**: stage 6 Scenario manager built on H01-H08 (tree box `lpn_smbox`, Scenarios
-  tab in the Tables pane, drag ONTO re-parents / BETWEEN reorders, several Bases, copy asks, Compare
-  checked set `project.compareSet`, "Active topology" + tip "Asset activation", "used by N"). The
-  Alternatives preview box is gone (`lpn_altbox` removed on open; keys lpn_alt_title, lpn_alt_note
-  deleted). The 781 inactive-control notes stand in the Libraries box, not per run. Perry: READY
-  (real Chrome, Net1: an assigned Demand alternative changes the solve); his three defects (Del on Base,
-  Base2 parent shown as Base, override count 0 through an assigned alternative) sent back to the builder.
-  Builder's six calls for Tom are in its last commits' roadmap note. Change type: no more work.
-- **feat/user-guide**: Guide index hierarchy (sub-heading per menu, Boxes "From Water"), collapsible
-  main headings (chevron, click, double-click, Enter/Space), About's notes and "Notes on this page" moved
-  into the Guide (the Notes box and `lpn_notesbox` retired); "What it does not do" lost its first
-  sentence in all 27 files. Green. Needs his browser pass.
-- **feat/visit-dedupe**: unchanged; G01 consent translation still owed; syn notes for
-  consent_current_granted and consent_region_label still describe logging (propose; AI may not write).
-- Unchanged: feat/section-grid, feat/desktop await his browser pass; label-placer branches bench only.
+- **feat/bentley-interop** (e66572a5): Scenario manager round 2 on his 10-10 pass: ? tip in his words,
+  buttons [Add child] [Add base] [−] [Make current] + Copy (alternatives copy too); per-scenario Change
+  type REMOVED (Base only, refusal points to Active topology; Mary found Bentley Morph, epanet-js and
+  DC Water do it as a plain edit, none per scenario); keys lpn_change_type_scenario_ask, _create_new,
+  _not_carried, _old_controls, _customers_left, _switch_base deleted there. He said "slow down and test
+  more later". check_all green but payload freshness. Merging master in will conflict on
+  EC_HARNESS_WORDING_BASELINE (both sides 42) and entry-mode-exit-harness's split pin.
+- **feat/user-guide** (386d3e32): folding moved from the content to the index rail on his words; green
+  except a stale generated file fixed after. Needs his browser pass.
+- Unchanged: feat/visit-dedupe (G01 consent translation owed), feat/section-grid, feat/desktop; label
+  branches bench only.
 
 ### Next job
 
-His browser passes (master's EWB fixes, feat/user-guide, feat/bentley-interop). Then the delta sprint
-(`1008c`, plus every English change since; authorized: "Proceed with a translation sprint whenever you
-deem it prudent") — held this session because the Scenario manager's ~30 keys are not on master yet.
+His browser passes. The delta sprint is deferred by his 10-10 word ("deferring translations").
+Task 782 (snap to asset, match properties) is the next build when budget allows.
+
+### Traps met 2026-10-10 (twelfth session)
+
+- **A feature merged to master can break a branch's seam check**: split pipe walked `sc.overrides`, fine on
+  master, a defect on bentley-interop where values also live in alternatives. Run the branch suite after
+  every master merge into it.
+- **A harness that tests one message kind passes over another**: hide-on-reload passed for diagnostics while
+  Tom hid a run message. Ask which message, or test every kind.
 
 ### Traps met 2026-10-09 (eleventh session)
 
