@@ -35171,8 +35171,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			if (nl.tok) { delete nl.tok._length; if (!Object.keys(nl.tok).length) { delete nl.tok; } }
 		}
 		// Scenario overrides: copied to both, the minor loss to the original only, a length divided.
-		scenarios.forEach(function (sc) {
-			var key = ovKeyFor('link', oldId), ov = sc.overrides[key], c2;
+		// Every scenario AND every stored alternative holds such a map (eachOverrideMap()).
+		eachOverrideMap(function (map) {
+			var key = ovKeyFor('link', oldId), ov = map[key], c2;
 			if (!ov) { return; }
 			c2 = JSON.parse(JSON.stringify(ov));
 			delete c2.k; delete c2.fittingsId;
@@ -35180,7 +35181,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				ov.length = ov.length * frac;
 				c2.length = c2.length * (1 - frac);
 			}
-			if (Object.keys(c2).length) { sc.overrides[ovKeyFor('link', nl.id)] = c2; }
+			if (Object.keys(c2).length) { map[ovKeyFor('link', nl.id)] = c2; }
 		});
 		// Meters and Texts attached by station on the old pipe.
 		(customersByLink[oldId] || []).slice().forEach(function (cid) {

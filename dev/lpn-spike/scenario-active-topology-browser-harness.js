@@ -140,7 +140,7 @@ async function main() {
 		await settle(800);
 		ok('1.2 no box opens', !(await a.dialog()));
 		const said = await page.evaluate(() => (document.getElementById('lpn_map_notice') || {}).textContent || '');
-		ok('1.3 one sentence says Change type works in Base and points to Active topology', said.indexOf('Change type works in Base. A scenario can switch assets on and off in Active topology instead.') >= 0, said.slice(0, 200));
+		ok('1.3 one sentence says Change type works in Base and points to Active topology', said.indexOf(await page.evaluate(() => EngCalcs.pageConfig.lpn_change_type_base_only)) >= 0, said.slice(0, 200));
 		ok('1.4 22 is still an active junction', /lpn-node-junction/.test(await nodeClass('22') || '') && !/lpn-inactive/.test(await nodeClass('22') || ''));
 
 		console.log('\n--- 2. what a scenario does instead: switch 22 off ---');

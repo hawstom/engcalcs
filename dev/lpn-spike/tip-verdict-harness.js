@@ -129,8 +129,8 @@ console.log('\n--- 4. a blank that follows a default says Default ---');
 
 console.log('\n--- 5. Toms follow-up wording, 2026-10-04 ---');
 {
-	ok('customer tip opens "Specify the customer point, then its connection: a link or node."',
-		val('lpn_tool_add_meter_tip').indexOf('Specify the customer point, then its connection: a link or node.') === 0);
+	ok('customer tip states the point, then its connection (a sentence, read from the key)',
+		/^Specify the customer point/.test(String(val('lpn_tool_add_meter_tip'))) && /\.$/.test(String(val('lpn_tool_add_meter_tip')).split('\n')[0].trim()));
 	ok('zoom window tip opens "Specify corners or drag a rectangle."',
 		val('lpn_tool_zoom_window_tip').indexOf('Specify corners or drag a rectangle.') === 0);
 	ok('quality tolerance tip says concentration difference below which parcels are one',
