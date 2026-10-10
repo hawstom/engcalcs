@@ -263,6 +263,10 @@ the block.
   (`convert-as-fotobi-harness.js`, four paths, master and production 9c71d54f); ask which surface.
   MERGED 2026-10-07 (`feat/web-mercator`, Tom: "Merge."): EPSG:3857 is a real projected project in
   metres, lengths on the ground, 4326 marked suggested. Open: only the unreproduced symbol loss.
+- 100|782| **Snap to asset, and Match properties: the small tools that replace Change type.**
+  Tom, 2026-10-10: if nobody else does Change type, *"abandon the project and institute a variety of smaller
+  and better tools: Snap/magnet to asset; Match properties from one asset to others (as applicable); Change
+  link connections (done); Split pipe (done)."* Seam: Task 779 snapping to shape points.
 - 75|578| **Fire flow: the EPS frame and the Run concept, extracted from 530.**
   Everything else in Task 530 shipped and that task is closed. Two phases were never built and are
   kept here so they are not lost in a closed block.
@@ -401,6 +405,10 @@ the block.
 - 75|777| **Station and elevation marks on the mi and wi section sketches.**
   Tom, 2026-10-06: *"it would be very nice to add either an automatic stations and elevations grid
   or the stations and elevations about 4 to 8 points."* Branch `feat/section-grid`.
+- 75|783| **Tank depth and volume, in the tables and the time series.**
+  Tom, 2026-10-10: *"Time Series and table columns for tank Depth. Volume would be nice too, with zero at
+  minimum depth."* Also his question: Bentley has a Base Elevation; EPANET's tank Elevation is the bottom,
+  where the level is zero, and volume below Min level still counts. Make sure our labels say so.
 - 50|146.09| **An inset overview map: the whole project, with a box round where you are.**
   Reworked by Tom 2026-08-25, and it is a different feature from the one this ID used to hold:
   *"146.09 reworked as a key/overview map inset like many games where the entire project is depicted
@@ -956,6 +964,10 @@ the block.
   **BUILT 2026-10-08 on `feat/hover-label`**, asked again by outside tester DDN ("whether to show these
   should be a setting"): Select mode, card on rest, setting in Map and page; Perry passed it. Open: field
   names in words, and other modes (calls page G07, G08).
+- 50|784| **A small time-series graph bubble on the map, from an asset's right-click.**
+  Tom, 2026-10-10: *"a right-click menu at assets that includes 'Time series graph' that makes a pretty
+  'speech bubble' 200px to 400 px ... so that four or six could be arranged on the map. And it would be
+  really cool if that presentation scenario could be saved."*
 - 25|144| **Diagnose the Hazen-Williams conversion leak — full record in `dev/hazen-williams-leak.md`.**
   **The 11% outlier does not reproduce and the fix it was waiting for already shipped** (2026-07-28,
   `9c47608f`, one day after the snapshot). The 2026-08-21 report gives HW 58% use-of-shopping, ordinary
