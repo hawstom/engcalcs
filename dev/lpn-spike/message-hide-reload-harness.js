@@ -61,7 +61,7 @@ async function main() {
 			await a.goto('Looped-Network.php');
 			await prep();
 			await a.settle(1000);
-			if (v[0] === 'new') { await a.newProject('us'); } else if (/^Net/.test(v[0])) { await a.openExampleCard(v[0] === 'Net1' ? 'EPANET Net1 plus rule-based controls' : 'EPANET ' + v[0]); await a.settle(2500); }
+			if (v[0] === 'new') { await a.newProject('us'); } else if (/^Net/.test(v[0])) { await a.openExampleCard(await a.lang('lpn_ex_' + v[0].toLowerCase() + '_title')); await a.settle(2500); }
 			await a.dismissGallery();
 			await a.toolbarClick('Junction');
 			const r = await page.evaluate(() => { const b = document.getElementById('lpn_canvas').getBoundingClientRect(); return { x: b.x, y: b.y, w: b.width, h: b.height }; });
@@ -70,7 +70,7 @@ async function main() {
 			await a.settle(900);
 			await a.toolbarClick('Select');
 			await a.settle(1200);
-			const noRes = corner ? 'Left out of this run' : await a.lang('lpn_diag_no_fixed_head');
+			const noRes = corner ? (await a.lang('lpn_omitted_note')).split('{ids}')[0] : await a.lang('lpn_diag_no_fixed_head');
 			const text = () => page.evaluate(() => (document.getElementById('lpn_status_text') || {}).textContent);
 			ok('"Add a reservoir" is standing', ((await text()) || '').indexOf(noRes) === 0, await text());
 			await page.click('#lpn_status_dismiss');
