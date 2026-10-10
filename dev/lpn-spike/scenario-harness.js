@@ -824,7 +824,7 @@ function modelHas(m, group, id) {
 	// THE DANGEROUS HALF. `active` is on both groups, so under one flat map switching the junction
 	// off took a pipe it never touched out of the solve with it.
 	L.setProp(nodeOf('20'), 'active', false);
-	const m = L.assembleModel();
+	const m = L.assembleModel(true);
 	ok('switching the junction off removes the junction', !modelHas(m, 'node', '20'));
 	ok('...and its OWN incident pipes, which is the correct cascade',
 		!modelHas(m, 'link', 'P2') && !modelHas(m, 'link', 'P3') && !modelHas(m, 'link', '10'));

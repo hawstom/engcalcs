@@ -19988,6 +19988,26 @@ var EngCalcs = EngCalcs || {};
 	// straight to Zoom Window with no drag or click-click ever asked for. Tom's rule is "click
 	// TWICE IN A ROW", and a click on the map in between is not that.
 	var zoomToolArmed = false;
+	// Straight into Zoom Window, from the Map menu row and the W key. The toolbar button is painted
+	// as Zoom Window for the duration, exactly as its own second press does, and setMode() puts it
+	// back when the mode ends. Pressed again while already in the mode, it leaves it.
+	function enterZoomWindow() {
+		if (mode === 'zoom-window') { setMode('select'); return; }
+		zoomToolArmed = false;
+		zoomToolShape = 'window';
+		setMode('zoom-window');
+		if (repaintZoomTool) { repaintZoomTool(); }
+	}
+	// The corner target of the Zoom to fit button: a square at its lower-right corner, about 14 px for
+	// a mouse and 22 px for a finger, never more than half the button either way.
+	function zoomCornerHit(btn, e) {
+		var r = btn.getBoundingClientRect();
+		var coarse = !!(window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
+		var side = coarse ? 22 : 14;
+		var w = Math.min(side, r.width / 2), h = Math.min(side, r.height / 2);
+		// Physical right in every language, because the CSS triangle is drawn at `right: 2px`.
+		return e.clientX >= r.right - w && e.clientX <= r.right && e.clientY >= r.bottom - h && e.clientY <= r.bottom;
+	}
 	// The button itself, held the same way `openToolButton`/`saveToolButton` below are, so
 	// `wireZoomArmReset()`'s one, wired-once listener can always test against the CURRENT button
 	// even though wireToolbar() rebuilds the strip (language switch, unit switch) and would
@@ -20611,7 +20631,7 @@ var EngCalcs = EngCalcs || {};
 	var findConnCache = null;
 	function findConnectionMap() {
 		if (findConnCache) { return findConnCache; }
-		var model = assembleModel(), nodeById2 = {}, fixed = [], adjAll = {}, adjOpen = {},
+		var model = assembleModel(true), nodeById2 = {}, fixed = [], adjAll = {}, adjOpen = {},
 			facts = {}, seenAll, seenOpen, i, link, n;
 		for (i = 0; i < model.nodes.length; i++) {
 			n = model.nodes[i];
@@ -24843,22 +24863,31 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				if (t) { el.tag = t; } else { delete el.tag; }   // base-write: identity, as in the popup -- see tagField()
 			} };
 	}
-	// A link's two ends, read-only and as TEXT: which node a pipe lands on is identity, and identity
-	// is never overridable (a node cannot be in two places at once in one rendered map). Re-drawing
-	// the pipe is how it changes.
+	// A link's two ends, as TEXT and editable (Tom, 2026-10-09: *"I got caught by the inability to
+	// edit the from and to nodes for a link. Can these be editable? I see them in table."*). Which
+	// node a pipe lands on is identity, and identity is never overridable (a node cannot be in two
+	// places in one rendered map), so a write here is Base's and a scenario is unaffected. The new
+	// ID must name an existing node and not be the link's other end; a refusal is said in place, in
+	// the same box as an ID that is taken, and `reread` puts the old node back in the cell.
+	// reconnectLinkEnd() is the one door, shared with the Properties box.
 	// **`refTo` IS WHAT MAKES A SUPPORT COLUMN POINT SOMEWHERE ELSE** (Tom, 2026-09-21: *"when we
 	// right-click on a support column (like From and To) that contains an asset, we can Show on map
 	// that asset instead of the row's asset"*). A column declares the element its VALUE names, and
 	// the right-click menu's Select in map reads it; every other column has none and the menu falls
 	// back to the row's own element, which is what it has always done.
-	function paneColEnds() {
-		return [
-			{ key: 'from', label: 'lpn_field_from', get: function (l) { return l.from; },
-				refTo: function (l) { return { group: 'node', id: l.from }; } },
-			{ key: 'to', label: 'lpn_field_to', get: function (l) { return l.to; },
-				refTo: function (l) { return { group: 'node', id: l.to }; } }
-		];
+	function paneColEnd(end, labelKey) {
+		return { key: end, label: labelKey, str: true, reread: true, em: 5,
+			get: function (l) { return l[end]; },
+			set: function (l, v) {
+				var newId = String(v === undefined || v === null ? '' : v).trim(), why;
+				if (newId === l[end]) { return; }
+				why = linkEndProblem(l, end, newId);
+				if (why) { setWarning(why); return; }
+				reconnectLinkEnd(l, end, newId);
+			},
+			refTo: function (l) { return { group: 'node', id: l[end] }; } };
 	}
+	function paneColEnds() { return [paneColEnd('from', 'lpn_field_from'), paneColEnd('to', 'lpn_field_to')]; }
 	/**
 	 * **A LINK'S VERTICES AS ONE CELL** (ROADMAP Task 610), in the format the data-entry clerk
 	 * specified before anything was built (dev/agents/data-entry-clerk/task-610-vertex-cell-spec.md):
@@ -31488,7 +31517,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		mk(pc.points_data_copy || 'Copy', function () {
 			libCopyOut(paneCopyTsv(spec, rows, cols, box));
 		}, 'Ctrl+C');
-		mk(pc.lpn_pane_copy_heads || 'Copy with headings', function () {
+		mk(pc.lpn_pane_copy_heads || 'Copy with column headings', function () {
 			libCopyOut(paneCopyTsv(spec, rows, cols, box, true));
 		});
 		mk(pc.points_data_paste || 'Paste', function () {
@@ -35054,6 +35083,159 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (type === 'GPV') { return 0; }
 		return 2;
 	}
+	/**
+	 * **BREAK A PIPE AT A NODE PLACED ON IT** (Tom, 2026-10-09, after an Engineers Without Borders
+	 * meeting: *"Could we offer to break a link when a node is placed on it? 'Break link for
+	 * node?'"*). The pipe becomes two pipes meeting at a new node of the kind the tool places.
+	 *
+	 * **WHICH HALF KEEPS WHAT.** The original keeps its ID, its From node and everything it carries,
+	 * and now ends at the new node; the new pipe runs from the new node to the old To node and takes
+	 * the next free ID with the project's link prefix (mintId). Diameter, roughness, status,
+	 * description, pipe type and the rest are copied. **The minor loss coefficient and its fittings
+	 * list stay on the original only**, because a fitting is one thing at one place, and a Tag is not
+	 * copied either: it is the join key to an asset register and two pipes cannot both be that
+	 * asset. A control or rule that names the pipe keeps naming the original, which is the one the
+	 * ID still belongs to.
+	 *
+	 * **THE NODE IS PLACED ON THE PIPE'S LINE**, at the foot of the press, so the two halves are
+	 * exactly the old polyline cut in two rather than the old polyline with a kink in it. Interior
+	 * vertices go to the half they lie on.
+	 *
+	 * **LENGTH.** A pipe whose length is drawn (Auto) stays drawn: each half measures itself. A pipe
+	 * with a TYPED length is divided in proportion to the drawn length of the halves. Those are new
+	 * numbers the user did not type, and that is acceptable only because the user asked for the split
+	 * (CLAUDE.md: only the user touches a file's numbers); the typed characters of both are dropped.
+	 * A scenario's override of the length is divided the same way.
+	 *
+	 * **A METER OR A TEXT ATTACHED BY STATION KEEPS ITS PHYSICAL PLACE**: its fraction along the old
+	 * pipe is restated along whichever half now holds that point, and one that falls on the new half
+	 * moves to it.
+	 *
+	 * Offered in Base only. A scenario varies topology by switching elements on and off, and cutting a
+	 * Base pipe from inside one would change the other scenarios under it.
+	 * dev/lpn-spike/ewb-meeting-harness.js.
+	 */
+	function breakPipeAtPoint(l, nodeType, wx, wy) {
+		var pts = linkPointList(l), r = Geom.nearestFractionOnPolyline(pts, wx, wy),
+			total = Geom.polylineLength(pts), splitAlong = r.f * total,
+			oldTo = l.to, oldId = l.id, cum = [0], i, keepVerts = [], newVerts = [], node, nl, clone,
+			lenOrig, lenNew, frac, wasTyped = !l.lenAuto, typedLen = l._length;
+		for (i = 0; i + 1 < pts.length; i++) {
+			cum.push(cum[i] + Math.hypot(pts[i + 1].x - pts[i].x, pts[i + 1].y - pts[i].y));
+		}
+		// A vertex travels with its typed geographic characters, so it is copied whole.
+		(l.verts || []).forEach(function (v, k) {
+			if (cum[k + 1] < splitAlong - 1e-12) { keepVerts.push(v); }
+			else { newVerts.push(Object.assign({}, v)); }
+		});
+		clone = JSON.parse(JSON.stringify(l));
+		node = addNode(nodeType, r.x, r.y);
+		nl = addLink('pipe', node.id, oldTo, newVerts);
+		nl.verts = newVerts;   // base-write: construction: whole copies, so a vertex keeps its typed characters
+		// Everything the pipe carries comes across, except what is its own place or identity.
+		Object.keys(clone).forEach(function (k) {
+			if (k === 'id' || k === 'from' || k === 'to' || k === 'verts' || k === 'lx' || k === 'ly' ||
+				k === 'tag' || k === '_k' || k === 'fittingsId' || k === '_fittingsId') { return; }
+			nl[k] = clone[k];   // base-write: construction: the new half is born in Base as a copy of the pipe it came from
+		});
+		nl._k = 0;   // base-write: construction: a minor loss stays on the original only
+		if (nl.tok) {
+			delete nl.tok._k;
+			if (!Object.keys(nl.tok).length) { delete nl.tok; }
+		}
+		// The original now ends at the new node.
+		incidentLinks[oldTo] = incidentLinks[oldTo].filter(function (x) { return x !== oldId; });
+		l.to = node.id;   // base-write: identity -- Base is showing (the offer is made in Base only)
+		l.verts = keepVerts;   // base-write: identity, as above
+		incidentLinks[node.id].push(oldId);
+		// Lengths: each half measured, then the typed length shared out in proportion.
+		lenOrig = linkGeomLength(l); lenNew = linkGeomLength(nl);
+		frac = (lenOrig + lenNew) > 0 ? lenOrig / (lenOrig + lenNew) : 0.5;
+		if (wasTyped) {
+			l._length = typedLen * frac;   // base-write: the visitor asked for the split; see this function's note
+			nl._length = typedLen * (1 - frac);   // base-write: as above
+			if (l.tok) { delete l.tok._length; if (!Object.keys(l.tok).length) { delete l.tok; } }
+			if (nl.tok) { delete nl.tok._length; if (!Object.keys(nl.tok).length) { delete nl.tok; } }
+		}
+		// Scenario overrides: copied to both, the minor loss to the original only, a length divided.
+		scenarios.forEach(function (sc) {
+			var key = ovKeyFor('link', oldId), ov = sc.overrides[key], c2;
+			if (!ov) { return; }
+			c2 = JSON.parse(JSON.stringify(ov));
+			delete c2.k; delete c2.fittingsId;
+			if (typeof ov.length === 'number') {
+				ov.length = ov.length * frac;
+				c2.length = c2.length * (1 - frac);
+			}
+			if (Object.keys(c2).length) { sc.overrides[ovKeyFor('link', nl.id)] = c2; }
+		});
+		// Meters and Texts attached by station on the old pipe.
+		(customersByLink[oldId] || []).slice().forEach(function (cid) {
+			var c = (doc.customers || []).filter(function (x) { return x.id === cid; })[0], along;
+			if (!c || typeof c.t !== 'number') { return; }
+			along = c.t * total;
+			if (along <= splitAlong) { c.t = splitAlong > 0 ? along / splitAlong : 0; return; }
+			c.t = (total - splitAlong) > 0 ? (along - splitAlong) / (total - splitAlong) : 1;
+			c.link = nl.id;
+			customersByLink[oldId] = customersByLink[oldId].filter(function (x) { return x !== cid; });
+			(customersByLink[nl.id] = customersByLink[nl.id] || []).push(cid);
+		});
+		(labelsByLinkAnchor[oldId] || []).slice().forEach(function (lid) {
+			var lb = labelById(lid), along;
+			if (!lb || typeof lb.anchorT !== 'number') { return; }
+			along = lb.anchorT * total;
+			if (along <= splitAlong) { lb.anchorT = splitAlong > 0 ? along / splitAlong : 0; return; }
+			lb.anchorT = (total - splitAlong) > 0 ? (along - splitAlong) / (total - splitAlong) : 1;
+			lb.anchorLink = nl.id;
+			labelsByLinkAnchor[oldId] = labelsByLinkAnchor[oldId].filter(function (x) { return x !== lid; });
+			(labelsByLinkAnchor[nl.id] = labelsByLinkAnchor[nl.id] || []).push(lid);
+		});
+		rebuildLink(l);
+		rebuildLink(nl);
+		updateLinkGeometry(oldId);
+		updateLinkGeometry(nl.id);
+		updateNode(node.id, true);
+		refreshPaneIfOpen();
+		scheduleSolve();
+		return { node: node, original: l, added: nl };
+	}
+	/**
+	 * **RECONNECTING A LINK'S END** (Tom, 2026-10-09: *"I got caught by the inability to edit the
+	 * from and to nodes for a link."*). Returns '' when the new node is acceptable, else the words
+	 * to say why, in the order the visitor can act on them.
+	 * dev/lpn-spike/ewb-meeting-harness.js.
+	 */
+	function linkEndProblem(l, end, newId) {
+		var pc = EngCalcs.pageConfig || {}, other = end === 'from' ? l.to : l.from;
+		if (!newId || !nodeById(newId)) {
+			return (pc.lpn_link_end_unknown || 'No node has the ID {id}.').replace('{id}', newId);
+		}
+		if (newId === other) { return pc.lpn_link_end_same || 'From and To must be different nodes.'; }
+		return '';
+	}
+	// **THE LINK KEEPS ITS ID, ITS VERTICES AND EVERY VALUE THE USER TYPED** -- a typed length stays
+	// exactly as typed (only the user touches numbers). Vertices are kept even though the pipe's
+	// ends move, because they are the user's drawing and a polyline from the new node through them
+	// is the honest reading of what was asked; the user removes a bend in Vertices mode. An Auto
+	// length is derived from the drawing, so it follows the new geometry. From and To are identity,
+	// never overridable, so a scenario is unaffected. The caller has taken the one undo snapshot.
+	function reconnectLinkEnd(l, end, newId) {
+		var old = l[end], touched;
+		if (old === newId) { return; }
+		l[end] = newId;   // base-write: identity -- a link's ends are not overridable, like its ID
+		incidentLinks[old] = (incidentLinks[old] || []).filter(function (x) { return x !== l.id; });
+		(incidentLinks[newId] = incidentLinks[newId] || []).push(l.id);
+		touched = [old, newId];
+		beginMapBoxHold();
+		beginLinkGeomHold();
+		try {
+			updateLinkGeometry(l.id);
+			touched.forEach(function (nid) { if (nodeEls[nid]) { layoutNodeLabel(nid); } });
+		} finally { endMapBoxHold(); endLinkGeomHold(); }
+		refreshOneLabelInPlace(l);
+		refreshPaneIfOpen();
+		scheduleSolve();
+	}
 	// anchorNode, if given, anchors the new Text to that node with a leader -- lb.x/lb.y become an
 	// OFFSET from the node (matching buildLabelEls'/updateLabelGeometry's model), computed here so
 	// the label still appears exactly where the user tapped, not snapped onto the node itself.
@@ -36847,13 +37029,16 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function setStorageError(on, kind) {
 		var pc = EngCalcs.pageConfig || {};
 		kind = on ? (kind || '') : '';
+		// A write that took ends "storage full", whether or not it was flagged (H11). Unreadable ends
+		// where the open document is read, not here: a sibling's write must not end it.
+		if (!on) { clearHiddenCond('storage-full'); }
 		if (on === storageError && kind === storageErrorKind) { return; }
 		storageError = on;
 		storageErrorKind = kind;
 		if (!on) { return; }
 		if (kind === 'unreadable') {
 			var said = pc.lpn_storage_unreadable || 'Not saved. This project could not be read from browser storage. Its stored copy is left exactly as it is and will not be written over, so nothing on this tab is being saved. Open a file or create a new project to keep working.';
-			setStatus(said);
+			setStatus(said, '', false, 'storage-unreadable');
 			// **AND A MODAL, because the status line is not durable enough for THIS one.** The first
 			// solve on the empty document runs `if (!doc.nodes.length) { setStatus(''); return; }`
 			// and the sentence is gone -- which is the exact silence this defect is made of, a named
@@ -36864,7 +37049,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			if (!unreadableTold) { unreadableTold = true; askDialog({ kind: 'alert', text: said }); }
 			return;
 		}
-		setStatus(pc.lpn_storage_full || 'Not saved. Browser storage is full or unavailable, so your recent changes will be lost when you close this tab.');
+		setStatus(pc.lpn_storage_full || 'Not saved. Browser storage is full or unavailable, so your recent changes will be lost when you close this tab.', '', false, 'storage-full');
 	}
 	function projectKey(id) { return LPN_PROJECT_PREFIX + id; }
 	// The full reset behind "?lpn_wipe=1" and the Wipe memory button. Clears EVERY project key plus
@@ -36885,7 +37070,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// same reason.
 		var i, key, doomed = [LPN_LEGACY_KEY, LPN_INDEX_KEY, LPN_IDENTITY_KEY,
 			LPN_PANE_KEY, LPN_RPANE_KEY, LPN_SETBOX_KEY, LPN_FINDBOX_KEY, LPN_LIBBOX_KEY,
-			LPN_FFBOX_KEY, LPN_ENERGYBOX_KEY, LPN_CMPBOX_KEY, LPN_RPTBOX_KEY, LPN_CONTOURBOX_KEY,
+			LPN_FFBOX_KEY, LPN_ENERGYBOX_KEY, LPN_CMPBOX_KEY, LPN_RPTBOX_KEY, LPN_CONTOURBOX_KEY, LPN_MSGHIDDEN_KEY,
 			// 'lpn_notesbox' and 'lpn_hotkeysbox' join the list here rather than a day later, for the
 			// same reason every entry above states its own miss: window furniture left out of this
 			// list makes "exactly as a brand-new visitor would see it" false for that one key. Named
@@ -38596,6 +38781,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// two branches, since `indexEntry(library.openId)` is true by construction two lines above.
 		if (!doc2) { unreadableOpenId = library.openId; unreadableTold = false; return null; }
 		unreadableOpenId = null;
+		clearHiddenCond('storage-unreadable');
 		return doc2;
 	}
 	// Everything a freshly-installed document has to push back out to the UI. Shared by
@@ -38675,6 +38861,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		renderLabelsLegend();
 		applyMaskLabels();   // the setting belongs to the project, so opening one can change it
 		updateEmptyHint();
+		clearStatusHidden();   // hidden messages belong to the network that was on screen
 		setStatus('');
 		setMode('select');
 		refreshMapStatus();   // units belong to the project now, so switching projects can change this
@@ -45772,6 +45959,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	var LPN_WORKSPACE_EXCLUDED = [
 		// Documents, not preferences: the project library, its index, and the pre-library document.
 		'lpn_index', 'lpn_document', 'lpn_project_',
+		// Which messages this reader hid, keyed to a project id of THIS browser: meaningless elsewhere.
+		'lpn_msghidden',
 		// An opaque token naming this browser to the file-lock broker: identity, not a layout.
 		'lpn_identity',
 		// Legacy keys nothing writes any more; a workspace must not resurrect them.
@@ -46090,9 +46279,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// **THE TABLES, BY FORMAT** (Tom, 2026-10-07: *"File, Export to, and we are adding
 			// ODS/XLSX/CSV. And we include Libraries"*). Each row opens the box that asks which tables
 			// and which scenarios; the format is the row. Rows are named for the file, like the three
-			// above, under a heading that says what goes into it.
+			// above, each tip says what it carries.
 			{ separator: true },
-			{ heading: true, label: pc.lpn_file_export_tables_heading || 'Tables and libraries' },
 			{ icon: 'save', label: pc.lpn_file_export_item_ods || 'ODS file…',
 			  tip: pc.lpn_file_export_tables_tip, fn: function () { openExportTableBox('ods'); } },
 			{ icon: 'save', label: pc.lpn_file_export_item_xlsx || 'XLSX file…',
@@ -46171,7 +46359,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// **AN EXPORT SUBMENU (Tom, 2026-10-06: "it's time to put all the exports into a
 			// submenu")**, the twin of Import above it and built the same way. Each row keeps its
 			// handler and tip; see exportMenuRows(), where a new export is one line.
-			{ icon: 'save', label: pc.lpn_file_export_menu || 'Export to…', submenu: exportMenuRows },
+			{ icon: 'save', label: pc.lpn_file_export_menu || 'Export…', submenu: exportMenuRows },
 		].concat([
 			{ separator: true },
 			// **The menu says Save and Save as… in every browser**, never "Download a copy": the
@@ -46687,6 +46875,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var pc = EngCalcs.pageConfig || {};
 		return [
 			{ icon: 'zoom', label: pc.lpn_tool_zoom_extent || 'Zoom to fit', tip: pc.lpn_tool_zoom_extent_tip, fn: zoomExtent },
+			// **A DOOR TO ZOOM WINDOW THAT NEEDS NO ZOOM TO FIT FIRST** (Tom, 2026-10-07: "We need a way to
+			// zoom window without Zoom to Fit first."). The toolbar button still reaches it by a second
+			// press; this row and the W key enter it directly. Pointer-only, like every tool that
+			// needs a drag.
+			{ icon: 'zoom-window', pointerOnly: true, label: pc.lpn_tool_zoom_window || 'Zoom Window', tip: pc.lpn_tool_zoom_window_tip, hotkey: 'W', fn: enterZoomWindow },
 			// **A SNIPPING TOOL, IN THE MAP MENU BECAUSE IT IS NOT ABOUT WATER** (Tom, 2026-10-05). Beside
 			// Zoom to fit: both are about the view of the drawing, and the one frames what the other takes.
 			{ icon: 'image', pointerOnly: true, label: pc.lpn_screenshot_menu || 'Screenshot', tip: pc.lpn_screenshot_tip, fn: function () { startScreenshot(); } },
@@ -48414,6 +48607,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			closePopup();
 			buildDom();
 			updateEmptyHint();
+			clearStatusHidden(true);
 			setStatus('');
 			setMode('select');
 			refreshScenarioStatus();
@@ -49049,7 +49243,14 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			extentBtn.dataset.tool = 'zoom-window';
 			extentBtn.setAttribute('aria-pressed', mode === 'zoom-window' ? 'true' : 'false');
 		}
-		extentBtn.addEventListener('click', function () {
+		extentBtn.addEventListener('click', function (e) {
+			// **THE CORNER TRIANGLE IS A DOOR NOW** (Tom, 2026-10-07: "Maybe the little triangle really
+			// means something if you click there", and "We need to access Zoom Window without any view
+			// change intervening"). A pointer click in the button's lower-right corner enters Zoom Window
+			// at once, with no fit; anywhere else on the button keeps the press-twice behaviour below.
+			// Measured from the click's own coordinates because the triangle is a CSS ::after with
+			// nothing in the DOM to click; a keyboard press (detail 0) has no position and is never one.
+			if (e && e.detail > 0 && zoomCornerHit(extentBtn, e)) { enterZoomWindow(); return; }
 			// Already drawing a Zoom Window: a second press exits it and shows Zoom to fit again,
 			// mirroring select-area's "press again to cycle" -- except this cycle has one member to
 			// come back to, because Zoom to fit is what the button shows by default.
@@ -49803,6 +50004,30 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// die together. Nothing was written to the document, so there is nothing to undo.
 			var exitLinkId = LINK_CLICK_EXITS_MODE[mode] &&
 				!nearestNodeNearScreen(e.clientX, e.clientY, reachPx(e)) ? tapLinkId(t) : null;
+			// **A NODE TOOL PRESSED ON A PIPE ASKS TO BREAK IT** (Tom, 2026-10-09: *"Could we offer to
+			// break a link when a node is placed on it?"*). That replaces the exit-and-open the three
+			// node tools used to make on a pipe, for a pipe in Base only: Yes cuts the pipe in two at
+			// the node (breakPipeAtPoint), No places the node where it was pressed, joined to nothing.
+			// A pump or valve, a scenario, and every other tool keep the exit-and-open below.
+			var breakLink = exitLinkId !== null && exitLinkId !== undefined && inBaseScenario() &&
+				(mode === 'add-junction' || mode === 'add-reservoir' || mode === 'add-tank')
+				? linkById(exitLinkId) : null;
+			if (breakLink && breakLink.type === 'pipe' && nodeById(breakLink.from) && nodeById(breakLink.to) &&
+				(function () {
+					var f = Geom.nearestFractionOnPolyline(linkPointList(breakLink), w.x, w.y).f;
+					return f > 1e-9 && f < 1 - 1e-9;
+				}())) {
+				var breakType = mode.slice('add-'.length), breakPc = EngCalcs.pageConfig || {};
+				askDialog({ kind: 'confirm',
+					text: (breakPc.lpn_break_pipe_ask || 'Break pipe {id} at this node?').replace('{id}', breakLink.id),
+					ok: breakPc.lpn_break_yes || 'Yes', cancel: breakPc.lpn_break_no || 'No' }, function (yes) {
+					saveUndoSnapshot();
+					logLpnFirstAction('element');
+					if (yes) { breakPipeAtPoint(breakLink, breakType, w.x, w.y); }
+					else { addNode(breakType, w.x, w.y); }
+				});
+				return;
+			}
 			if (exitLinkId !== null && exitLinkId !== undefined && linkById(exitLinkId)) {
 				setMode('select');
 				// Selected AND opened, because that is what this press would have done in Select and
@@ -63517,6 +63742,29 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		curveChooser(fields, l, 'curveId', 'headloss', pc.lpn_gpv_curve_source || 'Valve head loss curve',
 			pc.lpn_gpv_curve_source_tip);
 	}
+	// **A LINK'S FROM AND TO NODE AS EDITABLE TEXT** (Tom, 2026-10-09), the Tables pane's two cells
+	// in the Properties box. A refused ID is said out loud and the old one put back; an accepted one
+	// is one undo step. See reconnectLinkEnd().
+	function endField(fields, l, end) {
+		var pc = EngCalcs.pageConfig || {}, label = document.createElement('label'),
+			input = document.createElement('input');
+		input.type = 'text';
+		input.value = l[end];
+		input.addEventListener('change', function () {
+			var newId = String(input.value).trim(), why;
+			if (newId === l[end]) { input.value = l[end]; return; }
+			why = linkEndProblem(l, end, newId);
+			if (why) { setWarning(why); input.value = l[end]; return; }
+			saveUndoSnapshot();
+			reconnectLinkEnd(l, end, newId);
+			refreshPopupIfOpen();
+		});
+		if (end === 'from') { setFieldLabel(label, pc.lpn_field_from || 'From'); }
+		else { setFieldLabel(label, pc.lpn_field_to || 'To'); }
+		label.appendChild(input);
+		fields.appendChild(label);
+		fields.appendChild(document.createElement('br'));
+	}
 	function renderLinkFields(linkId) {
 		var l = linkById(linkId), fields = document.getElementById('lpn_popup_fields'), pc = EngCalcs.pageConfig || {};
 		idField(l.id, function (newId) { renameLink(linkId, newId); }, 'link');
@@ -63601,6 +63849,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				});
 			}
 		}
+		// From and To (Tom, 2026-10-09), after everything the link is: the identity band is ID,
+		// Description and Tag, and the pipe type selector stands immediately after it.
+		endField(fields, l, 'from');
+		endField(fields, l, 'to');
 		closedField(fields, l, linkId);
 		customPropFields(fields, l);
 		activeField(fields, l);
@@ -65011,6 +65263,21 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		setMode(m);
 	});
 
+	// **W IS ZOOM WINDOW** (Tom, 2026-10-07). Free of every other plain key on this page (the digits,
+	// Esc, Delete, +, =, -, and the menu mnemonics, which answer only inside an open menu). Same
+	// guard as the digit picker: never with a modifier, never while typing.
+	document.addEventListener('keydown', function (e) {
+		if (e.ctrlKey || e.metaKey || e.altKey) { return; }
+		if (isTextEntry(e.target)) { return; }
+		// By character, and by physical key so a layout that types something else there (Russian: key
+		// 'ц', code KeyW) still answers, as the menu chords' own e.code rule does.
+		if (e.key !== 'w' && e.key !== 'W' && e.code !== 'KeyW') { return; }
+		// An open menu owns the letters (its rows answer to mnemonics), and it checks defaultPrevented.
+		if (openMenuAnchor) { return; }
+		if (e.preventDefault) { e.preventDefault(); }
+		enterZoomWindow();
+	});
+
 	/**
 	 * **PLAIN `+`/`-`, NEVER Ctrl/Cmd** (ROADMAP Task 682; Tom, 2026-09-17: "How would a person
 	 * zoom on a PC without a mouse wheel or, for that matter, with a keyboard"). Read the ROADMAP
@@ -65680,7 +65947,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		});
 		if (ids.length) { t.warnings = (t.warnings || []).concat([{ code: 'control-inactive', ids: ids }]); }
 	}
-	function assembleModel() {
+	// `keepDisconnected` is for the one reader that asks WHICH nodes have no path to a source (Find's
+	// Connectivity): it must see the whole network, not the one the solver is handed.
+	function assembleModel(keepDisconnected) {
 		var live = {};
 		doc.nodes.forEach(function (n) { if (isActive(n)) { live[n.id] = true; } });
 		var nodes = doc.nodes.filter(isActive).map(function (n) {
@@ -65942,6 +66211,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// The clock, the patterns and the controls, converted to SI (js/lpn-time.js). Absent that
 		// file the model is exactly the pre-Task-248 one and the page solves one instant.
 		if (EngCalcs.lpnTimeAttach) { EngCalcs.lpnTimeAttach(model); }
+		// **A NODE WITH NO PATH TO A RESERVOIR OR TANK IS LEFT OUT OF THE RUN, NOT REFUSED** (Tom,
+		// 2026-10-09). Done HERE so that every reader of the model -- both engines, the extended-
+		// period run, fire flow, scenario compare -- sees the same network, and never in the
+		// document: nothing is marked inactive and an .inp export writes what is stored. The ids
+		// ride on `model.omitted`; runSolve() turns them into the standing note.
+		if (EngCalcs.lpnOmitDisconnected && !keepDisconnected) { EngCalcs.lpnOmitDisconnected(model); }
 		dropInactiveControls(model);
 		return model;
 	}
@@ -66038,7 +66313,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var pc = EngCalcs.pageConfig || {};
 		if (issue.code === 'no-fixed-head') { return pc.lpn_diag_no_fixed_head || 'Add a reservoir or a tank. The network needs at least one known water level before it can be solved.'; }
 		if (issue.code === 'dangling-link') { return (pc.lpn_diag_dangling_link || 'A pipe or pump connects to a node that no longer exists:') + ' ' + issue.ids.join(', '); }
-		if (issue.code === 'unreachable') { return (pc.lpn_diag_unreachable || 'These nodes have no path to a reservoir:') + ' ' + issue.ids.join(', '); }
+		if (issue.code === 'unreachable') { return (pc.lpn_diag_unreachable || 'These nodes have no path to a reservoir or tank:') + ' ' + issue.ids.join(', '); }
 		// NAMES THE VALVES, which is the entire reason this page keeps its own diagnostics instead
 		// of surfacing EPANET's numeric error codes. A user staring at a drawing can act on "V3".
 		if (issue.code === 'valve-needs-epanet') { return (pc.lpn_diag_valve_needs_epanet || 'These are pressure or flow control valves, and only the EPANET solver can compute them. The EPANET solver could not be loaded, so these results are missing:') + ' ' + issue.ids.join(', '); }
@@ -66173,7 +66448,38 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var pc = EngCalcs.pageConfig || {}, panel = document.getElementById('lpn_msglog_panel');
 		if (!panel) { return; }
 		panel.innerHTML = '';
-		if (!noticeLog.length) {
+		// **A HIDDEN MESSAGE IS THE TOP ROW, MARKED, WITH ITS RESTORE** (Tom, 2026-10-07: "Put the hidden
+		// at the top of the expando history"). Pinned above the newest-first list, and its own entry in
+		// that list is left out below so the same words never appear twice.
+		var hiddenText = statusHiddenText();
+		var hiddenNotes = (notesLast && notesHidden) ? notesLast : '';
+		function hiddenRow(text, restore) {
+			var hrow = document.createElement('div');
+			hrow.className = 'lpn-msglog-panel-row lpn-msglog-panel-hidden';
+			var mark = document.createElement('span');
+			mark.className = 'lpn-msglog-panel-when lpn-msglog-hidden-mark';
+			mark.textContent = pc.lpn_msglog_hidden || 'Hidden';
+			hrow.appendChild(mark);
+			var htext = document.createElement('span');
+			htext.className = 'lpn-msglog-panel-text';
+			htext.textContent = text;
+			hrow.appendChild(htext);
+			var show = document.createElement('button');
+			show.type = 'button';
+			show.className = 'lpn-msglog-unhide';
+			show.textContent = pc.lpn_msglog_unhide || 'Show';
+			show.title = pc.lpn_status_hidden_tip || 'Show the hidden message on the map again.';
+			show.addEventListener('click', function () {
+				restore();
+				var xEl = document.getElementById('lpn_status_dismiss');
+				if (xEl && xEl.focus) { xEl.focus(); }
+			});
+			hrow.appendChild(show);
+			panel.appendChild(hrow);
+		}
+		if (hiddenText) { hiddenRow(hiddenText, unhideStatus); }
+		if (hiddenNotes) { hiddenRow(hiddenNotes, unhideEngineNotes); }
+		if (!noticeLog.length && !hiddenText && !hiddenNotes) {
 			// A DIFFERENT CLASS FROM A REAL ROW ON PURPOSE: "no messages yet" is not itself a
 			// kept message, so it must not count as one to anything reading .lpn-msglog-panel-row.
 			var none = document.createElement('div');
@@ -66185,6 +66491,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// Newest first, matching noticeLog's own order (Tom: "oldest at the bottom") -- no
 		// re-sorting at render time, so the panel can never disagree with the log it is reading.
 		noticeLog.forEach(function (row) {
+			if ((hiddenText && row.text === hiddenText) || (hiddenNotes && row.text === hiddenNotes)) { return; }
 			var pill = document.createElement('div');
 			pill.className = 'lpn-msglog-panel-row' + (row.severity === 'warning' ? ' lpn-msglog-panel-warn' : '');
 			var when = document.createElement('span');
@@ -66203,7 +66510,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// as the last row rather than dropped along with the dialog chrome around it.
 		var note = document.createElement('div');
 		note.className = 'lpn-msglog-panel-note';
-		note.textContent = (pc.lpn_msglog_note || 'Newest first. This page keeps the last {n} messages while it is open, and nothing is stored on your computer.')
+		note.textContent = (pc.lpn_msglog_note || 'Newest first. This page keeps the last {n} messages while it is open and does not store them on your computer.')
 			.replace('{n}', NOTICE_LOG_MAX);
 		panel.appendChild(note);
 	}
@@ -66399,14 +66706,149 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// the text -- diagIssueText() already turned the code into the sentence. A caller with no code
 	// gets 'status', which is honest: something was said, and it was not one of the diagnoses.
 	var statusWrongCode = '';
-	function setStatus(text, code) {
+	// **HIDING A STANDING MESSAGE** (Tom, 2026-10-07: "I wish there were a way to dismiss error
+	// messages that I no longer want to see like 'no path to a reservoir'. After about a minute or
+	// two it's just an annoyance."). Ida's design: a small x beside the text (never in the grievance
+	// button's element), hiding exactly that TEXT -- the same words stay hidden, different words (another
+	// node list) show again. IN MEMORY ONLY: the set lives as long as the page and is emptied when a
+	// different network opens, so nothing is stored on the device.
+	//
+	// **HIDDEN MEANS HIDDEN** (Tom, 2026-10-07, of a "1 hidden" chip left in the amber box: "Put the
+	// hidden at the top of the expando history instead of still on the map. Hidden means hidden, and
+	// it's not hidden."). Nothing of a hidden message stays on the map: the box goes with it, its
+	// grievance button included (the bottom strip keeps the standing one). The message waits as the
+	// TOP row of the message history panel (renderMsglogPanel()), marked Hidden, with the one control
+	// that brings it back. No count, badge or highlight on the history glyph either: that glyph sits
+	// on the map too, and lighting it would be the chip again in another place.
+	//
+	// **EVERY STANDING MESSAGE IS HIDEABLE** (Tom, 2026-10-08, G09: "Every standing message"). One
+	// mechanism, no per-message exceptions. A hidden message comes back by two doors only: (1) its
+	// text stops being the standing one (fix the problem, break it again: a diagnostic from
+	// lpnDiagnose() is seen again), and (2) for a run message (anything not a diagnostic: run
+	// summaries, not-converged, engine loading and failure, storage full, unit unknown) the start of
+	// the next run, since the same sentence after a new run is a new fact. `diag` is true only for
+	// a diagnostic.
+	//
+	// **REMEMBERED ACROSS A RELOAD, IN THIS BROWSER** (Tom, 2026-10-09, H09: "this should not be lost on
+	// reload."). A reading preference the visitor asked for, the class of `lpn_hovercard`, so it is
+	// `localStorage` only and never in serializeProject(). What is stored is as little as can do the
+	// job: the open project's id and, per hidden message, a short hash of its words with its kind
+	// (`diag` or `cond:<name>`). Never the words. A hidden RUN message is not stored at all: the next
+	// run, which a reload is, forgets it anyway.
+	//
+	// **THREE MESSAGES STAY HIDDEN UNTIL THEIR CONDITION CHANGES** (Tom, 2026-10-09, H11): storage full,
+	// storage unreadable and unit unknown. They are neither a diagnostic nor a run summary, since an
+	// edit or a run says the same sentence again and no one fixed anything. A `cond:` entry survives
+	// edits and runs; clearHiddenCond() removes it when the condition clears (storage takes a write,
+	// the document reads, the unit is recognised), so a recurrence after that shows again.
+	var LPN_MSGHIDDEN_KEY = 'lpn_msghidden';
+	// Words to a short key: the identity of a message, which cannot be turned back into the words.
+	function statusKey(text) {
+		var h = 5381, i;
+		for (i = 0; i < text.length; i++) { h = ((h * 33) ^ text.charCodeAt(i)) >>> 0; }
+		return h.toString(36) + '.' + text.length;
+	}
+	var statusHiddenOwner = '';   // the project id the hidden set belongs to
+	function loadStatusHidden() {
+		var out = {};
+		try {
+			var o = JSON.parse(localStorage.getItem(LPN_MSGHIDDEN_KEY) || 'null');
+			if (o && typeof o.o === 'string' && o.h && typeof o.h === 'object') {
+				Object.keys(o.h).forEach(function (k) {
+					if (/^(diag|cond:[a-z-]+)$/.test(String(o.h[k]))) { out[k] = o.h[k]; statusHiddenOwner = o.o; }
+				});
+			}
+		} catch (e) { out = {}; }
+		return out;
+	}
+	var statusHidden = loadStatusHidden();   // statusKey(text) -> 'diag' | 'run' | 'cond:<name>'
+	// A restored hidden set is not judged by the empty statements a page load makes on its way to its
+	// first real message; the grace ends at the first non-empty one.
+	var statusHiddenGrace = Object.keys(statusHidden).length > 0;
+	var statusLast = { text: '', code: '', diag: false, cond: '' };
+	function saveStatusHidden() {
+		var keep = {}, n = 0;
+		Object.keys(statusHidden).forEach(function (k) {
+			if (statusHidden[k] !== 'run' && n < 40) { keep[k] = statusHidden[k]; n++; }
+		});
+		try {
+			if (n) { localStorage.setItem(LPN_MSGHIDDEN_KEY, JSON.stringify({ o: statusHiddenOwner, h: keep })); }
+			else { localStorage.removeItem(LPN_MSGHIDDEN_KEY); }
+		} catch (e) { /* private mode or full: hidden for this page view only */ }
+	}
+	// Opening a different network, or clearing this one, ends the set. Opening the SAME project (a
+	// reload) keeps what was restored.
+	function clearStatusHidden(force) {
+		if (!force && statusHiddenOwner && statusHiddenOwner === library.openId) { return; }
+		statusHidden = {};
+		statusHiddenGrace = false;
+		saveStatusHidden();
+	}
+	function hideStatusMessage() {
+		statusHiddenOwner = library.openId || '';
+		statusHidden[statusKey(statusLast.text)] = statusLast.cond ? 'cond:' + statusLast.cond : (statusLast.diag ? 'diag' : 'run');
+		saveStatusHidden();
+	}
+	// The condition behind a `cond:` message has cleared, so a recurrence is news again.
+	function clearHiddenCond(name) {
+		var any = false;
+		Object.keys(statusHidden).forEach(function (k) { if (statusHidden[k] === 'cond:' + name) { delete statusHidden[k]; any = true; } });
+		if (!any) { return; }
+		saveStatusHidden();
+		if (statusLast.cond === name) { paintStatus(); syncStatusBoxVisibility(); }
+	}
+	// A new run forgets the hidden RUN messages (door 2 above); hidden diagnostics stay hidden.
+	function forgetHiddenRunMessages() {
+		Object.keys(statusHidden).forEach(function (k) { if (statusHidden[k] === 'run') { delete statusHidden[k]; } });
+	}
+	// The text the user has hidden and that is still the standing message, or '' -- what the history
+	// panel pins at its top.
+	function statusHiddenText() {
+		return (statusLast.text && statusHidden[statusKey(statusLast.text)]) ? statusLast.text : '';
+	}
+	// Paints what setStatus() last stated, honouring the hidden set. Called by setStatus(), and by
+	// the x and the history row's Show, which must not re-log a message that has not changed.
+	function paintStatus() {
 		var el = document.getElementById('lpn_status');
 		var textEl = document.getElementById('lpn_status_text');
+		var xEl = document.getElementById('lpn_status_dismiss');
 		if (!el) { return; }
+		var hide = !!statusHiddenText();
 		// WRITTEN INTO THE INNER SPAN, not into the <p>: the <p> also holds the grievance button,
 		// and textContent on the parent would delete it on the first solve. Falls back to the <p>
 		// where the span is absent, so a harness or a page that has not been updated still works.
-		(textEl || el).textContent = text || '';
+		(textEl || el).textContent = hide ? '' : (statusLast.text || '');
+		// The x serves the notes beside the text too (H10): shown while either has something on the map.
+		if (xEl) { xEl.style.display = ((statusLast.text && !hide) || (notesLast && !notesHidden)) ? '' : 'none'; }
+		// An open history panel follows: a hidden message forgotten by an edit leaves its top row.
+		if (msglogPanelOpen) { renderMsglogPanel(); }
+	}
+	// Brings the hidden message back onto the map. The one restore door, on the history row.
+	function unhideStatus() {
+		delete statusHidden[statusKey(statusLast.text)];
+		saveStatusHidden();
+		paintStatus();
+		syncStatusBoxVisibility();
+	}
+	function setStatus(text, code, diag, cond) {
+		var el = document.getElementById('lpn_status');
+		if (!el) { return; }
+		statusLast = { text: text || '', code: code || '', diag: !!(text && diag), cond: text ? (cond || '') : '' };
+		// A hidden text is FORGOTTEN the moment it is no longer the one showing: fix the problem,
+		// break it again (undo, redo, an edit) and the message must be seen again. A `cond:` entry is
+		// the exception, kept until clearHiddenCond().
+		if (!statusHiddenGrace || statusLast.text) {
+			var cur = statusLast.text ? statusKey(statusLast.text) : '', pruned = false;
+			Object.keys(statusHidden).forEach(function (k) {
+				if (k !== cur && statusHidden[k].indexOf('cond:') !== 0) { delete statusHidden[k]; pruned = true; }
+			});
+			if (pruned) { saveStatusHidden(); }
+			statusHiddenGrace = false;
+		}
+		paintStatus();
+		// Hidden when empty, or an empty amber box sits on the drawing saying nothing. It is an
+		// overlay now, so this changes what is COVERED, never what is laid out.
+		syncStatusBoxVisibility();
 		// **THE DIAGNOSTIC IS A MESSAGE TOO** (Task 704, Tom 2026-09-22: "**All** messages now
 		// need to go through this messenger system"). This is the SAME door js/lpn-time.js's
 		// progress box writes through (`host.status`) -- "Working out the extended period
@@ -66421,9 +66863,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// sentence, and refusing to hear about that one would be the instrument measuring itself.
 		if (next !== statusWrongCode) { resetWrongButton('lpn_wrong_status_btn'); }
 		statusWrongCode = next;
-		// Hidden when empty, or an empty amber box sits on the drawing saying nothing. It is an
-		// overlay now, so this changes what is COVERED, never what is laid out.
-		syncStatusBoxVisibility();
 	}
 
 	/**
@@ -66490,6 +66929,25 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// grievance button beside it.
 	var LPN_ENGINE_NOTE_MS = 120000, LPN_ENGINE_NOTE_FADE_MS = 800;
 	var engineNoteTimer = 0, engineNoteFadeTimer = 0;
+	// **THE x HIDES THE NOTES TOO** (Tom, 2026-10-09, H10: "hidden means hidden"). Their text is kept
+	// here while hidden so the history can show it with Show; it is not stored on the device, because
+	// a note lives two minutes and its next showing is a new fact.
+	var notesLast = '', notesHidden = false;
+	function hideEngineNotes() {
+		var el = document.getElementById('lpn_status_notes');
+		if (!notesLast || notesHidden || !el) { return; }
+		notesHidden = true;
+		el.textContent = '';
+	}
+	function unhideEngineNotes() {
+		var el = document.getElementById('lpn_status_notes');
+		if (!notesLast || !notesHidden || !el) { return; }
+		notesHidden = false;
+		el.textContent = ' ' + notesLast;
+		el.style.opacity = '';
+		paintStatus();
+		syncStatusBoxVisibility();
+	}
 	function clearEngineNoteTimers() {
 		if (engineNoteTimer) { clearTimeout(engineNoteTimer); engineNoteTimer = 0; }
 		if (engineNoteFadeTimer) { clearTimeout(engineNoteFadeTimer); engineNoteFadeTimer = 0; }
@@ -66503,6 +66961,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// A leading space because this span abuts #lpn_status_text with no whitespace between the
 		// two tags -- the markup cannot carry one without it showing when the note is absent.
 		el.textContent = text ? ' ' + text : '';
+		notesLast = text || '';
+		notesHidden = false;
 		// **ALL MESSAGES GO THROUGH ONE DOOR** (ROADMAP Task 704; Perry's review, 2026-09-22:
 		// setEngineNotes() was the one writer of on-map text this branch had missed -- it stands
 		// for two minutes and then fades, exactly the "read it, then it is gone" shape the whole
@@ -66512,15 +66972,23 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (text) {
 			engineNoteTimer = setTimeout(function () {
 				engineNoteTimer = 0;
+				if (notesHidden) {   // hidden notes just expire, with their history row
+					notesLast = ''; notesHidden = false;
+					paintStatus(); syncStatusBoxVisibility();
+					return;
+				}
 				el.style.opacity = '0';
 				engineNoteFadeTimer = setTimeout(function () {
 					engineNoteFadeTimer = 0;
 					el.textContent = '';
 					el.style.opacity = '';
+					notesLast = '';
+					paintStatus();
 					syncStatusBoxVisibility();
 				}, LPN_ENGINE_NOTE_FADE_MS);
 			}, LPN_ENGINE_NOTE_MS);
 		}
+		paintStatus();   // the x serves the notes too
 		syncStatusBoxVisibility();
 	}
 	// The box shows while EITHER half has something to say. Before the notes moved out this was one
@@ -66758,6 +67226,23 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// empty one would be indistinguishable in the log from a row whose detail was dropped.
 		wireWrongButton('lpn_wrong_btn', 'none');
 		wireWrongButton('lpn_wrong_status_btn', function () { return statusWrongCode || 'status'; });
+		wireStatusHide();
+	}
+	// The x. Focus moves to the history glyph, which is where the message went, so a keyboard user is
+	// never dropped onto the page and is one Enter away from bringing it back.
+	function wireStatusHide() {
+		var xEl = document.getElementById('lpn_status_dismiss');
+		if (xEl) {
+			xEl.addEventListener('click', function () {
+				if (!statusLast.text && !(notesLast && !notesHidden)) { return; }
+				if (statusLast.text && !statusHiddenText()) { hideStatusMessage(); }
+				hideEngineNotes();
+				paintStatus();
+				syncStatusBoxVisibility();
+				var logBtn = document.getElementById('lpn_msglog_btn');
+				if (logBtn && logBtn.focus) { logBtn.focus(); }
+			});
+		}
 	}
 	// Rounds to the same number of decimals the label actually displays, in the DISPLAY unit --
 	// extrema and decoration MUST compare on this, not the raw SI value. Two series links carrying
@@ -67688,6 +68173,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// of it is committed, and saveToStorage() already refuses a placement in progress for the
 		// same reason. Finish and Cancel both schedule a solve on the way out.
 		if (georefActive()) { return; }
+		forgetHiddenRunMessages();
 		// Autosave piggybacks on the same debounce as the solve, not a separate timer -- one
 		// mutation, one save, regardless of solve outcome (a manual delete-to-empty must persist
 		// too, or a reload would resurrect the stale pre-delete network).
@@ -67711,10 +68197,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			lastSolveResult = null;
 			setStatus(((EngCalcs.pageConfig || {}).lpn_unit_unknown ||
 				'This drawing states a unit this page does not offer: {unit}. Everything is kept and shown exactly as it came in, and nothing was changed. No answers can be given until this page knows that unit, because there is no way to tell how big it is.')
-				.replace('{unit}', unknownUnits.join(', ')), 'unit-unknown');
+				.replace('{unit}', unknownUnits.join(', ')), 'unit-unknown', false, 'unit-unknown');
 			refreshLabelText();
 			return;
 		}
+		clearHiddenCond('unit-unknown');
 		var model = assembleModel();
 		// **THE EPANET FETCH STARTS HERE, BEFORE ANY OPINION ABOUT THE NETWORK IS FORMED** (Task
 		// 608). This is the one function every edit's debounce and every Calculate demand arrive at,
@@ -67722,11 +68209,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// are silent and both are cheap; the state machine makes the fetch itself once-only.
 		maybeWarmEpanetInBackground(model);
 		syncEpanetNeed(model);
+		omittedNote = omittedNoteText(model);
 		var issues = EngCalcs.lpnDiagnose(model);
 		if (issues.length > 0) {
 			lastSolveResult = null;
 			issues.forEach(function (issue) { logLpnDiag(issue.code); });
-			setStatus(issues.map(diagIssueText).join(' '), issues[0].code);
+			setStatus(issues.map(diagIssueText).join(' '), issues[0].code, true);
 			refreshLabelText();
 			return;
 		}
@@ -67769,6 +68257,24 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// Set by runSolve() when a network was routed to EPANET by its own contents rather than by the
 	// user's choice; read by applySolveResult(), which owns the status bar after a successful solve.
 	var valveRouteNote = '';
+	// **THE STANDING NOTE FOR NODES LEFT OUT OF THE RUN** because no path reaches a reservoir or a
+	// tank (Tom, 2026-10-09). Set by runSolve() from the model's `omitted` list, said in the status
+	// bar with the other run notes by applySolveResult() and by the extended-period run's own
+	// status writes (the seam's `status`), and gone the moment a run has nothing left out. Never a
+	// modal and never a toast: it stays true until the network changes.
+	var omittedNote = '';
+	function omittedNoteText(model) {
+		var ids = (model && model.omitted) || [];
+		if (ids.length === 0) { return ''; }
+		return ((EngCalcs.pageConfig || {}).lpn_omitted_note ||
+			'Left out of this run because no path leads from them to a reservoir or tank: {ids}')
+			.replace('{ids}', ids.join(', '));
+	}
+	// A status line with the standing note beneath it, unless it is already there.
+	function withOmittedNote(text) {
+		if (!text || !omittedNote || text.indexOf(omittedNote) >= 0) { return text; }
+		return text + ' ' + omittedNote;
+	}
 
 	// ---- Warming the EPANET engine ----
 	//
@@ -72195,7 +72701,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// diameter that is not there.
 			if (result.issues && result.issues.length > 0) {
 				result.issues.forEach(function (issue) { logLpnDiag(issue.code); });
-				setStatus(result.issues.map(diagIssueText).join(' '), result.issues[0].code);
+				setStatus(result.issues.map(diagIssueText).join(' '), result.issues[0].code, true);
 				refreshLabelText();
 				refreshValueColors();   // Task 384: the colours came from results that no longer exist
 				refreshPaneIfOpen();    // Task 409: and so did the grade line and the result columns
@@ -72324,7 +72830,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var pdaNote = pdaShort > 0
 			? (pc.lpn_pda_deficit_note || 'Junctions receiving less than their demand: {n}.').replace('{n}', String(pdaShort))
 			: '';
-		setStatus([notConvergedNote, valveRouteNote, pdaNote,
+		setStatus([notConvergedNote, valveRouteNote, pdaNote, omittedNote,
 			droppedNote('control-dangling', 'lpn_control_dangling_note',
 				'These controls name an element that is no longer in this project, so they were left out: {ids}'),
 			droppedNote('control-unreadable', 'lpn_control_unreadable_note',
@@ -72456,7 +72962,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			openScenarioOptions: function (id, key) { openSettingsTableAt(id, ['times', key]); },
 			// The [TIMES] block Settings > Time edits: a scenario's view while one is open.
 			editTimes: setboxEditTimes,
-			apply: applySolveResult, status: setStatus, notice: showSlowAdvice, solve: scheduleSolve,
+			apply: applySolveResult, status: function (t, c) { setStatus(withOmittedNote(t), c); }, notice: showSlowAdvice, solve: scheduleSolve,
 			// **AND THE UNDEBOUNCED ONE, which is what asking for a run needs** (Task 248,
 			// 2026-08-19). A period run is provoked by a deliberate act -- the Run button, or a
 			// quiet moment that has already been waited out -- and going through the 300 ms

@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "bg",
-        "expected_key_count": 2482,
-        "delta_key_count": 38,
+        "expected_key_count": 2492,
+        "delta_key_count": 48,
         "exempt_key_count": 32,
         "exempt_keys": [
             "calc_units_us",
@@ -711,20 +711,24 @@
         ]
     },
     "keys_to_translate": {
-        "lpn_pane_copy_heads": "Copy with headings",
+        "lpn_hotkeys_zoomwin_def": "Zoom Window: drag a rectangle to zoom to.",
+        "lpn_status_dismiss": "Hide this message",
+        "lpn_msglog_hidden": "Hidden",
+        "lpn_msglog_unhide": "Show",
+        "lpn_status_hidden_tip": "Show the hidden message on the map again.",
+        "lpn_pane_copy_heads": "Copy with column headings",
         "lpn_export_table_title": "Export to {format}",
         "lpn_export_table_current": "Current",
         "lpn_export_table_all": "All",
         "lpn_export_table_go": "Export",
         "lpn_export_table_scn_note": "Results are exported only for the scenario last calculated.",
-        "lpn_file_export_tables_heading": "Tables and libraries",
         "lpn_file_export_item_ods": "ODS file…",
         "lpn_file_export_item_xlsx": "XLSX file…",
         "lpn_file_export_item_csv": "CSV file…",
-        "lpn_file_export_tables_tip": "Download the tables as the Tables pane shows them, one sheet each, with a sheet for each library their IDs refer to: patterns, curves, pipe types, and fittings.",
-        "lpn_file_export_csv_tip": "Download a table as the Tables pane shows it. Several tables come as one zip file of CSV files, with a file for each library their IDs refer to.",
+        "lpn_file_export_tables_tip": "Download the tables as the Tables pane shows them, in one workbook with a sheet for each table (and for each scenario you choose), plus a sheet for each library their IDs refer to: patterns, curves, pipe types, and fittings. Results are included for the scenario last calculated only.",
+        "lpn_file_export_csv_tip": "Download a table as the Tables pane shows it. One table comes as a single CSV file with no libraries. Several tables or scenarios come as one zip file of CSV files, with a file for each library their IDs refer to. Results are included for the scenario last calculated only.",
         "lpn_file_export_item_dxf": "DXF file…",
-        "lpn_file_export_dxf_tip": "Download this network for AutoCAD and other CAD programs: pipes, pumps, and valves as polylines, and every asset as a block whose attributes carry its ID and property values in the project units.",
+        "lpn_file_export_dxf_tip": "Download this network for AutoCAD and other CAD programs: nodes as symbol blocks, pipes, pumps, and valves as polylines, and every asset as a block whose attributes carry its ID and property values in the project units.",
         "lpn_dxf_export_no_utm": "The DXF file was not written: this network lies outside the latitudes UTM covers (80° S to 84° N), and a drawing needs a flat grid to be drawn on.",
         "lpn_dxf_export_refused": "The DXF file was not written: the coordinate conversion it needs did not load. Check the connection and try again.",
         "lpn_dxf_export_failed": "The DXF file was not written: an error in this page stopped it ({error}).",
@@ -736,9 +740,9 @@
         "lpn_dxf_note_shortened": "{n} values were longer than a DXF file allows ({max} characters), so each was shortened and ends in three periods.",
         "lpn_dxf_note_categories": "{n} junctions have more than one demand category. Their {tag} attribute holds the sum of the base demands of all categories.",
         "lpn_file_export_item_workspace": "Workspace…",
-        "lpn_file_export_workspace_tip": "Download a small file holding where your boxes sit, their sizes, which are open or docked, and your pane and column sizes, plus the reading preferences of this page. Your projects, project settings and cookies (language, consent, units) are not in it. Load it on another screen or browser with File, Import, Workspace.",
+        "lpn_file_export_workspace_tip": "Download a small file holding where your boxes sit, their sizes, which are open or docked, and your pane and column sizes, plus the display options of this page, such as which help bubbles and the hover card are shown. Your projects, project settings and cookies (language, consent, units) are not in it. Load it on another screen or browser with File, Import, Workspace.",
         "lpn_file_import_workspace": "Workspace…",
-        "lpn_file_import_workspace_tip": "Apply a workspace file saved with File, Export, Workspace: box positions and sizes, docking, pane sizes and the reading preferences of this page. Your projects and cookies are not touched.",
+        "lpn_file_import_workspace_tip": "Apply a workspace file saved with File, Export, Workspace: box positions and sizes, docking, pane sizes and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched.",
         "lpn_workspace_exported": "Workspace saved to {file}: {n} settings.",
         "lpn_workspace_imported": "Workspace applied from {file}. Settings applied: {n}. Returned to their defaults: {r}.",
         "lpn_workspace_ignored": "Entries ignored because they were not recognized: {u}.",
@@ -747,24 +751,34 @@
         "lpn_workspace_refused_newer": "This workspace file was saved by a newer version of this page (format {version}), so nothing was changed.",
         "lpn_workspace_confirm": "Replace this browser's workspace layout with the one in the file?",
         "lpn_workspace_refused_storage": "Browser storage is full or unavailable, so the workspace was not applied.",
+        "lpn_omitted_note": "Left out of this run because no path leads from them to a reservoir or tank: {ids}",
+        "lpn_link_end_unknown": "No node has the ID {id}.",
+        "lpn_link_end_same": "From and To must be different nodes.",
+        "lpn_break_pipe_ask": "Break pipe {id} at this node?",
+        "lpn_break_yes": "Yes",
+        "lpn_break_no": "No",
         "lpn_settings_hover_card": "Show the full label on hover",
-        "lpn_settings_hover_card_tip": "Rest the pointer on a node, link or customer to see its label as specified in Settings at any scale, fit or not. This is a setting for this browser, not for the project."
+        "lpn_settings_hover_card_tip": "Rest the pointer on a node, link or customer to see its label as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project."
     },
     "keys": {
-        "lpn_pane_copy_heads": "Copy with headings",
+        "lpn_hotkeys_zoomwin_def": "Zoom Window: drag a rectangle to zoom to.",
+        "lpn_status_dismiss": "Hide this message",
+        "lpn_msglog_hidden": "Hidden",
+        "lpn_msglog_unhide": "Show",
+        "lpn_status_hidden_tip": "Show the hidden message on the map again.",
+        "lpn_pane_copy_heads": "Copy with column headings",
         "lpn_export_table_title": "Export to {format}",
         "lpn_export_table_current": "Current",
         "lpn_export_table_all": "All",
         "lpn_export_table_go": "Export",
         "lpn_export_table_scn_note": "Results are exported only for the scenario last calculated.",
-        "lpn_file_export_tables_heading": "Tables and libraries",
         "lpn_file_export_item_ods": "ODS file…",
         "lpn_file_export_item_xlsx": "XLSX file…",
         "lpn_file_export_item_csv": "CSV file…",
-        "lpn_file_export_tables_tip": "Download the tables as the Tables pane shows them, one sheet each, with a sheet for each library their IDs refer to: patterns, curves, pipe types, and fittings.",
-        "lpn_file_export_csv_tip": "Download a table as the Tables pane shows it. Several tables come as one zip file of CSV files, with a file for each library their IDs refer to.",
+        "lpn_file_export_tables_tip": "Download the tables as the Tables pane shows them, in one workbook with a sheet for each table (and for each scenario you choose), plus a sheet for each library their IDs refer to: patterns, curves, pipe types, and fittings. Results are included for the scenario last calculated only.",
+        "lpn_file_export_csv_tip": "Download a table as the Tables pane shows it. One table comes as a single CSV file with no libraries. Several tables or scenarios come as one zip file of CSV files, with a file for each library their IDs refer to. Results are included for the scenario last calculated only.",
         "lpn_file_export_item_dxf": "DXF file…",
-        "lpn_file_export_dxf_tip": "Download this network for AutoCAD and other CAD programs: pipes, pumps, and valves as polylines, and every asset as a block whose attributes carry its ID and property values in the project units.",
+        "lpn_file_export_dxf_tip": "Download this network for AutoCAD and other CAD programs: nodes as symbol blocks, pipes, pumps, and valves as polylines, and every asset as a block whose attributes carry its ID and property values in the project units.",
         "lpn_dxf_export_no_utm": "The DXF file was not written: this network lies outside the latitudes UTM covers (80° S to 84° N), and a drawing needs a flat grid to be drawn on.",
         "lpn_dxf_export_refused": "The DXF file was not written: the coordinate conversion it needs did not load. Check the connection and try again.",
         "lpn_dxf_export_failed": "The DXF file was not written: an error in this page stopped it ({error}).",
@@ -776,9 +790,9 @@
         "lpn_dxf_note_shortened": "{n} values were longer than a DXF file allows ({max} characters), so each was shortened and ends in three periods.",
         "lpn_dxf_note_categories": "{n} junctions have more than one demand category. Their {tag} attribute holds the sum of the base demands of all categories.",
         "lpn_file_export_item_workspace": "Workspace…",
-        "lpn_file_export_workspace_tip": "Download a small file holding where your boxes sit, their sizes, which are open or docked, and your pane and column sizes, plus the reading preferences of this page. Your projects, project settings and cookies (language, consent, units) are not in it. Load it on another screen or browser with File, Import, Workspace.",
+        "lpn_file_export_workspace_tip": "Download a small file holding where your boxes sit, their sizes, which are open or docked, and your pane and column sizes, plus the display options of this page, such as which help bubbles and the hover card are shown. Your projects, project settings and cookies (language, consent, units) are not in it. Load it on another screen or browser with File, Import, Workspace.",
         "lpn_file_import_workspace": "Workspace…",
-        "lpn_file_import_workspace_tip": "Apply a workspace file saved with File, Export, Workspace: box positions and sizes, docking, pane sizes and the reading preferences of this page. Your projects and cookies are not touched.",
+        "lpn_file_import_workspace_tip": "Apply a workspace file saved with File, Export, Workspace: box positions and sizes, docking, pane sizes and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched.",
         "lpn_workspace_exported": "Workspace saved to {file}: {n} settings.",
         "lpn_workspace_imported": "Workspace applied from {file}. Settings applied: {n}. Returned to their defaults: {r}.",
         "lpn_workspace_ignored": "Entries ignored because they were not recognized: {u}.",
@@ -787,10 +801,96 @@
         "lpn_workspace_refused_newer": "This workspace file was saved by a newer version of this page (format {version}), so nothing was changed.",
         "lpn_workspace_confirm": "Replace this browser's workspace layout with the one in the file?",
         "lpn_workspace_refused_storage": "Browser storage is full or unavailable, so the workspace was not applied.",
+        "lpn_omitted_note": "Left out of this run because no path leads from them to a reservoir or tank: {ids}",
+        "lpn_link_end_unknown": "No node has the ID {id}.",
+        "lpn_link_end_same": "From and To must be different nodes.",
+        "lpn_break_pipe_ask": "Break pipe {id} at this node?",
+        "lpn_break_yes": "Yes",
+        "lpn_break_no": "No",
         "lpn_settings_hover_card": "Show the full label on hover",
-        "lpn_settings_hover_card_tip": "Rest the pointer on a node, link or customer to see its label as specified in Settings at any scale, fit or not. This is a setting for this browser, not for the project."
+        "lpn_settings_hover_card_tip": "Rest the pointer on a node, link or customer to see its label as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project."
     },
     "key_context": {
+        "lpn_hotkeys_zoomwin_def": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_hotkeys_map_def",
+                    "value": "<table class=\"lpn-notes-table\"><tbody><tr><td>1 или Esc<\/td><td>Избор.<\/td><\/tr><tr><td>2<\/td><td>Добавя възел.<\/td><\/tr><tr><td>3<\/td><td>Добавя резервоар.<\/td><\/tr><tr><td>4<\/td><td>Добавя цистерна.<\/td><\/tr><tr><td>5<\/td><td>Добавя тръба.<\/td><\/tr><tr><td>6<\/td><td>Добавя помпа.<\/td><\/tr><tr><td>7<\/td><td>Добавя вентил.<\/td><\/tr><tr><td>8<\/td><td>Добавя абонат.<\/td><\/tr><tr><td>9<\/td><td>Добавя текст.<\/td><\/tr><tr><td>Delete<\/td><td>Изтрива избраното.<\/td><\/tr><tr><td>Ctrl+Z<\/td><td>Отменя последната промяна.<\/td><\/tr><tr><td>+ или =<\/td><td>Увеличава мащаба.<\/td><\/tr><tr><td>-<\/td><td>Намалява мащаба.<\/td><\/tr><\/tbody><\/table>",
+                    "english": "<table class=\"lpn-notes-table\"><tbody><tr><td>1 or Esc<\/td><td>Select.<\/td><\/tr><tr><td>2<\/td><td>Add a junction.<\/td><\/tr><tr><td>3<\/td><td>Add a reservoir.<\/td><\/tr><tr><td>4<\/td><td>Add a tank.<\/td><\/tr><tr><td>5<\/td><td>Add a pipe.<\/td><\/tr><tr><td>6<\/td><td>Add a pump.<\/td><\/tr><tr><td>7<\/td><td>Add a valve.<\/td><\/tr><tr><td>8<\/td><td>Add a customer.<\/td><\/tr><tr><td>9<\/td><td>Add text.<\/td><\/tr><tr><td>Delete<\/td><td>Delete the selection.<\/td><\/tr><tr><td>Ctrl+Z<\/td><td>Undo the last change.<\/td><\/tr><tr><td>+ or =<\/td><td>Zoom in.<\/td><\/tr><tr><td>-<\/td><td>Zoom out.<\/td><\/tr><\/tbody><\/table>"
+                },
+                "next_translated": {
+                    "key": "lpn_hotkeys_menu_heading",
+                    "value": "Менюта",
+                    "english": "Menus"
+                }
+            }
+        },
+        "lpn_status_dismiss": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_wrong_btn",
+                    "value": "Нещо не е наред тук?",
+                    "english": "Something wrong here?"
+                },
+                "next_translated": {
+                    "key": "lpn_wrong_tip",
+                    "value": "Докладвайте грешка на тази страница. Отваря се кутия, в която можете да изберете проблема, да добавите коментар и да въведете имейл адрес, ако желаете отговор. Всички полета са по избор и нищо не се изпраща, докато не натиснете Изпрати.",
+                    "english": "Report an error on this page. This opens a box to select the problem, add a comment, and enter an email address if a reply is wanted. All fields are optional, and nothing is sent until you press Send."
+                }
+            }
+        },
+        "lpn_msglog_hidden": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_wrong_btn",
+                    "value": "Нещо не е наред тук?",
+                    "english": "Something wrong here?"
+                },
+                "next_translated": {
+                    "key": "lpn_wrong_tip",
+                    "value": "Докладвайте грешка на тази страница. Отваря се кутия, в която можете да изберете проблема, да добавите коментар и да въведете имейл адрес, ако желаете отговор. Всички полета са по избор и нищо не се изпраща, докато не натиснете Изпрати.",
+                    "english": "Report an error on this page. This opens a box to select the problem, add a comment, and enter an email address if a reply is wanted. All fields are optional, and nothing is sent until you press Send."
+                }
+            }
+        },
+        "lpn_msglog_unhide": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_wrong_btn",
+                    "value": "Нещо не е наред тук?",
+                    "english": "Something wrong here?"
+                },
+                "next_translated": {
+                    "key": "lpn_wrong_tip",
+                    "value": "Докладвайте грешка на тази страница. Отваря се кутия, в която можете да изберете проблема, да добавите коментар и да въведете имейл адрес, ако желаете отговор. Всички полета са по избор и нищо не се изпраща, докато не натиснете Изпрати.",
+                    "english": "Report an error on this page. This opens a box to select the problem, add a comment, and enter an email address if a reply is wanted. All fields are optional, and nothing is sent until you press Send."
+                }
+            }
+        },
+        "lpn_status_hidden_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_wrong_btn",
+                    "value": "Нещо не е наред тук?",
+                    "english": "Something wrong here?"
+                },
+                "next_translated": {
+                    "key": "lpn_wrong_tip",
+                    "value": "Докладвайте грешка на тази страница. Отваря се кутия, в която можете да изберете проблема, да добавите коментар и да въведете имейл адрес, ако желаете отговор. Всички полета са по избор и нищо не се изпраща, докато не натиснете Изпрати.",
+                    "english": "Report an error on this page. This opens a box to select the problem, add a comment, and enter an email address if a reply is wanted. All fields are optional, and nothing is sent until you press Send."
+                }
+            }
+        },
         "lpn_pane_copy_heads": {
             "reason": "missing",
             "current_value": null,
@@ -884,22 +984,6 @@
                     "key": "lpn_menu_project",
                     "value": "Вода",
                     "english": "Water"
-                }
-            }
-        },
-        "lpn_file_export_tables_heading": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_file_export_item_geojson",
-                    "value": "Файл GeoJSON…",
-                    "english": "GeoJSON file…"
-                },
-                "next_translated": {
-                    "key": "lpn_file_export_inp_tip",
-                    "value": "Изтеглете тази мрежа като файл .inp на EPANET (в zip файл с изображението ѝ, ако има такова). Всичко, което форматът .inp не може да побере, се изброява след това.",
-                    "english": "Download this network as an EPANET .inp file (in a zip file with its image if applicable). Anything the .inp format cannot hold is listed for you afterwards."
                 }
             }
         },
@@ -1364,6 +1448,102 @@
                     "key": "lpn_geojson_refused_local",
                     "value": "Файлът GeoJSON съдържа само географска ширина и дължина, а този проект е начертан в локална координатна мрежа без място на Земята. Първо го геопривържете чрез Карта, Карта на света, Прикачи, после експортирайте отново.",
                     "english": "A GeoJSON file holds latitude and longitude only, and this project is drawn on a local grid with no place on the Earth. Georeference it first with Map, World map, Attach, then export again."
+                }
+            }
+        },
+        "lpn_omitted_note": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_diag_unreachable",
+                    "value": "Тези възли нямат път до резервоар:",
+                    "english": "These nodes have no path to a reservoir or tank:"
+                },
+                "next_translated": {
+                    "key": "lpn_engine_fetching",
+                    "value": "Изтегляне на решаващия модул на EPANET. Той се изтегля веднъж и след това остава на това устройство, така че след това работи офлайн.",
+                    "english": "Downloading the EPANET solver. It is downloaded once and then stored on this device, so it works offline afterward."
+                }
+            }
+        },
+        "lpn_link_end_unknown": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_field_to",
+                    "value": "До",
+                    "english": "To"
+                },
+                "next_translated": {
+                    "key": "lpn_field_valve_type",
+                    "value": "Тип вентил",
+                    "english": "Valve type"
+                }
+            }
+        },
+        "lpn_link_end_same": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_field_to",
+                    "value": "До",
+                    "english": "To"
+                },
+                "next_translated": {
+                    "key": "lpn_field_valve_type",
+                    "value": "Тип вентил",
+                    "english": "Valve type"
+                }
+            }
+        },
+        "lpn_break_pipe_ask": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_field_to",
+                    "value": "До",
+                    "english": "To"
+                },
+                "next_translated": {
+                    "key": "lpn_field_valve_type",
+                    "value": "Тип вентил",
+                    "english": "Valve type"
+                }
+            }
+        },
+        "lpn_break_yes": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_field_to",
+                    "value": "До",
+                    "english": "To"
+                },
+                "next_translated": {
+                    "key": "lpn_field_valve_type",
+                    "value": "Тип вентил",
+                    "english": "Valve type"
+                }
+            }
+        },
+        "lpn_break_no": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_field_to",
+                    "value": "До",
+                    "english": "To"
+                },
+                "next_translated": {
+                    "key": "lpn_field_valve_type",
+                    "value": "Тип вентил",
+                    "english": "Valve type"
                 }
             }
         },

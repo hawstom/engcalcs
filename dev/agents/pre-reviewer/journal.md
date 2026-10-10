@@ -4169,6 +4169,13 @@ OBSERVED real Chromium 1400x900, net3 example, hand-edited workspace files then 
 Not done: harness mutation test; how boxes LOOK on a different-size real screen; unit cookie behaviour on other pages.
 Lesson: do not wrap a harness that takes its own flock in an outer flock; it deadlocks against itself.
 
+## 2026-10-07 feat/message-dismiss (Hide a standing message; Zoom Window row and W)
+- OBSERVED: harness message-dismiss-browser-harness.js 30/30 passes; adding 'no-fixed-head' to the hideable set makes it fail (1 FAIL), so it holds the line.
+- OBSERVED: the x is 18x15 px on desktop and at 390/320 wide; a real click at its centre works; no sideways scroll; Something-wrong button untouched.
+- OBSERVED: hidden set is keyed on text only and survives the problem going away and returning (undo x2 then redo x2 left it hidden, chip shown). Chip is always "1 hidden" (only one message exists at a time, so it never miscounts).
+- OBSERVED: W keys on e.key only; a keydown with key 'ц' code 'KeyW' does nothing. Latin w/W, toolbar-button focus, Settings box open: works; open menu: ignored; Escape-closed menu: works.
+- OBSERVED: menu rows have no active state anywhere in this menu (menu closes on click), so Zoom Window row shows none; toolbar button does show pressed.
+- LESSON: Session.closeMenu() only hides the popup with CSS, leaving openMenuAnchor set; use Escape in probes.
 # Perry, feat/user-guide pre-review, 2026-10-08 (head 00862427)
 OBSERVED: user-guide-find-harness ALL PASS. Net3 worked queries reproduce in en, de, zh, tr, ar, fr, es.
 OBSERVED: the 7th worked query (Junction.Connectivity ...) FAILS on every non-English page tried ("Not a property of X: Connectivity"). English property words are NOT universally accepted: Connectivity, Source share, C, Minor loss, k, Average source share fail on es and de. Chapter says English words accepted in every language.
@@ -4227,3 +4234,10 @@ OBSERVED defect 1: a control/rule naming the old asset is NOT omitted from B's r
 OBSERVED defect 2: after Create new assets, Properties box still shows old junction 22 while map selection is new tank T1.
 OBSERVED: customer 100 gpm on 22 vanishes in B with no word; same as Base change-to-tank (pre-existing), box lists only "Base demand 200".
 Native engine and undo taken from builder's harness, not re-run by me (headless harness re-run: all ok, incl. 7 mutations).
+
+
+# Perry journal 2026-10-09: feat/bentley-interop stage 6 Scenario manager (head e2fad9e7)
+OBSERVED (decays): driven in real Chromium on Net1, own scripts in scratchpad (p3..p10).
+- Works: add/rename/F2/slow-click rename, Child_1/2_of_Horse numbering, Base2/Base3, drag reparent+reorder, cycle refusal, delete-in-use refusal naming users, Demand alt assigned in Scenarios table -> junction edit lands in alt, Base untouched, solve differs; copy own/share; Compare honours unchecked; save/reopen keeps tree, alternatives, compareSet; es shows menu/headings, new strings English.
+- Defects: Delete on Base: misleading map message; Base2 Parent column says Base while tip says Base has no parent; scenario override count 0 though holds Dry year demand edit; builder harness has `|| true` assertions (1.1, 3.4, 2.1) and weak 5.5/6.4.
+- Could not find the builder's "six self-declared calls" in git log or dev/*.md.

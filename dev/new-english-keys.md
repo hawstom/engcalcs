@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**138 still to read on master**, of 140 untranslated keys, of 2578 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**40 still to read on master**, of 48 untranslated keys, of 2492 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -51,7 +51,7 @@ is the one you meant. "The first one" is a complete answer.
   *The proposal:* PROPOSED syn: 'Current' (this radio, under Tables and Scenarios) means the one now selected, as opposed to All; it is never a flow or electric current. Alternative English: 'Selected only' / 'All'.
   @@ NEEDS RULING
 - **`lpn_file_export_workspace_tip`**
-  > Download a small file holding where your boxes sit, their sizes, which are open or docked, and your pane and column sizes, plus the reading preferences of this page. Your projects, project settings and cookies (language, consent, units) are not in it. Load it on another screen or browser with File, Import, Workspace.
+  > Download a small file holding where your boxes sit, their sizes, which are open or docked, and your pane and column sizes, plus the display options of this page, such as which help bubbles and the hover card are shown. Your projects, project settings and cookies (language, consent, units) are not in it. Load it on another screen or browser with File, Import, Workspace.
   *The finding:* 'the reading preferences of this page' is unexplained jargon: a translator cannot tell whether it means language, text size, or display toggles such as the run box, the area hint and the hover card. Same phrase in lpn_file_import_workspace_tip.
   1. language or font settings for reading text
   2. display toggles the visitor set, such as whether help bubbles and the hover card are shown
@@ -59,7 +59,7 @@ is the one you meant. "The first one" is a complete answer.
   *The proposal:* PROPOSED English (both keys): replace 'the reading preferences of this page' with 'the display options of this page, such as which help bubbles and the hover card are shown'.
   @@ NEEDS RULING
 - **`lpn_pane_copy_heads`**
-  > Copy with headings
+  > Copy with column headings
   *The finding:* 'headings' does not say which: the column headings the table shows, or row and column headings. Right-click menu item in a Tables pane (js/looped-network.js:28892); paneCopyTsv adds one row, the column headings with unit.
   1. copy the selected cells with their column headings as a first row
   2. copy the selected cells with both row and column headings
@@ -67,7 +67,7 @@ is the one you meant. "The first one" is a complete answer.
   *The proposal:* PROPOSED English: 'Copy with column headings'
   @@ NEEDS RULING
 - **`lpn_settings_hover_card_tip`**
-  > Rest the pointer on a node, link or customer to see its label as specified in Settings at any scale, fit or not. This is a setting for this browser, not for the project.
+  > Rest the pointer on a node, link or customer to see its label as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project.
   *The finding:* 'at any scale, fit or not' leaves 'fit' with no subject: fit what? The setting makes the hover card show the label even when the on-map label was dropped for lack of room (js/looped-network.js:51225). 'fit' also collides with 'zoom to fit'.
   1. whether or not the label fits on the map at the current zoom
   2. whether or not the map is zoomed to fit the network
@@ -175,43 +175,16 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   @@ NEEDS RULING
 
-## lpn_  (140, 138 to read @@ NEEDS RULING)
+## lpn_  (48, 40 to read @@ NEEDS RULING)
 
-- **`lpn_alt_cat_calculation`**
-  > Calculation
+- **`lpn_break_no`**
+  > No
   @@ NEEDS RULING
-- **`lpn_alt_cat_presentation`**
-  > Presentation
+- **`lpn_break_pipe_ask`**
+  > Break pipe {id} at this node?
   @@ NEEDS RULING
-- **`lpn_alt_cat_topology_tip`**
-  > Asset activation
-  @@ NEEDS RULING
-- **`lpn_change_type_create_new`**
-  > Create new assets
-  @@ NEEDS RULING
-- **`lpn_change_type_customers_left`**
-  > A customer cannot be assigned per scenario, so the demand of these customers stays with the old junction and is not in this scenario's solve:
-  @@ NEEDS RULING
-- **`lpn_change_type_line_alternative`**
-  > {id}: {property} {value}, in alternative {alternative}
-  @@ NEEDS RULING
-- **`lpn_change_type_not_carried`**
-  > The new assets cannot hold these values. The old assets keep them:
-  @@ NEEDS RULING
-- **`lpn_change_type_old_controls`**
-  > These controls and rules refer to an old asset, which is inactive in this scenario, so they are left out of this scenario's run and its .inp export:
-  @@ NEEDS RULING
-- **`lpn_change_type_scenario_ask`**
-  > Current scenario is not Base. Create new assets? The selected assets become inactive in this scenario.
-  @@ NEEDS RULING
-- **`lpn_change_type_switch_base`**
-  > Switch to Base
-  @@ NEEDS RULING
-- **`lpn_control_inactive_note`**
-  > These controls refer to an asset that is inactive in this scenario, so they are ignored in its run: {ids}
-  @@ NEEDS RULING
-- **`lpn_customer_node_inactive`**
-  > This customer is assigned to a junction that is inactive in this scenario, so its demand is not part of the solve.
+- **`lpn_break_yes`**
+  > Yes
   @@ NEEDS RULING
 - **`lpn_dxf_export_failed`**
   > The DXF file was not written: an error in this page stopped it ({error}).
@@ -259,10 +232,10 @@ never edits a synonym.
   > Export to {format}
   @@ NEEDS RULING
 - **`lpn_file_export_csv_tip`**
-  > Download a table as the Tables pane shows it. Several tables come as one zip file of CSV files, with a file for each library their IDs refer to.
+  > Download a table as the Tables pane shows it. One table comes as a single CSV file with no libraries. Several tables or scenarios come as one zip file of CSV files, with a file for each library their IDs refer to. Results are included for the scenario last calculated only.
   @@ NEEDS RULING
 - **`lpn_file_export_dxf_tip`**
-  > Download this network for AutoCAD and other CAD programs: pipes, pumps, and valves as polylines, and every asset as a block whose attributes carry its ID and property values in the project units.
+  > Download this network for AutoCAD and other CAD programs: nodes as symbol blocks, pipes, pumps, and valves as polylines, and every asset as a block whose attributes carry its ID and property values in the project units.
   @@ NEEDS RULING
 - **`lpn_file_export_item_csv`**
   > CSV file…
@@ -279,29 +252,134 @@ never edits a synonym.
 - **`lpn_file_export_item_xlsx`**
   > XLSX file…
   @@ NEEDS RULING
-- **`lpn_file_export_tables_heading`**
-  > Tables and libraries
-  @@ NEEDS RULING
 - **`lpn_file_export_tables_tip`**
-  > Download the tables as the Tables pane shows them, one sheet each, with a sheet for each library their IDs refer to: patterns, curves, pipe types, and fittings.
+  > Download the tables as the Tables pane shows them, in one workbook with a sheet for each table (and for each scenario you choose), plus a sheet for each library their IDs refer to: patterns, curves, pipe types, and fittings. Results are included for the scenario last calculated only.
   @@ NEEDS RULING
 - **`lpn_file_export_workspace_tip`**
-  > Download a small file holding where your boxes sit, their sizes, which are open or docked, and your pane and column sizes, plus the reading preferences of this page. Your projects, project settings and cookies (language, consent, units) are not in it. Load it on another screen or browser with File, Import, Workspace.
-  @@ NEEDS RULING
+  > Download a small file holding where your boxes sit, their sizes, which are open or docked, and your pane and column sizes, plus the display options of this page, such as which help bubbles and the hover card are shown. Your projects, project settings and cookies (language, consent, units) are not in it. Load it on another screen or browser with File, Import, Workspace.
+  _Ruled 2026-10-09: Use proposed (Tom, calls page round 3)._
 - **`lpn_file_import_workspace`**
   > Workspace…
   @@ NEEDS RULING
 - **`lpn_file_import_workspace_tip`**
-  > Apply a workspace file saved with File, Export, Workspace: box positions and sizes, docking, pane sizes and the reading preferences of this page. Your projects and cookies are not touched.
+  > Apply a workspace file saved with File, Export, Workspace: box positions and sizes, docking, pane sizes and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched.
+  _Ruled 2026-10-09: Use proposed (Tom, calls page round 3)._
+- **`lpn_hotkeys_zoomwin_def`**
+  > Zoom Window: drag a rectangle to zoom to.
+  @@ NEEDS RULING
+- **`lpn_link_end_same`**
+  > From and To must be different nodes.
+  @@ NEEDS RULING
+- **`lpn_link_end_unknown`**
+  > No node has the ID {id}.
+  @@ NEEDS RULING
+- **`lpn_msglog_hidden`**
+  > Hidden
+  _Ruled 2026-10-08: Calls page 8 October: Use as written_
+- **`lpn_msglog_unhide`**
+  > Show
+  _Ruled 2026-10-08: Calls page 8 October: Use as written_
+- **`lpn_omitted_note`**
+  > Left out of this run because no path leads from them to a reservoir or tank: {ids}
+  @@ NEEDS RULING
+- **`lpn_pane_copy_heads`**
+  > Copy with column headings
+  _Ruled 2026-10-09: Use proposed (Tom, calls page round 3)._
+- **`lpn_settings_hover_card`**
+  > Show the full label on hover
+  @@ NEEDS RULING
+- **`lpn_settings_hover_card_tip`**
+  > Rest the pointer on a node, link or customer to see its label as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project.
+  _Ruled 2026-10-09: Use proposed (Tom, calls page round 3)._
+- **`lpn_status_dismiss`**
+  > Hide this message
+  @@ NEEDS RULING
+- **`lpn_status_hidden_tip`**
+  > Show the hidden message on the map again.
+  @@ NEEDS RULING
+- **`lpn_workspace_confirm`**
+  > Replace this browser's workspace layout with the one in the file?
+  _Ruled 2026-10-08: Calls page 8 October: his own text, "Replace this browser's workspace layout with the one in the file?"_
+- **`lpn_workspace_exported`**
+  > Workspace saved to {file}: {n} settings.
+  @@ NEEDS RULING
+- **`lpn_workspace_ignored`**
+  > Entries ignored because they were not recognized: {u}.
+  @@ NEEDS RULING
+- **`lpn_workspace_imported`**
+  > Workspace applied from {file}. Settings applied: {n}. Returned to their defaults: {r}.
+  @@ NEEDS RULING
+- **`lpn_workspace_refused_format`**
+  > This is not a workspace file saved by this page, so nothing was changed.
+  @@ NEEDS RULING
+- **`lpn_workspace_refused_newer`**
+  > This workspace file was saved by a newer version of this page (format {version}), so nothing was changed.
+  @@ NEEDS RULING
+- **`lpn_workspace_refused_storage`**
+  > Browser storage is full or unavailable, so the workspace was not applied.
+  @@ NEEDS RULING
+- **`lpn_workspace_refused_unreadable`**
+  > This file could not be read as a workspace, so nothing was changed.
+  @@ NEEDS RULING
+
+---
+
+# Strings waiting on a branch
+
+**147 still to read**, of 150 new keys across 12 unmerged branch(es).
+
+A feature waits on its branch until you have used it and said so, so this is where new
+wording lives before it reaches master. **These strings are real and are not on master**,
+which is why the list above can honestly say none while there is reading to do here.
+
+Each branch carries the commit it was read at. This part is a SNAPSHOT and is not held
+fresh by the build — a branch moves whenever anybody commits on it, and failing master's
+build for that would be a gate nobody keeps. Refresh it with
+`php dev/scripts/new_english_keys.php --write`.
+
+### feat/bentley-interop (`43043b60`) — 101 new, 101 to read @@ NEEDS RULING
+
+- **`lpn_alt_cat_calculation`**
+  > Calculation
+  @@ NEEDS RULING
+- **`lpn_alt_cat_presentation`**
+  > Presentation
+  @@ NEEDS RULING
+- **`lpn_alt_cat_topology_tip`**
+  > Asset activation
+  @@ NEEDS RULING
+- **`lpn_change_type_create_new`**
+  > Create new assets
+  @@ NEEDS RULING
+- **`lpn_change_type_customers_left`**
+  > A customer cannot be assigned per scenario, so the demand of these customers stays with the old junction and is not in this scenario's solve:
+  @@ NEEDS RULING
+- **`lpn_change_type_line_alternative`**
+  > {id}: {property} {value}, in alternative {alternative}
+  @@ NEEDS RULING
+- **`lpn_change_type_not_carried`**
+  > The new assets cannot hold these values. The old assets keep them:
+  @@ NEEDS RULING
+- **`lpn_change_type_old_controls`**
+  > These controls and rules refer to an old asset, which is inactive in this scenario, so they are left out of this scenario's run and its .inp export:
+  @@ NEEDS RULING
+- **`lpn_change_type_scenario_ask`**
+  > Current scenario is not Base. Create new assets? The selected assets become inactive in this scenario.
+  @@ NEEDS RULING
+- **`lpn_change_type_switch_base`**
+  > Switch to Base
+  @@ NEEDS RULING
+- **`lpn_control_inactive_note`**
+  > These controls refer to an asset that is inactive in this scenario, so they are ignored in its run: {ids}
+  @@ NEEDS RULING
+- **`lpn_customer_node_inactive`**
+  > This customer is assigned to a junction that is inactive in this scenario, so its demand is not part of the solve.
   @@ NEEDS RULING
 - **`lpn_inp_export_flat_customers_inactive`**
   > {n} of these customers are assigned to a junction that is inactive in this scenario, so their demand is not in the file.
   @@ NEEDS RULING
 - **`lpn_inp_export_flat_inactive_controls`**
   > These controls and rules refer to an asset that is inactive in this scenario, so they are not in the file: {ids}
-  @@ NEEDS RULING
-- **`lpn_pane_copy_heads`**
-  > Copy with headings
   @@ NEEDS RULING
 - **`lpn_pane_inactive_show`**
   > Include inactive topology
@@ -329,12 +407,6 @@ never edits a synonym.
   @@ NEEDS RULING
 - **`lpn_settings_held_base`**
   > {base}: {value}
-  @@ NEEDS RULING
-- **`lpn_settings_hover_card`**
-  > Show the full label on hover
-  @@ NEEDS RULING
-- **`lpn_settings_hover_card_tip`**
-  > Rest the pointer on a node, link or customer to see its label as specified in Settings at any scale, fit or not. This is a setting for this browser, not for the project.
   @@ NEEDS RULING
 - **`lpn_settings_restore_base_only`**
   > Switch to Base to restore the defaults.
@@ -501,9 +573,6 @@ never edits a synonym.
 - **`lpn_sm_add_child`**
   > Add a child of the selected item
   @@ NEEDS RULING
-- **`lpn_sm_base_kept`**
-  > The Base of a tree is not deleted. Another Base added with Add Base is deleted when nothing uses it.
-  @@ NEEDS RULING
 - **`lpn_sm_basic_off`**
   > Basic mode is off, so the Scenario manager and the Scenarios table are shown.
   @@ NEEDS RULING
@@ -573,47 +642,6 @@ never edits a synonym.
 - **`lpn_sm_used_by_tip`**
   > Used by: {list}
   @@ NEEDS RULING
-- **`lpn_workspace_confirm`**
-  > Replace this browser's workspace layout with the one in the file?
-  _Ruled 2026-10-08: Calls page 8 October: his own text, "Replace this browser's workspace layout with the one in the file?"_
-- **`lpn_workspace_exported`**
-  > Workspace saved to {file}: {n} settings.
-  @@ NEEDS RULING
-- **`lpn_workspace_ignored`**
-  > Entries ignored because they were not recognized: {u}.
-  @@ NEEDS RULING
-- **`lpn_workspace_imported`**
-  > Workspace applied from {file}. Settings applied: {n}. Returned to their defaults: {r}.
-  @@ NEEDS RULING
-- **`lpn_workspace_refused_format`**
-  > This is not a workspace file saved by this page, so nothing was changed.
-  @@ NEEDS RULING
-- **`lpn_workspace_refused_newer`**
-  > This workspace file was saved by a newer version of this page (format {version}), so nothing was changed.
-  @@ NEEDS RULING
-- **`lpn_workspace_refused_storage`**
-  > Browser storage is full or unavailable, so the workspace was not applied.
-  @@ NEEDS RULING
-- **`lpn_workspace_refused_unreadable`**
-  > This file could not be read as a workspace, so nothing was changed.
-  @@ NEEDS RULING
-
----
-
-# Strings waiting on a branch
-
-**46 still to read**, of 49 new keys across 11 unmerged branch(es).
-
-A feature waits on its branch until you have used it and said so, so this is where new
-wording lives before it reaches master. **These strings are real and are not on master**,
-which is why the list above can honestly say none while there is reading to do here.
-
-Each branch carries the commit it was read at. This part is a SNAPSHOT and is not held
-fresh by the build — a branch moves whenever anybody commits on it, and failing master's
-build for that would be a gate nobody keeps. Refresh it with
-`php dev/scripts/new_english_keys.php --write`.
-
-### feat/bentley-interop (`e2fad9e7`) — adds no English strings
 
 ### feat/desktop (`baba0f04`) — adds no English strings
 
@@ -784,3 +812,5 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 
 ### feat/visit-dedupe (`7b4a84bd`) — adds no English strings
+
+### fix/ewb-meeting (`4953af70`) — adds no English strings

@@ -470,12 +470,13 @@ console.log('\n--- each table lists exactly its own type ---');
 		report(pipeCells[k] && pipeCells[k]._tag === 'input', `...and its ${k} cell IS editable`,
 			pipeCells[k] && pipeCells[k]._tag);
 	});
-	// The endpoints are identity, which is the drawing's to own: read-only for the same reason a
-	// result is, and for a different reason.
-	report(pipeCells.from && pipeCells.from._tag === 'td' && pipeCells.to && pipeCells.to._tag === 'td',
-		'a pipe’s From and To are read-only — re-drawing the pipe is how they change');
-	report(pipeCells.from.textContent === j1.id && pipeCells.to.textContent === j2.id,
-		'...and they name the right nodes', pipeCells.from.textContent + ' → ' + pipeCells.to.textContent);
+	// The endpoints are EDITABLE since 2026-10-09 (Tom: "I got caught by the inability to edit the
+	// from and to nodes for a link. Can these be editable? I see them in table."); the rules and the
+	// reconnection itself are held by ewb-meeting-harness.js.
+	report(pipeCells.from && pipeCells.from._tag === 'input' && pipeCells.to && pipeCells.to._tag === 'input',
+		'a pipe’s From and To are editable (2026-10-09)');
+	report(pipeCells.from.value === j1.id && pipeCells.to.value === j2.id,
+		'...and they name the right nodes', pipeCells.from.value + ' → ' + pipeCells.to.value);
 	// **THE PUMP TABLE MATCHES THE PUMP PROPERTIES, and this assertion used to say the opposite.**
 	// It read "a pump has no editable scalar at all: what it is, is its curve" and required every
 	// cell but Active, Description and Tag to be read-only. Tom struck that on 2026-09-18: *"Make

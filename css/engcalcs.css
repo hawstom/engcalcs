@@ -4042,6 +4042,31 @@ label > .lpn-valwarn { margin-inline-start: .3em; }
 	color: var(--ec-ink-muted);
 	cursor: pointer;
 }
+/* THE HIDE x ON A STANDING MESSAGE (Tom, 2026-10-08: "I can't find how to hide a message. There was a
+   little x before."). It was 18x15 px in the muted ink of the amber box's own fine print, so it read as
+   punctuation. It now has the weight of the page's other close x (.lpn-popover-x: --ec-ink, a square
+   target, a grey fill on hover and focus), scaled to sit in a line of 11 px text without growing the box. */
+.lpn-status-x {
+	pointer-events: auto;
+	background: transparent;
+	border: 0;
+	border-radius: 3px;
+	padding: 0;
+	margin-inline-start: 4px;
+	margin-block: -1px;
+	width: 20px;
+	height: 20px;
+	vertical-align: middle;
+	font: inherit;
+	font-size: 20px;
+	line-height: 1;
+	color: var(--ec-ink);
+	cursor: pointer;
+	position: relative;
+}
+/* A finger needs about 32 px: widen the hit area without moving the text or the neighbouring button. */
+@media (pointer: coarse) { .lpn-status-x::after { content: ""; position: absolute; top: -9px; bottom: -9px; left: -8px; right: -8px; } }
+.lpn-status-x:hover, .lpn-status-x:focus { background: var(--ec-gray-eee); color: var(--ec-ink-black); }
 .lpn-wrong-btn:hover, .lpn-wrong-btn:focus { border-color: var(--ec-gray-bbb); color: var(--ec-ink-strong); }
 /* Once tapped it is no longer a control, and it must not keep looking like one: the label is the
    thank-you, so a hover border on it would invite a second press that posts nothing. */
@@ -4131,6 +4156,16 @@ label > .lpn-valwarn { margin-inline-start: .3em; }
    already use for a warning -- the log says the same thing the map said; a marker WORD would be a
    word to translate and one more thing to get wrong in five right-to-left languages. */
 .lpn-msglog-panel-warn { background: var(--ec-warn-bg); border-color: var(--ec-warn-border); }
+/* A message the user hid from the map: the top row, its mark in the age column, and its Show button
+   at the end of the row. The amber of the box it left, so it reads as that message, put away. */
+.lpn-msglog-panel-hidden { background: var(--ec-warn-bg); border-color: var(--ec-warn-border); align-items: center; }
+.lpn-msglog-hidden-mark { font-style: italic; }
+.lpn-msglog-unhide {
+	flex: none; font: inherit; font-size: 11px; cursor: pointer;
+	background: var(--ec-bg); color: var(--ec-ink-strong);
+	border: 1px solid var(--ec-gray-bbb); border-radius: 3px; padding: 0 6px;
+}
+@media (pointer: coarse) { .lpn-msglog-unhide { min-height: 32px; padding: 0 12px; } }
 /* The empty state, deliberately NOT .lpn-msglog-panel-row -- it is not itself a kept message. */
 .lpn-msglog-panel-empty {
 	background: var(--ec-map-overlay-bg);

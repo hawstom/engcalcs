@@ -209,6 +209,12 @@ the block.
   Stages, answers and code: `dev/scenario-alternatives.md` on `feat/bentley-interop`. Basic mode
   hides it until the Advanced UX is designed. Task 765 (Presentation) is folded in here. Stage 6 (the
   Scenario manager and the Scenarios table, Tom's calls of 2026-10-09) is built on the branch.
+- 100|779| **Shape: a simple drawn element, point, polyline or polygon, with snapping.**
+  Tom, 2026-10-06: *"a very simple shape element type (if one point, it's a point, and if more,
+  it's a polyline, and it can close into a polygon if you let it. Either way, we call it a
+  'Shape', and we can export or import to and from points, polylines, and polygons.) and the
+  ability to snap or magnet to shape points."* Seams: DXF (Task 772), GeoJSON, survey points.
+  Tom, 2026-10-09: a one-point Shape is drawn as an ×, and the task is Next (calls page H12).
 - 100|781| **Active topology first; then Change type becomes a new asset in the old one's place.**
   Tom, 2026-10-08, choosing "Active topology first": *"I never wanted what we have anyway. Now that
   I understand, I want it changed. Change type is to be make a new object at the location of the old
@@ -216,6 +222,10 @@ the block.
   scenarios that include it (a new tank, pipe or subdivision). Change type then adds the new asset
   in this scenario, switches the old one off and carries the values across; the type-per-scenario
   override built on `feat/bentley-interop` goes. Seam: Task 721.
+  **On hold for planning** (Tom, 2026-10-09, H15: *"I am worried that this Change asset type is proving
+  to be too difficult... Let's keep planning"*). His H13 idea: ask *"Keep same ID, overrides, and library
+  references (as much as possible) or create new ID with no overrides and libraries?"*; H14: *"Rejected.
+  Reconnected."*; and *"A customer cannot be assigned per scenario"* sounds to him like a design flaw.
 - 100|737| **Coined names for interface elements, so every language names each one once.**
   Tom, 2026-09-28: *"The key here is for every language to invent unique words for each interface
   element and to use them consistently... it might be handy to literally make up unique, but memorable
@@ -392,11 +402,6 @@ the block.
 - 75|777| **Station and elevation marks on the mi and wi section sketches.**
   Tom, 2026-10-06: *"it would be very nice to add either an automatic stations and elevations grid
   or the stations and elevations about 4 to 8 points."* Branch `feat/section-grid`.
-- 75|779| **Shape: a simple drawn element, point, polyline or polygon, with snapping.**
-  Tom, 2026-10-06: *"a very simple shape element type (if one point, it's a point, and if more,
-  it's a polyline, and it can close into a polygon if you let it. Either way, we call it a
-  'Shape', and we can export or import to and from points, polylines, and polygons.) and the
-  ability to snap or magnet to shape points."* Seams: DXF (Task 772), GeoJSON, survey points.
 - 50|146.09| **An inset overview map: the whole project, with a box round where you are.**
   Reworked by Tom 2026-08-25, and it is a different feature from the one this ID used to hold:
   *"146.09 reworked as a key/overview map inset like many games where the entire project is depicted

@@ -1091,6 +1091,9 @@ $ec_lang['lpn_hotkeys_map_term']='Map keyboard shortcuts';
 // js/looped-network.js; Select also answers to Esc and Delete to the Delete key
 // (LPN_TOOL_ALT_KEYS); Ctrl+Z is undo(); +/- and = are keyZoom() (ROADMAP Task 682).
 $ec_lang['lpn_hotkeys_map_def']='<table class="lpn-notes-table"><tbody><tr><td>1 or Esc</td><td>Select.</td></tr><tr><td>2</td><td>Add a junction.</td></tr><tr><td>3</td><td>Add a reservoir.</td></tr><tr><td>4</td><td>Add a tank.</td></tr><tr><td>5</td><td>Add a pipe.</td></tr><tr><td>6</td><td>Add a pump.</td></tr><tr><td>7</td><td>Add a valve.</td></tr><tr><td>8</td><td>Add a customer.</td></tr><tr><td>9</td><td>Add text.</td></tr><tr><td>Delete</td><td>Delete the selection.</td></tr><tr><td>Ctrl+Z</td><td>Undo the last change.</td></tr><tr><td>+ or =</td><td>Zoom in.</td></tr><tr><td>-</td><td>Zoom out.</td></tr></tbody></table>';
+// The W row of the Map table. Its own key, spliced into the table by Looped-Network.php, because a new row in
+// lpn_hotkeys_map_def is new markup that 'lang markup matches English' refuses until all 26 languages carry it.
+$ec_lang['lpn_hotkeys_zoomwin_def']='Zoom Window: drag a rectangle to zoom to.';
 // The menu chords (Task 748): Alt+Shift+letter on Windows and Linux, Ctrl+Option on a Mac, and F10.
 // Exactly two rows (Tom, 2026-10-03: "show only the Alt+Shift and the F10"); the letters themselves
 // are assigned per language by menuMnemonics() and shown on the menus, never listed here.
@@ -1108,6 +1111,12 @@ $ec_lang['lpn_hotkeys_snip_def']='<table class="lpn-notes-table"><tbody><tr><td>
 // the solver's diagnostic box when one is on screen. The first click opens a box; Send is the second.
 // The thank-you must never imply an answer: a reply comes only to somebody who left an address.
 $ec_lang['lpn_wrong_btn']='Something wrong here?';
+// The standing message's own Hide control. A hidden message leaves the map and waits as the top row of the
+// message history (the down-arrow glyph), marked by lpn_msglog_hidden, with lpn_msglog_unhide to bring it back.
+$ec_lang['lpn_status_dismiss']='Hide this message';
+$ec_lang['lpn_msglog_hidden']='Hidden';
+$ec_lang['lpn_msglog_unhide']='Show';
+$ec_lang['lpn_status_hidden_tip']='Show the hidden message on the map again.';
 // Rewritten for the two-click box (Task 768); TGH's 2026-09-07 wording described one press.
 $ec_lang['lpn_wrong_tip']='Report an error on this page. This opens a box to select the problem, add a comment, and enter an email address if a reply is wanted. All fields are optional, and nothing is sent until you press Send.';
 $ec_lang['lpn_wrong_thanks']='Thank you. Your report was received.';
@@ -1378,7 +1387,7 @@ $ec_lang['lpn_area_none']='Nothing found in that area.';
 $ec_lang['lpn_tool_vertices_tip']='Add and remove pipe vertices. Specify a point on a pipe to add a vertex, select a vertex to remove it, and drag a vertex to move it. A vertex changes automatic length, but doesn’t add or change minor (local) losses.';
 $ec_lang['lpn_tool_undo_tip']='Undo history length = 20 actions';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_tool_zoom_extent_tip']='Fit the whole network to the map window. Press again for Zoom Window. See also upper right map zoom controls.';
+$ec_lang['lpn_tool_zoom_extent_tip']='Fit the whole network to the map window. For Zoom Window with no fit first, press W or click the small triangle in the corner of the Zoom to fit toolbar button. See also upper right map zoom controls.';
 $ec_lang['lpn_tool_zoom_window_tip']='Specify corners or drag a rectangle. Press again for Zoom to fit.';
 // Tom's wording, 2026-09-25.
 $ec_lang['lpn_zoom_in_tip']='Zoom in. Shortcut: +';
@@ -1543,7 +1552,7 @@ $ec_lang['lpn_pane_unselect_on_map']='Unselect on map';
 $ec_lang['lpn_pane_print']='Print table';
 // Tom, 2026-10-06. Copy with headings puts the heading line, unit included, above the selected cells; plain
 // Copy never does. The two Export rows download the whole table as shown.
-$ec_lang['lpn_pane_copy_heads']='Copy with headings';
+$ec_lang['lpn_pane_copy_heads']='Copy with column headings';
 // Tom, 2026-10-07. File, Export to, ODS/XLSX/CSV file: a box asking which tables and which scenarios.
 // {format} is ODS, XLSX or CSV, the file format's own name, never translated.
 $ec_lang['lpn_export_table_title']='Export to {format}';
@@ -2103,17 +2112,14 @@ $ec_lang['lpn_file_import_inp_tip']='Create a new project from an EPANET file, e
 // keeps no handle on an `.inp` and never writes back to one.
 // File > Export is a submenu (Tom, 2026-10-06), so its rows drop the verb the heading carries. The
 // two keys above are what the rows were called before it.
-$ec_lang['lpn_file_export_menu']='Export to…';
+$ec_lang['lpn_file_export_menu']='Export…';
 $ec_lang['lpn_file_export_item_inp']='EPANET file…';
 $ec_lang['lpn_file_export_item_geojson']='GeoJSON file…';
-// Tom, 2026-10-07: "File, Export to, and we are adding ODS/XLSX/CSV. And we include Libraries". A heading in
-// the File, Export to submenu over the three table rows, which are named for the file like the rows above.
-$ec_lang['lpn_file_export_tables_heading']='Tables and libraries';
 $ec_lang['lpn_file_export_item_ods']='ODS file…';
 $ec_lang['lpn_file_export_item_xlsx']='XLSX file…';
 $ec_lang['lpn_file_export_item_csv']='CSV file…';
-$ec_lang['lpn_file_export_tables_tip']='Download the tables as the Tables pane shows them, one sheet each, with a sheet for each library their IDs refer to: patterns, curves, pipe types, and fittings.';
-$ec_lang['lpn_file_export_csv_tip']='Download a table as the Tables pane shows it. Several tables come as one zip file of CSV files, with a file for each library their IDs refer to.';
+$ec_lang['lpn_file_export_tables_tip']='Download the tables as the Tables pane shows them, in one workbook with a sheet for each table (and for each scenario you choose), plus a sheet for each library their IDs refer to: patterns, curves, pipe types, and fittings. Results are included for the scenario last calculated only.';
+$ec_lang['lpn_file_export_csv_tip']='Download a table as the Tables pane shows it. One table comes as a single CSV file with no libraries. Several tables or scenarios come as one zip file of CSV files, with a file for each library their IDs refer to. Results are included for the scenario last calculated only.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_file_export_inp_tip']='Download this network as an EPANET .inp file (in a zip file with its image if applicable). Anything the .inp format cannot hold is listed for you afterwards.';
 $ec_lang['lpn_status_inp_exported']='Exported {file}.';
@@ -2128,7 +2134,7 @@ $ec_lang['lpn_inp_export_difference_one']='One thing the .inp format cannot hold
 $ec_lang['lpn_inp_export_refused']='This project cannot be written as an EPANET file: {detail}';
 // Task 772: File > Export DXF file. The model's data for AutoCAD and other CAD programs.
 $ec_lang['lpn_file_export_item_dxf']='DXF file…';
-$ec_lang['lpn_file_export_dxf_tip']='Download this network for AutoCAD and other CAD programs: pipes, pumps, and valves as polylines, and every asset as a block whose attributes carry its ID and property values in the project units.';
+$ec_lang['lpn_file_export_dxf_tip']='Download this network for AutoCAD and other CAD programs: nodes as symbol blocks, pipes, pumps, and valves as polylines, and every asset as a block whose attributes carry its ID and property values in the project units.';
 $ec_lang['lpn_dxf_export_no_utm']='The DXF file was not written: this network lies outside the latitudes UTM covers (80° S to 84° N), and a drawing needs a flat grid to be drawn on.';
 $ec_lang['lpn_dxf_export_refused']='The DXF file was not written: the coordinate conversion it needs did not load. Check the connection and try again.';
 $ec_lang['lpn_dxf_export_failed']='The DXF file was not written: an error in this page stopped it ({error}).';
@@ -2153,9 +2159,9 @@ $ec_lang['lpn_dxf_note_categories']='{n} junctions have more than one demand cat
 $ec_lang['lpn_file_export_geojson_tip']='Download this network as a GeoJSON file for QGIS, ArcGIS Pro and other GIS programs. Junctions, tanks and reservoirs are points, and pipes, pumps and valves are lines that follow their vertices. Positions are latitude and longitude. Results are included only when the network has been solved.';
 // Workspace export and import (Tom, 2026-10-07). {file}, {n}, {r}, {u} and {version} are filled in by the page.
 $ec_lang['lpn_file_export_item_workspace']='Workspace…';
-$ec_lang['lpn_file_export_workspace_tip']='Download a small file holding where your boxes sit, their sizes, which are open or docked, and your pane and column sizes, plus the reading preferences of this page. Your projects, project settings and cookies (language, consent, units) are not in it. Load it on another screen or browser with File, Import, Workspace.';
+$ec_lang['lpn_file_export_workspace_tip']='Download a small file holding where your boxes sit, their sizes, which are open or docked, and your pane and column sizes, plus the display options of this page, such as which help bubbles and the hover card are shown. Your projects, project settings and cookies (language, consent, units) are not in it. Load it on another screen or browser with File, Import, Workspace.';
 $ec_lang['lpn_file_import_workspace']='Workspace…';
-$ec_lang['lpn_file_import_workspace_tip']='Apply a workspace file saved with File, Export, Workspace: box positions and sizes, docking, pane sizes and the reading preferences of this page. Your projects and cookies are not touched.';
+$ec_lang['lpn_file_import_workspace_tip']='Apply a workspace file saved with File, Export, Workspace: box positions and sizes, docking, pane sizes and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched.';
 $ec_lang['lpn_workspace_exported']='Workspace saved to {file}: {n} settings.';
 $ec_lang['lpn_workspace_imported']='Workspace applied from {file}. Settings applied: {n}. Returned to their defaults: {r}.';
 $ec_lang['lpn_workspace_ignored']='Entries ignored because they were not recognized: {u}.';
@@ -2386,7 +2392,7 @@ $ec_lang['lpn_msglog_empty']='No messages yet.';
 // The wrapper around lpn_ago_seconds and its siblings, so a language can put the word for "ago"
 // wherever its own grammar wants it.
 $ec_lang['lpn_msglog_ago']='{x} ago';
-$ec_lang['lpn_msglog_note']='Newest first. This page keeps the last {n} messages while it is open, and nothing is stored on your computer.';
+$ec_lang['lpn_msglog_note']='Newest first. This page keeps the last {n} messages while it is open and does not store them on your computer.';
 // Read-only means read-only: it never turns itself back into an editable file while you are looking
 // at it, and it never offers to save over the other person\'s file. It cannot -- their file has moved
 // on since you opened it, so writing yours over it would destroy their work. What you CAN do is
@@ -2529,7 +2535,11 @@ $ec_lang['lpn_id_invalid']='Enter an ID with no spaces and no quotation marks.';
 $ec_lang['lpn_id_taken']='That ID is already in use.';
 $ec_lang['lpn_diag_no_fixed_head']='Add a reservoir or a tank. The network needs at least one known water level before it can be solved.';
 $ec_lang['lpn_diag_dangling_link']='A pipe or pump connects to a node that no longer exists:';
-$ec_lang['lpn_diag_unreachable']='These nodes have no path to a reservoir:';
+$ec_lang['lpn_diag_unreachable']='These nodes have no path to a reservoir or tank:';
+// Tom, 2026-10-09: a node nothing connects to a source is left out of the run, not refused. The
+// ids stand in the status bar until the network changes. Said in EPANET's own terms (junction,
+// reservoir, tank) and never as an error, because the run happened.
+$ec_lang['lpn_omitted_note']='Left out of this run because no path leads from them to a reservoir or tank: {ids}';
 // BOTH OF THESE NAME THE VALVES. The page ends each one with a list of IDs, which is the reason
 // this calculator writes its own messages instead of showing EPANET\'s numbered errors: a person
 // looking at a drawing can act on \'V3\' and can do nothing at all with \'error 110\'.
@@ -2587,6 +2597,14 @@ $ec_lang['lpn_field_roughness_tip']='Hazen-Williams C. A higher number means a s
 $ec_lang['lpn_field_length']='Length';
 $ec_lang['lpn_field_from']='From';
 $ec_lang['lpn_field_to']='To';
+// Tom, 2026-10-09: From and To are editable text. Said in the box a refused ID is said in.
+$ec_lang['lpn_link_end_unknown']='No node has the ID {id}.';
+$ec_lang['lpn_link_end_same']='From and To must be different nodes.';
+// Tom, 2026-10-09: "Break link for node?", adapted to name the pipe. The two answers are Yes and No
+// because No is not a cancel: it places the node where it was pressed, joined to nothing.
+$ec_lang['lpn_break_pipe_ask']='Break pipe {id} at this node?';
+$ec_lang['lpn_break_yes']='Yes';
+$ec_lang['lpn_break_no']='No';
 // Plain-text wording of the concept mphl_total_junction_k/mphl_junction_loss already own (their
 // values carry k<sub>m</sub> markup, incompatible with this popup's textContent-only fields) --
 // Tom, 2026-07-30, "default to 2" matches mphl_total_junction_k_tip's own stated default exactly.
@@ -2995,7 +3013,7 @@ $ec_lang['lpn_hide_titles']='Hide these titles';
 $ec_lang['lpn_settings_area_hint']='Show the selection help';
 $ec_lang['lpn_settings_area_hint_tip']='Show the prompt over the map that gives the next step while you are selecting an area.';
 $ec_lang['lpn_settings_hover_card']='Show the full label on hover';
-$ec_lang['lpn_settings_hover_card_tip']='Rest the pointer on a node, link or customer to see its label as specified in Settings at any scale, fit or not. This is a setting for this browser, not for the project.';
+$ec_lang['lpn_settings_hover_card_tip']='Rest the pointer on a node, link or customer to see its label as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project.';
 $ec_lang['lpn_settings_id_prefixes']='ID prefixes';
 // NEVER "Starting values" (Tom, 2026-08-19: "The problem is that it's misleading"). These are what
 // a NEW asset is created with; "starting" reads as the initial condition of a run, which on a
