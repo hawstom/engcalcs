@@ -47057,8 +47057,8 @@ var EngCalcs = EngCalcs || {};
 				}())) {
 				var breakType = mode.slice('add-'.length), breakPc = EngCalcs.pageConfig || {};
 				askDialog({ kind: 'confirm',
-					text: (breakPc.lpn_break_pipe_ask || 'Break pipe {id} at this node?').replace('{id}', breakLink.id),
-					ok: breakPc.lpn_break_yes || 'Yes', cancel: breakPc.lpn_break_no || 'No' }, function (yes) {
+					text: (breakPc.lpn_split_pipe_ask || 'Split pipe {id} at this node?').replace('{id}', breakLink.id),
+					ok: breakPc.lpn_split_yes || 'Yes', cancel: breakPc.lpn_split_no || 'No' }, function (yes) {
 					saveUndoSnapshot();
 					logLpnFirstAction('element');
 					if (yes) { breakPipeAtPoint(breakLink, breakType, w.x, w.y); }
@@ -62982,8 +62982,11 @@ var EngCalcs = EngCalcs || {};
 	// reload."). A reading preference the visitor asked for, the class of `lpn_hovercard`, so it is
 	// `localStorage` only and never in serializeProject(). What is stored is as little as can do the
 	// job: the open project's id and, per hidden message, a short hash of its words with its kind
-	// (`diag` or `cond:<name>`). Never the words. A hidden RUN message is not stored at all: the next
-	// run, which a reload is, forgets it anyway.
+	// (`diag`, `run` or `cond:<name>`). Never the words. **A hidden RUN message is stored too** (Tom,
+	// 2026-10-10: hid "Left out of this run..." on Net1, reloaded, "Doesn't stay hidden"; it was not
+	// stored on the reasoning that a reload is a new run). A reload is not news: the first run after a
+	// reload leaves a restored run entry alone (statusRestoredRun), and the NEXT run forgets it as
+	// ever, so the same sentence after an edit is seen again.
 	//
 	// **THREE MESSAGES STAY HIDDEN UNTIL THEIR CONDITION CHANGES** (Tom, 2026-10-09, H11): storage full,
 	// storage unreadable and unit unknown. They are neither a diagnostic nor a run summary, since an
@@ -63004,7 +63007,7 @@ var EngCalcs = EngCalcs || {};
 			var o = JSON.parse(localStorage.getItem(LPN_MSGHIDDEN_KEY) || 'null');
 			if (o && typeof o.o === 'string' && o.h && typeof o.h === 'object') {
 				Object.keys(o.h).forEach(function (k) {
-					if (/^(diag|cond:[a-z-]+)$/.test(String(o.h[k]))) { out[k] = o.h[k]; statusHiddenOwner = o.o; }
+					if (/^(diag|run|cond:[a-z-]+)$/.test(String(o.h[k]))) { out[k] = o.h[k]; statusHiddenOwner = o.o; }
 				});
 			}
 		} catch (e) { out = {}; }
@@ -63014,11 +63017,15 @@ var EngCalcs = EngCalcs || {};
 	// A restored hidden set is not judged by the empty statements a page load makes on its way to its
 	// first real message; the grace ends at the first non-empty one.
 	var statusHiddenGrace = Object.keys(statusHidden).length > 0;
+	// Restored `run` entries survive the first solve after the reload (and any progress messages it
+	// says on the way); the second solve forgets them like any run message.
+	var statusRestoredRun = Object.keys(statusHidden).some(function (k) { return statusHidden[k] === 'run'; });
+	var statusSolvesSinceLoad = 0;
 	var statusLast = { text: '', code: '', diag: false, cond: '' };
 	function saveStatusHidden() {
 		var keep = {}, n = 0;
 		Object.keys(statusHidden).forEach(function (k) {
-			if (statusHidden[k] !== 'run' && n < 40) { keep[k] = statusHidden[k]; n++; }
+			if (n < 40) { keep[k] = statusHidden[k]; n++; }
 		});
 		try {
 			if (n) { localStorage.setItem(LPN_MSGHIDDEN_KEY, JSON.stringify({ o: statusHiddenOwner, h: keep })); }
@@ -63048,7 +63055,14 @@ var EngCalcs = EngCalcs || {};
 	}
 	// A new run forgets the hidden RUN messages (door 2 above); hidden diagnostics stay hidden.
 	function forgetHiddenRunMessages() {
-		Object.keys(statusHidden).forEach(function (k) { if (statusHidden[k] === 'run') { delete statusHidden[k]; } });
+		statusSolvesSinceLoad++;
+		if (statusRestoredRun) {
+			if (statusSolvesSinceLoad < 2) { return; }
+			statusRestoredRun = false;
+		}
+		var any = false;
+		Object.keys(statusHidden).forEach(function (k) { if (statusHidden[k] === 'run') { delete statusHidden[k]; any = true; } });
+		if (any) { saveStatusHidden(); }
 	}
 	// The text the user has hidden and that is still the standing message, or '' -- what the history
 	// panel pins at its top.
@@ -63089,7 +63103,7 @@ var EngCalcs = EngCalcs || {};
 		if (!statusHiddenGrace || statusLast.text) {
 			var cur = statusLast.text ? statusKey(statusLast.text) : '', pruned = false;
 			Object.keys(statusHidden).forEach(function (k) {
-				if (k !== cur && statusHidden[k].indexOf('cond:') !== 0) { delete statusHidden[k]; pruned = true; }
+				if (k !== cur && statusHidden[k].indexOf('cond:') !== 0 && !(statusRestoredRun && statusHidden[k] === 'run')) { delete statusHidden[k]; pruned = true; }
 			});
 			if (pruned) { saveStatusHidden(); }
 			statusHiddenGrace = false;

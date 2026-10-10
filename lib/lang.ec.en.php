@@ -2584,9 +2584,9 @@ $ec_lang['lpn_link_end_unknown']='No node has the ID {id}.';
 $ec_lang['lpn_link_end_same']='From and To must be different nodes.';
 // Tom, 2026-10-09: "Break link for node?", adapted to name the pipe. The two answers are Yes and No
 // because No is not a cancel: it places the node where it was pressed, joined to nothing.
-$ec_lang['lpn_break_pipe_ask']='Break pipe {id} at this node?';
-$ec_lang['lpn_break_yes']='Yes';
-$ec_lang['lpn_break_no']='No';
+$ec_lang['lpn_split_pipe_ask']='Split pipe {id} at this node?';
+$ec_lang['lpn_split_yes']='Yes';
+$ec_lang['lpn_split_no']='No';
 // Plain-text wording of the concept mphl_total_junction_k/mphl_junction_loss already own (their
 // values carry k<sub>m</sub> markup, incompatible with this popup's textContent-only fields) --
 // Tom, 2026-07-30, "default to 2" matches mphl_total_junction_k_tip's own stated default exactly.

@@ -91,7 +91,7 @@ async function main() {
 	ok('fixed and broken again, it shows again', text() === said && boxShown());
 	ok('...and the browser forgot it meanwhile', stored() === null, String(stored()));
 
-	console.log('\n=== H09. a different network clears it; a hidden run message is not stored ===');
+	console.log('\n=== H09. a different network clears it; a hidden run message is stored too (Tom, 2026-10-10) ===');
 	clickX();
 	L.library.openId = 'P2';
 	L.clearStatusHidden();
@@ -99,7 +99,7 @@ async function main() {
 	L.setStatus('Run finished in 3 s.');
 	clickX();
 	ok('a hidden run summary is hidden now', text() === '');
-	ok('...but not stored (the next run forgets it anyway)', stored() === null, String(stored()));
+	ok('...and stored, as a hash with the kind run', /"run"/.test(String(stored())) && String(stored()).indexOf('Run finished') < 0, String(stored()));
 
 	console.log('\n=== H10. the x hides the engine-difference note too ===');
 	manningLine(L);
