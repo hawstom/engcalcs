@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "it",
-        "expected_key_count": 2492,
-        "delta_key_count": 50,
+        "expected_key_count": 2494,
+        "delta_key_count": 52,
         "exempt_key_count": 45,
         "exempt_keys": [
             "calc_units_us",
@@ -767,13 +767,15 @@
         "lpn_omitted_note": "Left out of this run because no path leads from them to a reservoir or tank: {ids}",
         "lpn_link_end_unknown": "No node has the ID {id}.",
         "lpn_link_end_same": "From and To must be different nodes.",
-        "lpn_break_pipe_ask": "Break pipe {id} at this node?",
-        "lpn_break_yes": "Yes",
-        "lpn_break_no": "No",
+        "lpn_split_pipe_ask": "Split pipe {id} at this node?",
+        "lpn_split_yes": "Yes",
+        "lpn_split_no": "No",
         "lpn_settings_hover_card": "Show the full label on hover",
         "lpn_settings_hover_card_tip": "Rest the pointer on a node, link or customer to see its label as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project.",
         "lpn_time_stat_minimum": "Min",
-        "lpn_time_stat_maximum": "Max"
+        "lpn_time_stat_maximum": "Max",
+        "lpn_junction_pattern_unknown": "No pattern in this project is named {id}, so the junction was left as it was.",
+        "lpn_settings_default_pattern_implied": "None stated (pattern {id} is used)"
     },
     "keys": {
         "lpn_hotkeys_zoomwin_def": "Zoom Window: drag a rectangle to zoom to.",
@@ -819,13 +821,15 @@
         "lpn_omitted_note": "Left out of this run because no path leads from them to a reservoir or tank: {ids}",
         "lpn_link_end_unknown": "No node has the ID {id}.",
         "lpn_link_end_same": "From and To must be different nodes.",
-        "lpn_break_pipe_ask": "Break pipe {id} at this node?",
-        "lpn_break_yes": "Yes",
-        "lpn_break_no": "No",
+        "lpn_split_pipe_ask": "Split pipe {id} at this node?",
+        "lpn_split_yes": "Yes",
+        "lpn_split_no": "No",
         "lpn_settings_hover_card": "Show the full label on hover",
         "lpn_settings_hover_card_tip": "Rest the pointer on a node, link or customer to see its label as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project.",
         "lpn_time_stat_minimum": "Min",
-        "lpn_time_stat_maximum": "Max"
+        "lpn_time_stat_maximum": "Max",
+        "lpn_junction_pattern_unknown": "No pattern in this project is named {id}, so the junction was left as it was.",
+        "lpn_settings_default_pattern_implied": "None stated (pattern {id} is used)"
     },
     "key_context": {
         "lpn_hotkeys_zoomwin_def": {
@@ -1516,7 +1520,7 @@
                 }
             }
         },
-        "lpn_break_pipe_ask": {
+        "lpn_split_pipe_ask": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
@@ -1532,7 +1536,7 @@
                 }
             }
         },
-        "lpn_break_yes": {
+        "lpn_split_yes": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
@@ -1548,7 +1552,7 @@
                 }
             }
         },
-        "lpn_break_no": {
+        "lpn_split_no": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
@@ -1625,6 +1629,38 @@
                     "key": "lpn_time_stat_range",
                     "value": "Intervallo",
                     "english": "Range"
+                }
+            }
+        },
+        "lpn_junction_pattern_unknown": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_default_pattern_tip",
+                    "value": "Ogni nodo senza un modello usa questo.",
+                    "english": "Every junction with no pattern uses this one."
+                },
+                "next_translated": {
+                    "key": "lpn_library_control_add",
+                    "value": "Aggiungi un controllo",
+                    "english": "Add a control"
+                }
+            }
+        },
+        "lpn_settings_default_pattern_implied": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_default_pattern_tip",
+                    "value": "Ogni nodo senza un modello usa questo.",
+                    "english": "Every junction with no pattern uses this one."
+                },
+                "next_translated": {
+                    "key": "lpn_library_control_add",
+                    "value": "Aggiungi un controllo",
+                    "english": "Add a control"
                 }
             }
         }

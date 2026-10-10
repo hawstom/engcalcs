@@ -4104,6 +4104,8 @@ $ec_lang['lpn_library_pattern_none']='No pattern';
 $ec_lang['lpn_choice_default']='Default';
 $ec_lang['lpn_settings_default_pattern']='Default demand pattern';
 $ec_lang['lpn_settings_default_pattern_tip']='Every junction with no pattern uses this one.';
+$ec_lang['lpn_junction_pattern_unknown']='No pattern in this project is named {id}, so the junction was left as it was.';
+$ec_lang['lpn_settings_default_pattern_implied']='None stated (pattern {id} is used)';
 $ec_lang['lpn_library_control_add']='Add a control';
 // THE KEYWORDS IN THE EXAMPLES ARE NOT TRANSLATED and must be left exactly as they are: LINK,
 // OPEN, CLOSED, IF, NODE, ABOVE, BELOW, AT, TIME and CLOCKTIME are what the reader types into the

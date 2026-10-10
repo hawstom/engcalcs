@@ -252,7 +252,7 @@ console.log('\n--- nothing on the sheet is a control ---');
 	const head = s.headings.map((h) => h.replace(SHY_RE, '')), order = L.tableOrder('junctions');
 	const rowFor = (id) => s.rows[order.indexOf(id)];
 	const at = (id, h) => rowFor(id)[head.findIndex((x) => x.indexOf(h) === 0)].text;
-	report(at(j2.id, 'Demand') === '50', 'a typed demand prints as its number', at(j2.id, 'Demand'));
+	report(at(j2.id, 'Demand (') === '50', 'a typed demand prints as its number', at(j2.id, 'Demand ('));
 	report(at(j2.id, 'Elevation') === '10', '...and a typed elevation as its number', at(j2.id, 'Elevation'));
 	report(rowFor(j2.id)[0].text === j2.id, '...and the ID prints as the ID, not as a link',
 		rowFor(j2.id)[0].text);
