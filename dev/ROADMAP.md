@@ -221,10 +221,10 @@ the block.
   scenarios that include it (a new tank, pipe or subdivision). Change type then adds the new asset
   in this scenario, switches the old one off and carries the values across; the type-per-scenario
   override built on `feat/bentley-interop` goes. Seam: Task 721.
-  **On hold for planning** (Tom, 2026-10-09, H15: *"I am worried that this Change asset type is proving
-  to be too difficult... Let's keep planning"*). His H13 idea: ask *"Keep same ID, overrides, and library
-  references (as much as possible) or create new ID with no overrides and libraries?"*; H14: *"Rejected.
-  Reconnected."*; and *"A customer cannot be assigned per scenario"* sounds to him like a design flaw.
+  **Decided 2026-10-10: Change type works in Base only, in place, keeping the ID**; the per-scenario
+  version is removed on `feat/bentley-interop` (Mary: Bentley's Morph, epanet-js and DC Water change a
+  node's type as a plain edit, none per scenario). Tom, 2026-10-10: *"Is Change really Copy? That's not
+  what I asked for... Does anybody else do it? And if not, let's drop it."* Closes when the branch merges.
 - 100|737| **Coined names for interface elements, so every language names each one once.**
   Tom, 2026-09-28: *"The key here is for every language to invent unique words for each interface
   element and to use them consistently... it might be handy to literally make up unique, but memorable
