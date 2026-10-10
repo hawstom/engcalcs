@@ -50,7 +50,7 @@ const INJECT =
 	"\t\texportInp: function () { return EngCalcs.lpnExportInp(inpExportDocument(), inpExportOptions()); },\n" +
 	"\t\tsmTrees: smTrees, smAdd: smAdd, smRename: smRename, smDelete: smDelete, smMove: smMove,\n" +
 	"\t\tsmChildren: smChildren, smRows: smRows, smName: smName, smBaseKey: smBaseKey, smRecords: smRecords,\n" +
-	"\t\tsmAssign: smAssign, smCopyScenario: smCopyScenario, smChoice: smChoice, smCellText: smCellText,\n" +
+	"\t\tsmAssign: smAssign, smCopyScenario: smCopyScenario, smCopyStored: smCopyStored, smChoice: smChoice, smCellText: smCellText,\n" +
 	"\t\tsmCellChoices: smCellChoices, smCellValue: smCellValue, smUsedBy: smUsedBy, smUsedByText: smUsedByText,\n" +
 	"\t\tsmCompareSet: smCompareSet, smCompareChecked: smCompareChecked, compareScenarios: compareScenarios,\n" +
 	"\t\tscenarioCompareModels: scenarioCompareModels, scenariosForDisplay: scenariosForDisplay,\n" +
@@ -203,6 +203,13 @@ async function run(mutate, quiet) {
 		L.switchScenario(BASE);
 		return Math.abs(out[0] - out[1]) < 1e-9 && Math.abs(out[0] - out[2]) < 1e-9;
 	})());
+	{
+		const orig = L.smRecords('demand').filter((r) => r.id === Q.alternatives.demand)[0];
+		const ac = L.smCopyStored('demand', orig.id), recs = L.smRecords('demand');
+		ok('6.0 an alternative copy: Copy_of_<name>, same values and parent, a new record right after it', ac.name === 'Copy_of_' + orig.name && ac.id !== orig.id &&
+			JSON.stringify(ac.values) === JSON.stringify(orig.values) && ac.parent === orig.parent && ac.category === orig.category &&
+			recs.indexOf(ac) === recs.indexOf(orig) + 1 && L.smUsedBy('demand', ac.id).length === 0, JSON.stringify(ac));
+	}
 	// edit the alternative through the original; the shared copy follows, the own copy does not
 	L.switchScenario(Q.id);
 	L.setProp(L.nodeById('22'), 'demand', 1200);

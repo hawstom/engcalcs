@@ -5936,6 +5936,19 @@ var EngCalcs = EngCalcs || {};
 		touchTree('smCopyScenario');
 		return s;
 	}
+	// **COPY AN ALTERNATIVE (or a calculation set)**: its own values, as a sibling beside it under the
+	// same parent, named like a scenario copy. Nothing uses the copy until a scenario chooses it.
+	function smCopyStored(tree, key) {
+		var kind = smKind(tree), src = smRecord(tree, key), c, list;
+		if (!src || kind === 'scn') { return treeRefuse('missing'); }
+		list = storedList(kind);
+		c = altCopy(src);
+		c.id = treeNewId(list, kind === 'calc' ? 'c' : 'a');
+		c.name = smUniqueName(tree, 'Copy_of_' + String(src.name || ''));
+		smPutAt(list, c, src, true);
+		touchTree('smCopyStored');
+		return c;
+	}
 	// **WHEN AN OVERRIDE IS WRITTEN INTO A SHARED ALTERNATIVE, THE NOTE SAYS WHO ELSE USES IT** (the
 	// market researcher's call, 2026-10-09; Tom, 2026-10-05: *editing a shared alternative changes
 	// every scenario that uses it*). Names the other scenarios using what the open scenario writes
@@ -71598,13 +71611,14 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		host.appendChild(tools);
 		tools = document.createElement('div');
 		tools.className = 'lpn-sm-tools';
-		smButton(tools, '+', pc.lpn_sm_add_child || 'Add a child of the selected item', function () { smActAdd(smState.sel === null ? smBaseKey(smState.tree) : smState.sel); }).id = 'lpn_sm_add';
+		smButton(tools, pc.lpn_sm_add_child || 'Add child', null, function () { smActAdd(smState.sel === null ? smBaseKey(smState.tree) : smState.sel); }).id = 'lpn_sm_add';
+		smButton(tools, pc.lpn_sm_add_base || 'Add base', pc.lpn_sm_add_base_tip, function () { smActAdd(null); }).id = 'lpn_sm_addbase';
 		smButton(tools, '−', pc.lpn_sm_delete || 'Delete the selected item. A used item is not deleted.', function () { smActDelete(smState.sel); }).id = 'lpn_sm_del';
-		smButton(tools, pc.lpn_sm_add_base || 'Add Base', pc.lpn_sm_add_base_tip, function () { smActAdd(null); }).id = 'lpn_sm_addbase';
 		if (smState.tree === 'scenarios') {
 			smButton(tools, pc.lpn_sm_make_current || 'Make current', null, function () { smActCurrent(smState.sel); }).id = 'lpn_sm_current';
-			smButton(tools, pc.lpn_sm_copy || 'Copy scenario…', null, function () { smActCopy(smState.sel); }).id = 'lpn_sm_copy';
 		}
+		// Copy follows the four: a scenario asks make-copies or share; an alternative is copied beside itself.
+		smButton(tools, smState.tree === 'scenarios' ? (pc.lpn_sm_copy || 'Copy scenario…') : (pc.lpn_sm_copy_alt || 'Copy'), null, function () { smActCopy(smState.sel); }).id = 'lpn_sm_copy';
 		host.appendChild(tools);
 		head = document.createElement('h3');
 		head.className = 'lpn-sm-head';
@@ -71811,7 +71825,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var tree = smState.tree, pc = EngCalcs.pageConfig || {}, name, res, wasCurrent = key === project.activeScenario, from = activeScenario();
 		if (key === null || key === undefined) { return; }
 		if (smIsBaseKey(tree, key)) {
-			setNotice((pc.lpn_sm_base_kept || 'The Base of a tree is not deleted. Another Base added with Add Base is deleted when nothing uses it.'));
+			setNotice((pc.lpn_sm_base_kept || 'The Base of a tree is not deleted. Another Base added with Add base is deleted when nothing uses it.'));
 			return;
 		}
 		name = smName(tree, key);
@@ -71848,7 +71862,15 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		dropScenarioCompareRun();
 	}
 	function smActCopy(key) {
-		var pc = EngCalcs.pageConfig || {}, src = key ? scenarioById(key) : null;
+		var pc = EngCalcs.pageConfig || {}, src = key ? scenarioById(key) : null, res;
+		if (smState.tree !== 'scenarios') {
+			if (key === null || key === undefined || smIsBaseKey(smState.tree, key)) { return; }
+			res = smTry(function () { return smCopyStored(smState.tree, key); });
+			if (!res || res.refused) { return; }
+			smState.sel = res.id;
+			smAfter(true, false);
+			return;
+		}
 		if (!src) { return; }
 		askDialog({
 			kind: 'choice',
@@ -71904,12 +71926,14 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		menu.setAttribute('role', 'menu');
 		menu.style.left = x + 'px';
 		menu.style.top = y + 'px';
-		mk(pc.lpn_sm_add_child || 'Add a child of the selected item', function () { smActAdd(key); });
-		mk(pc.lpn_sm_add_base || 'Add Base', function () { smActAdd(null); });
+		mk(pc.lpn_sm_add_child || 'Add child', function () { smActAdd(key); });
+		mk(pc.lpn_sm_add_base || 'Add base', function () { smActAdd(null); });
 		if (!isBase) { mk(pc.lpn_sm_rename || 'Rename', function () { smStartRename(key); }); }
 		if (tree === 'scenarios') {
 			mk(pc.lpn_sm_make_current || 'Make current', function () { smActCurrent(key); });
 			mk(pc.lpn_sm_copy || 'Copy scenario…', function () { smActCopy(key); });
+		} else if (!isBase) {
+			mk(pc.lpn_sm_copy_alt || 'Copy', function () { smActCopy(key); });
 		}
 		if (!isBase) { mk(pc.lpn_tool_delete || 'Delete', function () { smActDelete(key); }); }
 		document.body.appendChild(menu);

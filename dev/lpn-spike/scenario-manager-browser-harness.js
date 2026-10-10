@@ -130,6 +130,11 @@ async function main() {
 
 		console.log('\n--- 2. add, rename, delete ---');
 		await clickRow(await L('lpn_scenario_base'));
+		const toolbar = () => page.evaluate(() => Array.from(document.querySelectorAll('#lpn_sm_body .lpn-sm-tools button')).map((b) => b.textContent));
+		ok('1.9 the toolbar is Add child, Add base, minus, Make current, then Copy scenario', JSON.stringify(await toolbar()) === JSON.stringify([await L('lpn_sm_add_child'), await L('lpn_sm_add_base'), '\u2212', await L('lpn_sm_make_current'), await L('lpn_sm_copy')]) && (await L('lpn_sm_add_base')) === 'Add base' && (await L('lpn_sm_add_child')) === 'Add child', JSON.stringify(await toolbar()));
+		ok('1.10 the minus carries its tip', (await page.evaluate(() => document.getElementById('lpn_sm_del').title)) === await L('lpn_sm_delete'));
+		const helpTip = await page.evaluate(() => { const t = document.querySelector('#lpn_smbox_title .ec-help'); return t ? (t.title || t.getAttribute('data-bs-original-title')) : null; });
+		ok('1.11 the box title has a ? tip with the explanation', helpTip === 'Create and organize scenarios and alternatives and their inheritance here. Choose Alternatives for Scenarios in the Scenarios table.' && !!(await page.$('#lpn_smbox_title .ec-tip')), String(helpTip));
 		await click('#lpn_sm_add');
 		ok('2.1 "+" adds Child_1_of_Base and opens its name for editing', JSON.stringify(await names()) === JSON.stringify(['Base', '-EDIT:Child_1_of_Base']), JSON.stringify(await names()));
 		await page.keyboard.type('Peak');
@@ -244,6 +249,14 @@ async function main() {
 		await settle(500);
 		ok('4.3 an alternative was added under Base', JSON.stringify(await names()) === JSON.stringify(['Base', '-Dry year']), JSON.stringify(await names()));
 		ok('4.4 ...used by no scenario yet', (await rows())[1].meta === await L('lpn_sm_used_by_none'), (await rows())[1].meta);
+		ok('4.5 an alternatives tree toolbar is the three, then Copy (no Make current)', JSON.stringify(await toolbar()) === JSON.stringify([await L('lpn_sm_add_child'), await L('lpn_sm_add_base'), '\u2212', await L('lpn_sm_copy_alt')]), JSON.stringify(await toolbar()));
+		await clickRow('Dry year');
+		await click('#lpn_sm_copy');
+		await settle(400);
+		ok('4.6 Copy makes Copy_of_Dry year beside it under the same parent', JSON.stringify(await names()) === JSON.stringify(['Base', '-Dry year', '-Copy_of_Dry year']), JSON.stringify(await names()));
+		await click('#lpn_sm_del');
+		await settle(400);
+		ok('4.8 the copy deletes (nothing uses it), leaving Dry year', JSON.stringify(await names()) === JSON.stringify(['Base', '-Dry year']), JSON.stringify(await names()));
 
 		console.log('\n--- 5. the Scenarios table ---');
 		await a.toolbarClick(await L('lpn_pane_toggle'));

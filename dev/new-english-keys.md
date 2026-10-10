@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**40 still to read on master**, of 48 untranslated keys, of 2492 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**144 still to read on master**, of 152 untranslated keys, of 2590 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -175,8 +175,17 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   @@ NEEDS RULING
 
-## lpn_  (48, 40 to read @@ NEEDS RULING)
+## lpn_  (152, 144 to read @@ NEEDS RULING)
 
+- **`lpn_alt_cat_calculation`**
+  > Calculation
+  @@ NEEDS RULING
+- **`lpn_alt_cat_presentation`**
+  > Presentation
+  @@ NEEDS RULING
+- **`lpn_alt_cat_topology_tip`**
+  > Asset activation
+  @@ NEEDS RULING
 - **`lpn_break_no`**
   > No
   @@ NEEDS RULING
@@ -185,6 +194,33 @@ never edits a synonym.
   @@ NEEDS RULING
 - **`lpn_break_yes`**
   > Yes
+  @@ NEEDS RULING
+- **`lpn_change_type_create_new`**
+  > Create new assets
+  @@ NEEDS RULING
+- **`lpn_change_type_customers_left`**
+  > A customer cannot be assigned per scenario, so the demand of these customers stays with the old junction and is not in this scenario's solve:
+  @@ NEEDS RULING
+- **`lpn_change_type_line_alternative`**
+  > {id}: {property} {value}, in alternative {alternative}
+  @@ NEEDS RULING
+- **`lpn_change_type_not_carried`**
+  > The new assets cannot hold these values. The old assets keep them:
+  @@ NEEDS RULING
+- **`lpn_change_type_old_controls`**
+  > These controls and rules refer to an old asset, which is inactive in this scenario, so they are left out of this scenario's run and its .inp export:
+  @@ NEEDS RULING
+- **`lpn_change_type_scenario_ask`**
+  > Current scenario is not Base. Create new assets? The selected assets become inactive in this scenario.
+  @@ NEEDS RULING
+- **`lpn_change_type_switch_base`**
+  > Switch to Base
+  @@ NEEDS RULING
+- **`lpn_control_inactive_note`**
+  > These controls refer to an asset that is inactive in this scenario, so they are ignored in its run: {ids}
+  @@ NEEDS RULING
+- **`lpn_customer_node_inactive`**
+  > This customer is assigned to a junction that is inactive in this scenario, so its demand is not part of the solve.
   @@ NEEDS RULING
 - **`lpn_dxf_export_failed`**
   > The DXF file was not written: an error in this page stopped it ({error}).
@@ -267,6 +303,12 @@ never edits a synonym.
 - **`lpn_hotkeys_zoomwin_def`**
   > Zoom Window: drag a rectangle to zoom to.
   @@ NEEDS RULING
+- **`lpn_inp_export_flat_customers_inactive`**
+  > {n} of these customers are assigned to a junction that is inactive in this scenario, so their demand is not in the file.
+  @@ NEEDS RULING
+- **`lpn_inp_export_flat_inactive_controls`**
+  > These controls and rules refer to an asset that is inactive in this scenario, so they are not in the file: {ids}
+  @@ NEEDS RULING
 - **`lpn_link_end_same`**
   > From and To must be different nodes.
   @@ NEEDS RULING
@@ -285,102 +327,6 @@ never edits a synonym.
 - **`lpn_pane_copy_heads`**
   > Copy with column headings
   _Ruled 2026-10-09: Use proposed (Tom, calls page round 3)._
-- **`lpn_settings_hover_card`**
-  > Show the full label on hover
-  @@ NEEDS RULING
-- **`lpn_settings_hover_card_tip`**
-  > Rest the pointer on a node, link or customer to see its label as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project.
-  _Ruled 2026-10-09: Use proposed (Tom, calls page round 3)._
-- **`lpn_status_dismiss`**
-  > Hide this message
-  @@ NEEDS RULING
-- **`lpn_status_hidden_tip`**
-  > Show the hidden message on the map again.
-  @@ NEEDS RULING
-- **`lpn_workspace_confirm`**
-  > Replace this browser's workspace layout with the one in the file?
-  _Ruled 2026-10-08: Calls page 8 October: his own text, "Replace this browser's workspace layout with the one in the file?"_
-- **`lpn_workspace_exported`**
-  > Workspace saved to {file}: {n} settings.
-  @@ NEEDS RULING
-- **`lpn_workspace_ignored`**
-  > Entries ignored because they were not recognized: {u}.
-  @@ NEEDS RULING
-- **`lpn_workspace_imported`**
-  > Workspace applied from {file}. Settings applied: {n}. Returned to their defaults: {r}.
-  @@ NEEDS RULING
-- **`lpn_workspace_refused_format`**
-  > This is not a workspace file saved by this page, so nothing was changed.
-  @@ NEEDS RULING
-- **`lpn_workspace_refused_newer`**
-  > This workspace file was saved by a newer version of this page (format {version}), so nothing was changed.
-  @@ NEEDS RULING
-- **`lpn_workspace_refused_storage`**
-  > Browser storage is full or unavailable, so the workspace was not applied.
-  @@ NEEDS RULING
-- **`lpn_workspace_refused_unreadable`**
-  > This file could not be read as a workspace, so nothing was changed.
-  @@ NEEDS RULING
-
----
-
-# Strings waiting on a branch
-
-**147 still to read**, of 150 new keys across 12 unmerged branch(es).
-
-A feature waits on its branch until you have used it and said so, so this is where new
-wording lives before it reaches master. **These strings are real and are not on master**,
-which is why the list above can honestly say none while there is reading to do here.
-
-Each branch carries the commit it was read at. This part is a SNAPSHOT and is not held
-fresh by the build — a branch moves whenever anybody commits on it, and failing master's
-build for that would be a gate nobody keeps. Refresh it with
-`php dev/scripts/new_english_keys.php --write`.
-
-### feat/bentley-interop (`43043b60`) — 101 new, 101 to read @@ NEEDS RULING
-
-- **`lpn_alt_cat_calculation`**
-  > Calculation
-  @@ NEEDS RULING
-- **`lpn_alt_cat_presentation`**
-  > Presentation
-  @@ NEEDS RULING
-- **`lpn_alt_cat_topology_tip`**
-  > Asset activation
-  @@ NEEDS RULING
-- **`lpn_change_type_create_new`**
-  > Create new assets
-  @@ NEEDS RULING
-- **`lpn_change_type_customers_left`**
-  > A customer cannot be assigned per scenario, so the demand of these customers stays with the old junction and is not in this scenario's solve:
-  @@ NEEDS RULING
-- **`lpn_change_type_line_alternative`**
-  > {id}: {property} {value}, in alternative {alternative}
-  @@ NEEDS RULING
-- **`lpn_change_type_not_carried`**
-  > The new assets cannot hold these values. The old assets keep them:
-  @@ NEEDS RULING
-- **`lpn_change_type_old_controls`**
-  > These controls and rules refer to an old asset, which is inactive in this scenario, so they are left out of this scenario's run and its .inp export:
-  @@ NEEDS RULING
-- **`lpn_change_type_scenario_ask`**
-  > Current scenario is not Base. Create new assets? The selected assets become inactive in this scenario.
-  @@ NEEDS RULING
-- **`lpn_change_type_switch_base`**
-  > Switch to Base
-  @@ NEEDS RULING
-- **`lpn_control_inactive_note`**
-  > These controls refer to an asset that is inactive in this scenario, so they are ignored in its run: {ids}
-  @@ NEEDS RULING
-- **`lpn_customer_node_inactive`**
-  > This customer is assigned to a junction that is inactive in this scenario, so its demand is not part of the solve.
-  @@ NEEDS RULING
-- **`lpn_inp_export_flat_customers_inactive`**
-  > {n} of these customers are assigned to a junction that is inactive in this scenario, so their demand is not in the file.
-  @@ NEEDS RULING
-- **`lpn_inp_export_flat_inactive_controls`**
-  > These controls and rules refer to an asset that is inactive in this scenario, so they are not in the file: {ids}
-  @@ NEEDS RULING
 - **`lpn_pane_inactive_show`**
   > Include inactive topology
   @@ NEEDS RULING
@@ -408,6 +354,12 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_settings_held_base`**
   > {base}: {value}
   @@ NEEDS RULING
+- **`lpn_settings_hover_card`**
+  > Show the full label on hover
+  @@ NEEDS RULING
+- **`lpn_settings_hover_card_tip`**
+  > Rest the pointer on a node, link or customer to see its label as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project.
+  _Ruled 2026-10-09: Use proposed (Tom, calls page round 3)._
 - **`lpn_settings_restore_base_only`**
   > Switch to Base to restore the defaults.
   @@ NEEDS RULING
@@ -565,13 +517,16 @@ build for that would be a gate nobody keeps. Refresh it with
   > Top left corner
   @@ NEEDS RULING
 - **`lpn_sm_add_base`**
-  > Add Base
+  > Add base
   @@ NEEDS RULING
 - **`lpn_sm_add_base_tip`**
   > Add another Base to this tree. A Base has no parent.
   @@ NEEDS RULING
 - **`lpn_sm_add_child`**
-  > Add a child of the selected item
+  > Add child
+  @@ NEEDS RULING
+- **`lpn_sm_base_kept`**
+  > The Base of a tree is not deleted. Another Base added with Add base is deleted when nothing uses it.
   @@ NEEDS RULING
 - **`lpn_sm_basic_off`**
   > Basic mode is off, so the Scenario manager and the Scenarios table are shown.
@@ -584,6 +539,9 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 - **`lpn_sm_copy`**
   > Copy scenario…
+  @@ NEEDS RULING
+- **`lpn_sm_copy_alt`**
+  > Copy
   @@ NEEDS RULING
 - **`lpn_sm_copy_ask`**
   > Copy the scenario {name}. Make its own copies of the alternatives it uses, or share them? A shared alternative changes in every scenario that uses it.
@@ -599,6 +557,9 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 - **`lpn_sm_delete`**
   > Delete the selected item. A used item is not deleted.
+  @@ NEEDS RULING
+- **`lpn_sm_help`**
+  > Create and organize scenarios and alternatives and their inheritance here. Choose Alternatives for Scenarios in the Scenarios table.
   @@ NEEDS RULING
 - **`lpn_sm_hint`**
   > Drag an item onto another to make it a child of that item. Drag between two items to reorder them. Click a selected item or press F2 to rename it, Delete to delete it, Enter to make a scenario current. Right-click for more.
@@ -642,6 +603,55 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_sm_used_by_tip`**
   > Used by: {list}
   @@ NEEDS RULING
+- **`lpn_status_dismiss`**
+  > Hide this message
+  @@ NEEDS RULING
+- **`lpn_status_hidden_tip`**
+  > Show the hidden message on the map again.
+  @@ NEEDS RULING
+- **`lpn_workspace_confirm`**
+  > Replace this browser's workspace layout with the one in the file?
+  _Ruled 2026-10-08: Calls page 8 October: his own text, "Replace this browser's workspace layout with the one in the file?"_
+- **`lpn_workspace_exported`**
+  > Workspace saved to {file}: {n} settings.
+  @@ NEEDS RULING
+- **`lpn_workspace_ignored`**
+  > Entries ignored because they were not recognized: {u}.
+  @@ NEEDS RULING
+- **`lpn_workspace_imported`**
+  > Workspace applied from {file}. Settings applied: {n}. Returned to their defaults: {r}.
+  @@ NEEDS RULING
+- **`lpn_workspace_refused_format`**
+  > This is not a workspace file saved by this page, so nothing was changed.
+  @@ NEEDS RULING
+- **`lpn_workspace_refused_newer`**
+  > This workspace file was saved by a newer version of this page (format {version}), so nothing was changed.
+  @@ NEEDS RULING
+- **`lpn_workspace_refused_storage`**
+  > Browser storage is full or unavailable, so the workspace was not applied.
+  @@ NEEDS RULING
+- **`lpn_workspace_refused_unreadable`**
+  > This file could not be read as a workspace, so nothing was changed.
+  @@ NEEDS RULING
+
+---
+
+# Strings waiting on a branch
+
+**47 still to read**, of 50 new keys across 13 unmerged branch(es).
+
+A feature waits on its branch until you have used it and said so, so this is where new
+wording lives before it reaches master. **These strings are real and are not on master**,
+which is why the list above can honestly say none while there is reading to do here.
+
+Each branch carries the commit it was read at. This part is a SNAPSHOT and is not held
+fresh by the build — a branch moves whenever anybody commits on it, and failing master's
+build for that would be a gate nobody keeps. Refresh it with
+`php dev/scripts/new_english_keys.php --write`.
+
+### chore/roadmap-1010 (`1ea15e85`) — adds no English strings
+
+### feat/bentley-interop (`2f17711a`) — adds no English strings
 
 ### feat/desktop (`baba0f04`) — adds no English strings
 
@@ -673,7 +683,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Points data<br />(use Copy to see format)
   @@ NEEDS RULING
 
-### feat/user-guide (`8fb6434e`) — 45 new, 45 to read @@ NEEDS RULING
+### feat/user-guide (`f141e735`) — 45 new, 45 to read @@ NEEDS RULING
 
 - **`lpn_guide_about_heading`**
   > About this calculator
@@ -813,4 +823,8 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/visit-dedupe (`7b4a84bd`) — adds no English strings
 
-### fix/ewb-meeting (`4953af70`) — adds no English strings
+### fix/demand-pattern (`d75c9ec2`) — 1 new, 1 to read @@ NEEDS RULING
+
+- **`lpn_settings_default_pattern_implied`**
+  > None stated (pattern {id} is used)
+  @@ NEEDS RULING

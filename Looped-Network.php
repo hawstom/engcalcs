@@ -1471,7 +1471,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
       // window furniture (localStorage `lpn_smbox`), never in the project file. The tree itself is
       // built in JS (rebuildScenarioManager). ?>
 <div id="lpn_sm_box" class="d-print-none lpn-popover lpn-setbox lpn-ffbox" style="display:none;position:fixed;background:var(--ec-bg);border:1px solid var(--ec-ink);padding:40px 8px 8px;box-shadow:2px 2px 6px var(--ec-a-0-0-0-3)" role="dialog" aria-labelledby="lpn_smbox_title">
-	<div id="lpn_smbox_title" class="lpn-setbox-title"><?=$ec_lang['lpn_sm_title']?></div>
+	<div id="lpn_smbox_title" class="lpn-setbox-title"><?=ecTipLabel($ec_lang['lpn_sm_title'], $ec_lang['lpn_sm_help'])?></div>
 	<button type="button" id="lpn_sm_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
 	<div class="lpn-popover-body lpn-setbox-body">
 		<div id="lpn_sm_body" class="lpn-sm-body"></div>
@@ -3634,6 +3634,7 @@ EngCalcs.pageConfig = {
 	lpn_sm_rename: <?=json_encode($ec_lang['lpn_sm_rename'])?>,
 	lpn_sm_make_current: <?=json_encode($ec_lang['lpn_sm_make_current'])?>,
 	lpn_sm_copy: <?=json_encode($ec_lang['lpn_sm_copy'])?>,
+	lpn_sm_copy_alt: <?=json_encode($ec_lang['lpn_sm_copy_alt'])?>,
 	lpn_sm_copy_ask: <?=json_encode($ec_lang['lpn_sm_copy_ask'])?>,
 	lpn_sm_copy_own: <?=json_encode($ec_lang['lpn_sm_copy_own'])?>,
 	lpn_sm_copy_share: <?=json_encode($ec_lang['lpn_sm_copy_share'])?>,
