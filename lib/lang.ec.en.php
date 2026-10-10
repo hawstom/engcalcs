@@ -1617,13 +1617,8 @@ $ec_lang['lpn_change_type_no_curve']='{id}: No pump head curve, so the pump adds
 $ec_lang['lpn_change_type_becomes']='{id}: {property} {value}, in scenario {scenario}, becomes {new}';
 $ec_lang['lpn_change_type_customers']='Only a pipe serves customers, so these customers are connected instead to the node shown in parentheses, where their demand is already applied. They stay where they are drawn, and their demand is unchanged:';
 $ec_lang['lpn_change_type_setting']='These controls and rules give or test the setting of a link being changed. A setting is a different quantity on a pipe, a pump, and a valve, so these will read it differently:';
+$ec_lang['lpn_change_type_base_only']='Change type works in Base. A scenario can switch assets on and off in Active topology instead.';
 $ec_lang['lpn_change_type_rules']='These rule lines name a link by its kind, and will name its new kind instead:';
-$ec_lang['lpn_change_type_scenario_ask']='Current scenario is not Base. Create new assets? The selected assets become inactive in this scenario.';
-$ec_lang['lpn_change_type_create_new']='Create new assets';
-$ec_lang['lpn_change_type_not_carried']='The new assets cannot hold these values. The old assets keep them:';
-$ec_lang['lpn_change_type_old_controls']='These controls and rules refer to an old asset, which is inactive in this scenario, so they are left out of this scenario\'s run and its .inp export:';
-$ec_lang['lpn_change_type_customers_left']='A customer cannot be assigned per scenario, so the demand of these customers stays with the old junction and is not in this scenario\'s solve:';
-$ec_lang['lpn_change_type_switch_base']='Switch to Base';
 $ec_lang['lpn_tables_menu_tip']='View and edit assets in tables in bottom panel.';
 // The Run row's own tip, NOT lpn_time_run_tip: this row exists partly to answer "where is my Run
 // button?" for somebody whose project recalculates by itself, and that sentence is not true of the

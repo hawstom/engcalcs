@@ -35425,10 +35425,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	//
 	// **THE TYPE IS BASE-OWNED**, like a valve's type (renderValveFields()): it is not in
 	// LPN_OVERRIDABLE, so a change made in Base changes the asset in every scenario, and the
-	// scenario overrides of what the old type alone had go with it. **OUTSIDE BASE, CHANGE TYPE
-	// MAKES A NEW ASSET IN THE OLD ONE'S PLACE** (Tom, 2026-10-08: *"Change type is to be make a new
-	// object at the location of the old object. And that's physically analogous."*): see
-	// replaceTypeInScenario() below, and dev/scenario-alternatives.md, "Change type in a scenario".
+	// scenario overrides of what the old type alone had go with it. **OUTSIDE BASE, CHANGE TYPE IS
+	// REFUSED** (changeSelectedType()): other programs change a type only as a plain edit, and a
+	// scenario switches assets on and off in Active topology instead (Tom, 2026-10-10).
 	var LPN_NODE_TYPES = ['junction', 'reservoir', 'tank'];
 	/**
 	 * Every node property that belongs to SOME node types and not to others. A key named in no row
@@ -35995,10 +35994,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var isNode = LPN_NODE_TYPES.indexOf(to) >= 0, isLink = LPN_LINK_TYPES.indexOf(to) >= 0;
 		if (!isNode && !isLink) { return; }
 		if (!changeTypeTargets(to).length) { return; }
-		// Tom's question first, in any scenario but Base (askTypeChangeScope()); in Base it is not asked.
-		askTypeChangeScope(function (mode) {
-			if (mode === 'scenario') { replaceSelectedTypeInScenario(to); } else { changeSelectedTypeIn(to); }
-		});
+		// **CHANGE TYPE WORKS IN BASE ONLY**, in place, keeping the ID. Bentley Morph, epanet-js and
+		// DC Water's Change Node Class all change a type as a plain edit, never per scenario; a
+		// scenario switches assets on and off in Active topology instead (Tom, 2026-10-10).
+		if (!inBaseScenario()) { setNotice((EngCalcs.pageConfig || {}).lpn_change_type_base_only || 'Change type works in Base. A scenario can switch assets on and off in Active topology instead.'); return; }
+		changeSelectedTypeIn(to);
 	}
 	// Every selected asset of the right kind that is not already `to` in the scenario showing.
 	function changeTypeTargets(to) {
@@ -36122,257 +36122,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		return LPN_NODE_TYPES.map(function (t) { return row(t, nodes); })
 			.concat([{ separator: true }])
 			.concat(LPN_LINK_TYPES.map(function (t) { return row(t, links); }));
-	}
-	// ---- CHANGE TYPE IN A SCENARIO: A NEW ASSET IN THE OLD ONE'S PLACE (Task 781) ---------------
-	//
-	// Tom, 2026-10-08, choosing "Active topology first": *"I never wanted what we have anyway. Now
-	// that I understand, I want it changed. Change type is to be make a new object at the location of
-	// the old object. And that's physically analogous."* It replaced the type override (a scenario
-	// stating its own `type` for an asset), which is gone with everything that served it.
-	//
-	// **OUTSIDE BASE, EACH SELECTED ASSET IS REPLACED.** A NEW asset of the new type, its ID minted by
-	// the ID-prefix rules, at the old one's place, active only where this scenario's topology puts it
-	// (bornInScenario(), Bentley's rule for an element added in a child Active Topology alternative);
-	// the old asset is made inactive in this scenario and kept, untouched, for Base and every other
-	// scenario. Both are ordinary Active Topology values, so the scenario tree, the Alternatives
-	// table, undo, the file and both solvers need nothing new.
-	//
-	// **A NODE TAKES ITS LINKS WITH IT.** A link's ends are Base-owned, so a link left on the old node
-	// would leave the network with it (a link whose end is inactive is out of the solve). Each live
-	// link at the node is replaced the same way, its end moved to the new node, its type unchanged.
-	//
-	// **WHAT THE NEW ASSET CARRIES is what this scenario showed on the old one**: Base's record with
-	// this scenario's resolved overrides written in as the new asset's own values (it exists only
-	// where this scenario's topology puts it, so its own values are this scenario's, as a drawn
-	// one's are), then the ordinary Base change of type on that copy (applyNodeTypeChange(),
-	// applyLinkTypeChange()), so what the new type cannot hold is left behind on the old asset, what
-	// only the new type has comes from New assets, and a water surface stays where it was. A position
-	// this scenario moved stays this scenario's override, verbatim, so no coordinate is run through
-	// a projection it does not need.
-	function replaceSelectedTypeInScenario(to) {
-		var pc = EngCalcs.pageConfig || {}, isNode = LPN_NODE_TYPES.indexOf(to) >= 0,
-			targets = changeTypeTargets(to), notCarried = [], surface = [], born = [], old = [], custs = [], text, MAX = 20;
-		if (!targets.length || inBaseScenario()) { return; }
-		targets.forEach(function (el) {
-			var r = replaceTypeReport(el, to);
-			notCarried = notCarried.concat(r.notCarried); surface = surface.concat(r.surface);
-			born = born.concat(r.born); old = old.concat(r.old); custs = custs.concat(r.customers);
-		});
-		function capped(lines) {
-			if (lines.length <= MAX) { return lines; }
-			return lines.slice(0, MAX).concat([String(pc.lpn_change_type_more || 'And {n} more.')
-				.replace('{n}', String(lines.length - MAX))]);
-		}
-		function proceed() {
-			var made = [], swap = {};
-			saveUndoSnapshot();
-			targets.forEach(function (el) {
-				if ((isNode ? nodeById(el.id) : linkById(el.id)) !== el) { return; }
-				made.push(replaceTypeInScenario(el, to, swap));
-			});
-			touchTree('replaceSelectedTypeInScenario');
-			// The symbols are new, so the drawing is rebuilt; the new assets are the selection.
-			buildDom();
-			setSelectionList(made.filter(Boolean).map(function (m) { return { kind: isNode ? 'node' : 'link', id: m.id }; }));
-			// **PROPERTIES FOLLOWS THE NEW ASSET** (Perry, 2026-10-08): left on the old one, it showed
-			// an inactive asset beside a selection of its replacement, and a typed value edited the
-			// asset that is out of this scenario's network.
-			if (currentPopup && (currentPopup.kind === 'node' || currentPopup.kind === 'link') &&
-					swap[currentPopup.kind + ':' + currentPopup.id]) {
-				currentPopup.id = swap[currentPopup.kind + ':' + currentPopup.id];
-			}
-			refreshScenarioMarks();
-			refreshScenarioStatus();
-			refreshPaneIfOpen();
-			refreshPopupIfOpen();
-			refreshScenarioManagerIfOpen();
-			scheduleSolve();
-			scheduleSave();
-		}
-		if (!notCarried.length && !surface.length && !born.length && !old.length && !custs.length) { proceed(); return; }
-		text = [];
-		if (surface.length) {
-			text.push([pc.lpn_change_type_surface || 'These keep the water surface where it was. A reservoir\'s head is the tank\'s elevation plus its water depth, and a tank\'s water depth is the reservoir\'s head minus its elevation:']
-				.concat(capped(surface)).join('\n'));
-		}
-		if (notCarried.length) {
-			text.push([pc.lpn_change_type_not_carried || 'The new assets cannot hold these values. The old assets keep them:']
-				.concat(capped(notCarried)).join('\n'));
-		}
-		if (custs.length) {
-			text.push([pc.lpn_change_type_customers_left || 'A customer cannot be assigned per scenario, so the demand of these customers stays with the old junction and is not in this scenario\'s solve:']
-				.concat(capped(custs)).join('\n'));
-		}
-		if (born.length) {
-			text.push([pc.lpn_change_type_born || 'These values are new, set as on a newly drawn asset:'].concat(capped(born)).join('\n'));
-		}
-		if (old.length) {
-			text.push([pc.lpn_change_type_old_controls || 'These controls and rules refer to an old asset, which is inactive in this scenario, so they are left out of this scenario\'s run and its .inp export:']
-				.concat(capped(old)).join('\n'));
-		}
-		askDialog({ kind: 'confirm', title: pc.lpn_change_type_menu || 'Change type',
-			ok: pc.lpn_change_type_ok || 'Change', text: text.join('\n\n') }, function (yes) {
-			if (yes) { proceed(); }
-		});
-	}
-	// **WHAT REPLACING `el` WITH A NEW `to` WOULD SAY**, in the scenario showing and in its terms:
-	// the values the new type cannot hold (kept by the old asset, so not lost), the water surface
-	// carried, what a new link is born with, and the controls and rules that name the old asset or a
-	// link replaced with it.
-	function replaceTypeReport(el, to) {
-		var pc = EngCalcs.pageConfig || {}, isLink = elGroup(el) === 'link', LINE = pc.lpn_change_type_line || '{id}: {property} {value}',
-			out = { notCarried: [], surface: [], born: [], old: [], customers: [] }, carry = null, names = {}, from, dest;
-		if (isLink) {
-			from = linkTypeDesc(el); dest = linkTargetDesc(to, el);
-			typeOwnedLinkSpecs(el).forEach(function (spec) {
-				var v;
-				if (!linkChangeDrops(spec, from, dest) || (!spec.custom && !spec.has(from))) { return; }
-				v = spec.props.length ? effective(el, spec.props[0]) : el[spec.keys[0]];
-				if (changeTypeSays(spec, v)) { out.notCarried.push(changeTypeLine(LINE, el.id, spec.label, changeTypeValueText(spec, v))); }
-			});
-			out.born = linkTypeChangeReport(el, to).born;
-			names[el.id] = true;
-		} else {
-			carry = replaceSurfaceCarry(el, to);
-			typeOwnedNodeSpecs().forEach(function (spec) {
-				var v;
-				if (!changeTypeDrops(spec, el.type, to) || (!spec.custom && spec.types.indexOf(el.type) < 0)) { return; }
-				if (carry && spec.props.indexOf(carry.prop) >= 0) { return; }
-				v = spec.props.length ? effective(el, spec.props[0]) : el[spec.keys[0]];
-				// A demand is its whole list, as the Base report says it (typeOwnedNodeSpecs()).
-				if (spec.props.indexOf('demands') >= 0) {
-					v = effective(el, 'demands');
-					v = (v.length === 1 && !v[0].category && !changeTypeSays({ none: [0] }, v[0].base)) ? undefined
-						: v.map(function (r) { return r.base; });
-				}
-				if (changeTypeSays(spec, v)) { out.notCarried.push(changeTypeLine(LINE, el.id, spec.label, changeTypeValueText(spec, v))); }
-			});
-			if (carry) {
-				typeOwnedNodeSpecs().forEach(function (spec) {
-					if (!spec.custom && spec.props.indexOf(carry.newProp) >= 0) {
-						out.surface.push(changeTypeLine(LINE, el.id, spec.label, changeTypeValueText(spec, carry.value)));
-					}
-				});
-			}
-			names[el.id] = true;
-			replacedLinksAt(el).forEach(function (l) { names[l.id] = true; });
-			// **A CUSTOMER STAYS WITH THE OLD JUNCTION** (Perry, 2026-10-08). A customer carries nothing
-			// a scenario can change (Task 247), so it cannot follow the replacement into one scenario
-			// alone; moving it would move it in Base too. Its demand, assigned to this junction or
-			// landing on it from a pipe, leaves this scenario's solve with the junction, and each is
-			// listed with its demand. A pipe changed in type keeps its ends, so a customer on it still
-			// lands on a live node and needs no line.
-			if (el.type === 'junction') {
-				customerRowsOf(el.id).forEach(function (r) {
-					out.customers.push(changeTypeLine(LINE, el.id, (pc.lpn_tool_add_meter || 'Customer') + ' ' + r.customer.id,
-						changeTypeValueText({ unit: 'lpn_u_flow' }, r.base)));
-				});
-			}
-		}
-		libControlsRead().forEach(function (c) {
-			if (!c) { return; }
-			if ((isLink && names[c.link]) || (!isLink && (names[c.link] || (c.condition && c.condition.kind === 'node' && c.condition.node === el.id)))) {
-				out.old.push(libControlText(c));
-			}
-		});
-		(doc.rules || []).forEach(function (line) {
-			var t = String(line).replace(/;.*$/, '').trim().split(/\s+/), i;
-			for (i = 1; i < t.length; i++) {
-				if (names[t[i]] && /^(NODE|JUNCTION|RESERVOIR|TANK|LINK|PIPE|PUMP|VALVE)$/i.test(t[i - 1])) { out.old.push(String(line).trim()); return; }
-			}
-		});
-		return out;
-	}
-	// The water surface a tank or reservoir made from the other keeps, in the scenario's own terms
-	// (waterSurfaceCarry() is the same rule on Base's values, and does the carrying).
-	function replaceSurfaceCarry(n, to) {
-		var e = n.elev, h;
-		if (typeof e !== 'number') { return null; }
-		if (n.type === 'tank' && to === 'reservoir') { return { prop: 'level', newProp: 'head', value: e + (effective(n, 'level') || 0) }; }
-		if (n.type === 'reservoir' && to === 'tank') {
-			h = effective(n, 'head');
-			if (h === undefined || h === null || h === '') { return null; }
-			return h >= e ? { prop: 'head', newProp: 'level', value: h - e } : null;
-		}
-		return null;
-	}
-	// The links at node `n` that are live in the scenario showing: the ones replaced with it.
-	function replacedLinksAt(n) {
-		return (incidentLinks[n.id] || []).map(linkById).filter(function (l) { return l && linkLive(l); });
-	}
-	/**
-	 * **THE REPLACEMENT ITSELF**, for one asset, in the scenario showing. No snapshot and no redraw:
-	 * replaceSelectedTypeInScenario() takes one of each for the whole selection. Returns the new
-	 * asset.
-	 */
-	// `swap` collects 'node:old' / 'link:old' -> new id for every asset replaced.
-	function replaceTypeInScenario(el, to, swap) {
-		var isNode = elGroup(el) === 'node', links = isNode ? replacedLinksAt(el) : [], nu;
-		swap = swap || {};
-		nu = scenarioCopyOf(el, mintId(LPN_ID_KEY[to] || (isNode ? 'J' : 'L')), null);
-		if (isNode) { applyNodeTypeChange(nu, to); } else { applyLinkTypeChange(nu, to); }
-		scenarioCopyBorn(el, nu);
-		swap[(isNode ? 'node:' : 'link:') + el.id] = nu.id;
-		links.forEach(function (l) {
-			var lc = scenarioCopyOf(l, mintId(LPN_ID_KEY[l.type] || 'L'),
-				{ from: l.from === el.id ? nu.id : l.from, to: l.to === el.id ? nu.id : l.to });
-			scenarioCopyBorn(l, lc);
-			swap['link:' + l.id] = lc.id;
-		});
-		return nu;
-	}
-	// A copy of `el` under `id`, holding what the scenario showing shows on it as its own values
-	// (see the section note). `ends` moves a link's ends. Pushed into the document, not yet drawn.
-	function scenarioCopyOf(el, id, ends) {
-		var ov = resolvedOverrides(activeScenario())[ovKey(el)] || {}, c = altCopy(el), rows = null;
-		c.id = id;
-		delete c._active;
-		if (ends) { c.from = ends.from; c.to = ends.to; }
-		if (elGroup(el) === 'node' && (Object.prototype.hasOwnProperty.call(ov, 'demands') || Object.prototype.hasOwnProperty.call(ov, 'demand'))) {
-			rows = effective(el, 'demands');
-		}
-		(elGroup(el) === 'node' ? doc.nodes : doc.links).push(c);
-		paneInScenario(baseScenario(), function () {
-			Object.keys(ov).forEach(function (p) {
-				if (p === 'active' || LPN_COORD_PROP[p] || p === 'demand' || p === 'demands') { return; }
-				if (c.tok) { delete c.tok['_' + p]; }
-				setProp(c, p, altCopy(ov[p]));
-			});
-			if (rows) { setProp(c, 'demands', rows); }
-		});
-		if (c.tok && !Object.keys(c.tok).length) { delete c.tok; }
-		return c;
-	}
-	// The copy joins this scenario's topology, as a drawn asset does, and the old asset leaves it.
-	// A position the scenario moved stays its own override, verbatim.
-	function scenarioCopyBorn(el, c) {
-		var ov = resolvedOverrides(activeScenario())[ovKey(el)] || {}, live = isActive(el);
-		Object.keys(LPN_COORD_PROP).forEach(function (p) {
-			if (Object.prototype.hasOwnProperty.call(ov, p)) { setOverride(c, p, ov[p]); }
-		});
-		bornInScenario(c);
-		if (!live) { setOverride(c, 'active', false); }
-		setOverride(el, 'active', false);
-	}
-	/**
-	 * **THE QUESTION, IN TOM'S WORDS, BEFORE ANY OTHER**: in a scenario other than Base, Change
-	 * type asks first, with exactly three answers. Replace makes the new assets in this scenario
-	 * (replaceSelectedTypeInScenario()); Switch to Base switches, then makes the ordinary Base
-	 * change (its own box included); Cancel does nothing. `go(mode)` is handed 'scenario' or 'base'.
-	 */
-	function askTypeChangeScope(go) {
-		var pc = EngCalcs.pageConfig || {};
-		if (inBaseScenario()) { go('base'); return; }
-		askDialog({ kind: 'choice', title: pc.lpn_change_type_menu || 'Change type',
-			text: pc.lpn_change_type_scenario_ask || 'Current scenario is not Base. Create new assets? The selected assets become inactive in this scenario.',
-			choices: [
-				{ value: 'scenario', label: pc.lpn_change_type_create_new || 'Create new assets', isDefault: true },
-				{ value: 'base', label: pc.lpn_change_type_switch_base || 'Switch to Base' },
-				{ value: null, label: pc.lpn_cancel || 'Cancel', cancel: true }
-			] }, function (v) {
-			if (v === 'scenario') { go('scenario'); return; }
-			if (v === 'base') { switchScenario(baseScenario().id); go('base'); }
-		});
 	}
 	// ---- The examples gallery (ROADMAP Task 314) ---------------------------------------------
 	//

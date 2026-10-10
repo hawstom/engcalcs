@@ -1,17 +1,15 @@
-// ACTIVE TOPOLOGY AND CHANGE TYPE IN A SCENARIO, CLICKED IN A REAL CHROMIUM (Task 781). Run with:
+// ACTIVE TOPOLOGY AND CHANGE TYPE, CLICKED IN A REAL CHROMIUM (Task 781). Run with:
 //   node dev/lpn-spike/scenario-active-topology-browser-harness.js
 //
 // The hydraulics, the file, undo, inheritance and the export are held headless by
 // scenario-active-topology-harness.js; this holds the real rows and buttons, on Net1:
-//   1. In scenario B, Water > Change type > Tank on junction 22 asks the scope question with its
-//      three buttons in the page's own box; Cancel changes nothing.
-//   2. Create new assets, then Change on the box that lists the demand a tank cannot hold: a new
-//      tank is drawn and selected, 22 and its four pipes are drawn greyed.
+//   1. In scenario B, Water > Change type > Tank on junction 22 is refused in one sentence, no box.
+//   2. B switches 22 off in the Junctions table (Is active?): 22 and its four pipes are greyed.
 //   3. The Junctions and Pipes tables leave the inactive assets out; the cell menu's Include
 //      inactive topology brings them back, and the heading menu offers it too.
 //   4. With inactive topology included, row 22's Is active? box is cleared; selecting it makes 22
-//      active in B; Ctrl+Z undoes. (The tank stands on 22, so the map's click selects the tank.)
-//   5. Base: 22 is a junction and active, the tank greyed; Ctrl+Z undoes the replacement.
+//      active in B; Ctrl+Z undoes.
+//   5. Base: Change type makes 22 a tank in place, same ID; Ctrl+Z undoes.
 // Every button is pressed with a MouseEvent of detail 1, as a person's click is.
 //
 // DO NOT PREFIX THIS WITH `flock`: it takes /tmp/engcalcs-browser.lock itself.
@@ -133,58 +131,51 @@ async function main() {
 		};
 		const ACTIVE = await L('lpn_field_active');
 
-		console.log('--- 1. the question, in scenario B ---');
+		console.log('--- 1. Change type is refused in scenario B ---');
 		a.answerPromptWith('B');
 		await scenarioMenu(await L('lpn_scenario_new'));
 		await page.evaluate(() => { delete window.lpnDialogAnswerer; });
 		ok('1.1 a click selects junction 22', await clickNode('22') && await selectedNode() === '22');
 		await changeTo('lpn_tool_add_tank');
 		await settle(800);
-		const d = await a.dialog();
-		ok('1.2 the page\'s own box asks the scope question', d && d.text.trim() === await L('lpn_change_type_scenario_ask'), d && d.text);
-		ok('1.3 ...with three buttons: Create new assets, Switch to Base, Cancel',
-			d && JSON.stringify(d.buttons) === JSON.stringify([await L('lpn_change_type_create_new'), await L('lpn_change_type_switch_base'), await L('lpn_cancel')]),
-			d && JSON.stringify(d.buttons));
-		ok('1.4 Cancel is pressed', await press(await L('lpn_cancel')));
-		ok('1.5 the box is gone and 22 is still an active junction', !(await a.dialog()) && /lpn-node-junction/.test(await nodeClass('22') || '') &&
-			!/lpn-inactive/.test(await nodeClass('22') || ''));
+		ok('1.2 no box opens', !(await a.dialog()));
+		const said = await page.evaluate(() => (document.getElementById('lpn_map_notice') || {}).textContent || '');
+		ok('1.3 one sentence says Change type works in Base and points to Active topology', said.indexOf('Change type works in Base. A scenario can switch assets on and off in Active topology instead.') >= 0, said.slice(0, 200));
+		ok('1.4 22 is still an active junction', /lpn-node-junction/.test(await nodeClass('22') || '') && !/lpn-inactive/.test(await nodeClass('22') || ''));
 
-		console.log('\n--- 2. Create new assets ---');
-		await clickNode('22');
-		// Properties opened on 22 the way a person opens it: a double-click on the node.
-		const at = await page.evaluate(() => {
-			const c = document.querySelector('.lpn-node-hit[data-node="22"]'), b = c.getBoundingClientRect();
-			return { x: b.left + b.width / 2, y: b.top + b.height / 2 };
+		console.log('\n--- 2. what a scenario does instead: switch 22 off ---');
+		await a.toolbarClick(await L('lpn_pane_toggle'));
+		await settle(600);
+		await page.click('#lpn_pane_tab_junctions');
+		await settle(600);
+		await page.click('#lpn_pane_junctions tbody td:nth-child(2)', { button: 'right' });
+		await settle(300);
+		await menuPick(await L('lpn_pane_inactive_show'));
+		const boxOf0 = (id) => page.evaluate((id) => {
+			const td = Array.from(document.querySelectorAll('#lpn_pane_junctions td.lpn-pane-col-active')).filter((t) => String(t._lpnPaneId) === id)[0];
+			const i = td && td.querySelector('input[type=checkbox]');
+			return i ? i.checked : null;
+		}, id);
+		await page.evaluate(() => {
+			const td = Array.from(document.querySelectorAll('#lpn_pane_junctions td.lpn-pane-col-active')).filter((t) => String(t._lpnPaneId) === '22')[0];
+			td.querySelector('input[type=checkbox]').click();
 		});
-		await page.mouse.dblclick(at.x, at.y);
-		await settle(800);
-		const popText = () => page.evaluate(() => { const p = document.getElementById('lpn_popup'); return p && getComputedStyle(p).display !== 'none' ? p.textContent : ''; });
-		const before = await popText();
-		const BD = await L('lpn_field_base_demand');
-		ok('2.0 Properties is open on junction 22', !!BD && before.indexOf(BD) >= 0, before.replace(/\s+/g, ' ').trim().slice(0, 120));
-		await changeTo('lpn_tool_add_tank');
-		ok('2.1 Create new assets is pressed', await press(await L('lpn_change_type_create_new')));
-		const d2 = await a.dialog();
-		ok('2.2 the box lists what the tank cannot hold, kept by the old asset', d2 && d2.text.indexOf(await L('lpn_change_type_not_carried')) >= 0, d2 && d2.text);
-		ok('2.3 Change is pressed', await press(await L('lpn_change_type_ok')));
 		await settle(1200);
-		const T = await selectedNode();
-		ok('2.4 a new tank is selected, under a new ID', !!T && T !== '22' && /lpn-node-tank/.test(await nodeClass(T) || ''), T + ' ' + await nodeClass(T));
-		const popup = await popText(), MX = await L('lpn_field_tank_maxlevel');
-		ok('2.4b Properties, open on 22 before, now shows the new tank (Perry, 2026-10-08)', !!MX && popup.indexOf(MX) >= 0 &&
-			popup.indexOf(T) >= 0 && popup.indexOf(BD) < 0, popup.replace(/\s+/g, ' ').trim().slice(0, 160));
-		ok('2.5 22 is drawn greyed', /lpn-inactive/.test(await nodeClass('22') || ''), await nodeClass('22'));
-		ok('2.6 ...and so are its four pipes', (await Promise.all(['21', '22', '112', '122'].map(linkClass))).every((c) => /lpn-inactive/.test(c || '')));
+		ok('2.1 Is active? cleared on 22 in B: 22 is drawn greyed', await boxOf0('22') === false && /lpn-inactive/.test(await nodeClass('22') || ''), await nodeClass('22'));
+		ok('2.2 ...and so are its four pipes', (await Promise.all(['21', '22', '112', '122'].map(linkClass))).every((c) => /lpn-inactive/.test(c || '')));
+		await page.click('#lpn_pane_junctions thead th:nth-child(2)', { button: 'right' });
+		await settle(300);
+		await menuPick(await L('lpn_pane_inactive_show'));
+		await a.toolbarClick(await L('lpn_pane_toggle'));
+		await settle(400);
 
 		console.log('\n--- 3. the tables leave inactive assets out ---');
 		await a.toolbarClick(await L('lpn_pane_toggle'));
 		await settle(600);
 		let juncs = await tableIds('junctions');
 		ok('3.1 the Junctions table has no row for 22', juncs.length > 0 && juncs.indexOf('22') < 0, JSON.stringify(juncs));
-		const tanks = await tableIds('tanks');
-		ok('3.2 the Tanks table has the new tank', tanks.indexOf(T) >= 0, JSON.stringify(tanks));
 		const pipes = await tableIds('pipes');
-		ok('3.3 the Pipes table has none of 22\'s old pipes, and four new ones', ['21', '22', '112', '122'].every((p) => pipes.indexOf(p) < 0) && pipes.length === 12, JSON.stringify(pipes));
+		ok('3.3 the Pipes table has none of 22\'s four pipes', ['21', '22', '112', '122'].every((p) => pipes.indexOf(p) < 0) && pipes.length === 8, JSON.stringify(pipes));
 		await tableIds('junctions');
 		const m = await cellMenu('junctions');
 		ok('3.4 the cell menu offers Include inactive topology', m.indexOf(await L('lpn_pane_inactive_show')) >= 0, JSON.stringify(m));
@@ -223,15 +214,18 @@ async function main() {
 		await a.toolbarClick(await L('lpn_pane_toggle'));
 		await settle(400);
 
-		console.log('\n--- 5. Base, and undoing the replacement ---');
+		console.log('\n--- 5. Base: Change type is made in place ---');
 		await scenarioMenu(await L('lpn_scenario_base'));
-		ok('5.1 in Base 22 is an active junction and the tank is greyed', /lpn-node-junction/.test(await nodeClass('22') || '') &&
-			!/lpn-inactive/.test(await nodeClass('22') || '') && /lpn-inactive/.test(await nodeClass(T) || ''), await nodeClass(T));
-		await scenarioMenu('B');
+		ok('5.1 in Base 22 is an active junction', /lpn-node-junction/.test(await nodeClass('22') || '') && !/lpn-inactive/.test(await nodeClass('22') || ''));
+		await clickNode('22');
+		await changeTo('lpn_tool_add_tank');
+		await settle(800);
+		if (await a.dialog()) { await press(await L('lpn_change_type_ok')); }
+		await settle(1200);
+		ok('5.2 22 is now a tank under the same ID', /lpn-node-tank/.test(await nodeClass('22') || '') && await selectedNode() === '22', await nodeClass('22'));
 		await page.keyboard.press('Control+z');
 		await settle(1500);
-		ok('5.2 Ctrl+Z in B: the tank is gone and 22 is active again', (await nodeClass(T)) === null && !/lpn-inactive/.test(await nodeClass('22') || ''),
-			String(await nodeClass(T)));
+		ok('5.3 Ctrl+Z: 22 is a junction again', /lpn-node-junction/.test(await nodeClass('22') || ''), await nodeClass('22'));
 		ok('no uncaught page errors', errors.length === 0, errors.join(' | '));
 	} finally { await browser.close(); env.stopServer(); }
 	console.log(fails ? `\n${fails} FAILED` : '\nall ok');

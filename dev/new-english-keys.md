@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**144 still to read on master**, of 152 untranslated keys, of 2590 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**139 still to read on master**, of 147 untranslated keys, of 2585 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -175,7 +175,7 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   @@ NEEDS RULING
 
-## lpn_  (152, 144 to read @@ NEEDS RULING)
+## lpn_  (147, 139 to read @@ NEEDS RULING)
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -195,26 +195,11 @@ never edits a synonym.
 - **`lpn_break_yes`**
   > Yes
   @@ NEEDS RULING
-- **`lpn_change_type_create_new`**
-  > Create new assets
-  @@ NEEDS RULING
-- **`lpn_change_type_customers_left`**
-  > A customer cannot be assigned per scenario, so the demand of these customers stays with the old junction and is not in this scenario's solve:
+- **`lpn_change_type_base_only`**
+  > Change type works in Base. A scenario can switch assets on and off in Active topology instead.
   @@ NEEDS RULING
 - **`lpn_change_type_line_alternative`**
   > {id}: {property} {value}, in alternative {alternative}
-  @@ NEEDS RULING
-- **`lpn_change_type_not_carried`**
-  > The new assets cannot hold these values. The old assets keep them:
-  @@ NEEDS RULING
-- **`lpn_change_type_old_controls`**
-  > These controls and rules refer to an old asset, which is inactive in this scenario, so they are left out of this scenario's run and its .inp export:
-  @@ NEEDS RULING
-- **`lpn_change_type_scenario_ask`**
-  > Current scenario is not Base. Create new assets? The selected assets become inactive in this scenario.
-  @@ NEEDS RULING
-- **`lpn_change_type_switch_base`**
-  > Switch to Base
   @@ NEEDS RULING
 - **`lpn_control_inactive_note`**
   > These controls refer to an asset that is inactive in this scenario, so they are ignored in its run: {ids}
@@ -638,7 +623,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**47 still to read**, of 50 new keys across 13 unmerged branch(es).
+**50 still to read**, of 53 new keys across 14 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -651,7 +636,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### chore/roadmap-1010 (`1ea15e85`) — adds no English strings
 
-### feat/bentley-interop (`2f17711a`) — adds no English strings
+### feat/bentley-interop (`9d1c18b5`) — adds no English strings
 
 ### feat/desktop (`baba0f04`) — adds no English strings
 
@@ -683,7 +668,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Points data<br />(use Copy to see format)
   @@ NEEDS RULING
 
-### feat/user-guide (`f141e735`) — 45 new, 45 to read @@ NEEDS RULING
+### feat/user-guide (`ac679db9`) — 45 new, 45 to read @@ NEEDS RULING
 
 - **`lpn_guide_about_heading`**
   > About this calculator
@@ -827,4 +812,16 @@ build for that would be a gate nobody keeps. Refresh it with
 
 - **`lpn_settings_default_pattern_implied`**
   > None stated (pattern {id} is used)
+  @@ NEEDS RULING
+
+### fix/split-and-hide (`744f8cdb`) — 3 new, 3 to read @@ NEEDS RULING
+
+- **`lpn_split_no`**
+  > No
+  @@ NEEDS RULING
+- **`lpn_split_pipe_ask`**
+  > Split pipe {id} at this node?
+  @@ NEEDS RULING
+- **`lpn_split_yes`**
+  > Yes
   @@ NEEDS RULING

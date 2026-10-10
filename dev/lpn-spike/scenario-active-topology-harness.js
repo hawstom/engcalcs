@@ -1,4 +1,4 @@
-// Headless check of ACTIVE TOPOLOGY and of Change type in a scenario (Task 781). Run with:
+// Headless check of ACTIVE TOPOLOGY and of Change type (Base only, in place; refused in a scenario) (Task 781). Run with:
 //   node dev/lpn-spike/scenario-active-topology-harness.js
 //
 // Tom, 2026-10-08, choosing "Active topology first": *"I never wanted what we have anyway. Now that
@@ -12,14 +12,12 @@
 //      hand-built Net1 with that pipe.
 //   2. A pipe deactivated in scenario D: D's heads equal a hand-built Net1 without it; the pipe is
 //      drawn greyed in D and in a node's absence its links are greyed too.
-//   3. Change type in scenario B, junction 22 -> tank: the question in its words; Cancel; then a
-//      NEW tank with a new ID at 22's place, active only in B, 22 inactive in B, 22's four pipes
-//      replaced by new pipes on the tank carrying B's own values (pipe 21's diameter override);
-//      B's heads equal a hand-built Net1 with a real tank at 22; Base's heads unchanged.
+//   3. Change type: in Base junction 22 becomes a tank in place (ID kept), equal to a hand-built
+//      Net1; in scenario B it is refused in one sentence, nothing changes; B switches pipe 21 off.
 //   4. Inheritance: C, a child of B, has B's topology and B's heads.
-//   5. Undo, byte for byte; redo.
-//   6. Save and reopen; the .inp export of each scenario, reopened and solved.
-//   7. A link changed in a scenario (pipe 10 -> valve): a new valve, pipe 10 inactive there.
+//   5. Save and reopen; the .inp export of each scenario, reopened and solved.
+//   6. Undo and redo of the Base change.
+//   7. A link: pipe 10 -> valve refused in V, in place in Base.
 //   8. A file a type override was saved in opens with it dropped.
 //   9. Live mutations: each must turn this harness red.
 //
@@ -54,6 +52,7 @@ const INJECT =
 	"\t\tserializeProject: serializeProject, undo: undo, redo: redo, importProject: importProject,\n" +
 	"\t\tsetSelectionList: setSelectionList, selectedRefs: selectedRefs, changeSelectedType: changeSelectedType,\n" +
 	"\t\tnodeById: nodeById, linkById: linkById, assembleModel: assembleModel, importInp: importInpFromFile,\n" +
+	"\t\tlastNotice: function () { return lastNoticeText; },\n" +
 	"\t\tisActive: isActive, linkLive: linkLive, liveInScenario: liveInScenario, buildDom: buildDom,\n" +
 	"\t\texportInp: function () { return EngCalcs.lpnExportInp(inpExportDocument(), inpExportOptions()); },\n" +
 	"\t\tnodeClass: function (id) { var e = nodeEls[id]; return e && e.circle ? e.circle.getAttribute('class') : null; },\n" +
@@ -199,77 +198,59 @@ async function run(mutate, quiet) {
 	base();
 	ok('2.8 in Base 111 is live and not greyed', L.linkLive(L.linkById('111')) && !/lpn-inactive/.test(L.linkClass('111') || ''));
 
-	say('\n--- 3. Change type in scenario B: junction 22 -> tank ---');
-	let q = change('node', '22', 'reservoir', undefined, false);
-	ok('3.1 in Base no scope question is asked', !q.some((r) => r.kind === 'choice'));
+	say('\n--- 3. Change type works in Base only: in place there, refused in a scenario ---');
+	base();
+	const before0 = snap();
+	let q = change('node', '22', 'tank', undefined, true);
+	ok('3.1 in Base, junction 22 becomes a tank in place: the ID is kept, one node 22', L.nodeById('22').type === 'tank' &&
+		L.getDoc().nodes.filter((n) => n.id === '22').length === 1);
+	const tH = await bothHeads(L);
+	const tankRow = ' 22\t695\t' + S.defaults.tankLevel + '\t' + S.defaults.tankMinLevel + '\t' + S.defaults.tankMaxLevel + '\t' + S.defaults.tankDiameter + '\t0\t\t;';
+	const handT = editInp([['JUNCTIONS', '22']], [['TANKS', tankRow]]);
+	const hT = await hand(handT);
+	ok('3.2 Base equals the hand-built Net1 with a real tank at 22, built-in solver', worst(tH.n, hT.n) < 1e-6, 'worst ' + worst(tH.n, hT.n));
+	ok('3.3 ...and EPANET', worst(tH.e, hT.e) < 1e-6, 'worst ' + worst(tH.e, hT.e));
+	ok('3.4 ...and the tank changed the answer', Math.abs(tH.n['22'] - base0.n['22']) > 0.3048);
+	L.undo();
+	ok('3.5 one undo puts Base back byte for byte', snap() === before0 && L.nodeById('22').type === 'junction');
 	const B = L.createScenario('B');
 	L.switchScenario(B.id);
-	L.setProp(L.linkById('21'), 'diameter', 12);   // B's own value on a pipe the change will replace
 	const before = snap();
-	q = change('node', '22', 'tank', null);
-	const ask = q[0] || {};
-	ok('3.2 in B the first question is the scope question, in the page\'s words', ask.kind === 'choice' && ask.text === PC.lpn_change_type_scenario_ask, ask.text);
-	ok('3.3 ...with three buttons: Create new assets, Switch to Base, Cancel',
-		JSON.stringify((ask.choices || []).map((c) => c.label)) === JSON.stringify([PC.lpn_change_type_create_new, PC.lpn_change_type_switch_base, PC.lpn_cancel]),
-		JSON.stringify((ask.choices || []).map((c) => c.label)));
-	ok('3.4 Cancel: byte-identical, still in B', q.length === 1 && snap() === before && L.activeScenario().id === B.id);
-	q = change('node', '22', 'tank', 'scenario', true);
-	const box = (q[1] || {}).text || '';
-	ok('3.5 the box lists the demand the tank cannot hold, as kept by the old asset', box.indexOf(PC.lpn_change_type_not_carried) >= 0 && box.indexOf('22: ') >= 0, box.split('\n')[0]);
-	const sel = L.selectedRefs();
-	const T = sel.length === 1 ? L.nodeById(sel[0].id) : null;
-	ok('3.6 the selection is one NEW node, a tank with a new ID', !!T && T.id !== '22' && T.type === 'tank', JSON.stringify(sel));
-	ok('3.7 ...at 22\'s place, with 22\'s elevation and the New assets depths', !!T && T.x === L.nodeById('22').x && T.y === L.nodeById('22').y &&
-		T.elev === 695 && L.effective(T, 'level') === S.defaults.tankLevel && T.maxLevel === S.defaults.tankMaxLevel);
-	ok('3.8 22 is still a junction, inactive in B', L.nodeById('22').type === 'junction' && !L.isActive(L.nodeById('22')));
-	const newPipes = {};
-	['21', '22', '112', '122'].forEach((id) => {
-		const o = L.linkById(id);
-		const nu = L.getDoc().links.filter((l) => l !== o && l.type === 'pipe' && (l.from === T.id || l.to === T.id) &&
-			((o.from === '22' ? T.id : o.from) === l.from) && ((o.to === '22' ? T.id : o.to) === l.to))[0];
-		newPipes[id] = nu ? nu.id : null;
-	});
-	ok('3.9 each of 22\'s four pipes is replaced by a new pipe on the tank', Object.keys(newPipes).every((k) => newPipes[k] && newPipes[k] !== k), JSON.stringify(newPipes));
-	ok('3.10 ...the old pipes inactive in B, the new active', ['21', '22', '112', '122'].every((k) => !L.isActive(L.linkById(k)) && L.isActive(L.linkById(newPipes[k]))));
-	ok('3.11 ...carrying B\'s own values: pipe 21\'s replacement is 12 in, the others Base\'s',
-		L.effective(L.linkById(newPipes['21']), 'diameter') === 12 && L.effective(L.linkById(newPipes['122']), 'diameter') === 6 &&
-		L.effective(L.linkById(newPipes['21']), 'length') === 5280);
-	ok('3.12 B\'s own value lives on the new pipe as its own, not as an override', L.linkById(newPipes['21'])._diameter === 12);
-	L.buildDom();
-	ok('3.13 in B, 22 and its old pipes are drawn greyed, the tank is not', /lpn-inactive/.test(L.nodeClass('22') || '') &&
-		/lpn-inactive/.test(L.linkClass('21') || '') && !/lpn-inactive/.test(L.nodeClass(T.id) || '') && /lpn-node-tank/.test(L.nodeClass(T.id) || ''), L.nodeClass(T.id));
+	q = change('node', '22', 'tank', undefined, true);
+	ok('3.6 in B, Change type is refused: no box, nothing changed, 22 still a junction', q.length === 0 && snap() === before && L.nodeById('22').type === 'junction', JSON.stringify(q.map((r) => r.kind)));
+	const said = L.lastNotice();
+	ok('3.7 ...one sentence says it works in Base and points to Active topology', said === PC.lpn_change_type_base_only && /Base/.test(said) && /Active topology/.test(said) && said.split('. ').length === 2, said);
+	q = change('link', '10', 'valve', undefined, true);
+	ok('3.8 a link is refused the same way', q.length === 0 && snap() === before && L.linkById('10').type === 'pipe');
+	// What a scenario does instead: switch an asset off. B has no pipe 21.
+	L.setProp(L.linkById('21'), 'active', false);
+	ok('3.9 B switches pipe 21 off in Active topology', !L.isActive(L.linkById('21')) && L.isActive(L.linkById('22')));
 	const bH = await bothHeads(L);
-	ok('3.14 B solves in both engines', !!bH.n && !!bH.e);
-	const tankRow = ' 22\t695\t' + S.defaults.tankLevel + '\t' + S.defaults.tankMinLevel + '\t' + S.defaults.tankMaxLevel + '\t' + S.defaults.tankDiameter + '\t0\t\t;';
-	const handB = editInp([['JUNCTIONS', '22'], ['PIPES', '21']], [['TANKS', tankRow], ['PIPES', ' 21\t21\t22\t5280\t12\t100\t0\tOpen\t;']]);
-	ok('3.15 the hand-built file states node 22 as a tank', sectionOf(handB, '22') === 'TANKS,PIPES', sectionOf(handB, '22'));
+	ok('3.10 B solves in both engines', !!bH.n && !!bH.e);
+	const handB = editInp([['PIPES', '21']], []);
 	const hB = await hand(handB);
-	const ren = {}; ren[T.id] = '22';
-	ok('3.16 B equals the hand-built Net1 with a real tank at 22, built-in solver', worst(bH.n, hB.n, ren) < 1e-6, 'worst ' + worst(bH.n, hB.n, ren));
-	ok('3.17 ...and EPANET', worst(bH.e, hB.e, ren) < 1e-6, 'worst ' + worst(bH.e, hB.e, ren));
-	ok('3.18 ...and the tank changed the answer', Math.abs(bH.n[T.id] - base0.n['22']) > 0.3048);
+	ok('3.11 B equals the hand-built Net1 without pipe 21, built-in solver', worst(bH.n, hB.n) < 1e-6, 'worst ' + worst(bH.n, hB.n));
+	ok('3.12 ...and EPANET', worst(bH.e, hB.e) < 1e-6, 'worst ' + worst(bH.e, hB.e));
 	base();
 	const b3 = await bothHeads(L);
-	ok('3.19 Base heads unchanged to 1e-6, built-in solver', worst(base0.n, b3.n) < 1e-6, 'worst ' + worst(base0.n, b3.n));
-	ok('3.20 ...and EPANET', worst(base0.e, b3.e) < 1e-6, 'worst ' + worst(base0.e, b3.e));
-	ok('3.21 in Base the tank and new pipes are inactive and 22 is a junction', !L.isActive(L.nodeById(T.id)) &&
-		!L.isActive(L.linkById(newPipes['21'])) && L.isActive(L.nodeById('22')) && L.nodeById('22').type === 'junction');
-	ok('3.22 Base\'s export is the export from before any change, character for character', L.exportInp().inp === inpBase0);
+	ok('3.13 Base heads unchanged to 1e-6, built-in solver', worst(base0.n, b3.n) < 1e-6, 'worst ' + worst(base0.n, b3.n));
+	ok('3.14 ...and EPANET', worst(base0.e, b3.e) < 1e-6, 'worst ' + worst(base0.e, b3.e));
+	ok('3.15 Base\'s export is the export from before any change, character for character', L.exportInp().inp === inpBase0);
 
 	say('\n--- 4. inheritance: C, a child of B ---');
 	const C = L.createScenario('C');
 	L.setScenarioParent(C.id, B.id);
 	L.switchScenario(C.id);
-	ok('4.1 C has B\'s topology: the tank active, 22 inactive', L.isActive(L.nodeById(T.id)) && !L.isActive(L.nodeById('22')));
+	ok('4.1 C has B\'s topology: pipe 21 inactive', !L.isActive(L.linkById('21')));
 	const cH = await bothHeads(L);
 	ok('4.2 C\'s heads equal B\'s, built-in solver', worst(cH.n, bH.n) < 1e-9, 'worst ' + worst(cH.n, bH.n));
 	ok('4.3 ...and EPANET', worst(cH.e, bH.e) < 1e-9, 'worst ' + worst(cH.e, bH.e));
-	ok('4.4 the other scenarios do not have the tank', [N, D].every((s) => !L.liveInScenario(L.nodeById(T.id), s)));
+	ok('4.4 the other scenarios keep pipe 21', [N, D].every((s) => L.liveInScenario(L.linkById('21'), s)));
 
 	say('\n--- 5. export, save and reopen ---');
 	L.switchScenario(B.id);
 	const inpB = L.exportInp().inp;
-	ok('5.1 B\'s export writes the tank and no junction 22', sectionOf(inpB, T.id) === 'TANKS' && sectionOf(inpB, '22') === '');
+	ok('5.1 B\'s export writes junction 21 but no pipe 21', sectionOf(inpB, '21') === 'JUNCTIONS');
 	const X = page();
 	X.importInp({ name: 'B.inp', _text: inpB });
 	const xH = await bothHeads(X);
@@ -278,39 +259,43 @@ async function run(mutate, quiet) {
 	const fileL = JSON.stringify(L.serializeProject()), file = JSON.parse(fileL);
 	const R = page();
 	R.importProject(file);
-	ok('5.3 reopened: B is showing, the tank active and 22 inactive', R.activeScenario().name === 'B' && R.isActive(R.nodeById(T.id)) && !R.isActive(R.nodeById('22')));
+	ok('5.3 reopened: B is showing, pipe 21 inactive', R.activeScenario().name === 'B' && !R.isActive(R.linkById('21')));
 	const rH = await bothHeads(R);
 	ok('5.4 ...and B solves to its heads, both engines', worst(rH.n, bH.n) < 1e-9 && worst(rH.e, bH.e) < 1e-9);
 	const fileR = JSON.stringify(R.serializeProject());
 	let at = 0; while (at < fileR.length && fileR[at] === fileL[at]) { at++; }
 	ok('5.5 ...and the reopened file saves to the same bytes', fileR === fileL, fileL.slice(at - 60, at + 60) + ' || ' + fileR.slice(at - 60, at + 60));
 	R.switchScenario(R.baseScenario().id);
-	ok('5.6 ...and in Base 22 is the junction it was', R.isActive(R.nodeById('22')) && !R.isActive(R.nodeById(T.id)));
+	ok('5.6 ...and in Base pipe 21 is active', R.isActive(R.linkById('21')));
 
-	say('\n--- 6. undo and redo ---');
-	L.switchScenario(B.id);
+	say('\n--- 6. undo and redo of the Base change ---');
+	base();
+	const pre6 = snap();
+	change('node', '22', 'tank', undefined, true);
 	const after = snap();
 	L.undo();
-	ok('6.1 one undo puts the document back byte for byte', snap() === before);
-	ok('6.2 ...the tank is gone and 22 is active in B', !L.nodeById(T.id) && L.isActive(L.nodeById('22')));
+	ok('6.1 one undo puts the document back byte for byte', snap() === pre6 && L.nodeById('22').type === 'junction');
 	L.redo();
-	ok('6.3 redo brings the change back byte for byte', snap() === after);
+	ok('6.2 redo brings the change back byte for byte', snap() === after && L.nodeById('22').type === 'tank');
+	L.undo();
 
-	say('\n--- 7. a link changed in a scenario: pipe 10 -> valve in V ---');
+	say('\n--- 7. a link: pipe 10 -> valve is refused in V, in place in Base ---');
 	{
 		base();
 		const V = L.createScenario('V');
 		L.switchScenario(V.id);
-		change('link', '10', 'valve', 'scenario', true);
-		const s7 = L.selectedRefs(), v = s7.length ? L.linkById(s7[0].id) : null;
-		ok('7.1 a new TCV valve on 10\'s ends, pipe 10 inactive in V', !!v && v.id !== '10' && v.type === 'valve' && v.valveType === 'TCV' &&
-			v.from === '10' && v.to === '11' && !L.isActive(L.linkById('10')), JSON.stringify(v && { id: v.id, t: v.type }));
-		ok('7.2 ...carrying 10\'s diameter, 18 in', !!v && L.effective(v, 'diameter') === 18);
-		const vH = nativeHeads(L);
-		ok('7.3 V solves', !!vH);
+		const pre7 = snap();
+		q = change('link', '10', 'valve', undefined, true);
+		ok('7.1 refused in V: no box, nothing changed', q.length === 0 && snap() === pre7 && L.linkById('10').type === 'pipe');
 		base();
-		ok('7.4 Base: pipe 10 a pipe and active, the valve inactive', L.linkById('10').type === 'pipe' && L.isActive(L.linkById('10')) && !L.isActive(v));
-		ok('7.5 Base heads still unchanged', worst(base0.n, nativeHeads(L)) < 1e-6);
+		change('link', '10', 'valve', undefined, true);
+		const v = L.linkById('10');
+		ok('7.2 in Base the same link, ID 10, becomes a TCV valve on 10\'s ends', v.type === 'valve' && v.valveType === 'TCV' && v.from === '10' && v.to === '11' &&
+			L.getDoc().links.filter((l) => l.id === '10').length === 1);
+		ok('7.3 ...carrying 10\'s diameter, 18 in', L.effective(v, 'diameter') === 18);
+		ok('7.4 ...and Base solves', !!nativeHeads(L));
+		L.undo();
+		ok('7.5 undo restores the pipe and Base heads', L.linkById('10').type === 'pipe' && worst(base0.n, nativeHeads(L)) < 1e-6);
 	}
 
 	say('\n--- 8. a file holding a type override opens with it dropped ---');
@@ -344,12 +329,8 @@ async function run(mutate, quiet) {
 		ok('10.3 Base\'s export writes both', /LINK 21 CLOSED IF NODE 2 BELOW 100/.test(inp0) && /RULE R1/.test(inp0));
 		const PB = P.createScenario('B');
 		P.switchScenario(PB.id);
-		asked = []; answers = { choice: ['scenario'], confirm: [true] };
-		P.setSelectionList([{ kind: 'node', id: '22' }]);
-		P.changeSelectedType('tank');
-		const box = (asked[1] || {}).text || '';
-		ok('10.4 the box lists the control and the rule as left out', box.indexOf(PC.lpn_change_type_old_controls) >= 0 && /LINK 21/.test(box) && /RULE R1|IF NODE 22/.test(box), box.slice(0, 400));
-		ok('10.5 ...and customer M9 with its demand, as staying with the old junction', box.indexOf(PC.lpn_change_type_customers_left) >= 0 && /M9/.test(box) && /25/.test(box));
+		P.setProp(P.nodeById('22'), 'active', false);
+		ok('10.4 B switches junction 22 off in Active topology: the control on 21 and the rule name inactive assets', !P.isActive(P.nodeById('22')) && !P.linkLive(P.linkById('21')));
 		const m1 = P.assembleModel();
 		ok('10.6 B hands the engine neither the control nor the rule', ctlLinks(m1).indexOf('21') < 0 && ruleCount(m1) === 0, JSON.stringify(ctlLinks(m1)) + ' rules ' + ruleCount(m1));
 		const r1 = await global.EngCalcs.lpnSolveEpanet(m1);
@@ -380,14 +361,8 @@ async function run(mutate, quiet) {
 
 // **LIVE MUTATIONS: EACH MUST TURN THIS HARNESS RED** (dev/testing-notes.md).
 const MUTATIONS = [
-	['the old asset stays active in the scenario', (src) => src.replace(
-		"\t\tif (!live) { setOverride(c, 'active', false); }\n\t\tsetOverride(el, 'active', false);", "\t\tif (!live) { setOverride(c, 'active', false); }")],
-	['a node\'s links are not replaced', (src) => src.replace(
-		"var isNode = elGroup(el) === 'node', links = isNode ? replacedLinksAt(el) : [], nu;", "var isNode = elGroup(el) === 'node', links = [], nu;")],
-	['the scenario\'s values are not carried', (src) => src.replace(
-		"\t\t\t\tsetProp(c, p, altCopy(ov[p]));", "\t\t\t\tvoid p;")],
-	['the new asset is active in Base', (src) => src.replace(
-		"\t\tbornInScenario(c);\n", "\t\tsetOverride(c, 'active', true);\n")],
+	['Change type is allowed outside Base', (src) => src.replace(
+		"if (!inBaseScenario()) { setNotice(", "if (false) { setNotice(")],
 	['a link whose end is inactive is drawn active', (src) => src.replace(
 		"off = !linkLive(el); ov = hasDisplayedOverride(el);", "off = !isActive(el); ov = hasDisplayedOverride(el);")],
 	['the solve keeps a link whose end is inactive', (src) => src.replace(

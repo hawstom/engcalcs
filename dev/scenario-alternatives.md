@@ -761,31 +761,15 @@ on."* What this task added or confirmed:
   so the box is the visible form of what Basic mode already does; hiding it would leave a deleted
   pipe with no way back but undo. The tree it resolves through stays hidden.
 
-**Change type outside Base makes a new asset in the old one's place**
-(`replaceSelectedTypeInScenario()`, `replaceTypeInScenario()`):
+**Change type works in Base only** (Tom, 2026-10-10, retiring the per-scenario version built
+2026-10-08). Bentley Morph, epanet-js and DC Water's Change Node Class change a node's type only as
+a plain edit, never per scenario, and the per-scenario version (a new coincident asset, the old one
+deactivated) was confusing and costly. In Base the asset keeps its ID and changes type in every
+scenario, with its own box. Outside Base the command is refused in one sentence
+(`lpn_change_type_base_only`): a scenario switches assets on and off in Active topology instead.
+Rejected: the per-scenario replacement. A project already holding such copies opens them as
+ordinary assets; there is no migration.
 
-- After the question (below), each selected asset is replaced by a NEW asset of the new type, its
-  ID minted by the ID-prefix rules in effect in the scenario, at the old one's place. The new asset
-  is born in the scenario (`bornInScenario()`: inactive in Base, active here and in this scenario's
-  children); the old one is made inactive in this scenario and is otherwise untouched, in Base and
-  in every other scenario. One undo step. The new assets become the selection.
-- **A node takes its links with it.** A link's ends are Base-owned, so a link left on the old node
-  would leave the network with it. Each live link at the node is replaced the same way, its end on
-  the new node, its type unchanged. Rejected: making link ends overridable, which would be more
-  "the same pipe, reconnected" but touches every reader of `from`/`to` in the page and its modules.
-- **What the new asset carries is what this scenario showed on the old one**: Base's record with the
-  scenario's resolved overrides written in as the new asset's own values (it exists only where this
-  scenario's topology puts it, so its own values are this scenario's, as a drawn asset's are; so it
-  carries no override marks but its own `active`), then the ordinary Base change of type on that
-  copy (`applyNodeTypeChange()`, `applyLinkTypeChange()`): what the new type cannot hold stays with
-  the old asset, what only the new type has comes from the scenario's New assets values, and a
-  water surface stays where it was. A position the scenario moved stays the scenario's override,
-  verbatim, so no coordinate is run through a projection it does not need. An old asset inactive in
-  the scenario gives an inactive new one.
-- **The box** (only when something is listed) says which values the new assets cannot hold (the old
-  assets keep them), the water surface carried, each customer whose demand stays with the old
-  junction, what a new link is born with, and the controls and rules naming an old asset or a
-  replaced link.
 - **A control or rule naming an asset inactive in a scenario is left out of that scenario's run and
   of its `.inp` export, and said** (Perry, 2026-10-08: EPANET refused the input, Error 200, and the
   page fell back to the built-in solver). Controls and rules are document-wide and still name the
@@ -794,29 +778,6 @@ on."* What this task added or confirmed:
   project" would be false); in the export, js/lpn-inp.js drops them as `inactive-control` and
   `inactive-rule`, rebuilding `[RULES]` only when a block is dropped, and the export alert names
   them. Base, where the assets are active, runs and writes them as before.
-- **Properties follows the new asset**: open on a replaced asset, it moves to its replacement.
-- **In Base, Change type is unchanged**: the asset keeps its ID and changes type in every scenario.
-  Tom's words describe a change made in a scenario, where the old asset must survive for the
-  others; in Base there is no other scenario to keep it for, and a new ID would orphan every
-  scenario's overrides, controls and rules naming the asset. Rejected: a new ID in Base too.
-- **Customers stay with the old junction.** A customer carries nothing a scenario can change
-  (Task 247), so moving one to a replacement would move it in Base too. A pipe changed in type keeps
-  its ends, so a customer on it still lands on a live node. A junction replaced in a scenario takes
-  the demand of its customers (assigned to it, or landing on it from a pipe) out of that scenario's
-  solve: the box lists each with its demand, and the `.inp` export alert says how many customers'
-  demand is not in the file (`customer-inactive-node`). Rejected: reassigning the customer, which
-  is a Base edit.
-- **Known gaps**, reported and not built: a child scenario's own overrides of the old asset are not
-  copied to the new one; the new assets are copies, so a later Base edit to an old asset does not
-  reach them; replaced assets stay in the file, inactive, as every Bentley topology alternative
-  keeps them.
-
-**The question**, the page's own box (`askDialog` kind `choice`), asked only outside Base, three
-buttons: **Create new assets** (the replacement), **Switch to Base** (switches, then the ordinary
-Base change with its own box), **Cancel** (writes nothing). Tom's 2026-10-07 wording asked *"Create
-overrides?"*; it no longer creates overrides, so the sentence and the first button were reworded
-minimally, for his word.
-
 **The type override is gone** (built 2026-10-07 for Tom's 6a, removed 2026-10-08): `type` in a
 scenario's override map, the elements laid out per scenario (`typeViewSync()`, `withBaseTypes()`),
 `pinTypeOverrideInheritance()`, `LPN_TYPE_FIELD_CATEGORY_OF`, `writeOverrideIn()`, and their three
