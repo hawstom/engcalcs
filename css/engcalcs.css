@@ -4518,13 +4518,27 @@ html[dir="rtl"] .lpn-guide-railtoggle svg { transform: scaleX(-1); }
 .lpn-guide-railbody input { width: 100%; box-sizing: border-box; padding: 3px 6px; font-size: 1rem; flex: 0 0 auto; }
 .lpn-guide-nav { overflow: auto; flex: 1 1 auto; min-height: 0; padding-top: 6px; touch-action: auto; }
 .lpn-guide-nav a {
-	display: block; padding: 3px 6px; color: inherit; text-decoration: none; border-inline-start: 3px solid transparent;
+	display: block; padding: 3px 6px 3px 2px; color: inherit; text-decoration: none; border-inline-start: 3px solid transparent;
 	overflow-wrap: anywhere;
 }
 .lpn-guide-nav a:hover { background: var(--ec-hover-bg); }
 .lpn-guide-nav a[aria-current="true"] { border-inline-start-color: var(--ec-accent); font-weight: bold; background: var(--ec-hover-bg); }
-.lpn-guide-nav a.lpn-guide-nav-sub { padding-inline-start: 18px; }
-.lpn-guide-nav a.lpn-guide-nav-sub2 { padding-inline-start: 30px; }
+.lpn-guide-nav { user-select: none; }
+.lpn-guide-nav-row { display: flex; align-items: flex-start; }
+.lpn-guide-nav-row.lpn-guide-nav-folded { display: none; }
+.lpn-guide-nav-row > a { flex: 1 1 auto; min-width: 0; }
+.lpn-guide-nav-row[data-level="1"] { padding-inline-start: 12px; }
+.lpn-guide-nav-row[data-level="2"] { padding-inline-start: 24px; }
+.lpn-guide-nav-chev, .lpn-guide-nav-spacer { flex: 0 0 20px; width: 20px; height: 24px; }
+.lpn-guide-nav-chev {
+	padding: 0; border: 0; background: transparent; color: var(--ec-ink); cursor: pointer;
+	display: inline-flex; align-items: center; justify-content: center;
+}
+.lpn-guide-nav-chev:hover, .lpn-guide-nav-chev:focus-visible { background: var(--ec-gray-eee); color: var(--ec-ink-black); }
+.lpn-guide-nav-chev-svg { width: .9em; height: .9em; transition: transform .12s; }
+.lpn-guide-nav-closed > .lpn-guide-nav-chev .lpn-guide-nav-chev-svg { transform: rotate(-90deg); }
+html[dir="rtl"] .lpn-guide-nav-closed > .lpn-guide-nav-chev .lpn-guide-nav-chev-svg { transform: rotate(90deg); }
+@media (prefers-reduced-motion: reduce) { .lpn-guide-nav-chev-svg { transition: none; } }
 .lpn-guide-nav-snip { display: block; font-weight: normal; color: var(--ec-ink-muted); font-size: .9em; }
 .lpn-guide-rail-collapsed .lpn-guide-rail { flex-basis: 34px; padding-inline-end: 2px; }
 .lpn-guide-rail-collapsed .lpn-guide-railtitle, .lpn-guide-rail-collapsed .lpn-guide-railbody { display: none; }
@@ -4577,18 +4591,6 @@ html[dir="rtl"] .lpn-guide-rail-collapsed .lpn-guide-railtoggle svg { transform:
 }
 .lpn-guide-group > h3 { padding-inline: 5px; }
 .lpn-guide-group > .lpn-guide-boxentry:first-of-type { border-top: 0; }
-/* A main heading is a disclosure: the whole row toggles; the chevron says so. */
-.lpn-guide-section > h2 { cursor: pointer; }
-.lpn-guide-disc {
-	display: inline-flex; align-items: center; gap: .35em; margin: 0; padding: 0; border: 0; background: none;
-	font: inherit; color: inherit; cursor: pointer; text-align: start; user-select: none;
-}
-.lpn-guide-disc:focus-visible { outline: 2px solid var(--ec-accent); outline-offset: 2px; }
-.lpn-guide-disc-chev { width: .9em; height: .9em; flex: 0 0 auto; transition: transform .12s; }
-.lpn-guide-collapsed .lpn-guide-disc-chev { transform: rotate(-90deg); }
-html[dir="rtl"] .lpn-guide-collapsed .lpn-guide-disc-chev { transform: rotate(90deg); }
-@media (prefers-reduced-motion: reduce) { .lpn-guide-disc-chev { transition: none; } }
-.lpn-guide-section.lpn-guide-collapsed > :not(h2) { display: none; }
 .lpn-guide-section dd { margin: 0 0 .6em; }
 .lpn-guide-boxentry > h3 { font-size: 1rem; font-weight: bold; }
 /* A Boxes entry is separated as a toolbar row group is: 12 px of air and the same hairline. */

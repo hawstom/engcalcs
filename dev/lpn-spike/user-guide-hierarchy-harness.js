@@ -70,9 +70,10 @@ const bodyShown = (page, sec) => page.evaluate((s) => {
 	return Array.from(el.children).filter(c => c.tagName !== 'H2' && c.tagName !== 'TEMPLATE')
 		.some(c => c.style.display !== 'none' && !c.hidden && c.getClientRects().length > 0);
 }, sec);
-const expanded = (page, sec) => page.evaluate((s) =>
-	document.querySelector('[data-guide-section="' + s + '"] > h2 > .lpn-guide-disc').getAttribute('aria-expanded'), sec);
-const disc = (sec) => '[data-guide-section="' + sec + '"] > h2 > .lpn-guide-disc';
+const row = (k) => '#lpn_guide_nav .lpn-guide-nav-row[data-key="' + k + '"]';
+const chev = (k) => row(k) + ' > .lpn-guide-nav-chev';
+// Is a rail entry drawn?
+const railShown = (page, k) => page.evaluate((sel) => { const r = document.querySelector(sel); return !!r && r.getClientRects().length > 0; }, row(k));
 
 async function english(browser, Session) {
 	const a = await boot(Session, browser, 'hier', 'Looped-Network.php');
@@ -119,83 +120,98 @@ async function english(browser, Session) {
 	});
 	ok('the rail runs in reading order', JSON.stringify(orders.rail) === JSON.stringify(orders.dom.filter(k => orders.rail.indexOf(k) >= 0)));
 
-	console.log('\n2. Main headings collapse');
-	ok('every section opens expanded, with a chevron button in its heading', await page.evaluate(() => {
-		const b = Array.from(document.querySelectorAll('.lpn-guide-section > h2 > .lpn-guide-disc'));
-		return b.length === document.querySelectorAll('.lpn-guide-section').length && b.every(x => x.getAttribute('aria-expanded') === 'true' && x.querySelector('svg'));
-	}));
-	ok('the heading text is unchanged by the button', (await page.textContent('[data-guide-section="menus"] > h2')).trim() === enString('lpn_hotkeys_menu_heading'));
+	console.log('\n2. The main content does not fold');
+	ok('no section heading carries a chevron button or a fold class', await page.evaluate(() =>
+		document.querySelectorAll('.lpn-guide-disc, .lpn-guide-disc-chev, .lpn-guide-collapsed').length === 0
+		&& Array.from(document.querySelectorAll('.lpn-guide-section > h2')).every(h => !h.querySelector('button, svg'))));
+	ok('the heading text is plain', (await page.textContent('[data-guide-section="menus"] > h2')).trim() === enString('lpn_hotkeys_menu_heading'));
 	ok('Menus shows its cards', await bodyShown(page, 'menus'));
-	await page.click(disc('menus'));
+	await page.click('[data-guide-section="menus"] > h2');
+	await page.dblclick('[data-guide-section="menus"] > h2');
 	await a.settle(120);
-	ok('a click on the chevron collapses Menus', !(await bodyShown(page, 'menus')) && (await expanded(page, 'menus')) === 'false');
-	ok('...its heading stays', await page.evaluate(() => document.querySelector('[data-guide-section="menus"] > h2').getClientRects().length > 0));
-	await page.click(disc('menus'));
+	ok('a click and a double-click on a main heading fold nothing', await bodyShown(page, 'menus'));
+
+	console.log('\n3. The contents rail folds');
+	const parents = await page.evaluate(() => Array.from(document.querySelectorAll('#lpn_guide_nav .lpn-guide-nav-row')).map(r => ({
+		k: r.getAttribute('data-key'), lvl: +r.getAttribute('data-level'), has: r.getAttribute('data-has') === '1', chev: !!r.querySelector('.lpn-guide-nav-chev') })));
+	ok('Menus, Boxes and the box groups have a chevron; a leaf has none',
+		['menus', 'boxes'].every(k => parents.some(p => p.k === k && p.has && p.chev)) && parents.filter(p => /^menu-/.test(p.k)).every(p => !p.has && !p.chev));
+	ok('every entry starts unfolded, with its children shown', await page.evaluate(() => Array.from(document.querySelectorAll('.lpn-guide-nav-row')).every(r => r.getClientRects().length > 0 && !r.classList.contains('lpn-guide-nav-closed'))));
+	const kid = await page.evaluate(() => document.querySelector('#lpn_guide_nav a[data-guide-link^="menu-"]').getAttribute('data-guide-link'));
+	const grp = parents.filter(p => /^boxgroup-/.test(p.k) && p.has)[0];
+	const grpKid = await page.evaluate((g) => { const r = document.querySelector('#lpn_guide_nav .lpn-guide-nav-row[data-key="' + g + '"]'); return r.nextElementSibling.getAttribute('data-key'); }, grp.k);
+	ok('the chevron says it is expanded', (await page.getAttribute(chev('menus'), 'aria-expanded')) === 'true');
+	await page.click(chev('menus'));
 	await a.settle(120);
-	ok('a second click expands it', (await bodyShown(page, 'menus')) && (await expanded(page, 'menus')) === 'true');
-	await page.click('[data-guide-section="menus"] > h2', { position: { x: 600, y: 8 } });
+	ok('a click on the chevron folds Menus: its menus leave the rail', !(await railShown(page, kid)) && (await railShown(page, 'menus')) && (await page.getAttribute(chev('menus'), 'aria-expanded')) === 'false');
+	ok('...the main content is untouched', await bodyShown(page, 'menus'));
+	ok('...and the other entries are untouched', (await railShown(page, 'boxes')) && (await railShown(page, grpKid)));
+	await page.click(chev('menus'));
 	await a.settle(120);
-	ok('a click on the heading row, beside the words, collapses it', !(await bodyShown(page, 'menus')));
-	await page.dblclick('[data-guide-section="menus"] > h2', { position: { x: 600, y: 8 } });
-	await a.settle(120);
-	ok('a double-click expands it (one net change)', (await bodyShown(page, 'menus')) && (await expanded(page, 'menus')) === 'true');
-	await page.dblclick(disc('menus'));
-	await a.settle(120);
-	ok('a double-click collapses it again', !(await bodyShown(page, 'menus')) && (await expanded(page, 'menus')) === 'false');
-	await page.focus(disc('menus'));
+	ok('a second click unfolds it', (await railShown(page, kid)) && (await page.getAttribute(chev('menus'), 'aria-expanded')) === 'true');
+	await page.dblclick('#lpn_guide_nav a[data-guide-link="menus"]');
+	await a.settle(200);
+	ok('a double-click on the entry folds it', !(await railShown(page, kid)));
+	await page.dblclick('#lpn_guide_nav a[data-guide-link="menus"]');
+	await a.settle(200);
+	ok('...and a second double-click unfolds it', await railShown(page, kid));
+	await page.focus(chev('menus'));
 	await page.keyboard.press('Enter');
 	await a.settle(120);
-	ok('Enter on the focused heading expands it', await bodyShown(page, 'menus'));
+	ok('Enter on the focused chevron folds', !(await railShown(page, kid)));
 	await page.keyboard.press('Space');
 	await a.settle(120);
-	ok('Space collapses it', !(await bodyShown(page, 'menus')));
+	ok('Space unfolds', await railShown(page, kid));
 	await page.keyboard.press('Space');
 	await a.settle(120);
-	ok('...and Space expands it again', await bodyShown(page, 'menus'));
-	await page.click(disc('tables'));
+	ok('...and Space folds it again, keeping focus on the chevron', !(await railShown(page, kid)) && await page.evaluate((sel) => document.activeElement === document.querySelector(sel), chev('menus')));
+	await page.click('#lpn_guide_nav a[data-guide-link="menus"]');
+	await a.settle(300);
+	ok('a single click on the entry text still jumps to its section, and does not unfold it',
+		(await page.evaluate(() => document.getElementById('lpn_guide_nav').getAttribute('data-current'))) === 'menus' && !(await railShown(page, kid)));
+	await page.click(chev('boxes'));
 	await a.settle(120);
-	ok('collapsing one section leaves its neighbours open', !(await bodyShown(page, 'tables')) && (await bodyShown(page, 'toolbar')) && (await bodyShown(page, 'boxes')));
+	ok('folding Boxes hides its groups and, deeper, its boxes',
+		!(await railShown(page, grp.k)) && !(await railShown(page, grpKid)));
+	await page.click(chev('boxes'));
+	await a.settle(120);
+	ok('unfolding Boxes shows them again', (await railShown(page, grp.k)) && (await railShown(page, grpKid)));
+	await page.click(chev(grp.k));
+	await a.settle(120);
+	ok('a box group folds on its own, leaving its siblings', !(await railShown(page, grpKid)) && (await railShown(page, grp.k)) && (await railShown(page, 'boxes')));
+	await page.click(chev(grp.k));
+	await a.settle(120);
 
-	console.log('\n3. Search and the rail open a collapsed section');
-	await page.click(disc('menus'));   // collapsed; Tables is collapsed too
-	await a.settle(120);
-	ok('Menus and Tables are collapsed', !(await bodyShown(page, 'menus')) && !(await bodyShown(page, 'tables')));
+	console.log('\n4b. Search does not fold or unfold anything');
 	const term = await page.evaluate(() => document.querySelector('[data-guide-section="menus"] .lpn-guide-menu .lpn-guide-name').textContent.trim());
 	await page.fill('#lpn_guide_search', term);
 	await a.settle(250);
-	ok('a search that hits a Menus card opens Menus', (await bodyShown(page, 'menus')) && (await expanded(page, 'menus')) === 'true', term);
-	ok('...and leaves collapsed a section with no hit (it is hidden)', await page.evaluate(() => {
-		const s = document.querySelector('[data-guide-section="tables"]'); return s.style.display === 'none' || s.classList.contains('lpn-guide-collapsed');
-	}));
+	ok('while searching the main content is as it was, and the rail shows every match', (await bodyShown(page, 'menus')) && await page.evaluate(() =>
+		document.querySelectorAll('#lpn_guide_nav .lpn-guide-nav-folded').length === 0));
 	await page.fill('#lpn_guide_search', '');
 	await a.settle(250);
-	ok('clearing the search puts Menus back as it was (collapsed)', !(await bodyShown(page, 'menus')) && (await expanded(page, 'menus')) === 'false');
-	ok('...and Tables stays collapsed', !(await bodyShown(page, 'tables')));
-	await page.click('#lpn_guide_nav a[data-guide-link="menus"]');
-	await a.settle(300);
-	ok('a rail click on a collapsed section opens it', (await bodyShown(page, 'menus')) && (await expanded(page, 'menus')) === 'true');
-	await page.click(disc('menus'));
-	await a.settle(100);
-	await page.click('#lpn_guide_nav a[data-guide-link^="menu-"]');
-	await a.settle(300);
-	ok('a rail click on one of its menus opens it too', await bodyShown(page, 'menus'));
-	await page.fill('#lpn_guide_search', term);
-	await a.settle(200);
-	await page.click(disc('menus'));
-	await a.settle(100);
-	await page.fill('#lpn_guide_search', '');
-	await a.settle(200);
-	ok('a collapse chosen during a search outlasts it', !(await bodyShown(page, 'menus')));
+	ok('...and after it the rail is back as it was (Menus still folded)', !(await railShown(page, kid)) && (await railShown(page, 'menus')));
+	await page.click(chev('menus'));
+	await a.settle(120);
+	ok('a fresh page starts with Menus unfolded: unfold now', await railShown(page, kid));
 	const keysAfter = await page.evaluate(() => Object.keys(localStorage).sort());
 	ok('no localStorage key was added by any of it', JSON.stringify(keysAfter.filter(k => keysBefore.indexOf(k) < 0 && !/hotkeysbox|dock|layout/.test(k))) === '[]', JSON.stringify(keysAfter.filter(k => keysBefore.indexOf(k) < 0)));
-	ok('...and none of the Guide\'s collapse state is in storage', await page.evaluate(() => !/collaps/i.test(JSON.stringify(localStorage) + JSON.stringify(sessionStorage))));
+	ok('...and none of the Guide\'s fold state is in storage', await page.evaluate(() => !/collaps|navfold|guide-?fold|nav-closed/i.test(JSON.stringify(localStorage) + JSON.stringify(sessionStorage))));
 	await page.reload();
 	await page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } });
 	await a.settle(500);
 	await a.openExampleCard(await a.lang('lpn_ex_net3_title')).catch(() => {});
 	await a.settle(500);
 	if (!(await page.evaluate(() => document.getElementById('lpn_hotkeys_popup').style.display === 'flex'))) { await viaHelp(a); }
-	ok('after a reload every section is open again', (await bodyShown(page, 'menus')) && (await bodyShown(page, 'tables')));
+	await page.click(chev('menus'));
+	await a.settle(100);
+	await page.reload();
+	await page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } });
+	await a.settle(500);
+	await a.openExampleCard(await a.lang('lpn_ex_net3_title')).catch(() => {});
+	await a.settle(500);
+	if (!(await page.evaluate(() => document.getElementById('lpn_hotkeys_popup').style.display === 'flex'))) { await viaHelp(a); }
+	ok('after a reload the rail is unfolded again', await railShown(page, kid));
 	ok('no page errors', a.errors.length === 0, a.errors.slice(0, 2).join(' | '));
 	await a.context.close().catch(() => {});
 }
@@ -207,17 +223,18 @@ async function spanish(browser, Session) {
 	await viaHelp(a);
 	const st = await page.evaluate(() => ({
 		secs: document.querySelectorAll('.lpn-guide-section').length,
-		discs: document.querySelectorAll('.lpn-guide-section > h2 > .lpn-guide-disc').length,
+		chevs: document.querySelectorAll('#lpn_guide_nav .lpn-guide-nav-chev').length,
+		plain: document.querySelectorAll('.lpn-guide-disc').length,
 		menus: document.querySelectorAll('[data-guide-section="menus"] .lpn-guide-menu').length,
 		groups: document.querySelectorAll('#lpn_guide_boxes > .lpn-guide-group').length,
 		nav: document.querySelectorAll('#lpn_guide_nav a').length,
 		about: (document.querySelector('[data-guide-section="about"] > h2') || {}).textContent
 	}));
-	ok('the Guide builds in Spanish with all its sections', st.secs >= 9 && st.discs === st.secs && st.menus >= 4 && st.groups >= 2 && st.nav > st.secs, JSON.stringify(st));
+	ok('the Guide builds in Spanish with all its sections', st.secs >= 9 && st.plain === 0 && st.chevs >= 2 && st.menus >= 4 && st.groups >= 2 && st.nav > st.secs, JSON.stringify(st));
 	ok('...the new heading falls back to English until it is translated', /About this calculator/.test(st.about || ''), st.about);
-	await page.click(disc('menus'));
+	await page.click(chev('menus'));
 	await a.settle(120);
-	ok('...and collapses there', !(await bodyShown(page, 'menus')));
+	ok('...Menus is folded in the rail (its chevron says so)', (await page.getAttribute(chev('menus'), 'aria-expanded')) === 'false');
 	ok('no page errors in Spanish', a.errors.length === 0, a.errors.slice(0, 2).join(' | '));
 	await a.context.close().catch(() => {});
 }

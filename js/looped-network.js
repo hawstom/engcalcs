@@ -44225,9 +44225,6 @@ var EngCalcs = EngCalcs || {};
 				});
 				if (guideShowEl(g, ghit)) { hit = true; }
 			});
-			// A collapsed section that holds a hit is opened for the search, and put back after it.
-			if (q && hit) { guideAutoExpand(sec); }
-			else if (!q) { guideAutoRestore(sec); }
 			sec.querySelectorAll('.lpn-guide-prose').forEach(function (pr) {
 				guideShowEl(pr, !q || guideMatch(pr, q));
 				if (!q || guideMatch(pr, q)) { hit = true; }
@@ -44316,36 +44313,85 @@ var EngCalcs = EngCalcs || {};
 		}
 		return '';
 	}
+	// ---- The contents rail folds (Tom, 2026-10-10: the index folds, the main text does not). An entry
+	// with entries under it carries a chevron button; the chevron, a double-click on the entry, or
+	// Enter or Space on the chevron folds it. A single click on the entry's own text still jumps.
+	// Nothing is remembered: every opening of the page starts unfolded. A search shows every match, so
+	// folding is suspended while there is a query.
+	var guideNavFolded = {};
+	function guideApplyNavFold() {
+		var nav = document.getElementById('lpn_guide_nav'), hideBelow = null, filtering;
+		if (!nav) { return; }
+		filtering = nav.getAttribute('data-filtering') === '1';
+		nav.querySelectorAll('.lpn-guide-nav-row').forEach(function (row) {
+			var lvl = +row.getAttribute('data-level'), key = row.getAttribute('data-key'), has = row.getAttribute('data-has') === '1',
+				folded = has && !filtering && !!guideNavFolded[key], b = row.querySelector('.lpn-guide-nav-chev');
+			if (hideBelow !== null && lvl > hideBelow) { row.classList.add('lpn-guide-nav-folded'); }
+			else { row.classList.remove('lpn-guide-nav-folded'); hideBelow = folded ? lvl : null; }
+			row.classList.toggle('lpn-guide-nav-closed', folded);
+			if (b) { b.setAttribute('aria-expanded', folded ? 'false' : 'true'); }
+		});
+	}
+	function guideToggleNav(key) {
+		if (!key) { return; }
+		if (guideNavFolded[key]) { delete guideNavFolded[key]; } else { guideNavFolded[key] = true; }
+		guideApplyNavFold();
+	}
 	function guideRebuildNav(q) {
-		var nav = document.getElementById('lpn_guide_nav'), cur = nav ? nav.getAttribute('data-current') : '', box = hotkeysBoxEl();
+		var nav = document.getElementById('lpn_guide_nav'), cur = nav ? nav.getAttribute('data-current') : '', box = hotkeysBoxEl(), rows = [];
 		if (!nav || !box) { return; }
 		while (nav.firstChild) { nav.removeChild(nav.firstChild); }
-		function add(key, text, sub, snip) {
-			var a = document.createElement('a'), sn;
+		nav.setAttribute('data-filtering', q ? '1' : '0');
+		function add(key, text, level, snip) {
+			var row = document.createElement('div'), a = document.createElement('a'), sn;
+			row.className = 'lpn-guide-nav-row';
+			row.setAttribute('data-level', String(level));
+			row.setAttribute('data-key', key);
+			row.setAttribute('data-has', '0');
 			a.href = '#guide/' + key;
 			a.setAttribute('data-guide-link', key);
-			if (sub) { a.className = 'lpn-guide-nav-sub'; }
+			if (level === 1) { a.className = 'lpn-guide-nav-sub'; }
+			if (level === 2) { a.className = 'lpn-guide-nav-sub lpn-guide-nav-sub2'; }
 			a.appendChild(document.createTextNode(text));
 			if (snip) { a.appendChild(document.createTextNode(' ')); sn = document.createElement('span'); sn.className = 'lpn-guide-nav-snip'; sn.textContent = snip; a.appendChild(sn); }
 			if (key === cur) { a.setAttribute('aria-current', 'true'); }
-			nav.appendChild(a);
+			row.appendChild(a);
+			nav.appendChild(row);
+			rows.push(row);
 		}
 		box.querySelectorAll('.lpn-guide-section').forEach(function (sec) {
 			var h = sec.querySelector('h2'), key = sec.getAttribute('data-guide-section');
 			if (!h || sec.style.display === 'none') { return; }
 			sec.setAttribute('data-guide-key', key);
-			add(key, String(h.textContent || '').trim(), false, q ? guideSnippet(sec, q) : '');
+			add(key, String(h.textContent || '').trim(), 0, q ? guideSnippet(sec, q) : '');
 			// Menus, box groups and boxes, in reading order: a second level (a menu, a group) and, under
 			// a box group, a third (the box).
 			sec.querySelectorAll('.lpn-guide-menu, .lpn-guide-group, .lpn-guide-boxentry').forEach(function (el) {
-				var grouped = !!el.parentNode.closest('.lpn-guide-group'), a;
+				var grouped = !!el.parentNode.closest('.lpn-guide-group');
 				if (el.style.display === 'none') { return; }
 				if (grouped && el.parentNode.style.display === 'none') { return; }
-				add(el.getAttribute('data-guide-key'), String(el.querySelector('h3').textContent || '').trim(), true, '');
-				a = nav.lastChild;
-				if (grouped) { a.className = 'lpn-guide-nav-sub lpn-guide-nav-sub2'; }
+				add(el.getAttribute('data-guide-key'), String(el.querySelector('h3').textContent || '').trim(), grouped ? 2 : 1, '');
 			});
 		});
+		// A row has children when the next row is deeper. It then gets the chevron; the others a
+		// spacer of the same width, so every name starts on its level's edge.
+		rows.forEach(function (row, i) {
+			var next = rows[i + 1], lvl = +row.getAttribute('data-level'), has = !!next && +next.getAttribute('data-level') > lvl, lead;
+			if (has && !q) {
+				row.setAttribute('data-has', '1');
+				lead = document.createElement('button');
+				lead.type = 'button';
+				lead.className = 'lpn-guide-nav-chev';
+				lead.setAttribute('aria-expanded', 'true');
+				lead.setAttribute('aria-label', row.firstChild.textContent);
+				lead.innerHTML = '<svg class="lpn-guide-nav-chev-svg" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 6l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>';
+			} else {
+				lead = document.createElement('span');
+				lead.className = 'lpn-guide-nav-spacer';
+			}
+			row.insertBefore(lead, row.firstChild);
+		});
+		guideApplyNavFold();
 	}
 	var guideIO = null, guidePinKey = null, guidePinTop = 0;
 	function guideSetCurrent(key) {
@@ -44385,66 +44431,11 @@ var EngCalcs = EngCalcs || {};
 		}, { root: content, rootMargin: '0px 0px -70% 0px', threshold: [0, 1] });
 		content.querySelectorAll('[data-guide-key]').forEach(function (el) { guideIO.observe(el); });
 	}
-	// ---- Main headings collapse (Tom, 2026-10-09; Ida: a double-click is undiscoverable, so the
-	// heading carries a disclosure chevron and a single click, Enter or Space toggles, and a
-	// double-click toggles too, which is Tom's gesture). Nothing is remembered, not even in the
-	// browser: every opening of the page starts with every section open.
-	function guideSetCollapsed(sec, collapsed) {
-		var b;
-		if (!sec || !sec.classList || !sec.classList.contains('lpn-guide-section')) { return; }
-		b = sec.querySelector('h2 > .lpn-guide-disc');
-		sec.classList.toggle('lpn-guide-collapsed', !!collapsed);
-		if (b) { b.setAttribute('aria-expanded', collapsed ? 'false' : 'true'); }
-	}
-	function guideAutoExpand(sec) {
-		if (!sec.classList.contains('lpn-guide-collapsed')) { return; }
-		sec.setAttribute('data-guide-pre', '1');
-		guideSetCollapsed(sec, false);
-	}
-	function guideAutoRestore(sec) {
-		if (sec.getAttribute('data-guide-pre') !== '1') { return; }
-		sec.removeAttribute('data-guide-pre');
-		guideSetCollapsed(sec, true);
-	}
-	function guideWireDisclosure(box) {
-		box.querySelectorAll('.lpn-guide-section').forEach(function (sec) {
-			var h = sec.querySelector(':scope > h2'), b, label, id, svgEl;
-			if (!h || h.querySelector('.lpn-guide-disc')) { return; }
-			label = document.createElement('span');
-			while (h.firstChild) { label.appendChild(h.firstChild); }
-			b = document.createElement('button');
-			b.type = 'button';
-			b.className = 'lpn-guide-disc';
-			b.setAttribute('aria-expanded', 'true');
-			id = 'lpn_guide_sec_' + sec.getAttribute('data-guide-section');
-			sec.id = sec.id || id;
-			b.setAttribute('aria-controls', sec.id);
-			svgEl = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-			svgEl.setAttribute('class', 'lpn-guide-disc-chev');
-			svgEl.setAttribute('viewBox', '0 0 16 16');
-			svgEl.setAttribute('aria-hidden', 'true');
-			svgEl.innerHTML = '<path d="M4 6l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.8"/>';
-			b.appendChild(svgEl);
-			b.appendChild(label);
-			h.appendChild(b);
-			function flip(e) {
-				if (e && e.target && e.target.closest && e.target.closest('a')) { return; }
-				sec.removeAttribute('data-guide-pre');   // a deliberate choice outlasts the search
-				guideSetCollapsed(sec, !sec.classList.contains('lpn-guide-collapsed'));
-			}
-			// The whole heading row is the target, not only the words; a button's own Enter/Space
-			// arrives as a click. A double-click is click, click, dblclick: three flips, one net change.
-			h.addEventListener('click', flip);
-			h.addEventListener('dblclick', flip);
-		});
-	}
 	function guideGoto(key, focusIn) {
 		var content = guideContentEl(), el, pulseEl, heading;
 		if (!content) { return false; }
 		el = content.querySelector('[data-guide-key="' + String(key).replace(/"/g, '') + '"]');
 		if (!el || el.style.display === 'none') { return false; }
-		// A reader who goes to something inside a collapsed section wants to read it: open it first.
-		guideSetCollapsed(el.closest('.lpn-guide-section'), false);
 		content.scrollTop = Math.max(0, el.getBoundingClientRect().top - content.getBoundingClientRect().top + content.scrollTop);
 		guidePinKey = null;
 		guideSetCurrent(key);
@@ -44701,7 +44692,6 @@ var EngCalcs = EngCalcs || {};
 		var box = hotkeysBoxEl(), input = document.getElementById('lpn_guide_search');
 		if (!box) { return; }
 		if (input) { input.addEventListener('input', guideFilter); }
-		guideWireDisclosure(box);
 		var toggle = document.getElementById('lpn_guide_railtoggle'), head = box.querySelector('.lpn-guide-railhead'),
 			nav = document.getElementById('lpn_guide_nav');
 		try { hotkeysboxLayout.rail = (JSON.parse(localStorage.getItem(LPN_HOTKEYSBOX_KEY) || '{}') || {}).rail === 'closed' ? 'closed' : 'open'; }
@@ -44713,11 +44703,17 @@ var EngCalcs = EngCalcs || {};
 		window.addEventListener('resize', guideApplyRail);
 		if (nav) {
 			nav.addEventListener('click', function (e) {
-				var a = e.target && e.target.closest ? e.target.closest('a[data-guide-link]') : null;
+				var chev = e.target && e.target.closest ? e.target.closest('.lpn-guide-nav-chev') : null, a;
+				if (chev) { e.preventDefault(); e.stopPropagation(); guideToggleNav(chev.parentNode.getAttribute('data-key')); return; }
+				a = e.target && e.target.closest ? e.target.closest('a[data-guide-link]') : null;
 				if (!a) { return; }
 				e.preventDefault();
 				e.stopPropagation();
 				guideGoto(a.getAttribute('data-guide-link'), true);
+			});
+			nav.addEventListener('dblclick', function (e) {
+				var a = e.target && e.target.closest ? e.target.closest('a[data-guide-link]') : null, row = a && a.parentNode;
+				if (row && row.getAttribute('data-has') === '1') { e.preventDefault(); guideToggleNav(row.getAttribute('data-key')); }
 			});
 		}
 		// "/" inside the guide goes to its search; Ctrl+K opens the guide there from anywhere.
