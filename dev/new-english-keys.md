@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**40 still to read on master**, of 48 untranslated keys, of 2492 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**42 still to read on master**, of 50 untranslated keys, of 2494 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -175,7 +175,7 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   @@ NEEDS RULING
 
-## lpn_  (48, 40 to read @@ NEEDS RULING)
+## lpn_  (50, 42 to read @@ NEEDS RULING)
 
 - **`lpn_break_no`**
   > No
@@ -267,6 +267,9 @@ never edits a synonym.
 - **`lpn_hotkeys_zoomwin_def`**
   > Zoom Window: drag a rectangle to zoom to.
   @@ NEEDS RULING
+- **`lpn_junction_pattern_unknown`**
+  > No pattern in this project is named {id}, so the junction was left as it was.
+  @@ NEEDS RULING
 - **`lpn_link_end_same`**
   > From and To must be different nodes.
   @@ NEEDS RULING
@@ -285,6 +288,9 @@ never edits a synonym.
 - **`lpn_pane_copy_heads`**
   > Copy with column headings
   _Ruled 2026-10-09: Use proposed (Tom, calls page round 3)._
+- **`lpn_settings_default_pattern_implied`**
+  > None stated (pattern {id} is used)
+  @@ NEEDS RULING
 - **`lpn_settings_hover_card`**
   > Show the full label on hover
   @@ NEEDS RULING
@@ -326,7 +332,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**147 still to read**, of 150 new keys across 12 unmerged branch(es).
+**148 still to read**, of 151 new keys across 14 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -337,7 +343,9 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/bentley-interop (`43043b60`) — 101 new, 101 to read @@ NEEDS RULING
+### chore/roadmap-1010 (`6501551d`) — adds no English strings
+
+### feat/bentley-interop (`95872ba6`) — 99 new, 99 to read @@ NEEDS RULING
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -348,26 +356,11 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_alt_cat_topology_tip`**
   > Asset activation
   @@ NEEDS RULING
-- **`lpn_change_type_create_new`**
-  > Create new assets
-  @@ NEEDS RULING
-- **`lpn_change_type_customers_left`**
-  > A customer cannot be assigned per scenario, so the demand of these customers stays with the old junction and is not in this scenario's solve:
+- **`lpn_change_type_base_only`**
+  > Change type works in Base. A scenario can switch assets on and off in Active topology instead.
   @@ NEEDS RULING
 - **`lpn_change_type_line_alternative`**
   > {id}: {property} {value}, in alternative {alternative}
-  @@ NEEDS RULING
-- **`lpn_change_type_not_carried`**
-  > The new assets cannot hold these values. The old assets keep them:
-  @@ NEEDS RULING
-- **`lpn_change_type_old_controls`**
-  > These controls and rules refer to an old asset, which is inactive in this scenario, so they are left out of this scenario's run and its .inp export:
-  @@ NEEDS RULING
-- **`lpn_change_type_scenario_ask`**
-  > Current scenario is not Base. Create new assets? The selected assets become inactive in this scenario.
-  @@ NEEDS RULING
-- **`lpn_change_type_switch_base`**
-  > Switch to Base
   @@ NEEDS RULING
 - **`lpn_control_inactive_note`**
   > These controls refer to an asset that is inactive in this scenario, so they are ignored in its run: {ids}
@@ -565,13 +558,16 @@ build for that would be a gate nobody keeps. Refresh it with
   > Top left corner
   @@ NEEDS RULING
 - **`lpn_sm_add_base`**
-  > Add Base
+  > Add base
   @@ NEEDS RULING
 - **`lpn_sm_add_base_tip`**
   > Add another Base to this tree. A Base has no parent.
   @@ NEEDS RULING
 - **`lpn_sm_add_child`**
-  > Add a child of the selected item
+  > Add child
+  @@ NEEDS RULING
+- **`lpn_sm_base_kept`**
+  > The Base of a tree is not deleted. Another Base added with Add base is deleted when nothing uses it.
   @@ NEEDS RULING
 - **`lpn_sm_basic_off`**
   > Basic mode is off, so the Scenario manager and the Scenarios table are shown.
@@ -584,6 +580,9 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 - **`lpn_sm_copy`**
   > Copy scenario…
+  @@ NEEDS RULING
+- **`lpn_sm_copy_alt`**
+  > Copy
   @@ NEEDS RULING
 - **`lpn_sm_copy_ask`**
   > Copy the scenario {name}. Make its own copies of the alternatives it uses, or share them? A shared alternative changes in every scenario that uses it.
@@ -599,6 +598,9 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 - **`lpn_sm_delete`**
   > Delete the selected item. A used item is not deleted.
+  @@ NEEDS RULING
+- **`lpn_sm_help`**
+  > Create and organize scenarios and alternatives and their inheritance here. Choose Alternatives for Scenarios in the Scenarios table.
   @@ NEEDS RULING
 - **`lpn_sm_hint`**
   > Drag an item onto another to make it a child of that item. Drag between two items to reorder them. Click a selected item or press F2 to rename it, Delete to delete it, Enter to make a scenario current. Right-click for more.
@@ -673,7 +675,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Points data<br />(use Copy to see format)
   @@ NEEDS RULING
 
-### feat/user-guide (`8fb6434e`) — 45 new, 45 to read @@ NEEDS RULING
+### feat/user-guide (`386d3e32`) — 45 new, 45 to read @@ NEEDS RULING
 
 - **`lpn_guide_about_heading`**
   > About this calculator
@@ -813,4 +815,16 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/visit-dedupe (`7b4a84bd`) — adds no English strings
 
-### fix/ewb-meeting (`4953af70`) — adds no English strings
+### fix/demand-pattern (`d75c9ec2`) — adds no English strings
+
+### fix/split-and-hide (`744f8cdb`) — 3 new, 3 to read @@ NEEDS RULING
+
+- **`lpn_split_no`**
+  > No
+  @@ NEEDS RULING
+- **`lpn_split_pipe_ask`**
+  > Split pipe {id} at this node?
+  @@ NEEDS RULING
+- **`lpn_split_yes`**
+  > Yes
+  @@ NEEDS RULING

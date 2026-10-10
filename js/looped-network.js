@@ -23718,12 +23718,20 @@ var EngCalcs = EngCalcs || {};
 	// pattern, written through the demand list's one door so a scenario overrides it whole. Blank
 	// is Default: the project's Default demand pattern, which is what the run applies.
 	function paneColDemandPattern() {
-		return { key: 'demandPattern', label: 'lpn_field_demand_pattern', em: 5,
+		return { key: 'demandPattern', label: 'lpn_field_demand_pattern', em: 5, lenient: true,
 			choices: function () { return paneChoicesPatterns(lpnBlankIsDefault()); },
 			get: function (n) { return ownDemandPattern(n) || ''; },
 			plainFor: function (n) { return hasDemandBreakdown(n); },
 			set: function (n, v) {
-				var id = v || null;
+				var id = v || null, pc = EngCalcs.pageConfig || {};
+				// A name nothing answers to is not written (a dangling reference is a run that
+				// fails in EPANET), and the reader is told, as the customer table does.
+				if (id && !libPatternsRead().some(function (p) { return p.id === id; })) {
+					setNotice(String(pc.lpn_junction_pattern_unknown ||
+						'No pattern in this project is named {id}, so the junction was left as it was.')
+						.split('{id}').join(id));
+					return;
+				}
 				if ((ownDemandPattern(n) || null) === id) { return; }
 				editDemandRows(n, function (rows) { rows[0].pattern = id; });
 			} };
@@ -25657,7 +25665,10 @@ var EngCalcs = EngCalcs || {};
 			return { ok: false };
 		}
 		if (c.choices) {
-			return { ok: c.choices().some(function (o) { return o[0] === t; }), v: t };
+			// `lenient`: a REFERENCE to a library entry another project holds (a pasted junction table
+			// names patterns this project has not got). The row is still made; the cell's setter
+			// leaves the reference out and says so, instead of refusing the whole paste.
+			return { ok: !!c.lenient || c.choices().some(function (o) { return o[0] === t; }), v: t };
 		}
 		if (c.str) { return { ok: true, v: t }; }
 		if (t !== '' && !isFinite(+t)) { return { ok: false }; }
