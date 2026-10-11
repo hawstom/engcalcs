@@ -12266,12 +12266,16 @@ var EngCalcs = EngCalcs || {};
 		}
 		l.verts.splice(bestI, 0, { x: pt.x, y: pt.y });
 		rebuildLink(l);
+		// A bend drag reaches scheduleSolve() through updateVertex(); a click did not, so the
+		// autosave (which rides this debounce) never saw the edit until some other one came along.
+		scheduleSolve();
 	}
 	function removeVertex(linkId, vidx) {
 		saveUndoSnapshot();
 		var l = linkById(linkId);
 		l.verts.splice(vidx, 1);
 		rebuildLink(l);
+		scheduleSolve();
 	}
 
 	// ---- zoom-extent: fits the actual rendered extent (symbol radius, label text box, link
