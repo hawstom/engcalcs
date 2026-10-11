@@ -28994,11 +28994,6 @@ var EngCalcs = EngCalcs || {};
 			});
 		}
 		mk(pc.lpn_pane_goto_tip || 'Zoom & select', function () { selectAndZoomTo(targets); openMultiProperties(); });
-		if (aim && (aim.group === 'node' || aim.group === 'link')) {
-			mk(pc.lpn_match_menu || 'Match properties', function () {
-				startMatchProperties({ kind: aim.group, id: aim.id }, selectedRefs());
-			});
-		}
 		// **SELECTION ONLY, offered only when the map has a selection** (or the filter is on, so it
 		// can be turned off from here). It acts on the MAP's selection, not on the rows clicked.
 		if (selections.length || paneSelFilter) {
@@ -47499,8 +47494,8 @@ var EngCalcs = EngCalcs || {};
 	// (as applicable)"*), the AutoCAD MATCHPROP ----
 	//
 	// A tool in the Delete tool's shape: choose the SOURCE, then press each DESTINATION in turn.
-	// Escape or a right-click ends it. Its doors are Edit > Match properties, the Tables row menu,
-	// and a right-click on an asset in Select mode.
+	// Escape or a right-click ends it. Its doors are Edit > Match properties and a right-click on an
+	// asset in Select mode. NOT the Tables right-click: that menu is a spreadsheet's rows (Tom, 2026-09-21).
 	//
 	// **THE PROPERTY LIST IS THE TABLES PANE'S OWN COLUMN SPEC, NOT A LIST OF OURS** -- the same
 	// reuse the multi-properties box makes (see multiGroups()). Each column already knows its

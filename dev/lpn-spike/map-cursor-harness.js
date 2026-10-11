@@ -219,7 +219,7 @@ const CROSSHAIR = ['add-junction', 'add-reservoir', 'add-tank', 'add-pipe', 'add
 // NOT crosshair, each for its own stated reason: `select` acts on the object under the pointer,
 // `delete` does too (so `pointer` is the true thing to say), and `vertices` already states its own
 // rule per element in the stylesheet.
-const PLAIN = ['select', 'delete', 'vertices'];
+const PLAIN = ['select', 'delete', 'vertices', 'match'];
 
 CROSSHAIR.forEach(function (m) {
 	L.setMode(m);
