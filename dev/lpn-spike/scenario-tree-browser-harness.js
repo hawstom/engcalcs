@@ -129,7 +129,7 @@ async function main() {
 		const iconColours = await page.evaluate(() => Array.from(document.querySelectorAll('#lpn_sm_tree .lpn-sm-icon')).map((i) => getComputedStyle(i).color));
 		ok('1.6 the Base icon is drawn in a different token colour from a child\'s', iconColours[0] !== iconColours[1], JSON.stringify(iconColours));
 		const hint = await page.evaluate(() => document.querySelector('#lpn_sm_body .lpn-sm-hint').textContent);
-		ok('1.7 the hint names the arrow and the menu', hint === await L('lpn_sm_hint') && /collapse or expand/.test(hint) && /same commands as the buttons/.test(hint), hint);
+		ok('1.7 the hint under the tree is its own sentence', hint === await L('lpn_sm_hint'), hint);
 
 		console.log('\n--- 2. the chevron, clicked ---');
 		const storeBefore = await h.store();

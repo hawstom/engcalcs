@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**190 still to read on master**, of 201 untranslated keys, of 2639 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**189 still to read on master**, of 200 untranslated keys, of 2638 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -175,7 +175,7 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   @@ NEEDS RULING
 
-## lpn_  (201, 190 to read @@ NEEDS RULING)
+## lpn_  (200, 189 to read @@ NEEDS RULING)
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -344,9 +344,6 @@ never edits a synonym.
   @@ NEEDS RULING
 - **`lpn_guide_how_popup`**
   > Properties opens when you select an asset or text.
-  @@ NEEDS RULING
-- **`lpn_guide_how_sm`**
-  > Scenario manager is listed under Water, Scenarios.
   @@ NEEDS RULING
 - **`lpn_guide_keys_def`**
   > <table class="lpn-notes-table"><tbody><tr><td>?</td><td>Open the guide at the control under the pointer or holding focus.</td></tr><tr><td>F1</td><td>Open the guide at the entry for the box that has focus.</td></tr><tr><td>Ctrl+K</td><td>Open the guide with the current selection in the search field.</td></tr><tr><td>/</td><td>Select the search field while the guide has focus.</td></tr><tr><td>Esc</td><td>Close the guide and return to where you were.</td></tr></tbody></table>
@@ -785,7 +782,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**16 still to read**, of 19 new keys across 14 unmerged branch(es).
+**40 still to read**, of 43 new keys across 15 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -796,9 +793,13 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/advisers-1011 (`388dbad8`) — adds no English strings
+### chore/advisers-1011 (`c39e12cf`) — 1 new, 1 to read @@ NEEDS RULING
 
-### feat/bentley-interop (`364bb09e`) — adds no English strings
+- **`points_data_points_heading`**
+  > Points data<br />(use Copy to see format)
+  @@ NEEDS RULING
+
+### feat/bentley-interop (`aa94894b`) — adds no English strings
 
 ### feat/desktop (`baba0f04`) — adds no English strings
 
@@ -824,13 +825,13 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`2e5e81c4`) — adds no English strings
 
-### feat/match-property (`9b4709d4`) — 9 new, 9 to read @@ NEEDS RULING
+### feat/match-property (`2acd9c69`) — 14 new, 14 to read @@ NEEDS RULING
 
 - **`lpn_match_done_many`**
-  > Matched {m} assets to {id}: {n} properties copied.
+  > Matched {m} assets to {id}. Values changed: {n}.
   @@ NEEDS RULING
 - **`lpn_match_done_one`**
-  > Matched {to} to {id}: {n} properties copied.
+  > Matched {to} to {id}. Values changed: {n}.
   @@ NEEDS RULING
 - **`lpn_match_kind`**
   > Match properties applies to nodes and pipes, pumps, and valves only.
@@ -844,8 +845,20 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_match_selected_ask`**
   > Apply the properties of {id} to the {n} other selected assets?
   @@ NEEDS RULING
+- **`lpn_match_selected_ask_one`**
+  > Apply the properties of {id} to the other selected asset?
+  @@ NEEDS RULING
+- **`lpn_match_skip_breakdown`**
+  > Not copied: {n} (demand is a list of categories).
+  @@ NEEDS RULING
+- **`lpn_match_skip_scn`**
+  > Not copied: {n} (they cannot differ by scenario).
+  @@ NEEDS RULING
+- **`lpn_match_skip_valve`**
+  > Not copied: {n} (the valve types differ).
+  @@ NEEDS RULING
 - **`lpn_match_tip`**
-  > Copy the properties of one asset to others. Specify the source, then each asset to change. ID, location, end nodes, description, and tag are never copied. Assets of a different type receive only the properties both types have.
+  > Copy the properties of one asset to others. Select the source, then each asset to change. Identity, location, and connections are never copied, and neither is status (Active, Shut). Assets of a different type receive only the properties both types have.
   @@ NEEDS RULING
 - **`lpn_mode_match`**
   > Mode: Match properties. Select the asset to copy properties from. Press Escape to cancel.
@@ -853,15 +866,69 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_mode_match_dest`**
   > Mode: Match properties. Select each asset to receive the properties of {id}. Press Escape or right-click when finished.
   @@ NEEDS RULING
-
-### feat/section-grid (`005d4e63`) — 1 new, 1 to read @@ NEEDS RULING
-
 - **`points_data_points_heading`**
   > Points data<br />(use Copy to see format)
   @@ NEEDS RULING
 
-### feat/snap (`c22988d5`) — 2 new, 2 to read @@ NEEDS RULING
+### feat/shape (`a1d7679c`) — 17 new, 17 to read @@ NEEDS RULING
 
+- **`lpn_file_import_geojson`**
+  > Import GeoJSON shapes…
+  @@ NEEDS RULING
+- **`lpn_file_import_geojson_tip`**
+  > Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network from an EPANET file. The project must be georeferenced or state a coordinate system.
+  @@ NEEDS RULING
+- **`lpn_geojson_import_done`**
+  > {n} Shapes imported from {file}.
+  @@ NEEDS RULING
+- **`lpn_geojson_import_holes`**
+  > {n} polygon holes not imported. A Shape has one boundary.
+  @@ NEEDS RULING
+- **`lpn_geojson_import_local`**
+  > GeoJSON positions are latitude and longitude, and this project has no place on the Earth to which they can be converted. Georeference it first with Map, World map, Attach, then import again.
+  @@ NEEDS RULING
+- **`lpn_geojson_import_parts`**
+  > {n} multipart features imported as one Shape for each part.
+  @@ NEEDS RULING
+- **`lpn_geojson_import_skipped`**
+  > {n} features not imported: {list}.
+  @@ NEEDS RULING
+- **`lpn_geojson_import_unreadable`**
+  > {file} is not a GeoJSON file: {detail}
+  @@ NEEDS RULING
+- **`lpn_geojson_import_why_geometry`**
+  > not a point, line, or polygon
+  @@ NEEDS RULING
+- **`lpn_geojson_import_why_network`**
+  > network asset
+  @@ NEEDS RULING
+- **`lpn_geojson_import_why_position`**
+  > position not a valid latitude and longitude
+  @@ NEEDS RULING
+- **`lpn_mode_add_shape`**
+  > Mode: Add Shape. Specify each point of the Shape. Specify the last point again, press Enter, or right-click to finish; a Shape of one point is a point. Specify the first point again to close the Shape into a polygon. Press Escape to discard the Shape being drawn.
+  @@ NEEDS RULING
+- **`lpn_snap_node_on_node`**
+  > {new} placed at the location of {target}. The two nodes are not connected.
+  @@ NEEDS RULING
+- **`lpn_snap_shape_point`**
+  > {shape}, point {n}
+  @@ NEEDS RULING
+- **`lpn_snap_vertex`**
+  > {link}, vertex {n}
+  @@ NEEDS RULING
+- **`lpn_tool_add_shape`**
+  > Shape
+  @@ NEEDS RULING
+- **`lpn_tool_add_shape_tip`**
+  > Draw a point, a polyline, or a polygon on the map. A Shape is annotation and is not part of the network. Specify each point, then specify the last point again, press Enter, or right-click to finish. Specify the first point again to close the Shape into a polygon.
+  @@ NEEDS RULING
+
+### feat/snap (`6a4347a7`) — 3 new, 3 to read @@ NEEDS RULING
+
+- **`lpn_snap_moved_on_node`**
+  > {moved} moved to the location of {target}. The two nodes are not connected.
+  @@ NEEDS RULING
 - **`lpn_snap_node_on_node`**
   > {new} placed at the location of {target}. The two nodes are not connected.
   @@ NEEDS RULING
@@ -869,7 +936,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > {link}, vertex {n}
   @@ NEEDS RULING
 
-### feat/tank-volume (`42f75c7f`) — 4 new, 4 to read @@ NEEDS RULING
+### feat/tank-volume (`31985741`) — 4 new, 4 to read @@ NEEDS RULING
 
 - **`lpn_result_depth`**
   > Depth
@@ -881,7 +948,13 @@ build for that would be a gate nobody keeps. Refresh it with
   > Usable volume
   @@ NEEDS RULING
 - **`lpn_result_tank_volume_tip`**
-  > Volume of water above the lowest water depth, so it is zero when the tank is at its minimum. EPANET's own tank volume also counts the water below the minimum level.
+  > Volume of water above the lowest water depth, so it is zero at that depth. The EPANET tank volume also includes the water below the lowest water depth, which still counts toward mixing and water age, so the tank elevation stays at the tank bottom.
   @@ NEEDS RULING
 
 ### feat/visit-dedupe (`7b4a84bd`) — adds no English strings
+
+### fix/vertex-autosave (`0bfd2ac5`) — 1 new, 1 to read @@ NEEDS RULING
+
+- **`points_data_points_heading`**
+  > Points data<br />(use Copy to see format)
+  @@ NEEDS RULING

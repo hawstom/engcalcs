@@ -2636,7 +2636,6 @@ EngCalcs.pageConfig = {
 	lpn_help_manual: <?=json_encode($ec_lang['lpn_help_manual'])?>,
 	lpn_guide_also: <?=json_encode($ec_lang['lpn_guide_also'])?>,
 	lpn_guide_how_popup: <?=json_encode($ec_lang['lpn_guide_how_popup'])?>,
-	lpn_guide_how_sm: <?=json_encode($ec_lang['lpn_guide_how_sm'])?>,
 	lpn_sm_help: <?=json_encode($ec_lang['lpn_sm_help'])?>,
 	lpn_guide_not_shown: <?=json_encode($ec_lang['lpn_guide_not_shown'])?>,
 	lpn_guide_box_help: <?=json_encode($ec_lang['lpn_guide_box_help'])?>,

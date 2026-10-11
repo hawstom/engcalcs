@@ -47329,7 +47329,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	function guideNoPoint(card) {
 		var pc = EngCalcs.pageConfig || {}, id = String(card.id || '').replace(/^lpn_guide_b_/, ''),
-			how = id === 'lpn_popup' ? pc.lpn_guide_how_popup : (id === 'lpn_sm_box' ? pc.lpn_guide_how_sm : ''),
+			how = id === 'lpn_popup' ? pc.lpn_guide_how_popup : '',
 			n = guideSpan('lpn-guide-nopoint', (pc.lpn_guide_not_shown || 'This control is not on screen right now.') + (how ? ' ' + how : '')), host;
 		guideClearPoint();
 		if (card.classList.contains('lpn-guide-boxentry')) { host = card.querySelector('h3'); if (host) { host.parentNode.insertBefore(n, host.nextSibling); } return; }
