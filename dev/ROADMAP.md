@@ -66,137 +66,6 @@ the block.
 
 ## 100 — Next.
 
-- 100|539| **Gang the neighbour labels so their leaders stop crossing.**
-  **PORTING THE BENCH TO MASTER, 2026-10-07** (Tom agreed D09: rules 1-3 as three defect branches;
-  stability is a criterion of low weight). Rule 1, clean ground first, MERGED (`fix/label-clean-ground`):
-  node labels over pipes -26%, leaders through node symbols -42%, labels shown flat, pass ~8% slower.
-  Rule 2, rescue search: TAKEN OUT 2026-10-07 (Tom: *"Too expensive. Don't keep it."*; +1.0 label per
-  100 for ~7% time). Rule 3, eviction, measured and NOT ported: +0.24 per 100 for ~11% (one neighbour).
-  His price: a rule must buy a large gain per percent of pass time. The pass is now ~98 ms on Novato
-  all-fields (Task 681(b), 2026-10-08, was ~254), so later percentages are of the smaller number.
-  **REBUILD FROM RULES, 2026-09-28:** rules reviewed (`dev/label-placement-rules.md`), bench and
-  seam built, two clean-room placers done and both fail R-075; state in the handoff.
-  **DROPPED TO 75 BY TOM, 2026-09-17** (*"Task 539: Demote to 75"*). Built on
-  `feat/label-gang-search`, port 8090, and **he has notes on it he has not yet been able to
-  write up** -- so the branch waits on his reading, not on more building.
-  Tom, 2026-08-26, on a screenshot of two crossing leaders: *"when it looks so easy (to a human) to
-  resolve, it's embarrassing."* All three phases are built and measured; every measured view of
-  every shipped example is at **0 crossings**, at a cost of 38 hidden labels across 28 views.
-  Numbers, both of his routes, the flicker repair and the measurement defect found with it:
-  `dev/label-placement-algorithms.md` §8-§11d.
-  - **START THE BRANCH. Tom, 2026-09-15: *"I would want to get this branch started on the grounds
-    that having a better network model could improve our performance placing labels."*** That is a
-    better reason than the one `spot_prime` was parked on, and it supersedes it. The case against
-    was that none of the five residual pairs is a gang with free labels and open ground, so a search
-    could fix none of them -- true, and it measures the wrong thing. **His argument is that the
-    MODEL is the asset**, not this week's crossing count: a count already at zero cannot show
-    whether the placement is GOOD, only that it is not embarrassing.
-  - **The five pairs left anywhere have BOTH halves hand-placed by the user, and an automatic pass
-    may not hide a hand-placed label.** That bounds what the branch may touch; they are named by id
-    in the harness.
-  - **HIS SPOT_PRIME MODEL WAS NEVER GIVEN A COLLEGE TRY, AND HE ASKED WHY ON 2026-09-21**: *"I
-    don't understand why we are spending effort on the rings model instead of giving the spot-prime
-    box model a good college try."* **The honest answer is that of his four steps only step 4 was
-    built** -- ordering a stack by the angle of the node each label belongs to, which shipped as the
-    gang route. Steps 1 to 3, finding the prime open ground and sizing `box_est` in it, were not,
-    because `dev/label-placement-algorithms.md` §9d says *"Not settled, and his own flag: how
-    `spot_prime` is found. Report back before building it"* -- **and nobody ever reported back**,
-    though he had written *"I waved my wand over finding spot-prime; if it's hard, let me know."*
-    The rings work got the effort because it was reachable. That is a reason about us, not about
-    the two models.
-  - **THE FIRST STEP IS CHEAP AND IS ALREADY HALF PRESENT (his R-079):** the node's table of every
-    gap between its pipes is already computed and already survives a zoom, and the code then throws
-    all but the biggest away. **Publishing it as a RANKED LIST instead of a single winner is a
-    change where it is consumed, not a new model.** Not built yet, and it is step 1 of the
-    spot_prime hunt rather than a separate errand. Do that, then report back on how spot_prime is
-    found, which is the thing he asked to be told.
-  - `dev/lpn-spike/label-stability-harness.js` asserts the LAYOUT and the shed's victims rather than
-    the count, so a model change that oscillates is caught instead of averaged away -- which is how
-    the A B A B A flicker got through the first time. §9b is `spot_prime`; §10c and §11e are his.
-- 100|676| **Watch the sites, and send a derived weekly report.**
-  Tom, 2026-09-15: *"mistakes like the site outages and merging difficult development branches to
-  master before proper vetting can no longer be the matter of course."* Plan, the corrected
-  diagnosis, and the things deliberately NOT to do: `dev/reputation-and-practice.md`.
-  - **PHASES 1, 1a AND 2 ARE CLOSED, and phase 1 closed by DISCOVERY rather than by building.** The
-    uptime watch already existed on the host and the plan could not see it, because the watch was
-    not in this repository. It is now, in `dev/host/`. **That is the finding worth keeping: a
-    diagnosis written from inside one tree could not see a working machine one directory outside
-    it.**
-  - **PHASE 2 IS A HEARTBEAT, NOT A SUMMARY** -- `dev/scripts/daily_report.sh`, 20:00 daily on
-    Tom's own offer of the faster cadence. The alarm is silent on success, so a healthy site and a
-    dead cron are the same silence; the report arriving is what separates them.
-  - **`sendmail` EXITED 0 DURING ALL 22,907 BOUNCES**, so an exit code was never evidence of
-    delivery. Phase 1a is proven at the far end, with Tom confirming receipt unprompted.
-  - **TWO OF THAT LIST ARE CLOSED AND ONE WAS A MISREADING (2026-09-17).**
-    - **GitHub branch protection is DECLINED and is not an ask any more.** Tom, 2026-09-16: *"I'm
-      sorry. I can't bring myself to do that."* His call, and the gap it would have closed is narrow
-      -- a clone or another machine with no hooks -- which `hook_install_check.php` already reports
-      on every suite run. **A gate he works around would be worse than none**, which is this
-      project's own rule. Do not re-propose it.
-    - **THE SIBLING PRE-PUSH IS BUILT AND INSTALLED IN BOTH REPOSITORIES.** Verified 2026-09-17:
-      `~/webdev/librewaternet.org/.git/hooks/pre-push` and the same in `~/webdev/not-epanet.org`
-      refuse a push unless `sh check.sh` passes, and both pass today with nothing unpushed. It runs
-      the suite rather than reading a stamp, deliberately: `check.sh` is under two seconds there, so
-      running it is cheaper than the machinery for not running it.
-    - **"THE ACCOUNT IS AT 96% DISK" WAS A MISREADING OF WHOSE DISK.** Measured on the host
-      2026-09-17: `/dev/md125` is 7.0 TB at 95% with 372 GB free, and that is the SHARED filesystem
-      every tenant sits on. **This account uses 6.3 GB of it and has no quota**, of which 2.3 GB is
-      cPanel's own `~/tmp/analog` stats cache and 1.9 GB is archived access logs. So clearing the
-      22,907 bounces (13 MB of mail in total) frees nothing that matters and is not urgent. **The
-      risk is real and is not ours to fix**: if the shared volume fills, the site goes down whoever
-      filled it. Worth knowing; not worth a task.
-  - **STILL OPEN:** whether the nightly 622 pages also want six URLs every fifteen minutes (a cost
-    question about a shared host, and nobody has been asked); then the portable kit.
-  - **AND THE RELEASE QUESTION IS ANSWERED IN PRACTICE, NOT ONLY ON PAPER.** `release/ewb` is cut
-    from `81792180`, the SHA Tom had deployed, and pushed. CLAUDE.md's Git Workflow carries the
-    procedure and the correction of the 2026-09-13 advice that a clean release could not be
-    extracted.
-- 100|681| **Economize the label layout: it is half the cost of a project switch.**
-  **(c)/(d) MERGED 2026-10-03** (`feat/label-cache`, Tom: *"I am impressed. This is a major efficiency
-  feature. Done."*): a bank per wheel notch, rounded outward, final; revisits run no pass (Novato ~85 -> ~13 ms). (e) already existed (one pass per wheel
-  burst). **(b) on `perf/label-pass`, 2026-10-07:** the same layout, labelPass 254 -> 98 ms (Novato, every field
-  on, Chrome); certain shed rungs not drawn, ring search cut to the grid. `label-pass-economy-browser-harness.js`.
-  Tom, 2026-09-16: *"if laying out the labels takes 2 sec, we have to figure out how to economize."*
-  - **THE NUMBER IS HIS: the label pass is 56% of `buildDom`**, which is about 1.9 s of his 4.6 s
-    switch into a geographic Net3 with every field on. Here, on a machine 6x faster, the same pass is
-    306 ms.
-  - **THE MEASURING IS ALREADY FIXED AND IS NOT WHAT IS LEFT.** `measuredTextWidth()` banks every answer
-    on (class, size, string): 8,140 browser measurements a switch became 100 once warm. What remains
-    is composing the rows, the first-fit, the ring pass, the gang repair and the shed -- arithmetic
-    and DOM writes, not layout reads.
-  - **(a) IS DONE, 2026-09-16.** The pass ran at the outgoing project's zoom and was superseded by
-    the view restore moments later; `buildDom()` now defers it and `refreshAllFromDocument()` runs
-    it once, after the camera is where it belongs. With Task 680's keep on top, a switch runs the
-    pass ZERO times.
-    (b) `dev/label-placement-algorithms.md` section 1 says the published engines run a cheap first
-    approximation before any search, and we have the search without it. (c) A label whose content
-    and scale have not changed since the last pass could keep its placement, which is the same
-    "keep what you already worked out" argument as Task 680.
-  - **(d) TOM'S OWN PROPOSAL, 2026-09-17: bank the answer PER ZOOM LEVEL.** *"We should be able to
-    save label position and shedding state for every node at every zoom level. And I assume that
-    that would give us almost instantaneous zooming."* It is (c) with a key, and the key is the
-    hard part. **It does NOT require Task 683's snapping and must not be built as though it does**
-    (Franco, 2026-09-17): key the cache on a ROUNDED BUCKET of the continuous scale and let the view
-    go on tracking the fingers exactly. What still needs his seat is the reading question -- banked
-    positions do not slide as you pinch, they JUMP between buckets, and the moment that is likeliest
-    to happen is the last half-second before a tap, which is the worst instant for a label to
-    relocate in a tight cluster.
-    - **TOM RULED IT AFTER 680's SECOND HALF, 2026-09-17, and gave the design rule that matters:**
-      *"What we need to be vigilant for is unnecessary passes. We have to be aware of whether the
-      pre-placements are final or not. I would agitate for using the next more zoomed out (larger
-      text) bucket and not revisiting it. And of course the buckets should correlate to the PC mouse
-      zoom levels."* **Round OUTWARD, never to nearest**, and treat a bucket's answer as final rather
-      than as a first guess to refine -- a refinement pass is the cost this whole task exists to
-      remove. Bucket boundaries follow the wheel's own notches (Task 683), **as a cache key and never
-      as a view snap** (Task 683 rules the view out).
-  - **(e) AND A PLACEMENT DELAY WHILE THE WHEEL IS STILL TURNING.** Tom, same day: *"if a person is
-    scrolling fast, there is no label placement recalculation until they stop. Maybe this is already
-    done, because the truth is that zoom performance is not terrible on Net3."* **Check before
-    building** -- `scheduleReshed()` is already deferred and `onZoomChanged()` already skips the
-    whole pipeline while annotation is hidden, so some of this exists. Measure what a fast wheel
-    burst actually costs before adding a second timer.
-  - Read with `dev/label-placement-algorithms.md` section 12 and `?debug=perf`, which now prints
-    `labelPass` inside `buildDom` and a label-measurement count.
 - 100|721| **The scenario and alternatives model: Bentley's tree, plus Presentation and Calculation.**
   Tom, 2026-09-25: *"I like the layered scenario alternatives paradigm."* The destination is
   Bentley's model (a scenario tree; each scenario picks one alternative per category; alternatives
@@ -257,16 +126,58 @@ the block.
   selection set from menu choices (his leading candidate: Highlighted / Chosen), and an audit of tip
   pollution in lpn (status strip, click-to-open, delays in master styles, tips that talk down).
   Ida's audit: `dev/tip-and-selection-audit.md` (branch `chore/ida-tip`); decisions go to him as an interview.
-- 100|775| **File, Convert as: what is left of the Fotobi, Ghana session.**
-  Tom, 2026-10-06. FIXED: Convert as on an empty project opened a file picker (it now opens the box).
-  NOT REPRODUCED: the old project losing its node symbols and its view after a conversion
-  (`convert-as-fotobi-harness.js`, four paths, master and production 9c71d54f); ask which surface.
-  MERGED 2026-10-07 (`feat/web-mercator`, Tom: "Merge."): EPSG:3857 is a real projected project in
-  metres, lengths on the ground, 4326 marked suggested. Open: only the unreproduced symbol loss.
 - 100|782| **Snap to asset, and Match properties: the small tools that replace Change type.**
   Tom, 2026-10-10: if nobody else does Change type, *"abandon the project and institute a variety of smaller
   and better tools: Snap/magnet to asset; Match properties from one asset to others (as applicable); Change
   link connections (done); Split pipe (done)."* Seam: Task 779 snapping to shape points.
+- 75|539| **Gang the neighbour labels so their leaders stop crossing.**
+  **DEMOTED TO 75 by Tom, 2026-10-11.**
+  **PORTING THE BENCH TO MASTER, 2026-10-07** (Tom agreed D09: rules 1-3 as three defect branches;
+  stability is a criterion of low weight). Rule 1, clean ground first, MERGED (`fix/label-clean-ground`):
+  node labels over pipes -26%, leaders through node symbols -42%, labels shown flat, pass ~8% slower.
+  Rule 2, rescue search: TAKEN OUT 2026-10-07 (Tom: *"Too expensive. Don't keep it."*; +1.0 label per
+  100 for ~7% time). Rule 3, eviction, measured and NOT ported: +0.24 per 100 for ~11% (one neighbour).
+  His price: a rule must buy a large gain per percent of pass time. The pass is now ~98 ms on Novato
+  all-fields (Task 681(b), 2026-10-08, was ~254), so later percentages are of the smaller number.
+  **REBUILD FROM RULES, 2026-09-28:** rules reviewed (`dev/label-placement-rules.md`), bench and
+  seam built, two clean-room placers done and both fail R-075; state in the handoff.
+  **DROPPED TO 75 BY TOM, 2026-09-17** (*"Task 539: Demote to 75"*). Built on
+  `feat/label-gang-search`, port 8090, and **he has notes on it he has not yet been able to
+  write up** -- so the branch waits on his reading, not on more building.
+  Tom, 2026-08-26, on a screenshot of two crossing leaders: *"when it looks so easy (to a human) to
+  resolve, it's embarrassing."* All three phases are built and measured; every measured view of
+  every shipped example is at **0 crossings**, at a cost of 38 hidden labels across 28 views.
+  Numbers, both of his routes, the flicker repair and the measurement defect found with it:
+  `dev/label-placement-algorithms.md` §8-§11d.
+  - **START THE BRANCH. Tom, 2026-09-15: *"I would want to get this branch started on the grounds
+    that having a better network model could improve our performance placing labels."*** That is a
+    better reason than the one `spot_prime` was parked on, and it supersedes it. The case against
+    was that none of the five residual pairs is a gang with free labels and open ground, so a search
+    could fix none of them -- true, and it measures the wrong thing. **His argument is that the
+    MODEL is the asset**, not this week's crossing count: a count already at zero cannot show
+    whether the placement is GOOD, only that it is not embarrassing.
+  - **The five pairs left anywhere have BOTH halves hand-placed by the user, and an automatic pass
+    may not hide a hand-placed label.** That bounds what the branch may touch; they are named by id
+    in the harness.
+  - **HIS SPOT_PRIME MODEL WAS NEVER GIVEN A COLLEGE TRY, AND HE ASKED WHY ON 2026-09-21**: *"I
+    don't understand why we are spending effort on the rings model instead of giving the spot-prime
+    box model a good college try."* **The honest answer is that of his four steps only step 4 was
+    built** -- ordering a stack by the angle of the node each label belongs to, which shipped as the
+    gang route. Steps 1 to 3, finding the prime open ground and sizing `box_est` in it, were not,
+    because `dev/label-placement-algorithms.md` §9d says *"Not settled, and his own flag: how
+    `spot_prime` is found. Report back before building it"* -- **and nobody ever reported back**,
+    though he had written *"I waved my wand over finding spot-prime; if it's hard, let me know."*
+    The rings work got the effort because it was reachable. That is a reason about us, not about
+    the two models.
+  - **THE FIRST STEP IS CHEAP AND IS ALREADY HALF PRESENT (his R-079):** the node's table of every
+    gap between its pipes is already computed and already survives a zoom, and the code then throws
+    all but the biggest away. **Publishing it as a RANKED LIST instead of a single winner is a
+    change where it is consumed, not a new model.** Not built yet, and it is step 1 of the
+    spot_prime hunt rather than a separate errand. Do that, then report back on how spot_prime is
+    found, which is the thing he asked to be told.
+  - `dev/lpn-spike/label-stability-harness.js` asserts the LAYOUT and the shed's victims rather than
+    the count, so a model change that oscillates is caught instead of averaged away -- which is how
+    the A B A B A flicker got through the first time. §9b is `spot_prime`; §10c and §11e are his.
 - 75|578| **Fire flow: the EPS frame and the Run concept, extracted from 530.**
   Everything else in Task 530 shipped and that task is closed. Two phases were never built and are
   kept here so they are not lost in a closed block.
@@ -349,6 +260,92 @@ the block.
     layer never renumbers the others, which is the whole reason it is not an index.
   - A layer setting is MODELLING data by CLAUDE.md's project-versus-browser rule and rides in
     `serializeProject()`; it is not window furniture.
+- 75|676| **Watch the sites, and send a derived weekly report.**
+  **DEMOTED TO 75 by Tom, 2026-10-11.**
+  Tom, 2026-09-15: *"mistakes like the site outages and merging difficult development branches to
+  master before proper vetting can no longer be the matter of course."* Plan, the corrected
+  diagnosis, and the things deliberately NOT to do: `dev/reputation-and-practice.md`.
+  - **PHASES 1, 1a AND 2 ARE CLOSED, and phase 1 closed by DISCOVERY rather than by building.** The
+    uptime watch already existed on the host and the plan could not see it, because the watch was
+    not in this repository. It is now, in `dev/host/`. **That is the finding worth keeping: a
+    diagnosis written from inside one tree could not see a working machine one directory outside
+    it.**
+  - **PHASE 2 IS A HEARTBEAT, NOT A SUMMARY** -- `dev/scripts/daily_report.sh`, 20:00 daily on
+    Tom's own offer of the faster cadence. The alarm is silent on success, so a healthy site and a
+    dead cron are the same silence; the report arriving is what separates them.
+  - **`sendmail` EXITED 0 DURING ALL 22,907 BOUNCES**, so an exit code was never evidence of
+    delivery. Phase 1a is proven at the far end, with Tom confirming receipt unprompted.
+  - **TWO OF THAT LIST ARE CLOSED AND ONE WAS A MISREADING (2026-09-17).**
+    - **GitHub branch protection is DECLINED and is not an ask any more.** Tom, 2026-09-16: *"I'm
+      sorry. I can't bring myself to do that."* His call, and the gap it would have closed is narrow
+      -- a clone or another machine with no hooks -- which `hook_install_check.php` already reports
+      on every suite run. **A gate he works around would be worse than none**, which is this
+      project's own rule. Do not re-propose it.
+    - **THE SIBLING PRE-PUSH IS BUILT AND INSTALLED IN BOTH REPOSITORIES.** Verified 2026-09-17:
+      `~/webdev/librewaternet.org/.git/hooks/pre-push` and the same in `~/webdev/not-epanet.org`
+      refuse a push unless `sh check.sh` passes, and both pass today with nothing unpushed. It runs
+      the suite rather than reading a stamp, deliberately: `check.sh` is under two seconds there, so
+      running it is cheaper than the machinery for not running it.
+    - **"THE ACCOUNT IS AT 96% DISK" WAS A MISREADING OF WHOSE DISK.** Measured on the host
+      2026-09-17: `/dev/md125` is 7.0 TB at 95% with 372 GB free, and that is the SHARED filesystem
+      every tenant sits on. **This account uses 6.3 GB of it and has no quota**, of which 2.3 GB is
+      cPanel's own `~/tmp/analog` stats cache and 1.9 GB is archived access logs. So clearing the
+      22,907 bounces (13 MB of mail in total) frees nothing that matters and is not urgent. **The
+      risk is real and is not ours to fix**: if the shared volume fills, the site goes down whoever
+      filled it. Worth knowing; not worth a task.
+  - **STILL OPEN:** whether the nightly 622 pages also want six URLs every fifteen minutes (a cost
+    question about a shared host, and nobody has been asked); then the portable kit.
+  - **AND THE RELEASE QUESTION IS ANSWERED IN PRACTICE, NOT ONLY ON PAPER.** `release/ewb` is cut
+    from `81792180`, the SHA Tom had deployed, and pushed. CLAUDE.md's Git Workflow carries the
+    procedure and the correction of the 2026-09-13 advice that a clean release could not be
+    extracted.
+- 75|681| **Economize the label layout: it is half the cost of a project switch.**
+  **DEMOTED TO 75 by Tom, 2026-10-11.**
+  **(c)/(d) MERGED 2026-10-03** (`feat/label-cache`, Tom: *"I am impressed. This is a major efficiency
+  feature. Done."*): a bank per wheel notch, rounded outward, final; revisits run no pass (Novato ~85 -> ~13 ms). (e) already existed (one pass per wheel
+  burst). **(b) on `perf/label-pass`, 2026-10-07:** the same layout, labelPass 254 -> 98 ms (Novato, every field
+  on, Chrome); certain shed rungs not drawn, ring search cut to the grid. `label-pass-economy-browser-harness.js`.
+  Tom, 2026-09-16: *"if laying out the labels takes 2 sec, we have to figure out how to economize."*
+  - **THE NUMBER IS HIS: the label pass is 56% of `buildDom`**, which is about 1.9 s of his 4.6 s
+    switch into a geographic Net3 with every field on. Here, on a machine 6x faster, the same pass is
+    306 ms.
+  - **THE MEASURING IS ALREADY FIXED AND IS NOT WHAT IS LEFT.** `measuredTextWidth()` banks every answer
+    on (class, size, string): 8,140 browser measurements a switch became 100 once warm. What remains
+    is composing the rows, the first-fit, the ring pass, the gang repair and the shed -- arithmetic
+    and DOM writes, not layout reads.
+  - **(a) IS DONE, 2026-09-16.** The pass ran at the outgoing project's zoom and was superseded by
+    the view restore moments later; `buildDom()` now defers it and `refreshAllFromDocument()` runs
+    it once, after the camera is where it belongs. With Task 680's keep on top, a switch runs the
+    pass ZERO times.
+    (b) `dev/label-placement-algorithms.md` section 1 says the published engines run a cheap first
+    approximation before any search, and we have the search without it. (c) A label whose content
+    and scale have not changed since the last pass could keep its placement, which is the same
+    "keep what you already worked out" argument as Task 680.
+  - **(d) TOM'S OWN PROPOSAL, 2026-09-17: bank the answer PER ZOOM LEVEL.** *"We should be able to
+    save label position and shedding state for every node at every zoom level. And I assume that
+    that would give us almost instantaneous zooming."* It is (c) with a key, and the key is the
+    hard part. **It does NOT require Task 683's snapping and must not be built as though it does**
+    (Franco, 2026-09-17): key the cache on a ROUNDED BUCKET of the continuous scale and let the view
+    go on tracking the fingers exactly. What still needs his seat is the reading question -- banked
+    positions do not slide as you pinch, they JUMP between buckets, and the moment that is likeliest
+    to happen is the last half-second before a tap, which is the worst instant for a label to
+    relocate in a tight cluster.
+    - **TOM RULED IT AFTER 680's SECOND HALF, 2026-09-17, and gave the design rule that matters:**
+      *"What we need to be vigilant for is unnecessary passes. We have to be aware of whether the
+      pre-placements are final or not. I would agitate for using the next more zoomed out (larger
+      text) bucket and not revisiting it. And of course the buckets should correlate to the PC mouse
+      zoom levels."* **Round OUTWARD, never to nearest**, and treat a bucket's answer as final rather
+      than as a first guess to refine -- a refinement pass is the cost this whole task exists to
+      remove. Bucket boundaries follow the wheel's own notches (Task 683), **as a cache key and never
+      as a view snap** (Task 683 rules the view out).
+  - **(e) AND A PLACEMENT DELAY WHILE THE WHEEL IS STILL TURNING.** Tom, same day: *"if a person is
+    scrolling fast, there is no label placement recalculation until they stop. Maybe this is already
+    done, because the truth is that zoom performance is not terrible on Net3."* **Check before
+    building** -- `scheduleReshed()` is already deferred and `onZoomChanged()` already skips the
+    whole pipeline while annotation is hidden, so some of this exists. Measure what a fast wheel
+    burst actually costs before adding a second timer.
+  - Read with `dev/label-placement-algorithms.md` section 12 and `?debug=perf`, which now prints
+    `labelPass` inside `buildDom` and a label-measurement count.
 - 75|714| **Theming: colour tokens first, then a Light/Dark choice in Settings.**
   **Phase 1b inline colours MERGED 2026-10-04** (`chore/theme-inline`): js/*.js literals on tokens or allow-listed; the check refuses new ones. Left: the button base (R-202), then dark mode.
   Tom, 2026-09-24 (R-211): *"preparing for this and implementing it will force us into some
@@ -383,14 +380,6 @@ the block.
   **Tom, 2026-10-01: stays at 75, with a branch to play on** (`feat/desktop`): *"my main concern is that we
   could get too heavy for the browser or find limitations. Until then, let's just play and plan and see
   what happens."*
-- 75|763| **A searchable help manual, built from the tips Tom cut.** Tom, 2026-10-04: *"Almost all
-  the deletes could be turned into a searchable help manual."* The cut tips' English is kept in
-  `dev/help-manual-source.md` (feat/tip-verdict) as its first material.
-  **2026-10-08 on `feat/user-guide`:** Find and replace rewritten from the source as the model chapter
-  (Tom: *"says nothing about our query language (!!!)"*); every other chapter audited, not yet rewritten:
-  `dev/user-guide-audit.md`. Rewrite them one by one to that model.
-  **Guide MERGED 2026-10-11** (`feat/user-guide`, Tom: "Merge"); index rail folds by chevron. Open: rewrite the
-  other chapters to the Find and replace model.
 - 75|772| **AutoCAD: import, export, and perhaps sync, on a long-lived branch.**
   Tom, 2026-10-05: *"I am an AutoCAD power user and developer... I would like to know what's already
   been done first."* Mary's survey of prior art: `dev/agents/market-researcher/autocad-interop.md`.
@@ -408,6 +397,10 @@ the block.
   Tom, 2026-10-10: *"Time Series and table columns for tank Depth. Volume would be nice too, with zero at
   minimum depth."* Also his question: Bentley has a Base Elevation; EPANET's tank Elevation is the bottom,
   where the level is zero, and volume below Min level still counts. Make sure our labels say so.
+- 75|786| **More native SI examples, since SI is chosen twice as often as US.**
+  Tom, 2026-10-11: *"SI presets are requested over twice as much as US presets. So I want to have more good SI
+  examples, even if I have to convert the Net2 and Net3 examples."* Mary is surveying redistributable SI networks
+  and the KYPipe examples (her journal, 2026-10-11).
 - 50|146.09| **An inset overview map: the whole project, with a box round where you are.**
   Reworked by Tom 2026-08-25, and it is a different feature from the one this ID used to hold:
   *"146.09 reworked as a key/overview map inset like many games where the entire project is depicted
@@ -525,41 +518,6 @@ the block.
   example to weigh, not a decision. The thing to weigh is that `dev/ROADMAP.md` is written for us and
   says things a public board should not (measured costs, what Tom is not proud of, who to ask), so a
   public board is a SECOND artifact to keep current, not this one exposed.
-- 50|544| **[H] epanet-js is implicitly claiming to be EPANET, and we have now decided.**
-  **THE ANSWER ARRIVED 2026-09-06 and it is Task 591**: we do not fight fire with fire, we build a
-  site whose subject is our own dependence and our own gratitude, and we let that stand as the
-  contrast. Nothing here is a grievance and the school of thought that said "do what they do" is
-  not the one taken. What is LEFT in this row is only the thing it originally recorded: that the
-  behaviour was observed, and that `dev/positioning.md` remains the authority for every sentence.
-  Tom, 2026-08-26, and he calls it socially difficult: *"epanetjs is legally, but unethically,
-  implicitly claiming to be epanet. For example, they have a Youtube video posted with the title
-  'Fire flow analysis with EPANET'. We need to note this because one school of thought says that we
-  should fight fire with fire. Our school of thought may be contrary. But we aren't going anywhere
-  without users, and apparently the name EPANET is gold."*
-  - **This is recorded rather than acted on, deliberately.** `dev/positioning.md` is the authority
-    for every public claim and it leads with the invitation, not the comparison. Nothing here
-    changes that without Tom saying so.
-  - **He is considering help:** *"Maybe I need to get human advisers. But a marketing specialist
-    agent might not hurt."* A marketing seat would have to carry outside evidence, like every other
-    seat (`dev/agents/README.md`), not just an opinion about names.
-  - **AND HE HAS WRITTEN THE POSITIONING SENTENCE HIMSELF**, which is the most useful thing in this
-    block: *"Semi-retired senior water engineer with a body of established software and online
-    calculators seeks radical volunteer engagement."* That is a personals ad, it is honest, it says
-    who is asking and what for, and it does not mention anybody else's product.
-  - **AND HE IS CONSIDERING LEANING INTO IT, 2026-09-05, which is a different school from the one
-    this block was opened in.** Tom: *"I have been considering leaning into the 'Not EPANET' brand,
-    maybe with a NotEPANET.org domain and maybe with 'Not EPANET' and 'The Un-EPANET' in video and
-    blog titles. That feels deeply honest and quietly rebuking of name dropping while all the while
-    invoking the EPANET name for SEO."* **He has registered `NotEPANET.org` and `Not-EPANET.org`.**
-    Nothing is built or claimed on either yet, and `dev/positioning.md` is still the authority for
-    every public sentence -- a brand that names somebody else's product is exactly the kind of claim
-    that file exists to gate. The market-researcher seat is the one to ask what "Not X" branding
-    actually earns, and whether it reads as honest or as trading on the name to anyone but us.
-  - **HE HAS STARTED, 2026-08-26:** *"I started using that appeal today, and I joined the
-    EPANET-USERS listserv to ask about hydrant modeling and more later."* So the sentence is in use
-    and there is now a channel to real practitioners. **That listserv is also the place the fire-flow
-    questions in Task 530 could be answered by people rather than by search** — the emitter posture,
-    and whether anyone models the assembly at all.
 - 50|614| **The sewer-slope cluster is the largest demand we do not convert.**
   Raised by Tom, 2026-09-08. Measured twice, 2026-07-27 and 2026-09-07, and unmoved: sewer, drainage
   and slope queries with no "manning" in them are 190 queries, 3,557 impressions, 60 clicks —
@@ -690,34 +648,6 @@ the block.
   bar of map height) and the blocker named is real (nowhere standard to put the current file
   name), so this is open rather than closed.** Anything that reopens it has to answer the file
   name question first. He suggested the interface designer could noodle it.
-- 50|636| **A custom properties UI, designed in a table.**
-  Tom, 2026-09-12, in full: a Custom properties heading under `Settings > Assets`, every property
-  one row of an abbreviated design table, added and removed like demand categories -- key, label,
-  applies-to, validation, character restriction, length, low and high limits. **The pane SHOWS a
-  truncated design and a POPUP edits it** (his revision 5 of eleven, 2026-09-13, confirming his own
-  original specification and reversing what phase 1 built). **Every applicable custom property then appears everywhere an ordinary one
-  does**: Properties, multi-properties, Find, Tables, Graphs. His whole specification, and the
-  three things to decide before building (`.inp` has nowhere to put one):
-  `dev/custom-property-scope.md`.
-  - **ALL NINE DESIGN QUESTIONS ARE ANSWERED (Tom, 2026-09-13)** and the answers are in the scope
-    document. The three that change the build: **everything is overridable by a scenario**, with no
-    per-property distinction (*"Let the people do the things!"*); the key is **NAMESPACED**
-    (`user_`/`custom_`) so a collision with a built-in field is impossible rather than refused; and
-    a value that breaks its own design is **FLAGGED IN PLACE, never cleared** -- which he turned
-    into a feature, *"a beautiful exploration tool. You change the constraints just to do a bit of
-    data entry error checking."* `Validate as` also gains a **Don't validate** entry, which the
-    original spec did not have.
-  - **PHASE 1 AND HIS ELEVEN NUMBERED REVISIONS OF IT BOTH SHIPPED 2026-09-13.** What is left is
-    Graphs, the `.inp` `;@key=value` comment convention, and the validation-regexp door revision 6
-    deliberately left shut. The revisions are folded into `dev/custom-property-scope.md`.
-  - **SINGULAR, in the database tradition** (Tom, 2026-09-12). The branch is `custom-property`, the
-    document is `dev/custom-property-scope.md`, and a table is named for the row it holds.
-  - **EMBRACE 247 but do NOT gate it.** An account number could be a custom property and the saving
-    would be real, but Tom ruled it is not the way in: an asset id already identifies a meter. Land
-    the field seams here first -- `pushSpecList()`, the popup bands, the Tables columns -- and 247's
-    geometry runs beside them.
-  - **AVOID running beside 640.** Graphs must offer a custom property in its selector, so it wants
-    this list to exist before it is written rather than to invent a second one.
 - 50|643| **The camel behind grid-to-ground: slope distance and a length adjustment.**
   Tom, 2026-09-13, answering the projection brief's question about grid versus ground length:
   *"this is straining at a gnat while we are swallowing the camel of slope distance, pipe dips, pipe
@@ -964,9 +894,14 @@ the block.
   should be a setting"): Select mode, card on rest, setting in Map and page; Perry passed it. Open: field
   names in words, and other modes (calls page G07, G08).
 - 50|784| **A small time-series graph bubble on the map, from an asset's right-click.**
+  Tom, 2026-10-11, looking for it: *"multiple concurrent map time series graph bubbles available by right-clicking
+  an asset."* The asset right-click menu now exists on `feat/match-property` as a row list (`openMapContextMenu`).
   Tom, 2026-10-10: *"a right-click menu at assets that includes 'Time series graph' that makes a pretty
   'speech bubble' 200px to 400 px ... so that four or six could be arranged on the map. And it would be
   really cool if that presentation scenario could be saved."*
+- 50|785| **Rewrite the Guide's chapters to the Find and replace model.**
+  Split from Task 763 on its close, 2026-10-11. Every chapter but Find and replace is audited, not rewritten:
+  `dev/user-guide-audit.md`.
 - 25|144| **Diagnose the Hazen-Williams conversion leak — full record in `dev/hazen-williams-leak.md`.**
   **The 11% outlier does not reproduce and the fix it was waiting for already shipped** (2026-07-28,
   `9c47608f`, one day after the snapshot). The 2026-08-21 report gives HW 58% use-of-shopping, ordinary
