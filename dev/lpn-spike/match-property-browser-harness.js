@@ -117,17 +117,46 @@ async function main() {
 		ok('pipes 11 and 12 start different from pipe 10', before11.d !== src.d && before11.r !== src.r && before12.d !== src.d, JSON.stringify([before11, before12]));
 		const flowsBefore = await flows();
 
-		// ---- 1. right-click pipe 10, Match properties, press 11 and 12 ----
+		const selCount = () => page.evaluate(() => document.querySelectorAll('#lpn_canvas .lpn-selected').length);
+		const clickAt = async (group, id, shift) => {
+			const p = await pointOf(group, id);
+			if (shift) { await page.keyboard.down('Shift'); }
+			await page.mouse.click(p.x, p.y);
+			if (shift) { await page.keyboard.up('Shift'); }
+			await a.settle(600);
+		};
+		// Targets first: the selection. Rightmost first, because the Properties box opens to the right of it.
+		const selectTargets = async (group, ids) => {
+			for (let i = 0; i < ids.length; i++) { await clickAt(group, ids[i], i > 0); }
+		};
+		const clearSelection = async () => {
+			const open = await page.evaluate(() => { const p = document.getElementById('lpn_popup'); return !!p && getComputedStyle(p).display !== 'none'; });
+			if (open) { await page.click('#lpn_popup_close'); await a.settle(300); }
+			await page.evaluate(() => { if (document.activeElement && document.activeElement.blur) { document.activeElement.blur(); } });
+			await page.keyboard.press('Escape'); await a.settle(300);
+			await page.keyboard.press('Escape'); await a.settle(300);
+		};
+		const startFromEdit = async () => { await a.menuClick(MATCH, 'edit'); await a.settle(400); };
+		const menuClickRow = () => page.$$eval('.lpn-pane-ctxmenu button', (bs, l) => bs.filter((b) => b.textContent.trim() === l)[0].dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 })), MATCH);
+
+		// ---- 0. nothing selected: the command does not start, and says why ----
+		await startFromEdit();
+		ok('with nothing selected the tool does not start', !/Match properties/.test(await hint()), await hint());
+		ok('...and a notice says to select the targets first', /Select the targets first/.test(await a.notice()), await a.notice());
 		await rightClick(await pointOf('link', '10'));
+		ok('right-click with nothing selected: the row is shown but greyed', await page.$$eval('.lpn-pane-ctxmenu button', (bs, l) => bs.filter((b) => b.textContent.trim() === l && b.disabled).length, MATCH) === 1);
+		await page.keyboard.press('Escape');
+		await a.settle(300);
+
+		// ---- 1. select pipes 12 and 11, right-click one of them, choose Match properties, press pipe 10 ----
+		await selectTargets('link', ['12', '11']);
+		await rightClick(await pointOf('link', '11'));
 		ok('a right-click on a pipe offers Match properties', (await menuRow(MATCH)) === 1);
-		ok('and did not open a property sheet', !(await page.evaluate(() => { const p = document.getElementById('lpn_popup'); return p && getComputedStyle(p).display !== 'none'; })));
-		await page.$$eval('.lpn-pane-ctxmenu button', (bs, l) => bs.filter((b) => b.textContent.trim() === l)[0].dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 })), MATCH);
+		await menuClickRow();
 		await a.settle(400);
-		ok('the status line names the source and asks for destinations', /10/.test(await hint()) && /Match/i.test(await hint()), await hint());
-		await page.mouse.click((await pointOf('link', '11')).x, (await pointOf('link', '11')).y);
-		await a.settle(900);
-		await page.mouse.click((await pointOf('link', '12')).x, (await pointOf('link', '12')).y);
-		await a.settle(1500);
+		ok('the status line asks for the source and discloses what is not copied', /copy properties from/.test(await hint()) && /Status, identity, and location are not copied/.test(await hint()), await hint());
+		await clickAt('link', '10');
+		await a.settle(1000);
 		for (const id of ['11', '12']) {
 			ok('pipe ' + id + ' diameter equals pipe 10', (await cell('pipes', id, 'diameter')) === src.d, await cell('pipes', id, 'diameter'));
 			ok('pipe ' + id + ' roughness equals pipe 10', (await cell('pipes', id, 'roughness')) === src.r, await cell('pipes', id, 'roughness'));
@@ -135,101 +164,81 @@ async function main() {
 		}
 		ok('pipe 11 keeps its ID and both end nodes', (await cell('pipes', '11', 'from')) === before11.from && (await cell('pipes', '11', 'to')) === before11.to);
 		ok('pipe 12 keeps its ID and both end nodes', (await cell('pipes', '12', 'from')) === before12.from && (await cell('pipes', '12', 'to')) === before12.to);
-		const flowsAfter = await flows();
-		ok('the network was solved again: flows changed', JSON.stringify(flowsAfter) !== JSON.stringify(flowsBefore), JSON.stringify([flowsBefore['11'], flowsAfter['11']]));
-		ok('a notice says what happened', /Matched/.test(await a.notice()), await a.notice());
-		await page.keyboard.press('Escape');
-		await a.settle(400);
-		ok('Escape ends the tool', !/Match properties/.test(await hint()), await hint());
-
+		ok('the network was solved again: flows changed', JSON.stringify(await flows()) !== JSON.stringify(flowsBefore));
+		ok('the notice says what was left out', /Matched 2 assets to 10, except status and location\. Values changed: \d+\./.test(await a.notice()), await a.notice());
+		ok('the tool ended by itself', !/Match properties/.test(await hint()), await hint());
 		await undo();
-		ok('Undo takes the second match back', (await cell('pipes', '12', 'diameter')) === before12.d, await cell('pipes', '12', 'diameter'));
-		await undo();
-		ok('Undo takes the first match back', (await cell('pipes', '11', 'diameter')) === before11.d && (await cell('pipes', '11', 'roughness')) === before11.r && (await cell('pipes', '11', 'km')) === before11.k);
+		ok('ONE Undo takes both back', (await cell('pipes', '12', 'diameter')) === before12.d && (await cell('pipes', '11', 'diameter')) === before11.d && (await cell('pipes', '11', 'roughness')) === before11.r && (await cell('pipes', '11', 'km')) === before11.k);
 		ok('and the flows are what they were', JSON.stringify(await flows()) === JSON.stringify(flowsBefore));
+		await clearSelection();
 
-		// ---- 2. a multi-selection is offered the match, and one Undo takes it all back ----
-		// The page's question box is answered for real here: the harness seam that turns it into a
-		// native confirm is removed, as dialog-modal-browser-harness.js does.
-		await page.evaluate(() => { delete window.lpnDialogAnswerer; });
-		const selCount = () => page.evaluate(() => document.querySelectorAll('#lpn_canvas .lpn-selected').length);
-		// Rightmost first: the Properties box opens to the right of the selection and would cover the next.
-		for (const id of ['22', '21', '31']) {
-			const p = await pointOf('link', id);
-			await page.keyboard.down('Shift'); await page.mouse.click(p.x, p.y); await page.keyboard.up('Shift');
-			await a.settle(600);
-		}
+		// ---- 1b. right-click an asset that is NOT in the selection: the tool starts for the selection ----
+		await selectTargets('link', ['11']);
+		const d31 = await cell('pipes', '31', 'diameter');
+		await rightClick(await pointOf('link', '31'));
+		await menuClickRow();
+		await a.settle(400);
+		await clickAt('link', '10');
+		await a.settle(1000);
+		ok('right-click outside the selection: the selected pipe changed', (await cell('pipes', '11', 'diameter')) === src.d);
+		ok('...and the pipe right-clicked did not', (await cell('pipes', '31', 'diameter')) === d31, await cell('pipes', '31', 'diameter'));
+		await undo();
+		await clearSelection();
+
+		// ---- 2. three pipes, ONE Undo ----
+		await selectTargets('link', ['22', '21', '31']);
 		ok('three pipes are selected', (await selCount()) === 3, String(await selCount()));
 		const sel3 = { d: [await cell('pipes', '21', 'diameter'), await cell('pipes', '22', 'diameter'), await cell('pipes', '31', 'diameter')] };
-		await rightClick(await pointOf('link', '10'));
-		await page.$$eval('.lpn-pane-ctxmenu button', (bs, l) => bs.filter((b) => b.textContent.trim() === l)[0].dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 })), MATCH);
-		await a.settle(500);
-		const dlg = await a.dialog();
-		ok('the selected pipes are offered the match', !!dlg && /3/.test(dlg.text) && /10/.test(dlg.text), dlg && dlg.text);
-		if (dlg) {
-			await page.$$eval('#lpn_dialog_buttons button', (bs, l) => bs.filter((b) => b.textContent.trim() === l)[0].dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 })), dlg.buttons[0]);
-			await a.settle(1500);
-		}
+		await startFromEdit();
+		await clickAt('link', '10');
+		await a.settle(1000);
 		ok('all three received pipe 10\'s diameter', (await cell('pipes', '21', 'diameter')) === src.d && (await cell('pipes', '22', 'diameter')) === src.d && (await cell('pipes', '31', 'diameter')) === src.d);
 		ok('and roughness 130', (await cell('pipes', '21', 'roughness')) === src.r && (await cell('pipes', '31', 'roughness')) === src.r);
 		await undo();
 		ok('ONE Undo restores all three', (await cell('pipes', '21', 'diameter')) === sel3.d[0] && (await cell('pipes', '22', 'diameter')) === sel3.d[1] && (await cell('pipes', '31', 'diameter')) === sel3.d[2], JSON.stringify(sel3.d));
 		ok('and the flows are what they were', JSON.stringify(await flows()) === JSON.stringify(flowsBefore));
-
-		await page.evaluate(() => { if (document.activeElement && document.activeElement.blur) { document.activeElement.blur(); } });
-		await page.keyboard.press('Escape');   // closes the Properties box
-		await a.settle(300);
-		await page.keyboard.press('Escape');   // and then clears the selection
-		await a.settle(300);
+		await clearSelection();
 		ok('the selection is clear before the junction test', (await selCount()) === 0, String(await selCount()));
-		// ---- 3a. a junction matched onto another junction: elevation and demand move, the flows are re-solved ----
+
+		// ---- 3a. junction 23 selected, junction 10 the source: elevation and demand move, the flows are re-solved ----
 		await showTab('junctions');
 		const j23 = { elev: await cell('junctions', '23', 'elev'), demand: await cell('junctions', '23', 'demand'), p: await cell('junctions', '23', 'pressure') };
 		const j10 = { elev: await cell('junctions', '10', 'elev'), demand: await cell('junctions', '10', 'demand') };
 		const jFlows = await flows();
 		ok('junction 23 starts different from junction 10', j23.elev !== j10.elev && j23.demand !== j10.demand, JSON.stringify([j10, j23]));
-		await rightClick(await pointOf('node', '10'));
-		await page.$$eval('.lpn-pane-ctxmenu button', (bs, l) => bs.filter((b) => b.textContent.trim() === l)[0].dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 })), MATCH);
-		await a.settle(400);
-		const p23 = await pointOf('node', '23');
-		await page.mouse.click(p23.x, p23.y);
-		await a.settle(1500);
-		await page.keyboard.press('Escape');
-		await a.settle(300);
+		await selectTargets('node', ['23']);
+		await startFromEdit();
+		await clickAt('node', '10');
+		await a.settle(1000);
 		await showTab('junctions');
 		ok('junction 23 took junction 10\'s elevation and demand', (await cell('junctions', '23', 'elev')) === j10.elev && (await cell('junctions', '23', 'demand')) === j10.demand, await cell('junctions', '23', 'elev') + ' / ' + await cell('junctions', '23', 'demand'));
 		ok('...and kept its ID', (await cell('junctions', '23', 'id')) === '23');
-		await showTab('pipes'); ok('the network was solved again: flows changed', JSON.stringify(await flows()) !== JSON.stringify(jFlows), JSON.stringify(jFlows) + ' -> ' + JSON.stringify(await flows())); await showTab('junctions');
+		ok('the network was solved again: flows changed', JSON.stringify(await flows()) !== JSON.stringify(jFlows));
+		await showTab('junctions');
 		ok('...and the pressure at 23 changed', (await cell('junctions', '23', 'pressure')) !== j23.p, j23.p + ' -> ' + await cell('junctions', '23', 'pressure'));
 		await undo();
 		await showTab('junctions');
 		ok('Undo restores junction 23', (await cell('junctions', '23', 'elev')) === j23.elev && (await cell('junctions', '23', 'demand')) === j23.demand);
-		await showTab('pipes'); const fl2 = JSON.stringify(await flows()); await showTab('junctions'); ok('...and the flows and pressure', fl2 === JSON.stringify(jFlows) && (await cell('junctions', '23', 'pressure')) === j23.p);
+		ok('...and the flows and pressure', JSON.stringify(await flows()) === JSON.stringify(jFlows) && (await (async () => { await showTab('junctions'); return cell('junctions', '23', 'pressure'); })()) === j23.p);
+		await clearSelection();
 
-		// ---- 3b. a junction matched onto the tank changes only what both have ----
+		// ---- 3b. the tank selected, junction 10 the source: only what both have changes ----
 		await showTab('junctions');
 		const jElev = await cell('junctions', '10', 'elev');
 		await showTab('tanks');
 		const t0 = { elev: await cell('tanks', '2', 'elev'), level: await cell('tanks', '2', 'level'), min: await cell('tanks', '2', 'minLevel'), dia: await cell('tanks', '2', 'tankDiameter') };
-		const tankFlows = await flows();
 		ok('tank 2 starts at a different elevation than junction 10', t0.elev !== jElev, t0.elev + ' vs ' + jElev);
-		await rightClick(await pointOf('node', '10'));
-		ok('a right-click on a junction offers Match properties', (await menuRow(MATCH)) === 1);
-		await page.$$eval('.lpn-pane-ctxmenu button', (bs, l) => bs.filter((b) => b.textContent.trim() === l)[0].dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 })), MATCH);
-		await a.settle(400);
-		const tp = await pointOf('node', '2');
-		await page.mouse.click(tp.x, tp.y);
-		await a.settle(1500);
+		await selectTargets('node', ['2']);
+		await startFromEdit();
+		await clickAt('node', '10');
+		await a.settle(1000);
 		await showTab('tanks');
 		ok('the tank took the junction\'s elevation', (await cell('tanks', '2', 'elev')) === jElev, await cell('tanks', '2', 'elev'));
 		ok('and kept its level, minimum level and diameter', (await cell('tanks', '2', 'level')) === t0.level && (await cell('tanks', '2', 'minLevel')) === t0.min && (await cell('tanks', '2', 'tankDiameter')) === t0.dia);
-		// (Net1's tank does not move any steady-state flow, so no hydraulic claim is made for the tank itself.)
-		await page.keyboard.press('Escape');
-		await a.settle(300);
 		await undo();
 		await showTab('tanks');
 		ok('Undo restores the tank elevation', (await cell('tanks', '2', 'elev')) === t0.elev, await cell('tanks', '2', 'elev'));
-		ok('and the flows', JSON.stringify(await flows()) === JSON.stringify(tankFlows));
+		await clearSelection();
 
 		// ---- 4. the Edit menu row, in English and on a Spanish page ----
 		await a.openMenu('edit');
@@ -254,15 +263,12 @@ async function main() {
 			return d;
 		};
 		const matchOnto = async (srcGroup, srcId, dstGroup, dstId) => {
-			await rightClick(await pointOf(srcGroup, srcId));
-			await page.$$eval('.lpn-pane-ctxmenu button', (bs, l) => bs.filter((b) => b.textContent.trim() === l)[0].dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 })), MATCH);
-			await a.settle(400);
-			const p = await pointOf(dstGroup, dstId);
-			await page.mouse.click(p.x, p.y);
-			await a.settle(1500);
+			await clickAt(dstGroup, dstId);
+			await startFromEdit();
+			await clickAt(srcGroup, srcId);
+			await a.settle(1000);
 			const n = await a.notice();
-			await page.keyboard.press('Escape');
-			await a.settle(300);
+			await clearSelection();
 			return n;
 		};
 		const saved = () => page.evaluate(() => JSON.parse(localStorage.getItem('lpn_project_hover')));
@@ -288,7 +294,7 @@ async function main() {
 		const base23 = byId(sv.nodes, '23');
 		ok('scenario: Base elevation of junction 23 is untouched', base23.elev === 690, String(base23.elev));
 		ok('scenario: Base demand of junction 23 is untouched', base23._demand === 150, String(base23._demand));
-		ok('scenario: the notice says what could not be copied', /Not copied: \d+ \(they cannot differ by scenario\)\./.test(note), note);
+		ok('scenario: the notice names what a scenario cannot hold, and where to change it', /Not copied: [^.]*Elevation[^.]*\. A scenario cannot hold its own value for these; change them in Base\./.test(note), note);
 
 		// 5b. A valve cannot take another valve type's setting.
 		await openProject((d) => {
