@@ -8954,7 +8954,7 @@ var EngCalcs = EngCalcs || {};
 		for (i = 0; i < defs.length; i++) { if (defs[i][0] === field) { return defs[i][1]; } }
 		// Tank-only results with no Labels row (Task 783): offered to the ramp, Find and the graph.
 		if (group === 'node' && field === 'depth') { return pc.lpn_result_depth || 'Depth'; }
-		if (group === 'node' && field === 'volume') { return pc.lpn_result_tank_volume || 'Usable volume'; }
+		if (group === 'node' && field === 'volume') { return pc.lpn_result_tank_volume || 'Available volume'; }
 		return field;
 	}
 	// **A STATISTIC VIEW SAYS SO IN THE HEADING** (Task 735): with the transport on Averaged, the map's
@@ -19022,7 +19022,7 @@ var EngCalcs = EngCalcs || {};
 			['head', 'lpn_result_head', 'Head'],
 			['pressure', 'lpn_result_pressure', 'Pressure'],
 			['depth', 'lpn_result_depth', 'Depth'],
-			['volume', 'lpn_result_tank_volume', 'Usable volume'],
+			['volume', 'lpn_result_tank_volume', 'Available volume'],
 			['quality', null, 'Water age']
 		];
 		var BAND_LINK = [
@@ -60257,7 +60257,7 @@ var EngCalcs = EngCalcs || {};
 			// Depth and usable volume, read the way the Tables pane reads them (Task 783).
 			readonlyField(fields, (pc.lpn_result_depth || 'Depth') + ' (' + unitLabel(resultUnit('elevhead')) + ')',
 				colorNodeValue(n, 'depth'), pc.lpn_result_depth_tip);
-			readonlyField(fields, (pc.lpn_result_tank_volume || 'Usable volume') + ' (' + tankVolumeUnitText() + ')',
+			readonlyField(fields, (pc.lpn_result_tank_volume || 'Available volume') + ' (' + tankVolumeUnitText() + ')',
 				colorNodeValue(n, 'volume'), pc.lpn_result_tank_volume_tip);
 		} else if (n.type === 'reservoir') {
 			unitNumberField(fields, pc.lpn_field_elev || 'Elevation', 'lpn_u_elevhead',
