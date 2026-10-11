@@ -6277,15 +6277,20 @@ var EngCalcs = EngCalcs || {};
 	// pattern, Tom 2026-10-11: renaming Net3's pattern "1" turned every run flat). A pattern is the
 	// document's, so a rename or a delete reaches every stored place that STATES the old id -- a
 	// scenario's own block, a stored alternative, a calculation set -- at once. Only a stated value
-	// moves; an inherited one follows its parent. `to` null is "not stated here".
+	// moves; an inherited one follows its parent. `to` null (a delete) CLEARS the holder's own value,
+	// so the scenario inherits again, rather than holding "none" over its parent.
 	function repointScenarioSetting(path, was, to) {
 		var p = settingPath(path);
 		scenarios.concat(doc.alternatives || [], doc.calcSets || []).forEach(function (o) {
 			var node = o && !o.isBase ? o.settings : null, i;
 			if (settingGet(node, p) !== was) { return; }
+			touchTree('repointScenarioSetting');
+			if (to === null) {
+				settingDelete(o, p);
+				return;
+			}
 			for (i = 0; i < p.length - 1; i++) { node = node[p[i]]; }
 			node[p[p.length - 1]] = to;
-			touchTree('repointScenarioSetting');
 		});
 	}
 	// Whether this scenario's own block (or the alternative it uses) states the path, rather than
@@ -47010,7 +47015,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function guideBoxList() {
 		return dockBoxes.map(function (d) {
 			var t = d.box.querySelector('.lpn-setbox-title');
-			return { d: d, id: d.box.id, title: t ? String(t.textContent || '').replace(/\s+/g, ' ').trim() : '' };
+			// dockTitleOf() names the box without a "?" its title carries (the Scenario manager's).
+			return { d: d, id: d.box.id, title: t ? dockTitleOf(d) : '' };
 		}).filter(function (e) { return !!e.title; });
 	}
 	function renderGuideBoxes() {
@@ -59068,8 +59074,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		return true;
 	}
 	function libDeletePattern(pat) {
-		var was = pat.id, pc = EngCalcs.pageConfig || {}, act = activeScenario(), hits, actHit, others, now, msg;
+		var was = pat.id, pc = EngCalcs.pageConfig || {}, act = activeScenario(), hits, actHit, others, now, msg, states = {};
 		hits = scenariosParentsFirst().filter(function (s) { return scenarioDefaultPatternFor(s) === was; });
+		// Asked before the delete clears what each one states.
+		scenarios.forEach(function (s) { states[s.id] = scenarioStatesSetting(s, ['defaultPattern']); });
 		doc.patterns = libPatterns().filter(function (p) { return p !== pat; });
 		// **A REFERENCE TO A DELETED PATTERN IS CLEARED, NOT LEFT DANGLING.** lpnPatternById returns
 		// null for a name nothing answers to and lpnPatternValue turns that into a multiplier of 1,
@@ -59085,8 +59093,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		actHit = hits.indexOf(act) >= 0;
 		others = hits.filter(function (s) {
 			if (s === act) { return false; }
-			if (s.isBase) { return !actHit || scenarioStatesSetting(act, ['defaultPattern']); }
-			return scenarioStatesSetting(s, ['defaultPattern']);
+			if (s.isBase) { return !actHit || states[act.id]; }
+			return states[s.id];
 		}).map(scenarioDisplayName);
 		if (actHit) {
 			now = effDefaultPattern();

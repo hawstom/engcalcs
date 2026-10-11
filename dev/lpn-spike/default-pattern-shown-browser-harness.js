@@ -11,7 +11,10 @@
 //   3. a blank-pattern junction reads "(default: 1)" in the Tables pane, and the Libraries list marks
 //      the default row; with no pattern "1" the selector offers "None (constant)" and a junction
 //      reads "(constant)";
-//   4. ?lang=es renders the same rows (English fallbacks for the new keys).
+//   4. a child scenario (Peak) states its own default: Base keeps its own; renaming either pattern
+//      reaches the scenario that uses it; deleting Peak's from Base names Peak and Peak inherits
+//      Base's again; every step is solved and the demand day compared;
+//   5. ?lang=es renders the same rows (English fallbacks for the new keys).
 //
 // Copyright 2009 Thomas Gail Haws
 // Licensed under GNU GPL v3.0 or later
@@ -242,6 +245,116 @@ async function main() {
 		await closeSettings();
 		const tc = await tableBlank();
 		ok('a blank-pattern junction reads "(constant)"', tc === '(constant)', JSON.stringify(tc));
+
+		// ---- A SCENARIO STATING ITS OWN DEFAULT (feat/bentley-interop: each scenario has its own) ----
+		console.log('\n--- a child scenario states its own default; rename and delete reach it ---');
+		{
+			const c = await Session.open(browser, 'defpat-scn');
+			const Q = (fn, arg) => c.page.evaluate(fn, arg);
+			let BASE = 'Base';
+			const scnMenu = async (label) => {
+				await c.page.click('#lpn_scenario_btn');
+				await c.page.waitForSelector('#lpn_menu_popup', { state: 'visible' });
+				let hit = false;
+				for (const r of await c.page.$$('#lpn_menu_list button.lpn-menu-row')) {
+					const t = (await r.textContent()).trim().replace(/^✓\s*/, '');
+					if (t === label || t.replace(/\s*\(\d+\)$/, '') === label) { await r.click(); hit = true; break; }
+				}
+				if (!hit) { await c.page.keyboard.press('Escape'); throw new Error('no scenario row ' + label); }
+				await c.settle(1000);
+			};
+			const cSettings = async () => {
+				const open = await Q(() => { const b = document.getElementById('lpn_settings_box'); return b && b.style.display !== 'none' && b.style.display !== ''; });
+				if (!open) { await c.toolbarClick(await c.lang('lpn_tool_settings')); await c.page.waitForSelector('#lpn_settings_box', { state: 'visible' }); }
+				await c.settle(500);
+				return Q((w) => {
+					const l = Array.from(document.querySelectorAll('#lpn_settings_box label')).find((x) => x.textContent.indexOf(w) >= 0 && x.querySelector('select'));
+					const sel = l && l.querySelector('select'); return sel ? sel.value : null;
+				}, await c.lang('lpn_settings_default_pattern'));
+			};
+			const cPick = async (v) => {
+				await cSettings();
+				// A real pick: focus, then the change event the browser sends.
+				await Q(([w, v]) => {
+					const l = Array.from(document.querySelectorAll('#lpn_settings_box label')).find((x) => x.textContent.indexOf(w) >= 0 && x.querySelector('select'));
+					const sel = l.querySelector('select'); sel.focus(); sel.value = v; sel.dispatchEvent(new Event('change', { bubbles: true }));
+				}, [await c.lang('lpn_settings_default_pattern'), v]);
+				await c.settle(600);
+			};
+			const cCloseSettings = async () => { await Q(() => { const b = document.getElementById('lpn_setbox_close'); if (b) { b.click(); } }); await c.settle(200); };
+			const cLib = async (fn, arg) => {
+				await c.menuClick(await c.lang('lpn_library_menu'), 'project');
+				await c.page.waitForSelector('#lpn_library_box', { state: 'visible' });
+				await Q(() => document.getElementById('lpn_libbox_link_patterns').dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, detail: 1 })));
+				await c.settle(300);
+				await Q(fn, arg);
+				await c.settle(500);
+				await Q(() => { const x = document.getElementById('lpn_libbox_close'); if (x) { x.click(); } });
+				await c.settle(200);
+			};
+			const series = async () => {
+				await Q(() => { EngCalcs.lpnTimeRunNow(); });
+				await c.waitFor(() => Q(() => EngCalcs.lpnTimeRunState().frames > 1), 'EPS frames', 120000);
+				await c.settle(300);
+				// One junction carrying a positive demand and no pattern of its own (Net3's 101 runs on
+				// the default), chosen on the first run and read the same way on every run after.
+				return Q((k) => { const fr = EngCalcs.lpnTimeRunFrames(); return fr.map((f) => +(+f.demands[k]).toFixed(5)); }, JKEY);
+			};
+			const flat = (a) => new Set(a).size <= 1;
+			const JKEY = '101';
+			await c.goto('Looped-Network.php');
+			await Q(() => { const x = document.getElementById('ec-consent'); if (x) { x.remove(); } });
+			await c.openExampleCard(await c.lang('lpn_ex_net3_title'));
+			await c.settle(800);
+			BASE = await c.lang('lpn_scenario_base');
+			const baseRun = await series();
+			c.answerPromptWith('Peak');
+			await scnMenu(await c.lang('lpn_scenario_new'));
+			await c.settle(1200);
+			ok('scn: a new scenario Peak is open and inherits default 1', (await cSettings()) === '1');
+			await cPick('2');
+			ok('scn: picking pattern 2 in Peak shows 2 there', (await cSettings()) === '2');
+			await cCloseSettings();
+			const peakRun = await series();
+			ok('scn: Peak solves on pattern 2 (not flat, and not Base\'s pattern-1 day)', !flat(peakRun) && JSON.stringify(peakRun) !== JSON.stringify(baseRun), JSON.stringify(peakRun.slice(0, 6)));
+			await scnMenu(BASE);
+			ok('scn: Base still shows 1 (the pick went to Peak, not Base)', (await cSettings()) === '1');
+			await cCloseSettings();
+			ok('scn: Base still solves on pattern 1', JSON.stringify(await series()) === JSON.stringify(baseRun));
+			// From Base: rename Peak's pattern 2 to P2, and Base's 1 to B1.
+			const ren = (args) => { const i = Array.from(document.querySelectorAll('#lpn_libbox_content input.lpn-lib-id')).find((x) => x.value === args[0]); i.value = args[1]; i.dispatchEvent(new Event('change', { bubbles: true })); };
+			await cLib(ren, ['2', 'P2']);
+			await cLib(ren, ['1', 'B1']);
+			ok('scn: Base shows B1 after renaming its 1', (await cSettings()) === 'B1');
+			await cCloseSettings();
+			ok('scn: Base runs the same day after its rename', JSON.stringify(await series()) === JSON.stringify(baseRun));
+			await scnMenu('Peak');
+			ok('scn: Peak, renamed from Base, shows P2', (await cSettings()) === 'P2');
+			await cCloseSettings();
+			ok('scn: Peak runs the same day after the rename', JSON.stringify(await series()) === JSON.stringify(peakRun));
+			// Back in Base, delete Peak's P2: the notice names Peak, and Peak inherits Base's B1 again.
+			await scnMenu(BASE);
+			await cLib(() => {
+				const e = Array.from(document.querySelectorAll('#lpn_libbox_content .lpn-lib-entry')).find((x) => x.querySelector('input.lpn-lib-id').value === 'P2');
+				e.querySelector('button.lpn-lib-del').dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, detail: 1 }));
+			});
+			const dn = String(await c.notice());
+			console.log('  notice:', JSON.stringify(dn));
+			ok('scn: deleting Peak\'s default from Base says so and names Peak', /P2/.test(dn) && /Peak/.test(dn) && /default demand pattern/i.test(dn), dn);
+			await scnMenu('Peak');
+			ok('scn: Peak now inherits Base\'s B1', (await cSettings()) === 'B1');
+			await cCloseSettings();
+			ok('scn: and Peak runs Base\'s day again', JSON.stringify(await series()) === JSON.stringify(baseRun));
+			// In Peak, delete B1 (Base's default, which Peak inherits): the notice is the open scenario's own.
+			await cLib(() => {
+				const e = Array.from(document.querySelectorAll('#lpn_libbox_content .lpn-lib-entry')).find((x) => x.querySelector('input.lpn-lib-id').value === 'B1');
+				e.querySelector('button.lpn-lib-del').dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, detail: 1 }));
+			});
+			const dn2 = String(await c.notice());
+			console.log('  notice:', JSON.stringify(dn2));
+			ok('scn: deleting B1 in Peak names a constant demand', /B1/.test(dn2) && /constant/i.test(dn2), dn2);
+			ok('scn: and Peak\'s run is now flat', flat(await series()));
+		}
 
 		console.log('\n--- ?lang=es ---');
 		const b = await Session.open(browser, 'defpat-es');
