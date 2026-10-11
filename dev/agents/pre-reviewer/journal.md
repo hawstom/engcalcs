@@ -4240,3 +4240,17 @@ NOT CHECKED: touch, satellite glyph look, Recalc OFF (code path untouched), Alt 
 - OBSERVED: own probe (scratchpad/p/probe.js): menu on Night == buttons order; Base menu greys Make current/Rename/Delete, only Delete has a tip; Net1 Base vs master identical; child Peak dia 18->8 numbers identical to master Base dia 8; Base unchanged after returning.
 - OBSERVED: 27 rows scroll inside tree, Home/End keep selection in view. Title carries two "?" (blue tip beside title, Guide "?" in header).
 - NOT CHECKED: real long-press (CDP touch in headless fired 0 contextmenu events), mutation-testing of the new harness.
+
+# Perry journal: feat/shape 8436cef6 (2026-10-11)
+OBSERVED: harness 70/70 passes. geojson-export-harness 80/80, dxf-export-harness all pass, lang_syntax and chrome_colour checks clean.
+OBSERVED: with no Shapes, Net1 .inp and DXF, and a geographic project's GeoJSON and DXF, are byte-identical to master's. Saved project file differs from master's only by settings.idPrefixes gaining S:"S"; no `shapes` key. Opening a master-saved file on the branch shows no spurious asterisk.
+OBSERVED: master (d4271727) opens a file containing doc.shapes with no error and no notice; Shapes are silently absent and lost on its next save.
+OBSERVED: master Net1 [LABELS] x changes on the first reload (-2.39947 -> -2.39837, 10.8899 -> 10.8756, 45.695 -> 45.716), stable on later reloads. Builder's side finding CONFIRMED, pre-existing.
+OBSERVED: GeoJSON import of a QGIS-style file: 7 shapes, notice "1 features not imported: Nothing (...)", holes counted, multipart counted; plurals "1 Shapes", "1 features", "1 polygon holes" appear. Feature name "Lot A" (space) is dropped, minted S1; names of multipart parts dropped; no mention in the notice.
+OBSERVED: 500 six-point polygons: import 1.1 s, reload 0.9 s, 0.4 ms per pointer move, wheel and pan unremarkable.
+OBSERVED: Shape drawn on a project with a scenario active edits the one shared Shape (no override, no notice), as claimed.
+OBSERVED: multi-select of Shape + junction then Delete = two Undo steps (one per element).
+OBSERVED: a Shape under a data label cannot be selected at the label's hit area; grips of a selected one win.
+OBSERVED: Select Area (window/lasso) never picks Shapes; no Tables tab; Find unaffected.
+OBSERVED: Arabic page: Shape strings are English (untranslated, expected); phone 390 draws by taps, closes by tap on first point.
+NOT CHECKED: Recalc OFF at runtime (code path calls only save/rebuild), projected-CRS import, visual appearance (colour, grips, 6% fill), dark theme, touch drag of grips.
