@@ -47118,9 +47118,9 @@ var EngCalcs = EngCalcs || {};
 			// every object on the map. Clearing a class costs nothing and cannot be wrong: there is
 			// no pan in progress once a pointer has been released.
 			setPanning(false);
-			if (drag && drag.pointerId === e.pointerId && (drag.type === 'node' || drag.type === 'vertex')) { hideSnapMark(); }
 			if (drag && drag.type === 'pinch' && pointers.size < 2) { drag = null; dragDirty = false; return; }
-			if (drag && drag.pointerId === e.pointerId) { drag = null; dragDirty = false; }
+			// The snap glyph of a node or bend drag ends with the drag (Task 782).
+			if (drag && drag.pointerId === e.pointerId) { drag = null; dragDirty = false; hideSnapMark(); }
 			// Task 647: a pan is the gesture that can put the whole network off screen by hand,
 			// and its release is the "at rest" moment -- never mid-drag.
 			if (wasPan && !drag) { relayoutLabels(); updateOffscreenNotice(); }
