@@ -12868,6 +12868,11 @@ var EngCalcs = EngCalcs || {};
 		// closer to the edge than the arithmetic thinks, against 16px of reserve.
 
 
+		// A Shape's points are drawn content too (Task 779), each with the few pixels its x or grip
+		// takes, so a fit frames a Shape drawn beyond the network and a project of Shapes alone.
+		docShapesRead().forEach(function (sh) {
+			(sh.pts || []).forEach(function (p) { fitItem(out, p.x, p.y, 6, 6, 6, 6); });
+		});
 		doc.nodes.forEach(function (n) {
 			// nodeRadiusFull(), NEVER nodeRadius() -- see its own comment. The fit must not bake in
 			// whichever scale happened to be live when it was asked for.

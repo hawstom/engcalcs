@@ -424,6 +424,23 @@ async function main() {
 			ok('the notice counts the Shapes and names the junction as not imported',
 				note.indexOf('3') >= 0 && note.indexOf(gj.id + ' (' + await a.lang('lpn_geojson_import_why_network') + ')') >= 0, note);
 			ok('...and no junction was made', (g3.nodes || []).length === 0);
+			// A project of Shapes alone: Zoom to fit frames them.
+			const allInView = () => P.evaluate(() => {
+				const r = document.getElementById('lpn_canvas').getBoundingClientRect();
+				// The drawing on screen only: another tab's kept drawing is in the page, hidden.
+				const gs = Array.from(document.querySelectorAll('#lpn_canvas .lpn-shape')).filter((e) => e.getClientRects().length > 0);
+				return gs.length === 3 && gs.every((e) => {
+					const b = e.getBoundingClientRect();
+					return b.left >= r.left && b.right <= r.right && b.top >= r.top && b.bottom <= r.bottom;
+				});
+			});
+			const cb = await P.evaluate(() => { const r = document.getElementById('lpn_canvas').getBoundingClientRect(); return { x: r.left + 40, y: r.top + r.height / 2 }; });
+			for (let k = 0; k < 12; k++) { await P.mouse.move(cb.x, cb.y); await P.mouse.wheel(0, -400); await h.settle(120); }
+			await h.settle(400);
+			const outBefore = !(await allInView());
+			await a.toolbarClick(await a.lang('lpn_tool_zoom_extent'));
+			await h.settle(900);
+			ok('Zoom to fit frames a project of Shapes alone', outBefore && await allInView(), 'out of view before: ' + outBefore);
 			await P.keyboard.press('Control+z'); await h.settle(400);
 			ok('one Undo takes the whole import back', ((await h.stored()).shapes || []).length === 0);
 		}
