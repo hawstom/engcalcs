@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "ar",
-        "expected_key_count": 2546,
-        "delta_key_count": 102,
+        "expected_key_count": 2550,
+        "delta_key_count": 106,
         "exempt_key_count": 31,
         "exempt_keys": [
             "calc_units_us",
@@ -792,6 +792,10 @@
         "lpn_msglog_hidden": "Hidden",
         "lpn_msglog_unhide": "Show",
         "lpn_status_hidden_tip": "Show the hidden message on the map again.",
+        "lpn_result_depth": "Depth",
+        "lpn_result_depth_tip": "Depth of water in the tank at the time shown, measured up from the tank bottom: the head minus the tank elevation.",
+        "lpn_result_tank_volume": "Usable volume",
+        "lpn_result_tank_volume_tip": "Volume of water above the lowest water depth, so it is zero at that depth. The EPANET tank volume also includes the water below the lowest water depth, which still counts toward mixing and water age, so the tank elevation stays at the tank bottom.",
         "lpn_pane_copy_heads": "Copy with column headings",
         "lpn_export_table_title": "Export to {format}",
         "lpn_export_table_current": "Current",
@@ -896,6 +900,10 @@
         "lpn_msglog_hidden": "Hidden",
         "lpn_msglog_unhide": "Show",
         "lpn_status_hidden_tip": "Show the hidden message on the map again.",
+        "lpn_result_depth": "Depth",
+        "lpn_result_depth_tip": "Depth of water in the tank at the time shown, measured up from the tank bottom: the head minus the tank elevation.",
+        "lpn_result_tank_volume": "Usable volume",
+        "lpn_result_tank_volume_tip": "Volume of water above the lowest water depth, so it is zero at that depth. The EPANET tank volume also includes the water below the lowest water depth, which still counts toward mixing and water age, so the tank elevation stays at the tank bottom.",
         "lpn_pane_copy_heads": "Copy with column headings",
         "lpn_export_table_title": "Export to {format}",
         "lpn_export_table_current": "Current",
@@ -1762,6 +1770,70 @@
                     "key": "lpn_wrong_tip",
                     "value": "أبلغ عن خطأ في هذه الصفحة. يفتح هذا مربعاً لاختيار المشكلة وإضافة تعليق وإدخال عنوان بريد إلكتروني إذا أُريد رد. كل الحقول اختيارية، ولا يُرسل شيء حتى تضغط إرسال.",
                     "english": "Report an error on this page. This opens a box to select the problem, add a comment, and enter an email address if a reply is wanted. All fields are optional, and nothing is sent until you press Send."
+                }
+            }
+        },
+        "lpn_result_depth": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_result_head_tip",
+                    "value": "الطاقة الكامنة للماء عند هذه العقدة، معبَّراً عنها كارتفاع عمود ماء. هذا ارتفاع مطلق، أما الضغط فهو قياس بمقياس الضغط.",
+                    "english": "Potential energy of the water at this node, written as a height of water column. It is an absolute height, where pressure is a gauge measurement."
+                },
+                "next_translated": {
+                    "key": "lpn_result_pressure",
+                    "value": "الضغط",
+                    "english": "Pressure"
+                }
+            }
+        },
+        "lpn_result_depth_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_result_head_tip",
+                    "value": "الطاقة الكامنة للماء عند هذه العقدة، معبَّراً عنها كارتفاع عمود ماء. هذا ارتفاع مطلق، أما الضغط فهو قياس بمقياس الضغط.",
+                    "english": "Potential energy of the water at this node, written as a height of water column. It is an absolute height, where pressure is a gauge measurement."
+                },
+                "next_translated": {
+                    "key": "lpn_result_pressure",
+                    "value": "الضغط",
+                    "english": "Pressure"
+                }
+            }
+        },
+        "lpn_result_tank_volume": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_result_head_tip",
+                    "value": "الطاقة الكامنة للماء عند هذه العقدة، معبَّراً عنها كارتفاع عمود ماء. هذا ارتفاع مطلق، أما الضغط فهو قياس بمقياس الضغط.",
+                    "english": "Potential energy of the water at this node, written as a height of water column. It is an absolute height, where pressure is a gauge measurement."
+                },
+                "next_translated": {
+                    "key": "lpn_result_pressure",
+                    "value": "الضغط",
+                    "english": "Pressure"
+                }
+            }
+        },
+        "lpn_result_tank_volume_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_result_head_tip",
+                    "value": "الطاقة الكامنة للماء عند هذه العقدة، معبَّراً عنها كارتفاع عمود ماء. هذا ارتفاع مطلق، أما الضغط فهو قياس بمقياس الضغط.",
+                    "english": "Potential energy of the water at this node, written as a height of water column. It is an absolute height, where pressure is a gauge measurement."
+                },
+                "next_translated": {
+                    "key": "lpn_result_pressure",
+                    "value": "الضغط",
+                    "english": "Pressure"
                 }
             }
         },

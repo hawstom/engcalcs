@@ -9977,6 +9977,14 @@ var EngCalcs = EngCalcs || {};
 			}
 			return lastSolveResult ? toDisplay(lastSolveResult.heads[n.id], resultUnit('elevhead')) : undefined;
 		}
+		if (field === 'depth') {
+			var depSI = tankDepthSI(n);
+			return depSI === undefined ? undefined : toDisplay(depSI, resultUnit('elevhead'));
+		}
+		if (field === 'volume') {
+			var volSI = tankUsableVolumeSI(n);
+			return volSI === undefined ? undefined : volSI * tankVolumeFactor();
+		}
 		if (field === 'pressure') {
 			if (isFixedHeadNode(n)) { return fixedHeadPressure(n); }
 			return lastSolveResult ? toDisplay(lastSolveResult.pressures[n.id], resultUnit('pressure')) : undefined;
@@ -9988,6 +9996,78 @@ var EngCalcs = EngCalcs || {};
 		// EPANET converts an initial quality nowhere either, so there is no factor on this side.
 		if (field === 'initQuality') { return nodeInitQuality(n); }
 		return undefined;
+	}
+	// ---- A TANK'S DEPTH AND USABLE VOLUME (Task 783) ---------------------------------------------
+	//
+	// **DEPTH IS HEAD MINUS THE TANK BOTTOM, and our Elevation IS the bottom** (EPANET's own: depth
+	// zero is the vessel floor). Inside a run the head is the frame's (what the engine integrated);
+	// at one instant it is the stored water depth, exactly as the Head column reads. SI metres.
+	function tankDepthSI(n) {
+		var hf = toSI(1, 'lpn_u_elevhead'), g;
+		if (!n || n.type !== 'tank' || !(hf > 0) || !isFinite(hf)) { return undefined; }
+		if (lastSolveResult && typeof lastSolveResult.t === 'number' && lastSolveResult.heads &&
+			typeof lastSolveResult.heads[n.id] === 'number') {
+			// **THE BOTTOM IS THE ONE THE RUN WAS SOLVED WITH** (Recalculate OFF is a snapshot): the
+			// head above is stale after an edit, so the elevation it is measured from must be too.
+			g = tankGeomOf(n, true);
+			return lastSolveResult.heads[n.id] - g.elevSI;
+		}
+		return toSI(effective(n, 'level') || 0, 'lpn_u_elevhead');
+	}
+	// **A TANK'S SHAPE AS THE RESULT ON SCREEN WAS SOLVED** (SI): bottom, lowest water depth,
+	// diameter and the usable volume curve. Captured when a result is installed (tankSnap), read
+	// here only for a run's frames, whose head is itself a snapshot. At one instant the head is
+	// derived from the typed numbers and moves with them, so the live numbers are right there.
+	var tankSnap = null;
+	function tankGeomLive(n) {
+		var hf = toSI(1, 'lpn_u_elevhead'), vf = hf * hf * hf, curve = n.volCurve ? curveById(n.volCurve) : null,
+			pts = curve ? curvePointsOf(curve) : [];
+		if (!(pts.length && EngCalcs.lpnTankVolumeCurveUsable && EngCalcs.lpnTankVolumeCurveUsable(pts))) { pts = null; }
+		else { pts = pts.map(function (pt) { return [pt[0] * hf, pt[1] * vf]; }); }
+		return { elevSI: toSI(n.elev || 0, 'lpn_u_elevhead'), minSI: toSI(n.minLevel || 0, 'lpn_u_elevhead'),
+			D: toSI(n.tankDiameter, 'lpn_u_length'), curve: pts };
+	}
+	function captureTankSnapshot() {
+		var snap = {};
+		doc.nodes.forEach(function (n) { if (n.type === 'tank') { snap[n.id] = tankGeomLive(n); } });
+		tankSnap = snap;
+	}
+	function tankGeomOf(n, fromSnapshot) {
+		return (fromSnapshot && tankSnap && tankSnap[n.id]) || tankGeomLive(n);
+	}
+	// **ZERO AT THE LOWEST WATER DEPTH** (Tom, 2026-10-10): the water a draw-down can actually use.
+	// EPANET's own tank volume also counts the water below the lowest water depth, so this is NOT
+	// that number. A usable volume curve wins (EPANET's rule: curve volumes replace the cylinder),
+	// otherwise a cylinder of the tank diameter. SI cubic metres.
+	function tankUsableVolumeSI(n) {
+		var dep = tankDepthSI(n), g, top;
+		if (dep === undefined) { return undefined; }
+		g = tankGeomOf(n, !!(lastSolveResult && typeof lastSolveResult.t === 'number'));
+		top = Math.max(dep, g.minSI);
+		if (g.curve) { return tankCurveVolume(g.curve, top) - tankCurveVolume(g.curve, g.minSI); }
+		if (!(g.D > 0) || !isFinite(g.D)) { return undefined; }
+		return Math.PI / 4 * g.D * g.D * (top - g.minSI);
+	}
+	// Linear between the curve's points, held flat beyond its ends. pts are SI and increasing in x.
+	function tankCurveVolume(pts, x) {
+		var i, a, b;
+		if (x <= pts[0][0]) { return pts[0][1]; }
+		for (i = 1; i < pts.length; i++) {
+			if (x <= pts[i][0]) {
+				a = pts[i - 1]; b = pts[i];
+				return a[1] + (b[1] - a[1]) * (x - a[0]) / (b[0] - a[0]);
+			}
+		}
+		return pts[pts.length - 1][1];
+	}
+	// A volume is shown in the LENGTH unit cubed (cubic feet or cubic metres, which is what EPANET
+	// pairs with its length): the factor and the mark come from the one LENGTH selector.
+	function tankVolumeFactor() { var f = unitFactor('lpn_u_length'); return f * f * f; }
+	function tankVolumeUnitText() {
+		var pc = EngCalcs.pageConfig || {}, k = unitKey('lpn_u_length');
+		if (k === 'ft') { return pc.u_ft3 || 'ft^3'; }
+		if (k === 'm') { return pc.u_m3 || 'm^3'; }
+		return unitLabel('lpn_u_length') + '^3';
 	}
 	function colorLinkValue(l, field) {
 		if (field === 'diameter') { return l.type === 'pump' ? undefined : effective(l, 'diameter'); }
@@ -10156,6 +10236,12 @@ var EngCalcs = EngCalcs || {};
 		// age or a source trace the document states no chemical and this is '', which is honest:
 		// nobody has said what the number is in.
 		if (group === 'node' && field === 'initQuality') { return concentrationUnitText(); }
+		// **A TANK'S TWO RESULTS ARE NOT COLOUR OR LABEL FIELDS** (Task 783; the chemical-symbology
+		// harness holds every colour field to a Labels row, and these have neither), so they sit
+		// outside COLOR_NODE_FIELDS and the unit is answered here. Depth reads in the Elevation/Head
+		// unit like the three typed levels; volume in the LENGTH unit cubed.
+		if (group === 'node' && field === 'volume') { return tankVolumeUnitText(); }
+		if (group === 'node' && field === 'depth') { return unitLabel(resultUnit('elevhead')); }
 		id = colorFieldUnit(group, field);
 		if (id) { return unitLabel(id); }
 		// A friction factor is dimensionless and a status is not a quantity at all; both print
@@ -10408,12 +10494,15 @@ var EngCalcs = EngCalcs || {};
 	function colorFieldLabel(group, field) {
 		var pc = EngCalcs.pageConfig || {}, defs = group === 'node' ? nodeFieldDefs(pc) : linkFieldDefs(pc), i;
 		for (i = 0; i < defs.length; i++) { if (defs[i][0] === field) { return defs[i][1]; } }
+		// Tank-only results with no Labels row (Task 783): offered to the ramp, Find and the graph.
+		if (group === 'node' && field === 'depth') { return pc.lpn_result_depth || 'Depth'; }
+		if (group === 'node' && field === 'volume') { return pc.lpn_result_tank_volume || 'Usable volume'; }
 		return field;
 	}
 	// **A STATISTIC VIEW SAYS SO IN THE HEADING** (Task 735): with the transport on Averaged, the map's
 	// "Pressure" is not an instant, and the label "P=124.88" cannot say so. Result fields only; an
 	// input (elevation, diameter) is the same in every view.
-	var STATISTIC_RESULT_FIELDS = { demandActual: 1, level: 1, head: 1, pressure: 1, quality: 1,
+	var STATISTIC_RESULT_FIELDS = { demandActual: 1, level: 1, depth: 1, volume: 1, head: 1, pressure: 1, quality: 1,
 		flow: 1, velocity: 1, headloss: 1, rate: 1 };
 	function colorHeadingText(group, field, unit, labelOverride) {
 		var stat = EngCalcs.lpnTimeStatisticLabel && !labelOverride && STATISTIC_RESULT_FIELDS[field] ?
@@ -13840,12 +13929,16 @@ var EngCalcs = EngCalcs || {};
 		}
 		l.verts.splice(bestI, 0, { x: pt.x, y: pt.y });
 		rebuildLink(l);
+		// A bend drag reaches scheduleSolve() through updateVertex(); a click did not, so the
+		// autosave (which rides this debounce) never saw the edit until some other one came along.
+		scheduleSolve();
 	}
 	function removeVertex(linkId, vidx) {
 		saveUndoSnapshot();
 		var l = linkById(linkId);
 		l.verts.splice(vidx, 1);
 		rebuildLink(l);
+		scheduleSolve();
 	}
 
 	// ---- zoom-extent: fits the actual rendered extent (symbol radius, label text box, link
@@ -20511,6 +20604,8 @@ var EngCalcs = EngCalcs || {};
 			['demandActual', 'bpn_demand', 'Demand'],
 			['head', 'lpn_result_head', 'Head'],
 			['pressure', 'lpn_result_pressure', 'Pressure'],
+			['depth', 'lpn_result_depth', 'Depth'],
+			['volume', 'lpn_result_tank_volume', 'Usable volume'],
 			['quality', null, 'Water age']
 		];
 		var BAND_LINK = [
@@ -20575,7 +20670,7 @@ var EngCalcs = EngCalcs || {};
 					if (d.group !== 'link' || (d.type && d.type !== 'pipe') || !reactionFieldsShown()) { return; }
 				} else if (key === 'emitter') {
 					if (d.group !== 'node' || (d.type && d.type !== 'junction')) { return; }
-				} else if (key === 'level' || key === 'minLevel' || key === 'maxLevel'
+				} else if (key === 'level' || key === 'minLevel' || key === 'maxLevel' || key === 'depth' || key === 'volume'
 						|| key === 'tankDiameter' || key === 'mixingModel' || key === 'mixingFraction') {
 					if (d.group !== 'node' || (d.type && d.type !== 'tank')) { return; }
 				} else if (key === 'speed' || key === 'energyPrice' || key === 'energyPattern') {
@@ -25922,6 +26017,14 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 					// it must be visible, but a second editable field would be two numbers that have
 					// to agree.
 					paneColNodeResult('head', 'lpn_result_head', paneUnitHead),
+					// **DEPTH AND USABLE VOLUME, AS RESULTS** (Task 783): head minus the tank bottom, and
+					// the water above the lowest water depth. Heading tips live in the popup rows.
+					paneColNodeResult('depth', 'lpn_result_depth', paneUnitHead),
+					(function () {
+						var c = paneColNodeResult('volume', 'lpn_result_tank_volume', null);
+						c.unitText = tankVolumeUnitText;
+						return c;
+					}()),
 					paneColNodeInitQuality(),
 					paneColSourceType(), paneColSourceQuality(), paneColSourcePattern(),
 					paneColNodeQuality()
@@ -33946,8 +34049,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// them says something true, and Tom named one field.
 	var TS_FIELD_SKIP = { node: { initQuality: 1 }, link: {} };
 	function tsFieldOptions(group) {
-		var skip = TS_FIELD_SKIP[group] || {};
-		return colorFieldOptions(group).filter(function (o) { return !skip[o[0]]; });
+		var skip = TS_FIELD_SKIP[group] || {},
+			out = colorFieldOptions(group).filter(function (o) { return !skip[o[0]]; });
+		// A tank's depth and usable volume (Task 783): graphable, but neither a map colour nor a label.
+		if (group === 'node') {
+			out.push(['depth', colorFieldLabel('node', 'depth')], ['volume', colorFieldLabel('node', 'volume')]);
+		}
+		return out;
 	}
 	function tsField() {
 		var group = tsGroup(), opts = tsFieldOptions(group), f = tsState.fields[group], i;
@@ -37317,7 +37425,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		switchKeepOrder = switchKeepOrder.filter(function (x) { return x !== id; });
 		switchKeepOrder.push(id);
 		var layout = captureLabelLayout();
-		switchKeep[id] = { sig: storedSignature(id), solve: lastSolveResult,
+		switchKeep[id] = { sig: storedSignature(id), solve: lastSolveResult, tank: tankSnap,
 			time: EngCalcs.lpnTimeKeep ? EngCalcs.lpnTimeKeep() : null,
 			layout: layout,
 			// **AND THE NODE CONTEXT THE PASS RANKED AND SIDED BY** (Task 758). Built only by a
@@ -38688,6 +38796,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// label would be drawn empty and drawn again when the values arrived.
 		var kept = keptStateForOpenProject();
 		lastSolveResult = (kept && kept.solve) || null;
+		tankSnap = (kept && kept.tank) || null;
 		// The context the kept layout was ranked and sided by, for the same reason (Task 758): a
 		// restored arrival runs no content pass, which is the only builder of it.
 		if (kept && kept.context) { nodeContext = kept.context; nodeFieldMid = kept.fieldMid || {}; }
@@ -63545,6 +63654,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			mixingFields(fields, n);
 			readonlyUnitField(fields, pc.lpn_result_head || 'Head', resultUnit('elevhead'),
 				toSI(nodeFixedHead(n), 'lpn_u_elevhead'), pc.lpn_tank_head_tip);
+			// Depth and usable volume, read the way the Tables pane reads them (Task 783).
+			readonlyField(fields, (pc.lpn_result_depth || 'Depth') + ' (' + unitLabel(resultUnit('elevhead')) + ')',
+				colorNodeValue(n, 'depth'), pc.lpn_result_depth_tip);
+			readonlyField(fields, (pc.lpn_result_tank_volume || 'Usable volume') + ' (' + tankVolumeUnitText() + ')',
+				colorNodeValue(n, 'volume'), pc.lpn_result_tank_volume_tip);
 		} else if (n.type === 'reservoir') {
 			unitNumberField(fields, pc.lpn_field_elev || 'Elevation', 'lpn_u_elevhead',
 				function () { return n.elev; },
@@ -73726,6 +73840,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// EPANET it is reachable through a control -- `Unbalanced: Stop` and a trials limit are
 		// both Settings rows, and neither makes the engine refuse: it hands back the last iterate.
 		var notConverged = result.converged === false;
+		captureTankSnapshot();
 		lastSolveResult = result;
 		refreshMapStatus();
 		// The only case where the two engines knowingly disagree, so say so rather than let a

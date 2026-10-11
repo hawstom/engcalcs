@@ -4257,3 +4257,39 @@ OBSERVED (decays): driven in real Chromium on Net1, own scripts in scratchpad (p
 - Works: add/rename/F2/slow-click rename, Child_1/2_of_Horse numbering, Base2/Base3, drag reparent+reorder, cycle refusal, delete-in-use refusal naming users, Demand alt assigned in Scenarios table -> junction edit lands in alt, Base untouched, solve differs; copy own/share; Compare honours unchecked; save/reopen keeps tree, alternatives, compareSet; es shows menu/headings, new strings English.
 - Defects: Delete on Base: misleading map message; Base2 Parent column says Base while tip says Base has no parent; scenario override count 0 though holds Dry year demand edit; builder harness has `|| true` assertions (1.1, 3.4, 2.1) and weak 5.5/6.4.
 - Could not find the builder's "six self-declared calls" in git log or dev/*.md.
+
+## 2026-10-11 feat/tank-volume @ 42f75c7f (Perry)
+
+- OBSERVED: independent EPANET (js/vendor/epanet-js.js in node, no app code) on Net3 and on an SI (LPS) inp with a cylinder tank and a VOLUME-curve tank: app Usable volume = EN_TANKVOLUME - EN_MINVOLUME at every hour tested, Depth = EN_HEAD - elevation. All agree to display rounding. Note EN_TANKLEVEL is the INITIAL level in EPANET, not the current one; use head minus elevation.
+- OBSERVED: Find (Tank scope) offers Depth and Usable volume, matches at the time shown, re-evaluates when time moves; Replace list correctly omits them.
+- OBSERVED: "ft H2O" on Depth is the same suffix the existing Elevation / Water depth / Lowest / Highest columns carry, so not a leak; tank diameter correctly stays in plain ft.
+- OBSERVED: with Recalculate OFF after a run, editing tank Elevation 50 -> 60 leaves Head stale (52.76) and Depth becomes -7.24 (stale head minus new elevation). Edit of Lowest water depth moves Usable volume at once while Head stays stale.
+- OBSERVED: Tables pane is not shown at 390 px (display none, pre-existing); could not drive Properties at phone width.
+- TRAP: the harness's "Depth = head - elevation" check restates the code; only the EPANET comparison is independent.
+
+## 2026-10-11 Perry: feat/match-property @ 9b4709d4 (Task 782)
+OBSERVED (in Chromium, Net1/Net3/Elm, this tree; re-verify before citing):
+- Harness 42/42 passes. Pipe/junction/tank match, one-step undo, Recalculate OFF snapshot all correct.
+- Inside scenario S1, pipe 10->11: Base untouched, BUT S1 gains 9 overrides ("S1 (9)") though only diameter differed; a later Base roughness edit on pipe 11 did not reach S1.
+- Inside scenario S1, junction 10->15 rewrote BASE elevation of 15 (32->147). Elevation is not overridable; same as typing it in a scenario, but silent in a bulk tool.
+- Plural: "to the 1 other selected assets?"; "1 properties copied" by code.
+- Valve PRV->FCV: setting refused, valveType column has no setter so never copied. OK.
+- Demand breakdown junction: demand/pattern silently skipped both directions; notice still counts "7 copied".
+- Pump 10 (closed, curve 1) -> pump 335: closed=1 and curve ref copied.
+- EPS at 4:00: match resets display to time-0 values; a Tables edit does the same (pre-existing).
+- Right-click on node: no selection, no Properties; one-row menu. Document-level capture swallows ALL right-button presses on the canvas in Select mode (code).
+SPECULATION: touch long-press yields native menu only (pointerdown button is 0).
+
+# Perry journal: feat/snap c22988d5 (2026-10-11)
+OBSERVED: harness 42/42 passes. Split reach for node tools now 14 px (was ~6): ground within reach of a pipe 7-9% -> 14-20% of the network bbox (Elm St, Net1, Net3 at fit zoom).
+OBSERVED: dragging junction 31 onto junction 22 (same type) stacks exactly, glyph shown, no notice. Dragging a node onto the far end of its own pipe lands exactly on it (zero-length drawn pipe); own pipes excluded but not neighbour node.
+OBSERVED: .inp export after tank snapped on 22 writes identical "50.00 40.00". Scenario drag writes override {x:30,y:10}, Base untouched, undo clears it. Hover cost 0.1 ms/move extra on Net3 world (580 nodes).
+OBSERVED: in a scenario a junction pressed 9 px from pipe 10 is placed on the line, no split offer, no notice.
+OBSERVED: Spanish notice mixes English template with Spanish names (key untranslated).
+NOT CHECKED: touch, satellite glyph look, Recalc OFF (code path untouched), Alt vs OS shortcuts.
+
+## 2026-10-11 Perry, feat/bentley-interop 784ea66f, Scenario manager tree
+- OBSERVED: scenario-tree, scenario-manager, default-pattern-shown, scenario-active-topology browser harnesses and change-type-harness all pass on 784ea66f.
+- OBSERVED: own probe (scratchpad/p/probe.js): menu on Night == buttons order; Base menu greys Make current/Rename/Delete, only Delete has a tip; Net1 Base vs master identical; child Peak dia 18->8 numbers identical to master Base dia 8; Base unchanged after returning.
+- OBSERVED: 27 rows scroll inside tree, Home/End keep selection in view. Title carries two "?" (blue tip beside title, Guide "?" in header).
+- NOT CHECKED: real long-press (CDP touch in headless fired 0 contextmenu events), mutation-testing of the new harness.

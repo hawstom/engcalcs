@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "my",
-        "expected_key_count": 2546,
-        "delta_key_count": 102,
+        "expected_key_count": 2550,
+        "delta_key_count": 106,
         "exempt_key_count": 41,
         "exempt_keys": [
             "u_imgd",
@@ -802,6 +802,10 @@
         "lpn_msglog_hidden": "Hidden",
         "lpn_msglog_unhide": "Show",
         "lpn_status_hidden_tip": "Show the hidden message on the map again.",
+        "lpn_result_depth": "Depth",
+        "lpn_result_depth_tip": "Depth of water in the tank at the time shown, measured up from the tank bottom: the head minus the tank elevation.",
+        "lpn_result_tank_volume": "Usable volume",
+        "lpn_result_tank_volume_tip": "Volume of water above the lowest water depth, so it is zero at that depth. The EPANET tank volume also includes the water below the lowest water depth, which still counts toward mixing and water age, so the tank elevation stays at the tank bottom.",
         "lpn_pane_copy_heads": "Copy with column headings",
         "lpn_export_table_title": "Export to {format}",
         "lpn_export_table_current": "Current",
@@ -906,6 +910,10 @@
         "lpn_msglog_hidden": "Hidden",
         "lpn_msglog_unhide": "Show",
         "lpn_status_hidden_tip": "Show the hidden message on the map again.",
+        "lpn_result_depth": "Depth",
+        "lpn_result_depth_tip": "Depth of water in the tank at the time shown, measured up from the tank bottom: the head minus the tank elevation.",
+        "lpn_result_tank_volume": "Usable volume",
+        "lpn_result_tank_volume_tip": "Volume of water above the lowest water depth, so it is zero at that depth. The EPANET tank volume also includes the water below the lowest water depth, which still counts toward mixing and water age, so the tank elevation stays at the tank bottom.",
         "lpn_pane_copy_heads": "Copy with column headings",
         "lpn_export_table_title": "Export to {format}",
         "lpn_export_table_current": "Current",
@@ -1772,6 +1780,70 @@
                     "key": "lpn_wrong_tip",
                     "value": "ဤစာမျက်နှာရှိ အမှားတစ်ခုကို အစီရင်ခံပါ။ ပြဿနာကို ရွေးချယ်ရန်၊ မှတ်ချက်ထည့်ရန်နှင့် အကြောင်းပြန်လိုလျှင် အီးမေးလ်လိပ်စာ ထည့်သွင်းရန် ဘောက်စ်တစ်ခု ပွင့်လာသည်။ အကွက်အားလုံးသည် မဖြစ်မနေမဟုတ်ပါ၊ ပို့ရန်ကို မနှိပ်မချင်း ဘာမျှ မပို့ပါ။",
                     "english": "Report an error on this page. This opens a box to select the problem, add a comment, and enter an email address if a reply is wanted. All fields are optional, and nothing is sent until you press Send."
+                }
+            }
+        },
+        "lpn_result_depth": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_result_head_tip",
+                    "value": "ဤ node ရှိ ရေ၏ အလားအလာစွမ်းအင်ကို ရေတိုင်အမြင့်အဖြစ် ရေးထားသည်။ ၎င်းသည် ပကတိအမြင့်ဖြစ်ပြီး ဖိအားမှာ gauge တိုင်းတာမှု ဖြစ်သည်။",
+                    "english": "Potential energy of the water at this node, written as a height of water column. It is an absolute height, where pressure is a gauge measurement."
+                },
+                "next_translated": {
+                    "key": "lpn_result_pressure",
+                    "value": "ဖိအား",
+                    "english": "Pressure"
+                }
+            }
+        },
+        "lpn_result_depth_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_result_head_tip",
+                    "value": "ဤ node ရှိ ရေ၏ အလားအလာစွမ်းအင်ကို ရေတိုင်အမြင့်အဖြစ် ရေးထားသည်။ ၎င်းသည် ပကတိအမြင့်ဖြစ်ပြီး ဖိအားမှာ gauge တိုင်းတာမှု ဖြစ်သည်။",
+                    "english": "Potential energy of the water at this node, written as a height of water column. It is an absolute height, where pressure is a gauge measurement."
+                },
+                "next_translated": {
+                    "key": "lpn_result_pressure",
+                    "value": "ဖိအား",
+                    "english": "Pressure"
+                }
+            }
+        },
+        "lpn_result_tank_volume": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_result_head_tip",
+                    "value": "ဤ node ရှိ ရေ၏ အလားအလာစွမ်းအင်ကို ရေတိုင်အမြင့်အဖြစ် ရေးထားသည်။ ၎င်းသည် ပကတိအမြင့်ဖြစ်ပြီး ဖိအားမှာ gauge တိုင်းတာမှု ဖြစ်သည်။",
+                    "english": "Potential energy of the water at this node, written as a height of water column. It is an absolute height, where pressure is a gauge measurement."
+                },
+                "next_translated": {
+                    "key": "lpn_result_pressure",
+                    "value": "ဖိအား",
+                    "english": "Pressure"
+                }
+            }
+        },
+        "lpn_result_tank_volume_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_result_head_tip",
+                    "value": "ဤ node ရှိ ရေ၏ အလားအလာစွမ်းအင်ကို ရေတိုင်အမြင့်အဖြစ် ရေးထားသည်။ ၎င်းသည် ပကတိအမြင့်ဖြစ်ပြီး ဖိအားမှာ gauge တိုင်းတာမှု ဖြစ်သည်။",
+                    "english": "Potential energy of the water at this node, written as a height of water column. It is an absolute height, where pressure is a gauge measurement."
+                },
+                "next_translated": {
+                    "key": "lpn_result_pressure",
+                    "value": "ဖိအား",
+                    "english": "Pressure"
                 }
             }
         },
