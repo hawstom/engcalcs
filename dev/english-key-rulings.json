@@ -5659,6 +5659,11 @@
             "ruled": "2026-10-08",
             "answer": "Calls page 8 October: Use as written"
         },
+        "lpn_guide_dimmed": {
+            "on": "A dimmed name is a button that is currently hidden on the toolbar.",
+            "ruled": "2026-10-08",
+            "answer": "Calls page 8 October: Use as written"
+        },
         "lpn_tool_zoom_extent_tip": {
             "on": "Fit the whole network to the map window. For Zoom Window with no fit first, press W or click the small triangle in the corner of the Zoom to fit toolbar button. See also upper right map zoom controls.",
             "ruled": "2026-10-08",
@@ -5678,6 +5683,11 @@
             "on": "Replace this browser's workspace layout with the one in the file?",
             "ruled": "2026-10-08",
             "answer": "Calls page 8 October: his own text, \"Replace this browser's workspace layout with the one in the file?\""
+        },
+        "lpn_guide_boxes_autohide": {
+            "on": "When the pointer leaves, a box without focus hides after a short delay. A box with focus hides when you click outside it, press Esc, or Tab out of it with the pointer elsewhere.",
+            "ruled": "2026-10-08",
+            "answer": "Calls page 8 October (round 2): his own text"
         },
         "lpn_change_type_key": {
             "on": "Each line: ID: the property and value that would be lost",

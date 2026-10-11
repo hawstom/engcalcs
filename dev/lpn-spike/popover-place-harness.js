@@ -308,9 +308,10 @@ console.log('\n-- every popover goes through the one placer, which is the whole 
 	// standing, draggable, resizeable box that remembers its own corner (Tom, "Draggable non-hog
 	// box for Help, Notes"), not a centred popover placed fresh with fitPanelToViewport() on every
 	// open. Same two assertions as openSettingsBox() above, for the same reason.
-	report(!/openPanelAtAnchor/.test(extract('openNotesBox')),
-		'the Notes box is a standing box, not an anchored pull-down');
-	report(/clampPanel\(/.test(extract('openNotesBox')),
+	// (The Notes box itself moved into the Guide on 2026-10-09; the Guide box is the same pattern.)
+	report(!/openPanelAtAnchor/.test(extract('openHotkeysBox')),
+		'the Guide box is a standing box, not an anchored pull-down');
+	report(/clampPanel\(/.test(extract('openHotkeysBox')),
 		'...and it is clamped into the viewport, so a remembered position always comes back');
 	report(/fitPanelToViewport\(popup\)/.test(extract('openPopupAt')), 'and the property popup');
 	// The clamp must be handed the CAPPED height, or it re-derives a top from a height the panel no

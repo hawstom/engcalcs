@@ -173,9 +173,14 @@ EngCalcs.pageCalculator = function (objForm) {
 	var
 	i,
 	htmlSketchSegments = '';
+	// The 600 x 100 box stays; the plot is inset to leave room for the scale marks.
+	var skW = 600, skH = 100, skL = 52, skR = 24, skT = 8, skB = 16,
+		fx = EngCalcs.unitFactor(objForm['stationu']), fy = EngCalcs.unitFactor(objForm['elevationu']),
+		sketchTop = Math.max(...arrElev, ws), sketchBottom = Math.min(...arrElev),
+		sketchLeft = Math.min(...arrStation), sketchRight = Math.max(...arrStation), htmlAxes = '';
 	this.Sketch.construct({
-		maxHeight: 100,
-		maxWidth: 600,
+		maxHeight: skH - skT - skB,
+		maxWidth: skW - skL - skR,
 		strokeColor: 'black',
 		strokeWidth: 4,
 		figureTop: Math.max(...arrElev, ws),
@@ -217,9 +222,22 @@ EngCalcs.pageCalculator = function (objForm) {
 		);
 	}
 
+	// a unit's NAME is its symbol (ft, m); it is a label here, not a factor
+	function unitSymbol(sel) { return sel ? String(sel.value) : ''; }
+	if (sketchRight > sketchLeft && sketchTop > sketchBottom) {
+		htmlAxes = EngCalcs.sketchAxesSvg({
+			x: { min: sketchLeft * fx, max: sketchRight * fx, unit: unitSymbol(objForm['stationu']), target: 6,
+				to: function (v) { return EngCalcs.Sketch.convertPoint({x: v / fx, y: sketchTop}).x; } },
+			y: { min: sketchBottom * fy, max: sketchTop * fy, unit: unitSymbol(objForm['elevationu']), target: 4,
+				to: function (v) { return EngCalcs.Sketch.convertPoint({x: sketchLeft, y: v / fy}).y; } }
+		});
+	}
 	document.getElementById('sketch').innerHTML =
-		'<svg height="' + this.Sketch.maxHeight + '" width="' + this.Sketch.maxWidth + '">'
+		'<svg height="' + skH + '" width="' + skW + '" viewBox="0 0 ' + skW + ' ' + skH + '" style="max-width:100%;height:auto;">'
+		+ '<g transform="translate(' + skL + ',' + skT + ')">'
+		+ htmlAxes
 		+ htmlSketchSegments
+		+ '</g>'
 		+ 'Sorry, your browser does not support inline SVG.'
 		+ '</svg>';
 };

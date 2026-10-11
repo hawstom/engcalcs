@@ -199,16 +199,14 @@ async function sectionLpnDesktop(Session, browser) {
 		await page.keyboard.press('Escape');
 		await a.settle(300);
 
-		// The box's own `?` beside its x (Q5).
-		const cg = await centre(page, '#lpn_ff_box .lpn-corner-help .ec-tip');
-		await page.mouse.move(cg.x, cg.y);
-		await page.waitForTimeout(1000);
-		ok('hovering the box\'s corner `?` opens nothing', !(await tipState(page, '#lpn_ff_box .lpn-corner-help')).shown);
-		await page.mouse.click(cg.x, cg.y);
-		await a.settle(350);
-		const cs = await tipState(page, '#lpn_ff_box .lpn-corner-help');
-		ok('a click on it opens the box\'s whole explanation', cs.shown &&
-			cs.text.indexOf((await a.lang('lpn_ff_intro')).split('\\n\\n').join(' ')) === 0 && cs.text.indexOf(await a.lang('lpn_ff_accounting')) > 0, String(cs.text).slice(0, 50));
+		// The box's own `?` beside its x is the Guide's, not a tip (Perry, 2026-10-07).
+		ok('the Fire flow corner holds no blue tip `?`', await page.evaluate(() => document.querySelectorAll('#lpn_ff_box .lpn-box-corner .ec-tip').length === 0));
+		await page.click('#lpn_ff_box .lpn-corner-guide');
+		await a.settle(450);
+		ok('a click on it opens the box\'s entry in the Guide, with the whole explanation', await page.evaluate((intro) => {
+			const e = document.querySelector('[data-guide-key="box-lpn_ff_box"]');
+			return !!e && Array.from(e.querySelectorAll('p')).map((p) => p.textContent).join(' ').indexOf(intro) === 0;
+		}, (await a.lang('lpn_ff_intro')).split('\\n\\n').join(' ')));
 		await page.keyboard.press('Escape');
 		await a.settle(300);
 

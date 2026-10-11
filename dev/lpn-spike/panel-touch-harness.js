@@ -325,6 +325,8 @@ const CONDITIONAL_DISPLAY = [
 	[/^setboxShow$/, /^el$/, 'a row, group or section inside the Settings box, filtered by its search field. '
 		+ 'JUDGEMENT CALL: it can be handed any element of that box, but never the box itself; the box is '
 		+ 'opened and closed through placePanelForScreen() and hidePanel()'],
+	[/^guideShowEl$/, /^el$/, 'a row, entry, menu block or section inside the User guide box, filtered by its search field; '
+		+ 'never the box itself, which opens through placePanelForScreen() and closes through hidePanel()'],
 	[/^filterSetboxContainer$/, /^(?:kid|pendingSub)$/, 'a row inside the Settings box, filtered by its search field'],
 	[/^applySetboxFilter$/, /^(?:sec|b|none)$/, 'a section, section button or "no match" line inside the Settings box'],
 	[/^libCurveEqRefresh$/, /^entry\._lpnEqField$/, 'a field inside the Library curve editor'],
@@ -367,6 +369,11 @@ ok('...and no declaration is left unused', condUsed.every(function (n) { return 
 		[/.*/, /lpn-lbl-hidden|lpn-labels-hidden/, 'a CSS class that blanks the map\'s data labels'],
 		[/.*/, /^\.hidden\s*=\s*(?:\[|work\.filter)/, 'a list of hidden table columns, not an element'],
 		[/.*/, /^\.style\.cssText\s*=\s*'display:flex;gap:0\.5em/, 'a row built inside a box, with its layout'],
+		[/^guideApplyRail$/, /lpn-guide-rail-collapsed/, 'the Guide\'s Contents rail folding to a strip (or, on a phone, closing its disclosure); '
+			+ 'the Guide box itself stays open and keeps its display'],
+		[/^guideApplyNavFold$/, /lpn-guide-nav-folded/, 'an entry of the Guide\'s contents rail folding away under its folded parent (Tom, 2026-10-10); the Guide box stays open and keeps its display'],
+		[/^guideDimNote$/, /^\.hidden\s*=\s*!document\.querySelector/, 'the one-line note above the Guide\'s Toolbar rows, shown while a toolbar name is dimmed'],
+		[/^guideFilter$/, /^\.hidden\s*=\s*any;/, 'the "Nothing matched." line inside the User guide box, by its search field'],
 		[/^wipeEverything$/, /^\.hidden\s*=\s*true/, 'a throwaway download form built and submitted in one breath, never in the page'],
 		[/^(?:dockPlace|dockRelease)$/, /lpn-dock-collapsed/, 'auto-hide tucking a docked box into its tab (Task 441). '
 			+ 'The box stays OPEN (display untouched, so every isOpen() still says so) and is only made '

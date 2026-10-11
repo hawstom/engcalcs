@@ -264,9 +264,8 @@ while ((m = boxRe.exec(PAGE)) !== null) {
 }
 ok('the drag band identifies the boxes', boxes.length >= 8, boxes.length + ': ' + boxes.join(' '));
 
-// The Notes popover is the one 40 px box with no title, and it is DECLARED rather than silently
-// tolerated: it is a free-text pad opened over the map with nothing to name.
-const NO_TITLE = ['lpn_notes_popup'];
+// No box is declared title-less now (the Notes popover, the one that was, moved into the Guide).
+const NO_TITLE = [];
 boxes.forEach(function (id) {
 	if (NO_TITLE.indexOf(id) >= 0) { return; }
 	// The title is the first .lpn-setbox-title inside the box's own markup.
