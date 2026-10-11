@@ -2681,6 +2681,7 @@ EngCalcs.pageConfig = {
 		'lpn_field_pump_speed',
 		'lpn_field_roughness',
 		'lpn_field_tag',
+		'lpn_field_tank_base_elev',
 		'lpn_field_tank_diameter',
 		'lpn_field_tank_level',
 		'lpn_field_tank_maxlevel',

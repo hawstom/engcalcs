@@ -37901,7 +37901,16 @@ var EngCalcs = EngCalcs || {};
 				}, LPN_INP_TOK_TANK);
 				// The ground starts as the same number in the same characters, so a DXF or GeoJSON
 				// written straight after import states it as the file did.
-				if (tk.tok && typeof tk.tok.bottomElev === 'string') { tk.tok.elev = tk.tok.bottomElev; }
+				// Rebuilt rather than added to, so the bag reads in the order a migrated v11 project's
+				// does (examples-audit-harness.js compares the two as JSON).
+				if (tk.tok && typeof tk.tok.bottomElev === 'string') {
+					var tkTok = {};
+					Object.keys(tk.tok).forEach(function (k) {
+						if (k === 'bottomElev') { tkTok.elev = tk.tok.bottomElev; } else { tkTok[k] = tk.tok[k]; }
+					});
+					tkTok.bottomElev = tk.tok.bottomElev;
+					tk.tok = tkTok;
+				}
 				if (n.desc) { tk.desc = n.desc; }   // base-write: see the reservoir above
 				return withInpNotes(tk, inpNodeNotes[n.id]);
 			}

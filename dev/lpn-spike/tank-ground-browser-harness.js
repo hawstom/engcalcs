@@ -88,11 +88,11 @@ async function main() {
 		let f = await fields();
 		const fBase = f.find((x) => x.text.indexOf('Base elevation') === 0),
 			fElev = f.find((x) => x.text.indexOf(esElev) === 0);
-		ok('the box shows ' + esElev + ' and Base elevation', !!fBase && !!fElev, f.map((x) => x.text).join(' | '));
+		ok('Properties lists ' + esElev + ' and Base elevation', !!fBase && !!fElev, f.map((x) => x.text).join(' | '));
 		ok('both read 850 for an imported tank', fBase && fElev && fBase.value === '850' && fElev.value === '850',
 			JSON.stringify({ fBase, fElev }));
 		const pBefore = f.find((x) => x.text.indexOf(esPressure) === 0);
-		ok('the box shows a pressure for the tank', !!pBefore, f.map((x) => x.text).join(' | '));
+		ok('Properties lists a pressure for the tank', !!pBefore, f.map((x) => x.text).join(' | '));
 		
 		// Type the ground 20 m below the base, the way a reader does.
 		const newGround = (850 - 20 / 0.3048).toFixed(2);
