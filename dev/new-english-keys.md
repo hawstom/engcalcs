@@ -249,10 +249,10 @@ never edits a synonym.
 - **`lpn_file_export_workspace_tip`**
   > Download a small file holding where your boxes sit, their sizes, which are open or docked, and your pane and column sizes, plus the display options of this page, such as which help bubbles and the hover card are shown. Your projects, project settings and cookies (language, consent, units) are not in it. Load it on another screen or browser with File, Import, Workspace.
   _Ruled 2026-10-09: Use proposed (Tom, calls page round 3)._
-- **`lpn_file_import_geojson`**
+- **`lpn_file_import_shapes`**
   > Import GeoJSON shapes…
   @@ NEEDS RULING
-- **`lpn_file_import_geojson_tip`**
+- **`lpn_file_import_shapes_tip`**
   > Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network from an EPANET file. The project must be georeferenced or state a coordinate system.
   @@ NEEDS RULING
 - **`lpn_file_import_workspace`**
@@ -383,7 +383,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**328 still to read**, of 331 new keys across 15 unmerged branch(es).
+**327 still to read**, of 330 new keys across 15 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -394,7 +394,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/advisers-1011 (`c39e12cf`) — 53 new, 53 to read @@ NEEDS RULING
+### chore/handoff-1011 (`6ceb463f`) — 53 new, 53 to read @@ NEEDS RULING
 
 - **`lpn_demand_pattern_constant`**
   > (constant)
@@ -556,7 +556,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Points data<br />(use Copy to see format)
   @@ NEEDS RULING
 
-### feat/bentley-interop (`017bbe69`) — 151 new, 151 to read @@ NEEDS RULING
+### feat/bentley-interop (`784ea66f`) — 152 new, 152 to read @@ NEEDS RULING
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -1011,6 +1011,9 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_sm_used_by_tip`**
   > Used by: {list}
   @@ NEEDS RULING
+- **`points_data_points_heading`**
+  > Points data<br />(use Copy to see format)
+  @@ NEEDS RULING
 
 ### feat/desktop (`baba0f04`) — adds no English strings
 
@@ -1036,7 +1039,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`2e5e81c4`) — adds no English strings
 
-### feat/match-property (`2acd9c69`) — 66 new, 66 to read @@ NEEDS RULING
+### feat/match-property (`bf2b722c`) — 64 new, 64 to read @@ NEEDS RULING
 
 - **`lpn_demand_pattern_constant`**
   > (constant)
@@ -1192,10 +1195,10 @@ build for that would be a gate nobody keeps. Refresh it with
   > The default demand pattern. Change it in Settings, Default demand pattern.
   @@ NEEDS RULING
 - **`lpn_match_done_many`**
-  > Matched {m} assets to {id}. Values changed: {n}.
+  > Matched {m} assets to {id}, except status and location. Values changed: {n}.
   @@ NEEDS RULING
 - **`lpn_match_done_one`**
-  > Matched {to} to {id}. Values changed: {n}.
+  > Matched {to} to {id}, except status and location. Values changed: {n}.
   @@ NEEDS RULING
 - **`lpn_match_kind`**
   > Match properties applies to nodes and pipes, pumps, and valves only.
@@ -1206,29 +1209,23 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_match_none`**
   > {to} and {id} have no properties in common to copy.
   @@ NEEDS RULING
-- **`lpn_match_selected_ask`**
-  > Apply the properties of {id} to the {n} other selected assets?
-  @@ NEEDS RULING
-- **`lpn_match_selected_ask_one`**
-  > Apply the properties of {id} to the other selected asset?
+- **`lpn_match_select_first`**
+  > Select the targets first, then choose Match properties.
   @@ NEEDS RULING
 - **`lpn_match_skip_breakdown`**
   > Not copied: {n} (demand is a list of categories).
   @@ NEEDS RULING
 - **`lpn_match_skip_scn`**
-  > Not copied: {n} (they cannot differ by scenario).
+  > Not copied: {names}. A scenario cannot hold its own value for these; change them in Base.
   @@ NEEDS RULING
 - **`lpn_match_skip_valve`**
   > Not copied: {n} (the valve types differ).
   @@ NEEDS RULING
 - **`lpn_match_tip`**
-  > Copy the properties of one asset to others. Select the source, then each asset to change. Identity, location, and connections are never copied, and neither is status (Active, Shut). Assets of a different type receive only the properties both types have.
+  > Copy the properties of one asset to the assets selected. Select the targets first, choose Match properties, then select the source. Status (Active, Shut), identity, location, and connections are never copied. Assets of a different type receive only the properties both types have.
   @@ NEEDS RULING
 - **`lpn_mode_match`**
-  > Mode: Match properties. Select the asset to copy properties from. Press Escape to cancel.
-  @@ NEEDS RULING
-- **`lpn_mode_match_dest`**
-  > Mode: Match properties. Select each asset to receive the properties of {id}. Press Escape or right-click when finished.
+  > Mode: Match properties. Select the asset to copy properties from. Status, identity, and location are not copied. Press Escape to cancel.
   @@ NEEDS RULING
 - **`lpn_settings_default_pattern_none`**
   > None (constant)
@@ -1237,7 +1234,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Points data<br />(use Copy to see format)
   @@ NEEDS RULING
 
-### feat/shape (`166d6298`) — adds no English strings
+### feat/shape (`9e25270b`) — adds no English strings
 
 ### feat/snap (`e1a40918`) — 1 new, 1 to read @@ NEEDS RULING
 
@@ -1260,9 +1257,9 @@ build for that would be a gate nobody keeps. Refresh it with
   > Volume of water above the lowest water depth, so it is zero at that depth. The EPANET tank volume also includes the water below the lowest water depth, which still counts toward mixing and water age, so the tank elevation stays at the tank bottom.
   @@ NEEDS RULING
 
-### feat/visit-dedupe (`7b4a84bd`) — adds no English strings
+### feat/visit-dedupe (`e22c4ec9`) — adds no English strings
 
-### fix/vertex-autosave (`0bfd2ac5`) — 53 new, 53 to read @@ NEEDS RULING
+### fix/node-size-cap (`f9464b17`) — 53 new, 53 to read @@ NEEDS RULING
 
 - **`lpn_demand_pattern_constant`**
   > (constant)

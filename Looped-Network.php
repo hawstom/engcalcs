@@ -3855,8 +3855,8 @@ EngCalcs.pageConfig = {
         // search and terrain blocks above it are. ?>
 	lpn_file_import_survey: <?=json_encode($ec_lang['lpn_file_import_survey'])?>,
 	lpn_file_import_survey_tip: <?=json_encode($ec_lang['lpn_file_import_survey_tip'])?>,
-	lpn_file_import_geojson: <?=json_encode($ec_lang['lpn_file_import_geojson'])?>,
-	lpn_file_import_geojson_tip: <?=json_encode($ec_lang['lpn_file_import_geojson_tip'])?>,
+	lpn_file_import_shapes: <?=json_encode($ec_lang['lpn_file_import_shapes'])?>,
+	lpn_file_import_shapes_tip: <?=json_encode($ec_lang['lpn_file_import_shapes_tip'])?>,
 	lpn_geojson_import_done: <?=json_encode($ec_lang['lpn_geojson_import_done'])?>,
 	lpn_geojson_import_skipped: <?=json_encode($ec_lang['lpn_geojson_import_skipped'])?>,
 	lpn_geojson_import_why_network: <?=json_encode($ec_lang['lpn_geojson_import_why_network'])?>,

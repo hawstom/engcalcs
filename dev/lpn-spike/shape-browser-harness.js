@@ -406,7 +406,7 @@ async function main() {
 			await h.esc();
 			const [chooser] = await Promise.all([
 				P.waitForEvent('filechooser', { timeout: 10000 }),
-				a.menuClickSub(await a.lang('lpn_file_import_menu'), await a.lang('lpn_file_import_geojson'), 'file')
+				a.menuClickSub(await a.lang('lpn_file_import_menu'), await a.lang('lpn_file_import_shapes'), 'file')
 			]);
 			await chooser.setFiles({ name: 'shapes.geojson', mimeType: 'application/geo+json', buffer: Buffer.from(gjText) });
 			await a.waitFor(async () => ((await h.stored()).shapes || []).length > 0, 'the import', 8000).catch(() => {});

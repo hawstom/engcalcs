@@ -7024,8 +7024,13 @@ var EngCalcs = EngCalcs || {};
 	var shapesLayer = null, shapeEls = {};
 	var shapeDraft = null;     // the Shape being drawn: { pts: [{x, y}...], live: {x, y} | null }
 	var shapeDraftEl = null;   // its drawing, in the world layer
-	function docShapes() { return (doc.shapes = doc.shapes || []); }
+	// Read through docShapesRead(); a Shape is added through addShapeToDoc(), the one write that
+	// gives a document its list (a render must not put an empty one into a file that stated none).
 	function docShapesRead() { return doc.shapes || []; }
+	function addShapeToDoc(s) {
+		if (!doc.shapes) { doc.shapes = []; }
+		doc.shapes.push(s);
+	}
 	function shapeById(id) {
 		var a = docShapesRead(), i;
 		for (i = 0; i < a.length; i++) { if (a[i].id === id) { return a[i]; } }
@@ -7174,7 +7179,7 @@ var EngCalcs = EngCalcs || {};
 		saveUndoSnapshot();
 		logLpnFirstAction('element');
 		s = { id: mintId(LPN_ID_KEY.shape), pts: pts, closed: !!closed && pts.length >= 3 };
-		docShapes().push(s);
+		addShapeToDoc(s);
 		buildShapeEls(s);
 		scheduleSave();
 		return s;
@@ -37233,7 +37238,7 @@ var EngCalcs = EngCalcs || {};
 			if (made.length) {
 				saveUndoSnapshot();
 				logLpnFirstAction('element');
-				made.forEach(function (s) { docShapes().push(s); buildShapeEls(s); });
+				made.forEach(function (s) { addShapeToDoc(s); buildShapeEls(s); });
 				scheduleSave();
 			}
 			lines.push((pc.lpn_geojson_import_done || '{n} Shapes imported from {file}.')
@@ -43928,8 +43933,8 @@ var EngCalcs = EngCalcs || {};
 			{ icon: 'open', label: pc.lpn_file_import_inp || 'Import EPANET file…',
 			  tip: pc.lpn_file_import_inp_tip, fn: pickInpFile },
 			// The points, lines and polygons of a GeoJSON file, as Shapes (Task 779).
-			{ icon: 'open', label: pc.lpn_file_import_geojson || 'Import GeoJSON shapes…',
-			  tip: pc.lpn_file_import_geojson_tip, fn: pickGeoJsonFile },
+			{ icon: 'open', label: pc.lpn_file_import_shapes || 'Import GeoJSON shapes…',
+			  tip: pc.lpn_file_import_shapes_tip, fn: pickGeoJsonFile },
 			// **THE LIBRARY IMPORT WIZARD'S OWN DOOR, AND ITS ONLY ONE** (Task 611). Tom,
 			// 2026-09-17: *"Move the button to the File menu. I thought you already did that."* Then
 			// 2026-09-18: *"Remove buttons except at the File menu."* The Libraries box carried the

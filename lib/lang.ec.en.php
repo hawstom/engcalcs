@@ -4511,8 +4511,8 @@ $ec_lang['lpn_file_import_survey']='Import surveyed points…';
 $ec_lang['lpn_file_import_survey_tip']='Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not.';
 // GeoJSON import of Shapes (Task 779). Only points, lines and polygons come in, as Shapes; the
 // network is imported from an EPANET file. Every feature not imported is named in the report.
-$ec_lang['lpn_file_import_geojson']='Import GeoJSON shapes…';
-$ec_lang['lpn_file_import_geojson_tip']='Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network from an EPANET file. The project must be georeferenced or state a coordinate system.';
+$ec_lang['lpn_file_import_shapes']='Import GeoJSON shapes…';
+$ec_lang['lpn_file_import_shapes_tip']='Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network from an EPANET file. The project must be georeferenced or state a coordinate system.';
 $ec_lang['lpn_geojson_import_done']='{n} Shapes imported from {file}.';
 $ec_lang['lpn_geojson_import_skipped']='{n} features not imported: {list}.';
 $ec_lang['lpn_geojson_import_why_network']='network asset';
