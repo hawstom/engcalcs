@@ -2534,6 +2534,14 @@
 			"quality": false,
 			"rate": false
 		},
+		"prefix": {
+			"node": {
+				"id": "N"
+			},
+			"link": {
+				"id": "L"
+			}
+		},
 		"separator": ", ",
 		"markExtrema": true
 	},

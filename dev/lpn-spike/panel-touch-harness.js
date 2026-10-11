@@ -218,6 +218,7 @@ console.log('\n--- one place hides a panel, tips and all ---');
 		[/b\.el\.style\.display = 'none'; return;/, 'a legend badge on the map'],
 		[/pendingPathEl\.style\.display = 'none'; return;/, 'the dashed line of a link being drawn (Task 567)'],
 		[/selectAreaEl\.style\.display = 'none'; return;/, 'the select-area marquee on the map (Task 266)'],
+		[/snapMarkEl\.style\.display = 'none';/, 'the object-snap glyph and name on the map (Task 782), drawing furniture with no control'],
 		[/marker\.style\.display = 'none';/, 'the column-drag insertion marker (2026-09-26, fourth '
 			+ 'pass), declared with its reason beside NOT_A_PANEL_SHOW above'],
 		[/zoomWinEl\.style\.display = 'none'; return;/, 'the Zoom Window drag box on the map (Task 682), the same kind of shape as the select-area marquee above'],
@@ -302,12 +303,14 @@ const CONDITIONAL_DISPLAY = [
 		+ 'draggable furniture, but it is shown and hidden by what the map holds, never by the visitor, '
 		+ 'so there is no closer to route through hidePanel()'],
 	[/^renderLabelsLegend$/, /^box$/, 'the labels legend on the map: same reasoning as the colour legend above'],
+	[/^paintStatus$/, /^xEl$/, 'the Hide control inside the status line (lpn_status), shown by the message on screen'],
 	[/^updateOffscreenNotice$/, /^el$/, 'the one-line "something is off screen" notice on the map'],
 	[/^refreshBasemapTeaser$/, /^b$/, 'the satellite toggle button'],
 	[/^refreshBasemapCredit$/, /^(?:c|el2)$/, 'a basemap attribution line in the map footer, required by the tile licences'],
 	[/^georefRefreshBar$/, /^bar$/, 'the georeference bar across the map: a fixed strip, not a draggable box'],
 	[/^georefRefreshBar$/, /^georefBarEl\('lpn_georef_\w+'\)$/, 'a control inside the georeference bar'],
 	[/^paintZoomWin$/, /^zoomWinEl$/, 'the Zoom Window drag box on the map'],
+	[/^showSnapMark$/, /^snapMarkEl$/, 'the object-snap glyph and name on the map (Task 782): shown while a tool or drag has caught a target'],
 	[/^mapgeoShow$/, /^b$/, 'a control inside the map-geometry bar'],
 	[/^mapgeoRefreshBar$/, /^bar$/, 'the map-geometry bar: a fixed strip, not a draggable box'],
 	[/^setPendingLinkFrom$/, /^rubberBandEl$/, 'the rubber-band line of a link being drawn'],
@@ -324,6 +327,8 @@ const CONDITIONAL_DISPLAY = [
 	[/^setboxShow$/, /^el$/, 'a row, group or section inside the Settings box, filtered by its search field. '
 		+ 'JUDGEMENT CALL: it can be handed any element of that box, but never the box itself; the box is '
 		+ 'opened and closed through placePanelForScreen() and hidePanel()'],
+	[/^guideShowEl$/, /^el$/, 'a row, entry, menu block or section inside the User guide box, filtered by its search field; '
+		+ 'never the box itself, which opens through placePanelForScreen() and closes through hidePanel()'],
 	[/^filterSetboxContainer$/, /^(?:kid|pendingSub)$/, 'a row inside the Settings box, filtered by its search field'],
 	[/^applySetboxFilter$/, /^(?:sec|b|none)$/, 'a section, section button or "no match" line inside the Settings box'],
 	[/^libCurveEqRefresh$/, /^entry\._lpnEqField$/, 'a field inside the Library curve editor'],
@@ -366,6 +371,11 @@ ok('...and no declaration is left unused', condUsed.every(function (n) { return 
 		[/.*/, /lpn-lbl-hidden|lpn-labels-hidden/, 'a CSS class that blanks the map\'s data labels'],
 		[/.*/, /^\.hidden\s*=\s*(?:\[|work\.filter)/, 'a list of hidden table columns, not an element'],
 		[/.*/, /^\.style\.cssText\s*=\s*'display:flex;gap:0\.5em/, 'a row built inside a box, with its layout'],
+		[/^guideApplyRail$/, /lpn-guide-rail-collapsed/, 'the Guide\'s Contents rail folding to a strip (or, on a phone, closing its disclosure); '
+			+ 'the Guide box itself stays open and keeps its display'],
+		[/^guideApplyNavFold$/, /lpn-guide-nav-folded/, 'an entry of the Guide\'s contents rail folding away under its folded parent (Tom, 2026-10-10); the Guide box stays open and keeps its display'],
+		[/^guideDimNote$/, /^\.hidden\s*=\s*!document\.querySelector/, 'the one-line note above the Guide\'s Toolbar rows, shown while a toolbar name is dimmed'],
+		[/^guideFilter$/, /^\.hidden\s*=\s*any;/, 'the "Nothing matched." line inside the User guide box, by its search field'],
 		[/^wipeEverything$/, /^\.hidden\s*=\s*true/, 'a throwaway download form built and submitted in one breath, never in the page'],
 		[/^(?:dockPlace|dockRelease)$/, /lpn-dock-collapsed/, 'auto-hide tucking a docked box into its tab (Task 441). '
 			+ 'The box stays OPEN (display untouched, so every isOpen() still says so) and is only made '

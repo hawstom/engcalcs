@@ -3927,6 +3927,13 @@ Lesson: pressing a menu row by text prefix hit a different "Copy" button elsewhe
 - OBSERVED: the layer table matches the Duke-hosted AIA CAD Layer Guidelines text for EQPM, VALV, TANK, LABL, TEXT, RDME; NODE is a prescribed minor group there, not user-defined. That PDF is an older edition than v5; v5 itself was not fetchable.
 - OBSERVED: dxf-export-harness.js passes and has no assertion on %% escaping, zoom, zone boundary or long strings.
 
+## feat/section-grid at 0b3bad98 (OBSERVED, 2026-10-06; re-verify before citing)
+OBSERVED real Chrome (desktop 1200, phone 390; US and SI via es locale; default and offset/negative sections): mi and wi grids render, 4-8 round marks, unit on largest mark for mi (ft/m follow the selects), negative elevations and stations starting at 1000 fine; no mark collides with the n labels, but gridlines run through them (and 0.04 strikes the section line, as on master).
+OBSERVED: phone mi shrinks to 390 wide so marks render ~7px high (wi ~11px). Master mi overflowed at 600. Plot is ~12-16% smaller than master in mi.
+OBSERVED: wi has no unit selects (Cw only), so bare numbers are honest. No dark mode on these pages (prefers-color-scheme only styles lpn cards).
+Lesson: php -S needs a docroot with an engcalcs/ symlink (pages use /engcalcs/ asset paths); sticky header and consent bar cover element screenshots.
+SPECULATION: print rendering not checked.
+
 ## 2026-10-06 feat/asset-type, link half (tree 4c26066b)
 
 OBSERVED (real Chrome on a scratch copy with a test hook, this tree; re-verify before citing):
@@ -3937,6 +3944,15 @@ OBSERVED (real Chrome on a scratch copy with a test hook, this tree; re-verify b
 - Pipe with scenario type override -> valve: that scenario's diameter silently reverts to Base's.
 Method note: scratch copy served by php -S, injected EngCalcs.__t; playwright from ~/.npm/_npx; lock via flock.
 
+## feat/user-guide at 3efca049 (OBSERVED, 2026-10-07; re-verify before citing)
+
+OBSERVED real Chromium (php -S on the worktree, 1400x900, 390x844 touch, ar, de): branch's own harness passes all; with a planted "guide row also clicks the target" mutation it fails 10 checks (not decoration). lpn_notes_6_def swap: own script, 27/27 files cells exactly exchanged, skeleton and every other line unchanged. All five top menus open by click and by keyboard, rows run, Esc closes (Edit keyboard Enter result identical to master). Guide rows never ran a command (undo 0->0).
+OBSERVED: "Also in" correct on all 26 toolbar rows (read against the live menus). "?" ignored in Find box, table cell editor, Properties-type inputs; opens at hovered/focused toolbar and menu rows (keyboard-focused Edit row, hovered File row).
+OBSERVED DEFECT (low-medium): guide stays open across a project switch with the transport rows dimmed ("off") until it is reopened; render happens only at open or strip repaint.
+OBSERVED: de and ar show "User guide" and "Also in" in English (new keys; old translated "Tables and Hotkeys" gone); lpn_help_hotkeys orphaned in 26 files.
+OBSERVED: the toolbar spec "a disabled one says why it is off" fails identically on master.
+NOT CHECKED: a real lpn_dialog modal with "?" (guide listener is capture on window, so it would open under/over a modal); how it looks.
+Method note: Playwright keyboard.press('Shift+/') sends '/', not '?'; use press('?').
 ## 2026-10-06 -- feat/dxf (05d5a7ad) and feat/section-grid (89905957)
 
 Neither branch is my work. My test scripts and exported files are in the scratchpad (dxf/, sg-probe*.js, mut/).
@@ -4116,6 +4132,13 @@ OBSERVED real Chromium 1400x900, net3 example, hand-edited workspace files then 
 Not done: harness mutation test; how boxes LOOK on a different-size real screen; unit cookie behaviour on other pages.
 Lesson: do not wrap a harness that takes its own flock in an outer flock; it deadlocks against itself.
 
+## 2026-10-07 feat/message-dismiss (Hide a standing message; Zoom Window row and W)
+- OBSERVED: harness message-dismiss-browser-harness.js 30/30 passes; adding 'no-fixed-head' to the hideable set makes it fail (1 FAIL), so it holds the line.
+- OBSERVED: the x is 18x15 px on desktop and at 390/320 wide; a real click at its centre works; no sideways scroll; Something-wrong button untouched.
+- OBSERVED: hidden set is keyed on text only and survives the problem going away and returning (undo x2 then redo x2 left it hidden, chip shown). Chip is always "1 hidden" (only one message exists at a time, so it never miscounts).
+- OBSERVED: W keys on e.key only; a keydown with key 'ц' code 'KeyW' does nothing. Latin w/W, toolbar-button focus, Settings box open: works; open menu: ignored; Escape-closed menu: works.
+- OBSERVED: menu rows have no active state anywhere in this menu (menu closes on click), so Zoom Window row shows none; toolbar button does show pressed.
+- LESSON: Session.closeMenu() only hides the popup with CSS, leaving openMenuAnchor set; use Escape in probes.
 # Perry, feat/user-guide pre-review, 2026-10-08 (head 00862427)
 OBSERVED: user-guide-find-harness ALL PASS. Net3 worked queries reproduce in en, de, zh, tr, ar, fr, es.
 OBSERVED: the 7th worked query (Junction.Connectivity ...) FAILS on every non-English page tried ("Not a property of X: Connectivity"). English property words are NOT universally accepted: Connectivity, Source share, C, Minor loss, k, Average source share fail on es and de. Chapter says English words accepted in every language.
@@ -4141,6 +4164,13 @@ OBSERVED non-English banners (Spanish checked) still say "cookie de un solo díg
 OBSERVED librewaternet.org/features.html:177 says "no visitor identifier"; false for a yes-sayer once deployed.
 CITED WebKit ITP 2.1: cookies written by document.cookie are capped at 7 days; the page rewrites ec_code by script on every DOMContentLoaded, so in Safari the "400 days" is probably 7. Not testable here (no WebKit).
 NOT RUN: mutation test of the harnesses (would require editing the worktree); full check_all; the Safari point; appearance of spock with coded rows (its selftest drives the real page).
+## 2026-10-08 feat/hover-label f8393134 (Perry)
+OBSERVED: dev/lpn-spike/hover-card-browser-harness.js 26/26. Mutation (card composed from the user's own ticks instead of all-ticked) fails 5 checks, so the harness has teeth.
+OBSERVED (label bench, headless, scratch archives of master a871d194 and HEAD): scenes for Net1, Net2, Net3, Novato zoom+seq identical byte for byte, with default fields AND with every node and link field ticked (the all-ticked run differs from the default run, so the compare is not vacuous). Placements unchanged.
+OBSERVED: single-label refresh vs full pass, every field on, Net1/Net3: master differs on 13/24 and 119/216 elements (no Initial status, Cb, Cw, and the show order wrong: diameter before length); branch 0 differences. The builder said "three fields"; it is also the order.
+OBSERVED real Chromium: card appears in Select mode only. Delete, Pipe, Vertices, Junction... modes: no card and no highlight (the pre-existing highlight is Select-only). Net3/Novato all fields on: sweep of 240 moves, frames p95 17.5 ms, no long tasks; 10 rests per net, no long tasks. Card never covers the pointer, never clipped (Net1, Net3, Novato). Card text via text nodes, a desc of <img onerror> stays inert. Dark scheme: card is the suite's black tip regardless. ar page: rtl, left aligned, "Init. مفتوح". de, zh words localized. Touch (hasTouch, 390 px): ecCanHover false, tap shows no card. Customer card OK. Setting survives reload; key removed returns the card.
+OBSERVED defects: (1) card fires 500 ms after ENTERING a target, not after the pointer stops: moving steadily along a pipe, it appears mid-move and stays pinned where it appeared while the pointer goes on (110 px away after a sweep). (2) Esc and Ctrl+Z leave it up. (3) lines are the map's own abbreviations (Qb=, Hl=, a bare "0%"), no field names; with prefixes cleared the card is bare numbers. (4) setting row shows on a phone where it does nothing.
+NOT CHECKED: Tom's eye on the look; recalc-off stale snapshot; scenarios.
 
 ## 2026-10-08 feat/workspace fb8eea71, in-place import (Perry)
 OBSERVED real Chromium 1400x900 and 390x844: builder harnesses pass bare (inplace 19/19, browser 43/43). My own comparison (UI-arranged file, import into a browser with a different UI-arranged layout, then a real reload, every box's position/size/dock/z/state): no reload happened (window marker kept), no page errors, no duplicate dock tabs, focus on body, one Ctrl+Z undoes the pre-import edit, results kept (pressure in the pane and on map labels), docks and pinned/auto-hide state, pane sizes, right pane all equal a reload. Phone 390: zero differences from a reload, no sideways scroll. Old-style file (no dock fields) and empty file: equal to reload; flyout showing at import time: closed, equal.
@@ -4148,3 +4178,86 @@ OBSERVED DEFECT: a box the file stores with no position (left/top null) is place
 OBSERVED minor: Contour box 11 px shorter in place (356 vs 367); map margin variable left "0px" instead of unset; z-index values keep climbing (relative order matches reload).
 Lesson (mine): the page's dialog stub (window.lpnDialogAnswerer) must be deleted, and a probe dialog I left queued made Ctrl+Z "fail" for three runs. Retract before reporting; control against a generic dialog first.
 Not done: mutation test of the harness; contour plot on the map when the contour box is in dst but not the file; Properties box floating position when it stays open.
+
+## 2026-10-08 feat/message-dismiss @ aaedf63e (second pass, x made visible)
+- OBSERVED: both branch harnesses (message-dismiss-x 23 checks, message-dismiss-browser 55 checks) pass on this head.
+- OBSERVED: own probe, Chromium. x present on "Add a reservoir"; Tab-focus + Enter hides it and moves focus to the history glyph; RELOAD brings every hidden message back (in-memory only); no localStorage/cookie key added (grep of diff + key scan).
+- OBSERVED: es and ar at 1400 and 390 px: x 20x20, on screen, not overlapping text or Something wrong, no sideways scroll. aria/title on the x read "Hide this message" in English on es/ar pages (new keys not yet translated, expected).
+- OBSERVED (code only): #lpn_status_notes (engine-difference notes, 2 min) has no x and keeps the box open after the diagnostic text is hidden.
+- NOT EXERCISED: storage full / storage unreadable / unit unknown paths in a browser (my storage-full probe was pre-empted by a diagnostic); covered only by the generic mechanism and the "No solution" harness case.
+- OBSERVED: branch also carries Zoom Window (W key, Map-menu row, corner triangle) unrelated to message hiding.
+
+# Perry journal, feat/user-guide @ 92ce4d1b, 2026-10-08
+OBSERVED (real Chromium, php -S via env.startServer, en/es/ar, 1280 and 390 px):
+- Ring: dashed #c2185b, solid-ish 1.5 s then fades to gone by ~2.5 s; never covered by the Guide (menus stack above it). Same in es, ar (RTL ring placed correctly), phone.
+- After ring fades, Water menu + Scenarios fly-out stay open indefinitely (5.8 s+). Clicking Guide text closes only the fly-out, not Water.
+- Clicking Select card while Water menu open from a prior card: Water menu stays open, ring on Select -> stale menu.
+- Desktop: the fly-out sits on top of the Basic mode card in the Guide itself (card partly hidden). Phone: menus cover most of the Guide.
+- Properties card: note shown in magenta italic above the text; no hint where Properties opens.
+- Search "mode": hit shows heading Water, then "Scenarios > [state glyph] Basic mode". Glyph is the menu row's check icon (tofu box in this headless font).
+- Dark theme: prefers-color-scheme emulation changed nothing visible (page has no dark chrome here); --ec-point has no dark override. UNVERIFIED.
+- Not checked: Esc behaviour was ambiguous (Esc closed the Guide with menus left "block" in my probe).
+
+## 2026-10-08 Task 781 (feat/bentley-interop 07ca4206..2cfebc47) -- Perry
+OBSERVED (real Chromium, php -S, this tree): Net1+1 customer, scenario B, junction 22 -> tank. EPANET tables equal a hand-edited Net1.inp (tank at 22) to the printed digit; Base-only save byte-identical to 07ca4206; B save/reopen reopens on B with same heads; B .inp export has new tank + L1..L4, no 22.
+OBSERVED defect 1: a control/rule naming the old asset is NOT omitted from B's run (still in B's .inp export); EPANET Error 200, run falls back to built-in solver. Box text lpn_change_type_old_controls says it is omitted: false.
+OBSERVED defect 2: after Create new assets, Properties box still shows old junction 22 while map selection is new tank T1.
+OBSERVED: customer 100 gpm on 22 vanishes in B with no word; same as Base change-to-tank (pre-existing), box lists only "Base demand 200".
+Native engine and undo taken from builder's harness, not re-run by me (headless harness re-run: all ok, incl. 7 mutations).
+
+
+# Perry journal 2026-10-09: feat/bentley-interop stage 6 Scenario manager (head e2fad9e7)
+OBSERVED (decays): driven in real Chromium on Net1, own scripts in scratchpad (p3..p10).
+- Works: add/rename/F2/slow-click rename, Child_1/2_of_Horse numbering, Base2/Base3, drag reparent+reorder, cycle refusal, delete-in-use refusal naming users, Demand alt assigned in Scenarios table -> junction edit lands in alt, Base untouched, solve differs; copy own/share; Compare honours unchecked; save/reopen keeps tree, alternatives, compareSet; es shows menu/headings, new strings English.
+- Defects: Delete on Base: misleading map message; Base2 Parent column says Base while tip says Base has no parent; scenario override count 0 though holds Dry year demand edit; builder harness has `|| true` assertions (1.1, 3.4, 2.1) and weak 5.5/6.4.
+- Could not find the builder's "six self-declared calls" in git log or dev/*.md.
+
+## 2026-10-11 feat/tank-volume @ 42f75c7f (Perry)
+
+- OBSERVED: independent EPANET (js/vendor/epanet-js.js in node, no app code) on Net3 and on an SI (LPS) inp with a cylinder tank and a VOLUME-curve tank: app Usable volume = EN_TANKVOLUME - EN_MINVOLUME at every hour tested, Depth = EN_HEAD - elevation. All agree to display rounding. Note EN_TANKLEVEL is the INITIAL level in EPANET, not the current one; use head minus elevation.
+- OBSERVED: Find (Tank scope) offers Depth and Usable volume, matches at the time shown, re-evaluates when time moves; Replace list correctly omits them.
+- OBSERVED: "ft H2O" on Depth is the same suffix the existing Elevation / Water depth / Lowest / Highest columns carry, so not a leak; tank diameter correctly stays in plain ft.
+- OBSERVED: with Recalculate OFF after a run, editing tank Elevation 50 -> 60 leaves Head stale (52.76) and Depth becomes -7.24 (stale head minus new elevation). Edit of Lowest water depth moves Usable volume at once while Head stays stale.
+- OBSERVED: Tables pane is not shown at 390 px (display none, pre-existing); could not drive Properties at phone width.
+- TRAP: the harness's "Depth = head - elevation" check restates the code; only the EPANET comparison is independent.
+
+## 2026-10-11 Perry: feat/match-property @ 9b4709d4 (Task 782)
+OBSERVED (in Chromium, Net1/Net3/Elm, this tree; re-verify before citing):
+- Harness 42/42 passes. Pipe/junction/tank match, one-step undo, Recalculate OFF snapshot all correct.
+- Inside scenario S1, pipe 10->11: Base untouched, BUT S1 gains 9 overrides ("S1 (9)") though only diameter differed; a later Base roughness edit on pipe 11 did not reach S1.
+- Inside scenario S1, junction 10->15 rewrote BASE elevation of 15 (32->147). Elevation is not overridable; same as typing it in a scenario, but silent in a bulk tool.
+- Plural: "to the 1 other selected assets?"; "1 properties copied" by code.
+- Valve PRV->FCV: setting refused, valveType column has no setter so never copied. OK.
+- Demand breakdown junction: demand/pattern silently skipped both directions; notice still counts "7 copied".
+- Pump 10 (closed, curve 1) -> pump 335: closed=1 and curve ref copied.
+- EPS at 4:00: match resets display to time-0 values; a Tables edit does the same (pre-existing).
+- Right-click on node: no selection, no Properties; one-row menu. Document-level capture swallows ALL right-button presses on the canvas in Select mode (code).
+SPECULATION: touch long-press yields native menu only (pointerdown button is 0).
+
+# Perry journal: feat/snap c22988d5 (2026-10-11)
+OBSERVED: harness 42/42 passes. Split reach for node tools now 14 px (was ~6): ground within reach of a pipe 7-9% -> 14-20% of the network bbox (Elm St, Net1, Net3 at fit zoom).
+OBSERVED: dragging junction 31 onto junction 22 (same type) stacks exactly, glyph shown, no notice. Dragging a node onto the far end of its own pipe lands exactly on it (zero-length drawn pipe); own pipes excluded but not neighbour node.
+OBSERVED: .inp export after tank snapped on 22 writes identical "50.00 40.00". Scenario drag writes override {x:30,y:10}, Base untouched, undo clears it. Hover cost 0.1 ms/move extra on Net3 world (580 nodes).
+OBSERVED: in a scenario a junction pressed 9 px from pipe 10 is placed on the line, no split offer, no notice.
+OBSERVED: Spanish notice mixes English template with Spanish names (key untranslated).
+NOT CHECKED: touch, satellite glyph look, Recalc OFF (code path untouched), Alt vs OS shortcuts.
+
+## 2026-10-11 Perry, feat/bentley-interop 784ea66f, Scenario manager tree
+- OBSERVED: scenario-tree, scenario-manager, default-pattern-shown, scenario-active-topology browser harnesses and change-type-harness all pass on 784ea66f.
+- OBSERVED: own probe (scratchpad/p/probe.js): menu on Night == buttons order; Base menu greys Make current/Rename/Delete, only Delete has a tip; Net1 Base vs master identical; child Peak dia 18->8 numbers identical to master Base dia 8; Base unchanged after returning.
+- OBSERVED: 27 rows scroll inside tree, Home/End keep selection in view. Title carries two "?" (blue tip beside title, Guide "?" in header).
+- NOT CHECKED: real long-press (CDP touch in headless fired 0 contextmenu events), mutation-testing of the new harness.
+
+# Perry journal: feat/shape 8436cef6 (2026-10-11)
+OBSERVED: harness 70/70 passes. geojson-export-harness 80/80, dxf-export-harness all pass, lang_syntax and chrome_colour checks clean.
+OBSERVED: with no Shapes, Net1 .inp and DXF, and a geographic project's GeoJSON and DXF, are byte-identical to master's. Saved project file differs from master's only by settings.idPrefixes gaining S:"S"; no `shapes` key. Opening a master-saved file on the branch shows no spurious asterisk.
+OBSERVED: master (d4271727) opens a file containing doc.shapes with no error and no notice; Shapes are silently absent and lost on its next save.
+OBSERVED: master Net1 [LABELS] x changes on the first reload (-2.39947 -> -2.39837, 10.8899 -> 10.8756, 45.695 -> 45.716), stable on later reloads. Builder's side finding CONFIRMED, pre-existing.
+OBSERVED: GeoJSON import of a QGIS-style file: 7 shapes, notice "1 features not imported: Nothing (...)", holes counted, multipart counted; plurals "1 Shapes", "1 features", "1 polygon holes" appear. Feature name "Lot A" (space) is dropped, minted S1; names of multipart parts dropped; no mention in the notice.
+OBSERVED: 500 six-point polygons: import 1.1 s, reload 0.9 s, 0.4 ms per pointer move, wheel and pan unremarkable.
+OBSERVED: Shape drawn on a project with a scenario active edits the one shared Shape (no override, no notice), as claimed.
+OBSERVED: multi-select of Shape + junction then Delete = two Undo steps (one per element).
+OBSERVED: a Shape under a data label cannot be selected at the label's hit area; grips of a selected one win.
+OBSERVED: Select Area (window/lasso) never picks Shapes; no Tables tab; Find unaffected.
+OBSERVED: Arabic page: Shape strings are English (untranslated, expected); phone 390 draws by taps, closes by tap on first point.
+NOT CHECKED: Recalc OFF at runtime (code path calls only save/rebuild), projected-CRS import, visual appearance (colour, grips, 6% fill), dark theme, touch drag of grips.

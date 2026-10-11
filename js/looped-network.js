@@ -6072,8 +6072,12 @@ var EngCalcs = EngCalcs || {};
 			// `symbolCapPercentile` percentile pipe." Always on -- there is no "off" state to
 			// explain, unlike the labeling threshold above. Both are plain dimensionless numbers
 			// (a ratio and a percentage), so neither is reinterpreted on a unit change.
-			symbolCapMultiple: 0.5,
-			symbolCapPercentile: 20,
+			// **NEW-PROJECT DEFAULT 0.25 x the MEDIAN pipe** (Tom, 2026-10-11, Tweaks: *"Initial default:
+			// Prevent nodes from scaling larger than 0.25 times 50%-ile pipe. (Inexact science). Leave
+			// examples as they are for now."*). A file saved without the pair is read as the old
+			// 0.5 / 20 by the load path, so the shipped examples are unchanged.
+			symbolCapMultiple: 0.25,
+			symbolCapPercentile: 50,
 			// Task 617: a CSS look (grayscale etc.) on the TILE LAYER only (LPN_BASEMAP_STYLES). Project data on the
 			// precedent of backdropOpacity beside it; a new project opens Muted; a file saved without the field opens Normal (see the load path).
 			basemapStyle: 'muted',
@@ -6913,6 +6917,217 @@ var EngCalcs = EngCalcs || {};
 		}
 		return best;
 	}
+	// ---- OBJECT SNAP: THE MAGNET (ROADMAP Task 782) -----------------------------------------------
+	//
+	// Tom, 2026-10-10, listing the tools that replace per-scenario Change type: *"Snap/magnet to
+	// asset"*. CAD object snap, in his AutoCAD/Civil 3D sense: while a node is placed or moved, or a
+	// bend is moved, the point jumps to an existing node, a pipe vertex, or the nearest point on a
+	// pipe when one is within reach, a glyph and a name show what it caught, and a held Alt key
+	// places at the bare pointer instead. The reach is the gesture's own reachPx() -- the number every
+	// other finder on this page uses, so there is no second tolerance to keep in step.
+	//
+	// **THE SEAM: ONE PROVIDER PER SOURCE OF SNAP POINTS.** addSnapProvider(fn) registers a source;
+	// snapAtWorld() asks every source and Geom.bestSnapCandidate() picks the winner, by rank and then
+	// distance. A provider is `function (wx, wy, tolW, opts)` returning an array of candidates:
+	//
+	//   { kind, rank, x, y, dist, name, glyph, src, ... }
+	//
+	// `kind` names the source ('node', 'vertex', 'line'; Task 779's Shape adds its own), and
+	// `opts.kinds`, when given, limits a gesture to some of them. `rank` orders sources (0 node,
+	// 1 vertex, 2 nearest point on a pipe; a Shape vertex would be 1). `dist` is in world units and
+	// `tolW` is the reach in world units. `name` is what the tip shows ("Junction 22"). `glyph` is
+	// 'square', 'diamond' or 'hourglass'. `src` is the stored point object the candidate stands on,
+	// or null when the point is computed: copySnapProvenance() copies that object's file characters
+	// (`tok.x/y`) and geographic source record (`_xsrc/_ysrc`), so a snapped point is written back
+	// to the character as the target's own. `opts.exclude` = {nodes: {id: true}, links: {id: true}}
+	// is what a drag must not snap to (itself and what moves with it); a provider honours it.
+	// `opts.onLink`, when present, limits the pipe-line source to that one link id (or to none,
+	// when it is null): a node tool's line magnet is only the pipe the press is ON.
+	//
+	// So Task 779's Shape vertices are one call: addSnapProvider(snapProviderShapeVertices), with a
+	// provider shaped like snapProviderVertices() below.
+	var SNAP_PROVIDERS = [];
+	function addSnapProvider(fn) { SNAP_PROVIDERS.push(fn); }
+	function snapKindWanted(opts, kind) { return !opts || !opts.kinds || !!opts.kinds[kind]; }
+	function snapExcluded(opts, what, id) {
+		return !!(opts && opts.exclude && opts.exclude[what] && opts.exclude[what][id]);
+	}
+	// Nodes, at the position the scenario on screen draws them. `src` is the node only where that
+	// position IS the node's stored one; a scenario's moved node has no file characters to copy.
+	function snapProviderNodes(wx, wy, tolW, opts) {
+		var out = [], i, n, x, y, d;
+		if (!snapKindWanted(opts, 'node')) { return out; }
+		for (i = 0; i < doc.nodes.length; i++) {
+			n = doc.nodes[i];
+			if (!nodeEls[n.id] || snapExcluded(opts, 'nodes', n.id)) { continue; }
+			x = nodeDrawX(n); y = nodeDrawY(n);
+			d = Math.hypot(x - wx, y - wy);
+			if (d > tolW) { continue; }
+			out.push({ kind: 'node', rank: 0, x: x, y: y, dist: d, glyph: 'square',
+				name: reportTypeNoun('node', n.type) + ' ' + n.id, node: n,
+				src: nodeHasCoordOverride(n) ? null : n, ov: coordOverridesOf(n) });
+		}
+		return out;
+	}
+	function snapProviderVertices(wx, wy, tolW, opts) {
+		var out = [], pc = EngCalcs.pageConfig || {}, i, j, l, v, d;
+		if (!snapKindWanted(opts, 'vertex')) { return out; }
+		for (i = 0; i < doc.links.length; i++) {
+			l = doc.links[i];
+			if (!linkEls[l.id] || snapExcluded(opts, 'links', l.id)) { continue; }
+			for (j = 0; j < (l.verts || []).length; j++) {
+				v = l.verts[j];
+				d = Math.hypot(v.x - wx, v.y - wy);
+				if (d > tolW) { continue; }
+				out.push({ kind: 'vertex', rank: 1, x: v.x, y: v.y, dist: d, glyph: 'diamond',
+					name: String(pc.lpn_snap_vertex || '{link}, vertex {n}')
+						.split('{link}').join(reportTypeNoun('link', l.type) + ' ' + l.id).split('{n}').join(String(j + 1)),
+					link: l, vidx: j, src: v });
+			}
+		}
+		return out;
+	}
+	// The nearest point on a PIPE's line, lowest rank: a pipe passes through its own end nodes and
+	// bends, so this only wins where neither of those is within reach. Pumps and valves are left
+	// out: a point on a pump's symbol line is not a place anybody puts a node.
+	function snapProviderPipeLine(wx, wy, tolW, opts) {
+		var out = [], i, l, hit;
+		if (!snapKindWanted(opts, 'line')) { return out; }
+		for (i = 0; i < doc.links.length; i++) {
+			l = doc.links[i];
+			if (l.type !== 'pipe' || !linkEls[l.id] || snapExcluded(opts, 'links', l.id)) { continue; }
+			if (opts && opts.onLink !== undefined && opts.onLink !== l.id) { continue; }
+			if (!nodeById(l.from) || !nodeById(l.to)) { continue; }
+			hit = Geom.nearestFractionOnPolyline(linkPointList(l), wx, wy);
+			if (!(hit.dist <= tolW) || hit.f <= 1e-9 || hit.f >= 1 - 1e-9) { continue; }
+			out.push({ kind: 'line', rank: 2, x: hit.x, y: hit.y, dist: hit.dist, glyph: 'hourglass',
+				name: reportTypeNoun('link', l.type) + ' ' + l.id, link: l, f: hit.f, src: null });
+		}
+		return out;
+	}
+	addSnapProvider(snapProviderNodes);
+	addSnapProvider(snapProviderVertices);
+	addSnapProvider(snapProviderPipeLine);
+	// The snap for a WORLD point, at a reach in SCREEN pixels. Null when nothing is in reach.
+	function snapAtWorld(wx, wy, px, opts) {
+		var tolW = px / (state.s || 1), all = [], i;
+		for (i = 0; i < SNAP_PROVIDERS.length; i++) { all = all.concat(SNAP_PROVIDERS[i](wx, wy, tolW, opts) || []); }
+		return Geom.bestSnapCandidate(all, tolW);
+	}
+	function snapAtScreen(cx, cy, px, opts) {
+		var w = screenToWorld(cx, cy);
+		return snapAtWorld(w.x, w.y, px, opts);
+	}
+	// **THE TARGET'S FILE CHARACTERS GO WITH ITS NUMBERS.** `dst` has just been given the target's
+	// x and y; this makes it carry the same source record, so a saved file and an exported `.inp`
+	// write the same characters for both. Each record is still believed only while its number
+	// matches (unprojectStoredGeo(), lpnNumText()), so a later move retires it by itself. BASE
+	// ONLY: inside a scenario the position is an override and the element's own record must stay.
+	function copySnapProvenance(c, dst) {
+		var s = c && c.src;
+		if (!dst || !inBaseScenario()) { return; }
+		delete dst[LPN_GEO_XSRC]; delete dst[LPN_GEO_YSRC];
+		if (dst.tok) {
+			delete dst.tok.x; delete dst.tok.y;
+			if (!Object.keys(dst.tok).length) { delete dst.tok; }
+		}
+		if (!s || s.x !== dst.x || s.y !== dst.y) { return; }
+		if (typeof s[LPN_GEO_XSRC] === 'number') { dst[LPN_GEO_XSRC] = s[LPN_GEO_XSRC]; }
+		if (typeof s[LPN_GEO_YSRC] === 'number') { dst[LPN_GEO_YSRC] = s[LPN_GEO_YSRC]; }
+		if (s.tok && (typeof s.tok.x === 'string' || typeof s.tok.y === 'string')) {
+			dst.tok = dst.tok || {};
+			if (typeof s.tok.x === 'string') { dst.tok.x = s.tok.x; }
+			if (typeof s.tok.y === 'string') { dst.tok.y = s.tok.y; }
+		}
+	}
+	// A node moved onto a snap target, through the one door a node's position is written by. In a
+	// scenario the OUTWARD pair is handed over where the target has one of its own (its override),
+	// so a typed 38.5 on the target is 38.5 on the node too.
+	function writeNodeAtSnap(n, c) {
+		var ov = c.ov || null;
+		writeNodeCoord(n, false, c.x, (!inBaseScenario() && ov && typeof ov.x === 'number') ? ov.x : undefined);
+		writeNodeCoord(n, true, c.y, (!inBaseScenario() && ov && typeof ov.y === 'number') ? ov.y : undefined);
+		copySnapProvenance(c, n);
+	}
+	// **THE GLYPH AND THE NAME.** One group in the world layer, redrawn on every call at a constant
+	// screen size; display none whenever nothing is caught. Decoration only: never in a document,
+	// a snapshot or a scenario.
+	var snapMarkEl = null;
+	function showSnapMark(c) {
+		if (!snapMarkEl) { return; }
+		if (!c) { hideSnapMark(); return; }
+		var s = state.s || 1, h = 6 / s, x = c.x, y = c.y, d, txt;
+		while (snapMarkEl.firstChild) { snapMarkEl.removeChild(snapMarkEl.firstChild); }
+		d = c.glyph === 'diamond'
+			? 'M' + x + ' ' + (y - h * 1.3) + 'L' + (x + h * 1.3) + ' ' + y + 'L' + x + ' ' + (y + h * 1.3) + 'L' + (x - h * 1.3) + ' ' + y + 'Z'
+			: c.glyph === 'hourglass'
+				? 'M' + (x - h) + ' ' + (y - h) + 'L' + (x + h) + ' ' + (y - h) + 'L' + (x - h) + ' ' + (y + h) + 'L' + (x + h) + ' ' + (y + h) + 'Z'
+				: 'M' + (x - h) + ' ' + (y - h) + 'L' + (x + h) + ' ' + (y - h) + 'L' + (x + h) + ' ' + (y + h) + 'L' + (x - h) + ' ' + (y + h) + 'Z';
+		el('path', { 'class': 'lpn-snap-glyph', d: d }, snapMarkEl);
+		txt = el('text', { 'class': 'lpn-snap-name', x: x + 10 / s, y: y - 10 / s, 'font-size': 12 / s }, snapMarkEl);
+		txt.textContent = c.name || '';
+		snapMarkEl.setAttribute('data-snap-kind', c.kind);
+		snapMarkEl.style.display = '';
+	}
+	function hideSnapMark() {
+		if (!snapMarkEl || snapMarkEl.style.display === 'none') { return; }
+		snapMarkEl.style.display = 'none';
+		snapMarkEl.removeAttribute('data-snap-kind');
+	}
+	// WHICH TARGETS EACH TOOL MAGNETS TO, in one table, so the hover glyph and the press that
+	// commits can never disagree. A node tool takes all three. The pipe, pump and valve tools
+	// already connect to a node within reach (the snap-on-create below), so their glyph names that
+	// node, and a bend in open space takes a vertex. Junction and Pipe (the chain) is left as it
+	// was: each of its presses makes a junction joined to the one before, and one landing on a
+	// pipe's line or bend unjoined to that pipe would look connected and not be.
+	var SNAP_KINDS_BY_MODE = {
+		'add-junction': { node: true, vertex: true, line: true },
+		'add-reservoir': { node: true, vertex: true, line: true },
+		'add-tank': { node: true, vertex: true, line: true },
+		'add-pipe': { node: true, vertex: true },
+		'add-pump': { node: true, vertex: true },
+		'add-valve': { node: true, vertex: true }
+	};
+	// What a press in this mode, at this point, would snap to. Null with Alt held (the bare
+	// pointer), in a mode that does not snap, and when nothing is in reach.
+	//
+	// **A NODE TOOL'S LINE MAGNET IS THE PIPE'S OWN HIT BAND, NOT THE NODE REACH** (Perry's review of
+	// Task 782): at 14/24 px the "Split pipe?" question covered twice the map it did on master. So the
+	// line candidate is only the pipe the browser's hit test puts the press ON (tapLinkId(), the test
+	// that decided "on the pipe" before the magnet), and node and bend targets keep the full reach.
+	// **AND IN A SCENARIO A NODE TOOL MAGNETS TO NODES ONLY**: a scenario cannot split a pipe, so a
+	// node put on a line or bend there would look connected and be offered nothing.
+	function toolSnapAt(e) {
+		var kinds = SNAP_KINDS_BY_MODE[mode], opts;
+		if (!kinds || (e && e.altKey)) { return null; }
+		opts = { kinds: kinds };
+		if (mode === 'add-junction' || mode === 'add-reservoir' || mode === 'add-tank') {
+			if (!inBaseScenario()) { opts.kinds = { node: true }; }
+			else { opts.onLink = tapLinkId(mapHitAt(e.clientX, e.clientY)); }
+		}
+		return snapAtScreen(e.clientX, e.clientY, reachPx(e), opts);
+	}
+	// What a dragged node or bend snaps to: the same three sources, less the thing being dragged and
+	// what moves with it (a node's own pipes; a bend's own pipe and its two end nodes), since a node
+	// snapping onto its own pipe would be chasing a line that follows it.
+	function dragSnapOpts(dr) {
+		var ex = { nodes: {}, links: {} }, l;
+		if (dr.type === 'node') {
+			ex.nodes[dr.id] = true;
+			// ...and the nodes at the far ends of its own links, which would make a link of zero
+			// length (Perry's review).
+			(incidentLinks[dr.id] || []).forEach(function (lid) {
+				var il = linkById(lid);
+				ex.links[lid] = true;
+				if (il) { ex.nodes[il.from] = true; ex.nodes[il.to] = true; }
+			});
+		} else if (dr.type === 'vertex') {
+			l = linkById(dr.id);
+			ex.links[dr.id] = true;
+			if (l) { ex.nodes[l.from] = true; ex.nodes[l.to] = true; }
+		}
+		return { exclude: ex };
+	}
 	// A reservoir's effective fixed head: whatever the user typed, or -- when blank -- its own
 	// elevation. Blank is stored as undefined rather than as a copy of the elevation, so the two
 	// stay linked: moving the elevation moves the water surface with it until the user takes control
@@ -7380,11 +7595,11 @@ var EngCalcs = EngCalcs || {};
 	function invalidateLinkLengths() { pctLinkLengthCache = null; pctLinkLengthPctCache = null; symbolCapCache = null; }
 	function symbolCapMultiple() {
 		var v = settings.symbolCapMultiple;
-		return (typeof v === 'number' && isFinite(v) && v > 0) ? v : 0.5;
+		return (typeof v === 'number' && isFinite(v) && v > 0) ? v : 0.25;
 	}
 	function symbolCapPercentile() {
 		var v = settings.symbolCapPercentile;
-		return (typeof v === 'number' && isFinite(v) && v >= 0 && v <= 100) ? v : 20;
+		return (typeof v === 'number' && isFinite(v) && v >= 0 && v <= 100) ? v : 50;
 	}
 	// **STRIDE-SAMPLED TO AT MOST 512 LINKS, DETERMINISTICALLY.** A percentile wants a sort, and
 	// this is consulted on the zoom path; a deterministic stride is stable under re-entry where a
@@ -8439,6 +8654,14 @@ var EngCalcs = EngCalcs || {};
 			}
 			return lastSolveResult ? toDisplay(lastSolveResult.heads[n.id], resultUnit('elevhead')) : undefined;
 		}
+		if (field === 'depth') {
+			var depSI = tankDepthSI(n);
+			return depSI === undefined ? undefined : toDisplay(depSI, resultUnit('elevhead'));
+		}
+		if (field === 'volume') {
+			var volSI = tankUsableVolumeSI(n);
+			return volSI === undefined ? undefined : volSI * tankVolumeFactor();
+		}
 		if (field === 'pressure') {
 			if (isFixedHeadNode(n)) { return fixedHeadPressure(n); }
 			return lastSolveResult ? toDisplay(lastSolveResult.pressures[n.id], resultUnit('pressure')) : undefined;
@@ -8450,6 +8673,78 @@ var EngCalcs = EngCalcs || {};
 		// EPANET converts an initial quality nowhere either, so there is no factor on this side.
 		if (field === 'initQuality') { return nodeInitQuality(n); }
 		return undefined;
+	}
+	// ---- A TANK'S DEPTH AND USABLE VOLUME (Task 783) ---------------------------------------------
+	//
+	// **DEPTH IS HEAD MINUS THE TANK BOTTOM, and our Elevation IS the bottom** (EPANET's own: depth
+	// zero is the vessel floor). Inside a run the head is the frame's (what the engine integrated);
+	// at one instant it is the stored water depth, exactly as the Head column reads. SI metres.
+	function tankDepthSI(n) {
+		var hf = toSI(1, 'lpn_u_elevhead'), g;
+		if (!n || n.type !== 'tank' || !(hf > 0) || !isFinite(hf)) { return undefined; }
+		if (lastSolveResult && typeof lastSolveResult.t === 'number' && lastSolveResult.heads &&
+			typeof lastSolveResult.heads[n.id] === 'number') {
+			// **THE BOTTOM IS THE ONE THE RUN WAS SOLVED WITH** (Recalculate OFF is a snapshot): the
+			// head above is stale after an edit, so the elevation it is measured from must be too.
+			g = tankGeomOf(n, true);
+			return lastSolveResult.heads[n.id] - g.elevSI;
+		}
+		return toSI(effective(n, 'level') || 0, 'lpn_u_elevhead');
+	}
+	// **A TANK'S SHAPE AS THE RESULT ON SCREEN WAS SOLVED** (SI): bottom, lowest water depth,
+	// diameter and the usable volume curve. Captured when a result is installed (tankSnap), read
+	// here only for a run's frames, whose head is itself a snapshot. At one instant the head is
+	// derived from the typed numbers and moves with them, so the live numbers are right there.
+	var tankSnap = null;
+	function tankGeomLive(n) {
+		var hf = toSI(1, 'lpn_u_elevhead'), vf = hf * hf * hf, curve = n.volCurve ? curveById(n.volCurve) : null,
+			pts = curve ? curvePointsOf(curve) : [];
+		if (!(pts.length && EngCalcs.lpnTankVolumeCurveUsable && EngCalcs.lpnTankVolumeCurveUsable(pts))) { pts = null; }
+		else { pts = pts.map(function (pt) { return [pt[0] * hf, pt[1] * vf]; }); }
+		return { elevSI: toSI(n.elev || 0, 'lpn_u_elevhead'), minSI: toSI(n.minLevel || 0, 'lpn_u_elevhead'),
+			D: toSI(n.tankDiameter, 'lpn_u_length'), curve: pts };
+	}
+	function captureTankSnapshot() {
+		var snap = {};
+		doc.nodes.forEach(function (n) { if (n.type === 'tank') { snap[n.id] = tankGeomLive(n); } });
+		tankSnap = snap;
+	}
+	function tankGeomOf(n, fromSnapshot) {
+		return (fromSnapshot && tankSnap && tankSnap[n.id]) || tankGeomLive(n);
+	}
+	// **ZERO AT THE LOWEST WATER DEPTH** (Tom, 2026-10-10): the water a draw-down can actually use.
+	// EPANET's own tank volume also counts the water below the lowest water depth, so this is NOT
+	// that number. A usable volume curve wins (EPANET's rule: curve volumes replace the cylinder),
+	// otherwise a cylinder of the tank diameter. SI cubic metres.
+	function tankUsableVolumeSI(n) {
+		var dep = tankDepthSI(n), g, top;
+		if (dep === undefined) { return undefined; }
+		g = tankGeomOf(n, !!(lastSolveResult && typeof lastSolveResult.t === 'number'));
+		top = Math.max(dep, g.minSI);
+		if (g.curve) { return tankCurveVolume(g.curve, top) - tankCurveVolume(g.curve, g.minSI); }
+		if (!(g.D > 0) || !isFinite(g.D)) { return undefined; }
+		return Math.PI / 4 * g.D * g.D * (top - g.minSI);
+	}
+	// Linear between the curve's points, held flat beyond its ends. pts are SI and increasing in x.
+	function tankCurveVolume(pts, x) {
+		var i, a, b;
+		if (x <= pts[0][0]) { return pts[0][1]; }
+		for (i = 1; i < pts.length; i++) {
+			if (x <= pts[i][0]) {
+				a = pts[i - 1]; b = pts[i];
+				return a[1] + (b[1] - a[1]) * (x - a[0]) / (b[0] - a[0]);
+			}
+		}
+		return pts[pts.length - 1][1];
+	}
+	// A volume is shown in the LENGTH unit cubed (cubic feet or cubic metres, which is what EPANET
+	// pairs with its length): the factor and the mark come from the one LENGTH selector.
+	function tankVolumeFactor() { var f = unitFactor('lpn_u_length'); return f * f * f; }
+	function tankVolumeUnitText() {
+		var pc = EngCalcs.pageConfig || {}, k = unitKey('lpn_u_length');
+		if (k === 'ft') { return pc.u_ft3 || 'ft^3'; }
+		if (k === 'm') { return pc.u_m3 || 'm^3'; }
+		return unitLabel('lpn_u_length') + '^3';
 	}
 	function colorLinkValue(l, field) {
 		if (field === 'diameter') { return l.type === 'pump' ? undefined : effective(l, 'diameter'); }
@@ -8618,6 +8913,12 @@ var EngCalcs = EngCalcs || {};
 		// age or a source trace the document states no chemical and this is '', which is honest:
 		// nobody has said what the number is in.
 		if (group === 'node' && field === 'initQuality') { return concentrationUnitText(); }
+		// **A TANK'S TWO RESULTS ARE NOT COLOUR OR LABEL FIELDS** (Task 783; the chemical-symbology
+		// harness holds every colour field to a Labels row, and these have neither), so they sit
+		// outside COLOR_NODE_FIELDS and the unit is answered here. Depth reads in the Elevation/Head
+		// unit like the three typed levels; volume in the LENGTH unit cubed.
+		if (group === 'node' && field === 'volume') { return tankVolumeUnitText(); }
+		if (group === 'node' && field === 'depth') { return unitLabel(resultUnit('elevhead')); }
 		id = colorFieldUnit(group, field);
 		if (id) { return unitLabel(id); }
 		// A friction factor is dimensionless and a status is not a quantity at all; both print
@@ -8866,12 +9167,15 @@ var EngCalcs = EngCalcs || {};
 	function colorFieldLabel(group, field) {
 		var pc = EngCalcs.pageConfig || {}, defs = group === 'node' ? nodeFieldDefs(pc) : linkFieldDefs(pc), i;
 		for (i = 0; i < defs.length; i++) { if (defs[i][0] === field) { return defs[i][1]; } }
+		// Tank-only results with no Labels row (Task 783): offered to the ramp, Find and the graph.
+		if (group === 'node' && field === 'depth') { return pc.lpn_result_depth || 'Depth'; }
+		if (group === 'node' && field === 'volume') { return pc.lpn_result_tank_volume || 'Available volume'; }
 		return field;
 	}
 	// **A STATISTIC VIEW SAYS SO IN THE HEADING** (Task 735): with the transport on Averaged, the map's
 	// "Pressure" is not an instant, and the label "P=124.88" cannot say so. Result fields only; an
 	// input (elevation, diameter) is the same in every view.
-	var STATISTIC_RESULT_FIELDS = { demandActual: 1, level: 1, head: 1, pressure: 1, quality: 1,
+	var STATISTIC_RESULT_FIELDS = { demandActual: 1, level: 1, depth: 1, volume: 1, head: 1, pressure: 1, quality: 1,
 		flow: 1, velocity: 1, headloss: 1, rate: 1 };
 	function colorHeadingText(group, field, unit, labelOverride) {
 		var stat = EngCalcs.lpnTimeStatisticLabel && !labelOverride && STATISTIC_RESULT_FIELDS[field] ?
@@ -11008,15 +11312,15 @@ var EngCalcs = EngCalcs || {};
 	function customerResolvedFlow(c) {
 		var b = customerFlow(c);
 		if (typeof b !== 'number' || !isFinite(b)) { return b; }
-		return b * patternMultiplier(c.pattern || doc.defaultPattern, modelTimeSeconds()) *
+		return b * patternMultiplier(c.pattern || effDefaultPattern(), modelTimeSeconds()) *
 			docDemandMultiplier();
 	}
 	// **READ OUT OF THE CUSTOMER GROUP, NOT THE NODE GROUP** (Tom, 2026-09-19 -- see
 	// defaultLabelSettings().customer for why that changed). The ORDER is the order of
 	// customerFieldDefs(), which is the order the checkboxes are drawn in, so what a reader ticks
 	// top to bottom is what they get left to right.
-	function customerLabelLines(c) {
-		var ls = labelSettings, cd = ls.decimals.customer, lines = [];
+	function customerLabelLines(c, lsOverride) {
+		var ls = lsOverride || labelSettings, cd = ls.decimals.customer, lines = [];
 		if (ls.customer.id) { lines.push(affix('customer', 'id', { text: c.id })); }
 		// Demand over Base demand, which is refreshLabelTextPass()'s own order for a junction.
 		// rawLine() for both: a customer's numbers are already in the displayed flow unit, because
@@ -12204,6 +12508,7 @@ var EngCalcs = EngCalcs || {};
 	// an edit lands, with recalculate off and no solve running.
 	function refreshOneLabelInPlace(el) {
 		labelCacheTaint();
+		hoverCardHide();
 		// A pass already owed runs first (Task 653), so this one label is reflowed among neighbours
 		// that are where the owed pass puts them. It is the pass somebody else asked for, not one
 		// this edit triggers: with nothing owed this is a no-op.
@@ -12213,42 +12518,9 @@ var EngCalcs = EngCalcs || {};
 		if (group === 'node') {
 			var n = el, ne = nodeEls[n.id];
 			if (!ne) { return; }
-			lines = [];
-			if (ls.node.id) { lines.push(affix('node', 'id', { text: n.id })); }
-			// The two identity words, as the full pass prints them (Task 774): this single-label
-			// path left them out, so a Description just typed did not reach its own label.
-			if (ls.node.desc && n.desc) { lines.push(affix('node', 'desc', { text: String(n.desc) })); }
-			if (ls.node.tag && n.tag) { lines.push(affix('node', 'tag', { text: String(n.tag) })); }
-			// **GUARDED, WHERE THE FULL PASS IS NOT.** A junction with no demand stated at all
-			// resolves to `undefined` (resolvedDemand()/baseDemandTotal() hand back `rows[0].base`
-			// verbatim), and rawLine() has no guard of its own -- plainRound() returns undefined for
-			// a non-number and `.toFixed()` on that throws. refreshLabelTextPass() carries the same
-			// unguarded call and has simply never been driven at this one node with demandActual on;
-			// a single-element refresh reaches combinations a whole-document pass may not have, so
-			// it cannot rely on that silence. Same treatment elev/quality/initQuality already get.
-			var demandActualVal = resolvedDemand(n), demandVal = baseDemandTotal(n);
-			if (!isFixedHeadNode(n) && ls.node.demandActual && typeof demandActualVal === 'number') { lines.push(affix('node', 'demandActual', rawLine(demandActualVal, null, nd.demandActual))); }
-			if (!isFixedHeadNode(n) && ls.node.demand && typeof demandVal === 'number') { lines.push(affix('node', 'demand', rawLine(demandVal, null, nd.demand))); }
-			var headVal = isFixedHeadNode(n)
-				? fixedHeadDisplay(n)
-				: (lastSolveResult ? toDisplay(lastSolveResult.heads[n.id], resultUnit('elevhead')) : undefined);
-			var pressVal = isFixedHeadNode(n)
-				? fixedHeadPressure(n)
-				: (lastSolveResult ? toDisplay(lastSolveResult.pressures[n.id], resultUnit('pressure')) : undefined);
-			if (ls.node.head && headVal !== undefined) { lines.push(affix('node', 'head', rawLine(headVal, null, nd.head))); }
-			if (ls.node.pressure && pressVal !== undefined) { lines.push(affix('node', 'pressure', rawLine(pressVal, null, nd.pressure))); }
-			if (ls.node.elev && typeof n.elev === 'number') { lines.push(affix('node', 'elev', rawLine(n.elev, null, nd.elev))); }
-			// **TANK WATER DEPTH, TANK ONLY** (Task 696), same treatment elev/quality/initQuality
-			// get above: guarded, and with no extrema mark (null) since this is one label, not a pass.
-			var levelVal = n.type === 'tank' ? effective(n, 'level') : undefined;
-			if (ls.node.level && typeof levelVal === 'number') { lines.push(affix('node', 'level', rawLine(levelVal, null, nd.level))); }
-			var qualVal = nodeQualityValue(n);
-			if (ls.node.quality && qualVal !== undefined) { lines.push(affix('node', 'quality', rawLine(qualVal, null, qualityDecimals(nd)))); }
-			var initQualVal = nodeInitQuality(n);
-			if (ls.node.initQuality && initQualVal !== undefined) { lines.push(affix('node', 'initQuality', rawLine(initQualVal, null, nd.initQuality))); }
+			lines = nodeLabelFieldLines(n, ls, null);
 			ne.empty = lines.length === 0;
 			if (lines.length === 0) { lines.push({ text: '' }); }
-			lines = nodeDisplayOrder(lines);
 			ne.allLines = lines;
 			writeNodeLabelGlyphs(ne, n, lines, fsNow);
 			measureLabelWidths(ne);
@@ -12256,31 +12528,7 @@ var EngCalcs = EngCalcs || {};
 		} else if (group === 'link') {
 			var l = el, le = linkEls[l.id];
 			if (!le) { return; }
-			lines = [];
-			if (ls.link.id) { lines.push(affix('link', 'id', { text: l.id })); }
-			if (ls.link.desc && l.desc) { lines.push(affix('link', 'desc', { text: String(l.desc) })); }
-			if (ls.link.tag && l.tag) { lines.push(affix('link', 'tag', { text: String(l.tag) })); }
-			if (l.type === 'pipe') {
-				if (ls.link.diameter) { lines.push(affix('link', 'diameter', rawLine(effective(l, 'diameter'), null, ld.diameter))); }
-				if (ls.link.length) { lines.push(affix('link', 'length', rawLine(effective(l, 'length'), null, ld.length))); }
-				if (ls.link.roughness) { lines.push(affix('link', 'roughness', rawLine(effective(l, 'roughness'), null, ld.roughness))); }
-				if (ls.link.km) { lines.push(affix('link', 'km', rawLine(pipeK(l), null, ld.km))); }
-			} else if (l.type === 'valve') {
-				if (ls.link.diameter) { lines.push(affix('link', 'diameter', rawLine(effective(l, 'diameter'), null, ld.diameter))); }
-			}
-			if (lastSolveResult && !linkResultHeld(l) && lastSolveResult.flows[l.id] !== undefined) {
-				if (ls.link.flow) { lines.push(affix('link', 'flow', numLine(shownFlow(lastSolveResult.flows[l.id]), resultUnit('flow'), null, ld.flow))); }
-				if (ls.link.velocity && l.type !== 'pump') { lines.push(affix('link', 'velocity', numLine(lastSolveResult.velocities[l.id], resultUnit('velocity'), null, ld.velocity))); }
-				if (ls.link.headloss) { lines.push(affix('link', 'headloss', numLine(shownHeadloss(l, lastSolveResult.headlosses[l.id]), resultUnit('elevhead'), null, ld.headloss), l)); }
-				if (ls.link.gradient && l.type !== 'pump' && linkLengthSI(l)) { lines.push(affix('link', 'gradient', numLine(shownHeadloss(l, lastSolveResult.headlosses[l.id]) / linkLengthSI(l), resultUnit('gradient'), null, ld.gradient, gradientSuffix()))); }
-				var fricVal = linkFrictionFactor(l);
-				if (ls.link.friction && fricVal !== undefined) { lines.push(affix('link', 'friction', rawLine(fricVal, null, ld.friction))); }
-			}
-			if (ls.link.status) { lines.push(affix('link', 'status', { text: linkStatusText(l) })); }
-			var lqVal = linkQualityValue(l);
-			if (ls.link.quality && lqVal !== undefined) { lines.push(affix('link', 'quality', rawLine(lqVal, null, qualityDecimals(ld)))); }
-			var lrVal = linkReactionRate(l);
-			if (ls.link.rate && lrVal !== undefined) { lines.push(affix('link', 'rate', rawLine(lrVal, null, ld.rate))); }
+			lines = linkLabelFieldLines(l, ls, null);
 			le.empty = lines.length === 0;
 			if (lines.length === 0) { lines.push({ text: '' }); }
 			le.allLines = lines;
@@ -12322,12 +12570,16 @@ var EngCalcs = EngCalcs || {};
 		}
 		l.verts.splice(bestI, 0, { x: pt.x, y: pt.y });
 		rebuildLink(l);
+		// A bend drag reaches scheduleSolve() through updateVertex(); a click did not, so the
+		// autosave (which rides this debounce) never saw the edit until some other one came along.
+		scheduleSolve();
 	}
 	function removeVertex(linkId, vidx) {
 		saveUndoSnapshot();
 		var l = linkById(linkId);
 		l.verts.splice(vidx, 1);
 		rebuildLink(l);
+		scheduleSolve();
 	}
 
 	// ---- zoom-extent: fits the actual rendered extent (symbol radius, label text box, link
@@ -14268,6 +14520,7 @@ var EngCalcs = EngCalcs || {};
 		};
 		reader.readAsDataURL(file);
 	}
+	EngCalcs.lpnEffDefaultPattern = function () { return effDefaultPattern(); };
 	EngCalcs.lpnBackdropProbe = function () {
 		var inp = EngCalcs.lpnExportInp(serializeProject(), inpExportOptions()).inp, m = /\[BACKDROP\]([^\[]*)/.exec(inp);
 		return {
@@ -18016,9 +18269,174 @@ var EngCalcs = EngCalcs || {};
 		if (sel && (!hoverPreview || sel.kind !== hoverPreview.kind || sel.id !== hoverPreview.id)) {
 			paintHoverPreview(sel, true);
 		}
+		var changed = !hoverPreview !== !sel || (sel && (sel.kind !== hoverPreview.kind || sel.id !== hoverPreview.id));
 		hoverPreview = sel;
+		if (changed) { hoverCard.x = hoverCard.nx; hoverCard.y = hoverCard.ny; hoverCardRetarget(sel); }
 	}
 	function clearHoverPreview() { setHoverPreview(null); }
+	/**
+	 * **THE HOVER CARD: AN ASSET'S LABEL PER SETTINGS, AT ANY SCALE, FIT OR NOT** (Task 773). Tom,
+	 * 2026-10-05: informative where labels are missing, and a clue to what a click will select;
+	 * 2026-10-08, relaying an outside tester: *"when we hover on an element, we see the full label
+	 * (as defined by the user in settings, of course)... Whether to show these should be a
+	 * setting."*
+	 *
+	 * **IT RIDES THE HOVER HIGHLIGHT.** The element wearing `.lpn-hover` is the element the card
+	 * describes, from the same hit test a click uses, so the card cannot name one thing while a
+	 * click selects another. It is armed from setHoverPreview() whenever the target CHANGES, and
+	 * composed only when the 500 ms rest has run out: nothing here runs per pointer move, and it
+	 * never calls refreshLabelText() or any placement pass.
+	 *
+	 * **THE LINES COME FROM THE MAP LABEL'S OWN COMPOSERS** (nodeLabelFieldLines(),
+	 * linkLabelFieldLines(), customerLabelLines()), handed the live label settings (the fields
+	 * ticked there, and only those; the ID alone if none). Same units, same decimals, same order, same prefixes and suffixes; a field with
+	 * nothing to say (no solve yet, no quality analysis) is left out exactly as the label leaves it
+	 * out. Results show what the label would show, so the stale-snapshot rule holds without a line
+	 * of code of its own. One value to a line, not the link label's one-line concatenation: a card
+	 * has the room, and a stack reads faster.
+	 *
+	 * **THE LOOK IS THE SUITE'S ONE NAME TIP**: a Bootstrap tooltip on a one-pixel anchor parked at
+	 * the pointer, opened after EngCalcs.tipShowDelay. The anchor carries no `title`, so the
+	 * browser's own tooltip never gets a say. `.lpn-hovercard` makes it click-through.
+	 *
+	 * **NOTHING NEW ON TOUCH**: a hover-less device never moves a pointer over the map, and
+	 * ecCanHover() is asked again here. A long-press is not built (Tom, 2026-10-05, thought it
+	 * counter-natural and possibly phone-intuitive; left for a decision).
+	 *
+	 * **A BROWSER PREFERENCE, NOT THE PROJECT'S** (LPN_HOVERCARD_KEY): whether one reader wants a
+	 * card to appear is a fact about the person at the screen.
+	 */
+	var LPN_HOVERCARD_KEY = 'lpn_hovercard';
+	function hoverCardOn() {
+		try { return localStorage.getItem(LPN_HOVERCARD_KEY) !== 'off'; } catch (e) { return true; }
+	}
+	function setHoverCardOn(on) {
+		// Written only when OFF, like lpn_runbox: a browser that never touched it holds nothing.
+		try {
+			if (on) { localStorage.removeItem(LPN_HOVERCARD_KEY); }
+			else { localStorage.setItem(LPN_HOVERCARD_KEY, 'off'); }
+		} catch (e) {}
+		if (!on) { hoverCardHide(); }
+	}
+	var hoverCard = { timer: null, anchor: null, tip: null, shown: false, x: 0, y: 0, nx: 0, ny: 0, sel: null };
+	// Esc, Ctrl+Z and Ctrl+Y can change what the card describes; any label-text change dismisses it
+	// too (refreshLabelText(), refreshOneLabelInPlace()), so it never shows stale text.
+	if (typeof document !== 'undefined' && document.addEventListener) {
+		document.addEventListener('keydown', function (e) {
+			if (e.key === 'Escape' || ((e.ctrlKey || e.metaKey) && /^[zy]$/i.test(e.key || ''))) { hoverCardHide(); }
+		}, true);
+	}
+	function hoverCardHide() {
+		if (hoverCard.timer) { clearTimeout(hoverCard.timer); hoverCard.timer = null; }
+		if (hoverCard.shown && hoverCard.tip) { hoverCard.tip.hide(); }
+		hoverCard.shown = false;
+	}
+	// **THE REST TIMER RUNS FROM THE POINTER COMING TO REST, NOT FROM ENTERING THE TARGET**
+	// (Perry's review). Sliding along a long pipe the card used to open 500 ms in, with the pointer
+	// still moving, and sit behind it. The card is placed at the resting point; a move of more than
+	// HOVERCARD_STILL_PX hides it and starts the wait again, so it is never left behind (a name tip
+	// is anchored to its element and stays while the pointer stays on it; this one is anchored to
+	// a point, so the point moving is the same event).
+	var HOVERCARD_STILL_PX = 4;
+	function hoverCardNudge(x, y) {
+		if (!hoverCard.sel) { return; }
+		if (Math.abs(x - hoverCard.x) <= HOVERCARD_STILL_PX && Math.abs(y - hoverCard.y) <= HOVERCARD_STILL_PX) { return; }
+		hoverCard.x = x; hoverCard.y = y;
+		hoverCardRetarget(hoverCard.sel);
+	}
+	function hoverCardRetarget(sel) {
+		hoverCardHide();
+		hoverCard.sel = (sel && sel.kind !== 'label') ? sel : null;
+		if (!sel || sel.kind === 'label' || !hoverCardOn()) { return; }
+		if (typeof ecCanHover === 'function' && !ecCanHover()) { return; }
+		if (!window.bootstrap || !bootstrap.Tooltip) { return; }
+		var delay = (window.EngCalcs && EngCalcs.tipShowDelay) || 500;
+		hoverCard.timer = setTimeout(function () {
+			hoverCard.timer = null;
+			if (hoverCard.sel && hoverCard.sel.kind === sel.kind && hoverCard.sel.id === sel.id) { hoverCardShow(sel); }
+		}, delay);
+	}
+	// **THE CARD READS THE LABEL SETTINGS AS THEY STAND, NOT A COPY WITH EVERYTHING TICKED** (Tom,
+	// 2026-10-08: *"It should show per Settings. Not more and not less."*). It hands the map label's
+	// own composers the live `labelSettings`, so the fields, show order, decimals, prefixes and
+	// suffixes are the label's by construction. What it does NOT inherit is anything about the
+	// LABEL'S PLACEMENT: the labeling threshold (dataLabelsHidden) and the shed cascade (fit) act on
+	// the drawn glyphs after these composers have run, and the card never calls them, so it shows at
+	// any scale, fit or not. A group with nothing ticked (or nothing to say yet) shows the ID alone:
+	// the card has to name what it is resting on, and an asset's ID is the one field it always has.
+	function idOnlyLabelSettings() {
+		var only = Object.assign({}, labelSettings);
+		['node', 'link', 'customer'].forEach(function (g) {
+			only[g] = {};
+			Object.keys(labelSettings[g] || {}).forEach(function (k) { only[g][k] = (k === 'id'); });
+		});
+		return only;
+	}
+	function hoverCardLinesWith(sel, ls) {
+		var e;
+		if (sel.kind === 'node') { e = nodeById(sel.id); return e ? nodeLabelFieldLines(e, ls, null) : []; }
+		if (sel.kind === 'link') { e = linkById(sel.id); return e ? linkLabelFieldLines(e, ls, null) : []; }
+		if (sel.kind === 'customer') { e = customerById(sel.id); return e ? customerLabelLines(e, ls) : []; }
+		return [];
+	}
+	function hoverCardLines(sel) {
+		var lines = hoverCardLinesWith(sel, labelSettings).filter(function (l) { return l.text !== ''; });
+		return lines.length ? lines : hoverCardLinesWith(sel, idOnlyLabelSettings());
+	}
+	// **THE CARD IN DELETE AND THE LINK-DRAWING MODES** (Tom, 2026-10-08): the same card, for the
+	// thing the next click would act on (what you are about to delete; the node you are about to
+	// join). It paints no highlight (those modes have their own feedback) and takes no pointer
+	// events; a press dismisses it like anywhere else.
+	function hoverCardOtherMode() {
+		return mode === 'delete' || mode === 'add-pipe' || mode === 'add-pump' || mode === 'add-valve' || mode === 'add-chain';
+	}
+	var hoverCardOtherRaf = null, hoverCardOtherAt = null;
+	function hoverCardOtherTarget(x, y) {
+		var t = hoverTargetFromHit(mapHitAt(x, y));
+		if (mode === 'delete') { return t && t.kind !== 'label' ? t : null; }
+		if (t && t.kind === 'node') { return t; }
+		var near = nearestNodeNearScreen(x, y, POINTER_REACH_PX);
+		return near ? { kind: 'node', id: near.id } : null;
+	}
+	function hoverCardOtherMove(e) {
+		if (e.pointerType === 'touch' || !hoverCardOtherMode() || drag) { return; }
+		hoverCardOtherAt = { x: e.clientX, y: e.clientY };
+		hoverCardNudge(e.clientX, e.clientY);
+		if (hoverCardOtherRaf) { return; }
+		hoverCardOtherRaf = requestAnimationFrame(function () {
+			hoverCardOtherRaf = null;
+			if (!hoverCardOtherMode() || drag || !hoverCardOtherAt) { return; }
+			var t = hoverCardOtherTarget(hoverCardOtherAt.x, hoverCardOtherAt.y), cur = hoverCard.sel;
+			if (t && !selectionExists(t)) { t = null; }
+			if ((!t && !cur) || (t && cur && t.kind === cur.kind && t.id === cur.id)) { return; }
+			hoverCard.x = hoverCardOtherAt.x; hoverCard.y = hoverCardOtherAt.y;
+			hoverCardRetarget(t);
+		});
+	}
+	function hoverCardShow(sel) {
+		var lines = hoverCardLines(sel).map(function (l) { return l.text; }).filter(function (t) { return t !== ''; });
+		perfDebugCount('hoverCards');
+		if (!lines.length) { return; }
+		var host = document.createElement('div');
+		lines.forEach(function (t, i) {
+			if (i) { host.appendChild(document.createElement('br')); }
+			host.appendChild(document.createTextNode(t));
+		});
+		if (!hoverCard.anchor) {
+			hoverCard.anchor = document.createElement('div');
+			hoverCard.anchor.className = 'lpn-hovercard-anchor';
+			document.body.appendChild(hoverCard.anchor);
+		}
+		hoverCard.anchor.style.left = hoverCard.x + 'px';
+		hoverCard.anchor.style.top = hoverCard.y + 'px';
+		if (hoverCard.tip) { hoverCard.tip.dispose(); }
+		hoverCard.tip = bootstrap.Tooltip.getOrCreateInstance(hoverCard.anchor, {
+			trigger: 'manual', html: true, placement: 'top', customClass: 'lpn-hovercard',
+			title: host.innerHTML
+		});
+		hoverCard.tip.show();
+		hoverCard.shown = true;
+	}
 	// The VERB. Reads the subject once, drops it, then deletes -- deleteElement() may cascade,
 	// confirm, or (inside a scenario) deactivate rather than destroy, and none of those should find
 	// a selection still pointing at what they are working on.
@@ -18341,6 +18759,26 @@ var EngCalcs = EngCalcs || {};
 	// straight to Zoom Window with no drag or click-click ever asked for. Tom's rule is "click
 	// TWICE IN A ROW", and a click on the map in between is not that.
 	var zoomToolArmed = false;
+	// Straight into Zoom Window, from the Map menu row and the W key. The toolbar button is painted
+	// as Zoom Window for the duration, exactly as its own second press does, and setMode() puts it
+	// back when the mode ends. Pressed again while already in the mode, it leaves it.
+	function enterZoomWindow() {
+		if (mode === 'zoom-window') { setMode('select'); return; }
+		zoomToolArmed = false;
+		zoomToolShape = 'window';
+		setMode('zoom-window');
+		if (repaintZoomTool) { repaintZoomTool(); }
+	}
+	// The corner target of the Zoom to fit button: a square at its lower-right corner, about 14 px for
+	// a mouse and 22 px for a finger, never more than half the button either way.
+	function zoomCornerHit(btn, e) {
+		var r = btn.getBoundingClientRect();
+		var coarse = !!(window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
+		var side = coarse ? 22 : 14;
+		var w = Math.min(side, r.width / 2), h = Math.min(side, r.height / 2);
+		// Physical right in every language, because the CSS triangle is drawn at `right: 2px`.
+		return e.clientX >= r.right - w && e.clientX <= r.right && e.clientY >= r.bottom - h && e.clientY <= r.bottom;
+	}
 	// The button itself, held the same way `openToolButton`/`saveToolButton` below are, so
 	// `wireZoomArmReset()`'s one, wired-once listener can always test against the CURRENT button
 	// even though wireToolbar() rebuilds the strip (language switch, unit switch) and would
@@ -18798,6 +19236,8 @@ var EngCalcs = EngCalcs || {};
 			['demandActual', 'bpn_demand', 'Demand'],
 			['head', 'lpn_result_head', 'Head'],
 			['pressure', 'lpn_result_pressure', 'Pressure'],
+			['depth', 'lpn_result_depth', 'Depth'],
+			['volume', 'lpn_result_tank_volume', 'Available volume'],
 			['quality', null, 'Water age']
 		];
 		var BAND_LINK = [
@@ -18862,7 +19302,7 @@ var EngCalcs = EngCalcs || {};
 					if (d.group !== 'link' || (d.type && d.type !== 'pipe') || !reactionFieldsShown()) { return; }
 				} else if (key === 'emitter') {
 					if (d.group !== 'node' || (d.type && d.type !== 'junction')) { return; }
-				} else if (key === 'level' || key === 'minLevel' || key === 'maxLevel'
+				} else if (key === 'level' || key === 'minLevel' || key === 'maxLevel' || key === 'depth' || key === 'volume'
 						|| key === 'tankDiameter' || key === 'mixingModel' || key === 'mixingFraction') {
 					if (d.group !== 'node' || (d.type && d.type !== 'tank')) { return; }
 				} else if (key === 'speed' || key === 'energyPrice' || key === 'energyPattern') {
@@ -18964,7 +19404,7 @@ var EngCalcs = EngCalcs || {};
 	var findConnCache = null;
 	function findConnectionMap() {
 		if (findConnCache) { return findConnCache; }
-		var model = assembleModel(), nodeById2 = {}, fixed = [], adjAll = {}, adjOpen = {},
+		var model = assembleModel(true), nodeById2 = {}, fixed = [], adjAll = {}, adjOpen = {},
 			facts = {}, seenAll, seenOpen, i, link, n;
 		for (i = 0; i < model.nodes.length; i++) {
 			n = model.nodes[i];
@@ -19156,6 +19596,21 @@ var EngCalcs = EngCalcs || {};
 	// The translated word for a stored code, or null where `prop` is not a choice property, or the
 	// code is not one of its choices (a document written by an older version, or hand-edited) --
 	// the caller's own signal to fall back to printing the raw code rather than nothing at all.
+	// **A TYPED CHOICE IS READ AS ITS CODE** (Tom's guide audit, 2026-10-07): the query line takes
+	// the stored code (`'closed'`) or the word the pull-down shows (`'Closed'`, `'Cerrado'`), in
+	// any case, and both mean the same choice. Null for a word that is neither, which the caller
+	// must not quietly turn into the first choice: `Pipe.Closed equal to 'Closed'` once listed
+	// every OPEN pipe that way, because the pull-down reset an unknown word to its first entry.
+	function findChoiceCodeOf(prop, word) {
+		var defs = findChoiceDefs(prop), w = String(word === undefined || word === null ? '' : word).trim().toLowerCase(), i;
+		if (!defs) { return null; }
+		// The English word for a choice is accepted on every page, as every other word is.
+		defs = defs.concat(findEnglishDefs(function () { return findChoiceDefs(prop); }) || []);
+		for (i = 0; i < defs.length; i++) {
+			if (String(defs[i][0]).toLowerCase() === w || String(defs[i][1]).toLowerCase() === w) { return defs[i][0]; }
+		}
+		return null;
+	}
 	function findChoiceLabelOf(prop, code) {
 		var defs = findChoiceDefs(prop), i;
 		if (!defs) { return null; }
@@ -19224,6 +19679,12 @@ var EngCalcs = EngCalcs || {};
 	function findOpDefs() {
 		var pc = EngCalcs.pageConfig || {};
 		if (findPropIsConnection(findState.prop)) { return findConnOpDefs(); }
+		// **A CHOICE IS EQUAL TO ONE OF ITS WORDS, OR EMPTY** (Perry's review, 2026-10-07): choosing
+		// Closed once defaulted to `contains` and wrote `Pipe.Closed contains 'open'`. Ranking or a
+		// part of a word means nothing for a list of fixed codes, so equal to comes first.
+		if (findPropIsChoice(findState.prop)) {
+			return [['equals', pc.lpn_find_op_equals || 'equal to', 'equal to'], findEmptyDef()];
+		}
 		// **THE EXTREMES ARE A STANDARD CONDITION ON EVERY PROPERTY THAT HAS AN ORDER** (Tom,
 		// 2026-08-26: *"One reason it's confusing is that it should be a standard condition, but
 		// it's not. Make it a condition for all assets and numerical or alphanumerical
@@ -20020,6 +20481,28 @@ var EngCalcs = EngCalcs || {};
 		findState.scope = save.s; findState.prop = save.p;
 		return out;
 	}
+	// **THE SAME LISTS, WORDED IN ENGLISH** (Perry's review, 2026-10-07): the def lists are built
+	// again with the English values of their keys (pageConfig.findEnglishWords) standing in, so every
+	// label, composed ones included ("Roughness, C", "Average source share"), has its English
+	// spelling. Null on a page without the English copy.
+	function findEnglishDefs(fn) {
+		var pc = EngCalcs.pageConfig || {}, en = pc.findEnglishWords, merged = {}, k;
+		if (!en) { return null; }
+		for (k in pc) { if (Object.prototype.hasOwnProperty.call(pc, k)) { merged[k] = pc[k]; } }
+		for (k in en) { if (Object.prototype.hasOwnProperty.call(en, k)) { merged[k] = en[k]; } }
+		EngCalcs.pageConfig = merged;
+		try { return fn(); } finally { EngCalcs.pageConfig = pc; }
+	}
+	// `defs` with each row's English label added to the spellings in its third slot.
+	function findWithEnglish(defs, enDefs) {
+		var byKey = {};
+		(enDefs || []).forEach(function (d) { byKey[d[0]] = d[1]; });
+		return defs.map(function (d) {
+			var en = byKey[d[0]];
+			if (!en || en === d[1]) { return d; }
+			return [d[0], d[1], [en].concat(d[2] === undefined || d[2] === null ? [] : d[2])];
+		});
+	}
 	// The word that could not be understood, for the message. Up to the next space, dot or bracket.
 	function findBadWord(text, at) {
 		var m = /^[^\s().]+/.exec(text.substring(at));
@@ -20073,7 +20556,7 @@ var EngCalcs = EngCalcs || {};
 			}
 			i += 1; ws();
 			propDefs = findDefsFor(scope).props;
-			propAlts = findAlts(propDefs);
+			propAlts = findAlts(findWithEnglish(propDefs, findEnglishDefs(function () { return findDefsFor(scope).props; })));
 			at = i;
 			m = findMatchAlt(s, i, propAlts);
 			if (!m) {
@@ -20082,7 +20565,7 @@ var EngCalcs = EngCalcs || {};
 			}
 			prop = m.key; i += m.len;
 			opDefs = findDefsFor(scope, prop).ops;
-			opAlts = findAlts(opDefs);
+			opAlts = findAlts(findWithEnglish(opDefs, findEnglishDefs(function () { return findDefsFor(scope, prop).ops; })));
 			ws();
 			at = i;
 			// **AN EXTREME IS MATCHED AS A WHOLE PHRASE, COUNT INCLUDED**, because its count is
@@ -20122,6 +20605,8 @@ var EngCalcs = EngCalcs || {};
 				return fail('lpn_find_q_err_value', 'This condition needs a value after it: {op}',
 					{ op: findLabelOf(opDefs, op) }, at);
 			}
+			// A choice is matched by its code: the word on the pull-down is read as the code it names.
+			if (findPropIsChoice(prop) && findChoiceCodeOf(prop, v.v) !== null) { v.v = findChoiceCodeOf(prop, v.v); }
 			return { t: 'cond', scope: scope, prop: prop, op: op, value: v.v };
 		}
 		function primary() {
@@ -20281,7 +20766,7 @@ var EngCalcs = EngCalcs || {};
 			if (!r.ok) {
 				findQueryError = { msg: r.msg + ' ' + findMsg('lpn_find_q_err_pos', '(at character {n})',
 					{ n: String(r.pos + 1) }) };
-			} else if (findAstIsCond(r.ast)) {
+			} else if (findAstIsCond(r.ast) && !findChoiceUnknown(r.ast)) {
 				findState.scope = r.ast.scope; findState.prop = r.ast.prop;
 				findState.op = r.ast.op; findState.value = r.ast.value;
 				findNormalize();
@@ -20291,6 +20776,13 @@ var EngCalcs = EngCalcs || {};
 		}
 		renderFindControls();
 		renderFindMessage();
+	}
+	// A single condition on a choice property whose value names no choice: the pull-down cannot show
+	// it, so it runs as typed (and matches nothing) with the controls put away, rather than being
+	// reset to the first choice and searching for something nobody typed.
+	function findChoiceUnknown(ast) {
+		return findPropIsChoice(ast.prop) && !findOpIsExtreme(ast.op) && !findOpIsValueless(ast.op)
+			&& findChoiceCodeOf(ast.prop, ast.value) === null;
 	}
 	function findControlsShown() { return !findQueryAst && !findQueryError; }
 	function renderFindControls() {
@@ -20669,6 +21161,9 @@ var EngCalcs = EngCalcs || {};
 	}
 	function runFind() {
 		var pc = EngCalcs.pageConfig || {}, run;
+		// A typed query can change the kind of asset found, so Change what was found is rebuilt for
+		// it here: before this, a query typed into the line left that part offering nothing.
+		rebuildReplaceForm();
 		findConnNote = '';
 		findHasRun = true;
 		// The typed query is the one that runs, and an unreadable one runs nothing at all.
@@ -23192,22 +23687,31 @@ var EngCalcs = EngCalcs || {};
 				if (t) { el.tag = t; } else { delete el.tag; }   // base-write: identity, as in the popup -- see tagField()
 			} };
 	}
-	// A link's two ends, read-only and as TEXT: which node a pipe lands on is identity, and identity
-	// is never overridable (a node cannot be in two places at once in one rendered map). Re-drawing
-	// the pipe is how it changes.
+	// A link's two ends, as TEXT and editable (Tom, 2026-10-09: *"I got caught by the inability to
+	// edit the from and to nodes for a link. Can these be editable? I see them in table."*). Which
+	// node a pipe lands on is identity, and identity is never overridable (a node cannot be in two
+	// places in one rendered map), so a write here is Base's and a scenario is unaffected. The new
+	// ID must name an existing node and not be the link's other end; a refusal is said in place, in
+	// the same box as an ID that is taken, and `reread` puts the old node back in the cell.
+	// reconnectLinkEnd() is the one door, shared with the Properties box.
 	// **`refTo` IS WHAT MAKES A SUPPORT COLUMN POINT SOMEWHERE ELSE** (Tom, 2026-09-21: *"when we
 	// right-click on a support column (like From and To) that contains an asset, we can Show on map
 	// that asset instead of the row's asset"*). A column declares the element its VALUE names, and
 	// the right-click menu's Select in map reads it; every other column has none and the menu falls
 	// back to the row's own element, which is what it has always done.
-	function paneColEnds() {
-		return [
-			{ key: 'from', label: 'lpn_field_from', get: function (l) { return l.from; },
-				refTo: function (l) { return { group: 'node', id: l.from }; } },
-			{ key: 'to', label: 'lpn_field_to', get: function (l) { return l.to; },
-				refTo: function (l) { return { group: 'node', id: l.to }; } }
-		];
+	function paneColEnd(end, labelKey) {
+		return { key: end, label: labelKey, str: true, reread: true, em: 5,
+			get: function (l) { return l[end]; },
+			set: function (l, v) {
+				var newId = String(v === undefined || v === null ? '' : v).trim(), why;
+				if (newId === l[end]) { return; }
+				why = linkEndProblem(l, end, newId);
+				if (why) { setWarning(why); return; }
+				reconnectLinkEnd(l, end, newId);
+			},
+			refTo: function (l) { return { group: 'node', id: l[end] }; } };
 	}
+	function paneColEnds() { return [paneColEnd('from', 'lpn_field_from'), paneColEnd('to', 'lpn_field_to')]; }
 	/**
 	 * **A LINK'S VERTICES AS ONE CELL** (ROADMAP Task 610), in the format the data-entry clerk
 	 * specified before anything was built (dev/agents/data-entry-clerk/task-610-vertex-cell-spec.md):
@@ -23572,6 +24076,30 @@ var EngCalcs = EngCalcs || {};
 			unitText: function () { return unitLabel('lpn_u_flow') + '/' + unitLabel('lpn_u_pressure'); },
 			get: function (n) { return emitterToDisplay(effective(n, 'emitter')); },
 			set: function (n, v) { setProp(n, 'emitter', emitterToStore(v)); } };
+	}
+	// **A JUNCTION'S DEMAND PATTERN, AS A COLUMN** (Tom, 2026-10-10: *"The Junctions table doesn't
+	// show Demand pattern"*; and Properties on several junctions takes its rows from these columns,
+	// so this one cell is also *"Multi-select doesn't allow Demand pattern selection"*). Row 0's
+	// pattern, written through the demand list's one door so a scenario overrides it whole. Blank
+	// is Default: the project's Default demand pattern, which is what the run applies.
+	function paneColDemandPattern() {
+		return { key: 'demandPattern', label: 'lpn_field_demand_pattern', em: 5, lenient: true,
+			choices: function () { return paneChoicesPatterns(lpnBlankIsDemandDefault()); },
+			get: function (n) { return ownDemandPattern(n) || ''; },
+			plainFor: function (n) { return hasDemandBreakdown(n); },
+			set: function (n, v) {
+				var id = v || null, pc = EngCalcs.pageConfig || {};
+				// A name nothing answers to is not written (a dangling reference is a run that
+				// fails in EPANET), and the reader is told, as the customer table does.
+				if (id && !libPatternsRead().some(function (p) { return p.id === id; })) {
+					setNotice(String(pc.lpn_junction_pattern_unknown ||
+						'No pattern in this project is named {id}, so the junction was left as it was.')
+						.split('{id}').join(id));
+					return;
+				}
+				if ((ownDemandPattern(n) || null) === id) { return; }
+				editDemandRows(n, function (rows) { rows[0].pattern = id; });
+			} };
 	}
 	// A reservoir's head pattern: EPANET multiplies the stated head by it. A PLAIN write, as in the
 	// popup -- which pattern a source follows is a statement about the system, not a design
@@ -24028,6 +24556,7 @@ var EngCalcs = EngCalcs || {};
 						prop: 'demand', get: baseDemandTotal,
 						plainFor: function (n) { return demandRowsOf(n, effective(n, 'demand')).length > 1; },
 						set: function (n, v) { setProp(n, 'demand', v); } },
+					paneColDemandPattern(),
 					paneColNodeResult('demandActual', 'bpn_demand', paneUnitFlow),
 					paneColPdaResult('demandDelivered', 'lpn_result_delivered_demand', 'demands'),
 					paneColPdaResult('demandDeficit', 'lpn_result_demand_deficit', 'demandDeficits'),
@@ -24116,6 +24645,14 @@ var EngCalcs = EngCalcs || {};
 					// it must be visible, but a second editable field would be two numbers that have
 					// to agree.
 					paneColNodeResult('head', 'lpn_result_head', paneUnitHead),
+					// **DEPTH AND USABLE VOLUME, AS RESULTS** (Task 783): head minus the tank bottom, and
+					// the water above the lowest water depth. Heading tips live in the popup rows.
+					paneColNodeResult('depth', 'lpn_result_depth', paneUnitHead),
+					(function () {
+						var c = paneColNodeResult('volume', 'lpn_result_tank_volume', null);
+						c.unitText = tankVolumeUnitText;
+						return c;
+					}()),
 					paneColNodeInitQuality(),
 					paneColSourceType(), paneColSourceQuality(), paneColSourcePattern(),
 					paneColNodeQuality()
@@ -25501,7 +26038,10 @@ var EngCalcs = EngCalcs || {};
 			return { ok: false };
 		}
 		if (c.choices) {
-			return { ok: c.choices().some(function (o) { return o[0] === t; }), v: t };
+			// `lenient`: a REFERENCE to a library entry another project holds (a pasted junction table
+			// names patterns this project has not got). The row is still made; the cell's setter
+			// leaves the reference out and says so, instead of refusing the whole paste.
+			return { ok: !!c.lenient || c.choices().some(function (o) { return o[0] === t; }), v: t };
 		}
 		if (c.str) { return { ok: true, v: t }; }
 		if (t !== '' && !isFinite(+t)) { return { ok: false }; }
@@ -28780,7 +29320,7 @@ var EngCalcs = EngCalcs || {};
 		mk(pc.points_data_copy || 'Copy', function () {
 			libCopyOut(paneCopyTsv(spec, rows, cols, box));
 		}, 'Ctrl+C');
-		mk(pc.lpn_pane_copy_heads || 'Copy with headings', function () {
+		mk(pc.lpn_pane_copy_heads || 'Copy with column headings', function () {
 			libCopyOut(paneCopyTsv(spec, rows, cols, box, true));
 		});
 		mk(pc.points_data_paste || 'Paste', function () {
@@ -31055,8 +31595,13 @@ var EngCalcs = EngCalcs || {};
 	// them says something true, and Tom named one field.
 	var TS_FIELD_SKIP = { node: { initQuality: 1 }, link: {} };
 	function tsFieldOptions(group) {
-		var skip = TS_FIELD_SKIP[group] || {};
-		return colorFieldOptions(group).filter(function (o) { return !skip[o[0]]; });
+		var skip = TS_FIELD_SKIP[group] || {},
+			out = colorFieldOptions(group).filter(function (o) { return !skip[o[0]]; });
+		// A tank's depth and usable volume (Task 783): graphable, but neither a map colour nor a label.
+		if (group === 'node') {
+			out.push(['depth', colorFieldLabel('node', 'depth')], ['volume', colorFieldLabel('node', 'volume')]);
+		}
+		return out;
 	}
 	function tsField() {
 		var group = tsGroup(), opts = tsFieldOptions(group), f = tsState.fields[group], i;
@@ -32128,10 +32673,13 @@ var EngCalcs = EngCalcs || {};
 		// a preview left on the map by a tool that is no longer running is a shape nothing can
 		// finish (Task 247).
 		if (mode === 'add-meter' && newMode !== 'add-meter') { setPendingMeter(null); }
+		// The snap glyph belongs to the tool that showed it (Task 782).
+		hideSnapMark();
 		// The hover preview is a Select-mode-only signal (Ida's wishlist item 1): leaving 'select'
 		// for any other tool drops it rather than leaving a highlight nothing will now clear, since
 		// the pointermove listener that maintains it does no work outside 'select'.
 		if (mode === 'select' && newMode !== 'select') { clearHoverPreview(); }
+		if (newMode !== mode) { hoverCardRetarget(null); }
 		mode = newMode; setPendingLinkFrom(null);
 		// **THE GRIPS ARE A CSS STATE, NOT A REDRAW** (Task 567). Every vertex handle already exists
 		// in the drawing -- buildLinkEls() makes one per bend -- so turning the mode on is one class
@@ -32318,6 +32866,165 @@ var EngCalcs = EngCalcs || {};
 		if (type === 'GPV') { return 0; }
 		return 2;
 	}
+	/**
+	 * **BREAK A PIPE AT A NODE PLACED ON IT** (Tom, 2026-10-09, after an Engineers Without Borders
+	 * meeting: *"Could we offer to break a link when a node is placed on it? 'Break link for
+	 * node?'"*). The pipe becomes two pipes meeting at a new node of the kind the tool places.
+	 *
+	 * **WHICH HALF KEEPS WHAT.** The original keeps its ID, its From node and everything it carries,
+	 * and now ends at the new node; the new pipe runs from the new node to the old To node and takes
+	 * the next free ID with the project's link prefix (mintId). Diameter, roughness, status,
+	 * description, pipe type and the rest are copied. **The minor loss coefficient and its fittings
+	 * list stay on the original only**, because a fitting is one thing at one place, and a Tag is not
+	 * copied either: it is the join key to an asset register and two pipes cannot both be that
+	 * asset. A control or rule that names the pipe keeps naming the original, which is the one the
+	 * ID still belongs to.
+	 *
+	 * **THE NODE IS PLACED ON THE PIPE'S LINE**, at the foot of the press, so the two halves are
+	 * exactly the old polyline cut in two rather than the old polyline with a kink in it. Interior
+	 * vertices go to the half they lie on.
+	 *
+	 * **LENGTH.** A pipe whose length is drawn (Auto) stays drawn: each half measures itself. A pipe
+	 * with a TYPED length is divided in proportion to the drawn length of the halves. Those are new
+	 * numbers the user did not type, and that is acceptable only because the user asked for the split
+	 * (CLAUDE.md: only the user touches a file's numbers); the typed characters of both are dropped.
+	 * A scenario's override of the length is divided the same way.
+	 *
+	 * **A METER OR A TEXT ATTACHED BY STATION KEEPS ITS PHYSICAL PLACE**: its fraction along the old
+	 * pipe is restated along whichever half now holds that point, and one that falls on the new half
+	 * moves to it.
+	 *
+	 * Offered in Base only. A scenario varies topology by switching elements on and off, and cutting a
+	 * Base pipe from inside one would change the other scenarios under it.
+	 * dev/lpn-spike/ewb-meeting-harness.js.
+	 */
+	// `at`, when given, is a snap target on this pipe (Task 782): the node goes EXACTLY on it, and a
+	// bend it stands on is consumed by the node rather than left as a zero-length leg beside it.
+	function breakPipeAtPoint(l, nodeType, wx, wy, at) {
+		var pts = linkPointList(l), r = Geom.nearestFractionOnPolyline(pts, wx, wy),
+			atV = at && at.kind === 'vertex' && at.link === l ? at.vidx : -1,
+			total = Geom.polylineLength(pts), splitAlong = r.f * total,
+			oldTo = l.to, oldId = l.id, cum = [0], i, keepVerts = [], newVerts = [], node, nl, clone,
+			lenOrig, lenNew, frac, wasTyped = !l.lenAuto, typedLen = l._length;
+		for (i = 0; i + 1 < pts.length; i++) {
+			cum.push(cum[i] + Math.hypot(pts[i + 1].x - pts[i].x, pts[i + 1].y - pts[i].y));
+		}
+		// A vertex travels with its typed geographic characters, so it is copied whole.
+		if (atV >= 0) { splitAlong = cum[atV + 1]; }
+		(l.verts || []).forEach(function (v, k) {
+			if (k === atV) { return; }
+			if (cum[k + 1] < splitAlong - 1e-12) { keepVerts.push(v); }
+			else { newVerts.push(Object.assign({}, v)); }
+		});
+		clone = JSON.parse(JSON.stringify(l));
+		node = at ? addNode(nodeType, at.x, at.y) : addNode(nodeType, r.x, r.y);
+		if (at) { copySnapProvenance(at, node); }
+		nl = addLink('pipe', node.id, oldTo, newVerts);
+		nl.verts = newVerts;   // base-write: construction: whole copies, so a vertex keeps its typed characters
+		// Everything the pipe carries comes across, except what is its own place or identity.
+		Object.keys(clone).forEach(function (k) {
+			if (k === 'id' || k === 'from' || k === 'to' || k === 'verts' || k === 'lx' || k === 'ly' ||
+				k === 'tag' || k === '_k' || k === 'fittingsId' || k === '_fittingsId') { return; }
+			nl[k] = clone[k];   // base-write: construction: the new half is born in Base as a copy of the pipe it came from
+		});
+		nl._k = 0;   // base-write: construction: a minor loss stays on the original only
+		if (nl.tok) {
+			delete nl.tok._k;
+			if (!Object.keys(nl.tok).length) { delete nl.tok; }
+		}
+		// The original now ends at the new node.
+		incidentLinks[oldTo] = incidentLinks[oldTo].filter(function (x) { return x !== oldId; });
+		l.to = node.id;   // base-write: identity -- Base is showing (the offer is made in Base only)
+		l.verts = keepVerts;   // base-write: identity, as above
+		incidentLinks[node.id].push(oldId);
+		// Lengths: each half measured, then the typed length shared out in proportion.
+		lenOrig = linkGeomLength(l); lenNew = linkGeomLength(nl);
+		frac = (lenOrig + lenNew) > 0 ? lenOrig / (lenOrig + lenNew) : 0.5;
+		if (wasTyped) {
+			l._length = typedLen * frac;   // base-write: the visitor asked for the split; see this function's note
+			nl._length = typedLen * (1 - frac);   // base-write: as above
+			if (l.tok) { delete l.tok._length; if (!Object.keys(l.tok).length) { delete l.tok; } }
+			if (nl.tok) { delete nl.tok._length; if (!Object.keys(nl.tok).length) { delete nl.tok; } }
+		}
+		// Scenario overrides: copied to both, the minor loss to the original only, a length divided.
+		scenarios.forEach(function (sc) {
+			var key = ovKeyFor('link', oldId), ov = sc.overrides[key], c2;
+			if (!ov) { return; }
+			c2 = JSON.parse(JSON.stringify(ov));
+			delete c2.k; delete c2.fittingsId;
+			if (typeof ov.length === 'number') {
+				ov.length = ov.length * frac;
+				c2.length = c2.length * (1 - frac);
+			}
+			if (Object.keys(c2).length) { sc.overrides[ovKeyFor('link', nl.id)] = c2; }
+		});
+		// Meters and Texts attached by station on the old pipe.
+		(customersByLink[oldId] || []).slice().forEach(function (cid) {
+			var c = (doc.customers || []).filter(function (x) { return x.id === cid; })[0], along;
+			if (!c || typeof c.t !== 'number') { return; }
+			along = c.t * total;
+			if (along <= splitAlong) { c.t = splitAlong > 0 ? along / splitAlong : 0; return; }
+			c.t = (total - splitAlong) > 0 ? (along - splitAlong) / (total - splitAlong) : 1;
+			c.link = nl.id;
+			customersByLink[oldId] = customersByLink[oldId].filter(function (x) { return x !== cid; });
+			(customersByLink[nl.id] = customersByLink[nl.id] || []).push(cid);
+		});
+		(labelsByLinkAnchor[oldId] || []).slice().forEach(function (lid) {
+			var lb = labelById(lid), along;
+			if (!lb || typeof lb.anchorT !== 'number') { return; }
+			along = lb.anchorT * total;
+			if (along <= splitAlong) { lb.anchorT = splitAlong > 0 ? along / splitAlong : 0; return; }
+			lb.anchorT = (total - splitAlong) > 0 ? (along - splitAlong) / (total - splitAlong) : 1;
+			lb.anchorLink = nl.id;
+			labelsByLinkAnchor[oldId] = labelsByLinkAnchor[oldId].filter(function (x) { return x !== lid; });
+			(labelsByLinkAnchor[nl.id] = labelsByLinkAnchor[nl.id] || []).push(lid);
+		});
+		rebuildLink(l);
+		rebuildLink(nl);
+		updateLinkGeometry(oldId);
+		updateLinkGeometry(nl.id);
+		updateNode(node.id, true);
+		refreshPaneIfOpen();
+		scheduleSolve();
+		return { node: node, original: l, added: nl };
+	}
+	/**
+	 * **RECONNECTING A LINK'S END** (Tom, 2026-10-09: *"I got caught by the inability to edit the
+	 * from and to nodes for a link."*). Returns '' when the new node is acceptable, else the words
+	 * to say why, in the order the visitor can act on them.
+	 * dev/lpn-spike/ewb-meeting-harness.js.
+	 */
+	function linkEndProblem(l, end, newId) {
+		var pc = EngCalcs.pageConfig || {}, other = end === 'from' ? l.to : l.from;
+		if (!newId || !nodeById(newId)) {
+			return (pc.lpn_link_end_unknown || 'No node has the ID {id}.').replace('{id}', newId);
+		}
+		if (newId === other) { return pc.lpn_link_end_same || 'From and To must be different nodes.'; }
+		return '';
+	}
+	// **THE LINK KEEPS ITS ID, ITS VERTICES AND EVERY VALUE THE USER TYPED** -- a typed length stays
+	// exactly as typed (only the user touches numbers). Vertices are kept even though the pipe's
+	// ends move, because they are the user's drawing and a polyline from the new node through them
+	// is the honest reading of what was asked; the user removes a bend in Vertices mode. An Auto
+	// length is derived from the drawing, so it follows the new geometry. From and To are identity,
+	// never overridable, so a scenario is unaffected. The caller has taken the one undo snapshot.
+	function reconnectLinkEnd(l, end, newId) {
+		var old = l[end], touched;
+		if (old === newId) { return; }
+		l[end] = newId;   // base-write: identity -- a link's ends are not overridable, like its ID
+		incidentLinks[old] = (incidentLinks[old] || []).filter(function (x) { return x !== l.id; });
+		(incidentLinks[newId] = incidentLinks[newId] || []).push(l.id);
+		touched = [old, newId];
+		beginMapBoxHold();
+		beginLinkGeomHold();
+		try {
+			updateLinkGeometry(l.id);
+			touched.forEach(function (nid) { if (nodeEls[nid]) { layoutNodeLabel(nid); } });
+		} finally { endMapBoxHold(); endLinkGeomHold(); }
+		refreshOneLabelInPlace(l);
+		refreshPaneIfOpen();
+		scheduleSolve();
+	}
 	// anchorNode, if given, anchors the new Text to that node with a leader -- lb.x/lb.y become an
 	// OFFSET from the node (matching buildLabelEls'/updateLabelGeometry's model), computed here so
 	// the label still appears exactly where the user tapped, not snapped onto the node itself.
@@ -32372,8 +33079,26 @@ var EngCalcs = EngCalcs || {};
 		el._active = false;   // base-write: born inactive in Base, then overridden active here -- the whole membership design
 		setOverride(el, 'active', true);
 	}
+	// **AN ASSET THAT EXISTS ONLY IN THE CURRENT SCENARIO IS REALLY DELETED THERE** (Tom,
+	// 2026-10-11: *"I created a junction in a Scenario 1, and it doesn't exist in Base scenario. But
+	// I can't delete it in Scenario 1. So I can't delete it at all."*). Drawing in a scenario makes
+	// an element inactive in Base and active here (bornInScenario()), so deactivating it here left an
+	// element active nowhere and still drawn. "Only here" is read off the `active` values alone:
+	// inactive in Base and in every other scenario. No flag is stored, so files are unchanged.
+	function activeInScenario(el, s) {
+		var ov = s.isBase ? null : s.overrides[ovKey(el)];
+		if (ov && Object.prototype.hasOwnProperty.call(ov, 'active')) { return ov.active !== false; }
+		return baseValue(el, 'active') !== false;
+	}
+	function onlyInThisScenario(el) {
+		var here = activeScenario();
+		if (here.isBase || !el || baseValue(el, 'active') !== false) { return false; }
+		return !scenarios.some(function (s) { return s !== here && !s.isBase && activeInScenario(el, s); });
+	}
+
 	// DELETING: inside a scenario it means "not in this network", so it sets inactive rather than
-	// destroying an element every other scenario may be using. In BASE it is a real deletion and
+	// destroying an element every other scenario may be using -- unless the element exists only in
+	// that scenario (onlyInThisScenario() above), which is then deleted as Base deletes. In BASE it is a real deletion and
 	// takes every scenario's overrides on that element with it -- confirmed with a count, because
 	// that is work in documents the user is not looking at.
 	// A node carries its incident links with it either way: a link to a node that is not there is
@@ -32401,7 +33126,8 @@ var EngCalcs = EngCalcs || {};
 		// a cascade beat it to it, or a second tap landed on the same handle -- and the Base branch
 		// would otherwise walk an incidentLinks entry that no longer exists.
 		if (!el) { return; }
-		if (!inBaseScenario()) {
+		var here = activeScenario(), only = onlyInThisScenario(el);
+		if (!inBaseScenario() && !only) {
 			saveUndoSnapshot();
 			setOverride(el, 'active', false);
 			if (kind === 'node') {
@@ -32410,8 +33136,24 @@ var EngCalcs = EngCalcs || {};
 			afterPropertyEdit(el);
 			if (kind === 'node') { buildDom(); }
 			setNotice((pc.lpn_scenario_deactivated || '{id} is excluded from the network in {scenario}. It remains in the drawing and in the other scenarios.')
-				.replace('{id}', id).replace('{scenario}', scenarioDisplayName(activeScenario())));
+				.replace('{id}', id).replace('{scenario}', scenarioDisplayName(here)) + ' ' +
+				(pc.lpn_scenario_delete_in_base || 'To remove it from the drawing, delete it in the {base} scenario.')
+				.split('{base}').join(scenarioDisplayName(baseScenario())));
 			return;
+		}
+		// **A SCENARIO-ONLY NODE NEVER TAKES A LINK THAT EXISTS OUTSIDE THIS SCENARIO WITH IT.** The
+		// cascade below would delete that link from Base and every other scenario, so the delete is
+		// refused and the first such link is named.
+		if (only && kind === 'node') {
+			var keeper = (incidentLinks[id] || []).map(linkById)
+				.filter(function (l) { return l && !onlyInThisScenario(l); })[0];
+			if (keeper) {
+				setNotice((pc.lpn_scenario_delete_blocked || '{id} is not deleted, because link {link} ends on it and also exists outside {scenario}. To delete both, delete them in the {base} scenario.')
+					.split('{id}').join(id).split('{link}').join(keeper.id)
+					.split('{scenario}').join(scenarioDisplayName(here))
+					.split('{base}').join(scenarioDisplayName(baseScenario())));
+				return;
+			}
 		}
 		// The element itself, plus -- for a node -- every link the cascade is about to take with it.
 		// Built as KEYS rather than ids, because those incident ones are links whatever `kind` is.
@@ -32421,6 +33163,11 @@ var EngCalcs = EngCalcs || {};
 		}
 		var lost = 0;
 		keys.forEach(function (k) { lost += overrideCountForElement(k); });
+		// A scenario-only asset's overrides in THIS scenario are what made it exist here (its `active`
+		// among them); deleting it is the request, so only the other scenarios' values are a loss.
+		if (only) {
+			keys.forEach(function (k) { if (here.overrides[k]) { lost -= Object.keys(here.overrides[k]).length; } });
+		}
 		function proceed() {
 			// Asked in the page's box (Task 710), so a multi-delete's later cascade may have taken this
 			// one while the question was open.
@@ -32430,6 +33177,10 @@ var EngCalcs = EngCalcs || {};
 			else if (kind === 'label') { deleteLabelById(id); }
 			else { deleteLink(id); }
 			refreshScenarioStatus();
+			if (only) {
+				setNotice((pc.lpn_scenario_only_deleted || '{id} is deleted. It was part of {scenario} only.')
+					.replace('{id}', id).replace('{scenario}', scenarioDisplayName(here)));
+			}
 		}
 		if (!lost) { proceed(); return; }
 		askDialog({ kind: 'confirm', text: (pc.lpn_delete_drops_overrides || 'Deleting this asset also deletes {n} scenario overrides for it. Continue?').replace('{n}', lost) }, function (yes) {
@@ -33110,7 +33861,7 @@ var EngCalcs = EngCalcs || {};
 		if (!lost.length && !meaning.length && !surface.length && !moved.length && !rules.length && !setting.length && !born.length) { proceed(); return; }
 		text = [];
 		// The key to the lost lines, first in the box: each is the asset ID, a colon, the entry lost.
-		if (lost.length) { text.push(String(pc.lpn_change_type_key || 'ID: Lost entry')); }
+		if (lost.length) { text.push(String(pc.lpn_change_type_key || 'Each line: ID: the property and value that would be lost')); }
 		if (surface.length) {
 			text.push([pc.lpn_change_type_surface || 'These keep the water surface where it was. A reservoir\'s head is the tank\'s elevation plus its water depth, and a tank\'s water depth is the reservoir\'s head minus its elevation:']
 				.concat(capped(surface)).join('\n'));
@@ -33829,13 +34580,16 @@ var EngCalcs = EngCalcs || {};
 	function setStorageError(on, kind) {
 		var pc = EngCalcs.pageConfig || {};
 		kind = on ? (kind || '') : '';
+		// A write that took ends "storage full", whether or not it was flagged (H11). Unreadable ends
+		// where the open document is read, not here: a sibling's write must not end it.
+		if (!on) { clearHiddenCond('storage-full'); }
 		if (on === storageError && kind === storageErrorKind) { return; }
 		storageError = on;
 		storageErrorKind = kind;
 		if (!on) { return; }
 		if (kind === 'unreadable') {
 			var said = pc.lpn_storage_unreadable || 'Not saved. This project could not be read from browser storage. Its stored copy is left exactly as it is and will not be written over, so nothing on this tab is being saved. Open a file or create a new project to keep working.';
-			setStatus(said);
+			setStatus(said, '', false, 'storage-unreadable');
 			// **AND A MODAL, because the status line is not durable enough for THIS one.** The first
 			// solve on the empty document runs `if (!doc.nodes.length) { setStatus(''); return; }`
 			// and the sentence is gone -- which is the exact silence this defect is made of, a named
@@ -33846,7 +34600,7 @@ var EngCalcs = EngCalcs || {};
 			if (!unreadableTold) { unreadableTold = true; askDialog({ kind: 'alert', text: said }); }
 			return;
 		}
-		setStatus(pc.lpn_storage_full || 'Not saved. Browser storage is full or unavailable, so your recent changes will be lost when you close this tab.');
+		setStatus(pc.lpn_storage_full || 'Not saved. Browser storage is full or unavailable, so your recent changes will be lost when you close this tab.', '', false, 'storage-full');
 	}
 	function projectKey(id) { return LPN_PROJECT_PREFIX + id; }
 	// The full reset behind "?lpn_wipe=1" and the Wipe memory button. Clears EVERY project key plus
@@ -33867,11 +34621,12 @@ var EngCalcs = EngCalcs || {};
 		// same reason.
 		var i, key, doomed = [LPN_LEGACY_KEY, LPN_INDEX_KEY, LPN_IDENTITY_KEY,
 			LPN_PANE_KEY, LPN_RPANE_KEY, LPN_SETBOX_KEY, LPN_FINDBOX_KEY, LPN_LIBBOX_KEY,
-			LPN_FFBOX_KEY, LPN_ENERGYBOX_KEY, LPN_CMPBOX_KEY, LPN_RPTBOX_KEY, LPN_CONTOURBOX_KEY,
+			LPN_FFBOX_KEY, LPN_ENERGYBOX_KEY, LPN_CMPBOX_KEY, LPN_RPTBOX_KEY, LPN_CONTOURBOX_KEY, LPN_MSGHIDDEN_KEY,
 			// 'lpn_notesbox' and 'lpn_hotkeysbox' join the list here rather than a day later, for the
 			// same reason every entry above states its own miss: window furniture left out of this
-			// list makes "exactly as a brand-new visitor would see it" false for that one key. Named
-			// as literals because LPN_NOTESBOX_KEY and LPN_HOTKEYSBOX_KEY are declared later in this
+			// list makes "exactly as a brand-new visitor would see it" false for that one key. ('lpn_notesbox'
+			// is a retired key, still swept so an old browser's copy goes.) Named
+			// as literals because LPN_HOTKEYSBOX_KEY is declared later in this
 			// file, the same reason 'lpn_show_titles' below is a literal.
 			'lpn_notesbox', 'lpn_hotkeysbox',
 			// 'lpn_snipbox' (the Screenshot box and its magnification) joined the day it was written.
@@ -33890,7 +34645,7 @@ var EngCalcs = EngCalcs || {};
 			// page-title toggle went with the titles; a browser that used it before still carries
 			// the key, and "exactly as a brand-new visitor would see it" has to mean that too.
 			// Erasing a key we no longer write is the one direction that is always safe.
-			'lpn_show_titles', 'lpn_menucue', AREA_HINT_KEY, LPN_RUNBOX_KEY, LPN_SCNBASIC_KEY];
+			'lpn_show_titles', 'lpn_menucue', AREA_HINT_KEY, LPN_RUNBOX_KEY, LPN_SCNBASIC_KEY, LPN_HOVERCARD_KEY];
 		try {
 			for (i = 0; i < localStorage.length; i++) {
 				key = localStorage.key(i);
@@ -34231,7 +34986,7 @@ var EngCalcs = EngCalcs || {};
 		switchKeepOrder = switchKeepOrder.filter(function (x) { return x !== id; });
 		switchKeepOrder.push(id);
 		var layout = captureLabelLayout();
-		switchKeep[id] = { sig: storedSignature(id), solve: lastSolveResult,
+		switchKeep[id] = { sig: storedSignature(id), solve: lastSolveResult, tank: tankSnap,
 			time: EngCalcs.lpnTimeKeep ? EngCalcs.lpnTimeKeep() : null,
 			layout: layout,
 			// **AND THE NODE CONTEXT THE PASS RANKED AND SIDED BY** (Task 758). Built only by a
@@ -34449,7 +35204,7 @@ var EngCalcs = EngCalcs || {};
 	// "just moved" flash. The selection is already gone (applySaved() clears it while this drawing
 	// is still the one on screen), and everything document-derived stays, which is the point.
 	function unmarkLeavingDrawing() {
-		if (hoverPreview) { paintHoverPreview(hoverPreview, false); hoverPreview = null; }
+		if (hoverPreview) { paintHoverPreview(hoverPreview, false); hoverPreview = null; hoverCardHide(); }
 		if (pendingLinkFrom && nodeEls[pendingLinkFrom] && nodeEls[pendingLinkFrom].circle) {
 			nodeEls[pendingLinkFrom].circle.classList.remove('lpn-node-pending');
 		}
@@ -35305,6 +36060,10 @@ var EngCalcs = EngCalcs || {};
 		// basemapFilter is the pre-release name of the field.
 		if (savedSettings.basemapStyle === undefined) { savedSettings.basemapStyle = savedSettings.basemapFilter || 'normal'; }
 		delete savedSettings.basemapFilter;
+		// A file saved without the symbol-cap pair (every shipped example) was drawn under the old
+		// rule, 0.5 x the 20th-percentile pipe; only a NEW project gets 0.25 x the median.
+		if (savedSettings.symbolCapMultiple === undefined) { savedSettings.symbolCapMultiple = 0.5; }
+		if (savedSettings.symbolCapPercentile === undefined) { savedSettings.symbolCapPercentile = 20; }
 		settings = Object.assign(defaultSettings(), savedSettings);
 		// **A PROJECT SAVED BEFORE `Quality` WAS INTERPRETED STILL CARRIES ONLY THE TOKEN**, and it
 		// must not come back as "no analysis": it would then export a file missing a line its source
@@ -35562,6 +36321,7 @@ var EngCalcs = EngCalcs || {};
 		// two branches, since `indexEntry(library.openId)` is true by construction two lines above.
 		if (!doc2) { unreadableOpenId = library.openId; unreadableTold = false; return null; }
 		unreadableOpenId = null;
+		clearHiddenCond('storage-unreadable');
 		return doc2;
 	}
 	// Everything a freshly-installed document has to push back out to the UI. Shared by
@@ -35588,6 +36348,7 @@ var EngCalcs = EngCalcs || {};
 		// label would be drawn empty and drawn again when the values arrived.
 		var kept = keptStateForOpenProject();
 		lastSolveResult = (kept && kept.solve) || null;
+		tankSnap = (kept && kept.tank) || null;
 		// The context the kept layout was ranked and sided by, for the same reason (Task 758): a
 		// restored arrival runs no content pass, which is the only builder of it.
 		if (kept && kept.context) { nodeContext = kept.context; nodeFieldMid = kept.fieldMid || {}; }
@@ -35641,6 +36402,7 @@ var EngCalcs = EngCalcs || {};
 		renderLabelsLegend();
 		applyMaskLabels();   // the setting belongs to the project, so opening one can change it
 		updateEmptyHint();
+		clearStatusHidden();   // hidden messages belong to the network that was on screen
 		setStatus('');
 		setMode('select');
 		refreshMapStatus();   // units belong to the project now, so switching projects can change this
@@ -36027,6 +36789,18 @@ var EngCalcs = EngCalcs || {};
 	// the writer -- which scenario's numbers, which positions, how big a label is -- can be asserted
 	// without a download; dev/lpn-spike/node-coord-entry-harness.js drives it. A writer handed
 	// options it did not get from here would be right only by accident.
+	function exportReferenceScale() {
+		var x1 = Infinity, x2 = -Infinity, y1 = Infinity, y2 = -Infinity, dx, dy, s = Infinity;
+		doc.nodes.forEach(function (n) {
+			var p = nodeAt(n);
+			if (!isFinite(p.x) || !isFinite(p.y)) { return; }
+			x1 = Math.min(x1, p.x); x2 = Math.max(x2, p.x); y1 = Math.min(y1, p.y); y2 = Math.max(y2, p.y);
+		});
+		dx = x2 - x1; dy = y2 - y1;
+		if (dx > 0) { s = Math.min(s, 1000 / dx); }
+		if (dy > 0) { s = Math.min(s, 700 / dy); }
+		return isFinite(s) && s > 0 ? s : (state.s || 1);
+	}
 	function inpExportOptions() {
 		return {
 			// The scenario the user is looking at, through the one resolver -- so an export from
@@ -36055,9 +36829,23 @@ var EngCalcs = EngCalcs || {};
 			times: scenarioTimesForExport(),
 			// A label's box, so its centre anchor can be shifted to the upper-left corner EPANET
 			// means by a [LABELS] point. Measured, never assumed: see reanchorImportedLabels().
+			// **MEASURED AT A SCALE THE DOCUMENT FIXES, NEVER THE ONE ON SCREEN.** A Text is lettered
+			// at a pixel size, so its width in map units is pixels over the zoom; read at the live
+			// zoom, the same untouched Text exported a different [LABELS] x after every reload or
+			// resize. The width is taken from a fresh element at the nominal font size and divided by
+			// the scale that fits the drawn nodes into a 1000 x 700 px reference window, a number the
+			// drawing alone decides. (A Text imported from an .inp is left/top and never reaches here.)
 			labelSize: function (lb) {
-				var le = labelEls[lb.id];
-				return le ? { w: textLabelWidth(le), h: textLabelHeight(lb) } : null;
+				var le = labelEls[lb.id], sRef = exportReferenceScale(), probe, wpx = 0;
+				if (!le) { return null; }
+				try {
+					probe = el('text', { x: 0, y: 0, 'class': 'lpn-lbl',
+						style: 'font-size:' + (settings.textSize * (lb.sizeMult || 1)) + 'px;font-weight:' + textLabelWeight(lb) }, labelsLayer);
+					setTextLabelContent(probe, lb, 0);
+					wpx = probe.getBBox().width;
+					labelsLayer.removeChild(probe);
+				} catch (err) { return { w: textLabelWidth(le), h: textLabelHeight(lb) }; }
+				return { w: wpx / sRef, h: settings.textSize * (lb.sizeMult || 1) / sRef * 1.2 * textLabelLines(lb).length };
 			}
 		};
 	}
@@ -41106,7 +41894,7 @@ var EngCalcs = EngCalcs || {};
 	// accessible name and the head of the tip. Everything else on this page -- the menu bar, the
 	// menu rows, the tab strip, the map symbols -- keeps its words and keeps setLabel().
 	//
-	// Every button that goes through here is also recorded, so Help > "What the toolbar icons mean"
+	// Every button that goes through here is also recorded, so the User guide's Toolbar section
 	// is DERIVED from the strip rather than being a second list to keep in step with it. A new
 	// toolbar button appears in that list without anybody remembering to add it.
 	var toolbarTipsWired = false;
@@ -41117,8 +41905,8 @@ var EngCalcs = EngCalcs || {};
 	// or a touch user learns what an icon-only button does. The two jobs used to be bolted together
 	// so tightly that taking one meant losing the other, which nobody had asked for.). This is only
 	// the bookkeeping: keyed on the button so a repaint replaces its row rather than adding one, and
-	// callable with an empty `tip` for a control that genuinely carries none -- `iconGuideRows()`
-	// already treats a falsy tip as "no tip on this row" the same way `openMenu()` does everywhere
+	// callable with an empty `tip` for a control that genuinely carries none -- the User guide
+	// (guideToolbarRows()) treats a falsy tip as "no tip on this row" the same way `openMenu()` does everywhere
 	// else. setIconLabel() below calls this too, so every ordinary toolbar button keeps getting both
 	// jobs from the one call it always made; a button built by hand because it must carry no tip
 	// calls this alone.
@@ -41282,6 +42070,9 @@ var EngCalcs = EngCalcs || {};
 			b.className = 'lpn-menu-row';
 			b.setAttribute('role', 'menuitem');
 			b.tabIndex = -1;   // arrows move through the rows; Tab leaves the menu (Task 748)
+			// The row it was drawn from, so the User guide can find this row again (a guide row
+			// SHOWS it) and `?` on this row can find its guide entry. Read, never run.
+			b.__lpnRow = r;
 			// A reserved icon column, not an inline prefix: a row with no natural glyph leaves the
 			// cell EMPTY and its text still lines up with its neighbours. Prefixing inline instead
 			// would ragged-edge the whole menu the moment one row went without.
@@ -42712,6 +43503,8 @@ var EngCalcs = EngCalcs || {};
 	var LPN_WORKSPACE_EXCLUDED = [
 		// Documents, not preferences: the project library, its index, and the pre-library document.
 		'lpn_index', 'lpn_document', 'lpn_project_',
+		// Which messages this reader hid, keyed to a project id of THIS browser: meaningless elsewhere.
+		'lpn_msghidden',
 		// An opaque token naming this browser to the file-lock broker: identity, not a layout.
 		'lpn_identity',
 		// Legacy keys nothing writes any more; a workspace must not resurrect them.
@@ -42881,7 +43674,7 @@ var EngCalcs = EngCalcs || {};
 			lpn_energy_box: closeEnergyBox, lpn_contour_box: closeContourBox, lpn_snip_box: closeSnipBox,
 			lpn_scncmp_box: closeScenarioCompareBox, lpn_rptbox: closeRunReportBox, lpn_status_box: closeStatusReportBox,
 			lpn_alt_box: closeAlternativesBox, lpn_full_box: closeFullReportBox, lpn_calib_box: closeCalibBox,
-			'lpn_notes_popup': closeNotesPopup, 'lpn_hotkeys_popup': closeHotkeysBox
+			'lpn_hotkeys_popup': closeHotkeysBox
 		};
 	}
 	// A record as it is before any storage has been read.
@@ -42979,7 +43772,7 @@ var EngCalcs = EngCalcs || {};
 	EngCalcs.lpnWorkspacePlan = workspacePlan;
 	EngCalcs.lpnWorkspaceCarries = workspaceCarries;
 	// **THE THREE IMPORT ROWS, APART FROM THE MENU THAT SHOWS THEM** (Task 718), the same split
-	// iconGuideRows() takes from openHelpMenu(): a harness can ask what the submenu offers without
+	// mapMenuRows() takes from openMapMenu(): a harness can ask what the submenu offers without
 	// driving a popup. Each row is unchanged from the flat list it moved out of -- same icon, same
 	// label key, same tip, same handler.
 	function importMenuRows() {
@@ -43030,9 +43823,8 @@ var EngCalcs = EngCalcs || {};
 			// **THE TABLES, BY FORMAT** (Tom, 2026-10-07: *"File, Export to, and we are adding
 			// ODS/XLSX/CSV. And we include Libraries"*). Each row opens the box that asks which tables
 			// and which scenarios; the format is the row. Rows are named for the file, like the three
-			// above, under a heading that says what goes into it.
+			// above, each tip says what it carries.
 			{ separator: true },
-			{ heading: true, label: pc.lpn_file_export_tables_heading || 'Tables and libraries' },
 			{ icon: 'save', label: pc.lpn_file_export_item_ods || 'ODS file…',
 			  tip: pc.lpn_file_export_tables_tip, fn: function () { openExportTableBox('ods'); } },
 			{ icon: 'save', label: pc.lpn_file_export_item_xlsx || 'XLSX file…',
@@ -43053,6 +43845,11 @@ var EngCalcs = EngCalcs || {};
 		// own for the toolbar button and the keyboard, so this one is about the door rather than
 		// the deed: a menu that opens and then refuses every row is a menu that teaches nothing.
 		if (georefBlocksProjectSwitch()) { return; }
+		openMenu(anchor, fileMenuRows());
+	}
+	// **THE ROWS, APART FROM THE OPENING OF THEM** (the split Task 542 gave mapMenuRows()), so the
+	// User guide lists what this menu offers from the menu itself. A pure extraction.
+	function fileMenuRows() {
 		var pc = EngCalcs.pageConfig || {}, id = library.openId, entry = indexEntry(id);
 		var linked = isLinked(id), api = fileApiAvailable();
 		// **RECENT FILES SIT JUST ABOVE CLOSE** (Tom, 2026-09-25, correcting "Exit" to "Close" on
@@ -43079,7 +43876,7 @@ var EngCalcs = EngCalcs || {};
 				});
 			});
 		}
-		openMenu(anchor, [
+		return [
 			// New project OPENS A SUBMENU now (Task 264, Tom 2026-08-10) rather than making a blank
 			// one on the spot -- "Blank project" is still the first row of it, so the old act is one
 			// extra click and every other way to start is finally reachable from the same place.
@@ -43111,7 +43908,7 @@ var EngCalcs = EngCalcs || {};
 			// **AN EXPORT SUBMENU (Tom, 2026-10-06: "it's time to put all the exports into a
 			// submenu")**, the twin of Import above it and built the same way. Each row keeps its
 			// handler and tip; see exportMenuRows(), where a new export is one line.
-			{ icon: 'save', label: pc.lpn_file_export_menu || 'Export to…', submenu: exportMenuRows },
+			{ icon: 'save', label: pc.lpn_file_export_menu || 'Export…', submenu: exportMenuRows },
 		].concat([
 			{ separator: true },
 			// **The menu says Save and Save as… in every browser**, never "Download a copy": the
@@ -43171,16 +43968,17 @@ var EngCalcs = EngCalcs || {};
 		], recentRows, [
 			{ separator: true },
 			{ icon: 'close', label: pc.lpn_close || 'Close', fn: function () { closeTab(id); } }
-		]));
+		]);
 	}
 	// ---- The menu bar (ROADMAP Task 211) ----
 	// Every command on this page is reachable from here; the toolbar is the high-use subset, so a
 	// command appearing in both is correct, not duplication to be cleaned up. The names are the ones
 	// desktop applications have used for thirty years: adopting a paradigm only pays if it is adopted
 	// whole. Rows are data, not markup, so moving a command between menus is a one-line change.
-	function openEditMenu(anchor) {
+	function openEditMenu(anchor) { openMenu(anchor, editMenuRows(anchor)); }
+	function editMenuRows(anchor) {
 		var pc = EngCalcs.pageConfig || {};
-		openMenu(anchor, [
+		return [
 			// **SELECT IS A MENU ROW BECAUSE THE TOOLBAR IS NOT ALWAYS THERE** (Task 486). Below the
 			// small-screen breakpoint every toolbar control except the transport is hidden, and
 			// Select was the one of them with no other door: Insert can put you into add-junction
@@ -43223,7 +44021,7 @@ var EngCalcs = EngCalcs || {};
 				setMode(mode === 'delete' ? 'select' : 'delete');
 			} },
 			{ icon: 'delnetwork', label: pc.lpn_edit_delete_network || 'Delete network', fn: deleteNetwork }
-		]);
+		];
 	}
 	// **THERE IS NO INSERT MENU ANY MORE** (Tom, 2026-08-27, deciding Task 543's larger half):
 	// *"(1) Change the View menu to Map. (2) Move the Insert asset group to Water as the first item,
@@ -43358,44 +44156,28 @@ var EngCalcs = EngCalcs || {};
 	// EVERY row here opens a NEW TAB, including the two internal pages, and that is not stylistic:
 	// the beforeunload guard in init() prompts whenever a file project is dirty, so navigating this
 	// tab to About.php would meet a browser "Leave site?" dialog mid-edit.
-	// One row per toolbar button, in strip order: the icon as drawn, the name as announced, and the
-	// explanation as a tip. A MENU rather than a new popover, because a menu is exactly this shape
-	// already -- icon, label, tip -- and it is keyboard- and touch-operable without a second panel
-	// to build, position, dismiss and translate.
-	// **A FLY-OUT, NOT A SECOND TOP-LEVEL MENU, AND THAT IS THE BUG FIX** (Tom, 2026-08-18: 'Help >
-	// "What the toolbar icons mean" does nothing'). It did nothing for a precise reason worth
-	// keeping written down: it re-opened level 0 anchored on #lpn_menu_help, which is the anchor
-	// the Help menu showing at that moment was already open on -- so openMenu()'s
-	// same-anchor-means-toggle branch fired and CLOSED the menu instead of replacing it. Any menu
-	// row that opens a list is a submenu; declaring it as one gets the fly-out placement, the ▸
-	// marker, the hover-open and the click that does not dismiss its own parent, all for free.
-	function iconGuideRows() {
-		return toolbarIconIndex.map(function (b) {
-			return { icon: b.icon, label: b.name, tip: b.tip, fn: function () {} };
-		});
-	}
 	// **THREE GROUPS, TOM'S OWN ORDER** (Task 745, 2026-09-29: *"(1) True help: Walkthroughs,
 	// Tables and Hotkeys ..., Toolbars. (2) Helpers: Fix something, Install, and Cookies.
 	// (3) True about: Notes on this page, Welcome page, Screenshot, Privacy, Terms, About."*).
 	// This replaces every earlier grouping in this file's history -- do not restore one from an
 	// older comment. Each row still carries the key and the reasoning it always had; what moved is
 	// only which group it stands in.
-	function openHelpMenu(anchor) {
+	function openHelpMenu(anchor) { openMenu(anchor, helpMenuRows()); }
+	function helpMenuRows() {
 		var pc = EngCalcs.pageConfig || {};
 		function ext(url) { return function () { window.open(url, '_blank', 'noopener'); }; }
-		openMenu(anchor, [
+		return [
 			// ---- Group 1: true help ----
 			{ icon: 'help', label: pc.lpn_help_walkthroughs || 'Walkthroughs', fn: ext(LPN_WALKTHROUGHS_URL) },
-			// **THE NEW BOX** (Task 745). Gathers the table-help entries that used to live only in
-			// the Notes list (lpn_notes_6/7 -- see #lpn_hotkeys_popup in Looped-Network.php) and the
-			// keyboard shortcuts that had never been gathered anywhere, divided by context.
-			{ icon: 'help', label: pc.lpn_help_hotkeys || 'Tables and Hotkeys', fn: toggleHotkeysBox },
-			// **THE DISCOVERY ROUTE THAT IS NOT A TOOLTIP** (dev/toolbar-icons.md). Once the toolbar
-			// is icons only, a first-time user who does not think to hover -- and a touch user, for
-			// whom a tip needs a deliberate press-and-hold -- has no way to read the strip. This is
-			// that way: the same icon, its name, and its explanation, in one list. DERIVED from the
-			// strip itself (toolbarIconIndex), so a button added later is in it already.
-			{ icon: 'help', label: pc.lpn_help_icons || 'Toolbar', submenu: iconGuideRows },
+			// **THE USER GUIDE** (Tom, 2026-10-06: *"The Help, Toolbar menu is unconventional. It should
+			// be a list or table in a help manual or on a help page ... Maybe items 2 and 3 combined
+			// into a simple User Manual"*; Ida's design, journal 2026-10-06). ONE row where "Tables and
+			// Hotkeys" and the "Toolbar" fly-out stood: the fly-out was 26 rows that looked like
+			// commands and did nothing, with the explanation hidden in a hover tip that touch cannot
+			// reach. The box shows every toolbar button with its tip written out, every menu row, and
+			// the map and table keys, with a search over all of it. `?` opens it from anywhere but a
+			// field, at the control under the pointer or holding focus -- see openGuideAt().
+			{ icon: 'help', label: pc.lpn_help_manual || 'Guide', hotkey: '?', fn: toggleHotkeysBox },
 			{ separator: true },
 			// ---- Group 2: helpers ----
 			// **A VERB, not a noun.** "Contribute" reads as money or code to most visitors; the
@@ -43416,12 +44198,7 @@ var EngCalcs = EngCalcs || {};
 				fn: function () { if (window.ecReopenConsent) { window.ecReopenConsent(); } } },
 			{ separator: true },
 			// ---- Group 3: true about ----
-			// The page's own Notes, which used to sit below the map (Tom, 2026-08-14). This is the
-			// ONE row in this menu that does not open a new tab, because it does not leave the page
-			// at all -- the notes are still in this document, hidden, and this reveals them. See the
-			// comment on #lpn_notes_popup in Looped-Network.php for why the markup stayed in the
-			// page rather than becoming a JS string.
-			{ icon: 'help', label: pc.lpn_help_notes || 'Notes on this page', fn: toggleNotesPopup },
+			// (Notes on this page moved into the Guide, Tom 2026-10-09.)
 			// **THE WAY BACK TO THE SITE, AND IT IS ONE ROW** (Tom, 2026-09-11: *"Help menu to
 			// include Welcome Page ... as last item in top group"* -- true of ITS group, now group
 			// 3, since Task 745 split the one group into three).
@@ -43439,7 +44216,7 @@ var EngCalcs = EngCalcs || {};
 			// About last, where every Help menu in the world puts it, and an IN-PAGE box rather
 			// than a link to the suite's About.php -- Tom's fourth embarrassment.
 			{ icon: 'info', label: pc.about_main_menu || 'About', fn: toggleAboutPopup }
-		]);
+		];
 	}
 
 	// **ONE ROW PER LANGUAGE, AND EACH DECLARES ITS OWN** (Task 625). The rows come from
@@ -43470,61 +44247,6 @@ var EngCalcs = EngCalcs || {};
 		openMenu(anchor, rows);
 	}
 
-	// **THE NOTES BOX** (Tom, 2026-09-28: *"Draggable non-hog box for Help, Notes. I need it open
-	// for my spreadsheet editing video."*). Until now this was a centred popover in VIEW_POPOVERS --
-	// a click anywhere away from it, or a bare Escape, closed it, which is exactly what "non-hog"
-	// rules out. It is now the same shell and the same memory as Settings, Find and the four report
-	// boxes: draggable by its title bar, resizable, remembered per browser as window furniture
-	// (`lpn_notesbox`), and dismissed only by its own × or an Escape pressed while focus is inside
-	// it -- see wireNotesBox().
-	function notesBoxEl() { return document.getElementById('lpn_notes_popup'); }
-	function notesBoxIsOpen() {
-		var b = notesBoxEl();
-		return !!b && b.style.display === 'flex';
-	}
-	var LPN_NOTESBOX_KEY = 'lpn_notesbox';
-	var notesboxLayout = newBoxLayout();
-	function saveNotesboxLayout() {
-		if (boxSaveHeld()) { return; }
-		try { localStorage.setItem(LPN_NOTESBOX_KEY, JSON.stringify(notesboxLayout)); } catch (e) {}
-	}
-	// **OPENS AT THE MAP'S TOP-RIGHT, NOT CENTRED, THE FIRST TIME** (setboxHomeCorner() -- the same
-	// corner Settings opens at). Centring is what the old popover did, and centring a box tall
-	// enough to hold every term in this list lands squarely on top of the Tables pane docked under
-	// the map, which is the one thing this box must not do on a first open.
-	function openNotesBox() {
-		var box = notesBoxEl(), r, at, home, floor;
-		if (!box) { return; }
-		closeMenu();
-		closeViewPopovers();
-		hideOpenTips();
-		box.style.display = 'flex';
-		placePanelForScreen(box, function () {
-			applyBoxSize(box, notesboxLayout);
-			floor = chromeFloor();
-			capPanelToRoomBelow(box, floor);
-			r = box.getBoundingClientRect();
-			if (notesboxLayout.left === null || notesboxLayout.top === null) {
-				home = setboxHomeCorner(r.width, r.height);
-				at = clampPanel(home.left, home.top, r.width, r.height,
-					window.innerWidth, window.innerHeight, floor);
-			} else {
-				at = restoreBounds(notesboxLayout.left, notesboxLayout.top, r.width, r.height,
-					window.innerWidth, window.innerHeight);
-			}
-			box.style.left = at.left + 'px';
-			box.style.top = at.top + 'px';
-		});
-		if (!notesboxLayout.open) { notesboxLayout.open = true; saveNotesboxLayout(); }
-	}
-	function closeNotesPopup() {
-		hidePanel(notesBoxEl());
-		if (notesboxLayout.open) { notesboxLayout.open = false; saveNotesboxLayout(); }
-	}
-	function toggleNotesPopup() {
-		if (notesBoxIsOpen() && !boxIsTucked(notesBoxEl())) { closeNotesPopup(); return; }
-		openNotesBox();
-	}
 	// The About box. Still a centred, click-away-dismissed popover -- unlike Notes since Tom's
 	// 2026-09-28 ruling, this is read once and closed, not a reference kept open beside the work.
 	function toggleAboutPopup() {
@@ -43543,24 +44265,13 @@ var EngCalcs = EngCalcs || {};
 		popup.style.top = top + 'px';
 	}
 	function closeAboutPopup() { hidePanel(document.getElementById('lpn_about_popup')); }
-	function wireNotesPopup() {
+	function wireAboutPopup() {
 		var ax = document.getElementById('lpn_about_close');
 		if (ax) { ax.addEventListener('click', closeAboutPopup); }
-		var box = notesBoxEl(), x = document.getElementById('lpn_notes_close');
-		if (!box) { return; }
-		if (x) { x.addEventListener('click', closeNotesPopup); }
-		// **ESCAPE CLOSES IT ONLY WHEN FOCUS IS INSIDE IT** -- bound on the box itself rather than on
-		// `document`, exactly like the CRS convert-as box (closeConvasBox()). The page-wide Escape
-		// handler no longer knows about this box at all (VIEW_POPOVERS above), which is the point:
-		// pressing Escape to back out of an edit elsewhere on the page must not also sweep this box
-		// away, and a table cell or the map must keep taking Escape for its own undo.
-		box.addEventListener('keydown', function (e) {
-			if (e.key === 'Escape') { e.preventDefault(); closeNotesPopup(); }
-		});
-		wireBoxMemory(box, LPN_NOTESBOX_KEY, notesboxLayout, saveNotesboxLayout, notesBoxIsOpen);
 	}
 
-	// **THE TABLES AND HOTKEYS BOX** (Task 745). The same non-hog shell and memory as Notes --
+	// **THE USER GUIDE BOX** (Tables and Hotkeys until 2026-10-06, Task 745; see renderGuide()
+	// below). The same non-hog shell and memory as Notes --
 	// draggable, resizable, remembered per browser as window furniture (`lpn_hotkeysbox`), and
 	// dismissed only by its own X or an Escape pressed while focus is inside it.
 	function hotkeysBoxEl() { return document.getElementById('lpn_hotkeys_popup'); }
@@ -43574,13 +44285,17 @@ var EngCalcs = EngCalcs || {};
 		if (boxSaveHeld()) { return; }
 		try { localStorage.setItem(LPN_HOTKEYSBOX_KEY, JSON.stringify(hotkeysboxLayout)); } catch (e) {}
 	}
+	// Where focus was when the Guide opened, so that closing it puts the reader back there.
+	var guideReturnEl = null, guidePendingKey = null;
 	function openHotkeysBox() {
-		var box = hotkeysBoxEl(), r, at, home, floor;
+		var box = hotkeysBoxEl(), r, at, home, floor, ae = document.activeElement;
 		if (!box) { return; }
+		if (ae && ae !== document.body && !box.contains(ae)) { guideReturnEl = ae; }
 		closeMenu();
 		closeViewPopovers();
 		hideOpenTips();
 		box.style.display = 'flex';
+		renderGuide();
 		placePanelForScreen(box, function () {
 			applyBoxSize(box, hotkeysboxLayout);
 			floor = chromeFloor();
@@ -43600,7 +44315,11 @@ var EngCalcs = EngCalcs || {};
 		if (!hotkeysboxLayout.open) { hotkeysboxLayout.open = true; saveHotkeysboxLayout(); }
 	}
 	function closeHotkeysBox() {
+		var back = guideReturnEl;
+		guideReturnEl = null;
 		hidePanel(hotkeysBoxEl());
+		if (back && back.isConnected && back.getClientRects().length && back.focus) { try { back.focus({ preventScroll: true }); } catch (e) { back.focus(); } }
+		try { if (/^#guide/i.test(location.hash)) { history.replaceState(null, '', location.pathname + location.search); } } catch (e) {}
 		if (hotkeysboxLayout.open) { hotkeysboxLayout.open = false; saveHotkeysboxLayout(); }
 	}
 	function toggleHotkeysBox() {
@@ -43612,9 +44331,875 @@ var EngCalcs = EngCalcs || {};
 		if (!box) { return; }
 		if (x) { x.addEventListener('click', closeHotkeysBox); }
 		box.addEventListener('keydown', function (e) {
-			if (e.key === 'Escape') { e.preventDefault(); closeHotkeysBox(); }
+			// **THE KEY IS SPENT HERE.** Closing returns focus to the control that opened the Guide,
+			// which is often inside another box; the page's own Escape handler would then see focus
+			// (and the pointer) in that box and close it too. One Esc, one box.
+			if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); if (e.stopImmediatePropagation) { e.stopImmediatePropagation(); } closeHotkeysBox(); }
 		});
 		wireBoxMemory(box, LPN_HOTKEYSBOX_KEY, hotkeysboxLayout, saveHotkeysboxLayout, hotkeysBoxIsOpen);
+	}
+	// ---- THE USER GUIDE (Tom, 2026-10-06; Ida's design, dev/agents/interface-designer/journal.md) ----
+	// One box, four sections: Toolbar, Menus, Map, Tables. **THE FIRST TWO ARE DERIVED, NEVER
+	// WRITTEN**: the toolbar rows come from toolbarIconIndex (the strip records itself through
+	// registerToolbarIcon()), and the menu rows from the same row functions the menu bar opens
+	// (fileMenuRows() and its siblings), so a button or a row added later is in the guide without
+	// anybody remembering to add it. Map and Tables are the PHP-rendered tables that were already in
+	// this box, so a search engine, print and Find-in-page still see them.
+	//
+	// **A ROW SHOWS, IT NEVER RUNS** (Ida: a menu is a list of verbs, a guide a list of nouns with
+	// definitions). Clicking a toolbar row pulses the real button; on a phone, where the strip is
+	// folded away, or for a menu row, it opens that menu (and fly-out) with the row focused. Nothing
+	// here calls a row's `fn`. A guide that ran commands would let a reader never meet the menu bar;
+	// one that points at it teaches it.
+	var GUIDE_PULSE_MS = 1500;
+	var GUIDE_MENUS = [
+		{ id: 'lpn_menu_file', rows: function () { return fileMenuRows(); } },
+		{ id: 'lpn_menu_edit', rows: function () { return editMenuRows(null); } },
+		{ id: 'lpn_menu_map', rows: function () { return mapMenuRows(); } },
+		{ id: 'lpn_menu_project', rows: function () { return waterMenuRows(); } },
+		{ id: 'lpn_menu_help', rows: function () { return helpMenuRows(); } }
+	];
+	// The word on the menu-bar button itself, so the guide can never name a menu differently --
+	// without the keyboard-mode letter badge that rides inside the button (.lpn-kbdbadge).
+	function guideMenuLabel(id) {
+		var b = document.getElementById(id), c;
+		if (!b) { return ''; }
+		c = b.cloneNode(true);
+		Array.prototype.forEach.call(c.querySelectorAll('.lpn-kbdbadge, svg'), function (x) { x.parentNode.removeChild(x); });
+		return String(c.textContent || '').replace(/\s+/g, ' ').trim();
+	}
+	// Every menu row, one fly-out deep (openMenu() has exactly one fly-out level). Hidden rows,
+	// headings and `variable` rows (recent file names, scenario names: content, not commands) are
+	// left out; separators are kept and tidied at render time.
+	function guideMenuEntries() {
+		var out = [];
+		GUIDE_MENUS.forEach(function (m) {
+			var rows, menuLabel = guideMenuLabel(m.id);
+			try { rows = m.rows() || []; } catch (err) { rows = []; }
+			(function walk(list, depth, parent) {
+				list.forEach(function (r) {
+					var e, sub;
+					if (!r || r.hidden || r.variable || r.heading) { return; }
+					if (r.separator) { out.push({ menuId: m.id, menuLabel: menuLabel, separator: true, depth: depth, parent: parent }); return; }
+					if (!r.label) { return; }
+					e = { menuId: m.id, menuLabel: menuLabel, row: r, depth: depth, parent: parent };
+					out.push(e);
+					if (r.submenu && depth === 0) {
+						try { sub = r.submenu() || []; } catch (err2) { sub = []; }
+						walk(sub, 1, e);
+					}
+				});
+			})(rows, 0, null);
+		});
+		return out;
+	}
+	// A toolbar button's menu twin: the first menu row with the same icon AND the same words. Both,
+	// because either alone mismatches (two rows share 'del'; Graphs rows share no icon at all).
+	function guideTwinFor(b, entries) {
+		var i, e;
+		for (i = 0; i < entries.length; i++) {
+			e = entries[i];
+			if (!e.separator && e.row.icon === b.icon && e.row.label === b.name) { return e; }
+		}
+		return null;
+	}
+	// The tip without the "Shortcut: N" toolTipWithKey() appended: the key has a <kbd> of its own.
+	function guideTipText(b) {
+		var tip = String(b.tip || ''), t = b.el && b.el.dataset ? b.el.dataset.tool : null, suffix;
+		if (t) {
+			suffix = toolTipWithKey(t, '');
+			if (suffix && tip.slice(-suffix.length) === suffix) { tip = tip.slice(0, -suffix.length).trim(); }
+		}
+		return tip;
+	}
+	function guideKeysFor(b, twin) {
+		var t = b.el && b.el.dataset ? b.el.dataset.tool : null, keys = [], k, alt;
+		if (t) {
+			k = toolKeyFor(t); alt = LPN_TOOL_ALT_KEYS[t];
+			if (k) { keys.push(k); }
+			if (alt) { keys.push(alt); }
+		}
+		if (!keys.length && twin && twin.row.hotkey) { keys.push(menuHotkeyText(twin.row.hotkey)); }
+		return keys;
+	}
+	// One record per toolbar button, in strip order. Exported for the harness.
+	function guideToolbarRows() {
+		var entries = guideMenuEntries();
+		return toolbarIconIndex.map(function (b) {
+			var twin = guideTwinFor(b, entries);
+			return {
+				b: b, twin: twin, tip: guideTipText(b), keys: guideKeysFor(b, twin),
+				group: b.el && b.el.closest ? b.el.closest('.lpn-toolbar-group') : null,
+				shown: !!(b.el && b.el.isConnected && b.el.getClientRects().length > 0)
+			};
+		});
+	}
+	function guideSpan(cls, text) {
+		var s = document.createElement('span');
+		s.className = cls;
+		if (text) { s.textContent = text; }
+		return s;
+	}
+	// A drawn chevron, not a '›' character, so RTL mirrors it in CSS like the transport arrows.
+	function guideChevron() {
+		var ns = 'http://www.w3.org/2000/svg', svgEl = document.createElementNS(ns, 'svg'), path = document.createElementNS(ns, 'path');
+		svgEl.setAttribute('viewBox', '0 0 10 10');
+		svgEl.setAttribute('class', 'lpn-guide-chev');
+		svgEl.setAttribute('aria-hidden', 'true');
+		path.setAttribute('d', 'M3.5 1.5 L7 5 L3.5 8.5');
+		svgEl.appendChild(path);
+		return svgEl;
+	}
+	function guidePathEl(e) {
+		var p = guideSpan('lpn-guide-path'), parts = [e.menuLabel];
+		if (e.parent) { parts.push(e.parent.row.label); }
+		parts.push(e.row.label);
+		parts.forEach(function (w, i) {
+			if (i) { p.appendChild(guideChevron()); }
+			p.appendChild(guideSpan('lpn-guide-seg', w));
+		});
+		return p;
+	}
+	function guideRow(icon, name, tip, keys) {
+		var row = document.createElement('button'), ic = guideSpan('lpn-guide-icon'), desc, keyEl, ie;
+		row.type = 'button';
+		row.className = 'lpn-guide-row';
+		ie = icon ? iconEl(icon) : null;
+		if (ie) { ic.appendChild(ie); }
+		row.appendChild(ic);
+		row.appendChild(guideSpan('lpn-guide-name', name));
+		desc = guideSpan('lpn-guide-desc');
+		if (tip) { desc.appendChild(guideSpan('lpn-guide-tip', tip)); }
+		row.appendChild(desc);
+		keyEl = guideSpan('lpn-guide-keys');
+		(keys || []).forEach(function (k) {
+			var kb = document.createElement('kbd');
+			kb.textContent = k;
+			keyEl.appendChild(kb);
+		});
+		row.appendChild(keyEl);
+		return row;
+	}
+	function guideRule(list) {
+		var last = list.lastElementChild;
+		if (!last || last.className === 'lpn-guide-rule' || last.tagName === 'H3') { return; }
+		var hr = document.createElement('hr');
+		hr.className = 'lpn-guide-rule';
+		list.appendChild(hr);
+	}
+	function guideTrimRule(list) {
+		var last = list.lastElementChild;
+		if (last && last.className === 'lpn-guide-rule') { list.removeChild(last); }
+	}
+	function renderGuide() {
+		var pc = EngCalcs.pageConfig || {}, tb = document.getElementById('lpn_guide_toolbar'),
+			mn = document.getElementById('lpn_guide_menus'), entries, lastGroup = null, curMenu = null, block = null;
+		if (!tb || !mn) { return; }
+		entries = guideMenuEntries();
+		var secNames = Array.prototype.map.call(document.querySelectorAll('#lpn_hotkeys_popup .lpn-guide-section > h2'),
+			function (h2) { return String(h2.textContent || '').replace(/\s+/g, ' ').trim().toLowerCase(); });
+		tb.innerHTML = '';
+		guideToolbarRows().forEach(function (g, i) {
+			var row, twin, also, at;
+			if (lastGroup && g.group !== lastGroup) { guideRule(tb); }
+			lastGroup = g.group;
+			row = guideRow(g.b.icon, g.b.name, g.tip, g.keys);
+			row.setAttribute('data-guide-toolbar', String(i));
+			if (!g.shown) { row.classList.add('lpn-guide-off'); }
+			if (g.twin) {
+				// "Also in Edit › Delete": the sentence is one key with a {menu} slot, so a translator
+				// can put the path wherever the language wants it.
+				also = guideSpan('lpn-guide-twin');
+				twin = (pc.lpn_guide_also || 'Also in {menu}').split('{menu}');
+				if (twin[0]) { also.appendChild(document.createTextNode(twin[0])); }
+				also.appendChild(guidePathEl(g.twin));
+				if (twin[1]) { also.appendChild(document.createTextNode(twin[1])); }
+				row.querySelector('.lpn-guide-desc').appendChild(also);
+			}
+			row.__lpnGuide = { kind: 'toolbar', g: g };
+			tb.appendChild(row);
+		});
+		mn.innerHTML = '';
+		entries.forEach(function (e) {
+			var row, anc, ctx;
+			if (e.menuId !== curMenu) {
+				if (block) { guideTrimRule(block); }
+				curMenu = e.menuId;
+				block = document.createElement('div');
+				block.className = 'lpn-guide-menu';
+				block.setAttribute('data-guide-menu', e.menuId);
+				// A second level of the index: the menu is a sub-heading of Menus, in the rail too.
+				block.setAttribute('data-guide-key', 'menu-' + e.menuId);
+				var h = document.createElement('h3');
+				// A menu named like a section of the Guide ("Map") is told apart as "Map menu", so the rail
+				// does not list one word twice (the same rule the Boxes entries follow).
+				h.textContent = secNames.indexOf(String(e.menuLabel).toLowerCase()) >= 0 ?
+					(pc.lpn_guide_menu_named || '{menu} menu').replace('{menu}', e.menuLabel) : e.menuLabel;
+				h.tabIndex = -1;
+				block.appendChild(h);
+				mn.appendChild(block);
+			}
+			if (e.separator) { if (e.depth === 0) { guideRule(block); } return; }
+			row = guideRow(e.row.icon, e.row.label, e.row.tip, e.row.hotkey ? [menuHotkeyText(e.row.hotkey)] : []);
+			if (e.depth) {
+				row.classList.add('lpn-guide-sub');
+				// The ancestors' names, drawn before the name only while a search is active (CSS), so a
+				// hit shows its whole path: Menus > Water > Scenarios > Basic mode.
+				for (anc = e.parent, ctx = []; anc; anc = anc.parent) { ctx.unshift(anc.row.label); }
+				row.querySelector('.lpn-guide-name').setAttribute('data-guide-ctx', ctx.join(' \u203a '));
+			}
+			row.__lpnGuide = { kind: 'menu', e: e };
+			block.appendChild(row);
+		});
+		if (block) { guideTrimRule(block); }
+		renderGuideBoxes();
+		guideDimNote();
+		guideFilter();
+		guideObserve();
+	}
+	// **DIMMING FOLLOWS THE STRIP WHILE THE GUIDE IS OPEN** (Perry, pre-review 2026-10-06). The
+	// strip shows and hides buttons under an open guide -- the transport when another project opens,
+	// Calculate when Recalculate automatically is turned off -- so "dimmed" is re-read from the
+	// buttons whenever anything on the strip changes, not only when the guide is drawn. A button
+	// that is not in the guide yet (the strip was rebuilt) redraws the section instead.
+	var guideDimQueued = false;
+	// The one sentence that says what a dimmed name means (Ida, 2026-10-07: on a phone, grey names
+	// read as disabled). Shown only while some toolbar row is dimmed.
+	function guideDimNote() {
+		var note = document.getElementById('lpn_guide_dimnote');
+		if (note) { note.hidden = !document.querySelector('#lpn_guide_toolbar > .lpn-guide-row.lpn-guide-off'); }
+	}
+	function guideRefreshDimming() {
+		var rows, n = 0;
+		guideDimQueued = false;
+		if (!hotkeysBoxIsOpen()) { return; }
+		rows = document.querySelectorAll('#lpn_guide_toolbar > .lpn-guide-row');
+		Array.prototype.forEach.call(rows, function (r) {
+			var g = r.__lpnGuide && r.__lpnGuide.g, el = g && g.b.el;
+			if (g && toolbarIconIndex.indexOf(g.b) >= 0) { n++; }
+			r.classList.toggle('lpn-guide-off', !(el && el.isConnected && el.getClientRects().length > 0));
+		});
+		guideDimNote();
+		if (n !== toolbarIconIndex.length || rows.length !== toolbarIconIndex.length) { renderGuide(); }
+	}
+	function guideQueueDimming() {
+		if (guideDimQueued) { return; }
+		guideDimQueued = true;
+		(window.requestAnimationFrame || setTimeout)(guideRefreshDimming);
+	}
+	// ---- Search: one box over all four sections ----
+	// **MATCHING IGNORES MARKS**: Arabic harakat, shadda and tatweel, Hebrew points, and the accents of
+	// Latin letters, so a reader who types the bare letters finds the pointed word. One character at a
+	// time, so an index in the folded text is an index in the original (guideSnippet() needs that).
+	var GUIDE_MARKS = /[\u0300-\u036f\u0610-\u061a\u064b-\u065f\u0670\u06d6-\u06ed\u0640\u0591-\u05bd\u05bf\u05c1\u05c2\u05c4\u05c5\u05c7]/g;
+	function guideFoldChar(ch) {
+		var f = ch;
+		try { f = ch.normalize('NFD'); } catch (e) { /* no normalize */ }
+		return f.replace(GUIDE_MARKS, '').toLowerCase();
+	}
+	function guideFold(t) {
+		var out = '', i, s = String(t || '');
+		for (i = 0; i < s.length; i++) { out += guideFoldChar(s.charAt(i)); }
+		return out;
+	}
+	// Text as read: table cells and list rows with a space between them, not run together.
+	// All of it: an entry that holds a table also has a heading and paragraphs to match (the Find
+	// and replace chapter), so the cells are spaced apart rather than read alone.
+	function guideTextOf(el) {
+		var out = [];
+		if (!el.querySelector || !el.querySelector('td, th')) { return String(el.textContent || ''); }
+		(function walk(n) {
+			var c;
+			if (n.nodeType === 3) { out.push(n.nodeValue); return; }
+			for (c = n.firstChild; c; c = c.nextSibling) { walk(c); }
+			if (n.nodeType === 1 && /^(TD|TH|TR|P|LI|DT|DD|H[1-6])$/.test(n.tagName)) { out.push(' '); }
+		})(el);
+		return out.join('');
+	}
+	function guideMatch(el, q) { return guideFold(guideTextOf(el)).indexOf(q) >= 0; }
+	function guideFilter() {
+		var box = hotkeysBoxEl(), input = document.getElementById('lpn_guide_search'), none = document.getElementById('lpn_guide_none'),
+			q = input ? guideFold(String(input.value || '').trim()) : '', any = false;
+		if (!box) { return; }
+		function guideShowEl(el, on) { el.style.display = on ? '' : 'none'; return on; }
+		box.classList.toggle('lpn-guide-filtering', !!q);
+		box.querySelectorAll('.lpn-guide-section').forEach(function (sec) {
+			var hit = false;
+			sec.querySelectorAll('.lpn-guide-rule').forEach(function (r) { guideShowEl(r, !q); });
+			sec.querySelectorAll('#lpn_guide_toolbar > .lpn-guide-row').forEach(function (r) {
+				if (guideShowEl(r, !q || guideMatch(r, q))) { hit = true; }
+			});
+			sec.querySelectorAll('.lpn-guide-menu').forEach(function (m) {
+				var h = m.querySelector('h3'), all = !q || guideMatch(h, q), mhit = false;
+				m.querySelectorAll('.lpn-guide-row').forEach(function (r) {
+					if (guideShowEl(r, all || guideMatch(r, q))) { mhit = true; }
+				});
+				if (guideShowEl(m, mhit)) { hit = true; }
+			});
+			// The PHP tables: a matching term shows its whole entry, otherwise only matching rows.
+			sec.querySelectorAll('dl > dt').forEach(function (dt) {
+				var dd = dt.nextElementSibling, all = !q || guideMatch(dt, q), dhit = false, trs;
+				if (!dd || dd.tagName !== 'DD') { return; }
+				// Inside a box's entry the entry is matched whole, below; its terms are not filtered.
+				if (dt.closest && dt.closest('.lpn-guide-boxentry')) { return; }
+				trs = dd.querySelectorAll('tr');
+				if (trs.length) {
+					trs.forEach(function (tr) { if (guideShowEl(tr, all || guideMatch(tr, q))) { dhit = true; } });
+				} else { dhit = all || guideMatch(dd, q); }
+				guideShowEl(dt, dhit); guideShowEl(dd, dhit);
+				if (dhit) { hit = true; }
+			});
+			// The Boxes section: a box's entry is a heading and its description, matched whole.
+			sec.querySelectorAll('.lpn-guide-boxentry').forEach(function (en) {
+				if (guideShowEl(en, !q || guideMatch(en, q))) { hit = true; }
+			});
+			sec.querySelectorAll('.lpn-guide-group').forEach(function (g) {
+				var all = !q || guideMatch(g.querySelector('h3'), q), ghit = false;
+				g.querySelectorAll('.lpn-guide-boxentry').forEach(function (en) {
+					if (guideShowEl(en, all || guideMatch(en, q))) { ghit = true; }
+				});
+				if (guideShowEl(g, ghit)) { hit = true; }
+			});
+			sec.querySelectorAll('.lpn-guide-prose').forEach(function (pr) {
+				guideShowEl(pr, !q || guideMatch(pr, q));
+				if (!q || guideMatch(pr, q)) { hit = true; }
+			});
+			if (guideShowEl(sec, hit)) { any = true; }
+		});
+		if (none) { none.hidden = any; }
+		guideRebuildNav(q);
+	}
+	// ---- THE BOXES SECTION, THE CONTENTS RAIL AND THE "?" IN A TITLE BAR (Tom, 2026-10-07) ----
+	// One entry per dockable box, derived from the boxes themselves (their title bar and the tip
+	// their corner `?` already carries), never written here. Prose for a box goes where its tip
+	// stands now, so a box with no description yet still has an entry for its "?" to open.
+	function guideBoxList() {
+		return dockBoxes.map(function (d) {
+			var t = d.box.querySelector('.lpn-setbox-title');
+			return { d: d, id: d.box.id, title: t ? String(t.textContent || '').replace(/\s+/g, ' ').trim() : '' };
+		}).filter(function (e) { return !!e.title; });
+	}
+	function renderGuideBoxes() {
+		var host = document.getElementById('lpn_guide_boxes'), pc = EngCalcs.pageConfig || {};
+		if (!host) { return; }
+		while (host.firstChild) { host.removeChild(host.firstChild); }
+		var sectionNames = Array.prototype.map.call(document.querySelectorAll('#lpn_hotkeys_popup .lpn-guide-section > h2'),
+			function (h2) { return String(h2.textContent || '').replace(/\s+/g, ' ').trim().toLowerCase(); });
+		var groups = {}, groupOrder = [];
+		guideBoxList().forEach(function (e) {
+			var en = document.createElement('div'), h = document.createElement('h3'), p, ctl, gk = '', gl = '', grp;
+			en.className = 'lpn-guide-boxentry';
+			en.id = 'lpn_guide_b_' + e.id;
+			en.setAttribute('data-guide-key', 'box-' + e.id);
+			// A box named like a section of the Guide ("Screenshot") is told apart in the Guide only, as
+			// "Screenshot box", so the rail does not list one word twice (Ida, 2026-10-07). The box's
+			// own title is untouched.
+			h.textContent = sectionNames.indexOf(e.title.toLowerCase()) >= 0 ?
+				(pc.lpn_guide_box_named || '{box} box').replace('{box}', e.title) : e.title;
+			en.appendChild(h);
+			h.tabIndex = -1;
+			(e.d.tipText || pc['lpn_guide_text_' + e.id.replace(/^lpn_/, '')] || '').split(/\\n\\n|\n\n/).forEach(function (para) {
+				if (!String(para).trim()) { return; }
+				p = document.createElement('p');
+				p.textContent = String(para).trim();
+				en.appendChild(p);
+			});
+			// A chapter longer than a paragraph or two (Find and replace, Tom 2026-10-07) is written in
+			// the page as <template id="lpn_guide_more_<box id>"> and copied in under its paragraphs.
+			var more = document.getElementById('lpn_guide_more_' + e.id);
+			if (more && more.content) { en.appendChild(document.importNode(more.content, true)); }
+			// Seventeen cards under one heading are too many to scan: each sits under the menu that
+			// opens it, named from the menu bar itself (Tom, 2026-10-09: "more index hierarchy").
+			// A box no menu opens (Properties opens on a click in the map) stays ungrouped, first.
+			ctl = guideBoxControl(e.id, true);
+			if (ctl && ctl.e) { gk = ctl.e.menuId; gl = ctl.e.menuLabel; }
+			if (!gk) { host.appendChild(en); return; }
+			grp = groups[gk];
+			if (!grp) {
+				grp = groups[gk] = document.createElement('div');
+				grp.className = 'lpn-guide-group';
+				grp.setAttribute('data-guide-key', 'boxgroup-' + gk);
+				var gh = document.createElement('h3');
+				gh.textContent = (pc.lpn_guide_group_from || 'From {menu}').replace('{menu}', gl);
+				gh.tabIndex = -1;
+				grp.appendChild(gh);
+				groupOrder.push(gk);
+			}
+			grp.appendChild(en);
+		});
+		groupOrder.forEach(function (k) { host.appendChild(groups[k]); });
+	}
+	function guideContentEl() { return document.getElementById('lpn_guide_content'); }
+	function guideVisible(el) { return !!el && el.style.display !== 'none' && (!el.closest || !el.closest('[style*="display: none"]')); }
+	function guideSnippet(sec, q) {
+		var cands = sec.querySelectorAll('.lpn-guide-row, tr, dt, dd, .lpn-guide-boxentry, .lpn-guide-prose'), i, el, t, at, map, f, k, from, to;
+		for (i = 0; i < cands.length; i++) {
+			el = cands[i];
+			if (!guideVisible(el) || el.querySelector('.lpn-guide-row, tr')) { continue; }
+			t = guideTextOf(el).replace(/\s+/g, ' ').trim();
+			f = ''; map = [];
+			for (k = 0; k < t.length; k++) { var fc = guideFoldChar(t.charAt(k)); f += fc; for (var m = 0; m < fc.length; m++) { map.push(k); } }
+			at = f.indexOf(q);
+			if (at >= 0) {
+				from = Math.max(0, map[at] - 20);
+				to = Math.min(t.length, (map[Math.min(map.length - 1, at + q.length - 1)] || 0) + 50);
+				return (from > 0 ? '\u2026' : '') + t.slice(from, to) + (to < t.length ? '\u2026' : '');
+			}
+		}
+		return '';
+	}
+	// ---- The contents rail folds (Tom, 2026-10-10: the index folds, the main text does not). An entry
+	// with entries under it carries a chevron button; the chevron, a double-click on the entry, or
+	// Enter or Space on the chevron folds it. A single click on the entry's own text still jumps.
+	// Nothing is remembered: every opening of the page starts unfolded. A search shows every match, so
+	// folding is suspended while there is a query.
+	var guideNavFolded = {};
+	function guideApplyNavFold() {
+		var nav = document.getElementById('lpn_guide_nav'), hideBelow = null, filtering;
+		if (!nav) { return; }
+		filtering = nav.getAttribute('data-filtering') === '1';
+		nav.querySelectorAll('.lpn-guide-nav-row').forEach(function (row) {
+			var lvl = +row.getAttribute('data-level'), key = row.getAttribute('data-key'), has = row.getAttribute('data-has') === '1',
+				folded = has && !filtering && !!guideNavFolded[key], b = row.querySelector('.lpn-guide-nav-chev');
+			if (hideBelow !== null && lvl > hideBelow) { row.classList.add('lpn-guide-nav-folded'); }
+			else { row.classList.remove('lpn-guide-nav-folded'); hideBelow = folded ? lvl : null; }
+			row.classList.toggle('lpn-guide-nav-closed', folded);
+			if (b) { b.setAttribute('aria-expanded', folded ? 'false' : 'true'); }
+		});
+	}
+	function guideToggleNav(key) {
+		if (!key) { return; }
+		if (guideNavFolded[key]) { delete guideNavFolded[key]; } else { guideNavFolded[key] = true; }
+		guideApplyNavFold();
+	}
+	function guideRebuildNav(q) {
+		var nav = document.getElementById('lpn_guide_nav'), cur = nav ? nav.getAttribute('data-current') : '', box = hotkeysBoxEl(), rows = [];
+		if (!nav || !box) { return; }
+		while (nav.firstChild) { nav.removeChild(nav.firstChild); }
+		nav.setAttribute('data-filtering', q ? '1' : '0');
+		function add(key, text, level, snip) {
+			var row = document.createElement('div'), a = document.createElement('a'), sn;
+			row.className = 'lpn-guide-nav-row';
+			row.setAttribute('data-level', String(level));
+			row.setAttribute('data-key', key);
+			row.setAttribute('data-has', '0');
+			a.href = '#guide/' + key;
+			a.setAttribute('data-guide-link', key);
+			if (level === 1) { a.className = 'lpn-guide-nav-sub'; }
+			if (level === 2) { a.className = 'lpn-guide-nav-sub lpn-guide-nav-sub2'; }
+			a.appendChild(document.createTextNode(text));
+			if (snip) { a.appendChild(document.createTextNode(' ')); sn = document.createElement('span'); sn.className = 'lpn-guide-nav-snip'; sn.textContent = snip; a.appendChild(sn); }
+			if (key === cur) { a.setAttribute('aria-current', 'true'); }
+			row.appendChild(a);
+			nav.appendChild(row);
+			rows.push(row);
+		}
+		box.querySelectorAll('.lpn-guide-section').forEach(function (sec) {
+			var h = sec.querySelector('h2'), key = sec.getAttribute('data-guide-section');
+			if (!h || sec.style.display === 'none') { return; }
+			sec.setAttribute('data-guide-key', key);
+			add(key, String(h.textContent || '').trim(), 0, q ? guideSnippet(sec, q) : '');
+			// Menus, box groups and boxes, in reading order: a second level (a menu, a group) and, under
+			// a box group, a third (the box).
+			sec.querySelectorAll('.lpn-guide-menu, .lpn-guide-group, .lpn-guide-boxentry').forEach(function (el) {
+				var grouped = !!el.parentNode.closest('.lpn-guide-group');
+				if (el.style.display === 'none') { return; }
+				if (grouped && el.parentNode.style.display === 'none') { return; }
+				add(el.getAttribute('data-guide-key'), String(el.querySelector('h3').textContent || '').trim(), grouped ? 2 : 1, '');
+			});
+		});
+		// A row has children when the next row is deeper. It then gets the chevron; the others a
+		// spacer of the same width, so every name starts on its level's edge.
+		rows.forEach(function (row, i) {
+			var next = rows[i + 1], lvl = +row.getAttribute('data-level'), has = !!next && +next.getAttribute('data-level') > lvl, lead;
+			if (has && !q) {
+				row.setAttribute('data-has', '1');
+				lead = document.createElement('button');
+				lead.type = 'button';
+				lead.className = 'lpn-guide-nav-chev';
+				lead.setAttribute('aria-expanded', 'true');
+				lead.setAttribute('aria-label', row.firstChild.textContent);
+				lead.innerHTML = '<svg class="lpn-guide-nav-chev-svg" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 6l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>';
+			} else {
+				lead = document.createElement('span');
+				lead.className = 'lpn-guide-nav-spacer';
+			}
+			row.insertBefore(lead, row.firstChild);
+		});
+		guideApplyNavFold();
+	}
+	var guideIO = null, guidePinKey = null, guidePinTop = 0;
+	function guideSetCurrent(key) {
+		var nav = document.getElementById('lpn_guide_nav'), cur = null;
+		if (!nav) { return; }
+		nav.setAttribute('data-current', key || '');
+		nav.querySelectorAll('a').forEach(function (a) {
+			var on = a.getAttribute('data-guide-link') === key;
+			if (on) { a.setAttribute('aria-current', 'true'); cur = a; } else { a.removeAttribute('aria-current'); }
+		});
+		if (cur && cur.scrollIntoView && nav.scrollHeight > nav.clientHeight) {
+			// Keep the current row in the rail's own view, without moving the page or the box.
+			if (cur.offsetTop < nav.scrollTop || cur.offsetTop + cur.offsetHeight > nav.scrollTop + nav.clientHeight) {
+				nav.scrollTop = Math.max(0, cur.offsetTop - 20);
+			}
+		}
+	}
+	// The current section is the last one, in reading order, whose top has reached the top edge of
+	// the pane. The observer is only the trigger: a band of the pane is watched, and what is
+	// current is decided from positions, so short neighbouring entries cannot outvote the one
+	// that was scrolled to.
+	function guideObserve() {
+		var content = guideContentEl();
+		if (!content || !window.IntersectionObserver) { return; }
+		if (guideIO) { guideIO.disconnect(); }
+		guideIO = new window.IntersectionObserver(function () {
+			var top = content.getBoundingClientRect().top + 8, key = null, first = null;
+			content.querySelectorAll('[data-guide-key]').forEach(function (el) {
+				if (el.style.display === 'none' || !el.getClientRects().length) { return; }
+				if (first === null) { first = el.getAttribute('data-guide-key'); }
+				if (el.getBoundingClientRect().top <= top) { key = el.getAttribute('data-guide-key'); }
+			});
+			// A card just clicked holds the highlight until the reader scrolls away from where it was.
+			if (guidePinKey && Math.abs(content.scrollTop - guidePinTop) < 2) { return; }
+			guidePinKey = null;
+			if (key || first) { guideSetCurrent(key || first); }
+		}, { root: content, rootMargin: '0px 0px -70% 0px', threshold: [0, 1] });
+		content.querySelectorAll('[data-guide-key]').forEach(function (el) { guideIO.observe(el); });
+	}
+	function guideGoto(key, focusIn) {
+		var content = guideContentEl(), el, pulseEl, heading;
+		if (!content) { return false; }
+		el = content.querySelector('[data-guide-key="' + String(key).replace(/"/g, '') + '"]');
+		if (!el || el.style.display === 'none') { return false; }
+		content.scrollTop = Math.max(0, el.getBoundingClientRect().top - content.getBoundingClientRect().top + content.scrollTop);
+		guidePinKey = null;
+		guideSetCurrent(key);
+		pulseEl = el.classList.contains('lpn-guide-boxentry') ? el : null;
+		if (pulseEl) { guidePulse(pulseEl); }
+		// Focus moves into the Guide, to the entry's heading (or the section's), so Esc and Tab work from there.
+		heading = el.querySelector('h3, h2');
+		if (focusIn && heading) { heading.tabIndex = -1; heading.focus({ preventScroll: true }); }
+		try { history.replaceState(null, '', '#guide/' + key); } catch (e) {}
+		return true;
+	}
+	// Opens the Guide at the entry for one box: the "?" in its title bar, and F1 inside it.
+	function openGuideForBox(boxId) {
+		var input = document.getElementById('lpn_guide_search');
+		if (dialogIsOpen()) { return; }
+		if (input) { input.value = ''; }
+		openHotkeysBox();
+		guideFilter();
+		if (!guideGoto('box-' + boxId, true)) { guideGoto('boxes', true); }
+		(window.requestAnimationFrame || setTimeout)(function () {
+			if (!guideGoto('box-' + boxId, true)) { guideGoto('boxes', true); }
+		});
+	}
+	// ---- the rail: collapsed state is window furniture inside the record the box already keeps ----
+	var guideRailPhoneClosed = true;
+	function guideRailCollapsed() { return smallScreen() ? guideRailPhoneClosed : hotkeysboxLayout.rail === 'closed'; }
+	function guideApplyRail() {
+		var box = hotkeysBoxEl(), t = document.getElementById('lpn_guide_railtoggle'), pc = EngCalcs.pageConfig || {}, c = guideRailCollapsed(), text;
+		if (!box || !t) { return; }
+		box.classList.toggle('lpn-guide-rail-collapsed', c);
+		t.setAttribute('aria-expanded', c ? 'false' : 'true');
+		text = c ? (pc.lpn_guide_rail_show || 'Show contents') : (pc.lpn_guide_rail_hide || 'Hide contents');
+		t.title = text;
+		t.setAttribute('aria-label', text);
+	}
+	function guideSetRail(collapsed) {
+		if (smallScreen()) { guideRailPhoneClosed = collapsed; }
+		else { hotkeysboxLayout.rail = collapsed ? 'closed' : 'open'; saveHotkeysboxLayout(); }
+		guideApplyRail();
+	}
+	// **Ctrl+K SEARCHES FOR WHAT IS SELECTED** (Tom, 2026-10-07: *"Open the guide with the current
+	// selection in the search field."*). The selection is SELECTED TEXT: on the page, or inside a
+	// text box that has focus (the page selection does not include a text box's own). A selected map
+	// asset is not used: the guide describes controls, and an asset ID matches nothing in it.
+	// Whitespace is collapsed and the text is cut at 80 characters, a search rather than a passage.
+	function guideSelectedText() {
+		var ae = document.activeElement, t = '';
+		try {
+			if (ae && ae.id !== 'lpn_guide_search' && (ae.tagName === 'TEXTAREA' || (ae.tagName === 'INPUT' && guideTyping(ae)))
+					&& typeof ae.selectionStart === 'number' && ae.selectionEnd > ae.selectionStart) {
+				t = String(ae.value).substring(ae.selectionStart, ae.selectionEnd);
+			} else if (window.getSelection) {
+				var sel = window.getSelection(), node = sel && sel.anchorNode;
+				if (node && node.nodeType !== 1) { node = node.parentNode; }
+				if (!(node && node.closest && node.closest('#lpn_guide_rail'))) { t = String(sel || ''); }
+			}
+		} catch (e) { t = ''; }
+		t = t.replace(/\s+/g, ' ').trim();
+		return t.length > 80 ? t.substring(0, 80).trim() : t;
+	}
+	function guideFocusSearch() {
+		var input = document.getElementById('lpn_guide_search');
+		if (!input) { return; }
+		if (guideRailCollapsed()) { guideSetRail(false); }
+		input.focus();
+		if (input.select) { input.select(); }
+	}
+	// ---- Show, never run ----
+	function guidePulse(el) {
+		if (!el || !el.classList) { return; }
+		el.classList.remove('lpn-guide-pulse');
+		void el.offsetWidth;   // restart the animation on a second click
+		el.classList.add('lpn-guide-pulse');
+		clearTimeout(el.__lpnPulseT);
+		el.__lpnPulseT = setTimeout(function () { el.classList.remove('lpn-guide-pulse'); }, GUIDE_PULSE_MS);
+	}
+	function guideMenuRowIn(listId, row) {
+		return Array.prototype.filter.call(document.querySelectorAll('#' + listId + ' button.lpn-menu-row'), function (x) {
+			return x.__lpnRow && x.__lpnRow.label === row.label && x.__lpnRow.icon === row.icon;
+		})[0] || null;
+	}
+	// **ONE RULE FOR EVERY CARD** (Tom, 2026-10-08: *"Things need to have a predictable behavior."*):
+	// a card POINTS. It opens whatever menu holds its control, draws the pointer ring on that control
+	// (lpn-guide-point: a dashed ring in its own colour, which no control uses for pressed, active,
+	// focused or hover), and never moves keyboard focus onto the control and never runs it. A card whose
+	// control cannot be shown says so on the card (lpn_guide_not_shown), so no card does nothing.
+	var guidePointEl = null, GUIDE_POINT_MS = 2500, guideOpenedMenu = false, guideMenuT = null, guideMenuAnchor = null;
+	// Whatever menu the last card opened is closed before the next card acts and when its ring fades,
+	// unless the reader has moved into it (pointer over it, or focus inside it) in the meantime.
+	function guideCloseOpened(onlyIfUntouched) {
+		var pop = document.getElementById('lpn_menu_popup'), pop2 = document.getElementById('lpn_menu_popup2');
+		clearTimeout(guideMenuT);
+		if (!guideOpenedMenu) { return; }
+		if (onlyIfUntouched && ((pop && pop.matches(':hover')) || (pop2 && pop2.matches(':hover'))
+				|| (pop && pop.contains(document.activeElement)) || (pop2 && pop2.contains(document.activeElement)))) { guideOpenedMenu = false; return; }
+		guideOpenedMenu = false;
+		if (pop && pop.style.display === 'block' && openMenuAnchor === guideMenuAnchor) { closeMenu(); }
+	}
+	function guideClearPoint() {
+		guideCloseOpened(false);
+		if (guidePointEl) { guidePointEl.classList.remove('lpn-guide-point'); clearTimeout(guidePointEl.__lpnPointT); guidePointEl = null; }
+		Array.prototype.forEach.call(document.querySelectorAll('.lpn-guide-nopoint'), function (n) { n.parentNode.removeChild(n); });
+	}
+	function guidePoint(el) {
+		var opened = guideOpenedMenu;
+		if (!el || !el.classList) { return false; }
+		guideOpenedMenu = false;
+		guideClearPoint();
+		guideOpenedMenu = opened;
+		void el.offsetWidth;   // the animation restarts on every click, so every click looks the same
+		el.classList.add('lpn-guide-point');
+		guidePointEl = el;
+		el.__lpnPointT = setTimeout(function () { el.classList.remove('lpn-guide-point'); if (guidePointEl === el) { guidePointEl = null; } }, GUIDE_POINT_MS);
+		guideMenuT = setTimeout(function () { guideCloseOpened(true); }, GUIDE_POINT_MS);
+		return true;
+	}
+	function guideNoPoint(card) {
+		var pc = EngCalcs.pageConfig || {}, id = String(card.id || '').replace(/^lpn_guide_b_/, ''),
+			how = id === 'lpn_popup' ? pc.lpn_guide_how_popup : (id === 'lpn_alt_box' ? pc.lpn_guide_how_alt : ''),
+			n = guideSpan('lpn-guide-nopoint', (pc.lpn_guide_not_shown || 'This control is not on screen right now.') + (how ? ' ' + how : '')), host;
+		guideClearPoint();
+		if (card.classList.contains('lpn-guide-boxentry')) { host = card.querySelector('h3'); if (host) { host.parentNode.insertBefore(n, host.nextSibling); } return; }
+		host = card.querySelector('.lpn-guide-desc') || card;
+		host.appendChild(n);
+	}
+	// Opens the menu the entry lives in, and its fly-out, through the menu bar's own button, and
+	// points at the row. Focus is not moved onto the row (a focused row looks selected), and the
+	// command is not run.
+	function guideShowMenuEntry(e) {
+		var btn = document.getElementById(e.menuId), pop = document.getElementById('lpn_menu_popup'), opener, target;
+		if (!btn || !btn.getClientRects().length || !pop) { return false; }
+		closeMenu();
+		btn.click();
+		if (pop.style.display !== 'block') { return false; }
+		guideOpenedMenu = true;
+		guideMenuAnchor = btn;
+		if (e.depth) {
+			opener = guideMenuRowIn('lpn_menu_list', e.parent.row);
+			if (!opener) { return false; }
+			if (opener.disabled || !opener.__lpnRow.submenu) { return guidePoint(opener); }
+			openMenu(opener, opener.__lpnRow.submenu(), 1);
+			target = guideMenuRowIn('lpn_menu_list2', e.row);
+		} else {
+			target = guideMenuRowIn('lpn_menu_list', e.row);
+		}
+		if (document.activeElement && pop.contains(document.activeElement)) { document.activeElement.blur(); }
+		return guidePoint(target);
+	}
+	// A box's card points at the control that opens the box: the menu row or toolbar button that
+	// carries the box's title as its name (a trailing ellipsis ignored).
+	// Where the menu row is not named like the box (the Reports submenu says "Run", the box "Run report").
+	var GUIDE_BOX_ROW_KEY = {
+		lpn_rptbox: 'lpn_reports_epanet', lpn_full_box: 'lpn_reports_full', lpn_calib_box: 'lpn_reports_calib',
+		lpn_energy_box: 'lpn_energy_menu', lpn_contour_box: 'lpn_contour_menu'
+	};
+	function guideBoxControl(boxId, menuOnly) {
+		var pc = EngCalcs.pageConfig || {}, item = guideBoxList().filter(function (b) { return b.id === boxId; })[0], t, found = null;
+		function norm(x) { return guideFold(String(x || '')).replace(/[\u2026.]+\s*$/, '').replace(/\s+/g, ' ').trim(); }
+		if (!item) { return null; }
+		t = norm(GUIDE_BOX_ROW_KEY[boxId] && pc[GUIDE_BOX_ROW_KEY[boxId]] || item.title);
+		if (!menuOnly) {
+			guideToolbarRows().forEach(function (g) {
+				if (!found && g.shown && norm(g.b.name) === t) { found = { kind: 'toolbar', el: g.b.el }; }
+			});
+		}
+		if (found && !smallScreen()) { return found; }
+		found = null;
+		guideMenuEntries().forEach(function (e) {
+			if (!found && !e.separator && norm(e.row.label) === t) { found = { kind: 'menu', e: e }; }
+		});
+		return found;
+	}
+	function guideShow(card) {
+		var d = card && card.__lpnGuide, el, ok = false, c, key;
+		if (!d && card && card.classList.contains('lpn-guide-boxentry')) {
+			c = guideBoxControl(String(card.id).replace(/^lpn_guide_b_/, ''));
+			if (c) { d = c.kind === 'toolbar' ? { kind: 'toolbar', g: { b: { el: c.el } } } : { kind: 'menu', e: c.e }; }
+		}
+		guideClearPoint();   // the previous card's ring, note and menu, whatever kind this card is
+		if (card) { key = (card.closest && card.closest('[data-guide-key]')); if (key) { guidePinKey = key.getAttribute('data-guide-key'); guidePinTop = guideContentEl().scrollTop; guideSetCurrent(guidePinKey); } }
+		if (!d) { if (card) { guideNoPoint(card); } return; }
+		if (d.kind === 'toolbar') {
+			el = d.g.b.el;
+			if (!smallScreen() && el && el.isConnected && el.getClientRects().length > 0) { ok = guidePoint(el); }
+			else if (d.g.twin) { ok = guideShowMenuEntry(d.g.twin); }
+		} else {
+			ok = guideShowMenuEntry(d.e);
+		}
+		if (!ok) { guideNoPoint(card); }
+	}
+	// ---- `?` opens the guide at the control under the pointer or holding focus ----
+	var guideHoverEl = null;
+	var GUIDE_SUBJECTS = '#lpn_toolbar button, #lpn_menu_popup button.lpn-menu-row, #lpn_menu_popup2 button.lpn-menu-row';
+	document.addEventListener('mouseover', function (e) {
+		guideHoverEl = e.target && e.target.closest ? e.target.closest(GUIDE_SUBJECTS) : null;
+	}, true);
+	function guideTyping(el) {
+		var tag = el && el.tagName, type;
+		if (!tag) { return false; }
+		if (el.isContentEditable || tag === 'TEXTAREA' || tag === 'SELECT') { return true; }
+		if (tag !== 'INPUT') { return false; }
+		type = String(el.type || 'text').toLowerCase();
+		return ['button', 'checkbox', 'radio', 'range', 'color', 'submit', 'reset', 'file', 'image'].indexOf(type) < 0;
+	}
+	function guideSubjectOf(el) {
+		var t = el && el.closest ? el.closest(GUIDE_SUBJECTS) : null, inSub;
+		if (!t) { return null; }
+		if (t.closest('#lpn_toolbar')) { return { kind: 'toolbar', el: t }; }
+		if (!t.__lpnRow) { return null; }
+		inSub = !!t.closest('#lpn_menu_popup2');
+		return {
+			kind: 'menu', row: t.__lpnRow, menuId: openMenuAnchor ? openMenuAnchor.id : '',
+			parentRow: inSub && subOpener ? subOpener.__lpnRow || null : null
+		};
+	}
+	function guideRowFor(subject) {
+		var rows = Array.prototype.slice.call(document.querySelectorAll('#lpn_hotkeys_popup .lpn-guide-row'));
+		return rows.filter(function (r) {
+			var d = r.__lpnGuide;
+			if (!d || !subject || d.kind !== subject.kind) { return false; }
+			if (d.kind === 'toolbar') { return d.g.b.el === subject.el; }
+			return d.e.menuId === subject.menuId && d.e.row.label === subject.row.label && d.e.row.icon === subject.row.icon
+				&& (!subject.parentRow || (d.e.parent && d.e.parent.row.label === subject.parentRow.label));
+		})[0] || null;
+	}
+	function openGuideAt(subject) {
+		var input = document.getElementById('lpn_guide_search'), row;
+		if (input) { input.value = ''; }
+		openHotkeysBox();
+		row = subject ? guideRowFor(subject) : null;
+		if (row) {
+			if (row.scrollIntoView) { row.scrollIntoView({ block: 'center' }); }
+			row.focus({ preventScroll: true });
+			guidePulse(row);
+		} else if (input && !smallScreen()) {
+			input.focus();
+		}
+	}
+	window.addEventListener('keydown', function (e) {
+		var ae = document.activeElement, subject;
+		if (e.defaultPrevented || e.key !== '?' || e.ctrlKey || e.altKey || e.metaKey) { return; }
+		if (guideTyping(e.target) || guideTyping(ae)) { return; }
+		// A modal question owns the keyboard; the guide never opens over it (Perry).
+		if (dialogIsOpen()) { return; }
+		// Already ON a guide row: point at that row, and leave the search and the scroll alone.
+		var onRow = ae && ae.closest ? ae.closest('#lpn_hotkeys_popup .lpn-guide-row') : null;
+		if (onRow) { e.preventDefault(); e.stopPropagation(); guidePulse(onRow); return; }
+		subject = guideSubjectOf(ae) || guideSubjectOf(guideHoverEl);
+		e.preventDefault();
+		e.stopPropagation();
+		openGuideAt(subject);
+	}, true);
+	function wireGuide() {
+		var box = hotkeysBoxEl(), input = document.getElementById('lpn_guide_search');
+		if (!box) { return; }
+		if (input) { input.addEventListener('input', guideFilter); }
+		var toggle = document.getElementById('lpn_guide_railtoggle'), head = box.querySelector('.lpn-guide-railhead'),
+			nav = document.getElementById('lpn_guide_nav');
+		try { hotkeysboxLayout.rail = (JSON.parse(localStorage.getItem(LPN_HOTKEYSBOX_KEY) || '{}') || {}).rail === 'closed' ? 'closed' : 'open'; }
+		catch (e) { hotkeysboxLayout.rail = 'open'; }
+		guideApplyRail();
+		if (toggle) { toggle.addEventListener('click', function (e) { e.stopPropagation(); guideSetRail(!guideRailCollapsed()); }); }
+		// On a phone the whole heading row is the disclosure.
+		if (head) { head.addEventListener('click', function (e) { if (smallScreen() && e.target !== toggle && !toggle.contains(e.target)) { guideSetRail(!guideRailCollapsed()); } }); }
+		window.addEventListener('resize', guideApplyRail);
+		if (nav) {
+			nav.addEventListener('click', function (e) {
+				var chev = e.target && e.target.closest ? e.target.closest('.lpn-guide-nav-chev') : null, a;
+				if (chev) { e.preventDefault(); e.stopPropagation(); guideToggleNav(chev.parentNode.getAttribute('data-key')); return; }
+				a = e.target && e.target.closest ? e.target.closest('a[data-guide-link]') : null;
+				if (!a) { return; }
+				e.preventDefault();
+				e.stopPropagation();
+				guideGoto(a.getAttribute('data-guide-link'), true);
+			});
+			nav.addEventListener('dblclick', function (e) {
+				var a = e.target && e.target.closest ? e.target.closest('a[data-guide-link]') : null, row = a && a.parentNode;
+				if (row && row.getAttribute('data-has') === '1') { e.preventDefault(); guideToggleNav(row.getAttribute('data-key')); }
+			});
+		}
+		// "/" inside the guide goes to its search; Ctrl+K opens the guide there from anywhere.
+		window.addEventListener('keydown', function (e) {
+			var ae = document.activeElement;
+			if (e.defaultPrevented) { return; }
+			if (e.key === '/' && !e.ctrlKey && !e.altKey && !e.metaKey && ae && ae.closest && ae.closest('#lpn_hotkeys_popup') && !guideTyping(ae)) {
+				e.preventDefault(); e.stopPropagation(); guideFocusSearch(); return;
+			}
+			if ((e.ctrlKey || e.metaKey) && !e.altKey && !e.shiftKey && String(e.key).toLowerCase() === 'k') {
+				if (dialogIsOpen()) { return; }
+				e.preventDefault(); e.stopPropagation();
+				// Read before the guide opens: opening it moves the focus and clears the selection.
+				var picked = guideSelectedText(), si;
+				if (!hotkeysBoxIsOpen()) { openGuideAt(null); }
+				raisePanel(hotkeysBoxEl());   // open but behind a later box: the same raise a click on it does
+				if (picked) {
+					si = document.getElementById('lpn_guide_search');
+					if (si) { si.value = picked; guideFilter(); }
+				}
+				guideFocusSearch();
+			}
+		}, true);
+		var strip = document.getElementById('lpn_toolbar');
+		if (strip && window.MutationObserver) {
+			new window.MutationObserver(guideQueueDimming).observe(strip,
+				{ subtree: true, childList: true, attributes: true, attributeFilter: ['style', 'class', 'hidden'] });
+		}
+		// The phone breakpoint folds the strip away without touching a single attribute on it.
+		window.addEventListener('resize', guideQueueDimming);
+		if (hotkeysBoxIsOpen()) { renderGuide(); }   // reopened from memory before the menu bar existed
+		box.addEventListener('click', function (e) {
+			var row = e.target && e.target.closest ? e.target.closest('.lpn-guide-row, .lpn-guide-boxentry') : null;
+			if (!row) { return; }
+			// A box's card holds prose: a click that ends a text selection, or lands on a link or a
+			// field inside it, is not a request to point.
+			if (row.classList.contains('lpn-guide-boxentry')
+					&& (String(window.getSelection ? window.getSelection() : '') || e.target.closest('a, button, input, select, textarea'))) { return; }
+			// Stopped, so the page's click-away dismissal does not close the menu this opens.
+			e.stopPropagation();
+			guideShow(row);
+		});
+		// **Looped-Network.php#guide OPENS IT**, so a link, a blog post or an email can point at it.
+		function fromHash() {
+			var m = /^#guide(?:\/(.+))?$/i.exec(String(location.hash || ''));
+			if (!m) { return; }
+			openGuideAt(null);
+			if (m[1] && !guideGoto(decodeURIComponent(m[1]))) { guidePendingKey = decodeURIComponent(m[1]); }
+		}
+		window.addEventListener('hashchange', fromHash);
+		fromHash();
 	}
 	// **THE MAP MENU** -- View until 2026-08-27, renamed on Tom's word. It holds the drawing's frame,
 	// the pictures behind it, where on Earth it is, and the elevations read off that ground. Only
@@ -43627,6 +45212,11 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {};
 		return [
 			{ icon: 'zoom', label: pc.lpn_tool_zoom_extent || 'Zoom to fit', tip: pc.lpn_tool_zoom_extent_tip, fn: zoomExtent },
+			// **A DOOR TO ZOOM WINDOW THAT NEEDS NO ZOOM TO FIT FIRST** (Tom, 2026-10-07: "We need a way to
+			// zoom window without Zoom to Fit first."). The toolbar button still reaches it by a second
+			// press; this row and the W key enter it directly. Pointer-only, like every tool that
+			// needs a drag.
+			{ icon: 'zoom-window', pointerOnly: true, label: pc.lpn_tool_zoom_window || 'Zoom Window', tip: pc.lpn_tool_zoom_window_tip, hotkey: 'W', fn: enterZoomWindow },
 			// **A SNIPPING TOOL, IN THE MAP MENU BECAUSE IT IS NOT ABOUT WATER** (Tom, 2026-10-05). Beside
 			// Zoom to fit: both are about the view of the drawing, and the one frames what the other takes.
 			{ icon: 'image', pointerOnly: true, label: pc.lpn_screenshot_menu || 'Screenshot', tip: pc.lpn_screenshot_tip, fn: function () { startScreenshot(); } },
@@ -44455,9 +46045,10 @@ var EngCalcs = EngCalcs || {};
 	//
 	// Named openProjectBarMenu(), NOT openProjectMenu(): that name is taken by the TAB's own menu
 	// (rename, duplicate, close), which is about one project rather than about the open one.
-	function openProjectBarMenu(anchor) {
+	function openProjectBarMenu(anchor) { openMenu(anchor, waterMenuRows()); }
+	function waterMenuRows() {
 		var pc = EngCalcs.pageConfig || {};
-		openMenu(anchor, [
+		return [
 			// **FIRST, because it is the one thing here that adds water to the model** (Tom,
 			// 2026-08-27). Everything under it reads, configures or reports on what these rows put
 			// on the map. It keeps `lpn_menu_insert` -- the word is right and it is already
@@ -44624,7 +46215,7 @@ var EngCalcs = EngCalcs || {};
 				tip: pc.lpn_change_type_tip,
 				submenu: changeTypeRows
 			}
-		]);
+		];
 	}
 	// openSettingsMenu() is GONE (Tom, 2026-08-08). Its three rows now live where they belong: Settings
 	// and Units are sections of the panel, and Clear calculator is the button at its foot --
@@ -45342,6 +46933,7 @@ var EngCalcs = EngCalcs || {};
 			closePopup();
 			buildDom();
 			updateEmptyHint();
+			clearStatusHidden(true);
 			setStatus('');
 			setMode('select');
 			refreshScenarioStatus();
@@ -45423,6 +47015,8 @@ var EngCalcs = EngCalcs || {};
 		// they are one drawing in progress, not two things, and giving them a second appearance
 		// would read as an object that already exists.
 		pendingPathEl = el('polyline', { 'class': 'lpn-rubberband', style: 'display:none' }, world);
+		// The object-snap glyph and name (Task 782): above the drawing, under the debug boxes.
+		snapMarkEl = el('g', { 'class': 'lpn-snap-mark', style: 'display:none' }, world);
 		// Above everything, and EMPTY unless ?debug=boxes is on the URL -- see drawCollisionBoxes().
 		debugBoxLayer = el('g', {}, world);
 		setTransform();
@@ -45524,7 +47118,7 @@ var EngCalcs = EngCalcs || {};
 			bornClean = true;
 			saveIndex();
 		}
-		wireNotesPopup();
+		wireAboutPopup();
 		wireHotkeysBox();
 		// **THE MAP STATUS STRIP HAS TO BE RE-READ HERE, AND THIS IS THE ONLY PLACE THAT DOES IT ON
 		// BOOT** (ROADMAP Task 521, Tom 2026-08-24 with a screenshot of the strip disagreeing with
@@ -45580,6 +47174,7 @@ var EngCalcs = EngCalcs || {};
 		wireFullReportBox();
 		wireCalibBox();
 		buildMenuBar();
+		wireGuide();   // after the menu bar: the guide names each menu by its button
 		wireScenarioButton();
 		wireWrongButtons();
 		wireMessageLogButton();
@@ -45606,6 +47201,12 @@ var EngCalcs = EngCalcs || {};
 		// the tab strip are all the ones the visitor will actually be looking at.
 		// Docking (Task 441) is wired after every box it docks, and read before any of them reopens.
 		wireBoxDocking();
+		// A #guide/<key> link met on load before the boxes existed to list: land on it now.
+		if (guidePendingKey) {
+			renderGuide();
+			(window.requestAnimationFrame || setTimeout)(function () { guideGoto(guidePendingKey); guidePendingKey = null; });
+			guideGoto(guidePendingKey);
+		}
 		dockBooting = true;
 		restoreOpenBoxes();
 		restoreDockedShared();
@@ -45977,7 +47578,14 @@ var EngCalcs = EngCalcs || {};
 			extentBtn.dataset.tool = 'zoom-window';
 			extentBtn.setAttribute('aria-pressed', mode === 'zoom-window' ? 'true' : 'false');
 		}
-		extentBtn.addEventListener('click', function () {
+		extentBtn.addEventListener('click', function (e) {
+			// **THE CORNER TRIANGLE IS A DOOR NOW** (Tom, 2026-10-07: "Maybe the little triangle really
+			// means something if you click there", and "We need to access Zoom Window without any view
+			// change intervening"). A pointer click in the button's lower-right corner enters Zoom Window
+			// at once, with no fit; anywhere else on the button keeps the press-twice behaviour below.
+			// Measured from the click's own coordinates because the triangle is a CSS ::after with
+			// nothing in the DOM to click; a keyboard press (detail 0) has no position and is never one.
+			if (e && e.detail > 0 && zoomCornerHit(extentBtn, e)) { enterZoomWindow(); return; }
 			// Already drawing a Zoom Window: a second press exits it and shows Zoom to fit again,
 			// mirroring select-area's "press again to cycle" -- except this cycle has one member to
 			// come back to, because Zoom to fit is what the button shows by default.
@@ -46128,6 +47736,8 @@ var EngCalcs = EngCalcs || {};
 		paneBtn.setAttribute('aria-pressed', paneIsOpen() ? 'true' : 'false');
 		paneBtn.addEventListener('click', togglePane);
 		endGroup.appendChild(paneBtn);
+		// A repainted strip repaints the guide's Toolbar section if the guide is open.
+		if (hotkeysBoxIsOpen()) { renderGuide(); }
 		// **NO RIGHT-PANE TOGGLE.** Tom, 2026-08-19: "We can hide the right pane button for now."
 		// This button was its only door, so hiding it retires the right pane from the interface
 		// without deleting a line of it -- which is the point, because the pane is already
@@ -46254,6 +47864,16 @@ var EngCalcs = EngCalcs || {};
 		svg.addEventListener('pointermove', function (e) {
 			profileDrawHover(e.clientX, e.clientY);
 		});
+		// **THE SNAP GLYPH FOLLOWS THE POINTER IN A TOOL THAT SNAPS** (Task 782), so the press
+		// commits what the glyph shows: toolSnapAt() is the one question both ask. A pointer only;
+		// a finger has no hover and snaps on the press itself. A drag draws its own (applyDrag()).
+		svg.addEventListener('pointermove', function (e) {
+			if (e.pointerType === 'touch' || drag) { return; }
+			showSnapMark(toolSnapAt(e));
+		});
+		svg.addEventListener('pointerleave', function (e) {
+			if (e.pointerType !== 'touch' && !drag) { hideSnapMark(); }
+		});
 
 		// **SELECTION PREVIEW** (Ida's wishlist item 1): the Select-mode hover highlight, driven by
 		// the SAME hit-test a click uses (`mapHitAt`), so it always shows exactly what a click would
@@ -46265,10 +47885,12 @@ var EngCalcs = EngCalcs || {};
 			if (e.pointerType === 'touch') { return; }
 			if (mode !== 'select' || drag) { return; }
 			hoverPreviewAt = { x: e.clientX, y: e.clientY };
+			hoverCardNudge(e.clientX, e.clientY);
 			if (hoverPreviewRaf) { return; }
 			hoverPreviewRaf = requestAnimationFrame(function () {
 				hoverPreviewRaf = null;
 				if (mode !== 'select' || drag || !hoverPreviewAt) { return; }
+				hoverCard.nx = hoverPreviewAt.x; hoverCard.ny = hoverPreviewAt.y;
 				setHoverPreview(hoverTargetFromHit(mapHitAt(hoverPreviewAt.x, hoverPreviewAt.y)));
 			});
 		});
@@ -46279,6 +47901,12 @@ var EngCalcs = EngCalcs || {};
 			hoverPreviewAt = null;
 			clearHoverPreview();
 		});
+		// A press is a click or a drag beginning and a wheel notch moves the map from under the
+		// pointer: either way the card has had its say. The highlight stays as it always did.
+		svg.addEventListener('pointerdown', hoverCardHide, true);
+		svg.addEventListener('wheel', hoverCardHide, true);
+		svg.addEventListener('pointermove', hoverCardOtherMove);
+		svg.addEventListener('pointerleave', function () { hoverCardOtherAt = null; if (hoverCardOtherMode()) { hoverCardRetarget(null); } });
 
 		// **HAS THIS PRESS BECOME A DRAG?** One flag for the whole gesture, set once the pointer has
 		// travelled past `tapMovePx(e)` and never cleared until the next press. It is what makes
@@ -46480,6 +48108,8 @@ var EngCalcs = EngCalcs || {};
 			if (!pointers.has(e.pointerId)) { return; }
 			pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
 			if (!drag) { return; }
+			// Alt held on the latest move turns the magnet off for this frame of a drag (Task 782).
+			if (drag.pointerId === e.pointerId) { drag.alt = !!e.altKey; drag.reach = reachPx(e); }
 			// **NOTHING MOVES UNTIL THE PRESS HAS TRAVELLED PAST ITS OWN SLOP** -- see TAP_MOVE_PX.
 			// The offsets seeded on the press are kept, so the element does not jump when the drag
 			// does arm: it simply starts following a finger that is already where it is.
@@ -46534,6 +48164,15 @@ var EngCalcs = EngCalcs || {};
 			// junction whose new position is the only evidence it moved.
 			if (drag && drag.pointerId === e.pointerId && drag.type === 'node' && drag.snapped) {
 				markNodeMoved(drag.id);
+				// **A NODE DROPPED ON A NODE SAYS SO**, as a placement does (Task 782): one dot on
+				// the map cannot show that the two are separate.
+				if (drag.lastSnap && drag.lastSnap.kind === 'node' && nodeById(drag.id)) {
+					var mvN = nodeById(drag.id), mvPc = EngCalcs.pageConfig || {};
+					setNotice(String(mvPc.lpn_snap_moved_on_node ||
+						'{moved} moved to the location of {target}. The two nodes are not connected.')
+						.split('{moved}').join(reportTypeNoun('node', mvN.type) + ' ' + mvN.id)
+						.split('{target}').join(drag.lastSnap.name));
+				}
 				// Pipe lengths moved, so the 10th percentile is re-read at the next re-size (Task
 				// 705). Not re-applied here: one moved junction does not move it visibly, and a drop
 				// that re-sized every symbol would be a flicker nobody asked for.
@@ -46554,7 +48193,8 @@ var EngCalcs = EngCalcs || {};
 			// no pan in progress once a pointer has been released.
 			setPanning(false);
 			if (drag && drag.type === 'pinch' && pointers.size < 2) { drag = null; dragDirty = false; return; }
-			if (drag && drag.pointerId === e.pointerId) { drag = null; dragDirty = false; }
+			// The snap glyph of a node or bend drag ends with the drag (Task 782).
+			if (drag && drag.pointerId === e.pointerId) { drag = null; dragDirty = false; hideSnapMark(); }
 			// Task 647: a pan is the gesture that can put the whole network off screen by hand,
 			// and its release is the "at rest" moment -- never mid-drag.
 			if (wasPan && !drag) { relayoutLabels(); updateOffscreenNotice(); }
@@ -46723,6 +48363,44 @@ var EngCalcs = EngCalcs || {};
 			// die together. Nothing was written to the document, so there is nothing to undo.
 			var exitLinkId = LINK_CLICK_EXITS_MODE[mode] &&
 				!nearestNodeNearScreen(e.clientX, e.clientY, reachPx(e)) ? tapLinkId(t) : null;
+			// **A NODE TOOL PRESSED ON A PIPE ASKS TO BREAK IT** (Tom, 2026-10-09: *"Could we offer to
+			// break a link when a node is placed on it?"*). That replaces the exit-and-open the three
+			// node tools used to make on a pipe, for a pipe in Base only: Yes cuts the pipe in two at
+			// the node (breakPipeAtPoint), No places the node where it was pressed, joined to nothing.
+			// A pump or valve, a scenario, and every other tool keep the exit-and-open below.
+			var nodeTool = mode === 'add-junction' || mode === 'add-reservoir' || mode === 'add-tank';
+			// **THE MAGNET** (Task 782): what this press snaps to, the same answer the hover glyph
+			// showed. Null with Alt held, which places at the bare pointer.
+			var snapHit = toolSnapAt(e);
+			hideSnapMark();
+			// A node tool magneted onto a PIPE's bend or line is a press on that pipe, so it gets the
+			// split question below at the snapped point, with the same reach the magnet has.
+			var snapPipe = nodeTool && snapHit && (snapHit.kind === 'vertex' || snapHit.kind === 'line') &&
+				snapHit.link.type === 'pipe' ? snapHit.link : null;
+			var breakLink = snapPipe && inBaseScenario() ? snapPipe
+				: (exitLinkId !== null && exitLinkId !== undefined && inBaseScenario() && nodeTool
+					? linkById(exitLinkId) : null);
+			// The point a node tool places at: the snap target exactly, else the press.
+			var placeAt = nodeTool && snapHit ? snapHit : null, px0 = placeAt ? placeAt.x : w.x, py0 = placeAt ? placeAt.y : w.y;
+			if (breakLink && breakLink.type === 'pipe' && nodeById(breakLink.from) && nodeById(breakLink.to) &&
+				(function () {
+					var f = Geom.nearestFractionOnPolyline(linkPointList(breakLink), px0, py0).f;
+					return f > 1e-9 && f < 1 - 1e-9;
+				}())) {
+				var breakType = mode.slice('add-'.length), breakPc = EngCalcs.pageConfig || {},
+					breakAt = placeAt && placeAt.link === breakLink ? placeAt : null;
+				askDialog({ kind: 'confirm',
+					text: (breakPc.lpn_split_pipe_ask || 'Split pipe {id} at this node?').replace('{id}', breakLink.id),
+					ok: breakPc.lpn_split_yes || 'Yes', cancel: breakPc.lpn_split_no || 'No' }, function (yes) {
+					saveUndoSnapshot();
+					logLpnFirstAction('element');
+					if (yes) { breakPipeAtPoint(breakLink, breakType, px0, py0, breakAt); }
+					// No places the node where the press was, unsnapped: a node left on the line and
+					// joined to nothing would look connected (Perry's review).
+					else { addNode(breakType, w.x, w.y); }
+				});
+				return;
+			}
 			if (exitLinkId !== null && exitLinkId !== undefined && linkById(exitLinkId)) {
 				setMode('select');
 				// Selected AND opened, because that is what this press would have done in Select and
@@ -46737,8 +48415,25 @@ var EngCalcs = EngCalcs || {};
 			if (mode === 'add-junction' || mode === 'add-reservoir' || mode === 'add-tank') {
 				// Snap-on-create: a click within this gesture's own reach of an existing node reuses
 				// it instead of creating a new, overlapping one -- see TOUCH_REACH_PX.
-				var onNode = nearestNodeNearScreen(e.clientX, e.clientY, reachPx(e));
-				if (onNode) {
+				// **A NODE OF THE SAME TYPE OPENS; A NODE OF ANOTHER TYPE IS A TARGET** (Task 782). A
+				// second junction stacked on a junction is the double-tap the rule below exists for,
+				// so it still opens the one there. A tank or reservoir magneted onto a junction (or the
+				// reverse) is the CAD gesture Tom asked for: the new node is placed at exactly that
+				// position, and the notice says the two are not connected, since one dot on the map
+				// cannot show it. Never merged: two nodes at one point is legal in EPANET. Alt places
+				// at the bare pointer, near a node or not.
+				var newType = mode.slice('add-'.length),
+					onNode = e.altKey ? null : nearestNodeNearScreen(e.clientX, e.clientY, reachPx(e));
+				if (onNode && placeAt && placeAt.kind === 'node' && placeAt.node.type !== newType) {
+					saveUndoSnapshot();
+					logLpnFirstAction('element');
+					var stacked = addNode(newType, px0, py0), stackPc = EngCalcs.pageConfig || {};
+					copySnapProvenance(placeAt, stacked);
+					setNotice(String(stackPc.lpn_snap_node_on_node ||
+						'{new} placed at the location of {target}. The two nodes are not connected.')
+						.split('{new}').join(reportTypeNoun('node', newType) + ' ' + stacked.id)
+						.split('{target}').join(placeAt.name));
+				} else if (onNode) {
 					// **A MISS THAT LANDS ON WHAT YOU JUST PLACED OPENS IT**, and switches to Select.
 					// Refusing to place a second node on top of an existing one and then doing
 					// NOTHING AT ALL is worse: the user taps, nothing appears, nothing opens, and
@@ -46750,7 +48445,7 @@ var EngCalcs = EngCalcs || {};
 				} else {
 					saveUndoSnapshot();
 					logLpnFirstAction('element');
-					addNode(mode.slice('add-'.length), w.x, w.y);
+					copySnapProvenance(placeAt, addNode(newType, px0, py0));
 				}
 			}
 			else if (mode === 'add-meter') {
@@ -46893,7 +48588,10 @@ var EngCalcs = EngCalcs || {};
 					// one. Nothing is written to the document here -- the points are held in view
 					// state until a second NODE arrives, so no undo snapshot is owed and an
 					// abandoned drawing leaves nothing behind.
-					pendingLinkVerts.push({ x: w.x, y: w.y });
+					// A bend magnets to another pipe's vertex (Task 782), carrying its characters.
+					var bend = snapHit && snapHit.kind === 'vertex' ? { x: snapHit.x, y: snapHit.y } : { x: w.x, y: w.y };
+					if (snapHit && snapHit.kind === 'vertex') { copySnapProvenance(snapHit, bend); }
+					pendingLinkVerts.push(bend);
 					drawPendingPath();
 				}
 			} else if (mode === 'vertices') {
@@ -47212,14 +48910,26 @@ var EngCalcs = EngCalcs || {};
 			// **A DRAGGED POSITION AND A TYPED ONE GO THROUGH THE SAME DOOR** (Task 674), so inside
 			// a scenario a drag records that scenario's own position exactly as the boxes do, and
 			// neither editor can come to a different idea of what placing a node means.
-			writeNodeCoord(n, false, w.x + drag.offX);
-			writeNodeCoord(n, true, w.y + drag.offY);
+			// **THE NODE ITSELF IS WHAT MAGNETS** (Task 782): its would-be position is tested, not
+			// the pointer, so a node grabbed off-centre still lands dead on the target. Alt is off.
+			var ns = drag.alt ? null : snapAtWorld(w.x + drag.offX, w.y + drag.offY, drag.reach || POINTER_REACH_PX, dragSnapOpts(drag));
+			drag.lastSnap = ns;
+			if (ns) { writeNodeAtSnap(n, ns); }
+			else {
+				writeNodeCoord(n, false, w.x + drag.offX);
+				writeNodeCoord(n, true, w.y + drag.offY);
+			}
+			showSnapMark(ns);
 			updateNode(drag.id);
 			relayoutLabels();
 		} else if (drag.type === 'vertex') {
 			snapshotDragOnce();
-			var w2 = screenToWorld(p.x, p.y);
-			linkById(drag.id).verts[drag.vidx] = { x: w2.x + drag.offX, y: w2.y + drag.offY };
+			var w2 = screenToWorld(p.x, p.y),
+				vs = drag.alt ? null : snapAtWorld(w2.x + drag.offX, w2.y + drag.offY, drag.reach || POINTER_REACH_PX, dragSnapOpts(drag)),
+				nv = vs ? { x: vs.x, y: vs.y } : { x: w2.x + drag.offX, y: w2.y + drag.offY };
+			if (vs) { copySnapProvenance(vs, nv); }
+			linkById(drag.id).verts[drag.vidx] = nv;
+			showSnapMark(vs);
 			updateVertex(drag.id, drag.vidx);
 			relayoutLabels();
 		} else if (drag.type === 'customer') {
@@ -51095,6 +52805,17 @@ var EngCalcs = EngCalcs || {};
 		areaHintInput.addEventListener('change', function () { setAreaHintShown(areaHintInput.checked); });
 		row(pageBody, pc.lpn_settings_area_hint || 'Show the selection help', areaHintInput,
 			pc.lpn_settings_area_hint_tip);
+		// The hover card's switch (Task 773). The same section and the same reason as the row above:
+		// a reading aid for the person at this screen, kept in this browser (LPN_HOVERCARD_KEY).
+		// Not offered where the card can never appear (a device that cannot hover).
+		if (typeof ecCanHover !== 'function' || ecCanHover()) {
+			var hoverCardInput = document.createElement('input');
+			hoverCardInput.type = 'checkbox';
+			hoverCardInput.checked = hoverCardOn();
+			hoverCardInput.addEventListener('change', function () { setHoverCardOn(hoverCardInput.checked); });
+			row(pageBody, pc.lpn_settings_hover_card || 'Show the full label on hover', hoverCardInput,
+				pc.lpn_settings_hover_card_tip);
+		}
 		var tail = document.createElement('div');
 		tail.style.marginTop = '6px';
 		pageBody.appendChild(tail);
@@ -52303,9 +54024,6 @@ var EngCalcs = EngCalcs || {};
 		// 2026-10-07: *"All the docks I make need to be remembered."*).
 		if (statusboxLayout.open) { openStatusReportBox(); }
 		if (fullboxLayout.open) { openFullReportBox(); }
-		// The Notes box (Tom, 2026-09-28), after the reports and before Find for the same stacking
-		// reason: Find is the smallest and ends up on top.
-		if (notesboxLayout.open) { openNotesBox(); }
 		if (hotkeysboxLayout.open) { openHotkeysBox(); }
 		if (findUserOpen) { toggleFindPopup(null, true); }
 	}
@@ -52820,7 +54538,12 @@ var EngCalcs = EngCalcs || {};
 	// so there is no column to dock into: the dock buttons are not offered there, and a box that is
 	// docked on the desktop opens as it always did. Its docking is kept and comes back on a wider
 	// window.
-	var LPN_DOCK_MIN_W = 240, LPN_DOCK_MAX_FRAC = 0.45, LPN_DOCK_MAP_MIN = 320, LPN_DOCK_DEFAULT_W = 360,
+	// **NO SHARE OF THE WINDOW CAPS A DOCKED BOX; ONLY THE MAP'S OWN MINIMUM DOES** (Tom, 2026-10-07,
+	// on the Alternatives preview stopping at about 860 px: *"Is there any reason not to give the user
+	// control and freedom?"*). There was not. A column used to stop at 45% of the window, which on a
+	// 1920 screen held a docked table to 864 px while the map beside it had a thousand to spare. The
+	// map keeps LPN_DOCK_MAP_MIN, and that was always the reason the cap existed.
+	var LPN_DOCK_MIN_W = 240, LPN_DOCK_MAP_MIN = 320, LPN_DOCK_DEFAULT_W = 360, LPN_DOCK_FIRST_FRAC = 0.45,
 		LPN_DOCK_STRIP_W = 24, LPN_DOCK_TUCK_MS = 400, LPN_DOCK_HOVER_MS = 150, LPN_CORNER_BTN_W = 28,
 		LPN_UNDOCK_SLOP = 6;
 	var dockBoxes = [], dockFlyout = null, dockTimer = null, dockBooting = false, dockQueued = false,
@@ -52997,8 +54720,12 @@ var EngCalcs = EngCalcs || {};
 			});
 		});
 	}
-	function clampDockW(w, room) {
-		var max = Math.max(LPN_DOCK_MIN_W, Math.floor((window.innerWidth || 1000) * LPN_DOCK_MAX_FRAC));
+	// **AN AUTO-HIDDEN BOX MAY COVER THE WHOLE MAP; ONLY A PINNED ONE KEEPS THE MAP'S MINIMUM** (Tom,
+	// 2026-10-08: *"Why not cover the map entirely when it's an autohide box. A pinned box is
+	// different, of course. It needs its limits."*). A flyout takes no space from the map, so the
+	// 320 px floor protects nothing; `over` lifts it and leaves only `room`.
+	function clampDockW(w, room, over) {
+		var max = over && room > 0 ? room : Math.max(LPN_DOCK_MIN_W, Math.floor((window.innerWidth || 1000) - LPN_DOCK_MAP_MIN));
 		if (!(w > 0)) { w = LPN_DOCK_DEFAULT_W; }
 		if (room > 0) { max = Math.min(max, room); }
 		return Math.round(Math.max(Math.min(LPN_DOCK_MIN_W, max), Math.min(w, max)));
@@ -53057,6 +54784,20 @@ var EngCalcs = EngCalcs || {};
 		help.appendChild(glyph);
 		return help;
 	}
+	// **THE ONE "?" OF EVERY STANDING BOX** (Tom, 2026-10-07; Ida): the last glyph before the X, with
+	// the tip "Help for this box", opening that box's entry in the Guide. F1 inside the box does the
+	// same. Feedback is not a second glyph; it is one Help-menu entry.
+	function guideCornerButton(d) {
+		var b = document.createElement('button'), pc = EngCalcs.pageConfig || {}, tip = pc.lpn_guide_box_help || 'Help for this box';
+		b.type = 'button';
+		b.className = 'lpn-corner-btn lpn-corner-guide';
+		b.setAttribute('data-guide-for', d.box.id);
+		b.title = tip;
+		b.setAttribute('aria-label', tip);
+		b.textContent = '?';
+		b.addEventListener('click', function (e) { e.stopPropagation(); openGuideForBox(d.box.id); });
+		return b;
+	}
 	// Rebuilt whole on every change of state, because which buttons exist IS the state. A button the
 	// keyboard was on is replaced by its successor, so focus does not fall out of the box.
 	function renderDockCorner(d) {
@@ -53072,6 +54813,7 @@ var EngCalcs = EngCalcs || {};
 			if (side) { row.appendChild(dockButton(d, 'float', pc.lpn_dock_float || 'Float')); n++; }
 		}
 		if (d.help) { row.appendChild(d.help); n++; }
+		if (d.guideBtn) { row.appendChild(d.guideBtn); n++; }
 		d.box.style.setProperty('--lpn-corner-w', (n * LPN_CORNER_BTN_W) + 'px');
 		if (had) {
 			next = row.querySelector('[data-dock="' + had + '"]') || row.querySelector('[data-dock="float"]') ||
@@ -53082,10 +54824,12 @@ var EngCalcs = EngCalcs || {};
 	function dockAct(d, act) {
 		var r, wasSide = dockSideOf(d);
 		if (act === 'left' || act === 'right') {
-			// The width it floats at is the width it docks at, the first time.
+			// The width it floats at is the width it docks at, the first time, up to 45% of the
+			// window, so a box that floats wide (Alternatives, 1500 px) does not dock over most of
+			// the map. That is the first width only: the grip takes it anywhere the map allows.
 			if (!wasSide && !d.rec.dockW) {
 				r = d.box.getBoundingClientRect();
-				if (r.width > 0) { d.rec.dockW = Math.round(r.width); }
+				if (r.width > 0) { d.rec.dockW = Math.round(Math.min(r.width, Math.max(LPN_DOCK_MIN_W, (window.innerWidth || 1000) * LPN_DOCK_FIRST_FRAC))); }
 			}
 			if (d.rec.dock !== act || d.rec.dockOrd === undefined) { d.rec.dockOrd = dockNextOrd(act, d); }
 			d.rec.dock = act;
@@ -53098,8 +54842,13 @@ var EngCalcs = EngCalcs || {};
 			if (d.rec.autohide) { delete d.rec.autohide; } else { d.rec.autohide = true; }
 		}
 		if (dockFlyout === d) { dockFlyout = null; }
-		if (d.save) { d.save(); }
 		layoutDocks();
+		// Pinned from a width only a flyout may have, it keeps the map's minimum: store what it got.
+		if (act === 'autohide' && !d.rec.autohide && d.rec.dock) {
+			r = d.box.getBoundingClientRect();
+			if (r.width > 0 && d.rec.dockW > Math.round(r.width)) { d.rec.dockW = Math.round(r.width); }
+		}
+		if (d.save) { d.save(); }
 		renderDockCorner(d);
 		// Turned on from inside the box, auto-hide tucks it at once; the keyboard lands on its tab.
 		if (act === 'autohide' && d.rec.autohide && d.tab) { d.tab.focus(); }
@@ -53191,9 +54940,12 @@ var EngCalcs = EngCalcs || {};
 		el.lpnDockList = list;
 		el.classList.toggle('lpn-dock-grip-live', x !== null);
 		if (x === null) { return; }
-		// In front of a flown-out box, whose own stacking number is above the strip's.
-		el.style.zIndex = String((list.length === 1 && list[0].box.classList.contains('lpn-dock-out'))
-			? (Number(list[0].box.style.zIndex) || 0) + 1 : '');
+		// In front of the boxes it sizes, whose own stacking numbers rise each time one is brought
+		// forward: under a raised docked box the grip's inner half was the box's own edge, so a press
+		// there did nothing a reader could see (found 2026-10-07, docking Alternatives).
+		var zTop = 0;
+		list.forEach(function (d) { zTop = Math.max(zTop, Number(d.box.style.zIndex) || 0); });
+		el.style.zIndex = zTop ? String(zTop + 1) : '';
 		el.style.left = Math.round(x) + 'px';
 		el.style.top = Math.round(y) + 'px';
 		el.style.height = Math.round(h) + 'px';
@@ -53215,7 +54967,8 @@ var EngCalcs = EngCalcs || {};
 			var w;
 			if (!from) { return; }
 			w = from.w + (side === 'left' ? e.clientX - from.x : from.x - e.clientX);
-			w = clampDockW(w);
+			var wrap = dockMapWrap(), over = !!from.list[0].rec.autohide;
+			w = clampDockW(w, over && wrap ? Math.floor(wrap.getBoundingClientRect().width + dockMargins.left + dockMargins.right - LPN_DOCK_STRIP_W * 2) : 0, over);
 			from.list.forEach(function (d) { d.rec.dockW = w; });
 			layoutDocks();
 		});
@@ -53307,7 +55060,7 @@ var EngCalcs = EngCalcs || {};
 				dockPlace(d, x, top + y0, c.w, y1 - y0, 'pinned');
 			});
 			S.auto.forEach(function (d) {
-				var w = clampDockW(d.rec.dockW, Math.floor(outerR - outerL - c.strip - LPN_DOCK_STRIP_W)),
+				var w = clampDockW(d.rec.dockW, Math.floor(outerR - outerL - c.strip - LPN_DOCK_STRIP_W), true),
 					ax = s === 'left' ? outerL + c.strip : outerR - c.strip - w;
 				dockPlace(d, ax, top, w, h, d === dockFlyout ? 'out' : 'tucked');
 			});
@@ -53315,7 +55068,7 @@ var EngCalcs = EngCalcs || {};
 			// A box flown out of its tab is the frontmost thing on its side, so its edge is the one a
 			// reader reaches for; otherwise the pinned column's. The flown-out box is alone in its list.
 			if (dockFlyout && S.auto.indexOf(dockFlyout) >= 0) {
-				w = clampDockW(dockFlyout.rec.dockW, Math.floor(outerR - outerL - c.strip - LPN_DOCK_STRIP_W));
+				w = clampDockW(dockFlyout.rec.dockW, Math.floor(outerR - outerL - c.strip - LPN_DOCK_STRIP_W), true);
 				placeDockGrip(s, s === 'left' ? outerL + c.strip + w : outerR - c.strip - w, top, h, [dockFlyout]);
 			} else {
 				placeDockGrip(s, c.w ? (s === 'left' ? outerL + c.strip + c.w : outerR - c.strip - c.w) : null, top, h, S.pinned);
@@ -53512,7 +55265,20 @@ var EngCalcs = EngCalcs || {};
 		d.corner = row;
 		tip = typeof tipKey === 'function' ? tipKey() :
 			[].concat(tipKey || []).map(function (k) { return pc[k]; }).filter(Boolean).join(' ');
-		if (tip) { d.help = cornerHelp(tip); }
+		// **THE EXPLANATION LIVES IN THE GUIDE** (Perry, 2026-10-07: one kind of `?`). A box that had
+		// its explanation as a corner tip now has it as its Guide entry; the blue tip `?` stays beside
+		// field labels only. renderGuideBoxes() reads this, and refreshBoxTip() keeps it current.
+		d.tipText = tip || '';
+		// The Guide's own title bar carries no "?": in the Guide it would open help inside help
+		// (Ida, 2026-10-07). Its entry in the Boxes section stays, reached by search or the rail.
+		d.guideBtn = box.id === 'lpn_hotkeys_popup' ? null : guideCornerButton(d);
+		box.addEventListener('keydown', function (e) {
+			if (e.key === 'F1' && !e.ctrlKey && !e.altKey && !e.shiftKey && !e.metaKey) {
+				e.preventDefault();
+				e.stopPropagation();
+				openGuideForBox(box.id);
+			}
+		});
 		wireDockTab(d);
 		box.addEventListener('pointerenter', function () { if (dockFlyout === d) { clearTimeout(dockTimer); } });
 		box.addEventListener('pointerleave', function () { if (dockFlyout === d) { dockTuckLater(d); } });
@@ -53570,7 +55336,6 @@ var EngCalcs = EngCalcs || {};
 			['lpn_alt_box', altboxLayout, null, null],
 			['lpn_full_box', fullboxLayout, saveFullboxLayout, LPN_FULLBOX_KEY],
 			['lpn_calib_box', calibboxLayout, null, null],
-			['lpn_notes_popup', notesboxLayout, saveNotesboxLayout, LPN_NOTESBOX_KEY],
 			['lpn_hotkeys_popup', hotkeysboxLayout, saveHotkeysboxLayout, LPN_HOTKEYSBOX_KEY]
 		].forEach(function (r) { registerDockBox(r[0], r[1], r[2], r[3], r[4]); });
 		applyDefaultDocks();
@@ -54469,23 +56234,39 @@ var EngCalcs = EngCalcs || {};
 		if (doc.defaultPattern === was) { doc.defaultPattern = to; }
 	}
 	function libRenamePattern(pat, want) {
-		var name = String(want || '').trim(), clash, was;
+		var name = String(want || '').trim(), clash, was, implied;
 		if (!name || name === pat.id) { return false; }
 		clash = libPatterns().some(function (p) { return p !== pat && p.id === name; });
 		if (clash) { return false; }
 		was = pat.id;
+		// **THE DEFAULT FOLLOWS ITS PATTERN** (Tom, 2026-10-11: renaming Net3's pattern "1" turned every
+		// run flat, because the implied default "1" had nothing to point at). A stated default is
+		// renamed by libRepointPattern(); an IMPLIED one (no PATTERN option, pattern "1" present) becomes
+		// a stated default under the new name, so the run keeps the shape it had.
+		implied = !doc.defaultPattern && effDefaultPattern() === was;
 		pat.id = name;
 		libRepointPattern(was, name);
+		if (implied) { doc.defaultPattern = name; }
 		return true;
 	}
 	function libDeletePattern(pat) {
-		var was = pat.id;
+		var was = pat.id, pc = EngCalcs.pageConfig || {}, wasDefault = effDefaultPattern() === was, now;
 		doc.patterns = libPatterns().filter(function (p) { return p !== pat; });
 		// **A REFERENCE TO A DELETED PATTERN IS CLEARED, NOT LEFT DANGLING.** lpnPatternById returns
 		// null for a name nothing answers to and lpnPatternValue turns that into a multiplier of 1,
 		// so the run would be right either way -- but the junction would still SAY it follows a
 		// pattern that is not there, and the next thing the user does is look for it.
 		libRepointPattern(was, null);
+		// **DELETING THE DEFAULT IS SAID OUT LOUD, NOT ANSWERED SILENTLY.** The default is cleared, never
+		// moved to some other pattern; what the junctions use now is EPANET's own fallback (pattern "1"
+		// if there is one, else a constant), and the notice names it.
+		if (wasDefault) {
+			now = effDefaultPattern();
+			setNotice(String(now
+				? (pc.lpn_library_pattern_default_deleted_to || 'Pattern {id} was the default demand pattern. Junctions with no pattern now use pattern {now}.')
+				: (pc.lpn_library_pattern_default_deleted_none || 'Pattern {id} was the default demand pattern. Junctions with no pattern now use a constant demand.'))
+				.split('{id}').join(was).split('{now}').join(now || ''));
+		}
 	}
 
 	// ---- CONTROLS --------------------------------------------------------------------------------
@@ -54639,10 +56420,38 @@ var EngCalcs = EngCalcs || {};
 	// scope marker rather than letting the section's silence imply the wrong one.
 	function settingsDefaultPatternRow(host, rowFn) {
 		var pc = EngCalcs.pageConfig || {}, sel = document.createElement('select');
-		libFillPatternOptions(sel, doc.defaultPattern);
+		// The blank names what it MEANS: with no pattern stated and a pattern "1" present, EPANET
+		// uses pattern 1, and a row reading "No pattern" would say the opposite of what the run does.
+		// **REFILLED WHEN THE LIST IS ABOUT TO BE USED** (Tom, 2026-10-10: *"isn't letting me select
+		// anything. I had to close the project and reopen"*): this select is built once per Settings
+		// rebuild, and a pattern added, renamed or deleted since left it with options that no longer
+		// matched the document.
+		// **NEVER BLANK WHILE A PATTERN IS IN FORCE** (Tom, 2026-10-11: EPANET refuses a blank default
+		// and fills in 1). With nothing stated and a pattern "1" present the selector SHOWS "1", which is
+		// what the run uses; picking it writes nothing, so an unedited file still exports character-
+		// exact. The plain "None (constant)" row exists only where no pattern "1" does, because only
+		// then is a constant demand what a blank means.
+		function hasOne() { return libPatternsRead().some(function (p) { return p.id === '1'; }); }
+		function fill() {
+			libFillPatternOptions(sel, effDefaultPattern() || '',
+				String(pc.lpn_settings_default_pattern_none || 'None (constant)'), hasOne());
+		}
+		fill();
+		['focus', 'mousedown', 'touchstart', 'keydown'].forEach(function (ev) {
+			sel.addEventListener(ev, function () {
+				var shown = Array.prototype.map.call(sel.children, function (o) { return o.value; }).join('\u0001'),
+					want = (hasOne() ? [] : ['']).concat(libPatternsRead().map(function (p) { return p.id; })).join('\u0001');
+				if (shown !== want || (sel.value || '') !== (effDefaultPattern() || '')) { fill(); }
+			});
+		});
 		sel.addEventListener('change', function () {
-			doc.defaultPattern = sel.value || null;
+			var v = sel.value || null;
+			// Choosing what is already in force writes nothing; choosing "1" over another stated
+			// default returns to the implied one, which is the same run.
+			if (v === (effDefaultPattern() || null)) { fill(); return; }
+			doc.defaultPattern = (v === '1') ? null : v;
 			libCommit();
+			fill();
 			refreshPopupIfOpen();
 		});
 		rowFn(host, pc.lpn_settings_default_pattern || 'Default demand pattern', sel,
@@ -55094,15 +56903,22 @@ var EngCalcs = EngCalcs || {};
 	// tip is not needed?"*). A junction's or a customer's blank pattern follows the project's
 	// Default demand pattern, and a pump's blank price pattern follows the network's, so those
 	// callers pass lpnBlankIsDefault(); everywhere else a blank really is No pattern.
+	// **A JUNCTION'S OR CUSTOMER'S BLANK DEMAND PATTERN NAMES WHAT IT RESOLVES TO** (Tom, 2026-10-11):
+	// "(default: 1)" or "(constant)". Display only; the stored value stays blank.
+	function lpnBlankIsDemandDefault() {
+		var pc = EngCalcs.pageConfig || {}, eff = effDefaultPattern();
+		return eff ? String(pc.lpn_demand_pattern_default || '(default: {id})').split('{id}').join(eff)
+			: String(pc.lpn_demand_pattern_constant || '(constant)');
+	}
 	function lpnBlankIsDefault() {
 		return (EngCalcs.pageConfig || {}).lpn_choice_default || 'Default';
 	}
-	function libFillPatternOptions(sel, value, blankLabel) {
+	function libFillPatternOptions(sel, value, blankLabel, omitBlank) {
 		var pc = EngCalcs.pageConfig || {}, none = document.createElement('option');
 		sel.textContent = '';
 		none.value = '';
 		none.textContent = blankLabel || pc.lpn_library_pattern_none || 'No pattern';
-		sel.appendChild(none);
+		if (!omitBlank) { sel.appendChild(none); }
 		libPatternsRead().forEach(function (p) {
 			var o = document.createElement('option');
 			o.value = p.id;
@@ -55137,7 +56953,7 @@ var EngCalcs = EngCalcs || {};
 				values = document.createElement('input'),
 				span = libEl('div', 'lpn-lib-note', libSpanText((pat.multipliers || []).length)),
 				spark = libSparkline(pat.multipliers),
-				del;
+				mark, del;
 			id.type = 'text';
 			id.className = 'lpn-lib-id';
 			id.value = pat.id;
@@ -55151,6 +56967,11 @@ var EngCalcs = EngCalcs || {};
 				rebuildLibraryBox();
 			});
 			headRow.appendChild(id);
+			if (effDefaultPattern() === pat.id) {
+				mark = libEl('span', 'lpn-lib-note', pc.lpn_library_pattern_default_mark || '(default)');
+				mark.title = pc.lpn_library_pattern_default_tip || 'The default demand pattern. Change it in Settings, Default demand pattern.';
+				headRow.appendChild(mark);
+			}
 			del = libButton(pc.lpn_tool_delete || 'Delete', function () {
 				saveUndoSnapshot();
 				libDeletePattern(pat);
@@ -58800,6 +60621,11 @@ var EngCalcs = EngCalcs || {};
 			mixingFields(fields, n);
 			readonlyUnitField(fields, pc.lpn_result_head || 'Head', resultUnit('elevhead'),
 				toSI(nodeFixedHead(n), 'lpn_u_elevhead'), pc.lpn_tank_head_tip);
+			// Depth and usable volume, read the way the Tables pane reads them (Task 783).
+			readonlyField(fields, (pc.lpn_result_depth || 'Depth') + ' (' + unitLabel(resultUnit('elevhead')) + ')',
+				colorNodeValue(n, 'depth'), pc.lpn_result_depth_tip);
+			readonlyField(fields, (pc.lpn_result_tank_volume || 'Available volume') + ' (' + tankVolumeUnitText() + ')',
+				colorNodeValue(n, 'volume'), pc.lpn_result_tank_volume_tip);
 		} else if (n.type === 'reservoir') {
 			unitNumberField(fields, pc.lpn_field_elev || 'Elevation', 'lpn_u_elevhead',
 				function () { return n.elev; },
@@ -59233,7 +61059,7 @@ var EngCalcs = EngCalcs || {};
 			acc.setBase(+bInput.value);
 			afterPropertyEdit(n);
 		});
-		libFillPatternOptions(sel, acc.getPattern(), lpnBlankIsDefault());
+		libFillPatternOptions(sel, acc.getPattern(), lpnBlankIsDemandDefault());
 		sel.setAttribute('aria-label', (pc.lpn_field_demand_pattern || 'Demand pattern') + ' ' + (index + 1));
 		sel.addEventListener('change', function () {
 			saveUndoSnapshot();
@@ -59799,6 +61625,29 @@ var EngCalcs = EngCalcs || {};
 		curveChooser(fields, l, 'curveId', 'headloss', pc.lpn_gpv_curve_source || 'Valve head loss curve',
 			pc.lpn_gpv_curve_source_tip);
 	}
+	// **A LINK'S FROM AND TO NODE AS EDITABLE TEXT** (Tom, 2026-10-09), the Tables pane's two cells
+	// in the Properties box. A refused ID is said out loud and the old one put back; an accepted one
+	// is one undo step. See reconnectLinkEnd().
+	function endField(fields, l, end) {
+		var pc = EngCalcs.pageConfig || {}, label = document.createElement('label'),
+			input = document.createElement('input');
+		input.type = 'text';
+		input.value = l[end];
+		input.addEventListener('change', function () {
+			var newId = String(input.value).trim(), why;
+			if (newId === l[end]) { input.value = l[end]; return; }
+			why = linkEndProblem(l, end, newId);
+			if (why) { setWarning(why); input.value = l[end]; return; }
+			saveUndoSnapshot();
+			reconnectLinkEnd(l, end, newId);
+			refreshPopupIfOpen();
+		});
+		if (end === 'from') { setFieldLabel(label, pc.lpn_field_from || 'From'); }
+		else { setFieldLabel(label, pc.lpn_field_to || 'To'); }
+		label.appendChild(input);
+		fields.appendChild(label);
+		fields.appendChild(document.createElement('br'));
+	}
 	function renderLinkFields(linkId) {
 		var l = linkById(linkId), fields = document.getElementById('lpn_popup_fields'), pc = EngCalcs.pageConfig || {};
 		idField(l.id, function (newId) { renameLink(linkId, newId); }, 'link');
@@ -59883,6 +61732,10 @@ var EngCalcs = EngCalcs || {};
 				});
 			}
 		}
+		// From and To (Tom, 2026-10-09), after everything the link is: the identity band is ID,
+		// Description and Tag, and the pipe type selector stands immediately after it.
+		endField(fields, l, 'from');
+		endField(fields, l, 'to');
 		closedField(fields, l, linkId);
 		customPropFields(fields, l);
 		activeField(fields, l);
@@ -60559,7 +62412,7 @@ var EngCalcs = EngCalcs || {};
 		 */
 		patLabel = document.createElement('label');
 		patSel = document.createElement('select');
-		libFillPatternOptions(patSel, c.pattern || '', lpnBlankIsDefault());
+		libFillPatternOptions(patSel, c.pattern || '', lpnBlankIsDemandDefault());
 		patSel.addEventListener('change', function () {
 			if ((c.pattern || '') === patSel.value) { return; }
 			saveUndoSnapshot();
@@ -61221,6 +63074,21 @@ var EngCalcs = EngCalcs || {};
 		setMode(m);
 	});
 
+	// **W IS ZOOM WINDOW** (Tom, 2026-10-07). Free of every other plain key on this page (the digits,
+	// Esc, Delete, +, =, -, and the menu mnemonics, which answer only inside an open menu). Same
+	// guard as the digit picker: never with a modifier, never while typing.
+	document.addEventListener('keydown', function (e) {
+		if (e.ctrlKey || e.metaKey || e.altKey) { return; }
+		if (isTextEntry(e.target)) { return; }
+		// By character, and by physical key so a layout that types something else there (Russian: key
+		// 'ц', code KeyW) still answers, as the menu chords' own e.code rule does.
+		if (e.key !== 'w' && e.key !== 'W' && e.code !== 'KeyW') { return; }
+		// An open menu owns the letters (its rows answer to mnemonics), and it checks defaultPrevented.
+		if (openMenuAnchor) { return; }
+		if (e.preventDefault) { e.preventDefault(); }
+		enterZoomWindow();
+	});
+
 	/**
 	 * **PLAIN `+`/`-`, NEVER Ctrl/Cmd** (ROADMAP Task 682; Tom, 2026-09-17: "How would a person
 	 * zoom on a PC without a mouse wheel or, for that matter, with a keyboard"). Read the ROADMAP
@@ -61303,8 +63171,18 @@ var EngCalcs = EngCalcs || {};
 	//
 	// Returns 1 for every way of having no answer, so a hand-drawn network, a pre-Task-423 saved
 	// file and a page whose js/lpn-patterns.js failed to load all behave exactly as they did before.
+	// **THE DEFAULT DEMAND PATTERN AS EPANET 2.2 RESOLVES IT** (Tom, 2026-10-10: *"Net3 Junctions
+	// use pattern 1 by specifying none/default, so something is wrong"*). A demand with no pattern
+	// of its own uses [OPTIONS] Pattern; where the file names none, EPANET uses a pattern whose ID
+	// is "1" if there is one; otherwise the demand is constant. `doc.defaultPattern` stays only
+	// what the file stated (so an export writes no Pattern line the file did not have); every
+	// RESOLUTION goes through here.
+	function effDefaultPattern() {
+		if (doc.defaultPattern) { return doc.defaultPattern; }
+		return libPatternsRead().some(function (p) { return p.id === '1'; }) ? '1' : null;
+	}
 	function demandMultiplier(n, t) {
-		return patternMultiplier(ownDemandPattern(n) || doc.defaultPattern, t);
+		return patternMultiplier(ownDemandPattern(n) || effDefaultPattern(), t);
 	}
 	// **A JUNCTION'S DEMANDS ARE A LIST** (Task 468), and this is the page's one door to it.
 	// EngCalcs.lpnDemandRows() owns the Base shape -- row 0 is `_demand`/`demandPattern`/
@@ -61718,7 +63596,7 @@ var EngCalcs = EngCalcs || {};
 		for (i = 0; i < rows.length; i++) {
 			b = rows[i].base;
 			if (typeof b !== 'number' || !isFinite(b)) { continue; }
-			total += b * patternMultiplier(rows[i].pattern || doc.defaultPattern, t);
+			total += b * patternMultiplier(rows[i].pattern || effDefaultPattern(), t);
 		}
 		return total * dm;
 	}
@@ -61733,7 +63611,7 @@ var EngCalcs = EngCalcs || {};
 		for (i = 0; i < rows.length; i++) {
 			out.push({
 				base: toSI(rows[i].base || 0, 'lpn_u_flow'),
-				pattern: rows[i].pattern || doc.defaultPattern || null
+				pattern: rows[i].pattern || effDefaultPattern() || null
 			});
 		}
 		return out;
@@ -61749,7 +63627,7 @@ var EngCalcs = EngCalcs || {};
 	// and Task 468's categories work will want it: a junction with categories resolves through the
 	// same door. Delete it if that turns out not to be true, but do not re-wire the popup to it.
 	function demandPatternActs(n) {
-		return !isFixedHeadNode(n) && !!(ownDemandPattern(n) || doc.defaultPattern);
+		return !isFixedHeadNode(n) && !!(ownDemandPattern(n) || effDefaultPattern());
 	}
 	// **THE SAME ARITHMETIC FOR EVERY ATTACHMENT POINT** (Task 248.02). A pattern does not know what
 	// it is for -- js/lpn-patterns.js says so in its own header -- so a demand, a reservoir head and
@@ -61786,7 +63664,9 @@ var EngCalcs = EngCalcs || {};
 		return (typeof l.speed === 'number' && isFinite(l.speed)) ? l.speed : 1;
 	}
 
-	function assembleModel() {
+	// `keepDisconnected` is for the one reader that asks WHICH nodes have no path to a source (Find's
+	// Connectivity): it must see the whole network, not the one the solver is handed.
+	function assembleModel(keepDisconnected) {
 		var live = {};
 		doc.nodes.forEach(function (n) { if (isActive(n)) { live[n.id] = true; } });
 		var nodes = doc.nodes.filter(isActive).map(function (n) {
@@ -61844,7 +63724,7 @@ var EngCalcs = EngCalcs || {};
 					// above is still what every one-instant solve reads; js/lpn-epanet.js takes one or
 					// the other and never both, or the multiplier would be applied twice.
 					demandBase: toSI(effective(n, 'demand') || 0, 'lpn_u_flow'),
-					demandPattern: ownDemandPattern(n) || doc.defaultPattern || null,
+					demandPattern: ownDemandPattern(n) || effDefaultPattern() || null,
 					// **AND THE WHOLE BREAKDOWN RIDES ALONG WITH THEM, for the same reason and only
 					// when there is one** (Task 468). An extended-period run has EPANET doing the
 					// multiplying, and two categories on two patterns are two daily shapes that
@@ -62048,6 +63928,12 @@ var EngCalcs = EngCalcs || {};
 		// The clock, the patterns and the controls, converted to SI (js/lpn-time.js). Absent that
 		// file the model is exactly the pre-Task-248 one and the page solves one instant.
 		if (EngCalcs.lpnTimeAttach) { EngCalcs.lpnTimeAttach(model); }
+		// **A NODE WITH NO PATH TO A RESERVOIR OR TANK IS LEFT OUT OF THE RUN, NOT REFUSED** (Tom,
+		// 2026-10-09). Done HERE so that every reader of the model -- both engines, the extended-
+		// period run, fire flow, scenario compare -- sees the same network, and never in the
+		// document: nothing is marked inactive and an .inp export writes what is stored. The ids
+		// ride on `model.omitted`; runSolve() turns them into the standing note.
+		if (EngCalcs.lpnOmitDisconnected && !keepDisconnected) { EngCalcs.lpnOmitDisconnected(model); }
 		return model;
 	}
 	/**
@@ -62138,7 +64024,7 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {};
 		if (issue.code === 'no-fixed-head') { return pc.lpn_diag_no_fixed_head || 'Add a reservoir or a tank. The network needs at least one known water level before it can be solved.'; }
 		if (issue.code === 'dangling-link') { return (pc.lpn_diag_dangling_link || 'A pipe or pump connects to a node that no longer exists:') + ' ' + issue.ids.join(', '); }
-		if (issue.code === 'unreachable') { return (pc.lpn_diag_unreachable || 'These nodes have no path to a reservoir:') + ' ' + issue.ids.join(', '); }
+		if (issue.code === 'unreachable') { return (pc.lpn_diag_unreachable || 'These nodes have no path to a reservoir or tank:') + ' ' + issue.ids.join(', '); }
 		// NAMES THE VALVES, which is the entire reason this page keeps its own diagnostics instead
 		// of surfacing EPANET's numeric error codes. A user staring at a drawing can act on "V3".
 		if (issue.code === 'valve-needs-epanet') { return (pc.lpn_diag_valve_needs_epanet || 'These are pressure or flow control valves, and only the EPANET solver can compute them. The EPANET solver could not be loaded, so these results are missing:') + ' ' + issue.ids.join(', '); }
@@ -62273,7 +64159,38 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {}, panel = document.getElementById('lpn_msglog_panel');
 		if (!panel) { return; }
 		panel.innerHTML = '';
-		if (!noticeLog.length) {
+		// **A HIDDEN MESSAGE IS THE TOP ROW, MARKED, WITH ITS RESTORE** (Tom, 2026-10-07: "Put the hidden
+		// at the top of the expando history"). Pinned above the newest-first list, and its own entry in
+		// that list is left out below so the same words never appear twice.
+		var hiddenText = statusHiddenText();
+		var hiddenNotes = (notesLast && notesHidden) ? notesLast : '';
+		function hiddenRow(text, restore) {
+			var hrow = document.createElement('div');
+			hrow.className = 'lpn-msglog-panel-row lpn-msglog-panel-hidden';
+			var mark = document.createElement('span');
+			mark.className = 'lpn-msglog-panel-when lpn-msglog-hidden-mark';
+			mark.textContent = pc.lpn_msglog_hidden || 'Hidden';
+			hrow.appendChild(mark);
+			var htext = document.createElement('span');
+			htext.className = 'lpn-msglog-panel-text';
+			htext.textContent = text;
+			hrow.appendChild(htext);
+			var show = document.createElement('button');
+			show.type = 'button';
+			show.className = 'lpn-msglog-unhide';
+			show.textContent = pc.lpn_msglog_unhide || 'Show';
+			show.title = pc.lpn_status_hidden_tip || 'Show the hidden message on the map again.';
+			show.addEventListener('click', function () {
+				restore();
+				var xEl = document.getElementById('lpn_status_dismiss');
+				if (xEl && xEl.focus) { xEl.focus(); }
+			});
+			hrow.appendChild(show);
+			panel.appendChild(hrow);
+		}
+		if (hiddenText) { hiddenRow(hiddenText, unhideStatus); }
+		if (hiddenNotes) { hiddenRow(hiddenNotes, unhideEngineNotes); }
+		if (!noticeLog.length && !hiddenText && !hiddenNotes) {
 			// A DIFFERENT CLASS FROM A REAL ROW ON PURPOSE: "no messages yet" is not itself a
 			// kept message, so it must not count as one to anything reading .lpn-msglog-panel-row.
 			var none = document.createElement('div');
@@ -62285,6 +64202,7 @@ var EngCalcs = EngCalcs || {};
 		// Newest first, matching noticeLog's own order (Tom: "oldest at the bottom") -- no
 		// re-sorting at render time, so the panel can never disagree with the log it is reading.
 		noticeLog.forEach(function (row) {
+			if ((hiddenText && row.text === hiddenText) || (hiddenNotes && row.text === hiddenNotes)) { return; }
 			var pill = document.createElement('div');
 			pill.className = 'lpn-msglog-panel-row' + (row.severity === 'warning' ? ' lpn-msglog-panel-warn' : '');
 			var when = document.createElement('span');
@@ -62303,7 +64221,7 @@ var EngCalcs = EngCalcs || {};
 		// as the last row rather than dropped along with the dialog chrome around it.
 		var note = document.createElement('div');
 		note.className = 'lpn-msglog-panel-note';
-		note.textContent = (pc.lpn_msglog_note || 'Newest first. This page keeps the last {n} messages while it is open, and nothing is stored on your computer.')
+		note.textContent = (pc.lpn_msglog_note || 'Newest first. This page keeps the last {n} messages while it is open and does not store them on your computer.')
 			.replace('{n}', NOTICE_LOG_MAX);
 		panel.appendChild(note);
 	}
@@ -62499,14 +64417,163 @@ var EngCalcs = EngCalcs || {};
 	// the text -- diagIssueText() already turned the code into the sentence. A caller with no code
 	// gets 'status', which is honest: something was said, and it was not one of the diagnoses.
 	var statusWrongCode = '';
-	function setStatus(text, code) {
+	// **HIDING A STANDING MESSAGE** (Tom, 2026-10-07: "I wish there were a way to dismiss error
+	// messages that I no longer want to see like 'no path to a reservoir'. After about a minute or
+	// two it's just an annoyance."). Ida's design: a small x beside the text (never in the grievance
+	// button's element), hiding exactly that TEXT -- the same words stay hidden, different words (another
+	// node list) show again. IN MEMORY ONLY: the set lives as long as the page and is emptied when a
+	// different network opens, so nothing is stored on the device.
+	//
+	// **HIDDEN MEANS HIDDEN** (Tom, 2026-10-07, of a "1 hidden" chip left in the amber box: "Put the
+	// hidden at the top of the expando history instead of still on the map. Hidden means hidden, and
+	// it's not hidden."). Nothing of a hidden message stays on the map: the box goes with it, its
+	// grievance button included (the bottom strip keeps the standing one). The message waits as the
+	// TOP row of the message history panel (renderMsglogPanel()), marked Hidden, with the one control
+	// that brings it back. No count, badge or highlight on the history glyph either: that glyph sits
+	// on the map too, and lighting it would be the chip again in another place.
+	//
+	// **EVERY STANDING MESSAGE IS HIDEABLE** (Tom, 2026-10-08, G09: "Every standing message"). One
+	// mechanism, no per-message exceptions. A hidden message comes back by two doors only: (1) its
+	// text stops being the standing one (fix the problem, break it again: a diagnostic from
+	// lpnDiagnose() is seen again), and (2) for a run message (anything not a diagnostic: run
+	// summaries, not-converged, engine loading and failure, storage full, unit unknown) the start of
+	// the next run, since the same sentence after a new run is a new fact. `diag` is true only for
+	// a diagnostic.
+	//
+	// **REMEMBERED ACROSS A RELOAD, IN THIS BROWSER** (Tom, 2026-10-09, H09: "this should not be lost on
+	// reload."). A reading preference the visitor asked for, the class of `lpn_hovercard`, so it is
+	// `localStorage` only and never in serializeProject(). What is stored is as little as can do the
+	// job: the open project's id and, per hidden message, a short hash of its words with its kind
+	// (`diag`, `run` or `cond:<name>`). Never the words. **A hidden RUN message is stored too** (Tom,
+	// 2026-10-10: hid "Left out of this run..." on Net1, reloaded, "Doesn't stay hidden"; it was not
+	// stored on the reasoning that a reload is a new run). A reload is not news: the first run after a
+	// reload leaves a restored run entry alone (statusRestoredRun), and the NEXT run forgets it as
+	// ever, so the same sentence after an edit is seen again.
+	//
+	// **THREE MESSAGES STAY HIDDEN UNTIL THEIR CONDITION CHANGES** (Tom, 2026-10-09, H11): storage full,
+	// storage unreadable and unit unknown. They are neither a diagnostic nor a run summary, since an
+	// edit or a run says the same sentence again and no one fixed anything. A `cond:` entry survives
+	// edits and runs; clearHiddenCond() removes it when the condition clears (storage takes a write,
+	// the document reads, the unit is recognised), so a recurrence after that shows again.
+	var LPN_MSGHIDDEN_KEY = 'lpn_msghidden';
+	// Words to a short key: the identity of a message, which cannot be turned back into the words.
+	function statusKey(text) {
+		var h = 5381, i;
+		for (i = 0; i < text.length; i++) { h = ((h * 33) ^ text.charCodeAt(i)) >>> 0; }
+		return h.toString(36) + '.' + text.length;
+	}
+	var statusHiddenOwner = '';   // the project id the hidden set belongs to
+	function loadStatusHidden() {
+		var out = {};
+		try {
+			var o = JSON.parse(localStorage.getItem(LPN_MSGHIDDEN_KEY) || 'null');
+			if (o && typeof o.o === 'string' && o.h && typeof o.h === 'object') {
+				Object.keys(o.h).forEach(function (k) {
+					if (/^(diag|run|cond:[a-z-]+)$/.test(String(o.h[k]))) { out[k] = o.h[k]; statusHiddenOwner = o.o; }
+				});
+			}
+		} catch (e) { out = {}; }
+		return out;
+	}
+	var statusHidden = loadStatusHidden();   // statusKey(text) -> 'diag' | 'run' | 'cond:<name>'
+	// A restored hidden set is not judged by the empty statements a page load makes on its way to its
+	// first real message; the grace ends at the first non-empty one.
+	var statusHiddenGrace = Object.keys(statusHidden).length > 0;
+	// Restored `run` entries survive the first solve after the reload (and any progress messages it
+	// says on the way); the second solve forgets them like any run message.
+	var statusRestoredRun = Object.keys(statusHidden).some(function (k) { return statusHidden[k] === 'run'; });
+	var statusSolvesSinceLoad = 0;
+	var statusLast = { text: '', code: '', diag: false, cond: '' };
+	function saveStatusHidden() {
+		var keep = {}, n = 0;
+		Object.keys(statusHidden).forEach(function (k) {
+			if (n < 40) { keep[k] = statusHidden[k]; n++; }
+		});
+		try {
+			if (n) { localStorage.setItem(LPN_MSGHIDDEN_KEY, JSON.stringify({ o: statusHiddenOwner, h: keep })); }
+			else { localStorage.removeItem(LPN_MSGHIDDEN_KEY); }
+		} catch (e) { /* private mode or full: hidden for this page view only */ }
+	}
+	// Opening a different network, or clearing this one, ends the set. Opening the SAME project (a
+	// reload) keeps what was restored.
+	function clearStatusHidden(force) {
+		if (!force && statusHiddenOwner && statusHiddenOwner === library.openId) { return; }
+		statusHidden = {};
+		statusHiddenGrace = false;
+		saveStatusHidden();
+	}
+	function hideStatusMessage() {
+		statusHiddenOwner = library.openId || '';
+		statusHidden[statusKey(statusLast.text)] = statusLast.cond ? 'cond:' + statusLast.cond : (statusLast.diag ? 'diag' : 'run');
+		saveStatusHidden();
+	}
+	// The condition behind a `cond:` message has cleared, so a recurrence is news again.
+	function clearHiddenCond(name) {
+		var any = false;
+		Object.keys(statusHidden).forEach(function (k) { if (statusHidden[k] === 'cond:' + name) { delete statusHidden[k]; any = true; } });
+		if (!any) { return; }
+		saveStatusHidden();
+		if (statusLast.cond === name) { paintStatus(); syncStatusBoxVisibility(); }
+	}
+	// A new run forgets the hidden RUN messages (door 2 above); hidden diagnostics stay hidden.
+	function forgetHiddenRunMessages() {
+		statusSolvesSinceLoad++;
+		if (statusRestoredRun) {
+			if (statusSolvesSinceLoad < 2) { return; }
+			statusRestoredRun = false;
+		}
+		var any = false;
+		Object.keys(statusHidden).forEach(function (k) { if (statusHidden[k] === 'run') { delete statusHidden[k]; any = true; } });
+		if (any) { saveStatusHidden(); }
+	}
+	// The text the user has hidden and that is still the standing message, or '' -- what the history
+	// panel pins at its top.
+	function statusHiddenText() {
+		return (statusLast.text && statusHidden[statusKey(statusLast.text)]) ? statusLast.text : '';
+	}
+	// Paints what setStatus() last stated, honouring the hidden set. Called by setStatus(), and by
+	// the x and the history row's Show, which must not re-log a message that has not changed.
+	function paintStatus() {
 		var el = document.getElementById('lpn_status');
 		var textEl = document.getElementById('lpn_status_text');
+		var xEl = document.getElementById('lpn_status_dismiss');
 		if (!el) { return; }
+		var hide = !!statusHiddenText();
 		// WRITTEN INTO THE INNER SPAN, not into the <p>: the <p> also holds the grievance button,
 		// and textContent on the parent would delete it on the first solve. Falls back to the <p>
 		// where the span is absent, so a harness or a page that has not been updated still works.
-		(textEl || el).textContent = text || '';
+		(textEl || el).textContent = hide ? '' : (statusLast.text || '');
+		// The x serves the notes beside the text too (H10): shown while either has something on the map.
+		if (xEl) { xEl.style.display = ((statusLast.text && !hide) || (notesLast && !notesHidden)) ? '' : 'none'; }
+		// An open history panel follows: a hidden message forgotten by an edit leaves its top row.
+		if (msglogPanelOpen) { renderMsglogPanel(); }
+	}
+	// Brings the hidden message back onto the map. The one restore door, on the history row.
+	function unhideStatus() {
+		delete statusHidden[statusKey(statusLast.text)];
+		saveStatusHidden();
+		paintStatus();
+		syncStatusBoxVisibility();
+	}
+	function setStatus(text, code, diag, cond) {
+		var el = document.getElementById('lpn_status');
+		if (!el) { return; }
+		statusLast = { text: text || '', code: code || '', diag: !!(text && diag), cond: text ? (cond || '') : '' };
+		// A hidden text is FORGOTTEN the moment it is no longer the one showing: fix the problem,
+		// break it again (undo, redo, an edit) and the message must be seen again. A `cond:` entry is
+		// the exception, kept until clearHiddenCond().
+		if (!statusHiddenGrace || statusLast.text) {
+			var cur = statusLast.text ? statusKey(statusLast.text) : '', pruned = false;
+			Object.keys(statusHidden).forEach(function (k) {
+				if (k !== cur && statusHidden[k].indexOf('cond:') !== 0 && !(statusRestoredRun && statusHidden[k] === 'run')) { delete statusHidden[k]; pruned = true; }
+			});
+			if (pruned) { saveStatusHidden(); }
+			statusHiddenGrace = false;
+		}
+		paintStatus();
+		// Hidden when empty, or an empty amber box sits on the drawing saying nothing. It is an
+		// overlay now, so this changes what is COVERED, never what is laid out.
+		syncStatusBoxVisibility();
 		// **THE DIAGNOSTIC IS A MESSAGE TOO** (Task 704, Tom 2026-09-22: "**All** messages now
 		// need to go through this messenger system"). This is the SAME door js/lpn-time.js's
 		// progress box writes through (`host.status`) -- "Working out the extended period
@@ -62521,9 +64588,6 @@ var EngCalcs = EngCalcs || {};
 		// sentence, and refusing to hear about that one would be the instrument measuring itself.
 		if (next !== statusWrongCode) { resetWrongButton('lpn_wrong_status_btn'); }
 		statusWrongCode = next;
-		// Hidden when empty, or an empty amber box sits on the drawing saying nothing. It is an
-		// overlay now, so this changes what is COVERED, never what is laid out.
-		syncStatusBoxVisibility();
 	}
 
 	/**
@@ -62590,6 +64654,25 @@ var EngCalcs = EngCalcs || {};
 	// grievance button beside it.
 	var LPN_ENGINE_NOTE_MS = 120000, LPN_ENGINE_NOTE_FADE_MS = 800;
 	var engineNoteTimer = 0, engineNoteFadeTimer = 0;
+	// **THE x HIDES THE NOTES TOO** (Tom, 2026-10-09, H10: "hidden means hidden"). Their text is kept
+	// here while hidden so the history can show it with Show; it is not stored on the device, because
+	// a note lives two minutes and its next showing is a new fact.
+	var notesLast = '', notesHidden = false;
+	function hideEngineNotes() {
+		var el = document.getElementById('lpn_status_notes');
+		if (!notesLast || notesHidden || !el) { return; }
+		notesHidden = true;
+		el.textContent = '';
+	}
+	function unhideEngineNotes() {
+		var el = document.getElementById('lpn_status_notes');
+		if (!notesLast || !notesHidden || !el) { return; }
+		notesHidden = false;
+		el.textContent = ' ' + notesLast;
+		el.style.opacity = '';
+		paintStatus();
+		syncStatusBoxVisibility();
+	}
 	function clearEngineNoteTimers() {
 		if (engineNoteTimer) { clearTimeout(engineNoteTimer); engineNoteTimer = 0; }
 		if (engineNoteFadeTimer) { clearTimeout(engineNoteFadeTimer); engineNoteFadeTimer = 0; }
@@ -62603,6 +64686,8 @@ var EngCalcs = EngCalcs || {};
 		// A leading space because this span abuts #lpn_status_text with no whitespace between the
 		// two tags -- the markup cannot carry one without it showing when the note is absent.
 		el.textContent = text ? ' ' + text : '';
+		notesLast = text || '';
+		notesHidden = false;
 		// **ALL MESSAGES GO THROUGH ONE DOOR** (ROADMAP Task 704; Perry's review, 2026-09-22:
 		// setEngineNotes() was the one writer of on-map text this branch had missed -- it stands
 		// for two minutes and then fades, exactly the "read it, then it is gone" shape the whole
@@ -62612,15 +64697,23 @@ var EngCalcs = EngCalcs || {};
 		if (text) {
 			engineNoteTimer = setTimeout(function () {
 				engineNoteTimer = 0;
+				if (notesHidden) {   // hidden notes just expire, with their history row
+					notesLast = ''; notesHidden = false;
+					paintStatus(); syncStatusBoxVisibility();
+					return;
+				}
 				el.style.opacity = '0';
 				engineNoteFadeTimer = setTimeout(function () {
 					engineNoteFadeTimer = 0;
 					el.textContent = '';
 					el.style.opacity = '';
+					notesLast = '';
+					paintStatus();
 					syncStatusBoxVisibility();
 				}, LPN_ENGINE_NOTE_FADE_MS);
 			}, LPN_ENGINE_NOTE_MS);
 		}
+		paintStatus();   // the x serves the notes too
 		syncStatusBoxVisibility();
 	}
 	// The box shows while EITHER half has something to say. Before the notes moved out this was one
@@ -62858,6 +64951,23 @@ var EngCalcs = EngCalcs || {};
 		// empty one would be indistinguishable in the log from a row whose detail was dropped.
 		wireWrongButton('lpn_wrong_btn', 'none');
 		wireWrongButton('lpn_wrong_status_btn', function () { return statusWrongCode || 'status'; });
+		wireStatusHide();
+	}
+	// The x. Focus moves to the history glyph, which is where the message went, so a keyboard user is
+	// never dropped onto the page and is one Enter away from bringing it back.
+	function wireStatusHide() {
+		var xEl = document.getElementById('lpn_status_dismiss');
+		if (xEl) {
+			xEl.addEventListener('click', function () {
+				if (!statusLast.text && !(notesLast && !notesHidden)) { return; }
+				if (statusLast.text && !statusHiddenText()) { hideStatusMessage(); }
+				hideEngineNotes();
+				paintStatus();
+				syncStatusBoxVisibility();
+				var logBtn = document.getElementById('lpn_msglog_btn');
+				if (logBtn && logBtn.focus) { logBtn.focus(); }
+			});
+		}
 	}
 	// Rounds to the same number of decimals the label actually displays, in the DISPLAY unit --
 	// extrema and decoration MUST compare on this, not the raw SI value. Two series links carrying
@@ -63200,6 +65310,7 @@ var EngCalcs = EngCalcs || {};
 		// A synchronous pass answers every request made before it (see requestLabelRefresh()).
 		labelRefreshPending = false;
 		labelCacheTaint();
+		hoverCardHide();
 		if (dataLabelsHidden) { labelWorkSkipped = true; refreshLabelPassTail(); return; }
 		perfDebugCount('labelPasses');
 		beginMapBoxHold();
@@ -63212,6 +65323,129 @@ var EngCalcs = EngCalcs || {};
 		renderLabelsLegend();
 		refreshScenarioMarks();
 	}
+	// **THE ONE COMPOSER OF AN ELEMENT'S LABEL FIELDS** (Task 773). The full content pass, the
+	// single-label refresh and the hover card all read their lines from here, so they cannot come to
+	// print different things. `ls` is the label settings to read; `extrema` is the network-wide high/low table, or null for no marks. Returns the lines
+	// in show order, possibly none: the empty placeholder is the caller's business.
+	function nodeLabelFieldLines(n, ls, extrema) {
+		var nd = ls.decimals.node, ex = extrema || {}, lines = [];
+			// Order (Tom, 2026-07-30, thinking physically): ID, Demand, Head, Pressure, Elevation --
+			// demand is the thing the user set as a design target, head/pressure are what the solve
+			// produced from it, and elevation (the input least likely to change page to page) trails.
+			if (ls.node.id) { lines.push(affix('node', 'id', { text: n.id })); }
+			// **THE TWO IDENTITY WORDS** (Tom's table, R-327), printed as the words they are and only
+			// where one is stated -- a customer's own rule (customerLabelLines()): a blank slot where
+			// a description would be reads as a defect on every node that has none.
+			if (ls.node.desc && n.desc) { lines.push(affix('node', 'desc', { text: String(n.desc) })); }
+			if (ls.node.tag && n.tag) { lines.push(affix('node', 'tag', { text: String(n.tag) })); }
+			// **DEMAND FIRST, BASE DEMAND UNDER IT.** Two quantities and two rows -- see
+			// resolvedDemand(). rawLine() for both: neither number ever crossed into SI.
+			if (!isFixedHeadNode(n) && ls.node.demandActual && typeof resolvedDemand(n) === 'number') { lines.push(affix('node', 'demandActual', rawLine(resolvedDemand(n), ex.demandActual, nd.demandActual))); }
+			if (!isFixedHeadNode(n) && ls.node.demand && typeof baseDemandTotal(n) === 'number') { lines.push(affix('node', 'demand', rawLine(baseDemandTotal(n), ex.demand, nd.demand))); }
+			// Both are already IN Elevation/Head and Pressure units by the time they get here -- the
+			// fixed-head branch because those are declared inputs, the junction branch because the
+			// solve result is converted on the spot. rawLine() then prints what it is given, so the
+			// two halves of each field agree with the extrema computed above. A TANK's pressure is
+			// the depth of water standing in it, which is the same head-minus-elevation subtraction
+			// a reservoir makes -- see nodeFixedHead().
+			// **HEAD IS A RESULT COLUMN, so a fixed head is read in the RESULT unit too** (Task 422).
+			// A tank's or reservoir's head is DERIVED from typed numbers, so it arrives in the INPUT
+			// elevation unit and has to cross; a junction's comes from the solver in SI. Two sources,
+			// one column, and if they did not both end in the result unit the same map label would
+			// print two different quantities under one heading.
+			var headVal = isFixedHeadNode(n)
+				? fixedHeadDisplay(n)
+				: (lastSolveResult ? toDisplay(lastSolveResult.heads[n.id], resultUnit('elevhead')) : undefined);
+			var pressVal = isFixedHeadNode(n)
+				? fixedHeadPressure(n)
+				: (lastSolveResult ? toDisplay(lastSolveResult.pressures[n.id], resultUnit('pressure')) : undefined);
+			if (ls.node.head && headVal !== undefined) { lines.push(affix('node', 'head', rawLine(headVal, ex.head, nd.head))); }
+			if (ls.node.pressure && pressVal !== undefined) { lines.push(affix('node', 'pressure', rawLine(pressVal, ex.pressure, nd.pressure))); }
+			// An elevation nobody stated prints nothing, exactly as an unsolved pressure does -- an
+			// imported reservoir has none (Task 390) and rawLine() would have thrown on it.
+			if (ls.node.elev && typeof n.elev === 'number') { lines.push(affix('node', 'elev', rawLine(n.elev, ex.elev, nd.elev))); }
+			// **TANK WATER DEPTH, TANK ONLY** (Task 696): a junction or reservoir has no 'level',
+			// exactly as neither has a diameter, and prints nothing rather than a stray zero. The
+			// raw effective() value, matching how elev above hands rawLine() its own raw n.elev --
+			// nodeVal.level exists only to feed ex.level above, the same division every other
+			// field on this list keeps.
+			var levelVal = n.type === 'tank' ? effective(n, 'level') : undefined;
+			if (ls.node.level && typeof levelVal === 'number') { lines.push(affix('node', 'level', rawLine(levelVal, ex.level, nd.level))); }
+			// **LAST, AND ONLY WHERE THERE IS ONE.** A network with the analysis off, or one that has
+			// not been run since it was switched on, prints nothing here rather than a zero -- the
+			// same rule an unsolved pressure and an unstated elevation already follow.
+			var qualVal = nodeQualityValue(n);
+			if (ls.node.quality && qualVal !== undefined) { lines.push(affix('node', 'quality', rawLine(qualVal, ex.quality, qualityDecimals(nd)))); }
+			// **AND ONLY WHERE ONE IS TYPED.** Blank means EPANET's own zero and prints nothing:
+			// "nobody stated a starting concentration" and "the starting concentration is zero" are
+			// different facts, and printing 0.00 for the first is the same defect an unsolved
+			// pressure printed as a zero would be.
+			var initQualVal = nodeInitQuality(n);
+			if (ls.node.initQuality && initQualVal !== undefined) { lines.push(affix('node', 'initQuality', rawLine(initQualVal, ex.initQuality, nd.initQuality))); }
+		return nodeDisplayOrder(lines);
+	}
+	function linkLabelFieldLines(l, ls, extrema) {
+		var ld = ls.decimals.link, ex = extrema || {}, lines = [];
+			if (ls.link.id) { lines.push(affix('link', 'id', { text: l.id })); }
+			if (ls.link.desc && l.desc) { lines.push(affix('link', 'desc', { text: String(l.desc) })); }
+			if (ls.link.tag && l.tag) { lines.push(affix('link', 'tag', { text: String(l.tag) })); }
+			// **THE STATUS THE DOCUMENT STATES, BEFORE ANY RUN** (Tom's table, R-327: "Initial
+			// status"), beside the Status row below, which is the run's answer where there is one.
+			// EPANET's own pair of words for a link's starting state.
+			if (ls.link.initStatus) { lines.push(affix('link', 'initStatus', { text: linkInitialStatusText(l) })); }
+			if (l.type === 'pipe') {
+				if (ls.link.diameter) { lines.push(affix('link', 'diameter', rawLine(effective(l, 'diameter'), ex.diameter, ld.diameter))); }
+				if (ls.link.length) { lines.push(affix('link', 'length', rawLine(effective(l, 'length'), ex.length, ld.length))); }
+				if (ls.link.roughness) { lines.push(affix('link', 'roughness', rawLine(effective(l, 'roughness'), ex.roughness, ld.roughness))); }
+				if (ls.link.km) { lines.push(affix('link', 'km', rawLine(pipeK(l), ex.km, ld.km))); }
+				// **THE TWO REACTION COEFFICIENTS** (Tom's table, R-327), under the gate every other
+				// place that shows them already asks (reactionFieldsShown()): a coefficient changes
+				// nothing unless a chemical is being tracked. The one in force: the pipe's own, or the
+				// network-wide one it inherits. Typed numbers, so rawLine(), with no high/low mark.
+				if (reactionFieldsShown()) {
+					var bulkVal = linkReactionCoeff(l, 'bulkCoeff'), wallVal = linkReactionCoeff(l, 'wallCoeff');
+					if (ls.link.bulkCoeff && bulkVal !== undefined) { lines.push(affix('link', 'bulkCoeff', rawLine(bulkVal, null, ld.bulkCoeff))); }
+					if (ls.link.wallCoeff && wallVal !== undefined) { lines.push(affix('link', 'wallCoeff', rawLine(wallVal, null, ld.wallCoeff))); }
+				}
+			} else if (l.type === 'valve') {
+				// A VALVE PRINTS ITS DIAMETER AND NOTHING ELSE FROM THIS GROUP. Length and
+				// roughness do not exist on it, and its loss lives in a SETTING whose meaning
+				// changes with the type -- so a bare number beside a pipe's k would be read as the
+				// same quantity when it is a pressure or a flow. The setting belongs in the popup,
+				// where it is labelled, until a label toggle of its own is worth 26 translations.
+				if (ls.link.diameter) { lines.push(affix('link', 'diameter', rawLine(effective(l, 'diameter'), ex.diameter, ld.diameter))); }
+			}
+			if (lastSolveResult && !linkResultHeld(l) && lastSolveResult.flows[l.id] !== undefined) {
+				if (ls.link.flow) { lines.push(affix('link', 'flow', numLine(shownFlow(lastSolveResult.flows[l.id]), resultUnit('flow'), ex.flow, ld.flow))); }
+				// Velocity is meaningless for a pump (no diameter -- see renderLinkFields() above).
+				if (ls.link.velocity && l.type !== 'pump') { lines.push(affix('link', 'velocity', numLine(lastSolveResult.velocities[l.id], resultUnit('velocity'), ex.velocity, ld.velocity))); }
+				if (ls.link.headloss) { lines.push(affix('link', 'headloss', numLine(shownHeadloss(l, lastSolveResult.headlosses[l.id]), resultUnit('elevhead'), ex.headloss, ld.headloss), l)); }
+				// The '%' is read from the SELECT, not assumed: this family offers rise/run too, and
+				// a "%" on a ratio would be a lie rather than a redundancy. Blank in that form --
+				// there is no token for a bare ratio that is shorter than the ambiguity it fixes.
+				if (ls.link.gradient && l.type !== 'pump' && linkLengthSI(l)) { lines.push(affix('link', 'gradient', numLine(shownHeadloss(l, lastSolveResult.headlosses[l.id]) / linkLengthSI(l), resultUnit('gradient'), ex.gradient, ld.gradient, gradientSuffix()))); }
+				// rawLine(), not numLine(): linkFrictionFactor() is already a dimensionless number
+				// and running it through a unit factor would scale it by whatever the unit strip
+				// happened to be showing (Task 638).
+				var fricVal = linkFrictionFactor(l);
+				if (ls.link.friction && fricVal !== undefined) { lines.push(affix('link', 'friction', rawLine(fricVal, ex.friction, ld.friction))); }
+			}
+			// **OUTSIDE THE FLOW GUARD, for the reason colorLinkValue() gives**: a status is a fact
+			// about the link whether or not anything has been solved, and an average quality asks
+			// its own two questions rather than the flow's. A status is TEXT, like an ID -- which is
+			// why it has no entry in the decimals map and gets no spinner.
+			if (ls.link.status) { lines.push(affix('link', 'status', { text: linkStatusText(l) })); }
+			var lqVal = linkQualityValue(l);
+			if (ls.link.quality && lqVal !== undefined) { lines.push(affix('link', 'quality', rawLine(lqVal, ex.linkQuality, qualityDecimals(ld)))); }
+			// rawLine() for the third time on this block, and for the third reason: the number is
+			// already in the unit its heading names and there is no factor to run it through.
+			var lrVal = linkReactionRate(l);
+			if (ls.link.rate && lrVal !== undefined) { lines.push(affix('link', 'rate', rawLine(lrVal, ex.rate, ld.rate))); }
+			// **SHOW ORDER** (R-329), before the full list is banked: the shed cascade and the drawn
+			// label are then the one order, exactly as a node label's are.
+		return labelShowOrder('link', lines);
+	}
+
 	function refreshLabelTextPass() {
 		var ls = labelSettings, nd = ls.decimals.node, ld = ls.decimals.link,
 			// One string, computed once for the whole pass -- see the measurement comment below.
@@ -63349,60 +65583,7 @@ var EngCalcs = EngCalcs || {};
 		var nodeLines = {}, linkLines = {};
 		doc.nodes.forEach(function (n) {
 			var ne = nodeEls[n.id]; if (!ne) { return; }
-			var lines = [];
-			// Order (Tom, 2026-07-30, thinking physically): ID, Demand, Head, Pressure, Elevation --
-			// demand is the thing the user set as a design target, head/pressure are what the solve
-			// produced from it, and elevation (the input least likely to change page to page) trails.
-			if (ls.node.id) { lines.push(affix('node', 'id', { text: n.id })); }
-			// **THE TWO IDENTITY WORDS** (Tom's table, R-327), printed as the words they are and only
-			// where one is stated -- a customer's own rule (customerLabelLines()): a blank slot where
-			// a description would be reads as a defect on every node that has none.
-			if (ls.node.desc && n.desc) { lines.push(affix('node', 'desc', { text: String(n.desc) })); }
-			if (ls.node.tag && n.tag) { lines.push(affix('node', 'tag', { text: String(n.tag) })); }
-			// **DEMAND FIRST, BASE DEMAND UNDER IT.** Two quantities and two rows -- see
-			// resolvedDemand(). rawLine() for both: neither number ever crossed into SI.
-			if (!isFixedHeadNode(n) && ls.node.demandActual) { lines.push(affix('node', 'demandActual', rawLine(resolvedDemand(n), extrema.demandActual, nd.demandActual))); }
-			if (!isFixedHeadNode(n) && ls.node.demand) { lines.push(affix('node', 'demand', rawLine(baseDemandTotal(n), extrema.demand, nd.demand))); }
-			// Both are already IN Elevation/Head and Pressure units by the time they get here -- the
-			// fixed-head branch because those are declared inputs, the junction branch because the
-			// solve result is converted on the spot. rawLine() then prints what it is given, so the
-			// two halves of each field agree with the extrema computed above. A TANK's pressure is
-			// the depth of water standing in it, which is the same head-minus-elevation subtraction
-			// a reservoir makes -- see nodeFixedHead().
-			// **HEAD IS A RESULT COLUMN, so a fixed head is read in the RESULT unit too** (Task 422).
-			// A tank's or reservoir's head is DERIVED from typed numbers, so it arrives in the INPUT
-			// elevation unit and has to cross; a junction's comes from the solver in SI. Two sources,
-			// one column, and if they did not both end in the result unit the same map label would
-			// print two different quantities under one heading.
-			var headVal = isFixedHeadNode(n)
-				? fixedHeadDisplay(n)
-				: (lastSolveResult ? toDisplay(lastSolveResult.heads[n.id], resultUnit('elevhead')) : undefined);
-			var pressVal = isFixedHeadNode(n)
-				? fixedHeadPressure(n)
-				: (lastSolveResult ? toDisplay(lastSolveResult.pressures[n.id], resultUnit('pressure')) : undefined);
-			if (ls.node.head && headVal !== undefined) { lines.push(affix('node', 'head', rawLine(headVal, extrema.head, nd.head))); }
-			if (ls.node.pressure && pressVal !== undefined) { lines.push(affix('node', 'pressure', rawLine(pressVal, extrema.pressure, nd.pressure))); }
-			// An elevation nobody stated prints nothing, exactly as an unsolved pressure does -- an
-			// imported reservoir has none (Task 390) and rawLine() would have thrown on it.
-			if (ls.node.elev && typeof n.elev === 'number') { lines.push(affix('node', 'elev', rawLine(n.elev, extrema.elev, nd.elev))); }
-			// **TANK WATER DEPTH, TANK ONLY** (Task 696): a junction or reservoir has no 'level',
-			// exactly as neither has a diameter, and prints nothing rather than a stray zero. The
-			// raw effective() value, matching how elev above hands rawLine() its own raw n.elev --
-			// nodeVal.level exists only to feed extrema.level above, the same division every other
-			// field on this list keeps.
-			var levelVal = n.type === 'tank' ? effective(n, 'level') : undefined;
-			if (ls.node.level && typeof levelVal === 'number') { lines.push(affix('node', 'level', rawLine(levelVal, extrema.level, nd.level))); }
-			// **LAST, AND ONLY WHERE THERE IS ONE.** A network with the analysis off, or one that has
-			// not been run since it was switched on, prints nothing here rather than a zero -- the
-			// same rule an unsolved pressure and an unstated elevation already follow.
-			var qualVal = nodeQualityValue(n);
-			if (ls.node.quality && qualVal !== undefined) { lines.push(affix('node', 'quality', rawLine(qualVal, extrema.quality, qualityDecimals(nd)))); }
-			// **AND ONLY WHERE ONE IS TYPED.** Blank means EPANET's own zero and prints nothing:
-			// "nobody stated a starting concentration" and "the starting concentration is zero" are
-			// different facts, and printing 0.00 for the first is the same defect an unsolved
-			// pressure printed as a zero would be.
-			var initQualVal = nodeInitQuality(n);
-			if (ls.node.initQuality && initQualVal !== undefined) { lines.push(affix('node', 'initQuality', rawLine(initQualVal, extrema.initQuality, nd.initQuality))); }
+			var lines = nodeLabelFieldLines(n, ls, extrema);
 			// EMPTY IS CAPTURED BEFORE THE PLACEHOLDER BELOW: a label with no fields toggled on still gets
 			// an empty line pushed so getBBox() never throws, and everything downstream (the leader, the
 			// collision box) must know it is really empty rather than really one blank line.
@@ -63412,7 +65593,6 @@ var EngCalcs = EngCalcs || {};
 			// and before it is banked, so the shed cascade and the drawn label are the one order:
 			// keptLines() preserves relative order, so a label sheds from the bottom of what is on
 			// the screen rather than from somewhere in the middle of it.
-			lines = nodeDisplayOrder(lines);
 			// **THE FULL LIST IS KEPT BESIDE THE DRAWN ONE, exactly as a link label's is** (Task
 			// 469). The node shed cascade starts from the whole label every time; shedding down from
 			// whatever survived last pass is a ratchet, and a label that gave up a value at one
@@ -63440,65 +65620,7 @@ var EngCalcs = EngCalcs || {};
 		var linkWork = [];
 		doc.links.forEach(function (l) {
 			var le = linkEls[l.id]; if (!le) { return; }
-			var lines = [];
-			if (ls.link.id) { lines.push(affix('link', 'id', { text: l.id })); }
-			if (ls.link.desc && l.desc) { lines.push(affix('link', 'desc', { text: String(l.desc) })); }
-			if (ls.link.tag && l.tag) { lines.push(affix('link', 'tag', { text: String(l.tag) })); }
-			// **THE STATUS THE DOCUMENT STATES, BEFORE ANY RUN** (Tom's table, R-327: "Initial
-			// status"), beside the Status row below, which is the run's answer where there is one.
-			// EPANET's own pair of words for a link's starting state.
-			if (ls.link.initStatus) { lines.push(affix('link', 'initStatus', { text: linkInitialStatusText(l) })); }
-			if (l.type === 'pipe') {
-				if (ls.link.diameter) { lines.push(affix('link', 'diameter', rawLine(effective(l, 'diameter'), extrema.diameter, ld.diameter))); }
-				if (ls.link.length) { lines.push(affix('link', 'length', rawLine(effective(l, 'length'), extrema.length, ld.length))); }
-				if (ls.link.roughness) { lines.push(affix('link', 'roughness', rawLine(effective(l, 'roughness'), extrema.roughness, ld.roughness))); }
-				if (ls.link.km) { lines.push(affix('link', 'km', rawLine(pipeK(l), extrema.km, ld.km))); }
-				// **THE TWO REACTION COEFFICIENTS** (Tom's table, R-327), under the gate every other
-				// place that shows them already asks (reactionFieldsShown()): a coefficient changes
-				// nothing unless a chemical is being tracked. The one in force: the pipe's own, or the
-				// network-wide one it inherits. Typed numbers, so rawLine(), with no high/low mark.
-				if (reactionFieldsShown()) {
-					var bulkVal = linkReactionCoeff(l, 'bulkCoeff'), wallVal = linkReactionCoeff(l, 'wallCoeff');
-					if (ls.link.bulkCoeff && bulkVal !== undefined) { lines.push(affix('link', 'bulkCoeff', rawLine(bulkVal, null, ld.bulkCoeff))); }
-					if (ls.link.wallCoeff && wallVal !== undefined) { lines.push(affix('link', 'wallCoeff', rawLine(wallVal, null, ld.wallCoeff))); }
-				}
-			} else if (l.type === 'valve') {
-				// A VALVE PRINTS ITS DIAMETER AND NOTHING ELSE FROM THIS GROUP. Length and
-				// roughness do not exist on it, and its loss lives in a SETTING whose meaning
-				// changes with the type -- so a bare number beside a pipe's k would be read as the
-				// same quantity when it is a pressure or a flow. The setting belongs in the popup,
-				// where it is labelled, until a label toggle of its own is worth 26 translations.
-				if (ls.link.diameter) { lines.push(affix('link', 'diameter', rawLine(effective(l, 'diameter'), extrema.diameter, ld.diameter))); }
-			}
-			if (lastSolveResult && !linkResultHeld(l) && lastSolveResult.flows[l.id] !== undefined) {
-				if (ls.link.flow) { lines.push(affix('link', 'flow', numLine(shownFlow(lastSolveResult.flows[l.id]), resultUnit('flow'), extrema.flow, ld.flow))); }
-				// Velocity is meaningless for a pump (no diameter -- see renderLinkFields() above).
-				if (ls.link.velocity && l.type !== 'pump') { lines.push(affix('link', 'velocity', numLine(lastSolveResult.velocities[l.id], resultUnit('velocity'), extrema.velocity, ld.velocity))); }
-				if (ls.link.headloss) { lines.push(affix('link', 'headloss', numLine(shownHeadloss(l, lastSolveResult.headlosses[l.id]), resultUnit('elevhead'), extrema.headloss, ld.headloss), l)); }
-				// The '%' is read from the SELECT, not assumed: this family offers rise/run too, and
-				// a "%" on a ratio would be a lie rather than a redundancy. Blank in that form --
-				// there is no token for a bare ratio that is shorter than the ambiguity it fixes.
-				if (ls.link.gradient && l.type !== 'pump' && linkLengthSI(l)) { lines.push(affix('link', 'gradient', numLine(shownHeadloss(l, lastSolveResult.headlosses[l.id]) / linkLengthSI(l), resultUnit('gradient'), extrema.gradient, ld.gradient, gradientSuffix()))); }
-				// rawLine(), not numLine(): linkFrictionFactor() is already a dimensionless number
-				// and running it through a unit factor would scale it by whatever the unit strip
-				// happened to be showing (Task 638).
-				var fricVal = linkFrictionFactor(l);
-				if (ls.link.friction && fricVal !== undefined) { lines.push(affix('link', 'friction', rawLine(fricVal, extrema.friction, ld.friction))); }
-			}
-			// **OUTSIDE THE FLOW GUARD, for the reason colorLinkValue() gives**: a status is a fact
-			// about the link whether or not anything has been solved, and an average quality asks
-			// its own two questions rather than the flow's. A status is TEXT, like an ID -- which is
-			// why it has no entry in the decimals map and gets no spinner.
-			if (ls.link.status) { lines.push(affix('link', 'status', { text: linkStatusText(l) })); }
-			var lqVal = linkQualityValue(l);
-			if (ls.link.quality && lqVal !== undefined) { lines.push(affix('link', 'quality', rawLine(lqVal, extrema.linkQuality, qualityDecimals(ld)))); }
-			// rawLine() for the third time on this block, and for the third reason: the number is
-			// already in the unit its heading names and there is no factor to run it through.
-			var lrVal = linkReactionRate(l);
-			if (ls.link.rate && lrVal !== undefined) { lines.push(affix('link', 'rate', rawLine(lrVal, extrema.rate, ld.rate))); }
-			// **SHOW ORDER** (R-329), before the full list is banked: the shed cascade and the drawn
-			// label are then the one order, exactly as a node label's are.
-			lines = labelShowOrder('link', lines);
+			var lines = linkLabelFieldLines(l, ls, extrema);
 			le.empty = lines.length === 0;
 			if (lines.length === 0) { lines.push({ text: '' }); }
 			// **DRAW IT, MEASURE IT, AND IF IT DOES NOT FIT, DROP A VALUE AND DO IT AGAIN.** One
@@ -63760,6 +65882,7 @@ var EngCalcs = EngCalcs || {};
 		// of it is committed, and saveToStorage() already refuses a placement in progress for the
 		// same reason. Finish and Cancel both schedule a solve on the way out.
 		if (georefActive()) { return; }
+		forgetHiddenRunMessages();
 		// Autosave piggybacks on the same debounce as the solve, not a separate timer -- one
 		// mutation, one save, regardless of solve outcome (a manual delete-to-empty must persist
 		// too, or a reload would resurrect the stale pre-delete network).
@@ -63783,10 +65906,11 @@ var EngCalcs = EngCalcs || {};
 			lastSolveResult = null;
 			setStatus(((EngCalcs.pageConfig || {}).lpn_unit_unknown ||
 				'This drawing states a unit this page does not offer: {unit}. Everything is kept and shown exactly as it came in, and nothing was changed. No answers can be given until this page knows that unit, because there is no way to tell how big it is.')
-				.replace('{unit}', unknownUnits.join(', ')), 'unit-unknown');
+				.replace('{unit}', unknownUnits.join(', ')), 'unit-unknown', false, 'unit-unknown');
 			refreshLabelText();
 			return;
 		}
+		clearHiddenCond('unit-unknown');
 		var model = assembleModel();
 		// **THE EPANET FETCH STARTS HERE, BEFORE ANY OPINION ABOUT THE NETWORK IS FORMED** (Task
 		// 608). This is the one function every edit's debounce and every Calculate demand arrive at,
@@ -63794,11 +65918,12 @@ var EngCalcs = EngCalcs || {};
 		// are silent and both are cheap; the state machine makes the fetch itself once-only.
 		maybeWarmEpanetInBackground(model);
 		syncEpanetNeed(model);
+		omittedNote = omittedNoteText(model);
 		var issues = EngCalcs.lpnDiagnose(model);
 		if (issues.length > 0) {
 			lastSolveResult = null;
 			issues.forEach(function (issue) { logLpnDiag(issue.code); });
-			setStatus(issues.map(diagIssueText).join(' '), issues[0].code);
+			setStatus(issues.map(diagIssueText).join(' '), issues[0].code, true);
 			refreshLabelText();
 			return;
 		}
@@ -63840,6 +65965,24 @@ var EngCalcs = EngCalcs || {};
 	// Set by runSolve() when a network was routed to EPANET by its own contents rather than by the
 	// user's choice; read by applySolveResult(), which owns the status bar after a successful solve.
 	var valveRouteNote = '';
+	// **THE STANDING NOTE FOR NODES LEFT OUT OF THE RUN** because no path reaches a reservoir or a
+	// tank (Tom, 2026-10-09). Set by runSolve() from the model's `omitted` list, said in the status
+	// bar with the other run notes by applySolveResult() and by the extended-period run's own
+	// status writes (the seam's `status`), and gone the moment a run has nothing left out. Never a
+	// modal and never a toast: it stays true until the network changes.
+	var omittedNote = '';
+	function omittedNoteText(model) {
+		var ids = (model && model.omitted) || [];
+		if (ids.length === 0) { return ''; }
+		return ((EngCalcs.pageConfig || {}).lpn_omitted_note ||
+			'Left out of this run because no path leads from them to a reservoir or tank: {ids}')
+			.replace('{ids}', ids.join(', '));
+	}
+	// A status line with the standing note beneath it, unless it is already there.
+	function withOmittedNote(text) {
+		if (!text || !omittedNote || text.indexOf(omittedNote) >= 0) { return text; }
+		return text + ' ' + omittedNote;
+	}
 
 	// ---- Warming the EPANET engine ----
 	//
@@ -64564,7 +66707,7 @@ var EngCalcs = EngCalcs || {};
 	}
 	function refreshBoxTip(id, text) {
 		var box = document.getElementById(id), d = box && box.__lpnDock;
-		if (d && d.help && text) { EngCalcs.setTipText(d.help, text); }
+		if (d && text) { d.tipText = text; if (d.help) { EngCalcs.setTipText(d.help, text); } }
 	}
 	function buildFireFlowControls() {
 		var pc = EngCalcs.pageConfig || {},
@@ -67954,7 +70097,7 @@ var EngCalcs = EngCalcs || {};
 			// diameter that is not there.
 			if (result.issues && result.issues.length > 0) {
 				result.issues.forEach(function (issue) { logLpnDiag(issue.code); });
-				setStatus(result.issues.map(diagIssueText).join(' '), result.issues[0].code);
+				setStatus(result.issues.map(diagIssueText).join(' '), result.issues[0].code, true);
 				refreshLabelText();
 				refreshValueColors();   // Task 384: the colours came from results that no longer exist
 				refreshPaneIfOpen();    // Task 409: and so did the grade line and the result columns
@@ -67986,6 +70129,7 @@ var EngCalcs = EngCalcs || {};
 		// EPANET it is reachable through a control -- `Unbalanced: Stop` and a trials limit are
 		// both Settings rows, and neither makes the engine refuse: it hands back the last iterate.
 		var notConverged = result.converged === false;
+		captureTankSnapshot();
 		lastSolveResult = result;
 		refreshMapStatus();
 		// The only case where the two engines knowingly disagree, so say so rather than let a
@@ -68083,7 +70227,7 @@ var EngCalcs = EngCalcs || {};
 		var pdaNote = pdaShort > 0
 			? (pc.lpn_pda_deficit_note || 'Junctions receiving less than their demand: {n}.').replace('{n}', String(pdaShort))
 			: '';
-		setStatus([notConvergedNote, valveRouteNote, pdaNote,
+		setStatus([notConvergedNote, valveRouteNote, pdaNote, omittedNote,
 			droppedNote('control-dangling', 'lpn_control_dangling_note',
 				'These controls name an element that is no longer in this project, so they were left out: {ids}'),
 			droppedNote('control-unreadable', 'lpn_control_unreadable_note',
@@ -68210,7 +70354,7 @@ var EngCalcs = EngCalcs || {};
 			// Which scenarios state their own value of each, for the note under Settings > Time.
 			timeOverrides: scenarioTimeOverrides,
 			openScenarioOptions: function () { openAlternativesBox(); },
-			apply: applySolveResult, status: setStatus, notice: showSlowAdvice, solve: scheduleSolve,
+			apply: applySolveResult, status: function (t, c) { setStatus(withOmittedNote(t), c); }, notice: showSlowAdvice, solve: scheduleSolve,
 			// **AND THE UNDEBOUNCED ONE, which is what asking for a run needs** (Task 248,
 			// 2026-08-19). A period run is provoked by a deliberate act -- the Run button, or a
 			// quiet moment that has already been waited out -- and going through the 300 ms
@@ -68403,6 +70547,17 @@ var EngCalcs = EngCalcs || {};
 	// file draws it, so the dependency runs one way: lpn-time.js owns the text, looped-network.js
 	// owns the boxes, and neither reaches into the other's state.
 	EngCalcs.lpnOpenRunReportBox = function () { return openRunReportBox(); };
+	// For dev/lpn-spike/user-guide-harness.js: the strip's own record, the undo depth and the
+	// document's signature, so the harness can prove a guide row SHOWS and runs nothing.
+	EngCalcs.lpnGuideProbe = function () {
+		return {
+			toolbar: toolbarIconIndex.map(function (b) { return { el: b.el, icon: b.icon, name: b.name }; }),
+			undo: undoStack.length, sig: docSignature(), mode: mode, fold: guideFold
+		};
+	};
+	// The heads and flows on screen, for dev/lpn-spike/snap-browser-harness.js (Task 782): it asserts
+	// that a model edited by snapping still solves.
+	EngCalcs.lpnSolveProbe = function () { return lastSolveResult; };
 	// The Full report's Type column harness opens the box through this, not through the menu.
 	EngCalcs.lpnOpenFullReportBox = function () { return openFullReportBox(); };
 

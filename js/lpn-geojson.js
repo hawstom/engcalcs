@@ -228,7 +228,7 @@
 					put(p, u, 'base_demand', rows[0].rec, rows[0].key, rows[0].base || 0, uFlow);
 					// A blank pattern means the project's default pattern ([OPTIONS] Pattern), which is
 					// what EPANET applies; written resolved, so a reader does not apply none.
-					putPattern(p, 'demand_pattern', rows[0].pattern || doc.defaultPattern);
+					putPattern(p, 'demand_pattern', rows[0].pattern || (EngCalcs.lpnEffDefaultPattern ? EngCalcs.lpnEffDefaultPattern() : doc.defaultPattern));
 					// Further demand rows are the user's too; their count is stated so a reader of the
 					// table knows base_demand is not the junction's whole demand.
 					if (rows.length > 1) { p.demand_rows = rows.length; }

@@ -77,6 +77,7 @@ const L = loadLoopedNetwork(
 	"\t\t\treturn panePasteAt(s, libPasteCells(text), { append: true }); },\n" +
 	"\t\tnodeById: nodeById, linkById: linkById, customerById: customerById, labelById: labelById,\n" +
 	"\t\tsetCurves: function (c) { doc.curves = c; },\n" +
+	"\t\tsetPatterns: function (c) { doc.patterns = c; },\n" +
 	"\t\treset: function () { doc = { nodes: [], links: [], labels: [], customers: [], origin: { x: 0, y: 0 } };\n" +
 	"\t\t\tnodeEls = {}; linkEls = {}; labelEls = {}; incidentLinks = {}; labelsByAnchor = {};\n" +
 	"\t\t\tnextId = { J: 1, R: 1, T: 1, L: 1, P: 1, V: 1, X: 1, M: 1 };\n" +
@@ -183,6 +184,8 @@ console.log('\n--- every table (Text and Customers included) pastes into one new
 const sourceSaved = L.serializeProject();
 L.reset();
 L.setCurves(JSON.parse(JSON.stringify(sourceSaved.curves || [])));
+// Likewise a junction's Demand pattern is a reference to a pattern the destination must hold.
+L.setPatterns(JSON.parse(JSON.stringify(sourceSaved.patterns || [])));
 ['junctions', 'reservoirs', 'tanks', 'pipes', 'pumps', 'valves', 'customers', 'text'].forEach((tableId) => {
 	const s = sheets[tableId];
 	const res = pasteIntoEmpty(tableId, s.sheet);

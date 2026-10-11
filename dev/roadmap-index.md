@@ -7,34 +7,33 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**91 open tasks.** Next (100): 8 · Soon (75): 13 · Someday (50): 35 · Maybe (25): 16 · Parked (5): 19
+**90 open tasks.** Next (100): 7 · Soon (75): 13 · Someday (50): 35 · Maybe (25): 16 · Parked (5): 19
 
-## 100 — Next (8)
+## 100 — Next (7)
 
-- Task 539 — Gang the neighbour labels so their leaders stop crossing.
-- Task 676 — Watch the sites, and send a derived weekly report.
-- ! Task 681 — Economize the label layout: it is half the cost of a project switch.
 - Task 721 — The scenario and alternatives model: Bentley's tree, plus Presentation and Calculation.
 - Task 737 — Coined names for interface elements, so every language names each one once.
 - Task 741 — The infinite map: generated networks for the label bench.
 - ! Task 759 — One word for the map selection, another for a menu choice; tips that earn their place.
-- Task 775 — File, Convert as: what is left of the Fotobi, Ghana session.
+- Task 779 — Shape: a simple drawn element, point, polyline or polygon, with snapping.
+- ! Task 781 — Active topology first; then Change type becomes a new asset in the old one's place.
+- ! Task 782 — Snap to asset, and Match properties: the small tools that replace Change type.
 
 ## 75 — Soon (13)
 
+- Task 539 — Gang the neighbour labels so their leaders stop crossing.
 - Task 578 — Fire flow: the EPS frame and the Run concept, extracted from 530.
 - Task 617 — More map view options, the opacity one having shipped.
 - Task 623 — File loss judged only by people whose files are throwaway.
 - Task 639 — Layers: the first heading under Map and page.
+- Task 676 — Watch the sites, and send a derived weekly report.
+- ! Task 681 — Economize the label layout: it is half the cost of a project switch.
 - Task 714 — Theming: colour tokens first, then a Light/Dark choice in Settings.
 - Task 749 — Bentley interop: read and write the WaterCAD/WaterGEMS `.wtg.sqlite` file.
 - Task 752 — Google Sheets: sync the scenarios and their alternatives out and in.
 - Task 756 — Cross-platform: the suite as a desktop application, beyond the web folder.
-- Task 763 — A searchable help manual, built from the tips Tom cut.
 - Task 772 — AutoCAD: import, export, and perhaps sync, on a long-lived branch.
-- Task 776 — Copy a table with its headings; export Tables to CSV and ODS.
-- Task 777 — Station and elevation marks on the mi and wi section sketches.
-- Task 779 — Shape: a simple drawn element, point, polyline or polygon, with snapping.
+- ! Task 786 — More native SI examples, since SI is chosen twice as often as US.
 
 ## 50 — Someday (35)
 
@@ -46,7 +45,6 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 269 — Both EWB chapters answered, and Phoenix invited a talk.
 - Task 285 — We do not know what devices anybody uses this on.
 - Task 498 — A public roadmap, with epanet-js's Canny board as the worked example.
-- Task 544 — [H] · epanet-js is implicitly claiming to be EPANET, and we have now decided.
 - Task 614 — The sewer-slope cluster is the largest demand we do not convert.
 - Task 620 — [H] · A changed icon never reaches a returning visitor.
 - Task 622 — [H] · A refused terrain lookup is reported as an unreachable one.
@@ -54,7 +52,6 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 629 — [H] · GUARDED: a geographic project opening on the XY default view, in pixels.
 - Task 631 — Four things Tom hit while testing, none of them urgent.
 - Task 633 — The project tab strip, and whether it could collapse into the toolbar.
-- Task 636 — A custom properties UI, designed in a table.
 - Task 643 — The camel behind grid-to-ground: slope distance and a length adjustment.
 - Task 649 — Retire the nested repository: serve the suite by Alias at both mounts.
 - Task 667 — Tom's reflections on saving, locking and who can see your work.
@@ -73,6 +70,8 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 734 — Where space is open east or west, one label on one line.
 - Task 736 — [H] · Count installs and app launches, if the consent text allows it.
 - Task 773 — Hover shows an asset's full label, as if every field were ticked.
+- Task 784 — A small time-series graph bubble on the map, from an asset's right-click.
+- Task 785 — Rewrite the Guide's chapters to the Find and replace model.
 
 ## 25 — Maybe (16)
 
@@ -119,5 +118,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-83 of 91 titles are within 4–12 words. `!` marks the rest;
+79 of 90 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.

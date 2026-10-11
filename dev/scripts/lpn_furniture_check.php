@@ -128,10 +128,10 @@ const EC_LPN_FURNITURE = [
     'lpn_fullbox'     => 'position, size and openness of the Full report box (Task 715)',
     'lpn_dockbox'     => 'where the boxes that keep no record of their own are docked, in what order, '
         . 'and whether each docked one is open (Tom, 2026-10-07: all docks remembered)',
-    // The Notes box joined the standing-box shell on Tom's word (2026-09-28: *"Draggable non-hog
-    // box for Help, Notes."*) after being a centred, click-away-dismissed popover until then.
-    'lpn_notesbox'    => 'position, size and openness of the Notes box',
-    'lpn_hotkeysbox'  => 'position, size and openness of the Tables and Hotkeys box (Task 745)',
+    // RETIRED 2026-10-09 (the Notes moved into the Guide): nothing writes it any more; the erase-all
+    // list still sweeps an old browser's copy.
+    'lpn_notesbox'    => 'retired record of the Notes box, swept by Erase everything',
+    'lpn_hotkeysbox'  => 'position, size, openness and Contents-rail collapse of the Guide box (Task 745)',
     'lpn_contourbox'  => 'position, size and openness of the Contour plot box (Task 600)',
     // The Screenshot box (Tom, 2026-10-05). Its magnification rides here too: how sharp a picture
     // somebody pastes into their own report is not a fact about the network.
@@ -150,7 +150,15 @@ const EC_LPN_FURNITURE = [
     // lpn_show_titles above and for the same reason: whether one reader still wants an instruction
     // they have read a hundred times is a fact about that reader, and carried in the file it would
     // take the instruction away from a colleague who has never used the tool.
+    // The hover card (Task 773): whether the full-label card appears when the pointer rests on an
+    // asset. A reading aid for the person at the screen; written only when OFF.
+    'lpn_hovercard'   => 'whether the full-label hover card is shown, for this browser',
     'lpn_areahint'    => 'whether the area-selection help bubble is shown',
+    // Hidden amber messages (Tom, 2026-10-09, H09: "this should not be lost on reload."). Which
+    // messages this reader hid is a fact about the person at the screen: the open project's id and a
+    // short hash of each hidden message's words, never the words. A colleague opening the file must
+    // not inherit it.
+    'lpn_msghidden'   => 'which standing messages this reader hid (hashes, never the words), for this browser',
     // **WHICH WAY ROUND THE LAST SURVEY FILE WAS WRITTEN IS A FACT ABOUT THAT PERSON'S DATA
     // COLLECTOR, not about this network** (Task 592). It is the remembered answer to the import
     // chooser's one question -- northing first or easting first -- and a file read from it has

@@ -19,6 +19,7 @@ const PC = global.EngCalcs.pageConfig;
 const L = loadLoopedNetwork(
 	EXAMPLE_EXPORTS +
 	"\t\tgetDoc: function () { return doc; },\n" +
+	"\t\tidPrefix: function (g) { return labelPrefixFor(g, 'id'); },\n" +
 	"\t\trunSolve: runSolve, openFireFlowBox: openFireFlowBox, wireFireFlowBox: wireFireFlowBox,\n" +
 	"\t\trunFireFlowSweep: runFireFlowSweep, run: function () { return fireFlowRun; },\n" +
 	"\t\tsetAsk: function (k, v) { if (!fireFlowAsk) { fireFlowAsk = fireFlowDefaults(); } fireFlowAsk[k] = v; },\n" +
@@ -78,6 +79,9 @@ function arrowOf(th) { return kids(th).filter((c) => isTag(c, 'button'))[0]; }
 function cls(e) { return String(e.className || e['class'] || ''); }
 function press(col) { const a = arrowOf(heads(byId.lpn_ff_report)[col]); click(a); }
 function colVals(col, fn) { return rows(byId.lpn_ff_report).map((tds) => fn(tds, col)); }
+// The page prints an id as labelPrefixFor(group, 'id') + id (the shipped examples state N and L);
+// strip exactly the prefix the page applies to compare the bare id.
+function bare(group, t) { const p = L.idPrefix(group); t = String(t); return p && t.indexOf(p) === 0 ? t.slice(p.length) : t; }
 const idOrder = () => rows(byId.lpn_ff_report).map((tds) => links(tds[0])[0].textContent);
 
 (async function () {
@@ -118,7 +122,7 @@ const idOrder = () => rows(byId.lpn_ff_report).map((tds) => links(tds[0])[0].tex
 
 	console.log('\n--- the text column: Junction ---');
 	press(0);
-	const ids = idOrder().map((t) => t.replace('NODE-', ''));
+	const ids = idOrder().map((t) => bare('node', t));
 	const want = ids.slice().sort((x, y) => x.localeCompare(y, undefined, { numeric: true }));
 	ok('Junction sorts by ID, naturally', JSON.stringify(ids) === JSON.stringify(want), JSON.stringify(ids));
 	ok('...and the other column\'s arrow is no longer marked', cls(arrowOf(heads(byId.lpn_ff_report)[4])).indexOf('active') < 0);
@@ -146,7 +150,7 @@ const idOrder = () => rows(byId.lpn_ff_report).map((tds) => links(tds[0])[0].tex
 	const r0 = rows(byId.lpn_ff_report)[0];
 	const l0 = links(r0[0])[0];
 	click(l0);
-	ok('the first row\'s link goes to the junction it names', JSON.stringify(L.selectedRefs()) === JSON.stringify([{ kind: 'node', id: l0.textContent.replace(/^NODE-/, '') }]),
+	ok('the first row\'s link goes to the junction it names', JSON.stringify(L.selectedRefs()) === JSON.stringify([{ kind: 'node', id: bare('node', l0.textContent) }]),
 		l0.textContent + ' -> ' + JSON.stringify(L.selectedRefs()));
 	const clickHead = heads(byId.lpn_ff_report)[1];
 	((clickHead._listeners && clickHead._listeners.click) || []).forEach((f) => f({}));

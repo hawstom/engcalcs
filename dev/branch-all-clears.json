@@ -630,6 +630,48 @@
    "words": "feat/workspace Merge",
    "context": "Typed by Tom in the session on 2026-10-08, after his browser pass of the no-reload import ('It works now').",
    "pin_note": "Pinned to the branch head as it stood when he typed the words."
+  },
+  "feat/hover-label": {
+   "head": "31b137e53149efc247f22309ae8bae31647af398",
+   "date": "2026-10-08",
+   "words": "feat/hover-label: (1) Peripherally, change all of our EPANET examples to put N and L as label prefix for nodes and links respectively. (3) Merge.",
+   "context": "In his pasted session message of 2026-10-08 (his own message, per his global CLAUDE.md), after his browser pass. Item (1) was built first, as 31b137e5.",
+   "pin_note": "Pinned to the head that carries his item (1), the condition he set before the merge."
+  },
+  "feat/message-dismiss": {
+   "head": "26e1afc84ed56251608ac35e2c3dae071169af15",
+   "date": "2026-10-09",
+   "words": "feat/message-dismiss: merge",
+   "context": "In his pasted session message of 2026-10-09 (his own message, per his global CLAUDE.md), after answering H09-H11 on the calls page: H09 \"this should not be lost on reload\", H10 \"Give them the ×\", H11 \"Until the condition changes\".",
+   "pin_note": "Pinned to the head that carries his H09-H11 calls, applied after his word, plus one truthful edit to lpn_msglog_note that H09 made necessary."
+  },
+  "feat/user-guide": {
+   "head": "386d3e32f6af917d1782d0255856452e581bfd63",
+   "date": "2026-10-11",
+   "words": "Merge feat/user-guide",
+   "context": "Typed in the session on 2026-10-11, after his pasted browser pass the same day: \"feat/user-guide: (1) chevron is a good tree paradigm (2) Merge.\"",
+   "pin_note": "Pinned to the head he tested on the preview; merged directly into master with no further commits on the branch."
+  },
+  "feat/section-grid": {
+   "head": "005d4e638b1921c3b7afb1b4886fd0e7617e7ad5",
+   "date": "2026-10-11",
+   "words": "feat/section-grid: Merge",
+   "context": "Typed in the session on 2026-10-11, after his browser pass of the points-data copy and paste on the preview.",
+   "pin_note": "Pinned to the head served on the preview; merged directly into master with no further commits on the branch."
+  },
+  "feat/tank-volume": {
+   "head": "31985741b964ffbd1128e2ee9beab71e581b3ca3",
+   "date": "2026-10-11",
+   "words": "feat/tank-volume (Task 783): merge",
+   "context": "Typed in the session on 2026-10-11 after his browser pass on the preview; the same message asked \"Volume: Will 'Available volume' work?\", which is a follow-up rename on a fix branch, not a condition of the merge.",
+   "pin_note": "Pinned to the head served on the preview (Perry's two fixes included); merged directly with no further commits."
+  },
+  "feat/snap": {
+   "head": "e1a409184369ec18118ad1aa9994f64d2b30e6a0",
+   "date": "2026-10-11",
+   "words": "feat/snap: merge",
+   "context": "Typed in the session on 2026-10-11 after his browser pass on the preview, in the same message as the scenario delete defect he found while testing it (a junction added in Scenario 1 cannot be deleted); that defect is on master's code and goes to fix/scenario-delete, not a condition of this merge.",
+   "pin_note": "Pinned to the head served on the preview (Perry's three fixes included); merged directly with no further commits."
   }
  }
 }

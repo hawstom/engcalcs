@@ -406,7 +406,7 @@ console.log('\n--- a tip whose trigger was rebuilt away is swept from the body -
 // any route but this one.
 console.log('\n--- ...and so does every other box that carries "?" glyphs ---');
 ['closeSettingsBox', 'closeLibraryBox', 'closeFireFlowBox', 'closeFindPopup', 'closeNewBox',
-	'closeMenu', 'closeSubMenu', 'closeNotesPopup', 'closeDialog', 'closeViewPopovers',
+	'closeMenu', 'closeSubMenu', 'closeHotkeysBox', 'closeDialog', 'closeViewPopovers',
 	'closeFireFlowRunBox'].forEach((fn) => {
 	ok(/hidePanel\(/.test(extract(fn)), `${fn}() closes through the one seam that sweeps its tips`);
 });

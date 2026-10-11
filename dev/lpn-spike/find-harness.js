@@ -117,7 +117,7 @@ const L = loadLoopedNetwork(
 	"\t\tresultsBox: function () { return document.getElementById('lpn_find_results'); },\n" +
 	// The solver's OWN structural verdict, so the report can be checked against it rather than
 	// against itself.
-	"\t\tdiagnose: function () { return EngCalcs.lpnDiagnose(assembleModel()); },\n" +
+	"\t\tdiagnose: function () { return EngCalcs.lpnDiagnose(assembleModel(true)); },\n" +
 	"\t\tsetState: function (scope, prop, op, value) {\n" +
 	"\t\t\tfindState.scope = scope; findState.prop = prop; findState.op = op;\n" +
 	"\t\t\tfindState.value = value === undefined ? '' : value; findNormalize(); },\n" +
@@ -711,7 +711,7 @@ function fire(el, type) { (el._listeners[type] || []).forEach(function (f) { f({
 		lineFor('junction', 'connection', 'conn-nolinksource', '') === 'Junction.Connectivity no link path to a source',
 		JSON.stringify(L.queryText()));
 	ok('the umbrella condition names the missing OPEN PATH',
-		lineFor('junction', 'connection', 'conn-noopensource', '') === 'Junction.Connectivity no open path to a source',
+		lineFor('junction', 'connection', 'conn-noopensource', '') === PC.lpn_tool_add_junction + '.' + PC.lpn_find_prop_connection + ' ' + PC.lpn_find_op_conn_noopensource,
 		JSON.stringify(L.queryText()));
 	// An empty box with "contains" matches everything, and the quotes are what make that readable
 	// rather than a sentence that stops in the middle.

@@ -5,6 +5,15 @@
 - **Rank honestly, including against myself.** Something I found is not thereby important.
 - **State the case once and do not campaign.**
 
+## 0p. Screenshots of WaterGEMS Scenarios/Alternatives managers and the EPANET Project Defaults dialog (2026-10-11)
+Tree look (icons, expanders, current-scenario marker, right-click menu) and whether EPANET's GUI refuses a blank Default Pattern are in no page I can read. One screenshot each from anyone with the software closes them. Cost: ten minutes of Tom's or a friend's time.
+
+## 0o. Scenario manager: a real complaint source, the Alternatives Manager page, and a modeller's answer on copy vs share (2026-10-09)
+
+1. A source for user complaints: Bentley Communities and Autodesk Forums need a browser that can read them; ask Tom to paste three threads on scenarios/alternatives (search "alternative" "scenario" "inherited"), or give me one permitted fetch route.
+2. A Bentley Alternatives Manager screenshot (docs 35003.html) to confirm per-category tree and whether several Bases exist; I did not open it.
+3. A fieldwork question for a real modeller (Perry or a utility engineer): "Do you edit an alternative once and expect all scenarios using it to change?" The answer decides copy-vs-share default.
+
 ## 0m. Write to Gusnet's author first, then QGISRed; before either, test one DXF yourself (2026-10-06, Tom's three replies)
 
 Tom said he wants to collaborate with QGISRed and Giswater, and asked whether DXF attribute data works in all DWG software. Evidence is in journal 2026-10-06.

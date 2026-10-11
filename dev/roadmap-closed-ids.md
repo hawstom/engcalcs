@@ -699,3 +699,10 @@ red builds on 2026-09-15 before anybody wrote it down.
 - 0|768| CLOSED 2026-10-07 (`feat/feedback`, Tom: "Merge."): "Something wrong here?" opens a box with canned picks, optional comment and email; Send is the second click.
 - 0|771| CLOSED 2026-10-07 (`feat/survey-code`, Tom: "Merge."): survey points as a script, the Description naming an asset or a pipe vertex; JPN<point> joins a tee.
 - 0|780| CLOSED 2026-10-07 (`feat/epp`, Tom: "Do it"): Save writes `.epp`; Open reads `.epp`, `.lwn` and `.json` forever. The file's content and `format` key are unchanged; `LPN_FILE_EXT` is `.epp`, `LPN_FILE_EXT_LWN` is read-only.
+- 0|776| CLOSED 2026-10-08 (`feat/table-export`, Tom: "Merge feat/table-export"): copy a table with its headings; File > Export to ODS, XLSX or CSV, by table and scenario, with the libraries.
+- 0|777| CLOSED 2026-10-11 (`feat/section-grid`, Tom: "Merge"): station and elevation marks on the mi and wi section sketches; points data copies point rows only.
+- 0|775| CLOSED 2026-10-11 (Tom: "Wrap up"): Convert as on an empty project fixed; EPSG:3857 merged (feat/web-mercator); the old project's lost symbols were never reproduced (four paths). Reopen with the surface if seen again.
+- 0|544| CLOSED 2026-10-11 (Tom: "Wrap up"): the observation is recorded; Task 591 answered it, and dev/positioning.md stays the authority for every public claim.
+- 0|636| CLOSED 2026-10-11 (Tom: "Wrap up"): custom properties shipped (Settings > Assets table, popup editor, every place an ordinary property appears); dev/custom-property-scope.md.
+- 0|763| CLOSED 2026-10-11 (Tom: "Wrap up"): the Guide (Help > Guide) merged from feat/user-guide; Find and replace is the model chapter. Rewriting the other chapters is Task 785.
+- 0|783| CLOSED 2026-10-11 (`feat/tank-volume`, Tom: "merge"): tank Depth and Usable volume (zero at the lowest water depth) in the Tanks table, Properties, Find and the time series; Recalculate OFF keeps them as a snapshot.

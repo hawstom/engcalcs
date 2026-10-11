@@ -51,6 +51,7 @@ const L = loadLoopedNetwork(
 	"\t\tsymbolHitPx: function () { return LPN_SYMBOL_HIT_PX; },\n" +
 	"\t\tsymbolHitCoarsePx: function () { return LPN_SYMBOL_HIT_COARSE_PX; },\n" +
 	"\t\trefreshSymbolSizes: refreshSymbolSizes,\n" +
+	"\t\tgetSettings: function () { return settings; },\n" +
 	"\t\tsetScale: function (s) { state.s = s; state.tx = 0; state.ty = 0; },\n" +
 	"\t\tupdateNode: updateNode,\n" +
 	"\t\tdeleteLink: deleteLink,\n" +
@@ -76,6 +77,9 @@ function inLayer(el, layer) { return !!el && el.parentNode === layer; }
 // pump's link is a fraction of the pipe's length and the symbol is the only thing worth aiming at.
 L.seedDefaultInputs();
 L.buildLayers();
+// This scene's premise is a symbol wider than its 3-unit pump; the 2026-10-11 new-project cap
+// (0.25 x the median pipe) would shrink it below that, so pin the earlier 0.5 x 20th percentile.
+L.getSettings().symbolCapMultiple = 0.5; L.getSettings().symbolCapPercentile = 20;
 const R1 = L.addNode('reservoir', 0, 0).id;
 const J1 = L.addNode('junction', 3, 0).id;
 const J2 = L.addNode('junction', 200, 0).id;

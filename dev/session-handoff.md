@@ -99,43 +99,112 @@ lines rather than appending corrections.
   tile counts at a 900 ms settle (basemap.js now waits for a pointable tile). Pre-existing and unrelated: `scale-publish-harness.js` (2 checks). The full `node dev/browser-pass/run.js` is green (1853/1853, 2026-10-04, Task 761); browser-pass specs are not in
   check_all.
 
-## STATE — 2026-10-08 (ninth session, Arizona time)
+## STATE — 2026-10-11 (thirteenth session, Arizona time)
 
-### Master = see `git log -1 master`, pushed. Production: last confirmed pull edc78d01 (2026-10-07); confirm with the About box
+### Master: see `git log -1 origin/master`; every merge listed here passed check_all and is pushed. Production: ask; About box
 
-Merged this session: chore/wave0-apply-1008 (his Wave 0 answers; five $ec_lang_syn notes, two in his
-words, three on his "Use proposed"), chore/sprint-1008 (26 languages, 224 new and 343 resynced keys; only
-consent_body left CHANGED on purpose), fix/mnemonic-han-harness, fix/sw-precache-log (the service worker's
-first install wrote ~23 page-load rows per visit; now one), chore/protect-1008. Deleted keys: none.
+Merged 10-11 (his words in `dev/branch-all-clears.json`): feat/user-guide, feat/section-grid (777
+closed), feat/tank-volume (783 closed; column now "Available volume", his word), feat/snap (782 half),
+fix/default-pattern-shown (rename carries the default; Settings never blank while pattern 1 exists;
+"(default: 1)" on junctions; "(default)" in Libraries), fix/vertex-autosave, fix/label-export (EPANET
+[LABELS] x stable across reloads: measured at a reference scale), fix/node-size-cap (new projects 0.25 x
+median pipe; files stating no pair, i.e. every shipped example and old project, keep 0.5 / 20th). Roadmap: 539, 676,
+681 to 75; closed 775, 544, 636, 763, 777, 783; new 785 (Guide chapters), 786 (SI examples). Deleted keys:
+lpn_settings_default_pattern_implied (master); lpn_sm_hint, lpn_guide_how_alt, lpn_guide_text_alt_box
+(bentley-interop); lpn_match_selected_ask, _ask_one, lpn_mode_match_dest (match-property).
 
-### Awaiting him
+### Branches awaiting him (pushed; previews listed on the Branch previews page)
 
-- **Merge words he must TYPE in the session** (the classifier refused CC writing an all-clear from his
-  pasted 10-08 message, which said "feat/table-export: Merge." and "feat/dxf: Merge."). Pins when he types:
-  table-export at its head after master is merged in; then master into dxf, then dxf. After dxf merges:
-  customers to colour 7 on a fix branch (his F03), and record his lpn_dxf_note_blocks "Use as written"
-  in english-key-rulings.json (not done on the branch, so his pin would not lapse).
-- **Calls page** https://claude.ai/artifact/1eHT8AMCRcRhcbjtsKUzNd, same db collection `answers`; new ids
-  G01-G10, `w2-<key>` (5 strings), `v2-<key>` (3 sprint questions). The F/v/w answers of 10-08 are applied.
-- Browser pass, fix rounds done and Perry-checked where large: feat/message-dismiss (visible x),
-  feat/workspace (import applies in place, no reload; Perry's placement defect fixed, 60879c22), feat/bentley-interop
-  (auto-hide may cover the map, pinned keeps 320 px, every box), feat/user-guide (14.4 px like Settings,
-  Ctrl+K raises, focus sentence), feat/hover-label (NEW, Task 773, port 8110), feat/visit-dedupe (F01 built:
-  ec_code; Safari-safe; waits on G01-G05 and a consent_body translation round BEFORE merge), plus
-  feat/section-grid and feat/desktop from before.
-- **Seam when feat/workspace and feat/bentley-interop both merge:** `if (boxSaveHeld()) { return; }` at
-  the top of `saveAltboxLayout`; add 'lpn_altbox' and 'lpn_hovercard' to the import-site names in
-  storage_inventory_check.php if workspace export should carry them.
-- **Sprint 1008 close-out:** three English questions open (v2- on the page); `friction_check.php
-  --sprint=1008` exits 1 until answered and applied. Branch keys (six branches) join a later delta sprint,
-  with consent_body and the two consent strings first.
+- **feat/bentley-interop** (44a81de6, 8116): round 4. "?" tip = his sentence + the old footer + what a new
+  scenario does (creates no alternatives; first edit is an override in its own values). Chevrons, tree
+  keys, icons, one command list (`smCommands()`). Suite green but payload freshness. OPEN, his question: an alert that creates an alternative on a scenario's
+  first edit. Builder's estimate 2-3 days; 8 design questions in the 10-11 transcript and below. Perry
+  should-fix: greyed Rename/Make current carry no tip (only Delete does).
+- **feat/match-property** (2aeaaaf7, 8117): targets first (his "object/verb"), then Match properties, then the
+  source. Status never copied; differing values only; in a scenario, non-overridable properties are named
+  and skipped ("Not copied: Elevation. A scenario cannot hold its own value for these; change them in
+  Base."). Suite green but payload freshness. The map right-click menu is `openMapContextMenu(x, y, rows)`:
+  Task 784's "Time series graph" row is one entry.
+- **feat/shape** (2b5cf162, 8108; Task 779): Perry's A-E fixed (imported names kept, singulars, area select,
+  one undo for a mixed delete, short hint); ready for his pass. Decisions for him: no Properties / Tables /
+  Find for Shapes; one purple style; clockwise polygons reversed on GeoJSON export; DXF colour 6 shared with
+  pumps; Shapes are in no scenario (a move in Peak moves it everywhere); an older build drops Shapes silently
+  on save (a storage-version bump would make old builds refuse instead: his call).
+- **fix/scenario-delete** MERGED 10-11 (his defect on feat/snap): an asset inactive in Base and every other
+  scenario is "only in this scenario" and deleting it there deletes it ("J1 is deleted. It was part of
+  Scenario 1 only."); a Base link onto it blocks with a sentence. Edge: a Base asset unticked in Base and on
+  in one scenario now counts as scenario-only too. bentley-interop must carry `onlyInThisScenario()` through
+  alternatives (a shared topology alternative).
+- **feat/visit-dedupe** (e22c4ec9, 8119): his consent synonyms written (his words, 10-11). He said "Merge
+  unless there were questions awaiting my input" — none now. OWED before merge, his G01 call "Translate
+  first": consent_body, consent_current_granted, consent_region_label in 26 languages (Sonnet, one agent per
+  language, 20 then 6). Merge master into it first (journal conflict: union). After merge: G05, merge
+  librewaternet.org branch `visit-code-claim`. It changes what is stored on a visitor's device (he knows).
+- Unchanged: feat/desktop; label branches bench only.
+
+### Answers he is owed or questions out to him
+
+- **Alert on a scenario's first edit** (bentley): what Create means (a named alternative in the tree, or
+  inform only); Cancel reverts; "Always ask" stored where (project setting, device storage = consent talk,
+  or session only); one alert per gesture for bulk edits; name clash numbering; shared alternative; one
+  undo removes both; Base never asks.
+- **Raised tanks** (Sue, journal 10-11): Bentley's "Elevation" is GROUND, "Elevation (Base)" the tank
+  bottom. Recommended: (A) say on screen that the "pressure" at a tank is depth above its bottom; (B) an
+  optional non-hydraulic Ground elevation with "Pressure at ground", never written to .inp. Volume-curve
+  trick rejected. Not on the roadmap until he rules.
+- **SI examples** (Mary, journal 10-11; Task 786): openly licensed native-SI networks are scarce. CC BY 4.0:
+  Mini C-Town (186 junctions, best fit), L-Town (782), C-Town (388). Convert Net1/Net2 to SI ourselves (MIT).
+  KY networks: US units, CC BY-NC, evaluate only (uknowledge.uky.edu/wdst or KIOS-Research/EPANET-Benchmarks).
+- **Task 639 Layers**: he asked to re-evaluate/justify; not yet answered. CC's view: Map appearance already
+  holds opacity/sizes/colours; what is left is on/off and order, worth doing once Shapes (and contours,
+  customers) are layers; propose rescoping to that, after 779.
+- **Task 759**: only the selection word is open (Highlighted / Chosen). Ask, then close.
+- Depth (result) beside Water depth (typed): Perry thinks they will be confused; he did not answer.
+  `lpn_field_tank_minlevel_tip` could read "Lowest water depth allowed, measured up from the tank bottom."
+- **Delta translation sprint** owed on master (many new keys since 10-08), he allows one "whenever prudent".
 
 ### Next job
 
-- Read the calls page; apply; merge what he clears (merge master in first, regenerate payloads on the
-  merge, suite on the merge).
-- G01 "Translate first": 26 Sonnet agents on feat/visit-dedupe for consent_body plus the two banner strings.
-- Task 714 (theming) is the next 75 build if nothing of his is waiting.
+Run the
+visit-dedupe consent translation, then merge it. Then a delta sprint (Wave 0 first; see
+dev/translation-process.md). Then Task 786 (an SI example: convert Net1, then Mini C-Town with attribution).
+
+### Traps met 2026-10-11 (thirteenth session)
+
+- **The classifier refused an all-clear from his PASTED message again**, though his global CLAUDE.md says
+  pasted is his. He typed "Merge feat/user-guide" and it went through. Ask for the typed word at once.
+- **Two branches green alone broke one harness together** (user-guide's Find word list vs tank-volume's new
+  Find fields). The suite on the merge commit caught it; fix on a fix branch, merge, rerun.
+- **An agent's background check_all outlived its report**; CC's merge into that worktree then ran under
+  it. Before merging into an agent's worktree, `ps` for its suite and stop it.
+- **A merge left orphaned conflict markers in an agent journal** (`<<<<<<< HEAD` / `>>>>>>> theirs`
+  with no separator). grep journals for markers after any merge.
+- **Slots congest**: with four branch suites queued, master's run took ~2 h. Merge master's batches before
+  launching branch suites.
+
+### Traps met 2026-10-10 (twelfth session)
+
+- **A feature merged to master can break a branch's seam check**: split pipe walked `sc.overrides`, fine on
+  master, a defect on bentley-interop where values also live in alternatives. Run the branch suite after
+  every master merge into it.
+- **A harness that tests one message kind passes over another**: hide-on-reload passed for diagnostics while
+  Tom hid a run message. Ask which message, or test every kind.
+
+### Traps met 2026-10-09 (eleventh session)
+
+- **Merging two branches that each regenerated payloads conflicts in all 27 payloads and new-english-keys.md**:
+  take either side, then `new_english_keys.php --write --force` (both sides were generated, so --force loses
+  nothing) and regenerate payloads, all in the merge commit.
+- **The all-clear must be in master's working tree when the merge runs** (branch_gate reads the file there):
+  write it uncommitted, merge, set it aside for the suite's clean tree, then commit it on a chore branch.
+
+### Traps met 2026-10-08 (tenth session)
+
+- **A builder reported "all lpn harnesses passed" and six failed on master** after its merge (the N/L
+  example prefixes; harnesses expected bare IDs). Run the suite on the merge commit before pushing, always.
+- **`git commit --amend` on a merge commit is refused on master** (pre-commit sees a non-merge commit).
+  Put a forgotten generated file on a fix branch and merge it.
+- **`new_english_keys.php` without `--write` only prints**; check_all then fails "new english keys listed".
 
 ### Traps met 2026-10-08 (ninth session)
 

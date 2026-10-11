@@ -264,6 +264,8 @@ async function main() {
 		customer: 'C-WATR-MODL-C___-BASE' };
 	const layers1 = d1.sections.TABLES.filter(e => e.type === 'LAYER').map(e => g(e, 2));
 	Object.keys(LAY).forEach(t => ok('Net1: layer ' + LAY[t] + ' is declared', layers1.indexOf(LAY[t]) >= 0));
+	const custLayer = d1.sections.TABLES.find(e => e.type === 'LAYER' && g(e, 2) === LAY.customer);
+	ok('Net1: the customer layer is white (62 = 7; Tom, 2026-10-08)', custLayer && g(custLayer, 62).trim() === '7');
 	ok('Net1: one polyline and one WATR_PIPE block per pipe (' + linksOf('pipe').length + ')',
 		countOn(e1, 'LWPOLYLINE', LAY.pipe) === linksOf('pipe').length &&
 		e1.filter(e => e.type === 'INSERT' && e.layer === LAY.pipe && e.block === 'WATR_PIPE').length === linksOf('pipe').length);

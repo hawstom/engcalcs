@@ -271,7 +271,7 @@ console.log('\n--- moving the view is an edit, unless the app moved it ---');
 	// which is the other half of the same rule. The Map menu row is untouched and still passes
 	// zoomExtent BY REFERENCE, exactly as before.
 	ok('...and the button the user presses is NOT marked automatic, since that one is an edit',
-		/fn: zoomExtent\b/.test(code) && /extentBtn\.addEventListener\('click', function \(\) \{[\s\S]*?zoomExtent\(false\);/.test(code));
+		/fn: zoomExtent\b/.test(code) && /extentBtn\.addEventListener\('click', function \(e?\) \{[\s\S]*?zoomExtent\(false\);/.test(code));
 	ok('...with a re-baseline that only ever fires on an already-clean project',
 		/function rebaseSignatureIfClean/.test(code) && /if \(e && !e\.dirty\)/.test(code));
 }

@@ -575,7 +575,62 @@ EngCalcs.lpnDiagnose = function (model, options) {
 	}
 	if (unreachable.length > 0) { issues.push({ code: 'unreachable', ids: unreachable }); }
 
+	// NOTHING LEFT TO SOLVE AFTER THE DISCONNECTED NODES WERE LEFT OUT (lpnOmitDisconnected below)
+	// is the one case where leaving them out may not stand in for refusing: the answer would be a
+	// bare reservoir. Say what the old refusal said, about the nodes that were left out.
+	if (model.omitted && model.omitted.length > 0 && model.links.length === 0) {
+		issues.push({ code: 'unreachable', ids: model.omitted.slice() });
+	}
+
 	return issues;
+};
+
+// **A NODE WITH NO PATH TO A FIXED HEAD IS LEFT OUT OF THE RUN, NOT REFUSED** (Tom, 2026-10-09,
+// after an Engineers Without Borders meeting: *"Do we have the power to relax this and to simply
+// neglect disconnected junctions?"*). Every such node, and every link that touches one, is removed
+// from the MODEL, exactly as if it were inactive for this run. The document is never touched, so
+// nothing is marked inactive and an .inp export still writes the network as stored. A path runs
+// through links that are not closed, the same walk lpnDiagnose() makes, and a pump the clock
+// closes counts by its own status (`statusBase`), because being off at an instant is not being cut
+// off. `model.omitted` carries the ids for the standing note. With no fixed head at all nothing is
+// removed: that is lpnDiagnose()'s no-fixed-head, and every node would be "disconnected" from it,
+// which is true and useless. Run it BEFORE lpnDiagnose, in one place, so both engines and the
+// extended-period run read the same model.
+EngCalcs.lpnOmitDisconnected = function (model) {
+	'use strict';
+	var byId = {}, adj = {}, seen = {}, queue = [], omitted = [], i, id, link, st, keep;
+	model.omitted = [];
+	for (i = 0; i < model.nodes.length; i++) {
+		byId[model.nodes[i].id] = model.nodes[i];
+		adj[model.nodes[i].id] = [];
+		if (EngCalcs.lpnIsFixedHead(model.nodes[i])) { queue.push(model.nodes[i].id); seen[model.nodes[i].id] = true; }
+	}
+	if (queue.length === 0) { return model; }
+	for (i = 0; i < model.links.length; i++) {
+		link = model.links[i];
+		st = Object.prototype.hasOwnProperty.call(link, 'statusBase') ? link.statusBase : link.status;
+		if (st === 'closed' || !byId[link.from] || !byId[link.to]) { continue; }
+		adj[link.from].push(link.to);
+		adj[link.to].push(link.from);
+	}
+	for (i = 0; i < queue.length; i++) {
+		id = queue[i];
+		adj[id].forEach(function (nb) { if (!seen[nb]) { seen[nb] = true; queue.push(nb); } });
+	}
+	for (i = 0; i < model.nodes.length; i++) {
+		if (!seen[model.nodes[i].id]) { omitted.push(model.nodes[i].id); }
+	}
+	if (omitted.length === 0) { return model; }
+	keep = {};
+	model.nodes.forEach(function (n) { if (seen[n.id]) { keep[n.id] = true; } });
+	model.nodes = model.nodes.filter(function (n) { return keep[n.id]; });
+	// A link whose end is a node that was never in the model stays: that is a dangling-link,
+	// which lpnDiagnose() reports by name.
+	model.links = model.links.filter(function (l) {
+		return !((byId[l.from] && !keep[l.from]) || (byId[l.to] && !keep[l.to]));
+	});
+	model.omitted = omitted;
+	return model;
 };
 
 // Solves the network. Returns

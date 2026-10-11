@@ -13,6 +13,7 @@
 # 405 from the lock. Refusing is the healthy answer; a 200 here would be the bug.
 ^https://[^/]+/engcalcs/log-[a-z-]+\.php$
 ^https://[^/]+/engcalcs/lpn-lock\.php$
+^https://[^/]+/engcalcs/send-feedback\.php$
 
 # Serves HTTP 503 on purpose: that is what a maintenance page is for.
 ^https://[^/]+/maintenance\.php$
