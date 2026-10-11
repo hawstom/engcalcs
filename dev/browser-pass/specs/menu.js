@@ -61,39 +61,25 @@ exports.run = async function ({ browser, report }) {
 			'New project… opens the New-project box, not a fly-out',
 			'Task 477 retired the fly-out: four questions in one box, not four rows');
 
-		// **HELP > "WHAT THE TOOLBAR ICONS MEAN" ACTUALLY OPENS SOMETHING** (Tom, 2026-08-18: it
-		// "does nothing"). It called openMenu() at level 0 on the Help button — the anchor the menu
-		// it was clicked in was already open on — so the same-anchor toggle branch fired and closed
-		// the menu instead of listing anything. A browser check because the bug was invisible to
-		// every static one: the row existed, its handler existed, and the handler ran.
-		//
-		// **THE ROW IS FOUND BY KEY.** It was matched on `/icon/i` against the row's own English
-		// until 2026-09-09, when `lpn_help_icons` became plain 'Toolbar' — a word with no "icon" in
-		// it — and all four checks below went red on a rename that broke nothing. A regex over
-		// visitor English is a pinned literal wearing a disguise, and it is the shape
-		// dev/session-handoff.md §4 records.
-		const ICONS = await a.lang('lpn_help_icons');
+		// **HELP > USER GUIDE OPENS THE GUIDE** (Tom, 2026-10-06). It replaced the "Toolbar" fly-out,
+		// whose rows looked like commands and did nothing, and the "Tables and Hotkeys" row. Found by
+		// KEY, never by a regex over visitor English (dev/session-handoff.md section 4).
+		const GUIDE = await a.lang('lpn_help_manual');
 		const help = await a.menuRows('help');
-		const iconsRow = help.find(r => r.label === ICONS);
-		report.ok(!!iconsRow, 'Help carries the toolbar-icon guide', help.map(r => r.label).join(' | '));
-		report.ok(iconsRow && iconsRow.submenu, '...as a fly-out row, which is what makes it openable');
-		await a.openMenu('help');
-		await a.page.evaluate((label) => {
-			const row = [...document.querySelectorAll('#lpn_menu_list button.lpn-menu-row')]
-				.find(b => b.textContent.replace('▸', '').trim() === label);
-			if (row) { row.click(); }
-		}, ICONS);
-		await a.settle(400);
+		const guideRow = help.find(r => r.label === GUIDE);
+		report.ok(!!guideRow, 'Help carries the User guide', help.map(r => r.label).join(' | '));
+		report.ok(guideRow && !guideRow.submenu, '...as a command row that opens a box, not a fly-out');
+		await a.menuClick(GUIDE, 'help');
+		await a.settle(300);
 		const guide = await a.page.evaluate(() => ({
-			open: document.getElementById('lpn_menu_popup2').style.display === 'block',
-			rows: document.querySelectorAll('#lpn_menu_list2 button.lpn-menu-row').length,
-			parentStillOpen: document.getElementById('lpn_menu_popup').style.display === 'block'
+			open: document.getElementById('lpn_hotkeys_popup').style.display === 'flex',
+			rows: document.querySelectorAll('#lpn_guide_toolbar > .lpn-guide-row').length,
+			menuClosed: document.getElementById('lpn_menu_popup').style.display !== 'block'
 		}));
-		report.ok(guide.open, 'clicking it opens the guide instead of closing the menu');
-		report.ok(guide.rows >= 8, '...with one row per toolbar button, derived from the strip itself',
-			String(guide.rows));
-		report.ok(guide.parentStillOpen, '...beside the Help menu, which stays up as a fly-out should');
-		await a.closeMenu();
+		report.ok(guide.open, 'clicking it opens the User guide');
+		report.ok(guide.rows >= 8, '...with one row per toolbar button, derived from the strip itself', String(guide.rows));
+		report.ok(guide.menuClosed, '...and the Help menu closes behind it, as a command row should');
+		await a.page.evaluate(() => document.getElementById('lpn_hotkeys_close').dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 })));
 
 		// Nothing is written behind your back. The punch list asks for a two-minute wait; the same
 		// fact is provable in a second by checking that no file exists at all after an edit.

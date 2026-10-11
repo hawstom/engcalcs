@@ -1853,15 +1853,9 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 		<h2 class="lpn-about-name"><img class="lpn-about-mark" src="/engcalcs/icons/favicon.svg" alt="" width="24" height="24" /><a href="<?=htmlspecialchars(ecAppSiteUrl(), ENT_QUOTES, 'UTF-8')?>" target="_blank" rel="noopener"><?=htmlspecialchars(ecAppBrandName(), ENT_QUOTES, 'UTF-8')?></a></h2>
 		<p class="lpn-about-dedication" lang="en"><a href="https://tomsthird.blogspot.com/2026/10/why-engineering-calculator-needs-to.html" target="_blank" rel="noopener">You are loved and cherished forever, you have nothing to fear, and you are not ruining everything.</a></p>
 		<p><?=$ec_lang['lpn_about_license']?><br />Copyright &copy; 2009&ndash;2026 Thomas Gail Haws</p>
-<?php   // HOW IT IS SOLVED and WHAT IT DOES NOT DO live here, not in the Notes box (Tom,
-        // 2026-10-06: "Move 'How it is solved' and 'What it does not do' into the About rewrite,
-        // as Ida's wish list proposes"). They are statements of what the application is, which is
-        // About's genre; the Notes box keeps task-context advisories. Keys kept as lpn_notes_1/2
-        // so the translations carry. ?>
-		<dl class="lpn-about-scope" id="lpn_about_scope">
-			<dt><?=$ec_lang['lpn_notes_1_term']?></dt><dd><?=$ec_lang['lpn_notes_1_def']?></dd>
-			<dt><?=$ec_lang['lpn_notes_2_term']?></dt><dd><?=$ec_lang['lpn_notes_2_def']?></dd>
-		</dl>
+<?php   // How it is solved and What it does not do, and the page notes, are in the Guide (Tom,
+        // 2026-10-09: *"It's not conventional to include notes in Help, About."*); About keeps the
+        // conventional content: name, licence, credits, build. ?>
 <?php   // Credits, which an About box conventionally carries (MAH's own observation) and which
         // this one can finally honour: credits.html is the About-EPANET page that survived
         // not-epanet.org, and naming what this is built on belongs here.
@@ -1881,19 +1875,88 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 <?php   endif; ?>
 	</div>
 </div>
-<?php // **A NON-HOGGING BOX, LIKE SETTINGS, FIND AND THE FOUR REPORT BOXES** (Tom, 2026-09-28: *"I
-      // need it open for my spreadsheet editing video."*). It used to be a centred, modal-feeling
-      // popover that a click anywhere away from it would close (VIEW_POPOVERS in
-      // js/looped-network.js) -- fine for a column of prose read once, wrong for a box Tom wants
-      // to leave open while he works the Tables pane on camera. It now borrows the Settings box's
-      // whole shell (`.lpn-setbox` for the drag band, the resize grabber and the viewport caps),
-      // is wired through wireBoxMemory() like the report boxes, and is no longer in VIEW_POPOVERS:
-      // nothing closes it but its own × or an Escape pressed while focus is inside it. ?>
-<div id="lpn_notes_popup" class="d-print-none lpn-popover lpn-setbox lpn-notesbox" style="display:none;position:fixed;background:var(--ec-bg);border:1px solid var(--ec-ink);padding:40px 8px 8px;box-shadow:2px 2px 6px var(--ec-a-0-0-0-3)" role="dialog" aria-labelledby="lpn_notes_title">
-	<div id="lpn_notes_title" class="lpn-setbox-title"><?=$ec_lang['lpn_help_notes']?></div>
-	<button type="button" id="lpn_notes_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
-	<div class="lpn-popover-body lpn-setbox-body">
-<h2><?=$ec_lang['ws_notes_heading']?></h2>
+<?php // ---- THE USER GUIDE (Tom, 2026-10-06; Ida's design; was the Tables and Hotkeys box, Task 745) ----
+      //
+      // ONE BOX where Help > "Tables and Hotkeys" and the Help > "Toolbar" fly-out stood. Four
+      // sections under one search: Toolbar and Menus are DERIVED at runtime by renderGuide() in
+      // js/looped-network.js from the strip and the menu rows themselves, so they cannot drift;
+      // Map and Tables stay real PHP-rendered markup, as the Notes list is, so a search engine,
+      // print and Find-in-page still see them. lpn_notes_6/7 moved here from Notes (Task 745) and
+      // were not duplicated.
+      //
+      // **SAME SHELL AS NOTES** (.lpn-setbox / .lpn-notesbox), wired by wireHotkeysBox(): draggable,
+      // resizable, remembered per browser as `lpn_hotkeysbox` (the key it always had; nothing new is
+      // stored), dismissed only by its own X or an Escape pressed while focus is inside it. ?>
+<div id="lpn_hotkeys_popup" class="d-print-none lpn-popover lpn-setbox lpn-notesbox lpn-guidebox" style="display:none;position:fixed;background:var(--ec-bg);border:1px solid var(--ec-ink);padding:40px 8px 8px;box-shadow:2px 2px 6px var(--ec-a-0-0-0-3)" role="dialog" aria-labelledby="lpn_hotkeys_title">
+	<div id="lpn_hotkeys_title" class="lpn-setbox-title"><?=$ec_lang['lpn_help_manual']?></div>
+	<button type="button" id="lpn_hotkeys_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
+	<div class="lpn-popover-body lpn-setbox-body lpn-guide-body">
+<div id="lpn_guide_panes" class="lpn-guide-panes">
+<aside id="lpn_guide_rail" class="lpn-guide-rail" aria-label="<?=htmlspecialchars($ec_lang['lpn_guide_contents'])?>">
+	<div class="lpn-guide-railhead">
+		<button type="button" id="lpn_guide_railtoggle" class="lpn-guide-railtoggle" aria-expanded="true" aria-controls="lpn_guide_railbody" title="<?=htmlspecialchars($ec_lang['lpn_guide_rail_hide'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_guide_rail_hide'])?>"><svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M10 3 5 8l5 5" fill="none" stroke="currentColor" stroke-width="1.8"/></svg></button>
+		<span class="lpn-guide-railtitle"><?=$ec_lang['lpn_guide_contents']?></span>
+	</div>
+	<div id="lpn_guide_railbody" class="lpn-guide-railbody">
+		<input type="search" id="lpn_guide_search" autocomplete="off" placeholder="<?=htmlspecialchars($ec_lang['lpn_guide_search'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_guide_search'])?>">
+		<nav id="lpn_guide_nav" class="lpn-guide-nav" aria-label="<?=htmlspecialchars($ec_lang['lpn_guide_contents'])?>"></nav>
+	</div>
+</aside>
+<div id="lpn_guide_content" class="lpn-guide-content">
+<p id="lpn_guide_none" class="lpn-guide-none" hidden><?=$ec_lang['lpn_find_none']?></p>
+<?php // **USING THE GUIDE COMES FIRST** (Tom, 2026-10-07: *"Shouldn't 'Using the guide' be first?"*). ?>
+<section class="lpn-guide-section" data-guide-section="using">
+<h2><?=$ec_lang['lpn_guide_using_heading']?></h2>
+<dl>
+	<dt><?=$ec_lang['lpn_guide_keys_term']?></dt><dd><?=$ec_lang['lpn_guide_keys_def']?></dd>
+</dl>
+</section>
+<section class="lpn-guide-section" data-guide-section="toolbar">
+<h2><?=$ec_lang['lpn_help_icons']?></h2>
+<p id="lpn_guide_dimnote" class="lpn-guide-prose" hidden><?=$ec_lang['lpn_guide_dimmed']?></p>
+<div id="lpn_guide_toolbar" class="lpn-guide-list"></div>
+</section>
+<section class="lpn-guide-section" data-guide-section="menus">
+<h2><?=$ec_lang['lpn_hotkeys_menu_heading']?></h2>
+<dl>
+	<dt><?=$ec_lang['lpn_hotkeys_menu_term']?></dt><dd><?=$ec_lang['lpn_hotkeys_menu_def']?></dd>
+</dl>
+<div id="lpn_guide_menus" class="lpn-guide-list"></div>
+</section>
+<section class="lpn-guide-section" data-guide-section="map">
+<h2><?=$ec_lang['lpn_hotkeys_map_heading']?></h2>
+<dl>
+	<dt class="lpn-guide-dup"><?=$ec_lang['lpn_hotkeys_map_term']?></dt><dd><?=str_replace('</tbody></table>', '<tr><td>W</td><td>' . $ec_lang['lpn_hotkeys_zoomwin_def'] . '</td></tr></tbody></table>', $ec_lang['lpn_hotkeys_map_def'])?></dd>
+</dl>
+</section>
+<section class="lpn-guide-section" data-guide-section="snip">
+<h2><?=$ec_lang['lpn_hotkeys_snip_heading']?></h2>
+<dl>
+	<dt class="lpn-guide-dup"><?=$ec_lang['lpn_hotkeys_snip_term']?></dt><dd><?=$ec_lang['lpn_hotkeys_snip_def']?></dd>
+</dl>
+</section>
+<section class="lpn-guide-section" data-guide-section="tables">
+<h2><?=$ec_lang['lpn_hotkeys_tables_heading']?></h2>
+<dl>
+	<dt><?=$ec_lang['lpn_notes_6_term']?></dt><dd><?=$ec_lang['lpn_notes_6_def']?></dd>
+	<dt><?=$ec_lang['lpn_notes_7_term']?></dt><dd><?=$ec_lang['lpn_notes_7_def']?></dd>
+</dl>
+</section>
+<section class="lpn-guide-section" data-guide-section="boxes">
+<h2><?=$ec_lang['lpn_guide_boxes_heading']?></h2>
+<p class="lpn-guide-prose"><?=$ec_lang['lpn_guide_boxes_intro']?></p>
+<p class="lpn-guide-prose"><?=$ec_lang['lpn_guide_boxes_autohide']?></p>
+<div id="lpn_guide_boxes" class="lpn-guide-list"></div>
+</section>
+<section class="lpn-guide-section" data-guide-section="about">
+<h2><?=$ec_lang['lpn_guide_about_heading']?></h2>
+<dl>
+	<dt><?=$ec_lang['lpn_notes_1_term']?></dt><dd><?=$ec_lang['lpn_notes_1_def']?></dd>
+	<dt><?=$ec_lang['lpn_notes_2_term']?></dt><dd><?=$ec_lang['lpn_notes_2_def']?></dd>
+</dl>
+</section>
+<section class="lpn-guide-section" data-guide-section="notes">
+<h2><?=$ec_lang['lpn_help_notes']?></h2>
 <dl>
 	<dt><?=$ec_lang['lpn_notes_3_term']?></dt><dd><?=$ec_lang['lpn_notes_3_def']?></dd>
 	<dt><?=$ec_lang['lpn_notes_5_term']?></dt><dd><?=$ec_lang['lpn_notes_5_def']?></dd>
@@ -1901,47 +1964,19 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 	<dt><?=$ec_lang['lpn_notes_epanet_term']?></dt><dd><?=$ec_lang['lpn_notes_epanet_def']?></dd>
 	<dt><?=$ec_lang['lpn_notes_engine_term']?></dt><dd><?=$ec_lang['lpn_notes_engine_def']?></dd>
 </dl>
-	</div>
+</section>
+<?php // The Find and replace chapter beyond its opening paragraphs (lpn_guide_text_find_popup):
+      // renderGuideBoxes() copies this template into the box's entry. Tom, 2026-10-07: *"The Find
+      // and Replace chapter says nothing about our query language (!!!)"*. ?>
+<template id="lpn_guide_more_lpn_find_popup"><dl>
+	<dt><?=$ec_lang['lpn_guide_find_query_term']?></dt><dd><?=$ec_lang['lpn_guide_find_query_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_find_examples_term']?></dt><dd><?=$ec_lang['lpn_guide_find_examples_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_find_results_term']?></dt><dd><?=$ec_lang['lpn_guide_find_results_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_find_replace_term']?></dt><dd><?=$ec_lang['lpn_guide_find_replace_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_find_notes_term']?></dt><dd><?=$ec_lang['lpn_guide_find_notes_def']?></dd>
+</dl></template>
 </div>
-
-<?php // ---- THE TABLES AND HOTKEYS BOX (ROADMAP Task 745) -------------------------------------------
-      //
-      // **MOVED HERE RATHER THAN DUPLICATED.** lpn_notes_6 (table columns help) and lpn_notes_7
-      // (table keyboard shortcuts) used to sit in the Notes list above; Tom, 2026-09-29, asked for
-      // one box gathering ALL table help and ALL keyboard shortcuts, divided by context, so they
-      // moved out of Notes rather than being shown twice. Neither key was deleted -- both still
-      // render here, and both are still real PHP-rendered markup, for the same reason the Notes
-      // list itself is: a search engine, print, and Find-in-page must still be able to see them.
-      //
-      // **Map is new content.** The digit tool keys, Undo and the zoom keys had tips of their own
-      // (toolTipWithKey(), lpn_zoom_in_tip, lpn_zoom_out_tip) but had never been gathered into one
-      // place a reader could scan. lpn_hotkeys_map_def states them once, in the same
-      // key-then-action table shape as lpn_notes_7_def.
-      //
-      // **SAME SHELL AS NOTES** (.lpn-setbox / .lpn-notesbox), wired by wireHotkeysBox() in
-      // js/looped-network.js: draggable, resizable, remembered per browser as `lpn_hotkeysbox`,
-      // dismissed only by its own X or an Escape pressed while focus is inside it. ?>
-<div id="lpn_hotkeys_popup" class="d-print-none lpn-popover lpn-setbox lpn-notesbox" style="display:none;position:fixed;background:var(--ec-bg);border:1px solid var(--ec-ink);padding:40px 8px 8px;box-shadow:2px 2px 6px var(--ec-a-0-0-0-3)" role="dialog" aria-labelledby="lpn_hotkeys_title">
-	<div id="lpn_hotkeys_title" class="lpn-setbox-title"><?=$ec_lang['lpn_help_hotkeys']?></div>
-	<button type="button" id="lpn_hotkeys_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
-	<div class="lpn-popover-body lpn-setbox-body">
-<h2><?=$ec_lang['lpn_hotkeys_tables_heading']?></h2>
-<dl>
-	<dt><?=$ec_lang['lpn_notes_6_term']?></dt><dd><?=$ec_lang['lpn_notes_6_def']?></dd>
-	<dt><?=$ec_lang['lpn_notes_7_term']?></dt><dd><?=$ec_lang['lpn_notes_7_def']?></dd>
-</dl>
-<h2><?=$ec_lang['lpn_hotkeys_map_heading']?></h2>
-<dl>
-	<dt><?=$ec_lang['lpn_hotkeys_map_term']?></dt><dd><?=str_replace('</tbody></table>', '<tr><td>W</td><td>' . $ec_lang['lpn_hotkeys_zoomwin_def'] . '</td></tr></tbody></table>', $ec_lang['lpn_hotkeys_map_def'])?></dd>
-</dl>
-<h2><?=$ec_lang['lpn_hotkeys_menu_heading']?></h2>
-<dl>
-	<dt><?=$ec_lang['lpn_hotkeys_menu_term']?></dt><dd><?=$ec_lang['lpn_hotkeys_menu_def']?></dd>
-</dl>
-<h2><?=$ec_lang['lpn_hotkeys_snip_heading']?></h2>
-<dl>
-	<dt><?=$ec_lang['lpn_hotkeys_snip_term']?></dt><dd><?=$ec_lang['lpn_hotkeys_snip_def']?></dd>
-</dl>
+</div>
 	</div>
 </div>
 
@@ -2576,8 +2611,136 @@ EngCalcs.pageConfig = {
 	lpn_field_speed_pattern: <?=json_encode($ec_lang['lpn_field_speed_pattern'])?>,
 	lpn_field_speed_pattern_tip: <?=json_encode($ec_lang['lpn_field_speed_pattern_tip'])?>,
 	lpn_help_fix: <?=json_encode($ec_lang['lpn_help_fix'])?>,
-	lpn_help_notes: <?=json_encode($ec_lang['lpn_help_notes'])?>,
-	lpn_help_hotkeys: <?=json_encode($ec_lang['lpn_help_hotkeys'])?>,
+	lpn_help_manual: <?=json_encode($ec_lang['lpn_help_manual'])?>,
+	lpn_guide_also: <?=json_encode($ec_lang['lpn_guide_also'])?>,
+	lpn_guide_how_popup: <?=json_encode($ec_lang['lpn_guide_how_popup'])?>,
+	lpn_guide_how_alt: <?=json_encode($ec_lang['lpn_guide_how_alt'])?>,
+	lpn_guide_not_shown: <?=json_encode($ec_lang['lpn_guide_not_shown'])?>,
+	lpn_guide_box_help: <?=json_encode($ec_lang['lpn_guide_box_help'])?>,
+	lpn_guide_contents: <?=json_encode($ec_lang['lpn_guide_contents'])?>,
+	lpn_guide_menu_named: <?=json_encode($ec_lang['lpn_guide_menu_named'])?>,
+	lpn_guide_group_from: <?=json_encode($ec_lang['lpn_guide_group_from'])?>,
+	lpn_guide_box_named: <?=json_encode($ec_lang['lpn_guide_box_named'])?>,
+	lpn_guide_text_popup: <?=json_encode($ec_lang['lpn_guide_text_popup'])?>,
+	lpn_guide_text_find_popup: <?=json_encode($ec_lang['lpn_guide_text_find_popup'])?>,
+	lpn_guide_text_settings_box: <?=json_encode($ec_lang['lpn_guide_text_settings_box'])?>,
+	lpn_guide_text_library_box: <?=json_encode($ec_lang['lpn_guide_text_library_box'])?>,
+	lpn_guide_text_energy_box: <?=json_encode($ec_lang['lpn_guide_text_energy_box'])?>,
+	lpn_guide_text_contour_box: <?=json_encode($ec_lang['lpn_guide_text_contour_box'])?>,
+	lpn_guide_text_scncmp_box: <?=json_encode($ec_lang['lpn_guide_text_scncmp_box'])?>,
+	lpn_guide_text_rptbox: <?=json_encode($ec_lang['lpn_guide_text_rptbox'])?>,
+	lpn_guide_text_status_box: <?=json_encode($ec_lang['lpn_guide_text_status_box'])?>,
+	lpn_guide_text_alt_box: <?=json_encode($ec_lang['lpn_guide_text_alt_box'])?>,
+	lpn_guide_text_full_box: <?=json_encode($ec_lang['lpn_guide_text_full_box'])?>,
+	lpn_guide_text_calib_box: <?=json_encode($ec_lang['lpn_guide_text_calib_box'])?>,
+	lpn_guide_text_notes_popup: <?=json_encode($ec_lang['lpn_guide_text_notes_popup'])?>,
+	lpn_guide_text_hotkeys_popup: <?=json_encode($ec_lang['lpn_guide_text_hotkeys_popup'])?>,
+	lpn_guide_rail_hide: <?=json_encode($ec_lang['lpn_guide_rail_hide'])?>,
+	lpn_guide_rail_show: <?=json_encode($ec_lang['lpn_guide_rail_show'])?>,
+	<?php // **THE FIND QUERY'S WORDS IN ENGLISH, ON EVERY PAGE** (Perry's review, 2026-10-07): the
+	      // parser accepts the English word for every scope, property and condition beside the
+	      // translated one, so a query copied from the Guide or a colleague runs in any language.
+	      // findEnglishDefs() reads these. The list is every key the Find word lists read
+	      // (findPropDefs() and the label functions it calls); user-guide-find-harness.js holds it
+	      // to the code, so a new property key that is missing here fails there. ?>
+	findEnglishWords: <?=json_encode(ecEnglishStrings(array(
+		'bpn_demand',
+		'lpn_energy_price',
+		'lpn_energy_price_pattern',
+		'lpn_ff_required',
+		'lpn_field_base_demand',
+		'lpn_field_closed',
+		'lpn_field_desc',
+		'lpn_field_diameter',
+		'lpn_field_easting',
+		'lpn_field_easting_abbr',
+		'lpn_field_elev',
+		'lpn_field_emitter',
+		'lpn_field_id',
+		'lpn_field_km_short',
+		'lpn_field_lat',
+		'lpn_field_length',
+		'lpn_field_lon',
+		'lpn_field_meter_count',
+		'lpn_field_meter_demand',
+		'lpn_field_meter_lumped',
+		'lpn_field_meter_offset',
+		'lpn_field_meter_pipe',
+		'lpn_field_meter_station',
+		'lpn_field_meter_total',
+		'lpn_field_northing',
+		'lpn_field_northing_abbr',
+		'lpn_field_pump_speed',
+		'lpn_field_roughness',
+		'lpn_field_tag',
+		'lpn_field_tank_diameter',
+		'lpn_field_tank_level',
+		'lpn_field_tank_maxlevel',
+		'lpn_field_tank_minlevel',
+		'lpn_field_text_all_zoom',
+		'lpn_field_text_size',
+		'lpn_field_x',
+		'lpn_field_y',
+		'lpn_find_op_bottom',
+		'lpn_find_op_conn_nolinksource',
+		'lpn_find_op_conn_noopen',
+		'lpn_find_op_conn_noopensource',
+		'lpn_find_op_conn_unlinked',
+		'lpn_find_op_contains',
+		'lpn_find_op_empty',
+		'lpn_find_op_equals',
+		'lpn_find_op_gt',
+		'lpn_find_op_lt',
+		'lpn_find_op_top',
+		'lpn_find_prop_connection',
+		'lpn_find_prop_demand_desc',
+		'lpn_find_q_and',
+		'lpn_find_q_or',
+		'lpn_find_scope_all',
+		'lpn_find_scope_source',
+		'lpn_mixing_2comp',
+		'lpn_mixing_fifo',
+		'lpn_mixing_fraction',
+		'lpn_mixing_lifo',
+		'lpn_mixing_mixed',
+		'lpn_mixing_model',
+		'lpn_quality_initial',
+		'lpn_quality_named_avg_concentration',
+		'lpn_quality_named_concentration',
+		'lpn_reaction_bulk',
+		'lpn_reaction_wall',
+		'lpn_result_avg_concentration',
+		'lpn_result_avg_source_share',
+		'lpn_result_avg_water_age',
+		'lpn_result_concentration',
+		'lpn_result_flow',
+		'lpn_result_gradient',
+		'lpn_result_head',
+		'lpn_result_headloss',
+		'lpn_result_pressure',
+		'lpn_result_pump_head',
+		'lpn_result_source_share',
+		'lpn_result_status_closed',
+		'lpn_result_status_open',
+		'lpn_result_velocity',
+		'lpn_result_water_age',
+		'lpn_source_pattern',
+		'lpn_source_quality',
+		'lpn_source_type',
+		'lpn_source_type_concen',
+		'lpn_source_type_flowpaced',
+		'lpn_source_type_mass',
+		'lpn_source_type_none',
+		'lpn_source_type_setpoint',
+		'lpn_tool_add_junction',
+		'lpn_tool_add_meter',
+		'lpn_tool_add_pipe',
+		'lpn_tool_add_pump',
+		'lpn_tool_add_reservoir',
+		'lpn_tool_add_tank',
+		'lpn_tool_add_text',
+		'lpn_tool_add_valve'
+	)), JSON_UNESCAPED_UNICODE)?>,
 <?php   // The suite's existing legal-link strings, needed here because this page's Help menu and
         // examples gallery carry them instead of a footer. Reused, never re-keyed: the wording must
         // match the identical links on every other page. ?>
@@ -3050,7 +3213,6 @@ EngCalcs.pageConfig = {
 	lpn_zoom_in_tip: <?=json_encode($ec_lang['lpn_zoom_in_tip'])?>,
 	lpn_zoom_out_tip: <?=json_encode($ec_lang['lpn_zoom_out_tip'])?>,
 	lpn_find_menu_tip: <?=json_encode($ec_lang['lpn_find_menu_tip'])?>,
-	lpn_help_icons: <?=json_encode($ec_lang['lpn_help_icons'])?>,
 	lpn_pane_right_toggle: <?=json_encode($ec_lang['lpn_pane_right_toggle'])?>,
 	lpn_color_legend_open_tip: <?=json_encode($ec_lang['lpn_color_legend_open_tip'])?>,
 	lpn_color_node_field: <?=json_encode($ec_lang['lpn_color_node_field'])?>,

@@ -49,18 +49,19 @@ function fnBody(source, fnSig, nextFnPrefix) {
 
 console.log('\n-- Task 745: the Help menu is three groups, divided by two separators --');
 {
-	const body = fnBody(src, 'function openHelpMenu', '\n\tfunction ');
-	report(!!body, 'openHelpMenu() is in the source');
-	const rowsMatch = body && body.match(/openMenu\(anchor, \[([\s\S]*)\]\);/);
+	const body = fnBody(src, 'function helpMenuRows', '\n\tfunction ');
+	report(!!body, 'helpMenuRows() is in the source');
+	const rowsMatch = body && body.match(/return \[([\s\S]*)\];/);
 	const rows = rowsMatch ? rowsMatch[1] : '';
 	const seps = (rows.match(/\{ separator: true \}/g) || []).length;
 	report(seps === 2, 'exactly two separators -- three groups, not more and not fewer', `${seps}`);
 
 	// Group 1, true help, Tom's own order.
-	const group1 = ['lpn_help_walkthroughs', 'lpn_help_hotkeys', 'lpn_help_icons'];
+	// Tables and Hotkeys and Toolbars became ONE row, the User guide (Tom, 2026-10-06).
+	const group1 = ['lpn_help_walkthroughs', 'lpn_help_manual'];
 	const sep1 = rows.indexOf('{ separator: true }');
 	const group1At = group1.map(k => rows.indexOf('pc.' + k));
-	report(group1At.every(i => i >= 0 && i < sep1), 'group 1 (Walkthroughs, Tables and Hotkeys, Toolbars) is entirely before the first separator');
+	report(group1At.every(i => i >= 0 && i < sep1), 'group 1 (Walkthroughs, User guide) is entirely before the first separator');
 	report(group1At.every((v, i) => i === 0 || v > group1At[i - 1]), 'group 1 stands in Tom\'s order');
 
 	// Group 2, helpers.
@@ -71,10 +72,10 @@ console.log('\n-- Task 745: the Help menu is three groups, divided by two separa
 	report(group2At.every((v, i) => i === 0 || v > group2At[i - 1]), 'group 2 stands in Tom\'s order');
 
 	// Group 3, true about.
-	const group3 = ['lpn_help_notes', 'lpn_help_welcome', 'lpn_help_screenshots', 'privacy_link',
+	const group3 = ['lpn_help_welcome', 'lpn_help_screenshots', 'privacy_link',
 		'terms_link', 'about_main_menu'];
 	const group3At = group3.map(k => rows.indexOf('pc.' + k));
-	report(group3At.every(i => i > sep2), 'group 3 (Notes, Welcome, Screenshot, Privacy, Terms, About) is entirely after the second separator');
+	report(group3At.every(i => i > sep2), 'group 3 (Welcome, Screenshot, Privacy, Terms, About) is entirely after the second separator');
 	report(group3At.every((v, i) => i === 0 || v > group3At[i - 1]), 'group 3 stands in Tom\'s order');
 
 	// Every row named by Tom is present; every row NOT named by him that Help used to carry (there
@@ -86,12 +87,12 @@ console.log('\n-- Task 745: the Help menu is three groups, divided by two separa
 console.log('\n-- Task 745: the Tables and Hotkeys box exists and opens from Help --');
 {
 	report(/toggleHotkeysBox/.test(src), 'toggleHotkeysBox() exists');
-	report(/label: pc\.lpn_help_hotkeys[^,]*, fn: toggleHotkeysBox/.test(src),
+	report(/label: pc\.lpn_help_manual[^,]*,[^}\n]*fn: toggleHotkeysBox/.test(src),
 		'the Help row opens it');
 	report(page.indexOf('id="lpn_hotkeys_popup"') > 0, 'the box markup is on the page');
 	report(page.indexOf('id="lpn_hotkeys_close"') > 0, 'and has a close button');
 	const at = page.indexOf('id="lpn_hotkeys_popup"');
-	const boxBlock = page.slice(at, at + 3000);
+	const boxBlock = page.slice(at, at + 6000);
 	report(/display:none/.test(boxBlock.slice(0, 300)), 'the box starts hidden');
 	report(/wireBoxMemory\(box, LPN_HOTKEYSBOX_KEY/.test(src),
 		'it is remembered as window furniture, the same pattern as Notes and the Library box');
@@ -104,11 +105,7 @@ console.log('\n-- Task 745: the Tables and Hotkeys box exists and opens from Hel
 	// Moved, not duplicated: the Notes popover (which ends where this box begins) no longer shows
 	// either. Sliced narrowly so a coincidental substring match elsewhere on the page cannot pass
 	// this by accident.
-	const notesAt = page.indexOf('id="lpn_notes_popup"');
-	const notesBlock = page.slice(notesAt, at);
-	report(notesBlock.indexOf("$ec_lang['lpn_notes_6_term']") < 0 &&
-		notesBlock.indexOf("$ec_lang['lpn_notes_7_term']") < 0,
-		'and the Notes popover no longer shows either -- moved, not duplicated');
+	report(page.indexOf('id="lpn_notes_popup"') < 0, 'and there is no Notes popover to duplicate them (it moved into the Guide, 2026-10-09)');
 
 	console.log('\n-- Task 745: the box carries ALL keyboard shortcuts, by context --');
 	report(boxBlock.indexOf("$ec_lang['lpn_hotkeys_map_term']") > 0, 'a Map context is in the box');
@@ -151,8 +148,8 @@ console.log('\n-- Task 745: the Tables and Hotkeys box exists and opens from Hel
 
 console.log('\n-- Task 718: Recent files sits directly above Close --');
 {
-	const body = fnBody(src, 'function openFileMenu', '\n\tfunction ');
-	report(!!body, 'openFileMenu() is in the source');
+	const body = fnBody(src, 'function fileMenuRows', '\n\tfunction ');
+	report(!!body, 'fileMenuRows() is in the source');
 	report(/\], recentRows, \[/.test(body), 'recentRows is concatenated directly before the closing block');
 	const tail = body.slice(body.indexOf('], recentRows, ['));
 	report(/\{ separator: true \},\s*\n\s*\{ icon: 'close', label: pc\.lpn_close/.test(tail),
@@ -163,16 +160,16 @@ console.log('\n-- Task 718: Recent files sits directly above Close --');
 
 console.log('\n-- Task 718: the three import rows are one Import submenu --');
 {
-	const fileBody = fnBody(src, 'function openFileMenu', '\n\tfunction ');
+	const fileBody = fnBody(src, 'function fileMenuRows', '\n\tfunction ');
 	const importRowsBody = fnBody(src, 'function importMenuRows', '\n\tfunction ');
 	report(!!importRowsBody, 'importMenuRows() exists');
 	['pickSurveyFile', 'pickInpFile', 'libImportPick'].forEach(function (fn) {
 		report(importRowsBody.indexOf(fn) > 0, fn + ' is one of the submenu rows');
 	});
 	report(/label: pc\.lpn_file_import_menu[^,]*, submenu: importMenuRows/.test(fileBody),
-		'the File menu opens them through one submenu row, the same idiom Help > Toolbar uses');
+		'the File menu opens them through one submenu row');
 	// None of the three stands loose in the flat top-level list any more.
-	const flatListMatch = fileBody.match(/openMenu\(anchor, \[([\s\S]*?)\]\.concat\(\[/);
+	const flatListMatch = fileBody.match(/return \[([\s\S]*?)\]\.concat\(\[/);
 	const flatList = flatListMatch ? flatListMatch[1] : '';
 	report(flatList.indexOf('pickSurveyFile') < 0 && flatList.indexOf('pickInpFile') < 0 &&
 		flatList.indexOf('libImportPick') < 0,

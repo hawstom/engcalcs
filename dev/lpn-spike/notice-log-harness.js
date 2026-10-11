@@ -59,7 +59,7 @@ const INJECT =
 	"\t\ttoggleMessageLogPanel: toggleMessageLogPanel,\n" +
 	"\t\tpanelOpen: function () { return msglogPanelOpen; },\n" +
 	"\t\twireMessageLogButton: wireMessageLogButton,\n" +
-	"\t\ticonGuideRows: function () { return iconGuideRows(); },\n" +
+	"\t\ticonGuideRows: function () { return toolbarIconIndex.map(function (b) { return { icon: b.icon }; }); },\n" +   // the User guide's Toolbar rows, one per record (guideToolbarRows())
 	"\t\trenderBanner: renderBanner,\n" +
 	"\t\tsetBannerWarn: function (w) { bannerWarn = w; bannerRO = null; },\n" +
 	"\t\tsetBannerRO: function (r) { bannerRO = r; bannerWarn = null; },\n" +

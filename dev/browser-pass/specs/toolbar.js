@@ -129,30 +129,12 @@ exports.run = async function ({ browser, report }) {
 		// THE DISCOVERY ROUTE THAT IS NOT A TOOLTIP. A first-time mouse user who does not think to
 		// hover, and a touch user who must press and hold, both need one list of what the icons
 		// mean — and it has to be DERIVED from the strip or it rots.
-		await a.page.evaluate(() => { document.getElementById('lpn_menu_help').click(); });
-		await a.settle(200);
-		const rows = await a.page.evaluate(() =>
-			[...document.querySelectorAll('#lpn_menu_list button')].map(b => b.textContent.trim()));
-		// **BY KEY, NOT BY A REGEX OVER TOM'S ENGLISH.** `/icon/i` matched the row while it read
-		// "What the toolbar icons mean"; the row is plain 'Toolbar' now and the regex found nothing,
-		// taking three checks down with it on a rename that broke no behaviour. A regex over
-		// visitor-facing English is a pinned literal in disguise — dev/session-handoff.md §4.
-		const ICONS = await a.lang('lpn_help_icons');
-		const guide = rows.find(r => r.replace('▸', '').trim() === ICONS);
-		report.ok(!!guide, 'Help offers a list of what the icons mean', rows.join(' | '));
-		await a.page.evaluate((label) => {
-			const b = [...document.querySelectorAll('#lpn_menu_list button')]
-				.find(x => x.textContent.replace('▸', '').trim() === label);
-			if (b) { b.click(); }
-		}, ICONS);
+		// **THE USER GUIDE'S TOOLBAR SECTION** (Tom, 2026-10-06), where the Help > "Toolbar"
+		// fly-out stood: the same derived list, with each tip written out rather than behind hover.
+		await a.menuClick(await a.lang('lpn_help_manual'), 'help');
 		await a.settle(300);
-		// **THE GUIDE IS A FLY-OUT, so it is in the SECOND menu popup** (Task 441). As a level-0
-		// menu it re-opened on the Help button the parent menu was already anchored to, hit
-		// openMenu()'s same-anchor toggle branch, and closed the menu instead — Tom's "it does
-		// nothing". This spec read the parent list and therefore could not see the difference; it
-		// reads the fly-out now, which is where the rows really are.
 		const guideRows = await a.page.evaluate(() =>
-			[...document.querySelectorAll('#lpn_menu_list2 button')].map(b => b.textContent.trim()));
+			[...document.querySelectorAll('#lpn_guide_toolbar > .lpn-guide-row .lpn-guide-name')].map(b => b.textContent.trim()));
 		report.eq(guideRows.length, btns.length, 'and it lists exactly the buttons on the strip',
 			`${guideRows.length} rows vs ${btns.length} buttons`);
 		report.has(guideRows.join(' | '), await a.lang('lpn_tool_zoom_extent'),

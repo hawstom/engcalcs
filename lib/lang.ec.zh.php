@@ -2060,7 +2060,7 @@ $ec_lang['lpn_notes_2_term']='本工具不做的事';
 // omission is a public claim about scope, and this file's history says those go wrong in the
 // confident direction; the one omission stated here is the one nothing in this tree implements
 // or claims to. Do not lengthen the list without him.
-$ec_lang['lpn_notes_2_def']='已对水质建模：水龄、来源追踪，以及在管壁和主体水流中发生反应的化学物质。未对涌浪和水锤建模：所有结果均针对恒定流或缓变流，而不是阀门快速关闭引起的瞬态压力波。';
+$ec_lang['lpn_notes_2_def']='未对涌浪和水锤建模：所有结果均针对恒定流或缓变流，而不是阀门快速关闭引起的瞬态压力波。';
 $ec_lang['lpn_notes_3_term']='保存项目';
 $ec_lang['lpn_notes_3_def']='每个项目对应一个标签页，且在您操作时即保存在本浏览器中。清除浏览器数据会将它们全部删除，因此请把成果保存到文件中：使用"文件"、"另存为"。标签页上的星号表示其中含有尚未保存到文件的更改。除非您主动要求，否则不会有任何内容写入文件。在部分浏览器中，项目会连接到您保存的文件，此后"文件"、"保存"会写回该文件；在另一些浏览器中无法建立此连接，因此"保存"不可用，只能使用"另存为"。当项目文件保存在共享磁盘上时，本页面会提示您该文件是否已被同事打开，以避免两人互相覆盖成果。';
 // Pump curve documentation (Tom, 2026-07-30: "How should we document the curve equations?").
@@ -2082,7 +2082,7 @@ $ec_lang['lpn_notes_6_term']='表格列帮助';
 // heading top right corner, or Ctrl+Shift+V". It rides on this table rather than the shortcuts one
 // because its own wording pairs a command with a GESTURE, on the same "action, then gesture" shape
 // every row here already has -- the Hide/Show row beside it names the identical menu.
-$ec_lang['lpn_notes_6_def']='<table class="lpn-notes-table"><tbody><tr><td>选择列</td><td>点击表头</td></tr><tr><td>添加或扩展列选择</td><td>Ctrl+click 或 Shift+click 另一个表头</td></tr><tr><td>移动（重新排列）所选的列</td><td>拖动，或在右键菜单或 ⋮ 菜单中使用“管理列…”</td></tr><tr><td>⋮ 菜单和排序箭头。</td><td>将指针悬停在表头的右上角，或选中表头或按 Tab 键移入表头</td></tr><tr><td>隐藏、显示全部或管理可见性与顺序</td><td>右键点击表头，或点击表头右上角的 ⋮ 菜单</td></tr><tr><td>按列排序</td><td>表头右上角的箭头图标</td></tr><tr><td>粘贴为表格末尾的新行</td><td>右键点击、表头右上角的 ⋮ 菜单，或 Ctrl+Shift+V</td></tr></tbody></table>';
+$ec_lang['lpn_notes_6_def']='<table class="lpn-notes-table"><tbody><tr><td>点击表头</td><td>选择列</td></tr><tr><td>Ctrl+click 或 Shift+click 另一个表头</td><td>添加或扩展列选择</td></tr><tr><td>拖动，或在右键菜单或 ⋮ 菜单中使用“管理列…”</td><td>移动（重新排列）所选的列</td></tr><tr><td>将指针悬停在表头的右上角，或选中表头或按 Tab 键移入表头</td><td>⋮ 菜单和排序箭头。</td></tr><tr><td>右键点击表头，或点击表头右上角的 ⋮ 菜单</td><td>隐藏、显示全部或管理可见性与顺序</td></tr><tr><td>表头右上角的箭头图标</td><td>按列排序</td></tr><tr><td>右键点击、表头右上角的 ⋮ 菜单，或 Ctrl+Shift+V</td><td>粘贴为表格末尾的新行</td></tr></tbody></table>';
 $ec_lang['lpn_notes_7_term']='表格键盘快捷键';
 // R-311, his own row: "Ctrl+Shift+V | Paste as new rows at end of table".
 $ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>方向键</td><td>移动。</td></tr><tr><td>Tab、Enter</td><td>完成输入并向右/向下移动一个单元格。</td></tr><tr><td>Shift+Tab、Shift+Enter</td><td>向反方向移动。</td></tr><tr><td>Shift+方向键</td><td>扩展选区。</td></tr><tr><td>Ctrl+C</td><td>复制所选内容。</td></tr><tr><td>Ctrl+D</td><td>用选区顶行的内容向下填充选区。</td></tr><tr><td>Ctrl+Enter</td><td>用活动单元格的数值填充选区。</td></tr><tr><td>Ctrl+A</td><td>选中整个表格。</td></tr><tr><td>Ctrl+Shift+V</td><td>粘贴为表格末尾的新行。</td></tr><tr><td>Ctrl+Shift+PageDown、Ctrl+Shift+PageUp</td><td>切换到下一个或上一个标签页，无论是表格还是图形。</td></tr><tr><td>Delete</td><td>清空单元格。</td></tr><tr><td>F2</td><td>打开单元格进行编辑。</td></tr><tr><td>Esc</td><td>取消编辑。</td></tr></tbody></table>';

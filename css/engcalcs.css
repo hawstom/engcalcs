@@ -17,6 +17,8 @@
 	--ec-border-strong: #ccc;
 	/* Accent: links, outlined buttons, menu bar */
 	--ec-accent: #0645ad;
+	/* The Guide's pointer ring: the one colour no control uses for pressed, active, focused or hover. */
+	--ec-point: #c2185b;
 	--ec-accent-hover: #1f58b5;
 	--ec-accent-open: #05378a;
 	--ec-accent-hover-bg: #eaf1fc;
@@ -4486,6 +4488,192 @@ html:has(#lpn_canvas) { overflow: hidden; }
    Only the width is its own, kept at the 44rem the old centred popover opened with -- a column of
    defined terms reads better at Library's width than at Settings' narrower one. */
 .lpn-notesbox { width: min(44rem, 94vw); }
+/* The Guide carries a 240 px contents rail beside its text, so it opens wider than Notes. */
+.lpn-guidebox { width: min(62rem, 94vw); }
+/* ---- THE USER GUIDE (Tom, 2026-10-06; Ida's design) ---------------------------------------------
+   The Notes shell, with a search pinned at the top and rows that are a legend, not a menu: icon,
+   name and key on one line, the whole tip written out below them. The body is a size container so
+   the key tables stack by the BOX's width (a narrow box on a desktop stacks the same as a phone).
+   A toolbar button that is not on screen now is dimmed, not dropped. */
+.lpn-guide-body { container-type: inline-size; }
+/* **THE CONTENTS RAIL** (Tom, 2026-10-07: *"a collapsible top or side Contents pane"*; Ida's spec).
+   A 240 px rail at the start edge holding the search and the list of sections; collapsed it is a
+   strip with only the chevron. Logical properties throughout, so a right-to-left page mirrors it.
+   At 640 px and under it stacks on top as a disclosure, closed by default. The content pane is the
+   one that scrolls, so the rail stays in view while a section is read. */
+.lpn-guide-panes { display: flex; flex: 1 1 auto; min-height: 0; gap: 10px; }
+.lpn-guide-rail {
+	flex: 0 0 240px; min-width: 0; display: flex; flex-direction: column; min-height: 0;
+	border-inline-end: 1px solid var(--ec-border); padding-inline-end: 6px; font-size: .9em;
+}
+.lpn-guide-railhead { display: flex; align-items: center; gap: 4px; flex: 0 0 auto; padding-bottom: 4px; }
+.lpn-guide-railtitle { font-weight: bold; }
+.lpn-guide-railtoggle {
+	width: 28px; height: 28px; padding: 0; border: 0; background: transparent; color: var(--ec-ink);
+	cursor: pointer; display: inline-flex; align-items: center; justify-content: center;
+}
+.lpn-guide-railtoggle:hover, .lpn-guide-railtoggle:focus-visible { background: var(--ec-gray-eee); color: var(--ec-ink-black); }
+html[dir="rtl"] .lpn-guide-railtoggle svg { transform: scaleX(-1); }
+.lpn-guide-railbody { display: flex; flex-direction: column; min-height: 0; flex: 1 1 auto; }
+.lpn-guide-railbody input { width: 100%; box-sizing: border-box; padding: 3px 6px; font-size: 1rem; flex: 0 0 auto; }
+.lpn-guide-nav { overflow: auto; flex: 1 1 auto; min-height: 0; padding-top: 6px; touch-action: auto; }
+.lpn-guide-nav a {
+	display: block; padding: 3px 6px 3px 2px; color: inherit; text-decoration: none; border-inline-start: 3px solid transparent;
+	overflow-wrap: anywhere;
+}
+.lpn-guide-nav a:hover { background: var(--ec-hover-bg); }
+.lpn-guide-nav a[aria-current="true"] { border-inline-start-color: var(--ec-accent); font-weight: bold; background: var(--ec-hover-bg); }
+.lpn-guide-nav { user-select: none; }
+.lpn-guide-nav-row { display: flex; align-items: flex-start; }
+.lpn-guide-nav-row.lpn-guide-nav-folded { display: none; }
+.lpn-guide-nav-row > a { flex: 1 1 auto; min-width: 0; }
+.lpn-guide-nav-row[data-level="1"] { padding-inline-start: 12px; }
+.lpn-guide-nav-row[data-level="2"] { padding-inline-start: 24px; }
+.lpn-guide-nav-chev, .lpn-guide-nav-spacer { flex: 0 0 20px; width: 20px; height: 24px; }
+.lpn-guide-nav-chev {
+	padding: 0; border: 0; background: transparent; color: var(--ec-ink); cursor: pointer;
+	display: inline-flex; align-items: center; justify-content: center;
+}
+.lpn-guide-nav-chev:hover, .lpn-guide-nav-chev:focus-visible { background: var(--ec-gray-eee); color: var(--ec-ink-black); }
+.lpn-guide-nav-chev-svg { width: .9em; height: .9em; transition: transform .12s; }
+.lpn-guide-nav-closed > .lpn-guide-nav-chev .lpn-guide-nav-chev-svg { transform: rotate(-90deg); }
+html[dir="rtl"] .lpn-guide-nav-closed > .lpn-guide-nav-chev .lpn-guide-nav-chev-svg { transform: rotate(90deg); }
+@media (prefers-reduced-motion: reduce) { .lpn-guide-nav-chev-svg { transition: none; } }
+.lpn-guide-nav-snip { display: block; font-weight: normal; color: var(--ec-ink-muted); font-size: .9em; }
+.lpn-guide-rail-collapsed .lpn-guide-rail { flex-basis: 34px; padding-inline-end: 2px; }
+.lpn-guide-rail-collapsed .lpn-guide-railtitle, .lpn-guide-rail-collapsed .lpn-guide-railbody { display: none; }
+.lpn-guide-rail-collapsed .lpn-guide-railtoggle svg { transform: scaleX(-1); }
+html[dir="rtl"] .lpn-guide-rail-collapsed .lpn-guide-railtoggle svg { transform: none; }
+.lpn-guide-content { flex: 1 1 auto; min-width: 0; overflow: auto; scroll-padding-top: 4px; touch-action: auto; font-size: .9em; }
+.lpn-guide-prose { margin: .3em 0 .6em; }
+.lpn-guide-boxentry { margin: 0 0 .6em; }
+.lpn-guide-boxentry > h3 { margin: .6em 0 .2em; }
+.lpn-guide-boxentry > p { margin: 0 0 .4em; }
+.lpn-guide-boxentry > h3:focus { outline: none; }
+.lpn-guide-boxentry > h3:focus-visible { outline: 2px solid var(--ec-accent); outline-offset: 2px; }
+@media (max-width: 640px) {
+	.lpn-guide-panes { flex-direction: column; gap: 4px; }
+	.lpn-guide-rail { flex: 0 0 auto; border-inline-end: 0; padding-inline-end: 0; border-bottom: 1px solid var(--ec-border); padding-bottom: 4px; }
+	.lpn-guide-rail-collapsed .lpn-guide-rail { flex-basis: auto; }
+	.lpn-guide-railhead { cursor: pointer; }
+	.lpn-guide-railbody { max-height: 40vh; }
+	.lpn-guide-railtoggle svg { transform: rotate(-90deg); }
+	html[dir="rtl"] .lpn-guide-railtoggle svg { transform: rotate(-90deg); }
+	.lpn-guide-rail-collapsed .lpn-guide-railtitle { display: inline; }
+	.lpn-guide-rail-collapsed .lpn-guide-railtoggle svg { transform: rotate(90deg); }
+	html[dir="rtl"] .lpn-guide-rail-collapsed .lpn-guide-railtoggle svg { transform: rotate(90deg); }
+}
+.lpn-corner-guide { font-weight: bold; font-size: 15px; }
+.lpn-guide-none { margin: .5em 0; color: var(--ec-ink-muted); }
+/* **ONE READING COLUMN, TOP TO BOTTOM** (Tom, 2026-10-07: *"Ditch the two-column approach for the
+   right pane and put it all in line. Audit style too."*). Every entry in every section has the same
+   shape: a name line, then its text at the full width of the pane, starting at the pane's own
+   edge -- a toolbar or menu row (icon, name, key), a box entry (its title), a term (dt). Three
+   levels and no more: h2 a section; h3 a group inside it (a menu, or a term such as "Map keyboard
+   shortcuts"), ruled underneath; then the entry names, bold at body size. Rows are buttons and
+   need padding for their hover box, so every other block takes the same inline padding (5 px =
+   4 px padding + 1 px border) and all text lines up on one edge. */
+.lpn-guide-section > h2, .lpn-guide-section > dl, .lpn-guide-section > .lpn-guide-prose,
+.lpn-guide-menu > h3, .lpn-guide-boxentry { padding-inline: 5px; }
+.lpn-guidebox .lpn-guide-section > h2 {
+	font-size: 1.15rem; font-weight: bold; margin: .9em 0 .3em; padding-bottom: 4px;
+	border-bottom: 1px solid var(--ec-border-strong);
+}
+.lpn-guidebox .lpn-guide-section:first-of-type > h2 { margin-top: .2em; }
+.lpn-guide-menu > h3, .lpn-guide-section dt {
+	font-size: 1rem; font-weight: bold; margin: .9em 0 .3em; padding-bottom: .15em;
+	border-bottom: 1px solid var(--ec-border);
+}
+/* The second level of the hierarchy (a menu under Menus, a menu's boxes under Boxes): heavier than
+   an entry name, lighter than the section. */
+.lpn-guide-menu > h3, .lpn-guide-group > h3 {
+	font-size: 1.05rem; margin-top: 1.1em; border-bottom-color: var(--ec-border-strong);
+}
+.lpn-guide-group > h3 { padding-inline: 5px; }
+.lpn-guide-group > .lpn-guide-boxentry:first-of-type { border-top: 0; }
+.lpn-guide-section dd { margin: 0 0 .6em; }
+.lpn-guide-boxentry > h3 { font-size: 1rem; font-weight: bold; }
+/* A Boxes entry is separated as a toolbar row group is: 12 px of air and the same hairline. */
+.lpn-guidebox .lpn-guide-boxentry { margin: 12px 0 0; padding-top: 4px; border-top: 1px solid var(--ec-border); }
+.lpn-guidebox .lpn-guide-boxentry > h3 { margin-top: 0; }
+/* A term that only repeats its section's heading ("Map" then "Map keyboard shortcuts") is kept for
+   search, Find-in-page and screen readers, and not drawn. */
+.lpn-guide-section dt.lpn-guide-dup {
+	position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%);
+	white-space: nowrap; margin: 0; padding: 0; border: 0;
+}
+.lpn-guide-row {
+	display: grid; grid-template-columns: 1.6em 1fr auto; column-gap: .4em; row-gap: 2px;
+	align-items: start; width: 100%; box-sizing: border-box; text-align: start;
+	background: none; border: 1px solid transparent; border-radius: 3px; padding: 3px 4px;
+	color: inherit; font: inherit; cursor: pointer;
+}
+.lpn-guide-row:hover { background: var(--ec-hover-bg); border-color: var(--ec-hover-border); }
+.lpn-guide-row:focus-visible { outline: 2px solid var(--ec-accent); outline-offset: 1px; }
+.lpn-guide-icon { grid-column: 1; grid-row: 1; display: inline-flex; justify-content: center; padding-top: 1px; }
+.lpn-guide-icon svg { width: 18px; height: 18px; }
+.lpn-guide-name { grid-column: 2; grid-row: 1; font-weight: bold; }
+.lpn-guide-keys { grid-column: 3; grid-row: 1; display: flex; gap: 3px; flex-wrap: wrap; justify-content: flex-end; }
+.lpn-guide-desc { grid-column: 1 / -1; grid-row: 2; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.lpn-guide-desc:empty { display: none; }
+.lpn-guide-tip { white-space: pre-line; }
+.lpn-guide-twin { color: var(--ec-ink-muted); font-size: .9em; }
+.lpn-guide-path { white-space: nowrap; }
+.lpn-guide-chev { width: .7em; height: .7em; margin: 0 .2em; vertical-align: middle; fill: none; stroke: currentColor; stroke-width: 1.6; }
+html[dir="rtl"] .lpn-guide-chev { transform: scaleX(-1); }
+.lpn-guide-keys kbd {
+	font: inherit; font-size: .85em; padding: 0 .4em; border: 1px solid var(--ec-border-strong);
+	border-radius: 3px; background: var(--ec-gray-f6f6f6); color: var(--ec-ink); white-space: nowrap;
+}
+.lpn-guide-off .lpn-guide-icon, .lpn-guide-off .lpn-guide-name { opacity: .55; }
+/* A submenu's rows sit under their parent row: the one indent in the pane, and it means nesting. */
+.lpn-guide-sub { margin-inline-start: 1.6em; width: calc(100% - 1.6em); }
+.lpn-guide-rule { margin: 3px 0; border: 0; border-top: 1px solid var(--ec-border); }
+/* The key tables (Map, Screenshot, Tables, Using the guide) are real tables, a key and its action.
+   Inside the Guide they lose the suite's blue cell borders for one quiet rule per row, every key
+   column is the same 12em (room for "Ctrl+Shift+PageDown,") so the actions line up from one
+   table to the next, and below 520 px of box they stack, key above action. */
+.lpn-guidebox table.lpn-notes-table, .lpn-guidebox table.lpn-notes-table td { border: 0; }
+.lpn-guidebox table.lpn-notes-table tr { border: 0; border-bottom: 1px solid var(--ec-border); }
+.lpn-guidebox table.lpn-notes-table td { padding: .25em 1em .25em 0; }
+.lpn-guidebox table.lpn-notes-table td:first-child { width: 12em; min-width: 12em; }
+/* Table columns help (the first table under Tables) has a gesture written out in its first column,
+   not a key, so that one table keeps a wider column. */
+.lpn-guidebox [data-guide-section="tables"] dd:first-of-type table.lpn-notes-table td:first-child { width: 40%; }
+@container (max-width: 520px) {
+	.lpn-guidebox table.lpn-notes-table, .lpn-guidebox table.lpn-notes-table tbody,
+	.lpn-guidebox table.lpn-notes-table tr { display: block; width: auto; }
+	.lpn-guidebox .lpn-guide-section[data-guide-section] table.lpn-notes-table td { display: block; width: auto; min-width: 0; }
+	.lpn-guidebox .lpn-guide-section[data-guide-section="tables"] dd:first-of-type table.lpn-notes-table td:first-child { width: auto; }
+	.lpn-guidebox table.lpn-notes-table tr { padding: .25em 0; }
+	.lpn-guidebox table.lpn-notes-table td { padding: 0; }
+}
+/* The SHOW pulse: a guide row points at the real control (a toolbar button or a menu row) and
+   never runs it. ~1.5 s, matching GUIDE_PULSE_MS in js/looped-network.js. */
+@keyframes lpn-guide-pulse {
+	0%, 50%, 100% { box-shadow: 0 0 0 0 transparent; }
+	25%, 75% { box-shadow: 0 0 0 3px var(--ec-accent); }
+}
+.lpn-guide-pulse { animation: lpn-guide-pulse 1.5s ease-in-out 1; outline: 2px solid var(--ec-accent); outline-offset: 1px; }
+@media (prefers-reduced-motion: reduce) { .lpn-guide-pulse { animation: none; } }
+/* THE POINTER: what every Guide card does. A dashed ring in --ec-point round the control the card
+   describes, pulsing and then fading out (~2.5 s, GUIDE_POINT_MS). Not a fill and not the accent
+   outline, so it cannot be read as the control's own pressed, active, focused or hover state. */
+@keyframes lpn-guide-point {
+	0% { outline-color: var(--ec-point); outline-offset: 5px; }
+	20% { outline-color: var(--ec-point); outline-offset: 2px; }
+	40% { outline-color: var(--ec-point); outline-offset: 5px; }
+	60% { outline-color: var(--ec-point); outline-offset: 2px; }
+	100% { outline-color: transparent; outline-offset: 2px; }
+}
+.lpn-guide-point { outline: 3px dashed var(--ec-point); outline-offset: 2px; animation: lpn-guide-point 2.5s ease-in-out 1 forwards; }
+@media (prefers-reduced-motion: reduce) { .lpn-guide-point { animation: none; } }
+/* A card whose control is not on screen says so on the card. */
+.lpn-guide-nopoint { display: block; color: var(--ec-point); font-style: italic; }
+.lpn-guide-boxentry { cursor: pointer; }
+.lpn-guide-boxentry a, .lpn-guide-boxentry table, .lpn-guide-boxentry input { cursor: auto; }
+/* While a search is active a nested row shows its ancestors before its name, so a hit reads as a path. */
+.lpn-guide-filtering .lpn-guide-name[data-guide-ctx]::before { content: attr(data-guide-ctx) " \203A "; font-weight: normal; color: var(--ec-ink-muted); }
 /* ---- THE FIRE FLOW BOX (ROADMAP Task 530) -----------------------------------------------------
    It borrows .lpn-setbox's whole shell -- moveable by its chrome, resizeable by `resize: both` and
    by the touch grabber, capped to the viewport, body scrolling inside itself. Only the width is its

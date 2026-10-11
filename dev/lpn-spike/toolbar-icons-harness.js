@@ -87,7 +87,7 @@ console.log('\n-- every toolbar button goes through it --');
 	// mean" entry for it would now be describing an icon no toolbar button wears. Assert the
 	// absence, so putting the button back is a deliberate two-file change rather than a drift.
 	report(!/setIconLabel\([^)]*'profile'/.test(bar), 'the profile has NO toolbar button any more');
-	report(/lpn_profile_menu/.test(strip(fnBody(src, 'openProjectBarMenu'))),
+	report(/lpn_profile_menu/.test(strip(fnBody(src, 'waterMenuRows'))),
 		'...and its Water menu row is untouched, because a command that leaves the toolbar must not leave the app');
 	// **THE LABELS BUTTON IS GONE** (Tom: "We can remove this button now ... all project settings
 	// are in (tada!) Settings"). Asserted so it is not reflexively restored: every other route to
@@ -156,15 +156,12 @@ console.log('\n-- the Help list is DERIVED from the strip --');
 		'registerToolbarIcon() records each button, so the list cannot drift from the strip');
 	report(/registerToolbarIcon\(/.test(fnBody(src, 'setIconLabel')),
 		'and setIconLabel() reaches the list through that same door, not a push of its own');
-	const guide = strip(fnBody(src, 'iconGuideRows'));
+	// **THE LIST IS THE USER GUIDE'S TOOLBAR SECTION NOW** (Tom, 2026-10-06), not a Help fly-out of
+	// rows that looked like commands and did nothing. dev/lpn-spike/user-guide-harness.js drives it.
+	const guide = strip(fnBody(src, 'guideToolbarRows'));
 	report(/toolbarIconIndex\.map/.test(guide), 'the guide is built from that record, not from a second list');
-	report(/lpn_help_icons/.test(src), 'and Help carries a row for it');
-	// **AND THAT ROW MUST BE A SUBMENU, NOT AN ACTION** (Tom, 2026-08-18: it "does nothing"). As an
-	// action it called openMenu() at level 0 on #lpn_menu_help -- the anchor the Help menu it was
-	// clicked in was already open on -- so openMenu()'s same-anchor toggle branch closed the menu
-	// instead of showing the guide. A `submenu` row is a fly-out and cannot hit that branch.
-	report(/lpn_help_icons[^\n]*submenu: iconGuideRows/.test(src),
-		'the Help row is a submenu, so it cannot re-open its own anchor and toggle itself shut');
+	report(/lpn_help_manual[^\n]*fn: toggleHotkeysBox/.test(src), 'and Help carries a row that opens it');
+	report(!/function iconGuideRows/.test(src), 'and the old do-nothing fly-out is gone');
 }
 
 console.log('\n-- the strings exist, in English only --');

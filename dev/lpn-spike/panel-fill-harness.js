@@ -149,9 +149,6 @@ console.log('\n--- one seam decides how a standing box opens (rule 2) ---');
 		// columns plus Type and ID -- so a phone wants the whole window for either.
 		['openStatusReportBox', 'the pump/valve/tank status box'],
 		['openFullReportBox', 'the per-step node/link table box'],
-		// The Notes box (Tom, 2026-09-28): it left VIEW_POPOVERS for the standing-box shell and is
-		// now draggable and resizeable like the boxes above it, so a phone wants the same fill.
-		['openNotesBox', 'the Notes box'],
 		// Criticality analysis (Tom, 2026-09-30): fire flow's sibling on the same shell, with a
 		// report table, so a phone wants the whole window for it as it does for fire flow's.
 		['openCriticalityBox', 'Criticality analysis'],

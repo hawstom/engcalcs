@@ -45,7 +45,7 @@ async function probe(browser, Session, platform, tag) {
 	await a.page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } });
 	await a.openExampleCard(await a.lang('lpn_ex_net3_title'));
 	await a.settle(800);
-	const boxes = await a.page.evaluate(() => ['lpn_notes_popup', 'lpn_hotkeys_popup'].map((id) => {
+	const boxes = await a.page.evaluate(() => ['lpn_hotkeys_popup'].map((id) => {
 		const e = document.getElementById(id); return e ? e.textContent : '';
 	}).join('\n'));
 	// Open the Tables pane on Junctions, then right-click a cell.

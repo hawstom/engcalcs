@@ -19286,6 +19286,21 @@ var EngCalcs = EngCalcs || {};
 	// The translated word for a stored code, or null where `prop` is not a choice property, or the
 	// code is not one of its choices (a document written by an older version, or hand-edited) --
 	// the caller's own signal to fall back to printing the raw code rather than nothing at all.
+	// **A TYPED CHOICE IS READ AS ITS CODE** (Tom's guide audit, 2026-10-07): the query line takes
+	// the stored code (`'closed'`) or the word the pull-down shows (`'Closed'`, `'Cerrado'`), in
+	// any case, and both mean the same choice. Null for a word that is neither, which the caller
+	// must not quietly turn into the first choice: `Pipe.Closed equal to 'Closed'` once listed
+	// every OPEN pipe that way, because the pull-down reset an unknown word to its first entry.
+	function findChoiceCodeOf(prop, word) {
+		var defs = findChoiceDefs(prop), w = String(word === undefined || word === null ? '' : word).trim().toLowerCase(), i;
+		if (!defs) { return null; }
+		// The English word for a choice is accepted on every page, as every other word is.
+		defs = defs.concat(findEnglishDefs(function () { return findChoiceDefs(prop); }) || []);
+		for (i = 0; i < defs.length; i++) {
+			if (String(defs[i][0]).toLowerCase() === w || String(defs[i][1]).toLowerCase() === w) { return defs[i][0]; }
+		}
+		return null;
+	}
 	function findChoiceLabelOf(prop, code) {
 		var defs = findChoiceDefs(prop), i;
 		if (!defs) { return null; }
@@ -19354,6 +19369,12 @@ var EngCalcs = EngCalcs || {};
 	function findOpDefs() {
 		var pc = EngCalcs.pageConfig || {};
 		if (findPropIsConnection(findState.prop)) { return findConnOpDefs(); }
+		// **A CHOICE IS EQUAL TO ONE OF ITS WORDS, OR EMPTY** (Perry's review, 2026-10-07): choosing
+		// Closed once defaulted to `contains` and wrote `Pipe.Closed contains 'open'`. Ranking or a
+		// part of a word means nothing for a list of fixed codes, so equal to comes first.
+		if (findPropIsChoice(findState.prop)) {
+			return [['equals', pc.lpn_find_op_equals || 'equal to', 'equal to'], findEmptyDef()];
+		}
 		// **THE EXTREMES ARE A STANDARD CONDITION ON EVERY PROPERTY THAT HAS AN ORDER** (Tom,
 		// 2026-08-26: *"One reason it's confusing is that it should be a standard condition, but
 		// it's not. Make it a condition for all assets and numerical or alphanumerical
@@ -20150,6 +20171,28 @@ var EngCalcs = EngCalcs || {};
 		findState.scope = save.s; findState.prop = save.p;
 		return out;
 	}
+	// **THE SAME LISTS, WORDED IN ENGLISH** (Perry's review, 2026-10-07): the def lists are built
+	// again with the English values of their keys (pageConfig.findEnglishWords) standing in, so every
+	// label, composed ones included ("Roughness, C", "Average source share"), has its English
+	// spelling. Null on a page without the English copy.
+	function findEnglishDefs(fn) {
+		var pc = EngCalcs.pageConfig || {}, en = pc.findEnglishWords, merged = {}, k;
+		if (!en) { return null; }
+		for (k in pc) { if (Object.prototype.hasOwnProperty.call(pc, k)) { merged[k] = pc[k]; } }
+		for (k in en) { if (Object.prototype.hasOwnProperty.call(en, k)) { merged[k] = en[k]; } }
+		EngCalcs.pageConfig = merged;
+		try { return fn(); } finally { EngCalcs.pageConfig = pc; }
+	}
+	// `defs` with each row's English label added to the spellings in its third slot.
+	function findWithEnglish(defs, enDefs) {
+		var byKey = {};
+		(enDefs || []).forEach(function (d) { byKey[d[0]] = d[1]; });
+		return defs.map(function (d) {
+			var en = byKey[d[0]];
+			if (!en || en === d[1]) { return d; }
+			return [d[0], d[1], [en].concat(d[2] === undefined || d[2] === null ? [] : d[2])];
+		});
+	}
 	// The word that could not be understood, for the message. Up to the next space, dot or bracket.
 	function findBadWord(text, at) {
 		var m = /^[^\s().]+/.exec(text.substring(at));
@@ -20203,7 +20246,7 @@ var EngCalcs = EngCalcs || {};
 			}
 			i += 1; ws();
 			propDefs = findDefsFor(scope).props;
-			propAlts = findAlts(propDefs);
+			propAlts = findAlts(findWithEnglish(propDefs, findEnglishDefs(function () { return findDefsFor(scope).props; })));
 			at = i;
 			m = findMatchAlt(s, i, propAlts);
 			if (!m) {
@@ -20212,7 +20255,7 @@ var EngCalcs = EngCalcs || {};
 			}
 			prop = m.key; i += m.len;
 			opDefs = findDefsFor(scope, prop).ops;
-			opAlts = findAlts(opDefs);
+			opAlts = findAlts(findWithEnglish(opDefs, findEnglishDefs(function () { return findDefsFor(scope, prop).ops; })));
 			ws();
 			at = i;
 			// **AN EXTREME IS MATCHED AS A WHOLE PHRASE, COUNT INCLUDED**, because its count is
@@ -20252,6 +20295,8 @@ var EngCalcs = EngCalcs || {};
 				return fail('lpn_find_q_err_value', 'This condition needs a value after it: {op}',
 					{ op: findLabelOf(opDefs, op) }, at);
 			}
+			// A choice is matched by its code: the word on the pull-down is read as the code it names.
+			if (findPropIsChoice(prop) && findChoiceCodeOf(prop, v.v) !== null) { v.v = findChoiceCodeOf(prop, v.v); }
 			return { t: 'cond', scope: scope, prop: prop, op: op, value: v.v };
 		}
 		function primary() {
@@ -20411,7 +20456,7 @@ var EngCalcs = EngCalcs || {};
 			if (!r.ok) {
 				findQueryError = { msg: r.msg + ' ' + findMsg('lpn_find_q_err_pos', '(at character {n})',
 					{ n: String(r.pos + 1) }) };
-			} else if (findAstIsCond(r.ast)) {
+			} else if (findAstIsCond(r.ast) && !findChoiceUnknown(r.ast)) {
 				findState.scope = r.ast.scope; findState.prop = r.ast.prop;
 				findState.op = r.ast.op; findState.value = r.ast.value;
 				findNormalize();
@@ -20421,6 +20466,13 @@ var EngCalcs = EngCalcs || {};
 		}
 		renderFindControls();
 		renderFindMessage();
+	}
+	// A single condition on a choice property whose value names no choice: the pull-down cannot show
+	// it, so it runs as typed (and matches nothing) with the controls put away, rather than being
+	// reset to the first choice and searching for something nobody typed.
+	function findChoiceUnknown(ast) {
+		return findPropIsChoice(ast.prop) && !findOpIsExtreme(ast.op) && !findOpIsValueless(ast.op)
+			&& findChoiceCodeOf(ast.prop, ast.value) === null;
 	}
 	function findControlsShown() { return !findQueryAst && !findQueryError; }
 	function renderFindControls() {
@@ -20799,6 +20851,9 @@ var EngCalcs = EngCalcs || {};
 	}
 	function runFind() {
 		var pc = EngCalcs.pageConfig || {}, run;
+		// A typed query can change the kind of asset found, so Change what was found is rebuilt for
+		// it here: before this, a query typed into the line left that part offering nothing.
+		rebuildReplaceForm();
 		findConnNote = '';
 		findHasRun = true;
 		// The typed query is the one that runs, and an unreadable one runs nothing at all.
@@ -34194,8 +34249,9 @@ var EngCalcs = EngCalcs || {};
 			LPN_FFBOX_KEY, LPN_ENERGYBOX_KEY, LPN_CMPBOX_KEY, LPN_RPTBOX_KEY, LPN_CONTOURBOX_KEY, LPN_MSGHIDDEN_KEY,
 			// 'lpn_notesbox' and 'lpn_hotkeysbox' join the list here rather than a day later, for the
 			// same reason every entry above states its own miss: window furniture left out of this
-			// list makes "exactly as a brand-new visitor would see it" false for that one key. Named
-			// as literals because LPN_NOTESBOX_KEY and LPN_HOTKEYSBOX_KEY are declared later in this
+			// list makes "exactly as a brand-new visitor would see it" false for that one key. ('lpn_notesbox'
+			// is a retired key, still swept so an old browser's copy goes.) Named
+			// as literals because LPN_HOTKEYSBOX_KEY is declared later in this
 			// file, the same reason 'lpn_show_titles' below is a literal.
 			'lpn_notesbox', 'lpn_hotkeysbox',
 			// 'lpn_snipbox' (the Screenshot box and its magnification) joined the day it was written.
@@ -41432,7 +41488,7 @@ var EngCalcs = EngCalcs || {};
 	// accessible name and the head of the tip. Everything else on this page -- the menu bar, the
 	// menu rows, the tab strip, the map symbols -- keeps its words and keeps setLabel().
 	//
-	// Every button that goes through here is also recorded, so Help > "What the toolbar icons mean"
+	// Every button that goes through here is also recorded, so the User guide's Toolbar section
 	// is DERIVED from the strip rather than being a second list to keep in step with it. A new
 	// toolbar button appears in that list without anybody remembering to add it.
 	var toolbarTipsWired = false;
@@ -41443,8 +41499,8 @@ var EngCalcs = EngCalcs || {};
 	// or a touch user learns what an icon-only button does. The two jobs used to be bolted together
 	// so tightly that taking one meant losing the other, which nobody had asked for.). This is only
 	// the bookkeeping: keyed on the button so a repaint replaces its row rather than adding one, and
-	// callable with an empty `tip` for a control that genuinely carries none -- `iconGuideRows()`
-	// already treats a falsy tip as "no tip on this row" the same way `openMenu()` does everywhere
+	// callable with an empty `tip` for a control that genuinely carries none -- the User guide
+	// (guideToolbarRows()) treats a falsy tip as "no tip on this row" the same way `openMenu()` does everywhere
 	// else. setIconLabel() below calls this too, so every ordinary toolbar button keeps getting both
 	// jobs from the one call it always made; a button built by hand because it must carry no tip
 	// calls this alone.
@@ -41608,6 +41664,9 @@ var EngCalcs = EngCalcs || {};
 			b.className = 'lpn-menu-row';
 			b.setAttribute('role', 'menuitem');
 			b.tabIndex = -1;   // arrows move through the rows; Tab leaves the menu (Task 748)
+			// The row it was drawn from, so the User guide can find this row again (a guide row
+			// SHOWS it) and `?` on this row can find its guide entry. Read, never run.
+			b.__lpnRow = r;
 			// A reserved icon column, not an inline prefix: a row with no natural glyph leaves the
 			// cell EMPTY and its text still lines up with its neighbours. Prefixing inline instead
 			// would ragged-edge the whole menu the moment one row went without.
@@ -43209,7 +43268,7 @@ var EngCalcs = EngCalcs || {};
 			lpn_energy_box: closeEnergyBox, lpn_contour_box: closeContourBox, lpn_snip_box: closeSnipBox,
 			lpn_scncmp_box: closeScenarioCompareBox, lpn_rptbox: closeRunReportBox, lpn_status_box: closeStatusReportBox,
 			lpn_alt_box: closeAlternativesBox, lpn_full_box: closeFullReportBox, lpn_calib_box: closeCalibBox,
-			'lpn_notes_popup': closeNotesPopup, 'lpn_hotkeys_popup': closeHotkeysBox
+			'lpn_hotkeys_popup': closeHotkeysBox
 		};
 	}
 	// A record as it is before any storage has been read.
@@ -43307,7 +43366,7 @@ var EngCalcs = EngCalcs || {};
 	EngCalcs.lpnWorkspacePlan = workspacePlan;
 	EngCalcs.lpnWorkspaceCarries = workspaceCarries;
 	// **THE THREE IMPORT ROWS, APART FROM THE MENU THAT SHOWS THEM** (Task 718), the same split
-	// iconGuideRows() takes from openHelpMenu(): a harness can ask what the submenu offers without
+	// mapMenuRows() takes from openMapMenu(): a harness can ask what the submenu offers without
 	// driving a popup. Each row is unchanged from the flat list it moved out of -- same icon, same
 	// label key, same tip, same handler.
 	function importMenuRows() {
@@ -43380,6 +43439,11 @@ var EngCalcs = EngCalcs || {};
 		// own for the toolbar button and the keyboard, so this one is about the door rather than
 		// the deed: a menu that opens and then refuses every row is a menu that teaches nothing.
 		if (georefBlocksProjectSwitch()) { return; }
+		openMenu(anchor, fileMenuRows());
+	}
+	// **THE ROWS, APART FROM THE OPENING OF THEM** (the split Task 542 gave mapMenuRows()), so the
+	// User guide lists what this menu offers from the menu itself. A pure extraction.
+	function fileMenuRows() {
 		var pc = EngCalcs.pageConfig || {}, id = library.openId, entry = indexEntry(id);
 		var linked = isLinked(id), api = fileApiAvailable();
 		// **RECENT FILES SIT JUST ABOVE CLOSE** (Tom, 2026-09-25, correcting "Exit" to "Close" on
@@ -43406,7 +43470,7 @@ var EngCalcs = EngCalcs || {};
 				});
 			});
 		}
-		openMenu(anchor, [
+		return [
 			// New project OPENS A SUBMENU now (Task 264, Tom 2026-08-10) rather than making a blank
 			// one on the spot -- "Blank project" is still the first row of it, so the old act is one
 			// extra click and every other way to start is finally reachable from the same place.
@@ -43498,16 +43562,17 @@ var EngCalcs = EngCalcs || {};
 		], recentRows, [
 			{ separator: true },
 			{ icon: 'close', label: pc.lpn_close || 'Close', fn: function () { closeTab(id); } }
-		]));
+		]);
 	}
 	// ---- The menu bar (ROADMAP Task 211) ----
 	// Every command on this page is reachable from here; the toolbar is the high-use subset, so a
 	// command appearing in both is correct, not duplication to be cleaned up. The names are the ones
 	// desktop applications have used for thirty years: adopting a paradigm only pays if it is adopted
 	// whole. Rows are data, not markup, so moving a command between menus is a one-line change.
-	function openEditMenu(anchor) {
+	function openEditMenu(anchor) { openMenu(anchor, editMenuRows(anchor)); }
+	function editMenuRows(anchor) {
 		var pc = EngCalcs.pageConfig || {};
-		openMenu(anchor, [
+		return [
 			// **SELECT IS A MENU ROW BECAUSE THE TOOLBAR IS NOT ALWAYS THERE** (Task 486). Below the
 			// small-screen breakpoint every toolbar control except the transport is hidden, and
 			// Select was the one of them with no other door: Insert can put you into add-junction
@@ -43550,7 +43615,7 @@ var EngCalcs = EngCalcs || {};
 				setMode(mode === 'delete' ? 'select' : 'delete');
 			} },
 			{ icon: 'delnetwork', label: pc.lpn_edit_delete_network || 'Delete network', fn: deleteNetwork }
-		]);
+		];
 	}
 	// **THERE IS NO INSERT MENU ANY MORE** (Tom, 2026-08-27, deciding Task 543's larger half):
 	// *"(1) Change the View menu to Map. (2) Move the Insert asset group to Water as the first item,
@@ -43685,44 +43750,28 @@ var EngCalcs = EngCalcs || {};
 	// EVERY row here opens a NEW TAB, including the two internal pages, and that is not stylistic:
 	// the beforeunload guard in init() prompts whenever a file project is dirty, so navigating this
 	// tab to About.php would meet a browser "Leave site?" dialog mid-edit.
-	// One row per toolbar button, in strip order: the icon as drawn, the name as announced, and the
-	// explanation as a tip. A MENU rather than a new popover, because a menu is exactly this shape
-	// already -- icon, label, tip -- and it is keyboard- and touch-operable without a second panel
-	// to build, position, dismiss and translate.
-	// **A FLY-OUT, NOT A SECOND TOP-LEVEL MENU, AND THAT IS THE BUG FIX** (Tom, 2026-08-18: 'Help >
-	// "What the toolbar icons mean" does nothing'). It did nothing for a precise reason worth
-	// keeping written down: it re-opened level 0 anchored on #lpn_menu_help, which is the anchor
-	// the Help menu showing at that moment was already open on -- so openMenu()'s
-	// same-anchor-means-toggle branch fired and CLOSED the menu instead of replacing it. Any menu
-	// row that opens a list is a submenu; declaring it as one gets the fly-out placement, the ▸
-	// marker, the hover-open and the click that does not dismiss its own parent, all for free.
-	function iconGuideRows() {
-		return toolbarIconIndex.map(function (b) {
-			return { icon: b.icon, label: b.name, tip: b.tip, fn: function () {} };
-		});
-	}
 	// **THREE GROUPS, TOM'S OWN ORDER** (Task 745, 2026-09-29: *"(1) True help: Walkthroughs,
 	// Tables and Hotkeys ..., Toolbars. (2) Helpers: Fix something, Install, and Cookies.
 	// (3) True about: Notes on this page, Welcome page, Screenshot, Privacy, Terms, About."*).
 	// This replaces every earlier grouping in this file's history -- do not restore one from an
 	// older comment. Each row still carries the key and the reasoning it always had; what moved is
 	// only which group it stands in.
-	function openHelpMenu(anchor) {
+	function openHelpMenu(anchor) { openMenu(anchor, helpMenuRows()); }
+	function helpMenuRows() {
 		var pc = EngCalcs.pageConfig || {};
 		function ext(url) { return function () { window.open(url, '_blank', 'noopener'); }; }
-		openMenu(anchor, [
+		return [
 			// ---- Group 1: true help ----
 			{ icon: 'help', label: pc.lpn_help_walkthroughs || 'Walkthroughs', fn: ext(LPN_WALKTHROUGHS_URL) },
-			// **THE NEW BOX** (Task 745). Gathers the table-help entries that used to live only in
-			// the Notes list (lpn_notes_6/7 -- see #lpn_hotkeys_popup in Looped-Network.php) and the
-			// keyboard shortcuts that had never been gathered anywhere, divided by context.
-			{ icon: 'help', label: pc.lpn_help_hotkeys || 'Tables and Hotkeys', fn: toggleHotkeysBox },
-			// **THE DISCOVERY ROUTE THAT IS NOT A TOOLTIP** (dev/toolbar-icons.md). Once the toolbar
-			// is icons only, a first-time user who does not think to hover -- and a touch user, for
-			// whom a tip needs a deliberate press-and-hold -- has no way to read the strip. This is
-			// that way: the same icon, its name, and its explanation, in one list. DERIVED from the
-			// strip itself (toolbarIconIndex), so a button added later is in it already.
-			{ icon: 'help', label: pc.lpn_help_icons || 'Toolbar', submenu: iconGuideRows },
+			// **THE USER GUIDE** (Tom, 2026-10-06: *"The Help, Toolbar menu is unconventional. It should
+			// be a list or table in a help manual or on a help page ... Maybe items 2 and 3 combined
+			// into a simple User Manual"*; Ida's design, journal 2026-10-06). ONE row where "Tables and
+			// Hotkeys" and the "Toolbar" fly-out stood: the fly-out was 26 rows that looked like
+			// commands and did nothing, with the explanation hidden in a hover tip that touch cannot
+			// reach. The box shows every toolbar button with its tip written out, every menu row, and
+			// the map and table keys, with a search over all of it. `?` opens it from anywhere but a
+			// field, at the control under the pointer or holding focus -- see openGuideAt().
+			{ icon: 'help', label: pc.lpn_help_manual || 'Guide', hotkey: '?', fn: toggleHotkeysBox },
 			{ separator: true },
 			// ---- Group 2: helpers ----
 			// **A VERB, not a noun.** "Contribute" reads as money or code to most visitors; the
@@ -43743,12 +43792,7 @@ var EngCalcs = EngCalcs || {};
 				fn: function () { if (window.ecReopenConsent) { window.ecReopenConsent(); } } },
 			{ separator: true },
 			// ---- Group 3: true about ----
-			// The page's own Notes, which used to sit below the map (Tom, 2026-08-14). This is the
-			// ONE row in this menu that does not open a new tab, because it does not leave the page
-			// at all -- the notes are still in this document, hidden, and this reveals them. See the
-			// comment on #lpn_notes_popup in Looped-Network.php for why the markup stayed in the
-			// page rather than becoming a JS string.
-			{ icon: 'help', label: pc.lpn_help_notes || 'Notes on this page', fn: toggleNotesPopup },
+			// (Notes on this page moved into the Guide, Tom 2026-10-09.)
 			// **THE WAY BACK TO THE SITE, AND IT IS ONE ROW** (Tom, 2026-09-11: *"Help menu to
 			// include Welcome Page ... as last item in top group"* -- true of ITS group, now group
 			// 3, since Task 745 split the one group into three).
@@ -43766,7 +43810,7 @@ var EngCalcs = EngCalcs || {};
 			// About last, where every Help menu in the world puts it, and an IN-PAGE box rather
 			// than a link to the suite's About.php -- Tom's fourth embarrassment.
 			{ icon: 'info', label: pc.about_main_menu || 'About', fn: toggleAboutPopup }
-		]);
+		];
 	}
 
 	// **ONE ROW PER LANGUAGE, AND EACH DECLARES ITS OWN** (Task 625). The rows come from
@@ -43797,61 +43841,6 @@ var EngCalcs = EngCalcs || {};
 		openMenu(anchor, rows);
 	}
 
-	// **THE NOTES BOX** (Tom, 2026-09-28: *"Draggable non-hog box for Help, Notes. I need it open
-	// for my spreadsheet editing video."*). Until now this was a centred popover in VIEW_POPOVERS --
-	// a click anywhere away from it, or a bare Escape, closed it, which is exactly what "non-hog"
-	// rules out. It is now the same shell and the same memory as Settings, Find and the four report
-	// boxes: draggable by its title bar, resizable, remembered per browser as window furniture
-	// (`lpn_notesbox`), and dismissed only by its own × or an Escape pressed while focus is inside
-	// it -- see wireNotesBox().
-	function notesBoxEl() { return document.getElementById('lpn_notes_popup'); }
-	function notesBoxIsOpen() {
-		var b = notesBoxEl();
-		return !!b && b.style.display === 'flex';
-	}
-	var LPN_NOTESBOX_KEY = 'lpn_notesbox';
-	var notesboxLayout = newBoxLayout();
-	function saveNotesboxLayout() {
-		if (boxSaveHeld()) { return; }
-		try { localStorage.setItem(LPN_NOTESBOX_KEY, JSON.stringify(notesboxLayout)); } catch (e) {}
-	}
-	// **OPENS AT THE MAP'S TOP-RIGHT, NOT CENTRED, THE FIRST TIME** (setboxHomeCorner() -- the same
-	// corner Settings opens at). Centring is what the old popover did, and centring a box tall
-	// enough to hold every term in this list lands squarely on top of the Tables pane docked under
-	// the map, which is the one thing this box must not do on a first open.
-	function openNotesBox() {
-		var box = notesBoxEl(), r, at, home, floor;
-		if (!box) { return; }
-		closeMenu();
-		closeViewPopovers();
-		hideOpenTips();
-		box.style.display = 'flex';
-		placePanelForScreen(box, function () {
-			applyBoxSize(box, notesboxLayout);
-			floor = chromeFloor();
-			capPanelToRoomBelow(box, floor);
-			r = box.getBoundingClientRect();
-			if (notesboxLayout.left === null || notesboxLayout.top === null) {
-				home = setboxHomeCorner(r.width, r.height);
-				at = clampPanel(home.left, home.top, r.width, r.height,
-					window.innerWidth, window.innerHeight, floor);
-			} else {
-				at = restoreBounds(notesboxLayout.left, notesboxLayout.top, r.width, r.height,
-					window.innerWidth, window.innerHeight);
-			}
-			box.style.left = at.left + 'px';
-			box.style.top = at.top + 'px';
-		});
-		if (!notesboxLayout.open) { notesboxLayout.open = true; saveNotesboxLayout(); }
-	}
-	function closeNotesPopup() {
-		hidePanel(notesBoxEl());
-		if (notesboxLayout.open) { notesboxLayout.open = false; saveNotesboxLayout(); }
-	}
-	function toggleNotesPopup() {
-		if (notesBoxIsOpen() && !boxIsTucked(notesBoxEl())) { closeNotesPopup(); return; }
-		openNotesBox();
-	}
 	// The About box. Still a centred, click-away-dismissed popover -- unlike Notes since Tom's
 	// 2026-09-28 ruling, this is read once and closed, not a reference kept open beside the work.
 	function toggleAboutPopup() {
@@ -43870,24 +43859,13 @@ var EngCalcs = EngCalcs || {};
 		popup.style.top = top + 'px';
 	}
 	function closeAboutPopup() { hidePanel(document.getElementById('lpn_about_popup')); }
-	function wireNotesPopup() {
+	function wireAboutPopup() {
 		var ax = document.getElementById('lpn_about_close');
 		if (ax) { ax.addEventListener('click', closeAboutPopup); }
-		var box = notesBoxEl(), x = document.getElementById('lpn_notes_close');
-		if (!box) { return; }
-		if (x) { x.addEventListener('click', closeNotesPopup); }
-		// **ESCAPE CLOSES IT ONLY WHEN FOCUS IS INSIDE IT** -- bound on the box itself rather than on
-		// `document`, exactly like the CRS convert-as box (closeConvasBox()). The page-wide Escape
-		// handler no longer knows about this box at all (VIEW_POPOVERS above), which is the point:
-		// pressing Escape to back out of an edit elsewhere on the page must not also sweep this box
-		// away, and a table cell or the map must keep taking Escape for its own undo.
-		box.addEventListener('keydown', function (e) {
-			if (e.key === 'Escape') { e.preventDefault(); closeNotesPopup(); }
-		});
-		wireBoxMemory(box, LPN_NOTESBOX_KEY, notesboxLayout, saveNotesboxLayout, notesBoxIsOpen);
 	}
 
-	// **THE TABLES AND HOTKEYS BOX** (Task 745). The same non-hog shell and memory as Notes --
+	// **THE USER GUIDE BOX** (Tables and Hotkeys until 2026-10-06, Task 745; see renderGuide()
+	// below). The same non-hog shell and memory as Notes --
 	// draggable, resizable, remembered per browser as window furniture (`lpn_hotkeysbox`), and
 	// dismissed only by its own X or an Escape pressed while focus is inside it.
 	function hotkeysBoxEl() { return document.getElementById('lpn_hotkeys_popup'); }
@@ -43901,13 +43879,17 @@ var EngCalcs = EngCalcs || {};
 		if (boxSaveHeld()) { return; }
 		try { localStorage.setItem(LPN_HOTKEYSBOX_KEY, JSON.stringify(hotkeysboxLayout)); } catch (e) {}
 	}
+	// Where focus was when the Guide opened, so that closing it puts the reader back there.
+	var guideReturnEl = null, guidePendingKey = null;
 	function openHotkeysBox() {
-		var box = hotkeysBoxEl(), r, at, home, floor;
+		var box = hotkeysBoxEl(), r, at, home, floor, ae = document.activeElement;
 		if (!box) { return; }
+		if (ae && ae !== document.body && !box.contains(ae)) { guideReturnEl = ae; }
 		closeMenu();
 		closeViewPopovers();
 		hideOpenTips();
 		box.style.display = 'flex';
+		renderGuide();
 		placePanelForScreen(box, function () {
 			applyBoxSize(box, hotkeysboxLayout);
 			floor = chromeFloor();
@@ -43927,7 +43909,11 @@ var EngCalcs = EngCalcs || {};
 		if (!hotkeysboxLayout.open) { hotkeysboxLayout.open = true; saveHotkeysboxLayout(); }
 	}
 	function closeHotkeysBox() {
+		var back = guideReturnEl;
+		guideReturnEl = null;
 		hidePanel(hotkeysBoxEl());
+		if (back && back.isConnected && back.getClientRects().length && back.focus) { try { back.focus({ preventScroll: true }); } catch (e) { back.focus(); } }
+		try { if (/^#guide/i.test(location.hash)) { history.replaceState(null, '', location.pathname + location.search); } } catch (e) {}
 		if (hotkeysboxLayout.open) { hotkeysboxLayout.open = false; saveHotkeysboxLayout(); }
 	}
 	function toggleHotkeysBox() {
@@ -43939,9 +43925,875 @@ var EngCalcs = EngCalcs || {};
 		if (!box) { return; }
 		if (x) { x.addEventListener('click', closeHotkeysBox); }
 		box.addEventListener('keydown', function (e) {
-			if (e.key === 'Escape') { e.preventDefault(); closeHotkeysBox(); }
+			// **THE KEY IS SPENT HERE.** Closing returns focus to the control that opened the Guide,
+			// which is often inside another box; the page's own Escape handler would then see focus
+			// (and the pointer) in that box and close it too. One Esc, one box.
+			if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); if (e.stopImmediatePropagation) { e.stopImmediatePropagation(); } closeHotkeysBox(); }
 		});
 		wireBoxMemory(box, LPN_HOTKEYSBOX_KEY, hotkeysboxLayout, saveHotkeysboxLayout, hotkeysBoxIsOpen);
+	}
+	// ---- THE USER GUIDE (Tom, 2026-10-06; Ida's design, dev/agents/interface-designer/journal.md) ----
+	// One box, four sections: Toolbar, Menus, Map, Tables. **THE FIRST TWO ARE DERIVED, NEVER
+	// WRITTEN**: the toolbar rows come from toolbarIconIndex (the strip records itself through
+	// registerToolbarIcon()), and the menu rows from the same row functions the menu bar opens
+	// (fileMenuRows() and its siblings), so a button or a row added later is in the guide without
+	// anybody remembering to add it. Map and Tables are the PHP-rendered tables that were already in
+	// this box, so a search engine, print and Find-in-page still see them.
+	//
+	// **A ROW SHOWS, IT NEVER RUNS** (Ida: a menu is a list of verbs, a guide a list of nouns with
+	// definitions). Clicking a toolbar row pulses the real button; on a phone, where the strip is
+	// folded away, or for a menu row, it opens that menu (and fly-out) with the row focused. Nothing
+	// here calls a row's `fn`. A guide that ran commands would let a reader never meet the menu bar;
+	// one that points at it teaches it.
+	var GUIDE_PULSE_MS = 1500;
+	var GUIDE_MENUS = [
+		{ id: 'lpn_menu_file', rows: function () { return fileMenuRows(); } },
+		{ id: 'lpn_menu_edit', rows: function () { return editMenuRows(null); } },
+		{ id: 'lpn_menu_map', rows: function () { return mapMenuRows(); } },
+		{ id: 'lpn_menu_project', rows: function () { return waterMenuRows(); } },
+		{ id: 'lpn_menu_help', rows: function () { return helpMenuRows(); } }
+	];
+	// The word on the menu-bar button itself, so the guide can never name a menu differently --
+	// without the keyboard-mode letter badge that rides inside the button (.lpn-kbdbadge).
+	function guideMenuLabel(id) {
+		var b = document.getElementById(id), c;
+		if (!b) { return ''; }
+		c = b.cloneNode(true);
+		Array.prototype.forEach.call(c.querySelectorAll('.lpn-kbdbadge, svg'), function (x) { x.parentNode.removeChild(x); });
+		return String(c.textContent || '').replace(/\s+/g, ' ').trim();
+	}
+	// Every menu row, one fly-out deep (openMenu() has exactly one fly-out level). Hidden rows,
+	// headings and `variable` rows (recent file names, scenario names: content, not commands) are
+	// left out; separators are kept and tidied at render time.
+	function guideMenuEntries() {
+		var out = [];
+		GUIDE_MENUS.forEach(function (m) {
+			var rows, menuLabel = guideMenuLabel(m.id);
+			try { rows = m.rows() || []; } catch (err) { rows = []; }
+			(function walk(list, depth, parent) {
+				list.forEach(function (r) {
+					var e, sub;
+					if (!r || r.hidden || r.variable || r.heading) { return; }
+					if (r.separator) { out.push({ menuId: m.id, menuLabel: menuLabel, separator: true, depth: depth, parent: parent }); return; }
+					if (!r.label) { return; }
+					e = { menuId: m.id, menuLabel: menuLabel, row: r, depth: depth, parent: parent };
+					out.push(e);
+					if (r.submenu && depth === 0) {
+						try { sub = r.submenu() || []; } catch (err2) { sub = []; }
+						walk(sub, 1, e);
+					}
+				});
+			})(rows, 0, null);
+		});
+		return out;
+	}
+	// A toolbar button's menu twin: the first menu row with the same icon AND the same words. Both,
+	// because either alone mismatches (two rows share 'del'; Graphs rows share no icon at all).
+	function guideTwinFor(b, entries) {
+		var i, e;
+		for (i = 0; i < entries.length; i++) {
+			e = entries[i];
+			if (!e.separator && e.row.icon === b.icon && e.row.label === b.name) { return e; }
+		}
+		return null;
+	}
+	// The tip without the "Shortcut: N" toolTipWithKey() appended: the key has a <kbd> of its own.
+	function guideTipText(b) {
+		var tip = String(b.tip || ''), t = b.el && b.el.dataset ? b.el.dataset.tool : null, suffix;
+		if (t) {
+			suffix = toolTipWithKey(t, '');
+			if (suffix && tip.slice(-suffix.length) === suffix) { tip = tip.slice(0, -suffix.length).trim(); }
+		}
+		return tip;
+	}
+	function guideKeysFor(b, twin) {
+		var t = b.el && b.el.dataset ? b.el.dataset.tool : null, keys = [], k, alt;
+		if (t) {
+			k = toolKeyFor(t); alt = LPN_TOOL_ALT_KEYS[t];
+			if (k) { keys.push(k); }
+			if (alt) { keys.push(alt); }
+		}
+		if (!keys.length && twin && twin.row.hotkey) { keys.push(menuHotkeyText(twin.row.hotkey)); }
+		return keys;
+	}
+	// One record per toolbar button, in strip order. Exported for the harness.
+	function guideToolbarRows() {
+		var entries = guideMenuEntries();
+		return toolbarIconIndex.map(function (b) {
+			var twin = guideTwinFor(b, entries);
+			return {
+				b: b, twin: twin, tip: guideTipText(b), keys: guideKeysFor(b, twin),
+				group: b.el && b.el.closest ? b.el.closest('.lpn-toolbar-group') : null,
+				shown: !!(b.el && b.el.isConnected && b.el.getClientRects().length > 0)
+			};
+		});
+	}
+	function guideSpan(cls, text) {
+		var s = document.createElement('span');
+		s.className = cls;
+		if (text) { s.textContent = text; }
+		return s;
+	}
+	// A drawn chevron, not a '›' character, so RTL mirrors it in CSS like the transport arrows.
+	function guideChevron() {
+		var ns = 'http://www.w3.org/2000/svg', svgEl = document.createElementNS(ns, 'svg'), path = document.createElementNS(ns, 'path');
+		svgEl.setAttribute('viewBox', '0 0 10 10');
+		svgEl.setAttribute('class', 'lpn-guide-chev');
+		svgEl.setAttribute('aria-hidden', 'true');
+		path.setAttribute('d', 'M3.5 1.5 L7 5 L3.5 8.5');
+		svgEl.appendChild(path);
+		return svgEl;
+	}
+	function guidePathEl(e) {
+		var p = guideSpan('lpn-guide-path'), parts = [e.menuLabel];
+		if (e.parent) { parts.push(e.parent.row.label); }
+		parts.push(e.row.label);
+		parts.forEach(function (w, i) {
+			if (i) { p.appendChild(guideChevron()); }
+			p.appendChild(guideSpan('lpn-guide-seg', w));
+		});
+		return p;
+	}
+	function guideRow(icon, name, tip, keys) {
+		var row = document.createElement('button'), ic = guideSpan('lpn-guide-icon'), desc, keyEl, ie;
+		row.type = 'button';
+		row.className = 'lpn-guide-row';
+		ie = icon ? iconEl(icon) : null;
+		if (ie) { ic.appendChild(ie); }
+		row.appendChild(ic);
+		row.appendChild(guideSpan('lpn-guide-name', name));
+		desc = guideSpan('lpn-guide-desc');
+		if (tip) { desc.appendChild(guideSpan('lpn-guide-tip', tip)); }
+		row.appendChild(desc);
+		keyEl = guideSpan('lpn-guide-keys');
+		(keys || []).forEach(function (k) {
+			var kb = document.createElement('kbd');
+			kb.textContent = k;
+			keyEl.appendChild(kb);
+		});
+		row.appendChild(keyEl);
+		return row;
+	}
+	function guideRule(list) {
+		var last = list.lastElementChild;
+		if (!last || last.className === 'lpn-guide-rule' || last.tagName === 'H3') { return; }
+		var hr = document.createElement('hr');
+		hr.className = 'lpn-guide-rule';
+		list.appendChild(hr);
+	}
+	function guideTrimRule(list) {
+		var last = list.lastElementChild;
+		if (last && last.className === 'lpn-guide-rule') { list.removeChild(last); }
+	}
+	function renderGuide() {
+		var pc = EngCalcs.pageConfig || {}, tb = document.getElementById('lpn_guide_toolbar'),
+			mn = document.getElementById('lpn_guide_menus'), entries, lastGroup = null, curMenu = null, block = null;
+		if (!tb || !mn) { return; }
+		entries = guideMenuEntries();
+		var secNames = Array.prototype.map.call(document.querySelectorAll('#lpn_hotkeys_popup .lpn-guide-section > h2'),
+			function (h2) { return String(h2.textContent || '').replace(/\s+/g, ' ').trim().toLowerCase(); });
+		tb.innerHTML = '';
+		guideToolbarRows().forEach(function (g, i) {
+			var row, twin, also, at;
+			if (lastGroup && g.group !== lastGroup) { guideRule(tb); }
+			lastGroup = g.group;
+			row = guideRow(g.b.icon, g.b.name, g.tip, g.keys);
+			row.setAttribute('data-guide-toolbar', String(i));
+			if (!g.shown) { row.classList.add('lpn-guide-off'); }
+			if (g.twin) {
+				// "Also in Edit › Delete": the sentence is one key with a {menu} slot, so a translator
+				// can put the path wherever the language wants it.
+				also = guideSpan('lpn-guide-twin');
+				twin = (pc.lpn_guide_also || 'Also in {menu}').split('{menu}');
+				if (twin[0]) { also.appendChild(document.createTextNode(twin[0])); }
+				also.appendChild(guidePathEl(g.twin));
+				if (twin[1]) { also.appendChild(document.createTextNode(twin[1])); }
+				row.querySelector('.lpn-guide-desc').appendChild(also);
+			}
+			row.__lpnGuide = { kind: 'toolbar', g: g };
+			tb.appendChild(row);
+		});
+		mn.innerHTML = '';
+		entries.forEach(function (e) {
+			var row, anc, ctx;
+			if (e.menuId !== curMenu) {
+				if (block) { guideTrimRule(block); }
+				curMenu = e.menuId;
+				block = document.createElement('div');
+				block.className = 'lpn-guide-menu';
+				block.setAttribute('data-guide-menu', e.menuId);
+				// A second level of the index: the menu is a sub-heading of Menus, in the rail too.
+				block.setAttribute('data-guide-key', 'menu-' + e.menuId);
+				var h = document.createElement('h3');
+				// A menu named like a section of the Guide ("Map") is told apart as "Map menu", so the rail
+				// does not list one word twice (the same rule the Boxes entries follow).
+				h.textContent = secNames.indexOf(String(e.menuLabel).toLowerCase()) >= 0 ?
+					(pc.lpn_guide_menu_named || '{menu} menu').replace('{menu}', e.menuLabel) : e.menuLabel;
+				h.tabIndex = -1;
+				block.appendChild(h);
+				mn.appendChild(block);
+			}
+			if (e.separator) { if (e.depth === 0) { guideRule(block); } return; }
+			row = guideRow(e.row.icon, e.row.label, e.row.tip, e.row.hotkey ? [menuHotkeyText(e.row.hotkey)] : []);
+			if (e.depth) {
+				row.classList.add('lpn-guide-sub');
+				// The ancestors' names, drawn before the name only while a search is active (CSS), so a
+				// hit shows its whole path: Menus > Water > Scenarios > Basic mode.
+				for (anc = e.parent, ctx = []; anc; anc = anc.parent) { ctx.unshift(anc.row.label); }
+				row.querySelector('.lpn-guide-name').setAttribute('data-guide-ctx', ctx.join(' \u203a '));
+			}
+			row.__lpnGuide = { kind: 'menu', e: e };
+			block.appendChild(row);
+		});
+		if (block) { guideTrimRule(block); }
+		renderGuideBoxes();
+		guideDimNote();
+		guideFilter();
+		guideObserve();
+	}
+	// **DIMMING FOLLOWS THE STRIP WHILE THE GUIDE IS OPEN** (Perry, pre-review 2026-10-06). The
+	// strip shows and hides buttons under an open guide -- the transport when another project opens,
+	// Calculate when Recalculate automatically is turned off -- so "dimmed" is re-read from the
+	// buttons whenever anything on the strip changes, not only when the guide is drawn. A button
+	// that is not in the guide yet (the strip was rebuilt) redraws the section instead.
+	var guideDimQueued = false;
+	// The one sentence that says what a dimmed name means (Ida, 2026-10-07: on a phone, grey names
+	// read as disabled). Shown only while some toolbar row is dimmed.
+	function guideDimNote() {
+		var note = document.getElementById('lpn_guide_dimnote');
+		if (note) { note.hidden = !document.querySelector('#lpn_guide_toolbar > .lpn-guide-row.lpn-guide-off'); }
+	}
+	function guideRefreshDimming() {
+		var rows, n = 0;
+		guideDimQueued = false;
+		if (!hotkeysBoxIsOpen()) { return; }
+		rows = document.querySelectorAll('#lpn_guide_toolbar > .lpn-guide-row');
+		Array.prototype.forEach.call(rows, function (r) {
+			var g = r.__lpnGuide && r.__lpnGuide.g, el = g && g.b.el;
+			if (g && toolbarIconIndex.indexOf(g.b) >= 0) { n++; }
+			r.classList.toggle('lpn-guide-off', !(el && el.isConnected && el.getClientRects().length > 0));
+		});
+		guideDimNote();
+		if (n !== toolbarIconIndex.length || rows.length !== toolbarIconIndex.length) { renderGuide(); }
+	}
+	function guideQueueDimming() {
+		if (guideDimQueued) { return; }
+		guideDimQueued = true;
+		(window.requestAnimationFrame || setTimeout)(guideRefreshDimming);
+	}
+	// ---- Search: one box over all four sections ----
+	// **MATCHING IGNORES MARKS**: Arabic harakat, shadda and tatweel, Hebrew points, and the accents of
+	// Latin letters, so a reader who types the bare letters finds the pointed word. One character at a
+	// time, so an index in the folded text is an index in the original (guideSnippet() needs that).
+	var GUIDE_MARKS = /[\u0300-\u036f\u0610-\u061a\u064b-\u065f\u0670\u06d6-\u06ed\u0640\u0591-\u05bd\u05bf\u05c1\u05c2\u05c4\u05c5\u05c7]/g;
+	function guideFoldChar(ch) {
+		var f = ch;
+		try { f = ch.normalize('NFD'); } catch (e) { /* no normalize */ }
+		return f.replace(GUIDE_MARKS, '').toLowerCase();
+	}
+	function guideFold(t) {
+		var out = '', i, s = String(t || '');
+		for (i = 0; i < s.length; i++) { out += guideFoldChar(s.charAt(i)); }
+		return out;
+	}
+	// Text as read: table cells and list rows with a space between them, not run together.
+	// All of it: an entry that holds a table also has a heading and paragraphs to match (the Find
+	// and replace chapter), so the cells are spaced apart rather than read alone.
+	function guideTextOf(el) {
+		var out = [];
+		if (!el.querySelector || !el.querySelector('td, th')) { return String(el.textContent || ''); }
+		(function walk(n) {
+			var c;
+			if (n.nodeType === 3) { out.push(n.nodeValue); return; }
+			for (c = n.firstChild; c; c = c.nextSibling) { walk(c); }
+			if (n.nodeType === 1 && /^(TD|TH|TR|P|LI|DT|DD|H[1-6])$/.test(n.tagName)) { out.push(' '); }
+		})(el);
+		return out.join('');
+	}
+	function guideMatch(el, q) { return guideFold(guideTextOf(el)).indexOf(q) >= 0; }
+	function guideFilter() {
+		var box = hotkeysBoxEl(), input = document.getElementById('lpn_guide_search'), none = document.getElementById('lpn_guide_none'),
+			q = input ? guideFold(String(input.value || '').trim()) : '', any = false;
+		if (!box) { return; }
+		function guideShowEl(el, on) { el.style.display = on ? '' : 'none'; return on; }
+		box.classList.toggle('lpn-guide-filtering', !!q);
+		box.querySelectorAll('.lpn-guide-section').forEach(function (sec) {
+			var hit = false;
+			sec.querySelectorAll('.lpn-guide-rule').forEach(function (r) { guideShowEl(r, !q); });
+			sec.querySelectorAll('#lpn_guide_toolbar > .lpn-guide-row').forEach(function (r) {
+				if (guideShowEl(r, !q || guideMatch(r, q))) { hit = true; }
+			});
+			sec.querySelectorAll('.lpn-guide-menu').forEach(function (m) {
+				var h = m.querySelector('h3'), all = !q || guideMatch(h, q), mhit = false;
+				m.querySelectorAll('.lpn-guide-row').forEach(function (r) {
+					if (guideShowEl(r, all || guideMatch(r, q))) { mhit = true; }
+				});
+				if (guideShowEl(m, mhit)) { hit = true; }
+			});
+			// The PHP tables: a matching term shows its whole entry, otherwise only matching rows.
+			sec.querySelectorAll('dl > dt').forEach(function (dt) {
+				var dd = dt.nextElementSibling, all = !q || guideMatch(dt, q), dhit = false, trs;
+				if (!dd || dd.tagName !== 'DD') { return; }
+				// Inside a box's entry the entry is matched whole, below; its terms are not filtered.
+				if (dt.closest && dt.closest('.lpn-guide-boxentry')) { return; }
+				trs = dd.querySelectorAll('tr');
+				if (trs.length) {
+					trs.forEach(function (tr) { if (guideShowEl(tr, all || guideMatch(tr, q))) { dhit = true; } });
+				} else { dhit = all || guideMatch(dd, q); }
+				guideShowEl(dt, dhit); guideShowEl(dd, dhit);
+				if (dhit) { hit = true; }
+			});
+			// The Boxes section: a box's entry is a heading and its description, matched whole.
+			sec.querySelectorAll('.lpn-guide-boxentry').forEach(function (en) {
+				if (guideShowEl(en, !q || guideMatch(en, q))) { hit = true; }
+			});
+			sec.querySelectorAll('.lpn-guide-group').forEach(function (g) {
+				var all = !q || guideMatch(g.querySelector('h3'), q), ghit = false;
+				g.querySelectorAll('.lpn-guide-boxentry').forEach(function (en) {
+					if (guideShowEl(en, all || guideMatch(en, q))) { ghit = true; }
+				});
+				if (guideShowEl(g, ghit)) { hit = true; }
+			});
+			sec.querySelectorAll('.lpn-guide-prose').forEach(function (pr) {
+				guideShowEl(pr, !q || guideMatch(pr, q));
+				if (!q || guideMatch(pr, q)) { hit = true; }
+			});
+			if (guideShowEl(sec, hit)) { any = true; }
+		});
+		if (none) { none.hidden = any; }
+		guideRebuildNav(q);
+	}
+	// ---- THE BOXES SECTION, THE CONTENTS RAIL AND THE "?" IN A TITLE BAR (Tom, 2026-10-07) ----
+	// One entry per dockable box, derived from the boxes themselves (their title bar and the tip
+	// their corner `?` already carries), never written here. Prose for a box goes where its tip
+	// stands now, so a box with no description yet still has an entry for its "?" to open.
+	function guideBoxList() {
+		return dockBoxes.map(function (d) {
+			var t = d.box.querySelector('.lpn-setbox-title');
+			return { d: d, id: d.box.id, title: t ? String(t.textContent || '').replace(/\s+/g, ' ').trim() : '' };
+		}).filter(function (e) { return !!e.title; });
+	}
+	function renderGuideBoxes() {
+		var host = document.getElementById('lpn_guide_boxes'), pc = EngCalcs.pageConfig || {};
+		if (!host) { return; }
+		while (host.firstChild) { host.removeChild(host.firstChild); }
+		var sectionNames = Array.prototype.map.call(document.querySelectorAll('#lpn_hotkeys_popup .lpn-guide-section > h2'),
+			function (h2) { return String(h2.textContent || '').replace(/\s+/g, ' ').trim().toLowerCase(); });
+		var groups = {}, groupOrder = [];
+		guideBoxList().forEach(function (e) {
+			var en = document.createElement('div'), h = document.createElement('h3'), p, ctl, gk = '', gl = '', grp;
+			en.className = 'lpn-guide-boxentry';
+			en.id = 'lpn_guide_b_' + e.id;
+			en.setAttribute('data-guide-key', 'box-' + e.id);
+			// A box named like a section of the Guide ("Screenshot") is told apart in the Guide only, as
+			// "Screenshot box", so the rail does not list one word twice (Ida, 2026-10-07). The box's
+			// own title is untouched.
+			h.textContent = sectionNames.indexOf(e.title.toLowerCase()) >= 0 ?
+				(pc.lpn_guide_box_named || '{box} box').replace('{box}', e.title) : e.title;
+			en.appendChild(h);
+			h.tabIndex = -1;
+			(e.d.tipText || pc['lpn_guide_text_' + e.id.replace(/^lpn_/, '')] || '').split(/\\n\\n|\n\n/).forEach(function (para) {
+				if (!String(para).trim()) { return; }
+				p = document.createElement('p');
+				p.textContent = String(para).trim();
+				en.appendChild(p);
+			});
+			// A chapter longer than a paragraph or two (Find and replace, Tom 2026-10-07) is written in
+			// the page as <template id="lpn_guide_more_<box id>"> and copied in under its paragraphs.
+			var more = document.getElementById('lpn_guide_more_' + e.id);
+			if (more && more.content) { en.appendChild(document.importNode(more.content, true)); }
+			// Seventeen cards under one heading are too many to scan: each sits under the menu that
+			// opens it, named from the menu bar itself (Tom, 2026-10-09: "more index hierarchy").
+			// A box no menu opens (Properties opens on a click in the map) stays ungrouped, first.
+			ctl = guideBoxControl(e.id, true);
+			if (ctl && ctl.e) { gk = ctl.e.menuId; gl = ctl.e.menuLabel; }
+			if (!gk) { host.appendChild(en); return; }
+			grp = groups[gk];
+			if (!grp) {
+				grp = groups[gk] = document.createElement('div');
+				grp.className = 'lpn-guide-group';
+				grp.setAttribute('data-guide-key', 'boxgroup-' + gk);
+				var gh = document.createElement('h3');
+				gh.textContent = (pc.lpn_guide_group_from || 'From {menu}').replace('{menu}', gl);
+				gh.tabIndex = -1;
+				grp.appendChild(gh);
+				groupOrder.push(gk);
+			}
+			grp.appendChild(en);
+		});
+		groupOrder.forEach(function (k) { host.appendChild(groups[k]); });
+	}
+	function guideContentEl() { return document.getElementById('lpn_guide_content'); }
+	function guideVisible(el) { return !!el && el.style.display !== 'none' && (!el.closest || !el.closest('[style*="display: none"]')); }
+	function guideSnippet(sec, q) {
+		var cands = sec.querySelectorAll('.lpn-guide-row, tr, dt, dd, .lpn-guide-boxentry, .lpn-guide-prose'), i, el, t, at, map, f, k, from, to;
+		for (i = 0; i < cands.length; i++) {
+			el = cands[i];
+			if (!guideVisible(el) || el.querySelector('.lpn-guide-row, tr')) { continue; }
+			t = guideTextOf(el).replace(/\s+/g, ' ').trim();
+			f = ''; map = [];
+			for (k = 0; k < t.length; k++) { var fc = guideFoldChar(t.charAt(k)); f += fc; for (var m = 0; m < fc.length; m++) { map.push(k); } }
+			at = f.indexOf(q);
+			if (at >= 0) {
+				from = Math.max(0, map[at] - 20);
+				to = Math.min(t.length, (map[Math.min(map.length - 1, at + q.length - 1)] || 0) + 50);
+				return (from > 0 ? '\u2026' : '') + t.slice(from, to) + (to < t.length ? '\u2026' : '');
+			}
+		}
+		return '';
+	}
+	// ---- The contents rail folds (Tom, 2026-10-10: the index folds, the main text does not). An entry
+	// with entries under it carries a chevron button; the chevron, a double-click on the entry, or
+	// Enter or Space on the chevron folds it. A single click on the entry's own text still jumps.
+	// Nothing is remembered: every opening of the page starts unfolded. A search shows every match, so
+	// folding is suspended while there is a query.
+	var guideNavFolded = {};
+	function guideApplyNavFold() {
+		var nav = document.getElementById('lpn_guide_nav'), hideBelow = null, filtering;
+		if (!nav) { return; }
+		filtering = nav.getAttribute('data-filtering') === '1';
+		nav.querySelectorAll('.lpn-guide-nav-row').forEach(function (row) {
+			var lvl = +row.getAttribute('data-level'), key = row.getAttribute('data-key'), has = row.getAttribute('data-has') === '1',
+				folded = has && !filtering && !!guideNavFolded[key], b = row.querySelector('.lpn-guide-nav-chev');
+			if (hideBelow !== null && lvl > hideBelow) { row.classList.add('lpn-guide-nav-folded'); }
+			else { row.classList.remove('lpn-guide-nav-folded'); hideBelow = folded ? lvl : null; }
+			row.classList.toggle('lpn-guide-nav-closed', folded);
+			if (b) { b.setAttribute('aria-expanded', folded ? 'false' : 'true'); }
+		});
+	}
+	function guideToggleNav(key) {
+		if (!key) { return; }
+		if (guideNavFolded[key]) { delete guideNavFolded[key]; } else { guideNavFolded[key] = true; }
+		guideApplyNavFold();
+	}
+	function guideRebuildNav(q) {
+		var nav = document.getElementById('lpn_guide_nav'), cur = nav ? nav.getAttribute('data-current') : '', box = hotkeysBoxEl(), rows = [];
+		if (!nav || !box) { return; }
+		while (nav.firstChild) { nav.removeChild(nav.firstChild); }
+		nav.setAttribute('data-filtering', q ? '1' : '0');
+		function add(key, text, level, snip) {
+			var row = document.createElement('div'), a = document.createElement('a'), sn;
+			row.className = 'lpn-guide-nav-row';
+			row.setAttribute('data-level', String(level));
+			row.setAttribute('data-key', key);
+			row.setAttribute('data-has', '0');
+			a.href = '#guide/' + key;
+			a.setAttribute('data-guide-link', key);
+			if (level === 1) { a.className = 'lpn-guide-nav-sub'; }
+			if (level === 2) { a.className = 'lpn-guide-nav-sub lpn-guide-nav-sub2'; }
+			a.appendChild(document.createTextNode(text));
+			if (snip) { a.appendChild(document.createTextNode(' ')); sn = document.createElement('span'); sn.className = 'lpn-guide-nav-snip'; sn.textContent = snip; a.appendChild(sn); }
+			if (key === cur) { a.setAttribute('aria-current', 'true'); }
+			row.appendChild(a);
+			nav.appendChild(row);
+			rows.push(row);
+		}
+		box.querySelectorAll('.lpn-guide-section').forEach(function (sec) {
+			var h = sec.querySelector('h2'), key = sec.getAttribute('data-guide-section');
+			if (!h || sec.style.display === 'none') { return; }
+			sec.setAttribute('data-guide-key', key);
+			add(key, String(h.textContent || '').trim(), 0, q ? guideSnippet(sec, q) : '');
+			// Menus, box groups and boxes, in reading order: a second level (a menu, a group) and, under
+			// a box group, a third (the box).
+			sec.querySelectorAll('.lpn-guide-menu, .lpn-guide-group, .lpn-guide-boxentry').forEach(function (el) {
+				var grouped = !!el.parentNode.closest('.lpn-guide-group');
+				if (el.style.display === 'none') { return; }
+				if (grouped && el.parentNode.style.display === 'none') { return; }
+				add(el.getAttribute('data-guide-key'), String(el.querySelector('h3').textContent || '').trim(), grouped ? 2 : 1, '');
+			});
+		});
+		// A row has children when the next row is deeper. It then gets the chevron; the others a
+		// spacer of the same width, so every name starts on its level's edge.
+		rows.forEach(function (row, i) {
+			var next = rows[i + 1], lvl = +row.getAttribute('data-level'), has = !!next && +next.getAttribute('data-level') > lvl, lead;
+			if (has && !q) {
+				row.setAttribute('data-has', '1');
+				lead = document.createElement('button');
+				lead.type = 'button';
+				lead.className = 'lpn-guide-nav-chev';
+				lead.setAttribute('aria-expanded', 'true');
+				lead.setAttribute('aria-label', row.firstChild.textContent);
+				lead.innerHTML = '<svg class="lpn-guide-nav-chev-svg" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 6l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>';
+			} else {
+				lead = document.createElement('span');
+				lead.className = 'lpn-guide-nav-spacer';
+			}
+			row.insertBefore(lead, row.firstChild);
+		});
+		guideApplyNavFold();
+	}
+	var guideIO = null, guidePinKey = null, guidePinTop = 0;
+	function guideSetCurrent(key) {
+		var nav = document.getElementById('lpn_guide_nav'), cur = null;
+		if (!nav) { return; }
+		nav.setAttribute('data-current', key || '');
+		nav.querySelectorAll('a').forEach(function (a) {
+			var on = a.getAttribute('data-guide-link') === key;
+			if (on) { a.setAttribute('aria-current', 'true'); cur = a; } else { a.removeAttribute('aria-current'); }
+		});
+		if (cur && cur.scrollIntoView && nav.scrollHeight > nav.clientHeight) {
+			// Keep the current row in the rail's own view, without moving the page or the box.
+			if (cur.offsetTop < nav.scrollTop || cur.offsetTop + cur.offsetHeight > nav.scrollTop + nav.clientHeight) {
+				nav.scrollTop = Math.max(0, cur.offsetTop - 20);
+			}
+		}
+	}
+	// The current section is the last one, in reading order, whose top has reached the top edge of
+	// the pane. The observer is only the trigger: a band of the pane is watched, and what is
+	// current is decided from positions, so short neighbouring entries cannot outvote the one
+	// that was scrolled to.
+	function guideObserve() {
+		var content = guideContentEl();
+		if (!content || !window.IntersectionObserver) { return; }
+		if (guideIO) { guideIO.disconnect(); }
+		guideIO = new window.IntersectionObserver(function () {
+			var top = content.getBoundingClientRect().top + 8, key = null, first = null;
+			content.querySelectorAll('[data-guide-key]').forEach(function (el) {
+				if (el.style.display === 'none' || !el.getClientRects().length) { return; }
+				if (first === null) { first = el.getAttribute('data-guide-key'); }
+				if (el.getBoundingClientRect().top <= top) { key = el.getAttribute('data-guide-key'); }
+			});
+			// A card just clicked holds the highlight until the reader scrolls away from where it was.
+			if (guidePinKey && Math.abs(content.scrollTop - guidePinTop) < 2) { return; }
+			guidePinKey = null;
+			if (key || first) { guideSetCurrent(key || first); }
+		}, { root: content, rootMargin: '0px 0px -70% 0px', threshold: [0, 1] });
+		content.querySelectorAll('[data-guide-key]').forEach(function (el) { guideIO.observe(el); });
+	}
+	function guideGoto(key, focusIn) {
+		var content = guideContentEl(), el, pulseEl, heading;
+		if (!content) { return false; }
+		el = content.querySelector('[data-guide-key="' + String(key).replace(/"/g, '') + '"]');
+		if (!el || el.style.display === 'none') { return false; }
+		content.scrollTop = Math.max(0, el.getBoundingClientRect().top - content.getBoundingClientRect().top + content.scrollTop);
+		guidePinKey = null;
+		guideSetCurrent(key);
+		pulseEl = el.classList.contains('lpn-guide-boxentry') ? el : null;
+		if (pulseEl) { guidePulse(pulseEl); }
+		// Focus moves into the Guide, to the entry's heading (or the section's), so Esc and Tab work from there.
+		heading = el.querySelector('h3, h2');
+		if (focusIn && heading) { heading.tabIndex = -1; heading.focus({ preventScroll: true }); }
+		try { history.replaceState(null, '', '#guide/' + key); } catch (e) {}
+		return true;
+	}
+	// Opens the Guide at the entry for one box: the "?" in its title bar, and F1 inside it.
+	function openGuideForBox(boxId) {
+		var input = document.getElementById('lpn_guide_search');
+		if (dialogIsOpen()) { return; }
+		if (input) { input.value = ''; }
+		openHotkeysBox();
+		guideFilter();
+		if (!guideGoto('box-' + boxId, true)) { guideGoto('boxes', true); }
+		(window.requestAnimationFrame || setTimeout)(function () {
+			if (!guideGoto('box-' + boxId, true)) { guideGoto('boxes', true); }
+		});
+	}
+	// ---- the rail: collapsed state is window furniture inside the record the box already keeps ----
+	var guideRailPhoneClosed = true;
+	function guideRailCollapsed() { return smallScreen() ? guideRailPhoneClosed : hotkeysboxLayout.rail === 'closed'; }
+	function guideApplyRail() {
+		var box = hotkeysBoxEl(), t = document.getElementById('lpn_guide_railtoggle'), pc = EngCalcs.pageConfig || {}, c = guideRailCollapsed(), text;
+		if (!box || !t) { return; }
+		box.classList.toggle('lpn-guide-rail-collapsed', c);
+		t.setAttribute('aria-expanded', c ? 'false' : 'true');
+		text = c ? (pc.lpn_guide_rail_show || 'Show contents') : (pc.lpn_guide_rail_hide || 'Hide contents');
+		t.title = text;
+		t.setAttribute('aria-label', text);
+	}
+	function guideSetRail(collapsed) {
+		if (smallScreen()) { guideRailPhoneClosed = collapsed; }
+		else { hotkeysboxLayout.rail = collapsed ? 'closed' : 'open'; saveHotkeysboxLayout(); }
+		guideApplyRail();
+	}
+	// **Ctrl+K SEARCHES FOR WHAT IS SELECTED** (Tom, 2026-10-07: *"Open the guide with the current
+	// selection in the search field."*). The selection is SELECTED TEXT: on the page, or inside a
+	// text box that has focus (the page selection does not include a text box's own). A selected map
+	// asset is not used: the guide describes controls, and an asset ID matches nothing in it.
+	// Whitespace is collapsed and the text is cut at 80 characters, a search rather than a passage.
+	function guideSelectedText() {
+		var ae = document.activeElement, t = '';
+		try {
+			if (ae && ae.id !== 'lpn_guide_search' && (ae.tagName === 'TEXTAREA' || (ae.tagName === 'INPUT' && guideTyping(ae)))
+					&& typeof ae.selectionStart === 'number' && ae.selectionEnd > ae.selectionStart) {
+				t = String(ae.value).substring(ae.selectionStart, ae.selectionEnd);
+			} else if (window.getSelection) {
+				var sel = window.getSelection(), node = sel && sel.anchorNode;
+				if (node && node.nodeType !== 1) { node = node.parentNode; }
+				if (!(node && node.closest && node.closest('#lpn_guide_rail'))) { t = String(sel || ''); }
+			}
+		} catch (e) { t = ''; }
+		t = t.replace(/\s+/g, ' ').trim();
+		return t.length > 80 ? t.substring(0, 80).trim() : t;
+	}
+	function guideFocusSearch() {
+		var input = document.getElementById('lpn_guide_search');
+		if (!input) { return; }
+		if (guideRailCollapsed()) { guideSetRail(false); }
+		input.focus();
+		if (input.select) { input.select(); }
+	}
+	// ---- Show, never run ----
+	function guidePulse(el) {
+		if (!el || !el.classList) { return; }
+		el.classList.remove('lpn-guide-pulse');
+		void el.offsetWidth;   // restart the animation on a second click
+		el.classList.add('lpn-guide-pulse');
+		clearTimeout(el.__lpnPulseT);
+		el.__lpnPulseT = setTimeout(function () { el.classList.remove('lpn-guide-pulse'); }, GUIDE_PULSE_MS);
+	}
+	function guideMenuRowIn(listId, row) {
+		return Array.prototype.filter.call(document.querySelectorAll('#' + listId + ' button.lpn-menu-row'), function (x) {
+			return x.__lpnRow && x.__lpnRow.label === row.label && x.__lpnRow.icon === row.icon;
+		})[0] || null;
+	}
+	// **ONE RULE FOR EVERY CARD** (Tom, 2026-10-08: *"Things need to have a predictable behavior."*):
+	// a card POINTS. It opens whatever menu holds its control, draws the pointer ring on that control
+	// (lpn-guide-point: a dashed ring in its own colour, which no control uses for pressed, active,
+	// focused or hover), and never moves keyboard focus onto the control and never runs it. A card whose
+	// control cannot be shown says so on the card (lpn_guide_not_shown), so no card does nothing.
+	var guidePointEl = null, GUIDE_POINT_MS = 2500, guideOpenedMenu = false, guideMenuT = null, guideMenuAnchor = null;
+	// Whatever menu the last card opened is closed before the next card acts and when its ring fades,
+	// unless the reader has moved into it (pointer over it, or focus inside it) in the meantime.
+	function guideCloseOpened(onlyIfUntouched) {
+		var pop = document.getElementById('lpn_menu_popup'), pop2 = document.getElementById('lpn_menu_popup2');
+		clearTimeout(guideMenuT);
+		if (!guideOpenedMenu) { return; }
+		if (onlyIfUntouched && ((pop && pop.matches(':hover')) || (pop2 && pop2.matches(':hover'))
+				|| (pop && pop.contains(document.activeElement)) || (pop2 && pop2.contains(document.activeElement)))) { guideOpenedMenu = false; return; }
+		guideOpenedMenu = false;
+		if (pop && pop.style.display === 'block' && openMenuAnchor === guideMenuAnchor) { closeMenu(); }
+	}
+	function guideClearPoint() {
+		guideCloseOpened(false);
+		if (guidePointEl) { guidePointEl.classList.remove('lpn-guide-point'); clearTimeout(guidePointEl.__lpnPointT); guidePointEl = null; }
+		Array.prototype.forEach.call(document.querySelectorAll('.lpn-guide-nopoint'), function (n) { n.parentNode.removeChild(n); });
+	}
+	function guidePoint(el) {
+		var opened = guideOpenedMenu;
+		if (!el || !el.classList) { return false; }
+		guideOpenedMenu = false;
+		guideClearPoint();
+		guideOpenedMenu = opened;
+		void el.offsetWidth;   // the animation restarts on every click, so every click looks the same
+		el.classList.add('lpn-guide-point');
+		guidePointEl = el;
+		el.__lpnPointT = setTimeout(function () { el.classList.remove('lpn-guide-point'); if (guidePointEl === el) { guidePointEl = null; } }, GUIDE_POINT_MS);
+		guideMenuT = setTimeout(function () { guideCloseOpened(true); }, GUIDE_POINT_MS);
+		return true;
+	}
+	function guideNoPoint(card) {
+		var pc = EngCalcs.pageConfig || {}, id = String(card.id || '').replace(/^lpn_guide_b_/, ''),
+			how = id === 'lpn_popup' ? pc.lpn_guide_how_popup : (id === 'lpn_alt_box' ? pc.lpn_guide_how_alt : ''),
+			n = guideSpan('lpn-guide-nopoint', (pc.lpn_guide_not_shown || 'This control is not on screen right now.') + (how ? ' ' + how : '')), host;
+		guideClearPoint();
+		if (card.classList.contains('lpn-guide-boxentry')) { host = card.querySelector('h3'); if (host) { host.parentNode.insertBefore(n, host.nextSibling); } return; }
+		host = card.querySelector('.lpn-guide-desc') || card;
+		host.appendChild(n);
+	}
+	// Opens the menu the entry lives in, and its fly-out, through the menu bar's own button, and
+	// points at the row. Focus is not moved onto the row (a focused row looks selected), and the
+	// command is not run.
+	function guideShowMenuEntry(e) {
+		var btn = document.getElementById(e.menuId), pop = document.getElementById('lpn_menu_popup'), opener, target;
+		if (!btn || !btn.getClientRects().length || !pop) { return false; }
+		closeMenu();
+		btn.click();
+		if (pop.style.display !== 'block') { return false; }
+		guideOpenedMenu = true;
+		guideMenuAnchor = btn;
+		if (e.depth) {
+			opener = guideMenuRowIn('lpn_menu_list', e.parent.row);
+			if (!opener) { return false; }
+			if (opener.disabled || !opener.__lpnRow.submenu) { return guidePoint(opener); }
+			openMenu(opener, opener.__lpnRow.submenu(), 1);
+			target = guideMenuRowIn('lpn_menu_list2', e.row);
+		} else {
+			target = guideMenuRowIn('lpn_menu_list', e.row);
+		}
+		if (document.activeElement && pop.contains(document.activeElement)) { document.activeElement.blur(); }
+		return guidePoint(target);
+	}
+	// A box's card points at the control that opens the box: the menu row or toolbar button that
+	// carries the box's title as its name (a trailing ellipsis ignored).
+	// Where the menu row is not named like the box (the Reports submenu says "Run", the box "Run report").
+	var GUIDE_BOX_ROW_KEY = {
+		lpn_rptbox: 'lpn_reports_epanet', lpn_full_box: 'lpn_reports_full', lpn_calib_box: 'lpn_reports_calib',
+		lpn_energy_box: 'lpn_energy_menu', lpn_contour_box: 'lpn_contour_menu'
+	};
+	function guideBoxControl(boxId, menuOnly) {
+		var pc = EngCalcs.pageConfig || {}, item = guideBoxList().filter(function (b) { return b.id === boxId; })[0], t, found = null;
+		function norm(x) { return guideFold(String(x || '')).replace(/[\u2026.]+\s*$/, '').replace(/\s+/g, ' ').trim(); }
+		if (!item) { return null; }
+		t = norm(GUIDE_BOX_ROW_KEY[boxId] && pc[GUIDE_BOX_ROW_KEY[boxId]] || item.title);
+		if (!menuOnly) {
+			guideToolbarRows().forEach(function (g) {
+				if (!found && g.shown && norm(g.b.name) === t) { found = { kind: 'toolbar', el: g.b.el }; }
+			});
+		}
+		if (found && !smallScreen()) { return found; }
+		found = null;
+		guideMenuEntries().forEach(function (e) {
+			if (!found && !e.separator && norm(e.row.label) === t) { found = { kind: 'menu', e: e }; }
+		});
+		return found;
+	}
+	function guideShow(card) {
+		var d = card && card.__lpnGuide, el, ok = false, c, key;
+		if (!d && card && card.classList.contains('lpn-guide-boxentry')) {
+			c = guideBoxControl(String(card.id).replace(/^lpn_guide_b_/, ''));
+			if (c) { d = c.kind === 'toolbar' ? { kind: 'toolbar', g: { b: { el: c.el } } } : { kind: 'menu', e: c.e }; }
+		}
+		guideClearPoint();   // the previous card's ring, note and menu, whatever kind this card is
+		if (card) { key = (card.closest && card.closest('[data-guide-key]')); if (key) { guidePinKey = key.getAttribute('data-guide-key'); guidePinTop = guideContentEl().scrollTop; guideSetCurrent(guidePinKey); } }
+		if (!d) { if (card) { guideNoPoint(card); } return; }
+		if (d.kind === 'toolbar') {
+			el = d.g.b.el;
+			if (!smallScreen() && el && el.isConnected && el.getClientRects().length > 0) { ok = guidePoint(el); }
+			else if (d.g.twin) { ok = guideShowMenuEntry(d.g.twin); }
+		} else {
+			ok = guideShowMenuEntry(d.e);
+		}
+		if (!ok) { guideNoPoint(card); }
+	}
+	// ---- `?` opens the guide at the control under the pointer or holding focus ----
+	var guideHoverEl = null;
+	var GUIDE_SUBJECTS = '#lpn_toolbar button, #lpn_menu_popup button.lpn-menu-row, #lpn_menu_popup2 button.lpn-menu-row';
+	document.addEventListener('mouseover', function (e) {
+		guideHoverEl = e.target && e.target.closest ? e.target.closest(GUIDE_SUBJECTS) : null;
+	}, true);
+	function guideTyping(el) {
+		var tag = el && el.tagName, type;
+		if (!tag) { return false; }
+		if (el.isContentEditable || tag === 'TEXTAREA' || tag === 'SELECT') { return true; }
+		if (tag !== 'INPUT') { return false; }
+		type = String(el.type || 'text').toLowerCase();
+		return ['button', 'checkbox', 'radio', 'range', 'color', 'submit', 'reset', 'file', 'image'].indexOf(type) < 0;
+	}
+	function guideSubjectOf(el) {
+		var t = el && el.closest ? el.closest(GUIDE_SUBJECTS) : null, inSub;
+		if (!t) { return null; }
+		if (t.closest('#lpn_toolbar')) { return { kind: 'toolbar', el: t }; }
+		if (!t.__lpnRow) { return null; }
+		inSub = !!t.closest('#lpn_menu_popup2');
+		return {
+			kind: 'menu', row: t.__lpnRow, menuId: openMenuAnchor ? openMenuAnchor.id : '',
+			parentRow: inSub && subOpener ? subOpener.__lpnRow || null : null
+		};
+	}
+	function guideRowFor(subject) {
+		var rows = Array.prototype.slice.call(document.querySelectorAll('#lpn_hotkeys_popup .lpn-guide-row'));
+		return rows.filter(function (r) {
+			var d = r.__lpnGuide;
+			if (!d || !subject || d.kind !== subject.kind) { return false; }
+			if (d.kind === 'toolbar') { return d.g.b.el === subject.el; }
+			return d.e.menuId === subject.menuId && d.e.row.label === subject.row.label && d.e.row.icon === subject.row.icon
+				&& (!subject.parentRow || (d.e.parent && d.e.parent.row.label === subject.parentRow.label));
+		})[0] || null;
+	}
+	function openGuideAt(subject) {
+		var input = document.getElementById('lpn_guide_search'), row;
+		if (input) { input.value = ''; }
+		openHotkeysBox();
+		row = subject ? guideRowFor(subject) : null;
+		if (row) {
+			if (row.scrollIntoView) { row.scrollIntoView({ block: 'center' }); }
+			row.focus({ preventScroll: true });
+			guidePulse(row);
+		} else if (input && !smallScreen()) {
+			input.focus();
+		}
+	}
+	window.addEventListener('keydown', function (e) {
+		var ae = document.activeElement, subject;
+		if (e.defaultPrevented || e.key !== '?' || e.ctrlKey || e.altKey || e.metaKey) { return; }
+		if (guideTyping(e.target) || guideTyping(ae)) { return; }
+		// A modal question owns the keyboard; the guide never opens over it (Perry).
+		if (dialogIsOpen()) { return; }
+		// Already ON a guide row: point at that row, and leave the search and the scroll alone.
+		var onRow = ae && ae.closest ? ae.closest('#lpn_hotkeys_popup .lpn-guide-row') : null;
+		if (onRow) { e.preventDefault(); e.stopPropagation(); guidePulse(onRow); return; }
+		subject = guideSubjectOf(ae) || guideSubjectOf(guideHoverEl);
+		e.preventDefault();
+		e.stopPropagation();
+		openGuideAt(subject);
+	}, true);
+	function wireGuide() {
+		var box = hotkeysBoxEl(), input = document.getElementById('lpn_guide_search');
+		if (!box) { return; }
+		if (input) { input.addEventListener('input', guideFilter); }
+		var toggle = document.getElementById('lpn_guide_railtoggle'), head = box.querySelector('.lpn-guide-railhead'),
+			nav = document.getElementById('lpn_guide_nav');
+		try { hotkeysboxLayout.rail = (JSON.parse(localStorage.getItem(LPN_HOTKEYSBOX_KEY) || '{}') || {}).rail === 'closed' ? 'closed' : 'open'; }
+		catch (e) { hotkeysboxLayout.rail = 'open'; }
+		guideApplyRail();
+		if (toggle) { toggle.addEventListener('click', function (e) { e.stopPropagation(); guideSetRail(!guideRailCollapsed()); }); }
+		// On a phone the whole heading row is the disclosure.
+		if (head) { head.addEventListener('click', function (e) { if (smallScreen() && e.target !== toggle && !toggle.contains(e.target)) { guideSetRail(!guideRailCollapsed()); } }); }
+		window.addEventListener('resize', guideApplyRail);
+		if (nav) {
+			nav.addEventListener('click', function (e) {
+				var chev = e.target && e.target.closest ? e.target.closest('.lpn-guide-nav-chev') : null, a;
+				if (chev) { e.preventDefault(); e.stopPropagation(); guideToggleNav(chev.parentNode.getAttribute('data-key')); return; }
+				a = e.target && e.target.closest ? e.target.closest('a[data-guide-link]') : null;
+				if (!a) { return; }
+				e.preventDefault();
+				e.stopPropagation();
+				guideGoto(a.getAttribute('data-guide-link'), true);
+			});
+			nav.addEventListener('dblclick', function (e) {
+				var a = e.target && e.target.closest ? e.target.closest('a[data-guide-link]') : null, row = a && a.parentNode;
+				if (row && row.getAttribute('data-has') === '1') { e.preventDefault(); guideToggleNav(row.getAttribute('data-key')); }
+			});
+		}
+		// "/" inside the guide goes to its search; Ctrl+K opens the guide there from anywhere.
+		window.addEventListener('keydown', function (e) {
+			var ae = document.activeElement;
+			if (e.defaultPrevented) { return; }
+			if (e.key === '/' && !e.ctrlKey && !e.altKey && !e.metaKey && ae && ae.closest && ae.closest('#lpn_hotkeys_popup') && !guideTyping(ae)) {
+				e.preventDefault(); e.stopPropagation(); guideFocusSearch(); return;
+			}
+			if ((e.ctrlKey || e.metaKey) && !e.altKey && !e.shiftKey && String(e.key).toLowerCase() === 'k') {
+				if (dialogIsOpen()) { return; }
+				e.preventDefault(); e.stopPropagation();
+				// Read before the guide opens: opening it moves the focus and clears the selection.
+				var picked = guideSelectedText(), si;
+				if (!hotkeysBoxIsOpen()) { openGuideAt(null); }
+				raisePanel(hotkeysBoxEl());   // open but behind a later box: the same raise a click on it does
+				if (picked) {
+					si = document.getElementById('lpn_guide_search');
+					if (si) { si.value = picked; guideFilter(); }
+				}
+				guideFocusSearch();
+			}
+		}, true);
+		var strip = document.getElementById('lpn_toolbar');
+		if (strip && window.MutationObserver) {
+			new window.MutationObserver(guideQueueDimming).observe(strip,
+				{ subtree: true, childList: true, attributes: true, attributeFilter: ['style', 'class', 'hidden'] });
+		}
+		// The phone breakpoint folds the strip away without touching a single attribute on it.
+		window.addEventListener('resize', guideQueueDimming);
+		if (hotkeysBoxIsOpen()) { renderGuide(); }   // reopened from memory before the menu bar existed
+		box.addEventListener('click', function (e) {
+			var row = e.target && e.target.closest ? e.target.closest('.lpn-guide-row, .lpn-guide-boxentry') : null;
+			if (!row) { return; }
+			// A box's card holds prose: a click that ends a text selection, or lands on a link or a
+			// field inside it, is not a request to point.
+			if (row.classList.contains('lpn-guide-boxentry')
+					&& (String(window.getSelection ? window.getSelection() : '') || e.target.closest('a, button, input, select, textarea'))) { return; }
+			// Stopped, so the page's click-away dismissal does not close the menu this opens.
+			e.stopPropagation();
+			guideShow(row);
+		});
+		// **Looped-Network.php#guide OPENS IT**, so a link, a blog post or an email can point at it.
+		function fromHash() {
+			var m = /^#guide(?:\/(.+))?$/i.exec(String(location.hash || ''));
+			if (!m) { return; }
+			openGuideAt(null);
+			if (m[1] && !guideGoto(decodeURIComponent(m[1]))) { guidePendingKey = decodeURIComponent(m[1]); }
+		}
+		window.addEventListener('hashchange', fromHash);
+		fromHash();
 	}
 	// **THE MAP MENU** -- View until 2026-08-27, renamed on Tom's word. It holds the drawing's frame,
 	// the pictures behind it, where on Earth it is, and the elevations read off that ground. Only
@@ -44787,9 +45639,10 @@ var EngCalcs = EngCalcs || {};
 	//
 	// Named openProjectBarMenu(), NOT openProjectMenu(): that name is taken by the TAB's own menu
 	// (rename, duplicate, close), which is about one project rather than about the open one.
-	function openProjectBarMenu(anchor) {
+	function openProjectBarMenu(anchor) { openMenu(anchor, waterMenuRows()); }
+	function waterMenuRows() {
 		var pc = EngCalcs.pageConfig || {};
-		openMenu(anchor, [
+		return [
 			// **FIRST, because it is the one thing here that adds water to the model** (Tom,
 			// 2026-08-27). Everything under it reads, configures or reports on what these rows put
 			// on the map. It keeps `lpn_menu_insert` -- the word is right and it is already
@@ -44956,7 +45809,7 @@ var EngCalcs = EngCalcs || {};
 				tip: pc.lpn_change_type_tip,
 				submenu: changeTypeRows
 			}
-		]);
+		];
 	}
 	// openSettingsMenu() is GONE (Tom, 2026-08-08). Its three rows now live where they belong: Settings
 	// and Units are sections of the panel, and Clear calculator is the button at its foot --
@@ -45857,7 +46710,7 @@ var EngCalcs = EngCalcs || {};
 			bornClean = true;
 			saveIndex();
 		}
-		wireNotesPopup();
+		wireAboutPopup();
 		wireHotkeysBox();
 		// **THE MAP STATUS STRIP HAS TO BE RE-READ HERE, AND THIS IS THE ONLY PLACE THAT DOES IT ON
 		// BOOT** (ROADMAP Task 521, Tom 2026-08-24 with a screenshot of the strip disagreeing with
@@ -45913,6 +46766,7 @@ var EngCalcs = EngCalcs || {};
 		wireFullReportBox();
 		wireCalibBox();
 		buildMenuBar();
+		wireGuide();   // after the menu bar: the guide names each menu by its button
 		wireScenarioButton();
 		wireWrongButtons();
 		wireMessageLogButton();
@@ -45939,6 +46793,12 @@ var EngCalcs = EngCalcs || {};
 		// the tab strip are all the ones the visitor will actually be looking at.
 		// Docking (Task 441) is wired after every box it docks, and read before any of them reopens.
 		wireBoxDocking();
+		// A #guide/<key> link met on load before the boxes existed to list: land on it now.
+		if (guidePendingKey) {
+			renderGuide();
+			(window.requestAnimationFrame || setTimeout)(function () { guideGoto(guidePendingKey); guidePendingKey = null; });
+			guideGoto(guidePendingKey);
+		}
 		dockBooting = true;
 		restoreOpenBoxes();
 		restoreDockedShared();
@@ -46468,6 +47328,8 @@ var EngCalcs = EngCalcs || {};
 		paneBtn.setAttribute('aria-pressed', paneIsOpen() ? 'true' : 'false');
 		paneBtn.addEventListener('click', togglePane);
 		endGroup.appendChild(paneBtn);
+		// A repainted strip repaints the guide's Toolbar section if the guide is open.
+		if (hotkeysBoxIsOpen()) { renderGuide(); }
 		// **NO RIGHT-PANE TOGGLE.** Tom, 2026-08-19: "We can hide the right pane button for now."
 		// This button was its only door, so hiding it retires the right pane from the interface
 		// without deleting a line of it -- which is the point, because the pane is already
@@ -52686,9 +53548,6 @@ var EngCalcs = EngCalcs || {};
 		// 2026-10-07: *"All the docks I make need to be remembered."*).
 		if (statusboxLayout.open) { openStatusReportBox(); }
 		if (fullboxLayout.open) { openFullReportBox(); }
-		// The Notes box (Tom, 2026-09-28), after the reports and before Find for the same stacking
-		// reason: Find is the smallest and ends up on top.
-		if (notesboxLayout.open) { openNotesBox(); }
 		if (hotkeysboxLayout.open) { openHotkeysBox(); }
 		if (findUserOpen) { toggleFindPopup(null, true); }
 	}
@@ -53449,6 +54308,20 @@ var EngCalcs = EngCalcs || {};
 		help.appendChild(glyph);
 		return help;
 	}
+	// **THE ONE "?" OF EVERY STANDING BOX** (Tom, 2026-10-07; Ida): the last glyph before the X, with
+	// the tip "Help for this box", opening that box's entry in the Guide. F1 inside the box does the
+	// same. Feedback is not a second glyph; it is one Help-menu entry.
+	function guideCornerButton(d) {
+		var b = document.createElement('button'), pc = EngCalcs.pageConfig || {}, tip = pc.lpn_guide_box_help || 'Help for this box';
+		b.type = 'button';
+		b.className = 'lpn-corner-btn lpn-corner-guide';
+		b.setAttribute('data-guide-for', d.box.id);
+		b.title = tip;
+		b.setAttribute('aria-label', tip);
+		b.textContent = '?';
+		b.addEventListener('click', function (e) { e.stopPropagation(); openGuideForBox(d.box.id); });
+		return b;
+	}
 	// Rebuilt whole on every change of state, because which buttons exist IS the state. A button the
 	// keyboard was on is replaced by its successor, so focus does not fall out of the box.
 	function renderDockCorner(d) {
@@ -53464,6 +54337,7 @@ var EngCalcs = EngCalcs || {};
 			if (side) { row.appendChild(dockButton(d, 'float', pc.lpn_dock_float || 'Float')); n++; }
 		}
 		if (d.help) { row.appendChild(d.help); n++; }
+		if (d.guideBtn) { row.appendChild(d.guideBtn); n++; }
 		d.box.style.setProperty('--lpn-corner-w', (n * LPN_CORNER_BTN_W) + 'px');
 		if (had) {
 			next = row.querySelector('[data-dock="' + had + '"]') || row.querySelector('[data-dock="float"]') ||
@@ -53915,7 +54789,20 @@ var EngCalcs = EngCalcs || {};
 		d.corner = row;
 		tip = typeof tipKey === 'function' ? tipKey() :
 			[].concat(tipKey || []).map(function (k) { return pc[k]; }).filter(Boolean).join(' ');
-		if (tip) { d.help = cornerHelp(tip); }
+		// **THE EXPLANATION LIVES IN THE GUIDE** (Perry, 2026-10-07: one kind of `?`). A box that had
+		// its explanation as a corner tip now has it as its Guide entry; the blue tip `?` stays beside
+		// field labels only. renderGuideBoxes() reads this, and refreshBoxTip() keeps it current.
+		d.tipText = tip || '';
+		// The Guide's own title bar carries no "?": in the Guide it would open help inside help
+		// (Ida, 2026-10-07). Its entry in the Boxes section stays, reached by search or the rail.
+		d.guideBtn = box.id === 'lpn_hotkeys_popup' ? null : guideCornerButton(d);
+		box.addEventListener('keydown', function (e) {
+			if (e.key === 'F1' && !e.ctrlKey && !e.altKey && !e.shiftKey && !e.metaKey) {
+				e.preventDefault();
+				e.stopPropagation();
+				openGuideForBox(box.id);
+			}
+		});
 		wireDockTab(d);
 		box.addEventListener('pointerenter', function () { if (dockFlyout === d) { clearTimeout(dockTimer); } });
 		box.addEventListener('pointerleave', function () { if (dockFlyout === d) { dockTuckLater(d); } });
@@ -53973,7 +54860,6 @@ var EngCalcs = EngCalcs || {};
 			['lpn_alt_box', altboxLayout, null, null],
 			['lpn_full_box', fullboxLayout, saveFullboxLayout, LPN_FULLBOX_KEY],
 			['lpn_calib_box', calibboxLayout, null, null],
-			['lpn_notes_popup', notesboxLayout, saveNotesboxLayout, LPN_NOTESBOX_KEY],
 			['lpn_hotkeys_popup', hotkeysboxLayout, saveHotkeysboxLayout, LPN_HOTKEYSBOX_KEY]
 		].forEach(function (r) { registerDockBox(r[0], r[1], r[2], r[3], r[4]); });
 		applyDefaultDocks();
@@ -65305,7 +66191,7 @@ var EngCalcs = EngCalcs || {};
 	}
 	function refreshBoxTip(id, text) {
 		var box = document.getElementById(id), d = box && box.__lpnDock;
-		if (d && d.help && text) { EngCalcs.setTipText(d.help, text); }
+		if (d && text) { d.tipText = text; if (d.help) { EngCalcs.setTipText(d.help, text); } }
 	}
 	function buildFireFlowControls() {
 		var pc = EngCalcs.pageConfig || {},
@@ -69144,6 +70030,14 @@ var EngCalcs = EngCalcs || {};
 	// file draws it, so the dependency runs one way: lpn-time.js owns the text, looped-network.js
 	// owns the boxes, and neither reaches into the other's state.
 	EngCalcs.lpnOpenRunReportBox = function () { return openRunReportBox(); };
+	// For dev/lpn-spike/user-guide-harness.js: the strip's own record, the undo depth and the
+	// document's signature, so the harness can prove a guide row SHOWS and runs nothing.
+	EngCalcs.lpnGuideProbe = function () {
+		return {
+			toolbar: toolbarIconIndex.map(function (b) { return { el: b.el, icon: b.icon, name: b.name }; }),
+			undo: undoStack.length, sig: docSignature(), mode: mode, fold: guideFold
+		};
+	};
 	// The Full report's Type column harness opens the box through this, not through the menu.
 	EngCalcs.lpnOpenFullReportBox = function () { return openFullReportBox(); };
 
