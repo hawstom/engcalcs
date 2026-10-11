@@ -439,7 +439,7 @@ never edits a synonym.
   > Depth of water in the tank at the time shown, measured up from the tank bottom: the head minus the tank elevation.
   @@ NEEDS RULING
 - **`lpn_result_tank_volume`**
-  > Usable volume
+  > Available volume
   @@ NEEDS RULING
 - **`lpn_result_tank_volume_tip`**
   > Volume of water above the lowest water depth, so it is zero at that depth. The EPANET tank volume also includes the water below the lowest water depth, which still counts toward mixing and water age, so the tank elevation stays at the tank bottom.
@@ -503,7 +503,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**132 still to read**, of 135 new keys across 15 unmerged branch(es).
+**132 still to read**, of 135 new keys across 13 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -513,8 +513,6 @@ Each branch carries the commit it was read at. This part is a SNAPSHOT and is no
 fresh by the build — a branch moves whenever anybody commits on it, and failing master's
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
-
-### chore/handoff-1011 (`6ceb463f`) — adds no English strings
 
 ### feat/bentley-interop (`784ea66f`) — 101 new, 101 to read @@ NEEDS RULING
 
@@ -947,8 +945,6 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_snap_vertex`**
   > {link}, vertex {n}
   @@ NEEDS RULING
-
-### feat/tank-volume (`31985741`) — adds no English strings
 
 ### feat/visit-dedupe (`e22c4ec9`) — adds no English strings
 
