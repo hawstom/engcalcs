@@ -7,7 +7,7 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**94 open tasks.** Next (100): 11 · Soon (75): 12 · Someday (50): 36 · Maybe (25): 16 · Parked (5): 19
+**93 open tasks.** Next (100): 11 · Soon (75): 11 · Someday (50): 36 · Maybe (25): 16 · Parked (5): 19
 
 ## 100 — Next (11)
 
@@ -23,7 +23,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - ! Task 781 — Active topology first; then Change type becomes a new asset in the old one's place.
 - ! Task 782 — Snap to asset, and Match properties: the small tools that replace Change type.
 
-## 75 — Soon (12)
+## 75 — Soon (11)
 
 - Task 578 — Fire flow: the EPS frame and the Run concept, extracted from 530.
 - Task 617 — More map view options, the opacity one having shipped.
@@ -35,7 +35,6 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 756 — Cross-platform: the suite as a desktop application, beyond the web folder.
 - Task 763 — A searchable help manual, built from the tips Tom cut.
 - Task 772 — AutoCAD: import, export, and perhaps sync, on a long-lived branch.
-- Task 777 — Station and elevation marks on the mi and wi section sketches.
 - Task 783 — Tank depth and volume, in the tables and the time series.
 
 ## 50 — Someday (36)
@@ -122,5 +121,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-84 of 94 titles are within 4–12 words. `!` marks the rest;
+83 of 93 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.

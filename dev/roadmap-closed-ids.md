@@ -700,3 +700,4 @@ red builds on 2026-09-15 before anybody wrote it down.
 - 0|771| CLOSED 2026-10-07 (`feat/survey-code`, Tom: "Merge."): survey points as a script, the Description naming an asset or a pipe vertex; JPN<point> joins a tee.
 - 0|780| CLOSED 2026-10-07 (`feat/epp`, Tom: "Do it"): Save writes `.epp`; Open reads `.epp`, `.lwn` and `.json` forever. The file's content and `format` key are unchanged; `LPN_FILE_EXT` is `.epp`, `LPN_FILE_EXT_LWN` is read-only.
 - 0|776| CLOSED 2026-10-08 (`feat/table-export`, Tom: "Merge feat/table-export"): copy a table with its headings; File > Export to ODS, XLSX or CSV, by table and scenario, with the libraries.
+- 0|777| CLOSED 2026-10-11 (`feat/section-grid`, Tom: "Merge"): station and elevation marks on the mi and wi section sketches; points data copies point rows only.
