@@ -191,31 +191,60 @@ async function main() {
 			r2 && r2.heads && r2.heads[tankId]);
 		ok('...and the new pipe carries a flow', !!newPipe && r2 && r2.flows && isFinite(r2.flows[newPipe.id]), r2 && r2.flows && r2.flows[newPipe && newPipe.id]);
 
-		console.log('\n--- 3. a junction near pipe 10\'s line goes on the line and is offered the split ---');
+		console.log('\n--- 3. a junction on pipe 10 is offered the split; one merely near it is not ---');
 		{
 			const p10 = linkOf(d2, '10'), a10 = await nodeAtScreen(p10.from), b10 = await nodeAtScreen(p10.to);
 			const len = Math.hypot(b10.x - a10.x, b10.y - a10.y), nx = -(b10.y - a10.y) / len, ny = (b10.x - a10.x) / len;
-			const at = { x: (a10.x + b10.x) / 2 + nx * 9, y: (a10.y + b10.y) / 2 + ny * 9 };
-			await tool(await a.lang('lpn_tool_add_junction'));
-			await P.mouse.move(at.x + 20, at.y + 20);
-			await P.mouse.move(at.x, at.y, { steps: 3 });
-			await settle(150);
-			const m3 = await mark();
-			ok('hovering 9 px off the line shows the line glyph naming Pipe 10', !!m3 && m3.kind === 'line' && m3.name === 'Pipe 10', JSON.stringify(m3));
-			await P.mouse.click(at.x, at.y);
-			const dlg = await a.waitDialog(4000).catch(() => null);
-			ok('the split question is asked', !!dlg && /Split pipe 10/.test(JSON.stringify(dlg)), JSON.stringify(dlg));
-			await P.evaluate((yes) => {
-				const b = Array.from(document.querySelectorAll('#lpn_dialog_buttons button')).find((x) => x.textContent.trim() === yes);
+			const off = (k) => ({ x: (a10.x + b10.x) / 2 + nx * k, y: (a10.y + b10.y) / 2 + ny * k });
+			const crossOf = (d, n) => {
+				const A = nodeOf(d, p10.from), B = nodeOf(d, p10.to);
+				return ((B.x - A.x) * (n.y - A.y) - (B.y - A.y) * (n.x - A.x)) / Math.hypot(B.x - A.x, B.y - A.y);
+			};
+			const answer = (label) => P.evaluate((l) => {
+				const b = Array.from(document.querySelectorAll('#lpn_dialog_buttons button')).find((x) => x.textContent.trim() === l);
 				if (b) { b.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 })); }
-			}, await a.lang('lpn_split_yes'));
-			await settle(500);
+			}, label);
+			await tool(await a.lang('lpn_tool_add_junction'));
+			// 3a. 9 px off the line: outside the pipe's own hit band, so no line magnet and no question.
+			const far = off(9);
+			await P.mouse.move(far.x + 20, far.y + 20);
+			await P.mouse.move(far.x, far.y, { steps: 3 }); await settle(150);
+			const m3a = await mark();
+			ok('9 px off the line: no glyph (the line magnet is the pipe\'s own hit band)', m3a === null, JSON.stringify(m3a));
+			await P.mouse.click(far.x, far.y);
+			const dlgA = await a.waitDialog(1200).catch(() => null);
+			ok('...no split question', !dlgA, JSON.stringify(dlgA));
+			const d3a = await stored(), nA = d3a.nodes.find((n) => !ids(d2).has(n.id));
+			ok('...a junction is placed at the press, off the line', !!nA && Math.abs(crossOf(d3a, nA)) > 1e-6 && linkOf(d3a, '10').to === p10.to,
+				nA && crossOf(d3a, nA));
+			await P.keyboard.press('Control+z'); await settle(400);
+			// 3b. ON the line: the line glyph, the question; No places the node at the press, unsnapped.
+			const on = off(0.6);
+			await P.mouse.move(on.x + 20, on.y + 20);
+			await P.mouse.move(on.x, on.y, { steps: 3 }); await settle(150);
+			const m3 = await mark();
+			ok('on the line: the line glyph naming Pipe 10', !!m3 && m3.kind === 'line' && m3.name === 'Pipe 10', JSON.stringify(m3));
+			await P.mouse.click(on.x, on.y);
+			const dlgB = await a.waitDialog(4000).catch(() => null);
+			ok('...the split question is asked', !!dlgB && /Split pipe 10/.test(dlgB.text), JSON.stringify(dlgB));
+			await answer(await a.lang('lpn_split_no')); await settle(500);
+			const d3b = await stored(), nB = d3b.nodes.find((n) => !ids(d2).has(n.id));
+			ok('No: the junction is at the press, not snapped onto the line, and pipe 10 is whole',
+				!!nB && Math.abs(crossOf(d3b, nB)) > 1e-6 && linkOf(d3b, '10').to === p10.to, nB && crossOf(d3b, nB));
+			await P.keyboard.press('Control+z'); await settle(400);
+			ok('Undo removes it', (await stored()).nodes.length === d2.nodes.length);
+			// 3c. The same press, Yes: the split, with the node exactly on the line.
+			await P.mouse.move(on.x + 20, on.y + 20);
+			await P.mouse.move(on.x, on.y, { steps: 3 }); await settle(150);
+			await P.mouse.click(on.x, on.y);
+			const dlg = await a.waitDialog(4000).catch(() => null);
+			ok('Yes: the split question again', !!dlg && /Split pipe 10/.test(dlg.text), JSON.stringify(dlg));
+			await answer(await a.lang('lpn_split_yes')); await settle(500);
 			const d3 = await stored();
 			const nj = d3.nodes.find((n) => !ids(d2).has(n.id));
-			const q10 = linkOf(d3, '10'), A = nodeOf(d3, p10.from), B = nodeOf(d3, p10.to);
-			const cross = nj ? ((B.x - A.x) * (nj.y - A.y) - (B.y - A.y) * (nj.x - A.x)) / Math.hypot(B.x - A.x, B.y - A.y) : NaN;
+			const q10 = linkOf(d3, '10');
 			ok('a junction was made and pipe 10 now ends at it', !!nj && q10.to === nj.id, nj && q10.to);
-			ok('the junction is ON the old line (off it by under 1e-6 units)', Math.abs(cross) < 1e-6, cross);
+			ok('the junction is ON the old line (off it by under 1e-6 units)', !!nj && Math.abs(crossOf(d3, nj)) < 1e-6, nj && crossOf(d3, nj));
 			ok('the other half runs from it to pipe 10\'s old end', d3.links.some((l) => l.from === nj.id && l.to === p10.to));
 			await P.keyboard.press('Escape'); await P.keyboard.press('Escape');
 			const r3 = await solve();
@@ -272,6 +301,59 @@ async function main() {
 			ok('...and junction 31 does NOT land on the vertex', !(n31.x === v7.x && n31.y === v7.y) && n31.x !== nodeOf(d6, '31').x);
 			const r7 = await solve();
 			ok('the network still solves after the drags', allFinite(r7 && r7.heads));
+		}
+
+		console.log('\n--- 4b. a node dragged onto a node says so; onto its own neighbour it does not snap ---');
+		{
+			await P.keyboard.press('Escape'); await P.keyboard.press('Escape');
+			await a.toolbarClick('Select'); await settle(200);
+			const d8 = await stored();
+			const c22 = await nodeAtScreen('22'), c23 = await nodeAtScreen('23');
+			// 23 is joined to 22 by pipe 22, so 22 is its neighbour: no snap.
+			const mN = await dragTo(c23, { x: c22.x + 5, y: c22.y + 4 }, false);
+			const d9 = await stored(), n23 = nodeOf(d9, '23'), n22b = nodeOf(d9, '22');
+			ok('dragging 23 next to its neighbour 22: no glyph naming 22', !(mN && mN.name === 'Junction 22'), JSON.stringify(mN));
+			ok('...and 23 does not land on 22 (no zero-length pipe 22)', !(n23.x === n22b.x && n23.y === n22b.y));
+			await P.keyboard.press('Control+z'); await settle(400);
+			// 31 is not joined to 13: it snaps, and the notice says the two are separate.
+			const c13 = await nodeAtScreen('13'), c31 = await nodeAtScreen('31');
+			const mS = await dragTo(c31, { x: c13.x + 5, y: c13.y + 4 }, false);
+			const d10 = await stored(), n31 = nodeOf(d10, '31'), n13 = nodeOf(d10, '13');
+			ok('dragging 31 onto 13: the glyph names Junction 13', !!mS && mS.kind === 'node' && mS.name === 'Junction 13', JSON.stringify(mS));
+			ok('...31 lands on 13 exactly', n31.x === n13.x && n31.y === n13.y);
+			ok('...and the notice says so', /Junction 31 moved to the location of Junction 13\. The two nodes are not connected\./.test(await a.notice()), await a.notice());
+			await P.keyboard.press('Control+z'); await settle(400);
+			const n31b = nodeOf(await stored(), '31');
+			ok('Undo puts 31 back', n31b.x === nodeOf(d8, '31').x && n31b.y === nodeOf(d8, '31').y);
+		}
+
+		console.log('\n--- 4c. inside a scenario a node tool does not magnet to a pipe ---');
+		{
+			await a.menuClickSub(await a.lang('lpn_scenario_menu'), await a.lang('lpn_scenario_new'), 'project');
+			await a.waitDialog(3000);
+			await P.evaluate(() => {
+				const b = document.querySelector('#lpn_dialog_buttons button');
+				if (b) { b.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 })); }
+			});
+			await settle(500);
+			const ds = await stored();
+			ok('a scenario is active', ds.project && ds.project.activeScenario && ds.project.activeScenario !== 'base', ds.project && ds.project.activeScenario);
+			const p11 = linkOf(ds, '11'), a11 = await nodeAtScreen(p11.from), b11 = await nodeAtScreen(p11.to);
+			const len = Math.hypot(b11.x - a11.x, b11.y - a11.y), nx = -(b11.y - a11.y) / len, ny = (b11.x - a11.x) / len;
+			const near = { x: (a11.x + b11.x) / 2 + nx * 3, y: (a11.y + b11.y) / 2 + ny * 3 };
+			await tool(await a.lang('lpn_tool_add_junction'));
+			await P.mouse.move(near.x + 20, near.y + 20);
+			await P.mouse.move(near.x, near.y, { steps: 3 }); await settle(150);
+			const mSc = await mark();
+			ok('near pipe 11 in a scenario: no line glyph', !(mSc && (mSc.kind === 'line' || mSc.kind === 'vertex')), JSON.stringify(mSc));
+			await P.mouse.click(near.x, near.y);
+			const dlgS = await a.waitDialog(1200).catch(() => null);
+			ok('...no split question', !dlgS, JSON.stringify(dlgS));
+			const dS = await stored(), nS = dS.nodes.find((n) => !ids(ds).has(n.id));
+			const A = nodeOf(dS, p11.from), B = nodeOf(dS, p11.to);
+			const crossS = nS ? ((B.x - A.x) * (nS.y - A.y) - (B.y - A.y) * (nS.x - A.x)) / Math.hypot(B.x - A.x, B.y - A.y) : NaN;
+			ok('...the junction is placed at the press, not on the line', !!nS && Math.abs(crossS) > 1e-6, crossS);
+			await P.keyboard.press('Escape'); await P.keyboard.press('Escape');
 		}
 
 		console.log('\n--- 5. a geographic project: the snapped reservoir stores the junction\'s lon/lat ---');

@@ -427,3 +427,21 @@ function compare_langs ($baseLang, $secondLang) {
     }
     echo "\n</table>";
 }
+
+/**
+ * The ENGLISH values of `$keys`, whatever language the page is in (Perry's review, 2026-10-07):
+ * the Find query parser accepts the English word for every scope, property and condition beside the
+ * translated one, and reads them from these. $ec_lang is deliberately LOCAL: the English file is
+ * required into this function's own scope so the page's strings are untouched.
+ */
+function ecEnglishStrings(array $keys): array
+{
+    $ec_lang = array();
+    $ec_lang_syn = array();
+    require __DIR__ . '/lang.ec.en.php';
+    $out = array();
+    foreach ($keys as $k) {
+        if (isset($ec_lang[$k])) { $out[$k] = $ec_lang[$k]; }
+    }
+    return $out;
+}

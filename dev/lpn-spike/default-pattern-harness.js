@@ -132,14 +132,13 @@ let patRow;
 	ok('...whose value is 1, which is what Net3 said and nobody typed',
 		!!patRow && patRow.control.value === '1',
 		patRow && patRow.control ? JSON.stringify(patRow.control.value) : 'none');
-	ok('...offering every pattern in the library, plus the blank',
-		!!patRow && tagged(patRow.control, 'OPTION').length === L.libPatterns().length + 1,
+	ok('...offering every pattern in the library and no blank while pattern 1 exists',
+		!!patRow && tagged(patRow.control, 'OPTION').length === L.libPatterns().length,
 		patRow ? tagged(patRow.control, 'OPTION').map(o => o.value).join(',') : '');
-	// The blank is FIRST and is a named option, not an empty slot: "no pattern" is an answer.
-	ok('...with the blank first and carrying a name',
-		!!patRow && tagged(patRow.control, 'OPTION')[0].value === '' &&
-			tagged(patRow.control, 'OPTION')[0].textContent.length > 0,
-		patRow ? JSON.stringify(tagged(patRow.control, 'OPTION')[0].textContent) : '');
+	// EPANET refuses a blank default and fills in 1; so does this row, while a pattern "1" is there.
+	ok('...with no blank option at all',
+		!!patRow && tagged(patRow.control, 'OPTION').every(o => o.value !== ''),
+		patRow ? tagged(patRow.control, 'OPTION').map(o => JSON.stringify(o.value)).join(',') : '');
 	// It carries a tip, because "default" alone does not say default for WHAT.
 	ok('...and the label carries its tip', !!patRow && /\?/.test(patRow.label),
 		patRow ? JSON.stringify(patRow.label) : '');
@@ -157,23 +156,14 @@ console.log('\n--- and it is a control, not a readout ---');
 		typeof n._demand === 'number' && n._demand !== 0)[0];
 	ok('Net3 has a junction relying on the project default', !!j, j && j.id);
 	const before = L.resolvedDemand(j, 0);
-	patRow.control.value = '';
+	patRow.control.value = '2';
 	patRow.control._listeners.change[0]();
-	ok('choosing the blank clears the document', doc.defaultPattern === null,
-		JSON.stringify(doc.defaultPattern));
-	const after = L.resolvedDemand(j, 0);
-	// **THE POINT OF THE WHOLE ROW.** Pattern 1's first multiplier is 1.0 in Net3, so if this
-	// asserted only the number it would pass with the wiring cut. Assert the RESOLUTION instead:
-	// with a default the junction follows a pattern, without one it does not.
-	// EPANET 2.2: with no pattern stated, a pattern whose ID is "1" still applies (fix/demand-pattern,
-	// dev/lpn-spike/demand-pattern-default-harness.js proves the other half, with no "1" at all).
-	ok('...and the junction still follows pattern 1, which EPANET uses when none is stated',
-		L.resolvedDemand(j, 0) === before,
-		'base ' + j._demand + ', draws ' + after);
+	ok('choosing 2 states it as the default', doc.defaultPattern === '2', JSON.stringify(doc.defaultPattern));
 	patRow.control.value = '1';
 	patRow.control._listeners.change[0]();
-	ok('...and choosing 1 again puts it back', doc.defaultPattern === '1' &&
-		L.resolvedDemand(j, 0) === before, 'draws ' + L.resolvedDemand(j, 0));
+	// "1" is what is implied, so choosing it returns to nothing stated: the export writes no Pattern line.
+	ok('...and choosing 1 again returns to the implied default, and the junction as it was',
+		doc.defaultPattern === null && L.resolvedDemand(j, 0) === before, 'draws ' + L.resolvedDemand(j, 0));
 }
 
 // ---------------------------------------------------------------------------
@@ -214,7 +204,7 @@ console.log('\n--- and drawing it changes nothing ---');
 	ok('a document that states no patterns still states none after the rebuild',
 		JSON.stringify(doc) === before,
 		'patterns is now ' + JSON.stringify(doc.patterns));
-	ok('...and the row still built, offering the blank alone',
+	ok('...and the row still built, offering "None (constant)" alone',
 		settingsRows().some(r => r.label.indexOf(PC.lpn_settings_default_pattern) >= 0));
 }
 

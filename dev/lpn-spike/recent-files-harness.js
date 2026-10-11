@@ -216,7 +216,7 @@ async function run() {
 	// the most-used row of. That makes its position a real decision rather than a layout detail,
 	// so it is asserted rather than left to whoever next edits this menu.
 	{
-		const menu = extract('openFileMenu');
+		const menu = extract('fileMenuRows');
 		const save = menu.indexOf('lpn_file_save ||');
 		const recents = menu.lastIndexOf('recentRows');
 		report(save > 0 && recents > save, 'Recent files are concatenated AFTER Save, not before it',
