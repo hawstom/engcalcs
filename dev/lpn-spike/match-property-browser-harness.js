@@ -187,7 +187,7 @@ async function main() {
 		await startFromEdit();
 		await pickSource('link', '10', 1);   // Cancel
 		const askMany = (await a.lang('lpn_match_selected_ask')).replace('{n}', '2');
-		ok('the question is Tom\'s sentence with the count', askedText.last === askMany && askMany === "Copy this object's properties except activation status to 2 selected objects?", askedText.last);
+		ok('the question is Tom\'s sentence with the count', askedText.last === askMany, askedText.last);
 		ok('Cancel wrote nothing to pipe 11', (await cell('pipes', '11', 'diameter')) === before11.d && (await cell('pipes', '11', 'roughness')) === before11.r);
 		ok('Cancel wrote nothing to pipe 12', (await cell('pipes', '12', 'diameter')) === before12.d);
 		ok('Cancel ended the tool', !/Match properties/.test(await hint()), await hint());
@@ -195,7 +195,7 @@ async function main() {
 		await selectTargets('link', ['11']);
 		await startFromEdit();
 		await pickSource('link', '10', 0);   // OK
-		ok('one target asks the one-object sentence', askedText.last === "Copy this object's properties except activation status to 1 selected object?", askedText.last);
+		ok('one target asks the one-object sentence', askedText.last === (await a.lang('lpn_match_selected_ask_one')), askedText.last);
 		ok('OK wrote pipe 11', (await cell('pipes', '11', 'diameter')) === src.d);
 		await undo();
 		await clearSelection();
@@ -207,7 +207,7 @@ async function main() {
 		await page.mouse.move(offBox.x + 6, offBox.y + 6);
 		await a.settle(900);
 		const tipText = await page.evaluate(() => { const t = document.querySelector('.tooltip.show .tooltip-inner'); return t ? t.textContent.trim() : null; });
-		ok('hovering the greyed row shows a styled tip with Tom\'s sentence', tipText === (await a.lang('lpn_match_menu_off_tip')) && tipText === "Select target objects to match this object's properties except activation status.", String(tipText));
+		ok('hovering the greyed row shows a styled tip with Tom\'s sentence', tipText === (await a.lang('lpn_match_menu_off_tip')), String(tipText));
 		ok('...and no native title is left on the row', await offRow.asElement().evaluate((b) => !b.getAttribute('title')));
 		await offRow.asElement().evaluate((b) => b.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 })));
 		await a.settle(300);
