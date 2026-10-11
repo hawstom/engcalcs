@@ -2230,7 +2230,13 @@
         "lpn_settings_default_pattern": "Default demand pattern",
         "lpn_settings_default_pattern_tip": "Every junction with no pattern uses this one.",
         "lpn_junction_pattern_unknown": "No pattern in this project is named {id}, so the junction was left as it was.",
-        "lpn_settings_default_pattern_implied": "None stated (pattern {id} is used)",
+        "lpn_settings_default_pattern_none": "None (constant)",
+        "lpn_demand_pattern_default": "(default: {id})",
+        "lpn_demand_pattern_constant": "(constant)",
+        "lpn_library_pattern_default_mark": "(default)",
+        "lpn_library_pattern_default_tip": "The default demand pattern. Change it in Settings, Default demand pattern.",
+        "lpn_library_pattern_default_deleted_to": "Pattern {id} was the default demand pattern. Junctions with no pattern now use pattern {now}.",
+        "lpn_library_pattern_default_deleted_none": "Pattern {id} was the default demand pattern. Junctions with no pattern now use a constant demand.",
         "lpn_library_control_add": "Add a control",
         "lpn_library_control_tip": "A one-line rule using EPANET syntax. Use consistent project units. Keywords must be in English. Examples: LINK 12 CLOSED IF NODE 23 ABOVE 20 (Link 12 will be closed when the level in Tank 23 exceeds 20 ft); LINK 12 OPEN IF NODE 130 BELOW 30 (Link 12 will be opened if the pressure at Node 130 drops below 30 psi); LINK PUMP02 1.5 AT TIME 16 (The relative speed of pump PUMP02 is set to 1.5 at 16 hours into the simulation); LINK 12 CLOSED AT CLOCKTIME 10 AM LINK 12 OPEN AT CLOCKTIME 8 PM (Two rules: Link 12 is repeatedly closed at 10 am and opened at 8 pm throughout the simulation)",
         "lpn_library_control_ok": "✓ Understood",
@@ -2541,7 +2547,7 @@
         "lpn_snip_tip_redo": "Redo (Ctrl+Y)",
         "lpn_screenshot_scale_tip": "The picture's size as a multiple of the area on the screen. A larger one is sharper and makes a bigger file."
     },
-    "count": 2539,
+    "count": 2545,
     "active_prefixes": [
         "about",
         "bpn",

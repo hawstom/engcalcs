@@ -23774,7 +23774,7 @@ var EngCalcs = EngCalcs || {};
 	// is Default: the project's Default demand pattern, which is what the run applies.
 	function paneColDemandPattern() {
 		return { key: 'demandPattern', label: 'lpn_field_demand_pattern', em: 5, lenient: true,
-			choices: function () { return paneChoicesPatterns(lpnBlankIsDefault()); },
+			choices: function () { return paneChoicesPatterns(lpnBlankIsDemandDefault()); },
 			get: function (n) { return ownDemandPattern(n) || ''; },
 			plainFor: function (n) { return hasDemandBreakdown(n); },
 			set: function (n, v) {
@@ -55758,23 +55758,39 @@ var EngCalcs = EngCalcs || {};
 		if (doc.defaultPattern === was) { doc.defaultPattern = to; }
 	}
 	function libRenamePattern(pat, want) {
-		var name = String(want || '').trim(), clash, was;
+		var name = String(want || '').trim(), clash, was, implied;
 		if (!name || name === pat.id) { return false; }
 		clash = libPatterns().some(function (p) { return p !== pat && p.id === name; });
 		if (clash) { return false; }
 		was = pat.id;
+		// **THE DEFAULT FOLLOWS ITS PATTERN** (Tom, 2026-10-11: renaming Net3's pattern "1" turned every
+		// run flat, because the implied default "1" had nothing to point at). A stated default is
+		// renamed by libRepointPattern(); an IMPLIED one (no PATTERN option, pattern "1" present) becomes
+		// a stated default under the new name, so the run keeps the shape it had.
+		implied = !doc.defaultPattern && effDefaultPattern() === was;
 		pat.id = name;
 		libRepointPattern(was, name);
+		if (implied) { doc.defaultPattern = name; }
 		return true;
 	}
 	function libDeletePattern(pat) {
-		var was = pat.id;
+		var was = pat.id, pc = EngCalcs.pageConfig || {}, wasDefault = effDefaultPattern() === was, now;
 		doc.patterns = libPatterns().filter(function (p) { return p !== pat; });
 		// **A REFERENCE TO A DELETED PATTERN IS CLEARED, NOT LEFT DANGLING.** lpnPatternById returns
 		// null for a name nothing answers to and lpnPatternValue turns that into a multiplier of 1,
 		// so the run would be right either way -- but the junction would still SAY it follows a
 		// pattern that is not there, and the next thing the user does is look for it.
 		libRepointPattern(was, null);
+		// **DELETING THE DEFAULT IS SAID OUT LOUD, NOT ANSWERED SILENTLY.** The default is cleared, never
+		// moved to some other pattern; what the junctions use now is EPANET's own fallback (pattern "1"
+		// if there is one, else a constant), and the notice names it.
+		if (wasDefault) {
+			now = effDefaultPattern();
+			setNotice(String(now
+				? (pc.lpn_library_pattern_default_deleted_to || 'Pattern {id} was the default demand pattern. Junctions with no pattern now use pattern {now}.')
+				: (pc.lpn_library_pattern_default_deleted_none || 'Pattern {id} was the default demand pattern. Junctions with no pattern now use a constant demand.'))
+				.split('{id}').join(was).split('{now}').join(now || ''));
+		}
 	}
 
 	// ---- CONTROLS --------------------------------------------------------------------------------
@@ -55934,23 +55950,30 @@ var EngCalcs = EngCalcs || {};
 		// anything. I had to close the project and reopen"*): this select is built once per Settings
 		// rebuild, and a pattern added, renamed or deleted since left it with options that no longer
 		// matched the document.
+		// **NEVER BLANK WHILE A PATTERN IS IN FORCE** (Tom, 2026-10-11: EPANET refuses a blank default
+		// and fills in 1). With nothing stated and a pattern "1" present the selector SHOWS "1", which is
+		// what the run uses; picking it writes nothing, so an unedited file still exports character-
+		// exact. The plain "None (constant)" row exists only where no pattern "1" does, because only
+		// then is a constant demand what a blank means.
+		function hasOne() { return libPatternsRead().some(function (p) { return p.id === '1'; }); }
 		function fill() {
-			var implied = !doc.defaultPattern && effDefaultPattern();
-			libFillPatternOptions(sel, doc.defaultPattern, implied
-				? String(pc.lpn_settings_default_pattern_implied || 'None stated (pattern {id} is used)')
-					.split('{id}').join(implied)
-				: undefined);
+			libFillPatternOptions(sel, effDefaultPattern() || '',
+				String(pc.lpn_settings_default_pattern_none || 'None (constant)'), hasOne());
 		}
 		fill();
 		['focus', 'mousedown', 'touchstart', 'keydown'].forEach(function (ev) {
 			sel.addEventListener(ev, function () {
 				var shown = Array.prototype.map.call(sel.children, function (o) { return o.value; }).join('\u0001'),
-					want = [''].concat(libPatternsRead().map(function (p) { return p.id; })).join('\u0001');
-				if (shown !== want || (sel.value || null) !== (doc.defaultPattern || null)) { fill(); }
+					want = (hasOne() ? [] : ['']).concat(libPatternsRead().map(function (p) { return p.id; })).join('\u0001');
+				if (shown !== want || (sel.value || '') !== (effDefaultPattern() || '')) { fill(); }
 			});
 		});
 		sel.addEventListener('change', function () {
-			doc.defaultPattern = sel.value || null;
+			var v = sel.value || null;
+			// Choosing what is already in force writes nothing; choosing "1" over another stated
+			// default returns to the implied one, which is the same run.
+			if (v === (effDefaultPattern() || null)) { fill(); return; }
+			doc.defaultPattern = (v === '1') ? null : v;
 			libCommit();
 			fill();
 			refreshPopupIfOpen();
@@ -56404,15 +56427,22 @@ var EngCalcs = EngCalcs || {};
 	// tip is not needed?"*). A junction's or a customer's blank pattern follows the project's
 	// Default demand pattern, and a pump's blank price pattern follows the network's, so those
 	// callers pass lpnBlankIsDefault(); everywhere else a blank really is No pattern.
+	// **A JUNCTION'S OR CUSTOMER'S BLANK DEMAND PATTERN NAMES WHAT IT RESOLVES TO** (Tom, 2026-10-11):
+	// "(default: 1)" or "(constant)". Display only; the stored value stays blank.
+	function lpnBlankIsDemandDefault() {
+		var pc = EngCalcs.pageConfig || {}, eff = effDefaultPattern();
+		return eff ? String(pc.lpn_demand_pattern_default || '(default: {id})').split('{id}').join(eff)
+			: String(pc.lpn_demand_pattern_constant || '(constant)');
+	}
 	function lpnBlankIsDefault() {
 		return (EngCalcs.pageConfig || {}).lpn_choice_default || 'Default';
 	}
-	function libFillPatternOptions(sel, value, blankLabel) {
+	function libFillPatternOptions(sel, value, blankLabel, omitBlank) {
 		var pc = EngCalcs.pageConfig || {}, none = document.createElement('option');
 		sel.textContent = '';
 		none.value = '';
 		none.textContent = blankLabel || pc.lpn_library_pattern_none || 'No pattern';
-		sel.appendChild(none);
+		if (!omitBlank) { sel.appendChild(none); }
 		libPatternsRead().forEach(function (p) {
 			var o = document.createElement('option');
 			o.value = p.id;
@@ -56447,7 +56477,7 @@ var EngCalcs = EngCalcs || {};
 				values = document.createElement('input'),
 				span = libEl('div', 'lpn-lib-note', libSpanText((pat.multipliers || []).length)),
 				spark = libSparkline(pat.multipliers),
-				del;
+				mark, del;
 			id.type = 'text';
 			id.className = 'lpn-lib-id';
 			id.value = pat.id;
@@ -56461,6 +56491,11 @@ var EngCalcs = EngCalcs || {};
 				rebuildLibraryBox();
 			});
 			headRow.appendChild(id);
+			if (effDefaultPattern() === pat.id) {
+				mark = libEl('span', 'lpn-lib-note', pc.lpn_library_pattern_default_mark || '(default)');
+				mark.title = pc.lpn_library_pattern_default_tip || 'The default demand pattern. Change it in Settings, Default demand pattern.';
+				headRow.appendChild(mark);
+			}
 			del = libButton(pc.lpn_tool_delete || 'Delete', function () {
 				saveUndoSnapshot();
 				libDeletePattern(pat);
@@ -60543,7 +60578,7 @@ var EngCalcs = EngCalcs || {};
 			acc.setBase(+bInput.value);
 			afterPropertyEdit(n);
 		});
-		libFillPatternOptions(sel, acc.getPattern(), lpnBlankIsDefault());
+		libFillPatternOptions(sel, acc.getPattern(), lpnBlankIsDemandDefault());
 		sel.setAttribute('aria-label', (pc.lpn_field_demand_pattern || 'Demand pattern') + ' ' + (index + 1));
 		sel.addEventListener('change', function () {
 			saveUndoSnapshot();
@@ -61896,7 +61931,7 @@ var EngCalcs = EngCalcs || {};
 		 */
 		patLabel = document.createElement('label');
 		patSel = document.createElement('select');
-		libFillPatternOptions(patSel, c.pattern || '', lpnBlankIsDefault());
+		libFillPatternOptions(patSel, c.pattern || '', lpnBlankIsDemandDefault());
 		patSel.addEventListener('change', function () {
 			if ((c.pattern || '') === patSel.value) { return; }
 			saveUndoSnapshot();

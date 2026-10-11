@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**84 still to read on master**, of 95 untranslated keys, of 2539 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**90 still to read on master**, of 101 untranslated keys, of 2545 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -175,8 +175,14 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   @@ NEEDS RULING
 
-## lpn_  (95, 84 to read @@ NEEDS RULING)
+## lpn_  (101, 90 to read @@ NEEDS RULING)
 
+- **`lpn_demand_pattern_constant`**
+  > (constant)
+  @@ NEEDS RULING
+- **`lpn_demand_pattern_default`**
+  > (default: {id})
+  @@ NEEDS RULING
 - **`lpn_dxf_export_failed`**
   > The DXF file was not written: an error in this page stopped it ({error}).
   @@ NEEDS RULING
@@ -396,6 +402,18 @@ never edits a synonym.
 - **`lpn_junction_pattern_unknown`**
   > No pattern in this project is named {id}, so the junction was left as it was.
   @@ NEEDS RULING
+- **`lpn_library_pattern_default_deleted_none`**
+  > Pattern {id} was the default demand pattern. Junctions with no pattern now use a constant demand.
+  @@ NEEDS RULING
+- **`lpn_library_pattern_default_deleted_to`**
+  > Pattern {id} was the default demand pattern. Junctions with no pattern now use pattern {now}.
+  @@ NEEDS RULING
+- **`lpn_library_pattern_default_mark`**
+  > (default)
+  @@ NEEDS RULING
+- **`lpn_library_pattern_default_tip`**
+  > The default demand pattern. Change it in Settings, Default demand pattern.
+  @@ NEEDS RULING
 - **`lpn_link_end_same`**
   > From and To must be different nodes.
   @@ NEEDS RULING
@@ -414,8 +432,8 @@ never edits a synonym.
 - **`lpn_pane_copy_heads`**
   > Copy with column headings
   _Ruled 2026-10-09: Use proposed (Tom, calls page round 3)._
-- **`lpn_settings_default_pattern_implied`**
-  > None stated (pattern {id} is used)
+- **`lpn_settings_default_pattern_none`**
+  > None (constant)
   @@ NEEDS RULING
 - **`lpn_settings_hover_card`**
   > Show the full label on hover
@@ -467,7 +485,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**113 still to read**, of 116 new keys across 15 unmerged branch(es).
+**115 still to read**, of 118 new keys across 15 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -804,13 +822,43 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`2e5e81c4`) — adds no English strings
 
+### feat/match-property (`9b4709d4`) — 9 new, 9 to read @@ NEEDS RULING
+
+- **`lpn_match_done_many`**
+  > Matched {m} assets to {id}: {n} properties copied.
+  @@ NEEDS RULING
+- **`lpn_match_done_one`**
+  > Matched {to} to {id}: {n} properties copied.
+  @@ NEEDS RULING
+- **`lpn_match_kind`**
+  > Match properties applies to nodes and pipes, pumps, and valves only.
+  @@ NEEDS RULING
+- **`lpn_match_menu`**
+  > Match properties
+  @@ NEEDS RULING
+- **`lpn_match_none`**
+  > {to} and {id} have no properties in common to copy.
+  @@ NEEDS RULING
+- **`lpn_match_selected_ask`**
+  > Apply the properties of {id} to the {n} other selected assets?
+  @@ NEEDS RULING
+- **`lpn_match_tip`**
+  > Copy the properties of one asset to others. Specify the source, then each asset to change. ID, location, end nodes, description, and tag are never copied. Assets of a different type receive only the properties both types have.
+  @@ NEEDS RULING
+- **`lpn_mode_match`**
+  > Mode: Match properties. Select the asset to copy properties from. Press Escape to cancel.
+  @@ NEEDS RULING
+- **`lpn_mode_match_dest`**
+  > Mode: Match properties. Select each asset to receive the properties of {id}. Press Escape or right-click when finished.
+  @@ NEEDS RULING
+
 ### feat/section-grid (`005d4e63`) — 1 new, 1 to read @@ NEEDS RULING
 
 - **`points_data_points_heading`**
   > Points data<br />(use Copy to see format)
   @@ NEEDS RULING
 
-### feat/snap (`dacc4425`) — 2 new, 2 to read @@ NEEDS RULING
+### feat/snap (`c22988d5`) — 2 new, 2 to read @@ NEEDS RULING
 
 - **`lpn_snap_node_on_node`**
   > {new} placed at the location of {target}. The two nodes are not connected.
@@ -819,7 +867,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > {link}, vertex {n}
   @@ NEEDS RULING
 
-### feat/tank-volume (`a85e4c69`) — 4 new, 4 to read @@ NEEDS RULING
+### feat/tank-volume (`42f75c7f`) — 4 new, 4 to read @@ NEEDS RULING
 
 - **`lpn_result_depth`**
   > Depth
@@ -834,30 +882,6 @@ build for that would be a gate nobody keeps. Refresh it with
   > Volume of water above the lowest water depth, so it is zero when the tank is at its minimum. EPANET's own tank volume also counts the water below the minimum level.
   @@ NEEDS RULING
 
-### feat/user-guide (`386d3e32`) — adds no English strings
-
 ### feat/visit-dedupe (`7b4a84bd`) — adds no English strings
 
-### fix/default-pattern-shown (`58706793`) — 7 new, 7 to read @@ NEEDS RULING
-
-- **`lpn_demand_pattern_constant`**
-  > (constant)
-  @@ NEEDS RULING
-- **`lpn_demand_pattern_default`**
-  > (default: {id})
-  @@ NEEDS RULING
-- **`lpn_library_pattern_default_deleted_none`**
-  > Pattern {id} was the default demand pattern. Junctions with no pattern now use a constant demand.
-  @@ NEEDS RULING
-- **`lpn_library_pattern_default_deleted_to`**
-  > Pattern {id} was the default demand pattern. Junctions with no pattern now use pattern {now}.
-  @@ NEEDS RULING
-- **`lpn_library_pattern_default_mark`**
-  > (default)
-  @@ NEEDS RULING
-- **`lpn_library_pattern_default_tip`**
-  > The default demand pattern. Change it in Settings, Default demand pattern.
-  @@ NEEDS RULING
-- **`lpn_settings_default_pattern_none`**
-  > None (constant)
-  @@ NEEDS RULING
+### fix/default-pattern-shown (`303b9c48`) — adds no English strings

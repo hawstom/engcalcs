@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "ru",
-        "expected_key_count": 2539,
-        "delta_key_count": 95,
+        "expected_key_count": 2545,
+        "delta_key_count": 101,
         "exempt_key_count": 27,
         "exempt_keys": [
             "calc_units_us",
@@ -800,7 +800,13 @@
         "lpn_settings_hover_card": "Show the full label on hover",
         "lpn_settings_hover_card_tip": "Rest the pointer on a node, link or customer to see its label as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project.",
         "lpn_junction_pattern_unknown": "No pattern in this project is named {id}, so the junction was left as it was.",
-        "lpn_settings_default_pattern_implied": "None stated (pattern {id} is used)"
+        "lpn_settings_default_pattern_none": "None (constant)",
+        "lpn_demand_pattern_default": "(default: {id})",
+        "lpn_demand_pattern_constant": "(constant)",
+        "lpn_library_pattern_default_mark": "(default)",
+        "lpn_library_pattern_default_tip": "The default demand pattern. Change it in Settings, Default demand pattern.",
+        "lpn_library_pattern_default_deleted_to": "Pattern {id} was the default demand pattern. Junctions with no pattern now use pattern {now}.",
+        "lpn_library_pattern_default_deleted_none": "Pattern {id} was the default demand pattern. Junctions with no pattern now use a constant demand."
     },
     "keys": {
         "lpn_guide_about_heading": "About this calculator",
@@ -897,7 +903,13 @@
         "lpn_settings_hover_card": "Show the full label on hover",
         "lpn_settings_hover_card_tip": "Rest the pointer on a node, link or customer to see its label as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project.",
         "lpn_junction_pattern_unknown": "No pattern in this project is named {id}, so the junction was left as it was.",
-        "lpn_settings_default_pattern_implied": "None stated (pattern {id} is used)"
+        "lpn_settings_default_pattern_none": "None (constant)",
+        "lpn_demand_pattern_default": "(default: {id})",
+        "lpn_demand_pattern_constant": "(constant)",
+        "lpn_library_pattern_default_mark": "(default)",
+        "lpn_library_pattern_default_tip": "The default demand pattern. Change it in Settings, Default demand pattern.",
+        "lpn_library_pattern_default_deleted_to": "Pattern {id} was the default demand pattern. Junctions with no pattern now use pattern {now}.",
+        "lpn_library_pattern_default_deleted_none": "Pattern {id} was the default demand pattern. Junctions with no pattern now use a constant demand."
     },
     "key_context": {
         "lpn_guide_about_heading": {
@@ -2404,7 +2416,103 @@
                 }
             }
         },
-        "lpn_settings_default_pattern_implied": {
+        "lpn_settings_default_pattern_none": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_default_pattern_tip",
+                    "value": "Этот график использует каждый узел, у которого нет своего графика.",
+                    "english": "Every junction with no pattern uses this one."
+                },
+                "next_translated": {
+                    "key": "lpn_library_control_add",
+                    "value": "Добавить управление",
+                    "english": "Add a control"
+                }
+            }
+        },
+        "lpn_demand_pattern_default": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_default_pattern_tip",
+                    "value": "Этот график использует каждый узел, у которого нет своего графика.",
+                    "english": "Every junction with no pattern uses this one."
+                },
+                "next_translated": {
+                    "key": "lpn_library_control_add",
+                    "value": "Добавить управление",
+                    "english": "Add a control"
+                }
+            }
+        },
+        "lpn_demand_pattern_constant": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_default_pattern_tip",
+                    "value": "Этот график использует каждый узел, у которого нет своего графика.",
+                    "english": "Every junction with no pattern uses this one."
+                },
+                "next_translated": {
+                    "key": "lpn_library_control_add",
+                    "value": "Добавить управление",
+                    "english": "Add a control"
+                }
+            }
+        },
+        "lpn_library_pattern_default_mark": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_default_pattern_tip",
+                    "value": "Этот график использует каждый узел, у которого нет своего графика.",
+                    "english": "Every junction with no pattern uses this one."
+                },
+                "next_translated": {
+                    "key": "lpn_library_control_add",
+                    "value": "Добавить управление",
+                    "english": "Add a control"
+                }
+            }
+        },
+        "lpn_library_pattern_default_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_default_pattern_tip",
+                    "value": "Этот график использует каждый узел, у которого нет своего графика.",
+                    "english": "Every junction with no pattern uses this one."
+                },
+                "next_translated": {
+                    "key": "lpn_library_control_add",
+                    "value": "Добавить управление",
+                    "english": "Add a control"
+                }
+            }
+        },
+        "lpn_library_pattern_default_deleted_to": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_default_pattern_tip",
+                    "value": "Этот график использует каждый узел, у которого нет своего графика.",
+                    "english": "Every junction with no pattern uses this one."
+                },
+                "next_translated": {
+                    "key": "lpn_library_control_add",
+                    "value": "Добавить управление",
+                    "english": "Add a control"
+                }
+            }
+        },
+        "lpn_library_pattern_default_deleted_none": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
