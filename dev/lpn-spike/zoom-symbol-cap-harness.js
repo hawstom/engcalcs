@@ -231,10 +231,10 @@ function suite(mutate, quiet) {
 	check(near(L.symbolCapScale(), st().symbolSize / (2 * P50_BY_HAND)),
 		'3.3 moving to the 50th percentile reads the LONGER pipe', L.symbolCapScale().toFixed(6));
 	st().symbolCapMultiple = -5;
-	check(L.symbolCapMultiple() === 0.5, '3.4 an invalid (non-positive) multiple falls back to 0.5',
+	check(L.symbolCapMultiple() === 0.25, '3.4 an invalid (non-positive) multiple falls back to 0.25',
 		String(L.symbolCapMultiple()));
 	st().symbolCapPercentile = 150;
-	check(L.symbolCapPercentile() === 20, '3.5 an out-of-range (>100) percentile falls back to 20',
+	check(L.symbolCapPercentile() === 50, '3.5 an out-of-range (>100) percentile falls back to 50',
 		String(L.symbolCapPercentile()));
 	st().symbolCapMultiple = 0.5; st().symbolCapPercentile = 20;
 	L.invalidateSymbolCap();
