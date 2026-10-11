@@ -1318,7 +1318,7 @@ $ec_lang['lpn_result_head_tip']='Potential energy of the water at this node, wri
 // counts the water below the lowest water depth (that water is in the mixing volume, it just cannot be drawn down).
 $ec_lang['lpn_result_depth']='Depth';
 $ec_lang['lpn_result_depth_tip']='Depth of water in the tank at the time shown, measured up from the tank bottom: the head minus the tank elevation.';
-$ec_lang['lpn_result_tank_volume']='Usable volume';
+$ec_lang['lpn_result_tank_volume']='Available volume';
 $ec_lang['lpn_result_tank_volume_tip']='Volume of water above the lowest water depth, so it is zero at that depth. The EPANET tank volume also includes the water below the lowest water depth, which still counts toward mixing and water age, so the tank elevation stays at the tank bottom.';
 $ec_lang['lpn_result_pressure']='Pressure';
 $ec_lang['lpn_result_flow']='Flow';
@@ -2673,6 +2673,14 @@ $ec_lang['lpn_link_end_same']='From and To must be different nodes.';
 $ec_lang['lpn_split_pipe_ask']='Split pipe {id} at this node?';
 $ec_lang['lpn_split_yes']='Yes';
 $ec_lang['lpn_split_no']='No';
+// Object snap (Task 782). The tip beside the snap glyph on a pipe vertex: "Pipe 10, vertex 2". A node
+// or a pipe is named by its type word and ID alone.
+$ec_lang['lpn_snap_vertex']='{link}, vertex {n}';
+// A tank, reservoir or junction snapped onto a node of another type is placed at exactly that
+// position. Two nodes at one point are legal in EPANET, and the map cannot show that they are separate.
+$ec_lang['lpn_snap_node_on_node']='{new} placed at the location of {target}. The two nodes are not connected.';
+// The same, for a node DRAGGED onto another node.
+$ec_lang['lpn_snap_moved_on_node']='{moved} moved to the location of {target}. The two nodes are not connected.';
 // Plain-text wording of the concept mphl_total_junction_k/mphl_junction_loss already own (their
 // values carry k<sub>m</sub> markup, incompatible with this popup's textContent-only fields) --
 // Tom, 2026-07-30, "default to 2" matches mphl_total_junction_k_tip's own stated default exactly.

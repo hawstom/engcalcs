@@ -209,9 +209,12 @@ async function main() {
 	{
 		const src = fs.readFileSync(ROOT + 'js/looped-network.js', 'utf8');
 		ok('the click handler asks lpn_split_pipe_ask for add-junction, add-reservoir and add-tank',
-			/mode === 'add-junction' \|\| mode === 'add-reservoir' \|\| mode === 'add-tank'\)\s*\? linkById\(exitLinkId\)/.test(src) &&
+			/nodeTool = mode === 'add-junction' \|\| mode === 'add-reservoir' \|\| mode === 'add-tank'/.test(src) &&
+			/inBaseScenario\(\) && nodeTool\s*\?\s*linkById\(exitLinkId\)/.test(src) &&
 			src.indexOf('lpn_split_pipe_ask') > 0);
-		ok('only pipes, only in Base', /breakLink\.type === 'pipe'/.test(src) && /inBaseScenario\(\) &&\s*\(mode === 'add-junction'/.test(src));
+		// The snap (Task 782) widens the offer to a pipe the node tool magneted onto, still in Base
+		// only; dev/lpn-spike/snap-browser-harness.js presses it in a real Chrome.
+		ok('only pipes, only in Base', /breakLink\.type === 'pipe'/.test(src) && /snapPipe && inBaseScenario\(\)/.test(src));
 		const en = fs.readFileSync(ROOT + 'lib/lang.ec.en.php', 'utf8');
 		ok('the question names the pipe', /lpn_split_pipe_ask'\]='Split pipe \{id\} at this node\?'/.test(en));
 	}

@@ -4,7 +4,7 @@
 //
 // Tom, 2026-10-10: depth and volume columns for tanks, "with zero at minimum depth". Real Chromium:
 //   1. Net3 (three tanks), its EPANET run finished. At several clock times the Tanks table's Depth is
-//      the frame's head minus the tank bottom, and Usable volume is pi/4 D^2 (depth - lowest water
+//      the frame's head minus the tank bottom, and Available volume is pi/4 D^2 (depth - lowest water
 //      depth) in the LENGTH unit cubed. The depth MOVES across the run (a column that repeated the
 //      first frame would be flat).
 //   2. A tank that states a VOLUME curve: the usable volume is the curve at the depth minus the
@@ -140,7 +140,7 @@ async function main() {
 					near(dep, head - elev, 0.06));
 				ok('t=' + t + ' tank ' + id + ': Depth is the engine\'s own level (' + depFrame.toFixed(2) + ')', near(dep, depFrame, 0.02));
 				const expect = Math.PI / 4 * dia * dia * (dep - min);
-				ok('t=' + t + ' tank ' + id + ': Usable volume = pi/4 D^2 (depth - lowest) = ' + expect.toFixed(0) + ' (shown ' + vol + ')',
+				ok('t=' + t + ' tank ' + id + ': Available volume = pi/4 D^2 (depth - lowest) = ' + expect.toFixed(0) + ' (shown ' + vol + ')',
 					near(vol, expect, Math.max(1, expect * 2e-3)));
 				depthAt[id] = depthAt[id] || [];
 				depthAt[id].push(dep);
@@ -187,12 +187,12 @@ async function main() {
 		ok('the Elevation edit took (' + before.elev + ' -> ' + after.elev + ')', near(after.elev, before.elev + 10, 0.01));
 		ok('Head stays stale (' + before.head + ' -> ' + after.head + ')', near(after.head, before.head, 0.01));
 		ok('Depth stays with the stale Head (' + before.dep + ' -> ' + after.dep + ')', near(after.dep, before.dep, 0.01));
-		ok('Usable volume stays (' + before.vol + ' -> ' + after.vol + ')', near(after.vol, before.vol, Math.max(1, before.vol * 1e-4)));
+		ok('Available volume stays (' + before.vol + ' -> ' + after.vol + ')', near(after.vol, before.vol, Math.max(1, before.vol * 1e-4)));
 		await edit(0, 'Lowest', before.min + 3);
 		await a.settle(600);
 		after = await snap();
 		ok('the Lowest water depth edit took (' + after.min + ')', near(after.min, before.min + 3, 0.01));
-		ok('Usable volume still does not move with Head stale (' + before.vol + ' -> ' + after.vol + ')',
+		ok('Available volume still does not move with Head stale (' + before.vol + ' -> ' + after.vol + ')',
 			near(after.vol, before.vol, Math.max(1, before.vol * 1e-4)));
 		ok('and Depth still holds', near(after.dep, before.dep, 0.01));
 
@@ -200,7 +200,7 @@ async function main() {
 		const heads = Object.keys((await table(a))[0]);
 		const dh = heads.filter((h) => h.indexOf(depthName) === 0)[0], vh = heads.filter((h) => h.indexOf(volName) === 0)[0];
 		ok('Depth heading states the head unit: ' + dh, /\(ft H2O\)/.test(dh || ''));
-		ok('Usable volume heading states the length unit cubed: ' + vh, /\(ft\^3\)/.test(vh || ''));
+		ok('Available volume heading states the length unit cubed: ' + vh, /\(ft\^3\)/.test(vh || ''));
 
 		// ---- 3. the graph offers both (Net3 still open) ------------------------------------------
 		console.log('\n3. THE TIME-SERIES GRAPH');
@@ -208,7 +208,7 @@ async function main() {
 		await a.settle(800);
 		const opts = await a.page.evaluate(() => Array.from(document.querySelectorAll('#lpn_ts_quantity option')).map((o) => [o.value, o.textContent]));
 		ok('the node quantities include Depth', opts.some((o) => o[0] === 'depth' && o[1] === depthName), JSON.stringify(opts.map((o) => o[1])));
-		ok('the node quantities include Usable volume', opts.some((o) => o[0] === 'volume' && o[1] === volName));
+		ok('the node quantities include Available volume', opts.some((o) => o[0] === 'volume' && o[1] === volName));
 
 		// ---- 2. a tank with a volume curve -------------------------------------------------------
 		console.log('\n2. A TANK WITH A VOLUME CURVE');
@@ -283,7 +283,7 @@ async function main() {
 		const esRows = await table(c);
 		const esHeads = Object.keys(esRows[0]);
 		ok('Depth column is present: ' + esDepth, esHeads.some((h) => h.indexOf(esDepth) === 0));
-		ok('Usable volume column is present: ' + esVol, esHeads.some((h) => h.indexOf(esVol) === 0));
+		ok('Available volume column is present: ' + esVol, esHeads.some((h) => h.indexOf(esVol) === 0));
 		const ev = parseFloat(col(esRows[0], esVol)), ed = parseFloat(col(esRows[0], esDepth));
 		ok('and carry numbers (' + ed + ', ' + ev + ')', isFinite(ed) && isFinite(ev) && ev > 0);
 		ok('no heading reads "undefined"', esHeads.every((h) => h.indexOf('undefined') < 0));

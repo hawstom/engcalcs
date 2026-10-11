@@ -8450,6 +8450,217 @@ var EngCalcs = EngCalcs || {};
 		}
 		return best;
 	}
+	// ---- OBJECT SNAP: THE MAGNET (ROADMAP Task 782) -----------------------------------------------
+	//
+	// Tom, 2026-10-10, listing the tools that replace per-scenario Change type: *"Snap/magnet to
+	// asset"*. CAD object snap, in his AutoCAD/Civil 3D sense: while a node is placed or moved, or a
+	// bend is moved, the point jumps to an existing node, a pipe vertex, or the nearest point on a
+	// pipe when one is within reach, a glyph and a name show what it caught, and a held Alt key
+	// places at the bare pointer instead. The reach is the gesture's own reachPx() -- the number every
+	// other finder on this page uses, so there is no second tolerance to keep in step.
+	//
+	// **THE SEAM: ONE PROVIDER PER SOURCE OF SNAP POINTS.** addSnapProvider(fn) registers a source;
+	// snapAtWorld() asks every source and Geom.bestSnapCandidate() picks the winner, by rank and then
+	// distance. A provider is `function (wx, wy, tolW, opts)` returning an array of candidates:
+	//
+	//   { kind, rank, x, y, dist, name, glyph, src, ... }
+	//
+	// `kind` names the source ('node', 'vertex', 'line'; Task 779's Shape adds its own), and
+	// `opts.kinds`, when given, limits a gesture to some of them. `rank` orders sources (0 node,
+	// 1 vertex, 2 nearest point on a pipe; a Shape vertex would be 1). `dist` is in world units and
+	// `tolW` is the reach in world units. `name` is what the tip shows ("Junction 22"). `glyph` is
+	// 'square', 'diamond' or 'hourglass'. `src` is the stored point object the candidate stands on,
+	// or null when the point is computed: copySnapProvenance() copies that object's file characters
+	// (`tok.x/y`) and geographic source record (`_xsrc/_ysrc`), so a snapped point is written back
+	// to the character as the target's own. `opts.exclude` = {nodes: {id: true}, links: {id: true}}
+	// is what a drag must not snap to (itself and what moves with it); a provider honours it.
+	// `opts.onLink`, when present, limits the pipe-line source to that one link id (or to none,
+	// when it is null): a node tool's line magnet is only the pipe the press is ON.
+	//
+	// So Task 779's Shape vertices are one call: addSnapProvider(snapProviderShapeVertices), with a
+	// provider shaped like snapProviderVertices() below.
+	var SNAP_PROVIDERS = [];
+	function addSnapProvider(fn) { SNAP_PROVIDERS.push(fn); }
+	function snapKindWanted(opts, kind) { return !opts || !opts.kinds || !!opts.kinds[kind]; }
+	function snapExcluded(opts, what, id) {
+		return !!(opts && opts.exclude && opts.exclude[what] && opts.exclude[what][id]);
+	}
+	// Nodes, at the position the scenario on screen draws them. `src` is the node only where that
+	// position IS the node's stored one; a scenario's moved node has no file characters to copy.
+	function snapProviderNodes(wx, wy, tolW, opts) {
+		var out = [], i, n, x, y, d;
+		if (!snapKindWanted(opts, 'node')) { return out; }
+		for (i = 0; i < doc.nodes.length; i++) {
+			n = doc.nodes[i];
+			if (!nodeEls[n.id] || snapExcluded(opts, 'nodes', n.id)) { continue; }
+			x = nodeDrawX(n); y = nodeDrawY(n);
+			d = Math.hypot(x - wx, y - wy);
+			if (d > tolW) { continue; }
+			out.push({ kind: 'node', rank: 0, x: x, y: y, dist: d, glyph: 'square',
+				name: reportTypeNoun('node', n.type) + ' ' + n.id, node: n,
+				src: nodeHasCoordOverride(n) ? null : n, ov: coordOverridesOf(n) });
+		}
+		return out;
+	}
+	function snapProviderVertices(wx, wy, tolW, opts) {
+		var out = [], pc = EngCalcs.pageConfig || {}, i, j, l, v, d;
+		if (!snapKindWanted(opts, 'vertex')) { return out; }
+		for (i = 0; i < doc.links.length; i++) {
+			l = doc.links[i];
+			if (!linkEls[l.id] || snapExcluded(opts, 'links', l.id)) { continue; }
+			for (j = 0; j < (l.verts || []).length; j++) {
+				v = l.verts[j];
+				d = Math.hypot(v.x - wx, v.y - wy);
+				if (d > tolW) { continue; }
+				out.push({ kind: 'vertex', rank: 1, x: v.x, y: v.y, dist: d, glyph: 'diamond',
+					name: String(pc.lpn_snap_vertex || '{link}, vertex {n}')
+						.split('{link}').join(reportTypeNoun('link', l.type) + ' ' + l.id).split('{n}').join(String(j + 1)),
+					link: l, vidx: j, src: v });
+			}
+		}
+		return out;
+	}
+	// The nearest point on a PIPE's line, lowest rank: a pipe passes through its own end nodes and
+	// bends, so this only wins where neither of those is within reach. Pumps and valves are left
+	// out: a point on a pump's symbol line is not a place anybody puts a node.
+	function snapProviderPipeLine(wx, wy, tolW, opts) {
+		var out = [], i, l, hit;
+		if (!snapKindWanted(opts, 'line')) { return out; }
+		for (i = 0; i < doc.links.length; i++) {
+			l = doc.links[i];
+			if (l.type !== 'pipe' || !linkEls[l.id] || snapExcluded(opts, 'links', l.id)) { continue; }
+			if (opts && opts.onLink !== undefined && opts.onLink !== l.id) { continue; }
+			if (!nodeById(l.from) || !nodeById(l.to)) { continue; }
+			hit = Geom.nearestFractionOnPolyline(linkPointList(l), wx, wy);
+			if (!(hit.dist <= tolW) || hit.f <= 1e-9 || hit.f >= 1 - 1e-9) { continue; }
+			out.push({ kind: 'line', rank: 2, x: hit.x, y: hit.y, dist: hit.dist, glyph: 'hourglass',
+				name: reportTypeNoun('link', l.type) + ' ' + l.id, link: l, f: hit.f, src: null });
+		}
+		return out;
+	}
+	addSnapProvider(snapProviderNodes);
+	addSnapProvider(snapProviderVertices);
+	addSnapProvider(snapProviderPipeLine);
+	// The snap for a WORLD point, at a reach in SCREEN pixels. Null when nothing is in reach.
+	function snapAtWorld(wx, wy, px, opts) {
+		var tolW = px / (state.s || 1), all = [], i;
+		for (i = 0; i < SNAP_PROVIDERS.length; i++) { all = all.concat(SNAP_PROVIDERS[i](wx, wy, tolW, opts) || []); }
+		return Geom.bestSnapCandidate(all, tolW);
+	}
+	function snapAtScreen(cx, cy, px, opts) {
+		var w = screenToWorld(cx, cy);
+		return snapAtWorld(w.x, w.y, px, opts);
+	}
+	// **THE TARGET'S FILE CHARACTERS GO WITH ITS NUMBERS.** `dst` has just been given the target's
+	// x and y; this makes it carry the same source record, so a saved file and an exported `.inp`
+	// write the same characters for both. Each record is still believed only while its number
+	// matches (unprojectStoredGeo(), lpnNumText()), so a later move retires it by itself. BASE
+	// ONLY: inside a scenario the position is an override and the element's own record must stay.
+	function copySnapProvenance(c, dst) {
+		var s = c && c.src;
+		if (!dst || !inBaseScenario()) { return; }
+		delete dst[LPN_GEO_XSRC]; delete dst[LPN_GEO_YSRC];
+		if (dst.tok) {
+			delete dst.tok.x; delete dst.tok.y;
+			if (!Object.keys(dst.tok).length) { delete dst.tok; }
+		}
+		if (!s || s.x !== dst.x || s.y !== dst.y) { return; }
+		if (typeof s[LPN_GEO_XSRC] === 'number') { dst[LPN_GEO_XSRC] = s[LPN_GEO_XSRC]; }
+		if (typeof s[LPN_GEO_YSRC] === 'number') { dst[LPN_GEO_YSRC] = s[LPN_GEO_YSRC]; }
+		if (s.tok && (typeof s.tok.x === 'string' || typeof s.tok.y === 'string')) {
+			dst.tok = dst.tok || {};
+			if (typeof s.tok.x === 'string') { dst.tok.x = s.tok.x; }
+			if (typeof s.tok.y === 'string') { dst.tok.y = s.tok.y; }
+		}
+	}
+	// A node moved onto a snap target, through the one door a node's position is written by. In a
+	// scenario the OUTWARD pair is handed over where the target has one of its own (its override),
+	// so a typed 38.5 on the target is 38.5 on the node too.
+	function writeNodeAtSnap(n, c) {
+		var ov = c.ov || null;
+		writeNodeCoord(n, false, c.x, (!inBaseScenario() && ov && typeof ov.x === 'number') ? ov.x : undefined);
+		writeNodeCoord(n, true, c.y, (!inBaseScenario() && ov && typeof ov.y === 'number') ? ov.y : undefined);
+		copySnapProvenance(c, n);
+	}
+	// **THE GLYPH AND THE NAME.** One group in the world layer, redrawn on every call at a constant
+	// screen size; display none whenever nothing is caught. Decoration only: never in a document,
+	// a snapshot or a scenario.
+	var snapMarkEl = null;
+	function showSnapMark(c) {
+		if (!snapMarkEl) { return; }
+		if (!c) { hideSnapMark(); return; }
+		var s = state.s || 1, h = 6 / s, x = c.x, y = c.y, d, txt;
+		while (snapMarkEl.firstChild) { snapMarkEl.removeChild(snapMarkEl.firstChild); }
+		d = c.glyph === 'diamond'
+			? 'M' + x + ' ' + (y - h * 1.3) + 'L' + (x + h * 1.3) + ' ' + y + 'L' + x + ' ' + (y + h * 1.3) + 'L' + (x - h * 1.3) + ' ' + y + 'Z'
+			: c.glyph === 'hourglass'
+				? 'M' + (x - h) + ' ' + (y - h) + 'L' + (x + h) + ' ' + (y - h) + 'L' + (x - h) + ' ' + (y + h) + 'L' + (x + h) + ' ' + (y + h) + 'Z'
+				: 'M' + (x - h) + ' ' + (y - h) + 'L' + (x + h) + ' ' + (y - h) + 'L' + (x + h) + ' ' + (y + h) + 'L' + (x - h) + ' ' + (y + h) + 'Z';
+		el('path', { 'class': 'lpn-snap-glyph', d: d }, snapMarkEl);
+		txt = el('text', { 'class': 'lpn-snap-name', x: x + 10 / s, y: y - 10 / s, 'font-size': 12 / s }, snapMarkEl);
+		txt.textContent = c.name || '';
+		snapMarkEl.setAttribute('data-snap-kind', c.kind);
+		snapMarkEl.style.display = '';
+	}
+	function hideSnapMark() {
+		if (!snapMarkEl || snapMarkEl.style.display === 'none') { return; }
+		snapMarkEl.style.display = 'none';
+		snapMarkEl.removeAttribute('data-snap-kind');
+	}
+	// WHICH TARGETS EACH TOOL MAGNETS TO, in one table, so the hover glyph and the press that
+	// commits can never disagree. A node tool takes all three. The pipe, pump and valve tools
+	// already connect to a node within reach (the snap-on-create below), so their glyph names that
+	// node, and a bend in open space takes a vertex. Junction and Pipe (the chain) is left as it
+	// was: each of its presses makes a junction joined to the one before, and one landing on a
+	// pipe's line or bend unjoined to that pipe would look connected and not be.
+	var SNAP_KINDS_BY_MODE = {
+		'add-junction': { node: true, vertex: true, line: true },
+		'add-reservoir': { node: true, vertex: true, line: true },
+		'add-tank': { node: true, vertex: true, line: true },
+		'add-pipe': { node: true, vertex: true },
+		'add-pump': { node: true, vertex: true },
+		'add-valve': { node: true, vertex: true }
+	};
+	// What a press in this mode, at this point, would snap to. Null with Alt held (the bare
+	// pointer), in a mode that does not snap, and when nothing is in reach.
+	//
+	// **A NODE TOOL'S LINE MAGNET IS THE PIPE'S OWN HIT BAND, NOT THE NODE REACH** (Perry's review of
+	// Task 782): at 14/24 px the "Split pipe?" question covered twice the map it did on master. So the
+	// line candidate is only the pipe the browser's hit test puts the press ON (tapLinkId(), the test
+	// that decided "on the pipe" before the magnet), and node and bend targets keep the full reach.
+	// **AND IN A SCENARIO A NODE TOOL MAGNETS TO NODES ONLY**: a scenario cannot split a pipe, so a
+	// node put on a line or bend there would look connected and be offered nothing.
+	function toolSnapAt(e) {
+		var kinds = SNAP_KINDS_BY_MODE[mode], opts;
+		if (!kinds || (e && e.altKey)) { return null; }
+		opts = { kinds: kinds };
+		if (mode === 'add-junction' || mode === 'add-reservoir' || mode === 'add-tank') {
+			if (!inBaseScenario()) { opts.kinds = { node: true }; }
+			else { opts.onLink = tapLinkId(mapHitAt(e.clientX, e.clientY)); }
+		}
+		return snapAtScreen(e.clientX, e.clientY, reachPx(e), opts);
+	}
+	// What a dragged node or bend snaps to: the same three sources, less the thing being dragged and
+	// what moves with it (a node's own pipes; a bend's own pipe and its two end nodes), since a node
+	// snapping onto its own pipe would be chasing a line that follows it.
+	function dragSnapOpts(dr) {
+		var ex = { nodes: {}, links: {} }, l;
+		if (dr.type === 'node') {
+			ex.nodes[dr.id] = true;
+			// ...and the nodes at the far ends of its own links, which would make a link of zero
+			// length (Perry's review).
+			(incidentLinks[dr.id] || []).forEach(function (lid) {
+				var il = linkById(lid);
+				ex.links[lid] = true;
+				if (il) { ex.nodes[il.from] = true; ex.nodes[il.to] = true; }
+			});
+		} else if (dr.type === 'vertex') {
+			l = linkById(dr.id);
+			ex.links[dr.id] = true;
+			if (l) { ex.nodes[l.from] = true; ex.nodes[l.to] = true; }
+		}
+		return { exclude: ex };
+	}
 	// A reservoir's effective fixed head: whatever the user typed, or -- when blank -- its own
 	// elevation. Blank is stored as undefined rather than as a copy of the elevation, so the two
 	// stay linked: moving the elevation moves the water surface with it until the user takes control
@@ -10496,7 +10707,7 @@ var EngCalcs = EngCalcs || {};
 		for (i = 0; i < defs.length; i++) { if (defs[i][0] === field) { return defs[i][1]; } }
 		// Tank-only results with no Labels row (Task 783): offered to the ramp, Find and the graph.
 		if (group === 'node' && field === 'depth') { return pc.lpn_result_depth || 'Depth'; }
-		if (group === 'node' && field === 'volume') { return pc.lpn_result_tank_volume || 'Usable volume'; }
+		if (group === 'node' && field === 'volume') { return pc.lpn_result_tank_volume || 'Available volume'; }
 		return field;
 	}
 	// **A STATISTIC VIEW SAYS SO IN THE HEADING** (Task 735): with the transport on Averaged, the map's
@@ -20605,7 +20816,7 @@ var EngCalcs = EngCalcs || {};
 			['head', 'lpn_result_head', 'Head'],
 			['pressure', 'lpn_result_pressure', 'Pressure'],
 			['depth', 'lpn_result_depth', 'Depth'],
-			['volume', 'lpn_result_tank_volume', 'Usable volume'],
+			['volume', 'lpn_result_tank_volume', 'Available volume'],
 			['quality', null, 'Water age']
 		];
 		var BAND_LINK = [
@@ -35127,6 +35338,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// a preview left on the map by a tool that is no longer running is a shape nothing can
 		// finish (Task 247).
 		if (mode === 'add-meter' && newMode !== 'add-meter') { setPendingMeter(null); }
+		// The snap glyph belongs to the tool that showed it (Task 782).
+		hideSnapMark();
 		// The hover preview is a Select-mode-only signal (Ida's wishlist item 1): leaving 'select'
 		// for any other tool drops it rather than leaving a highlight nothing will now clear, since
 		// the pointermove listener that maintains it does no work outside 'select'.
@@ -35352,8 +35565,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	 * Base pipe from inside one would change the other scenarios under it.
 	 * dev/lpn-spike/ewb-meeting-harness.js.
 	 */
-	function breakPipeAtPoint(l, nodeType, wx, wy) {
+	// `at`, when given, is a snap target on this pipe (Task 782): the node goes EXACTLY on it, and a
+	// bend it stands on is consumed by the node rather than left as a zero-length leg beside it.
+	function breakPipeAtPoint(l, nodeType, wx, wy, at) {
 		var pts = linkPointList(l), r = Geom.nearestFractionOnPolyline(pts, wx, wy),
+			atV = at && at.kind === 'vertex' && at.link === l ? at.vidx : -1,
 			total = Geom.polylineLength(pts), splitAlong = r.f * total,
 			oldTo = l.to, oldId = l.id, cum = [0], i, keepVerts = [], newVerts = [], node, nl, clone,
 			lenOrig, lenNew, frac, wasTyped = !l.lenAuto, typedLen = l._length;
@@ -35361,12 +35577,15 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			cum.push(cum[i] + Math.hypot(pts[i + 1].x - pts[i].x, pts[i + 1].y - pts[i].y));
 		}
 		// A vertex travels with its typed geographic characters, so it is copied whole.
+		if (atV >= 0) { splitAlong = cum[atV + 1]; }
 		(l.verts || []).forEach(function (v, k) {
+			if (k === atV) { return; }
 			if (cum[k + 1] < splitAlong - 1e-12) { keepVerts.push(v); }
 			else { newVerts.push(Object.assign({}, v)); }
 		});
 		clone = JSON.parse(JSON.stringify(l));
-		node = addNode(nodeType, r.x, r.y);
+		node = at ? addNode(nodeType, at.x, at.y) : addNode(nodeType, r.x, r.y);
+		if (at) { copySnapProvenance(at, node); }
 		nl = addLink('pipe', node.id, oldTo, newVerts);
 		nl.verts = newVerts;   // base-write: construction: whole copies, so a vertex keeps its typed characters
 		// Everything the pipe carries comes across, except what is its own place or identity.
@@ -49476,6 +49695,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// they are one drawing in progress, not two things, and giving them a second appearance
 		// would read as an object that already exists.
 		pendingPathEl = el('polyline', { 'class': 'lpn-rubberband', style: 'display:none' }, world);
+		// The object-snap glyph and name (Task 782): above the drawing, under the debug boxes.
+		snapMarkEl = el('g', { 'class': 'lpn-snap-mark', style: 'display:none' }, world);
 		// Above everything, and EMPTY unless ?debug=boxes is on the URL -- see drawCollisionBoxes().
 		debugBoxLayer = el('g', {}, world);
 		setTransform();
@@ -50323,6 +50544,16 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		svg.addEventListener('pointermove', function (e) {
 			profileDrawHover(e.clientX, e.clientY);
 		});
+		// **THE SNAP GLYPH FOLLOWS THE POINTER IN A TOOL THAT SNAPS** (Task 782), so the press
+		// commits what the glyph shows: toolSnapAt() is the one question both ask. A pointer only;
+		// a finger has no hover and snaps on the press itself. A drag draws its own (applyDrag()).
+		svg.addEventListener('pointermove', function (e) {
+			if (e.pointerType === 'touch' || drag) { return; }
+			showSnapMark(toolSnapAt(e));
+		});
+		svg.addEventListener('pointerleave', function (e) {
+			if (e.pointerType !== 'touch' && !drag) { hideSnapMark(); }
+		});
 
 		// **SELECTION PREVIEW** (Ida's wishlist item 1): the Select-mode hover highlight, driven by
 		// the SAME hit-test a click uses (`mapHitAt`), so it always shows exactly what a click would
@@ -50557,6 +50788,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			if (!pointers.has(e.pointerId)) { return; }
 			pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
 			if (!drag) { return; }
+			// Alt held on the latest move turns the magnet off for this frame of a drag (Task 782).
+			if (drag.pointerId === e.pointerId) { drag.alt = !!e.altKey; drag.reach = reachPx(e); }
 			// **NOTHING MOVES UNTIL THE PRESS HAS TRAVELLED PAST ITS OWN SLOP** -- see TAP_MOVE_PX.
 			// The offsets seeded on the press are kept, so the element does not jump when the drag
 			// does arm: it simply starts following a finger that is already where it is.
@@ -50611,6 +50844,15 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// junction whose new position is the only evidence it moved.
 			if (drag && drag.pointerId === e.pointerId && drag.type === 'node' && drag.snapped) {
 				markNodeMoved(drag.id);
+				// **A NODE DROPPED ON A NODE SAYS SO**, as a placement does (Task 782): one dot on
+				// the map cannot show that the two are separate.
+				if (drag.lastSnap && drag.lastSnap.kind === 'node' && nodeById(drag.id)) {
+					var mvN = nodeById(drag.id), mvPc = EngCalcs.pageConfig || {};
+					setNotice(String(mvPc.lpn_snap_moved_on_node ||
+						'{moved} moved to the location of {target}. The two nodes are not connected.')
+						.split('{moved}').join(reportTypeNoun('node', mvN.type) + ' ' + mvN.id)
+						.split('{target}').join(drag.lastSnap.name));
+				}
 				// Pipe lengths moved, so the 10th percentile is re-read at the next re-size (Task
 				// 705). Not re-applied here: one moved junction does not move it visibly, and a drop
 				// that re-sized every symbol would be a flicker nobody asked for.
@@ -50631,7 +50873,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// no pan in progress once a pointer has been released.
 			setPanning(false);
 			if (drag && drag.type === 'pinch' && pointers.size < 2) { drag = null; dragDirty = false; return; }
-			if (drag && drag.pointerId === e.pointerId) { drag = null; dragDirty = false; }
+			// The snap glyph of a node or bend drag ends with the drag (Task 782).
+			if (drag && drag.pointerId === e.pointerId) { drag = null; dragDirty = false; hideSnapMark(); }
 			// Task 647: a pan is the gesture that can put the whole network off screen by hand,
 			// and its release is the "at rest" moment -- never mid-drag.
 			if (wasPan && !drag) { relayoutLabels(); updateOffscreenNotice(); }
@@ -50805,21 +51048,35 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// node tools used to make on a pipe, for a pipe in Base only: Yes cuts the pipe in two at
 			// the node (breakPipeAtPoint), No places the node where it was pressed, joined to nothing.
 			// A pump or valve, a scenario, and every other tool keep the exit-and-open below.
-			var breakLink = exitLinkId !== null && exitLinkId !== undefined && inBaseScenario() &&
-				(mode === 'add-junction' || mode === 'add-reservoir' || mode === 'add-tank')
-				? linkById(exitLinkId) : null;
+			var nodeTool = mode === 'add-junction' || mode === 'add-reservoir' || mode === 'add-tank';
+			// **THE MAGNET** (Task 782): what this press snaps to, the same answer the hover glyph
+			// showed. Null with Alt held, which places at the bare pointer.
+			var snapHit = toolSnapAt(e);
+			hideSnapMark();
+			// A node tool magneted onto a PIPE's bend or line is a press on that pipe, so it gets the
+			// split question below at the snapped point, with the same reach the magnet has.
+			var snapPipe = nodeTool && snapHit && (snapHit.kind === 'vertex' || snapHit.kind === 'line') &&
+				snapHit.link.type === 'pipe' ? snapHit.link : null;
+			var breakLink = snapPipe && inBaseScenario() ? snapPipe
+				: (exitLinkId !== null && exitLinkId !== undefined && inBaseScenario() && nodeTool
+					? linkById(exitLinkId) : null);
+			// The point a node tool places at: the snap target exactly, else the press.
+			var placeAt = nodeTool && snapHit ? snapHit : null, px0 = placeAt ? placeAt.x : w.x, py0 = placeAt ? placeAt.y : w.y;
 			if (breakLink && breakLink.type === 'pipe' && nodeById(breakLink.from) && nodeById(breakLink.to) &&
 				(function () {
-					var f = Geom.nearestFractionOnPolyline(linkPointList(breakLink), w.x, w.y).f;
+					var f = Geom.nearestFractionOnPolyline(linkPointList(breakLink), px0, py0).f;
 					return f > 1e-9 && f < 1 - 1e-9;
 				}())) {
-				var breakType = mode.slice('add-'.length), breakPc = EngCalcs.pageConfig || {};
+				var breakType = mode.slice('add-'.length), breakPc = EngCalcs.pageConfig || {},
+					breakAt = placeAt && placeAt.link === breakLink ? placeAt : null;
 				askDialog({ kind: 'confirm',
 					text: (breakPc.lpn_split_pipe_ask || 'Split pipe {id} at this node?').replace('{id}', breakLink.id),
 					ok: breakPc.lpn_split_yes || 'Yes', cancel: breakPc.lpn_split_no || 'No' }, function (yes) {
 					saveUndoSnapshot();
 					logLpnFirstAction('element');
-					if (yes) { breakPipeAtPoint(breakLink, breakType, w.x, w.y); }
+					if (yes) { breakPipeAtPoint(breakLink, breakType, px0, py0, breakAt); }
+					// No places the node where the press was, unsnapped: a node left on the line and
+					// joined to nothing would look connected (Perry's review).
 					else { addNode(breakType, w.x, w.y); }
 				});
 				return;
@@ -50838,8 +51095,25 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			if (mode === 'add-junction' || mode === 'add-reservoir' || mode === 'add-tank') {
 				// Snap-on-create: a click within this gesture's own reach of an existing node reuses
 				// it instead of creating a new, overlapping one -- see TOUCH_REACH_PX.
-				var onNode = nearestNodeNearScreen(e.clientX, e.clientY, reachPx(e));
-				if (onNode) {
+				// **A NODE OF THE SAME TYPE OPENS; A NODE OF ANOTHER TYPE IS A TARGET** (Task 782). A
+				// second junction stacked on a junction is the double-tap the rule below exists for,
+				// so it still opens the one there. A tank or reservoir magneted onto a junction (or the
+				// reverse) is the CAD gesture Tom asked for: the new node is placed at exactly that
+				// position, and the notice says the two are not connected, since one dot on the map
+				// cannot show it. Never merged: two nodes at one point is legal in EPANET. Alt places
+				// at the bare pointer, near a node or not.
+				var newType = mode.slice('add-'.length),
+					onNode = e.altKey ? null : nearestNodeNearScreen(e.clientX, e.clientY, reachPx(e));
+				if (onNode && placeAt && placeAt.kind === 'node' && placeAt.node.type !== newType) {
+					saveUndoSnapshot();
+					logLpnFirstAction('element');
+					var stacked = addNode(newType, px0, py0), stackPc = EngCalcs.pageConfig || {};
+					copySnapProvenance(placeAt, stacked);
+					setNotice(String(stackPc.lpn_snap_node_on_node ||
+						'{new} placed at the location of {target}. The two nodes are not connected.')
+						.split('{new}').join(reportTypeNoun('node', newType) + ' ' + stacked.id)
+						.split('{target}').join(placeAt.name));
+				} else if (onNode) {
 					// **A MISS THAT LANDS ON WHAT YOU JUST PLACED OPENS IT**, and switches to Select.
 					// Refusing to place a second node on top of an existing one and then doing
 					// NOTHING AT ALL is worse: the user taps, nothing appears, nothing opens, and
@@ -50851,7 +51125,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				} else {
 					saveUndoSnapshot();
 					logLpnFirstAction('element');
-					addNode(mode.slice('add-'.length), w.x, w.y);
+					copySnapProvenance(placeAt, addNode(newType, px0, py0));
 				}
 			}
 			else if (mode === 'add-meter') {
@@ -50994,7 +51268,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 					// one. Nothing is written to the document here -- the points are held in view
 					// state until a second NODE arrives, so no undo snapshot is owed and an
 					// abandoned drawing leaves nothing behind.
-					pendingLinkVerts.push({ x: w.x, y: w.y });
+					// A bend magnets to another pipe's vertex (Task 782), carrying its characters.
+					var bend = snapHit && snapHit.kind === 'vertex' ? { x: snapHit.x, y: snapHit.y } : { x: w.x, y: w.y };
+					if (snapHit && snapHit.kind === 'vertex') { copySnapProvenance(snapHit, bend); }
+					pendingLinkVerts.push(bend);
 					drawPendingPath();
 				}
 			} else if (mode === 'vertices') {
@@ -51313,14 +51590,26 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// **A DRAGGED POSITION AND A TYPED ONE GO THROUGH THE SAME DOOR** (Task 674), so inside
 			// a scenario a drag records that scenario's own position exactly as the boxes do, and
 			// neither editor can come to a different idea of what placing a node means.
-			writeNodeCoord(n, false, w.x + drag.offX);
-			writeNodeCoord(n, true, w.y + drag.offY);
+			// **THE NODE ITSELF IS WHAT MAGNETS** (Task 782): its would-be position is tested, not
+			// the pointer, so a node grabbed off-centre still lands dead on the target. Alt is off.
+			var ns = drag.alt ? null : snapAtWorld(w.x + drag.offX, w.y + drag.offY, drag.reach || POINTER_REACH_PX, dragSnapOpts(drag));
+			drag.lastSnap = ns;
+			if (ns) { writeNodeAtSnap(n, ns); }
+			else {
+				writeNodeCoord(n, false, w.x + drag.offX);
+				writeNodeCoord(n, true, w.y + drag.offY);
+			}
+			showSnapMark(ns);
 			updateNode(drag.id);
 			relayoutLabels();
 		} else if (drag.type === 'vertex') {
 			snapshotDragOnce();
-			var w2 = screenToWorld(p.x, p.y);
-			linkById(drag.id).verts[drag.vidx] = { x: w2.x + drag.offX, y: w2.y + drag.offY };
+			var w2 = screenToWorld(p.x, p.y),
+				vs = drag.alt ? null : snapAtWorld(w2.x + drag.offX, w2.y + drag.offY, drag.reach || POINTER_REACH_PX, dragSnapOpts(drag)),
+				nv = vs ? { x: vs.x, y: vs.y } : { x: w2.x + drag.offX, y: w2.y + drag.offY };
+			if (vs) { copySnapProvenance(vs, nv); }
+			linkById(drag.id).verts[drag.vidx] = nv;
+			showSnapMark(vs);
 			updateVertex(drag.id, drag.vidx);
 			relayoutLabels();
 		} else if (drag.type === 'customer') {
@@ -63657,7 +63946,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// Depth and usable volume, read the way the Tables pane reads them (Task 783).
 			readonlyField(fields, (pc.lpn_result_depth || 'Depth') + ' (' + unitLabel(resultUnit('elevhead')) + ')',
 				colorNodeValue(n, 'depth'), pc.lpn_result_depth_tip);
-			readonlyField(fields, (pc.lpn_result_tank_volume || 'Usable volume') + ' (' + tankVolumeUnitText() + ')',
+			readonlyField(fields, (pc.lpn_result_tank_volume || 'Available volume') + ' (' + tankVolumeUnitText() + ')',
 				colorNodeValue(n, 'volume'), pc.lpn_result_tank_volume_tip);
 		} else if (n.type === 'reservoir') {
 			unitNumberField(fields, pc.lpn_field_elev || 'Elevation', 'lpn_u_elevhead',
@@ -74272,6 +74561,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			undo: undoStack.length, sig: docSignature(), mode: mode, fold: guideFold
 		};
 	};
+	// The heads and flows on screen, for dev/lpn-spike/snap-browser-harness.js (Task 782): it asserts
+	// that a model edited by snapping still solves.
+	EngCalcs.lpnSolveProbe = function () { return lastSolveResult; };
 	// The Full report's Type column harness opens the box through this, not through the menu.
 	EngCalcs.lpnOpenFullReportBox = function () { return openFullReportBox(); };
 
