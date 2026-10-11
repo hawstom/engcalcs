@@ -4213,3 +4213,16 @@ OBSERVED (decays): driven in real Chromium on Net1, own scripts in scratchpad (p
 - OBSERVED: with Recalculate OFF after a run, editing tank Elevation 50 -> 60 leaves Head stale (52.76) and Depth becomes -7.24 (stale head minus new elevation). Edit of Lowest water depth moves Usable volume at once while Head stays stale.
 - OBSERVED: Tables pane is not shown at 390 px (display none, pre-existing); could not drive Properties at phone width.
 - TRAP: the harness's "Depth = head - elevation" check restates the code; only the EPANET comparison is independent.
+
+## 2026-10-11 Perry: feat/match-property @ 9b4709d4 (Task 782)
+OBSERVED (in Chromium, Net1/Net3/Elm, this tree; re-verify before citing):
+- Harness 42/42 passes. Pipe/junction/tank match, one-step undo, Recalculate OFF snapshot all correct.
+- Inside scenario S1, pipe 10->11: Base untouched, BUT S1 gains 9 overrides ("S1 (9)") though only diameter differed; a later Base roughness edit on pipe 11 did not reach S1.
+- Inside scenario S1, junction 10->15 rewrote BASE elevation of 15 (32->147). Elevation is not overridable; same as typing it in a scenario, but silent in a bulk tool.
+- Plural: "to the 1 other selected assets?"; "1 properties copied" by code.
+- Valve PRV->FCV: setting refused, valveType column has no setter so never copied. OK.
+- Demand breakdown junction: demand/pattern silently skipped both directions; notice still counts "7 copied".
+- Pump 10 (closed, curve 1) -> pump 335: closed=1 and curve ref copied.
+- EPS at 4:00: match resets display to time-0 values; a Tables edit does the same (pre-existing).
+- Right-click on node: no selection, no Properties; one-row menu. Document-level capture swallows ALL right-button presses on the canvas in Select mode (code).
+SPECULATION: touch long-press yields native menu only (pointerdown button is 0).
