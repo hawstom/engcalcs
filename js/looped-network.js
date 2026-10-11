@@ -6072,8 +6072,12 @@ var EngCalcs = EngCalcs || {};
 			// `symbolCapPercentile` percentile pipe." Always on -- there is no "off" state to
 			// explain, unlike the labeling threshold above. Both are plain dimensionless numbers
 			// (a ratio and a percentage), so neither is reinterpreted on a unit change.
-			symbolCapMultiple: 0.5,
-			symbolCapPercentile: 20,
+			// **NEW-PROJECT DEFAULT 0.25 x the MEDIAN pipe** (Tom, 2026-10-11, Tweaks: *"Initial default:
+			// Prevent nodes from scaling larger than 0.25 times 50%-ile pipe. (Inexact science). Leave
+			// examples as they are for now."*). A file saved without the pair is read as the old
+			// 0.5 / 20 by the load path, so the shipped examples are unchanged.
+			symbolCapMultiple: 0.25,
+			symbolCapPercentile: 50,
 			// Task 617: a CSS look (grayscale etc.) on the TILE LAYER only (LPN_BASEMAP_STYLES). Project data on the
 			// precedent of backdropOpacity beside it; a new project opens Muted; a file saved without the field opens Normal (see the load path).
 			basemapStyle: 'muted',
@@ -7380,11 +7384,11 @@ var EngCalcs = EngCalcs || {};
 	function invalidateLinkLengths() { pctLinkLengthCache = null; pctLinkLengthPctCache = null; symbolCapCache = null; }
 	function symbolCapMultiple() {
 		var v = settings.symbolCapMultiple;
-		return (typeof v === 'number' && isFinite(v) && v > 0) ? v : 0.5;
+		return (typeof v === 'number' && isFinite(v) && v > 0) ? v : 0.25;
 	}
 	function symbolCapPercentile() {
 		var v = settings.symbolCapPercentile;
-		return (typeof v === 'number' && isFinite(v) && v >= 0 && v <= 100) ? v : 20;
+		return (typeof v === 'number' && isFinite(v) && v >= 0 && v <= 100) ? v : 50;
 	}
 	// **STRIDE-SAMPLED TO AT MOST 512 LINKS, DETERMINISTICALLY.** A percentile wants a sort, and
 	// this is consulted on the zoom path; a deterministic stride is stable under re-entry where a
@@ -35689,6 +35693,10 @@ var EngCalcs = EngCalcs || {};
 		// basemapFilter is the pre-release name of the field.
 		if (savedSettings.basemapStyle === undefined) { savedSettings.basemapStyle = savedSettings.basemapFilter || 'normal'; }
 		delete savedSettings.basemapFilter;
+		// A file saved without the symbol-cap pair (every shipped example) was drawn under the old
+		// rule, 0.5 x the 20th-percentile pipe; only a NEW project gets 0.25 x the median.
+		if (savedSettings.symbolCapMultiple === undefined) { savedSettings.symbolCapMultiple = 0.5; }
+		if (savedSettings.symbolCapPercentile === undefined) { savedSettings.symbolCapPercentile = 20; }
 		settings = Object.assign(defaultSettings(), savedSettings);
 		// **A PROJECT SAVED BEFORE `Quality` WAS INTERPRETED STILL CARRIES ONLY THE TOKEN**, and it
 		// must not come back as "no analysis": it would then export a file missing a line its source
