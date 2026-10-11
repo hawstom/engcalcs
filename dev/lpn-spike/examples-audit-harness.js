@@ -105,6 +105,8 @@ const SOURCE_OF = {
 // Everything else on `settings` is model and is compared.
 const CURATED_SETTING = {
 	engine: 'every gallery example opens on EPANET, which is the page default since Task 605; the routing is not the model',
+	symbolCapMultiple: 'Tom, 2026-10-11: the new-project cap is 0.25 x the median pipe; the examples keep the old 0.5 x 20th percentile (load path fills it)',
+	symbolCapPercentile: 'same: examples keep the 20th percentile',
 	sectionsOpen: 'which Settings sections are unfolded',
 	colorClassesNode: 'legend banding', colorClassesLink: 'legend banding',
 	colorRampNode: 'palette', colorRampLink: 'palette',

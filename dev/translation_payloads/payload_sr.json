@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "sr",
-        "expected_key_count": 2553,
-        "delta_key_count": 109,
+        "expected_key_count": 2556,
+        "delta_key_count": 112,
         "exempt_key_count": 34,
         "exempt_keys": [
             "calc_units_us",
@@ -845,6 +845,9 @@
         "lpn_snap_moved_on_node": "{moved} moved to the location of {target}. The two nodes are not connected.",
         "lpn_settings_hover_card": "Show the full label on hover",
         "lpn_settings_hover_card_tip": "Rest the pointer on a node, link or customer to see its label as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project.",
+        "lpn_scenario_delete_in_base": "To remove it from the drawing, delete it in the {base} scenario.",
+        "lpn_scenario_only_deleted": "{id} is deleted. It was part of {scenario} only.",
+        "lpn_scenario_delete_blocked": "{id} is not deleted, because link {link} ends on it and also exists outside {scenario}. To delete both, delete them in the {base} scenario.",
         "lpn_junction_pattern_unknown": "No pattern in this project is named {id}, so the junction was left as it was.",
         "lpn_settings_default_pattern_none": "None (constant)",
         "lpn_demand_pattern_default": "(default: {id})",
@@ -956,6 +959,9 @@
         "lpn_snap_moved_on_node": "{moved} moved to the location of {target}. The two nodes are not connected.",
         "lpn_settings_hover_card": "Show the full label on hover",
         "lpn_settings_hover_card_tip": "Rest the pointer on a node, link or customer to see its label as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project.",
+        "lpn_scenario_delete_in_base": "To remove it from the drawing, delete it in the {base} scenario.",
+        "lpn_scenario_only_deleted": "{id} is deleted. It was part of {scenario} only.",
+        "lpn_scenario_delete_blocked": "{id} is not deleted, because link {link} ends on it and also exists outside {scenario}. To delete both, delete them in the {base} scenario.",
         "lpn_junction_pattern_unknown": "No pattern in this project is named {id}, so the junction was left as it was.",
         "lpn_settings_default_pattern_none": "None (constant)",
         "lpn_demand_pattern_default": "(default: {id})",
@@ -2579,6 +2585,54 @@
                     "key": "lpn_settings_id_prefixes",
                     "value": "Префикси ID-а",
                     "english": "ID prefixes"
+                }
+            }
+        },
+        "lpn_scenario_delete_in_base": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scenario_deactivated",
+                    "value": "{id} је изван мреже у сценарију {scenario}. И даље је на цртежу и у вашим осталим сценаријима.",
+                    "english": "{id} is excluded from the network in {scenario}. It remains in the drawing and in the other scenarios."
+                },
+                "next_translated": {
+                    "key": "lpn_scenario_push_btn",
+                    "value": "Примени вредности из Основе на све сценарије",
+                    "english": "Apply Base values to all scenarios"
+                }
+            }
+        },
+        "lpn_scenario_only_deleted": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scenario_deactivated",
+                    "value": "{id} је изван мреже у сценарију {scenario}. И даље је на цртежу и у вашим осталим сценаријима.",
+                    "english": "{id} is excluded from the network in {scenario}. It remains in the drawing and in the other scenarios."
+                },
+                "next_translated": {
+                    "key": "lpn_scenario_push_btn",
+                    "value": "Примени вредности из Основе на све сценарије",
+                    "english": "Apply Base values to all scenarios"
+                }
+            }
+        },
+        "lpn_scenario_delete_blocked": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scenario_deactivated",
+                    "value": "{id} је изван мреже у сценарију {scenario}. И даље је на цртежу и у вашим осталим сценаријима.",
+                    "english": "{id} is excluded from the network in {scenario}. It remains in the drawing and in the other scenarios."
+                },
+                "next_translated": {
+                    "key": "lpn_scenario_push_btn",
+                    "value": "Примени вредности из Основе на све сценарије",
+                    "english": "Apply Base values to all scenarios"
                 }
             }
         },
