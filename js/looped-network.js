@@ -33079,8 +33079,26 @@ var EngCalcs = EngCalcs || {};
 		el._active = false;   // base-write: born inactive in Base, then overridden active here -- the whole membership design
 		setOverride(el, 'active', true);
 	}
+	// **AN ASSET THAT EXISTS ONLY IN THE CURRENT SCENARIO IS REALLY DELETED THERE** (Tom,
+	// 2026-10-11: *"I created a junction in a Scenario 1, and it doesn't exist in Base scenario. But
+	// I can't delete it in Scenario 1. So I can't delete it at all."*). Drawing in a scenario makes
+	// an element inactive in Base and active here (bornInScenario()), so deactivating it here left an
+	// element active nowhere and still drawn. "Only here" is read off the `active` values alone:
+	// inactive in Base and in every other scenario. No flag is stored, so files are unchanged.
+	function activeInScenario(el, s) {
+		var ov = s.isBase ? null : s.overrides[ovKey(el)];
+		if (ov && Object.prototype.hasOwnProperty.call(ov, 'active')) { return ov.active !== false; }
+		return baseValue(el, 'active') !== false;
+	}
+	function onlyInThisScenario(el) {
+		var here = activeScenario();
+		if (here.isBase || !el || baseValue(el, 'active') !== false) { return false; }
+		return !scenarios.some(function (s) { return s !== here && !s.isBase && activeInScenario(el, s); });
+	}
+
 	// DELETING: inside a scenario it means "not in this network", so it sets inactive rather than
-	// destroying an element every other scenario may be using. In BASE it is a real deletion and
+	// destroying an element every other scenario may be using -- unless the element exists only in
+	// that scenario (onlyInThisScenario() above), which is then deleted as Base deletes. In BASE it is a real deletion and
 	// takes every scenario's overrides on that element with it -- confirmed with a count, because
 	// that is work in documents the user is not looking at.
 	// A node carries its incident links with it either way: a link to a node that is not there is
@@ -33108,7 +33126,8 @@ var EngCalcs = EngCalcs || {};
 		// a cascade beat it to it, or a second tap landed on the same handle -- and the Base branch
 		// would otherwise walk an incidentLinks entry that no longer exists.
 		if (!el) { return; }
-		if (!inBaseScenario()) {
+		var here = activeScenario(), only = onlyInThisScenario(el);
+		if (!inBaseScenario() && !only) {
 			saveUndoSnapshot();
 			setOverride(el, 'active', false);
 			if (kind === 'node') {
@@ -33117,8 +33136,24 @@ var EngCalcs = EngCalcs || {};
 			afterPropertyEdit(el);
 			if (kind === 'node') { buildDom(); }
 			setNotice((pc.lpn_scenario_deactivated || '{id} is excluded from the network in {scenario}. It remains in the drawing and in the other scenarios.')
-				.replace('{id}', id).replace('{scenario}', scenarioDisplayName(activeScenario())));
+				.replace('{id}', id).replace('{scenario}', scenarioDisplayName(here)) + ' ' +
+				(pc.lpn_scenario_delete_in_base || 'To remove it from the drawing, delete it in the {base} scenario.')
+				.split('{base}').join(scenarioDisplayName(baseScenario())));
 			return;
+		}
+		// **A SCENARIO-ONLY NODE NEVER TAKES A LINK THAT EXISTS OUTSIDE THIS SCENARIO WITH IT.** The
+		// cascade below would delete that link from Base and every other scenario, so the delete is
+		// refused and the first such link is named.
+		if (only && kind === 'node') {
+			var keeper = (incidentLinks[id] || []).map(linkById)
+				.filter(function (l) { return l && !onlyInThisScenario(l); })[0];
+			if (keeper) {
+				setNotice((pc.lpn_scenario_delete_blocked || '{id} is not deleted, because link {link} ends on it and also exists outside {scenario}. To delete both, delete them in the {base} scenario.')
+					.split('{id}').join(id).split('{link}').join(keeper.id)
+					.split('{scenario}').join(scenarioDisplayName(here))
+					.split('{base}').join(scenarioDisplayName(baseScenario())));
+				return;
+			}
 		}
 		// The element itself, plus -- for a node -- every link the cascade is about to take with it.
 		// Built as KEYS rather than ids, because those incident ones are links whatever `kind` is.
@@ -33128,6 +33163,11 @@ var EngCalcs = EngCalcs || {};
 		}
 		var lost = 0;
 		keys.forEach(function (k) { lost += overrideCountForElement(k); });
+		// A scenario-only asset's overrides in THIS scenario are what made it exist here (its `active`
+		// among them); deleting it is the request, so only the other scenarios' values are a loss.
+		if (only) {
+			keys.forEach(function (k) { if (here.overrides[k]) { lost -= Object.keys(here.overrides[k]).length; } });
+		}
 		function proceed() {
 			// Asked in the page's box (Task 710), so a multi-delete's later cascade may have taken this
 			// one while the question was open.
@@ -33137,6 +33177,10 @@ var EngCalcs = EngCalcs || {};
 			else if (kind === 'label') { deleteLabelById(id); }
 			else { deleteLink(id); }
 			refreshScenarioStatus();
+			if (only) {
+				setNotice((pc.lpn_scenario_only_deleted || '{id} is deleted. It was part of {scenario} only.')
+					.replace('{id}', id).replace('{scenario}', scenarioDisplayName(here)));
+			}
 		}
 		if (!lost) { proceed(); return; }
 		askDialog({ kind: 'confirm', text: (pc.lpn_delete_drops_overrides || 'Deleting this asset also deletes {n} scenario overrides for it. Continue?').replace('{n}', lost) }, function (yes) {

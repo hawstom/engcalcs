@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**98 still to read on master**, of 109 untranslated keys, of 2553 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**101 still to read on master**, of 112 untranslated keys, of 2556 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -175,7 +175,7 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   @@ NEEDS RULING
 
-## lpn_  (108, 97 to read @@ NEEDS RULING)
+## lpn_  (111, 100 to read @@ NEEDS RULING)
 
 - **`lpn_demand_pattern_constant`**
   > (constant)
@@ -444,6 +444,15 @@ never edits a synonym.
 - **`lpn_result_tank_volume_tip`**
   > Volume of water above the lowest water depth, so it is zero at that depth. The EPANET tank volume also includes the water below the lowest water depth, which still counts toward mixing and water age, so the tank elevation stays at the tank bottom.
   @@ NEEDS RULING
+- **`lpn_scenario_delete_blocked`**
+  > {id} is not deleted, because link {link} ends on it and also exists outside {scenario}. To delete both, delete them in the {base} scenario.
+  @@ NEEDS RULING
+- **`lpn_scenario_delete_in_base`**
+  > To remove it from the drawing, delete it in the {base} scenario.
+  @@ NEEDS RULING
+- **`lpn_scenario_only_deleted`**
+  > {id} is deleted. It was part of {scenario} only.
+  @@ NEEDS RULING
 - **`lpn_settings_default_pattern_none`**
   > None (constant)
   @@ NEEDS RULING
@@ -512,7 +521,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**129 still to read**, of 132 new keys across 14 unmerged branch(es).
+**132 still to read**, of 135 new keys across 13 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -523,7 +532,9 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/bentley-interop (`d248bd16`) — 100 new, 100 to read @@ NEEDS RULING
+### chore/handoff-1011b (`e28ef88a`) — adds no English strings
+
+### feat/bentley-interop (`44a81de6`) — 100 new, 100 to read @@ NEEDS RULING
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -886,7 +897,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Mode: Match properties. Select the asset to copy properties from. Status, identity, and location are not copied. Press Escape to cancel.
   @@ NEEDS RULING
 
-### feat/shape (`8436cef6`) — 15 new, 15 to read @@ NEEDS RULING
+### feat/shape (`2b5cf162`) — 21 new, 21 to read @@ NEEDS RULING
 
 - **`lpn_file_import_shapes`**
   > Import GeoJSON shapes…
@@ -897,8 +908,14 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_geojson_import_done`**
   > {n} Shapes imported from {file}.
   @@ NEEDS RULING
+- **`lpn_geojson_import_done_one`**
+  > One Shape imported from {file}.
+  @@ NEEDS RULING
 - **`lpn_geojson_import_holes`**
   > {n} polygon holes not imported. A Shape has one boundary.
+  @@ NEEDS RULING
+- **`lpn_geojson_import_holes_one`**
+  > One polygon hole not imported. A Shape has one boundary.
   @@ NEEDS RULING
 - **`lpn_geojson_import_local`**
   > GeoJSON positions are latitude and longitude, and this project has no place on the Earth to which they can be converted. Georeference it first with Map, World map, Attach, then import again.
@@ -906,8 +923,20 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_geojson_import_parts`**
   > {n} multipart features imported as one Shape for each part.
   @@ NEEDS RULING
+- **`lpn_geojson_import_parts_one`**
+  > One multipart feature imported as one Shape for each part.
+  @@ NEEDS RULING
+- **`lpn_geojson_import_renamed`**
+  > {n} feature names cannot be Shape IDs and are kept with the Shapes: {list}.
+  @@ NEEDS RULING
+- **`lpn_geojson_import_renamed_one`**
+  > One feature name cannot be a Shape ID and is kept with the Shape: {list}.
+  @@ NEEDS RULING
 - **`lpn_geojson_import_skipped`**
   > {n} features not imported: {list}.
+  @@ NEEDS RULING
+- **`lpn_geojson_import_skipped_one`**
+  > One feature not imported: {list}.
   @@ NEEDS RULING
 - **`lpn_geojson_import_unreadable`**
   > {file} is not a GeoJSON file: {detail}
@@ -922,7 +951,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > position not a valid latitude and longitude
   @@ NEEDS RULING
 - **`lpn_mode_add_shape`**
-  > Mode: Add Shape. Specify each point of the Shape. Specify the last point again, press Enter, or right-click to finish; a Shape of one point is a point. Specify the first point again to close the Shape into a polygon. Press Escape to discard the Shape being drawn.
+  > Mode: Add Shape. Specify each point. Specify the last point again or press Enter to finish; specify the first point to close a polygon.
   @@ NEEDS RULING
 - **`lpn_snap_shape_point`**
   > {shape}, point {n}
@@ -934,20 +963,6 @@ build for that would be a gate nobody keeps. Refresh it with
   > Draw a point, a polyline, or a polygon on the map. A Shape is annotation and is not part of the network. Specify each point, then specify the last point again, press Enter, or right-click to finish. Specify the first point again to close the Shape into a polygon.
   @@ NEEDS RULING
 
-### feat/snap (`e1a40918`) — adds no English strings
-
 ### feat/visit-dedupe (`e22c4ec9`) — adds no English strings
 
-### fix/node-size-cap (`b0bbfdc0`) — adds no English strings
-
-### fix/scenario-delete (`a211f10d`) — 3 new, 3 to read @@ NEEDS RULING
-
-- **`lpn_scenario_delete_blocked`**
-  > {id} is not deleted. Link {link} ends on it and is also part of {base} or another scenario. To delete both, delete {id} in the {base} scenario.
-  @@ NEEDS RULING
-- **`lpn_scenario_delete_in_base`**
-  > To remove it from the drawing, delete it in the {base} scenario.
-  @@ NEEDS RULING
-- **`lpn_scenario_only_deleted`**
-  > {id} is deleted. It was part of {scenario} only.
-  @@ NEEDS RULING
+### fix/scenario-delete (`556cf46a`) — adds no English strings

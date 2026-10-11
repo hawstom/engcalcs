@@ -3221,6 +3221,9 @@ $ec_lang['lpn_scenario_override_tip']='Selected means this scenario overrides it
 // Same label-versus-sentence distinction that decided the eigenvalue fixes in sprint 316.
 $ec_lang['lpn_scenario_base_value']='Base scenario: {value}';
 $ec_lang['lpn_scenario_deactivated']='{id} is excluded from the network in {scenario}. It remains in the drawing and in the other scenarios.';
+$ec_lang['lpn_scenario_delete_in_base']='To remove it from the drawing, delete it in the {base} scenario.';
+$ec_lang['lpn_scenario_only_deleted']='{id} is deleted. It was part of {scenario} only.';
+$ec_lang['lpn_scenario_delete_blocked']='{id} is not deleted, because link {link} ends on it and also exists outside {scenario}. To delete both, delete them in the {base} scenario.';
 $ec_lang['lpn_scenario_push_btn']='Apply Base values to all scenarios';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_scenario_push_tip']='Every scenario goes back to the Base value for the properties whose labels are showing right now. Values entered for them in any scenario are discarded.';
