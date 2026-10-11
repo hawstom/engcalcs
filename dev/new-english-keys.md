@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**95 still to read on master**, of 106 untranslated keys, of 2550 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**98 still to read on master**, of 109 untranslated keys, of 2553 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -175,7 +175,7 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   @@ NEEDS RULING
 
-## lpn_  (105, 94 to read @@ NEEDS RULING)
+## lpn_  (108, 97 to read @@ NEEDS RULING)
 
 - **`lpn_demand_pattern_constant`**
   > (constant)
@@ -444,6 +444,15 @@ never edits a synonym.
 - **`lpn_result_tank_volume_tip`**
   > Volume of water above the lowest water depth, so it is zero at that depth. The EPANET tank volume also includes the water below the lowest water depth, which still counts toward mixing and water age, so the tank elevation stays at the tank bottom.
   @@ NEEDS RULING
+- **`lpn_scenario_delete_blocked`**
+  > {id} is not deleted. Link {link} ends on it and is also part of {base} or another scenario. To delete both, delete {id} in the {base} scenario.
+  @@ NEEDS RULING
+- **`lpn_scenario_delete_in_base`**
+  > To remove it from the drawing, delete it in the {base} scenario.
+  @@ NEEDS RULING
+- **`lpn_scenario_only_deleted`**
+  > {id} is deleted. It was part of {scenario} only.
+  @@ NEEDS RULING
 - **`lpn_settings_default_pattern_none`**
   > None (constant)
   @@ NEEDS RULING
@@ -503,7 +512,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**132 still to read**, of 135 new keys across 15 unmerged branch(es).
+**131 still to read**, of 134 new keys across 15 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -514,9 +523,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/handoff-1011 (`6ceb463f`) — adds no English strings
-
-### feat/bentley-interop (`784ea66f`) — 101 new, 101 to read @@ NEEDS RULING
+### feat/bentley-interop (`d248bd16`) — 100 new, 100 to read @@ NEEDS RULING
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -777,10 +784,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Delete the selected item. A used item is not deleted.
   @@ NEEDS RULING
 - **`lpn_sm_help`**
-  > Create and organize scenarios and alternatives and their inheritance here. Choose Alternatives for Scenarios in the Scenarios table.
-  @@ NEEDS RULING
-- **`lpn_sm_hint`**
-  > Drag an item onto another to make it a child of that item. Drag between two items to reorder them. Click the arrow beside an item, or press Left or Right, to collapse or expand it. Click a selected item or press F2 to rename it, Delete to delete it, Enter to make a scenario current. Right-click an item for the same commands as the buttons.
+  > Create and organize scenarios and alternatives and their inheritance here. Assign Alternatives to Scenarios in the Scenarios table.\n\nA new scenario creates no alternatives; it uses its parent's. A change made in a scenario is an override kept in that scenario's own values, shown as Own values in the Scenarios table. If the scenario is assigned an alternative for that category, the change goes into that alternative instead and reaches every scenario that uses it.\n\nDrag an item onto another to make it a child of that item. Drag between two items to reorder them. Click the arrow beside an item, or press Left or Right, to collapse or expand it.\n\nClick a selected item or press F2 to rename it, Delete to delete it, Enter to make a scenario current. Right-click an item for the same commands as the buttons.
   @@ NEEDS RULING
 - **`lpn_sm_in_use`**
   > {name} cannot be deleted while it is used by: {list}.
@@ -846,7 +850,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`2e5e81c4`) — adds no English strings
 
-### feat/match-property (`bf2b722c`) — 11 new, 11 to read @@ NEEDS RULING
+### feat/match-property (`2aeaaaf7`) — 11 new, 11 to read @@ NEEDS RULING
 
 - **`lpn_match_done_many`**
   > Matched {m} assets to {id}, except status and location. Values changed: {n}.
@@ -882,7 +886,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Mode: Match properties. Select the asset to copy properties from. Status, identity, and location are not copied. Press Escape to cancel.
   @@ NEEDS RULING
 
-### feat/shape (`c7792882`) — 17 new, 17 to read @@ NEEDS RULING
+### feat/shape (`8436cef6`) — 17 new, 17 to read @@ NEEDS RULING
 
 - **`lpn_file_import_shapes`**
   > Import GeoJSON shapes…
@@ -948,8 +952,10 @@ build for that would be a gate nobody keeps. Refresh it with
   > {link}, vertex {n}
   @@ NEEDS RULING
 
-### feat/tank-volume (`31985741`) — adds no English strings
-
 ### feat/visit-dedupe (`e22c4ec9`) — adds no English strings
 
-### fix/node-size-cap (`f9464b17`) — adds no English strings
+### fix/available-volume (`30fbc008`) — adds no English strings
+
+### fix/node-size-cap (`b0bbfdc0`) — adds no English strings
+
+### fix/scenario-delete (`bc22a423`) — adds no English strings
