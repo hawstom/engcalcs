@@ -1735,10 +1735,14 @@ $ec_lang['lpn_find_menu']='Find and replace';
 // Match properties (Task 782; Tom, 2026-10-10: the AutoCAD MATCHPROP). Pick a source asset, then each
 // asset to receive its properties. Identity and placement are never copied.
 $ec_lang['lpn_match_menu']='Match properties';
-$ec_lang['lpn_match_tip']='Copy the properties of one asset to others. Specify the source, then each asset to change. ID, location, end nodes, description, and tag are never copied. Assets of a different type receive only the properties both types have.';
+$ec_lang['lpn_match_tip']='Copy the properties of one asset to others. Select the source, then each asset to change. Identity, location, and connections are never copied, and neither is status (Active, Shut). Assets of a different type receive only the properties both types have.';
+$ec_lang['lpn_match_selected_ask_one']='Apply the properties of {id} to the other selected asset?';
+$ec_lang['lpn_match_skip_scn']='Not copied: {n} (they cannot differ by scenario).';
+$ec_lang['lpn_match_skip_breakdown']='Not copied: {n} (demand is a list of categories).';
+$ec_lang['lpn_match_skip_valve']='Not copied: {n} (the valve types differ).';
 $ec_lang['lpn_match_selected_ask']='Apply the properties of {id} to the {n} other selected assets?';
-$ec_lang['lpn_match_done_one']='Matched {to} to {id}: {n} properties copied.';
-$ec_lang['lpn_match_done_many']='Matched {m} assets to {id}: {n} properties copied.';
+$ec_lang['lpn_match_done_one']='Matched {to} to {id}. Values changed: {n}.';
+$ec_lang['lpn_match_done_many']='Matched {m} assets to {id}. Values changed: {n}.';
 $ec_lang['lpn_match_none']='{to} and {id} have no properties in common to copy.';
 $ec_lang['lpn_match_kind']='Match properties applies to nodes and pipes, pumps, and valves only.';
 $ec_lang['lpn_find_title']='Find and replace';

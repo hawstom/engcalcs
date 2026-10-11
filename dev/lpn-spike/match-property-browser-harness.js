@@ -11,6 +11,7 @@
 //   node dev/lpn-spike/match-property-browser-harness.js   (takes the browser lock itself)
 'use strict';
 const path = require('path');
+const fs = require('fs');
 const { execFileSync, spawnSync } = require('child_process');
 
 const REPO = path.resolve(__dirname, '..', '..');
@@ -47,8 +48,8 @@ async function main() {
 	if (!executablePath) { console.error('no Chromium; SKIPPING'); env.stopServer(); process.exit(0); }
 	const browser = await chromium.launch({ executablePath });
 	try {
-		const a = await Session.open(browser, 'A');
-		const page = a.page;
+		let a = await Session.open(browser, 'A');
+		let page = a.page;
 		await a.goto('Looped-Network.php');
 		await a.openExampleCard(await a.lang('lpn_ex_net1_title'));
 		await a.settle(1500);
@@ -235,6 +236,107 @@ async function main() {
 		let rows = await page.$$eval('#lpn_menu_list button.lpn-menu-row', (els) => els.map((e) => e.textContent.trim()));
 		ok('Edit > Match properties exists', rows.indexOf(MATCH) >= 0, JSON.stringify(rows));
 		await a.closeMenu();
+		// ---- 5. crafted cases, each on a project built from Net1 ----
+		const openProject = async (edit) => {
+			const d = JSON.parse(fs.readFileSync(path.join(REPO, 'dev', 'water-network-examples', 'Net1.lwn'), 'utf8'));
+			edit(d);
+			const s = await Session.open(browser, 'C', { serviceWorkers: 'block' });
+			await s.page.route(/tile\.openstreetmap\.org|api\.mapbox\.com/, (route) => route.abort());
+			await s.goto('Looped-Network.php?ec_nolog=1');
+			await s.page.evaluate((txt) => { localStorage.clear(); localStorage.setItem('lpn_project_hover', txt); }, JSON.stringify(d));
+			await s.reload();
+			await s.answerTrainingPanel().catch(() => {});
+			await s.page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } });
+			await s.settle(2500);
+			a = s; page = s.page;
+			await a.toolbarClick(await a.lang('lpn_pane_toggle'));
+			await a.settle(500);
+			return d;
+		};
+		const matchOnto = async (srcGroup, srcId, dstGroup, dstId) => {
+			await rightClick(await pointOf(srcGroup, srcId));
+			await page.$$eval('.lpn-pane-ctxmenu button', (bs, l) => bs.filter((b) => b.textContent.trim() === l)[0].dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 })), MATCH);
+			await a.settle(400);
+			const p = await pointOf(dstGroup, dstId);
+			await page.mouse.click(p.x, p.y);
+			await a.settle(1500);
+			const n = await a.notice();
+			await page.keyboard.press('Escape');
+			await a.settle(300);
+			return n;
+		};
+		const saved = () => page.evaluate(() => JSON.parse(localStorage.getItem('lpn_project_hover')));
+		const byId = (arr, id) => arr.filter((x) => x.id === id)[0];
+
+		// 5a. In a scenario: only values that differ become overrides, and Base is never written.
+		await openProject((d) => {
+			d.scenarios.push({ id: 's1', name: 'S1', overrides: {} });
+			d.project = Object.assign({}, d.project, { activeScenario: 's1' });
+			byId(d.links, '11')._diameter = 14;
+		});
+		await showTab('pipes');
+		let note = await matchOnto('link', '10', 'link', '11');
+		await a.settle(1500);
+		let sv = await saved();
+		const s1 = sv.scenarios.filter((x) => x.id === 's1')[0];
+		ok('scenario: pipe 10 onto 11 writes exactly one override (the diameter)', JSON.stringify(Object.keys((s1.overrides || {})['l:11'] || {})) === '["diameter"]', JSON.stringify(s1.overrides));
+		ok('scenario: Base diameter of pipe 11 is untouched', byId(sv.links, '11')._diameter === 14);
+		ok('scenario: the notice counts the one value changed', /Values changed: 1\./.test(note), note);
+		note = await matchOnto('node', '10', 'node', '23');
+		await a.settle(1500);
+		sv = await saved();
+		const base23 = byId(sv.nodes, '23');
+		ok('scenario: Base elevation of junction 23 is untouched', base23.elev === 690, String(base23.elev));
+		ok('scenario: Base demand of junction 23 is untouched', base23._demand === 150, String(base23._demand));
+		ok('scenario: the notice says what could not be copied', /Not copied: \d+ \(they cannot differ by scenario\)\./.test(note), note);
+
+		// 5b. A valve cannot take another valve type's setting.
+		await openProject((d) => {
+			const v = (id, type, setting, dia) => { const l = byId(d.links, id); l.type = 'valve'; l.valveType = type; l._setting = setting; l._diameter = dia; l._k = 0; delete l._roughness; delete l._length; };
+			v('11', 'PRV', 60, 14); v('12', 'FCV', 300, 10);
+		});
+		await showTab('valves');
+		note = await matchOnto('link', '11', 'link', '12');
+		ok('valve: diameter copied', (await cell('valves', '12', 'diameter')) === '14', await cell('valves', '12', 'diameter'));
+		ok('valve: PRV setting did not land on the FCV', (await cell('valves', '12', 'setting')) === '300', await cell('valves', '12', 'setting'));
+		ok('valve: the notice says the types differ', /Not copied: 1 \(the valve types differ\)\./.test(note), note);
+
+		// 5c. A junction with a demand breakdown keeps it, and the notice says so.
+		await openProject((d) => { byId(d.nodes, '23').extraDemands = [{ base: 50, pattern: null, category: null }]; });
+		await showTab('junctions');
+		const d23 = await cell('junctions', '23', 'demand');
+		note = await matchOnto('node', '10', 'node', '23');
+		await showTab('junctions');
+		ok('breakdown: demand of junction 23 is unchanged', (await cell('junctions', '23', 'demand')) === d23, d23 + ' -> ' + await cell('junctions', '23', 'demand'));
+		ok('breakdown: the notice says why', /Not copied: 1 \(demand is a list of categories\)\./.test(note), note);
+
+		// 5d. A pump: speed is copied, status is not.
+		await openProject((d) => {
+			const p9 = byId(d.links, '9'), l = byId(d.links, '12');
+			Object.keys(l).forEach((k) => { delete l[k]; });
+			Object.assign(l, JSON.parse(JSON.stringify(p9)), { id: '12', from: '12', to: '13', _status: 'closed', speed: 1 });
+			p9.speed = 1.5; p9._status = 'open';
+		});
+		await showTab('pumps');
+		note = await matchOnto('link', '9', 'link', '12');
+		await showTab('pumps');
+		ok('pump: speed copied', (await cell('pumps', '12', 'speed')) === '1.5', await cell('pumps', '12', 'speed'));
+		ok('pump: status (Shut) not copied', (await cell('pumps', '12', 'closed')) === '1', await cell('pumps', '12', 'closed'));
+
+		// 5e. Right-drag on empty canvas still pans; no menu appears.
+		await openProject(() => {});
+		const n10 = await pointOf('node', '10');
+		const emptyAt = { x: n10.x + 60, y: n10.y - 140 };
+		const hitEmpty = await page.evaluate(([x, y]) => document.elementsFromPoint(x, y)[0].tagName, [emptyAt.x, emptyAt.y]);
+		await page.mouse.move(emptyAt.x, emptyAt.y);
+		await page.mouse.down({ button: 'right' });
+		await page.mouse.move(emptyAt.x + 80, emptyAt.y + 40, { steps: 6 });
+		await page.mouse.up({ button: 'right' });
+		await a.settle(500);
+		const n10b = await pointOf('node', '10');
+		ok('right-drag on empty canvas pans the map', Math.abs((n10b.x - n10.x) - 80) < 6 && Math.abs((n10b.y - n10.y) - 40) < 6, hitEmpty + ' ' + JSON.stringify([n10, n10b]));
+		ok('...and offers no menu', (await page.$$('.lpn-pane-ctxmenu')).length === 0);
+
 		const b = await Session.open(browser, 'B');
 		await b.goto('Looped-Network.php?lang=es');
 		await b.settle(800);

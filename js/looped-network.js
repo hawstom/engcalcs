@@ -48362,21 +48362,23 @@ var EngCalcs = EngCalcs || {};
 	// **THE PROPERTY LIST IS THE TABLES PANE'S OWN COLUMN SPEC, NOT A LIST OF OURS** -- the same
 	// reuse the multi-properties box makes (see multiGroups()). Each column already knows its
 	// getter, its unit and a setter that goes through setProp(), so a property added to a table is
-	// matched with no edit here, and **EVERY WRITE IS A COLUMN SETTER, i.e. THE ONE SEAM**: inside
-	// a scenario a match records overrides and leaves Base alone.
+	// matched with no edit here, and **EVERY WRITE IS A COLUMN SETTER, i.e. THE ONE SEAM**.
 	//
-	// **WHAT IS NEVER COPIED** is identity and placement: ID, both coordinates, the two end nodes,
-	// the vertices, the pipe's length (it follows the geometry), Description and Tag. Custom
-	// properties are left alone as well: they are the user's own register, closer to identity than
-	// to the hydraulics. Customers are not properties of a node and do not move.
-	// **TWO ASSETS OF DIFFERENT TYPES** share only the columns that carry the same key, the same
-	// heading and the same unit (an elevation, a diameter, an Active box), and a valve's setting
-	// and curve are copied only between valves of the same valve type, because a pressure, a flow
-	// and a loss coefficient are not the same quantity.
+	// **WHAT IS NEVER COPIED**: identity and placement (ID, both coordinates, the two end nodes, the
+	// vertices, the pipe's length, Description, Tag), custom properties (the user's own register),
+	// customers, and STATUS (Active, Shut): MATCHPROP copies properties, not state, and a careless
+	// match must not switch a pipe off.
+	// **TWO ASSETS OF DIFFERENT TYPES** share only the columns with the same key, heading and unit.
+	//
+	// **ONLY A VALUE THAT DIFFERS IS WRITTEN.** Inside a scenario an equal value written anyway is
+	// an override, and an override stops the scenario following Base. **INSIDE A SCENARIO ONLY AN
+	// OVERRIDABLE PROPERTY IS WRITTEN**: the rest (elevation, tank dimensions, pump speed, demand
+	// pattern...) would land in Base under every other scenario, so they are skipped and counted.
 	var matchSource = null;      // {kind:'node'|'link', id} while the tool runs
 	var matchOffered = false;    // the "apply to the selection" question is asked once per source
 	var matchSelection = [];     // the selection when the tool started
-	var MATCH_NEVER = { id: true, axis1: true, axis2: true, desc: true, tag: true, from: true, to: true, verts: true, length: true };
+	var MATCH_NEVER = { id: true, axis1: true, axis2: true, desc: true, tag: true, from: true, to: true, verts: true, length: true,
+		active: true, closed: true };
 	function matchElOf(ref) { return !ref ? null : (ref.kind === 'node' ? nodeById(ref.id) : (ref.kind === 'link' ? linkById(ref.id) : null)); }
 	function matchSpecOf(el) {
 		var ty = el && el.type, found = null;
@@ -48385,47 +48387,65 @@ var EngCalcs = EngCalcs || {};
 	}
 	function matchColUnit(c) { return c.unit ? String(c.unit()) : (c.unitText ? String(c.unitText()) : ''); }
 	function matchColLabel(c) { return typeof c.label === 'function' ? String(c.label()) : String(c.label); }
-	// The columns of dst's table that src's table also has, in dst's order, as {c, sc} pairs.
+	function matchSame(a, b) {
+		var pa = panePresent(a), pb = panePresent(b);
+		if (!pa || !pb) { return pa === pb; }
+		return a === b || (typeof a === 'number' && typeof b === 'number' && Math.abs(a - b) <= 1e-12 * Math.max(1, Math.abs(a)));
+	}
+	// The columns of dst's table that src's table also has, in dst's order, as {c, sc, why} (why is
+	// 'valve' for a setting or curve between two valves of different types).
 	function matchPairs(src, dst) {
 		var ss = matchSpecOf(src), ds = matchSpecOf(dst), out = [];
 		if (!ss || !ds || ss.group !== ds.group) { return out; }
 		ds.cols.forEach(function (c) {
-			var sc = null;
+			var sc = null, why = null;
 			if (MATCH_NEVER[c.key] || c.result || !c.set || c.noMulti || c.cp) { return; }
 			ss.cols.forEach(function (x) { if (x.key === c.key && !x.result && x.set && !x.cp) { sc = x; } });
 			if (!sc) { return; }
 			if (ss !== ds && (matchColUnit(sc) !== matchColUnit(c) || matchColLabel(sc) !== matchColLabel(c))) { return; }
-			// A valve's setting and curve mean something only for the same valve type.
 			if ((c.key === 'setting' || c.key === 'curveId') && src.type === 'valve' && dst.type === 'valve' &&
-				(src.valveType || 'TCV').toUpperCase() !== (dst.valveType || 'TCV').toUpperCase()) { return; }
-			out.push({ c: c, sc: sc });
+				(src.valveType || 'TCV').toUpperCase() !== (dst.valveType || 'TCV').toUpperCase()) { why = 'valve'; }
+			out.push({ c: c, sc: sc, why: why });
 		});
 		return out;
 	}
-	// Writes the source's matchable values onto dst; returns how many were written. No snapshot and
-	// no redraw: the caller owns both, once for the whole act.
-	function matchWrite(src, dst) {
-		var pairs = matchPairs(src, dst), done = {}, n = 0, pass;
+	// Writes what differs; counts what it could not. ctx = {changed, skip:{scn,breakdown,valve}, before}.
+	function matchWrite(src, dst, ctx) {
+		var pairs = matchPairs(src, dst), done = {}, pass;
 		// Two passes: a pipe type or fittings list written in the first pass can make a column
 		// writable that the first pass met read-only.
 		for (pass = 0; pass < 2; pass++) {
 			pairs.forEach(function (p) {
-				var v;
-				if (done[p.c.key]) { return; }
-				if (p.sc.plainFor && p.sc.plainFor(src)) { done[p.c.key] = true; return; }   // not the source's own value
-				if (paneCellIsPlain(p.c, dst)) { return; }
+				var c = p.c, v, prop;
+				if (done[c.key]) { return; }
+				if (p.why) {
+					if (!matchSame(p.sc.get(src), c.get(dst))) { ctx.skip[p.why]++; }
+					done[c.key] = true; return;
+				}
+				if (p.sc.plainFor && p.sc.plainFor(src)) {
+					if (c.key === 'demand') { ctx.skip.breakdown++; }
+					done[c.key] = true; return;   // not the source's own value
+				}
+				if (paneCellIsPlain(c, dst)) {
+					if (c.key === 'demand') { ctx.skip.breakdown++; done[c.key] = true; }
+					return;
+				}
 				v = p.sc.get(src);
-				if (!panePresent(v) && !p.c.bool) { if (!paneWriteCellText(null, p.c, dst, '')) { return; } }
-				else { p.c.set(dst, v); }
-				done[p.c.key] = true;
-				n++;
+				if (matchSame(v, c.get(dst))) { done[c.key] = true; return; }
+				prop = paneColProp(c);
+				if (!inBaseScenario() && !(prop && isOverridable(dst, prop))) { ctx.skip.scn++; done[c.key] = true; return; }
+				ctx.before();
+				if (!panePresent(v) && !c.bool) { if (!paneWriteCellText(null, c, dst, '')) { return; } }
+				else { c.set(dst, v); }
+				done[c.key] = true;
+				ctx.changed++;
 			});
 		}
-		return n;
 	}
 	// Apply the source to a list of {kind,id}: one undo step, one solve.
 	function matchApply(srcRef, targets) {
-		var pc = EngCalcs.pageConfig || {}, src = matchElOf(srcRef), els, n = 0, said;
+		var pc = EngCalcs.pageConfig || {}, src = matchElOf(srcRef), els, said, snapped = false, parts = [],
+			ctx = { changed: 0, skip: { scn: 0, breakdown: 0, valve: 0 }, before: function () { if (!snapped) { snapped = true; saveUndoSnapshot(); } } };
 		if (!src) { return; }
 		els = targets.map(matchElOf).filter(function (el) { return el && el !== src; });
 		if (!els.length) { return; }
@@ -48434,18 +48454,23 @@ var EngCalcs = EngCalcs || {};
 				.replace('{to}', els.length === 1 ? els[0].id : String(els.length)).replace('{id}', src.id));
 			return;
 		}
-		saveUndoSnapshot();
-		els.forEach(function (el) { n += matchWrite(src, el); });
-		els.forEach(function (el) { afterPropertyEdit(el); });
+		els.forEach(function (el) { matchWrite(src, el, ctx); });
+		if (snapped) { els.forEach(function (el) { afterPropertyEdit(el); }); }
 		said = els.length === 1
-			? String(pc.lpn_match_done_one || 'Matched {to} to {id}: {n} properties copied.').replace('{to}', els[0].id)
-			: String(pc.lpn_match_done_many || 'Matched {m} assets to {id}: {n} properties copied.').replace('{m}', String(els.length));
-		setNotice(said.replace('{id}', src.id).replace('{n}', String(n)));
+			? String(pc.lpn_match_done_one || 'Matched {to} to {id}. Values changed: {n}.').replace('{to}', els[0].id)
+			: String(pc.lpn_match_done_many || 'Matched {m} assets to {id}. Values changed: {n}.').replace('{m}', String(els.length));
+		parts.push(said.replace('{id}', src.id).replace('{n}', String(ctx.changed)));
+		[['scn', 'lpn_match_skip_scn', 'Not copied: {n} (they cannot differ by scenario).'],
+			['breakdown', 'lpn_match_skip_breakdown', 'Not copied: {n} (demand is a list of categories).'],
+			['valve', 'lpn_match_skip_valve', 'Not copied: {n} (the valve types differ).']].forEach(function (r) {
+			if (ctx.skip[r[0]]) { parts.push(String(pc[r[1]] || r[2]).replace('{n}', String(ctx.skip[r[0]]))); }
+		});
+		setNotice(parts.join(' '));
 		refreshPaneIfOpen();
 		refreshSelection();
 	}
-	// The door shared by the Edit menu, the Tables menu and the right-click. `src` null means "the one
-	// selected asset, or ask"; `sel` is the selection to offer once a source exists.
+	// The door shared by the Edit menu and the right-click. `src` null means "the one selected asset,
+	// or ask"; `sel` is the selection to offer once a source exists.
 	function startMatchProperties(src, sel) {
 		var one = (sel || []).filter(function (s) { return s.kind === 'node' || s.kind === 'link'; });
 		if (!src && one.length === 1 && (sel || []).length === 1) { src = one[0]; }
@@ -48457,16 +48482,17 @@ var EngCalcs = EngCalcs || {};
 		if (matchSource) { matchOfferSelection(); }
 	}
 	function matchOfferSelection() {
-		var pc = EngCalcs.pageConfig || {}, src = matchSource, others;
+		var pc = EngCalcs.pageConfig || {}, src = matchSource, others, text;
 		if (matchOffered || !src) { return; }
 		matchOffered = true;
 		others = matchSelection.filter(function (s) {
 			return (s.kind === 'node' || s.kind === 'link') && !(s.kind === src.kind && s.id === src.id);
 		});
 		if (!others.length) { return; }
-		askDialog({ kind: 'confirm',
-			text: String(pc.lpn_match_selected_ask || 'Apply the properties of {id} to the {n} other selected assets?')
-				.replace('{id}', src.id).replace('{n}', String(others.length)),
+		text = others.length === 1
+			? String(pc.lpn_match_selected_ask_one || 'Apply the properties of {id} to the other selected asset?')
+			: String(pc.lpn_match_selected_ask || 'Apply the properties of {id} to the {n} other selected assets?');
+		askDialog({ kind: 'confirm', text: text.replace('{id}', src.id).replace('{n}', String(others.length)),
 			ok: pc.lpn_split_yes || 'Yes', cancel: pc.lpn_split_no || 'No' }, function (yes) {
 			if (!yes) { return; }
 			matchApply(src, others);
@@ -48489,47 +48515,67 @@ var EngCalcs = EngCalcs || {};
 		if (t.kind === matchSource.kind && t.id === matchSource.id) { return; }
 		matchApply(matchSource, [t]);
 	}
-	// **RIGHT-CLICK ON AN ASSET IN SELECT MODE OFFERS THE TOOL.** Captured on the document, ahead of the
-	// map's own press handlers, so the press neither selects nor opens a property sheet: the menu is
-	// the whole answer. The selection is recorded at the press, so a multi-selection the right-click
-	// is made on can be offered the match. A right-click inside the tool ends it.
+	// **THE MAP'S RIGHT-CLICK MENU, AS A ROW LIST** -- [{label, enabled, run}] -- so a later command
+	// (Task 784's Time series graph) is one more entry. A row that does not apply is greyed, never hidden.
+	function openMapContextMenu(x, y, rows) {
+		var menu = document.createElement('div'), first = null;
+		paneCloseContextMenu();
+		menu.className = 'lpn-pane-ctxmenu';
+		menu.setAttribute('role', 'menu');
+		menu.style.left = x + 'px';
+		menu.style.top = y + 'px';
+		menu.addEventListener('keydown', paneCtxMenuKey);
+		rows.forEach(function (r) {
+			var b = document.createElement('button');
+			b.type = 'button';
+			b.setAttribute('role', 'menuitem');
+			b.textContent = r.label;
+			b.disabled = r.enabled === false;
+			b.addEventListener('click', function () { paneCloseContextMenu(); r.run(); });
+			menu.appendChild(b);
+			if (!first && !b.disabled) { first = b; }
+		});
+		document.body.appendChild(menu);
+		paneCtxMenuEl = menu;
+		paneClampMenu(menu, x, y);
+		if (first) { first.focus(); }
+	}
+	// **ONLY A NODE OR A LINK IS INTERCEPTED.** Captured on the document ahead of the map's press
+	// handlers, so the press neither selects nor opens a property sheet; empty canvas (right-drag
+	// pans), Text labels and customers are left exactly as they were. The selection is recorded at
+	// the press, so a multi-selection the right-click is made on can be offered the match. A
+	// right-click inside the tool ends it.
 	var matchCtxSel = [], matchCtxHit = null;
 	function matchOnCanvas(e) { return !!(e.target && e.target.closest && e.target.closest('#lpn_canvas')); }
+	function matchCtxTarget(e) {
+		var t = hoverTargetFromHit(mapHitAt(e.clientX, e.clientY));
+		return t && (t.kind === 'node' || t.kind === 'link') ? t : null;
+	}
 	document.addEventListener('pointerdown', function (e) {
-		if (e.button !== 2 || !matchOnCanvas(e) || (mode !== 'select' && mode !== 'match')) { return; }
+		if (e.button !== 2 || !matchOnCanvas(e)) { return; }
+		matchCtxHit = null;
+		if (mode === 'match') { e.stopPropagation(); return; }
+		if (mode !== 'select') { return; }
+		matchCtxHit = matchCtxTarget(e);
+		if (!matchCtxHit) { return; }
 		matchCtxSel = selectedRefs();
-		matchCtxHit = mode === 'select' ? matchPickAt(e.clientX, e.clientY, e) : null;
 		e.stopPropagation();
 	}, true);
 	document.addEventListener('pointerup', function (e) {
-		if (e.button !== 2 || !matchOnCanvas(e) || (mode !== 'select' && mode !== 'match')) { return; }
-		e.stopPropagation();
+		if (e.button !== 2 || !matchOnCanvas(e)) { return; }
+		if (mode === 'match' || (mode === 'select' && matchCtxHit)) { e.stopPropagation(); }
 	}, true);
 	document.addEventListener('contextmenu', function (e) {
-		var pc = EngCalcs.pageConfig || {}, hit, menu, b;
+		var pc = EngCalcs.pageConfig || {}, hit;
 		if (!matchOnCanvas(e)) { return; }
 		if (mode === 'match') { e.preventDefault(); setMode('select'); return; }
 		if (mode !== 'select') { return; }
 		hit = matchCtxHit; matchCtxHit = null;
-		if (!hit || (hit.kind !== 'node' && hit.kind !== 'link')) { return; }
+		if (!hit) { return; }
 		e.preventDefault();
-		paneCloseContextMenu();
-		menu = document.createElement('div');
-		menu.className = 'lpn-pane-ctxmenu';
-		menu.setAttribute('role', 'menu');
-		menu.style.left = e.clientX + 'px';
-		menu.style.top = e.clientY + 'px';
-		menu.addEventListener('keydown', paneCtxMenuKey);
-		b = document.createElement('button');
-		b.type = 'button';
-		b.setAttribute('role', 'menuitem');
-		b.textContent = pc.lpn_match_menu || 'Match properties';
-		b.addEventListener('click', function () { paneCloseContextMenu(); startMatchProperties(hit, matchCtxSel); });
-		menu.appendChild(b);
-		document.body.appendChild(menu);
-		paneCtxMenuEl = menu;
-		paneClampMenu(menu, e.clientX, e.clientY);
-		b.focus();
+		openMapContextMenu(e.clientX, e.clientY, [
+			{ label: pc.lpn_match_menu || 'Match properties', enabled: true, run: function () { startMatchProperties(hit, matchCtxSel); } }
+		]);
 	});
 
 	// ---- ROADMAP Task 277: a move is undoable ----

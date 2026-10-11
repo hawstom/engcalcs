@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**91 still to read on master**, of 102 untranslated keys, of 2546 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**104 still to read on master**, of 115 untranslated keys, of 2559 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -175,7 +175,7 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   @@ NEEDS RULING
 
-## lpn_  (101, 90 to read @@ NEEDS RULING)
+## lpn_  (114, 103 to read @@ NEEDS RULING)
 
 - **`lpn_demand_pattern_constant`**
   > (constant)
@@ -420,6 +420,45 @@ never edits a synonym.
 - **`lpn_link_end_unknown`**
   > No node has the ID {id}.
   @@ NEEDS RULING
+- **`lpn_match_done_many`**
+  > Matched {m} assets to {id}. Values changed: {n}.
+  @@ NEEDS RULING
+- **`lpn_match_done_one`**
+  > Matched {to} to {id}. Values changed: {n}.
+  @@ NEEDS RULING
+- **`lpn_match_kind`**
+  > Match properties applies to nodes and pipes, pumps, and valves only.
+  @@ NEEDS RULING
+- **`lpn_match_menu`**
+  > Match properties
+  @@ NEEDS RULING
+- **`lpn_match_none`**
+  > {to} and {id} have no properties in common to copy.
+  @@ NEEDS RULING
+- **`lpn_match_selected_ask`**
+  > Apply the properties of {id} to the {n} other selected assets?
+  @@ NEEDS RULING
+- **`lpn_match_selected_ask_one`**
+  > Apply the properties of {id} to the other selected asset?
+  @@ NEEDS RULING
+- **`lpn_match_skip_breakdown`**
+  > Not copied: {n} (demand is a list of categories).
+  @@ NEEDS RULING
+- **`lpn_match_skip_scn`**
+  > Not copied: {n} (they cannot differ by scenario).
+  @@ NEEDS RULING
+- **`lpn_match_skip_valve`**
+  > Not copied: {n} (the valve types differ).
+  @@ NEEDS RULING
+- **`lpn_match_tip`**
+  > Copy the properties of one asset to others. Select the source, then each asset to change. Identity, location, and connections are never copied, and neither is status (Active, Shut). Assets of a different type receive only the properties both types have.
+  @@ NEEDS RULING
+- **`lpn_mode_match`**
+  > Mode: Match properties. Select the asset to copy properties from. Press Escape to cancel.
+  @@ NEEDS RULING
+- **`lpn_mode_match_dest`**
+  > Mode: Match properties. Select each asset to receive the properties of {id}. Press Escape or right-click when finished.
+  @@ NEEDS RULING
 - **`lpn_msglog_hidden`**
   > Hidden
   _Ruled 2026-10-08: Calls page 8 October: Use as written_
@@ -491,7 +530,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**117 still to read**, of 120 new keys across 14 unmerged branch(es).
+**108 still to read**, of 111 new keys across 13 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -502,7 +541,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/advisers-1011 (`15d26f57`) — adds no English strings
+### chore/advisers-1011 (`6e83e334`) — adds no English strings
 
 ### feat/bentley-interop (`4577a1f1`) — 102 new, 102 to read @@ NEEDS RULING
 
@@ -837,37 +876,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`2e5e81c4`) — adds no English strings
 
-### feat/match-property (`9b4709d4`) — 9 new, 9 to read @@ NEEDS RULING
-
-- **`lpn_match_done_many`**
-  > Matched {m} assets to {id}: {n} properties copied.
-  @@ NEEDS RULING
-- **`lpn_match_done_one`**
-  > Matched {to} to {id}: {n} properties copied.
-  @@ NEEDS RULING
-- **`lpn_match_kind`**
-  > Match properties applies to nodes and pipes, pumps, and valves only.
-  @@ NEEDS RULING
-- **`lpn_match_menu`**
-  > Match properties
-  @@ NEEDS RULING
-- **`lpn_match_none`**
-  > {to} and {id} have no properties in common to copy.
-  @@ NEEDS RULING
-- **`lpn_match_selected_ask`**
-  > Apply the properties of {id} to the {n} other selected assets?
-  @@ NEEDS RULING
-- **`lpn_match_tip`**
-  > Copy the properties of one asset to others. Specify the source, then each asset to change. ID, location, end nodes, description, and tag are never copied. Assets of a different type receive only the properties both types have.
-  @@ NEEDS RULING
-- **`lpn_mode_match`**
-  > Mode: Match properties. Select the asset to copy properties from. Press Escape to cancel.
-  @@ NEEDS RULING
-- **`lpn_mode_match_dest`**
-  > Mode: Match properties. Select each asset to receive the properties of {id}. Press Escape or right-click when finished.
-  @@ NEEDS RULING
-
-### feat/section-grid (`005d4e63`) — adds no English strings
+### feat/match-property (`2ad76405`) — adds no English strings
 
 ### feat/snap (`c22988d5`) — 2 new, 2 to read @@ NEEDS RULING
 
