@@ -128,6 +128,7 @@ $ec_lang_syn['calc_defaults']='Restore (revert, return) to the original (initial
 $ec_lang['calc_defaults_confirm']='Reset calculator to the original default values?';
 $ec_lang['points_data_note']='(or copy/paste using the data area)';
 $ec_lang['points_data_heading']='Calculator data<br />(use Copy to see format)';
+$ec_lang['points_data_points_heading']='Points data<br />(use Copy to see format)';
 $ec_lang['points_data_copy']='Copy';
 $ec_lang['points_data_paste']='Paste';
 $ec_lang['points_data_msg_line']='Nothing was pasted. Line {n} could not be read as a station and an elevation.';

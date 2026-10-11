@@ -5563,6 +5563,9 @@ tr.lpn-ff-error { background: var(--ec-gray-f2f2f2); }
 	.lpn-menu-row[data-hotkey]::after { content: none; }
 }
 
+/* Cross-section sketch scale (mi_, wi_): faint grid and round-number marks */
+.ec-sk-grid { stroke: var(--ec-border); stroke-width: 1; }
+.ec-sk-tick { fill: var(--ec-ink-subtle); font-size: 10px; font-family: sans-serif; }
 /* Paragraphs inside an explanation (EngCalcs.tipHtml()). */
 .tooltip.ec-explain .tooltip-inner p { margin: 0 0 0.6em; }
 .tooltip.ec-explain .tooltip-inner p:last-child { margin-bottom: 0; }

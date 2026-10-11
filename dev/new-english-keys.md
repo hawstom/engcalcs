@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**90 still to read on master**, of 101 untranslated keys, of 2545 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**91 still to read on master**, of 102 untranslated keys, of 2546 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -481,11 +481,17 @@ never edits a synonym.
   > This file could not be read as a workspace, so nothing was changed.
   @@ NEEDS RULING
 
+## points_  (1, 1 to read @@ NEEDS RULING)
+
+- **`points_data_points_heading`**
+  > Points data<br />(use Copy to see format)
+  @@ NEEDS RULING
+
 ---
 
 # Strings waiting on a branch
 
-**115 still to read**, of 118 new keys across 15 unmerged branch(es).
+**117 still to read**, of 120 new keys across 14 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -496,9 +502,9 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/advisers-1011 (`388dbad8`) — adds no English strings
+### chore/advisers-1011 (`15d26f57`) — adds no English strings
 
-### feat/bentley-interop (`e644f9b1`) — 99 new, 99 to read @@ NEEDS RULING
+### feat/bentley-interop (`4577a1f1`) — 102 new, 102 to read @@ NEEDS RULING
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -521,11 +527,20 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_customer_node_inactive`**
   > This customer is assigned to a junction that is inactive in this scenario, so its demand is not part of the solve.
   @@ NEEDS RULING
+- **`lpn_guide_how_sm`**
+  > Scenario manager is listed under Water, Scenarios.
+  @@ NEEDS RULING
 - **`lpn_inp_export_flat_customers_inactive`**
   > {n} of these customers are assigned to a junction that is inactive in this scenario, so their demand is not in the file.
   @@ NEEDS RULING
 - **`lpn_inp_export_flat_inactive_controls`**
   > These controls and rules refer to an asset that is inactive in this scenario, so they are not in the file: {ids}
+  @@ NEEDS RULING
+- **`lpn_library_pattern_default_deleted_also`**
+  > Scenarios that also used it as their default: {list}.
+  @@ NEEDS RULING
+- **`lpn_library_pattern_default_deleted_in`**
+  > Pattern {id} was the default demand pattern in these scenarios: {list}.
   @@ NEEDS RULING
 - **`lpn_pane_inactive_show`**
   > Include inactive topology
@@ -756,7 +771,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Create and organize scenarios and alternatives and their inheritance here. Choose Alternatives for Scenarios in the Scenarios table.
   @@ NEEDS RULING
 - **`lpn_sm_hint`**
-  > Drag an item onto another to make it a child of that item. Drag between two items to reorder them. Click a selected item or press F2 to rename it, Delete to delete it, Enter to make a scenario current. Right-click for more.
+  > Drag an item onto another to make it a child of that item. Drag between two items to reorder them. Click the arrow beside an item, or press Left or Right, to collapse or expand it. Click a selected item or press F2 to rename it, Delete to delete it, Enter to make a scenario current. Right-click an item for the same commands as the buttons.
   @@ NEEDS RULING
 - **`lpn_sm_in_use`**
   > {name} cannot be deleted while it is used by: {list}.
@@ -852,11 +867,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Mode: Match properties. Select each asset to receive the properties of {id}. Press Escape or right-click when finished.
   @@ NEEDS RULING
 
-### feat/section-grid (`005d4e63`) — 1 new, 1 to read @@ NEEDS RULING
-
-- **`points_data_points_heading`**
-  > Points data<br />(use Copy to see format)
-  @@ NEEDS RULING
+### feat/section-grid (`005d4e63`) — adds no English strings
 
 ### feat/snap (`c22988d5`) — 2 new, 2 to read @@ NEEDS RULING
 
@@ -867,7 +878,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > {link}, vertex {n}
   @@ NEEDS RULING
 
-### feat/tank-volume (`42f75c7f`) — 4 new, 4 to read @@ NEEDS RULING
+### feat/tank-volume (`31985741`) — 4 new, 4 to read @@ NEEDS RULING
 
 - **`lpn_result_depth`**
   > Depth
@@ -879,9 +890,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Usable volume
   @@ NEEDS RULING
 - **`lpn_result_tank_volume_tip`**
-  > Volume of water above the lowest water depth, so it is zero when the tank is at its minimum. EPANET's own tank volume also counts the water below the minimum level.
+  > Volume of water above the lowest water depth, so it is zero at that depth. The EPANET tank volume also includes the water below the lowest water depth, which still counts toward mixing and water age, so the tank elevation stays at the tank bottom.
   @@ NEEDS RULING
 
 ### feat/visit-dedupe (`7b4a84bd`) — adds no English strings
-
-### fix/default-pattern-shown (`303b9c48`) — adds no English strings
