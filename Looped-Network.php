@@ -3797,7 +3797,6 @@ EngCalcs.pageConfig = {
 	lpn_sm_basic_off: <?=json_encode($ec_lang['lpn_sm_basic_off'])?>,
 	lpn_pane_tab_scenarios: <?=json_encode($ec_lang['lpn_pane_tab_scenarios'])?>,
 	lpn_sm_col_parent: <?=json_encode($ec_lang['lpn_sm_col_parent'])?>,
-	lpn_sm_hint: <?=json_encode($ec_lang['lpn_sm_hint'])?>,
 	lpn_sm_add_child: <?=json_encode($ec_lang['lpn_sm_add_child'])?>,
 	lpn_sm_add_base: <?=json_encode($ec_lang['lpn_sm_add_base'])?>,
 	lpn_sm_add_base_tip: <?=json_encode($ec_lang['lpn_sm_add_base_tip'])?>,

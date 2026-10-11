@@ -4723,7 +4723,6 @@ html[dir="rtl"] .lpn-guide-chev { transform: scaleX(-1); }
 .lpn-sm-name { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .lpn-sm-name input { width: 100%; box-sizing: border-box; }
 .lpn-sm-meta { flex: 0 0 auto; font-size: 0.85em; opacity: 0.8; }
-.lpn-sm-hint { font-size: 0.85em; opacity: 0.85; margin: 0; }
 /* The expander is a 24 px square, a finger's target on a phone, and a row without children keeps
    the same width so names on one level line up. */
 .lpn-sm-row { padding-block: 0; min-height: 24px; gap: 4px; }

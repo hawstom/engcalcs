@@ -72658,10 +72658,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		});
 		host.appendChild(tree);
 		tree.scrollTop = scroll;
-		old = document.createElement('p');
-		old.className = 'lpn-sm-hint';
-		old.textContent = pc.lpn_sm_hint || 'Drag an item onto another to make it a child of that item. Drag between two items to reorder them. Click the arrow beside an item, or press Left or Right, to collapse or expand it. Click a selected item or press F2 to rename it, Delete to delete it, Enter to make a scenario current. Right-click an item for the same commands as the buttons.';
-		host.appendChild(old);
+		// The gestures and keys are written in the title's "?" (Tom, 2026-10-11: "Move the footer
+		// text to the tip."), so nothing sits under the tree.
 		initTipsIn(host);
 		if (smState.editing !== null) { smFocusEditor(); }
 		else if (hadFocus && tree.focus) { tree.focus(); }

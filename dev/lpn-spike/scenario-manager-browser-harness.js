@@ -135,7 +135,10 @@ async function main() {
 		ok('1.9 the toolbar is Make current, Add child, Add base, Rename, Copy scenario, then minus (the menu\'s order)', JSON.stringify(await toolbar()) === JSON.stringify([await L('lpn_sm_make_current'), await L('lpn_sm_add_child'), await L('lpn_sm_add_base'), await L('lpn_sm_rename'), await L('lpn_sm_copy'), '\u2212']) && (await L('lpn_sm_add_base')) === 'Add base' && (await L('lpn_sm_add_child')) === 'Add child', JSON.stringify(await toolbar()));
 		ok('1.10 on Base the minus is greyed and its tip says why', (await page.evaluate(() => document.getElementById('lpn_sm_del').title)) === await L('lpn_sm_base_kept') && (await page.evaluate(() => document.getElementById('lpn_sm_del').getAttribute('aria-disabled'))) === 'true');
 		const helpTip = await page.evaluate(() => { const t = document.querySelector('#lpn_smbox_title .ec-help'); return t ? (t.title || t.getAttribute('data-bs-original-title')) : null; });
-		ok('1.11 the box title has a ? tip with the explanation', helpTip === 'Create and organize scenarios and alternatives and their inheritance here. Choose Alternatives for Scenarios in the Scenarios table.' && !!(await page.$('#lpn_smbox_title .ec-tip')), String(helpTip));
+		// The tip is lpn_sm_help with its paragraph marks as real breaks; the explanation shows the
+		// same paragraphs, so its text is theirs run together.
+		const helpParas = (await L('lpn_sm_help')).split('\\n\\n'), helpShown = helpParas.join('');
+		ok('1.11 the box title has a ? tip with the explanation', helpTip === helpParas.join('\n\n') && !!(await page.$('#lpn_smbox_title .ec-tip')), String(helpTip));
 		// **THE "?" ON THE TITLE TAKES A CLICK** (Tom, 2026-10-11: *"The glyph isn't clickable."*). The
 		// title band ignores the pointer so it can be the drag surface; the glyph must not. A real mouse
 		// click at the glyph's centre, and at a point 10 px off it (the touch hit area), opens the
@@ -148,14 +151,14 @@ async function main() {
 		const explainUp = () => page.evaluate(() => { const t = document.querySelector('.tooltip.ec-explain.show'); return t ? t.textContent : null; });
 		await page.mouse.click(glyphBox.x, glyphBox.y);
 		await settle(500);
-		ok('1.15 a real click on the ? opens the explanation', (await explainUp()) === helpTip, String(await explainUp()));
+		ok('1.15 a real click on the ? opens the explanation', (await explainUp()) === helpShown, String(await explainUp()));
 		ok('1.16 ...and the glyph says it is expanded', (await page.evaluate(() => document.querySelector('#lpn_smbox_title .ec-tip').getAttribute('aria-expanded'))) === 'true');
 		await page.keyboard.press('Escape');
 		await settle(400);
 		ok('1.17 Esc closes it and leaves the box open', (await explainUp()) === null && await page.evaluate(() => getComputedStyle(document.getElementById('lpn_sm_box')).display !== 'none'));
 		await page.mouse.click(glyphBox.x + glyphBox.w / 2 - 2, glyphBox.y + glyphBox.h / 2 - 2);
 		await settle(500);
-		ok('1.18 a click near the edge of the hit area opens it too', (await explainUp()) === helpTip, String(await explainUp()));
+		ok('1.18 a click near the edge of the hit area opens it too', (await explainUp()) === helpShown, String(await explainUp()));
 		await page.keyboard.press('Escape');
 		await settle(400);
 		ok('1.19 the title words beside the ? are still the drag band (the box)', (await hitAt(glyphBox.x - glyphBox.w - 40, glyphBox.y)) === 'lpn_sm_box', String(await hitAt(glyphBox.x - glyphBox.w - 40, glyphBox.y)));

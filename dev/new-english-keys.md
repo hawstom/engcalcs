@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**194 still to read on master**, of 205 untranslated keys, of 2643 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**193 still to read on master**, of 204 untranslated keys, of 2642 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -175,7 +175,7 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   @@ NEEDS RULING
 
-## lpn_  (204, 193 to read @@ NEEDS RULING)
+## lpn_  (203, 192 to read @@ NEEDS RULING)
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -706,10 +706,7 @@ never edits a synonym.
   > Delete the selected item. A used item is not deleted.
   @@ NEEDS RULING
 - **`lpn_sm_help`**
-  > Create and organize scenarios and alternatives and their inheritance here. Choose Alternatives for Scenarios in the Scenarios table.
-  @@ NEEDS RULING
-- **`lpn_sm_hint`**
-  > Drag an item onto another to make it a child of that item. Drag between two items to reorder them. Click the arrow beside an item, or press Left or Right, to collapse or expand it. Click a selected item or press F2 to rename it, Delete to delete it, Enter to make a scenario current. Right-click an item for the same commands as the buttons.
+  > Create and organize scenarios and alternatives and their inheritance here. Assign Alternatives to Scenarios in the Scenarios table.\n\nA new scenario creates no alternatives; it uses its parent's. A change made in a scenario is an override kept in that scenario's own values, shown as Own values in the Scenarios table. If the scenario is assigned an alternative for that category, the change goes into that alternative instead and reaches every scenario that uses it.\n\nDrag an item onto another to make it a child of that item. Drag between two items to reorder them. Click the arrow beside an item, or press Left or Right, to collapse or expand it.\n\nClick a selected item or press F2 to rename it, Delete to delete it, Enter to make a scenario current. Right-click an item for the same commands as the buttons.
   @@ NEEDS RULING
 - **`lpn_sm_in_use`**
   > {name} cannot be deleted while it is used by: {list}.
@@ -811,7 +808,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/bentley-interop (`784ea66f`) — adds no English strings
+### feat/bentley-interop (`3c969d82`) — adds no English strings
 
 ### feat/desktop (`baba0f04`) — adds no English strings
 
@@ -873,7 +870,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Mode: Match properties. Select the asset to copy properties from. Status, identity, and location are not copied. Press Escape to cancel.
   @@ NEEDS RULING
 
-### feat/shape (`c7792882`) — 17 new, 17 to read @@ NEEDS RULING
+### feat/shape (`8436cef6`) — 17 new, 17 to read @@ NEEDS RULING
 
 - **`lpn_file_import_shapes`**
   > Import GeoJSON shapes…

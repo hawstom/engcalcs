@@ -2,7 +2,8 @@
 // probably belong in a right-click menu in a modern tree paradigm"*, and of the Guide rail:
 // *"chevron is a good tree paradigm"*; Ida's advice is the spec). Real Chromium, the real page, Net1:
 //   1. Base -> Peak -> Night built with the real buttons; a chevron at every parent and a spacer at
-//      the leaf, at least 24 px square; one icon per kind of item;
+//      the leaf, at least 24 px square; one icon per kind of item; no footer under the tree, its
+//      text now paragraphs of the title's "?" (Tom, 2026-10-11);
 //   2. a real mouse click on a chevron collapses and expands; a selection folded away moves to the
 //      folding item; nothing is written to the device and the project is unchanged;
 //   3. keyboard: Up, Down, Home, End, Right (expand, then first child), Left (collapse, then parent);
@@ -128,8 +129,17 @@ async function main() {
 		ok('1.5 an icon per kind: Base the base icon, Peak and Night the child icon', rows[0].icon === 'lpn-sm-icon-scnbase' && rows[1].icon === 'lpn-sm-icon-scn' && rows[2].icon === 'lpn-sm-icon-scn', JSON.stringify(rows.map((r) => r.icon)));
 		const iconColours = await page.evaluate(() => Array.from(document.querySelectorAll('#lpn_sm_tree .lpn-sm-icon')).map((i) => getComputedStyle(i).color));
 		ok('1.6 the Base icon is drawn in a different token colour from a child\'s', iconColours[0] !== iconColours[1], JSON.stringify(iconColours));
-		const hint = await page.evaluate(() => document.querySelector('#lpn_sm_body .lpn-sm-hint').textContent);
-		ok('1.7 the hint under the tree is its own sentence', hint === await L('lpn_sm_hint'), hint);
+		// **THE FOOTER MOVED INTO THE "?"** (Tom, 2026-10-11: "Move the footer text to the tip.").
+		ok('1.7 nothing sits under the tree any more (no footer hint)', !(await page.$('#lpn_sm_body .lpn-sm-hint')) && (await page.evaluate(() => { const t = document.getElementById('lpn_sm_tree'); return !t.nextElementSibling; })));
+		const tipParas = (await L('lpn_sm_help')).split('\\n\\n');
+		ok('1.8 the tip has four paragraphs: what the box is, what a new scenario creates, the gestures, the keys', tipParas.length === 4, JSON.stringify(tipParas));
+		ok('1.9 Tom\'s second sentence replaced the old one', !/Choose Alternatives for Scenarios/.test(tipParas[0]) && tipParas[0].split('. ').length === 2, tipParas[0]);
+		await page.mouse.click(...(await page.evaluate(() => { const g = document.querySelector('#lpn_smbox_title .ec-tip').getBoundingClientRect(); return [g.left + g.width / 2, g.top + g.height / 2]; })));
+		await a.settle(500);
+		const shown = await page.evaluate(() => Array.from(document.querySelectorAll('.tooltip.ec-explain.show p')).map((p) => p.textContent));
+		ok('1.10 clicking the ? shows those four paragraphs as paragraphs', JSON.stringify(shown) === JSON.stringify(tipParas.map((t) => t.trim())), JSON.stringify(shown));
+		await page.keyboard.press('Escape');
+		await a.settle(300);
 
 		console.log('\n--- 2. the chevron, clicked ---');
 		const storeBefore = await h.store();
