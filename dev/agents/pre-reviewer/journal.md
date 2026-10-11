@@ -4188,3 +4188,12 @@ OBSERVED (decays): driven in real Chromium on Net1, own scripts in scratchpad (p
 - Works: add/rename/F2/slow-click rename, Child_1/2_of_Horse numbering, Base2/Base3, drag reparent+reorder, cycle refusal, delete-in-use refusal naming users, Demand alt assigned in Scenarios table -> junction edit lands in alt, Base untouched, solve differs; copy own/share; Compare honours unchecked; save/reopen keeps tree, alternatives, compareSet; es shows menu/headings, new strings English.
 - Defects: Delete on Base: misleading map message; Base2 Parent column says Base while tip says Base has no parent; scenario override count 0 though holds Dry year demand edit; builder harness has `|| true` assertions (1.1, 3.4, 2.1) and weak 5.5/6.4.
 - Could not find the builder's "six self-declared calls" in git log or dev/*.md.
+
+## 2026-10-11 feat/tank-volume @ 42f75c7f (Perry)
+
+- OBSERVED: independent EPANET (js/vendor/epanet-js.js in node, no app code) on Net3 and on an SI (LPS) inp with a cylinder tank and a VOLUME-curve tank: app Usable volume = EN_TANKVOLUME - EN_MINVOLUME at every hour tested, Depth = EN_HEAD - elevation. All agree to display rounding. Note EN_TANKLEVEL is the INITIAL level in EPANET, not the current one; use head minus elevation.
+- OBSERVED: Find (Tank scope) offers Depth and Usable volume, matches at the time shown, re-evaluates when time moves; Replace list correctly omits them.
+- OBSERVED: "ft H2O" on Depth is the same suffix the existing Elevation / Water depth / Lowest / Highest columns carry, so not a leak; tank diameter correctly stays in plain ft.
+- OBSERVED: with Recalculate OFF after a run, editing tank Elevation 50 -> 60 leaves Head stale (52.76) and Depth becomes -7.24 (stale head minus new elevation). Edit of Lowest water depth moves Usable volume at once while Head stays stale.
+- OBSERVED: Tables pane is not shown at 390 px (display none, pre-existing); could not drive Properties at phone width.
+- TRAP: the harness's "Depth = head - elevation" check restates the code; only the EPANET comparison is independent.
