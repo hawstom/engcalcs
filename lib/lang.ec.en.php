@@ -1666,6 +1666,15 @@ $ec_lang['lpn_confirm_delete_network']='Delete every node, pipe, and text label 
 // point: a conventional name is what makes a powerful command findable by somebody who has never
 // read a word about this page.
 $ec_lang['lpn_find_menu']='Find and replace';
+// Match properties (Task 782; Tom, 2026-10-10: the AutoCAD MATCHPROP). Pick a source asset, then each
+// asset to receive its properties. Identity and placement are never copied.
+$ec_lang['lpn_match_menu']='Match properties';
+$ec_lang['lpn_match_tip']='Copy the properties of one asset to others. Specify the source, then each asset to change. ID, location, end nodes, description, and tag are never copied. Assets of a different type receive only the properties both types have.';
+$ec_lang['lpn_match_selected_ask']='Apply the properties of {id} to the {n} other selected assets?';
+$ec_lang['lpn_match_done_one']='Matched {to} to {id}: {n} properties copied.';
+$ec_lang['lpn_match_done_many']='Matched {m} assets to {id}: {n} properties copied.';
+$ec_lang['lpn_match_none']='{to} and {id} have no properties in common to copy.';
+$ec_lang['lpn_match_kind']='Match properties applies to nodes and pipes, pumps, and valves only.';
 $ec_lang['lpn_find_title']='Find and replace';
 $ec_lang['lpn_find_scope']='What to search';
 $ec_lang['lpn_find_scope_all']='Everything';
@@ -2733,6 +2742,8 @@ $ec_lang['lpn_pump_effic_unstated']='This pump refers to an efficiency curve cal
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_mode_select']='Mode: Select. Select an asset or a label to see or change it. Drag to move a node or a label. Use the Vertices tool to add or remove the bends in a pipe.';
 $ec_lang['lpn_mode_delete']='Mode: Delete. Select an asset to remove it.';
+$ec_lang['lpn_mode_match']='Mode: Match properties. Select the asset to copy properties from. Press Escape to cancel.';
+$ec_lang['lpn_mode_match_dest']='Mode: Match properties. Select each asset to receive the properties of {id}. Press Escape or right-click when finished.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_mode_vertices']='Mode: Vertices. The vertices of every pipe are shown as small square handles. Specify a point on a pipe to add a vertex, select a handle to remove it, or drag a handle to move it. Nothing else on the map can be changed in this mode.';
 $ec_lang['lpn_mode_zoom_window']='Mode: Zoom window. Specify two opposite corners of a box, or drag one, on the map to zoom in on it.';

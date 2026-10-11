@@ -18080,12 +18080,13 @@ var EngCalcs = EngCalcs || {};
 	// join). It paints no highlight (those modes have their own feedback) and takes no pointer
 	// events; a press dismisses it like anywhere else.
 	function hoverCardOtherMode() {
-		return mode === 'delete' || mode === 'add-pipe' || mode === 'add-pump' || mode === 'add-valve' || mode === 'add-chain';
+		return mode === 'delete' || mode === 'match' || mode === 'add-pipe' || mode === 'add-pump' || mode === 'add-valve' || mode === 'add-chain';
 	}
 	var hoverCardOtherRaf = null, hoverCardOtherAt = null;
 	function hoverCardOtherTarget(x, y) {
 		var t = hoverTargetFromHit(mapHitAt(x, y));
 		if (mode === 'delete') { return t && t.kind !== 'label' ? t : null; }
+		if (mode === 'match') { return t && (t.kind === 'node' || t.kind === 'link') ? t : null; }
 		if (t && t.kind === 'node') { return t; }
 		var near = nearestNodeNearScreen(x, y, POINTER_REACH_PX);
 		return near ? { kind: 'node', id: near.id } : null;
@@ -28993,6 +28994,11 @@ var EngCalcs = EngCalcs || {};
 			});
 		}
 		mk(pc.lpn_pane_goto_tip || 'Zoom & select', function () { selectAndZoomTo(targets); openMultiProperties(); });
+		if (aim && (aim.group === 'node' || aim.group === 'link')) {
+			mk(pc.lpn_match_menu || 'Match properties', function () {
+				startMatchProperties({ kind: aim.group, id: aim.id }, selectedRefs());
+			});
+		}
 		// **SELECTION ONLY, offered only when the map has a selection** (or the filter is on, so it
 		// can be turned off from here). It acts on the MAP's selection, not on the rows clicked.
 		if (selections.length || paneSelFilter) {
@@ -32252,13 +32258,19 @@ var EngCalcs = EngCalcs || {};
 		'add-pipe': 'lpn_mode_add_pipe', 'add-pump': 'lpn_mode_add_pump',
 		'add-valve': 'lpn_mode_add_valve', 'add-meter': 'lpn_mode_add_meter',
 		'add-text': 'lpn_mode_add_text', 'add-chain': 'lpn_mode_add_chain',
-		'vertices': 'lpn_mode_vertices',
+		'vertices': 'lpn_mode_vertices', 'match': 'lpn_mode_match',
 		'zoom-window': 'lpn_mode_zoom_window'
 	};
 	function updateModeHint() {
 		var el = document.getElementById('lpn_mode_hint'); if (!el) { return; }
 		var pc = EngCalcs.pageConfig || {}, key = MODE_HINT_KEYS[mode];
-		el.textContent = key ? (pc[key] || '') : '';
+		// Match properties has two prompts, source then destination, and the second names the source.
+		if (mode === 'match' && matchSource) {
+			el.textContent = String(pc.lpn_mode_match_dest || 'Mode: Match properties. Select each asset to receive the properties of {id}. Press Escape or right-click when finished.')
+				.replace('{id}', matchSource.id);
+		} else {
+			el.textContent = key ? (pc[key] || '') : '';
+		}
 		// The hint's width and line count change with the mode and with the language, and a legend
 		// dodges the box that is there NOW -- see placeLegends().
 		placeLegends();
@@ -32295,6 +32307,8 @@ var EngCalcs = EngCalcs || {};
 		// a preview left on the map by a tool that is no longer running is a shape nothing can
 		// finish (Task 247).
 		if (mode === 'add-meter' && newMode !== 'add-meter') { setPendingMeter(null); }
+		// Match properties keeps its source only while the tool runs.
+		if (mode === 'match' && newMode !== 'match') { matchSource = null; matchOffered = false; }
 		// The hover preview is a Select-mode-only signal (Ida's wishlist item 1): leaving 'select'
 		// for any other tool drops it rather than leaving a highlight nothing will now clear, since
 		// the pointermove listener that maintains it does no work outside 'select'.
@@ -43539,6 +43553,10 @@ var EngCalcs = EngCalcs || {};
 			// menu is about; View holds the things that change how the map is drawn. Every editor
 			// puts Find in Edit for the same reason.
 			{ icon: 'find', label: pc.lpn_find_menu || 'Find and replace', fn: function () { toggleFindPopup(anchor); } },
+			// **MATCH PROPERTIES, THE AUTOCAD MATCHPROP** (Tom, 2026-10-10). Toggles like Delete, so the
+			// way out of the tool is the control that went in; see startMatchProperties().
+			{ icon: 'duplicate', label: pc.lpn_match_menu || 'Match properties', tip: pc.lpn_match_tip,
+				fn: function () { if (mode === 'match') { setMode('select'); } else { startMatchProperties(null, selectedRefs()); } } },
 			{ separator: true },
 			// SUBJECT, THEN VERB (Task 415): with something selected this row deletes it, which is
 			// what Delete means in every editor. With nothing selected it still toggles the Delete
@@ -46670,7 +46688,7 @@ var EngCalcs = EngCalcs || {};
 				return;
 			}
 			if (mode.indexOf('add-') === 0) { return; } // handled on click below, not drag
-			if (mode === 'delete') { return; }
+			if (mode === 'delete' || mode === 'match') { return; }
 			// **VERTICES MODE DRAGS A HANDLE AND NOTHING ELSE** (Task 567). Same rule and the same
 			// reason as the profile's edit mode below: a bend can sit anywhere, including on top of
 			// a node or a label, and the mode whose whole subject is the bend must not move the
@@ -47288,6 +47306,8 @@ var EngCalcs = EngCalcs || {};
 						: ((nearestLinkNearScreen(e.clientX, e.clientY, reachPx(e)) || {}).link || {}).id;
 					if (lTap) { insertVertex(lTap, w); }
 				}
+			} else if (mode === 'match') {
+				matchTap(e);
 			} else if (mode === 'delete') {
 				// One-step undo: snapshot the whole document just before any destructive action, NOT
 				// inside the delete functions, so a cascade (deleting a node also deletes its links)
@@ -47473,6 +47493,186 @@ var EngCalcs = EngCalcs || {};
 		if (mode !== 'add-chain' || !pendingLinkFrom || !e.target || !e.target.closest || !e.target.closest('#lpn_canvas')) { return; }
 		e.preventDefault();
 		setPendingLinkFrom(null);
+	});
+
+	// ---- MATCH PROPERTIES (Task 782; Tom, 2026-10-10: *"Match properties from one asset to others
+	// (as applicable)"*), the AutoCAD MATCHPROP ----
+	//
+	// A tool in the Delete tool's shape: choose the SOURCE, then press each DESTINATION in turn.
+	// Escape or a right-click ends it. Its doors are Edit > Match properties, the Tables row menu,
+	// and a right-click on an asset in Select mode.
+	//
+	// **THE PROPERTY LIST IS THE TABLES PANE'S OWN COLUMN SPEC, NOT A LIST OF OURS** -- the same
+	// reuse the multi-properties box makes (see multiGroups()). Each column already knows its
+	// getter, its unit and a setter that goes through setProp(), so a property added to a table is
+	// matched with no edit here, and **EVERY WRITE IS A COLUMN SETTER, i.e. THE ONE SEAM**: inside
+	// a scenario a match records overrides and leaves Base alone.
+	//
+	// **WHAT IS NEVER COPIED** is identity and placement: ID, both coordinates, the two end nodes,
+	// the vertices, the pipe's length (it follows the geometry), Description and Tag. Custom
+	// properties are left alone as well: they are the user's own register, closer to identity than
+	// to the hydraulics. Customers are not properties of a node and do not move.
+	// **TWO ASSETS OF DIFFERENT TYPES** share only the columns that carry the same key, the same
+	// heading and the same unit (an elevation, a diameter, an Active box), and a valve's setting
+	// and curve are copied only between valves of the same valve type, because a pressure, a flow
+	// and a loss coefficient are not the same quantity.
+	var matchSource = null;      // {kind:'node'|'link', id} while the tool runs
+	var matchOffered = false;    // the "apply to the selection" question is asked once per source
+	var matchSelection = [];     // the selection when the tool started
+	var MATCH_NEVER = { id: true, axis1: true, axis2: true, desc: true, tag: true, from: true, to: true, verts: true, length: true };
+	function matchElOf(ref) { return !ref ? null : (ref.kind === 'node' ? nodeById(ref.id) : (ref.kind === 'link' ? linkById(ref.id) : null)); }
+	function matchSpecOf(el) {
+		var ty = el && el.type, found = null;
+		paneTables().forEach(function (spec) { if (spec.type === ty && (spec.group === 'node' || spec.group === 'link')) { found = spec; } });
+		return found;
+	}
+	function matchColUnit(c) { return c.unit ? String(c.unit()) : (c.unitText ? String(c.unitText()) : ''); }
+	function matchColLabel(c) { return typeof c.label === 'function' ? String(c.label()) : String(c.label); }
+	// The columns of dst's table that src's table also has, in dst's order, as {c, sc} pairs.
+	function matchPairs(src, dst) {
+		var ss = matchSpecOf(src), ds = matchSpecOf(dst), out = [];
+		if (!ss || !ds || ss.group !== ds.group) { return out; }
+		ds.cols.forEach(function (c) {
+			var sc = null;
+			if (MATCH_NEVER[c.key] || c.result || !c.set || c.noMulti || c.cp) { return; }
+			ss.cols.forEach(function (x) { if (x.key === c.key && !x.result && x.set && !x.cp) { sc = x; } });
+			if (!sc) { return; }
+			if (ss !== ds && (matchColUnit(sc) !== matchColUnit(c) || matchColLabel(sc) !== matchColLabel(c))) { return; }
+			// A valve's setting and curve mean something only for the same valve type.
+			if ((c.key === 'setting' || c.key === 'curveId') && src.type === 'valve' && dst.type === 'valve' &&
+				(src.valveType || 'TCV').toUpperCase() !== (dst.valveType || 'TCV').toUpperCase()) { return; }
+			out.push({ c: c, sc: sc });
+		});
+		return out;
+	}
+	// Writes the source's matchable values onto dst; returns how many were written. No snapshot and
+	// no redraw: the caller owns both, once for the whole act.
+	function matchWrite(src, dst) {
+		var pairs = matchPairs(src, dst), done = {}, n = 0, pass;
+		// Two passes: a pipe type or fittings list written in the first pass can make a column
+		// writable that the first pass met read-only.
+		for (pass = 0; pass < 2; pass++) {
+			pairs.forEach(function (p) {
+				var v;
+				if (done[p.c.key]) { return; }
+				if (p.sc.plainFor && p.sc.plainFor(src)) { done[p.c.key] = true; return; }   // not the source's own value
+				if (paneCellIsPlain(p.c, dst)) { return; }
+				v = p.sc.get(src);
+				if (!panePresent(v) && !p.c.bool) { if (!paneWriteCellText(null, p.c, dst, '')) { return; } }
+				else { p.c.set(dst, v); }
+				done[p.c.key] = true;
+				n++;
+			});
+		}
+		return n;
+	}
+	// Apply the source to a list of {kind,id}: one undo step, one solve.
+	function matchApply(srcRef, targets) {
+		var pc = EngCalcs.pageConfig || {}, src = matchElOf(srcRef), els, n = 0, said;
+		if (!src) { return; }
+		els = targets.map(matchElOf).filter(function (el) { return el && el !== src; });
+		if (!els.length) { return; }
+		if (!els.some(function (el) { return matchPairs(src, el).length; })) {
+			setNotice(String(pc.lpn_match_none || '{to} and {id} have no properties in common to copy.')
+				.replace('{to}', els.length === 1 ? els[0].id : String(els.length)).replace('{id}', src.id));
+			return;
+		}
+		saveUndoSnapshot();
+		els.forEach(function (el) { n += matchWrite(src, el); });
+		els.forEach(function (el) { afterPropertyEdit(el); });
+		said = els.length === 1
+			? String(pc.lpn_match_done_one || 'Matched {to} to {id}: {n} properties copied.').replace('{to}', els[0].id)
+			: String(pc.lpn_match_done_many || 'Matched {m} assets to {id}: {n} properties copied.').replace('{m}', String(els.length));
+		setNotice(said.replace('{id}', src.id).replace('{n}', String(n)));
+		refreshPaneIfOpen();
+		refreshSelection();
+	}
+	// The door shared by the Edit menu, the Tables menu and the right-click. `src` null means "the one
+	// selected asset, or ask"; `sel` is the selection to offer once a source exists.
+	function startMatchProperties(src, sel) {
+		var one = (sel || []).filter(function (s) { return s.kind === 'node' || s.kind === 'link'; });
+		if (!src && one.length === 1 && (sel || []).length === 1) { src = one[0]; }
+		setMode('match');
+		matchSelection = (sel || []).slice();
+		matchOffered = false;
+		matchSource = src ? { kind: src.kind, id: src.id } : null;
+		updateModeHint();
+		if (matchSource) { matchOfferSelection(); }
+	}
+	function matchOfferSelection() {
+		var pc = EngCalcs.pageConfig || {}, src = matchSource, others;
+		if (matchOffered || !src) { return; }
+		matchOffered = true;
+		others = matchSelection.filter(function (s) {
+			return (s.kind === 'node' || s.kind === 'link') && !(s.kind === src.kind && s.id === src.id);
+		});
+		if (!others.length) { return; }
+		askDialog({ kind: 'confirm',
+			text: String(pc.lpn_match_selected_ask || 'Apply the properties of {id} to the {n} other selected assets?')
+				.replace('{id}', src.id).replace('{n}', String(others.length)),
+			ok: pc.lpn_split_yes || 'Yes', cancel: pc.lpn_split_no || 'No' }, function (yes) {
+			if (!yes) { return; }
+			matchApply(src, others);
+			setMode('select');
+		});
+	}
+	function matchPickAt(x, y, e) {
+		var t = hoverTargetFromHit(mapHitAt(x, y)), near;
+		if (t) { return t; }
+		near = nearestNodeNearScreen(x, y, reachPx(e));
+		if (near) { return { kind: 'node', id: near.id }; }
+		near = nearestLinkNearScreen(x, y, reachPx(e));
+		return near ? { kind: 'link', id: near.link.id } : null;
+	}
+	function matchTap(e) {
+		var pc = EngCalcs.pageConfig || {}, t = matchPickAt(e.clientX, e.clientY, e);
+		if (!t) { return; }
+		if (t.kind !== 'node' && t.kind !== 'link') { setNotice(pc.lpn_match_kind || 'Match properties applies to nodes and pipes, pumps, and valves only.'); return; }
+		if (!matchSource) { matchSource = { kind: t.kind, id: t.id }; updateModeHint(); matchOfferSelection(); return; }
+		if (t.kind === matchSource.kind && t.id === matchSource.id) { return; }
+		matchApply(matchSource, [t]);
+	}
+	// **RIGHT-CLICK ON AN ASSET IN SELECT MODE OFFERS THE TOOL.** Captured on the document, ahead of the
+	// map's own press handlers, so the press neither selects nor opens a property sheet: the menu is
+	// the whole answer. The selection is recorded at the press, so a multi-selection the right-click
+	// is made on can be offered the match. A right-click inside the tool ends it.
+	var matchCtxSel = [], matchCtxHit = null;
+	function matchOnCanvas(e) { return !!(e.target && e.target.closest && e.target.closest('#lpn_canvas')); }
+	document.addEventListener('pointerdown', function (e) {
+		if (e.button !== 2 || !matchOnCanvas(e) || (mode !== 'select' && mode !== 'match')) { return; }
+		matchCtxSel = selectedRefs();
+		matchCtxHit = mode === 'select' ? matchPickAt(e.clientX, e.clientY, e) : null;
+		e.stopPropagation();
+	}, true);
+	document.addEventListener('pointerup', function (e) {
+		if (e.button !== 2 || !matchOnCanvas(e) || (mode !== 'select' && mode !== 'match')) { return; }
+		e.stopPropagation();
+	}, true);
+	document.addEventListener('contextmenu', function (e) {
+		var pc = EngCalcs.pageConfig || {}, hit, menu, b;
+		if (!matchOnCanvas(e)) { return; }
+		if (mode === 'match') { e.preventDefault(); setMode('select'); return; }
+		if (mode !== 'select') { return; }
+		hit = matchCtxHit; matchCtxHit = null;
+		if (!hit || (hit.kind !== 'node' && hit.kind !== 'link')) { return; }
+		e.preventDefault();
+		paneCloseContextMenu();
+		menu = document.createElement('div');
+		menu.className = 'lpn-pane-ctxmenu';
+		menu.setAttribute('role', 'menu');
+		menu.style.left = e.clientX + 'px';
+		menu.style.top = e.clientY + 'px';
+		menu.addEventListener('keydown', paneCtxMenuKey);
+		b = document.createElement('button');
+		b.type = 'button';
+		b.setAttribute('role', 'menuitem');
+		b.textContent = pc.lpn_match_menu || 'Match properties';
+		b.addEventListener('click', function () { paneCloseContextMenu(); startMatchProperties(hit, matchCtxSel); });
+		menu.appendChild(b);
+		document.body.appendChild(menu);
+		paneCtxMenuEl = menu;
+		paneClampMenu(menu, e.clientX, e.clientY);
+		b.focus();
 	});
 
 	// ---- ROADMAP Task 277: a move is undoable ----
