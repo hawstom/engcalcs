@@ -148,6 +148,54 @@ async function main() {
 		}
 		ok('Depth moves across the run for at least one tank', Object.keys(depthAt).some((id) => Math.max(...depthAt[id]) - Math.min(...depthAt[id]) > 0.5),
 			JSON.stringify(depthAt));
+		// ---- Recalculate OFF is a snapshot (Perry, 2026-10-10) -----------------------------------
+		console.log('\n1b. RECALCULATE OFF: EDITING A STALE TANK CHANGES NONE OF HEAD, DEPTH, USABLE VOLUME');
+		await goTo(a, 2 * 3600);
+		const edit = (rowIdx, prefix, value) => a.page.evaluate(([ri, pre, v]) => {
+			const tb = document.querySelector('#lpn_pane_tanks table');
+			const heads = Array.from(tb.querySelectorAll('th')).map((h) => h.textContent.replace(/\u00ad/g, ''));
+			const idx = heads.findIndex((h) => h.indexOf(pre) === 0);
+			const inp = tb.querySelectorAll('tbody tr')[ri].children[idx].querySelector('input');
+			inp.focus(); inp.value = String(v);
+			inp.dispatchEvent(new Event('input', { bubbles: true }));
+			inp.dispatchEvent(new Event('change', { bubbles: true }));
+			inp.blur();
+		}, [rowIdx, prefix, value]);
+		const snap = async () => {
+			const r = (await table(a))[0];
+			return { head: parseFloat(col(r, headName)), dep: parseFloat(col(r, depthName)), vol: parseFloat(col(r, volName)),
+				elev: parseFloat(col(r, 'Elevation')), min: parseFloat(col(r, 'Lowest')) };
+		};
+		const before = await snap();
+		// Turn Recalculate automatically OFF through the Settings box, the way a reader does.
+		await a.toolbarClick(await a.lang('lpn_tool_settings'));
+		await a.page.waitForSelector('#lpn_settings_box', { state: 'visible' });
+		await a.settle(500);
+		const autoLabel = await a.lang('lpn_settings_auto_run');
+		await a.page.evaluate((label) => {
+			const rows = Array.from(document.querySelectorAll('#lpn_settings_box label'));
+			const row = rows.filter((r) => (r.textContent || '').trim().indexOf(label) === 0)[0];
+			const cb = row.querySelector('input[type=checkbox]');
+			if (cb.checked) { cb.click(); }
+		}, autoLabel);
+		await a.settle(400);
+		await a.page.evaluate(() => { const b = document.getElementById('lpn_setbox_close'); if (b) { b.click(); } });
+		await a.settle(400);
+		await edit(0, 'Elevation', before.elev + 10);
+		await a.settle(600);
+		let after = await snap();
+		ok('the Elevation edit took (' + before.elev + ' -> ' + after.elev + ')', near(after.elev, before.elev + 10, 0.01));
+		ok('Head stays stale (' + before.head + ' -> ' + after.head + ')', near(after.head, before.head, 0.01));
+		ok('Depth stays with the stale Head (' + before.dep + ' -> ' + after.dep + ')', near(after.dep, before.dep, 0.01));
+		ok('Usable volume stays (' + before.vol + ' -> ' + after.vol + ')', near(after.vol, before.vol, Math.max(1, before.vol * 1e-4)));
+		await edit(0, 'Lowest', before.min + 3);
+		await a.settle(600);
+		after = await snap();
+		ok('the Lowest water depth edit took (' + after.min + ')', near(after.min, before.min + 3, 0.01));
+		ok('Usable volume still does not move with Head stale (' + before.vol + ' -> ' + after.vol + ')',
+			near(after.vol, before.vol, Math.max(1, before.vol * 1e-4)));
+		ok('and Depth still holds', near(after.dep, before.dep, 0.01));
+
 		// The column headings carry the units: depth in the Elevation/Head unit, volume in the length unit cubed.
 		const heads = Object.keys((await table(a))[0]);
 		const dh = heads.filter((h) => h.indexOf(depthName) === 0)[0], vh = heads.filter((h) => h.indexOf(volName) === 0)[0];

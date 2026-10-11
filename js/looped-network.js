@@ -8465,35 +8465,50 @@ var EngCalcs = EngCalcs || {};
 	// zero is the vessel floor). Inside a run the head is the frame's (what the engine integrated);
 	// at one instant it is the stored water depth, exactly as the Head column reads. SI metres.
 	function tankDepthSI(n) {
-		var hf = toSI(1, 'lpn_u_elevhead'), elevSI;
+		var hf = toSI(1, 'lpn_u_elevhead'), g;
 		if (!n || n.type !== 'tank' || !(hf > 0) || !isFinite(hf)) { return undefined; }
 		if (lastSolveResult && typeof lastSolveResult.t === 'number' && lastSolveResult.heads &&
 			typeof lastSolveResult.heads[n.id] === 'number') {
-			elevSI = toSI(n.elev || 0, 'lpn_u_elevhead');
-			return lastSolveResult.heads[n.id] - elevSI;
+			// **THE BOTTOM IS THE ONE THE RUN WAS SOLVED WITH** (Recalculate OFF is a snapshot): the
+			// head above is stale after an edit, so the elevation it is measured from must be too.
+			g = tankGeomOf(n, true);
+			return lastSolveResult.heads[n.id] - g.elevSI;
 		}
 		return toSI(effective(n, 'level') || 0, 'lpn_u_elevhead');
 	}
+	// **A TANK'S SHAPE AS THE RESULT ON SCREEN WAS SOLVED** (SI): bottom, lowest water depth,
+	// diameter and the usable volume curve. Captured when a result is installed (tankSnap), read
+	// here only for a run's frames, whose head is itself a snapshot. At one instant the head is
+	// derived from the typed numbers and moves with them, so the live numbers are right there.
+	var tankSnap = null;
+	function tankGeomLive(n) {
+		var hf = toSI(1, 'lpn_u_elevhead'), vf = hf * hf * hf, curve = n.volCurve ? curveById(n.volCurve) : null,
+			pts = curve ? curvePointsOf(curve) : [];
+		if (!(pts.length && EngCalcs.lpnTankVolumeCurveUsable && EngCalcs.lpnTankVolumeCurveUsable(pts))) { pts = null; }
+		else { pts = pts.map(function (pt) { return [pt[0] * hf, pt[1] * vf]; }); }
+		return { elevSI: toSI(n.elev || 0, 'lpn_u_elevhead'), minSI: toSI(n.minLevel || 0, 'lpn_u_elevhead'),
+			D: toSI(n.tankDiameter, 'lpn_u_length'), curve: pts };
+	}
+	function captureTankSnapshot() {
+		var snap = {};
+		doc.nodes.forEach(function (n) { if (n.type === 'tank') { snap[n.id] = tankGeomLive(n); } });
+		tankSnap = snap;
+	}
+	function tankGeomOf(n, fromSnapshot) {
+		return (fromSnapshot && tankSnap && tankSnap[n.id]) || tankGeomLive(n);
+	}
 	// **ZERO AT THE LOWEST WATER DEPTH** (Tom, 2026-10-10): the water a draw-down can actually use.
-	// EPANET's own tank volume also counts the water below the minimum level, so this is NOT that
-	// number. A volume curve wins when the tank states a usable one (EPANET's rule: curve volumes
-	// replace the cylinder), read in the Elevation/Head unit and that unit cubed, as the engine
-	// attachment does; otherwise a cylinder of the tank diameter. SI cubic metres.
+	// EPANET's own tank volume also counts the water below the lowest water depth, so this is NOT
+	// that number. A usable volume curve wins (EPANET's rule: curve volumes replace the cylinder),
+	// otherwise a cylinder of the tank diameter. SI cubic metres.
 	function tankUsableVolumeSI(n) {
-		var dep = tankDepthSI(n), hf = toSI(1, 'lpn_u_elevhead'), vf, minSI, curve, pts, D, top;
+		var dep = tankDepthSI(n), g, top;
 		if (dep === undefined) { return undefined; }
-		minSI = toSI(n.minLevel || 0, 'lpn_u_elevhead');
-		top = Math.max(dep, minSI);
-		curve = n.volCurve ? curveById(n.volCurve) : null;
-		pts = curve ? curvePointsOf(curve) : [];
-		if (pts.length && EngCalcs.lpnTankVolumeCurveUsable && EngCalcs.lpnTankVolumeCurveUsable(pts)) {
-			vf = hf * hf * hf;
-			pts = pts.map(function (pt) { return [pt[0] * hf, pt[1] * vf]; });
-			return tankCurveVolume(pts, top) - tankCurveVolume(pts, minSI);
-		}
-		D = toSI(n.tankDiameter, 'lpn_u_length');
-		if (!(D > 0) || !isFinite(D)) { return undefined; }
-		return Math.PI / 4 * D * D * (top - minSI);
+		g = tankGeomOf(n, !!(lastSolveResult && typeof lastSolveResult.t === 'number'));
+		top = Math.max(dep, g.minSI);
+		if (g.curve) { return tankCurveVolume(g.curve, top) - tankCurveVolume(g.curve, g.minSI); }
+		if (!(g.D > 0) || !isFinite(g.D)) { return undefined; }
+		return Math.PI / 4 * g.D * g.D * (top - g.minSI);
 	}
 	// Linear between the curve's points, held flat beyond its ends. pts are SI and increasing in x.
 	function tankCurveVolume(pts, x) {
@@ -34644,7 +34659,7 @@ var EngCalcs = EngCalcs || {};
 		switchKeepOrder = switchKeepOrder.filter(function (x) { return x !== id; });
 		switchKeepOrder.push(id);
 		var layout = captureLabelLayout();
-		switchKeep[id] = { sig: storedSignature(id), solve: lastSolveResult,
+		switchKeep[id] = { sig: storedSignature(id), solve: lastSolveResult, tank: tankSnap,
 			time: EngCalcs.lpnTimeKeep ? EngCalcs.lpnTimeKeep() : null,
 			layout: layout,
 			// **AND THE NODE CONTEXT THE PASS RANKED AND SIDED BY** (Task 758). Built only by a
@@ -36002,6 +36017,7 @@ var EngCalcs = EngCalcs || {};
 		// label would be drawn empty and drawn again when the values arrived.
 		var kept = keptStateForOpenProject();
 		lastSolveResult = (kept && kept.solve) || null;
+		tankSnap = (kept && kept.tank) || null;
 		// The context the kept layout was ranked and sided by, for the same reason (Task 758): a
 		// restored arrival runs no content pass, which is the only builder of it.
 		if (kept && kept.context) { nodeContext = kept.context; nodeFieldMid = kept.fieldMid || {}; }
@@ -68821,6 +68837,7 @@ var EngCalcs = EngCalcs || {};
 		// EPANET it is reachable through a control -- `Unbalanced: Stop` and a trials limit are
 		// both Settings rows, and neither makes the engine refuse: it hands back the last iterate.
 		var notConverged = result.converged === false;
+		captureTankSnapshot();
 		lastSolveResult = result;
 		refreshMapStatus();
 		// The only case where the two engines knowingly disagree, so say so rather than let a
