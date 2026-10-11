@@ -63919,6 +63919,11 @@ var EngCalcs = EngCalcs || {};
 			// else: energy is power integrated over time, so only a RUN can produce one, exactly as
 			// with water quality. Not cloned and not converted -- docEnergy() says why.
 			energy: docEnergy(),
+			// **THE UNITS EPANET'S RUN REPORT IS WRITTEN IN** (Tom, 2026-10-11). Names only: every
+			// number on this model stays SI, and EngCalcs.lpnReportUnits says what the engine does
+			// with these and how its answers come back unchanged.
+			reportUnits: { flow: unitKey('lpn_u_flow'), length: unitKey('lpn_u_length'),
+				diameter: unitKey('lpn_u_diameter') },
 			rules: modelRules(),
 			// **AND WHAT WAS LEFT OUT OF THAT LIST, BY NAME.** Read one property after `rules` on
 			// purpose: modelRules() fills it, and a literal's properties are evaluated in order.

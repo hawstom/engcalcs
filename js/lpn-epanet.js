@@ -105,6 +105,90 @@
 		EN_OPT_FLOWCHANGE = 6;
 
 	/**
+	 * **THE RUN REPORT IS IN THE PROJECT'S UNITS; THE NUMBERS HANDED BACK ARE NOT CHANGED BY IT**
+	 * (Tom, 2026-10-11: a US project's report said L/s, and "closed at 7.01 m" left him asking
+	 * whether m was minutes or metres. It is metres: the tank's water depth above its bottom).
+	 *
+	 * The input this file writes stays LPS and metres. After the engine has read it, a project
+	 * whose flow unit EPANET can name switches the engine's REPORTING units with setFlowUnits(),
+	 * so the report EPANET writes reads gpm, ft and psi (or m3/h and m). EPANET holds every value
+	 * in its own internal feet and cfs either way, so the solve is the same one; only the unit the
+	 * getters answer in moves, and lpnEpanetRun multiplies each read back into L/s and metres with
+	 * the factors below. Rules and curves are converted by the switch itself; a pipe's wall
+	 * reaction coefficient is not, and reportWallKept() does it (dev/lpn-spike/run-report-units-harness.js).
+	 *
+	 * **THE FACTORS ARE EPANET'S OWN ROUNDED CONSTANTS (src/types.h), NOT THE EXACT ONES**, each
+	 * found in the vendored wasm: the engine converts with 28.317 L/s per cfs, not 28.3168, and
+	 * converting back with the exact one would move every flow by 7 ppm. `code` is EN_FlowUnits.
+	 * A flow unit EPANET cannot name (m3ps, lph, gph) takes the keyword of the same system, as the
+	 * .inp exporter does.
+	 *
+	 * **PRESSURE IS NOT SWITCHED, AND THAT IS MEASURED, NOT ASSUMED.** setFlowUnits() leaves the
+	 * pressure unit the file stated (metres, under `Units LPS`), so EN_PRESSURE still answers
+	 * metres and is read back as it always was; this build has no option to change it. The status
+	 * report a visitor reads prints no pressures, so nothing on it is in metres for that reason.
+	 * The harness fails if a future engine starts switching it.
+	 */
+	var REPORT_FLOW = {
+		ft3ps: { code: 0, perCfs: 1, us: true },
+		gpm: { code: 1, perCfs: 448.831, us: true },
+		mgd: { code: 2, perCfs: 0.64632, us: true },
+		imgd: { code: 3, perCfs: 0.5382, us: true },
+		afd: { code: 4, perCfs: 1.9837, us: true },
+		lps: { code: 5, perCfs: 28.317 },
+		lpm: { code: 6, perCfs: 1699.0 },
+		mld: { code: 7, perCfs: 2.4466 },
+		cmh: { code: 8, perCfs: 101.94 },
+		cmd: { code: 9, perCfs: 2446.6 }
+	};
+	var EPANET_M_PER_FT = 0.3048, EPANET_LPS_PER_CFS = 28.317;
+
+	/**
+	 * **THE ONE COEFFICIENT setFlowUnits() FORGETS: A PIPE'S WALL REACTION RATE.** EPANET keeps
+	 * every other input in its internal feet, or converts it in setFlowUnits() itself (curves,
+	 * rules), but a wall coefficient stays in the FILE's length unit and is divided by the CURRENT
+	 * one at every quality step (src/qualreact.c). Switched from metres to feet without this, a
+	 * first-order 0.3 m/day would act as 0.3 ft/day -- a chlorine answer wrong by 3.28 with every
+	 * hydraulic number still right, which is how Net1's harness caught it. So each pipe's own
+	 * coefficient is restated in feet: divided by 0.3048 for a first-order wall reaction (length
+	 * per day), multiplied by 0.3048 squared for a zero-order one (mass per area per day). The
+	 * order is the engine's own, asked for rather than read off the model. Answers false when it
+	 * cannot be done, and the caller then switches back to L/s rather than run a wrong reaction.
+	 */
+	var EN_KWALL = 7, EN_OPT_WALLORDER = 20;
+	function reportWallKept(p, model, ru) {
+		var i, idx, kw, scale;
+		if (ru.head === 1) { return true; }
+		try {
+			scale = p.getOption(EN_OPT_WALLORDER) === 0 ? ru.head * ru.head : 1 / ru.head;
+			for (i = 0; i < model.links.length; i++) {
+				if (model.links[i].type !== 'pipe') { continue; }
+				idx = p.getLinkIndex(model.links[i].id);
+				kw = p.getLinkValue(idx, EN_KWALL);
+				if (kw) { p.setLinkValue(idx, EN_KWALL, kw * scale); }
+			}
+		} catch (e) { return false; }
+		return true;
+	}
+
+	/**
+	 * `units` is the project's {flow, length, diameter} unit names (assembleModel's reportUnits).
+	 * Answers null when the report stays in LPS and metres -- no switch, no factor -- or
+	 * { code, flow, head }: the EN_FlowUnits code to switch to, and what multiplies a getter's
+	 * answer back into L/s and into metres (of head, of head loss, and per second of velocity).
+	 */
+	EngCalcs.lpnReportUnits = function (units) {
+		var u = units || {}, f = REPORT_FLOW[u.flow];
+		if (!f) { f = (u.length === 'ft' || u.diameter === 'in') ? REPORT_FLOW.gpm : null; }
+		if (!f || f === REPORT_FLOW.lps) { return null; }
+		return {
+			code: f.code,
+			flow: EPANET_LPS_PER_CFS / f.perCfs,
+			head: f.us ? EPANET_M_PER_FT : 1
+		};
+	};
+
+	/**
 	 * **DID THIS HYDRAULIC STEP ACTUALLY CONVERGE?** ROADMAP Task 565.
 	 *
 	 * Until this existed, both success sites in this file returned `converged: true` HARDCODED and
@@ -1806,6 +1890,10 @@
 			return Promise.resolve({ ok: false, engine: 'epanet', issues: issues, frames: [], report: '' });
 		}
 		var built = EngCalcs.lpnToInp(model, { eps: true });
+		// Factors back from the report's units to L/s and metres; null means none are needed.
+		var ru = EngCalcs.lpnReportUnits(model.reportUnits),
+			ruFlow = function (v) { return ru ? v * ru.flow : v; },
+			ruHead = function (v) { return ru ? v * ru.head : v; };
 		var times = (model.time && model.time.times) || EngCalcs.lpnTimesDefaults(),
 			reportStart = times.reportStart || 0,
 			reportStep = times.reportStep > 0 ? times.reportStep : 3600,
@@ -1868,7 +1956,7 @@
 					 * somebody else's opinion rather than a second one of ours.
 					 */
 					rateOn = qualOn && (model.quality || {}).mode === 'chemical',
-					// The bytes of `eps.out`, read in shutdown() beside the report and for the same
+					// The bytes of `temp.out`, read in shutdown() beside the report and for the same
 					// reason: closing is what flushes the last period to the engine's filesystem.
 					outBytes = null,
 					// The two passes share one progress bar, so each owns half of it. Both are the
@@ -1894,12 +1982,12 @@
 					try { p.closeQ(); } catch (e) { /* no quality pass, or already shut */ }
 					try { p.closeH(); } catch (e) { /* never opened, or already shut */ }
 					try { p.close(); } catch (e) { /* already torn down */ }
-					try { txt = ws.readFile('eps.rpt') || ''; } catch (e) { txt = ''; }
+					try { txt = ws.readFile('temp.rpt') || ''; } catch (e) { txt = ''; }
 					// The same flush, the same moment, the other file. Wrapped on its own rather
 					// than sharing the report's catch: a build whose filesystem cannot hand back
 					// the binary must still hand back the report.
 					if (rateOn) {
-						try { outBytes = ws.readFile('eps.out', 'binary') || null; } catch (e) { outBytes = null; }
+						try { outBytes = ws.readFile('temp.out', 'binary') || null; } catch (e) { outBytes = null; }
 					}
 					return txt;
 				}
@@ -1928,9 +2016,24 @@
 					return now >= reportStart && ((now - reportStart) % reportStep) === 0 && now <= duration;
 				}
 
-				ws.writeFile('eps.inp', built.inp);
+				// **`temp`, BECAUSE THE REPORT NAMES ITS INPUT FILE** (Tom, 2026-10-11): EPANET prints
+				// "Input Data File ... temp.inp" at the head of the run report a visitor reads, and
+				// `eps.inp` raised a question `temp.inp` does not. Not the single-instant session's
+				// `net.*`: that Project stays open in the same Workspace between solves, holding its
+				// report file, and a run beside it must not write into the same one.
+				ws.writeFile('temp.inp', built.inp);
 				try {
-					p.open('eps.inp', 'eps.rpt', 'eps.out');
+					p.open('temp.inp', 'temp.rpt', 'temp.out');
+					// **THE REPORT IN THE PROJECT'S UNITS** -- see EngCalcs.lpnReportUnits. Switched
+					// before the clock starts, so every line EPANET writes is in them. A build that
+					// refuses the switch keeps L/s and metres, and `ru` says so to every read below.
+					if (ru) {
+						try { p.setFlowUnits(ru.code); } catch (e) { ru = null; }
+						if (ru && !reportWallKept(p, model, ru)) {
+							p.setFlowUnits(REPORT_FLOW.lps.code);
+							ru = null;
+						}
+					}
 					// The engine writes its own report only when it is asked to. Level 1 is the
 					// status report -- what balanced in how many trials, which control fired, which
 					// tank filled -- which is the half of EPANET's report that says what HAPPENED.
@@ -1991,7 +2094,7 @@
 					}
 					/**
 					 * **THE REACTION RATE OFF EPANET'S BINARY OUTPUT, ONTO THE FRAMES THAT ALREADY
-					 * EXIST** (Task 652). Called once, after shutdown() has flushed `eps.out`.
+					 * EXIST** (Task 652). Called once, after shutdown() has flushed `temp.out`.
 					 *
 					 * **PERIOD i IS FRAME i, AND THAT IS ASSERTED RATHER THAN ASSUMED.** EPANET
 					 * writes one period per reporting instant from `Rstart` on, and isReportTime()
@@ -2156,7 +2259,7 @@
 							// the precondition, not tidying up.
 							p.closeH();
 							p.openQ();
-							// EN_SAVE here is what writes `eps.out` at all -- see the rateOn note
+							// EN_SAVE here is what writes `temp.out` at all -- see the rateOn note
 							// above. It is the entire cost of the reaction rate, and it buys
 							// EPANET'S OWN number in place of one of ours.
 							p.initQ(rateOn ? EN_SAVE : EN_NOSAVE);
@@ -2192,14 +2295,14 @@
 									};
 									for (i = 0; i < model.nodes.length; i++) {
 										n = model.nodes[i];
-										f.heads[n.id] = p.getNodeValue(nodeIdx[n.id], EN_HEAD);
+										f.heads[n.id] = ruHead(p.getNodeValue(nodeIdx[n.id], EN_HEAD));
 										f.pressures[n.id] = p.getNodeValue(nodeIdx[n.id], EN_PRESSURE);
 										// L/s -> m3/s, the same scale a [JUNCTIONS] demand is written in.
-										f.demands[n.id] = p.getNodeValue(nodeIdx[n.id], EN_DEMAND) / 1000;
+										f.demands[n.id] = ruFlow(p.getNodeValue(nodeIdx[n.id], EN_DEMAND)) / 1000;
 										// Under PDA only (Task 762): what the junction asked for and did not get.
 										if (EngCalcs.lpnDemandModelIsPda(model) && n.type !== 'reservoir' && n.type !== 'tank') {
 											(f.demandDeficits || (f.demandDeficits = {}))[n.id] =
-												Math.max(0, p.getNodeValue(nodeIdx[n.id], EN_DEMANDDEFICIT)) / 1000;
+												Math.max(0, ruFlow(p.getNodeValue(nodeIdx[n.id], EN_DEMANDDEFICIT))) / 1000;
 										}
 										// **THE TANK LEVEL IS A RESULT, NOT AN INPUT** -- the point of the run.
 										// It is metres above the tank's own bottom under LPS, the same quantity
@@ -2216,9 +2319,9 @@
 									}
 									for (i = 0; i < model.links.length; i++) {
 										l = model.links[i];
-										f.flows[l.id] = p.getLinkValue(linkIdx[l.id], EN_FLOW) / 1000;
-										f.velocities[l.id] = p.getLinkValue(linkIdx[l.id], EN_VELOCITY);
-										f.headlosses[l.id] = p.getLinkValue(linkIdx[l.id], EN_HEADLOSS);
+										f.flows[l.id] = ruFlow(p.getLinkValue(linkIdx[l.id], EN_FLOW)) / 1000;
+										f.velocities[l.id] = ruHead(p.getLinkValue(linkIdx[l.id], EN_VELOCITY));
+										f.headlosses[l.id] = ruHead(p.getLinkValue(linkIdx[l.id], EN_HEADLOSS));
 										f.statuses[l.id] = p.getLinkValue(linkIdx[l.id], EN_STATUS) > 0 ? 'open' : 'closed';
 									}
 									frames.push(f);
