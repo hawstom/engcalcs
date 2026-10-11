@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**101 still to read on master**, of 112 untranslated keys, of 2556 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**115 still to read on master**, of 126 untranslated keys, of 2570 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -175,7 +175,7 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   @@ NEEDS RULING
 
-## lpn_  (111, 100 to read @@ NEEDS RULING)
+## lpn_  (125, 114 to read @@ NEEDS RULING)
 
 - **`lpn_demand_pattern_constant`**
   > (constant)
@@ -420,6 +420,48 @@ never edits a synonym.
 - **`lpn_link_end_unknown`**
   > No node has the ID {id}.
   @@ NEEDS RULING
+- **`lpn_match_done_many`**
+  > Matched {m} assets to {id}, except status and location. Values changed: {n}.
+  @@ NEEDS RULING
+- **`lpn_match_done_one`**
+  > Matched {to} to {id}, except status and location. Values changed: {n}.
+  @@ NEEDS RULING
+- **`lpn_match_kind`**
+  > Match properties applies to nodes and pipes, pumps, and valves only.
+  @@ NEEDS RULING
+- **`lpn_match_menu`**
+  > Match properties
+  @@ NEEDS RULING
+- **`lpn_match_menu_off_tip`**
+  > Select target objects to match this object's properties except activation status.
+  @@ NEEDS RULING
+- **`lpn_match_none`**
+  > {to} and {id} have no properties in common to copy.
+  @@ NEEDS RULING
+- **`lpn_match_select_first`**
+  > Select the targets first, then choose Match properties.
+  @@ NEEDS RULING
+- **`lpn_match_selected_ask`**
+  > Copy this object's properties except activation status to {n} selected objects?
+  @@ NEEDS RULING
+- **`lpn_match_selected_ask_one`**
+  > Copy this object's properties except activation status to 1 selected object?
+  @@ NEEDS RULING
+- **`lpn_match_skip_breakdown`**
+  > Not copied: {n} (demand is a list of categories).
+  @@ NEEDS RULING
+- **`lpn_match_skip_scn`**
+  > Not copied: {names}. A scenario cannot hold its own value for these; change them in Base.
+  @@ NEEDS RULING
+- **`lpn_match_skip_valve`**
+  > Not copied: {n} (the valve types differ).
+  @@ NEEDS RULING
+- **`lpn_match_tip`**
+  > Copy the properties of one asset to the assets selected. Select the targets first, choose Match properties, then select the source. Status (Active, Shut), identity, location, and connections are never copied. Assets of a different type receive only the properties both types have.
+  @@ NEEDS RULING
+- **`lpn_mode_match`**
+  > Mode: Match properties. Select the asset to copy properties from. Status, identity, and location are not copied. Press Escape to cancel.
+  @@ NEEDS RULING
 - **`lpn_msglog_hidden`**
   > Hidden
   _Ruled 2026-10-08: Calls page 8 October: Use as written_
@@ -521,7 +563,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**132 still to read**, of 135 new keys across 13 unmerged branch(es).
+**132 still to read**, of 135 new keys across 17 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -532,9 +574,11 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/handoff-1011b (`e28ef88a`) — adds no English strings
+### chore/roadmap-1011c (`4cda3c09`) — adds no English strings
 
-### feat/bentley-interop (`44a81de6`) — 100 new, 100 to read @@ NEEDS RULING
+### chore/selection-word (`b32ccf97`) — adds no English strings
+
+### feat/bentley-interop (`fa83b30c`) — 100 new, 100 to read @@ NEEDS RULING
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -861,43 +905,9 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`2e5e81c4`) — adds no English strings
 
-### feat/match-property (`2aeaaaf7`) — 11 new, 11 to read @@ NEEDS RULING
+### feat/match-property (`ea6934fb`) — adds no English strings
 
-- **`lpn_match_done_many`**
-  > Matched {m} assets to {id}, except status and location. Values changed: {n}.
-  @@ NEEDS RULING
-- **`lpn_match_done_one`**
-  > Matched {to} to {id}, except status and location. Values changed: {n}.
-  @@ NEEDS RULING
-- **`lpn_match_kind`**
-  > Match properties applies to nodes and pipes, pumps, and valves only.
-  @@ NEEDS RULING
-- **`lpn_match_menu`**
-  > Match properties
-  @@ NEEDS RULING
-- **`lpn_match_none`**
-  > {to} and {id} have no properties in common to copy.
-  @@ NEEDS RULING
-- **`lpn_match_select_first`**
-  > Select the targets first, then choose Match properties.
-  @@ NEEDS RULING
-- **`lpn_match_skip_breakdown`**
-  > Not copied: {n} (demand is a list of categories).
-  @@ NEEDS RULING
-- **`lpn_match_skip_scn`**
-  > Not copied: {names}. A scenario cannot hold its own value for these; change them in Base.
-  @@ NEEDS RULING
-- **`lpn_match_skip_valve`**
-  > Not copied: {n} (the valve types differ).
-  @@ NEEDS RULING
-- **`lpn_match_tip`**
-  > Copy the properties of one asset to the assets selected. Select the targets first, choose Match properties, then select the source. Status (Active, Shut), identity, location, and connections are never copied. Assets of a different type receive only the properties both types have.
-  @@ NEEDS RULING
-- **`lpn_mode_match`**
-  > Mode: Match properties. Select the asset to copy properties from. Status, identity, and location are not copied. Press Escape to cancel.
-  @@ NEEDS RULING
-
-### feat/shape (`2b5cf162`) — 21 new, 21 to read @@ NEEDS RULING
+### feat/shape (`f9b60726`) — 25 new, 25 to read @@ NEEDS RULING
 
 - **`lpn_file_import_shapes`**
   > Import GeoJSON shapes…
@@ -953,6 +963,18 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_mode_add_shape`**
   > Mode: Add Shape. Specify each point. Specify the last point again or press Enter to finish; specify the first point to close a polygon.
   @@ NEEDS RULING
+- **`lpn_pane_paste_shape_no_points`**
+  > Row {row}: a new Shape needs its Points.
+  @@ NEEDS RULING
+- **`lpn_pane_shape_closed`**
+  > Closed
+  @@ NEEDS RULING
+- **`lpn_pane_shape_points`**
+  > Points
+  @@ NEEDS RULING
+- **`lpn_pane_tab_shapes`**
+  > Shapes
+  @@ NEEDS RULING
 - **`lpn_snap_shape_point`**
   > {shape}, point {n}
   @@ NEEDS RULING
@@ -963,6 +985,35 @@ build for that would be a gate nobody keeps. Refresh it with
   > Draw a point, a polyline, or a polygon on the map. A Shape is annotation and is not part of the network. Specify each point, then specify the last point again, press Enter, or right-click to finish. Specify the first point again to close the Shape into a polygon.
   @@ NEEDS RULING
 
-### feat/visit-dedupe (`e22c4ec9`) — adds no English strings
+### feat/si-example (`19c43524`) — 4 new, 4 to read @@ NEEDS RULING
 
-### fix/scenario-delete (`556cf46a`) — adds no English strings
+- **`lpn_ex_net2_si_desc`**
+  > Litres per second, with metres and millimetres. EPANET’s Net2, converted from gallons per minute, feet and inches: a branched distribution system with a tank.
+  @@ NEEDS RULING
+- **`lpn_ex_net2_si_title`**
+  > EPANET Net2, L/s (SI)
+  @@ NEEDS RULING
+- **`lpn_ex_net3_si_desc`**
+  > Litres per second, with metres and millimetres. EPANET’s Net3, converted from gallons per minute, feet and inches: 92 junctions, three tanks, and two reservoirs, one of them a river.
+  @@ NEEDS RULING
+- **`lpn_ex_net3_si_title`**
+  > EPANET Net3, L/s (SI)
+  @@ NEEDS RULING
+
+### feat/tank-ground (`7be93ed2`) — 3 new, 3 to read @@ NEEDS RULING
+
+- **`lpn_field_tank_base_elev`**
+  > Base elevation
+  @@ NEEDS RULING
+- **`lpn_field_tank_base_elev_tip`**
+  > Elevation of the tank bottom, from which water depth and volume are measured. Left blank, the bottom is at the ground elevation.
+  @@ NEEDS RULING
+- **`lpn_tank_ground_elev_tip`**
+  > Ground elevation at the tank. Pressure at the tank is measured from here, as at a junction.
+  @@ NEEDS RULING
+
+### feat/visit-dedupe (`f8cf3ed5`) — adds no English strings
+
+### fix/dxf-layer-code (`d87ca580`) — adds no English strings
+
+### fix/run-report (`f908c408`) — adds no English strings

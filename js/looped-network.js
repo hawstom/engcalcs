@@ -48895,7 +48895,9 @@ var EngCalcs = EngCalcs || {};
 				}
 				v = p.sc.get(src);
 				if (matchSame(v, c.get(dst))) { done[c.key] = true; return; }
-				prop = paneColProp(c);
+				// A junction's demand pattern has no `prop` of its own but IS held per scenario: it is
+				// row 0 of the demand list, which a scenario overrides whole (measured 2026-10-11).
+				prop = paneColProp(c) || (c.key === 'demandPattern' ? 'demands' : undefined);
 				if (!inBaseScenario() && !(prop && isOverridable(dst, prop))) {
 					ctx.skip.scn++; done[c.key] = true;
 					if (ctx.scnNames.indexOf(matchColName(c)) < 0) { ctx.scnNames.push(matchColName(c)); }
@@ -48967,11 +48969,20 @@ var EngCalcs = EngCalcs || {};
 		return near ? { kind: 'link', id: near.link.id } : null;
 	}
 	function matchTap(e) {
-		var pc = EngCalcs.pageConfig || {}, t = matchPickAt(e.clientX, e.clientY, e);
+		var pc = EngCalcs.pageConfig || {}, t = matchPickAt(e.clientX, e.clientY, e), n;
 		if (!t) { return; }
 		if (t.kind !== 'node' && t.kind !== 'link') { setNotice(pc.lpn_match_kind || 'Match properties applies to nodes and pipes, pumps, and valves only.'); return; }
-		matchApply(t, matchTargetsList);
-		setMode('select');
+		// **THE CONFIRMATION COMES BEFORE ANYTHING IS WRITTEN; CANCEL WRITES NOTHING** (Tom, 2026-10-11:
+		// "You made it dangerous and confusing"). The tool ends either way.
+		n = matchTargetsList.filter(function (r) { return !(r.kind === t.kind && r.id === t.id) && matchElOf(r); }).length;
+		if (!n) { setMode('select'); return; }
+		askDialog({ kind: 'confirm', text: String(n === 1
+			? (pc.lpn_match_selected_ask_one || "Copy this object's properties except activation status to 1 selected object?")
+			: (pc.lpn_match_selected_ask || "Copy this object's properties except activation status to {n} selected objects?"))
+			.replace('{n}', String(n)) }, function (yes) {
+			if (yes) { matchApply(t, matchTargetsList); }
+			setMode('select');
+		});
 	}
 	// **THE MAP'S RIGHT-CLICK MENU, AS A ROW LIST** -- [{label, enabled, run}] -- so a later command
 	// (Task 784's Time series graph) is one more entry. A row that does not apply is greyed, never hidden.
@@ -48984,14 +48995,17 @@ var EngCalcs = EngCalcs || {};
 		menu.style.top = y + 'px';
 		menu.addEventListener('keydown', paneCtxMenuKey);
 		rows.forEach(function (r) {
-			var b = document.createElement('button');
+			var b = document.createElement('button'), off;
 			b.type = 'button';
 			b.setAttribute('role', 'menuitem');
 			b.textContent = r.label;
-			b.disabled = r.enabled === false;
-			b.addEventListener('click', function () { paneCloseContextMenu(); r.run(); });
+			// A greyed row is aria-disabled, not `disabled`: a disabled button receives no pointer
+			// events, so its tip (r.tip) could never show.
+			off = r.enabled === false;
+			if (off) { b.setAttribute('aria-disabled', 'true'); if (r.tip) { b.title = r.tip; } }
+			b.addEventListener('click', function () { if (off) { return; } paneCloseContextMenu(); r.run(); });
 			menu.appendChild(b);
-			if (!first && !b.disabled) { first = b; }
+			if (!first && !off) { first = b; }
 		});
 		document.body.appendChild(menu);
 		paneCtxMenuEl = menu;
@@ -49032,7 +49046,7 @@ var EngCalcs = EngCalcs || {};
 		if (!hit) { return; }
 		e.preventDefault();
 		openMapContextMenu(e.clientX, e.clientY, [
-			{ label: pc.lpn_match_menu || 'Match properties', enabled: matchTargets(matchCtxSel).length > 0, run: function () { startMatchProperties(matchCtxSel); } }
+			{ label: pc.lpn_match_menu || 'Match properties', enabled: matchTargets(matchCtxSel).length > 0, tip: pc.lpn_match_menu_off_tip || "Select target objects to match this object's properties except activation status.", run: function () { startMatchProperties(matchCtxSel); } }
 		]);
 	});
 
