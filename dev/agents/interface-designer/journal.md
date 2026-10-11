@@ -3812,3 +3812,14 @@ Recommendations in the report to Tom: (1) keep the triangle, add View > Zoom Win
 - SPECULATION: a reader of a scenario manager asks "what is different about this scenario?", so inheritance should be quiet and override loud (same principle as the amber held-field edge). Not tested on a reader.
 - SPECULATION: master-detail (tree left, recipe right) fits a 480-560 px dock better than the 12-column matrix; matrix is a better compare view. Not measured with a populated project (Net3 has only Base; no example carries scenarios beyond Base on load).
 - Recommendation given to orchestrator: one box, two views (Scenarios | Alternatives), docked, titled "Scenario manager"; always-present menu row; Basic shows no manager. See report.
+
+
+## 2026-10-11 (Ida) -- default demand pattern; scenario buttons vs right-click; tree paradigm
+
+- OBSERVED (master): Settings row js/looped-network.js:55043-55073 is a select; blank option reads "None stated (pattern {id} is used)" (lang.ec.en.php:4108) only while a pattern "1" exists. effDefaultPattern() at :61778: stated, else "1", else constant. Tip (lang:4106) says only "Every junction with no pattern uses this one." The renamed-pattern-1 case: blank option then reads no implied id and the run goes flat with no word anywhere.
+- OBSERVED (feat/bentley-interop): scenario tree already has a right-click menu (js/looped-network.js:71386 smOpenMenu), F2/Delete/Enter keys, drag reparent, role=tree/treeitem with aria-level (:71377,71408); the hint (lang lpn_sm_hint) already says "Right-click for more". Rows are indent-only (paddingInlineStart 6+16*depth, :71413); no connector lines or expander box in css/engcalcs.css:4511-4523.
+- OBSERVED: /tmp/tree.PNG is Civil 3D Toolspace Settings: boxed +/- expanders on dotted connectors, icon per node, bold root, menu Edit/Copy/Delete/Refresh.
+- CITED (from memory, not re-fetched; unverified): the Windows TreeView / Explorer convention of +/- boxes and WAI-ARIA Authoring Practices tree pattern (Right expands, Left collapses, Up/Down move, Home/End). EPANET 2.2 desktop forces a nonblank default pattern (Tom's own report, 2026-10-11).
+- SPECULATION: the failure was silent state, not a misplaced setting. A value that changes behaviour must be visible where the behaviour is read (the junction field), not only where it is set.
+- SPECULATION: buttons and right-click menu are two doors to one command list; keep both only if the same list feeds both (one source), else they drift.
+Recommendations: see report to orchestrator.
