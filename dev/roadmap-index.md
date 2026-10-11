@@ -7,9 +7,9 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**90 open tasks.** Next (100): 7 · Soon (75): 13 · Someday (50): 35 · Maybe (25): 16 · Parked (5): 19
+**91 open tasks.** Next (100): 9 · Soon (75): 13 · Someday (50): 34 · Maybe (25): 16 · Parked (5): 19
 
-## 100 — Next (7)
+## 100 — Next (9)
 
 - Task 721 — The scenario and alternatives model: Bentley's tree, plus Presentation and Calculation.
 - Task 737 — Coined names for interface elements, so every language names each one once.
@@ -18,6 +18,8 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 779 — Shape: a simple drawn element, point, polyline or polygon, with snapping.
 - ! Task 781 — Active topology first; then Change type becomes a new asset in the old one's place.
 - ! Task 782 — Snap to asset, and Match properties: the small tools that replace Change type.
+- Task 784 — A small time-series graph bubble on the map, from an asset's right-click.
+- Task 787 — Raised tanks: a ground elevation and a base elevation.
 
 ## 75 — Soon (13)
 
@@ -35,7 +37,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 772 — AutoCAD: import, export, and perhaps sync, on a long-lived branch.
 - ! Task 786 — More native SI examples, since SI is chosen twice as often as US.
 
-## 50 — Someday (35)
+## 50 — Someday (34)
 
 - ! Task 146.09 — An inset overview map: the whole project, with a box round where you are.
 - Task 217 — A suite-owned, multilingual Manning's n table, built from primary sources.
@@ -70,7 +72,6 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 734 — Where space is open east or west, one label on one line.
 - Task 736 — [H] · Count installs and app launches, if the consent text allows it.
 - Task 773 — Hover shows an asset's full label, as if every field were ticked.
-- Task 784 — A small time-series graph bubble on the map, from an asset's right-click.
 - Task 785 — Rewrite the Guide's chapters to the Find and replace model.
 
 ## 25 — Maybe (16)
@@ -118,5 +119,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-79 of 90 titles are within 4–12 words. `!` marks the rest;
+80 of 91 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.
