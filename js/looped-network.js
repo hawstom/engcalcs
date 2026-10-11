@@ -8372,11 +8372,6 @@ var EngCalcs = EngCalcs || {};
 	}
 	var COLOR_NODE_FIELDS = { elev: 'lpn_u_elevhead', demand: 'lpn_u_flow', demandActual: 'lpn_u_flow',
 		head: 'lpn_u_elevhead', pressure: 'lpn_u_pressure',
-		// **A TANK'S DEPTH AND USABLE VOLUME** (Task 783). Depth is a height on the same staff as the
-		// tank's three typed levels, so it reads in the Elevation/Head unit. Volume has no unit
-		// family of its own on this page: colorFieldUnitText() answers its mark (the LENGTH unit
-		// cubed), so it declares '' here for the reason `roughness` does.
-		depth: 'lpn_u_elevhead', volume: '',
 		// Declared with the age unit so the field is offered; colorFieldUnit() overrides it with
 		// qualityUnitId(), which is the one place that knows a source share has no unit.
 		quality: 'lpn_u_age',
@@ -8562,7 +8557,7 @@ var EngCalcs = EngCalcs || {};
 		// ("what is being drawn here"), and the base is the input behind it.
 		// The two chemical fields trail the hydraulic ones on both groups: neither exists until
 		// somebody switches the analysis on and runs, which is the standing of `quality` already.
-		node: ['pressure', 'head', 'elev', 'demandActual', 'demand', 'quality', 'initQuality', 'depth', 'volume'],
+		node: ['pressure', 'head', 'elev', 'demandActual', 'demand', 'quality', 'initQuality'],
 		link: ['velocity', 'flow', 'headloss', 'gradient', 'friction', 'diameter', 'roughness',
 			'status', 'quality', 'rate']
 	};
@@ -8688,7 +8683,12 @@ var EngCalcs = EngCalcs || {};
 		// age or a source trace the document states no chemical and this is '', which is honest:
 		// nobody has said what the number is in.
 		if (group === 'node' && field === 'initQuality') { return concentrationUnitText(); }
+		// **A TANK'S TWO RESULTS ARE NOT COLOUR OR LABEL FIELDS** (Task 783; the chemical-symbology
+		// harness holds every colour field to a Labels row, and these have neither), so they sit
+		// outside COLOR_NODE_FIELDS and the unit is answered here. Depth reads in the Elevation/Head
+		// unit like the three typed levels; volume in the LENGTH unit cubed.
 		if (group === 'node' && field === 'volume') { return tankVolumeUnitText(); }
+		if (group === 'node' && field === 'depth') { return unitLabel(resultUnit('elevhead')); }
 		id = colorFieldUnit(group, field);
 		if (id) { return unitLabel(id); }
 		// A friction factor is dimensionless and a status is not a quantity at all; both print
@@ -31306,8 +31306,13 @@ var EngCalcs = EngCalcs || {};
 	// them says something true, and Tom named one field.
 	var TS_FIELD_SKIP = { node: { initQuality: 1 }, link: {} };
 	function tsFieldOptions(group) {
-		var skip = TS_FIELD_SKIP[group] || {};
-		return colorFieldOptions(group).filter(function (o) { return !skip[o[0]]; });
+		var skip = TS_FIELD_SKIP[group] || {},
+			out = colorFieldOptions(group).filter(function (o) { return !skip[o[0]]; });
+		// A tank's depth and usable volume (Task 783): graphable, but neither a map colour nor a label.
+		if (group === 'node') {
+			out.push(['depth', colorFieldLabel('node', 'depth')], ['volume', colorFieldLabel('node', 'volume')]);
+		}
+		return out;
 	}
 	function tsField() {
 		var group = tsGroup(), opts = tsFieldOptions(group), f = tsState.fields[group], i;
