@@ -548,3 +548,8 @@ N. **One in-page "User guide" box replaces Help > Tables and Hotkeys and Help > 
 - Ranked 1: a populated-scenario example (Net3 with Peak hour, Fire plus max day, one shared alternative, one grandchild) so a manager can be photographed and measured; today every example opens with Base only.
 - Ranked 2: an unchecked-Basic probe that opens the box at 1400x900 and 390x844 and reports box area / window area (measured 2026-10-08: preview box is about 75% of the drawing region, for one row).
 - Ranked 3: check the Basic-mode tick glyph renders (empty box in headless Chromium, 2026-10-08).
+
+## Added 2026-10-11
+
+- Junction demand-pattern field shows the pattern actually in force as placeholder text, e.g. "(default: 1)" or "(constant)", read-only grey. Cost: one string, 27 translations. Buys the one thing Tom's rename bug lacked: visible state where it is read. (Journal 2026-10-11.)
+- One look for the suite's trees (Guide rail, scenario tree, Libraries): chevron expander, indent, one selected-row shade, one keyboard model. Defer boxed +/- and dotted connectors. (Journal 2026-10-11.)

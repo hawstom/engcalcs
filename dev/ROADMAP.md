@@ -389,6 +389,8 @@ the block.
   **2026-10-08 on `feat/user-guide`:** Find and replace rewritten from the source as the model chapter
   (Tom: *"says nothing about our query language (!!!)"*); every other chapter audited, not yet rewritten:
   `dev/user-guide-audit.md`. Rewrite them one by one to that model.
+  **Guide MERGED 2026-10-11** (`feat/user-guide`, Tom: "Merge"); index rail folds by chevron. Open: rewrite the
+  other chapters to the Find and replace model.
 - 75|772| **AutoCAD: import, export, and perhaps sync, on a long-lived branch.**
   Tom, 2026-10-05: *"I am an AutoCAD power user and developer... I would like to know what's already
   been done first."* Mary's survey of prior art: `dev/agents/market-researcher/autocad-interop.md`.
@@ -402,9 +404,6 @@ the block.
   R2000. Tom, 2026-10-07: his DXF Interface Manager spec, for import AND export, and a rudimentary
   interim workflow, verbatim in `dev/dxf-interface.md`. **DXF export merged 2026-10-08**; import is
   what remains.
-- 75|777| **Station and elevation marks on the mi and wi section sketches.**
-  Tom, 2026-10-06: *"it would be very nice to add either an automatic stations and elevations grid
-  or the stations and elevations about 4 to 8 points."* Branch `feat/section-grid`.
 - 75|783| **Tank depth and volume, in the tables and the time series.**
   Tom, 2026-10-10: *"Time Series and table columns for tank Depth. Volume would be nice too, with zero at
   minimum depth."* Also his question: Bentley has a Base Elevation; EPANET's tank Elevation is the bottom,
