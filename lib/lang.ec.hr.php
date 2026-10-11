@@ -88,13 +88,13 @@ $ec_lang['template_printable_subtitle']='Podnaslov za ispis';
 // NO EC_CONSENT_VERSION BUMP. Nothing about what is stored, who reads it or how long it lives has
 // moved; the sentence became more accurate, not different. Bumping would re-ask every visitor who
 // has already answered, for no change they could act on.
-$ec_lang['consent_body']='Smijemo li spremiti jednoznamenkasti kolačić u ovaj preglednik kako bismo zapamtili da smo ovu stranicu već izbrojali? Ne bilježi ništa o vama niti ništa što upišete. Bez njega ne možemo razlikovati vaš drugi posjet od nečijeg prvog.';
+$ec_lang['consent_body']='Smijemo li u ovaj preglednik spremiti nasumični kod kako bismo mogli brojiti koliko preglednika koristi pojedini dio ove stranice? Kod se stvara na licu mjesta, ne govori ništa o vama ni o vašem uređaju i ne bilježi ništa što unesete. Bez njega ne možemo razlikovati vaš drugi posjet od nečijeg prvog.';
 $ec_lang['consent_accept']='Prihvati ovo';
 $ec_lang['consent_accept_all']='Prihvati uvijek';
 $ec_lang['consent_decline']='Odbij uvijek';
-$ec_lang['consent_current_granted']='Dopustili ste ovo. Ograničavamo bilježenje za ovaj profil preglednika.';
+$ec_lang['consent_current_granted']='Dopustili ste ovo. Ovaj preglednik čuva nasumični kod kako bismo ga mogli izbrojati.';
 $ec_lang['consent_current_denied']='Odbili ste ovo. Ne pohranjujemo ništa za ograničavanje bilježenja za ovaj profil preglednika.';
-$ec_lang['consent_region_label']='Vaš izbor o ograničavanju bilježenja.';
+$ec_lang['consent_region_label']='Vaš izbor o kodu za brojenje.';
 $ec_lang['consent_settings_link']='Postavke kolačića';
 $ec_lang['privacy_link']='Obavijest o privatnosti';
 $ec_lang['terms_link']='Uvjeti korištenja';

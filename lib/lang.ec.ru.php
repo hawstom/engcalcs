@@ -88,13 +88,13 @@ $ec_lang['template_printable_subtitle']='Печатный подзаголово
 // NO EC_CONSENT_VERSION BUMP. Nothing about what is stored, who reads it or how long it lives has
 // moved; the sentence became more accurate, not different. Bumping would re-ask every visitor who
 // has already answered, for no change they could act on.
-$ec_lang['consent_body']='Разрешите нам сохранить в этом браузере одну цифру-cookie, чтобы запомнить, что эта страница уже учтена? Она не записывает ничего о вас и ничего из того, что вы вводите. Без неё мы не можем отличить ваш второй визит от первого визита другого человека.';
+$ec_lang['consent_body']='Разрешите сохранить в этом браузере случайный код, чтобы мы могли подсчитать, сколько браузеров используют каждую часть этого сайта? Код создаётся на месте, ничего не говорит ни о вас, ни о вашем устройстве и не записывает ничего из того, что вы вводите. Без него мы не можем отличить ваш второй визит от первого визита другого человека.';
 $ec_lang['consent_accept']='Принять';
 $ec_lang['consent_accept_all']='Всегда принимать';
 $ec_lang['consent_decline']='Всегда отклонять';
-$ec_lang['consent_current_granted']='Вы разрешили это. Мы ограничиваем учёт посещений для этого профиля браузера.';
+$ec_lang['consent_current_granted']='Вы разрешили это. Этот браузер хранит случайный код, чтобы мы могли его учесть.';
 $ec_lang['consent_current_denied']='Вы отказали в этом. Мы ничего не храним, чтобы ограничить учёт посещений для этого профиля браузера.';
-$ec_lang['consent_region_label']='Ваш выбор об ограничении учёта посещений.';
+$ec_lang['consent_region_label']='Ваш выбор относительно кода для подсчёта.';
 $ec_lang['consent_settings_link']='Настройки файлов cookie';
 $ec_lang['privacy_link']='Политика конфиденциальности';
 $ec_lang['terms_link']='Условия использования';
