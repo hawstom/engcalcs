@@ -700,7 +700,7 @@ never edits a synonym.
   > Create and organize scenarios and alternatives and their inheritance here. Choose Alternatives for Scenarios in the Scenarios table.
   @@ NEEDS RULING
 - **`lpn_sm_hint`**
-  > Drag an item onto another to make it a child of that item. Drag between two items to reorder them. Click a selected item or press F2 to rename it, Delete to delete it, Enter to make a scenario current. Right-click for more.
+  > Drag an item onto another to make it a child of that item. Drag between two items to reorder them. Click the arrow beside an item, or press Left or Right, to collapse or expand it. Click a selected item or press F2 to rename it, Delete to delete it, Enter to make a scenario current. Right-click an item for the same commands as the buttons.
   @@ NEEDS RULING
 - **`lpn_sm_in_use`**
   > {name} cannot be deleted while it is used by: {list}.
@@ -798,7 +798,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### chore/advisers-1011 (`388dbad8`) — adds no English strings
 
-### feat/bentley-interop (`e644f9b1`) — adds no English strings
+### feat/bentley-interop (`364bb09e`) — adds no English strings
 
 ### feat/desktop (`baba0f04`) — adds no English strings
 

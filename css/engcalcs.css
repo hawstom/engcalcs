@@ -4551,15 +4551,21 @@ html[dir="rtl"] .lpn-guide-railtoggle svg { transform: scaleX(-1); }
 .lpn-guide-nav-row[data-level="1"] { padding-inline-start: 12px; }
 .lpn-guide-nav-row[data-level="2"] { padding-inline-start: 24px; }
 .lpn-guide-nav-chev, .lpn-guide-nav-spacer { flex: 0 0 20px; width: 20px; height: 24px; }
-.lpn-guide-nav-chev {
+/* **ONE CHEVRON FOR EVERY TREE** (Ida, 2026-10-11: the suite's trees share one look): the Guide
+   rail's, and `.lpn-tree-chev` for any other tree (the Scenario manager's). Open points down;
+   closed points toward the end of the line, so it points left on a right-to-left page. */
+.lpn-guide-nav-chev, .lpn-tree-chev {
 	padding: 0; border: 0; background: transparent; color: var(--ec-ink); cursor: pointer;
 	display: inline-flex; align-items: center; justify-content: center;
 }
-.lpn-guide-nav-chev:hover, .lpn-guide-nav-chev:focus-visible { background: var(--ec-gray-eee); color: var(--ec-ink-black); }
-.lpn-guide-nav-chev-svg { width: .9em; height: .9em; transition: transform .12s; }
-.lpn-guide-nav-closed > .lpn-guide-nav-chev .lpn-guide-nav-chev-svg { transform: rotate(-90deg); }
-html[dir="rtl"] .lpn-guide-nav-closed > .lpn-guide-nav-chev .lpn-guide-nav-chev-svg { transform: rotate(90deg); }
-@media (prefers-reduced-motion: reduce) { .lpn-guide-nav-chev-svg { transition: none; } }
+.lpn-guide-nav-chev:hover, .lpn-guide-nav-chev:focus-visible,
+.lpn-tree-chev:hover, .lpn-tree-chev:focus-visible { background: var(--ec-gray-eee); color: var(--ec-ink-black); }
+.lpn-guide-nav-chev-svg, .lpn-tree-chev-svg { width: .9em; height: .9em; transition: transform .12s; }
+.lpn-guide-nav-closed > .lpn-guide-nav-chev .lpn-guide-nav-chev-svg,
+.lpn-tree-chev[aria-expanded="false"] .lpn-tree-chev-svg { transform: rotate(-90deg); }
+html[dir="rtl"] .lpn-guide-nav-closed > .lpn-guide-nav-chev .lpn-guide-nav-chev-svg,
+html[dir="rtl"] .lpn-tree-chev[aria-expanded="false"] .lpn-tree-chev-svg { transform: rotate(90deg); }
+@media (prefers-reduced-motion: reduce) { .lpn-guide-nav-chev-svg, .lpn-tree-chev-svg { transition: none; } }
 .lpn-guide-nav-snip { display: block; font-weight: normal; color: var(--ec-ink-muted); font-size: .9em; }
 .lpn-guide-rail-collapsed .lpn-guide-rail { flex-basis: 34px; padding-inline-end: 2px; }
 .lpn-guide-rail-collapsed .lpn-guide-railtitle, .lpn-guide-rail-collapsed .lpn-guide-railbody { display: none; }
@@ -4718,6 +4724,19 @@ html[dir="rtl"] .lpn-guide-chev { transform: scaleX(-1); }
 .lpn-sm-name input { width: 100%; box-sizing: border-box; }
 .lpn-sm-meta { flex: 0 0 auto; font-size: 0.85em; opacity: 0.8; }
 .lpn-sm-hint { font-size: 0.85em; opacity: 0.85; margin: 0; }
+/* The expander is a 24 px square, a finger's target on a phone, and a row without children keeps
+   the same width so names on one level line up. */
+.lpn-sm-row { padding-block: 0; min-height: 24px; gap: 4px; }
+.lpn-sm-row .lpn-tree-chev, .lpn-sm-row .lpn-tree-spacer { flex: 0 0 24px; width: 24px; height: 24px; }
+.lpn-sm-row .lpn-tree-chev-svg { width: 14px; height: 14px; }
+.lpn-sm-icon { flex: 0 0 16px; width: 16px; height: 16px; display: inline-flex; color: var(--ec-ink-muted); }
+.lpn-sm-icon svg { width: 16px; height: 16px; }
+.lpn-sm-icon-scnbase, .lpn-sm-icon-altbase { color: var(--ec-accent); }
+html[dir="rtl"] .lpn-sm-icon svg { transform: scaleX(-1); }
+/* A command that does not apply to the item is greyed, never hidden, in the buttons and the menu. */
+.lpn-sm-tools button[aria-disabled="true"], .lpn-sm-menu button[aria-disabled="true"] { color: var(--ec-gray-888); cursor: default; }
+.lpn-sm-menu button[aria-disabled="true"]:hover { background: none; }
+.lpn-sm-menusep { margin: 3px 0; border-top: 1px solid var(--ec-border-strong); }
 /* ---- THE RUN'S OWN DIALOG (ROADMAP Task 530) --------------------------------------------------
 
    Progress, Stop, nothing else (Tom, 2026-08-30). It borrows .lpn-popover for the viewport caps and

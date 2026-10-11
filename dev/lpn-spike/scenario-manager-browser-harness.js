@@ -7,7 +7,7 @@
 //      explanation on a real mouse click (Tom, 2026-10-11: "The glyph isn't clickable").
 //   2. "+" adds Child_1_of_Base and opens its name for editing; "Add Base" adds Base2; F2 renames; a
 //      slow click on the selected row renames; Escape cancels; Del is refused for a scenario with a
-//      child, naming it; right-click offers Add child, Rename, Make current, Copy, Delete.
+//      child, naming it; right-click offers Make current, Add child, Add base, Rename, Copy, Delete.
 //   3. A drop ONTO a row re-parents (the row is outlined); a drop BETWEEN rows reorders (a line);
 //      a drop onto its own child is refused; Enter and a double-click make a scenario current.
 //   4. A category tree (Demand): "Used by scenarios: N" with the list in its tip.
@@ -132,8 +132,8 @@ async function main() {
 		console.log('\n--- 2. add, rename, delete ---');
 		await clickRow(await L('lpn_scenario_base'));
 		const toolbar = () => page.evaluate(() => Array.from(document.querySelectorAll('#lpn_sm_body .lpn-sm-tools button')).map((b) => b.textContent));
-		ok('1.9 the toolbar is Add child, Add base, minus, Make current, then Copy scenario', JSON.stringify(await toolbar()) === JSON.stringify([await L('lpn_sm_add_child'), await L('lpn_sm_add_base'), '\u2212', await L('lpn_sm_make_current'), await L('lpn_sm_copy')]) && (await L('lpn_sm_add_base')) === 'Add base' && (await L('lpn_sm_add_child')) === 'Add child', JSON.stringify(await toolbar()));
-		ok('1.10 the minus carries its tip', (await page.evaluate(() => document.getElementById('lpn_sm_del').title)) === await L('lpn_sm_delete'));
+		ok('1.9 the toolbar is Make current, Add child, Add base, Rename, Copy scenario, then minus (the menu\'s order)', JSON.stringify(await toolbar()) === JSON.stringify([await L('lpn_sm_make_current'), await L('lpn_sm_add_child'), await L('lpn_sm_add_base'), await L('lpn_sm_rename'), await L('lpn_sm_copy'), '\u2212']) && (await L('lpn_sm_add_base')) === 'Add base' && (await L('lpn_sm_add_child')) === 'Add child', JSON.stringify(await toolbar()));
+		ok('1.10 on Base the minus is greyed and its tip says why', (await page.evaluate(() => document.getElementById('lpn_sm_del').title)) === await L('lpn_sm_base_kept') && (await page.evaluate(() => document.getElementById('lpn_sm_del').getAttribute('aria-disabled'))) === 'true');
 		const helpTip = await page.evaluate(() => { const t = document.querySelector('#lpn_smbox_title .ec-help'); return t ? (t.title || t.getAttribute('data-bs-original-title')) : null; });
 		ok('1.11 the box title has a ? tip with the explanation', helpTip === 'Create and organize scenarios and alternatives and their inheritance here. Choose Alternatives for Scenarios in the Scenarios table.' && !!(await page.$('#lpn_smbox_title .ec-tip')), String(helpTip));
 		// **THE "?" ON THE TITLE TAKES A CLICK** (Tom, 2026-10-11: *"The glyph isn't clickable."*). The
@@ -198,7 +198,7 @@ async function main() {
 		await rowOf('Peak Hour').locator('.lpn-sm-name').click({ button: 'right' });
 		await settle(300);
 		const items = await ctxItems();
-		ok('2.8 right-click offers add child, add Base, rename, make current, copy, delete', items.length === 6, JSON.stringify(items));
+		ok('2.8 right-click offers make current, add child, add base, rename, copy, delete', JSON.stringify(items) === JSON.stringify([await L('lpn_sm_make_current'), await L('lpn_sm_add_child'), await L('lpn_sm_add_base'), await L('lpn_sm_rename'), await L('lpn_sm_copy'), await L('lpn_tool_delete')]), JSON.stringify(items));
 		await ctxPick(await L('lpn_sm_add_child'));
 		await page.keyboard.press('Enter');
 		await settle(500);
@@ -223,7 +223,7 @@ async function main() {
 		const bn = await page.evaluate(() => (document.getElementById('lpn_map_notice') || {}).textContent || '');
 		ok('2.14 Del on Base is refused with its own sentence, not "Nothing is selected"', bn.indexOf(await L('lpn_sm_base_kept')) >= 0 && bn.indexOf((await L('lpn_select_first')).slice(0, 14)) < 0, bn);
 		await click('#lpn_sm_del');
-		ok('2.15 "-" on Base gives the same sentence', (await page.evaluate(() => (document.getElementById('lpn_map_notice') || {}).textContent || '')).indexOf(await L('lpn_sm_base_kept')) >= 0);
+		ok('2.15 "-" on Base is greyed, deletes nothing, and its tip is the same sentence', (await names()).some((n) => n === 'Base') && (await page.evaluate(() => document.getElementById('lpn_sm_del').title)) === await L('lpn_sm_base_kept'));
 		await clickRow('Base2');
 		await click('#lpn_sm_del');
 		ok('2.16 an unused Base of its own can be deleted', !(await names()).some((n) => n === 'Base2'), JSON.stringify(await names()));
@@ -280,7 +280,7 @@ async function main() {
 		await settle(500);
 		ok('4.3 an alternative was added under Base', JSON.stringify(await names()) === JSON.stringify(['Base', '-Dry year']), JSON.stringify(await names()));
 		ok('4.4 ...used by no scenario yet', (await rows())[1].meta === await L('lpn_sm_used_by_none'), (await rows())[1].meta);
-		ok('4.5 an alternatives tree toolbar is the three, then Copy (no Make current)', JSON.stringify(await toolbar()) === JSON.stringify([await L('lpn_sm_add_child'), await L('lpn_sm_add_base'), '\u2212', await L('lpn_sm_copy_alt')]), JSON.stringify(await toolbar()));
+		ok('4.5 an alternatives tree toolbar is Add child, Add base, Rename, Copy, minus (no Make current)', JSON.stringify(await toolbar()) === JSON.stringify([await L('lpn_sm_add_child'), await L('lpn_sm_add_base'), await L('lpn_sm_rename'), await L('lpn_sm_copy_alt'), '\u2212']), JSON.stringify(await toolbar()));
 		await clickRow('Dry year');
 		await click('#lpn_sm_copy');
 		await settle(400);

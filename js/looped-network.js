@@ -72399,6 +72399,94 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		host.appendChild(b);
 		return b;
 	}
+	// **WHICH ITEMS ARE COLLAPSED, FOR THIS PAGE LOAD ONLY** (Ida, 2026-10-11, on Tom's "modern tree
+	// paradigm"): window furniture, so never in the project; and no key holds it on the device, so
+	// a reload opens every tree fully expanded. Per tree, by key.
+	var smCollapsed = {};
+	function smIsCollapsed(tree, key) { return !!(smCollapsed[tree] && smCollapsed[tree][key]); }
+	function smSetCollapsed(tree, key, on) {
+		smCollapsed[tree] = smCollapsed[tree] || {};
+		if (on) { smCollapsed[tree][key] = true; } else { delete smCollapsed[tree][key]; }
+	}
+	// True when `key` hangs, at any depth, under `anc`.
+	function smIsUnder(tree, key, anc) {
+		var k = smParentKey(tree, key), n = 0;
+		while (k !== null && k !== undefined && n++ < 1000) { if (k === anc) { return true; } k = smParentKey(tree, k); }
+		return false;
+	}
+	// Every collapsed ancestor of `key` is opened, so the item is on screen.
+	function smReveal(tree, key) {
+		var k = key === null || key === undefined ? null : smParentKey(tree, key), n = 0;
+		while (k !== null && k !== undefined && n++ < 1000) { smSetCollapsed(tree, k, false); k = smParentKey(tree, k); }
+	}
+	// The rows drawn: smRows() with each row's `hasKids`, without the rows under a collapsed one.
+	function smVisibleRows(tree) {
+		var all = smRows(tree), out = [], hideBelow = null;
+		all.forEach(function (r, i) {
+			var next = all[i + 1];
+			r.hasKids = !!next && next.depth > r.depth;
+			if (hideBelow !== null) { if (r.depth > hideBelow) { return; } hideBelow = null; }
+			out.push(r);
+			if (r.hasKids && smIsCollapsed(tree, r.key)) { hideBelow = r.depth; }
+		});
+		return out;
+	}
+	function smToggle(key, open) {
+		var tree = smState.tree;
+		if (open === undefined) { open = smIsCollapsed(tree, key); }
+		smSetCollapsed(tree, key, !open);
+		// A selection folded away moves to the item that folded it.
+		if (!open && smState.sel !== null && smIsUnder(tree, smState.sel, key)) { smState.sel = key; }
+		rebuildScenarioManager();
+	}
+	// **ONE COMMAND LIST FOR THE BUTTONS AND THE RIGHT-CLICK MENU** (Ida, 2026-10-11), so the two
+	// cannot drift: the same commands, in the same order, disabled in the same states. A disabled
+	// command stays in both, greyed, and says why in its tip where there is a why to say.
+	// `face` is the button's own text where it is shorter than the menu's.
+	function smCommands(key) {
+		var pc = EngCalcs.pageConfig || {}, tree = smState.tree, isBase, valid, out = [];
+		valid = key !== null && key !== undefined && (smIsBaseKey(tree, key) || !!smRecord(tree, key));
+		isBase = valid && smIsBaseKey(tree, key);
+		if (tree === 'scenarios') {
+			out.push({ id: 'current', label: pc.lpn_sm_make_current || 'Make current', off: !valid || key === project.activeScenario,
+				fn: function () { smActCurrent(key); } });
+		}
+		out.push({ id: 'add', label: pc.lpn_sm_add_child || 'Add child', fn: function () { smActAdd(valid ? key : smBaseKey(tree)); } });
+		out.push({ id: 'addbase', label: pc.lpn_sm_add_base || 'Add base', tip: pc.lpn_sm_add_base_tip, fn: function () { smActAdd(null); } });
+		out.push({ id: 'rename', label: pc.lpn_sm_rename || 'Rename', off: !valid || isBase, fn: function () { smStartRename(key); } });
+		// A scenario asks make-copies or share; an alternative is copied beside itself.
+		out.push({ id: 'copy', label: tree === 'scenarios' ? (pc.lpn_sm_copy || 'Copy scenario…') : (pc.lpn_sm_copy_alt || 'Copy'),
+			off: !valid || (tree !== 'scenarios' && isBase), fn: function () { smActCopy(key); } });
+		out.push({ separator: true });
+		out.push({ id: 'del', label: pc.lpn_tool_delete || 'Delete', face: '−', off: !valid || isBase,
+			tip: isBase ? (pc.lpn_sm_base_kept || 'The Base of a tree is not deleted. Another Base added with Add base is deleted when nothing uses it.')
+				: (pc.lpn_sm_delete || 'Delete the selected item. A used item is not deleted.'),
+			fn: function () { smActDelete(key); } });
+		return out;
+	}
+	// A command drawn as a button: aria-disabled rather than `disabled`, so a greyed one still shows
+	// its tip on hover.
+	function smCommandButton(host, c, id) {
+		var b = smButton(host, c.face || c.label, c.tip || (c.face ? c.label : null), function () { if (!c.off) { c.fn(); } });
+		b.id = id;
+		b.setAttribute('data-sm-cmd', c.id);
+		if (c.off) { b.setAttribute('aria-disabled', 'true'); }
+		return b;
+	}
+	// Small inline icons, one per kind of item, drawn in currentColor so the colour is a token in the
+	// stylesheet (.lpn-sm-icon-*). The child scenario's hook points toward the reading direction's
+	// end and is mirrored on a right-to-left page by the stylesheet.
+	var SM_ICONS = {
+		scnbase: '<rect x="2.5" y="2.5" width="11" height="11" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.4"/><rect x="2.5" y="2.5" width="11" height="4" fill="currentColor"/>',
+		scn: '<rect x="2.5" y="2.5" width="11" height="11" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M5.5 5.5v4.5h5" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M9 8.5l1.8 1.5L9 11.5" fill="none" stroke="currentColor" stroke-width="1.2"/>',
+		altbase: '<rect x="4.5" y="2" width="9.5" height="7" rx="1" fill="none" stroke="currentColor" stroke-width="1.3"/><rect x="2" y="6.5" width="9.5" height="7" rx="1" fill="currentColor"/>',
+		alt: '<path d="M8 2.2L13.8 8 8 13.8 2.2 8z" fill="none" stroke="currentColor" stroke-width="1.4"/>'
+	};
+	function smIconKind(tree, r) {
+		var root = r.depth === 0;
+		if (tree === 'scenarios') { return root ? 'scnbase' : 'scn'; }
+		return root ? 'altbase' : 'alt';
+	}
 	function rebuildScenarioManager() {
 		var host = document.getElementById('lpn_sm_body'), pc = EngCalcs.pageConfig || {}, tools, sel, tree, head,
 			scroll = 0, old, hadFocus;
@@ -72429,14 +72517,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		host.appendChild(tools);
 		tools = document.createElement('div');
 		tools.className = 'lpn-sm-tools';
-		smButton(tools, pc.lpn_sm_add_child || 'Add child', null, function () { smActAdd(smState.sel === null ? smBaseKey(smState.tree) : smState.sel); }).id = 'lpn_sm_add';
-		smButton(tools, pc.lpn_sm_add_base || 'Add base', pc.lpn_sm_add_base_tip, function () { smActAdd(null); }).id = 'lpn_sm_addbase';
-		smButton(tools, '−', pc.lpn_sm_delete || 'Delete the selected item. A used item is not deleted.', function () { smActDelete(smState.sel); }).id = 'lpn_sm_del';
-		if (smState.tree === 'scenarios') {
-			smButton(tools, pc.lpn_sm_make_current || 'Make current', null, function () { smActCurrent(smState.sel); }).id = 'lpn_sm_current';
-		}
-		// Copy follows the four: a scenario asks make-copies or share; an alternative is copied beside itself.
-		smButton(tools, smState.tree === 'scenarios' ? (pc.lpn_sm_copy || 'Copy scenario…') : (pc.lpn_sm_copy_alt || 'Copy'), null, function () { smActCopy(smState.sel); }).id = 'lpn_sm_copy';
+		// The buttons act on the selected item, the right-click menu on the item clicked; both are
+		// drawn from smCommands(). The separator is the menu's alone.
+		smCommands(smState.sel).forEach(function (c) {
+			if (!c.separator) { smCommandButton(tools, c, 'lpn_sm_' + c.id); }
+		});
 		host.appendChild(tools);
 		head = document.createElement('h3');
 		head.className = 'lpn-sm-head';
@@ -72449,7 +72534,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		tree.setAttribute('role', 'tree');
 		tree.setAttribute('aria-label', smTreeLabel(smState.tree));
 		tree.tabIndex = 0;
-		smRows(smState.tree).forEach(function (r) { tree.appendChild(smRowEl(r)); });
+		if (smState.editing !== null) { smReveal(smState.tree, smState.editing); }
+		if (smState.sel !== null) { smReveal(smState.tree, smState.sel); }
+		smVisibleRows(smState.tree).forEach(function (r) { tree.appendChild(smRowEl(r)); });
 		tree.addEventListener('keydown', smKeydown);
 		tree.addEventListener('contextmenu', function (e) {
 			if (e.preventDefault) { e.preventDefault(); }
@@ -72459,7 +72546,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		tree.scrollTop = scroll;
 		old = document.createElement('p');
 		old.className = 'lpn-sm-hint';
-		old.textContent = pc.lpn_sm_hint || 'Drag an item onto another to make it a child of that item. Drag between two items to reorder them. Click a selected item or press F2 to rename it, Delete to delete it, Enter to make a scenario current. Right-click for more.';
+		old.textContent = pc.lpn_sm_hint || 'Drag an item onto another to make it a child of that item. Drag between two items to reorder them. Click the arrow beside an item, or press Left or Right, to collapse or expand it. Click a selected item or press F2 to rename it, Delete to delete it, Enter to make a scenario current. Right-click an item for the same commands as the buttons.';
 		host.appendChild(old);
 		initTipsIn(host);
 		if (smState.editing !== null) { smFocusEditor(); }
@@ -72474,13 +72561,41 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	function smRowEl(r) {
 		var pc = EngCalcs.pageConfig || {}, tree = smState.tree, row = document.createElement('div'), name = document.createElement('span'),
-			meta = document.createElement('span'), cb, ed, used;
+			meta = document.createElement('span'), cb, ed, used, lead, icon;
 		row.className = 'lpn-sm-row' + (smState.sel === r.key ? ' lpn-sm-sel' : '');
 		row.setAttribute('role', 'treeitem');
 		row.setAttribute('aria-level', String(r.depth + 1));
 		row.setAttribute('aria-selected', smState.sel === r.key ? 'true' : 'false');
 		row.setAttribute('data-key', r.key);
-		row.style.paddingInlineStart = (6 + r.depth * 16) + 'px';
+		row.style.paddingInlineStart = (2 + r.depth * 16) + 'px';
+		// **A REAL EXPANDER AT EVERY PARENT** (Ida, 2026-10-11): the Guide rail's chevron, one shared
+		// look (.lpn-tree-chev); a row with no children has a spacer of the same width, so every
+		// name on a level starts at the same edge. It takes a click of its own and never selects,
+		// renames or makes current.
+		if (r.hasKids) {
+			lead = document.createElement('button');
+			lead.type = 'button';
+			lead.className = 'lpn-tree-chev lpn-sm-chev';
+			lead.tabIndex = -1;
+			lead.setAttribute('aria-expanded', smIsCollapsed(tree, r.key) ? 'false' : 'true');
+			lead.setAttribute('aria-label', r.name);
+			lead.innerHTML = '<svg class="lpn-tree-chev-svg" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 6l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>';
+			lead.addEventListener('click', function (e) { if (e.stopPropagation) { e.stopPropagation(); } smToggle(r.key); });
+			lead.addEventListener('dblclick', function (e) { if (e.stopPropagation) { e.stopPropagation(); } });
+			// The press keeps focus where it is: a name being edited is not committed out from
+			// under the click by a blur that rebuilds the tree.
+			lead.addEventListener('mousedown', function (e) { if (e.stopPropagation) { e.stopPropagation(); } if (e.preventDefault) { e.preventDefault(); } });
+			row.setAttribute('aria-expanded', smIsCollapsed(tree, r.key) ? 'false' : 'true');
+		} else {
+			lead = document.createElement('span');
+			lead.className = 'lpn-tree-spacer';
+		}
+		row.appendChild(lead);
+		icon = document.createElement('span');
+		icon.className = 'lpn-sm-icon lpn-sm-icon-' + smIconKind(tree, r);
+		icon.setAttribute('aria-hidden', 'true');
+		icon.innerHTML = '<svg viewBox="0 0 16 16" width="16" height="16">' + SM_ICONS[smIconKind(tree, r)] + '</svg>';
+		row.appendChild(icon);
 		name.className = 'lpn-sm-name';
 		if (smState.editing === r.key) {
 			ed = document.createElement('input');
@@ -72635,6 +72750,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (parentKey === undefined) { return; }
 		res = smTry(function () { return smAdd(tree, parentKey, parentKey === null); });
 		if (!res || res.refused) { return; }
+		if (parentKey !== null) { smSetCollapsed(tree, parentKey, false); smReveal(tree, parentKey); }
 		smState.sel = res.id;
 		smState.editing = res.id;
 		smAfter(false, false);
@@ -72707,53 +72823,87 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			smAfter(true, true);
 		});
 	}
+	// **THE TREE'S KEYS** (WAI-ARIA tree pattern, Ida 2026-10-11): Up and Down move over the rows on
+	// screen, Home and End to the first and last; Right opens a collapsed item or moves to its first
+	// child, Left collapses an open one or moves to its parent (the two swap on a right-to-left
+	// page); Enter makes a scenario current, F2 renames, Delete deletes.
 	function smKeydown(e) {
-		var rows = smRows(smState.tree), i = -1, k = e.key;
-		rows.forEach(function (r, n) { if (r.key === smState.sel) { i = n; } });
+		var tree = smState.tree, rows = smVisibleRows(tree), i = -1, k = e.key, r, rtl, t, go = null;
+		rows.forEach(function (row, n) { if (row.key === smState.sel) { i = n; } });
+		r = i >= 0 ? rows[i] : null;
+		rtl = (document.documentElement.getAttribute('dir') || '').toLowerCase() === 'rtl';
+		if (rtl && k === 'ArrowRight') { k = 'ArrowLeft'; } else if (rtl && k === 'ArrowLeft') { k = 'ArrowRight'; }
 		if (k === 'ArrowDown' || k === 'ArrowUp') {
-			if (e.preventDefault) { e.preventDefault(); }
-			i = Math.max(0, Math.min(rows.length - 1, i + (k === 'ArrowDown' ? 1 : -1)));
-			smSelect(rows[i].key);
-			var t = document.getElementById('lpn_sm_tree');
-			if (t && t.focus) { t.focus(); }
+			go = rows[Math.max(0, Math.min(rows.length - 1, i + (k === 'ArrowDown' ? 1 : -1)))];
+		} else if (k === 'Home') {
+			go = rows[0];
+		} else if (k === 'End') {
+			go = rows[rows.length - 1];
+		} else if (k === 'ArrowRight') {
+			if (!r) { go = rows[0]; }
+			else if (r.hasKids && smIsCollapsed(tree, r.key)) { if (e.preventDefault) { e.preventDefault(); } smToggle(r.key, true); return; }
+			else if (r.hasKids) { go = rows[i + 1]; }
+			else { if (e.preventDefault) { e.preventDefault(); } return; }
+		} else if (k === 'ArrowLeft') {
+			if (!r) { go = rows[0]; }
+			else if (r.hasKids && !smIsCollapsed(tree, r.key)) { if (e.preventDefault) { e.preventDefault(); } smToggle(r.key, false); return; }
+			else {
+				t = smParentKey(tree, r.key);
+				go = t === null || t === undefined ? null : rows.filter(function (x) { return x.key === t; })[0];
+				if (!go) { if (e.preventDefault) { e.preventDefault(); } return; }
+			}
 		} else if (k === 'F2') {
 			if (e.preventDefault) { e.preventDefault(); }
 			if (smState.sel !== null) { smStartRename(smState.sel); }
+			return;
 		} else if (k === 'Delete') {
 			if (e.preventDefault) { e.preventDefault(); }
 			if (e.stopPropagation) { e.stopPropagation(); }
 			smActDelete(smState.sel);
+			return;
 		} else if (k === 'Enter') {
 			if (e.preventDefault) { e.preventDefault(); }
 			smActCurrent(smState.sel);
+			return;
+		} else {
+			return;
 		}
+		if (e.preventDefault) { e.preventDefault(); }
+		if (!go) { return; }
+		smSelect(go.key);
+		t = document.getElementById('lpn_sm_tree');
+		if (t && t.focus) { t.focus(); }
 	}
 	function smOpenMenu(key, x, y) {
-		var pc = EngCalcs.pageConfig || {}, menu, tree = smState.tree, isBase = smIsBaseKey(tree, key);
-		function mk(text, fn) {
-			var b = document.createElement('button');
-			b.type = 'button';
-			b.setAttribute('role', 'menuitem');
-			b.textContent = text;
-			b.addEventListener('click', function () { paneCloseContextMenu(); fn(); });
-			menu.appendChild(b);
-		}
+		var menu;
 		paneCloseContextMenu();
 		menu = document.createElement('div');
 		menu.className = 'lpn-pane-ctxmenu lpn-sm-menu';
 		menu.setAttribute('role', 'menu');
 		menu.style.left = x + 'px';
 		menu.style.top = y + 'px';
-		mk(pc.lpn_sm_add_child || 'Add child', function () { smActAdd(key); });
-		mk(pc.lpn_sm_add_base || 'Add base', function () { smActAdd(null); });
-		if (!isBase) { mk(pc.lpn_sm_rename || 'Rename', function () { smStartRename(key); }); }
-		if (tree === 'scenarios') {
-			mk(pc.lpn_sm_make_current || 'Make current', function () { smActCurrent(key); });
-			mk(pc.lpn_sm_copy || 'Copy scenario…', function () { smActCopy(key); });
-		} else if (!isBase) {
-			mk(pc.lpn_sm_copy_alt || 'Copy', function () { smActCopy(key); });
-		}
-		if (!isBase) { mk(pc.lpn_tool_delete || 'Delete', function () { smActDelete(key); }); }
+		// The buttons' commands, in the buttons' order, Delete after a separator.
+		smCommands(key).forEach(function (c) {
+			var b;
+			if (c.separator) {
+				b = document.createElement('div');
+				b.setAttribute('role', 'separator');
+				b.className = 'lpn-sm-menusep';
+				menu.appendChild(b);
+				return;
+			}
+			b = document.createElement('button');
+			b.type = 'button';
+			b.setAttribute('role', 'menuitem');
+			b.setAttribute('data-sm-cmd', c.id);
+			b.textContent = c.label;
+			if (c.off) {
+				b.setAttribute('aria-disabled', 'true');
+				if (c.tip && c.id === 'del') { b.title = c.tip; }
+			}
+			b.addEventListener('click', function () { if (c.off) { return; } paneCloseContextMenu(); c.fn(); });
+			menu.appendChild(b);
+		});
 		document.body.appendChild(menu);
 		paneCtxMenuEl = menu;
 		paneClampMenu(menu, x, y);
