@@ -85,6 +85,7 @@
         "calc_defaults_confirm": "Reset calculator to the original default values?",
         "points_data_note": "(or copy\/paste using the data area)",
         "points_data_heading": "Calculator data<br \/>(use Copy to see format)",
+        "points_data_points_heading": "Points data<br \/>(use Copy to see format)",
         "points_data_copy": "Copy",
         "points_data_paste": "Paste",
         "points_data_msg_line": "Nothing was pasted. Line {n} could not be read as a station and an elevation.",
@@ -2547,7 +2548,7 @@
         "lpn_snip_tip_redo": "Redo (Ctrl+Y)",
         "lpn_screenshot_scale_tip": "The picture's size as a multiple of the area on the screen. A larger one is sharper and makes a bigger file."
     },
-    "count": 2545,
+    "count": 2546,
     "active_prefixes": [
         "about",
         "bpn",

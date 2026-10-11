@@ -3968,6 +3968,13 @@ Lesson: pressing a menu row by text prefix hit a different "Copy" button elsewhe
 - OBSERVED: the layer table matches the Duke-hosted AIA CAD Layer Guidelines text for EQPM, VALV, TANK, LABL, TEXT, RDME; NODE is a prescribed minor group there, not user-defined. That PDF is an older edition than v5; v5 itself was not fetchable.
 - OBSERVED: dxf-export-harness.js passes and has no assertion on %% escaping, zoom, zone boundary or long strings.
 
+## feat/section-grid at 0b3bad98 (OBSERVED, 2026-10-06; re-verify before citing)
+OBSERVED real Chrome (desktop 1200, phone 390; US and SI via es locale; default and offset/negative sections): mi and wi grids render, 4-8 round marks, unit on largest mark for mi (ft/m follow the selects), negative elevations and stations starting at 1000 fine; no mark collides with the n labels, but gridlines run through them (and 0.04 strikes the section line, as on master).
+OBSERVED: phone mi shrinks to 390 wide so marks render ~7px high (wi ~11px). Master mi overflowed at 600. Plot is ~12-16% smaller than master in mi.
+OBSERVED: wi has no unit selects (Cw only), so bare numbers are honest. No dark mode on these pages (prefers-color-scheme only styles lpn cards).
+Lesson: php -S needs a docroot with an engcalcs/ symlink (pages use /engcalcs/ asset paths); sticky header and consent bar cover element screenshots.
+SPECULATION: print rendering not checked.
+
 ## 2026-10-06 feat/asset-type, link half (tree 4c26066b)
 
 OBSERVED (real Chrome on a scratch copy with a test hook, this tree; re-verify before citing):

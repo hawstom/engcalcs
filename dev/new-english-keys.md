@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**189 still to read on master**, of 200 untranslated keys, of 2638 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**190 still to read on master**, of 201 untranslated keys, of 2639 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -778,11 +778,17 @@ never edits a synonym.
   > This file could not be read as a workspace, so nothing was changed.
   @@ NEEDS RULING
 
+## points_  (1, 1 to read @@ NEEDS RULING)
+
+- **`points_data_points_heading`**
+  > Points data<br />(use Copy to see format)
+  @@ NEEDS RULING
+
 ---
 
 # Strings waiting on a branch
 
-**40 still to read**, of 43 new keys across 15 unmerged branch(es).
+**37 still to read**, of 40 new keys across 15 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -793,13 +799,9 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/advisers-1011 (`c39e12cf`) — 1 new, 1 to read @@ NEEDS RULING
+### chore/advisers-1011 (`c39e12cf`) — adds no English strings
 
-- **`points_data_points_heading`**
-  > Points data<br />(use Copy to see format)
-  @@ NEEDS RULING
-
-### feat/bentley-interop (`aa94894b`) — adds no English strings
+### feat/bentley-interop (`017bbe69`) — adds no English strings
 
 ### feat/desktop (`baba0f04`) — adds no English strings
 
@@ -825,7 +827,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`2e5e81c4`) — adds no English strings
 
-### feat/match-property (`2acd9c69`) — 14 new, 14 to read @@ NEEDS RULING
+### feat/match-property (`2acd9c69`) — 13 new, 13 to read @@ NEEDS RULING
 
 - **`lpn_match_done_many`**
   > Matched {m} assets to {id}. Values changed: {n}.
@@ -866,11 +868,8 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_mode_match_dest`**
   > Mode: Match properties. Select each asset to receive the properties of {id}. Press Escape or right-click when finished.
   @@ NEEDS RULING
-- **`points_data_points_heading`**
-  > Points data<br />(use Copy to see format)
-  @@ NEEDS RULING
 
-### feat/shape (`a1d7679c`) — 17 new, 17 to read @@ NEEDS RULING
+### feat/shape (`9e25270b`) — 17 new, 17 to read @@ NEEDS RULING
 
 - **`lpn_file_import_geojson`**
   > Import GeoJSON shapes…
@@ -924,7 +923,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Draw a point, a polyline, or a polygon on the map. A Shape is annotation and is not part of the network. Specify each point, then specify the last point again, press Enter, or right-click to finish. Specify the first point again to close the Shape into a polygon.
   @@ NEEDS RULING
 
-### feat/snap (`6a4347a7`) — 3 new, 3 to read @@ NEEDS RULING
+### feat/snap (`e1a40918`) — 3 new, 3 to read @@ NEEDS RULING
 
 - **`lpn_snap_moved_on_node`**
   > {moved} moved to the location of {target}. The two nodes are not connected.
@@ -953,8 +952,4 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/visit-dedupe (`7b4a84bd`) — adds no English strings
 
-### fix/vertex-autosave (`0bfd2ac5`) — 1 new, 1 to read @@ NEEDS RULING
-
-- **`points_data_points_heading`**
-  > Points data<br />(use Copy to see format)
-  @@ NEEDS RULING
+### fix/vertex-autosave (`0bfd2ac5`) — adds no English strings
