@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**41 still to read on master**, of 50 untranslated keys, of 2494 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**47 still to read on master**, of 56 untranslated keys, of 2500 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -175,8 +175,14 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   @@ NEEDS RULING
 
-## lpn_  (50, 41 to read @@ NEEDS RULING)
+## lpn_  (56, 47 to read @@ NEEDS RULING)
 
+- **`lpn_demand_pattern_constant`**
+  > (constant)
+  @@ NEEDS RULING
+- **`lpn_demand_pattern_default`**
+  > (default: {id})
+  @@ NEEDS RULING
 - **`lpn_dxf_export_failed`**
   > The DXF file was not written: an error in this page stopped it ({error}).
   @@ NEEDS RULING
@@ -261,6 +267,18 @@ never edits a synonym.
 - **`lpn_junction_pattern_unknown`**
   > No pattern in this project is named {id}, so the junction was left as it was.
   @@ NEEDS RULING
+- **`lpn_library_pattern_default_deleted_none`**
+  > Pattern {id} was the default demand pattern. Junctions with no pattern now use a constant demand.
+  @@ NEEDS RULING
+- **`lpn_library_pattern_default_deleted_to`**
+  > Pattern {id} was the default demand pattern. Junctions with no pattern now use pattern {now}.
+  @@ NEEDS RULING
+- **`lpn_library_pattern_default_mark`**
+  > (default)
+  @@ NEEDS RULING
+- **`lpn_library_pattern_default_tip`**
+  > The default demand pattern. Change it in Settings, Default demand pattern.
+  @@ NEEDS RULING
 - **`lpn_link_end_same`**
   > From and To must be different nodes.
   @@ NEEDS RULING
@@ -279,8 +297,8 @@ never edits a synonym.
 - **`lpn_pane_copy_heads`**
   > Copy with column headings
   _Ruled 2026-10-09: Use proposed (Tom, calls page round 3)._
-- **`lpn_settings_default_pattern_implied`**
-  > None stated (pattern {id} is used)
+- **`lpn_settings_default_pattern_none`**
+  > None (constant)
   @@ NEEDS RULING
 - **`lpn_settings_hover_card`**
   > Show the full label on hover
@@ -332,7 +350,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**145 still to read**, of 148 new keys across 14 unmerged branch(es).
+**151 still to read**, of 154 new keys across 15 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -343,9 +361,9 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/roadmap-1010 (`eb6cc396`) — adds no English strings
+### chore/advisers-1011 (`388dbad8`) — adds no English strings
 
-### feat/bentley-interop (`e66572a5`) — 99 new, 99 to read @@ NEEDS RULING
+### feat/bentley-interop (`e644f9b1`) — 99 new, 99 to read @@ NEEDS RULING
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -675,6 +693,30 @@ build for that would be a gate nobody keeps. Refresh it with
   > Points data<br />(use Copy to see format)
   @@ NEEDS RULING
 
+### feat/snap (`dacc4425`) — 2 new, 2 to read @@ NEEDS RULING
+
+- **`lpn_snap_node_on_node`**
+  > {new} placed at the location of {target}. The two nodes are not connected.
+  @@ NEEDS RULING
+- **`lpn_snap_vertex`**
+  > {link}, vertex {n}
+  @@ NEEDS RULING
+
+### feat/tank-volume (`a85e4c69`) — 4 new, 4 to read @@ NEEDS RULING
+
+- **`lpn_result_depth`**
+  > Depth
+  @@ NEEDS RULING
+- **`lpn_result_depth_tip`**
+  > Depth of water in the tank at the time shown, measured up from the tank bottom: the head minus the tank elevation.
+  @@ NEEDS RULING
+- **`lpn_result_tank_volume`**
+  > Usable volume
+  @@ NEEDS RULING
+- **`lpn_result_tank_volume_tip`**
+  > Volume of water above the lowest water depth, so it is zero when the tank is at its minimum. EPANET's own tank volume also counts the water below the minimum level.
+  @@ NEEDS RULING
+
 ### feat/user-guide (`386d3e32`) — 45 new, 45 to read @@ NEEDS RULING
 
 - **`lpn_guide_about_heading`**
@@ -815,6 +857,4 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/visit-dedupe (`7b4a84bd`) — adds no English strings
 
-### fix/demand-pattern (`829761a2`) — adds no English strings
-
-### fix/split-and-hide (`7bc55df1`) — adds no English strings
+### fix/default-pattern-shown (`1547b87b`) — adds no English strings
