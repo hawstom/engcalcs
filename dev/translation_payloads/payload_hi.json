@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "hi",
-        "expected_key_count": 2546,
-        "delta_key_count": 102,
+        "expected_key_count": 2550,
+        "delta_key_count": 106,
         "exempt_key_count": 39,
         "exempt_keys": [
             "u_imgd",
@@ -800,6 +800,10 @@
         "lpn_msglog_hidden": "Hidden",
         "lpn_msglog_unhide": "Show",
         "lpn_status_hidden_tip": "Show the hidden message on the map again.",
+        "lpn_result_depth": "Depth",
+        "lpn_result_depth_tip": "Depth of water in the tank at the time shown, measured up from the tank bottom: the head minus the tank elevation.",
+        "lpn_result_tank_volume": "Usable volume",
+        "lpn_result_tank_volume_tip": "Volume of water above the lowest water depth, so it is zero at that depth. The EPANET tank volume also includes the water below the lowest water depth, which still counts toward mixing and water age, so the tank elevation stays at the tank bottom.",
         "lpn_pane_copy_heads": "Copy with column headings",
         "lpn_export_table_title": "Export to {format}",
         "lpn_export_table_current": "Current",
@@ -904,6 +908,10 @@
         "lpn_msglog_hidden": "Hidden",
         "lpn_msglog_unhide": "Show",
         "lpn_status_hidden_tip": "Show the hidden message on the map again.",
+        "lpn_result_depth": "Depth",
+        "lpn_result_depth_tip": "Depth of water in the tank at the time shown, measured up from the tank bottom: the head minus the tank elevation.",
+        "lpn_result_tank_volume": "Usable volume",
+        "lpn_result_tank_volume_tip": "Volume of water above the lowest water depth, so it is zero at that depth. The EPANET tank volume also includes the water below the lowest water depth, which still counts toward mixing and water age, so the tank elevation stays at the tank bottom.",
         "lpn_pane_copy_heads": "Copy with column headings",
         "lpn_export_table_title": "Export to {format}",
         "lpn_export_table_current": "Current",
@@ -1770,6 +1778,70 @@
                     "key": "lpn_wrong_tip",
                     "value": "इस पेज पर त्रुटि की रिपोर्ट करें। इससे एक बॉक्स खुलता है जिसमें समस्या चुनें, टिप्पणी जोड़ें, और उत्तर चाहिए तो ईमेल पता दर्ज करें। सभी फ़ील्ड वैकल्पिक हैं, और जब तक आप भेजें नहीं दबाते कुछ नहीं भेजा जाता।",
                     "english": "Report an error on this page. This opens a box to select the problem, add a comment, and enter an email address if a reply is wanted. All fields are optional, and nothing is sent until you press Send."
+                }
+            }
+        },
+        "lpn_result_depth": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_result_head_tip",
+                    "value": "इस नोड पर जल की ऊर्जा, जल-स्तंभ की ऊँचाई के रूप में लिखी गई। यह एक निरपेक्ष ऊँचाई है, जबकि दाब एक गेज माप है।",
+                    "english": "Potential energy of the water at this node, written as a height of water column. It is an absolute height, where pressure is a gauge measurement."
+                },
+                "next_translated": {
+                    "key": "lpn_result_pressure",
+                    "value": "दाब",
+                    "english": "Pressure"
+                }
+            }
+        },
+        "lpn_result_depth_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_result_head_tip",
+                    "value": "इस नोड पर जल की ऊर्जा, जल-स्तंभ की ऊँचाई के रूप में लिखी गई। यह एक निरपेक्ष ऊँचाई है, जबकि दाब एक गेज माप है।",
+                    "english": "Potential energy of the water at this node, written as a height of water column. It is an absolute height, where pressure is a gauge measurement."
+                },
+                "next_translated": {
+                    "key": "lpn_result_pressure",
+                    "value": "दाब",
+                    "english": "Pressure"
+                }
+            }
+        },
+        "lpn_result_tank_volume": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_result_head_tip",
+                    "value": "इस नोड पर जल की ऊर्जा, जल-स्तंभ की ऊँचाई के रूप में लिखी गई। यह एक निरपेक्ष ऊँचाई है, जबकि दाब एक गेज माप है।",
+                    "english": "Potential energy of the water at this node, written as a height of water column. It is an absolute height, where pressure is a gauge measurement."
+                },
+                "next_translated": {
+                    "key": "lpn_result_pressure",
+                    "value": "दाब",
+                    "english": "Pressure"
+                }
+            }
+        },
+        "lpn_result_tank_volume_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_result_head_tip",
+                    "value": "इस नोड पर जल की ऊर्जा, जल-स्तंभ की ऊँचाई के रूप में लिखी गई। यह एक निरपेक्ष ऊँचाई है, जबकि दाब एक गेज माप है।",
+                    "english": "Potential energy of the water at this node, written as a height of water column. It is an absolute height, where pressure is a gauge measurement."
+                },
+                "next_translated": {
+                    "key": "lpn_result_pressure",
+                    "value": "दाब",
+                    "english": "Pressure"
                 }
             }
         },
