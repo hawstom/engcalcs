@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "ar",
-        "expected_key_count": 2546,
-        "delta_key_count": 102,
+        "expected_key_count": 2556,
+        "delta_key_count": 112,
         "exempt_key_count": 31,
         "exempt_keys": [
             "calc_units_us",
@@ -792,6 +792,10 @@
         "lpn_msglog_hidden": "Hidden",
         "lpn_msglog_unhide": "Show",
         "lpn_status_hidden_tip": "Show the hidden message on the map again.",
+        "lpn_result_depth": "Depth",
+        "lpn_result_depth_tip": "Depth of water in the tank at the time shown, measured up from the tank bottom: the head minus the tank elevation.",
+        "lpn_result_tank_volume": "Available volume",
+        "lpn_result_tank_volume_tip": "Volume of water above the lowest water depth, so it is zero at that depth. The EPANET tank volume also includes the water below the lowest water depth, which still counts toward mixing and water age, so the tank elevation stays at the tank bottom.",
         "lpn_pane_copy_heads": "Copy with column headings",
         "lpn_export_table_title": "Export to {format}",
         "lpn_export_table_current": "Current",
@@ -833,8 +837,14 @@
         "lpn_split_pipe_ask": "Split pipe {id} at this node?",
         "lpn_split_yes": "Yes",
         "lpn_split_no": "No",
+        "lpn_snap_vertex": "{link}, vertex {n}",
+        "lpn_snap_node_on_node": "{new} placed at the location of {target}. The two nodes are not connected.",
+        "lpn_snap_moved_on_node": "{moved} moved to the location of {target}. The two nodes are not connected.",
         "lpn_settings_hover_card": "Show the full label on hover",
         "lpn_settings_hover_card_tip": "Rest the pointer on a node, link or customer to see its label as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project.",
+        "lpn_scenario_delete_in_base": "To remove it from the drawing, delete it in the {base} scenario.",
+        "lpn_scenario_only_deleted": "{id} is deleted. It was part of {scenario} only.",
+        "lpn_scenario_delete_blocked": "{id} is not deleted, because link {link} ends on it and also exists outside {scenario}. To delete both, delete them in the {base} scenario.",
         "lpn_junction_pattern_unknown": "No pattern in this project is named {id}, so the junction was left as it was.",
         "lpn_settings_default_pattern_none": "None (constant)",
         "lpn_demand_pattern_default": "(default: {id})",
@@ -896,6 +906,10 @@
         "lpn_msglog_hidden": "Hidden",
         "lpn_msglog_unhide": "Show",
         "lpn_status_hidden_tip": "Show the hidden message on the map again.",
+        "lpn_result_depth": "Depth",
+        "lpn_result_depth_tip": "Depth of water in the tank at the time shown, measured up from the tank bottom: the head minus the tank elevation.",
+        "lpn_result_tank_volume": "Available volume",
+        "lpn_result_tank_volume_tip": "Volume of water above the lowest water depth, so it is zero at that depth. The EPANET tank volume also includes the water below the lowest water depth, which still counts toward mixing and water age, so the tank elevation stays at the tank bottom.",
         "lpn_pane_copy_heads": "Copy with column headings",
         "lpn_export_table_title": "Export to {format}",
         "lpn_export_table_current": "Current",
@@ -937,8 +951,14 @@
         "lpn_split_pipe_ask": "Split pipe {id} at this node?",
         "lpn_split_yes": "Yes",
         "lpn_split_no": "No",
+        "lpn_snap_vertex": "{link}, vertex {n}",
+        "lpn_snap_node_on_node": "{new} placed at the location of {target}. The two nodes are not connected.",
+        "lpn_snap_moved_on_node": "{moved} moved to the location of {target}. The two nodes are not connected.",
         "lpn_settings_hover_card": "Show the full label on hover",
         "lpn_settings_hover_card_tip": "Rest the pointer on a node, link or customer to see its label as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project.",
+        "lpn_scenario_delete_in_base": "To remove it from the drawing, delete it in the {base} scenario.",
+        "lpn_scenario_only_deleted": "{id} is deleted. It was part of {scenario} only.",
+        "lpn_scenario_delete_blocked": "{id} is not deleted, because link {link} ends on it and also exists outside {scenario}. To delete both, delete them in the {base} scenario.",
         "lpn_junction_pattern_unknown": "No pattern in this project is named {id}, so the junction was left as it was.",
         "lpn_settings_default_pattern_none": "None (constant)",
         "lpn_demand_pattern_default": "(default: {id})",
@@ -1765,6 +1785,70 @@
                 }
             }
         },
+        "lpn_result_depth": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_result_head_tip",
+                    "value": "الطاقة الكامنة للماء عند هذه العقدة، معبَّراً عنها كارتفاع عمود ماء. هذا ارتفاع مطلق، أما الضغط فهو قياس بمقياس الضغط.",
+                    "english": "Potential energy of the water at this node, written as a height of water column. It is an absolute height, where pressure is a gauge measurement."
+                },
+                "next_translated": {
+                    "key": "lpn_result_pressure",
+                    "value": "الضغط",
+                    "english": "Pressure"
+                }
+            }
+        },
+        "lpn_result_depth_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_result_head_tip",
+                    "value": "الطاقة الكامنة للماء عند هذه العقدة، معبَّراً عنها كارتفاع عمود ماء. هذا ارتفاع مطلق، أما الضغط فهو قياس بمقياس الضغط.",
+                    "english": "Potential energy of the water at this node, written as a height of water column. It is an absolute height, where pressure is a gauge measurement."
+                },
+                "next_translated": {
+                    "key": "lpn_result_pressure",
+                    "value": "الضغط",
+                    "english": "Pressure"
+                }
+            }
+        },
+        "lpn_result_tank_volume": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_result_head_tip",
+                    "value": "الطاقة الكامنة للماء عند هذه العقدة، معبَّراً عنها كارتفاع عمود ماء. هذا ارتفاع مطلق، أما الضغط فهو قياس بمقياس الضغط.",
+                    "english": "Potential energy of the water at this node, written as a height of water column. It is an absolute height, where pressure is a gauge measurement."
+                },
+                "next_translated": {
+                    "key": "lpn_result_pressure",
+                    "value": "الضغط",
+                    "english": "Pressure"
+                }
+            }
+        },
+        "lpn_result_tank_volume_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_result_head_tip",
+                    "value": "الطاقة الكامنة للماء عند هذه العقدة، معبَّراً عنها كارتفاع عمود ماء. هذا ارتفاع مطلق، أما الضغط فهو قياس بمقياس الضغط.",
+                    "english": "Potential energy of the water at this node, written as a height of water column. It is an absolute height, where pressure is a gauge measurement."
+                },
+                "next_translated": {
+                    "key": "lpn_result_pressure",
+                    "value": "الضغط",
+                    "english": "Pressure"
+                }
+            }
+        },
         "lpn_pane_copy_heads": {
             "reason": "missing",
             "current_value": null,
@@ -2421,6 +2505,54 @@
                 }
             }
         },
+        "lpn_snap_vertex": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_field_to",
+                    "value": "إلى",
+                    "english": "To"
+                },
+                "next_translated": {
+                    "key": "lpn_field_valve_type",
+                    "value": "نوع الصمام",
+                    "english": "Valve type"
+                }
+            }
+        },
+        "lpn_snap_node_on_node": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_field_to",
+                    "value": "إلى",
+                    "english": "To"
+                },
+                "next_translated": {
+                    "key": "lpn_field_valve_type",
+                    "value": "نوع الصمام",
+                    "english": "Valve type"
+                }
+            }
+        },
+        "lpn_snap_moved_on_node": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_field_to",
+                    "value": "إلى",
+                    "english": "To"
+                },
+                "next_translated": {
+                    "key": "lpn_field_valve_type",
+                    "value": "نوع الصمام",
+                    "english": "Valve type"
+                }
+            }
+        },
         "lpn_settings_hover_card": {
             "reason": "missing",
             "current_value": null,
@@ -2450,6 +2582,54 @@
                     "key": "lpn_settings_id_prefixes",
                     "value": "بادئات المعرّفات",
                     "english": "ID prefixes"
+                }
+            }
+        },
+        "lpn_scenario_delete_in_base": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scenario_deactivated",
+                    "value": "يُستثنى {id} من الشبكة في {scenario}. يبقى في الرسم وفي السيناريوهات الأخرى.",
+                    "english": "{id} is excluded from the network in {scenario}. It remains in the drawing and in the other scenarios."
+                },
+                "next_translated": {
+                    "key": "lpn_scenario_push_btn",
+                    "value": "تطبيق قيم الأساس على جميع السيناريوهات",
+                    "english": "Apply Base values to all scenarios"
+                }
+            }
+        },
+        "lpn_scenario_only_deleted": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scenario_deactivated",
+                    "value": "يُستثنى {id} من الشبكة في {scenario}. يبقى في الرسم وفي السيناريوهات الأخرى.",
+                    "english": "{id} is excluded from the network in {scenario}. It remains in the drawing and in the other scenarios."
+                },
+                "next_translated": {
+                    "key": "lpn_scenario_push_btn",
+                    "value": "تطبيق قيم الأساس على جميع السيناريوهات",
+                    "english": "Apply Base values to all scenarios"
+                }
+            }
+        },
+        "lpn_scenario_delete_blocked": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scenario_deactivated",
+                    "value": "يُستثنى {id} من الشبكة في {scenario}. يبقى في الرسم وفي السيناريوهات الأخرى.",
+                    "english": "{id} is excluded from the network in {scenario}. It remains in the drawing and in the other scenarios."
+                },
+                "next_translated": {
+                    "key": "lpn_scenario_push_btn",
+                    "value": "تطبيق قيم الأساس على جميع السيناريوهات",
+                    "english": "Apply Base values to all scenarios"
                 }
             }
         },

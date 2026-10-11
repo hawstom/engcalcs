@@ -6072,8 +6072,12 @@ var EngCalcs = EngCalcs || {};
 			// `symbolCapPercentile` percentile pipe." Always on -- there is no "off" state to
 			// explain, unlike the labeling threshold above. Both are plain dimensionless numbers
 			// (a ratio and a percentage), so neither is reinterpreted on a unit change.
-			symbolCapMultiple: 0.5,
-			symbolCapPercentile: 20,
+			// **NEW-PROJECT DEFAULT 0.25 x the MEDIAN pipe** (Tom, 2026-10-11, Tweaks: *"Initial default:
+			// Prevent nodes from scaling larger than 0.25 times 50%-ile pipe. (Inexact science). Leave
+			// examples as they are for now."*). A file saved without the pair is read as the old
+			// 0.5 / 20 by the load path, so the shipped examples are unchanged.
+			symbolCapMultiple: 0.25,
+			symbolCapPercentile: 50,
 			// Task 617: a CSS look (grayscale etc.) on the TILE LAYER only (LPN_BASEMAP_STYLES). Project data on the
 			// precedent of backdropOpacity beside it; a new project opens Muted; a file saved without the field opens Normal (see the load path).
 			basemapStyle: 'muted',
@@ -6913,6 +6917,217 @@ var EngCalcs = EngCalcs || {};
 		}
 		return best;
 	}
+	// ---- OBJECT SNAP: THE MAGNET (ROADMAP Task 782) -----------------------------------------------
+	//
+	// Tom, 2026-10-10, listing the tools that replace per-scenario Change type: *"Snap/magnet to
+	// asset"*. CAD object snap, in his AutoCAD/Civil 3D sense: while a node is placed or moved, or a
+	// bend is moved, the point jumps to an existing node, a pipe vertex, or the nearest point on a
+	// pipe when one is within reach, a glyph and a name show what it caught, and a held Alt key
+	// places at the bare pointer instead. The reach is the gesture's own reachPx() -- the number every
+	// other finder on this page uses, so there is no second tolerance to keep in step.
+	//
+	// **THE SEAM: ONE PROVIDER PER SOURCE OF SNAP POINTS.** addSnapProvider(fn) registers a source;
+	// snapAtWorld() asks every source and Geom.bestSnapCandidate() picks the winner, by rank and then
+	// distance. A provider is `function (wx, wy, tolW, opts)` returning an array of candidates:
+	//
+	//   { kind, rank, x, y, dist, name, glyph, src, ... }
+	//
+	// `kind` names the source ('node', 'vertex', 'line'; Task 779's Shape adds its own), and
+	// `opts.kinds`, when given, limits a gesture to some of them. `rank` orders sources (0 node,
+	// 1 vertex, 2 nearest point on a pipe; a Shape vertex would be 1). `dist` is in world units and
+	// `tolW` is the reach in world units. `name` is what the tip shows ("Junction 22"). `glyph` is
+	// 'square', 'diamond' or 'hourglass'. `src` is the stored point object the candidate stands on,
+	// or null when the point is computed: copySnapProvenance() copies that object's file characters
+	// (`tok.x/y`) and geographic source record (`_xsrc/_ysrc`), so a snapped point is written back
+	// to the character as the target's own. `opts.exclude` = {nodes: {id: true}, links: {id: true}}
+	// is what a drag must not snap to (itself and what moves with it); a provider honours it.
+	// `opts.onLink`, when present, limits the pipe-line source to that one link id (or to none,
+	// when it is null): a node tool's line magnet is only the pipe the press is ON.
+	//
+	// So Task 779's Shape vertices are one call: addSnapProvider(snapProviderShapeVertices), with a
+	// provider shaped like snapProviderVertices() below.
+	var SNAP_PROVIDERS = [];
+	function addSnapProvider(fn) { SNAP_PROVIDERS.push(fn); }
+	function snapKindWanted(opts, kind) { return !opts || !opts.kinds || !!opts.kinds[kind]; }
+	function snapExcluded(opts, what, id) {
+		return !!(opts && opts.exclude && opts.exclude[what] && opts.exclude[what][id]);
+	}
+	// Nodes, at the position the scenario on screen draws them. `src` is the node only where that
+	// position IS the node's stored one; a scenario's moved node has no file characters to copy.
+	function snapProviderNodes(wx, wy, tolW, opts) {
+		var out = [], i, n, x, y, d;
+		if (!snapKindWanted(opts, 'node')) { return out; }
+		for (i = 0; i < doc.nodes.length; i++) {
+			n = doc.nodes[i];
+			if (!nodeEls[n.id] || snapExcluded(opts, 'nodes', n.id)) { continue; }
+			x = nodeDrawX(n); y = nodeDrawY(n);
+			d = Math.hypot(x - wx, y - wy);
+			if (d > tolW) { continue; }
+			out.push({ kind: 'node', rank: 0, x: x, y: y, dist: d, glyph: 'square',
+				name: reportTypeNoun('node', n.type) + ' ' + n.id, node: n,
+				src: nodeHasCoordOverride(n) ? null : n, ov: coordOverridesOf(n) });
+		}
+		return out;
+	}
+	function snapProviderVertices(wx, wy, tolW, opts) {
+		var out = [], pc = EngCalcs.pageConfig || {}, i, j, l, v, d;
+		if (!snapKindWanted(opts, 'vertex')) { return out; }
+		for (i = 0; i < doc.links.length; i++) {
+			l = doc.links[i];
+			if (!linkEls[l.id] || snapExcluded(opts, 'links', l.id)) { continue; }
+			for (j = 0; j < (l.verts || []).length; j++) {
+				v = l.verts[j];
+				d = Math.hypot(v.x - wx, v.y - wy);
+				if (d > tolW) { continue; }
+				out.push({ kind: 'vertex', rank: 1, x: v.x, y: v.y, dist: d, glyph: 'diamond',
+					name: String(pc.lpn_snap_vertex || '{link}, vertex {n}')
+						.split('{link}').join(reportTypeNoun('link', l.type) + ' ' + l.id).split('{n}').join(String(j + 1)),
+					link: l, vidx: j, src: v });
+			}
+		}
+		return out;
+	}
+	// The nearest point on a PIPE's line, lowest rank: a pipe passes through its own end nodes and
+	// bends, so this only wins where neither of those is within reach. Pumps and valves are left
+	// out: a point on a pump's symbol line is not a place anybody puts a node.
+	function snapProviderPipeLine(wx, wy, tolW, opts) {
+		var out = [], i, l, hit;
+		if (!snapKindWanted(opts, 'line')) { return out; }
+		for (i = 0; i < doc.links.length; i++) {
+			l = doc.links[i];
+			if (l.type !== 'pipe' || !linkEls[l.id] || snapExcluded(opts, 'links', l.id)) { continue; }
+			if (opts && opts.onLink !== undefined && opts.onLink !== l.id) { continue; }
+			if (!nodeById(l.from) || !nodeById(l.to)) { continue; }
+			hit = Geom.nearestFractionOnPolyline(linkPointList(l), wx, wy);
+			if (!(hit.dist <= tolW) || hit.f <= 1e-9 || hit.f >= 1 - 1e-9) { continue; }
+			out.push({ kind: 'line', rank: 2, x: hit.x, y: hit.y, dist: hit.dist, glyph: 'hourglass',
+				name: reportTypeNoun('link', l.type) + ' ' + l.id, link: l, f: hit.f, src: null });
+		}
+		return out;
+	}
+	addSnapProvider(snapProviderNodes);
+	addSnapProvider(snapProviderVertices);
+	addSnapProvider(snapProviderPipeLine);
+	// The snap for a WORLD point, at a reach in SCREEN pixels. Null when nothing is in reach.
+	function snapAtWorld(wx, wy, px, opts) {
+		var tolW = px / (state.s || 1), all = [], i;
+		for (i = 0; i < SNAP_PROVIDERS.length; i++) { all = all.concat(SNAP_PROVIDERS[i](wx, wy, tolW, opts) || []); }
+		return Geom.bestSnapCandidate(all, tolW);
+	}
+	function snapAtScreen(cx, cy, px, opts) {
+		var w = screenToWorld(cx, cy);
+		return snapAtWorld(w.x, w.y, px, opts);
+	}
+	// **THE TARGET'S FILE CHARACTERS GO WITH ITS NUMBERS.** `dst` has just been given the target's
+	// x and y; this makes it carry the same source record, so a saved file and an exported `.inp`
+	// write the same characters for both. Each record is still believed only while its number
+	// matches (unprojectStoredGeo(), lpnNumText()), so a later move retires it by itself. BASE
+	// ONLY: inside a scenario the position is an override and the element's own record must stay.
+	function copySnapProvenance(c, dst) {
+		var s = c && c.src;
+		if (!dst || !inBaseScenario()) { return; }
+		delete dst[LPN_GEO_XSRC]; delete dst[LPN_GEO_YSRC];
+		if (dst.tok) {
+			delete dst.tok.x; delete dst.tok.y;
+			if (!Object.keys(dst.tok).length) { delete dst.tok; }
+		}
+		if (!s || s.x !== dst.x || s.y !== dst.y) { return; }
+		if (typeof s[LPN_GEO_XSRC] === 'number') { dst[LPN_GEO_XSRC] = s[LPN_GEO_XSRC]; }
+		if (typeof s[LPN_GEO_YSRC] === 'number') { dst[LPN_GEO_YSRC] = s[LPN_GEO_YSRC]; }
+		if (s.tok && (typeof s.tok.x === 'string' || typeof s.tok.y === 'string')) {
+			dst.tok = dst.tok || {};
+			if (typeof s.tok.x === 'string') { dst.tok.x = s.tok.x; }
+			if (typeof s.tok.y === 'string') { dst.tok.y = s.tok.y; }
+		}
+	}
+	// A node moved onto a snap target, through the one door a node's position is written by. In a
+	// scenario the OUTWARD pair is handed over where the target has one of its own (its override),
+	// so a typed 38.5 on the target is 38.5 on the node too.
+	function writeNodeAtSnap(n, c) {
+		var ov = c.ov || null;
+		writeNodeCoord(n, false, c.x, (!inBaseScenario() && ov && typeof ov.x === 'number') ? ov.x : undefined);
+		writeNodeCoord(n, true, c.y, (!inBaseScenario() && ov && typeof ov.y === 'number') ? ov.y : undefined);
+		copySnapProvenance(c, n);
+	}
+	// **THE GLYPH AND THE NAME.** One group in the world layer, redrawn on every call at a constant
+	// screen size; display none whenever nothing is caught. Decoration only: never in a document,
+	// a snapshot or a scenario.
+	var snapMarkEl = null;
+	function showSnapMark(c) {
+		if (!snapMarkEl) { return; }
+		if (!c) { hideSnapMark(); return; }
+		var s = state.s || 1, h = 6 / s, x = c.x, y = c.y, d, txt;
+		while (snapMarkEl.firstChild) { snapMarkEl.removeChild(snapMarkEl.firstChild); }
+		d = c.glyph === 'diamond'
+			? 'M' + x + ' ' + (y - h * 1.3) + 'L' + (x + h * 1.3) + ' ' + y + 'L' + x + ' ' + (y + h * 1.3) + 'L' + (x - h * 1.3) + ' ' + y + 'Z'
+			: c.glyph === 'hourglass'
+				? 'M' + (x - h) + ' ' + (y - h) + 'L' + (x + h) + ' ' + (y - h) + 'L' + (x - h) + ' ' + (y + h) + 'L' + (x + h) + ' ' + (y + h) + 'Z'
+				: 'M' + (x - h) + ' ' + (y - h) + 'L' + (x + h) + ' ' + (y - h) + 'L' + (x + h) + ' ' + (y + h) + 'L' + (x - h) + ' ' + (y + h) + 'Z';
+		el('path', { 'class': 'lpn-snap-glyph', d: d }, snapMarkEl);
+		txt = el('text', { 'class': 'lpn-snap-name', x: x + 10 / s, y: y - 10 / s, 'font-size': 12 / s }, snapMarkEl);
+		txt.textContent = c.name || '';
+		snapMarkEl.setAttribute('data-snap-kind', c.kind);
+		snapMarkEl.style.display = '';
+	}
+	function hideSnapMark() {
+		if (!snapMarkEl || snapMarkEl.style.display === 'none') { return; }
+		snapMarkEl.style.display = 'none';
+		snapMarkEl.removeAttribute('data-snap-kind');
+	}
+	// WHICH TARGETS EACH TOOL MAGNETS TO, in one table, so the hover glyph and the press that
+	// commits can never disagree. A node tool takes all three. The pipe, pump and valve tools
+	// already connect to a node within reach (the snap-on-create below), so their glyph names that
+	// node, and a bend in open space takes a vertex. Junction and Pipe (the chain) is left as it
+	// was: each of its presses makes a junction joined to the one before, and one landing on a
+	// pipe's line or bend unjoined to that pipe would look connected and not be.
+	var SNAP_KINDS_BY_MODE = {
+		'add-junction': { node: true, vertex: true, line: true },
+		'add-reservoir': { node: true, vertex: true, line: true },
+		'add-tank': { node: true, vertex: true, line: true },
+		'add-pipe': { node: true, vertex: true },
+		'add-pump': { node: true, vertex: true },
+		'add-valve': { node: true, vertex: true }
+	};
+	// What a press in this mode, at this point, would snap to. Null with Alt held (the bare
+	// pointer), in a mode that does not snap, and when nothing is in reach.
+	//
+	// **A NODE TOOL'S LINE MAGNET IS THE PIPE'S OWN HIT BAND, NOT THE NODE REACH** (Perry's review of
+	// Task 782): at 14/24 px the "Split pipe?" question covered twice the map it did on master. So the
+	// line candidate is only the pipe the browser's hit test puts the press ON (tapLinkId(), the test
+	// that decided "on the pipe" before the magnet), and node and bend targets keep the full reach.
+	// **AND IN A SCENARIO A NODE TOOL MAGNETS TO NODES ONLY**: a scenario cannot split a pipe, so a
+	// node put on a line or bend there would look connected and be offered nothing.
+	function toolSnapAt(e) {
+		var kinds = SNAP_KINDS_BY_MODE[mode], opts;
+		if (!kinds || (e && e.altKey)) { return null; }
+		opts = { kinds: kinds };
+		if (mode === 'add-junction' || mode === 'add-reservoir' || mode === 'add-tank') {
+			if (!inBaseScenario()) { opts.kinds = { node: true }; }
+			else { opts.onLink = tapLinkId(mapHitAt(e.clientX, e.clientY)); }
+		}
+		return snapAtScreen(e.clientX, e.clientY, reachPx(e), opts);
+	}
+	// What a dragged node or bend snaps to: the same three sources, less the thing being dragged and
+	// what moves with it (a node's own pipes; a bend's own pipe and its two end nodes), since a node
+	// snapping onto its own pipe would be chasing a line that follows it.
+	function dragSnapOpts(dr) {
+		var ex = { nodes: {}, links: {} }, l;
+		if (dr.type === 'node') {
+			ex.nodes[dr.id] = true;
+			// ...and the nodes at the far ends of its own links, which would make a link of zero
+			// length (Perry's review).
+			(incidentLinks[dr.id] || []).forEach(function (lid) {
+				var il = linkById(lid);
+				ex.links[lid] = true;
+				if (il) { ex.nodes[il.from] = true; ex.nodes[il.to] = true; }
+			});
+		} else if (dr.type === 'vertex') {
+			l = linkById(dr.id);
+			ex.links[dr.id] = true;
+			if (l) { ex.nodes[l.from] = true; ex.nodes[l.to] = true; }
+		}
+		return { exclude: ex };
+	}
 	// A reservoir's effective fixed head: whatever the user typed, or -- when blank -- its own
 	// elevation. Blank is stored as undefined rather than as a copy of the elevation, so the two
 	// stay linked: moving the elevation moves the water surface with it until the user takes control
@@ -7380,11 +7595,11 @@ var EngCalcs = EngCalcs || {};
 	function invalidateLinkLengths() { pctLinkLengthCache = null; pctLinkLengthPctCache = null; symbolCapCache = null; }
 	function symbolCapMultiple() {
 		var v = settings.symbolCapMultiple;
-		return (typeof v === 'number' && isFinite(v) && v > 0) ? v : 0.5;
+		return (typeof v === 'number' && isFinite(v) && v > 0) ? v : 0.25;
 	}
 	function symbolCapPercentile() {
 		var v = settings.symbolCapPercentile;
-		return (typeof v === 'number' && isFinite(v) && v >= 0 && v <= 100) ? v : 20;
+		return (typeof v === 'number' && isFinite(v) && v >= 0 && v <= 100) ? v : 50;
 	}
 	// **STRIDE-SAMPLED TO AT MOST 512 LINKS, DETERMINISTICALLY.** A percentile wants a sort, and
 	// this is consulted on the zoom path; a deterministic stride is stable under re-entry where a
@@ -8439,6 +8654,14 @@ var EngCalcs = EngCalcs || {};
 			}
 			return lastSolveResult ? toDisplay(lastSolveResult.heads[n.id], resultUnit('elevhead')) : undefined;
 		}
+		if (field === 'depth') {
+			var depSI = tankDepthSI(n);
+			return depSI === undefined ? undefined : toDisplay(depSI, resultUnit('elevhead'));
+		}
+		if (field === 'volume') {
+			var volSI = tankUsableVolumeSI(n);
+			return volSI === undefined ? undefined : volSI * tankVolumeFactor();
+		}
 		if (field === 'pressure') {
 			if (isFixedHeadNode(n)) { return fixedHeadPressure(n); }
 			return lastSolveResult ? toDisplay(lastSolveResult.pressures[n.id], resultUnit('pressure')) : undefined;
@@ -8450,6 +8673,78 @@ var EngCalcs = EngCalcs || {};
 		// EPANET converts an initial quality nowhere either, so there is no factor on this side.
 		if (field === 'initQuality') { return nodeInitQuality(n); }
 		return undefined;
+	}
+	// ---- A TANK'S DEPTH AND USABLE VOLUME (Task 783) ---------------------------------------------
+	//
+	// **DEPTH IS HEAD MINUS THE TANK BOTTOM, and our Elevation IS the bottom** (EPANET's own: depth
+	// zero is the vessel floor). Inside a run the head is the frame's (what the engine integrated);
+	// at one instant it is the stored water depth, exactly as the Head column reads. SI metres.
+	function tankDepthSI(n) {
+		var hf = toSI(1, 'lpn_u_elevhead'), g;
+		if (!n || n.type !== 'tank' || !(hf > 0) || !isFinite(hf)) { return undefined; }
+		if (lastSolveResult && typeof lastSolveResult.t === 'number' && lastSolveResult.heads &&
+			typeof lastSolveResult.heads[n.id] === 'number') {
+			// **THE BOTTOM IS THE ONE THE RUN WAS SOLVED WITH** (Recalculate OFF is a snapshot): the
+			// head above is stale after an edit, so the elevation it is measured from must be too.
+			g = tankGeomOf(n, true);
+			return lastSolveResult.heads[n.id] - g.elevSI;
+		}
+		return toSI(effective(n, 'level') || 0, 'lpn_u_elevhead');
+	}
+	// **A TANK'S SHAPE AS THE RESULT ON SCREEN WAS SOLVED** (SI): bottom, lowest water depth,
+	// diameter and the usable volume curve. Captured when a result is installed (tankSnap), read
+	// here only for a run's frames, whose head is itself a snapshot. At one instant the head is
+	// derived from the typed numbers and moves with them, so the live numbers are right there.
+	var tankSnap = null;
+	function tankGeomLive(n) {
+		var hf = toSI(1, 'lpn_u_elevhead'), vf = hf * hf * hf, curve = n.volCurve ? curveById(n.volCurve) : null,
+			pts = curve ? curvePointsOf(curve) : [];
+		if (!(pts.length && EngCalcs.lpnTankVolumeCurveUsable && EngCalcs.lpnTankVolumeCurveUsable(pts))) { pts = null; }
+		else { pts = pts.map(function (pt) { return [pt[0] * hf, pt[1] * vf]; }); }
+		return { elevSI: toSI(n.elev || 0, 'lpn_u_elevhead'), minSI: toSI(n.minLevel || 0, 'lpn_u_elevhead'),
+			D: toSI(n.tankDiameter, 'lpn_u_length'), curve: pts };
+	}
+	function captureTankSnapshot() {
+		var snap = {};
+		doc.nodes.forEach(function (n) { if (n.type === 'tank') { snap[n.id] = tankGeomLive(n); } });
+		tankSnap = snap;
+	}
+	function tankGeomOf(n, fromSnapshot) {
+		return (fromSnapshot && tankSnap && tankSnap[n.id]) || tankGeomLive(n);
+	}
+	// **ZERO AT THE LOWEST WATER DEPTH** (Tom, 2026-10-10): the water a draw-down can actually use.
+	// EPANET's own tank volume also counts the water below the lowest water depth, so this is NOT
+	// that number. A usable volume curve wins (EPANET's rule: curve volumes replace the cylinder),
+	// otherwise a cylinder of the tank diameter. SI cubic metres.
+	function tankUsableVolumeSI(n) {
+		var dep = tankDepthSI(n), g, top;
+		if (dep === undefined) { return undefined; }
+		g = tankGeomOf(n, !!(lastSolveResult && typeof lastSolveResult.t === 'number'));
+		top = Math.max(dep, g.minSI);
+		if (g.curve) { return tankCurveVolume(g.curve, top) - tankCurveVolume(g.curve, g.minSI); }
+		if (!(g.D > 0) || !isFinite(g.D)) { return undefined; }
+		return Math.PI / 4 * g.D * g.D * (top - g.minSI);
+	}
+	// Linear between the curve's points, held flat beyond its ends. pts are SI and increasing in x.
+	function tankCurveVolume(pts, x) {
+		var i, a, b;
+		if (x <= pts[0][0]) { return pts[0][1]; }
+		for (i = 1; i < pts.length; i++) {
+			if (x <= pts[i][0]) {
+				a = pts[i - 1]; b = pts[i];
+				return a[1] + (b[1] - a[1]) * (x - a[0]) / (b[0] - a[0]);
+			}
+		}
+		return pts[pts.length - 1][1];
+	}
+	// A volume is shown in the LENGTH unit cubed (cubic feet or cubic metres, which is what EPANET
+	// pairs with its length): the factor and the mark come from the one LENGTH selector.
+	function tankVolumeFactor() { var f = unitFactor('lpn_u_length'); return f * f * f; }
+	function tankVolumeUnitText() {
+		var pc = EngCalcs.pageConfig || {}, k = unitKey('lpn_u_length');
+		if (k === 'ft') { return pc.u_ft3 || 'ft^3'; }
+		if (k === 'm') { return pc.u_m3 || 'm^3'; }
+		return unitLabel('lpn_u_length') + '^3';
 	}
 	function colorLinkValue(l, field) {
 		if (field === 'diameter') { return l.type === 'pump' ? undefined : effective(l, 'diameter'); }
@@ -8618,6 +8913,12 @@ var EngCalcs = EngCalcs || {};
 		// age or a source trace the document states no chemical and this is '', which is honest:
 		// nobody has said what the number is in.
 		if (group === 'node' && field === 'initQuality') { return concentrationUnitText(); }
+		// **A TANK'S TWO RESULTS ARE NOT COLOUR OR LABEL FIELDS** (Task 783; the chemical-symbology
+		// harness holds every colour field to a Labels row, and these have neither), so they sit
+		// outside COLOR_NODE_FIELDS and the unit is answered here. Depth reads in the Elevation/Head
+		// unit like the three typed levels; volume in the LENGTH unit cubed.
+		if (group === 'node' && field === 'volume') { return tankVolumeUnitText(); }
+		if (group === 'node' && field === 'depth') { return unitLabel(resultUnit('elevhead')); }
 		id = colorFieldUnit(group, field);
 		if (id) { return unitLabel(id); }
 		// A friction factor is dimensionless and a status is not a quantity at all; both print
@@ -8866,12 +9167,15 @@ var EngCalcs = EngCalcs || {};
 	function colorFieldLabel(group, field) {
 		var pc = EngCalcs.pageConfig || {}, defs = group === 'node' ? nodeFieldDefs(pc) : linkFieldDefs(pc), i;
 		for (i = 0; i < defs.length; i++) { if (defs[i][0] === field) { return defs[i][1]; } }
+		// Tank-only results with no Labels row (Task 783): offered to the ramp, Find and the graph.
+		if (group === 'node' && field === 'depth') { return pc.lpn_result_depth || 'Depth'; }
+		if (group === 'node' && field === 'volume') { return pc.lpn_result_tank_volume || 'Available volume'; }
 		return field;
 	}
 	// **A STATISTIC VIEW SAYS SO IN THE HEADING** (Task 735): with the transport on Averaged, the map's
 	// "Pressure" is not an instant, and the label "P=124.88" cannot say so. Result fields only; an
 	// input (elevation, diameter) is the same in every view.
-	var STATISTIC_RESULT_FIELDS = { demandActual: 1, level: 1, head: 1, pressure: 1, quality: 1,
+	var STATISTIC_RESULT_FIELDS = { demandActual: 1, level: 1, depth: 1, volume: 1, head: 1, pressure: 1, quality: 1,
 		flow: 1, velocity: 1, headloss: 1, rate: 1 };
 	function colorHeadingText(group, field, unit, labelOverride) {
 		var stat = EngCalcs.lpnTimeStatisticLabel && !labelOverride && STATISTIC_RESULT_FIELDS[field] ?
@@ -18933,6 +19237,8 @@ var EngCalcs = EngCalcs || {};
 			['demandActual', 'bpn_demand', 'Demand'],
 			['head', 'lpn_result_head', 'Head'],
 			['pressure', 'lpn_result_pressure', 'Pressure'],
+			['depth', 'lpn_result_depth', 'Depth'],
+			['volume', 'lpn_result_tank_volume', 'Available volume'],
 			['quality', null, 'Water age']
 		];
 		var BAND_LINK = [
@@ -18997,7 +19303,7 @@ var EngCalcs = EngCalcs || {};
 					if (d.group !== 'link' || (d.type && d.type !== 'pipe') || !reactionFieldsShown()) { return; }
 				} else if (key === 'emitter') {
 					if (d.group !== 'node' || (d.type && d.type !== 'junction')) { return; }
-				} else if (key === 'level' || key === 'minLevel' || key === 'maxLevel'
+				} else if (key === 'level' || key === 'minLevel' || key === 'maxLevel' || key === 'depth' || key === 'volume'
 						|| key === 'tankDiameter' || key === 'mixingModel' || key === 'mixingFraction') {
 					if (d.group !== 'node' || (d.type && d.type !== 'tank')) { return; }
 				} else if (key === 'speed' || key === 'energyPrice' || key === 'energyPattern') {
@@ -24340,6 +24646,14 @@ var EngCalcs = EngCalcs || {};
 					// it must be visible, but a second editable field would be two numbers that have
 					// to agree.
 					paneColNodeResult('head', 'lpn_result_head', paneUnitHead),
+					// **DEPTH AND USABLE VOLUME, AS RESULTS** (Task 783): head minus the tank bottom, and
+					// the water above the lowest water depth. Heading tips live in the popup rows.
+					paneColNodeResult('depth', 'lpn_result_depth', paneUnitHead),
+					(function () {
+						var c = paneColNodeResult('volume', 'lpn_result_tank_volume', null);
+						c.unitText = tankVolumeUnitText;
+						return c;
+					}()),
 					paneColNodeInitQuality(),
 					paneColSourceType(), paneColSourceQuality(), paneColSourcePattern(),
 					paneColNodeQuality()
@@ -31282,8 +31596,13 @@ var EngCalcs = EngCalcs || {};
 	// them says something true, and Tom named one field.
 	var TS_FIELD_SKIP = { node: { initQuality: 1 }, link: {} };
 	function tsFieldOptions(group) {
-		var skip = TS_FIELD_SKIP[group] || {};
-		return colorFieldOptions(group).filter(function (o) { return !skip[o[0]]; });
+		var skip = TS_FIELD_SKIP[group] || {},
+			out = colorFieldOptions(group).filter(function (o) { return !skip[o[0]]; });
+		// A tank's depth and usable volume (Task 783): graphable, but neither a map colour nor a label.
+		if (group === 'node') {
+			out.push(['depth', colorFieldLabel('node', 'depth')], ['volume', colorFieldLabel('node', 'volume')]);
+		}
+		return out;
 	}
 	function tsField() {
 		var group = tsGroup(), opts = tsFieldOptions(group), f = tsState.fields[group], i;
@@ -32355,6 +32674,8 @@ var EngCalcs = EngCalcs || {};
 		if (mode === 'add-meter' && newMode !== 'add-meter') { setPendingMeter(null); }
 		// Match properties keeps its source only while the tool runs.
 		if (mode === 'match' && newMode !== 'match') { matchTargetsList = []; }
+		// The snap glyph belongs to the tool that showed it (Task 782).
+		hideSnapMark();
 		// The hover preview is a Select-mode-only signal (Ida's wishlist item 1): leaving 'select'
 		// for any other tool drops it rather than leaving a highlight nothing will now clear, since
 		// the pointermove listener that maintains it does no work outside 'select'.
@@ -32578,8 +32899,11 @@ var EngCalcs = EngCalcs || {};
 	 * Base pipe from inside one would change the other scenarios under it.
 	 * dev/lpn-spike/ewb-meeting-harness.js.
 	 */
-	function breakPipeAtPoint(l, nodeType, wx, wy) {
+	// `at`, when given, is a snap target on this pipe (Task 782): the node goes EXACTLY on it, and a
+	// bend it stands on is consumed by the node rather than left as a zero-length leg beside it.
+	function breakPipeAtPoint(l, nodeType, wx, wy, at) {
 		var pts = linkPointList(l), r = Geom.nearestFractionOnPolyline(pts, wx, wy),
+			atV = at && at.kind === 'vertex' && at.link === l ? at.vidx : -1,
 			total = Geom.polylineLength(pts), splitAlong = r.f * total,
 			oldTo = l.to, oldId = l.id, cum = [0], i, keepVerts = [], newVerts = [], node, nl, clone,
 			lenOrig, lenNew, frac, wasTyped = !l.lenAuto, typedLen = l._length;
@@ -32587,12 +32911,15 @@ var EngCalcs = EngCalcs || {};
 			cum.push(cum[i] + Math.hypot(pts[i + 1].x - pts[i].x, pts[i + 1].y - pts[i].y));
 		}
 		// A vertex travels with its typed geographic characters, so it is copied whole.
+		if (atV >= 0) { splitAlong = cum[atV + 1]; }
 		(l.verts || []).forEach(function (v, k) {
+			if (k === atV) { return; }
 			if (cum[k + 1] < splitAlong - 1e-12) { keepVerts.push(v); }
 			else { newVerts.push(Object.assign({}, v)); }
 		});
 		clone = JSON.parse(JSON.stringify(l));
-		node = addNode(nodeType, r.x, r.y);
+		node = at ? addNode(nodeType, at.x, at.y) : addNode(nodeType, r.x, r.y);
+		if (at) { copySnapProvenance(at, node); }
 		nl = addLink('pipe', node.id, oldTo, newVerts);
 		nl.verts = newVerts;   // base-write: construction: whole copies, so a vertex keeps its typed characters
 		// Everything the pipe carries comes across, except what is its own place or identity.
@@ -32753,8 +33080,26 @@ var EngCalcs = EngCalcs || {};
 		el._active = false;   // base-write: born inactive in Base, then overridden active here -- the whole membership design
 		setOverride(el, 'active', true);
 	}
+	// **AN ASSET THAT EXISTS ONLY IN THE CURRENT SCENARIO IS REALLY DELETED THERE** (Tom,
+	// 2026-10-11: *"I created a junction in a Scenario 1, and it doesn't exist in Base scenario. But
+	// I can't delete it in Scenario 1. So I can't delete it at all."*). Drawing in a scenario makes
+	// an element inactive in Base and active here (bornInScenario()), so deactivating it here left an
+	// element active nowhere and still drawn. "Only here" is read off the `active` values alone:
+	// inactive in Base and in every other scenario. No flag is stored, so files are unchanged.
+	function activeInScenario(el, s) {
+		var ov = s.isBase ? null : s.overrides[ovKey(el)];
+		if (ov && Object.prototype.hasOwnProperty.call(ov, 'active')) { return ov.active !== false; }
+		return baseValue(el, 'active') !== false;
+	}
+	function onlyInThisScenario(el) {
+		var here = activeScenario();
+		if (here.isBase || !el || baseValue(el, 'active') !== false) { return false; }
+		return !scenarios.some(function (s) { return s !== here && !s.isBase && activeInScenario(el, s); });
+	}
+
 	// DELETING: inside a scenario it means "not in this network", so it sets inactive rather than
-	// destroying an element every other scenario may be using. In BASE it is a real deletion and
+	// destroying an element every other scenario may be using -- unless the element exists only in
+	// that scenario (onlyInThisScenario() above), which is then deleted as Base deletes. In BASE it is a real deletion and
 	// takes every scenario's overrides on that element with it -- confirmed with a count, because
 	// that is work in documents the user is not looking at.
 	// A node carries its incident links with it either way: a link to a node that is not there is
@@ -32782,7 +33127,8 @@ var EngCalcs = EngCalcs || {};
 		// a cascade beat it to it, or a second tap landed on the same handle -- and the Base branch
 		// would otherwise walk an incidentLinks entry that no longer exists.
 		if (!el) { return; }
-		if (!inBaseScenario()) {
+		var here = activeScenario(), only = onlyInThisScenario(el);
+		if (!inBaseScenario() && !only) {
 			saveUndoSnapshot();
 			setOverride(el, 'active', false);
 			if (kind === 'node') {
@@ -32791,8 +33137,24 @@ var EngCalcs = EngCalcs || {};
 			afterPropertyEdit(el);
 			if (kind === 'node') { buildDom(); }
 			setNotice((pc.lpn_scenario_deactivated || '{id} is excluded from the network in {scenario}. It remains in the drawing and in the other scenarios.')
-				.replace('{id}', id).replace('{scenario}', scenarioDisplayName(activeScenario())));
+				.replace('{id}', id).replace('{scenario}', scenarioDisplayName(here)) + ' ' +
+				(pc.lpn_scenario_delete_in_base || 'To remove it from the drawing, delete it in the {base} scenario.')
+				.split('{base}').join(scenarioDisplayName(baseScenario())));
 			return;
+		}
+		// **A SCENARIO-ONLY NODE NEVER TAKES A LINK THAT EXISTS OUTSIDE THIS SCENARIO WITH IT.** The
+		// cascade below would delete that link from Base and every other scenario, so the delete is
+		// refused and the first such link is named.
+		if (only && kind === 'node') {
+			var keeper = (incidentLinks[id] || []).map(linkById)
+				.filter(function (l) { return l && !onlyInThisScenario(l); })[0];
+			if (keeper) {
+				setNotice((pc.lpn_scenario_delete_blocked || '{id} is not deleted, because link {link} ends on it and also exists outside {scenario}. To delete both, delete them in the {base} scenario.')
+					.split('{id}').join(id).split('{link}').join(keeper.id)
+					.split('{scenario}').join(scenarioDisplayName(here))
+					.split('{base}').join(scenarioDisplayName(baseScenario())));
+				return;
+			}
 		}
 		// The element itself, plus -- for a node -- every link the cascade is about to take with it.
 		// Built as KEYS rather than ids, because those incident ones are links whatever `kind` is.
@@ -32802,6 +33164,11 @@ var EngCalcs = EngCalcs || {};
 		}
 		var lost = 0;
 		keys.forEach(function (k) { lost += overrideCountForElement(k); });
+		// A scenario-only asset's overrides in THIS scenario are what made it exist here (its `active`
+		// among them); deleting it is the request, so only the other scenarios' values are a loss.
+		if (only) {
+			keys.forEach(function (k) { if (here.overrides[k]) { lost -= Object.keys(here.overrides[k]).length; } });
+		}
 		function proceed() {
 			// Asked in the page's box (Task 710), so a multi-delete's later cascade may have taken this
 			// one while the question was open.
@@ -32811,6 +33178,10 @@ var EngCalcs = EngCalcs || {};
 			else if (kind === 'label') { deleteLabelById(id); }
 			else { deleteLink(id); }
 			refreshScenarioStatus();
+			if (only) {
+				setNotice((pc.lpn_scenario_only_deleted || '{id} is deleted. It was part of {scenario} only.')
+					.replace('{id}', id).replace('{scenario}', scenarioDisplayName(here)));
+			}
 		}
 		if (!lost) { proceed(); return; }
 		askDialog({ kind: 'confirm', text: (pc.lpn_delete_drops_overrides || 'Deleting this asset also deletes {n} scenario overrides for it. Continue?').replace('{n}', lost) }, function (yes) {
@@ -34616,7 +34987,7 @@ var EngCalcs = EngCalcs || {};
 		switchKeepOrder = switchKeepOrder.filter(function (x) { return x !== id; });
 		switchKeepOrder.push(id);
 		var layout = captureLabelLayout();
-		switchKeep[id] = { sig: storedSignature(id), solve: lastSolveResult,
+		switchKeep[id] = { sig: storedSignature(id), solve: lastSolveResult, tank: tankSnap,
 			time: EngCalcs.lpnTimeKeep ? EngCalcs.lpnTimeKeep() : null,
 			layout: layout,
 			// **AND THE NODE CONTEXT THE PASS RANKED AND SIDED BY** (Task 758). Built only by a
@@ -35690,6 +36061,10 @@ var EngCalcs = EngCalcs || {};
 		// basemapFilter is the pre-release name of the field.
 		if (savedSettings.basemapStyle === undefined) { savedSettings.basemapStyle = savedSettings.basemapFilter || 'normal'; }
 		delete savedSettings.basemapFilter;
+		// A file saved without the symbol-cap pair (every shipped example) was drawn under the old
+		// rule, 0.5 x the 20th-percentile pipe; only a NEW project gets 0.25 x the median.
+		if (savedSettings.symbolCapMultiple === undefined) { savedSettings.symbolCapMultiple = 0.5; }
+		if (savedSettings.symbolCapPercentile === undefined) { savedSettings.symbolCapPercentile = 20; }
 		settings = Object.assign(defaultSettings(), savedSettings);
 		// **A PROJECT SAVED BEFORE `Quality` WAS INTERPRETED STILL CARRIES ONLY THE TOKEN**, and it
 		// must not come back as "no analysis": it would then export a file missing a line its source
@@ -35974,6 +36349,7 @@ var EngCalcs = EngCalcs || {};
 		// label would be drawn empty and drawn again when the values arrived.
 		var kept = keptStateForOpenProject();
 		lastSolveResult = (kept && kept.solve) || null;
+		tankSnap = (kept && kept.tank) || null;
 		// The context the kept layout was ranked and sided by, for the same reason (Task 758): a
 		// restored arrival runs no content pass, which is the only builder of it.
 		if (kept && kept.context) { nodeContext = kept.context; nodeFieldMid = kept.fieldMid || {}; }
@@ -36414,6 +36790,18 @@ var EngCalcs = EngCalcs || {};
 	// the writer -- which scenario's numbers, which positions, how big a label is -- can be asserted
 	// without a download; dev/lpn-spike/node-coord-entry-harness.js drives it. A writer handed
 	// options it did not get from here would be right only by accident.
+	function exportReferenceScale() {
+		var x1 = Infinity, x2 = -Infinity, y1 = Infinity, y2 = -Infinity, dx, dy, s = Infinity;
+		doc.nodes.forEach(function (n) {
+			var p = nodeAt(n);
+			if (!isFinite(p.x) || !isFinite(p.y)) { return; }
+			x1 = Math.min(x1, p.x); x2 = Math.max(x2, p.x); y1 = Math.min(y1, p.y); y2 = Math.max(y2, p.y);
+		});
+		dx = x2 - x1; dy = y2 - y1;
+		if (dx > 0) { s = Math.min(s, 1000 / dx); }
+		if (dy > 0) { s = Math.min(s, 700 / dy); }
+		return isFinite(s) && s > 0 ? s : (state.s || 1);
+	}
 	function inpExportOptions() {
 		return {
 			// The scenario the user is looking at, through the one resolver -- so an export from
@@ -36442,9 +36830,23 @@ var EngCalcs = EngCalcs || {};
 			times: scenarioTimesForExport(),
 			// A label's box, so its centre anchor can be shifted to the upper-left corner EPANET
 			// means by a [LABELS] point. Measured, never assumed: see reanchorImportedLabels().
+			// **MEASURED AT A SCALE THE DOCUMENT FIXES, NEVER THE ONE ON SCREEN.** A Text is lettered
+			// at a pixel size, so its width in map units is pixels over the zoom; read at the live
+			// zoom, the same untouched Text exported a different [LABELS] x after every reload or
+			// resize. The width is taken from a fresh element at the nominal font size and divided by
+			// the scale that fits the drawn nodes into a 1000 x 700 px reference window, a number the
+			// drawing alone decides. (A Text imported from an .inp is left/top and never reaches here.)
 			labelSize: function (lb) {
-				var le = labelEls[lb.id];
-				return le ? { w: textLabelWidth(le), h: textLabelHeight(lb) } : null;
+				var le = labelEls[lb.id], sRef = exportReferenceScale(), probe, wpx = 0;
+				if (!le) { return null; }
+				try {
+					probe = el('text', { x: 0, y: 0, 'class': 'lpn-lbl',
+						style: 'font-size:' + (settings.textSize * (lb.sizeMult || 1)) + 'px;font-weight:' + textLabelWeight(lb) }, labelsLayer);
+					setTextLabelContent(probe, lb, 0);
+					wpx = probe.getBBox().width;
+					labelsLayer.removeChild(probe);
+				} catch (err) { return { w: textLabelWidth(le), h: textLabelHeight(lb) }; }
+				return { w: wpx / sRef, h: settings.textSize * (lb.sizeMult || 1) / sRef * 1.2 * textLabelLines(lb).length };
 			}
 		};
 	}
@@ -46618,6 +47020,8 @@ var EngCalcs = EngCalcs || {};
 		// they are one drawing in progress, not two things, and giving them a second appearance
 		// would read as an object that already exists.
 		pendingPathEl = el('polyline', { 'class': 'lpn-rubberband', style: 'display:none' }, world);
+		// The object-snap glyph and name (Task 782): above the drawing, under the debug boxes.
+		snapMarkEl = el('g', { 'class': 'lpn-snap-mark', style: 'display:none' }, world);
 		// Above everything, and EMPTY unless ?debug=boxes is on the URL -- see drawCollisionBoxes().
 		debugBoxLayer = el('g', {}, world);
 		setTransform();
@@ -47465,6 +47869,16 @@ var EngCalcs = EngCalcs || {};
 		svg.addEventListener('pointermove', function (e) {
 			profileDrawHover(e.clientX, e.clientY);
 		});
+		// **THE SNAP GLYPH FOLLOWS THE POINTER IN A TOOL THAT SNAPS** (Task 782), so the press
+		// commits what the glyph shows: toolSnapAt() is the one question both ask. A pointer only;
+		// a finger has no hover and snaps on the press itself. A drag draws its own (applyDrag()).
+		svg.addEventListener('pointermove', function (e) {
+			if (e.pointerType === 'touch' || drag) { return; }
+			showSnapMark(toolSnapAt(e));
+		});
+		svg.addEventListener('pointerleave', function (e) {
+			if (e.pointerType !== 'touch' && !drag) { hideSnapMark(); }
+		});
 
 		// **SELECTION PREVIEW** (Ida's wishlist item 1): the Select-mode hover highlight, driven by
 		// the SAME hit-test a click uses (`mapHitAt`), so it always shows exactly what a click would
@@ -47699,6 +48113,8 @@ var EngCalcs = EngCalcs || {};
 			if (!pointers.has(e.pointerId)) { return; }
 			pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
 			if (!drag) { return; }
+			// Alt held on the latest move turns the magnet off for this frame of a drag (Task 782).
+			if (drag.pointerId === e.pointerId) { drag.alt = !!e.altKey; drag.reach = reachPx(e); }
 			// **NOTHING MOVES UNTIL THE PRESS HAS TRAVELLED PAST ITS OWN SLOP** -- see TAP_MOVE_PX.
 			// The offsets seeded on the press are kept, so the element does not jump when the drag
 			// does arm: it simply starts following a finger that is already where it is.
@@ -47753,6 +48169,15 @@ var EngCalcs = EngCalcs || {};
 			// junction whose new position is the only evidence it moved.
 			if (drag && drag.pointerId === e.pointerId && drag.type === 'node' && drag.snapped) {
 				markNodeMoved(drag.id);
+				// **A NODE DROPPED ON A NODE SAYS SO**, as a placement does (Task 782): one dot on
+				// the map cannot show that the two are separate.
+				if (drag.lastSnap && drag.lastSnap.kind === 'node' && nodeById(drag.id)) {
+					var mvN = nodeById(drag.id), mvPc = EngCalcs.pageConfig || {};
+					setNotice(String(mvPc.lpn_snap_moved_on_node ||
+						'{moved} moved to the location of {target}. The two nodes are not connected.')
+						.split('{moved}').join(reportTypeNoun('node', mvN.type) + ' ' + mvN.id)
+						.split('{target}').join(drag.lastSnap.name));
+				}
 				// Pipe lengths moved, so the 10th percentile is re-read at the next re-size (Task
 				// 705). Not re-applied here: one moved junction does not move it visibly, and a drop
 				// that re-sized every symbol would be a flicker nobody asked for.
@@ -47773,7 +48198,8 @@ var EngCalcs = EngCalcs || {};
 			// no pan in progress once a pointer has been released.
 			setPanning(false);
 			if (drag && drag.type === 'pinch' && pointers.size < 2) { drag = null; dragDirty = false; return; }
-			if (drag && drag.pointerId === e.pointerId) { drag = null; dragDirty = false; }
+			// The snap glyph of a node or bend drag ends with the drag (Task 782).
+			if (drag && drag.pointerId === e.pointerId) { drag = null; dragDirty = false; hideSnapMark(); }
 			// Task 647: a pan is the gesture that can put the whole network off screen by hand,
 			// and its release is the "at rest" moment -- never mid-drag.
 			if (wasPan && !drag) { relayoutLabels(); updateOffscreenNotice(); }
@@ -47947,21 +48373,35 @@ var EngCalcs = EngCalcs || {};
 			// node tools used to make on a pipe, for a pipe in Base only: Yes cuts the pipe in two at
 			// the node (breakPipeAtPoint), No places the node where it was pressed, joined to nothing.
 			// A pump or valve, a scenario, and every other tool keep the exit-and-open below.
-			var breakLink = exitLinkId !== null && exitLinkId !== undefined && inBaseScenario() &&
-				(mode === 'add-junction' || mode === 'add-reservoir' || mode === 'add-tank')
-				? linkById(exitLinkId) : null;
+			var nodeTool = mode === 'add-junction' || mode === 'add-reservoir' || mode === 'add-tank';
+			// **THE MAGNET** (Task 782): what this press snaps to, the same answer the hover glyph
+			// showed. Null with Alt held, which places at the bare pointer.
+			var snapHit = toolSnapAt(e);
+			hideSnapMark();
+			// A node tool magneted onto a PIPE's bend or line is a press on that pipe, so it gets the
+			// split question below at the snapped point, with the same reach the magnet has.
+			var snapPipe = nodeTool && snapHit && (snapHit.kind === 'vertex' || snapHit.kind === 'line') &&
+				snapHit.link.type === 'pipe' ? snapHit.link : null;
+			var breakLink = snapPipe && inBaseScenario() ? snapPipe
+				: (exitLinkId !== null && exitLinkId !== undefined && inBaseScenario() && nodeTool
+					? linkById(exitLinkId) : null);
+			// The point a node tool places at: the snap target exactly, else the press.
+			var placeAt = nodeTool && snapHit ? snapHit : null, px0 = placeAt ? placeAt.x : w.x, py0 = placeAt ? placeAt.y : w.y;
 			if (breakLink && breakLink.type === 'pipe' && nodeById(breakLink.from) && nodeById(breakLink.to) &&
 				(function () {
-					var f = Geom.nearestFractionOnPolyline(linkPointList(breakLink), w.x, w.y).f;
+					var f = Geom.nearestFractionOnPolyline(linkPointList(breakLink), px0, py0).f;
 					return f > 1e-9 && f < 1 - 1e-9;
 				}())) {
-				var breakType = mode.slice('add-'.length), breakPc = EngCalcs.pageConfig || {};
+				var breakType = mode.slice('add-'.length), breakPc = EngCalcs.pageConfig || {},
+					breakAt = placeAt && placeAt.link === breakLink ? placeAt : null;
 				askDialog({ kind: 'confirm',
 					text: (breakPc.lpn_split_pipe_ask || 'Split pipe {id} at this node?').replace('{id}', breakLink.id),
 					ok: breakPc.lpn_split_yes || 'Yes', cancel: breakPc.lpn_split_no || 'No' }, function (yes) {
 					saveUndoSnapshot();
 					logLpnFirstAction('element');
-					if (yes) { breakPipeAtPoint(breakLink, breakType, w.x, w.y); }
+					if (yes) { breakPipeAtPoint(breakLink, breakType, px0, py0, breakAt); }
+					// No places the node where the press was, unsnapped: a node left on the line and
+					// joined to nothing would look connected (Perry's review).
 					else { addNode(breakType, w.x, w.y); }
 				});
 				return;
@@ -47980,8 +48420,25 @@ var EngCalcs = EngCalcs || {};
 			if (mode === 'add-junction' || mode === 'add-reservoir' || mode === 'add-tank') {
 				// Snap-on-create: a click within this gesture's own reach of an existing node reuses
 				// it instead of creating a new, overlapping one -- see TOUCH_REACH_PX.
-				var onNode = nearestNodeNearScreen(e.clientX, e.clientY, reachPx(e));
-				if (onNode) {
+				// **A NODE OF THE SAME TYPE OPENS; A NODE OF ANOTHER TYPE IS A TARGET** (Task 782). A
+				// second junction stacked on a junction is the double-tap the rule below exists for,
+				// so it still opens the one there. A tank or reservoir magneted onto a junction (or the
+				// reverse) is the CAD gesture Tom asked for: the new node is placed at exactly that
+				// position, and the notice says the two are not connected, since one dot on the map
+				// cannot show it. Never merged: two nodes at one point is legal in EPANET. Alt places
+				// at the bare pointer, near a node or not.
+				var newType = mode.slice('add-'.length),
+					onNode = e.altKey ? null : nearestNodeNearScreen(e.clientX, e.clientY, reachPx(e));
+				if (onNode && placeAt && placeAt.kind === 'node' && placeAt.node.type !== newType) {
+					saveUndoSnapshot();
+					logLpnFirstAction('element');
+					var stacked = addNode(newType, px0, py0), stackPc = EngCalcs.pageConfig || {};
+					copySnapProvenance(placeAt, stacked);
+					setNotice(String(stackPc.lpn_snap_node_on_node ||
+						'{new} placed at the location of {target}. The two nodes are not connected.')
+						.split('{new}').join(reportTypeNoun('node', newType) + ' ' + stacked.id)
+						.split('{target}').join(placeAt.name));
+				} else if (onNode) {
 					// **A MISS THAT LANDS ON WHAT YOU JUST PLACED OPENS IT**, and switches to Select.
 					// Refusing to place a second node on top of an existing one and then doing
 					// NOTHING AT ALL is worse: the user taps, nothing appears, nothing opens, and
@@ -47993,7 +48450,7 @@ var EngCalcs = EngCalcs || {};
 				} else {
 					saveUndoSnapshot();
 					logLpnFirstAction('element');
-					addNode(mode.slice('add-'.length), w.x, w.y);
+					copySnapProvenance(placeAt, addNode(newType, px0, py0));
 				}
 			}
 			else if (mode === 'add-meter') {
@@ -48136,7 +48593,10 @@ var EngCalcs = EngCalcs || {};
 					// one. Nothing is written to the document here -- the points are held in view
 					// state until a second NODE arrives, so no undo snapshot is owed and an
 					// abandoned drawing leaves nothing behind.
-					pendingLinkVerts.push({ x: w.x, y: w.y });
+					// A bend magnets to another pipe's vertex (Task 782), carrying its characters.
+					var bend = snapHit && snapHit.kind === 'vertex' ? { x: snapHit.x, y: snapHit.y } : { x: w.x, y: w.y };
+					if (snapHit && snapHit.kind === 'vertex') { copySnapProvenance(snapHit, bend); }
+					pendingLinkVerts.push(bend);
 					drawPendingPath();
 				}
 			} else if (mode === 'vertices') {
@@ -48685,14 +49145,26 @@ var EngCalcs = EngCalcs || {};
 			// **A DRAGGED POSITION AND A TYPED ONE GO THROUGH THE SAME DOOR** (Task 674), so inside
 			// a scenario a drag records that scenario's own position exactly as the boxes do, and
 			// neither editor can come to a different idea of what placing a node means.
-			writeNodeCoord(n, false, w.x + drag.offX);
-			writeNodeCoord(n, true, w.y + drag.offY);
+			// **THE NODE ITSELF IS WHAT MAGNETS** (Task 782): its would-be position is tested, not
+			// the pointer, so a node grabbed off-centre still lands dead on the target. Alt is off.
+			var ns = drag.alt ? null : snapAtWorld(w.x + drag.offX, w.y + drag.offY, drag.reach || POINTER_REACH_PX, dragSnapOpts(drag));
+			drag.lastSnap = ns;
+			if (ns) { writeNodeAtSnap(n, ns); }
+			else {
+				writeNodeCoord(n, false, w.x + drag.offX);
+				writeNodeCoord(n, true, w.y + drag.offY);
+			}
+			showSnapMark(ns);
 			updateNode(drag.id);
 			relayoutLabels();
 		} else if (drag.type === 'vertex') {
 			snapshotDragOnce();
-			var w2 = screenToWorld(p.x, p.y);
-			linkById(drag.id).verts[drag.vidx] = { x: w2.x + drag.offX, y: w2.y + drag.offY };
+			var w2 = screenToWorld(p.x, p.y),
+				vs = drag.alt ? null : snapAtWorld(w2.x + drag.offX, w2.y + drag.offY, drag.reach || POINTER_REACH_PX, dragSnapOpts(drag)),
+				nv = vs ? { x: vs.x, y: vs.y } : { x: w2.x + drag.offX, y: w2.y + drag.offY };
+			if (vs) { copySnapProvenance(vs, nv); }
+			linkById(drag.id).verts[drag.vidx] = nv;
+			showSnapMark(vs);
 			updateVertex(drag.id, drag.vidx);
 			relayoutLabels();
 		} else if (drag.type === 'customer') {
@@ -60384,6 +60856,11 @@ var EngCalcs = EngCalcs || {};
 			mixingFields(fields, n);
 			readonlyUnitField(fields, pc.lpn_result_head || 'Head', resultUnit('elevhead'),
 				toSI(nodeFixedHead(n), 'lpn_u_elevhead'), pc.lpn_tank_head_tip);
+			// Depth and usable volume, read the way the Tables pane reads them (Task 783).
+			readonlyField(fields, (pc.lpn_result_depth || 'Depth') + ' (' + unitLabel(resultUnit('elevhead')) + ')',
+				colorNodeValue(n, 'depth'), pc.lpn_result_depth_tip);
+			readonlyField(fields, (pc.lpn_result_tank_volume || 'Available volume') + ' (' + tankVolumeUnitText() + ')',
+				colorNodeValue(n, 'volume'), pc.lpn_result_tank_volume_tip);
 		} else if (n.type === 'reservoir') {
 			unitNumberField(fields, pc.lpn_field_elev || 'Elevation', 'lpn_u_elevhead',
 				function () { return n.elev; },
@@ -69887,6 +70364,7 @@ var EngCalcs = EngCalcs || {};
 		// EPANET it is reachable through a control -- `Unbalanced: Stop` and a trials limit are
 		// both Settings rows, and neither makes the engine refuse: it hands back the last iterate.
 		var notConverged = result.converged === false;
+		captureTankSnapshot();
 		lastSolveResult = result;
 		refreshMapStatus();
 		// The only case where the two engines knowingly disagree, so say so rather than let a
@@ -70312,6 +70790,9 @@ var EngCalcs = EngCalcs || {};
 			undo: undoStack.length, sig: docSignature(), mode: mode, fold: guideFold
 		};
 	};
+	// The heads and flows on screen, for dev/lpn-spike/snap-browser-harness.js (Task 782): it asserts
+	// that a model edited by snapping still solves.
+	EngCalcs.lpnSolveProbe = function () { return lastSolveResult; };
 	// The Full report's Type column harness opens the box through this, not through the menu.
 	EngCalcs.lpnOpenFullReportBox = function () { return openFullReportBox(); };
 

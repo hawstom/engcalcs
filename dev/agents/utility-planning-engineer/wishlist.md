@@ -995,3 +995,7 @@ see reasoning above):
 3. "Only what is local in this alternative" filter in the alternative editor. At 2,000 nodes the full-element checkbox table is unusable; our Overrides only filter is already most of it.
 4. Merge and reparent last. I found no Bentley merge; this is ours and the least-evidenced.
 Disagreement with the roadmap order: none known. I ranked Active Topology (Task 781) high because a CIP is a set of projects that turn assets on, one alternative each.
+
+### 2026-10-11 — new small row: optional "Ground elevation" on a tank, with "Pressure at ground"
+
+Ranked low-middle, below the built rows; from Tom's question, not my own find. (1) Tip/label fix first, near free. (2) Non-hydraulic Ground elevation property (project-stored, never written to .inp) plus Pressure at ground = head - ground; small-medium; adds a second elevation to explain. Citation: journal 2026-10-11; Bentley "Elevation" = ground at tanks, "Elevation (Base)" = tank base. Volume-curve route judged not a fix. Would not change a master-plan decision (plans list HWL and base); it removes a misreading.

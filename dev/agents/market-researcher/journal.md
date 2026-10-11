@@ -2785,3 +2785,14 @@ Brief: tree vs table, complaints, what the design misses (reorder, several Bases
 - CITED. InfoWater Scenario Explorer: toolbar only documented: Activate, New Scenario (child of highlighted), Reset, Delete, Edit Description, ID Counter, Save As Default, Copy, Replace, Paste as Child, Edit Active Scenario, Batch Simulation, Compare Scenarios (with parent), Exit, Help. No context menu documented (help.innovyze.com/space/infowater/17760545).
 - NOT FOUND: any description of WaterGEMS tree icons, expanders, check marks, or drag to re-parent. Help says "hierarchical tree"; no drag documented (see 2026-10-09). Bentley OpenPaths Scenario Manager has drag to move.
 - SPECULATION: Tom's Civil 3D tree is closer to a Windows-explorer idiom than to any water tool's documented tree; no tool needs matching.
+
+
+## 2026-10-11 -- Mary: native-SI example networks; KY Pipe / Kentucky set (Tom, two questions)
+- OBSERVED. examples/manifest.json ships Net3 world, Elm Street, Basic SI/US, Net1, Net2, Net3 (all US except Basic SI). L-Town and C-Town exist only as label-bench inputs (worktree feat-label-placer dev/lpn-spike/label-bench/networks/README.md), CC BY 4.0 each; that README already records KY/Anytown/Modena/Balerma CC BY-NC and Hanoi/Richmond/D-Town/Exeter "no licence found".
+- CITED. Unit survey by reading [OPTIONS] of 264 .inp in github.com/KIOS-Research/EPANET-Benchmarks (repo has NO licence file; just a collection). ky1-ky15: Units GPM (US). Hanoi LPS or CMH, D-Town LPS, Richmond LPS, Gessler LPS, Balerma LPS, EXNET LPS, L-Town CMH, C-Town LPS.
+- CITED. Mini C-Town, Salomons (OptiWater), Zenodo 14759988: CC BY 4.0, 186 junctions, 210 pipes, 2 tanks, 2 pumps, CMH, mini-bwcn.inp.
+- CITED. L-Town: zenodo.org/records/4017659, CC BY 4.0; file read: 782 J, 2 reservoirs, 1 tank, 905 pipes, 1 pump, 3 valves, CMH.
+- CITED. UKnowledge Kentucky/ASCE set (uknowledge.uky.edu/wdst, wdst_ky_valved): CC BY-NC 4.0 per page; KY1..KY18, each with description, EPANET file, KYPIPE file. Collection page states no licence.
+- CITED. KYPipe demo (kypipe.com/demo-download/): 50-pipe cap, ships example files; their licence not found.
+- NOT FOUND. Licence for Exeter CWS benchmark files, Richmond (Yorkshire Water permission), D-Town, Hanoi, Gessler.
+- SPECULATION. Small SI teaching networks with a clear open licence are scarce; building our own from Net1/Net2 (EPANET is MIT) is the likely route. Not tested: whether our importer reads ky*.inp.

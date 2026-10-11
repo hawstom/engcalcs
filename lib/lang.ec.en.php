@@ -1314,6 +1314,13 @@ $ec_lang['lpn_result_status_closed']='Closed';
 $ec_lang['lpn_result_head']='Head';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_result_head_tip']='Potential energy of the water at this node, written as a height of water column. It is an absolute height, where pressure is a gauge measurement.';
+// A tank's depth and usable volume (Task 783). Depth is head minus the tank bottom, which is our
+// Elevation. Volume is zero at the Lowest water depth, so it is NOT EPANET's tank volume, which also
+// counts the water below the lowest water depth (that water is in the mixing volume, it just cannot be drawn down).
+$ec_lang['lpn_result_depth']='Depth';
+$ec_lang['lpn_result_depth_tip']='Depth of water in the tank at the time shown, measured up from the tank bottom: the head minus the tank elevation.';
+$ec_lang['lpn_result_tank_volume']='Available volume';
+$ec_lang['lpn_result_tank_volume_tip']='Volume of water above the lowest water depth, so it is zero at that depth. The EPANET tank volume also includes the water below the lowest water depth, which still counts toward mixing and water age, so the tank elevation stays at the tank bottom.';
 $ec_lang['lpn_result_pressure']='Pressure';
 $ec_lang['lpn_result_flow']='Flow';
 $ec_lang['lpn_result_velocity']='Velocity';
@@ -2667,6 +2674,14 @@ $ec_lang['lpn_link_end_same']='From and To must be different nodes.';
 $ec_lang['lpn_split_pipe_ask']='Split pipe {id} at this node?';
 $ec_lang['lpn_split_yes']='Yes';
 $ec_lang['lpn_split_no']='No';
+// Object snap (Task 782). The tip beside the snap glyph on a pipe vertex: "Pipe 10, vertex 2". A node
+// or a pipe is named by its type word and ID alone.
+$ec_lang['lpn_snap_vertex']='{link}, vertex {n}';
+// A tank, reservoir or junction snapped onto a node of another type is placed at exactly that
+// position. Two nodes at one point are legal in EPANET, and the map cannot show that they are separate.
+$ec_lang['lpn_snap_node_on_node']='{new} placed at the location of {target}. The two nodes are not connected.';
+// The same, for a node DRAGGED onto another node.
+$ec_lang['lpn_snap_moved_on_node']='{moved} moved to the location of {target}. The two nodes are not connected.';
 // Plain-text wording of the concept mphl_total_junction_k/mphl_junction_loss already own (their
 // values carry k<sub>m</sub> markup, incompatible with this popup's textContent-only fields) --
 // Tom, 2026-07-30, "default to 2" matches mphl_total_junction_k_tip's own stated default exactly.
@@ -3219,6 +3234,9 @@ $ec_lang['lpn_scenario_override_tip']='Selected means this scenario overrides it
 // Same label-versus-sentence distinction that decided the eigenvalue fixes in sprint 316.
 $ec_lang['lpn_scenario_base_value']='Base scenario: {value}';
 $ec_lang['lpn_scenario_deactivated']='{id} is excluded from the network in {scenario}. It remains in the drawing and in the other scenarios.';
+$ec_lang['lpn_scenario_delete_in_base']='To remove it from the drawing, delete it in the {base} scenario.';
+$ec_lang['lpn_scenario_only_deleted']='{id} is deleted. It was part of {scenario} only.';
+$ec_lang['lpn_scenario_delete_blocked']='{id} is not deleted, because link {link} ends on it and also exists outside {scenario}. To delete both, delete them in the {base} scenario.';
 $ec_lang['lpn_scenario_push_btn']='Apply Base values to all scenarios';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_scenario_push_tip']='Every scenario goes back to the Base value for the properties whose labels are showing right now. Values entered for them in any scenario are discarded.';
