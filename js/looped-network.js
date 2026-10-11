@@ -36737,6 +36737,18 @@ var EngCalcs = EngCalcs || {};
 	// the writer -- which scenario's numbers, which positions, how big a label is -- can be asserted
 	// without a download; dev/lpn-spike/node-coord-entry-harness.js drives it. A writer handed
 	// options it did not get from here would be right only by accident.
+	function exportReferenceScale() {
+		var x1 = Infinity, x2 = -Infinity, y1 = Infinity, y2 = -Infinity, dx, dy, s = Infinity;
+		doc.nodes.forEach(function (n) {
+			var p = nodeAt(n);
+			if (!isFinite(p.x) || !isFinite(p.y)) { return; }
+			x1 = Math.min(x1, p.x); x2 = Math.max(x2, p.x); y1 = Math.min(y1, p.y); y2 = Math.max(y2, p.y);
+		});
+		dx = x2 - x1; dy = y2 - y1;
+		if (dx > 0) { s = Math.min(s, 1000 / dx); }
+		if (dy > 0) { s = Math.min(s, 700 / dy); }
+		return isFinite(s) && s > 0 ? s : (state.s || 1);
+	}
 	function inpExportOptions() {
 		return {
 			// The scenario the user is looking at, through the one resolver -- so an export from
@@ -36765,9 +36777,23 @@ var EngCalcs = EngCalcs || {};
 			times: scenarioTimesForExport(),
 			// A label's box, so its centre anchor can be shifted to the upper-left corner EPANET
 			// means by a [LABELS] point. Measured, never assumed: see reanchorImportedLabels().
+			// **MEASURED AT A SCALE THE DOCUMENT FIXES, NEVER THE ONE ON SCREEN.** A Text is lettered
+			// at a pixel size, so its width in map units is pixels over the zoom; read at the live
+			// zoom, the same untouched Text exported a different [LABELS] x after every reload or
+			// resize. The width is taken from a fresh element at the nominal font size and divided by
+			// the scale that fits the drawn nodes into a 1000 x 700 px reference window, a number the
+			// drawing alone decides. (A Text imported from an .inp is left/top and never reaches here.)
 			labelSize: function (lb) {
-				var le = labelEls[lb.id];
-				return le ? { w: textLabelWidth(le), h: textLabelHeight(lb) } : null;
+				var le = labelEls[lb.id], sRef = exportReferenceScale(), probe, wpx = 0;
+				if (!le) { return null; }
+				try {
+					probe = el('text', { x: 0, y: 0, 'class': 'lpn-lbl',
+						style: 'font-size:' + (settings.textSize * (lb.sizeMult || 1)) + 'px;font-weight:' + textLabelWeight(lb) }, labelsLayer);
+					setTextLabelContent(probe, lb, 0);
+					wpx = probe.getBBox().width;
+					labelsLayer.removeChild(probe);
+				} catch (err) { return { w: textLabelWidth(le), h: textLabelHeight(lb) }; }
+				return { w: wpx / sRef, h: settings.textSize * (lb.sizeMult || 1) / sRef * 1.2 * textLabelLines(lb).length };
 			}
 		};
 	}
