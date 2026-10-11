@@ -234,6 +234,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 	<?php // The Profile tab menu's EPANET .PRO picker (Task 604). Its own input: it sets the profile path, not a project. ?>
 	<input type="file" id="lpn_profile_file" accept=".pro,.txt,text/plain" style="display:none">
 	<input type="file" id="lpn_survey_file" accept=".csv,.txt,.pnt,.pts,text/csv,text/plain" style="display:none">
+	<input type="file" id="lpn_geojson_file" accept=".geojson,.json,application/geo+json,application/json" style="display:none">
 	<?php // Library import (Task 611). A picker of its own, and it takes the same two extensions
 	      // #lpn_project_file does because it reads the same kind of file -- but it lands somewhere
 	      // else entirely: it copies one library (pipe types, fittings or curves) into the project
@@ -2653,6 +2654,7 @@ EngCalcs.pageConfig = {
 	lpn_split_no: <?=json_encode($ec_lang['lpn_split_no'])?>,
 	lpn_snap_vertex: <?=json_encode($ec_lang['lpn_snap_vertex'])?>,
 	lpn_snap_node_on_node: <?=json_encode($ec_lang['lpn_snap_node_on_node'])?>,
+	lpn_snap_shape_point: <?=json_encode($ec_lang['lpn_snap_shape_point'])?>,
 	lpn_field_to: <?=json_encode($ec_lang['lpn_field_to'])?>,
 	// The minor-loss table, the same one mphl, hw, dw, mhp, bpn and ip all link to. One URL rather
 	// than three: k is one quantity whatever friction method carries the pipe alongside it. The
@@ -2743,6 +2745,7 @@ EngCalcs.pageConfig = {
 	lpn_mode_add_valve: <?=json_encode($ec_lang['lpn_mode_add_valve'])?>,
 	lpn_mode_add_text: <?=json_encode($ec_lang['lpn_mode_add_text'])?>,
 	lpn_mode_add_chain: <?=json_encode($ec_lang['lpn_mode_add_chain'])?>,
+	lpn_mode_add_shape: <?=json_encode($ec_lang['lpn_mode_add_shape'])?>,
 	lpn_tip_select: <?=json_encode($ec_lang['lpn_tip_select'])?>,
 	bpn_demand: <?=json_encode($ec_lang['bpn_demand'])?>,
 	bpn_method: <?=json_encode($ec_lang['bpn_method'])?>,
@@ -3029,6 +3032,8 @@ EngCalcs.pageConfig = {
 	lpn_tool_key_hint: <?=json_encode($ec_lang['lpn_tool_key_hint'])?>,
 	lpn_tool_key_hint_two: <?=json_encode($ec_lang['lpn_tool_key_hint_two'])?>,
 	lpn_tool_add_chain_tip: <?=json_encode($ec_lang['lpn_tool_add_chain_tip'])?>,
+	lpn_tool_add_shape: <?=json_encode($ec_lang['lpn_tool_add_shape'])?>,
+	lpn_tool_add_shape_tip: <?=json_encode($ec_lang['lpn_tool_add_shape_tip'])?>,
 	lpn_tool_undo_tip: <?=json_encode($ec_lang['lpn_tool_undo_tip'])?>,
 	lpn_tool_zoom_extent_tip: <?=json_encode($ec_lang['lpn_tool_zoom_extent_tip'])?>,
 	lpn_screenshot_menu: <?=json_encode($ec_lang['lpn_screenshot_menu'])?>,
@@ -3850,6 +3855,17 @@ EngCalcs.pageConfig = {
         // search and terrain blocks above it are. ?>
 	lpn_file_import_survey: <?=json_encode($ec_lang['lpn_file_import_survey'])?>,
 	lpn_file_import_survey_tip: <?=json_encode($ec_lang['lpn_file_import_survey_tip'])?>,
+	lpn_file_import_geojson: <?=json_encode($ec_lang['lpn_file_import_geojson'])?>,
+	lpn_file_import_geojson_tip: <?=json_encode($ec_lang['lpn_file_import_geojson_tip'])?>,
+	lpn_geojson_import_done: <?=json_encode($ec_lang['lpn_geojson_import_done'])?>,
+	lpn_geojson_import_skipped: <?=json_encode($ec_lang['lpn_geojson_import_skipped'])?>,
+	lpn_geojson_import_why_network: <?=json_encode($ec_lang['lpn_geojson_import_why_network'])?>,
+	lpn_geojson_import_why_geometry: <?=json_encode($ec_lang['lpn_geojson_import_why_geometry'])?>,
+	lpn_geojson_import_why_position: <?=json_encode($ec_lang['lpn_geojson_import_why_position'])?>,
+	lpn_geojson_import_holes: <?=json_encode($ec_lang['lpn_geojson_import_holes'])?>,
+	lpn_geojson_import_parts: <?=json_encode($ec_lang['lpn_geojson_import_parts'])?>,
+	lpn_geojson_import_local: <?=json_encode($ec_lang['lpn_geojson_import_local'])?>,
+	lpn_geojson_import_unreadable: <?=json_encode($ec_lang['lpn_geojson_import_unreadable'])?>,
 	lpn_survey_read_error: <?=json_encode($ec_lang['lpn_survey_read_error'])?>,
 	lpn_survey_cancelled: <?=json_encode($ec_lang['lpn_survey_cancelled'])?>,
 	lpn_survey_axis_north: <?=json_encode($ec_lang['lpn_survey_axis_north'])?>,
