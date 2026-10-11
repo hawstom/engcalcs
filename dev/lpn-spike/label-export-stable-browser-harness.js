@@ -10,6 +10,7 @@
 'use strict';
 
 const fs = require('fs');
+const zlib = require('zlib');
 const path = require('path');
 const { execFileSync, spawnSync } = require('child_process');
 
@@ -43,6 +44,39 @@ function ok(label, cond, detail) {
 }
 
 let Session;
+// A .zip read back by its central directory, each entry inflated by node's zlib and its CRC checked
+// against node's own crc32, so nothing here shares code with the page's writer.
+function unzip(buf) {
+	const out = {};
+	let e = buf.length - 22;
+	while (e >= 0 && buf.readUInt32LE(e) !== 0x06054b50) { e--; }
+	if (e < 0) { return null; }
+	const n = buf.readUInt16LE(e + 10);
+	let p = buf.readUInt32LE(e + 16);
+	for (let i = 0; i < n; i++) {
+		if (buf.readUInt32LE(p) !== 0x02014b50) { return null; }
+		const method = buf.readUInt16LE(p + 10), crc = buf.readUInt32LE(p + 16), csize = buf.readUInt32LE(p + 20),
+			usize = buf.readUInt32LE(p + 24), nlen = buf.readUInt16LE(p + 28), xlen = buf.readUInt16LE(p + 30),
+			clen = buf.readUInt16LE(p + 32), loc = buf.readUInt32LE(p + 42), name = buf.toString('utf8', p + 46, p + 46 + nlen);
+		if (buf.readUInt32LE(loc) !== 0x04034b50) { return null; }
+		const start = loc + 30 + buf.readUInt16LE(loc + 26) + buf.readUInt16LE(loc + 28), body = buf.subarray(start, start + csize);
+		const data = method === 8 ? zlib.inflateRawSync(body) : method === 0 ? Buffer.from(body) : null;
+		if (!data || data.length !== usize || zlib.crc32(data) !== crc) { return null; }
+		out[name] = data;
+		p += 46 + nlen + xlen + clen;
+	}
+	return out;
+}
+// A project with a background picture exports ONE .zip (the .inp, a .bmp and a .bpw) whose entries carry
+// the clock's time, so two exports differ in the zip's bytes alone. Compare the .inp inside it.
+function inpText(buf) {
+	if (buf.length > 4 && buf.toString('latin1', 0, 2) === 'PK') {
+		const z = unzip(buf), n = z && Object.keys(z).find((k) => /\.inp$/i.test(k));
+		return n ? z[n].toString('utf8') : null;
+	}
+	return buf.toString('utf8');
+}
+
 async function open(browser) {
 	const a = await Session.open(browser, NAME, { viewport: { width: 1400, height: 900 }, acceptDownloads: true });
 	await a.page.route(/tile\.openstreetmap\.org|api\.mapbox\.com/, (route) => route.abort());
@@ -73,7 +107,7 @@ async function exportInp(a) {
 	await a.page.waitForTimeout(800);
 	a.page.off('download', onDl);
 	if (!got.length) { return null; }
-	return fs.readFileSync(await got[0].path(), 'utf8');
+	return inpText(fs.readFileSync(await got[0].path()));
 }
 // The [LABELS] rows, exactly as written (whitespace included), without the header comment line.
 function labelRows(text) {
@@ -116,7 +150,9 @@ async function main() {
 				const r1 = labelRows(first), r2 = labelRows(second);
 				if (label === 'Net1') { ok(label + ': has [LABELS] rows', r1.length > 0, r1.length + ' rows'); }
 				ok(label + ': [LABELS] identical across the reload', JSON.stringify(r1) === JSON.stringify(r2), '\n    ' + r1.join('\n    ') + '\n  vs\n    ' + r2.join('\n    '));
-				ok(label + ': the whole file is identical across the reload', first === second);
+				const l1 = first.split(/\r?\n/), l2 = second.split(/\r?\n/), diffs = [];
+				for (let k = 0; k < Math.max(l1.length, l2.length) && diffs.length < 12; k++) { if (l1[k] !== l2[k]) { diffs.push('line ' + (k + 1) + ': ' + JSON.stringify(l1[k]) + ' vs ' + JSON.stringify(l2[k])); } }
+				ok(label + ': the whole file is identical across the reload', first === second, diffs.length ? '\n    ' + diffs.join('\n    ') : '');
 			}
 			await a.close();
 		}
