@@ -3394,6 +3394,15 @@ table.lpn-notes-table td:first-child { font-weight: bold; width: 40%; }
 	border-bottom: 1px solid var(--ec-border-strong); overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
 }
 
+/* **A "?" IN THE TITLE BAND TAKES THE POINTER** (Tom, 2026-10-11, on the Scenario manager's: *"The
+   glyph isn't clickable."*). The band ignores the pointer so the box drags by it; the glyph alone
+   opts back in, so the words beside it still drag. 24 px square, the band's own height allowing,
+   so a finger finds it. */
+.lpn-setbox-title .ec-tip {
+	pointer-events: auto; cursor: pointer; display: inline-block;
+	min-width: 24px; height: 24px; line-height: 24px; margin-top: -4px; text-align: center; vertical-align: top;
+}
+
 /* ---- THE CORNER BUTTONS AND DOCKING (ROADMAP Task 441) ---------------------------------------
    Tom, 2026-10-03: *"the conventional docking, hide, autohide, etc icon buttons at the upper right
    corner of non-hog (non-modal) boxes right before (next to) the exit X"*. One row per standing box,

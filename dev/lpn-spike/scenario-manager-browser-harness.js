@@ -3,7 +3,8 @@
 //
 // The model is held headless by scenario-manager-harness.js; this holds the real box and table, on Net1:
 //   1. Scenarios > Scenario manager, with Basic mode ticked, opens the box, turns Basic mode off and
-//      says so; the Scenarios tab appears in the Tables pane.
+//      says so; the Scenarios tab appears in the Tables pane. The "?" on its title opens the
+//      explanation on a real mouse click (Tom, 2026-10-11: "The glyph isn't clickable").
 //   2. "+" adds Child_1_of_Base and opens its name for editing; "Add Base" adds Base2; F2 renames; a
 //      slow click on the selected row renames; Escape cancels; Del is refused for a scenario with a
 //      child, naming it; right-click offers Add child, Rename, Make current, Copy, Delete.
@@ -135,6 +136,36 @@ async function main() {
 		ok('1.10 the minus carries its tip', (await page.evaluate(() => document.getElementById('lpn_sm_del').title)) === await L('lpn_sm_delete'));
 		const helpTip = await page.evaluate(() => { const t = document.querySelector('#lpn_smbox_title .ec-help'); return t ? (t.title || t.getAttribute('data-bs-original-title')) : null; });
 		ok('1.11 the box title has a ? tip with the explanation', helpTip === 'Create and organize scenarios and alternatives and their inheritance here. Choose Alternatives for Scenarios in the Scenarios table.' && !!(await page.$('#lpn_smbox_title .ec-tip')), String(helpTip));
+		// **THE "?" ON THE TITLE TAKES A CLICK** (Tom, 2026-10-11: *"The glyph isn't clickable."*). The
+		// title band ignores the pointer so it can be the drag surface; the glyph must not. A real mouse
+		// click at the glyph's centre, and at a point 10 px off it (the touch hit area), opens the
+		// explanation; Esc closes it; the band beside the glyph still belongs to the box.
+		const glyphBox = await page.evaluate(() => { const g = document.querySelector('#lpn_smbox_title .ec-tip'); const r = g.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2, w: r.width, h: r.height }; });
+		const hitAt = (x, y) => page.evaluate(([x, y]) => { const e = document.elementFromPoint(x, y); return e ? (e.closest('.ec-tip') ? 'glyph' : (e.id || e.className)) : null; }, [x, y]);
+		ok('1.12 the point under the ? is the glyph, not the band', (await hitAt(glyphBox.x, glyphBox.y)) === 'glyph', String(await hitAt(glyphBox.x, glyphBox.y)));
+		ok('1.13 the glyph is at least 24 px square for a finger', glyphBox.w >= 24 && glyphBox.h >= 24, glyphBox.w + 'x' + glyphBox.h);
+		ok('1.14 the glyph shows a pointer cursor', (await page.evaluate(() => getComputedStyle(document.querySelector('#lpn_smbox_title .ec-tip')).cursor)) === 'pointer');
+		const explainUp = () => page.evaluate(() => { const t = document.querySelector('.tooltip.ec-explain.show'); return t ? t.textContent : null; });
+		await page.mouse.click(glyphBox.x, glyphBox.y);
+		await settle(500);
+		ok('1.15 a real click on the ? opens the explanation', (await explainUp()) === helpTip, String(await explainUp()));
+		ok('1.16 ...and the glyph says it is expanded', (await page.evaluate(() => document.querySelector('#lpn_smbox_title .ec-tip').getAttribute('aria-expanded'))) === 'true');
+		await page.keyboard.press('Escape');
+		await settle(400);
+		ok('1.17 Esc closes it and leaves the box open', (await explainUp()) === null && await page.evaluate(() => getComputedStyle(document.getElementById('lpn_sm_box')).display !== 'none'));
+		await page.mouse.click(glyphBox.x + glyphBox.w / 2 - 2, glyphBox.y + glyphBox.h / 2 - 2);
+		await settle(500);
+		ok('1.18 a click near the edge of the hit area opens it too', (await explainUp()) === helpTip, String(await explainUp()));
+		await page.keyboard.press('Escape');
+		await settle(400);
+		ok('1.19 the title words beside the ? are still the drag band (the box)', (await hitAt(glyphBox.x - glyphBox.w - 40, glyphBox.y)) === 'lpn_sm_box', String(await hitAt(glyphBox.x - glyphBox.w - 40, glyphBox.y)));
+		const dockClick = async (sel) => { await page.evaluate((q) => document.querySelector(q).dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 })), sel); await settle(700); };
+		await dockClick('#lpn_sm_box [data-dock="autohide"]');
+		const dockTab = await page.evaluate(() => { const t = document.querySelector('.lpn-dock-tab[aria-controls=lpn_sm_box]'); return t ? t.textContent : null; });
+		ok('1.20 auto-hidden, its dock tab names the box without the ?', dockTab === await L('lpn_sm_title'), String(dockTab));
+		await dockClick('.lpn-dock-tab[aria-controls=lpn_sm_box]');
+		await dockClick('#lpn_sm_box [data-dock="autohide"]');
+		ok('1.21 pinned again, the box is open', await page.evaluate(() => getComputedStyle(document.getElementById('lpn_sm_box')).display !== 'none' && !document.querySelector('.lpn-dock-tab[aria-controls=lpn_sm_box]')));
 		await click('#lpn_sm_add');
 		ok('2.1 "+" adds Child_1_of_Base and opens its name for editing', JSON.stringify(await names()) === JSON.stringify(['Base', '-EDIT:Child_1_of_Base']), JSON.stringify(await names()));
 		await page.keyboard.type('Peak');

@@ -56811,8 +56811,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		return el;
 	}
 	function dockTitleOf(d) {
-		var t = d.box.querySelector('.lpn-setbox-title');
-		return t ? t.textContent.replace(/\s+/g, ' ').trim() : d.box.id;
+		var t = d.box.querySelector('.lpn-setbox-title'), g;
+		if (!t) { return d.box.id; }
+		// A title carrying a "?" (the Scenario manager's) names the box without the glyph.
+		if (t.querySelector('.ec-tip')) { t = t.cloneNode(true); g = t.querySelector('.ec-tip'); g.parentNode.removeChild(g); }
+		return t.textContent.replace(/\s+/g, ' ').trim();
 	}
 	function renderDockStrip(side, list, x, y, h) {
 		var el = dockStripEl(side), same = el.children.length === list.length;
