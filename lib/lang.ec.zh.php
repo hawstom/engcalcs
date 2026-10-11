@@ -868,7 +868,7 @@ $ec_lang['lpn_field_head_tip']='水库的水面标高，以高度表示，而非
 // pipe-diameter unit would put a 15 m tank on screen as 15000. Same reason the three levels say
 // "measured up from the tank bottom" rather than leaving the datum to be guessed -- EPANET measures
 // a tank level from the vessel floor, not from the same zero the elevations use.
-$ec_lang['lpn_tank_elev_tip']='水箱底部的高程。水箱内的水深均从此处向上测量。';
+$ec_lang['lpn_field_tank_base_elev_tip']='水箱底部的高程。水箱内的水深均从此处向上测量。';
 $ec_lang['lpn_field_tank_level']='水深';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_field_tank_level_tip']='水箱中当前水的深度，从水箱底部向上测量。水面标高等于水箱底部高程加上该深度。';

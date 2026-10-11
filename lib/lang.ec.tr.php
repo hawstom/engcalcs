@@ -867,7 +867,7 @@ $ec_lang['lpn_field_head_tip']='Rezervuardaki su yüzü kotu, basınç olarak de
 // pipe-diameter unit would put a 15 m tank on screen as 15000. Same reason the three levels say
 // "measured up from the tank bottom" rather than leaving the datum to be guessed -- EPANET measures
 // a tank level from the vessel floor, not from the same zero the elevations use.
-$ec_lang['lpn_tank_elev_tip']='Depo tabanının kotu. Depodaki su derinlikleri buradan yukarı doğru ölçülür.';
+$ec_lang['lpn_field_tank_base_elev_tip']='Depo tabanının kotu. Depodaki su derinlikleri buradan yukarı doğru ölçülür.';
 $ec_lang['lpn_field_tank_level']='Su derinliği';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_field_tank_level_tip']='Depoda duran suyun derinliği, depo tabanından yukarı doğru ölçülür.';

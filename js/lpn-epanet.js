@@ -104,6 +104,18 @@
 		EN_OPT_HEADERROR = 5,
 		EN_OPT_FLOWCHANGE = 6;
 
+	// **EPANET MEASURES A TANK'S PRESSURE ABOVE ITS BASE; THIS PAGE MEASURES IT ABOVE THE GROUND**
+	// (Tom, 2026-10-11: *"Pressure is above ground. No special meaning at tanks."*). The engine is
+	// handed the base, because that is what its [TANKS] Elevation is, so its EN_PRESSURE at a tank is
+	// (H - base) x SG. Moved onto the ground here, at the one door its pressures come through, so both
+	// engines report one number. Every other node's pressure passes untouched.
+	function tankGroundPressure(n, pEngine, model) {
+		if (!n || n.type !== 'tank' || typeof n.ground !== 'number' || !isFinite(n.ground)) { return pEngine; }
+		var hyd = model && model.hydraulics,
+			sg = (hyd && typeof hyd.specificGravity === 'number' && isFinite(hyd.specificGravity)) ? hyd.specificGravity : 1;
+		return pEngine + ((n.elev || 0) - n.ground) * sg;
+	}
+
 	/**
 	 * **DID THIS HYDRAULIC STEP ACTUALLY CONVERGE?** ROADMAP Task 565.
 	 *
@@ -1485,7 +1497,7 @@
 					n = model.nodes[i];
 					idx = s.nodeIdx[n.id];
 					heads[n.id] = p.getNodeValue(idx, EN_HEAD);
-					pressures[n.id] = p.getNodeValue(idx, EN_PRESSURE);
+					pressures[n.id] = tankGroundPressure(n, p.getNodeValue(idx, EN_PRESSURE), model);
 					if (pda && n.type !== 'reservoir' && n.type !== 'tank') {
 						demands[n.id] = p.getNodeValue(idx, EN_DEMAND) / 1000;
 						deficits[n.id] = Math.max(0, p.getNodeValue(idx, EN_DEMANDDEFICIT)) / 1000;
@@ -2193,7 +2205,7 @@
 									for (i = 0; i < model.nodes.length; i++) {
 										n = model.nodes[i];
 										f.heads[n.id] = p.getNodeValue(nodeIdx[n.id], EN_HEAD);
-										f.pressures[n.id] = p.getNodeValue(nodeIdx[n.id], EN_PRESSURE);
+										f.pressures[n.id] = tankGroundPressure(n, p.getNodeValue(nodeIdx[n.id], EN_PRESSURE), model);
 										// L/s -> m3/s, the same scale a [JUNCTIONS] demand is written in.
 										f.demands[n.id] = p.getNodeValue(nodeIdx[n.id], EN_DEMAND) / 1000;
 										// Under PDA only (Task 762): what the junction asked for and did not get.

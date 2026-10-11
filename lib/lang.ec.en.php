@@ -1007,7 +1007,12 @@ $ec_lang['lpn_field_head_tip']='Water surface level in the reservoir, measured a
 // pipe-diameter unit would put a 15 m tank on screen as 15000. Same reason the three levels say
 // "measured up from the tank bottom" rather than leaving the datum to be guessed -- EPANET measures
 // a tank level from the vessel floor, not from the same zero the elevations use.
-$ec_lang['lpn_tank_elev_tip']='Elevation of the tank bottom. Water depths in the tank are measured up from here.';
+// A tank has two elevations (Tom, 2026-10-11): Elevation is the ground, the pressure datum as at a
+// junction; Base elevation is the tank bottom, EPANET's [TANKS] Elevation, from which depth and
+// volume are measured.
+$ec_lang['lpn_field_tank_base_elev']='Base elevation';
+$ec_lang['lpn_field_tank_base_elev_tip']='Elevation of the tank bottom, from which water depth and volume are measured. Left blank, the bottom is at the ground elevation.';
+$ec_lang['lpn_tank_ground_elev_tip']='Ground elevation at the tank. Pressure at the tank is measured from here, as at a junction.';
 $ec_lang['lpn_field_tank_level']='Water depth';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_field_tank_level_tip']='Depth of water in the tank, measured up from the tank bottom.';
