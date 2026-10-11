@@ -407,7 +407,7 @@
 	 * point of the Shape. A third number is carried as `z`. Every number keeps its characters where
 	 * the browser reports them (JSON.parse source text access), else String() of the value.
 	 *
-	 * Returns { ok: true, shapes: [{ name, desc, props, fid, closed, pts: [{ lon, lat, z?, tok }] }],
+	 * Returns { ok: true, shapes: [{ name, srcName, desc, props, fid, closed, pts: [{ lon, lat, z?, tok }] }],
 	 *           skipped: [{ name, why: 'network' | 'geometry' | 'position' }], holes, multipart }
 	 *      or { ok: false, detail }.
 	 */
@@ -505,7 +505,10 @@
 				if (Object.prototype.hasOwnProperty.call(pr, k) && k !== 'name' && k !== 'description' && k !== 'element') { props[k] = pr[k]; }
 			}
 			got.forEach(function (sh) {
+				// The ID is tried from a single-part feature's name; every part keeps the name the
+				// file gave it (`srcName`), so the page can carry it where it cannot be an ID.
 				sh.name = got.length > 1 ? '' : name;
+				sh.srcName = name;
 				if (pr.description !== undefined && pr.description !== null && pr.description !== '') { sh.desc = String(pr.description); }
 				if (Object.keys(props).length) { sh.props = JSON.parse(JSON.stringify(props)); }
 				if (f && f.id !== undefined && got.length === 1) { sh.fid = plain(f.id); }

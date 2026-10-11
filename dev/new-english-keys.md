@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**113 still to read on master**, of 124 untranslated keys, of 2568 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**119 still to read on master**, of 130 untranslated keys, of 2574 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -175,7 +175,7 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   @@ NEEDS RULING
 
-## lpn_  (123, 112 to read @@ NEEDS RULING)
+## lpn_  (129, 118 to read @@ NEEDS RULING)
 
 - **`lpn_demand_pattern_constant`**
   > (constant)
@@ -270,8 +270,14 @@ never edits a synonym.
 - **`lpn_geojson_import_done`**
   > {n} Shapes imported from {file}.
   @@ NEEDS RULING
+- **`lpn_geojson_import_done_one`**
+  > One Shape imported from {file}.
+  @@ NEEDS RULING
 - **`lpn_geojson_import_holes`**
   > {n} polygon holes not imported. A Shape has one boundary.
+  @@ NEEDS RULING
+- **`lpn_geojson_import_holes_one`**
+  > One polygon hole not imported. A Shape has one boundary.
   @@ NEEDS RULING
 - **`lpn_geojson_import_local`**
   > GeoJSON positions are latitude and longitude, and this project has no place on the Earth to which they can be converted. Georeference it first with Map, World map, Attach, then import again.
@@ -279,8 +285,20 @@ never edits a synonym.
 - **`lpn_geojson_import_parts`**
   > {n} multipart features imported as one Shape for each part.
   @@ NEEDS RULING
+- **`lpn_geojson_import_parts_one`**
+  > One multipart feature imported as one Shape for each part.
+  @@ NEEDS RULING
+- **`lpn_geojson_import_renamed`**
+  > {n} feature names cannot be Shape IDs and are kept with the Shapes: {list}.
+  @@ NEEDS RULING
+- **`lpn_geojson_import_renamed_one`**
+  > One feature name cannot be a Shape ID and is kept with the Shape: {list}.
+  @@ NEEDS RULING
 - **`lpn_geojson_import_skipped`**
   > {n} features not imported: {list}.
+  @@ NEEDS RULING
+- **`lpn_geojson_import_skipped_one`**
+  > One feature not imported: {list}.
   @@ NEEDS RULING
 - **`lpn_geojson_import_unreadable`**
   > {file} is not a GeoJSON file: {detail}
@@ -454,7 +472,7 @@ never edits a synonym.
   > No node has the ID {id}.
   @@ NEEDS RULING
 - **`lpn_mode_add_shape`**
-  > Mode: Add Shape. Specify each point of the Shape. Specify the last point again, press Enter, or right-click to finish; a Shape of one point is a point. Specify the first point again to close the Shape into a polygon. Press Escape to discard the Shape being drawn.
+  > Mode: Add Shape. Specify each point. Specify the last point again or press Enter to finish; specify the first point to close a polygon.
   @@ NEEDS RULING
 - **`lpn_msglog_hidden`**
   > Hidden
@@ -933,7 +951,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Mode: Match properties. Select the asset to copy properties from. Status, identity, and location are not copied. Press Escape to cancel.
   @@ NEEDS RULING
 
-### feat/shape (`8436cef6`) — adds no English strings
+### feat/shape (`9c872dc2`) — adds no English strings
 
 ### feat/visit-dedupe (`e22c4ec9`) — adds no English strings
 

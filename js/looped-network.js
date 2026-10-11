@@ -18726,10 +18726,15 @@ var EngCalcs = EngCalcs || {};
 		// took the nodes first would hand deleteElement() link ids that had already gone -- and a
 		// multi-element delete is exactly where that ordering starts to matter, because a marquee
 		// routinely catches both ends of a pipe and the pipe itself.
-		subject.filter(function (s) { return s.kind !== 'node'; })
-			.forEach(function (s) { deleteElement(s.kind, s.id); });
-		subject.filter(function (s) { return s.kind === 'node'; })
-			.forEach(function (s) { deleteElement(s.kind, s.id); });
+		// ONE undo step for the whole subject (saveUndoSnapshot()'s group). A delete that stops to
+		// ask first (scenario overrides) takes its own step when it is answered.
+		undoGroup = { taken: false };
+		try {
+			subject.filter(function (s) { return s.kind !== 'node'; })
+				.forEach(function (s) { deleteElement(s.kind, s.id); });
+			subject.filter(function (s) { return s.kind === 'node'; })
+				.forEach(function (s) { deleteElement(s.kind, s.id); });
+		} finally { undoGroup = null; }
 		return true;
 	}
 	// A typed Delete/Backspace belongs to whatever field has focus, always. Without this, editing an
@@ -19128,6 +19133,12 @@ var EngCalcs = EngCalcs || {};
 		(doc.customers || []).forEach(function (c) {
 			var pt = customerPoint(c);
 			if (pt && inArea(ring, pt.x, pt.y)) { out.push({ kind: 'customer', id: c.id }); }
+		});
+		// A Shape is caught when every point of it is inside, the rule a pipe follows (Task 779).
+		docShapesRead().forEach(function (sh) {
+			if (shapeEls[sh.id] && sh.pts.length && sh.pts.every(function (p) { return inArea(ring, p.x, p.y); })) {
+				out.push({ kind: 'shape', id: sh.id });
+			}
 		});
 		return out;
 	}
@@ -36075,7 +36086,7 @@ var EngCalcs = EngCalcs || {};
 		// so a file whose `nodes` is a string or a number would install and then break the renderer
 		// rather than being refused here. Absent is fine -- that is an empty project; present and
 		// not an array is not a project document.
-		var lists = ['nodes', 'links', 'labels', 'customers'], i;
+		var lists = ['nodes', 'links', 'labels', 'customers', 'shapes'], i;
 		for (i = 0; i < lists.length; i++) {
 			if (saved[lists[i]] !== undefined && !Array.isArray(saved[lists[i]])) { return null; }
 		}
@@ -37382,7 +37393,11 @@ var EngCalcs = EngCalcs || {};
 		}
 		function go() {
 			var r = EngCalcs.lpnGeoJsonShapes ? EngCalcs.lpnGeoJsonShapes(text) : { ok: false, detail: '' },
-				geo = isLatLonProject(), code = projectCrsCode(), made = [], used = {}, lines = [];
+				geo = isLatLonProject(), code = projectCrsCode(), made = [], used = {}, lines = [], renamed = [];
+			// The singular where the count is one: `key` holds {n}, `key_one` says it for one.
+			function counted(key, n, fallback, fallbackOne) {
+				return n === 1 ? String(pc[key + '_one'] || fallbackOne) : String(pc[key] || fallback).replace('{n}', String(n));
+			}
 			if (!r.ok) {
 				say((pc.lpn_geojson_import_unreadable || '{file} is not a GeoJSON file: {detail}')
 					.replace('{file}', fileName).replace('{detail}', r.detail || ''), { ok: false, reason: 'unreadable' });
@@ -37419,6 +37434,14 @@ var EngCalcs = EngCalcs || {};
 				var s = { id: id, pts: pts, closed: !!sh.closed };
 				if (sh.desc) { s.desc = sh.desc; }
 				if (sh.props) { s.props = sh.props; }
+				// **A NAME THAT CANNOT BE THE ID IS KEPT, AND SAID** (Perry's review): as the
+				// description where the file stated none, else as a `source_name` property, and both
+				// ride back out on export. The notice lists each one beside the ID it was given.
+				if (sh.srcName && sh.srcName !== id) {
+					if (!s.desc) { s.desc = sh.srcName; }
+					else { s.props = s.props || {}; s.props.source_name = sh.srcName; }
+					renamed.push(sh.srcName + ' (' + id + ')');
+				}
 				if (sh.fid !== undefined) { s.fid = sh.fid; }
 				made.push(s);
 			});
@@ -37428,23 +37451,30 @@ var EngCalcs = EngCalcs || {};
 				made.forEach(function (s) { addShapeToDoc(s); buildShapeEls(s); });
 				scheduleSave();
 			}
-			lines.push((pc.lpn_geojson_import_done || '{n} Shapes imported from {file}.')
-				.replace('{n}', String(made.length)).replace('{file}', fileName));
+			lines.push(counted('lpn_geojson_import_done', made.length, '{n} Shapes imported from {file}.',
+				'One Shape imported from {file}.').replace('{file}', fileName));
+			if (renamed.length) {
+				lines.push(counted('lpn_geojson_import_renamed', renamed.length,
+					'{n} feature names cannot be Shape IDs and are kept with the Shapes: {list}.',
+					'One feature name cannot be a Shape ID and is kept with the Shape: {list}.').replace('{list}', renamed.join(', ')));
+			}
 			if (r.skipped.length) {
 				var why = { network: pc.lpn_geojson_import_why_network || 'network asset',
 					geometry: pc.lpn_geojson_import_why_geometry || 'not a point, line, or polygon',
 					position: pc.lpn_geojson_import_why_position || 'position not a valid latitude and longitude' };
-				lines.push((pc.lpn_geojson_import_skipped || '{n} features not imported: {list}.')
-					.replace('{n}', String(r.skipped.length))
+				lines.push(counted('lpn_geojson_import_skipped', r.skipped.length, '{n} features not imported: {list}.',
+					'One feature not imported: {list}.')
 					.replace('{list}', r.skipped.map(function (k) { return k.name + ' (' + why[k.why] + ')'; }).join(', ')));
 			}
 			if (r.holes) {
-				lines.push((pc.lpn_geojson_import_holes || '{n} polygon holes not imported. A Shape has one boundary.').replace('{n}', String(r.holes)));
+				lines.push(counted('lpn_geojson_import_holes', r.holes, '{n} polygon holes not imported. A Shape has one boundary.',
+					'One polygon hole not imported. A Shape has one boundary.'));
 			}
 			if (r.multipart) {
-				lines.push((pc.lpn_geojson_import_parts || '{n} multipart features imported as one Shape for each part.').replace('{n}', String(r.multipart)));
+				lines.push(counted('lpn_geojson_import_parts', r.multipart, '{n} multipart features imported as one Shape for each part.',
+					'One multipart feature imported as one Shape for each part.'));
 			}
-			say(lines.join(' '), { ok: true, made: made.map(function (s) { return s.id; }), skipped: r.skipped, holes: r.holes, multipart: r.multipart });
+			say(lines.join(' '), { ok: true, made: made.map(function (s) { return s.id; }), skipped: r.skipped, holes: r.holes, multipart: r.multipart, renamed: renamed });
 		}
 		if (!isLatLonProject() && EngCalcs.lpnCrsLoad && EngCalcs.lpnCrsReady && !EngCalcs.lpnCrsReady()) { EngCalcs.lpnCrsLoad(go); return; }
 		go();
@@ -62288,12 +62318,14 @@ var EngCalcs = EngCalcs || {};
 		selectedRefs().forEach(function (s) {
 			var el = s.kind === 'node' ? nodeById(s.id)
 					: (s.kind === 'link' ? linkById(s.id)
-					: (s.kind === 'customer' ? customerById(s.id) : labelById(s.id))),
+					: (s.kind === 'customer' ? customerById(s.id)
+					: (s.kind === 'shape' ? shapeById(s.id) : labelById(s.id)))),
 				// A Text object carries no `type`; its table is keyed 'text'. Never undefined --
 				// that was Tom's *"9 undefined assets selected"* (2026-09-08).
 				// A Text and a meter both carry no `type`; their tables are keyed 'text' and
 				// 'customer'. Never undefined -- that was Tom's *"9 undefined assets selected"*.
 				ty = s.kind === 'label' ? 'text' : s.kind === 'customer' ? 'customer'
+					: s.kind === 'shape' ? String((EngCalcs.pageConfig || {}).lpn_tool_add_shape || 'Shape')
 					: (el && el.type) || s.kind;
 			if (!el) { return; }
 			if (!byType[ty]) { byType[ty] = []; }
@@ -62478,6 +62510,8 @@ var EngCalcs = EngCalcs || {};
 				(l.verts || []).forEach(take);
 			} else if (s.kind === 'customer') {
 				if (customerById(s.id)) { take(customerPoint(customerById(s.id))); }
+			} else if (s.kind === 'shape') {
+				if (shapeById(s.id)) { shapeById(s.id).pts.forEach(take); }
 			} else if (labelById(s.id)) { take(textLabelPoint(labelById(s.id))); }
 		});
 		return box;
@@ -63200,8 +63234,16 @@ var EngCalcs = EngCalcs || {};
 		stack.push(snap);
 		if (stack.length > UNDO_LIMIT) { stack.shift(); }
 	}
+	// **ONE GESTURE, ONE UNDO STEP** (Perry's review of Task 779): while a group is open, only its
+	// first snapshot is pushed, so a Delete of a mixed selection (a Shape, a junction, a pipe) comes
+	// back with one Ctrl+Z. See deleteSelection().
+	var undoGroup = null;
 	function saveUndoSnapshot() {
 		markEdited(); // one seam, because every real mutation snapshots before it changes anything
+		if (undoGroup) {
+			if (undoGroup.taken) { return; }
+			undoGroup.taken = true;
+		}
 		pushUndoSnapshot(makeUndoSnapshot());
 	}
 	// Switching projects drops the undo history (Task 146.08). The stack holds snapshots of the

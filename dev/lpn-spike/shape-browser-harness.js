@@ -326,6 +326,45 @@ async function main() {
 			ok('...and Undo restores it', (await h.stored()).shapes.some((s) => s.id === sLine.id));
 		}
 
+		console.log('\n--- 7b. a window selection catches a Shape, and Delete takes it (Perry\'s review) ---');
+		{
+			await h.esc();
+			await a.toolbarClick(await a.lang('lpn_tool_area_window')); await h.settle(250);
+			// The instruction bubble opens over the middle of the map; its own box turns it off.
+			await P.evaluate(() => { const b = document.querySelector('#lpn_area_hint .lpn-area-hint-show input'); if (b && b.checked) { b.click(); } });
+			await h.settle(150);
+			const scr = await P.evaluate((q) => {
+				const g = document.querySelector('#lpn_canvas .lpn-shape[data-shape="' + q + '"] polygon'), m = g.getScreenCTM();
+				return Array.from({ length: g.points.numberOfItems }, (_, i) => g.points.getItem(i)).map((p) => ({ x: m.a * p.x + m.c * p.y + m.e, y: m.b * p.x + m.d * p.y + m.f }));
+			}, sPoly.id);
+			const xs = scr.map((p) => p.x), ys = scr.map((p) => p.y);
+			await h.click({ x: Math.min(...xs) - 8, y: Math.min(...ys) - 8 });
+			await h.click({ x: Math.max(...xs) + 8, y: Math.max(...ys) + 8 });
+			const caught = await P.evaluate((q) => document.querySelector('#lpn_canvas .lpn-shape[data-shape="' + q + '"]').classList.contains('lpn-selected'), sPoly.id);
+			ok('a window drawn round the polygon selects it', caught);
+			await P.keyboard.press('Delete'); await h.settle(400);
+			ok('...and Delete removes it', !(await h.stored()).shapes.some((x) => x.id === sPoly.id));
+			await P.keyboard.press('Control+z'); await h.settle(400);
+			ok('...and Undo brings it back', (await h.stored()).shapes.some((x) => x.id === sPoly.id));
+		}
+
+		console.log('\n--- 7c. deleting a Shape and a junction together is one undo step ---');
+		{
+			await h.select();
+			const before = await h.stored();
+			await h.click(await shapeMid(P, sLine.id));
+			const j21 = await h.nodeAt('21');
+			await P.keyboard.down('Shift'); await P.mouse.click(j21.x, j21.y); await P.keyboard.up('Shift'); await h.settle(300);
+			await P.evaluate(() => { const c = document.getElementById('lpn_popup_close'); if (c) { c.click(); } });
+			await P.keyboard.press('Delete'); await h.settle(500);
+			const gone = await h.stored();
+			ok('Delete on the two removes the Shape and junction 21', !gone.shapes.some((x) => x.id === sLine.id) && !gone.nodes.some((x) => x.id === '21'));
+			await P.keyboard.press('Control+z'); await h.settle(500);
+			const back = await h.stored();
+			ok('ONE Undo brings back both, with every pipe', back.shapes.some((x) => x.id === sLine.id) && back.nodes.some((x) => x.id === '21') &&
+				back.links.length === before.links.length, back.links.length + ' / ' + before.links.length);
+		}
+
 		console.log('\n--- 8. the network with Shapes present: the same answers, the same EPANET file ---');
 		{
 			const r8 = await h.solve();
@@ -443,6 +482,33 @@ async function main() {
 			ok('Zoom to fit frames a project of Shapes alone', outBefore && await allInView(), 'out of view before: ' + outBefore);
 			await P.keyboard.press('Control+z'); await h.settle(400);
 			ok('one Undo takes the whole import back', ((await h.stored()).shapes || []).length === 0);
+
+			// Names that cannot be IDs are kept and named; one of anything is said in the singular.
+			const odd = JSON.stringify({ type: 'FeatureCollection', features: [
+				{ type: 'Feature', properties: { name: 'Lot A' }, geometry: { type: 'Point', coordinates: [10, 20] } },
+				{ type: 'Feature', properties: { name: 'Wells' }, geometry: { type: 'MultiPoint', coordinates: [[11, 21], [12, 22]] } },
+				{ type: 'Feature', properties: { name: 'Pond' }, geometry: { type: 'Polygon', coordinates: [[[13, 23], [14, 23], [14, 24], [13, 23]], [[13.5, 23.2], [13.8, 23.2], [13.8, 23.5], [13.5, 23.2]]] } },
+				{ type: 'Feature', properties: { name: 'J9', node_type: 'Junction' }, geometry: { type: 'Point', coordinates: [15, 25] } }
+			] });
+			await P.setInputFiles('#lpn_geojson_file', { name: 'odd.geojson', mimeType: 'application/geo+json', buffer: Buffer.from(odd) });
+			await a.waitFor(async () => ((await h.stored()).shapes || []).length > 0, 'the second import', 8000).catch(() => {});
+			const g4 = await h.stored(), note4 = await a.notice();
+			const byDesc = (d) => (g4.shapes || []).filter((x) => x.desc === d);
+			ok('"Lot A", which cannot be an ID, is kept as its Shape\'s description', byDesc('Lot A').length === 1, JSON.stringify((g4.shapes || []).map((x) => [x.id, x.desc])));
+			ok('...and each part of the multipoint "Wells" keeps the name', byDesc('Wells').length === 2);
+			ok('the notice names each kept name beside its ID', /Lot A \(S\d+\)/.test(note4) && /Wells \(S\d+\)/.test(note4), note4);
+			ok('one hole, one feature not imported and one multipart feature are said in the singular',
+				note4.indexOf(await a.lang('lpn_geojson_import_holes_one')) >= 0 &&
+				note4.indexOf((await a.lang('lpn_geojson_import_skipped_one')).split('{list}')[0]) >= 0 &&
+				note4.indexOf(await a.lang('lpn_geojson_import_parts_one')) >= 0 && !/\b1 (polygon|feature|multipart)/.test(note4), note4);
+			const gjOut = await h.exportVia('lpn_file_export_item_geojson');
+			ok('the kept name rides back out on export', !!gjOut && gjOut.indexOf('"description":"Lot A"') >= 0);
+			await P.keyboard.press('Control+z'); await h.settle(400);
+			const one = JSON.stringify({ type: 'Feature', properties: { name: 'P1' }, geometry: { type: 'Point', coordinates: [10, 20] } });
+			await P.setInputFiles('#lpn_geojson_file', { name: 'one.geojson', mimeType: 'application/geo+json', buffer: Buffer.from(one) });
+			await a.waitFor(async () => ((await h.stored()).shapes || []).length > 0, 'the one-Shape import', 8000).catch(() => {});
+			const note5 = await a.notice();
+			ok('one Shape imported is said in the singular', note5.indexOf((await a.lang('lpn_geojson_import_done_one')).replace('{file}', 'one.geojson')) === 0, note5);
 		}
 		ok('no uncaught page errors', a.errors.length === 0, a.errors.slice(0, 2).join(' | '));
 		await a.close();

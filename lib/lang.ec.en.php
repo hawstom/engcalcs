@@ -2838,7 +2838,7 @@ $ec_lang['lpn_mode_add_valve']='Mode: Add Valve. Select a start node and then an
 // sequence (click node, THEN click to place), but placing near a node anchors it in that ONE click.
 $ec_lang['lpn_mode_add_text']='Mode: Add Text. Specify a location on the map to place a Text. Specify a location near a node to attach the Text to that node. Switch to Select mode to change or move assets and labels.';
 $ec_lang['lpn_mode_add_chain']='Mode: Junction Pipe Chain. Specify a point on the map to add a junction, then specify each next point to add a pipe and a junction. Specify an existing node to continue from it. Press Escape to end the chain. Switch to Select mode to change or move assets and labels.';
-$ec_lang['lpn_mode_add_shape']='Mode: Add Shape. Specify each point of the Shape. Specify the last point again, press Enter, or right-click to finish; a Shape of one point is a point. Specify the first point again to close the Shape into a polygon. Press Escape to discard the Shape being drawn.';
+$ec_lang['lpn_mode_add_shape']='Mode: Add Shape. Specify each point. Specify the last point again or press Enter to finish; specify the first point to close a polygon.';
 // Toolbar button tips (Tom, 2026-07-30): hover/tap explanations on the two buttons a new user is
 // most likely to miss the point of -- that Select is what you use to edit/move things, and that a
 // label itself can be dragged. Both economize on translation for later, per CLAUDE.md's tip-only
@@ -4597,12 +4597,18 @@ $ec_lang['lpn_file_import_survey_tip']='Read a list of surveyed points from a te
 $ec_lang['lpn_file_import_shapes']='Import GeoJSON shapes…';
 $ec_lang['lpn_file_import_shapes_tip']='Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network from an EPANET file. The project must be georeferenced or state a coordinate system.';
 $ec_lang['lpn_geojson_import_done']='{n} Shapes imported from {file}.';
+$ec_lang['lpn_geojson_import_done_one']='One Shape imported from {file}.';
+$ec_lang['lpn_geojson_import_renamed']='{n} feature names cannot be Shape IDs and are kept with the Shapes: {list}.';
+$ec_lang['lpn_geojson_import_renamed_one']='One feature name cannot be a Shape ID and is kept with the Shape: {list}.';
 $ec_lang['lpn_geojson_import_skipped']='{n} features not imported: {list}.';
+$ec_lang['lpn_geojson_import_skipped_one']='One feature not imported: {list}.';
 $ec_lang['lpn_geojson_import_why_network']='network asset';
 $ec_lang['lpn_geojson_import_why_geometry']='not a point, line, or polygon';
 $ec_lang['lpn_geojson_import_why_position']='position not a valid latitude and longitude';
 $ec_lang['lpn_geojson_import_holes']='{n} polygon holes not imported. A Shape has one boundary.';
+$ec_lang['lpn_geojson_import_holes_one']='One polygon hole not imported. A Shape has one boundary.';
 $ec_lang['lpn_geojson_import_parts']='{n} multipart features imported as one Shape for each part.';
+$ec_lang['lpn_geojson_import_parts_one']='One multipart feature imported as one Shape for each part.';
 $ec_lang['lpn_geojson_import_local']='GeoJSON positions are latitude and longitude, and this project has no place on the Earth to which they can be converted. Georeference it first with Map, World map, Attach, then import again.';
 $ec_lang['lpn_geojson_import_unreadable']='{file} is not a GeoJSON file: {detail}';
 $ec_lang['lpn_survey_read_error']='That file could not be read from your disk.';
