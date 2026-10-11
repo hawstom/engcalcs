@@ -265,7 +265,7 @@ async function main() {
 			await h.clickCell('A1', 'id');
 			await P.keyboard.press('Control+Shift+V'); await h.settle(600);
 			const note = await a.notice();
-			ok('nothing was created', JSON.stringify(await h.shapes()) === before, note);
+			ok('no Shape was made', JSON.stringify(await h.shapes()) === before, note);
 			ok('...and the notice names row 2', /2/.test(note), note);
 			await h.setClip(tsv([['F7', 'no points', '0', '']]));
 			await h.clickCell('A1', 'id');
