@@ -4105,7 +4105,13 @@ $ec_lang['lpn_choice_default']='Default';
 $ec_lang['lpn_settings_default_pattern']='Default demand pattern';
 $ec_lang['lpn_settings_default_pattern_tip']='Every junction with no pattern uses this one.';
 $ec_lang['lpn_junction_pattern_unknown']='No pattern in this project is named {id}, so the junction was left as it was.';
-$ec_lang['lpn_settings_default_pattern_implied']='None stated (pattern {id} is used)';
+$ec_lang['lpn_settings_default_pattern_none']='None (constant)';
+$ec_lang['lpn_demand_pattern_default']='(default: {id})';
+$ec_lang['lpn_demand_pattern_constant']='(constant)';
+$ec_lang['lpn_library_pattern_default_mark']='(default)';
+$ec_lang['lpn_library_pattern_default_tip']='The default demand pattern. Change it in Settings, Default demand pattern.';
+$ec_lang['lpn_library_pattern_default_deleted_to']='Pattern {id} was the default demand pattern. Junctions with no pattern now use pattern {now}.';
+$ec_lang['lpn_library_pattern_default_deleted_none']='Pattern {id} was the default demand pattern. Junctions with no pattern now use a constant demand.';
 $ec_lang['lpn_library_control_add']='Add a control';
 // THE KEYWORDS IN THE EXAMPLES ARE NOT TRANSLATED and must be left exactly as they are: LINK,
 // OPEN, CLOSED, IF, NODE, ABOVE, BELOW, AT, TIME and CLOCKTIME are what the reader types into the
