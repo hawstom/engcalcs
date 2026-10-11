@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**122 still to read on master**, of 133 untranslated keys, of 2577 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**126 still to read on master**, of 137 untranslated keys, of 2581 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -175,7 +175,7 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   @@ NEEDS RULING
 
-## lpn_  (132, 121 to read @@ NEEDS RULING)
+## lpn_  (136, 125 to read @@ NEEDS RULING)
 
 - **`lpn_demand_pattern_constant`**
   > (constant)
@@ -486,6 +486,18 @@ never edits a synonym.
 - **`lpn_pane_copy_heads`**
   > Copy with column headings
   _Ruled 2026-10-09: Use proposed (Tom, calls page round 3)._
+- **`lpn_pane_paste_shape_no_points`**
+  > Row {row}: a new Shape needs its Points.
+  @@ NEEDS RULING
+- **`lpn_pane_shape_closed`**
+  > Closed
+  @@ NEEDS RULING
+- **`lpn_pane_shape_points`**
+  > Points
+  @@ NEEDS RULING
+- **`lpn_pane_tab_shapes`**
+  > Shapes
+  @@ NEEDS RULING
 - **`lpn_result_depth`**
   > Depth
   @@ NEEDS RULING
@@ -584,7 +596,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**111 still to read**, of 114 new keys across 11 unmerged branch(es).
+**118 still to read**, of 121 new keys across 16 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -595,7 +607,11 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/bentley-interop (`44a81de6`) — 100 new, 100 to read @@ NEEDS RULING
+### chore/roadmap-1011c (`4cda3c09`) — adds no English strings
+
+### chore/selection-word (`b32ccf97`) — adds no English strings
+
+### feat/bentley-interop (`fa83b30c`) — 100 new, 100 to read @@ NEEDS RULING
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -922,7 +938,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`2e5e81c4`) — adds no English strings
 
-### feat/match-property (`2aeaaaf7`) — 11 new, 11 to read @@ NEEDS RULING
+### feat/match-property (`ea6934fb`) — 11 new, 11 to read @@ NEEDS RULING
 
 - **`lpn_match_done_many`**
   > Matched {m} assets to {id}, except status and location. Values changed: {n}.
@@ -958,6 +974,35 @@ build for that would be a gate nobody keeps. Refresh it with
   > Mode: Match properties. Select the asset to copy properties from. Status, identity, and location are not copied. Press Escape to cancel.
   @@ NEEDS RULING
 
-### feat/shape (`5d234758`) — adds no English strings
+### feat/shape (`2fcd52e6`) — adds no English strings
 
-### feat/visit-dedupe (`f61e6013`) — adds no English strings
+### feat/si-example (`19c43524`) — 4 new, 4 to read @@ NEEDS RULING
+
+- **`lpn_ex_net2_si_desc`**
+  > Litres per second, with metres and millimetres. EPANET’s Net2, converted from gallons per minute, feet and inches: a branched distribution system with a tank.
+  @@ NEEDS RULING
+- **`lpn_ex_net2_si_title`**
+  > EPANET Net2, L/s (SI)
+  @@ NEEDS RULING
+- **`lpn_ex_net3_si_desc`**
+  > Litres per second, with metres and millimetres. EPANET’s Net3, converted from gallons per minute, feet and inches: 92 junctions, three tanks, and two reservoirs, one of them a river.
+  @@ NEEDS RULING
+- **`lpn_ex_net3_si_title`**
+  > EPANET Net3, L/s (SI)
+  @@ NEEDS RULING
+
+### feat/tank-ground (`7be93ed2`) — 3 new, 3 to read @@ NEEDS RULING
+
+- **`lpn_field_tank_base_elev`**
+  > Base elevation
+  @@ NEEDS RULING
+- **`lpn_field_tank_base_elev_tip`**
+  > Elevation of the tank bottom, from which water depth and volume are measured. Left blank, the bottom is at the ground elevation.
+  @@ NEEDS RULING
+- **`lpn_tank_ground_elev_tip`**
+  > Ground elevation at the tank. Pressure at the tank is measured from here, as at a junction.
+  @@ NEEDS RULING
+
+### feat/visit-dedupe (`f8cf3ed5`) — adds no English strings
+
+### fix/dxf-layer-code (`d87ca580`) — adds no English strings
