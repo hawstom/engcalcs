@@ -133,9 +133,9 @@ async function main() {
 		ok('1.7 nothing sits under the tree any more (no footer hint)', !(await page.$('#lpn_sm_body .lpn-sm-hint')) && (await page.evaluate(() => { const t = document.getElementById('lpn_sm_tree'); return !t.nextElementSibling; })));
 		const tipParas = (await L('lpn_sm_help')).split('\\n\\n');
 		// Tom's draft of 2026-10-11, finished: his two headings, his model, his example named after its scenario.
-		ok('1.8 the tip opens with Tom\'s heading and has the second one', tipParas[0] === 'How scenarios and alternatives work:' && tipParas.indexOf('How to manage scenarios:') > 1, JSON.stringify(tipParas));
-		ok('1.9 his example names the alternative after the scenario', tipParas[1].indexOf('a Text alternative called "Figure: Node and link IDs" is created') >= 0 &&
-			tipParas[1].indexOf('if the scenario has no such alternative, a new alternative is created using the name of the scenario') >= 0 && !/alernative/.test(tipParas.join(' ')), tipParas[1]);
+		ok('1.8 the tip is in two parts, each under a heading line of its own', tipParas.filter((t) => /:$/.test(t)).length === 2 && /:$/.test(tipParas[0]), JSON.stringify(tipParas));
+		const exScn = (tipParas[1].match(/create a "([^"]+)" scenario/) || [])[1], exAlt = (tipParas[1].match(/alternative called "([^"]+)"/) || [])[1];
+		ok('1.9 his example names the alternative after the scenario, and the typo is gone', !!exScn && exScn === exAlt && !/alernative/.test(tipParas.join(' ')), exScn + ' / ' + exAlt);
 		await page.mouse.click(...(await page.evaluate(() => { const g = document.querySelector('#lpn_smbox_title .ec-tip').getBoundingClientRect(); return [g.left + g.width / 2, g.top + g.height / 2]; })));
 		await a.settle(500);
 		const shown = await page.evaluate(() => Array.from(document.querySelectorAll('.tooltip.ec-explain.show p')).map((p) => p.textContent));

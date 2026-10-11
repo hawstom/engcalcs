@@ -80,12 +80,12 @@ function checkPresets(where) {
 	{
 		const P = global.EngCalcs.pageConfig || {};
 		const kind = (r) => r.separator ? '-' : r.scenarioId !== undefined ? 'S'
-			: r.label === (P.lpn_sm_menu || 'Scenario manager…') ? 'manager'
-			: r.label.slice(2) === (P.lpn_scenario_basic || 'Basic mode') ? 'basic'
-			: r.label === (P.lpn_scenario_new || 'New scenario…') ? 'new'
-			: r.label === (P.lpn_scenario_rename || 'Rename scenario…') ? 'rename'
-			: r.label === (P.lpn_scenario_delete || 'Delete scenario') ? 'delete'
-			: r.label === (P.lpn_scenario_push_btn || 'Apply Base values to all scenarios') ? 'apply' : '?' + r.label;
+			: r.label === P.lpn_sm_menu ? 'manager'
+			: r.label.slice(2) === P.lpn_scenario_basic ? 'basic'
+			: r.label === P.lpn_scenario_new ? 'new'
+			: r.label === P.lpn_scenario_rename ? 'rename'
+			: r.label === P.lpn_scenario_delete ? 'delete'
+			: r.label === P.lpn_scenario_push_btn ? 'apply' : '?' + r.label;
 		const got = L.scenarioMenuRows().map(kind).join(','), want = ['manager', '-', 'basic', 'new', 'rename', 'delete', '-', 'apply'].concat(sc.map(() => 'S')).join(',');
 		check(got === want, where + ': the menu is in Tom\'s order, the scenarios last', got);
 	}

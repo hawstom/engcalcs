@@ -75,9 +75,8 @@ console.log('\n--- scenarios created out of order, by name, natural and case-ins
 console.log('\n--- the Scenario menu shows the sorted order ---');
 {
 	const rows = openScenarioMenu();
-	// Rows after the five scenarios are the separator and the New/Rename/Delete/Push actions; read
-	// only the scenario rows off the front.
-	const names = rows.slice(0, 5).map(function (r) {
+	// The five scenarios are the last rows, after the commands (Tom, 2026-10-11).
+	const names = rows.slice(-5).map(function (r) {
 		var t = rowText(r).replace(/✓/g, '');
 		if (/Base/.test(t)) { return 'Base'; }
 		if (/Scenario 10/.test(t)) { return 'Scenario 10'; }

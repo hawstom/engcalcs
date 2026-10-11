@@ -609,8 +609,10 @@ console.log('\n--- create, rename, delete, and the two things Base may not do --
 {
 	L.switchScenario('base');
 	const rows = openScenarioMenu();
-	ok('every scenario is listed, Base first', /Base/.test(rowText(rows[0])), rowText(rows[0]));
-	ok('...with a tick on the one you are in', /✓/.test(rowText(rows[0])), rowText(rows[0]));
+	// The scenarios are the last rows (Tom, 2026-10-11: the commands first, the list of scenarios last).
+	const firstScn = rows[rows.length - L.getScenarios().length];
+	ok('every scenario is listed, Base first', /Base/.test(rowText(firstScn)), rowText(firstScn));
+	ok('...with a tick on the one you are in', /✓/.test(rowText(firstScn)), rowText(firstScn));
 	ok('Base cannot be renamed', findRow(rows, /Rename/).disabled === true);
 	ok('Base cannot be deleted', findRow(rows, /Delete/).disabled === true);
 	ok('...and Base is the only place the push is offered', findRow(rows, /all scenarios/).disabled === false);

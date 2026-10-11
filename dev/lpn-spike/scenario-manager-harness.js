@@ -365,10 +365,10 @@ async function runTail(mutate, quiet) {
 		let asked = 0;
 		const answerer = global.window.lpnDialogAnswerer;
 		global.window.lpnDialogAnswerer = function (req) { asked++; return answerer(req); };
-		const FIG = 'Figure: Node and link IDs';
+		const FIG = 'Figure 1';
 		const F = P.createScenario(FIG);
 		const named = (cat, name) => P.smRecords(cat).filter((r) => r.name === name);
-		ok('12.1 ' + W + 'a new scenario creates no alternative', P.smRecords('demand').length === 0 && P.smRecords('text').length === 0 &&
+		ok('12.1 ' + W + 'a scenario just made has no alternative of its own', P.smRecords('demand').length === 0 && P.smRecords('text').length === 0 &&
 			P.smChoice(F, 'demand').base === true && P.smCellText(F, 'demand') === PC.lpn_scenario_base);
 		P.switchScenario(F.id);
 		const logBefore = P.noticeLog().length, noticeBefore = P.lastNotice();
