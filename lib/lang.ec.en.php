@@ -2587,6 +2587,12 @@ $ec_lang['lpn_link_end_same']='From and To must be different nodes.';
 $ec_lang['lpn_split_pipe_ask']='Split pipe {id} at this node?';
 $ec_lang['lpn_split_yes']='Yes';
 $ec_lang['lpn_split_no']='No';
+// Object snap (Task 782). The tip beside the snap glyph on a pipe vertex: "Pipe 10, vertex 2". A node
+// or a pipe is named by its type word and ID alone.
+$ec_lang['lpn_snap_vertex']='{link}, vertex {n}';
+// A tank, reservoir or junction snapped onto a node of another type is placed at exactly that
+// position. Two nodes at one point are legal in EPANET, and the map cannot show that they are separate.
+$ec_lang['lpn_snap_node_on_node']='{new} placed at the location of {target}. The two nodes are not connected.';
 // Plain-text wording of the concept mphl_total_junction_k/mphl_junction_loss already own (their
 // values carry k<sub>m</sub> markup, incompatible with this popup's textContent-only fields) --
 // Tom, 2026-07-30, "default to 2" matches mphl_total_junction_k_tip's own stated default exactly.

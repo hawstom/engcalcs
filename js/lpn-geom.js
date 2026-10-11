@@ -886,6 +886,22 @@ EngCalcs.lpnGeom = (function () {
 			hi = { x: Math.max(x0, x1), y: Math.max(y0, y1) };
 		return [{ x: lo.x, y: lo.y }, { x: hi.x, y: lo.y }, { x: hi.x, y: hi.y }, { x: lo.x, y: hi.y }];
 	}
+	// ---- object snap (Task 782) -------------------------------------------------------------
+	// THE WINNER AMONG SNAP CANDIDATES, by rank first and distance second. A candidate is
+	// {rank, dist, ...}: rank 0 is a node, 1 a vertex, 2 the nearest point on a pipe, and a later
+	// source (a Shape's vertices, Task 779) states its own rank. A lower rank wins outright inside
+	// the reach, the way CAD object snap prefers an endpoint to "nearest": a pipe passes through
+	// every node it ends at, so ranking by distance alone would let the line steal the node.
+	// Candidates past `tol` (the same units as `dist`) are ignored. Returns the candidate or null.
+	function bestSnapCandidate(cands, tol) {
+		var best = null, i, c;
+		for (i = 0; i < (cands || []).length; i++) {
+			c = cands[i];
+			if (!c || !isFinite(c.dist) || c.dist > tol) { continue; }
+			if (!best || c.rank < best.rank || (c.rank === best.rank && c.dist < best.dist)) { best = c; }
+		}
+		return best;
+	}
 	function mercLatFromRad(m) { return Math.atan(Math.sinh(m)) * 180 / Math.PI; }
 	function mercY(latDeg) { return mercRadY(latDeg) * 180 / Math.PI; }
 	function mercLat(yDeg) { return mercLatFromRad(yDeg * Math.PI / 180); }
@@ -919,6 +935,7 @@ EngCalcs.lpnGeom = (function () {
 		buildSegmentIndex: buildSegmentIndex,
 		nearestSegmentDistance: nearestSegmentDistance,
 		snapLeaderOffset: snapLeaderOffset,
+		bestSnapCandidate: bestSnapCandidate,
 		angularGap: angularGap,
 		directionOpenness: directionOpenness,
 		mostOpenDirection: mostOpenDirection,
