@@ -37201,15 +37201,18 @@ var EngCalcs = EngCalcs || {};
 				var pts = [], ok = true, id;
 				sh.pts.forEach(function (q) {
 					var p, xy;
+					// The project's OUTWARD pair first, then the one crossing into the drawing frame.
 					if (geo) {
 						if (Math.abs(q.lat) > LPN_MERC_MAX_LAT) { ok = false; return; }
-						p = { x: inwardX(q.lon), y: inwardY(q.lat) };
-						p[LPN_GEO_XSRC] = q.lon; p[LPN_GEO_YSRC] = q.lat;
-						if (q.tok && (q.tok.x || q.tok.y)) { p.tok = { x: q.tok.x, y: q.tok.y }; }
+						xy = { x: q.lon, y: q.lat };
 					} else {
 						xy = EngCalcs.lpnCrsForward ? EngCalcs.lpnCrsForward(code, { lon: q.lon, lat: q.lat }) : null;
 						if (!xy) { ok = false; return; }
-						p = { x: inwardX(xy.x), y: inwardY(xy.y) };
+					}
+					p = { x: inwardX(xy.x), y: inwardY(xy.y) };
+					if (geo) {
+						p[LPN_GEO_XSRC] = q.lon; p[LPN_GEO_YSRC] = q.lat;
+						if (q.tok && (q.tok.x || q.tok.y)) { p.tok = { x: q.tok.x, y: q.tok.y }; }
 					}
 					if (typeof q.z === 'number') {
 						p.z = q.z;

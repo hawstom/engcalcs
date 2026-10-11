@@ -490,8 +490,9 @@ console.log('\n--- one home for the concept ---');
 	// paneCreateFromPlan()'s label and customer branches convert a pasted row's typed position
 	// through this door exactly as a node's own does, and the customer branch's node-attachment
 	// lookup (customerAttachAtNode()) needs the same inward point to find the nearest pipe.
-	ok('inwardX has one definition and 44 call sites', count(/inwardX\(/g) === 45, count(/inwardX\(/g));
-	ok('inwardY has one definition and 45 call sites', count(/inwardY\(/g) === 46, count(/inwardY\(/g));
+	// +1 each: the GeoJSON Shape import's one crossing (Task 779, landGeoJsonShapes()).
+	ok('inwardX has one definition and 45 call sites', count(/inwardX\(/g) === 46, count(/inwardX\(/g));
+	ok('inwardY has one definition and 46 call sites', count(/inwardY\(/g) === 47, count(/inwardY\(/g));
 	// And nothing else may take the flip on its own: a site that flips without shifting is exactly
 	// the mistake this task exists to prevent.
 	ok('cartesianY is called only by the two converters', count(/cartesianY\(/g) === 3,
