@@ -678,6 +678,8 @@
 		return model;
 	};
 
+	EC.lpnTankVolumeCurveUsable = function (pts) { return volumeCurveUsable(pts); };
+
 	// The three things a level-to-volume curve has to be for EPANET to read it and for the answer to
 	// mean anything. Deliberately not a repair: see the note above.
 	function volumeCurveUsable(pts) {

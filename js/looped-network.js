@@ -8372,6 +8372,11 @@ var EngCalcs = EngCalcs || {};
 	}
 	var COLOR_NODE_FIELDS = { elev: 'lpn_u_elevhead', demand: 'lpn_u_flow', demandActual: 'lpn_u_flow',
 		head: 'lpn_u_elevhead', pressure: 'lpn_u_pressure',
+		// **A TANK'S DEPTH AND USABLE VOLUME** (Task 783). Depth is a height on the same staff as the
+		// tank's three typed levels, so it reads in the Elevation/Head unit. Volume has no unit
+		// family of its own on this page: colorFieldUnitText() answers its mark (the LENGTH unit
+		// cubed), so it declares '' here for the reason `roughness` does.
+		depth: 'lpn_u_elevhead', volume: '',
 		// Declared with the age unit so the field is offered; colorFieldUnit() overrides it with
 		// qualityUnitId(), which is the one place that knows a source share has no unit.
 		quality: 'lpn_u_age',
@@ -8439,6 +8444,14 @@ var EngCalcs = EngCalcs || {};
 			}
 			return lastSolveResult ? toDisplay(lastSolveResult.heads[n.id], resultUnit('elevhead')) : undefined;
 		}
+		if (field === 'depth') {
+			var depSI = tankDepthSI(n);
+			return depSI === undefined ? undefined : toDisplay(depSI, resultUnit('elevhead'));
+		}
+		if (field === 'volume') {
+			var volSI = tankUsableVolumeSI(n);
+			return volSI === undefined ? undefined : volSI * tankVolumeFactor();
+		}
 		if (field === 'pressure') {
 			if (isFixedHeadNode(n)) { return fixedHeadPressure(n); }
 			return lastSolveResult ? toDisplay(lastSolveResult.pressures[n.id], resultUnit('pressure')) : undefined;
@@ -8450,6 +8463,63 @@ var EngCalcs = EngCalcs || {};
 		// EPANET converts an initial quality nowhere either, so there is no factor on this side.
 		if (field === 'initQuality') { return nodeInitQuality(n); }
 		return undefined;
+	}
+	// ---- A TANK'S DEPTH AND USABLE VOLUME (Task 783) ---------------------------------------------
+	//
+	// **DEPTH IS HEAD MINUS THE TANK BOTTOM, and our Elevation IS the bottom** (EPANET's own: depth
+	// zero is the vessel floor). Inside a run the head is the frame's (what the engine integrated);
+	// at one instant it is the stored water depth, exactly as the Head column reads. SI metres.
+	function tankDepthSI(n) {
+		var hf = toSI(1, 'lpn_u_elevhead'), elevSI;
+		if (!n || n.type !== 'tank' || !(hf > 0) || !isFinite(hf)) { return undefined; }
+		if (lastSolveResult && typeof lastSolveResult.t === 'number' && lastSolveResult.heads &&
+			typeof lastSolveResult.heads[n.id] === 'number') {
+			elevSI = toSI(n.elev || 0, 'lpn_u_elevhead');
+			return lastSolveResult.heads[n.id] - elevSI;
+		}
+		return toSI(effective(n, 'level') || 0, 'lpn_u_elevhead');
+	}
+	// **ZERO AT THE LOWEST WATER DEPTH** (Tom, 2026-10-10): the water a draw-down can actually use.
+	// EPANET's own tank volume also counts the water below the minimum level, so this is NOT that
+	// number. A volume curve wins when the tank states a usable one (EPANET's rule: curve volumes
+	// replace the cylinder), read in the Elevation/Head unit and that unit cubed, as the engine
+	// attachment does; otherwise a cylinder of the tank diameter. SI cubic metres.
+	function tankUsableVolumeSI(n) {
+		var dep = tankDepthSI(n), hf = toSI(1, 'lpn_u_elevhead'), vf, minSI, curve, pts, D, top;
+		if (dep === undefined) { return undefined; }
+		minSI = toSI(n.minLevel || 0, 'lpn_u_elevhead');
+		top = Math.max(dep, minSI);
+		curve = n.volCurve ? curveById(n.volCurve) : null;
+		pts = curve ? curvePointsOf(curve) : [];
+		if (pts.length && EngCalcs.lpnTankVolumeCurveUsable && EngCalcs.lpnTankVolumeCurveUsable(pts)) {
+			vf = hf * hf * hf;
+			pts = pts.map(function (pt) { return [pt[0] * hf, pt[1] * vf]; });
+			return tankCurveVolume(pts, top) - tankCurveVolume(pts, minSI);
+		}
+		D = toSI(n.tankDiameter, 'lpn_u_length');
+		if (!(D > 0) || !isFinite(D)) { return undefined; }
+		return Math.PI / 4 * D * D * (top - minSI);
+	}
+	// Linear between the curve's points, held flat beyond its ends. pts are SI and increasing in x.
+	function tankCurveVolume(pts, x) {
+		var i, a, b;
+		if (x <= pts[0][0]) { return pts[0][1]; }
+		for (i = 1; i < pts.length; i++) {
+			if (x <= pts[i][0]) {
+				a = pts[i - 1]; b = pts[i];
+				return a[1] + (b[1] - a[1]) * (x - a[0]) / (b[0] - a[0]);
+			}
+		}
+		return pts[pts.length - 1][1];
+	}
+	// A volume is shown in the LENGTH unit cubed (cubic feet or cubic metres, which is what EPANET
+	// pairs with its length): the factor and the mark come from the one LENGTH selector.
+	function tankVolumeFactor() { var f = unitFactor('lpn_u_length'); return f * f * f; }
+	function tankVolumeUnitText() {
+		var pc = EngCalcs.pageConfig || {}, k = unitKey('lpn_u_length');
+		if (k === 'ft') { return pc.u_ft3 || 'ft^3'; }
+		if (k === 'm') { return pc.u_m3 || 'm^3'; }
+		return unitLabel('lpn_u_length') + '^3';
 	}
 	function colorLinkValue(l, field) {
 		if (field === 'diameter') { return l.type === 'pump' ? undefined : effective(l, 'diameter'); }
@@ -8492,7 +8562,7 @@ var EngCalcs = EngCalcs || {};
 		// ("what is being drawn here"), and the base is the input behind it.
 		// The two chemical fields trail the hydraulic ones on both groups: neither exists until
 		// somebody switches the analysis on and runs, which is the standing of `quality` already.
-		node: ['pressure', 'head', 'elev', 'demandActual', 'demand', 'quality', 'initQuality'],
+		node: ['pressure', 'head', 'elev', 'demandActual', 'demand', 'quality', 'initQuality', 'depth', 'volume'],
 		link: ['velocity', 'flow', 'headloss', 'gradient', 'friction', 'diameter', 'roughness',
 			'status', 'quality', 'rate']
 	};
@@ -8618,6 +8688,7 @@ var EngCalcs = EngCalcs || {};
 		// age or a source trace the document states no chemical and this is '', which is honest:
 		// nobody has said what the number is in.
 		if (group === 'node' && field === 'initQuality') { return concentrationUnitText(); }
+		if (group === 'node' && field === 'volume') { return tankVolumeUnitText(); }
 		id = colorFieldUnit(group, field);
 		if (id) { return unitLabel(id); }
 		// A friction factor is dimensionless and a status is not a quantity at all; both print
@@ -8866,12 +8937,15 @@ var EngCalcs = EngCalcs || {};
 	function colorFieldLabel(group, field) {
 		var pc = EngCalcs.pageConfig || {}, defs = group === 'node' ? nodeFieldDefs(pc) : linkFieldDefs(pc), i;
 		for (i = 0; i < defs.length; i++) { if (defs[i][0] === field) { return defs[i][1]; } }
+		// Tank-only results with no Labels row (Task 783): offered to the ramp, Find and the graph.
+		if (group === 'node' && field === 'depth') { return pc.lpn_result_depth || 'Depth'; }
+		if (group === 'node' && field === 'volume') { return pc.lpn_result_tank_volume || 'Usable volume'; }
 		return field;
 	}
 	// **A STATISTIC VIEW SAYS SO IN THE HEADING** (Task 735): with the transport on Averaged, the map's
 	// "Pressure" is not an instant, and the label "P=124.88" cannot say so. Result fields only; an
 	// input (elevation, diameter) is the same in every view.
-	var STATISTIC_RESULT_FIELDS = { demandActual: 1, level: 1, head: 1, pressure: 1, quality: 1,
+	var STATISTIC_RESULT_FIELDS = { demandActual: 1, level: 1, depth: 1, volume: 1, head: 1, pressure: 1, quality: 1,
 		flow: 1, velocity: 1, headloss: 1, rate: 1 };
 	function colorHeadingText(group, field, unit, labelOverride) {
 		var stat = EngCalcs.lpnTimeStatisticLabel && !labelOverride && STATISTIC_RESULT_FIELDS[field] ?
@@ -18928,6 +19002,8 @@ var EngCalcs = EngCalcs || {};
 			['demandActual', 'bpn_demand', 'Demand'],
 			['head', 'lpn_result_head', 'Head'],
 			['pressure', 'lpn_result_pressure', 'Pressure'],
+			['depth', 'lpn_result_depth', 'Depth'],
+			['volume', 'lpn_result_tank_volume', 'Usable volume'],
 			['quality', null, 'Water age']
 		];
 		var BAND_LINK = [
@@ -18992,7 +19068,7 @@ var EngCalcs = EngCalcs || {};
 					if (d.group !== 'link' || (d.type && d.type !== 'pipe') || !reactionFieldsShown()) { return; }
 				} else if (key === 'emitter') {
 					if (d.group !== 'node' || (d.type && d.type !== 'junction')) { return; }
-				} else if (key === 'level' || key === 'minLevel' || key === 'maxLevel'
+				} else if (key === 'level' || key === 'minLevel' || key === 'maxLevel' || key === 'depth' || key === 'volume'
 						|| key === 'tankDiameter' || key === 'mixingModel' || key === 'mixingFraction') {
 					if (d.group !== 'node' || (d.type && d.type !== 'tank')) { return; }
 				} else if (key === 'speed' || key === 'energyPrice' || key === 'energyPattern') {
@@ -24280,6 +24356,14 @@ var EngCalcs = EngCalcs || {};
 					// it must be visible, but a second editable field would be two numbers that have
 					// to agree.
 					paneColNodeResult('head', 'lpn_result_head', paneUnitHead),
+					// **DEPTH AND USABLE VOLUME, AS RESULTS** (Task 783): head minus the tank bottom, and
+					// the water above the lowest water depth. Heading tips live in the popup rows.
+					paneColNodeResult('depth', 'lpn_result_depth', paneUnitHead),
+					(function () {
+						var c = paneColNodeResult('volume', 'lpn_result_tank_volume', null);
+						c.unitText = tankVolumeUnitText;
+						return c;
+					}()),
 					paneColNodeInitQuality(),
 					paneColSourceType(), paneColSourceQuality(), paneColSourcePattern(),
 					paneColNodeQuality()
@@ -59224,6 +59308,11 @@ var EngCalcs = EngCalcs || {};
 			mixingFields(fields, n);
 			readonlyUnitField(fields, pc.lpn_result_head || 'Head', resultUnit('elevhead'),
 				toSI(nodeFixedHead(n), 'lpn_u_elevhead'), pc.lpn_tank_head_tip);
+			// Depth and usable volume, read the way the Tables pane reads them (Task 783).
+			readonlyField(fields, (pc.lpn_result_depth || 'Depth') + ' (' + unitLabel(resultUnit('elevhead')) + ')',
+				colorNodeValue(n, 'depth'), pc.lpn_result_depth_tip);
+			readonlyField(fields, (pc.lpn_result_tank_volume || 'Usable volume') + ' (' + tankVolumeUnitText() + ')',
+				colorNodeValue(n, 'volume'), pc.lpn_result_tank_volume_tip);
 		} else if (n.type === 'reservoir') {
 			unitNumberField(fields, pc.lpn_field_elev || 'Elevation', 'lpn_u_elevhead',
 				function () { return n.elev; },
