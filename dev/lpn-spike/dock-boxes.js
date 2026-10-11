@@ -20,7 +20,7 @@ const OPENERS = {
 	lpn_ff_box: ['project', 'lpn_analyze_menu', 'lpn_ff_menu'],
 	lpn_crit_box: ['project', 'lpn_analyze_menu', 'lpn_crit_menu'],
 	lpn_ds_box: ['project', 'lpn_analyze_menu', 'lpn_ds_menu'],
-	lpn_notes_popup: ['help', null, 'lpn_help_notes']
+	lpn_hotkeys_popup: ['help', null, 'lpn_help_manual']
 };
 
 const strips = (page) => page.evaluate(() => ['left', 'right'].map((s) =>

@@ -711,7 +711,7 @@ function fire(el, type) { (el._listeners[type] || []).forEach(function (f) { f({
 		lineFor('junction', 'connection', 'conn-nolinksource', '') === 'Junction.Connectivity no link path to a source',
 		JSON.stringify(L.queryText()));
 	ok('the umbrella condition names the missing OPEN PATH',
-		lineFor('junction', 'connection', 'conn-noopensource', '') === 'Junction.Connectivity no open path to a source',
+		lineFor('junction', 'connection', 'conn-noopensource', '') === PC.lpn_tool_add_junction + '.' + PC.lpn_find_prop_connection + ' ' + PC.lpn_find_op_conn_noopensource,
 		JSON.stringify(L.queryText()));
 	// An empty box with "contains" matches everything, and the quotes are what make that readable
 	// rather than a sentence that stops in the middle.

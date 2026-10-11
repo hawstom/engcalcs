@@ -644,6 +644,13 @@
    "words": "feat/message-dismiss: merge",
    "context": "In his pasted session message of 2026-10-09 (his own message, per his global CLAUDE.md), after answering H09-H11 on the calls page: H09 \"this should not be lost on reload\", H10 \"Give them the ×\", H11 \"Until the condition changes\".",
    "pin_note": "Pinned to the head that carries his H09-H11 calls, applied after his word, plus one truthful edit to lpn_msglog_note that H09 made necessary."
+  },
+  "feat/user-guide": {
+   "head": "386d3e32f6af917d1782d0255856452e581bfd63",
+   "date": "2026-10-11",
+   "words": "Merge feat/user-guide",
+   "context": "Typed in the session on 2026-10-11, after his pasted browser pass the same day: \"feat/user-guide: (1) chevron is a good tree paradigm (2) Merge.\"",
+   "pin_note": "Pinned to the head he tested on the preview; merged directly into master with no further commits on the branch."
   }
  }
 }

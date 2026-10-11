@@ -86,12 +86,12 @@ async function main() {
 		}
 
 		console.log('\n--- one more dock goes to the bottom ---');
-		await dockHidden(a, 'lpn_notes_popup', 'right');
+		await dockHidden(a, 'lpn_hotkeys_popup', 'right');
 		got = await strips(a.page);
-		ok('Notes, docked last, is the last tab on the right', got[1].length === 9 && got[1][8] === 'lpn_notes_popup', JSON.stringify(got[1]));
+		ok('Guide, docked last, is the last tab on the right', got[1].length === 9 && got[1][8] === 'lpn_hotkeys_popup', JSON.stringify(got[1]));
 		await reload(a);
 		got = await strips(a.page);
-		ok('...and still last after a reload, the rest unmoved', JSON.stringify(got) === JSON.stringify([LEFT, RIGHT.concat('lpn_notes_popup')]), JSON.stringify(got));
+		ok('...and still last after a reload, the rest unmoved', JSON.stringify(got) === JSON.stringify([LEFT, RIGHT.concat('lpn_hotkeys_popup')]), JSON.stringify(got));
 
 		console.log('\n--- a docked Properties box with nothing selected ---');
 		const none = await a.lang('lpn_popup_none');
@@ -120,11 +120,11 @@ async function main() {
 		await reload(a);
 		got = await strips(a.page);
 		ok('...and a reload leaves it closed, every other dock in place',
-			JSON.stringify(got) === JSON.stringify([LEFT, RIGHT.filter((x) => x !== 'lpn_popup').concat('lpn_notes_popup')]), JSON.stringify(got));
+			JSON.stringify(got) === JSON.stringify([LEFT, RIGHT.filter((x) => x !== 'lpn_popup').concat('lpn_hotkeys_popup')]), JSON.stringify(got));
 		await openBox(a, 'lpn_popup');
 		got = await strips(a.page);
 		ok('reopened by a selection, it is docked again in its old place',
-			JSON.stringify(got[1]) === JSON.stringify(RIGHT.concat('lpn_notes_popup')), JSON.stringify(got[1]));
+			JSON.stringify(got[1]) === JSON.stringify(RIGHT.concat('lpn_hotkeys_popup')), JSON.stringify(got[1]));
 
 		console.log('\n--- a phone does not forget the desktop docks ---');
 		await a.page.setViewportSize({ width: 390, height: 844 });
@@ -134,7 +134,7 @@ async function main() {
 		await a.page.setViewportSize({ width: 1600, height: 1000 });
 		await reload(a);
 		got = await strips(a.page);
-		ok('back on the desktop every dock is there, in order', JSON.stringify(got) === JSON.stringify([LEFT, RIGHT.concat('lpn_notes_popup')]), JSON.stringify(got));
+		ok('back on the desktop every dock is there, in order', JSON.stringify(got) === JSON.stringify([LEFT, RIGHT.concat('lpn_hotkeys_popup')]), JSON.stringify(got));
 
 		console.log('\n--- floating one takes it off its edge for good ---');
 		await a.page.click('#lpn_dock_strip_right .lpn-dock-tab[aria-controls="lpn_crit_box"]');
@@ -144,7 +144,7 @@ async function main() {
 		await reload(a);
 		got = await strips(a.page);
 		ok('Criticality floated: not a tab after a reload, the rest in order',
-			JSON.stringify(got) === JSON.stringify([LEFT, RIGHT.filter((x) => x !== 'lpn_crit_box').concat('lpn_notes_popup')]), JSON.stringify(got));
+			JSON.stringify(got) === JSON.stringify([LEFT, RIGHT.filter((x) => x !== 'lpn_crit_box').concat('lpn_hotkeys_popup')]), JSON.stringify(got));
 		ok('no uncaught page errors', a.errors.length === 0, a.errors.slice(0, 2).join(' | '));
 	} finally {
 		await a.close();

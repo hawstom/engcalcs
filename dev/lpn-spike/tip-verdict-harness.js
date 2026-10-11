@@ -110,18 +110,18 @@ console.log('\n--- 4. a blank that follows a default says Default ---');
 	ok('lpnBlankIsDefault() returns that key',
 		/function lpnBlankIsDefault\(\) \{\s*return \(EngCalcs\.pageConfig \|\| \{\}\)\.lpn_choice_default \|\| 'Default';/.test(js));
 	const sites = [
-		['junction demand row', /libFillPatternOptions\(sel, acc\.getPattern\(\), lpnBlankIsDefault\(\)\)/],
-		['customer demand pattern', /libFillPatternOptions\(patSel, c\.pattern \|\| '', lpnBlankIsDefault\(\)\)/],
+		['junction demand row', /libFillPatternOptions\(sel, acc\.getPattern\(\), lpnBlankIsDemandDefault\(\)\)/],
+		['customer demand pattern', /libFillPatternOptions\(patSel, c\.pattern \|\| '', lpnBlankIsDemandDefault\(\)\)/],
 		['pump price pattern', /pc\.lpn_energy_price_pattern_tip, lpnBlankIsDefault\(\)\)/],
 		['pump efficiency-curve chooser', /pc\.lpn_pump_effic_curve_tip, lpnBlankIsDefault\(\)\)/],
 		['pump price pattern column', /setProp\(l, 'energyPattern', v \|\| null\); \}, true, true\)/],
 		['pump efficiency-curve column', /paneColCurveRef\('efficCurveId', 'effic', 'lpn_pump_effic_curve', true\)/]
 	];
-	sites.forEach((s) => { ok(s[0] + ' passes Default for its blank', s[1].test(js)); });
+	sites.forEach((s) => { ok(s[0] + ' passes its default label for its blank', s[1].test(js)); });
 	// And the blanks that really are "none" stay so: the project's own Default demand pattern, a
 	// reservoir's head pattern, a pump's speed pattern, a source pattern, the network price pattern.
-	ok('the Settings default-pattern row still offers No pattern',
-		/libFillPatternOptions\(sel, scnDefaultPattern\(\), implied/.test(js));
+	ok('the Settings default-pattern row offers None (constant), and only without a pattern 1',
+		/libFillPatternOptions\(sel, effDefaultPattern\(\) \|\| '',\s*String\(pc\.lpn_settings_default_pattern_none/.test(js));
 	ok('...as does the network price pattern', /libFillPatternOptions\(pat, e\.globalPattern \|\| ''\);/.test(js));
 	// Nothing may still hand the two deleted pattern tips to a label.
 	ok('neither deleted pattern tip is read', !/pc\.lpn_field_(demand|meter)_pattern_tip/.test(js));
@@ -129,8 +129,8 @@ console.log('\n--- 4. a blank that follows a default says Default ---');
 
 console.log('\n--- 5. Toms follow-up wording, 2026-10-04 ---');
 {
-	ok('customer tip states the point, then its connection (a sentence, read from the key)',
-		/^Specify the customer point/.test(String(val('lpn_tool_add_meter_tip'))) && /\.$/.test(String(val('lpn_tool_add_meter_tip')).split('\n')[0].trim()));
+	ok('customer tip opens "Specify the customer point, then its connection: a link or node."',
+		val('lpn_tool_add_meter_tip').indexOf('Specify the customer point, then its connection: a link or node.') === 0);
 	ok('zoom window tip opens "Specify corners or drag a rectangle."',
 		val('lpn_tool_zoom_window_tip').indexOf('Specify corners or drag a rectangle.') === 0);
 	ok('quality tolerance tip says concentration difference below which parcels are one',
