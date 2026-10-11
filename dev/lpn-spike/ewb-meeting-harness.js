@@ -208,12 +208,12 @@ async function main() {
 	console.log('\n--- 4. the offer is made by the node tool on a pipe, and No places the node alone ---');
 	{
 		const src = fs.readFileSync(ROOT + 'js/looped-network.js', 'utf8');
-		ok('the click handler asks lpn_break_pipe_ask for add-junction, add-reservoir and add-tank',
+		ok('the click handler asks lpn_split_pipe_ask for add-junction, add-reservoir and add-tank',
 			/mode === 'add-junction' \|\| mode === 'add-reservoir' \|\| mode === 'add-tank'\)\s*\? linkById\(exitLinkId\)/.test(src) &&
-			src.indexOf('lpn_break_pipe_ask') > 0);
+			src.indexOf('lpn_split_pipe_ask') > 0);
 		ok('only pipes, only in Base', /breakLink\.type === 'pipe'/.test(src) && /inBaseScenario\(\) &&\s*\(mode === 'add-junction'/.test(src));
 		const en = fs.readFileSync(ROOT + 'lib/lang.ec.en.php', 'utf8');
-		ok('the question names the pipe', /lpn_break_pipe_ask'\]='Break pipe \{id\} at this node\?'/.test(en));
+		ok('the question names the pipe', /lpn_split_pipe_ask'\]='Split pipe \{id\} at this node\?'/.test(en));
 	}
 
 	console.log('\n--- 5. a normal network is unchanged: Net1 ---');

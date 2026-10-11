@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**139 still to read on master**, of 147 untranslated keys, of 2585 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**140 still to read on master**, of 149 untranslated keys, of 2587 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -175,7 +175,7 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   @@ NEEDS RULING
 
-## lpn_  (147, 139 to read @@ NEEDS RULING)
+## lpn_  (149, 140 to read @@ NEEDS RULING)
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -185,15 +185,6 @@ never edits a synonym.
   @@ NEEDS RULING
 - **`lpn_alt_cat_topology_tip`**
   > Asset activation
-  @@ NEEDS RULING
-- **`lpn_break_no`**
-  > No
-  @@ NEEDS RULING
-- **`lpn_break_pipe_ask`**
-  > Break pipe {id} at this node?
-  @@ NEEDS RULING
-- **`lpn_break_yes`**
-  > Yes
   @@ NEEDS RULING
 - **`lpn_change_type_base_only`**
   > Change type works in Base. A scenario can switch assets on and off in Active topology instead.
@@ -294,6 +285,9 @@ never edits a synonym.
 - **`lpn_inp_export_flat_inactive_controls`**
   > These controls and rules refer to an asset that is inactive in this scenario, so they are not in the file: {ids}
   @@ NEEDS RULING
+- **`lpn_junction_pattern_unknown`**
+  > No pattern in this project is named {id}, so the junction was left as it was.
+  @@ NEEDS RULING
 - **`lpn_link_end_same`**
   > From and To must be different nodes.
   @@ NEEDS RULING
@@ -335,6 +329,9 @@ never edits a synonym.
   @@ NEEDS RULING
 - **`lpn_scncmp_none_checked`**
   > No scenario is checked for comparison. Check scenarios in the Scenario manager.
+  @@ NEEDS RULING
+- **`lpn_settings_default_pattern_implied`**
+  > None stated (pattern {id} is used)
   @@ NEEDS RULING
 - **`lpn_settings_held_base`**
   > {base}: {value}
@@ -588,6 +585,15 @@ never edits a synonym.
 - **`lpn_sm_used_by_tip`**
   > Used by: {list}
   @@ NEEDS RULING
+- **`lpn_split_no`**
+  > No
+  @@ NEEDS RULING
+- **`lpn_split_pipe_ask`**
+  > Split pipe {id} at this node?
+  _Ruled 2026-10-10: I agree with Bentley that "split" is better than "break"._
+- **`lpn_split_yes`**
+  > Yes
+  @@ NEEDS RULING
 - **`lpn_status_dismiss`**
   > Hide this message
   @@ NEEDS RULING
@@ -623,7 +629,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**50 still to read**, of 53 new keys across 14 unmerged branch(es).
+**46 still to read**, of 49 new keys across 11 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -634,9 +640,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/roadmap-1010 (`1ea15e85`) — adds no English strings
-
-### feat/bentley-interop (`9d1c18b5`) — adds no English strings
+### feat/bentley-interop (`e66572a5`) — adds no English strings
 
 ### feat/desktop (`baba0f04`) — adds no English strings
 
@@ -668,7 +672,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Points data<br />(use Copy to see format)
   @@ NEEDS RULING
 
-### feat/user-guide (`ac679db9`) — 45 new, 45 to read @@ NEEDS RULING
+### feat/user-guide (`386d3e32`) — 45 new, 45 to read @@ NEEDS RULING
 
 - **`lpn_guide_about_heading`**
   > About this calculator
@@ -807,21 +811,3 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 
 ### feat/visit-dedupe (`7b4a84bd`) — adds no English strings
-
-### fix/demand-pattern (`d75c9ec2`) — 1 new, 1 to read @@ NEEDS RULING
-
-- **`lpn_settings_default_pattern_implied`**
-  > None stated (pattern {id} is used)
-  @@ NEEDS RULING
-
-### fix/split-and-hide (`744f8cdb`) — 3 new, 3 to read @@ NEEDS RULING
-
-- **`lpn_split_no`**
-  > No
-  @@ NEEDS RULING
-- **`lpn_split_pipe_ask`**
-  > Split pipe {id} at this node?
-  @@ NEEDS RULING
-- **`lpn_split_yes`**
-  > Yes
-  @@ NEEDS RULING

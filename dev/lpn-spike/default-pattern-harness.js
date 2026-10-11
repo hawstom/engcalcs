@@ -165,8 +165,10 @@ console.log('\n--- and it is a control, not a readout ---');
 	// **THE POINT OF THE WHOLE ROW.** Pattern 1's first multiplier is 1.0 in Net3, so if this
 	// asserted only the number it would pass with the wiring cut. Assert the RESOLUTION instead:
 	// with a default the junction follows a pattern, without one it does not.
-	ok('...and the junction that relied on it now follows no pattern',
-		L.resolvedDemand(j, 0) === j._demand,
+	// EPANET 2.2: with no pattern stated, a pattern whose ID is "1" still applies (fix/demand-pattern,
+	// dev/lpn-spike/demand-pattern-default-harness.js proves the other half, with no "1" at all).
+	ok('...and the junction still follows pattern 1, which EPANET uses when none is stated',
+		L.resolvedDemand(j, 0) === before,
 		'base ' + j._demand + ', draws ' + after);
 	patRow.control.value = '1';
 	patRow.control._listeners.change[0]();

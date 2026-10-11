@@ -2564,6 +2564,8 @@ EngCalcs.pageConfig = {
 	lpn_choice_default: <?=json_encode($ec_lang['lpn_choice_default'])?>,
 	lpn_settings_default_pattern: <?=json_encode($ec_lang['lpn_settings_default_pattern'])?>,
 	lpn_settings_default_pattern_tip: <?=json_encode($ec_lang['lpn_settings_default_pattern_tip'])?>,
+	lpn_settings_default_pattern_implied: <?=json_encode($ec_lang['lpn_settings_default_pattern_implied'])?>,
+	lpn_junction_pattern_unknown: <?=json_encode($ec_lang['lpn_junction_pattern_unknown'])?>,
 	lpn_library_control_add: <?=json_encode($ec_lang['lpn_library_control_add'])?>,
 	lpn_library_control_tip: <?=json_encode($ec_lang['lpn_library_control_tip'])?>,
 	lpn_library_control_ok: <?=json_encode($ec_lang['lpn_library_control_ok'])?>,
@@ -2660,9 +2662,9 @@ EngCalcs.pageConfig = {
 	lpn_field_from: <?=json_encode($ec_lang['lpn_field_from'])?>,
 	lpn_link_end_unknown: <?=json_encode($ec_lang['lpn_link_end_unknown'])?>,
 	lpn_link_end_same: <?=json_encode($ec_lang['lpn_link_end_same'])?>,
-	lpn_break_pipe_ask: <?=json_encode($ec_lang['lpn_break_pipe_ask'])?>,
-	lpn_break_yes: <?=json_encode($ec_lang['lpn_break_yes'])?>,
-	lpn_break_no: <?=json_encode($ec_lang['lpn_break_no'])?>,
+	lpn_split_pipe_ask: <?=json_encode($ec_lang['lpn_split_pipe_ask'])?>,
+	lpn_split_yes: <?=json_encode($ec_lang['lpn_split_yes'])?>,
+	lpn_split_no: <?=json_encode($ec_lang['lpn_split_no'])?>,
 	lpn_field_to: <?=json_encode($ec_lang['lpn_field_to'])?>,
 	// The minor-loss table, the same one mphl, hw, dw, mhp, bpn and ip all link to. One URL rather
 	// than three: k is one quantity whatever friction method carries the pipe alongside it. The

@@ -12523,7 +12523,7 @@ var EngCalcs = EngCalcs || {};
 	function customerResolvedFlow(c) {
 		var b = customerFlow(c);
 		if (typeof b !== 'number' || !isFinite(b)) { return b; }
-		return b * patternMultiplier(c.pattern || scnDefaultPattern(), modelTimeSeconds()) *
+		return b * patternMultiplier(c.pattern || effDefaultPattern(), modelTimeSeconds()) *
 			docDemandMultiplier();
 	}
 	// **READ OUT OF THE CUSTOMER GROUP, NOT THE NODE GROUP** (Tom, 2026-09-19 -- see
@@ -15759,6 +15759,7 @@ var EngCalcs = EngCalcs || {};
 		};
 		reader.readAsDataURL(file);
 	}
+	EngCalcs.lpnEffDefaultPattern = function () { return effDefaultPattern(); };
 	EngCalcs.lpnBackdropProbe = function () {
 		var inp = EngCalcs.lpnExportInp(serializeProject(), inpExportOptions()).inp, m = /\[BACKDROP\]([^\[]*)/.exec(inp);
 		return {
@@ -25266,6 +25267,30 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			get: function (n) { return emitterToDisplay(effective(n, 'emitter')); },
 			set: function (n, v) { setProp(n, 'emitter', emitterToStore(v)); } };
 	}
+	// **A JUNCTION'S DEMAND PATTERN, AS A COLUMN** (Tom, 2026-10-10: *"The Junctions table doesn't
+	// show Demand pattern"*; and Properties on several junctions takes its rows from these columns,
+	// so this one cell is also *"Multi-select doesn't allow Demand pattern selection"*). Row 0's
+	// pattern, written through the demand list's one door so a scenario overrides it whole. Blank
+	// is Default: the project's Default demand pattern, which is what the run applies.
+	function paneColDemandPattern() {
+		return { key: 'demandPattern', label: 'lpn_field_demand_pattern', em: 5, lenient: true,
+			choices: function () { return paneChoicesPatterns(lpnBlankIsDefault()); },
+			get: function (n) { return ownDemandPattern(n) || ''; },
+			plainFor: function (n) { return hasDemandBreakdown(n); },
+			set: function (n, v) {
+				var id = v || null, pc = EngCalcs.pageConfig || {};
+				// A name nothing answers to is not written (a dangling reference is a run that
+				// fails in EPANET), and the reader is told, as the customer table does.
+				if (id && !libPatternsRead().some(function (p) { return p.id === id; })) {
+					setNotice(String(pc.lpn_junction_pattern_unknown ||
+						'No pattern in this project is named {id}, so the junction was left as it was.')
+						.split('{id}').join(id));
+					return;
+				}
+				if ((ownDemandPattern(n) || null) === id) { return; }
+				editDemandRows(n, function (rows) { rows[0].pattern = id; });
+			} };
+	}
 	// A reservoir's head pattern: EPANET multiplies the stated head by it. A PLAIN write, as in the
 	// popup -- which pattern a source follows is a statement about the system, not a design
 	// variable a scenario asks "what if" about.
@@ -25721,6 +25746,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 						prop: 'demand', get: baseDemandTotal,
 						plainFor: function (n) { return demandRowsOf(n, effective(n, 'demand')).length > 1; },
 						set: function (n, v) { setProp(n, 'demand', v); } },
+					paneColDemandPattern(),
 					paneColNodeResult('demandActual', 'bpn_demand', paneUnitFlow),
 					paneColPdaResult('demandDelivered', 'lpn_result_delivered_demand', 'demands'),
 					paneColPdaResult('demandDeficit', 'lpn_result_demand_deficit', 'demandDeficits'),
@@ -28202,7 +28228,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			return { ok: false };
 		}
 		if (c.choices) {
-			return { ok: c.choices().some(function (o) { return o[0] === t; }), v: t };
+			// `lenient`: a REFERENCE to a library entry another project holds (a pasted junction table
+			// names patterns this project has not got). The row is still made; the cell's setter
+			// leaves the reference out and says so, instead of refusing the whole paste.
+			return { ok: !!c.lenient || c.choices().some(function (o) { return o[0] === t; }), v: t };
 		}
 		if (c.str) { return { ok: true, v: t }; }
 		if (t !== '' && !isFinite(+t)) { return { ok: false }; }
@@ -49782,8 +49811,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				}())) {
 				var breakType = mode.slice('add-'.length), breakPc = EngCalcs.pageConfig || {};
 				askDialog({ kind: 'confirm',
-					text: (breakPc.lpn_break_pipe_ask || 'Break pipe {id} at this node?').replace('{id}', breakLink.id),
-					ok: breakPc.lpn_break_yes || 'Yes', cancel: breakPc.lpn_break_no || 'No' }, function (yes) {
+					text: (breakPc.lpn_split_pipe_ask || 'Split pipe {id} at this node?').replace('{id}', breakLink.id),
+					ok: breakPc.lpn_split_yes || 'Yes', cancel: breakPc.lpn_split_no || 'No' }, function (yes) {
 					saveUndoSnapshot();
 					logLpnFirstAction('element');
 					if (yes) { breakPipeAtPoint(breakLink, breakType, w.x, w.y); }
@@ -58274,10 +58303,31 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// scope marker rather than letting the section's silence imply the wrong one.
 	function settingsDefaultPatternRow(host, rowFn) {
 		var pc = EngCalcs.pageConfig || {}, sel = document.createElement('select');
-		libFillPatternOptions(sel, scnDefaultPattern());
+		// The blank names what it MEANS: with no pattern stated and a pattern "1" present, EPANET
+		// uses pattern 1, and a row reading "No pattern" would say the opposite of what the run does.
+		// **REFILLED WHEN THE LIST IS ABOUT TO BE USED** (Tom, 2026-10-10: *"isn't letting me select
+		// anything. I had to close the project and reopen"*): this select is built once per Settings
+		// rebuild, and a pattern added, renamed or deleted since left it with options that no longer
+		// matched the document.
+		function fill() {
+			var implied = !scnDefaultPattern() && effDefaultPattern();
+			libFillPatternOptions(sel, scnDefaultPattern(), implied
+				? String(pc.lpn_settings_default_pattern_implied || 'None stated (pattern {id} is used)')
+					.split('{id}').join(implied)
+				: undefined);
+		}
+		fill();
+		['focus', 'mousedown', 'touchstart', 'keydown'].forEach(function (ev) {
+			sel.addEventListener(ev, function () {
+				var shown = Array.prototype.map.call(sel.children, function (o) { return o.value; }).join('\u0001'),
+					want = [''].concat(libPatternsRead().map(function (p) { return p.id; })).join('\u0001');
+				if (shown !== want || (sel.value || null) !== scnDefaultPattern()) { fill(); }
+			});
+		});
 		sel.addEventListener('change', function () {
 			doc.defaultPattern = sel.value || null;
 			libCommit();
+			fill();
 			refreshPopupIfOpen();
 		});
 		setboxTag(rowFn(host, pc.lpn_settings_default_pattern || 'Default demand pattern', sel,
@@ -65144,8 +65194,20 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	//
 	// Returns 1 for every way of having no answer, so a hand-drawn network, a pre-Task-423 saved
 	// file and a page whose js/lpn-patterns.js failed to load all behave exactly as they did before.
+	// **THE DEFAULT DEMAND PATTERN AS EPANET 2.2 RESOLVES IT** (Tom, 2026-10-10: *"Net3 Junctions
+	// use pattern 1 by specifying none/default, so something is wrong"*). A demand with no pattern
+	// of its own uses [OPTIONS] Pattern; where the file names none, EPANET uses a pattern whose ID
+	// is "1" if there is one; otherwise the demand is constant. `doc.defaultPattern` stays only
+	// what the file stated (so an export writes no Pattern line the file did not have); every
+	// RESOLUTION goes through here.
+	// In a scenario the stated pattern is the scenario's own, through scnDefaultPattern().
+	function effDefaultPattern() {
+		var stated = scnDefaultPattern();
+		if (stated) { return stated; }
+		return libPatternsRead().some(function (p) { return p.id === '1'; }) ? '1' : null;
+	}
 	function demandMultiplier(n, t) {
-		return patternMultiplier(ownDemandPattern(n) || scnDefaultPattern(), t);
+		return patternMultiplier(ownDemandPattern(n) || effDefaultPattern(), t);
 	}
 	// **A JUNCTION'S DEMANDS ARE A LIST** (Task 468), and this is the page's one door to it.
 	// EngCalcs.lpnDemandRows() owns the Base shape -- row 0 is `_demand`/`demandPattern`/
@@ -65620,7 +65682,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		t = modelTimeSeconds();
 		if (rows.length === 1) { return rows[0].base * demandMultiplier(n, t) * dm; }
 		total = 0;
-		dp = scnDefaultPattern();
+		dp = effDefaultPattern();
 		for (i = 0; i < rows.length; i++) {
 			b = rows[i].base;
 			if (typeof b !== 'number' || !isFinite(b)) { continue; }
@@ -65636,7 +65698,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var rows = demandRowsOf(n, effective(n, 'demand')), i, out, dp;
 		if (rows.length < 2) { return null; }
 		out = [];
-		dp = scnDefaultPattern();
+		dp = effDefaultPattern();
 		for (i = 0; i < rows.length; i++) {
 			out.push({
 				base: toSI(rows[i].base || 0, 'lpn_u_flow'),
@@ -65656,7 +65718,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// and Task 468's categories work will want it: a junction with categories resolves through the
 	// same door. Delete it if that turns out not to be true, but do not re-wire the popup to it.
 	function demandPatternActs(n) {
-		return !isFixedHeadNode(n) && !!(ownDemandPattern(n) || scnDefaultPattern());
+		return !isFixedHeadNode(n) && !!(ownDemandPattern(n) || effDefaultPattern());
 	}
 	// **THE SAME ARITHMETIC FOR EVERY ATTACHMENT POINT** (Task 248.02). A pattern does not know what
 	// it is for -- js/lpn-patterns.js says so in its own header -- so a demand, a reservoir head and
@@ -65770,7 +65832,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 					// above is still what every one-instant solve reads; js/lpn-epanet.js takes one or
 					// the other and never both, or the multiplier would be applied twice.
 					demandBase: toSI(effective(n, 'demand') || 0, 'lpn_u_flow'),
-					demandPattern: ownDemandPattern(n) || scnDefaultPattern() || null,
+					demandPattern: ownDemandPattern(n) || effDefaultPattern() || null,
 					// **AND THE WHOLE BREAKDOWN RIDES ALONG WITH THEM, for the same reason and only
 					// when there is one** (Task 468). An extended-period run has EPANET doing the
 					// multiplying, and two categories on two patterns are two daily shapes that
@@ -66496,8 +66558,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// reload."). A reading preference the visitor asked for, the class of `lpn_hovercard`, so it is
 	// `localStorage` only and never in serializeProject(). What is stored is as little as can do the
 	// job: the open project's id and, per hidden message, a short hash of its words with its kind
-	// (`diag` or `cond:<name>`). Never the words. A hidden RUN message is not stored at all: the next
-	// run, which a reload is, forgets it anyway.
+	// (`diag`, `run` or `cond:<name>`). Never the words. **A hidden RUN message is stored too** (Tom,
+	// 2026-10-10: hid "Left out of this run..." on Net1, reloaded, "Doesn't stay hidden"; it was not
+	// stored on the reasoning that a reload is a new run). A reload is not news: the first run after a
+	// reload leaves a restored run entry alone (statusRestoredRun), and the NEXT run forgets it as
+	// ever, so the same sentence after an edit is seen again.
 	//
 	// **THREE MESSAGES STAY HIDDEN UNTIL THEIR CONDITION CHANGES** (Tom, 2026-10-09, H11): storage full,
 	// storage unreadable and unit unknown. They are neither a diagnostic nor a run summary, since an
@@ -66518,7 +66583,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			var o = JSON.parse(localStorage.getItem(LPN_MSGHIDDEN_KEY) || 'null');
 			if (o && typeof o.o === 'string' && o.h && typeof o.h === 'object') {
 				Object.keys(o.h).forEach(function (k) {
-					if (/^(diag|cond:[a-z-]+)$/.test(String(o.h[k]))) { out[k] = o.h[k]; statusHiddenOwner = o.o; }
+					if (/^(diag|run|cond:[a-z-]+)$/.test(String(o.h[k]))) { out[k] = o.h[k]; statusHiddenOwner = o.o; }
 				});
 			}
 		} catch (e) { out = {}; }
@@ -66528,11 +66593,15 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// A restored hidden set is not judged by the empty statements a page load makes on its way to its
 	// first real message; the grace ends at the first non-empty one.
 	var statusHiddenGrace = Object.keys(statusHidden).length > 0;
+	// Restored `run` entries survive the first solve after the reload (and any progress messages it
+	// says on the way); the second solve forgets them like any run message.
+	var statusRestoredRun = Object.keys(statusHidden).some(function (k) { return statusHidden[k] === 'run'; });
+	var statusSolvesSinceLoad = 0;
 	var statusLast = { text: '', code: '', diag: false, cond: '' };
 	function saveStatusHidden() {
 		var keep = {}, n = 0;
 		Object.keys(statusHidden).forEach(function (k) {
-			if (statusHidden[k] !== 'run' && n < 40) { keep[k] = statusHidden[k]; n++; }
+			if (n < 40) { keep[k] = statusHidden[k]; n++; }
 		});
 		try {
 			if (n) { localStorage.setItem(LPN_MSGHIDDEN_KEY, JSON.stringify({ o: statusHiddenOwner, h: keep })); }
@@ -66562,7 +66631,14 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	// A new run forgets the hidden RUN messages (door 2 above); hidden diagnostics stay hidden.
 	function forgetHiddenRunMessages() {
-		Object.keys(statusHidden).forEach(function (k) { if (statusHidden[k] === 'run') { delete statusHidden[k]; } });
+		statusSolvesSinceLoad++;
+		if (statusRestoredRun) {
+			if (statusSolvesSinceLoad < 2) { return; }
+			statusRestoredRun = false;
+		}
+		var any = false;
+		Object.keys(statusHidden).forEach(function (k) { if (statusHidden[k] === 'run') { delete statusHidden[k]; any = true; } });
+		if (any) { saveStatusHidden(); }
 	}
 	// The text the user has hidden and that is still the standing message, or '' -- what the history
 	// panel pins at its top.
@@ -66603,7 +66679,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (!statusHiddenGrace || statusLast.text) {
 			var cur = statusLast.text ? statusKey(statusLast.text) : '', pruned = false;
 			Object.keys(statusHidden).forEach(function (k) {
-				if (k !== cur && statusHidden[k].indexOf('cond:') !== 0) { delete statusHidden[k]; pruned = true; }
+				if (k !== cur && statusHidden[k].indexOf('cond:') !== 0 && !(statusRestoredRun && statusHidden[k] === 'run')) { delete statusHidden[k]; pruned = true; }
 			});
 			if (pruned) { saveStatusHidden(); }
 			statusHiddenGrace = false;
