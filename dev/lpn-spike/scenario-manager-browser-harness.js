@@ -113,6 +113,13 @@ async function main() {
 		const SMMENU = await L('lpn_sm_menu');
 		const menuRows = await page.evaluate(() => Array.from(document.querySelectorAll('#lpn_menu_list button.lpn-menu-row')).map((r) => r.textContent.trim()));
 		ok('1.1 the Scenario manager row is in the menu with Basic mode ticked', menuRows.some((t) => t.indexOf(SMMENU) >= 0), JSON.stringify(menuRows));
+		// Tom, 2026-10-11: "Scenario manager..., -, Basic mode, New, Rename, Delete, -, Apply Base, list of scenarios."
+		const menuSeq = await page.evaluate(() => Array.from(document.querySelectorAll('#lpn_menu_list > *')).filter((e) => e.offsetParent !== null || e.tagName === 'HR')
+			.map((e) => e.tagName === 'HR' ? '-' : e.textContent.trim()));
+		const wantSeq = [SMMENU, '-', '✓ ' + await L('lpn_scenario_basic'), await L('lpn_scenario_new'), await L('lpn_scenario_rename'), await L('lpn_scenario_delete'), '-',
+			await L('lpn_scenario_push_btn'), '✓ ' + await L('lpn_scenario_base')];
+		ok('1.1a the menu is in Tom\'s order: Scenario manager, Basic mode and the three commands, Apply Base, then the scenarios',
+			JSON.stringify(menuSeq.map((t) => t.replace(/\s+/g, ' '))) === JSON.stringify(wantSeq.map((t) => t.replace(/\s+/g, ' '))), JSON.stringify(menuSeq));
 		await page.keyboard.press('Escape');
 		await page.evaluate(() => { document.body.click(); });
 		ok('1.2 the Scenarios tab is not shown in Basic mode', await page.evaluate(() => { const b = document.getElementById('lpn_pane_tab_scenarios'); return !b || getComputedStyle(b).display === 'none'; }));
@@ -133,6 +140,9 @@ async function main() {
 		await clickRow(await L('lpn_scenario_base'));
 		const toolbar = () => page.evaluate(() => Array.from(document.querySelectorAll('#lpn_sm_body .lpn-sm-tools button')).map((b) => b.textContent));
 		ok('1.9 the toolbar is Make current, Add child, Add base, Rename, Copy scenario, then minus (the menu\'s order)', JSON.stringify(await toolbar()) === JSON.stringify([await L('lpn_sm_make_current'), await L('lpn_sm_add_child'), await L('lpn_sm_add_base'), await L('lpn_sm_rename'), await L('lpn_sm_copy'), '\u2212']) && (await L('lpn_sm_add_base')) === 'Add base' && (await L('lpn_sm_add_child')) === 'Add child', JSON.stringify(await toolbar()));
+		const tipOf = (id) => page.evaluate((i) => { const b = document.getElementById(i); return b ? [b.getAttribute('aria-disabled'), b.title] : null; }, id);
+		ok('1.10a on Base, the current scenario, Make current is greyed and its tip says why', JSON.stringify(await tipOf('lpn_sm_current')) === JSON.stringify(['true', await L('lpn_sm_current_already')]), JSON.stringify(await tipOf('lpn_sm_current')));
+		ok('1.10b ...and Rename is greyed and its tip says why', JSON.stringify(await tipOf('lpn_sm_rename')) === JSON.stringify(['true', await L('lpn_sm_base_named')]), JSON.stringify(await tipOf('lpn_sm_rename')));
 		ok('1.10 on Base the minus is greyed and its tip says why', (await page.evaluate(() => document.getElementById('lpn_sm_del').title)) === await L('lpn_sm_base_kept') && (await page.evaluate(() => document.getElementById('lpn_sm_del').getAttribute('aria-disabled'))) === 'true');
 		const helpTip = await page.evaluate(() => { const t = document.querySelector('#lpn_smbox_title .ec-help'); return t ? (t.title || t.getAttribute('data-bs-original-title')) : null; });
 		// The tip is lpn_sm_help with its paragraph marks as real breaks; the explanation shows the

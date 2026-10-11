@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**199 still to read on master**, of 210 untranslated keys, of 2648 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**200 still to read on master**, of 211 untranslated keys, of 2649 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -175,7 +175,7 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   @@ NEEDS RULING
 
-## lpn_  (209, 198 to read @@ NEEDS RULING)
+## lpn_  (210, 199 to read @@ NEEDS RULING)
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -684,6 +684,9 @@ never edits a synonym.
 - **`lpn_sm_base_kept`**
   > The Base of a tree is not deleted. Another Base added with Add base is deleted when nothing uses it.
   @@ NEEDS RULING
+- **`lpn_sm_base_named`**
+  > The Base of a tree is not renamed.
+  @@ NEEDS RULING
 - **`lpn_sm_basic_off`**
   > Basic mode is off, so the Scenario manager and the Scenarios table are shown.
   @@ NEEDS RULING
@@ -708,6 +711,9 @@ never edits a synonym.
 - **`lpn_sm_copy_share`**
   > Share them
   @@ NEEDS RULING
+- **`lpn_sm_current_already`**
+  > This scenario is already the current scenario.
+  @@ NEEDS RULING
 - **`lpn_sm_cycle`**
   > {name} cannot be moved under one of its own children.
   @@ NEEDS RULING
@@ -715,16 +721,13 @@ never edits a synonym.
   > Delete the selected item. A used item is not deleted.
   @@ NEEDS RULING
 - **`lpn_sm_help`**
-  > Create and organize scenarios and alternatives and their inheritance here. Assign Alternatives to Scenarios in the Scenarios table.\n\nA new scenario creates no alternatives; it uses its parent's. A change made in a scenario is an override kept in that scenario's own values, shown as Own values in the Scenarios table. If the scenario is assigned an alternative for that category, the change goes into that alternative instead and reaches every scenario that uses it.\n\nDrag an item onto another to make it a child of that item. Drag between two items to reorder them. Click the arrow beside an item, or press Left or Right, to collapse or expand it.\n\nClick a selected item or press F2 to rename it, Delete to delete it, Enter to make a scenario current. Right-click an item for the same commands as the buttons.
+  > How scenarios and alternatives work:\n\nAn override made in a scenario is stored in the alternative associated with the scenario. Associations of alternatives to scenarios are managed in the Scenarios table in the bottom pane. Creating a new scenario creates no alternatives; it uses its parent's alternatives until new alternatives are needed as overrides are created. When overrides are created in a scenario, they are stored in their respective alternative for the scenario; if the scenario has no such alternative, a new alternative is created using the name of the scenario. Example: You create a "Figure: Node and link IDs" scenario and edit a Text to say "Node and Link IDs." When you create the scenario, no alternatives are created. But at the moment you save the Text, a Text alternative called "Figure: Node and link IDs" is created with the override for the Text value. In Basic mode, you see this as simply an override in the scenario itself.\n\nHow to manage scenarios:\n\nChoose Scenarios or an alternatives category in the list at the top to show its tree.\n\nCreate a child of the selected item with Add child, or an item with no parent with Add base. A new item is named after its parent; type a name to rename it. Copy scenario copies the selected scenario and asks whether to copy the alternatives it uses or share them.\n\nDrag an item onto another to make it a child of that item. Drag an item between two items to reorder them.\n\nClick a selected item, or press F2, to rename it. Double-click a scenario, or press Enter, to make it current. Click the arrow beside an item, or press Left or Right, to collapse or expand it. Right-click an item for the same commands as the buttons.\n\nPress Delete, or click the minus button, to delete the selected item. An item in use is not deleted, and the message names what uses it.\n\nTo make a scenario use another alternative, choose that alternative in the scenario's row of the Scenarios table. An override made in a shared alternative changes every scenario that uses it.
   @@ NEEDS RULING
 - **`lpn_sm_in_use`**
   > {name} cannot be deleted while it is used by: {list}.
   @@ NEEDS RULING
 - **`lpn_sm_inherited`**
   > inherited
-  @@ NEEDS RULING
-- **`lpn_sm_kept`**
-  > The values this scenario held in {category} were kept as the alternative {name}.
   @@ NEEDS RULING
 - **`lpn_sm_make_current`**
   > Make current
@@ -735,8 +738,8 @@ never edits a synonym.
 - **`lpn_sm_name_taken`**
   > The name {name} is already used in this tree.
   @@ NEEDS RULING
-- **`lpn_sm_own_values`**
-  > Own values
+- **`lpn_sm_none_selected`**
+  > Select an item in the tree first.
   @@ NEEDS RULING
 - **`lpn_sm_rename`**
   > Rename
@@ -815,7 +818,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**32 still to read**, of 35 new keys across 11 unmerged branch(es).
+**46 still to read**, of 49 new keys across 17 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -826,7 +829,11 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/bentley-interop (`44a81de6`) — adds no English strings
+### chore/roadmap-1011c (`4cda3c09`) — adds no English strings
+
+### chore/selection-word (`b32ccf97`) — adds no English strings
+
+### feat/bentley-interop (`fa83b30c`) — adds no English strings
 
 ### feat/desktop (`baba0f04`) — adds no English strings
 
@@ -852,7 +859,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`2e5e81c4`) — adds no English strings
 
-### feat/match-property (`ea6934fb`) — 11 new, 11 to read @@ NEEDS RULING
+### feat/match-property (`7b82ae84`) — 14 new, 14 to read @@ NEEDS RULING
 
 - **`lpn_match_done_many`**
   > Matched {m} assets to {id}, except status and location. Values changed: {n}.
@@ -866,11 +873,20 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_match_menu`**
   > Match properties
   @@ NEEDS RULING
+- **`lpn_match_menu_off_tip`**
+  > Select target objects to match this object's properties except activation status.
+  @@ NEEDS RULING
 - **`lpn_match_none`**
   > {to} and {id} have no properties in common to copy.
   @@ NEEDS RULING
 - **`lpn_match_select_first`**
   > Select the targets first, then choose Match properties.
+  @@ NEEDS RULING
+- **`lpn_match_selected_ask`**
+  > Copy this object's properties except activation status to {n} selected objects?
+  @@ NEEDS RULING
+- **`lpn_match_selected_ask_one`**
+  > Copy this object's properties except activation status to 1 selected object?
   @@ NEEDS RULING
 - **`lpn_match_skip_breakdown`**
   > Not copied: {n} (demand is a list of categories).
@@ -888,7 +904,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Mode: Match properties. Select the asset to copy properties from. Status, identity, and location are not copied. Press Escape to cancel.
   @@ NEEDS RULING
 
-### feat/shape (`5d234758`) — 21 new, 21 to read @@ NEEDS RULING
+### feat/shape (`5d104743`) — 25 new, 25 to read @@ NEEDS RULING
 
 - **`lpn_file_import_shapes`**
   > Import GeoJSON shapes…
@@ -944,6 +960,18 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_mode_add_shape`**
   > Mode: Add Shape. Specify each point. Specify the last point again or press Enter to finish; specify the first point to close a polygon.
   @@ NEEDS RULING
+- **`lpn_pane_paste_shape_no_points`**
+  > Row {row}: a new Shape needs its Points.
+  @@ NEEDS RULING
+- **`lpn_pane_shape_closed`**
+  > Closed
+  @@ NEEDS RULING
+- **`lpn_pane_shape_points`**
+  > Points
+  @@ NEEDS RULING
+- **`lpn_pane_tab_shapes`**
+  > Shapes
+  @@ NEEDS RULING
 - **`lpn_snap_shape_point`**
   > {shape}, point {n}
   @@ NEEDS RULING
@@ -954,4 +982,35 @@ build for that would be a gate nobody keeps. Refresh it with
   > Draw a point, a polyline, or a polygon on the map. A Shape is annotation and is not part of the network. Specify each point, then specify the last point again, press Enter, or right-click to finish. Specify the first point again to close the Shape into a polygon.
   @@ NEEDS RULING
 
-### feat/visit-dedupe (`f61e6013`) — adds no English strings
+### feat/si-example (`19c43524`) — 4 new, 4 to read @@ NEEDS RULING
+
+- **`lpn_ex_net2_si_desc`**
+  > Litres per second, with metres and millimetres. EPANET’s Net2, converted from gallons per minute, feet and inches: a branched distribution system with a tank.
+  @@ NEEDS RULING
+- **`lpn_ex_net2_si_title`**
+  > EPANET Net2, L/s (SI)
+  @@ NEEDS RULING
+- **`lpn_ex_net3_si_desc`**
+  > Litres per second, with metres and millimetres. EPANET’s Net3, converted from gallons per minute, feet and inches: 92 junctions, three tanks, and two reservoirs, one of them a river.
+  @@ NEEDS RULING
+- **`lpn_ex_net3_si_title`**
+  > EPANET Net3, L/s (SI)
+  @@ NEEDS RULING
+
+### feat/tank-ground (`25f4b72e`) — 3 new, 3 to read @@ NEEDS RULING
+
+- **`lpn_field_tank_base_elev`**
+  > Base elevation
+  @@ NEEDS RULING
+- **`lpn_field_tank_base_elev_tip`**
+  > Elevation of the tank bottom, from which water depth and volume are measured. Left blank, the bottom is at the ground elevation.
+  @@ NEEDS RULING
+- **`lpn_tank_ground_elev_tip`**
+  > Ground elevation at the tank. Pressure at the tank is measured from here, as at a junction.
+  @@ NEEDS RULING
+
+### feat/visit-dedupe (`f8cf3ed5`) — adds no English strings
+
+### fix/dxf-layer-code (`d87ca580`) — adds no English strings
+
+### fix/run-report (`f908c408`) — adds no English strings

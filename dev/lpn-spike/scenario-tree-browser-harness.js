@@ -132,12 +132,14 @@ async function main() {
 		// **THE FOOTER MOVED INTO THE "?"** (Tom, 2026-10-11: "Move the footer text to the tip.").
 		ok('1.7 nothing sits under the tree any more (no footer hint)', !(await page.$('#lpn_sm_body .lpn-sm-hint')) && (await page.evaluate(() => { const t = document.getElementById('lpn_sm_tree'); return !t.nextElementSibling; })));
 		const tipParas = (await L('lpn_sm_help')).split('\\n\\n');
-		ok('1.8 the tip has four paragraphs: what the box is, what a new scenario creates, the gestures, the keys', tipParas.length === 4, JSON.stringify(tipParas));
-		ok('1.9 Tom\'s second sentence replaced the old one', !/Choose Alternatives for Scenarios/.test(tipParas[0]) && tipParas[0].split('. ').length === 2, tipParas[0]);
+		// Tom's draft of 2026-10-11, finished: his two headings, his model, his example named after its scenario.
+		ok('1.8 the tip opens with Tom\'s heading and has the second one', tipParas[0] === 'How scenarios and alternatives work:' && tipParas.indexOf('How to manage scenarios:') > 1, JSON.stringify(tipParas));
+		ok('1.9 his example names the alternative after the scenario', tipParas[1].indexOf('a Text alternative called "Figure: Node and link IDs" is created') >= 0 &&
+			tipParas[1].indexOf('if the scenario has no such alternative, a new alternative is created using the name of the scenario') >= 0 && !/alernative/.test(tipParas.join(' ')), tipParas[1]);
 		await page.mouse.click(...(await page.evaluate(() => { const g = document.querySelector('#lpn_smbox_title .ec-tip').getBoundingClientRect(); return [g.left + g.width / 2, g.top + g.height / 2]; })));
 		await a.settle(500);
 		const shown = await page.evaluate(() => Array.from(document.querySelectorAll('.tooltip.ec-explain.show p')).map((p) => p.textContent));
-		ok('1.10 clicking the ? shows those four paragraphs as paragraphs', JSON.stringify(shown) === JSON.stringify(tipParas.map((t) => t.trim())), JSON.stringify(shown));
+		ok('1.10 clicking the ? shows those paragraphs as paragraphs', JSON.stringify(shown) === JSON.stringify(tipParas.map((t) => t.trim())), JSON.stringify(shown));
 		await page.keyboard.press('Escape');
 		await a.settle(300);
 

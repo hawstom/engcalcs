@@ -5622,17 +5622,70 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {};
 		return tree === 'scenarios' ? (pc.lpn_pane_tab_scenarios || 'Scenarios') : altCategoryLabel(tree);
 	}
-	// The records of one tree in stored order, the Base item excluded.
+	// The records of one tree in stored order, the Base item excluded; in a category tree, the
+	// stored records and then each scenario's own alternative (below).
 	function smRecords(tree) {
 		var kind = smKind(tree);
 		if (kind === 'scn') { return scenarios.filter(function (s) { return !s.isBase; }); }
-		if (kind === 'calc') { return (doc.calcSets || []).slice(); }
-		return (doc.alternatives || []).filter(function (a) { return a.category === tree; });
+		if (kind === 'calc') { return (doc.calcSets || []).slice().concat(smImplicitRecords(tree)); }
+		return (doc.alternatives || []).filter(function (a) { return a.category === tree; }).concat(smImplicitRecords(tree));
 	}
 	function smRecord(tree, key) {
-		var kind = smKind(tree);
+		var kind = smKind(tree), owner;
 		if (key === smBaseKey(tree)) { return null; }
-		return kind === 'scn' ? scenarioById(key) : storedById(kind === 'calc' ? doc.calcSets : doc.alternatives, key);
+		if (kind === 'scn') { return scenarioById(key); }
+		owner = smImplicitOwner(tree, key);
+		return owner ? smImplicitRecord(owner, tree) : storedById(kind === 'calc' ? doc.calcSets : doc.alternatives, key);
+	}
+	// **A SCENARIO'S OWN ALTERNATIVE IS AN ITEM OF ITS CATEGORY'S TREE, NAMED AFTER THE SCENARIO**
+	// (Tom, 2026-10-11: *"if the scenario has no such alternative, a new alternative is created
+	// using the name of the scenario"*). It exists from the scenario's first override in that
+	// category, which goes into it; the next one in the same category reuses it; a scenario holding
+	// none uses its parent's. It is still not stored (choice A): the scenario's own values ARE it, so
+	// it is named after the scenario, follows a rename of it, goes with it when it is deleted, and
+	// goes when its last override is cleared. Its key is the derived id, `<scenario id>:<category>`.
+	// An act that makes it a thing of its own (Rename, a drag, Copy, Add child under it, sharing it
+	// with another scenario in the Scenarios table) stores it first (smMaterialize()).
+	function smImplicitKey(s, cat) { return s.id + ':' + cat; }
+	function smImplicitOwner(tree, key) {
+		var i, s, c;
+		if (tree === 'scenarios' || typeof key !== 'string' || (i = key.lastIndexOf(':')) < 0 || key.slice(i + 1) !== tree) { return null; }
+		s = scenarioById(key.slice(0, i));
+		if (!s || s.isBase) { return null; }
+		c = smChoice(s, tree);
+		return (c.own && !c.via) ? s : null;
+	}
+	function smImplicitRecord(owner, cat) {
+		return { id: smImplicitKey(owner, cat), name: scenarioDisplayName(owner), implicit: true, owner: owner };
+	}
+	function smImplicitRecords(tree) {
+		return scenariosForDisplay().filter(function (s) {
+			var c;
+			if (s.isBase) { return false; }
+			c = smChoice(s, tree);
+			return c.own && !c.via;
+		}).map(function (s) { return smImplicitRecord(s, tree); });
+	}
+	// The item a scenario's own alternative hangs from: what the scenario would use if it held
+	// nothing of its own, which is what its parent scenario uses.
+	function smImplicitParentKey(owner, cat) {
+		var p = owner.root === true ? null : parentScenarioOf(owner), c;
+		if (!p || p.isBase) { return 'base'; }
+		c = smChoice(p, cat);
+		if (c.id !== null && c.id !== undefined) { return c.id; }
+		if (c.own) { return smImplicitKey(c.via || p, cat); }
+		return 'base';
+	}
+	// Stores a scenario's own alternative as a record of its own, named after the scenario, and
+	// answers the record's id (any other key comes back as it was). Nothing resolves differently.
+	function smMaterialize(tree, key) {
+		var owner = smImplicitOwner(tree, key), r;
+		if (!owner) { return key; }
+		r = promoteStored(owner.id, tree, smUniqueName(tree, scenarioDisplayName(owner), key));
+		if (!r || r.refused) { return r || treeRefuse('failed'); }
+		if (smState.sel === key) { smState.sel = r.id; }
+		if (smState.editing === key) { smState.editing = r.id; }
+		return r.id;
 	}
 	function smIsBaseKey(tree, key) { return key === smBaseKey(tree); }
 	function smName(tree, key) {
@@ -5646,6 +5699,7 @@ var EngCalcs = EngCalcs || {};
 		var kind = smKind(tree), r, p;
 		if (smIsBaseKey(tree, key)) { return null; }
 		r = smRecord(tree, key);
+		if (r && r.implicit) { return smImplicitParentKey(r.owner, tree); }
 		if (!r || r.root === true) { return null; }
 		if (kind === 'scn') {
 			p = r.parent !== undefined ? scenarioById(r.parent) : null;
@@ -5685,9 +5739,11 @@ var EngCalcs = EngCalcs || {};
 		smRecords(tree).forEach(function (r) { if (r.id !== exceptKey && String(r.name || '').toLowerCase() === low) { taken = true; } });
 		return taken;
 	}
-	function smUniqueName(tree, stem) {
+	// `exceptKey`: an item whose own name does not count as taken (a scenario's own alternative,
+	// stored under the name it already shows).
+	function smUniqueName(tree, stem, exceptKey) {
 		var name = stem, n = 2;
-		while (smNameTaken(tree, name)) { name = stem + '_' + n; n++; }
+		while (smNameTaken(tree, name, exceptKey)) { name = stem + '_' + n; n++; }
 		return name;
 	}
 	// **A NEW CHILD IS NAMED LIKE "Child_2_of_Horse"** (Tom's own example, H08): its place among the
@@ -5717,6 +5773,10 @@ var EngCalcs = EngCalcs || {};
 	function smAdd(tree, parentKey, asBase) {
 		var kind = smKind(tree), name, r, root = !!asBase || parentKey === null, pk = root ? null : (parentKey || smBaseKey(tree));
 		if (!root && !smIsBaseKey(tree, pk) && !smRecord(tree, pk)) { return treeRefuse('missing'); }
+		if (!root && kind !== 'scn') {
+			pk = smMaterialize(tree, pk);
+			if (pk && pk.refused) { return pk; }
+		}
 		name = root ? smBaseName(tree) : smChildName(tree, pk);
 		if (kind === 'scn') {
 			r = { id: newScenarioId(), name: name, overrides: {} };
@@ -5738,6 +5798,11 @@ var EngCalcs = EngCalcs || {};
 		if (!r) { return treeRefuse('missing'); }
 		if (!v) { return treeRefuse('empty'); }
 		if (smNameTaken(tree, v, key)) { return treeRefuse('duplicate'); }
+		if (r.implicit) {
+			key = smMaterialize(tree, key);
+			if (key && key.refused) { return key; }
+			r = smRecord(tree, key);
+		}
 		r.name = v;
 		touchTree('smRename');
 		return true;
@@ -5750,6 +5815,9 @@ var EngCalcs = EngCalcs || {};
 			scenarios.forEach(function (x) { if (x.parent === key) { who.push(scenarioDisplayName(x)); } });
 			return who;
 		}
+		// A scenario's own alternative is always used by that scenario, and by any child of it that
+		// holds nothing of its own there.
+		if (smImplicitOwner(tree, key)) { return smUsedBy(tree, key).map(scenarioDisplayName); }
 		storedUsers(kind, key).scenarios.forEach(function (sid) { who.push(scenarioDisplayName(scenarioById(sid))); });
 		storedUsers(kind, key).children.forEach(function (cid) { who.push(smName(tree, cid)); });
 		return who;
@@ -5787,6 +5855,23 @@ var EngCalcs = EngCalcs || {};
 		if (!target && !smIsBaseKey(tree, targetKey)) { return treeRefuse('missing'); }
 		if (mode !== 'into' && smIsBaseKey(tree, targetKey)) { return treeRefuse('base'); }
 		newParent = mode === 'into' ? targetKey : smParentKey(tree, targetKey);
+		// A scenario's own alternative, moved or moved beside, is stored first; a move that would be
+		// refused is refused before anything is stored.
+		if (kind !== 'scn' && (r.implicit || (target && target.implicit) || smImplicitOwner(tree, newParent))) {
+			if (newParent !== null && (newParent === key || smIsUnder(tree, newParent, key))) { return treeRefuse('parent'); }
+			// The target first, then the new parent, then the item: storing one may store the
+			// alternatives its scenario inherits, never the other way about.
+			if (target && target.implicit) { targetKey = smMaterialize(tree, targetKey); }
+			if (targetKey && targetKey.refused) { return targetKey; }
+			target = smRecord(tree, targetKey);
+			newParent = mode === 'into' ? targetKey : smParentKey(tree, targetKey);
+			if (smImplicitOwner(tree, newParent)) { newParent = smMaterialize(tree, newParent); }
+			if (newParent && newParent.refused) { return newParent; }
+			if (r.implicit) { key = smMaterialize(tree, key); }
+			if (key && key.refused) { return key; }
+			r = smRecord(tree, key);
+			if (!r) { return treeRefuse('missing'); }
+		}
 		if (kind === 'scn') {
 			if (newParent === null) { delete r.parent; r.root = true; }
 			else {
@@ -5844,7 +5929,7 @@ var EngCalcs = EngCalcs || {};
 		if (tree === 'scenarios') { return out; }
 		scenarios.forEach(function (s) {
 			var c = smChoice(s, tree);
-			if (smIsBaseKey(tree, key) ? c.base === true : c.id === key) { out.push(s); }
+			if (smIsBaseKey(tree, key) ? c.base === true : (c.own ? smImplicitKey(c.via || s, tree) === key : c.id === key)) { out.push(s); }
 		});
 		return out;
 	}
@@ -5852,15 +5937,15 @@ var EngCalcs = EngCalcs || {};
 	function smCellText(s, cat) {
 		var c = smChoice(s, cat), pc = EngCalcs.pageConfig || {}, name;
 		if (c.id !== null && c.id !== undefined) { name = smName(cat, c.id); }
-		else if (c.own) { name = (pc.lpn_sm_own_values || 'Own values') + ' (' + alternativeFor(c.via || s, cat).count + ')'; }
+		else if (c.own) { name = scenarioDisplayName(c.via || s); }
 		else { name = smName(cat, smBaseKey(cat)); }
 		return c.via ? name + ' (' + (pc.lpn_sm_inherited || 'inherited') + ')' : name;
 	}
 	// The pick-list of one cell: ['' inherits / Base, then every item of the category by name].
 	function smCellChoices(s, cat) {
-		var out = [['', smCellText(s, cat)]], c = smChoice(s, cat);
-		if (c.own && !c.via) { out = [['', smCellText(s, cat)]]; }
-		smRecords(cat).forEach(function (r) { out.push([String(r.name || ''), String(r.name || '')]); });
+		var out = [['', smCellText(s, cat)]], mine = smImplicitKey(s, cat);
+		// Its own alternative is the blank row's text already.
+		smRecords(cat).forEach(function (r) { if (r.id !== mine) { out.push([String(r.name || ''), String(r.name || '')]); } });
 		return out;
 	}
 	function smCellValue(s, cat) {
@@ -5877,12 +5962,21 @@ var EngCalcs = EngCalcs || {};
 		var s = scenarioById(scnId), kind = cat === 'calculation' ? 'calc' : 'alt', rec = null, kept = null, res;
 		if (!s || s.isBase) { return treeRefuse('base'); }
 		if (name !== '' && name !== null && name !== undefined) {
-			smRecords(cat).forEach(function (r) { if (String(r.name || '') === name) { rec = r; } });
+			// A stored record wins a name it shares with a scenario's own alternative.
+			smRecords(cat).forEach(function (r) { if (String(r.name || '') === name && !(rec && !rec.implicit)) { rec = r; } });
 			if (!rec) { return treeRefuse('missing'); }
+			// Its own alternative, chosen again, is no change.
+			if (rec.implicit && rec.owner === s) { return true; }
+			// Another scenario's own alternative, chosen here, is shared: it is stored first.
+			if (rec.implicit) {
+				res = smMaterialize(cat, rec.id);
+				if (res && res.refused) { return res; }
+				rec = smRecord(cat, res);
+			}
 		}
 		if (rec === null && !storedChoiceOf(s, cat)) { return true; }
 		if (rec !== null && scenarioHoldsLocal(s, cat)) {
-			kept = promoteStored(s.id, cat, smUniqueName(cat, s.name || s.id));
+			kept = promoteStored(s.id, cat, smUniqueName(cat, scenarioDisplayName(s), smImplicitKey(s, cat)));
 			if (kept.refused) { return kept; }
 		}
 		res = kind === 'calc' ? assignCalcSet(scnId, rec ? rec.id : null) : assignAlternative(scnId, cat, rec ? rec.id : null);
@@ -5939,7 +6033,10 @@ var EngCalcs = EngCalcs || {};
 	// **COPY AN ALTERNATIVE (or a calculation set)**: its own values, as a sibling beside it under the
 	// same parent, named like a scenario copy. Nothing uses the copy until a scenario chooses it.
 	function smCopyStored(tree, key) {
-		var kind = smKind(tree), src = smRecord(tree, key), c, list;
+		var kind = smKind(tree), src, c, list;
+		if (kind !== 'scn') { key = smMaterialize(tree, key); }
+		if (key && key.refused) { return key; }
+		src = smRecord(tree, key);
 		if (!src || kind === 'scn') { return treeRefuse('missing'); }
 		list = storedList(kind);
 		c = altCopy(src);
@@ -6684,22 +6781,22 @@ var EngCalcs = EngCalcs || {};
 	}
 	function scenarioMenuRows() {
 		var pc = EngCalcs.pageConfig || {}, rows = [], scn = activeScenario();
-		scenariosForDisplay().forEach(function (s) {
-			rows.push({
-				// scenarioId is what makes a row a scenario, so a reader of the rows (the harness)
-				// never has to tell one from a command by its position or its label.
-				scenarioId: s.id,
-				variable: true,   // a name from the project: its letter must not move the fixed rows' (Task 748)
-				// A tick on the row you are already in, the way every view menu in this file's
-				// neighbourhood marks a current choice. No icon column entry, so the marker cannot
-				// be mistaken for a command's glyph.
-				label: (s.id === scn.id ? '✓ ' : '  ') + scenarioDisplayName(s)
-					+ (s.isBase ? '' : ' (' + overrideCount(s) + ')'),
-				tip: presetScenarioTip(s),
-				fn: function () { switchScenario(s.id); }
-			});
+		// **THE ORDER IS TOM'S** (2026-10-11): *"Scenario manager..., -, Basic mode, New, Rename,
+		// Delete, -, Apply Base, list of scenarios."* The Scenarios table and the Scenario manager are
+		// where scenarios are managed, so the list of scenarios comes last.
+		// **THE SCENARIO MANAGER ROW IS ALWAYS HERE** (Tom, 2026-10-09, H03); choosing it while
+		// Basic mode is ticked turns Basic mode off and says so in one line (openScenarioManager()).
+		// **BASIC MODE** (Tom, 2026-09-30), ticked by default: see setScenarioBasicMode().
+		rows.push({
+			icon: 'scenarios', label: pc.lpn_sm_menu || 'Scenario manager…',
+			fn: function () { openScenarioManager(); }
 		});
 		rows.push({ separator: true });
+		rows.push({
+			label: (scenarioBasicMode ? '✓ ' : '  ') + (pc.lpn_scenario_basic || 'Basic mode'),
+			tip: pc.lpn_scenario_basic_tip,
+			fn: function () { setScenarioBasicMode(!scenarioBasicMode); }
+		});
 		rows.push({
 			icon: 'insert', label: pc.lpn_scenario_new || 'New scenario…',
 			fn: function () {
@@ -6764,18 +6861,20 @@ var EngCalcs = EngCalcs || {};
 			// push into a push against whatever it happened to hand over.
 			fn: function () { pushBaseToScenarios(); }
 		});
-		// **THE SCENARIO MANAGER ROW IS ALWAYS HERE** (Tom, 2026-10-09, H03); choosing it while
-		// Basic mode is ticked turns Basic mode off and says so in one line (openScenarioManager()).
-		// **BASIC MODE** (Tom, 2026-09-30), ticked by default: see setScenarioBasicMode().
-		rows.push({ separator: true });
-		rows.push({
-			icon: 'scenarios', label: pc.lpn_sm_menu || 'Scenario manager…',
-			fn: function () { openScenarioManager(); }
-		});
-		rows.push({
-			label: (scenarioBasicMode ? '✓ ' : '  ') + (pc.lpn_scenario_basic || 'Basic mode'),
-			tip: pc.lpn_scenario_basic_tip,
-			fn: function () { setScenarioBasicMode(!scenarioBasicMode); }
+		scenariosForDisplay().forEach(function (s) {
+			rows.push({
+				// scenarioId is what makes a row a scenario, so a reader of the rows (the harness)
+				// never has to tell one from a command by its position or its label.
+				scenarioId: s.id,
+				variable: true,   // a name from the project: its letter must not move the fixed rows' (Task 748)
+				// A tick on the row you are already in, the way every view menu in this file's
+				// neighbourhood marks a current choice. No icon column entry, so the marker cannot
+				// be mistaken for a command's glyph.
+				label: (s.id === scn.id ? '✓ ' : '  ') + scenarioDisplayName(s)
+					+ (s.isBase ? '' : ' (' + overrideCount(s) + ')'),
+				tip: presetScenarioTip(s),
+				fn: function () { switchScenario(s.id); }
+			});
 		});
 		return rows;
 	}
@@ -35757,13 +35856,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// an element inactive in Base and active here (bornInScenario()), so deactivating it here left an
 	// element active nowhere and still drawn. "Only here" is read off the `active` values alone:
 	// inactive in Base and in every other scenario. No flag is stored, so files are unchanged.
-	// Read through the scenario's resolved overrides, so an `active` held in a stored topology
-	// alternative (its own or one it shares or inherits) counts as the scenario's.
-	function activeInScenario(el, s) {
-		var ov = s.isBase ? null : resolvedOverrides(s)[ovKey(el)];
-		if (ov && Object.prototype.hasOwnProperty.call(ov, 'active')) { return ov.active !== false; }
-		return baseValue(el, 'active') !== false;
-	}
+	// activeInScenario() (beside isActive()) reads each scenario's resolved Active topology, so an
+	// `active` held in a stored alternative, its own or one it shares or inherits, counts.
 	function onlyInThisScenario(el) {
 		var here = activeScenario();
 		if (here.isBase || !el || baseValue(el, 'active') !== false) { return false; }
@@ -72937,19 +73031,24 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// command stays in both, greyed, and says why in its tip where there is a why to say.
 	// `face` is the button's own text where it is shorter than the menu's.
 	function smCommands(key) {
-		var pc = EngCalcs.pageConfig || {}, tree = smState.tree, isBase, valid, out = [];
+		var pc = EngCalcs.pageConfig || {}, tree = smState.tree, isBase, valid, out = [], noSel;
 		valid = key !== null && key !== undefined && (smIsBaseKey(tree, key) || !!smRecord(tree, key));
 		isBase = valid && smIsBaseKey(tree, key);
+		// `offTip`: why a greyed command is greyed (Perry, 2026-10-11: only Delete said so).
+		noSel = pc.lpn_sm_none_selected || 'Select an item in the tree first.';
 		if (tree === 'scenarios') {
 			out.push({ id: 'current', label: pc.lpn_sm_make_current || 'Make current', off: !valid || key === project.activeScenario,
+				offTip: !valid ? noSel : (pc.lpn_sm_current_already || 'This scenario is already the current scenario.'),
 				fn: function () { smActCurrent(key); } });
 		}
 		out.push({ id: 'add', label: pc.lpn_sm_add_child || 'Add child', fn: function () { smActAdd(valid ? key : smBaseKey(tree)); } });
 		out.push({ id: 'addbase', label: pc.lpn_sm_add_base || 'Add base', tip: pc.lpn_sm_add_base_tip, fn: function () { smActAdd(null); } });
-		out.push({ id: 'rename', label: pc.lpn_sm_rename || 'Rename', off: !valid || isBase, fn: function () { smStartRename(key); } });
+		out.push({ id: 'rename', label: pc.lpn_sm_rename || 'Rename', off: !valid || isBase,
+			offTip: !valid ? noSel : (pc.lpn_sm_base_named || 'The Base of a tree is not renamed.'),
+			fn: function () { smStartRename(key); } });
 		// A scenario asks make-copies or share; an alternative is copied beside itself.
 		out.push({ id: 'copy', label: tree === 'scenarios' ? (pc.lpn_sm_copy || 'Copy scenario…') : (pc.lpn_sm_copy_alt || 'Copy'),
-			off: !valid || (tree !== 'scenarios' && isBase), fn: function () { smActCopy(key); } });
+			off: !valid || (tree !== 'scenarios' && isBase), offTip: !valid ? noSel : null, fn: function () { smActCopy(key); } });
 		out.push({ separator: true });
 		out.push({ id: 'del', label: pc.lpn_tool_delete || 'Delete', face: '−', off: !valid || isBase,
 			tip: isBase ? (pc.lpn_sm_base_kept || 'The Base of a tree is not deleted. Another Base added with Add base is deleted when nothing uses it.')
@@ -72960,7 +73059,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// A command drawn as a button: aria-disabled rather than `disabled`, so a greyed one still shows
 	// its tip on hover.
 	function smCommandButton(host, c, id) {
-		var b = smButton(host, c.face || c.label, c.tip || (c.face ? c.label : null), function () { if (!c.off) { c.fn(); } });
+		var b = smButton(host, c.face || c.label, (c.off && c.offTip) || c.tip || (c.face ? c.label : null), function () { if (!c.off) { c.fn(); } });
 		b.id = id;
 		b.setAttribute('data-sm-cmd', c.id);
 		if (c.off) { b.setAttribute('aria-disabled', 'true'); }
@@ -73391,7 +73490,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			b.textContent = c.label;
 			if (c.off) {
 				b.setAttribute('aria-disabled', 'true');
-				if (c.tip && c.id === 'del') { b.title = c.tip; }
+				if (c.offTip || (c.tip && c.id === 'del')) { b.title = c.offTip || c.tip; }
 			}
 			b.addEventListener('click', function () { if (c.off) { return; } paneCloseContextMenu(); c.fn(); });
 			menu.appendChild(b);
@@ -73450,12 +73549,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		return scenariosForDisplay().map(function (s) { return { id: s.id, _lpnScenario: true, scn: s }; });
 	}
 	function smSetCell(scn, cat, name) {
-		var pc = EngCalcs.pageConfig || {}, res = smAssign(scn.id, cat, name);
+		// No message when the scenario's own values are kept as a stored alternative: they were
+		// already shown as its own alternative, under its name (Tom, 2026-10-11: no alert on the
+		// creation of an alternative).
+		var res = smAssign(scn.id, cat, name);
 		if (res && res.refused) { return false; }
-		if (res && res.kept) {
-			setNotice((pc.lpn_sm_kept || 'The values this scenario held in {category} were kept as the alternative {name}.')
-				.replace('{category}', altCategoryLabel(cat)).replace('{name}', res.kept));
-		}
 		smAfter(true, false);
 		return true;
 	}

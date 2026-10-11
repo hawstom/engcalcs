@@ -17,6 +17,9 @@
 //      before any of it opens unchanged and re-saves with none of the new keys; an .inp export of
 //      Base is character-exact before and after all of it.
 //  10. Used-by counts, and a standing control note in the Libraries box.
+//  12. The first override in a category makes an alternative named after the scenario; a second one
+//      reuses it; a child with no override uses its parent's; no question or message, Basic or not.
+//  13. "Only in this scenario" (master's scenario delete) reads through a shared topology alternative.
 //
 // Copyright 2009 Thomas Gail Haws
 // Licensed under GNU GPL v3.0 or later
@@ -59,6 +62,7 @@ const INJECT =
 	"\t\tlastNotice: function () { return lastNoticeText; }, promote: promoteImplicitAlternative,\n" +
 	"\t\talternativeFor: alternativeFor, libInactiveIds: libInactiveIds, smInUseBy: smInUseBy,\n" +
 	"\t\toverrideCount: overrideCount, smSharedText: smSharedText, scenarioTableCols: scenarioTableCols, scenarioTableRows: scenarioTableRows,\n" +
+	"\t\tsmImplicitKey: smImplicitKey, onlyInThisScenario: onlyInThisScenario, deleteElement: deleteElement, noticeLog: function () { return noticeLog; },\n" +
 	"\t\tbuildLayers: function () { svg = document.getElementById('lpn_canvas');\n" +
 	"\t\t\tworld = el('g', {}, svg);\n" +
 	"\t\t\tbackdropLayer = el('g', {}, world); gridLayer = el('g', {}, world);\n" +
@@ -328,6 +332,111 @@ async function run(mutate, quiet) {
 		ok('10.10 and the run says nothing of them (no per-run message): the strings are the note\'s', PC.lpn_control_inactive_note.indexOf('{ids}') >= 0 && PC.lpn_rule_inactive_note.indexOf('{ids}') >= 0);
 		ok('10.11 the words are "refer to", not "name"', PC.lpn_inp_export_flat_inactive_controls.indexOf('refer to') >= 0);
 	}
+
+	return fails;
+}
+
+// Sections 12 and 13, on pages of their own: the live mutations aimed at them run only these.
+async function runTail(mutate, quiet) {
+	let fails = 0;
+	const say = (t) => { if (!quiet) { console.log(t); } };
+	function ok(name, cond, extra) {
+		if (!cond) { fails++; }
+		if (!quiet) { console.log((cond ? '  ok   ' : '  FAIL ') + name + (extra === undefined ? '' : '   ' + extra)); }
+	}
+	function page() {
+		const L = loadLoopedNetwork(INJECT, null, mutate);
+		setUnitSet('us');
+		L.buildLayers();
+		L.seedDefaultInputs();
+		L.getSettings().engine = 'native';
+		return L;
+	}
+	// Tom, 2026-10-11: "Creating a new scenario creates no alternatives; it uses its parent's
+	// alternatives until new alternatives are needed as overrides are created. ... if the scenario
+	// has no such alternative, a new alternative is created using the name of the scenario." And (3):
+	// no alert on the creation of an alternative, in Basic mode or out of it.
+	say('--- 12. the first override in a category makes an alternative named after the scenario ---');
+	for (const basic of [true, false]) {
+		const W = basic ? 'Basic: ' : 'Advanced: ';
+		const P = page();
+		P.importInp({ name: 'Net1.inp', _text: NET1 });
+		P.setBasicMode(basic);
+		let asked = 0;
+		const answerer = global.window.lpnDialogAnswerer;
+		global.window.lpnDialogAnswerer = function (req) { asked++; return answerer(req); };
+		const FIG = 'Figure: Node and link IDs';
+		const F = P.createScenario(FIG);
+		const named = (cat, name) => P.smRecords(cat).filter((r) => r.name === name);
+		ok('12.1 ' + W + 'a new scenario creates no alternative', P.smRecords('demand').length === 0 && P.smRecords('text').length === 0 &&
+			P.smChoice(F, 'demand').base === true && P.smCellText(F, 'demand') === PC.lpn_scenario_base);
+		P.switchScenario(F.id);
+		const logBefore = P.noticeLog().length, noticeBefore = P.lastNotice();
+		P.setProp(P.nodeById('22'), 'demand', 900);
+		const own = named('demand', FIG);
+		ok('12.2 ' + W + 'its first Demand override makes a Demand alternative named after it, under Base', own.length === 1 && P.smChildren('demand', 'base').indexOf(own[0].id) >= 0, JSON.stringify(P.smRows('demand')));
+		ok('12.3 ' + W + '...the scenario uses it, and the Scenarios table names it', P.smUsedBy('demand', own[0].id).indexOf(F) >= 0 && P.smCellText(F, 'demand') === FIG, P.smCellText(F, 'demand'));
+		ok('12.4 ' + W + '...and nothing else: no other category has one', P.smRecords('physical').length === 0 && P.smRecords('text').length === 0 && P.smCellText(F, 'physical') === PC.lpn_scenario_base);
+		ok('12.5 ' + W + 'no question was asked and no message given', asked === 0 && P.noticeLog().length === logBefore && P.lastNotice() === noticeBefore, asked + ' asked, ' + (P.noticeLog().length - logBefore) + ' messages');
+		P.setProp(P.nodeById('12'), 'demand', 300);
+		ok('12.6 ' + W + 'a second Demand override reuses it', named('demand', FIG).length === 1 && P.smRecords('demand').length === 1 && P.alternativeFor(F, 'demand').count === 2);
+		ok('12.7 ' + W + 'the file is unchanged in form: the values are the scenario\'s own, no alternatives list', !('alternatives' in P.getDoc()) && !/"alternatives"/.test(JSON.stringify(P.serializeProject())));
+		// A child of the figure, with no override of its own, uses its parent's alternative.
+		P.switchScenario(P.baseScenario().id);
+		const C = P.smAdd('scenarios', F.id, false);
+		P.switchScenario(C.id);
+		ok('12.8 ' + W + 'a child with no override uses its parent\'s alternative', P.smChoice(C, 'demand').own === true && P.smChoice(C, 'demand').via === F &&
+			P.smUsedBy('demand', own[0].id).indexOf(C) >= 0 && P.effective(P.nodeById('22'), 'demand') === 900 && named('demand', C.name).length === 0, P.smCellText(C, 'demand'));
+		ok('12.9 ' + W + '...and its Scenarios table cell says so', P.smCellText(C, 'demand') === FIG + ' (' + PC.lpn_sm_inherited + ')', P.smCellText(C, 'demand'));
+		P.setProp(P.nodeById('22'), 'demand', 950);
+		const kid = named('demand', C.name);
+		ok('12.10 ' + W + 'the child\'s first override makes its own, named after it, a child of its parent\'s', kid.length === 1 &&
+			P.smChildren('demand', own[0].id).indexOf(kid[0].id) >= 0 && P.effective(P.nodeById('12'), 'demand') === 300, JSON.stringify(P.smRows('demand')));
+		ok('12.11 ' + W + 'still no question and no message', asked === 0 && P.noticeLog().length === logBefore, asked + ' asked');
+		const del = P.smDelete('demand', own[0].id);
+		ok('12.12 ' + W + 'a scenario\'s own alternative is not deleted: it is used, and the refusal names who', del.refused === 'in use' && del.who.indexOf(FIG) >= 0, JSON.stringify(del));
+		// Renaming it makes it an alternative of its own; nothing resolves differently.
+		ok('12.13 ' + W + 'renamed, it is stored under the new name and the scenario names it', P.smRename('demand', own[0].id, 'Figure demands') === true &&
+			P.getDoc().alternatives.length === 1 && P.getDoc().alternatives[0].name === 'Figure demands' && F.alternatives.demand === P.getDoc().alternatives[0].id &&
+			named('demand', FIG).length === 0 && P.effective(P.nodeById('12'), 'demand') === 300 && P.effective(P.nodeById('22'), 'demand') === 950);
+		ok('12.14 ' + W + '...and the child\'s own alternative now hangs from it', P.smChildren('demand', P.getDoc().alternatives[0].id).indexOf(kid[0].id) >= 0);
+		// Another scenario picks the child's own alternative in the Scenarios table: it is stored and shared.
+		P.switchScenario(P.baseScenario().id);
+		const G = P.createScenario('Gamma');
+		const res = P.smAssign(G.id, 'demand', C.name);
+		const stored = P.getDoc().alternatives.filter((a) => a.name === C.name)[0];
+		ok('12.15 ' + W + 'another scenario choosing it shares it: stored, named after its scenario, used by both', res === true && !!stored &&
+			C.alternatives && C.alternatives.demand === stored.id && G.alternatives.demand === stored.id, JSON.stringify(res));
+		P.switchScenario(G.id);
+		ok('12.16 ' + W + '...and Gamma reads its values', P.effective(P.nodeById('22'), 'demand') === 950 && P.effective(P.nodeById('12'), 'demand') === 300);
+		ok('12.17 ' + W + 'no question and no message, all the way', asked === 0, asked + ' asked');
+		global.window.lpnDialogAnswerer = answerer;
+	}
+
+	// master's fix/scenario-delete: an asset in this scenario only is deleted there. Here `active` may
+	// live in a stored Active topology alternative, which another scenario can share.
+	say('--- 13. "only in this scenario" reads through a topology alternative ---');
+	{
+		const P = page();
+		P.importInp({ name: 'Net1.inp', _text: NET1 });
+		const S1 = P.createScenario('S1'), S2 = P.createScenario('S2');
+		const link = P.linkById('10');
+		link._active = false;   // as bornInScenario() leaves it: inactive in Base
+		P.switchScenario(S1.id);
+		P.setProp(link, 'active', true);
+		P.promote(S1.id, 'topology', 'Topo');
+		ok('13.1 active in S1 through its stored topology alternative: only in S1', P.onlyInThisScenario(link) === true && S1.alternatives.topology !== undefined);
+		P.smAssign(S2.id, 'topology', 'Topo');
+		ok('13.2 S2 shares that alternative, so it is active in S2 too: not only in S1', P.onlyInThisScenario(link) === false);
+		P.smAssign(S2.id, 'topology', '');
+		ok('13.3 S2 back on Base\'s: only in S1 again', P.onlyInThisScenario(link) === true);
+		let asked = 0;
+		const answerer = global.window.lpnDialogAnswerer;
+		global.window.lpnDialogAnswerer = function (req) { asked++; return answerer(req); };
+		P.deleteElement('link', '10');
+		global.window.lpnDialogAnswerer = answerer;
+		ok('13.4 deleted in S1, with no question: the overrides lost were S1\'s alone', !P.linkById('10') && asked === 0, asked + ' asked');
+	}
 	return fails;
 }
 
@@ -338,16 +447,19 @@ const MUTATIONS = [
 	['a reorder is not stored', (src) => src.replace("		project.scenarioOrdered = true;\n	}", "	}")],
 	['the compare set is ignored', (src) => src.replace("return scenariosForDisplay().filter(function (s) { return !Array.isArray(set) || set.indexOf(s.id) >= 0; });", "return scenariosForDisplay();")],
 	['a copy always shares', (src) => src.replace("				if (mode === 'own') {", "				if (false) {")],
-	['an assignment drops the values the scenario held', (src) => src.replace("			kept = promoteStored(s.id, cat, smUniqueName(cat, s.name || s.id));\n			if (kept.refused) { return kept; }", "			kept = { name: 'x' };\n			takeScenarioLocals(s, cat);")],
+	['an assignment drops the values the scenario held', (src) => src.replace("			kept = promoteStored(s.id, cat, smUniqueName(cat, scenarioDisplayName(s), smImplicitKey(s, cat)));\n			if (kept.refused) { return kept; }", "			kept = { name: 'x' };\n			takeScenarioLocals(s, cat);")],
 	['a new child is not named for its parent', (src) => src.replace("name = 'Child_' + n + '_of_' + parent;", "name = 'Child_' + n;")],
+	['only-in-this-scenario reads the scenario\'s own values alone', (src) => src.replace("var ov = (!scn || scn.isBase) ? null : resolvedOverrides(scn)[ovKey(el)];", "var ov = (!scn || scn.isBase) ? null : (scn.overrides || {})[ovKey(el)];"), true],
+	['a scenario\'s own alternative is not an item of its tree', (src) => src.replace("		}).map(function (s) { return smImplicitRecord(s, tree); });", "		}).map(function (s) { return smImplicitRecord(s, tree); }).slice(0, 0);"), true],
+	['the first override asks first', (src) => src.replace("		var scn = activeScenario(), key = ovKey(el), t = writeTargetFor(scn, categoryOf(prop, elGroup(el)));\n", "		var scn = activeScenario(), key = ovKey(el), t = writeTargetFor(scn, categoryOf(prop, elGroup(el)));\n		if (t.kind === 'scn' && !scenarioHoldsLocal(scn, categoryOf(prop, elGroup(el)))) { askDialog({ kind: 'alert', text: 'x' }); }\n"), true],
 	['Basic mode stays on when the manager is chosen', (src) => src.replace("		if (scenarioBasicMode) {\n			setScenarioBasicMode(false);\n			setNotice(", "		if (false) {\n			setScenarioBasicMode(false);\n			setNotice(")]
 ];
 (async function main() {
-	let fails = await run(null, false);
+	let fails = await run(null, false) + await runTail(null, false);
 	console.log('\n--- 11. live mutations: each must turn this harness red ---');
 	for (const m of MUTATIONS) {
 		let red;
-		try { red = await run(m[1], true); } catch (e) {
+		try { red = await (m[2] ? runTail : run)(m[1], true); } catch (e) {
 			if (/the mutation changed nothing/.test(String(e && e.message))) { fails++; console.log('  FAIL mutation no longer applies: ' + m[0]); continue; }
 			red = 'a thrown error (' + (e && e.message) + '), so it';
 		}

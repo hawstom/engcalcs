@@ -922,11 +922,24 @@ Tom's calls of 2026-10-09 (H01-H08), in his words where they govern:
   and no Alternatives table (the read-only preview box this replaced, `lpn_alt_box`, is gone).
 - **The Scenarios table** (Tables pane, shown with Basic mode off): one row per scenario, one column per
   category, each cell a pick-list of that category's alternatives only. The cell text is the
-  alternative the scenario uses; `inherited` marks one it takes from its parent; `Own values (n)` is a
-  scenario holding values of its own. Picking one assigns it; choosing another while the scenario holds
-  its own values first keeps them as a stored alternative named for the scenario. A blank pick
-  (Clear override, Delete) inherits again. Fill, paste and the cell menu are the pane's own.
+  alternative the scenario uses; `inherited` marks one it takes from its parent. Picking one assigns it;
+  choosing another while the scenario holds its own values first stores its own alternative (below),
+  silently. A blank pick (Clear override, Delete) inherits again. Fill, paste and the cell menu are the
+  pane's own.
+- **A scenario's own alternative is an item, named after the scenario** (Tom, 2026-10-11, the "?" tip:
+  *"if the scenario has no such alternative, a new alternative is created using the name of the
+  scenario"*). The first override in a category makes it, the next ones go into it, and a scenario
+  holding none in that category uses its parent's. Still choice A: the scenario's own values ARE it,
+  keyed `<scenario id>:<category>` (`smImplicitRecords()`), so no file changes, and it follows a rename
+  of the scenario, goes with the scenario, and goes when its last override is cleared. It hangs from
+  what the scenario's parent uses. Rename, a drag, Copy, Add child under it, or another scenario picking
+  it in the Scenarios table stores it first (`smMaterialize()`, which is `promoteStored()`); Delete is
+  refused, since its scenario uses it. **No message or question announces it, in Basic mode or out**
+  (Tom, 2026-10-11: *"We may not need the alert on creation of an alternative"*); the "kept as the
+  alternative" notice went with it.
 - **The menu row is always present**; choosing it with Basic mode ticked turns Basic mode off and says so.
+  The Scenarios menu's order is Tom's (2026-10-11): Scenario manager, a rule, Basic mode, New, Rename,
+  Delete, a rule, Apply Base values, then the scenarios.
 - **Gestures**: drag a leaf or branch onto an item to re-parent it (the row is outlined); drag between
   two items to reorder (a line); a cycle is refused. Click a selected item or F2 renames, Delete or the
   minus button or the context menu deletes, the plus button or the context menu adds a child
@@ -951,8 +964,8 @@ Tom's calls of 2026-10-09 (H01-H08), in his words where they govern:
      Base is never deleted, with its own sentence (`lpn_sm_base_kept`).
   2. A child cannot choose Base while its parent uses another alternative (choosing nothing inherits);
      re-parent the scenario to Base instead.
-  3. Picking an alternative for a scenario that holds its own values in that category first keeps them as
-     a stored alternative named for the scenario; nothing is lost, and that alternative then shows in the tree.
+  3. Picking an alternative for a scenario that holds its own values in that category first stores its own
+     alternative under its name; nothing is lost, and nothing is said.
   4. "Used by" counts scenarios that inherit an alternative as well as those that name it.
   5. The Scenarios tab is hidden, not removed, in Basic mode, and Ctrl+Shift+PageDown skips it.
   6. A Base of its own resolves exactly as a child of Base does; `root: true` only says which row it hangs

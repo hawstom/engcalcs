@@ -270,7 +270,7 @@ console.log('\n--- Basic mode ---');
 	mgrRow().fn();
 	ok('the Scenario manager row opens the box', L.smBoxIsOpen());
 	// The Scenarios table's cell for a scenario holding its own demand value.
-	ok('...and the Scenarios table reads Peak Hour\'s Demand as its own values, counted', L.smCellText(pk, 'demand') === PC.lpn_sm_own_values + ' (1)', L.smCellText(pk, 'demand'));
+	ok('...and the Scenarios table reads Peak Hour\'s Demand as its own alternative, named after it', L.smCellText(pk, 'demand') === 'Peak Hour', L.smCellText(pk, 'demand'));
 	ok('...and Base\'s other categories as Base', L.smCellText(pk, 'physical') === PC.lpn_scenario_base, L.smCellText(pk, 'physical'));
 	// Q7 (Tom, 2026-10-05): the demand multiplier, run time and time step are calculation options,
 	// counted in the Calculation category.
@@ -279,7 +279,7 @@ console.log('\n--- Basic mode ---');
 		const ownMult = L.createScenario('Max Day'); ownMult.demandMultiplier = 2;
 		ok('a multiplier seeded equal to the project\'s counts nothing: Calculation is Base\'s',
 			L.smCellText(seeded, 'calculation') === PC.lpn_scenario_base, L.smCellText(seeded, 'calculation'));
-		ok('a scenario with its own multiplier counts it in Calculation', L.smCellText(ownMult, 'calculation') === PC.lpn_sm_own_values + ' (1)',
+		ok('a scenario with its own multiplier has its own Calculation alternative, named after it', L.smCellText(ownMult, 'calculation') === 'Max Day',
 			L.smCellText(ownMult, 'calculation'));
 		ok('...and that count is the number beside its name', L.overrideCount(ownMult) === 1, L.overrideCount(ownMult));
 		L.deleteScenario(ownMult.id); L.deleteScenario(seeded.id);

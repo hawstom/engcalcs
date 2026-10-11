@@ -345,9 +345,9 @@ async function main() {
 		ok('the Scenarios table ends with Presentation and Calculation, and no option columns',
 			ah[ah.length - 2] === PRES && ah[ah.length - 1] === CALC && ah.indexOf(DM) < 0 && ah.indexOf(DUR) < 0, JSON.stringify(ah));
 		const peakRow = alt.filter((r) => r[0] === 'Peak')[0] || [];
-		const OWN = await L('lpn_sm_own_values');
-		ok('Peak: own values (1) for its text size, own values (1) for its multiplier',
-			peakRow[ah.length - 2] === OWN + ' (1)' && peakRow[ah.length - 1] === OWN + ' (1)', JSON.stringify(peakRow));
+		// Tom, 2026-10-11: the first override in a category makes an alternative named after the scenario.
+		ok('Peak: its text size and its multiplier are in alternatives named Peak',
+			peakRow[ah.length - 2] === 'Peak' && peakRow[ah.length - 1] === 'Peak', JSON.stringify(peakRow));
 		await H.scenarioMenu('  ' + await L('lpn_scenario_basic')).catch(() => {});
 		await page.evaluate(() => { try { localStorage.removeItem('lpn_scnbasic'); } catch (e) {} });
 		// Basic mode ticked again moved the pane off the hidden Scenarios tab; back to the Settings table.
