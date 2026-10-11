@@ -393,10 +393,6 @@ the block.
   R2000. Tom, 2026-10-07: his DXF Interface Manager spec, for import AND export, and a rudimentary
   interim workflow, verbatim in `dev/dxf-interface.md`. **DXF export merged 2026-10-08**; import is
   what remains.
-- 75|783| **Tank depth and volume, in the tables and the time series.**
-  Tom, 2026-10-10: *"Time Series and table columns for tank Depth. Volume would be nice too, with zero at
-  minimum depth."* Also his question: Bentley has a Base Elevation; EPANET's tank Elevation is the bottom,
-  where the level is zero, and volume below Min level still counts. Make sure our labels say so.
 - 75|786| **More native SI examples, since SI is chosen twice as often as US.**
   Tom, 2026-10-11: *"SI presets are requested over twice as much as US presets. So I want to have more good SI
   examples, even if I have to convert the Net2 and Net3 examples."* Mary is surveying redistributable SI networks

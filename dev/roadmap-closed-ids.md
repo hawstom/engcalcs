@@ -705,3 +705,4 @@ red builds on 2026-09-15 before anybody wrote it down.
 - 0|544| CLOSED 2026-10-11 (Tom: "Wrap up"): the observation is recorded; Task 591 answered it, and dev/positioning.md stays the authority for every public claim.
 - 0|636| CLOSED 2026-10-11 (Tom: "Wrap up"): custom properties shipped (Settings > Assets table, popup editor, every place an ordinary property appears); dev/custom-property-scope.md.
 - 0|763| CLOSED 2026-10-11 (Tom: "Wrap up"): the Guide (Help > Guide) merged from feat/user-guide; Find and replace is the model chapter. Rewriting the other chapters is Task 785.
+- 0|783| CLOSED 2026-10-11 (`feat/tank-volume`, Tom: "merge"): tank Depth and Usable volume (zero at the lowest water depth) in the Tanks table, Properties, Find and the time series; Recalculate OFF keeps them as a snapshot.
