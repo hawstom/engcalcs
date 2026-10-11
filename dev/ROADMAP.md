@@ -127,6 +127,7 @@ the block.
   pollution in lpn (status strip, click-to-open, delays in master styles, tips that talk down).
   Ida's audit: `dev/tip-and-selection-audit.md` (branch `chore/ida-tip`); decisions go to him as an interview.
 - 100|782| **Snap to asset, and Match properties: the small tools that replace Change type.**
+  **SNAP MERGED 2026-10-11** (`feat/snap`, Tom: "merge"); Match properties on `feat/match-property`, targets first.
   Tom, 2026-10-10: if nobody else does Change type, *"abandon the project and institute a variety of smaller
   and better tools: Snap/magnet to asset; Match properties from one asset to others (as applicable); Change
   link connections (done); Split pipe (done)."* Seam: Task 779 snapping to shape points.

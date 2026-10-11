@@ -6073,8 +6073,12 @@ var EngCalcs = EngCalcs || {};
 			// `symbolCapPercentile` percentile pipe." Always on -- there is no "off" state to
 			// explain, unlike the labeling threshold above. Both are plain dimensionless numbers
 			// (a ratio and a percentage), so neither is reinterpreted on a unit change.
-			symbolCapMultiple: 0.5,
-			symbolCapPercentile: 20,
+			// **NEW-PROJECT DEFAULT 0.25 x the MEDIAN pipe** (Tom, 2026-10-11, Tweaks: *"Initial default:
+			// Prevent nodes from scaling larger than 0.25 times 50%-ile pipe. (Inexact science). Leave
+			// examples as they are for now."*). A file saved without the pair is read as the old
+			// 0.5 / 20 by the load path, so the shipped examples are unchanged.
+			symbolCapMultiple: 0.25,
+			symbolCapPercentile: 50,
 			// Task 617: a CSS look (grayscale etc.) on the TILE LAYER only (LPN_BASEMAP_STYLES). Project data on the
 			// precedent of backdropOpacity beside it; a new project opens Muted; a file saved without the field opens Normal (see the load path).
 			basemapStyle: 'muted',
@@ -7854,11 +7858,11 @@ var EngCalcs = EngCalcs || {};
 	function invalidateLinkLengths() { pctLinkLengthCache = null; pctLinkLengthPctCache = null; symbolCapCache = null; }
 	function symbolCapMultiple() {
 		var v = settings.symbolCapMultiple;
-		return (typeof v === 'number' && isFinite(v) && v > 0) ? v : 0.5;
+		return (typeof v === 'number' && isFinite(v) && v > 0) ? v : 0.25;
 	}
 	function symbolCapPercentile() {
 		var v = settings.symbolCapPercentile;
-		return (typeof v === 'number' && isFinite(v) && v >= 0 && v <= 100) ? v : 20;
+		return (typeof v === 'number' && isFinite(v) && v >= 0 && v <= 100) ? v : 50;
 	}
 	// **STRIDE-SAMPLED TO AT MOST 512 LINKS, DETERMINISTICALLY.** A percentile wants a sort, and
 	// this is consulted on the zoom path; a deterministic stride is stable under re-entry where a
@@ -33370,8 +33374,26 @@ var EngCalcs = EngCalcs || {};
 		el._active = false;   // base-write: born inactive in Base, then overridden active here -- the whole membership design
 		setOverride(el, 'active', true);
 	}
+	// **AN ASSET THAT EXISTS ONLY IN THE CURRENT SCENARIO IS REALLY DELETED THERE** (Tom,
+	// 2026-10-11: *"I created a junction in a Scenario 1, and it doesn't exist in Base scenario. But
+	// I can't delete it in Scenario 1. So I can't delete it at all."*). Drawing in a scenario makes
+	// an element inactive in Base and active here (bornInScenario()), so deactivating it here left an
+	// element active nowhere and still drawn. "Only here" is read off the `active` values alone:
+	// inactive in Base and in every other scenario. No flag is stored, so files are unchanged.
+	function activeInScenario(el, s) {
+		var ov = s.isBase ? null : s.overrides[ovKey(el)];
+		if (ov && Object.prototype.hasOwnProperty.call(ov, 'active')) { return ov.active !== false; }
+		return baseValue(el, 'active') !== false;
+	}
+	function onlyInThisScenario(el) {
+		var here = activeScenario();
+		if (here.isBase || !el || baseValue(el, 'active') !== false) { return false; }
+		return !scenarios.some(function (s) { return s !== here && !s.isBase && activeInScenario(el, s); });
+	}
+
 	// DELETING: inside a scenario it means "not in this network", so it sets inactive rather than
-	// destroying an element every other scenario may be using. In BASE it is a real deletion and
+	// destroying an element every other scenario may be using -- unless the element exists only in
+	// that scenario (onlyInThisScenario() above), which is then deleted as Base deletes. In BASE it is a real deletion and
 	// takes every scenario's overrides on that element with it -- confirmed with a count, because
 	// that is work in documents the user is not looking at.
 	// A node carries its incident links with it either way: a link to a node that is not there is
@@ -33407,7 +33429,8 @@ var EngCalcs = EngCalcs || {};
 		// a cascade beat it to it, or a second tap landed on the same handle -- and the Base branch
 		// would otherwise walk an incidentLinks entry that no longer exists.
 		if (!el) { return; }
-		if (!inBaseScenario()) {
+		var here = activeScenario(), only = onlyInThisScenario(el);
+		if (!inBaseScenario() && !only) {
 			saveUndoSnapshot();
 			setOverride(el, 'active', false);
 			if (kind === 'node') {
@@ -33416,8 +33439,24 @@ var EngCalcs = EngCalcs || {};
 			afterPropertyEdit(el);
 			if (kind === 'node') { buildDom(); }
 			setNotice((pc.lpn_scenario_deactivated || '{id} is excluded from the network in {scenario}. It remains in the drawing and in the other scenarios.')
-				.replace('{id}', id).replace('{scenario}', scenarioDisplayName(activeScenario())));
+				.replace('{id}', id).replace('{scenario}', scenarioDisplayName(here)) + ' ' +
+				(pc.lpn_scenario_delete_in_base || 'To remove it from the drawing, delete it in the {base} scenario.')
+				.split('{base}').join(scenarioDisplayName(baseScenario())));
 			return;
+		}
+		// **A SCENARIO-ONLY NODE NEVER TAKES A LINK THAT EXISTS OUTSIDE THIS SCENARIO WITH IT.** The
+		// cascade below would delete that link from Base and every other scenario, so the delete is
+		// refused and the first such link is named.
+		if (only && kind === 'node') {
+			var keeper = (incidentLinks[id] || []).map(linkById)
+				.filter(function (l) { return l && !onlyInThisScenario(l); })[0];
+			if (keeper) {
+				setNotice((pc.lpn_scenario_delete_blocked || '{id} is not deleted, because link {link} ends on it and also exists outside {scenario}. To delete both, delete them in the {base} scenario.')
+					.split('{id}').join(id).split('{link}').join(keeper.id)
+					.split('{scenario}').join(scenarioDisplayName(here))
+					.split('{base}').join(scenarioDisplayName(baseScenario())));
+				return;
+			}
 		}
 		// The element itself, plus -- for a node -- every link the cascade is about to take with it.
 		// Built as KEYS rather than ids, because those incident ones are links whatever `kind` is.
@@ -33427,6 +33466,11 @@ var EngCalcs = EngCalcs || {};
 		}
 		var lost = 0;
 		keys.forEach(function (k) { lost += overrideCountForElement(k); });
+		// A scenario-only asset's overrides in THIS scenario are what made it exist here (its `active`
+		// among them); deleting it is the request, so only the other scenarios' values are a loss.
+		if (only) {
+			keys.forEach(function (k) { if (here.overrides[k]) { lost -= Object.keys(here.overrides[k]).length; } });
+		}
 		function proceed() {
 			// Asked in the page's box (Task 710), so a multi-delete's later cascade may have taken this
 			// one while the question was open.
@@ -33436,6 +33480,10 @@ var EngCalcs = EngCalcs || {};
 			else if (kind === 'label') { deleteLabelById(id); }
 			else { deleteLink(id); }
 			refreshScenarioStatus();
+			if (only) {
+				setNotice((pc.lpn_scenario_only_deleted || '{id} is deleted. It was part of {scenario} only.')
+					.replace('{id}', id).replace('{scenario}', scenarioDisplayName(here)));
+			}
 		}
 		if (!lost) { proceed(); return; }
 		askDialog({ kind: 'confirm', text: (pc.lpn_delete_drops_overrides || 'Deleting this asset also deletes {n} scenario overrides for it. Continue?').replace('{n}', lost) }, function (yes) {
@@ -36327,6 +36375,10 @@ var EngCalcs = EngCalcs || {};
 		// basemapFilter is the pre-release name of the field.
 		if (savedSettings.basemapStyle === undefined) { savedSettings.basemapStyle = savedSettings.basemapFilter || 'normal'; }
 		delete savedSettings.basemapFilter;
+		// A file saved without the symbol-cap pair (every shipped example) was drawn under the old
+		// rule, 0.5 x the 20th-percentile pipe; only a NEW project gets 0.25 x the median.
+		if (savedSettings.symbolCapMultiple === undefined) { savedSettings.symbolCapMultiple = 0.5; }
+		if (savedSettings.symbolCapPercentile === undefined) { savedSettings.symbolCapPercentile = 20; }
 		settings = Object.assign(defaultSettings(), savedSettings);
 		// **A PROJECT SAVED BEFORE `Quality` WAS INTERPRETED STILL CARRIES ONLY THE TOKEN**, and it
 		// must not come back as "no analysis": it would then export a file missing a line its source
@@ -37052,6 +37104,18 @@ var EngCalcs = EngCalcs || {};
 	// the writer -- which scenario's numbers, which positions, how big a label is -- can be asserted
 	// without a download; dev/lpn-spike/node-coord-entry-harness.js drives it. A writer handed
 	// options it did not get from here would be right only by accident.
+	function exportReferenceScale() {
+		var x1 = Infinity, x2 = -Infinity, y1 = Infinity, y2 = -Infinity, dx, dy, s = Infinity;
+		doc.nodes.forEach(function (n) {
+			var p = nodeAt(n);
+			if (!isFinite(p.x) || !isFinite(p.y)) { return; }
+			x1 = Math.min(x1, p.x); x2 = Math.max(x2, p.x); y1 = Math.min(y1, p.y); y2 = Math.max(y2, p.y);
+		});
+		dx = x2 - x1; dy = y2 - y1;
+		if (dx > 0) { s = Math.min(s, 1000 / dx); }
+		if (dy > 0) { s = Math.min(s, 700 / dy); }
+		return isFinite(s) && s > 0 ? s : (state.s || 1);
+	}
 	function inpExportOptions() {
 		return {
 			// The scenario the user is looking at, through the one resolver -- so an export from
@@ -37080,9 +37144,23 @@ var EngCalcs = EngCalcs || {};
 			times: scenarioTimesForExport(),
 			// A label's box, so its centre anchor can be shifted to the upper-left corner EPANET
 			// means by a [LABELS] point. Measured, never assumed: see reanchorImportedLabels().
+			// **MEASURED AT A SCALE THE DOCUMENT FIXES, NEVER THE ONE ON SCREEN.** A Text is lettered
+			// at a pixel size, so its width in map units is pixels over the zoom; read at the live
+			// zoom, the same untouched Text exported a different [LABELS] x after every reload or
+			// resize. The width is taken from a fresh element at the nominal font size and divided by
+			// the scale that fits the drawn nodes into a 1000 x 700 px reference window, a number the
+			// drawing alone decides. (A Text imported from an .inp is left/top and never reaches here.)
 			labelSize: function (lb) {
-				var le = labelEls[lb.id];
-				return le ? { w: textLabelWidth(le), h: textLabelHeight(lb) } : null;
+				var le = labelEls[lb.id], sRef = exportReferenceScale(), probe, wpx = 0;
+				if (!le) { return null; }
+				try {
+					probe = el('text', { x: 0, y: 0, 'class': 'lpn-lbl',
+						style: 'font-size:' + (settings.textSize * (lb.sizeMult || 1)) + 'px;font-weight:' + textLabelWeight(lb) }, labelsLayer);
+					setTextLabelContent(probe, lb, 0);
+					wpx = probe.getBBox().width;
+					labelsLayer.removeChild(probe);
+				} catch (err) { return { w: textLabelWidth(le), h: textLabelHeight(lb) }; }
+				return { w: wpx / sRef, h: settings.textSize * (lb.sizeMult || 1) / sRef * 1.2 * textLabelLines(lb).length };
 			}
 		};
 	}

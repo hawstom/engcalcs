@@ -1741,6 +1741,9 @@
         "lpn_scenario_override_tip": "Selected means this scenario overrides its parent for this value, even when the number is the same. Clear the box to use its parent's.",
         "lpn_scenario_base_value": "Base scenario: {value}",
         "lpn_scenario_deactivated": "{id} is excluded from the network in {scenario}. It remains in the drawing and in the other scenarios.",
+        "lpn_scenario_delete_in_base": "To remove it from the drawing, delete it in the {base} scenario.",
+        "lpn_scenario_only_deleted": "{id} is deleted. It was part of {scenario} only.",
+        "lpn_scenario_delete_blocked": "{id} is not deleted, because link {link} ends on it and also exists outside {scenario}. To delete both, delete them in the {base} scenario.",
         "lpn_scenario_push_btn": "Apply Base values to all scenarios",
         "lpn_scenario_push_tip": "Every scenario goes back to the Base value for the properties whose labels are showing right now. Values entered for them in any scenario are discarded.",
         "lpn_scenario_basic": "Basic mode",
@@ -2555,7 +2558,7 @@
         "lpn_snip_tip_redo": "Redo (Ctrl+Y)",
         "lpn_screenshot_scale_tip": "The picture's size as a multiple of the area on the screen. A larger one is sharper and makes a bigger file."
     },
-    "count": 2553,
+    "count": 2556,
     "active_prefixes": [
         "about",
         "bpn",
