@@ -449,6 +449,32 @@ async function main() {
 			ok('no uncaught page errors on the Spanish page', b.errors.length === 0, b.errors.slice(0, 2).join(' | '));
 			await b.close();
 		}
+
+		console.log('\n--- 11. a phone in tall mode: taps draw, a tap on the last point finishes ---');
+		{
+			const c = await Session.open(browser, NAME + '-phone', { viewport: { width: 412, height: 860 }, hasTouch: true, isMobile: true });
+			await c.page.route(/tile\.openstreetmap\.org|api\.mapbox\.com|nominatim/, (route) => route.abort());
+			await c.goto('Looped-Network.php');
+			await c.answerTrainingPanel().catch(() => {});
+			await c.page.evaluate(() => { const k = document.getElementById('ec-consent'); if (k) { k.remove(); } delete window.lpnDialogAnswerer; });
+			await c.settle(1000);
+			await c.openExampleCard(await c.lang('lpn_ex_net1_title'));
+			await c.settle(800);
+			const hc = helpers(c), T = c.page.touchscreen;
+			const q = {};
+			for (const id of ['21', '22', '31', '32']) { q[id] = await hc.nodeAt(id); }
+			const cx = (q['21'].x + q['22'].x) / 2, cy = (q['21'].y + q['31'].y) / 2, r = Math.min(Math.abs(q['22'].x - q['21'].x), Math.abs(q['31'].y - q['21'].y)) / 4;
+			// On a phone the toolbar keeps only the player; every tool is in Project > Insert.
+			await c.menuClickSub(await c.lang('lpn_menu_insert'), await c.lang('lpn_tool_add_shape'), 'project'); await hc.settle(250);
+			const taps = [{ x: cx - r, y: cy }, { x: cx, y: cy - r }, { x: cx + r, y: cy }];
+			for (const p of taps) { await T.tap(p.x, p.y); await hc.settle(250); }
+			await T.tap(taps[2].x, taps[2].y); await hc.settle(400);
+			const dp = await hc.stored();
+			ok('three taps and a tap on the last point make a three-point open Shape', (dp.shapes || []).length === 1 &&
+				dp.shapes[0].pts.length === 3 && dp.shapes[0].closed === false, JSON.stringify((dp.shapes || []).map((s) => [s.pts.length, s.closed])));
+			ok('no uncaught page errors on the phone', c.errors.length === 0, c.errors.slice(0, 2).join(' | '));
+			await c.close();
+		}
 	} finally {
 		await browser.close();
 		env.stopServer();
