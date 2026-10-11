@@ -101,7 +101,7 @@ lines rather than appending corrections.
 
 ## STATE — 2026-10-11 (thirteenth session, Arizona time)
 
-### Master = c827ca93 (suite running at handoff; push it when green). Production: ask; About box
+### Master: see `git log -1 origin/master`; every merge listed here passed check_all and is pushed. Production: ask; About box
 
 Merged 10-11 (his words in `dev/branch-all-clears.json`): feat/user-guide, feat/section-grid (777
 closed), feat/tank-volume (783 closed; column now "Available volume", his word), feat/snap (782 half),
@@ -117,8 +117,7 @@ lpn_settings_default_pattern_implied (master); lpn_sm_hint, lpn_guide_how_alt, l
 
 - **feat/bentley-interop** (44a81de6, 8116): round 4. "?" tip = his sentence + the old footer + what a new
   scenario does (creates no alternatives; first edit is an override in its own values). Chevrons, tree
-  keys, icons, one command list (`smCommands()`). Full suite was running at handoff
-  (`/tmp/ca-bentley-44a8.log`). OPEN, his question: an alert that creates an alternative on a scenario's
+  keys, icons, one command list (`smCommands()`). Suite green but payload freshness. OPEN, his question: an alert that creates an alternative on a scenario's
   first edit. Builder's estimate 2-3 days; 8 design questions in the 10-11 transcript and below. Perry
   should-fix: greyed Rename/Make current carry no tip (only Delete does).
 - **feat/match-property** (2aeaaaf7, 8117): targets first (his "object/verb"), then Match properties, then the
@@ -126,14 +125,16 @@ lpn_settings_default_pattern_implied (master); lpn_sm_hint, lpn_guide_how_alt, l
   and skipped ("Not copied: Elevation. A scenario cannot hold its own value for these; change them in
   Base."). Suite green but payload freshness. The map right-click menu is `openMapContextMenu(x, y, rows)`:
   Task 784's "Time series graph" row is one entry.
-- **feat/shape** (Task 779, cut from feat/snap): built, Perry: not blocking; builder fixing A-E (imported
-  names lost, plurals, area select, one undo for mixed delete, short hint) and merging master at handoff.
-  Then Perry glance, preview port (lowest free 8101-8139), his pass. Decisions for him: no Properties /
-  Tables / Find for Shapes; one purple style; clockwise polygons reversed on GeoJSON export; DXF colour 6
-  shared with pumps; Shapes are in no scenario (a move in Peak moves it everywhere); an older build opening a
-  file with Shapes drops them silently on save.
-- **fix/scenario-delete** (defect he hit on feat/snap: a junction added in Scenario 1 cannot be deleted
-  anywhere): builder running at handoff; merges on green. Its report says what bentley-interop must carry.
+- **feat/shape** (2b5cf162, 8108; Task 779): Perry's A-E fixed (imported names kept, singulars, area select,
+  one undo for a mixed delete, short hint); ready for his pass. Decisions for him: no Properties / Tables /
+  Find for Shapes; one purple style; clockwise polygons reversed on GeoJSON export; DXF colour 6 shared with
+  pumps; Shapes are in no scenario (a move in Peak moves it everywhere); an older build drops Shapes silently
+  on save (a storage-version bump would make old builds refuse instead: his call).
+- **fix/scenario-delete** MERGED 10-11 (his defect on feat/snap): an asset inactive in Base and every other
+  scenario is "only in this scenario" and deleting it there deletes it ("J1 is deleted. It was part of
+  Scenario 1 only."); a Base link onto it blocks with a sentence. Edge: a Base asset unticked in Base and on
+  in one scenario now counts as scenario-only too. bentley-interop must carry `onlyInThisScenario()` through
+  alternatives (a shared topology alternative).
 - **feat/visit-dedupe** (e22c4ec9, 8119): his consent synonyms written (his words, 10-11). He said "Merge
   unless there were questions awaiting my input" — none now. OWED before merge, his G01 call "Translate
   first": consent_body, consent_current_granted, consent_region_label in 26 languages (Sonnet, one agent per
@@ -164,7 +165,7 @@ lpn_settings_default_pattern_implied (master); lpn_sm_hint, lpn_guide_how_alt, l
 
 ### Next job
 
-Push master when `/tmp/ca-master-c827.log` ends EXIT=0. Finish feat/shape and fix/scenario-delete. Run the
+Run the
 visit-dedupe consent translation, then merge it. Then a delta sprint (Wave 0 first; see
 dev/translation-process.md). Then Task 786 (an SI example: convert Net1, then Mini C-Town with attribution).
 
