@@ -72828,23 +72828,24 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// child, Left collapses an open one or moves to its parent (the two swap on a right-to-left
 	// page); Enter makes a scenario current, F2 renames, Delete deletes.
 	function smKeydown(e) {
-		var tree = smState.tree, rows = smVisibleRows(tree), i = -1, k = e.key, r, rtl, t, go = null;
+		var tree = smState.tree, rows = smVisibleRows(tree), i = -1, press = e.key, r, rtl, t, go = null;
 		rows.forEach(function (row, n) { if (row.key === smState.sel) { i = n; } });
 		r = i >= 0 ? rows[i] : null;
 		rtl = (document.documentElement.getAttribute('dir') || '').toLowerCase() === 'rtl';
-		if (rtl && k === 'ArrowRight') { k = 'ArrowLeft'; } else if (rtl && k === 'ArrowLeft') { k = 'ArrowRight'; }
-		if (k === 'ArrowDown' || k === 'ArrowUp') {
-			go = rows[Math.max(0, Math.min(rows.length - 1, i + (k === 'ArrowDown' ? 1 : -1)))];
-		} else if (k === 'Home') {
+		// On a right-to-left page the two horizontal arrows trade meanings.
+		if (rtl && press === 'ArrowRight') { press = 'ArrowLeft'; } else if (rtl && press === 'ArrowLeft') { press = 'ArrowRight'; }
+		if (press === 'ArrowDown' || press === 'ArrowUp') {
+			go = rows[Math.max(0, Math.min(rows.length - 1, i + (press === 'ArrowDown' ? 1 : -1)))];
+		} else if (press === 'Home') {
 			go = rows[0];
-		} else if (k === 'End') {
+		} else if (press === 'End') {
 			go = rows[rows.length - 1];
-		} else if (k === 'ArrowRight') {
+		} else if (press === 'ArrowRight') {
 			if (!r) { go = rows[0]; }
 			else if (r.hasKids && smIsCollapsed(tree, r.key)) { if (e.preventDefault) { e.preventDefault(); } smToggle(r.key, true); return; }
 			else if (r.hasKids) { go = rows[i + 1]; }
 			else { if (e.preventDefault) { e.preventDefault(); } return; }
-		} else if (k === 'ArrowLeft') {
+		} else if (press === 'ArrowLeft') {
 			if (!r) { go = rows[0]; }
 			else if (r.hasKids && !smIsCollapsed(tree, r.key)) { if (e.preventDefault) { e.preventDefault(); } smToggle(r.key, false); return; }
 			else {
@@ -72852,16 +72853,16 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				go = t === null || t === undefined ? null : rows.filter(function (x) { return x.key === t; })[0];
 				if (!go) { if (e.preventDefault) { e.preventDefault(); } return; }
 			}
-		} else if (k === 'F2') {
+		} else if (press === 'F2') {
 			if (e.preventDefault) { e.preventDefault(); }
 			if (smState.sel !== null) { smStartRename(smState.sel); }
 			return;
-		} else if (k === 'Delete') {
+		} else if (press === 'Delete') {
 			if (e.preventDefault) { e.preventDefault(); }
 			if (e.stopPropagation) { e.stopPropagation(); }
 			smActDelete(smState.sel);
 			return;
-		} else if (k === 'Enter') {
+		} else if (press === 'Enter') {
 			if (e.preventDefault) { e.preventDefault(); }
 			smActCurrent(smState.sel);
 			return;
