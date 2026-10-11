@@ -496,7 +496,7 @@ const FIXTURE = [
 	// is that the ghost name reaches the reader AND that the sentence shown is the unstated one
 	// rather than its sibling lpn_pump_effic_global, which is about a pump that names no curve at
 	// all. Those two are told apart by whether a name is offered, so asserting both halves pins it.
-	check(/GHOST/.test(ghostText) && !/no efficiency curve selected/.test(ghostText),
+	check(/GHOST/.test(ghostText) && !/no efficiency curve chosen/.test(ghostText),
 		`a curve named but not stated is disclosed by name, and not confused with naming none: ${/This pump[^]{0,120}/.exec(ghostText)}`);
 	chainPump._efficCurveId = keptName;
 
