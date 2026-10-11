@@ -32915,7 +32915,7 @@ var EngCalcs = EngCalcs || {};
 			setNotice((pc.lpn_scenario_deactivated || '{id} is excluded from the network in {scenario}. It remains in the drawing and in the other scenarios.')
 				.replace('{id}', id).replace('{scenario}', scenarioDisplayName(here)) + ' ' +
 				(pc.lpn_scenario_delete_in_base || 'To remove it from the drawing, delete it in the {base} scenario.')
-				.replace('{base}', scenarioDisplayName(baseScenario())));
+				.split('{base}').join(scenarioDisplayName(baseScenario())));
 			return;
 		}
 		// **A SCENARIO-ONLY NODE NEVER TAKES A LINK THAT EXISTS OUTSIDE THIS SCENARIO WITH IT.** The
@@ -32925,8 +32925,9 @@ var EngCalcs = EngCalcs || {};
 			var keeper = (incidentLinks[id] || []).map(linkById)
 				.filter(function (l) { return l && !onlyInThisScenario(l); })[0];
 			if (keeper) {
-				setNotice((pc.lpn_scenario_delete_blocked || '{id} is not deleted. Link {link} ends on it and is also part of {base} or another scenario. To delete both, delete {id} in the {base} scenario.')
-					.split('{id}').join(id).replace('{link}', keeper.id)
+				setNotice((pc.lpn_scenario_delete_blocked || '{id} is not deleted, because link {link} ends on it and also exists outside {scenario}. To delete both, delete them in the {base} scenario.')
+					.split('{id}').join(id).split('{link}').join(keeper.id)
+					.split('{scenario}').join(scenarioDisplayName(here))
 					.split('{base}').join(scenarioDisplayName(baseScenario())));
 				return;
 			}

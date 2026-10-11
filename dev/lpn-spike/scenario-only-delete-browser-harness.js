@@ -281,8 +281,8 @@ async function main() {
 		await P.keyboard.press('Delete');
 		await wait();
 		doc = await stored();
-		const blocked = (await L('lpn_scenario_delete_blocked')).split('{id}').join(j2).replace('{link}', basePipe)
-			.split('{base}').join(await L('lpn_scenario_base'));
+		const blocked = (await L('lpn_scenario_delete_blocked')).split('{id}').join(j2).split('{link}').join(basePipe)
+			.split('{scenario}').join(scn1(doc).name).split('{base}').join(await L('lpn_scenario_base'));
 		ok('Delete in Scenario 1 is refused, naming the Base pipe', hasNode(doc, j2) && hasLink(doc, basePipe)
 			&& (await a.notice()).indexOf(blocked) >= 0, await a.notice());
 
