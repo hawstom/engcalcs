@@ -37370,12 +37370,11 @@ var EngCalcs = EngCalcs || {};
 				['ID', c.id], ['DEMAND', dxfVal(c, 'demand')], ['COUNT', dxfVal(c, 'count')],
 				['TAG', c.tag || ''], ['DESC', c.desc || '']]) });
 		});
-		// **THE LAYER NAMES**: js/lpn-dxf.js's one prefix, the project's own ID prefixes as asset
-		// codes, and the scenario on screen as the alternative (BASE for Base). The whole network
+		// **THE LAYER NAMES**: js/lpn-dxf.js's one prefix, its fixed asset codes (NODE, LINK, ...), and the scenario on screen as the alternative (BASE for Base). The whole network
 		// as that scenario has it is written; an overrides-only layer per alternative waits on
 		// Task 721, which owns the alternatives model.
 		var alternative = dxfAlternative(activeScenario()),
-			codes = EngCalcs.lpnDxfAssetCodes(settings.idPrefixes),
+			codes = EngCalcs.lpnDxfAssetCodes,
 			readme = [projectDisplayName(project), frame.note,
 				(pc.lpn_dxf_note_blocks || 'Layers are named {prefix}, the asset code, a hyphen, and the alternative, as in {example}. Each element is a block inserted at scale 1 with attributes 1 unit high; scale the blocks to set the text height. Every attribute is visible; the attributes of one element are stacked in a column beside its symbol.')
 					.replace('{prefix}', EngCalcs.lpnDxfModelPrefix)
