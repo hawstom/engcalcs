@@ -4226,3 +4226,11 @@ OBSERVED (in Chromium, Net1/Net3/Elm, this tree; re-verify before citing):
 - EPS at 4:00: match resets display to time-0 values; a Tables edit does the same (pre-existing).
 - Right-click on node: no selection, no Properties; one-row menu. Document-level capture swallows ALL right-button presses on the canvas in Select mode (code).
 SPECULATION: touch long-press yields native menu only (pointerdown button is 0).
+
+# Perry journal: feat/snap c22988d5 (2026-10-11)
+OBSERVED: harness 42/42 passes. Split reach for node tools now 14 px (was ~6): ground within reach of a pipe 7-9% -> 14-20% of the network bbox (Elm St, Net1, Net3 at fit zoom).
+OBSERVED: dragging junction 31 onto junction 22 (same type) stacks exactly, glyph shown, no notice. Dragging a node onto the far end of its own pipe lands exactly on it (zero-length drawn pipe); own pipes excluded but not neighbour node.
+OBSERVED: .inp export after tank snapped on 22 writes identical "50.00 40.00". Scenario drag writes override {x:30,y:10}, Base untouched, undo clears it. Hover cost 0.1 ms/move extra on Net3 world (580 nodes).
+OBSERVED: in a scenario a junction pressed 9 px from pipe 10 is placed on the line, no split offer, no notice.
+OBSERVED: Spanish notice mixes English template with Spanish names (key untranslated).
+NOT CHECKED: touch, satellite glyph look, Recalc OFF (code path untouched), Alt vs OS shortcuts.
