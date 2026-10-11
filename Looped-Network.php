@@ -965,6 +965,9 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 		      // table! Yes!"). The pane generates one tab per row of paneTables(), so a Customer
 		      // table is a row in that list plus this host div, and nothing else. ?>
 		<div id="lpn_pane_customers" class="lpn-pane-panel lpn-pane-scroll" role="tabpanel" aria-labelledby="lpn_pane_tab_customers"></div>
+		<?php // The Shape table (Task 779; Tom, 2026-10-11: "I need to be able to paste shapes so that
+		      // I can import and export."). ?>
+		<div id="lpn_pane_shapes" class="lpn-pane-panel lpn-pane-scroll" role="tabpanel" aria-labelledby="lpn_pane_tab_shapes"></div>
 	</div>
 </div>
 <?php // position:fixed, not absolute: the popup is positioned from pointer-event clientX/clientY
@@ -1997,6 +2000,9 @@ EngCalcs.pageConfig = {
 	lpn_tool_add_meter_tip: <?=json_encode($ec_lang['lpn_tool_add_meter_tip'])?>,
 	lpn_mode_add_meter: <?=json_encode($ec_lang['lpn_mode_add_meter'])?>,
 	lpn_pane_tab_customers: <?=json_encode($ec_lang['lpn_pane_tab_customers'])?>,
+	lpn_pane_tab_shapes: <?=json_encode($ec_lang['lpn_pane_tab_shapes'])?>,
+	lpn_pane_shape_closed: <?=json_encode($ec_lang['lpn_pane_shape_closed'])?>,
+	lpn_pane_shape_points: <?=json_encode($ec_lang['lpn_pane_shape_points'])?>,
 	lpn_customer_heading: <?=json_encode($ec_lang['lpn_customer_heading'])?>,
 	lpn_field_meter_demand: <?=json_encode($ec_lang['lpn_field_meter_demand'])?>,
 	lpn_field_meter_count: <?=json_encode($ec_lang['lpn_field_meter_count'])?>,
@@ -2064,6 +2070,7 @@ EngCalcs.pageConfig = {
 	lpn_pane_paste_text_no_position: <?=json_encode($ec_lang['lpn_pane_paste_text_no_position'])?>,
 	lpn_pane_paste_no_anchor: <?=json_encode($ec_lang['lpn_pane_paste_no_anchor'])?>,
 	lpn_pane_paste_customer_no_position: <?=json_encode($ec_lang['lpn_pane_paste_customer_no_position'])?>,
+	lpn_pane_paste_shape_no_points: <?=json_encode($ec_lang['lpn_pane_paste_shape_no_points'])?>,
 	lpn_pane_paste_no_customer_ref: <?=json_encode($ec_lang['lpn_pane_paste_no_customer_ref'])?>,
 	lpn_pane_paste_no_pipe: <?=json_encode($ec_lang['lpn_pane_paste_no_pipe'])?>,
 	lpn_pane_paste_no_customer_node: <?=json_encode($ec_lang['lpn_pane_paste_no_customer_node'])?>,

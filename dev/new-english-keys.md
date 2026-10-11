@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**101 still to read on master**, of 112 untranslated keys, of 2556 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**122 still to read on master**, of 133 untranslated keys, of 2577 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -175,7 +175,7 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   @@ NEEDS RULING
 
-## lpn_  (111, 100 to read @@ NEEDS RULING)
+## lpn_  (132, 121 to read @@ NEEDS RULING)
 
 - **`lpn_demand_pattern_constant`**
   > (constant)
@@ -255,12 +255,63 @@ never edits a synonym.
 - **`lpn_file_export_workspace_tip`**
   > Download a small file holding where your boxes sit, their sizes, which are open or docked, and your pane and column sizes, plus the display options of this page, such as which help bubbles and the hover card are shown. Your projects, project settings and cookies (language, consent, units) are not in it. Load it on another screen or browser with File, Import, Workspace.
   _Ruled 2026-10-09: Use proposed (Tom, calls page round 3)._
+- **`lpn_file_import_shapes`**
+  > Import GeoJSON shapes…
+  @@ NEEDS RULING
+- **`lpn_file_import_shapes_tip`**
+  > Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network from an EPANET file. The project must be georeferenced or state a coordinate system.
+  @@ NEEDS RULING
 - **`lpn_file_import_workspace`**
   > Workspace…
   @@ NEEDS RULING
 - **`lpn_file_import_workspace_tip`**
   > Apply a workspace file saved with File, Export, Workspace: box positions and sizes, docking, pane sizes and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched.
   _Ruled 2026-10-09: Use proposed (Tom, calls page round 3)._
+- **`lpn_geojson_import_done`**
+  > {n} Shapes imported from {file}.
+  @@ NEEDS RULING
+- **`lpn_geojson_import_done_one`**
+  > One Shape imported from {file}.
+  @@ NEEDS RULING
+- **`lpn_geojson_import_holes`**
+  > {n} polygon holes not imported. A Shape has one boundary.
+  @@ NEEDS RULING
+- **`lpn_geojson_import_holes_one`**
+  > One polygon hole not imported. A Shape has one boundary.
+  @@ NEEDS RULING
+- **`lpn_geojson_import_local`**
+  > GeoJSON positions are latitude and longitude, and this project has no place on the Earth to which they can be converted. Georeference it first with Map, World map, Attach, then import again.
+  @@ NEEDS RULING
+- **`lpn_geojson_import_parts`**
+  > {n} multipart features imported as one Shape for each part.
+  @@ NEEDS RULING
+- **`lpn_geojson_import_parts_one`**
+  > One multipart feature imported as one Shape for each part.
+  @@ NEEDS RULING
+- **`lpn_geojson_import_renamed`**
+  > {n} feature names cannot be Shape IDs and are kept with the Shapes: {list}.
+  @@ NEEDS RULING
+- **`lpn_geojson_import_renamed_one`**
+  > One feature name cannot be a Shape ID and is kept with the Shape: {list}.
+  @@ NEEDS RULING
+- **`lpn_geojson_import_skipped`**
+  > {n} features not imported: {list}.
+  @@ NEEDS RULING
+- **`lpn_geojson_import_skipped_one`**
+  > One feature not imported: {list}.
+  @@ NEEDS RULING
+- **`lpn_geojson_import_unreadable`**
+  > {file} is not a GeoJSON file: {detail}
+  @@ NEEDS RULING
+- **`lpn_geojson_import_why_geometry`**
+  > not a point, line, or polygon
+  @@ NEEDS RULING
+- **`lpn_geojson_import_why_network`**
+  > network asset
+  @@ NEEDS RULING
+- **`lpn_geojson_import_why_position`**
+  > position not a valid latitude and longitude
+  @@ NEEDS RULING
 - **`lpn_guide_about_heading`**
   > About this calculator
   @@ NEEDS RULING
@@ -420,6 +471,9 @@ never edits a synonym.
 - **`lpn_link_end_unknown`**
   > No node has the ID {id}.
   @@ NEEDS RULING
+- **`lpn_mode_add_shape`**
+  > Mode: Add Shape. Specify each point. Specify the last point again or press Enter to finish; specify the first point to close a polygon.
+  @@ NEEDS RULING
 - **`lpn_msglog_hidden`**
   > Hidden
   _Ruled 2026-10-08: Calls page 8 October: Use as written_
@@ -468,6 +522,9 @@ never edits a synonym.
 - **`lpn_snap_node_on_node`**
   > {new} placed at the location of {target}. The two nodes are not connected.
   @@ NEEDS RULING
+- **`lpn_snap_shape_point`**
+  > {shape}, point {n}
+  @@ NEEDS RULING
 - **`lpn_snap_vertex`**
   > {link}, vertex {n}
   @@ NEEDS RULING
@@ -485,6 +542,12 @@ never edits a synonym.
   @@ NEEDS RULING
 - **`lpn_status_hidden_tip`**
   > Show the hidden message on the map again.
+  @@ NEEDS RULING
+- **`lpn_tool_add_shape`**
+  > Shape
+  @@ NEEDS RULING
+- **`lpn_tool_add_shape_tip`**
+  > Draw a point, a polyline, or a polygon on the map. A Shape is annotation and is not part of the network. Specify each point, then specify the last point again, press Enter, or right-click to finish. Specify the first point again to close the Shape into a polygon.
   @@ NEEDS RULING
 - **`lpn_workspace_confirm`**
   > Replace this browser's workspace layout with the one in the file?
@@ -521,7 +584,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**132 still to read**, of 135 new keys across 13 unmerged branch(es).
+**111 still to read**, of 114 new keys across 11 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -531,8 +594,6 @@ Each branch carries the commit it was read at. This part is a SNAPSHOT and is no
 fresh by the build — a branch moves whenever anybody commits on it, and failing master's
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
-
-### chore/handoff-1011b (`e28ef88a`) — adds no English strings
 
 ### feat/bentley-interop (`44a81de6`) — 100 new, 100 to read @@ NEEDS RULING
 
@@ -897,72 +958,6 @@ build for that would be a gate nobody keeps. Refresh it with
   > Mode: Match properties. Select the asset to copy properties from. Status, identity, and location are not copied. Press Escape to cancel.
   @@ NEEDS RULING
 
-### feat/shape (`2b5cf162`) — 21 new, 21 to read @@ NEEDS RULING
+### feat/shape (`5d234758`) — adds no English strings
 
-- **`lpn_file_import_shapes`**
-  > Import GeoJSON shapes…
-  @@ NEEDS RULING
-- **`lpn_file_import_shapes_tip`**
-  > Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network from an EPANET file. The project must be georeferenced or state a coordinate system.
-  @@ NEEDS RULING
-- **`lpn_geojson_import_done`**
-  > {n} Shapes imported from {file}.
-  @@ NEEDS RULING
-- **`lpn_geojson_import_done_one`**
-  > One Shape imported from {file}.
-  @@ NEEDS RULING
-- **`lpn_geojson_import_holes`**
-  > {n} polygon holes not imported. A Shape has one boundary.
-  @@ NEEDS RULING
-- **`lpn_geojson_import_holes_one`**
-  > One polygon hole not imported. A Shape has one boundary.
-  @@ NEEDS RULING
-- **`lpn_geojson_import_local`**
-  > GeoJSON positions are latitude and longitude, and this project has no place on the Earth to which they can be converted. Georeference it first with Map, World map, Attach, then import again.
-  @@ NEEDS RULING
-- **`lpn_geojson_import_parts`**
-  > {n} multipart features imported as one Shape for each part.
-  @@ NEEDS RULING
-- **`lpn_geojson_import_parts_one`**
-  > One multipart feature imported as one Shape for each part.
-  @@ NEEDS RULING
-- **`lpn_geojson_import_renamed`**
-  > {n} feature names cannot be Shape IDs and are kept with the Shapes: {list}.
-  @@ NEEDS RULING
-- **`lpn_geojson_import_renamed_one`**
-  > One feature name cannot be a Shape ID and is kept with the Shape: {list}.
-  @@ NEEDS RULING
-- **`lpn_geojson_import_skipped`**
-  > {n} features not imported: {list}.
-  @@ NEEDS RULING
-- **`lpn_geojson_import_skipped_one`**
-  > One feature not imported: {list}.
-  @@ NEEDS RULING
-- **`lpn_geojson_import_unreadable`**
-  > {file} is not a GeoJSON file: {detail}
-  @@ NEEDS RULING
-- **`lpn_geojson_import_why_geometry`**
-  > not a point, line, or polygon
-  @@ NEEDS RULING
-- **`lpn_geojson_import_why_network`**
-  > network asset
-  @@ NEEDS RULING
-- **`lpn_geojson_import_why_position`**
-  > position not a valid latitude and longitude
-  @@ NEEDS RULING
-- **`lpn_mode_add_shape`**
-  > Mode: Add Shape. Specify each point. Specify the last point again or press Enter to finish; specify the first point to close a polygon.
-  @@ NEEDS RULING
-- **`lpn_snap_shape_point`**
-  > {shape}, point {n}
-  @@ NEEDS RULING
-- **`lpn_tool_add_shape`**
-  > Shape
-  @@ NEEDS RULING
-- **`lpn_tool_add_shape_tip`**
-  > Draw a point, a polyline, or a polygon on the map. A Shape is annotation and is not part of the network. Specify each point, then specify the last point again, press Enter, or right-click to finish. Specify the first point again to close the Shape into a polygon.
-  @@ NEEDS RULING
-
-### feat/visit-dedupe (`e22c4ec9`) — adds no English strings
-
-### fix/scenario-delete (`556cf46a`) — adds no English strings
+### feat/visit-dedupe (`f61e6013`) — adds no English strings

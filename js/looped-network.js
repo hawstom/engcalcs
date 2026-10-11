@@ -4320,6 +4320,9 @@ var EngCalcs = EngCalcs || {};
 		if (!el) { return 'node'; }
 		if (el.from !== undefined) { return 'link'; }
 		if (el._text !== undefined) { return 'label'; }
+		// A Shape (Task 779): points and no type. Asked only by the Tables pane, where a Shape row's
+		// ID cell is plain (it has no rename, as a Text and a Customer have none).
+		if (Array.isArray(el.pts) && el.type === undefined) { return 'shape'; }
 		return 'node';
 	}
 	// THE OVERRIDE MAP'S KEY, and it carries the element's GROUP because an id alone does not
@@ -7042,6 +7045,15 @@ var EngCalcs = EngCalcs || {};
 		var a = docShapesRead(), i;
 		for (i = 0; i < a.length; i++) { if (a[i].id === id) { return a[i]; } }
 		return null;
+	}
+	// The drawn extent of one Shape, or null for one with no points.
+	function shapeBox(s) {
+		var b = null;
+		(s && s.pts || []).forEach(function (p) {
+			b = b ? { x0: Math.min(b.x0, p.x), y0: Math.min(b.y0, p.y), x1: Math.max(b.x1, p.x), y1: Math.max(b.y1, p.y) }
+				: { x0: p.x, y0: p.y, x1: p.x, y1: p.y };
+		});
+		return b;
 	}
 	function shapeNoun(s) {
 		return String((EngCalcs.pageConfig || {}).lpn_tool_add_shape || 'Shape') + ' ' + (s ? s.id : '');
@@ -20459,6 +20471,7 @@ var EngCalcs = EngCalcs || {};
 			return { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
 		}
 		if (cand.group === 'customer') { return customerPoint(cand.el); }
+		if (cand.group === 'shape') { var sb = shapeBox(cand.el); return sb ? { x: (sb.x0 + sb.x1) / 2, y: (sb.y0 + sb.y1) / 2 } : null; }
 		return textLabelPoint(cand.el);
 	}
 	// **HOW MUCH OF THE DRAWING A RESULT NEEDS AROUND IT** (Tom, 2026-08-18: *"something like twice
@@ -20490,6 +20503,8 @@ var EngCalcs = EngCalcs || {};
 		// A customer borrows its own main's length, which is the neighbourhood a service belongs to:
 		// arriving at a meter and stopping shows you a dot on a pipe you cannot see the ends of. A
 		// detached one has no neighbourhood at all and returns 0.
+		// A Shape's own extent, so arriving at one shows the whole of it.
+		if (group === 'shape') { var shb = shapeBox(el); return shb ? Math.hypot(shb.x1 - shb.x0, shb.y1 - shb.y0) : 0; }
 		if (group === 'customer') {
 			var cLink = customerLink(el);
 			return cLink ? findContextLength('link', cLink) : 0;
@@ -20525,7 +20540,7 @@ var EngCalcs = EngCalcs || {};
 	function findGoTo(group, id) {
 		var el = group === 'node' ? nodeById(id)
 			: (group === 'link' ? linkById(id)
-			: (group === 'customer' ? customerById(id) : labelById(id))), p, v;
+			: (group === 'customer' ? customerById(id) : (group === 'shape' ? shapeById(id) : labelById(id)))), p, v;
 		if (!el) { return; }
 		// **A GO-TO NEVER REPLACES A SELECTION** (Tom, 2026-09-28; see setLocated()). Nothing
 		// selected: select it, as before. Something selected: leave the set alone and mark this one.
@@ -20544,7 +20559,7 @@ var EngCalcs = EngCalcs || {};
 		var refs = [], pts = [], box = null, pad, v, el, p;
 		(list || []).forEach(function (t) {
 			el = t.group === 'node' ? nodeById(t.id) : (t.group === 'link' ? linkById(t.id)
-				: (t.group === 'customer' ? customerById(t.id) : labelById(t.id)));
+				: (t.group === 'customer' ? customerById(t.id) : (t.group === 'shape' ? shapeById(t.id) : labelById(t.id))));
 			if (!el) { return; }
 			refs.push({ kind: t.group, id: t.id });
 			p = findPointOf({ group: t.group, el: el });
@@ -24585,6 +24600,74 @@ var EngCalcs = EngCalcs || {};
 			set: function (c, v) { setCustomerCoordAxis(c, slot, v); customerEdited(c); }
 		};
 	}
+	/**
+	 * **THE SHAPE TABLE'S COLUMNS** (Task 779), designed for the round trip Tom asked for (2026-10-11:
+	 * *"I need to be able to paste shapes so that I can import and export."*): ID, Description,
+	 * Closed and Points. Points is the pipe Vertices cell's own format -- `a/b|a/b|...`, in the
+	 * same axis order and with the same heading -- so one reader serves both and a sheet laid out
+	 * for one pastes into the other. A one-point Shape is one pair.
+	 *
+	 * **THE ID IS PLAIN**, as a Text's and a Customer's are: a Shape has no rename anywhere else.
+	 *
+	 * **A PASTED NUMBER COMES BACK OUT CHARACTER FOR CHARACTER** (Tom's use case: shapes from GIS
+	 * or CAD to place assets precisely by). Each point keeps the text it was pasted as in `tok`,
+	 * the channel an `.inp` coordinate uses, and shapePointText() hands it back while it still
+	 * reads as the stored number; a move retires it by itself.
+	 */
+	function paneShapeCols() {
+		var verts = paneColVerts();
+		return [
+			paneColId(),
+			paneColDesc(),
+			{ key: 'closed', label: 'lpn_pane_shape_closed', bool: true, em: 2,
+				get: function (s) { return !!s.closed; },
+				// A polygon needs three points; fewer stays open, as the Shape tool leaves it.
+				set: function (s, v) { s.closed = !!v && (s.pts || []).length >= 3; buildShapeEls(s); scheduleSave(); } },
+			{ key: 'verts', str: true, em: 12, noMulti: true, parse: paneParseShapePoints,
+				label: function () { return (EngCalcs.pageConfig || {}).lpn_pane_shape_points || 'Points'; },
+				unitText: verts.unitText,
+				get: function (s) {
+					return (s.pts || []).map(function (p) { return shapePointText(p, 1) + '/' + shapePointText(p, 2); }).join('|');
+				},
+				set: function (s, pts) {
+					s.pts = pts;
+					if (pts.length < 3) { s.closed = false; }
+					buildShapeEls(s);
+					scheduleSave();
+				} }
+		];
+	}
+	// One coordinate of a Shape point as the table shows it: the text it was pasted or read as,
+	// while that text still says the stored number, else the Vertices cell's own rendering.
+	function shapePointText(p, slot) {
+		var isY = coordSlotIsY(slot), t = p.tok ? p.tok[isY ? 'y' : 'x'] : undefined;
+		if (typeof t === 'string' && t !== '' && isFinite(+t) && (isY ? inwardY(+t) === p.y : inwardX(+t) === p.x)) { return t; }
+		return paneVertText(p, slot);
+	}
+	// The Points cell: the Vertices reader, then each point's own text kept beside its number.
+	// Never empty: a Shape with no points is not a Shape.
+	function paneParseShapePoints(t) {
+		var r, texts;
+		if (t === '') { return { ok: false }; }
+		r = paneParseVerts(t);
+		if (!r.ok || !r.v.length) { return { ok: false }; }
+		texts = t.indexOf('|') !== -1
+			? t.split('|').map(function (g) { return g.trim().split('/').map(function (x) { return x.trim(); }); })
+			: null;
+		if (!texts) {
+			texts = [];
+			t.split('/').map(function (x) { return x.trim(); }).forEach(function (x, i) {
+				if (i % 2) { texts[texts.length - 1].push(x); } else { texts.push([x]); }
+			});
+		}
+		r.v.forEach(function (p, i) {
+			// Both texts, always: the fallback rendering rounds to six decimals, so even a text
+			// that String() would reproduce is not safe to leave to it.
+			var a = texts[i][0], b = texts[i][1];
+			p.tok = { x: coordSlotIsY(1) ? b : a, y: coordSlotIsY(1) ? a : b };
+		});
+		return r;
+	}
 	function paneCustomerCols() {
 		var pc = EngCalcs.pageConfig || {};
 		return [
@@ -25080,6 +25163,14 @@ var EngCalcs = EngCalcs || {};
 				id: 'customers', panel: 'lpn_pane_customers', label: 'lpn_pane_tab_customers',
 				group: 'customer', type: 'customer',
 				cols: paneCustomerCols()
+			},
+			// **THE SHAPE TABLE** (Task 779; Tom, 2026-10-11: *"I see no Shapes table. I need to be
+			// able to paste shapes so that I can import and export."*). A Shape is in no scenario,
+			// so like Customers it has no scenario view; see paneShapeCols() for the columns.
+			{
+				id: 'shapes', panel: 'lpn_pane_shapes', label: 'lpn_pane_tab_shapes',
+				group: 'shape', type: 'shape',
+				cols: paneShapeCols()
 			}
 		].map(function (spec) {
 			// The per-type view state. On the SPEC, so six tables genuinely have six of everything
@@ -25296,6 +25387,7 @@ var EngCalcs = EngCalcs || {};
 		// of them (Tom, 2026-09-08). A customer is the same shape (Task 247).
 		if (spec.group === 'label') { return (doc.labels || []).slice(); }
 		if (spec.group === 'customer') { return (doc.customers || []).slice(); }
+		if (spec.group === 'shape') { return docShapesRead().slice(); }
 		return pool.filter(function (x) { return x.type === spec.type; });
 	}
 	// **THE ONE PLACE A ROW'S MEMBERSHIP IS DECIDED**, and so the one place an edit is noticed.
@@ -26082,7 +26174,8 @@ var EngCalcs = EngCalcs || {};
 		return x ? x.el.id + ' ' + scenarioDisplayName(x.scn) : (row ? row.id : '');
 	}
 	// A customer carries nothing a scenario can change (Task 247), so its table has no such view.
-	function paneScnAvailable(spec) { return spec.group !== 'customer'; }
+	// Nor does a Shape (Task 779): it is drawn once, for every scenario.
+	function paneScnAvailable(spec) { return spec.group !== 'customer' && spec.group !== 'shape'; }
 	function paneInScenario(scn, fn) {
 		var was = project.activeScenario;
 		if (!scn || scn.id === was) { return fn(); }
@@ -27991,7 +28084,7 @@ var EngCalcs = EngCalcs || {};
 	// (a node or a link) by ID in its own `anchor` column, exactly as a Pipe names its two nodes; a
 	// Customer names its serving pipe or node exactly the same way. Each refuses a row only when
 	// what it needs is not there yet, never because the TABLE cannot make the kind of thing at all.
-	function paneCanCreate(spec) { return !spec.scnRows && (spec.group === 'node' || spec.group === 'link' || spec.group === 'label' || spec.group === 'customer'); }
+	function paneCanCreate(spec) { return !spec.scnRows && (spec.group === 'node' || spec.group === 'link' || spec.group === 'label' || spec.group === 'customer' || spec.group === 'shape'); }
 	// **A HEADING ROW IS NOT A ROW.** Copying a whole table puts its headings on the clipboard
 	// (paneCopyTsv()), and a spreadsheet kept for this purpose has them too -- so a first line
 	// whose every filled cell is the heading of the column it lands on, with or without its unit,
@@ -28146,6 +28239,16 @@ var EngCalcs = EngCalcs || {};
 					}
 				}
 			}
+			// **A SHAPE IS ITS POINTS** (Task 779): a new row must state them, in the Points cell's
+			// own format, and the whole cell or nothing, exactly as a typed cell is read.
+			if (!err && spec.group === 'shape') {
+				if (!txt('verts')) {
+					err = panePasteSay('lpn_pane_paste_shape_no_points', 'Row {row}: a new Shape needs its Points.', row);
+				} else {
+					vp = paneParseShapePoints(txt('verts'));
+					if (!vp.ok) { err = bad('verts'); } else { plan.pts = vp.v; }
+				}
+			}
 			// Every other cell: blank keeps the default a drawn element is born with (spec §2), a
 			// result or identity cell is left to the solve and counted, and anything else must read
 			// as its column reads a typed value.
@@ -28197,6 +28300,10 @@ var EngCalcs = EngCalcs || {};
 				plan.anchorNode || plan.anchorLink ? 0 : inwardY(plan.yv),
 				plan.anchorNode || null, plan.anchorLink ? { link: plan.anchorLink, t: 0.5 } : null, plan.id);
 			if (el.anchorNode || el.anchorLink) { el.x = 0; el.y = 0; updateLabelGeometry(el.id); }
+		} else if (spec.group === 'shape') {
+			el = { id: plan.id, pts: plan.pts, closed: false };
+			addShapeToDoc(el);
+			buildShapeEls(el);
 		} else {
 			el = addCustomer(inwardX(plan.xv), inwardY(plan.yv),
 				plan.customerLink ? { link: plan.customerLink, t: plan.customerT } : null, plan.id);

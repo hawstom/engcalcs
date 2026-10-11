@@ -388,8 +388,8 @@ async function main() {
 			const dxf = await h.exportVia('lpn_file_export_item_dxf', 'latin1');
 			const ents = dxf ? dxfEntities(dxf) : [];
 			const layerOf = (e) => (e.g.find((p) => p[0] === '8') || [])[1];
-			const onShape = ents.filter((e) => layerOf(e) === 'C-WATR-MODL-S___-BASE');
-			ok('the DXF file has a Shape layer, C-WATR-MODL-S___-BASE', !!dxf && /C-WATR-MODL-S___-BASE/.test(dxf));
+			const onShape = ents.filter((e) => layerOf(e) === 'C-WATR-MODL-SHAP-BASE');
+			ok('the DXF file has a Shape layer, C-WATR-MODL-SHAP-BASE', !!dxf && /C-WATR-MODL-SHAP-BASE/.test(dxf));
 			ok('...holding one POINT', onShape.filter((e) => e.type === 'POINT').length === 1);
 			const polys = onShape.filter((e) => e.type === 'LWPOLYLINE').map((e) => (e.g.find((p) => p[0] === '70') || [])[1].trim());
 			ok('...and two LWPOLYLINEs, one closed (70 = 1) and one open (70 = 0)', polys.sort().join() === '0,1', polys.join());

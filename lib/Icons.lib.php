@@ -245,9 +245,11 @@ $ec_icons = array(
 	// the pipe and the next junction are dashed, square-ended because round caps would close the gaps.
 	'chain'      => '<circle cx="5.75" cy="5.75" r="4.25"/><path d="M8.8 8.8L15.2 15.2" stroke-dasharray="2.2 1.9" stroke-linecap="butt"/><circle cx="18.25" cy="18.25" r="4.25" stroke-dasharray="2.4 2" stroke-linecap="butt"/>',
 	'text'       => '<path d="M5 6h14"/><path d="M12 6v14"/><path d="M9 20h6"/>',
-	// **A SHAPE (Task 779): an open polyline of three legs with a square grip on each point**, so it
-	// reads as a drawn line and not as a pipe (whose icon ends in two bars) or as a polygon tool.
-	'shape'      => '<path d="M4.5 18.5L9 7.5L15 15L19.5 5.5"/><path d="M3 17h3v3H3zM7.5 6h3v3h-3zM13.5 13.5h3v3h-3zM18 4h3v3h-3z" stroke-width="1.5"/>',
+	// **A SHAPE (Task 779): an almost-closed pentagon, open on the right, and no vertex markers**
+	// (Tom, 2026-10-11: *"Use an open (almost closed) polygon instead, with no vertex markers."*), so it
+	// is not read as `vertices`, whose polyline carries square grips. Five plain strokes; the gap is
+	// on the right side, between the first point and the last.
+	'shape'      => '<path d="M20.5 9.5L12 3L3.5 9.5L6.5 20.5H17.5L19.3 13.9"/>',
 	// **A HOUSE, IN EIGHT STRAIGHT LINES** (Tom, 2026-09-18: *"Let's go with a very simple 8-line
 	// house icon. Much easier and more recognizeable."*, with his own sketch in
 	// dev/icon-preview/tgh-icon-concepts.png). Two roof slopes, two walls, a floor and three sides

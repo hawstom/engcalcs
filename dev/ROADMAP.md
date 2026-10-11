@@ -83,6 +83,8 @@ the block.
   'Shape', and we can export or import to and from points, polylines, and polygons.) and the
   ability to snap or magnet to shape points."* Seams: DXF (Task 772), GeoJSON, survey points.
   Tom, 2026-10-09: a one-point Shape is drawn as an ×, and the task is Next (calls page H12).
+  Tom, 2026-10-11: a Shapes table for paste import and export; shapefile and DXF import next.
+  Notes: `dev/shapes.md`.
 - 100|781| **Active topology first; then Change type becomes a new asset in the old one's place.**
   Tom, 2026-10-08, choosing "Active topology first": *"I never wanted what we have anyway. Now that
   I understand, I want it changed. Change type is to be make a new object at the location of the old

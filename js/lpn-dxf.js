@@ -53,8 +53,8 @@
 	// only (a hyphen would split the code from the alternative), padded with underscores to four
 	// characters as Tom's "J___" is. These are the built-in prefixes (settings.idPrefixes in
 	// js/looped-network.js), used where the project's are empty or two types would share a code.
-	var TYPE_KEY = { junction: 'J', reservoir: 'R', tank: 'T', pipe: 'L', pump: 'P', valve: 'V', customer: 'M', shape: 'S' };
-	var DEFAULT_PREFIX = { J: 'J', R: 'R', T: 'T', L: 'L', P: 'P', V: 'V', M: 'C', S: 'S' };
+	var TYPE_KEY = { junction: 'J', reservoir: 'R', tank: 'T', pipe: 'L', pump: 'P', valve: 'V', customer: 'M' };
+	var DEFAULT_PREFIX = { J: 'J', R: 'R', T: 'T', L: 'L', P: 'P', V: 'V', M: 'C' };
 	// Layer order and ACI colours (1-9 only, so every program shows the same colour). Never 5, blue,
 	// which is unreadable on a dark screen (Tom, 2026-10-07: choose among 1, 2, 3, 4, 6 and 7); the
 	// pipe is yellow (2) because cyan (4) is the junction's; the customer is white (7; Tom,
@@ -76,26 +76,18 @@
 	}
 	/** settings.idPrefixes -> { junction: 'J___', ... }, the built-in set if any is empty or shared. */
 	function assetCodes(idPrefixes) {
-		var out = {}, seen = {}, clash = false, sc;
+		var out = {}, seen = {}, clash = false;
 		Object.keys(TYPE_KEY).forEach(function (t) {
-			if (t === 'shape') { return; }
 			var c = codeOf((idPrefixes || {})[TYPE_KEY[t]]);
 			if (!c || seen[c]) { clash = true; }
 			seen[c] = true; out[t] = c;
 		});
 		if (clash) {
-			seen = {};
-			Object.keys(TYPE_KEY).forEach(function (t) {
-				if (t !== 'shape') { out[t] = codeOf(DEFAULT_PREFIX[TYPE_KEY[t]]); seen[out[t]] = true; }
-			});
+			Object.keys(TYPE_KEY).forEach(function (t) { out[t] = codeOf(DEFAULT_PREFIX[TYPE_KEY[t]]); });
 		}
-		// **THE SHAPE'S CODE NEVER MOVES THE OTHERS** (Task 779): a project saved before Shapes
-		// existed states no S prefix, and that must not send every asset to the built-in codes. Its
-		// own prefix if free, else S___, else SHAP.
-		sc = codeOf((idPrefixes || {}).S);
-		if (!sc || seen[sc]) { sc = codeOf(DEFAULT_PREFIX.S); }
-		if (seen[sc]) { sc = 'SHAP'; }
-		out.shape = sc;
+		// **THE SHAPE'S CODE IS FIXED: SHAP** (Tom, 2026-10-11, with NODE, LINK, RESV, TANK, PUMP,
+		// VALV). It never comes from a prefix, so it never moves the others' codes.
+		out.shape = 'SHAP';
 		return out;
 	}
 	/**

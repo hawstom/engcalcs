@@ -33,9 +33,9 @@ exports.title = '17. Bottom pane: the asset tables';
 // **TEXT JOINED THE STRIP ON 2026-09-08 (Task 266) and is a TABLE like the other six.** A Text
 // object is our name for what EPANET calls a Label, and it now has a pane table of its own, sitting
 // seventh — after the six asset types, before the odd one out. Eight tabs then, seven of them tables.
-// Twelve since 2026-10-04: Customers sits after Text (a table, the customer branch), and the four graph
+// Thirteen since 2026-10-11: Customers sits after Text, then Shapes (Task 779), and the four graph
 // tabs follow in the Graphs menu's order (fix/graphs-order): Time series, Profile, Frequency, Flow balance.
-const TABS = ['junctions', 'reservoirs', 'tanks', 'pipes', 'pumps', 'valves', 'text', 'customers',
+const TABS = ['junctions', 'reservoirs', 'tanks', 'pipes', 'pumps', 'valves', 'text', 'customers', 'shapes',
 	'timeseries', 'profile', 'frequency', 'sysflow'];
 // The tab labels BY KEY, in the same order, so a rewording of any of them moves both ends at once
 // rather than turning this spec red -- dev/session-handoff.md section 4. Read off the pane's own specs in
@@ -43,13 +43,13 @@ const TABS = ['junctions', 'reservoirs', 'tanks', 'pipes', 'pumps', 'valves', 't
 // `lpn_pane_tab_*` key, and the graph tabs borrow their Graphs menu rows.
 const TAB_LABEL_KEYS = ['lpn_pane_tab_junctions', 'lpn_pane_tab_reservoirs', 'lpn_pane_tab_tanks',
 	'lpn_pane_tab_pipes', 'lpn_pane_tab_pumps', 'lpn_pane_tab_valves', 'lpn_tool_add_text',
-	'lpn_pane_tab_customers', 'lpn_ts_menu', 'lpn_profile_menu', 'lpn_freq_menu', 'lpn_sysflow_menu'];
+	'lpn_pane_tab_customers', 'lpn_pane_tab_shapes', 'lpn_ts_menu', 'lpn_profile_menu', 'lpn_freq_menu', 'lpn_sysflow_menu'];
 // The ones that are tables (they share the one tip); the four graphs are drawings. Named rather than
 // sliced at each use, so "which tabs share the one tip" is stated once.
-const TABLE_TABS = TABS.slice(0, 8);
+const TABLE_TABS = TABS.slice(0, 9);
 // What Elm Street Center holds. Read off the example file, not off the page, so a table that
 // listed every element would fail rather than agree with itself. `text` is its 11 `labels`.
-const ROWS = { junctions: 17, reservoirs: 1, tanks: 0, pipes: 16, pumps: 1, valves: 2, text: 11, customers: 0 };
+const ROWS = { junctions: 17, reservoirs: 1, tanks: 0, pipes: 16, pumps: 1, valves: 2, text: 11, customers: 0, shapes: 0 };
 
 // The strip as the user sees it: the tab buttons in order, and which panel is showing.
 async function strip(page) {

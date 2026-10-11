@@ -801,6 +801,12 @@ $ec_lang['lpn_tool_add_meter']='Customer';
 $ec_lang['lpn_tool_add_meter_tip']='Specify the customer point, then its connection: a link or node. The demand you give the customer is added to the node at the nearest end of that link.';
 $ec_lang['lpn_mode_add_meter']='Customer: specify where the customer is, then select the pipe or the node that serves it. Or use Esc to cancel.';
 $ec_lang['lpn_pane_tab_customers']='Customers';
+// The Shape table (Task 779). Closed is a polygon's closure, not a pipe's or valve's status, so it
+// is a key of its own and not lpn_field_closed: many languages use different words for the two.
+// Points is the column of the Shape's points, "Shape S1, point 2" in lpn_snap_shape_point.
+$ec_lang['lpn_pane_tab_shapes']='Shapes';
+$ec_lang['lpn_pane_shape_closed']='Closed';
+$ec_lang['lpn_pane_shape_points']='Points';
 $ec_lang['lpn_customer_heading']='Customer {id}';
 // ROADMAP Task 247. lpn_field_account and lpn_field_account_tip were DELETED 2026-09-19 (Tom:
 // "Didn't I say to trash Account number since they can just make a Custom property for that or
@@ -909,6 +915,7 @@ $ec_lang['lpn_pane_paste_text_no_position']='Row {row}: a new Text needs both {f
 // {id} is what the Text table's own Attached to cell named.
 $ec_lang['lpn_pane_paste_no_anchor']='Row {row}: {id} is not a node or a pipe in this network yet. Paste it first, then this Text.';
 $ec_lang['lpn_pane_paste_customer_no_position']='Row {row}: a new Customer needs both {first} and {second}.';
+$ec_lang['lpn_pane_paste_shape_no_points']='Row {row}: a new Shape needs its Points.';
 $ec_lang['lpn_pane_paste_no_customer_ref']='Row {row}: a new Customer needs a connected pipe or node.';
 $ec_lang['lpn_pane_paste_no_pipe']='Row {row}: pipe {id} does not exist yet. Paste your pipes first, then your customers.';
 $ec_lang['lpn_pane_paste_no_customer_node']='Row {row}: node {id} does not exist yet. Paste your junctions first, then your customers.';
