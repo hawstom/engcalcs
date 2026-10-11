@@ -6937,6 +6937,8 @@ var EngCalcs = EngCalcs || {};
 	// (`tok.x/y`) and geographic source record (`_xsrc/_ysrc`), so a snapped point is written back
 	// to the character as the target's own. `opts.exclude` = {nodes: {id: true}, links: {id: true}}
 	// is what a drag must not snap to (itself and what moves with it); a provider honours it.
+	// `opts.onLink`, when present, limits the pipe-line source to that one link id (or to none,
+	// when it is null): a node tool's line magnet is only the pipe the press is ON.
 	//
 	// So Task 779's Shape vertices are one call: addSnapProvider(snapProviderShapeVertices), with a
 	// provider shaped like snapProviderVertices() below.
@@ -6990,6 +6992,7 @@ var EngCalcs = EngCalcs || {};
 		for (i = 0; i < doc.links.length; i++) {
 			l = doc.links[i];
 			if (l.type !== 'pipe' || !linkEls[l.id] || snapExcluded(opts, 'links', l.id)) { continue; }
+			if (opts && opts.onLink !== undefined && opts.onLink !== l.id) { continue; }
 			if (!nodeById(l.from) || !nodeById(l.to)) { continue; }
 			hit = Geom.nearestFractionOnPolyline(linkPointList(l), wx, wy);
 			if (!(hit.dist <= tolW) || hit.f <= 1e-9 || hit.f >= 1 - 1e-9) { continue; }
@@ -7083,10 +7086,22 @@ var EngCalcs = EngCalcs || {};
 	};
 	// What a press in this mode, at this point, would snap to. Null with Alt held (the bare
 	// pointer), in a mode that does not snap, and when nothing is in reach.
+	//
+	// **A NODE TOOL'S LINE MAGNET IS THE PIPE'S OWN HIT BAND, NOT THE NODE REACH** (Perry's review of
+	// Task 782): at 14/24 px the "Split pipe?" question covered twice the map it did on master. So the
+	// line candidate is only the pipe the browser's hit test puts the press ON (tapLinkId(), the test
+	// that decided "on the pipe" before the magnet), and node and bend targets keep the full reach.
+	// **AND IN A SCENARIO A NODE TOOL MAGNETS TO NODES ONLY**: a scenario cannot split a pipe, so a
+	// node put on a line or bend there would look connected and be offered nothing.
 	function toolSnapAt(e) {
-		var kinds = SNAP_KINDS_BY_MODE[mode];
+		var kinds = SNAP_KINDS_BY_MODE[mode], opts;
 		if (!kinds || (e && e.altKey)) { return null; }
-		return snapAtScreen(e.clientX, e.clientY, reachPx(e), { kinds: kinds });
+		opts = { kinds: kinds };
+		if (mode === 'add-junction' || mode === 'add-reservoir' || mode === 'add-tank') {
+			if (!inBaseScenario()) { opts.kinds = { node: true }; }
+			else { opts.onLink = tapLinkId(mapHitAt(e.clientX, e.clientY)); }
+		}
+		return snapAtScreen(e.clientX, e.clientY, reachPx(e), opts);
 	}
 	// What a dragged node or bend snaps to: the same three sources, less the thing being dragged and
 	// what moves with it (a node's own pipes; a bend's own pipe and its two end nodes), since a node
@@ -7095,7 +7110,13 @@ var EngCalcs = EngCalcs || {};
 		var ex = { nodes: {}, links: {} }, l;
 		if (dr.type === 'node') {
 			ex.nodes[dr.id] = true;
-			(incidentLinks[dr.id] || []).forEach(function (lid) { ex.links[lid] = true; });
+			// ...and the nodes at the far ends of its own links, which would make a link of zero
+			// length (Perry's review).
+			(incidentLinks[dr.id] || []).forEach(function (lid) {
+				var il = linkById(lid);
+				ex.links[lid] = true;
+				if (il) { ex.nodes[il.from] = true; ex.nodes[il.to] = true; }
+			});
 		} else if (dr.type === 'vertex') {
 			l = linkById(dr.id);
 			ex.links[dr.id] = true;
@@ -47099,6 +47120,15 @@ var EngCalcs = EngCalcs || {};
 			// junction whose new position is the only evidence it moved.
 			if (drag && drag.pointerId === e.pointerId && drag.type === 'node' && drag.snapped) {
 				markNodeMoved(drag.id);
+				// **A NODE DROPPED ON A NODE SAYS SO**, as a placement does (Task 782): one dot on
+				// the map cannot show that the two are separate.
+				if (drag.lastSnap && drag.lastSnap.kind === 'node' && nodeById(drag.id)) {
+					var mvN = nodeById(drag.id), mvPc = EngCalcs.pageConfig || {};
+					setNotice(String(mvPc.lpn_snap_moved_on_node ||
+						'{moved} moved to the location of {target}. The two nodes are not connected.')
+						.split('{moved}').join(reportTypeNoun('node', mvN.type) + ' ' + mvN.id)
+						.split('{target}').join(drag.lastSnap.name));
+				}
 				// Pipe lengths moved, so the 10th percentile is re-read at the next re-size (Task
 				// 705). Not re-applied here: one moved junction does not move it visibly, and a drop
 				// that re-sized every symbol would be a flicker nobody asked for.
@@ -47321,7 +47351,9 @@ var EngCalcs = EngCalcs || {};
 					saveUndoSnapshot();
 					logLpnFirstAction('element');
 					if (yes) { breakPipeAtPoint(breakLink, breakType, px0, py0, breakAt); }
-					else { copySnapProvenance(placeAt, addNode(breakType, px0, py0)); }
+					// No places the node where the press was, unsnapped: a node left on the line and
+					// joined to nothing would look connected (Perry's review).
+					else { addNode(breakType, w.x, w.y); }
 				});
 				return;
 			}
@@ -47837,6 +47869,7 @@ var EngCalcs = EngCalcs || {};
 			// **THE NODE ITSELF IS WHAT MAGNETS** (Task 782): its would-be position is tested, not
 			// the pointer, so a node grabbed off-centre still lands dead on the target. Alt is off.
 			var ns = drag.alt ? null : snapAtWorld(w.x + drag.offX, w.y + drag.offY, drag.reach || POINTER_REACH_PX, dragSnapOpts(drag));
+			drag.lastSnap = ns;
 			if (ns) { writeNodeAtSnap(n, ns); }
 			else {
 				writeNodeCoord(n, false, w.x + drag.offX);
