@@ -204,6 +204,36 @@ function sameResults(label, r, kinds, skip) {
 		Object.values((model.reactions || {}).wall || {}).some((k) => k !== 0) || (model.reactions || {}).globalWall,
 		JSON.stringify(model.reactions && model.reactions.globalWall));
 
+	// **A RESTATEMENT THAT FAILS PART WAY IS UNDONE** (Perry's review, 2026-10-11). The setter is
+	// made to throw on the fifth pipe, after four are already in feet; the run must fall back to
+	// an L/s report with every pipe's coefficient back as the file stated it, so its chlorine is
+	// the L/s run's exactly.
+	{
+		const real = global.EngCalcs.lpnReportWallKept;
+		let writes = 0, threw = false;
+		global.EngCalcs.lpnReportWallKept = function (p, m, ru) {
+			const q = {
+				getOption: (a) => p.getOption(a),
+				getLinkIndex: (a) => p.getLinkIndex(a),
+				getLinkValue: (a, b) => p.getLinkValue(a, b),
+				setLinkValue: (a, b, c) => {
+					writes++;
+					if (writes === 5) { threw = true; throw new Error('forced failure on the fifth pipe'); }
+					return p.setLinkValue(a, b, c);
+				}
+			};
+			return real(q, m, ru);
+		};
+		try {
+			r = await pair(model);
+		} finally {
+			global.EngCalcs.lpnReportWallKept = real;
+		}
+		ok('the forced failure really came after four pipes were restated', threw && writes > 5, String(writes));
+		sameResults('Net1 after a failed restatement', r, ['qualities', 'linkQualities', 'linkRates']);
+		ok('...and that run fell back to the L/s report', r.after.report === r.before.report && /LPS|L\/s/.test(r.after.report));
+	}
+
 	console.log('\n5. THE RULE FOR A FLOW UNIT EPANET HAS NO WORD FOR');
 	const RU = global.EngCalcs.lpnReportUnits;
 	ok('gph in a feet project reports in gpm', RU({ flow: 'gph', length: 'ft', diameter: 'in' }).code === 1);

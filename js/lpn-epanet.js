@@ -115,7 +115,7 @@
 	 * in its own internal feet and cfs either way, so the solve is the same one; only the unit the
 	 * getters answer in moves, and lpnEpanetRun multiplies each read back into L/s and metres with
 	 * the factors below. Rules and curves are converted by the switch itself; a pipe's wall
-	 * reaction coefficient is not, and reportWallKept() does it (dev/lpn-spike/run-report-units-harness.js).
+	 * reaction coefficient is not, and lpnReportWallKept() does it (dev/lpn-spike/run-report-units-harness.js).
 	 *
 	 * **THE FACTORS ARE EPANET'S OWN ROUNDED CONSTANTS (src/types.h), NOT THE EXACT ONES**, each
 	 * found in the vendored wasm: the engine converts with 28.317 L/s per cfs, not 28.3168, and
@@ -156,20 +156,32 @@
 	 * cannot be done, and the caller then switches back to L/s rather than run a wrong reaction.
 	 */
 	var EN_KWALL = 7, EN_OPT_WALLORDER = 20;
-	function reportWallKept(p, model, ru) {
-		var i, idx, kw, scale;
+	EngCalcs.lpnReportWallKept = function (p, model, ru) {
+		var i, idx, kw, scale, todo = [], done = 0;
 		if (ru.head === 1) { return true; }
+		// Every value is READ and worked out before any is WRITTEN, so a failure while reading
+		// leaves the engine exactly as it loaded the file.
 		try {
 			scale = p.getOption(EN_OPT_WALLORDER) === 0 ? ru.head * ru.head : 1 / ru.head;
 			for (i = 0; i < model.links.length; i++) {
 				if (model.links[i].type !== 'pipe') { continue; }
 				idx = p.getLinkIndex(model.links[i].id);
 				kw = p.getLinkValue(idx, EN_KWALL);
-				if (kw) { p.setLinkValue(idx, EN_KWALL, kw * scale); }
+				if (kw) { todo.push([idx, kw]); }
 			}
 		} catch (e) { return false; }
+		// **A WRITE THAT FAILS PART WAY IS UNDONE BEFORE THE CALLER SWITCHES BACK TO L/s**, or the
+		// pipes already restated in feet would run as metres and the chlorine would be silently
+		// wrong (Perry's review, 2026-10-11). An undo that also fails cannot be made safe, so it
+		// throws and the run is refused rather than answered.
+		try {
+			for (done = 0; done < todo.length; done++) { p.setLinkValue(todo[done][0], EN_KWALL, todo[done][1] * scale); }
+		} catch (e) {
+			for (i = 0; i < done; i++) { p.setLinkValue(todo[i][0], EN_KWALL, todo[i][1]); }
+			return false;
+		}
 		return true;
-	}
+	};
 
 	/**
 	 * `units` is the project's {flow, length, diameter} unit names (assembleModel's reportUnits).
@@ -2029,7 +2041,7 @@
 					// refuses the switch keeps L/s and metres, and `ru` says so to every read below.
 					if (ru) {
 						try { p.setFlowUnits(ru.code); } catch (e) { ru = null; }
-						if (ru && !reportWallKept(p, model, ru)) {
+						if (ru && !EngCalcs.lpnReportWallKept(p, model, ru)) {
 							p.setFlowUnits(REPORT_FLOW.lps.code);
 							ru = null;
 						}
