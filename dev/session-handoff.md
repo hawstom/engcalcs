@@ -99,39 +99,87 @@ lines rather than appending corrections.
   tile counts at a 900 ms settle (basemap.js now waits for a pointable tile). Pre-existing and unrelated: `scale-publish-harness.js` (2 checks). The full `node dev/browser-pass/run.js` is green (1853/1853, 2026-10-04, Task 761); browser-pass specs are not in
   check_all.
 
-## STATE — 2026-10-10 (twelfth session, Arizona time)
+## STATE — 2026-10-11 (thirteenth session, Arizona time)
 
-### Master = 90091ac2, pushed. Production: d8b345e1 per a 10-09 feedback report; confirm with the About box
+### Master = c827ca93 (suite running at handoff; push it when green). Production: ask; About box
 
-Merged 10-10: fix/demand-pattern (EPANET's default-pattern rule via `effDefaultPattern()`: stated
-default, else pattern "1", else constant; selector refills; Junctions table Demand pattern column, also in
-multi-select Properties; Net3 EPS matches EPA's Net3.rpt); fix/split-and-hide ("Split pipe {id} at this
-node?", keys renamed lpn_break_* to lpn_split_*; a hidden RUN message now survives a reload too, as a
-`run` hash in `lpn_msghidden`; send-feedback.php excused in dev/host/check.exclude). Roadmap: Tasks 782
-(snap, match properties, 100), 783 (tank depth/volume, 75), 784 (graph bubble, 50); 781 Change type
-decided Base only. Deleted keys: none on master.
+Merged 10-11 (his words in `dev/branch-all-clears.json`): feat/user-guide, feat/section-grid (777
+closed), feat/tank-volume (783 closed; column now "Available volume", his word), feat/snap (782 half),
+fix/default-pattern-shown (rename carries the default; Settings never blank while pattern 1 exists;
+"(default: 1)" on junctions; "(default)" in Libraries), fix/vertex-autosave, fix/label-export (EPANET
+[LABELS] x stable across reloads: measured at a reference scale), fix/node-size-cap (new projects 0.25 x
+median pipe; files stating no pair, i.e. every shipped example and old project, keep 0.5 / 20th). Roadmap: 539, 676,
+681 to 75; closed 775, 544, 636, 763, 777, 783; new 785 (Guide chapters), 786 (SI examples). Deleted keys:
+lpn_settings_default_pattern_implied (master); lpn_sm_hint, lpn_guide_how_alt, lpn_guide_text_alt_box
+(bentley-interop); lpn_match_selected_ask, _ask_one, lpn_mode_match_dest (match-property).
 
-**Owed by Tom on the server after his pull:** `sh dev/host/install.sh` from the production checkout
-(copies the new check.exclude to ~/; the uptime check's send-feedback.php 405 stops).
+### Branches awaiting him (pushed; previews listed on the Branch previews page)
 
-### Not yet on master (pushed as branches)
+- **feat/bentley-interop** (44a81de6, 8116): round 4. "?" tip = his sentence + the old footer + what a new
+  scenario does (creates no alternatives; first edit is an override in its own values). Chevrons, tree
+  keys, icons, one command list (`smCommands()`). Full suite was running at handoff
+  (`/tmp/ca-bentley-44a8.log`). OPEN, his question: an alert that creates an alternative on a scenario's
+  first edit. Builder's estimate 2-3 days; 8 design questions in the 10-11 transcript and below. Perry
+  should-fix: greyed Rename/Make current carry no tip (only Delete does).
+- **feat/match-property** (2aeaaaf7, 8117): targets first (his "object/verb"), then Match properties, then the
+  source. Status never copied; differing values only; in a scenario, non-overridable properties are named
+  and skipped ("Not copied: Elevation. A scenario cannot hold its own value for these; change them in
+  Base."). Suite green but payload freshness. The map right-click menu is `openMapContextMenu(x, y, rows)`:
+  Task 784's "Time series graph" row is one entry.
+- **feat/shape** (Task 779, cut from feat/snap): built, Perry: not blocking; builder fixing A-E (imported
+  names lost, plurals, area select, one undo for mixed delete, short hint) and merging master at handoff.
+  Then Perry glance, preview port (lowest free 8101-8139), his pass. Decisions for him: no Properties /
+  Tables / Find for Shapes; one purple style; clockwise polygons reversed on GeoJSON export; DXF colour 6
+  shared with pumps; Shapes are in no scenario (a move in Peak moves it everywhere); an older build opening a
+  file with Shapes drops them silently on save.
+- **fix/scenario-delete** (defect he hit on feat/snap: a junction added in Scenario 1 cannot be deleted
+  anywhere): builder running at handoff; merges on green. Its report says what bentley-interop must carry.
+- **feat/visit-dedupe** (e22c4ec9, 8119): his consent synonyms written (his words, 10-11). He said "Merge
+  unless there were questions awaiting my input" — none now. OWED before merge, his G01 call "Translate
+  first": consent_body, consent_current_granted, consent_region_label in 26 languages (Sonnet, one agent per
+  language, 20 then 6). Merge master into it first (journal conflict: union). After merge: G05, merge
+  librewaternet.org branch `visit-code-claim`. It changes what is stored on a visitor's device (he knows).
+- Unchanged: feat/desktop; label branches bench only.
 
-- **feat/bentley-interop** (e66572a5): Scenario manager round 2 on his 10-10 pass: ? tip in his words,
-  buttons [Add child] [Add base] [−] [Make current] + Copy (alternatives copy too); per-scenario Change
-  type REMOVED (Base only, refusal points to Active topology; Mary found Bentley Morph, epanet-js and
-  DC Water do it as a plain edit, none per scenario); keys lpn_change_type_scenario_ask, _create_new,
-  _not_carried, _old_controls, _customers_left, _switch_base deleted there. He said "slow down and test
-  more later". check_all green but payload freshness. Merging master in will conflict on
-  EC_HARNESS_WORDING_BASELINE (both sides 42) and entry-mode-exit-harness's split pin.
-- **feat/user-guide** (386d3e32): folding moved from the content to the index rail on his words; green
-  except a stale generated file fixed after. Needs his browser pass.
-- Unchanged: feat/visit-dedupe (G01 consent translation owed), feat/section-grid, feat/desktop; label
-  branches bench only.
+### Answers he is owed or questions out to him
+
+- **Alert on a scenario's first edit** (bentley): what Create means (a named alternative in the tree, or
+  inform only); Cancel reverts; "Always ask" stored where (project setting, device storage = consent talk,
+  or session only); one alert per gesture for bulk edits; name clash numbering; shared alternative; one
+  undo removes both; Base never asks.
+- **Raised tanks** (Sue, journal 10-11): Bentley's "Elevation" is GROUND, "Elevation (Base)" the tank
+  bottom. Recommended: (A) say on screen that the "pressure" at a tank is depth above its bottom; (B) an
+  optional non-hydraulic Ground elevation with "Pressure at ground", never written to .inp. Volume-curve
+  trick rejected. Not on the roadmap until he rules.
+- **SI examples** (Mary, journal 10-11; Task 786): openly licensed native-SI networks are scarce. CC BY 4.0:
+  Mini C-Town (186 junctions, best fit), L-Town (782), C-Town (388). Convert Net1/Net2 to SI ourselves (MIT).
+  KY networks: US units, CC BY-NC, evaluate only (uknowledge.uky.edu/wdst or KIOS-Research/EPANET-Benchmarks).
+- **Task 639 Layers**: he asked to re-evaluate/justify; not yet answered. CC's view: Map appearance already
+  holds opacity/sizes/colours; what is left is on/off and order, worth doing once Shapes (and contours,
+  customers) are layers; propose rescoping to that, after 779.
+- **Task 759**: only the selection word is open (Highlighted / Chosen). Ask, then close.
+- Depth (result) beside Water depth (typed): Perry thinks they will be confused; he did not answer.
+  `lpn_field_tank_minlevel_tip` could read "Lowest water depth allowed, measured up from the tank bottom."
+- **Delta translation sprint** owed on master (many new keys since 10-08), he allows one "whenever prudent".
 
 ### Next job
 
-His browser passes. The delta sprint is deferred by his 10-10 word ("deferring translations").
-Task 782 (snap to asset, match properties) is the next build when budget allows.
+Push master when `/tmp/ca-master-c827.log` ends EXIT=0. Finish feat/shape and fix/scenario-delete. Run the
+visit-dedupe consent translation, then merge it. Then a delta sprint (Wave 0 first; see
+dev/translation-process.md). Then Task 786 (an SI example: convert Net1, then Mini C-Town with attribution).
+
+### Traps met 2026-10-11 (thirteenth session)
+
+- **The classifier refused an all-clear from his PASTED message again**, though his global CLAUDE.md says
+  pasted is his. He typed "Merge feat/user-guide" and it went through. Ask for the typed word at once.
+- **Two branches green alone broke one harness together** (user-guide's Find word list vs tank-volume's new
+  Find fields). The suite on the merge commit caught it; fix on a fix branch, merge, rerun.
+- **An agent's background check_all outlived its report**; CC's merge into that worktree then ran under
+  it. Before merging into an agent's worktree, `ps` for its suite and stop it.
+- **A merge left orphaned conflict markers in an agent journal** (`<<<<<<< HEAD` / `>>>>>>> theirs`
+  with no separator). grep journals for markers after any merge.
+- **Slots congest**: with four branch suites queued, master's run took ~2 h. Merge master's batches before
+  launching branch suites.
 
 ### Traps met 2026-10-10 (twelfth session)
 
