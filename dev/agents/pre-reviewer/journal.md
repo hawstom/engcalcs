@@ -4234,3 +4234,9 @@ OBSERVED: .inp export after tank snapped on 22 writes identical "50.00 40.00". S
 OBSERVED: in a scenario a junction pressed 9 px from pipe 10 is placed on the line, no split offer, no notice.
 OBSERVED: Spanish notice mixes English template with Spanish names (key untranslated).
 NOT CHECKED: touch, satellite glyph look, Recalc OFF (code path untouched), Alt vs OS shortcuts.
+
+## 2026-10-11 Perry, feat/bentley-interop 784ea66f, Scenario manager tree
+- OBSERVED: scenario-tree, scenario-manager, default-pattern-shown, scenario-active-topology browser harnesses and change-type-harness all pass on 784ea66f.
+- OBSERVED: own probe (scratchpad/p/probe.js): menu on Night == buttons order; Base menu greys Make current/Rename/Delete, only Delete has a tip; Net1 Base vs master identical; child Peak dia 18->8 numbers identical to master Base dia 8; Base unchanged after returning.
+- OBSERVED: 27 rows scroll inside tree, Home/End keep selection in view. Title carries two "?" (blue tip beside title, Guide "?" in header).
+- NOT CHECKED: real long-press (CDP touch in headless fired 0 contextmenu events), mutation-testing of the new harness.

@@ -2906,3 +2906,16 @@ Read-only: dev/scenario-alternatives.md in the feat-bentley-interop worktree (92
 - OBSERVED, scenario-alternatives.md:778-779: stage 6 is "design first (Ida, Sue, Declan), then Tom's interview". :851-853 delete refused while used. :854-857 merge rules.
 - OBSERVED, :70: our Active Topology category is named "Asset activation" (Tom, 2026-09-30), id `topology`; Bentley's name is Active Topology.
 - SPECULATION: which operations a planner uses weekly. I have never run WaterGEMS. The ranking below comes from the docs' own command lists and master-plan structure (many scenarios on one base), not from use. Re-derive or ask IOD before relying on it.
+
+## 2026-10-11 — Sue: raised-tank elevation, Bentley's two elevations vs EPANET's one
+
+Tom asked about "ground Elevation + Base elevation" for raised tanks (low "pressure" at an elevated tank).
+
+- **CITED**, Bentley WaterGEMS SS6 docs (docs.bentley.com GUID-5E65E167360045B6BA07EDA1A122C61D, Hydropneumatic Tank Attributes; GUID-A8BF45418DC04913815F45BAD0C733D9, Tank Attributes): "Elevation" = "Elevation at centroid of junctions, valves, and pumps; the ground elevation at tanks; the hydraulic grade at reservoirs." "Elevation (Base)" = "Elevation of the storage tank base used as a reference when entering water surface elevations in the tank in terms of levels." "Level (Calculated)" = "Difference between calculated hydraulic grade and the base elevation of the tank." Min/Initial/Max may be entered as Elevation or Level (Operating Range Type).
+- **NOT FOUND**: no Bentley page I could read states which elevation the tank's Pressure (Calculated) uses. The inference "pressure = grade - ground Elevation" is **SPECULATION**, consistent with the generic Elevation definition; a WaterGEMS user must confirm. The Tanks overview page (GUID-D1C8970F...) gave nothing on this.
+- **CITED**, EPANET 2.2 manual / Eng-Tips / openepanet threads (search-surfaced, Eng-Tips 403 on fetch): EPANET tank Elevation is the bottom where level is zero; level controls are depth above bottom. EPANET has one elevation. InfoWater: searched, found nothing specific on a ground/bottom pair; NOT FOUND.
+- **CITED**, master plans tabulate tanks by HWL/overflow and base elevation, not tank pressure: Santa Fe Water Transmission and Storage System Master Plan (santafenm.gov document 1188; HWL 7178 / Base 7146 etc.); Milford MA master plan (milfordwater.com; overflow ~525, base ~430-441); a town tank assessment table (overflow 443 ft NGVD, height to overflow 35 ft). Search-snippet read, PDFs not fetched: secondary.
+- **OBSERVED**: our tank elevation tip already says bottom (`lib/lang.ec.en.php:1010`); a fixed-head node's pressure is head minus `n.elev` (`js/looped-network.js:6940-6944`).
+- **SPECULATION**: a VOLUME curve cannot fix the display; it changes volume vs depth, not the reference elevation of the pressure subtraction. Using ground as tank Elevation with a zero-volume lower stretch in the curve is a trick that also may trouble EPANET (zero area); untested.
+
+— Sue
