@@ -142,7 +142,7 @@ async function main() {
 		// ---- 0. nothing selected: the command does not start, and says why ----
 		await startFromEdit();
 		ok('with nothing selected the tool does not start', !/Match properties/.test(await hint()), await hint());
-		ok('...and a notice says to select the targets first', /Select the targets first/.test(await a.notice()), await a.notice());
+		ok('...and a notice says to select the targets first', (await a.notice()) === (await a.lang('lpn_match_select_first')), await a.notice());
 		await rightClick(await pointOf('link', '10'));
 		ok('right-click with nothing selected: the row is shown but greyed', await page.$$eval('.lpn-pane-ctxmenu button', (bs, l) => bs.filter((b) => b.textContent.trim() === l && b.disabled).length, MATCH) === 1);
 		await page.keyboard.press('Escape');
@@ -154,7 +154,7 @@ async function main() {
 		ok('a right-click on a pipe offers Match properties', (await menuRow(MATCH)) === 1);
 		await menuClickRow();
 		await a.settle(400);
-		ok('the status line asks for the source and discloses what is not copied', /copy properties from/.test(await hint()) && /Status, identity, and location are not copied/.test(await hint()), await hint());
+		ok('the status line asks for the source and discloses what is not copied', (await hint()) === (await a.lang('lpn_mode_match')), await hint());
 		await clickAt('link', '10');
 		await a.settle(1000);
 		for (const id of ['11', '12']) {
