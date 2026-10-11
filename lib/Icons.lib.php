@@ -249,7 +249,7 @@ $ec_icons = array(
 	// (Tom, 2026-10-11: *"Use an open (almost closed) polygon instead, with no vertex markers."*), so it
 	// is not read as `vertices`, whose polyline carries square grips. Five plain strokes; the gap is
 	// on the right side, between the first point and the last.
-	'shape'      => '<path d="M20.5 9.5L12 3L3.5 9.5L6.5 20.5H17.5L19.3 13.9"/>',
+	'shape'      => '<path d="M20.5 9.5L12 3L3.5 9.5L6.5 20.5H17.5L18.9 15.5"/>',
 	// **A HOUSE, IN EIGHT STRAIGHT LINES** (Tom, 2026-09-18: *"Let's go with a very simple 8-line
 	// house icon. Much easier and more recognizeable."*, with his own sketch in
 	// dev/icon-preview/tgh-icon-concepts.png). Two roof slopes, two walls, a floor and three sides
