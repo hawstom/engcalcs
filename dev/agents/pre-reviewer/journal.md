@@ -3927,6 +3927,13 @@ Lesson: pressing a menu row by text prefix hit a different "Copy" button elsewhe
 - OBSERVED: the layer table matches the Duke-hosted AIA CAD Layer Guidelines text for EQPM, VALV, TANK, LABL, TEXT, RDME; NODE is a prescribed minor group there, not user-defined. That PDF is an older edition than v5; v5 itself was not fetchable.
 - OBSERVED: dxf-export-harness.js passes and has no assertion on %% escaping, zoom, zone boundary or long strings.
 
+## feat/section-grid at 0b3bad98 (OBSERVED, 2026-10-06; re-verify before citing)
+OBSERVED real Chrome (desktop 1200, phone 390; US and SI via es locale; default and offset/negative sections): mi and wi grids render, 4-8 round marks, unit on largest mark for mi (ft/m follow the selects), negative elevations and stations starting at 1000 fine; no mark collides with the n labels, but gridlines run through them (and 0.04 strikes the section line, as on master).
+OBSERVED: phone mi shrinks to 390 wide so marks render ~7px high (wi ~11px). Master mi overflowed at 600. Plot is ~12-16% smaller than master in mi.
+OBSERVED: wi has no unit selects (Cw only), so bare numbers are honest. No dark mode on these pages (prefers-color-scheme only styles lpn cards).
+Lesson: php -S needs a docroot with an engcalcs/ symlink (pages use /engcalcs/ asset paths); sticky header and consent bar cover element screenshots.
+SPECULATION: print rendering not checked.
+
 ## 2026-10-06 feat/asset-type, link half (tree 4c26066b)
 
 OBSERVED (real Chrome on a scratch copy with a test hook, this tree; re-verify before citing):
@@ -3937,6 +3944,15 @@ OBSERVED (real Chrome on a scratch copy with a test hook, this tree; re-verify b
 - Pipe with scenario type override -> valve: that scenario's diameter silently reverts to Base's.
 Method note: scratch copy served by php -S, injected EngCalcs.__t; playwright from ~/.npm/_npx; lock via flock.
 
+## feat/user-guide at 3efca049 (OBSERVED, 2026-10-07; re-verify before citing)
+
+OBSERVED real Chromium (php -S on the worktree, 1400x900, 390x844 touch, ar, de): branch's own harness passes all; with a planted "guide row also clicks the target" mutation it fails 10 checks (not decoration). lpn_notes_6_def swap: own script, 27/27 files cells exactly exchanged, skeleton and every other line unchanged. All five top menus open by click and by keyboard, rows run, Esc closes (Edit keyboard Enter result identical to master). Guide rows never ran a command (undo 0->0).
+OBSERVED: "Also in" correct on all 26 toolbar rows (read against the live menus). "?" ignored in Find box, table cell editor, Properties-type inputs; opens at hovered/focused toolbar and menu rows (keyboard-focused Edit row, hovered File row).
+OBSERVED DEFECT (low-medium): guide stays open across a project switch with the transport rows dimmed ("off") until it is reopened; render happens only at open or strip repaint.
+OBSERVED: de and ar show "User guide" and "Also in" in English (new keys; old translated "Tables and Hotkeys" gone); lpn_help_hotkeys orphaned in 26 files.
+OBSERVED: the toolbar spec "a disabled one says why it is off" fails identically on master.
+NOT CHECKED: a real lpn_dialog modal with "?" (guide listener is capture on window, so it would open under/over a modal); how it looks.
+Method note: Playwright keyboard.press('Shift+/') sends '/', not '?'; use press('?').
 ## 2026-10-06 -- feat/dxf (05d5a7ad) and feat/section-grid (89905957)
 
 Neither branch is my work. My test scripts and exported files are in the scratchpad (dxf/, sg-probe*.js, mut/).

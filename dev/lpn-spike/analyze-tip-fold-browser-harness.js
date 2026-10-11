@@ -77,21 +77,22 @@ function boxShape(page, controls) {
 		};
 	}, controls);
 }
-// Open the box's corner `?` by a click and read the tip the reader gets.
+// Open the box's Guide `?` by a click and read the entry the reader gets (the box's explanation
+// lives in its Guide entry since 2026-10-07; the blue tip `?` is for field labels only).
 async function openCornerTip(a, boxId) {
-	const sel = '#' + boxId + ' .lpn-corner-help .ec-tip';
+	const sel = '#' + boxId + ' .lpn-corner-guide';
 	const g = await a.page.evaluate((s) => { const r = document.querySelector(s).getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; }, sel);
 	await a.page.mouse.click(g.x, g.y);
-	await a.settle(400);
-	return a.page.evaluate((s) => {
-		const h = document.querySelector(s).closest('.ec-help'), id = h.getAttribute('aria-describedby');
-		const t = id && document.getElementById(id);
-		if (!t) { return { shown: false }; }
-		const r = t.getBoundingClientRect(), inner = t.querySelector('.tooltip-inner');
-		return { shown: t.classList.contains('show'), text: Array.from(t.querySelectorAll('p')).map((p) => p.textContent).join(' ') || t.textContent, left: r.left, right: r.right, top: r.top, bottom: r.bottom,
+	await a.settle(500);
+	return a.page.evaluate((id) => {
+		const e = document.querySelector('[data-guide-key="box-' + id + '"]'), box = document.getElementById('lpn_hotkeys_popup'),
+			content = document.getElementById('lpn_guide_content');
+		if (!e || box.style.display !== 'flex') { return { shown: false }; }
+		const r = box.getBoundingClientRect();
+		return { shown: true, text: Array.from(e.querySelectorAll('p')).map((p) => p.textContent).join(' '), left: r.left, right: r.right, top: r.top, bottom: r.bottom,
 			vw: window.innerWidth, vh: window.innerHeight,
-			scrolls: inner.scrollHeight > inner.clientHeight + 1, overflowY: getComputedStyle(inner).overflowY };
-	}, sel);
+			scrolls: content.scrollHeight > content.clientHeight + 1, overflowY: getComputedStyle(content).overflowY };
+	}, boxId);
 }
 function sentences(text) { return text.split(/(?<=[.;:])\s+/).map((x) => x.trim()).filter((x) => x.length > 8); }
 async function closeTip(a) { await a.page.keyboard.press('Escape'); await a.settle(300); }
@@ -107,7 +108,7 @@ async function sectionFireFlow(a, lang) {
 	ok('...the six criteria rows are still there, in order', JSON.stringify(s.rows) === JSON.stringify(lang.ffRows), JSON.stringify(s.rows));
 	ok('...and Run, Stop and Clear rings', JSON.stringify(s.buttons) === JSON.stringify(lang.ffButtons), JSON.stringify(s.buttons));
 	const t = await openCornerTip(a, 'lpn_ff_box');
-	ok('the corner `?` opens one tip', t.shown);
+	ok('the corner `?` opens the box\'s entry in the Guide', t.shown);
 	// Every sentence the tip holds (the engine cost, maximum day, the hydrant accounting, the ISO
 	// limit, the engine) is one the box no longer prints.
 	const printed = sentences(t.text).filter((x) => s.text.indexOf(x) >= 0);
@@ -150,7 +151,7 @@ async function sectionDemandScale(a, lang) {
 	ok('...the two headings are still there', JSON.stringify(s.heads) === JSON.stringify(lang.dsHeads), JSON.stringify(s.heads));
 	ok('...and Run, Find and Stop', JSON.stringify(s.buttons) === JSON.stringify(lang.dsButtons), JSON.stringify(s.buttons));
 	const t = await openCornerTip(a, 'lpn_ds_box');
-	ok('the corner `?` opens one tip', t.shown);
+	ok('the corner `?` opens the box\'s entry in the Guide', t.shown);
 	ok('...that explains Run and Find, with the search\'s range and step filled in', t.text.indexOf(lang.dsIntro) === 0 && t.text.indexOf('{') < 0, t.text.slice(0, 80));
 	ok('...and ends with the engine that will run', t.text.endsWith(lang.engineNative) || t.text.endsWith(lang.engineEpanet), t.text.slice(-40));
 	ok('...and fits the window', t.left >= 0 && t.right <= t.vw && t.top >= 0 && t.bottom <= t.vh);
@@ -178,8 +179,7 @@ async function sectionPhone(Session, browser, lang, vp, name) {
 			ok('...inside the screen\'s width', t.left >= 0 && t.right <= t.vw, JSON.stringify({ left: t.left, right: t.right, vw: t.vw }));
 			ok('...and its height: whatever does not fit scrolls inside the tip', t.top >= 0 && t.bottom <= t.vh && (t.overflowY === 'auto' || !t.scrolls),
 				JSON.stringify({ top: Math.round(t.top), bottom: Math.round(t.bottom), vh: t.vh, scrolls: t.scrolls }));
-			await a.page.mouse.click(5, vp.viewport.height - 14);
-			await a.settle(300);
+			await closeTip(a);
 			await a.page.evaluate((id) => { const x = document.querySelector('#' + id + ' .lpn-popover-x'); if (x) { x.click(); } }, box);
 			await a.settle(300);
 		}
