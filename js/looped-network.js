@@ -12456,12 +12456,17 @@ var EngCalcs = EngCalcs || {};
 		}
 		l.verts.splice(bestI, 0, { x: pt.x, y: pt.y });
 		rebuildLink(l);
+		// A bend added or removed is an edit like a bend dragged (updateVertex()): it re-solves an
+		// Auto length and, through the same timer, autosaves. Without it the bend was not saved
+		// until the next other edit (found by dev/lpn-spike/snap-browser-harness.js).
+		scheduleSolve();
 	}
 	function removeVertex(linkId, vidx) {
 		saveUndoSnapshot();
 		var l = linkById(linkId);
 		l.verts.splice(vidx, 1);
 		rebuildLink(l);
+		scheduleSolve();
 	}
 
 	// ---- zoom-extent: fits the actual rendered extent (symbol radius, label text box, link
@@ -69400,6 +69405,9 @@ var EngCalcs = EngCalcs || {};
 	// file draws it, so the dependency runs one way: lpn-time.js owns the text, looped-network.js
 	// owns the boxes, and neither reaches into the other's state.
 	EngCalcs.lpnOpenRunReportBox = function () { return openRunReportBox(); };
+	// The heads and flows on screen, for dev/lpn-spike/snap-browser-harness.js (Task 782): it asserts
+	// that a model edited by snapping still solves.
+	EngCalcs.lpnSolveProbe = function () { return lastSolveResult; };
 	// The Full report's Type column harness opens the box through this, not through the menu.
 	EngCalcs.lpnOpenFullReportBox = function () { return openFullReportBox(); };
 
