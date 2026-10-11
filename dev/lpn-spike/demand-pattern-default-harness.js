@@ -40,7 +40,7 @@ const L = loadLoopedNetwork(
 	"\t\tresolvedDemand: resolvedDemand, assembleModel: assembleModel,\n" +
 	"\t\ttimeBlock: function () { return EngCalcs.lpnTimeModelBlock(doc, toSI); },\n" +
 	"\t\trebuildSettings: rebuildSettingsFields,\n" +
-	"\t\trenamePattern: libRenamePattern, effDefault: effDefaultPattern,\n" +
+	"\t\trenamePattern: libRenamePattern, deletePattern: libDeletePattern, effDefault: effDefaultPattern,\n" +
 	"\t\tjunctionSpec: function () { return paneTables().filter(function (s) { return s.type === 'junction'; })[0]; },\n" +
 	"\t\tcols: function (s) { return paneCols(s); }, cellText: paneCellText, writeCell: paneWriteCellText,\n" +
 	"\t\tmultiSection: multiSection,\n" +
@@ -115,16 +115,20 @@ const FT = 1 / 0.3048;
 	ok('the junction demand varies through the day', dem.length > 5 && Math.max(...dem) - Math.min(...dem) > 1e-6,
 		dem.length ? Math.min(...dem).toExponential(3) + '..' + Math.max(...dem).toExponential(3) : 'no demands in frames');
 
-	// no pattern "1": constant. Rename it away.
+	// Renaming pattern "1" carries the (implied) default with it (Tom, 2026-10-11), so the run keeps its shape.
 	const p1 = L.libPatterns().filter(p => p.id === '1')[0];
 	L.renamePattern(p1, 'DAY');
-	ok('renamed away: effective default is none', L.effDefault() === null);
+	ok('renamed: the default follows to DAY', L.effDefault() === 'DAY' && L.getDoc().defaultPattern === 'DAY');
+	ok('...and the demand is unchanged', Math.abs(L.resolvedDemand(j) - withOne) < 1e-9);
+	// Only with no default at all does a demand run flat: delete the default pattern.
+	L.deletePattern(L.libPatterns().filter(p => p.id === 'DAY')[0]);
+	ok('deleted: effective default is none', L.effDefault() === null);
 	ok('...and the demand is constant', Math.abs(L.resolvedDemand(j) - j._demand) < 1e-9);
 	const flat = L.assembleModel();
 	ok('...and the model carries no pattern for it', !flat.nodes.filter(x => x.id === j.id)[0].demandPattern);
-	// renamed back: pattern "1" again
-	L.renamePattern(L.libPatterns().filter(p => p.id === 'DAY')[0], '1');
-	ok('renamed back to "1": the pattern applies again', L.effDefault() === '1' && Math.abs(L.resolvedDemand(j) - withOne) < 1e-9);
+	// restore a pattern "1": it applies again, by EPANET's rule
+	L.getDoc().patterns.push(global.EngCalcs.lpnPatternMake('1', p1.multipliers));
+	ok('a pattern "1" again: it applies', L.effDefault() === '1' && Math.abs(L.resolvedDemand(j) - withOne) < 1e-9);
 	// a stated default wins over "1"
 	L.getDoc().patterns.push(global.EngCalcs.lpnPatternMake('B', [2, 2, 2]));
 	L.getDoc().defaultPattern = 'B';
@@ -135,8 +139,8 @@ const FT = 1 / 0.3048;
 	L.rebuildSettings();
 	let sel = settingsPatternSelect();
 	ok('selector exists', !!sel);
-	ok('blank option says what it means ("pattern 1 is used")', /\b1\b/.test(tagged(sel, 'OPTION')[0].textContent),
-		JSON.stringify(tagged(sel, 'OPTION')[0].textContent));
+	ok('with pattern 1 implied the selector shows 1 and offers no blank', sel.value === '1' && tagged(sel, 'OPTION').every(o => o.value !== ''),
+		JSON.stringify(sel.value) + ' / ' + tagged(sel, 'OPTION').map(o => o.value).join(','));
 	// a pattern is added AFTER the Settings box was built
 	L.getDoc().patterns.push(global.EngCalcs.lpnPatternMake('NEW', [1, 1, 1]));
 	fire(sel, 'mousedown');
@@ -159,7 +163,7 @@ const FT = 1 / 0.3048;
 	ok('column exists', !!col);
 	const jn = L.getDoc().nodes.filter(x => x.type === 'junction' && !x.demandPattern && x._demand > 0);
 	ok('blank reads blank (Default), not a stored value', L.cellText(col, jn[0]) === '', JSON.stringify(L.cellText(col, jn[0])));
-	ok('the blank choice is labelled Default', col.choices()[0][1] === PC.lpn_choice_default, col.choices()[0][1]);
+	ok('the blank choice names what it resolves to', col.choices()[0][1] === '(default: ' + L.effDefault() + ')', col.choices()[0][1]);
 	ok('it is a pick-list of the project\'s patterns', col.choices().length === L.libPatterns().length + 1);
 	ok('picking a pattern writes the junction', L.writeCell(spec, col, jn[0], 'B') && jn[0].demandPattern === 'B');
 	ok('...and the demand follows it', Math.abs(L.resolvedDemand(jn[0]) - jn[0]._demand * 2) < 1e-9);
