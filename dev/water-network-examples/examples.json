@@ -6,8 +6,10 @@
 	"Basic-example-SI-units.lwn": { "key": "basic_si", "order": -20 },
 	"Basic-example-US-units.lwn": { "key": "basic_us", "order": -10 },
 	"Net1.lwn": { "key": "net1" },
-	"Net2.lwn": { "key": "net2" },
-	"Net3.lwn": { "key": "net3" },
+	"Net2-SI.lwn": { "key": "net2_si", "order": -60 },
+	"Net2.lwn": { "key": "net2", "order": -50 },
+	"Net3-SI.lwn": { "key": "net3_si", "order": -80 },
+	"Net3.lwn": { "key": "net3", "order": -70 },
 	"Net3-Novato-CA-World.lwn": { "key": "net3_world", "order": -40 },
 	"Elm-Street-Center.lwn": { "key": "elm_street", "order": -30 }
 }

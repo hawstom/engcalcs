@@ -97,7 +97,7 @@ examples.forEach(function (ex) {
 // Nothing derives this list; it is a DECLARATION that these three examples are drawn over a plan and
 // must arrive with it. An example that gains a backdrop adds itself here, which is the moment to
 // think about the megabytes; one that loses it fails loudly instead of quietly looking plainer.
-const WANT_BACKDROP = ['Net2.lwn', 'Net3.lwn', 'Elm-Street-Center.lwn'];
+const WANT_BACKDROP = ['Net2.lwn', 'Net2-SI.lwn', 'Net3.lwn', 'Net3-SI.lwn', 'Elm-Street-Center.lwn'];
 console.log('\n-- the examples drawn over a site plan still carry it --');
 WANT_BACKDROP.forEach(function (file) {
 	[srcDir, outDir].forEach(function (dir) {
@@ -229,14 +229,14 @@ console.log('\n-- layout: a deliberate order, not an accident of equal size --')
 		'every entry carries an explicit order');
 	const si = examples.filter(function (e) { return e.system === 'si'; });
 	report(si.length > 0, 'the shelf has at least one SI example', `${si.length}`);
-	// **THE HEAD OF THE WALL IS TOM'S, AND IT IS NOT SIZE-ORDERED** (2026-08-21): Net3-World leads
-	// because it is the real geographic project, Elm Street Center second. This used to assert that
-	// an SI example led -- that was Tom's 2026-08-14 ruling when the basics were the head, and it is
-	// superseded, not broken. What survives of it is checked just below: SI still precedes US among
-	// the two basics, which is what he actually cared about and what a size sort cannot express.
-	report(examples[0].file === 'Net3-Novato-CA-World.lwn', 'Net3-World leads the wall', examples[0].file);
-	report(examples[1].file === 'Elm-Street-Center.lwn', 'and Elm Street Center is second',
-		examples[1].file);
+	// **THE HEAD OF THE WALL IS TOM'S, AND IT IS NOT SIZE-ORDERED.** Tom, 2026-10-11 (Task 786): the
+	// first four are Net3 SI, Net3 US, Net2 SI, Net2 US, then the wall as it was (Net3-World, Elm
+	// Street Center, the two basics, Net1). What survives of his 2026-08-14 "an SI example leads" is
+	// that an SI example is first, and that each SI twin precedes its US twin.
+	['Net3-SI.lwn', 'Net3.lwn', 'Net2-SI.lwn', 'Net2.lwn', 'Net3-Novato-CA-World.lwn',
+		'Elm-Street-Center.lwn'].forEach(function (f, i) {
+		report(examples[i].file === f, 'wall position ' + (i + 1) + ' is ' + f, examples[i].file);
+	});
 	let sorted = true;
 	for (let i = 1; i < examples.length; i++) {
 		const a = examples[i - 1], b = examples[i];

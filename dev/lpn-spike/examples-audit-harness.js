@@ -91,6 +91,10 @@ const SOURCE_OF = {
 	'Net1.lwn': 'Net1.inp',
 	'Net2.lwn': 'Net2.inp',
 	'Net3.lwn': 'Net3.inp',
+	// The SI twins are CONVERTED from the two files above, not imported, so a fresh import of the
+	// `.inp` cannot be their reference; si-example-equivalence-harness.js is.
+	'Net2-SI.lwn': null,
+	'Net3-SI.lwn': null,
 	// Net3 placed on the world (Task 497's geographic project). Its model is Net3's, so Net3.inp is
 	// its source too and the geographic coordinates are the curation.
 	'Net3-Novato-CA-World.lwn': 'Net3.inp',

@@ -1225,12 +1225,16 @@ $ec_lang['lpn_ex_basic_us_desc']='The same starting network in gallons per minut
 $ec_lang['lpn_ex_net1_title']='EPANET Net1 plus rule-based controls';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_ex_net1_desc']='The smallest of the three EPANET example networks: one reservoir, a pump, and a single loop.';
-$ec_lang['lpn_ex_net2_title']='EPANET Net2';
+$ec_lang['lpn_ex_net2_si_title']='EPANET Net2, L/s (SI)';
+$ec_lang['lpn_ex_net2_si_desc']='Litres per second, with metres and millimetres. EPANET’s Net2, converted from gallons per minute, feet and inches: a branched distribution system with a tank.';
+$ec_lang['lpn_ex_net2_title']='EPANET Net2, gpm (US)';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_ex_net2_desc']='A branched distribution system with a tank, from EPANET’s examples.';
-$ec_lang['lpn_ex_net3_title']='EPANET Net3';
+$ec_lang['lpn_ex_net2_desc']='Gallons per minute, with feet and inches. A branched distribution system with a tank, from EPANET’s examples.';
+$ec_lang['lpn_ex_net3_si_title']='EPANET Net3, L/s (SI)';
+$ec_lang['lpn_ex_net3_si_desc']='Litres per second, with metres and millimetres. EPANET’s Net3, converted from gallons per minute, feet and inches: 92 junctions, three tanks, and two reservoirs, one of them a river.';
+$ec_lang['lpn_ex_net3_title']='EPANET Net3, gpm (US)';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_ex_net3_desc']='The large EPANET example: 92 junctions, three tanks, and two reservoirs, one of them a river. It shows how a full-size model appears on the map.';
+$ec_lang['lpn_ex_net3_desc']='Gallons per minute, with feet and inches. The large EPANET example: 92 junctions, three tanks, and two reservoirs, one of them a river. It shows how a full-size model appears on the map.';
 $ec_lang['lpn_ex_net3_world_title']='EPANET Net3, lat/lon';
 $ec_lang['lpn_ex_net3_world_desc']='The EPANET Net3 network converted to lat/lon at Novato, CA with the world map behind it.';
 $ec_lang['lpn_ex_elm_street_title']='Elm Street Center';

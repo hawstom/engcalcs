@@ -110,7 +110,9 @@ function exampleWork($name) {
 		'Elm-Street-Center.lwn' => 'design',
 		'Net1.lwn' => 'maintenance',
 		'Net2.lwn' => 'maintenance',
+		'Net2-SI.lwn' => 'maintenance',
 		'Net3.lwn' => 'maintenance',
+		'Net3-SI.lwn' => 'maintenance',
 		'Net3-Novato-CA-World.lwn' => 'maintenance'
 	);
 	return $work[$name] ?? null;

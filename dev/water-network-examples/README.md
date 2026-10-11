@@ -16,11 +16,15 @@ and a function cannot carry a description, cannot be authored by anyone who is n
 | `Net3.lwn` | 97 | 119 | gpm | EPANET's Net3. The large-model case — this is the one that exercises label clutter and the sizing paradigm. |
 | `Elm-Street-Center.lwn` | 18 | 19 | gpm | Tom's own design snapshot, anonymised, with a CAD site plan as its backdrop. The first example drawn from real work rather than invented. |
 
-**All four are US/gpm.** The gap is an SI example and it CANNOT be made by converting one of these:
-this suite reinterprets rather than converts when a unit changes (CLAUDE.md, "Unit Sets"), so
-clicking SI on Net1 gives 8 mm mains, not 200 mm ones. An SI example has to be authored in metres,
-or imported from an `.inp` declaring LPS/LPM/CMH/MLD — which `js/lpn-inp.js` already reads
-correctly, and which is the cheap route if a public SI model turns up.
+**`Net2-SI.lwn` and `Net3-SI.lwn` are unit conversions of `Net2.lwn` and `Net3.lwn`** (Task 786,
+Tom 2026-10-11), made by `node dev/scripts/convert_example_to_si.js Net3 Net3-SI "Net3 SI"`: ft to m,
+in to mm, gpm to L/s, every number rounded to 6 significant figures; coordinates, Hazen-Williams
+roughness, minor loss k, patterns, times and the quality sections are carried across unchanged. A unit
+switch on the page reinterprets rather than converts, so an SI twin is a separate file.
+`dev/lpn-spike/si-example-equivalence-harness.js` proves each pair solves alike (single instant and
+the whole EPANET extended-period run). They carry no `.inp` of their own. The converter reads the
+SHIPPED US file, so anything curated into it (labels, backdrop, node ID prefixes) rides along. The
+other three are US/gpm.
 
 ## Two things to know before adding one
 

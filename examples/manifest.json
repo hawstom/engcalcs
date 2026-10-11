@@ -3,6 +3,66 @@
     "generated": "dev/scripts/generate_examples.php",
     "examples": [
         {
+            "file": "Net3-SI.lwn",
+            "order": -80,
+            "titleKey": "lpn_ex_net3_si_title",
+            "descKey": "lpn_ex_net3_si_desc",
+            "title": "EPANET Net3, L/s (SI)",
+            "description": "Litres per second, with metres and millimetres. EPANET’s Net3, converted from gallons per minute, feet and inches: 92 junctions, three tanks, and two reservoirs, one of them a river.",
+            "system": "si",
+            "coords": "xy",
+            "work": "maintenance",
+            "flow": "lps",
+            "nodes": 97,
+            "links": 119,
+            "thumb": "Net3-SI.svg"
+        },
+        {
+            "file": "Net3.lwn",
+            "order": -70,
+            "titleKey": "lpn_ex_net3_title",
+            "descKey": "lpn_ex_net3_desc",
+            "title": "EPANET Net3, gpm (US)",
+            "description": "Gallons per minute, with feet and inches. The large EPANET example: 92 junctions, three tanks, and two reservoirs, one of them a river. It shows how a full-size model appears on the map.",
+            "system": "us",
+            "coords": "xy",
+            "work": "maintenance",
+            "flow": "gpm",
+            "nodes": 97,
+            "links": 119,
+            "thumb": "Net3.svg"
+        },
+        {
+            "file": "Net2-SI.lwn",
+            "order": -60,
+            "titleKey": "lpn_ex_net2_si_title",
+            "descKey": "lpn_ex_net2_si_desc",
+            "title": "EPANET Net2, L/s (SI)",
+            "description": "Litres per second, with metres and millimetres. EPANET’s Net2, converted from gallons per minute, feet and inches: a branched distribution system with a tank.",
+            "system": "si",
+            "coords": "xy",
+            "work": "maintenance",
+            "flow": "lps",
+            "nodes": 36,
+            "links": 40,
+            "thumb": "Net2-SI.svg"
+        },
+        {
+            "file": "Net2.lwn",
+            "order": -50,
+            "titleKey": "lpn_ex_net2_title",
+            "descKey": "lpn_ex_net2_desc",
+            "title": "EPANET Net2, gpm (US)",
+            "description": "Gallons per minute, with feet and inches. A branched distribution system with a tank, from EPANET’s examples.",
+            "system": "us",
+            "coords": "xy",
+            "work": "maintenance",
+            "flow": "gpm",
+            "nodes": 36,
+            "links": 40,
+            "thumb": "Net2.svg"
+        },
+        {
             "file": "Net3-Novato-CA-World.lwn",
             "order": -40,
             "titleKey": "lpn_ex_net3_world_title",
@@ -76,36 +136,6 @@
             "nodes": 11,
             "links": 13,
             "thumb": "Net1.svg"
-        },
-        {
-            "file": "Net2.lwn",
-            "order": 0,
-            "titleKey": "lpn_ex_net2_title",
-            "descKey": "lpn_ex_net2_desc",
-            "title": "EPANET Net2",
-            "description": "A branched distribution system with a tank, from EPANET’s examples.",
-            "system": "us",
-            "coords": "xy",
-            "work": "maintenance",
-            "flow": "gpm",
-            "nodes": 36,
-            "links": 40,
-            "thumb": "Net2.svg"
-        },
-        {
-            "file": "Net3.lwn",
-            "order": 0,
-            "titleKey": "lpn_ex_net3_title",
-            "descKey": "lpn_ex_net3_desc",
-            "title": "EPANET Net3",
-            "description": "The large EPANET example: 92 junctions, three tanks, and two reservoirs, one of them a river. It shows how a full-size model appears on the map.",
-            "system": "us",
-            "coords": "xy",
-            "work": "maintenance",
-            "flow": "gpm",
-            "nodes": 97,
-            "links": 119,
-            "thumb": "Net3.svg"
         }
     ]
 }

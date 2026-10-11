@@ -398,6 +398,7 @@ the block.
   Tom, 2026-10-11: *"SI presets are requested over twice as much as US presets. So I want to have more good SI
   examples, even if I have to convert the Net2 and Net3 examples."* Mary is surveying redistributable SI networks
   and the KYPipe examples (her journal, 2026-10-11).
+  Net3 and Net2 SI twins are on `feat/si-example`, first four on the wall; Mini C-Town (CC BY 4.0) is what remains.
 - 50|146.09| **An inset overview map: the whole project, with a box round where you are.**
   Reworked by Tom 2026-08-25, and it is a different feature from the one this ID used to hold:
   *"146.09 reworked as a key/overview map inset like many games where the entire project is depicted
