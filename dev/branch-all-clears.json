@@ -665,6 +665,13 @@
    "words": "feat/tank-volume (Task 783): merge",
    "context": "Typed in the session on 2026-10-11 after his browser pass on the preview; the same message asked \"Volume: Will 'Available volume' work?\", which is a follow-up rename on a fix branch, not a condition of the merge.",
    "pin_note": "Pinned to the head served on the preview (Perry's two fixes included); merged directly with no further commits."
+  },
+  "feat/snap": {
+   "head": "e1a409184369ec18118ad1aa9994f64d2b30e6a0",
+   "date": "2026-10-11",
+   "words": "feat/snap: merge",
+   "context": "Typed in the session on 2026-10-11 after his browser pass on the preview, in the same message as the scenario delete defect he found while testing it (a junction added in Scenario 1 cannot be deleted); that defect is on master's code and goes to fix/scenario-delete, not a condition of this merge.",
+   "pin_note": "Pinned to the head served on the preview (Perry's three fixes included); merged directly with no further commits."
   }
  }
 }

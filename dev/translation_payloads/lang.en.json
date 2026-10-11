@@ -876,7 +876,7 @@
         "lpn_result_head_tip": "Potential energy of the water at this node, written as a height of water column. It is an absolute height, where pressure is a gauge measurement.",
         "lpn_result_depth": "Depth",
         "lpn_result_depth_tip": "Depth of water in the tank at the time shown, measured up from the tank bottom: the head minus the tank elevation.",
-        "lpn_result_tank_volume": "Usable volume",
+        "lpn_result_tank_volume": "Available volume",
         "lpn_result_tank_volume_tip": "Volume of water above the lowest water depth, so it is zero at that depth. The EPANET tank volume also includes the water below the lowest water depth, which still counts toward mixing and water age, so the tank elevation stays at the tank bottom.",
         "lpn_result_pressure": "Pressure",
         "lpn_result_flow": "Flow",
@@ -1487,6 +1487,9 @@
         "lpn_split_pipe_ask": "Split pipe {id} at this node?",
         "lpn_split_yes": "Yes",
         "lpn_split_no": "No",
+        "lpn_snap_vertex": "{link}, vertex {n}",
+        "lpn_snap_node_on_node": "{new} placed at the location of {target}. The two nodes are not connected.",
+        "lpn_snap_moved_on_node": "{moved} moved to the location of {target}. The two nodes are not connected.",
         "lpn_field_valve_type": "Valve type",
         "lpn_field_valve_type_tip": "Valve type. A throttle valve (TCV) applies a fixed loss. PRV, PSV, and FCV maintain a pressure or a flow, and open fully, close, or partly close as hydraulic conditions change. A PBV removes a fixed pressure, and a GPV follows a head loss curve. The types control different hydraulic properties, so settings may be lost when the type is changed.",
         "lpn_valve_type_tcv": "Throttle (TCV)",
@@ -2552,7 +2555,7 @@
         "lpn_snip_tip_redo": "Redo (Ctrl+Y)",
         "lpn_screenshot_scale_tip": "The picture's size as a multiple of the area on the screen. A larger one is sharper and makes a bigger file."
     },
-    "count": 2550,
+    "count": 2553,
     "active_prefixes": [
         "about",
         "bpn",

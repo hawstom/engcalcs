@@ -2824,6 +2824,9 @@ EngCalcs.pageConfig = {
 	lpn_split_pipe_ask: <?=json_encode($ec_lang['lpn_split_pipe_ask'])?>,
 	lpn_split_yes: <?=json_encode($ec_lang['lpn_split_yes'])?>,
 	lpn_split_no: <?=json_encode($ec_lang['lpn_split_no'])?>,
+	lpn_snap_vertex: <?=json_encode($ec_lang['lpn_snap_vertex'])?>,
+	lpn_snap_node_on_node: <?=json_encode($ec_lang['lpn_snap_node_on_node'])?>,
+	lpn_snap_moved_on_node: <?=json_encode($ec_lang['lpn_snap_moved_on_node'])?>,
 	lpn_field_to: <?=json_encode($ec_lang['lpn_field_to'])?>,
 	// The minor-loss table, the same one mphl, hw, dw, mhp, bpn and ip all link to. One URL rather
 	// than three: k is one quantity whatever friction method carries the pipe alongside it. The

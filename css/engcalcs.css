@@ -1123,6 +1123,15 @@ html[lang="zh"] .ec-welcome {
 /* Dashed line from the first-picked node to the live pointer, same context (add-pipe/add-pump
    mode) -- shown/hidden and repositioned entirely from JS (rubberBandEl in looped-network.js). */
 .lpn-rubberband { stroke: #d32f2f; stroke-width: calc(0.4 * var(--lpn-symf, 0)); stroke-dasharray: 1.2 1; pointer-events: none; fill: none; }
+/* The object-snap glyph and the name of what it caught (Task 782): a CAD-style marker, square on a
+   node, diamond on a pipe vertex, hourglass on the nearest point of a pipe. A constant 2 px on screen
+   at every zoom (the JS redraws its size per frame); never takes a pointer event. */
+.lpn-snap-mark { pointer-events: none; }
+.lpn-snap-glyph { fill: none; stroke: var(--ec-hue-e8a33d); stroke-width: 2px; vector-effect: non-scaling-stroke; }
+.lpn-snap-name {
+	fill: var(--ec-ink-strong); stroke: var(--lpn-map-bg, var(--ec-bg)); stroke-width: 3px; paint-order: stroke;
+	vector-effect: non-scaling-stroke; font-family: sans-serif;
+}
 /* The select-area marquee (Task 266). Blue rather than the rubber band's red, because the rubber
    band says "a pipe will be drawn here" and this says "these are the ones I mean" -- two shapes
    that both follow the pointer and must never be mistaken for each other. A faint wash inside it,

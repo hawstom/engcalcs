@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "ro",
-        "expected_key_count": 2550,
-        "delta_key_count": 106,
+        "expected_key_count": 2553,
+        "delta_key_count": 109,
         "exempt_key_count": 49,
         "exempt_keys": [
             "u_imgd",
@@ -812,7 +812,7 @@
         "lpn_status_hidden_tip": "Show the hidden message on the map again.",
         "lpn_result_depth": "Depth",
         "lpn_result_depth_tip": "Depth of water in the tank at the time shown, measured up from the tank bottom: the head minus the tank elevation.",
-        "lpn_result_tank_volume": "Usable volume",
+        "lpn_result_tank_volume": "Available volume",
         "lpn_result_tank_volume_tip": "Volume of water above the lowest water depth, so it is zero at that depth. The EPANET tank volume also includes the water below the lowest water depth, which still counts toward mixing and water age, so the tank elevation stays at the tank bottom.",
         "lpn_pane_copy_heads": "Copy with column headings",
         "lpn_export_table_title": "Export to {format}",
@@ -855,6 +855,9 @@
         "lpn_split_pipe_ask": "Split pipe {id} at this node?",
         "lpn_split_yes": "Yes",
         "lpn_split_no": "No",
+        "lpn_snap_vertex": "{link}, vertex {n}",
+        "lpn_snap_node_on_node": "{new} placed at the location of {target}. The two nodes are not connected.",
+        "lpn_snap_moved_on_node": "{moved} moved to the location of {target}. The two nodes are not connected.",
         "lpn_settings_hover_card": "Show the full label on hover",
         "lpn_settings_hover_card_tip": "Rest the pointer on a node, link or customer to see its label as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project.",
         "lpn_junction_pattern_unknown": "No pattern in this project is named {id}, so the junction was left as it was.",
@@ -920,7 +923,7 @@
         "lpn_status_hidden_tip": "Show the hidden message on the map again.",
         "lpn_result_depth": "Depth",
         "lpn_result_depth_tip": "Depth of water in the tank at the time shown, measured up from the tank bottom: the head minus the tank elevation.",
-        "lpn_result_tank_volume": "Usable volume",
+        "lpn_result_tank_volume": "Available volume",
         "lpn_result_tank_volume_tip": "Volume of water above the lowest water depth, so it is zero at that depth. The EPANET tank volume also includes the water below the lowest water depth, which still counts toward mixing and water age, so the tank elevation stays at the tank bottom.",
         "lpn_pane_copy_heads": "Copy with column headings",
         "lpn_export_table_title": "Export to {format}",
@@ -963,6 +966,9 @@
         "lpn_split_pipe_ask": "Split pipe {id} at this node?",
         "lpn_split_yes": "Yes",
         "lpn_split_no": "No",
+        "lpn_snap_vertex": "{link}, vertex {n}",
+        "lpn_snap_node_on_node": "{new} placed at the location of {target}. The two nodes are not connected.",
+        "lpn_snap_moved_on_node": "{moved} moved to the location of {target}. The two nodes are not connected.",
         "lpn_settings_hover_card": "Show the full label on hover",
         "lpn_settings_hover_card_tip": "Rest the pointer on a node, link or customer to see its label as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project.",
         "lpn_junction_pattern_unknown": "No pattern in this project is named {id}, so the junction was left as it was.",
@@ -2496,6 +2502,54 @@
             }
         },
         "lpn_split_no": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_field_to",
+                    "value": "La",
+                    "english": "To"
+                },
+                "next_translated": {
+                    "key": "lpn_field_valve_type",
+                    "value": "Tipul vanei",
+                    "english": "Valve type"
+                }
+            }
+        },
+        "lpn_snap_vertex": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_field_to",
+                    "value": "La",
+                    "english": "To"
+                },
+                "next_translated": {
+                    "key": "lpn_field_valve_type",
+                    "value": "Tipul vanei",
+                    "english": "Valve type"
+                }
+            }
+        },
+        "lpn_snap_node_on_node": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_field_to",
+                    "value": "La",
+                    "english": "To"
+                },
+                "next_translated": {
+                    "key": "lpn_field_valve_type",
+                    "value": "Tipul vanei",
+                    "english": "Valve type"
+                }
+            }
+        },
+        "lpn_snap_moved_on_node": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
