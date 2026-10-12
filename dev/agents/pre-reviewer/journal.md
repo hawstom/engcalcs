@@ -4328,3 +4328,35 @@ OBSERVED: type change tank(ground 900, base 880, depth 120)->reservoir keeps hea
 OBSERVED: with Specific Gravity 1.1 the built-in engine reports the tank pressure x1.1 (23.47 m) and EPANET unscaled (21.34 m); junctions differ the same way (85.4 vs 77.7), so pre-existing between engines, but the idle label (x SG) jumps when an EPANET run starts.
 OBSERVED: DXF ELEV for a tank now means ground; GeoJSON "elevation" still means base. Spanish/French base-elevation tip is the old translated text (lacks the "blank = at the ground" sentence); ground tip falls back to English.
 NOT CHECKED: look of the new column and rows, v12 file in an old build in a real browser (code: master refuses saved.v > its version at js/looped-network.js:35815), scenario Find-replace of Base elevation.
+
+2026-10-12 feat/convert-search b71bb912. OBSERVED: builder harness 16/16 pass (stubbed Nominatim; one request; prefill; world-map). CITED/read: second-search and cancel paths by code only, not run. SPECULATION: wide-extent hits (state/country) become the site width.
+
+## 2026-10-12 - feat/match-property @ daa13a9c (Copy/Paste properties)
+
+OBSERVED (ran builder's harness in Chromium, 51/51; plus my own scenario script): right-click rows, greyed tip, no dialog, one Undo, selection-only paste, junction->tank only elevation, pump Shut copied, no Match door in Edit menu or lang/PHP/JS, localStorage+cookie unchanged by Copy.
+OBSERVED DEFECT: in scenario S1, pasting junction 10 onto 23 wrote ELEVATION into Base (node 23 elev 690 -> 710, no override), notice only "Values changed: 2". Cause: column setter -> setProp() writes Base for non-overridable props (elevation, tank dims, pump speed...). The removed Match build skipped+counted these. Same shape as R-027 (scope leak).
+OBSERVED: junction elevation pasted onto tank changed tank elevation 850 -> 710 (a tank is a fixed head: moves its water surface).
+CITED (code, not run): paste tip shows "No selected asset can take..." even when nothing is selected at all.
+UNVERIFIED: how it looks; touch (no right-click); "The table is good" meaning - ambiguous, no table in the prior Match UI beyond Tables-pane column reuse (kept).
+
+Perry journal, 2026-10-12, feat/graph-bubble 17a7c041. OBSERVED: harness 37/37 passes; delete-asset+undo leaves a bubble chart drawn at wrong scale (hidden when redrawn); zoom out piles all bubbles over the network (screen-pixel offsets); close is not undoable; deleted asset's bubble record stays in doc.bubbles (counts toward 12); master opens a bubbled file and drops the field on resave; .inp byte-identical with/without bubbles; tab switch hides and restores. SPECULATION: touch drag untested.
+
+## 2026-10-12 -- feat/bentley-interop f370eef4 (Perry)
+OBSERVED (real Chromium, probes in /tmp/claude-1000/p/): the Scenarios TABLE refuses a pick of "Base": the select offers it, but the
+cell parser (scenarioTableCols().parse) accepts only '' or a stored record's name, and Base is no record, so paneCommitCell
+reverts the cell silently. smAssign(..,'Base') itself works (headless 14.x calls it directly, which is why the harness is green).
+Control: picking a real alternative from the same select commits. Tom's "I can't select Base" is NOT fixed in the table.
+OBSERVED: Fig 5 case (child inherits parent's ticked label, clear it) now makes child's own Presentation alt named for it; parent/Base untouched; false overrides persist.
+OBSERVED: junction elev (Properties + Tables), tank elev/diameter/min/max, pump speed: override marker, own Physical alt, Base unchanged, pressures change only in scenario, EPANET and built-in; .inp export carries them.
+OBSERVED: dblclick on a Scenarios-TABLE name cell does nothing; tree dblclick makes current (no clash with F2/editor dblclick).
+OBSERVED: Copy/share: edit in the copy changes the original silently (no note); delete scenario leaves its alt "Not used by any scenario" in tree and file, deletable.
+OBSERVED: merge feat/match-property (05bda765) into f370eef4: conflicts in js/looped-network.js (10 hunks), lpn-geojson.js, lpn-inp.js, dev/new-english-keys.md. All code hunks are tank "Base elevation" (bottomElev, Base-owned plain write) vs effective(n,'elev'). Resolved ours; paste then writes bottomElev into BASE from a scenario (Net3 tank 1->2: Base bottomElev 116.5 -> 131.9) while the rest lands in the scenario.
+Mistakes of mine worth keeping: clicking map symbols while Properties popup is open hits the popup (made a phantom "alt created on click" finding; discarded). Test seam a.answerPromptWith leaves window.lpnDialogAnswerer set, so later Ask dialogs throw "window[kind] is not a function"; delete it.
+SPECULATION: none carried.
+
+# Perry, feat/si-example d3bd3f23, 2026-10-12
+OBSERVED: gallery order/titles correct; scale bars within 0.5% of ground on all 4 (farthest-pair measurement, headless Chromium).
+OBSERVED: Net2 US and SI open with project.basemap=satellite and request api.mapbox.com tiles with no consent (cookie refused). privacy.php says the other three features "ask you first".
+OBSERVED: Net2 US labelSettings (suffix/decimals/show/priority/useUnits/customer) and symbolCap* dropped vs Tom's /tmp/Net2.epp; nodes/links identical.
+OBSERVED: translation payloads still carry lpn_ex_net3_world keys (orchestrator regenerates).
+OBSERVED: Net3 SI colorBreaks {} -> legend auto-breaks 14.1/28.1/42.2/56.3 m, not round.

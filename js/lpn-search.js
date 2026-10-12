@@ -461,6 +461,12 @@
 	 * Order matters and is not arbitrary: the consent question comes BEFORE the search box, so
 	 * nobody types a place name and only then learns where it was about to go.
 	 */
+	// **A QUERY CARRIED IN FROM ANOTHER BOX, IN MEMORY ONLY** (File, Convert as: the coordinate-system
+	// chooser's search is not typed twice). It only pre-fills the box above; a visitor who submits it
+	// meets the repeated-query memory (`last`), so it costs no second request. Set and cleared by the
+	// host; never stored anywhere.
+	var prefill = '';
+	EC.lpnSearchPrefill = function (text) { prefill = String(text == null ? '' : text); };
 	EC.lpnSearchOpen = function () {
 		if (!seam || (seam.locatable && !seam.locatable())) { return; }
 		if (inFlight) {
@@ -470,7 +476,7 @@
 		mayWeSend(function () {
 			ask({ kind: 'prompt', text: t('lpn_search_prompt',
 				'Search for a place by name. A town, a street, a landmark — for example: ' +
-				'Petaluma, California'), value: '' }, function (v) {
+				'Petaluma, California'), value: prefill }, function (v) {
 				if (v === null) { return; }
 				EC.lpnSearchRun(v, true);
 			});

@@ -42856,16 +42856,41 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		}
 		convas = { origId: origId, copyId: id, to: to, lenKey: lenTo, name: name, step: step, srcUnitM: srcUnitM,
 			bdTurn: (from.kind === 'unnamed' && saved.backdrop && bdTurn) ? bdTurn : 0 };
-		if (step === 'attach') { mapgeoStart(); if (!mapgeoActive()) { convasAbandon(); } return; }
+		if (step === 'attach') { mapgeoStart(); if (!mapgeoActive()) { convasAbandon(); } else { convasSeedStep1(); } return; }
 		georefStart();
-		if (!georefActive()) { convasAbandon(); }
+		if (!georefActive()) { convasAbandon(); } else if (step === 'place') { convasSeedStep1(); }
 	}
+	// **A PLACE SEARCHED FOR IN THE CHOOSER IS NOT SEARCHED FOR AGAIN** (Tom, 2026-10-12: *"remember
+	// if user does place name search in the coordinate system chooser and place the Step 1 of 2 view
+	// based on that name search"*). The chooser's hit is in hand, so Step 1 opens centred there with
+	// no request, and the Search by name box opens with the query already typed. Memory only: the
+	// hit lives in convasPick, which dies with the next open of the box. A chooser that was not
+	// searched (convasPick.place has no query) leaves Step 1 on the whole world, as before.
+	function convasSeedStep1() {
+		var p = convasPick.place, ext, mpd, span;
+		if (!p || !p.query || !isFinite(p.lat) || !isFinite(p.lon)) { return; }
+		if (EngCalcs.lpnSearchPrefill) { EngCalcs.lpnSearchPrefill(p.query); }
+		if (mapgeoActive()) { mapgeoGoTo({ lat: p.lat, lon: p.lon }, p.extent); return; }
+		if (!georefActive() || !georef.t) { return; }
+		// The placement wizard travels with a site width; the found place's own extent is the best
+		// one in hand, and the wizard's usual default otherwise. The size question is not asked.
+		ext = p.extent;
+		span = 0;
+		if (ext && isFinite(ext.east) && isFinite(ext.west) && isFinite(ext.north) && isFinite(ext.south)) {
+			mpd = EngCalcs.lpnGeorefMetersPerDegree(p.lat);
+			span = Math.max((ext.east - ext.west) * mpd.lon, (ext.north - ext.south) * mpd.lat);
+		}
+		if (!(span > 0)) { span = toSI(georefDefaultSpan(), 'lpn_u_length'); }
+		georefGoTo({ lat: p.lat, lon: p.lon }, span);
+	}
+	function convasEndSearch() { if (EngCalcs.lpnSearchPrefill) { EngCalcs.lpnSearchPrefill(''); } }
 	// **AFTER Keep this placement (or Georeference here).** The wizard ends on a lat/lon project;
 	// this lays it onto the system the box asked for, on the saved document, and installs it in the
 	// same tab. A conversion to lat/lon itself is already finished.
 	function convasPlaced(unrotated) {
 		var pc = EngCalcs.pageConfig || {}, c = convas, saved, t2, ok = true, prepared;
 		convas = null;
+		convasEndSearch();
 		if (!c || c.copyId !== library.openId) { return; }
 		if (c.step === 'attach' || (c.to.kind === 'epsg' && c.to.crs === LPN_CRS_LATLON)) { return; }
 		try { saved = JSON.parse(JSON.stringify(serializeProject())); } catch (err) { saved = null; }
@@ -42905,6 +42930,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function convasAbandon() {
 		var pc = EngCalcs.pageConfig || {}, c = convas;
 		convas = null;
+		convasEndSearch();
 		if (!c || c.copyId !== library.openId) { return; }
 		if (indexEntry(c.origId)) { switchToTab(c.origId); }
 		discardProject(c.copyId);
@@ -46453,7 +46479,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			text = field ? String(field.value || '').trim() : '';
 		if (!text || !EngCalcs.lpnSearchPoint) { return; }
 		EngCalcs.lpnSearchPoint(text, function (hit) {
-			crsBox.place = { lat: hit.lat, lon: hit.lon, extent: hit.extent };
+			// The query rides with the point, in memory, so File, Convert as can open its Step 1 there.
+			crsBox.place = { lat: hit.lat, lon: hit.lon, extent: hit.extent, query: text };
 			renderCrsBoxList();
 		});
 	}
