@@ -68,7 +68,7 @@
             "titleKey": "lpn_ex_elm_street_title",
             "descKey": "lpn_ex_elm_street_desc",
             "title": "Elm Street Center",
-            "description": "Prescott Valley, Arizona: 17 junctions, 1 reservoir and 1 pump, with no extended-period simulation. A commercial site solved for fire flow on top of maximum day demand, at one moment in time, drawn over a site plan.",
+            "description": "Prescott Valley, Arizona: 17 junctions, 1 reservoir and 1 pump. A commercial site solved for fire flow on top of maximum day demand, at one moment in time, drawn over a site plan.",
             "system": "us",
             "coords": "xy",
             "work": "design",

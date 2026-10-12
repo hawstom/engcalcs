@@ -28,7 +28,7 @@ function ok(name, cond, extra) {
 }
 
 const files = fs.readdirSync(ROOT + 'examples').filter(function (f) { return /\.lwn$/.test(f); });
-ok('the examples folder holds the nine shipped examples', files.length === 9, files.length);
+ok('the examples folder holds the eight shipped examples', files.length === 8, files.length);
 
 files.forEach(function (f) {
 	setUnitSet('us');
