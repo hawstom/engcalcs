@@ -5584,3 +5584,34 @@ tr.lpn-ff-error { background: var(--ec-gray-f2f2f2); }
 .lpn-hovercard-anchor { position: fixed; width: 1px; height: 1px; pointer-events: none; }
 .tooltip.lpn-hovercard { pointer-events: none; }
 .tooltip.lpn-hovercard .tooltip-inner { text-align: left; }
+
+/* ---- Time series graph bubbles (Task 784) -------------------------------------------------------
+   The layer is a fixed window over the part of the canvas that is on screen, clipped to it, and does
+   not catch the pointer; each bubble does. The tail is drawn in one SVG above the bubbles: a fill
+   that hides the bubble's border where the tail joins it, and a stroke along its two slanted edges. */
+.lpn-tsb-layer { position: fixed; z-index: 1100; overflow: hidden; pointer-events: none; }
+.lpn-tsb-tails { position: absolute; left: 0; top: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; z-index: 100000; }
+.lpn-tsb-tailfill { fill: var(--ec-bg); stroke: none; }
+.lpn-tsb-tailline { fill: none; stroke: var(--ec-gray-999); stroke-width: 1; stroke-linejoin: round; }
+.lpn-tsb {
+	position: absolute; box-sizing: border-box; pointer-events: auto; background: var(--ec-bg); color: var(--ec-ink);
+	border: 1px solid var(--ec-gray-999); border-radius: 8px; box-shadow: 0 2px 8px var(--ec-a-0-0-0-25);
+	overflow: hidden;
+}
+.lpn-tsb-head {
+	display: flex; align-items: center; gap: 4px; height: 24px; padding: 0 2px 0 8px; cursor: move; touch-action: none;
+	background: var(--ec-gray-f6f6f6); border-bottom: 1px solid var(--ec-border); user-select: none;
+}
+.lpn-tsb-title { flex: 1; min-width: 0; font-size: 12px; font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lpn-tsb-close {
+	flex: none; width: 20px; height: 20px; padding: 0; border: 0; border-radius: 10px; background: none; font: inherit;
+	font-size: 16px; line-height: 18px; color: inherit; cursor: pointer;
+}
+.lpn-tsb-close:hover, .lpn-tsb-close:focus-visible { background: var(--ec-gray-eaeaea); outline: 0; }
+.lpn-tsb-chart { width: 100%; }
+.lpn-tsb-say { padding: 8px; font-size: 12px; }
+.lpn-tsb-grip { position: absolute; right: 0; bottom: 0; width: 16px; height: 16px; cursor: nwse-resize; touch-action: none; }
+.lpn-tsb-grip::after {
+	content: ''; position: absolute; right: 3px; bottom: 3px; width: 8px; height: 8px;
+	border-right: 2px solid var(--ec-gray-888); border-bottom: 2px solid var(--ec-gray-888);
+}

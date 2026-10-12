@@ -6317,6 +6317,7 @@ var EngCalcs = EngCalcs || {};
 		// While it is DETACHED it must not move on the screen at all, which takes an equal and
 		// opposite transform on its own group, and a re-derivation once the gesture settles.
 		georefDetachTick();
+		tsbSchedule();
 	}
 	// ---- ROADMAP Task 274: the user works in CARTESIAN coordinates (Y increases upward) ----
 	//
@@ -30406,6 +30407,7 @@ var EngCalcs = EngCalcs || {};
 	// remembered row order belongs to the outgoing document, so all seven forget it.
 	function paneDocumentArrived() {
 		var t = activePaneTab();
+		tsbArrived();
 		paneTables().forEach(paneTableReset);
 		if (paneIsOpen() && activePaneTableSpec()) { renderPaneTable(activePaneTableSpec()); }
 		// The Time series tab draws from the run, not the table specs, and a switch that re-solves
@@ -32301,6 +32303,290 @@ var EngCalcs = EngCalcs || {};
 		if (!popup || !panelIsOpen(popup) || popupUserSize) { return; }
 		r = popup.getBoundingClientRect();
 		if (r.bottom > window.innerHeight - POPUP_EDGE) { capPanelToRoomBelow(popup, r.top); }
+	}
+
+	// ---- TIME SERIES GRAPH BUBBLES (ROADMAP Task 784) ---------------------------------------------
+	//
+	// Tom, 2026-10-10: *"a right-click menu at assets that includes 'Time series graph' that makes a
+	// pretty 'speech bubble' 200px to 400 px ... so that four or six could be arranged on the map. And
+	// it would be really cool if that presentation scenario could be saved."*
+	//
+	// **ONE RENDERER, AGAIN.** A bubble is a host div handed to tsDraw(), the Time series tab's own
+	// drawing, over the run's own frames (pgAvailable() picks the asset's series exactly as the
+	// Properties graph does). Nothing here plots, solves or stores a result, so Recalculate OFF is
+	// honoured for free: the run is kept until Calculate replaces it, and a bubble shows that snapshot.
+	//
+	// **THE ARRANGEMENT IS PRESENTATION AND RIDES IN THE FILE.** `doc.bubbles` = [{id, g, n, x, y, w}]:
+	// group ('node'|'link'), asset id, the bubble's top-left as a SCREEN-pixel offset from the asset,
+	// and its width. Written by serializeProject() only when there is one, so a file without bubbles is
+	// byte-identical to what it was. It is project-wide: a per-scenario presentation does not exist on
+	// this branch's base. Never localStorage: an arrangement worth saving is worth sending with the file.
+	//
+	// **THE OFFSET IS IN PIXELS, NOT WORLD UNITS**, so a zoom keeps the bubble's size and its distance
+	// from the asset and moves only the asset under the tail. The tail is recomputed on every pan, zoom,
+	// resize and scroll (setTransform() is the one seam), coalesced to one frame.
+	var TSB_MIN_W = 200, TSB_MAX_W = 400, TSB_DEF_W = 300, TSB_HEAD_PX = 24, TSB_MAX = 12,
+		TSB_TAIL_HALF = 9, TSB_GAP = 28, TSB_PAD = 4;
+	var tsbLayer = null, tsbTails = null, tsbEls = {}, tsbQueued = false, tsbZ = 1;
+	function tsbList() { return doc.bubbles || []; }
+	function tsbClampW(w) { return Math.max(TSB_MIN_W, Math.min(TSB_MAX_W, Math.round(w) || TSB_DEF_W)); }
+	function tsbChartH(w) { return Math.round(w * 0.6); }
+	function tsbSubject(b) {
+		var e = b.g === 'link' ? linkById(b.n) : nodeById(b.n);
+		return e ? { group: b.g === 'link' ? 'link' : 'node', e: e } : null;
+	}
+	function tsbAnchor(s) {
+		var p = s.group === 'link' ? pointAlongLink(s.e, 0.5) : nodeAt(s.e);
+		return p && isFinite(p.x) && isFinite(p.y) ? worldToScreen(p.x, p.y) : null;
+	}
+	// Only a number the file could have written is kept; anything else is dropped on arrival.
+	function tsbClean(list) {
+		if (!Array.isArray(list)) { return []; }
+		return list.filter(function (b) {
+			return b && typeof b.id === 'string' && (b.g === 'node' || b.g === 'link') && typeof b.n === 'string' &&
+				isFinite(b.x) && isFinite(b.y);
+		}).slice(0, TSB_MAX * 4).map(function (b) {
+			return { id: b.id, g: b.g, n: b.n, x: Math.round(b.x), y: Math.round(b.y), w: tsbClampW(b.w) };
+		});
+	}
+	function tsbEnsureLayer() {
+		if (tsbLayer) { return tsbLayer; }
+		tsbLayer = document.createElement('div');
+		tsbLayer.id = 'lpn_tsb_layer';
+		tsbLayer.className = 'lpn-tsb-layer';
+		tsbTails = el('svg', { 'class': 'lpn-tsb-tails' }, tsbLayer);
+		document.body.appendChild(tsbLayer);
+		window.addEventListener('scroll', tsbSchedule, true);
+		window.addEventListener('resize', tsbSchedule);
+		return tsbLayer;
+	}
+	// The layer covers the part of the canvas that is on screen; a bubble is clipped to it, so one never
+	// floats over the menus, the bottom pane or another page region.
+	function tsbFit() {
+		var r = svg.getBoundingClientRect(),
+			l = Math.max(r.left, 0), t = Math.max(r.top, 0),
+			rr = Math.min(r.right, window.innerWidth), b = Math.min(r.bottom, window.innerHeight);
+		tsbLayer.style.left = l + 'px'; tsbLayer.style.top = t + 'px';
+		tsbLayer.style.width = Math.max(0, rr - l) + 'px'; tsbLayer.style.height = Math.max(0, b - t) + 'px';
+		return { left: l, top: t, width: Math.max(0, rr - l), height: Math.max(0, b - t) };
+	}
+	function tsbSchedule() {
+		if (tsbQueued || !doc.bubbles || !doc.bubbles.length) { return; }
+		tsbQueued = true;
+		window.requestAnimationFrame(function () { tsbQueued = false; tsbPlaceAll(); });
+	}
+	// A new run, a new frame of the transport, a new document: redraw every chart as well as place it.
+	function tsbRefresh() {
+		if (!doc.bubbles || !doc.bubbles.length) { return; }
+		window.requestAnimationFrame(function () { tsbEnsureLayer(); tsbSync(); tsbList().forEach(tsbDraw); tsbPlaceAll(); });
+	}
+	// Builds the elements for the list and removes those whose record is gone.
+	function tsbSync() {
+		var want = {};
+		tsbList().forEach(function (b) { want[b.id] = true; if (!tsbEls[b.id]) { tsbBuild(b); } });
+		Object.keys(tsbEls).forEach(function (id) {
+			if (want[id]) { return; }
+			if (tsbEls[id].root.parentNode) { tsbEls[id].root.parentNode.removeChild(tsbEls[id].root); }
+			delete tsbEls[id];
+		});
+	}
+	function tsbBuild(b) {
+		var pc = EngCalcs.pageConfig || {}, root = document.createElement('div'), head = document.createElement('div'),
+			title = document.createElement('span'), close = document.createElement('button'),
+			host = document.createElement('div'), grip = document.createElement('div');
+		tsbEnsureLayer();
+		root.className = 'lpn-tsb';
+		root.setAttribute('role', 'group');
+		root.setAttribute('data-bubble', b.id);
+		head.className = 'lpn-tsb-head';
+		title.className = 'lpn-tsb-title';
+		close.type = 'button';
+		close.className = 'lpn-tsb-close';
+		close.textContent = '×';
+		close.setAttribute('aria-label', pc.lpn_tsb_close || 'Close graph');
+		close.title = pc.lpn_tsb_close || 'Close graph';
+		host.className = 'lpn-tsb-chart';
+		grip.className = 'lpn-tsb-grip';
+		grip.title = pc.lpn_tsb_resize || 'Drag to resize';
+		head.appendChild(title); head.appendChild(close);
+		root.appendChild(head); root.appendChild(host); root.appendChild(grip);
+		tsbLayer.insertBefore(root, tsbTails);
+		tsbEls[b.id] = { root: root, title: title, host: host, rect: null };
+		root.addEventListener('pointerdown', function () { root.style.zIndex = String(++tsbZ); });
+		head.addEventListener('pointerdown', function (e) {
+			if (e.target === close || e.button > 0) { return; }
+			tsbDrag(e, b, 'move');
+		});
+		grip.addEventListener('pointerdown', function (e) { if (e.button > 0) { return; } tsbDrag(e, b, 'size'); });
+		close.addEventListener('click', function () { tsbClose(b.id); });
+	}
+	function tsbDrag(e, b, mode) {
+		var sx = e.clientX, sy = e.clientY, x0 = b.x, y0 = b.y, w0 = b.w, moved = false;
+		e.preventDefault();
+		function mv(ev) {
+			var dx = ev.clientX - sx, dy = ev.clientY - sy;
+			if (mode === 'move') { b.x = Math.round(x0 + dx); b.y = Math.round(y0 + dy); }
+			else {
+				b.w = tsbClampW(w0 + dx);
+				tsbDraw(b);
+			}
+			moved = true;
+			tsbPlaceAll();
+		}
+		function up() {
+			window.removeEventListener('pointermove', mv);
+			window.removeEventListener('pointerup', up);
+			window.removeEventListener('pointercancel', up);
+			if (moved) { saveToStorage(); }
+		}
+		window.addEventListener('pointermove', mv);
+		window.addEventListener('pointerup', up);
+		window.addEventListener('pointercancel', up);
+	}
+	function tsbClose(id) {
+		doc.bubbles = tsbList().filter(function (b) { return b.id !== id; });
+		if (!doc.bubbles.length) { delete doc.bubbles; }
+		tsbSync();
+		tsbPlaceAll();
+		saveToStorage();
+	}
+	function tsbDefaultField(s, avail) {
+		var want = s.group === 'link' ? 'flow' : (s.e.type === 'tank' || s.e.type === 'reservoir' ? 'head' : 'pressure'), i;
+		for (i = 0; i < avail.length; i++) { if (avail[i].field === want) { return avail[i]; } }
+		return avail[0];
+	}
+	function tsbDraw(b) {
+		var rec = tsbEls[b.id], pc = EngCalcs.pageConfig || {}, s = tsbSubject(b), frames, avail, pick, host, lay, say;
+		if (!rec) { return; }
+		host = rec.host;
+		host.innerHTML = '';
+		host.style.height = tsbChartH(b.w) + 'px';
+		rec.root.style.width = b.w + 'px';
+		if (!s) { return; }
+		rec.title.textContent = b.n;
+		frames = EngCalcs.lpnTimeRunFrames ? EngCalcs.lpnTimeRunFrames() : [];
+		say = function (text) {
+			var d = document.createElement('div');
+			d.className = 'lpn-profile-say lpn-tsb-say';
+			d.textContent = text;
+			host.appendChild(d);
+		};
+		if (!frames.length) { say(tsWaitingText(pc)); return; }
+		avail = pgAvailable(s.group, s.e, frames);
+		if (!avail.length) { say(pc.lpn_pgraph_none || 'This asset has no results in the current run.'); return; }
+		pick = tsbDefaultField(s, avail);
+		rec.title.textContent = b.n + '  ' + pgFieldLabel(s.group, pick.field, s.e);
+		lay = tsLayout(host);
+		tsDraw(host, lay, frames, [{ id: s.e.id, color: LPN_TS_COLORS[0], points: pick.points }],
+			s.group, pick.field, pgFieldLabel(s.group, pick.field, s.e));
+	}
+	// The tail: a triangle from the nearest edge of the bubble to just short of the asset, so the tip
+	// does not cover the symbol it points at. Null when the asset is under the bubble.
+	function tsbTail(ax, ay, r) {
+		var px = Math.max(r.l, Math.min(r.l + r.w, ax)), py = Math.max(r.t, Math.min(r.t + r.h, ay)),
+			outX = Math.abs(ax - px), outY = Math.abs(ay - py), horiz = outX >= outY, bx, by, p1, p2, len, ux, uy, R = 14;
+		if (outX === 0 && outY === 0) { return null; }
+		if (horiz) {
+			bx = ax < r.l ? r.l : r.l + r.w;
+			by = Math.max(r.t + R, Math.min(r.t + r.h - R, ay));
+			p1 = { x: bx + (ax < r.l ? 1.5 : -1.5), y: by - TSB_TAIL_HALF };
+			p2 = { x: p1.x, y: by + TSB_TAIL_HALF };
+		} else {
+			by = ay < r.t ? r.t : r.t + r.h;
+			bx = Math.max(r.l + R, Math.min(r.l + r.w - R, ax));
+			p1 = { x: bx - TSB_TAIL_HALF, y: by + (ay < r.t ? 1.5 : -1.5) };
+			p2 = { x: bx + TSB_TAIL_HALF, y: p1.y };
+		}
+		len = Math.hypot(ax - bx, ay - by);
+		if (len < 1) { return null; }
+		ux = (ax - bx) / len; uy = (ay - by) / len;
+		len = Math.max(2, len - 6);
+		return { p1: p1, p2: p2, tip: { x: bx + ux * len, y: by + uy * len } };
+	}
+	function tsbPlaceAll() {
+		var lr;
+		if (!tsbLayer) { return; }
+		lr = tsbFit();
+		while (tsbTails.firstChild) { tsbTails.removeChild(tsbTails.firstChild); }
+		tsbList().forEach(function (b) {
+			var rec = tsbEls[b.id], s = tsbSubject(b), a, w, h, r, t;
+			if (!rec) { return; }
+			a = s ? tsbAnchor(s) : null;
+			if (!a) { rec.root.style.display = 'none'; rec.rect = null; return; }
+			rec.root.style.display = '';
+			w = Math.max(TSB_MIN_W, Math.min(b.w, lr.width - 2 * TSB_PAD));
+			h = TSB_HEAD_PX + tsbChartH(b.w) + 2;
+			rec.root.style.width = b.w + 'px';
+			r = { l: a.x - lr.left + b.x, t: a.y - lr.top + b.y, w: b.w, h: h };
+			rec.root.style.left = r.l + 'px';
+			rec.root.style.top = r.t + 'px';
+			rec.rect = r;
+			t = tsbTail(a.x - lr.left, a.y - lr.top, r);
+			if (!t) { return; }
+			el('polygon', { 'class': 'lpn-tsb-tailfill', points: [t.p1, t.tip, t.p2].map(function (p) { return p.x + ',' + p.y; }).join(' ') }, tsbTails);
+			el('polyline', { 'class': 'lpn-tsb-tailline', points: [t.p1, t.tip, t.p2].map(function (p) { return p.x + ',' + p.y; }).join(' ') }, tsbTails);
+		});
+	}
+	// First free corner round the asset that keeps the whole bubble on the canvas and off its neighbours.
+	function tsbDefaultOffset(b, a, lr) {
+		var h = TSB_HEAD_PX + tsbChartH(b.w) + 2, w = b.w, best = null, cands, i, j, ox, oy, r, bad, o;
+		cands = [[TSB_GAP, -h - TSB_GAP], [-w - TSB_GAP, -h - TSB_GAP], [TSB_GAP, TSB_GAP], [-w - TSB_GAP, TSB_GAP],
+			[TSB_GAP, -h / 2], [-w - TSB_GAP, -h / 2], [-w / 2, -h - TSB_GAP], [-w / 2, TSB_GAP]];
+		for (i = 0; i < cands.length && !best; i++) {
+			ox = Math.round(cands[i][0]); oy = Math.round(cands[i][1]);
+			r = { l: a.x - lr.left + ox, t: a.y - lr.top + oy, w: w, h: h };
+			bad = r.l < TSB_PAD || r.t < TSB_PAD || r.l + w > lr.width - TSB_PAD || r.t + h > lr.height - TSB_PAD;
+			for (j in tsbEls) {
+				o = tsbEls[j].rect;
+				if (o && !(r.l + r.w <= o.l || o.l + o.w <= r.l || r.t + r.h <= o.t || o.t + o.h <= r.t)) { bad = true; }
+			}
+			if (!bad) { best = { x: ox, y: oy }; }
+		}
+		if (best) { return best; }
+		// Nowhere clear (a narrow screen, a crowded map): the first corner, pulled back inside the canvas.
+		ox = Math.round(cands[0][0]); oy = Math.round(cands[0][1]);
+		ox = Math.max(TSB_PAD - (a.x - lr.left), Math.min(lr.width - w - TSB_PAD - (a.x - lr.left), ox));
+		oy = Math.max(TSB_PAD - (a.y - lr.top), Math.min(lr.height - h - TSB_PAD - (a.y - lr.top), oy));
+		return { x: Math.round(ox), y: Math.round(oy) };
+	}
+	function tsbHasRun() {
+		return !!EngCalcs.lpnTimeRunFrames && EngCalcs.lpnTimeRunFrames().length > 1;
+	}
+	function tsbOpen(ref) {
+		var pc = EngCalcs.pageConfig || {}, list = tsbList(), b, s, a, lr, n = 0, off, id;
+		list.forEach(function (x) { if (x.g === ref.kind && x.n === ref.id && tsbEls[x.id]) { b = x; } });
+		if (b) { tsbEls[b.id].root.style.zIndex = String(++tsbZ); return; }
+		if (list.length >= TSB_MAX) {
+			setNotice(String(pc.lpn_tsb_max || 'Close a graph before opening another. Up to {n} stay open.').replace('{n}', String(TSB_MAX)));
+			return;
+		}
+		s = { group: ref.kind, e: ref.kind === 'link' ? linkById(ref.id) : nodeById(ref.id) };
+		if (!s.e) { return; }
+		a = tsbAnchor(s);
+		if (!a) { return; }
+		tsbEnsureLayer();
+		lr = tsbFit();
+		do { n++; id = 'tsb' + n; } while (list.some(function (x) { return x.id === id; }));
+		b = { id: id, g: ref.kind, n: ref.id, x: 0, y: 0, w: TSB_DEF_W };
+		off = tsbDefaultOffset(b, a, lr);
+		b.x = off.x; b.y = off.y;
+		doc.bubbles = list.concat([b]);
+		tsbBuild(b);
+		tsbEls[b.id].root.style.zIndex = String(++tsbZ);
+		tsbDraw(b);
+		tsbPlaceAll();
+		saveToStorage();
+	}
+	// A document arrives (a file, a tab, a new project): its bubbles are drawn, the previous one's go.
+	function tsbArrived() {
+		if (tsbLayer) {
+			Object.keys(tsbEls).forEach(function (id) {
+				if (tsbEls[id].root.parentNode) { tsbEls[id].root.parentNode.removeChild(tsbEls[id].root); }
+			});
+			tsbEls = {};
+			while (tsbTails.firstChild) { tsbTails.removeChild(tsbTails.firstChild); }
+		}
+		if (doc.bubbles && doc.bubbles.length) { tsbRefresh(); }
 	}
 
 	// ---- FREQUENCY PLOT (ROADMAP Task 600, first slice) --------------------------------------------
@@ -34857,6 +35143,8 @@ var EngCalcs = EngCalcs || {};
 		// **A STORED SCENARIO TREE IS CARRIED, NEVER DROPPED** (dev/scenario-alternatives.md):
 		// written last, and only when the file brought one or an explicit act made one.
 		LPN_TREE_KEYS.forEach(function (k) { if (doc[k] !== undefined) { out[k] = doc[k]; } });
+		// Task 784's graph bubbles: presentation, project-wide, written only when there are some.
+		if (doc.bubbles && doc.bubbles.length) { out.bubbles = doc.bubbles; }
 		// From v4 the file is Cartesian. CLONED FIRST -- flipStoredY() mutates, and the object above
 		// holds live references to doc.nodes/links/labels, so flipping in place would turn the
 		// drawing upside down on screen every time it was saved.
@@ -36007,6 +36295,8 @@ var EngCalcs = EngCalcs || {};
 		// is the user's data and is reported where it is used, never pruned here -- see
 		// profileMissingStops(). A file written before this existed simply has none.
 		doc.profiles = saved.profiles || [];
+		doc.bubbles = tsbClean(saved.bubbles);
+		if (!doc.bubbles.length) { delete doc.bubbles; }
 		// Which one was selected is a fact about a reader, not about the file.
 		profileState.activeId = '';
 		dropStoredPumpFit(doc.links);
@@ -49097,7 +49387,10 @@ var EngCalcs = EngCalcs || {};
 			{ label: pc.lpn_paste_props_menu || 'Paste properties to selection', enabled: hasTargets,
 				tip: propClip ? (pc.lpn_paste_props_off_kind || 'No selected asset can take the copied properties.')
 					: (pc.lpn_paste_props_off_none || 'Nothing is copied. Right-click an asset and choose Copy properties.'),
-				run: function () { pasteProperties(ctxSel); } }
+				run: function () { pasteProperties(ctxSel); } },
+			{ label: pc.lpn_tsb_menu || 'Time series graph', enabled: tsbHasRun(),
+				tip: pc.lpn_tsb_off_tip || 'Needs extended period results. Set a Total run time in Settings, Calculation, Time, and calculate.',
+				run: function () { tsbOpen(hitRef); } }
 		]);
 	});
 
@@ -70441,6 +70734,7 @@ var EngCalcs = EngCalcs || {};
 
 	function applySolveResult(result) {
 		var pc = EngCalcs.pageConfig || {};
+		tsbRefresh();
 		// The demand scaling report names the time step it was computed at, and says when the clock
 		// has left it; every frame the transport shows arrives here, so this is where it re-reads.
 		demandScaleClockMoved();
