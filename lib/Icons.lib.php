@@ -245,11 +245,11 @@ $ec_icons = array(
 	// the pipe and the next junction are dashed, square-ended because round caps would close the gaps.
 	'chain'      => '<circle cx="5.75" cy="5.75" r="4.25"/><path d="M8.8 8.8L15.2 15.2" stroke-dasharray="2.2 1.9" stroke-linecap="butt"/><circle cx="18.25" cy="18.25" r="4.25" stroke-dasharray="2.4 2" stroke-linecap="butt"/>',
 	'text'       => '<path d="M5 6h14"/><path d="M12 6v14"/><path d="M9 20h6"/>',
-	// **A SHAPE (Task 779): an almost-closed pentagon, open on the right, and no vertex markers**
-	// (Tom, 2026-10-11: *"Use an open (almost closed) polygon instead, with no vertex markers."*), so it
-	// is not read as `vertices`, whose polyline carries square grips. Five plain strokes; the gap is
-	// on the right side, between the first point and the last.
-	'shape'      => '<path d="M20.5 9.5L12 3L3.5 9.5L6.5 20.5H17.5L18.9 15.5"/>',
+	// **A SHAPE (Task 779): Tom's own freehand drawing, an irregular open polyline of four strokes**
+	// (Tom, 2026-10-12: *"I didn't draw an open pentagon ... and I didn't want a broken regular convex
+	// polygon because it looks like it might be yet another symbol."*). Five uneven points taken from his
+	// sketch, open at the right, no vertex markers, so it is not read as `vertices` (square grips).
+	'shape'      => '<path d="M19.7 8.4L12.6 4.3L3 14.9L9.9 19.6L21 17.1"/>',
 	// **A HOUSE, IN EIGHT STRAIGHT LINES** (Tom, 2026-09-18: *"Let's go with a very simple 8-line
 	// house icon. Much easier and more recognizeable."*, with his own sketch in
 	// dev/icon-preview/tgh-icon-concepts.png). Two roof slopes, two walls, a floor and three sides
