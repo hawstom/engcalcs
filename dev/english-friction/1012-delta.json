@@ -228,6 +228,294 @@
    "readings": [],
    "disposition": "dismissed",
    "resolution": "The three characters are shown literally in the file; the string is exact and unambiguous."
+  },
+  {
+   "key": "lpn_guide_find_query_def",
+   "source": "translator",
+   "lang": "am",
+   "complaint": "Query keywords (Everything, equal to, n highest) must stay English per the text, but the table mixes them with translated prose, so it is unclear whether the example column should be translated.",
+   "readings": [
+    "kept all query words and examples in English, prose translated",
+    "translate the keywords"
+   ],
+   "disposition": "dismissed",
+   "resolution": "The guide states that the English query words are accepted in every language: code samples keep the English words, and prose names the control as the translated page shows it."
+  },
+  {
+   "key": "lpn_hotkeys_zoomwin_def",
+   "source": "translator",
+   "lang": "am",
+   "complaint": "'Zoom Window:' reads as a menu name; unclear if it must match the translated toolbar label.",
+   "readings": [
+    "matched lpn_tool_zoom_window (የመስኮት ማጉላት)",
+    "literal description"
+   ],
+   "disposition": "dismissed",
+   "resolution": "'Zoom Window' names the tool; render it as the translated toolbar label names it."
+  },
+  {
+   "key": "lpn_result_tank_volume_tip",
+   "source": "translator",
+   "lang": "am",
+   "complaint": "'mixing and water age' and the long reason are dense; hard to render as a single clear sentence in a low-resource language.",
+   "readings": [
+    "literal rendering with ውሃ ዕድሜ",
+    "simplify"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Dense but single-reading; a descriptive rendering in two sentences is acceptable in the low-resource tier."
+  },
+  {
+   "key": "lpn_file_export_item_workspace",
+   "source": "translator",
+   "lang": "bg",
+   "complaint": "\"Workspace\" is ambiguous between a project folder and the saved window layout; the tip shows it is the layout.",
+   "readings": [
+    "Работна среда (saved layout of boxes and panes)",
+    "Работно пространство / project container"
+   ],
+   "disposition": "dismissed",
+   "resolution": "The tip disambiguates (the saved window layout), and the translator read it correctly."
+  },
+  {
+   "key": "lpn_guide_find_query_def",
+   "source": "translator",
+   "lang": "cs",
+   "complaint": "The table lists query words (equal to, above, n highest) that the guide says are accepted in every language, but the Czech UI shows translated words (rovno, větší než); unclear which the guide should show.",
+   "readings": [
+    "kept the English words the query accepts, as typed",
+    "translated them to match the Czech Condition list"
+   ],
+   "disposition": "dismissed",
+   "resolution": "The guide states that the English query words are accepted in every language: code samples keep the English words, and prose names the control as the translated page shows it."
+  },
+  {
+   "key": "lpn_dxf_note_blocks",
+   "source": "translator",
+   "lang": "cs",
+   "complaint": "'Layers' and 'attributes' are CAD terms; unclear if Layer names the DXF layer or the app's alternative.",
+   "readings": [
+    "DXF layers (hladiny), with the English term in parentheses",
+    "a map layer"
+   ],
+   "disposition": "dismissed",
+   "resolution": "In a DXF note, 'layers' and 'attributes' are the CAD meanings, and 'scale the blocks' is an instruction to the reader."
+  },
+  {
+   "key": "lpn_split_no",
+   "source": "translator",
+   "lang": "es",
+   "complaint": "identical to English is correct",
+   "readings": [
+    "No",
+    "(no alternative)"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Cognate: identical to English is correct for es; exempted per language in translation_exempt_keys.json."
+  },
+  {
+   "key": "lpn_help_manual",
+   "source": "translator",
+   "lang": "fr",
+   "complaint": "identical to English is correct",
+   "readings": [
+    "Guide (the French word is the same)",
+    "Manuel"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Cognate: identical to English is correct for fr; exempted per language in translation_exempt_keys.json."
+  },
+  {
+   "key": "lpn_guide_find_replace_def",
+   "source": "translator",
+   "lang": "hi",
+   "complaint": "Quotes the box text \"Change 4 assets?\" but the hi value of lpn_replace_preview is still English, so the guide and the page disagree if that key is later translated.",
+   "readings": [
+    "left the quoted English as shown on the page today",
+    "translate the quote now"
+   ],
+   "disposition": "dismissed",
+   "resolution": "The quoted labels are keys of their own (lpn_replace_preview, the Change them and Change what was found keys) and are translated; the guide quotes those translated values. The hi report that lpn_replace_preview was English was wrong: the hi file holds a translation."
+  },
+  {
+   "key": "lpn_guide_text_contour_box",
+   "source": "translator",
+   "lang": "hi",
+   "complaint": "\"Color nodes by:\" is a label; the sentence runs it inline as a name, which reads oddly with a colon.",
+   "readings": [
+    "used the hi label of lpn_color_node_field without colon",
+    "kept the colon"
+   ],
+   "disposition": "dismissed",
+   "resolution": "A quoted label may keep its colon or drop it inline, per the language's punctuation."
+  },
+  {
+   "key": "lpn_time_stat_minimum",
+   "source": "translator",
+   "lang": "id",
+   "complaint": "identical to English is correct",
+   "readings": [
+    "Min (standard Indonesian abbreviation of minimum, paired with Maks)",
+    "Minimum spelled out"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Cognate: identical to English is correct for id; exempted per language in translation_exempt_keys.json."
+  },
+  {
+   "key": "lpn_demand_pattern_default",
+   "source": "translator",
+   "lang": "id",
+   "complaint": "identical to English is correct",
+   "readings": [
+    "(default: {id}) — 'default' is the established Indonesian software term and the file already uses it (Pola kebutuhan default)",
+    "(bawaan: {id})"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Cognate: identical to English is correct for id; exempted per language in translation_exempt_keys.json."
+  },
+  {
+   "key": "lpn_library_pattern_default_mark",
+   "source": "translator",
+   "lang": "id",
+   "complaint": "identical to English is correct",
+   "readings": [
+    "(default) — established term, matches lpn_settings_default_pattern",
+    "(bawaan)"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Cognate: identical to English is correct for id; exempted per language in translation_exempt_keys.json."
+  },
+  {
+   "key": "lpn_time_stat_minimum",
+   "source": "translator",
+   "lang": "it",
+   "complaint": "identical to English is correct",
+   "readings": [
+    "Min is the standard Italian abbreviation",
+    "a longer word would not fit the column"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Cognate: identical to English is correct for it; exempted per language in translation_exempt_keys.json."
+  },
+  {
+   "key": "lpn_time_stat_maximum",
+   "source": "translator",
+   "lang": "it",
+   "complaint": "identical to English is correct",
+   "readings": [
+    "Max is the standard Italian abbreviation",
+    "a longer word would not fit the column"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Cognate: identical to English is correct for it; exempted per language in translation_exempt_keys.json."
+  },
+  {
+   "key": "lpn_split_no",
+   "source": "translator",
+   "lang": "it",
+   "complaint": "identical to English is correct",
+   "readings": [
+    "No is the Italian word for no",
+    "no alternative exists"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Cognate: identical to English is correct for it; exempted per language in translation_exempt_keys.json."
+  },
+  {
+   "key": "lpn_guide_text_calib_box",
+   "source": "translator",
+   "lang": "ps",
+   "complaint": "'one file for each parameter' is ambiguous between per-parameter files and one file per measured quantity.",
+   "readings": [
+    "one file for each measured parameter (pressure, flow)",
+    "one file per location"
+   ],
+   "disposition": "dismissed",
+   "resolution": "One file per measured quantity (pressure, flow, level): the two readings are the same."
+  },
+  {
+   "key": "lpn_snap_vertex",
+   "source": "translator",
+   "lang": "ps",
+   "complaint": "'vertex' has no established Pashto engineering term; used the Arabic-derived 'رأس' (corner point).",
+   "readings": [
+    "رأس (corner point of a polyline)",
+    "نقطه (would collide with node)"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Descriptive rendering is right for the low-resource tier."
+  },
+  {
+   "key": "lpn_demand_pattern_constant",
+   "source": "translator",
+   "lang": "ro",
+   "complaint": "identical to English is correct",
+   "readings": [
+    "(constant)",
+    "(fix)"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Cognate: identical to English is correct for ro; exempted per language in translation_exempt_keys.json."
+  },
+  {
+   "key": "lpn_tool_zoom_extent_tip",
+   "source": "translator",
+   "lang": "sw",
+   "complaint": "'Zoom Window with no fit first' has no clear object, so it is unclear whether the W key skips fitting or opens the window tool.",
+   "readings": [
+    "W starts the Zoom Window tool directly without fitting the network first",
+    "W fits the network then starts Zoom Window"
+   ],
+   "disposition": "english",
+   "resolution": "Two languages (sw, ur) independently could not parse 'For Zoom Window with no fit first'. Rewritten after the sprint to: 'Fit the whole network to the map window. To zoom to a rectangle you drag instead, press W or click the small triangle in the corner of the Zoom to fit toolbar button. See also the zoom controls at the upper right of the map.' Held back from the baseline (--except), so the next sprint retranslates it."
+  },
+  {
+   "key": "lpn_guide_find_replace_def",
+   "source": "translator",
+   "lang": "sw",
+   "complaint": "The quoted button labels 'Change them' and 'Change what was found' have no confirmed Swahili UI counterparts, so quoted names may not match the shipped buttons.",
+   "readings": [
+    "Vibadilishe / Badilisha vilivyopatikana, following lpn_replace_title",
+    "Badilisha vyote"
+   ],
+   "disposition": "dismissed",
+   "resolution": "The quoted labels are keys of their own (lpn_replace_preview, the Change them and Change what was found keys) and are translated; the guide quotes those translated values. The hi report that lpn_replace_preview was English was wrong: the hi file holds a translation."
+  },
+  {
+   "key": "lpn_dxf_note_blocks",
+   "source": "translator",
+   "lang": "sw",
+   "complaint": "'attributes 1 unit high' and 'scale the blocks to set the text height' are ambiguous about whether the instruction is to the reader or a statement of fact.",
+   "readings": [
+    "advice to the CAD user: scale blocks to change text height",
+    "statement that scaling happens automatically"
+   ],
+   "disposition": "dismissed",
+   "resolution": "In a DXF note, 'layers' and 'attributes' are the CAD meanings, and 'scale the blocks' is an instruction to the reader."
+  },
+  {
+   "key": "lpn_tool_zoom_extent_tip",
+   "source": "translator",
+   "lang": "ur",
+   "complaint": "'For Zoom Window with no fit first' is elliptical and can be read two ways.",
+   "readings": [
+    "To use Zoom Window without fitting first, press W or click the corner triangle",
+    "Zoom Window as a separate alternative to fitting"
+   ],
+   "disposition": "english",
+   "resolution": "Two languages (sw, ur) independently could not parse 'For Zoom Window with no fit first'. Rewritten after the sprint to: 'Fit the whole network to the map window. To zoom to a rectangle you drag instead, press W or click the small triangle in the corner of the Zoom to fit toolbar button. See also the zoom controls at the upper right of the map.' Held back from the baseline (--except), so the next sprint retranslates it."
+  },
+  {
+   "key": "lpn_guide_find_query_def",
+   "source": "translator",
+   "lang": "ur",
+   "complaint": "Condition names are shown in English in the code samples but are translated in the UI; unclear whether the prose should name the English or the UI words.",
+   "readings": [
+    "prose uses the Urdu UI condition names, code samples stay English",
+    "prose also in English"
+   ],
+   "disposition": "dismissed",
+   "resolution": "The guide states that the English query words are accepted in every language: code samples keep the English words, and prose names the control as the translated page shows it."
   }
  ]
 }

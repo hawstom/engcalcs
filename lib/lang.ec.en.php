@@ -1458,7 +1458,7 @@ $ec_lang['lpn_area_none']='Nothing found in that area.';
 $ec_lang['lpn_tool_vertices_tip']='Add and remove pipe vertices. Specify a point on a pipe to add a vertex, select a vertex to remove it, and drag a vertex to move it. A vertex changes automatic length, but doesn’t add or change minor (local) losses.';
 $ec_lang['lpn_tool_undo_tip']='Undo history length = 20 actions';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_tool_zoom_extent_tip']='Fit the whole network to the map window. For Zoom Window with no fit first, press W or click the small triangle in the corner of the Zoom to fit toolbar button. See also upper right map zoom controls.';
+$ec_lang['lpn_tool_zoom_extent_tip']='Fit the whole network to the map window. To zoom to a rectangle you drag instead, press W or click the small triangle in the corner of the Zoom to fit toolbar button. See also the zoom controls at the upper right of the map.';
 $ec_lang['lpn_tool_zoom_window_tip']='Specify corners or drag a rectangle. Press again for Zoom to fit.';
 // Tom's wording, 2026-09-25.
 $ec_lang['lpn_zoom_in_tip']='Zoom in. Shortcut: +';

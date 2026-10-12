@@ -869,7 +869,7 @@ $ec_lang['lpn_field_head_tip']='מפלס פני המים במאגר, נמדד כ
 // pipe-diameter unit would put a 15 m tank on screen as 15000. Same reason the three levels say
 // "measured up from the tank bottom" rather than leaving the datum to be guessed -- EPANET measures
 // a tank level from the vessel floor, not from the same zero the elevations use.
-$ec_lang['lpn_field_tank_base_elev_tip']='רום תחתית המכל. עומק המים במכל נמדד כלפי מעלה החל מכאן.';
+$ec_lang['lpn_field_tank_base_elev_tip']='רום תחתית המכל, שממנו נמדדים עומק המים והנפח. אם נשאר ריק, התחתית נמצאת ברום הקרקע.';
 $ec_lang['lpn_field_tank_level']='עומק מים';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_field_tank_level_tip']='עומק המים העומדים במכל, נמדד כלפי מעלה החל מתחתית המכל. פני המים הם רום תחתית המכל בתוספת עומק זה.';
@@ -885,7 +885,7 @@ $ec_lang['lpn_field_tank_diameter_tip']='רוחב המכל מצד לצד. הוא
 // 'head' is a documented trap term in glossary.json. This tip names it as a level, which is the
 // same guard lpn_field_head_tip carries for the reservoir.
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_tank_head_tip']='רום פני המים במכל: רום תחתית המכל בתוספת עומק המים. זהו הערך שהפותר משתמש בו עבור המכל.';
+$ec_lang['lpn_tank_head_tip']='רום פני המים במכל: רום הבסיס בתוספת עומק המים.';
 $ec_lang['lpn_close']='סגור';
 // The property popup's own name, in its drag bar (Tom, 2026-09-08: *"maybe the right title is
 // 'Properties'"*). It names the BOX, not the element in it: lpn_popup_title below the bar carries
@@ -1181,7 +1181,7 @@ $ec_lang['lpn_area_none']='לא נמצא דבר באזור זה.';
 $ec_lang['lpn_tool_vertices_tip']='הוספה והסרה של נקודות עיקול בצינור. ציינו נקודה על צינור כדי להוסיף נקודת עיקול, בחרו נקודת עיקול כדי להסיר אותה, וגררו נקודת עיקול כדי להזיז אותה. נקודת עיקול משנה את האורך האוטומטי, אך אינה מוסיפה או משנה הפסדים מקומיים.';
 $ec_lang['lpn_tool_undo_tip']='היסטוריית ביטול באורך 20 פעולות';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_tool_zoom_extent_tip']='התאמת הרשת כולה לחלון המפה. לחצו שוב לתקריב לחלון. ראו גם את פקדי התקריב בפינה הימנית העליונה של המפה.';
+$ec_lang['lpn_tool_zoom_extent_tip']='התאמת הרשת כולה לחלון המפה. לתקריב לחלון ללא התאמה מוקדמת, לחצו W או לחצו על המשולש הקטן בפינת כפתור סרגל הכלים התאמה לתצוגה. ראו גם את פקדי התקריב בפינה הימנית העליונה של המפה.';
 $ec_lang['lpn_tool_zoom_window_tip']='ציינו פינות או גררו מלבן. לחצו שוב להתאמה לתצוגה.';
 // Tom's wording, 2026-09-25.
 $ec_lang['lpn_zoom_in_tip']='הגדלה. קיצור: +';
@@ -1357,7 +1357,7 @@ $ec_lang['lpn_run_menu_tip']='הרצת סימולציה. אין צורך בכך 
 // out over time, and this switch is about the run, not about the drawing.
 $ec_lang['lpn_settings_auto_run']='חשב מחדש אוטומטית';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_settings_auto_run_tip']='כבו אם החישוב מחדש איטי מדי. מסתיר את הכפתור חשב.';
+$ec_lang['lpn_settings_auto_run_tip']='כבו אם החישוב מחדש איטי מדי. כל עוד הגדרה זו פועלת, הכפתור חשב מוסתר.';
 // **AN EDIT SAYS NOTHING AT ALL WHEN THE SWITCH IS OFF** (Tom, 2026-09-19: *"Recalc off Old
 // values: Leave in place stale. Don't clear. Trust the user."*). `lpn_manual_results_cleared`
 // stood here for part of one day and is DELETED, English-only, never translated: it announced a
@@ -2086,7 +2086,7 @@ $ec_lang['lpn_notes_6_term']='עזרה בעמודות הטבלה';
 $ec_lang['lpn_notes_6_def']='<table class="lpn-notes-table"><tbody><tr><td>לחיצה על הכותרת</td><td>בחירת עמודה</td></tr><tr><td>Ctrl+לחיצה או Shift+לחיצה על כותרת אחרת</td><td>הוספה או הרחבה של בחירת העמודות</td></tr><tr><td>גררו או השתמשו בניהול עמודות… בתפריט לחיצה ימנית או ⋮</td><td>הזזה (שינוי סדר) של העמודות הנבחרות</td></tr><tr><td>רחפו מעל הפינה העליונה של כותרת, או בחרו או עברו בטאב אל כותרת</td><td>תפריט ⋮ וחץ המיון.</td></tr><tr><td>לחיצה ימנית על הכותרת או תפריט ⋮ בפינה הימנית העליונה של הכותרת</td><td>הסתרה, הצגת הכול, או ניהול הנראות והסדר</td></tr><tr><td>סמל חץ בפינה הימנית העליונה של הכותרת</td><td>מיון לפי עמודה</td></tr><tr><td>לחיצה ימנית, תפריט ⋮ בפינה הימנית העליונה של הכותרת, או Ctrl+Shift+V</td><td>הדבקה כשורות חדשות בסוף הטבלה</td></tr></tbody></table>';
 $ec_lang['lpn_notes_7_term']='קיצורי מקלדת לטבלה';
 // R-311, his own row: "Ctrl+Shift+V | Paste as new rows at end of table".
-$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>מקשי חצים</td><td>ניווט.</td></tr><tr><td>Tab,‏ Enter</td><td>סיום הזנה וניווט תא אחד הצידה / למטה.</td></tr><tr><td>Shift+Tab,‏ Shift+Enter</td><td>ניווט אחורה.</td></tr><tr><td>Shift+מקשי חצים</td><td>הרחבת הבחירה.</td></tr><tr><td>Ctrl+C</td><td>העתקת הבחירה.</td></tr><tr><td>Ctrl+D</td><td>מילוי הבחירה למטה משורתה העליונה.</td></tr><tr><td>Ctrl+Enter</td><td>מילוי הבחירה בערך התא הפעיל.</td></tr><tr><td>Ctrl+A</td><td>בחירת הטבלה כולה.</td></tr><tr><td>Ctrl+Shift+V</td><td>הדבקה כשורות חדשות בסוף הטבלה.</td></tr><tr><td>Ctrl+Shift+PageDown,‏ Ctrl+Shift+PageUp</td><td>מעבר ללשונית הבאה או הקודמת, בין אם טבלה ובין אם גרף.</td></tr><tr><td>Delete</td><td>ניקוי תא.</td></tr><tr><td>F2</td><td>פתיחת תא לעריכה.</td></tr><tr><td>Esc</td><td>ביטול עריכה.</td></tr></tbody></table>';
+$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>מקשי חצים</td><td>ניווט.</td></tr><tr><td>Tab,‏ Enter</td><td>סיום ההזנה וניווט תא אחד הצידה (Tab) או למטה (Enter).</td></tr><tr><td>Shift+Tab,‏ Shift+Enter</td><td>ניווט תא אחד אחורה (Shift+Tab) או למעלה (Shift+Enter).</td></tr><tr><td>Shift+מקשי חצים</td><td>הרחבת הבחירה.</td></tr><tr><td>Ctrl+C</td><td>העתקת הבחירה.</td></tr><tr><td>Ctrl+D</td><td>מילוי הבחירה למטה משורתה העליונה.</td></tr><tr><td>Ctrl+Enter</td><td>מילוי הבחירה בערך התא הפעיל.</td></tr><tr><td>Ctrl+A</td><td>בחירת הטבלה כולה.</td></tr><tr><td>Ctrl+Shift+V</td><td>הדבקה כשורות חדשות בסוף הטבלה.</td></tr><tr><td>Ctrl+Shift+PageDown,‏ Ctrl+Shift+PageUp</td><td>מעבר ללשונית הבאה או הקודמת, בין אם טבלה ובין אם גרף.</td></tr><tr><td>Delete</td><td>ניקוי התא הפעיל. כדי לנקות טווח נבחר, לחצו לחיצה ימנית ובחרו מחיקה.</td></tr><tr><td>F2</td><td>פתיחת תא לעריכה.</td></tr><tr><td>Esc</td><td>ביטול עריכה.</td></tr></tbody></table>';
 // COLOR BAND LIMITS ARE FROZEN, NOT LIVE (Task 448). Tom, 2026-08-19: *"colors are subconsciously
 // expected to be stable through an animation... recomputing at each time step gives a wrong
 // impression of the system. In this we are ratifying EPANET."* The mechanism is
@@ -2305,7 +2305,7 @@ $ec_lang['lpn_mode_add_text']='מצב: הוספת טקסט. ציינו מיקו�
 // label itself can be dragged. Both economize on translation for later, per CLAUDE.md's tip-only
 // whole-label-wrap convention -- the button itself is already the click target (no separate "?"
 // glyph needed), so the tip goes straight on the button as a title, matched to the .ec-help class.
-$ec_lang['lpn_tip_select']='השתמשו במצב זה כדי לשנות, להזיז ולגרור רכיבי מפה או להזיז את המפה. זהו מצב ברירת המחדל של המפה. הקשה שנייה על Esc מבטלת את בחירת כל מה שנבחר.';
+$ec_lang['lpn_tip_select']='השתמשו במצב זה כדי לשנות, להזיז ולגרור נכסים וטקסט על המפה, או להזיז את המפה. זהו מצב ברירת המחדל של המפה. הקשה שנייה על Esc מבטלת את הבחירה.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_field_auto']='אוטומטי';
 $ec_lang['lpn_method_switch_confirm']='שינוי שיטת החיכוך אינו משנה את מספרי החספוס שכבר הוזנו בצינורות, וחספוס של שיטה אחת חסר משמעות בשיטה אחרת. בדקו כל צינור לאחר מכן. לשנות בכל זאת?';
@@ -2709,7 +2709,7 @@ $ec_lang['lpn_elev_dem_use_tip']='מכניס את הרום של ה-DEM בצומ�
 $ec_lang['lpn_elev_dem_none']='ל-DEM אין רום עבור צומת זה.';
 $ec_lang['lpn_elev_dem_said']='רום DEM מ-Mapbox: {v} {u}.';
 $ec_lang['lpn_settings_elev_source']='מקור הרום';
-$ec_lang['lpn_settings_elev_source_tip']='הדיוק האופקי והאנכי של Mapbox DEM לשנת 2026 נע בין 1–10 מ׳ ופחות מ-1 מ׳ בארצות הברית, 2–10 מ׳ ו-1–3 מ׳ באירופה וביפן, 30 מ׳ ו-10–16 מ׳ ברחבי העולם, ו-90 מ׳ ויותר מ-16 מ׳ בקטבים.';
+$ec_lang['lpn_settings_elev_source_tip']='דיוק Mapbox DEM בשנת 2026, אופקי ואחר כך אנכי: 1–10 מ׳ ופחות מ-1 מ׳ בארצות הברית, 2–10 מ׳ ו-1–3 מ׳ באירופה וביפן, 30 מ׳ ו-10–16 מ׳ בעולם כולו, ו-90 מ׳ ויותר מ-16 מ׳ בקטבים.';
 $ec_lang['lpn_settings_elev_source_typed']='למעלה';
 $ec_lang['lpn_settings_elev_source_dem']='DEM של Mapbox';
 $ec_lang['lpn_settings_accuracy']='דיוק';
@@ -3950,7 +3950,7 @@ $ec_lang['lpn_ff_rows_more_links']='עוד {n} קישורים אינם מוצג�
 $ec_lang['lpn_crit_menu']='ניתוח קריטיות…';
 $ec_lang['lpn_crit_menu_tip']='מסיר מהרשת כל צינור, משאבה ושסתום בתורו ומדווח על ההשפעה על המערכת.';
 $ec_lang['lpn_crit_title']='ניתוח קריטיות';
-$ec_lang['lpn_crit_intro']='כל נכס מוצא מהרשת בתורו, והרשת נפתרת בצעד הזמן המוצג על המסך בתרחיש הפעיל. שום דבר בפרויקט שלכם אינו משתנה; כל ההרצה נעשית על עותק.';
+$ec_lang['lpn_crit_intro']='כל נכס מוצא מהרשת בתורו, והרשת נפתרת בצעד הזמן המוצג על המסך בתרחיש הפעיל. דבר בפרויקט אינו משתנה; כל ההרצה נעשית על עותק.';
 $ec_lang['lpn_crit_scope']='קישורים להפסקה';
 $ec_lang['lpn_crit_scope_tip']='כל הצינורות, המשאבות והשסתומים, או רק אלה שנבחרו על המפה. בחרו את הקבוצה לפני ההרצה.';
 $ec_lang['lpn_crit_scope_all']='כל הקישורים';
@@ -4015,7 +4015,7 @@ $ec_lang['lpn_change_type_menu']='שינוי סוג';
 $ec_lang['lpn_change_type_tip']='משנה את הצמתים הנבחרים לצמתי חיבור, מאגרים או מכלים, או את הקישורים הנבחרים לצינורות, משאבות או שסתומים. כל אחד שומר על המזהה שלו, על מקומו, על חיבוריו ועל כל ערך שיש גם לסוג החדש. אם משהו עלול ללכת לאיבוד, תתבקשו לאשר קודם.';
 $ec_lang['lpn_change_type_ok']='שינוי';
 $ec_lang['lpn_change_type_lost']='הערכים האלה יאבדו:';
-$ec_lang['lpn_change_type_key']='מזהה: ערך שאבד';
+$ec_lang['lpn_change_type_key']='כל שורה: מזהה: המאפיין והערך שיאבדו';
 $ec_lang['lpn_change_type_line']='{id}: {property} {value}';
 $ec_lang['lpn_change_type_line_scenario']='{id}: {property} {value}, בתרחיש {scenario}';
 $ec_lang['lpn_change_type_more']='ועוד {n}.';
@@ -4181,7 +4181,7 @@ $ec_lang['lpn_pda_deficit_note']='צמתים שמקבלים פחות מהדרי�
 $ec_lang['lpn_diag_pda_pressures']='הלחץ הנדרש חייב להיות גדול מהלחץ המזערי. שנו אחד מהם בהגדרות.';
 $ec_lang['lpn_inp_drop_pressure_unit']='קובץ זה מציין יחידת לחץ שונה מזו שהעמוד קורא ליחידת הספיקה שלו, שהיא psi ביחידות אמריקאיות ומטרים בשאר המקרים. כל הלחצים בקובץ נקראים כך, ולכן בדקו את הגדרות השסתומים, המטפטפים והגבולות המונחי לחץ שהוא מכיל. השורה נשמרת וכתובה בחזרה.';
 $ec_lang['lpn_screenshot_menu']='צילום מסך';
-$ec_lang['lpn_screenshot_tip']='העתקת תמונה חדה מהמסך של אזור המפה שגררתם, מוכנה להדבקה בדוח. לחצו בלי לגרור כדי לצלם את כל המפה.';
+$ec_lang['lpn_screenshot_tip']='צילום של אזור המפה שגררתם, ברזולוציה גבוהה מזו של המסך. סמנו עליו, ולאחר מכן העתיקו אותו לדוח בלחיצה על הכפתור העתק. לחצו בלי לגרור כדי לצלם את כל המפה.';
 $ec_lang['lpn_screenshot_hint']='גררו מלבן על המפה, או לחצו לצילום כל המפה. Esc מבטל.';
 $ec_lang['lpn_screenshot_copied']='צילום המסך הועתק.';
 $ec_lang['lpn_screenshot_saved']='הלוח אינו זמין כאן, ולכן צילום המסך הורד כקובץ PNG.';
@@ -4197,3 +4197,117 @@ $ec_lang['lpn_snip_tip_eraser']='מחק: לחצו על קו כדי להסיר א
 $ec_lang['lpn_snip_tip_undo']='ביטול (Ctrl+Z)';
 $ec_lang['lpn_snip_tip_redo']='ביצוע חוזר (Ctrl+Y)';
 $ec_lang['lpn_screenshot_scale_tip']='גודל התמונה כמכפלה של האזור שעל המסך. גדול יותר חד יותר ויוצר קובץ גדול יותר.';
+$ec_lang['points_data_points_heading']='נתוני נקודות<br />(השתמשו ב"העתק" כדי לראות את התבנית)';
+$ec_lang['lpn_field_tank_base_elev']='רום בסיס';
+$ec_lang['lpn_tank_ground_elev_tip']='רום הקרקע במכל. הלחץ במכל נמדד מכאן, כמו בצומת.';
+$ec_lang['lpn_guide_about_heading']='על מחשבון זה';
+$ec_lang['lpn_guide_group_from']='מתוך {menu}';
+$ec_lang['lpn_guide_menu_named']='תפריט {menu}';
+$ec_lang['lpn_help_manual']='מדריך';
+$ec_lang['lpn_guide_contents']='תוכן העניינים';
+$ec_lang['lpn_guide_rail_hide']='הסתרת תוכן העניינים';
+$ec_lang['lpn_guide_rail_show']='הצגת תוכן העניינים';
+$ec_lang['lpn_guide_search']='חיפוש במדריך';
+$ec_lang['lpn_guide_boxes_heading']='תיבות';
+$ec_lang['lpn_guide_boxes_intro']='ניתן להזיז כל תיבה, לשנות את גודלה, לעגן אותה בצד שמאל או ימין של המפה, או לסגור אותה. סימן ה-? בשורת הכותרת של תיבה פותח את העזרה שלה.';
+$ec_lang['lpn_guide_boxes_autohide']='כשהמצביע עוזב, תיבה ללא מיקוד מוסתרת לאחר השהיה קצרה. תיבה עם מיקוד מוסתרת כשלוחצים מחוצה לה, לוחצים Esc, או עוברים ממנה ב-Tab כשהמצביע במקום אחר.';
+$ec_lang['lpn_guide_box_help']='עזרה לתיבה זו';
+$ec_lang['lpn_guide_box_named']='תיבת {box}';
+$ec_lang['lpn_guide_dimmed']='שם עמום הוא כפתור המוסתר כעת בסרגל הכלים.';
+$ec_lang['lpn_guide_text_popup']='מציג את המאפיינים של הנכס או הטקסט הנבחר, או של כמה נכסים נבחרים, לצד הבחירה או במקום שאליו הוזזה התיבה לאחרונה. ערך שנערך משנה את הרשת מיד, ותווית הנכס במפה והחלונית טבלאות מתעדכנות בהתאם. תוצאות החישוב האחרון מופיעות מתחת לנתוני הקלט ואינן ניתנות לעריכה.';
+$ec_lang['lpn_guide_text_find_popup']='מאתר את הנכסים העומדים בתנאי, כגון כל צינור קטן מ-8 אינץ\' או כל צומת מתחת ל-40 psi, ויכול לשנות מאפיין אחד בכולם בפעולה אחת. השתמשו בו כדי לבדוק מודל לפני פתרונו (רום חסר, קוטר שהוזן ביחידה שגויה), כדי לרשום מקומות בעייתיים לאחר פתרונו (לחץ נמוך, מהירות גבוהה), וכדי לבצע תיקון אחד בנכסים רבים.\n\nהרשימות מה לחפש, מאפיין, תנאי וערך בונות תנאי אחד וכותבות אותו כשורת טקסט בתיבת השאילתה. ניתן לערוך את השורה גם ישירות, והרשימות עוקבות אחריה. שאילתה שהרשימות אינן יכולות לבטא, כגון שני תנאים המחוברים ב-OR, מסתירה את הרשימות עד ללחיצה על הכפתור השתמשו בבקרות במקום. כדי לחפש, לחצו Enter בתיבת השאילתה או לחצו על הכפתור חפש.';
+$ec_lang['lpn_guide_text_settings_box']='כל ההגדרות ושני כפתורי איפוס נמצאים בתיבת ההגדרות. אין מקום אחר למצוא בו הגדרות. ניתן לחפש בתיבה: הקלידו מילה אחת או יותר בשדה חיפוש הגדרות כדי להציג רק את ההגדרות שמזכירות את כולן. ההגדרות נשמרות עם הפרויקט, פרט להצגת תיבת התקדמות ההרצה ולהגדרות שתחת עמוד, שנשמרות בדפדפן זה. גם המיקום והגודל של תיבה זו נשמרים בדפדפן זה בלבד.';
+$ec_lang['lpn_guide_text_library_box']='מכילה את התבניות, העקומות, סוגי הצינורות, האביזרים, הבקרות והכללים של הפרויקט. נכס מפנה לתבנית, לעקומה, לסוג צינור או לאביזר לפי המזהה שלו, והפריט נערך כאן. בקרות וכללים חלים על הרשת כולה. כללים מופעלים רק על ידי מנוע EPANET. כולם נשמרים עם הפרויקט.';
+$ec_lang['lpn_guide_text_energy_box']='מדווחת על צריכת האנרגיה, ההספק השיאי והעלות של כל משאבה בהדמיית התקופה המורחבת האחרונה, לפי היעילות של כל משאבה ומחיר האנרגיה שנקבע תחת הגדרות, אנרגיה. היא דורשת משך ריצה כולל בהגדרות ורשת פתורה. היא אינה משנה את הרשת.';
+$ec_lang['lpn_guide_text_contour_box']='שולטת בתרשים קווי המתאר המצויר על המפה מערך הצומת שנבחר ב-צביעת צמתים לפי: ערכת הצבעים, המילוי והשקיפות שלו, מרווח קווי המתאר והתוויות, והמרחק שאליו הצבע מגיע מכל צינור. כיבויה מסתיר את התרשים ומשאיר את צבעי הצמתים. היא משנה רק את התצוגה, לא את הרשת.';
+$ec_lang['lpn_guide_text_scncmp_box']='פותרת כל תרחיש מעותק של השרטוט ומציגה בטבלה, לכל תרחיש, את מספר הערכים המותאמים, הלחץ הנמוך ביותר והמהירות הגבוהה ביותר. היא אינה משנה את הפרויקט, והתרחיש הפתוח נשאר כפי שהיה.';
+$ec_lang['lpn_guide_text_rptbox']='מציגה את דוח הטקסט שכתב מנוע EPANET עבור הדמיית התקופה המורחבת האחרונה, כולל האזהרות שלו וסיכום הרשת. כל הדמיית תקופה מורחבת מחליפה אותו; פתרון ברגע בודד אינו מחליף אותו, ועריכה משאירה את הדוח הקודם במקומו.';
+$ec_lang['lpn_guide_text_status_box']='מפרטת, לפי סדר הזמן, כל שינוי במהלך הדמיית התקופה המורחבת האחרונה: משאבה, שסתום או צינור שנפתחים או נסגרים, מכל שמתחיל להתמלא או להתרוקן או שהופך למלא או לריק, וכל צעד זמן שלא התכנס במלואו. רק שינויים מפורטים, לא כל צעד זמן.';
+$ec_lang['lpn_guide_text_alt_box']='מציגה, לכל תרחיש, באיזו חלופה הוא משתמש בכל קטגוריה, כגון פיזיקלי, דרישה והפעלת נכסים, ואת אפשרויות החישוב שלו: מכפיל דרישה, משך ריצה כולל וצעד זמן הידראולי. החלופות הן לקריאה בלבד. אפשרויות החישוב של תרחיש ניתנות להקלדה כאן, וערך ריק משתמש בערך של ההורה. פתחו אותה מהתפריט תרחישים לאחר ניקוי מצב בסיסי.';
+$ec_lang['lpn_guide_text_full_box']='מפרטת כל צומת וכל קישור בכל צעד זמן דיווח, ביחידות המוצגות בחלונית טבלאות. ללא הדמיית תקופה מורחבת היא מציגה את הפתרון הנוכחי ברגע בודד. הורדה או הדפסה כוללות כל צעד זמן, והטבלה מציגה אחד בכל פעם.';
+$ec_lang['lpn_guide_text_calib_box']='משווה קובץ של מדידות שדה עם התוצאות המחושבות באותם מקומות ובאותם זמנים, קובץ אחד לכל פרמטר. הקובץ נשמר להפעלה הנוכחית בלבד ואינו נשמר עם הפרויקט.';
+$ec_lang['lpn_guide_text_notes_popup']='מפרטת הערות על אופן הפעולה של עמוד זה ועל מה שהוא אינו עושה, כל אחת כמונח ואחריו הגדרתו. היא אינה משנה את הרשת.';
+$ec_lang['lpn_guide_text_hotkeys_popup']='מפרטת כל כפתור בסרגל הכלים וכל שורת תפריט, את קיצורי המקלדת, ורשומה לכל תיבה. בחירה בשורה מראה היכן הפקד נמצא; היא לעולם אינה מפעילה אותו. כדי לחפש, לחצו Ctrl+K מכל מקום, או / כשהמדריך במיקוד.';
+$ec_lang['lpn_guide_find_query_term']='שפת השאילתה';
+$ec_lang['lpn_guide_find_query_def']='<table class="lpn-notes-table"><tbody><tr><td><code>Scope.Property condition value</code></td><td>תנאי אחד. ההיקף הוא Everything, Junction, Reservoir, Tank, Pipe, Pump, Valve, Text, Customer או Source. המאפיין הוא כל רשומה ברשימת מאפיין עבור אותו היקף.</td></tr><tr><td>תנאים</td><td>equal to, above, below, contains, n highest, n lowest ו-empty. התנאי contains חל על טקסט בלבד. ב-n highest וב-n lowest, n הוא מספר, כמו ב-5 highest. עם האות n עצמה, כמו ב-<code>Pipe.Velocity n highest</code>, או כשתיבת הערך ריקה, מפורטים 10 נכסים. התנאי empty מוצא את הנכסים שאין להם ערך עבור המאפיין. לקישוריות יש ארבעה תנאים והיא אינה מקבלת ערך.</td></tr><tr><td>ערכים</td><td>מספר מוזן ללא יחידתו, ביחידה המוצגת במאפיינים ובחלונית טבלאות: 40, לא 40 psi. טקסט, כולל מזהה, מוקף במירכאות בודדות או כפולות: <code>\'60\'</code>.</td></tr><tr><td>AND, OR וסוגריים</td><td>AND מוערך לפני OR, וסוגריים מקבצים תנאים. NOT אינו זמין.</td></tr><tr><td>איות</td><td>אין הבחנה בין אותיות גדולות לקטנות. המילים באנגלית מתקבלות בכל שפה, ולכן שאילתה שהועתקה ממדריך זה פועלת בעמוד בכל שפה.</td></tr></tbody></table>';
+$ec_lang['lpn_guide_find_examples_term']='דוגמאות עבודה על Net3';
+$ec_lang['lpn_guide_find_examples_def']='<p>פתחו את הדוגמה Net3 כדי לעקוב אחר הדוגמאות. הלחץ ב-psi והמהירות ב-ft/s.</p><table class="lpn-notes-table"><tbody><tr><td><code>Everything.ID equal to \'60\'</code></td><td>צומת 60 וצינור 60. לצומת ולצינור יכול להיות אותו מזהה, ולכן חיפוש מזהה תחת Everything עשוי להחזיר יותר מנכס אחד.</td></tr><tr><td><code>Junction.Pressure below 40</code></td><td>צמתים 10, 40, 50, 20 ו-153, הלחץ הנמוך ביותר ראשון. בצומת 10 הלחץ הוא -0.6 psi, לחץ שלילי הדורש בדיקה.</td></tr><tr><td><code>Pipe.Velocity 5 highest</code></td><td>צינורות 60, 329, 125, 123 ו-149, המהירות הגבוהה ביותר ראשונה. בצינור 60 זורמת מהירות של 9.3 ft/s.</td></tr><tr><td><code>Junction.Pressure below 20 OR Pipe.Velocity above 5</code></td><td>צמתים 10, 20, 40 ו-50, וצינורות 60, 125 ו-329: לחצים נמוכים ומהירויות גבוהות ברשימה אחת.</td></tr><tr><td><code>Junction.Pressure below 40 AND Junction.Elevation above 100</code></td><td>צמתים 10, 20, 40 ו-50, הלחצים הנמוכים בקרקע גבוהה. שני התנאים חייבים לציין את אותו סוג נכס: <code>Junction.Pressure below 40 AND Pipe.Velocity above 3</code> אינו תואם דבר, כי אין נכס שהוא גם צומת וגם צינור.</td></tr><tr><td><code>Pipe.Closed equal to \'closed\'</code></td><td>צינור 330, הצינור היחיד הסגור בקובץ Net3.</td></tr><tr><td><code>Junction.Connectivity no open path to a source</code></td><td>אף צומת, כפי שהקובץ מופץ. כשצינור 247 סגור (ראו החלפה וביטול), צמתים 215, 217, 219 ו-225: הצמתים שפיצוץ בצינור 247 היה משאיר ללא אספקה. חזרה על כך לכל צינור היא ניתוח קריטיות.</td></tr></tbody></table>';
+$ec_lang['lpn_guide_find_results_term']='תוצאות, הבחירה וטבלאות';
+$ec_lang['lpn_guide_find_results_def']='<p>הנכסים התואמים מפורטים מתחת לכפתור חפש. התנאים above ו-n highest מפרטים תחילה את הערך הגבוה ביותר, התנאים below ו-n lowest את הנמוך ביותר, ותנאים אחרים לפי הערך שנמצא ולאחר מכן לפי מזהה. שאילתה עם AND או OR מפרטת צמתים ולאחר מכן קישורים, כל אחד לפי מזהה. התאמה בודדת מוצגת במפה מיד. בחרו שורה כדי למרכז את המפה על אותו נכס. אם דבר אינו נבחר, הנכס נבחר גם הוא; אם משהו נבחר, הנכס מודגש והבחירה אינה משתנה. Shift+לחיצה או Ctrl+לחיצה על שורה מוסיפה אותה לבחירה או מסירה אותה. חיפוש אינו בוחר את כל ההתאמות מעצמו.</p><p>הכפתור סינון בטבלה הנוכחית מחיל את אותה שאילתה על החלונית טבלאות. כל טבלה שהשאילתה חלה עליה מציגה רק את השורות התואמות, עם השאילתה ומספר השורות מעליהן. כדי לבחור את כל ההתאמות במפה, בחרו את השורות האלה ובחרו בחירה במפה מתפריט הלחיצה הימנית. מסנן טבלה אינו נשמר עם הפרויקט ומסתיים בטעינה מחדש של העמוד. שורה שנערכה כך שאינה תואמת עוד נשארת בטבלה, עמומה ומסומנת בסימן אזהרה, עד שיילחץ שוב הכפתור סינון בטבלה הנוכחית.</p>';
+$ec_lang['lpn_guide_find_replace_term']='החלפה וביטול';
+$ec_lang['lpn_guide_find_replace_def']='<p>החלק שינוי מה שנמצא בתיבה כותב מאפיין אחד בכל נכס שהשאילתה מצאה. בחרו את המאפיין ברשימה מאפיין לשינוי, הזינו את הערך החדש בתיבה ערך חדש ביחידה המוצגת, ולחצו על הכפתור החלף. התיבה מציינת אז כמה נכסים ישתנו, ללא אלה שכבר יש להם את הערך החדש. לחצו על הכפתור שנה אותם כדי להחיל את השינוי, או על בטל. ביטול אחד מבטל את ההחלפה כולה.</p><p>דוגמה על Net1: <code>Pipe.Diameter below 10</code> מוצאת את צינורות 31, 122, 113 ו-121. בחרו קוטר, הזינו 10 ולחצו על החלף; התיבה מציגה "לשנות 4 אלמנטים?". לחצו על שנה אותם כדי להגדיר את כל ארבעת הצינורות ל-10 אינץ\'. ביטול אחד מחזיר אותם ל-6 ול-8 אינץ\'.</p><p>דוגמה על Net3: <code>Pipe.ID equal to \'247\'</code> מוצאת את צינור 247. בחרו סגור, בחרו שוב סגור ברשימה ערך חדש, ולחצו על החלף ולאחר מכן על שנה אותם, כדי לסגור את הצינור עבור דוגמת הקישוריות שלמעלה. ביטול פותח אותו שוב.</p><p>החלפה דורשת סוג נכס אחד, ולכן תחת Everything בחרו תחילה סוג נכס ברשימה מה לחפש. בתרחיש שאינו בסיס, החלפה נשמרת בתרחיש זה, כמו אותה עריכה במאפיינים. כשזמינים רומים מ-Mapbox, ניתן להחליף את הרום ב-DEM של Mapbox במקום בערך מוקלד.</p>';
+$ec_lang['lpn_guide_find_notes_term']='נקודות לתשומת לב';
+$ec_lang['lpn_guide_find_notes_def']='<ul><li>ערכים מושווים בדיוק מלא ומפורטים בארבע ספרות אחרי הנקודה העשרונית. התנאי equal to כמעט אינו תואם תוצאה מחושבת; השתמשו ב-above וב-below.</li><li>לחץ, עומד, ספיקה, מהירות ושאר התוצאות הם של החישוב האחרון. כשההגדרה חשב מחדש אוטומטית מנוקה, הם מתארים את הרשת כפי שהייתה בחישוב האחרון.</li><li>above ו-below על טקסט משתמשים בסדר מילוני, כשמספרים בסדר מספרי: ב-Net1, <code>Junction.ID above \'20\'</code> מוצאת את צמתים 21, 22, 23, 31 ו-32.</li><li>תחת Everything מוצעים רק ID, Description, Tag ו-Connectivity. בחרו סוג נכס ברשימה מה לחפש כדי לראות את רשימת המאפיינים המלאה שלו.</li><li>לפריט טקסט אין מזהה. חפשו אותו לפי המילים שלו, כמו ב-<code>Text.Text contains \'pump\'</code>.</li><li>ארבעת תנאי הקישוריות לצומת הם no links at node, no open links at node, no link path to a source ו-no open path to a source. מקור הוא מאגר או מכל.</li></ul>';
+$ec_lang['lpn_guide_using_heading']='שימוש במדריך';
+$ec_lang['lpn_guide_keys_term']='קיצורי מקלדת במדריך';
+$ec_lang['lpn_guide_keys_def']='<table class="lpn-notes-table"><tbody><tr><td>?</td><td>פתיחת המדריך בפקד שמתחת למצביע או שבמיקוד.</td></tr><tr><td>F1</td><td>פתיחת המדריך ברשומה של התיבה שבמיקוד.</td></tr><tr><td>Ctrl+K</td><td>פתיחת המדריך כשהטקסט הנבחר בשדה החיפוש.</td></tr><tr><td>/</td><td>בחירת שדה החיפוש כשהמדריך במיקוד.</td></tr><tr><td>Esc</td><td>סגירת המדריך וחזרה למקום שבו הייתם.</td></tr></tbody></table>';
+$ec_lang['lpn_guide_also']='גם ב{menu}';
+$ec_lang['lpn_guide_how_popup']='המאפיינים נפתחים כשבוחרים נכס או טקסט.';
+$ec_lang['lpn_guide_how_alt']='תצוגה מקדימה של חלופות מופיעה תחת מים, תרחישים כשמצב בסיסי כבוי.';
+$ec_lang['lpn_guide_not_shown']='פקד זה אינו מוצג כעת על המסך.';
+$ec_lang['lpn_hotkeys_zoomwin_def']='תקריב לחלון: גררו מלבן על המפה כדי להתקרב לאזור זה.';
+$ec_lang['lpn_status_dismiss']='הסתרת הודעה זו';
+$ec_lang['lpn_msglog_hidden']='מוסתר';
+$ec_lang['lpn_msglog_unhide']='הצגה';
+$ec_lang['lpn_status_hidden_tip']='הצגה מחדש של ההודעה המוסתרת על המפה.';
+$ec_lang['lpn_result_depth']='עומק';
+$ec_lang['lpn_result_depth_tip']='עומק המים במכל בזמן המוצג, נמדד כלפי מעלה מתחתית המכל: העומד פחות רום המכל.';
+$ec_lang['lpn_result_tank_volume']='נפח זמין';
+$ec_lang['lpn_result_tank_volume_tip']='נפח המים מעל עומק המים הנמוך ביותר, ולכן הוא אפס בעומק זה. נפח המכל ב-EPANET כולל גם את המים שמתחת לעומק המים הנמוך ביותר, שעדיין נחשבים לצורך ערבוב וגיל המים, ולכן רום המכל נשאר בתחתית המכל.';
+$ec_lang['lpn_pane_copy_heads']='העתקה עם כותרות עמודות';
+$ec_lang['lpn_export_table_title']='ייצוא ל-{format}';
+$ec_lang['lpn_export_table_current']='נוכחית';
+$ec_lang['lpn_export_table_all']='הכול';
+$ec_lang['lpn_export_table_go']='ייצוא';
+$ec_lang['lpn_export_table_scn_note']='תוצאות מיוצאות רק עבור התרחיש שחושב לאחרונה.';
+$ec_lang['lpn_file_export_item_ods']='קובץ ODS…';
+$ec_lang['lpn_file_export_item_xlsx']='קובץ XLSX…';
+$ec_lang['lpn_file_export_item_csv']='קובץ CSV…';
+$ec_lang['lpn_file_export_tables_tip']='הורדת הטבלאות כפי שחלונית טבלאות מציגה אותן, בחוברת אחת עם גיליון לכל טבלה (ולכל תרחיש שתבחרו), וגיליון לכל ספרייה שהמזהים שלהן מפנים אליה: תבניות, עקומות, סוגי צינורות ואביזרים. תוצאות כלולות רק עבור התרחיש שחושב לאחרונה.';
+$ec_lang['lpn_file_export_csv_tip']='הורדת טבלה כפי שחלונית טבלאות מציגה אותה. טבלה אחת מגיעה כקובץ CSV יחיד ללא ספריות. כמה טבלאות או תרחישים מגיעים כקובץ zip אחד של קובצי CSV, עם קובץ לכל ספרייה שהמזהים שלהן מפנים אליה. תוצאות כלולות רק עבור התרחיש שחושב לאחרונה.';
+$ec_lang['lpn_file_export_item_dxf']='קובץ DXF…';
+$ec_lang['lpn_file_export_dxf_tip']='הורדת רשת זו עבור AutoCAD ותוכנות CAD אחרות: צמתים כבלוקי סמל, צינורות, משאבות ושסתומים כפוליליינים, וכל נכס כבלוק שהתכונות שלו נושאות את המזהה וערכי המאפיינים שלו ביחידות הפרויקט.';
+$ec_lang['lpn_dxf_export_no_utm']='קובץ ה-DXF לא נכתב: רשת זו נמצאת מחוץ לקווי הרוחב ש-UTM מכסה (80° דרום עד 84° צפון), ושרטוט דורש רשת שטוחה שעליה מציירים.';
+$ec_lang['lpn_dxf_export_refused']='קובץ ה-DXF לא נכתב: המרת הקואורדינטות שהוא דורש לא נטענה. בדקו את החיבור ונסו שוב.';
+$ec_lang['lpn_dxf_export_failed']='קובץ ה-DXF לא נכתב: שגיאה בעמוד זה עצרה אותו ({error}).';
+$ec_lang['lpn_dxf_note_grid']='קואורדינטות: ה-X וה-Y של פרויקט זה, ב-{unit}. לא צוינה מערכת קואורדינטות.';
+$ec_lang['lpn_dxf_note_crs']='קואורדינטות: {crs}, בדיוק כפי שפרויקט זה מציין אותן.';
+$ec_lang['lpn_dxf_note_geo']='קואורדינטות: {crs}, במטרים, לא קו רוחב וקו אורך. קווי הרוחב וקווי האורך של הפרויקט הומרו לרשת זו.';
+$ec_lang['lpn_dxf_exported_geo']='{file} יוצא. הקואורדינטות שלו הן {crs}, במטרים, לא קו רוחב וקו אורך.';
+$ec_lang['lpn_dxf_note_blocks']='שמות השכבות הם {prefix}, קוד הנכס, מקף והחלופה, כמו ב-{example}. כל אלמנט הוא בלוק שהוכנס בקנה מידה 1 עם תכונות בגובה יחידה אחת; שנו את קנה המידה של הבלוקים כדי לקבוע את גובה הטקסט. כל תכונה גלויה; תכונות האלמנט האחד מוערמות בעמודה לצד הסמל שלו.';
+$ec_lang['lpn_dxf_note_shortened']='{n} ערכים ארוכים ממה שקובץ DXF מאפשר ({max} תווים), ולכן כל אחד קוצר ומסתיים בשלוש נקודות.';
+$ec_lang['lpn_dxf_note_categories']='ל-{n} צמתים יותר מקטגוריית דרישה אחת. התכונה {tag} שלהם מכילה את סכום הדרישות הבסיסיות של כל הקטגוריות.';
+$ec_lang['lpn_file_export_item_workspace']='סביבת עבודה…';
+$ec_lang['lpn_file_export_workspace_tip']='הורדת קובץ קטן המכיל היכן התיבות שלכם ממוקמות, את גודלן, אילו פתוחות או מעוגנות, ואת גדלי הלוחות והעמודות שלכם, וכן את אפשרויות התצוגה של עמוד זה, כגון אילו בועות עזרה וכרטיס ריחוף מוצגים. הפרויקטים שלכם, הגדרות הפרויקט והעוגיות (שפה, הסכמה, יחידות) אינם כלולים בו. טענו אותו במסך או בדפדפן אחר באמצעות קובץ, ייבוא, סביבת עבודה.';
+$ec_lang['lpn_file_import_workspace']='סביבת עבודה…';
+$ec_lang['lpn_file_import_workspace_tip']='החלת קובץ סביבת עבודה שנשמר באמצעות קובץ, ייצוא, סביבת עבודה: מיקומי תיבות וגדלים, עיגון, גדלי לוחות ואפשרויות התצוגה של עמוד זה, כגון אילו בועות עזרה וכרטיס ריחוף מוצגים. הפרויקטים והעוגיות שלכם אינם נפגעים.';
+$ec_lang['lpn_workspace_exported']='סביבת העבודה נשמרה ב-{file}: {n} הגדרות.';
+$ec_lang['lpn_workspace_imported']='סביבת העבודה הוחלה מ-{file}. הגדרות שהוחלו: {n}. הוחזרו לברירות המחדל: {r}.';
+$ec_lang['lpn_workspace_ignored']='רשומות שהתעלמו מהן כי לא זוהו: {u}.';
+$ec_lang['lpn_workspace_refused_unreadable']='לא ניתן היה לקרוא קובץ זה כסביבת עבודה, ולכן דבר לא שונה.';
+$ec_lang['lpn_workspace_refused_format']='זה אינו קובץ סביבת עבודה שנשמר על ידי עמוד זה, ולכן דבר לא שונה.';
+$ec_lang['lpn_workspace_refused_newer']='קובץ סביבת עבודה זה נשמר על ידי גרסה חדשה יותר של עמוד זה (פורמט {version}), ולכן דבר לא שונה.';
+$ec_lang['lpn_workspace_confirm']='להחליף את פריסת סביבת העבודה של דפדפן זה בזו שבקובץ?';
+$ec_lang['lpn_workspace_refused_storage']='אחסון הדפדפן מלא או אינו זמין, ולכן סביבת העבודה לא הוחלה.';
+$ec_lang['lpn_omitted_note']='הושמטו מהרצה זו כי אין מהם מסלול למאגר או למכל: {ids}';
+$ec_lang['lpn_link_end_unknown']='אין צומת עם המזהה {id}.';
+$ec_lang['lpn_link_end_same']='מ- ואל חייבים להיות צמתים שונים.';
+$ec_lang['lpn_split_pipe_ask']='לפצל את צינור {id} בצומת זה?';
+$ec_lang['lpn_split_yes']='כן';
+$ec_lang['lpn_split_no']='לא';
+$ec_lang['lpn_snap_vertex']='{link}, קדקוד {n}';
+$ec_lang['lpn_snap_node_on_node']='{new} ממוקם במקום של {target}. שני הצמתים אינם מחוברים.';
+$ec_lang['lpn_snap_moved_on_node']='{moved} הוזז למקום של {target}. שני הצמתים אינם מחוברים.';
+$ec_lang['lpn_settings_hover_card']='הצגת התווית המלאה בריחוף';
+$ec_lang['lpn_settings_hover_card_tip']='החזיקו את המצביע על צומת, קישור או לקוח כדי לראות את התווית שלו כפי שצוינה בהגדרות, בכל קנה מידה, בין אם התווית נכנסת במפה ובין אם לא. זו הגדרה של דפדפן זה, לא של הפרויקט.';
+$ec_lang['lpn_scenario_delete_in_base']='כדי להסיר אותו מהשרטוט, מחקו אותו בתרחיש {base}.';
+$ec_lang['lpn_scenario_only_deleted']='{id} נמחק. הוא היה חלק מ-{scenario} בלבד.';
+$ec_lang['lpn_scenario_delete_blocked']='{id} לא נמחק, כי הקישור {link} מסתיים בו, והקישור קיים גם מחוץ ל-{scenario}. כדי למחוק את שניהם, מחקו אותם בתרחיש {base}.';
+$ec_lang['lpn_junction_pattern_unknown']='אין בפרויקט זה תבנית עם המזהה {id}, ולכן הצומת נשאר כפי שהיה.';
+$ec_lang['lpn_settings_default_pattern_none']='ללא (קבוע)';
+$ec_lang['lpn_demand_pattern_default']='(ברירת מחדל: {id})';
+$ec_lang['lpn_demand_pattern_constant']='(קבוע)';
+$ec_lang['lpn_library_pattern_default_mark']='(ברירת מחדל)';
+$ec_lang['lpn_library_pattern_default_tip']='תבנית הדרישה ברירת המחדל. שנו אותה בהגדרות, תבנית דרישה ברירת מחדל.';
+$ec_lang['lpn_library_pattern_default_deleted_to']='תבנית {id} הייתה תבנית הדרישה ברירת המחדל. צמתים ללא תבנית משתמשים כעת בתבנית {now}.';
+$ec_lang['lpn_library_pattern_default_deleted_none']='תבנית {id} הייתה תבנית הדרישה ברירת המחדל. צמתים ללא תבנית משתמשים כעת בדרישה קבועה.';
