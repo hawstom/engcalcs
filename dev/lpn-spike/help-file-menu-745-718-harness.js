@@ -124,11 +124,11 @@ console.log('\n-- Task 745: the Tables and Hotkeys box exists and opens from Hel
 	// object the toolbar's own shortcuts come from -- so a digit rebound later and never re-gathered
 	// here is a red build rather than a silently stale help box.
 	const toolKeysMatch = src.match(/var LPN_TOOL_KEYS = \{([^}]*)\}/);
-	// **0 (Junction and Pipe, Task 719) IS NOT YET IN THE TABLE**, for the reason Redo is not: a row
+	// **1 (Junction and Pipe, Task 719; the key was 0 until 2026-10-12) IS NOT YET IN THE TABLE**, for the reason Redo is not: a row
 	// there is new markup, and 'lang markup matches English' refuses it until all 26 languages carry
 	// the row. The key is named on the tool's own tip meanwhile. When the row lands, drop this filter.
 	const allDigits = toolKeysMatch ? (toolKeysMatch[1].match(/'(\d)':/g) || []).map(s => s[1]) : [];
-	const digits = allDigits.filter(d => d !== '0');
+	const digits = allDigits.filter(d => d !== '1');
 	report(allDigits.length === 10 && digits.length === 9, 'read all ten tool digits out of LPN_TOOL_KEYS (nine in the table)', `${allDigits.length}`);
 	const mapDef = mapDefMatch ? mapDefMatch[1] : '';
 	digits.forEach(function (d) {

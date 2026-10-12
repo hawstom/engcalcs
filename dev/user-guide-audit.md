@@ -62,7 +62,7 @@ series letters, opens the tank level graph without the mouse.
 ## Map
 
 (a) Omits:
-- 0 is the tenth tool, Junction and pipe (`LPN_TOOL_KEYS`); the table lists 1 to 9.
+- 0 is Select and 1 is the Junction and pipe chain (`LPN_TOOL_KEYS`, since 2026-10-12); the Map table lists every digit but 1.
 - Redo is Ctrl+Y or Ctrl+Shift+Z, not listed.
 - Undo keeps 20 steps in memory only, cleared on switching projects (`UNDO_LIMIT`, `clearUndo()`);
   each step also restores scenarios, the active scenario, and units.

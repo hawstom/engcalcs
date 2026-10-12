@@ -44240,6 +44240,7 @@ var EngCalcs = EngCalcs || {};
 			// of the two doors: a reader who opens the menu rather than hovering the strip was told
 			// nothing at all, about any of the eight tools. No new key, and the digit still comes
 			// from LPN_TOOL_KEYS rather than from a translator.
+			{ icon: 'chain', pointerOnly: true, label: pc.lpn_tool_add_chain || 'Junction Pipe Chain', tip: toolTipWithKey('add-chain', pc.lpn_tool_add_chain_tip), hotkey: toolKeyFor('add-chain'), fn: function () { setMode('add-chain'); } },
 			{ icon: 'junction', pointerOnly: true, label: pc.lpn_tool_add_junction || 'Junction', tip: toolTipWithKey('add-junction'), hotkey: toolKeyFor('add-junction'), fn: function () { setMode('add-junction'); } },
 			{ icon: 'reservoir', pointerOnly: true, label: pc.lpn_tool_add_reservoir || 'Reservoir', tip: toolTipWithKey('add-reservoir'), hotkey: toolKeyFor('add-reservoir'), fn: function () { setMode('add-reservoir'); } },
 			{ icon: 'tank', pointerOnly: true, label: pc.lpn_tool_add_tank || 'Tank', tip: toolTipWithKey('add-tank'), hotkey: toolKeyFor('add-tank'), fn: function () { setMode('add-tank'); } },
@@ -44252,7 +44253,6 @@ var EngCalcs = EngCalcs || {};
 			// Text stays last, being the only tool that adds nothing hydraulic.
 			{ icon: 'customer', pointerOnly: true, label: pc.lpn_tool_add_meter || 'Customer', tip: toolTipWithKey('add-meter', pc.lpn_tool_add_meter_tip), hotkey: toolKeyFor('add-meter'), fn: function () { setMode('add-meter'); } },
 			{ icon: 'text', pointerOnly: true, label: pc.lpn_tool_add_text || 'Text', tip: toolTipWithKey('add-text'), hotkey: toolKeyFor('add-text'), fn: function () { setMode('add-text'); } },
-			{ icon: 'chain', pointerOnly: true, label: pc.lpn_tool_add_chain || 'Junction Pipe Chain', tip: toolTipWithKey('add-chain', pc.lpn_tool_add_chain_tip), hotkey: toolKeyFor('add-chain'), fn: function () { setMode('add-chain'); } },
 			{ separator: true },
 			// Dev-only, last, and wearing a bracketed label so it reads as not-a-real-feature.
 			// Deliberately NOT translated: scaffolding for measuring how ~100 links performs, and it
@@ -47627,8 +47627,8 @@ var EngCalcs = EngCalcs || {};
 
 		// **THE EDIT GROUP SITS LEFT OF THE INSERT GROUP SO THE STRIP READS IN KEYBOARD ORDER**
 		// (Tom, 2026-09-08: "Toolbar buttons should be in keyboard order, which means to break up
-		// the Edit group or move it all left of the Insert group."). LPN_TOOL_KEYS binds 1 Select,
-		// 2 Junction ... 9 Text, and every keyed button except Select was already in ascending
+		// the Edit group or move it all left of the Insert group."). LPN_TOOL_KEYS binds 0 Select,
+		// 1 Chain, 2 Junction ... 9 Text, and every keyed button except Select was already in ascending
 		// order; Select alone sat eighth, because the all-keyed Insert group came first. Of his two
 		// remedies this is the one that keeps the editing cluster intact, and it also puts the
 		// resting-state tool leftmost after the file commands. The cost of getting this wrong is a
@@ -47693,9 +47693,10 @@ var EngCalcs = EngCalcs || {};
 
 		var addGroup = group();
 		addGroup.dataset.edits = '1';
-		// Junction, Reservoir, Tank, Pipe, Pump, Valve, Meter, Text -- the same order as the Insert menu and
-		// the ID-prefix rows. See insertAssetRows() for why that order.
+		// Chain, Junction, Reservoir, Tank, Pipe, Pump, Valve, Meter, Text -- the same order as the Insert menu
+		// and keys 1 to 9 (the ID-prefix rows have no Chain, and otherwise follow it). See insertAssetRows() for why that order.
 		[
+			{ mode: 'add-chain', key: 'lpn_tool_add_chain', icon: 'chain', tip: pc.lpn_tool_add_chain_tip },
 			{ mode: 'add-junction', key: 'lpn_tool_add_junction', icon: 'junction' },
 			{ mode: 'add-reservoir', key: 'lpn_tool_add_reservoir', icon: 'reservoir' },
 			{ mode: 'add-tank', key: 'lpn_tool_add_tank', icon: 'tank' },
@@ -47703,8 +47704,7 @@ var EngCalcs = EngCalcs || {};
 			{ mode: 'add-pump', key: 'lpn_tool_add_pump', icon: 'pump' },
 			{ mode: 'add-valve', key: 'lpn_tool_add_valve', icon: 'valve' },
 			{ mode: 'add-meter', key: 'lpn_tool_add_meter', icon: 'customer', tip: pc.lpn_tool_add_meter_tip },
-			{ mode: 'add-text', key: 'lpn_tool_add_text', icon: 'text' },
-			{ mode: 'add-chain', key: 'lpn_tool_add_chain', icon: 'chain', tip: pc.lpn_tool_add_chain_tip }
+			{ mode: 'add-text', key: 'lpn_tool_add_text', icon: 'text' }
 		].forEach(function (t) { modeButton(t, addGroup); });
 
 		var viewGroup = group();
@@ -63285,11 +63285,13 @@ var EngCalcs = EngCalcs || {};
 	 * user is unaffected and nothing new is created, drawn or stored.
 	 */
 	var LPN_TOOL_KEYS = {
-		'1': 'select', '2': 'add-junction', '3': 'add-reservoir', '4': 'add-tank',
-		'5': 'add-pipe', '6': 'add-pump', '7': 'add-valve', '8': 'add-meter', '9': 'add-text',
-		// Junction and Pipe (Task 719) is the tenth tool, so its key is the tenth digit: the key
-		// IS the position, as the nine above are.
-		'0': 'add-chain'
+		// **0 IS SELECT, 1 IS THE CHAIN, AND THE REST FOLLOW THE INSERT GROUP** (Tom, 2026-10-12: "Chain
+		// command is last, far from the junction command, and with a shortcut key separated from the
+		// junction command ... '0' seems like an appropriate mnemonic, if any, for Select ... 0 Select,
+		// all the other edit buttons, 1 Chain, 2 Junction, etc"). The Insert group runs in key order,
+		// Chain first.
+		'0': 'select', '1': 'add-chain', '2': 'add-junction', '3': 'add-reservoir', '4': 'add-tank',
+		'5': 'add-pipe', '6': 'add-pump', '7': 'add-valve', '8': 'add-meter', '9': 'add-text'
 	};
 	document.addEventListener('keydown', function (e) {
 		if (e.ctrlKey || e.metaKey || e.altKey) { return; }
