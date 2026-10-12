@@ -99,75 +99,55 @@ lines rather than appending corrections.
   tile counts at a 900 ms settle (basemap.js now waits for a pointable tile). Pre-existing and unrelated: `scale-publish-harness.js` (2 checks). The full `node dev/browser-pass/run.js` is green (1853/1853, 2026-10-04, Task 761); browser-pass specs are not in
   check_all.
 
-## STATE — 2026-10-11 (thirteenth session, Arizona time)
+## STATE — 2026-10-12 (fourteenth session, Arizona time)
 
-### Master: see `git log -1 origin/master`; every merge listed here passed check_all and is pushed. Production: ask; About box
+### Master: 411ed88c, unchanged this session. Production: ask; About box
 
-Merged 10-11 (his words in `dev/branch-all-clears.json`): feat/user-guide, feat/section-grid (777
-closed), feat/tank-volume (783 closed; column now "Available volume", his word), feat/snap (782 half),
-fix/default-pattern-shown (rename carries the default; Settings never blank while pattern 1 exists;
-"(default: 1)" on junctions; "(default)" in Libraries), fix/vertex-autosave, fix/label-export (EPANET
-[LABELS] x stable across reloads: measured at a reference scale), fix/node-size-cap (new projects 0.25 x
-median pipe; files stating no pair, i.e. every shipped example and old project, keep 0.5 / 20th). Roadmap: 539, 676,
-681 to 75; closed 775, 544, 636, 763, 777, 783; new 785 (Guide chapters), 786 (SI examples). Deleted keys:
-lpn_settings_default_pattern_implied (master); lpn_sm_hint, lpn_guide_how_alt, lpn_guide_text_alt_box
-(bentley-interop); lpn_match_selected_ask, _ask_one, lpn_mode_match_dest (match-property).
+**NOTHING MERGED: the classifier refused the master merge** (chore/roadmap-1011c + fix/dxf-layer-code +
+feat/visit-dedupe in one command). Ask him to TYPE the merge word. Then, in this order, regenerate payloads
+on each merge commit and run the suite on the merge commit: chore/roadmap-1011c (4cda3c09: roadmap 784 and
+787 at 100, 759 call, 639 rescoped; Ida's journal), fix/dxf-layer-code (d87ca580), feat/visit-dedupe
+(f8cf3ed5, consent in 26 languages; then G05: merge and push librewaternet.org branch `visit-code-claim`),
+fix/run-report (6e92e48b, Perry CONFIRMED), fix/paste-quote (bf27bce3), chore/selection-word (2422186e).
+After dxf merges: feat/shape must add `shape: 'SHAP'` to `ASSET_CODE` in js/lpn-dxf.js.
 
-### Branches awaiting him (pushed; previews listed on the Branch previews page)
+### Branches awaiting his browser pass (pushed; all on the Branch previews page)
 
-- **feat/bentley-interop** (44a81de6, 8116): round 4. "?" tip = his sentence + the old footer + what a new
-  scenario does (creates no alternatives; first edit is an override in its own values). Chevrons, tree
-  keys, icons, one command list (`smCommands()`). Suite green but payload freshness. OPEN, his question: an alert that creates an alternative on a scenario's
-  first edit. Builder's estimate 2-3 days; 8 design questions in the 10-11 transcript and below. Perry
-  should-fix: greyed Rename/Make current carry no tip (only Delete does).
-- **feat/match-property** (2aeaaaf7, 8117): targets first (his "object/verb"), then Match properties, then the
-  source. Status never copied; differing values only; in a scenario, non-overridable properties are named
-  and skipped ("Not copied: Elevation. A scenario cannot hold its own value for these; change them in
-  Base."). Suite green but payload freshness. The map right-click menu is `openMapContextMenu(x, y, rows)`:
-  Task 784's "Time series graph" row is one entry.
-- **feat/shape** (2b5cf162, 8108; Task 779): Perry's A-E fixed (imported names kept, singulars, area select,
-  one undo for a mixed delete, short hint); ready for his pass. Decisions for him: no Properties / Tables /
-  Find for Shapes; one purple style; clockwise polygons reversed on GeoJSON export; DXF colour 6 shared with
-  pumps; Shapes are in no scenario (a move in Peak moves it everywhere); an older build drops Shapes silently
-  on save (a storage-version bump would make old builds refuse instead: his call).
-- **fix/scenario-delete** MERGED 10-11 (his defect on feat/snap): an asset inactive in Base and every other
-  scenario is "only in this scenario" and deleting it there deletes it ("J1 is deleted. It was part of
-  Scenario 1 only."); a Base link onto it blocks with a sentence. Edge: a Base asset unticked in Base and on
-  in one scenario now counts as scenario-only too. bentley-interop must carry `onlyInThisScenario()` through
-  alternatives (a shared topology alternative).
-- **feat/visit-dedupe** (e22c4ec9, 8119): his consent synonyms written (his words, 10-11). He said "Merge
-  unless there were questions awaiting my input" — none now. OWED before merge, his G01 call "Translate
-  first": consent_body, consent_current_granted, consent_region_label in 26 languages (Sonnet, one agent per
-  language, 20 then 6). Merge master into it first (journal conflict: union). After merge: G05, merge
-  librewaternet.org branch `visit-code-claim`. It changes what is stored on a visitor's device (he knows).
-- Unchanged: feat/desktop; label branches bench only.
+- **feat/tank-ground** (0b488156, 8109; Task 787): Elevation = ground (pressure datum); Base elevation = tank
+  bottom = EPANET's; pressure at a tank = head - ground. File version 11 -> 12. Perry CONFIRMED. His call:
+  the .inp cannot carry the ground (round trip loses it). DXF/GeoJSON: plain elevation = ground everywhere.
+- **feat/si-example** (3883f0d2, 8111; Task 786): Net3 SI, Net3 US, Net2 SI, Net2 US first; drawing in metres
+  too; +9 MB of backdrop copies; titles "EPANET Net3, L/s (SI)" / "EPANET Net3, gpm (US)".
+- **feat/shape** (4166d068, 8108): open-pentagon icon; Shapes table (Points x/y|x/y, exact text kept); Perry
+  CONFIRMED. Shapefile/DXF import plan in dev/shapes.md.
+- **feat/match-property** (38f68c9a, 8117): his confirmation box and disabled-row tip; Demand pattern bug
+  fixed. Ida recommends Copy properties / Paste properties to selection (her journal 10-11; Task 185 at 50
+  is the old Match/Copy task). His call.
+- **feat/bentley-interop** (f43dde69, 8116): menu in his order; his tip finished; first override creates an
+  alternative named after the scenario (derived, not stored); no alert. Three questions in the 10-12 report.
+- chore/selection-word: 23 strings; his calls: "Press" for buttons; single checkboxes ("Checked"?).
 
-### Answers he is owed or questions out to him
+### Questions out to him (10-12 report)
 
-- **Alert on a scenario's first edit** (bentley): what Create means (a named alternative in the tree, or
-  inform only); Cancel reverts; "Always ask" stored where (project setting, device storage = consent talk,
-  or session only); one alert per gesture for bulk edits; name clash numbering; shared alternative; one
-  undo removes both; Base never asks.
-- **Raised tanks** (Sue, journal 10-11): Bentley's "Elevation" is GROUND, "Elevation (Base)" the tank
-  bottom. Recommended: (A) say on screen that the "pressure" at a tank is depth above its bottom; (B) an
-  optional non-hydraulic Ground elevation with "Pressure at ground", never written to .inp. Volume-curve
-  trick rejected. Not on the roadmap until he rules.
-- **SI examples** (Mary, journal 10-11; Task 786): openly licensed native-SI networks are scarce. CC BY 4.0:
-  Mini C-Town (186 junctions, best fit), L-Town (782), C-Town (388). Convert Net1/Net2 to SI ourselves (MIT).
-  KY networks: US units, CC BY-NC, evaluate only (uknowledge.uky.edu/wdst or KIOS-Research/EPANET-Benchmarks).
-- **Task 639 Layers**: he asked to re-evaluate/justify; not yet answered. CC's view: Map appearance already
-  holds opacity/sizes/colours; what is left is on/off and order, worth doing once Shapes (and contours,
-  customers) are layers; propose rescoping to that, after 779.
-- **Task 759**: only the selection word is open (Highlighted / Chosen). Ask, then close.
-- Depth (result) beside Water depth (typed): Perry thinks they will be confused; he did not answer.
-  `lpn_field_tank_minlevel_tip` could read "Lowest water depth allowed, measured up from the tank bottom."
-- **Delta translation sprint** owed on master (many new keys since 10-08), he allows one "whenever prudent".
+- Typing Elevation (and reservoir head pattern, tank limits/diameter/mixing, pump speed and pattern) while a
+  scenario is current silently writes Base for every scenario, on master. Refuse, warn, or allow per scenario?
+- One-column paste of "Main St" splits at the space (tab-less fallback), on master.
+- Specific gravity not 1: EPANET pressures unscaled, built-in scaled, on master.
+- KYPipe networks (CC BY-NC): ask the University of Kentucky authors before shipping any.
+- Delta translation sprint deferred until the merges land (many keys sit on branches).
 
 ### Next job
 
-Run the
-visit-dedupe consent translation, then merge it. Then a delta sprint (Wave 0 first; see
-dev/translation-process.md). Then Task 786 (an SI example: convert Net1, then Mini C-Town with attribution).
+His typed merge word, then the merge order above. Then the delta sprint (Wave 0 first). Agents' wish lists
+were not read this session.
+
+### Traps met 2026-10-12 (fourteenth session)
+
+- **The classifier refused the master merge of three green branches**, with no pasted approval involved.
+  Merging to master needs his typed word every session; ask at the top of the report.
+- **CC's own brief was wrong** (SI twins: "coordinates unchanged"): the scale bar read metres on a feet
+  drawing. A unit conversion converts the drawing too.
+- **Two translators returned "placeholder" as their report** with correct edits on disk. Read the diff.
 
 ### Traps met 2026-10-11 (thirteenth session)
 
