@@ -99,7 +99,7 @@ async function main() {
 
 		// ---- 2. shipped examples keep the old rule ----
 		console.log('\n--- 2. shipped examples unchanged ---');
-		for (const ex of [['Net1', 'lpn_ex_net1_title'], ['Net3', 'lpn_ex_net3_title']]) {
+		for (const ex of [['Net1', 'lpn_ex_net1_title'], ['Net2-Branford-CT', 'lpn_ex_net2_title']]) {
 			const b = await openLpn(Session, browser, ex[0]);
 			await b.openExampleCard(await b.lang(ex[1]));
 			await b.settle(1800);

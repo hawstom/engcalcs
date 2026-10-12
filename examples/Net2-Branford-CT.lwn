@@ -1068,8 +1068,6 @@
 		"linkWidth": 4,
 		"symbolOpacity": 1,
 		"labelMaxWidth": null,
-		"symbolCapMultiple": 0.5,
-		"symbolCapPercentile": 20,
 		"basemapStyle": "normal",
 		"backdropOpacity": 0.5,
 		"alignPipeLabels": true,
