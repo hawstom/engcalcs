@@ -1196,7 +1196,7 @@ $ec_lang['lpn_find_menu_tip']='ቀላል ወይም ውስብስብ ፈልግና 
 $ec_lang['lpn_help_icons']='የመሳሪያ አሞሌ ምልክቶች ትርጉም';
 // ---- The right panel: Visibility ----
 $ec_lang['lpn_pane_right_toggle']='ታይነት';
-$ec_lang['lpn_color_legend_open_tip']='የቀለም አሰጣጥ ቅንብሮችን ለመክፈትና እነዚህን ቀለሞች ለመቀየር ይምረጡ።';
+$ec_lang['lpn_color_legend_open_tip']='የቀለም አሰጣጥ ቅንብሮችን ለመክፈትና እነዚህን ቀለሞች ለመቀየር ይጫኑ።';
 $ec_lang['lpn_color_node_field']='ነጥብ ቀለም በ';
 $ec_lang['lpn_color_link_field']='ቧንቧ ቀለም በ';
 $ec_lang['lpn_color_ramp_sequential']='ተከታታይ';
@@ -2512,7 +2512,7 @@ $ec_lang['lpn_backdrop_scale_prompt2']='በሁለቱ ነጥቦች መካከል �
 // one move. The second names the panel it is about to show, so the alert and the panel read as one
 // step rather than two.
 $ec_lang['lpn_backdrop_position_prompt1']='ለእንቅስቃሴው የመነሻ ነጥቡን (በምስሉ ላይ) ያመልክቱ።';
-$ec_lang['lpn_backdrop_position_prompt2']='ለመድረሻው ነጥብ ዘዴውን ይምረጡ፣ ከዚያም ቀጥል ይምረጡ።';
+$ec_lang['lpn_backdrop_position_prompt2']='ለመድረሻው ነጥብ ዘዴውን ይምረጡ፣ ከዚያም ቀጥል ይጫኑ።';
 // The standing "you are in the middle of something" bar, shown while a background-image scale or
 // move is waiting for a click. It carries the only visible way out of that state.
 $ec_lang['lpn_backdrop_busy']='የበስተጀርባ ምስሉን በማስተካከል ላይ።';
@@ -4100,7 +4100,7 @@ $ec_lang['lpn_choice_default']='ነባሪ';
 $ec_lang['lpn_ds_menu']='የፍላጎት ማመጣጠኛ…';
 $ec_lang['lpn_ds_menu_tip']='በመረቡ ቅጂ ላይ ፍላጎቶችን ያባዙና ግፊቶቹንና ፍጥነቶቹን ይመልከቱ፣ ወይም ስርዓቱ ሊሸከመው የሚችለውን ትልቁን የፍላጎት ማመጣጠኛ ያግኙ።';
 $ec_lang['lpn_ds_title']='የፍላጎት ማመጣጠኛ';
-$ec_lang['lpn_ds_intro']='በተመረጡት መገናኛዎች ላይ ያሉትን ፍላጎቶች በፍላጎት ማመጣጠኛው ለማባዛት እና ግፊቶቹንና ፍጥነቶቹን ለማየት አስላ አዝራሩን ይምረጡ።\n\nእነዚህ ሁሉ መገናኛዎች የሚፈቀደውን ዝቅተኛ ግፊት ቢያንስ የሚጠብቁበትን ትልቁን የፍላጎት ማመጣጠኛ፣ እስከ ቅርብ {step} ድረስ ለማግኘት ፈልግ አዝራሩን ይምረጡ፤ ከ0 እስከ {max} ይፈልጋል።\n\nሁለቱም በመረቡ ቅጂ ላይ ይሠራሉ፣ በስክሪኑ ላይ ባለው የጊዜ ደረጃ በንቁ ሁኔታ ተፈትተው፣ ስለዚህ በፕሮጀክትዎ ውስጥ ምንም አይለወጥም። የሚመጣጠነው ያ የጊዜ ደረጃ ብቻ ነው፣ ደረጃዎችና ሁኔታዎችም ከእሱ ይወሰዳሉ፤ ከፍተኛውን ለመፈተን ከማስኬድዎ በፊት ሰዓቱን ወደ ከፍተኛ ፍላጎት ያንቀሳቅሱ።';
+$ec_lang['lpn_ds_intro']='በተመረጡት መገናኛዎች ላይ ያሉትን ፍላጎቶች በፍላጎት ማመጣጠኛው ለማባዛት እና ግፊቶቹንና ፍጥነቶቹን ለማየት አስላ አዝራሩን ይጫኑ።\n\nእነዚህ ሁሉ መገናኛዎች የሚፈቀደውን ዝቅተኛ ግፊት ቢያንስ የሚጠብቁበትን ትልቁን የፍላጎት ማመጣጠኛ፣ እስከ ቅርብ {step} ድረስ ለማግኘት ፈልግ አዝራሩን ይጫኑ፤ ከ0 እስከ {max} ይፈልጋል።\n\nሁለቱም በመረቡ ቅጂ ላይ ይሠራሉ፣ በስክሪኑ ላይ ባለው የጊዜ ደረጃ በንቁ ሁኔታ ተፈትተው፣ ስለዚህ በፕሮጀክትዎ ውስጥ ምንም አይለወጥም። የሚመጣጠነው ያ የጊዜ ደረጃ ብቻ ነው፣ ደረጃዎችና ሁኔታዎችም ከእሱ ይወሰዳሉ፤ ከፍተኛውን ለመፈተን ከማስኬድዎ በፊት ሰዓቱን ወደ ከፍተኛ ፍላጎት ያንቀሳቅሱ።';
 $ec_lang['lpn_ds_scope']='የሚመጣጠኑ መገናኛዎች';
 $ec_lang['lpn_ds_scope_all']='ሁሉም መገናኛዎች';
 $ec_lang['lpn_ds_scope_selected']='የተመረጡ መገናኛዎች';
@@ -4292,7 +4292,7 @@ $ec_lang['lpn_link_end_same']='ከ እና ወደ የተለያዩ ነጥቦች �
 $ec_lang['lpn_split_pipe_ask']='ቧንቧ {id} በዚህ ነጥብ ይከፈል?';
 $ec_lang['lpn_split_yes']='አዎ';
 $ec_lang['lpn_split_no']='አይ';
-$ec_lang['lpn_snap_vertex']='{link}፣ ጫፍ {n}';
+$ec_lang['lpn_snap_vertex']='{link}፣ መታጠፊያ {n}';
 $ec_lang['lpn_snap_node_on_node']='{new} በ{target} ቦታ ላይ ተቀመጠ። ሁለቱ ነጥቦች አልተገናኙም።';
 $ec_lang['lpn_snap_moved_on_node']='{moved} ወደ {target} ቦታ ተንቀሳቀሰ። ሁለቱ ነጥቦች አልተገናኙም።';
 $ec_lang['lpn_settings_hover_card']='በማንዣበብ ሙሉውን ምልክት አሳይ';

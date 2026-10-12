@@ -883,7 +883,7 @@ $ec_lang['lpn_field_tank_diameter_tip']='Largura do tanque de lado a lado. Está
 // 'head' is a documented trap term in glossary.json. This tip names it as a level, which is the
 // same guard lpn_field_head_tip carries for the reservoir.
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_tank_head_tip']='Elevação da superfície da água no tanque: a elevação da base mais a profundidade da água.';
+$ec_lang['lpn_tank_head_tip']='Elevação da superfície da água no tanque: a elevação do fundo mais a profundidade da água.';
 $ec_lang['lpn_close']='Fechar';
 // The property popup's own name, in its drag bar (Tom, 2026-09-08: *"maybe the right title is
 // 'Properties'"*). It names the BOX, not the element in it: lpn_popup_title below the bar carries
@@ -2084,7 +2084,7 @@ $ec_lang['lpn_notes_6_term']='Ajuda das colunas da tabela';
 $ec_lang['lpn_notes_6_def']='<table class="lpn-notes-table"><tbody><tr><td>Clique no cabeçalho</td><td>Selecionar coluna</td></tr><tr><td>Ctrl+clique ou Shift+clique em outro cabeçalho</td><td>Adicionar ou estender a seleção de colunas</td></tr><tr><td>Arraste ou use Gerenciar colunas… no menu de clique direito ou ⋮</td><td>Mover (reordenar) coluna(s) selecionada(s)</td></tr><tr><td>Passe o mouse no canto superior de um cabeçalho, ou selecione ou use Tab até um cabeçalho</td><td>Menu ⋮ e seta de ordenação.</td></tr><tr><td>Clique direito no cabeçalho ou menu ⋮ no canto superior direito do cabeçalho</td><td>Ocultar, Mostrar tudo, ou Gerenciar visibilidade e ordem</td></tr><tr><td>Ícone de seta no canto superior direito do cabeçalho</td><td>Ordenar por coluna</td></tr><tr><td>Clique direito, menu ⋮ no canto superior direito do cabeçalho, ou Ctrl+Shift+V</td><td>Colar como novas linhas no fim da tabela</td></tr></tbody></table>';
 $ec_lang['lpn_notes_7_term']='Atalhos de teclado da tabela';
 // R-311, his own row: "Ctrl+Shift+V | Paste as new rows at end of table".
-$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>Teclas de seta</td><td>Navegar.</td></tr><tr><td>Tab, Enter</td><td>Concluir a entrada e mover uma célula para o lado (Tab) ou para baixo (Enter).</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>Mover uma célula para trás (Shift+Tab) ou para cima (Shift+Enter).</td></tr><tr><td>Shift+teclas de seta</td><td>Estender a seleção.</td></tr><tr><td>Ctrl+C</td><td>Copiar a seleção.</td></tr><tr><td>Ctrl+D</td><td>Preencher a seleção para baixo a partir da sua linha superior.</td></tr><tr><td>Ctrl+Enter</td><td>Preencher a seleção com o valor da célula ativa.</td></tr><tr><td>Ctrl+A</td><td>Selecionar a tabela inteira.</td></tr><tr><td>Ctrl+Shift+V</td><td>Colar como novas linhas no fim da tabela.</td></tr><tr><td>Ctrl+Shift+PageDown, Ctrl+Shift+PageUp</td><td>Alternar para a aba seguinte ou a anterior, seja uma tabela ou um gráfico.</td></tr><tr><td>Delete</td><td>Limpar a célula ativa. Para limpar um intervalo selecionado, clique com o botão direito e escolha Delete.</td></tr><tr><td>F2</td><td>Abrir uma célula para editá-la.</td></tr><tr><td>Esc</td><td>Cancelar uma edição.</td></tr></tbody></table>';
+$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>Teclas de seta</td><td>Navegar.</td></tr><tr><td>Tab, Enter</td><td>Concluir a entrada e mover uma célula para o lado (Tab) ou para baixo (Enter).</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>Mover uma célula para trás (Shift+Tab) ou para cima (Shift+Enter).</td></tr><tr><td>Shift+teclas de seta</td><td>Estender a seleção.</td></tr><tr><td>Ctrl+C</td><td>Copiar a seleção.</td></tr><tr><td>Ctrl+D</td><td>Preencher a seleção para baixo a partir da sua linha superior.</td></tr><tr><td>Ctrl+Enter</td><td>Preencher a seleção com o valor da célula ativa.</td></tr><tr><td>Ctrl+A</td><td>Selecionar a tabela inteira.</td></tr><tr><td>Ctrl+Shift+V</td><td>Colar como novas linhas no fim da tabela.</td></tr><tr><td>Ctrl+Shift+PageDown, Ctrl+Shift+PageUp</td><td>Alternar para a aba seguinte ou a anterior, seja uma tabela ou um gráfico.</td></tr><tr><td>Delete</td><td>Limpar a célula ativa. Para limpar um intervalo selecionado, clique com o botão direito e escolha Excluir.</td></tr><tr><td>F2</td><td>Abrir uma célula para editá-la.</td></tr><tr><td>Esc</td><td>Cancelar uma edição.</td></tr></tbody></table>';
 // COLOR BAND LIMITS ARE FROZEN, NOT LIVE (Task 448). Tom, 2026-08-19: *"colors are subconsciously
 // expected to be stable through an animation... recomputing at each time step gives a wrong
 // impression of the system. In this we are ratifying EPANET."* The mechanism is
@@ -4199,7 +4199,7 @@ $ec_lang['lpn_snip_tip_undo']='Desfazer (Ctrl+Z)';
 $ec_lang['lpn_snip_tip_redo']='Refazer (Ctrl+Y)';
 $ec_lang['lpn_screenshot_scale_tip']='O tamanho da imagem como múltiplo da área na tela. Um múltiplo maior é mais nítido e gera um arquivo maior.';
 $ec_lang['points_data_points_heading']='Dados dos pontos<br />(use Copiar para ver o formato)';
-$ec_lang['lpn_field_tank_base_elev']='Elevação da base';
+$ec_lang['lpn_field_tank_base_elev']='Elevação do fundo';
 $ec_lang['lpn_tank_ground_elev_tip']='Elevação do terreno no tanque. A pressão no tanque é medida a partir daqui, como em uma junção.';
 $ec_lang['lpn_guide_about_heading']='Sobre esta calculadora';
 $ec_lang['lpn_guide_group_from']='Do menu {menu}';

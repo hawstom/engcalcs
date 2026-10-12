@@ -885,7 +885,7 @@ $ec_lang['lpn_field_tank_diameter_tip']='רוחב המכל מצד לצד. הוא
 // 'head' is a documented trap term in glossary.json. This tip names it as a level, which is the
 // same guard lpn_field_head_tip carries for the reservoir.
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_tank_head_tip']='רום פני המים במכל: רום הבסיס בתוספת עומק המים.';
+$ec_lang['lpn_tank_head_tip']='רום פני המים במכל: רום התחתית בתוספת עומק המים.';
 $ec_lang['lpn_close']='סגור';
 // The property popup's own name, in its drag bar (Tom, 2026-09-08: *"maybe the right title is
 // 'Properties'"*). It names the BOX, not the element in it: lpn_popup_title below the bar carries
@@ -4198,7 +4198,7 @@ $ec_lang['lpn_snip_tip_undo']='ביטול (Ctrl+Z)';
 $ec_lang['lpn_snip_tip_redo']='ביצוע חוזר (Ctrl+Y)';
 $ec_lang['lpn_screenshot_scale_tip']='גודל התמונה כמכפלה של האזור שעל המסך. גדול יותר חד יותר ויוצר קובץ גדול יותר.';
 $ec_lang['points_data_points_heading']='נתוני נקודות<br />(השתמשו ב"העתק" כדי לראות את התבנית)';
-$ec_lang['lpn_field_tank_base_elev']='רום בסיס';
+$ec_lang['lpn_field_tank_base_elev']='רום תחתית';
 $ec_lang['lpn_tank_ground_elev_tip']='רום הקרקע במכל. הלחץ במכל נמדד מכאן, כמו בצומת.';
 $ec_lang['lpn_guide_about_heading']='על מחשבון זה';
 $ec_lang['lpn_guide_group_from']='מתוך {menu}';
@@ -4295,7 +4295,7 @@ $ec_lang['lpn_link_end_same']='מ- ואל חייבים להיות צמתים ש�
 $ec_lang['lpn_split_pipe_ask']='לפצל את צינור {id} בצומת זה?';
 $ec_lang['lpn_split_yes']='כן';
 $ec_lang['lpn_split_no']='לא';
-$ec_lang['lpn_snap_vertex']='{link}, קדקוד {n}';
+$ec_lang['lpn_snap_vertex']='{link}, נקודת עיקול {n}';
 $ec_lang['lpn_snap_node_on_node']='{new} ממוקם במקום של {target}. שני הצמתים אינם מחוברים.';
 $ec_lang['lpn_snap_moved_on_node']='{moved} הוזז למקום של {target}. שני הצמתים אינם מחוברים.';
 $ec_lang['lpn_settings_hover_card']='הצגת התווית המלאה בריחוף';
