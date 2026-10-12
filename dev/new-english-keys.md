@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**62 still to read on master**, of 62 untranslated keys, of 2620 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**65 still to read on master**, of 65 untranslated keys, of 2623 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -199,7 +199,7 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   @@ NEEDS RULING
 
-## lpn_  (62, 62 to read @@ NEEDS RULING)
+## lpn_  (65, 65 to read @@ NEEDS RULING)
 
 - **`lpn_dxf_import_binary`**
   > {file} is a binary DXF. Save it from your CAD program as an ASCII DXF, then import again.
@@ -327,6 +327,9 @@ never edits a synonym.
 - **`lpn_shapes_import_more`**
   > and {n} more
   @@ NEEDS RULING
+- **`lpn_shapes_import_none`**
+  > Nothing was imported from {file}.
+  @@ NEEDS RULING
 - **`lpn_shp_import_attrs`**
   > Attribute columns kept as properties of each Shape: {list}.
   @@ NEEDS RULING
@@ -370,10 +373,16 @@ never edits a synonym.
   > {file} has no .prj file, and its coordinates are not latitudes and longitudes, so they cannot be placed in this project.
   @@ NEEDS RULING
 - **`lpn_shp_import_skipped`**
-  > {n} records not imported: {list}.
+  > {n} records not imported, because their shape type is not read: {list}.
   @@ NEEDS RULING
 - **`lpn_shp_import_skipped_one`**
-  > One record not imported: {list}.
+  > One record not imported, because its shape type is not read: {list}.
+  @@ NEEDS RULING
+- **`lpn_shp_import_unplaced`**
+  > {n} records have coordinates this project cannot place, such as a latitude beyond the limit of the map. Record numbers: {list}.
+  @@ NEEDS RULING
+- **`lpn_shp_import_unplaced_one`**
+  > One record has coordinates this project cannot place, such as a latitude beyond the limit of the map. Record number: {list}.
   @@ NEEDS RULING
 - **`lpn_shp_import_unreadable`**
   > {file} is not a shapefile this page can read: {detail}
@@ -862,9 +871,9 @@ build for that would be a gate nobody keeps. Refresh it with
   > Not pasted: {n} (the valve types differ).
   @@ NEEDS RULING
 
-### feat/shape (`e4bcb363`) — adds no English strings
+### feat/shape (`a4d9a471`) — adds no English strings
 
-### feat/si-example (`a61a5886`) — 4 new, 4 to read @@ NEEDS RULING
+### feat/si-example (`6fb4f501`) — 4 new, 4 to read @@ NEEDS RULING
 
 - **`lpn_ex_net2_si_desc`**
   > Litres per second, with metres and millimetres. An EPANET example at Branford, Connecticut, converted from gallons per minute, feet and inches: 35 junctions and 1 tank, with no reservoir, no pump and no valves, about 2 km by 4 km. Fluoride, a non-reactive substance, enters at one source.

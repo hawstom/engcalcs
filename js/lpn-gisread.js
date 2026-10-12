@@ -364,6 +364,6 @@
 			});
 			return { ok: true, shapes: shapes, fields: dbf ? dbf.fields : null, prj: prj, holes: r.holes,
 				multipart: r.multipart, skipped: r.skipped, deletedRows: deleted };
-		}, function (e) { return { ok: false, detail: String(e && e.message ? e.message : e) }; });
+		}, function (e) { return { ok: false, detail: 'damaged', error: String(e && e.message ? e.message : e) }; });
 	};
 }(typeof globalThis !== 'undefined' ? globalThis : this));

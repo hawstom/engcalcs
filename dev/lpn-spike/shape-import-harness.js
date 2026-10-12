@@ -306,6 +306,27 @@ async function main() {
 		ok('a record marked deleted in the .dbf is skipped and the notice says so (9 of 10)', sh.length === 9 &&
 			note.indexOf(await L('lpn_shp_import_deleted_one')) >= 0, sh.length + ' ' + note.slice(0, 300));
 		await h.undo();
+
+		console.log('\n--- 6. naming, damage, unplaceable records, nothing imported ---');
+		await h.newCrsProject('2278');
+		await a.dismissGallery().catch(() => {});
+		await h.importVia('lpn_file_import_shp', stk);
+		sh = await h.shapes();
+		ok('Stacks: the Name column names the Shapes ("4 level"), not the all-zero Id', sh.some((s) => s.desc === '4 level' || s.id === '4 level') && !sh.some((s) => s.id === '0'), JSON.stringify(sh.map((s) => [s.id, s.desc])));
+		await h.undo();
+		note = await h.importVia('lpn_file_import_shp', { name: 'corrupt.zip', mimeType: 'application/zip', buffer: Buffer.from('PK\u0003\u0004 this is not really a zip archive at all') });
+		ok('a corrupt zip is said in the plain damaged-file sentence', note === (await L('lpn_shp_import_damaged')).replace('{file}', 'corrupt.zip'), note);
+		note = await h.importVia('lpn_file_import_dxf', { name: 'circle.dxf', buffer: Buffer.from('0\nSECTION\n2\nENTITIES\n0\nCIRCLE\n8\n0\n10\n1\n20\n1\n40\n2\n0\nENDSEC\n0\nEOF\n') });
+		ok('nothing imported reads as nothing imported, not "0 Shapes"', note.indexOf((await L('lpn_shapes_import_none')).replace('{file}', 'circle.dxf')) === 0 && note.indexOf('0 Shapes') < 0, note);
+		await a.newGeoProject('us');
+		await a.dismissGallery().catch(() => {});
+		await h.settle(500);
+		note = await h.importVia('lpn_file_import_shp', fx('shapes-highlat.shp'));
+		ok('a record beyond the map latitude limit is named by record number with its reason, not as "2 (1)"', (await h.shapes()).length === 2 &&
+			note.indexOf((await L('lpn_shp_import_unplaced_one')).split('{list}')[0]) >= 0 && note.indexOf('Record number: 2.') >= 0, note);
+		await h.undo();
+		note = await h.importVia('lpn_file_import_shp', fx('shapes-geo.zip'));
+		ok('the unread MultiPatch sentence gives its reason', note.indexOf((await L('lpn_shp_import_skipped_one')).split('{list}')[0]) >= 0, note);
 		ok('no uncaught page errors', a.errors.length === 0, a.errors.slice(0, 2).join(' | '));
 		await a.close();
 	} finally {

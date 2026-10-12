@@ -37893,8 +37893,9 @@ var EngCalcs = EngCalcs || {};
 			made.forEach(function (s) { addShapeToDoc(s); buildShapeEls(s); });
 			scheduleSave();
 		}
-		lines.push(gisCounted('lpn_geojson_import_done', made.length, '{n} Shapes imported from {file}.',
-			'One Shape imported from {file}.').replace('{file}', fileName));
+		lines.push(made.length === 0 ? String(pc.lpn_shapes_import_none || 'Nothing was imported from {file}.').replace('{file}', fileName)
+			: gisCounted('lpn_geojson_import_done', made.length, '{n} Shapes imported from {file}.',
+				'One Shape imported from {file}.').replace('{file}', fileName));
 		if (renamed.length) {
 			lines.push(gisCounted('lpn_geojson_import_renamed', renamed.length,
 				'{n} feature names cannot be Shape IDs and are kept with the Shapes: {list}.',
@@ -38035,13 +38036,29 @@ var EngCalcs = EngCalcs || {};
 				mode = 'planar';
 				lines.push(String(pc.lpn_shp_import_prj_other || 'The .prj states {theirs}. This project states no coordinate system, so the coordinates were read as {frame}, with no conversion.').replace('{theirs}', theirsName || prj.name).replace('{frame}', gisFrameText()));
 			}
-			var nameCols = ['name', 'id'], descCols = ['description', 'desc'], bad = [];
-			// Which dbf column gives the name and the description: the first of each, by lower-case name.
+			var descCols = ['description', 'desc'], bad = [];
+			// Which dbf column gives the name and the description. A NAME column wins over ID, and an
+			// ID column names Shapes only when it tells records apart: ArcGIS writes an Id of zeros
+			// first in every file it makes, and a column of zeros or repeats is not a name.
 			var nameCol = null, descCol = null;
 			(r.fields || []).forEach(function (f) {
-				if (!nameCol && nameCols.indexOf(f.toLowerCase()) >= 0) { nameCol = f; }
+				if (!nameCol && f.toLowerCase() === 'name') { nameCol = f; }
 				if (!descCol && descCols.indexOf(f.toLowerCase()) >= 0) { descCol = f; }
 			});
+			if (!nameCol) {
+				(r.fields || []).forEach(function (f) {
+					var seen = {}, distinct = true, rows = {}, any = false;
+					if (nameCol || f.toLowerCase() !== 'id') { return; }
+					r.shapes.forEach(function (sh) {
+						var v = sh.attrs ? String(sh.attrs[f]) : '';
+						if (rows[sh.row]) { return; }
+						rows[sh.row] = true;
+						if (v === '' || /^0+$/.test(v) || seen[v]) { distinct = false; }
+						seen[v] = true; any = true;
+					});
+					if (any && distinct) { nameCol = f; }
+				});
+			}
 			var byRow = {};
 			r.shapes.forEach(function (sh) { byRow[sh.row] = (byRow[sh.row] || 0) + 1; });
 			r.shapes.forEach(function (sh) {
@@ -38081,14 +38098,23 @@ var EngCalcs = EngCalcs || {};
 			if (r.fields && r.fields.length) {
 				attrCols = r.fields.filter(function (f) { return f !== nameCol && f !== descCol; });
 				if (attrCols.length) {
-					lines.push(String(pc.lpn_shp_import_attrs || 'Attribute columns kept as properties of each Shape: {list}.').replace('{list}', attrCols.join(', ')));
+					lines.push(String(pc.lpn_shp_import_attrs || 'Attribute columns kept as properties of each Shape: {list}.').replace('{list}', attrCols.slice(0, 8).join(', ') + (attrCols.length > 8 ? ', ' +
+						String(pc.lpn_shapes_import_more || 'and {n} more').replace('{n}', String(attrCols.length - 8)) : '')));
 				}
 			}
-			var sk = r.skipped.slice().concat(bad);
+			var sk = r.skipped;
 			if (sk.length) {
 				var total = sk.reduce(function (s, k) { return s + k.n; }, 0);
-				skipped.push(gisCounted('lpn_shp_import_skipped', total, '{n} records not imported: {list}.',
-					'One record not imported: {list}.').replace('{list}', gisList(sk)));
+				skipped.push(gisCounted('lpn_shp_import_skipped', total, '{n} records not imported, because their shape type is not read: {list}.',
+					'One record not imported, because its shape type is not read: {list}.').replace('{list}', gisList(sk)));
+			}
+			if (bad.length) {
+				var nums = bad.map(function (k) { return k.name; });
+				skipped.push(gisCounted('lpn_shp_import_unplaced', bad.length,
+					'{n} records have coordinates this project cannot place, such as a latitude beyond the limit of the map. Record numbers: {list}.',
+					'One record has coordinates this project cannot place, such as a latitude beyond the limit of the map. Record number: {list}.')
+					.replace('{list}', nums.slice(0, 8).join(', ') + (nums.length > 8 ? ', ' +
+						String(pc.lpn_shapes_import_more || 'and {n} more').replace('{n}', String(nums.length - 8)) : '')));
 			}
 			if (r.deletedRows) {
 				skipped.push(gisCounted('lpn_shp_import_deleted', r.deletedRows, '{n} records marked deleted in the .dbf were not imported.',

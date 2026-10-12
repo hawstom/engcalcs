@@ -143,4 +143,8 @@ fs.writeFileSync(path.join(here, 'shapes-grid.dbf'), dbf([{ name: 'NAME', type: 
 		{ name: 'utm' + z + '.shp', data: u.shp }, { name: 'utm' + z + '.prj', data: Buffer.from(prj) }
 	]));
 });
+// A point beyond the Web Mercator latitude limit, between two ordinary ones.
+fs.writeFileSync(path.join(here, 'shapes-highlat.shp'), shp(0, [
+	{ type: 1, parts: [[[-112, 33]]] }, { type: 1, parts: [[[10, 89.5]]] }, { type: 1, parts: [[[-111, 34]]] }
+]).shp);
 console.log('wrote fixtures in ' + here);
