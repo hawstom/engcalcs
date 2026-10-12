@@ -24668,6 +24668,44 @@ var EngCalcs = EngCalcs || {};
 		});
 		return r;
 	}
+	// **A PASTED SHAPE ROW IS JUDGED WHOLE, AND A REFUSAL SAYS WHY** (Perry's review, 2026-10-11):
+	// a Points cell with comma decimals or space-separated pairs is refused, never converted, and
+	// the row's reason names the format the cell wanted; Closed on fewer than three points is
+	// refused rather than quietly left open. `pts` is the row's points after the paste (pasted or
+	// kept), `closedOn` whether the row says Closed. Returns the reason, or null.
+	function paneShapeRowError(row, ptsText, pts, closedOn) {
+		var pc = EngCalcs.pageConfig || {}, pair = String(paneColVerts().unitText()).split('|')[0];
+		if (ptsText !== null && !pts) {
+			return String(pc.lpn_pane_paste_shape_bad_points ||
+				'Row {row}: {text} is not a list of points. Write each point as {pair}, with a point (.) as the decimal mark, and separate the points with |.')
+				.replace('{row}', String(row)).replace('{text}', ptsText).replace('{pair}', pair);
+		}
+		if (closedOn && pts && pts.length < 3) {
+			return panePasteSay('lpn_pane_paste_shape_closed_few', 'Row {row}: a closed Shape needs at least three points.', row);
+		}
+		return null;
+	}
+	// The existing Shape rows a paste lands on, judged before anything is written.
+	function paneShapeUpdateErrors(rows, cols, box, cells, nRows, nCols, srcRows, srcCols, lineOffset) {
+		var errs = [], r, cIdx, el, col, t, ptsText, closedT, pts, closedOn, p, e;
+		for (r = 0; r < nRows && box.r0 + r < rows.length; r++) {
+			el = rows[box.r0 + r]; ptsText = null; closedT = null;
+			for (cIdx = 0; cIdx < nCols; cIdx++) {
+				col = cols[box.c0 + cIdx];
+				t = cells[r % srcRows][cIdx % srcCols];
+				if (!col || t === undefined) { continue; }
+				if (col.key === 'verts') { ptsText = String(t).trim(); }
+				if (col.key === 'closed') { closedT = String(t).trim(); }
+			}
+			if (ptsText === null && closedT === null) { continue; }
+			pts = el.pts;
+			if (ptsText !== null) { p = paneParseShapePoints(ptsText); pts = p.ok ? p.v : null; }
+			closedOn = closedT !== null ? !!(paneParseCellText({ bool: true }, closedT).v) : !!el.closed;
+			e = paneShapeRowError(r + 1 + lineOffset, ptsText, pts, closedOn && closedT !== null);
+			if (e) { errs.push(e); }
+		}
+		return errs;
+	}
 	function paneCustomerCols() {
 		var pc = EngCalcs.pageConfig || {};
 		return [
@@ -28246,7 +28284,9 @@ var EngCalcs = EngCalcs || {};
 					err = panePasteSay('lpn_pane_paste_shape_no_points', 'Row {row}: a new Shape needs its Points.', row);
 				} else {
 					vp = paneParseShapePoints(txt('verts'));
-					if (!vp.ok) { err = bad('verts'); } else { plan.pts = vp.v; }
+					plan.pts = vp.ok ? vp.v : null;
+					err = paneShapeRowError(row, txt('verts'), plan.pts,
+						txt('closed') !== '' && !!paneParseCellText({ bool: true }, txt('closed')).v);
 				}
 			}
 			// Every other cell: blank keeps the default a drawn element is born with (spec §2), a
@@ -28485,6 +28525,10 @@ var EngCalcs = EngCalcs || {};
 			var renames = paneIdRenames(spec, rows, cols, box, cells, nRows, nCols, srcRows, srcCols),
 				renameErrs = paneRenameErrors(spec, renames, lineOffset);
 			if (renameErrs.length) { return paneRefuse(renameErrs); }
+			if (spec.group === 'shape') {
+				var shapeErrs = paneShapeUpdateErrors(rows, cols, box, cells, nRows, nCols, srcRows, srcCols, lineOffset);
+				if (shapeErrs.length) { return paneRefuse(shapeErrs); }
+			}
 			if (!overflow && !opts.idsOk && renames.length) { return paneAskIdChanges(spec, opts.raw, renames.length); }
 		}
 		if (mayAsk && extra) { return paneAskOverflow(spec, opts.raw, nRows, extra); }

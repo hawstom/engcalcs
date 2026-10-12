@@ -916,6 +916,9 @@ $ec_lang['lpn_pane_paste_text_no_position']='Row {row}: a new Text needs both {f
 $ec_lang['lpn_pane_paste_no_anchor']='Row {row}: {id} is not a node or a pipe in this network yet. Paste it first, then this Text.';
 $ec_lang['lpn_pane_paste_customer_no_position']='Row {row}: a new Customer needs both {first} and {second}.';
 $ec_lang['lpn_pane_paste_shape_no_points']='Row {row}: a new Shape needs its Points.';
+// {pair} is the Points heading's own pair in this project's axis words: X/Y, N/E or Lat/Lon.
+$ec_lang['lpn_pane_paste_shape_bad_points']='Row {row}: {text} is not a list of points. Write each point as {pair}, with a point (.) as the decimal mark, and separate the points with |.';
+$ec_lang['lpn_pane_paste_shape_closed_few']='Row {row}: a closed Shape needs at least three points.';
 $ec_lang['lpn_pane_paste_no_customer_ref']='Row {row}: a new Customer needs a connected pipe or node.';
 $ec_lang['lpn_pane_paste_no_pipe']='Row {row}: pipe {id} does not exist yet. Paste your pipes first, then your customers.';
 $ec_lang['lpn_pane_paste_no_customer_node']='Row {row}: node {id} does not exist yet. Paste your junctions first, then your customers.';

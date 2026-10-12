@@ -14,7 +14,8 @@
 //    trailing zeros and eight decimals included.
 // 4. A paste over the existing rows updates them (a moved point, a description, a polygon closed),
 //    one Undo puts all of it back; a paste of new rows adds them and leaves the old ones alone.
-// 5. A row whose Points cannot be read refuses the whole paste and changes nothing.
+// 5. A row whose Points cannot be read (comma decimals, space-separated pairs) refuses the whole paste,
+//    says the format it wanted, and changes nothing; so does Closed on fewer than three points.
 // 6. On a geographic project a latitude and longitude come back character for character.
 'use strict';
 
@@ -272,6 +273,35 @@ async function main() {
 			await P.keyboard.press('Control+Shift+V'); await h.settle(600);
 			const note2 = await a.notice();
 			ok('a new row with no Points is refused, in its own words', note2.indexOf((await a.lang('lpn_pane_paste_shape_no_points')).replace('{row}', '1')) >= 0, note2);
+			// Perry's review: a refused Points cell says what it wanted, and Closed needs three points.
+			const badPts = (await a.lang('lpn_pane_paste_shape_bad_points'));
+			for (const bad of ['512345,67/3456789,12', '512345.67 3456789.12|512400.5 3456789.12']) {
+				const was = JSON.stringify(await h.shapes());
+				await h.setClip(tsv([['G8', '', '0', bad]]));
+				await h.clickCell('A1', 'id');
+				await P.keyboard.press('Control+Shift+V'); await h.settle(600);
+				const n = await a.notice();
+				ok('"' + bad + '" is refused, naming the X/Y format and the decimal point',
+					JSON.stringify(await h.shapes()) === was && n.indexOf(badPts.replace('{row}', '1').replace('{text}', bad).replace('{pair}', 'X/Y')) >= 0, n);
+			}
+			const few = (await a.lang('lpn_pane_paste_shape_closed_few')).replace('{row}', '1');
+			{
+				const was = JSON.stringify(await h.shapes());
+				await h.setClip(tsv([['H9', '', '1', ptsCell(B2)]]));
+				await h.clickCell('A1', 'id');
+				await P.keyboard.press('Control+Shift+V'); await h.settle(600);
+				const n = await a.notice();
+				ok('a new closed row of two points is refused, with its reason', JSON.stringify(await h.shapes()) === was && n.indexOf(few) >= 0, n);
+			}
+			{
+				// Over the existing B2 (two points): Closed = 1 is refused, nothing written.
+				const was = JSON.stringify(await h.shapes());
+				await h.setClip(tsv([['B2', '', '1', ptsCell(B2)]]));
+				await h.clickCell('B2', 'id');
+				await P.keyboard.press('Control+V'); await h.settle(600);
+				const n = await a.notice();
+				ok('Closed pasted over a two-point Shape is refused, and nothing changes', JSON.stringify(await h.shapes()) === was && n.indexOf(few) >= 0, n);
+			}
 		}
 		ok('no uncaught page errors on the grid project', a.errors.length === 0, a.errors.slice(0, 2).join(' | '));
 
