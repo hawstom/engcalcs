@@ -27425,6 +27425,14 @@ var EngCalcs = EngCalcs || {};
 	 * on screen. Excel makes you ask for that with Alt+semicolon and silently includes hidden rows
 	 * if you forget; here it is true by construction.
 	 */
+	// A cell holding a tab, a line break or a quote goes out quoted, a quote inside doubled, as a
+	// spreadsheet writes it, so libPasteCells() reads back the same characters. In a ONE-column
+	// copy there is no tab on any line, and libPasteCells() splits such a line on whitespace,
+	// commas and semicolons, so a cell holding one of those is quoted there too.
+	function paneQuoteCell(t, oneColumn) {
+		t = String(t === undefined || t === null ? '' : t);
+		return (/[\t\r\n"]/.test(t) || (oneColumn && /[\s,;]/.test(t))) ? '"' + t.replace(/"/g, '""') + '"' : t;
+	}
 	function paneCopyTsv(spec, rows, cols, box, withHeads) {
 		var out = [], r, c, line;
 		// **HEADINGS ONLY WHEN ASKED FOR, BY NAME** (Tom, 2026-10-06: *"it would be nice
@@ -27439,7 +27447,7 @@ var EngCalcs = EngCalcs || {};
 		}
 		for (r = box.r0; r <= box.r1; r++) {
 			line = [];
-			for (c = box.c0; c <= box.c1; c++) { line.push(paneCellText(cols[c], rows[r])); }
+			for (c = box.c0; c <= box.c1; c++) { line.push(paneQuoteCell(paneCellText(cols[c], rows[r]), box.c0 === box.c1)); }
 			out.push(line.join('\t'));
 		}
 		return out.join('\n');
@@ -57839,16 +57847,50 @@ var EngCalcs = EngCalcs || {};
 	 * was the one thing the old single text field did well and it is not given up.
 	 */
 	function libPasteCells(text) {
-		var out = [];
-		String(text === null || text === undefined ? '' : text)
-			.replace(/\r\n?/g, '\n').split('\n').forEach(function (line) {
-				var t;
-				if (line.indexOf('\t') >= 0) { out.push(line.split('\t')); return; }
-				t = line.trim();
-				// A blank line is not a row. Keeping one would push every row under it down by one,
-				// which is a paste that quietly lands somewhere other than where it was aimed.
-				if (t !== '') { out.push(t.split(/[\s,;]+/)); }
-			});
+		var src = String(text === null || text === undefined ? '' : text).replace(/\r\n?/g, '\n'),
+			out = [], n = src.length, i = 0, rec, field, quoted, anyQuoted, j, ch, closed;
+		// **QUOTED FIELDS (Perry, 2026-10-11).** Excel, LibreOffice Calc and Google Sheets write a
+		// cell holding a tab, a line break or a double quote as `"..."` with each inner quote
+		// doubled. A field is quoted ONLY when its first character is `"`: it runs to the next
+		// quote not doubled, and that quote must be followed by a tab, a line end or the end of the
+		// text. Anything else (`6" pipe`, `"abc"def`, a quote never closed) is taken literally, as
+		// it always was.
+		while (i <= n) {
+			rec = []; anyQuoted = false;
+			for (;;) {
+				quoted = false; field = '';
+				if (src.charAt(i) === '"') {
+					closed = false; j = i + 1; field = '';
+					while (j < n) {
+						ch = src.charAt(j);
+						if (ch === '"') {
+							if (src.charAt(j + 1) === '"') { field += '"'; j += 2; continue; }
+							closed = true; break;
+						}
+						field += ch; j++;
+					}
+					ch = src.charAt(j + 1);
+					if (closed && (j + 1 >= n || ch === '\t' || ch === '\n')) {
+						quoted = true; anyQuoted = true; i = j + 1;
+					} else { field = ''; }
+				}
+				if (!quoted) {
+					j = i;
+					while (j < n && src.charAt(j) !== '\t' && src.charAt(j) !== '\n') { j++; }
+					field = src.slice(i, j); i = j;
+				}
+				rec.push(field);
+				if (i < n && src.charAt(i) === '\t') { i++; continue; }
+				break;
+			}
+			i++;   // the line end (or one past the end)
+			if (rec.length > 1 || anyQuoted) { out.push(rec); continue; }
+			// A line with no tab is split on whitespace instead (see above). A blank line is not a
+			// row: keeping one would push every row under it down by one, a paste that quietly lands
+			// somewhere other than where it was aimed.
+			field = rec[0].trim();
+			if (field !== '') { out.push(field.split(/[\s,;]+/)); }
+		}
 		return out;
 	}
 	// ONE cell is not a grid: it is ordinary typing, and the browser's own paste does it better
