@@ -3,7 +3,7 @@
         "language": "fr",
         "expected_key_count": 2558,
         "delta_key_count": 0,
-        "exempt_key_count": 63,
+        "exempt_key_count": 62,
         "exempt_keys": [
             "u_depthFrac",
             "calc_units_us",
@@ -27,7 +27,6 @@
             "bpn_id",
             "bpn_source_label",
             "lpn_field_text_align_center",
-            "lpn_help_manual",
             "lpn_hotkeys_menu_heading",
             "lpn_ex_net2_title",
             "lpn_ex_net3_title",
