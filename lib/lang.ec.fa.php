@@ -88,13 +88,13 @@ $ec_lang['template_printable_subtitle']='زیرعنوان قابل چاپ';
 // NO EC_CONSENT_VERSION BUMP. Nothing about what is stored, who reads it or how long it lives has
 // moved; the sentence became more accurate, not different. Bumping would re-ask every visitor who
 // has already answered, for no change they could act on.
-$ec_lang['consent_body']='آیا اجازه می‌دهید یک کوکی یک‌رقمی در این مرورگر ذخیره کنیم تا به یاد داشته باشیم این صفحه را پیش‌تر شمرده‌ایم؟ این کوکی هیچ‌چیز دربارهٔ شما و هیچ‌چیز از آنچه تایپ می‌کنید را ثبت نمی‌کند. بدون آن نمی‌توانیم بازدید دوم شما را از بازدید نخست کسی دیگر تشخیص دهیم.';
+$ec_lang['consent_body']='آیا اجازه می‌دهید یک کد تصادفی در این مرورگر ذخیره کنیم تا بتوانیم بشماریم چند مرورگر از هر بخش این سایت استفاده می‌کنند؟ این کد در همان لحظه ساخته می‌شود، چیزی دربارهٔ شما یا دستگاهتان نمی‌گوید و هیچ‌چیز از آنچه وارد می‌کنید را ثبت نمی‌کند. بدون آن نمی‌توانیم بازدید دوم شما را از بازدید نخست کسی دیگر تشخیص دهیم.';
 $ec_lang['consent_accept']='پذیرفتن همین درخواست';
 $ec_lang['consent_accept_all']='پذیرفتن همیشگی';
 $ec_lang['consent_decline']='رد همیشگی';
-$ec_lang['consent_current_granted']='شما این را پذیرفته‌اید. ثبت بازدید برای این مرورگر محدود می‌شود.';
+$ec_lang['consent_current_granted']='شما این را پذیرفته‌اید. این مرورگر یک کد تصادفی نگه می‌دارد تا بتوانیم آن را بشماریم.';
 $ec_lang['consent_current_denied']='شما این را رد کرده‌اید. برای محدود کردن ثبت بازدید، چیزی ذخیره نمی‌کنیم.';
-$ec_lang['consent_region_label']='انتخاب شما درباره محدود کردن ثبت بازدید.';
+$ec_lang['consent_region_label']='انتخاب شما درباره کد شمارش.';
 $ec_lang['consent_settings_link']='تنظیمات کوکی';
 $ec_lang['privacy_link']='اعلامیه حریم خصوصی';
 $ec_lang['terms_link']='شرایط استفاده';

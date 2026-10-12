@@ -88,13 +88,13 @@ $ec_lang['template_printable_subtitle']='אזור כותרת משנה להדפס
 // NO EC_CONSENT_VERSION BUMP. Nothing about what is stored, who reads it or how long it lives has
 // moved; the sentence became more accurate, not different. Bumping would re-ask every visitor who
 // has already answered, for no change they could act on.
-$ec_lang['consent_body']='האם נוכל לשמור עוגיית ספרה אחת בדפדפן זה כדי לזכור שכבר ספרנו עמוד זה? היא אינה רושמת דבר עליכם ולא דבר שאתם מקלידים. בלעדיה, לא נוכל להבחין בין הביקור השני שלכם לביקור הראשון של מישהו אחר.';
+$ec_lang['consent_body']='האם נוכל לשמור קוד אקראי בדפדפן זה, כדי שנוכל לספור כמה דפדפנים משתמשים בכל חלק של האתר? הקוד נוצר ברגע זה, אינו אומר דבר עליכם או על המכשיר שלכם, ואינו רושם דבר ממה שאתם מזינים. בלעדיו לא נוכל להבחין בין הביקור השני שלכם לביקור הראשון של מישהו אחר.';
 $ec_lang['consent_accept']='אשר בקשה זו';
 $ec_lang['consent_accept_all']='אשר תמיד';
 $ec_lang['consent_decline']='דחה תמיד';
-$ec_lang['consent_current_granted']='אישרת זאת. אנו מגבילים את הרישום עבור פרופיל דפדפן זה.';
+$ec_lang['consent_current_granted']='אישרתם זאת. דפדפן זה שומר קוד אקראי כדי שנוכל לספור אותו.';
 $ec_lang['consent_current_denied']='דחית זאת. איננו שומרים דבר כדי להגביל את הרישום עבור פרופיל דפדפן זה.';
-$ec_lang['consent_region_label']='הבחירה שלכם לגבי הגבלת הרישום.';
+$ec_lang['consent_region_label']='הבחירה שלכם לגבי קוד הספירה.';
 $ec_lang['consent_settings_link']='הגדרות עוגיות';
 $ec_lang['privacy_link']='הצהרת פרטיות';
 $ec_lang['terms_link']='תנאי שימוש';

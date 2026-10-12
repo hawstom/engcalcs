@@ -83,36 +83,30 @@ $ec_lang['template_printable_subtitle']='Printable Subtitle';
 // cannot read is not consent. The long-form privacy notice and terms are a separate question --
 // English-authoritative, and translated by a human later if at all.
 // Edited by TGH 2026-09-07; the word "cookie" approved by TGH 2026-09-09.
-// **IT SAYS "COOKIE" BECAUSE THAT IS THE WORD PEOPLE KNOW** (Tom, 2026-09-09, watching a
-// first-time reader: *"We should use the word 'cookie'. 'May we save a one-digit cookie...?' That
-// is the word people know."*). "One digit in this browser" was accurate and taught nobody what was
-// being asked; a reader who has met a hundred cookie banners knows instantly what this one is
-// about, and can then notice that this one is asking for far less than the others did.
+// **REWRITTEN 2026-10-08 (Tom, call F01: "Go (random code, new consent text)")**, his draft used
+// exactly. The yes now also covers a random browser code (EC_CODE_COOKIE in lib/config.inc.php), so
+// "a one-digit cookie" was no longer the whole of what is asked for. The code is what the sentence
+// names because it is what the yes newly buys: counting browsers, not only page loads.
 //
-// **AND IT IS STILL LITERALLY TRUE, which is the only reason the word is allowed here.** What is
-// stored IS a cookie, and it holds one base-32 digit per page visited -- five bits, maximum 31.
-// The arithmetic is in lib/config.inc.php beside the bits themselves. If that ever stops being one
-// digit, this sentence is the thing that has to change first.
-//
-// NO EC_CONSENT_VERSION BUMP. Nothing about what is stored, who reads it or how long it lives has
-// moved; the sentence became more accurate, not different. Bumping would re-ask every visitor who
-// has already answered, for no change they could act on.
-$ec_lang['consent_body']='May we save a one-digit cookie in this browser to remember that we have already counted this page? It records nothing about you and nothing you enter. Without it we cannot tell your second visit from somebody else’s first.';
+// EC_CONSENT_VERSION WENT FROM 1 TO 2 WITH IT, because what is stored changed. Everybody who chose
+// "Allow this" is asked again; "Allow all" and "Refuse all" are not. The other 26 languages keep
+// their old sentence until the next translation sprint, under the same version.
+$ec_lang['consent_body']='May we save a random code in this browser so that we can count how many browsers use each part of this site? The code is made up on the spot, says nothing about you or your device, and records nothing you enter. Without it we cannot tell your second visit from somebody else\'s first.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_time_run_tip']='Solve this network at every hydraulic time step.';
-$ec_lang_syn['consent_body']='May we save (store, keep, put) a one-digit cookie (a tiny stored marker) in this browser to remember that we have already counted this page? It records nothing about you and nothing you enter. Without it we cannot tell your second visit from somebody else’s first.';
+$ec_lang_syn['consent_body']='May we save (store, keep, put) a random code (a string of letters and digits chosen by chance) in this browser so that we can count (tally) how many browsers use each part of this site? The code is made up on the spot (created at that moment), says nothing about you or your device, and records nothing you enter. Without it we cannot tell your second visit from somebody else\'s first.';
 $ec_lang['consent_accept']='Allow this';
 $ec_lang_syn['consent_accept']='Allow (permit, accept) this ask (this request, this question)';
 $ec_lang['consent_accept_all']='Allow all';
 $ec_lang_syn['consent_accept_all']='Allow (permit, accept) this and any later ask; do not ask (question) me again';
 $ec_lang['consent_decline']='Refuse all';
 $ec_lang_syn['consent_decline']='Refuse (decline, deny) this and any later ask; do not ask (question) me again';
-$ec_lang['consent_current_granted']='You allowed this. We limit logging for this browser profile.';
-$ec_lang_syn['consent_current_granted']='You allowed this. We limit logging (recording) for this browser profile.';
+$ec_lang['consent_current_granted']='You allowed this. This browser keeps a random code so that we can count it.';
+$ec_lang_syn['consent_current_granted']='You allowed this. A random browser code is tracked to minimize duplicate use counts.';
 $ec_lang['consent_current_denied']='You refused this. We store nothing to limit logging for this browser profile.';
 $ec_lang_syn['consent_current_denied']='You refused (declined or denied) this. We store (keep or save) nothing to limit logging (recording) for this browser profile.';
-$ec_lang['consent_region_label']='Your choice about limiting logging.';
-$ec_lang_syn['consent_region_label']='Your choice about limiting logging (recording).';
+$ec_lang['consent_region_label']='Your choice about the counting code.';
+$ec_lang_syn['consent_region_label']='Your choice about the random browser code tracking.';
 $ec_lang['consent_settings_link']='Cookie settings';
 $ec_lang['privacy_link']='Privacy notice';
 $ec_lang['terms_link']='Terms of use';

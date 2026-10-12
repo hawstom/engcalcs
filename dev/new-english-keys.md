@@ -75,13 +75,37 @@ is the one you meant. "The first one" is a complete answer.
   *The proposal:* PROPOSED English: 'Rest the pointer on a node, link or customer to see its label as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project.'
   @@ NEEDS RULING
 
-## Synonym entries to approve  (12, 10 to read @@ NEEDS RULING)
+## Synonym entries to approve  (15, 13 to read @@ NEEDS RULING)
 
 **These are translator notes (`$ec_lang_syn`), not visitor wording.** Each was written against an
 English string that has since changed, or against a key that no longer exists. Say which: keep it
 as is, change it (a proposal may follow), or remove it. **Your answer on the flag line is the
 written permission** the rule requires; CC then applies it by hand and re-records it. A script
 never edits a synonym.
+
+- **`consent_body`**
+  > May we save a random code in this browser so that we can count how many browsers use each part of this site? The code is made up on the spot, says nothing about you or your device, and records nothing you enter. Without it we cannot tell your second visit from somebody else's first.
+  *Why stale:* the English changed after this synonym was written
+  *Written against:* May we save a one-digit cookie in this browser to remember that we have already counted this page? It records nothing about you and nothing you enter. Without it we cannot tell your second visit from somebody else’s first.
+  *Current synonym:* May we save (store, keep, put) a random code (a string of letters and digits chosen by chance) in this browser so that we can count (tally) how many browsers use each part of this site? The code is made up on the spot (created at that moment), says nothing about you or your device, and records nothing you enter. Without it we cannot tell your second visit from somebody else's first.
+  **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
+  @@ NEEDS RULING
+
+- **`consent_current_granted`**
+  > You allowed this. This browser keeps a random code so that we can count it.
+  *Why stale:* the English changed after this synonym was written
+  *Written against:* You allowed this. We limit logging for this browser profile.
+  *Current synonym:* You allowed this. A random browser code is tracked to minimize duplicate use counts.
+  **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
+  @@ NEEDS RULING
+
+- **`consent_region_label`**
+  > Your choice about the counting code.
+  *Why stale:* the English changed after this synonym was written
+  *Written against:* Your choice about limiting logging.
+  *Current synonym:* Your choice about the random browser code tracking.
+  **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
+  @@ NEEDS RULING
 
 - **`ip_is_lateral`**
   > <span class="ec-help" title="Selected: this reach is a segment of the test lateral, from which individual emitters withdraw water. Cleared: this reach is a main, only passing flow along to laterals not on the test path.">Lat. <span class="ec-tip">?</span></span>
@@ -532,7 +556,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/handoff-1011b (`e28ef88a`) — adds no English strings
+### chore/roadmap-1011c (`4cda3c09`) — adds no English strings
 
 ### feat/bentley-interop (`44a81de6`) — 100 new, 100 to read @@ NEEDS RULING
 
@@ -861,7 +885,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`2e5e81c4`) — adds no English strings
 
-### feat/match-property (`2aeaaaf7`) — 11 new, 11 to read @@ NEEDS RULING
+### feat/match-property (`ea6934fb`) — 11 new, 11 to read @@ NEEDS RULING
 
 - **`lpn_match_done_many`**
   > Matched {m} assets to {id}, except status and location. Values changed: {n}.
@@ -897,7 +921,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Mode: Match properties. Select the asset to copy properties from. Status, identity, and location are not copied. Press Escape to cancel.
   @@ NEEDS RULING
 
-### feat/shape (`2b5cf162`) — 21 new, 21 to read @@ NEEDS RULING
+### feat/shape (`5d234758`) — 21 new, 21 to read @@ NEEDS RULING
 
 - **`lpn_file_import_shapes`**
   > Import GeoJSON shapes…
@@ -963,6 +987,6 @@ build for that would be a gate nobody keeps. Refresh it with
   > Draw a point, a polyline, or a polygon on the map. A Shape is annotation and is not part of the network. Specify each point, then specify the last point again, press Enter, or right-click to finish. Specify the first point again to close the Shape into a polygon.
   @@ NEEDS RULING
 
-### feat/visit-dedupe (`e22c4ec9`) — adds no English strings
+### feat/visit-dedupe (`83268b23`) — adds no English strings
 
-### fix/scenario-delete (`556cf46a`) — adds no English strings
+### fix/dxf-layer-code (`d87ca580`) — adds no English strings

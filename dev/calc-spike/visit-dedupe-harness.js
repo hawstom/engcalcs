@@ -1,0 +1,272 @@
+// Behavioural test of the counting changes of 2026-10-07 and 2026-10-08, over real HTTP against the
+// real PHP.
+//
+//   node dev/calc-spike/visit-dedupe-harness.js
+//
+// Tom, 2026-10-07: "(1) I would rather dedupe where we can. So if we are collecting consent anyway,
+// let's collect it for remembering for a year that they've been here. (2) ... if ?ec_nolog=1 could
+// be an 'invoke once to be ignored in reports forever', then that would be very useful, and I would
+// be very interested to see a side count of 'tester browsers'."
+//
+// Tom, 2026-10-08, call F01, replacing (1): "Go (random code, new consent text)" -- after a yes the
+// browser keeps a random 16-character code, every said-yes log row carries it, and ec_seen went
+// back to a session cookie (rows count uses; distinct codes count browsers).
+//
+// So this holds:
+//   1. ec_seen is a session cookie, written only for a browser that said yes, and a second sighting
+//      of the same page in the same visit writes no second row;
+//   2. ?ec_nolog=1 sets a one-year tester cookie stamped with the UTC day, writes 'on' and 'day'
+//      rows to the tester log, and from then on every writer sends that browser's rows to the tester
+//      log instead of the main logs; one 'day' row per browser per day; ?ec_nolog=0 clears it;
+//   1b. the browser code: made on a said-yes page view and renewed for 400 days on every one, carried
+//      just before the bucket by every log writer's said-yes rows and by none of the page-load rows
+//      or tester rows, never made without a yes, and deleted on refusal and on an out-of-date
+//      "Allow this" (the consent version is 2). The browser half is
+//      dev/lpn-spike/count-code-browser-harness.js.
+//
+// The server is PHP's own `php -S` serving this checkout, with EC_TEST_LOG_DIR pointing every log at
+// a temporary directory (lib/config.inc.php honours that variable under cli-server only), so the
+// rows a request wrote can be read back without touching the checkout's log/. The daily email's
+// rendering of the new columns is dev/scripts/daily_report_selftest.php's job.
+
+const { spawn } = require('child_process');
+const fs = require('fs');
+const net = require('net');
+const os = require('os');
+const path = require('path');
+const { makeReporter, ROOT } = require('./calc-page.js');
+
+const r = makeReporter('visit dedupe and tester browsers (2026-10-07)');
+const YEAR = 365 * 86400;
+const CODE_DAYS = 400 * 86400;
+const A = '0123456789abcdef';
+const today = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+const logDir = fs.mkdtempSync(path.join(os.tmpdir(), 'visit-dedupe-'));
+const consent = '1.' + Math.floor(Date.now() / 1000) + '.2';
+const oldAllowThis = '1.' + Math.floor(Date.now() / 1000) + '.1';
+const oldAllowAll = '2.' + Math.floor(Date.now() / 1000) + '.1';
+
+function freePort() {
+	return new Promise((resolve, reject) => {
+		const srv = net.createServer();
+		srv.on('error', reject);
+		srv.listen(0, '127.0.0.1', () => { const p = srv.address().port; srv.close(() => resolve(p)); });
+	});
+}
+
+function rows(name) {
+	const f = path.join(logDir, name);
+	if (!fs.existsSync(f)) { return []; }
+	return fs.readFileSync(f, 'utf8').split('\n').filter(Boolean).map((l) => l.split('\t'));
+}
+function clearLogs() {
+	for (const f of fs.readdirSync(logDir)) { fs.unlinkSync(path.join(logDir, f)); }
+}
+
+/** One request. cookies: {name: value}. Returns {status, body, set: {name: {value, maxAge, httponly}}}. */
+async function req(base, rel, { cookies = {}, post = null } = {}) {
+	const headers = { 'Accept-Language': 'en-US' };
+	const jar = Object.entries(cookies).map(([k, v]) => `${k}=${v}`).join('; ');
+	if (jar) { headers.Cookie = jar; }
+	const opt = { method: post ? 'POST' : 'GET', headers, redirect: 'manual' };
+	if (post) {
+		opt.body = new URLSearchParams(post).toString();
+		headers['Content-Type'] = 'application/x-www-form-urlencoded';
+	}
+	const res = await fetch(base + rel, opt);
+	const body = await res.text();
+	const set = {};
+	for (const line of res.headers.getSetCookie()) {
+		const parts = line.split(';').map((s) => s.trim());
+		const [name, ...rest] = parts[0].split('=');
+		const attr = {};
+		for (const p of parts.slice(1)) { const [k, v] = p.split('='); attr[k.toLowerCase()] = v === undefined ? true : v; }
+		set[name] = {
+			value: decodeURIComponent(rest.join('=')),
+			maxAge: attr['max-age'] === undefined ? null : Number(attr['max-age']),
+			httponly: !!attr.httponly,
+		};
+	}
+	return { status: res.status, body, set };
+}
+
+function aboutAYear(c) { return c && c.maxAge !== null && Math.abs(c.maxAge - YEAR) <= 60; }
+function about400Days(c) { return c && c.maxAge !== null && Math.abs(c.maxAge - CODE_DAYS) <= 60; }
+const isCode = (v) => /^[0-9a-f]{16}$/.test(v);
+
+(async () => {
+	const port = await freePort();
+	const php = spawn('php', ['-d', 'display_errors=0', '-d', 'pcre.jit=0', '-S', `127.0.0.1:${port}`, '-t', ROOT],
+		{ env: Object.assign({}, process.env, { EC_TEST_LOG_DIR: logDir }), stdio: 'ignore' });
+	const base = `http://127.0.0.1:${port}/`;
+	try {
+		let up = false;
+		for (let i = 0; i < 100 && !up; i++) {
+			try { await fetch(base + 'log-human-view.php'); up = true; } catch (e) { await new Promise((ok) => setTimeout(ok, 100)); }
+		}
+		if (!up) { r.ok(false, 'php -S came up'); return; }
+
+		r.section('1. ec_seen: one visit, consent-gated, first sighting only');
+		clearLogs();
+		let a = await req(base, 'log-human-view.php', { cookies: { ec_consent: consent }, post: { page: 'Manning-Pipe-Flow', lang: 'en' } });
+		r.eq(a.status, 204, 'a said-yes human view is accepted');
+		r.ok(a.set.ec_seen && a.set.ec_seen.value === 'Manning-Pipe-Flow:2', 'ec_seen records bit 2 for the page', JSON.stringify(a.set.ec_seen));
+		r.ok(a.set.ec_seen && a.set.ec_seen.maxAge === null,
+			'ec_seen is a session cookie again (no Max-Age): the code counts browsers now', JSON.stringify(a.set.ec_seen));
+		r.ok(a.set.ec_seen && a.set.ec_seen.httponly, 'ec_seen stays HttpOnly');
+		let hv = rows('engcalcs-human-view.log');
+		r.ok(hv.length === 1 && hv[0][hv[0].length - 1] === 'visitor', 'one row, in the said-yes (visitor) bucket', JSON.stringify(hv));
+
+		a = await req(base, 'log-human-view.php', { cookies: { ec_consent: consent, ec_seen: 'Manning-Pipe-Flow:2' }, post: { page: 'Manning-Pipe-Flow', lang: 'en' } });
+		r.eq(rows('engcalcs-human-view.log').length, 1, 'the same browser on the same page again writes no second row');
+
+		a = await req(base, 'log-human-view.php', { cookies: { ec_consent: consent, ec_seen: 'Manning-Pipe-Flow:2' }, post: { page: 'Darcy-Weisbach', lang: 'en' } });
+		r.eq(rows('engcalcs-human-view.log').length, 2, 'the same browser on a different page is a first sighting there');
+		r.ok(a.set.ec_seen && /Manning-Pipe-Flow:2/.test(a.set.ec_seen.value) && /Darcy-Weisbach:2/.test(a.set.ec_seen.value),
+			'the rewrite keeps both pages', JSON.stringify(a.set.ec_seen));
+
+		a = await req(base, 'log-human-view.php', { post: { page: 'Manning-Pipe-Flow', lang: 'en' } });
+		hv = rows('engcalcs-human-view.log');
+		r.ok(!a.set.ec_seen, 'a browser that has not answered gets no ec_seen');
+		r.eq(hv[hv.length - 1][hv[hv.length - 1].length - 1], 'visit', 'and its row is in the page-load (visit) bucket');
+
+		a = await req(base, 'log-human-view.php', { cookies: { ec_consent: '0.1.1', ec_seen: 'Manning-Pipe-Flow:2' } });
+		r.ok(a.set.ec_seen && a.set.ec_seen.value === 'deleted', 'a refused browser still carrying ec_seen has it deleted', JSON.stringify(a.set.ec_seen));
+
+		r.section('1b. the browser code (call F01, 2026-10-08)');
+		clearLogs();
+		a = await req(base, 'Manning-Pipe-Flow.php');
+		r.ok(!a.set.ec_code, 'a page view from a browser that has not answered makes no code');
+		a = await req(base, 'Manning-Pipe-Flow.php', { cookies: { ec_consent: consent } });
+		r.ok(a.set.ec_code && isCode(a.set.ec_code.value), 'a said-yes page view with no code makes one: 16 lowercase hex', JSON.stringify(a.set.ec_code));
+		r.ok(about400Days(a.set.ec_code), 'it lasts 400 days', JSON.stringify(a.set.ec_code));
+		r.ok(a.set.ec_code && !a.set.ec_code.httponly, 'readable by the page, so the banner can delete it at a no');
+		const made = a.set.ec_code ? a.set.ec_code.value : '';
+		const lr = rows('engcalcs-lang.log').slice(-1)[0] || [];
+		r.ok(made !== '' && lr[lr.length - 2] === made && lr[lr.length - 1] === 'visitor',
+			'the same page view\'s reach row already carries the new code just before the bucket', JSON.stringify(lr));
+		a = await req(base, 'Manning-Pipe-Flow.php?lang=en', { cookies: { ec_consent: consent, ec_code: A } });
+		r.ok(a.set.ec_code && a.set.ec_code.value === A && about400Days(a.set.ec_code),
+			'a later page view keeps the code and renews its 400 days (each day\'s first visit included)', JSON.stringify(a.set.ec_code));
+		a = await req(base, 'Manning-Pipe-Flow.php', { cookies: { ec_consent: consent, ec_code: 'NOT-A-CODE' } });
+		r.ok(a.set.ec_code && isCode(a.set.ec_code.value), 'a value we did not write is replaced, never logged', JSON.stringify(a.set.ec_code));
+		a = await req(base, 'log-human-view.php', { cookies: { ec_consent: consent, ec_code: A } , post: { page: 'Orifice-Flow', lang: 'en' } });
+		r.ok(!a.set.ec_code, 'a beacon neither makes nor renews it: only a page view does');
+
+		clearLogs();
+		const yes = { ec_consent: consent, ec_code: A };
+		await req(base, 'log-human-view.php', { cookies: yes, post: { page: 'Orifice-Flow', lang: 'en', pointer: 'fine' } });
+		await req(base, 'log-calc-event.php', { cookies: yes, post: { page: 'Orifice-Flow', lang: 'en', pointer: 'fine' } });
+		await req(base, 'log-signal-event.php', { cookies: yes, post: { page: 'Orifice-Flow', lang: 'en', event: 'outbound', detail: 'example.com/x' } });
+		await req(base, 'log-title-event.php', { cookies: yes, post: { page: 'Orifice-Flow', lang: 'en', field: 'title' } });
+		await req(base, 'Orifice-Flow.php?lang=en', { cookies: yes });
+		for (const [log, name] of [['engcalcs-human-view.log', 'human view'], ['engcalcs-calc-usage.log', 'calculation'],
+			['engcalcs-signal.log', 'signal'], ['engcalcs-title.log', 'title'], ['engcalcs-lang.log', 'reach']]) {
+			const rs = rows(log);
+			const x = rs[rs.length - 1] || [];
+			r.ok(rs.length === 1 && x[x.length - 1] === 'visitor' && x[x.length - 2] === A,
+				'the said-yes ' + name + ' row carries the code just before the bucket', JSON.stringify(rs));
+		}
+		const sig = rows('engcalcs-signal.log')[0] || [];
+		r.ok(sig[4] === 'outbound' && sig[5] === 'example.com/x', 'and every column counted from the front stays where it was', JSON.stringify(sig));
+
+		clearLogs();
+		const no = { ec_consent: '0.1.2', ec_code: A };
+		a = await req(base, 'log-human-view.php', { cookies: no, post: { page: 'Orifice-Flow', lang: 'en' } });
+		r.ok(a.set.ec_code && a.set.ec_code.value === 'deleted', 'a refused browser still carrying a code has it deleted on its next request', JSON.stringify(a.set.ec_code));
+		let hv5 = rows('engcalcs-human-view.log');
+		r.ok(hv5.length === 1 && hv5[0][hv5[0].length - 1] === 'visit' && !hv5[0].includes(A), 'and its row is a page load with no code', JSON.stringify(hv5));
+		a = await req(base, 'Orifice-Flow.php', { cookies: { ec_consent: oldAllowThis, ec_code: A } });
+		r.ok(a.set.ec_code && a.set.ec_code.value === 'deleted', '"Allow this" from consent version 1 is no yes any more: its code is deleted', JSON.stringify(a.set.ec_code));
+		r.ok(/id="ec-consent"[^>]*>/.test(a.body) && !/id="ec-consent"[^>]*\shidden/.test(a.body), 'and the banner is rendered open, to ask again');
+		a = await req(base, 'Orifice-Flow.php', { cookies: { ec_consent: oldAllowAll } });
+		r.ok(a.set.ec_code && isCode(a.set.ec_code.value), '"Allow all" from version 1 still counts as a yes: a code is made', JSON.stringify(a.set.ec_code));
+		r.ok(/id="ec-consent"[^>]*\shidden/.test(a.body), 'and the banner stays closed');
+		a = await req(base, 'consent.php', { cookies: { ec_consent: consent, ec_code: A }, post: { ec_wipe: '1', return: '/engcalcs/index.php' } });
+		r.ok(a.set.ec_code && a.set.ec_code.value === 'deleted', 'Start fresh (consent.php ec_wipe) deletes the code', JSON.stringify(a.set.ec_code));
+		a = await req(base, 'consent.php', { cookies: { ec_consent: consent, ec_code: A }, post: { ec_consent: '0', return: '/engcalcs/index.php' } });
+		r.ok(a.set.ec_code && a.set.ec_code.value === 'deleted', 'Refuse all without JavaScript (consent.php) deletes the code', JSON.stringify(a.set.ec_code));
+
+		r.section('2. ?ec_nolog=1 marks a tester browser for a year');
+		clearLogs();
+		a = await req(base, 'log-human-view.php?ec_nolog=1');
+		r.ok(a.set.ec_nolog && a.set.ec_nolog.value === '1' && aboutAYear(a.set.ec_nolog),
+			'?ec_nolog=1 on a non-page request sets the mark for a year, not yet tallied', JSON.stringify(a.set.ec_nolog));
+		r.ok(/^tester:/.test(a.body), 'the hand-opened endpoint says "tester"', a.body.trim());
+		r.eq(rows('engcalcs-tester.log').map((x) => x[1]).join(','), 'on', 'a non-page request writes the mark but no day row');
+		clearLogs();
+		a = await req(base, 'Manning-Pipe-Flow.php?ec_nolog=1');
+		r.ok(a.set.ec_nolog && a.set.ec_nolog.value === '1.' + today, 'on a page the cookie is stamped with the UTC day', JSON.stringify(a.set.ec_nolog));
+		r.ok(aboutAYear(a.set.ec_nolog), 'it lasts one year', JSON.stringify(a.set.ec_nolog));
+		r.ok(a.set.ec_nolog && a.set.ec_nolog.httponly, 'it is HttpOnly');
+		let t = rows('engcalcs-tester.log').map((x) => x[1]);
+		r.eq(t.join(','), 'on,day,reach', 'the tester log records the mark, the day, and the page load held out');
+
+		const tester = { ec_nolog: '1.' + today };
+		a = await req(base, 'log-human-view.php', { cookies: tester, post: { page: 'Manning-Pipe-Flow', lang: 'en' } });
+		r.eq(rows('engcalcs-human-view.log').length, 0, 'a tester human view writes nothing to the main log');
+		a = await req(base, 'log-calc-event.php', { cookies: tester, post: { page: 'Manning-Pipe-Flow', lang: 'en' } });
+		r.eq(rows('engcalcs-calc-usage.log').length, 0, 'a tester calculation writes nothing to the main log');
+		a = await req(base, 'log-signal-event.php', { cookies: tester, post: { page: 'Manning-Pipe-Flow', lang: 'en', event: 'touch' } });
+		r.eq(rows('engcalcs-signal.log').length, 0, 'a tester signal writes nothing to the main log');
+		a = await req(base, 'log-title-event.php', { cookies: tester, post: { page: 'Manning-Pipe-Flow', lang: 'en', field: 'title' } });
+		r.eq(rows('engcalcs-title.log').length, 0, 'a tester title writes nothing to the main log');
+		a = await req(base, 'Manning-Pipe-Flow.php', { cookies: tester });
+		r.eq(a.status, 200, 'a real calculator page renders for a tester');
+		r.eq(rows('engcalcs-lang.log').length, 0, 'a tester page load writes nothing to the reach log');
+		t = rows('engcalcs-tester.log');
+		r.eq(t.map((x) => x[1]).join(','), 'on,day,reach,shopping,using,behaviour,naming,reach',
+			'every one of them went to the tester log instead, and no second day row');
+		r.ok(t.every((x) => x[2] === 'Manning-Pipe-Flow' || x[1] === 'on' || x[1] === 'day'), 'each tester row names its page');
+		r.ok(t.every((x) => x[x.length - 1] === 'visit'), 'each tester row carries the bucket token last');
+		r.ok(!a.set.ec_nolog, 'a tester already stamped today is not re-stamped');
+
+		a = await req(base, 'Manning-Pipe-Flow.php');
+		r.eq(rows('engcalcs-lang.log').length, 1, 'control: the same page load from a non-tester IS in the reach log');
+
+		r.section('3. one day row per browser per day; old marks are honoured and upgraded');
+		clearLogs();
+		a = await req(base, 'log-human-view.php', { cookies: { ec_nolog: '1.20200101' }, post: { page: 'Manning-Pipe-Flow', lang: 'en' } });
+		a = await req(base, 'lpn-lock.php', { cookies: { ec_nolog: '1.20200101' } });
+		r.ok(!a.set.ec_nolog, 'a beacon or the lock endpoint does not restamp the cookie');
+		r.eq(rows('engcalcs-tester.log').map((x) => x[1]).join(','), 'shopping', 'and writes no day row: only a page view counts as a day of use');
+		clearLogs();
+		a = await req(base, 'Manning-Pipe-Flow.php', { cookies: { ec_nolog: '1.20200101' } });
+		r.ok(a.set.ec_nolog && a.set.ec_nolog.value === '1.' + today && aboutAYear(a.set.ec_nolog), 'a page view renews a stamp from an earlier day for a year', JSON.stringify(a.set.ec_nolog));
+		a = await req(base, 'Manning-Pipe-Flow.php', { cookies: { ec_nolog: '1' } });
+		r.ok(a.set.ec_nolog && a.set.ec_nolog.value === '1.' + today, 'a legacy plain "1" mark is honoured and upgraded', JSON.stringify(a.set.ec_nolog));
+		r.eq(rows('engcalcs-tester.log').map((x) => x[1]).join(','), 'day,reach,day,reach', 'two browsers, two day rows, no "on" rows (both were already marked)');
+		a = await req(base, 'sw.php', { cookies: { ec_nolog: '1.20200101' } });
+		r.ok(!a.set.ec_nolog, 'the service worker script, fetched in the background, is not a day of use');
+		a = await req(base, 'log-human-view.php', { cookies: { ec_nolog: '1' } });
+		r.ok(/^tester:/.test(a.body), 'a legacy mark reads as a tester');
+		a = await req(base, 'log-human-view.php', { cookies: { ec_nolog: 'junk' } });
+		r.ok(/^counted:/.test(a.body), 'a malformed value is not a tester mark');
+
+		r.section('4. a tester who said yes, and ?ec_nolog=0');
+		clearLogs();
+		a = await req(base, 'log-human-view.php', { cookies: { ec_nolog: '1.' + today, ec_consent: consent }, post: { page: 'Orifice-Flow', lang: 'en' } });
+		t = rows('engcalcs-tester.log');
+		r.ok(t.length === 1 && t[0][1] === 'shopping' && t[0][3] === 'visitor', 'a said-yes tester row is tallied with the visitor bucket token', JSON.stringify(t));
+		a = await req(base, 'log-human-view.php', { cookies: { ec_nolog: '1.' + today, ec_consent: consent, ec_code: A }, post: { page: 'Orifice-Flow', lang: 'en' } });
+		t = rows('engcalcs-tester.log');
+		r.ok(t.length === 2 && t[1].length === 4 && !t[1].includes(A), 'a tester row never carries the browser code: a tester is counted on the side, not as a browser', JSON.stringify(t));
+		r.ok(!a.set.ec_seen, 'and no ec_seen is written for it: a tester is not counted in the main logs at all');
+
+		clearLogs();
+		a = await req(base, 'log-human-view.php?ec_nolog=0', { cookies: { ec_nolog: '1.' + today } });
+		r.ok(a.set.ec_nolog && (a.set.ec_nolog.value === 'deleted' || a.set.ec_nolog.value === '') , '?ec_nolog=0 deletes the cookie', JSON.stringify(a.set.ec_nolog));
+		r.ok(/^counted:/.test(a.body), 'and that same request already reads as counted');
+		r.eq(rows('engcalcs-tester.log').map((x) => x[1]).join(','), 'off', 'the tester log records the mark cleared');
+		a = await req(base, 'log-human-view.php?ec_nolog=0');
+		r.eq(rows('engcalcs-tester.log').length, 1, '?ec_nolog=0 on an unmarked browser records nothing');
+		a = await req(base, 'log-human-view.php', { post: { page: 'Orifice-Flow', lang: 'en' } });
+		r.eq(rows('engcalcs-human-view.log').length, 1, 'once cleared, the browser is in the main counts again');
+	} catch (e) {
+		r.ok(false, 'harness ran to the end', String(e && e.stack || e));
+	} finally {
+		php.kill();
+		fs.rmSync(logDir, { recursive: true, force: true });
+		r.finish();
+	}
+})();

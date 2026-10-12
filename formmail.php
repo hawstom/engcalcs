@@ -101,7 +101,11 @@ function ecContactOriginPage() {
 function ecLogContactSend() {
   // Same opt-out as the other three log writers, and cheaper here than in a beacon because the
   // function is already in scope.
-  if (function_exists('ecLoggingOptedOut') && ecLoggingOptedOut()) return;
+  // Since 2026-10-07 a tester browser's send goes to the tester tally instead.
+  if (function_exists('ecLoggingOptedOut') && ecLoggingOptedOut()) {
+    if (function_exists('ecLogTester')) ecLogTester('sends', 'contact');
+    return;
+  }
 
   // The language actually served, read straight from the cookie Language.lib.php sets: formmail
   // does not bootstrap the app, and loading all 27 lang files to learn one code would be silly.

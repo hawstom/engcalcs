@@ -88,13 +88,13 @@ $ec_lang['template_printable_subtitle']='Subtitlu tipărit';
 // NO EC_CONSENT_VERSION BUMP. Nothing about what is stored, who reads it or how long it lives has
 // moved; the sentence became more accurate, not different. Bumping would re-ask every visitor who
 // has already answered, for no change they could act on.
-$ec_lang['consent_body']='Ne permiteți să salvăm o cifră unică (un cookie) în acest browser, pentru a ține minte că am contorizat deja această pagină? Nu înregistrează nimic despre dvs. și nimic din ce introduceți. Fără el, nu putem distinge a doua dvs. vizită de prima vizită a altcuiva.';
+$ec_lang['consent_body']='Ne permiteți să salvăm un cod aleatoriu în acest browser, pentru a număra câte browsere folosesc fiecare parte a acestui site? Codul este generat pe loc, nu spune nimic despre dvs. sau despre dispozitivul dvs. și nu înregistrează nimic din ce introduceți. Fără el, nu putem deosebi a doua dvs. vizită de prima vizită a altcuiva.';
 $ec_lang['consent_accept']='Permit acum';
 $ec_lang['consent_accept_all']='Permit mereu';
 $ec_lang['consent_decline']='Refuz mereu';
-$ec_lang['consent_current_granted']='Ați permis aceasta. Limităm înregistrarea pentru acest profil de browser.';
+$ec_lang['consent_current_granted']='Ați permis aceasta. Acest browser păstrează un cod aleatoriu, pentru ca să-l putem număra.';
 $ec_lang['consent_current_denied']='Ați refuzat aceasta. Nu stocăm nimic, pentru a limita înregistrarea pentru acest profil de browser.';
-$ec_lang['consent_region_label']='Alegerea dvs. privind limitarea înregistrării.';
+$ec_lang['consent_region_label']='Alegerea dvs. privind codul de numărare.';
 $ec_lang['consent_settings_link']='Setări cookie-uri';
 $ec_lang['privacy_link']='Politica de confidențialitate';
 $ec_lang['terms_link']='Termeni de utilizare';
