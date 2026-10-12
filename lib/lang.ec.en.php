@@ -3310,7 +3310,6 @@ $ec_lang['lpn_settings_default_is']='The default is {n}.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_settings_accuracy_tip']='Convergence limit the solver must reach before it stops, measured as the total change in flow from one trial to the next, divided by the total flow in the links. A smaller number is more exact and takes longer.';
 $ec_lang['lpn_settings_specific_gravity']='Specific gravity';
-$ec_lang['lpn_settings_specific_gravity_tip']='Density of the fluid relative to water. It scales pressure in every unit, because a pressure in m or ft is a column of water, and it does not change head or HGL. It changes no flow.';
 $ec_lang['lpn_settings_viscosity']='Relative viscosity';
 // **THE PASHTO COLLISION THIS ANSWERS IS REAL AND IS INSIDE PASHTO** (sprint 584-wave1). ps renders
 // this key with the word غلظت, which carries BOTH viscosity/thickness AND concentration -- so it
