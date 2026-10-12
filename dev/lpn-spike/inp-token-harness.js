@@ -190,6 +190,13 @@ function checkDoc(inpPath) {
 				ok(tag + 'doc ' + r[0] + '.' + field + ' keeps its text',
 					EngCalcs.lpnNumText(n, field, n[field]) === t,
 					JSON.stringify(EngCalcs.lpnNumText(n, field, n[field])) + ' vs ' + JSON.stringify(t));
+				// A [TANKS] Elevation is the tank's BASE (Tom, 2026-10-11), and the base is what an
+				// export writes back, so its text must ride there too.
+				if (s === 'TANKS' && col === '1') {
+					ok(tag + 'doc ' + r[0] + '.bottomElev keeps its text',
+						EngCalcs.lpnNumText(n, 'bottomElev', n.bottomElev) === t,
+						JSON.stringify(EngCalcs.lpnNumText(n, 'bottomElev', n.bottomElev)) + ' vs ' + JSON.stringify(t));
+				}
 			});
 		});
 	});

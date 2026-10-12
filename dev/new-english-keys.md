@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**115 still to read on master**, of 126 untranslated keys, of 2570 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**112 still to read on master**, of 123 untranslated keys, of 2567 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -199,8 +199,14 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   @@ NEEDS RULING
 
-## lpn_  (125, 114 to read @@ NEEDS RULING)
+## lpn_  (122, 111 to read @@ NEEDS RULING)
 
+- **`lpn_copy_props_done`**
+  > Copied properties of {id}.
+  @@ NEEDS RULING
+- **`lpn_copy_props_menu`**
+  > Copy properties
+  @@ NEEDS RULING
 - **`lpn_demand_pattern_constant`**
   > (constant)
   @@ NEEDS RULING
@@ -251,6 +257,9 @@ never edits a synonym.
   @@ NEEDS RULING
 - **`lpn_export_table_title`**
   > Export to {format}
+  @@ NEEDS RULING
+- **`lpn_field_tank_base_elev`**
+  > Base elevation
   @@ NEEDS RULING
 - **`lpn_file_export_csv_tip`**
   > Download a table as the Tables pane shows it. One table comes as a single CSV file with no libraries. Several tables or scenarios come as one zip file of CSV files, with a file for each library their IDs refer to. Results are included for the scenario last calculated only.
@@ -444,48 +453,6 @@ never edits a synonym.
 - **`lpn_link_end_unknown`**
   > No node has the ID {id}.
   @@ NEEDS RULING
-- **`lpn_match_done_many`**
-  > Matched {m} assets to {id}, except status and location. Values changed: {n}.
-  @@ NEEDS RULING
-- **`lpn_match_done_one`**
-  > Matched {to} to {id}, except status and location. Values changed: {n}.
-  @@ NEEDS RULING
-- **`lpn_match_kind`**
-  > Match properties applies to nodes and pipes, pumps, and valves only.
-  @@ NEEDS RULING
-- **`lpn_match_menu`**
-  > Match properties
-  @@ NEEDS RULING
-- **`lpn_match_menu_off_tip`**
-  > Select target objects to match this object's properties except activation status.
-  @@ NEEDS RULING
-- **`lpn_match_none`**
-  > {to} and {id} have no properties in common to copy.
-  @@ NEEDS RULING
-- **`lpn_match_select_first`**
-  > Select the targets first, then choose Match properties.
-  @@ NEEDS RULING
-- **`lpn_match_selected_ask`**
-  > Copy this object's properties except activation status to {n} selected objects?
-  @@ NEEDS RULING
-- **`lpn_match_selected_ask_one`**
-  > Copy this object's properties except activation status to 1 selected object?
-  @@ NEEDS RULING
-- **`lpn_match_skip_breakdown`**
-  > Not copied: {n} (demand is a list of categories).
-  @@ NEEDS RULING
-- **`lpn_match_skip_scn`**
-  > Not copied: {names}. A scenario cannot hold its own value for these; change them in Base.
-  @@ NEEDS RULING
-- **`lpn_match_skip_valve`**
-  > Not copied: {n} (the valve types differ).
-  @@ NEEDS RULING
-- **`lpn_match_tip`**
-  > Copy the properties of one asset to the assets selected. Select the targets first, choose Match properties, then select the source. Status (Active, Shut), identity, location, and connections are never copied. Assets of a different type receive only the properties both types have.
-  @@ NEEDS RULING
-- **`lpn_mode_match`**
-  > Mode: Match properties. Select the asset to copy properties from. Status, identity, and location are not copied. Press Escape to cancel.
-  @@ NEEDS RULING
 - **`lpn_msglog_hidden`**
   > Hidden
   _Ruled 2026-10-08: Calls page 8 October: Use as written_
@@ -498,6 +465,27 @@ never edits a synonym.
 - **`lpn_pane_copy_heads`**
   > Copy with column headings
   _Ruled 2026-10-09: Use proposed (Tom, calls page round 3)._
+- **`lpn_paste_done_many`**
+  > Pasted properties of {id} to {m} assets. Values changed: {n}.
+  @@ NEEDS RULING
+- **`lpn_paste_done_one`**
+  > Pasted properties of {id} to {to}. Values changed: {n}.
+  @@ NEEDS RULING
+- **`lpn_paste_props_menu`**
+  > Paste properties to selection
+  @@ NEEDS RULING
+- **`lpn_paste_props_off_kind`**
+  > No selected asset can take the copied properties.
+  @@ NEEDS RULING
+- **`lpn_paste_props_off_none`**
+  > Nothing is copied. Right-click an asset and choose Copy properties.
+  @@ NEEDS RULING
+- **`lpn_paste_skip_breakdown`**
+  > Not pasted: {n} (demand is a list of categories).
+  @@ NEEDS RULING
+- **`lpn_paste_skip_valve`**
+  > Not pasted: {n} (the valve types differ).
+  @@ NEEDS RULING
 - **`lpn_result_depth`**
   > Depth
   @@ NEEDS RULING
@@ -552,6 +540,9 @@ never edits a synonym.
 - **`lpn_status_hidden_tip`**
   > Show the hidden message on the map again.
   @@ NEEDS RULING
+- **`lpn_tank_ground_elev_tip`**
+  > Ground elevation at the tank. Pressure at the tank is measured from here, as at a junction.
+  @@ NEEDS RULING
 - **`lpn_workspace_confirm`**
   > Replace this browser's workspace layout with the one in the file?
   _Ruled 2026-10-08: Calls page 8 October: his own text, "Replace this browser's workspace layout with the one in the file?"_
@@ -587,7 +578,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**135 still to read**, of 138 new keys across 13 unmerged branch(es).
+**132 still to read**, of 135 new keys across 11 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -598,9 +589,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/handoff-1012 (`d271ca42`) — adds no English strings
-
-### feat/bentley-interop (`f43dde69`) — 101 new, 101 to read @@ NEEDS RULING
+### feat/bentley-interop (`ad8cfe6e`) — 101 new, 101 to read @@ NEEDS RULING
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -930,9 +919,9 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`2e5e81c4`) — adds no English strings
 
-### feat/match-property (`38f68c9a`) — adds no English strings
+### feat/match-property (`75fba369`) — adds no English strings
 
-### feat/shape (`4166d068`) — 27 new, 27 to read @@ NEEDS RULING
+### feat/shape (`6a957eac`) — 27 new, 27 to read @@ NEEDS RULING
 
 - **`lpn_file_import_shapes`**
   > Import GeoJSON shapes…
@@ -1016,7 +1005,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Draw a point, a polyline, or a polygon on the map. A Shape is annotation and is not part of the network. Specify each point, then specify the last point again, press Enter, or right-click to finish. Specify the first point again to close the Shape into a polygon.
   @@ NEEDS RULING
 
-### feat/si-example (`3883f0d2`) — 4 new, 4 to read @@ NEEDS RULING
+### feat/si-example (`0f3023d7`) — 4 new, 4 to read @@ NEEDS RULING
 
 - **`lpn_ex_net2_si_desc`**
   > Litres per second, with metres and millimetres. EPANET’s Net2, converted from gallons per minute, feet and inches: a branched distribution system with a tank.
@@ -1029,16 +1018,4 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 - **`lpn_ex_net3_si_title`**
   > EPANET Net3, L/s (SI)
-  @@ NEEDS RULING
-
-### feat/tank-ground (`0b488156`) — 3 new, 3 to read @@ NEEDS RULING
-
-- **`lpn_field_tank_base_elev`**
-  > Base elevation
-  @@ NEEDS RULING
-- **`lpn_field_tank_base_elev_tip`**
-  > Elevation of the tank bottom, from which water depth and volume are measured. Left blank, the bottom is at the ground elevation.
-  @@ NEEDS RULING
-- **`lpn_tank_ground_elev_tip`**
-  > Ground elevation at the tank. Pressure at the tank is measured from here, as at a junction.
   @@ NEEDS RULING

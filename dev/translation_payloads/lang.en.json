@@ -717,7 +717,9 @@
         "lpn_field_elev": "Elevation",
         "lpn_field_head": "Head",
         "lpn_field_head_tip": "Water surface level in the reservoir, measured as a height, not as a pressure. Leave it blank to put the water surface at the reservoir elevation.",
-        "lpn_tank_elev_tip": "Elevation of the tank bottom. Water depths in the tank are measured up from here.",
+        "lpn_field_tank_base_elev": "Base elevation",
+        "lpn_field_tank_base_elev_tip": "Elevation of the tank bottom, from which water depth and volume are measured. Left blank, the bottom is at the ground elevation.",
+        "lpn_tank_ground_elev_tip": "Ground elevation at the tank. Pressure at the tank is measured from here, as at a junction.",
         "lpn_field_tank_level": "Water depth",
         "lpn_field_tank_level_tip": "Depth of water in the tank, measured up from the tank bottom.",
         "lpn_field_tank_minlevel": "Lowest water depth",
@@ -726,7 +728,7 @@
         "lpn_field_tank_maxlevel_tip": "Maximum allowable depth, measured up from the tank bottom.",
         "lpn_field_tank_diameter": "Tank diameter",
         "lpn_field_tank_diameter_tip": "For a vertical cylinder. Same units as elevation, not pipe diameter. It sets how much water a given depth holds.",
-        "lpn_tank_head_tip": "Water surface elevation in the tank: the tank bottom elevation plus the water depth.",
+        "lpn_tank_head_tip": "Water surface elevation in the tank: the base elevation plus the water depth.",
         "lpn_close": "Close",
         "lpn_dock_left": "Dock at the left of the map",
         "lpn_dock_right": "Dock at the right of the map",
@@ -2558,7 +2560,7 @@
         "lpn_snip_tip_redo": "Redo (Ctrl+Y)",
         "lpn_screenshot_scale_tip": "The picture's size as a multiple of the area on the screen. A larger one is sharper and makes a bigger file."
     },
-    "count": 2556,
+    "count": 2558,
     "active_prefixes": [
         "about",
         "bpn",

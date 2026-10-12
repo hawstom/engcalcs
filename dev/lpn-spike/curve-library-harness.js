@@ -197,7 +197,7 @@ const FIVE = [
 	const near = (a, b) => Math.abs(a - b) <= 1e-12 * Math.max(1, Math.abs(b));
 
 	const migrated = L.migrateSaved(JSON.parse(JSON.stringify(v10)));
-	check(migrated.v === 11, `the project is stamped v11: ${migrated.v}`);
+	check(migrated.v === 12, `the project is stamped v12 (the current version): ${migrated.v}`);
 	L.applySaved(migrated);
 	const mDoc = L.getDoc();
 	check((mDoc.curves || []).length === 2,
