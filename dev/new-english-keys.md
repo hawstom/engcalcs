@@ -75,13 +75,37 @@ is the one you meant. "The first one" is a complete answer.
   *The proposal:* PROPOSED English: 'Rest the pointer on a node, link or customer to see its label as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project.'
   @@ NEEDS RULING
 
-## Synonym entries to approve  (12, 10 to read @@ NEEDS RULING)
+## Synonym entries to approve  (15, 13 to read @@ NEEDS RULING)
 
 **These are translator notes (`$ec_lang_syn`), not visitor wording.** Each was written against an
 English string that has since changed, or against a key that no longer exists. Say which: keep it
 as is, change it (a proposal may follow), or remove it. **Your answer on the flag line is the
 written permission** the rule requires; CC then applies it by hand and re-records it. A script
 never edits a synonym.
+
+- **`consent_body`**
+  > May we save a random code in this browser so that we can count how many browsers use each part of this site? The code is made up on the spot, says nothing about you or your device, and records nothing you enter. Without it we cannot tell your second visit from somebody else's first.
+  *Why stale:* the English changed after this synonym was written
+  *Written against:* May we save a one-digit cookie in this browser to remember that we have already counted this page? It records nothing about you and nothing you enter. Without it we cannot tell your second visit from somebody else’s first.
+  *Current synonym:* May we save (store, keep, put) a random code (a string of letters and digits chosen by chance) in this browser so that we can count (tally) how many browsers use each part of this site? The code is made up on the spot (created at that moment), says nothing about you or your device, and records nothing you enter. Without it we cannot tell your second visit from somebody else's first.
+  **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
+  @@ NEEDS RULING
+
+- **`consent_current_granted`**
+  > You allowed this. This browser keeps a random code so that we can count it.
+  *Why stale:* the English changed after this synonym was written
+  *Written against:* You allowed this. We limit logging for this browser profile.
+  *Current synonym:* You allowed this. A random browser code is tracked to minimize duplicate use counts.
+  **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
+  @@ NEEDS RULING
+
+- **`consent_region_label`**
+  > Your choice about the counting code.
+  *Why stale:* the English changed after this synonym was written
+  *Written against:* Your choice about limiting logging.
+  *Current synonym:* Your choice about the random browser code tracking.
+  **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
+  @@ NEEDS RULING
 
 - **`ip_is_lateral`**
   > <span class="ec-help" title="Selected: this reach is a segment of the test lateral, from which individual emitters withdraw water. Cleared: this reach is a main, only passing flow along to laterals not on the test path.">Lat. <span class="ec-tip">?</span></span>
@@ -364,7 +388,7 @@ never edits a synonym.
   > Replace and Undo
   @@ NEEDS RULING
 - **`lpn_guide_find_results_def`**
-  > <p>The matching assets are listed below the Find button. Above and n highest list the highest value first, below and n lowest the lowest value first, and other conditions list by the value found, then by ID. A query with AND or OR lists nodes, then links, each by ID. A single match is shown on the map immediately. Select a row to center the map on that asset. If nothing is selected, the asset is also selected; if something is, the asset is marked and the selection is not changed. Shift+click or Ctrl+click a row to add it to the selection or remove it. Find does not select all matches by itself.</p><p>The Filter in table button applies the same query to the Tables pane. Each table that the query applies to shows only the matching rows, with the query and the row count above them. To select all matches on the map, select those rows and choose Select on map from the right-click menu. A table filter is not saved with the project and ends when the page is reloaded. A row edited so that it no longer matches stays in the table, dimmed and marked with a warning sign, until the Filter in table button is pressed again.</p>
+  > <p>The matching assets are listed below the Find button. Above and n highest list the highest value first, below and n lowest the lowest value first, and other conditions list by the value found, then by ID. A query with AND or OR lists nodes, then links, each by ID. A single match is shown on the map immediately. Select a row to center the map on that asset. If nothing is selected, the asset is also selected; if something is, the asset is highlighted and the selection is not changed. Shift+click or Ctrl+click a row to add it to the selection or remove it. Find does not select all matches by itself.</p><p>The Filter in table button applies the same query to the Tables pane. Each table that the query applies to shows only the matching rows, with the query and the row count above them. To select all matches on the map, select those rows and choose Select on map from the right-click menu. A table filter is not saved with the project and ends when the page is reloaded. A row edited so that it no longer matches stays in the table, dimmed and marked with a warning sign, until the Filter in table button is pressed again.</p>
   @@ NEEDS RULING
 - **`lpn_guide_find_results_term`**
   > Results, the selection, and Tables
@@ -418,7 +442,7 @@ never edits a synonym.
   > Lists every node and every link at every reporting time step, in the units shown on the Tables pane. Without an extended period simulation, it shows the current solution at a single instant. Download or print carries every time step, and the table shows one at a time.
   @@ NEEDS RULING
 - **`lpn_guide_text_hotkeys_popup`**
-  > Lists every toolbar button and menu row, the keyboard shortcuts, and an entry for each box. Selecting a row shows where that control is; it never runs it. To search, press Ctrl+K from anywhere, or / while the guide has focus.
+  > Lists every toolbar button and menu row, the keyboard shortcuts, and an entry for each box. Choosing a row shows where that control is; it never runs it. To search, press Ctrl+K from anywhere, or / while the guide has focus.
   @@ NEEDS RULING
 - **`lpn_guide_text_library_box`**
   > Holds the project's patterns, curves, pipe types, fittings, controls, and rules. An asset refers to a pattern, curve, pipe type, or fitting by its ID, and that item is edited here. Controls and rules apply to the whole network. Rules are applied by the EPANET engine only. All are saved with the project.
@@ -602,7 +626,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**122 still to read**, of 125 new keys across 17 unmerged branch(es).
+**122 still to read**, of 125 new keys across 12 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -613,11 +637,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/roadmap-1011c (`4cda3c09`) — adds no English strings
-
-### chore/selection-word (`2422186e`) — adds no English strings
-
-### feat/bentley-interop (`f43dde69`) — 101 new, 101 to read @@ NEEDS RULING
+### feat/bentley-interop (`ad8cfe6e`) — 101 new, 101 to read @@ NEEDS RULING
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -947,7 +967,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`2e5e81c4`) — adds no English strings
 
-### feat/match-property (`38f68c9a`) — 14 new, 14 to read @@ NEEDS RULING
+### feat/match-property (`f5a59fc3`) — 14 new, 14 to read @@ NEEDS RULING
 
 - **`lpn_match_done_many`**
   > Matched {m} assets to {id}, except status and location. Values changed: {n}.
@@ -992,9 +1012,9 @@ build for that would be a gate nobody keeps. Refresh it with
   > Mode: Match properties. Select the asset to copy properties from. Status, identity, and location are not copied. Press Escape to cancel.
   @@ NEEDS RULING
 
-### feat/shape (`8fa913d8`) — adds no English strings
+### feat/shape (`4166d068`) — adds no English strings
 
-### feat/si-example (`3883f0d2`) — 4 new, 4 to read @@ NEEDS RULING
+### feat/si-example (`0f3023d7`) — 4 new, 4 to read @@ NEEDS RULING
 
 - **`lpn_ex_net2_si_desc`**
   > Litres per second, with metres and millimetres. EPANET’s Net2, converted from gallons per minute, feet and inches: a branched distribution system with a tank.
@@ -1020,9 +1040,3 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_tank_ground_elev_tip`**
   > Ground elevation at the tank. Pressure at the tank is measured from here, as at a junction.
   @@ NEEDS RULING
-
-### feat/visit-dedupe (`f8cf3ed5`) — adds no English strings
-
-### fix/dxf-layer-code (`d87ca580`) — adds no English strings
-
-### fix/run-report (`6e92e48b`) — adds no English strings

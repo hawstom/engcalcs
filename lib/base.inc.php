@@ -43,6 +43,18 @@ require_once('config.inc.php');
 // bit, this browser already dwelt somewhere long enough to count.
 $ec_sessionAgeMs = ecSessionAgeMs();
 
+// The tester browsers' daily tally (ecTesterDayTally() in config). Here rather than in config so
+// only a PAGE VIEW writes it: the beacons, the Looped-Network lock heartbeat and consent.php load
+// config alone. sw.php and manifest.php load this file but are fetched by the browser in the
+// background, so they are excluded by name.
+// The browser code (ecCountCodeRenew() in config) is made or renewed on the same page views, and
+// BEFORE the language log below writes this page's reach row, so that row already carries it.
+if (PHP_SAPI !== 'cli'
+    && !in_array(basename(isset($_SERVER['SCRIPT_NAME']) ? $_SERVER['SCRIPT_NAME'] : '', '.php'), ['sw', 'manifest'], true)) {
+    ecTesterDayTally();
+    ecCountCodeRenew();
+}
+
 // Load the language settings.
 // They are needed for determining the session language in Session.lib.php below.
 require_once('Language.Settings.php');

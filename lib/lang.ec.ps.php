@@ -88,13 +88,13 @@ $ec_lang['template_printable_subtitle']='د چاپ فرعي سرلیک';
 // NO EC_CONSENT_VERSION BUMP. Nothing about what is stored, who reads it or how long it lives has
 // moved; the sentence became more accurate, not different. Bumping would re-ask every visitor who
 // has already answered, for no change they could act on.
-$ec_lang['consent_body']='ایا موږ کولی شو په دې براوزر کې د یو-رقمي کوکي وساتو ترڅو مو په یاد وي چې دا پاڼه مو دمخه شمېرلې ده؟ دا هیڅ شی ستاسو په اړه او هیڅ هغه شی چې تاسو یې لیکئ نه ثبتوي. پرته له دې موږ نشو کولی ستاسو دویمه کتنه د بل چا لومړۍ کتنې نه توپیر کړو.';
+$ec_lang['consent_body']='ایا موږ کولی شو په دې براوزر کې یو تصادفي کوډ وساتو ترڅو وشمېرو چې څو براوزرونه د دې پاڼې هر برخه کاروي؟ دا کوډ په ځای کې جوړیږي، ستاسو یا ستاسو د وسیلې په اړه هیڅ نه وایي، او هغه څه نه ثبتوي چې تاسو یې لیکئ. پرته له دې موږ نشو کولی ستاسو دویمه کتنه د بل چا له لومړۍ کتنې نه جلا کړو.';
 $ec_lang['consent_accept']='دا ومنئ';
 $ec_lang['consent_accept_all']='تل يې ومنئ';
 $ec_lang['consent_decline']='تل يې رد کړئ';
-$ec_lang['consent_current_granted']='تاسو دا اجازه ورکړې ده. موږ د دې براوزر پروفایل لپاره ثبت محدودوو.';
+$ec_lang['consent_current_granted']='تاسو دا اجازه ورکړې ده. دا براوزر یو تصادفي کوډ ساتي ترڅو موږ یې وشمېرو.';
 $ec_lang['consent_current_denied']='تاسو دا رد کړې ده. موږ د ثبت محدودولو لپاره هیڅ نه ساتو.';
-$ec_lang['consent_region_label']='ستاسو د ثبت محدودولو په اړه انتخاب.';
+$ec_lang['consent_region_label']='د شمېرنې کوډ په اړه ستاسو انتخاب.';
 $ec_lang['consent_settings_link']='د کوکي تنظیمات';
 $ec_lang['privacy_link']='د محرمیت خبرتیا';
 $ec_lang['terms_link']='د کارونې شرایط';

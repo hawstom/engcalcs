@@ -88,13 +88,13 @@ $ec_lang['template_printable_subtitle']='Subjudul Cetak';
 // NO EC_CONSENT_VERSION BUMP. Nothing about what is stored, who reads it or how long it lives has
 // moved; the sentence became more accurate, not different. Bumping would re-ask every visitor who
 // has already answered, for no change they could act on.
-$ec_lang['consent_body']='Bolehkah kami menyimpan satu digit angka (cookie) di peramban ini untuk mengingat bahwa kami sudah menghitung kunjungan ke halaman ini? Cookie ini tidak mencatat apa pun tentang Anda maupun apa pun yang Anda ketik. Tanpanya, kami tidak dapat membedakan kunjungan kedua Anda dari kunjungan pertama orang lain.';
+$ec_lang['consent_body']='Bolehkah kami menyimpan kode acak di peramban ini agar kami dapat menghitung berapa banyak peramban yang menggunakan setiap bagian situs ini? Kode itu dibuat saat itu juga, tidak mengatakan apa pun tentang Anda maupun perangkat Anda, dan tidak mencatat apa pun yang Anda masukkan. Tanpanya, kami tidak dapat membedakan kunjungan kedua Anda dari kunjungan pertama orang lain.';
 $ec_lang['consent_accept']='Terima kali ini';
 $ec_lang['consent_accept_all']='Selalu terima';
 $ec_lang['consent_decline']='Selalu tolak';
-$ec_lang['consent_current_granted']='Anda mengizinkan ini. Kami membatasi pencatatan untuk profil peramban ini.';
+$ec_lang['consent_current_granted']='Anda mengizinkan ini. Peramban ini menyimpan kode acak agar kami dapat menghitungnya.';
 $ec_lang['consent_current_denied']='Anda menolak ini. Kami tidak menyimpan apa pun untuk membatasi pencatatan pada profil peramban ini.';
-$ec_lang['consent_region_label']='Pilihan Anda tentang pembatasan pencatatan.';
+$ec_lang['consent_region_label']='Pilihan Anda tentang kode penghitung.';
 $ec_lang['consent_settings_link']='Pengaturan cookie';
 $ec_lang['privacy_link']='Kebijakan Privasi';
 $ec_lang['terms_link']='Ketentuan Penggunaan';

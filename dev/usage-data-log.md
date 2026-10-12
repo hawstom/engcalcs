@@ -1516,3 +1516,22 @@ each host you use (`hawsedc.com`, `www.hawsedc.com`, `librewaternet.org`) in eac
   `WINDOW 2026-09-03 .. 2026-09-07` on 2026-09-08, so the Monday cron ran and the URL is the way to
   read production from a session. (`librewaternet.org/spock/...` is a 404; that host serves the
   suite under `/app`, not the checkout root.)
+
+## 2026-10-08 — FORMAT CHANGE: said-yes rows carry a browser code; consent version 2
+
+Not a snapshot. Tom's call F01 (*"Go (random code, new consent text)"*): after a yes, the browser
+keeps a random 16-hex-character code (`ec_code`), and **every said-yes row of all six logs carries
+it as the field just before the bucket**. Page-load (`visit`) rows carry none.
+
+- **Field order:** `... [code] bucket`. The bucket stays last. A code is recognised only on a
+  `visitor` row and only as exactly 16 lowercase hex characters, which no older column can be, so it
+  is taken off the back like the bucket and every column counted from the front stays put.
+- **Mixed vintage:** a said-yes row from before 2026-10-08 has no code. It counts as a use and never
+  as a browser; both reports print how many such rows the window holds.
+- **What the numbers mean now:** `browsers` = distinct codes (inside the said-yes bucket, never
+  added to anything); `said yes` = rows, once per page per visit (`ec_seen` is a session cookie
+  again, after one day at a year); `page loads` = everybody else.
+- **`EC_CONSENT_VERSION` 1 → 2.** Everybody who chose "Allow this" drops back to unanswered and is
+  asked again, so expect the said-yes share of rows to dip after deploy and recover as they answer.
+  "Allow all" and "Refuse all" are not asked again. Compare no said-yes count across this date
+  without saying so.

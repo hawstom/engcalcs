@@ -88,13 +88,13 @@ $ec_lang['template_printable_subtitle']='Tisknutelný podtitul';
 // NO EC_CONSENT_VERSION BUMP. Nothing about what is stored, who reads it or how long it lives has
 // moved; the sentence became more accurate, not different. Bumping would re-ask every visitor who
 // has already answered, for no change they could act on.
-$ec_lang['consent_body']='Smíme si v tomto prohlížeči uložit jednociferný soubor cookie, abychom si zapamatovali, že jsme tuto stránku již započítali? Nezaznamenává nic o vás ani nic, co napíšete. Bez něj nedokážeme rozlišit vaši druhou návštěvu od první návštěvy někoho jiného.';
+$ec_lang['consent_body']='Smíme si v tomto prohlížeči uložit náhodný kód, abychom mohli počítat, kolik prohlížečů používá jednotlivé části tohoto webu? Kód se vytvoří na místě, nic o vás ani o vašem zařízení nevypovídá a nezaznamenává nic, co zadáte. Bez něj nedokážeme rozlišit vaši druhou návštěvu od první návštěvy někoho jiného.';
 $ec_lang['consent_accept']='Přijmout tentokrát';
 $ec_lang['consent_accept_all']='Přijmout natrvalo';
 $ec_lang['consent_decline']='Odmítnout natrvalo';
-$ec_lang['consent_current_granted']='Povolili jste to. Omezujeme zaznamenávání pro tento profil prohlížeče.';
+$ec_lang['consent_current_granted']='Povolili jste to. Tento prohlížeč uchovává náhodný kód, abychom ho mohli započítat.';
 $ec_lang['consent_current_denied']='Odmítli jste to. Neukládáme nic, co by omezovalo zaznamenávání pro tento profil prohlížeče.';
-$ec_lang['consent_region_label']='Vaše volba ohledně omezení zaznamenávání.';
+$ec_lang['consent_region_label']='Vaše volba ohledně kódu pro počítání.';
 $ec_lang['consent_settings_link']='Nastavení cookies';
 $ec_lang['privacy_link']='Zásady ochrany osobních údajů';
 $ec_lang['terms_link']='Podmínky použití';

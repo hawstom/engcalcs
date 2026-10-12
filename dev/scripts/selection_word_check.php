@@ -11,9 +11,12 @@
  *
  * WHAT IT READS. English `$ec_lang` values only, as `plain_english_swap_check.php` does.
  *
- * A SHORT DECLARED TABLE, NOT A CLEVERNESS. Three failure shapes, each a pattern. "Select" as the
- * name of a tool or mode ("Select mode") and "selected" as the state of a list ("No curve
- * selected") are ordinary and are not matched.
+ * Tom, 2026-10-11: "map selection is "Select/Selected/Selection" with "Highlight" approved for
+ * specific uses such as "the selected objects are highlighted". And menu and dialog options
+ * choices/choose/chosen (never "selected")." So a list's empty state reads "No curve chosen".
+ *
+ * A SHORT DECLARED TABLE, NOT A CLEVERNESS. Four failure shapes, each a pattern. "Select" as the
+ * name of a tool or mode ("Select mode") is ordinary and is not matched.
  *
  * BASELINE. Keys that knowingly break the rule, each with a reason.
  * A trailing * is a prefix.
@@ -41,6 +44,12 @@ const EC_SELECTION_PATTERNS = [
         'fix'     => 'Use choose for a list, menu, pull-down or option.',
     ],
     [
+        'name'    => 'selected as the state of a list',
+        // "No curve selected"; not "No junctions are selected", which is the map set.
+        'pattern' => '/\bno\s+(?!(?:\w+\s+){0,3}(?:are|is)\b)(?:\w+\s+){1,3}selected\b/iu',
+        'fix'     => 'A list, menu or pull-down entry is chosen: "No curve chosen".',
+    ],
+    [
         'name'    => 'choose word for the map set',
         // chosen/choose ... on the map; choose + assets.
         'pattern' => '/\b(?:chosen|choose)\b[^.]{0,40}\bon\s+the\s+map\b|\bchosen\s+set\b|\bchoose\s+(?:assets|junctions|pipes|nodes|links|elements)\b/iu',
@@ -55,8 +64,6 @@ const EC_SELECTION_PATTERNS = [
 
 /** key (or prefix*) => reason. */
 const EC_SELECTION_BASELINE = [
-    'lpn_profile_say_idle' => 'pointing at a place on the map (a third sense), not the set; audit C.1 lowest priority',
-    'lpn_profile_none'    => 'pointing at a place on the map (a third sense), not the set; audit C.1 lowest priority',
 ];
 
 function ecSelectionBaselined(string $key): bool
