@@ -49,7 +49,7 @@ function ok(name, cond, extra) {
 	console.log((cond ? '  ok   ' : '  FAIL ') + name + (extra === undefined ? '' : '   ' + extra));
 	if (!cond) { fails++; }
 }
-const NEW = { node: ['elev', 'minLevel', 'maxLevel', 'tankDiameter', 'volCurve', 'mixingModel', 'mixingFraction', 'headPattern'], link: ['speed', 'speedPattern'] };
+const NEW = { node: ['elev', 'bottomElev', 'minLevel', 'maxLevel', 'tankDiameter', 'volCurve', 'mixingModel', 'mixingFraction', 'headPattern'], link: ['speed', 'speedPattern'] };
 
 function open() {
 	L.applySaved(L.acceptImportedText(fs.readFileSync(ROOT + 'examples/Net1.lwn', 'utf8')));
@@ -83,11 +83,15 @@ const inpRow = (inp, section, id) => {
 		JSON.stringify(Object.keys(NEW).map((g) => NEW[g].filter((p) => !L.OVERRIDABLE[g][p]))));
 	const J = node('22'), T = node('2'), R = node('9'), P = link('9');
 	ok('Net1 has junction 22, tank 2, reservoir 9 and pump 9', !!(J && T && R && P && T.type === 'tank' && R.type === 'reservoir' && P.type === 'pump'));
-	const base0 = { jElev: J.elev, tElev: T.elev, tMin: T.minLevel, tMax: T.maxLevel, tD: T.tankDiameter, pSpeed: P.speed, mix: T.mixingModel };
+	// A tank has two elevations since feat/tank-ground: `elev` the ground (the pressure datum) and
+	// `bottomElev` the base its water stands on (EPANET's [TANKS] Elevation). Net1's opens with the
+	// base at the ground.
+	const base0 = { tBase: T.bottomElev, jElev: J.elev, tElev: T.elev, tMin: T.minLevel, tMax: T.maxLevel, tD: T.tankDiameter, pSpeed: P.speed, mix: T.mixingModel };
 	const S = L.createScenario('Everything');
 	L.switchScenario(S.id);
 	L.setProp(J, 'elev', J.elev + 50);
 	L.setProp(T, 'elev', T.elev + 20);
+	L.setProp(T, 'bottomElev', T.bottomElev + 20);
 	L.setProp(T, 'minLevel', 5);
 	L.setProp(T, 'maxLevel', 140);
 	L.setProp(T, 'tankDiameter', 60);
@@ -96,11 +100,18 @@ const inpRow = (inp, section, id) => {
 	L.setProp(R, 'headPattern', '1');
 	L.setProp(P, 'speed', 0.8);
 	L.setProp(P, 'speedPattern', '1');
-	const marked = [[J, 'elev'], [T, 'elev'], [T, 'minLevel'], [T, 'maxLevel'], [T, 'tankDiameter'], [T, 'mixingModel'], [T, 'mixingFraction'], [R, 'headPattern'], [P, 'speed'], [P, 'speedPattern']]
+	// A speed pattern REPLACES the speed (EPANET's rule, pumpSpeedNow()), so the speed's own effect
+	// is asked of a second scenario holding the speed alone.
+	L.switchScenario(L.baseScenario().id);
+	const Slow = L.createScenario('Slow');
+	L.switchScenario(Slow.id);
+	L.setProp(P, 'speed', 0.8);
+	L.switchScenario(S.id);
+	const marked = [[J, 'elev'], [T, 'elev'], [T, 'bottomElev'], [T, 'minLevel'], [T, 'maxLevel'], [T, 'tankDiameter'], [T, 'mixingModel'], [T, 'mixingFraction'], [R, 'headPattern'], [P, 'speed'], [P, 'speedPattern']]
 		.filter((x) => !L.hasOverride(x[0], x[1])).map((x) => x[0].id + '.' + x[1]);
 	ok('each write in the scenario is an override, marked', !marked.length, marked.join(', '));
 	ok('...and Base\'s own values are untouched', J.elev === base0.jElev && T.elev === base0.tElev && T.minLevel === base0.tMin && T.maxLevel === base0.tMax &&
-		T.tankDiameter === base0.tD && P.speed === base0.pSpeed && T.mixingModel === base0.mix && !R.headPattern && !P.speedPattern);
+		T.tankDiameter === base0.tD && T.bottomElev === base0.tBase && P.speed === base0.pSpeed && T.mixingModel === base0.mix && !R.headPattern && !P.speedPattern);
 	ok('...and the scenario reads its own', L.effective(J, 'elev') === base0.jElev + 50 && L.effective(T, 'tankDiameter') === 60 && L.effective(P, 'speed') === 0.8);
 	const altPhys = (L.getDoc().alternatives || []).filter((a) => a.id === (S.alternatives || {}).physical)[0];
 	ok('...held in the scenario\'s own Physical alternative, named after it', !!altPhys && altPhys.name === 'Everything' && altPhys.values['n:22'].elev === base0.jElev + 50);
@@ -114,16 +125,19 @@ const inpRow = (inp, section, id) => {
 		L.switchScenario(S.id);
 		const s = await solve();
 		ok(engine + ': the scenario solves', !!s && !!s.pressures);
+		L.switchScenario(Slow.id);
+		const sl = await solve();
 		L.switchScenario(L.baseScenario().id);
 		const b2 = await solve();
 		// The solver answers in SI: heads in metres, pressures in metres of water. Junction 22's
-		// ground is 50 ft (15.24 m) higher, and the tank that sets the heads around it is 20 ft
-		// (6.10 m) higher, so its pressure falls by about the difference, 9.1 m.
+		// ground is 50 ft (15.24 m) higher, and the tank that sets the heads around it stands on a
+		// base 20 ft (6.10 m) higher, so its pressure falls by about the difference, 9.1 m.
 		const drop = b.pressures['22'] - s.pressures['22'];
 		ok(engine + ': junction 22 sits 50 ft higher under a tank 20 ft higher: its pressure is about 30 ft (9.1 m) lower', Math.abs(drop - 30 * 0.3048) < 0.5, b.pressures['22'] + ' -> ' + s.pressures['22']);
-		ok(engine + ': the pump at speed 0.8 moves a different flow', Math.abs(flowOf(s, '9') - flowOf(b, '9')) > 1e-3, flowOf(b, '9') + ' -> ' + flowOf(s, '9'));
+		ok(engine + ': in Slow, the pump at speed 0.8 moves less water', flowOf(b, '9') - flowOf(sl, '9') > 1e-3, flowOf(b, '9') + ' -> ' + flowOf(sl, '9'));
 		const tankHead = (r) => (r.heads || {})['2'];
-		ok(engine + ': the tank 20 ft higher holds a head 20 ft (6.096 m) higher', Math.abs((tankHead(s) - tankHead(b)) - 20 * 0.3048) < 1e-6, tankHead(b) + ' -> ' + tankHead(s));
+		ok(engine + ': the tank on a base 20 ft higher holds a head 20 ft (6.096 m) higher', Math.abs((tankHead(s) - tankHead(b)) - 20 * 0.3048) < 1e-6, tankHead(b) + ' -> ' + tankHead(s));
+		ok(engine + ': its pressure, above a ground also 20 ft higher, is unchanged', Math.abs(s.pressures['2'] - b.pressures['2']) < 1e-6, b.pressures['2'] + ' -> ' + s.pressures['2']);
 		ok(engine + ': Base solves exactly as before the scenario was solved', JSON.stringify(b2.pressures) === JSON.stringify(b.pressures));
 	}
 
@@ -133,7 +147,8 @@ const inpRow = (inp, section, id) => {
 	L.switchScenario(S.id);
 	const ms = L.assembleModel(), xs = L.exportInp();
 	const mn = (m, id) => m.nodes.filter((n) => n.id === id)[0], ml = (m, id) => m.links.filter((l) => l.id === id)[0];
-	ok('the model\'s tank 2 has the scenario\'s limits and diameter', mn(ms, '2').maxLevel !== mn(mb, '2').maxLevel && mn(ms, '2').minLevel !== mn(mb, '2').minLevel &&
+	ok('the model\'s tank 2 has the scenario\'s base, ground, limits and diameter', Math.abs(mn(ms, '2').elev - mn(mb, '2').elev - 20 * 0.3048) < 1e-9 &&
+		Math.abs(mn(ms, '2').ground - mn(mb, '2').ground - 20 * 0.3048) < 1e-9 && mn(ms, '2').maxLevel !== mn(mb, '2').maxLevel && mn(ms, '2').minLevel !== mn(mb, '2').minLevel &&
 		mn(ms, '2').diameter !== mn(mb, '2').diameter, JSON.stringify([mn(mb, '2'), mn(ms, '2')]));
 	ok('...reservoir 9 names the scenario\'s head pattern, Base\'s none', mn(ms, '9').headPattern === '1' && !mn(mb, '9').headPattern);
 	ok('...pump 9 runs at 0.8 on pattern 1 in the scenario, 1 on none in Base', ml(ms, '9').speed === 0.8 && ml(ms, '9').speedPattern === '1' && ml(mb, '9').speed === 1 && !ml(mb, '9').speedPattern,
@@ -142,8 +157,8 @@ const inpRow = (inp, section, id) => {
 	const jb = inpRow(xb.inp, 'JUNCTIONS', '22'), js = inpRow(xs.inp, 'JUNCTIONS', '22');
 	ok('[JUNCTIONS] 22: the scenario\'s export states its elevation, Base\'s its own', +js[1] === base0.jElev + 50 && +jb[1] === base0.jElev, JSON.stringify([jb, js]));
 	const tb = inpRow(xb.inp, 'TANKS', '2'), ts = inpRow(xs.inp, 'TANKS', '2');
-	ok('[TANKS] 2: elevation, minimum and maximum depth and diameter are the scenario\'s', +ts[1] === base0.tElev + 20 && +ts[3] === 5 && +ts[4] === 140 && +ts[5] === 60 &&
-		+tb[1] === base0.tElev && +tb[5] === base0.tD, JSON.stringify([tb, ts]));
+	ok('[TANKS] 2: base elevation, minimum and maximum depth and diameter are the scenario\'s', +ts[1] === base0.tBase + 20 && +ts[3] === 5 && +ts[4] === 140 && +ts[5] === 60 &&
+		+tb[1] === base0.tBase && +tb[5] === base0.tD, JSON.stringify([tb, ts]));
 	const rs = inpRow(xs.inp, 'RESERVOIRS', '9'), rb = inpRow(xb.inp, 'RESERVOIRS', '9');
 	ok('[RESERVOIRS] 9: the scenario\'s head pattern', rs[2] === '1' && rb.length === 2, JSON.stringify([rb, rs]));
 	const ps = inpRow(xs.inp, 'PUMPS', '9');
@@ -162,8 +177,9 @@ const inpRow = (inp, section, id) => {
 	ok('...and Base its own', (L.switchScenario(L.baseScenario().id), node('22').elev === base0.jElev && L.effective(link('9'), 'speed') === base0.pSpeed));
 	L.convertUnitValues('lpn_u_elevhead', 0.3048);
 	L.switchScenario(S2.id);
-	ok('a unit change (ft to m) converts the scenario\'s elevation and depth limits', Math.abs(L.effective(node('22'), 'elev') - (base0.jElev + 50) * 0.3048) < 1e-9 &&
-		Math.abs(L.effective(node('2'), 'maxLevel') - 140 * 0.3048) < 1e-9, String(L.effective(node('22'), 'elev')));
+	ok('a unit change (ft to m) converts the scenario\'s elevation, tank base and depth limits', Math.abs(L.effective(node('22'), 'elev') - (base0.jElev + 50) * 0.3048) < 1e-9 &&
+		Math.abs(L.effective(node('2'), 'maxLevel') - 140 * 0.3048) < 1e-9 && Math.abs(L.effective(node('2'), 'bottomElev') - (base0.tBase + 20) * 0.3048) < 1e-9,
+		String(L.effective(node('22'), 'elev')));
 	L.convertUnitValues('lpn_u_length', 0.3048);
 	ok('...and a length change converts its tank diameter', Math.abs(L.effective(node('2'), 'tankDiameter') - 60 * 0.3048) < 1e-9, String(L.effective(node('2'), 'tankDiameter')));
 	L.libRepointPattern('1', 'Daily');
