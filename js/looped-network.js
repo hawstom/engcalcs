@@ -49095,7 +49095,7 @@ var EngCalcs = EngCalcs || {};
 			{ label: pc.lpn_copy_props_menu || 'Copy properties', enabled: true,
 				run: function () { if (copyProperties(hitRef)) { setNotice(String(pc.lpn_copy_props_done || 'Copied properties of {id}.').replace('{id}', hitRef.id)); } } },
 			{ label: pc.lpn_paste_props_menu || 'Paste properties to selection', enabled: hasTargets,
-				tip: propClip ? (pc.lpn_paste_props_off_kind || 'None of the selected assets can take the copied properties.')
+				tip: propClip ? (pc.lpn_paste_props_off_kind || 'No selected asset can take the copied properties.')
 					: (pc.lpn_paste_props_off_none || 'Nothing is copied. Right-click an asset and choose Copy properties.'),
 				run: function () { pasteProperties(ctxSel); } }
 		]);
