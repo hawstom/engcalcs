@@ -205,7 +205,7 @@ None on master. Every English key here is present in at least one other language
 
 # Strings waiting on a branch
 
-**156 still to read**, of 159 new keys across 15 unmerged branch(es).
+**156 still to read**, of 159 new keys across 13 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -724,7 +724,3 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_ex_net3_si_title`**
   > EPANET Net3, L/s (SI)
   @@ NEEDS RULING
-
-### fix/label-drag (`cce90ef0`) — adds no English strings
-
-### fix/paste-column (`21765a8c`) — adds no English strings
