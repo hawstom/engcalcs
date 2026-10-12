@@ -39999,6 +39999,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				var n = nodeById(id);
 				return (n && nodeHasCoordOverride(n)) ? coordOverridesOf(n) : null;
 			},
+			// **AND ITS OWN TEXT POSITIONS AND ALIGNMENT** (Tom, 2026-10-12), stored outward as a node's
+			// are; the size and bold reach the corner shift through labelSize().
+			textOverride: function (id) {
+				var lb = labelById(id), ov = (lb && !inBaseScenario()) ? resolvedOverrides(activeScenario())[ovKey(lb)] : null;
+				return ov ? { x: ov.x, y: ov.y, align: ov.align, valign: ov.valign } : null;
+			},
 			// The same rule for the one DOCUMENT-level option a scenario can carry: the export
 			// writes the scenario the user is looking at, so a max-day export states max day's
 			// multiplier. Undefined where the scenario inherits, which leaves the document's own
@@ -40017,16 +40023,18 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// the scale that fits the drawn nodes into a 1000 x 700 px reference window, a number the
 			// drawing alone decides. (A Text imported from an .inp is left/top and never reaches here.)
 			labelSize: function (lb) {
-				var le = labelEls[lb.id], sRef = exportReferenceScale(), probe, wpx = 0;
-				if (!le) { return null; }
+				// The LIVE Text, so the scenario's own size and bold are measured (the writer places the
+				// scenario's point: textOverride above).
+				var le = labelEls[lb.id], sRef = exportReferenceScale(), probe, wpx = 0, live = labelById(lb.id);
+				if (!le || !live) { return null; }
 				try {
 					probe = el('text', { x: 0, y: 0, 'class': 'lpn-lbl',
-						style: 'font-size:' + (settings.textSize * (lb.sizeMult || 1)) + 'px;font-weight:' + (lb.bold ? 'bold' : 'normal') }, labelsLayer);   // Base's look, as the writer places Base's point
-					setTextLabelContent(probe, lb, 0);
+						style: 'font-size:' + (settings.textSize * textSizeMult(live)) + 'px;font-weight:' + textLabelWeight(live) }, labelsLayer);
+					setTextLabelContent(probe, live, 0);
 					wpx = probe.getBBox().width;
 					labelsLayer.removeChild(probe);
-				} catch (err) { return { w: textLabelWidth(le), h: textLabelHeight(lb) }; }
-				return { w: wpx / sRef, h: settings.textSize * (lb.sizeMult || 1) / sRef * 1.2 * textLabelLines(lb).length };
+				} catch (err) { return { w: textLabelWidth(le), h: textLabelHeight(live) }; }
+				return { w: wpx / sRef, h: settings.textSize * textSizeMult(live) / sRef * 1.2 * textLabelLines(live).length };
 			}
 		};
 	}
@@ -57358,8 +57366,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// and the note said Not stated). So those are read as Base reads them, through the same readers.
 	// A text that is empty or begins or ends in a space is quoted, or the note would show nothing.
 	function setboxQuoteBlank(t) { t = String(t); return /^\s|\s$|^$/.test(t) ? '"' + t + '"' : t; }
-	function setboxBaseText(row) {
-		var base = baseScenario(), v, opts, i, p = row.path;
+	// **WHAT CLEAR OVERRIDE WOULD RESTORE** (Tom, 2026-10-12): read in `src`, the scenario the held
+	// one inherits from (its parent, Base for a child of Base), not always Base.
+	function setboxBaseText(row, src) {
+		var base = src || baseScenario(), v, opts, i, p = row.path;
+		// A parent that holds a view of its own (resolved) restores that one; else it follows Base's.
+		if (p[0] === 'view' && !base.isBase && heldView(base)) { return viewSummaryText(outwardViewOf(heldView(base))); }
 		if (p[0] === 'view') {
 			// Base's view is the live one: where leaving this scenario goes (followScenarioView()),
 			// which, with nothing remembered, is where the map is now.
@@ -57402,7 +57414,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			el.classList.add('lpn-set-held');
 			many = held.length > 1;
 			text = held.map(function (r) {
-				var t = setboxBaseText(r), part = setboxLabelPart(r.path);
+				var t = setboxBaseText(r, parentScenarioOf(scn)), part = setboxLabelPart(r.path);
 				if (t === null || t === undefined) { return null; }
 				// A Labels row edits six things: each held one is named by its column ("Decimals: 0").
 				if (part) { return settingTableFill(pc.lpn_settings_row_labels_field || '{labels}: {field}', { labels: part, field: t }); }
@@ -57418,7 +57430,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				.split('{scenario}').join(scenarioDisplayName(scn)) + ' '));
 			if (text.length) {
 				note.appendChild(document.createTextNode((pc.lpn_settings_held_base || '{base}: {value}')
-					.split('{base}').join(pc.lpn_scenario_base || 'Base').split('{value}').join(text.join('; ')) + ' '));
+					.split('{base}').join(scenarioDisplayName(parentScenarioOf(scn))).split('{value}').join(text.join('; ')) + ' '));
 			}
 			shared = smSharedText(held.map(function (r) { return r.cat; }).filter(function (c) { return !!c; }));
 			if (shared) { note.appendChild(document.createTextNode(shared + ' ')); }
@@ -63197,6 +63209,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		scheduleSave();
 		refreshPaneIfOpen();
 	}
+	// **THE LINE BESIDE AN OVERRIDE SAYS WHAT CLEAR OVERRIDE WOULD RESTORE, AND FROM WHERE** (Tom,
+	// 2026-10-12): the parent scenario's value as it resolves there, named; Base's in Base's words.
+	function inheritedLine(fn) {
+		var pc = EngCalcs.pageConfig || {}, par = parentScenarioOf(activeScenario()), v = paneInScenario(par, fn);
+		if (!par || par.isBase) { return (pc.lpn_scenario_base_value || 'Base scenario: {value}').replace('{value}', v); }
+		return (pc.lpn_settings_held_base || '{base}: {value}').split('{base}').join(scenarioDisplayName(par)).split('{value}').join(v);
+	}
 	function overrideMarker(fields, el, prop, format) {
 		var pc = EngCalcs.pageConfig || {};
 		// Nothing at all in Base: there is no scenario to belong to, and a permanently-unticked box
@@ -63226,8 +63245,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (on) {
 			var base = document.createElement('span');
 			base.className = 'lpn-ov-base';
-			base.textContent = (pc.lpn_scenario_base_value || 'Base scenario: {value}')
-				.replace('{value}', (format || formatPropValue)(baseValue(el, prop)));
+			base.textContent = inheritedLine(function () { return (format || formatPropValue)(effective(el, prop)); });
 			label.appendChild(base);
 			shared = smSharedText([categoryOf(prop, elGroup(el))]);
 			if (shared) {
@@ -63272,11 +63290,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		label.appendChild(document.createTextNode(' '));
 		label.appendChild(text);
 		if (on) {
-			var base = document.createElement('span'), parts = [baseValue(n, 'demand')];
-			(n.extraDemands || []).forEach(function (d) { parts.push(d.base); });
+			var base = document.createElement('span');
 			base.className = 'lpn-ov-base';
-			base.textContent = (pc.lpn_scenario_base_value || 'Base scenario: {value}')
-				.replace('{value}', parts.map(function (v) { return formatPropValue(v); }).join(' + '));
+			base.textContent = inheritedLine(function () {
+				return ownDemandRows(n).map(function (d) { return formatPropValue(d.base); }).join(' + ');
+			});
 			label.appendChild(base);
 			if (smSharedText(['demand'])) {
 				base = document.createElement('span');
@@ -63295,7 +63313,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var pc = EngCalcs.pageConfig || {};
 		if (!lb || inBaseScenario() || !isOverridable(lb, 'x')) { return; }
 		var label = document.createElement('label'), box = document.createElement('input'),
-			text = document.createElement('span'), on = hasOverride(lb, 'x') || hasOverride(lb, 'y'), base, bp;
+			text = document.createElement('span'), on = hasOverride(lb, 'x') || hasOverride(lb, 'y'), base;
 		label.className = 'lpn-ov-marker';
 		box.type = 'checkbox';
 		box.checked = on;
@@ -63313,10 +63331,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		label.appendChild(text);
 		if (on) {
 			// Base's point in the popup's own reading order (labelCoordAxis()'s two slots).
-			bp = paneInScenario(baseScenario(), function () { return [labelCoordAxis(lb, 1), labelCoordAxis(lb, 2)]; });
 			base = document.createElement('span');
 			base.className = 'lpn-ov-base';
-			base.textContent = (pc.lpn_scenario_base_value || 'Base scenario: {value}').replace('{value}', coordText(bp[0]) + ', ' + coordText(bp[1]));
+			base.textContent = inheritedLine(function () { return coordText(labelCoordAxis(lb, 1)) + ', ' + coordText(labelCoordAxis(lb, 2)); });
 			label.appendChild(base);
 		}
 		fields.appendChild(label);

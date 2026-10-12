@@ -12,6 +12,9 @@
 //   M2  in Basic mode a new scenario is a child of Base, even made while Fig 5 is current;
 //   F7  the menu's New and Rename refuse a name already used;
 //   F8  "Shared with" names a scenario that names the alternative, not a child that inherits it.
+//   Q2  the line beside an override says what Clear override restores, named by where it comes from
+//       (the parent scenario, or Base);
+//   Q3  an .inp export from Fig 5 writes Fig 5's Text position, as it writes its node values.
 // Wording is read from the page's own language strings, never written here.
 //
 //   node dev/lpn-spike/scenario-pass-1012-browser-harness.js   (takes the browser lock itself)
@@ -43,6 +46,68 @@ function ok(label, cond, detail) {
 	console.log((cond ? '  ok   ' : '  FAIL ') + label + (detail === undefined ? '' : '   ' + detail));
 }
 const byId = (arr, id) => (arr || []).filter((x) => x.id === id)[0];
+// The .inp download, as label-export-stable-browser-harness.js reads it.
+function unzip(buf) {
+	const out = {};
+	let e = buf.length - 22;
+	while (e >= 0 && buf.readUInt32LE(e) !== 0x06054b50) { e--; }
+	if (e < 0) { return null; }
+	const n = buf.readUInt16LE(e + 10);
+	let p = buf.readUInt32LE(e + 16);
+	for (let i = 0; i < n; i++) {
+		if (buf.readUInt32LE(p) !== 0x02014b50) { return null; }
+		const method = buf.readUInt16LE(p + 10), crc = buf.readUInt32LE(p + 16), csize = buf.readUInt32LE(p + 20),
+			usize = buf.readUInt32LE(p + 24), nlen = buf.readUInt16LE(p + 28), xlen = buf.readUInt16LE(p + 30),
+			clen = buf.readUInt16LE(p + 32), loc = buf.readUInt32LE(p + 42), name = buf.toString('utf8', p + 46, p + 46 + nlen);
+		if (buf.readUInt32LE(loc) !== 0x04034b50) { return null; }
+		const start = loc + 30 + buf.readUInt16LE(loc + 26) + buf.readUInt16LE(loc + 28), body = buf.subarray(start, start + csize);
+		const data = method === 8 ? zlib.inflateRawSync(body) : method === 0 ? Buffer.from(body) : null;
+		if (!data || data.length !== usize || zlib.crc32(data) !== crc) { return null; }
+		out[name] = data;
+		p += 46 + nlen + xlen + clen;
+	}
+	return out;
+}
+function inpText(buf) {
+	if (buf.length > 4 && buf.toString('latin1', 0, 2) === 'PK') {
+		const z = unzip(buf), n = z && Object.keys(z).find((k) => /\.inp$/i.test(k));
+		return n ? z[n].toString('utf8') : null;
+	}
+	return buf.toString('utf8');
+}
+async function closeDialog(a) {
+	for (let k = 0; k < 6; k++) {
+		const shown = await a.page.evaluate(() => {
+			const bd = document.getElementById('lpn_dialog_backdrop');
+			return !!bd && getComputedStyle(bd).display !== 'none';
+		});
+		if (!shown) { return; }
+		await a.page.click('#lpn_dialog_buttons button:visible');
+		await a.settle(400);
+	}
+}
+async function exportInp(a) {
+	const got = [];
+	const onDl = (d) => got.push(d);
+	a.page.on('download', onDl);
+	await closeDialog(a);
+	await a.menuClickSub(await a.lang('lpn_file_export_menu'), await a.lang('lpn_file_export_item_inp'), 'file');
+	for (let i = 0; i < 60 && got.length < 1; i++) { await a.page.waitForTimeout(100); }
+	await a.page.waitForTimeout(800);
+	a.page.off('download', onDl);
+	if (!got.length) { return null; }
+	return inpText(fs.readFileSync(await got[0].path()));
+}
+function labelRows(text) {
+	const out = [];
+	let on = false;
+	for (const line of String(text).split(/\r?\n/)) {
+		const m = /^\s*\[(\w+)\]/.exec(line);
+		if (m) { on = m[1].toUpperCase() === 'LABELS'; continue; }
+		if (on && line.trim() && line.trim()[0] !== ';') { out.push(line); }
+	}
+	return out;
+}
 
 async function main() {
 	const env = require(path.join(REPO, 'dev', 'browser-pass', 'lib', 'env.js'));
@@ -141,6 +206,7 @@ async function main() {
 		// ---- B1 ----
 		console.log('--- B1. the Settings box note names the scenario holding the override ---');
 		await openProject((d) => { byId(d.scenarios, 'f5').settings = { labelSettings: { link: { id: false } } }; });
+		const await0held = await L('lpn_settings_held_base');
 		await a.toolbarClick(await L('lpn_tool_settings'));
 		await page.waitForSelector('#lpn_settings_box', { state: 'visible' });
 		await a.settle(800);
@@ -149,6 +215,7 @@ async function main() {
 		ok('B1 a held row is marked in Fig 5', notes.length >= 1, JSON.stringify(notes));
 		ok('B1 every note begins by naming Fig 5, the scenario holding the override', notes.length > 0 && notes.every((n) => n.indexOf(wantIn) === 0), JSON.stringify(notes));
 		const BASEW = await L('lpn_scenario_base');
+		ok('Q2 ...then what Clear override restores, from Fig 4, its parent', notes.every((n) => n.indexOf(wantIn + ' ' + (await0held).replace('{base}', 'Fig 4').split('{value}')[0]) === 0), JSON.stringify(notes));
 		ok('B1 ...and no note begins with Base', notes.every((n) => n.indexOf(BASEW) !== 0));
 
 		// ---- B2 ----
@@ -172,6 +239,15 @@ async function main() {
 		ok('B2 the position is in a Text alternative named Fig 5, which Fig 5 names', !!textAlt && textAlt.name === 'Fig 5' &&
 			!!(textAlt.values || {})['t:X2'] && typeof textAlt.values['t:X2'].x === 'number' && typeof textAlt.values['t:X2'].y === 'number' &&
 			(byId(sv.scenarios, 'f5').alternatives || {}).text === textAlt.id, JSON.stringify(sv.alternatives));
+		// Q3: the export from Fig 5 writes the Text where Fig 5 has it, as it writes Fig 5's node values.
+		const inp5 = await exportInp(a);
+		await scenarioMenu(await L('lpn_scenario_base'));
+		const inpB = await exportInp(a);
+		const rowOf = (t) => labelRows(t || '').filter((r) => /"Pump"/.test(r))[0] || '';
+		ok('Q3 the [LABELS] row of the moved Text differs between a Fig 5 export and a Base export', !!rowOf(inp5) && !!rowOf(inpB) && rowOf(inp5) !== rowOf(inpB), rowOf(inp5) + ' | ' + rowOf(inpB));
+		const xy = (r) => r.trim().split(/\s+/).slice(0, 2).map(Number);
+		const dx = xy(rowOf(inp5))[0] - xy(rowOf(inpB))[0], dy = xy(rowOf(inp5))[1] - xy(rowOf(inpB))[1];
+		ok('Q3 ...moved right and down, the way it was dragged (x up, y down in the file)', dx > 0 && dy < 0, dx + ', ' + dy);
 		await scenarioMenu('Fig 4');
 		const p4 = await textPoint();
 		ok('B2 in Fig 4 the Text is where it was', p4 && Math.abs(p4.x - p0.x) < 1e-6 && Math.abs(p4.y - p0.y) < 1e-6, JSON.stringify([p0, p4]));
@@ -363,6 +439,23 @@ async function main() {
 		const want = (await L('lpn_sm_shared_note')).replace('{list}', 'Fig 9');
 		ok('F8 in Fig 4 the elevation note names Fig 9, which names the alternative, and not Fig 5, which inherits it',
 			shared.length > 0 && shared.every((t) => t === want), JSON.stringify(shared));
+
+		// ---- Q2 in Properties ----
+		console.log('\n--- Q2. Properties says what Clear override restores, and from where ---');
+		await openProject((d) => {
+			byId(d.scenarios, 'f4').overrides = { 'n:10': { elev: 720 } };
+			byId(d.scenarios, 'f5').overrides = { 'n:10': { elev: 730 } };
+		});
+		await clickNode('10');
+		let lines = await page.evaluate(() => Array.from(document.querySelectorAll('#lpn_popup .lpn-ov-base')).filter((e) => !e.classList.contains('lpn-ov-shared')).map((e) => e.textContent.trim()));
+		const HB = await L('lpn_settings_held_base'), await0bv = await L('lpn_scenario_base_value');
+		ok('Q2 in Fig 5 the elevation line names Fig 4 and its 720', lines.some((t) => t === HB.replace('{base}', 'Fig 4').replace('{value}', '720')), JSON.stringify(lines));
+		await page.evaluate(() => { const p = document.getElementById('lpn_popup_close'); if (p && p.offsetParent) { p.click(); } });
+		await scenarioMenu('Fig 4');
+		await clickNode('10');
+		lines = await page.evaluate(() => Array.from(document.querySelectorAll('#lpn_popup .lpn-ov-base')).filter((e) => !e.classList.contains('lpn-ov-shared')).map((e) => e.textContent.trim()));
+		const baseElev = String(byId(JSON.parse(fs.readFileSync(path.join(REPO, 'dev', 'water-network-examples', 'Net1.lwn'), 'utf8')).nodes, '10').elev);
+		ok('Q2 in Fig 4, a child of Base, it reads Base scenario: ' + baseElev, lines.some((t) => t === (await0bv).replace('{value}', baseElev)), JSON.stringify(lines));
 
 		ok('no page error', errors.length === 0, JSON.stringify(errors).slice(0, 400));
 	} finally {

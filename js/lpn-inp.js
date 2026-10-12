@@ -2432,6 +2432,9 @@
 	 *   doc   the saved document shape (docFromInp / serializeProject)
 	 *   opts  .effective(el, prop)  scenario resolver; default is Base (`el['_' + prop]`)
 	 *         .coordOverride(id)    {x, y} the ACTIVE SCENARIO moved this node to, or null
+	 *         .textOverride(id)     the ACTIVE SCENARIO's own {x?, y?, align?, valign?} for a Text,
+	 *                               or null: x/y an absolute outward point for a free Text, an
+	 *                               offset in this document's frame for an attached one
 	 *         .demandRows(node)     the ACTIVE SCENARIO's own demand list for this junction
 	 *                               ([{base, pattern, category, tok?}]), or null for the document's
 	 *         .demandMultiplier      the active scenario's own, if it has one; the document's otherwise
@@ -2466,6 +2469,8 @@
 		 * in, so it goes straight into the row.
 		 */
 		var covOf = typeof opts.coordOverride === 'function' ? opts.coordOverride : function () { return null; };
+		// A Text the active scenario moved or reshaped (Tom, 2026-10-12), on the node's rule above.
+		var txOf = typeof opts.textOverride === 'function' ? opts.textOverride : function () { return null; };
 		// A scenario that owns a junction's whole demand list (R-369) hands it over here; null is
 		// the document's own rows, read by EngCalcs.lpnDemandRows() exactly as before.
 		var ovRowsOf = typeof opts.demandRows === 'function' ? opts.demandRows : function () { return null; };
@@ -2884,14 +2889,17 @@
 				anchor = linkAnchorPoint(lb);
 				linkAnchored.push(lb.id);
 			}
-			var px = (lb.x || 0) + (anchor ? (anchor.x || 0) : 0) + origin.x,
-				py = (lb.y || 0) + (anchor ? (anchor.y || 0) : 0) + origin.y,
+			var tov = txOf(lb.id) || {}, ox = typeof tov.x === 'number' ? tov.x : lb.x, oy = typeof tov.y === 'number' ? tov.y : lb.y,
+				px = (ox || 0) + (anchor ? (anchor.x || 0) : 0) + origin.x,
+				py = (oy || 0) + (anchor ? (anchor.y || 0) : 0) + origin.y,
 				// An anchored label is rendered from the side its offset points to and is vertically
 				// centred (labelHAlign/labelVAlign); a free one uses its own align/valign, which
 				// default to centre and middle.
-				hal = anchor ? (lb.x >= 0 ? 'left' : 'right') : (lb.align || 'center'),
-				val = anchor ? 'middle' : (lb.valign || 'middle'),
+				hal = anchor ? (ox >= 0 ? 'left' : 'right') : ((tov.align !== undefined && tov.align !== null ? tov.align : lb.align) || 'center'),
+				val = anchor ? 'middle' : ((tov.valign !== undefined && tov.valign !== null ? tov.valign : lb.valign) || 'middle'),
 				size = (typeof opts.labelSize === 'function') ? opts.labelSize(lb) : null;
+			if (!anchor && typeof tov.x === 'number') { px = tov.x; }
+			if (!anchor && typeof tov.y === 'number') { py = tov.y; }
 			if (hal !== 'left' || val !== 'top') {
 				if (size && isFinite(size.w) && isFinite(size.h)) {
 					if (hal === 'center') { px -= size.w / 2; } else if (hal === 'right') { px -= size.w; }
