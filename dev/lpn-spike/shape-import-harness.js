@@ -98,7 +98,7 @@ function helpers(a) {
 	};
 	const undo = async () => { await P.keyboard.press('Control+z'); await settle(500); };
 	// A fresh project in UTM 12N, through the New project box and its coordinate system chooser.
-	const newUtmProject = async () => {
+	const newCrsProject = async (code) => {
 		await a.menuClick(await a.lang('lpn_file_new'), 'file');
 		await P.waitForSelector('#lpn_new_panel', { state: 'visible' });
 		await P.check('#lpn_new_panel input[name="lpn_new_coords"][value="geo"]');
@@ -107,9 +107,9 @@ function helpers(a) {
 		await a.settle(500);
 		const view = await P.$('#lpn_crsbox_view');
 		if (view && await view.isChecked()) { await view.uncheck(); }
-		await P.fill('#lpn_crsbox_name', '32612');
+		await P.fill('#lpn_crsbox_name', code);
 		await a.settle(300);
-		await P.selectOption('#lpn_crsbox_list', 'EPSG:32612');
+		await P.selectOption('#lpn_crsbox_list', 'EPSG:' + code);
 		await P.click('#lpn_crsbox_ok');
 		await P.waitForSelector('#lpn_crsbox', { state: 'hidden' });
 		await P.click('#lpn_new_us');
@@ -117,7 +117,7 @@ function helpers(a) {
 		await P.waitForSelector('#lpn_new_panel', { state: 'hidden' });
 		await a.settle(800);
 	};
-	return { P, settle, stored, shapes, importVia, exportVia, undo, newUtmProject };
+	return { P, settle, stored, shapes, importVia, exportVia, undo, newCrsProject };
 }
 
 async function main() {
@@ -214,10 +214,12 @@ async function main() {
 		ok('a name with a space is kept as the description (Well A)', sh.some((s) => s.desc === 'Well A'));
 		const main1 = sh.filter((s) => s.desc === 'Main 1');
 		ok('both parts of Main 1 keep the name and the dBASE columns as properties',
-			main1.length === 2 && main1.every((s) => s.props && s.props.KIND === 'main' && s.props.DIAM === 12), JSON.stringify(main1.map((s) => s.props)));
+			main1.length === 2 && main1.every((s) => s.props && s.props.KIND === 'main' && s.props.DIAM === '12' && /^00000001\d\d$/.test(s.props.CODE)), JSON.stringify(main1.map((s) => s.props)));
 		ok('the notice names the unread MultiPatch, the hole, the two multipart features and the columns',
 			note.indexOf('MultiPatch (1)') >= 0 && note.indexOf((await L('lpn_geojson_import_holes_one'))) >= 0 &&
-			note.indexOf((await L('lpn_geojson_import_parts')).replace('{n}', '2')) >= 0 && note.indexOf('KIND, DIAM') >= 0, note);
+			note.indexOf((await L('lpn_geojson_import_parts')).replace('{n}', '2')) >= 0 && note.indexOf('KIND, DIAM, CODE') >= 0, note);
+		ok('a numeric column keeps its source characters: 0000000170 is not 170', sh.some((x) => x.props.CODE === '0000000170'), JSON.stringify(sh.map((x) => x.props.CODE)));
+		ok('seven kept names are listed five and then "and 2 more"', note.indexOf((await L('lpn_shapes_import_more')).replace('{n}', '2')) >= 0 && note.indexOf('Z line (S7)') < 0, note);
 		await h.undo();
 		ok('one Undo takes the seven back', (await h.shapes()).length === 0);
 		note = await h.importVia('lpn_file_import_dxf', fx('shapes-sample.dxf'));
@@ -235,7 +237,7 @@ async function main() {
 			note === (await L('lpn_shp_import_refuse_range')).replace('{file}', 'shapes-grid.shp'), note);
 
 		console.log('\n--- 4. into a project in UTM 12N ---');
-		await h.newUtmProject();
+		await h.newCrsProject('32612');
 		await a.dismissGallery().catch(() => {});
 		note = await h.importVia('lpn_file_import_shp', fx('shapes-geo.zip'));
 		sh = await h.shapes();
@@ -251,12 +253,59 @@ async function main() {
 			note.indexOf((await L('lpn_shp_import_prj_same')).split('{crs}')[0]) >= 0, note);
 		await h.undo();
 		note = await h.importVia('lpn_file_import_shp', fx('shapes-utm10.zip'));
-		ok('a .prj stating EPSG:32610 is refused, nothing converted', (await h.shapes()).length === 0 && note.indexOf('EPSG:32610') >= 0 && note.indexOf('EPSG:32612') >= 0, note);
+		ok('a .prj stating EPSG:32610 is refused, nothing converted', (await h.shapes()).length === 0 && note.indexOf('EPSG:32610') >= 0 && note.indexOf('EPSG:32612') >= 0 && note.indexOf((await L('lpn_shp_import_convert_hint')).split('{theirs}')[0]) >= 0, note);
 		note = await h.importVia('lpn_file_import_dxf', fx('shapes-sample.dxf'));
 		sh = await h.shapes();
 		ok('a DXF is read as the project\'s own numbers, six Shapes, and a feet drawing in a metre project is said',
 			sh.length === 6 && note.indexOf((await L('lpn_dxf_import_units')).split('{theirs}')[0]) >= 0 && note.indexOf('ft') >= 0, note);
 
+
+		console.log('\n--- 5. real files: ArcGIS .prj, the Object Coordinate System, paper space, damage, deleted rows ---');
+		await h.newCrsProject('32612');
+		await a.dismissGallery().catch(() => {});
+		const stk = [fx('gdal-Stacks.shp'), fx('gdal-Stacks.dbf'), fx('gdal-Stacks.prj')];
+		note = await h.importVia('lpn_file_import_shp', stk);
+		ok('an ArcGIS .prj (no EPSG code) into UTM 12N is refused, and Convert as is NOT suggested (it could not help)',
+			(await h.shapes()).length === 0 && note.indexOf('NAD_1983_StatePlane_Texas_South_Central') >= 0 &&
+			note.indexOf('Convert as') < 0, note);
+		await h.newCrsProject('2278');
+		await a.dismissGallery().catch(() => {});
+		note = await h.importVia('lpn_file_import_shp', stk);
+		sh = await h.shapes();
+		ok('the same ArcGIS .prj into EPSG:2278 (Texas South Central, US ft) is recognised by its parameters: two Shapes, unchanged',
+			sh.length === 2 && note.indexOf((await L('lpn_shp_import_prj_same')).split('{crs}')[0]) >= 0, note);
+		ok('...the first coordinate exactly as the file wrote it', sh.some((s) => s.pts[0].tok && s.pts[0].tok.x === '3115478.809630728'));
+		await h.undo();
+		note = await h.importVia('lpn_file_import_dxf', fx('shapes-sample.dxf'));
+		ok('a DXF in feet into a US-survey-foot project says nothing about units', (await h.shapes()).length === 6 &&
+			note.indexOf((await L('lpn_dxf_import_units')).split('{theirs}')[0]) < 0 && note.indexOf('us-ft') < 0, note);
+		await h.undo();
+		await a.newProject('us');
+		await h.settle(600);
+		note = await h.importVia('lpn_file_import_dxf', fx('gdal-ocs2wcs1.dxf'));
+		sh = await h.shapes();
+		const tri = (xs) => sh.some((s) => s.closed && s.pts.length === 3 && JSON.stringify(s.pts.map((p) => [p.x, Math.abs(p.y)])) === JSON.stringify(xs));
+		ok('mirrored (extrusion 0,0,-1) polylines land in the mirrored quadrant: (-1,1)(-2,1)(-1,2) and also the ordinary (1,1)(2,1)(1,2)',
+			tri([[-1, 1], [-2, 1], [-1, 2]]) && tri([[1, 1], [2, 1], [1, 2]]), JSON.stringify(sh.map((s) => s.pts.map((p) => [p.x, p.y]))).slice(0, 400));
+		await h.undo();
+		note = await h.importVia('lpn_file_import_dxf', fx('gdal-LWPOLYLINE-OCS.dxf'));
+		sh = await h.shapes();
+		const xsAll = [].concat(...sh.map((s) => s.pts.map((p) => p.x)));
+		ok('a survey drawing near 600000 stays near 600000 (no polyline thrown thousands of km by its OCS)', sh.length > 0 &&
+			Math.min(...xsAll) > 590000 && Math.max(...xsAll) < 620000, Math.min(...xsAll) + ' to ' + Math.max(...xsAll));
+		await h.undo();
+		note = await h.importVia('lpn_file_import_dxf', fx('ezdxf-VP4.dxf'));
+		sh = await h.shapes();
+		ok('paper-space entities are not imported and are counted', sh.length === 2 && note.indexOf((await L('lpn_dxf_import_paperspace')) + ' (21)') >= 0, sh.length + ' ' + note);
+		await h.undo();
+		note = await h.importVia('lpn_file_import_shp', fx('gdal-truncated.shp'));
+		ok('a cut-short .shp gives a notice, not silence, and imports nothing', (await h.shapes()).length === 0 &&
+			note === (await L('lpn_shp_import_damaged')).replace('{file}', 'gdal-truncated.shp'), note);
+		note = await h.importVia('lpn_file_import_shp', [fx('gdal-polydel-poly.shp'), fx('gdal-polydel-poly.dbf')]);
+		sh = await h.shapes();
+		ok('a record marked deleted in the .dbf is skipped and the notice says so (9 of 10)', sh.length === 9 &&
+			note.indexOf(await L('lpn_shp_import_deleted_one')) >= 0, sh.length + ' ' + note.slice(0, 300));
+		await h.undo();
 		ok('no uncaught page errors', a.errors.length === 0, a.errors.slice(0, 2).join(' | '));
 		await a.close();
 	} finally {

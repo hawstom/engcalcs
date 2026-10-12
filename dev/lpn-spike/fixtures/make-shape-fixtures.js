@@ -1,3 +1,9 @@
+// Real-world fixtures beside these (not generated here): gdal-* come from the GDAL autotest data (MIT,
+// github.com/OSGeo/gdal autotest/ogr/data: Stacks, ocs2wcs1.dxf, LWPOLYLINE-OCS.dxf, a truncated .shp, and
+// poly.shp/.dbf with record 1 marked deleted); ezdxf-VP4.dxf is from ezdxf (MIT, github.com/mozman/ezdxf).
+// Too large to keep: Natural Earth 10m rivers (public domain, 2.08 MB, 257,645 vertices):
+// https://naciscdn.org/naturalearth/10m/physical/ne_10m_rivers_lake_centerlines.zip
+//
 // Writes the DXF and shapefile fixtures of dev/lpn-spike/shape-import-harness.js (Task 779).
 //
 //   node dev/lpn-spike/fixtures/make-shape-fixtures.js
@@ -90,8 +96,8 @@ const geoRecs = [
 	{ raw: Buffer.concat([i32(31), Buffer.alloc(60)]) }
 ];
 const g = shp(0, geoRecs);
-const gd = dbf([{ name: 'NAME', type: 'C', len: 12 }, { name: 'KIND', type: 'C', len: 8 }, { name: 'DIAM', type: 'N', len: 6 }],
-	[['Well A', 'well', 0], ['Pair', 'well', 0], ['Main 1', 'main', 12], ['Lot 7', 'lot', 0], ['Z line', 'main', 8], ['Patch', 'x', 0]]);
+const gd = dbf([{ name: 'NAME', type: 'C', len: 12 }, { name: 'KIND', type: 'C', len: 8 }, { name: 'DIAM', type: 'N', len: 6 }, { name: 'CODE', type: 'N', len: 10 }],
+	[['Well A', 'well', 0, '0000000170'], ['Pair', 'well', 0, '0000000171'], ['Main 1', 'main', 12, '0000000172'], ['Lot 7', 'lot', 0, '0000000173'], ['Z line', 'main', 8, '0000000174'], ['Patch', 'x', 0, '0000000175']]);
 fs.writeFileSync(path.join(here, 'shapes-geo-noprj.shp'), g.shp);
 
 // A zip with fixed dates; deflated entries so the page's unzip is exercised, one stored.

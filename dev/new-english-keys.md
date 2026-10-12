@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**56 still to read on master**, of 56 untranslated keys, of 2614 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**62 still to read on master**, of 62 untranslated keys, of 2620 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -199,7 +199,7 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   @@ NEEDS RULING
 
-## lpn_  (56, 56 to read @@ NEEDS RULING)
+## lpn_  (62, 62 to read @@ NEEDS RULING)
 
 - **`lpn_dxf_import_binary`**
   > {file} is a binary DXF. Save it from your CAD program as an ASCII DXF, then import again.
@@ -212,6 +212,9 @@ never edits a synonym.
   @@ NEEDS RULING
 - **`lpn_dxf_import_inblocks`**
   > in block definitions
+  @@ NEEDS RULING
+- **`lpn_dxf_import_paperspace`**
+  > in paper space
   @@ NEEDS RULING
 - **`lpn_dxf_import_refuse_geo`**
   > A DXF drawing is flat, and this project is in latitude and longitude, so the coordinates of {file} have no place in it. Use Convert as… to copy the project into a coordinate system, then import again.
@@ -321,11 +324,26 @@ never edits a synonym.
 - **`lpn_shapes_import_frame`**
   > The coordinates were read as {frame}, with no conversion.
   @@ NEEDS RULING
+- **`lpn_shapes_import_more`**
+  > and {n} more
+  @@ NEEDS RULING
 - **`lpn_shp_import_attrs`**
   > Attribute columns kept as properties of each Shape: {list}.
   @@ NEEDS RULING
+- **`lpn_shp_import_convert_hint`**
+  > Use Convert as… to copy the project into {theirs}, then import again.
+  @@ NEEDS RULING
 - **`lpn_shp_import_converted`**
   > The coordinates are latitude and longitude. They were converted to {crs} by the transform the map uses.
+  @@ NEEDS RULING
+- **`lpn_shp_import_damaged`**
+  > {file} is damaged or cut short, so nothing was imported.
+  @@ NEEDS RULING
+- **`lpn_shp_import_deleted`**
+  > {n} records marked deleted in the .dbf were not imported.
+  @@ NEEDS RULING
+- **`lpn_shp_import_deleted_one`**
+  > One record marked deleted in the .dbf was not imported.
   @@ NEEDS RULING
 - **`lpn_shp_import_manyshp`**
   > {file} holds more than one shapefile. Import one at a time.
@@ -343,7 +361,7 @@ never edits a synonym.
   > The .prj states {crs}, the coordinate system of this project, so the coordinates were not changed.
   @@ NEEDS RULING
 - **`lpn_shp_import_refuse_crs`**
-  > {file} states {theirs}, and this project is in {ours}. Nothing was imported and nothing was converted. Use Convert as… to copy the project into the coordinate system of the file, then import again.
+  > {file} states {theirs}, and this project is in {ours}. Nothing was imported and nothing was converted.
   @@ NEEDS RULING
 - **`lpn_shp_import_refuse_local`**
   > {file} is in latitude and longitude, and this project has no place on the Earth to which they can be converted. Georeference it first with Map, World map, Attach, then import again.
@@ -374,7 +392,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**140 still to read**, of 143 new keys across 13 unmerged branch(es).
+**146 still to read**, of 149 new keys across 13 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -385,7 +403,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/bentley-interop (`a9be8bec`) — 111 new, 111 to read @@ NEEDS RULING
+### feat/bentley-interop (`9e4c0206`) — 117 new, 117 to read @@ NEEDS RULING
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -408,8 +426,14 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_copy_props_done`**
   > Copied properties of {id}.
   @@ NEEDS RULING
+- **`lpn_copy_props_done_ov`**
+  > Copied the overrides of {id} in this scenario.
+  @@ NEEDS RULING
 - **`lpn_copy_props_menu`**
   > Copy properties
+  @@ NEEDS RULING
+- **`lpn_copy_props_no_overrides`**
+  > No overrides to copy.
   @@ NEEDS RULING
 - **`lpn_customer_node_inactive`**
   > This customer is assigned to a junction that is inactive in this scenario, so its demand is not part of the solve.
@@ -441,6 +465,9 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_pane_tab_scenarios`**
   > Scenarios
   @@ NEEDS RULING
+- **`lpn_paste_alt_created`**
+  > Created {category} alternative {name} for this scenario.
+  @@ NEEDS RULING
 - **`lpn_paste_done_many`**
   > Pasted properties of {id} to {m} assets. Values changed: {n}.
   @@ NEEDS RULING
@@ -468,14 +495,26 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_rule_inactive_note`**
   > These rules refer to an asset that is inactive in this scenario, so they are ignored in its run: {ids}
   @@ NEEDS RULING
+- **`lpn_scenario_delete_ask`**
+  > Delete the scenario {name}? The drawing itself is not changed.
+  @@ NEEDS RULING
+- **`lpn_scenario_delete_goes`**
+  > Its {n} overrides are deleted with it.
+  @@ NEEDS RULING
 - **`lpn_scenario_delete_has_children`**
   > The scenario {name} cannot be deleted while other scenarios inherit from it: {list}. Delete those first, or give them another parent.
+  @@ NEEDS RULING
+- **`lpn_scenario_delete_stays`**
+  > These alternatives it uses stay in the project: {list}.
   @@ NEEDS RULING
 - **`lpn_scncmp_none_checked`**
   > No scenario is checked for comparison. Check scenarios in the Scenario manager.
   @@ NEEDS RULING
 - **`lpn_settings_held_base`**
   > {base}: {value}
+  @@ NEEDS RULING
+- **`lpn_settings_held_in`**
+  > Override in {scenario}.
   @@ NEEDS RULING
 - **`lpn_settings_restore_base_only`**
   > Switch to Base to restore the defaults.
@@ -658,19 +697,16 @@ build for that would be a gate nobody keeps. Refresh it with
   > Include in Scenario comparison
   @@ NEEDS RULING
 - **`lpn_sm_copy`**
-  > Copy scenario…
-  @@ NEEDS RULING
-- **`lpn_sm_copy_alt`**
   > Copy
   @@ NEEDS RULING
 - **`lpn_sm_copy_ask`**
-  > Copy the scenario {name}. Make its own copies of the alternatives it uses, or share them? A shared alternative changes in every scenario that uses it.
+  > Copy the scenario {name}. Share edits: the copy uses the same alternatives, so an edit in either scenario changes both. Separate edits: the copy gets its own copies of the alternatives.
   @@ NEEDS RULING
 - **`lpn_sm_copy_own`**
-  > Make copies
+  > Separate edits
   @@ NEEDS RULING
 - **`lpn_sm_copy_share`**
-  > Share them
+  > Share edits
   @@ NEEDS RULING
 - **`lpn_sm_current_already`**
   > This scenario is already the current scenario.
@@ -682,7 +718,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Delete the selected item. A used item is not deleted.
   @@ NEEDS RULING
 - **`lpn_sm_help`**
-  > How scenarios and alternatives work:\n\nAn override made in a scenario is stored in the alternative associated with the scenario. Associations of alternatives to scenarios are managed in the Scenarios table in the bottom pane. Creating a new scenario creates no alternatives; it uses its parent's alternatives until new alternatives are needed as overrides are created. When overrides are created in a scenario, they are stored in their respective alternative for the scenario; if the scenario has no such alternative, a new alternative is created using the name of the scenario. Example: You create a "Figure: Node and link IDs" scenario and edit a Text to say "Node and Link IDs." When you create the scenario, no alternatives are created. But at the moment you save the Text, a Text alternative called "Figure: Node and link IDs" is created with the override for the Text value. In Basic mode, you see this as simply an override in the scenario itself.\n\nHow to manage scenarios:\n\n- Choose Scenarios or an alternatives category in the list at the top to show its tree.\n\n- Create a child of the selected item with Add child, or an item with no parent with Add base. A new item is named after its parent; type a name to rename it. Copy scenario copies the selected scenario and asks whether to copy the alternatives it uses or share them.\n\n- Drag an item onto another to make it a child of that item. Drag an item between two items to reorder them.\n\n- Click an item to select it. Press F2, or choose Rename, to rename the selected item. Double-click a scenario, or press Enter, to make it current. Click the arrow beside an item, or press Left or Right, to collapse or expand it. Right-click an item for the same commands as the buttons.\n\n- Press Delete, or click the minus button, to delete the selected item. An item in use is not deleted, and the message names what uses it.\n\n- To make a scenario use another alternative, including Base, choose it in the scenario's row of the Scenarios table. An override made in a shared alternative changes every scenario that uses it.
+  > How scenarios and alternatives work:\n\nIn Basic mode, alternatives are hidden and automatic, and all new scenarios are children of the Base scenario.\n\nProperties and settings are grouped into alternatives categories that appear as columns of the Scenarios table and as management options in Scenario manager.\n\nOverrides are created in scenarios, but they really belong to the respective alternatives associated with the scenario; so a scenario is like a window to its alternatives. Associations of alternatives to scenarios are managed in the Scenarios table in the bottom pane. Creating a new scenario creates no alternatives; the new scenario uses its parent's alternatives until overrides are created that need new alternatives. When overrides are created in a scenario, they are stored in their respective alternative for the scenario; if the scenario has no such alternative, a new alternative is created using the name of the scenario.\n\nWith Basic mode off, a complex inheritance tree is available, and alternatives can be shared among scenarios. But the default behavior of edits when a new alternative is needed is to create an alternative named like the current scenario, which gives each scenario its unique set of alternatives.\n\nExample: You create a "Figure: Node and link IDs" scenario and edit a Text to say "Node and Link IDs." When you create the scenario, no alternatives are created. But at the moment you save the Text, a Text alternative called "Figure: Node and link IDs" is created with the override for the Text value. In Basic mode, you see this as simply an override in the scenario itself.\n\nIn any scenario other than Base, Copy properties copies only the overrides the asset has in that scenario.\n\nHow to manage scenarios:\n\n- Choose Scenarios or an alternatives category in the list at the top to show its tree.\n\n- Create a child of the selected item with Add child, or an item with no parent with Add base. A new item is named after its parent; type a name to rename it. Copy copies the selected item. Copying a scenario asks whether the copy shares edits with the original (it uses the same alternatives, so an edit in either changes both) or keeps its edits separate (it gets its own copies of the alternatives).\n\n- Drag an item onto another to make it a child of that item. Drag an item between two items to reorder them.\n\n- Click an item to select it. Press F2, or choose Rename, to rename the selected item. Double-click a scenario, or press Enter, to make it current. Click the arrow beside an item, or press Left or Right, to collapse or expand it. Right-click an item for the same commands as the buttons.\n\n- Press Delete, or click the minus button, to delete the selected item. An item in use is not deleted, and the message names what uses it. Deleting a scenario with Basic mode off keeps the alternatives it uses. Deleting a scenario with Basic mode on also deletes each of its alternatives that no other scenario uses.\n\n- To make a scenario use another alternative, including Base, choose it in the scenario's row of the Scenarios table. An override made in a shared alternative changes every scenario that uses it.
   @@ NEEDS RULING
 - **`lpn_sm_in_use`**
   > {name} cannot be deleted while it is used by: {list}.
@@ -723,7 +759,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/desktop (`baba0f04`) — adds no English strings
 
-### feat/graph-bubble (`7054ea4a`) — 15 new, 15 to read @@ NEEDS RULING
+### feat/graph-bubble (`3385a0aa`) — 15 new, 15 to read @@ NEEDS RULING
 
 - **`lpn_copy_props_done`**
   > Copied properties of {id}.
@@ -826,9 +862,9 @@ build for that would be a gate nobody keeps. Refresh it with
   > Not pasted: {n} (the valve types differ).
   @@ NEEDS RULING
 
-### feat/shape (`a5ce9cfc`) — adds no English strings
+### feat/shape (`e4bcb363`) — adds no English strings
 
-### feat/si-example (`d1636a3e`) — 4 new, 4 to read @@ NEEDS RULING
+### feat/si-example (`a61a5886`) — 4 new, 4 to read @@ NEEDS RULING
 
 - **`lpn_ex_net2_si_desc`**
   > Litres per second, with metres and millimetres. An EPANET example at Branford, Connecticut, converted from gallons per minute, feet and inches: 35 junctions and 1 tank, with no reservoir, no pump and no valves, about 2 km by 4 km. Fluoride, a non-reactive substance, enters at one source.
@@ -843,4 +879,4 @@ build for that would be a gate nobody keeps. Refresh it with
   > EPANET Net3, L/s (SI)
   @@ NEEDS RULING
 
-### feat/tool-key (`163a1f50`) — adds no English strings
+### feat/tool-key (`896d92a7`) — adds no English strings

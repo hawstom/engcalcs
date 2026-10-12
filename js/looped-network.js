@@ -37836,7 +37836,12 @@ var EngCalcs = EngCalcs || {};
 	}
 	function importDxfShapesFromFile(file) {
 		var reader = new FileReader();
-		reader.onload = function (ev) { landDxfShapes(String(ev.target.result), file.name); };
+		reader.onload = function (ev) {
+			try { landDxfShapes(String(ev.target.result), file.name); }
+			catch (e) {
+				setNotice(String((EngCalcs.pageConfig || {}).lpn_dxf_import_unreadable || '{file} is not an ASCII DXF file.').replace('{file}', file.name));
+			}
+		};
 		reader.onerror = function () {
 			setNotice((EngCalcs.pageConfig || {}).lpn_survey_read_error || 'That file could not be read from your disk.');
 		};
@@ -37893,7 +37898,9 @@ var EngCalcs = EngCalcs || {};
 		if (renamed.length) {
 			lines.push(gisCounted('lpn_geojson_import_renamed', renamed.length,
 				'{n} feature names cannot be Shape IDs and are kept with the Shapes: {list}.',
-				'One feature name cannot be a Shape ID and is kept with the Shape: {list}.').replace('{list}', renamed.join(', ')));
+				'One feature name cannot be a Shape ID and is kept with the Shape: {list}.')
+				.replace('{list}', renamed.slice(0, 5).join(', ') + (renamed.length > 5 ? ', ' +
+					String(pc.lpn_shapes_import_more || 'and {n} more').replace('{n}', String(renamed.length - 5)) : '')));
 		}
 		Array.prototype.push.apply(lines, skippedLines);
 		Array.prototype.push.apply(lines, extraLines);
@@ -37936,6 +37943,7 @@ var EngCalcs = EngCalcs || {};
 		});
 		var sk = r.skipped.slice();
 		if (r.inBlocks) { sk.push({ name: String(pc.lpn_dxf_import_inblocks || 'in block definitions'), n: r.inBlocks }); }
+		if (r.paperSpace) { sk.push({ name: String(pc.lpn_dxf_import_paperspace || 'in paper space'), n: r.paperSpace }); }
 		if (sk.length) {
 			var total = sk.reduce(function (s, k) { return s + k.n; }, 0);
 			skipped.push(gisCounted('lpn_dxf_import_skipped', total, '{n} entities not imported: {list}.',
@@ -37950,11 +37958,14 @@ var EngCalcs = EngCalcs || {};
 		// The drawing's stated units against the project's length unit, said and not acted on.
 		ours = isProjectedProject() ? ((EngCalcs.lpnCrsUnit && EngCalcs.lpnCrsUnit(projectCrsCode()) || {}).units || '') : unitKey('lpn_u_length');
 		theirs = r.unit;
-		if (theirs && ours && theirs !== ours) {
+		// A foot and a US survey foot differ by 2 ppm and are one unit here; a unit is named as the
+		// page names it (ft), never as the projection library spells it (us-ft).
+		function uName(u) { return String(pc['u_' + (u === 'us-ft' ? 'ft' : u)] || u); }
+		if (theirs && ours && (theirs === 'us-ft' ? 'ft' : theirs) !== (ours === 'us-ft' ? 'ft' : ours)) {
 			lines.push(String(pc.lpn_dxf_import_units || 'The drawing states its units as {theirs} and this project uses {ours}. The numbers were not changed.')
-				.replace('{theirs}', theirs).replace('{ours}', ours));
+				.replace('{theirs}', uName(theirs)).replace('{ours}', uName(ours)));
 		}
-		gisPlaceShapes(items, fileName, lines, skipped, done, { skipped: r.skipped, inBlocks: r.inBlocks, bulged: r.bulged, unit: r.unit });
+		gisPlaceShapes(items, fileName, lines, skipped, done, { skipped: r.skipped, inBlocks: r.inBlocks, paperSpace: r.paperSpace, bulged: r.bulged, unit: r.unit });
 	}
 	// The files of a shapefile ([{ name, bytes }]), into Shapes.
 	function landShapefileShapes(files, done) {
@@ -37964,9 +37975,13 @@ var EngCalcs = EngCalcs || {};
 			if (shp.length === 1) { fileName = shp[0].name; }
 		}
 		function say(msg, rep) { setNotice(msg); if (done) { done(rep); } }
+		function failed(e) {
+			say(String(pc.lpn_shp_import_damaged || '{file} is damaged or cut short, so nothing was imported.').replace('{file}', fileName), { ok: false, reason: 'damaged', error: String(e && e.message || e) });
+		}
 		EngCalcs.lpnShapefileRead(files).then(function (r) {
-			function go() { place(r); }
+			function go() { try { place(r); } catch (e) { failed(e); } }
 			if (!r.ok) {
+				if (r.detail === 'damaged') { failed(); return; }
 				if (r.detail === 'noshp') { say(String(pc.lpn_shp_import_noshp || '{file} has no .shp file in it. Pick the .zip of a shapefile, or the .shp together with its .dbf and .prj.').replace('{file}', fileName), { ok: false, reason: 'noshp' }); }
 				else if (r.detail === 'manyshp') { say(String(pc.lpn_shp_import_manyshp || '{file} holds more than one shapefile. Import one at a time.').replace('{file}', fileName), { ok: false, reason: 'manyshp' }); }
 				else { say(String(pc.lpn_shp_import_unreadable || '{file} is not a shapefile this page can read: {detail}').replace('{file}', fileName).replace('{detail}', r.detail || ''), { ok: false, reason: 'unreadable' }); }
@@ -37977,13 +37992,14 @@ var EngCalcs = EngCalcs || {};
 				say(String(pc.lpn_shp_import_refuse_local || '{file} is in latitude and longitude, and this project has no place on the Earth to which they can be converted. Georeference it first with Map, World map, Attach, then import again.').replace('{file}', fileName), { ok: false, reason: 'local' });
 				return;
 			}
-			if (geoFile && !isLatLonProject() && EngCalcs.lpnCrsLoad && EngCalcs.lpnCrsReady && !EngCalcs.lpnCrsReady()) { EngCalcs.lpnCrsLoad(go); return; }
+			if (!isLatLonProject() && isProjectedProject() && EngCalcs.lpnCrsLoad && EngCalcs.lpnCrsReady && !EngCalcs.lpnCrsReady()) { EngCalcs.lpnCrsLoad(go); return; }
 			go();
-		});
+		}).catch(failed);
 		function place(r) {
 			var prj = r.prj, lines = [], skipped = [], items = [], ok = true, mode, geo = isLatLonProject(), code = projectCrsCode(), attrCols = [];
-			function refuse(key, fb, reason, theirs) {
-				say(String(pc[key] || fb).replace('{file}', fileName).replace('{theirs}', theirs || '').replace('{ours}', geo ? gisFrameText() : (code ? crsLabel(code) + ' (' + code + ')' : '')), { ok: false, reason: reason });
+			function refuse(key, fb, reason, theirs, hint) {
+				say(String(pc[key] || fb).replace('{file}', fileName).replace('{theirs}', theirs || '').replace('{ours}', geo ? gisFrameText() : (code ? crsLabel(code) + ' (' + code + ')' : ''))
+					+ (hint ? ' ' + String(pc.lpn_shp_import_convert_hint || 'Use Convert as… to copy the project into {theirs}, then import again.').replace('{theirs}', theirs || '') : ''), { ok: false, reason: reason });
 			}
 			var theirsName = prj ? (prj.epsg ? (prj.name ? prj.name + ' (' + prj.epsg + ')' : prj.epsg) : prj.name) : '';
 			if (!prj) {
@@ -38000,14 +38016,19 @@ var EngCalcs = EngCalcs || {};
 					lines.push(String(pc.lpn_shp_import_converted || 'The coordinates are latitude and longitude. They were converted to {crs} by the transform the map uses.').replace('{crs}', crsLabel(code) + ' (' + code + ')'));
 				}
 			} else if (geo) {
-				refuse('lpn_shp_import_refuse_crs', '{file} states {theirs}, and this project is in {ours}. Nothing was imported and nothing was converted. Use Convert as… to copy the project into the coordinate system of the file, then import again.', 'crs', theirsName);
+				refuse('lpn_shp_import_refuse_crs', '{file} states {theirs}, and this project is in {ours}. Nothing was imported and nothing was converted.', 'crs', theirsName,
+					!!(prj.epsg && EngCalcs.lpnCrsHas && EngCalcs.lpnCrsHas(prj.epsg)));
 				return;
 			} else if (isProjectedProject()) {
-				if (prj.epsg && prj.epsg === code) {
+				// By code where the file states one, else by arithmetic: an ArcGIS .prj states the method
+				// and its parameters (no EPSG code), and is the same system when both give the same plane.
+				if ((prj.epsg && prj.epsg === code) || (!prj.epsg && EngCalcs.lpnCrsMatchWkt && EngCalcs.lpnCrsMatchWkt(code, prj.wkt) === true)) {
 					mode = 'planar';
 					lines.push(String(pc.lpn_shp_import_prj_same || 'The .prj states {crs}, the coordinate system of this project, so the coordinates were not changed.').replace('{crs}', crsLabel(code) + ' (' + code + ')'));
 				} else {
-					refuse('lpn_shp_import_refuse_crs', '{file} states {theirs}, and this project is in {ours}. Nothing was imported and nothing was converted. Use Convert as… to copy the project into the coordinate system of the file, then import again.', 'crs', theirsName || prj.name);
+					// Convert as… can only help where the file names a system the page knows.
+					var canConvert = !!(prj.epsg && EngCalcs.lpnCrsHas && EngCalcs.lpnCrsHas(prj.epsg));
+					refuse('lpn_shp_import_refuse_crs', '{file} states {theirs}, and this project is in {ours}. Nothing was imported and nothing was converted.', 'crs', theirsName || prj.name, canConvert);
 					return;
 				}
 			} else {
@@ -38069,6 +38090,10 @@ var EngCalcs = EngCalcs || {};
 				skipped.push(gisCounted('lpn_shp_import_skipped', total, '{n} records not imported: {list}.',
 					'One record not imported: {list}.').replace('{list}', gisList(sk)));
 			}
+			if (r.deletedRows) {
+				skipped.push(gisCounted('lpn_shp_import_deleted', r.deletedRows, '{n} records marked deleted in the .dbf were not imported.',
+					'One record marked deleted in the .dbf was not imported.'));
+			}
 			if (r.holes) {
 				skipped.push(gisCounted('lpn_geojson_import_holes', r.holes, '{n} polygon holes not imported. A Shape has one boundary.',
 					'One polygon hole not imported. A Shape has one boundary.'));
@@ -38077,7 +38102,7 @@ var EngCalcs = EngCalcs || {};
 				skipped.push(gisCounted('lpn_geojson_import_parts', r.multipart, '{n} multipart features imported as one Shape for each part.',
 					'One multipart feature imported as one Shape for each part.'));
 			}
-			gisPlaceShapes(items, fileName, lines, skipped, done, { skipped: r.skipped, holes: r.holes, multipart: r.multipart, mode: mode });
+			gisPlaceShapes(items, fileName, lines, skipped, done, { skipped: r.skipped, holes: r.holes, multipart: r.multipart, deletedRows: r.deletedRows, mode: mode });
 		}
 	}
 	// ---- EXPORT DXF FILE (ROADMAP Task 772) ---------------------------------------------------------

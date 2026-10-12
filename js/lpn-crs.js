@@ -268,7 +268,54 @@
 		return m ? { toMeter: parseFloat(m[1]) } : { units: 'm' };
 	}
 
+	/**
+	 * **DOES AN ESRI OR OGC WKT .prj STATE THIS COORDINATE SYSTEM?** (Task 779.) An ArcGIS-written
+	 * .prj carries no EPSG code, only the projection method and its parameters
+	 * (NAD_1983_StatePlane_Texas_South_Central_FIPS_4204_Feet), so a name or a code cannot say. The
+	 * test is the arithmetic: the WKT is turned into a proj4 definition and both are asked for the
+	 * plane position of nine points about its origin; they are the same system when every answer
+	 * agrees to 5 mm. Returns true, false, or null where the method is not one this reads (so the
+	 * caller must not claim either). No datum shift is applied: both sides are taken as the
+	 * geographic coordinates they are given, the way the suite reads every other .prj.
+	 */
+	function matchWkt(code, wkt) {
+		var t = String(wkt || ''), id = name(code), P = {}, m, re = /PARAMETER\s*\[\s*"([^"]+)"\s*,\s*([-+0-9.eE]+)\s*\]/gi,
+			proj, sph, units = [], uf = 1, mapped, a, b, lon0, lat0, probes = [], i, j, A, B, parts, maxd = 0, defStr;
+		if (!id || !root.proj4) { return null; }
+		while ((m = re.exec(t))) { P[m[1].toLowerCase().replace(/[^a-z0-9]/g, '')] = parseFloat(m[2]); }
+		proj = /PROJECTION\s*\[\s*"([^"]+)"/i.exec(t);
+		sph = /SPHEROID\s*\[\s*"[^"]*"\s*,\s*([-+0-9.eE]+)\s*,\s*([-+0-9.eE]+)/i.exec(t);
+		units = t.match(/UNIT\s*\[\s*"[^"]*"\s*,\s*([-+0-9.eE]+)/gi) || [];
+		if (!proj || !sph || units.length < 2) { return null; }
+		uf = parseFloat(/,\s*([-+0-9.eE]+)/.exec(units[units.length - 1])[1]);
+		mapped = { transversemercator: 'tmerc', gausskruger: 'tmerc', lambertconformalconic: 'lcc', lambertconformalconic2sp: 'lcc',
+			lambertconformalconic1sp: 'lcc', albers: 'aea', albersconicequalarea: 'aea', mercator: 'merc', mercator1sp: 'merc' }[proj[1].toLowerCase().replace(/[^a-z0-9]/g, '')];
+		if (!mapped || !isFinite(uf) || !(uf > 0)) { return null; }
+		lon0 = P.centralmeridian !== undefined ? P.centralmeridian : (P.longitudeoforigin !== undefined ? P.longitudeoforigin : 0);
+		lat0 = P.latitudeoforigin !== undefined ? P.latitudeoforigin : 0;
+		defStr = '+proj=' + mapped + ' +lat_0=' + lat0 + ' +lon_0=' + lon0;
+		if (mapped === 'lcc' || mapped === 'aea') {
+			defStr += ' +lat_1=' + (P.standardparallel1 !== undefined ? P.standardparallel1 : lat0);
+			defStr += ' +lat_2=' + (P.standardparallel2 !== undefined ? P.standardparallel2 : (P.standardparallel1 !== undefined ? P.standardparallel1 : lat0));
+		}
+		if (mapped === 'tmerc' || mapped === 'lcc' || mapped === 'merc') { defStr += ' +k_0=' + (P.scalefactor !== undefined ? P.scalefactor : 1); }
+		defStr += ' +x_0=' + ((P.falseeasting || 0) * uf) + ' +y_0=' + ((P.falsenorthing || 0) * uf);
+		defStr += ' +a=' + parseFloat(sph[1]) + ' +rf=' + parseFloat(sph[2]) + ' +to_meter=' + uf + ' +no_defs';
+		try {
+			root.proj4.defs('LPNCRS:WKT', defStr);
+			for (i = -1; i <= 1; i++) { for (j = -1; j <= 1; j++) { probes.push([lon0 + i * 0.5, Math.max(-80, Math.min(80, lat0 + j * 0.5))]); } }
+			for (i = 0; i < probes.length; i++) {
+				A = root.proj4(WGS84, id, probes[i]); B = root.proj4(WGS84, 'LPNCRS:WKT', probes[i]);
+				if (!isFinite(A[0]) || !isFinite(B[0])) { return false; }
+				maxd = Math.max(maxd, Math.abs(A[0] - B[0]), Math.abs(A[1] - B[1]));
+			}
+		} catch (e) { return null; }
+		// The unit is part of the answer: the same arithmetic in feet and in metres differs by 3x.
+		return maxd < 0.005;
+	}
+
 	EngCalcs.lpnCrsLoad = load;
+	EngCalcs.lpnCrsMatchWkt = matchWkt;
 	EngCalcs.lpnCrsUnit = unitOf;
 	EngCalcs.lpnCrsReady = ready;
 	EngCalcs.lpnCrsHas = has;

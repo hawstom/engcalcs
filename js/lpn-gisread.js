@@ -36,7 +36,7 @@
 	 */
 	EngCalcs.lpnDxfShapes = function (text) {
 		var lines, i, code, val, section = '', want = false, ents = [], cur = null, insunits = null, hdr = '',
-			shapes = [], skipped = {}, order = [], bulged = 0, inBlocks = 0, sawEnt = false;
+			shapes = [], skipped = {}, order = [], bulged = 0, inBlocks = 0, paper = 0, sawEnt = false;
 		text = String(text);
 		if (text.slice(0, 18) === 'AutoCAD Binary DXF') { return { ok: false, detail: 'binary' }; }
 		lines = text.split(/\r\n|\n|\r/);
@@ -48,10 +48,10 @@
 			if (!isFinite(code)) { return { ok: false, detail: 'pairs' }; }
 			if (code === 0) {
 				cur = null;
-				if (val === 'SECTION') { want = true; continue; }
+				if (val === 'SECTION') { want = true; sawEnt = true; continue; }
 				if (val === 'ENDSEC') { section = ''; continue; }
-				if (val === 'EOF') { break; }
-				if (section === 'ENTITIES' || section === 'BLOCKS') { cur = { type: val, g: [], blocks: section === 'BLOCKS' }; ents.push(cur); sawEnt = true; }
+				if (val === 'EOF') { sawEnt = true; break; }
+				if (section === 'ENTITIES' || section === 'BLOCKS') { cur = { type: val, g: [], blocks: section === 'BLOCKS' }; ents.push(cur); }
 				continue;
 			}
 			if (want && code === 2) { section = val; want = false; continue; }
@@ -81,6 +81,31 @@
 			return { x: num(x), y: num(y), tok: { x: x, y: y } };
 		}
 		function good(p) { return isFinite(p.x) && isFinite(p.y); }
+		// **OBJECT COORDINATE SYSTEM** (DXF reference, "Arbitrary Axis Algorithm"): the vertices of an
+		// LWPOLYLINE and of a 2D POLYLINE are in a plane whose normal is the extrusion direction
+		// (groups 210, 220, 230; default 0,0,1), at the elevation given. A mirrored drawing (0,0,-1) or
+		// an inclined plane puts them elsewhere in the world. Returns null where the plane is the
+		// ordinary one, so the file's own characters are kept; else a function (x, y, z) -> {x, y}.
+		function ocsOf(e) {
+			var nx = num(group(e, 210) || '0'), ny = num(group(e, 220) || '0'), nz = num(group(e, 230) || '1'), l, ax, ay, az, bx, by, bz;
+			if (!isFinite(nx) || !isFinite(ny) || !isFinite(nz)) { return null; }
+			l = Math.sqrt(nx * nx + ny * ny + nz * nz);
+			if (!l) { return null; }
+			nx /= l; ny /= l; nz /= l;
+			if (nx === 0 && ny === 0 && nz === 1) { return null; }
+			if (Math.abs(nx) < 1 / 64 && Math.abs(ny) < 1 / 64) { ax = nz; ay = 0; az = -nx; }   // Wy x N
+			else { ax = -ny; ay = nx; az = 0; }                                                              // Wz x N
+			l = Math.sqrt(ax * ax + ay * ay + az * az); ax /= l; ay /= l; az /= l;
+			bx = ny * az - nz * ay; by = nz * ax - nx * az; bz = nx * ay - ny * ax;                                                    // N x Ax
+			return function (x, y, z) { return { x: x * ax + y * bx + z * nx, y: x * ay + y * by + z * ny }; };
+		}
+		function toWorld(pts, f, z) {
+			if (!f) { return pts; }
+			return pts.map(function (p) {
+				var w = f(p.x, p.y, z);
+				return { x: w.x, y: w.y, tok: { x: undefined, y: undefined }, computed: true };
+			});
+		}
 		function emit(type, layer, flags, pts, bulge) {
 			if (!pts.length || !pts.every(good)) { skip(type + ' (no usable position)'); return; }
 			if (bulge) { bulged++; }
@@ -89,9 +114,14 @@
 		for (i = 0; i < ents.length; i++) {
 			var e = ents[i], layer = group(e, 8) || '', flags = parseInt(group(e, 70), 10) || 0;
 			if (e.blocks) { if (e.type !== 'BLOCK' && e.type !== 'ENDBLK') { inBlocks++; } continue; }
+			// MODEL SPACE ONLY: group 67 = 1 is paper space, the sheet and its title block.
+			if (group(e, 67) === '1') {
+				if (e.type === 'POLYLINE') { var kk = i + 1; while (kk < ents.length && ents[kk].type === 'VERTEX') { kk++; } if (ents[kk] && ents[kk].type === 'SEQEND') { kk++; } i = kk - 1; }
+				paper++; continue;
+			}
 			if (e.type === 'POINT') { emit('POINT', layer, 0, [pointOf(e, 10, 20)]); }
 			else if (e.type === 'LINE') { emit('LINE', layer, 0, [pointOf(e, 10, 20), pointOf(e, 11, 21)]); }
-			else if (e.type === 'LWPOLYLINE') { e.bulge = false; var vs = lwVerts(e); emit('LWPOLYLINE', layer, flags, vs, e.bulge); }
+			else if (e.type === 'LWPOLYLINE') { e.bulge = false; var vs = lwVerts(e); emit('LWPOLYLINE', layer, flags, toWorld(vs, ocsOf(e), num(group(e, 38) || '0') || 0), e.bulge); }
 			else if (e.type === 'POLYLINE') {
 				var pv = [], bl = false, k = i + 1, f2;
 				while (k < ents.length && ents[k].type === 'VERTEX') {
@@ -106,14 +136,14 @@
 				if (ents[k] && ents[k].type === 'SEQEND') { k++; }
 				i = k - 1;
 				if (flags & (16 | 64)) { skip('POLYLINE (mesh)'); }
-				else { emit('POLYLINE', layer, flags, pv, bl); }
+				else { emit('POLYLINE', layer, flags, (flags & 8) ? pv : toWorld(pv, ocsOf(e), num(group(e, 30) || '0') || 0), bl); }
 			}
 			else if (e.type === 'VERTEX' || e.type === 'SEQEND') { continue; }
 			else { skip(e.type); }
 		}
 		if (!sawEnt) { return { ok: false, detail: 'sections' }; }
 		return {
-			ok: true, shapes: shapes, bulged: bulged, inBlocks: inBlocks,
+			ok: true, shapes: shapes, bulged: bulged, inBlocks: inBlocks, paperSpace: paper,
 			skipped: order.map(function (k) { return { name: k, n: skipped[k] }; }),
 			insunits: insunits, unit: INSUNITS_NAME[insunits] || ''
 		};
@@ -158,8 +188,13 @@
 			});
 			o += 32;
 		}
-		try { dec = new TextDecoder(/1252|ansi|latin/i.test(cpg || '') ? 'windows-1252' : 'utf-8', { fatal: true }); }
-		catch (e) { dec = null; }
+		// The .cpg names the code page: UTF-8, or a number such as 1251 for windows-1251.
+		var label = 'utf-8', cm = /^\s*(?:cp|windows-?)?(\d{3,5})\s*$/i.exec(cpg || '');
+		if (/utf-?8|65001/i.test(cpg || '')) { label = 'utf-8'; }
+		else if (cm) { label = 'windows-' + cm[1]; }
+		else if (/8859|latin|ansi/i.test(cpg || '')) { label = 'windows-1252'; }
+		try { dec = new TextDecoder(label, { fatal: true }); }
+		catch (e) { try { dec = new TextDecoder('utf-8', { fatal: true }); } catch (e1) { dec = null; } }
 		for (r = 0; r < nrec; r++) {
 			p = hlen + r * rlen;
 			if (p + rlen > bytes.length) { break; }
@@ -168,8 +203,8 @@
 				var raw = bytes.subarray(q, q + fields[f].len), t;
 				try { t = (dec || new TextDecoder('windows-1252')).decode(raw); } catch (e2) { t = new TextDecoder('windows-1252').decode(raw); }
 				t = t.replace(/\0/g, '').trim();
-				row[fields[f].name] = fields[f].type === 'N' || fields[f].type === 'F'
-					? (t !== '' && isFinite(+t) ? +t : t) : (fields[f].type === 'L' ? (/^[TtYy]/.test(t) ? true : (/^[FfNn]/.test(t) ? false : '')) : t);
+				// A number stays the characters it was written as ("0000000170" is not 170).
+				row[fields[f].name] = fields[f].type === 'L' ? (/^[TtYy]/.test(t) ? true : (/^[FfNn]/.test(t) ? false : '')) : t;
 				q += fields[f].len;
 			}
 			rows.push(row);
@@ -205,7 +240,7 @@
 			m = /^(?:AUTHORITY|ID)\s*\[\s*"EPSG"\s*,\s*"?(\d+)"?/i.exec(t.slice(last));
 			if (m) { epsg = 'EPSG:' + m[1]; }
 		}
-		return { kind: kind, name: name, epsg: epsg };
+		return { kind: kind, name: name, epsg: epsg, wkt: t };
 	}
 
 	// ---- shapefile ---------------------------------------------------------------------------------
@@ -223,18 +258,37 @@
 		function skip(name) { if (!skipped[name]) { skipped[name] = 0; order.push(name); } skipped[name]++; }
 		function pt(p) { var x = dv.getFloat64(p, true), y = dv.getFloat64(p + 8, true); return { x: x, y: y, tok: { x: String(x), y: String(y) } }; }
 		while (o + 12 <= fileLen) {
-			var cl = dv.getInt32(o + 4, false) * 2, c = o + 8, type = dv.getInt32(c, true), base = BASE[type], parts = [], np, nq, k, j, ring, end;
+			var cl = dv.getInt32(o + 4, false) * 2, c = o + 8, type, base, parts = [], np, nq, k, j, ring, end;
+			if (cl < 4 || c + cl > bytes.length) { return { ok: false, detail: 'damaged' }; }
+			type = dv.getInt32(c, true); base = BASE[type];
 			o = c + cl;
 			if (type === 0) { skip('Null'); recs.push({ shapes: [] }); continue; }
 			if (!base) { skip(TYPE_NAME[type] || ('type ' + type)); recs.push({ shapes: [] }); continue; }
+			if ((base === 'point' && cl < 20) || (base === 'multi' && cl < 40) || ((base === 'line' || base === 'poly') && cl < 44)) { return { ok: false, detail: 'damaged' }; }
+			if (base === 'multi' && c + 40 + dv.getInt32(c + 36, true) * 16 > bytes.length) { return { ok: false, detail: 'damaged' }; }
 			if (base === 'point') { parts.push({ closed: false, pts: [pt(c + 4)] }); }
 			else if (base === 'multi') {
 				nq = dv.getInt32(c + 36, true);
 				for (k = 0; k < nq; k++) { parts.push({ closed: false, pts: [pt(c + 40 + k * 16)] }); }
 			} else {
 				np = dv.getInt32(c + 36, true); nq = dv.getInt32(c + 40, true);
-				var pOff = c + 44, qOff = pOff + np * 4, starts = [];
+				var pOff = c + 44, qOff = pOff + np * 4, starts = [], rings = [], anyCw = false;
+				if (np < 0 || nq < 0 || qOff + nq * 16 > bytes.length) { return { ok: false, detail: 'damaged' }; }
 				for (k = 0; k < np; k++) { starts.push(dv.getInt32(pOff + k * 4, true)); }
+				// A conforming writer puts exteriors clockwise; one that wrote every ring the other way
+				// would otherwise lose all but the first, so counterclockwise rings are holes only when
+				// some ring in the record is clockwise.
+				if (base === 'poly') {
+					for (k = 0; k < np; k++) {
+						var e2 = k + 1 < np ? starts[k + 1] : nq, a2 = 0, j2;
+						for (j2 = starts[k]; j2 + 1 < e2; j2++) {
+							var x1 = dv.getFloat64(qOff + j2 * 16, true), y1 = dv.getFloat64(qOff + j2 * 16 + 8, true),
+								x2 = dv.getFloat64(qOff + (j2 + 1) * 16, true), y2 = dv.getFloat64(qOff + (j2 + 1) * 16 + 8, true);
+							a2 += x1 * y2 - x2 * y1;
+						}
+						if (a2 < 0) { anyCw = true; }
+					}
+				}
 				for (k = 0; k < np; k++) {
 					end = k + 1 < np ? starts[k + 1] : nq;
 					ring = [];
@@ -243,7 +297,8 @@
 						// ESRI: an exterior ring runs clockwise and a hole counterclockwise (y up).
 						var area = 0, m;
 						for (m = 0; m + 1 < ring.length; m++) { area += ring[m].x * ring[m + 1].y - ring[m + 1].x * ring[m].y; }
-						if (k > 0 && area > 0 && parts.length) { holes++; continue; }
+						rings.push(area);
+						if (k > 0 && area > 0 && parts.length && anyCw) { holes++; continue; }
 						if (ring.length > 1 && ring[0].x === ring[ring.length - 1].x && ring[0].y === ring[ring.length - 1].y) { ring.pop(); }
 						parts.push({ closed: ring.length >= 3, pts: ring });
 					} else if (ring.length) { parts.push({ closed: false, pts: ring }); }
@@ -292,17 +347,18 @@
 				for (i = 0; i < l.length; i++) { if (l[i].name.replace(/\.[^.]*$/, '').toLowerCase() === stem) { return l[i].bytes; } }
 				return l.length === 1 && !shp.length ? l[0].bytes : null;
 			};
-			r = readShp(shp[0].bytes);
+			try { r = readShp(shp[0].bytes); } catch (e) { r = { ok: false, detail: 'damaged' }; }
 			if (!r.ok) { return r; }
 			var cp = pick('cpg'); if (cp) { cpg = new TextDecoder().decode(cp); }
 			var db = pick('dbf'); if (db) { dbf = readDbf(db, cpg); }
 			var pj = pick('prj'); if (pj) { prj = readPrj(new TextDecoder().decode(pj)); }
 			r.recs.forEach(function (rec, idx) {
 				var row = dbf && dbf.rows[idx] ? dbf.rows[idx] : null, attrs = null;
+				// A record the .dbf marks deleted ('*') is not part of the layer: skipped, and counted.
+				if (row && row.deleted) { if (rec.shapes.length) { deleted++; } return; }
 				if (row) {
 					attrs = {};
 					dbf.fields.forEach(function (f) { attrs[f] = row[f]; });
-					if (row.deleted) { deleted++; }
 				}
 				rec.shapes.forEach(function (s) { s.attrs = attrs; s.row = idx + 1; shapes.push(s); });
 			});
