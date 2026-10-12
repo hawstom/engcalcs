@@ -151,7 +151,11 @@ console.log('\n-- card descriptions read from the language file --');
 		report(langOf(ex.descKey) === ex.description, `${ex.file}: manifest description equals ${ex.descKey}`);
 	});
 	examples.filter(e => /^lpn_ex_basic_/.test(e.titleKey)).forEach(function (ex) {
-		report(/^A reservoir/.test(ex.description), `${ex.titleKey}: begins "A reservoir"`, ex.description);
+		report(/^(A|Two) reservoirs?/.test(ex.description), `${ex.titleKey}: begins with what it is, a reservoir`, ex.description);
+		const f = JSON.parse(fs.readFileSync(path.join(outDir, ex.file), 'utf8'));
+		const c = (o, t) => o.filter(x => x.type === t).length;
+		report(c(f.nodes, 'reservoir') === 2 && c(f.nodes, 'junction') === 6 && c(f.links, 'pump') === 1 && c(f.links, 'pipe') === 6 && c(f.nodes, 'tank') === 0,
+			`${ex.file}: 2 reservoirs, 6 junctions, 1 pump, 6 pipes, no tank (the counts its description states)`);
 		report(!/start here|starting|the same|the smallest/i.test(ex.description), `${ex.titleKey}: none of the struck phrases`);
 	});
 	examples.filter(e => /^Net2/.test(e.file)).forEach(function (ex) {
