@@ -137,6 +137,15 @@ function tokens(text, section) {
 		near(L.colorNodeValue(t2, 'depth'), L.toDisplay(120 * 0.3048, L.resultUnit('elevhead')), 1e-9),
 		String(L.colorNodeValue(t2, 'depth')));
 	ok('head is still base + level (970 ft)', L.nodeFixedHead(t2) === 970, String(L.nodeFixedHead(t2)));
+	// The two drawing exports say the same thing: plain elevation is the ground, the base is named.
+	// (GeoJSON needs a located project, so this uses the shipped Net3 on the world, tank 1.)
+	const world = L.migrateSaved(JSON.parse(fs.readFileSync(path.join(ROOT, 'examples', 'Net3-Novato-CA-World.lwn'), 'utf8')));
+	const wt = world.nodes.find((n) => n.id === '1');
+	wt.elev = wt.bottomElev - 20;
+	const gj = JSON.parse(EngCalcs.lpnExportGeoJson(world, {}).text);
+	const gt = gj.features.find((f) => f.properties.node_type && f.properties.name === '1').properties;
+	ok('GeoJSON: elevation is the ground, base_elevation the base',
+		gt.elevation === wt.elev && gt.base_elevation === wt.bottomElev, JSON.stringify(gt));
 
 	// Specific gravity reaches a tank's pressure exactly as it reaches a junction's, in each engine.
 	// (They differ from each other: the native solver multiplies by SG and EPANET, in metres, does

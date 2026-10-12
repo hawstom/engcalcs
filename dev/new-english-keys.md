@@ -540,9 +540,9 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### chore/roadmap-1011c (`4cda3c09`) — adds no English strings
 
-### chore/selection-word (`874ec357`) — adds no English strings
+### chore/selection-word (`2422186e`) — adds no English strings
 
-### feat/bentley-interop (`81ddc836`) — 101 new, 101 to read @@ NEEDS RULING
+### feat/bentley-interop (`f43dde69`) — 101 new, 101 to read @@ NEEDS RULING
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -872,7 +872,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`2e5e81c4`) — adds no English strings
 
-### feat/match-property (`7b82ae84`) — 14 new, 14 to read @@ NEEDS RULING
+### feat/match-property (`38f68c9a`) — 14 new, 14 to read @@ NEEDS RULING
 
 - **`lpn_match_done_many`**
   > Matched {m} assets to {id}, except status and location. Values changed: {n}.
@@ -917,7 +917,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Mode: Match properties. Select the asset to copy properties from. Status, identity, and location are not copied. Press Escape to cancel.
   @@ NEEDS RULING
 
-### feat/shape (`5d104743`) — 25 new, 25 to read @@ NEEDS RULING
+### feat/shape (`0a1f1359`) — 25 new, 25 to read @@ NEEDS RULING
 
 - **`lpn_file_import_shapes`**
   > Import GeoJSON shapes…
@@ -995,7 +995,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Draw a point, a polyline, or a polygon on the map. A Shape is annotation and is not part of the network. Specify each point, then specify the last point again, press Enter, or right-click to finish. Specify the first point again to close the Shape into a polygon.
   @@ NEEDS RULING
 
-### feat/si-example (`61385282`) — 4 new, 4 to read @@ NEEDS RULING
+### feat/si-example (`d29aa243`) — 4 new, 4 to read @@ NEEDS RULING
 
 - **`lpn_ex_net2_si_desc`**
   > Litres per second, with metres and millimetres. EPANET’s Net2, converted from gallons per minute, feet and inches: a branched distribution system with a tank.
@@ -1010,10 +1010,10 @@ build for that would be a gate nobody keeps. Refresh it with
   > EPANET Net3, L/s (SI)
   @@ NEEDS RULING
 
-### feat/tank-ground (`25f4b72e`) — adds no English strings
+### feat/tank-ground (`08dcef0b`) — adds no English strings
 
 ### feat/visit-dedupe (`f8cf3ed5`) — adds no English strings
 
 ### fix/dxf-layer-code (`d87ca580`) — adds no English strings
 
-### fix/run-report (`f908c408`) — adds no English strings
+### fix/run-report (`6e92e48b`) — adds no English strings

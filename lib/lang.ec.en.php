@@ -1028,7 +1028,7 @@ $ec_lang['lpn_field_tank_diameter_tip']='For a vertical cylinder. Same units as 
 // 'head' is a documented trap term in glossary.json. This tip names it as a level, which is the
 // same guard lpn_field_head_tip carries for the reservoir.
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_tank_head_tip']='Water surface elevation in the tank: the tank bottom elevation plus the water depth.';
+$ec_lang['lpn_tank_head_tip']='Water surface elevation in the tank: the base elevation plus the water depth.';
 $ec_lang['lpn_close']='Close';
 // The corner buttons beside every standing box's X (Task 441). Each is an icon-only button, so the
 // value is its name: the hover tip and the screen reader's label at once. Auto-hide is a toggle and
