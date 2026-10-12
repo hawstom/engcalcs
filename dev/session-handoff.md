@@ -101,15 +101,11 @@ lines rather than appending corrections.
 
 ## STATE — 2026-10-12 (fourteenth session, Arizona time)
 
-### Master: 411ed88c, unchanged this session. Production: ask; About box
+### Master: f9bcdee1 (2026-10-12). Production: ask; About box
 
-**NOTHING MERGED: the classifier refused the master merge** (chore/roadmap-1011c + fix/dxf-layer-code +
-feat/visit-dedupe in one command). Ask him to TYPE the merge word. Then, in this order, regenerate payloads
-on each merge commit and run the suite on the merge commit: chore/roadmap-1011c (4cda3c09: roadmap 784 and
-787 at 100, 759 call, 639 rescoped; Ida's journal), fix/dxf-layer-code (d87ca580), feat/visit-dedupe
-(f8cf3ed5, consent in 26 languages; then G05: merge and push librewaternet.org branch `visit-code-claim`),
-fix/run-report (6e92e48b, Perry CONFIRMED), fix/paste-quote (bf27bce3), chore/selection-word (2422186e).
-After dxf merges: feat/shape must add `shape: 'SHAP'` to `ASSET_CODE` in js/lpn-dxf.js.
+Merged on his typed word and pushed: chore/roadmap-1011c, fix/dxf-layer-code, feat/visit-dedupe, fix/run-report,
+fix/paste-quote, chore/selection-word; librewaternet.org `visit-code-claim` merged and pushed (226d1b8).
+feat/shape must still add `shape: 'SHAP'` to `ASSET_CODE` in js/lpn-dxf.js when master is next merged into it.
 
 ### Branches awaiting his browser pass (pushed; all on the Branch previews page)
 
@@ -125,7 +121,6 @@ After dxf merges: feat/shape must add `shape: 'SHAP'` to `ASSET_CODE` in js/lpn-
   is the old Match/Copy task). His call.
 - **feat/bentley-interop** (f43dde69, 8116): menu in his order; his tip finished; first override creates an
   alternative named after the scenario (derived, not stored); no alert. Three questions in the 10-12 report.
-- chore/selection-word: 23 strings; his calls: "Press" for buttons; single checkboxes ("Checked"?).
 
 ### Questions out to him (10-12 report)
 
@@ -138,7 +133,7 @@ After dxf merges: feat/shape must add `shape: 'SHAP'` to `ASSET_CODE` in js/lpn-
 
 ### Next job
 
-His typed merge word, then the merge order above. Then the delta sprint (Wave 0 first). Agents' wish lists
+The delta sprint (Wave 0 first). Agents' wish lists
 were not read this session.
 
 ### Traps met 2026-10-12 (fourteenth session)
