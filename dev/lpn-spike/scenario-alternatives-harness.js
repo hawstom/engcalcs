@@ -451,8 +451,10 @@ console.log('\n--- settings: an override resolves in its scenario and not in Bas
 	L.deleteScenario(pk2.id);
 	L.switchScenario('base');
 	const after = JSON.parse(L.projectFileText()), was = JSON.parse(before);
-	ok('...and with the scenario gone the file is what it was, but for the two empty records it made, which stay',
-		JSON.stringify((after.alternatives || []).concat(after.calcSets || []).map(function (r) { return r.name; })) === '["Peak Hour","Peak Hour"]' &&
+	// Basic mode is on here, so deleting the scenario deletes the two records only it named (Tom,
+	// 2026-10-12, B5); with Basic mode off they would stay (scenario-pass-1012-browser-harness.js).
+	ok('...and with the scenario gone in Basic mode, the file is what it was: the two records it made went with it',
+		!(after.alternatives || []).length && !(after.calcSets || []).length &&
 		(delete after.alternatives, delete after.calcSets, JSON.stringify(after) === JSON.stringify(was)));
 
 	// A file is read, never trusted.

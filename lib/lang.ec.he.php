@@ -2653,7 +2653,6 @@ $ec_lang['lpn_scenario_new_name']='תרחיש {n}';
 $ec_lang['lpn_scenario_prompt_name']='שם עבור תרחיש זה';
 $ec_lang['lpn_scenario_rename']='שינוי שם תרחיש…';
 $ec_lang['lpn_scenario_delete']='מחיקת תרחיש';
-$ec_lang['lpn_scenario_delete_confirm']='למחוק את התרחיש {name} ואת {n} הערכים המותאמים שלו? השרטוט עצמו אינו משתנה.';
 $ec_lang['lpn_scenario_override']='ערך מותאם בתרחיש זה';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_scenario_override_tip']='מסומן פירושו שתרחיש זה עוקף את ההורה שלו עבור ערך זה, גם כאשר המספר זהה. בטלו את הסימון בתיבה כדי להשתמש בערך של ההורה.';

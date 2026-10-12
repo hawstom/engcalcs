@@ -2656,7 +2656,6 @@ $ec_lang['lpn_scenario_new_name']='Skenario {n}';
 $ec_lang['lpn_scenario_prompt_name']='Nama untuk skenario ini';
 $ec_lang['lpn_scenario_rename']='Ganti nama skenario…';
 $ec_lang['lpn_scenario_delete']='Hapus skenario';
-$ec_lang['lpn_scenario_delete_confirm']='Hapus skenario {name}, beserta {n} nilai khususnya? Gambar itu sendiri tidak berubah.';
 $ec_lang['lpn_scenario_override']='Nilai khusus di skenario ini';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_scenario_override_tip']='Dicentang berarti skenario ini menimpa induknya untuk nilai ini, meskipun angkanya sama. Hapus centang untuk memakai nilai induk.';

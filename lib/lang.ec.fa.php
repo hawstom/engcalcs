@@ -2652,7 +2652,6 @@ $ec_lang['lpn_scenario_new_name']='سناریوی {n}';
 $ec_lang['lpn_scenario_prompt_name']='نامی برای این سناریو';
 $ec_lang['lpn_scenario_rename']='تغییر نام سناریو…';
 $ec_lang['lpn_scenario_delete']='حذف سناریو';
-$ec_lang['lpn_scenario_delete_confirm']='سناریوی {name} و {n} مقدار اختصاصی آن حذف شود؟ خود ترسیم تغییر نمی‌کند.';
 $ec_lang['lpn_scenario_override']='مقدار اختصاصی در این سناریو';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_scenario_override_tip']='علامت‌دار یعنی این سناریو برای این مقدار بر والد خود مقدم است، حتی وقتی عدد یکسان است. برای استفاده از مقدار والد، علامت جعبه را بردارید.';

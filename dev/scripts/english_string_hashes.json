@@ -1,7 +1,7 @@
 {
     "description": "sha1 of each lang.ec.en.php $ec_lang value as of the last full translation sync. Maintained by detect_english_drift.php --update. A current-vs-manifest hash mismatch means that key's English changed and translations may be stale. Do not hand-edit.",
     "updated": "2026-09-30",
-    "count": 2556,
+    "count": 2555,
     "partial_updates": [
         {
             "date": "2026-08-08",
@@ -7147,7 +7147,6 @@
         "lpn_scenario_deactivated": "e2346a19f78e8c9e1b105bf9f5bdb97368b7d98c",
         "lpn_scenario_delete": "92f18604ed3875b89df8b049319e29504e03e6d5",
         "lpn_scenario_delete_blocked": "507e26e6a8f143996f6317842d62bf1810732ebf",
-        "lpn_scenario_delete_confirm": "e4788e600ebea20d080d24a668987025ca9257bb",
         "lpn_scenario_delete_in_base": "681cb93e064e8298506f582ade94ce28cf3fa8b8",
         "lpn_scenario_label": "569aae5b47e464b83049959de67717fbf2ff4407",
         "lpn_scenario_mark_tip": "9dced59c405c291c951a61e7e9c928dde016c532",
@@ -14803,10 +14802,6 @@
         },
         "lpn_scenario_delete_blocked": {
             "words": 26,
-            "ends_sentence": true
-        },
-        "lpn_scenario_delete_confirm": {
-            "words": 19,
             "ends_sentence": true
         },
         "lpn_scenario_delete_in_base": {

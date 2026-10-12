@@ -2664,7 +2664,6 @@ $ec_lang['lpn_scenario_new_name']='Scénario {n}';
 $ec_lang['lpn_scenario_prompt_name']='Nom de ce scénario';
 $ec_lang['lpn_scenario_rename']='Renommer le scénario…';
 $ec_lang['lpn_scenario_delete']='Supprimer le scénario';
-$ec_lang['lpn_scenario_delete_confirm']='Supprimer le scénario {name} et ses {n} valeurs personnalisées ? Le dessin lui-même n\'est pas modifié.';
 $ec_lang['lpn_scenario_override']='Valeur personnalisée dans ce scénario';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_scenario_override_tip']='Cochée, ce scénario remplace la valeur de son parent pour cette valeur, même si le nombre est identique. Décochez la case pour utiliser celle de son parent.';

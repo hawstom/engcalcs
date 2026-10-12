@@ -1727,7 +1727,7 @@ var EngCalcs = EngCalcs || {};
 				px = pt.x, py = pt.y,
 				b = Geom.orientedLabelBox(px, py, textLabelWidth(le), textLabelHeight(lb),
 					labelHAlign(lb), labelVAlign(lb), textLabelSvgAngle(lb),
-					effectiveFontSize(lb && lb.sizeMult));
+					effectiveFontSize(textSizeMult(lb)));
 			b.kind = 'label';
 			// **THE BOX AND ITS OWN CALLOUT LINE ARE ONE OBJECT ON THE MAP, and a reader of this
 			// list has to be able to say so.** `linkOwner` already does that job for a stationed
@@ -4259,13 +4259,16 @@ var EngCalcs = EngCalcs || {};
 			curveId: true, efficCurveId: true, typeId: true, fittingsId: true,
 		// A pump's relative speed and its speed pattern (Tom, 2026-10-12, as above).
 			speed: true, speedPattern: true },
-		// A TEXT LABEL IS A THIRD GROUP (Task 407) with exactly two properties: `text` is what the
-		// note SAYS and `active` whether it is there at all, which together answer "this scenario has
-		// its own note" with no second mechanism.
-		// Its POSITION, size multiplier, anchor node and alignment stay Base-owned: two scenarios of
-		// one network must LOOK the same or you cannot compare them.
-
-		label: { text: true, active: true }
+		// A TEXT LABEL IS A THIRD GROUP (Task 407). `text` is what the note SAYS and `active` whether
+		// it is there at all, which together answer "this scenario has its own note" with no second
+		// mechanism. **ITS POSITION AND ITS LOOK ARE OVERRIDABLE TOO** (Tom, 2026-10-12: *"I moved a
+		// text in Fig 5, a grandchild of Base. But there is no override for text location, so it
+		// moved in all scenarios."*; every property overridable is his standing rule): `x`/`y` (an
+		// offset from its anchor when attached, else its point), size, both alignments, bold, angle
+		// and Show at all zoom levels. Its ATTACHMENT (anchorNode, anchorLink, anchorT) stays
+		// Base-owned: it decides what x and y mean, so it cannot differ under a scenario's x and y.
+		label: { text: true, active: true, x: true, y: true, sizeMult: true, align: true, valign: true,
+			bold: true, rot: true, allZoom: true }
 	};
 	// The two overridable properties stored WITHOUT their underscore -- see the note above. Read by
 	// effective(), baseValue() and setProp(), which is every fork there is.
@@ -4278,8 +4281,10 @@ var EngCalcs = EngCalcs || {};
 	// The two positions are here too (their outward conversion is asked first, LPN_COORD_PROP).
 	// dev/scripts/scenario_seam_check.php reads this list and refuses a bare write of any of them
 	// that is not marked `// base-write:`.
+	// A Text's own look is stored bare too, as it always was (`sizeMult`, `align`...).
 	var LPN_BARE_PROP = { x: true, y: true, elev: true, bottomElev: true, minLevel: true, maxLevel: true, tankDiameter: true, volCurve: true,
-		mixingModel: true, mixingFraction: true, headPattern: true, speed: true, speedPattern: true };
+		mixingModel: true, mixingFraction: true, headPattern: true, speed: true, speedPattern: true,
+		sizeMult: true, align: true, valign: true, bold: true, rot: true, allZoom: true };
 	// **WHERE BASE KEEPS A JUNCTION'S `demands`** (R-369): row 0 is `_demand` plus two of these
 	// fields, and the rest of the list is `extraDemands`. A plain write to any of them edits Base
 	// from inside a scenario, exactly as `el._diameter = v` would, so
@@ -4319,6 +4324,8 @@ var EngCalcs = EngCalcs || {};
 		if (LPN_COORD_PROP[prop]) {
 			var oc = resolvedOverrides(activeScenario())[ovKey(el)];
 			if (oc && typeof oc[prop] === 'number') { return oc[prop]; }
+			// A Text's x and y are outward too: its point, or its offset when attached (textCoordOut()).
+			if (el._text !== undefined) { return textCoordOut(el, prop, el[prop]); }
 			return prop === 'y' ? outwardY(el.y) : outwardX(el.x);
 		}
 		// **A JUNCTION'S DEMAND BREAKDOWN IS ONE PROPERTY WITH A SPREAD-OUT STORAGE** (R-369): a
@@ -4727,7 +4734,10 @@ var EngCalcs = EngCalcs || {};
 	function baseValue(el, prop) {
 		// Base's own position, outward, for the "Base scenario: {value}" line beside an overridden
 		// coordinate row. Stored bare, so it cannot come out of `el['_' + prop]`.
-		if (LPN_COORD_PROP[prop]) { return prop === 'y' ? outwardY(el.y) : outwardX(el.x); }
+		if (LPN_COORD_PROP[prop]) {
+			if (el._text !== undefined) { return textCoordOut(el, prop, el[prop]); }
+			return prop === 'y' ? outwardY(el.y) : outwardX(el.x);
+		}
 		if (prop === 'active' && el['_' + prop] === undefined) { return true; }
 		if (LPN_BARE_PROP[prop]) { return el[prop]; }
 		return el['_' + prop];
@@ -4783,6 +4793,8 @@ var EngCalcs = EngCalcs || {};
 			return;
 		}
 		if (!inBaseScenario() && isOverridable(el, prop)) { setOverride(el, prop, value); return; }
+		// A Text's x or y arrives outward, as a node's does, and Base keeps it in the drawing frame.
+		if (LPN_COORD_PROP[prop] && elGroup(el) === 'label') { el[prop] = textCoordIn(el, prop, value); return; }   // base-write: setProp() in Base, the one door
 		if (LPN_BARE_PROP[prop] && isOverridable(el, prop)) { el[prop] = value; return; }   // base-write: setProp() in Base, the one door
 		el['_' + prop] = value;
 	}
@@ -4911,8 +4923,13 @@ var EngCalcs = EngCalcs || {};
 			// setting by its name; its pattern goes with it. Not confirmed from a cited page.
 			speed: 'initial', speedPattern: 'initial' },
 		// A Text's `active` is not topology: it takes nothing out of the solve, and Bentley keeps
-		// annotation outside the model altogether.
-		label: { text: 'text', active: 'text' }
+		// annotation outside the model altogether. **EVERY PROPERTY OF A TEXT IS IN THE TEXT
+		// CATEGORY**, its position and look included (2026-10-12): one note is one alternative's
+		// business, so a scenario's own version of a note is one Text alternative, not a Text and a
+		// Presentation alternative split down the middle of one object. Presentation stays the
+		// category of the Settings box's drawing settings.
+		label: { text: 'text', active: 'text', x: 'text', y: 'text', sizeMult: 'text', align: 'text', valign: 'text',
+			bold: 'text', rot: 'text', allZoom: 'text' }
 	};
 	// group 'setting': `prop` is a setting's path, answered by categoryOfSetting() -- null for one
 	// that may never vary by scenario, undefined for one no table names.
@@ -5940,7 +5957,9 @@ var EngCalcs = EngCalcs || {};
 		who = smInUseBy(tree, key);
 		if (who.length) { return treeRefuse('in use', { who: who }); }
 		if (kind === 'scn') {
+			var plan = scenarioDeletePlan(r);
 			scenarios.splice(scenarios.indexOf(r), 1);
+			dropScenarioOrphans(plan);
 			if (Array.isArray(project.compareSet)) {
 				project.compareSet = project.compareSet.filter(function (id) { return id !== key; });
 			}
@@ -6187,8 +6206,11 @@ var EngCalcs = EngCalcs || {};
 		cats.forEach(function (cat) {
 			var t = writeTargetFor(scn, cat);
 			if (!t || t.kind === 'scn') { return; }
-			smUsedBy(cat, t.obj.id).forEach(function (u) {
-				if (u.id !== scn.id && !seen[u.id]) { seen[u.id] = true; names.push(scenarioDisplayName(u)); }
+			// **ONLY SCENARIOS THAT NAME IT** (Sue, 2026-10-12): a child that inherits it is
+			// inheritance, the point of a child, not the sharing "Share edits" sets up.
+			storedUsers(t.kind === 'calc' ? 'calc' : 'alt', t.obj.id).scenarios.forEach(function (id) {
+				var u = scenarioById(id);
+				if (u && u.id !== scn.id && !seen[u.id]) { seen[u.id] = true; names.push(scenarioDisplayName(u)); }
 			});
 		});
 		return names.length ? (pc.lpn_sm_shared_note || 'Shared with: {list}').replace('{list}', names.join(', ')) : '';
@@ -6790,13 +6812,15 @@ var EngCalcs = EngCalcs || {};
 	// **REFUSED WHILE IT HAS CHILD SCENARIOS** (stage 5), naming them; the stored alternatives it
 	// names are the document's and survive it.
 	function deleteScenario(id) {
-		var s = scenarioById(id), from = activeScenario(), kids;
+		var s = scenarioById(id), from = activeScenario(), kids, plan;
 		if (!s || s.isBase) { return; }
 		kids = scenarios.filter(function (x) { return x.parent === id; }).map(function (x) { return x.id; });
 		if (kids.length) { return treeRefuse('children', { children: kids }); }
+		plan = scenarioDeletePlan(s);
 		// In place, so the list keeps its identity and the epoch bump below is what the resolver's
 		// cache answers to (not the identity guard, which is for a whole document swapped in).
 		scenarios.splice(scenarios.indexOf(s), 1);
+		dropScenarioOrphans(plan);
 		if (Array.isArray(project.compareSet)) { project.compareSet = project.compareSet.filter(function (x) { return x !== id; }); }
 		touchTree('deleteScenario');
 		if (project.activeScenario === id) { project.activeScenario = baseScenario().id; }
@@ -6806,6 +6830,42 @@ var EngCalcs = EngCalcs || {};
 	function scenarioById(id) {
 		for (var i = 0; i < scenarios.length; i++) { if (scenarios[i].id === id) { return scenarios[i]; } }
 		return null;
+	}
+	// **WHAT DELETING A SCENARIO TAKES WITH IT** (Tom, 2026-10-12, B5; Sue's F1). Its own values always
+	// go. The stored alternatives it names stay in the project with Basic mode off, as Bentley keeps
+	// them; with Basic mode on, where alternatives are hidden and automatic, each one no other
+	// scenario names and no other alternative inherits from goes with it. Read BEFORE the scenario is
+	// removed: {orphans: [{kind, id}], kept: [names], n: values deleted}.
+	function scenarioDeletePlan(sc) {
+		var out = { orphans: [], kept: [], n: 0 }, own = alternativesOf(sc);
+		if (!sc || sc.isBase) { return out; }
+		LPN_ALT_CATEGORIES.forEach(function (cat) { if (own[cat] && !own[cat].isBase) { out.n += own[cat].count; } });
+		LPN_ALT_CATEGORIES.forEach(function (cat) {
+			var kind = cat === 'calculation' ? 'calc' : 'alt', id = storedChoiceOf(sc, cat), rec, u, m;
+			if (id === undefined || id === LPN_BASE_CHOICE) { return; }
+			rec = storedById(storedList(kind), id);
+			if (!rec) { return; }
+			u = storedUsers(kind, id);
+			if (scenarioBasicMode && u.children.length === 0 && u.scenarios.every(function (x) { return x === sc.id; })) {
+				out.orphans.push({ kind: kind, id: id });
+				m = combineHolders([rec]);
+				Object.keys(m.values).forEach(function (k) { out.n += Object.keys(m.values[k]).length; });
+				out.n += settingLeaves(m.settings).length;
+				if (kind === 'calc' && typeof rec.demandMultiplier === 'number') { out.n++; }
+			} else if (out.kept.indexOf(String(rec.name || '')) < 0) { out.kept.push(String(rec.name || '')); }
+		});
+		return out;
+	}
+	function dropScenarioOrphans(plan) {
+		(plan && plan.orphans || []).forEach(function (o) { deleteStored(o.kind, o.id); });
+	}
+	// The one question both doors ask (the Scenarios menu's Delete and the Scenario manager's).
+	function scenarioDeleteQuestion(sc) {
+		var pc = EngCalcs.pageConfig || {}, plan = scenarioDeletePlan(sc), parts;
+		parts = [(pc.lpn_scenario_delete_ask || 'Delete the scenario {name}? The drawing itself is not changed.').replace('{name}', scenarioDisplayName(sc))];
+		if (plan.n) { parts.push((pc.lpn_scenario_delete_goes || 'Its {n} overrides are deleted with it.').replace('{n}', String(plan.n))); }
+		if (plan.kept.length) { parts.push((pc.lpn_scenario_delete_stays || 'These alternatives it uses stay in the project: {list}.').replace('{list}', plan.kept.join(', '))); }
+		return parts.join(' ');
 	}
 	/**
 	 * The scenario rows, built and returned rather than opened.
@@ -6932,11 +6992,14 @@ var EngCalcs = EngCalcs || {};
 		rows.push({
 			icon: 'insert', label: pc.lpn_scenario_new || 'New scenario…',
 			fn: function () {
-				var suggested = (pc.lpn_scenario_new_name || 'Scenario {n}').replace('{n}', scenarios.length);
+				var n = scenarios.length, suggested;
+				do { suggested = (pc.lpn_scenario_new_name || 'Scenario {n}').replace('{n}', n); n++; } while (smNameTaken('scenarios', suggested));
 				askDialog({ kind: 'prompt', text: pc.lpn_scenario_prompt_name || 'Name for this scenario', value: suggested }, function (v) {
 					if (v === null) { return; }
 					v = v.trim();
 					if (!v) { return; }
+					// The manager's rule (Sue, 2026-10-12): one name, one scenario, Base included.
+					if (smNameTaken('scenarios', v)) { setNotice((pc.lpn_sm_name_taken || 'The name {name} is already used in this tree.').replace('{name}', v)); return; }
 					saveUndoSnapshot();
 					createScenario(v);
 				});
@@ -6949,6 +7012,7 @@ var EngCalcs = EngCalcs || {};
 			fn: function () {
 				askDialog({ kind: 'prompt', text: pc.lpn_scenario_prompt_name || 'Name for this scenario', value: scn.name || '' }, function (v) {
 					if (v === null || !v.trim()) { return; }
+					if (smNameTaken('scenarios', v.trim(), scn.id)) { setNotice((pc.lpn_sm_name_taken || 'The name {name} is already used in this tree.').replace('{name}', v.trim())); return; }
 					saveUndoSnapshot();
 					scn.name = v.trim();
 					refreshScenarioStatus();
@@ -6960,10 +7024,8 @@ var EngCalcs = EngCalcs || {};
 		rows.push({
 			icon: 'close', label: pc.lpn_scenario_delete || 'Delete scenario', disabled: scn.isBase,
 			fn: function () {
-				// The count is the whole of the warning: a scenario holding nothing is worth no
-				// question, and one holding forty values is worth a specific one.
-				var msg = (pc.lpn_scenario_delete_confirm || 'Delete the scenario {name}, and its {n} overrides? The drawing itself is not changed.')
-					.replace('{name}', scenarioDisplayName(scn)).replace('{n}', overrideCount(scn));
+				// What goes and what stays, in this mode (scenarioDeleteQuestion()).
+				var msg = scenarioDeleteQuestion(scn);
 				// **A SCENARIO OTHERS INHERIT FROM IS NOT DELETED** (stage 5): say which, before asking.
 				var kids = scenarios.filter(function (x) { return x.parent === scn.id; });
 				if (kids.length) {
@@ -12201,8 +12263,8 @@ var EngCalcs = EngCalcs || {};
 	//
 	// A FREE-FLOATING Text has no leader and no side, so it keeps the manual control Task 342 added.
 	function labelHAlign(lb) {
-		if (textIsAnchored(lb)) { return lb.x >= 0 ? 'start' : 'end'; }
-		var a = lb && lb.align;
+		if (textIsAnchored(lb)) { return textOwnPoint(lb).x >= 0 ? 'start' : 'end'; }
+		var a = lb && effective(lb, 'align');
 		return a === 'left' ? 'start' : a === 'right' ? 'end' : 'middle';
 	}
 	// The leader lands at the vertical MIDDLE of the text, which is what AutoCAD's default vertical
@@ -12211,8 +12273,9 @@ var EngCalcs = EngCalcs || {};
 	function labelVAlign(lb) {
 		if (!lb) { return 'middle'; }
 		if (textIsAnchored(lb)) { return 'middle'; }
-		if (lb.valign === 'top') { return 'hanging'; }
-		if (lb.valign === 'bottom') { return 'bottom'; }
+		var v = effective(lb, 'valign');
+		if (v === 'top') { return 'hanging'; }
+		if (v === 'bottom') { return 'bottom'; }
 		return 'middle';
 	}
 	// **THE JUSTIFICATION HAS TO BE WRITTEN TO THE ELEMENT WHENEVER IT CHANGES, NOT ONLY WHEN THE
@@ -12280,7 +12343,7 @@ var EngCalcs = EngCalcs || {};
 		}
 		setMultilineText(textEl, x, lines.map(function (t) { return [{ text: t }]; }), textLabelFirstDy(lb));
 	}
-	function textLabelHeight(lb) { return effectiveFontSize(lb && lb.sizeMult) * 1.2 * textLabelLines(lb).length; }
+	function textLabelHeight(lb) { return effectiveFontSize(textSizeMult(lb)) * 1.2 * textLabelLines(lb).length; }
 
 	// ---- Task 337: a Text label's own boldface and its own rotation ----
 	//
@@ -12309,13 +12372,13 @@ var EngCalcs = EngCalcs || {};
 		return (a > 90 || a <= -90) ? normalizeDeg(a + 180) : a;
 	}
 	function textLabelRotation(lb) {
-		var r = lb ? +lb.rot : 0;
+		var r = lb ? +effective(lb, 'rot') : 0;
 		return isFinite(r) ? normalizeDeg(r) : 0;
 	}
 	function textLabelSvgAngle(lb) { return -textLabelRotation(lb); }
-	function textLabelWeight(lb) { return (lb && lb.bold) ? 'bold' : 'normal'; }
+	function textLabelWeight(lb) { return (lb && effective(lb, 'bold')) ? 'bold' : 'normal'; }
 	function textLabelStyle(lb) {
-		return 'font-size:' + effectiveFontSize(lb && lb.sizeMult) + 'px;font-weight:' + textLabelWeight(lb);
+		return 'font-size:' + effectiveFontSize(textSizeMult(lb)) + 'px;font-weight:' + textLabelWeight(lb);
 	}
 	// The attribute is REMOVED rather than set to a zero rotation when the label is upright: a stale
 	// transform is invisible in the code and obvious on screen.
@@ -12368,7 +12431,7 @@ var EngCalcs = EngCalcs || {};
 	// never disagree about where the same label is.
 	function textLabelBox(lb, le, px, py) {
 		var box = Geom.labelBoxAt(px, py, textLabelWidth(le), textLabelHeight(lb),
-				labelHAlign(lb), labelVAlign(lb), effectiveFontSize(lb && lb.sizeMult)),
+				labelHAlign(lb), labelVAlign(lb), effectiveFontSize(textSizeMult(lb))),
 			a = textLabelSvgAngle(lb);
 		return a ? rotatedAabb(box, px, py, a) : box;
 	}
@@ -12430,8 +12493,48 @@ var EngCalcs = EngCalcs || {};
 	// attachment. Every site that used to spell `an ? an.x + lb.x : lb.x` out for itself comes here
 	// instead, so a second kind of anchor could not be half-implemented.
 	function textLabelPoint(lb) {
-		var an = textAnchorPoint(lb);
-		return an ? { x: an.x + lb.x, y: an.y + lb.y } : { x: lb.x, y: lb.y };
+		var an = textAnchorPoint(lb), o = textOwnPoint(lb);
+		return an ? { x: an.x + o.x, y: an.y + o.y } : { x: o.x, y: o.y };
+	}
+	// ---- A TEXT'S POSITION IN A SCENARIO (Tom, 2026-10-12; see LPN_OVERRIDABLE) ----
+	//
+	// Base keeps lb.x/lb.y in the drawing frame, as it always has. An override is kept in the FILE'S
+	// frame, as a node's position override is: a free Text's point outward (origin added, y up,
+	// latitude in a geographic project), an attached Text's offset with only its y turned up, which
+	// is exactly what serializeProject() does to Base's own offset. So an override survives an
+	// origin shift and reads in a file the way Base's number beside it does.
+	function textCoordOut(lb, prop, v) {
+		if (typeof v !== 'number') { return v; }
+		if (textIsAnchored(lb)) { return prop === 'y' ? -v : v; }
+		return prop === 'y' ? outwardY(v) : outwardX(v);
+	}
+	function textCoordIn(lb, prop, v) {
+		if (typeof v !== 'number') { return v; }
+		if (textIsAnchored(lb)) { return prop === 'y' ? -v : v; }
+		return prop === 'y' ? inwardY(v) : inwardX(v);
+	}
+	// lb.x/lb.y as the current scenario has them, in the drawing frame: Base's own numbers untouched
+	// unless the scenario holds a position, so Base pays one lookup and no conversion.
+	function textOwnPoint(lb) {
+		var oc = inBaseScenario() ? null : resolvedOverrides(activeScenario())[ovKey(lb)], x = lb.x, y = lb.y;
+		if (oc && typeof oc.x === 'number') { x = textCoordIn(lb, 'x', oc.x); }
+		if (oc && typeof oc.y === 'number') { y = textCoordIn(lb, 'y', oc.y); }
+		return { x: x, y: y };
+	}
+	// The one door a gesture moves a Text through, drawing-frame numbers in: in Base the element, in
+	// a scenario an override of both (setProp()), so moving a note in Fig 5 moves it in Fig 5 only.
+	function setTextPoint(lb, x, y) {
+		if (inBaseScenario()) { lb.x = x; lb.y = y; return; }   // base-write: setTextPoint() in Base, the one door
+		setProp(lb, 'x', textCoordOut(lb, 'x', x));
+		setProp(lb, 'y', textCoordOut(lb, 'y', y));
+	}
+	// A Text's own look, as the current scenario has it.
+	function textSizeMult(lb) { return (lb && effective(lb, 'sizeMult')) || 1; }
+	function textAllZoom(lb) { return !!lb && effective(lb, 'allZoom') === true; }
+	// Stored only when ticked in Base (absence is the default); a scenario holds its own either way.
+	function setTextAllZoom(lb, on) {
+		if (!inBaseScenario()) { setProp(lb, 'allZoom', on); return; }
+		if (on) { lb.allZoom = true; } else { delete lb.allZoom; }   // base-write: setTextAllZoom() in Base, the one door
 	}
 	// **DETACHING A TEXT** (Tom, 2026-10-05: *"Text that is attached to an asset needs to be able to
 	// be detached, at least by deleting the attachment in Table or Properties."*). The words stay
@@ -13754,8 +13857,7 @@ var EngCalcs = EngCalcs || {};
 		return coordSlotIsY(slot) ? outwardY(pt.y) : outwardX(pt.x);
 	}
 	// Writing a FREE-FLOATING Text's position only -- an anchored one is read-only here (see the
-	// column's plainFor). Base-owned, exactly as size and justification are (Task 407): a Text's
-	// place on the drawing does not change with the scenario.
+	// column's plainFor). Overridable since 2026-10-12, like everything else a Text has.
 	function setLabelCoordAxis(lb, slot, v) {
 		var pc = EngCalcs.pageConfig || {}, isY;
 		if (!lb || !labelEls[lb.id] || textIsAnchored(lb)) { return false; }
@@ -13766,7 +13868,8 @@ var EngCalcs = EngCalcs || {};
 			return false;
 		}
 		isY = coordSlotIsY(slot);
-		if (isY) { lb.y = inwardY(v); } else { lb.x = inwardX(v); }   // base-write: position is Base-owned, exactly as size is
+		// Through the one seam, so a typed point in a scenario is that scenario's (Tom, 2026-10-12).
+		setProp(lb, isY ? 'y' : 'x', v);
 		updateLabelGeometry(lb.id);
 		relayoutLabels();
 		saveToStorage();
@@ -14028,16 +14131,16 @@ var EngCalcs = EngCalcs || {};
 	var ADVERSE_FRAC = 0.75;
 	function updateLabelGeometry(id) {
 		labelCacheTaint();
-		var lb = labelById(id), le = labelEls[id], an = textAnchorPoint(lb), px, py, box, halfW, att;
+		var lb = labelById(id), le = labelEls[id], an = textAnchorPoint(lb), px, py, box, halfW, att, own = textOwnPoint(lb);
 		if (!an) {
 			// repositionMultilineText(), not two setAttribute()s: every ROW of a multi-line label
 			// carries its own x, so moving the parent alone would strand the rows where they were
 			// (Task 342). It sets the parent's x/y too, so the single-line case is unchanged.
-			repositionMultilineText(le.text, lb.x, lb.y);
-			applyTextLabelRotation(lb, le, lb.x, lb.y);
+			repositionMultilineText(le.text, own.x, own.y);
+			applyTextLabelRotation(lb, le, own.x, own.y);
 			return;
 		}
-		px = an.x + lb.x; py = an.y + lb.y;
+		px = an.x + own.x; py = an.y + own.y;
 		box = textLabelBox(lb, le, px, py);
 		// **THE LEADER ENDS AT THE LABEL'S OWN POINT, AND NOTHING HERE READS A WIDTH.** An anchored
 		// label is edge-justified by labelHAlign(), so its anchored edge IS lb.x -- change the text,
@@ -14063,10 +14166,10 @@ var EngCalcs = EngCalcs || {};
 	function resetTextLabelHome(id) {
 		var lb = labelById(id);
 		if (!lb || !textIsAnchored(lb)) { return; }
-		var home = defaultLabelOffset();
-		if (lb.x === home.x && lb.y === home.y) { return; }
+		var home = defaultLabelOffset(), own = textOwnPoint(lb);
+		if (own.x === home.x && own.y === home.y) { return; }
 		saveUndoSnapshot();
-		lb.x = home.x; lb.y = home.y;
+		setTextPoint(lb, home.x, home.y);
 		labelEls[id].side = 'right';
 		updateLabelGeometry(id);
 		scheduleSolve();
@@ -21760,8 +21863,8 @@ var EngCalcs = EngCalcs || {};
 			return String(cpV);
 		}
 		if (prop === 'text') { return effective(cand.el, 'text'); }
-		if (prop === 'sizeMult') { return cand.el.sizeMult || 1; }
-		if (prop === 'allZoom') { return cand.el.allZoom === true ? 1 : 0; }
+		if (prop === 'sizeMult') { return textSizeMult(cand.el); }
+		if (prop === 'allZoom') { return textAllZoom(cand.el) ? 1 : 0; }
 		if (prop === 'connection') {
 			return cand.group === 'node' ? findConnStateOf(cand.el.id) : undefined;
 		}
@@ -23474,9 +23577,9 @@ var EngCalcs = EngCalcs || {};
 			{ key: 'allZoom', group: 'label', field: 'allZoom',
 				label: pc.lpn_field_text_all_zoom || 'Show at all zoom levels',
 				applies: function () { return true; },
-				get: function (lb) { return lb.allZoom === true ? 1 : 0; },
+				get: function (lb) { return textAllZoom(lb) ? 1 : 0; },
 				set: function (lb, v) {
-					if (v) { lb.allZoom = true; } else { delete lb.allZoom; }   // base-write: zoom visibility is Base-owned, exactly as size is
+					setTextAllZoom(lb, !!v);
 					applyLabelVisibility();
 				} }
 		];
@@ -26294,7 +26397,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			label: function () { return slot === 1 ? axisNames().first : axisNames().second; },
 			get: function (lb) { return labelCoordAxis(lb, slot); },
 			plainFor: textIsAnchored, plainWord: paneTextAttachedWord, plainTip: paneTextAttachedTip,
-			set: function (lb, v) { setLabelCoordAxis(lb, slot, v); }
+			set: function (lb, v) { setLabelCoordAxis(lb, slot, v); },
+			propFn: function () { return coordSlotIsY(slot) ? 'y' : 'x'; }
 		};
 	}
 	function paneTextCols() {
@@ -26315,18 +26419,17 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 					if (String(v === null || v === undefined ? '' : v).trim() === '') { detachText(lb); }
 				} },
 			paneColActive(),
-			// The words and the presence are the label's two OVERRIDABLE properties (Task 407) and
-			// go through setProp(); everything below is Base-owned, as the popup's own rows say.
+			// Every column here writes through setProp() (Task 407; all overridable since 2026-10-12).
 			{ key: 'text', label: 'lpn_tool_add_text', str: true, em: 9, prop: 'text',
 				get: function (lb) { return effective(lb, 'text'); },
 				set: function (lb, v) { setProp(lb, 'text', v); refreshLabelContent(lb.id); } },
 			// Not overridable, like every other element's Description (see descField()).
 			paneColDesc(),
-			{ key: 'sizeMult', label: 'lpn_field_text_size', em: 2.5,
-				get: function (lb) { return lb.sizeMult || 1; },
+			{ key: 'sizeMult', label: 'lpn_field_text_size', em: 2.5, prop: 'sizeMult',
+				get: function (lb) { return textSizeMult(lb); },
 				set: function (lb, v) {
 					if (!(v > 0)) { return; }
-					lb.sizeMult = v;   // base-write: size is Base-owned, exactly as position is
+					setProp(lb, 'sizeMult', v);
 					textLabelRelayout(lb.id);
 				} },
 			{ key: 'align', label: 'lpn_field_text_align',
@@ -26335,11 +26438,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 						['center', pc.lpn_field_text_align_center || 'Centre'],
 						['right', pc.lpn_field_text_align_right || 'Right']];
 				},
-				get: function (lb) { return lb.align || 'center'; },
+				get: function (lb) { return effective(lb, 'align') || 'center'; },
 				plainFor: function (lb) { return textIsAnchored(lb); },
-				plainWord: paneTextAttachedWord, plainTip: paneTextAttachedTip,
+				plainWord: paneTextAttachedWord, plainTip: paneTextAttachedTip, prop: 'align',
 				set: function (lb, v) {
-					lb.align = v;   // base-write: justification is Base-owned, exactly as position and size are
+					setProp(lb, 'align', v);
 					textLabelRelayout(lb.id);
 				} },
 			{ key: 'valign', label: 'lpn_field_text_valign',
@@ -26348,17 +26451,17 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 						['middle', pc.lpn_field_text_valign_middle || 'Middle'],
 						['bottom', pc.lpn_field_text_valign_bottom || 'Bottom']];
 				},
-				get: function (lb) { return lb.valign || 'middle'; },
+				get: function (lb) { return effective(lb, 'valign') || 'middle'; },
 				plainFor: function (lb) { return textIsAnchored(lb); },
-				plainWord: paneTextAttachedWord, plainTip: paneTextAttachedTip,
+				plainWord: paneTextAttachedWord, plainTip: paneTextAttachedTip, prop: 'valign',
 				set: function (lb, v) {
-					lb.valign = v;   // base-write: see align
+					setProp(lb, 'valign', v);
 					textLabelRelayout(lb.id);
 				} },
-			{ key: 'bold', label: 'lpn_field_text_bold', bool: true, em: 2,
-				get: function (lb) { return !!lb.bold; },
+			{ key: 'bold', label: 'lpn_field_text_bold', bool: true, em: 2, prop: 'bold',
+				get: function (lb) { return !!effective(lb, 'bold'); },
 				set: function (lb, v) {
-					lb.bold = !!v;   // base-write: Base-owned, as in the popup
+					setProp(lb, 'bold', !!v);
 					textLabelRelayout(lb.id);
 				} },
 			// **THE POPUP'S OWN "Show at all zoom levels" ROW, RE-KEYED** (Tom, review-queue R-174,
@@ -26368,18 +26471,18 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// multiGroups()/multiSection() above), so one column earns both venues at once. Off by
 			// default, like the popup's own row; a scenario visibility change is a redraw, not a
 			// re-solve, so applyLabelVisibility() stands in for textLabelRelayout()'s afterPropertyEdit().
-			{ key: 'allZoom', label: 'lpn_field_text_all_zoom', bool: true, em: 2,
-				get: function (lb) { return lb.allZoom === true; },
+			{ key: 'allZoom', label: 'lpn_field_text_all_zoom', bool: true, em: 2, prop: 'allZoom',
+				get: function (lb) { return textAllZoom(lb); },
 				set: function (lb, v) {
-					if (v) { lb.allZoom = true; } else { delete lb.allZoom; }   // base-write: zoom visibility is Base-owned, exactly as size is
+					setTextAllZoom(lb, !!v);
 					applyLabelVisibility();
 					saveToStorage();
 				} },
-			{ key: 'rot', label: 'lpn_field_text_rotation', em: 2.5,
+			{ key: 'rot', label: 'lpn_field_text_rotation', em: 2.5, prop: 'rot',
 				get: function (lb) { return textLabelRotation(lb); },
 				set: function (lb, v) {
 					if (!isFinite(v)) { return; }
-					lb.rot = normalizeDeg(v);   // base-write: Base-owned, as in the popup
+					setProp(lb, 'rot', normalizeDeg(v));
 					textLabelRelayout(lb.id);
 				} }
 		];
@@ -39918,7 +40021,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				if (!le) { return null; }
 				try {
 					probe = el('text', { x: 0, y: 0, 'class': 'lpn-lbl',
-						style: 'font-size:' + (settings.textSize * (lb.sizeMult || 1)) + 'px;font-weight:' + textLabelWeight(lb) }, labelsLayer);
+						style: 'font-size:' + (settings.textSize * (lb.sizeMult || 1)) + 'px;font-weight:' + (lb.bold ? 'bold' : 'normal') }, labelsLayer);   // Base's look, as the writer places Base's point
 					setTextLabelContent(probe, lb, 0);
 					wpx = probe.getBBox().width;
 					labelsLayer.removeChild(probe);
@@ -52010,15 +52113,49 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		return a === b || (typeof a === 'number' && typeof b === 'number' && Math.abs(a - b) <= 1e-12 * Math.max(1, Math.abs(a)));
 	}
 	// Copy: hold every copyable property of one asset. Returns false for an asset with no table.
+	// **IN A SCENARIO, ONLY ITS OVERRIDES** (Tom, 2026-10-12: *"if there is an override, we copy. If
+	// there is not, there is nothing to copy."*): a column is held only where the asset has an
+	// override of its property in the current scenario, and with none the answer is 'none' and the
+	// clipboard is left as it was.
 	function copyProperties(ref) {
-		var el = matchElOf(ref), spec = matchSpecOf(el), items = [];
+		var el = matchElOf(ref), spec = matchSpecOf(el), items = [], inScn = !inBaseScenario();
 		if (!el || !spec) { return false; }
 		spec.cols.forEach(function (c) {
+			var prop;
 			if (MATCH_NEVER[c.key] || c.result || !c.set || c.noMulti || c.cp) { return; }
+			if (inScn) {
+				prop = paneColProp(c);
+				if (!prop || !(hasOverride(el, prop) || (prop === 'demand' && hasOverride(el, 'demands')))) { return; }
+			}
 			items.push({ key: c.key, label: matchColLabel(c), unit: matchColUnit(c), v: c.get(el), plain: !!(c.plainFor && c.plainFor(el)) });
 		});
+		if (inScn && !items.length) { return 'none'; }
 		propClip = { id: el.id, kind: ref.kind, type: el.type, group: spec.group, valveType: (el.valveType || 'TCV').toUpperCase(), items: items };
 		return true;
+	}
+	// The stored alternatives and calculation sets there are now, by id, so a paste can name the ones
+	// it created (an ordinary edit creates one exactly as setProp() always does: ownWriteTarget()).
+	function storedIdsNow() {
+		var out = {};
+		(doc.alternatives || []).forEach(function (r) { out['a\u0000' + r.id] = true; });
+		(doc.calcSets || []).forEach(function (r) { out['c\u0000' + r.id] = true; });
+		return out;
+	}
+	function storedCreatedSince(before) {
+		var pc = EngCalcs.pageConfig || {}, out = [];
+		(doc.alternatives || []).forEach(function (r) {
+			if (!before['a\u0000' + r.id]) {
+				out.push((pc.lpn_paste_alt_created || 'Created {category} alternative {name} for this scenario.')
+					.replace('{category}', smTreeLabel(r.category)).replace('{name}', String(r.name || '')));
+			}
+		});
+		(doc.calcSets || []).forEach(function (r) {
+			if (!before['c\u0000' + r.id]) {
+				out.push((pc.lpn_paste_alt_created || 'Created {category} alternative {name} for this scenario.')
+					.replace('{category}', smTreeLabel('calculation')).replace('{name}', String(r.name || '')));
+			}
+		});
+		return out;
 	}
 	// The columns of dst's table that the clipboard also holds, in dst's order, as {c, it, why} (why is
 	// 'valve' for a setting or curve between two valves of different types).
@@ -52081,6 +52218,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (!propClip) { return; }
 		els = pasteTargets(targets).map(matchElOf);
 		if (!els.length) { return; }
+		var storedBefore = storedIdsNow();
 		els.forEach(function (el) { matchWrite(propClip, el, ctx); });
 		if (snapped) { els.forEach(function (el) { afterPropertyEdit(el); }); }
 		said = els.length === 1
@@ -52091,6 +52229,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			['valve', 'lpn_paste_skip_valve', 'Not pasted: {n} (the valve types differ).']].forEach(function (r) {
 			if (ctx.skip[r[0]]) { parts.push(String(pc[r[1]] || r[2]).replace('{n}', String(ctx.skip[r[0]]))); }
 		});
+		// A paste in a scenario is an ordinary edit there; an alternative it had to create is named.
+		parts = parts.concat(storedCreatedSince(storedBefore));
 		setNotice(parts.join(' '));
 		refreshPaneIfOpen();
 		refreshSelection();
@@ -52162,7 +52302,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		hasTargets = pasteTargets(ctxSel).length > 0;
 		openMapContextMenu(e.clientX, e.clientY, [
 			{ label: pc.lpn_copy_props_menu || 'Copy properties', enabled: true,
-				run: function () { if (copyProperties(hitRef)) { setNotice(String(pc.lpn_copy_props_done || 'Copied properties of {id}.').replace('{id}', hitRef.id)); } } },
+				run: function () {
+					var got = copyProperties(hitRef);
+					if (got === 'none') { setNotice(pc.lpn_copy_props_no_overrides || 'No overrides to copy.'); return; }
+					if (!got) { return; }
+					setNotice(String(inBaseScenario() ? (pc.lpn_copy_props_done || 'Copied properties of {id}.')
+						: (pc.lpn_copy_props_done_ov || 'Copied the overrides of {id} in this scenario.')).replace('{id}', hitRef.id));
+				} },
 			{ label: pc.lpn_paste_props_menu || 'Paste properties to selection', enabled: hasTargets,
 				tip: !propClip ? (pc.lpn_paste_props_off_none || 'Nothing is copied. Right-click an asset and choose Copy properties.')
 					: (!ctxSel.some(function (r) { return r.kind === 'node' || r.kind === 'link'; })
@@ -52400,9 +52546,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// and there is no leader and so no angle to snap. Task 408 is about leader angles.
 			if (an) {
 				var t3 = snapLeaderOffset((w3.x + drag.offX) - an.x, (w3.y + drag.offY) - an.y);
-				lb.x = t3.x; lb.y = t3.y;
+				setTextPoint(lb, t3.x, t3.y);
 			}
-			else { lb.x = w3.x + drag.offX; lb.y = w3.y + drag.offY; }
+			else { setTextPoint(lb, w3.x + drag.offX, w3.y + drag.offY); }
 			updateLabelGeometry(drag.id);
 			// Every label drag ends in relayoutLabels(), not just a layout of the one being dragged:
 			// the label that moved is an obstacle to every other label (and so is the leader that
@@ -54616,7 +54762,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function refreshTextLabelSizes() {
 		Object.keys(labelEls).forEach(function (id) {
 			var le = labelEls[id], lb = labelById(id);
-			le.text.style.fontSize = effectiveFontSize(lb && lb.sizeMult) + 'px';
+			le.text.style.fontSize = effectiveFontSize(textSizeMult(lb)) + 'px';
 			try { noteTextWidth(le, le.text.getBBox().width); } catch (err) { /* pre-layout measurement can throw; stale width stands */ }
 			updateLabelGeometry(id);
 		});
@@ -54670,7 +54816,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// hidden: it is authored content with its own per-label rule, not annotation we made.
 			Object.keys(labelEls).forEach(function (id) {
 				var le = labelEls[id], lb = labelById(id);
-				le.text.style.fontSize = effectiveFontSize(lb && lb.sizeMult) + 'px';
+				le.text.style.fontSize = effectiveFontSize(textSizeMult(lb)) + 'px';
 			});
 		});
 		perfDebugTime('  symSizes', function () { refreshSymbolSizes(); });
@@ -54793,7 +54939,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// property both read as off. Each shipped example now states `allZoom: true` on
 			// whichever of its own Text objects is the largest, which is what keeps a note like
 			// Net3's "Zoom in to see labels" readable when the labels have gone.
-			var gone = !isActive(lb) || (past && lb.allZoom !== true);
+			var gone = !isActive(lb) || (past && !textAllZoom(lb));
 			// The grab shape carries the class too -- see setLabelAssemblyHidden(): it is a sibling
 			// of the words, so nothing hides it by inheritance.
 			[le.text, le.leader, le.lblHit].forEach(function (e) {
@@ -57266,6 +57412,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			note = document.createElement('div');
 			note.className = 'lpn-set-note lpn-set-heldnote';
 			note.setAttribute('data-lpn-noseam', '1');
+			// **THE NOTE FIRST NAMES THE SCENARIO THAT HOLDS THE OVERRIDE** (Tom, 2026-10-12: an override
+			// in Fig 5 read "Base: Is active", as if Base held it), then says what Base has.
+			note.appendChild(document.createTextNode((pc.lpn_settings_held_in || 'Override in {scenario}.')
+				.split('{scenario}').join(scenarioDisplayName(scn)) + ' '));
 			if (text.length) {
 				note.appendChild(document.createTextNode((pc.lpn_settings_held_base || '{base}: {value}')
 					.split('{base}').join(pc.lpn_scenario_base || 'Base').split('{value}').join(text.join('; ')) + ' '));
@@ -59059,7 +59209,18 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		return !!g.lpnDragging || g.matches(':hover');
 	}
 	function dockPointerOver(d) {
-		try { return d.box.matches(':hover') || (!!d.tab && d.tab.matches(':hover')) || dockGripHeld(d); } catch (e) { return false; }
+		try { return d.box.matches(':hover') || (!!d.tab && d.tab.matches(':hover')) || dockGripHeld(d) || dockOwnMenuHovered(d); } catch (e) { return false; }
+	}
+	// **A RIGHT-CLICK MENU A BOX OPENED IS PART OF THAT BOX** (Tom, 2026-10-12: *"In Scenario Manager,
+	// any right-click action hides the box. (F2 does not.)"*). The menu is drawn on the page's body,
+	// outside the box, so pointing at it and pressing a row read as leaving the box and tucked it.
+	// Recorded on the menu as `_lpnOwner` when the box opens it (smOpenMenu()).
+	function dockOwnMenu(d, t) {
+		var m = t && t.closest ? t.closest('.lpn-pane-ctxmenu') : null;
+		return !!m && !!m._lpnOwner && m._lpnOwner === d.box;
+	}
+	function dockOwnMenuHovered(d) {
+		return !!paneCtxMenuEl && paneCtxMenuEl._lpnOwner === d.box && !!paneCtxMenuEl.parentNode && paneCtxMenuEl.matches(':hover');
 	}
 	function dockFlyOut(d, focusIn) {
 		var f;
@@ -59092,6 +59253,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function dockOutsidePress(e) {
 		var d = dockFlyout, t = e.target;
 		if (!d || !t || d.box.contains(t) || (d.tab && d.tab.contains(t)) || (t.classList && t.classList.contains('lpn-dock-grip'))) { return; }
+		if (dockOwnMenu(d, t)) { return; }
 		// A press inside a tip that box raised is still the box's.
 		if (t.closest && t.closest('.tooltip, .popover')) { return; }
 		dockTuck(d);
@@ -62987,9 +63149,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		beginMapBoxHold();
 		try {
 			if (group === 'link') { rebuildLink(el); }
-			// A Text label's redraw is its content, its measured width and its visibility -- the same
-			// three whether the words changed or the label was switched off (Task 407).
-			else if (group === 'label') { refreshLabelContent(el.id); }
+			// A Text label's redraw is its anchors, its style, its content, its measured width, its
+			// geometry and its visibility, whichever of its properties moved (textLabelRelayout()).
+			else if (group === 'label') { textLabelRelayout(el.id); }
 			else if (nodeEls[el.id]) { updateNode(el.id, true); }
 		} finally { endMapBoxHold(); }
 		// **THE ELEMENT JUST EDITED, NOT EVERY ELEMENT ON THE MAP** (ROADMAP Task 706). The amber
@@ -63025,7 +63187,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			withOneLabelBatch(function () { els.forEach(function (el) {
 				var group = elGroup(el);
 				if (group === 'link') { rebuildLink(el); }
-				else if (group === 'label') { refreshLabelContent(el.id); }
+				else if (group === 'label') { textLabelRelayout(el.id); }
 				else if (nodeEls[el.id]) { updateNode(el.id, true); }
 				applyScenarioMarks(el);
 			}); });
@@ -63122,6 +63284,40 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				base.textContent = ' ' + smSharedText(['demand']);
 				label.appendChild(base);
 			}
+		}
+		fields.appendChild(label);
+		fields.appendChild(document.createElement('br'));
+	}
+	// **A TEXT'S POSITION, ONE MARKER FOR ITS TWO NUMBERS** (Tom, 2026-10-12): x and y move together
+	// (a drag writes both), so one box holds or releases both, on overrideMarker()'s shape. The Base
+	// line names Base's point in the order the popup's coordinate rows read.
+	function textPositionMarker(fields, lb) {
+		var pc = EngCalcs.pageConfig || {};
+		if (!lb || inBaseScenario() || !isOverridable(lb, 'x')) { return; }
+		var label = document.createElement('label'), box = document.createElement('input'),
+			text = document.createElement('span'), on = hasOverride(lb, 'x') || hasOverride(lb, 'y'), base, bp;
+		label.className = 'lpn-ov-marker';
+		box.type = 'checkbox';
+		box.checked = on;
+		box.addEventListener('change', function () {
+			saveUndoSnapshot();
+			if (box.checked) { setProp(lb, 'x', effective(lb, 'x')); setProp(lb, 'y', effective(lb, 'y')); }
+			else { clearOverride(lb, 'x'); clearOverride(lb, 'y'); }
+			afterPropertyEdit(lb);
+			relayoutLabels();
+			refreshPopupIfOpen();
+		});
+		setFieldLabel(text, pc.lpn_scenario_override || 'Override in this scenario', pc.lpn_scenario_override_tip);
+		label.appendChild(box);
+		label.appendChild(document.createTextNode(' '));
+		label.appendChild(text);
+		if (on) {
+			bp = paneInScenario(baseScenario(), function () { return textLabelPoint(lb); });
+			base = document.createElement('span');
+			base.className = 'lpn-ov-base';
+			base.textContent = (pc.lpn_scenario_base_value || 'Base scenario: {value}').replace('{value}',
+				readsNorthFirst() ? coordText(outwardY(bp.y)) + ', ' + coordText(outwardX(bp.x)) : coordText(outwardX(bp.x)) + ', ' + coordText(outwardY(bp.y)));
+			label.appendChild(base);
 		}
 		fields.appendChild(label);
 		fields.appendChild(document.createElement('br'));
@@ -66290,23 +66486,21 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// (effectiveFontSize(lb.sizeMult) in buildLabelEls/refreshFontSizes above).
 		var sizeLabel = document.createElement('label'), sizeInput = document.createElement('input');
 		sizeInput.type = 'number'; sizeInput.step = 'any'; sizeInput.min = '0.1';
-		sizeInput.value = lb.sizeMult || 1;
+		sizeInput.value = textSizeMult(lb);
 		sizeInput.addEventListener('change', function () {
 			var v = +sizeInput.value;
-			if (!(v > 0)) { sizeInput.value = lb.sizeMult || 1; return; }
-			if (v === (lb.sizeMult || 1)) { return; }
+			if (!(v > 0)) { sizeInput.value = textSizeMult(lb); return; }
+			if (v === textSizeMult(lb)) { return; }
 			saveUndoSnapshot();
-			lb.sizeMult = v;
-			var le = labelEls[labelId];
-			le.text.style.fontSize = effectiveFontSize(lb.sizeMult) + 'px';
-			try { noteTextWidth(le, le.text.getBBox().width); } catch (err) { /* pre-layout measurement can throw; stale width stands */ }
-			updateLabelGeometry(labelId);
-			saveToStorage();
+			setProp(lb, 'sizeMult', v);
+			afterPropertyEdit(lb);
+			refreshPopupIfOpen();
 		});
 		sizeLabel.textContent = (pc.lpn_field_text_size || 'Size multiplier') + ' ';
 		sizeLabel.appendChild(sizeInput);
 		fields.appendChild(sizeLabel);
 		fields.appendChild(document.createElement('br'));
+		overrideMarker(fields, lb, 'sizeMult');
 		// **SHOW AT ALL ZOOM LEVELS** (Task 705 (3), one of the restorations Tom listed).
 		// **UNTICKED BY DEFAULT** (Tom, review-queue R-174, 2026-09-23: *"This property should be
 		// off for all but the largest text object in our examples and for all projects with no
@@ -66317,14 +66511,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// the default. BASE-WIDE like size and position, and for the same reason.
 		var allZoomLabel = document.createElement('label'), allZoomInput = document.createElement('input');
 		allZoomInput.type = 'checkbox';
-		allZoomInput.checked = lb.allZoom === true;
+		allZoomInput.checked = textAllZoom(lb);
 		allZoomInput.addEventListener('change', function () {
-			if (allZoomInput.checked === (lb.allZoom === true)) { return; }
+			if (allZoomInput.checked === textAllZoom(lb)) { return; }
 			saveUndoSnapshot();
-			if (allZoomInput.checked) { lb.allZoom = true; }
-			else { delete lb.allZoom; }   // base-write: zoom visibility is Base-owned, exactly as size is
-			applyLabelVisibility();
-			saveToStorage();
+			setTextAllZoom(lb, allZoomInput.checked);
+			afterPropertyEdit(lb);
+			refreshPopupIfOpen();
 		});
 		allZoomLabel.appendChild(allZoomInput);
 		allZoomLabel.appendChild(document.createTextNode(' '));
@@ -66332,6 +66525,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			pc.lpn_field_text_all_zoom || 'Show at all zoom levels', pc.lpn_field_text_all_zoom_tip);
 		fields.appendChild(allZoomLabel);
 		fields.appendChild(document.createElement('br'));
+		overrideMarker(fields, lb, 'allZoom');
 		// ---- Justification (Task 342) ------------------------------
 		// `lb.align`/`lb.valign` have been in the document since Task 332 and are interpreted in ONE
 		// place (Geom.labelBoxAt via labelHAlign/labelVAlign); all this owes them is the row.
@@ -66346,13 +66540,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// justification."*
 		function alignRow(labelText, prop, options, dflt) {
 			if (textIsAnchored(lb)) { return; }
-			selectFieldPlain(fields, labelText, options, (lb[prop] || dflt), function (v) {
-				if ((lb[prop] || dflt) === v) { return; }
+			selectFieldPlain(fields, labelText, options, (effective(lb, prop) || dflt), function (v) {
+				if ((effective(lb, prop) || dflt) === v) { return; }
 				saveUndoSnapshot();
-				// BASE-WIDE, like position and size and for the same reason (Task 407): a note that
-				// changes shape as you flip scenarios is unreadable. Not in LPN_OVERRIDABLE, so
-				// setProp() would be the wrong seam here, not merely unnecessary.
-				lb[prop] = v;   // base-write: justification is Base-owned, exactly as position and size are
+				// Overridable since 2026-10-12, like everything a Text has: through the one seam.
+				setProp(lb, prop, v);
 				// THE ELEMENT'S OWN ATTRIBUTES FIRST. Without this the box moves and the words do
 				// not -- the defect Tom reported on the example callouts, reachable from this row
 				// too. See applyTextLabelJustification().
@@ -66362,7 +66554,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				// where every row starts.
 				refreshLabelContent(labelId);
 				relayoutThisLabel();
+				afterPropertyEdit(lb);
+				refreshPopupIfOpen();
 			});
+			overrideMarker(fields, lb, prop);
 		}
 		alignRow(pc.lpn_field_text_align || 'Horizontal alignment', 'align', [
 			['left', pc.lpn_field_text_align_left || 'Left'],
@@ -66389,16 +66584,19 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		}
 		var boldLabel = document.createElement('label'), boldInput = document.createElement('input');
 		boldInput.type = 'checkbox';
-		boldInput.checked = !!lb.bold;
+		boldInput.checked = !!effective(lb, 'bold');
 		boldInput.addEventListener('change', function () {
 			saveUndoSnapshot();
-			lb.bold = boldInput.checked;
+			setProp(lb, 'bold', boldInput.checked);
 			relayoutThisLabel();
+			afterPropertyEdit(lb);
+			refreshPopupIfOpen();
 		});
 		boldLabel.textContent = (pc.lpn_field_text_bold || 'Bold text') + ' ';
 		boldLabel.appendChild(boldInput);
 		fields.appendChild(boldLabel);
 		fields.appendChild(document.createElement('br'));
+		overrideMarker(fields, lb, 'bold');
 		// THE BOX IS THE CONTROL AND THE BUTTONS ONLY FILL IT (Tom, 2026-08-14). A control whose
 		// only input is "match a pipe" is unusable on a label nowhere near a pipe, and a preset is
 		// what people reach for nine times in ten -- so free numeric entry first, a preset list
@@ -66418,9 +66616,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			if (!isFinite(v)) { rotInput.value = textLabelRotation(lb); return; }
 			if (v === textLabelRotation(lb)) { rotInput.value = v; return; }
 			saveUndoSnapshot();
-			lb.rot = v;
+			setProp(lb, 'rot', v);
 			rotInput.value = v;
 			relayoutThisLabel();
+			afterPropertyEdit(lb);
+			refreshPopupIfOpen();
 		}
 		rotInput.addEventListener('change', function () { setRotation(rotInput.value); });
 		rotLabel.textContent = (pc.lpn_field_text_rotation || 'Angle (degrees)') + ' ';
@@ -66449,8 +66649,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		flipBtn.addEventListener('click', function () { setRotation(textLabelRotation(lb) + 180); });
 		fields.appendChild(flipBtn);
 		fields.appendChild(document.createElement('br'));
+		overrideMarker(fields, lb, 'rot');
 		var here = textLabelPoint(lb);
 		coordFields(fields, outwardX(here.x), outwardY(here.y));
+		textPositionMarker(fields, lb);
 		// **WHAT THIS NOTE IS FOLLOWING, said out loud** (Task 502). Read-only: a Text is attached
 		// where it is placed, and detaching it is not a thing the page offers for a node anchor
 		// either -- so this row answers "which pipe is that leader going to", which is a real
@@ -73573,8 +73775,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// always present; choosing it while Basic mode is ticked turns Basic mode off and says so in
 	// one line.*
 	//
-	// **A BROWSER SETTING, NOT A PROJECT ONE.** The mode changes no value, no solve and no stored
-	// byte -- only how much machinery the person at this screen wants shown, which a colleague
+	// **A BROWSER SETTING, NOT A PROJECT ONE.** The mode changes no value and no solve; the one act
+	// it changes is Delete scenario, which with it on also deletes the scenario's unshared
+	// alternatives (scenarioDeletePlan()). Otherwise only how much machinery the person at this screen wants shown, which a colleague
 	// opening the file must not inherit. Written only when OFF, like lpn_runbox, so a browser that
 	// never touched it holds nothing.
 	var LPN_SCNBASIC_KEY = 'lpn_scnbasic';
@@ -73696,8 +73899,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		out.push({ id: 'rename', label: pc.lpn_sm_rename || 'Rename', off: !valid || isBase,
 			offTip: !valid ? noSel : (pc.lpn_sm_base_named || 'The Base of a tree is not renamed.'),
 			fn: function () { smStartRename(key); } });
-		// A scenario asks make-copies or share; an alternative is copied beside itself.
-		out.push({ id: 'copy', label: tree === 'scenarios' ? (pc.lpn_sm_copy || 'Copy scenario…') : (pc.lpn_sm_copy_alt || 'Copy'),
+		// **ONE "Copy", ACTING ON WHAT IS SELECTED** (Tom, 2026-10-12): a scenario asks Separate edits
+		// or Share edits; an alternative is copied beside itself.
+		out.push({ id: 'copy', label: pc.lpn_sm_copy || 'Copy',
 			off: !valid || (tree !== 'scenarios' && isBase), offTip: !valid ? noSel : null, fn: function () { smActCopy(key); } });
 		out.push({ separator: true });
 		out.push({ id: 'del', label: pc.lpn_tool_delete || 'Delete', face: '−', off: !valid || isBase,
@@ -74003,13 +74207,24 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		smAfter(false, false);
 	}
 	function smActDelete(key) {
-		var tree = smState.tree, pc = EngCalcs.pageConfig || {}, name, res, wasCurrent = key === project.activeScenario, from = activeScenario();
+		var tree = smState.tree, pc = EngCalcs.pageConfig || {}, name, wasCurrent = key === project.activeScenario, from = activeScenario();
 		if (key === null || key === undefined) { return; }
 		if (smIsBaseKey(tree, key)) {
 			setNotice((pc.lpn_sm_base_kept || 'The Base of a tree is not deleted. Another Base added with Add base is deleted when nothing uses it.'));
 			return;
 		}
 		name = smName(tree, key);
+		// A scenario asks first, in the menu's own words (Sue, 2026-10-12: this door asked nothing).
+		if (tree === 'scenarios' && scenarioById(key) && !smInUseBy(tree, key).length) {
+			askDialog({ kind: 'confirm', text: scenarioDeleteQuestion(scenarioById(key)) }, function (yes) {
+				if (yes) { smActDeleteNow(tree, key, name, wasCurrent, from); }
+			});
+			return;
+		}
+		smActDeleteNow(tree, key, name, wasCurrent, from);
+	}
+	function smActDeleteNow(tree, key, name, wasCurrent, from) {
+		var pc = EngCalcs.pageConfig || {}, res;
 		res = smTry(function () { return smDelete(tree, key); });
 		if (res !== true) {
 			if (res.refused === 'in use') {
@@ -74149,9 +74364,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				b.setAttribute('aria-disabled', 'true');
 				if (c.offTip || (c.tip && c.id === 'del')) { b.title = c.offTip || c.tip; }
 			}
-			b.addEventListener('click', function () { if (c.off) { return; } paneCloseContextMenu(); c.fn(); });
+			// The row's act keeps the box out: a tuck queued while the pointer crossed to the menu is dropped.
+			b.addEventListener('click', function () { if (c.off) { return; } paneCloseContextMenu(); c.fn(); clearTimeout(dockTimer); });
 			menu.appendChild(b);
 		});
+		menu._lpnOwner = smBoxEl();
 		document.body.appendChild(menu);
 		paneCtxMenuEl = menu;
 		paneClampMenu(menu, x, y);

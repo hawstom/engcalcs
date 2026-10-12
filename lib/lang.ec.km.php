@@ -2700,7 +2700,6 @@ $ec_lang['lpn_scenario_new_name']='សេណារីយ៉ូ {n}';
 $ec_lang['lpn_scenario_prompt_name']='ឈ្មោះសម្រាប់សេណារីយ៉ូនេះ';
 $ec_lang['lpn_scenario_rename']='ប្ដូរឈ្មោះសេណារីយ៉ូ…';
 $ec_lang['lpn_scenario_delete']='លុបសេណារីយ៉ូ';
-$ec_lang['lpn_scenario_delete_confirm']='លុបសេណារីយ៉ូ {name} និងតម្លៃផ្ទាល់ខ្លួនរបស់វា {n}? គំនូរខ្លួនវាមិនត្រូវបានផ្លាស់ប្ដូរទេ។';
 $ec_lang['lpn_scenario_override']='តម្លៃផ្ទាល់ខ្លួនក្នុងសេណារីយ៉ូនេះ';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_scenario_override_tip']='ធីកមានន័យថាសេណារីយ៉ូនេះជំនួសតម្លៃរបស់មេសម្រាប់តម្លៃនេះ សូម្បីតែនៅពេលលេខដូចគ្នា។ ដោះធីកប្រអប់ដើម្បីប្រើតម្លៃរបស់មេ។';

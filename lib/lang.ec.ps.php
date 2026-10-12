@@ -2653,7 +2653,6 @@ $ec_lang['lpn_scenario_new_name']='سناریو {n}';
 $ec_lang['lpn_scenario_prompt_name']='د دې سناریو لپاره نوم';
 $ec_lang['lpn_scenario_rename']='د سناریو نوم بدلول…';
 $ec_lang['lpn_scenario_delete']='سناریو ړنګول';
-$ec_lang['lpn_scenario_delete_confirm']='سناریو {name}، او هغه {n} ارزښتونه چې یوازې ورسره اړه لري، ړنګ کړم؟ خپل انځور نه بدلیږي.';
 $ec_lang['lpn_scenario_override']='یوازې په دې سناریو کې';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_scenario_override_tip']='چک شوی یې معنی دا ده چې دا ارزښت یوازې دې سناریو پورې اړه لري، حتی که ورته شمېره وي لکه اساس کې. بکس پاک کړئ ترڅو بېرته د اساس ارزښت وکارول شي.';

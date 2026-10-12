@@ -139,7 +139,7 @@ async function main() {
 		console.log('\n--- 2. add, rename, delete ---');
 		await clickRow(await L('lpn_scenario_base'));
 		const toolbar = () => page.evaluate(() => Array.from(document.querySelectorAll('#lpn_sm_body .lpn-sm-tools button')).map((b) => b.textContent));
-		ok('1.9 the toolbar is Make current, Add child, Add base, Rename, Copy scenario, then minus (the menu\'s order)', JSON.stringify(await toolbar()) === JSON.stringify([await L('lpn_sm_make_current'), await L('lpn_sm_add_child'), await L('lpn_sm_add_base'), await L('lpn_sm_rename'), await L('lpn_sm_copy'), '\u2212']) && (await L('lpn_sm_add_base')) === 'Add base' && (await L('lpn_sm_add_child')) === 'Add child', JSON.stringify(await toolbar()));
+		ok('1.9 the toolbar is Make current, Add child, Add base, Rename, Copy, then minus (the menu\'s order)', JSON.stringify(await toolbar()) === JSON.stringify([await L('lpn_sm_make_current'), await L('lpn_sm_add_child'), await L('lpn_sm_add_base'), await L('lpn_sm_rename'), await L('lpn_sm_copy'), '\u2212']) && (await L('lpn_sm_add_base')) === 'Add base' && (await L('lpn_sm_add_child')) === 'Add child', JSON.stringify(await toolbar()));
 		const tipOf = (id) => page.evaluate((i) => { const b = document.getElementById(i); return b ? [b.getAttribute('aria-disabled'), b.title] : null; }, id);
 		ok('1.10a on Base, the current scenario, Make current is greyed and its tip says why', JSON.stringify(await tipOf('lpn_sm_current')) === JSON.stringify(['true', await L('lpn_sm_current_already')]), JSON.stringify(await tipOf('lpn_sm_current')));
 		ok('1.10b ...and Rename is greyed and its tip says why', JSON.stringify(await tipOf('lpn_sm_rename')) === JSON.stringify(['true', await L('lpn_sm_base_named')]), JSON.stringify(await tipOf('lpn_sm_rename')));
@@ -238,6 +238,10 @@ async function main() {
 		ok('2.11 ...and nothing was deleted', (await names()).length === 4);
 		await clickRow('Child_1_of_Peak Hour');
 		await click('#lpn_sm_del');
+		// Deleting a scenario asks first, in the menu's own words (Sue, 2026-10-12).
+		const dq = await a.dialog();
+		ok('2.12a ...after asking the Delete scenario question', !!dq && dq.text.indexOf((await L('lpn_scenario_delete_ask')).replace('{name}', 'Child_1_of_Peak Hour')) === 0, dq && dq.text);
+		await press(await L('lpn_dialog_ok'));
 		ok('2.12 the "-" button deletes a leaf', (await names()).length === 3, JSON.stringify(await names()));
 		await page.keyboard.press('Control+z');
 		await settle(800);
@@ -252,6 +256,7 @@ async function main() {
 		ok('2.15 "-" on Base is greyed, deletes nothing, and its tip is the same sentence', (await names()).some((n) => n === 'Base') && (await page.evaluate(() => document.getElementById('lpn_sm_del').title)) === await L('lpn_sm_base_kept'));
 		await clickRow('Base2');
 		await click('#lpn_sm_del');
+		await press(await L('lpn_dialog_ok'));
 		ok('2.16 an unused Base of its own can be deleted', !(await names()).some((n) => n === 'Base2'), JSON.stringify(await names()));
 		await page.keyboard.press('Control+z');
 		await settle(600);
@@ -306,7 +311,7 @@ async function main() {
 		await settle(500);
 		ok('4.3 an alternative was added under Base', JSON.stringify(await names()) === JSON.stringify(['Base', '-Dry year']), JSON.stringify(await names()));
 		ok('4.4 ...used by no scenario yet', (await rows())[1].meta === await L('lpn_sm_used_by_none'), (await rows())[1].meta);
-		ok('4.5 an alternatives tree toolbar is Add child, Add base, Rename, Copy, minus (no Make current)', JSON.stringify(await toolbar()) === JSON.stringify([await L('lpn_sm_add_child'), await L('lpn_sm_add_base'), await L('lpn_sm_rename'), await L('lpn_sm_copy_alt'), '\u2212']), JSON.stringify(await toolbar()));
+		ok('4.5 an alternatives tree toolbar is Add child, Add base, Rename, Copy, minus (no Make current)', JSON.stringify(await toolbar()) === JSON.stringify([await L('lpn_sm_add_child'), await L('lpn_sm_add_base'), await L('lpn_sm_rename'), await L('lpn_sm_copy'), '\u2212']), JSON.stringify(await toolbar()));
 		await clickRow('Dry year');
 		await click('#lpn_sm_copy');
 		await settle(400);
@@ -462,7 +467,7 @@ async function main() {
 		await clickRow('Peak Hour');
 		await click('#lpn_sm_copy');
 		const cd = await a.dialog();
-		ok('6.1 Copy asks: make copies, share them, or cancel', cd && JSON.stringify(cd.buttons) === JSON.stringify([await L('lpn_sm_copy_own'), await L('lpn_sm_copy_share'), await L('lpn_cancel')]), cd && JSON.stringify(cd.buttons));
+		ok('6.1 Copy asks: Separate edits, Share edits, or cancel', cd && JSON.stringify(cd.buttons) === JSON.stringify([await L('lpn_sm_copy_own'), await L('lpn_sm_copy_share'), await L('lpn_cancel')]), cd && JSON.stringify(cd.buttons));
 		const namesBeforeCopy = (await names()).length;
 		await press(await L('lpn_cancel'));
 		ok('6.2 Cancel copies nothing', (await names()).length === namesBeforeCopy, JSON.stringify(await names()));

@@ -2722,7 +2722,6 @@ $ec_lang['lpn_scenario_new_name']='سيناريو {n}';
 $ec_lang['lpn_scenario_prompt_name']='اسم هذا السيناريو';
 $ec_lang['lpn_scenario_rename']='إعادة تسمية السيناريو…';
 $ec_lang['lpn_scenario_delete']='حذف السيناريو';
-$ec_lang['lpn_scenario_delete_confirm']='هل تريد حذف السيناريو {name} وتجاوزاته البالغ عددها {n}؟ لا يتغير الرسم نفسه.';
 $ec_lang['lpn_scenario_override']='تجاوز في هذا السيناريو';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_scenario_override_tip']='يعني التحديد أن هذا السيناريو يتجاوز الأصل لهذه القيمة، حتى لو كان الرقم نفسه. ألغِ تحديد المربع لاستخدام قيمة الأصل.';

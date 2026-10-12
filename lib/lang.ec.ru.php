@@ -2653,7 +2653,6 @@ $ec_lang['lpn_scenario_new_name']='Сценарий {n}';
 $ec_lang['lpn_scenario_prompt_name']='Название этого сценария';
 $ec_lang['lpn_scenario_rename']='Переименовать сценарий…';
 $ec_lang['lpn_scenario_delete']='Удалить сценарий';
-$ec_lang['lpn_scenario_delete_confirm']='Удалить сценарий {name} и {n} значений, принадлежащих только ему? Сам чертёж не изменится.';
 $ec_lang['lpn_scenario_override']='Переопределить в этом сценарии';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_scenario_override_tip']='Если отмечено, этот сценарий переопределяет значение родителя, даже если число совпадает. Снимите отметку, чтобы использовать значение родителя.';

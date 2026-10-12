@@ -2652,7 +2652,6 @@ $ec_lang['lpn_scenario_new_name']='Сценарио {n}';
 $ec_lang['lpn_scenario_prompt_name']='Назив овог сценарија';
 $ec_lang['lpn_scenario_rename']='Преименуј сценарио…';
 $ec_lang['lpn_scenario_delete']='Обриши сценарио';
-$ec_lang['lpn_scenario_delete_confirm']='Обрисати сценарио {name} и {n} вредности које припадају само њему? Сам цртеж се не мења.';
 $ec_lang['lpn_scenario_override']='Само у овом сценарију';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_scenario_override_tip']='Означено значи да овај сценарио има унету вредност за ово поље, чак и када је исти број као Основа. Уклоните ознаку да бисте поново користили вредност из Основе.';

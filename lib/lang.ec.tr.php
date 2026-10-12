@@ -2651,7 +2651,6 @@ $ec_lang['lpn_scenario_new_name']='Senaryo {n}';
 $ec_lang['lpn_scenario_prompt_name']='Bu senaryo için ad';
 $ec_lang['lpn_scenario_rename']='Senaryoyu yeniden adlandır…';
 $ec_lang['lpn_scenario_delete']='Senaryoyu sil';
-$ec_lang['lpn_scenario_delete_confirm']='{name} senaryosu ve yalnızca ona ait olan {n} değer silinsin mi? Çizimin kendisi değişmez.';
 $ec_lang['lpn_scenario_override']='Yalnızca bu senaryoda';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_scenario_override_tip']='İşaretlemek, bu senaryonun bu değer için — Temel ile aynı sayı olsa bile — kendi girişine sahip olduğu anlamına gelir. Kutuyu boşaltarak yeniden Temel değerini kullanın.';

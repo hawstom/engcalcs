@@ -2651,7 +2651,6 @@ $ec_lang['lpn_scenario_new_name']='ሁኔታ {n}';
 $ec_lang['lpn_scenario_prompt_name']='ለዚህ ሁኔታ ስም';
 $ec_lang['lpn_scenario_rename']='የሁኔታ ስም ቀይር…';
 $ec_lang['lpn_scenario_delete']='ሁኔታ አጥፋ';
-$ec_lang['lpn_scenario_delete_confirm']='ሁኔታ {name}ን እና {n} የራስ ዋጋዎቹን ይሰርዙ? ስዕሉ ራሱ አይለወጥም።';
 $ec_lang['lpn_scenario_override']='በዚህ ሁኔታ ውስጥ የራስ ዋጋ';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_scenario_override_tip']='ሲመረጥ፣ ቁጥሩ ተመሳሳይ ቢሆንም እንኳ ይህ ሁኔታ ለዚህ ዋጋ ወላጁን ይሽራል። የወላጁን ዋጋ ለመጠቀም ሳጥኑን ያጽዱ።';

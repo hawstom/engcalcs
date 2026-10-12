@@ -68,8 +68,10 @@ async function main() {
 		await a.toolbarClick(await L('lpn_pane_toggle'));
 		await a.settle(500);
 		const BASE = await L('lpn_scenario_base'), CLEAR = await L('lpn_pane_clear_override'),
-			HELD = await L('lpn_settings_held_base'), HW = await L('bpn_method_hw');
-		const baseNote = (v) => HELD.replace('{base}', BASE).replace('{value}', v);
+			HELD = await L('lpn_settings_held_base'), HW = await L('bpn_method_hw'), HELDIN = await L('lpn_settings_held_in');
+		// The note names the scenario holding the override first (Tom, 2026-10-12), then Base's value.
+		// Every held note this harness reads is in the scenario it calls Peak.
+		const baseNote = (v) => HELDIN.replace('{scenario}', 'Peak') + ' ' + HELD.replace('{base}', BASE).replace('{value}', v);
 
 		// ---- what a person does and sees ----
 		const tab = async (id) => { await page.click('#lpn_pane_tab_' + id); await a.settle(600); };

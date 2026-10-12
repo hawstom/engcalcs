@@ -222,6 +222,8 @@ $ovAllowed = [
     'sanitizeScenarioTree', 'mergeAlternativeInto', 'combineHolders', 'scenarioHoldsLocal', 'takeScenarioLocals', 'promoteStored',
     // the one write seam, and the scenario's own count beside its name
     'setOverride', 'clearOverride', 'overrideCount',
+    // what Delete scenario says it removes: the values of the alternatives that go with it, read only
+    'scenarioDeletePlan',
     // where a write lands, the scenario's own alternative made first (Tom, 2026-10-12)
     'ownWriteMap',
     // the derived (Basic mode) alternatives, read off each scenario's own map

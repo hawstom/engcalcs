@@ -73,7 +73,7 @@ here. Each property is in exactly one category. The category id is what the code
 | Fire flow (`fireflow`) | Fire Flow | junction `fireFlow` | The required fire flow per junction (Task 530). |
 | Energy cost (`energy`) | Energy Cost | pump `energyPrice`, `energyPattern` | |
 | User data (`userdata`) | User Data Extensions | every custom property (`custom_*`, Task 636) | Bentley lets a user field be placed in an alternative; ours are all overridable, so they are one category. Also the home of any stray property name an old file carries that no category claims, so "exactly one" holds for every key a file can contain. |
-| Text (`text`) | none | Text label `text`, `active` | **Ours only.** Bentley keeps annotation in the `.wtg`, outside the model (`dev/bentley-interop.md`). A label's `active` is not topology: it takes nothing out of the solve. |
+| Text (`text`) | none | Text label `text`, `active`, and (Tom, 2026-10-12) its position `x`, `y` and look `sizeMult`, `align`, `valign`, `bold`, `rot`, `allZoom`; its attachment stays Base's. One note is one alternative's business, so it is not split with Presentation. A position override is stored in the file's frame (`textCoordOut()`). **Ours only.** Bentley keeps annotation in the `.wtg`, outside the model (`dev/bentley-interop.md`). A label's `active` is not topology: it takes nothing out of the solve. |
 
 **The demand multiplier is a calculation option.** `scenario.demandMultiplier` is a per-scenario
 number, not an element property. Its Bentley counterpart is a **Calculation Option** (a scenario
@@ -149,8 +149,10 @@ byte-identical.
 
 **Stored in the browser, not the project** (`localStorage` key `lpn_scnbasic`, written only as
 `off`, like `lpn_runbox`). CLAUDE.md's rule: modelling data rides in `serializeProject()`; a fact
-about the person at the screen stays in the browser. Under A, Basic mode changes no value, no
-solve and no stored byte: it decides only how much of the scenario machinery this person wants
+about the person at the screen stays in the browser. Basic mode changes no value and no solve, and
+one act only writes differently under it (Tom, 2026-10-12): deleting a scenario with Basic mode on
+also deletes each stored alternative it names that no other scenario names and no alternative
+inherits from; with it off they stay. Otherwise it decides only how much of the scenario machinery this person wants
 shown, which is the kind of answer a colleague opening the file must not inherit (a Basic-mode user
 handed a file by an Advanced one would otherwise open it into a UX they never asked for). What the
 file holds is judged from the file itself, not from a remembered mode: once B exists, "this file

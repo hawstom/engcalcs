@@ -2695,7 +2695,6 @@ $ec_lang['lpn_scenario_new_name']='Сценарій {n}';
 $ec_lang['lpn_scenario_prompt_name']='Назва цього сценарію';
 $ec_lang['lpn_scenario_rename']='Перейменувати сценарій…';
 $ec_lang['lpn_scenario_delete']='Видалити сценарій';
-$ec_lang['lpn_scenario_delete_confirm']='Видалити сценарій {name} і {n} значень, які належать лише йому? Саме креслення не зміниться.';
 $ec_lang['lpn_scenario_override']='Лише в цьому сценарії';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_scenario_override_tip']='Вибрано означає, що цей сценарій перевизначає батьківський для цього значення, навіть якщо число те саме. Зніміть позначку, щоб використовувати значення батьківського.';

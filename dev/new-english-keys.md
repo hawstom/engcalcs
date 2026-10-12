@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**111 still to read on master**, of 111 untranslated keys, of 2661 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**117 still to read on master**, of 117 untranslated keys, of 2666 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -199,7 +199,7 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   @@ NEEDS RULING
 
-## lpn_  (111, 111 to read @@ NEEDS RULING)
+## lpn_  (117, 117 to read @@ NEEDS RULING)
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -222,8 +222,14 @@ never edits a synonym.
 - **`lpn_copy_props_done`**
   > Copied properties of {id}.
   @@ NEEDS RULING
+- **`lpn_copy_props_done_ov`**
+  > Copied the overrides of {id} in this scenario.
+  @@ NEEDS RULING
 - **`lpn_copy_props_menu`**
   > Copy properties
+  @@ NEEDS RULING
+- **`lpn_copy_props_no_overrides`**
+  > No overrides to copy.
   @@ NEEDS RULING
 - **`lpn_customer_node_inactive`**
   > This customer is assigned to a junction that is inactive in this scenario, so its demand is not part of the solve.
@@ -255,6 +261,9 @@ never edits a synonym.
 - **`lpn_pane_tab_scenarios`**
   > Scenarios
   @@ NEEDS RULING
+- **`lpn_paste_alt_created`**
+  > Created {category} alternative {name} for this scenario.
+  @@ NEEDS RULING
 - **`lpn_paste_done_many`**
   > Pasted properties of {id} to {m} assets. Values changed: {n}.
   @@ NEEDS RULING
@@ -282,14 +291,26 @@ never edits a synonym.
 - **`lpn_rule_inactive_note`**
   > These rules refer to an asset that is inactive in this scenario, so they are ignored in its run: {ids}
   @@ NEEDS RULING
+- **`lpn_scenario_delete_ask`**
+  > Delete the scenario {name}? The drawing itself is not changed.
+  @@ NEEDS RULING
+- **`lpn_scenario_delete_goes`**
+  > Its {n} overrides are deleted with it.
+  @@ NEEDS RULING
 - **`lpn_scenario_delete_has_children`**
   > The scenario {name} cannot be deleted while other scenarios inherit from it: {list}. Delete those first, or give them another parent.
+  @@ NEEDS RULING
+- **`lpn_scenario_delete_stays`**
+  > These alternatives it uses stay in the project: {list}.
   @@ NEEDS RULING
 - **`lpn_scncmp_none_checked`**
   > No scenario is checked for comparison. Check scenarios in the Scenario manager.
   @@ NEEDS RULING
 - **`lpn_settings_held_base`**
   > {base}: {value}
+  @@ NEEDS RULING
+- **`lpn_settings_held_in`**
+  > Override in {scenario}.
   @@ NEEDS RULING
 - **`lpn_settings_restore_base_only`**
   > Switch to Base to restore the defaults.
@@ -472,19 +493,16 @@ never edits a synonym.
   > Include in Scenario comparison
   @@ NEEDS RULING
 - **`lpn_sm_copy`**
-  > Copy scenario…
-  @@ NEEDS RULING
-- **`lpn_sm_copy_alt`**
   > Copy
   @@ NEEDS RULING
 - **`lpn_sm_copy_ask`**
-  > Copy the scenario {name}. Make its own copies of the alternatives it uses, or share them? A shared alternative changes in every scenario that uses it.
+  > Copy the scenario {name}. Share edits: the copy uses the same alternatives, so an edit in either scenario changes both. Separate edits: the copy gets its own copies of the alternatives.
   @@ NEEDS RULING
 - **`lpn_sm_copy_own`**
-  > Make copies
+  > Separate edits
   @@ NEEDS RULING
 - **`lpn_sm_copy_share`**
-  > Share them
+  > Share edits
   @@ NEEDS RULING
 - **`lpn_sm_current_already`**
   > This scenario is already the current scenario.
@@ -496,7 +514,7 @@ never edits a synonym.
   > Delete the selected item. A used item is not deleted.
   @@ NEEDS RULING
 - **`lpn_sm_help`**
-  > How scenarios and alternatives work:\n\nAn override made in a scenario is stored in the alternative associated with the scenario. Associations of alternatives to scenarios are managed in the Scenarios table in the bottom pane. Creating a new scenario creates no alternatives; it uses its parent's alternatives until new alternatives are needed as overrides are created. When overrides are created in a scenario, they are stored in their respective alternative for the scenario; if the scenario has no such alternative, a new alternative is created using the name of the scenario. Example: You create a "Figure: Node and link IDs" scenario and edit a Text to say "Node and Link IDs." When you create the scenario, no alternatives are created. But at the moment you save the Text, a Text alternative called "Figure: Node and link IDs" is created with the override for the Text value. In Basic mode, you see this as simply an override in the scenario itself.\n\nHow to manage scenarios:\n\n- Choose Scenarios or an alternatives category in the list at the top to show its tree.\n\n- Create a child of the selected item with Add child, or an item with no parent with Add base. A new item is named after its parent; type a name to rename it. Copy scenario copies the selected scenario and asks whether to copy the alternatives it uses or share them.\n\n- Drag an item onto another to make it a child of that item. Drag an item between two items to reorder them.\n\n- Click an item to select it. Press F2, or choose Rename, to rename the selected item. Double-click a scenario, or press Enter, to make it current. Click the arrow beside an item, or press Left or Right, to collapse or expand it. Right-click an item for the same commands as the buttons.\n\n- Press Delete, or click the minus button, to delete the selected item. An item in use is not deleted, and the message names what uses it.\n\n- To make a scenario use another alternative, including Base, choose it in the scenario's row of the Scenarios table. An override made in a shared alternative changes every scenario that uses it.
+  > How scenarios and alternatives work:\n\nIn Basic mode, alternatives are hidden and automatic, and all new scenarios are children of the Base scenario.\n\nProperties and settings are grouped into alternatives categories that appear as columns of the Scenarios table and as management options in Scenario manager.\n\nOverrides are created in scenarios, but they really belong to the respective alternatives associated with the scenario; so a scenario is like a window to its alternatives. Associations of alternatives to scenarios are managed in the Scenarios table in the bottom pane. Creating a new scenario creates no alternatives; the new scenario uses its parent's alternatives until overrides are created that need new alternatives. When overrides are created in a scenario, they are stored in their respective alternative for the scenario; if the scenario has no such alternative, a new alternative is created using the name of the scenario.\n\nWith Basic mode off, a complex inheritance tree is available, and alternatives can be shared among scenarios. But the default behavior of edits when a new alternative is needed is to create an alternative named like the current scenario, which gives each scenario its unique set of alternatives.\n\nExample: You create a "Figure: Node and link IDs" scenario and edit a Text to say "Node and Link IDs." When you create the scenario, no alternatives are created. But at the moment you save the Text, a Text alternative called "Figure: Node and link IDs" is created with the override for the Text value. In Basic mode, you see this as simply an override in the scenario itself.\n\nIn any scenario other than Base, Copy properties copies only the overrides the asset has in that scenario.\n\nHow to manage scenarios:\n\n- Choose Scenarios or an alternatives category in the list at the top to show its tree.\n\n- Create a child of the selected item with Add child, or an item with no parent with Add base. A new item is named after its parent; type a name to rename it. Copy copies the selected item. Copying a scenario asks whether the copy shares edits with the original (it uses the same alternatives, so an edit in either changes both) or keeps its edits separate (it gets its own copies of the alternatives).\n\n- Drag an item onto another to make it a child of that item. Drag an item between two items to reorder them.\n\n- Click an item to select it. Press F2, or choose Rename, to rename the selected item. Double-click a scenario, or press Enter, to make it current. Click the arrow beside an item, or press Left or Right, to collapse or expand it. Right-click an item for the same commands as the buttons.\n\n- Press Delete, or click the minus button, to delete the selected item. An item in use is not deleted, and the message names what uses it. Deleting a scenario with Basic mode off keeps the alternatives it uses. Deleting a scenario with Basic mode on also deletes each of its alternatives that no other scenario uses.\n\n- To make a scenario use another alternative, including Base, choose it in the scenario's row of the Scenarios table. An override made in a shared alternative changes every scenario that uses it.
   @@ NEEDS RULING
 - **`lpn_sm_in_use`**
   > {name} cannot be deleted while it is used by: {list}.
@@ -539,7 +557,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**36 still to read**, of 39 new keys across 12 unmerged branch(es).
+**66 still to read**, of 69 new keys across 13 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -550,11 +568,11 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/bentley-interop (`9e4b35ab`) — adds no English strings
+### feat/bentley-interop (`a9be8bec`) — adds no English strings
 
 ### feat/desktop (`baba0f04`) — adds no English strings
 
-### feat/graph-bubble (`c3ce953d`) — 5 new, 5 to read @@ NEEDS RULING
+### feat/graph-bubble (`7054ea4a`) — 6 new, 6 to read @@ NEEDS RULING
 
 - **`lpn_tsb_close`**
   > Close graph
@@ -567,6 +585,9 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 - **`lpn_tsb_off_tip`**
   > Needs extended period results. Set a Total run time in Settings, Calculation, Time, and calculate.
+  @@ NEEDS RULING
+- **`lpn_tsb_quantity`**
+  > Quantity to graph
   @@ NEEDS RULING
 - **`lpn_tsb_resize`**
   > Drag to resize
@@ -596,13 +617,52 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/match-property (`05bda765`) — adds no English strings
 
-### feat/shape (`a5ce9cfc`) — 27 new, 27 to read @@ NEEDS RULING
+### feat/shape (`e34f3b8e`) — 56 new, 56 to read @@ NEEDS RULING
 
+- **`lpn_dxf_import_binary`**
+  > {file} is a binary DXF. Save it from your CAD program as an ASCII DXF, then import again.
+  @@ NEEDS RULING
+- **`lpn_dxf_import_bulge`**
+  > {n} polylines have arc segments, which were imported as straight segments between their vertices.
+  @@ NEEDS RULING
+- **`lpn_dxf_import_bulge_one`**
+  > One polyline has arc segments, which were imported as straight segments between its vertices.
+  @@ NEEDS RULING
+- **`lpn_dxf_import_inblocks`**
+  > in block definitions
+  @@ NEEDS RULING
+- **`lpn_dxf_import_refuse_geo`**
+  > A DXF drawing is flat, and this project is in latitude and longitude, so the coordinates of {file} have no place in it. Use Convert as… to copy the project into a coordinate system, then import again.
+  @@ NEEDS RULING
+- **`lpn_dxf_import_skipped`**
+  > {n} entities not imported: {list}.
+  @@ NEEDS RULING
+- **`lpn_dxf_import_skipped_one`**
+  > One entity not imported: {list}.
+  @@ NEEDS RULING
+- **`lpn_dxf_import_units`**
+  > The drawing states its units as {theirs} and this project uses {ours}. The numbers were not changed.
+  @@ NEEDS RULING
+- **`lpn_dxf_import_unreadable`**
+  > {file} is not an ASCII DXF file.
+  @@ NEEDS RULING
+- **`lpn_file_import_dxf`**
+  > Import DXF shapes…
+  @@ NEEDS RULING
+- **`lpn_file_import_dxf_tip`**
+  > Read the points, lines, and polylines of an ASCII DXF file into this project as Shapes, with each layer name kept as a property. Other entities are counted and listed, not imported. The coordinates are read as the X and Y of this project, with no conversion.
+  @@ NEEDS RULING
 - **`lpn_file_import_shapes`**
   > Import GeoJSON shapes…
   @@ NEEDS RULING
 - **`lpn_file_import_shapes_tip`**
   > Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network from an EPANET file. The project must be georeferenced or state a coordinate system.
+  @@ NEEDS RULING
+- **`lpn_file_import_shp`**
+  > Import shapefile shapes…
+  @@ NEEDS RULING
+- **`lpn_file_import_shp_tip`**
+  > Read the points, lines, and polygons of an ESRI shapefile into this project as Shapes, with the attribute columns kept as properties. Pick the .zip, or the .shp together with its .dbf and .prj. Latitude and longitude are converted to the project coordinate system; any other coordinate system that differs from the project is refused, not converted.
   @@ NEEDS RULING
 - **`lpn_geojson_import_done`**
   > {n} Shapes imported from {file}.
@@ -670,6 +730,54 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_pane_tab_shapes`**
   > Shapes
   @@ NEEDS RULING
+- **`lpn_shapes_frame_latlon`**
+  > latitude and longitude
+  @@ NEEDS RULING
+- **`lpn_shapes_frame_xy`**
+  > the X and Y of this project
+  @@ NEEDS RULING
+- **`lpn_shapes_import_frame`**
+  > The coordinates were read as {frame}, with no conversion.
+  @@ NEEDS RULING
+- **`lpn_shp_import_attrs`**
+  > Attribute columns kept as properties of each Shape: {list}.
+  @@ NEEDS RULING
+- **`lpn_shp_import_converted`**
+  > The coordinates are latitude and longitude. They were converted to {crs} by the transform the map uses.
+  @@ NEEDS RULING
+- **`lpn_shp_import_manyshp`**
+  > {file} holds more than one shapefile. Import one at a time.
+  @@ NEEDS RULING
+- **`lpn_shp_import_noprj`**
+  > There is no .prj file, so the coordinates were read as {frame}, with no conversion.
+  @@ NEEDS RULING
+- **`lpn_shp_import_noshp`**
+  > {file} has no .shp file in it. Pick the .zip of a shapefile, or the .shp together with its .dbf and .prj.
+  @@ NEEDS RULING
+- **`lpn_shp_import_prj_other`**
+  > The .prj states {theirs}. This project states no coordinate system, so the coordinates were read as {frame}, with no conversion.
+  @@ NEEDS RULING
+- **`lpn_shp_import_prj_same`**
+  > The .prj states {crs}, the coordinate system of this project, so the coordinates were not changed.
+  @@ NEEDS RULING
+- **`lpn_shp_import_refuse_crs`**
+  > {file} states {theirs}, and this project is in {ours}. Nothing was imported and nothing was converted. Use Convert as… to copy the project into the coordinate system of the file, then import again.
+  @@ NEEDS RULING
+- **`lpn_shp_import_refuse_local`**
+  > {file} is in latitude and longitude, and this project has no place on the Earth to which they can be converted. Georeference it first with Map, World map, Attach, then import again.
+  @@ NEEDS RULING
+- **`lpn_shp_import_refuse_range`**
+  > {file} has no .prj file, and its coordinates are not latitudes and longitudes, so they cannot be placed in this project.
+  @@ NEEDS RULING
+- **`lpn_shp_import_skipped`**
+  > {n} records not imported: {list}.
+  @@ NEEDS RULING
+- **`lpn_shp_import_skipped_one`**
+  > One record not imported: {list}.
+  @@ NEEDS RULING
+- **`lpn_shp_import_unreadable`**
+  > {file} is not a shapefile this page can read: {detail}
+  @@ NEEDS RULING
 - **`lpn_snap_shape_point`**
   > {shape}, point {n}
   @@ NEEDS RULING
@@ -680,10 +788,10 @@ build for that would be a gate nobody keeps. Refresh it with
   > Draw a point, a polyline, or a polygon on the map. A Shape is annotation and is not part of the network. Specify each point, then specify the last point again, press Enter, or right-click to finish. Specify the first point again to close the Shape into a polygon.
   @@ NEEDS RULING
 
-### feat/si-example (`fa3298c5`) — 4 new, 4 to read @@ NEEDS RULING
+### feat/si-example (`31f59714`) — 4 new, 4 to read @@ NEEDS RULING
 
 - **`lpn_ex_net2_si_desc`**
-  > Litres per second, with metres and millimetres. An EPANET example at Branford, Connecticut, converted from gallons per minute, feet and inches: 35 junctions and 1 tank, with no reservoir and no pump. Fluoride, a non-reactive substance, enters at one source.
+  > Litres per second, with metres and millimetres. An EPANET example at Branford, Connecticut, converted from gallons per minute, feet and inches: 35 junctions and 1 tank, with no reservoir, no pump and no valves, about 2 km by 4 km. Fluoride, a non-reactive substance, enters at one source.
   @@ NEEDS RULING
 - **`lpn_ex_net2_si_title`**
   > EPANET Net2, L/s (SI)
@@ -694,3 +802,5 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_ex_net3_si_title`**
   > EPANET Net3, L/s (SI)
   @@ NEEDS RULING
+
+### feat/tool-key (`163a1f50`) — adds no English strings

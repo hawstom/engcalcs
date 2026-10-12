@@ -2654,7 +2654,6 @@ $ec_lang['lpn_scenario_new_name']='Szenario {n}';
 $ec_lang['lpn_scenario_prompt_name']='Name für dieses Szenario';
 $ec_lang['lpn_scenario_rename']='Szenario umbenennen…';
 $ec_lang['lpn_scenario_delete']='Szenario löschen';
-$ec_lang['lpn_scenario_delete_confirm']='Das Szenario {name} und seine {n} Überschreibungen löschen? Die Zeichnung selbst wird nicht geändert.';
 $ec_lang['lpn_scenario_override']='In diesem Szenario überschreiben';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_scenario_override_tip']='Ausgewählt bedeutet, dass dieses Szenario für diesen Wert den übergeordneten Wert überschreibt, auch wenn die Zahl dieselbe ist. Abwählen, um den übergeordneten Wert zu verwenden.';

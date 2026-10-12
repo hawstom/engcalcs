@@ -2653,7 +2653,6 @@ $ec_lang['lpn_scenario_new_name']='Cenário {n}';
 $ec_lang['lpn_scenario_prompt_name']='Nome para este cenário';
 $ec_lang['lpn_scenario_rename']='Renomear cenário…';
 $ec_lang['lpn_scenario_delete']='Excluir cenário';
-$ec_lang['lpn_scenario_delete_confirm']='Excluir o cenário {name} e seus {n} valores individuais? O desenho em si não é alterado.';
 $ec_lang['lpn_scenario_override']='Valor individual neste cenário';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_scenario_override_tip']='Marcado significa que este cenário substitui o valor do pai, mesmo quando o número é o mesmo. Desmarque a caixa para usar o do pai.';

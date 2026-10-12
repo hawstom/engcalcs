@@ -2654,7 +2654,6 @@ $ec_lang['lpn_scenario_new_name']='Scénář {n}';
 $ec_lang['lpn_scenario_prompt_name']='Název tohoto scénáře';
 $ec_lang['lpn_scenario_rename']='Přejmenovat scénář…';
 $ec_lang['lpn_scenario_delete']='Smazat scénář';
-$ec_lang['lpn_scenario_delete_confirm']='Smazat scénář {name} a jeho specifické hodnoty ({n})? Samotný výkres se nemění.';
 $ec_lang['lpn_scenario_override']='Specifická hodnota v tomto scénáři';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_scenario_override_tip']='Zaškrtnuto znamená, že tento scénář pro tuto hodnotu přepisuje nadřazený scénář, i když je číslo stejné. Zrušením zaškrtnutí se použije hodnota nadřazeného scénáře.';

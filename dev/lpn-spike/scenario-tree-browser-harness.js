@@ -134,7 +134,9 @@ async function main() {
 		const tipParas = (await L('lpn_sm_help')).split('\\n\\n');
 		// Tom's draft of 2026-10-11, finished: his two headings, his model, his example named after its scenario.
 		ok('1.8 the tip is in two parts, each under a heading line of its own', tipParas.filter((t) => /:$/.test(t)).length === 2 && /:$/.test(tipParas[0]), JSON.stringify(tipParas));
-		const exScn = (tipParas[1].match(/create a "([^"]+)" scenario/) || [])[1], exAlt = (tipParas[1].match(/alternative called "([^"]+)"/) || [])[1];
+		// The example is the paragraph that begins "Example:" (Tom's text of 2026-10-12 put paragraphs before it).
+		const exPara = tipParas.filter((t) => /create a "[^"]+" scenario/.test(t))[0] || '';
+		const exScn = (exPara.match(/create a "([^"]+)" scenario/) || [])[1], exAlt = (exPara.match(/alternative called "([^"]+)"/) || [])[1];
 		ok('1.9 his example names the alternative after the scenario, and the typo is gone', !!exScn && exScn === exAlt && !/alernative/.test(tipParas.join(' ')), exScn + ' / ' + exAlt);
 		await page.mouse.click(...(await page.evaluate(() => { const g = document.querySelector('#lpn_smbox_title .ec-tip').getBoundingClientRect(); return [g.left + g.width / 2, g.top + g.height / 2]; })));
 		await a.settle(500);

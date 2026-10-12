@@ -2695,7 +2695,6 @@ $ec_lang['lpn_scenario_new_name']='Сценарий {n}';
 $ec_lang['lpn_scenario_prompt_name']='Име за този сценарий';
 $ec_lang['lpn_scenario_rename']='Преименуване на сценарий…';
 $ec_lang['lpn_scenario_delete']='Изтриване на сценарий';
-$ec_lang['lpn_scenario_delete_confirm']='Да се изтрие ли сценарият {name} и неговите {n} свои стойности? Самият чертеж не се променя.';
 $ec_lang['lpn_scenario_override']='Своя стойност в този сценарий';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_scenario_override_tip']='Отметнато означава, че този сценарий замества стойността на родителския си сценарий за тази стойност, дори когато числото е същото. Изчистете отметката, за да се използва стойността на родителя.';

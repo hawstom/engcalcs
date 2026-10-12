@@ -2654,7 +2654,6 @@ $ec_lang['lpn_scenario_new_name']='परिदृश्य {n}';
 $ec_lang['lpn_scenario_prompt_name']='इस परिदृश्य के लिए नाम';
 $ec_lang['lpn_scenario_rename']='परिदृश्य का नाम बदलें…';
 $ec_lang['lpn_scenario_delete']='परिदृश्य हटाएँ';
-$ec_lang['lpn_scenario_delete_confirm']='परिदृश्य {name} और उसके {n} अपने मान हटाएँ? ड्राइंग स्वयं नहीं बदलती।';
 $ec_lang['lpn_scenario_override']='इस परिदृश्य में अपना मान';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_scenario_override_tip']='चयनित का अर्थ है कि यह परिदृश्य इस मान के लिए अपने पैरेंट को अधिलेखित करता है, भले ही संख्या समान हो। पैरेंट का मान उपयोग करने के लिए बॉक्स को अचयनित करें।';

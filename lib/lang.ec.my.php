@@ -2693,7 +2693,6 @@ $ec_lang['lpn_scenario_new_name']='အခြေအနေ {n}';
 $ec_lang['lpn_scenario_prompt_name']='ဤအခြေအနေအတွက် အမည်';
 $ec_lang['lpn_scenario_rename']='အခြေအနေ အမည်ပြောင်းရန်…';
 $ec_lang['lpn_scenario_delete']='အခြေအနေ ဖျက်ရန်';
-$ec_lang['lpn_scenario_delete_confirm']='အခြေအနေ {name} နှင့် ၎င်း၏ ကိုယ်ပိုင်တန်ဖိုး {n} ခုကို ဖျက်မလား။ ပုံဆွဲမှုကိုယ်တိုင်ကို မပြောင်းလဲပါ။';
 $ec_lang['lpn_scenario_override']='ဤအခြေအနေတွင် ကိုယ်ပိုင်တန်ဖိုး';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_scenario_override_tip']='ရွေးချယ်ထားလျှင် ဂဏန်းတူနေသော်လည်း ဤအခြေအနေက ဤတန်ဖိုးအတွက် ၎င်း၏ မိဘကို အစားထိုးသည်။ မိဘ၏တန်ဖိုးကို သုံးရန် ဘောက်စ်ကို ရှင်းလင်းပါ။';

@@ -1,0 +1,375 @@
+// **TOM'S BROWSER PASS OF 2026-10-12 ON SCENARIOS, AND SUE'S REVIEW OF THE SAME DAY**, in a real
+// Chromium on crafted Net1 projects (Base > Fig 4 > Fig 5):
+//   B1  the Settings box's override note names the scenario holding the override (Fig 5), not Base;
+//   B2  a Text dragged in Fig 5 moves in Fig 5 only: Base and Fig 4 keep it where it was, and the
+//       position lands in Fig 5's own Text alternative; its size is overridable the same way;
+//   B3  a right-click menu action in an auto-hidden Scenario manager leaves the box out;
+//   B4  the manager's button is "Copy" on every tree; copying a scenario asks Separate or Share edits;
+//   B5/F1 Delete scenario asks one question naming what goes and what stays: Basic mode on deletes
+//       its unshared alternatives, off keeps them (and the manager's Delete asks too);
+//   M1  in a scenario, Copy properties copies overrides only ("No overrides to copy." when none);
+//       a paste in another scenario writes there (Base unchanged) and names the alternative it made;
+//   M2  in Basic mode a new scenario is a child of Base, even made while Fig 5 is current;
+//   F7  the menu's New and Rename refuse a name already used;
+//   F8  "Shared with" names a scenario that names the alternative, not a child that inherits it.
+// Wording is read from the page's own language strings, never written here.
+//
+//   node dev/lpn-spike/scenario-pass-1012-browser-harness.js   (takes the browser lock itself)
+//
+// Copyright 2009 Thomas Gail Haws
+// Licensed under GNU GPL v3.0 or later
+'use strict';
+const path = require('path');
+const fs = require('fs');
+const { execFileSync, spawnSync } = require('child_process');
+const REPO = path.resolve(__dirname, '..', '..');
+const LOCK_FILE = process.env.EC_BROWSER_LOCK || '/tmp/engcalcs-browser.lock';
+const LOCK_ENV = 'EC_SCNPASS1012_LOCKED';
+const NAME = 'scenario-pass-1012-browser-harness';
+if (process.env[LOCK_ENV] !== '1') {
+	let has = false;
+	try { execFileSync('which', ['flock'], { stdio: 'ignore' }); has = true; } catch (e) { /* none */ }
+	if (has) {
+		const r = spawnSync('flock', ['-E', '75', '-w', '280', LOCK_FILE, process.execPath, __filename], {
+			stdio: 'inherit', env: Object.assign({}, process.env, { [LOCK_ENV]: '1' }) });
+		if (r.status === 75) { console.error(NAME + ': NOT RUN -- browser lock held 280 s.'); process.exit(1); }
+		process.exit(r.status === null ? 1 : r.status);
+	}
+}
+let checks = 0, failures = 0;
+function ok(label, cond, detail) {
+	checks++;
+	if (!cond) { failures++; }
+	console.log((cond ? '  ok   ' : '  FAIL ') + label + (detail === undefined ? '' : '   ' + detail));
+}
+const byId = (arr, id) => (arr || []).filter((x) => x.id === id)[0];
+
+async function main() {
+	const env = require(path.join(REPO, 'dev', 'browser-pass', 'lib', 'env.js'));
+	const { Session } = require(path.join(REPO, 'dev', 'browser-pass', 'lib', 'session.js'));
+	const { chromium } = require(path.join(REPO, 'dev', 'browser-pass', 'node_modules', 'playwright-core'));
+	await env.startServer();
+	const executablePath = env.findChromium();
+	if (!executablePath) { console.error('no Chromium; SKIPPING'); env.stopServer(); process.exit(0); }
+	const browser = await chromium.launch({ executablePath });
+	const errors = [];
+	let a = null, page = null;
+	try {
+		// A crafted Net1: Base > Fig 4 > Fig 5, Fig 5 current. `basicOff` writes the browser preference.
+		const openProject = async (edit, basicOff) => {
+			const d = JSON.parse(fs.readFileSync(path.join(REPO, 'dev', 'water-network-examples', 'Net1.lwn'), 'utf8'));
+			d.scenarios.push({ id: 'f4', name: 'Fig 4', overrides: {} }, { id: 'f5', name: 'Fig 5', parent: 'f4', overrides: {} });
+			d.project = Object.assign({}, d.project, { activeScenario: 'f5' });
+			if (edit) { edit(d); }
+			if (a) { await a.context.close(); }
+			a = await Session.open(browser, 'A', { serviceWorkers: 'block' });
+			page = a.page;
+			page.on('pageerror', (e) => errors.push(String(e && e.message)));
+			await page.route(/tile\.openstreetmap\.org|api\.mapbox\.com/, (route) => route.abort());
+			await a.goto('Looped-Network.php?ec_nolog=1');
+			await page.evaluate(([txt, off]) => { localStorage.clear(); localStorage.setItem('lpn_project_hover', txt); if (off) { localStorage.setItem('lpn_scnbasic', 'off'); } }, [JSON.stringify(d), !!basicOff]);
+			await a.reload();
+			await a.answerTrainingPanel().catch(() => {});
+			await page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } });
+			await page.setViewportSize({ width: 1600, height: 1000 });
+			await a.settle(2500);
+			return d;
+		};
+		const L = (k) => a.lang(k);
+		const saved = () => page.evaluate(() => JSON.parse(localStorage.getItem('lpn_project_hover')));
+		const flush = async () => { await a.settle(2600); };
+		const scenarioMenu = async (label) => {
+			await page.click('#lpn_scenario_btn');
+			await page.waitForSelector('#lpn_menu_popup', { state: 'visible' });
+			let hit = false;
+			for (const r of await page.$$('#lpn_menu_list button.lpn-menu-row')) {
+				const t = (await r.textContent()).trim().replace(/^✓\s*/, '').replace(/\s*\(\d+\)$/, '');
+				if (t === label.trim()) { await r.click(); hit = true; break; }
+			}
+			if (!hit) { await page.keyboard.press('Escape'); }
+			await a.settle(1200);
+			return hit;
+		};
+		const tab = async (id) => { await page.click('#lpn_pane_tab_' + id); await a.settle(700); };
+		const cell = (kind, id, key) => page.evaluate(([k, i, c]) => {
+			const td = Array.from(document.querySelectorAll('#lpn_pane_' + k + ' td.lpn-pane-col-' + c)).filter((t) => t._lpnPaneId === i)[0];
+			if (!td) { return null; }
+			const inp = td.querySelector('input,select');
+			return inp ? (inp.type === 'checkbox' ? (inp.checked ? '1' : '0') : inp.value) : td.textContent.trim();
+		}, [kind, id, key]);
+		const typeInto = async (kind, id, key, text) => {
+			const h = await page.evaluateHandle(([s, i]) => Array.from(document.querySelectorAll(s)).filter((t) => t._lpnPaneId === i)[0],
+				['#lpn_pane_' + kind + ' td.lpn-pane-col-' + key, id]);
+			const inp = await h.asElement().$('input');
+			await inp.click();
+			await page.keyboard.press('Control+A');
+			await page.keyboard.type(text, { delay: 10 });
+			await page.keyboard.press('Tab');
+			await a.settle(900);
+		};
+		const pointOf = (group, id) => page.evaluate(([g, i]) => {
+			const el = Array.from(document.querySelectorAll('#lpn_canvas [data-' + g + '="' + i + '"]')).filter((e) => e.getBoundingClientRect().width > 0)[0];
+			if (!el) { return null; }
+			const r = el.getBoundingClientRect();
+			return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+		}, [group, id]);
+		const textPoint = () => page.evaluate(() => {
+			const t = document.querySelector('#lpn_canvas text[data-lbl="X2"]');
+			return t ? { x: +t.getAttribute('x'), y: +t.getAttribute('y'), fs: parseFloat(t.style.fontSize) } : null;
+		});
+		const rightClickRow = async (label) => {
+			const p = await pointOf(label[0], label[1]);
+			await page.mouse.move(p.x, p.y);
+			await page.mouse.click(p.x, p.y, { button: 'right' });
+			await a.settle(400);
+			const hit = await page.$$eval('.lpn-pane-ctxmenu button', (bs, l) => {
+				const b = bs.filter((x) => x.textContent.trim() === l)[0];
+				if (b) { b.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 })); }
+				return !!b;
+			}, label[2]);
+			await a.settle(1000);
+			return hit;
+		};
+		const clickNode = async (id, shift) => {
+			const p = await pointOf('node', id);
+			if (shift) { await page.keyboard.down('Shift'); }
+			await page.mouse.click(p.x, p.y);
+			if (shift) { await page.keyboard.up('Shift'); }
+			await a.settle(700);
+		};
+
+		// ---- B1 ----
+		console.log('--- B1. the Settings box note names the scenario holding the override ---');
+		await openProject((d) => { byId(d.scenarios, 'f5').settings = { labelSettings: { link: { id: false } } }; });
+		await a.toolbarClick(await L('lpn_tool_settings'));
+		await page.waitForSelector('#lpn_settings_box', { state: 'visible' });
+		await a.settle(800);
+		const notes = await page.evaluate(() => Array.from(document.querySelectorAll('#lpn_settings_box .lpn-set-heldnote')).map((n) => n.textContent.trim()));
+		const wantIn = (await L('lpn_settings_held_in')).replace('{scenario}', 'Fig 5');
+		ok('B1 a held row is marked in Fig 5', notes.length >= 1, JSON.stringify(notes));
+		ok('B1 every note begins by naming Fig 5, the scenario holding the override', notes.length > 0 && notes.every((n) => n.indexOf(wantIn) === 0), JSON.stringify(notes));
+		const BASEW = await L('lpn_scenario_base');
+		ok('B1 ...and no note begins with Base', notes.every((n) => n.indexOf(BASEW) !== 0));
+
+		// ---- B2 ----
+		console.log('\n--- B2. a Text moved in Fig 5 moves in Fig 5 only ---');
+		const d2 = await openProject();
+		const base0 = byId(d2.labels, 'X2');
+		const p0 = await textPoint();
+		const sp = await pointOf('lbl', 'X2');
+		await page.mouse.move(sp.x, sp.y);
+		await page.mouse.down();
+		await page.mouse.move(sp.x + 30, sp.y + 15, { steps: 4 });
+		await page.mouse.move(sp.x + 60, sp.y + 30, { steps: 4 });
+		await page.mouse.up();
+		await flush();
+		const p5 = await textPoint();
+		ok('B2 the Text moved on screen in Fig 5', p5 && (Math.abs(p5.x - p0.x) > 1 || Math.abs(p5.y - p0.y) > 1), JSON.stringify([p0, p5]));
+		let sv = await saved();
+		ok('B2 Base keeps its position in the file', Math.abs(byId(sv.labels, 'X2').x - base0.x) < 1e-9 && Math.abs(byId(sv.labels, 'X2').y - base0.y) < 1e-9,
+			JSON.stringify([byId(sv.labels, 'X2').x, byId(sv.labels, 'X2').y, base0.x, base0.y]));
+		const textAlt = (sv.alternatives || []).filter((r) => r.category === 'text')[0];
+		ok('B2 the position is in a Text alternative named Fig 5, which Fig 5 names', !!textAlt && textAlt.name === 'Fig 5' &&
+			!!(textAlt.values || {})['t:X2'] && typeof textAlt.values['t:X2'].x === 'number' && typeof textAlt.values['t:X2'].y === 'number' &&
+			(byId(sv.scenarios, 'f5').alternatives || {}).text === textAlt.id, JSON.stringify(sv.alternatives));
+		await scenarioMenu('Fig 4');
+		const p4 = await textPoint();
+		ok('B2 in Fig 4 the Text is where it was', p4 && Math.abs(p4.x - p0.x) < 1e-6 && Math.abs(p4.y - p0.y) < 1e-6, JSON.stringify([p0, p4]));
+		await scenarioMenu(await L('lpn_scenario_base'));
+		const pb = await textPoint();
+		ok('B2 in Base the Text is where it was', pb && Math.abs(pb.x - p0.x) < 1e-6 && Math.abs(pb.y - p0.y) < 1e-6, JSON.stringify([p0, pb]));
+		await scenarioMenu('Fig 5');
+		const p5b = await textPoint();
+		ok('B2 back in Fig 5 the Text is where it was moved', p5b && Math.abs(p5b.x - p5.x) < 1e-6 && Math.abs(p5b.y - p5.y) < 1e-6, JSON.stringify([p5, p5b]));
+		// Its size, typed in the Text table in Fig 5.
+		await a.toolbarClick(await L('lpn_pane_toggle'));
+		await a.settle(500);
+		await tab('text');
+		await typeInto('text', 'X2', 'sizeMult', '3');
+		await flush();
+		sv = await saved();
+		ok('B2 a size typed in Fig 5 is an override there; Base keeps its own', byId(sv.labels, 'X2').sizeMult === base0.sizeMult &&
+			((sv.alternatives || []).filter((r) => r.category === 'text')[0].values['t:X2'] || {}).sizeMult === 3, JSON.stringify(sv.alternatives));
+		await scenarioMenu(await L('lpn_scenario_base'));
+		const fsBase = (await textPoint()).fs;
+		await scenarioMenu('Fig 5');
+		ok('B2 the Text is drawn larger in Fig 5 than in Base', (await textPoint()).fs > fsBase * 1.4, fsBase + ' ' + (await textPoint()).fs);
+
+		// ---- M1 ----
+		console.log('\n--- M1. Copy and Paste properties in scenarios ---');
+		const dM = await openProject();
+		await a.toolbarClick(await L('lpn_pane_toggle'));
+		await a.settle(500);
+		await tab('junctions');
+		await rightClickRow(['node', '10', await L('lpn_copy_props_menu')]);
+		ok('M1 Copy on an asset with no overrides in Fig 5 says "No overrides to copy."', (await a.notice()) === (await L('lpn_copy_props_no_overrides')), await a.notice());
+		await typeInto('junctions', '10', 'elev', '777');
+		await rightClickRow(['node', '10', await L('lpn_copy_props_menu')]);
+		ok('M1 with an override, Copy says it copied the overrides', (await a.notice()) === (await L('lpn_copy_props_done_ov')).replace('{id}', '10'), await a.notice());
+		await scenarioMenu('Fig 4');
+		await tab('junctions');
+		const dem23 = await cell('junctions', '23', 'demand');
+		await clickNode('23');
+		await page.evaluate(() => { const p = document.getElementById('lpn_popup_close'); if (p && p.offsetParent) { p.click(); } });
+		await a.settle(300);
+		await rightClickRow(['node', '23', await L('lpn_paste_props_menu')]);
+		const pasteNote = await a.notice();
+		await tab('junctions');
+		ok('M1 pasted in Fig 4: junction 23 shows the copied elevation', (await cell('junctions', '23', 'elev')) === '777', await cell('junctions', '23', 'elev'));
+		ok('M1 ...and only the override was pasted: its demand is unchanged', (await cell('junctions', '23', 'demand')) === dem23);
+		const created = (await L('lpn_paste_alt_created')).replace('{category}', await page.evaluate(() => {
+			const o = Array.from(document.querySelectorAll('#lpn_sm_tree_select option')).filter((x) => x.value === 'physical')[0];
+			return o ? o.textContent : null;
+		}) || '').replace('{name}', 'Fig 4');
+		ok('M1 the notice names the alternative the paste created', pasteNote.indexOf((await L('lpn_paste_alt_created')).split('{category}')[0]) >= 0 && pasteNote.indexOf('Fig 4') >= 0, pasteNote + ' | ' + created);
+		await flush();
+		sv = await saved();
+		ok('M1 Base elevation of junction 23 is unchanged (paste elevation in a scenario leaves Base alone)', byId(sv.nodes, '23').elev === byId(dM.nodes, '23').elev, String(byId(sv.nodes, '23').elev));
+		const phys4 = (sv.alternatives || []).filter((r) => r.category === 'physical' && r.name === 'Fig 4')[0];
+		ok('M1 the elevation is in Fig 4\'s own Physical alternative', !!phys4 && ((phys4.values || {})['n:23'] || {}).elev === 777 && (byId(sv.scenarios, 'f4').alternatives || {}).physical === phys4.id, JSON.stringify(sv.alternatives));
+		await scenarioMenu(await L('lpn_scenario_base'));
+		await tab('junctions');
+		await rightClickRow(['node', '10', await L('lpn_copy_props_menu')]);
+		ok('M1 in Base, Copy copies properties as before', (await a.notice()) === (await L('lpn_copy_props_done')).replace('{id}', '10'), await a.notice());
+
+		// ---- M2 and F7 ----
+		console.log('\n--- M2, F7. a new scenario in Basic mode; duplicate names ---');
+		await openProject();
+		a.answerPromptWith('Fig 7');
+		await scenarioMenu(await L('lpn_scenario_new'));
+		await flush();
+		sv = await saved();
+		const f7 = sv.scenarios.filter((s) => s.name === 'Fig 7')[0];
+		ok('M2 New, made while Fig 5 (a grandchild) is current, is a child of Base', !!f7 && f7.parent === undefined && !f7.root, JSON.stringify(f7));
+		const n0 = sv.scenarios.length;
+		a.answerPromptWith('Fig 4');
+		await scenarioMenu(await L('lpn_scenario_new'));
+		await flush();
+		sv = await saved();
+		ok('F7 New refuses a name another scenario has', sv.scenarios.length === n0, String(sv.scenarios.length));
+		ok('F7 ...and says so', (await a.notice()) === (await L('lpn_sm_name_taken')).replace('{name}', 'Fig 4'), await a.notice());
+		a.answerPromptWith(await L('lpn_scenario_base'));
+		await scenarioMenu(await L('lpn_scenario_rename'));
+		await flush();
+		sv = await saved();
+		ok('F7 Rename refuses Base', sv.scenarios.filter((s) => s.name === 'Fig 7').length === 1, JSON.stringify(sv.scenarios.map((s) => s.name)));
+
+		// ---- B5 / F1 ----
+		console.log('\n--- B5, F1. Delete scenario, Basic mode on and off ---');
+		const withAlt = (d) => {
+			d.alternatives = [{ id: 'a1', category: 'physical', name: 'Fig 6', parent: null, values: { 'n:10': { elev: 701 } } },
+				{ id: 'a2', category: 'demand', name: 'Shared', parent: null, values: { 'n:10': { demand: 9 } } }];
+			d.scenarios.push({ id: 'f6', name: 'Fig 6', overrides: {}, alternatives: { physical: 'a1', demand: 'a2' } },
+				{ id: 'f9', name: 'Fig 9', overrides: {}, alternatives: { demand: 'a2' } });
+			d.project.activeScenario = 'f6';
+		};
+		await openProject(withAlt);
+		a.dialogs.length = 0;
+		a.answerConfirmsWith(true);
+		await scenarioMenu(await L('lpn_scenario_delete'));
+		await flush();
+		let asked = (a.dialogs[0] || {}).message || '';
+		ok('F1 Basic on: the question names the scenario and the overrides that go',
+			asked.indexOf((await L('lpn_scenario_delete_ask')).replace('{name}', 'Fig 6')) === 0 && asked.indexOf((await L('lpn_scenario_delete_goes')).replace('{n}', '1')) >= 0, asked);
+		ok('F1 ...and the shared alternative stays and is named', asked.indexOf((await L('lpn_scenario_delete_stays')).replace('{list}', 'Shared')) >= 0, asked);
+		sv = await saved();
+		ok('B5 Basic on: Fig 6 is deleted, and its unshared alternative with it', !byId(sv.scenarios, 'f6') && !byId(sv.alternatives, 'a1'), JSON.stringify(sv.alternatives));
+		ok('B5 ...and the alternative Fig 9 also uses stays', !!byId(sv.alternatives, 'a2'));
+		await openProject(withAlt, true);
+		a.dialogs.length = 0;
+		await scenarioMenu(await L('lpn_scenario_delete'));
+		await flush();
+		asked = (a.dialogs[0] || {}).message || '';
+		ok('F1 Basic off: the question says both alternatives stay', asked.indexOf((await L('lpn_scenario_delete_stays')).replace('{list}', 'Fig 6, Shared')) >= 0 &&
+			asked.indexOf((await L('lpn_scenario_delete_goes')).split('{n}')[0]) < 0, asked);
+		sv = await saved();
+		ok('B5 Basic off: Fig 6 is deleted and both alternatives stay', !byId(sv.scenarios, 'f6') && !!byId(sv.alternatives, 'a1') && !!byId(sv.alternatives, 'a2'));
+		// The manager's Delete asks the same question.
+		await openProject((d) => { withAlt(d); d.project.activeScenario = 'base'; }, true);
+		await scenarioMenu(await L('lpn_sm_menu'));
+		await page.locator('#lpn_sm_tree .lpn-sm-row', { has: page.locator('.lpn-sm-name', { hasText: /^Fig 6$/ }) }).first().locator('.lpn-sm-name').click();
+		await a.settle(300);
+		a.dialogs.length = 0;
+		await page.keyboard.press('Delete');
+		await flush();
+		asked = (a.dialogs[0] || {}).message || '';
+		ok('F1 the Scenario manager\'s Delete asks the same question', asked.indexOf((await L('lpn_scenario_delete_ask')).replace('{name}', 'Fig 6')) === 0, asked);
+		sv = await saved();
+		ok('F1 ...and deletes on yes, keeping the alternatives (Basic mode is off)', !byId(sv.scenarios, 'f6') && !!byId(sv.alternatives, 'a1'));
+
+		// ---- B4 ----
+		console.log('\n--- B4. one Copy button; Separate edits or Share edits ---');
+		const COPY = await L('lpn_sm_copy');
+		ok('B4 the Scenarios tree\'s button reads Copy', (await page.evaluate(() => (document.getElementById('lpn_sm_copy') || {}).textContent)) === COPY);
+		await page.locator('#lpn_sm_tree .lpn-sm-row', { has: page.locator('.lpn-sm-name', { hasText: /^Fig 9$/ }) }).first().locator('.lpn-sm-name').click();
+		await a.settle(300);
+		await page.evaluate(() => { window.__ans = window.lpnDialogAnswerer; delete window.lpnDialogAnswerer; });
+		await page.evaluate(() => document.getElementById('lpn_sm_copy').dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, detail: 1 })));
+		await a.settle(600);
+		const btns = await page.evaluate(() => Array.from(document.querySelectorAll('#lpn_dialog_buttons button')).map((b) => b.textContent.trim()));
+		ok('B4 copying a scenario asks Separate edits or Share edits', JSON.stringify(btns.slice(0, 2)) === JSON.stringify([await L('lpn_sm_copy_own'), await L('lpn_sm_copy_share')]), JSON.stringify(btns));
+		await page.evaluate((t) => { const b = Array.from(document.querySelectorAll('#lpn_dialog_buttons button')).filter((x) => x.textContent.trim() === t)[0]; b.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 })); }, await L('lpn_sm_copy_share'));
+		await flush();
+		sv = await saved();
+		const cp = sv.scenarios.filter((s) => /Fig 9/.test(s.name) && s.id !== 'f9')[0];
+		ok('B4 Share edits: the copy names the same alternative', !!cp && (cp.alternatives || {}).demand === 'a2', JSON.stringify(cp));
+		await page.selectOption('#lpn_sm_tree_select', 'demand');
+		await a.settle(500);
+		ok('B4 a category tree\'s button reads Copy too', (await page.evaluate(() => (document.getElementById('lpn_sm_copy') || {}).textContent)) === COPY);
+		await page.evaluate(() => { window.lpnDialogAnswerer = window.__ans; });
+
+		// ---- B3 ----
+		console.log('\n--- B3. a right-click action keeps an auto-hidden Scenario manager out ---');
+		await page.selectOption('#lpn_sm_tree_select', 'scenarios');
+		await a.settle(400);
+		await page.evaluate(() => document.querySelector('#lpn_sm_box [data-dock="right"]').dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 })));
+		await a.settle(800);
+		await page.evaluate(() => document.querySelector('#lpn_sm_box [data-dock="autohide"]').dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 })));
+		await a.settle(800);
+		const tabEl = () => page.evaluate(() => {
+			const t = Array.from(document.querySelectorAll('.lpn-dock-tab')).filter((x) => x.offsetParent && x.textContent.indexOf(document.getElementById('lpn_smbox_title').textContent.replace('?', '').trim()) >= 0)[0];
+			if (!t) { return null; }
+			const r = t.getBoundingClientRect();
+			return { x: r.left + r.width / 2, y: r.top + r.height / 2, open: t.getAttribute('aria-expanded') };
+		});
+		const t0 = await tabEl();
+		ok('B3 the box is auto-hidden on a tab', !!t0, JSON.stringify(t0));
+		if (t0) {
+			await page.mouse.move(t0.x, t0.y, { steps: 3 });
+			await a.settle(700);
+			const rows0 = await page.evaluate(() => document.querySelectorAll('#lpn_sm_tree .lpn-sm-row').length);
+			const rb = await page.locator('#lpn_sm_tree .lpn-sm-row').first().boundingBox();
+			await page.mouse.move(rb.x + 20, rb.y + rb.height / 2, { steps: 4 });
+			await page.mouse.click(rb.x + 20, rb.y + rb.height / 2, { button: 'right' });
+			await a.settle(400);
+			const ib = await (await page.evaluateHandle(() => document.querySelector('.lpn-sm-menu [data-sm-cmd="add"]'))).asElement().boundingBox();
+			await page.mouse.move(ib.x + 10, ib.y + 5, { steps: 4 });
+			await page.mouse.click(ib.x + 10, ib.y + 5);
+			await a.settle(1500);
+			ok('B3 the menu\'s Add child worked', (await page.evaluate(() => document.querySelectorAll('#lpn_sm_tree .lpn-sm-row').length)) === rows0 + 1);
+			ok('B3 ...and the box is still out', (await tabEl()).open === 'true', JSON.stringify(await tabEl()));
+		}
+
+		// ---- F8 ----
+		console.log('\n--- F8. "Shared with" counts only scenarios that name the alternative ---');
+		await openProject((d) => {
+			d.alternatives = [{ id: 'a1', category: 'physical', name: 'Fig 4', parent: null, values: { 'n:10': { elev: 700 } } }];
+			byId(d.scenarios, 'f4').alternatives = { physical: 'a1' };
+			d.scenarios.push({ id: 'f9', name: 'Fig 9', overrides: {}, alternatives: { physical: 'a1' } });
+			d.project.activeScenario = 'f4';
+		}, true);
+		await clickNode('10');
+		const shared = await page.evaluate(() => Array.from(document.querySelectorAll('#lpn_popup .lpn-ov-shared')).map((e) => e.textContent.trim()));
+		const want = (await L('lpn_sm_shared_note')).replace('{list}', 'Fig 9');
+		ok('F8 in Fig 4 the elevation note names Fig 9, which names the alternative, and not Fig 5, which inherits it',
+			shared.length > 0 && shared.every((t) => t === want), JSON.stringify(shared));
+
+		ok('no page error', errors.length === 0, JSON.stringify(errors).slice(0, 400));
+	} finally {
+		await browser.close();
+		env.stopServer();
+	}
+	console.log(NAME + ': ' + (failures ? failures + ' of ' + checks + ' FAILED' : checks + '/' + checks + ' checks passed'));
+	process.exit(failures ? 1 : 0);
+}
+main().catch((e) => { console.error(e); process.exit(1); });
