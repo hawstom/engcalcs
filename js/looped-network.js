@@ -359,8 +359,39 @@ var EngCalcs = EngCalcs || {};
 	// there is no continuous sweep to damp. Taking the nearest side unconditionally also makes
 	// js/lpn-collide.js's labelBoxAtEnd() correct by construction rather than by reproducing a
 	// render-time quirk -- the scorer and the renderer cannot disagree about a rule neither has.
+	// **THE LABEL IN THE HAND IS HELD BY THE SPOT THE READER GRABBED, NOT BY ITS LEADER END**
+	// (Tom, 2026-10-12: *"the label jumping out twice as far as my mouse cursor while dragging"*).
+	// A data label hangs off its leader's end on whichever side the flip rule picks, so a drag that
+	// moved only the END jumped the whole box by its own width whenever the end crossed the
+	// anchor's line, and the cursor was left a grab-distance outside the label. Here the box
+	// follows the cursor rigidly -- `gx` is how far from the box's left edge it was picked up -- and
+	// the end is wherever that puts it on the side the rule leaves standing. Where the box straddles
+	// the anchor's line neither side stands; the box sits at the rule's edge on the nearer side, so it
+	// lags the cursor by under a quarter of its width instead of jumping its width.
+	// dev/lpn-spike/label-drag-track-harness.js.
+	function heldLabelEnd(holder, anchor, cw, d) {
+		var w = labelBoxWidth(holder), left = cw.x - d.gx, hyst = (w / 2) * (2 * ADVERSE_FRAC - 1),
+			prev = holder.side || 'right', order = [prev, prev === 'right' ? 'left' : 'right'], i, e, x, er, el, side;
+		for (i = 0; i < 2; i++) {
+			e = order[i] === 'right' ? left : left + w;
+			if (Geom.labelSideAtEnd(order[i], e, anchor.x, w / 2, ADVERSE_FRAC) === order[i]) {
+				holder.side = order[i];
+				return { x: e, y: cw.y + d.offY };
+			}
+		}
+		// Neither side stands: the box can sit only at the rule's edge on one side or the other,
+		// short of the cursor by `er` or `el`. Take the nearer, and keep the current side until the
+		// other is nearer by an eighth of the box, so the box does not flicker across the line.
+		er = Math.max(0, (anchor.x - hyst * 0.9) - left);
+		el = Math.max(0, left - (anchor.x + hyst * 0.9 - w));
+		side = (prev === 'right' ? er <= el + w / 8 : el > er + w / 8) ? 'right' : 'left';
+		holder.side = side;
+		x = side === 'right' ? left + er : left + w - el;
+		return { x: x, y: cw.y + d.offY };
+	}
 	function dataLabelOrigin(holder, anchor, end, dragged) {
 		var w = labelBoxWidth(holder);
+		if (window.__lblDbg && dragged) { console.log('SEED origin ' + JSON.stringify({side0: holder.side, end: end.x, anchor: anchor.x, w: w})); }
 		holder.side = dragged
 			? Geom.labelSideAtEnd(holder.side, end.x, anchor.x, w / 2, ADVERSE_FRAC)
 			: (end.x >= anchor.x ? 'right' : 'left');
@@ -48185,7 +48216,9 @@ var EngCalcs = EngCalcs || {};
 				// stored as n.lx/n.ly, world units from the node center, same convention as a Text
 				// label's lb.x/lb.y offset from its anchor.
 				var nn = nodeById(t.dataset.nodelbl), posN = nodeLabelPos(nn), w4 = screenToWorld(e.clientX, e.clientY);
-				drag = { type: 'nodelbl', id: t.dataset.nodelbl, offX: posN.x - w4.x, offY: posN.y - w4.y };
+				var neN = nodeEls[t.dataset.nodelbl],
+					gxN = neN ? w4.x - (neN.side === 'left' ? posN.x - labelBoxWidth(neN) : posN.x) : null;
+				drag = { type: 'nodelbl', id: t.dataset.nodelbl, offX: posN.x - w4.x, offY: posN.y - w4.y, gx: gxN };
 				Object.assign(drag, common);
 			} else if (t.dataset.linklbl !== undefined) {
 				// GRABBING A REPEAT COLLAPSES THE CHAIN TO WHERE IT WAS GRABBED, and this line is the
@@ -48199,7 +48232,26 @@ var EngCalcs = EngCalcs || {};
 						? le5.repeats[+t.dataset.repeat] : null,
 					posL = rep5 ? repeatLabelPos(ll, rep5) : linkLabelPos(ll),
 					w5 = screenToWorld(e.clientX, e.clientY);
-				drag = { type: 'linklbl', id: t.dataset.linklbl, offX: posL.x - w5.x, offY: posL.y - w5.y };
+				// **AN ALIGNED LABEL IS NOT WHERE linkLabelPos() SAYS IT IS.** While `alignPipeLabels`
+				// holds, the label lies along its pipe, centred on it; the first frame of a drag
+				// re-lays it out left-anchored at the default offset, a box width or more from where
+				// it was grabbed. So the grab is measured on the box the reader is holding.
+				var gxL = null;
+				if (le5 && ll) {
+					var heldTxt = (rep5 && rep5.text) ? rep5.text : le5.text,
+						sideL = le5.side || 'right', wL = labelBoxWidth(le5);
+					if (linkLabelAligned(ll) && heldTxt) {
+						var hb = heldTxt.getBoundingClientRect();
+						if (hb.width > 0) {
+							var hc = screenToWorld(hb.left + hb.width / 2, hb.top + hb.height / 2);
+							posL = { x: hc.x - wL / 2, y: hc.y + effectiveFontSize() * 0.3 };
+							sideL = 'right';
+						}
+					}
+					gxL = w5.x - (sideL === 'left' ? posL.x - wL : posL.x);
+					le5.side = sideL;
+				}
+				drag = { type: 'linklbl', id: t.dataset.linklbl, offX: posL.x - w5.x, offY: posL.y - w5.y, gx: gxL };
 				Object.assign(drag, common);
 			} else {
 				drag = { type: 'pan', tx0: state.tx, ty0: state.ty }; Object.assign(drag, common);
@@ -49147,7 +49199,9 @@ var EngCalcs = EngCalcs || {};
 		} else if (drag.type === 'nodelbl') {
 			snapshotDragOnce();
 			var w6 = screenToWorld(p.x, p.y), nn2 = nodeById(drag.id),
-				t6 = snapLeaderOffset((w6.x + drag.offX) - nn2.x, (w6.y + drag.offY) - nn2.y);
+				held6 = (drag.gx !== null && drag.gx !== undefined && nodeEls[drag.id])
+					? heldLabelEnd(nodeEls[drag.id], nn2, w6, drag) : { x: w6.x + drag.offX, y: w6.y + drag.offY },
+				t6 = snapLeaderOffset(held6.x - nn2.x, held6.y - nn2.y);
 			nn2.lx = t6.x; nn2.ly = t6.y;
 			layoutNodeLabel(drag.id);
 			relayoutLabels();
@@ -49155,7 +49209,9 @@ var EngCalcs = EngCalcs || {};
 		} else if (drag.type === 'linklbl') {
 			snapshotDragOnce();
 			var w7 = screenToWorld(p.x, p.y), ll2 = linkById(drag.id), mid2 = linkLabelMid(ll2),
-				t7 = snapLeaderOffset((w7.x + drag.offX) - mid2.x, (w7.y + drag.offY) - mid2.y);
+				held7 = (drag.gx !== null && drag.gx !== undefined && linkEls[drag.id])
+					? heldLabelEnd(linkEls[drag.id], mid2, w7, drag) : { x: w7.x + drag.offX, y: w7.y + drag.offY },
+				t7 = snapLeaderOffset(held7.x - mid2.x, held7.y - mid2.y);
 			ll2.lx = t7.x; ll2.ly = t7.y;
 			layoutLinkLabel(drag.id);
 			relayoutLabels();
