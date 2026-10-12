@@ -8,7 +8,11 @@
 // "In scenario Peak Hour, I change a Base Demand. This triggers the creation of a Peak Hour demand
 // alternative child of the Base demand alternative."
 //
-// The model is DERIVED from the overrides (choice A in the doc), so what can go wrong is silent:
+// Since Tom's call of 2026-10-12 (*"It's a first-class alternative, and this is the primary way of
+// creating alternatives."*) the first override in a category STORES the scenario's own alternative,
+// named after it (section 3). A file from before holds the scenario's values in its own maps, and
+// for those the model is still DERIVED (choice A in the doc); sections 4 on build that shape
+// directly, and what can go wrong there is silent:
 //   1. a property nobody gave a category (it would quietly fall into User data);
 //   2. the derived tree disagreeing with what effective() reads -- the whole claim of choice A;
 //   3. the API mutating the overrides it reads, or a new key reaching the saved file.
@@ -27,7 +31,7 @@ global.alert = global.window.alert = function () {};
 const L = loadLoopedNetwork(
 	"\t\tgetDoc: function () { return doc; }, getScenarios: function () { return scenarios; },\n" +
 	"\t\tseedDefaultInputs: seedDefaultInputs, addNode: addNode, addLink: addLink, addText: addText,\n" +
-	"\t\teffective: effective, setProp: setProp, setOverride: setOverride, clearOverride: clearOverride,\n" +
+	"\t\teffective: effective, setProp: setProp, setOverride: setOverride, clearOverride: clearOverride, baseValue: baseValue,\n" +
 	"\t\tovKey: ovKey, createScenario: createScenario, switchScenario: switchScenario,\n" +
 	"\t\tdeleteScenario: deleteScenario, activeScenario: activeScenario, baseScenario: baseScenario,\n" +
 	"\t\tserializeProject: serializeProject, projectFileText: projectFileText, applySaved: applySaved,\n" +
@@ -41,7 +45,7 @@ const L = loadLoopedNetwork(
 	"\t\tgetSettings: function () { return settings; }, getProject: function () { return project; },\n" +
 	"\t\tscenarioMenuRows: scenarioMenuRows, openScenarioManager: openScenarioManager, smCellText: smCellText,\n" +
 	"\t\tsmBoxIsOpen: smBoxIsOpen, wireScenarioManager: wireScenarioManager,\n" +
-	"\t\tbasicMode: function () { return scenarioBasicMode; },\n" +
+	"\t\tbasicMode: function () { return scenarioBasicMode; }, touchTree: touchTree, altById: altById, calcSetById: calcSetById,\n" +
 	"\t\tbuildLayers: function () { svg = document.getElementById('lpn_canvas');\n" +
 	"\t\t\tworld = el('g', {}, svg);\n" +
 	"\t\t\tbackdropLayer = el('g', {}, world); gridLayer = el('g', {}, world);\n" +
@@ -121,33 +125,33 @@ let peak;
 		L.allAlternatives().length === L.CATS.length);
 
 	L.setProp(j2, 'demand', 180);
-	alts = L.alternativesOf(peak);
-	const d = alts.demand, all = L.allAlternatives(), extra = all.filter(function (a) { return !a.isBase; });
-	ok('Peak Hour now uses its own Demand alternative', !d.isBase && d.scenario === peak.id);
-	ok('...a child of the Base Demand alternative', d.parent === L.alternativeFor(L.baseScenario(), 'demand').id, d.parent);
-	ok('...holding exactly the one value typed', d.count === 1 && d.values[L.ovKey(j2)].demand === 180);
+	const stored = () => (L.getDoc().alternatives || []);
+	const dId = peak.alternatives && peak.alternatives.demand, d = dId && L.altById(dId);
+	ok('Peak Hour now uses its own Demand alternative, stored and named after it', !!d && d.category === 'demand' && d.name === 'Peak Hour', JSON.stringify(d));
+	ok('...a child of the Base Demand alternative', !!d && d.parent === null, d && d.parent);
+	ok('...holding exactly the one value typed', !!d && JSON.stringify(d.values) === JSON.stringify({ [L.ovKey(j2)]: { demand: 180 } }), JSON.stringify(d && d.values));
+	ok('...and the scenario holds no value of its own beside it', !Object.keys(peak.overrides || {}).length);
 	ok('every other category of Peak Hour is still Base\'s',
-		L.CATS.filter(function (c) { return c !== 'demand'; }).every(function (c) { return alts[c].isBase; }));
-	ok('the project holds exactly one alternative beyond the Base ones', extra.length === 1 && extra[0].id === d.id,
-		extra.map(function (a) { return a.id; }).join(', '));
-	const res = L.resolveThroughAlternatives(peak, j2, 'demand');
-	ok('the chain resolves the demand in Peak Hour\'s Demand alternative', res.found && res.value === 180 && res.alternative.id === d.id);
-	const res1 = L.resolveThroughAlternatives(peak, j1, 'demand');
-	ok('...and an untouched junction falls through to Base (the element\'s own)', !res1.found && L.effective(j1, 'demand') === 100);
+		Object.keys(peak.alternatives).join() === 'demand' && !peak.calc);
+	ok('the project holds exactly one alternative beyond the Base ones', stored().length === 1, stored().map(function (x) { return x.name; }).join(', '));
+	L.switchScenario(peak.id);
+	ok('the demand reads Peak Hour\'s alternative', L.effective(j2, 'demand') === 180);
+	ok('...and an untouched junction falls through to Base (the element\'s own)', L.effective(j1, 'demand') === 100);
 
 	// A description in the demand table (R-369) is the same category: still one alternative.
 	const rows = L.effective(j2, 'demands');
 	L.setProp(j2, 'demands', rows);
-	ok('a whole-breakdown write stays in the same Demand alternative',
-		L.allAlternatives().filter(function (a) { return !a.isBase; }).length === 1);
+	ok('a whole-breakdown write stays in the same Demand alternative', stored().length === 1 && !!d.values[L.ovKey(j2)].demands);
 
-	// A pipe diameter is Physical: a second child appears, of a different Base alternative.
+	// A pipe diameter is Physical: a second alternative appears, of a different category.
 	L.setProp(l2, 'diameter', 12);
-	const p = L.alternativeFor(peak, 'physical');
-	ok('a diameter makes a Physical child of Base Physical', !p.isBase && p.parent === L.alternativeFor(L.baseScenario(), 'physical').id);
+	const p = L.altById(peak.alternatives.physical);
+	ok('a diameter makes a Physical alternative named after the scenario, child of Base Physical', !!p && p.name === 'Peak Hour' && p.parent === null && stored().length === 2);
 	L.clearOverride(l2, 'diameter');
-	ok('clearing the last Physical value makes that child vanish', L.alternativeFor(peak, 'physical').isBase);
-	ok('...and leaves the Demand child standing', !L.alternativeFor(peak, 'demand').isBase);
+	ok('clearing its last value keeps the alternative: Peak Hour still names it (Tom: a first-class alternative)',
+		peak.alternatives.physical === p.id && L.altById(p.id) === p && L.effective(l2, 'diameter') === L.baseValue(l2, 'diameter'));
+	ok('...and leaves the Demand alternative standing', L.altById(dId).values[L.ovKey(j2)].demands.length === 1);
+	L.switchScenario('base');
 }
 
 // ---------------------------------------------------------------------------
@@ -158,6 +162,13 @@ let peak;
 // every element in every scenario, routing effective() through the alternatives would change
 // nothing anybody could observe.
 console.log('\n--- the alternatives rebuild every override map exactly ---');
+// A scenario's value in its own map, as a file from before 2026-10-12 holds it (setProp() now
+// stores the scenario's own alternative instead).
+function legacyPut(scn, el, p, v) {
+	const k = L.ovKey(el);
+	(scn.overrides[k] = scn.overrides[k] || {})[p] = v;
+	L.touchTree();
+}
 {
 	const t = L.addText(50, 50);
 	L.switchScenario('base');
@@ -168,14 +179,14 @@ console.log('\n--- the alternatives rebuild every override map exactly ---');
 	Object.keys(L.OVERRIDABLE).forEach(function (g) {
 		if (!holder[g]) { return; }
 		Object.keys(L.OVERRIDABLE[g]).forEach(function (p) {
-			if (p === 'x' || p === 'y') { return; } // position has its own writer; covered below by setProp
-			L.setOverride(holder[g], p, p === 'demands' ? [{ base: 7, pattern: '', category: 'x' }] : 1.5);
+			if (p === 'x' || p === 'y') { return; } // position is written below
+			legacyPut(s2, holder[g], p, p === 'demands' ? [{ base: 7, pattern: '', category: 'x' }] : 1.5);
 			written++;
 		});
 	});
-	L.setProp(j2, 'x', 222);
+	legacyPut(s2, j2, 'x', 222);
 	const s3 = L.createScenario('Only topology');
-	L.setProp(l2, 'active', false);
+	legacyPut(s3, l2, 'active', false);
 
 	const els = L.getDoc().nodes.concat(L.getDoc().links, L.getDoc().labels);
 	let mapsChecked = 0, mapBad = [], chainBad = [], effBad = [];
@@ -222,8 +233,11 @@ console.log('\n--- the alternatives rebuild every override map exactly ---');
 console.log('\n--- no file changes ---');
 {
 	const saved = L.serializeProject();
-	ok('the saved project carries no alternatives key', !has(saved, 'alternatives'));
-	ok('...and no scenario does either', saved.scenarios.every(function (s) { return !has(s, 'alternatives'); }));
+	ok('the saved project carries exactly the alternatives the edits stored: Peak Hour\'s Demand and Physical',
+		JSON.stringify((saved.alternatives || []).map(function (a) { return a.category + ':' + a.name; })) === JSON.stringify(['demand:Peak Hour', 'physical:Peak Hour']),
+		JSON.stringify(saved.alternatives));
+	ok('...and the scenarios whose values sit in their own maps name none',
+		saved.scenarios.filter(function (s) { return s.name !== 'Peak Hour'; }).every(function (s) { return !has(s, 'alternatives'); }));
 	const dir = ROOT + 'examples/';
 	fs.readdirSync(dir).filter(function (f) { return /\.lwn$/.test(f); }).forEach(function (f) {
 		const s = L.acceptImportedText(fs.readFileSync(dir + f, 'utf8'));
@@ -393,7 +407,9 @@ console.log('\n--- settings: an override resolves in its scenario and not in Bas
 		JSON.stringify(L.effectiveSetting(['settings', 'colorBreaks'])['node.pressure']) === '[10,20,30]');
 	ok('...a calculation option', L.effectiveSetting('settings.hydraulics.accuracy') === 0.0001);
 	ok('...a member of an atomic object, from the scenario\'s whole', L.effectiveSetting('settings.quality.mode') === 'age');
+	// A multiplier in the scenario's own field, as a file from before holds it.
 	pk.demandMultiplier = 2.5;
+	L.touchTree();
 	ok('...and the demand multiplier from where it has always been stored',
 		L.effectiveSetting('settings.hydraulics.demandMultiplier') === 2.5 && L.effectiveSetting('settings.hydraulics').demandMultiplier === 2.5);
 	ok('an untouched setting in Peak Hour is the project\'s own object, not a copy',
@@ -405,33 +421,39 @@ console.log('\n--- settings: an override resolves in its scenario and not in Bas
 	ok('...and the project\'s own objects were never written through the seam',
 		S.textSize === baseText && JSON.stringify(S.colorBreaks) === baseBreaks && S.hydraulics.accuracy !== 0.0001);
 
-	const pres = L.alternativeFor(pk, 'presentation'), calc = L.alternativeFor(pk, 'calculation');
-	ok('Peak Hour now uses its own Presentation alternative, a child of Base Presentation, of two values',
-		!pres.isBase && pres.parent === L.alternativeFor(L.baseScenario(), 'presentation').id && pres.count === 2 && pres.settings.length === 2);
-	// Q7 (Tom, 2026-10-05): the demand multiplier is a calculation option like accuracy, counted here.
-	ok('...and its own Calculation alternative, of three values, the demand multiplier among them',
-		!calc.isBase && calc.count === 3 && calc.settings.some(function (l) { return l.path.join('.') === 'settings.hydraulics.demandMultiplier'; }),
-		JSON.stringify(calc.settings));
-	ok('...and every element category is still Base\'s',
-		L.CATS.filter(function (c) { return c !== 'presentation' && c !== 'calculation'; }).every(function (c) { return L.alternativeFor(pk, c).isBase; }));
+	const leaves = (o) => { let n = 0; (function w(v) { if (v && typeof v === 'object' && !Array.isArray(v)) { Object.keys(v).forEach(function (k) { w(v[k]); }); } else { n++; } }(o || {})); return n; };
+	const pres = L.altById(pk.alternatives && pk.alternatives.presentation), calc = L.calcSetById(pk.calc);
+	ok('Peak Hour now uses its own Presentation alternative, stored, named after it, a child of Base Presentation, of two values',
+		!!pres && pres.name === 'Peak Hour' && pres.parent === null && leaves(pres.settings) === 2, JSON.stringify(pres));
+	// Q7 (Tom, 2026-10-05): calculation options are a calculation set; the multiplier still in the
+	// scenario's own field is nearest, and counted with them.
+	ok('...and its own calculation set, named after it, of two values (accuracy and the water quality choice)',
+		!!calc && calc.name === 'Peak Hour' && calc.settings.settings.hydraulics.accuracy === 0.0001 && calc.settings.settings.quality.mode === 'age' &&
+		JSON.stringify(Object.keys(calc.settings.settings).sort()) === '["hydraulics","quality"]' && !has(pk, 'settings'), JSON.stringify(calc));
+	ok('...and every element category is still Base\'s', JSON.stringify(Object.keys(pk.alternatives)) === '["presentation"]');
 	ok('the scenario\'s count includes its four setting values', L.overrideCount(pk) === 5, String(L.overrideCount(pk)));
 
 	const text = L.projectFileText();
 	L.applySaved(L.acceptImportedText(text));
 	L.buildDom();
 	const pk2 = L.getScenarios().filter(function (s) { return s.name === 'Peak Hour'; })[0];
-	ok('a scenario\'s settings block survives a save and reopen byte-identical',
-		L.projectFileText() === text && pk2.settings && pk2.settings.settings.textSize === baseText + 9);
+	ok('a scenario\'s settings survive a save and reopen byte-identical, in its alternative',
+		L.projectFileText() === text && L.altById(pk2.alternatives.presentation).settings.settings.textSize === baseText + 9);
 
 	['settings.textSize', ['settings', 'colorBreaks', 'node.pressure'], 'settings.hydraulics.accuracy', 'settings.quality'].forEach(function (p) {
 		L.setScenarioSetting(pk2, p, undefined);
 	});
 	delete pk2.demandMultiplier;
-	ok('clearing every value removes the block, and Peak Hour uses the Base alternatives again',
-		!has(pk2, 'settings') && L.alternativeFor(pk2, 'presentation').isBase && L.alternativeFor(pk2, 'calculation').isBase);
+	L.touchTree();
+	ok('clearing every value empties its alternatives and keeps them, still named (a first-class alternative)',
+		!has(pk2, 'settings') && !leaves(L.altById(pk2.alternatives.presentation).settings) && !leaves(L.calcSetById(pk2.calc).settings) &&
+		L.overrideCount(pk2) === 0);
 	L.deleteScenario(pk2.id);
 	L.switchScenario('base');
-	ok('...and with the scenario gone the file is what it was', L.projectFileText() === before);
+	const after = JSON.parse(L.projectFileText()), was = JSON.parse(before);
+	ok('...and with the scenario gone the file is what it was, but for the two empty records it made, which stay',
+		JSON.stringify((after.alternatives || []).concat(after.calcSets || []).map(function (r) { return r.name; })) === '["Peak Hour","Peak Hour"]' &&
+		(delete after.alternatives, delete after.calcSets, JSON.stringify(after) === JSON.stringify(was)));
 
 	// A file is read, never trusted.
 	const hand = JSON.parse(before);

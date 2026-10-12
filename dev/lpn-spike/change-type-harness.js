@@ -62,6 +62,9 @@ const INJECT =
 	"\t\teffective: effective, setProp: setProp, setCustomProp: setCustomProp,\n" +
 	"\t\tcreateScenario: createScenario, switchScenario: switchScenario, baseScenario: baseScenario,\n" +
 	"\t\tserializeProject: serializeProject, undo: undo, promoteImplicitAlternative: promoteImplicitAlternative,\n" +
+	// A scenario's values as it resolves them, wherever they are held (since 2026-10-12 an override
+	// stores the scenario's own alternative).
+	"\t\town: function (s) { return resolvedOverrides(s); },\n" +
 	"\t\tsetSelectionList: setSelectionList, changeSelectedNodeType: changeSelectedType, changeSelectedType: changeSelectedType,\n" +
 	"\t\tchangeTypeRows: changeTypeRows, nodeById: nodeById, linkById: linkById,\n" +
 	"\t\tincident: function (id) { return incidentLinks[id]; },\n" +
@@ -211,7 +214,7 @@ function run(mutate, quiet) {
 		ok('4.2 ...and the scenario\'s own, by name, led by the ID and a colon', text.split('\n').some(l => l.indexOf(J + ': ') === 0 && l.indexOf('Max day') > 0 && l.indexOf(' 25') > 0), text);
 		ok('4.3 Cancel: byte-identical, scenarios included', snap() === before);
 		change(J, 'tank', true);
-		const ov = (L.getScenarios().filter(s => s.id === scn.id)[0] || {}).overrides || {};
+		const ov = L.own(L.getScenarios().filter(s => s.id === scn.id)[0] || null) || {};
 		const key = Object.keys(ov).filter(k => k.slice(-J.length - 1) === ':' + J)[0];
 		ok('4.4 the scenario\'s demand override went with the type', !key || !('demand' in ov[key]),
 			JSON.stringify(ov));
@@ -229,8 +232,12 @@ function run(mutate, quiet) {
 		const scn = L.createScenario('Peak alt');
 		L.setProp(n, 'demand', 33);
 		L.setProp(n, 'initQuality', 0.7);
-		const altD = L.promoteImplicitAlternative(scn.id, 'demand', 'Peak demand');
-		const altQ = L.promoteImplicitAlternative(scn.id, 'constituent', 'Peak quality');
+		// The two writes stored the scenario's own Demand and Constituent alternatives, both named
+		// "Peak alt" after it; renamed here so the box's lines can be told apart.
+		const altOf = (cat) => (L.getDoc().alternatives || []).filter(x => x.category === cat && x.id === (scn.alternatives || {})[cat])[0];
+		const altD = altOf('demand'), altQ = altOf('constituent');
+		if (altD) { altD.name = 'Peak demand'; }
+		if (altQ) { altQ.name = 'Peak quality'; }
 		L.switchScenario(L.baseScenario().id);
 		const alts = () => L.getDoc().alternatives || [];
 		const valuesOf = (name) => { const a = alts().filter(x => x.name === name)[0]; return a ? (a.values || {})['n:' + J] || {} : null; };
@@ -378,7 +385,7 @@ function run(mutate, quiet) {
 		const low = L.createScenario('Low tank');
 		L.setProp(t2, 'level', 100);
 		L.switchScenario(L.baseScenario().id);
-		const ovOf = () => (L.getScenarios().filter(x => x.id === low.id)[0].overrides || {})['n:2'] || {};
+		const ovOf = () => L.own(L.getScenarios().filter(x => x.id === low.id)[0])['n:2'] || {};
 		let q = change('2', 'reservoir', true);
 		ok('11.1b the scenario\'s depth 100 became its head 950, and the box names it',
 			ovOf().head === 950 && !('level' in ovOf()) && (q[0] || '').indexOf('Low tank') >= 0, JSON.stringify(ovOf()));
@@ -695,8 +702,10 @@ function run(mutate, quiet) {
 		L.setProp(L.linkById('10'), 'typeId', 'DI30');
 		L.switchScenario(L.baseScenario().id);
 		const q = changeLink('10', 'valve', true);
-		ok('19.1 the box says that scenario\'s diameter 30 in becomes Base\'s 18 in',
-			(q[0] || '').indexOf('10: ' + PC.lpn_field_diameter + ' 30 in, in scenario S1, becomes 18 in') >= 0, q[0]);
+		// The type is held in S1's own Physical alternative (an override stores it, 2026-10-12), so
+		// the line names the alternative, as every value an alternative holds is named.
+		ok('19.1 the box says that S1\'s alternative loses its diameter 30 in',
+			(q[0] || '').indexOf('10: ' + PC.lpn_field_diameter + ' 30 in, ' + PC.lpn_change_type_line_alternative.split('{value}, ')[1].replace('{alternative}', 'S1')) >= 0, q[0]);
 		L.switchScenario(s1.id);
 		ok('19.2 ...and so it is', L.effective(L.linkById('10'), 'diameter') === 18, String(L.effective(L.linkById('10'), 'diameter')));
 		L.switchScenario(L.baseScenario().id);

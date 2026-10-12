@@ -20,6 +20,8 @@
 //      value, not a dropped write.
 //   6. Every third checkbox in the box, with the box scrolled so it is mid-way down, is ticked and
 //      cleared: it stays where it was on screen while notes appear and go.
+//   7. Tom's Fig 5 report: in a child scenario made in the Scenario manager, a label it inherits
+//      ticked is cleared, and the child gets its own Presentation alternative, named after it.
 //
 // DO NOT PREFIX THIS WITH `flock`: it takes /tmp/engcalcs-browser.lock itself.
 //
@@ -219,6 +221,46 @@ async function main() {
 			}
 		}
 		ok('every third checkbox in the box, ticked and cleared with the box scrolled to it (' + tried + ' clicks): none moves on screen', tried >= 20 && moved.length === 0, JSON.stringify(moved.slice(0, 8)));
+		console.log('--- 7. a child scenario: a Presentation setting changed there makes its own alternative ---');
+		// Tom, 2026-10-12: "when I changed presentation settings for a child called 'Fig 5: Pipe D, C,
+		// and k', it didn't create a scenario [alternative]". The child inherited its parent's ticked
+		// label, and clearing it wrote Base's own value (cleared) to the project, which the seam saw
+		// as no change at all. Made here as Tom made it: a child of Fig 5 in the Scenario manager.
+		await scenarioMenu(await L('lpn_sm_menu'));
+		await a.settle(800);
+		const smRow = (name) => page.locator('#lpn_sm_tree .lpn-sm-row', { has: page.locator('.lpn-sm-name', { hasText: new RegExp('^' + name + '$') }) }).first();
+		await smRow('Fig 5').locator('.lpn-sm-name').click();
+		await a.settle(400);
+		await page.evaluate(() => document.getElementById('lpn_sm_add').dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, detail: 1 })));
+		await a.settle(500);
+		await page.keyboard.press('Control+a');
+		await page.keyboard.type('Fig 6');
+		await page.keyboard.press('Enter');
+		await a.settle(600);
+		await smRow('Fig 6').locator('.lpn-sm-name').dblclick();
+		await a.settle(1200);
+		ok('Fig 6, a child of Fig 5, made current with a double-click', (await page.evaluate(() => document.getElementById('lpn_scenario_btn').textContent)).indexOf('Fig 6') >= 0);
+		await openBox();
+		const inherited = await rowOf(B);
+		ok('Fig 6 inherits Fig 5\'s ticked "' + B + '" label, unmarked (it holds nothing of its own)', inherited.checked && !inherited.held, JSON.stringify(inherited));
+		await clickBox(B);
+		const own6 = await rowOf(B);
+		ok('cleared in Fig 6: shows cleared, marked as Fig 6\'s override', !own6.checked && own6.held, JSON.stringify(own6));
+		const file6 = await page.evaluate(() => {
+			for (let i = 0; i < localStorage.length; i++) {
+				let d = null;
+				try { d = JSON.parse(localStorage.getItem(localStorage.key(i)) || 'null'); } catch (e) { d = null; }
+				if (d && Array.isArray(d.scenarios) && d.scenarios.some((s) => s.name === 'Fig 6')) { return d; }
+			}
+			return null;
+		});
+		const s6 = file6 && file6.scenarios.filter((s) => s.name === 'Fig 6')[0];
+		const alt6 = s6 && (file6.alternatives || []).filter((x) => x.id === (s6.alternatives || {}).presentation)[0];
+		ok('...and Fig 6 now has its own Presentation alternative, named Fig 6, in the file, holding the cleared label',
+			!!alt6 && alt6.name === 'Fig 6' && alt6.category === 'presentation' && alt6.settings.labelSettings.node[B] === false, JSON.stringify(alt6 || s6));
+		await scenarioMenu('Fig 5');
+		await openBox();
+		ok('...while Fig 5 keeps its own ticked', (await rowOf(B)).checked);
 		ok('no page error', errors.length === 0, JSON.stringify(errors.slice(0, 3)));
 	} finally {
 		await browser.close();

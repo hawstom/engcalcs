@@ -93,8 +93,14 @@
 	 */
 	EngCalcs.lpnExportGeoJson = function (doc, opts) {
 		opts = opts || {};
-		var eff = typeof opts.effective === 'function' ? opts.effective
-				: function (el, prop) { return el['_' + prop]; },
+		// The properties a document stores under their own name rather than an underscore (all
+		// overridable since 2026-10-12; LPN_BARE_PROP in js/looped-network.js).
+		var BARE = { elev: 1, minLevel: 1, maxLevel: 1, tankDiameter: 1, volCurve: 1, mixingModel: 1, mixingFraction: 1,
+				headPattern: 1, speed: 1, speedPattern: 1 },
+			// A caller's resolver written before then reads `_prop` only; a bare one it cannot find
+			// is read off the element, which is what Base holds.
+			effIn = typeof opts.effective === 'function' ? opts.effective : function (el, prop) { return el['_' + prop]; },
+			eff = function (el, prop) { var v = effIn(el, prop); return (v === undefined && BARE[prop]) ? el[prop] : v; },
 			covOf = typeof opts.coordOverride === 'function' ? opts.coordOverride : function () { return null; },
 			units = doc.units || {}, settings = doc.settings || {}, project = doc.project || {},
 			origin = (doc.origin && isFinite(doc.origin.x) && isFinite(doc.origin.y)) ? doc.origin : { x: 0, y: 0 },
@@ -222,7 +228,7 @@
 			u = {};
 			putText(p, 'description', nd.desc);
 			if (nd.type === 'junction') {
-				put(p, u, 'elevation', nd, 'elev', nd.elev || 0, uHead);
+				put(p, u, 'elevation', nd, 'elev', (eff(nd, 'elev') || 0), uHead);
 				var rows = EngCalcs.lpnDemandRows ? EngCalcs.lpnDemandRows(nd, eff(nd, 'demand') || 0) : null;
 				if (rows) {
 					put(p, u, 'base_demand', rows[0].rec, rows[0].key, rows[0].base || 0, uFlow);
@@ -235,17 +241,17 @@
 				}
 			} else if (nd.type === 'reservoir') {
 				var rh = eff(nd, 'head');
-				if (rh === undefined || rh === null || rh === '') { put(p, u, 'base_head', nd, 'elev', nd.elev || 0, uHead); }
+				if (rh === undefined || rh === null || rh === '') { put(p, u, 'base_head', nd, 'elev', (eff(nd, 'elev') || 0), uHead); }
 				else { put(p, u, 'base_head', nd, '_head', rh, uHead); }
-				putPattern(p, 'head_pattern', nd.headPattern);
+				putPattern(p, 'head_pattern', eff(nd, 'headPattern'));
 			} else {
-				put(p, u, 'elevation', nd, 'elev', nd.elev || 0, uHead);
+				put(p, u, 'elevation', nd, 'elev', (eff(nd, 'elev') || 0), uHead);
 				put(p, u, 'init_level', nd, '_level', eff(nd, 'level') || 0, uHead);
-				put(p, u, 'min_level', nd, 'minLevel', nd.minLevel || 0, uHead);
-				put(p, u, 'max_level', nd, 'maxLevel', nd.maxLevel || 0, uHead);
+				put(p, u, 'min_level', nd, 'minLevel', (eff(nd, 'minLevel') || 0), uHead);
+				put(p, u, 'max_level', nd, 'maxLevel', (eff(nd, 'maxLevel') || 0), uHead);
 				// Tank diameter is in the LENGTH unit, not the pipe-diameter unit (CLAUDE.md).
-				put(p, u, 'tank_diameter', nd, 'tankDiameter', nd.tankDiameter || 0, uLen);
-				putCurve(p, 'vol_curve', nd.volCurve);
+				put(p, u, 'tank_diameter', nd, 'tankDiameter', (eff(nd, 'tankDiameter') || 0), uLen);
+				putCurve(p, 'vol_curve', eff(nd, 'volCurve'));
 				// EPANET's own MinVol column, which this page does not hold: 0, as the .inp writer
 				// writes it. With a volume curve EPANET takes the minimum volume from the curve.
 				p.min_vol = new Raw('0');
@@ -296,8 +302,8 @@
 			} else if (lk.type === 'pump') {
 				lp.pump_type = 'HEAD';
 				putCurve(lp, 'pump_curve', eff(lk, 'curveId'));
-				if (typeof lk.speed === 'number') { put(lp, lu, 'base_speed', lk, 'speed', lk.speed, ''); }
-				putPattern(lp, 'speed_pattern', lk.speedPattern);
+				if (typeof eff(lk, 'speed') === 'number') { put(lp, lu, 'base_speed', lk, 'speed', eff(lk, 'speed'), ''); }
+				putPattern(lp, 'speed_pattern', eff(lk, 'speedPattern'));
 				lp.initial_status = closed ? 'Closed' : 'Open';
 			} else {
 				var vt = String(lk.valveType || 'TCV').toUpperCase(), set = eff(lk, 'setting') || 0;

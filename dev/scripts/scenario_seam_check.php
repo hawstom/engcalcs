@@ -172,6 +172,41 @@ foreach ($lines as $i => $line) {
     foreach ($found as $f) { $bad[] = ['line' => $i + 1, 'expr' => trim($f), 'text' => trim($line)]; }
 }
 
+// ---- 2b'. The overridable properties Base stores BARE (LPN_BARE_PROP) ----------------------------
+//
+// Tom made every property overridable on 2026-10-12, and the ones that had been Base-owned are
+// stored under their own names (`elev`, `minLevel`, `speed`...), as the file states them -- so the
+// `x._prop =` rule above cannot see a write to any of them, and `n.elev = v` in an editor would
+// edit Base from inside a scenario. The names are PARSED from LPN_BARE_PROP; the two positions are
+// left to their own guard (writeNodeCoord() is their one door, counted by node-coord-entry-harness.js).
+if (!preg_match('/var LPN_BARE_PROP = \{(.*?)\};/s', $src, $bp)) {
+    fwrite(STDERR, "FAIL: could not find LPN_BARE_PROP in js/looped-network.js.\n");
+    fwrite(STDERR, "It names the overridable properties Base stores without an underscore, and this check\n");
+    fwrite(STDERR, "derives the fields it guards from it. Fix the parse; do not hardcode the names.\n");
+    exit(1);
+}
+preg_match_all('/(\w+)\s*:\s*true/', $bp[1], $bpm);
+$bare = array_values(array_diff(array_unique($bpm[1]), ['x', 'y']));
+if (count($bare) < 5) {
+    fwrite(STDERR, "FAIL: parsed only " . count($bare) . " bare propert(ies) from LPN_BARE_PROP; the parse has drifted.\n");
+    exit(1);
+}
+$balt = implode('|', array_map('preg_quote', $bare));
+$bpatterns = [
+    '/(?<![\w.])[A-Za-z_$][\w$]*\.(' . $balt . ')\s*=(?!=)/',
+    '/\bdelete\s+[A-Za-z_$][\w$.]*\.(' . $balt . ')\b/',
+];
+foreach ($lines as $i => $line) {
+    if (preg_match('/^\s*(\/\/|\*|\/\*)/', $line)) { continue; }
+    $found = [];
+    foreach ($bpatterns as $bpat) {
+        if (preg_match_all($bpat, $line, $bh)) { $found = array_merge($found, $bh[0]); }
+    }
+    if (!$found) { continue; }
+    if (strpos($line, '// base-write:') !== false) { $approved += count($found); continue; }
+    foreach ($found as $f) { $bad[] = ['line' => $i + 1, 'expr' => trim($f), 'text' => trim($line)]; }
+}
+
 // ---- 2c. Override maps are walked by a named few, and maintenance goes through eachOverrideMap() ---
 //
 // Since the scenario tree is stored (dev/scenario-alternatives.md, stage 4), an override lives in
@@ -187,6 +222,8 @@ $ovAllowed = [
     'sanitizeScenarioTree', 'mergeAlternativeInto', 'combineHolders', 'scenarioHoldsLocal', 'takeScenarioLocals', 'promoteStored',
     // the one write seam, and the scenario's own count beside its name
     'setOverride', 'clearOverride', 'overrideCount',
+    // where a write lands, the scenario's own alternative made first (Tom, 2026-10-12)
+    'ownWriteMap',
     // the derived (Basic mode) alternatives, read off each scenario's own map
     'alternativesOf', 'resolveThroughAlternatives', 'alternativeOverrides',
     // opening a file: the old key migration, and the guarantee that every scenario has a map
@@ -213,6 +250,7 @@ if ($ovBad) {
 printf("Scenario write seam — %d group(s) (%s) and %d overridable propert(ies) parsed from LPN_OVERRIDABLE: %s\n",
     count($groups), implode(', ', $groups), count($props), implode(', ', $props));
 printf("  demand list stored as %s (LPN_DEMANDS_STORAGE)\n", implode(', ', $dfields));
+printf("  stored bare: %s (LPN_BARE_PROP)\n", implode(', ', $bare));
 printf("  %d approved base-write(s), %d unmarked direct write(s)\n\n", $approved, count($bad));
 
 if ($bad) {

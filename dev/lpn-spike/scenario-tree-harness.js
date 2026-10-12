@@ -395,14 +395,17 @@ console.log('\n--- 2. explicit but derivable == derived ---');
 	}
 	files.forEach((f) => {
 		open(f);
+		// A DERIVED project is one a file from before 2026-10-12 holds: the scenario's own values in
+		// its own maps. Written there directly, since a write through setProp() now stores the
+		// scenario's own alternative (ownWriteTarget()).
 		const busy = L.createScenario('Busy');
 		busy.demandMultiplier = 1.5; busy.times = { duration: 0 };
-		L.setScenarioSetting(busy, 'settings.hydraulics.accuracy', 1e-4);
-		L.setScenarioSetting(busy, 'times.patternStep', 1800);
+		busy.settings = { settings: { hydraulics: { accuracy: 1e-4 } }, times: { patternStep: 1800 } };
 		const pipe = L.getDoc().links.filter((l) => l.type === 'pipe')[0];
-		if (pipe) { L.setProp(pipe, 'diameter', 99); }
+		if (pipe) { busy.overrides[L.ovKey(pipe)] = { diameter: 99 }; }
 		const junc = L.getDoc().nodes.filter((n) => n.type === 'junction')[0];
-		if (junc) { L.setProp(junc, 'demand', 77); }
+		if (junc) { busy.overrides[L.ovKey(junc)] = { demand: 77 }; }
+		L.touchTree();
 		const derived = fp();
 		L.touchTree();
 		ok(f + ': the derived project reads as derived', !L.isExplicitTree());
@@ -563,12 +566,21 @@ function fixture(explicit) {
 	settingPaths = [['settings', 'hydraulics', 'demandMultiplier']];
 	L.switchScenario(L.baseScenario().id);
 	const peak = L.createScenario('Peak');
-	L.setProp(j, 'demand', 500);
+	// Peak's own demand in its own map, as a file from before stored own alternatives holds it, so
+	// fixture(false) is a derived project (setProp() would store Peak's alternative).
+	peak.overrides[L.ovKey(j)] = { demand: 500 };
+	L.touchTree();
 	const kid = explicit ? L.createScenario('Kid', peak.id) : null;
 	L.switchScenario(L.baseScenario().id);
 	return { d, j, pipe, peak, kid };
 }
-siteCase('setOverride', 'a demand typed in a child', () => { const f = fixture(true); return () => { L.getProject().activeScenario = f.kid.id; L.setProp(f.j, 'demand', 4321); }; });
+// The child's own alternative is made by its first demand, before the act: making one bumps the
+// epoch itself (promoteStored), so only a second write into it tests setOverride()'s own touch.
+siteCase('setOverride', 'a demand typed in a child', () => {
+	const f = fixture(true);
+	L.getProject().activeScenario = f.kid.id; L.setProp(f.j, 'demand', 1); L.getProject().activeScenario = L.baseScenario().id;
+	return () => { L.getProject().activeScenario = f.kid.id; L.setProp(f.j, 'demand', 4321); };
+});
 siteCase('clearOverride', 'a demand cleared in a parent', () => { const f = fixture(true); return () => { L.getProject().activeScenario = f.peak.id; L.clearOverride(f.j, 'demand'); }; });
 siteCase('createStored', 'the first alternative makes the tree stored', () => { fixture(false); return () => { L.createAlternative('physical', 'x', null); }; });
 siteCase('deleteStored', 'the last alternative goes', () => { fixture(false); const a = L.createAlternative('physical', 'x', null); return () => { L.deleteAlternative(a.id); }; });
@@ -593,6 +605,9 @@ siteCase('createScenario', 'a child scenario makes the tree stored', () => { con
 siteCase('deleteScenario', 'the only stored parent goes with its scenario', () => { const f = fixture(true); return () => { L.deleteScenario(f.kid.id); }; });
 siteCase('demandMultiplier', 'a parent\'s multiplier typed in the Settings table', () => {
 	const f = fixture(true);
+	// Peak's calculation set is made by its first multiplier (that bumps the epoch itself), so the
+	// act is a second write into it.
+	L.settingType(f.peak, ['settings', 'hydraulics', 'demandMultiplier'], '3');
 	return () => { L.settingType(f.peak, ['settings', 'hydraulics', 'demandMultiplier'], '4'); };
 });
 siteCase('georef', 'a scenario\'s own position moved by the georeferencing wizard', () => {
@@ -667,7 +682,10 @@ console.log('\n--- 7. the API ---');
 	const j = L.getDoc().nodes.filter((n) => n.type === 'junction')[0];
 	elements = [j];
 	const peak = L.createScenario('Peak Hour');
-	L.setProp(j, 'demand', 300);
+	// Held in Peak Hour's own map, as a file from before stored own alternatives holds it: the API's
+	// refusal and promote are about that shape (setProp() now stores the alternative itself).
+	peak.overrides[L.ovKey(j)] = { demand: 300 };
+	L.touchTree();
 	const fire = L.createScenario('Fire at Peak Hour');
 	ok('a scenario holding a local demand cannot just name an alternative', !!L.assignAlternative(peak.id, 'demand', L.createAlternative('demand', 'x', null).id).refused);
 	L.deleteAlternative(L.getDoc().alternatives[0].id);

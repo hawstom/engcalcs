@@ -668,7 +668,10 @@
 		});
 		model.nodes.forEach(function (m) {
 			if (!m || m.type !== 'tank') { return; }
-			var name = named[String(m.id)], curve = name ? curveById[name] : null, pts;
+			// The model states the name its scenario resolves (volCurveName, js/looped-network.js);
+			// a model built without it reads the document's own.
+			var name = m.volCurveName !== undefined ? (m.volCurveName ? String(m.volCurveName) : undefined) : named[String(m.id)],
+				curve = name ? curveById[name] : null, pts;
 			if (!curve) { return; }
 			pts = EC.lpnCurvePoints ? EC.lpnCurvePoints(curve) : null;
 			if (!volumeCurveUsable(pts)) { return; }

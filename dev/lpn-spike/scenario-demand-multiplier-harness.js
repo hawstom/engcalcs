@@ -32,7 +32,7 @@ const L = loadLoopedNetwork(
 	"\t\tactiveScenario: activeScenario, inBase: inBaseScenario,\n" +
 	"\t\toverrideCount: function (s) { return overrideCount(s || activeScenario()); },\n" +
 	"\t\tresolvedDemand: resolvedDemand, docDM: docDemandMultiplier,\n" +
-	"\t\tscenarioDM: scenarioDemandMultiplier,\n" +
+	"\t\tscenarioDM: scenarioDemandMultiplier, touchTree: touchTree,\n" +
 	"\t\tassembleModel: assembleModel,\n" +
 	"\t\texportInp: function () { return EngCalcs.lpnExportInp(serializeProject(), {\n" +
 	"\t\t\teffective: effective, demandMultiplier: scenarioDemandMultiplier() }); },\n" +
@@ -137,9 +137,13 @@ console.log('\n--- a scenario carries its own ---');
 	L.switchScenario(maxDay.id);
 
 	// Blank means inherit, in the scenario exactly as it means "the file did not say" in Base.
+	// (Written straight onto the scenario, so the resolver is told; the demand typed above made the
+	// tree a stored one, whose resolved values are cached.)
 	delete maxDay.demandMultiplier;
+	L.touchTree();
 	ok('clearing it inherits again', L.docDM() === 1.2, L.docDM());
 	maxDay.demandMultiplier = 1.8;
+	L.touchTree();
 }
 
 // ---------------------------------------------------------------------------

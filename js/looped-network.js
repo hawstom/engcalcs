@@ -4173,6 +4173,15 @@ var EngCalcs = EngCalcs || {};
 		node: { demand: true, emitter: true, head: true, level: true, active: true, fireFlow: true,
 			initQuality: true, tankCoeff: true, x: true, y: true,
 			sourceType: true, sourceQuality: true, sourcePattern: true,
+		// **EVERY OTHER PROPERTY TOO** (Tom, 2026-10-12: *"I don't accept this. Change it, include
+		// them all as overridable ... these limitations were ... indefensible."*). The ground, a
+		// reservoir's head pattern, a tank's depth limits, diameter, volume curve and mixing, and a
+		// pump's relative speed and speed pattern were Base-owned on the reading that what was BUILT
+		// does not vary by scenario. Bentley's own Physical alternative carries elevation, and "what
+		// if we raise this tank" or "what if this pump runs at 90 percent" is exactly a scenario's
+		// question. Stored bare, as the file and EPANET name them: see LPN_BARE_PROP.
+			elev: true, minLevel: true, maxLevel: true, tankDiameter: true, volCurve: true,
+			mixingModel: true, mixingFraction: true, headPattern: true,
 		// `demands` is a junction's WHOLE DEMAND BREAKDOWN -- every row's base, pattern and
 		// description -- as ONE property (R-369; Tom, 2026-09-28: *"Add a demand category in a
 		// scenario. It adds to Base. Bad."*). A category has no name to key an override by, only a
@@ -4217,7 +4226,9 @@ var EngCalcs = EngCalcs || {};
 		// throttling valves out of this reach" is the question a scenario asks, and it is answered
 		// by pointing the pipe at another list. **THE OVERRIDE IS ON WHICH LIST, NEVER ON WHAT A
 		// LIST CONTAINS**, for the reason stated for a curve above.
-			curveId: true, efficCurveId: true, typeId: true, fittingsId: true },
+			curveId: true, efficCurveId: true, typeId: true, fittingsId: true,
+		// A pump's relative speed and its speed pattern (Tom, 2026-10-12, as above).
+			speed: true, speedPattern: true },
 		// A TEXT LABEL IS A THIRD GROUP (Task 407) with exactly two properties: `text` is what the
 		// note SAYS and `active` whether it is there at all, which together answer "this scenario has
 		// its own note" with no second mechanism.
@@ -4229,6 +4240,16 @@ var EngCalcs = EngCalcs || {};
 	// The two overridable properties stored WITHOUT their underscore -- see the note above. Read by
 	// effective(), baseValue() and setProp(), which is every fork there is.
 	var LPN_COORD_PROP = { x: true, y: true };
+	// **THE OVERRIDABLE PROPERTIES BASE STORES WITHOUT AN UNDERSCORE** (Tom, 2026-10-12). Each was
+	// Base-owned until then and was always stored under its own name, as the file and EPANET's
+	// sections state it (`elev`, `minLevel`, `speed`...); moving them behind an underscore would be a
+	// document-format change in every module that reads a saved project. So effective(), baseValue()
+	// and setProp() read and write Base's value bare for these, exactly as they do for a position.
+	// The two positions are here too (their outward conversion is asked first, LPN_COORD_PROP).
+	// dev/scripts/scenario_seam_check.php reads this list and refuses a bare write of any of them
+	// that is not marked `// base-write:`.
+	var LPN_BARE_PROP = { x: true, y: true, elev: true, minLevel: true, maxLevel: true, tankDiameter: true, volCurve: true,
+		mixingModel: true, mixingFraction: true, headPattern: true, speed: true, speedPattern: true };
 	// **WHERE BASE KEEPS A JUNCTION'S `demands`** (R-369): row 0 is `_demand` plus two of these
 	// fields, and the rest of the list is `extraDemands`. A plain write to any of them edits Base
 	// from inside a scenario, exactly as `el._diameter = v` would, so
@@ -4297,6 +4318,7 @@ var EngCalcs = EngCalcs || {};
 		// touched is never mistaken for inactive. This is the one property effective() defaults
 		// itself, per the trap note in Task 146.08 step 2.
 		if (prop === 'active' && el['_' + prop] === undefined) { return true; }
+		if (LPN_BARE_PROP[prop]) { return el[prop]; }
 		return el['_' + prop];
 	}
 	// ---- the write side (ROADMAP Task 184's scenario UI) ----
@@ -4677,11 +4699,12 @@ var EngCalcs = EngCalcs || {};
 		// coordinate row. Stored bare, so it cannot come out of `el['_' + prop]`.
 		if (LPN_COORD_PROP[prop]) { return prop === 'y' ? outwardY(el.y) : outwardX(el.x); }
 		if (prop === 'active' && el['_' + prop] === undefined) { return true; }
+		if (LPN_BARE_PROP[prop]) { return el[prop]; }
 		return el['_' + prop];
 	}
 	function setOverride(el, prop, value) {
 		if (!el || !isOverridable(el, prop) || inBaseScenario()) { return; }
-		var scn = activeScenario(), key = ovKey(el), t = writeTargetFor(scn, categoryOf(prop, elGroup(el)));
+		var scn = activeScenario(), key = ovKey(el), t = ownWriteTarget(scn, categoryOf(prop, elGroup(el)));
 		// A stored alternative the scenario names takes the write (one source of truth: a scenario
 		// that names one holds no local value in its category).
 		if (t.kind === 'alt') { scn = { overrides: plainObject(t.obj.values) ? t.obj.values : (t.obj.values = {}) }; }
@@ -4730,6 +4753,7 @@ var EngCalcs = EngCalcs || {};
 			return;
 		}
 		if (!inBaseScenario() && isOverridable(el, prop)) { setOverride(el, prop, value); return; }
+		if (LPN_BARE_PROP[prop] && isOverridable(el, prop)) { el[prop] = value; return; }   // base-write: setProp() in Base, the one door
 		el['_' + prop] = value;
 	}
 	function overrideCount(scn) {
@@ -4764,9 +4788,16 @@ var EngCalcs = EngCalcs || {};
 				m = combineHolders(layers);
 				Object.keys(m.values).forEach(function (k) { total += Object.keys(m.values[k]).length; });
 				total += settingLeaves(m.settings).length;
+				// The multiplier and the two times count as calcOptionLeaves() counts a scenario's own:
+				// the nearest one stated, and only where it differs from the project's.
 				if (cat === 'calculation') {
-					if (layers.some(function (r) { return typeof r.demandMultiplier === 'number'; })) { total++; }
-					LPN_SCENARIO_TIME_KEYS.forEach(function (k) { if (layers.some(function (r) { return r.times && r.times[k] !== undefined; })) { total++; } });
+					var docDm = (settings.hydraulics || {}).demandMultiplier, dm = layers.filter(function (r) { return typeof r.demandMultiplier === 'number'; })[0];
+					if (!(typeof docDm === 'number' && isFinite(docDm))) { docDm = 1; }
+					if (dm && dm.demandMultiplier !== docDm) { total++; }
+					LPN_SCENARIO_TIME_KEYS.forEach(function (k) {
+						var r = layers.filter(function (x) { return scenarioTimeValue(x, k) !== undefined; })[0];
+						if (r && scenarioTimeValue(r, k) !== projectTimes()[k]) { total++; }
+					});
 				}
 			});
 		}
@@ -4832,13 +4863,23 @@ var EngCalcs = EngCalcs || {};
 			level: 'initial',
 			initQuality: 'constituent', tankCoeff: 'constituent', sourceType: 'constituent',
 			sourceQuality: 'constituent', sourcePattern: 'constituent',
-			fireFlow: 'fireflow' },
+			fireFlow: 'fireflow',
+			// SPECULATION, as `head` and `emitter` are (dev/scenario-alternatives.md): Bentley's
+			// Physical alternative carries a node's elevation and a tank's geometry; its tank
+			// mixing model we place with the rest of water quality; a reservoir's head pattern goes
+			// with the head it varies.
+			elev: 'physical', minLevel: 'physical', maxLevel: 'physical', tankDiameter: 'physical', volCurve: 'physical',
+			headPattern: 'physical',
+			mixingModel: 'constituent', mixingFraction: 'constituent' },
 		link: { diameter: 'physical', roughness: 'physical', k: 'physical', length: 'physical',
 			typeId: 'physical', fittingsId: 'physical', curveId: 'physical', efficCurveId: 'physical',
 			active: 'topology',
 			status: 'initial', setting: 'initial',
 			bulkCoeff: 'constituent', wallCoeff: 'constituent',
-			energyPrice: 'energy', energyPattern: 'energy' },
+			energyPrice: 'energy', energyPattern: 'energy',
+			// SPECULATION: Bentley's pump "Relative Speed Factor (Initial)" reads as an initial
+			// setting by its name; its pattern goes with it. Not confirmed from a cited page.
+			speed: 'initial', speedPattern: 'initial' },
 		// A Text's `active` is not topology: it takes nothing out of the solve, and Bentley keeps
 		// annotation outside the model altogether.
 		label: { text: 'text', active: 'text' }
@@ -4954,9 +4995,10 @@ var EngCalcs = EngCalcs || {};
 	// ---- SCENARIO TREE: STORED ALTERNATIVES, CALCULATION SETS, SCENARIO PARENTS -----------------
 	//
 	// Stages 4 and 5 of dev/scenario-alternatives.md. **NOTHING HERE IS WRITTEN EXCEPT BY AN
-	// EXPLICIT ACT** (share, name, reparent, set a scenario's parent), and a project that holds no
-	// such act is read exactly as before: isExplicitTree() false sends every reader down today's
-	// code. The stored shape:
+	// EXPLICIT ACT** (an override, which stores the scenario's own alternative since 2026-10-12;
+	// share, name, reparent, set a scenario's parent), and a project that holds no such act is read
+	// exactly as before: isExplicitTree() false sends every reader down the derived code. The stored
+	// shape:
 	//   scenario: {..., parent?: scenario id (absent = Base), alternatives?: {category: id}, calc?: id}
 	//   doc.alternatives: [{id, category, name, parent: null | id, values: {ovKey: {prop: v}}, settings: {mirror}}]
 	//   doc.calcSets: [{id, name, parent: null | id, settings: {mirror}, demandMultiplier?, times?}]
@@ -5056,6 +5098,8 @@ var EngCalcs = EngCalcs || {};
 			seen[s.id] = true;
 			out.push({ kind: 'scn', obj: s });
 			named = isCalc ? s.calc : (s.alternatives ? s.alternatives[cat] : undefined);
+			// A scenario that chose Base for the category inherits nothing past itself.
+			if (named === LPN_BASE_CHOICE) { return out; }
 			if (named !== undefined) { return out.concat(storedChain(isCalc ? 'calc' : 'alt', named, cat)); }
 			s = parentScenarioOf(s);
 		}
@@ -5167,6 +5211,7 @@ var EngCalcs = EngCalcs || {};
 	function writeTargetFor(scn, cat) {
 		var id, r;
 		if (!scn || scn.isBase) { return null; }
+		// (A scenario that chose Base names no record, so it writes its own values, as below.)
 		if (cat === 'calculation') {
 			r = scn.calc !== undefined ? calcSetById(scn.calc) : null;
 			return r ? { kind: 'calc', obj: r } : { kind: 'scn', obj: scn };
@@ -5175,6 +5220,37 @@ var EngCalcs = EngCalcs || {};
 		r = id !== undefined ? altById(id) : null;
 		return (r && r.category === cat) ? { kind: 'alt', obj: r } : { kind: 'scn', obj: scn };
 	}
+	/**
+	 * **AN OVERRIDE CREATES THE SCENARIO'S OWN ALTERNATIVE, A STORED ONE** (Tom, 2026-10-12: *"It's a
+	 * first-class alternative, and this is the primary way of creating alternatives."*). Where a
+	 * write in this scenario lands for one category: the record the scenario names, else a new
+	 * alternative (a calculation set, for Calculation) named after the scenario as it is now, whose
+	 * parent is what the scenario inherited, and which the scenario then names. From then on it is
+	 * an alternative like any other: renamed on its own, kept when its last override is cleared, and
+	 * written in the file. Any value the scenario held of its own in the category (a file from
+	 * before this) moves into it, so nothing resolves differently. Clearing never creates one:
+	 * that goes through writeTargetFor().
+	 */
+	function ownWriteTarget(scn, cat) {
+		var t = writeTargetFor(scn, cat), r;
+		if (!t || t.kind !== 'scn' || (cat !== 'calculation' && !storedCategoryOk(cat))) { return t; }
+		r = promoteStored(scn.id, cat, smUniqueName(cat, scenarioDisplayName(scn), smImplicitKey(scn, cat)));
+		if (!r || r.refused) { return t; }
+		return writeTargetFor(scn, cat);
+	}
+	// The element-value map a write in this scenario lands in for one category (ownWriteTarget()),
+	// made if need be; null for Base.
+	function ownWriteMap(scn, cat) {
+		var t = ownWriteTarget(scn, cat);
+		if (!t) { return null; }
+		if (t.kind === 'alt') { return plainObject(t.obj.values) ? t.obj.values : (t.obj.values = {}); }
+		return plainObject(t.obj.overrides) ? t.obj.overrides : (t.obj.overrides = {});
+	}
+	// **"Base" CHOSEN FOR A CATEGORY** (Tom, 2026-10-12: *"I can't select Base as the alternative."*):
+	// the value `scenario.alternatives[cat]` (or `scenario.calc`) holds when a scenario uses the Base
+	// alternative on purpose, whatever its parent uses. It is the Base item's own key in a category
+	// tree (smBaseKey()), and no stored id is ever "base" (treeNewId() makes a1, c1...).
+	var LPN_BASE_CHOICE = 'base';
 	// The override map an edit of this category lands in, for this scenario. Read-only here.
 	function localOverrideMap(scn, cat) {
 		var t = writeTargetFor(scn, cat);
@@ -5300,12 +5376,13 @@ var EngCalcs = EngCalcs || {};
 				else {
 					Object.keys(s.alternatives).forEach(function (cat) {
 						var a = altById(s.alternatives[cat]);
+						if (s.alternatives[cat] === LPN_BASE_CHOICE && storedCategoryOk(cat)) { return; }
 						if (!a || a.category !== cat) { delete s.alternatives[cat]; }
 					});
 					if (!Object.keys(s.alternatives).length) { delete s.alternatives; }
 				}
 			}
-			if (s.calc !== undefined && !calcSetById(s.calc)) { delete s.calc; }
+			if (s.calc !== undefined && s.calc !== LPN_BASE_CHOICE && !calcSetById(s.calc)) { delete s.calc; }
 		});
 	}
 	// A calculation set's own options, cleaned as a scenario's are: only calculation paths in its
@@ -5520,7 +5597,9 @@ var EngCalcs = EngCalcs || {};
 		if (kind === 'calc') { cat = 'calculation'; }
 		if (!s || s.isBase) { return treeRefuse('base'); }
 		if (kind === 'alt' && !storedCategoryOk(cat)) { return treeRefuse('category'); }
-		if (id !== null && id !== undefined) {
+		if (id === LPN_BASE_CHOICE) {
+			r = { id: LPN_BASE_CHOICE };
+		} else if (id !== null && id !== undefined) {
 			r = storedById(storedList(kind), id);
 			if (!r || (kind === 'alt' && r.category !== cat)) { return treeRefuse('missing'); }
 		}
@@ -5547,20 +5626,22 @@ var EngCalcs = EngCalcs || {};
 	function inheritedStoredChoice(s, cat) {
 		var p = s, seen = {}, named, r;
 		seen[s.id] = true;
-		if ((named = storedChoiceOf(s, cat)) !== undefined) { return named; }
+		if ((named = storedChoiceOf(s, cat)) !== undefined) { return named === LPN_BASE_CHOICE ? null : named; }
 		for (p = parentScenarioOf(s); p && !p.isBase && !seen[p.id]; p = parentScenarioOf(p)) {
 			seen[p.id] = true;
 			if (scenarioHoldsLocal(p, cat)) {
 				r = promoteStored(p.id, cat, p.name);
 				return r && r.id ? r.id : null;
 			}
-			if ((named = storedChoiceOf(p, cat)) !== undefined) { return named; }
+			if ((named = storedChoiceOf(p, cat)) !== undefined) { return named === LPN_BASE_CHOICE ? null : named; }
 		}
 		return null;
 	}
+	// LPN_BASE_CHOICE when the scenario chose Base on purpose.
 	function storedChoiceOf(s, cat) {
-		if (cat === 'calculation') { return s.calc !== undefined && calcSetById(s.calc) ? s.calc : undefined; }
-		return s.alternatives && s.alternatives[cat] !== undefined && altById(s.alternatives[cat]) ? s.alternatives[cat] : undefined;
+		if (cat === 'calculation') { return s.calc !== undefined && (s.calc === LPN_BASE_CHOICE || calcSetById(s.calc)) ? s.calc : undefined; }
+		return s.alternatives && s.alternatives[cat] !== undefined &&
+			(s.alternatives[cat] === LPN_BASE_CHOICE || altById(s.alternatives[cat])) ? s.alternatives[cat] : undefined;
 	}
 	/**
 	 * **PROMOTE: A SCENARIO'S IMPLICIT ALTERNATIVE BECOMES A STORED, NAMED ONE** -- the act that lets
@@ -5637,15 +5718,14 @@ var EngCalcs = EngCalcs || {};
 		owner = smImplicitOwner(tree, key);
 		return owner ? smImplicitRecord(owner, tree) : storedById(kind === 'calc' ? doc.calcSets : doc.alternatives, key);
 	}
-	// **A SCENARIO'S OWN ALTERNATIVE IS AN ITEM OF ITS CATEGORY'S TREE, NAMED AFTER THE SCENARIO**
-	// (Tom, 2026-10-11: *"if the scenario has no such alternative, a new alternative is created
-	// using the name of the scenario"*). It exists from the scenario's first override in that
-	// category, which goes into it; the next one in the same category reuses it; a scenario holding
-	// none uses its parent's. It is still not stored (choice A): the scenario's own values ARE it, so
-	// it is named after the scenario, follows a rename of it, goes with it when it is deleted, and
-	// goes when its last override is cleared. Its key is the derived id, `<scenario id>:<category>`.
-	// An act that makes it a thing of its own (Rename, a drag, Copy, Add child under it, sharing it
-	// with another scenario in the Scenarios table) stores it first (smMaterialize()).
+	// **A SCENARIO'S OWN VALUES IN A FILE FROM BEFORE 2026-10-12 ARE AN ITEM OF ITS CATEGORY'S TREE,
+	// NAMED AFTER THE SCENARIO.** Since then the first override in a category STORES the scenario's
+	// own alternative (ownWriteTarget(); Tom: *"It's a first-class alternative, and this is the
+	// primary way of creating alternatives."*). A file written before holds the values in the
+	// scenario's own maps, and those are shown as the derived item they always were, keyed
+	// `<scenario id>:<category>`, until a write in that category or an act that makes it a thing of
+	// its own (Rename, a drag, Copy, Add child under it, sharing it in the Scenarios table) stores it
+	// (smMaterialize()).
 	function smImplicitKey(s, cat) { return s.id + ':' + cat; }
 	function smImplicitOwner(tree, key) {
 		var i, s, c;
@@ -5915,6 +5995,7 @@ var EngCalcs = EngCalcs || {};
 		while (p && !p.isBase && !seen[p.id]) {
 			seen[p.id] = true;
 			named = storedChoiceOf(p, cat);
+			if (named === LPN_BASE_CHOICE) { return { id: null, base: true, chosen: true, via: inherited ? p : null }; }
 			if (named !== undefined) { return { id: named, via: inherited ? p : null }; }
 			if (scenarioHoldsLocal(p, cat)) { return { id: null, own: true, via: inherited ? p : null }; }
 			inherited = true;
@@ -5941,15 +6022,19 @@ var EngCalcs = EngCalcs || {};
 		else { name = smName(cat, smBaseKey(cat)); }
 		return c.via ? name + ' (' + (pc.lpn_sm_inherited || 'inherited') + ')' : name;
 	}
-	// The pick-list of one cell: ['' inherits / Base, then every item of the category by name].
+	// The pick-list of one cell: ['' inherits, then Base, then every item of the category by name].
+	// **BASE IS A CHOICE** (Tom, 2026-10-12: *"I can't select Base as the alternative."*), offered
+	// whenever the cell does not already show it.
 	function smCellChoices(s, cat) {
-		var out = [['', smCellText(s, cat)]], mine = smImplicitKey(s, cat);
+		var out = [['', smCellText(s, cat)]], mine = smImplicitKey(s, cat), base = smName(cat, smBaseKey(cat));
+		if (!smChoice(s, cat).base) { out.push([base, base]); }
 		// Its own alternative is the blank row's text already.
 		smRecords(cat).forEach(function (r) { if (r.id !== mine) { out.push([String(r.name || ''), String(r.name || '')]); } });
 		return out;
 	}
 	function smCellValue(s, cat) {
 		var c = smChoice(s, cat);
+		if (c.base && c.chosen && !c.via) { return smName(cat, smBaseKey(cat)); }
 		return (c.id !== null && c.id !== undefined && !c.via) ? smName(cat, c.id) : '';
 	}
 	/**
@@ -5961,7 +6046,11 @@ var EngCalcs = EngCalcs || {};
 	function smAssign(scnId, cat, name) {
 		var s = scenarioById(scnId), kind = cat === 'calculation' ? 'calc' : 'alt', rec = null, kept = null, res;
 		if (!s || s.isBase) { return treeRefuse('base'); }
-		if (name !== '' && name !== null && name !== undefined) {
+		if (name !== '' && name !== null && name !== undefined && name === smName(cat, smBaseKey(cat))) {
+			// Base, chosen on purpose: no record has its name (smNameTaken()).
+			rec = { id: LPN_BASE_CHOICE };
+			if (storedChoiceOf(s, cat) === LPN_BASE_CHOICE) { return true; }
+		} else if (name !== '' && name !== null && name !== undefined) {
 			// A stored record wins a name it shares with a scenario's own alternative.
 			smRecords(cat).forEach(function (r) { if (String(r.name || '') === name && !(rec && !rec.implicit)) { rec = r; } });
 			if (!rec) { return treeRefuse('missing'); }
@@ -6010,6 +6099,7 @@ var EngCalcs = EngCalcs || {};
 			if (field === 'calc') { held = { calculation: src.calc }; }
 			Object.keys(held).forEach(function (cat) {
 				var kind = cat === 'calculation' ? 'calc' : 'alt', orig = storedById(storedList(kind), held[cat]), c;
+				if (held[cat] === LPN_BASE_CHOICE) { copies[cat] = LPN_BASE_CHOICE; return; }
 				if (!orig) { return; }
 				if (mode === 'own') {
 					c = altCopy(orig);
@@ -6358,8 +6448,9 @@ var EngCalcs = EngCalcs || {};
 		if (!scn || scn.isBase || LPN_SETTING_ROOTS.indexOf(p[0]) < 0) { return false; }
 		if (!categoryOfSetting(p) || settingHasOtherHome(p)) { return false; }
 		touchTree('setScenarioSetting');
-		// A stored alternative or calculation set the scenario names takes the write.
-		scn = writeTargetFor(scn, categoryOfSetting(p)).obj;
+		// A stored alternative or calculation set the scenario names takes the write; a value written
+		// where it names none makes its own first (ownWriteTarget()).
+		scn = (value === undefined ? writeTargetFor(scn, categoryOfSetting(p)) : ownWriteTarget(scn, categoryOfSetting(p))).obj;
 		if (value === undefined) { settingDelete(scn, p); return true; }
 		scn.settings = plainObject(scn.settings) ? scn.settings : {};
 		node = scn.settings;
@@ -6902,11 +6993,9 @@ var EngCalcs = EngCalcs || {};
 	function pushSpecList() {
 		var pc = EngCalcs.pageConfig || {};
 		return [
-			{ key: 'nodeElev', group: 'node', field: 'elev', label: pc.lpn_field_elev || 'Elevation',
-				// Elevation is survey data, not an overridable design variable (LPN_OVERRIDABLE), so
-				// it has no `prop` and the scenario push skips it. It stays in the Settings push,
-				// which writes Base.
-				applies: function () { return true; }, get: function (n) { return n.elev; }, set: function (n, v) { n.elev = v; } },
+			{ key: 'nodeElev', group: 'node', field: 'elev', prop: 'elev', label: pc.lpn_field_elev || 'Elevation',
+				// Overridable since 2026-10-12 (Tom: every property), so the scenario push reaches it.
+				applies: function () { return true; }, get: function (n) { return effective(n, 'elev'); }, set: function (n, v) { n.elev = v; } },   // base-write: pushSpecList: the documented Base-level push, refused outside Base
 			// `altField` exists for this one row and says why it has to: a push is scoped by the
 			// labels on screen, and since 2026-08-25 a map showing a junction's demand is normally
 			// showing the RESOLVED one. Both labels describe the same stored number, so either being
@@ -7000,14 +7089,14 @@ var EngCalcs = EngCalcs || {};
 				applies: function () { return true; },
 				get: function (l) { return effective(l, 'status') === 'closed' ? 'closed' : 'open'; },
 				set: function (l, v) { l._status = v; } },   // base-write: pushSpecList: the documented Base-level push, refused outside Base
-			// **THE THREE PUMP-ONLY INPUTS (gap #5).** Speed is base-owned (not in
-			// LPN_OVERRIDABLE), so no `prop`, and the write is the same clamp
-			// paneColPumpSpeed() applies: a blank, a zero or a negative all mean 1 rather than a
-			// pump switched off, which has its own property (`status`, above).
-			{ key: 'speed', group: 'link', field: 'speed', label: pc.lpn_field_pump_speed || 'Relative speed',
+			// **THE THREE PUMP-ONLY INPUTS (gap #5).** Speed is overridable (2026-10-12), and the
+			// write is the same clamp paneColPumpSpeed() applies: a blank, a zero or a negative all
+			// mean 1 rather than a pump switched off, which has its own property (`status`, above).
+			{ key: 'speed', group: 'link', field: 'speed', prop: 'speed', label: pc.lpn_field_pump_speed || 'Relative speed',
 				applies: function (l) { return l.type === 'pump'; },
-				get: function (l) { return (typeof l.speed === 'number' && isFinite(l.speed)) ? l.speed : 1; },
-				set: function (l, v) { l.speed = (isFinite(v) && v > 0) ? v : 1; } },
+				get: function (l) { return pumpSpeedOf(l); },
+				norm: function (v) { return (isFinite(v) && v > 0) ? v : 1; },
+				set: function (l, v) { l.speed = (isFinite(v) && v > 0) ? v : 1; } },   // base-write: pushSpecList: the documented Base-level push, refused outside Base
 			{ key: 'energyPrice', group: 'link', field: 'energyPrice', prop: 'energyPrice', label: pc.lpn_energy_price || 'Price of power',
 				applies: function (l) { return l.type === 'pump'; },
 				get: function (l) { return effective(l, 'energyPrice'); }, set: function (l, v) { l._energyPrice = v; } },   // base-write: pushSpecList: the documented Base-level push, refused outside Base
@@ -7024,37 +7113,36 @@ var EngCalcs = EngCalcs || {};
 					if (!id || !libPatternsRead().some(function (pp) { return pp.id === id; })) { return; }
 					setProp(l, 'energyPattern', id);
 				} },
-			// **FOUR TANK SCALARS (gap #4).** `level` is overridable, so a plain `prop` is correct
-			// and safe -- its `set` mirrors `demand`'s own bare Base write, marked below. The
-			// other three are base-owned geometry, written bare exactly as their table cells are.
+			// **FOUR TANK SCALARS (gap #4).** All four are overridable (the geometry since
+			// 2026-10-12), so each has its `prop`; each `set` is the push's bare Base write, marked.
 			{ key: 'level', group: 'node', field: 'level', prop: 'level', label: pc.lpn_field_tank_level || 'Water depth',
 				applies: function (n) { return n.type === 'tank'; },
 				get: function (n) { return effective(n, 'level'); }, set: function (n, v) { n._level = v; } },   // base-write: pushSpecList: the documented Base-level push, refused outside Base
-			{ key: 'minLevel', group: 'node', field: 'minLevel', label: pc.lpn_field_tank_minlevel || 'Lowest water depth',
+			{ key: 'minLevel', group: 'node', field: 'minLevel', prop: 'minLevel', label: pc.lpn_field_tank_minlevel || 'Lowest water depth',
 				applies: function (n) { return n.type === 'tank'; },
-				get: function (n) { return n.minLevel; }, set: function (n, v) { n.minLevel = v; } },
-			{ key: 'maxLevel', group: 'node', field: 'maxLevel', label: pc.lpn_field_tank_maxlevel || 'Highest water depth',
+				get: function (n) { return effective(n, 'minLevel'); }, set: function (n, v) { n.minLevel = v; } },   // base-write: pushSpecList: the documented Base-level push, refused outside Base
+			{ key: 'maxLevel', group: 'node', field: 'maxLevel', prop: 'maxLevel', label: pc.lpn_field_tank_maxlevel || 'Highest water depth',
 				applies: function (n) { return n.type === 'tank'; },
-				get: function (n) { return n.maxLevel; }, set: function (n, v) { n.maxLevel = v; } },
-			{ key: 'tankDiameter', group: 'node', field: 'tankDiameter', label: pc.lpn_field_tank_diameter || 'Tank diameter',
+				get: function (n) { return effective(n, 'maxLevel'); }, set: function (n, v) { n.maxLevel = v; } },   // base-write: pushSpecList: the documented Base-level push, refused outside Base
+			{ key: 'tankDiameter', group: 'node', field: 'tankDiameter', prop: 'tankDiameter', label: pc.lpn_field_tank_diameter || 'Tank diameter',
 				applies: function (n) { return n.type === 'tank'; },
-				get: function (n) { return n.tankDiameter; }, set: function (n, v) { n.tankDiameter = v; } },
+				get: function (n) { return effective(n, 'tankDiameter'); }, set: function (n, v) { n.tankDiameter = v; } },   // base-write: pushSpecList: the documented Base-level push, refused outside Base
 			// **THE MIXING MODEL, A FOUR-WAY CHOICE**, on the same `choices` door `status` uses
 			// above. The CODES are the internal EPANET tokens and are never translated, so a saved
 			// query keeps reading in every language -- but the WORDS a person picks from are the
 			// popup's own four (paneColMixingModel()'s `choices()`, read through findChoiceDefs()
 			// so there is exactly one list of them, not a second copy to drift out of translation).
-			{ key: 'mixingModel', group: 'node', field: 'mixingModel',
+			{ key: 'mixingModel', group: 'node', field: 'mixingModel', prop: 'mixingModel',
 				choices: findChoiceDefs('mixingModel').map(function (o) { return o[0]; }),
 				label: pc.lpn_mixing_model || 'Mixing model',
 				applies: function (n) { return n.type === 'tank'; },
-				get: function (n) { return n.mixingModel || 'MIXED'; }, set: function (n, v) { n.mixingModel = v; } },
+				get: function (n) { return effective(n, 'mixingModel') || 'MIXED'; }, set: function (n, v) { n.mixingModel = v; } },   // base-write: pushSpecList: the documented Base-level push, refused outside Base
 			// **THE MIXING FRACTION, GATED EXACTLY AS THE TABLE CELL GATES IT** -- only a
 			// two-compartment tank has one, so `applies` refuses the rest rather than writing a
 			// number nothing reads.
-			{ key: 'mixingFraction', group: 'node', field: 'mixingFraction', label: pc.lpn_mixing_fraction || 'Mixing fraction',
-				applies: function (n) { return n.type === 'tank' && (n.mixingModel || 'MIXED') === '2COMP'; },
-				get: function (n) { return n.mixingFraction; }, set: function (n, v) { n.mixingFraction = v; } }
+			{ key: 'mixingFraction', group: 'node', field: 'mixingFraction', prop: 'mixingFraction', label: pc.lpn_mixing_fraction || 'Mixing fraction',
+				applies: function (n) { return n.type === 'tank' && (effective(n, 'mixingModel') || 'MIXED') === '2COMP'; },
+				get: function (n) { return effective(n, 'mixingFraction'); }, set: function (n, v) { n.mixingFraction = v; } }   // base-write: pushSpecList: the documented Base-level push, refused outside Base
 		].concat(customPushSpecs());
 	}
 	/**
@@ -7128,11 +7216,17 @@ var EngCalcs = EngCalcs || {};
 		}
 		// Counted, not estimated: how many overrides would actually be discarded. Zero says so in
 		// its own words, because "nothing to push" and "pushed nothing" look identical afterwards.
-		var hits = 0, touched = 0;
+		var hits = 0, touchedIds = {}, touched;
 		// The one place the scope is applied, to both the count and the delete -- so a confirm can
 		// never promise a different blast radius from the one that happens.
 		function scopedKeys(map) { return key ? (map[key] ? [key] : []) : Object.keys(map); }
-		eachOverrideMap(function (map) {
+		// **SCENARIOS, NOT MAPS**: one scenario's values sit in one alternative per category, so a
+		// map is counted as every scenario that reads through it.
+		function users(holder) {
+			if (scenarios.indexOf(holder) >= 0) { return [holder]; }
+			return scenarios.filter(function (sc) { return treeLayers(sc, holder.category).some(function (l) { return l.obj === holder; }); });
+		}
+		eachOverrideMap(function (map, holder) {
 			var any = false;
 			// Walks the map by KEY and matches on the property NAME only -- deliberately group-blind,
 			// because no property in pushSpecList() exists on both groups (`active` is the only name
@@ -7144,8 +7238,9 @@ var EngCalcs = EngCalcs || {};
 					});
 				});
 			});
-			if (any) { touched++; }
+			if (any) { users(holder).forEach(function (sc) { touchedIds[sc.id] = true; }); }
 		}, null, true);
+		touched = Object.keys(touchedIds).length;
 		if (!hits) { tellNotice(pc.lpn_scenario_push_none || 'No scenario overrides Base for any of these properties, so nothing would change. Nothing is discarded.'); return; }
 		// NAMES the properties as well as counting them, and NAMES THE ELEMENT when scoped to one --
 		// reusing lpn_field_id ("ID") rather than minting a key, per the whole-label reuse rule.
@@ -8770,14 +8865,14 @@ var EngCalcs = EngCalcs || {};
 	// by typing a head. Every consumer goes through this one function.
 	function reservoirHead(n) {
 		var h = effective(n, 'head');
-		return (h === undefined || h === null || h === '') ? (n.elev || 0) : h;
+		return (h === undefined || h === null || h === '') ? (effective(n, 'elev') || 0) : h;
 	}
 	// The water surface at ANY fixed-head node, in the Elevation/Head display unit. A tank's is
 	// derived -- bottom elevation plus the level standing in the vessel -- which is why there is no
 	// blank-means-follow rule for it: both halves are always real numbers. Everything that draws,
 	// labels, solves or reports a fixed head goes through here (Task 248).
 	function nodeFixedHead(n) {
-		if (n.type === 'tank') { return (n.elev || 0) + (effective(n, 'level') || 0); }
+		if (n.type === 'tank') { return (effective(n, 'elev') || 0) + (effective(n, 'level') || 0); }
 		return reservoirHead(n);
 	}
 	// **A PRESSURE IS A HEAD ABOVE A GROUND, so a node with no ground has no pressure** (Task 390).
@@ -8791,8 +8886,8 @@ var EngCalcs = EngCalcs || {};
 	function fixedHeadPressure(n) {
 		var held = heldTypeChange(n, 'pressure');
 		if (held !== undefined) { return held; }
-		if (n.type !== 'tank' && typeof n.elev !== 'number') { return undefined; }
-		return toDisplay(toSI(nodeFixedHead(n) - (n.elev || 0), 'lpn_u_elevhead'), resultUnit('pressure'));
+		if (n.type !== 'tank' && typeof effective(n, 'elev') !== 'number') { return undefined; }
+		return toDisplay(toSI(nodeFixedHead(n) - (effective(n, 'elev') || 0), 'lpn_u_elevhead'), resultUnit('pressure'));
 	}
 	function isFixedHeadNode(n) { return !!n && (n.type === 'reservoir' || n.type === 'tank'); }
 	// A tank's or reservoir's head as a result reads it, in the result unit: held across a type
@@ -8819,7 +8914,7 @@ var EngCalcs = EngCalcs || {};
 		}
 		return h[field];
 	}
-	function typeChangeSig(n) { return nodeFixedHead(n) + '|' + n.elev; }
+	function typeChangeSig(n) { return nodeFixedHead(n) + '|' + effective(n, 'elev'); }
 	// **A LINK WHOSE TYPE CHANGED HAS NO RESULTS UNTIL THE NEXT CALCULATE** (pre-review,
 	// 2026-10-06: Net1's pump 9 turned into a pipe showed a velocity of 0.00 and a head loss of
 	// 204 ft, numbers no solve produced). Unlike a node, nothing about a link's result can be read
@@ -10250,7 +10345,7 @@ var EngCalcs = EngCalcs || {};
 	// bottom colour: a pump has no velocity, and painting it dark blue would assert that it has a
 	// low one.
 	function colorNodeValue(n, field) {
-		if (field === 'elev') { return typeof n.elev === 'number' ? n.elev : undefined; }
+		if (field === 'elev') { var ev = effective(n, 'elev'); return typeof ev === 'number' ? ev : undefined; }
 		// baseDemandTotal(), NOT the junction's own field: with demand CATEGORIES the typed number is
 		// a list, and one row's base under the heading "Base demand" beside a Demand that sums them all
 		// is the disagreement Task 468 exists to end. Identical for a one-demand junction.
@@ -10334,12 +10429,12 @@ var EngCalcs = EngCalcs || {};
 	// derived from the typed numbers and moves with them, so the live numbers are right there.
 	var tankSnap = null;
 	function tankGeomLive(n) {
-		var hf = toSI(1, 'lpn_u_elevhead'), vf = hf * hf * hf, curve = n.volCurve ? curveById(n.volCurve) : null,
+		var hf = toSI(1, 'lpn_u_elevhead'), vf = hf * hf * hf, vc = effective(n, 'volCurve'), curve = vc ? curveById(vc) : null,
 			pts = curve ? curvePointsOf(curve) : [];
 		if (!(pts.length && EngCalcs.lpnTankVolumeCurveUsable && EngCalcs.lpnTankVolumeCurveUsable(pts))) { pts = null; }
 		else { pts = pts.map(function (pt) { return [pt[0] * hf, pt[1] * vf]; }); }
-		return { elevSI: toSI(n.elev || 0, 'lpn_u_elevhead'), minSI: toSI(n.minLevel || 0, 'lpn_u_elevhead'),
-			D: toSI(n.tankDiameter, 'lpn_u_length'), curve: pts };
+		return { elevSI: toSI(effective(n, 'elev') || 0, 'lpn_u_elevhead'), minSI: toSI(effective(n, 'minLevel') || 0, 'lpn_u_elevhead'),
+			D: toSI(effective(n, 'tankDiameter'), 'lpn_u_length'), curve: pts };
 	}
 	function captureTankSnapshot() {
 		var snap = {};
@@ -11358,7 +11453,7 @@ var EngCalcs = EngCalcs || {};
 			var elev = new Float64Array(grid.nx * grid.ny), m;
 			for (m = 0; m < elev.length; m++) { elev[m] = NaN; }
 			heights.forEach(function (h) { elev[h.id] = h.meters; });
-			contourDem.elev = elev;
+			contourDem.elev = elev;   // base-write: the contour's own sampled ground grid, not an asset
 			// What the legend says the surface stands on: the coarser of the grid cell and the DEM
 			// pixel, in metres on the ground.
 			var a = drawLonLat(grid.x0, grid.y0), b = drawLonLat(grid.x0 + grid.dx, grid.y0), cell = 0, px = 0;
@@ -17921,7 +18016,7 @@ var EngCalcs = EngCalcs || {};
 	// **A NODE THAT ALREADY HAS AN ELEVATION IS NOT IN THE LIST AND IS NOT IN THE WRITE.** The test
 	// is made twice on purpose -- once to build the request, once at the moment of writing -- because
 	// between the two a person may have typed one, and only the user touches a file's numbers.
-	function terrainHasElev(n) { return typeof n.elev === 'number' && isFinite(n.elev); }
+	function terrainHasElev(n) { var e = effective(n, 'elev'); return typeof e === 'number' && isFinite(e); }
 	/**
 	 * **THE LON/LAT OF NODES SOMEBODY ELSE CHOSE** (Task 542). The two new doors -- a node born on a
 	 * geographic project, and Find and replace with Elevation set to From DEM -- both arrive holding
@@ -18057,7 +18152,7 @@ var EngCalcs = EngCalcs || {};
 		var d = (scnSetting('defaults') || {}).nodeElev, out = [];
 		if (!projectLocatable() || typeof d !== 'number' || !isFinite(d)) { return { value: d, points: out }; }
 		doc.nodes.forEach(function (n) {
-			if (n.elev !== d) { return; }
+			if (effective(n, 'elev') !== d) { return; }
 			// **THE THIRD LIST, AND THE ONE THAT WAS MISSED ON 2026-09-14.** Its two siblings were
 			// taught about projected projects and this was not, so on a projected project it
 			// answered "no nodes are on the starting elevation" -- which is the list that MATTERS
@@ -18077,8 +18172,8 @@ var EngCalcs = EngCalcs || {};
 	 * from outside the document exactly as a solved head does, and what lands in the field is the
 	 * number a person would have typed, in the unit the strip is showing.
 	 *
-	 * `elev` is survey data and is deliberately NOT in LPN_OVERRIDABLE (see the property popup's own
-	 * note), so this is a plain element write and carries no scenario override.
+	 * `elev` is overridable (Tom, 2026-10-12: every property), so the write goes through setProp():
+	 * a fill made inside a scenario is that scenario's ground, as every other Find and replace is.
 	 *
 	 * `replaceValue` is the ONE value a node is allowed to already hold and still be written -- the
 	 * starting elevation the user answered a separate question about (see
@@ -18123,7 +18218,7 @@ var EngCalcs = EngCalcs || {};
 			// Recorded BEFORE the write is decided, so a reading is remembered even where the
 			// elevation is left alone -- see terrainLastRead's own note.
 			if (typeof e.meters === 'number' && isFinite(e.meters)) { terrainLastRead[e.id] = e.meters; }
-			if (terrainHasElev(n) && !replaceAny && !(mayReplace && n.elev === replaceValue)) { return; }
+			if (terrainHasElev(n) && !replaceAny && !(mayReplace && effective(n, 'elev') === replaceValue)) { return; }
 			if (typeof e.meters !== 'number' || !isFinite(e.meters)) { return; }
 			// Two decimals in the displayed unit. The raster's own quantum is 0.1 m, so more digits
 			// would be a precision the data does not have, and a person reading 143.7 ft can see at
@@ -18138,7 +18233,7 @@ var EngCalcs = EngCalcs || {};
 		// said. Returning early without this left the button looking like it had done nothing.
 		if (!pending.length) { refreshPopupIfOpen(); return []; }
 		saveUndoSnapshot();
-		pending.forEach(function (p) { p.n.elev = p.v; });
+		pending.forEach(function (p) { setProp(p.n, 'elev', p.v); });
 		buildDom();
 		refreshPopupIfOpen();
 		scheduleSolve();
@@ -21619,26 +21714,25 @@ var EngCalcs = EngCalcs || {};
 		if (prop === 'emitter') {
 			return cand.group === 'node' ? emitterToDisplay(effective(cand.el, 'emitter')) : undefined;
 		}
-		// **THE FOUR TANK SCALARS, TANK-ONLY** (Task 708, gap #4). `level` is overridable, so it
-		// is read through effective() like every other overridable input; the other three are
-		// base-owned geometry, read straight off the node exactly as their table cells do.
+		// **THE FOUR TANK SCALARS, TANK-ONLY** (Task 708, gap #4), all overridable, so all read
+		// through effective() like every other overridable input.
 		if (prop === 'level' || prop === 'minLevel' || prop === 'maxLevel' || prop === 'tankDiameter') {
 			if (cand.group !== 'node' || cand.el.type !== 'tank') { return undefined; }
-			var tankVal = prop === 'level' ? effective(cand.el, 'level') : cand.el[prop];
+			var tankVal = effective(cand.el, prop);
 			return (typeof tankVal === 'number' && isFinite(tankVal)) ? tankVal : undefined;
 		}
 		// **THE MIXING MODEL, AS THE TOKEN THE DOCUMENT STORES** -- 'MIXED' is the standing
 		// default, exactly as the table's own get() answers it.
 		if (prop === 'mixingModel') {
-			return (cand.group === 'node' && cand.el.type === 'tank') ? (cand.el.mixingModel || 'MIXED') : undefined;
+			return (cand.group === 'node' && cand.el.type === 'tank') ? (effective(cand.el, 'mixingModel') || 'MIXED') : undefined;
 		}
 		// **ONLY TWO-COMPARTMENT MIXING HAS A FRACTION**, the same gate the popup and the table
 		// draw the row under (paneColMixingFraction()'s own `plainFor`).
 		if (prop === 'mixingFraction') {
 			return (cand.group === 'node' && cand.el.type === 'tank'
-				&& (cand.el.mixingModel || 'MIXED') === '2COMP'
-				&& typeof cand.el.mixingFraction === 'number' && isFinite(cand.el.mixingFraction))
-				? cand.el.mixingFraction : undefined;
+				&& (effective(cand.el, 'mixingModel') || 'MIXED') === '2COMP'
+				&& typeof effective(cand.el, 'mixingFraction') === 'number' && isFinite(effective(cand.el, 'mixingFraction')))
+				? effective(cand.el, 'mixingFraction') : undefined;
 		}
 		// **A NODE'S POSITION** (Task 708, gap #7), read through nodeCoordAxis() -- the same
 		// resolver the popup's typed boxes and the Tables column (paneColCoord()) read, so a search
@@ -21652,13 +21746,12 @@ var EngCalcs = EngCalcs || {};
 		if (prop === 'status') {
 			return cand.group === 'link' ? (effective(cand.el, 'status') === 'closed' ? 'closed' : 'open') : undefined;
 		}
-		// **THE THREE PUMP-ONLY INPUTS** (Task 708, gap #5). Speed is base-owned (not in
-		// LPN_OVERRIDABLE) and read bare with the same "blank/zero/negative means 1" rule
-		// paneColPumpSpeed() states; the price and its pattern are overridable, read through
-		// effective() like every other input here.
+		// **THE THREE PUMP-ONLY INPUTS** (Task 708, gap #5), all overridable, read through
+		// effective(); speed with the same "blank/zero/negative means 1" rule paneColPumpSpeed()
+		// states (pumpSpeedOf()).
 		if (prop === 'speed') {
 			if (cand.group !== 'link' || cand.el.type !== 'pump') { return undefined; }
-			return (typeof cand.el.speed === 'number' && isFinite(cand.el.speed)) ? cand.el.speed : 1;
+			return pumpSpeedOf(cand.el);
 		}
 		if (prop === 'energyPrice') {
 			if (cand.group !== 'link' || cand.el.type !== 'pump') { return undefined; }
@@ -23531,7 +23624,9 @@ var EngCalcs = EngCalcs || {};
 	// purpose**, which is the same ruling tagField() makes at the popup: a scenario asks what if
 	// this pipe were bigger, not what if it were a different asset.
 	function replaceWrite(el, spec, v) {
-		if (spec.prop) { setProp(el, spec.prop, v); return; }
+		// `norm`: the rule a spec's own value obeys on every door (a pump's speed: a blank, a zero
+		// or a negative is 1), applied before the seam as its Base `set` applies it.
+		if (spec.prop) { setProp(el, spec.prop, spec.norm ? spec.norm(v) : v); return; }
 		spec.set(el, v);
 	}
 	// The redraw half of afterPropertyEdit(), per element. Its other half -- re-solve, re-count,
@@ -25296,9 +25391,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			} };
 	}
 	function paneColElev() {
-		return { key: 'elev', label: 'lpn_field_elev', unit: paneUnitElevHead, em: 3.5,
-			get: function (n) { return n.elev; },
-			set: function (n, v) { n.elev = v; updateNode(n.id, true); } };
+		return { key: 'elev', label: 'lpn_field_elev', unit: paneUnitElevHead, em: 3.5, prop: 'elev',
+			get: function (n) { return effective(n, 'elev'); },
+			set: function (n, v) { setProp(n, 'elev', v); updateNode(n.id, true); } };
 	}
 	/**
 	 * **A NODE'S POSITION AS TWO COLUMNS** (ROADMAP Task 674), the property popup's own two rows
@@ -25787,16 +25882,15 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				editDemandRows(n, function (rows) { rows[0].pattern = id; });
 			} };
 	}
-	// A reservoir's head pattern: EPANET multiplies the stated head by it. A PLAIN write, as in the
-	// popup -- which pattern a source follows is a statement about the system, not a design
-	// variable a scenario asks "what if" about.
+	// A reservoir's head pattern: EPANET multiplies the stated head by it. Overridable since
+	// 2026-10-12 (Tom: every property), as the head it varies is.
 	function paneColHeadPattern() {
 		return paneColPattern('headPattern', 'lpn_field_head_pattern',
-			function (n) { return n.headPattern; },
-			function (n, v) { n.headPattern = v || null; updateNode(n.id); }, false);
+			function (n) { return effective(n, 'headPattern'); },
+			function (n, v) { setProp(n, 'headPattern', v || null); updateNode(n.id); }, true);
 	}
 	function paneColMixingModel() {
-		return { key: 'mixingModel', label: 'lpn_mixing_model', em: 6,
+		return { key: 'mixingModel', label: 'lpn_mixing_model', em: 6, prop: 'mixingModel',
 			choices: function () {
 				var pc = EngCalcs.pageConfig || {};
 				return [['MIXED', pc.lpn_mixing_mixed || 'Complete mixing'],
@@ -25804,22 +25898,22 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 					['FIFO', pc.lpn_mixing_fifo || 'FIFO plug flow'],
 					['LIFO', pc.lpn_mixing_lifo || 'LIFO plug flow']];
 			},
-			get: function (n) { return n.mixingModel || 'MIXED'; },
-			set: function (n, v) { n.mixingModel = v; updateNode(n.id); } };
+			get: function (n) { return effective(n, 'mixingModel') || 'MIXED'; },
+			set: function (n, v) { setProp(n, 'mixingModel', v); updateNode(n.id); } };
 	}
 	// **ONLY TWO-COMPARTMENT MIXING HAS A FRACTION**, which is why the popup draws this row only for
 	// that model. The cell exists on every row because a column does; on the others it states the
 	// rule instead of showing a number nothing reads.
 	function paneColMixingFraction() {
-		return { key: 'mixingFraction', label: 'lpn_mixing_fraction', em: 3.5, blank: true,
-			get: function (n) { return n.mixingFraction; },
-			plainFor: function (n) { return (n.mixingModel || 'MIXED') !== '2COMP'; },
+		return { key: 'mixingFraction', label: 'lpn_mixing_fraction', em: 3.5, blank: true, prop: 'mixingFraction',
+			get: function (n) { return effective(n, 'mixingFraction'); },
+			plainFor: function (n) { return (effective(n, 'mixingModel') || 'MIXED') !== '2COMP'; },
 			plainWord: paneNotUsedWord,
 			plainTip: function () {
 				var pc = EngCalcs.pageConfig || {};
 				return pc.lpn_mixing_fraction_tip;
 			},
-			set: function (n, v) { n.mixingFraction = v; updateNode(n.id); } };
+			set: function (n, v) { setProp(n, 'mixingFraction', v); updateNode(n.id); } };
 	}
 	// **SHUT IS NOT THE SAME QUESTION AS "part of this network"**, and both belong here: Active is
 	// whether the scenario contains the link at all, Closed is whether water can pass through the one
@@ -25879,15 +25973,17 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// speed 0 is a pump that is off, and switching one off because a cell was cleared is the
 	// failure to avoid. Turning a pump off has its own column, Closed.
 	function paneColPumpSpeed() {
-		return { key: 'speed', label: 'lpn_field_pump_speed', em: 3,
-			get: function (l) { return (typeof l.speed === 'number' && isFinite(l.speed)) ? l.speed : 1; },
-			set: function (l, v) { l.speed = (isFinite(v) && v > 0) ? v : 1; } };
+		return { key: 'speed', label: 'lpn_field_pump_speed', em: 3, prop: 'speed',
+			get: function (l) { return pumpSpeedOf(l); },
+			set: function (l, v) { setProp(l, 'speed', (isFinite(v) && v > 0) ? v : 1); } };
 	}
 	function paneColSpeedPattern() {
 		return paneColPattern('speedPattern', 'lpn_field_speed_pattern',
-			function (l) { return l.speedPattern; },
-			function (l, v) { l.speedPattern = v || null; }, false);
+			function (l) { return effective(l, 'speedPattern'); },
+			function (l, v) { setProp(l, 'speedPattern', v || null); }, true);
 	}
+	// A pump's relative speed as it is read everywhere: a blank is 1.
+	function pumpSpeedOf(l) { var v = effective(l, 'speed'); return (typeof v === 'number' && isFinite(v)) ? v : 1; }
 	function paneColEnergyPrice() {
 		return { key: 'energyPrice', label: 'lpn_energy_price', em: 3.5, blank: true, prop: 'energyPrice',
 			unitText: function () {
@@ -26308,20 +26404,20 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 					{ key: 'level', em: 3.5, label: 'lpn_field_tank_level', unit: paneUnitElevHead,
 						prop: 'level', get: function (n) { return effective(n, 'level'); },
 						set: function (n, v) { setProp(n, 'level', v); } },
-					{ key: 'minLevel', em: 3.5, label: 'lpn_field_tank_minlevel', unit: paneUnitElevHead,
-						get: function (n) { return n.minLevel; },
-						set: function (n, v) { n.minLevel = v; updateNode(n.id, true); } },
-					{ key: 'maxLevel', em: 3.5, label: 'lpn_field_tank_maxlevel', unit: paneUnitElevHead,
-						get: function (n) { return n.maxLevel; },
-						set: function (n, v) { n.maxLevel = v; updateNode(n.id, true); } },
+					{ key: 'minLevel', em: 3.5, label: 'lpn_field_tank_minlevel', unit: paneUnitElevHead, prop: 'minLevel',
+						get: function (n) { return effective(n, 'minLevel'); },
+						set: function (n, v) { setProp(n, 'minLevel', v); updateNode(n.id, true); } },
+					{ key: 'maxLevel', em: 3.5, label: 'lpn_field_tank_maxlevel', unit: paneUnitElevHead, prop: 'maxLevel',
+						get: function (n) { return effective(n, 'maxLevel'); },
+						set: function (n, v) { setProp(n, 'maxLevel', v); updateNode(n.id, true); } },
 					// **THE LENGTH UNIT, NOT ELEVATION/HEAD AND NOT THE PIPE-DIAMETER UNIT** (CLAUDE.md;
 					// a pre-review pass caught this heading printing "Tank diameter (ft H2O)", "(ft
 					// WS)" in German -- a head suffix on a horizontal distance). Not the pipe unit
 					// either: inches or millimetres would put a 15 m tank on screen as 15000. The
 					// popup says the same thing in its tip.
-					{ key: 'tankDiameter', em: 3.5, label: 'lpn_field_tank_diameter', unit: paneUnitLength,
-						get: function (n) { return n.tankDiameter; },
-						set: function (n, v) { n.tankDiameter = v; updateNode(n.id, true); } },
+					{ key: 'tankDiameter', em: 3.5, label: 'lpn_field_tank_diameter', unit: paneUnitLength, prop: 'tankDiameter',
+						get: function (n) { return effective(n, 'tankDiameter'); },
+						set: function (n, v) { setProp(n, 'tankDiameter', v); updateNode(n.id, true); } },
 					// **THE TANK'S OWN REACTION COEFFICIENT** (Task 566), the twin of the pipe pair:
 					// water sits in a tank far longer than it sits in any main, so this is where a
 					// residual is actually lost. A bulk rate, in the same 1/day.
@@ -27698,9 +27794,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function paneScnCellTip(c, row) {
 		var x = paneScnRowOf(row), pc = EngCalcs.pageConfig || {},
 			cat = c.scnCat ? c.scnCat(x.el) : categoryOf(paneColProp(c) || c.key, elGroup(x.el)),
-			alt = alternativeFor(x.scn, cat), owner = alt && !alt.isBase ? (scenarioById(alt.scenario) || x.scn) : baseScenario();
+			// The holder the cell's value is local in (paneScnCellIsLocal()'s rule): a stored
+			// alternative by its own name, the scenario's own values by the scenario's.
+			t = writeTargetFor(x.scn, cat),
+			name = !t ? scenarioDisplayName(baseScenario()) : (t.kind === 'scn' ? scenarioDisplayName(x.scn) : String(t.obj.name || ''));
 		return String(pc.lpn_pane_scn_alt_tip || '{category} alt.: {alternative}')
-			.split('{category}').join(altCategoryLabel(cat)).split('{alternative}').join(scenarioDisplayName(owner));
+			.split('{category}').join(altCategoryLabel(cat)).split('{alternative}').join(name);
 	}
 	function paneScnMarkCell(td, c, row) {
 		var on, tip;
@@ -28458,8 +28557,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			return true;
 		}
 		if (!scn.isBase) {
-			if (row.home === 'dm') { touchTree('demandMultiplier'); calcTargetOf(scn).demandMultiplier = p.v; return true; }
-			if (row.home === 'time2') { return setScenarioTime(calcTargetOf(scn), k, p.text); }
+			if (row.home === 'dm') { touchTree('demandMultiplier'); calcWriteTargetOf(scn).demandMultiplier = p.v; return true; }
+			if (row.home === 'time2') { return setScenarioTime(String(p.text === undefined || p.text === null ? '' : p.text).trim() === '' ? calcTargetOf(scn) : calcWriteTargetOf(scn), k, p.text); }
 			if (row.path[0] === 'times') {
 				setScenarioSetting(scn, row.path, p.v);
 				return setScenarioSetting(scn, ['times', 'text', k], p.text);
@@ -33253,8 +33352,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var elev = {}, head = {}, length = {}, type = {}, closed = {};
 		doc.nodes.forEach(function (n) {
 			var h;
-			if (typeof n.elev === 'number') {
-				elev[n.id] = toDisplay(toSI(n.elev, 'lpn_u_elevhead'), resultUnit('elevhead'));
+			var ev = effective(n, 'elev');
+			if (typeof ev === 'number') {
+				elev[n.id] = toDisplay(toSI(ev, 'lpn_u_elevhead'), resultUnit('elevhead'));
 			}
 			// colorNodeValue() is the accessor the map labels and the colour ramp already use, so
 			// the profile cannot disagree with the number printed beside the node.
@@ -35506,7 +35606,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var fromDem = elevSourceIsDem(), dfl = scnSetting('defaults') || {};
 		var n = { id: id, type: type, x: x, y: y, elev: dfl.nodeElev }, birth = nodeBirthFields(type), k;
 		for (k in birth) { if (Object.prototype.hasOwnProperty.call(birth, k)) { n[k] = birth[k]; } }
-		if (fromDem) { delete n.elev; }
+		if (fromDem) { delete n.elev; }   // base-write: a new asset is born in Base
 		bornInScenario(n);
 		doc.nodes.push(n);
 		buildNodeEls(n);
@@ -36065,18 +36165,18 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				label: pc.lpn_ff_required || 'Required fire flow' },
 			{ types: ['reservoir'], keys: ['_head'], props: ['head'], unit: 'lpn_u_elevhead',
 				label: pc.lpn_field_head || 'Head' },
-			{ types: ['reservoir'], keys: ['headPattern'], props: [], label: pc.lpn_field_head_pattern || 'Head pattern' },
+			{ types: ['reservoir'], keys: ['headPattern'], props: ['headPattern'], label: pc.lpn_field_head_pattern || 'Head pattern' },
 			{ types: ['tank'], keys: ['_level'], props: ['level'], unit: 'lpn_u_elevhead',
 				label: pc.lpn_field_tank_level || 'Water depth' },
-			{ types: ['tank'], keys: ['minLevel'], props: [], unit: 'lpn_u_elevhead',
+			{ types: ['tank'], keys: ['minLevel'], props: ['minLevel'], unit: 'lpn_u_elevhead',
 				label: pc.lpn_field_tank_minlevel || 'Lowest water depth' },
-			{ types: ['tank'], keys: ['maxLevel'], props: [], unit: 'lpn_u_elevhead',
+			{ types: ['tank'], keys: ['maxLevel'], props: ['maxLevel'], unit: 'lpn_u_elevhead',
 				label: pc.lpn_field_tank_maxlevel || 'Highest water depth' },
-			{ types: ['tank'], keys: ['tankDiameter'], props: [], unit: 'lpn_u_length',
+			{ types: ['tank'], keys: ['tankDiameter'], props: ['tankDiameter'], unit: 'lpn_u_length',
 				label: pc.lpn_field_tank_diameter || 'Tank diameter' },
-			{ types: ['tank'], keys: ['volCurve'], props: [], label: pc.lpn_curve_kind_volume || 'Tank volume' },
-			{ types: ['tank'], keys: ['mixingModel'], props: [], none: ['MIXED'], label: pc.lpn_mixing_model || 'Mixing model' },
-			{ types: ['tank'], keys: ['mixingFraction'], props: [], label: pc.lpn_mixing_fraction || 'Mixing fraction' },
+			{ types: ['tank'], keys: ['volCurve'], props: ['volCurve'], label: pc.lpn_curve_kind_volume || 'Tank volume' },
+			{ types: ['tank'], keys: ['mixingModel'], props: ['mixingModel'], none: ['MIXED'], label: pc.lpn_mixing_model || 'Mixing model' },
+			{ types: ['tank'], keys: ['mixingFraction'], props: ['mixingFraction'], label: pc.lpn_mixing_fraction || 'Mixing fraction' },
 			{ types: ['tank'], keys: ['_tankCoeff'], props: ['tankCoeff'], label: pc.lpn_reaction_tank || 'Reaction coefficient' }
 		].concat(customPropDefs().filter(function (d) { return !!d.key; }).map(function (d) {
 			return { custom: true, keys: ['_' + d.key], props: [d.key], label: customPropLabel(d),
@@ -36290,7 +36390,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// typed default.
 		if (n.elev === undefined && to !== 'reservoir') {
 			if (elevSourceIsDem()) { queueTerrainForNewNode(n.id); }
-			else { n.elev = (scnSetting('defaults') || {}).nodeElev; }
+			else { n.elev = (scnSetting('defaults') || {}).nodeElev; }   // base-write: a type change is Base's, and so is the ground it gives a node that had none
 		}
 		// The water surface, carried (waterSurfaceCarry()). Written after the strip, which has
 		// already taken the old property and any override map it left empty.
@@ -36299,15 +36399,29 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			depths.push(carry.base.value);
 		}
 		carry.ovs.forEach(function (c) {
-			if (!plainObject(c.map[key])) { c.map[key] = {}; }
-			c.map[key][carry.newProp] = c.value;
+			var newCat = categoryOf(carry.newProp, 'node'), maps = [c.map];
+			// **A STORED ALTERNATIVE HOLDS ONE CATEGORY**: a tank's depth is Initial settings and a
+			// reservoir's head Physical, so a surface carried out of an alternative lands where each
+			// scenario naming it writes that category (its own alternative, made if need be), or a
+			// value nothing reads would be left in the wrong one.
+			if (scenarios.indexOf(c.s) < 0 && c.s.category !== newCat) {
+				maps = [];
+				storedUsers('alt', c.s.id).scenarios.forEach(function (sid) {
+					var m = ownWriteMap(scenarioById(sid), newCat);
+					if (m && maps.indexOf(m) < 0) { maps.push(m); }
+				});
+			}
+			maps.forEach(function (m) {
+				if (!plainObject(m[key])) { m[key] = {}; }
+				m[key][carry.newProp] = c.value;
+			});
 			depths.push(c.value);
 		});
 		if (carry.ovs.length) { touchTree('applyNodeTypeChange'); }
 		// A tank may not start above its own highest water depth (EPANET refuses it), so a depth
 		// carried from a reservoir raises the tank's top to meet it.
 		if (to === 'tank' && depths.length) {
-			n.maxLevel = Math.max.apply(null, [typeof n.maxLevel === 'number' ? n.maxLevel : 0].concat(depths));
+			n.maxLevel = Math.max.apply(null, [typeof n.maxLevel === 'number' ? n.maxLevel : 0].concat(depths));   // base-write: a type change is Base's; the top is raised to hold every carried depth
 		}
 	}
 	// ---- CHANGE TYPE FOR A LINK: Pipe, Pump, Valve (Tom, 2026-10-06: "Proceed.") ----------------
@@ -36374,8 +36488,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			{ has: function (d) { return d.type === 'valve' && d.valveType === 'GPV'; }, keys: ['_curveId'], props: ['curveId'],
 				label: pc.lpn_gpv_curve_source || 'Valve head loss curve' },
 			{ has: pump, keys: ['_efficCurveId'], props: ['efficCurveId'], label: pc.lpn_pump_effic_curve || 'Pump efficiency curve' },
-			{ has: pump, keys: ['speed'], props: [], none: [1], label: pc.lpn_field_pump_speed || 'Relative speed' },
-			{ has: pump, keys: ['speedPattern'], props: [], label: pc.lpn_field_speed_pattern || 'Speed pattern' },
+			{ has: pump, keys: ['speed'], props: ['speed'], none: [1], label: pc.lpn_field_pump_speed || 'Relative speed' },
+			{ has: pump, keys: ['speedPattern'], props: ['speedPattern'], label: pc.lpn_field_speed_pattern || 'Speed pattern' },
 			{ has: pump, keys: ['_energyPrice'], props: ['energyPrice'], label: pc.lpn_energy_price || 'Price of power' },
 			{ has: pump, keys: ['_energyPattern'], props: ['energyPattern'], label: pc.lpn_energy_price_pattern || 'Price pattern' },
 			{ has: valve, keys: ['valveType'], props: [], label: pc.lpn_field_valve_type || 'Valve type', show: valveTypeName },
@@ -38472,7 +38586,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 					// because the file states them and so does EPANET -- so renaming them here would
 					// move every coordinate in a v1 autosave to a field nothing reads, and the whole
 					// drawing would open at undefined. See LPN_OVERRIDABLE.
-					if (LPN_COORD_PROP[prop]) { return; }
+					if (LPN_BARE_PROP[prop]) { return; }
 					if (Object.prototype.hasOwnProperty.call(el, prop)) {
 						el['_' + prop] = el[prop];
 						delete el[prop];
@@ -40652,7 +40766,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				// **THE FILE'S OWN COLUMN, AND ONLY THAT** (Task 248.02), exactly as a junction's
 				// demand pattern below. EPANET has no [OPTIONS]-level default for a head pattern, so
 				// a blank column here means no pattern at all and nothing is resolved later.
-				if (n.headPattern) { rz.headPattern = n.headPattern; }
+				if (n.headPattern) { rz.headPattern = n.headPattern; }   // base-write: an imported document is born in Base
 				return withInpNotes(carryInpTokens(n, rz, LPN_INP_TOK_RESERVOIR), inpNodeNotes[n.id]);
 			}
 			if (n.type === 'tank') {
@@ -40755,8 +40869,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				// **SPEED AND ITS PATTERN** (Task 248.02). A relative speed of 1 is EPANET's own
 				// default and is not written onto the pump, for the same reason the blank pattern
 				// column is not: the field must say what the file said.
-				if (typeof l.speed === 'number' && isFinite(l.speed) && l.speed !== 1) { out.speed = l.speed; }
-				if (l.speedPattern) { out.speedPattern = l.speedPattern; }
+				if (typeof l.speed === 'number' && isFinite(l.speed) && l.speed !== 1) { out.speed = l.speed; }   // base-write: an imported document is born in Base
+				if (l.speedPattern) { out.speedPattern = l.speedPattern; }   // base-write: an imported document is born in Base
 				// NO FITTED CURVE IS WRITTEN HERE (Task 390 step 5). pumpFit() derives h0/a/b at the
 				// solver handoff, so an imported pump carries exactly what the file stated and
 				// nothing of ours.
@@ -41030,8 +41144,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			if (n.type !== 'tank') { return; }
 			m = mix[n.id];
 			if (!m) { return; }
-			n.mixingModel = m.model;
-			if (m.fraction !== undefined) { n.mixingFraction = m.fraction; }
+			n.mixingModel = m.model;   // base-write: an imported document is born in Base
+			if (m.fraction !== undefined) { n.mixingFraction = m.fraction; }   // base-write: an imported document is born in Base
 		});
 	}
 
@@ -41816,7 +41930,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// guess that rewrote the user's own numbers. So the number goes in as written, in
 			// whatever unit the project is showing, and the file's own text rides with it.
 			if (typeof p.elev === 'number') {
-				n.elev = p.elev;
+				n.elev = p.elev;   // base-write: a surveyed node is born in Base
 				if (p.elevTok) { (n.tok || (n.tok = {})).elev = p.elevTok; }
 				elevFromFile++;
 			}
@@ -52288,6 +52402,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// horizontal distance and this is the horizontal-distance family; a Length change must
 			// rescale it and an Elevation/Head change must leave it alone, both now true below.
 			doc.nodes.forEach(function (nd) { conv(nd, 'tankDiameter'); });
+			convOverrides('tankDiameter');
 		} else if (name === 'lpn_u_diameter') {
 			doc.links.forEach(function (l) { conv(l, '_diameter'); });
 			convOverrides('diameter');
@@ -52309,6 +52424,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				conv(nd, 'maxLevel'); conv(nd, '_head');
 			});
 			convOverrides('level'); convOverrides('head');
+			// Overridable since 2026-10-12, so a scenario's own ground and depth limits move too.
+			convOverrides('elev'); convOverrides('minLevel'); convOverrides('maxLevel');
 			// Head error limit is a head typed in this unit (Task 762 pass: it was missed here).
 			convSetting('headError');
 			// A curve point is [flow, value]; this unit owns the second, for the two kinds whose
@@ -52759,7 +52876,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		f = unit ? unitFactor(unit) : 1;
 		if (LPN_VALUE_RULES[field].order) {
 			if (!el || el.type !== 'tank') { return ''; }
-			ctx = { level: effective(el, 'level'), minLevel: el.minLevel, maxLevel: el.maxLevel };
+			ctx = { level: effective(el, 'level'), minLevel: effective(el, 'minLevel'), maxLevel: effective(el, 'maxLevel') };
 		}
 		r = valueWarningRule(field, +shown / f, valueWarnMethod(el), ctx);
 		if (!r) { return ''; }
@@ -56618,7 +56735,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			}
 			if (s === 'settings.hydraulics.demandMultiplier') {
 				touchTree('demandMultiplier');
-				if (typeof v === 'number' && isFinite(v)) { calcTargetOf(scn).demandMultiplier = v; } else { delete calcTargetOf(scn).demandMultiplier; }
+				if (typeof v === 'number' && isFinite(v)) { calcWriteTargetOf(scn).demandMultiplier = v; } else { delete calcTargetOf(scn).demandMultiplier; }
 				return;
 			}
 			// Unstated in the scenario where Base states it: held as an explicit null ("not stated
@@ -56628,7 +56745,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		});
 		Object.keys(times).forEach(function (k) {
 			var t = setboxView.times, text = t.text && typeof t.text[k] === 'string' ? t.text[k] : (EngCalcs.lpnFormatTime ? EngCalcs.lpnFormatTime(t[k]) : String(t[k]));
-			if (LPN_SCENARIO_TIME_KEYS.indexOf(k) >= 0) { setScenarioTime(calcTargetOf(scn), k, text); return; }
+			if (LPN_SCENARIO_TIME_KEYS.indexOf(k) >= 0) { setScenarioTime(String(text).trim() === '' ? calcTargetOf(scn) : calcWriteTargetOf(scn), k, text); return; }
 			setScenarioSetting(scn, ['times', k], t[k]);
 			setScenarioSetting(scn, ['times', 'text', k], typeof t[k] === 'number' ? text : undefined);
 		});
@@ -59084,6 +59201,17 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				});
 			});
 		});
+		// **A TANK'S VOLUME CURVE** is a reference too, in Base and (since 2026-10-12) in a scenario.
+		(doc.nodes || []).forEach(function (n) {
+			if (n.volCurve === was) {
+				if (now) { n.volCurve = now; } else { delete n.volCurve; }   // base-write: see above
+			}
+			eachOverrideMap(function (map) {
+				var ov = map[ovKey(n)];
+				if (!ov || ov.volCurve !== was) { return; }
+				if (now) { ov.volCurve = now; } else { delete ov.volCurve; }   // base-write: an override map entry repointed with its curve's rename
+			});
+		});
 	}
 	// An id nothing in the list is using yet. Same shape as the element ID minting, deliberately
 	// simple: a pattern id is a name, and EPANET's own files use bare numbers for them.
@@ -59675,19 +59803,22 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function libRepointPattern(was, to) {
 		doc.nodes.forEach(function (n) {
 			if (n.demandPattern === was) { n.demandPattern = to; }   // base-write: a pattern rename is document-wide; the scenario lists are repointed just below
-			if (n.headPattern === was) { n.headPattern = to; }
+			if (n.headPattern === was) { n.headPattern = to; }   // base-write: a pattern rename is document-wide; the scenario values are repointed just below
 			// A DEMAND CATEGORY IS A FIFTH ATTACHMENT POINT (Task 468), and it is the one that
 			// would have been missed: it is not a field on the node but a field on a row of a list.
 			(n.extraDemands || []).forEach(function (d) { if (d.pattern === was) { d.pattern = to; } });
 		});
 		// **AND A SCENARIO'S OWN DEMAND LIST** (R-369), which names patterns exactly as Base's rows
 		// do. The pattern is the document's, so a rename reaches every scenario at once.
+		// A head pattern and a speed pattern a scenario states (overridable since 2026-10-12) are
+		// repointed the same way.
 		eachOverrideMap(function (map) {
 			Object.keys(map).forEach(function (k) {
 				(map[k].demands || []).forEach(function (d) { if (d.pattern === was) { d.pattern = to; } });
+				['headPattern', 'speedPattern'].forEach(function (p) { if (map[k][p] === was) { map[k][p] = to; } });
 			});
 		});
-		doc.links.forEach(function (l) { if (l.speedPattern === was) { l.speedPattern = to; } });
+		doc.links.forEach(function (l) { if (l.speedPattern === was) { l.speedPattern = to; } });   // base-write: a pattern rename is document-wide; the scenario values are repointed above
 		// **A CUSTOMER IS THE SIXTH, AND IT IS THE ONE A READER WOULD NOT THINK OF** (Task 247,
 		// Tom 2026-09-18: *"A Customer demand can follow a pattern. Add that."*). A meter's demand
 		// is one of Task 468's demand rows, so it carries a pattern exactly as a category does --
@@ -64080,24 +64211,24 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	 * about how the tank is plumbed rather than about which analysis is being run today.
 	 *
 	 * **THE FRACTION APPEARS ONLY UNDER TWO-COMPARTMENT MIXING**, because that is the only model it
-	 * means anything to -- EPANET greys it out for the other three. Written straight onto the tank
-	 * rather than through setProp(): see LPN_OVERRIDABLE, where a tank's construction is Base's.
+	 * means anything to -- EPANET greys it out for the other three. Both write through setProp():
+	 * overridable since 2026-10-12 (Tom: every property).
 	 */
 	function mixingFields(fields, n) {
-		var pc = EngCalcs.pageConfig || {}, model = n.mixingModel || 'MIXED';
+		var pc = EngCalcs.pageConfig || {}, model = effective(n, 'mixingModel') || 'MIXED';
 		selectFieldPlain(fields, pc.lpn_mixing_model || 'Mixing model',
 			[['MIXED', pc.lpn_mixing_mixed || 'Complete mixing'],
 				['2COMP', pc.lpn_mixing_2comp || 'Two-compartment mixing'],
 				['FIFO', pc.lpn_mixing_fifo || 'FIFO plug flow'],
 				['LIFO', pc.lpn_mixing_lifo || 'LIFO plug flow']],
 			model,
-			function (v) { n.mixingModel = v; updateNode(n.id, true); refreshPopupIfOpen(); },
+			function (v) { setProp(n, 'mixingModel', v); updateNode(n.id, true); refreshPopupIfOpen(); },
 			pc.lpn_mixing_model_tip);
 		if (model !== '2COMP') { return; }
 		numberFieldBlank(fields, pc.lpn_mixing_fraction || 'Mixing fraction',
-			n.mixingFraction,
-			function (v) { n.mixingFraction = v; updateNode(n.id, true); },
-			pc.lpn_mixing_fraction_tip);
+			effective(n, 'mixingFraction'),
+			function (v) { setProp(n, 'mixingFraction', v); updateNode(n.id, true); },
+			pc.lpn_mixing_fraction_tip, { el: n, prop: 'mixingFraction' });
 	}
 	function qualityResultRow(fields, n) {
 		var pc = EngCalcs.pageConfig || {}, v = nodeQualityValue(n),
@@ -64178,32 +64309,33 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// a second editable field would be two numbers that have to agree -- the "hidden curve"
 			// trap Tom named on the pump (see addLink()).
 			unitNumberField(fields, pc.lpn_field_elev || 'Elevation', 'lpn_u_elevhead',
-				function () { return n.elev; },
-				function (v) { n.elev = v; updateNode(nodeId, true); refreshPopupIfOpen(); },
-				pc.lpn_tank_elev_tip);
+				function () { return effective(n, 'elev'); },
+				function (v) { setProp(n, 'elev', v); updateNode(nodeId, true); refreshPopupIfOpen(); },
+				pc.lpn_tank_elev_tip, { el: n, prop: 'elev' });
 			elevationDemRow(fields, n, nodeId,
-				function (v) { n.elev = v; updateNode(nodeId, true); });
+				function (v) { setProp(n, 'elev', v); updateNode(nodeId, true); });
 			unitNumberField(fields, pc.lpn_field_tank_level || 'Water depth', 'lpn_u_elevhead',
 				function () { return effective(n, 'level'); },
 				function (v) { setProp(n, 'level', v); updateNode(nodeId, true); refreshPopupIfOpen(); },
 				pc.lpn_field_tank_level_tip, { el: n, prop: 'level' });
-			// Not overridable, so no `ov` to key the ⚠ on: these two name their field themselves.
+			// These two name their field themselves for the ⚠ (a depth limit is judged against the
+			// other two depths, valueWarnText()).
 			valueWarnPaint(unitNumberField(fields, pc.lpn_field_tank_minlevel || 'Lowest water depth', 'lpn_u_elevhead',
-				function () { return n.minLevel; },
-				function (v) { n.minLevel = v; updateNode(nodeId, true); refreshPopupIfOpen(); },
-				pc.lpn_field_tank_minlevel_tip), valueWarnText('minLevel', n, n.minLevel));
+				function () { return effective(n, 'minLevel'); },
+				function (v) { setProp(n, 'minLevel', v); updateNode(nodeId, true); refreshPopupIfOpen(); },
+				pc.lpn_field_tank_minlevel_tip, { el: n, prop: 'minLevel' }), valueWarnText('minLevel', n, effective(n, 'minLevel')));
 			valueWarnPaint(unitNumberField(fields, pc.lpn_field_tank_maxlevel || 'Highest water depth', 'lpn_u_elevhead',
-				function () { return n.maxLevel; },
-				function (v) { n.maxLevel = v; updateNode(nodeId, true); refreshPopupIfOpen(); },
-				pc.lpn_field_tank_maxlevel_tip), valueWarnText('maxLevel', n, n.maxLevel));
+				function () { return effective(n, 'maxLevel'); },
+				function (v) { setProp(n, 'maxLevel', v); updateNode(nodeId, true); refreshPopupIfOpen(); },
+				pc.lpn_field_tank_maxlevel_tip, { el: n, prop: 'maxLevel' }), valueWarnText('maxLevel', n, effective(n, 'maxLevel')));
 			// **THE LENGTH UNIT** (CLAUDE.md), NOT the Elevation/Head unit this box used to read it
 			// in -- a fix caught in review printing "ft H2O" beside a distance across the vessel --
 			// and NOT the pipe-diameter unit either, or inches/millimetres would put a 15 m tank on
 			// screen as 15000. The tip says so.
 			unitNumberField(fields, pc.lpn_field_tank_diameter || 'Tank diameter', 'lpn_u_length',
-				function () { return n.tankDiameter; },
-				function (v) { n.tankDiameter = v; updateNode(nodeId, true); refreshPopupIfOpen(); },
-				pc.lpn_field_tank_diameter_tip);
+				function () { return effective(n, 'tankDiameter'); },
+				function (v) { setProp(n, 'tankDiameter', v); updateNode(nodeId, true); refreshPopupIfOpen(); },
+				pc.lpn_field_tank_diameter_tip, { el: n, prop: 'tankDiameter' });
 			// **THE TANK'S OWN REACTION COEFFICIENT** (Task 566), shown on the same terms as the
 			// pipe pair: only while a chemical is being tracked, blank-capable because blank means
 			// "use the coefficient set for the whole network", and written through setProp()
@@ -64231,10 +64363,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				colorNodeValue(n, 'volume'), pc.lpn_result_tank_volume_tip);
 		} else if (n.type === 'reservoir') {
 			unitNumberField(fields, pc.lpn_field_elev || 'Elevation', 'lpn_u_elevhead',
-				function () { return n.elev; },
-				function (v) { n.elev = v; updateNode(nodeId, true); refreshPopupIfOpen(); });
+				function () { return effective(n, 'elev'); },
+				function (v) { setProp(n, 'elev', v); updateNode(nodeId, true); refreshPopupIfOpen(); }, undefined, { el: n, prop: 'elev' });
 			elevationDemRow(fields, n, nodeId,
-				function (v) { n.elev = v; updateNode(nodeId, true); });
+				function (v) { setProp(n, 'elev', v); updateNode(nodeId, true); });
 			// Blank = follow the elevation, which is what the placeholder shows -- so the field reads
 			// as already filled in without pretending the user typed it. Clearing it hands the head
 			// back to the elevation. Both setters re-render the popup, because each field feeds the
@@ -64244,16 +64376,15 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			unitNumberFieldBlank(fields, pc.lpn_field_head || 'Head', 'lpn_u_elevhead',
 				function () { return effective(n, 'head'); },
 				function (v) { setProp(n, 'head', v); updateNode(nodeId, true); refreshPopupIfOpen(); },
-				n.elev || 0, pc.lpn_field_head_tip, { el: n, prop: 'head' });
+				effective(n, 'elev') || 0, pc.lpn_field_head_tip, { el: n, prop: 'head' });
 			// **HOW THAT HEAD MOVES THROUGH THE RUN** (Task 248.02), the reservoir's twin of the
 			// junction's demand pattern below: the total head is the head above times the pattern's
 			// multiplier, which is EPANET's own rule. PER RESERVOIR, so it belongs here rather than
-			// in the Libraries box, and it is a plain write for the same reason the demand pattern
-			// is -- which pattern a source follows is a statement about the system, not a design
-			// variable a scenario asks "what if" about.
+			// in the Libraries box. Through setProp(): overridable since 2026-10-12 (Tom: every
+			// property).
 			patternField(fields, pc.lpn_field_head_pattern || 'Head pattern',
-				function () { return n.headPattern; },
-				function (v) { n.headPattern = v || null; updateNode(nodeId, true); scheduleSolve(); saveToStorage(); },
+				function () { return effective(n, 'headPattern'); },
+				function (v) { setProp(n, 'headPattern', v || null); updateNode(nodeId, true); scheduleSolve(); saveToStorage(); },
 				pc.lpn_field_head_pattern_tip);
 			// No read-only Head row here (a junction gets one because its head is a solve RESULT) --
 			// the editable field above shows this reservoir's head, typed or inherited.
@@ -64263,15 +64394,15 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// conversion between two units the USER chose, not of an input on a unit change.
 			// **OMITTED ENTIRELY WHEN THE GROUND IS UNKNOWN** (Task 390): an imported reservoir has a
 			// head and no elevation, and a pressure row reading 0 asserts what the file never said.
-			if (typeof n.elev === 'number') {
+			if (typeof effective(n, 'elev') === 'number') {
 				readonlyUnitField(fields, pc.lpn_result_pressure || 'Pressure', resultUnit('pressure'),
-					toSI(reservoirHead(n) - n.elev, 'lpn_u_elevhead'));
+					toSI(reservoirHead(n) - effective(n, 'elev'), 'lpn_u_elevhead'));
 			}
 		} else {
 			unitNumberField(fields, pc.lpn_field_elev || 'Elevation', 'lpn_u_elevhead',
-				function () { return n.elev; }, function (v) { n.elev = v; updateNode(nodeId, true); });
+				function () { return effective(n, 'elev'); }, function (v) { setProp(n, 'elev', v); updateNode(nodeId, true); }, undefined, { el: n, prop: 'elev' });
 			elevationDemRow(fields, n, nodeId,
-				function (v) { n.elev = v; updateNode(nodeId, true); });
+				function (v) { setProp(n, 'elev', v); updateNode(nodeId, true); });
 			// **THERE IS NO PLAIN Base demand / Demand pattern FIELD ANY MORE** (Task 553, Tom
 			// 2026-08-28: *"The EPANET UX is confusing by breaking out one demand (the initial)
 			// specially. What we need to do is remove the original Base demand and Demand pattern
@@ -65169,13 +65300,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// measured at, which is why this is numberFieldPlain and carries no unit selector. The label says
 	// so rather than leaving the reader to guess what "Speed" is in.
 	//
-	// Plain writes, no `ov`: neither is in LPN_OVERRIDABLE, so setProp() would write `_speed` into a
-	// field nothing reads. If a scenario ever wants "what if this pump ran at 0.8", `speed` earns its
-	// place in that table and both halves move together -- the field, and the read in assembleModel().
+	// **BOTH OVERRIDABLE** (Tom, 2026-10-12: every property): "what if this pump ran at 0.8" is a
+	// scenario's question, so both write through setProp(), and assembleModel() reads both through
+	// effective().
 	function renderPumpSpeedFields(fields, l) {
 		var pc = EngCalcs.pageConfig || {};
 		numberFieldPlain(fields, pc.lpn_field_pump_speed || 'Relative speed',
-			(typeof l.speed === 'number' && isFinite(l.speed)) ? l.speed : 1,
+			pumpSpeedOf(l),
 			function (v) {
 				saveUndoSnapshot();
 				// **A BLANK, A ZERO AND A NEGATIVE ALL READ AS 1** -- the pump as its curve describes
@@ -65183,12 +65314,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				// at speed 0 is a pump that is off: switching one off silently because the user
 				// tabbed through an empty field is the failure to avoid. Turning a pump off has its
 				// own control on this popup, the Closed box below.
-				l.speed = (isFinite(v) && v > 0) ? v : 1;
+				setProp(l, 'speed', (isFinite(v) && v > 0) ? v : 1);
 				afterPropertyEdit(l);
-			}, pc.lpn_field_pump_speed_tip);
+			}, pc.lpn_field_pump_speed_tip, { el: l, prop: 'speed' });
 		patternField(fields, pc.lpn_field_speed_pattern || 'Speed pattern',
-			function () { return l.speedPattern; },
-			function (v) { l.speedPattern = v || null; afterPropertyEdit(l); },
+			function () { return effective(l, 'speedPattern'); },
+			function (v) { setProp(l, 'speedPattern', v || null); afterPropertyEdit(l); },
 			pc.lpn_field_speed_pattern_tip);
 		renderPumpEnergyFields(fields, l);
 	}
@@ -67104,10 +67235,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	 * two-compartment split the user never made.
 	 */
 	function nodeMixing(n) {
-		if (!n || n.type !== 'tank' || !n.mixingModel) { return undefined; }
-		return (typeof n.mixingFraction === 'number' && isFinite(n.mixingFraction))
-			? { model: n.mixingModel, fraction: n.mixingFraction }
-			: { model: n.mixingModel };
+		var m = n ? effective(n, 'mixingModel') : undefined, f;
+		if (!n || n.type !== 'tank' || !m) { return undefined; }
+		f = effective(n, 'mixingFraction');
+		return (typeof f === 'number' && isFinite(f)) ? { model: m, fraction: f } : { model: m };
 	}
 	// **BLANK REQUIRED PRESSURE MEANS WHAT EPANET MEANS** (Task 762): 0.1 in the pressure unit the
 	// exported file is read in, psi for a US flow unit and metres otherwise, whatever the project's
@@ -67203,6 +67334,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		return typeof t === 'string' ? t : undefined;
 	}
 	function calcTargetOf(s) { var t = writeTargetFor(s, 'calculation'); return t ? t.obj : s; }
+	// Where a calculation option WRITTEN in this scenario lands: its calculation set, made first if it
+	// names none (ownWriteTarget()). Clearing reads calcTargetOf(), which never makes one.
+	function calcWriteTargetOf(s) { var t = ownWriteTarget(s, 'calculation'); return t ? t.obj : s; }
 	// One [TIMES] value the pattern clock reads, for the open scenario, without building the block:
 	// patternMultiplier() runs per element per solve. Neither key has a home of its own on the
 	// scenario, so the settings block and the project are the only two places it can be.
@@ -67426,8 +67560,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	//
 	// 1 when the pump states neither, which is a pump running at the speed its curve was drawn for.
 	function pumpSpeedNow(l, t) {
-		if (l.speedPattern) { return patternMultiplier(l.speedPattern, t); }
-		return (typeof l.speed === 'number' && isFinite(l.speed)) ? l.speed : 1;
+		var sp = effective(l, 'speedPattern');
+		if (sp) { return patternMultiplier(sp, t); }
+		return pumpSpeedOf(l);
 	}
 
 	// **A CONTROL NAMING AN ASSET OUT OF THIS SCENARIO'S NETWORK IS LEFT OUT OF ITS RUN** (Task 781;
@@ -67463,12 +67598,15 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				// a pipe diameter either, which would read a 15 m tank as 15000.
 				return {
 					id: n.id, type: n.type,
-					elev: toSI(n.elev || 0, 'lpn_u_elevhead'),
+					elev: toSI(effective(n, 'elev') || 0, 'lpn_u_elevhead'),
 					head: toSI(nodeFixedHead(n), 'lpn_u_elevhead'),
 					level: toSI(effective(n, 'level') || 0, 'lpn_u_elevhead'),
-					minLevel: toSI(n.minLevel || 0, 'lpn_u_elevhead'),
-					maxLevel: toSI(n.maxLevel || 0, 'lpn_u_elevhead'),
-					diameter: toSI(n.tankDiameter || 0, 'lpn_u_length')
+					minLevel: toSI(effective(n, 'minLevel') || 0, 'lpn_u_elevhead'),
+					maxLevel: toSI(effective(n, 'maxLevel') || 0, 'lpn_u_elevhead'),
+					diameter: toSI(effective(n, 'tankDiameter') || 0, 'lpn_u_length'),
+					// The volume curve's NAME as this scenario states it; js/lpn-time.js attaches the
+					// curve's points (overridable since 2026-10-12, so the document's name is not enough).
+					volCurveName: effective(n, 'volCurve') || null
 				};
 			}
 			return n.type === 'reservoir'
@@ -67486,18 +67624,18 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				// A reservoir on a pattern is still a FIXED HEAD -- EngCalcs.lpnIsFixedHead is
 				// unchanged and needs to be: what varies is the number, not the kind of boundary.
 				? {
-					id: n.id, type: n.type, elev: toSI(n.elev || 0, 'lpn_u_elevhead'),
+					id: n.id, type: n.type, elev: toSI(effective(n, 'elev') || 0, 'lpn_u_elevhead'),
 					head: toSI(reservoirHead(n), 'lpn_u_elevhead') *
-						patternMultiplier(n.headPattern, modelTimeSeconds()),
+						patternMultiplier(effective(n, 'headPattern'), modelTimeSeconds()),
 					headBase: toSI(reservoirHead(n), 'lpn_u_elevhead'),
-					headPattern: n.headPattern || null
+					headPattern: effective(n, 'headPattern') || null
 				}
 				// **THE MULTIPLIER GOES ON HERE, NOT ON THE DOCUMENT** (Task 423). A pattern scales
 				// the demand the user typed; it never replaces it. Doing it at this boundary is the
 				// same rule every unit conversion on this page follows -- the document holds what
 				// was stated, and the solver is handed what it needs.
 				: {
-					id: n.id, type: n.type, elev: toSI(n.elev || 0, 'lpn_u_elevhead'),
+					id: n.id, type: n.type, elev: toSI(effective(n, 'elev') || 0, 'lpn_u_elevhead'),
 					// resolvedDemand() and nothing else, so the number the solver is handed and the
 					// number on the label are ONE expression -- with demand categories (Task 468) it
 					// is the sum of every row at its own pattern, which is exactly what EPANET's own
@@ -67605,8 +67743,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				out.statusBase = out.status;
 				if (!(s > 0)) { out.status = 'closed'; }
 				out.h0Base = fit.h0; out.aBase = fit.a;
-				out.speed = (typeof l.speed === 'number' && isFinite(l.speed)) ? l.speed : 1;
-				out.speedPattern = l.speedPattern || null;
+				out.speed = pumpSpeedOf(l);   // base-write: the solver's model, not an asset
+				out.speedPattern = effective(l, 'speedPattern') || null;   // base-write: the solver's model, not an asset
 				// **AND THE CURVE'S REAL POINTS RIDE ALONG, IN SI** (Task 586). The native solver has
 				// only the three-coefficient form and takes the fit; EPANET reads a curve of any
 				// length and interpolates it, so handing it three samples off our own fit was
@@ -69159,7 +69297,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			if (ls.node.pressure && pressVal !== undefined) { lines.push(affix('node', 'pressure', rawLine(pressVal, ex.pressure, nd.pressure))); }
 			// An elevation nobody stated prints nothing, exactly as an unsolved pressure does -- an
 			// imported reservoir has none (Task 390) and rawLine() would have thrown on it.
-			if (ls.node.elev && typeof n.elev === 'number') { lines.push(affix('node', 'elev', rawLine(n.elev, ex.elev, nd.elev))); }
+			if (ls.node.elev && typeof effective(n, 'elev') === 'number') { lines.push(affix('node', 'elev', rawLine(effective(n, 'elev'), ex.elev, nd.elev))); }
 			// **TANK WATER DEPTH, TANK ONLY** (Task 696): a junction or reservoir has no 'level',
 			// exactly as neither has a diameter, and prints nothing rather than a stray zero. The
 			// raw effective() value, matching how elev above hands rawLine() its own raw n.elev --
@@ -69270,7 +69408,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// treatment length/roughness/km have always had. Only solve RESULTS still come out of the
 		// solver in SI and go through displayRound().
 		var nodeVal = {
-			elev: nodeValueMap(function (n) { return plainRound(n.elev, nd.elev); }),
+			elev: nodeValueMap(function (n) { return plainRound(effective(n, 'elev'), nd.elev); }),
 			// **TANK WATER DEPTH ONLY** (Task 696): a junction or reservoir has no 'level' to print,
 			// exactly as it has no diameter. plainRound(), not displayRound(): effective(n, 'level')
 			// is a typed number already in the Elevation/Head display unit, the same treatment elev
@@ -69294,7 +69432,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			pressure: nodeValueMap(function (n) {
 				if (isFixedHeadNode(n)) {
 					return heldTypeChange(n, 'pressure') !== undefined ? plainRound(heldTypeChange(n, 'pressure'), nd.pressure)
-						: displayRound(toSI(nodeFixedHead(n) - (n.elev || 0), 'lpn_u_elevhead'), resultUnit('pressure'), nd.pressure);
+						: displayRound(toSI(nodeFixedHead(n) - (effective(n, 'elev') || 0), 'lpn_u_elevhead'), resultUnit('pressure'), nd.pressure);
 				}
 				return lastSolveResult ? displayRound(lastSolveResult.pressures[n.id], resultUnit('pressure'), nd.pressure) : undefined;
 			}),
@@ -72869,8 +73007,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	 * against the frame's SI level as they stand, which is the Task 255 shape of defect.
 	 */
 	function tankLevelBandSI(n) {
-		var minSI = typeof n.minLevel === 'number' ? toSI(n.minLevel, 'lpn_u_elevhead') : undefined,
-			maxSI = typeof n.maxLevel === 'number' ? toSI(n.maxLevel, 'lpn_u_elevhead') : undefined;
+		var mn = effective(n, 'minLevel'), mx = effective(n, 'maxLevel'),
+			minSI = typeof mn === 'number' ? toSI(mn, 'lpn_u_elevhead') : undefined,
+			maxSI = typeof mx === 'number' ? toSI(mx, 'lpn_u_elevhead') : undefined;
 		return { min: minSI, max: maxSI };
 	}
 	/**

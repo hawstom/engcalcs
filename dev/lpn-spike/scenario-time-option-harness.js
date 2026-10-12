@@ -35,6 +35,9 @@ const L = loadLoopedNetwork(
 	EXAMPLE_EXPORTS +
 	"\t\tgetDoc: function () { return doc; }, getScenarios: function () { return scenarios; },\n" +
 	"\t\tbyIdScn: scenarioById, createScenario: createScenario, switchScenario: switchScenario,\n" +
+	// Where a scenario's own run time is held: its calculation set, which its first one stores
+	// (2026-10-12), or the scenario itself in a file from before.
+	"\t\ttimesOf: function (id) { return calcTargetOf(scenarioById(id)).times; },\n" +
 	"\t\tactiveId: function () { return project.activeScenario; },\n" +
 	"\t\teffectiveTimes: effectiveTimes, extended: effectiveTimesExtended,\n" +
 	"\t\tsettingText: function (scn, path) { return settingRowText(settingTableRows().filter(function (r) { return r.id === JSON.stringify(path); })[0], scn); },\n" +
@@ -118,14 +121,14 @@ function timesLines(inp) {
 	type(two.id, 'duration', 'abc');
 	type(two.id, 'duration', '-1');
 	type(two.id, 'hydraulicStep', '0');
-	ok('text that is not a usable time writes nothing', !L.byIdScn(two.id).times, JSON.stringify(L.byIdScn(two.id).times));
+	ok('text that is not a usable time writes nothing', !L.timesOf(two.id), JSON.stringify(L.timesOf(two.id)));
 	ok('...and pushes no undo step', L.undoDepth() === undo0, L.undoDepth() + ' vs ' + undo0);
 	type(two.id, 'duration', '48:00');
 	type(two.id, 'hydraulicStep', '0:30');
-	let s2 = L.byIdScn(two.id);
+	let s2 = L.byIdScn(two.id), t2 = L.timesOf(two.id);
 	ok('the scenario holds 48:00 and 0:30, in seconds, with the typed text',
-		s2.times && s2.times.duration === 172800 && s2.times.hydraulicStep === 1800 &&
-		s2.times.text.duration === '48:00' && s2.times.text.hydraulicStep === '0:30', JSON.stringify(s2.times));
+		t2 && t2.duration === 172800 && t2.hydraulicStep === 1800 &&
+		t2.text.duration === '48:00' && t2.text.hydraulicStep === '0:30', JSON.stringify(t2));
 	ok('the project\'s own block is untouched', doc.times.duration === 86400 && doc.times.hydraulicStep === 3600,
 		doc.times.duration + ' / ' + doc.times.hydraulicStep);
 	ok('the open scenario runs on its own clock', L.effectiveTimes().duration === 172800 && L.effectiveTimes().hydraulicStep === 1800);
@@ -149,22 +152,22 @@ function timesLines(inp) {
 	type(two.id, 'duration', '72:00');
 	ok('one accepted edit is one undo step', L.undoDepth() === depth + 1, L.undoDepth() - depth);
 	L.undo();
-	ok('undo puts the scenario\'s 48:00 back', L.byIdScn(two.id).times.duration === 172800, L.byIdScn(two.id).times.duration);
+	ok('undo puts the scenario\'s 48:00 back', L.timesOf(two.id).duration === 172800, L.timesOf(two.id).duration);
 	ok('...and the open scenario runs on it', L.effectiveTimes().duration === 172800);
 	L.redo();
-	ok('redo puts 72:00 back', L.byIdScn(two.id).times.duration === 259200);
+	ok('redo puts 72:00 back', L.timesOf(two.id).duration === 259200);
 	L.undo();
 	type(two.id, 'duration', '');
-	ok('a blank inherits again', L.byIdScn(two.id).times && L.byIdScn(two.id).times.duration === undefined &&
+	ok('a blank inherits again', L.timesOf(two.id) && L.timesOf(two.id).duration === undefined &&
 		L.effectiveTimes().duration === 86400);
 	L.undo();
-	ok('...and undoing the blank restores the scenario\'s own', L.byIdScn(two.id).times.duration === 172800);
+	ok('...and undoing the blank restores the scenario\'s own', L.timesOf(two.id).duration === 172800);
 	s2 = L.byIdScn(two.id);
 
 	console.log('\n--- 4. a duration of 0 is a steady-state run ---');
 	const steady = L.createScenario('Steady');
 	type(steady.id, 'duration', '0');
-	ok('a steady scenario in a 24-hour project is not a period run', !L.extended() && L.byIdScn(steady.id).times.duration === 0);
+	ok('a steady scenario in a 24-hour project is not a period run', !L.extended() && L.timesOf(steady.id).duration === 0);
 	ok('...and its model says so', !EC.lpnTimeIsExtended(L.assembleModel().time.times));
 	ok('...while Base is still a period run', (function () { L.switchScenario('base'); const x = L.extended(); return x; }()));
 
@@ -192,8 +195,9 @@ function timesLines(inp) {
 	L.applySaved(JSON.parse(JSON.stringify(file)));
 	L.buildDom();
 	const back = L.getScenarios().filter(function (s) { return s.name === 'Two days'; })[0];
-	ok('the scenario\'s run time and step survive, with their text', back && back.times &&
-		back.times.duration === 172800 && back.times.text.hydraulicStep === '0:30', back && JSON.stringify(back.times));
+	const bt = back && L.timesOf(back.id);
+	ok('the scenario\'s run time and step survive, with their text', bt &&
+		bt.duration === 172800 && bt.text.hydraulicStep === '0:30', JSON.stringify(bt));
 	const bad = JSON.parse(JSON.stringify(file));
 	bad.scenarios.forEach(function (s) {
 		if (s.isBase) { s.times = { duration: 3600 }; }

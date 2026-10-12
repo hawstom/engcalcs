@@ -51,7 +51,7 @@ const INJECT =
 	"\t\tserializeProject: serializeProject, undo: undo, importProject: importProject,\n" +
 	"\t\tnodeById: nodeById, linkById: linkById, assembleModel: assembleModel, importInp: importInpFromFile,\n" +
 	"\t\texportInp: function () { return EngCalcs.lpnExportInp(inpExportDocument(), inpExportOptions()); },\n" +
-	"\t\tsmTrees: smTrees, smAdd: smAdd, smRename: smRename, smDelete: smDelete, smMove: smMove,\n" +
+	"\t\tsmTrees: smTrees, smAdd: smAdd, smRename: smRename, smDelete: smDelete, smMove: smMove, clearOverride: clearOverride,\n" +
 	"\t\tsmChildren: smChildren, smRows: smRows, smName: smName, smBaseKey: smBaseKey, smRecords: smRecords,\n" +
 	"\t\tsmAssign: smAssign, smCopyScenario: smCopyScenario, smCopyStored: smCopyStored, smChoice: smChoice, smCellText: smCellText,\n" +
 	"\t\tsmCellChoices: smCellChoices, smCellValue: smCellValue, smUsedBy: smUsedBy, smUsedByText: smUsedByText,\n" +
@@ -63,6 +63,7 @@ const INJECT =
 	"\t\talternativeFor: alternativeFor, libInactiveIds: libInactiveIds, smInUseBy: smInUseBy,\n" +
 	"\t\toverrideCount: overrideCount, smSharedText: smSharedText, scenarioTableCols: scenarioTableCols, scenarioTableRows: scenarioTableRows,\n" +
 	"\t\tsmImplicitKey: smImplicitKey, onlyInThisScenario: onlyInThisScenario, deleteElement: deleteElement, noticeLog: function () { return noticeLog; },\n" +
+	"\t\ttouchTree: touchTree, ovKey: ovKey,\n" +
 	"\t\tbuildLayers: function () { svg = document.getElementById('lpn_canvas');\n" +
 	"\t\t\tworld = el('g', {}, svg);\n" +
 	"\t\t\tbackdropLayer = el('g', {}, world); gridLayer = el('g', {}, world);\n" +
@@ -183,8 +184,21 @@ async function run(mutate, quiet) {
 	L.setProp(L.nodeById('22'), 'demand', 300);
 	const mine = heads(L);
 	const res = L.smAssign(R.id, 'demand', 'PeakDemand');
-	ok('5.10 a scenario holding demand values keeps them as an alternative named for it', res.kept === 'R' && L.smRecords('demand').some((r) => r.name === 'R'), JSON.stringify(res));
+	// R's first override stored its own alternative, named R (Tom, 2026-10-12: a first-class
+	// alternative); picking another leaves it in the tree.
+	ok('5.10 a scenario holding demand values keeps them as an alternative named for it', res === true && L.smRecords('demand').some((r) => r.name === 'R' && !r.implicit), JSON.stringify(res));
 	ok('5.11 ...and picking it back restores its numbers exactly', (L.smAssign(R.id, 'demand', 'R'), Math.abs(heads(L)['22'] - mine['22']) < 1e-9));
+	// A file from before 2026-10-12 holds a scenario's values in its own map: its own alternative is
+	// then an item of the tree named after it (implicit), and picking another stores it first.
+	const R2 = L.createScenario('R2');
+	R2.overrides[L.ovKey(L.nodeById('22'))] = { demand: 310 };
+	L.touchTree();
+	ok('5.11b a file\'s scenario holding its own demand values shows them as an item named for it', L.smRecords('demand').some((r) => r.name === 'R2' && r.implicit));
+	const res2 = L.smAssign(R2.id, 'demand', 'PeakDemand');
+	ok('5.11c ...and picking another stores them first, under that name', res2.kept === 'R2' && L.smRecords('demand').some((r) => r.name === 'R2' && !r.implicit), JSON.stringify(res2));
+	L.switchScenario(R2.id);
+	ok('5.11d ...and picking it back restores its number', (L.smAssign(R2.id, 'demand', 'R2'), L.effective(L.nodeById('22'), 'demand') === 310));
+	L.switchScenario(R.id);
 	ok('5.12 a Base row cannot choose', L.smAssign(BASE, 'demand', 'PeakDemand').refused === 'base');
 	ok('5.13 the table has a row per scenario and a column per category', (() => {
 		const cols = L.scenarioTableCols(), rows = L.scenarioTableRows();
@@ -298,7 +312,8 @@ async function run(mutate, quiet) {
 		P2.switchScenario(Pk.id);
 		P2.setProp(P2.nodeById('22'), 'demand', 900);
 		P2.setProp(P2.nodeById('12'), 'demand', 300);
-		P2.promote(Pk.id, 'demand', 'DryYear');
+		// Peak's first override stored its own alternative, named Peak; it is renamed DryYear.
+		P2.smRename('demand', Pk.alternatives.demand, 'DryYear');
 		P2.switchScenario(P2.baseScenario().id);
 		const Hs = P2.createScenario('Horse');
 		ok('10.12 before assigning, Horse counts 0', P2.overrideCount(Hs) === 0);
@@ -379,13 +394,16 @@ async function runTail(mutate, quiet) {
 		ok('12.4 ' + W + '...and nothing else: no other category has one', P.smRecords('physical').length === 0 && P.smRecords('text').length === 0 && P.smCellText(F, 'physical') === PC.lpn_scenario_base);
 		ok('12.5 ' + W + 'no question was asked and no message given', asked === 0 && P.noticeLog().length === logBefore && P.lastNotice() === noticeBefore, asked + ' asked, ' + (P.noticeLog().length - logBefore) + ' messages');
 		P.setProp(P.nodeById('12'), 'demand', 300);
-		ok('12.6 ' + W + 'a second Demand override reuses it', named('demand', FIG).length === 1 && P.smRecords('demand').length === 1 && P.alternativeFor(F, 'demand').count === 2);
-		ok('12.7 ' + W + 'the file is unchanged in form: the values are the scenario\'s own, no alternatives list', !('alternatives' in P.getDoc()) && !/"alternatives"/.test(JSON.stringify(P.serializeProject())));
+		ok('12.6 ' + W + 'a second Demand override reuses it', named('demand', FIG).length === 1 && P.smRecords('demand').length === 1 && Object.keys(own[0].values).length === 2);
+		// Tom, 2026-10-12: "It's a first-class alternative, and this is the primary way of creating
+		// alternatives." So it is stored, in the file, and the scenario names it.
+		ok('12.7 ' + W + 'it is a stored alternative in the file, and the scenario names it', !own[0].implicit && F.alternatives.demand === own[0].id &&
+			JSON.parse(JSON.stringify(P.serializeProject())).alternatives.some((a) => a.id === own[0].id && a.name === FIG) && !Object.keys(F.overrides).length);
 		// A child of the figure, with no override of its own, uses its parent's alternative.
 		P.switchScenario(P.baseScenario().id);
 		const C = P.smAdd('scenarios', F.id, false);
 		P.switchScenario(C.id);
-		ok('12.8 ' + W + 'a child with no override uses its parent\'s alternative', P.smChoice(C, 'demand').own === true && P.smChoice(C, 'demand').via === F &&
+		ok('12.8 ' + W + 'a child with no override uses its parent\'s alternative', P.smChoice(C, 'demand').id === own[0].id && P.smChoice(C, 'demand').via === F &&
 			P.smUsedBy('demand', own[0].id).indexOf(C) >= 0 && P.effective(P.nodeById('22'), 'demand') === 900 && named('demand', C.name).length === 0, P.smCellText(C, 'demand'));
 		ok('12.9 ' + W + '...and its Scenarios table cell says so', P.smCellText(C, 'demand') === FIG + ' (' + PC.lpn_sm_inherited + ')', P.smCellText(C, 'demand'));
 		P.setProp(P.nodeById('22'), 'demand', 950);
@@ -396,10 +414,19 @@ async function runTail(mutate, quiet) {
 		const del = P.smDelete('demand', own[0].id);
 		ok('12.12 ' + W + 'a scenario\'s own alternative is not deleted: it is used, and the refusal names who', del.refused === 'in use' && del.who.indexOf(FIG) >= 0, JSON.stringify(del));
 		// Renaming it makes it an alternative of its own; nothing resolves differently.
-		ok('12.13 ' + W + 'renamed, it is stored under the new name and the scenario names it', P.smRename('demand', own[0].id, 'Figure demands') === true &&
-			P.getDoc().alternatives.length === 1 && P.getDoc().alternatives[0].name === 'Figure demands' && F.alternatives.demand === P.getDoc().alternatives[0].id &&
+		ok('12.13 ' + W + 'renamed, it keeps its place and the scenario still names it', P.smRename('demand', own[0].id, 'Figure demands') === true &&
+			own[0].name === 'Figure demands' && F.alternatives.demand === own[0].id &&
 			named('demand', FIG).length === 0 && P.effective(P.nodeById('12'), 'demand') === 300 && P.effective(P.nodeById('22'), 'demand') === 950);
-		ok('12.14 ' + W + '...and the child\'s own alternative now hangs from it', P.smChildren('demand', P.getDoc().alternatives[0].id).indexOf(kid[0].id) >= 0);
+		ok('12.14 ' + W + '...and the child\'s own alternative still hangs from it', P.smChildren('demand', own[0].id).indexOf(kid[0].id) >= 0);
+		// The scenario renamed later does not rename its alternative: it was named at creation.
+		P.smRename('scenarios', F.id, 'Figure 1 renamed');
+		ok('12.14b ' + W + 'renaming the scenario leaves its alternative\'s name alone', own[0].name === 'Figure demands');
+		// Its last override cleared, the alternative stays, empty, and the scenario still names it.
+		P.switchScenario(C.id);
+		P.clearOverride(P.nodeById('22'), 'demand');
+		ok('12.14c ' + W + 'the child\'s alternative, its last override cleared, stays in the tree, still the child\'s',
+			named('demand', C.name).length === 1 && C.alternatives.demand === kid[0].id && !Object.keys(kid[0].values || {}).length);
+		P.setProp(P.nodeById('22'), 'demand', 950);
 		// Another scenario picks the child's own alternative in the Scenarios table: it is stored and shared.
 		P.switchScenario(P.baseScenario().id);
 		const G = P.createScenario('Gamma');
@@ -424,7 +451,8 @@ async function runTail(mutate, quiet) {
 		link._active = false;   // as bornInScenario() leaves it: inactive in Base
 		P.switchScenario(S1.id);
 		P.setProp(link, 'active', true);
-		P.promote(S1.id, 'topology', 'Topo');
+		// S1's first override stored its own Asset activation alternative; renamed Topo.
+		P.smRename('topology', S1.alternatives.topology, 'Topo');
 		ok('13.1 active in S1 through its stored topology alternative: only in S1', P.onlyInThisScenario(link) === true && S1.alternatives.topology !== undefined);
 		P.smAssign(S2.id, 'topology', 'Topo');
 		ok('13.2 S2 shares that alternative, so it is active in S2 too: not only in S1', P.onlyInThisScenario(link) === false);
@@ -436,6 +464,45 @@ async function runTail(mutate, quiet) {
 		P.deleteElement('link', '10');
 		global.window.lpnDialogAnswerer = answerer;
 		ok('13.4 deleted in S1, with no question: the overrides lost were S1\'s alone', !P.linkById('10') && asked === 0, asked + ' asked');
+	}
+
+	// Tom, 2026-10-12: "Alt selection: I can't select Base as the alternative." A child whose parent
+	// uses another alternative chooses Base on purpose, and reads Base's values whatever its parent does.
+	say('--- 14. Base is a choice in the Scenarios table ---');
+	{
+		const P = page();
+		P.importInp({ name: 'Net1.inp', _text: NET1 });
+		const solve = () => { const r = solver.lpnSolve(P.assembleModel(), { tol: 1e-10 }); return r && r.converged ? r.heads : null; };
+		const base0 = solve();
+		const BASEW = PC.lpn_scenario_base;
+		const Par = P.createScenario('Parent');
+		P.switchScenario(Par.id);
+		P.setProp(P.nodeById('22'), 'demand', 900);
+		const parH = solve();
+		P.switchScenario(P.baseScenario().id);
+		const Kid = P.smAdd('scenarios', Par.id, false);
+		P.switchScenario(Kid.id);
+		ok('14.1 the child inherits its parent\'s Demand alternative', Math.abs(solve()['22'] - parH['22']) < 1e-9 && /\(/.test(P.smCellText(Kid, 'demand')), P.smCellText(Kid, 'demand'));
+		ok('14.2 its cell offers Base', P.smCellChoices(Kid, 'demand').some((o) => o[0] === BASEW), JSON.stringify(P.smCellChoices(Kid, 'demand')));
+		ok('14.3 choosing Base is accepted', P.smAssign(Kid.id, 'demand', BASEW) === true);
+		ok('14.4 ...the child solves as Base, to 1e-9, while its parent still holds 900', Math.abs(solve()['22'] - base0['22']) < 1e-9 &&
+			(P.switchScenario(Par.id), Math.abs(solve()['22'] - parH['22']) < 1e-9), String(solve()['22']));
+		P.switchScenario(Kid.id);
+		ok('14.5 ...its cell reads Base, as its own choice, not inherited', P.smCellText(Kid, 'demand') === BASEW && P.smCellValue(Kid, 'demand') === BASEW, P.smCellText(Kid, 'demand'));
+		ok('14.6 ...and Base, already chosen, is not offered a second time', !P.smCellChoices(Kid, 'demand').slice(1).some((o) => o[0] === BASEW));
+		ok('14.7 ...and the Base item counts it among its users', P.smUsedBy('demand', P.smBaseKey('demand')).indexOf(Kid) >= 0);
+		const text = JSON.stringify(P.serializeProject());
+		const f = JSON.parse(text);
+		ok('14.8 the choice is in the file', f.scenarios.filter((x) => x.id === Kid.id)[0].alternatives.demand === 'base');
+		P.setProp(P.nodeById('12'), 'demand', 300);
+		const own = (P.getDoc().alternatives || []).filter((a) => a.id === Kid.alternatives.demand)[0];
+		ok('14.9 an override in the child then makes its own alternative, a child of Base, not of its parent\'s', !!own && own.name === Kid.name && own.parent === null &&
+			P.effective(P.nodeById('22'), 'demand') === P.nodeById('22')._demand, JSON.stringify(own));
+		ok('14.10 choosing "" inherits from the parent again', P.smAssign(Kid.id, 'demand', '') === true && Math.abs(solve()['22'] - parH['22']) < 1e-9);
+		const Cp = P.smAssign(Kid.id, 'demand', BASEW) === true && P.smCopyScenario(Kid.id, 'own');
+		ok('14.11 a copy of a scenario that chose Base chooses Base too', !!Cp && Cp.alternatives && Cp.alternatives.demand === 'base', JSON.stringify(Cp && Cp.alternatives));
+		ok('14.12 the Calculation column offers Base as well', P.smCellChoices(Kid, 'calculation').length >= 1 &&
+			(P.smCellChoices(Kid, 'calculation').some((o) => o[0] === BASEW) || P.smChoice(Kid, 'calculation').base === true));
 	}
 	return fails;
 }
@@ -450,8 +517,8 @@ const MUTATIONS = [
 	['an assignment drops the values the scenario held', (src) => src.replace("			kept = promoteStored(s.id, cat, smUniqueName(cat, scenarioDisplayName(s), smImplicitKey(s, cat)));\n			if (kept.refused) { return kept; }", "			kept = { name: 'x' };\n			takeScenarioLocals(s, cat);")],
 	['a new child is not named for its parent', (src) => src.replace("name = 'Child_' + n + '_of_' + parent;", "name = 'Child_' + n;")],
 	['only-in-this-scenario reads the scenario\'s own values alone', (src) => src.replace("var ov = (!scn || scn.isBase) ? null : resolvedOverrides(scn)[ovKey(el)];", "var ov = (!scn || scn.isBase) ? null : (scn.overrides || {})[ovKey(el)];"), true],
-	['a scenario\'s own alternative is not an item of its tree', (src) => src.replace("		}).map(function (s) { return smImplicitRecord(s, tree); });", "		}).map(function (s) { return smImplicitRecord(s, tree); }).slice(0, 0);"), true],
-	['the first override asks first', (src) => src.replace("		var scn = activeScenario(), key = ovKey(el), t = writeTargetFor(scn, categoryOf(prop, elGroup(el)));\n", "		var scn = activeScenario(), key = ovKey(el), t = writeTargetFor(scn, categoryOf(prop, elGroup(el)));\n		if (t.kind === 'scn' && !scenarioHoldsLocal(scn, categoryOf(prop, elGroup(el)))) { askDialog({ kind: 'alert', text: 'x' }); }\n"), true],
+	['a scenario\'s own alternative is not an item of its tree', (src) => src.replace("		}).map(function (s) { return smImplicitRecord(s, tree); });", "		}).map(function (s) { return smImplicitRecord(s, tree); }).slice(0, 0);")],
+	['the first override asks first', (src) => src.replace("		var scn = activeScenario(), key = ovKey(el), t = ownWriteTarget(scn, categoryOf(prop, elGroup(el)));\n", "		if (writeTargetFor(activeScenario(), categoryOf(prop, elGroup(el))).kind === 'scn') { askDialog({ kind: 'alert', text: 'x' }); }\n		var scn = activeScenario(), key = ovKey(el), t = ownWriteTarget(scn, categoryOf(prop, elGroup(el)));\n"), true],
 	['Basic mode stays on when the manager is chosen', (src) => src.replace("		if (scenarioBasicMode) {\n			setScenarioBasicMode(false);\n			setNotice(", "		if (false) {\n			setScenarioBasicMode(false);\n			setNotice(")]
 ];
 (async function main() {

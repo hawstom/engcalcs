@@ -35,7 +35,8 @@ const L = loadLoopedNetwork(
 	"\t\tsetProp: setProp, baseValue: baseValue,\n" +
 	"\t\tcreateScenario: createScenario, switchScenario: switchScenario,\n" +
 	"\t\tbaseId: function () { return baseScenario().id; },\n" +
-	"\t\toverrides: function (scnId) { return scenarioById(scnId).overrides; },\n" +
+	// What the scenario resolves: its own map, or the alternative an override stored (2026-10-12).
+	"\t\toverrides: function (scnId) { return resolvedOverrides(scenarioById(scnId)); },\n" +
 	"\t\tbuildLayers: function () { svg = document.getElementById('lpn_canvas');\n" +
 	"\t\t\tworld = el('g', {}, svg);\n" +
 	"\t\t\tbackdropLayer = el('g', {}, world); gridLayer = el('g', {}, world);\n" +

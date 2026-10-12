@@ -38,6 +38,9 @@ const fs = require('fs');
 
 const L = loadLoopedNetwork(
 	"\t\tgetDoc: function () { return doc; }, getScenarios: function () { return scenarios; },\n" +
+	// A scenario's values as it resolves them: its own map, or the alternative an override stored
+	// (2026-10-12).
+	"\t\town: function (s) { return resolvedOverrides(s); }, touchTree: touchTree,\n" +
 	"\t\taddNode: addNode, addLink: addLink, addText: addText, seedDefaultInputs: seedDefaultInputs,\n" +
 	"\t\teffective: effective, setProp: setProp, hasOverride: hasOverride, baseValue: baseValue,\n" +
 	"\t\tclearOverride: clearOverride, isOverridable: isOverridable, isActive: isActive,\n" +
@@ -156,7 +159,9 @@ ok('...and each key is the one its own group spells', L.ovKey(note) === L.ovKeyF
 	// reason section 1 created.
 	note.id = 'X99';
 	doc.labels.forEach(function () {});
-	L.getScenarios().forEach(function (s) { s.overrides = {}; });
+	L.getScenarios().forEach(function (s) { s.overrides = {}; delete s.alternatives; delete s.calc; });
+	delete L.getDoc().alternatives; delete L.getDoc().calcSets;
+	L.touchTree();
 	L.switchScenario(s1.id);
 	L.switchScenario('base');
 }
@@ -263,7 +268,7 @@ console.log('\n--- the drawing does not fork ---');
 	const before = { x: lb.x, y: lb.y };
 	lb.x = 777; lb.y = 888;                       // the drag, inside a scenario
 	ok('the move landed on the element itself, not in an override',
-		lb.x === 777 && L.activeScenario().overrides[L.ovKey(lb)].x === undefined);
+		lb.x === 777 && L.own(L.activeScenario())[L.ovKey(lb)].x === undefined);
 	ok('...and Base sees it', (L.switchScenario('base'), lb.x === 777 && lb.y === 888));
 	L.switchScenario(scn.id);
 	ok('...and so does every scenario -- the map cannot move under the reader',
@@ -355,9 +360,10 @@ console.log('\n--- storage and deletion ---');
 	edit(n2, 'text', 'BYPASS OPEN');
 	const key = L.ovKey(n2);
 	const saved = JSON.parse(JSON.stringify(L.serializeProject()));
+	// In the scenario's own map, or in the alternative its first override stored (2026-10-12).
 	ok('the override is written under the label key', !!(saved.scenarios || []).filter(function (x) {
 		return x.overrides && x.overrides[key];
-	}).length, key);
+	}).concat((saved.alternatives || []).filter(function (a) { return a.values && a.values[key]; })).length, key);
 
 	L.applySaved(L.migrateSaved(JSON.parse(JSON.stringify(saved))));
 	L.buildDom();
@@ -380,8 +386,8 @@ console.log('\n--- storage and deletion ---');
 	L.deleteElement('label', back.id);
 	ok('deleting it in Base really deletes it', L.labelById(back.id) === null);
 	ok('...and takes every scenario\'s values on it away', L.getScenarios().every(function (x) {
-		return !x.overrides[key];
-	}));
+		return !L.own(x)[key];
+	}) && (L.getDoc().alternatives || []).every(function (a) { return !(a.values || {})[key]; }));
 }
 
 console.log(fails ? '\n' + fails + ' FAILURE(S)' : '\nALL PASS');

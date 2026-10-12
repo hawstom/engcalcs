@@ -42,6 +42,9 @@ global.confirm = global.window.confirm = function () { return true; };
 
 const L = loadLoopedNetwork(
 	"\t\timportInp: importInpFromFile, getDoc: function () { return doc; },\n" +
+	// A scenario's values as it resolves them: its own map, or the alternative an override stored
+	// (2026-10-12).
+	"\t\town: function (s) { return resolvedOverrides(s); },\n" +
 	"\t\tserialize: serializeProject, applySaved: applySaved, assembleModel: assembleModel,\n" +
 	"\t\teffective: effective, setProp: setProp, hasOverride: hasOverride, ovKey: ovKey,\n" +
 	"\t\tcreateScenario: createScenario, switchScenario: switchScenario,\n" +
@@ -111,7 +114,7 @@ function table(id) {
 	};
 }
 function type(input, v) { input.value = v; input._listeners.change[0](); }
-function ovOf(id) { return L.activeScenario().overrides[L.ovKey(J(id))] || {}; }
+function ovOf(id) { return L.own(L.activeScenario())[L.ovKey(J(id))] || {}; }
 
 L.createScenario('Growth');
 const SCN = L.getScenarios()[L.getScenarios().length - 1];
@@ -184,11 +187,11 @@ console.log('\n--- editing the list inside a scenario ---');
 // ---------------------------------------------------------------------------
 console.log('\n--- undo ---');
 {
-	const before = JSON.stringify(L.activeScenario().overrides);
+	const before = JSON.stringify(L.own(L.activeScenario()));
 	table('J3').add._listeners.click[0]();
 	ok('Add on J3 made an override', !!ovOf('J3').demands);
 	L.undo();
-	ok('ONE undo takes it back, exactly', JSON.stringify(L.activeScenario().overrides) === before);
+	ok('ONE undo takes it back, exactly', JSON.stringify(L.own(L.activeScenario())) === before);
 	ok('...and Base never moved', baseNodes() === BASE0);
 }
 
@@ -297,6 +300,8 @@ console.log('\n--- a scenario saved before R-369 ---');
 	const sc = file.scenarios.find(s => s.id === SCN.id);
 	sc.overrides = {};
 	sc.overrides[L.ovKey(J('J1'))] = { demand: 100 };
+	// A file from before R-369 has no stored alternatives either (an override stores one since 2026-10-12).
+	delete sc.alternatives; delete file.alternatives;
 	L.applySaved(file);
 	ok('it loads and means what it meant: row 0 at 100, the other rows Base\'s',
 		L.effective(J('J1'), 'demand') === 100 && near(L.resolvedDemand(J('J1')), 100 * 0.6 + 20 * 0.2 + 12.5 * 0.6),
@@ -339,8 +344,8 @@ console.log('\n--- Base itself ---');
 	t = table('J1');
 	type(t.sels[0], 'Pat2');
 	ok('a pattern edit in Base writes Base\'s own field', J('J1').demandPattern === 'Pat2');
-	ok('...and makes no override anywhere', L.getScenarios().every(s => !s.overrides[L.ovKey(J('J1'))] ||
-		!s.overrides[L.ovKey(J('J1'))].demands));
+	ok('...and makes no override anywhere', L.getScenarios().every(s => !L.own(s)[L.ovKey(J('J1'))] ||
+		!L.own(s)[L.ovKey(J('J1'))].demands));
 }
 
 console.log(fails ? '\n' + fails + ' FAILED' : '\nall passed');

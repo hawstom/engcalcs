@@ -628,12 +628,14 @@ console.log('\n--- the write seam ---');
 	pcells.diameter._listeners.change[0]();
 	report(L.effective(pipe, 'diameter') === 400, 'typing a pipe diameter changes it in THIS scenario');
 	report(pipe._diameter === baseDia, '...and Base keeps its own', String(pipe._diameter));
-	// The elevation is not an overridable property, and is written exactly as the popup writes it.
+	// The elevation is overridable since 2026-10-12 (Tom: every property), so typed in a scenario it
+	// is that scenario's, as the popup writes it.
 	L.renderTable('junctions');
-	const cellsB = L.tableCells('junctions')[b.id];
+	const cellsB = L.tableCells('junctions')[b.id], elevB = b.elev;
 	cellsB.elev.value = '12.5';
 	cellsB.elev._listeners.change[0]();
-	report(b.elev === 12.5, 'typing in an elevation cell edits the elevation', String(b.elev));
+	report(L.effective(b, 'elev') === 12.5, 'typing in an elevation cell edits the elevation in THIS scenario', String(L.effective(b, 'elev')));
+	report(b.elev === elevB, '...and Base keeps its own', String(b.elev));
 	L.switchScenario('base');
 
 	// **AN EDIT MUST NOT MOVE THE ROW.** The sort was a gesture the user made once, and a table

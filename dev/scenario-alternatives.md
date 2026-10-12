@@ -65,11 +65,11 @@ here. Each property is in exactly one category. The category id is what the code
 
 | Category (id) | Bentley's | Properties | Notes |
 |---|---|---|---|
-| Physical (`physical`) | Physical | pipe `diameter`, `roughness`, `k`, `length`, `typeId`, `fittingsId`; pump `curveId`, `efficCurveId`; junction `emitter`; reservoir `head`; node `x`, `y` | **SPECULATION** for `emitter` and `head`: Bentley's reservoir "elevation" and junction emitter coefficient are element attributes we believe sit in Physical; not confirmed from a cited page. **Position has no Bentley home at all**: Bentley's geometry does not vary by scenario. Ours does (Tom, 2026-09-15), so a Physical child alternative holding `x`/`y` is ours alone and has no Bentley translation. |
+| Physical (`physical`) | Physical | pipe `diameter`, `roughness`, `k`, `length`, `typeId`, `fittingsId`; pump `curveId`, `efficCurveId`; junction `emitter`; reservoir `head`, `headPattern`; node `x`, `y`, `elev`; tank `minLevel`, `maxLevel`, `tankDiameter`, `volCurve` | **SPECULATION** for `emitter` and `head`: Bentley's reservoir "elevation" and junction emitter coefficient are element attributes we believe sit in Physical; not confirmed from a cited page. **Position has no Bentley home at all**: Bentley's geometry does not vary by scenario. Ours does (Tom, 2026-09-15), so a Physical child alternative holding `x`/`y` is ours alone and has no Bentley translation. |
 | Demand (`demand`) | Demand | junction `demand`, `demands` (the whole breakdown, R-369) | Tom's Peak Hour example. |
 | Asset activation (`topology`; Tom, 2026-09-30) | Active Topology | node `active`, link `active` | Task 753 ("Activation") is Tom's call on the words; the id here is neutral. Drawing inside a scenario (`bornInScenario()`) writes `active: true` there, so it creates that scenario's topology child alternative, exactly as Bentley's own "element added in a child topology" does. A link whose end is inactive is itself out (`linkLive()`). See "Active topology, and Change type in a scenario". |
-| Initial settings (`initial`) | Initial Settings | link `status`, valve `setting`, tank `level` | **CITED** for pipe status: *"a pipe can start in an open or closed position and a pump can start in an on or off condition"*, <https://docs.bentley.com/LiveContent/web/Bentley%20WaterGEMS%20SS6-v1/en/31010.html>. Tank level and valve setting: Bentley's SCADAConnect page lists *"initial conditions with regard to such properties as tank water levels, pump status and settings and valve status"*, <https://docs.bentley.com/LiveContent/web/Bentley%20WaterCAD%20CONNECT%20Edition%20Help-v1/en/GUID-E8008FFA-6E0C-4A98-AAF6-C6CC742D5A71.html>, which does not name the alternative; placing them in Initial Settings is SPECULATION on that reading. |
-| Constituent (`constituent`) | Water Quality: Constituent | node `initQuality`, `sourceType`, `sourceQuality`, `sourcePattern`; tank `tankCoeff`; pipe `bulkCoeff`, `wallCoeff` | Bentley splits water quality into Age, Constituent and Trace; everything we let a scenario vary is a chemical's. |
+| Initial settings (`initial`) | Initial Settings | link `status`, valve `setting`, tank `level`, pump `speed`, `speedPattern` | **CITED** for pipe status: *"a pipe can start in an open or closed position and a pump can start in an on or off condition"*, <https://docs.bentley.com/LiveContent/web/Bentley%20WaterGEMS%20SS6-v1/en/31010.html>. Tank level and valve setting: Bentley's SCADAConnect page lists *"initial conditions with regard to such properties as tank water levels, pump status and settings and valve status"*, <https://docs.bentley.com/LiveContent/web/Bentley%20WaterCAD%20CONNECT%20Edition%20Help-v1/en/GUID-E8008FFA-6E0C-4A98-AAF6-C6CC742D5A71.html>, which does not name the alternative; placing them in Initial Settings is SPECULATION on that reading. |
+| Constituent (`constituent`) | Water Quality: Constituent | node `initQuality`, `sourceType`, `sourceQuality`, `sourcePattern`; tank `tankCoeff`, `mixingModel`, `mixingFraction`; pipe `bulkCoeff`, `wallCoeff` | Bentley splits water quality into Age, Constituent and Trace; everything we let a scenario vary is a chemical's. |
 | Fire flow (`fireflow`) | Fire Flow | junction `fireFlow` | The required fire flow per junction (Task 530). |
 | Energy cost (`energy`) | Energy Cost | pump `energyPrice`, `energyPattern` | |
 | User data (`userdata`) | User Data Extensions | every custom property (`custom_*`, Task 636) | Bentley lets a user field be placed in an alternative; ours are all overridable, so they are one category. Also the home of any stray property name an old file carries that no category claims, so "exactly one" holds for every key a file can contain. |
@@ -83,9 +83,18 @@ and counts in the Calculation category (Q7).
 **Bentley categories we have nothing for:** Operational (controls; our `[RULES]` are the
 document's, not a scenario's), Age, Trace (the trace node is a document setting), Capital Cost,
 Pressure Dependent Demand, Transient (HAMMER), Failure History, Flushing, SCADA, and the other
-product-specific ones. **Base-owned and therefore in no category**: junction/tank `elev`, tank
-`minLevel`/`maxLevel`/diameter/mixing model, pump speed, element ids and types, link ends and
-bends, a Text's position and size, and everything a Customer carries.
+product-specific ones.
+
+**Every property is overridable** (Tom, 2026-10-12: *"I don't accept this. Change it, include them
+all as overridable ... these limitations were ... indefensible."*). Ground elevation, a reservoir's
+head pattern, a tank's depth limits, diameter, volume curve and mixing, and a pump's relative speed
+and speed pattern were Base-owned until then, on the reading that what is built does not vary by
+scenario; Bentley's own Physical alternative carries elevation. They are stored bare in Base, as
+the file names them (`LPN_BARE_PROP`); `scenario_seam_check.php` refuses an unmarked bare write.
+The categories for `elev`, the tank geometry, `headPattern`, mixing, `speed` and `speedPattern` are
+SPECULATION from Bentley's alternative names, not from a cited page. **Still not a scenario's**:
+element ids and types (Change type in a scenario makes a new asset), link ends and bends, a Text's
+position and size, an asset's description and tag, and everything a Customer carries.
 
 ## The key decision: derive the alternatives (A) or store them (B)
 
@@ -430,6 +439,17 @@ are the asset tables' own.
   back. A path no scenario may hold (a custom property's design) stays the project's; an answer to
   a question the box asked (the friction method's confirm) is bracketed too. Units say "Units are
   the same in every scenario" while a scenario is open; Restore defaults is Base's act only.
+  **For the length of the bracket the globals `settings` and `labelSettings` are the scenario's
+  view** (Tom, 2026-10-12: an override cleared to false came back ticked). The editors write the
+  globals when they fire, and outside a build those were the project's own, so a value equal to
+  Base's (a label cleared that Base leaves cleared, Hazen-Williams picked back) changed nothing the
+  seam could see and was dropped; the same drop is why a child scenario clearing a label it
+  inherited ticked got no Presentation alternative. A save asked for mid-bracket waits for its end.
+- **The control in the hand stays under the pointer** (Tom, 2026-10-12: the override note "loses my
+  place in the settings box"). The rebuild let the browser's scroll anchoring pick a surviving node
+  to hold still, and the content jumped hundreds of pixels (a link label at 522 px came back at
+  -106). The box turns anchoring off (`overflow-anchor: none`) and `setboxKeepPlace()` holds the
+  control the edit began on at its place on screen through the rebuild and the marks.
 - **A keystroke is not a rebuild**: an `input` event in the box routes its value and redraws the
   map but leaves the box alone (`settingTableAfterEditKeepBox()`), so typing into a label's text box
   in a scenario keeps every character; the `change` on leaving the field rebuilds it.
@@ -926,25 +946,33 @@ Tom's calls of 2026-10-09 (H01-H08), in his words where they govern:
   choosing another while the scenario holds its own values first stores its own alternative (below),
   silently. A blank pick (Clear override, Delete) inherits again. Fill, paste and the cell menu are the
   pane's own.
-- **A scenario's own alternative is an item, named after the scenario** (Tom, 2026-10-11, the "?" tip:
-  *"if the scenario has no such alternative, a new alternative is created using the name of the
-  scenario"*). The first override in a category makes it, the next ones go into it, and a scenario
-  holding none in that category uses its parent's. Still choice A: the scenario's own values ARE it,
-  keyed `<scenario id>:<category>` (`smImplicitRecords()`), so no file changes, and it follows a rename
-  of the scenario, goes with the scenario, and goes when its last override is cleared. It hangs from
-  what the scenario's parent uses. Rename, a drag, Copy, Add child under it, or another scenario picking
-  it in the Scenarios table stores it first (`smMaterialize()`, which is `promoteStored()`); Delete is
-  refused, since its scenario uses it. **No message or question announces it, in Basic mode or out**
-  (Tom, 2026-10-11: *"We may not need the alert on creation of an alternative"*); the "kept as the
-  alternative" notice went with it.
+- **A scenario's own alternative is a stored, first-class alternative** (Tom, 2026-10-12: *"No. It's
+  a first-class alternative, and this is the primary way of creating alternatives."*). The first
+  override in a category, in Basic mode or out, creates a stored alternative (a calculation set, for
+  Calculation) named after the scenario as it is then, whose parent is what the scenario inherited,
+  and the scenario names it (`ownWriteTarget()`, which is `promoteStored()`). The next overrides go
+  into it. From then on it is an alternative like any other: renamed on its own (renaming the
+  scenario does not rename it), kept when its last override is cleared, kept when its scenario is
+  deleted, and written in the file under `alternatives`/`calcSets`. Clearing never creates one. **No
+  message or question announces it** (Tom, 2026-10-11: *"We may not need the alert on creation of an
+  alternative"*). This retires choice A for any project written since: a Basic-mode project with
+  overrides now carries `alternatives`. A file from before still holds a scenario's values in its
+  own maps and opens unchanged; there the scenario's own alternative is the derived item
+  (`smImplicitRecords()`, `<scenario id>:<category>`) until a write in that category, or any act on it
+  (Rename, a drag, Copy, Add child, another scenario picking it), stores it (`smMaterialize()`).
 - **The menu row is always present**; choosing it with Basic mode ticked turns Basic mode off and says so.
   The Scenarios menu's order is Tom's (2026-10-11): Scenario manager, a rule, Basic mode, New, Rename,
-  Delete, a rule, Apply Base values, then the scenarios.
+  Delete, a rule, Apply Base values, then the scenarios. No separator before the scenario list (Tom,
+  2026-10-12: *"Not for now"*).
 - **Gestures**: drag a leaf or branch onto an item to re-parent it (the row is outlined); drag between
-  two items to reorder (a line); a cycle is refused. Click a selected item or F2 renames, Delete or the
-  minus button or the context menu deletes, the plus button or the context menu adds a child
-  (`Child_<n>_of_<parent>`), Enter or a double-click makes a scenario current. **Delete is refused while
-  the item is in use, naming who uses it.**
+  two items to reorder (a line); a cycle is refused. **A click selects and only selects** (Tom,
+  2026-10-12: *"Single-clicking on a tree name opens it in Rename mode ... Clicking again, ostensibly
+  to place the cursor, exits Rename mode."*): F2, Rename (button or right-click) renames, and a click
+  inside the open name places the caret. Delete or the minus button or the context menu deletes, the
+  plus button or the context menu adds a child (`Child_<n>_of_<parent>`), Enter or a double-click
+  makes a scenario current (Tom, 2026-10-12: *"OK. Yes, as long as that works with all our other
+  gestures."*; with no click-to-rename, nothing collides). **Delete is refused while the item is in
+  use, naming who uses it.**
 - **Several Bases** (H08): "Add Base" names `Base2`, `Base3`. A Base of its own is a record flagged
   `root: true` with no parent. It resolves exactly as a child of Base does (Base's values are the
   elements' own), so the flag is only which row it hangs from. A stage-4 record with parent null and no
@@ -962,10 +990,13 @@ Tom's calls of 2026-10-09 (H01-H08), in his words where they govern:
 - **Decisions made by CC that Tom may overturn** (his words govern where he gave them):
   1. A Base added with Add Base is deleted like any record when nothing uses it; only each tree's built-in
      Base is never deleted, with its own sentence (`lpn_sm_base_kept`).
-  2. A child cannot choose Base while its parent uses another alternative (choosing nothing inherits);
-     re-parent the scenario to Base instead.
-  3. Picking an alternative for a scenario that holds its own values in that category first stores its own
-     alternative under its name; nothing is lost, and nothing is said.
+  2. **Base is a choice in every cell** (Tom, 2026-10-12: *"I can't select Base as the alternative."*):
+     stored as `scenario.alternatives[cat] = 'base'` (`scenario.calc`, for Calculation), the Base
+     item's own key, so the scenario uses the Base alternative whatever its parent uses. A blank
+     pick still inherits. An override then makes the scenario's own alternative a child of Base.
+  3. Picking an alternative for a scenario that holds its own values in that category (a file from
+     before stored own alternatives) first stores them under its name; nothing is lost, and nothing is
+     said.
   4. "Used by" counts scenarios that inherit an alternative as well as those that name it.
   5. The Scenarios tab is hidden, not removed, in Basic mode, and Ctrl+Shift+PageDown skips it.
   6. A Base of its own resolves exactly as a child of Base does; `root: true` only says which row it hangs
@@ -973,8 +1004,6 @@ Tom's calls of 2026-10-09 (H01-H08), in his words where they govern:
   7. The override count (badge, menu, Compare column) also counts what a scenario takes from the stored
      alternatives it uses, folded as they resolve, so a value an alternative and its parent both state
      counts once. It does not count values inherited from a parent scenario's own implicit values.
-- Known limit: a child cannot choose Base while its parent uses another alternative, because choosing
-  nothing inherits. Re-parent the scenario to Base instead.
 
 Code: `smTrees()` ... `smCopyScenario()`, `compareScenarios()`, `smSharedText()` in the section "THE SCENARIO
 MANAGER'S MODEL"; the box and the table in "SCENARIOS > BASIC MODE, AND THE SCENARIO MANAGER". Harnesses:

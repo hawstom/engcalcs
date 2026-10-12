@@ -745,7 +745,7 @@ never edits a synonym.
   > Delete the selected item. A used item is not deleted.
   @@ NEEDS RULING
 - **`lpn_sm_help`**
-  > How scenarios and alternatives work:\n\nAn override made in a scenario is stored in the alternative associated with the scenario. Associations of alternatives to scenarios are managed in the Scenarios table in the bottom pane. Creating a new scenario creates no alternatives; it uses its parent's alternatives until new alternatives are needed as overrides are created. When overrides are created in a scenario, they are stored in their respective alternative for the scenario; if the scenario has no such alternative, a new alternative is created using the name of the scenario. Example: You create a "Figure: Node and link IDs" scenario and edit a Text to say "Node and Link IDs." When you create the scenario, no alternatives are created. But at the moment you save the Text, a Text alternative called "Figure: Node and link IDs" is created with the override for the Text value. In Basic mode, you see this as simply an override in the scenario itself.\n\nHow to manage scenarios:\n\nChoose Scenarios or an alternatives category in the list at the top to show its tree.\n\nCreate a child of the selected item with Add child, or an item with no parent with Add base. A new item is named after its parent; type a name to rename it. Copy scenario copies the selected scenario and asks whether to copy the alternatives it uses or share them.\n\nDrag an item onto another to make it a child of that item. Drag an item between two items to reorder them.\n\nClick a selected item, or press F2, to rename it. Double-click a scenario, or press Enter, to make it current. Click the arrow beside an item, or press Left or Right, to collapse or expand it. Right-click an item for the same commands as the buttons.\n\nPress Delete, or click the minus button, to delete the selected item. An item in use is not deleted, and the message names what uses it.\n\nTo make a scenario use another alternative, choose that alternative in the scenario's row of the Scenarios table. An override made in a shared alternative changes every scenario that uses it.
+  > How scenarios and alternatives work:\n\nAn override made in a scenario is stored in the alternative associated with the scenario. Associations of alternatives to scenarios are managed in the Scenarios table in the bottom pane. Creating a new scenario creates no alternatives; it uses its parent's alternatives until new alternatives are needed as overrides are created. When overrides are created in a scenario, they are stored in their respective alternative for the scenario; if the scenario has no such alternative, a new alternative is created using the name of the scenario. Example: You create a "Figure: Node and link IDs" scenario and edit a Text to say "Node and Link IDs." When you create the scenario, no alternatives are created. But at the moment you save the Text, a Text alternative called "Figure: Node and link IDs" is created with the override for the Text value. In Basic mode, you see this as simply an override in the scenario itself.\n\nHow to manage scenarios:\n\n- Choose Scenarios or an alternatives category in the list at the top to show its tree.\n\n- Create a child of the selected item with Add child, or an item with no parent with Add base. A new item is named after its parent; type a name to rename it. Copy scenario copies the selected scenario and asks whether to copy the alternatives it uses or share them.\n\n- Drag an item onto another to make it a child of that item. Drag an item between two items to reorder them.\n\n- Click an item to select it. Press F2, or choose Rename, to rename the selected item. Double-click a scenario, or press Enter, to make it current. Click the arrow beside an item, or press Left or Right, to collapse or expand it. Right-click an item for the same commands as the buttons.\n\n- Press Delete, or click the minus button, to delete the selected item. An item in use is not deleted, and the message names what uses it.\n\n- To make a scenario use another alternative, including Base, choose it in the scenario's row of the Scenarios table. An override made in a shared alternative changes every scenario that uses it.
   @@ NEEDS RULING
 - **`lpn_sm_in_use`**
   > {name} cannot be deleted while it is used by: {list}.
@@ -842,7 +842,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**48 still to read**, of 51 new keys across 13 unmerged branch(es).
+**59 still to read**, of 62 new keys across 17 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -853,9 +853,45 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/handoff-1012 (`d271ca42`) — adds no English strings
+### chore/mary-1012 (`26adbad5`) — 3 new, 3 to read @@ NEEDS RULING
 
-### feat/bentley-interop (`f43dde69`) — adds no English strings
+- **`lpn_field_tank_base_elev`**
+  > Base elevation
+  @@ NEEDS RULING
+- **`lpn_field_tank_base_elev_tip`**
+  > Elevation of the tank bottom, from which water depth and volume are measured. Left blank, the bottom is at the ground elevation.
+  @@ NEEDS RULING
+- **`lpn_tank_ground_elev_tip`**
+  > Ground elevation at the tank. Pressure at the tank is measured from here, as at a junction.
+  @@ NEEDS RULING
+
+### chore/pkill-guard (`b7b8c9fe`) — 3 new, 3 to read @@ NEEDS RULING
+
+- **`lpn_field_tank_base_elev`**
+  > Base elevation
+  @@ NEEDS RULING
+- **`lpn_field_tank_base_elev_tip`**
+  > Elevation of the tank bottom, from which water depth and volume are measured. Left blank, the bottom is at the ground elevation.
+  @@ NEEDS RULING
+- **`lpn_tank_ground_elev_tip`**
+  > Ground elevation at the tank. Pressure at the tank is measured from here, as at a junction.
+  @@ NEEDS RULING
+
+### chore/sprint-1012 (`71aec839`) — 3 new, 3 to read @@ NEEDS RULING
+
+- **`lpn_field_tank_base_elev`**
+  > Base elevation
+  @@ NEEDS RULING
+- **`lpn_field_tank_base_elev_tip`**
+  > Elevation of the tank bottom, from which water depth and volume are measured. Left blank, the bottom is at the ground elevation.
+  @@ NEEDS RULING
+- **`lpn_tank_ground_elev_tip`**
+  > Ground elevation at the tank. Pressure at the tank is measured from here, as at a junction.
+  @@ NEEDS RULING
+
+### feat/bentley-interop (`735199bd`) — adds no English strings
+
+### feat/convert-search (`b71bb912`) — adds no English strings
 
 ### feat/desktop (`baba0f04`) — adds no English strings
 
@@ -881,52 +917,46 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`2e5e81c4`) — adds no English strings
 
-### feat/match-property (`f5a59fc3`) — 14 new, 14 to read @@ NEEDS RULING
+### feat/match-property (`daa13a9c`) — 12 new, 12 to read @@ NEEDS RULING
 
-- **`lpn_match_done_many`**
-  > Matched {m} assets to {id}, except status and location. Values changed: {n}.
+- **`lpn_copy_props_done`**
+  > Copied properties of {id}.
   @@ NEEDS RULING
-- **`lpn_match_done_one`**
-  > Matched {to} to {id}, except status and location. Values changed: {n}.
+- **`lpn_copy_props_menu`**
+  > Copy properties
   @@ NEEDS RULING
-- **`lpn_match_kind`**
-  > Match properties applies to nodes and pipes, pumps, and valves only.
+- **`lpn_field_tank_base_elev`**
+  > Base elevation
   @@ NEEDS RULING
-- **`lpn_match_menu`**
-  > Match properties
+- **`lpn_field_tank_base_elev_tip`**
+  > Elevation of the tank bottom, from which water depth and volume are measured. Left blank, the bottom is at the ground elevation.
   @@ NEEDS RULING
-- **`lpn_match_menu_off_tip`**
-  > Select target objects to match this object's properties except activation status.
+- **`lpn_paste_done_many`**
+  > Pasted properties of {id} to {m} assets. Values changed: {n}.
   @@ NEEDS RULING
-- **`lpn_match_none`**
-  > {to} and {id} have no properties in common to copy.
+- **`lpn_paste_done_one`**
+  > Pasted properties of {id} to {to}. Values changed: {n}.
   @@ NEEDS RULING
-- **`lpn_match_select_first`**
-  > Select the targets first, then choose Match properties.
+- **`lpn_paste_props_menu`**
+  > Paste properties to selection
   @@ NEEDS RULING
-- **`lpn_match_selected_ask`**
-  > Copy this object's properties except activation status to {n} selected objects?
+- **`lpn_paste_props_off_kind`**
+  > No selected asset can take the copied properties.
   @@ NEEDS RULING
-- **`lpn_match_selected_ask_one`**
-  > Copy this object's properties except activation status to 1 selected object?
+- **`lpn_paste_props_off_none`**
+  > Nothing is copied. Right-click an asset and choose Copy properties.
   @@ NEEDS RULING
-- **`lpn_match_skip_breakdown`**
-  > Not copied: {n} (demand is a list of categories).
+- **`lpn_paste_skip_breakdown`**
+  > Not pasted: {n} (demand is a list of categories).
   @@ NEEDS RULING
-- **`lpn_match_skip_scn`**
-  > Not copied: {names}. A scenario cannot hold its own value for these; change them in Base.
+- **`lpn_paste_skip_valve`**
+  > Not pasted: {n} (the valve types differ).
   @@ NEEDS RULING
-- **`lpn_match_skip_valve`**
-  > Not copied: {n} (the valve types differ).
-  @@ NEEDS RULING
-- **`lpn_match_tip`**
-  > Copy the properties of one asset to the assets selected. Select the targets first, choose Match properties, then select the source. Status (Active, Shut), identity, location, and connections are never copied. Assets of a different type receive only the properties both types have.
-  @@ NEEDS RULING
-- **`lpn_mode_match`**
-  > Mode: Match properties. Select the asset to copy properties from. Status, identity, and location are not copied. Press Escape to cancel.
+- **`lpn_tank_ground_elev_tip`**
+  > Ground elevation at the tank. Pressure at the tank is measured from here, as at a junction.
   @@ NEEDS RULING
 
-### feat/shape (`4166d068`) — 27 new, 27 to read @@ NEEDS RULING
+### feat/shape (`554c2b24`) — 27 new, 27 to read @@ NEEDS RULING
 
 - **`lpn_file_import_shapes`**
   > Import GeoJSON shapes…
@@ -1010,28 +1040,42 @@ build for that would be a gate nobody keeps. Refresh it with
   > Draw a point, a polyline, or a polygon on the map. A Shape is annotation and is not part of the network. Specify each point, then specify the last point again, press Enter, or right-click to finish. Specify the first point again to close the Shape into a polygon.
   @@ NEEDS RULING
 
-### feat/si-example (`3883f0d2`) — 4 new, 4 to read @@ NEEDS RULING
+### feat/si-example (`30708037`) — 7 new, 7 to read @@ NEEDS RULING
 
 - **`lpn_ex_net2_si_desc`**
-  > Litres per second, with metres and millimetres. EPANET’s Net2, converted from gallons per minute, feet and inches: a branched distribution system with a tank.
+  > Litres per second, with metres and millimetres. An EPANET example at Branford, Connecticut, converted from gallons per minute, feet and inches: 35 junctions and 1 tank, with no reservoir and no pump. Fluoride, a non-reactive substance, enters at one source.
   @@ NEEDS RULING
 - **`lpn_ex_net2_si_title`**
   > EPANET Net2, L/s (SI)
   @@ NEEDS RULING
 - **`lpn_ex_net3_si_desc`**
-  > Litres per second, with metres and millimetres. EPANET’s Net3, converted from gallons per minute, feet and inches: 92 junctions, three tanks, and two reservoirs, one of them a river.
+  > Litres per second, with metres and millimetres. An EPANET example at Novato, California, converted from gallons per minute, feet and inches, with the world map behind it: 92 junctions, 3 tanks and 2 reservoirs, no valves, about 8 km square. A 24-hour extended-period simulation, with a source trace from the Lake.
   @@ NEEDS RULING
 - **`lpn_ex_net3_si_title`**
   > EPANET Net3, L/s (SI)
   @@ NEEDS RULING
+- **`lpn_field_tank_base_elev`**
+  > Base elevation
+  @@ NEEDS RULING
+- **`lpn_field_tank_base_elev_tip`**
+  > Elevation of the tank bottom, from which water depth and volume are measured. Left blank, the bottom is at the ground elevation.
+  @@ NEEDS RULING
+- **`lpn_tank_ground_elev_tip`**
+  > Ground elevation at the tank. Pressure at the tank is measured from here, as at a junction.
+  @@ NEEDS RULING
 
-### feat/tank-ground (`0b488156`) — 3 new, 3 to read @@ NEEDS RULING
+### fix/paste-column (`a4e50f15`) — adds no English strings
+
+### fix/specific-gravity (`1675818f`) — 4 new, 4 to read @@ NEEDS RULING
 
 - **`lpn_field_tank_base_elev`**
   > Base elevation
   @@ NEEDS RULING
 - **`lpn_field_tank_base_elev_tip`**
   > Elevation of the tank bottom, from which water depth and volume are measured. Left blank, the bottom is at the ground elevation.
+  @@ NEEDS RULING
+- **`lpn_settings_specific_gravity_tip`**
+  > Density of the fluid relative to water. It scales pressure in every unit, because a pressure in m or ft is a column of water, and it does not change head or HGL. It changes no flow.
   @@ NEEDS RULING
 - **`lpn_tank_ground_elev_tip`**
   > Ground elevation at the tank. Pressure at the tank is measured from here, as at a junction.

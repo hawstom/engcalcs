@@ -284,7 +284,9 @@ ok('6.2 with its key, label and applies-to',
 	saved.settings.customProps.some(function (d) {
 		return d.key === route.key && d.label === route.label && d.applies === 'J,L';
 	}));
-const savedOv = JSON.stringify(saved.scenarios);
+// The scenario's values, wherever the file holds them: its own map, or (since 2026-10-12) the
+// alternative its first override stored.
+const savedOv = JSON.stringify(saved.scenarios) + JSON.stringify(saved.alternatives || []);
 ok('6.3 the scenario override rides with it', savedOv.indexOf('TABLE-ROUTE') >= 0);
 L.applySaved(saved);
 const back = L.getDoc().nodes.filter(function (n) { return n.id === jC.id; })[0];

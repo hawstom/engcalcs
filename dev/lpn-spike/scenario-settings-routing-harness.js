@@ -48,6 +48,9 @@ function blind(src) {
 
 const L = loadLoopedNetwork(
 	"\t\tgetDoc: function () { return doc; }, getScenarios: function () { return scenarios; },\n" +
+	// The view a scenario holds, where it holds it: its Presentation alternative, which the first
+	// setting stores (2026-10-12), or its own block in a file from before.
+	"\t\tviewOf: function (s) { var t = writeTargetFor(s, 'presentation'), b = t && t.obj.settings; return b ? b.view : undefined; },\n" +
 	"\t\tgetSettings: function () { return settings; }, getLabelSettings: function () { return labelSettings; },\n" +
 	"\t\tseedDefaultInputs: seedDefaultInputs, buildDom: buildDom, applySaved: applySaved,\n" +
 	"\t\tacceptImportedText: acceptImportedText, serializeProject: serializeProject,\n" +
@@ -257,17 +260,18 @@ if (BLIND && process.env.LPN_SEAM_OVERRIDE === '1') {
 		// The scale is held as ground metres per CSS pixel (Declan's advice), never as the drawing's
 		// own pixels per unit, which means a different zoom in every frame.
 		ok('the view is held outward, as a position override is, its scale in metres per pixel',
-			scn.settings.view && scn.settings.view.mpp > 0 && scn.settings.view.s === undefined && typeof scn.settings.view.cx === 'number', JSON.stringify(scn.settings.view));
+			L.viewOf(scn) && L.viewOf(scn).mpp > 0 && L.viewOf(scn).s === undefined && typeof L.viewOf(scn).cx === 'number', JSON.stringify(L.viewOf(scn)));
 		L.switchScenario(L.baseScenario().id);
 		L.applyView(home);
 		L.switchScenario(scn.id);
 		ok('switching into a scenario that holds a view goes there', Math.abs(L.currentView().cx - figView.cx) < 1e-9 && Math.abs(L.currentView().cy - figView.cy) < 1e-9 && Math.abs(L.currentView().s - 5) < 1e-9);
 		L.switchScenario(L.baseScenario().id);
 		ok('...and switching out returns to where you were looking', Math.abs(L.currentView().cx - home.cx) < 1e-9 && Math.abs(L.currentView().cy - home.cy) < 1e-9 && L.currentView().s === home.s);
+		const heldWas = JSON.stringify(L.viewOf(scn));
 		const text = JSON.stringify(L.serializeProject());
 		L.applySaved(L.acceptImportedText(text));
 		const back = L.getScenarios().filter((s) => s.name === 'Figure')[0];
-		ok('...and the held view survives a save and reopen unchanged', back && JSON.stringify(back.settings.view) === JSON.stringify(scn.settings.view));
+		ok('...and the held view survives a save and reopen unchanged', back && JSON.stringify(L.viewOf(back)) === heldWas, heldWas);
 
 		console.log('\n' + (fails ? fails + ' FAILED' : 'ALL PASS'));
 		process.exit(fails ? 1 : 0);

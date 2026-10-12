@@ -2447,9 +2447,14 @@
 	 */
 	EngCalcs.lpnExportInp = function (doc, opts) {
 		opts = opts || {};
-		var eff = typeof opts.effective === 'function'
-			? opts.effective
-			: function (el, prop) { return el['_' + prop]; };
+		// The properties a document stores under their own name rather than an underscore, which
+		// every one became overridable as (Tom, 2026-10-12; LPN_BARE_PROP in js/looped-network.js).
+		var BARE = { elev: 1, minLevel: 1, maxLevel: 1, tankDiameter: 1, volCurve: 1, mixingModel: 1, mixingFraction: 1,
+			headPattern: 1, speed: 1, speedPattern: 1 };
+		// A caller's resolver written before then reads `_prop` only; a bare one it cannot find is
+		// read off the element, which is what Base holds.
+		var effIn = typeof opts.effective === 'function' ? opts.effective : function (el, prop) { return el['_' + prop]; },
+			eff = function (el, prop) { var v = effIn(el, prop); return (v === undefined && BARE[prop]) ? el[prop] : v; };
 		/**
 		 * **A NODE THE ACTIVE SCENARIO HAS MOVED** (ROADMAP Task 674). Deliberately NOT through
 		 * `eff()`, and the reason is the frame: this writer is handed the SERIALIZED document, whose
@@ -2629,9 +2634,9 @@
 				// (Task 248.02) -- the same rule the junction's pattern column follows below. There
 				// is no document-wide default for a head pattern in EPANET, so a blank column here
 				// really does mean "no pattern" and writing one would state what the user never did.
-				var rpat = nd.headPattern ? [String(nd.headPattern)] : [];
+				var rpat = eff(nd, 'headPattern') ? [String(eff(nd, 'headPattern'))] : [];
 				if (rh === undefined || rh === null || rh === '') {
-					reservoirs.push(row([nd.id, n(cHead, nd, 'elev', nd.elev || 0)].concat(rpat)) + descOf(nd));
+					reservoirs.push(row([nd.id, n(cHead, nd, 'elev', eff(nd, 'elev') || 0)].concat(rpat)) + descOf(nd));
 				} else {
 					reservoirs.push(row([nd.id, n(cHead, nd, '_head', rh)].concat(rpat)) + descOf(nd));
 				}
@@ -2646,14 +2651,14 @@
 				// **AND THE VOLUME CURVE'S NAME IN COLUMN EIGHT WHERE THE FILE PUT IT** (Task 586).
 				// Written only where the tank states one, so a cylindrical tank's row is unchanged.
 				var tankRow = [nd.id,
-					n(cHead, nd, 'elev', nd.elev || 0),
+					n(cHead, nd, 'elev', eff(nd, 'elev') || 0),
 					n(cHead, nd, '_level', eff(nd, 'level') || 0),
-					n(cHead, nd, 'minLevel', nd.minLevel || 0),
-					n(cHead, nd, 'maxLevel', nd.maxLevel || 0),
-					n(cLen, nd, 'tankDiameter', nd.tankDiameter || 0),
+					n(cHead, nd, 'minLevel', eff(nd, 'minLevel') || 0),
+					n(cHead, nd, 'maxLevel', eff(nd, 'maxLevel') || 0),
+					n(cLen, nd, 'tankDiameter', eff(nd, 'tankDiameter') || 0),
 					'0'];
-				if (nd.volCurve) {
-					tankRow.push(String(nd.volCurve));
+				if (eff(nd, 'volCurve')) {
+					tankRow.push(String(eff(nd, 'volCurve')));
 				}
 				tanks.push(row(tankRow) + descOf(nd));
 			} else {
@@ -2686,7 +2691,7 @@
 				// keeps every Net1/2/3 token identical (dev/lpn-spike/inp-export-harness.js).
 				if (EngCalcs.lpnDemandItemized(nd) || crows.length ||
 						(ovRows && (ovRows.length > 1 || ovRows[0].category))) {
-					junctions.push(row([nd.id, n(cHead, nd, 'elev', nd.elev || 0)]) + descOf(nd));
+					junctions.push(row([nd.id, n(cHead, nd, 'elev', eff(nd, 'elev') || 0)]) + descOf(nd));
 					for (j = 0; j < drows.length; j++) {
 						// The CATEGORY is a trailing comment, not a column -- see the reader's note
 						// at [DEMANDS]. Written verbatim, with anything that would start a second
@@ -2700,7 +2705,7 @@
 					}
 				} else {
 					junctions.push(row([nd.id,
-						n(cHead, nd, 'elev', nd.elev || 0),
+						n(cHead, nd, 'elev', eff(nd, 'elev') || 0),
 						n(cFlow, drows[0].rec, drows[0].key, drows[0].base || 0)].concat(
 						drows[0].pattern ? [String(drows[0].pattern)] : [])) + descOf(nd));
 				}
@@ -2797,11 +2802,11 @@
 					// column in the file that the file it came from did not have. The SPEED token is
 					// kept like every other number's, so `1.20` returns as `1.20`.
 					var pumpRow = [lk.id, lk.from, lk.to, 'HEAD ' + cname],
-						psp = lk.speed;
+						psp = eff(lk, 'speed');
 					if (typeof psp === 'number' && isFinite(psp) && psp !== 1) {
 						pumpRow.push('SPEED ' + n(PLAIN, lk, 'speed', psp));
 					}
-					if (lk.speedPattern) { pumpRow.push('PATTERN ' + String(lk.speedPattern)); }
+					if (eff(lk, 'speedPattern')) { pumpRow.push('PATTERN ' + String(eff(lk, 'speedPattern'))); }
 					pumps.push(row(pumpRow) + descOf(lk));
 					if (status === 'Closed') { statuses.push(row([lk.id, 'Closed'])); }
 				} else {
@@ -3243,9 +3248,9 @@
 			for (i = 0; i < (doc.nodes || []).length; i++) {
 				nd5 = doc.nodes[i];
 				if (nd5.type !== 'tank' || omitted[nd5.id]) { continue; }
-				mo = nd5.mixingModel;
+				mo = eff(nd5, 'mixingModel');
 				if (!mo) { continue; }
-				fr = nd5.mixingFraction;
+				fr = eff(nd5, 'mixingFraction');
 				out[nd5.id] = (typeof fr === 'number' && isFinite(fr))
 					? { model: mo, fraction: fr } : { model: mo };
 			}
