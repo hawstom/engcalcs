@@ -206,6 +206,12 @@ async function main() {
 		ok('ONE Undo restores all three', (await cell('pipes', '21', 'diameter')) === sel3[0] && (await cell('pipes', '22', 'diameter')) === sel3[1] && (await cell('pipes', '31', 'diameter')) === sel3[2], JSON.stringify(sel3));
 		await clearSelection();
 
+		// ---- 3a. copied but NOTHING selected: Paste is greyed with its own tip ----
+		await rightClick(await pointOf('link', '31'));
+		ok('copied, nothing selected: Paste is greyed', (await rowOff(PASTE)) === 1);
+		ok('...and the tip says to select the assets first', (await hoverTip(PASTE)) === (await a.lang('lpn_paste_props_off_select')));
+		await page.keyboard.press('Escape'); await a.settle(300);
+
 		// ---- 3b. a selection nothing in the clipboard fits ----
 		await selectTargets('node', ['23']);
 		await rightClick(await pointOf('node', '23'));

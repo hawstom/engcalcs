@@ -1744,6 +1744,7 @@ $ec_lang['lpn_copy_props_menu']='Copy properties';
 $ec_lang['lpn_copy_props_done']='Copied properties of {id}.';
 $ec_lang['lpn_paste_props_menu']='Paste properties to selection';
 $ec_lang['lpn_paste_props_off_none']='Nothing is copied. Right-click an asset and choose Copy properties.';
+$ec_lang['lpn_paste_props_off_select']='Select the assets to paste to, then choose Paste properties to selection.';
 $ec_lang['lpn_paste_props_off_kind']='No selected asset can take the copied properties.';
 $ec_lang['lpn_paste_done_one']='Pasted properties of {id} to {to}. Values changed: {n}.';
 $ec_lang['lpn_paste_done_many']='Pasted properties of {id} to {m} assets. Values changed: {n}.';

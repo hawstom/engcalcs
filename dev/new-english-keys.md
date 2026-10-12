@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**112 still to read on master**, of 123 untranslated keys, of 2567 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**113 still to read on master**, of 124 untranslated keys, of 2568 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -199,7 +199,7 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   @@ NEEDS RULING
 
-## lpn_  (122, 111 to read @@ NEEDS RULING)
+## lpn_  (123, 112 to read @@ NEEDS RULING)
 
 - **`lpn_copy_props_done`**
   > Copied properties of {id}.
@@ -480,6 +480,9 @@ never edits a synonym.
 - **`lpn_paste_props_off_none`**
   > Nothing is copied. Right-click an asset and choose Copy properties.
   @@ NEEDS RULING
+- **`lpn_paste_props_off_select`**
+  > Select the assets to paste to, then choose Paste properties to selection.
+  @@ NEEDS RULING
 - **`lpn_paste_skip_breakdown`**
   > Not pasted: {n} (demand is a list of categories).
   @@ NEEDS RULING
@@ -578,7 +581,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**132 still to read**, of 135 new keys across 11 unmerged branch(es).
+**133 still to read**, of 136 new keys across 15 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -589,7 +592,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/bentley-interop (`ad8cfe6e`) — 101 new, 101 to read @@ NEEDS RULING
+### feat/bentley-interop (`95055b9a`) — 101 new, 101 to read @@ NEEDS RULING
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -856,7 +859,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Delete the selected item. A used item is not deleted.
   @@ NEEDS RULING
 - **`lpn_sm_help`**
-  > How scenarios and alternatives work:\n\nAn override made in a scenario is stored in the alternative associated with the scenario. Associations of alternatives to scenarios are managed in the Scenarios table in the bottom pane. Creating a new scenario creates no alternatives; it uses its parent's alternatives until new alternatives are needed as overrides are created. When overrides are created in a scenario, they are stored in their respective alternative for the scenario; if the scenario has no such alternative, a new alternative is created using the name of the scenario. Example: You create a "Figure: Node and link IDs" scenario and edit a Text to say "Node and Link IDs." When you create the scenario, no alternatives are created. But at the moment you save the Text, a Text alternative called "Figure: Node and link IDs" is created with the override for the Text value. In Basic mode, you see this as simply an override in the scenario itself.\n\nHow to manage scenarios:\n\nChoose Scenarios or an alternatives category in the list at the top to show its tree.\n\nCreate a child of the selected item with Add child, or an item with no parent with Add base. A new item is named after its parent; type a name to rename it. Copy scenario copies the selected scenario and asks whether to copy the alternatives it uses or share them.\n\nDrag an item onto another to make it a child of that item. Drag an item between two items to reorder them.\n\nClick a selected item, or press F2, to rename it. Double-click a scenario, or press Enter, to make it current. Click the arrow beside an item, or press Left or Right, to collapse or expand it. Right-click an item for the same commands as the buttons.\n\nPress Delete, or click the minus button, to delete the selected item. An item in use is not deleted, and the message names what uses it.\n\nTo make a scenario use another alternative, choose that alternative in the scenario's row of the Scenarios table. An override made in a shared alternative changes every scenario that uses it.
+  > How scenarios and alternatives work:\n\nAn override made in a scenario is stored in the alternative associated with the scenario. Associations of alternatives to scenarios are managed in the Scenarios table in the bottom pane. Creating a new scenario creates no alternatives; it uses its parent's alternatives until new alternatives are needed as overrides are created. When overrides are created in a scenario, they are stored in their respective alternative for the scenario; if the scenario has no such alternative, a new alternative is created using the name of the scenario. Example: You create a "Figure: Node and link IDs" scenario and edit a Text to say "Node and Link IDs." When you create the scenario, no alternatives are created. But at the moment you save the Text, a Text alternative called "Figure: Node and link IDs" is created with the override for the Text value. In Basic mode, you see this as simply an override in the scenario itself.\n\nHow to manage scenarios:\n\n- Choose Scenarios or an alternatives category in the list at the top to show its tree.\n\n- Create a child of the selected item with Add child, or an item with no parent with Add base. A new item is named after its parent; type a name to rename it. Copy scenario copies the selected scenario and asks whether to copy the alternatives it uses or share them.\n\n- Drag an item onto another to make it a child of that item. Drag an item between two items to reorder them.\n\n- Click an item to select it. Press F2, or choose Rename, to rename the selected item. Double-click a scenario, or press Enter, to make it current. Click the arrow beside an item, or press Left or Right, to collapse or expand it. Right-click an item for the same commands as the buttons.\n\n- Press Delete, or click the minus button, to delete the selected item. An item in use is not deleted, and the message names what uses it.\n\n- To make a scenario use another alternative, including Base, choose it in the scenario's row of the Scenarios table. An override made in a shared alternative changes every scenario that uses it.
   @@ NEEDS RULING
 - **`lpn_sm_in_use`**
   > {name} cannot be deleted while it is used by: {list}.
@@ -895,7 +898,11 @@ build for that would be a gate nobody keeps. Refresh it with
   > Used by: {list}
   @@ NEEDS RULING
 
+### feat/convert-search (`b71bb912`) — adds no English strings
+
 ### feat/desktop (`baba0f04`) — adds no English strings
+
+### feat/graph-bubble (`56863e58`) — adds no English strings
 
 ### feat/label-gang-search (`8b31a907`) — 3 new, all ruled
 
@@ -919,9 +926,9 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`2e5e81c4`) — adds no English strings
 
-### feat/match-property (`75fba369`) — adds no English strings
+### feat/match-property (`daa13a9c`) — adds no English strings
 
-### feat/shape (`6a957eac`) — 27 new, 27 to read @@ NEEDS RULING
+### feat/shape (`554c2b24`) — 27 new, 27 to read @@ NEEDS RULING
 
 - **`lpn_file_import_shapes`**
   > Import GeoJSON shapes…
@@ -1005,17 +1012,25 @@ build for that would be a gate nobody keeps. Refresh it with
   > Draw a point, a polyline, or a polygon on the map. A Shape is annotation and is not part of the network. Specify each point, then specify the last point again, press Enter, or right-click to finish. Specify the first point again to close the Shape into a polygon.
   @@ NEEDS RULING
 
-### feat/si-example (`0f3023d7`) — 4 new, 4 to read @@ NEEDS RULING
+### feat/si-example (`634fe823`) — 4 new, 4 to read @@ NEEDS RULING
 
 - **`lpn_ex_net2_si_desc`**
-  > Litres per second, with metres and millimetres. EPANET’s Net2, converted from gallons per minute, feet and inches: a branched distribution system with a tank.
+  > Litres per second, with metres and millimetres. An EPANET example at Branford, Connecticut, converted from gallons per minute, feet and inches: 35 junctions and 1 tank, with no reservoir and no pump. Fluoride, a non-reactive substance, enters at one source.
   @@ NEEDS RULING
 - **`lpn_ex_net2_si_title`**
   > EPANET Net2, L/s (SI)
   @@ NEEDS RULING
 - **`lpn_ex_net3_si_desc`**
-  > Litres per second, with metres and millimetres. EPANET’s Net3, converted from gallons per minute, feet and inches: 92 junctions, three tanks, and two reservoirs, one of them a river.
+  > Litres per second, with metres and millimetres. An EPANET example at Novato, California, converted from gallons per minute, feet and inches, with the world map behind it: 92 junctions, 3 tanks and 2 reservoirs, no valves, about 8 km square. A 24-hour extended-period simulation, with a source trace from the Lake.
   @@ NEEDS RULING
 - **`lpn_ex_net3_si_title`**
   > EPANET Net3, L/s (SI)
+  @@ NEEDS RULING
+
+### fix/paste-column (`a4e50f15`) — adds no English strings
+
+### fix/specific-gravity (`c4f3598b`) — 1 new, 1 to read @@ NEEDS RULING
+
+- **`lpn_settings_specific_gravity_tip`**
+  > Density of the fluid relative to water. It scales pressure in every unit, because a pressure in m or ft is a column of water, and it does not change head or HGL. It changes no flow.
   @@ NEEDS RULING

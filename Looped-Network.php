@@ -2221,6 +2221,7 @@ EngCalcs.pageConfig = {
 	lpn_copy_props_done: <?=json_encode($ec_lang['lpn_copy_props_done'])?>,
 	lpn_paste_props_menu: <?=json_encode($ec_lang['lpn_paste_props_menu'])?>,
 	lpn_paste_props_off_none: <?=json_encode($ec_lang['lpn_paste_props_off_none'])?>,
+	lpn_paste_props_off_select: <?=json_encode($ec_lang['lpn_paste_props_off_select'])?>,
 	lpn_paste_props_off_kind: <?=json_encode($ec_lang['lpn_paste_props_off_kind'])?>,
 	lpn_paste_done_one: <?=json_encode($ec_lang['lpn_paste_done_one'])?>,
 	lpn_paste_done_many: <?=json_encode($ec_lang['lpn_paste_done_many'])?>,
