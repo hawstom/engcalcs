@@ -602,3 +602,11 @@ Today's answer rests on three half-verified rivals. Worth one session: price and
 ## Photo capture date on the map: say "no date" honestly now, ask Esri before building anything
 
 2026-10-08, answering Tom. Mapbox publishes no capture date and no history (journal 2026-10-08). The only no-account-looking per-point source is Esri World Imagery layer 4 plus Wayback, but forum answers say World Imagery needs an ArcGIS licence; I did not read the licence itself. Cheapest step: one tip sentence on the satellite basemap saying imagery is a mixed-date mosaic with no published date (about one string, 26 translations). Second: a written question to Esri licensing. Third and optional, US only: USGS NAIP `acquisition_date`, free, public domain, a fifth service. Historical imagery: no evidence our users want it; do not build.
+
+## Specific gravity: report pressure the way EPANET's psi/kPa path does, and say so
+
+2026-10-12, answering Tom (journal entry of the same date). EPANET scales head by SG only when the pressure unit is psi, kPa or bar; in metres or feet it reports fluid head, a rule the author confirmed in issue #864 (2025-07-13) after v2.2 had scaled metres too. Our built-in solver scales always; our EPANET bridge forces metres, so it never scales. Wish: make the two agree by multiplying the bridge's EPANET pressures by SG in the one door they come through (the same place tankGroundPressure sits), because a project in psi/kPa/bar would get the scaled number from EPANET itself; and put one sentence in the Settings tip that SG changes the gauge, not the head. A metres-display project is the real choice for Tom: gauge in metres of water (our current behaviour) versus metres of the fluid (EPANET's). I found no source for what WaterGEMS, InfoWater or Synergi do; do not claim either way. Not mine to size.
+
+## Antecedent software list does not exist; KYPipe is cited but unnamed in public
+
+2026-10-12. No repo file or sibling site keeps a list of comparison software (journal 2026-10-12). If Tom wants one, the natural home is a new sentence in librewaternet.org credits.html under "Everybody who extended EPANET before we did", which currently names nobody. Waiting on the University of Kentucky authors before any KYPipe example network ships (CC BY-NC).
