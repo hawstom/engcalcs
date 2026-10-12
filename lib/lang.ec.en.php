@@ -1749,6 +1749,7 @@ $ec_lang['lpn_tsb_menu']='Time series graph';
 $ec_lang['lpn_tsb_off_tip']='Needs extended period results. Set a Total run time in Settings, Calculation, Time, and calculate.';
 $ec_lang['lpn_tsb_close']='Close graph';
 $ec_lang['lpn_tsb_resize']='Drag to resize';
+$ec_lang['lpn_tsb_quantity']='Quantity to graph';
 $ec_lang['lpn_tsb_max']='Close a graph before opening another. Up to {n} stay open.';
 $ec_lang['lpn_paste_done_one']='Pasted properties of {id} to {to}. Values changed: {n}.';
 $ec_lang['lpn_paste_done_many']='Pasted properties of {id} to {m} assets. Values changed: {n}.';

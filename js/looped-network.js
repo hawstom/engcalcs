@@ -32371,7 +32371,9 @@ var EngCalcs = EngCalcs || {};
 			return b && typeof b.id === 'string' && (b.g === 'node' || b.g === 'link') && typeof b.n === 'string' &&
 				isFinite(b.x) && isFinite(b.y);
 		}).slice(0, TSB_MAX * 4).map(function (b) {
-			return { id: b.id, g: b.g, n: b.n, x: Math.round(b.x), y: Math.round(b.y), w: tsbClampW(b.w) };
+			var o = { id: b.id, g: b.g, n: b.n, x: Math.round(b.x), y: Math.round(b.y), w: tsbClampW(b.w) };
+			if (typeof b.f === 'string' && b.f) { o.f = b.f; }
+			return o;
 		});
 	}
 	function tsbEnsureLayer() {
@@ -32418,7 +32420,8 @@ var EngCalcs = EngCalcs || {};
 	function tsbBuild(b) {
 		var pc = EngCalcs.pageConfig || {}, root = document.createElement('div'), head = document.createElement('div'),
 			title = document.createElement('span'), close = document.createElement('button'),
-			host = document.createElement('div'), grip = document.createElement('div');
+			host = document.createElement('div'), grip = document.createElement('div'),
+			quant = document.createElement('select');
 		tsbEnsureLayer();
 		root.className = 'lpn-tsb';
 		root.setAttribute('role', 'group');
@@ -32433,13 +32436,17 @@ var EngCalcs = EngCalcs || {};
 		host.className = 'lpn-tsb-chart';
 		grip.className = 'lpn-tsb-grip';
 		grip.title = pc.lpn_tsb_resize || 'Drag to resize';
-		head.appendChild(title); head.appendChild(close);
+		quant.className = 'lpn-tsb-q';
+		quant.setAttribute('aria-label', pc.lpn_tsb_quantity || 'Quantity to graph');
+		quant.title = pc.lpn_tsb_quantity || 'Quantity to graph';
+		quant.addEventListener('change', function () { b.f = quant.value; tsbDraw(b); saveToStorage(); });
+		head.appendChild(title); head.appendChild(quant); head.appendChild(close);
 		root.appendChild(head); root.appendChild(host); root.appendChild(grip);
 		tsbLayer.insertBefore(root, tsbTails);
-		tsbEls[b.id] = { root: root, title: title, host: host, rect: null };
+		tsbEls[b.id] = { root: root, title: title, quant: quant, host: host, rect: null };
 		root.addEventListener('pointerdown', function () { root.style.zIndex = String(++tsbZ); });
 		head.addEventListener('pointerdown', function (e) {
-			if (e.target === close || e.button > 0) { return; }
+			if (e.target === close || e.target.closest('select') || e.button > 0) { return; }
 			tsbDrag(e, b, 'move');
 		});
 		grip.addEventListener('pointerdown', function (e) { if (e.button > 0) { return; } tsbDrag(e, b, 'size'); });
@@ -32480,6 +32487,30 @@ var EngCalcs = EngCalcs || {};
 		for (i = 0; i < avail.length; i++) { if (avail[i].field === want) { return avail[i]; } }
 		return avail[0];
 	}
+	// The quantity this bubble graphs: its own saved choice if the run still has it for the asset, else
+	// the bottom pane's Time series quantity when that pane is on this asset's group, else the old default.
+	function tsbPick(b, s, avail) {
+		var i, want = [b.f];
+		if (tsState.group === s.group) { want.push(tsField()); }
+		for (i = 0; i < want.length; i++) {
+			for (var j = 0; want[i] && j < avail.length; j++) { if (avail[j].field === want[i]) { return avail[j]; } }
+		}
+		return tsbDefaultField(s, avail);
+	}
+	function tsbFillQuant(rec, s, avail, pick) {
+		var key = avail.map(function (a) { return a.field; }).join(',') + '|' + (pick.field);
+		if (rec.quantKey !== key) {
+			rec.quant.innerHTML = '';
+			avail.forEach(function (a) {
+				var op = document.createElement('option');
+				op.value = a.field; op.textContent = pgFieldLabel(s.group, a.field, s.e);
+				rec.quant.appendChild(op);
+			});
+			rec.quantKey = key;
+		}
+		rec.quant.value = pick.field;
+		rec.quant.style.display = '';
+	}
 	function tsbDraw(b) {
 		var rec = tsbEls[b.id], pc = EngCalcs.pageConfig || {}, s = tsbSubject(b), frames, avail, pick, host, lay, say;
 		if (!rec) { return; }
@@ -32493,6 +32524,7 @@ var EngCalcs = EngCalcs || {};
 		rec.root.style.width = b.w + 'px';
 		if (!s) { return; }
 		rec.title.textContent = b.n;
+		rec.quant.style.display = 'none';
 		frames = EngCalcs.lpnTimeRunFrames ? EngCalcs.lpnTimeRunFrames() : [];
 		say = function (text) {
 			var d = document.createElement('div');
@@ -32503,8 +32535,8 @@ var EngCalcs = EngCalcs || {};
 		if (!frames.length) { say(tsWaitingText(pc)); return; }
 		avail = pgAvailable(s.group, s.e, frames);
 		if (!avail.length) { say(pc.lpn_pgraph_none || 'This asset has no results in the current run.'); return; }
-		pick = tsbDefaultField(s, avail);
-		rec.title.textContent = b.n + '  ' + pgFieldLabel(s.group, pick.field, s.e);
+		pick = tsbPick(b, s, avail);
+		tsbFillQuant(rec, s, avail, pick);
 		lay = tsLayout(host);
 		tsDraw(host, lay, frames, [{ id: s.e.id, color: LPN_TS_COLORS[0], points: pick.points }],
 			s.group, pick.field, pgFieldLabel(s.group, pick.field, s.e));
@@ -32583,7 +32615,7 @@ var EngCalcs = EngCalcs || {};
 		return !!EngCalcs.lpnTimeRunFrames && EngCalcs.lpnTimeRunFrames().length > 1;
 	}
 	function tsbOpen(ref) {
-		var pc = EngCalcs.pageConfig || {}, list = tsbList(), b, s, a, lr, n = 0, off, id;
+		var pc = EngCalcs.pageConfig || {}, list = tsbList(), b, s, a, lr, n = 0, off, id, avail;
 		// A record whose asset is gone is kept for Undo but is not on screen, so it does not count.
 		list.forEach(function (x) { if (x.g === ref.kind && x.n === ref.id && tsbEls[x.id]) { b = x; } });
 		if (b) { tsbEls[b.id].root.style.zIndex = String(++tsbZ); return; }
@@ -32601,6 +32633,10 @@ var EngCalcs = EngCalcs || {};
 		b = { id: id, g: ref.kind, n: ref.id, x: 0, y: 0, w: TSB_DEF_W };
 		off = tsbDefaultOffset(b, a, lr);
 		b.x = off.x; b.y = off.y;
+		if (tsbHasRun()) {
+			avail = pgAvailable(s.group, s.e, EngCalcs.lpnTimeRunFrames());
+			if (avail.length) { b.f = tsbPick(b, s, avail).field; }
+		}
 		doc.bubbles = list.concat([b]);
 		tsbBuild(b);
 		tsbEls[b.id].root.style.zIndex = String(++tsbZ);

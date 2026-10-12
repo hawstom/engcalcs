@@ -104,7 +104,7 @@ async function main() {
 		const bubbles = (a) => a.page.evaluate(() => Array.from(document.querySelectorAll('.lpn-tsb')).map((b) => {
 			const r = b.getBoundingClientRect();
 			return { id: b.getAttribute('data-bubble'), l: r.left, t: r.top, w: r.width, h: r.height,
-				title: b.querySelector('.lpn-tsb-title').textContent, lines: b.querySelectorAll('.lpn-ts-line').length,
+				title: b.querySelector('.lpn-tsb-title').textContent + '  ' + (b.querySelector('.lpn-tsb-q').selectedOptions[0] || { textContent: '' }).textContent, lines: b.querySelectorAll('.lpn-ts-line').length,
 				now: b.querySelectorAll('.lpn-ts-now').length, text: b.querySelector('.lpn-tsb-chart').textContent };
 		}));
 		// the tail's tip, in client coordinates (the layer is fixed over the canvas)
@@ -172,9 +172,9 @@ async function main() {
 		// ---- 3. drag and resize ----
 		console.log('3. drag and resize');
 		const head = '.lpn-tsb .lpn-tsb-head';
-		let h0 = await boxOf(a, head), b0 = (await bubbles(a))[0];
-		await a.page.mouse.move(h0.x - 20, h0.y); await a.page.mouse.down();
-		await a.page.mouse.move(h0.x + 20, h0.y + 30, { steps: 5 }); await a.page.mouse.up();
+		let h0 = await boxOf(a, '.lpn-tsb .lpn-tsb-title'), b0 = (await bubbles(a))[0];
+		await a.page.mouse.move(h0.l + 3, h0.y); await a.page.mouse.down();
+		await a.page.mouse.move(h0.l + 43, h0.y + 30, { steps: 5 }); await a.page.mouse.up();
 		await a.settle(300);
 		let b1 = (await bubbles(a))[0];
 		ok('dragging the header moves the bubble by the drag', Math.abs((b1.l - b0.l) - 40) <= 2 && Math.abs((b1.t - b0.t) - 30) <= 2, JSON.stringify([b1.l - b0.l, b1.t - b0.t]));

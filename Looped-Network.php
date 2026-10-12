@@ -2227,6 +2227,7 @@ EngCalcs.pageConfig = {
 	lpn_tsb_close: <?=json_encode($ec_lang['lpn_tsb_close'])?>,
 	lpn_tsb_resize: <?=json_encode($ec_lang['lpn_tsb_resize'])?>,
 	lpn_tsb_max: <?=json_encode($ec_lang['lpn_tsb_max'])?>,
+	lpn_tsb_quantity: <?=json_encode($ec_lang['lpn_tsb_quantity'])?>,
 	lpn_paste_done_one: <?=json_encode($ec_lang['lpn_paste_done_one'])?>,
 	lpn_paste_done_many: <?=json_encode($ec_lang['lpn_paste_done_many'])?>,
 	lpn_paste_skip_breakdown: <?=json_encode($ec_lang['lpn_paste_skip_breakdown'])?>,
