@@ -63312,11 +63312,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		label.appendChild(document.createTextNode(' '));
 		label.appendChild(text);
 		if (on) {
-			bp = paneInScenario(baseScenario(), function () { return textLabelPoint(lb); });
+			// Base's point in the popup's own reading order (labelCoordAxis()'s two slots).
+			bp = paneInScenario(baseScenario(), function () { return [labelCoordAxis(lb, 1), labelCoordAxis(lb, 2)]; });
 			base = document.createElement('span');
 			base.className = 'lpn-ov-base';
-			base.textContent = (pc.lpn_scenario_base_value || 'Base scenario: {value}').replace('{value}',
-				readsNorthFirst() ? coordText(outwardY(bp.y)) + ', ' + coordText(outwardX(bp.x)) : coordText(outwardX(bp.x)) + ', ' + coordText(outwardY(bp.y)));
+			base.textContent = (pc.lpn_scenario_base_value || 'Base scenario: {value}').replace('{value}', coordText(bp[0]) + ', ' + coordText(bp[1]));
 			label.appendChild(base);
 		}
 		fields.appendChild(label);
@@ -74270,10 +74270,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (!src) { return; }
 		askDialog({
 			kind: 'choice',
-			text: (pc.lpn_sm_copy_ask || 'Copy the scenario {name}. Make its own copies of the alternatives it uses, or share them? A shared alternative changes in every scenario that uses it.').replace('{name}', scenarioDisplayName(src)),
+			text: (pc.lpn_sm_copy_ask || 'Copy the scenario {name}. Share edits: the copy uses the same alternatives, so an edit in either scenario changes both. Separate edits: the copy gets its own copies of the alternatives.').replace('{name}', scenarioDisplayName(src)),
 			choices: [
-				{ label: pc.lpn_sm_copy_own || 'Make copies', value: 'own', isDefault: true },
-				{ label: pc.lpn_sm_copy_share || 'Share them', value: 'share' },
+				{ label: pc.lpn_sm_copy_own || 'Separate edits', value: 'own', isDefault: true },
+				{ label: pc.lpn_sm_copy_share || 'Share edits', value: 'share' },
 				{ label: pc.lpn_cancel || 'Cancel', value: null, cancel: true }
 			]
 		}, function (answer) {
