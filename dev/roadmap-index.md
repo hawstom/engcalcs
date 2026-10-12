@@ -7,21 +7,19 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**91 open tasks.** Next (100): 9 · Soon (75): 13 · Someday (50): 34 · Maybe (25): 16 · Parked (5): 19
+**91 open tasks.** Next (100): 7 · Soon (75): 14 · Someday (50): 35 · Maybe (25): 16 · Parked (5): 19
 
-## 100 — Next (9)
+## 100 — Next (7)
 
 - Task 721 — The scenario and alternatives model: Bentley's tree, plus Presentation and Calculation.
 - Task 737 — Coined names for interface elements, so every language names each one once.
 - Task 741 — The infinite map: generated networks for the label bench.
-- ! Task 759 — One word for the map selection, another for a menu choice; tips that earn their place.
 - Task 779 — Shape: a simple drawn element, point, polyline or polygon, with snapping.
 - ! Task 781 — Active topology first; then Change type becomes a new asset in the old one's place.
 - ! Task 782 — Snap to asset, and Match properties: the small tools that replace Change type.
 - Task 784 — A small time-series graph bubble on the map, from an asset's right-click.
-- Task 787 — Raised tanks: a ground elevation and a base elevation.
 
-## 75 — Soon (13)
+## 75 — Soon (14)
 
 - Task 539 — Gang the neighbour labels so their leaders stop crossing.
 - Task 578 — Fire flow: the EPS frame and the Run concept, extracted from 530.
@@ -36,8 +34,9 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 756 — Cross-platform: the suite as a desktop application, beyond the web folder.
 - Task 772 — AutoCAD: import, export, and perhaps sync, on a long-lived branch.
 - ! Task 786 — More native SI examples, since SI is chosen twice as often as US.
+- Task 788 — Translated Find guide and select/choose wording, swept across all 26 languages.
 
-## 50 — Someday (34)
+## 50 — Someday (35)
 
 - ! Task 146.09 — An inset overview map: the whole project, with a box round where you are.
 - Task 217 — A suite-owned, multilingual Manning's n table, built from primary sources.
@@ -73,6 +72,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 736 — [H] · Count installs and app launches, if the consent text allows it.
 - Task 773 — Hover shows an asset's full label, as if every field were ticked.
 - Task 785 — Rewrite the Guide's chapters to the Find and replace model.
+- Task 789 — A way into Copy/Paste properties and the graph bubbles without a right-click.
 
 ## 25 — Maybe (16)
 
@@ -119,5 +119,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-80 of 91 titles are within 4–12 words. `!` marks the rest;
+81 of 91 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.
