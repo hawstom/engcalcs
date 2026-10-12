@@ -224,6 +224,8 @@ $ovAllowed = [
     'setOverride', 'clearOverride', 'overrideCount',
     // what Delete scenario says it removes: the values of the alternatives that go with it, read only
     'scenarioDeletePlan',
+    // a new Base of its own: a snapshot of Base, written once into the record it creates
+    'baseSnapshotOf', 'storeBaseSnapshot',
     // where a write lands, the scenario's own alternative made first (Tom, 2026-10-12)
     'ownWriteMap',
     // the derived (Basic mode) alternatives, read off each scenario's own map

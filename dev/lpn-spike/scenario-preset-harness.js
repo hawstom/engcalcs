@@ -83,10 +83,11 @@ function checkPresets(where) {
 			: r.label === P.lpn_sm_menu ? 'manager'
 			: r.label.slice(2) === P.lpn_scenario_basic ? 'basic'
 			: r.label === P.lpn_scenario_new ? 'new'
+			: r.label === P.lpn_scenario_copy ? 'copy'
 			: r.label === P.lpn_scenario_rename ? 'rename'
 			: r.label === P.lpn_scenario_delete ? 'delete'
 			: r.label === P.lpn_scenario_push_btn ? 'apply' : '?' + r.label;
-		const got = L.scenarioMenuRows().map(kind).join(','), want = ['manager', '-', 'basic', 'new', 'rename', 'delete', '-', 'apply'].concat(sc.map(() => 'S')).join(',');
+		const got = L.scenarioMenuRows().map(kind).join(','), want = ['manager', '-', 'basic', 'new', 'copy', 'rename', 'delete', '-', 'apply'].concat(sc.map(() => 'S')).join(',');
 		check(got === want, where + ': the menu is in Tom\'s order, the scenarios last', got);
 	}
 	const tips = L.scenarioMenuRows().filter((r) => r.scenarioId !== undefined && r.tip);

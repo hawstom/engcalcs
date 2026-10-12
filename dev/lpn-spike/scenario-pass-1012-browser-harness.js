@@ -4,7 +4,11 @@
 //   B2  a Text dragged in Fig 5 moves in Fig 5 only: Base and Fig 4 keep it where it was, and the
 //       position lands in Fig 5's own Text alternative; its size is overridable the same way;
 //   B3  a right-click menu action in an auto-hidden Scenario manager leaves the box out;
-//   B4  the manager's button is "Copy" on every tree; copying a scenario asks Separate or Share edits;
+//   B4  the manager's button is "Copy" on every tree, greyed on the Scenarios tree;
+//   q01 a project Basic mode cannot show turns it off (and ticking it on is refused); Copy scenario,
+//       Basic mode only, copies the scenario's overrides with their alternatives, named like the copy;
+//   q02 renaming a scenario renames its equally named alternatives (Basic on) or asks (Basic off);
+//   q07 Add base makes a copy of Base that a later Base edit does not reach;
 //   B5/F1 Delete scenario asks one question naming what goes and what stays: Basic mode on deletes
 //       its unshared alternatives, off keeps them (and the manager's Delete asks too);
 //   M1  in a scenario, Copy properties copies overrides only ("No overrides to copy." when none);
@@ -141,6 +145,7 @@ async function main() {
 			return d;
 		};
 		const L = (k) => a.lang(k);
+		const flat = (d) => { delete byId(d.scenarios, 'f5').parent; };
 		const saved = () => page.evaluate(() => JSON.parse(localStorage.getItem('lpn_project_hover')));
 		const flush = async () => { await a.settle(2600); };
 		const scenarioMenu = async (label) => {
@@ -310,13 +315,14 @@ async function main() {
 
 		// ---- M2 and F7 ----
 		console.log('\n--- M2, F7. a new scenario in Basic mode; duplicate names ---');
-		await openProject();
+		await openProject(flat);
+		ok('M2 a project Basic mode can show keeps it on', (await page.evaluate(() => localStorage.getItem('lpn_scnbasic'))) === null);
 		a.answerPromptWith('Fig 7');
 		await scenarioMenu(await L('lpn_scenario_new'));
 		await flush();
 		sv = await saved();
 		const f7 = sv.scenarios.filter((s) => s.name === 'Fig 7')[0];
-		ok('M2 New, made while Fig 5 (a grandchild) is current, is a child of Base', !!f7 && f7.parent === undefined && !f7.root, JSON.stringify(f7));
+		ok('M2 New, made in Basic mode while Fig 5 is current, is a child of Base', !!f7 && f7.parent === undefined && !f7.root, JSON.stringify(f7));
 		const n0 = sv.scenarios.length;
 		a.answerPromptWith('Fig 4');
 		await scenarioMenu(await L('lpn_scenario_new'));
@@ -339,7 +345,8 @@ async function main() {
 				{ id: 'f9', name: 'Fig 9', overrides: {}, alternatives: { demand: 'a2' } });
 			d.project.activeScenario = 'f6';
 		};
-		await openProject(withAlt);
+		// Basic mode on needs a project it can show: nothing shared, every scenario a child of Base.
+		await openProject((d) => { withAlt(d); flat(d); byId(d.scenarios, 'f6').alternatives = { physical: 'a1' }; });
 		a.dialogs.length = 0;
 		a.answerConfirmsWith(true);
 		await scenarioMenu(await L('lpn_scenario_delete'));
@@ -347,10 +354,10 @@ async function main() {
 		let asked = (a.dialogs[0] || {}).message || '';
 		ok('F1 Basic on: the question names the scenario and the overrides that go',
 			asked.indexOf((await L('lpn_scenario_delete_ask')).replace('{name}', 'Fig 6')) === 0 && asked.indexOf((await L('lpn_scenario_delete_goes')).replace('{n}', '1')) >= 0, asked);
-		ok('F1 ...and the shared alternative stays and is named', asked.indexOf((await L('lpn_scenario_delete_stays')).replace('{list}', 'Shared')) >= 0, asked);
+		ok('F1 ...and names nothing as staying', asked.indexOf((await L('lpn_scenario_delete_stays')).split('{list}')[0]) < 0, asked);
 		sv = await saved();
-		ok('B5 Basic on: Fig 6 is deleted, and its unshared alternative with it', !byId(sv.scenarios, 'f6') && !byId(sv.alternatives, 'a1'), JSON.stringify(sv.alternatives));
-		ok('B5 ...and the alternative Fig 9 also uses stays', !!byId(sv.alternatives, 'a2'));
+		ok('B5 Basic on: Fig 6 is deleted, and its alternative with it', !byId(sv.scenarios, 'f6') && !byId(sv.alternatives, 'a1'), JSON.stringify(sv.alternatives));
+		ok('B5 ...and the alternative Fig 9 uses stays', !!byId(sv.alternatives, 'a2'));
 		await openProject(withAlt, true);
 		a.dialogs.length = 0;
 		await scenarioMenu(await L('lpn_scenario_delete'));
@@ -374,25 +381,14 @@ async function main() {
 		ok('F1 ...and deletes on yes, keeping the alternatives (Basic mode is off)', !byId(sv.scenarios, 'f6') && !!byId(sv.alternatives, 'a1'));
 
 		// ---- B4 ----
-		console.log('\n--- B4. one Copy button; Separate edits or Share edits ---');
+		console.log('\n--- B4. one Copy button; a scenario is copied from the menu, in Basic mode ---');
 		const COPY = await L('lpn_sm_copy');
-		ok('B4 the Scenarios tree\'s button reads Copy', (await page.evaluate(() => (document.getElementById('lpn_sm_copy') || {}).textContent)) === COPY);
-		await page.locator('#lpn_sm_tree .lpn-sm-row', { has: page.locator('.lpn-sm-name', { hasText: /^Fig 9$/ }) }).first().locator('.lpn-sm-name').click();
-		await a.settle(300);
-		await page.evaluate(() => { window.__ans = window.lpnDialogAnswerer; delete window.lpnDialogAnswerer; });
-		await page.evaluate(() => document.getElementById('lpn_sm_copy').dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, detail: 1 })));
-		await a.settle(600);
-		const btns = await page.evaluate(() => Array.from(document.querySelectorAll('#lpn_dialog_buttons button')).map((b) => b.textContent.trim()));
-		ok('B4 copying a scenario asks Separate edits or Share edits', JSON.stringify(btns.slice(0, 2)) === JSON.stringify([await L('lpn_sm_copy_own'), await L('lpn_sm_copy_share')]), JSON.stringify(btns));
-		await page.evaluate((t) => { const b = Array.from(document.querySelectorAll('#lpn_dialog_buttons button')).filter((x) => x.textContent.trim() === t)[0]; b.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 })); }, await L('lpn_sm_copy_share'));
-		await flush();
-		sv = await saved();
-		const cp = sv.scenarios.filter((s) => /Fig 9/.test(s.name) && s.id !== 'f9')[0];
-		ok('B4 Share edits: the copy names the same alternative', !!cp && (cp.alternatives || {}).demand === 'a2', JSON.stringify(cp));
+		ok('B4 the Scenarios tree\'s button reads Copy, greyed (Tom, 2026-10-12: Copy scenario is Basic mode\'s)',
+			(await page.evaluate(() => { const b = document.getElementById('lpn_sm_copy'); return b ? [b.textContent, b.getAttribute('aria-disabled'), b.title] : null; })).join('|') ===
+			[COPY, 'true', await L('lpn_scenario_copy_off')].join('|'));
 		await page.selectOption('#lpn_sm_tree_select', 'demand');
 		await a.settle(500);
 		ok('B4 a category tree\'s button reads Copy too', (await page.evaluate(() => (document.getElementById('lpn_sm_copy') || {}).textContent)) === COPY);
-		await page.evaluate(() => { window.lpnDialogAnswerer = window.__ans; });
 
 		// ---- B3 ----
 		console.log('\n--- B3. a right-click action keeps an auto-hidden Scenario manager out ---');
@@ -456,6 +452,93 @@ async function main() {
 		lines = await page.evaluate(() => Array.from(document.querySelectorAll('#lpn_popup .lpn-ov-base')).filter((e) => !e.classList.contains('lpn-ov-shared')).map((e) => e.textContent.trim()));
 		const baseElev = String(byId(JSON.parse(fs.readFileSync(path.join(REPO, 'dev', 'water-network-examples', 'Net1.lwn'), 'utf8')).nodes, '10').elev);
 		ok('Q2 in Fig 4, a child of Base, it reads Base scenario: ' + baseElev, lines.some((t) => t === (await0bv).replace('{value}', baseElev)), JSON.stringify(lines));
+
+		// ---- q01: what Basic mode can show; Copy scenario ----
+		console.log('\n--- q01. a project Basic mode cannot show turns it off; Copy scenario in Basic mode ---');
+		await openProject();   // Fig 5 is a child of Fig 4: Basic mode cannot show that
+		const MISFIT = await L('lpn_scenario_basic_misfit');
+		ok('q01 arriving, Basic mode is turned off', (await page.evaluate(() => localStorage.getItem('lpn_scnbasic'))) === 'off');
+		ok('q01 ...and says so in Tom\'s words', (await a.notice()) === MISFIT, await a.notice());
+		await scenarioMenu(await L('lpn_scenario_basic'));
+		ok('q01 ticking Basic mode on is refused for it, with the same sentence', (await page.evaluate(() => localStorage.getItem('lpn_scnbasic'))) === 'off' && (await a.notice()) === MISFIT);
+		await page.keyboard.press('Escape');
+		await page.click('#lpn_scenario_btn');
+		await page.waitForSelector('#lpn_menu_popup', { state: 'visible' });
+		const copyRow = await page.evaluate((l) => {
+			const b = Array.from(document.querySelectorAll('#lpn_menu_list button.lpn-menu-row')).filter((r) => r.textContent.trim() === l)[0];
+			return b ? { off: b.disabled || b.getAttribute('aria-disabled') === 'true', tip: b.title || b.getAttribute('data-bs-original-title') || '' } : null;
+		}, await L('lpn_scenario_copy'));
+		await page.keyboard.press('Escape');
+		await a.settle(300);
+		ok('q01 with Basic mode off, Copy scenario is greyed', !!copyRow && copyRow.off, JSON.stringify(copyRow));
+		await openProject((d) => {
+			flat(d);
+			d.alternatives = [{ id: 'a1', category: 'physical', name: 'Fig 6', parent: null, values: { 'n:10': { elev: 701 } } }];
+			d.scenarios.push({ id: 'f6', name: 'Fig 6', overrides: { 'n:10': { demand: 7 } }, alternatives: { physical: 'a1' } });
+			d.project.activeScenario = 'f6';
+		});
+		ok('q01 a project Basic mode can show opens with it on', (await page.evaluate(() => localStorage.getItem('lpn_scnbasic'))) === null);
+		a.dialogs.length = 0;
+		await scenarioMenu(await L('lpn_scenario_copy'));
+		await flush();
+		sv = await saved();
+		const cp6 = sv.scenarios.filter((x) => x.name === 'Copy_of_Fig 6')[0];
+		const cpAlt = cp6 && byId(sv.alternatives, (cp6.alternatives || {}).physical);
+		ok('q01 Copy scenario asks nothing and makes Copy_of_Fig 6 current', !!cp6 && sv.project.activeScenario === cp6.id && !a.dialogs.length && !(await a.dialog()), JSON.stringify(sv.scenarios.map((x) => x.name)));
+		ok('q01 ...with its own Physical alternative, named like the copy, holding the same override', !!cpAlt && cpAlt.id !== 'a1' && cpAlt.name === 'Copy_of_Fig 6' &&
+			cpAlt.values['n:10'].elev === 701 && (byId(sv.scenarios, 'f6').alternatives || {}).physical === 'a1', JSON.stringify(sv.alternatives));
+		ok('q01 ...and the scenario\'s own demand override, and no other alternative', ((cp6.overrides || {})['n:10'] || {}).demand === 7 &&
+			JSON.stringify(Object.keys(cp6.alternatives || {})) === '["physical"]' && cp6.calc === undefined, JSON.stringify(cp6));
+		ok('q01 the project still fits Basic mode', (await page.evaluate(() => localStorage.getItem('lpn_scnbasic'))) === null);
+
+		// ---- q02: renaming a scenario renames its equally named alternatives ----
+		console.log('\n--- q02. rename a scenario: its equally named alternatives ---');
+		await scenarioMenu('Fig 6');
+		a.dialogs.length = 0;
+		a.answerPromptWith('Fig 6b');
+		await scenarioMenu(await L('lpn_scenario_rename'));
+		await flush();
+		sv = await saved();
+		ok('q02 Basic mode on: the alternative named Fig 6 is renamed Fig 6b, without asking', byId(sv.alternatives, 'a1').name === 'Fig 6b' &&
+			!a.dialogs.some((x) => x.type === 'confirm'), JSON.stringify([byId(sv.alternatives, 'a1'), a.dialogs]));
+		await openProject((d) => {
+			flat(d);
+			d.alternatives = [{ id: 'a1', category: 'physical', name: 'Fig 6', parent: null, values: { 'n:10': { elev: 701 } } }];
+			d.scenarios.push({ id: 'f6', name: 'Fig 6', overrides: {}, alternatives: { physical: 'a1' } });
+			d.project.activeScenario = 'f6';
+		}, true);
+		a.dialogs.length = 0;
+		a.answerConfirmsWith(true);
+		a.answerPromptWith('Fig 6c');
+		await scenarioMenu(await L('lpn_scenario_rename'));
+		await flush();
+		sv = await saved();
+		const askedR = a.dialogs.filter((x) => x.type === 'confirm').map((x) => x.message);
+		ok('q02 Basic mode off: it asks "' + (await L('lpn_sm_rename_alts_ask')) + '"', askedR.indexOf(await L('lpn_sm_rename_alts_ask')) >= 0, JSON.stringify(a.dialogs));
+		ok('q02 ...and Yes renames the alternative', byId(sv.alternatives, 'a1').name === 'Fig 6c', byId(sv.alternatives, 'a1').name);
+
+		// ---- q07: Add base is an independent copy ----
+		console.log('\n--- q07. Add base: a copy of Base that later Base edits do not reach ---');
+		await scenarioMenu(await L('lpn_scenario_base'));
+		await scenarioMenu(await L('lpn_sm_menu'));
+		const e10 = String(byId(JSON.parse(fs.readFileSync(path.join(REPO, 'dev', 'water-network-examples', 'Net1.lwn'), 'utf8')).nodes, '10').elev);
+		ok('q07 the Scenarios tree\'s Add base tip says it is a copy', (await page.evaluate(() => (document.getElementById('lpn_sm_addbase') || {}).title)) === (await L('lpn_sm_add_base_tip')),
+			await page.evaluate(() => (document.getElementById('lpn_sm_addbase') || {}).title));
+		await page.evaluate(() => document.getElementById('lpn_sm_addbase').dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, detail: 1 })));
+		await a.settle(500);
+		await page.keyboard.press('Escape');
+		await flush();
+		sv = await saved();
+		const b2 = sv.scenarios.filter((x) => x.root === true)[0];
+		const b2phys = b2 && byId(sv.alternatives, (b2.alternatives || {}).physical);
+		ok('q07 the new Base names its own Base Physical alternative, holding Base\'s elevations', !!b2phys && b2phys.root === true && String(b2phys.values['n:10'].elev) === e10, JSON.stringify(b2phys && b2phys.values['n:10']));
+		await a.toolbarClick(await L('lpn_pane_toggle'));
+		await a.settle(500);
+		await tab('junctions');
+		await typeInto('junctions', '10', 'elev', '999');
+		await scenarioMenu(b2.name);
+		await tab('junctions');
+		ok('q07 an edit to Base afterward does not reach the new Base', (await cell('junctions', '10', 'elev')) === e10, await cell('junctions', '10', 'elev'));
 
 		ok('no page error', errors.length === 0, JSON.stringify(errors).slice(0, 400));
 	} finally {

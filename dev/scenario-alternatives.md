@@ -149,11 +149,9 @@ byte-identical.
 
 **Stored in the browser, not the project** (`localStorage` key `lpn_scnbasic`, written only as
 `off`, like `lpn_runbox`). CLAUDE.md's rule: modelling data rides in `serializeProject()`; a fact
-about the person at the screen stays in the browser. Basic mode changes no value and no solve, and
-one act only writes differently under it (Tom, 2026-10-12): deleting a scenario with Basic mode on
-also deletes each stored alternative it names that no other scenario names and no alternative
-inherits from; with it off they stay. Otherwise it decides only how much of the scenario machinery this person wants
-shown, which is the kind of answer a colleague opening the file must not inherit (a Basic-mode user
+about the person at the screen stays in the browser. Tom, 2026-10-12: *"The Basic mode on/off
+setting changes multiple application behaviors. And with Basic mode off, a project may become too
+complex for Basic mode to be turned on."* Which of those behaviors this person wants is the kind of answer a colleague opening the file must not inherit (a Basic-mode user
 handed a file by an Advanced one would otherwise open it into a UX they never asked for). What the
 file holds is judged from the file itself, not from a remembered mode: once B exists, "this file
 has an explicit tree" is read from its data.
@@ -912,7 +910,9 @@ that holds none shows Base's live view.
   intent); nothing prunes it. Tom: *"It's still an override? Yes. (Use the word override. It's the
   technical term.)"* Say "override", never "local value", in docs and visitor strings.
 - Editing a shared alternative changes every scenario that uses it, as in Bentley. Tom: *"Yes!"*
-- Reparenting an alternative or a scenario keeps its own values; what it inherits may change.
+- Reparenting an alternative or a scenario keeps its own values; what it inherits may change. For a
+  scenario (Tom, 2026-10-12): *"What it **inherits** changes. But what it has overridden does not
+  change."* A category in which it names its own alternative keeps it wherever the scenario moves.
 - Deleting an alternative, a calculation set or a scenario is refused while anything uses it, and
   the refusal names who (the Scenarios menu's Delete row says so in a notice); merging is the way
   to retire one. Tom: *"Yes."*
@@ -976,14 +976,13 @@ Tom's calls of 2026-10-09 (H01-H08), in his words where they govern:
   gestures."*; with no click-to-rename, nothing collides). **Delete is refused while the item is in
   use, naming who uses it.**
 - **Several Bases** (H08): "Add Base" names `Base2`, `Base3`. A Base of its own is a record flagged
-  `root: true` with no parent. It resolves exactly as a child of Base does (Base's values are the
-  elements' own), so the flag is only which row it hangs from. A stage-4 record with parent null and no
+  `root: true` with no parent. Since 2026-10-12 it holds a copy of every value Base has when it is
+  added (`baseSnapshotOf()`; Tom's calls below), so a later Base edit does not reach it. A stage-4 record with parent null and no
   flag hangs from Base.
 - **Order** (Tom asked for it): `project.scenarioOrdered` is set by the first reorder and freezes the
   order then shown into the stored array; until then scenarios sort by name, so a file that never
   reorders opens as it did. The stored order is shown everywhere scenarios are listed.
-- **Copy asks each time** (H05): own copies of the stored alternatives it names, or share them. Its own
-  values are always copied.
+- **Copy** (H05, superseded 2026-10-12, below): Basic mode only, own alternatives copied, no question.
 - **Compare** solves a checked set kept in `project.compareSet`; absent means every scenario, and
   checking everything deletes the key.
 - **Used by** (the market researcher): each alternative shows the number of scenarios using it (naming
@@ -1001,7 +1000,7 @@ Tom's calls of 2026-10-09 (H01-H08), in his words where they govern:
      said.
   4. "Used by" counts scenarios that inherit an alternative as well as those that name it.
   5. The Scenarios tab is hidden, not removed, in Basic mode, and Ctrl+Shift+PageDown skips it.
-  6. A Base of its own resolves exactly as a child of Base does; `root: true` only says which row it hangs
+  6. A Base of its own holds a copy of Base's values (2026-10-12); `root: true` says which row it hangs
      from. Its Parent column is blank.
   7. The override count (badge, menu, Compare column) also counts what a scenario takes from the stored
      alternatives it uses, folded as they resolve, so a value an alternative and its parent both state
@@ -1012,6 +1011,80 @@ MANAGER'S MODEL"; the box and the table in "SCENARIOS > BASIC MODE, AND THE SCEN
 `scenario-manager-harness.js` (model, headless) and `scenario-manager-browser-harness.js` (the box and the
 table in Chromium). Storage: the box keeps its place on `lpn_smbox` (window furniture); `lpn_altbox` is
 removed when the page opens.
+
+### Tom's calls of 2026-10-12 (interview, after Sue's review)
+
+His words, then what was built.
+
+**Copy scenario (q01).**
+
+> The fact that Bentley doesn't do this gives me pause. They certainly have experience, and I am not inclined to think I know better than they do. 
+>
+> Here's the case for not copying Scenarios. With basic mode off, it's trivial to create a scenario and connect it to any alternatives. So not much value is gained vs. all the rules that have to be invented and intuited/taught for copy mode.
+>
+> Here's the case for copying scenarios. With Basic mode on, there is no access to alternatives. So copying a scenario is helpful.
+>
+> Putting those together, we might see the following ideas coalescing:
+> - In the event that somebody received a project from an advanced user, there may be inheritance and alternatives assignments that  Basic mode can't handle. In such a case, should we say that "This project has scenarios and alternatives relationships that are not compatible with Scenarios Basic mode, so Basic mode is disabled."
+> - Copy scenario could possibly be unavailable when Basic mode is off.
+> - Copy scenario should copy all overrides along, of course with the alternatives they belong to and no other alternatives. 
+>
+> Does that fully cover the subject?
+
+Built: Copy scenario is a Scenarios menu row, offered in Basic mode only (greyed with Basic mode
+off, and in the Scenario manager's Scenarios tree, with `lpn_scenario_copy_off`). It copies the open
+scenario's own values and each stored alternative it names, as new alternatives named like the copy;
+what it inherits stays inherited. The Share edits / Separate edits question is gone. A project Basic
+mode cannot show turns Basic mode off when it arrives, in his words (`lpn_scenario_basic_misfit`), and
+ticking Basic mode on is refused for it; the test is `basicModeMisfit()`: a scenario with a parent
+other than Base or a Base of its own, an alternative or calculation set with a parent or a Base of its
+own, or one named by two scenarios.
+
+**Renaming a scenario (q02).**
+
+> With Basic mode on, we must rename everything at once without asking.
+> With Basic mode off, we can ask, "Rename equally named alternatives?"
+
+Built: the stored alternatives the scenario names that carry its old name (`scenarioNamesakes()`).
+
+**Moving a scenario (q03).**
+
+> This raises a dimension I had not previosly considered. 
+> - What is a scenario? It is a window to alternatives. 
+> - Does a scenario have overrides? Not to properties. But maybe it can to alternatives.
+> - What does it mean to have alternatives overrides? Every alternative on a scenario is either inherited or an override. Properties come along automatically.
+> - What does this have to do with moving a scenario? Behavior depends on whether its alternatives are inherited or overrides.
+> - So what's the answer to the question? The answer is "strictly speaking, yes" What it **inherits** changes. But what it has overridden does not change.
+> - What does this imply for our design? We must expose in our UI whether an alternative is an override vs inherited. This appears in the Scenarios table of the bottom pane. And some form of abbreviated UI for that would be nice. For example, an asterisk or some other single-character override marker (ask Mary and Ida) that you can click to remove. And it would be good to carry this abbreviated UI through Properties and Settings to minimize the real estate used by overrides exposure and interface. Autodesk has a satisfying overrides and clearing system in their Civil 3D Toolspace Settings. An "Override" column has checkboxes if the row is an override (vs. inherited). A "Child override" column has a down arrow for any row with overridden descendants, and you can click the arrow to push the present override to all children (clear their overrides); clicking it puts an x on it meaning clear all children. Or we could on click have a confirmation "Clear all child overrides? [Yes] [No]"
+
+Built: the words only (help, `smMove()`, `setScenarioParent()`, this doc); the behaviour already was
+this. The override-marker design he describes is a separate task.
+
+**What Basic mode changes (q04).**
+
+> I am quite sure that there is a miscommunication in "Basic mode changes no stored byte, only what is shown". Rewrite to clarify if you agree with this: "The Basic mode on/off setting changes multiple application behaviors. And with Basic mode off, a project may become too complex for Basic mode to be turned on." If we need to say more, we can say more, but I think it's better to say it in the code and the UI language than in the design record.
+
+**Copy properties (q05).**
+
+> Let's be clear. Alternatives are really where properties and settings overrides live. And scenarios have alternatives.
+>
+> Now, as I see it, until a scenario has overrides, it has neither properties nor alternatives. All it has is a name. Everything else is the same value: "inherited". And I think that we do not copy "inherited" as an explicit setting.
+>
+> We need to document this in our user guide "Copy properties copies only overrides."
+
+**Add Base (q07; his choice: "Keep, with an honest tip").**
+
+> Good catch. Let's be sure we understand the Bentley behavior.
+>
+> I would say that the most honest thing is to make the new base a copy like a new project with shared settings and alternatives. Keep in mind that Scenarios are only windows. So the bigger question is whether there can be copies of the Base alternatives, which would truly in effect mean multiple models in one file.
+
+Built: a new Base is an independent copy. Add base in the Scenarios tree makes a Base scenario with
+its own Base alternatives, one per category, each holding every value Base has now
+(`baseSnapshotOf()`); in an alternatives tree it makes one such Base alternative. Bentley:
+*"Base alternatives contain local data for all elements in your system"* (WaterGEMS, "Base and
+Child Alternatives", docs.bentley.com GUID-067F08A81CE747CDBDFB93AD301E0CFD); its "Creating
+Alternatives" page (GUID-630A2475...) says only how to make one, not whether it starts as a copy.
+Not snapshotted: the two scenario run times.
 
 ### Next stage: what the advisers said (recorded, not built)
 

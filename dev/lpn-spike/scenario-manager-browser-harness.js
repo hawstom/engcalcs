@@ -13,7 +13,8 @@
 //   4. A category tree (Demand): "Used by scenarios: N" with the list in its tip.
 //   5. The Scenarios table: one row per scenario, a column per category; picking an alternative in a
 //      cell assigns it; Clear override inherits again; the Base row has no pick-list.
-//   6. Copy scenario asks, and both answers work; the Compare checkbox is stored in the project.
+//   6. Copy is greyed on the Scenarios tree (Copy scenario is the menu's, in Basic mode); the Compare
+//      checkbox is stored in the project.
 //   7. Basic mode ticked again closes the box and hides the tab; the box's position is the only
 //      thing kept on the device (`lpn_smbox`), and `lpn_altbox` is cleared.
 // Every button is pressed with a MouseEvent of detail 1, as a person's click is.
@@ -116,7 +117,7 @@ async function main() {
 		// Tom, 2026-10-11: "Scenario manager..., -, Basic mode, New, Rename, Delete, -, Apply Base, list of scenarios."
 		const menuSeq = await page.evaluate(() => Array.from(document.querySelectorAll('#lpn_menu_list > *')).filter((e) => e.offsetParent !== null || e.tagName === 'HR')
 			.map((e) => e.tagName === 'HR' ? '-' : e.textContent.trim()));
-		const wantSeq = [SMMENU, '-', '✓ ' + await L('lpn_scenario_basic'), await L('lpn_scenario_new'), await L('lpn_scenario_rename'), await L('lpn_scenario_delete'), '-',
+		const wantSeq = [SMMENU, '-', '✓ ' + await L('lpn_scenario_basic'), await L('lpn_scenario_new'), await L('lpn_scenario_copy'), await L('lpn_scenario_rename'), await L('lpn_scenario_delete'), '-',
 			await L('lpn_scenario_push_btn'), '✓ ' + await L('lpn_scenario_base')];
 		ok('1.1a the menu is in Tom\'s order: Scenario manager, Basic mode and the three commands, Apply Base, then the scenarios',
 			JSON.stringify(menuSeq.map((t) => t.replace(/\s+/g, ' '))) === JSON.stringify(wantSeq.map((t) => t.replace(/\s+/g, ' '))), JSON.stringify(menuSeq));
@@ -302,23 +303,25 @@ async function main() {
 		console.log('\n--- 4. a category tree ---');
 		await page.selectOption('#lpn_sm_tree_select', 'demand');
 		await settle(400);
-		ok('4.1 the Demand tree shows only its Base', JSON.stringify(await names()) === JSON.stringify(['Base']));
+		// Base2, the Base scenario added in section 2, holds its own Base alternative in every category
+		// (Tom, 2026-10-12: a new Base is a copy of Base), so it is a second root here.
+		ok('4.1 the Demand tree shows its Base and Base2\'s own Base alternative', JSON.stringify(await names()) === JSON.stringify(['Base', 'Base2']), JSON.stringify(await names()));
 		const baseMeta = (await rows())[0];
 		ok('4.2 the Base item says how many scenarios use it', /\d/.test(baseMeta.meta) && baseMeta.metaTip.indexOf('Night') >= 0, baseMeta.meta + ' | ' + baseMeta.metaTip);
 		await click('#lpn_sm_add');
 		await page.keyboard.type('Dry year');
 		await page.keyboard.press('Enter');
 		await settle(500);
-		ok('4.3 an alternative was added under Base', JSON.stringify(await names()) === JSON.stringify(['Base', '-Dry year']), JSON.stringify(await names()));
+		ok('4.3 an alternative was added under Base', JSON.stringify(await names()) === JSON.stringify(['Base', '-Dry year', 'Base2']), JSON.stringify(await names()));
 		ok('4.4 ...used by no scenario yet', (await rows())[1].meta === await L('lpn_sm_used_by_none'), (await rows())[1].meta);
 		ok('4.5 an alternatives tree toolbar is Add child, Add base, Rename, Copy, minus (no Make current)', JSON.stringify(await toolbar()) === JSON.stringify([await L('lpn_sm_add_child'), await L('lpn_sm_add_base'), await L('lpn_sm_rename'), await L('lpn_sm_copy'), '\u2212']), JSON.stringify(await toolbar()));
 		await clickRow('Dry year');
 		await click('#lpn_sm_copy');
 		await settle(400);
-		ok('4.6 Copy makes Copy_of_Dry year beside it under the same parent', JSON.stringify(await names()) === JSON.stringify(['Base', '-Dry year', '-Copy_of_Dry year']), JSON.stringify(await names()));
+		ok('4.6 Copy makes Copy_of_Dry year beside it under the same parent', JSON.stringify(await names()) === JSON.stringify(['Base', '-Dry year', '-Copy_of_Dry year', 'Base2']), JSON.stringify(await names()));
 		await click('#lpn_sm_del');
 		await settle(400);
-		ok('4.8 the copy deletes (nothing uses it), leaving Dry year', JSON.stringify(await names()) === JSON.stringify(['Base', '-Dry year']), JSON.stringify(await names()));
+		ok('4.8 the copy deletes (nothing uses it), leaving Dry year', JSON.stringify(await names()) === JSON.stringify(['Base', '-Dry year', 'Base2']), JSON.stringify(await names()));
 
 		console.log('\n--- 5. the Scenarios table ---');
 		await a.toolbarClick(await L('lpn_pane_toggle'));
@@ -465,15 +468,12 @@ async function main() {
 		await page.selectOption('#lpn_sm_tree_select', 'scenarios');
 		await settle(300);
 		await clickRow('Peak Hour');
-		await click('#lpn_sm_copy');
-		const cd = await a.dialog();
-		ok('6.1 Copy asks: Separate edits, Share edits, or cancel', cd && JSON.stringify(cd.buttons) === JSON.stringify([await L('lpn_sm_copy_own'), await L('lpn_sm_copy_share'), await L('lpn_cancel')]), cd && JSON.stringify(cd.buttons));
+		// Copy scenario is the Scenarios menu's, in Basic mode (Tom, 2026-10-12): here it is greyed and says so.
 		const namesBeforeCopy = (await names()).length;
-		await press(await L('lpn_cancel'));
-		ok('6.2 Cancel copies nothing', (await names()).length === namesBeforeCopy, JSON.stringify(await names()));
+		ok('6.1 on the Scenarios tree, Copy is greyed and its tip says where to copy a scenario',
+			JSON.stringify(await tipOf('lpn_sm_copy')) === JSON.stringify(['true', await L('lpn_scenario_copy_off')]), JSON.stringify(await tipOf('lpn_sm_copy')));
 		await click('#lpn_sm_copy');
-		await press(await L('lpn_sm_copy_share'));
-		ok('6.3 Share them copies the scenario', (await names()).some((n) => /Copy_of_Peak Hour/.test(n)), JSON.stringify(await names()));
+		ok('6.2 ...and pressing it copies nothing, asking nothing', (await names()).length === namesBeforeCopy && !(await a.dialog()), JSON.stringify(await names()));
 		await page.evaluate(() => Array.from(document.querySelectorAll('#lpn_sm_tree .lpn-sm-row')).filter((r) => /Night/.test(r.textContent))[0].querySelector('.lpn-sm-compare').click());
 		await settle(500);
 		const proj = await page.evaluate(() => { try { return JSON.stringify(Object.keys(localStorage)); } catch (e) { return ''; } });
@@ -488,6 +488,20 @@ async function main() {
 		console.log('\n--- 7. Basic mode ticked again, and what is stored ---');
 		ok('7.1 the box keeps its place on one key', (await page.evaluate(() => { try { return localStorage.getItem('lpn_smbox') !== undefined; } catch (e) { return false; } })));
 		ok('7.2 the old Alternatives box key is cleared', (await store('lpn_altbox')) === null);
+		// This project now has a Base of its own and a child of a child: Basic mode cannot show it
+		// (Tom, 2026-10-12), so ticking it is refused and says so.
+		await scenarioMenu(await L('lpn_scenario_basic'));
+		ok('7.2a ticking Basic mode on is refused for a project it cannot show, in Tom\'s words',
+			(await store('lpn_scnbasic')) === 'off' && (await a.notice()) === (await L('lpn_scenario_basic_misfit')), await a.notice());
+		ok('7.2b ...and the box stays open', await page.evaluate(() => getComputedStyle(document.getElementById('lpn_sm_box')).display !== 'none'));
+		// A fresh Net1 fits Basic mode: ticking it now closes the box and hides the tab.
+		await page.keyboard.press('Escape');
+		await settle(300);
+		await a.menuClick(await L('lpn_examples_menu'));
+		await settle(800);
+		await a.openExampleCard(await L('lpn_ex_net1_title'));
+		await settle(1500);
+		await page.evaluate(() => { let e = document.querySelector('.ec-consent-actions'); while (e && getComputedStyle(e).position !== 'fixed') { e = e.parentElement; } if (e) { e.style.display = 'none'; } });
 		await scenarioMenu(await L('lpn_scenario_basic'));
 		ok('7.3 the box is closed', await page.evaluate(() => getComputedStyle(document.getElementById('lpn_sm_box')).display === 'none'));
 		ok('7.4 the Scenarios tab is hidden', await page.evaluate(() => getComputedStyle(document.getElementById('lpn_pane_tab_scenarios')).display === 'none'));

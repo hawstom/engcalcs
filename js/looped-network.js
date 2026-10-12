@@ -5717,7 +5717,8 @@ var EngCalcs = EngCalcs || {};
 	/**
 	 * **STAGE 5: A SCENARIO'S PARENT.** null (or Base) makes it Base's child again, which is stored as
 	 * no parent at all. Base takes none; a loop is refused. **ITS OWN VALUES ARE KEPT**; what it
-	 * inherits follows the new parent, as in Bentley.
+	 * inherits follows the new parent, and a category it has overridden (its own alternative) does
+	 * not change (Tom, 2026-10-12), as in Bentley.
 	 */
 	function setScenarioParent(scnId, parentId) {
 		var s = scenarioById(scnId), p = (parentId === null || parentId === undefined) ? null : scenarioById(parentId);
@@ -5737,8 +5738,8 @@ var EngCalcs = EngCalcs || {};
 	// `doc.alternatives[].parent` and `doc.calcSets[].parent`, and every act below goes through the
 	// stage 4 and 5 mutations. Two fields are new, both written only on an explicit act:
 	//   root: true      on a scenario, alternative or calculation set that is a Base of its own
-	//                   ("Add Base", Tom H08). It resolves exactly as a child of Base does, since
-	//                   Base's values are the elements' own; the flag is only which row it sits on.
+	//                   ("Add Base", Tom H08). Added, it holds a copy of every value Base has
+	//                   (baseSnapshotOf(), Tom 2026-10-12), so later Base edits do not reach it.
 	//   project.scenarioOrdered, project.compareSet   (see scenariosForDisplay(), compareScenarios()).
 	// A tree is addressed by `tree`: 'scenarios', or a category id ('physical' ... 'calculation').
 	// An item is addressed by `key`: a scenario id, a stored record id, or the Base item's own key
@@ -5896,6 +5897,60 @@ var EngCalcs = EngCalcs || {};
 		var kind = smKind(tree);
 		return kind === 'scn' ? scenarios : (kind === 'calc' ? doc.calcSets : doc.alternatives);
 	}
+	/**
+	 * **A NEW BASE IS AN INDEPENDENT COPY OF BASE** (Tom, 2026-10-12: *"the most honest thing is to
+	 * make the new base a copy like a new project with shared settings and alternatives"*). Bentley
+	 * states that *"Base alternatives contain local data for all elements in your system"*
+	 * (docs.bentley.com, WaterGEMS, "Base and Child Alternatives"), so a second Base holds every value
+	 * itself and a later edit to the first Base does not reach it. One category's snapshot, as Base
+	 * resolves it now: {values: {ovKey: {prop: v}}, settings, demandMultiplier?}. An element added to
+	 * the drawing later has no value here and reads the drawing's own, as a child of Base would.
+	 */
+	function baseSnapshotOf(cat) {
+		var out = { values: {}, settings: {} }, base = baseScenario(), any = false;
+		paneInScenario(base, function () {
+			[['node', doc.nodes], ['link', doc.links], ['label', doc.labels]].forEach(function (g) {
+				(g[1] || []).forEach(function (el) {
+					var props = Object.keys(LPN_OVERRIDABLE[g[0]] || {}).concat(Object.keys(el).filter(function (k) {
+						return k.indexOf('_' + LPN_CP_PREFIX) === 0;
+					}).map(function (k) { return k.slice(1); }));
+					props.forEach(function (prop) {
+						var v;
+						// The breakdown carries row 0's base, so `demand` is not stated twice.
+						if (prop === 'demand' || !isOverridable(el, prop) || categoryOf(prop, g[0]) !== cat) { return; }
+						v = effective(el, prop);
+						if (v === undefined || v === null) { return; }
+						(out.values[ovKey(el)] = out.values[ovKey(el)] || {})[prop] = altCopy(v);
+						any = true;
+					});
+				});
+			});
+			settingTableRows().forEach(function (r) {
+				var v;
+				// A setting stored elsewhere (the two run times) is not a calculation set's to hold.
+				if (r.cat !== cat || r.home === 'cp' || settingHasOtherHome(r.path) ||
+					(r.path[0] === 'times' && LPN_SCENARIO_TIME_KEYS.indexOf(r.path[1]) >= 0)) { return; }
+				v = settingRowValue(r, base);
+				if (v === undefined) { return; }
+				if (r.home === 'dm') { out.demandMultiplier = v; any = true; return; }
+				putResolvedLeaf(out.settings, r.path, altCopy(v));
+				any = true;
+			});
+		});
+		return any ? out : null;
+	}
+	// Stores a snapshot as a Base of its own in category `cat`, named `name`. Answers its id, or null.
+	function storeBaseSnapshot(cat, name, snap) {
+		var kind = cat === 'calculation' ? 'calc' : 'alt', r;
+		if (!snap) { return null; }
+		r = createStored(kind, cat, smUniqueName(cat, name), null, true);
+		if (r.refused) { return null; }
+		r.root = true;
+		if (Object.keys(snap.values).length && kind === 'alt') { r.values = snap.values; }
+		if (Object.keys(snap.settings).length) { r.settings = snap.settings; }
+		if (snap.demandMultiplier !== undefined && kind === 'calc') { r.demandMultiplier = snap.demandMultiplier; }
+		return r.id;
+	}
 	// New item under `parentKey` (null: a Base of its own). Answers the record, or {refused}.
 	function smAdd(tree, parentKey, asBase) {
 		var kind = smKind(tree), name, r, root = !!asBase || parentKey === null, pk = root ? null : (parentKey || smBaseKey(tree));
@@ -5908,13 +5963,24 @@ var EngCalcs = EngCalcs || {};
 		if (kind === 'scn') {
 			r = { id: newScenarioId(), name: name, overrides: {} };
 			if (!root && !smIsBaseKey(tree, pk)) { r.parent = pk; }
-			if (root) { r.root = true; }
+			if (root) {
+				r.root = true;
+				// Its own Base alternatives, one per category, each a snapshot of Base (baseSnapshotOf()).
+				LPN_ALT_CATEGORIES.forEach(function (cat) {
+					var id = storeBaseSnapshot(cat, name, baseSnapshotOf(cat));
+					if (id === null) { return; }
+					if (cat === 'calculation') { r.calc = id; } else { (r.alternatives = r.alternatives || {})[cat] = id; }
+				});
+			}
 			scenarios.push(r);
+		} else if (root) {
+			// A Base alternative of its own: every value of the category, copied from Base.
+			r = storedById(storedList(kind), storeBaseSnapshot(tree, name, baseSnapshotOf(tree) || { values: {}, settings: {} }));
+			if (!r) { return treeRefuse('failed'); }
 		} else {
-			r = kind === 'calc' ? createCalcSet(name, root || smIsBaseKey(tree, pk) ? null : pk)
-				: createAlternative(tree, name, root || smIsBaseKey(tree, pk) ? null : pk);
+			r = kind === 'calc' ? createCalcSet(name, smIsBaseKey(tree, pk) ? null : pk)
+				: createAlternative(tree, name, smIsBaseKey(tree, pk) ? null : pk);
 			if (r.refused) { return r; }
-			if (root) { r.root = true; }
 		}
 		touchTree('smAdd');
 		return r;
@@ -5974,7 +6040,10 @@ var EngCalcs = EngCalcs || {};
 	 * **MOVE AN ITEM** (H04: *"Drag a child leaf or branch anywhere to change inheritance"*; reorder
 	 * siblings). mode 'into' makes it the last child of `targetKey`; 'before' and 'after' put it
 	 * beside the target, under the target's own parent (a root's sibling becomes a Base of its own).
-	 * A cycle is refused. Its own values travel with it; what it inherits follows the new parent.
+	 * A cycle is refused. Its own values travel with it. **WHAT IT INHERITS CHANGES; WHAT IT HAS
+	 * OVERRIDDEN DOES NOT** (Tom, 2026-10-12: *"strictly speaking, yes. What it inherits changes. But
+	 * what it has overridden does not change."*): a category in which it names its own alternative
+	 * keeps that alternative, and its parent chain, wherever the scenario moves.
 	 */
 	function smMove(tree, key, targetKey, mode) {
 		var kind = smKind(tree), r = smRecord(tree, key), target = smRecord(tree, targetKey), newParent, list, res;
@@ -6133,15 +6202,17 @@ var EngCalcs = EngCalcs || {};
 		return kept ? { kept: kept.name } : true;
 	}
 	/**
-	 * **COPY A SCENARIO** (H05: *"copying a scenario asks each time: make its own copies of the
-	 * alternatives, or share them"*). mode 'own' copies each stored alternative the scenario names
-	 * (as a sibling of the original, named for the copy); 'share' names the same ones, so an edit
-	 * made in either changes both. The scenario's own values are always copied. The copy sits beside
-	 * the original and has its parent.
+	 * **COPY A SCENARIO** (Tom, 2026-10-12: *"Copy scenario should copy all overrides along, of
+	 * course with the alternatives they belong to and no other alternatives."*). Its own values come
+	 * along, and each stored alternative it names is copied as a new alternative named like the copy,
+	 * beside the original; what it inherits stays inherited. Offered in Basic mode only (*"Copy
+	 * scenario could possibly be unavailable when Basic mode is off"*, where a scenario is made and
+	 * given alternatives directly), so there is no question about sharing. The copy sits beside the
+	 * original and has its parent.
 	 */
-	function smCopyScenario(srcId, mode) {
+	function smCopyScenario(srcId) {
 		var src = scenarioById(srcId), s, name, copies = {};
-		if (!src) { return treeRefuse('missing'); }
+		if (!src || src.isBase) { return treeRefuse('missing'); }
 		name = smUniqueName('scenarios', 'Copy_of_' + scenarioDisplayName(src));
 		s = altCopy(src);
 		s.id = newScenarioId();
@@ -6161,15 +6232,11 @@ var EngCalcs = EngCalcs || {};
 				var kind = cat === 'calculation' ? 'calc' : 'alt', orig = storedById(storedList(kind), held[cat]), c;
 				if (held[cat] === LPN_BASE_CHOICE) { copies[cat] = LPN_BASE_CHOICE; return; }
 				if (!orig) { return; }
-				if (mode === 'own') {
-					c = altCopy(orig);
-					c.id = treeNewId(storedList(kind), kind === 'calc' ? 'c' : 'a');
-					c.name = smUniqueName(cat, String(orig.name || '') + '_copy_for_' + name);
-					storedList(kind).push(c);
-					copies[cat] = c.id;
-				} else {
-					copies[cat] = orig.id;
-				}
+				c = altCopy(orig);
+				c.id = treeNewId(storedList(kind), kind === 'calc' ? 'c' : 'a');
+				c.name = smUniqueName(cat, name);
+				storedList(kind).push(c);
+				copies[cat] = c.id;
 			});
 		});
 		Object.keys(copies).forEach(function (cat) {
@@ -6831,6 +6898,29 @@ var EngCalcs = EngCalcs || {};
 		for (var i = 0; i < scenarios.length; i++) { if (scenarios[i].id === id) { return scenarios[i]; } }
 		return null;
 	}
+	// **A SCENARIO'S EQUALLY NAMED ALTERNATIVES** (Tom, 2026-10-12: *"With Basic mode on, we must
+	// rename everything at once without asking. With Basic mode off, we can ask, 'Rename equally
+	// named alternatives?'"*): the stored alternatives and calculation sets the scenario names that
+	// carry its old name, as {kind, rec, cat}.
+	function scenarioNamesakes(sc, oldName) {
+		var out = [];
+		if (!sc || sc.isBase) { return out; }
+		LPN_ALT_CATEGORIES.forEach(function (cat) {
+			var kind = cat === 'calculation' ? 'calc' : 'alt', id = storedChoiceOf(sc, cat), rec;
+			if (id === undefined || id === LPN_BASE_CHOICE) { return; }
+			rec = storedById(storedList(kind), id);
+			if (rec && String(rec.name || '') === String(oldName)) { out.push({ kind: kind, rec: rec, cat: cat }); }
+		});
+		return out;
+	}
+	// Renames them; one whose new name its category already uses keeps its old one.
+	function renameScenarioNamesakes(list, newName) {
+		list.forEach(function (x) {
+			if (!smNameTaken(x.cat, newName, x.rec.id)) { x.rec.name = String(newName); }
+		});
+		if (list.length) { touchTree('renameScenarioNamesakes'); }
+		return true;
+	}
 	// **WHAT DELETING A SCENARIO TAKES WITH IT** (Tom, 2026-10-12, B5; Sue's F1). Its own values always
 	// go. The stored alternatives it names stay in the project with Basic mode off, as Bentley keeps
 	// them; with Basic mode on, where alternatives are hidden and automatic, each one no other
@@ -7006,6 +7096,11 @@ var EngCalcs = EngCalcs || {};
 			}
 		});
 		rows.push({
+			icon: 'copy', label: pc.lpn_scenario_copy || 'Copy scenario', disabled: scn.isBase || !scenarioBasicMode,
+			tip: !scenarioBasicMode ? (pc.lpn_scenario_copy_off || 'Copy scenario works in Basic mode. With Basic mode off, add a scenario and choose its alternatives in the Scenarios table.') : pc.lpn_scenario_copy_tip,
+			fn: function () { copyCurrentScenario(); }
+		});
+		rows.push({
 			// Base cannot be renamed away: its name is not stored in the user's language and the
 			// selector keys off isBase, so a rename here would rename nothing a user can see.
 			icon: 'edit', label: pc.lpn_scenario_rename || 'Rename scenario…', disabled: scn.isBase,
@@ -7013,8 +7108,12 @@ var EngCalcs = EngCalcs || {};
 				askDialog({ kind: 'prompt', text: pc.lpn_scenario_prompt_name || 'Name for this scenario', value: scn.name || '' }, function (v) {
 					if (v === null || !v.trim()) { return; }
 					if (smNameTaken('scenarios', v.trim(), scn.id)) { setNotice((pc.lpn_sm_name_taken || 'The name {name} is already used in this tree.').replace('{name}', v.trim())); return; }
+					var kin = scenarioNamesakes(scn, scenarioDisplayName(scn));
 					saveUndoSnapshot();
 					scn.name = v.trim();
+					// Basic mode renames them at once; off, it asks (renameScenarioNamesakes()).
+					if (kin.length && scenarioBasicMode) { renameScenarioNamesakes(kin, scn.name); }
+					else if (kin.length) { askRenameNamesakes(kin, scn.name); }
 					refreshScenarioStatus();
 					paneScnScenarioRenamed();
 					saveToStorage();
@@ -33417,6 +33516,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// remembered row order belongs to the outgoing document, so all seven forget it.
 	function paneDocumentArrived() {
 		var t = activePaneTab();
+		basicModeFitOnArrival();
 		paneTables().forEach(paneTableReset);
 		if (paneIsOpen() && activePaneTableSpec()) { renderPaneTable(activePaneTableSpec()); }
 		// The Time series tab draws from the run, not the table specs, and a switch that re-solves
@@ -73792,9 +73892,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// always present; choosing it while Basic mode is ticked turns Basic mode off and says so in
 	// one line.*
 	//
-	// **A BROWSER SETTING, NOT A PROJECT ONE.** The mode changes no value and no solve; the one act
-	// it changes is Delete scenario, which with it on also deletes the scenario's unshared
-	// alternatives (scenarioDeletePlan()). Otherwise only how much machinery the person at this screen wants shown, which a colleague
+	// **A BROWSER SETTING, NOT A PROJECT ONE.** Tom, 2026-10-12: *"The Basic mode on/off setting
+	// changes multiple application behaviors. And with Basic mode off, a project may become too
+	// complex for Basic mode to be turned on."* (Delete scenario: scenarioDeletePlan(); Rename:
+	// scenarioNamesakes(); Copy scenario: copyCurrentScenario(); what it can show: basicModeMisfit().)
+	// Which of them this person wants is a fact about the screen, which a colleague
 	// opening the file must not inherit. Written only when OFF, like lpn_runbox, so a browser that
 	// never touched it holds nothing.
 	var LPN_SCNBASIC_KEY = 'lpn_scnbasic';
@@ -73802,7 +73904,53 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function loadScenarioBasicPref() {
 		try { scenarioBasicMode = localStorage.getItem(LPN_SCNBASIC_KEY) !== 'off'; } catch (e) {}
 	}
+	/**
+	 * **WHAT BASIC MODE CAN SHOW** (Tom, 2026-10-12: *"In the event that somebody received a project
+	 * from an advanced user, there may be inheritance and alternatives assignments that Basic mode
+	 * can't handle."*). Basic mode shows each scenario as a child of Base holding its own overrides.
+	 * A project fits that exactly when:
+	 *   1. every scenario but Base is a child of the built-in Base (no parent scenario, no Base of
+	 *      its own added with Add base);
+	 *   2. every stored alternative and calculation set is a child of Base's (no parent, no Base of
+	 *      its own), so no alternative inherits from another;
+	 *   3. no stored alternative or calculation set is named by more than one scenario (none shared).
+	 * An alternative nobody names is allowed: it is no relationship, and Basic mode leaves it alone.
+	 * Answers the first reason it does not fit, or '' when it fits.
+	 */
+	function basicModeMisfit() {
+		var named = {}, why = '';
+		scenarios.forEach(function (sc) {
+			if (why || sc.isBase) { return; }
+			if (sc.parent !== undefined && sc.parent !== null && !(scenarioById(sc.parent) || {}).isBase) { why = 'parent'; return; }
+			if (sc.root === true) { why = 'root'; return; }
+			LPN_ALT_CATEGORIES.forEach(function (cat) {
+				var id = storedChoiceOf(sc, cat), k;
+				if (id === undefined || id === LPN_BASE_CHOICE) { return; }
+				k = (cat === 'calculation' ? 'c' : 'a') + '\u0000' + id;
+				if (named[k]) { why = why || 'shared'; }
+				named[k] = true;
+			});
+		});
+		(doc.alternatives || []).concat(doc.calcSets || []).forEach(function (r) {
+			if (!why && ((r.parent !== null && r.parent !== undefined) || r.root === true)) { why = 'tree'; }
+		});
+		return why;
+	}
+	// Called wherever a document arrives (paneDocumentArrived()): a project Basic mode cannot show
+	// turns it off, and says so in Tom's words.
+	function basicModeFitOnArrival() {
+		var pc = EngCalcs.pageConfig || {};
+		if (!scenarioBasicMode || !basicModeMisfit()) { return; }
+		setScenarioBasicMode(false);
+		setNotice(pc.lpn_scenario_basic_misfit || 'This project has scenarios and alternatives relationships that are not compatible with Scenarios Basic mode, so Basic mode is disabled.');
+	}
 	function setScenarioBasicMode(on) {
+		var pc = EngCalcs.pageConfig || {};
+		// Ticking it on is refused, with the same sentence, for a project it cannot show.
+		if (on && basicModeMisfit()) {
+			setNotice(pc.lpn_scenario_basic_misfit || 'This project has scenarios and alternatives relationships that are not compatible with Scenarios Basic mode, so Basic mode is disabled.');
+			return false;
+		}
 		scenarioBasicMode = !!on;
 		try {
 			if (scenarioBasicMode) { localStorage.removeItem(LPN_SCNBASIC_KEY); }
@@ -73912,14 +74060,16 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				fn: function () { smActCurrent(key); } });
 		}
 		out.push({ id: 'add', label: pc.lpn_sm_add_child || 'Add child', fn: function () { smActAdd(valid ? key : smBaseKey(tree)); } });
-		out.push({ id: 'addbase', label: pc.lpn_sm_add_base || 'Add base', tip: pc.lpn_sm_add_base_tip, fn: function () { smActAdd(null); } });
+		out.push({ id: 'addbase', label: pc.lpn_sm_add_base || 'Add base', tip: tree === 'scenarios' ? pc.lpn_sm_add_base_tip : pc.lpn_sm_add_base_alt_tip, fn: function () { smActAdd(null); } });
 		out.push({ id: 'rename', label: pc.lpn_sm_rename || 'Rename', off: !valid || isBase,
 			offTip: !valid ? noSel : (pc.lpn_sm_base_named || 'The Base of a tree is not renamed.'),
 			fn: function () { smStartRename(key); } });
 		// **ONE "Copy", ACTING ON WHAT IS SELECTED** (Tom, 2026-10-12): a scenario asks Separate edits
 		// or Share edits; an alternative is copied beside itself.
 		out.push({ id: 'copy', label: pc.lpn_sm_copy || 'Copy',
-			off: !valid || (tree !== 'scenarios' && isBase), offTip: !valid ? noSel : null, fn: function () { smActCopy(key); } });
+			off: !valid || isBase || tree === 'scenarios',
+			offTip: tree === 'scenarios' ? (pc.lpn_scenario_copy_off || 'Copy scenario works in Basic mode. With Basic mode off, add a scenario and choose its alternatives in the Scenarios table.') : (!valid ? noSel : null),
+			fn: function () { smActCopy(key); } });
 		out.push({ separator: true });
 		out.push({ id: 'del', label: pc.lpn_tool_delete || 'Delete', face: '−', off: !valid || isBase,
 			tip: isBase ? (pc.lpn_sm_base_kept || 'The Base of a tree is not deleted. Another Base added with Add base is deleted when nothing uses it.')
@@ -74181,6 +74331,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var key = smState.editing, tree = smState.tree, pc = EngCalcs.pageConfig || {}, res, v = String(text).trim();
 		smState.editing = null;
 		if (key === null || v === smName(tree, key)) { rebuildScenarioManager(); return; }
+		var kin = tree === 'scenarios' ? scenarioNamesakes(scenarioById(key), smName(tree, key)) : [];
 		res = smTry(function () { return smRename(tree, key, v); });
 		if (res !== true) {
 			if (res.refused === 'duplicate') { setNotice((pc.lpn_sm_name_taken || 'The name {name} is already used in this tree.').replace('{name}', v)); }
@@ -74188,6 +74339,17 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			return;
 		}
 		smAfter(false, tree === 'scenarios');
+		if (kin.length && scenarioBasicMode) { renameScenarioNamesakes(kin, v); smAfter(false, false); }
+		else if (kin.length) { askRenameNamesakes(kin, v); }
+	}
+	// Basic mode off: the question, in Tom's words; yes renames them as one more undo step.
+	function askRenameNamesakes(kin, newName) {
+		var pc = EngCalcs.pageConfig || {};
+		askDialog({ kind: 'confirm', text: pc.lpn_sm_rename_alts_ask || 'Rename equally named alternatives?' }, function (yes) {
+			if (!yes) { return; }
+			smTry(function () { return renameScenarioNamesakes(kin, newName); });
+			smAfter(false, false);
+		});
 	}
 	// An act on the tree: one undo step, taken first and dropped again if the act is refused. The
 	// two project-level facts the manager owns ride in the same step.
@@ -74274,33 +74436,24 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		saveToStorage();
 		dropScenarioCompareRun();
 	}
+	// An alternative (or calculation set) is copied beside itself; a scenario is copied from the
+	// Scenarios menu, in Basic mode (copyCurrentScenario()).
 	function smActCopy(key) {
-		var pc = EngCalcs.pageConfig || {}, src = key ? scenarioById(key) : null, res;
-		if (smState.tree !== 'scenarios') {
-			if (key === null || key === undefined || smIsBaseKey(smState.tree, key)) { return; }
-			res = smTry(function () { return smCopyStored(smState.tree, key); });
-			if (!res || res.refused) { return; }
-			smState.sel = res.id;
-			smAfter(true, false);
-			return;
-		}
-		if (!src) { return; }
-		askDialog({
-			kind: 'choice',
-			text: (pc.lpn_sm_copy_ask || 'Copy the scenario {name}. Share edits: the copy uses the same alternatives, so an edit in either scenario changes both. Separate edits: the copy gets its own copies of the alternatives.').replace('{name}', scenarioDisplayName(src)),
-			choices: [
-				{ label: pc.lpn_sm_copy_own || 'Separate edits', value: 'own', isDefault: true },
-				{ label: pc.lpn_sm_copy_share || 'Share edits', value: 'share' },
-				{ label: pc.lpn_cancel || 'Cancel', value: null, cancel: true }
-			]
-		}, function (answer) {
-			var res;
-			if (answer !== 'own' && answer !== 'share') { return; }
-			res = smTry(function () { return smCopyScenario(key, answer); });
-			if (!res || res.refused) { return; }
-			smState.sel = res.id;
-			smAfter(true, true);
-		});
+		var res;
+		if (smState.tree === 'scenarios') { return; }
+		if (key === null || key === undefined || smIsBaseKey(smState.tree, key)) { return; }
+		res = smTry(function () { return smCopyStored(smState.tree, key); });
+		if (!res || res.refused) { return; }
+		smState.sel = res.id;
+		smAfter(true, false);
+	}
+	// The Scenarios menu's Copy scenario: the open scenario, copied, and the copy made current.
+	function copyCurrentScenario() {
+		var src = activeScenario(), res;
+		if (!src || src.isBase || !scenarioBasicMode) { return; }
+		res = smTry(function () { return smCopyScenario(src.id); });
+		if (!res || res.refused) { return; }
+		switchScenario(res.id);
 	}
 	// **THE TREE'S KEYS** (WAI-ARIA tree pattern, Ida 2026-10-11): Up and Down move over the rows on
 	// screen, Home and End to the first and last; Right opens a collapsed item or moves to its first

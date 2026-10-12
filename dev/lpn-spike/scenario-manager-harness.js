@@ -104,11 +104,18 @@ async function run(mutate, quiet) {
 	ok('1.4 Add Base names Base2, Base3', b2.name === 'Base2' && b3.name === 'Base3' && b2.root === true && b2.parent === undefined, b2.name + ',' + b3.name);
 	ok('1.5 the roots are Base, Base2, Base3', JSON.stringify(L.smRows('scenarios').filter((r) => r.depth === 0).map((r) => r.name)) === JSON.stringify(['Base', 'Base2', 'Base3']));
 	const d1 = L.smAdd('demand', L.smBaseKey('demand'), false), d2 = L.smAdd('demand', L.smBaseKey('demand'), false), db2 = L.smAdd('demand', null, true);
-	ok('1.6 a category: Child_1_of_Base, Child_2_of_Base, Base2', d1.name === 'Child_1_of_Base' && d2.name === 'Child_2_of_Base' && db2.name === 'Base2' && db2.root === true, [d1.name, d2.name, db2.name].join(','));
+	// Base2 and Base3 above each made their own Base alternatives (Tom, 2026-10-12), so this one is Base4.
+	ok('1.6 a category: Child_1_of_Base, Child_2_of_Base, Base4', d1.name === 'Child_1_of_Base' && d2.name === 'Child_2_of_Base' && db2.name === 'Base4' && db2.root === true, [d1.name, d2.name, db2.name].join(','));
+	ok('1.6a a new Base scenario names its own Base alternatives, copies of Base: its demands are Base\'s, held as its own',
+		!!b2.alternatives && !!b2.alternatives.demand && (() => {
+			const r = L.smRecords('demand').filter((x) => x.id === b2.alternatives.demand)[0];
+			return !!r && r.root === true && r.values && r.values['n:22'] && Array.isArray(r.values['n:22'].demands);
+		})());
+	ok('1.6b ...and a new Base alternative holds every Base demand too', !!db2.values && Object.keys(db2.values).length > 0);
 	const dd = L.smAdd('demand', d1.id, false);
 	ok('1.7 ...and a grandchild', dd.name === 'Child_1_of_Child_1_of_Base' && dd.parent === d1.id, dd.name);
 	const cs1 = L.smAdd('calculation', L.smBaseKey('calculation'), false);
-	ok('1.8 calculation sets are a tree too', cs1.name === 'Child_1_of_Base' && L.smRecords('calculation').length === 1);
+	ok('1.8 calculation sets are a tree too', cs1.name === 'Child_1_of_Base' && L.smRecords('calculation').filter((r) => !r.root).length === 1);
 	ok('1.9 the trees are Scenarios and the eleven categories', L.smTrees().length === 12 && L.smTrees()[0] === 'scenarios');
 
 	say('--- 2. rename ---');
@@ -123,7 +130,7 @@ async function run(mutate, quiet) {
 	ok('3.1 a scenario with a child is refused, naming it', r1.refused === 'in use' && r1.who.join() === g1.name, JSON.stringify(r1));
 	const r2 = L.smDelete('demand', d1.id);
 	ok('3.2 an alternative with a child is refused, naming it', r2.refused === 'in use' && r2.who.join() === dd.name, JSON.stringify(r2));
-	ok('3.3 a leaf goes', L.smDelete('demand', dd.id) === true && L.smRecords('demand').length === 3);
+	ok('3.3 a leaf goes', L.smDelete('demand', dd.id) === true && L.smRecords('demand').filter((r) => !r.root).length === 2);
 	L.smAssign(c2.id, 'demand', 'Peak');
 	const r3 = L.smDelete('demand', d1.id);
 	ok('3.4 an alternative a scenario uses is refused, naming the scenario', r3.refused === 'in use' && r3.who.join() === 'Child_2_of_Base', JSON.stringify(r3));
@@ -206,15 +213,21 @@ async function run(mutate, quiet) {
 	})());
 	L.switchScenario(BASE);
 
-	say('--- 6. copy asks: own copies or shared ---');
+	say('--- 6. copy: its overrides, with the alternatives that hold them (Tom, 2026-10-12) ---');
 	const S0 = L.smRecords('demand').map((r) => r.id);
 	const src = L.getScenarios().filter((s) => s.id === Q.id)[0];
 	L.smAssign(Q.id, 'demand', 'PeakDemand');
-	const cOwn = L.smCopyScenario(Q.id, 'own'), cShare = L.smCopyScenario(Q.id, 'share');
-	ok('6.1 named Copy_of_<name>', cOwn.name === 'Copy_of_Q' && cShare.name === 'Copy_of_Q_2', cOwn.name + ',' + cShare.name);
-	ok('6.2 own: its demand alternative is a new record, a sibling of the original', cOwn.alternatives.demand !== Q.alternatives.demand &&
+	const cOwn = L.smCopyScenario(Q.id);
+	// A scenario sharing Q's alternative is made the Basic-mode-off way: added, then assigned.
+	const cShare = L.smAdd('scenarios', Q.parent || BASE, false);
+	L.smRename('scenarios', cShare.id, 'Copy_of_Q_2');
+	L.smAssign(cShare.id, 'demand', 'PeakDemand');
+	ok('6.1 named Copy_of_<name>', cOwn.name === 'Copy_of_Q', cOwn.name);
+	ok('6.2 its demand alternative is a new record, a sibling of the original', cOwn.alternatives.demand !== Q.alternatives.demand &&
 		L.smRecords('demand').filter((r) => !S0.includes(r.id) && r.id === cOwn.alternatives.demand).length === 1);
-	ok('6.3 share: it names the same record', cShare.alternatives.demand === Q.alternatives.demand);
+	ok('6.3 ...named like the copy', L.smName('demand', cOwn.alternatives.demand) === 'Copy_of_Q', L.smName('demand', cOwn.alternatives.demand));
+	ok('6.3a ...and it names no alternative Q does not name: what Q inherits stays inherited',
+		JSON.stringify(Object.keys(cOwn.alternatives || {}).sort()) === JSON.stringify(Object.keys(Q.alternatives || {}).sort()) && cOwn.calc === undefined === (Q.calc === undefined));
 	ok('6.4 both copies solve as Q does', (() => {
 		const out = [];
 		[Q, cOwn, cShare].forEach((s) => { L.switchScenario(s.id); out.push(heads(L)['22']); });
@@ -237,9 +250,9 @@ async function run(mutate, quiet) {
 	L.switchScenario(cOwn.id);
 	const oh = heads(L)['22'];
 	L.switchScenario(BASE);
-	ok('6.5 an edit in Q changes the shared copy', Math.abs(qh - sh) < 1e-9);
-	ok('6.6 ...and leaves the own copy alone', Math.abs(qh - oh) > 0.01);
-	ok('6.7 a copy sits right after the original (the second after the first)', (() => { const o = L.scenariosForDisplay().map((s) => s.id); return o.indexOf(cShare.id) === o.indexOf(Q.id) + 1 && o.indexOf(cOwn.id) === o.indexOf(Q.id) + 2; })());
+	ok('6.5 an edit in Q changes a scenario that names the same alternative', Math.abs(qh - sh) < 1e-9);
+	ok('6.6 ...and leaves the copy alone', Math.abs(qh - oh) > 0.01);
+	ok('6.7 the copy sits right after the original', (() => { const o = L.scenariosForDisplay().map((s) => s.id); return o.indexOf(cOwn.id) === o.indexOf(Q.id) + 1; })());
 
 	say('--- 7. compare: the checked set, stored in the project ---');
 	const all = L.scenariosForDisplay().length;
@@ -272,7 +285,7 @@ async function run(mutate, quiet) {
 	const M = page();
 	M.importProject(JSON.parse(fileNew));
 	const fileBack = JSON.stringify(M.serializeProject());
-	ok('9.1 save, reopen, save: the same bytes', fileBack === fileNew);
+	ok('9.1 save, reopen, save: the same bytes', fileBack === fileNew, (() => { let i = 0; while (i < fileNew.length && fileNew[i] === fileBack[i]) { i++; } return fileNew.slice(Math.max(0, i - 200), i + 120) + '\n  VS\n' + fileBack.slice(Math.max(0, i - 200), i + 120); })());
 	ok('9.2 the roots, the order and the names came back', M.smRows('scenarios').filter((r) => r.depth === 0).map((r) => r.name).join() === 'Base,Base2,Base3,Child_1_of_Base' &&
 		M.getProject().scenarioOrdered === true && M.smRecords('demand').some((r) => r.name === 'PeakDemand'), M.smRows('scenarios').filter((r) => r.depth === 0).map((r) => r.name).join());
 	L.smCompareSet(Q.id, false);
@@ -503,7 +516,7 @@ async function runTail(mutate, quiet) {
 		ok('14.9 an override in the child then makes its own alternative, a child of Base, not of its parent\'s', !!own && own.name === Kid.name && own.parent === null &&
 			P.effective(P.nodeById('22'), 'demand') === P.nodeById('22')._demand, JSON.stringify(own));
 		ok('14.10 choosing "" inherits from the parent again', P.smAssign(Kid.id, 'demand', '') === true && Math.abs(solve()['22'] - parH['22']) < 1e-9);
-		const Cp = P.smAssign(Kid.id, 'demand', BASEW) === true && P.smCopyScenario(Kid.id, 'own');
+		const Cp = P.smAssign(Kid.id, 'demand', BASEW) === true && P.smCopyScenario(Kid.id);
 		ok('14.11 a copy of a scenario that chose Base chooses Base too', !!Cp && Cp.alternatives && Cp.alternatives.demand === 'base', JSON.stringify(Cp && Cp.alternatives));
 		ok('14.12 the Calculation column offers Base as well', P.smCellChoices(Kid, 'calculation').length >= 1 &&
 			(P.smCellChoices(Kid, 'calculation').some((o) => o[0] === BASEW) || P.smChoice(Kid, 'calculation').base === true));
@@ -517,7 +530,7 @@ const MUTATIONS = [
 	['a cycle is allowed', (src) => src.replace("if (p === s || scenarioParentLoops(s.id, p.id)) { return treeRefuse('parent'); }", "")],
 	['a reorder is not stored', (src) => src.replace("		project.scenarioOrdered = true;\n	}", "	}")],
 	['the compare set is ignored', (src) => src.replace("return scenariosForDisplay().filter(function (s) { return !Array.isArray(set) || set.indexOf(s.id) >= 0; });", "return scenariosForDisplay();")],
-	['a copy always shares', (src) => src.replace("				if (mode === 'own') {", "				if (false) {")],
+	['a copy shares the alternatives it names', (src) => src.replace("				c = altCopy(orig);\n				c.id = treeNewId(storedList(kind), kind === 'calc' ? 'c' : 'a');\n				c.name = smUniqueName(cat, name);\n				storedList(kind).push(c);\n				copies[cat] = c.id;", "				copies[cat] = orig.id;")],
 	['an assignment drops the values the scenario held', (src) => src.replace("			kept = promoteStored(s.id, cat, smUniqueName(cat, scenarioDisplayName(s), smImplicitKey(s, cat)));\n			if (kept.refused) { return kept; }", "			kept = { name: 'x' };\n			takeScenarioLocals(s, cat);")],
 	['a new child is not named for its parent', (src) => src.replace("name = 'Child_' + n + '_of_' + parent;", "name = 'Child_' + n;")],
 	['only-in-this-scenario reads the scenario\'s own values alone', (src) => src.replace("var ov = (!scn || scn.isBase) ? null : resolvedOverrides(scn)[ovKey(el)];", "var ov = (!scn || scn.isBase) ? null : (scn.overrides || {})[ovKey(el)];"), true],
