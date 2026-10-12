@@ -75,7 +75,7 @@ is the one you meant. "The first one" is a complete answer.
   *The proposal:* PROPOSED English: 'Rest the pointer on a node, link or customer to see its label as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project.'
   @@ NEEDS RULING
 
-## Synonym entries to approve  (15, 13 to read @@ NEEDS RULING)
+## Synonym entries to approve  (15, 14 to read @@ NEEDS RULING)
 
 **These are translator notes (`$ec_lang_syn`), not visitor wording.** Each was written against an
 English string that has since changed, or against a key that no longer exists. Say which: keep it
@@ -108,12 +108,12 @@ never edits a synonym.
   @@ NEEDS RULING
 
 - **`ip_is_lateral`**
-  > <span class="ec-help" title="Selected: this reach is a segment of the test lateral, from which individual emitters withdraw water. Cleared: this reach is a main, only passing flow along to laterals not on the test path.">Lat. <span class="ec-tip">?</span></span>
+  > <span class="ec-help" title="Checked: this reach is a segment of the test lateral, from which individual emitters withdraw water. Cleared: this reach is a main, only passing flow along to laterals not on the test path.">Lat. <span class="ec-tip">?</span></span>
   *Why stale:* the English changed after this synonym was written
   *Written against:* <span class="ec-help" title="Checked: this reach is a segment of the test lateral, from which individual emitters withdraw water. Unchecked: this reach is a main, only passing flow along to laterals not on the test path.">Lat. <span class="ec-tip">?</span></span>
   *Current synonym:* | gloss: lateral, mainline; avoid: "test" read as typical/sample
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
-  _Ruled 2026-10-05: What's wrong with the way it is? I am confused on this on about what's happening and why a _syn is needed._
+  @@ NEEDS RULING
 
 - **`lpn_cp_restrict`**
   > Restrict these characters
@@ -218,7 +218,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**147 still to read**, of 150 new keys across 15 unmerged branch(es).
+**152 still to read**, of 155 new keys across 13 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -229,7 +229,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/bentley-interop (`95055b9a`) — 101 new, 101 to read @@ NEEDS RULING
+### feat/bentley-interop (`ad01d4f7`) — 101 new, 101 to read @@ NEEDS RULING
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -539,7 +539,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/desktop (`baba0f04`) — adds no English strings
 
-### feat/graph-bubble (`56863e58`) — 9 new, 9 to read @@ NEEDS RULING
+### feat/graph-bubble (`11236f20`) — 14 new, 14 to read @@ NEEDS RULING
 
 - **`lpn_copy_props_done`**
   > Copied properties of {id}.
@@ -567,6 +567,21 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 - **`lpn_paste_skip_valve`**
   > Not pasted: {n} (the valve types differ).
+  @@ NEEDS RULING
+- **`lpn_tsb_close`**
+  > Close graph
+  @@ NEEDS RULING
+- **`lpn_tsb_max`**
+  > Close a graph before opening another. Up to {n} stay open.
+  @@ NEEDS RULING
+- **`lpn_tsb_menu`**
+  > Time series graph
+  @@ NEEDS RULING
+- **`lpn_tsb_off_tip`**
+  > Needs extended period results. Set a Total run time in Settings, Calculation, Time, and calculate.
+  @@ NEEDS RULING
+- **`lpn_tsb_resize`**
+  > Drag to resize
   @@ NEEDS RULING
 
 ### feat/label-gang-search (`8b31a907`) — 3 new, all ruled
@@ -591,7 +606,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`2e5e81c4`) — adds no English strings
 
-### feat/match-property (`daa13a9c`) — 9 new, 9 to read @@ NEEDS RULING
+### feat/match-property (`05bda765`) — 10 new, 10 to read @@ NEEDS RULING
 
 - **`lpn_copy_props_done`**
   > Copied properties of {id}.
@@ -614,6 +629,9 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_paste_props_off_none`**
   > Nothing is copied. Right-click an asset and choose Copy properties.
   @@ NEEDS RULING
+- **`lpn_paste_props_off_select`**
+  > Select the assets to paste to, then choose Paste properties to selection.
+  @@ NEEDS RULING
 - **`lpn_paste_skip_breakdown`**
   > Not pasted: {n} (demand is a list of categories).
   @@ NEEDS RULING
@@ -621,7 +639,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Not pasted: {n} (the valve types differ).
   @@ NEEDS RULING
 
-### feat/shape (`554c2b24`) — 27 new, 27 to read @@ NEEDS RULING
+### feat/shape (`cb281a99`) — 27 new, 27 to read @@ NEEDS RULING
 
 - **`lpn_file_import_shapes`**
   > Import GeoJSON shapes…
@@ -705,12 +723,4 @@ build for that would be a gate nobody keeps. Refresh it with
   > Draw a point, a polyline, or a polygon on the map. A Shape is annotation and is not part of the network. Specify each point, then specify the last point again, press Enter, or right-click to finish. Specify the first point again to close the Shape into a polygon.
   @@ NEEDS RULING
 
-### feat/si-example (`0e3ef82d`) — adds no English strings
-
-### fix/paste-column (`a4e50f15`) — adds no English strings
-
-### fix/specific-gravity (`c4f3598b`) — 1 new, 1 to read @@ NEEDS RULING
-
-- **`lpn_settings_specific_gravity_tip`**
-  > Density of the fluid relative to water. It scales pressure in every unit, because a pressure in m or ft is a column of water, and it does not change head or HGL. It changes no flow.
-  @@ NEEDS RULING
+### feat/si-example (`01c5390c`) — adds no English strings

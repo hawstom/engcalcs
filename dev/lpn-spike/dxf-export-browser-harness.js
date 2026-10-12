@@ -118,7 +118,7 @@ async function exportOnce(a, card) {
 	// The page's own words, never pinned here: the read-me note and status templates.
 	const words = await a.page.evaluate(() => {
 		const pc = (window.EngCalcs || {}).pageConfig || {};
-		return { note: pc.lpn_dxf_note_geo || '', status: pc.lpn_dxf_exported_geo || '' };
+		return { grid: pc.lpn_dxf_note_grid || '', note: pc.lpn_dxf_note_geo || '', status: pc.lpn_dxf_exported_geo || '' };
 	});
 	return { count: downloads.length, name, text, notice, words };
 }
@@ -194,7 +194,7 @@ function checkDrawing(label, out, geo) {
 		ok(label + ': the status line names the file', out.notice.indexOf(out.name) >= 0, out.notice);
 	}
 	if (out.lang === 'zh') {
-		ok(label + ': the read-me states the unit as ft, not the page\'s translated symbol', / IN FT\. /.test(notes), notes.slice(0, 200));
+		ok(label + ': the read-me states the unit as the file\'s token FT, not the page\'s translated symbol', /(^|[^A-Z])FT([^A-Z]|$)/.test(notes) && !!out.words.grid && out.words.grid.toUpperCase().split(/\{\w+\}/).every((piece) => notes.replace(/\\U\+([0-9A-F]{4})/g, (m, h) => String.fromCharCode(parseInt(h, 16))).indexOf(piece.trim()) >= 0), notes.slice(0, 200));
 	}
 	ok(label + ': the read-me names the layer pattern', /C-WATR-MODL-NODE-BASE/.test(notes), notes.slice(0, 400));
 	const tmp = path.join(require('os').tmpdir(), NAME + '-' + process.pid + '-' + label.replace(/\W+/g, '_') + '.dxf');

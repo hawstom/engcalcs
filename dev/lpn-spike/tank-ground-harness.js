@@ -148,8 +148,8 @@ function tokens(text, section) {
 		gt.elevation === wt.elev && gt.base_elevation === wt.bottomElev, JSON.stringify(gt));
 
 	// Specific gravity reaches a tank's pressure exactly as it reaches a junction's, in each engine.
-	// (They differ from each other: the native solver multiplies by SG and EPANET, in metres, does
-	// not. That is older than this file and is not what it holds.)
+	// Both engines multiply by SG at their one door (a pressure in m or ft is a column of water);
+	// dev/lpn-spike/specific-gravity-harness.js holds that on Net1.
 	const sgModel = L.assembleModel();
 	sgModel.hydraulics = Object.assign({}, sgModel.hydraulics, { specificGravity: 1.1 });
 	const nat2 = EngCalcs.lpnSolve(sgModel), epa2 = await EngCalcs.lpnSolveEpanet(sgModel);
