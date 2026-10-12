@@ -235,6 +235,7 @@ async function main() {
 		console.log('\n--- 2. a reload keeps them ---');
 		await h.esc();
 		await a.reload(); await h.settle(1200);
+		await P.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } });   // a reload brings the banner back, over the map's lower edge
 		const d2 = await h.stored();
 		ok('after a reload the three Shapes are still stored', ((d2 && d2.shapes) || []).length === 3);
 		ok('...and drawn', await P.evaluate(() => document.querySelectorAll('#lpn_canvas .lpn-shape').length) === 3);
