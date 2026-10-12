@@ -706,3 +706,5 @@ red builds on 2026-09-15 before anybody wrote it down.
 - 0|636| CLOSED 2026-10-11 (Tom: "Wrap up"): custom properties shipped (Settings > Assets table, popup editor, every place an ordinary property appears); dev/custom-property-scope.md.
 - 0|763| CLOSED 2026-10-11 (Tom: "Wrap up"): the Guide (Help > Guide) merged from feat/user-guide; Find and replace is the model chapter. Rewriting the other chapters is Task 785.
 - 0|783| CLOSED 2026-10-11 (`feat/tank-volume`, Tom: "merge"): tank Depth and Usable volume (zero at the lowest water depth) in the Tanks table, Properties, Find and the time series; Recalculate OFF keeps them as a snapshot.
+- 0|759| CLOSED 2026-10-12: map selection is Select/Selected/Selection, menu and dialog options are chosen (`chore/selection-word`), single checkboxes say Checked (`fix/paste-column`), Tom's calls of 10-11 and 10-12; translations resynced in sprint 1012-delta.
+- 0|787| CLOSED 2026-10-12 (`feat/tank-ground`, Tom: "OK. Merge."): tank Elevation is the ground and pressure datum, Base elevation the tank bottom EPANET uses; the .inp cannot carry the ground.

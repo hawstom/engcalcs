@@ -99,42 +99,52 @@ lines rather than appending corrections.
   tile counts at a 900 ms settle (basemap.js now waits for a pointable tile). Pre-existing and unrelated: `scale-publish-harness.js` (2 checks). The full `node dev/browser-pass/run.js` is green (1853/1853, 2026-10-04, Task 761); browser-pass specs are not in
   check_all.
 
-## STATE — 2026-10-12 (fourteenth session, Arizona time)
+## STATE — 2026-10-12 (fifteenth session, Arizona time)
 
-### Master: f9bcdee1 (2026-10-12). Production: ask; About box
+### Master: c5f50997, pushed. Production: b7c99102 (10-09) when last read; ask, About box
 
-Merged on his typed word and pushed: chore/roadmap-1011c, fix/dxf-layer-code, feat/visit-dedupe, fix/run-report,
-fix/paste-quote, chore/selection-word; librewaternet.org `visit-code-claim` merged and pushed (226d1b8).
-feat/shape must still add `shape: 'SHAP'` to `ASSET_CODE` in js/lpn-dxf.js when master is next merged into it.
+Landed this session: feat/tank-ground (his "OK. Merge."); translation sprint 1012-delta (Wave 0, 149 keys x 26,
+QA, glossary terms 98 workspace and 99 base elevation); fix/specific-gravity (his rule: pressure = SG x (H - z) in
+water column, every unit; tip stays deleted per his 10-04 call); fix/paste-column (tab-less paste is one column;
+"Checked" for single checkboxes); fix/label-drag (the 2x jump: flip across the anchor line, aligned pipe labels);
+the pkill guard in .claude/hooks/guard-wait-loops.php; Mary's antecedent list (her research only, his words).
+**fix/label-drag answers his production report: it reaches production when he pulls master.**
 
 ### Branches awaiting his browser pass (pushed; all on the Branch previews page)
 
-- **feat/tank-ground** (0b488156, 8109; Task 787): Elevation = ground (pressure datum); Base elevation = tank
-  bottom = EPANET's; pressure at a tank = head - ground. File version 11 -> 12. Perry CONFIRMED. His call:
-  the .inp cannot carry the ground (round trip loses it). DXF/GeoJSON: plain elevation = ground everywhere.
-- **feat/si-example** (3883f0d2, 8111; Task 786): Net3 SI, Net3 US, Net2 SI, Net2 US first; drawing in metres
-  too; +9 MB of backdrop copies; titles "EPANET Net3, L/s (SI)" / "EPANET Net3, gpm (US)".
-- **feat/shape** (4166d068, 8108): open-pentagon icon; Shapes table (Points x/y|x/y, exact text kept); Perry
-  CONFIRMED. Shapefile/DXF import plan in dev/shapes.md.
-- **feat/match-property** (38f68c9a, 8117): his confirmation box and disabled-row tip; Demand pattern bug
-  fixed. Ida recommends Copy properties / Paste properties to selection (her journal 10-11; Task 185 at 50
-  is the old Match/Copy task). His call.
-- **feat/bentley-interop** (f43dde69, 8116): menu in his order; his tip finished; first override creates an
-  alternative named after the scenario (derived, not stored); no alert. Three questions in the 10-12 report.
+- **feat/match-property** (05bda765, 8117): Copy properties / Paste properties to selection, no box, memory
+  only, Match door gone. Perry CONFIRMED. MERGE ONLY TOGETHER WITH feat/bentley-interop: alone, pasting
+  elevation inside a scenario writes Base. His "The table is good": nobody can find which table; ask him.
+- **feat/graph-bubble** (11236f20, 8110; Task 784; cut from match-property, merges after it): speech-bubble
+  time-series graphs from the right-click; saved project-wide in doc.bubbles. Perry CONFIRMED; his two defects
+  fixed. His call: bubbles keep screen size, so a far zoom-out piles them over the network.
+- **feat/bentley-interop** (036f9d23, 8116; Task 721): every one of his 10-12 findings fixed; every property
+  overridable, tank bottomElev included (master merged in); Base choosable in every table cell; double-click a
+  name in the Scenarios TABLE makes it current. Perry CONFIRMED round 6; his three gaps fixed with real-mouse
+  checks. Test-merge with feat/match-property conflicts only in dev/new-english-keys.md.
+- **feat/si-example** (9df2f3f0, 8111; Task 786): eight cards, Net3/Net2 SI+US twins, backdrops only on Elm
+  Street; Net2 from his .epp but on the OSM map (satellite would be an unasked Mapbox request) and without his
+  label settings (symbology-table rule). Perry CONFIRMED scale bars. His notes miscount Net1 (9 junctions, 1 pump).
+- **feat/shape** (cb281a99, 8108): the icon is his freehand outline; DXF layer SHAP. Import stays on Task 779.
+- **feat/convert-search** (b71bb912, 8119): Convert as carries the chooser's place search into Step 1. Perry
+  CONFIRMED; a state- or country-size search makes a huge site width.
 
-### Questions out to him (10-12 report)
+### Questions out to him (10-12 second report)
 
-- Typing Elevation (and reservoir head pattern, tank limits/diameter/mixing, pump speed and pattern) while a
-  scenario is current silently writes Base for every scenario, on master. Refuse, warn, or allow per scenario?
-- One-column paste of "Main St" splits at the space (tab-less fallback), on master.
-- Specific gravity not 1: EPANET pressures unscaled, built-in scaled, on master.
-- KYPipe networks (CC BY-NC): ask the University of Kentucky authors before shipping any.
-- Delta translation sprint deferred until the merges land (many keys sit on branches).
+- Which table did "The table is good" mean (Match round 3)?
+- Graph bubbles piling on a far zoom-out: acceptable, or a hide-all control?
+- Net2 example: keep the OSM street map, or satellite with a privacy.php sentence?
+- Net1 note says 11 junctions, 2 pumps; the file has 9 and 1.
+- Bentley: deleting a scenario leaves its own alternatives unused in the file; "Copy, share them" makes edits
+  in the copy change the original with no note at that moment.
+- The English he had not read (103 keys on new-english-keys.md) went into sprint 1012 before he read it; the
+  list was emptied by the sprint. If he edits any, the drift check queues the retranslation.
 
 ### Next job
 
-The delta sprint (Wave 0 first). Agents' wish lists
-were not read this session.
+Merge on his typed word (classifier needs it typed): match-property + bentley-interop together (suite on the
+combined merge, then a paste-elevation-in-scenario check), then graph-bubble; si-example, shape, convert-search
+each on his all-clear. Then Task 788 (translation sweep) as a small sprint, and the keys waiting on branches.
 
 ### Traps met 2026-10-12 (fourteenth session)
 
@@ -143,6 +153,15 @@ were not read this session.
 - **CC's own brief was wrong** (SI twins: "coordinates unchanged"): the scale bar read metres on a feet
   drawing. A unit conversion converts the drawing too.
 - **Two translators returned "placeholder" as their report** with correct edits on disk. Read the diff.
+- **One agent's `pkill -f check_all.sh` killed every suite on the machine** (master twice, five agents). The
+  wait-loop guard now refuses a pkill/killall by a shared name; kill by PID after checking its cwd.
+- **A background Bash job of CC's died when a plugin was installed mid-run.** Start long suites with
+  `setsid nohup sh -c '... ; echo exit=$? >> log'` and wait with wait_for.sh --sentinel.
+- **Harnesses that hard-code an English fallback break the day the sprint translates the key** (three did).
+  Read the expected label from pageConfig or the language file.
+- **A sprint empties new-english-keys.md**: keys Tom had not read were translated before he read them.
+- **An agent re-added a tip Tom had deleted** because CC's brief asked to "update" it. Check
+  english-key-rulings and the deleted-key harness before briefing a string.
 
 ### Traps met 2026-10-11 (thirteenth session)
 
