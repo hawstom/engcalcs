@@ -875,7 +875,7 @@ $ec_lang['lpn_field_head_tip']='জলাধারে পানির উপর�
 // pipe-diameter unit would put a 15 m tank on screen as 15000. Same reason the three levels say
 // "measured up from the tank bottom" rather than leaving the datum to be guessed -- EPANET measures
 // a tank level from the vessel floor, not from the same zero the elevations use.
-$ec_lang['lpn_field_tank_base_elev_tip']='ট্যাংকের তলার উচ্চতা। ট্যাংকের পানির গভীরতা এখান থেকে উপরের দিকে পরিমাপ করা হয়।';
+$ec_lang['lpn_field_tank_base_elev_tip']='ট্যাংকের তলার উচ্চতা, যা থেকে পানির গভীরতা ও আয়তন পরিমাপ করা হয়। ফাঁকা রাখলে তলা ভূমির উচ্চতায় থাকে।';
 $ec_lang['lpn_field_tank_level']='পানির গভীরতা';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_field_tank_level_tip']='ট্যাংকে দাঁড়িয়ে থাকা পানির গভীরতা, ট্যাংকের তলা থেকে উপরের দিকে পরিমাপ করা। পানির উপরিতল হলো ট্যাংকের তলার উচ্চতা যোগ এই গভীরতা।';
@@ -891,7 +891,7 @@ $ec_lang['lpn_field_tank_diameter_tip']='ট্যাংকের এক পা�
 // 'head' is a documented trap term in glossary.json. This tip names it as a level, which is the
 // same guard lpn_field_head_tip carries for the reservoir.
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_tank_head_tip']='ট্যাংকে পানির উপরিতলের উচ্চতা: ট্যাংকের তলার উচ্চতা যোগ পানির গভীরতা। এই স্তরটিই সমাধানকারী ট্যাংকের জন্য ব্যবহার করে।';
+$ec_lang['lpn_tank_head_tip']='ট্যাংকে পানির উপরিতলের উচ্চতা: ট্যাংকের তলার উচ্চতা যোগ পানির গভীরতা।';
 $ec_lang['lpn_close']='বন্ধ করুন';
 // The property popup's own name, in its drag bar (Tom, 2026-09-08: *"maybe the right title is
 // 'Properties'"*). It names the BOX, not the element in it: lpn_popup_title below the bar carries
@@ -1187,7 +1187,7 @@ $ec_lang['lpn_area_none']='সেই এলাকায় কিছুই প�
 $ec_lang['lpn_tool_vertices_tip']='পাইপের শীর্ষবিন্দু যোগ ও সরান। শীর্ষবিন্দু যোগ করতে পাইপে একটি বিন্দু নির্দিষ্ট করুন, সরাতে একটি শীর্ষবিন্দু নির্বাচন করুন, এবং স্থানান্তর করতে একটি শীর্ষবিন্দু টেনে আনুন। শীর্ষবিন্দু স্বয়ংক্রিয় দৈর্ঘ্য বদলায়, কিন্তু স্থানীয় ক্ষতি যোগ বা পরিবর্তন করে না।';
 $ec_lang['lpn_tool_undo_tip']='পূর্বাবস্থায় ফেরার ইতিহাসের দৈর্ঘ্য = 20টি কাজ';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_tool_zoom_extent_tip']='পুরো নেটওয়ার্ক মানচিত্র উইন্ডোতে ধরান। জুম উইন্ডোর জন্য আবার চাপুন। মানচিত্রের ওপরের ডানের জুম নিয়ন্ত্রণও দেখুন।';
+$ec_lang['lpn_tool_zoom_extent_tip']='পুরো নেটওয়ার্ক মানচিত্র উইন্ডোতে ধরান। আগে পুরো নেটওয়ার্ক না ধরিয়ে জুম উইন্ডো ব্যবহার করতে W চাপুন, অথবা সম্পূর্ণ অঙ্কন দেখান টুলবার বোতামের কোণের ছোট ত্রিভুজে ক্লিক করুন। মানচিত্রের ওপরের ডানের জুম নিয়ন্ত্রণও দেখুন।';
 $ec_lang['lpn_tool_zoom_window_tip']='কোণ নির্দিষ্ট করুন অথবা একটি আয়তক্ষেত্র টানুন। সম্পূর্ণ অঙ্কন দেখান-এর জন্য আবার চাপুন।';
 // Tom's wording, 2026-09-25.
 $ec_lang['lpn_zoom_in_tip']='জুম ইন। শর্টকাট: +';
@@ -1204,7 +1204,7 @@ $ec_lang['lpn_find_menu_tip']='সহজ বা জটিল খুঁজুন 
 $ec_lang['lpn_help_icons']='টুলবার';
 // ---- The right panel: Visibility ----
 $ec_lang['lpn_pane_right_toggle']='দৃশ্যমানতা';
-$ec_lang['lpn_color_legend_open_tip']='রঙের সেটিংস খুলে এই রঙগুলো পরিবর্তন করতে নির্বাচন করুন।';
+$ec_lang['lpn_color_legend_open_tip']='রঙের সেটিংস খুলে এই রঙগুলো পরিবর্তন করতে চাপুন।';
 $ec_lang['lpn_color_node_field']='নোডের রঙ';
 $ec_lang['lpn_color_link_field']='পাইপের রঙ';
 $ec_lang['lpn_color_ramp_sequential']='অনুক্রমিক';
@@ -1365,7 +1365,7 @@ $ec_lang['lpn_run_menu_tip']='সিমুলেশন রান করুন।
 // out over time, and this switch is about the run, not about the drawing.
 $ec_lang['lpn_settings_auto_run']='স্বয়ংক্রিয়ভাবে পুনরায় গণনা করুন';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_settings_auto_run_tip']='পুনরায় গণনা খুব ধীর হলে বন্ধ করুন। গণনা করুন বোতাম লুকায়।';
+$ec_lang['lpn_settings_auto_run_tip']='পুনরায় গণনা খুব ধীর হলে বন্ধ করুন। এটি চালু থাকলে গণনা করুন বোতাম লুকানো থাকে।';
 // **AN EDIT SAYS NOTHING AT ALL WHEN THE SWITCH IS OFF** (Tom, 2026-09-19: *"Recalc off Old
 // values: Leave in place stale. Don't clear. Trust the user."*). `lpn_manual_results_cleared`
 // stood here for part of one day and is DELETED, English-only, never translated: it announced a
@@ -1567,12 +1567,12 @@ $ec_lang['lpn_profile_title']='একটি পথ ধরে প্রোফা�
 // the map to see the path, click to add a stop, double-click to finish.
 $ec_lang['lpn_profile_draw_start']='যে নোড থেকে পথ শুরু হবে সেটি নির্বাচন করুন।';
 $ec_lang['lpn_profile_draw_more']='পথ দেখতে মানচিত্রের ওপর সরান। একটি নোড যোগ করতে সেটি নির্বাচন করুন। শেষ করতে ডাবল-ক্লিক করুন। Esc বাতিল করে।';
-$ec_lang['lpn_profile_draw_blocked']='{a} থেকে {b} পর্যন্ত কোনো পথ নেই। অন্য একটি নোড বেছে নিন।';
+$ec_lang['lpn_profile_draw_blocked']='{a} থেকে {b} পর্যন্ত কোনো পথ নেই। অন্য একটি নোড নির্বাচন করুন।';
 $ec_lang['lpn_profile_tap_start']='যে নোড থেকে পথ শুরু হবে সেটি নির্বাচন করুন।';
 $ec_lang['lpn_profile_tap_more']='পথ দেখতে একটি নোড নির্বাচন করুন। এটি যোগ করতে চেপে ধরে রাখুন। শেষ করতে ডাবল-ট্যাপ করুন। বাতিল করতে আবার প্রোফাইল চাপুন।';
-$ec_lang['lpn_profile_say_idle']='মানচিত্রে নতুন একটি পথ বেছে নিতে আবার প্রোফাইল চাপুন।';
-$ec_lang['lpn_profile_none']='এখনও কোনো পথ নেই। মানচিত্রে একটি বেছে নিতে আবার প্রোফাইল চাপুন।';
-$ec_lang['lpn_profile_choose']='একটি শুরুর নোড ও একটি শেষের নোড বেছে নিন।';
+$ec_lang['lpn_profile_say_idle']='মানচিত্রে নতুন একটি পথ নির্বাচন করতে আবার প্রোফাইল চাপুন।';
+$ec_lang['lpn_profile_none']='এখনও কোনো পথ নেই। মানচিত্রে একটি নির্বাচন করতে আবার প্রোফাইল চাপুন।';
+$ec_lang['lpn_profile_choose']='একটি শুরুর নোড ও একটি শেষের নোড নির্বাচন করুন।';
 $ec_lang['lpn_profile_no_path']='এই দুটি নোড কোনো পথ দিয়ে সংযুক্ত নয়।';
 $ec_lang['lpn_profile_no_solve']='এখনও কোনো ফলাফল নেই, তাই শুধু ভূমির রেখাটিই আঁকা হয়েছে।';
 $ec_lang['lpn_profile_summary']='নোড: {n}, দৈর্ঘ্য: {len} {u}';
@@ -1967,7 +1967,7 @@ $ec_lang['lpn_msglog_empty']='এখনও কোনো বার্তা ন�
 // The wrapper around lpn_ago_seconds and its siblings, so a language can put the word for "ago"
 // wherever its own grammar wants it.
 $ec_lang['lpn_msglog_ago']='{x} আগে';
-$ec_lang['lpn_msglog_note']='সবচেয়ে নতুনটি প্রথমে। এই পৃষ্ঠা খোলা থাকা অবস্থায় সর্বশেষ {n}টি বার্তা রাখে, এবং আপনার কম্পিউটারে কিছুই সংরক্ষিত হয় না।';
+$ec_lang['lpn_msglog_note']='সবচেয়ে নতুনটি প্রথমে। এই পৃষ্ঠা খোলা থাকা অবস্থায় সর্বশেষ {n}টি বার্তা রাখে এবং সেগুলো আপনার কম্পিউটারে সংরক্ষণ করে না।';
 // Read-only means read-only: it never turns itself back into an editable file while you are looking
 // at it, and it never offers to save over the other person\'s file. It cannot -- their file has moved
 // on since you opened it, so writing yours over it would destroy their work. What you CAN do is
@@ -2095,7 +2095,7 @@ $ec_lang['lpn_notes_6_term']='টেবিল কলাম সহায়তা
 $ec_lang['lpn_notes_6_def']='<table class="lpn-notes-table"><tbody><tr><td>শিরোনামে ক্লিক করুন</td><td>কলাম নির্বাচন করুন</td></tr><tr><td>Ctrl+ক্লিক অথবা Shift+ক্লিক অন্য শিরোনামে</td><td>কলাম নির্বাচন যোগ বা প্রসারিত করুন</td></tr><tr><td>টেনে আনুন অথবা রাইট-ক্লিক বা ⋮ মেনুতে কলাম পরিচালনা করুন… ব্যবহার করুন</td><td>নির্বাচিত কলাম(গুলো) সরান (পুনর্বিন্যাস করুন)</td></tr><tr><td>একটি শিরোনামের উপরের কোণে হোভার করুন, অথবা একটি শিরোনামে নির্বাচন করুন বা Tab করুন</td><td>মেনু ⋮ ও সাজানোর তীরচিহ্ন।</td></tr><tr><td>শিরোনামে রাইট-ক্লিক করুন বা শিরোনামের উপরের ডান কোণে ⋮ মেনু</td><td>লুকান, সব দেখান, অথবা দৃশ্যমানতা ও ক্রম পরিচালনা করুন</td></tr><tr><td>শিরোনামের উপরের ডান কোণে তীরচিহ্ন আইকন</td><td>কলাম অনুসারে সাজান</td></tr><tr><td>রাইট-ক্লিক, শিরোনামের উপরের ডান কোণে ⋮ মেনু, অথবা Ctrl+Shift+V</td><td>টেবিলের শেষে নতুন সারি হিসেবে পেস্ট করুন</td></tr></tbody></table>';
 $ec_lang['lpn_notes_7_term']='টেবিল কিবোর্ড শর্টকাট';
 // R-311, his own row: "Ctrl+Shift+V | Paste as new rows at end of table".
-$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>তীর কী</td><td>নেভিগেট করুন।</td></tr><tr><td>Tab, Enter</td><td>প্রবেশ শেষ করুন এবং একটি কক্ষ পাশে / নিচে নেভিগেট করুন।</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>পেছনে নেভিগেট করুন।</td></tr><tr><td>Shift+তীর কী</td><td>নির্বাচন প্রসারিত করুন।</td></tr><tr><td>Ctrl+C</td><td>নির্বাচন কপি করুন।</td></tr><tr><td>Ctrl+D</td><td>নির্বাচনকে এর উপরের সারি থেকে নিচে পূরণ করুন।</td></tr><tr><td>Ctrl+Enter</td><td>নির্বাচনকে সক্রিয় কক্ষের মান দিয়ে পূরণ করুন।</td></tr><tr><td>Ctrl+A</td><td>পুরো টেবিল নির্বাচন করুন।</td></tr><tr><td>Ctrl+Shift+V</td><td>টেবিলের শেষে নতুন সারি হিসেবে পেস্ট করুন।</td></tr><tr><td>Ctrl+Shift+PageDown, Ctrl+Shift+PageUp</td><td>পরবর্তী বা পূর্ববর্তী ট্যাবে যান, তা টেবিল হোক বা গ্রাফ।</td></tr><tr><td>Delete</td><td>একটি কক্ষ পরিষ্কার করুন।</td></tr><tr><td>F2</td><td>সম্পাদনার জন্য একটি কক্ষ খুলুন।</td></tr><tr><td>Esc</td><td>সম্পাদনা বাতিল করুন।</td></tr></tbody></table>';
+$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>তীর কী</td><td>নেভিগেট করুন।</td></tr><tr><td>Tab, Enter</td><td>এন্ট্রি শেষ করুন এবং একটি কক্ষ পাশে (Tab) বা নিচে (Enter) যান।</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>একটি কক্ষ পেছনে (Shift+Tab) বা ওপরে (Shift+Enter) যান।</td></tr><tr><td>Shift+তীর কী</td><td>নির্বাচন প্রসারিত করুন।</td></tr><tr><td>Ctrl+C</td><td>নির্বাচন কপি করুন।</td></tr><tr><td>Ctrl+D</td><td>নির্বাচনকে এর ওপরের সারি থেকে নিচে পূরণ করুন।</td></tr><tr><td>Ctrl+Enter</td><td>নির্বাচনকে সক্রিয় কক্ষের মান দিয়ে পূরণ করুন।</td></tr><tr><td>Ctrl+A</td><td>পুরো টেবিল নির্বাচন করুন।</td></tr><tr><td>Ctrl+Shift+V</td><td>টেবিলের শেষে নতুন সারি হিসেবে পেস্ট করুন।</td></tr><tr><td>Ctrl+Shift+PageDown, Ctrl+Shift+PageUp</td><td>পরবর্তী বা পূর্ববর্তী ট্যাবে যান, তা টেবিল হোক বা গ্রাফ।</td></tr><tr><td>Delete</td><td>সক্রিয় কক্ষ খালি করুন। নির্বাচিত পরিসর খালি করতে রাইট-ক্লিক করে Delete বেছে নিন।</td></tr><tr><td>F2</td><td>সম্পাদনার জন্য একটি কক্ষ খুলুন।</td></tr><tr><td>Esc</td><td>সম্পাদনা বাতিল করুন।</td></tr></tbody></table>';
 // COLOR BAND LIMITS ARE FROZEN, NOT LIVE (Task 448). Tom, 2026-08-19: *"colors are subconsciously
 // expected to be stable through an animation... recomputing at each time step gives a wrong
 // impression of the system. In this we are ratifying EPANET."* The mechanism is
@@ -2110,7 +2110,7 @@ $ec_lang['lpn_id_invalid']='কোনো ফাঁকা স্থান বা 
 $ec_lang['lpn_id_taken']='সেই ID ইতিমধ্যে ব্যবহৃত হচ্ছে।';
 $ec_lang['lpn_diag_no_fixed_head']='একটি জলাধার বা একটি ট্যাংক যোগ করুন। সমাধান করার আগে নেটওয়ার্কে অন্তত একটি জানা পানির স্তর থাকা প্রয়োজন।';
 $ec_lang['lpn_diag_dangling_link']='একটি পাইপ বা পাম্প এমন একটি নোডের সাথে সংযুক্ত যা আর নেই:';
-$ec_lang['lpn_diag_unreachable']='এই নোডগুলোর কোনো জলাধারে যাওয়ার পথ নেই:';
+$ec_lang['lpn_diag_unreachable']='এই নোডগুলো থেকে কোনো জলাধার বা ট্যাংকে যাওয়ার পথ নেই:';
 // BOTH OF THESE NAME THE VALVES. The page ends each one with a list of IDs, which is the reason
 // this calculator writes its own messages instead of showing EPANET\'s numbered errors: a person
 // looking at a drawing can act on \'V3\' and can do nothing at all with \'error 110\'.
@@ -2252,7 +2252,7 @@ $ec_lang['lpn_pump_effic_curve']='পাম্প দক্ষতার কা�
 $ec_lang['lpn_pump_effic_curve_tip']='লাইব্রেরি বাক্সের যে কার্ভ প্রতিটি প্রবাহে এই পাম্পের দক্ষতা দেয়। একাধিক পাম্প একই কার্ভ ব্যবহার করতে পারে, এবং সেখানে সম্পাদনা করলে সবগুলো বদলায়। এই পাম্প শুধু রেফারেন্স রাখে; বিন্দুগুলো লাইব্রেরি, কার্ভ-এর অধীনে পড়া ও সম্পাদনা করা হয়।';
 // **THE STRINGS EVERY CURVE CONTROL SHARES** (Task 586). One chooser serves a pump's head curve, a
 // pump's efficiency curve and a valve's head-loss curve, so its fixed entries are keyed once.
-$ec_lang['lpn_curve_none']='কোনো কার্ভ বাছাই করা হয়নি';
+$ec_lang['lpn_curve_none']='কোনো কার্ভ বেছে নেওয়া হয়নি';
 // **THE CHOOSER OFFERS NO WAY TO MAKE A CURVE** (Tom, 2026-09-05: *"Pump properties has no 'New
 // curve...' button. And it shouldn't unless that's a link to the Curves library."*). It offered
 // one, and it made curve DATA from inside a pump's properties. This is the link that replaced it,
@@ -2286,7 +2286,7 @@ $ec_lang['lpn_pump_effic_col']='দক্ষতা';
 // is three fixed rows, because this page FITS a head curve from at most three points while EPANET
 // reads an efficiency curve directly: truncating an imported five-point curve would be rewriting
 // numbers that are the user's.
-$ec_lang['lpn_pump_effic_global']='এই পাম্পের জন্য কোনো দক্ষতার কার্ভ বাছাই করা হয়নি, তাই এটি পুরো নেটওয়ার্কের জন্য নির্ধারিত দক্ষতা, {percent}-এ চলে।';
+$ec_lang['lpn_pump_effic_global']='এই পাম্পের জন্য কোনো দক্ষতার কার্ভ বেছে নেওয়া হয়নি, তাই এটি পুরো নেটওয়ার্কের জন্য নির্ধারিত দক্ষতা, {percent}-এ চলে।';
 $ec_lang['lpn_pump_effic_unstated']='এই পাম্প {name} নামের একটি দক্ষতার কার্ভের কথা বলে, যা এই প্রকল্পে কিছুই নির্ধারণ করে না, তাই এটি পুরো নেটওয়ার্কের জন্য নির্ধারিত দক্ষতা, {percent}-এ চলে।';
 // Persistent mode-hint line (Task 146.01 follow-up, 2026-07-30): whole sentences, not composed
 // from a "Mode:" prefix + the tool's own label, per CLAUDE.md's concept-level label reuse rule --
@@ -2524,7 +2524,7 @@ $ec_lang['lpn_backdrop_scale_prompt2']='দুই বিন্দুর মধ�
 // one move. The second names the panel it is about to show, so the alert and the panel read as one
 // step rather than two.
 $ec_lang['lpn_backdrop_position_prompt1']='সরানোর জন্য (ছবির ওপর) ভিত্তি বিন্দু নির্দিষ্ট করুন।';
-$ec_lang['lpn_backdrop_position_prompt2']='গন্তব্য বিন্দুর পদ্ধতি বেছে নিন, তারপর চালিয়ে যান বেছে নিন।';
+$ec_lang['lpn_backdrop_position_prompt2']='গন্তব্য বিন্দুর পদ্ধতি বেছে নিন, তারপর চালিয়ে যান চাপুন।';
 // The standing "you are in the middle of something" bar, shown while a background-image scale or
 // move is waiting for a click. It carries the only visible way out of that state.
 $ec_lang['lpn_backdrop_busy']='পটভূমি চিত্র সমন্বয় করা হচ্ছে।';
@@ -2719,7 +2719,7 @@ $ec_lang['lpn_elev_dem_use_tip']='এই নোডে DEM-এর উচ্চত
 $ec_lang['lpn_elev_dem_none']='এই নোডের জন্য DEM-এ কোনো উচ্চতা নেই।';
 $ec_lang['lpn_elev_dem_said']='Mapbox DEM উচ্চতা: {v} {u}।';
 $ec_lang['lpn_settings_elev_source']='উচ্চতার উৎস';
-$ec_lang['lpn_settings_elev_source_tip']='2026 Mapbox DEM-এর অনুভূমিক ও উল্লম্ব নির্ভুলতার পরিসর: যুক্তরাষ্ট্রে 1–10 মিটার ও <1 মিটার, ইউরোপ ও জাপানে 2–10 মিটার ও 1–3 মিটার, বিশ্বব্যাপী 30 মিটার ও 10–16 মিটার, এবং মেরু অঞ্চলে 90 মিটার ও >16 মিটার।';
+$ec_lang['lpn_settings_elev_source_tip']='2026 সালে Mapbox DEM-এর নির্ভুলতা, প্রথমে অনুভূমিক তারপর উল্লম্ব: যুক্তরাষ্ট্রে 1–10 মিটার ও 1 মিটারের কম, ইউরোপ ও জাপানে 2–10 মিটার ও 1–3 মিটার, বিশ্বব্যাপী 30 মিটার ও 10–16 মিটার, এবং মেরু অঞ্চলে 90 মিটার ও 16 মিটারের বেশি।';
 $ec_lang['lpn_settings_elev_source_typed']='উপরে';
 $ec_lang['lpn_settings_elev_source_dem']='Mapbox DEM ডেটা';
 $ec_lang['lpn_settings_accuracy']='নির্ভুলতা';
@@ -3028,7 +3028,7 @@ $ec_lang['lpn_settings_sec_calculation']='হিসাব';
 // would follow Node styles"), so this section has one control and no checkboxes: how close the
 // view has to be before a service is worth lettering.
 $ec_lang['lpn_settings_sym_customer']='গ্রাহক';
-$ec_lang['lpn_labels_customer_note']='একটি গ্রাহক লেবেল এখানে নির্বাচিত মানগুলো দেখায়। এটি মানচিত্রের অন্য প্রতিটি লেবেলের একই টেক্সট আকারে আঁকা হয়।';
+$ec_lang['lpn_labels_customer_note']='একটি গ্রাহক লেবেল এখানে বেছে নেওয়া মানগুলো দেখায়। এটি মানচিত্রের অন্য প্রতিটি লেবেলের মতো একই টেক্সট আকারে আঁকা হয়।';
 // **THE ROW NAME IS lpn_settings_label_max_width NOW, NOT A KEY OF ITS OWN** (Tom, 2026-09-23:
 // "Make the Customer labels and All labels zoom limits settings interfaces identical... Both to
 // say 'Show labels when zoomed to this map width or less'"). KEY DELETED: lpn_labels_customer_width
@@ -3395,7 +3395,7 @@ $ec_lang['lpn_library_pipetype_in_use']='এই পাইপের ধরন {co
 // The pipe popup\'s own selector and the two controls beside it.
 $ec_lang['lpn_field_pipetype']='পাইপের ধরন';
 $ec_lang['lpn_field_pipetype_tip']='প্রকল্প লাইব্রেরির যে পাইপের ধরন এই পাইপটি ব্যবহার করে। পাইপের ধরনে অন্তর্ভুক্ত বৈশিষ্ট্যগুলো এখানে সম্পাদনার জন্য নিষ্ক্রিয় থাকে। এখানে সম্পাদনা সক্রিয় করতে পাইপের ধরন থেকে বিচ্ছিন্ন করুন।';
-$ec_lang['lpn_pipetype_none']='কোনো পাইপের ধরন নির্বাচিত নয়';
+$ec_lang['lpn_pipetype_none']='কোনো পাইপের ধরন বেছে নেওয়া হয়নি';
 $ec_lang['lpn_pipetype_detach']='পাইপের ধরন থেকে বিচ্ছিন্ন করুন';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_pipetype_detach_tip']='এই পাইপ তার ধরন থেকে যে মান পড়ে তা পাইপের মধ্যে কপি করুন এবং ধরন ব্যবহার বন্ধ করুন। পাইপের মান এখন বদলায় না, এবং এখন থেকে এই মানগুলো এখানে সম্পাদনা করা হয়।';
@@ -3461,7 +3461,7 @@ $ec_lang['lpn_fitting_total']='মোট স্থানীয় ক্ষত�
 $ec_lang['lpn_field_fittings']='ফিটিংস তালিকা';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_field_fittings_tip']='প্রকল্প লাইব্রেরির ফিটিংসের একটি তালিকা। এর পরিমাণ ও সহগ যোগ হয়ে এই পাইপের স্থানীয় ক্ষতি সহগ হয়, এবং তখন সহগের বাক্সটি শুধু পড়ার জন্য থাকে। সহগ নিজে লিখতে এটি অনির্বাচিত রাখুন।';
-$ec_lang['lpn_fittings_none']='কোনো ফিটিংস তালিকা নির্বাচিত নয়';
+$ec_lang['lpn_fittings_none']='কোনো ফিটিংস তালিকা বেছে নেওয়া হয়নি';
 // EPANET 2.2 user manual, Table 3.3, Minor Loss Coefficients for Selected Fittings. THE MANUAL\'S
 // OWN THIRTEEN NAMES, in its own order. CLAUDE.md: default to the EPANET terminology, since a
 // hydraulic engineer has to recognise every one of these.
@@ -3960,7 +3960,7 @@ $ec_lang['lpn_ff_rows_more_links']='দেখানো হয়নি এমন
 $ec_lang['lpn_crit_menu']='গুরুত্ব বিশ্লেষণ…';
 $ec_lang['lpn_crit_menu_tip']='নেটওয়ার্ক থেকে প্রতিটি পাইপ, পাম্প ও ভালভ একে একে সরান এবং সিস্টেমের ওপর প্রভাব জানান।';
 $ec_lang['lpn_crit_title']='গুরুত্ব বিশ্লেষণ';
-$ec_lang['lpn_crit_intro']='প্রতিটি উপাদান একে একে নেটওয়ার্ক থেকে সরানো হয়, এবং সক্রিয় দৃশ্যকল্পে পর্দায় দেখানো সময়ধাপে নেটওয়ার্কটি সমাধান করা হয়। আপনার প্রকল্পে কিছুই পরিবর্তিত হয় না; পুরো রানটি একটি কপির ওপর চলে।';
+$ec_lang['lpn_crit_intro']='প্রতিটি উপাদান একে একে নেটওয়ার্ক থেকে সরানো হয়, এবং সক্রিয় দৃশ্যকল্পে পর্দায় দেখানো সময় ধাপে নেটওয়ার্কটি সমাধান করা হয়। প্রকল্পে কিছুই পরিবর্তিত হয় না; পুরো রানটি একটি অনুলিপির ওপর চলে।';
 $ec_lang['lpn_crit_scope']='যেসব লিংক ভাঙা হবে';
 $ec_lang['lpn_crit_scope_tip']='সব পাইপ, পাম্প ও ভালভ, অথবা শুধু মানচিত্রে নির্বাচিতগুলো। চালানোর আগে সেটটি বেছে নিন।';
 $ec_lang['lpn_crit_scope_all']='সব লিংক';
@@ -4006,7 +4006,7 @@ $ec_lang['lpn_fb_pick_wording']='শব্দচয়ন বা অনুবা
 $ec_lang['lpn_fb_pick_confusing']='এটি বিভ্রান্তিকর';
 $ec_lang['lpn_fb_comment']='মন্তব্য (ঐচ্ছিক)';
 $ec_lang['lpn_fb_email']='ইমেইল (ঐচ্ছিক, শুধু উত্তর চাইলে)';
-$ec_lang['lpn_fb_sends']='এটি যা পাঠায়: এই পেজের নাম, আপনার ভাষা, সাইটের সংস্করণ, মানচিত্রে বার্তা থাকলে তার কোড, এবং আপনি যা বেছেছেন বা লিখেছেন। আপনার আঁকা বা নেটওয়ার্ক কখনোই নয়। আপনার ইমেইল ঠিকানা শুধু উত্তর দেওয়ার জন্য ব্যবহার করা হয়।';
+$ec_lang['lpn_fb_sends']='এটি যা পাঠায়: এই পৃষ্ঠার নাম, আপনার ভাষা, সাইটের সংস্করণ, মানচিত্রে বার্তা থাকলে তার কোড, এবং আপনি যা বেছে নিয়েছেন বা লিখেছেন। আপনার অঙ্কন বা আপনার নেটওয়ার্ক কখনোই নয়। আপনার ইমেইল ঠিকানা শুধু আপনাকে উত্তর দেওয়ার জন্য ব্যবহার করা হয়।';
 $ec_lang['lpn_fb_send']='পাঠান';
 $ec_lang['lpn_fb_sending']='পাঠানো হচ্ছে…';
 $ec_lang['lpn_fb_failed']='এটি আমাদের কাছে পৌঁছায়নি। আপনি যা লিখেছেন তা এখানেই আছে, তাই আবার চেষ্টা করতে পারেন।';
@@ -4025,14 +4025,14 @@ $ec_lang['lpn_change_type_menu']='ধরন পরিবর্তন করু�
 $ec_lang['lpn_change_type_tip']='নির্বাচিত নোডগুলোকে সংযোগস্থল, জলাধার বা ট্যাংকে, অথবা নির্বাচিত লিংকগুলোকে পাইপ, পাম্প বা ভালভে পরিবর্তন করুন। প্রতিটি তার আইডি, অবস্থান, সংযোগ এবং নতুন ধরনেও থাকা সব মান বজায় রাখে। কিছু হারিয়ে গেলে আগে আপনাকে জিজ্ঞাসা করা হয়।';
 $ec_lang['lpn_change_type_ok']='পরিবর্তন করুন';
 $ec_lang['lpn_change_type_lost']='এই মানগুলো হারিয়ে যাবে:';
-$ec_lang['lpn_change_type_key']='আইডি: হারানো এন্ট্রি';
+$ec_lang['lpn_change_type_key']='প্রতিটি লাইন: ID: যে বৈশিষ্ট্য ও মান হারিয়ে যাবে';
 $ec_lang['lpn_change_type_line']='{id}: {property}, {value}';
 $ec_lang['lpn_change_type_line_scenario']='{id}: {property} {value}, দৃশ্যকল্প {scenario}-এ';
 $ec_lang['lpn_change_type_more']='আরও {n}টি।';
 $ec_lang['lpn_change_type_surface']='এগুলো পানির তল আগের জায়গায় রাখে। জলাধারের হেড হলো ট্যাংকের উচ্চতা ও তার পানির গভীরতার যোগফল, আর ট্যাংকের পানির গভীরতা হলো জলাধারের হেড থেকে তার উচ্চতা বিয়োগ করলে যা থাকে:';
 $ec_lang['lpn_change_type_meaning']='এই কন্ট্রোল ও রুলগুলো পরিবর্তনাধীন একটি নোডকে পরীক্ষা করে, এবং সেটিকে ভিন্নভাবে পড়বে: সংযোগস্থল পরীক্ষিত হয় চাপ দিয়ে, আর ট্যাংক বা জলাধার পানির স্তর দিয়ে।';
 $ec_lang['lpn_change_type_born']='এই মানগুলো নতুন, নতুন আঁকা অ্যাসেটের মতো নির্ধারিত:';
-$ec_lang['lpn_change_type_no_curve']='{id}: পাম্প হেড কার্ভ নেই, তাই কার্ভ নির্বাচন না করা পর্যন্ত পাম্প কোনো হেড যোগ করে না, এবং .inp এক্সপোর্টে এটি পাইপ হিসেবে লেখা হয়';
+$ec_lang['lpn_change_type_no_curve']='{id}: পাম্পের হেড কার্ভ বেছে নেওয়া নেই, তাই একটি বেছে না নেওয়া পর্যন্ত পাম্প কোনো হেড যোগ করে না, এবং .inp এক্সপোর্টে এটি পাইপ হিসেবে লেখা হয়';
 $ec_lang['lpn_change_type_becomes']='{id}: {property} {value}, দৃশ্যকল্প {scenario}-এ, হয়ে যায় {new}';
 $ec_lang['lpn_change_type_customers']='শুধু পাইপ গ্রাহককে সেবা দেয়, তাই এই গ্রাহকরা বদলে বন্ধনীতে দেখানো নোডের সাথে যুক্ত হয়, যেখানে তাদের চাহিদা ইতিমধ্যেই প্রয়োগ করা আছে। তারা যেখানে আঁকা আছে সেখানেই থাকে, এবং তাদের চাহিদা অপরিবর্তিত থাকে:';
 $ec_lang['lpn_change_type_setting']='এই কন্ট্রোল ও রুলগুলো পরিবর্তনাধীন একটি লিংকের সেটিং দেয় বা পরীক্ষা করে। সেটিং পাইপ, পাম্প ও ভালভে ভিন্ন রাশি, তাই এগুলো সেটিংটি ভিন্নভাবে পড়বে:';
@@ -4191,7 +4191,7 @@ $ec_lang['lpn_pda_deficit_note']='চাহিদার চেয়ে কম �
 $ec_lang['lpn_diag_pda_pressures']='প্রয়োজনীয় চাপ সর্বনিম্ন চাপের চেয়ে বেশি হতে হবে। সেটিংসে একটি বদলান।';
 $ec_lang['lpn_inp_drop_pressure_unit']='এই ফাইলে এমন একটি চাপের একক আছে যা এই পেজ তার প্রবাহ এককের জন্য যা পড়ে তার চেয়ে ভিন্ন, অর্থাৎ US এককের জন্য psi এবং অন্যথায় মিটার। ফাইলের প্রতিটি চাপ সেভাবেই পড়া হয়, তাই এতে থাকা ভালভ সেটিং, এমিটার ও চাপ-চালিত সীমা পরীক্ষা করুন। লাইনটি রাখা হয়েছে এবং আবার লেখা হয়।';
 $ec_lang['lpn_screenshot_menu']='স্ক্রিনশট';
-$ec_lang['lpn_screenshot_tip']='আপনি যে মানচিত্র এলাকা টেনে বেছে নেন তার স্ক্রিনের চেয়ে স্পষ্ট একটি ছবি কপি করুন, রিপোর্টে পেস্ট করার জন্য প্রস্তুত। না টেনে ক্লিক করলে পুরো মানচিত্র নেওয়া হয়।';
+$ec_lang['lpn_screenshot_tip']='আপনি যে মানচিত্র এলাকা টেনে নেন তার ছবি তুলুন, স্ক্রিনের চেয়ে বেশি রেজোলিউশনে। এতে চিহ্ন দিন, তারপর কপি বোতাম দিয়ে রিপোর্টে কপি করুন। না টেনে ক্লিক করলে পুরো মানচিত্র নেওয়া হয়।';
 $ec_lang['lpn_screenshot_hint']='মানচিত্রের ওপর একটি আয়তক্ষেত্র টানুন, অথবা পুরো মানচিত্রের জন্য ক্লিক করুন। Esc বাতিল করে।';
 $ec_lang['lpn_screenshot_copied']='স্ক্রিনশট কপি করা হয়েছে।';
 $ec_lang['lpn_screenshot_saved']='এখানে ক্লিপবোর্ড পাওয়া যায় না, তাই স্ক্রিনশটটি PNG ফাইল হিসেবে ডাউনলোড করা হয়েছে।';
@@ -4207,3 +4207,117 @@ $ec_lang['lpn_snip_tip_eraser']='ইরেজার: একটি আঁচড�
 $ec_lang['lpn_snip_tip_undo']='পূর্বাবস্থায় ফিরুন (Ctrl+Z)';
 $ec_lang['lpn_snip_tip_redo']='পুনরায় করুন (Ctrl+Y)';
 $ec_lang['lpn_screenshot_scale_tip']='স্ক্রিনের এলাকার গুণিতক হিসেবে ছবির আকার। বড়টি বেশি স্পষ্ট এবং ফাইল বড় করে।';
+$ec_lang['points_data_points_heading']='পয়েন্ট ডেটা<br />(ফরম্যাট দেখতে কপি ব্যবহার করুন)';
+$ec_lang['lpn_field_tank_base_elev']='তলার উচ্চতা';
+$ec_lang['lpn_tank_ground_elev_tip']='ট্যাংকের স্থানের ভূমির উচ্চতা। সংযোগস্থলের মতোই ট্যাংকের চাপ এখান থেকে পরিমাপ করা হয়।';
+$ec_lang['lpn_guide_about_heading']='এই ক্যালকুলেটর সম্পর্কে';
+$ec_lang['lpn_guide_group_from']='{menu} থেকে';
+$ec_lang['lpn_guide_menu_named']='{menu} মেনু';
+$ec_lang['lpn_help_manual']='নির্দেশিকা';
+$ec_lang['lpn_guide_contents']='সূচিপত্র';
+$ec_lang['lpn_guide_rail_hide']='সূচিপত্র লুকান';
+$ec_lang['lpn_guide_rail_show']='সূচিপত্র দেখান';
+$ec_lang['lpn_guide_search']='নির্দেশিকায় অনুসন্ধান করুন';
+$ec_lang['lpn_guide_boxes_heading']='বাক্স';
+$ec_lang['lpn_guide_boxes_intro']='প্রতিটি বাক্স সরানো, আকার বদলানো, মানচিত্রের বামে বা ডানে ডক করা, অথবা বন্ধ করা যায়। বাক্সের টাইটেল বারের ? সেই বাক্সের সহায়তা খোলে।';
+$ec_lang['lpn_guide_boxes_autohide']='পয়েন্টার সরে গেলে ফোকাসহীন একটি বাক্স অল্প বিলম্বের পর লুকিয়ে যায়। ফোকাসযুক্ত একটি বাক্স লুকায় যখন আপনি এর বাইরে ক্লিক করেন, Esc চাপেন, অথবা পয়েন্টার অন্যত্র থাকা অবস্থায় Tab দিয়ে এর বাইরে যান।';
+$ec_lang['lpn_guide_box_help']='এই বাক্সের সহায়তা';
+$ec_lang['lpn_guide_box_named']='{box} বাক্স';
+$ec_lang['lpn_guide_dimmed']='ধূসর করা একটি নাম এমন একটি বোতাম, যা এখন টুলবারে লুকানো আছে।';
+$ec_lang['lpn_guide_text_popup']='নির্বাচিত উপাদান বা টেক্সটের, অথবা একাধিক নির্বাচিত উপাদানের, বৈশিষ্ট্য নির্বাচনের পাশে, অথবা বাক্সটি সর্বশেষ যেখানে সরানো হয়েছিল সেখানে দেখায়। সম্পাদিত একটি মান তৎক্ষণাৎ নেটওয়ার্ক বদলায়, এবং উপাদানের মানচিত্র লেবেল ও টেবিল প্যানেল সেটি অনুসরণ করে। সর্বশেষ গণনার ফলাফল ইনপুটের নিচে তালিকাভুক্ত থাকে এবং সম্পাদনা করা যায় না।';
+$ec_lang['lpn_guide_text_find_popup']='একটি শর্ত পূরণকারী উপাদান খুঁজে বের করে, যেমন 8 in.-এর চেয়ে ছোট প্রতিটি পাইপ বা 40 psi-এর নিচের প্রতিটি সংযোগস্থল, এবং সবগুলোর একটি বৈশিষ্ট্য এক ক্রিয়ায় বদলাতে পারে। সমাধানের আগে মডেল যাচাই করতে (অনুপস্থিত উচ্চতা, ভুল এককে লেখা ব্যাস), সমাধানের পরে সমস্যার স্থানগুলো তালিকাভুক্ত করতে (কম চাপ, বেশি বেগ), এবং অনেক উপাদানে একটি সংশোধন করতে এটি ব্যবহার করুন।\n\nকী অনুসন্ধান করবেন, বৈশিষ্ট্য, শর্ত এবং মান তালিকাগুলো মিলে একটি শর্ত তৈরি করে এবং সেটিকে কোয়েরি বাক্সে এক লাইনের টেক্সট হিসেবে লেখে। লাইনটি সরাসরিও সম্পাদনা করা যায়, এবং তালিকাগুলো তা অনুসরণ করে। তালিকাগুলো দিয়ে প্রকাশ করা যায় না এমন কোয়েরি, যেমন OR দিয়ে যুক্ত দুটি শর্ত, পরিবর্তে নিয়ন্ত্রণ ব্যবহার করুন বোতাম চাপা পর্যন্ত তালিকাগুলো লুকিয়ে রাখে। অনুসন্ধান করতে কোয়েরি বাক্সে Enter চাপুন অথবা খুঁজুন বোতাম চাপুন।';
+$ec_lang['lpn_guide_text_settings_box']='সব সেটিংস এবং দুটি রিসেট বোতাম সেটিংস বাক্সে আছে। সেটিংস পাওয়ার আর কোনো জায়গা নেই। বাক্সে অনুসন্ধান করা যায়: সেটিংস অনুসন্ধান করুন-এ এক বা একাধিক শব্দ লিখলে শুধু সেই সেটিংসগুলো তালিকাভুক্ত হয় যেগুলোতে সব শব্দ আছে। চালানোর অগ্রগতির বাক্স দেখান এবং পৃষ্ঠা-র অধীনের সেটিংস ছাড়া বাকি সেটিংস প্রকল্পের সাথে সংরক্ষিত হয়; ওই সেটিংসগুলো এই ব্রাউজারে রাখা হয়। এই বাক্সের অবস্থান ও আকারও শুধু এই ব্রাউজারে রাখা হয়।';
+$ec_lang['lpn_guide_text_library_box']='প্রকল্পের প্যাটার্ন, কার্ভ, পাইপের ধরন, ফিটিংস, নিয়ন্ত্রণ ও নিয়ম ধারণ করে। একটি উপাদান প্যাটার্ন, কার্ভ, পাইপের ধরন বা ফিটিংসকে তার ID দিয়ে উল্লেখ করে, এবং সেই আইটেম এখানে সম্পাদনা করা হয়। নিয়ন্ত্রণ ও নিয়ম পুরো নেটওয়ার্কে প্রযোজ্য। নিয়ম শুধু EPANET ইঞ্জিন প্রয়োগ করে। সবকিছু প্রকল্পের সাথে সংরক্ষিত হয়।';
+$ec_lang['lpn_guide_text_energy_box']='সর্বশেষ বর্ধিত সময়কাল সিমুলেশনে প্রতিটি পাম্পের শক্তি ব্যবহার, সর্বোচ্চ ক্ষমতা ও খরচ জানায়, প্রতিটি পাম্পের দক্ষতা এবং সেটিংস, শক্তি-এর অধীনে নির্ধারিত শক্তির দাম ব্যবহার করে। এর জন্য সেটিংসে মোট রান সময় এবং একটি সমাধান করা নেটওয়ার্ক দরকার। এটি নেটওয়ার্ক বদলায় না।';
+$ec_lang['lpn_guide_text_contour_box']='রঙ অনুযায়ী নোড-এ বেছে নেওয়া নোড মান থেকে মানচিত্রে আঁকা কনটুর প্লট নিয়ন্ত্রণ করে: রঙের স্কিম, ভরাট ও তার অস্বচ্ছতা, কনটুর রেখার ব্যবধান ও লেবেল, এবং প্রতিটি পাইপ থেকে রঙ কতদূর পর্যন্ত পৌঁছায়। বন্ধ করলে প্লট লুকায় এবং নোডের রঙ থেকে যায়। এটি শুধু প্রদর্শন বদলায়, নেটওয়ার্ক নয়।';
+$ec_lang['lpn_guide_text_scncmp_box']='অঙ্কনের একটি অনুলিপি থেকে প্রতিটি দৃশ্যকল্প সমাধান করে এবং প্রতিটির জন্য নিজস্ব মানের সংখ্যা, সর্বনিম্ন চাপ ও সর্বোচ্চ বেগ সারণিবদ্ধ করে। এটি প্রকল্প বদলায় না, এবং খোলা দৃশ্যকল্পটি যেমন ছিল তেমনই থাকে।';
+$ec_lang['lpn_guide_text_rptbox']='সর্বশেষ বর্ধিত সময়কাল সিমুলেশনের জন্য EPANET ইঞ্জিনের লেখা টেক্সট প্রতিবেদন দেখায়, এর সতর্কতা ও নেটওয়ার্ক সারাংশসহ। প্রতিটি বর্ধিত সময়কাল সিমুলেশন এটিকে প্রতিস্থাপন করে; একক মুহূর্তের সমাধান করে না, এবং সম্পাদনা আগের প্রতিবেদন যেমন ছিল তেমন রাখে।';
+$ec_lang['lpn_guide_text_status_box']='সময়ের ক্রমে সর্বশেষ বর্ধিত সময়কাল সিমুলেশনের সময় প্রতিটি পরিবর্তন তালিকাভুক্ত করে: একটি পাম্প, ভালভ বা পাইপের খোলা বা বন্ধ হওয়া, একটি ট্যাংকের ভরা বা খালি হওয়া শুরু করা বা পূর্ণ বা খালি হয়ে যাওয়া, এবং যেকোনো সময় ধাপ যা পুরোপুরি কনভার্জ করেনি। শুধু পরিবর্তনগুলো তালিকাভুক্ত হয়, প্রতিটি সময় ধাপ নয়।';
+$ec_lang['lpn_guide_text_alt_box']='প্রতিটি দৃশ্যকল্পের জন্য দেখায় যে এটি প্রতিটি বিভাগে কোন বিকল্প ব্যবহার করে, যেমন ভৌত, চাহিদা এবং উপাদান সক্রিয়করণ, এবং এর গণনার বিকল্পগুলো: চাহিদা গুণক, মোট রান সময় ও হাইড্রোলিক সময় ধাপ। বিকল্পগুলো শুধু পড়ার জন্য। একটি দৃশ্যকল্পের গণনার বিকল্প এখানে লেখা যায়, এবং ফাঁকা রাখলে তার প্যারেন্টের মান ব্যবহার হয়। সাধারণ মোড বন্ধ করার পর দৃশ্যকল্প মেনু থেকে এটি খুলুন।';
+$ec_lang['lpn_guide_text_full_box']='টেবিল প্যানেলে দেখানো এককে প্রতিটি প্রতিবেদন সময় ধাপে প্রতিটি নোড ও প্রতিটি লিংক তালিকাভুক্ত করে। বর্ধিত সময়কাল সিমুলেশন ছাড়া এটি একক মুহূর্তের বর্তমান সমাধান দেখায়। ডাউনলোড বা প্রিন্টে প্রতিটি সময় ধাপ থাকে, আর টেবিল একবারে একটি দেখায়।';
+$ec_lang['lpn_guide_text_calib_box']='মাঠ পরিমাপের একটি ফাইলকে একই স্থান ও সময়ের গণনা করা ফলাফলের সাথে তুলনা করে, প্রতিটি প্যারামিটারের জন্য একটি ফাইল। ফাইলটি শুধু বর্তমান সেশনের জন্য রাখা হয় এবং প্রকল্পের সাথে সংরক্ষিত হয় না।';
+$ec_lang['lpn_guide_text_notes_popup']='এই পৃষ্ঠা কীভাবে আচরণ করে এবং কী করে না তার নোট তালিকাভুক্ত করে, প্রতিটি একটি পদ ও তার সংজ্ঞা হিসেবে। এটি নেটওয়ার্ক বদলায় না।';
+$ec_lang['lpn_guide_text_hotkeys_popup']='টুলবারের প্রতিটি বোতাম ও মেনু সারি, কীবোর্ড শর্টকাট এবং প্রতিটি বাক্সের জন্য একটি এন্ট্রি তালিকাভুক্ত করে। একটি সারি বেছে নিলে সেই নিয়ন্ত্রণ কোথায় আছে তা দেখায়; এটি কখনো সেটি চালায় না। অনুসন্ধান করতে যেকোনো জায়গা থেকে Ctrl+K চাপুন, অথবা নির্দেশিকায় ফোকাস থাকলে / চাপুন।';
+$ec_lang['lpn_guide_find_query_term']='কোয়েরি ভাষা';
+$ec_lang['lpn_guide_find_query_def']='<table class="lpn-notes-table"><tbody><tr><td><code>Scope.Property condition value</code></td><td>একটি শর্ত। Scope হলো Everything, Junction, Reservoir, Tank, Pipe, Pump, Valve, Text, Customer বা Source। Property হলো সেই scope-এর বৈশিষ্ট্য তালিকার যেকোনো এন্ট্রি।</td></tr><tr><td>শর্তাবলি</td><td>equal to, above, below, contains, n highest, n lowest এবং empty। Contains শুধু টেক্সটের ক্ষেত্রে প্রযোজ্য। n highest ও n lowest-এ n একটি গণনা, যেমন 5 highest। n অক্ষরটি নিজে লিখলে, যেমন <code>Pipe.Velocity n highest</code>, অথবা মান বাক্স খালি থাকলে, 10টি উপাদান তালিকাভুক্ত হয়। Empty সেই উপাদানগুলো খুঁজে বের করে যাদের ওই বৈশিষ্ট্যের কোনো মান নেই। Connectivity-র চারটি শর্ত আছে এবং কোনো মান নেয় না।</td></tr><tr><td>মান</td><td>একটি সংখ্যা এককছাড়া লেখা হয়, যে এককে তা বৈশিষ্ট্যে ও টেবিল প্যানেলে দেখানো হয়: 40, 40 psi নয়। ID সহ টেক্সট একক বা দ্বৈত উদ্ধৃতি চিহ্নে ঘিরে লেখা হয়: <code>\'60\'</code>।</td></tr><tr><td>AND, OR ও বন্ধনী</td><td>AND-এর মূল্যায়ন OR-এর আগে হয়, এবং বন্ধনী শর্তগুলো গোষ্ঠীবদ্ধ করে। NOT পাওয়া যায় না।</td></tr><tr><td>বানান</td><td>শব্দগুলো ছোট-বড় হাতের অক্ষরে সংবেদনশীল নয়। ইংরেজি শব্দগুলো প্রতিটি ভাষায় গ্রহণ করা হয়, তাই এই নির্দেশিকা থেকে কপি করা কোয়েরি যেকোনো ভাষার পৃষ্ঠায় চলে।</td></tr></tbody></table>';
+$ec_lang['lpn_guide_find_examples_term']='Net3-এ কাজের উদাহরণ';
+$ec_lang['lpn_guide_find_examples_def']='<p>এগুলো অনুসরণ করতে Net3 উদাহরণটি খুলুন। চাপ psi-তে এবং বেগ ft/s-এ।</p><table class="lpn-notes-table"><tbody><tr><td><code>Everything.ID equal to \'60\'</code></td><td>সংযোগস্থল 60 ও পাইপ 60। একটি সংযোগস্থল ও একটি পাইপের ID একই হতে পারে, তাই Everything-এর অধীনে ID অনুসন্ধানে একাধিক উপাদান আসতে পারে।</td></tr><tr><td><code>Junction.Pressure below 40</code></td><td>সংযোগস্থল 10, 40, 50, 20 ও 153, সর্বনিম্ন চাপ প্রথমে। সংযোগস্থল 10-এ চাপ -0.6 psi, একটি ঋণাত্মক চাপ যা পর্যালোচনা প্রয়োজন।</td></tr><tr><td><code>Pipe.Velocity 5 highest</code></td><td>পাইপ 60, 329, 125, 123 ও 149, সর্বোচ্চ বেগ প্রথমে। পাইপ 60 বহন করে 9.3 ft/s।</td></tr><tr><td><code>Junction.Pressure below 20 OR Pipe.Velocity above 5</code></td><td>সংযোগস্থল 10, 20, 40 ও 50, এবং পাইপ 60, 125 ও 329: কম চাপ ও বেশি বেগ একটি তালিকায়।</td></tr><tr><td><code>Junction.Pressure below 40 AND Junction.Elevation above 100</code></td><td>সংযোগস্থল 10, 20, 40 ও 50, উঁচু জমিতে কম চাপ। দুটি শর্তকেই একই ধরনের উপাদানের নাম দিতে হবে: <code>Junction.Pressure below 40 AND Pipe.Velocity above 3</code> কিছুই মেলে না, কারণ কোনো উপাদান একই সাথে সংযোগস্থল ও পাইপ নয়।</td></tr><tr><td><code>Pipe.Closed equal to \'closed\'</code></td><td>পাইপ 330, Net3 ফাইলে বন্ধ থাকা একমাত্র পাইপ।</td></tr><tr><td><code>Junction.Connectivity no open path to a source</code></td><td>কিছুই নয়, ফাইলটি যেভাবে বিতরণ করা হয় সেভাবে। পাইপ 247 বন্ধ থাকলে (প্রতিস্থাপন ও পূর্বাবস্থা দেখুন), সংযোগস্থল 215, 217, 219 ও 225: পাইপ 247-এ ভাঙন হলে যে সংযোগস্থলগুলো সরবরাহ ছাড়া থাকত। প্রতিটি পাইপের জন্য এটি পুনরাবৃত্তি করা হলো সংকটাপন্নতা বিশ্লেষণ।</td></tr></tbody></table>';
+$ec_lang['lpn_guide_find_results_term']='ফলাফল, নির্বাচন ও টেবিল';
+$ec_lang['lpn_guide_find_results_def']='<p>মিলে যাওয়া উপাদানগুলো খুঁজুন বোতামের নিচে তালিকাভুক্ত হয়। Above ও n highest সর্বোচ্চ মান প্রথমে তালিকাভুক্ত করে, below ও n lowest সর্বনিম্ন মান প্রথমে, এবং অন্য শর্তগুলো প্রাপ্ত মান অনুযায়ী, তারপর ID অনুযায়ী তালিকাভুক্ত করে। AND বা OR সহ একটি কোয়েরি প্রথমে নোড, তারপর লিংক তালিকাভুক্ত করে, প্রতিটি ID অনুযায়ী। একটি মাত্র মিল তৎক্ষণাৎ মানচিত্রে দেখানো হয়। একটি সারি নির্বাচন করলে মানচিত্র সেই উপাদানে কেন্দ্রীভূত হয়। কিছু নির্বাচিত না থাকলে উপাদানটিও নির্বাচিত হয়; কিছু নির্বাচিত থাকলে উপাদানটি হাইলাইট হয় এবং নির্বাচন বদলায় না। একটি সারিকে নির্বাচনে যোগ বা তা থেকে বাদ দিতে Shift+ক্লিক বা Ctrl+ক্লিক করুন। খুঁজুন নিজে থেকে সব মিল নির্বাচন করে না।</p><p>বর্তমান সারণিতে ফিল্টার করুন বোতাম একই কোয়েরি টেবিল প্যানেলে প্রয়োগ করে। কোয়েরি যে টেবিলগুলোতে প্রযোজ্য, প্রতিটি শুধু মিলে যাওয়া সারি দেখায়, ওপরে কোয়েরি ও সারির সংখ্যাসহ। মানচিত্রে সব মিল নির্বাচন করতে সেই সারিগুলো নির্বাচন করুন এবং রাইট-ক্লিক মেনু থেকে মানচিত্রে নির্বাচন করুন বেছে নিন। একটি টেবিল ফিল্টার প্রকল্পের সাথে সংরক্ষিত হয় না এবং পৃষ্ঠা পুনরায় লোড করলে শেষ হয়ে যায়। যে সারি সম্পাদনার পর আর মেলে না, সেটি টেবিলে থেকে যায়, ধূসর হয়ে এবং একটি সতর্কচিহ্ন নিয়ে, যতক্ষণ না বর্তমান সারণিতে ফিল্টার করুন বোতাম আবার চাপা হয়।</p>';
+$ec_lang['lpn_guide_find_replace_term']='প্রতিস্থাপন ও পূর্বাবস্থা';
+$ec_lang['lpn_guide_find_replace_def']='<p>বাক্সের যা পাওয়া গেছে তা পরিবর্তন করুন অংশ কোয়েরি যে প্রতিটি উপাদান খুঁজে পেয়েছে তাতে একটি বৈশিষ্ট্য লেখে। পরিবর্তনযোগ্য বৈশিষ্ট্য তালিকা থেকে বৈশিষ্ট্যটি বেছে নিন, নতুন মান বাক্সে প্রদর্শিত এককে নতুন মান লিখুন, এবং পরিবর্তন করুন বোতাম চাপুন। তখন বাক্সটি জানায় কতগুলো উপাদান বদলাবে, যেগুলোতে ইতিমধ্যে নতুন মান আছে সেগুলো গণনা না করে। পরিবর্তন প্রয়োগ করতে সেগুলো পরিবর্তন করুন বোতাম চাপুন, অথবা বাতিল করুন। একটি পূর্বাবস্থা পুরো প্রতিস্থাপন ফিরিয়ে আনে।</p><p>Net1-এ উদাহরণ: <code>Pipe.Diameter below 10</code> পাইপ 31, 122, 113 ও 121 খুঁজে পায়। ব্যাস বেছে নিন, 10 লিখুন এবং পরিবর্তন করুন চাপুন; বাক্সটি "Change 4 assets?" দেখায়। চারটি পাইপকেই 10 in. করতে সেগুলো পরিবর্তন করুন চাপুন। একটি পূর্বাবস্থা সেগুলোকে 6 ও 8 in.-এ ফিরিয়ে দেয়।</p><p>Net3-এ উদাহরণ: <code>Pipe.ID equal to \'247\'</code> পাইপ 247 খুঁজে পায়। বন্ধ বেছে নিন, নতুন মান তালিকায় আবার বন্ধ বেছে নিন, এবং পরিবর্তন করুন চাপুন, তারপর সেগুলো পরিবর্তন করুন, ওপরের সংযোগ উদাহরণের জন্য পাইপটি বন্ধ করতে। পূর্বাবস্থা এটি আবার খোলে।</p><p>প্রতিস্থাপনের জন্য এক ধরনের উপাদান দরকার, তাই Everything-এর অধীনে প্রথমে কী অনুসন্ধান করবেন তালিকায় একটি উপাদানের ধরন বেছে নিন। ভিত্তি ছাড়া অন্য দৃশ্যকল্পে, বৈশিষ্ট্যে একই সম্পাদনার মতোই, প্রতিস্থাপন সেই দৃশ্যকল্পে সংরক্ষিত হয়। যেখানে Mapbox উচ্চতা পাওয়া যায়, সেখানে উচ্চতা টাইপ করা মানের বদলে Mapbox DEM থেকে প্রতিস্থাপন করা যায়।</p>';
+$ec_lang['lpn_guide_find_notes_term']='লক্ষণীয় বিষয়';
+$ec_lang['lpn_guide_find_notes_def']='<ul><li>মানগুলো পূর্ণ নির্ভুলতায় তুলনা করা হয় এবং চার দশমিক স্থান পর্যন্ত তালিকাভুক্ত হয়। Equal to গণনা করা ফলাফলের সাথে কদাচিৎ মেলে; above ও below ব্যবহার করুন।</li><li>চাপ, জলশীর্ষ, প্রবাহ, বেগ ও অন্যান্য ফলাফল সর্বশেষ গণনার। স্বয়ংক্রিয়ভাবে পুনরায় গণনা করুন সেটিং বন্ধ থাকলে, এগুলো সর্বশেষ গণনার সময় নেটওয়ার্ক যেমন ছিল তার বর্ণনা দেয়।</li><li>টেক্সটে above ও below অভিধান ক্রম ব্যবহার করে, সংখ্যা সাংখ্যিক ক্রমে: Net1-এ <code>Junction.ID above \'20\'</code> সংযোগস্থল 21, 22, 23, 31 ও 32 খুঁজে পায়।</li><li>Everything-এর অধীনে শুধু ID, Description, Tag ও Connectivity দেওয়া হয়। একটি উপাদানের পূর্ণ বৈশিষ্ট্য তালিকা দেখতে কী অনুসন্ধান করবেন তালিকায় একটি উপাদানের ধরন বেছে নিন।</li><li>একটি টেক্সট আইটেমের ID নেই। এটি তার শব্দ দিয়ে অনুসন্ধান করুন, যেমন <code>Text.Text contains \'pump\'</code>।</li><li>একটি নোডের চারটি Connectivity শর্ত হলো no links at node, no open links at node, no link path to a source এবং no open path to a source। উৎস হলো একটি জলাধার বা ট্যাংক।</li></ul>';
+$ec_lang['lpn_guide_using_heading']='নির্দেশিকা ব্যবহার';
+$ec_lang['lpn_guide_keys_term']='নির্দেশিকার কীবোর্ড শর্টকাট';
+$ec_lang['lpn_guide_keys_def']='<table class="lpn-notes-table"><tbody><tr><td>?</td><td>পয়েন্টারের নিচের বা ফোকাসযুক্ত নিয়ন্ত্রণের জন্য নির্দেশিকা খুলুন।</td></tr><tr><td>F1</td><td>ফোকাসযুক্ত বাক্সের এন্ট্রিতে নির্দেশিকা খুলুন।</td></tr><tr><td>Ctrl+K</td><td>নির্বাচিত টেক্সটসহ অনুসন্ধান ক্ষেত্রে নির্দেশিকা খুলুন।</td></tr><tr><td>/</td><td>নির্দেশিকায় ফোকাস থাকলে অনুসন্ধান ক্ষেত্র নির্বাচন করুন।</td></tr><tr><td>Esc</td><td>নির্দেশিকা বন্ধ করুন এবং যেখানে ছিলেন সেখানে ফিরে যান।</td></tr></tbody></table>';
+$ec_lang['lpn_guide_also']='{menu}-এ আরও';
+$ec_lang['lpn_guide_how_popup']='আপনি কোনো উপাদান বা টেক্সট নির্বাচন করলে বৈশিষ্ট্য খোলে।';
+$ec_lang['lpn_guide_how_alt']='সাধারণ মোড বন্ধ থাকলে বিকল্পগুলোর প্রিভিউ পানি, দৃশ্যকল্প-এর অধীনে তালিকাভুক্ত থাকে।';
+$ec_lang['lpn_guide_not_shown']='এই নিয়ন্ত্রণ এখন পর্দায় নেই।';
+$ec_lang['lpn_hotkeys_zoomwin_def']='জুম উইন্ডো: সেই এলাকায় জুম করতে মানচিত্রে একটি আয়তক্ষেত্র টানুন।';
+$ec_lang['lpn_status_dismiss']='এই বার্তা লুকান';
+$ec_lang['lpn_msglog_hidden']='লুকানো';
+$ec_lang['lpn_msglog_unhide']='দেখান';
+$ec_lang['lpn_status_hidden_tip']='লুকানো বার্তাটি আবার মানচিত্রে দেখান।';
+$ec_lang['lpn_result_depth']='গভীরতা';
+$ec_lang['lpn_result_depth_tip']='দেখানো সময়ে ট্যাংকের পানির গভীরতা, ট্যাংকের তলা থেকে ওপরের দিকে পরিমাপ করা: জলশীর্ষ বিয়োগ ট্যাংকের উচ্চতা।';
+$ec_lang['lpn_result_tank_volume']='ব্যবহারযোগ্য আয়তন';
+$ec_lang['lpn_result_tank_volume_tip']='সর্বনিম্ন পানির গভীরতার ওপরের পানির আয়তন, তাই সেই গভীরতায় এটি শূন্য। EPANET ট্যাংক আয়তনে সর্বনিম্ন পানির গভীরতার নিচের পানিও থাকে, যা এখনও মিশ্রণ ও পানির বয়সে গণনা হয়, তাই ট্যাংকের উচ্চতা ট্যাংকের তলায় থাকে।';
+$ec_lang['lpn_pane_copy_heads']='কলামের শিরোনামসহ কপি করুন';
+$ec_lang['lpn_export_table_title']='{format}-এ এক্সপোর্ট করুন';
+$ec_lang['lpn_export_table_current']='বর্তমান';
+$ec_lang['lpn_export_table_all']='সব';
+$ec_lang['lpn_export_table_go']='এক্সপোর্ট';
+$ec_lang['lpn_export_table_scn_note']='ফলাফল শুধু সর্বশেষ গণনা করা দৃশ্যকল্পের জন্য এক্সপোর্ট করা হয়।';
+$ec_lang['lpn_file_export_item_ods']='ODS ফাইল…';
+$ec_lang['lpn_file_export_item_xlsx']='XLSX ফাইল…';
+$ec_lang['lpn_file_export_item_csv']='CSV ফাইল…';
+$ec_lang['lpn_file_export_tables_tip']='টেবিল প্যানেল যেভাবে টেবিলগুলো দেখায় সেভাবে ডাউনলোড করুন, একটি ওয়ার্কবুকে প্রতিটি টেবিলের জন্য (এবং আপনার বেছে নেওয়া প্রতিটি দৃশ্যকল্পের জন্য) একটি শিট সহ, এবং সেগুলোর ID যে লাইব্রেরিগুলোর উল্লেখ করে তাদের প্রতিটির জন্য একটি শিট: প্যাটার্ন, কার্ভ, পাইপের ধরন ও ফিটিংস। ফলাফল শুধু সর্বশেষ গণনা করা দৃশ্যকল্পের জন্য থাকে।';
+$ec_lang['lpn_file_export_csv_tip']='টেবিল প্যানেল যেভাবে একটি টেবিল দেখায় সেভাবে ডাউনলোড করুন। একটি টেবিল লাইব্রেরি ছাড়া একটি CSV ফাইল হিসেবে আসে। একাধিক টেবিল বা দৃশ্যকল্প CSV ফাইলের একটি zip ফাইল হিসেবে আসে, সেগুলোর ID যে লাইব্রেরির উল্লেখ করে তার প্রতিটির জন্য একটি ফাইলসহ। ফলাফল শুধু সর্বশেষ গণনা করা দৃশ্যকল্পের জন্য থাকে।';
+$ec_lang['lpn_file_export_item_dxf']='DXF ফাইল…';
+$ec_lang['lpn_file_export_dxf_tip']='এই নেটওয়ার্কটি AutoCAD ও অন্যান্য CAD প্রোগ্রামের জন্য ডাউনলোড করুন: নোড প্রতীক ব্লক হিসেবে, পাইপ, পাম্প ও ভালভ পলিলাইন হিসেবে, এবং প্রতিটি উপাদান একটি ব্লক হিসেবে, যার অ্যাট্রিবিউটে প্রকল্পের এককে তার ID ও বৈশিষ্ট্যের মান থাকে।';
+$ec_lang['lpn_dxf_export_no_utm']='DXF ফাইল লেখা হয়নি: এই নেটওয়ার্ক UTM যে অক্ষাংশ কভার করে (80° S থেকে 84° N) তার বাইরে, এবং একটি ড্রয়িং আঁকার জন্য সমতল গ্রিড দরকার।';
+$ec_lang['lpn_dxf_export_refused']='DXF ফাইল লেখা হয়নি: এর জন্য প্রয়োজনীয় স্থানাঙ্ক রূপান্তর লোড হয়নি। সংযোগ পরীক্ষা করে আবার চেষ্টা করুন।';
+$ec_lang['lpn_dxf_export_failed']='DXF ফাইল লেখা হয়নি: এই পৃষ্ঠার একটি ত্রুটি এটি থামিয়ে দিয়েছে ({error})।';
+$ec_lang['lpn_dxf_note_grid']='স্থানাঙ্ক: এই প্রকল্পের X ও Y, {unit}-এ। কোনো স্থানাঙ্ক ব্যবস্থা উল্লেখ করা নেই।';
+$ec_lang['lpn_dxf_note_crs']='স্থানাঙ্ক: {crs}, এই প্রকল্প যেভাবে উল্লেখ করেছে হুবহু সেভাবে।';
+$ec_lang['lpn_dxf_note_geo']='স্থানাঙ্ক: {crs}, মিটারে, অক্ষাংশ ও দ্রাঘিমাংশে নয়। প্রকল্পের অক্ষাংশ ও দ্রাঘিমাংশ সেই গ্রিডে রূপান্তর করা হয়েছে।';
+$ec_lang['lpn_dxf_exported_geo']='{file} এক্সপোর্ট করা হয়েছে। এর স্থানাঙ্ক {crs}, মিটারে, অক্ষাংশ ও দ্রাঘিমাংশে নয়।';
+$ec_lang['lpn_dxf_note_blocks']='লেয়ারের নাম {prefix}, উপাদানের কোড, একটি হাইফেন এবং বিকল্প নিয়ে গঠিত, যেমন {example}। প্রতিটি উপাদান স্কেল 1-এ বসানো একটি ব্লক, যার অ্যাট্রিবিউটের উচ্চতা 1 একক; টেক্সটের উচ্চতা ঠিক করতে ব্লকগুলো স্কেল করুন। প্রতিটি অ্যাট্রিবিউট দৃশ্যমান; একটি উপাদানের অ্যাট্রিবিউটগুলো তার প্রতীকের পাশে একটি কলামে সাজানো থাকে।';
+$ec_lang['lpn_dxf_note_shortened']='{n}টি মান DXF ফাইলের অনুমোদিত দৈর্ঘ্যের ({max} অক্ষর) চেয়ে লম্বা ছিল, তাই প্রতিটি ছোট করা হয়েছে এবং তিনটি বিন্দুতে শেষ হয়।';
+$ec_lang['lpn_dxf_note_categories']='{n}টি সংযোগস্থলে একাধিক চাহিদা শ্রেণি আছে। তাদের {tag} অ্যাট্রিবিউটে সব শ্রেণির মূল চাহিদার যোগফল থাকে।';
+$ec_lang['lpn_file_export_item_workspace']='ওয়ার্কস্পেস…';
+$ec_lang['lpn_file_export_workspace_tip']='আপনার বাক্সগুলো কোথায় আছে, তাদের আকার, কোনগুলো খোলা বা ডক করা, এবং আপনার প্যানেল ও কলামের আকার, সাথে এই পৃষ্ঠার প্রদর্শন বিকল্প, যেমন কোন সহায়তা বাবল ও হোভার কার্ড দেখানো হবে, এমন একটি ছোট ফাইল ডাউনলোড করুন। আপনার প্রকল্প, প্রকল্প সেটিংস ও কুকি (ভাষা, সম্মতি, একক) এতে থাকে না। অন্য স্ক্রিনে বা ব্রাউজারে ফাইল, আমদানি করুন, ওয়ার্কস্পেস দিয়ে এটি লোড করুন।';
+$ec_lang['lpn_file_import_workspace']='ওয়ার্কস্পেস…';
+$ec_lang['lpn_file_import_workspace_tip']='ফাইল, এক্সপোর্ট, ওয়ার্কস্পেস দিয়ে সংরক্ষিত একটি ওয়ার্কস্পেস ফাইল প্রয়োগ করুন: বাক্সের অবস্থান ও আকার, ডকিং, প্যানেলের আকার এবং এই পৃষ্ঠার প্রদর্শন বিকল্প, যেমন কোন সহায়তা বাবল ও হোভার কার্ড দেখানো হবে। আপনার প্রকল্প ও কুকি স্পর্শ করা হয় না।';
+$ec_lang['lpn_workspace_exported']='ওয়ার্কস্পেস {file}-এ সংরক্ষিত হয়েছে: {n}টি সেটিং।';
+$ec_lang['lpn_workspace_imported']='{file} থেকে ওয়ার্কস্পেস প্রয়োগ করা হয়েছে। প্রয়োগ করা সেটিং: {n}। ডিফল্টে ফিরেছে: {r}।';
+$ec_lang['lpn_workspace_ignored']='চেনা না যাওয়ায় উপেক্ষা করা এন্ট্রি: {u}।';
+$ec_lang['lpn_workspace_refused_unreadable']='এই ফাইলটি ওয়ার্কস্পেস হিসেবে পড়া যায়নি, তাই কিছুই বদলানো হয়নি।';
+$ec_lang['lpn_workspace_refused_format']='এটি এই পৃষ্ঠার সংরক্ষিত কোনো ওয়ার্কস্পেস ফাইল নয়, তাই কিছুই বদলানো হয়নি।';
+$ec_lang['lpn_workspace_refused_newer']='এই ওয়ার্কস্পেস ফাইলটি এই পৃষ্ঠার একটি নতুন সংস্করণে সংরক্ষিত হয়েছিল (ফরম্যাট {version}), তাই কিছুই বদলানো হয়নি।';
+$ec_lang['lpn_workspace_confirm']='এই ব্রাউজারের ওয়ার্কস্পেস লেআউট ফাইলের লেআউট দিয়ে প্রতিস্থাপন করবেন?';
+$ec_lang['lpn_workspace_refused_storage']='ব্রাউজারের সঞ্চয়স্থান পূর্ণ বা অনুপলব্ধ, তাই ওয়ার্কস্পেস প্রয়োগ করা হয়নি।';
+$ec_lang['lpn_omitted_note']='এই রান থেকে বাদ দেওয়া হয়েছে, কারণ এগুলো থেকে কোনো জলাধার বা ট্যাংকে যাওয়ার পথ নেই: {ids}';
+$ec_lang['lpn_link_end_unknown']='{id} ID-এর কোনো নোড নেই।';
+$ec_lang['lpn_link_end_same']='শুরু ও শেষ ভিন্ন নোড হতে হবে।';
+$ec_lang['lpn_split_pipe_ask']='এই নোডে {id} পাইপ ভাগ করবেন?';
+$ec_lang['lpn_split_yes']='হ্যাঁ';
+$ec_lang['lpn_split_no']='না';
+$ec_lang['lpn_snap_vertex']='{link}, শীর্ষবিন্দু {n}';
+$ec_lang['lpn_snap_node_on_node']='{new} {target}-এর অবস্থানে বসানো হয়েছে। নোড দুটি সংযুক্ত নয়।';
+$ec_lang['lpn_snap_moved_on_node']='{moved} {target}-এর অবস্থানে সরানো হয়েছে। নোড দুটি সংযুক্ত নয়।';
+$ec_lang['lpn_settings_hover_card']='হোভারে পূর্ণ লেবেল দেখান';
+$ec_lang['lpn_settings_hover_card_tip']='কোনো নোড, লিংক বা গ্রাহকের ওপর পয়েন্টার রাখলে সেটির লেবেল দেখা যায়, যেভাবে সেটিংসে নির্ধারিত, যেকোনো স্কেলে, লেবেলটি মানচিত্রে খাপ খাক বা না খাক। এটি এই ব্রাউজারের সেটিং, প্রকল্পের নয়।';
+$ec_lang['lpn_scenario_delete_in_base']='অঙ্কন থেকে সরাতে {base} দৃশ্যকল্পে এটি মুছুন।';
+$ec_lang['lpn_scenario_only_deleted']='{id} মুছে ফেলা হয়েছে। এটি শুধু {scenario}-এর অংশ ছিল।';
+$ec_lang['lpn_scenario_delete_blocked']='{id} মোছা হয়নি, কারণ {link} লিংক এতে শেষ হয়, এবং সেই লিংক {scenario}-এর বাইরেও আছে। দুটোই মুছতে {base} দৃশ্যকল্পে মুছুন।';
+$ec_lang['lpn_junction_pattern_unknown']='এই প্রকল্পে {id} ID-এর কোনো প্যাটার্ন নেই, তাই সংযোগস্থলটি যেমন ছিল তেমনই রাখা হয়েছে।';
+$ec_lang['lpn_settings_default_pattern_none']='কোনোটি নয় (ধ্রুবক)';
+$ec_lang['lpn_demand_pattern_default']='(ডিফল্ট: {id})';
+$ec_lang['lpn_demand_pattern_constant']='(ধ্রুবক)';
+$ec_lang['lpn_library_pattern_default_mark']='(ডিফল্ট)';
+$ec_lang['lpn_library_pattern_default_tip']='ডিফল্ট চাহিদা প্যাটার্ন। সেটিংস, ডিফল্ট চাহিদা প্যাটার্ন-এ এটি বদলান।';
+$ec_lang['lpn_library_pattern_default_deleted_to']='{id} প্যাটার্নটি ডিফল্ট চাহিদা প্যাটার্ন ছিল। প্যাটার্নবিহীন সংযোগস্থলগুলো এখন {now} প্যাটার্ন ব্যবহার করে।';
+$ec_lang['lpn_library_pattern_default_deleted_none']='{id} প্যাটার্নটি ডিফল্ট চাহিদা প্যাটার্ন ছিল। প্যাটার্নবিহীন সংযোগস্থলগুলো এখন ধ্রুবক চাহিদা ব্যবহার করে।';

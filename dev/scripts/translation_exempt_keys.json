@@ -896,6 +896,57 @@
                 "ro"
             ],
             "reason": "'Export…' is the Romanian word. Sprint 1008."
+        },
+        "lpn_split_no": {
+            "category": "cognate",
+            "languages": [
+                "es",
+                "it"
+            ],
+            "reason": "'No' is the Spanish and Italian word. Sprint 1012."
+        },
+        "lpn_help_manual": {
+            "category": "cognate",
+            "languages": [
+                "fr"
+            ],
+            "reason": "'Guide' is the French word. Sprint 1012."
+        },
+        "lpn_time_stat_minimum": {
+            "category": "cognate",
+            "languages": [
+                "id",
+                "it"
+            ],
+            "reason": "'Min' is the Indonesian and Italian abbreviation. Sprint 1012."
+        },
+        "lpn_time_stat_maximum": {
+            "category": "cognate",
+            "languages": [
+                "it"
+            ],
+            "reason": "'Max' is the Italian abbreviation. Sprint 1012."
+        },
+        "lpn_demand_pattern_default": {
+            "category": "cognate",
+            "languages": [
+                "id"
+            ],
+            "reason": "'default' is the Indonesian software term the file already uses. Sprint 1012."
+        },
+        "lpn_library_pattern_default_mark": {
+            "category": "cognate",
+            "languages": [
+                "id"
+            ],
+            "reason": "'default' is the Indonesian software term the file already uses. Sprint 1012."
+        },
+        "lpn_demand_pattern_constant": {
+            "category": "cognate",
+            "languages": [
+                "ro"
+            ],
+            "reason": "'(constant)' is the Romanian word. Sprint 1012."
         }
     }
 }

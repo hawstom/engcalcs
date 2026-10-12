@@ -359,6 +359,36 @@ var EngCalcs = EngCalcs || {};
 	// there is no continuous sweep to damp. Taking the nearest side unconditionally also makes
 	// js/lpn-collide.js's labelBoxAtEnd() correct by construction rather than by reproducing a
 	// render-time quirk -- the scorer and the renderer cannot disagree about a rule neither has.
+	// **THE LABEL IN THE HAND IS HELD BY THE SPOT THE READER GRABBED, NOT BY ITS LEADER END**
+	// (Tom, 2026-10-12: *"the label jumping out twice as far as my mouse cursor while dragging"*).
+	// A data label hangs off its leader's end on whichever side the flip rule picks, so a drag that
+	// moved only the END jumped the whole box by its own width whenever the end crossed the
+	// anchor's line, and the cursor was left a grab-distance outside the label. Here the box
+	// follows the cursor rigidly -- `gx` is how far from the box's left edge it was picked up -- and
+	// the end is wherever that puts it on the side the rule leaves standing. Where the box straddles
+	// the anchor's line neither side stands; the box sits at the rule's edge on the nearer side, so it
+	// lags the cursor by under a quarter of its width instead of jumping its width.
+	// dev/lpn-spike/label-drag-track-harness.js.
+	function heldLabelEnd(holder, anchor, cw, d) {
+		var w = labelBoxWidth(holder), left = cw.x - d.gx, hyst = (w / 2) * (2 * ADVERSE_FRAC - 1),
+			prev = holder.side || 'right', order = [prev, prev === 'right' ? 'left' : 'right'], i, e, x, er, el, side;
+		for (i = 0; i < 2; i++) {
+			e = order[i] === 'right' ? left : left + w;
+			if (Geom.labelSideAtEnd(order[i], e, anchor.x, w / 2, ADVERSE_FRAC) === order[i]) {
+				holder.side = order[i];
+				return { x: e, y: cw.y + d.offY };
+			}
+		}
+		// Neither side stands: the box can sit only at the rule's edge on one side or the other,
+		// short of the cursor by `er` or `el`. Take the nearer, and keep the current side until the
+		// other is nearer by an eighth of the box, so the box does not flicker across the line.
+		er = Math.max(0, (anchor.x - hyst * 0.9) - left);
+		el = Math.max(0, left - (anchor.x + hyst * 0.9 - w));
+		side = (prev === 'right' ? er <= el + w / 8 : el > er + w / 8) ? 'right' : 'left';
+		holder.side = side;
+		x = side === 'right' ? left + er : left + w - el;
+		return { x: x, y: cw.y + d.offY };
+	}
 	function dataLabelOrigin(holder, anchor, end, dragged) {
 		var w = labelBoxWidth(holder);
 		holder.side = dragged
@@ -7180,10 +7210,8 @@ var EngCalcs = EngCalcs || {};
 	function tankPressureSI(n) {
 		var r = lastSolveResult;
 		if (r && typeof r.t === 'number' && r.pressures && typeof r.pressures[n.id] === 'number') { return r.pressures[n.id]; }
-		// Times the specific gravity, as the built-in engine's pressures are (Task 553), so with that
-		// engine the number does not jump when a run starts. With EPANET and a specific gravity other
-		// than 1 it does: EPANET's pressures in metres are unscaled, a difference that already holds
-		// for every junction on master and is left alone here.
+		// Times the specific gravity, as both engines' pressures are (the EPANET bridge multiplies at
+		// tankGroundPressure()), so the number does not jump when a run starts.
 		var hyd = settings.hydraulics,
 			sg = (hyd && typeof hyd.specificGravity === 'number' && isFinite(hyd.specificGravity)) ? hyd.specificGravity : 1;
 		return toSI(nodeFixedHead(n) - (n.elev || 0), 'lpn_u_elevhead') * sg;
@@ -23757,10 +23785,8 @@ var EngCalcs = EngCalcs || {};
 	 * **DISPLAY (Tom, 2026-09-27, on the old flat `n1/n2/n3/n4/...`: *"That is not very
 	 * readable."*): `n1/n2|n3/n4|...` -- a pair stays `/`-joined exactly as before, one vertex
 	 * from the next now reads `|` rather than the same slash, so a reader can see where a vertex
-	 * ends without counting fields. **NO SPACE AROUND THE `|`, EVER**: libPasteCells() splits a
-	 * line with no tab on whitespace (`/[\s,;]+/`), which is exactly the shape a vertices-only
-	 * single-cell paste arrives in -- `A | B` splits into three tokens ("A", "|", "B") the moment
-	 * either space is there, `A|B` does not split at all. A hyphen stays out for the same reason
+	 * ends without counting fields. **NO SPACE AROUND THE `|`, EVER**: the cell is
+	 * kept short and unambiguous, and `A|B` reads as one token wherever it is pasted. A hyphen stays out for the same reason
 	 * it always was: it is a minus sign.
 	 *
 	 * **THE PARSER TAKES EITHER FORM.** `|`-separated is tried first (unambiguous: '|' is never a
@@ -24128,7 +24154,7 @@ var EngCalcs = EngCalcs || {};
 				// fails in EPANET), and the reader is told, as the customer table does.
 				if (id && !libPatternsRead().some(function (p) { return p.id === id; })) {
 					setNotice(String(pc.lpn_junction_pattern_unknown ||
-						'No pattern in this project is named {id}, so the junction was left as it was.')
+						'No pattern in this project has the ID {id}, so the junction was left as it was.')
 						.split('{id}').join(id));
 					return;
 				}
@@ -27471,12 +27497,11 @@ var EngCalcs = EngCalcs || {};
 	 * if you forget; here it is true by construction.
 	 */
 	// A cell holding a tab, a line break or a quote goes out quoted, a quote inside doubled, as a
-	// spreadsheet writes it, so libPasteCells() reads back the same characters. In a ONE-column
-	// copy there is no tab on any line, and libPasteCells() splits such a line on whitespace,
-	// commas and semicolons, so a cell holding one of those is quoted there too.
-	function paneQuoteCell(t, oneColumn) {
+	// spreadsheet writes it, so libPasteCells() reads back the same characters. A space, comma or
+	// semicolon is not a reason to quote: a line with no tab is one cell.
+	function paneQuoteCell(t) {
 		t = String(t === undefined || t === null ? '' : t);
-		return (/[\t\r\n"]/.test(t) || (oneColumn && /[\s,;]/.test(t))) ? '"' + t.replace(/"/g, '""') + '"' : t;
+		return /[\t\r\n"]/.test(t) ? '"' + t.replace(/"/g, '""') + '"' : t;
 	}
 	function paneCopyTsv(spec, rows, cols, box, withHeads) {
 		var out = [], r, c, line;
@@ -27492,7 +27517,7 @@ var EngCalcs = EngCalcs || {};
 		}
 		for (r = box.r0; r <= box.r1; r++) {
 			line = [];
-			for (c = box.c0; c <= box.c1; c++) { line.push(paneQuoteCell(paneCellText(cols[c], rows[r]), box.c0 === box.c1)); }
+			for (c = box.c0; c <= box.c1; c++) { line.push(paneQuoteCell(paneCellText(cols[c], rows[r]))); }
 			out.push(line.join('\t'));
 		}
 		return out.join('\n');
@@ -33490,7 +33515,7 @@ var EngCalcs = EngCalcs || {};
 			var keeper = (incidentLinks[id] || []).map(linkById)
 				.filter(function (l) { return l && !onlyInThisScenario(l); })[0];
 			if (keeper) {
-				setNotice((pc.lpn_scenario_delete_blocked || '{id} is not deleted, because link {link} ends on it and also exists outside {scenario}. To delete both, delete them in the {base} scenario.')
+				setNotice((pc.lpn_scenario_delete_blocked || '{id} is not deleted, because link {link} ends on it, and that link also exists outside {scenario}. To delete both, delete them in the {base} scenario.')
 					.split('{id}').join(id).split('{link}').join(keeper.id)
 					.split('{scenario}').join(scenarioDisplayName(here))
 					.split('{base}').join(scenarioDisplayName(baseScenario())));
@@ -40144,16 +40169,41 @@ var EngCalcs = EngCalcs || {};
 		}
 		convas = { origId: origId, copyId: id, to: to, lenKey: lenTo, name: name, step: step, srcUnitM: srcUnitM,
 			bdTurn: (from.kind === 'unnamed' && saved.backdrop && bdTurn) ? bdTurn : 0 };
-		if (step === 'attach') { mapgeoStart(); if (!mapgeoActive()) { convasAbandon(); } return; }
+		if (step === 'attach') { mapgeoStart(); if (!mapgeoActive()) { convasAbandon(); } else { convasSeedStep1(); } return; }
 		georefStart();
-		if (!georefActive()) { convasAbandon(); }
+		if (!georefActive()) { convasAbandon(); } else if (step === 'place') { convasSeedStep1(); }
 	}
+	// **A PLACE SEARCHED FOR IN THE CHOOSER IS NOT SEARCHED FOR AGAIN** (Tom, 2026-10-12: *"remember
+	// if user does place name search in the coordinate system chooser and place the Step 1 of 2 view
+	// based on that name search"*). The chooser's hit is in hand, so Step 1 opens centred there with
+	// no request, and the Search by name box opens with the query already typed. Memory only: the
+	// hit lives in convasPick, which dies with the next open of the box. A chooser that was not
+	// searched (convasPick.place has no query) leaves Step 1 on the whole world, as before.
+	function convasSeedStep1() {
+		var p = convasPick.place, ext, mpd, span;
+		if (!p || !p.query || !isFinite(p.lat) || !isFinite(p.lon)) { return; }
+		if (EngCalcs.lpnSearchPrefill) { EngCalcs.lpnSearchPrefill(p.query); }
+		if (mapgeoActive()) { mapgeoGoTo({ lat: p.lat, lon: p.lon }, p.extent); return; }
+		if (!georefActive() || !georef.t) { return; }
+		// The placement wizard travels with a site width; the found place's own extent is the best
+		// one in hand, and the wizard's usual default otherwise. The size question is not asked.
+		ext = p.extent;
+		span = 0;
+		if (ext && isFinite(ext.east) && isFinite(ext.west) && isFinite(ext.north) && isFinite(ext.south)) {
+			mpd = EngCalcs.lpnGeorefMetersPerDegree(p.lat);
+			span = Math.max((ext.east - ext.west) * mpd.lon, (ext.north - ext.south) * mpd.lat);
+		}
+		if (!(span > 0)) { span = toSI(georefDefaultSpan(), 'lpn_u_length'); }
+		georefGoTo({ lat: p.lat, lon: p.lon }, span);
+	}
+	function convasEndSearch() { if (EngCalcs.lpnSearchPrefill) { EngCalcs.lpnSearchPrefill(''); } }
 	// **AFTER Keep this placement (or Georeference here).** The wizard ends on a lat/lon project;
 	// this lays it onto the system the box asked for, on the saved document, and installs it in the
 	// same tab. A conversion to lat/lon itself is already finished.
 	function convasPlaced(unrotated) {
 		var pc = EngCalcs.pageConfig || {}, c = convas, saved, t2, ok = true, prepared;
 		convas = null;
+		convasEndSearch();
 		if (!c || c.copyId !== library.openId) { return; }
 		if (c.step === 'attach' || (c.to.kind === 'epsg' && c.to.crs === LPN_CRS_LATLON)) { return; }
 		try { saved = JSON.parse(JSON.stringify(serializeProject())); } catch (err) { saved = null; }
@@ -40193,6 +40243,7 @@ var EngCalcs = EngCalcs || {};
 	function convasAbandon() {
 		var pc = EngCalcs.pageConfig || {}, c = convas;
 		convas = null;
+		convasEndSearch();
 		if (!c || c.copyId !== library.openId) { return; }
 		if (indexEntry(c.origId)) { switchToTab(c.origId); }
 		discardProject(c.copyId);
@@ -43741,7 +43792,8 @@ var EngCalcs = EngCalcs || {};
 			text = field ? String(field.value || '').trim() : '';
 		if (!text || !EngCalcs.lpnSearchPoint) { return; }
 		EngCalcs.lpnSearchPoint(text, function (hit) {
-			crsBox.place = { lat: hit.lat, lon: hit.lon, extent: hit.extent };
+			// The query rides with the point, in memory, so File, Convert as can open its Step 1 there.
+			crsBox.place = { lat: hit.lat, lon: hit.lon, extent: hit.extent, query: text };
 			renderCrsBoxList();
 		});
 	}
@@ -48481,7 +48533,9 @@ var EngCalcs = EngCalcs || {};
 				// stored as n.lx/n.ly, world units from the node center, same convention as a Text
 				// label's lb.x/lb.y offset from its anchor.
 				var nn = nodeById(t.dataset.nodelbl), posN = nodeLabelPos(nn), w4 = screenToWorld(e.clientX, e.clientY);
-				drag = { type: 'nodelbl', id: t.dataset.nodelbl, offX: posN.x - w4.x, offY: posN.y - w4.y };
+				var neN = nodeEls[t.dataset.nodelbl],
+					gxN = neN ? w4.x - (neN.side === 'left' ? posN.x - labelBoxWidth(neN) : posN.x) : null;
+				drag = { type: 'nodelbl', id: t.dataset.nodelbl, offX: posN.x - w4.x, offY: posN.y - w4.y, gx: gxN };
 				Object.assign(drag, common);
 			} else if (t.dataset.linklbl !== undefined) {
 				// GRABBING A REPEAT COLLAPSES THE CHAIN TO WHERE IT WAS GRABBED, and this line is the
@@ -48495,7 +48549,26 @@ var EngCalcs = EngCalcs || {};
 						? le5.repeats[+t.dataset.repeat] : null,
 					posL = rep5 ? repeatLabelPos(ll, rep5) : linkLabelPos(ll),
 					w5 = screenToWorld(e.clientX, e.clientY);
-				drag = { type: 'linklbl', id: t.dataset.linklbl, offX: posL.x - w5.x, offY: posL.y - w5.y };
+				// **AN ALIGNED LABEL IS NOT WHERE linkLabelPos() SAYS IT IS.** While `alignPipeLabels`
+				// holds, the label lies along its pipe, centred on it; the first frame of a drag
+				// re-lays it out left-anchored at the default offset, a box width or more from where
+				// it was grabbed. So the grab is measured on the box the reader is holding.
+				var gxL = null;
+				if (le5 && ll) {
+					var heldTxt = (rep5 && rep5.text) ? rep5.text : le5.text,
+						sideL = le5.side || 'right', wL = labelBoxWidth(le5);
+					if (linkLabelAligned(ll) && heldTxt) {
+						var hb = heldTxt.getBoundingClientRect();
+						if (hb.width > 0) {
+							var hc = screenToWorld(hb.left + hb.width / 2, hb.top + hb.height / 2);
+							posL = { x: hc.x - wL / 2, y: hc.y + effectiveFontSize() * 0.3 };
+							sideL = 'right';
+						}
+					}
+					gxL = w5.x - (sideL === 'left' ? posL.x - wL : posL.x);
+					le5.side = sideL;
+				}
+				drag = { type: 'linklbl', id: t.dataset.linklbl, offX: posL.x - w5.x, offY: posL.y - w5.y, gx: gxL };
 				Object.assign(drag, common);
 			} else {
 				drag = { type: 'pan', tx0: state.tx, ty0: state.ty }; Object.assign(drag, common);
@@ -49646,7 +49719,9 @@ var EngCalcs = EngCalcs || {};
 		} else if (drag.type === 'nodelbl') {
 			snapshotDragOnce();
 			var w6 = screenToWorld(p.x, p.y), nn2 = nodeById(drag.id),
-				t6 = snapLeaderOffset((w6.x + drag.offX) - nn2.x, (w6.y + drag.offY) - nn2.y);
+				held6 = (drag.gx !== null && drag.gx !== undefined && nodeEls[drag.id])
+					? heldLabelEnd(nodeEls[drag.id], nn2, w6, drag) : { x: w6.x + drag.offX, y: w6.y + drag.offY },
+				t6 = snapLeaderOffset(held6.x - nn2.x, held6.y - nn2.y);
 			nn2.lx = t6.x; nn2.ly = t6.y;
 			layoutNodeLabel(drag.id);
 			relayoutLabels();
@@ -49654,7 +49729,9 @@ var EngCalcs = EngCalcs || {};
 		} else if (drag.type === 'linklbl') {
 			snapshotDragOnce();
 			var w7 = screenToWorld(p.x, p.y), ll2 = linkById(drag.id), mid2 = linkLabelMid(ll2),
-				t7 = snapLeaderOffset((w7.x + drag.offX) - mid2.x, (w7.y + drag.offY) - mid2.y);
+				held7 = (drag.gx !== null && drag.gx !== undefined && linkEls[drag.id])
+					? heldLabelEnd(linkEls[drag.id], mid2, w7, drag) : { x: w7.x + drag.offX, y: w7.y + drag.offY },
+				t7 = snapLeaderOffset(held7.x - mid2.x, held7.y - mid2.y);
 			ll2.lx = t7.x; ll2.ly = t7.y;
 			layoutLinkLabel(drag.id);
 			relayoutLabels();
@@ -58434,9 +58511,10 @@ var EngCalcs = EngCalcs || {};
 	 * a selection as TAB between cells and a NEWLINE between rows, with CRLF on Windows -- so the
 	 * tab is the authority wherever there is one, empty cells included.
 	 *
-	 * **A LINE WITH NO TAB IS SPLIT ON WHITESPACE INSTEAD**, which is what makes a `[CURVES]` block
-	 * out of somebody's e-mail (`C1  0  100`) paste as well as a spreadsheet selection does. That
-	 * was the one thing the old single text field did well and it is not given up.
+	 * **A LINE WITH NO TAB IS ONE CELL, AND NEVER SPLIT ON SPACES, COMMAS OR SEMICOLONS** (Tom,
+	 * 2026-10-12: pasting a column split `Main St` in two). A tab-less text/plain is one column, one
+	 * cell per line, exactly as a spreadsheet writes a single-column selection. There is no guessing
+	 * fallback: a `[CURVES]` block from an e-mail is pasted through a spreadsheet, or tab-separated.
 	 */
 	function libPasteCells(text) {
 		var src = String(text === null || text === undefined ? '' : text).replace(/\r\n?/g, '\n'),
@@ -58477,11 +58555,10 @@ var EngCalcs = EngCalcs || {};
 			}
 			i++;   // the line end (or one past the end)
 			if (rec.length > 1 || anyQuoted) { out.push(rec); continue; }
-			// A line with no tab is split on whitespace instead (see above). A blank line is not a
-			// row: keeping one would push every row under it down by one, a paste that quietly lands
-			// somewhere other than where it was aimed.
-			field = rec[0].trim();
-			if (field !== '') { out.push(field.split(/[\s,;]+/)); }
+			// A line with no tab is one cell (see above). A blank line is not a row: keeping one
+			// would push every row under it down by one, a paste that quietly lands somewhere
+			// other than where it was aimed.
+			if (rec[0].trim() !== '') { out.push([rec[0]]); }
 		}
 		return out;
 	}

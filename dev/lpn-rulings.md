@@ -136,6 +136,13 @@ Never call it "preview". Scope: `dev/looped-network-calculator-scope.md`; ROADMA
   `dev/lpn-spike/tank-volume-curve-harness.js` anchors it on 216 m³ into one tank: 3.7502 m as a
   10 m cylinder against 6.1200 m on a stepped curve, both hand-computed.
   `dev/lpn-spike/curve-library-harness.js`; `dev/pump-energy.md` for the efficiency side.
+- **PRESSURE IS A COLUMN OF WATER; HEAD IS A HEIGHT** (Tom, 2026-10-12: *"Water height is fundamental and
+  pressure units are derived."*). Head (H) and elevation are heights and carry no specific gravity.
+  Pressure = SG x (H - z), shown in metres or feet of water, and psi, kPa and bar follow from that by
+  fixed factors, so SG is counted once. The built-in solver applies it in `lpnReport()`; the EPANET
+  bridge, whose `Units LPS` pressure carries none, multiplies at `tankGroundPressure()` after the tank's
+  ground shift. Rejected: EPANET's own reading (SG only at head to psi/kPa, issue #864), because a
+  pressure in m or ft is still a pressure. `dev/lpn-spike/specific-gravity-harness.js`.
 - **A tank is a fixed head at its water surface** — what EPANET itself solves at t=0.
   `EngCalcs.lpnIsFixedHead` is the one place that equivalence is declared. A tank diameter is in the
   LENGTH unit while a pipe diameter is in millimetres; only `dev/lpn-spike/tank-harness.js` asserts

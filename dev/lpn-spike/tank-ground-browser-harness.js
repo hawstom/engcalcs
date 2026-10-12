@@ -4,7 +4,7 @@
 //
 // ?lang=es, Net1: the Tanks table carries Base elevation right after Elevation and a Pressure
 // column, and the tank's Properties box shows both elevations and a pressure. The new strings are
-// not translated yet, so they arrive as the English fallback -- never as "undefined" or blank.
+// not translated yet, they arrive as the English fallback -- never as "undefined" or blank.
 // Typing a ground 20 m (65.6 ft) below the base in the Properties box moves the pressure and leaves
 // the head where it was. The arithmetic itself is held by tank-ground-harness.js.
 //
@@ -65,7 +65,7 @@ async function main() {
 		await page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } });
 		await a.openExampleCard(await a.lang('lpn_ex_net1_title'));
 		await a.settle(1200);
-		const esElev = await a.lang('lpn_field_elev'), esPressure = await a.lang('lpn_result_pressure');
+		const esBase = await a.lang('lpn_field_tank_base_elev'), esElev = await a.lang('lpn_field_elev'), esPressure = await a.lang('lpn_result_pressure');
 		ok('the page really is Spanish (Elevation is not the English word)', esElev && esElev !== 'Elevation', esElev);
 
 		// ---- the Properties box ------------------------------------------------------------------
@@ -86,9 +86,9 @@ async function main() {
 			return { text: l.textContent.replace(/­/g, '').trim(), value: i ? i.value : null, ph: i ? i.placeholder : null };
 		}));
 		let f = await fields();
-		const fBase = f.find((x) => x.text.indexOf('Base elevation') === 0),
+		const fBase = f.find((x) => x.text.indexOf(esBase) === 0),
 			fElev = f.find((x) => x.text.indexOf(esElev) === 0);
-		ok('Properties lists ' + esElev + ' and Base elevation', !!fBase && !!fElev, f.map((x) => x.text).join(' | '));
+		ok('Properties lists ' + esElev + ' and ' + esBase, !!fBase && !!fElev, f.map((x) => x.text).join(' | '));
 		ok('both read 850 for an imported tank', fBase && fElev && fBase.value === '850' && fElev.value === '850',
 			JSON.stringify({ fBase, fElev }));
 		const pBefore = f.find((x) => x.text.indexOf(esPressure) === 0);
@@ -108,7 +108,7 @@ async function main() {
 		}, [esElev, newGround]);
 		await a.settle(900);
 		f = await fields();
-		const fBase2 = f.find((x) => x.text.indexOf('Base elevation') === 0),
+		const fBase2 = f.find((x) => x.text.indexOf(esBase) === 0),
 			fElev2 = f.find((x) => x.text.indexOf(esElev) === 0);
 		ok('the ground took the new number and the base stayed at 850',
 			fElev2 && fBase2 && near(parseFloat(fElev2.value), +newGround, 1e-6) && fBase2.value === '850',
@@ -129,8 +129,8 @@ async function main() {
 		const heads = await page.evaluate(() => Array.from(document.querySelectorAll('#lpn_pane_tanks table th'))
 			.map((h) => h.textContent.replace(/­/g, '').trim()));
 		const iElev = heads.findIndex((h) => h.indexOf(esElev) === 0);
-		ok('Base elevation (English fallback) is the column right after ' + esElev,
-			iElev >= 0 && heads[iElev + 1].indexOf('Base elevation') === 0, heads.join(' | '));
+		ok(esBase + ' (Base elevation) is the column right after ' + esElev,
+			iElev >= 0 && heads[iElev + 1].indexOf(esBase) === 0, heads.join(' | '));
 		ok('a Pressure column (' + esPressure + ') is in the tanks table', heads.some((h) => h.indexOf(esPressure) === 0));
 		ok('no heading reads "undefined" or is blank', heads.every((h) => h && h.indexOf('undefined') < 0));
 
