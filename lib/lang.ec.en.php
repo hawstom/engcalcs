@@ -1004,7 +1004,7 @@ $ec_lang['lpn_field_head_tip']='Water surface level in the reservoir, measured a
 // A tank has two elevations (Tom, 2026-10-11): Elevation is the ground, the pressure datum as at a
 // junction; Base elevation is the tank bottom, EPANET's [TANKS] Elevation, from which depth and
 // volume are measured.
-$ec_lang['lpn_field_tank_base_elev']='Bottom elevation';
+$ec_lang['lpn_field_tank_base_elev']='Base elevation';
 $ec_lang['lpn_field_tank_base_elev_tip']='Elevation of the tank bottom, from which water depth and volume are measured. Left blank, the bottom is at the ground elevation.';
 $ec_lang['lpn_tank_ground_elev_tip']='Ground elevation at the tank. Pressure at the tank is measured from here, as at a junction.';
 $ec_lang['lpn_field_tank_level']='Water depth';
@@ -1316,7 +1316,7 @@ $ec_lang['lpn_result_head_tip']='Potential energy of the water at this node, wri
 // A tank's depth and usable volume (Task 783). Depth is head minus the tank bottom, which is our
 // Elevation. Volume is zero at the Lowest water depth, so it is NOT EPANET's tank volume, which also
 // counts the water below the lowest water depth (that water is in the mixing volume, it just cannot be drawn down).
-$ec_lang['lpn_result_depth']='Water depth';
+$ec_lang['lpn_result_depth']='Depth';
 $ec_lang['lpn_result_depth_tip']='Depth of water in the tank at the time shown, measured up from the tank bottom: the head minus the tank elevation.';
 $ec_lang['lpn_result_tank_volume']='Available volume';
 $ec_lang['lpn_result_tank_volume_tip']='Volume of water above the lowest water depth, so it is zero at that depth. The EPANET tank volume also includes the water below the lowest water depth, which still counts toward mixing and water age, so the tank elevation stays at the tank bottom.';

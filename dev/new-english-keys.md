@@ -253,7 +253,7 @@ never edits a synonym.
   > Export to {format}
   @@ NEEDS RULING
 - **`lpn_field_tank_base_elev`**
-  > Bottom elevation
+  > Base elevation
   @@ NEEDS RULING
 - **`lpn_file_export_csv_tip`**
   > Download a table as the Tables pane shows it. One table comes as a single CSV file with no libraries. Several tables or scenarios come as one zip file of CSV files, with a file for each library their IDs refer to. Results are included for the scenario last calculated only.
@@ -460,7 +460,7 @@ never edits a synonym.
   > Copy with column headings
   _Ruled 2026-10-09: Use proposed (Tom, calls page round 3)._
 - **`lpn_result_depth`**
-  > Water depth
+  > Depth
   @@ NEEDS RULING
 - **`lpn_result_depth_tip`**
   > Depth of water in the tank at the time shown, measured up from the tank bottom: the head minus the tank elevation.
@@ -551,7 +551,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**142 still to read**, of 145 new keys across 16 unmerged branch(es).
+**142 still to read**, of 145 new keys across 17 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -565,6 +565,8 @@ build for that would be a gate nobody keeps. Refresh it with
 ### chore/mary-1012 (`26adbad5`) — adds no English strings
 
 ### chore/pkill-guard (`b7b8c9fe`) — adds no English strings
+
+### chore/sprint-1012 (`6cf28626`) — adds no English strings
 
 ### feat/bentley-interop (`735199bd`) — 101 new, 101 to read @@ NEEDS RULING
 
