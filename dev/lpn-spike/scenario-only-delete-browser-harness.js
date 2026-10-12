@@ -132,7 +132,18 @@ async function main() {
 		const hasNode = (doc, id) => doc.nodes.some((n) => n.id === id);
 		const hasLink = (doc, id) => doc.links.some((l) => l.id === id);
 		const scn1 = (doc) => doc.scenarios.filter((s) => !s.isBase)[0];
-		const ovKeys = (doc) => doc.scenarios.reduce((acc, s) => acc.concat(Object.keys(s.overrides || {})), []);
+		// A scenario's values in the file: its own map and the alternatives it names (an override
+		// stores the scenario's own alternative since 2026-10-12).
+		const ownOf = (doc, s) => {
+			const o = Object.assign({}, s.overrides || {});
+			Object.keys(s.alternatives || {}).forEach((c) => {
+				const al = (doc.alternatives || []).find((x) => x.id === s.alternatives[c]);
+				Object.keys((al && al.values) || {}).forEach((k) => { o[k] = Object.assign({}, o[k] || {}, al.values[k]); });
+			});
+			return o;
+		};
+		const ovKeys = (doc) => doc.scenarios.reduce((acc, s) => acc.concat(Object.keys(s.overrides || {})), [])
+			.concat((doc.alternatives || []).reduce((acc, al) => acc.concat(Object.keys(al.values || {})), []));
 
 		// Every row of the Junctions and Pipes tables, inputs AND results, by element id.
 		await tool('lpn_pane_toggle');
@@ -175,7 +186,7 @@ async function main() {
 		const j1el = doc.nodes.find((n) => n.id === j1);
 		ok('the Junction tool drew a junction in Scenario 1', !!j1, j1);
 		ok('...inactive in Base and active only in Scenario 1', j1el && j1el._active === false
-			&& (scn1(doc).overrides['n:' + j1] || {}).active === true, JSON.stringify(j1el));
+			&& (ownOf(doc, scn1(doc))['n:' + j1] || {}).active === true, JSON.stringify(j1el));
 		await selectNode(j1);
 		await P.keyboard.press('Delete');
 		await wait();
@@ -192,7 +203,7 @@ async function main() {
 		await undo();
 		doc = await stored();
 		ok('one Undo brings the junction back, active in Scenario 1 only', hasNode(doc, j1)
-			&& (scn1(doc).overrides['n:' + j1] || {}).active === true && !!(await nodeAt(j1)));
+			&& (ownOf(doc, scn1(doc))['n:' + j1] || {}).active === true && !!(await nodeAt(j1)));
 
 		// ---- 2. Delete tool ----------------------------------------------------------------------
 		console.log('\n--- the same junction, Delete tool ---');
@@ -217,7 +228,7 @@ async function main() {
 		doc = await stored();
 		const pipe = doc.links.map((l) => l.id).filter((i) => linksBefore.indexOf(i) < 0)[0];
 		ok('the Pipe tool drew a pipe in Scenario 1 from the new junction to 10', !!pipe
-			&& (scn1(doc).overrides['l:' + pipe] || {}).active === true, pipe);
+			&& (ownOf(doc, scn1(doc))['l:' + pipe] || {}).active === true, pipe);
 		await selectNode(j2);
 		await P.keyboard.press('Delete');
 		await wait();
@@ -308,7 +319,7 @@ async function main() {
 		const excl = (await L('lpn_scenario_deactivated')).replace('{id}', '22').replace('{scenario}', scn1(doc).name);
 		const where = (await L('lpn_scenario_delete_in_base')).replace('{base}', await L('lpn_scenario_base'));
 		ok('junction 22 stays in the drawing, excluded in Scenario 1 only', hasNode(doc, '22')
-			&& (scn1(doc).overrides['n:22'] || {}).active === false && /lpn-inactive/.test(await drawnClass('22')));
+			&& (ownOf(doc, scn1(doc))['n:22'] || {}).active === false && /lpn-inactive/.test(await drawnClass('22')));
 		ok('...and the notice says where it can be deleted', (await a.notice()).indexOf(excl + ' ' + where) >= 0, await a.notice());
 		const ex22 = await tables();
 		// Rows OTHER than 22's must move: that proves the snapshot carries the solve's results, so

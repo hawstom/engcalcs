@@ -352,7 +352,11 @@ async function main() {
 		await page.click('#lpn_pane_tab_scenarios');
 		await settle(700);
 		const pc = await cellSel(peakRow, 'demand');
-		ok('5.4 a scenario\'s Demand cell is a pick-list with the alternatives', pc.options && pc.options.some((o) => o === 'Dry year=Dry year') && pc.value === '', JSON.stringify(pc));
+		// Peak Hour's demand stored its own alternative, named Peak Hour (Tom, 2026-10-12: a
+		// first-class alternative), so the cell names it; the blank row says what inheriting gives
+		// (Base), and Base is not offered twice.
+		ok('5.4 a scenario\'s Demand cell is a pick-list with the alternatives, its own chosen', pc.options && pc.options.some((o) => o === 'Dry year=Dry year') &&
+			pc.value === 'Peak Hour' && pc.options[0] === '=' + await L('lpn_scenario_base') && pc.options.filter((o) => /=Base$/.test(o)).length === 1, JSON.stringify(pc));
 		await page.evaluate(([row]) => {
 			const tr = document.querySelectorAll('#lpn_pane_scenarios tbody tr')[row], th = Array.from(document.querySelectorAll('#lpn_pane_scenarios thead th'));
 			const i = th.findIndex((t) => t._lpnColKey === 'sc_demand'), s = tr.children[i].querySelector('select');

@@ -6025,9 +6025,19 @@ var EngCalcs = EngCalcs || {};
 	// The pick-list of one cell: ['' inherits, then Base, then every item of the category by name].
 	// **BASE IS A CHOICE** (Tom, 2026-10-12: *"I can't select Base as the alternative."*), offered
 	// whenever the cell does not already show it.
+	// **THE BLANK ROW SAYS WHAT CHOOSING IT GIVES**: while the scenario names an alternative of its
+	// own (which its first override now stores), blank is "inherit", so it reads its parent's
+	// choice, "(inherited)", and never repeats the name already chosen.
+	function smInheritText(s, cat) {
+		var pc = EngCalcs.pageConfig || {}, p = s.root === true ? null : parentScenarioOf(s), t;
+		if (!p || p.isBase) { return smName(cat, smBaseKey(cat)); }
+		t = smCellText(p, cat);
+		return /\)$/.test(t) && t.indexOf(' (' + (pc.lpn_sm_inherited || 'inherited') + ')') > 0 ? t : t + ' (' + (pc.lpn_sm_inherited || 'inherited') + ')';
+	}
 	function smCellChoices(s, cat) {
-		var out = [['', smCellText(s, cat)]], mine = smImplicitKey(s, cat), base = smName(cat, smBaseKey(cat));
-		if (!smChoice(s, cat).base) { out.push([base, base]); }
+		var out = [['', smCellValue(s, cat) === '' ? smCellText(s, cat) : smInheritText(s, cat)]], mine = smImplicitKey(s, cat), base = smName(cat, smBaseKey(cat));
+		// (Where the blank row already reads Base, a second Base would be the same choice twice.)
+		if (!smChoice(s, cat).base && out[0][1] !== base) { out.push([base, base]); }
 		// Its own alternative is the blank row's text already.
 		smRecords(cat).forEach(function (r) { if (r.id !== mine) { out.push([String(r.name || ''), String(r.name || '')]); } });
 		return out;

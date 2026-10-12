@@ -368,7 +368,13 @@ async function main() {
 				let d = null;
 				try { d = JSON.parse(localStorage.getItem(localStorage.key(i)) || 'null'); } catch (e) { d = null; }
 				if (d && Array.isArray(d.scenarios)) {
-					out = out.concat(d.scenarios.filter((s) => s.name === 'Peak' && s.settings && s.settings.view).map((s) => s.settings.view));
+					// Its own block in a file from before, or the Presentation alternative its first
+					// setting stored (2026-10-12).
+					d.scenarios.filter((s) => s.name === 'Peak').forEach((s) => {
+						if (s.settings && s.settings.view) { out.push(s.settings.view); }
+						const al = (d.alternatives || []).filter((x) => x.id === (s.alternatives || {}).presentation)[0];
+						if (al && al.settings && al.settings.view) { out.push(al.settings.view); }
+					});
 				}
 			}
 			return out;
