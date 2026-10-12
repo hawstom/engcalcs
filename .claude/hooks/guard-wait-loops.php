@@ -144,6 +144,35 @@ if ($deny === '' && $bg && ec_has_loop($cmd)
           . "deadline (`timeout`, a `SECONDS` check, or a counter with a cap).";
 }
 
+// ---- Shape C: a kill by NAME that reaches every session's suites and servers -----------------
+// 2026-10-12: one build agent ran `pkill -f "check_all.sh"; pkill -f "S 127.0.0.1"` to stop its OWN
+// run. It killed the master suite twice and five other agents' suites, all of which then reported
+// exit 144. Every worktree runs the same command lines, so a name matches all of them. Kill by PID,
+// after checking the process's cwd is your own worktree.
+if ($deny === '') {
+    $shared = '/check_all|run_harnesses|127\.0\.0\.1|php\s+-S|^\s*(node|php|chrom\w*|sh)\s*$/';
+    $pats = array();
+    if (preg_match_all('/\bpkill\b((?:\s+-[A-Za-z]+)*)\s+(?:(["\'])(.*?)\2|([^\s;|&)]+))/s', $cmd, $m, PREG_SET_ORDER)) {
+        foreach ($m as $hit) {
+            if (preg_match('/^\s*-[A-Za-z]*P\b/', $hit[1])) { continue; } // -P <ppid> kills one tree
+            $pats[] = ($hit[3] !== '') ? $hit[3] : (isset($hit[4]) ? $hit[4] : '');
+        }
+    }
+    if (preg_match_all('/\bkillall\s+(?:-\S+\s+)*([^\s;|&)]+)/', $cmd, $m2)) {
+        foreach ($m2[1] as $name) { $pats[] = $name; }
+    }
+    foreach ($pats as $pat) {
+        if ($pat !== '' && preg_match($shared, $pat)) {
+            $deny = "SHARED-NAME KILL. `$pat` matches every session's suites, harnesses or servers on "
+                  . "this machine, not just yours: on 2026-10-12 one agent's `pkill -f check_all.sh` "
+                  . "killed the master suite twice and five other agents' runs.\n\n"
+                  . "Fix: kill by PID, after checking the process is yours -- e.g.\n"
+                  . "  for p in $(pgrep -f '[c]heck_all.sh'); do [ \"$(readlink /proc/\$p/cwd)\" = \"$(pwd)\" ] && pkill -TERM -P \$p && kill \$p; done\n";
+            break;
+        }
+    }
+}
+
 if ($deny !== '') {
     echo json_encode(array('hookSpecificOutput' => array(
         'hookEventName'          => 'PreToolUse',

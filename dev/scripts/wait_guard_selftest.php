@@ -75,6 +75,10 @@ $deny = array(
     'until ! pgrep -f "[r]un_harnesses.sh"; do sleep 20; done; echo ok', true),
   'unbounded condition (PID 266486)' => array(
     'f=/tmp/e.output; until [ -s "$f" ] && grep -qE "All blocking checks pass|BLOCKING FAILURES" "$f"; do sleep 15; done; head -4 "$f"', true),
+ 'shared-name kill of every suite (2026-10-12)' => array(
+    'cd /w/fix; pkill -f "check_all.sh" ; sleep 1; pkill -f "S 127.0.0.1"; git status', false),
+  'shared-name kill of harness runners' => array('pkill -f run_harnesses.sh', false),
+  'killall node' => array('killall node', false),
 );
 
 // ---- MUST ALLOW: ordinary work the guard must never touch ----------------------------------
@@ -93,6 +97,8 @@ $allow = array(
   'a plain harness run' => array('sh dev/scripts/run_harnesses.sh', true),
   'a one-shot pgrep with no loop' => array('pgrep -af run_harnesses.sh', false),
   'an ordinary git command' => array('git log --oneline origin/master..master', false),
+  'a kill of one process tree by PID' => array('pkill -TERM -P 2315507; kill 2315507', false),
+  'a pkill of a harness by its own name' => array('pkill -f convert-search-browser-harness', false),
   'a grep that mentions sleep' => array("grep -rn 'sleep' dev/scripts/ | head -20", false),
 );
 
