@@ -7179,10 +7179,8 @@ var EngCalcs = EngCalcs || {};
 	function tankPressureSI(n) {
 		var r = lastSolveResult;
 		if (r && typeof r.t === 'number' && r.pressures && typeof r.pressures[n.id] === 'number') { return r.pressures[n.id]; }
-		// Times the specific gravity, as the built-in engine's pressures are (Task 553), so with that
-		// engine the number does not jump when a run starts. With EPANET and a specific gravity other
-		// than 1 it does: EPANET's pressures in metres are unscaled, a difference that already holds
-		// for every junction on master and is left alone here.
+		// Times the specific gravity, as both engines' pressures are (the EPANET bridge multiplies at
+		// tankGroundPressure()), so the number does not jump when a run starts.
 		var hyd = settings.hydraulics,
 			sg = (hyd && typeof hyd.specificGravity === 'number' && isFinite(hyd.specificGravity)) ? hyd.specificGravity : 1;
 		return toSI(nodeFixedHead(n) - (n.elev || 0), 'lpn_u_elevhead') * sg;

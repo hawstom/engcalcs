@@ -1089,8 +1089,8 @@ EngCalcs.lpnReport = function (model, junctions, junctionIndex, byId, H, Q, meth
 	// this solver is a head OF THE FLUID -- the energy equation does not care what the fluid weighs,
 	// so a denser one raises no head and changes no flow. It changes what a gauge reads: pressure in
 	// metres of WATER is (H - z) x SG, which is exactly EPANET's own conversion. Applied here, at
-	// the one place a pressure is produced, so the two engines report the same number for the same
-	// file. Absent, it is 1 and every existing answer is bit-identical.
+	// the one place a pressure is produced; the EPANET bridge multiplies at tankGroundPressure(), so
+	// the two engines report the same number for the same file. Absent, it is 1 and every existing answer is bit-identical.
 	var sg = (model.hydraulics && typeof model.hydraulics.specificGravity === 'number'
 		&& isFinite(model.hydraulics.specificGravity)) ? model.hydraulics.specificGravity : 1;
 	for (i = 0; i < model.nodes.length; i++) {

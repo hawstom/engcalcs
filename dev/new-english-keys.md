@@ -205,7 +205,7 @@ None on master. Every English key here is present in at least one other language
 
 # Strings waiting on a branch
 
-**142 still to read**, of 145 new keys across 17 unmerged branch(es).
+**156 still to read**, of 159 new keys across 16 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -216,13 +216,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/mary-1012 (`26adbad5`) — adds no English strings
-
-### chore/pkill-guard (`b7b8c9fe`) — adds no English strings
-
-### chore/sprint-1012 (`0d7b8730`) — adds no English strings
-
-### feat/bentley-interop (`735199bd`) — 101 new, 101 to read @@ NEEDS RULING
+### feat/bentley-interop (`f370eef4`) — 101 new, 101 to read @@ NEEDS RULING
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -489,7 +483,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Delete the selected item. A used item is not deleted.
   @@ NEEDS RULING
 - **`lpn_sm_help`**
-  > How scenarios and alternatives work:\n\nAn override made in a scenario is stored in the alternative associated with the scenario. Associations of alternatives to scenarios are managed in the Scenarios table in the bottom pane. Creating a new scenario creates no alternatives; it uses its parent's alternatives until new alternatives are needed as overrides are created. When overrides are created in a scenario, they are stored in their respective alternative for the scenario; if the scenario has no such alternative, a new alternative is created using the name of the scenario. Example: You create a "Figure: Node and link IDs" scenario and edit a Text to say "Node and Link IDs." When you create the scenario, no alternatives are created. But at the moment you save the Text, a Text alternative called "Figure: Node and link IDs" is created with the override for the Text value. In Basic mode, you see this as simply an override in the scenario itself.\n\nHow to manage scenarios:\n\nChoose Scenarios or an alternatives category in the list at the top to show its tree.\n\nCreate a child of the selected item with Add child, or an item with no parent with Add base. A new item is named after its parent; type a name to rename it. Copy scenario copies the selected scenario and asks whether to copy the alternatives it uses or share them.\n\nDrag an item onto another to make it a child of that item. Drag an item between two items to reorder them.\n\nClick a selected item, or press F2, to rename it. Double-click a scenario, or press Enter, to make it current. Click the arrow beside an item, or press Left or Right, to collapse or expand it. Right-click an item for the same commands as the buttons.\n\nPress Delete, or click the minus button, to delete the selected item. An item in use is not deleted, and the message names what uses it.\n\nTo make a scenario use another alternative, choose that alternative in the scenario's row of the Scenarios table. An override made in a shared alternative changes every scenario that uses it.
+  > How scenarios and alternatives work:\n\nAn override made in a scenario is stored in the alternative associated with the scenario. Associations of alternatives to scenarios are managed in the Scenarios table in the bottom pane. Creating a new scenario creates no alternatives; it uses its parent's alternatives until new alternatives are needed as overrides are created. When overrides are created in a scenario, they are stored in their respective alternative for the scenario; if the scenario has no such alternative, a new alternative is created using the name of the scenario. Example: You create a "Figure: Node and link IDs" scenario and edit a Text to say "Node and Link IDs." When you create the scenario, no alternatives are created. But at the moment you save the Text, a Text alternative called "Figure: Node and link IDs" is created with the override for the Text value. In Basic mode, you see this as simply an override in the scenario itself.\n\nHow to manage scenarios:\n\n- Choose Scenarios or an alternatives category in the list at the top to show its tree.\n\n- Create a child of the selected item with Add child, or an item with no parent with Add base. A new item is named after its parent; type a name to rename it. Copy scenario copies the selected scenario and asks whether to copy the alternatives it uses or share them.\n\n- Drag an item onto another to make it a child of that item. Drag an item between two items to reorder them.\n\n- Click an item to select it. Press F2, or choose Rename, to rename the selected item. Double-click a scenario, or press Enter, to make it current. Click the arrow beside an item, or press Left or Right, to collapse or expand it. Right-click an item for the same commands as the buttons.\n\n- Press Delete, or click the minus button, to delete the selected item. An item in use is not deleted, and the message names what uses it.\n\n- To make a scenario use another alternative, including Base, choose it in the scenario's row of the Scenarios table. An override made in a shared alternative changes every scenario that uses it.
   @@ NEEDS RULING
 - **`lpn_sm_in_use`**
   > {name} cannot be deleted while it is used by: {list}.
@@ -532,29 +526,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/desktop (`baba0f04`) — adds no English strings
 
-### feat/label-gang-search (`8b31a907`) — 3 new, all ruled
-
-- **`lpn_confirm_labels_restore`**
-  > Set the label columns back to their original values? This resets which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.
-  _Ruled OK 2026-09-23._
-- **`lpn_labels_restore`**
-  > Restore label defaults
-  _Ruled OK 2026-09-23._
-- **`lpn_labels_restore_tip`**
-  > Sets the label columns back to their original values: which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.
-  _Ruled OK 2026-09-23._
-
-### feat/label-placer (`eaa25d02`) — adds no English strings
-
-### feat/label-placer-a (`2883c033`) — adds no English strings
-
-### feat/label-placer-b (`18cac708`) — adds no English strings
-
-### feat/label-placer-c (`4dc27ea1`) — adds no English strings
-
-### feat/label-placer-d (`2e5e81c4`) — adds no English strings
-
-### feat/match-property (`daa13a9c`) — 9 new, 9 to read @@ NEEDS RULING
+### feat/graph-bubble (`11236f20`) — 14 new, 14 to read @@ NEEDS RULING
 
 - **`lpn_copy_props_done`**
   > Copied properties of {id}.
@@ -583,8 +555,78 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_paste_skip_valve`**
   > Not pasted: {n} (the valve types differ).
   @@ NEEDS RULING
+- **`lpn_tsb_close`**
+  > Close graph
+  @@ NEEDS RULING
+- **`lpn_tsb_max`**
+  > Close a graph before opening another. Up to {n} stay open.
+  @@ NEEDS RULING
+- **`lpn_tsb_menu`**
+  > Time series graph
+  @@ NEEDS RULING
+- **`lpn_tsb_off_tip`**
+  > Needs extended period results. Set a Total run time in Settings, Calculation, Time, and calculate.
+  @@ NEEDS RULING
+- **`lpn_tsb_resize`**
+  > Drag to resize
+  @@ NEEDS RULING
 
-### feat/shape (`554c2b24`) — 27 new, 27 to read @@ NEEDS RULING
+### feat/label-gang-search (`8b31a907`) — 3 new, all ruled
+
+- **`lpn_confirm_labels_restore`**
+  > Set the label columns back to their original values? This resets which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.
+  _Ruled OK 2026-09-23._
+- **`lpn_labels_restore`**
+  > Restore label defaults
+  _Ruled OK 2026-09-23._
+- **`lpn_labels_restore_tip`**
+  > Sets the label columns back to their original values: which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.
+  _Ruled OK 2026-09-23._
+
+### feat/label-placer (`eaa25d02`) — adds no English strings
+
+### feat/label-placer-a (`2883c033`) — adds no English strings
+
+### feat/label-placer-b (`18cac708`) — adds no English strings
+
+### feat/label-placer-c (`4dc27ea1`) — adds no English strings
+
+### feat/label-placer-d (`2e5e81c4`) — adds no English strings
+
+### feat/match-property (`05bda765`) — 10 new, 10 to read @@ NEEDS RULING
+
+- **`lpn_copy_props_done`**
+  > Copied properties of {id}.
+  @@ NEEDS RULING
+- **`lpn_copy_props_menu`**
+  > Copy properties
+  @@ NEEDS RULING
+- **`lpn_paste_done_many`**
+  > Pasted properties of {id} to {m} assets. Values changed: {n}.
+  @@ NEEDS RULING
+- **`lpn_paste_done_one`**
+  > Pasted properties of {id} to {to}. Values changed: {n}.
+  @@ NEEDS RULING
+- **`lpn_paste_props_menu`**
+  > Paste properties to selection
+  @@ NEEDS RULING
+- **`lpn_paste_props_off_kind`**
+  > No selected asset can take the copied properties.
+  @@ NEEDS RULING
+- **`lpn_paste_props_off_none`**
+  > Nothing is copied. Right-click an asset and choose Copy properties.
+  @@ NEEDS RULING
+- **`lpn_paste_props_off_select`**
+  > Select the assets to paste to, then choose Paste properties to selection.
+  @@ NEEDS RULING
+- **`lpn_paste_skip_breakdown`**
+  > Not pasted: {n} (demand is a list of categories).
+  @@ NEEDS RULING
+- **`lpn_paste_skip_valve`**
+  > Not pasted: {n} (the valve types differ).
+  @@ NEEDS RULING
+
+### feat/shape (`cb281a99`) — 27 new, 27 to read @@ NEEDS RULING
 
 - **`lpn_file_import_shapes`**
   > Import GeoJSON shapes…
@@ -668,7 +710,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Draw a point, a polyline, or a polygon on the map. A Shape is annotation and is not part of the network. Specify each point, then specify the last point again, press Enter, or right-click to finish. Specify the first point again to close the Shape into a polygon.
   @@ NEEDS RULING
 
-### feat/si-example (`30708037`) — 4 new, 4 to read @@ NEEDS RULING
+### feat/si-example (`6a552271`) — 4 new, 4 to read @@ NEEDS RULING
 
 - **`lpn_ex_net2_si_desc`**
   > Litres per second, with metres and millimetres. An EPANET example at Branford, Connecticut, converted from gallons per minute, feet and inches: 35 junctions and 1 tank, with no reservoir and no pump. Fluoride, a non-reactive substance, enters at one source.
@@ -683,10 +725,8 @@ build for that would be a gate nobody keeps. Refresh it with
   > EPANET Net3, L/s (SI)
   @@ NEEDS RULING
 
-### fix/paste-column (`a4e50f15`) — adds no English strings
+### fix/label-drag (`cce90ef0`) — adds no English strings
 
-### fix/specific-gravity (`1675818f`) — 1 new, 1 to read @@ NEEDS RULING
+### fix/paste-column (`21765a8c`) — adds no English strings
 
-- **`lpn_settings_specific_gravity_tip`**
-  > Density of the fluid relative to water. It scales pressure in every unit, because a pressure in m or ft is a column of water, and it does not change head or HGL. It changes no flow.
-  @@ NEEDS RULING
+### fix/specific-gravity (`dc93462c`) — adds no English strings
