@@ -869,7 +869,7 @@ $ec_lang['lpn_field_head_tip']='Wasserspiegel im Reservoir, angegeben als Höhe,
 // pipe-diameter unit would put a 15 m tank on screen as 15000. Same reason the three levels say
 // "measured up from the tank bottom" rather than leaving the datum to be guessed -- EPANET measures
 // a tank level from the vessel floor, not from the same zero the elevations use.
-$ec_lang['lpn_tank_elev_tip']='Höhe des Tankbodens. Die Wassertiefen im Tank werden von hier aus nach oben gemessen.';
+$ec_lang['lpn_field_tank_base_elev_tip']='Höhe des Tankbodens. Die Wassertiefen im Tank werden von hier aus nach oben gemessen.';
 $ec_lang['lpn_field_tank_level']='Wassertiefe';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_field_tank_level_tip']='Tiefe des im Tank stehenden Wassers, gemessen vom Tankboden nach oben.';

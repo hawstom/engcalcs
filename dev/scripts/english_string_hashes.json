@@ -258,7 +258,7 @@
                 "lpn_scenario_push_values",
                 "lpn_scenario_rename",
                 "lpn_scenario_tip",
-                "lpn_tank_elev_tip",
+                "lpn_field_tank_base_elev_tip",
                 "lpn_tank_head_tip",
                 "lpn_tool_add_tank",
                 "lpn_tool_add_valve",
@@ -7263,7 +7263,7 @@
         "lpn_tab_unsaved": "b3c7270ccae3543a687dce9dd7f731425c01ba63",
         "lpn_tables_menu": "193daf137ed8b89de36d47c3df5fd8f66c0e1d14",
         "lpn_tables_menu_tip": "9f9a7292498e5378c0080a0c5ca0defcfe79dd3c",
-        "lpn_tank_elev_tip": "42a7e83306be0b782aef40102ccfdd737b078951",
+        "lpn_field_tank_base_elev_tip": "42a7e83306be0b782aef40102ccfdd737b078951",
         "lpn_tank_head_tip": "b305195fc2b91ade5b079094e42675237335e213",
         "lpn_terrain_accuracy": "de3b50fba938c86712d54f2b9872a0d8e7c94610",
         "lpn_terrain_blank_ids": "6943b7a080d0dd24235298ec9a23fdabe12c5443",
@@ -15523,7 +15523,7 @@
             "words": 33,
             "ends_sentence": true
         },
-        "lpn_tank_elev_tip": {
+        "lpn_field_tank_base_elev_tip": {
             "words": 15,
             "ends_sentence": true
         },
