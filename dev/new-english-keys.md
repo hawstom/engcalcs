@@ -75,7 +75,7 @@ is the one you meant. "The first one" is a complete answer.
   *The proposal:* PROPOSED English: 'Rest the pointer on a node, link or customer to see its label as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project.'
   @@ NEEDS RULING
 
-## Synonym entries to approve  (15, 13 to read @@ NEEDS RULING)
+## Synonym entries to approve  (15, 14 to read @@ NEEDS RULING)
 
 **These are translator notes (`$ec_lang_syn`), not visitor wording.** Each was written against an
 English string that has since changed, or against a key that no longer exists. Say which: keep it
@@ -108,12 +108,12 @@ never edits a synonym.
   @@ NEEDS RULING
 
 - **`ip_is_lateral`**
-  > <span class="ec-help" title="Selected: this reach is a segment of the test lateral, from which individual emitters withdraw water. Cleared: this reach is a main, only passing flow along to laterals not on the test path.">Lat. <span class="ec-tip">?</span></span>
+  > <span class="ec-help" title="Checked: this reach is a segment of the test lateral, from which individual emitters withdraw water. Cleared: this reach is a main, only passing flow along to laterals not on the test path.">Lat. <span class="ec-tip">?</span></span>
   *Why stale:* the English changed after this synonym was written
   *Written against:* <span class="ec-help" title="Checked: this reach is a segment of the test lateral, from which individual emitters withdraw water. Unchecked: this reach is a main, only passing flow along to laterals not on the test path.">Lat. <span class="ec-tip">?</span></span>
   *Current synonym:* | gloss: lateral, mainline; avoid: "test" read as typical/sample
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
-  _Ruled 2026-10-05: What's wrong with the way it is? I am confused on this on about what's happening and why a _syn is needed._
+  @@ NEEDS RULING
 
 - **`lpn_cp_restrict`**
   > Restrict these characters
@@ -205,7 +205,7 @@ None on master. Every English key here is present in at least one other language
 
 # Strings waiting on a branch
 
-**156 still to read**, of 159 new keys across 16 unmerged branch(es).
+**156 still to read**, of 159 new keys across 15 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -728,5 +728,3 @@ build for that would be a gate nobody keeps. Refresh it with
 ### fix/label-drag (`cce90ef0`) — adds no English strings
 
 ### fix/paste-column (`21765a8c`) — adds no English strings
-
-### fix/specific-gravity (`dc93462c`) — adds no English strings

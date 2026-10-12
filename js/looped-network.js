@@ -23754,10 +23754,8 @@ var EngCalcs = EngCalcs || {};
 	 * **DISPLAY (Tom, 2026-09-27, on the old flat `n1/n2/n3/n4/...`: *"That is not very
 	 * readable."*): `n1/n2|n3/n4|...` -- a pair stays `/`-joined exactly as before, one vertex
 	 * from the next now reads `|` rather than the same slash, so a reader can see where a vertex
-	 * ends without counting fields. **NO SPACE AROUND THE `|`, EVER**: libPasteCells() splits a
-	 * line with no tab on whitespace (`/[\s,;]+/`), which is exactly the shape a vertices-only
-	 * single-cell paste arrives in -- `A | B` splits into three tokens ("A", "|", "B") the moment
-	 * either space is there, `A|B` does not split at all. A hyphen stays out for the same reason
+	 * ends without counting fields. **NO SPACE AROUND THE `|`, EVER**: the cell is
+	 * kept short and unambiguous, and `A|B` reads as one token wherever it is pasted. A hyphen stays out for the same reason
 	 * it always was: it is a minus sign.
 	 *
 	 * **THE PARSER TAKES EITHER FORM.** `|`-separated is tried first (unambiguous: '|' is never a
@@ -27468,12 +27466,11 @@ var EngCalcs = EngCalcs || {};
 	 * if you forget; here it is true by construction.
 	 */
 	// A cell holding a tab, a line break or a quote goes out quoted, a quote inside doubled, as a
-	// spreadsheet writes it, so libPasteCells() reads back the same characters. In a ONE-column
-	// copy there is no tab on any line, and libPasteCells() splits such a line on whitespace,
-	// commas and semicolons, so a cell holding one of those is quoted there too.
-	function paneQuoteCell(t, oneColumn) {
+	// spreadsheet writes it, so libPasteCells() reads back the same characters. A space, comma or
+	// semicolon is not a reason to quote: a line with no tab is one cell.
+	function paneQuoteCell(t) {
 		t = String(t === undefined || t === null ? '' : t);
-		return (/[\t\r\n"]/.test(t) || (oneColumn && /[\s,;]/.test(t))) ? '"' + t.replace(/"/g, '""') + '"' : t;
+		return /[\t\r\n"]/.test(t) ? '"' + t.replace(/"/g, '""') + '"' : t;
 	}
 	function paneCopyTsv(spec, rows, cols, box, withHeads) {
 		var out = [], r, c, line;
@@ -27489,7 +27486,7 @@ var EngCalcs = EngCalcs || {};
 		}
 		for (r = box.r0; r <= box.r1; r++) {
 			line = [];
-			for (c = box.c0; c <= box.c1; c++) { line.push(paneQuoteCell(paneCellText(cols[c], rows[r]), box.c0 === box.c1)); }
+			for (c = box.c0; c <= box.c1; c++) { line.push(paneQuoteCell(paneCellText(cols[c], rows[r]))); }
 			out.push(line.join('\t'));
 		}
 		return out.join('\n');
@@ -57933,9 +57930,10 @@ var EngCalcs = EngCalcs || {};
 	 * a selection as TAB between cells and a NEWLINE between rows, with CRLF on Windows -- so the
 	 * tab is the authority wherever there is one, empty cells included.
 	 *
-	 * **A LINE WITH NO TAB IS SPLIT ON WHITESPACE INSTEAD**, which is what makes a `[CURVES]` block
-	 * out of somebody's e-mail (`C1  0  100`) paste as well as a spreadsheet selection does. That
-	 * was the one thing the old single text field did well and it is not given up.
+	 * **A LINE WITH NO TAB IS ONE CELL, AND NEVER SPLIT ON SPACES, COMMAS OR SEMICOLONS** (Tom,
+	 * 2026-10-12: pasting a column split `Main St` in two). A tab-less text/plain is one column, one
+	 * cell per line, exactly as a spreadsheet writes a single-column selection. There is no guessing
+	 * fallback: a `[CURVES]` block from an e-mail is pasted through a spreadsheet, or tab-separated.
 	 */
 	function libPasteCells(text) {
 		var src = String(text === null || text === undefined ? '' : text).replace(/\r\n?/g, '\n'),
@@ -57976,11 +57974,10 @@ var EngCalcs = EngCalcs || {};
 			}
 			i++;   // the line end (or one past the end)
 			if (rec.length > 1 || anyQuoted) { out.push(rec); continue; }
-			// A line with no tab is split on whitespace instead (see above). A blank line is not a
-			// row: keeping one would push every row under it down by one, a paste that quietly lands
-			// somewhere other than where it was aimed.
-			field = rec[0].trim();
-			if (field !== '') { out.push(field.split(/[\s,;]+/)); }
+			// A line with no tab is one cell (see above). A blank line is not a row: keeping one
+			// would push every row under it down by one, a paste that quietly lands somewhere
+			// other than where it was aimed.
+			if (rec[0].trim() !== '') { out.push([rec[0]]); }
 		}
 		return out;
 	}

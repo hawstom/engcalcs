@@ -641,7 +641,7 @@ $ec_lang_syn['ip_group_upstream']='| gloss: upstream';
 $ec_lang['ip_group_downstream']='Downstream';
 $ec_lang_syn['ip_group_downstream']='| gloss: downstream';
 $ec_lang['ip_group_loss']='Loss';
-$ec_lang['ip_is_lateral']='<span class="ec-help" title="Selected: this reach is a segment of the test lateral, from which individual emitters withdraw water. Cleared: this reach is a main, only passing flow along to laterals not on the test path.">Lat. <span class="ec-tip">?</span></span>';
+$ec_lang['ip_is_lateral']='<span class="ec-help" title="Checked: this reach is a segment of the test lateral, from which individual emitters withdraw water. Cleared: this reach is a main, only passing flow along to laterals not on the test path.">Lat. <span class="ec-tip">?</span></span>';
 $ec_lang_syn['ip_is_lateral']='| gloss: lateral, mainline; avoid: "test" read as typical/sample';
 $ec_lang['ip_count']='<span class="ec-help" title="Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) — their flow branches from this same reach too.">Emitters <span class="ec-tip">?</span></span>';
 $ec_lang_syn['ip_count']='| gloss: lateral, mainline, reach; avoid: "branch" as bough or office branch';
@@ -1998,7 +1998,7 @@ $ec_lang['lpn_contour_menu']='Contour';
 $ec_lang['lpn_contour_tip']='Show a contour plot on the map: the node colors spread along and beside the pipes, with labeled contour lines. Opens a box to tune it or turn it off.';
 $ec_lang['lpn_contour_plot']='Contour plot';
 $ec_lang['lpn_contour_show']='Show contours';
-$ec_lang['lpn_contour_show_tip']='Clear to hide the fill and the contour lines; select to bring them back as they were. Node colors stay.';
+$ec_lang['lpn_contour_show_tip']='Clear to hide the fill and the contour lines; check to bring them back as they were. Node colors stay.';
 $ec_lang['lpn_contour_fill']='Fill';
 $ec_lang['lpn_contour_fill_tip']='Smooth blends the colors from one class to the next. Bands paints each class of the color key flat.';
 $ec_lang['lpn_contour_fill_smooth']='Smooth';
@@ -2937,7 +2937,7 @@ $ec_lang['lpn_labels_show_tip']='The order in which values appear on a label. Th
 // Tom's own words for the control (R-331: "a code or a toggle to 'Use units' for the After string").
 // It heads a narrow column and names each row's tick box.
 $ec_lang['lpn_labels_use_units']='Use units';
-$ec_lang['lpn_labels_use_units_tip']='Select to show the unit in the After box and on the label, and to update it when the units change. Clear to enter custom After text.';
+$ec_lang['lpn_labels_use_units_tip']='Check to show the unit in the After box and on the label, and to update it when the units change. Clear to enter custom After text.';
 // EPANET's own name for a link's starting state, beside the Status row, which is the run's answer.
 $ec_lang['lpn_labels_init_status']='Initial status';
 // The Symbology index, reworked (Tom, R-333: "Node labels, Node colors, Link labels, Link colors,
@@ -3212,7 +3212,7 @@ $ec_lang['lpn_scenario_delete']='Delete scenario';
 $ec_lang['lpn_scenario_delete_confirm']='Delete the scenario {name}, and its {n} overrides? The drawing itself is not changed.';
 $ec_lang['lpn_scenario_override']='Override in this scenario';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_scenario_override_tip']='Selected means this scenario overrides its parent for this value, even when the number is the same. Clear the box to use its parent\'s.';
+$ec_lang['lpn_scenario_override_tip']='Checked means this scenario overrides its parent for this value, even when the number is the same. Clear the box to use its parent\'s.';
 // "Base scenario", not bare "Base" -- an ENGLISH fix, so this needs no _syn either. This is the one
 // place the polysemy genuinely bites: here the word sits beside a NUMBER, in a field popup with no
 // scenario dropdown nearby to frame it, which is exactly the reading that invites "base amount".
@@ -3227,7 +3227,7 @@ $ec_lang['lpn_scenario_push_btn']='Apply Base values to all scenarios';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_scenario_push_tip']='Every scenario goes back to the Base value for the properties whose labels are showing right now. Values entered for them in any scenario are discarded.';
 $ec_lang['lpn_scenario_basic']='Basic mode';
-$ec_lang['lpn_scenario_basic_tip']='Selected: a scenario consists only of the values set in it. Cleared: this menu also offers the Alternatives preview table, which shows how those values are grouped by category, and allows a scenario to have a separate total run time and hydraulic time step. Feedback on this feature is welcome.';
+$ec_lang['lpn_scenario_basic_tip']='Checked: a scenario consists only of the values set in it. Cleared: this menu also offers the Alternatives preview table, which shows how those values are grouped by category, and allows a scenario to have a separate total run time and hydraulic time step. Feedback on this feature is welcome.';
 $ec_lang['lpn_alt_title']='Alternatives preview';
 $ec_lang['lpn_alt_calc_options']='Calculation options';
 $ec_lang['lpn_alt_note']='Base uses the Base alternative of every category. Each scenario has a separate alternative, a child of the Base alternative, for any category that is changed. The number is the count of changed values. The last three columns are calculation options: enter a value for the scenario, or leave it blank to use the parent value. The project values are in Settings, Calculation, Time.';
