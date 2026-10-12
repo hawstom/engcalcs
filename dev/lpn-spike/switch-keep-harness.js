@@ -157,7 +157,7 @@ console.log('\n--- a restored layout equals a computed one, label by label ---')
 	// equal for the wrong reason (nothing drawn, not "restored correctly"). A shared example file is
 	// a shared fixture; this harness needs "always show labels", not whatever Net3.lwn ships today.
 	const net3Doc = JSON.parse(fs2.readFileSync(
-		path.join(__dirname, '../water-network-dev/water-network-examples/Net3.lwn'), 'utf8'));
+		path.join(__dirname, '../water-network-examples/Net3.lwn'), 'utf8'));
 	if (net3Doc.settings) { net3Doc.settings.labelMaxWidth = null; }
 	L.applySaved(net3Doc);
 	L.refreshAll();
@@ -236,7 +236,7 @@ console.log('\n--- a rebuild indexes the pipes once, not once per pipe ---');
 	const fs3 = require('fs');
 	L.openProject(second);
 	L.applySaved(JSON.parse(fs3.readFileSync(
-		path.join(__dirname, '../water-network-dev/water-network-examples/Net3.lwn'), 'utf8')));
+		path.join(__dirname, '../water-network-examples/Net3.lwn'), 'utf8')));
 	const links = L.getDoc().links.length;
 	const before2 = L.segIndexBuilds();
 	L.buildDom();

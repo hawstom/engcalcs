@@ -154,7 +154,7 @@ async function change(L, value) {
 
 	// ---- 1. AN EPS PROJECT, RECALCULATE ON ------------------------------------------------------
 	console.log('\n--- 1. Net3 (24 hours), Recalculate on: the Quality select, changed twice ---');
-	const net3 = await openPage('dev/water-network-dev/water-network-examples/Net3.lwn');
+	const net3 = await openPage('dev/water-network-examples/Net3.lwn');
 	const arrived = EC.lpnTimeRunState();
 	ok('the project arrived with its run in hand', arrived.frames === 25, arrived.frames + ' frames');
 	ok('...and that run was measured by its own thread time', typeof arrived.lastBusyMs === 'number',

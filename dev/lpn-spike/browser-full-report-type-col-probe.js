@@ -13,7 +13,7 @@
 const fs = require('fs');
 module.exports = async function ({ send, evaluate, sleep }) {
   const URL_ = process.env.PAGE;
-  const PROJ = process.env.PROJ || 'dev/water-network-dev/water-network-examples/Net3.lwn';
+  const PROJ = process.env.PROJ || 'dev/water-network-examples/Net3.lwn';
   const LANGS = (process.env.LANGS || 'en,de,ru,am,ar,hi,my,km,es,fr,pt,tr,zh,sw,he,fa,ur,bn,bg,cs,hr,id,it,ps,ro,sr,uk').split(',');
   let failures = 0;
   for (const lang of LANGS) {

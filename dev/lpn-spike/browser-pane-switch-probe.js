@@ -3,7 +3,7 @@
 //
 //   SCRIPT=dev/lpn-spike/browser-pane-switch-probe.js \
 //     PAGE=http://127.0.0.1:8096/engcalcs/Looped-Network.php \
-//     PROJ=dev/water-network-dev/water-network-examples/Net3.lwn node dev/lpn-spike/browser-drive.js
+//     PROJ=dev/water-network-examples/Net3.lwn node dev/lpn-spike/browser-drive.js
 //
 // Tom, 2026-09-21: *"Switching to Junctions the first time and some subsequent times delayed about
 // 3 seconds or more. This is the worst issue I found."* A headless stub cannot answer it -- style,
@@ -16,7 +16,7 @@
 const fs = require('fs');
 module.exports = async function ({ send, evaluate, logs, sleep }) {
   const URL_ = process.env.PAGE;
-  const PROJ = process.env.PROJ || 'dev/water-network-dev/water-network-examples/Net3.lwn';
+  const PROJ = process.env.PROJ || 'dev/water-network-examples/Net3.lwn';
   await send('Page.navigate', { url: URL_ });
   await sleep(4000);
   await evaluate(`(function(){

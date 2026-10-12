@@ -121,7 +121,7 @@ L.markSized();
 
 // Three projects. The first carries Net3 with every label field on, because a crowd is where a
 // label could move; the other two are small and differ, so a borrowed element would show.
-const net3 = JSON.parse(fs.readFileSync(path.join(__dirname, '../water-network-dev/water-network-examples/Net3.lwn'), 'utf8'));
+const net3 = JSON.parse(fs.readFileSync(path.join(__dirname, '../water-network-examples/Net3.lwn'), 'utf8'));
 if (net3.settings) { net3.settings.labelMaxWidth = null; }   // "always show labels" -- see switch-keep-harness.js
 L.newProject();
 const big = L.openId();

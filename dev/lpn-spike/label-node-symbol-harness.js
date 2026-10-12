@@ -30,7 +30,7 @@ const path = require('path');
 const NODE_FIELDS = ['id', 'pressure', 'demand', 'elev'], LINK_FIELDS = ['id', 'flow', 'velocity'];
 const EPS_PX = 1.5;
 const SCENES = [
-	{ name: 'Net3', file: path.join(__dirname, '../water-network-dev/water-network-examples/Net3.lwn'), view: 'fit',
+	{ name: 'Net3', file: path.join(__dirname, '../water-network-examples/Net3.lwn'), view: 'fit',
 		mults: [1, 2, 4, 8], minShown: 300 },
 	{ name: 'bench plain downtown', file: path.join(__dirname, 'fixtures/plain-downtown-n600-seed71.lwn'),
 		view: 'density', spacingPx: 28, mults: [1, 1.5, 2, 3, 4], minShown: 1100 }

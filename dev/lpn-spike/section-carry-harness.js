@@ -347,12 +347,12 @@ console.log('\n6. A shipped example states what its own source .inp states');
 	// comparison would fail for the wrong reasons. Add a field here when the importer learns one.
 	const INTERPRETED = ['settings.quality', 'settings.reactions', 'settings.energy', 'times.qualityStep'];
 	const dig = (o, p) => p.split('.').reduce((v, k) => (v == null ? v : v[k]), o);
-	['Net1', 'Net2', 'Net3'].forEach((name) => {
+	[['Net1', 'Net1'], ['Net2', 'Net2-Branford-CT'], ['Net3', 'Net3-Novato-CA-World']].forEach(([name, file]) => {
 		const srcText = fs.readFileSync(
 			path.join(ROOT, 'dev', 'water-network-examples', name + '.inp'), 'utf8');
 		const src = sectionLines(srcText);
 		const carried = Object.keys(src).filter((n) => !SECTIONS_READ[n] && src[n].length);
-		const saved = JSON.parse(fs.readFileSync(path.join(ROOT, 'examples', name + '.lwn'), 'utf8'));
+		const saved = JSON.parse(fs.readFileSync(path.join(ROOT, 'examples', file + '.lwn'), 'utf8'));
 
 		byId.lpn_dialog_body.children.length = 0;
 		L.importInp({ name: name + '.inp', _text: srcText });
