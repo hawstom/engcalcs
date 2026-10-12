@@ -259,9 +259,9 @@ async function main() {
 	const org1 = snap1.origin || { x: 0, y: 0 };
 	const byType = t => snap1.nodes.filter(n => n.type === t);
 	const linksOf = t => snap1.links.filter(l => l.type === t);
-	const LAY = { pipe: 'C-WATR-MODL-L___-BASE', pump: 'C-WATR-MODL-P___-BASE', valve: 'C-WATR-MODL-V___-BASE',
-		junction: 'C-WATR-MODL-J___-BASE', tank: 'C-WATR-MODL-T___-BASE', reservoir: 'C-WATR-MODL-R___-BASE',
-		customer: 'C-WATR-MODL-C___-BASE' };
+	const LAY = { pipe: 'C-WATR-MODL-LINK-BASE', pump: 'C-WATR-MODL-PUMP-BASE', valve: 'C-WATR-MODL-VALV-BASE',
+		junction: 'C-WATR-MODL-NODE-BASE', tank: 'C-WATR-MODL-TANK-BASE', reservoir: 'C-WATR-MODL-RESV-BASE',
+		customer: 'C-WATR-MODL-CUST-BASE' };
 	const layers1 = d1.sections.TABLES.filter(e => e.type === 'LAYER').map(e => g(e, 2));
 	Object.keys(LAY).forEach(t => ok('Net1: layer ' + LAY[t] + ' is declared', layers1.indexOf(LAY[t]) >= 0));
 	const custLayer = d1.sections.TABLES.find(e => e.type === 'LAYER' && g(e, 2) === LAY.customer);
@@ -318,20 +318,15 @@ async function main() {
 	ok('Net1: the read-me names the layer pattern with a real layer', rd1.some(t => t.indexOf(LAY.junction) >= 0));
 	ezdxfAudit(path.join(tmp, 'Net1.dxf'), 'Net1');
 
-	console.log('--- layer names follow the project\'s ID prefixes and the scenario on screen ---');
+	console.log('--- layer names: fixed asset codes whatever the ID prefixes, and the scenario on screen ---');
 	{
 		const st = L.settings();
 		const keep = Object.assign({}, st.idPrefixes);
 		st.idPrefixes.J = 'jn-'; st.idPrefixes.L = 'PIPE5';
 		L.createScenario('Fire flow 2030');
-		const ents = entities(readDxf(L.dxfExportText(out1.frame).text));
-		const lay = new Set(ents.map(e => e.layer));
-		ok('a junction prefix "jn-" gives JN__, a pipe prefix "PIPE5" gives PIPE, and the scenario its name',
-			lay.has('C-WATR-MODL-JN__-FIRE_FLOW_2030') && lay.has('C-WATR-MODL-PIPE-FIRE_FLOW_2030'), [...lay].join(' '));
-		st.idPrefixes.L = 'JN';
-		const lay2 = new Set(entities(readDxf(L.dxfExportText(out1.frame).text)).map(e => e.layer));
-		ok('two types that would share a code fall back to the built-in codes', lay2.has('C-WATR-MODL-J___-FIRE_FLOW_2030') &&
-			lay2.has('C-WATR-MODL-L___-FIRE_FLOW_2030'), [...lay2].join(' '));
+		const lay = new Set(entities(readDxf(L.dxfExportText(out1.frame).text)).map(e => e.layer));
+		ok('ID prefixes "jn-" and "PIPE5" change nothing: NODE and LINK, and the scenario gives its name',
+			lay.has('C-WATR-MODL-NODE-FIRE_FLOW_2030') && lay.has('C-WATR-MODL-LINK-FIRE_FLOW_2030'), [...lay].join(' '));
 		Object.assign(st.idPrefixes, keep);
 		L.switchScenario(L.baseScenario().id);
 	}
@@ -352,17 +347,17 @@ async function main() {
 		const layersOf = () => new Set(entities(readDxf(L.dxfExportText(out1.frame).text)).map(e => e.layer));
 		const rdOf = () => entities(readDxf(L.dxfExportText(out1.frame).text)).find(e => e.type === 'MTEXT').lines;
 		L.createScenario('Пожар');
-		const cyr = 'C-WATR-MODL-J___-' + global.EngCalcs.lpnDxfString('ПОЖАР');
+		const cyr = 'C-WATR-MODL-NODE-' + global.EngCalcs.lpnDxfString('ПОЖАР');
 		ok('D2: "Пожар" is written on ' + cyr + ', not -BASE', layersOf().has(cyr) && ![...layersOf()].some(n => /-BASE$/.test(n)), [...layersOf()].join(' '));
 		ok('D2: ...and the read-me example names that layer', rdOf().some(t => t.indexOf(cyr) >= 0));
 		L.createScenario('Débit max');
-		ok('D2: "Débit max" keeps its accent (DÉBIT_MAX, one Windows-1252 byte)', layersOf().has('C-WATR-MODL-J___-D\xc9BIT_MAX'), [...layersOf()].join(' '));
+		ok('D2: "Débit max" keeps its accent (DÉBIT_MAX, one Windows-1252 byte)', layersOf().has('C-WATR-MODL-NODE-D\xc9BIT_MAX'), [...layersOf()].join(' '));
 		L.createScenario('Fire flow');
 		L.createScenario('Fire-flow');
-		ok('D2: two names that encode alike are told apart (FIRE_FLOW, then FIRE_FLOW_2)', layersOf().has('C-WATR-MODL-J___-FIRE_FLOW_2'), [...layersOf()].join(' '));
+		ok('D2: two names that encode alike are told apart (FIRE_FLOW, then FIRE_FLOW_2)', layersOf().has('C-WATR-MODL-NODE-FIRE_FLOW_2'), [...layersOf()].join(' '));
 		L.createScenario('!!!');
 		ok('D2: a name with nothing left after encoding takes its scenario ID, not BASE',
-			[...layersOf()].some(n => /^C-WATR-MODL-J___-S\d+$/.test(n)), [...layersOf()].join(' '));
+			[...layersOf()].some(n => /^C-WATR-MODL-NODE-S\d+$/.test(n)), [...layersOf()].join(' '));
 		L.switchScenario(L.baseScenario().id);
 	}
 
@@ -410,7 +405,7 @@ async function main() {
 		}
 		ok('no chunk of 250 ends inside an escape pair, for a dozen offsets of the boundary', split === 0, split);
 		// 2. The cap cuts the NAME, never the notes after it.
-		const name = 'Ж'.repeat(1000), notes = ['LAYERS ARE NAMED C-WATR-MODL-J___-BASE.', '3 JUNCTIONS HAVE MORE THAN ONE DEMAND CATEGORY.', '2 VALUES WERE SHORTENED.'];
+		const name = 'Ж'.repeat(1000), notes = ['LAYERS ARE NAMED C-WATR-MODL-NODE-BASE.', '3 JUNCTIONS HAVE MORE THAN ONE DEMAND CATEGORY.', '2 VALUES WERE SHORTENED.'];
 		txt = W([name].concat(notes));
 		r = mtOf(txt);
 		const ls = r.text.split('\\P');

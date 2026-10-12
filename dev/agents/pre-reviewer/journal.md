@@ -4157,6 +4157,13 @@ OBSERVED: one change then 3 reloads: 6+7 stable. Start fresh clears lpn_dockbox,
 OBSERVED: Properties flyout text matches the string.
 SPECULATION: defaults gate looks only at box records + lpn_dockbox, not lpn_index; a returning visitor with projects but no box record gets 14 tabs once. navigator.webdriver true under --remote-debugging/automation Chrome.
 
+## 2026-10-08 feat/visit-dedupe 22e3c4ca (Perry)
+OBSERVED real Chromium (own probes, temp log dir): first visit with no answer leaves an empty cookie jar. Allow all via banner: ec_code (16 hex, 400.0 d, Lax, not HttpOnly) appears before any page load; the next page's reach row carries it just before "visitor". Both new harnesses pass bare (32/32, 67 checks); start-fresh harness 14/14 and deletes ec_code. Selftests (log_format, usage_report, daily_report, memory, log_bucket) and lang_syntax pass. lang-log-stats.sh on a coded fixture: browsers column, no sum.
+OBSERVED the builder's service-worker flag is real and understated: a fresh SW install fetches all ~22 pages WITH cookies. First visit, no answer: 23 page-load rows. Returning visitor with ec_language cookie: said-yes gets 1 cookie row + 21 coded 'view' rows (uses, not browsers); said-no gets 23 page-load rows. A yes-first context with no language cookie got 1 row. Pre-existing (sw.php and the logging branch are untouched by this branch) but it inflates "uses" and "page loads" on every deploy-triggered SW update.
+OBSERVED non-English banners (Spanish checked) still say "cookie de un solo dígito ... ya contamos esta página" and their yes now makes the random code; privacy.php is English only. Not an honest ask for the code. consent_current_granted still says "We limit logging for this browser profile."
+OBSERVED librewaternet.org/features.html:177 says "no visitor identifier"; false for a yes-sayer once deployed.
+CITED WebKit ITP 2.1: cookies written by document.cookie are capped at 7 days; the page rewrites ec_code by script on every DOMContentLoaded, so in Safari the "400 days" is probably 7. Not testable here (no WebKit).
+NOT RUN: mutation test of the harnesses (would require editing the worktree); full check_all; the Safari point; appearance of spock with coded rows (its selftest drives the real page).
 ## 2026-10-08 feat/hover-label f8393134 (Perry)
 OBSERVED: dev/lpn-spike/hover-card-browser-harness.js 26/26. Mutation (card composed from the user's own ticks instead of all-ticked) fails 5 checks, so the harness has teeth.
 OBSERVED (label bench, headless, scratch archives of master a871d194 and HEAD): scenes for Net1, Net2, Net3, Novato zoom+seq identical byte for byte, with default fields AND with every node and link field ticked (the all-ticked run differs from the default run, so the compare is not vacuous). Placements unchanged.
@@ -4254,3 +4261,9 @@ OBSERVED: a Shape under a data label cannot be selected at the label's hit area;
 OBSERVED: Select Area (window/lasso) never picks Shapes; no Tables tab; Find unaffected.
 OBSERVED: Arabic page: Shape strings are English (untranslated, expected); phone 390 draws by taps, closes by tap on first point.
 NOT CHECKED: Recalc OFF at runtime (code path calls only save/rebuild), projected-CRS import, visual appearance (colour, grips, 6% fill), dark theme, touch drag of grips.
+
+# Perry journal: fix/run-report f908c408 (2026-10-11)
+OBSERVED: builder's run-report-units-harness passes (57 checks). My own old-vs-new comparison (reportUnits stripped vs kept) on a hand-built 10-node .inp with emitters, PRV, FCV, head-curve pump with speed pattern, volume-curve tank, reservoir pattern, pressure/level/clock controls, 5 rules, PDA, chlorine with wall order 0 and 1, 24 h: heads, pressures, demands, flows, velocities, headlosses, levels, qualities, statuses, event timeline identical (3375 values, bad 0) for gpm, gph, mgd, afd, imgd, lpm, mld, cmd, cmh, m3ps, lps, in US and SI sets.
+OBSERVED: with D-W or C-M roughness on an ill-posed (hydraulically unbalanced) network, old vs new differ at ~1e-6 and "Balanced after 17 vs 16 trials" appears; not wall-related. Unreproduced on a well-posed network; not checked.
+SPECULATION: reportWallKept failing mid-loop leaves some pipes' wall coefficient already rescaled when it switches back to L/s; and the fallback tells the visitor nothing. Not exercised.
+NOT CHECKED: browser, rendered Run report dialog.

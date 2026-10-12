@@ -100,7 +100,7 @@ console.log('\n--- 3. a "No ..." selector does not count as content (rule a\'s e
 	const keys = L.headings('pipes').map((c) => c.key);
 	L.pasteAppend('junctions', 'J1\t0\t0\nJ2\t100\t0');
 	L.pasteAppend('pipes', pipeRow({ id: 'P1', from: 'J1', to: 'J2' }, keys));
-	// P1's pipe type is unset, so its cell reads the "No pipe type selected" placeholder choice --
+	// P1's pipe type is unset, so its cell reads the "No pipe type chosen" placeholder choice --
 	// a long sentence that must NOT inflate the column past the heading-only floor.
 	report(L.headings('pipes').some((c) => c.key === 'typeId'), 'sanity: the pipe type column exists');
 	const withNone = L.widthEm('pipes', 'typeId');
@@ -109,7 +109,7 @@ console.log('\n--- 3. a "No ..." selector does not count as content (rule a\'s e
 	L.reset();
 	const emptyTable = L.widthEm('pipes', 'typeId');
 	report(Math.abs(withNone - emptyTable) < 0.01,
-		'an all-"No pipe type selected" column is no wider than an empty one -- the placeholder does not count',
+		'an all-"No pipe type chosen" column is no wider than an empty one -- the placeholder does not count',
 		withNone + ' vs ' + emptyTable);
 }
 

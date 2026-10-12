@@ -45,16 +45,15 @@
 	// like C-WATR-MODL-. Everything after this prefix is used to specify asset and alternative
 	// according to the asset prefixes in the destination project like J___-BASE for a junction on
 	// (geometry) alternative Base"*. So a layer is PREFIX + ASSET CODE + "-" + ALTERNATIVE:
-	// C-WATR-MODL-J___-BASE. Tom, on the browser pass: *"let's attempt to make the layers prefix
+	// C-WATR-MODL-NODE-BASE (the codes are fixed, below). Tom, on the browser pass: *"let's attempt to make the layers prefix
 	// somewhat unique in the DWG with C-WATR-MODL-"*; the DXF Interface Manager will let a user
 	// change it, so it is this ONE constant, and a caller's `layerPrefix` replaces it.
 	var MODEL_PREFIX = 'C-WATR-MODL-';
-	// The ASSET CODE is the project's own ID prefix for that type, upper case, letters and digits
-	// only (a hyphen would split the code from the alternative), padded with underscores to four
-	// characters as Tom's "J___" is. These are the built-in prefixes (settings.idPrefixes in
-	// js/looped-network.js), used where the project's are empty or two types would share a code.
-	var TYPE_KEY = { junction: 'J', reservoir: 'R', tank: 'T', pipe: 'L', pump: 'P', valve: 'V', customer: 'M' };
-	var DEFAULT_PREFIX = { J: 'J', R: 'R', T: 'T', L: 'L', P: 'P', V: 'V', M: 'C' };
+	// The ASSET CODE is FIXED per type, four characters, whatever the project's ID prefixes are.
+	// Tom, 2026-10-11: *"Let's change our layer name groups as follows: N___ to NODE, L___ to LINK,
+	// R___ to RESV, T___ to TANK, P___ to PUMP, V___ to VALV, S___ to SHAP"*. Customers were not
+	// named; CUST is our decision. A Shape's code is SHAP (the shape branch adds the type).
+	var ASSET_CODE = { junction: 'NODE', pipe: 'LINK', reservoir: 'RESV', tank: 'TANK', pump: 'PUMP', valve: 'VALV', customer: 'CUST' };
 	// Layer order and ACI colours (1-9 only, so every program shows the same colour). Never 5, blue,
 	// which is unreadable on a dark screen (Tom, 2026-10-07: choose among 1, 2, 3, 4, 6 and 7); the
 	// pipe is yellow (2) because cyan (4) is the junction's; the customer is white (7; Tom,
@@ -67,23 +66,6 @@
 	// **THE READ-ME IS OUTSIDE THE MODEL PREFIX**, so an import of C-WATR-MODL-* never reads it as an
 	// asset. White (ACI 7; Tom: *"Make the README layer white."*) and not plotted.
 	var README_LAYER = 'C-WATR-RDME';
-	function codeOf(prefix) {
-		var c = String(prefix || '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 4);
-		return c ? (c + '____').slice(0, 4) : '';
-	}
-	/** settings.idPrefixes -> { junction: 'J___', ... }, the built-in set if any is empty or shared. */
-	function assetCodes(idPrefixes) {
-		var out = {}, seen = {}, clash = false;
-		Object.keys(TYPE_KEY).forEach(function (t) {
-			var c = codeOf((idPrefixes || {})[TYPE_KEY[t]]);
-			if (!c || seen[c]) { clash = true; }
-			seen[c] = true; out[t] = c;
-		});
-		if (clash) {
-			Object.keys(TYPE_KEY).forEach(function (t) { out[t] = codeOf(DEFAULT_PREFIX[TYPE_KEY[t]]); });
-		}
-		return out;
-	}
 	/**
 	 * An alternative's name as the part of a layer name after the asset code: capitals in the
 	 * page's locale, letters and digits of ANY script kept (pre-review 2026-10-07: "Пожар" fell back
@@ -226,7 +208,7 @@
 	 * model = {
 	 *   insunits, measurement (0 imperial, 1 metric),
 	 *   layerPrefix: replaces MODEL_PREFIX ('C-WATR-MODL-'),
-	 *   codes: { junction: 'J___', ... } (assetCodes()), alternative: 'BASE',
+	 *   alternative: 'BASE',
 	 *   locale: the page's language, for capitals ('tr' upper-cases i as İ),
 	 *   idTags: { junction: 'ID', ... } -- each block's ID tag, which is its VISIBLE attribute. By
 	 *     property, not by text: a translated label is not "ID" (pre-review 2026-10-07: in ar, fa,
@@ -243,12 +225,12 @@
 	function writeDxf(model) {
 		LOCALE = model.locale || '';
 		var w = new Writer(), pfx = model.layerPrefix === undefined ? MODEL_PREFIX : model.layerPrefix,
-			codes = model.codes || assetCodes(null), alt = alternativeCode(model.alternative) || 'BASE',
+			alt = alternativeCode(model.alternative) || 'BASE',
 			idTags = model.idTags || {},
 			ext = { x0: Infinity, y0: Infinity, x1: -Infinity, y1: -Infinity },
 			H = {}, blockRec = {}, blockTypes = [], tags = {}, i,
 			readme = (model.readme || []).map(function (s) { return caps(plainQuotes(s)); });
-		function layerOf(type) { return tableName(pfx + (codes[type] || codeOf(DEFAULT_PREFIX[TYPE_KEY[type]])) + '-' + alt); }
+		function layerOf(type) { return tableName(pfx + ASSET_CODE[type] + '-' + alt); }
 		Object.keys(BLOCK_OF).forEach(function (t) {
 			tags[t] = ((model.tags && model.tags[t]) || []).map(function (x) { return tagName(x); });
 		});
@@ -635,7 +617,7 @@
 	EngCalcs.lpnDxfWrite = writeDxf;
 	EngCalcs.lpnDxfModelPrefix = MODEL_PREFIX;
 	EngCalcs.lpnDxfReadmeLayer = README_LAYER;
-	EngCalcs.lpnDxfAssetCodes = assetCodes;
+	EngCalcs.lpnDxfAssetCodes = ASSET_CODE;
 	EngCalcs.lpnDxfAlternative = alternativeCode;
 	EngCalcs.lpnDxfTag = tagName;
 	EngCalcs.lpnDxfBlocks = BLOCK_OF;

@@ -83,6 +83,9 @@ the block.
   'Shape', and we can export or import to and from points, polylines, and polygons.) and the
   ability to snap or magnet to shape points."* Seams: DXF (Task 772), GeoJSON, survey points.
   Tom, 2026-10-09: a one-point Shape is drawn as an ×, and the task is Next (calls page H12).
+  Tom, 2026-10-11 browser pass: an open, almost-closed polygon icon; a Shapes table to paste and copy shapes
+  (import/export), then shapefile and DXF import; *"the main presenting use case ... is to import shapes from GIS
+  or CAD to guide precise placement or map supplementation."*
 - 100|781| **Active topology first; then Change type becomes a new asset in the old one's place.**
   Tom, 2026-10-08, choosing "Active topology first": *"I never wanted what we have anyway. Now that
   I understand, I want it changed. Change type is to be make a new object at the location of the old
@@ -120,6 +123,9 @@ the block.
   networks at any size and density (grid, radial, branched), a fresh seed each round, plus published
   utility-scale networks. Notes: dev/paper-notes-label-placement.md.
 - 100|759| **One word for the map selection, another for a menu choice; tips that earn their place.**
+  **CALLED 2026-10-11:** *"map selection is "Select/Selected/Selection" with "Highlight" approved for specific uses such
+  as "the selected objects are highlighted". And menu and dialog options choices/choose/chosen (never "selected")."*
+  Applied to the English on `chore/selection-word` (`dev/selection-word-changes.md`); closes when it merges.
   **TIPS HALF MERGED 2026-10-06** (`feat/tip-door`, Tom: "Merge"): one style of tip, every `title` the styled
   name tip; the ALL-CAPS headings dropped. Open: the selection word (Highlighted / Chosen).
   Tom, 2026-10-03: a "studied, considered, carefully adopted, and audited" strategy to tell the map
@@ -131,6 +137,17 @@ the block.
   Tom, 2026-10-10: if nobody else does Change type, *"abandon the project and institute a variety of smaller
   and better tools: Snap/magnet to asset; Match properties from one asset to others (as applicable); Change
   link connections (done); Split pipe (done)."* Seam: Task 779 snapping to shape points.
+- 100|784| **A small time-series graph bubble on the map, from an asset's right-click.**
+  **PROMOTED TO 100 by Tom, 2026-10-11** (*"784 time-series bubbles: Promote to 100."*).
+  Tom, 2026-10-11, looking for it: *"multiple concurrent map time series graph bubbles available by right-clicking
+  an asset."* The asset right-click menu now exists on `feat/match-property` as a row list (`openMapContextMenu`).
+  Tom, 2026-10-10: *"a right-click menu at assets that includes 'Time series graph' that makes a pretty
+  'speech bubble' 200px to 400 px ... so that four or six could be arranged on the map. And it would be
+  really cool if that presentation scenario could be saved."*
+- 100|787| **Raised tanks: a ground elevation and a base elevation.**
+  Tom, 2026-10-11, overruling the advice to give tank pressure a special meaning: *"Pressure is above ground. No
+  special meaning at tanks. ... Build Elevation (ground and pressure datum) and Elevation (depth and volume tank
+  base)."* EPANET's tank elevation is the base; ground is ours. Building on `feat/tank-ground`.
 - 75|539| **Gang the neighbour labels so their leaders stop crossing.**
   **DEMOTED TO 75 by Tom, 2026-10-11.**
   **PORTING THE BENCH TO MASTER, 2026-10-07** (Tom agreed D09: rules 1-3 as three defect branches;
@@ -253,6 +270,9 @@ the block.
     read-only console paste that answers the scenario list in one go -- run it on the next
     specimen BEFORE closing the tab.
 - 75|639| **Layers: the first heading under Map and page.**
+  **RESCOPED 2026-10-11** (Tom, to CC's proposal: *"OK. I am fuzzy on it at the moment, but clarities will arise
+  once I play with it."*): Map appearance already holds opacity, sizes and colours, so this is on/off and order per
+  layer, worth building once Shapes (779), contours and customers are layers. After 779 merges.
   Tom, 2026-09-12. A Layers sub-heading under `Settings > Map and page`, ABOVE Appearance, with a
   row per layer and the columns On/off, Opacity, Size (default), Color (default), Z.
   - **Phase 1 layers: Text, Symbol, Link, Flow arrow, Background.** Roadmap layers: Contour
@@ -398,7 +418,9 @@ the block.
   Tom, 2026-10-11: *"SI presets are requested over twice as much as US presets. So I want to have more good SI
   examples, even if I have to convert the Net2 and Net3 examples."* Mary is surveying redistributable SI networks
   and the KYPipe examples (her journal, 2026-10-11).
-  Net3 and Net2 SI twins are on `feat/si-example`, first four on the wall; Mini C-Town (CC BY 4.0) is what remains.
+  Tom, 2026-10-11: *"convert Net2 and Net3 to SI and put them first in this order: Net3 SI, Net3 US, Net2 SI, Net2
+  US."* Built on `feat/si-example`. Expand the gallery first, promote to the front later. KYPipe networks (CC BY-NC):
+  ask the authors before shipping any.
 - 50|146.09| **An inset overview map: the whole project, with a box round where you are.**
   Reworked by Tom 2026-08-25, and it is a different feature from the one this ID used to hold:
   *"146.09 reworked as a key/overview map inset like many games where the entire project is depicted
@@ -891,12 +913,6 @@ the block.
   **BUILT 2026-10-08 on `feat/hover-label`**, asked again by outside tester DDN ("whether to show these
   should be a setting"): Select mode, card on rest, setting in Map and page; Perry passed it. Open: field
   names in words, and other modes (calls page G07, G08).
-- 50|784| **A small time-series graph bubble on the map, from an asset's right-click.**
-  Tom, 2026-10-11, looking for it: *"multiple concurrent map time series graph bubbles available by right-clicking
-  an asset."* The asset right-click menu now exists on `feat/match-property` as a row list (`openMapContextMenu`).
-  Tom, 2026-10-10: *"a right-click menu at assets that includes 'Time series graph' that makes a pretty
-  'speech bubble' 200px to 400 px ... so that four or six could be arranged on the map. And it would be
-  really cool if that presentation scenario could be saved."*
 - 50|785| **Rewrite the Guide's chapters to the Find and replace model.**
   Split from Task 763 on its close, 2026-10-11. Every chapter but Find and replace is audited, not rewritten:
   `dev/user-guide-audit.md`.
