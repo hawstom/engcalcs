@@ -6,7 +6,7 @@
 		"name": "Net2",
 		"activeScenario": "base",
 		"gallery": "Net2-Branford-CT.lwn",
-		"basemap": "satellite",
+		"basemap": "osm",
 		"crs": "EPSG:2234"
 	},
 	"scenarios": [

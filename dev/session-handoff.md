@@ -123,7 +123,7 @@ the pkill guard in .claude/hooks/guard-wait-loops.php; Mary's antecedent list (h
   name in the Scenarios TABLE makes it current. Perry CONFIRMED round 6; his three gaps fixed with real-mouse
   checks. Test-merge with feat/match-property conflicts only in dev/new-english-keys.md.
 - **feat/si-example** (9df2f3f0, 8111; Task 786): eight cards, Net3/Net2 SI+US twins, backdrops only on Elm
-  Street; Net2 from his .epp on the satellite map as he asked (privacy.php sentence owed), Net3's label and
+  Street; Net2 from his .epp on the OSM street map (his call), Net3's label and
   colour conventions. Basics last. Perry CONFIRMED scale bars.
 - **feat/shape** (cb281a99, 8108): the icon is his freehand outline; DXF layer SHAP. Import stays on Task 779.
 - **feat/convert-search** (b71bb912, 8119): Convert as carries the chooser's place search into Step 1. Perry

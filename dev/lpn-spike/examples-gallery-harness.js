@@ -107,9 +107,8 @@ examples.forEach(function (ex) {
 });
 
 // ---- WHICH BASEMAP EACH EXAMPLE OPENS ON ----------------------------------------------------------
-// Tom, 2026-10-12: the two Net2 examples open on the satellite map his .epp asked for. Every other
-// example stays on the OSM street map or none (privacy.php: only the OSM tiles load unasked on the
-// empty first project; satellite is Mapbox and is gated on the token). Net3 and the opening page
+// Tom, 2026-10-12: the two Net2 examples use the street map. No example stores satellite (Mapbox,
+// gated on the token; privacy.php says only the OSM tiles load unasked). Net3 and the opening page
 // request OSM, which was checked against the files, not assumed.
 console.log('\n-- the basemap each example opens with --');
 examples.forEach(function (ex) {
@@ -117,8 +116,8 @@ examples.forEach(function (ex) {
 		const d = JSON.parse(fs.readFileSync(path.join(dir, ex.file), 'utf8'));
 		const b = (d.project || {}).basemap;
 		const net2 = /^Net2-Branford/.test(ex.file);
-		report(net2 ? b === 'satellite' : (b === undefined || b === 'osm' || b === 'off'),
-			`${ex.file} (${dir === srcDir ? 'authored' : 'served'}) basemap is ${net2 ? 'satellite' : 'OSM or none'}`, String(b));
+		report(net2 ? b === 'osm' : (b === undefined || b === 'osm' || b === 'off'),
+			`${ex.file} (${dir === srcDir ? 'authored' : 'served'}) basemap is ${net2 ? 'OSM street map' : 'OSM or none'}`, String(b));
 	});
 });
 

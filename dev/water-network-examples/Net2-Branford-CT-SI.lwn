@@ -6,7 +6,7 @@
 		"name": "Net2-Branford-CT SI",
 		"activeScenario": "base",
 		"gallery": "Net2-Branford-CT-SI.lwn",
-		"basemap": "satellite",
+		"basemap": "osm",
 		"crs": "EPSG:26956",
 		"docId": "dmsW58kqZtQHf9tme"
 	},
