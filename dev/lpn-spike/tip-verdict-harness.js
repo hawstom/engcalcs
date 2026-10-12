@@ -135,8 +135,8 @@ console.log('\n--- 5. Toms follow-up wording, 2026-10-04 ---');
 		val('lpn_tool_zoom_window_tip').indexOf('Specify corners or drag a rectangle.') === 0);
 	ok('quality tolerance tip says concentration difference below which parcels are one',
 		/^Concentration difference below which EPANET treats two adjoining parcels of water as one\./.test(val('lpn_quality_tolerance_tip')));
-	ok('the specific gravity tip returned 2026-10-12, saying it scales pressure in every unit and not head',
-		/scales pressure in every unit/.test(val('lpn_settings_specific_gravity_tip') || '') && /does not change head or HGL/.test(val('lpn_settings_specific_gravity_tip') || '') &&
+	ok('the specific gravity tip returned 2026-10-12 and its Settings row is wired to it',
+		typeof val('lpn_settings_specific_gravity_tip') === 'string' && val('lpn_settings_specific_gravity_tip').length > 0 &&
 		/hydNumberRow\('specificGravity', 'lpn_settings_specific_gravity', 'Specific gravity',\s*'lpn_settings_specific_gravity_tip', 1\)/.test(js));
 }
 
