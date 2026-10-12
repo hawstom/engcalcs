@@ -109,13 +109,21 @@
 	// handed the base, because that is what its [TANKS] Elevation is, so its EN_PRESSURE at a tank is
 	// H - base. Moved onto the ground here, at the one door its pressures come through, so both
 	// engines report one number. Every other node's pressure passes untouched.
-	// **NO SPECIFIC GRAVITY IN THE SHIFT, MEASURED**: this bridge always writes `Units LPS`, so the
-	// engine's pressure is in METRES, and EPANET scales only psi and kPa by Specific Gravity -- with
-	// SG 1.1 its junction pressures came back unchanged to the last digit. The tank is moved by the
-	// same factor the engine applies to every junction, which is 1.
-	function tankGroundPressure(n, pEngine) {
-		if (!n || n.type !== 'tank' || typeof n.ground !== 'number' || !isFinite(n.ground)) { return pEngine; }
-		return pEngine + ((n.elev || 0) - n.ground);
+	// **SPECIFIC GRAVITY IS APPLIED HERE, AFTER THE SHIFT** (Tom, 2026-10-12: *"1 ft or meter of
+	// water creates a pressure that varies with specific gravity"*). Under `Units LPS` the engine's
+	// pressure is a head of the fluid in METRES with no SG in it (measured: SG 1.1 left its junction
+	// pressures unchanged), whereas the built-in solver reports (H - z) x SG in every unit, so a
+	// pressure in m or ft is a column of WATER. This is the one door both engines' pressures leave
+	// through: a tank is moved onto the ground first, then every node is multiplied, which is
+	// SG x (pEngine + base - ground). Head stays a head of the fluid, unscaled.
+	function specificGravityOf(model) {
+		var h = model && model.hydraulics;
+		return (h && typeof h.specificGravity === 'number' && isFinite(h.specificGravity)) ? h.specificGravity : 1;
+	}
+	function tankGroundPressure(n, pEngine, sg) {
+		var p = pEngine;
+		if (n && n.type === 'tank' && typeof n.ground === 'number' && isFinite(n.ground)) { p = pEngine + ((n.elev || 0) - n.ground); }
+		return p * (sg === undefined ? 1 : sg);
 	}
 
 	/**
@@ -1595,7 +1603,7 @@
 					n = model.nodes[i];
 					idx = s.nodeIdx[n.id];
 					heads[n.id] = p.getNodeValue(idx, EN_HEAD);
-					pressures[n.id] = tankGroundPressure(n, p.getNodeValue(idx, EN_PRESSURE));
+					pressures[n.id] = tankGroundPressure(n, p.getNodeValue(idx, EN_PRESSURE), specificGravityOf(model));
 					if (pda && n.type !== 'reservoir' && n.type !== 'tank') {
 						demands[n.id] = p.getNodeValue(idx, EN_DEMAND) / 1000;
 						deficits[n.id] = Math.max(0, p.getNodeValue(idx, EN_DEMANDDEFICIT)) / 1000;
@@ -2322,7 +2330,7 @@
 									for (i = 0; i < model.nodes.length; i++) {
 										n = model.nodes[i];
 										f.heads[n.id] = ruHead(p.getNodeValue(nodeIdx[n.id], EN_HEAD));
-										f.pressures[n.id] = tankGroundPressure(n, p.getNodeValue(nodeIdx[n.id], EN_PRESSURE));
+										f.pressures[n.id] = tankGroundPressure(n, p.getNodeValue(nodeIdx[n.id], EN_PRESSURE), specificGravityOf(model));
 										// L/s -> m3/s, the same scale a [JUNCTIONS] demand is written in.
 										f.demands[n.id] = ruFlow(p.getNodeValue(nodeIdx[n.id], EN_DEMAND)) / 1000;
 										// Under PDA only (Task 762): what the junction asked for and did not get.

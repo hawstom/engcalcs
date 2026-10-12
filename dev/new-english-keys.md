@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**103 still to read on master**, of 114 untranslated keys, of 2558 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**104 still to read on master**, of 115 untranslated keys, of 2559 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -199,7 +199,7 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   @@ NEEDS RULING
 
-## lpn_  (113, 102 to read @@ NEEDS RULING)
+## lpn_  (114, 103 to read @@ NEEDS RULING)
 
 - **`lpn_demand_pattern_constant`**
   > (constant)
@@ -489,6 +489,9 @@ never edits a synonym.
 - **`lpn_settings_hover_card_tip`**
   > Rest the pointer on a node, link or customer to see its label as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project.
   _Ruled 2026-10-09: Use proposed (Tom, calls page round 3)._
+- **`lpn_settings_specific_gravity_tip`**
+  > Density of the fluid relative to water. It scales pressure shown in psi, kPa or bar, and does not scale pressure head shown in m or ft. It changes no flow.
+  @@ NEEDS RULING
 - **`lpn_snap_moved_on_node`**
   > {moved} moved to the location of {target}. The two nodes are not connected.
   @@ NEEDS RULING
@@ -551,7 +554,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**146 still to read**, of 149 new keys across 12 unmerged branch(es).
+**141 still to read**, of 144 new keys across 13 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -868,6 +871,8 @@ build for that would be a gate nobody keeps. Refresh it with
   > Used by: {list}
   @@ NEEDS RULING
 
+### feat/convert-search (`b71bb912`) — adds no English strings
+
 ### feat/desktop (`baba0f04`) — adds no English strings
 
 ### feat/label-gang-search (`8b31a907`) — 3 new, all ruled
@@ -892,52 +897,37 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`2e5e81c4`) — adds no English strings
 
-### feat/match-property (`f5a59fc3`) — 14 new, 14 to read @@ NEEDS RULING
+### feat/match-property (`e95c8ac1`) — 9 new, 9 to read @@ NEEDS RULING
 
-- **`lpn_match_done_many`**
-  > Matched {m} assets to {id}, except status and location. Values changed: {n}.
+- **`lpn_copy_props_done`**
+  > Copied properties of {id}.
   @@ NEEDS RULING
-- **`lpn_match_done_one`**
-  > Matched {to} to {id}, except status and location. Values changed: {n}.
+- **`lpn_copy_props_menu`**
+  > Copy properties
   @@ NEEDS RULING
-- **`lpn_match_kind`**
-  > Match properties applies to nodes and pipes, pumps, and valves only.
+- **`lpn_paste_done_many`**
+  > Pasted properties of {id} to {m} assets. Values changed: {n}.
   @@ NEEDS RULING
-- **`lpn_match_menu`**
-  > Match properties
+- **`lpn_paste_done_one`**
+  > Pasted properties of {id} to {to}. Values changed: {n}.
   @@ NEEDS RULING
-- **`lpn_match_menu_off_tip`**
-  > Select target objects to match this object's properties except activation status.
+- **`lpn_paste_props_menu`**
+  > Paste properties to selection
   @@ NEEDS RULING
-- **`lpn_match_none`**
-  > {to} and {id} have no properties in common to copy.
+- **`lpn_paste_props_off_kind`**
+  > No selected asset can take the copied properties.
   @@ NEEDS RULING
-- **`lpn_match_select_first`**
-  > Select the targets first, then choose Match properties.
+- **`lpn_paste_props_off_none`**
+  > Nothing is copied. Right-click an asset and choose Copy properties.
   @@ NEEDS RULING
-- **`lpn_match_selected_ask`**
-  > Copy this object's properties except activation status to {n} selected objects?
+- **`lpn_paste_skip_breakdown`**
+  > Not pasted: {n} (demand is a list of categories).
   @@ NEEDS RULING
-- **`lpn_match_selected_ask_one`**
-  > Copy this object's properties except activation status to 1 selected object?
-  @@ NEEDS RULING
-- **`lpn_match_skip_breakdown`**
-  > Not copied: {n} (demand is a list of categories).
-  @@ NEEDS RULING
-- **`lpn_match_skip_scn`**
-  > Not copied: {names}. A scenario cannot hold its own value for these; change them in Base.
-  @@ NEEDS RULING
-- **`lpn_match_skip_valve`**
-  > Not copied: {n} (the valve types differ).
-  @@ NEEDS RULING
-- **`lpn_match_tip`**
-  > Copy the properties of one asset to the assets selected. Select the targets first, choose Match properties, then select the source. Status (Active, Shut), identity, location, and connections are never copied. Assets of a different type receive only the properties both types have.
-  @@ NEEDS RULING
-- **`lpn_mode_match`**
-  > Mode: Match properties. Select the asset to copy properties from. Status, identity, and location are not copied. Press Escape to cancel.
+- **`lpn_paste_skip_valve`**
+  > Not pasted: {n} (the valve types differ).
   @@ NEEDS RULING
 
-### feat/shape (`6a957eac`) — 27 new, 27 to read @@ NEEDS RULING
+### feat/shape (`554c2b24`) — 27 new, 27 to read @@ NEEDS RULING
 
 - **`lpn_file_import_shapes`**
   > Import GeoJSON shapes…
@@ -1021,19 +1011,19 @@ build for that would be a gate nobody keeps. Refresh it with
   > Draw a point, a polyline, or a polygon on the map. A Shape is annotation and is not part of the network. Specify each point, then specify the last point again, press Enter, or right-click to finish. Specify the first point again to close the Shape into a polygon.
   @@ NEEDS RULING
 
-### feat/si-example (`0f3023d7`) — 4 new, 4 to read @@ NEEDS RULING
+### feat/si-example (`9f5bd0d9`) — 4 new, 4 to read @@ NEEDS RULING
 
 - **`lpn_ex_net2_si_desc`**
-  > Litres per second, with metres and millimetres. EPANET’s Net2, converted from gallons per minute, feet and inches: a branched distribution system with a tank.
+  > Litres per second, with metres and millimetres. An EPANET example at Branford, Connecticut, converted from gallons per minute, feet and inches: 35 junctions and 1 tank, with no reservoir and no pump. Fluoride, a non-reactive substance, enters at one source.
   @@ NEEDS RULING
 - **`lpn_ex_net2_si_title`**
   > EPANET Net2, L/s (SI)
   @@ NEEDS RULING
 - **`lpn_ex_net3_si_desc`**
-  > Litres per second, with metres and millimetres. EPANET’s Net3, converted from gallons per minute, feet and inches: 92 junctions, three tanks, and two reservoirs, one of them a river.
+  > Litres per second, with metres and millimetres. An EPANET example at Novato, California, converted from gallons per minute, feet and inches, with the world map behind it: 92 junctions, 3 tanks and 2 reservoirs, no valves, about 8 km square. A 24-hour extended-period simulation, with a source trace from the Lake.
   @@ NEEDS RULING
 - **`lpn_ex_net3_si_title`**
   > EPANET Net3, L/s (SI)
   @@ NEEDS RULING
 
-### feat/tank-ground (`0b488156`) — adds no English strings
+### fix/paste-column (`a4e50f15`) — adds no English strings
