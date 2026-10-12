@@ -4254,3 +4254,11 @@ OBSERVED: a Shape under a data label cannot be selected at the label's hit area;
 OBSERVED: Select Area (window/lasso) never picks Shapes; no Tables tab; Find unaffected.
 OBSERVED: Arabic page: Shape strings are English (untranslated, expected); phone 390 draws by taps, closes by tap on first point.
 NOT CHECKED: Recalc OFF at runtime (code path calls only save/rebuild), projected-CRS import, visual appearance (colour, grips, 6% fill), dark theme, touch drag of grips.
+
+# Perry journal: feat/tank-ground 5bf543f6 (2026-10-11)
+OBSERVED: tank-ground (53), tank-ground-browser, tank-depth-volume-browser, examples-audit (319), inp-roundtrip-net3, inp-passthrough (1921), examples-vs-epanet all pass; scenario_seam_check passes.
+OBSERVED: Net1 .inp export after editing a tank's ground is byte-identical to before (ground never reaches the .inp); editing base changes only the [TANKS] row. A blank base follows the ground into the [TANKS] row.
+OBSERVED: type change tank(ground 900, base 880, depth 120)->reservoir keeps head 1000; ->tank gives depth 100 on ground 900, head 1000; ->junction keeps ground only.
+OBSERVED: with Specific Gravity 1.1 the built-in engine reports the tank pressure x1.1 (23.47 m) and EPANET unscaled (21.34 m); junctions differ the same way (85.4 vs 77.7), so pre-existing between engines, but the idle label (x SG) jumps when an EPANET run starts.
+OBSERVED: DXF ELEV for a tank now means ground; GeoJSON "elevation" still means base. Spanish/French base-elevation tip is the old translated text (lacks the "blank = at the ground" sentence); ground tip falls back to English.
+NOT CHECKED: look of the new column and rows, v12 file in an old build in a real browser (code: master refuses saved.v > its version at js/looped-network.js:35815), scenario Find-replace of Base elevation.
