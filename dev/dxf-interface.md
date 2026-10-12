@@ -16,6 +16,8 @@ Here's one simplistic thought:
 - Values format: values match the current project units and are imported verbatim.
 - Layers, assets, scenarios and alternatives: EPANET++ imports all legal objects on layers with a specified prefix like C-WATR-MODL-. Everything after this prefix is used to specify asset and alternative according to the asset prefixes in the destination project like J___-BASE for a junction on (geometry) alternative Base or R___-0012 for a block insertion that supplies reservoir property overrides for alternative(s) 0012 that can be mapped or renamed at import to a name that matches alternative(s) in EPANET.
 
+(Superseded for the writer, Tom 2026-10-11: the asset codes are fixed, NODE LINK RESV TANK PUMP VALV SHAP, not the project prefixes. `js/lpn-dxf.js` ASSET_CODE.)
+
 ## Rudimentary work flow
 
 Tell people to use a points import/export LSP routine and EPANET++ Import survey points just to get things added in the right location.

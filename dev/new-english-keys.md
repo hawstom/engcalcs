@@ -75,13 +75,37 @@ is the one you meant. "The first one" is a complete answer.
   *The proposal:* PROPOSED English: 'Rest the pointer on a node, link or customer to see its label as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project.'
   @@ NEEDS RULING
 
-## Synonym entries to approve  (12, 10 to read @@ NEEDS RULING)
+## Synonym entries to approve  (15, 13 to read @@ NEEDS RULING)
 
 **These are translator notes (`$ec_lang_syn`), not visitor wording.** Each was written against an
 English string that has since changed, or against a key that no longer exists. Say which: keep it
 as is, change it (a proposal may follow), or remove it. **Your answer on the flag line is the
 written permission** the rule requires; CC then applies it by hand and re-records it. A script
 never edits a synonym.
+
+- **`consent_body`**
+  > May we save a random code in this browser so that we can count how many browsers use each part of this site? The code is made up on the spot, says nothing about you or your device, and records nothing you enter. Without it we cannot tell your second visit from somebody else's first.
+  *Why stale:* the English changed after this synonym was written
+  *Written against:* May we save a one-digit cookie in this browser to remember that we have already counted this page? It records nothing about you and nothing you enter. Without it we cannot tell your second visit from somebody else’s first.
+  *Current synonym:* May we save (store, keep, put) a random code (a string of letters and digits chosen by chance) in this browser so that we can count (tally) how many browsers use each part of this site? The code is made up on the spot (created at that moment), says nothing about you or your device, and records nothing you enter. Without it we cannot tell your second visit from somebody else's first.
+  **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
+  @@ NEEDS RULING
+
+- **`consent_current_granted`**
+  > You allowed this. This browser keeps a random code so that we can count it.
+  *Why stale:* the English changed after this synonym was written
+  *Written against:* You allowed this. We limit logging for this browser profile.
+  *Current synonym:* You allowed this. A random browser code is tracked to minimize duplicate use counts.
+  **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
+  @@ NEEDS RULING
+
+- **`consent_region_label`**
+  > Your choice about the counting code.
+  *Why stale:* the English changed after this synonym was written
+  *Written against:* Your choice about limiting logging.
+  *Current synonym:* Your choice about the random browser code tracking.
+  **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
+  @@ NEEDS RULING
 
 - **`ip_is_lateral`**
   > <span class="ec-help" title="Selected: this reach is a segment of the test lateral, from which individual emitters withdraw water. Cleared: this reach is a main, only passing flow along to laterals not on the test path.">Lat. <span class="ec-tip">?</span></span>
@@ -313,7 +337,7 @@ never edits a synonym.
   > Replace and Undo
   @@ NEEDS RULING
 - **`lpn_guide_find_results_def`**
-  > <p>The matching assets are listed below the Find button. Above and n highest list the highest value first, below and n lowest the lowest value first, and other conditions list by the value found, then by ID. A query with AND or OR lists nodes, then links, each by ID. A single match is shown on the map immediately. Select a row to center the map on that asset. If nothing is selected, the asset is also selected; if something is, the asset is marked and the selection is not changed. Shift+click or Ctrl+click a row to add it to the selection or remove it. Find does not select all matches by itself.</p><p>The Filter in table button applies the same query to the Tables pane. Each table that the query applies to shows only the matching rows, with the query and the row count above them. To select all matches on the map, select those rows and choose Select on map from the right-click menu. A table filter is not saved with the project and ends when the page is reloaded. A row edited so that it no longer matches stays in the table, dimmed and marked with a warning sign, until the Filter in table button is pressed again.</p>
+  > <p>The matching assets are listed below the Find button. Above and n highest list the highest value first, below and n lowest the lowest value first, and other conditions list by the value found, then by ID. A query with AND or OR lists nodes, then links, each by ID. A single match is shown on the map immediately. Select a row to center the map on that asset. If nothing is selected, the asset is also selected; if something is, the asset is highlighted and the selection is not changed. Shift+click or Ctrl+click a row to add it to the selection or remove it. Find does not select all matches by itself.</p><p>The Filter in table button applies the same query to the Tables pane. Each table that the query applies to shows only the matching rows, with the query and the row count above them. To select all matches on the map, select those rows and choose Select on map from the right-click menu. A table filter is not saved with the project and ends when the page is reloaded. A row edited so that it no longer matches stays in the table, dimmed and marked with a warning sign, until the Filter in table button is pressed again.</p>
   @@ NEEDS RULING
 - **`lpn_guide_find_results_term`**
   > Results, the selection, and Tables
@@ -367,7 +391,7 @@ never edits a synonym.
   > Lists every node and every link at every reporting time step, in the units shown on the Tables pane. Without an extended period simulation, it shows the current solution at a single instant. Download or print carries every time step, and the table shows one at a time.
   @@ NEEDS RULING
 - **`lpn_guide_text_hotkeys_popup`**
-  > Lists every toolbar button and menu row, the keyboard shortcuts, and an entry for each box. Selecting a row shows where that control is; it never runs it. To search, press Ctrl+K from anywhere, or / while the guide has focus.
+  > Lists every toolbar button and menu row, the keyboard shortcuts, and an entry for each box. Choosing a row shows where that control is; it never runs it. To search, press Ctrl+K from anywhere, or / while the guide has focus.
   @@ NEEDS RULING
 - **`lpn_guide_text_library_box`**
   > Holds the project's patterns, curves, pipe types, fittings, controls, and rules. An asset refers to a pattern, curve, pipe type, or fitting by its ID, and that item is edited here. Controls and rules apply to the whole network. Rules are applied by the EPANET engine only. All are saved with the project.
@@ -563,7 +587,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**132 still to read**, of 135 new keys across 17 unmerged branch(es).
+**135 still to read**, of 138 new keys across 13 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -574,11 +598,9 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/roadmap-1011c (`4cda3c09`) — adds no English strings
+### chore/handoff-1012 (`d271ca42`) — adds no English strings
 
-### chore/selection-word (`b32ccf97`) — adds no English strings
-
-### feat/bentley-interop (`fa83b30c`) — 100 new, 100 to read @@ NEEDS RULING
+### feat/bentley-interop (`f43dde69`) — 101 new, 101 to read @@ NEEDS RULING
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -808,6 +830,9 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_sm_base_kept`**
   > The Base of a tree is not deleted. Another Base added with Add base is deleted when nothing uses it.
   @@ NEEDS RULING
+- **`lpn_sm_base_named`**
+  > The Base of a tree is not renamed.
+  @@ NEEDS RULING
 - **`lpn_sm_basic_off`**
   > Basic mode is off, so the Scenario manager and the Scenarios table are shown.
   @@ NEEDS RULING
@@ -832,6 +857,9 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_sm_copy_share`**
   > Share them
   @@ NEEDS RULING
+- **`lpn_sm_current_already`**
+  > This scenario is already the current scenario.
+  @@ NEEDS RULING
 - **`lpn_sm_cycle`**
   > {name} cannot be moved under one of its own children.
   @@ NEEDS RULING
@@ -839,16 +867,13 @@ build for that would be a gate nobody keeps. Refresh it with
   > Delete the selected item. A used item is not deleted.
   @@ NEEDS RULING
 - **`lpn_sm_help`**
-  > Create and organize scenarios and alternatives and their inheritance here. Assign Alternatives to Scenarios in the Scenarios table.\n\nA new scenario creates no alternatives; it uses its parent's. A change made in a scenario is an override kept in that scenario's own values, shown as Own values in the Scenarios table. If the scenario is assigned an alternative for that category, the change goes into that alternative instead and reaches every scenario that uses it.\n\nDrag an item onto another to make it a child of that item. Drag between two items to reorder them. Click the arrow beside an item, or press Left or Right, to collapse or expand it.\n\nClick a selected item or press F2 to rename it, Delete to delete it, Enter to make a scenario current. Right-click an item for the same commands as the buttons.
+  > How scenarios and alternatives work:\n\nAn override made in a scenario is stored in the alternative associated with the scenario. Associations of alternatives to scenarios are managed in the Scenarios table in the bottom pane. Creating a new scenario creates no alternatives; it uses its parent's alternatives until new alternatives are needed as overrides are created. When overrides are created in a scenario, they are stored in their respective alternative for the scenario; if the scenario has no such alternative, a new alternative is created using the name of the scenario. Example: You create a "Figure: Node and link IDs" scenario and edit a Text to say "Node and Link IDs." When you create the scenario, no alternatives are created. But at the moment you save the Text, a Text alternative called "Figure: Node and link IDs" is created with the override for the Text value. In Basic mode, you see this as simply an override in the scenario itself.\n\nHow to manage scenarios:\n\nChoose Scenarios or an alternatives category in the list at the top to show its tree.\n\nCreate a child of the selected item with Add child, or an item with no parent with Add base. A new item is named after its parent; type a name to rename it. Copy scenario copies the selected scenario and asks whether to copy the alternatives it uses or share them.\n\nDrag an item onto another to make it a child of that item. Drag an item between two items to reorder them.\n\nClick a selected item, or press F2, to rename it. Double-click a scenario, or press Enter, to make it current. Click the arrow beside an item, or press Left or Right, to collapse or expand it. Right-click an item for the same commands as the buttons.\n\nPress Delete, or click the minus button, to delete the selected item. An item in use is not deleted, and the message names what uses it.\n\nTo make a scenario use another alternative, choose that alternative in the scenario's row of the Scenarios table. An override made in a shared alternative changes every scenario that uses it.
   @@ NEEDS RULING
 - **`lpn_sm_in_use`**
   > {name} cannot be deleted while it is used by: {list}.
   @@ NEEDS RULING
 - **`lpn_sm_inherited`**
   > inherited
-  @@ NEEDS RULING
-- **`lpn_sm_kept`**
-  > The values this scenario held in {category} were kept as the alternative {name}.
   @@ NEEDS RULING
 - **`lpn_sm_make_current`**
   > Make current
@@ -859,8 +884,8 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_sm_name_taken`**
   > The name {name} is already used in this tree.
   @@ NEEDS RULING
-- **`lpn_sm_own_values`**
-  > Own values
+- **`lpn_sm_none_selected`**
+  > Select an item in the tree first.
   @@ NEEDS RULING
 - **`lpn_sm_rename`**
   > Rename
@@ -905,9 +930,9 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`2e5e81c4`) — adds no English strings
 
-### feat/match-property (`ea6934fb`) — adds no English strings
+### feat/match-property (`38f68c9a`) — adds no English strings
 
-### feat/shape (`f9b60726`) — 25 new, 25 to read @@ NEEDS RULING
+### feat/shape (`4166d068`) — 27 new, 27 to read @@ NEEDS RULING
 
 - **`lpn_file_import_shapes`**
   > Import GeoJSON shapes…
@@ -963,6 +988,12 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_mode_add_shape`**
   > Mode: Add Shape. Specify each point. Specify the last point again or press Enter to finish; specify the first point to close a polygon.
   @@ NEEDS RULING
+- **`lpn_pane_paste_shape_bad_points`**
+  > Row {row}: {text} is not a list of points. Write each point as {pair}, with a point (.) as the decimal mark, and separate the points with |.
+  @@ NEEDS RULING
+- **`lpn_pane_paste_shape_closed_few`**
+  > Row {row}: a closed Shape needs at least three points.
+  @@ NEEDS RULING
 - **`lpn_pane_paste_shape_no_points`**
   > Row {row}: a new Shape needs its Points.
   @@ NEEDS RULING
@@ -985,7 +1016,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Draw a point, a polyline, or a polygon on the map. A Shape is annotation and is not part of the network. Specify each point, then specify the last point again, press Enter, or right-click to finish. Specify the first point again to close the Shape into a polygon.
   @@ NEEDS RULING
 
-### feat/si-example (`19c43524`) — 4 new, 4 to read @@ NEEDS RULING
+### feat/si-example (`3883f0d2`) — 4 new, 4 to read @@ NEEDS RULING
 
 - **`lpn_ex_net2_si_desc`**
   > Litres per second, with metres and millimetres. EPANET’s Net2, converted from gallons per minute, feet and inches: a branched distribution system with a tank.
@@ -1000,7 +1031,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > EPANET Net3, L/s (SI)
   @@ NEEDS RULING
 
-### feat/tank-ground (`7be93ed2`) — 3 new, 3 to read @@ NEEDS RULING
+### feat/tank-ground (`0b488156`) — 3 new, 3 to read @@ NEEDS RULING
 
 - **`lpn_field_tank_base_elev`**
   > Base elevation
@@ -1011,9 +1042,3 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_tank_ground_elev_tip`**
   > Ground elevation at the tank. Pressure at the tank is measured from here, as at a junction.
   @@ NEEDS RULING
-
-### feat/visit-dedupe (`f8cf3ed5`) — adds no English strings
-
-### fix/dxf-layer-code (`d87ca580`) — adds no English strings
-
-### fix/run-report (`f908c408`) — adds no English strings

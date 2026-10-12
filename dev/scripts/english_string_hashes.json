@@ -5315,6 +5315,15 @@
                 "lpn_notes_6_def"
             ],
             "reason": "cells swapped to gesture-then-action in all 27 files by script; prose unchanged"
+        },
+        {
+            "date": "2026-10-11",
+            "keys": [
+                "consent_body",
+                "consent_current_granted",
+                "consent_region_label"
+            ],
+            "reason": "(none given)"
         }
     ],
     "hashes": {
@@ -5386,11 +5395,11 @@
         "calc_units_us": "aa3093554472fd113135bed5b63e12f84c2e9fe8",
         "consent_accept": "a3dbf7dfe2395afe78e8d13d23fd35e6f495284c",
         "consent_accept_all": "a1632610ee60f8649cb3b39c50ab635c4a5e130f",
-        "consent_body": "bfc73c0db0b08d0030b6e5ae11aca9e02a706fcb",
+        "consent_body": "caf3426f0b35ac916ba7fa6a49c4b2c28eb2bda1",
         "consent_current_denied": "4f4019a7eed9cfda0702532cf68f7eb715bbc1aa",
-        "consent_current_granted": "a70c7b65ebc0d04276f74b1a0432d7de44adccd2",
+        "consent_current_granted": "a7c1388fef310cb6739e98d9e17814a99cdd8c9d",
         "consent_decline": "7139480f1e084b9e5cc9cfa9044c6831f74b24f1",
-        "consent_region_label": "bf5a6eb3a4bb648f4f732c3533cb4991cc599900",
+        "consent_region_label": "3c06e191a76bda28a1beb4dc40aed5e4b7bb6bf6",
         "consent_settings_link": "9e0cba87adec3208cfb83ceb40225bab61ab634d",
         "contactSendMessage": "0f175d5b1fca6693ed65ff5370e26b300120c394",
         "contactSpamPostfix": "f3e325c1b46f0197228f76a8ec227c1f1a0856ff",

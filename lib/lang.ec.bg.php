@@ -88,13 +88,13 @@ $ec_lang['template_printable_subtitle']='Подзаглавие за принт�
 // NO EC_CONSENT_VERSION BUMP. Nothing about what is stored, who reads it or how long it lives has
 // moved; the sentence became more accurate, not different. Bumping would re-ask every visitor who
 // has already answered, for no change they could act on.
-$ec_lang['consent_body']='Можем ли да запазим еднoцифрена бисквитка в този браузър, за да запомним, че вече сме преброили тази страница? Тя не записва нищо за вас и нищо от въведеното от вас. Без нея не можем да различим вашето второ посещение от първото посещение на друг човек.';
+$ec_lang['consent_body']='Можем ли да запазим случаен код в този браузър, за да броим колко браузъра използват всяка част от този сайт? Кодът се създава на момента, не казва нищо за вас или за вашето устройство и не записва нищо от въведеното от вас. Без него не можем да различим вашето второ посещение от първото посещение на друг човек.';
 $ec_lang['consent_accept']='Приемам';
 $ec_lang['consent_accept_all']='Приемам винаги';
 $ec_lang['consent_decline']='Отказвам винаги';
-$ec_lang['consent_current_granted']='Разрешихте това. Ограничаваме записването за този профил на браузъра.';
+$ec_lang['consent_current_granted']='Разрешихте това. Този браузър пази случаен код, за да можем да го преброим.';
 $ec_lang['consent_current_denied']='Отказахте това. Не съхраняваме нищо, за да ограничим записването за този профил на браузъра.';
-$ec_lang['consent_region_label']='Вашият избор относно ограничаването на записването.';
+$ec_lang['consent_region_label']='Вашият избор относно кода за преброяване.';
 $ec_lang['consent_settings_link']='Настройки на бисквитките';
 $ec_lang['privacy_link']='Политика за поверителност';
 $ec_lang['terms_link']='Условия за ползване';

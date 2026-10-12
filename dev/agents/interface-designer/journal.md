@@ -3841,3 +3841,37 @@ Recommendations in the report to Tom: (1) keep the triangle, add View > Zoom Win
 - SPECULATION: the failure was silent state, not a misplaced setting. A value that changes behaviour must be visible where the behaviour is read (the junction field), not only where it is set.
 - SPECULATION: buttons and right-click menu are two doors to one command list; keep both only if the same list feeds both (one source), else they drift.
 Recommendations: see report to orchestrator.
+
+## 2026-10-11 - Match properties vs Copy/Paste properties (feat/match-property)
+
+OBSERVED (lib/lang.ec.en.php:1735-1746, 2816 in the feat-match-property worktree): the branch ships
+a MODE ("Mode: Match properties. Select the asset to copy properties from"), a tip that tells the
+visitor to select targets first, then choose, then select the source, and a disabled menu row.
+That is three steps in an order the verb does not announce.
+
+Reading (hierarchy/affordance): the disabled row is the symptom. A command whose precondition lives
+on a DIFFERENT object (the selection) than the one you right-clicked is a bad fit for a context menu;
+the menu says "this asset" and the command needs "those assets". Copy/Paste splits the two objects
+across two verbs, so each verb's precondition is on the thing you are pointing at.
+
+Recommendation, ranked:
+1. Restore the confirmation dialog regardless (count, "except activation status"). It is the only
+   guard on a bulk write; Undo is the second guard, not a substitute.
+2. Adopt Copy properties / Paste properties to selection. Copy is always enabled on one asset. Paste is
+   enabled when a copied set exists AND a selection exists; when disabled it carries a tip saying which
+   of the two is missing (SPECULATION: two tips cost two strings x 27 languages; one combined tip is cheaper).
+3. Keep Match properties out of the menu, or keep it only as the same command by another route. Two
+   doors for one job is the Task 625 mistake again.
+4. Clipboard lifetime: memory only, this page load, cleared on opening another network. No storage, so
+   no consent conversation (storage-rulings applies only to device storage).
+5. Status: technically copyable (SPECULATION: it is an ordinary stored field, nothing prevents it).
+   It is excluded by judgment: Shut changes the hydraulic answer, so pasting it by accident across 40
+   pipes is the costly error. Keep excluded; say so once in the dialog; do not offer a checkbox (words
+   x 27 languages, and a bulk Shut belongs in the status control).
+6. Keyboard (Declan): bind nothing to Ctrl+C/V; they belong to assets and table rows. Offer
+   Ctrl+Shift+C / Ctrl+Shift+V (SPECULATION: unverified free in this page) and show them in the menu.
+
+Prior art, NOT verified this session (recalled, tag SPECULATION until fetched): AutoCAD MATCHPROP is
+source-then-targets with a Settings sub-dialog; Office Format Painter is copy-then-apply with a held
+clipboard; ArcGIS Pro and QGIS offer copy/paste of style; WaterGEMS has no equivalent I can name.
+Nobody's convention is a precedent for the disabled-until-selected-first form.

@@ -40,7 +40,7 @@ So the report column and the page's number are **one value out of one array**. T
 implementation, ours or anyone's, and nothing to keep in step.
 
 The whole change in this repository is: pass `EN_SAVE` to `initQ()` for a chemical run, read
-`eps.out` back out of the workspace at the same moment the report is read, and call the reader the
+`temp.out` back out of the workspace at the same moment the report is read, and call the reader the
 vendored file already exports. `dev/lpn-spike/reaction-rate-harness.js` anchors it against EPANET's
 own printed `.rpt`.
 

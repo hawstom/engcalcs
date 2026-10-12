@@ -16,13 +16,12 @@ and the reasons for R2000 and attributed blocks: `dev/agents/market-researcher/a
   Reference, not the 2000 one this file follows) and needs an MLEADERSTYLE object besides, so free
   annotation was dropped, which his note allows (*"people will mostly use this for geometry
   transfer"*). The labels a CAD user sees are the blocks' attributes.
-- **Layers: `C-WATR-MODL-` + asset code + `-` + alternative**, e.g. `C-WATR-MODL-J___-BASE`.
+- **Layers: `C-WATR-MODL-` + asset code + `-` + alternative**, e.g. `C-WATR-MODL-NODE-BASE`.
   - The prefix is one constant, `MODEL_PREFIX` in `js/lpn-dxf.js`; `lpnDxfWrite()`'s `layerPrefix`
     replaces it (the Interface Manager's future control).
-  - The asset code is the project's ID prefix for that type (Settings > ID prefixes), capitals,
-    letters and digits only, padded with `_` to four: J___, R___, T___, L___ (pipe), P___, V___,
-    C___ (customer) by default. If any type's prefix is empty, or two types would share a code, the
-    built-in set is used for all.
+  - The asset code is fixed per type, whatever the project's ID prefixes (Tom, 2026-10-11): NODE
+    (junction), LINK (pipe), RESV, TANK, PUMP, VALV, SHAP (a Shape; its branch adds the type) and
+    CUST (customer; our choice, Tom named none).
   - The alternative is `BASE` on Base; on another scenario it is that scenario's name in capitals
     (page locale), letters and digits of any script kept, every other run made `_`, and the whole
     network as that scenario has it is written. A character Windows-1252 lacks goes out as

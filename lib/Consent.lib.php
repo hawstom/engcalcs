@@ -32,7 +32,7 @@
 // first use of search."*
 //
 // **A SEPARATE RECORD, NOT A CHANGE TO THE BANNER ABOVE, AND THAT IS THE WHOLE POINT.** The banner
-// asks one question about one purpose (a digit per page, so a visit is not counted twice). Sending
+// asks one question about one purpose (counting: a digit per page and a random browser code). Sending
 // what somebody TYPED to a third-party geocoder is a different purpose entirely, and folding it in
 // would make consent_body false, need 26 retranslations, and force an EC_CONSENT_VERSION bump that
 // re-asks every existing visitor about analytics they already answered. So: its own cookie, its own
@@ -142,6 +142,9 @@ function echoConsentBanner() {
 		var secure = (location.protocol === 'https:') ? '; Secure' : '';
 		document.cookie = 'ec_consent=' + value + '; expires=' + expires + '; path=/; SameSite=Lax' + secure;
 		if (answer === '0') forget();
+		// The browser code (call F01, 2026-10-08) is made at the moment of the yes, so the counts
+		// this page sends from now on already carry it.
+		if (answer !== '0' && window.EngCalcs && typeof EngCalcs.countCodeMake === 'function') EngCalcs.countCodeMake();
 		if (current) current.textContent = texts[answer] || '';
 	}
 
@@ -151,6 +154,8 @@ function echoConsentBanner() {
 	// offline beacon queue.
 	function forget() {
 		if (window.EngCalcs && typeof EngCalcs.flushQueue === 'function') EngCalcs.flushQueue();
+		// The browser code is readable by JS on purpose, so it goes now rather than on the next request.
+		if (window.EngCalcs && typeof EngCalcs.countCodeForget === 'function') EngCalcs.countCodeForget();
 	}
 
 	if (form) {

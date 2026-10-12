@@ -286,7 +286,7 @@ console.log('\n--- nothing on the sheet is a control ---');
 			// <select>'s value-to-selectedIndex resolution (only its purpose-built unit selects do),
 			// so the match is made by hand, against the same `<option>` children the real DOM would
 			// search.
-			// An UNSELECTED choice ('' -- "No pattern", "No curve selected"...) has always printed
+			// An UNSELECTED choice ('' -- "No pattern", "No curve chosen"...) has always printed
 			// blank, on both sides of R-367: paneCellText() and paneCellDisplayText() both refuse it
 			// before ever reaching the choice list (`!panePresent(v)`), the same test every other
 			// empty cell on the sheet is held to. Only a REAL selection is looked up by label.

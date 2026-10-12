@@ -88,13 +88,13 @@ $ec_lang['template_printable_subtitle']='Kichwa Kidogo cha Kuchapishwa';
 // NO EC_CONSENT_VERSION BUMP. Nothing about what is stored, who reads it or how long it lives has
 // moved; the sentence became more accurate, not different. Bumping would re-ask every visitor who
 // has already answered, for no change they could act on.
-$ec_lang['consent_body']='Je, tunaweza kuhifadhi kuki ya tarakimu moja katika kivinjari hiki ili kukumbuka kwamba tayari tumehesabu ukurasa huu? Haihifadhi chochote kukuhusu wala chochote unachoandika. Bila hiyo, hatuwezi kutofautisha ziara yako ya pili na ziara ya kwanza ya mtu mwingine.';
+$ec_lang['consent_body']='Je, tunaweza kuhifadhi msimbo nasibu katika kivinjari hiki ili tuhesabu ni vivinjari vingapi vinatumia kila sehemu ya tovuti hii? Msimbo huundwa papo hapo, hauelezi chochote kukuhusu wewe wala kifaa chako, na hauhifadhi chochote unachoandika. Bila huo, hatuwezi kutofautisha ziara yako ya pili na ziara ya kwanza ya mtu mwingine.';
 $ec_lang['consent_accept']='Kubali hili';
 $ec_lang['consent_accept_all']='Kubali siku zote';
 $ec_lang['consent_decline']='Kataa siku zote';
-$ec_lang['consent_current_granted']='Ulikubali hili. Tunapunguza urekodiaji kwa kivinjari hiki.';
+$ec_lang['consent_current_granted']='Ulikubali hili. Kivinjari hiki kinahifadhi msimbo nasibu ili tuweze kukihesabu.';
 $ec_lang['consent_current_denied']='Ulikataa hili. Hatuhifadhi chochote cha kupunguza urekodiaji kwa kivinjari hiki.';
-$ec_lang['consent_region_label']='Chaguo lako kuhusu kupunguza urekodiaji.';
+$ec_lang['consent_region_label']='Chaguo lako kuhusu msimbo wa kuhesabu.';
 $ec_lang['consent_settings_link']='Mipangilio ya Cookie';
 $ec_lang['privacy_link']='Taarifa ya Faragha';
 $ec_lang['terms_link']='Masharti ya Matumizi';
