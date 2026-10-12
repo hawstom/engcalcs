@@ -32,7 +32,7 @@ and a deflated zip entry is inflated by the browser's DecompressionStream.
   polygon's clockwise rings are Shapes and its counterclockwise rings (holes) are counted and not
   imported. The .dbf columns become `props`; a NAME or ID column is the ID where it can be one,
   else kept as the description; DESCRIPTION or DESC is the description.
-- Coordinates, never reprojected silently: a geographic .prj goes where GeoJSON goes (exact into a
+- Coordinates, converted only where said: a projected .prj that differs from the project is converted through longitude and latitude by the suite's CRS definitions and the notice says from what to what; refused only when the file's system cannot be identified (grid projects keep reading it as X and Y). F starts the Shape tool.
   lat/lon project, the map's transform into a projected one, refused into a grid project); a
   projected .prj is read unchanged only when its EPSG code is the project's, and refused into a
   lat/lon project or a project with another code; into a grid project it is read as X and Y and the

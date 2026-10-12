@@ -4652,6 +4652,7 @@ $ec_lang['lpn_shp_import_refuse_range']='{file} has no .prj file, and its coordi
 $ec_lang['lpn_shp_import_noshp']='{file} has no .shp file in it. Pick the .zip of a shapefile, or the .shp together with its .dbf and .prj.';
 $ec_lang['lpn_shp_import_manyshp']='{file} holds more than one shapefile. Import one at a time.';
 $ec_lang['lpn_shp_import_unreadable']='{file} is not a shapefile this page can read: {detail}';
+$ec_lang['lpn_shp_import_reprojected']='The coordinates were converted from {theirs} to {ours}.';
 $ec_lang['lpn_shp_import_unplaced']='{n} records have coordinates this project cannot place, such as a latitude beyond the limit of the map. Record numbers: {list}.';
 $ec_lang['lpn_shp_import_unplaced_one']='One record has coordinates this project cannot place, such as a latitude beyond the limit of the map. Record number: {list}.';
 $ec_lang['lpn_shapes_import_none']='Nothing was imported from {file}.';

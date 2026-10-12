@@ -278,10 +278,11 @@
 	 * caller must not claim either). No datum shift is applied: both sides are taken as the
 	 * geographic coordinates they are given, the way the suite reads every other .prj.
 	 */
-	function matchWkt(code, wkt) {
-		var t = String(wkt || ''), id = name(code), P = {}, m, re = /PARAMETER\s*\[\s*"([^"]+)"\s*,\s*([-+0-9.eE]+)\s*\]/gi,
-			proj, sph, units = [], uf = 1, mapped, a, b, lon0, lat0, probes = [], i, j, A, B, parts, maxd = 0, defStr;
-		if (!id || !root.proj4) { return null; }
+	// A WKT .prj as a proj4 definition string, or null where its method is not one this reads.
+	// { def, uf, lon0, lat0 }: `uf` is the plane unit in metres.
+	function wktDef(wkt) {
+		var t = String(wkt || ''), P = {}, m, re = /PARAMETER\s*\[\s*"([^"]+)"\s*,\s*([-+0-9.eE]+)\s*\]/gi,
+			proj, sph, units, uf, mapped, lon0, lat0, defStr;
 		while ((m = re.exec(t))) { P[m[1].toLowerCase().replace(/[^a-z0-9]/g, '')] = parseFloat(m[2]); }
 		proj = /PROJECTION\s*\[\s*"([^"]+)"/i.exec(t);
 		sph = /SPHEROID\s*\[\s*"[^"]*"\s*,\s*([-+0-9.eE]+)\s*,\s*([-+0-9.eE]+)/i.exec(t);
@@ -301,21 +302,51 @@
 		if (mapped === 'tmerc' || mapped === 'lcc' || mapped === 'merc') { defStr += ' +k_0=' + (P.scalefactor !== undefined ? P.scalefactor : 1); }
 		defStr += ' +x_0=' + ((P.falseeasting || 0) * uf) + ' +y_0=' + ((P.falsenorthing || 0) * uf);
 		defStr += ' +a=' + parseFloat(sph[1]) + ' +rf=' + parseFloat(sph[2]) + ' +to_meter=' + uf + ' +no_defs';
+		return { def: defStr, uf: uf, lon0: lon0, lat0: lat0 };
+	}
+	function matchWkt(code, wkt) {
+		var id = name(code), d, probes = [], i, j, A, B, maxd = 0;
+		if (!id || !root.proj4) { return null; }
+		d = wktDef(wkt);
+		if (!d) { return null; }
 		try {
-			root.proj4.defs('LPNCRS:WKT', defStr);
-			for (i = -1; i <= 1; i++) { for (j = -1; j <= 1; j++) { probes.push([lon0 + i * 0.5, Math.max(-80, Math.min(80, lat0 + j * 0.5))]); } }
+			root.proj4.defs('LPNCRS:WKT', d.def);
+			for (i = -1; i <= 1; i++) { for (j = -1; j <= 1; j++) { probes.push([d.lon0 + i * 0.5, Math.max(-80, Math.min(80, d.lat0 + j * 0.5))]); } }
 			for (i = 0; i < probes.length; i++) {
 				A = root.proj4(WGS84, id, probes[i]); B = root.proj4(WGS84, 'LPNCRS:WKT', probes[i]);
 				if (!isFinite(A[0]) || !isFinite(B[0])) { return false; }
 				maxd = Math.max(maxd, Math.abs(A[0] - B[0]), Math.abs(A[1] - B[1]));
 			}
 		} catch (e) { return null; }
-		// The unit is part of the answer: the same arithmetic in feet and in metres differs by 3x.
 		return maxd < 0.005;
+	}
+	/**
+	 * **A FILE'S OWN PROJECTED SYSTEM, AS A WAY BACK TO LONGITUDE AND LATITUDE** (Task 779; Tom,
+	 * 2026-10-12: "Convert and say so"). `prj` is { epsg, wkt }: the system is identified by its EPSG
+	 * code where this page holds a definition of it, else by the method and parameters in its WKT.
+	 * Returns function (xy) -> { lon, lat } or null (not identifiable, or not loaded).
+	 */
+	function fileInverse(prj) {
+		var id = null, d;
+		if (!root.proj4 || !prj) { return null; }
+		if (prj.epsg && has(prj.epsg) && key(prj.epsg) !== WEBMERC) { id = name(prj.epsg); }
+		else if (prj.epsg && key(prj.epsg) === WEBMERC) { return function (xy) { return webMercInverse(xy); }; }
+		if (!id) {
+			d = wktDef(prj.wkt);
+			if (!d) { return null; }
+			try { root.proj4.defs('LPNCRS:FILE', d.def); } catch (e) { return null; }
+			id = 'LPNCRS:FILE';
+		}
+		return function (xy) {
+			var out;
+			try { out = root.proj4(id, WGS84, [xy.x, xy.y]); } catch (e) { return null; }
+			return (out && isFinite(out[0]) && isFinite(out[1])) ? { lon: out[0], lat: out[1] } : null;
+		};
 	}
 
 	EngCalcs.lpnCrsLoad = load;
 	EngCalcs.lpnCrsMatchWkt = matchWkt;
+	EngCalcs.lpnCrsFileInverse = fileInverse;
 	EngCalcs.lpnCrsUnit = unitOf;
 	EngCalcs.lpnCrsReady = ready;
 	EngCalcs.lpnCrsHas = has;

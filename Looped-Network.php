@@ -4081,6 +4081,7 @@ EngCalcs.pageConfig = {
 	lpn_shp_import_noshp: <?=json_encode($ec_lang['lpn_shp_import_noshp'])?>,
 	lpn_shp_import_manyshp: <?=json_encode($ec_lang['lpn_shp_import_manyshp'])?>,
 	lpn_shp_import_unreadable: <?=json_encode($ec_lang['lpn_shp_import_unreadable'])?>,
+	lpn_shp_import_reprojected: <?=json_encode($ec_lang['lpn_shp_import_reprojected'])?>,
 	lpn_shp_import_unplaced: <?=json_encode($ec_lang['lpn_shp_import_unplaced'])?>,
 	lpn_shp_import_unplaced_one: <?=json_encode($ec_lang['lpn_shp_import_unplaced_one'])?>,
 	lpn_shapes_import_none: <?=json_encode($ec_lang['lpn_shapes_import_none'])?>,

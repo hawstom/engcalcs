@@ -226,8 +226,16 @@ async function main() {
 		ok('a DXF into a latitude-and-longitude project is refused', (await h.shapes()).length === 0 &&
 			note === (await L('lpn_dxf_import_refuse_geo')).replace('{file}', 'shapes-sample.dxf'), note);
 		note = await h.importVia('lpn_file_import_shp', fx('shapes-utm12.zip'));
-		ok('a projected .prj into a latitude-and-longitude project is refused, naming the EPSG code',
-			(await h.shapes()).length === 0 && note.indexOf('EPSG:32612') >= 0 && note.indexOf((await L('lpn_shp_import_refuse_crs')).split('{theirs}')[1].split('{ours}')[0]) >= 0, note);
+		sh = await h.shapes();
+		const want12 = await P.evaluate(() => EngCalcs.lpnCrsInverse('EPSG:32612', { x: 400000.125, y: 3700000.5 }));
+		ok('a projected .prj into a latitude-and-longitude project is CONVERTED to longitude and latitude, and the notice says from what to what',
+			sh.length === 1 && Math.abs(sh[0].pts[0].x - want12.lon) < 1e-9 && Math.abs(sh[0].pts[0].y - want12.lat) < 1e-9 &&
+			note.indexOf((await L('lpn_shp_import_reprojected')).split('{theirs}')[0]) >= 0 && note.indexOf('EPSG:32612') >= 0 && note.indexOf(await L('lpn_shapes_frame_latlon')) >= 0, note + ' ' + JSON.stringify(sh[0] && sh[0].pts));
+		ok('...and converted coordinates keep no source text', !(sh[0].pts[0].tok));
+		await h.undo();
+		const odd = { name: 'odd.prj', buffer: Buffer.from('PROJCS["Odd",GEOGCS["GCS_WGS_1984",DATUM["D_WGS_1984",SPHEROID["WGS_1984",6378137.0,298.257223563]],PRIMEM["Greenwich",0.0],UNIT["Degree",0.0174532925199433]],PROJECTION["Hotine_Oblique_Mercator_Azimuth_Natural_Origin"],UNIT["Meter",1.0]]') };
+		note = await h.importVia('lpn_file_import_shp', [Object.assign({}, fx('shapes-grid.shp'), { name: 'odd.shp' }), odd]);
+		ok('a system the page cannot identify is the one case still refused', (await h.shapes()).length === 0 && note.indexOf('Odd') >= 0 && note.indexOf('nothing was converted') >= 0, note);
 		note = await h.importVia('lpn_file_import_shp', fx('shapes-geo-noprj.shp'));
 		ok('a .shp with no .prj and in-range numbers is read as latitude and longitude', (await h.shapes()).length === 7 &&
 			note.indexOf((await L('lpn_shp_import_noprj')).replace('{frame}', await L('lpn_shapes_frame_latlon'))) >= 0, note);
@@ -253,7 +261,13 @@ async function main() {
 			note.indexOf((await L('lpn_shp_import_prj_same')).split('{crs}')[0]) >= 0, note);
 		await h.undo();
 		note = await h.importVia('lpn_file_import_shp', fx('shapes-utm10.zip'));
-		ok('a .prj stating EPSG:32610 is refused, nothing converted', (await h.shapes()).length === 0 && note.indexOf('EPSG:32610') >= 0 && note.indexOf('EPSG:32612') >= 0 && note.indexOf((await L('lpn_shp_import_convert_hint')).split('{theirs}')[0]) >= 0, note);
+		sh = await h.shapes();
+		const w10 = await P.evaluate(() => EngCalcs.lpnCrsForward('EPSG:32612', EngCalcs.lpnCrsInverse('EPSG:32610', { x: 500000.125, y: 4000000.5 })));
+		const o10 = (await h.stored()).origin || { x: 0, y: 0 };
+		ok('a .prj stating EPSG:32610 into a UTM 12N project is converted (numbers agree with the suite\'s transform to a micrometre) and the notice says from and to',
+			sh.length === 1 && Math.abs(sh[0].pts[0].x + o10.x - w10.x) < 1e-6 && (Math.abs(sh[0].pts[0].y + o10.y - w10.y) < 1e-6 || Math.abs(sh[0].pts[0].y - o10.y + w10.y) < 1e-6 || Math.abs(-sh[0].pts[0].y + o10.y - w10.y) < 1e-6) &&
+			note.indexOf('EPSG:32610') >= 0 && note.indexOf('EPSG:32612') >= 0 && note.indexOf((await L('lpn_shp_import_reprojected')).split('{theirs}')[0]) >= 0, note + ' ' + JSON.stringify([sh[0] && sh[0].pts[0], w10, o10]));
+		await h.undo();
 		note = await h.importVia('lpn_file_import_dxf', fx('shapes-sample.dxf'));
 		sh = await h.shapes();
 		ok('a DXF is read as the project\'s own numbers, six Shapes, and a feet drawing in a metre project is said',
@@ -265,9 +279,10 @@ async function main() {
 		await a.dismissGallery().catch(() => {});
 		const stk = [fx('gdal-Stacks.shp'), fx('gdal-Stacks.dbf'), fx('gdal-Stacks.prj')];
 		note = await h.importVia('lpn_file_import_shp', stk);
-		ok('an ArcGIS .prj (no EPSG code) into UTM 12N is refused, and Convert as is NOT suggested (it could not help)',
-			(await h.shapes()).length === 0 && note.indexOf('NAD_1983_StatePlane_Texas_South_Central') >= 0 &&
-			note.indexOf('Convert as') < 0, note);
+		ok('an ArcGIS .prj (no EPSG code) into UTM 12N is converted by its parameters, and the notice names it',
+			(await h.shapes()).length === 2 && note.indexOf('NAD_1983_StatePlane_Texas_South_Central') >= 0 &&
+			note.indexOf((await L('lpn_shp_import_reprojected')).split('{theirs}')[0]) >= 0 && note.indexOf('Convert as') < 0, note);
+		await h.undo();
 		await h.newCrsProject('2278');
 		await a.dismissGallery().catch(() => {});
 		note = await h.importVia('lpn_file_import_shp', stk);
@@ -327,6 +342,22 @@ async function main() {
 		await h.undo();
 		note = await h.importVia('lpn_file_import_shp', fx('shapes-geo.zip'));
 		ok('the unread MultiPatch sentence gives its reason', note.indexOf((await L('lpn_shp_import_skipped_one')).split('{list}')[0]) >= 0, note);
+
+		console.log('\n--- 7. F is the Shape tool ---');
+		await a.newProject('us');
+		await a.dismissGallery().catch(() => {});
+		await h.settle(500);
+		await P.mouse.click(700, 500);
+		await P.keyboard.press('Escape');
+		await P.keyboard.press('f');
+		await h.settle(250);
+		const hint = await P.evaluate(() => (document.getElementById('lpn_mode_hint') || {}).textContent || '');
+		ok('plain F starts the Shape tool', hint === await L('lpn_mode_add_shape'), hint);
+		await P.keyboard.press('Escape'); await h.settle(150);
+		const tipBtn = await P.evaluate(() => { const b = document.querySelector('#lpn_toolbar [data-tool="add-shape"]'); if (!b) { return null; } const i = window.bootstrap && window.bootstrap.Tooltip.getInstance(b); return (i && i._config && i._config.title) || b.getAttribute('data-bs-original-title') || b.title || ''; });
+		ok('the toolbar button\'s tip names the key', typeof tipBtn === 'string' && tipBtn.indexOf((await L('lpn_tool_key_hint')).replace('{key}', 'F')) >= 0, tipBtn);
+		await P.keyboard.press('Control+f'); await h.settle(150);
+		ok('Ctrl+F does not start it', (await P.evaluate(() => (document.getElementById('lpn_mode_hint') || {}).textContent || '')) !== await L('lpn_mode_add_shape'));
 		ok('no uncaught page errors', a.errors.length === 0, a.errors.slice(0, 2).join(' | '));
 		await a.close();
 	} finally {

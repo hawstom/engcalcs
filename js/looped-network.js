@@ -37993,7 +37993,7 @@ var EngCalcs = EngCalcs || {};
 				say(String(pc.lpn_shp_import_refuse_local || '{file} is in latitude and longitude, and this project has no place on the Earth to which they can be converted. Georeference it first with Map, World map, Attach, then import again.').replace('{file}', fileName), { ok: false, reason: 'local' });
 				return;
 			}
-			if (!isLatLonProject() && isProjectedProject() && EngCalcs.lpnCrsLoad && EngCalcs.lpnCrsReady && !EngCalcs.lpnCrsReady()) { EngCalcs.lpnCrsLoad(go); return; }
+			if ((isProjectedProject() || (isLatLonProject() && r.prj && r.prj.kind === 'projected')) && EngCalcs.lpnCrsLoad && EngCalcs.lpnCrsReady && !EngCalcs.lpnCrsReady()) { EngCalcs.lpnCrsLoad(go); return; }
 			go();
 		}).catch(failed);
 		function place(r) {
@@ -38001,6 +38001,11 @@ var EngCalcs = EngCalcs || {};
 			function refuse(key, fb, reason, theirs, hint) {
 				say(String(pc[key] || fb).replace('{file}', fileName).replace('{theirs}', theirs || '').replace('{ours}', geo ? gisFrameText() : (code ? crsLabel(code) + ' (' + code + ')' : ''))
 					+ (hint ? ' ' + String(pc.lpn_shp_import_convert_hint || 'Use Convert as… to copy the project into {theirs}, then import again.').replace('{theirs}', theirs || '') : ''), { ok: false, reason: reason });
+			}
+			var conv = null;
+			function convertedLine(theirs) {
+				return String(pc.lpn_shp_import_reprojected || 'The coordinates were converted from {theirs} to {ours}.')
+					.replace('{theirs}', theirs).replace('{ours}', geo ? gisFrameText() : crsLabel(code) + ' (' + code + ')');
 			}
 			var theirsName = prj ? (prj.epsg ? (prj.name ? prj.name + ' (' + prj.epsg + ')' : prj.epsg) : prj.name) : '';
 			if (!prj) {
@@ -38016,9 +38021,11 @@ var EngCalcs = EngCalcs || {};
 				if (!geo) {
 					lines.push(String(pc.lpn_shp_import_converted || 'The coordinates are latitude and longitude. They were converted to {crs} by the transform the map uses.').replace('{crs}', crsLabel(code) + ' (' + code + ')'));
 				}
+			} else if (geo && (conv = EngCalcs.lpnCrsFileInverse && EngCalcs.lpnCrsFileInverse(prj))) {
+				mode = 'convert';
+				lines.push(convertedLine(theirsName));
 			} else if (geo) {
-				refuse('lpn_shp_import_refuse_crs', '{file} states {theirs}, and this project is in {ours}. Nothing was imported and nothing was converted.', 'crs', theirsName,
-					!!(prj.epsg && EngCalcs.lpnCrsHas && EngCalcs.lpnCrsHas(prj.epsg)));
+				refuse('lpn_shp_import_refuse_crs', '{file} states {theirs}, and this project is in {ours}. Nothing was imported and nothing was converted.', 'crs', theirsName);
 				return;
 			} else if (isProjectedProject()) {
 				// By code where the file states one, else by arithmetic: an ArcGIS .prj states the method
@@ -38026,10 +38033,15 @@ var EngCalcs = EngCalcs || {};
 				if ((prj.epsg && prj.epsg === code) || (!prj.epsg && EngCalcs.lpnCrsMatchWkt && EngCalcs.lpnCrsMatchWkt(code, prj.wkt) === true)) {
 					mode = 'planar';
 					lines.push(String(pc.lpn_shp_import_prj_same || 'The .prj states {crs}, the coordinate system of this project, so the coordinates were not changed.').replace('{crs}', crsLabel(code) + ' (' + code + ')'));
+				} else if ((conv = EngCalcs.lpnCrsFileInverse && EngCalcs.lpnCrsFileInverse(prj))) {
+					// **A DIFFERENT PROJECTED SYSTEM IS CONVERTED, AND SAID** (Tom, 2026-10-12: "Convert and
+					// say so"): back to longitude and latitude by the file's own system, then forward by the
+					// project's, the suite's transform both ways. The numbers are new, so none keeps source text.
+					mode = 'convert';
+					lines.push(convertedLine(theirsName || prj.name));
 				} else {
-					// Convert as… can only help where the file names a system the page knows.
-					var canConvert = !!(prj.epsg && EngCalcs.lpnCrsHas && EngCalcs.lpnCrsHas(prj.epsg));
-					refuse('lpn_shp_import_refuse_crs', '{file} states {theirs}, and this project is in {ours}. Nothing was imported and nothing was converted.', 'crs', theirsName || prj.name, canConvert);
+					// Only a system that cannot be identified is refused.
+					refuse('lpn_shp_import_refuse_crs', '{file} states {theirs}, and this project is in {ours}. Nothing was imported and nothing was converted.', 'crs', theirsName || prj.name);
 					return;
 				}
 			} else {
@@ -38065,7 +38077,13 @@ var EngCalcs = EngCalcs || {};
 				var pts = [], good = true, a = sh.attrs, props = {}, name = '';
 				sh.pts.forEach(function (q) {
 					var xy, p;
-					if (mode === 'lonlat') {
+					if (mode === 'convert') {
+						// The file's plane position to longitude and latitude; the stored number is then new.
+						var ll = conv({ x: q.x, y: q.y });
+						if (!ll) { good = false; return; }
+						q = { x: ll.lon, y: ll.lat, tok: null };
+					}
+					if (mode === 'lonlat' || mode === 'convert') {
 						if (!(q.x >= -180 && q.x <= 180 && q.y >= -90 && q.y <= 90)) { good = false; return; }
 						if (geo) {
 							if (Math.abs(q.y) > LPN_MERC_MAX_LAT) { good = false; return; }
@@ -38077,7 +38095,7 @@ var EngCalcs = EngCalcs || {};
 						p = { x: inwardX(xy.x), y: inwardY(xy.y) };
 						if (geo) {
 							p[LPN_GEO_XSRC] = q.x; p[LPN_GEO_YSRC] = q.y;
-							p.tok = { x: q.tok.x, y: q.tok.y };
+							if (q.tok) { p.tok = { x: q.tok.x, y: q.tok.y }; }
 						}
 					} else { p = gisPlanarPoint(q); }
 					pts.push(p);
@@ -45134,7 +45152,10 @@ var EngCalcs = EngCalcs || {};
 	// of the nine digits, and both facts were once told in prose instead. **NEITHER KEY SWITCHES
 	// THE TOOL ON, and that is not the claim**: Delete removes what is selected and Esc returns to
 	// Select, so the tip says what to press to do the thing the button is named for.
-	var LPN_TOOL_ALT_KEYS = { 'select': 'Esc', 'delete': 'Delete' };
+	// **F IS THE SHAPE TOOL** (Tom, 2026-10-12, with Zoom window's W as the pattern): a named key, not a
+	// digit, shown in the tip through this same table. The letter is the English "figure"; Shape's
+	// own name has no free initial (S is the Shapes table and the mnemonics).
+	var LPN_TOOL_ALT_KEYS = { 'select': 'Esc', 'delete': 'Delete', 'add-shape': 'F' };
 	function toolTipWithKey(mode, tip) {
 		var pc = EngCalcs.pageConfig || {}, key = toolKeyFor(mode), alt = LPN_TOOL_ALT_KEYS[mode] || null;
 		if (key && alt) {
@@ -45170,7 +45191,7 @@ var EngCalcs = EngCalcs || {};
 			{ icon: 'customer', pointerOnly: true, label: pc.lpn_tool_add_meter || 'Customer', tip: toolTipWithKey('add-meter', pc.lpn_tool_add_meter_tip), hotkey: toolKeyFor('add-meter'), fn: function () { setMode('add-meter'); } },
 			{ icon: 'text', pointerOnly: true, label: pc.lpn_tool_add_text || 'Text', tip: toolTipWithKey('add-text'), hotkey: toolKeyFor('add-text'), fn: function () { setMode('add-text'); } },
 			// Beside Text, the other tool that adds nothing hydraulic (Task 779). No digit is left.
-			{ icon: 'shape', pointerOnly: true, label: pc.lpn_tool_add_shape || 'Shape', tip: pc.lpn_tool_add_shape_tip, fn: function () { setMode('add-shape'); } },
+			{ icon: 'shape', pointerOnly: true, label: pc.lpn_tool_add_shape || 'Shape', tip: toolTipWithKey('add-shape', pc.lpn_tool_add_shape_tip), hotkey: 'F', fn: function () { setMode('add-shape'); } },
 			{ icon: 'chain', pointerOnly: true, label: pc.lpn_tool_add_chain || 'Junction Pipe Chain', tip: toolTipWithKey('add-chain', pc.lpn_tool_add_chain_tip), hotkey: toolKeyFor('add-chain'), fn: function () { setMode('add-chain'); } },
 			{ separator: true },
 			// Dev-only, last, and wearing a bracketed label so it reads as not-a-real-feature.
@@ -64298,6 +64319,17 @@ var EngCalcs = EngCalcs || {};
 		if (openMenuAnchor) { return; }
 		if (e.preventDefault) { e.preventDefault(); }
 		enterZoomWindow();
+	});
+
+	// **F IS THE SHAPE TOOL** (Tom, 2026-10-12). Wired exactly as W is above: no modifier, never while
+	// typing, by character and by physical key, and an open menu keeps the letters for its mnemonics.
+	document.addEventListener('keydown', function (e) {
+		if (e.ctrlKey || e.metaKey || e.altKey || e.defaultPrevented) { return; }
+		if (isTextEntry(e.target)) { return; }
+		if (e.key !== 'f' && e.key !== 'F' && e.code !== 'KeyF') { return; }
+		if (openMenuAnchor) { return; }
+		if (e.preventDefault) { e.preventDefault(); }
+		setMode('add-shape');
 	});
 
 	/**
