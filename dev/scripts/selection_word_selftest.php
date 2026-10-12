@@ -1,7 +1,7 @@
 <?php
 /**
  * Fixtures for `selection_word_check.php`, both directions. The negative list is the load-bearing
- * half: "Select" as a tool name and "selected" as a list's state are ordinary and must not fire.
+ * half: "Select" as a tool name and "selected" for the map set are ordinary and must not fire.
  */
 define('EC_SELECTION_WORD_LIB_ONLY', 1);
 require_once __DIR__ . '/selection_word_check.php';
@@ -26,11 +26,14 @@ ecSelAssert('highlight the assets', 'Highlight the assets you want.', 1);
 
 ecSelAssert('select the coordinate system', 'Select the coordinate system of your network.', 1);
 ecSelAssert('press Select', 'Choose one and press Select.', 1);
+ecSelAssert('list state selected', 'No curve selected', 1);
+ecSelAssert('list state, longer', 'This pump has no efficiency curve selected, so it runs.', 1);
 ecSelAssert('chosen set', 'Nothing in the chosen set went outside.', 1);
 
 echo "---- not caught ----\n";
 ecSelAssert('tool name', 'Mode: Select. Click an asset to see or change it.', 0);
-ecSelAssert('list state', 'No curve selected', 0);
+ecSelAssert('map set is selected', 'No junctions are selected. Select junctions or choose All junctions.', 0);
+ecSelAssert('list state chosen', 'No curve chosen', 0);
 ecSelAssert('select on the map', 'Select assets on the map, or choose All.', 0);
 ecSelAssert('choose a file', 'Choose a file to save to.', 0);
 ecSelAssert('choose an option', 'Choose a roughness option (Isbash recommended).', 0);

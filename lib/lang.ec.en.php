@@ -254,7 +254,7 @@ $ec_lang['mpf_full_flow_ratio']='Ratio to full flow, Q/Q<sub>0</sub>';
 $ec_lang['mpf_note_1']='<dl><dt>This is the flow and depth inside an <em>infinitely long</em> pipe.</dt><dd>Getting the flow into the pipe may require significantly higher headwater depth. Add at least 1.5 times the velocity head to estimate the headwater depth, or <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">see my 2-minute tutorial</a> for standard culvert headwater calculations using <a target="_blank" href="https://www.fhwa.dot.gov/engineering/hydraulics/software/hy8/">HY-8</a>, the free culvert program from the U.S. Federal Highway Administration.</dd>';
 $ec_lang['mpf_sewer_ref']='<dl><dt>Designing a sanitary sewer?</dt><dd>See the <a target="_blank" href="/sewslope.php">minimum sewer slope tables</a> for 4 to 96 inch (100 to 2400 mm) pipe, given in m/m, mm/m and percent, and the <a target="_blank" href="/peakfact.php">peaking factors for very low flows</a> study. Both are reference documents in English only.</dd></dl>';
 $ec_lang['mpf_solver_enter_positive_q']='Enter a positive target Q.';
-$ec_lang['mpf_solver_no_solution']='No solution: Q exceeds pipe capacity at y/d0 = 93.8% (Qmax = {qmax} in selected units).';
+$ec_lang['mpf_solver_no_solution']='No solution: Q exceeds pipe capacity at y/d0 = 93.8% (Qmax = {qmax} in chosen units).';
 $ec_lang['mpf_solve_btn']='Solve';
 $ec_lang['mpf_solve_for_flow']='for Flow, Q =';
 // Manning Pipe Head Loss. See mpf_ for missing text.
@@ -716,7 +716,7 @@ $ec_lang['bpn_id_tip']='Name of this pipe line. Other lines refer to it in the U
 $ec_lang['bpn_upstream']='Upstream ID';
 // Edited by TGH 2026-09-07
 $ec_lang['bpn_upstream_tip']='ID of the line that feeds this one. Leave blank to follow the line directly above it (a unbranched pipeline). Enter an ID here to branch off a different line.';
-$ec_lang['bpn_roughness_tip']='Pipe roughness for the selected friction method: Manning n, Hazen-Williams C, or Darcy-Weisbach roughness height e (a length). Typical smooth plastic pipe: n about 0.009, C about 150, e about 0.0015 mm.';
+$ec_lang['bpn_roughness_tip']='Pipe roughness for the chosen friction method: Manning n, Hazen-Williams C, or Darcy-Weisbach roughness height e (a length). Typical smooth plastic pipe: n about 0.009, C about 150, e about 0.0015 mm.';
 $ec_lang['bpn_demand']='Demand';
 // Edited by TGH 2026-09-07
 $ec_lang['bpn_demand_tip']='Fixed flow delivered at this line’s downstream end.';
@@ -1114,7 +1114,7 @@ $ec_lang['lpn_guide_text_alt_box']='Shows, for each scenario, which alternative 
 $ec_lang['lpn_guide_text_full_box']='Lists every node and every link at every reporting time step, in the units shown on the Tables pane. Without an extended period simulation, it shows the current solution at a single instant. Download or print carries every time step, and the table shows one at a time.';
 $ec_lang['lpn_guide_text_calib_box']='Compares a file of field measurements with the calculated results at the same locations and times, one file for each parameter. The file is held for the current session only and is not saved with the project.';
 $ec_lang['lpn_guide_text_notes_popup']='Lists notes on how this page behaves and what it does not do, each as a term followed by its definition. It does not change the network.';
-$ec_lang['lpn_guide_text_hotkeys_popup']='Lists every toolbar button and menu row, the keyboard shortcuts, and an entry for each box. Selecting a row shows where that control is; it never runs it. To search, press Ctrl+K from anywhere, or / while the guide has focus.';
+$ec_lang['lpn_guide_text_hotkeys_popup']='Lists every toolbar button and menu row, the keyboard shortcuts, and an entry for each box. Choosing a row shows where that control is; it never runs it. To search, press Ctrl+K from anywhere, or / while the guide has focus.';
 // The Find and replace chapter beyond its opening paragraphs, in the Guide's Boxes section
 // (Tom, 2026-10-07). Each _def is HTML: keep the tags. A query inside <code> runs as written in
 // English on a page in any language; translate it with the words the Find box shows in your
@@ -1125,7 +1125,7 @@ $ec_lang['lpn_guide_find_query_def']='<table class="lpn-notes-table"><tbody><tr>
 $ec_lang['lpn_guide_find_examples_term']='Worked examples on Net3';
 $ec_lang['lpn_guide_find_examples_def']='<p>Open the Net3 example to follow these. Pressure is in psi and velocity in ft/s.</p><table class="lpn-notes-table"><tbody><tr><td><code>Everything.ID equal to \'60\'</code></td><td>Junction 60 and Pipe 60. A junction and a pipe can have the same ID, so an ID search under Everything can return more than one asset.</td></tr><tr><td><code>Junction.Pressure below 40</code></td><td>Junctions 10, 40, 50, 20, and 153, lowest pressure first. Junction 10 is at -0.6 psi, a negative pressure that requires review.</td></tr><tr><td><code>Pipe.Velocity 5 highest</code></td><td>Pipes 60, 329, 125, 123, and 149, highest velocity first. Pipe 60 carries 9.3 ft/s.</td></tr><tr><td><code>Junction.Pressure below 20 OR Pipe.Velocity above 5</code></td><td>Junctions 10, 20, 40, and 50, and Pipes 60, 125, and 329: low pressures and high velocities in one list.</td></tr><tr><td><code>Junction.Pressure below 40 AND Junction.Elevation above 100</code></td><td>Junctions 10, 20, 40, and 50, the low pressures on high ground. Both conditions must name the same kind of asset: <code>Junction.Pressure below 40 AND Pipe.Velocity above 3</code> matches nothing, because no asset is both a junction and a pipe.</td></tr><tr><td><code>Pipe.Closed equal to \'closed\'</code></td><td>Pipe 330, the one pipe that is closed in the Net3 file.</td></tr><tr><td><code>Junction.Connectivity no open path to a source</code></td><td>Nothing, as the file is distributed. With Pipe 247 closed (see Replace and Undo), Junctions 215, 217, 219, and 225: the junctions that a break on Pipe 247 would leave without supply. Repeating this for each pipe is a criticality analysis.</td></tr></tbody></table>';
 $ec_lang['lpn_guide_find_results_term']='Results, the selection, and Tables';
-$ec_lang['lpn_guide_find_results_def']='<p>The matching assets are listed below the Find button. Above and n highest list the highest value first, below and n lowest the lowest value first, and other conditions list by the value found, then by ID. A query with AND or OR lists nodes, then links, each by ID. A single match is shown on the map immediately. Select a row to center the map on that asset. If nothing is selected, the asset is also selected; if something is, the asset is marked and the selection is not changed. Shift+click or Ctrl+click a row to add it to the selection or remove it. Find does not select all matches by itself.</p><p>The Filter in table button applies the same query to the Tables pane. Each table that the query applies to shows only the matching rows, with the query and the row count above them. To select all matches on the map, select those rows and choose Select on map from the right-click menu. A table filter is not saved with the project and ends when the page is reloaded. A row edited so that it no longer matches stays in the table, dimmed and marked with a warning sign, until the Filter in table button is pressed again.</p>';
+$ec_lang['lpn_guide_find_results_def']='<p>The matching assets are listed below the Find button. Above and n highest list the highest value first, below and n lowest the lowest value first, and other conditions list by the value found, then by ID. A query with AND or OR lists nodes, then links, each by ID. A single match is shown on the map immediately. Select a row to center the map on that asset. If nothing is selected, the asset is also selected; if something is, the asset is highlighted and the selection is not changed. Shift+click or Ctrl+click a row to add it to the selection or remove it. Find does not select all matches by itself.</p><p>The Filter in table button applies the same query to the Tables pane. Each table that the query applies to shows only the matching rows, with the query and the row count above them. To select all matches on the map, select those rows and choose Select on map from the right-click menu. A table filter is not saved with the project and ends when the page is reloaded. A row edited so that it no longer matches stays in the table, dimmed and marked with a warning sign, until the Filter in table button is pressed again.</p>';
 $ec_lang['lpn_guide_find_replace_term']='Replace and Undo';
 $ec_lang['lpn_guide_find_replace_def']='<p>The Change what was found part of the box writes one property on every asset the query found. Choose the property in the Property to change list, enter the new value in the New value box in the displayed unit, and press the Replace button. The box then states how many assets would change, not counting those that already have the new value. Press the Change them button to apply the change, or Cancel. One Undo reverses the whole replacement.</p><p>Example on Net1: <code>Pipe.Diameter below 10</code> finds Pipes 31, 122, 113, and 121. Choose Diameter, enter 10, and press Replace; the box shows "Change 4 assets?". Press Change them to set all four pipes to 10 in. One Undo returns them to 6 and 8 in.</p><p>Example on Net3: <code>Pipe.ID equal to \'247\'</code> finds Pipe 247. Choose Closed, choose Closed again in the New value list, and press Replace, then Change them, to close the pipe for the connectivity example above. Undo opens it again.</p><p>Replace requires one kind of asset, so under Everything, first choose a kind of asset in the What to search list. In a scenario other than Base, a replacement is stored in that scenario, as the same edit in Properties would be. Where Mapbox elevations are available, Elevation can be replaced from the Mapbox DEM instead of a typed value.</p>';
 $ec_lang['lpn_guide_find_notes_term']='Points to note';
@@ -1177,7 +1177,7 @@ $ec_lang['lpn_msglog_hidden']='Hidden';
 $ec_lang['lpn_msglog_unhide']='Show';
 $ec_lang['lpn_status_hidden_tip']='Show the hidden message on the map again.';
 // Rewritten for the two-click box (Task 768); TGH's 2026-09-07 wording described one press.
-$ec_lang['lpn_wrong_tip']='Report an error on this page. This opens a box to select the problem, add a comment, and enter an email address if a reply is wanted. All fields are optional, and nothing is sent until you press Send.';
+$ec_lang['lpn_wrong_tip']='Report an error on this page. This opens a box to choose the problem, add a comment, and enter an email address if a reply is wanted. All fields are optional, and nothing is sent until you press Send.';
 $ec_lang['lpn_wrong_thanks']='Thank you. Your report was received.';
 // The box "Something wrong here?" opens (ROADMAP Task 768). Every field is optional; Send with
 // nothing in it posts only the anonymous tally the button always posted. The four picks are canned
@@ -1191,7 +1191,7 @@ $ec_lang['lpn_fb_pick_wording']='The wording or translation is wrong';
 $ec_lang['lpn_fb_pick_confusing']='This is confusing';
 $ec_lang['lpn_fb_comment']='Comments (optional)';
 $ec_lang['lpn_fb_email']='Email (optional, only if you want a reply)';
-$ec_lang['lpn_fb_sends']='What this sends: the name of this page, your language, the version of the site, the code of the message on the map if there is one, and what you picked or typed. Never your drawing or your network. Your email address is used only to reply to you.';
+$ec_lang['lpn_fb_sends']='What this sends: the name of this page, your language, the version of the site, the code of the message on the map if there is one, and what you chose or typed. Never your drawing or your network. Your email address is used only to reply to you.';
 $ec_lang['lpn_fb_send']='Send';
 $ec_lang['lpn_fb_sending']='Sending…';
 $ec_lang['lpn_fb_failed']='That did not reach us. What you wrote is still here, so you can try again.';
@@ -1468,7 +1468,7 @@ $ec_lang['lpn_find_menu_tip']='Simple or complex find and replace';
 $ec_lang['lpn_help_icons']='Toolbar';
 // ---- The right panel: Visibility ----
 $ec_lang['lpn_pane_right_toggle']='Visibility';
-$ec_lang['lpn_color_legend_open_tip']='Select to open the coloring settings and change these colors.';
+$ec_lang['lpn_color_legend_open_tip']='Press to open the coloring settings and change these colors.';
 $ec_lang['lpn_color_node_field']='Color nodes by';
 $ec_lang['lpn_color_link_field']='Color links by';
 $ec_lang_syn['lpn_color_link_field']='Color links by, Color the links to show, Colors show these values, Link color shows, Value that color shows | avoid: a rendering that cannot be completed by the value of the dropdown that follows it';
@@ -1485,7 +1485,7 @@ $ec_lang['lpn_settings_color_classes']='Number of colors';
 // point of this control." -- the dropdown holds METHODS, and the noun alone would name the result.
 $ec_lang['lpn_color_mode']='Data classification method';
 $ec_lang['lpn_color_ranges_note']='The boundaries below are fixed once set; they do not follow the results as they change. Choosing a data classification method above sets the boundaries from the current state of the system. If you change any value by hand, the method above becomes Manual.';
-$ec_lang['lpn_color_criterion_note']='This method takes its boundaries from a design standard, so the number of colors is fixed while this method is selected.';
+$ec_lang['lpn_color_criterion_note']='This method takes its boundaries from a design standard, so the number of colors is fixed while this method is chosen.';
 $ec_lang['lpn_color_break_number']='A boundary must be a number. The map is unchanged.';
 $ec_lang['lpn_color_break_order']='Each boundary must be larger than the one before it. The map is unchanged.';
 $ec_lang['lpn_color_break_count']='There must be one boundary fewer than the number of colors. The map is unchanged.';
@@ -1670,7 +1670,7 @@ $ec_lang['lpn_change_type_surface']='These keep the water surface where it was. 
 $ec_lang['lpn_change_type_meaning']='These controls and rules test a node being changed, and will read it differently: a junction is tested by its pressure, and a tank or reservoir by its water level.';
 // The link half (Tom, 2026-10-06: "Proceed."). Each heads a list of "ID: entry" lines.
 $ec_lang['lpn_change_type_born']='These values are new, set as on a newly drawn asset:';
-$ec_lang['lpn_change_type_no_curve']='{id}: No pump head curve, so the pump adds no head until one is selected, and an .inp export writes it as a pipe';
+$ec_lang['lpn_change_type_no_curve']='{id}: No pump head curve, so the pump adds no head until one is chosen, and an .inp export writes it as a pipe';
 $ec_lang['lpn_change_type_becomes']='{id}: {property} {value}, in scenario {scenario}, becomes {new}';
 $ec_lang['lpn_change_type_customers']='Only a pipe serves customers, so these customers are connected instead to the node shown in parentheses, where their demand is already applied. They stay where they are drawn, and their demand is unchanged:';
 $ec_lang['lpn_change_type_setting']='These controls and rules give or test the setting of a link being changed. A setting is a different quantity on a pipe, a pump, and a valve, so these will read it differently:';
@@ -1892,12 +1892,12 @@ $ec_lang_syn['lpn_profile_title']='Profile or cross section along a path, route,
 // the map to see the path, click to add a stop, double-click to finish.
 $ec_lang['lpn_profile_draw_start']='Select the node where the path starts.';
 $ec_lang['lpn_profile_draw_more']='Move over the map to see the path. Select a node to add it. Double-click to finish. Esc cancels.';
-$ec_lang['lpn_profile_draw_blocked']='No route from {a} to {b}. Choose another node.';
+$ec_lang['lpn_profile_draw_blocked']='No route from {a} to {b}. Select another node.';
 $ec_lang['lpn_profile_tap_start']='Select the node where the path starts.';
 $ec_lang['lpn_profile_tap_more']='Select a node to see the path. Press and hold to add it. Double-tap to finish. Press Profile again to cancel.';
-$ec_lang['lpn_profile_say_idle']='Press Profile again to choose a new path on the map.';
-$ec_lang['lpn_profile_none']='No path yet. Press Profile again to choose one on the map.';
-$ec_lang['lpn_profile_choose']='Choose a start node and an end node.';
+$ec_lang['lpn_profile_say_idle']='Press Profile again to select a new path on the map.';
+$ec_lang['lpn_profile_none']='No path yet. Press Profile again to select one on the map.';
+$ec_lang['lpn_profile_choose']='Select a start node and an end node.';
 $ec_lang['lpn_profile_no_path']='These two nodes are not connected by any route.';
 $ec_lang['lpn_profile_no_solve']='No results yet, so only the ground line is drawn.';
 $ec_lang['lpn_profile_summary']='Nodes: {n}, length: {len} {u}';
@@ -2325,7 +2325,7 @@ $ec_lang['lpn_file_upload_explain']='This browser cannot connect to a file, so o
 // from. It belongs in this tip rather than in a dialog: it answers a question asked at the moment
 // the user is choosing where their work goes.
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_file_saveas_tip_download']='Save using your browser’s Download settings. This browser cannot connect to a file, so Save is disabled and only Save as is available. If your browser setting "Ask where to save each file" is on, the original file can be picked and overwritten.';
+$ec_lang['lpn_file_saveas_tip_download']='Save using your browser’s Download settings. This browser cannot connect to a file, so Save is disabled and only Save as is available. If your browser setting "Ask where to save each file" is on, the original file can be chosen and overwritten.';
 $ec_lang['lpn_status_uploaded']='Project file uploaded. No connection to it can be maintained, so the only way to save back to it is by using File, Save as.';
 $ec_lang['lpn_status_downloaded']='Downloaded {file}. This browser cannot connect to a file, so this project stays marked as not saved to a file.';
 $ec_lang['lpn_status_file_opened']='Opened {file}.';
@@ -2694,7 +2694,7 @@ $ec_lang['lpn_valve_type_gpv']='General purpose (GPV)';
 $ec_lang['lpn_field_valve_setting_drop']='Pressure drop';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_field_valve_setting_drop_tip']='The pressure lost at the valve. A pressure breaker valve always removes exactly this much pressure, whichever way the water is going. It is a drop across the valve, not a pressure to hold.';
-$ec_lang['lpn_inp_drop_gpv_curve']='This valve refers to a head loss curve that is not in the file. The valve was imported without a curve, so it remains fully open until a curve is selected.';
+$ec_lang['lpn_inp_drop_gpv_curve']='This valve refers to a head loss curve that is not in the file. The valve was imported without a curve, so it remains fully open until a curve is chosen.';
 $ec_lang['lpn_gpv_curve_source']='Valve head loss curve';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_gpv_curve_source_tip']='The curve in the Libraries box that gives the head loss through this valve at each flow. Several valves can use the same curve, and editing it there changes all of them.';
@@ -2768,7 +2768,7 @@ $ec_lang['lpn_pump_effic_curve']='Pump efficiency curve';
 $ec_lang['lpn_pump_effic_curve_tip']='The curve in the Libraries box that gives the efficiency of this pump at each flow. Several pumps can use the same curve, and editing it there changes all of them. This pump holds only the reference; the points themselves are read and edited under Libraries, Curves.';
 // **THE STRINGS EVERY CURVE CONTROL SHARES** (Task 586). One chooser serves a pump's head curve, a
 // pump's efficiency curve and a valve's head-loss curve, so its fixed entries are keyed once.
-$ec_lang['lpn_curve_none']='No curve selected';
+$ec_lang['lpn_curve_none']='No curve chosen';
 // **THE CHOOSER OFFERS NO WAY TO MAKE A CURVE** (Tom, 2026-09-05: *"Pump properties has no 'New
 // curve...' button. And it shouldn't unless that's a link to the Curves library."*). It offered
 // one, and it made curve DATA from inside a pump's properties. This is the link that replaced it,
@@ -2802,7 +2802,7 @@ $ec_lang['lpn_pump_effic_col']='Efficiency';
 // is three fixed rows, because this page FITS a head curve from at most three points while EPANET
 // reads an efficiency curve directly: truncating an imported five-point curve would be rewriting
 // numbers that are the user's.
-$ec_lang['lpn_pump_effic_global']='This pump has no efficiency curve selected, so it runs at the efficiency set for the whole network, {percent}.';
+$ec_lang['lpn_pump_effic_global']='This pump has no efficiency curve chosen, so it runs at the efficiency set for the whole network, {percent}.';
 $ec_lang['lpn_pump_effic_unstated']='This pump refers to an efficiency curve called {name}, which nothing in this project defines, so it runs at the efficiency set for the whole network, {percent}.';
 // Persistent mode-hint line (Task 146.01 follow-up, 2026-07-30): whole sentences, not composed
 // from a "Mode:" prefix + the tool's own label, per CLAUDE.md's concept-level label reuse rule --
@@ -3048,7 +3048,7 @@ $ec_lang['lpn_backdrop_scale_prompt2']='Real distance between the two points';
 // one move. The second names the panel it is about to show, so the alert and the panel read as one
 // step rather than two.
 $ec_lang['lpn_backdrop_position_prompt1']='Specify the base point (on the image) for the move.';
-$ec_lang['lpn_backdrop_position_prompt2']='Choose the method for the destination point, then select Continue.';
+$ec_lang['lpn_backdrop_position_prompt2']='Choose the method for the destination point, then press Continue.';
 // The standing "you are in the middle of something" bar, shown while a background-image scale or
 // move is waiting for a click. It carries the only visible way out of that state.
 $ec_lang['lpn_backdrop_busy']='Adjusting the background image.';
@@ -3625,7 +3625,7 @@ $ec_lang['lpn_settings_sec_calculation']='Calculation';
 // would follow Node styles"), so this section has one control and no checkboxes: how close the
 // view has to be before a service is worth lettering.
 $ec_lang['lpn_settings_sym_customer']='Customer';
-$ec_lang['lpn_labels_customer_note']='A customer label shows the values selected here. It is drawn at the same text size as every other label on the map.';
+$ec_lang['lpn_labels_customer_note']='A customer label shows the values chosen here. It is drawn at the same text size as every other label on the map.';
 // **THE ROW NAME IS lpn_settings_label_max_width NOW, NOT A KEY OF ITS OWN** (Tom, 2026-09-23:
 // "Make the Customer labels and All labels zoom limits settings interfaces identical... Both to
 // say 'Show labels when zoomed to this map width or less'"). KEY DELETED: lpn_labels_customer_width
@@ -4057,7 +4057,7 @@ $ec_lang['lpn_library_pipetype_in_use']='This pipe type is used by {count} pipes
 // The pipe popup\'s own selector and the two controls beside it.
 $ec_lang['lpn_field_pipetype']='Pipe type';
 $ec_lang['lpn_field_pipetype_tip']='The pipe type in the project library that this pipe uses. Properties included in the pipe type are disabled for editing here. Detach the pipe type to enable editing here.';
-$ec_lang['lpn_pipetype_none']='No pipe type selected';
+$ec_lang['lpn_pipetype_none']='No pipe type chosen';
 $ec_lang['lpn_pipetype_detach']='Detach from pipe type';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_pipetype_detach_tip']='Copy the values this pipe reads from its type into the pipe itself and stop using the type. The pipe’s values don’t change now, and from now on these values are edited here.';
@@ -4122,8 +4122,8 @@ $ec_lang['lpn_fitting_total']='Total minor (local) loss coefficient, k';
 // The pipe popup\'s own selector.
 $ec_lang['lpn_field_fittings']='Fittings list';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_field_fittings_tip']='A list of fittings from the project library. Its quantities and coefficients are added up into this pipe’s minor loss coefficient, and the coefficient box is then read only. Leave this unselected to enter the coefficient yourself.';
-$ec_lang['lpn_fittings_none']='No fittings list selected';
+$ec_lang['lpn_field_fittings_tip']='A list of fittings from the project library. Its quantities and coefficients are added up into this pipe’s minor loss coefficient, and the coefficient box is then read only. Leave no list chosen to enter the coefficient yourself.';
+$ec_lang['lpn_fittings_none']='No fittings list chosen';
 // EPANET 2.2 user manual, Table 3.3, Minor Loss Coefficients for Selected Fittings. THE MANUAL\'S
 // OWN THIRTEEN NAMES, in its own order. CLAUDE.md: default to the EPANET terminology, since a
 // hydraulic engineer has to recognise every one of these.
@@ -4527,7 +4527,7 @@ $ec_lang['lpn_crit_skipped_dead']='Dead-end links skipped: {n}. Each one cuts of
 $ec_lang['lpn_ds_menu']='Demand scaling…';
 $ec_lang['lpn_ds_menu_tip']='Multiply the demands on a copy of the network and see the pressures and velocities, or find the largest demand scale the system can carry.';
 $ec_lang['lpn_ds_title']='Demand scaling';
-$ec_lang['lpn_ds_intro']='Select the Run button to multiply the demands at the chosen junctions by the demand scale and see the pressures and velocities.\n\nSelect the Find button to find the largest demand scale, to the nearest {step}, at which all these junctions keep at least the lowest pressure allowed; it searches from 0 to {max}.\n\nBoth work on a copy of the network, solved at the time step on screen in the active scenario, so nothing in your project is changed. Only that time step is scaled, and levels and statuses are taken from it; to test the peak, move the clock to the peak demand before you run.';
+$ec_lang['lpn_ds_intro']='Press the Run button to multiply the demands at the chosen junctions by the demand scale and see the pressures and velocities.\n\nPress the Find button to find the largest demand scale, to the nearest {step}, at which all these junctions keep at least the lowest pressure allowed; it searches from 0 to {max}.\n\nBoth work on a copy of the network, solved at the time step on screen in the active scenario, so nothing in your project is changed. Only that time step is scaled, and levels and statuses are taken from it; to test the peak, move the clock to the peak demand before you run.';
 $ec_lang['lpn_ds_scope']='Junctions to scale';
 $ec_lang['lpn_ds_scope_all']='All junctions';
 $ec_lang['lpn_ds_scope_selected']='Selected junctions';

@@ -14800,7 +14800,7 @@ var EngCalcs = EngCalcs || {};
 		var handler = function (e) {
 			svg.removeEventListener('pointerup', handler, true);
 			var refWorld = screenToWorld(e.clientX, e.clientY);
-			setRegStep(pc.lpn_backdrop_position_prompt2 || 'Choose the method for the destination point, then select Continue.');
+			setRegStep(pc.lpn_backdrop_position_prompt2 || 'Choose the method for the destination point, then press Continue.');
 			showBackdropTargetPanel(refWorld);
 		};
 		svg.addEventListener('pointerup', handler, true);
@@ -23376,7 +23376,7 @@ var EngCalcs = EngCalcs || {};
 			rowIn(target, pc.lpn_color_mode || 'Data classification method', modeSel);
 			if (crit) {
 				noteIn(target, pc.lpn_color_criterion_note ||
-					'This method takes its boundaries from a design standard, so the number of colors is fixed while this method is selected.');
+					'This method takes its boundaries from a design standard, so the number of colors is fixed while this method is chosen.');
 			}
 			var rev = document.createElement('input');
 			rev.type = 'checkbox'; rev.checked = colorReverseOf(group);
@@ -24150,7 +24150,7 @@ var EngCalcs = EngCalcs || {};
 		return { key: 'typeId', label: 'lpn_field_pipetype', em: 6, prop: 'typeId',
 			choices: function () {
 				var pc = EngCalcs.pageConfig || {},
-					out = [['', pc.lpn_pipetype_none || 'No pipe type selected']];
+					out = [['', pc.lpn_pipetype_none || 'No pipe type chosen']];
 				libPipeTypesRead().forEach(function (t) { out.push([t.id, t.note ? (t.id + ' - ' + t.note) : t.id]); });
 				return out;
 			},
@@ -24161,7 +24161,7 @@ var EngCalcs = EngCalcs || {};
 		return { key: 'fittingsId', label: 'lpn_field_fittings', em: 6, prop: 'fittingsId',
 			choices: function () {
 				var pc = EngCalcs.pageConfig || {},
-					out = [['', pc.lpn_fittings_none || 'No fittings list selected']];
+					out = [['', pc.lpn_fittings_none || 'No fittings list chosen']];
 				libFittingSetsRead().forEach(function (f) { out.push([f.id, f.note ? (f.id + ' - ' + f.note) : f.id]); });
 				return out;
 			},
@@ -24176,7 +24176,7 @@ var EngCalcs = EngCalcs || {};
 		return { key: key, label: labelKey, em: 6, prop: key,
 			choices: function () {
 				var pc = EngCalcs.pageConfig || {},
-					out = [['', blankIsDefault ? lpnBlankIsDefault() : (pc.lpn_curve_none || 'No curve selected')]];
+					out = [['', blankIsDefault ? lpnBlankIsDefault() : (pc.lpn_curve_none || 'No curve chosen')]];
 				libCurvesRead().forEach(function (c) { if (c.kind === kind) { out.push([c.id, c.id]); } });
 				return out;
 			},
@@ -30854,7 +30854,7 @@ var EngCalcs = EngCalcs || {};
 		// rather than offered and then silently saving nothing.
 		stops = profileStops().filter(function (id) { return !!id; });
 		if (stops.length < 2) {
-			setNotice(pc.lpn_profile_none || 'No path yet. Press Profile again to choose one on the map.');
+			setNotice(pc.lpn_profile_none || 'No path yet. Press Profile again to select one on the map.');
 			return;
 		}
 		suggested = (pc.lpn_profile_new_name || 'Path {n}').replace('{n}', String(list.length + 1));
@@ -31091,10 +31091,10 @@ var EngCalcs = EngCalcs || {};
 		} else if (which === 'nowhere') {
 			txt = pc.lpn_profile_edit_nowhere || 'A point on the path has to be a node. The path is unchanged.';
 		} else if (which === 'blocked') {
-			txt = (pc.lpn_profile_draw_blocked || 'No route from {a} to {b}. Choose another node.')
+			txt = (pc.lpn_profile_draw_blocked || 'No route from {a} to {b}. Select another node.')
 				.replace('{a}', detail[0]).replace('{b}', detail[1]);
 		} else if (which === 'idle' || !d) {
-			txt = pc.lpn_profile_say_idle || 'Press Profile again to choose a new path on the map.';
+			txt = pc.lpn_profile_say_idle || 'Press Profile again to select a new path on the map.';
 		} else if (which === 'start') {
 			txt = profileTouch
 				? (pc.lpn_profile_tap_start || 'Select the node where the path starts.')
@@ -31382,7 +31382,7 @@ var EngCalcs = EngCalcs || {};
 			// contradicting itself mid-gesture.
 			if (note && !profileState.draw) {
 				note.textContent = (!profileState.from || !profileState.to)
-					? (pc.lpn_profile_none || 'No path yet. Press Profile again to choose one on the map.')
+					? (pc.lpn_profile_none || 'No path yet. Press Profile again to select one on the map.')
 					: (pc.lpn_profile_no_path || 'These two nodes are not connected by any route.');
 			}
 			return;
@@ -33688,7 +33688,7 @@ var EngCalcs = EngCalcs || {};
 		// what a drawn pump does too, and an .inp export writes it as a smooth stand-in pipe
 		// (js/lpn-inp.js), which comes back as a pipe. The box says both.
 		if (to === 'pump') {
-			born.push(String(pc.lpn_change_type_no_curve || '{id}: No pump head curve, so the pump adds no head until one is selected, and an .inp export writes it as a pipe')
+			born.push(String(pc.lpn_change_type_no_curve || '{id}: No pump head curve, so the pump adds no head until one is chosen, and an .inp export writes it as a pipe')
 				.replace('{id}', function () { return String(l.id); }));
 		}
 		// **A SCENARIO'S OWN LIBRARY PIPE TYPE GOES, AND ITS DIAMETER WITH IT** (pre-review): a
@@ -38241,7 +38241,7 @@ var EngCalcs = EngCalcs || {};
 			// arrive as themselves. The case is kept so an older saved report still renders a
 			// sentence rather than a blank; delete the key once nothing can produce it.
 			case 'valve-dropped': return pc.lpn_inp_drop_valve || 'These valves are described by a curve or by a fixed pressure drop, and this page has no such asset. They were imported as open pipes, so the network remains connected, but pressure and flow are no longer controlled at those locations.';
-			case 'gpv-curve-missing': return pc.lpn_inp_drop_gpv_curve || 'This valve refers to a head loss curve that is not in the file. The valve was imported without a curve, so it remains fully open until a curve is selected.';
+			case 'gpv-curve-missing': return pc.lpn_inp_drop_gpv_curve || 'This valve refers to a head loss curve that is not in the file. The valve was imported without a curve, so it remains fully open until a curve is chosen.';
 			case 'check-valve': return pc.lpn_inp_drop_cv || 'In EPANET these pipes allow flow in one direction only (check valves). They were imported as ordinary pipes, so flow may now pass in either direction.';
 			// 'demand-categories' IS NO LONGER EMITTED (Task 468): a junction holds its demands as a
 			// LIST, so nothing is added together and there is no difference to report. Kept, like
@@ -50512,7 +50512,7 @@ var EngCalcs = EngCalcs || {};
 		});
 		note.className = 'lpn-set-note';
 		note.textContent = pc.lpn_labels_customer_note ||
-			'A customer label shows the values selected here. It is drawn at the same text size as every other label on the map.';
+			'A customer label shows the values chosen here. It is drawn at the same text size as every other label on the map.';
 		host.appendChild(note);
 		// **THE SAME ROW SHAPE AS THE ALL-LABELS ROW BELOW IT IN SETTINGS, BUILT BY THE SAME SHARED
 		// CONTROL** (Tom, 2026-09-23: "Make the Customer labels and All labels zoom limits settings
@@ -57332,7 +57332,7 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {}, none = document.createElement('option'), found = false;
 		sel.innerHTML = '';
 		none.value = '';
-		none.textContent = pc.lpn_fittings_none || 'No fittings list selected';
+		none.textContent = pc.lpn_fittings_none || 'No fittings list chosen';
 		sel.appendChild(none);
 		libFittingSetsRead().forEach(function (f) {
 			var o = document.createElement('option');
@@ -61193,7 +61193,7 @@ var EngCalcs = EngCalcs || {};
 			cur = effective(l, prop) || '',
 			none = document.createElement('option');
 		none.value = '';
-		none.textContent = blankLabel || pc.lpn_curve_none || 'No curve selected';
+		none.textContent = blankLabel || pc.lpn_curve_none || 'No curve chosen';
 		sel.appendChild(none);
 		libCurvesRead().forEach(function (c) {
 			if (c.kind !== kind) { return; }
@@ -61280,7 +61280,7 @@ var EngCalcs = EngCalcs || {};
 			cur = effective(l, 'typeId') || '',
 			none = document.createElement('option');
 		none.value = '';
-		none.textContent = pc.lpn_pipetype_none || 'No pipe type selected';
+		none.textContent = pc.lpn_pipetype_none || 'No pipe type chosen';
 		sel.appendChild(none);
 		libPipeTypesRead().forEach(function (t) {
 			var o = document.createElement('option');
@@ -61588,7 +61588,7 @@ var EngCalcs = EngCalcs || {};
 				.replace('{name}', name).replace('{percent}', globalText));
 		} else if (!name) {
 			pumpEfficNote(fields, (pc.lpn_pump_effic_global
-				|| 'This pump has no efficiency curve selected, so it runs at the efficiency set for the whole network, {percent}.')
+				|| 'This pump has no efficiency curve chosen, so it runs at the efficiency set for the whole network, {percent}.')
 				.replace('{percent}', globalText));
 		}
 	}
