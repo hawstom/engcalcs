@@ -18388,13 +18388,12 @@ var EngCalcs = EngCalcs || {};
 	// join). It paints no highlight (those modes have their own feedback) and takes no pointer
 	// events; a press dismisses it like anywhere else.
 	function hoverCardOtherMode() {
-		return mode === 'delete' || mode === 'match' || mode === 'add-pipe' || mode === 'add-pump' || mode === 'add-valve' || mode === 'add-chain';
+		return mode === 'delete' || mode === 'add-pipe' || mode === 'add-pump' || mode === 'add-valve' || mode === 'add-chain';
 	}
 	var hoverCardOtherRaf = null, hoverCardOtherAt = null;
 	function hoverCardOtherTarget(x, y) {
 		var t = hoverTargetFromHit(mapHitAt(x, y));
 		if (mode === 'delete') { return t && t.kind !== 'label' ? t : null; }
-		if (mode === 'match') { return t && (t.kind === 'node' || t.kind === 'link') ? t : null; }
 		if (t && t.kind === 'node') { return t; }
 		var near = nearestNodeNearScreen(x, y, POINTER_REACH_PX);
 		return near ? { kind: 'node', id: near.id } : null;
@@ -32639,7 +32638,7 @@ var EngCalcs = EngCalcs || {};
 		'add-pipe': 'lpn_mode_add_pipe', 'add-pump': 'lpn_mode_add_pump',
 		'add-valve': 'lpn_mode_add_valve', 'add-meter': 'lpn_mode_add_meter',
 		'add-text': 'lpn_mode_add_text', 'add-chain': 'lpn_mode_add_chain',
-		'vertices': 'lpn_mode_vertices', 'match': 'lpn_mode_match',
+		'vertices': 'lpn_mode_vertices',
 		'zoom-window': 'lpn_mode_zoom_window'
 	};
 	function updateModeHint() {
@@ -32680,8 +32679,6 @@ var EngCalcs = EngCalcs || {};
 		// a preview left on the map by a tool that is no longer running is a shape nothing can
 		// finish (Task 247).
 		if (mode === 'add-meter' && newMode !== 'add-meter') { setPendingMeter(null); }
-		// Match properties keeps its source only while the tool runs.
-		if (mode === 'match' && newMode !== 'match') { matchTargetsList = []; }
 		// The snap glyph belongs to the tool that showed it (Task 782).
 		hideSnapMark();
 		// The hover preview is a Select-mode-only signal (Ida's wishlist item 1): leaving 'select'
@@ -36611,6 +36608,7 @@ var EngCalcs = EngCalcs || {};
 		library.openId = id;
 		saveIndex();
 		applySaved(doc2);
+		propClip = null;   // copied properties belong to the project they were copied from
 		clearUndo();
 		refreshAllFromDocument();
 		return true;
@@ -44018,10 +44016,6 @@ var EngCalcs = EngCalcs || {};
 			// menu is about; View holds the things that change how the map is drawn. Every editor
 			// puts Find in Edit for the same reason.
 			{ icon: 'find', label: pc.lpn_find_menu || 'Find and replace', fn: function () { toggleFindPopup(anchor); } },
-			// **MATCH PROPERTIES, THE AUTOCAD MATCHPROP** (Tom, 2026-10-10). Toggles like Delete, so the
-			// way out of the tool is the control that went in; see startMatchProperties().
-			{ icon: 'duplicate', label: pc.lpn_match_menu || 'Match properties', tip: pc.lpn_match_tip,
-				fn: function () { if (mode === 'match') { setMode('select'); } else { startMatchProperties(selectedRefs()); } } },
 			{ separator: true },
 			// SUBJECT, THEN VERB (Task 415): with something selected this row deletes it, which is
 			// what Delete means in every editor. With nothing selected it still toggles the Delete
@@ -47962,7 +47956,7 @@ var EngCalcs = EngCalcs || {};
 				return;
 			}
 			if (mode.indexOf('add-') === 0) { return; } // handled on click below, not drag
-			if (mode === 'delete' || mode === 'match') { return; }
+			if (mode === 'delete') { return; }
 			// **VERTICES MODE DRAGS A HANDLE AND NOTHING ELSE** (Task 567). Same rule and the same
 			// reason as the profile's edit mode below: a bend can sit anywhere, including on top of
 			// a node or a label, and the mode whose whole subject is the bend must not move the
@@ -48626,8 +48620,6 @@ var EngCalcs = EngCalcs || {};
 						: ((nearestLinkNearScreen(e.clientX, e.clientY, reachPx(e)) || {}).link || {}).id;
 					if (lTap) { insertVertex(lTap, w); }
 				}
-			} else if (mode === 'match') {
-				matchTap(e);
 			} else if (mode === 'delete') {
 				// One-step undo: snapshot the whole document just before any destructive action, NOT
 				// inside the delete functions, so a cascade (deleting a node also deletes its links)
@@ -48815,35 +48807,32 @@ var EngCalcs = EngCalcs || {};
 		setPendingLinkFrom(null);
 	});
 
-	// ---- MATCH PROPERTIES (Task 782; Tom, 2026-10-10: *"Match properties from one asset to others
-	// (as applicable)"*), the AutoCAD MATCHPROP ----
+	// ---- COPY / PASTE PROPERTIES (Task 782; Tom, 2026-10-12: *"Change the paradigm to a clipboard
+	// Copy/Paste paradigm. Right-click to 'Copy properties' and 'Paste properties to selection'. And
+	// there is no confirmation."*) ----
 	//
-	// **OBJECT, THEN VERB, AND ONLY THAT** (Tom, 2026-10-11: *"I think we should limit this to the
-	// object/verb method. The verb/object method seems too dangerous. 'Select targets first.'"*).
-	// The TARGETS are the selection when the command starts; the tool then asks for the SOURCE, applies
-	// the match to the selection in one undo step, and ends. Nothing is ever written by clicking
-	// destinations one after another. With nothing selected the command does not start.
-	// Escape or a right-click ends it. Its doors are Edit > Match properties and a right-click on an
-	// asset in Select mode. NOT the Tables right-click: that menu is a spreadsheet's rows (Tom, 2026-09-21).
+	// Right-click an asset: Copy properties holds that asset's properties; right-click anywhere in
+	// the selection: Paste properties to selection writes them to every selected asset that can take
+	// them, in ONE undo step, with no question asked (Undo is the guard). The clipboard is a JS
+	// variable: **IN MEMORY ONLY, NOTHING IS STORED ON THE VISITOR'S DEVICE**, and opening another
+	// project empties it. It holds the VALUES as they were when copied, not a pointer to the asset.
 	//
 	// **THE PROPERTY LIST IS THE TABLES PANE'S OWN COLUMN SPEC, NOT A LIST OF OURS** -- the same
 	// reuse the multi-properties box makes (see multiGroups()). Each column already knows its
 	// getter, its unit and a setter that goes through setProp(), so a property added to a table is
-	// matched with no edit here, and **EVERY WRITE IS A COLUMN SETTER, i.e. THE ONE SEAM**.
+	// pasted with no edit here, and **EVERY WRITE IS A COLUMN SETTER, i.e. THE ONE SEAM**: the
+	// scenario model decides where a value lands, this code adds no scenario rule of its own and
+	// holds no "not overridable" list. Activation status and elevation are properties like any other.
 	//
 	// **WHAT IS NEVER COPIED**: identity and placement (ID, both coordinates, the two end nodes, the
-	// vertices, the pipe's length, Description, Tag), custom properties (the user's own register),
-	// customers, and STATUS (Active, Shut): MATCHPROP copies properties, not state, and a careless
-	// match must not switch a pipe off.
-	// **TWO ASSETS OF DIFFERENT TYPES** share only the columns with the same key, heading and unit.
+	// vertices, the pipe's length, Description, Tag), custom properties (the user's own register)
+	// and customers. **TWO ASSETS OF DIFFERENT TYPES** share only the columns with the same key,
+	// heading and unit.
 	//
 	// **ONLY A VALUE THAT DIFFERS IS WRITTEN.** Inside a scenario an equal value written anyway is
-	// an override, and an override stops the scenario following Base. **INSIDE A SCENARIO ONLY AN
-	// OVERRIDABLE PROPERTY IS WRITTEN**: the rest (elevation, tank dimensions, pump speed, demand
-	// pattern...) would land in Base under every other scenario, so they are skipped and counted.
-	var matchTargetsList = [];   // the selection when the tool started: what the match is applied to
-	var MATCH_NEVER = { id: true, axis1: true, axis2: true, desc: true, tag: true, from: true, to: true, verts: true, length: true,
-		active: true, closed: true };
+	// an override, and an override stops the scenario following Base.
+	var propClip = null;   // {id, kind, type, valveType, items:[{key, label, unit, v, plain}]}, or null
+	var MATCH_NEVER = { id: true, axis1: true, axis2: true, desc: true, tag: true, from: true, to: true, verts: true, length: true };
 	function matchElOf(ref) { return !ref ? null : (ref.kind === 'node' ? nodeById(ref.id) : (ref.kind === 'link' ? linkById(ref.id) : null)); }
 	function matchSpecOf(el) {
 		var ty = el && el.type, found = null;
@@ -48857,42 +48846,53 @@ var EngCalcs = EngCalcs || {};
 		if (!pa || !pb) { return pa === pb; }
 		return a === b || (typeof a === 'number' && typeof b === 'number' && Math.abs(a - b) <= 1e-12 * Math.max(1, Math.abs(a)));
 	}
-	// The columns of dst's table that src's table also has, in dst's order, as {c, sc, why} (why is
-	// 'valve' for a setting or curve between two valves of different types).
-	function matchPairs(src, dst) {
-		var ss = matchSpecOf(src), ds = matchSpecOf(dst), out = [];
-		if (!ss || !ds || ss.group !== ds.group) { return out; }
-		ds.cols.forEach(function (c) {
-			var sc = null, why = null;
+	// Copy: hold every copyable property of one asset. Returns false for an asset with no table.
+	function copyProperties(ref) {
+		var el = matchElOf(ref), spec = matchSpecOf(el), items = [];
+		if (!el || !spec) { return false; }
+		spec.cols.forEach(function (c) {
 			if (MATCH_NEVER[c.key] || c.result || !c.set || c.noMulti || c.cp) { return; }
-			ss.cols.forEach(function (x) { if (x.key === c.key && !x.result && x.set && !x.cp) { sc = x; } });
-			if (!sc) { return; }
-			if (ss !== ds && (matchColUnit(sc) !== matchColUnit(c) || matchColLabel(sc) !== matchColLabel(c))) { return; }
-			if ((c.key === 'setting' || c.key === 'curveId') && src.type === 'valve' && dst.type === 'valve' &&
-				(src.valveType || 'TCV').toUpperCase() !== (dst.valveType || 'TCV').toUpperCase()) { why = 'valve'; }
-			out.push({ c: c, sc: sc, why: why });
+			items.push({ key: c.key, label: matchColLabel(c), unit: matchColUnit(c), v: c.get(el), plain: !!(c.plainFor && c.plainFor(el)) });
+		});
+		propClip = { id: el.id, kind: ref.kind, type: el.type, group: spec.group, valveType: (el.valveType || 'TCV').toUpperCase(), items: items };
+		return true;
+	}
+	// The columns of dst's table that the clipboard also holds, in dst's order, as {c, it, why} (why is
+	// 'valve' for a setting or curve between two valves of different types).
+	function matchPairs(clip, dst) {
+		var ds = matchSpecOf(dst), out = [];
+		if (!clip || !ds || ds.group !== clip.group) { return out; }
+		ds.cols.forEach(function (c) {
+			var it = null, why = null;
+			if (MATCH_NEVER[c.key] || c.result || !c.set || c.noMulti || c.cp) { return; }
+			clip.items.forEach(function (x) { if (x.key === c.key) { it = x; } });
+			if (!it) { return; }
+			if (clip.type !== dst.type && (it.unit !== matchColUnit(c) || it.label !== matchColLabel(c))) { return; }
+			if ((c.key === 'setting' || c.key === 'curveId') && clip.type === 'valve' && dst.type === 'valve' &&
+				clip.valveType !== (dst.valveType || 'TCV').toUpperCase()) { why = 'valve'; }
+			out.push({ c: c, it: it, why: why });
 		});
 		return out;
 	}
-	// The heading of a column, without its unit, for the notice that names what was not copied.
+	// The heading of a column, for the notice that names what was not pasted.
 	function matchColName(c) {
 		var pc = EngCalcs.pageConfig || {};
 		return typeof c.label === 'function' ? String(c.label()) : String(pc[c.label] || c.key);
 	}
-	// Writes what differs; counts what it could not. ctx = {changed, skip:{scn,breakdown,valve}, scnNames, before}.
-	function matchWrite(src, dst, ctx) {
-		var pairs = matchPairs(src, dst), done = {}, pass;
+	// Writes what differs; counts what it could not. ctx = {changed, skip:{breakdown,valve}, before}.
+	function matchWrite(clip, dst, ctx) {
+		var pairs = matchPairs(clip, dst), done = {}, pass;
 		// Two passes: a pipe type or fittings list written in the first pass can make a column
 		// writable that the first pass met read-only.
 		for (pass = 0; pass < 2; pass++) {
 			pairs.forEach(function (p) {
-				var c = p.c, v, prop;
+				var c = p.c, v;
 				if (done[c.key]) { return; }
 				if (p.why) {
-					if (!matchSame(p.sc.get(src), c.get(dst))) { ctx.skip[p.why]++; }
+					if (!matchSame(p.it.v, c.get(dst))) { ctx.skip[p.why]++; }
 					done[c.key] = true; return;
 				}
-				if (p.sc.plainFor && p.sc.plainFor(src)) {
+				if (p.it.plain) {
 					if (c.key === 'demand') { ctx.skip.breakdown++; }
 					done[c.key] = true; return;   // not the source's own value
 				}
@@ -48900,16 +48900,8 @@ var EngCalcs = EngCalcs || {};
 					if (c.key === 'demand') { ctx.skip.breakdown++; done[c.key] = true; }
 					return;
 				}
-				v = p.sc.get(src);
+				v = p.it.v;
 				if (matchSame(v, c.get(dst))) { done[c.key] = true; return; }
-				// A junction's demand pattern has no `prop` of its own but IS held per scenario: it is
-				// row 0 of the demand list, which a scenario overrides whole (measured 2026-10-11).
-				prop = paneColProp(c) || (c.key === 'demandPattern' ? 'demands' : undefined);
-				if (!inBaseScenario() && !(prop && isOverridable(dst, prop))) {
-					ctx.skip.scn++; done[c.key] = true;
-					if (ctx.scnNames.indexOf(matchColName(c)) < 0) { ctx.scnNames.push(matchColName(c)); }
-					return;
-				}
 				ctx.before();
 				if (!panePresent(v) && !c.bool) { if (!paneWriteCellText(null, c, dst, '')) { return; } }
 				else { c.set(dst, v); }
@@ -48918,80 +48910,37 @@ var EngCalcs = EngCalcs || {};
 			});
 		}
 	}
-	// Apply the source to the targets, a list of {kind,id}: one undo step, one solve.
-	function matchApply(srcRef, targets) {
-		var pc = EngCalcs.pageConfig || {}, src = matchElOf(srcRef), els, said, snapped = false, parts = [],
-			ctx = { changed: 0, skip: { scn: 0, breakdown: 0, valve: 0 }, scnNames: [],
+	// Paste the clipboard onto targets, a list of {kind,id}: one undo step, one solve, no question.
+	function pasteProperties(targets) {
+		var pc = EngCalcs.pageConfig || {}, els, said, snapped = false, parts = [],
+			ctx = { changed: 0, skip: { breakdown: 0, valve: 0 },
 				before: function () { if (!snapped) { snapped = true; saveUndoSnapshot(); } } };
-		if (!src) { return; }
-		els = targets.map(matchElOf).filter(function (el) { return el && el !== src; });
+		if (!propClip) { return; }
+		els = pasteTargets(targets).map(matchElOf);
 		if (!els.length) { return; }
-		if (!els.some(function (el) { return matchPairs(src, el).length; })) {
-			setNotice(String(pc.lpn_match_none || '{to} and {id} have no properties in common to copy.')
-				.replace('{to}', els.length === 1 ? els[0].id : String(els.length)).replace('{id}', src.id));
-			return;
-		}
-		els.forEach(function (el) { matchWrite(src, el, ctx); });
+		els.forEach(function (el) { matchWrite(propClip, el, ctx); });
 		if (snapped) { els.forEach(function (el) { afterPropertyEdit(el); }); }
 		said = els.length === 1
-			? String(pc.lpn_match_done_one || 'Matched {to} to {id}, except status and location. Values changed: {n}.').replace('{to}', els[0].id)
-			: String(pc.lpn_match_done_many || 'Matched {m} assets to {id}, except status and location. Values changed: {n}.').replace('{m}', String(els.length));
-		parts.push(said.replace('{id}', src.id).replace('{n}', String(ctx.changed)));
-		// **A SCENARIO DOES HOLD AN OVERRIDE FOR EVERY PROPERTY IT CAN; THE ONES NAMED HERE HAVE NONE.**
-		// Any edit of these, even one typed inside a scenario, changes Base under every scenario at once.
-		if (ctx.scnNames.length) {
-			parts.push(String(pc.lpn_match_skip_scn || 'Not copied: {names}. A scenario cannot hold its own value for these; change them in Base.')
-				.replace('{names}', ctx.scnNames.join(', ')));
-		}
-		[['breakdown', 'lpn_match_skip_breakdown', 'Not copied: {n} (demand is a list of categories).'],
-			['valve', 'lpn_match_skip_valve', 'Not copied: {n} (the valve types differ).']].forEach(function (r) {
+			? String(pc.lpn_paste_done_one || 'Pasted properties of {id} to {to}. Values changed: {n}.').replace('{to}', els[0].id)
+			: String(pc.lpn_paste_done_many || 'Pasted properties of {id} to {m} assets. Values changed: {n}.').replace('{m}', String(els.length));
+		parts.push(said.replace('{id}', propClip.id).replace('{n}', String(ctx.changed)));
+		[['breakdown', 'lpn_paste_skip_breakdown', 'Not pasted: {n} (demand is a list of categories).'],
+			['valve', 'lpn_paste_skip_valve', 'Not pasted: {n} (the valve types differ).']].forEach(function (r) {
 			if (ctx.skip[r[0]]) { parts.push(String(pc[r[1]] || r[2]).replace('{n}', String(ctx.skip[r[0]]))); }
 		});
 		setNotice(parts.join(' '));
 		refreshPaneIfOpen();
 		refreshSelection();
 	}
-	// The targets: the nodes and links of the selection.
-	function matchTargets(sel) {
+	// The selected nodes and links that can take something from the clipboard.
+	function pasteTargets(sel) {
 		return (sel || []).filter(function (s) { return s.kind === 'node' || s.kind === 'link'; })
-			.map(function (s) { return { kind: s.kind, id: s.id }; });
+			.filter(function (s) {
+				var el = matchElOf(s);
+				return el && !(propClip && s.kind === propClip.kind && s.id === propClip.id) && matchPairs(propClip, el).length > 0;
+			}).map(function (s) { return { kind: s.kind, id: s.id }; });
 	}
-	// The door shared by the Edit menu and the right-click. **WITH NO TARGETS SELECTED IT DOES NOT START.**
-	function startMatchProperties(sel) {
-		var pc = EngCalcs.pageConfig || {}, targets = matchTargets(sel);
-		if (!targets.length) {
-			setNotice(pc.lpn_match_select_first || 'Select the targets first, then choose Match properties.');
-			return;
-		}
-		setMode('match');
-		matchTargetsList = targets;
-		updateModeHint();
-	}
-	function matchPickAt(x, y, e) {
-		var t = hoverTargetFromHit(mapHitAt(x, y)), near;
-		if (t) { return t; }
-		near = nearestNodeNearScreen(x, y, reachPx(e));
-		if (near) { return { kind: 'node', id: near.id }; }
-		near = nearestLinkNearScreen(x, y, reachPx(e));
-		return near ? { kind: 'link', id: near.link.id } : null;
-	}
-	function matchTap(e) {
-		var pc = EngCalcs.pageConfig || {}, t = matchPickAt(e.clientX, e.clientY, e), n;
-		if (!t) { return; }
-		if (t.kind !== 'node' && t.kind !== 'link') { setNotice(pc.lpn_match_kind || 'Match properties applies to nodes and pipes, pumps, and valves only.'); return; }
-		// **THE CONFIRMATION COMES BEFORE ANYTHING IS WRITTEN; CANCEL WRITES NOTHING** (Tom, 2026-10-11:
-		// "You made it dangerous and confusing"). The tool ends either way.
-		n = matchTargetsList.filter(function (r) { return !(r.kind === t.kind && r.id === t.id) && matchElOf(r); }).length;
-		if (!n) { setMode('select'); return; }
-		askDialog({ kind: 'confirm', text: String(n === 1
-			? (pc.lpn_match_selected_ask_one || "Copy this object's properties except activation status to 1 selected object?")
-			: (pc.lpn_match_selected_ask || "Copy this object's properties except activation status to {n} selected objects?"))
-			.replace('{n}', String(n)) }, function (yes) {
-			if (yes) { matchApply(t, matchTargetsList); }
-			setMode('select');
-		});
-	}
-	// **THE MAP'S RIGHT-CLICK MENU, AS A ROW LIST** -- [{label, enabled, run}] -- so a later command
+	// **THE MAP'S RIGHT-CLICK MENU, AS A ROW LIST** -- [{label, enabled, tip, run}] -- so a later command
 	// (Task 784's Time series graph) is one more entry. A row that does not apply is greyed, never hidden.
 	function openMapContextMenu(x, y, rows) {
 		var menu = document.createElement('div'), first = null;
@@ -49022,38 +48971,39 @@ var EngCalcs = EngCalcs || {};
 	// **ONLY A NODE OR A LINK IS INTERCEPTED.** Captured on the document ahead of the map's press
 	// handlers, so the press neither selects nor opens a property sheet; empty canvas (right-drag
 	// pans), Text labels and customers are left exactly as they were. The selection is recorded at
-	// the press, so a multi-selection the right-click is made on can be offered the match. A
-	// right-click inside the tool ends it.
-	var matchCtxSel = [], matchCtxHit = null;
-	function matchOnCanvas(e) { return !!(e.target && e.target.closest && e.target.closest('#lpn_canvas')); }
-	function matchCtxTarget(e) {
+	// the press, so a multi-selection the right-click is made on can be offered the paste.
+	var ctxSel = [], ctxHit = null;
+	function ctxOnCanvas(e) { return !!(e.target && e.target.closest && e.target.closest('#lpn_canvas')); }
+	function ctxTarget(e) {
 		var t = hoverTargetFromHit(mapHitAt(e.clientX, e.clientY));
 		return t && (t.kind === 'node' || t.kind === 'link') ? t : null;
 	}
 	document.addEventListener('pointerdown', function (e) {
-		if (e.button !== 2 || !matchOnCanvas(e)) { return; }
-		matchCtxHit = null;
-		if (mode === 'match') { e.stopPropagation(); return; }
-		if (mode !== 'select') { return; }
-		matchCtxHit = matchCtxTarget(e);
-		if (!matchCtxHit) { return; }
-		matchCtxSel = selectedRefs();
+		if (e.button !== 2 || !ctxOnCanvas(e) || mode !== 'select') { return; }
+		ctxHit = ctxTarget(e);
+		if (!ctxHit) { return; }
+		ctxSel = selectedRefs();
 		e.stopPropagation();
 	}, true);
 	document.addEventListener('pointerup', function (e) {
-		if (e.button !== 2 || !matchOnCanvas(e)) { return; }
-		if (mode === 'match' || (mode === 'select' && matchCtxHit)) { e.stopPropagation(); }
+		if (e.button !== 2 || !ctxOnCanvas(e)) { return; }
+		if (mode === 'select' && ctxHit) { e.stopPropagation(); }
 	}, true);
 	document.addEventListener('contextmenu', function (e) {
-		var pc = EngCalcs.pageConfig || {}, hit;
-		if (!matchOnCanvas(e)) { return; }
-		if (mode === 'match') { e.preventDefault(); setMode('select'); return; }
-		if (mode !== 'select') { return; }
-		hit = matchCtxHit; matchCtxHit = null;
+		var pc = EngCalcs.pageConfig || {}, hit, hasTargets, hitRef;
+		if (!ctxOnCanvas(e) || mode !== 'select') { return; }
+		hit = ctxHit; ctxHit = null;
 		if (!hit) { return; }
 		e.preventDefault();
+		hitRef = { kind: hit.kind, id: hit.id };
+		hasTargets = pasteTargets(ctxSel).length > 0;
 		openMapContextMenu(e.clientX, e.clientY, [
-			{ label: pc.lpn_match_menu || 'Match properties', enabled: matchTargets(matchCtxSel).length > 0, tip: pc.lpn_match_menu_off_tip || "Select target objects to match this object's properties except activation status.", run: function () { startMatchProperties(matchCtxSel); } }
+			{ label: pc.lpn_copy_props_menu || 'Copy properties', enabled: true,
+				run: function () { if (copyProperties(hitRef)) { setNotice(String(pc.lpn_copy_props_done || 'Copied properties of {id}.').replace('{id}', hitRef.id)); } } },
+			{ label: pc.lpn_paste_props_menu || 'Paste properties to selection', enabled: hasTargets,
+				tip: propClip ? (pc.lpn_paste_props_off_kind || 'None of the selected assets can take the copied properties.')
+					: (pc.lpn_paste_props_off_none || 'Nothing is copied. Right-click an asset and choose Copy properties.'),
+				run: function () { pasteProperties(ctxSel); } }
 		]);
 	});
 

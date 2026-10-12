@@ -1733,21 +1733,17 @@ $ec_lang['lpn_confirm_delete_network']='Delete every node, pipe, and text label 
 // point: a conventional name is what makes a powerful command findable by somebody who has never
 // read a word about this page.
 $ec_lang['lpn_find_menu']='Find and replace';
-// Match properties (Task 782; Tom, 2026-10-10: the AutoCAD MATCHPROP). Pick a source asset, then each
-// asset to receive its properties. Identity and placement are never copied.
-$ec_lang['lpn_match_menu']='Match properties';
-$ec_lang['lpn_match_tip']='Copy the properties of one asset to the assets selected. Select the targets first, choose Match properties, then select the source. Status (Active, Shut), identity, location, and connections are never copied. Assets of a different type receive only the properties both types have.';
-$ec_lang['lpn_match_skip_scn']='Not copied: {names}. A scenario cannot hold its own value for these; change them in Base.';
-$ec_lang['lpn_match_skip_breakdown']='Not copied: {n} (demand is a list of categories).';
-$ec_lang['lpn_match_skip_valve']='Not copied: {n} (the valve types differ).';
-$ec_lang['lpn_match_done_one']='Matched {to} to {id}, except status and location. Values changed: {n}.';
-$ec_lang['lpn_match_done_many']='Matched {m} assets to {id}, except status and location. Values changed: {n}.';
-$ec_lang['lpn_match_selected_ask']='Copy this object\'s properties except activation status to {n} selected objects?';
-$ec_lang['lpn_match_selected_ask_one']='Copy this object\'s properties except activation status to 1 selected object?';
-$ec_lang['lpn_match_menu_off_tip']='Select target objects to match this object\'s properties except activation status.';
-$ec_lang['lpn_match_select_first']='Select the targets first, then choose Match properties.';
-$ec_lang['lpn_match_none']='{to} and {id} have no properties in common to copy.';
-$ec_lang['lpn_match_kind']='Match properties applies to nodes and pipes, pumps, and valves only.';
+// Copy and Paste properties (Task 782; Tom, 2026-10-12: a clipboard, no confirmation). Identity and
+// placement are never pasted.
+$ec_lang['lpn_copy_props_menu']='Copy properties';
+$ec_lang['lpn_copy_props_done']='Copied properties of {id}.';
+$ec_lang['lpn_paste_props_menu']='Paste properties to selection';
+$ec_lang['lpn_paste_props_off_none']='Nothing is copied. Right-click an asset and choose Copy properties.';
+$ec_lang['lpn_paste_props_off_kind']='No selected asset can take the copied properties.';
+$ec_lang['lpn_paste_done_one']='Pasted properties of {id} to {to}. Values changed: {n}.';
+$ec_lang['lpn_paste_done_many']='Pasted properties of {id} to {m} assets. Values changed: {n}.';
+$ec_lang['lpn_paste_skip_breakdown']='Not pasted: {n} (demand is a list of categories).';
+$ec_lang['lpn_paste_skip_valve']='Not pasted: {n} (the valve types differ).';
 $ec_lang['lpn_find_title']='Find and replace';
 $ec_lang['lpn_find_scope']='What to search';
 $ec_lang['lpn_find_scope_all']='Everything';
@@ -2825,7 +2821,6 @@ $ec_lang['lpn_pump_effic_unstated']='This pump refers to an efficiency curve cal
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_mode_select']='Mode: Select. Select an asset or a label to see or change it. Drag to move a node or a label. Use the Vertices tool to add or remove the bends in a pipe.';
 $ec_lang['lpn_mode_delete']='Mode: Delete. Select an asset to remove it.';
-$ec_lang['lpn_mode_match']='Mode: Match properties. Select the asset to copy properties from. Status, identity, and location are not copied. Press Escape to cancel.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_mode_vertices']='Mode: Vertices. The vertices of every pipe are shown as small square handles. Specify a point on a pipe to add a vertex, select a handle to remove it, or drag a handle to move it. Nothing else on the map can be changed in this mode.';
 $ec_lang['lpn_mode_zoom_window']='Mode: Zoom window. Specify two opposite corners of a box, or drag one, on the map to zoom in on it.';
