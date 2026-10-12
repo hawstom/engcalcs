@@ -95,7 +95,7 @@ function openPage(file, mutate) {
 	const L = loadLoopedNetwork(INJECT, null, mutate);
 	setUnitSet('us');
 	L.reset();
-	const saved = L.acceptImportedText(fs.readFileSync(ROOT + 'examples/' + file, 'utf8'));
+	const saved = L.acceptImportedText(fs.readFileSync(ROOT + (/^Net[23]\.lwn$/.test(file) ? 'dev/water-network-examples/' : 'examples/') + file, 'utf8'));
 	if (!saved) { throw new Error('the example did not open: ' + file); }
 	L.applySaved(saved);
 	L.buildDom();

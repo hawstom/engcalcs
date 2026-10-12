@@ -970,8 +970,6 @@ $ec_lang['lpn_ex_net2_desc']='EPANET के उदाहरणों में �
 $ec_lang['lpn_ex_net3_title']='EPANET Net3';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_ex_net3_desc']='EPANET का बड़ा उदाहरण: 92 जंक्शन, तीन टैंक और दो जलाशय, जिनमें से एक नदी है। यह दिखाता है कि पूर्ण आकार का मॉडल मानचित्र पर कैसा दिखता है।';
-$ec_lang['lpn_ex_net3_world_title']='EPANET Net3, lat/lon';
-$ec_lang['lpn_ex_net3_world_desc']='EPANET Net3 नेटवर्क को Novato, CA में अक्षांश/देशांतर में बदला गया, जिसके पीछे विश्व मानचित्र है।';
 $ec_lang['lpn_ex_elm_street_title']='Elm Street Center';
 $ec_lang['lpn_ex_elm_street_desc']='अधिकतम दैनिक माँग के ऊपर अग्नि-प्रवाह के लिए हल किया गया एक व्यावसायिक स्थल, एक ही क्षण में, साइट योजना के ऊपर बनाया गया।';
 $ec_lang['lpn_tool_undo']='पूर्ववत करें';

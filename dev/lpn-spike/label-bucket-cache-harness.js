@@ -125,7 +125,7 @@ setUnitSet('us');
 L.buildLayers();
 const W = 1400, H = 700;
 L.setCanvas(W, H);
-L.applySaved(JSON.parse(fs.readFileSync(path.join(__dirname, '../water-network-examples/Net3.lwn'), 'utf8')));
+L.applySaved(JSON.parse(fs.readFileSync(path.join(__dirname, '../water-network-dev/water-network-examples/Net3.lwn'), 'utf8')));
 L.buildDom();
 L.noteMapSized();
 const doc = L.getDoc();

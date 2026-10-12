@@ -19,7 +19,7 @@
 const fs = require('fs');
 module.exports = async function ({ send, evaluate, logs, sleep }) {
   const URL_ = process.env.PAGE;
-  const PROJ = process.env.PROJ || 'dev/water-network-examples/Net3.lwn';
+  const PROJ = process.env.PROJ || 'dev/water-network-dev/water-network-examples/Net3.lwn';
   await send('Page.navigate', { url: URL_ });
   await sleep(4000);
   await evaluate(`(function(){

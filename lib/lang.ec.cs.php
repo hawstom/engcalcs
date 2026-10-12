@@ -970,8 +970,6 @@ $ec_lang['lpn_ex_net2_desc']='Větvená rozvodná síť s nádrží, z ukázkov�
 $ec_lang['lpn_ex_net3_title']='EPANET Net3';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_ex_net3_desc']='Velká ukázková síť EPANET: 92 uzlů, tři nádrže a dva zdroje, z nichž jeden je řeka. Ukazuje, jak na mapě vypadá model skutečné velikosti.';
-$ec_lang['lpn_ex_net3_world_title']='EPANET Net3, lat/lon';
-$ec_lang['lpn_ex_net3_world_desc']='Síť EPANET Net3 převedená na zeměpisnou šířku a délku v Novato, Kalifornie, s mapou světa v pozadí.';
 $ec_lang['lpn_ex_elm_street_title']='Elm Street Center';
 $ec_lang['lpn_ex_elm_street_desc']='Komerční areál řešený pro požární průtok navíc k maximálnímu dennímu odběru, v jednom okamžiku, nakreslený na podkladu situačního plánu.';
 $ec_lang['lpn_tool_undo']='Zpět';

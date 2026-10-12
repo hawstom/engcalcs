@@ -1,4 +1,4 @@
-// THE SI TWINS OF Net2 AND Net3 SOLVE LIKE THEIR US ORIGINALS (ROADMAP Task 786). Run with:
+// THE SI TWINS OF THE Net2 (BRANFORD) AND Net3 (NOVATO) EXAMPLES SOLVE LIKE THEIR US ORIGINALS (ROADMAP Task 786). Run with:
 //   node dev/lpn-spike/si-example-equivalence-harness.js
 //
 // Tom, 2026-10-11: convert Net2 and Net3 to SI. A converted file can be wrong silently -- a flow
@@ -47,7 +47,7 @@ const worst = () => ({ v: 0, at: '' });
 const note = (w, v, at) => { if (v > w.v) { w.v = v; w.at = at; } };
 
 function open(file, edit) {
-	setUnitSet(/-SI/.test(file) ? 'si' : 'us');
+	setUnitSet(/-SI\.lwn$/.test(file) ? 'si' : 'us');
 	const saved = JSON.parse(fs.readFileSync(ROOT + 'examples/' + file, 'utf8'));
 	if (edit) { edit(saved); }
 	L.applySaved(L.migrateSaved(saved));
@@ -64,9 +64,12 @@ const MODEL_REL = 1e-5, HEAD_ABS = 0.005, FLOW_REL = 1e-4, FLOW_ABS = 1e-6;
 	await EC.lpnEpanetLoad('file://' + ROOT + 'js/vendor/epanet-js.js');
 	const summary = [];
 
-	for (const net of ['Net3', 'Net2']) {
-		console.log('\n== ' + net + ': US original against its SI twin');
-		const us = open(net + '.lwn'), si = open(net + '-SI.lwn');
+	// kind: 'geo' is a lat/lon project (degrees, drawing untouched), 'proj' a projected one whose
+	// drawing and origin shift convert and whose CRS becomes its metre twin.
+	const PAIRS = [['Net3-Novato-CA-World', 'geo', 'Net3'], ['Net2-Branford-CT', 'proj', 'Net2']];
+	for (const [file, kind, net] of PAIRS) {
+		console.log('\n== ' + file + ': US original against its SI twin');
+		const us = open(file + '.lwn'), si = open(file + '-SI.lwn');
 
 		// 1. THE MODELS ---------------------------------------------------------------------
 		const wm = worst();
@@ -101,17 +104,18 @@ const MODEL_REL = 1e-5, HEAD_ABS = 0.005, FLOW_REL = 1e-4, FLOW_ABS = 1e-6;
 			us.method === si.method && us.links.every((l, i) => l.roughness === si.links[i].roughness));
 		summary.push(net + ' inputs: ' + wm.v.toExponential(2));
 
-		// 1b. THE DRAWING IS IN METRES TOO ------------------------------------------------------
-		// On a grid project a world unit IS the display length unit, so the scale bar, a new pipe's
-		// auto length and the backdrop all read the coordinates as metres in the SI twin. A pipe's
-		// STATED length is not its drawn length in these two files (EPA drew them schematically:
-		// stated over drawn runs from 1 to 25951 in Net3), so "bar equals stated" cannot hold even in
-		// the US file; what must hold is that the drawn geometry is the same drawing at 0.3048 the
-		// size, which is exactly what the bar, auto length and snapping measure.
+		// 1b. THE DRAWING AND ITS GEOREFERENCE ---------------------------------------------------
+		// A lat/lon project stores degrees, so its drawing must be IDENTICAL in the twin (nothing to
+		// convert, and converting would move it off the map). A projected project is drawn in the
+		// CRS's feet: the drawing is the US one times 0.3048 (what the scale bar, auto length and
+		// snapping measure), the origin shift is an absolute position and converts at the US survey
+		// foot, and the CRS becomes the metre twin of the same projection. A pipe's STATED length is
+		// not its drawn length in these files (EPA drew them schematically), so "bar equals stated"
+		// cannot hold even in the US file.
 		{
-			const ru = JSON.parse(fs.readFileSync(ROOT + 'examples/' + net + '.lwn', 'utf8'));
-			const rs = JSON.parse(fs.readFileSync(ROOT + 'examples/' + net + '-SI.lwn', 'utf8'));
-			const K = 0.3048, wd = worst(), wl = worst(), wb = worst();
+			const ru = JSON.parse(fs.readFileSync(ROOT + 'examples/' + file + '.lwn', 'utf8'));
+			const rs = JSON.parse(fs.readFileSync(ROOT + 'examples/' + file + '-SI.lwn', 'utf8'));
+			const K = kind === 'geo' ? 1 : 0.3048, wd = worst(), wl = worst();
 			const NU = {}, NS = {};
 			ru.nodes.forEach((n) => { NU[n.id] = n; }); rs.nodes.forEach((n) => { NS[n.id] = n; });
 			ru.nodes.forEach((n) => {
@@ -128,29 +132,55 @@ const MODEL_REL = 1e-5, HEAD_ABS = 0.005, FLOW_REL = 1e-4, FLOW_ABS = 1e-6;
 			ru.links.forEach((l, i) => {
 				note(wl, rel(drawn(ru, NU, l) * K, drawn(rs, NS, rs.links[i]), 1e-3), 'link ' + l.id);
 			});
-			// The site plan: its four corners, as a fraction of the drawing's own extent, in both.
-			const ext = (doc) => {
-				const xs = doc.nodes.map((n) => n.x), ys = doc.nodes.map((n) => n.y);
-				return { x0: Math.min.apply(null, xs), y0: Math.min.apply(null, ys),
-					w: Math.max.apply(null, xs) - Math.min.apply(null, xs), h: Math.max.apply(null, ys) - Math.min.apply(null, ys) };
-			};
-			const corners = (doc) => {
-				const b = doc.backdrop, e = ext(doc), out = [];
-				[[b.x, b.y], [b.x + b.width, b.y], [b.x, b.y + b.height], [b.x + b.width, b.y + b.height]].forEach((p) => {
-					out.push([(b.tx + b.s * p[0] - e.x0) / e.w, (b.ty + b.s * p[1] - e.y0) / e.h]);
-				});
-				return out;
-			};
-			const cu = corners(ru), cs = corners(rs);
-			cu.forEach((c, i) => { note(wb, Math.abs(c[0] - cs[i][0]) + Math.abs(c[1] - cs[i][1]), 'corner ' + i); });
-			ok('every coordinate is the US one times 0.3048', wd.v < 1e-8, 'worst ' + wd.v.toExponential(2) + ' (' + wd.at + ')');
-			ok('every drawn pipe length (the scale bar and auto-length measure) is 0.3048 times the US one', wl.v < 1e-8,
+			ok('every coordinate is the US one times ' + K, wd.v < 1e-6, 'worst ' + wd.v.toExponential(2) + ' (' + wd.at + ')');
+			ok('every drawn pipe length (the scale bar and auto-length measure) is ' + K + ' times the US one', wl.v < 1e-6,
 				'worst ' + wl.v.toExponential(2) + ' (' + wl.at + ')');
-			ok('the site plan sits at the same relative place under the pipes', wb.v < 1e-7,
-				'worst corner offset ' + wb.v.toExponential(2) + ' of the drawing (' + wb.at + ')');
 			ok('the view is the same window (centre and pixels per unit)',
 				rel(ru.view.cx * K, rs.view.cx, 1e-3) < 1e-8 && rel(ru.view.s / K, rs.view.s, 1e-3) < 1e-8);
-			summary.push(net + ' drawing: coordinates ' + wd.v.toExponential(2) + ', pipe drawn length ' + wl.v.toExponential(2) + ', backdrop corners ' + wb.v.toExponential(2));
+			ok('neither twin has a backdrop', !ru.backdrop && !rs.backdrop);
+			if (kind === 'geo') {
+				ok('the georeference is carried: lat/lon project, no CRS, origin unchanged',
+					rs.project.coords === 'geo' && !rs.project.crs && JSON.stringify(rs.origin) === JSON.stringify(ru.origin));
+			} else {
+				const F = 1200 / 3937;
+				ok('the CRS is the metre twin of the same projection (EPSG:2234 ftUS to EPSG:26956 m)',
+					ru.project.crs === 'EPSG:2234' && rs.project.crs === 'EPSG:26956');
+				ok('the origin shift is the US survey foot conversion',
+					rel(ru.origin.x * F, rs.origin.x, 1) < 1e-8 && rel(ru.origin.y * F, rs.origin.y, 1) < 1e-8,
+					JSON.stringify(ru.origin) + ' -> ' + JSON.stringify(rs.origin));
+				// Where the origin lands, in the CRS's metres: a Connecticut (NAD83) easting is ~300000 m
+				// and a northing ~200000 m, so a missed conversion is 3 times off and shows here.
+				ok('the placed origin is plausible Connecticut State Plane in metres',
+					rs.origin.x > 250000 && rs.origin.x < 350000 && rs.origin.y > 150000 && rs.origin.y < 250000,
+					JSON.stringify(rs.origin));
+				// And the proof that matters: the same node lands on the same spot on the Earth in both
+				// twins, through each CRS's own definition (proj4, the library the page uses).
+				const P0 = require(ROOT + 'js/vendor/proj4.js'), P = P0.default || P0;
+				const D = JSON.parse(fs.readFileSync(ROOT + 'js/data/epsg-proj4.json', 'utf8'));
+				const D2 = D.defs || D;
+				P.defs('US', D2['2234']); P.defs('SI', D2['26956']);
+				const at = (c, d) => { const n = d.nodes.find((x) => x.id === '26'); return P(c, 'EPSG:4326', [d.origin.x + n.x, d.origin.y + n.y]); };
+				const pu = at('US', ru), ps = at('SI', rs);
+				const metres = Math.hypot((pu[0] - ps[0]) * 85000, (pu[1] - ps[1]) * 111000);
+				ok('node 26 lands on the same spot on the Earth in both twins', metres < 0.05,
+					metres.toFixed(4) + ' m apart, at lat ' + pu[1].toFixed(5) + ' lon ' + pu[0].toFixed(5));
+			}
+			summary.push(net + ' drawing: coordinates ' + wd.v.toExponential(2) + ', pipe drawn length ' + wl.v.toExponential(2));
+		}
+
+		// 1c. A FEW NUMBERS, NAMED: what a reader would check by hand, from the files' own values --------
+		{
+			const ru = JSON.parse(fs.readFileSync(ROOT + 'examples/' + file + '.lwn', 'utf8'));
+			const rs = JSON.parse(fs.readFileSync(ROOT + 'examples/' + file + '-SI.lwn', 'utf8'));
+			const LPS = 3.785411784 / 60;	// one gpm in L/s
+			ru.nodes.filter((n) => n._demand).slice(0, 3).forEach((a) => {
+				const b = rs.nodes.find((n) => n.id === a.id);
+				ok('node ' + a.id + ': ' + a._demand + ' gpm is ' + b._demand + ' L/s; ' + a.elev + ' ft is ' + b.elev + ' m',
+					rel(a._demand * LPS, b._demand, 1e-3) < 1e-5 && rel(a.elev * 0.3048, b.elev, 1e-3) < 1e-5);
+			});
+			const a = ru.links.find((l) => l.type === 'pipe'), b = rs.links.find((l) => l.id === a.id);
+			ok('pipe ' + a.id + ': ' + a._length + ' ft is ' + b._length + ' m; ' + a._diameter + ' in is ' + b._diameter + ' mm',
+				rel(a._length * 0.3048, b._length, 1e-3) < 1e-5 && rel(a._diameter * 25.4, b._diameter, 1e-3) < 1e-5);
 		}
 
 		// 2. A SINGLE INSTANT, built-in solver ---------------------------------------------
@@ -212,7 +242,7 @@ const MODEL_REL = 1e-5, HEAD_ABS = 0.005, FLOW_REL = 1e-4, FLOW_ABS = 1e-6;
 
 		// 4. THE COMPARISON CAN FAIL ---------------------------------------------------------
 		if (net === 'Net3') {
-			const bad = open('Net3-SI.lwn', (saved) => {
+			const bad = open('Net3-Novato-CA-World-SI.lwn', (saved) => {
 				const c = saved.controls.find((x) => x.link === '335' && x.condition && x.condition.cmp === 'below');
 				c.condition.value = 17.1;	// left in feet
 			});

@@ -217,7 +217,7 @@ async function main() {
 	if (!executablePath) { console.error(NAME + ': no Chromium found. SKIPPING.'); if (!BASE) { env.stopServer(); } process.exit(0); }
 	const browser = await chromium.launch({ executablePath });
 	try {
-		for (const c of [{ card: 'lpn_ex_net1_title', label: 'Net1', geo: false }, { card: 'lpn_ex_net3_world_title', label: 'Net3 lat/lon', geo: true },
+		for (const c of [{ card: 'lpn_ex_net1_title', label: 'Net1', geo: false }, { card: 'lpn_ex_net3_title', label: 'Net3 lat/lon', geo: true },
 			{ card: 'lpn_ex_net1_title', label: 'Net1 (ar)', geo: false, lang: 'ar' }, { card: 'lpn_ex_net1_title', label: 'Net1 (zh)', geo: false, lang: 'zh' }]) {
 			const q = 'Looped-Network.php?ec_nolog=1' + (c.lang ? '&lang=' + c.lang : '');
 			console.log('\n--- ' + c.label + (BASE ? ' at ' + BASE : '') + ' ---');

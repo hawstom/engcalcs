@@ -970,8 +970,6 @@ $ec_lang['lpn_ex_net2_desc']='Razgranati distribucijski sustav sa spremnikom, iz
 $ec_lang['lpn_ex_net3_title']='EPANET Net3';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_ex_net3_desc']='Velika EPANET-ova primjerna mreža: 92 čvora, tri spremnika i dva rezervoara, od kojih je jedan rijeka. Prikazuje kako model stvarne veličine izgleda na karti.';
-$ec_lang['lpn_ex_net3_world_title']='EPANET Net3, lat/lon';
-$ec_lang['lpn_ex_net3_world_desc']='Mreža EPANET Net3 pretvorena u zemljopisnu širinu/dužinu, smještena u Novatu u Kaliforniji, s kartom svijeta iza nje.';
 $ec_lang['lpn_ex_elm_street_title']='Elm Street Center';
 $ec_lang['lpn_ex_elm_street_desc']='Poslovni objekt riješen za protok za gašenje požara uz najveću dnevnu potražnju, u jednom trenutku, nacrtan preko situacijskog plana.';
 $ec_lang['lpn_tool_undo']='Poništi';

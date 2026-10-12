@@ -973,8 +973,6 @@ $ec_lang['lpn_ex_net2_desc']='Разклонена разпределителн�
 $ec_lang['lpn_ex_net3_title']='EPANET Net3';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_ex_net3_desc']='Големият пример на EPANET: 92 възела, три цистерни и два резервоара, единият от които е река. Показва как изглежда на картата модел с реален размер.';
-$ec_lang['lpn_ex_net3_world_title']='EPANET Net3, lat/lon';
-$ec_lang['lpn_ex_net3_world_desc']='Мрежата EPANET Net3, преобразувана в географска ширина/дължина при Новато, Калифорния, с картата на света зад нея.';
 $ec_lang['lpn_ex_elm_street_title']='Elm Street Center';
 $ec_lang['lpn_ex_elm_street_desc']='Търговски обект, решен за пожарно водно количество върху максималната дневна потребност, в един момент от времето, начертан върху план на обекта.';
 $ec_lang['lpn_tool_undo']='Отмяна';

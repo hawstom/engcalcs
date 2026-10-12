@@ -11,20 +11,27 @@ and a function cannot carry a description, cannot be authored by anyone who is n
 
 | File | Nodes | Links | Units | Notes |
 |------|------:|------:|-------|-------|
-| `Net1.lwn` | 11 | 13 | gpm | EPANET's Net1. Public domain, ships with EPANET, every water engineer recognises it. |
-| `Net2.lwn` | 36 | 40 | gpm | EPANET's Net2. |
-| `Net3.lwn` | 97 | 119 | gpm | EPANET's Net3. The large-model case — this is the one that exercises label clutter and the sizing paradigm. |
-| `Elm-Street-Center.lwn` | 18 | 19 | gpm | Tom's own design snapshot, anonymised, with a CAD site plan as its backdrop. The first example drawn from real work rather than invented. |
+| `Net1.lwn` | 11 | 13 | gpm | EPANET's Net1: 9 junctions, 1 reservoir, 1 tank, 1 pump. Public domain, ships with EPANET. |
+| `Net2-Branford-CT.lwn` | 36 | 40 | gpm | EPANET's Net2 placed at Branford, Connecticut on EPSG:2234 (Tom's own saved project, 2026-10-12). No backdrop. |
+| `Net3-Novato-CA-World.lwn` | 97 | 119 | gpm | EPANET's Net3 placed at Novato, California as a lat/lon project, world map behind it. No backdrop. |
+| `Elm-Street-Center.lwn` | 18 | 19 | gpm | Tom's own design snapshot, anonymised, with a CAD site plan as its backdrop. The one example with a backdrop (Tom, 2026-10-12). |
 
-**`Net2-SI.lwn` and `Net3-SI.lwn` are unit conversions of `Net2.lwn` and `Net3.lwn`** (Task 786,
-Tom 2026-10-11), made by `node dev/scripts/convert_example_to_si.js Net3 Net3-SI "Net3 SI"`: ft to m,
-in to mm, gpm to L/s, every number rounded to 6 significant figures; coordinates, Hazen-Williams
+**`Net2-Branford-CT-SI.lwn` and `Net3-Novato-CA-World-SI.lwn` are unit conversions of the two above** (Task 786,
+Tom 2026-10-11), made by `node dev/scripts/convert_example_to_si.js Net3-Novato-CA-World Net3-Novato-CA-World-SI "Net3-Novato-CA-World SI"`:
+ft to m, in to mm, gpm to L/s, every number rounded to 6 significant figures; Hazen-Williams
 roughness, minor loss k, patterns, times and the quality sections are carried across unchanged. A unit
-switch on the page reinterprets rather than converts, so an SI twin is a separate file.
-`dev/lpn-spike/si-example-equivalence-harness.js` proves each pair solves alike (single instant and
-the whole EPANET extended-period run). They carry no `.inp` of their own. The converter reads the
-SHIPPED US file, so anything curated into it (labels, backdrop, node ID prefixes) rides along. The
-other three are US/gpm.
+switch on the page reinterprets rather than converts, so an SI twin is a separate file. **The drawing
+converts with it** where it is a length: Net2 is drawn in its CRS's feet, so its drawing converts at
+0.3048, its origin shift at the US survey foot, and its CRS becomes the metre twin (EPSG:2234 to
+EPSG:26956); Net3 is a lat/lon project, whose degrees are no length, so its drawing and view are
+carried untouched. `dev/lpn-spike/si-example-equivalence-harness.js` proves each pair solves alike (single
+instant and the whole EPANET extended-period run) and that both twins place a node on the same spot of the
+Earth. They carry no `.inp` of their own. The converter reads the SHIPPED US file.
+
+**`Net2.lwn` and `Net3.lwn` are NOT examples any more.** They carry site plans (Tom, 2026-10-12: *"Remove all
+the examples that have background images except Elm Street Center."*), so `examples.json` does not name
+them and the generator does not publish them. They stay in this folder as the ft-grid test fixtures that
+dozens of harnesses read, beside the `.inp` they came from.
 
 ## Two things to know before adding one
 

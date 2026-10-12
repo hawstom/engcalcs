@@ -968,8 +968,6 @@ $ec_lang['lpn_ex_net2_desc']='Mfumo wa usambazaji wenye matawi, wenye tanki, kut
 $ec_lang['lpn_ex_net3_title']='EPANET Net3';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_ex_net3_desc']='Mfano mkubwa wa EPANET: miunganiko 92, matanki matatu, na hifadhi mbili za maji, moja ikiwa mto. Unaonyesha jinsi mfano wa ukubwa kamili unavyoonekana kwenye ramani.';
-$ec_lang['lpn_ex_net3_world_title']='EPANET Net3, lat/lon';
-$ec_lang['lpn_ex_net3_world_desc']='Mtandao wa EPANET Net3 uliobadilishwa kuwa latitudo/longitudo huko Novato, CA, ukiwa na ramani ya dunia nyuma yake.';
 $ec_lang['lpn_ex_elm_street_title']='Elm Street Center';
 $ec_lang['lpn_ex_elm_street_desc']='Eneo la kibiashara lililotatuliwa kwa mtiririko wa kuzimia moto juu ya mahitaji ya juu ya siku, kwa wakati mmoja, likichorwa juu ya ramani ya eneo.';
 $ec_lang['lpn_tool_undo']='Tengua';

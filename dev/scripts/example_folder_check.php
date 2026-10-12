@@ -21,7 +21,10 @@ $known = array(
 	'.gitignore', 'README.md', 'examples.json',
 	// The published gallery, and the EPA sources two of them were built from. Anything else is new.
 	'Basic-example-US-units.lwn', 'Basic-example-SI-units.lwn',
-	'Net1.lwn', 'Net2.lwn', 'Net3.lwn', 'Net3-Novato-CA-World.lwn', 'Elm-Street-Center.lwn',
+	'Net1.lwn', 'Net2-Branford-CT.lwn', 'Net2-Branford-CT-SI.lwn', 'Net3-Novato-CA-World.lwn',
+	'Net3-Novato-CA-World-SI.lwn', 'Elm-Street-Center.lwn',
+	// Unpublished test fixtures (site plans behind them, so not gallery examples): the harnesses' ft-grid Net2 and Net3.
+	'Net2.lwn', 'Net3.lwn',
 	'Net1.inp', 'Net2.inp', 'Net3.inp', 'Net3.rpt'
 );
 $strays = array();

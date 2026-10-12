@@ -88,26 +88,21 @@ examples.forEach(function (ex) {
 	report(a.replace(DOC_ID_MEMBER, '') === b, `${ex.file} is otherwise a faithful copy, not a re-serialisation`);
 });
 
-// ---- THE BACKDROP IS PART OF THE EXAMPLE, and it has been silently dropped once ----------------
-// Tom put site plans behind Net2 and Net3, they shipped in commit b9baf53, and the very next commit
-// regenerated the examples from a session that did not have them -- 1.7 MB and 2.5 MB of PNG gone,
-// with nothing anywhere saying so. He noticed by opening the gallery: "Net2 and Net3 are still
-// coming in without their images. I think you are reverting me." He was right.
-//
-// Nothing derives this list; it is a DECLARATION that these three examples are drawn over a plan and
-// must arrive with it. An example that gains a backdrop adds itself here, which is the moment to
-// think about the megabytes; one that loses it fails loudly instead of quietly looking plainer.
-const WANT_BACKDROP = ['Net2.lwn', 'Net2-SI.lwn', 'Net3.lwn', 'Net3-SI.lwn', 'Elm-Street-Center.lwn'];
-console.log('\n-- the examples drawn over a site plan still carry it --');
-WANT_BACKDROP.forEach(function (file) {
+// ---- ONLY ELM STREET CENTER CARRIES A BACKDROP (Tom, 2026-10-12) ---------------------------------
+// *"Remove all the examples that have background images except Elm Street Center."* Net2 and Net3
+// had site plans behind them, and two of the four SI-twin files copied ~9 MB of them. The shelf now
+// holds Elm Street Center as its one example drawn over a plan, and it must keep it; any other
+// example gaining one fails here so the megabytes are a decision.
+console.log('\n-- the only example drawn over a site plan is Elm Street Center --');
+examples.forEach(function (ex) {
 	[srcDir, outDir].forEach(function (dir) {
 		const where = dir === srcDir ? 'authored' : 'served';
-		let d = null;
-		try { d = JSON.parse(fs.readFileSync(path.join(dir, file), 'utf8')); } catch (e) { /* reported below */ }
+		const d = JSON.parse(fs.readFileSync(path.join(dir, ex.file), 'utf8'));
 		const href = d && d.backdrop && d.backdrop.href;
-		report(!!href && /^data:image\//.test(href),
-			`${file} (${where}) still has its site plan`,
-			href ? `${Math.round(href.length / 1024)} KB` : 'NO BACKDROP');
+		const want = ex.file === 'Elm-Street-Center.lwn';
+		report(want ? (!!href && /^data:image\//.test(href)) : !href,
+			`${ex.file} (${where}) ${want ? 'still has its site plan' : 'has no backdrop'}`,
+			href ? `${Math.round(href.length / 1024)} KB` : 'none');
 	});
 });
 
@@ -230,11 +225,11 @@ console.log('\n-- layout: a deliberate order, not an accident of equal size --')
 	const si = examples.filter(function (e) { return e.system === 'si'; });
 	report(si.length > 0, 'the shelf has at least one SI example', `${si.length}`);
 	// **THE HEAD OF THE WALL IS TOM'S, AND IT IS NOT SIZE-ORDERED.** Tom, 2026-10-11 (Task 786): the
-	// first four are Net3 SI, Net3 US, Net2 SI, Net2 US, then the wall as it was (Net3-World, Elm
+	// first four are Net3 SI, Net3 US, Net2 SI, Net2 US, then the wall as it was (Elm
 	// Street Center, the two basics, Net1). What survives of his 2026-08-14 "an SI example leads" is
 	// that an SI example is first, and that each SI twin precedes its US twin.
-	['Net3-SI.lwn', 'Net3.lwn', 'Net2-SI.lwn', 'Net2.lwn', 'Net3-Novato-CA-World.lwn',
-		'Elm-Street-Center.lwn'].forEach(function (f, i) {
+	['Net3-Novato-CA-World-SI.lwn', 'Net3-Novato-CA-World.lwn', 'Net2-Branford-CT-SI.lwn',
+		'Net2-Branford-CT.lwn', 'Elm-Street-Center.lwn'].forEach(function (f, i) {
 		report(examples[i].file === f, 'wall position ' + (i + 1) + ' is ' + f, examples[i].file);
 	});
 	let sorted = true;
@@ -356,10 +351,9 @@ console.log('\n-- R-205: Net3-Novato-CA-World gets an all-labels zoom limit and 
 	// place and the world map, whatever words carry that from here on.
 	const novatoTitle = novato && novato.title || '';
 	const novatoDesc = novato && novato.description || '';
-	report(/Net3/.test(novatoTitle) && /lat.?\/.?lon/i.test(novatoTitle),
-		'lpn_ex_net3_world_title still names Net3 and lat/lon', novatoTitle);
-	report(/Novato/.test(novatoDesc) && /CA/.test(novatoDesc) && /world map/i.test(novatoDesc),
-		'lpn_ex_net3_world_desc still names Novato, CA and the world map', novatoDesc);
+	report(/Net3/.test(novatoTitle), 'lpn_ex_net3_title still names Net3', novatoTitle);
+	report(/Novato/.test(novatoDesc) && /California/.test(novatoDesc) && /world map/i.test(novatoDesc),
+		'lpn_ex_net3_desc still names Novato, California and the world map', novatoDesc);
 }
 
 console.log('\n-- R-205: the other EPANET examples say "example", not "sample" --');

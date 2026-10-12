@@ -331,7 +331,7 @@ done('the unknown is kept, and the engine is spared');
 console.log('\n6. A shipped example states what its own source .inp states');
 {
 	// **A GALLERY EXAMPLE IS A STORED PROJECT, NOT A RE-IMPORT**, so it does not gain a feature the
-	// day the importer does -- `examples/Net3.lwn` carried no `Quality` line for as long as the
+	// day the importer does -- `dev/water-network-examples/Net3.lwn` carried no `Quality` line for as long as the
 	// carry existed, and the first person to notice was Tom exporting one. The source `.inp` is the
 	// expectation here for the same reason it is everywhere else in this file.
 	// **AND CARRYING IS ONLY HALF OF IT** (2026-09-04). A section this page INTERPRETS is not in

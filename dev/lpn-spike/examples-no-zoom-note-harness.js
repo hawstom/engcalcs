@@ -27,7 +27,7 @@ manifest.examples.forEach(function (ex) {
 		ok(path.relative(ROOT, f) + ': no "Zoom in to see labels" Text', notes.length === 0);
 	});
 });
-['Net3.lwn', 'Net3-Novato-CA-World.lwn'].forEach(function (file) {
+['Net3-Novato-CA-World.lwn', 'Net3-Novato-CA-World-SI.lwn'].forEach(function (file) {
 	const doc = JSON.parse(fs.readFileSync(path.join(ROOT, 'examples', file), 'utf8'));
 	const ids = (doc.labels || []).map(function (lb) { return lb.id; }).join(',');
 	ok(file + ': its other Text objects are still there (X1,X2)', ids === 'X1,X2');

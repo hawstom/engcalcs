@@ -189,7 +189,7 @@ exports.run = async function ({ browser, report }) {
 		// **THE CARD IS NAMED BY ITS KEY, never spelled out here** (dev/testing-notes.md, and
 		// harness_wording_check.php holds it): a title Tom rewords must not turn into a red build
 		// in a file about panning.
-		await b.openExampleCard(await b.lang('lpn_ex_net3_world_title'));
+		await b.openExampleCard(await b.lang('lpn_ex_net3_title'));
 		await b.settle(1500);
 		await assertPans(b, report, 'a geographic Net3, freshly opened');
 
