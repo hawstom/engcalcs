@@ -395,12 +395,15 @@ const FIVE = [
 		'CRLF from Windows reads identically to LF');
 	check(!L.libPasteIsGrid(L.libPasteCells('300')),
 		'one cell is NOT a grid: ordinary typing is left to the browser\'s own paste');
-	// The `[CURVES]` block out of somebody's e-mail: space separated, with the curve's own name in
-	// front of every pair. It was the one thing the old single text field did well.
-	const INP_BLOCK = ' C1  0  300\n C1  250  290\n C1  500  260';
+	// The `[CURVES]` block, tab separated (through a spreadsheet), with the curve's own name in front
+	// of every pair. A tab-less line is ONE cell and is never split on spaces (Tom, 2026-10-12).
+	const INP_BLOCK = 'C1\t0\t300\nC1\t250\t290\nC1\t500\t260';
 	const inpCells = L.libPasteCells(INP_BLOCK);
 	check(inpCells.length === 3 && inpCells[0].length === 3,
-		`a space-separated .inp block reads as rows of three: ${JSON.stringify(inpCells[0])}`);
+		`a tab-separated .inp block reads as rows of three: ${JSON.stringify(inpCells[0])}`);
+	check(JSON.stringify(L.libPasteCells(' C1  0  300\nMain St, North'))
+			=== JSON.stringify([[' C1  0  300'], ['Main St, North']]),
+		'a line with no tab is one cell, never split on spaces or commas');
 
 	// ---- the merge, on its own ----
 	// **IT LANDS AT THE CELL IT WAS PASTED INTO AND GROWS THE GRID.** Three rows already there, a
@@ -429,8 +432,8 @@ const FIVE = [
 	check(JSON.stringify(L.libGridPoints(L.libMergePaste([], 0, 0, inpCells)))
 			=== JSON.stringify([[0, 300], [250, 290], [500, 260]]),
 		'the .inp block\'s leading curve name is dropped and the pairs land');
-	check(L.libGridPoints(L.libMergePaste([], 0, 0, L.libPasteCells('1 2 3\n4 5 6'))).length === 2
-			&& L.libGridPoints(L.libMergePaste([], 0, 0, L.libPasteCells('1 2 3\n4 5 6')))[0][0] === 1,
+	check(L.libGridPoints(L.libMergePaste([], 0, 0, L.libPasteCells('1\t2\t3\n4\t5\t6'))).length === 2
+			&& L.libGridPoints(L.libMergePaste([], 0, 0, L.libPasteCells('1\t2\t3\n4\t5\t6')))[0][0] === 1,
 		'while three columns of NUMBERS keep their first column and drop the third');
 	// The OUT direction (ROADMAP Task 186), which is the same shape going back.
 	check(L.libCurveTsv([[0, 300], [250, 290]]) === '0\t300\n250\t290',
