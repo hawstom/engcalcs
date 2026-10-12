@@ -391,7 +391,6 @@ var EngCalcs = EngCalcs || {};
 	}
 	function dataLabelOrigin(holder, anchor, end, dragged) {
 		var w = labelBoxWidth(holder);
-		if (window.__lblDbg && dragged) { console.log('SEED origin ' + JSON.stringify({side0: holder.side, end: end.x, anchor: anchor.x, w: w})); }
 		holder.side = dragged
 			? Geom.labelSideAtEnd(holder.side, end.x, anchor.x, w / 2, ADVERSE_FRAC)
 			: (end.x >= anchor.x ? 'right' : 'left');

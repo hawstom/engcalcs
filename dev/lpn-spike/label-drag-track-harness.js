@@ -200,7 +200,10 @@ async function main() {
 	const browser = await chromium.launch({ executablePath });
 	try {
 		const ex = process.env.EX ? process.env.EX.split(',') : ['lpn_ex_net3_world_title', 'lpn_ex_net3_title', 'lpn_ex_basic_us_title'];
-		for (const exKey of ex) for (const dpr of (process.env.DPR ? [+process.env.DPR] : [1, 2])) for (const zin of (process.env.ZIN ? [+process.env.ZIN] : [0, 4])) for (const kind of (process.env.KIND ? [process.env.KIND] : ['node', 'link'])) {
+		// Twelve cases, not twenty-four, so the whole harness fits the runner's 300 s: the two
+		// pixel ratios and the two zooms are paired off rather than crossed.
+		const matrix = [[1, 0], [2, 4]];
+		for (const exKey of ex) for (const [dpr, zin] of matrix) for (const kind of (process.env.KIND ? [process.env.KIND] : ['node', 'link'])) {
 			const a = await Session.open(browser, NAME, { viewport: { width: 1280, height: 800 }, deviceScaleFactor: dpr });
 			try {
 				await a.page.route(/tile\.openstreetmap\.org|api\.mapbox\.com/, (route) => route.abort());
