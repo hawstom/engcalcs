@@ -3553,6 +3553,11 @@ table.lpn-notes-table td:first-child { font-weight: bold; width: 40%; }
 	border-right: 1px solid var(--ec-border); padding-right: 6px; font-size: .9em;
 }
 .lpn-setbox-content { flex: 1 1 auto; min-width: 0; overflow: auto; font-size: .9em; }
+/* **NO SCROLL ANCHORING IN THE SETTINGS BOX** (Tom, 2026-10-12: a held value's note "loses my place in
+   the settings box"). An edit rebuilds the box, so the node the browser picked to hold still was not
+   the one under the pointer, and the content jumped hundreds of pixels. setboxKeepPlace() holds the
+   control in the hand instead. */
+.lpn-setbox-content { overflow-anchor: none; }
 /* **THE DIVIDER BETWEEN THE TWO PANES** (ROADMAP Task 576; Tom, 2026-09-04: *"It might be nice...
    to let the user drag the divider between the settings panes."*). A grab strip, not a line: the
    visible rule stays on .lpn-setbox-index's own border-right, so the drawing does not change and

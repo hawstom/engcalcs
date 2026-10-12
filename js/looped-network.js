@@ -56377,9 +56377,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			if (!/^(SELECT|INPUT|TEXTAREA)$/.test(el.tagName || '')) { return; }
 			held.push({ el: el, key: setboxControlKey(el, box), focus: el === focused });
 		});
-		if (!held.length) { return rebuild(); }
+		if (!held.length) { out = rebuild(); setboxKeepPlace(); return out; }
 		setboxKeeping = true;
-		try { out = rebuild(); } finally { setboxKeeping = false; }
+		try { out = rebuild(); } finally { setboxKeeping = false; setboxKeepPlace(); }
 		held.forEach(function (h) {
 			var el = h.el, twin;
 			if (!box.contains(el)) {
@@ -56513,8 +56513,40 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		return out;
 	}
 	var setboxEdit = null;
+	// ---- THE CONTROL IN THE HAND STAYS UNDER THE POINTER (Tom, 2026-10-12) ----
+	//
+	// *"When I check or clear a labels display checkbox, the addition of the override notice loses my
+	// place in the settings box."* An edit in a scenario rebuilds the box and adds or removes the notes
+	// under held rows; the browser's scroll anchoring then picked some surviving node to hold still and
+	// moved the content by hundreds of pixels (measured on Net1: a link label 522 px down the screen
+	// came back at -106). The stylesheet turns that anchoring off for the box (overflow-anchor), and
+	// this holds the control the edit started on where it was on screen: pinned when the edit begins,
+	// put back after every rebuild and mark for a moment afterwards.
+	var setboxPlace = null;
+	function setboxScroller() { return document.getElementById('lpn_setbox_content'); }
+	function setboxPin(target) {
+		var sc = setboxScroller(), row, box = setboxEl();
+		if (!sc || !target || !target.getBoundingClientRect || !sc.contains || !sc.contains(target)) { return; }
+		row = target.closest ? target.closest('[data-lpn-setting]') : null;
+		setboxPlace = { el: target, key: /^(SELECT|INPUT|TEXTAREA)$/.test(target.tagName || '') ? setboxControlKey(target, box) : null,
+			tag: row ? row.getAttribute('data-lpn-setting') : null, top: target.getBoundingClientRect().top, at: Date.now() };
+	}
+	function setboxKeepPlace() {
+		var pl = setboxPlace, sc = setboxScroller(), el = null, box = setboxEl(), rows, i, delta;
+		if (!pl || !sc || Date.now() - pl.at > 2000) { return; }
+		if (pl.el && sc.contains(pl.el)) { el = pl.el; }
+		if (!el && pl.key && box) { el = setboxControlByKey(box, pl.key); }
+		if (!el && pl.tag) {
+			rows = sc.querySelectorAll('[data-lpn-setting]');
+			for (i = 0; i < rows.length; i++) { if (rows[i].getAttribute('data-lpn-setting') === pl.tag) { el = rows[i]; break; } }
+		}
+		if (!el || !el.getBoundingClientRect || !el.offsetParent) { return; }
+		delta = el.getBoundingClientRect().top - pl.top;
+		if (Math.abs(delta) >= 1) { sc.scrollTop += delta; }
+	}
 	function setboxEditBegin(e) {
 		if (setboxEdit) { return; }
+		if (e && e.target && (e.type === 'click' || e.type === 'change')) { setboxPin(e.target); }
 		if (!inBaseScenario()) { setboxViewSync(); }
 		// **A KEYSTROKE IS NOT A REBUILD** (Perry's re-review, 2026-10-06: typing "abcdef" into a
 		// label's Before box in a scenario stored "f", because each keystroke's rebuild swapped the box
@@ -56522,6 +56554,18 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// leaves the box as it is; the `change` that follows when the field is left rebuilds it.
 		setboxEdit = { state: JSON.parse(setboxState()), undoLen: undoStack.length, undoTop: undoStack[undoStack.length - 1],
 			keepBox: !!(e && e.type === 'input') };
+		// **IN A SCENARIO THE EDITORS WRITE THE VIEW, NOT THE PROJECT** (Tom, 2026-10-12: an override
+		// cleared to false came back ticked). Each editor writes the global `settings` or
+		// `labelSettings` when it fires, and outside a build those are the project's own, so a value
+		// equal to Base's -- a label cleared that Base leaves cleared, Hazen-Williams picked back --
+		// changed nothing this seam could see and was dropped, leaving the scenario's old value. For
+		// the length of the edit the globals are the scenario's view, as they are while the box is
+		// built, so every value typed is a change of the view; setboxEditEnd() puts them back.
+		if (!inBaseScenario() && setboxView) {
+			setboxEdit.real = { settings: settings, labelSettings: labelSettings };
+			settings = setboxView.settings; labelSettings = setboxView.labelSettings;
+			setboxViewDepth++;
+		}
 		// A handler that stops the event before it bubbles to the box still ends here.
 		setTimeout(setboxEditEnd, 0);
 	}
@@ -56529,7 +56573,16 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var ed = setboxEdit, changes, scn = activeScenario(), tookStep, scenarioPaths = [], basePaths = [], times = {};
 		if (!ed) { return; }
 		setboxEdit = null;
-		changes = setboxDiff(ed.state, JSON.parse(setboxState()));
+		if (ed.real) {
+			// An editor that put a whole new object in place (a Restore defaults) wrote the view too.
+			if (settings !== setboxView.settings) { setboxSyncInPlace(setboxView.settings, settings); }
+			if (labelSettings !== setboxView.labelSettings) { setboxSyncInPlace(setboxView.labelSettings, labelSettings); }
+			settings = ed.real.settings; labelSettings = ed.real.labelSettings;
+			setboxViewDepth--;
+		}
+		try { changes = setboxDiff(ed.state, JSON.parse(setboxState())); } finally {
+			if (ed.real && !setboxViewDepth && setboxSavePending) { setboxSavePending = false; setTimeout(saveToStorage, 0); }
+		}
 		if (!changes.length) { return; }
 		tookStep = undoStack.length !== ed.undoLen || undoStack[undoStack.length - 1] !== ed.undoTop;
 		changes.forEach(function (c) {
@@ -56580,6 +56633,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			setScenarioSetting(scn, ['times', 'text', k], typeof t[k] === 'number' ? text : undefined);
 		});
 		if (scenarioPaths.length) { if (ed.keepBox) { settingTableAfterEditKeepBox(); } else { settingTableAfterEditNow(); } }
+		setboxKeepPlace();
+		if (typeof requestAnimationFrame === 'function') { requestAnimationFrame(setboxKeepPlace); }
 	}
 	function setboxPut(path, v) {
 		if (path[0] === 'defaultPattern') { doc.defaultPattern = v === undefined ? null : v; } else { settingProjectPut(path, v); }
@@ -56683,7 +56738,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		Array.prototype.forEach.call(box.querySelectorAll('.lpn-set-heldnote'), function (n) { n.parentNode.removeChild(n); });
 		Array.prototype.forEach.call(box.querySelectorAll('.lpn-set-held'), function (el) { el.classList.remove('lpn-set-held'); });
 		Array.prototype.forEach.call(box.querySelectorAll('.lpn-setbox-link-held'), function (el) { el.classList.remove('lpn-setbox-link-held'); });
-		if (!scn || scn.isBase) { return; }
+		if (!scn || scn.isBase) { setboxKeepPlace(); return; }
 		Array.prototype.forEach.call(box.querySelectorAll('[data-lpn-setting]'), function (el) {
 			var paths, held, note, text, btn, many, shared;
 			try { paths = JSON.parse(el.getAttribute('data-lpn-setting')) || []; } catch (e) { paths = []; }
@@ -56723,6 +56778,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		});
 		// A search in force keeps each new note with its row.
 		if ((document.getElementById('lpn_setbox_filter') || {}).value) { applySetboxFilter(); }
+		setboxKeepPlace();
 	}
 	// The column of a Labels row a path is (its Show tick, Decimals, Before, After, Use units, the
 	// two ranks), in that column's own words; null for any other row.
@@ -73018,7 +73074,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		return !!box && box.style.display !== 'none' && box.style.display !== '';
 	}
 	// What the box is showing: the tree, the selected item's key, the key being renamed, the drag.
-	var smState = { tree: 'scenarios', sel: null, editing: null, drag: null, clickAt: 0 };
+	var smState = { tree: 'scenarios', sel: null, editing: null, drag: null };
 	function smSelValid() {
 		return smState.sel !== null && (smIsBaseKey(smState.tree, smState.sel) || !!smRecord(smState.tree, smState.sel));
 	}
@@ -73244,6 +73300,15 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				else if (e.key === 'Escape') { if (e.preventDefault) { e.preventDefault(); } smState.editing = null; rebuildScenarioManager(); }
 			});
 			ed.addEventListener('blur', function () { if (smState.editing === r.key) { smCommitRename(ed.value); } });
+			// **A CLICK IN THE NAME BEING EDITED PLACES THE CARET** (Tom, 2026-10-12: *"Clicking again,
+			// ostensibly to place the cursor, exits Rename mode."*). It reached the row, which renamed
+			// again: the rebuild threw the field away and its blur committed. The field keeps its own
+			// presses, and a double-click in it selects a word, never makes the scenario current.
+			['mousedown', 'click', 'dblclick'].forEach(function (type) {
+				ed.addEventListener(type, function (e) { if (e.stopPropagation) { e.stopPropagation(); } });
+			});
+			// Nor does a drag of the selection in it drag the row.
+			ed.addEventListener('dragstart', function (e) { if (e.stopPropagation) { e.stopPropagation(); } });
 			name.appendChild(ed);
 		} else {
 			name.textContent = r.name;
@@ -73326,14 +73391,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var t = document.querySelector('.lpn-sm-sel');
 		if (t && t.scrollIntoView) { try { t.scrollIntoView({ block: 'nearest' }); } catch (e) { /* none */ } }
 	}
-	// A click on an unselected row selects it; a slow click on the selected one renames it
-	// (Tom, H04: "click or F2 to rename"), and a quick second click is a double-click, which makes
-	// a scenario current.
-	function smRowClick(key, e) {
-		var now = Date.now(), slow = now - smState.clickAt > 500, was = smState.sel === key;
-		smState.clickAt = now;
-		if (was && slow && !smIsBaseKey(smState.tree, key) && !(e && (e.ctrlKey || e.shiftKey))) { smStartRename(key); return; }
-		if (!was) { smSelect(key); }
+	// **A CLICK SELECTS, AND ONLY SELECTS** (Tom, 2026-10-12: *"Single-clicking on a tree name opens
+	// it in Rename mode"*). The slow click on a selected item that renamed it (H04) is gone, so a
+	// double-click, which makes a scenario current, has nothing to collide with. F2, the Rename
+	// command on the right-click menu, and Add child (which opens the new name) rename.
+	function smRowClick(key) {
+		if (smState.sel !== key) { smSelect(key); }
 	}
 	function smStartRename(key) {
 		if (smIsBaseKey(smState.tree, key) || !key) { return; }

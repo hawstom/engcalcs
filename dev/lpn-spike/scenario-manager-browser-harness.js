@@ -6,7 +6,7 @@
 //      says so; the Scenarios tab appears in the Tables pane. The "?" on its title opens the
 //      explanation on a real mouse click (Tom, 2026-10-11: "The glyph isn't clickable").
 //   2. "+" adds Child_1_of_Base and opens its name for editing; "Add Base" adds Base2; F2 renames; a
-//      slow click on the selected row renames; Escape cancels; Del is refused for a scenario with a
+//      click only selects, and a click inside an open name places the caret; Escape cancels; Del is refused for a scenario with a
 //      child, naming it; right-click offers Make current, Add child, Add base, Rename, Copy, Delete.
 //   3. A drop ONTO a row re-parents (the row is outlined); a drop BETWEEN rows reorders (a line);
 //      a drop onto its own child is refused; Enter and a double-click make a scenario current.
@@ -198,15 +198,28 @@ async function main() {
 		await page.keyboard.press('Escape');
 		await settle(300);
 		ok('2.5 Escape cancels', (await names()).some((n) => n === '-Peak'), JSON.stringify(await names()));
+		// TOM, 2026-10-12: "Single-clicking on a tree name opens it in Rename mode... Clicking again,
+		// ostensibly to place the cursor, exits Rename mode." A click selects and only selects; a
+		// click inside the open name places the caret and stays in it.
 		await page.waitForTimeout(600);
 		await rowOf('Peak').locator('.lpn-sm-name').click();
 		await settle(300);
-		ok('2.6 a slow click on the selected row renames it', (await names()).some((n) => n === '-EDIT:Peak'), JSON.stringify(await names()));
-		await page.keyboard.press('Control+a');
-		await page.keyboard.type('Peak Hour');
+		ok('2.6 a slow click on the selected row only selects it: no rename', (await names()).some((n) => n === '-Peak') && !(await names()).some((n) => /EDIT:/.test(n)), JSON.stringify(await names()));
+		await click('#lpn_sm_rename');
+		ok('2.6b the Rename button opens the name for editing', (await names()).some((n) => n === '-EDIT:Peak'), JSON.stringify(await names()));
+		const edBox = await page.locator('#lpn_sm_editor').boundingBox();
+		await page.mouse.click(edBox.x + 3, edBox.y + edBox.height / 2);
+		await settle(400);
+		const caret = await page.evaluate(() => { const e = document.getElementById('lpn_sm_editor'); return e && document.activeElement === e ? [e.selectionStart, e.selectionEnd] : null; });
+		ok('2.6c a click at the start of the open name places the caret there and stays in Rename', !!caret && caret[0] === 0 && caret[1] === 0, JSON.stringify(caret) + ' ' + JSON.stringify(await names()));
+		await page.mouse.click(edBox.x + edBox.width - 3, edBox.y + edBox.height / 2);
+		await settle(400);
+		const caret2 = await page.evaluate(() => { const e = document.getElementById('lpn_sm_editor'); return e && document.activeElement === e ? [e.selectionStart, e.selectionEnd, e.value.length] : null; });
+		ok('2.6d a second click at its end moves the caret to the end, still in Rename', !!caret2 && caret2[0] === caret2[2] && caret2[1] === caret2[2], JSON.stringify(caret2));
+		await page.keyboard.type(' Hour');
 		await page.keyboard.press('Enter');
 		await settle(400);
-		ok('2.7 renamed to Peak Hour', (await names()).some((n) => n === '-Peak Hour'));
+		ok('2.7 typed at the caret and renamed to Peak Hour', (await names()).some((n) => n === '-Peak Hour'), JSON.stringify(await names()));
 		// a child of Peak Hour by right-click
 		await rowOf('Peak Hour').locator('.lpn-sm-name').click({ button: 'right' });
 		await settle(300);
