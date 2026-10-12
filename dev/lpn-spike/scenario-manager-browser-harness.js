@@ -397,6 +397,65 @@ async function main() {
 
 		await a.toolbarClick(await L('lpn_pane_toggle'));
 		await settle(400);
+		// Perry, 2026-10-12: a child of a scenario holding its own Demand alternative picked "Base" in
+		// its Demand cell, and the cell snapped back to "(inherited)": the cell's parse took only a
+		// stored alternative's name. And Tom's double-click on a name in the Scenarios TABLE.
+		console.log('\n--- 5b. Base picked through a real cell; a double-click on a name makes it current ---');
+		await page.selectOption('#lpn_sm_tree_select', 'scenarios');
+		await settle(300);
+		await clickRow('Peak Hour');
+		await click('#lpn_sm_add');
+		await page.keyboard.press('Control+a');
+		await page.keyboard.type('Kid');
+		await page.keyboard.press('Enter');
+		await settle(600);
+		await a.toolbarClick(await L('lpn_pane_toggle'));
+		await settle(600);
+		await page.click('#lpn_pane_tab_scenarios');
+		await settle(800);
+		const rowIdx = (name) => page.evaluate((n) => Array.from(document.querySelectorAll('#lpn_pane_scenarios tbody tr')).findIndex((r) => r.querySelector('td').textContent.trim() === n), name);
+		const cellSelect = async (name, cat) => (await page.evaluateHandle(([n, cat]) => {
+			const tr = Array.from(document.querySelectorAll('#lpn_pane_scenarios tbody tr')).filter((r) => r.querySelector('td').textContent.trim() === n)[0];
+			const th = Array.from(document.querySelectorAll('#lpn_pane_scenarios thead th')), i = th.findIndex((t) => t._lpnColKey === 'sc_' + cat);
+			return tr ? tr.children[i].querySelector('select') : null;
+		}, [name, cat])).asElement();
+		// A person's pick: a real click on the box, then the option.
+		const pick = async (name, cat, option) => {
+			const sel = await cellSelect(name, cat);
+			if (!sel) { return false; }
+			await sel.scrollIntoViewIfNeeded();
+			await sel.click();
+			await settle(150);
+			await sel.selectOption(option);
+			await settle(1200);
+			return true;
+		};
+		ok('5b.1 Peak Hour picks its own Peak Hour alternative again (it holds demands of its own)', await pick('Peak Hour', 'demand', 'Peak Hour') &&
+			(await cellSel(await rowIdx('Peak Hour'), 'demand')).value === 'Peak Hour', JSON.stringify(await cellSel(await rowIdx('Peak Hour'), 'demand')));
+		const kidCell0 = await cellSel(await rowIdx('Kid'), 'demand');
+		ok('5b.2 Kid, its child, inherits it, and its cell offers Base', kidCell0.value === '' && kidCell0.options.indexOf('Base=Base') >= 0, JSON.stringify(kidCell0));
+		ok('5b.3 Base picked in Kid\'s Demand cell', await pick('Kid', 'demand', 'Base'));
+		const kidCell = await cellSel(await rowIdx('Kid'), 'demand');
+		ok('5b.4 ...the cell holds Base, and does not snap back to inherited', kidCell.value === 'Base', JSON.stringify(kidCell));
+		// Tom's double-click: a real double-click on Kid's name cell.
+		const nameBox = await page.evaluate((n) => {
+			const tr = Array.from(document.querySelectorAll('#lpn_pane_scenarios tbody tr')).filter((r) => r.querySelector('td').textContent.trim() === n)[0];
+			const td = tr && tr.querySelector('td'); if (!td) { return null; }
+			td.scrollIntoView({ block: 'center' });
+			const r = td.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+		}, 'Kid');
+		await page.mouse.dblclick(nameBox.x, nameBox.y);
+		await settle(1500);
+		ok('5b.5 a double-click on Kid\'s name in the Scenarios table makes Kid current', (await current()).indexOf('Kid') >= 0, await current());
+		ok('5b.6 ...and the pick-list cells still open with a click (no edit was started on the name)', !!(await cellSelect('Kid', 'demand')));
+		await page.click('#lpn_pane_tab_junctions');
+		await settle(1500);
+		ok('5b.7 Kid, on Base\'s Demand, solves as Base does, not as Peak Hour', (await pressure()) === pBase, pBase + ' / ' + (await pressure()));
+		await page.click('#lpn_pane_tab_scenarios');
+		await settle(600);
+		await a.toolbarClick(await L('lpn_pane_toggle'));
+		await settle(400);
+
 		console.log('\n--- 6. copy, and the compare checkbox ---');
 		await page.selectOption('#lpn_sm_tree_select', 'scenarios');
 		await settle(300);
@@ -404,8 +463,9 @@ async function main() {
 		await click('#lpn_sm_copy');
 		const cd = await a.dialog();
 		ok('6.1 Copy asks: make copies, share them, or cancel', cd && JSON.stringify(cd.buttons) === JSON.stringify([await L('lpn_sm_copy_own'), await L('lpn_sm_copy_share'), await L('lpn_cancel')]), cd && JSON.stringify(cd.buttons));
+		const namesBeforeCopy = (await names()).length;
 		await press(await L('lpn_cancel'));
-		ok('6.2 Cancel copies nothing', (await names()).length === 5, JSON.stringify(await names()));
+		ok('6.2 Cancel copies nothing', (await names()).length === namesBeforeCopy, JSON.stringify(await names()));
 		await click('#lpn_sm_copy');
 		await press(await L('lpn_sm_copy_share'));
 		ok('6.3 Share them copies the scenario', (await names()).some((n) => /Copy_of_Peak Hour/.test(n)), JSON.stringify(await names()));

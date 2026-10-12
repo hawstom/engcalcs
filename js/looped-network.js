@@ -6066,8 +6066,9 @@ var EngCalcs = EngCalcs || {};
 	}
 	function smCellChoices(s, cat) {
 		var out = [['', smCellValue(s, cat) === '' ? smCellText(s, cat) : smInheritText(s, cat)]], mine = smImplicitKey(s, cat), base = smName(cat, smBaseKey(cat));
-		// (Where the blank row already reads Base, a second Base would be the same choice twice.)
-		if (!smChoice(s, cat).base && out[0][1] !== base) { out.push([base, base]); }
+		// Offered unless the blank row already reads Base (the same choice twice); chosen, it is
+		// listed so the cell can show it.
+		if (out[0][1] !== base) { out.push([base, base]); }
 		// Its own alternative is the blank row's text already.
 		smRecords(cat).forEach(function (r) { if (r.id !== mine) { out.push([String(r.name || ''), String(r.name || '')]); } });
 		return out;
@@ -29733,6 +29734,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			td._lpnPaneId = el.id;
 			td._lpnPaneKey = c.key;
 			tds[c.key] = td;
+			// A column may give a double-click an act of its own (the Scenarios table's name cell
+			// makes its scenario current). Only on a cell that has no edit mode to collide with.
+			if (c.dblclick && paneCellIsPlain(c, el)) {
+				td.addEventListener('dblclick', function (e) { if (e && e.preventDefault) { e.preventDefault(); } c.dblclick(el); });
+			}
 			if (paneCellIsPlain(c, el)) {
 				// **A RESULT IS NEVER AN INPUT**, and neither is an identity the drawing owns. Both
 				// are plain cells with no control in them at all, so there is no path by which
@@ -73980,10 +73986,25 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		smAfter(true, false);
 		return true;
 	}
+	function smParseCell(cat, t) {
+		var raw = String(t === undefined || t === null ? '' : t).trim(), names, hit;
+		if (raw === '') { return { ok: true, v: '' }; }
+		names = [smName(cat, smBaseKey(cat))].concat(smRecords(cat).map(function (x) { return String(x.name || ''); }));
+		hit = names.indexOf(raw) >= 0 ? raw : names.filter(function (nm) { return nm.toLowerCase() === raw.toLowerCase(); })[0];
+		return hit === undefined ? { ok: false, v: raw } : { ok: true, v: hit };
+	}
 	function scenarioTableCols() {
 		var cols = [
+			// **A DOUBLE-CLICK ON THE NAME MAKES THE SCENARIO CURRENT** (Tom, 2026-10-12: *"OK. Yes, as
+			// long as that works with all our other gestures."*). The name cell has no edit mode
+			// (renaming is the Scenario manager's), so nothing else answers a double-click there.
 			{ key: 'sc_name', label: 'lpn_scenario_label', str: true, em: 9,
-				get: function (r) { return scenarioDisplayName(r.scn); } },
+				get: function (r) { return scenarioDisplayName(r.scn); },
+				dblclick: function (r) {
+					if (!r || !r.scn || r.scn.id === project.activeScenario) { return; }
+					switchScenario(r.scn.id);
+					if (smBoxIsOpen()) { rebuildScenarioManager(); }
+				} },
 			{ key: 'sc_parent', label: 'lpn_sm_col_parent', str: true, em: 9,
 				get: function (r) { var p = r.scn.root === true ? null : parentScenarioOf(r.scn); return p ? scenarioDisplayName(p) : ''; } }
 		];
@@ -73994,9 +74015,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				plainFor: function (r) { return !!r.scn.isBase; },
 				choicesFor: function (r) { return !r.scn.isBase; },
 				choices: function (r) { return (r && r.scn && !r.scn.isBase) ? smCellChoices(r.scn, cat) : []; },
-				parse: function (t) {
-					return { ok: t === '' || smRecords(cat).some(function (x) { return String(x.name || '') === t; }), v: t };
-				},
+				// Blank, Base, or an alternative of the category, by its name (Perry, 2026-10-12: Base
+				// picked in a cell was refused here, so the cell snapped back to inheriting). A name
+				// typed or pasted in another case is read as the name it matches.
+				parse: function (t) { return smParseCell(cat, t); },
 				set: function (r, v) { smSetCell(r.scn, cat, v); },
 				reread: true,
 				smCat: cat

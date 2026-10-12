@@ -63,7 +63,7 @@ const INJECT =
 	"\t\talternativeFor: alternativeFor, libInactiveIds: libInactiveIds, smInUseBy: smInUseBy,\n" +
 	"\t\toverrideCount: overrideCount, smSharedText: smSharedText, scenarioTableCols: scenarioTableCols, scenarioTableRows: scenarioTableRows,\n" +
 	"\t\tsmImplicitKey: smImplicitKey, onlyInThisScenario: onlyInThisScenario, deleteElement: deleteElement, noticeLog: function () { return noticeLog; },\n" +
-	"\t\ttouchTree: touchTree, ovKey: ovKey,\n" +
+	"\t\ttouchTree: touchTree, ovKey: ovKey, smParseCell: smParseCell,\n" +
 	"\t\tbuildLayers: function () { svg = document.getElementById('lpn_canvas');\n" +
 	"\t\t\tworld = el('g', {}, svg);\n" +
 	"\t\t\tbackdropLayer = el('g', {}, world); gridLayer = el('g', {}, world);\n" +
@@ -489,7 +489,11 @@ async function runTail(mutate, quiet) {
 			(P.switchScenario(Par.id), Math.abs(solve()['22'] - parH['22']) < 1e-9), String(solve()['22']));
 		P.switchScenario(Kid.id);
 		ok('14.5 ...its cell reads Base, as its own choice, not inherited', P.smCellText(Kid, 'demand') === BASEW && P.smCellValue(Kid, 'demand') === BASEW, P.smCellText(Kid, 'demand'));
-		ok('14.6 ...and Base, already chosen, is not offered a second time', !P.smCellChoices(Kid, 'demand').slice(1).some((o) => o[0] === BASEW));
+		ok('14.6 ...Base, chosen, is listed once, so the cell can show it; the blank row reads the parent\'s, inherited',
+			P.smCellChoices(Kid, 'demand').filter((o) => o[0] === BASEW).length === 1 && P.smCellChoices(Kid, 'demand')[0][1] !== BASEW, JSON.stringify(P.smCellChoices(Kid, 'demand')));
+		// The Scenarios table's own cell reads Base typed or pasted, in any case, as Base (Perry: it snapped back).
+		ok('14.6b the cell accepts "Base" and "base" as Base, and refuses a name nothing has', P.smParseCell('demand', 'Base').ok && P.smParseCell('demand', 'base').v === BASEW &&
+			!P.smParseCell('demand', 'Nope').ok && P.smParseCell('demand', '').v === '');
 		ok('14.7 ...and the Base item counts it among its users', P.smUsedBy('demand', P.smBaseKey('demand')).indexOf(Kid) >= 0);
 		const text = JSON.stringify(P.serializeProject());
 		const f = JSON.parse(text);
