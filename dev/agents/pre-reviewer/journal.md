@@ -4261,3 +4261,9 @@ OBSERVED: a Shape under a data label cannot be selected at the label's hit area;
 OBSERVED: Select Area (window/lasso) never picks Shapes; no Tables tab; Find unaffected.
 OBSERVED: Arabic page: Shape strings are English (untranslated, expected); phone 390 draws by taps, closes by tap on first point.
 NOT CHECKED: Recalc OFF at runtime (code path calls only save/rebuild), projected-CRS import, visual appearance (colour, grips, 6% fill), dark theme, touch drag of grips.
+
+# Perry journal: fix/run-report f908c408 (2026-10-11)
+OBSERVED: builder's run-report-units-harness passes (57 checks). My own old-vs-new comparison (reportUnits stripped vs kept) on a hand-built 10-node .inp with emitters, PRV, FCV, head-curve pump with speed pattern, volume-curve tank, reservoir pattern, pressure/level/clock controls, 5 rules, PDA, chlorine with wall order 0 and 1, 24 h: heads, pressures, demands, flows, velocities, headlosses, levels, qualities, statuses, event timeline identical (3375 values, bad 0) for gpm, gph, mgd, afd, imgd, lpm, mld, cmd, cmh, m3ps, lps, in US and SI sets.
+OBSERVED: with D-W or C-M roughness on an ill-posed (hydraulically unbalanced) network, old vs new differ at ~1e-6 and "Balanced after 17 vs 16 trials" appears; not wall-related. Unreproduced on a well-posed network; not checked.
+SPECULATION: reportWallKept failing mid-loop leaves some pipes' wall coefficient already rescaled when it switches back to L/s; and the fallback tells the visitor nothing. Not exercised.
+NOT CHECKED: browser, rendered Run report dialog.

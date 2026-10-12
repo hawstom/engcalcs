@@ -204,7 +204,7 @@ from. The vendored `epanet-js` 0.9.0 already exports `readBinary()` and names th
 -- `dev/reaction-rate-upstream.md` records what a pull request would have been, and why it is moot.
 
 - **The cost is one file, and it is asked for only when it can be answered.** `initQ(EN_SAVE)` is
-  what writes `eps.out` at all, and `PipeRateCoeff` stays at zero unless `Qualflag == CHEM` -- so an
+  what writes `temp.out` at all, and `PipeRateCoeff` stays at zero unless `Qualflag == CHEM` -- so an
   age run and a source trace would pay for the whole file and get a column of zeros. Chemical only.
   **Measured on Net3 over 24 hours at a 5 minute reporting step** (289 periods, 119 links): a
   1.56 MB output file, 11 ms to read it back and **234 ms in `readBinary()`**, which materialises
