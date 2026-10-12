@@ -490,7 +490,7 @@ never edits a synonym.
   > Rest the pointer on a node, link or customer to see its label as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project.
   _Ruled 2026-10-09: Use proposed (Tom, calls page round 3)._
 - **`lpn_settings_specific_gravity_tip`**
-  > Density of the fluid relative to water. It scales pressure shown in psi, kPa or bar, and does not scale pressure head shown in m or ft. It changes no flow.
+  > Density of the fluid relative to water. It scales pressure in every unit, because a pressure in m or ft is a column of water, and it does not change head or HGL. It changes no flow.
   @@ NEEDS RULING
 - **`lpn_snap_moved_on_node`**
   > {moved} moved to the location of {target}. The two nodes are not connected.
@@ -554,7 +554,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**141 still to read**, of 144 new keys across 13 unmerged branch(es).
+**141 still to read**, of 144 new keys across 14 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -565,7 +565,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/bentley-interop (`ad8cfe6e`) — 101 new, 101 to read @@ NEEDS RULING
+### feat/bentley-interop (`735199bd`) — 101 new, 101 to read @@ NEEDS RULING
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -897,7 +897,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`2e5e81c4`) — adds no English strings
 
-### feat/match-property (`e95c8ac1`) — 9 new, 9 to read @@ NEEDS RULING
+### feat/match-property (`7c415712`) — 9 new, 9 to read @@ NEEDS RULING
 
 - **`lpn_copy_props_done`**
   > Copied properties of {id}.
@@ -1027,3 +1027,5 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 
 ### fix/paste-column (`a4e50f15`) — adds no English strings
+
+### fix/specific-gravity (`9a450ccf`) — adds no English strings
