@@ -1026,7 +1026,7 @@
    "resolution": "Left alone in this pass, and recorded rather than fixed: merging them is a key-consolidation decision (which key survives, which panel borrows it), and CLAUDE.md puts consolidation in one full-suite English-only pass, never inside a sprint gate. Flagged here so the next consolidation pass finds it with the pair already named."
   },
   {
-   "key": "lpn_ex_net3_world_title",
+   "key": "lpn_ex_net3_title",
    "source": "wave0",
    "lang": null,
    "complaint": "medium: written after the pass above, so it gets the same question here. 'Net3-World' is the FILE's name and would have read as a proper noun a translator must not touch; 'World' also invites 'worldwide' or 'the whole world' rather than 'on real ground'.",
@@ -1039,7 +1039,7 @@
    "resolution": "Titled 'EPANET Net3, lat/lon'. 'lat/lon' is Tom's own term (Task 145) and already appears translated in the four New project rows, so this reuses a settled word instead of introducing 'World'. 'EPANET Net3' is an identity string and stays."
   },
   {
-   "key": "lpn_ex_net3_world_desc",
+   "key": "lpn_ex_net3_desc",
    "source": "wave0",
    "lang": null,
    "complaint": "medium: the first draft said the network 'sits on real ground', which reads as soil or terrain -- a hydraulic page is exactly where a reader might take 'ground' as ground elevation, which this sentence is not about.",
@@ -1065,7 +1065,7 @@
    "resolution": "States the consequence and the cure in the same sentence: one moment to show, and Total run time in Settings is where to change it. 'Total run time' is quoted from lpn_time_duration, so the sentence names a control the reader can actually find; if that label is retranslated, this string must follow it."
   },
   {
-   "key": "lpn_ex_net3_world_title",
+   "key": "lpn_ex_net3_title",
    "source": "translator",
    "lang": "es",
    "complaint": "Reported independently by es, fr, it, ro and hr: the title is a proper noun plus the project-mode name, so in a language that keeps 'lat/lon' literal there is nothing left to translate and the identical-to-english gate fires on a correct value.",
@@ -1074,7 +1074,7 @@
     "a translation defect needing a different rendering"
    ],
    "disposition": "dismissed",
-   "resolution": "Not an English defect -- a TOOLING defect, and an expensive one. Three agents distorted a correct title to get past the gate (hr invented a phrase inconsistent with its own other mode-name strings, bg swapped the comma for an em dash, de renamed a correct 'XY' to 'XY-Ebene'). All three reverted; lpn_ex_net3_world_title and lpn_xymap added to translation_exempt_keys.json. A gate that forces a wrong translation is worse than no gate."
+   "resolution": "Not an English defect -- a TOOLING defect, and an expensive one. Three agents distorted a correct title to get past the gate (hr invented a phrase inconsistent with its own other mode-name strings, bg swapped the comma for an em dash, de renamed a correct 'XY' to 'XY-Ebene'). All three reverted; lpn_ex_net3_title and lpn_xymap added to translation_exempt_keys.json. A gate that forces a wrong translation is worse than no gate."
   },
   {
    "key": "lpn_labels_col_drop",
