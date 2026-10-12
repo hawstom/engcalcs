@@ -218,7 +218,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**198 still to read**, of 201 new keys across 13 unmerged branch(es).
+**204 still to read**, of 207 new keys across 13 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -229,7 +229,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/bentley-interop (`259807e6`) — 117 new, 117 to read @@ NEEDS RULING
+### feat/bentley-interop (`9e4c0206`) — 117 new, 117 to read @@ NEEDS RULING
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -688,7 +688,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Not pasted: {n} (the valve types differ).
   @@ NEEDS RULING
 
-### feat/shape (`e4bcb363`) — 56 new, 56 to read @@ NEEDS RULING
+### feat/shape (`a4d9a471`) — 62 new, 62 to read @@ NEEDS RULING
 
 - **`lpn_dxf_import_binary`**
   > {file} is a binary DXF. Save it from your CAD program as an ASCII DXF, then import again.
@@ -701,6 +701,9 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 - **`lpn_dxf_import_inblocks`**
   > in block definitions
+  @@ NEEDS RULING
+- **`lpn_dxf_import_paperspace`**
+  > in paper space
   @@ NEEDS RULING
 - **`lpn_dxf_import_refuse_geo`**
   > A DXF drawing is flat, and this project is in latitude and longitude, so the coordinates of {file} have no place in it. Use Convert as… to copy the project into a coordinate system, then import again.
@@ -810,11 +813,26 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_shapes_import_frame`**
   > The coordinates were read as {frame}, with no conversion.
   @@ NEEDS RULING
+- **`lpn_shapes_import_more`**
+  > and {n} more
+  @@ NEEDS RULING
 - **`lpn_shp_import_attrs`**
   > Attribute columns kept as properties of each Shape: {list}.
   @@ NEEDS RULING
+- **`lpn_shp_import_convert_hint`**
+  > Use Convert as… to copy the project into {theirs}, then import again.
+  @@ NEEDS RULING
 - **`lpn_shp_import_converted`**
   > The coordinates are latitude and longitude. They were converted to {crs} by the transform the map uses.
+  @@ NEEDS RULING
+- **`lpn_shp_import_damaged`**
+  > {file} is damaged or cut short, so nothing was imported.
+  @@ NEEDS RULING
+- **`lpn_shp_import_deleted`**
+  > {n} records marked deleted in the .dbf were not imported.
+  @@ NEEDS RULING
+- **`lpn_shp_import_deleted_one`**
+  > One record marked deleted in the .dbf was not imported.
   @@ NEEDS RULING
 - **`lpn_shp_import_manyshp`**
   > {file} holds more than one shapefile. Import one at a time.
@@ -832,7 +850,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > The .prj states {crs}, the coordinate system of this project, so the coordinates were not changed.
   @@ NEEDS RULING
 - **`lpn_shp_import_refuse_crs`**
-  > {file} states {theirs}, and this project is in {ours}. Nothing was imported and nothing was converted. Use Convert as… to copy the project into the coordinate system of the file, then import again.
+  > {file} states {theirs}, and this project is in {ours}. Nothing was imported and nothing was converted.
   @@ NEEDS RULING
 - **`lpn_shp_import_refuse_local`**
   > {file} is in latitude and longitude, and this project has no place on the Earth to which they can be converted. Georeference it first with Map, World map, Attach, then import again.
@@ -859,6 +877,6 @@ build for that would be a gate nobody keeps. Refresh it with
   > Draw a point, a polyline, or a polygon on the map. A Shape is annotation and is not part of the network. Specify each point, then specify the last point again, press Enter, or right-click to finish. Specify the first point again to close the Shape into a polygon.
   @@ NEEDS RULING
 
-### feat/si-example (`c578e2dd`) — adds no English strings
+### feat/si-example (`a61a5886`) — adds no English strings
 
 ### feat/tool-key (`896d92a7`) — adds no English strings
