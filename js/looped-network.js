@@ -24157,7 +24157,7 @@ var EngCalcs = EngCalcs || {};
 				// fails in EPANET), and the reader is told, as the customer table does.
 				if (id && !libPatternsRead().some(function (p) { return p.id === id; })) {
 					setNotice(String(pc.lpn_junction_pattern_unknown ||
-						'No pattern in this project is named {id}, so the junction was left as it was.')
+						'No pattern in this project has the ID {id}, so the junction was left as it was.')
 						.split('{id}').join(id));
 					return;
 				}
@@ -33230,7 +33230,7 @@ var EngCalcs = EngCalcs || {};
 			var keeper = (incidentLinks[id] || []).map(linkById)
 				.filter(function (l) { return l && !onlyInThisScenario(l); })[0];
 			if (keeper) {
-				setNotice((pc.lpn_scenario_delete_blocked || '{id} is not deleted, because link {link} ends on it and also exists outside {scenario}. To delete both, delete them in the {base} scenario.')
+				setNotice((pc.lpn_scenario_delete_blocked || '{id} is not deleted, because link {link} ends on it, and that link also exists outside {scenario}. To delete both, delete them in the {base} scenario.')
 					.split('{id}').join(id).split('{link}').join(keeper.id)
 					.split('{scenario}').join(scenarioDisplayName(here))
 					.split('{base}').join(scenarioDisplayName(baseScenario())));
