@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "es",
-        "expected_key_count": 2556,
-        "delta_key_count": 112,
+        "expected_key_count": 2558,
+        "delta_key_count": 114,
         "exempt_key_count": 47,
         "exempt_keys": [
             "calc_units_us",
@@ -758,6 +758,8 @@
     },
     "keys_to_translate": {
         "points_data_points_heading": "Points data<br \/>(use Copy to see format)",
+        "lpn_field_tank_base_elev": "Base elevation",
+        "lpn_tank_ground_elev_tip": "Ground elevation at the tank. Pressure at the tank is measured from here, as at a junction.",
         "lpn_guide_about_heading": "About this calculator",
         "lpn_guide_group_from": "From {menu}",
         "lpn_guide_menu_named": "{menu} menu",
@@ -872,6 +874,8 @@
     },
     "keys": {
         "points_data_points_heading": "Points data<br \/>(use Copy to see format)",
+        "lpn_field_tank_base_elev": "Base elevation",
+        "lpn_tank_ground_elev_tip": "Ground elevation at the tank. Pressure at the tank is measured from here, as at a junction.",
         "lpn_guide_about_heading": "About this calculator",
         "lpn_guide_group_from": "From {menu}",
         "lpn_guide_menu_named": "{menu} menu",
@@ -998,6 +1002,38 @@
                     "key": "points_data_copy",
                     "value": "Copiar",
                     "english": "Copy"
+                }
+            }
+        },
+        "lpn_field_tank_base_elev": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_field_head_tip",
+                    "value": "Nivel de la superficie del agua en el embalse, medido como una altura, no como una presión. Déjelo en blanco para colocar la superficie del agua en la elevación del embalse.",
+                    "english": "Water surface level in the reservoir, measured as a height, not as a pressure. Leave it blank to put the water surface at the reservoir elevation."
+                },
+                "next_translated": {
+                    "key": "lpn_field_tank_base_elev_tip",
+                    "value": "Elevación del fondo del depósito. Las profundidades de agua en el depósito se miden hacia arriba desde aquí.",
+                    "english": "Elevation of the tank bottom, from which water depth and volume are measured. Left blank, the bottom is at the ground elevation."
+                }
+            }
+        },
+        "lpn_tank_ground_elev_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_field_tank_base_elev_tip",
+                    "value": "Elevación del fondo del depósito. Las profundidades de agua en el depósito se miden hacia arriba desde aquí.",
+                    "english": "Elevation of the tank bottom, from which water depth and volume are measured. Left blank, the bottom is at the ground elevation."
+                },
+                "next_translated": {
+                    "key": "lpn_field_tank_level",
+                    "value": "Profundidad de agua",
+                    "english": "Water depth"
                 }
             }
         },

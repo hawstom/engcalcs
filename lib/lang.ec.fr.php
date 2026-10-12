@@ -875,7 +875,7 @@ $ec_lang['lpn_field_head_tip']='Niveau de la surface libre dans le réservoir, e
 // pipe-diameter unit would put a 15 m tank on screen as 15000. Same reason the three levels say
 // "measured up from the tank bottom" rather than leaving the datum to be guessed -- EPANET measures
 // a tank level from the vessel floor, not from the same zero the elevations use.
-$ec_lang['lpn_tank_elev_tip']='Cote du fond de la bâche. Les hauteurs d\'eau dans la bâche sont mesurées à partir de là.';
+$ec_lang['lpn_field_tank_base_elev_tip']='Cote du fond de la bâche. Les hauteurs d\'eau dans la bâche sont mesurées à partir de là.';
 $ec_lang['lpn_field_tank_level']='Hauteur d\'eau';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_field_tank_level_tip']='Hauteur d\'eau présente dans la bâche, mesurée à partir du fond de la bâche. La surface de l\'eau est la cote du fond de la bâche plus cette hauteur.';

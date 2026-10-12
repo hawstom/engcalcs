@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**105 still to read on master**, of 116 untranslated keys, of 2558 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**107 still to read on master**, of 118 untranslated keys, of 2560 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -199,7 +199,7 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   @@ NEEDS RULING
 
-## lpn_  (115, 104 to read @@ NEEDS RULING)
+## lpn_  (117, 106 to read @@ NEEDS RULING)
 
 - **`lpn_demand_pattern_constant`**
   > (constant)
@@ -263,6 +263,9 @@ never edits a synonym.
   @@ NEEDS RULING
 - **`lpn_export_table_title`**
   > Export to {format}
+  @@ NEEDS RULING
+- **`lpn_field_tank_base_elev`**
+  > Base elevation
   @@ NEEDS RULING
 - **`lpn_file_export_csv_tip`**
   > Download a table as the Tables pane shows it. One table comes as a single CSV file with no libraries. Several tables or scenarios come as one zip file of CSV files, with a file for each library their IDs refer to. Results are included for the scenario last calculated only.
@@ -522,6 +525,9 @@ never edits a synonym.
 - **`lpn_status_hidden_tip`**
   > Show the hidden message on the map again.
   @@ NEEDS RULING
+- **`lpn_tank_ground_elev_tip`**
+  > Ground elevation at the tank. Pressure at the tank is measured from here, as at a junction.
+  @@ NEEDS RULING
 - **`lpn_workspace_confirm`**
   > Replace this browser's workspace layout with the one in the file?
   _Ruled 2026-10-08: Calls page 8 October: his own text, "Replace this browser's workspace layout with the one in the file?"_
@@ -557,7 +563,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**140 still to read**, of 143 new keys across 12 unmerged branch(es).
+**137 still to read**, of 140 new keys across 12 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -898,19 +904,13 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`2e5e81c4`) — adds no English strings
 
-### feat/match-property (`e95c8ac1`) — 12 new, 12 to read @@ NEEDS RULING
+### feat/match-property (`e95c8ac1`) — 9 new, 9 to read @@ NEEDS RULING
 
 - **`lpn_copy_props_done`**
   > Copied properties of {id}.
   @@ NEEDS RULING
 - **`lpn_copy_props_menu`**
   > Copy properties
-  @@ NEEDS RULING
-- **`lpn_field_tank_base_elev`**
-  > Base elevation
-  @@ NEEDS RULING
-- **`lpn_field_tank_base_elev_tip`**
-  > Elevation of the tank bottom, from which water depth and volume are measured. Left blank, the bottom is at the ground elevation.
   @@ NEEDS RULING
 - **`lpn_paste_done_many`**
   > Pasted properties of {id} to {m} assets. Values changed: {n}.
@@ -932,9 +932,6 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 - **`lpn_paste_skip_valve`**
   > Not pasted: {n} (the valve types differ).
-  @@ NEEDS RULING
-- **`lpn_tank_ground_elev_tip`**
-  > Ground elevation at the tank. Pressure at the tank is measured from here, as at a junction.
   @@ NEEDS RULING
 
 ### feat/shape (`554c2b24`) — 27 new, 27 to read @@ NEEDS RULING
@@ -1021,6 +1018,6 @@ build for that would be a gate nobody keeps. Refresh it with
   > Draw a point, a polyline, or a polygon on the map. A Shape is annotation and is not part of the network. Specify each point, then specify the last point again, press Enter, or right-click to finish. Specify the first point again to close the Shape into a polygon.
   @@ NEEDS RULING
 
-### feat/si-example (`0f3023d7`) — adds no English strings
+### feat/si-example (`9b343e55`) — adds no English strings
 
 ### fix/paste-column (`77f81265`) — adds no English strings

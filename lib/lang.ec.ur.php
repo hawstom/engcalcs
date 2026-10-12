@@ -867,7 +867,7 @@ $ec_lang['lpn_field_head_tip']='ذخیرے میں پانی کی سطح کی بل
 // pipe-diameter unit would put a 15 m tank on screen as 15000. Same reason the three levels say
 // "measured up from the tank bottom" rather than leaving the datum to be guessed -- EPANET measures
 // a tank level from the vessel floor, not from the same zero the elevations use.
-$ec_lang['lpn_tank_elev_tip']='ٹینک کے فرش کی بلندی۔ ٹینک میں پانی کی گہرائیاں یہاں سے اوپر کی طرف ناپی جاتی ہیں۔';
+$ec_lang['lpn_field_tank_base_elev_tip']='ٹینک کے فرش کی بلندی۔ ٹینک میں پانی کی گہرائیاں یہاں سے اوپر کی طرف ناپی جاتی ہیں۔';
 $ec_lang['lpn_field_tank_level']='پانی کی گہرائی';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_field_tank_level_tip']='ٹینک میں پانی کی گہرائی، جسے ٹینک کے فرش سے اوپر کی طرف ناپا جاتا ہے۔';

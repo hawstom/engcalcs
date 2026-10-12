@@ -5392,6 +5392,9 @@ var EngCalcs = EngCalcs || {};
 			{ key: 'level', group: 'node', field: 'level', prop: 'level', label: pc.lpn_field_tank_level || 'Water depth',
 				applies: function (n) { return n.type === 'tank'; },
 				get: function (n) { return effective(n, 'level'); }, set: function (n, v) { n._level = v; } },   // base-write: pushSpecList: the documented Base-level push, refused outside Base
+			{ key: 'bottomElev', group: 'node', field: 'bottomElev', label: pc.lpn_field_tank_base_elev || 'Base elevation',
+				applies: function (n) { return n.type === 'tank'; },
+				get: function (n) { return n.bottomElev; }, set: function (n, v) { setTankBottom(n, v); } },
 			{ key: 'minLevel', group: 'node', field: 'minLevel', label: pc.lpn_field_tank_minlevel || 'Lowest water depth',
 				applies: function (n) { return n.type === 'tank'; },
 				get: function (n) { return n.minLevel; }, set: function (n, v) { n.minLevel = v; } },
@@ -7137,11 +7140,20 @@ var EngCalcs = EngCalcs || {};
 		return (h === undefined || h === null || h === '') ? (n.elev || 0) : h;
 	}
 	// The water surface at ANY fixed-head node, in the Elevation/Head display unit. A tank's is
-	// derived -- bottom elevation plus the level standing in the vessel -- which is why there is no
-	// blank-means-follow rule for it: both halves are always real numbers. Everything that draws,
-	// labels, solves or reports a fixed head goes through here (Task 248).
+	// derived -- BASE elevation plus the level standing in the vessel -- and never the ground: a
+	// tank's `elev` is the ground it stands on and the pressure datum, `bottomElev` the vessel's
+	// base (see EngCalcs.lpnTankBottom). Everything that draws, labels, solves or reports a fixed
+	// head goes through here (Task 248).
+	function tankBottom(n) { return EngCalcs.lpnTankBottom(n); }
+	// The one writer of a tank's base. Blank (undefined, '' or not a number) DELETES the key, which
+	// is how the document says "the base is at the ground"; Base-owned like the vessel's other
+	// geometry, so it is a plain write and never an override.
+	function setTankBottom(n, v) {
+		if (typeof v === 'number' && isFinite(v)) { n.bottomElev = v; }
+		else { delete n.bottomElev; }
+	}
 	function nodeFixedHead(n) {
-		if (n.type === 'tank') { return (n.elev || 0) + (effective(n, 'level') || 0); }
+		if (n.type === 'tank') { return tankBottom(n) + (effective(n, 'level') || 0); }
 		return reservoirHead(n);
 	}
 	// **A PRESSURE IS A HEAD ABOVE A GROUND, so a node with no ground has no pressure** (Task 390).
@@ -7155,8 +7167,25 @@ var EngCalcs = EngCalcs || {};
 	function fixedHeadPressure(n) {
 		var held = heldTypeChange(n, 'pressure');
 		if (held !== undefined) { return held; }
-		if (n.type !== 'tank' && typeof n.elev !== 'number') { return undefined; }
+		if (n.type === 'tank') { return toDisplay(tankPressureSI(n), resultUnit('pressure')); }
+		if (typeof n.elev !== 'number') { return undefined; }
 		return toDisplay(toSI(nodeFixedHead(n) - (n.elev || 0), 'lpn_u_elevhead'), resultUnit('pressure'));
+	}
+	// **A TANK'S PRESSURE IS ITS WATER SURFACE ABOVE ITS GROUND** (Tom, 2026-10-11: *"Pressure is
+	// above ground. No special meaning at tanks."*), SI. Inside a run the surface is the frame's, so
+	// the pressure moves as the tank fills and drains, as a junction's does; both engines already
+	// report it above the ground (EngCalcs.lpnPressureDatum). At one instant it is derived from the
+	// typed numbers, as the tank's head is.
+	function tankPressureSI(n) {
+		var r = lastSolveResult;
+		if (r && typeof r.t === 'number' && r.pressures && typeof r.pressures[n.id] === 'number') { return r.pressures[n.id]; }
+		// Times the specific gravity, as the built-in engine's pressures are (Task 553), so with that
+		// engine the number does not jump when a run starts. With EPANET and a specific gravity other
+		// than 1 it does: EPANET's pressures in metres are unscaled, a difference that already holds
+		// for every junction on master and is left alone here.
+		var hyd = settings.hydraulics,
+			sg = (hyd && typeof hyd.specificGravity === 'number' && isFinite(hyd.specificGravity)) ? hyd.specificGravity : 1;
+		return toSI(nodeFixedHead(n) - (n.elev || 0), 'lpn_u_elevhead') * sg;
 	}
 	function isFixedHeadNode(n) { return !!n && (n.type === 'reservoir' || n.type === 'tank'); }
 	// A tank's or reservoir's head as a result reads it, in the result unit: held across a type
@@ -7183,7 +7212,7 @@ var EngCalcs = EngCalcs || {};
 		}
 		return h[field];
 	}
-	function typeChangeSig(n) { return nodeFixedHead(n) + '|' + n.elev; }
+	function typeChangeSig(n) { return nodeFixedHead(n) + '|' + n.elev + '|' + n.bottomElev; }
 	// **A LINK WHOSE TYPE CHANGED HAS NO RESULTS UNTIL THE NEXT CALCULATE** (pre-review,
 	// 2026-10-06: Net1's pump 9 turned into a pipe showed a velocity of 0.00 and a head loss of
 	// 204 ft, numbers no solve produced). Unlike a node, nothing about a link's result can be read
@@ -8676,8 +8705,8 @@ var EngCalcs = EngCalcs || {};
 	}
 	// ---- A TANK'S DEPTH AND USABLE VOLUME (Task 783) ---------------------------------------------
 	//
-	// **DEPTH IS HEAD MINUS THE TANK BOTTOM, and our Elevation IS the bottom** (EPANET's own: depth
-	// zero is the vessel floor). Inside a run the head is the frame's (what the engine integrated);
+	// **DEPTH IS HEAD MINUS THE TANK BASE** (`bottomElev`, EPANET's own Elevation: depth zero is the
+	// vessel floor), never minus the ground the tank stands on. Inside a run the head is the frame's (what the engine integrated);
 	// at one instant it is the stored water depth, exactly as the Head column reads. SI metres.
 	function tankDepthSI(n) {
 		var hf = toSI(1, 'lpn_u_elevhead'), g;
@@ -8701,7 +8730,7 @@ var EngCalcs = EngCalcs || {};
 			pts = curve ? curvePointsOf(curve) : [];
 		if (!(pts.length && EngCalcs.lpnTankVolumeCurveUsable && EngCalcs.lpnTankVolumeCurveUsable(pts))) { pts = null; }
 		else { pts = pts.map(function (pt) { return [pt[0] * hf, pt[1] * vf]; }); }
-		return { elevSI: toSI(n.elev || 0, 'lpn_u_elevhead'), minSI: toSI(n.minLevel || 0, 'lpn_u_elevhead'),
+		return { elevSI: toSI(tankBottom(n), 'lpn_u_elevhead'), minSI: toSI(n.minLevel || 0, 'lpn_u_elevhead'),
 			D: toSI(n.tankDiameter, 'lpn_u_length'), curve: pts };
 	}
 	function captureTankSnapshot() {
@@ -19225,6 +19254,7 @@ var EngCalcs = EngCalcs || {};
 			// **THE SIX TANK-ONLY INPUTS THAT HAD NO FIND OR REPLACE ROW AT ALL** (Task 708, gap
 			// #4). A tank is the one node type with several scalar inputs of its own; gated to
 			// `d.type === 'tank'` below exactly as the fire flow pair is gated to a junction.
+			['bottomElev', 'lpn_field_tank_base_elev', 'Base elevation'],
 			['level', 'lpn_field_tank_level', 'Water depth'],
 			['minLevel', 'lpn_field_tank_minlevel', 'Lowest water depth'],
 			['maxLevel', 'lpn_field_tank_maxlevel', 'Highest water depth'],
@@ -19303,7 +19333,7 @@ var EngCalcs = EngCalcs || {};
 				} else if (key === 'emitter') {
 					if (d.group !== 'node' || (d.type && d.type !== 'junction')) { return; }
 				} else if (key === 'level' || key === 'minLevel' || key === 'maxLevel' || key === 'depth' || key === 'volume'
-						|| key === 'tankDiameter' || key === 'mixingModel' || key === 'mixingFraction') {
+						|| key === 'bottomElev' || key === 'tankDiameter' || key === 'mixingModel' || key === 'mixingFraction') {
 					if (d.group !== 'node' || (d.type && d.type !== 'tank')) { return; }
 				} else if (key === 'speed' || key === 'energyPrice' || key === 'energyPattern') {
 					if (d.group !== 'link' || (d.type && d.type !== 'pump')) { return; }
@@ -19940,9 +19970,13 @@ var EngCalcs = EngCalcs || {};
 		// **THE FOUR TANK SCALARS, TANK-ONLY** (Task 708, gap #4). `level` is overridable, so it
 		// is read through effective() like every other overridable input; the other three are
 		// base-owned geometry, read straight off the node exactly as their table cells do.
-		if (prop === 'level' || prop === 'minLevel' || prop === 'maxLevel' || prop === 'tankDiameter') {
+		// The BASE is read as the number it stands at, so a blank one (at the ground) is found by
+		// the ground's value, as its placeholder shows it.
+		if (prop === 'level' || prop === 'minLevel' || prop === 'maxLevel' || prop === 'tankDiameter' || prop === 'bottomElev') {
 			if (cand.group !== 'node' || cand.el.type !== 'tank') { return undefined; }
-			var tankVal = prop === 'level' ? effective(cand.el, 'level') : cand.el[prop];
+			var tankVal = prop === 'level' ? effective(cand.el, 'level')
+				: prop === 'bottomElev' ? (typeof cand.el.bottomElev === 'number' ? cand.el.bottomElev : cand.el.elev)
+				: cand.el[prop];
 			return (typeof tankVal === 'number' && isFinite(tankVal)) ? tankVal : undefined;
 		}
 		// **THE MIXING MODEL, AS THE TOKEN THE DOCUMENT STORES** -- 'MIXED' is the standing
@@ -24619,6 +24653,14 @@ var EngCalcs = EngCalcs || {};
 					paneColId(), paneColCoord(1), paneColCoord(2),
 					paneColDesc(), paneColTag(),
 					paneColActive(), paneColElev(),
+					// **THE TANK BASE, BESIDE ITS GROUND** (Tom, 2026-10-11). Blank means the base is
+					// at the ground -- the popup's rule -- so an empty cell shows the ground as its
+					// placeholder and writes nothing.
+					{ key: 'bottomElev', em: 3.5, label: 'lpn_field_tank_base_elev', unit: paneUnitElevHead,
+						blank: true,
+						hint: function (n) { return typeof n.elev === 'number' ? String(+(+n.elev).toFixed(6)) : ''; },
+						get: function (n) { return n.bottomElev; },
+						set: function (n, v) { setTankBottom(n, v); updateNode(n.id, true); } },
 					{ key: 'level', em: 3.5, label: 'lpn_field_tank_level', unit: paneUnitElevHead,
 						prop: 'level', get: function (n) { return effective(n, 'level'); },
 						set: function (n, v) { setProp(n, 'level', v); } },
@@ -24645,6 +24687,8 @@ var EngCalcs = EngCalcs || {};
 					// it must be visible, but a second editable field would be two numbers that have
 					// to agree.
 					paneColNodeResult('head', 'lpn_result_head', paneUnitHead),
+					// Pressure above the GROUND, as at any node (Tom, 2026-10-11).
+					paneColNodeResult('pressure', 'lpn_result_pressure', paneUnitPressure),
 					// **DEPTH AND USABLE VOLUME, AS RESULTS** (Task 783): head minus the tank bottom, and
 					// the water above the lowest water depth. Heading tips live in the popup rows.
 					paneColNodeResult('depth', 'lpn_result_depth', paneUnitHead),
@@ -33286,6 +33330,8 @@ var EngCalcs = EngCalcs || {};
 			{ types: ['reservoir'], keys: ['_head'], props: ['head'], unit: 'lpn_u_elevhead',
 				label: pc.lpn_field_head || 'Head' },
 			{ types: ['reservoir'], keys: ['headPattern'], props: [], label: pc.lpn_field_head_pattern || 'Head pattern' },
+			{ types: ['tank'], keys: ['bottomElev'], props: [], unit: 'lpn_u_elevhead',
+				label: pc.lpn_field_tank_base_elev || 'Base elevation' },
 			{ types: ['tank'], keys: ['_level'], props: ['level'], unit: 'lpn_u_elevhead',
 				label: pc.lpn_field_tank_level || 'Water depth' },
 			{ types: ['tank'], keys: ['minLevel'], props: [], unit: 'lpn_u_elevhead',
@@ -33372,7 +33418,8 @@ var EngCalcs = EngCalcs || {};
 	function waterSurfaceCarry(n, to) {
 		var from = n.type, key = ovKey(n), out = { base: null, ovs: [], prop: null, newProp: null }, e;
 		if (from === 'tank' && to === 'reservoir') {
-			e = typeof n.elev === 'number' ? n.elev : 0;
+			// The water surface stands on the tank's BASE, not on its ground.
+			e = tankBottom(n);
 			out.prop = 'level'; out.newProp = 'head';
 			if (typeof n._level === 'number') { out.base = { value: e + n._level }; }
 			scenarios.forEach(function (s) {
@@ -34255,7 +34302,12 @@ var EngCalcs = EngCalcs || {};
 	// and a pump, a GPV and a pump's efficiency name one by id -- so `curvePoints`, `efficPoints`
 	// and the `curveRef` borrow are gone from the elements. mintCurveLibrary() below does the move,
 	// and runs unconditionally rather than as a version step, for the reason renameLabelText() does.
-	var LPN_STORAGE_VERSION = 11;
+	// 12 (Tom, 2026-10-11): a TANK has two elevations. `elev` is its ground, the pressure datum as at
+	// a junction; `bottomElev` is its base, from which depth and volume are measured and on which the
+	// hydraulics stand. Every v11 tank's `elev` WAS its base, so migrateTankBottoms() copies it into
+	// `bottomElev` and leaves the ground at the same number: nothing moves, hydraulically or on
+	// screen. The stamp is also the guard -- an older page would read the ground as the base.
+	var LPN_STORAGE_VERSION = 12;
 	// ---- ROADMAP Task 274, second half ----
 	//
 	// From v4 the FILE stores Cartesian Y (up is positive), matching what the user sees and what
@@ -35607,6 +35659,13 @@ var EngCalcs = EngCalcs || {};
 		return dropped;
 	}
 
+	function migrateTankBottoms(saved) {
+		(saved.nodes || []).forEach(function (n) {
+			if (!n || n.type !== 'tank' || typeof n.bottomElev === 'number' || typeof n.elev !== 'number') { return; }
+			n.bottomElev = n.elev;
+			if (n.tok && typeof n.tok.elev === 'string') { n.tok.bottomElev = n.tok.elev; }
+		});
+	}
 	function migrateSaved(saved) {
 		// RUN ON EVERY DOCUMENT, NOT ONLY AS THE v7 -> v8 STEP, and v2 is the whole reason. A v2
 		// document deliberately lags at v2 until the user answers its units question, so it reaches
@@ -35788,6 +35847,19 @@ var EngCalcs = EngCalcs || {};
 		// So the stamp is the guard, not the move -- exactly the shape of the v7 -> v8 step.
 		if (saved.v === 10) {
 			saved.v = 11;
+		}
+		// ---- v11 -> v12: A TANK'S ELEVATION BECOMES ITS GROUND, AND ITS BASE GETS A FIELD ---------
+		//
+		// Until v12 a tank's one elevation was its base (EPANET's [TANKS] Elevation). It is copied
+		// into `bottomElev`, characters and all, and `elev` stays where it was as the ground -- so the
+		// pressure still equals the depth and every number on screen is what it was. Copied rather
+		// than left blank (blank means "the base follows the ground"): somebody who opens an old
+		// project to type the real ground under a raised tank must not drag the tank down with it.
+		// A LAGGING v2 DOCUMENT gets the same copy on every open, since it never reaches this step;
+		// the copy only ever fills an absent base, so a second pass finds nothing to do.
+		if (saved.v === 2 || saved.v === 11) {
+			migrateTankBottoms(saved);
+			if (saved.v === 11) { saved.v = 12; }
 		}
 		// **There is deliberately NO v2 -> v3 step here, and v2 is the ONLY version that lags.**
 		// Every other migration converts and stamps; this one cannot, because the conversion is the
@@ -36518,6 +36590,7 @@ var EngCalcs = EngCalcs || {};
 		// than leaving the numbers it states alone.
 		doc.nodes.forEach(function (n) {
 			scale(n, 'elev', hf);
+			scale(n, 'bottomElev', hf);
 			scale(n, '_head', hf);
 			scale(n, '_demand', qf);
 		});
@@ -37238,7 +37311,7 @@ var EngCalcs = EngCalcs || {};
 	var LPN_DXF_KEYS = {
 		junction: ['ID', 'ELEV', 'DEMAND', 'TAG', 'DESC'],
 		reservoir: ['ID', 'HEAD', 'TAG', 'DESC'],
-		tank: ['ID', 'ELEV', 'LEVEL', 'MINLEVEL', 'MAXLEVEL', 'DIAMETER', 'TAG', 'DESC'],
+		tank: ['ID', 'ELEV', 'BASEELEV', 'LEVEL', 'MINLEVEL', 'MAXLEVEL', 'DIAMETER', 'TAG', 'DESC'],
 		pipe: ['ID', 'DIAMETER', 'LENGTH', 'ROUGHNESS', 'TAG', 'DESC'],
 		pump: ['ID', 'TAG', 'DESC'],
 		valve: ['ID', 'VALVETYPE', 'DIAMETER', 'SETTING', 'TAG', 'DESC'],
@@ -37255,6 +37328,7 @@ var EngCalcs = EngCalcs || {};
 			ELEV: [pc.lpn_field_elev || 'Elevation', 'lpn_u_elevhead'],
 			DEMAND: [pc.lpn_field_base_demand || 'Base demand', 'lpn_u_flow'],
 			HEAD: [pc.lpn_field_head || 'Head', 'lpn_u_elevhead'],
+			BASEELEV: [pc.lpn_field_tank_base_elev || 'Base elevation', 'lpn_u_elevhead'],
 			LEVEL: [pc.lpn_field_tank_level || 'Water depth', 'lpn_u_elevhead'],
 			MINLEVEL: [pc.lpn_field_tank_minlevel || 'Lowest water depth', 'lpn_u_elevhead'],
 			MAXLEVEL: [pc.lpn_field_tank_maxlevel || 'Highest water depth', 'lpn_u_elevhead'],
@@ -37297,7 +37371,9 @@ var EngCalcs = EngCalcs || {};
 		} else if (n.type === 'reservoir') {
 			a.push(['HEAD', dxfNum(n, '_head', nodeFixedHead(n))]);
 		} else if (n.type === 'tank') {
-			a.push(['ELEV', dxfVal(n, 'elev')], ['LEVEL', dxfVal(n, 'level')], ['MINLEVEL', dxfVal(n, 'minLevel')],
+			// ELEV is the ground; the BASE is written as the number it stands at, blank or not.
+			a.push(['ELEV', dxfVal(n, 'elev')], ['BASEELEV', dxfNum(n, typeof n.bottomElev === 'number' ? 'bottomElev' : 'elev', tankBottom(n))],
+				['LEVEL', dxfVal(n, 'level')], ['MINLEVEL', dxfVal(n, 'minLevel')],
 				['MAXLEVEL', dxfVal(n, 'maxLevel')], ['DIAMETER', dxfVal(n, 'tankDiameter')]);
 		}
 		a.push(['TAG', dxfVal(n, 'tag')], ['DESC', dxfVal(n, 'desc')]);
@@ -37731,8 +37807,9 @@ var EngCalcs = EngCalcs || {};
 	}
 	var LPN_INP_TOK_JUNCTION = { elev: 'elev', demand: '_demand', x: 'x', y: 'y' },
 		LPN_INP_TOK_RESERVOIR = { head: '_head', x: 'x', y: 'y' },
+		// A tank's [TANKS] Elevation is its BASE, so the file's characters ride with `bottomElev`.
 		LPN_INP_TOK_TANK = {
-			elev: 'elev', level: '_level', minLevel: 'minLevel', maxLevel: 'maxLevel',
+			elev: 'bottomElev', level: '_level', minLevel: 'minLevel', maxLevel: 'maxLevel',
 			diameter: 'tankDiameter', x: 'x', y: 'y'
 		},
 		LPN_INP_TOK_LINK = {
@@ -37810,9 +37887,14 @@ var EngCalcs = EngCalcs || {};
 				// the four vertical distances, LENGTH for the diameter -- CLAUDE.md) later reads it
 				// in. Nothing here is blank-means-follow the way a reservoir's head is: EPANET states
 				// every one, so every one is written.
+				// **[TANKS] ELEVATION IS THE BASE** (Tom, 2026-10-11): the vessel floor that depth
+				// and volume are measured from. The file says nothing about the ground the tank
+				// stands on, so the ground is taken to be the base -- pressure equals depth, exactly
+				// as before -- and a raised tank is the user's to state.
 				var tk = carryInpTokens(n, {
 					id: n.id, type: 'tank', x: n.x, y: n.y,
 					elev: n.elev,
+					bottomElev: n.elev,
 					// _level is scenario-overridable (leading underscore, read through effective())
 					// because "what if the tank is drawn down to 2 m" is a scenario. The vessel's own
 					// geometry is not, sitting beside elev: a scenario changes operating state, not
@@ -37826,6 +37908,18 @@ var EngCalcs = EngCalcs || {};
 					maxLevel: n.maxLevel,
 					tankDiameter: n.diameter
 				}, LPN_INP_TOK_TANK);
+				// The ground starts as the same number in the same characters, so a DXF or GeoJSON
+				// written straight after import states it as the file did.
+				// Rebuilt rather than added to, so the bag reads in the order a migrated v11 project's
+				// does (examples-audit-harness.js compares the two as JSON).
+				if (tk.tok && typeof tk.tok.bottomElev === 'string') {
+					var tkTok = {};
+					Object.keys(tk.tok).forEach(function (k) {
+						if (k === 'bottomElev') { tkTok.elev = tk.tok.bottomElev; } else { tkTok[k] = tk.tok[k]; }
+					});
+					tkTok.bottomElev = tk.tok.bottomElev;
+					tk.tok = tkTok;
+				}
 				if (n.desc) { tk.desc = n.desc; }   // base-write: see the reservoir above
 				return withInpNotes(tk, inpNodeNotes[n.id]);
 			}
@@ -49441,7 +49535,7 @@ var EngCalcs = EngCalcs || {};
 			// tankDiameter is NOT one of these any more (CLAUDE.md: it is a LENGTH, handled in the
 			// lpn_u_length branch above) -- these four are all vertical distances on the same staff.
 			doc.nodes.forEach(function (nd) {
-				conv(nd, 'elev'); conv(nd, '_level'); conv(nd, 'minLevel');
+				conv(nd, 'elev'); conv(nd, 'bottomElev'); conv(nd, '_level'); conv(nd, 'minLevel');
 				conv(nd, 'maxLevel'); conv(nd, '_head');
 			});
 			convOverrides('level'); convOverrides('head');
@@ -60609,18 +60703,27 @@ var EngCalcs = EngCalcs || {};
 		descField(fields, n);
 		tagField(fields, n);
 		if (n.type === 'tank') {
-			// FIVE INPUTS AND ONE COMPUTED ROW, in the order a person builds a tank: where the
-			// bottom sits, how much water is in it right now, how far it can go either way, and how
-			// wide it is. The WATER SURFACE is deliberately read-only and derived (Task 248): it is
-			// the number the solve actually uses, so the user must be able to see it, but making it
-			// a second editable field would be two numbers that have to agree -- the "hidden curve"
-			// trap Tom named on the pump (see addLink()).
+			// SIX INPUTS AND THEIR COMPUTED ROWS, in the order a person builds a tank: the ground it
+			// stands on, where its base sits, how much water is in it right now, how far it can go
+			// either way, and how wide it is. The WATER SURFACE is deliberately read-only and derived
+			// (Task 248): it is the number the solve actually uses, so the user must be able to see
+			// it, but making it a second editable field would be two numbers that have to agree --
+			// the "hidden curve" trap Tom named on the pump (see addLink()).
+			//
+			// **TWO ELEVATIONS** (Tom, 2026-10-11: *"Build Elevation (ground and pressure datum) and
+			// Elevation (depth and volume tank base)."*). Elevation is the ground, read and filled
+			// from the terrain exactly as a junction's is; the base is blank-means-the-ground, so its
+			// placeholder is the ground.
 			unitNumberField(fields, pc.lpn_field_elev || 'Elevation', 'lpn_u_elevhead',
 				function () { return n.elev; },
 				function (v) { n.elev = v; updateNode(nodeId, true); refreshPopupIfOpen(); },
-				pc.lpn_tank_elev_tip);
+				pc.lpn_tank_ground_elev_tip);
 			elevationDemRow(fields, n, nodeId,
 				function (v) { n.elev = v; updateNode(nodeId, true); });
+			unitNumberFieldBlank(fields, pc.lpn_field_tank_base_elev || 'Base elevation', 'lpn_u_elevhead',
+				function () { return n.bottomElev; },
+				function (v) { setTankBottom(n, v); updateNode(nodeId, true); refreshPopupIfOpen(); },
+				n.elev, pc.lpn_field_tank_base_elev_tip);
 			unitNumberField(fields, pc.lpn_field_tank_level || 'Water depth', 'lpn_u_elevhead',
 				function () { return effective(n, 'level'); },
 				function (v) { setProp(n, 'level', v); updateNode(nodeId, true); refreshPopupIfOpen(); },
@@ -60662,6 +60765,11 @@ var EngCalcs = EngCalcs || {};
 			mixingFields(fields, n);
 			readonlyUnitField(fields, pc.lpn_result_head || 'Head', resultUnit('elevhead'),
 				toSI(nodeFixedHead(n), 'lpn_u_elevhead'), pc.lpn_tank_head_tip);
+			// The head above the GROUND, as at any node: the reading the Tables pane, the labels and
+			// the colouring take (tankPressureSI()), so it follows the two elevations as they are typed.
+			if (typeof n.elev === 'number') {
+				readonlyUnitField(fields, pc.lpn_result_pressure || 'Pressure', resultUnit('pressure'), tankPressureSI(n));
+			}
 			// Depth and usable volume, read the way the Tables pane reads them (Task 783).
 			readonlyField(fields, (pc.lpn_result_depth || 'Depth') + ' (' + unitLabel(resultUnit('elevhead')) + ')',
 				colorNodeValue(n, 'depth'), pc.lpn_result_depth_tip);
@@ -63718,9 +63826,13 @@ var EngCalcs = EngCalcs || {};
 				// in the Elevation/Head unit, measured on the same staff as the ground; the vessel
 				// DIAMETER is a horizontal one and is in the LENGTH unit instead (CLAUDE.md) -- not
 				// a pipe diameter either, which would read a 15 m tank as 15000.
+				// **`elev` HERE IS THE BASE, and `ground` the pressure datum**: both engines solve a
+				// tank standing on its base (EPANET's [TANKS] Elevation), and both report its
+				// pressure above the ground, like any node's (EngCalcs.lpnPressureDatum).
 				return {
 					id: n.id, type: n.type,
-					elev: toSI(n.elev || 0, 'lpn_u_elevhead'),
+					elev: toSI(tankBottom(n), 'lpn_u_elevhead'),
+					ground: toSI(n.elev || 0, 'lpn_u_elevhead'),
 					head: toSI(nodeFixedHead(n), 'lpn_u_elevhead'),
 					level: toSI(effective(n, 'level') || 0, 'lpn_u_elevhead'),
 					minLevel: toSI(n.minLevel || 0, 'lpn_u_elevhead'),
@@ -65544,7 +65656,8 @@ var EngCalcs = EngCalcs || {};
 			pressure: nodeValueMap(function (n) {
 				if (isFixedHeadNode(n)) {
 					return heldTypeChange(n, 'pressure') !== undefined ? plainRound(heldTypeChange(n, 'pressure'), nd.pressure)
-						: displayRound(toSI(nodeFixedHead(n) - (n.elev || 0), 'lpn_u_elevhead'), resultUnit('pressure'), nd.pressure);
+						: displayRound(n.type === 'tank' ? tankPressureSI(n) : toSI(nodeFixedHead(n) - (n.elev || 0), 'lpn_u_elevhead'),
+							resultUnit('pressure'), nd.pressure);
 				}
 				return lastSolveResult ? displayRound(lastSolveResult.pressures[n.id], resultUnit('pressure'), nd.pressure) : undefined;
 			}),

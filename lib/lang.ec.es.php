@@ -869,7 +869,7 @@ $ec_lang['lpn_field_head_tip']='Nivel de la superficie del agua en el embalse, m
 // pipe-diameter unit would put a 15 m tank on screen as 15000. Same reason the three levels say
 // "measured up from the tank bottom" rather than leaving the datum to be guessed -- EPANET measures
 // a tank level from the vessel floor, not from the same zero the elevations use.
-$ec_lang['lpn_tank_elev_tip']='Elevación del fondo del depósito. Las profundidades de agua en el depósito se miden hacia arriba desde aquí.';
+$ec_lang['lpn_field_tank_base_elev_tip']='Elevación del fondo del depósito. Las profundidades de agua en el depósito se miden hacia arriba desde aquí.';
 $ec_lang['lpn_field_tank_level']='Profundidad de agua';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_field_tank_level_tip']='Profundidad del agua que hay en el depósito, medida hacia arriba desde el fondo del depósito. La superficie del agua es la elevación del fondo del depósito más esta profundidad.';

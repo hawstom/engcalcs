@@ -384,6 +384,24 @@ EngCalcs.lpnIsFixedHead = function (node) {
 	return node.type === 'reservoir' || node.type === 'tank';
 };
 
+// **A TANK HAS TWO ELEVATIONS** (Tom, 2026-10-11: *"Pressure is above ground. No special meaning at
+// tanks."*). `elev` is the GROUND, the pressure datum, exactly as at a junction. `bottomElev` is the
+// tank BASE -- EPANET's [TANKS] Elevation -- from which water depth and volume are measured and on
+// which the hydraulics stand. BLANK MEANS THE BASE IS AT THE GROUND, the rule a reservoir's blank
+// head already follows, so a newly drawn tank (whose ground may still be arriving from a terrain
+// tile) is a tank standing on the ground. Read on a DOCUMENT node, in whatever unit it is stored.
+EngCalcs.lpnTankBottom = function (nd) {
+	var b = nd ? nd.bottomElev : undefined;
+	if (typeof b === 'number' && isFinite(b)) { return b; }
+	return (nd && typeof nd.elev === 'number') ? nd.elev : 0;
+};
+// What a pressure is measured above, on a MODEL node (SI). A model tank's `elev` is its base, because
+// that is what both engines solve on; its `ground` is the datum a gauge reads from.
+EngCalcs.lpnPressureDatum = function (node) {
+	if (node && typeof node.ground === 'number' && isFinite(node.ground)) { return node.ground; }
+	return (node && node.elev) || 0;
+};
+
 // ---------------------------------------------------------------------------
 // VALVES
 // ---------------------------------------------------------------------------
@@ -1080,11 +1098,11 @@ EngCalcs.lpnReport = function (model, junctions, junctionIndex, byId, H, Q, meth
 			// A reservoir now carries an elevation as well as a head, so its pressure is the same
 			// head-minus-elevation a junction's is -- zero only when the water surface sits at the
 			// reservoir's own ground elevation, which is the default but no longer the only case.
-			// A TANK is the case where the two routinely differ: its elevation is the bottom of the
-			// vessel and its head is the water surface, so the pressure reported here is the depth
-			// of water standing in it -- which is exactly what a reader wants to see at a tank.
+			// A TANK's pressure is measured above its GROUND, like any other node's, and not above
+			// the vessel's base (see EngCalcs.lpnTankBottom): a raised tank reads its water
+			// surface's height above the street.
 			heads[model.nodes[i].id] = model.nodes[i].head;
-			pressures[model.nodes[i].id] = (model.nodes[i].head - (model.nodes[i].elev || 0)) * sg;
+			pressures[model.nodes[i].id] = (model.nodes[i].head - EngCalcs.lpnPressureDatum(model.nodes[i])) * sg;
 		}
 	}
 	for (i = 0; i < junctions.length; i++) {

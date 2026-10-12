@@ -867,7 +867,7 @@ $ec_lang['lpn_field_head_tip']='ရေကန်ရှိ ရေမျက်န�
 // pipe-diameter unit would put a 15 m tank on screen as 15000. Same reason the three levels say
 // "measured up from the tank bottom" rather than leaving the datum to be guessed -- EPANET measures
 // a tank level from the vessel floor, not from the same zero the elevations use.
-$ec_lang['lpn_tank_elev_tip']='ရေတိုက်ကြမ်းပြင်၏ အမြင့်။ ရေတိုက်ရှိ ရေနက်ရှိုင်းမှုများကို ဤနေရာမှ အပေါ်သို့ တိုင်းတာသည်။';
+$ec_lang['lpn_field_tank_base_elev_tip']='ရေတိုက်ကြမ်းပြင်၏ အမြင့်။ ရေတိုက်ရှိ ရေနက်ရှိုင်းမှုများကို ဤနေရာမှ အပေါ်သို့ တိုင်းတာသည်။';
 $ec_lang['lpn_field_tank_level']='ရေနက်ရှိုင်းမှု';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_field_tank_level_tip']='ရေတိုက်ထဲတွင် ရပ်နေသော ရေ၏ နက်ရှိုင်းမှု၊ ရေတိုက်ကြမ်းပြင်မှ အပေါ်သို့ တိုင်းတာသည်။ ရေမျက်နှာပြင်မှာ ရေတိုက်ကြမ်းပြင်၏ အမြင့်နှင့် ဤနက်ရှိုင်းမှု ပေါင်းထားသည့် တန်ဖိုးဖြစ်သည်။';

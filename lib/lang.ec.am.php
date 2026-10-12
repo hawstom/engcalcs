@@ -867,7 +867,7 @@ $ec_lang['lpn_field_head_tip']='በማጠራቀሚያው ውስጥ ያለው የ
 // pipe-diameter unit would put a 15 m tank on screen as 15000. Same reason the three levels say
 // "measured up from the tank bottom" rather than leaving the datum to be guessed -- EPANET measures
 // a tank level from the vessel floor, not from the same zero the elevations use.
-$ec_lang['lpn_tank_elev_tip']='የታንኩ ግርጌ ከፍታ። በታንኩ ውስጥ ያለው የውሃ ጥልቀት ከዚህ ተነስቶ ወደ ላይ ይለካል።';
+$ec_lang['lpn_field_tank_base_elev_tip']='የታንኩ ግርጌ ከፍታ። በታንኩ ውስጥ ያለው የውሃ ጥልቀት ከዚህ ተነስቶ ወደ ላይ ይለካል።';
 $ec_lang['lpn_field_tank_level']='የውሃ ጥልቀት';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_field_tank_level_tip']='በታንኩ ውስጥ ያለው የቆመ ውሃ ጥልቀት፣ ከታንኩ ግርጌ ተነስቶ ወደ ላይ የሚለካ። የውሃው ወለል የታንኩ ግርጌ ከፍታ ከዚህ ጥልቀት ጋር ተደምሮ ነው።';

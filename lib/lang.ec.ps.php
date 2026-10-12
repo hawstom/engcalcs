@@ -869,7 +869,7 @@ $ec_lang['lpn_field_head_tip']='د ذخیرې کې د اوبو د سطحې کچ�
 // pipe-diameter unit would put a 15 m tank on screen as 15000. Same reason the three levels say
 // "measured up from the tank bottom" rather than leaving the datum to be guessed -- EPANET measures
 // a tank level from the vessel floor, not from the same zero the elevations use.
-$ec_lang['lpn_tank_elev_tip']='د ټانک د تل لوړوالی. د ټانک دننه د اوبو ژوروالی له همدې ځایه پورته اندازه کیږي.';
+$ec_lang['lpn_field_tank_base_elev_tip']='د ټانک د تل لوړوالی. د ټانک دننه د اوبو ژوروالی له همدې ځایه پورته اندازه کیږي.';
 $ec_lang['lpn_field_tank_level']='د اوبو ژوروالی';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_field_tank_level_tip']='د ټانک دننه د ولاړو اوبو ژوروالی، د ټانک له تله پورته اندازه شوی. د اوبو سطحه د ټانک د تل لوړوالی او دې ژوروالي مجموعه ده.';
