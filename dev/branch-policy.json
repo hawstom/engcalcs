@@ -73,6 +73,7 @@
         "feat/property-venue",
         "feat/label-limit",
         "feat/offscreen-notice",
+        "feat/graph-bubble",
         "feat/usage-report",
         "feat/select-on-focus",
         "feat/first-project",
