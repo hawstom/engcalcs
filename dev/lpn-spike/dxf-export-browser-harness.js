@@ -196,7 +196,7 @@ function checkDrawing(label, out, geo) {
 	if (out.lang === 'zh') {
 		ok(label + ': the read-me states the unit as ft, not the page\'s translated symbol', / IN FT\. /.test(notes), notes.slice(0, 200));
 	}
-	ok(label + ': the read-me names the layer pattern', /C-WATR-MODL-J___-BASE/.test(notes), notes.slice(0, 400));
+	ok(label + ': the read-me names the layer pattern', /C-WATR-MODL-NODE-BASE/.test(notes), notes.slice(0, 400));
 	const tmp = path.join(require('os').tmpdir(), NAME + '-' + process.pid + '-' + label.replace(/\W+/g, '_') + '.dxf');
 	fs.writeFileSync(tmp, Buffer.from(T, 'latin1'));
 	const audit = ezdxfAudit(tmp);
