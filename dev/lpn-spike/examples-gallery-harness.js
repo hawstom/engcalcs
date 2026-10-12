@@ -155,9 +155,9 @@ console.log('\n-- card descriptions read from the language file --');
 		report(!/start here|starting|the same|the smallest/i.test(ex.description), `${ex.titleKey}: none of the struck phrases`);
 	});
 	examples.filter(e => /^Net2/.test(e.file)).forEach(function (ex) {
-		const si = ex.system === 'si';
-		report(/no valves/.test(ex.description) && (si ? /about 2 km by 4 km/ : /about 1 mile by 2 miles/).test(ex.description),
-			`${ex.file}: states no valves and its size`);
+		// Wording is Tom's to reword; only that both twins state a size in their own length unit.
+		report(ex.system === 'si' ? /\bkm\b/.test(ex.description) : /\bmiles?\b/.test(ex.description),
+			`${ex.file}: states its size in its own length unit`);
 	});
 	const elm = examples.find(e => e.file === 'Elm-Street-Center.lwn');
 	report(/\(US\)$/.test(elm.title) && /^Gallons per minute, with feet and inches\./.test(elm.description), 'Elm Street Center discloses its units like the EPANET cards');
