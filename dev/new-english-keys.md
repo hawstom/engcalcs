@@ -563,7 +563,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**137 still to read**, of 140 new keys across 12 unmerged branch(es).
+**138 still to read**, of 141 new keys across 15 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -574,7 +574,9 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/bentley-interop (`ad8cfe6e`) — 101 new, 101 to read @@ NEEDS RULING
+### chore/mary-1012 (`26adbad5`) — adds no English strings
+
+### feat/bentley-interop (`735199bd`) — 101 new, 101 to read @@ NEEDS RULING
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -880,6 +882,8 @@ build for that would be a gate nobody keeps. Refresh it with
   > Used by: {list}
   @@ NEEDS RULING
 
+### feat/convert-search (`b71bb912`) — adds no English strings
+
 ### feat/desktop (`baba0f04`) — adds no English strings
 
 ### feat/label-gang-search (`8b31a907`) — 3 new, all ruled
@@ -904,7 +908,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`2e5e81c4`) — adds no English strings
 
-### feat/match-property (`e95c8ac1`) — 9 new, 9 to read @@ NEEDS RULING
+### feat/match-property (`7c415712`) — 9 new, 9 to read @@ NEEDS RULING
 
 - **`lpn_copy_props_done`**
   > Copied properties of {id}.
@@ -1018,6 +1022,12 @@ build for that would be a gate nobody keeps. Refresh it with
   > Draw a point, a polyline, or a polygon on the map. A Shape is annotation and is not part of the network. Specify each point, then specify the last point again, press Enter, or right-click to finish. Specify the first point again to close the Shape into a polygon.
   @@ NEEDS RULING
 
-### feat/si-example (`9b343e55`) — adds no English strings
+### feat/si-example (`9f5bd0d9`) — adds no English strings
 
-### fix/paste-column (`77f81265`) — adds no English strings
+### fix/paste-column (`a4e50f15`) — adds no English strings
+
+### fix/specific-gravity (`c000dec5`) — 1 new, 1 to read @@ NEEDS RULING
+
+- **`lpn_settings_specific_gravity_tip`**
+  > Density of the fluid relative to water. It scales pressure in every unit, because a pressure in m or ft is a column of water, and it does not change head or HGL. It changes no flow.
+  @@ NEEDS RULING
