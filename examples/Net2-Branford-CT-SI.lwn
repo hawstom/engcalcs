@@ -6,7 +6,7 @@
 		"name": "Net2-Branford-CT SI",
 		"activeScenario": "base",
 		"gallery": "Net2-Branford-CT-SI.lwn",
-		"basemap": "osm",
+		"basemap": "satellite",
 		"crs": "EPSG:26956"
 	},
 	"scenarios": [
@@ -964,7 +964,7 @@
 				"id": "L"
 			}
 		},
-		"separator": " ",
+		"separator": ", ",
 		"markExtrema": true
 	},
 	"backdrop": null,
@@ -1032,7 +1032,7 @@
 		"linkWidth": 4,
 		"symbolOpacity": 1,
 		"labelMaxWidth": null,
-		"basemapStyle": "normal",
+		"basemapStyle": "muted",
 		"backdropOpacity": 0.5,
 		"alignPipeLabels": true,
 		"labelFlipLeftOfVertical": 20,
@@ -1040,12 +1040,12 @@
 		"showArrows": true,
 		"leaderSnapDeg": 0,
 		"legendPosition": "top-right",
-		"colorNodeField": "",
-		"colorLinkField": "",
-		"colorRampNode": "epanet",
-		"colorRampLink": "epanet",
-		"colorClassesNode": 5,
-		"colorClassesLink": 5,
+		"colorNodeField": "pressure",
+		"colorLinkField": "velocity",
+		"colorRampNode": "rdylgn",
+		"colorRampLink": "viridis",
+		"colorClassesNode": 7,
+		"colorClassesLink": 7,
 		"colorReverseNode": false,
 		"colorReverseLink": false,
 		"contourFill": "",
@@ -1055,9 +1055,12 @@
 		"contourInterval": {},
 		"contourBuffer": 2.5,
 		"contourTerrain": false,
-		"colorLegendPosition": "bottom-right",
+		"colorLegendPosition": "middle-right",
 		"colorBreaks": {},
-		"colorModes": {},
+		"colorModes": {
+			"node.pressure": "pressure",
+			"link.velocity": "pretty"
+		},
 		"tolerance": 1e-9,
 		"labelReadabilityBias": 110,
 		"mapHeight": 500,

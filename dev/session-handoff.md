@@ -123,8 +123,8 @@ the pkill guard in .claude/hooks/guard-wait-loops.php; Mary's antecedent list (h
   name in the Scenarios TABLE makes it current. Perry CONFIRMED round 6; his three gaps fixed with real-mouse
   checks. Test-merge with feat/match-property conflicts only in dev/new-english-keys.md.
 - **feat/si-example** (9df2f3f0, 8111; Task 786): eight cards, Net3/Net2 SI+US twins, backdrops only on Elm
-  Street; Net2 from his .epp but on the OSM map (satellite would be an unasked Mapbox request) and without his
-  label settings (symbology-table rule). Perry CONFIRMED scale bars. His notes miscount Net1 (9 junctions, 1 pump).
+  Street; Net2 from his .epp on the satellite map as he asked (privacy.php sentence owed), Net3's label and
+  colour conventions. Basics last. Perry CONFIRMED scale bars.
 - **feat/shape** (cb281a99, 8108): the icon is his freehand outline; DXF layer SHAP. Import stays on Task 779.
 - **feat/convert-search** (b71bb912, 8119): Convert as carries the chooser's place search into Step 1. Perry
   CONFIRMED; a state- or country-size search makes a huge site width.
@@ -133,8 +133,6 @@ the pkill guard in .claude/hooks/guard-wait-loops.php; Mary's antecedent list (h
 
 - Which table did "The table is good" mean (Match round 3)?
 - Graph bubbles piling on a far zoom-out: acceptable, or a hide-all control?
-- Net2 example: keep the OSM street map, or satellite with a privacy.php sentence?
-- Net1 note says 11 junctions, 2 pumps; the file has 9 and 1.
 - Bentley: deleting a scenario leaves its own alternatives unused in the file; "Copy, share them" makes edits
   in the copy change the original with no note at that moment.
 - The English he had not read (103 keys on new-english-keys.md) went into sprint 1012 before he read it; the
