@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**101 still to read on master**, of 101 untranslated keys, of 2651 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**111 still to read on master**, of 111 untranslated keys, of 2661 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -199,7 +199,7 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   @@ NEEDS RULING
 
-## lpn_  (101, 101 to read @@ NEEDS RULING)
+## lpn_  (111, 111 to read @@ NEEDS RULING)
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -218,6 +218,12 @@ never edits a synonym.
   @@ NEEDS RULING
 - **`lpn_control_inactive_note`**
   > These controls refer to an asset that is inactive in this scenario, so they are ignored in its run: {ids}
+  @@ NEEDS RULING
+- **`lpn_copy_props_done`**
+  > Copied properties of {id}.
+  @@ NEEDS RULING
+- **`lpn_copy_props_menu`**
+  > Copy properties
   @@ NEEDS RULING
 - **`lpn_customer_node_inactive`**
   > This customer is assigned to a junction that is inactive in this scenario, so its demand is not part of the solve.
@@ -248,6 +254,30 @@ never edits a synonym.
   @@ NEEDS RULING
 - **`lpn_pane_tab_scenarios`**
   > Scenarios
+  @@ NEEDS RULING
+- **`lpn_paste_done_many`**
+  > Pasted properties of {id} to {m} assets. Values changed: {n}.
+  @@ NEEDS RULING
+- **`lpn_paste_done_one`**
+  > Pasted properties of {id} to {to}. Values changed: {n}.
+  @@ NEEDS RULING
+- **`lpn_paste_props_menu`**
+  > Paste properties to selection
+  @@ NEEDS RULING
+- **`lpn_paste_props_off_kind`**
+  > No selected asset can take the copied properties.
+  @@ NEEDS RULING
+- **`lpn_paste_props_off_none`**
+  > Nothing is copied. Right-click an asset and choose Copy properties.
+  @@ NEEDS RULING
+- **`lpn_paste_props_off_select`**
+  > Select the assets to paste to, then choose Paste properties to selection.
+  @@ NEEDS RULING
+- **`lpn_paste_skip_breakdown`**
+  > Not pasted: {n} (demand is a list of categories).
+  @@ NEEDS RULING
+- **`lpn_paste_skip_valve`**
+  > Not pasted: {n} (the valve types differ).
   @@ NEEDS RULING
 - **`lpn_rule_inactive_note`**
   > These rules refer to an asset that is inactive in this scenario, so they are ignored in its run: {ids}
@@ -509,7 +539,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**55 still to read**, of 58 new keys across 13 unmerged branch(es).
+**36 still to read**, of 39 new keys across 12 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -520,41 +550,12 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/bentley-interop (`f370eef4`) — adds no English strings
-
-### feat/convert-search (`b71bb912`) — adds no English strings
+### feat/bentley-interop (`9e4b35ab`) — adds no English strings
 
 ### feat/desktop (`baba0f04`) — adds no English strings
 
-### feat/graph-bubble (`11236f20`) — 14 new, 14 to read @@ NEEDS RULING
+### feat/graph-bubble (`c3ce953d`) — 5 new, 5 to read @@ NEEDS RULING
 
-- **`lpn_copy_props_done`**
-  > Copied properties of {id}.
-  @@ NEEDS RULING
-- **`lpn_copy_props_menu`**
-  > Copy properties
-  @@ NEEDS RULING
-- **`lpn_paste_done_many`**
-  > Pasted properties of {id} to {m} assets. Values changed: {n}.
-  @@ NEEDS RULING
-- **`lpn_paste_done_one`**
-  > Pasted properties of {id} to {to}. Values changed: {n}.
-  @@ NEEDS RULING
-- **`lpn_paste_props_menu`**
-  > Paste properties to selection
-  @@ NEEDS RULING
-- **`lpn_paste_props_off_kind`**
-  > No selected asset can take the copied properties.
-  @@ NEEDS RULING
-- **`lpn_paste_props_off_none`**
-  > Nothing is copied. Right-click an asset and choose Copy properties.
-  @@ NEEDS RULING
-- **`lpn_paste_skip_breakdown`**
-  > Not pasted: {n} (demand is a list of categories).
-  @@ NEEDS RULING
-- **`lpn_paste_skip_valve`**
-  > Not pasted: {n} (the valve types differ).
-  @@ NEEDS RULING
 - **`lpn_tsb_close`**
   > Close graph
   @@ NEEDS RULING
@@ -593,40 +594,9 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`2e5e81c4`) — adds no English strings
 
-### feat/match-property (`05bda765`) — 10 new, 10 to read @@ NEEDS RULING
+### feat/match-property (`05bda765`) — adds no English strings
 
-- **`lpn_copy_props_done`**
-  > Copied properties of {id}.
-  @@ NEEDS RULING
-- **`lpn_copy_props_menu`**
-  > Copy properties
-  @@ NEEDS RULING
-- **`lpn_paste_done_many`**
-  > Pasted properties of {id} to {m} assets. Values changed: {n}.
-  @@ NEEDS RULING
-- **`lpn_paste_done_one`**
-  > Pasted properties of {id} to {to}. Values changed: {n}.
-  @@ NEEDS RULING
-- **`lpn_paste_props_menu`**
-  > Paste properties to selection
-  @@ NEEDS RULING
-- **`lpn_paste_props_off_kind`**
-  > No selected asset can take the copied properties.
-  @@ NEEDS RULING
-- **`lpn_paste_props_off_none`**
-  > Nothing is copied. Right-click an asset and choose Copy properties.
-  @@ NEEDS RULING
-- **`lpn_paste_props_off_select`**
-  > Select the assets to paste to, then choose Paste properties to selection.
-  @@ NEEDS RULING
-- **`lpn_paste_skip_breakdown`**
-  > Not pasted: {n} (demand is a list of categories).
-  @@ NEEDS RULING
-- **`lpn_paste_skip_valve`**
-  > Not pasted: {n} (the valve types differ).
-  @@ NEEDS RULING
-
-### feat/shape (`cb281a99`) — 27 new, 27 to read @@ NEEDS RULING
+### feat/shape (`a5ce9cfc`) — 27 new, 27 to read @@ NEEDS RULING
 
 - **`lpn_file_import_shapes`**
   > Import GeoJSON shapes…
@@ -710,7 +680,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Draw a point, a polyline, or a polygon on the map. A Shape is annotation and is not part of the network. Specify each point, then specify the last point again, press Enter, or right-click to finish. Specify the first point again to close the Shape into a polygon.
   @@ NEEDS RULING
 
-### feat/si-example (`6a552271`) — 4 new, 4 to read @@ NEEDS RULING
+### feat/si-example (`fa3298c5`) — 4 new, 4 to read @@ NEEDS RULING
 
 - **`lpn_ex_net2_si_desc`**
   > Litres per second, with metres and millimetres. An EPANET example at Branford, Connecticut, converted from gallons per minute, feet and inches: 35 junctions and 1 tank, with no reservoir and no pump. Fluoride, a non-reactive substance, enters at one source.
