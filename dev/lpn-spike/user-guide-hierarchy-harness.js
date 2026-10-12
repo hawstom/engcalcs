@@ -231,7 +231,12 @@ async function spanish(browser, Session) {
 		about: (document.querySelector('[data-guide-section="about"] > h2') || {}).textContent
 	}));
 	ok('the Guide builds in Spanish with all its sections', st.secs >= 9 && st.plain === 0 && st.chevs >= 2 && st.menus >= 4 && st.groups >= 2 && st.nav > st.secs, JSON.stringify(st));
-	ok('...the new heading falls back to English until it is translated', /About this calculator/.test(st.about || ''), st.about);
+	// The key is not in pageConfig (the Guide is built server side), so read the language file itself.
+	const langSrc = (code) => { try { return require('fs').readFileSync(require('path').join(__dirname, '..', '..', 'lib', 'lang.ec.' + code + '.php'), 'utf8'); } catch (e) { return ''; } };
+	const guideKey = (code) => { const m = langSrc(code).match(/\$ec_lang\['lpn_guide_about_heading'\]='((?:[^'\\]|\\.)*)'/); return m ? m[1] : null; };
+	const esAbout = guideKey('es') || guideKey('en');
+	ok('...the About heading is present, in Spanish when the key is translated and in English only if it is not',
+		!!esAbout && (st.about || '').indexOf(esAbout) >= 0 && (esAbout !== 'About this calculator' || /About this calculator/.test(st.about || '')), st.about + ' / ' + esAbout);
 	await page.click(chev('menus'));
 	await a.settle(120);
 	ok('...Menus is folded in the rail (its chevron says so)', (await page.getAttribute(chev('menus'), 'aria-expanded')) === 'false');

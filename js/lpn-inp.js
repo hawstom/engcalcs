@@ -2449,7 +2449,7 @@
 		opts = opts || {};
 		// The properties a document stores under their own name rather than an underscore, which
 		// every one became overridable as (Tom, 2026-10-12; LPN_BARE_PROP in js/looped-network.js).
-		var BARE = { elev: 1, minLevel: 1, maxLevel: 1, tankDiameter: 1, volCurve: 1, mixingModel: 1, mixingFraction: 1,
+		var BARE = { elev: 1, bottomElev: 1, minLevel: 1, maxLevel: 1, tankDiameter: 1, volCurve: 1, mixingModel: 1, mixingFraction: 1,
 			headPattern: 1, speed: 1, speedPattern: 1 };
 		// A caller's resolver written before then reads `_prop` only; a bare one it cannot find is
 		// read off the element, which is what Base holds.
@@ -2650,8 +2650,16 @@
 				// the wrong one. MinVol 0 is EPANET's own "no separate minimum volume".
 				// **AND THE VOLUME CURVE'S NAME IN COLUMN EIGHT WHERE THE FILE PUT IT** (Task 586).
 				// Written only where the tank states one, so a cylindrical tank's row is unchanged.
+				// **COLUMN TWO IS THE BASE, NEVER THE GROUND** (Tom, 2026-10-11): EPANET's tank
+				// Elevation is the vessel floor. The ground is this page's pressure datum and has no
+				// column in [TANKS], so it is not written; a blank base is at the ground, and is
+				// written as that number in the ground's own characters.
+				// Both through eff(): a scenario may hold its own base or ground (2026-10-12).
+				var tankBottom = eff(nd, 'bottomElev'),
+					tankBaseKey = (typeof tankBottom === 'number' && isFinite(tankBottom)) ? 'bottomElev' : 'elev',
+					tankBase = eff(nd, tankBaseKey) || 0;   // EngCalcs.lpnTankBottom's rule, spelled here so this module stands alone
 				var tankRow = [nd.id,
-					n(cHead, nd, 'elev', eff(nd, 'elev') || 0),
+					n(cHead, nd, tankBaseKey, tankBase),
 					n(cHead, nd, '_level', eff(nd, 'level') || 0),
 					n(cHead, nd, 'minLevel', eff(nd, 'minLevel') || 0),
 					n(cHead, nd, 'maxLevel', eff(nd, 'maxLevel') || 0),

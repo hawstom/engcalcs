@@ -136,10 +136,28 @@ Never call it "preview". Scope: `dev/looped-network-calculator-scope.md`; ROADMA
   `dev/lpn-spike/tank-volume-curve-harness.js` anchors it on 216 m³ into one tank: 3.7502 m as a
   10 m cylinder against 6.1200 m on a stepped curve, both hand-computed.
   `dev/lpn-spike/curve-library-harness.js`; `dev/pump-energy.md` for the efficiency side.
+- **PRESSURE IS A COLUMN OF WATER; HEAD IS A HEIGHT** (Tom, 2026-10-12: *"Water height is fundamental and
+  pressure units are derived."*). Head (H) and elevation are heights and carry no specific gravity.
+  Pressure = SG x (H - z), shown in metres or feet of water, and psi, kPa and bar follow from that by
+  fixed factors, so SG is counted once. The built-in solver applies it in `lpnReport()`; the EPANET
+  bridge, whose `Units LPS` pressure carries none, multiplies at `tankGroundPressure()` after the tank's
+  ground shift. Rejected: EPANET's own reading (SG only at head to psi/kPa, issue #864), because a
+  pressure in m or ft is still a pressure. `dev/lpn-spike/specific-gravity-harness.js`.
 - **A tank is a fixed head at its water surface** — what EPANET itself solves at t=0.
   `EngCalcs.lpnIsFixedHead` is the one place that equivalence is declared. A tank diameter is in the
   LENGTH unit while a pipe diameter is in millimetres; only `dev/lpn-spike/tank-harness.js` asserts
   that, because no solve ever reads it.
+- **A tank has two elevations** (Tom, 2026-10-11, overruling the planning seat's advice to show a
+  tank's pressure as depth above its bottom: *"Pressure is above ground. No special meaning at
+  tanks."* and *"Build Elevation (ground and pressure datum) and Elevation (depth and volume tank
+  base)."*). `elev` is the GROUND, the pressure datum exactly as at a junction; `bottomElev` (Base
+  elevation) is EPANET's `[TANKS]` Elevation, on which both engines solve and from which depth and
+  volume are measured. Blank base = at the ground (`EngCalcs.lpnTankBottom`), the reservoir-head rule.
+  Both Base-owned. `.inp` import sets both to the file's number; export writes the base only, and
+  the ground travels in the project file and nowhere in the `.inp` (no comment convention carries
+  it). A v11 project's tank elevation was its base, so v12 copies it into `bottomElev` and leaves
+  the ground equal. EPANET's own tank pressure is moved onto the ground in `js/lpn-epanet.js`.
+  `dev/lpn-spike/tank-ground-harness.js`, `tank-ground-browser-harness.js`.
 - **A geographic project draws raster tiles behind it, and can read ELEVATIONS from the same
   account** (Task 497, `js/lpn-terrain.js`) — OpenStreetMap for the street map, Mapbox for satellite
   and for Terrain-RGB (all gated on `EC_MAPBOX_TOKEN`; absent means neither option exists). The

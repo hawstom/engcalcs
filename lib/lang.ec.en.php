@@ -641,7 +641,7 @@ $ec_lang_syn['ip_group_upstream']='| gloss: upstream';
 $ec_lang['ip_group_downstream']='Downstream';
 $ec_lang_syn['ip_group_downstream']='| gloss: downstream';
 $ec_lang['ip_group_loss']='Loss';
-$ec_lang['ip_is_lateral']='<span class="ec-help" title="Selected: this reach is a segment of the test lateral, from which individual emitters withdraw water. Cleared: this reach is a main, only passing flow along to laterals not on the test path.">Lat. <span class="ec-tip">?</span></span>';
+$ec_lang['ip_is_lateral']='<span class="ec-help" title="Checked: this reach is a segment of the test lateral, from which individual emitters withdraw water. Cleared: this reach is a main, only passing flow along to laterals not on the test path.">Lat. <span class="ec-tip">?</span></span>';
 $ec_lang_syn['ip_is_lateral']='| gloss: lateral, mainline; avoid: "test" read as typical/sample';
 $ec_lang['ip_count']='<span class="ec-help" title="Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) — their flow branches from this same reach too.">Emitters <span class="ec-tip">?</span></span>';
 $ec_lang_syn['ip_count']='| gloss: lateral, mainline, reach; avoid: "branch" as bough or office branch';
@@ -1002,7 +1002,12 @@ $ec_lang['lpn_field_head_tip']='Water surface level in the reservoir, measured a
 // pipe-diameter unit would put a 15 m tank on screen as 15000. Same reason the three levels say
 // "measured up from the tank bottom" rather than leaving the datum to be guessed -- EPANET measures
 // a tank level from the vessel floor, not from the same zero the elevations use.
-$ec_lang['lpn_tank_elev_tip']='Elevation of the tank bottom. Water depths in the tank are measured up from here.';
+// A tank has two elevations (Tom, 2026-10-11): Elevation is the ground, the pressure datum as at a
+// junction; Base elevation is the tank bottom, EPANET's [TANKS] Elevation, from which depth and
+// volume are measured.
+$ec_lang['lpn_field_tank_base_elev']='Base elevation';
+$ec_lang['lpn_field_tank_base_elev_tip']='Elevation of the tank bottom, from which water depth and volume are measured. Left blank, the bottom is at the ground elevation.';
+$ec_lang['lpn_tank_ground_elev_tip']='Ground elevation at the tank. Pressure at the tank is measured from here, as at a junction.';
 $ec_lang['lpn_field_tank_level']='Water depth';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_field_tank_level_tip']='Depth of water in the tank, measured up from the tank bottom.';
@@ -1018,7 +1023,7 @@ $ec_lang['lpn_field_tank_diameter_tip']='For a vertical cylinder. Same units as 
 // 'head' is a documented trap term in glossary.json. This tip names it as a level, which is the
 // same guard lpn_field_head_tip carries for the reservoir.
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_tank_head_tip']='Water surface elevation in the tank: the tank bottom elevation plus the water depth.';
+$ec_lang['lpn_tank_head_tip']='Water surface elevation in the tank: the base elevation plus the water depth.';
 $ec_lang['lpn_close']='Close';
 // The corner buttons beside every standing box's X (Task 441). Each is an icon-only button, so the
 // value is its name: the hover tip and the screen reader's label at once. Auto-hide is a toggle and
@@ -1133,7 +1138,7 @@ $ec_lang['lpn_guide_find_notes_def']='<ul><li>Values are compared at full precis
 // Where the Guide lists its own keys, so that a search for one finds it.
 $ec_lang['lpn_guide_using_heading']='Using the guide';
 $ec_lang['lpn_guide_keys_term']='Guide keyboard shortcuts';
-$ec_lang['lpn_guide_keys_def']='<table class="lpn-notes-table"><tbody><tr><td>?</td><td>Open the guide at the control under the pointer or holding focus.</td></tr><tr><td>F1</td><td>Open the guide at the entry for the box that has focus.</td></tr><tr><td>Ctrl+K</td><td>Open the guide with the current selection in the search field.</td></tr><tr><td>/</td><td>Select the search field while the guide has focus.</td></tr><tr><td>Esc</td><td>Close the guide and return to where you were.</td></tr></tbody></table>';
+$ec_lang['lpn_guide_keys_def']='<table class="lpn-notes-table"><tbody><tr><td>?</td><td>Open the guide at the control under the pointer or holding focus.</td></tr><tr><td>F1</td><td>Open the guide at the entry for the box that has focus.</td></tr><tr><td>Ctrl+K</td><td>Open the guide with the selected text in the search field.</td></tr><tr><td>/</td><td>Select the search field while the guide has focus.</td></tr><tr><td>Esc</td><td>Close the guide and return to where you were.</td></tr></tbody></table>';
 // Under a toolbar button in the User guide, naming the menu row that does the same thing.
 // {menu} becomes a path such as "Edit > Delete", drawn with chevrons; keep {menu} as it is.
 $ec_lang['lpn_guide_also']='Also in {menu}';
@@ -1151,7 +1156,7 @@ $ec_lang['lpn_hotkeys_map_term']='Map keyboard shortcuts';
 $ec_lang['lpn_hotkeys_map_def']='<table class="lpn-notes-table"><tbody><tr><td>1 or Esc</td><td>Select.</td></tr><tr><td>2</td><td>Add a junction.</td></tr><tr><td>3</td><td>Add a reservoir.</td></tr><tr><td>4</td><td>Add a tank.</td></tr><tr><td>5</td><td>Add a pipe.</td></tr><tr><td>6</td><td>Add a pump.</td></tr><tr><td>7</td><td>Add a valve.</td></tr><tr><td>8</td><td>Add a customer.</td></tr><tr><td>9</td><td>Add text.</td></tr><tr><td>Delete</td><td>Delete the selection.</td></tr><tr><td>Ctrl+Z</td><td>Undo the last change.</td></tr><tr><td>+ or =</td><td>Zoom in.</td></tr><tr><td>-</td><td>Zoom out.</td></tr></tbody></table>';
 // The W row of the Map table. Its own key, spliced into the table by Looped-Network.php, because a new row in
 // lpn_hotkeys_map_def is new markup that 'lang markup matches English' refuses until all 26 languages carry it.
-$ec_lang['lpn_hotkeys_zoomwin_def']='Zoom Window: drag a rectangle to zoom to.';
+$ec_lang['lpn_hotkeys_zoomwin_def']='Zoom Window: drag a rectangle on the map to zoom to that area.';
 // The menu chords (Task 748): Alt+Shift+letter on Windows and Linux, Ctrl+Option on a Mac, and F10.
 // Exactly two rows (Tom, 2026-10-03: "show only the Alt+Shift and the F10"); the letters themselves
 // are assigned per language by menuMnemonics() and shown on the menus, never listed here.
@@ -1452,7 +1457,7 @@ $ec_lang['lpn_area_none']='Nothing found in that area.';
 $ec_lang['lpn_tool_vertices_tip']='Add and remove pipe vertices. Specify a point on a pipe to add a vertex, select a vertex to remove it, and drag a vertex to move it. A vertex changes automatic length, but doesn’t add or change minor (local) losses.';
 $ec_lang['lpn_tool_undo_tip']='Undo history length = 20 actions';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_tool_zoom_extent_tip']='Fit the whole network to the map window. For Zoom Window with no fit first, press W or click the small triangle in the corner of the Zoom to fit toolbar button. See also upper right map zoom controls.';
+$ec_lang['lpn_tool_zoom_extent_tip']='Fit the whole network to the map window. To zoom to a rectangle you drag instead, press W or click the small triangle in the corner of the Zoom to fit toolbar button. See also the zoom controls at the upper right of the map.';
 $ec_lang['lpn_tool_zoom_window_tip']='Specify corners or drag a rectangle. Press again for Zoom to fit.';
 // Tom's wording, 2026-09-25.
 $ec_lang['lpn_zoom_in_tip']='Zoom in. Shortcut: +';
@@ -2002,7 +2007,7 @@ $ec_lang['lpn_contour_menu']='Contour';
 $ec_lang['lpn_contour_tip']='Show a contour plot on the map: the node colors spread along and beside the pipes, with labeled contour lines. Opens a box to tune it or turn it off.';
 $ec_lang['lpn_contour_plot']='Contour plot';
 $ec_lang['lpn_contour_show']='Show contours';
-$ec_lang['lpn_contour_show_tip']='Clear to hide the fill and the contour lines; select to bring them back as they were. Node colors stay.';
+$ec_lang['lpn_contour_show_tip']='Clear to hide the fill and the contour lines; check to bring them back as they were. Node colors stay.';
 $ec_lang['lpn_contour_fill']='Fill';
 $ec_lang['lpn_contour_fill_tip']='Smooth blends the colors from one class to the next. Bands paints each class of the color key flat.';
 $ec_lang['lpn_contour_fill_smooth']='Smooth';
@@ -2582,7 +2587,7 @@ $ec_lang['lpn_notes_6_term']='Table columns help';
 $ec_lang['lpn_notes_6_def']='<table class="lpn-notes-table"><tbody><tr><td>Click heading</td><td>Select column</td></tr><tr><td>Ctrl+click or Shift+click another heading</td><td>Add or extend column selection</td></tr><tr><td>Drag or use Manage columns… in right-click or ⋮ menu</td><td>Move (reorder) selected column(s)</td></tr><tr><td>Hover a heading\'s top corner, or select or Tab into a heading</td><td>Menu ⋮ and sort arrow.</td></tr><tr><td>Right-click heading or ⋮ menu in heading top right corner</td><td>Hide, Show all, or Manage visibility and order</td></tr><tr><td>Arrow icon in heading top right corner</td><td>Sort by column</td></tr><tr><td>Right-click, ⋮ menu in heading top right corner, or Ctrl+Shift+V</td><td>Paste as new rows at end of table</td></tr></tbody></table>';
 $ec_lang['lpn_notes_7_term']='Table keyboard shortcuts';
 // R-311, his own row: "Ctrl+Shift+V | Paste as new rows at end of table".
-$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>Arrow keys</td><td>Navigate.</td></tr><tr><td>Tab, Enter</td><td>Finish entry and navigate across / down one cell.</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>Navigate backward.</td></tr><tr><td>Shift+arrow keys</td><td>Extend the selection.</td></tr><tr><td>Ctrl+C</td><td>Copy the selection.</td></tr><tr><td>Ctrl+D</td><td>Fill the selection down from its top row.</td></tr><tr><td>Ctrl+Enter</td><td>Fill the selection with the active cell\'s value.</td></tr><tr><td>Ctrl+A</td><td>Select the whole table.</td></tr><tr><td>Ctrl+Shift+V</td><td>Paste as new rows at end of table.</td></tr><tr><td>Ctrl+Shift+PageDown, Ctrl+Shift+PageUp</td><td>Switch to the next or previous tab, whether a table or a graph.</td></tr><tr><td>Delete</td><td>Clear the active cell. To clear a selected range, right-click and choose Delete.</td></tr><tr><td>F2</td><td>Open a cell to edit it.</td></tr><tr><td>Esc</td><td>Cancel an edit.</td></tr></tbody></table>';
+$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>Arrow keys</td><td>Navigate.</td></tr><tr><td>Tab, Enter</td><td>Finish the entry and move one cell across (Tab) or down (Enter).</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>Move one cell back (Shift+Tab) or up (Shift+Enter).</td></tr><tr><td>Shift+arrow keys</td><td>Extend the selection.</td></tr><tr><td>Ctrl+C</td><td>Copy the selection.</td></tr><tr><td>Ctrl+D</td><td>Fill the selection down from its top row.</td></tr><tr><td>Ctrl+Enter</td><td>Fill the selection with the active cell\'s value.</td></tr><tr><td>Ctrl+A</td><td>Select the whole table.</td></tr><tr><td>Ctrl+Shift+V</td><td>Paste as new rows at end of table.</td></tr><tr><td>Ctrl+Shift+PageDown, Ctrl+Shift+PageUp</td><td>Switch to the next or previous tab, whether a table or a graph.</td></tr><tr><td>Delete</td><td>Clear the active cell. To clear a selected range, right-click and choose Delete.</td></tr><tr><td>F2</td><td>Open a cell to edit it.</td></tr><tr><td>Esc</td><td>Cancel an edit.</td></tr></tbody></table>';
 // COLOR BAND LIMITS ARE FROZEN, NOT LIVE (Task 448). Tom, 2026-08-19: *"colors are subconsciously
 // expected to be stable through an animation... recomputing at each time step gives a wrong
 // impression of the system. In this we are ratifying EPANET."* The mechanism is
@@ -2842,7 +2847,7 @@ $ec_lang['lpn_mode_add_chain']='Mode: Junction Pipe Chain. Specify a point on th
 // label itself can be dragged. Both economize on translation for later, per CLAUDE.md's tip-only
 // whole-label-wrap convention -- the button itself is already the click target (no separate "?"
 // glyph needed), so the tip goes straight on the button as a title, matched to the .ec-help class.
-$ec_lang['lpn_tip_select']='Use this mode to change, move, and drag assets and text on the map, or to pan the map. This is the default mode for the map. Pressing Esc a second time unselects whatever is selected.';
+$ec_lang['lpn_tip_select']='Use this mode to change, move, and drag assets and text on the map, or to pan the map. This is the default mode for the map. Pressing Esc a second time clears the selection.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_field_auto']='Auto';
 $ec_lang['lpn_method_switch_confirm']='Changing the friction method does not change the roughness numbers already entered on your pipes, and a roughness for one method is meaningless for another. Check every pipe after this. Change it anyway?';
@@ -2943,7 +2948,7 @@ $ec_lang['lpn_labels_show_tip']='The order in which values appear on a label. Th
 // Tom's own words for the control (R-331: "a code or a toggle to 'Use units' for the After string").
 // It heads a narrow column and names each row's tick box.
 $ec_lang['lpn_labels_use_units']='Use units';
-$ec_lang['lpn_labels_use_units_tip']='Select to show the unit in the After box and on the label, and to update it when the units change. Clear to enter custom After text.';
+$ec_lang['lpn_labels_use_units_tip']='Check to show the unit in the After box and on the label, and to update it when the units change. Clear to enter custom After text.';
 // EPANET's own name for a link's starting state, beside the Status row, which is the run's answer.
 $ec_lang['lpn_labels_init_status']='Initial status';
 // The Symbology index, reworked (Tom, R-333: "Node labels, Node colors, Link labels, Link colors,
@@ -3219,7 +3224,7 @@ $ec_lang['lpn_scenario_delete_confirm']='Delete the scenario {name}, and its {n}
 $ec_lang['lpn_scenario_delete_has_children']='The scenario {name} cannot be deleted while other scenarios inherit from it: {list}. Delete those first, or give them another parent.';
 $ec_lang['lpn_scenario_override']='Override in this scenario';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_scenario_override_tip']='Selected means this scenario overrides its parent for this value, even when the number is the same. Clear the box to use its parent\'s.';
+$ec_lang['lpn_scenario_override_tip']='Checked means this scenario overrides its parent for this value, even when the number is the same. Clear the box to use its parent\'s.';
 // "Base scenario", not bare "Base" -- an ENGLISH fix, so this needs no _syn either. This is the one
 // place the polysemy genuinely bites: here the word sits beside a NUMBER, in a field popup with no
 // scenario dropdown nearby to frame it, which is exactly the reading that invites "base amount".
@@ -3229,12 +3234,12 @@ $ec_lang['lpn_scenario_base_value']='Base scenario: {value}';
 $ec_lang['lpn_scenario_deactivated']='{id} is excluded from the network in {scenario}. It remains in the drawing and in the other scenarios.';
 $ec_lang['lpn_scenario_delete_in_base']='To remove it from the drawing, delete it in the {base} scenario.';
 $ec_lang['lpn_scenario_only_deleted']='{id} is deleted. It was part of {scenario} only.';
-$ec_lang['lpn_scenario_delete_blocked']='{id} is not deleted, because link {link} ends on it and also exists outside {scenario}. To delete both, delete them in the {base} scenario.';
+$ec_lang['lpn_scenario_delete_blocked']='{id} is not deleted, because link {link} ends on it, and that link also exists outside {scenario}. To delete both, delete them in the {base} scenario.';
 $ec_lang['lpn_scenario_push_btn']='Apply Base values to all scenarios';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_scenario_push_tip']='Every scenario goes back to the Base value for the properties whose labels are showing right now. Values entered for them in any scenario are discarded.';
 $ec_lang['lpn_scenario_basic']='Basic mode';
-$ec_lang['lpn_scenario_basic_tip']='Selected: a scenario consists only of the values set in it, and the Scenario manager and the Scenarios table are not shown. Cleared: both are shown. Choosing Scenario manager turns Basic mode off.';
+$ec_lang['lpn_scenario_basic_tip']='Checked: a scenario consists only of the values set in it, and the Scenario manager and the Scenarios table are not shown. Cleared: both are shown. Choosing Scenario manager turns Basic mode off.';
 $ec_lang['lpn_sm_title']='Scenario manager';
 $ec_lang['lpn_sm_menu']='Scenario manager…';
 $ec_lang['lpn_sm_basic_off']='Basic mode is off, so the Scenario manager and the Scenarios table are shown.';
@@ -4287,7 +4292,7 @@ $ec_lang['lpn_library_pattern_none']='No pattern';
 $ec_lang['lpn_choice_default']='Default';
 $ec_lang['lpn_settings_default_pattern']='Default demand pattern';
 $ec_lang['lpn_settings_default_pattern_tip']='Every junction with no pattern uses this one.';
-$ec_lang['lpn_junction_pattern_unknown']='No pattern in this project is named {id}, so the junction was left as it was.';
+$ec_lang['lpn_junction_pattern_unknown']='No pattern in this project has the ID {id}, so the junction was left as it was.';
 $ec_lang['lpn_settings_default_pattern_none']='None (constant)';
 $ec_lang['lpn_demand_pattern_default']='(default: {id})';
 $ec_lang['lpn_demand_pattern_constant']='(constant)';
@@ -4781,7 +4786,7 @@ $ec_lang['lpn_inp_drop_pressure_unit']='This file states a pressure unit other t
 
 // Map > Screenshot (Tom, 2026-10-05): a snipping tool that re-draws the dragged map area larger than its screen size (3x unless the Screenshot box says otherwise).
 $ec_lang['lpn_screenshot_menu']='Screenshot';
-$ec_lang['lpn_screenshot_tip']='Take a sharper-than-screen picture of the map area you drag, to mark up and then copy into a report with the Copy button. Click without dragging to take the whole map.';
+$ec_lang['lpn_screenshot_tip']='Take a picture of the map area you drag, at a higher resolution than the screen. Mark it up, then copy it into a report with the Copy button. Click without dragging to take the whole map.';
 $ec_lang['lpn_screenshot_hint']='Drag a rectangle over the map, or click for the whole map. Esc cancels.';
 $ec_lang['lpn_screenshot_copied']='Screenshot copied.';
 $ec_lang['lpn_screenshot_saved']='The clipboard is not available here, so the screenshot was downloaded as a PNG file.';

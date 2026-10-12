@@ -867,7 +867,7 @@ $ec_lang['lpn_field_head_tip']='በማጠራቀሚያው ውስጥ ያለው የ
 // pipe-diameter unit would put a 15 m tank on screen as 15000. Same reason the three levels say
 // "measured up from the tank bottom" rather than leaving the datum to be guessed -- EPANET measures
 // a tank level from the vessel floor, not from the same zero the elevations use.
-$ec_lang['lpn_tank_elev_tip']='የታንኩ ግርጌ ከፍታ። በታንኩ ውስጥ ያለው የውሃ ጥልቀት ከዚህ ተነስቶ ወደ ላይ ይለካል።';
+$ec_lang['lpn_field_tank_base_elev_tip']='የታንኩ ግርጌ ከፍታ፣ የውሃ ጥልቀትና መጠን ከዚህ ተነስተው ይለካሉ። ባዶ ሲተው ግርጌው በመሬት ከፍታ ላይ ነው።';
 $ec_lang['lpn_field_tank_level']='የውሃ ጥልቀት';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_field_tank_level_tip']='በታንኩ ውስጥ ያለው የቆመ ውሃ ጥልቀት፣ ከታንኩ ግርጌ ተነስቶ ወደ ላይ የሚለካ። የውሃው ወለል የታንኩ ግርጌ ከፍታ ከዚህ ጥልቀት ጋር ተደምሮ ነው።';
@@ -883,7 +883,7 @@ $ec_lang['lpn_field_tank_diameter_tip']='ከጎን እስከ ጎን ያለው �
 // 'head' is a documented trap term in glossary.json. This tip names it as a level, which is the
 // same guard lpn_field_head_tip carries for the reservoir.
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_tank_head_tip']='በታንኩ ውስጥ ያለው የውሃ ወለል ከፍታ፦ የታንኩ ግርጌ ከፍታ ከውሃ ጥልቀት ጋር ተደምሮ። ፈታቹ ለታንኩ የሚጠቀመው ደረጃ ይህ ነው።';
+$ec_lang['lpn_tank_head_tip']='በታንኩ ውስጥ ያለው የውሃ ወለል ከፍታ፦ የግርጌ ከፍታ ሲደመር የውሃ ጥልቀት።';
 $ec_lang['lpn_close']='ዝጋ';
 // The property popup's own name, in its drag bar (Tom, 2026-09-08: *"maybe the right title is
 // 'Properties'"*). It names the BOX, not the element in it: lpn_popup_title below the bar carries
@@ -1179,7 +1179,7 @@ $ec_lang['lpn_area_none']='በዚያ ቦታ ውስጥ ምንም አልተገኘ�
 $ec_lang['lpn_tool_vertices_tip']='የቧንቧ መታጠፊያዎችን ጨምር እና አስወግድ። መታጠፊያ ለመጨመር በቧንቧ ላይ ነጥብ ያመልክቱ፣ ለማስወገድ መታጠፊያ ይምረጡ፣ ለማንቀሳቀስ መታጠፊያ ይጎትቱ። መታጠፊያ አውቶማቲክ ርዝመትን ይለውጣል፣ ነገር ግን ጥቃቅን (አካባቢያዊ) ኪሳራዎችን አይጨምርም ወይም አይለውጥም።';
 $ec_lang['lpn_tool_undo_tip']='የመቀልበስ ታሪክ ርዝመት = 20 ድርጊቶች';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_tool_zoom_extent_tip']='መላውን መረብ በካርታ መስኮቱ ውስጥ አስማማ። ለማጉያ መስኮት እንደገና ይጫኑ። እንዲሁም በላይኛው ቀኝ ያሉትን የካርታ ማጉያ መቆጣጠሪያዎች ይመልከቱ።';
+$ec_lang['lpn_tool_zoom_extent_tip']='መላውን መረብ በካርታ መስኮቱ ውስጥ አስማማ። መጀመሪያ ማስማማት ሳይኖር ለመስኮት ማጉላት፣ W ይጫኑ ወይም በሁሉንም አሳይ የመሳሪያ አሞሌ አዝራር ጥግ ላይ ያለውን ትንሽ ሦስት ማዕዘን ጠቅ ያድርጉ። በላይኛው ቀኝ ያሉትን የካርታ ማጉያ መቆጣጠሪያዎችም ይመልከቱ።';
 $ec_lang['lpn_tool_zoom_window_tip']='ማዕዘኖችን ያመልክቱ ወይም አራት ማዕዘን ይጎትቱ። ሁሉንም ገጥሞ ለማጉላት እንደገና ይጫኑ።';
 // Tom's wording, 2026-09-25.
 $ec_lang['lpn_zoom_in_tip']='አጉላ። አቋራጭ፦ +';
@@ -1196,7 +1196,7 @@ $ec_lang['lpn_find_menu_tip']='ቀላል ወይም ውስብስብ ፈልግና 
 $ec_lang['lpn_help_icons']='የመሳሪያ አሞሌ ምልክቶች ትርጉም';
 // ---- The right panel: Visibility ----
 $ec_lang['lpn_pane_right_toggle']='ታይነት';
-$ec_lang['lpn_color_legend_open_tip']='የቀለም አሰጣጥ ቅንብሮችን ለመክፈትና እነዚህን ቀለሞች ለመቀየር ይምረጡ።';
+$ec_lang['lpn_color_legend_open_tip']='የቀለም አሰጣጥ ቅንብሮችን ለመክፈትና እነዚህን ቀለሞች ለመቀየር ይጫኑ።';
 $ec_lang['lpn_color_node_field']='ነጥብ ቀለም በ';
 $ec_lang['lpn_color_link_field']='ቧንቧ ቀለም በ';
 $ec_lang['lpn_color_ramp_sequential']='ተከታታይ';
@@ -1355,7 +1355,7 @@ $ec_lang['lpn_run_menu_tip']='ማስመሰያን አሂድ። በቅንብሮች
 // out over time, and this switch is about the run, not about the drawing.
 $ec_lang['lpn_settings_auto_run']='በራስ-ሰር እንደገና አስላ';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_settings_auto_run_tip']='እንደገና ማስላት በጣም ዘገምተኛ ከሆነ ያጥፉት። የአስላ አዝራሩን ይደብቃል።';
+$ec_lang['lpn_settings_auto_run_tip']='እንደገና ማስላት በጣም ዘገምተኛ ከሆነ ያጥፉት። ይህ ሲበራ የአስላ አዝራሩ ተደብቋል።';
 // **AN EDIT SAYS NOTHING AT ALL WHEN THE SWITCH IS OFF** (Tom, 2026-09-19: *"Recalc off Old
 // values: Leave in place stale. Don't clear. Trust the user."*). `lpn_manual_results_cleared`
 // stood here for part of one day and is DELETED, English-only, never translated: it announced a
@@ -1556,7 +1556,7 @@ $ec_lang['lpn_profile_title']='በመንገድ ላይ ያለ መገለጫ';
 // the map to see the path, click to add a stop, double-click to finish.
 $ec_lang['lpn_profile_draw_start']='መንገዱ የሚጀምርበትን ነጥብ ይምረጡ።';
 $ec_lang['lpn_profile_draw_more']='መንገዱን ለማየት በካርታው ላይ ያንቀሳቅሱ። ነጥብ ለመጨመር ይምረጡት። ለመጨረስ ሁለቴ ይጫኑ። Esc ይሰርዛል።';
-$ec_lang['lpn_profile_draw_blocked']='ከ{a} ወደ {b} ምንም መንገድ የለም። ሌላ መገናኛ ይምረጡ።';
+$ec_lang['lpn_profile_draw_blocked']='ከ{a} ወደ {b} ምንም መንገድ የለም። ሌላ ነጥብ ይምረጡ።';
 $ec_lang['lpn_profile_tap_start']='መንገዱ የሚጀምርበትን ነጥብ ይምረጡ።';
 $ec_lang['lpn_profile_tap_more']='መንገዱን ለማየት ነጥብ ይምረጡ። ለመጨመር ተጭነው ይያዙ። ለመጨረስ ሁለቴ ይንኩ። ለመሰረዝ መገለጫን እንደገና ይጫኑ።';
 $ec_lang['lpn_profile_say_idle']='በካርታው ላይ አዲስ መንገድ ለመምረጥ መገለጫን እንደገና ይጫኑ።';
@@ -2084,7 +2084,7 @@ $ec_lang['lpn_notes_6_term']='የሠንጠረዥ አምዶች እርዳታ';
 $ec_lang['lpn_notes_6_def']='<table class="lpn-notes-table"><tbody><tr><td>ራስጌ ይጫኑ</td><td>አምድ ምረጥ</td></tr><tr><td>Ctrl+click ወይም Shift+click ሌላ ራስጌ</td><td>የአምድ ምርጫ ጨምር ወይም ዘርጋ</td></tr><tr><td>ይጎትቱ ወይም በቀኝ-ጠቅ ወይም ⋮ ምናሌ ውስጥ አምዶችን አስተዳድር… ይጠቀሙ</td><td>የተመረጡ አምድ(ዎችን) አንቀሳቅስ (ደርድር)</td></tr><tr><td>የራስጌ የላይኛውን ጠርዝ ያንዣብቡ፣ ወይም ወደ ራስጌ ይምረጡ ወይም Tab ያድርጉ</td><td>ምናሌ ⋮ እና የደርድር ቀስት።</td></tr><tr><td>ራስጌ በቀኝ-ጠቅ ያድርጉ ወይም በራስጌ የላይኛው ቀኝ ጠርዝ ላይ ያለው ⋮ ምናሌ</td><td>ደብቅ፣ ሁሉንም አሳይ ወይም ታይነትና ቅደም ተከተል አስተዳድር</td></tr><tr><td>በራስጌ የላይኛው ቀኝ ጠርዝ ላይ ያለው የቀስት ምልክት</td><td>በአምድ ደርድር</td></tr><tr><td>በቀኝ-ጠቅ፣ በራስጌ የላይኛው ቀኝ ጠርዝ ላይ ያለው ⋮ ምናሌ፣ ወይም Ctrl+Shift+V</td><td>እንደ አዲስ ረድፎች በሠንጠረዡ መጨረሻ ለጥፍ</td></tr></tbody></table>';
 $ec_lang['lpn_notes_7_term']='የሠንጠረዥ የቁልፍ ሰሌዳ አቋራጮች';
 // R-311, his own row: "Ctrl+Shift+V | Paste as new rows at end of table".
-$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>የቀስት ቁልፎች</td><td>ዙር።</td></tr><tr><td>Tab, Enter</td><td>ግቤትን ጨርስና በአንድ ክፍል ላይ ተሻገር / ውረድ።</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>ወደ ኋላ ዙር።</td></tr><tr><td>Shift+የቀስት ቁልፎች</td><td>ምርጫውን ዘርጋ።</td></tr><tr><td>Ctrl+C</td><td>ምርጫውን ገልብጥ።</td></tr><tr><td>Ctrl+D</td><td>ምርጫውን ከላይኛው ረድፉ ወደታች ሙላ።</td></tr><tr><td>Ctrl+Enter</td><td>ምርጫውን በንቁ ክፍሉ ዋጋ ሙላ።</td></tr><tr><td>Ctrl+A</td><td>ጠቅላላውን ሠንጠረዥ ምረጥ።</td></tr><tr><td>Ctrl+Shift+V</td><td>እንደ አዲስ ረድፎች በሠንጠረዡ መጨረሻ ለጥፍ።</td></tr><tr><td>Ctrl+Shift+PageDown, Ctrl+Shift+PageUp</td><td>ወደ ቀጣዩ ወይም ቀዳሚው ትር ቀይር፣ ሠንጠረዥም ይሁን ግራፍ።</td></tr><tr><td>Delete</td><td>ክፍል አጽዳ።</td></tr><tr><td>F2</td><td>ክፍል ለማስተካከል ክፈት።</td></tr><tr><td>Esc</td><td>ማስተካከል ተወው።</td></tr></tbody></table>';
+$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>የቀስት ቁልፎች</td><td>ተንቀሳቀስ።</td></tr><tr><td>Tab, Enter</td><td>ግቤቱን ጨርስና አንድ ክፍል ወደ ጎን (Tab) ወይም ወደ ታች (Enter) ተንቀሳቀስ።</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>አንድ ክፍል ወደ ኋላ (Shift+Tab) ወይም ወደ ላይ (Shift+Enter) ተንቀሳቀስ።</td></tr><tr><td>Shift+የቀስት ቁልፎች</td><td>ምርጫውን ዘርጋ።</td></tr><tr><td>Ctrl+C</td><td>ምርጫውን ቅዳ።</td></tr><tr><td>Ctrl+D</td><td>ምርጫውን ከላይኛው ረድፉ ወደ ታች ሙላ።</td></tr><tr><td>Ctrl+Enter</td><td>ምርጫውን በንቁ ክፍሉ ዋጋ ሙላ።</td></tr><tr><td>Ctrl+A</td><td>ሙሉውን ሠንጠረዥ ምረጥ።</td></tr><tr><td>Ctrl+Shift+V</td><td>በሠንጠረዡ መጨረሻ እንደ አዲስ ረድፎች ለጥፍ።</td></tr><tr><td>Ctrl+Shift+PageDown, Ctrl+Shift+PageUp</td><td>ሠንጠረዥም ይሁን ግራፍ ወደ ቀጣዩ ወይም ቀዳሚው ትር ቀይር።</td></tr><tr><td>Delete</td><td>ንቁውን ክፍል አጽዳ። የተመረጠ ክልልን ለማጽዳት በቀኝ ጠቅ ያድርጉና ሰርዝ ይምረጡ።</td></tr><tr><td>F2</td><td>ክፍልን ለማስተካከል ክፈት።</td></tr><tr><td>Esc</td><td>ማስተካከሉን ተው።</td></tr></tbody></table>';
 // COLOR BAND LIMITS ARE FROZEN, NOT LIVE (Task 448). Tom, 2026-08-19: *"colors are subconsciously
 // expected to be stable through an animation... recomputing at each time step gives a wrong
 // impression of the system. In this we are ratifying EPANET."* The mechanism is
@@ -2512,7 +2512,7 @@ $ec_lang['lpn_backdrop_scale_prompt2']='በሁለቱ ነጥቦች መካከል �
 // one move. The second names the panel it is about to show, so the alert and the panel read as one
 // step rather than two.
 $ec_lang['lpn_backdrop_position_prompt1']='ለእንቅስቃሴው የመነሻ ነጥቡን (በምስሉ ላይ) ያመልክቱ።';
-$ec_lang['lpn_backdrop_position_prompt2']='ለመድረሻው ነጥብ ዘዴውን ይምረጡ፣ ከዚያም ቀጥል ይምረጡ።';
+$ec_lang['lpn_backdrop_position_prompt2']='ለመድረሻው ነጥብ ዘዴውን ይምረጡ፣ ከዚያም ቀጥል ይጫኑ።';
 // The standing "you are in the middle of something" bar, shown while a background-image scale or
 // move is waiting for a click. It carries the only visible way out of that state.
 $ec_lang['lpn_backdrop_busy']='የበስተጀርባ ምስሉን በማስተካከል ላይ።';
@@ -3943,7 +3943,7 @@ $ec_lang['lpn_analyze_menu_tip']='መረቡን በቅጂ ላይ የሚያሩጡ 
 $ec_lang['lpn_crit_menu']='የወሳኝነት ትንተና…';
 $ec_lang['lpn_crit_menu_tip']='እያንዳንዱን ቧንቧ፣ ፓምፕና ቫልቭ አንድ በአንድ ከመረቡ አስወግድና በስርዓቱ ላይ ያለውን ውጤት ሪፖርት አድርግ።';
 $ec_lang['lpn_crit_title']='የወሳኝነት ትንተና';
-$ec_lang['lpn_crit_intro']='እያንዳንዱ አካል በተራ ከመረቡ ይወጣል፣ መረቡም በገባሪው ሁኔታ ውስጥ በማያ ገጹ ላይ ባለው የጊዜ ደረጃ ይፈታል። በፕሮጀክትዎ ውስጥ ምንም ነገር አይለወጥም፤ ጠቅላላው ሩጫ በቅጂ ላይ ይደረጋል።';
+$ec_lang['lpn_crit_intro']='እያንዳንዱ አካል በተራ ከመረቡ ይወጣል፣ መረቡም በገባሪው ሁኔታ ውስጥ በማያ ገጹ ላይ ባለው የጊዜ ደረጃ ይፈታል። በፕሮጀክቱ ውስጥ ምንም ነገር አይለወጥም፤ ጠቅላላው ስራ በቅጂ ላይ ይደረጋል።';
 $ec_lang['lpn_crit_scope']='የሚሰበሩ አገናኞች';
 $ec_lang['lpn_crit_scope_tip']='ሁሉም ቧንቧዎች፣ ፓምፖችና ቫልቮች፣ ወይም በካርታው ላይ የተመረጡት ብቻ። ከማሩጥዎ በፊት ስብስቡን ይምረጡ።';
 $ec_lang['lpn_crit_scope_all']='ሁሉም አገናኞች';
@@ -4008,7 +4008,7 @@ $ec_lang['lpn_change_type_menu']='ዓይነት ቀይር';
 $ec_lang['lpn_change_type_tip']='የተመረጡትን ነጥቦች ወደ መገናኛዎች፣ ማጠራቀሚያዎች ወይም ታንኮች፣ ወይም የተመረጡትን ግንኙነቶች ወደ ቧንቧዎች፣ ፓምፖች ወይም ቫልቮች ይቀይራል። እያንዳንዱ መለያውን፣ ቦታውን፣ ግንኙነቶቹን እና አዲሱ ዓይነትም ያለውን እያንዳንዱን ዋጋ ይይዛል። ማንኛውም ነገር የሚጠፋ ከሆነ፣ መጀመሪያ ይጠየቃሉ።';
 $ec_lang['lpn_change_type_ok']='ቀይር';
 $ec_lang['lpn_change_type_lost']='እነዚህ ዋጋዎች ይጠፋሉ፦';
-$ec_lang['lpn_change_type_key']='መለያ፦ የጠፋ ግቤት';
+$ec_lang['lpn_change_type_key']='እያንዳንዱ መስመር፦ መለያ፦ የሚጠፋው ንብረትና ዋጋ';
 $ec_lang['lpn_change_type_line']='{id}፦ {property} {value}';
 $ec_lang['lpn_change_type_line_scenario']='{id}፦ {property} {value}፣ በሁኔታ {scenario}';
 $ec_lang['lpn_change_type_more']='እና {n} ተጨማሪ።';
@@ -4096,7 +4096,7 @@ $ec_lang['lpn_choice_default']='ነባሪ';
 $ec_lang['lpn_ds_menu']='የፍላጎት ማመጣጠኛ…';
 $ec_lang['lpn_ds_menu_tip']='በመረቡ ቅጂ ላይ ፍላጎቶችን ያባዙና ግፊቶቹንና ፍጥነቶቹን ይመልከቱ፣ ወይም ስርዓቱ ሊሸከመው የሚችለውን ትልቁን የፍላጎት ማመጣጠኛ ያግኙ።';
 $ec_lang['lpn_ds_title']='የፍላጎት ማመጣጠኛ';
-$ec_lang['lpn_ds_intro']='በተመረጡት መገናኛዎች ላይ ያሉትን ፍላጎቶች በፍላጎት ማመጣጠኛው ለማባዛት እና ግፊቶቹንና ፍጥነቶቹን ለማየት አስላ አዝራሩን ይምረጡ።\n\nእነዚህ ሁሉ መገናኛዎች የሚፈቀደውን ዝቅተኛ ግፊት ቢያንስ የሚጠብቁበትን ትልቁን የፍላጎት ማመጣጠኛ፣ እስከ ቅርብ {step} ድረስ ለማግኘት ፈልግ አዝራሩን ይምረጡ፤ ከ0 እስከ {max} ይፈልጋል።\n\nሁለቱም በመረቡ ቅጂ ላይ ይሠራሉ፣ በስክሪኑ ላይ ባለው የጊዜ ደረጃ በንቁ ሁኔታ ተፈትተው፣ ስለዚህ በፕሮጀክትዎ ውስጥ ምንም አይለወጥም። የሚመጣጠነው ያ የጊዜ ደረጃ ብቻ ነው፣ ደረጃዎችና ሁኔታዎችም ከእሱ ይወሰዳሉ፤ ከፍተኛውን ለመፈተን ከማስኬድዎ በፊት ሰዓቱን ወደ ከፍተኛ ፍላጎት ያንቀሳቅሱ።';
+$ec_lang['lpn_ds_intro']='በተመረጡት መገናኛዎች ላይ ያሉትን ፍላጎቶች በፍላጎት ማመጣጠኛው ለማባዛት እና ግፊቶቹንና ፍጥነቶቹን ለማየት አስላ አዝራሩን ይጫኑ።\n\nእነዚህ ሁሉ መገናኛዎች የሚፈቀደውን ዝቅተኛ ግፊት ቢያንስ የሚጠብቁበትን ትልቁን የፍላጎት ማመጣጠኛ፣ እስከ ቅርብ {step} ድረስ ለማግኘት ፈልግ አዝራሩን ይጫኑ፤ ከ0 እስከ {max} ይፈልጋል።\n\nሁለቱም በመረቡ ቅጂ ላይ ይሠራሉ፣ በስክሪኑ ላይ ባለው የጊዜ ደረጃ በንቁ ሁኔታ ተፈትተው፣ ስለዚህ በፕሮጀክትዎ ውስጥ ምንም አይለወጥም። የሚመጣጠነው ያ የጊዜ ደረጃ ብቻ ነው፣ ደረጃዎችና ሁኔታዎችም ከእሱ ይወሰዳሉ፤ ከፍተኛውን ለመፈተን ከማስኬድዎ በፊት ሰዓቱን ወደ ከፍተኛ ፍላጎት ያንቀሳቅሱ።';
 $ec_lang['lpn_ds_scope']='የሚመጣጠኑ መገናኛዎች';
 $ec_lang['lpn_ds_scope_all']='ሁሉም መገናኛዎች';
 $ec_lang['lpn_ds_scope_selected']='የተመረጡ መገናኛዎች';
@@ -4174,7 +4174,7 @@ $ec_lang['lpn_pda_deficit_note']='ከፍላጎታቸው ያነሰ የሚቀበ�
 $ec_lang['lpn_diag_pda_pressures']='የሚያስፈልግ ግፊት ከዝቅተኛ ግፊት መብለጥ አለበት። አንዱን በቅንብሮች ውስጥ ይቀይሩ።';
 $ec_lang['lpn_inp_drop_pressure_unit']='ይህ ፋይል ይህ ገጽ ለፍሰት መለኪያ ክፍሉ ከሚያነበው የተለየ የግፊት መለኪያ ክፍል ይገልጻል፣ እሱም ለUS ክፍሎች psi ነው፣ ለሌሎች ደግሞ ሜትር። በፋይሉ ውስጥ ያለው እያንዳንዱ ግፊት በዚያ መንገድ ይነበባል፣ ስለዚህ በውስጡ ያሉትን የቫልቭ ቅንብሮች፣ ኤሚተሮች እና በግፊት የሚመሩ ገደቦች ያረጋግጡ። መስመሩ ተቀምጧል እና ተመልሶ ይጻፋል።';
 $ec_lang['lpn_screenshot_menu']='ስክሪንሾት';
-$ec_lang['lpn_screenshot_tip']='ከሚጎትቱት የካርታ ቦታ ከስክሪኑ የበለጠ ጥራት ያለው ሥዕል ይቅዱ፣ ወደ ሪፖርት ለመለጠፍ ዝግጁ። ሙሉውን ካርታ ለመውሰድ ሳይጎትቱ ይጫኑ።';
+$ec_lang['lpn_screenshot_tip']='በሚጎትቱት የካርታ አካባቢ ላይ ከማያ ገጹ የላቀ ጥራት ያለው ሥዕል ያንሱ። ምልክት ያድርጉበት፣ ከዚያ በቅዳ አዝራሩ ወደ ሪፖርት ይቅዱት። ሙሉውን ካርታ ለማንሳት ሳይጎትቱ ጠቅ ያድርጉ።';
 $ec_lang['lpn_screenshot_hint']='በካርታው ላይ አራት ማዕዘን ይጎትቱ፣ ወይም ለሙሉ ካርታ ይጫኑ። Esc ይሰርዛል።';
 $ec_lang['lpn_screenshot_copied']='ስክሪንሾት ተቀድቷል።';
 $ec_lang['lpn_screenshot_saved']='ክሊፕቦርዱ እዚህ አይገኝም፣ ስለዚህ ስክሪንሾቱ እንደ PNG ፋይል ወርዷል።';
@@ -4190,3 +4190,117 @@ $ec_lang['lpn_snip_tip_eraser']='መሰረዣ፦ ለማስወገድ ጭረትን
 $ec_lang['lpn_snip_tip_undo']='ቀልብስ (Ctrl+Z)';
 $ec_lang['lpn_snip_tip_redo']='ድገም (Ctrl+Y)';
 $ec_lang['lpn_screenshot_scale_tip']='የሥዕሉ መጠን በስክሪኑ ላይ ካለው ቦታ እጥፍ። ትልቁ የበለጠ ጥርት ያለ ነው፣ ፋይሉንም ትልቅ ያደርገዋል።';
+$ec_lang['points_data_points_heading']='የነጥቦች ውሂብ<br />(ቅርጸቱን ለማየት ቅዳ ይጠቀሙ)';
+$ec_lang['lpn_field_tank_base_elev']='የግርጌ ከፍታ';
+$ec_lang['lpn_tank_ground_elev_tip']='በታንኩ ቦታ ያለው የመሬት ከፍታ። በታንኩ ላይ ያለው ግፊት ከዚህ ተነስቶ ይለካል፣ ልክ እንደ መገናኛ።';
+$ec_lang['lpn_guide_about_heading']='ስለዚህ ካልኩሌተር';
+$ec_lang['lpn_guide_group_from']='ከ{menu}';
+$ec_lang['lpn_guide_menu_named']='{menu} ምናሌ';
+$ec_lang['lpn_help_manual']='መመሪያ';
+$ec_lang['lpn_guide_contents']='ይዘት';
+$ec_lang['lpn_guide_rail_hide']='ይዘቱን ደብቅ';
+$ec_lang['lpn_guide_rail_show']='ይዘቱን አሳይ';
+$ec_lang['lpn_guide_search']='መመሪያውን ፈልግ';
+$ec_lang['lpn_guide_boxes_heading']='ሳጥኖች';
+$ec_lang['lpn_guide_boxes_intro']='እያንዳንዱ ሳጥን ሊንቀሳቀስ፣ መጠኑ ሊቀየር፣ በካርታው ግራ ወይም ቀኝ ሊያያዝ ወይም ሊዘጋ ይችላል። በሳጥኑ ርዕስ አሞሌ ላይ ያለው ? እገዛውን ይከፍታል።';
+$ec_lang['lpn_guide_boxes_autohide']='ጠቋሚው ሲወጣ፣ ትኩረት የሌለው ሳጥን ከአጭር መዘግየት በኋላ ይደበቃል። ትኩረት ያለው ሳጥን ከውጪ ሲጫኑ፣ Esc ሲጫኑ፣ ወይም ጠቋሚው ሌላ ቦታ ሆኖ በ Tab ከሳጥኑ ሲወጡ ይደበቃል።';
+$ec_lang['lpn_guide_box_help']='የዚህ ሳጥን እገዛ';
+$ec_lang['lpn_guide_box_named']='{box} ሳጥን';
+$ec_lang['lpn_guide_dimmed']='የደበዘዘ ስም በመሳሪያ አሞሌው ላይ አሁን የተደበቀ አዝራር ነው።';
+$ec_lang['lpn_guide_text_popup']='የተመረጠውን አካል ወይም ጽሑፍ፣ ወይም በርካታ የተመረጡ አካሎችን ንብረቶች በምርጫው አጠገብ፣ ወይም ሳጥኑ ለመጨረሻ ጊዜ በተንቀሳቀሰበት ቦታ ያሳያል። የተስተካከለ ዋጋ መረቡን ወዲያውኑ ይለውጣል፣ የአካሉ የካርታ ምልክትና የሠንጠረዦች ፓነልም ይከተላሉ። የመጨረሻው ስሌት ውጤቶች ከግብዓቶቹ በታች ተዘርዝረዋል፣ ሊስተካከሉም አይችሉም።';
+$ec_lang['lpn_guide_text_find_popup']='ሁኔታን የሚያሟሉ አካሎችን ያገኛል፣ ለምሳሌ ከ8 in. ያነሱ ሁሉንም ቧንቧዎች ወይም ከ40 psi በታች ያሉ ሁሉንም መገናኛዎች፣ እንዲሁም በሁሉም ላይ አንድ ንብረት በአንድ ክዋኔ መቀየር ይችላል። ሞዴሉ ከመፈታቱ በፊት ለመፈተሽ (የጠፋ ከፍታ፣ በተሳሳተ አሃድ የገባ ዲያሜትር)፣ ከተፈታ በኋላ ችግር ያለባቸውን ቦታዎች ለመዘርዘር (ዝቅተኛ ግፊት፣ ከፍተኛ ፍጥነት)፣ እና በብዙ አካሎች ላይ አንድ እርማት ለማድረግ ይጠቀሙበት።\n\nየምን ፈልግ፣ ንብረት፣ መስፈርት እና ዋጋ ዝርዝሮች አንድ መስፈርት ገንብተው በመጠይቅ ሳጥን ውስጥ እንደ አንድ መስመር ጽሑፍ ይጽፉታል። መስመሩ በቀጥታ ሊስተካከል ይችላል፣ ዝርዝሮቹም ይከተሉታል። ዝርዝሮቹ መግለጽ የማይችሉት መጠይቅ፣ ለምሳሌ በወይም የተያያዙ ሁለት መስፈርቶች፣ ዝርዝሮቹን ይደብቃል፣ በምትኩ መቆጣጠሪያዎቹን ተጠቀም አዝራሩ እስኪጫን ድረስ። ለመፈለግ በመጠይቅ ሳጥኑ ውስጥ Enter ወይም ፈልግ አዝራሩን ይጫኑ።';
+$ec_lang['lpn_guide_text_settings_box']='ሁሉም ቅንብሮችና ሁለት ዳግም ማስጀመሪያ አዝራሮች በቅንብሮች ሳጥን ውስጥ ናቸው። ቅንብሮችን የሚያገኙበት ሌላ ቦታ የለም። ሳጥኑ ሊፈለግ ይችላል፦ በቅንብሮችን ፈልግ ውስጥ አንድ ወይም ከዚያ በላይ ቃላት ይተይቡ፣ ሁሉንም የሚጠቅሱ ቅንብሮች ብቻ ይዘረዘራሉ። ቅንብሮች ከፕሮጀክቱ ጋር ይቀመጣሉ፣ የስራውን ሂደት ሳጥን አሳይ እና በገጽ ስር ያሉት ሲቀሩ፣ እነዚህ በዚህ አሳሽ ውስጥ ይቀመጣሉ። የዚህ ሳጥን ቦታና መጠንም በዚህ አሳሽ ውስጥ ብቻ ይቀመጣል።';
+$ec_lang['lpn_guide_text_library_box']='የፕሮጀክቱን ስርዓቶች፣ ኩርባዎች፣ የቧንቧ ዓይነቶች፣ ማገናኛዎች፣ መቆጣጠሪያዎችና ህጎች ይይዛል። አካል ስርዓትን፣ ኩርባን፣ የቧንቧ ዓይነትን ወይም ማገናኛን በመለያው ይጠቅሳል፣ ያ ንጥል እዚህ ይስተካከላል። መቆጣጠሪያዎችና ህጎች ለመላው መረብ ይሠራሉ። ህጎች የሚተገበሩት በEPANET ፈታች ብቻ ነው። ሁሉም ከፕሮጀክቱ ጋር ይቀመጣሉ።';
+$ec_lang['lpn_guide_text_energy_box']='የእያንዳንዱን ፓምፕ የኃይል አጠቃቀም፣ ከፍተኛ ኃይል እና ወጪ በመጨረሻው የተራዘመ ጊዜ ማስመሰያ ላይ ሪፖርት ያደርጋል፣ የእያንዳንዱን ፓምፕ ብቃትና በቅንብሮች፣ ኃይል ውስጥ የተዘጋጀውን የኃይል ዋጋ ተጠቅሞ። በቅንብሮች ውስጥ ጠቅላላ የመሮጫ ጊዜ እና የተፈታ መረብ ያስፈልገዋል። መረቡን አይለውጥም።';
+$ec_lang['lpn_guide_text_contour_box']='በካርታው ላይ በቀለም ነጥብ በ ውስጥ ከተመረጠው የነጥብ ዋጋ የተሳለውን የኮንቱር ስዕል ይቆጣጠራል፦ የቀለም ዕቅድ፣ መሙያውና ግልጽነቱ፣ የኮንቱር መስመር ክፍተትና ምልክቶች፣ እና ቀለሙ ከእያንዳንዱ ቧንቧ ምን ያህል እንደሚደርስ። ማጥፋት ስዕሉን ይደብቃል፣ የነጥብ ቀለሞቹን ግን ይተዋል። የሚለውጠው ማሳያውን ብቻ ነው፣ መረቡን አይደለም።';
+$ec_lang['lpn_guide_text_scncmp_box']='እያንዳንዱን ሁኔታ ከስዕሉ ቅጂ ይፈታል፣ ለእያንዳንዱም የራስ ዋጋዎችን ብዛት፣ ዝቅተኛውን ግፊት እና ከፍተኛውን ፍጥነት በሠንጠረዥ ያሳያል። ፕሮጀክቱን አይለውጥም፣ የተከፈተውም ሁኔታ እንደነበረ ይቀራል።';
+$ec_lang['lpn_guide_text_rptbox']='በመጨረሻው የተራዘመ ጊዜ ማስመሰያ የEPANET ፈታች የጻፈውን የጽሑፍ ሪፖርት ያሳያል፣ ማስጠንቀቂያዎቹንና የመረቡን ማጠቃለያ ጨምሮ። እያንዳንዱ የተራዘመ ጊዜ ማስመሰያ ይተካዋል፤ በአንድ ቅጽበት መፍታት አይተካውም፣ ማስተካከልም የቀደመውን ሪፖርት እንዳለ ይተዋል።';
+$ec_lang['lpn_guide_text_status_box']='በመጨረሻው የተራዘመ ጊዜ ማስመሰያ ወቅት እያንዳንዱን ለውጥ በጊዜ ቅደም ተከተል ይዘረዝራል፦ የፓምፕ፣ ቫልቭ ወይም ቧንቧ መከፈት ወይም መዘጋት፣ ታንክ መሙላት ወይም መራቆት ሲጀምር ወይም ሲሞላ ወይም ባዶ ሲሆን፣ እና ሙሉ በሙሉ ያልተሰባሰበ ማንኛውም የጊዜ ደረጃ። የሚዘረዘሩት ለውጦች ብቻ ናቸው፣ እያንዳንዱ የጊዜ ደረጃ አይደለም።';
+$ec_lang['lpn_guide_text_alt_box']='ለእያንዳንዱ ሁኔታ፣ በእያንዳንዱ ምድብ ማለትም አካላዊ፣ ፍላጎትና የአካል ማንቃት ውስጥ የትኛውን አማራጭ እንደሚጠቀም፣ እንዲሁም የስሌት አማራጮቹን ያሳያል፦ የፍላጎት ማባዣ፣ ጠቅላላ የመሮጫ ጊዜ እና የሃይድሮሊክ ጊዜ ደረጃ። አማራጮቹ ለንባብ ብቻ ናቸው። የሁኔታ የስሌት አማራጮች እዚህ ሊተየቡ ይችላሉ፣ ባዶ ሲሆን የወላጁን ዋጋ ይጠቀማል። መሰረታዊ ሁነታን ካጸዱ በኋላ ከሁኔታዎች ምናሌ ይክፈቱት።';
+$ec_lang['lpn_guide_text_full_box']='እያንዳንዱን ነጥብና እያንዳንዱን ግንኙነት በእያንዳንዱ የሪፖርት ጊዜ ደረጃ፣ በሠንጠረዦች ፓነል ላይ በሚታዩት አሃዶች ይዘረዝራል። የተራዘመ ጊዜ ማስመሰያ ከሌለ፣ አሁን ያለውን መፍትሄ በአንድ ቅጽበት ያሳያል። ማውረድ ወይም ማተም እያንዳንዱን የጊዜ ደረጃ ይይዛል፣ ሠንጠረዡ ግን አንድ በአንድ ያሳያል።';
+$ec_lang['lpn_guide_text_calib_box']='የመስክ መለኪያዎችን ፋይል በተመሳሳይ ቦታዎችና ጊዜያት ከተሰሉት ውጤቶች ጋር ያወዳድራል፣ ለእያንዳንዱ ግቤት አንድ ፋይል። ፋይሉ ለአሁኑ ክፍለ ጊዜ ብቻ ይያዛል፣ ከፕሮጀክቱ ጋር አይቀመጥም።';
+$ec_lang['lpn_guide_text_notes_popup']='ይህ ገጽ እንዴት እንደሚሠራና ምን እንደማያደርግ ማስታወሻዎችን ይዘረዝራል፣ እያንዳንዱ እንደ ቃልና ትርጉሙ። መረቡን አይለውጥም።';
+$ec_lang['lpn_guide_text_hotkeys_popup']='እያንዳንዱን የመሳሪያ አሞሌ አዝራር፣ የምናሌ ረድፍ፣ የቁልፍ ሰሌዳ አቋራጮችን እና ለእያንዳንዱ ሳጥን አንድ ግቤት ይዘረዝራል። ረድፍ መምረጥ ያ መቆጣጠሪያ የት እንዳለ ያሳያል፣ በጭራሽ አያስኬደውም። ለመፈለግ ከየትኛውም ቦታ Ctrl+K ይጫኑ፣ ወይም መመሪያው ትኩረት ሲኖረው / ይጫኑ።';
+$ec_lang['lpn_guide_find_query_term']='የመጠይቅ ቋንቋ';
+$ec_lang['lpn_guide_find_query_def']='<table class="lpn-notes-table"><tbody><tr><td><code>Scope.Property condition value</code></td><td>አንድ መስፈርት። ወሰኑ Everything፣ Junction፣ Reservoir፣ Tank፣ Pipe፣ Pump፣ Valve፣ Text፣ Customer ወይም Source ነው። ንብረቱ ለዚያ ወሰን በንብረት ዝርዝር ውስጥ ያለ ማንኛውም ግቤት ነው።</td></tr><tr><td>መስፈርቶች</td><td>equal to፣ above፣ below፣ contains፣ n highest፣ n lowest እና empty። Contains የሚሠራው ለጽሑፍ ብቻ ነው። በ n highest እና n lowest ውስጥ n ቆጠራ ነው፣ እንደ 5 highest። ፊደሉ n ራሱ ሲጻፍ፣ እንደ <code>Pipe.Velocity n highest</code>፣ ወይም የዋጋ ሳጥኑ ባዶ ሲሆን፣ 10 አካሎች ይዘረዘራሉ። Empty ለንብረቱ ምንም ዋጋ የሌላቸውን አካሎች ያገኛል። ግንኙነት አራት መስፈርቶች አሉት፣ ዋጋም አይወስድም።</td></tr><tr><td>ዋጋዎች</td><td>ቁጥር ያለ አሃዱ ይገባል፣ በንብረቶች ሳጥንና በሠንጠረዦች ፓነል ላይ በሚታየው አሃድ፦ 40 እንጂ 40 psi አይደለም። መለያን ጨምሮ ጽሑፍ በነጠላ ወይም ድርብ ጥቅስ ይከበባል፦ <code>\'60\'</code>።</td></tr><tr><td>AND፣ OR እና ቅንፎች</td><td>AND ከ OR በፊት ይሰላል፣ ቅንፎች መስፈርቶችን ይሰበስባሉ። NOT የለም።</td></tr><tr><td>አጻጻፍ</td><td>ቃላት ለፊደል መጠን ግድ የላቸውም። የእንግሊዝኛ ቃላት በሁሉም ቋንቋ ተቀባይነት አላቸው፣ ስለዚህ ከዚህ መመሪያ የተቀዳ መጠይቅ በማንኛውም ቋንቋ ገጽ ላይ ይሠራል።</td></tr></tbody></table>';
+$ec_lang['lpn_guide_find_examples_term']='በNet3 ላይ የተሠሩ ምሳሌዎች';
+$ec_lang['lpn_guide_find_examples_def']='<p>እነዚህን ለመከተል የNet3 ምሳሌን ይክፈቱ። ግፊት በ psi፣ ፍጥነት በ ft/s ነው።</p><table class="lpn-notes-table"><tbody><tr><td><code>Everything.ID equal to \'60\'</code></td><td>መገናኛ 60 እና ቧንቧ 60። መገናኛና ቧንቧ አንድ መለያ ሊኖራቸው ይችላል፣ ስለዚህ በ Everything ስር የመለያ ፍለጋ ከአንድ በላይ አካል ሊመልስ ይችላል።</td></tr><tr><td><code>Junction.Pressure below 40</code></td><td>መገናኛዎች 10፣ 40፣ 50፣ 20 እና 153፣ ዝቅተኛው ግፊት መጀመሪያ። መገናኛ 10 በ -0.6 psi ነው፣ ይህ ግምገማ የሚያስፈልገው አሉታዊ ግፊት ነው።</td></tr><tr><td><code>Pipe.Velocity 5 highest</code></td><td>ቧንቧዎች 60፣ 329፣ 125፣ 123 እና 149፣ ከፍተኛው ፍጥነት መጀመሪያ። ቧንቧ 60 9.3 ft/s ይሸከማል።</td></tr><tr><td><code>Junction.Pressure below 20 OR Pipe.Velocity above 5</code></td><td>መገናኛዎች 10፣ 20፣ 40 እና 50፣ እና ቧንቧዎች 60፣ 125 እና 329፦ ዝቅተኛ ግፊቶችና ከፍተኛ ፍጥነቶች በአንድ ዝርዝር።</td></tr><tr><td><code>Junction.Pressure below 40 AND Junction.Elevation above 100</code></td><td>መገናኛዎች 10፣ 20፣ 40 እና 50፣ በከፍተኛ መሬት ላይ ያሉ ዝቅተኛ ግፊቶች። ሁለቱም መስፈርቶች አንድ ዓይነት አካል መሰየም አለባቸው፦ <code>Junction.Pressure below 40 AND Pipe.Velocity above 3</code> ምንም አያገኝም፣ ምክንያቱም ማንም አካል መገናኛም ቧንቧም አይደለም።</td></tr><tr><td><code>Pipe.Closed equal to \'closed\'</code></td><td>ቧንቧ 330፣ በNet3 ፋይል ውስጥ የተዘጋው ብቸኛ ቧንቧ።</td></tr><tr><td><code>Junction.Connectivity no open path to a source</code></td><td>ፋይሉ እንደተሰራጨ ምንም። ቧንቧ 247 ሲዘጋ (ተካ እና ቀልብስ ይመልከቱ)፣ መገናኛዎች 215፣ 217፣ 219 እና 225፦ በቧንቧ 247 ላይ የሚደርስ መሰበር ያለ አቅርቦት የሚተዋቸው መገናኛዎች። ይህን ለእያንዳንዱ ቧንቧ መድገም ወሳኝነት ትንተና ነው።</td></tr></tbody></table>';
+$ec_lang['lpn_guide_find_results_term']='ውጤቶች፣ ምርጫው እና ሠንጠረዦች';
+$ec_lang['lpn_guide_find_results_def']='<p>የተመሳሰሉት አካሎች ከፈልግ አዝራሩ በታች ተዘርዝረዋል። Above እና n highest ከፍተኛውን ዋጋ መጀመሪያ፣ below እና n lowest ዝቅተኛውን ዋጋ መጀመሪያ ይዘረዝራሉ፣ ሌሎች መስፈርቶች በተገኘው ዋጋ፣ ከዚያም በመለያ ይዘረዝራሉ። AND ወይም OR ያለው መጠይቅ ነጥቦቹን ከዚያ ግንኙነቶቹን፣ እያንዳንዱን በመለያ ይዘረዝራል። አንድ ብቻ ተመሳሳይ ሲሆን ወዲያውኑ በካርታው ላይ ይታያል። ካርታውን በዚያ አካል ላይ ለማድረግ ረድፍ ይምረጡ። ምንም ካልተመረጠ አካሉም ይመረጣል፤ የሆነ ነገር ከተመረጠ አካሉ ይደምቃል፣ ምርጫው አይቀየርም። ወደ ምርጫው ለመጨመር ወይም ለማስወገድ በረድፍ ላይ Shift+ጠቅ ወይም Ctrl+ጠቅ ያድርጉ። ፈልግ ሁሉንም ተመሳሳዮች ራሱ አይመርጥም።</p><p>በሠንጠረዥ ውስጥ አጣራ አዝራሩ ተመሳሳዩን መጠይቅ በሠንጠረዦች ፓነል ላይ ይተገብራል። መጠይቁ የሚመለከተው እያንዳንዱ ሠንጠረዥ የተመሳሰሉትን ረድፎች ብቻ ያሳያል፣ ከላያቸው መጠይቁንና የረድፍ ቁጥሩን። ሁሉንም ተመሳሳዮች በካርታው ላይ ለመምረጥ እነዚያን ረድፎች ይምረጡና ከቀኝ-ጠቅ ምናሌ ካርታ ላይ ምረጥ ይምረጡ። የሠንጠረዥ ማጣሪያ ከፕሮጀክቱ ጋር አይቀመጥም፣ ገጹ እንደገና ሲጫን ያበቃል። ከእንግዲህ እንዳይመሳሰል የተስተካከለ ረድፍ በሠንጠረዡ ውስጥ ይቆያል፣ ደብዝዞ በማስጠንቀቂያ ምልክት ተለይቶ፣ በሠንጠረዥ ውስጥ አጣራ አዝራሩ እንደገና እስኪጫን ድረስ።</p>';
+$ec_lang['lpn_guide_find_replace_term']='ተካ እና ቀልብስ';
+$ec_lang['lpn_guide_find_replace_def']='<p>የተገኘውን ቀይር የሳጥኑ ክፍል መጠይቁ ባገኘው እያንዳንዱ አካል ላይ አንድ ንብረት ይጽፋል። ንብረቱን በሚቀየረው ንብረት ዝርዝር ውስጥ ይምረጡ፣ አዲሱን ዋጋ በአዲስ ዋጋ ሳጥን ውስጥ በሚታየው አሃድ ያስገቡ፣ ከዚያም ለውጥ አዝራሩን ይጫኑ። ሳጥኑ ከዚያ አዲሱ ዋጋ ያላቸውን ሳይቆጥር ስንት አካሎች እንደሚለወጡ ይናገራል። ለውጡን ለመተግበር ቀይራቸው አዝራሩን ይጫኑ፣ ወይም ይቅር። አንድ ቀልብስ ሙሉውን ምትክ ይቀለብሳል።</p><p>በNet1 ላይ ምሳሌ፦ <code>Pipe.Diameter below 10</code> ቧንቧዎች 31፣ 122፣ 113 እና 121ን ያገኛል። ዲያሜትር ይምረጡ፣ 10 ያስገቡ እና ለውጥ ይጫኑ፤ ሳጥኑ "4 አካሎችን ይቀየሩ?" ያሳያል። አራቱንም ቧንቧዎች ወደ 10 in. ለማዘጋጀት ቀይራቸው ይጫኑ። አንድ ቀልብስ ወደ 6 እና 8 in. ይመልሳቸዋል።</p><p>በNet3 ላይ ምሳሌ፦ <code>Pipe.ID equal to \'247\'</code> ቧንቧ 247ን ያገኛል። ዝግ ይምረጡ፣ በአዲስ ዋጋ ዝርዝር ውስጥ እንደገና ዝግ ይምረጡ፣ ከዚያ ለውጥ፣ ቀይራቸው ይጫኑ፣ ለላይኛው የግንኙነት ምሳሌ ቧንቧውን ለመዝጋት። ቀልብስ እንደገና ይከፍተዋል።</p><p>ተካ አንድ ዓይነት አካል ይፈልጋል፣ ስለዚህ በ Everything ስር መጀመሪያ በምን ፈልግ ዝርዝር ውስጥ አንድ ዓይነት አካል ይምረጡ። ከመሠረት ሌላ በሆነ ሁኔታ ውስጥ፣ ምትክ በዚያ ሁኔታ ውስጥ ይቀመጣል፣ በንብረቶች ውስጥ ያው ማስተካከያ እንደሚሆነው። የMapbox ከፍታዎች ባሉበት፣ ከፍታ ከተተየበ ዋጋ ይልቅ ከMapbox DEM ሊተካ ይችላል።</p>';
+$ec_lang['lpn_guide_find_notes_term']='ልብ ሊባሉ የሚገባቸው ነጥቦች';
+$ec_lang['lpn_guide_find_notes_def']='<ul><li>ዋጋዎች በሙሉ ትክክለኛነት ይነጻጸራሉ፣ እስከ አራት የአስርዮሽ ቦታዎችም ይዘረዘራሉ። Equal to ከተሰላ ውጤት ጋር አልፎ አልፎ ይመሳሰላል፤ above እና below ይጠቀሙ።</li><li>ግፊት፣ ሄድ፣ ፍሰት፣ ፍጥነት እና ሌሎቹ ውጤቶች የመጨረሻው ስሌት ናቸው። በራስ-ሰር እንደገና አስላ ቅንብር ሲጸዳ፣ መረቡን በመጨረሻው አስላ ጊዜ እንደነበረ ይገልጻሉ።</li><li>በጽሑፍ ላይ above እና below የመዝገበ ቃላት ቅደም ተከተል ይጠቀማሉ፣ ቁጥሮች በቁጥር ቅደም ተከተል፦ በNet1 ላይ <code>Junction.ID above \'20\'</code> መገናኛዎች 21፣ 22፣ 23፣ 31 እና 32ን ያገኛል።</li><li>በ Everything ስር የሚቀርቡት ID፣ Description፣ Tag እና Connectivity ብቻ ናቸው። ሙሉ የንብረት ዝርዝሩን ለማየት በምን ፈልግ ዝርዝር ውስጥ አንድ ዓይነት አካል ይምረጡ።</li><li>የጽሑፍ ንጥል መለያ የለውም። በቃላቱ ይፈልጉት፣ እንደ <code>Text.Text contains \'pump\'</code>።</li><li>ለአንድ ነጥብ አራቱ የግንኙነት መስፈርቶች no links at node፣ no open links at node፣ no link path to a source እና no open path to a source ናቸው። ምንጭ ማጠራቀሚያ ወይም ታንክ ነው።</li></ul>';
+$ec_lang['lpn_guide_using_heading']='መመሪያውን መጠቀም';
+$ec_lang['lpn_guide_keys_term']='የመመሪያ የቁልፍ ሰሌዳ አቋራጮች';
+$ec_lang['lpn_guide_keys_def']='<table class="lpn-notes-table"><tbody><tr><td>?</td><td>መመሪያውን ጠቋሚው ባለበት ወይም ትኩረት ባለው መቆጣጠሪያ ላይ ይከፍታል።</td></tr><tr><td>F1</td><td>መመሪያውን ትኩረት ላለው ሳጥን ግቤት ይከፍታል።</td></tr><tr><td>Ctrl+K</td><td>መመሪያውን የተመረጠው ጽሑፍ በመፈለጊያ መስኩ ውስጥ ሆኖ ይከፍታል።</td></tr><tr><td>/</td><td>መመሪያው ትኩረት ሲኖረው የመፈለጊያ መስኩን ይመርጣል።</td></tr><tr><td>Esc</td><td>መመሪያውን ዘግቶ ወደነበሩበት ይመልሳል።</td></tr></tbody></table>';
+$ec_lang['lpn_guide_also']='በ{menu} ውስጥ ደግሞ';
+$ec_lang['lpn_guide_how_popup']='አካል ወይም ጽሑፍ ሲመርጡ ንብረቶች ይከፈታል።';
+$ec_lang['lpn_guide_how_alt']='መሰረታዊ ሁነታ ሲጠፋ የአማራጮች ቅድመ ዕይታ በውሃ፣ ሁኔታዎች ስር ተዘርዝሯል።';
+$ec_lang['lpn_guide_not_shown']='ይህ መቆጣጠሪያ አሁን በስክሪኑ ላይ የለም።';
+$ec_lang['lpn_hotkeys_zoomwin_def']='የመስኮት ማጉላት፦ ወደዚያ አካባቢ ለማጉላት በካርታው ላይ አራት ማዕዘን ይጎትቱ።';
+$ec_lang['lpn_status_dismiss']='ይህን መልእክት ደብቅ';
+$ec_lang['lpn_msglog_hidden']='የተደበቀ';
+$ec_lang['lpn_msglog_unhide']='አሳይ';
+$ec_lang['lpn_status_hidden_tip']='የተደበቀውን መልእክት በካርታው ላይ እንደገና አሳይ።';
+$ec_lang['lpn_result_depth']='ጥልቀት';
+$ec_lang['lpn_result_depth_tip']='በሚታየው ጊዜ በታንኩ ውስጥ ያለው የውሃ ጥልቀት፣ ከታንኩ ግርጌ ወደ ላይ የሚለካ፦ ሄድ ሲቀነስ የታንኩ ከፍታ።';
+$ec_lang['lpn_result_tank_volume']='ተገኚ መጠን';
+$ec_lang['lpn_result_tank_volume_tip']='ከዝቅተኛው የውሃ ጥልቀት በላይ ያለው የውሃ መጠን፣ ስለዚህ በዚያ ጥልቀት ዜሮ ነው። የEPANET የታንክ መጠን ከዝቅተኛው የውሃ ጥልቀት በታች ያለውንም ውሃ ይጨምራል፣ ይህም ለመደባለቅና ለውሃ ዕድሜ አሁንም ይቆጠራል፣ ስለዚህ የታንኩ ከፍታ በታንኩ ግርጌ ይቆያል።';
+$ec_lang['lpn_pane_copy_heads']='ከአምድ ርዕሶች ጋር ቅዳ';
+$ec_lang['lpn_export_table_title']='ወደ {format} ላክ';
+$ec_lang['lpn_export_table_current']='የአሁኑ';
+$ec_lang['lpn_export_table_all']='ሁሉም';
+$ec_lang['lpn_export_table_go']='ላክ';
+$ec_lang['lpn_export_table_scn_note']='ውጤቶች የሚላኩት ለመጨረሻ ጊዜ ለተሰላው ሁኔታ ብቻ ነው።';
+$ec_lang['lpn_file_export_item_ods']='የODS ፋይል…';
+$ec_lang['lpn_file_export_item_xlsx']='የXLSX ፋይል…';
+$ec_lang['lpn_file_export_item_csv']='የCSV ፋይል…';
+$ec_lang['lpn_file_export_tables_tip']='ሠንጠረዦቹን የሠንጠረዦች ፓነል እንደሚያሳያቸው አውርድ፣ በአንድ የሥራ መጽሐፍ ውስጥ ለእያንዳንዱ ሠንጠረዥ (እና ለመረጧቸው ለእያንዳንዱ ሁኔታ) አንድ ሉህ፣ በተጨማሪም መለያዎቻቸው ለሚጠቅሷቸው ለእያንዳንዱ ቤተመዛግብት አንድ ሉህ፦ ስርዓቶች፣ ኩርባዎች፣ የቧንቧ ዓይነቶች እና ማገናኛዎች። ውጤቶች የሚካተቱት ለመጨረሻ ጊዜ ለተሰላው ሁኔታ ብቻ ነው።';
+$ec_lang['lpn_file_export_csv_tip']='አንድ ሠንጠረዥ የሠንጠረዦች ፓነል እንደሚያሳየው አውርድ። አንድ ሠንጠረዥ ያለ ቤተመዛግብት እንደ አንድ የCSV ፋይል ይመጣል። በርካታ ሠንጠረዦች ወይም ሁኔታዎች እንደ አንድ የCSV ፋይሎች ዚፕ ፋይል ይመጣሉ፣ መለያዎቻቸው ለሚጠቅሷቸው ለእያንዳንዱ ቤተመዛግብት አንድ ፋይል ጋር። ውጤቶች የሚካተቱት ለመጨረሻ ጊዜ ለተሰላው ሁኔታ ብቻ ነው።';
+$ec_lang['lpn_file_export_item_dxf']='የDXF ፋይል…';
+$ec_lang['lpn_file_export_dxf_tip']='ይህን መረብ ለAutoCAD እና ለሌሎች የCAD ፕሮግራሞች አውርድ፦ ነጥቦች እንደ ምልክት ብሎኮች፣ ቧንቧዎች፣ ፓምፖች እና ቫልቮች እንደ ፖሊላይኖች፣ እና እያንዳንዱ አካል መለያውንና የንብረት ዋጋዎቹን በፕሮጀክቱ አሃዶች የሚይዙ ባህሪያት ያሉት እንደ ብሎክ።';
+$ec_lang['lpn_dxf_export_no_utm']='የDXF ፋይሉ አልተጻፈም፦ ይህ መረብ UTM ከሚሸፍናቸው ኬክሮሶች (ከ80° ደቡብ እስከ 84° ሰሜን) ውጭ ነው፣ ሥዕልም ለመሳል ጠፍጣፋ ፍርግርግ ያስፈልገዋል።';
+$ec_lang['lpn_dxf_export_refused']='የDXF ፋይሉ አልተጻፈም፦ የሚያስፈልገው የመጋጠሚያ ልወጣ አልተጫነም። ግንኙነቱን ይፈትሹና እንደገና ይሞክሩ።';
+$ec_lang['lpn_dxf_export_failed']='የDXF ፋይሉ አልተጻፈም፦ በዚህ ገጽ ውስጥ ያለ ስህተት አቆመው ({error})።';
+$ec_lang['lpn_dxf_note_grid']='መጋጠሚያዎች፦ የዚህ ፕሮጀክት X እና Y፣ በ{unit}። ምንም የመጋጠሚያ ስርዓት አልተገለጸም።';
+$ec_lang['lpn_dxf_note_crs']='መጋጠሚያዎች፦ {crs}፣ ይህ ፕሮጀክት እንደሚገልጻቸው በትክክል።';
+$ec_lang['lpn_dxf_note_geo']='መጋጠሚያዎች፦ {crs}፣ በሜትር እንጂ በኬክሮስና ኬንትሮስ አይደለም። የፕሮጀክቱ ኬክሮሶችና ኬንትሮሶች ወደዚያ ፍርግርግ ተቀይረዋል።';
+$ec_lang['lpn_dxf_exported_geo']='{file} ተልኳል። መጋጠሚያዎቹ {crs} ናቸው፣ በሜትር እንጂ በኬክሮስና ኬንትሮስ አይደሉም።';
+$ec_lang['lpn_dxf_note_blocks']='ንብርብሮች ሲሰየሙ {prefix}፣ የአካሉ ኮድ፣ ሰረዝ እና አማራጩ ናቸው፣ እንደ {example}። እያንዳንዱ አካል በመጠን 1 የገባ ብሎክ ነው፣ ባህሪያቱ 1 አሃድ ከፍታ አላቸው፤ የጽሑፉን ቁመት ለማዘጋጀት ብሎኮቹን ያመጣጥኑ። እያንዳንዱ ባህሪ ይታያል፤ የአንድ አካል ባህሪያት ከምልክቱ አጠገብ በአንድ አምድ ውስጥ ተደርድረዋል።';
+$ec_lang['lpn_dxf_note_shortened']='{n} ዋጋዎች DXF ፋይል ከሚፈቅደው ({max} ቁምፊዎች) ረዘም ያሉ ነበሩ፣ ስለዚህ እያንዳንዳቸው አጥረው በሦስት ነጥቦች ያበቃሉ።';
+$ec_lang['lpn_dxf_note_categories']='{n} መገናኛዎች ከአንድ በላይ የፍላጎት ምድብ አላቸው። የ{tag} ባህሪያቸው የሁሉንም ምድቦች የመሠረት ፍላጎቶች ድምር ይይዛል።';
+$ec_lang['lpn_file_export_item_workspace']='የሥራ ቦታ…';
+$ec_lang['lpn_file_export_workspace_tip']='ሳጥኖችዎ የት እንዳሉ፣ መጠኖቻቸው፣ የትኞቹ ክፍት ወይም የተያያዙ እንደሆኑ፣ እና የፓነልና የአምድ መጠኖችዎን፣ እንዲሁም የዚህ ገጽ የማሳያ አማራጮችን፣ ለምሳሌ የትኞቹ የእገዛ አረፋዎችና የማንዣበቢያ ካርድ እንደሚታዩ፣ የያዘ ትንሽ ፋይል አውርድ። ፕሮጀክቶችዎ፣ የፕሮጀክት ቅንብሮችዎ እና ኩኪዎች (ቋንቋ፣ ፈቃድ፣ አሃዶች) በውስጡ የሉም። በሌላ ማያ ገጽ ወይም አሳሽ በፋይል፣ አስገባ፣ የሥራ ቦታ ይጫኑት።';
+$ec_lang['lpn_file_import_workspace']='የሥራ ቦታ…';
+$ec_lang['lpn_file_import_workspace_tip']='በፋይል፣ ላክ፣ የሥራ ቦታ የተቀመጠ የሥራ ቦታ ፋይል ተግብር፦ የሳጥን ቦታዎችና መጠኖች፣ ማያያዝ፣ የፓነል መጠኖች እና የዚህ ገጽ የማሳያ አማራጮች፣ ለምሳሌ የትኞቹ የእገዛ አረፋዎችና የማንዣበቢያ ካርድ እንደሚታዩ። ፕሮጀክቶችዎና ኩኪዎች አይነኩም።';
+$ec_lang['lpn_workspace_exported']='የሥራ ቦታ ወደ {file} ተቀምጧል፦ {n} ቅንብሮች።';
+$ec_lang['lpn_workspace_imported']='የሥራ ቦታ ከ{file} ተተግብሯል። የተተገበሩ ቅንብሮች፦ {n}። ወደ ነባሪዎቻቸው የተመለሱ፦ {r}።';
+$ec_lang['lpn_workspace_ignored']='ስላልታወቁ የተተዉ ግቤቶች፦ {u}።';
+$ec_lang['lpn_workspace_refused_unreadable']='ይህ ፋይል እንደ የሥራ ቦታ ሊነበብ አልቻለም፣ ስለዚህ ምንም አልተቀየረም።';
+$ec_lang['lpn_workspace_refused_format']='ይህ በዚህ ገጽ የተቀመጠ የሥራ ቦታ ፋይል አይደለም፣ ስለዚህ ምንም አልተቀየረም።';
+$ec_lang['lpn_workspace_refused_newer']='ይህ የሥራ ቦታ ፋይል በዚህ ገጽ አዲስ ስሪት ተቀምጧል (ቅርጸት {version})፣ ስለዚህ ምንም አልተቀየረም።';
+$ec_lang['lpn_workspace_confirm']='የዚህን አሳሽ የሥራ ቦታ አቀማመጥ በፋይሉ ውስጥ ባለው ይተኩ?';
+$ec_lang['lpn_workspace_refused_storage']='የአሳሽ ማከማቻ ሞልቷል ወይም አይገኝም፣ ስለዚህ የሥራ ቦታው አልተተገበረም።';
+$ec_lang['lpn_omitted_note']='ወደ ማጠራቀሚያ ወይም ታንክ የሚወስድ መንገድ ስለሌላቸው ከዚህ ስራ ተወግደዋል፦ {ids}';
+$ec_lang['lpn_link_end_unknown']='መለያው {id} የሆነ ነጥብ የለም።';
+$ec_lang['lpn_link_end_same']='ከ እና ወደ የተለያዩ ነጥቦች መሆን አለባቸው።';
+$ec_lang['lpn_split_pipe_ask']='ቧንቧ {id} በዚህ ነጥብ ይከፈል?';
+$ec_lang['lpn_split_yes']='አዎ';
+$ec_lang['lpn_split_no']='አይ';
+$ec_lang['lpn_snap_vertex']='{link}፣ መታጠፊያ {n}';
+$ec_lang['lpn_snap_node_on_node']='{new} በ{target} ቦታ ላይ ተቀመጠ። ሁለቱ ነጥቦች አልተገናኙም።';
+$ec_lang['lpn_snap_moved_on_node']='{moved} ወደ {target} ቦታ ተንቀሳቀሰ። ሁለቱ ነጥቦች አልተገናኙም።';
+$ec_lang['lpn_settings_hover_card']='በማንዣበብ ሙሉውን ምልክት አሳይ';
+$ec_lang['lpn_settings_hover_card_tip']='ጠቋሚውን በነጥብ፣ ግንኙነት ወይም ደንበኛ ላይ ያሳርፉ፣ ምልክቱ ከካርታው ጋር ቢስማማም ባይስማማም፣ በማንኛውም መጠን፣ በቅንብሮች ውስጥ እንደተገለጸው ለማየት። ይህ የዚህ አሳሽ ቅንብር ነው፣ የፕሮጀክቱ አይደለም።';
+$ec_lang['lpn_scenario_delete_in_base']='ከስዕሉ ለማስወገድ በ{base} ሁኔታ ውስጥ ይሰርዙት።';
+$ec_lang['lpn_scenario_only_deleted']='{id} ተሰርዟል። የ{scenario} ክፍል ብቻ ነበር።';
+$ec_lang['lpn_scenario_delete_blocked']='ግንኙነት {link} በእሱ ላይ ስለሚያበቃ፣ እና ያ ግንኙነት ከ{scenario} ውጭም ስላለ፣ {id} አልተሰረዘም። ሁለቱንም ለመሰረዝ በ{base} ሁኔታ ውስጥ ይሰርዟቸው።';
+$ec_lang['lpn_junction_pattern_unknown']='በዚህ ፕሮጀክት ውስጥ መለያው {id} የሆነ ስርዓት የለም፣ ስለዚህ መገናኛው እንደነበረ ተተወ።';
+$ec_lang['lpn_settings_default_pattern_none']='ምንም (ቋሚ)';
+$ec_lang['lpn_demand_pattern_default']='(ነባሪ፦ {id})';
+$ec_lang['lpn_demand_pattern_constant']='(ቋሚ)';
+$ec_lang['lpn_library_pattern_default_mark']='(ነባሪ)';
+$ec_lang['lpn_library_pattern_default_tip']='ነባሪው የፍላጎት ስርዓት። በቅንብሮች፣ ነባሪ የፍላጎት ስርዓት ውስጥ ይቀይሩት።';
+$ec_lang['lpn_library_pattern_default_deleted_to']='ስርዓት {id} ነባሪው የፍላጎት ስርዓት ነበር። ስርዓት የሌላቸው መገናኛዎች አሁን ስርዓት {now}ን ይጠቀማሉ።';
+$ec_lang['lpn_library_pattern_default_deleted_none']='ስርዓት {id} ነባሪው የፍላጎት ስርዓት ነበር። ስርዓት የሌላቸው መገናኛዎች አሁን ቋሚ ፍላጎት ይጠቀማሉ።';

@@ -168,3 +168,14 @@ and 4 by name, quoting `104.` against `104`.
 **This does not replace `section-carry-harness.js` §6 and is not a duplicate of it.** That one asks
 whether the CARRIED TEXT survives and whether a named set of interpreted fields matches; this one
 asks whether the whole document does. Both are cheap.
+
+---
+
+## Tom's notes on the examples, 2026-10-12
+
+Verbatim, *"for future organizational purposes"*:
+
+- Net3, Novato California, Source trace from Lake, 24 hr EPS, 5 miles square, 92 Junctions, 2 res, 3 tanks, no valves.
+- Net1, fictional, Chlorine, 11 Junctions, 1 res, 1 tank, 2 pumps
+- Net2, Branford Connectitut, Flouride (non-reactive), 35 Junctions, 0 res (1 source), 1 tank, no pump
+- Elm Street Center, Prescott Valley Arizona, 17 Junctions, 1 res, 1 pump, no EPS

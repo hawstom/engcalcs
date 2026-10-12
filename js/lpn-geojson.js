@@ -95,7 +95,7 @@
 		opts = opts || {};
 		// The properties a document stores under their own name rather than an underscore (all
 		// overridable since 2026-10-12; LPN_BARE_PROP in js/looped-network.js).
-		var BARE = { elev: 1, minLevel: 1, maxLevel: 1, tankDiameter: 1, volCurve: 1, mixingModel: 1, mixingFraction: 1,
+		var BARE = { elev: 1, bottomElev: 1, minLevel: 1, maxLevel: 1, tankDiameter: 1, volCurve: 1, mixingModel: 1, mixingFraction: 1,
 				headPattern: 1, speed: 1, speedPattern: 1 },
 			// A caller's resolver written before then reads `_prop` only; a bare one it cannot find
 			// is read off the element, which is what Base holds.
@@ -245,7 +245,12 @@
 				else { put(p, u, 'base_head', nd, '_head', rh, uHead); }
 				putPattern(p, 'head_pattern', eff(nd, 'headPattern'));
 			} else {
+				// `elevation` is the GROUND, as for every node and as in the DXF (ELEVATION); the BASE the
+				// levels stand on, EPANET's tank Elevation, is its own field (Tom, 2026-10-11). Both are
+				// the scenario's own where it holds one (every property is overridable, 2026-10-12).
+				var bEl = eff(nd, 'bottomElev'), baseKey = (typeof bEl === 'number' && isFinite(bEl)) ? 'bottomElev' : 'elev';
 				put(p, u, 'elevation', nd, 'elev', (eff(nd, 'elev') || 0), uHead);
+				put(p, u, 'base_elevation', nd, baseKey, eff(nd, baseKey) || 0, uHead);
 				put(p, u, 'init_level', nd, '_level', eff(nd, 'level') || 0, uHead);
 				put(p, u, 'min_level', nd, 'minLevel', (eff(nd, 'minLevel') || 0), uHead);
 				put(p, u, 'max_level', nd, 'maxLevel', (eff(nd, 'maxLevel') || 0), uHead);
