@@ -235,6 +235,9 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 	<input type="file" id="lpn_profile_file" accept=".pro,.txt,text/plain" style="display:none">
 	<input type="file" id="lpn_survey_file" accept=".csv,.txt,.pnt,.pts,text/csv,text/plain" style="display:none">
 	<input type="file" id="lpn_geojson_file" accept=".geojson,.json,application/geo+json,application/json" style="display:none">
+	<?php // Task 779: DXF and shapefile Shapes. Each its own input, as the GeoJSON one is; the shapefile one takes several files so a .shp can arrive with its .dbf and .prj. ?>
+	<input type="file" id="lpn_dxf_shapes_file" accept=".dxf" style="display:none">
+	<input type="file" id="lpn_shp_file" accept=".zip,.shp,.dbf,.prj,.cpg,.shx" multiple style="display:none">
 	<?php // Library import (Task 611). A picker of its own, and it takes the same two extensions
 	      // #lpn_project_file does because it reads the same kind of file -- but it lands somewhere
 	      // else entirely: it copies one library (pipe types, fittings or curves) into the project
@@ -4049,6 +4052,35 @@ EngCalcs.pageConfig = {
 	lpn_file_import_survey_tip: <?=json_encode($ec_lang['lpn_file_import_survey_tip'])?>,
 	lpn_file_import_shapes: <?=json_encode($ec_lang['lpn_file_import_shapes'])?>,
 	lpn_file_import_shapes_tip: <?=json_encode($ec_lang['lpn_file_import_shapes_tip'])?>,
+	lpn_file_import_dxf: <?=json_encode($ec_lang['lpn_file_import_dxf'])?>,
+	lpn_file_import_dxf_tip: <?=json_encode($ec_lang['lpn_file_import_dxf_tip'])?>,
+	lpn_file_import_shp: <?=json_encode($ec_lang['lpn_file_import_shp'])?>,
+	lpn_file_import_shp_tip: <?=json_encode($ec_lang['lpn_file_import_shp_tip'])?>,
+	lpn_dxf_import_skipped: <?=json_encode($ec_lang['lpn_dxf_import_skipped'])?>,
+	lpn_dxf_import_skipped_one: <?=json_encode($ec_lang['lpn_dxf_import_skipped_one'])?>,
+	lpn_dxf_import_inblocks: <?=json_encode($ec_lang['lpn_dxf_import_inblocks'])?>,
+	lpn_dxf_import_bulge: <?=json_encode($ec_lang['lpn_dxf_import_bulge'])?>,
+	lpn_dxf_import_bulge_one: <?=json_encode($ec_lang['lpn_dxf_import_bulge_one'])?>,
+	lpn_dxf_import_units: <?=json_encode($ec_lang['lpn_dxf_import_units'])?>,
+	lpn_dxf_import_refuse_geo: <?=json_encode($ec_lang['lpn_dxf_import_refuse_geo'])?>,
+	lpn_dxf_import_unreadable: <?=json_encode($ec_lang['lpn_dxf_import_unreadable'])?>,
+	lpn_dxf_import_binary: <?=json_encode($ec_lang['lpn_dxf_import_binary'])?>,
+	lpn_shapes_import_frame: <?=json_encode($ec_lang['lpn_shapes_import_frame'])?>,
+	lpn_shapes_frame_xy: <?=json_encode($ec_lang['lpn_shapes_frame_xy'])?>,
+	lpn_shapes_frame_latlon: <?=json_encode($ec_lang['lpn_shapes_frame_latlon'])?>,
+	lpn_shp_import_skipped: <?=json_encode($ec_lang['lpn_shp_import_skipped'])?>,
+	lpn_shp_import_skipped_one: <?=json_encode($ec_lang['lpn_shp_import_skipped_one'])?>,
+	lpn_shp_import_attrs: <?=json_encode($ec_lang['lpn_shp_import_attrs'])?>,
+	lpn_shp_import_noprj: <?=json_encode($ec_lang['lpn_shp_import_noprj'])?>,
+	lpn_shp_import_prj_same: <?=json_encode($ec_lang['lpn_shp_import_prj_same'])?>,
+	lpn_shp_import_converted: <?=json_encode($ec_lang['lpn_shp_import_converted'])?>,
+	lpn_shp_import_prj_other: <?=json_encode($ec_lang['lpn_shp_import_prj_other'])?>,
+	lpn_shp_import_refuse_local: <?=json_encode($ec_lang['lpn_shp_import_refuse_local'])?>,
+	lpn_shp_import_refuse_crs: <?=json_encode($ec_lang['lpn_shp_import_refuse_crs'])?>,
+	lpn_shp_import_refuse_range: <?=json_encode($ec_lang['lpn_shp_import_refuse_range'])?>,
+	lpn_shp_import_noshp: <?=json_encode($ec_lang['lpn_shp_import_noshp'])?>,
+	lpn_shp_import_manyshp: <?=json_encode($ec_lang['lpn_shp_import_manyshp'])?>,
+	lpn_shp_import_unreadable: <?=json_encode($ec_lang['lpn_shp_import_unreadable'])?>,
 	lpn_geojson_import_done: <?=json_encode($ec_lang['lpn_geojson_import_done'])?>,
 	lpn_geojson_import_done_one: <?=json_encode($ec_lang['lpn_geojson_import_done_one'])?>,
 	lpn_geojson_import_renamed: <?=json_encode($ec_lang['lpn_geojson_import_renamed'])?>,
@@ -4133,6 +4165,7 @@ EngCalcs.pageConfig = {
 <script src="/engcalcs/js/lpn-inp.js?v=<?=filemtime(__DIR__.'/js/lpn-inp.js')?>"></script>
 <?php // The GeoJSON writer (ROADMAP Task 728). Pure; reads EngCalcs.lpnNumText from lpn-inp.js, so AFTER it. ?>
 <script src="/engcalcs/js/lpn-geojson.js?v=<?=filemtime(__DIR__.'/js/lpn-geojson.js')?>"></script>
+<script src="/engcalcs/js/lpn-gisread.js?v=<?=filemtime(__DIR__.'/js/lpn-gisread.js')?>"></script>
 <?php // The clock's RUN half (ROADMAP Task 248). AFTER lpn-patterns.js, which it reads for
       // lpnParseTime, lpnTimeText and lpnTimesDefaults; BEFORE looped-network.js, which calls
       // EngCalcs.lpnTimeInit() at script scope to register its own bottom-pane tab. Get this

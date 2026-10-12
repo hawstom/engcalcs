@@ -14,18 +14,28 @@ heading, so one reader serves both. Pasting over rows updates them in place, as 
 Paste as new rows (Ctrl+Shift+V) creates; one undo step either way. No scenario view: a Shape is in
 no scenario.
 
-## How shapefile and DXF import would land
+## Shapefile and DXF import (built)
 
-Neither needs a new write path: each is a reader that turns a file into the rows the Shapes table
-already accepts, `{id, desc, closed, pts}` with each coordinate's file text kept as `tok`, then
-hands them to the same create path a pasted row takes (panePlanCreates() judges every row before
-anything is written, a bad row refuses the lot with a named reason, and the whole import is one
-undo step), exactly as the GeoJSON import (js/lpn-geojson.js) already does through its own copy of
-that path. A shapefile (.shp/.shx/.dbf, plus .prj) is binary; the reader would map Point, PolyLine
-and Polygon records to Shapes (one per part, as GeoJSON multipart features are), take the ID and
-description from named .dbf columns, and refuse or reproject against the project's coordinate
-system using .prj the way GeoJSON import does with EPSG:4326. A DXF reader would take POINT,
-LWPOLYLINE (group 70 bit 1 = closed) and LINE from chosen layers, which is the mirror of what the
-DXF export writes on `C-WATR-MODL-SHAP-<alt>`; its coordinates are already in project units. Until
-either exists, the route is a GIS or CAD program's own attribute or coordinate export into a
-spreadsheet, then a paste.
+Two readers in `js/lpn-gisread.js` (pure; `lpnDxfShapes`, `lpnShapefileRead`) and a placing half in
+`js/looped-network.js` (`landDxfShapes`, `landShapefileShapes`, `gisPlaceShapes`), behind File >
+Import > Import DXF shapes... and Import shapefile shapes.... The same ID rule, kept names and one
+undo step as the GeoJSON import. No library: the shapefile, dBASE and ZIP layouts are read by hand
+and a deflated zip entry is inflated by the browser's DecompressionStream.
+
+- DXF (ASCII only): POINT, LINE, LWPOLYLINE, POLYLINE (group 70 bit 1 = closed). Layer name goes to
+  the Shape's `props.layer`. Every other entity is counted by type in the notice, entities inside
+  BLOCKS as one count, arc segments (bulge) are read as chords and counted. A DXF states no
+  coordinate system, so it is read as the project's own X and Y (units from `$INSUNITS` compared and
+  a difference said); a latitude-and-longitude project refuses it.
+- Shapefile: .zip, or the .shp with .dbf/.prj/.cpg picked together. Point, MultiPoint, PolyLine,
+  Polygon and the Z/M forms (Z and M ignored); a multipart record is one Shape per part; a
+  polygon's clockwise rings are Shapes and its counterclockwise rings (holes) are counted and not
+  imported. The .dbf columns become `props`; a NAME or ID column is the ID where it can be one,
+  else kept as the description; DESCRIPTION or DESC is the description.
+- Coordinates, never reprojected silently: a geographic .prj goes where GeoJSON goes (exact into a
+  lat/lon project, the map's transform into a projected one, refused into a grid project); a
+  projected .prj is read unchanged only when its EPSG code is the project's, and refused into a
+  lat/lon project or a project with another code; into a grid project it is read as X and Y and the
+  .prj is named; with no .prj the numbers are the project's own (a lat/lon project requires them to
+  be in range). Every case says which in the notice.
+- Fixtures: `node dev/lpn-spike/fixtures/make-shape-fixtures.js`; harness `shape-import-harness.js`.

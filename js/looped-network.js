@@ -37814,6 +37814,272 @@ var EngCalcs = EngCalcs || {};
 		if (!isLatLonProject() && EngCalcs.lpnCrsLoad && EngCalcs.lpnCrsReady && !EngCalcs.lpnCrsReady()) { EngCalcs.lpnCrsLoad(go); return; }
 		go();
 	}
+	// ---- IMPORT DXF AND SHAPEFILE SHAPES (Task 779) -------------------------------------------------
+	//
+	// Tom, 2026-10-12: *"Import from dxf and shapefile before merging,"* for the use case of
+	// 2026-10-11: *"import shapes from GIS or CAD to guide precise placement or map supplementation."*
+	// js/lpn-gisread.js reads the file; this half places the coordinates and reports, in the
+	// GeoJSON import's own way (landGeoJsonShapes()): the same ID rule, the same kept names, one undo
+	// step. **NOTHING IS REPROJECTED UNLESS THE FILE STATES LATITUDE AND LONGITUDE**, which the map's
+	// own transform already converts for GeoJSON; a planar file is read as the project's own numbers
+	// and the notice says so, and a planar file that states another system than the project's is
+	// refused. A DXF carries no coordinate system, so it is always read as the project's X and Y
+	// (its $INSUNITS is compared with the project's length unit and a difference is said), and a
+	// latitude-and-longitude project refuses it: a flat drawing has no place in degrees.
+	function pickDxfShapesFile() {
+		var input = document.getElementById('lpn_dxf_shapes_file');
+		if (input) { input.click(); }
+	}
+	function pickShapefile() {
+		var input = document.getElementById('lpn_shp_file');
+		if (input) { input.click(); }
+	}
+	function importDxfShapesFromFile(file) {
+		var reader = new FileReader();
+		reader.onload = function (ev) { landDxfShapes(String(ev.target.result), file.name); };
+		reader.onerror = function () {
+			setNotice((EngCalcs.pageConfig || {}).lpn_survey_read_error || 'That file could not be read from your disk.');
+		};
+		reader.readAsText(file);
+	}
+	function importShapefileFromFiles(files) {
+		var got = [], left = files.length, bad = false;
+		files.forEach(function (f, i) {
+			var reader = new FileReader();
+			reader.onload = function (ev) {
+				got[i] = { name: f.name, bytes: new Uint8Array(ev.target.result) };
+				if (--left === 0 && !bad) { landShapefileShapes(got, null); }
+			};
+			reader.onerror = function () {
+				if (!bad) {
+					bad = true;
+					setNotice((EngCalcs.pageConfig || {}).lpn_survey_read_error || 'That file could not be read from your disk.');
+				}
+			};
+			reader.readAsArrayBuffer(f);
+		});
+	}
+	// The text sentence with a count: `key` holds {n}, `key_one` says it for one.
+	function gisCounted(key, n, fallback, fallbackOne) {
+		var pc = EngCalcs.pageConfig || {};
+		return n === 1 ? String(pc[key + '_one'] || fallbackOne) : String(pc[key] || fallback).replace('{n}', String(n));
+	}
+	// The ID, kept name, description, properties, undo and the notice, for Shapes already in the
+	// project frame. `items` are [{ name, srcName, desc, props, closed, pts: [{x, y, tok?, ...}] }].
+	function gisPlaceShapes(items, fileName, extraLines, skippedLines, done, extra) {
+		var made = [], used = {}, renamed = [], lines = [], pc = EngCalcs.pageConfig || {};
+		allIds().forEach(function (x) { used[x] = true; });
+		items.forEach(function (sh) {
+			var id = (sh.name && /^[^\s"']+$/.test(sh.name) && !used[sh.name]) ? sh.name : mintId(LPN_ID_KEY.shape), s;
+			used[id] = true;
+			s = { id: id, pts: sh.pts, closed: !!sh.closed };
+			if (sh.desc) { s.desc = sh.desc; }
+			if (sh.props && Object.keys(sh.props).length) { s.props = sh.props; }
+			if (sh.srcName && sh.srcName !== id) {
+				if (!s.desc) { s.desc = sh.srcName; }
+				else { s.props = s.props || {}; s.props.source_name = sh.srcName; }
+				renamed.push(sh.srcName + ' (' + id + ')');
+			}
+			made.push(s);
+		});
+		if (made.length) {
+			saveUndoSnapshot();
+			logLpnFirstAction('element');
+			made.forEach(function (s) { addShapeToDoc(s); buildShapeEls(s); });
+			scheduleSave();
+		}
+		lines.push(gisCounted('lpn_geojson_import_done', made.length, '{n} Shapes imported from {file}.',
+			'One Shape imported from {file}.').replace('{file}', fileName));
+		if (renamed.length) {
+			lines.push(gisCounted('lpn_geojson_import_renamed', renamed.length,
+				'{n} feature names cannot be Shape IDs and are kept with the Shapes: {list}.',
+				'One feature name cannot be a Shape ID and is kept with the Shape: {list}.').replace('{list}', renamed.join(', ')));
+		}
+		Array.prototype.push.apply(lines, skippedLines);
+		Array.prototype.push.apply(lines, extraLines);
+		setNotice(lines.join(' '));
+		if (done) {
+			done(Object.assign({ ok: true, made: made.map(function (s) { return s.id; }), renamed: renamed }, extra || {}));
+		}
+	}
+	// Planar numbers into the drawing frame, each keeping the characters it was written as.
+	function gisPlanarPoint(q) {
+		var p = { x: inwardX(q.x), y: inwardY(q.y) };
+		if (q.tok && (q.tok.x || q.tok.y)) { p.tok = { x: q.tok.x, y: q.tok.y }; }
+		return p;
+	}
+	function gisFrameText() {
+		var pc = EngCalcs.pageConfig || {};
+		if (isLatLonProject()) { return String(pc.lpn_shapes_frame_latlon || 'latitude and longitude'); }
+		if (isProjectedProject()) { return crsLabel(projectCrsCode()) + ' (' + projectCrsCode() + ')'; }
+		return String(pc.lpn_shapes_frame_xy || 'the X and Y of this project');
+	}
+	function gisList(arr) { return arr.map(function (k) { return k.name + ' (' + k.n + ')'; }).join(', '); }
+	// A DXF's text, into Shapes. `done(report)` is called once; a harness drives this half.
+	function landDxfShapes(text, fileName, done) {
+		var pc = EngCalcs.pageConfig || {}, r = EngCalcs.lpnDxfShapes(text), lines = [], skipped = [], items, unit, ours, theirs;
+		function refuse(key, fb, reason) {
+			setNotice(String(pc[key] || fb).replace('{file}', fileName));
+			if (done) { done({ ok: false, reason: reason }); }
+		}
+		if (!r.ok) {
+			if (r.detail === 'binary') { refuse('lpn_dxf_import_binary', '{file} is a binary DXF. Save it from your CAD program as an ASCII DXF, then import again.', 'binary'); }
+			else { refuse('lpn_dxf_import_unreadable', '{file} is not an ASCII DXF file.', 'unreadable'); }
+			return;
+		}
+		if (isLatLonProject()) {
+			refuse('lpn_dxf_import_refuse_geo', 'A DXF drawing is flat, and this project is in latitude and longitude, so the coordinates of {file} have no place in it. Use Convert as… to copy the project into a coordinate system, then import again.', 'geo');
+			return;
+		}
+		items = r.shapes.map(function (sh) {
+			return { closed: sh.closed, props: sh.layer ? { layer: sh.layer } : null, pts: sh.pts.map(gisPlanarPoint) };
+		});
+		var sk = r.skipped.slice();
+		if (r.inBlocks) { sk.push({ name: String(pc.lpn_dxf_import_inblocks || 'in block definitions'), n: r.inBlocks }); }
+		if (sk.length) {
+			var total = sk.reduce(function (s, k) { return s + k.n; }, 0);
+			skipped.push(gisCounted('lpn_dxf_import_skipped', total, '{n} entities not imported: {list}.',
+				'One entity not imported: {list}.').replace('{list}', gisList(sk)));
+		}
+		if (r.bulged) {
+			skipped.push(gisCounted('lpn_dxf_import_bulge', r.bulged,
+				'{n} polylines have arc segments, which were imported as straight segments between their vertices.',
+				'One polyline has arc segments, which were imported as straight segments between its vertices.'));
+		}
+		lines.push(String(pc.lpn_shapes_import_frame || 'The coordinates were read as {frame}, with no conversion.').replace('{frame}', gisFrameText()));
+		// The drawing's stated units against the project's length unit, said and not acted on.
+		ours = isProjectedProject() ? ((EngCalcs.lpnCrsUnit && EngCalcs.lpnCrsUnit(projectCrsCode()) || {}).units || '') : unitKey('lpn_u_length');
+		theirs = r.unit;
+		if (theirs && ours && theirs !== ours) {
+			lines.push(String(pc.lpn_dxf_import_units || 'The drawing states its units as {theirs} and this project uses {ours}. The numbers were not changed.')
+				.replace('{theirs}', theirs).replace('{ours}', ours));
+		}
+		gisPlaceShapes(items, fileName, lines, skipped, done, { skipped: r.skipped, inBlocks: r.inBlocks, bulged: r.bulged, unit: r.unit });
+	}
+	// The files of a shapefile ([{ name, bytes }]), into Shapes.
+	function landShapefileShapes(files, done) {
+		var pc = EngCalcs.pageConfig || {}, fileName = files.map(function (f) { return f.name; }).join(', ');
+		if (files.length > 1) {
+			var shp = files.filter(function (f) { return /\.shp$/i.test(f.name); });
+			if (shp.length === 1) { fileName = shp[0].name; }
+		}
+		function say(msg, rep) { setNotice(msg); if (done) { done(rep); } }
+		EngCalcs.lpnShapefileRead(files).then(function (r) {
+			function go() { place(r); }
+			if (!r.ok) {
+				if (r.detail === 'noshp') { say(String(pc.lpn_shp_import_noshp || '{file} has no .shp file in it. Pick the .zip of a shapefile, or the .shp together with its .dbf and .prj.').replace('{file}', fileName), { ok: false, reason: 'noshp' }); }
+				else if (r.detail === 'manyshp') { say(String(pc.lpn_shp_import_manyshp || '{file} holds more than one shapefile. Import one at a time.').replace('{file}', fileName), { ok: false, reason: 'manyshp' }); }
+				else { say(String(pc.lpn_shp_import_unreadable || '{file} is not a shapefile this page can read: {detail}').replace('{file}', fileName).replace('{detail}', r.detail || ''), { ok: false, reason: 'unreadable' }); }
+				return;
+			}
+			var prj = r.prj, geoFile = prj ? prj.kind === 'geographic' : false;
+			if (geoFile && !isLatLonProject() && !isProjectedProject()) {
+				say(String(pc.lpn_shp_import_refuse_local || '{file} is in latitude and longitude, and this project has no place on the Earth to which they can be converted. Georeference it first with Map, World map, Attach, then import again.').replace('{file}', fileName), { ok: false, reason: 'local' });
+				return;
+			}
+			if (geoFile && !isLatLonProject() && EngCalcs.lpnCrsLoad && EngCalcs.lpnCrsReady && !EngCalcs.lpnCrsReady()) { EngCalcs.lpnCrsLoad(go); return; }
+			go();
+		});
+		function place(r) {
+			var prj = r.prj, lines = [], skipped = [], items = [], ok = true, mode, geo = isLatLonProject(), code = projectCrsCode(), attrCols = [];
+			function refuse(key, fb, reason, theirs) {
+				say(String(pc[key] || fb).replace('{file}', fileName).replace('{theirs}', theirs || '').replace('{ours}', geo ? gisFrameText() : (code ? crsLabel(code) + ' (' + code + ')' : '')), { ok: false, reason: reason });
+			}
+			var theirsName = prj ? (prj.epsg ? (prj.name ? prj.name + ' (' + prj.epsg + ')' : prj.epsg) : prj.name) : '';
+			if (!prj) {
+				if (geo) {
+					// No .prj: degrees only if every number can be one.
+					r.shapes.forEach(function (sh) { sh.pts.forEach(function (q) { if (!(q.x >= -180 && q.x <= 180 && q.y >= -90 && q.y <= 90)) { ok = false; } }); });
+					if (!ok) { refuse('lpn_shp_import_refuse_range', '{file} has no .prj file, and its coordinates are not latitudes and longitudes, so they cannot be placed in this project.', 'range'); return; }
+				}
+				mode = geo ? 'lonlat' : 'planar';
+				lines.push(String(pc.lpn_shp_import_noprj || 'There is no .prj file, so the coordinates were read as {frame}, with no conversion.').replace('{frame}', gisFrameText()));
+			} else if (prj.kind === 'geographic') {
+				mode = 'lonlat';
+				if (!geo) {
+					lines.push(String(pc.lpn_shp_import_converted || 'The coordinates are latitude and longitude. They were converted to {crs} by the transform the map uses.').replace('{crs}', crsLabel(code) + ' (' + code + ')'));
+				}
+			} else if (geo) {
+				refuse('lpn_shp_import_refuse_crs', '{file} states {theirs}, and this project is in {ours}. Nothing was imported and nothing was converted. Use Convert as… to copy the project into the coordinate system of the file, then import again.', 'crs', theirsName);
+				return;
+			} else if (isProjectedProject()) {
+				if (prj.epsg && prj.epsg === code) {
+					mode = 'planar';
+					lines.push(String(pc.lpn_shp_import_prj_same || 'The .prj states {crs}, the coordinate system of this project, so the coordinates were not changed.').replace('{crs}', crsLabel(code) + ' (' + code + ')'));
+				} else {
+					refuse('lpn_shp_import_refuse_crs', '{file} states {theirs}, and this project is in {ours}. Nothing was imported and nothing was converted. Use Convert as… to copy the project into the coordinate system of the file, then import again.', 'crs', theirsName || prj.name);
+					return;
+				}
+			} else {
+				mode = 'planar';
+				lines.push(String(pc.lpn_shp_import_prj_other || 'The .prj states {theirs}. This project states no coordinate system, so the coordinates were read as {frame}, with no conversion.').replace('{theirs}', theirsName || prj.name).replace('{frame}', gisFrameText()));
+			}
+			var nameCols = ['name', 'id'], descCols = ['description', 'desc'], bad = [];
+			// Which dbf column gives the name and the description: the first of each, by lower-case name.
+			var nameCol = null, descCol = null;
+			(r.fields || []).forEach(function (f) {
+				if (!nameCol && nameCols.indexOf(f.toLowerCase()) >= 0) { nameCol = f; }
+				if (!descCol && descCols.indexOf(f.toLowerCase()) >= 0) { descCol = f; }
+			});
+			var byRow = {};
+			r.shapes.forEach(function (sh) { byRow[sh.row] = (byRow[sh.row] || 0) + 1; });
+			r.shapes.forEach(function (sh) {
+				var pts = [], good = true, a = sh.attrs, props = {}, name = '';
+				sh.pts.forEach(function (q) {
+					var xy, p;
+					if (mode === 'lonlat') {
+						if (!(q.x >= -180 && q.x <= 180 && q.y >= -90 && q.y <= 90)) { good = false; return; }
+						if (geo) {
+							if (Math.abs(q.y) > LPN_MERC_MAX_LAT) { good = false; return; }
+							xy = { x: q.x, y: q.y };
+						} else {
+							xy = EngCalcs.lpnCrsForward ? EngCalcs.lpnCrsForward(code, { lon: q.x, lat: q.y }) : null;
+							if (!xy) { good = false; return; }
+						}
+						p = { x: inwardX(xy.x), y: inwardY(xy.y) };
+						if (geo) {
+							p[LPN_GEO_XSRC] = q.x; p[LPN_GEO_YSRC] = q.y;
+							p.tok = { x: q.tok.x, y: q.tok.y };
+						}
+					} else { p = gisPlanarPoint(q); }
+					pts.push(p);
+				});
+				if (!good || !pts.length) { bad.push({ name: String(sh.row), n: 1 }); return; }
+				if (a) {
+					Object.keys(a).forEach(function (k) {
+						if (k !== nameCol && k !== descCol && a[k] !== '' && a[k] !== undefined) { props[k] = a[k]; }
+					});
+					if (nameCol && a[nameCol] !== '' && a[nameCol] !== undefined) { name = String(a[nameCol]); }
+				}
+				items.push({
+					name: byRow[sh.row] > 1 ? '' : name, srcName: name,
+					desc: descCol && a && a[descCol] !== '' && a[descCol] !== undefined ? String(a[descCol]) : '',
+					props: props, closed: sh.closed, pts: pts
+				});
+			});
+			if (r.fields && r.fields.length) {
+				attrCols = r.fields.filter(function (f) { return f !== nameCol && f !== descCol; });
+				if (attrCols.length) {
+					lines.push(String(pc.lpn_shp_import_attrs || 'Attribute columns kept as properties of each Shape: {list}.').replace('{list}', attrCols.join(', ')));
+				}
+			}
+			var sk = r.skipped.slice().concat(bad);
+			if (sk.length) {
+				var total = sk.reduce(function (s, k) { return s + k.n; }, 0);
+				skipped.push(gisCounted('lpn_shp_import_skipped', total, '{n} records not imported: {list}.',
+					'One record not imported: {list}.').replace('{list}', gisList(sk)));
+			}
+			if (r.holes) {
+				skipped.push(gisCounted('lpn_geojson_import_holes', r.holes, '{n} polygon holes not imported. A Shape has one boundary.',
+					'One polygon hole not imported. A Shape has one boundary.'));
+			}
+			if (r.multipart) {
+				skipped.push(gisCounted('lpn_geojson_import_parts', r.multipart, '{n} multipart features imported as one Shape for each part.',
+					'One multipart feature imported as one Shape for each part.'));
+			}
+			gisPlaceShapes(items, fileName, lines, skipped, done, { skipped: r.skipped, holes: r.holes, multipart: r.multipart, mode: mode });
+		}
+	}
 	// ---- EXPORT DXF FILE (ROADMAP Task 772) ---------------------------------------------------------
 	//
 	// **THE MODEL'S DATA, AS ATTRIBUTED BLOCKS** (Tom's DXF Interface Manager specification,
@@ -44537,6 +44803,10 @@ var EngCalcs = EngCalcs || {};
 			// The points, lines and polygons of a GeoJSON file, as Shapes (Task 779).
 			{ icon: 'open', label: pc.lpn_file_import_shapes || 'Import GeoJSON shapes…',
 			  tip: pc.lpn_file_import_shapes_tip, fn: pickGeoJsonFile },
+			{ icon: 'open', label: pc.lpn_file_import_dxf || 'Import DXF shapes…',
+			  tip: pc.lpn_file_import_dxf_tip, fn: pickDxfShapesFile },
+			{ icon: 'open', label: pc.lpn_file_import_shp || 'Import shapefile shapes…',
+			  tip: pc.lpn_file_import_shp_tip, fn: pickShapefile },
 			// **THE LIBRARY IMPORT WIZARD'S OWN DOOR, AND ITS ONLY ONE** (Task 611). Tom,
 			// 2026-09-17: *"Move the button to the File menu. I thought you already did that."* Then
 			// 2026-09-18: *"Remove buttons except at the File menu."* The Libraries box carried the
@@ -47631,6 +47901,22 @@ var EngCalcs = EngCalcs || {};
 				var f = gjInput.files[0];
 				gjInput.value = '';
 				if (f) { importGeoJsonShapesFromFile(f); }
+			});
+		}
+		var dxfInput = document.getElementById('lpn_dxf_shapes_file');
+		if (dxfInput) {
+			dxfInput.addEventListener('change', function () {
+				var f = dxfInput.files[0];
+				dxfInput.value = '';
+				if (f) { importDxfShapesFromFile(f); }
+			});
+		}
+		var shpInput = document.getElementById('lpn_shp_file');
+		if (shpInput) {
+			shpInput.addEventListener('change', function () {
+				var fs = Array.prototype.slice.call(shpInput.files);
+				shpInput.value = '';
+				if (fs.length) { importShapefileFromFiles(fs); }
 			});
 		}
 		var surveyInput = document.getElementById('lpn_survey_file');
