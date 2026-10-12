@@ -106,6 +106,18 @@ examples.forEach(function (ex) {
 	});
 });
 
+// ---- NO EXAMPLE ASKS FOR A THIRD-PARTY BASEMAP UNASKED --------------------------------------------
+// privacy.php and CLAUDE.md: only OSM street tiles load without consent. A stored `satellite` (Mapbox)
+// basemap would fire api.mapbox.com requests on opening (it shipped once on Net2, 2026-10-12).
+console.log('\n-- no example stores a basemap other than OSM or none --');
+examples.forEach(function (ex) {
+	[srcDir, outDir].forEach(function (dir) {
+		const d = JSON.parse(fs.readFileSync(path.join(dir, ex.file), 'utf8'));
+		const b = (d.project || {}).basemap;
+		report(b === undefined || b === 'osm' || b === 'off', `${ex.file} (${dir === srcDir ? 'authored' : 'served'}) basemap is OSM or none`, String(b));
+	});
+});
+
 console.log('\n-- the served copy carries the format marker (Task 315) --');
 examples.forEach(function (ex) {
 	const d = JSON.parse(fs.readFileSync(path.join(outDir, ex.file), 'utf8'));
