@@ -4,16 +4,18 @@
 //   node dev/scripts/convert_example_to_si.js Net3 Net3-SI "Net3 SI"
 //
 // reads dev/water-network-examples/<from>.lwn, writes <to>.lwn there. The number each field holds
-// is converted ONCE, here, to SIG significant figures; the drawing (coordinates), the Hazen-Williams
-// roughness, the minor-loss k, patterns, times and every [QUALITY]/[REACTIONS]/[ENERGY] line are
-// carried across untouched, because none of them carries a length, a flow or a head. Verbatim-text
+// is converted ONCE, here, to SIG significant figures. THE DRAWING IS CONVERTED TOO, to DSIG: on a
+// grid project a world unit IS the display length unit (scaleBarUnitsPerPx()), so feet-as-drawn would
+// read as metres and the scale bar, auto lengths and the site-plan backdrop would be 3.28 times off.
+// The Hazen-Williams roughness, the minor-loss k, patterns, times and every
+// [QUALITY]/[REACTIONS]/[ENERGY] line are carried across untouched. Verbatim-text
 // tokens (`tok`) of every converted field are dropped, since they spell the old number; the pump
 // curves' `src` lines are re-spelled in place, keeping EPANET's own ';PUMP:' comment.
 // dev/lpn-spike/si-example-equivalence-harness.js proves the pair solves alike.
 'use strict';
 const fs = require('fs');
 const path = require('path');
-const SIG = 6;
+const SIG = 6, DSIG = 9;
 const FT = 0.3048, IN = 25.4, GPM = 1 / 15850.323141488905 * 1000; // ft->m, in->mm, gpm->L/s (lib/Units.lib.php)
 
 const dir = path.join(__dirname, '..', 'water-network-examples');
@@ -37,17 +39,27 @@ d.project.docId = 'dms' + Array.from({ length: 14 }, () => 'abcdefghijklmnopqrst
 d.units = { lpn_u_length: 'm', lpn_u_elevhead: 'mh2o', lpn_u_pressure: 'mh2o', lpn_u_diameter: 'mm',
 	lpn_u_flow: 'lps', lpn_u_velocity: 'mps', lpn_u_gradient: d.units.lpn_u_gradient };
 
+const Dr = (x) => Number((x * FT).toPrecision(DSIG));
 d.nodes.forEach((n) => {
+	conv(n, ['x', 'y', 'lx', 'ly'], Dr);
 	conv(n, ['elev', '_head', '_level', 'minLevel', 'maxLevel', 'tankDiameter'], L);
 	conv(n, ['_demand'], Q);
 	if (n.demands) { throw new Error('node ' + n.id + ' has a demand list; extend the converter'); }
 });
 d.links.forEach((l) => {
+	conv(l, ['lx', 'ly'], Dr);
+	(l.verts || []).forEach((v) => { conv(v, ['x', 'y'], Dr); });
 	conv(l, ['_length'], L);
 	conv(l, ['_diameter'], Dm);
 	if (l.curvePoints) { l.curvePoints = l.curvePoints.map((p) => [Q(p[0]), L(p[1])]); }
 	['_minorLoss', 'setting', '_setting'].forEach((k) => { if (l[k] !== undefined && l.type !== 'pipe') { throw new Error('link ' + l.id + ' has ' + k); } });
 });
+(d.labels || []).forEach((t) => { conv(t, ['x', 'y'], Dr); });
+if (d.origin && (d.origin.x || d.origin.y)) { throw new Error('non-zero origin; extend the converter'); }
+['x', 'y', 'width', 'height', 'tx', 'ty'].forEach((k) => { if (d.backdrop) { d.backdrop[k] = Dr(d.backdrop[k]); } });	// s is a ratio, iw/ih are pixels
+d.view.cx = Dr(d.view.cx); d.view.cy = Dr(d.view.cy); d.view.s = Number((d.view.s / FT).toPrecision(DSIG));	// pixels per world unit
+if (typeof d.settings.labelMaxWidth === 'number') { d.settings.labelMaxWidth = L(d.settings.labelMaxWidth); }
+if (d.labelSettings.customerMaxWidth) { throw new Error('customerMaxWidth; extend the converter'); }
 (d.curves || []).forEach((c) => {
 	if (c.kind !== 'head') { throw new Error('curve ' + c.id + ' is ' + c.kind + '; extend the converter'); }
 	c.points = c.points.map((p) => [Q(p[0]), L(p[1])]);

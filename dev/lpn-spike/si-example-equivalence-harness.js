@@ -101,6 +101,58 @@ const MODEL_REL = 1e-5, HEAD_ABS = 0.005, FLOW_REL = 1e-4, FLOW_ABS = 1e-6;
 			us.method === si.method && us.links.every((l, i) => l.roughness === si.links[i].roughness));
 		summary.push(net + ' inputs: ' + wm.v.toExponential(2));
 
+		// 1b. THE DRAWING IS IN METRES TOO ------------------------------------------------------
+		// On a grid project a world unit IS the display length unit, so the scale bar, a new pipe's
+		// auto length and the backdrop all read the coordinates as metres in the SI twin. A pipe's
+		// STATED length is not its drawn length in these two files (EPA drew them schematically:
+		// stated over drawn runs from 1 to 25951 in Net3), so "bar equals stated" cannot hold even in
+		// the US file; what must hold is that the drawn geometry is the same drawing at 0.3048 the
+		// size, which is exactly what the bar, auto length and snapping measure.
+		{
+			const ru = JSON.parse(fs.readFileSync(ROOT + 'examples/' + net + '.lwn', 'utf8'));
+			const rs = JSON.parse(fs.readFileSync(ROOT + 'examples/' + net + '-SI.lwn', 'utf8'));
+			const K = 0.3048, wd = worst(), wl = worst(), wb = worst();
+			const NU = {}, NS = {};
+			ru.nodes.forEach((n) => { NU[n.id] = n; }); rs.nodes.forEach((n) => { NS[n.id] = n; });
+			ru.nodes.forEach((n) => {
+				const m = NS[n.id];
+				note(wd, rel(n.x * K, m.x, 1e-3), 'node ' + n.id + ' x'); note(wd, rel(n.y * K, m.y, 1e-3), 'node ' + n.id + ' y');
+			});
+			(ru.labels || []).forEach((t, i) => { note(wd, rel(t.x * K, rs.labels[i].x, 1e-3), 'text ' + t.id); });
+			const drawn = (doc, N, l) => {
+				const pts = [N[l.from]].concat(l.verts || [], [N[l.to]]);
+				let sum = 0;
+				for (let i = 1; i < pts.length; i++) { sum += Math.hypot(pts[i].x - pts[i - 1].x, pts[i].y - pts[i - 1].y); }
+				return sum;
+			};
+			ru.links.forEach((l, i) => {
+				note(wl, rel(drawn(ru, NU, l) * K, drawn(rs, NS, rs.links[i]), 1e-3), 'link ' + l.id);
+			});
+			// The site plan: its four corners, as a fraction of the drawing's own extent, in both.
+			const ext = (doc) => {
+				const xs = doc.nodes.map((n) => n.x), ys = doc.nodes.map((n) => n.y);
+				return { x0: Math.min.apply(null, xs), y0: Math.min.apply(null, ys),
+					w: Math.max.apply(null, xs) - Math.min.apply(null, xs), h: Math.max.apply(null, ys) - Math.min.apply(null, ys) };
+			};
+			const corners = (doc) => {
+				const b = doc.backdrop, e = ext(doc), out = [];
+				[[b.x, b.y], [b.x + b.width, b.y], [b.x, b.y + b.height], [b.x + b.width, b.y + b.height]].forEach((p) => {
+					out.push([(b.tx + b.s * p[0] - e.x0) / e.w, (b.ty + b.s * p[1] - e.y0) / e.h]);
+				});
+				return out;
+			};
+			const cu = corners(ru), cs = corners(rs);
+			cu.forEach((c, i) => { note(wb, Math.abs(c[0] - cs[i][0]) + Math.abs(c[1] - cs[i][1]), 'corner ' + i); });
+			ok('every coordinate is the US one times 0.3048', wd.v < 1e-8, 'worst ' + wd.v.toExponential(2) + ' (' + wd.at + ')');
+			ok('every drawn pipe length (the scale bar and auto-length measure) is 0.3048 times the US one', wl.v < 1e-8,
+				'worst ' + wl.v.toExponential(2) + ' (' + wl.at + ')');
+			ok('the site plan sits at the same relative place under the pipes', wb.v < 1e-7,
+				'worst corner offset ' + wb.v.toExponential(2) + ' of the drawing (' + wb.at + ')');
+			ok('the view is the same window (centre and pixels per unit)',
+				rel(ru.view.cx * K, rs.view.cx, 1e-3) < 1e-8 && rel(ru.view.s / K, rs.view.s, 1e-3) < 1e-8);
+			summary.push(net + ' drawing: coordinates ' + wd.v.toExponential(2) + ', pipe drawn length ' + wl.v.toExponential(2) + ', backdrop corners ' + wb.v.toExponential(2));
+		}
+
 		// 2. A SINGLE INSTANT, built-in solver ---------------------------------------------
 		const su = EC.lpnSolve(us, { tol: 1e-9 }), ss = EC.lpnSolve(si, { tol: 1e-9 });
 		if (su.ok && ss.ok) {
