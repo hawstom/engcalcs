@@ -118,9 +118,10 @@ the pkill guard in .claude/hooks/guard-wait-loops.php; Mary's antecedent list (h
 - **feat/graph-bubble** (11236f20, 8110; Task 784; cut from match-property, merges after it): speech-bubble
   time-series graphs from the right-click; saved project-wide in doc.bubbles. Perry CONFIRMED; his two defects
   fixed. His call: bubbles keep screen size, so a far zoom-out piles them over the network.
-- **feat/bentley-interop** (8116; Task 721): round 6 fixes all his 10-12 findings; every property overridable.
-  Perry found three gaps (Base pick snaps back in the real table; tank bottomElev not overridable after
-  tank-ground; double-click in the Scenarios TABLE) — sent back; see the branch log for the result.
+- **feat/bentley-interop** (036f9d23, 8116; Task 721): every one of his 10-12 findings fixed; every property
+  overridable, tank bottomElev included (master merged in); Base choosable in every table cell; double-click a
+  name in the Scenarios TABLE makes it current. Perry CONFIRMED round 6; his three gaps fixed with real-mouse
+  checks. Test-merge with feat/match-property conflicts only in dev/new-english-keys.md.
 - **feat/si-example** (9df2f3f0, 8111; Task 786): eight cards, Net3/Net2 SI+US twins, backdrops only on Elm
   Street; Net2 from his .epp but on the OSM map (satellite would be an unasked Mapbox request) and without his
   label settings (symbology-table rule). Perry CONFIRMED scale bars. His notes miscount Net1 (9 junctions, 1 pump).
