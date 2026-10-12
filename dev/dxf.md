@@ -38,7 +38,8 @@ and the reasons for R2000 and attributed blocks: `dev/agents/market-researcher/a
 - **ALL CAPS** (Tom: *"ALL CAPS in AutoCAD."*): layer names, block names, tags, prompts and the
   read-me, upper-cased in the page's locale (Turkish DERİNLİĞİ). Attribute values are the user's data and stay as typed.
 - **Tags are the property labels** in the page's language, capitals, spaces made `_` (AutoCAD
-  refuses spaces and `!` in a tag): ELEVATION, BASE_DEMAND, HEAD, WATER_DEPTH, LOWEST_WATER_DEPTH,
+  refuses spaces and `!` in a tag): ELEVATION (the ground, a tank's too), BASE_ELEVATION (a tank's
+  bottom, EPANET's tank Elevation; Tom, 2026-10-11), BASE_DEMAND, HEAD, WATER_DEPTH, LOWEST_WATER_DEPTH,
   HIGHEST_WATER_DEPTH, TANK_DIAMETER, DIAMETER, LENGTH, ROUGHNESS, VALVE_TYPE, SETTING,
   NUMBER_OF_SERVICES, TAG, DESCRIPTION, plus ID. A clash within one block gets `_2`. The visible
   ID attribute is found by property, never by the text "ID", which a translation changes. The prompt is

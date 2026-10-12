@@ -222,7 +222,7 @@ v9grid.view = { cx: 100, cy: 200, s: 1 };
 const m9g = L.migrateSaved(v9grid);
 ok('a v9 GRID document is stamped and otherwise untouched',
 	m9g.v === L.storageVersion() && m9g.view.cy === 200 && m9g.nodes.every((n, i) => n.y === LATS[i]));
-ok('the page writes the current version', L.storageVersion() === 11, L.storageVersion());
+ok('the page writes the current version', L.storageVersion() === 12, L.storageVersion());
 
 // ---- 5. an `.inp` in DEGREES, through the page and back out ------------------------------------
 // dev/lpn-spike/inp-export-harness.js reads a document straight out of docFromInp() and never opens

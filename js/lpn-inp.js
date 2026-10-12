@@ -2645,8 +2645,14 @@
 				// the wrong one. MinVol 0 is EPANET's own "no separate minimum volume".
 				// **AND THE VOLUME CURVE'S NAME IN COLUMN EIGHT WHERE THE FILE PUT IT** (Task 586).
 				// Written only where the tank states one, so a cylindrical tank's row is unchanged.
+				// **COLUMN TWO IS THE BASE, NEVER THE GROUND** (Tom, 2026-10-11): EPANET's tank
+				// Elevation is the vessel floor. The ground is this page's pressure datum and has no
+				// column in [TANKS], so it is not written; a blank base is at the ground, and is
+				// written as that number in the ground's own characters.
+				var tankBaseKey = (typeof nd.bottomElev === 'number' && isFinite(nd.bottomElev)) ? 'bottomElev' : 'elev',
+					tankBase = nd[tankBaseKey] || 0;   // EngCalcs.lpnTankBottom's rule, spelled here so this module stands alone
 				var tankRow = [nd.id,
-					n(cHead, nd, 'elev', nd.elev || 0),
+					n(cHead, nd, tankBaseKey, tankBase),
 					n(cHead, nd, '_level', eff(nd, 'level') || 0),
 					n(cHead, nd, 'minLevel', nd.minLevel || 0),
 					n(cHead, nd, 'maxLevel', nd.maxLevel || 0),

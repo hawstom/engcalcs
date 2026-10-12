@@ -239,7 +239,11 @@
 				else { put(p, u, 'base_head', nd, '_head', rh, uHead); }
 				putPattern(p, 'head_pattern', nd.headPattern);
 			} else {
+				// `elevation` is the GROUND, as for every node and as in the DXF (ELEVATION); the BASE the
+				// levels stand on, EPANET's tank Elevation, is its own field (Tom, 2026-10-11).
+				var baseKey = (typeof nd.bottomElev === 'number' && isFinite(nd.bottomElev)) ? 'bottomElev' : 'elev';
 				put(p, u, 'elevation', nd, 'elev', nd.elev || 0, uHead);
+				put(p, u, 'base_elevation', nd, baseKey, nd[baseKey] || 0, uHead);
 				put(p, u, 'init_level', nd, '_level', eff(nd, 'level') || 0, uHead);
 				put(p, u, 'min_level', nd, 'minLevel', nd.minLevel || 0, uHead);
 				put(p, u, 'max_level', nd, 'maxLevel', nd.maxLevel || 0, uHead);

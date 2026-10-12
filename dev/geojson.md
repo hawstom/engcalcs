@@ -77,7 +77,7 @@ Gusnet's (that is what a QGIS user already has). Every feature has `name`, `desc
 |---|---|---|
 | Junction | Point | `node_type`=Junction, `elevation` (elev/head), `base_demand` (flow; first demand row), `demand_pattern`, `demand_rows` (only if more than one) |
 | Reservoir | Point | `node_type`=Reservoir, `base_head` (elev/head; ground level if blank), `head_pattern` |
-| Tank | Point | `node_type`=Tank, `elevation`, `init_level`, `min_level`, `max_level` (elev/head), `tank_diameter` (LENGTH unit), `vol_curve` |
+| Tank | Point | `node_type`=Tank, `elevation` (the ground), `base_elevation` (the tank bottom, EPANET's tank Elevation), `init_level`, `min_level`, `max_level` (elev/head), `tank_diameter` (LENGTH unit), `vol_curve` |
 | Pipe | LineString | `link_type`=Pipe, `start_node_name`, `end_node_name`, `length` (length), `diameter` (diameter), `roughness` (roughness unit under D-W, none under H-W), `minor_loss`, `initial_status` (Open/Closed), `pipe_type` |
 | Pump | LineString | `link_type`=Pump, `start_node_name`, `end_node_name`, `pump_type`=HEAD, `pump_curve`, `base_speed`, `speed_pattern`, `initial_status` |
 | Valve | LineString | `link_type`=Valve, `start_node_name`, `end_node_name`, `valve_type`, `diameter`, one of `pressure_setting` (PRV, PSV, PBV; pressure) / `flow_setting` (FCV; flow) / `throttle_setting` (TCV) / `headloss_curve` (GPV), `minor_loss`, `valve_status` (Active/Closed) |
@@ -88,7 +88,10 @@ Differences from the two sources: `node_type` / `link_type`, `start_node_name` a
 are WNTR's (Gusnet derives them from geometry); the capitalised type values are WNTR's. `tank_diameter`,
 `vol_curve`, `pump_curve`, `head_pattern`, `speed_pattern`, `valve_status`, `*_setting` are Gusnet's
 (WNTR: `diameter`, `vol_curve_name`, `pump_curve_name`, `head_pattern_name`, `speed_pattern_name`).
-Result names are Gusnet's `ResultField`-style (`flowrate`, `unit_headloss`). A feature
+Result names are Gusnet's `ResultField`-style (`flowrate`, `unit_headloss`). A tank's `elevation`
+is its GROUND, as at every node and as the DXF's ELEVATION; WNTR's tank `elevation` is the base,
+which we write as `base_elevation` (Tom, 2026-10-11: a tank has two elevations). Nothing reads
+GeoJSON back in, so there is no import to keep in step. A feature
 collection is not a per-layer set: Gusnet and WNTR write six files, we write one, so a user
 splits by `node_type` / `link_type` in QGIS.
 

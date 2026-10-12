@@ -47,8 +47,8 @@ const SENT = ['Lot, "B" 7', 'a\tb', 'line1\nline2', '"quoted" start'];
 const WANT = ['Lot, "B" 7', 'a\tb', 'line1 line2', '"quoted" start'];
 const q = (s) => '"' + s.replace(/"/g, '""') + '"';
 const SHEET = SENT.map(q);
-// One column copies with no tab on any line, so a cell with a space, comma or quote is quoted too.
-const COPIED = WANT.map(q);
+// A cell with a tab, line break or quote is quoted; a space or comma alone is not a reason to.
+const COPIED = WANT.map((w) => (/[\t\r\n"]/.test(w) ? q(w) : w));
 
 async function main() {
 	const env = require(path.join(REPO, 'dev', 'browser-pass', 'lib', 'env.js'));
@@ -131,7 +131,7 @@ async function main() {
 
 			// Copy out, and paste the copy over the rows below: byte-identical.
 			const out = await copyRange(tab, 1, 4);
-			ok(tab + ' copy: a one-column copy quotes every cell with a tab, space, comma or quote', out === COPIED.join('\n'), JSON.stringify(out));
+			ok(tab + ' copy: a one-column copy quotes exactly the cells with a tab, line break or quote', out === COPIED.join('\n'), JSON.stringify(out));
 			await pasteText(tab, 6, out);
 			await a.settle(400);
 			const back = await readDesc(tab, 6, 4);
@@ -152,6 +152,22 @@ async function main() {
 		await pasteText('junctions', 1, '6" pipe\t7"\nx\ty');
 		await a.settle(300);
 		ok('an unquoted 6" value keeps its quote mark', same(await readDesc('junctions', 1, 2), ['6" pipe', 'x']));
+
+		// A tab-less text/plain is ONE COLUMN, one cell per line: never split on spaces, commas or semicolons.
+		const STREETS = ['Main St', 'Oak Ave, North', 'A; B  C', '12 Elm Court'];
+		await pasteText('junctions', 1, STREETS.join('\n') + '\n');
+		await a.settle(300);
+		let got = await readDesc('junctions', 1, 4);
+		ok('one column of tab-less lines pastes one cell per line, spaces and commas kept', same(got, STREETS), JSON.stringify(got));
+		ok('and the column to the right was not written',
+			await page.evaluate(() => Array.from(document.querySelectorAll('#lpn_pane_junctions table tbody tr:nth-child(1) td')).every((x) => !/Main|St$/.test(x._lpnPaneKey === 'desc' ? '' : x.textContent))));
+		const copied = await copyRange('junctions', 1, 4);
+		ok('a one-column copy of plain text carries no quote marks', copied === STREETS.join('\n'), JSON.stringify(copied));
+		// Multi-column tab-separated still fills across.
+		await pasteText('junctions', 1, 'Main St\t5\nOak Ave\t6');
+		await a.settle(300);
+		got = await readDesc('junctions', 1, 2);
+		ok('tab-separated text still pastes across columns', same(got, ['Main St', 'Oak Ave']), JSON.stringify(got));
 	} finally {
 		await browser.close();
 		env.stopServer();
