@@ -88,13 +88,13 @@ $ec_lang['template_printable_subtitle']='طباعت کے قابل ذیلی عن�
 // NO EC_CONSENT_VERSION BUMP. Nothing about what is stored, who reads it or how long it lives has
 // moved; the sentence became more accurate, not different. Bumping would re-ask every visitor who
 // has already answered, for no change they could act on.
-$ec_lang['consent_body']='کیا ہم اس بات کو یاد رکھنے کے لیے کہ ہم پہلے ہی اس صفحے کو شمار کر چکے ہیں، اس براؤزر میں ایک ہندسے کی کوکی محفوظ کر سکتے ہیں؟ یہ آپ کے بارے میں کچھ بھی اور آپ کے ٹائپ کردہ کچھ بھی ریکارڈ نہیں کرتی۔ اس کے بغیر ہم آپ کے دوسرے وزٹ کو کسی اور شخص کے پہلے وزٹ سے الگ نہیں پہچان سکتے۔';
+$ec_lang['consent_body']='کیا ہم اس براؤزر میں ایک بے ترتیب کوڈ محفوظ کر سکتے ہیں تاکہ ہم گن سکیں کہ اس سائٹ کا ہر حصہ کتنے براؤزر استعمال کرتے ہیں؟ یہ کوڈ اسی لمحے بنایا جاتا ہے، آپ یا آپ کے آلے کے بارے میں کچھ نہیں بتاتا، اور آپ کی درج کردہ کوئی چیز ریکارڈ نہیں کرتا۔ اس کے بغیر ہم آپ کے دوسرے وزٹ کو کسی اور شخص کے پہلے وزٹ سے الگ نہیں پہچان سکتے۔';
 $ec_lang['consent_accept']='یہ قبول کریں';
 $ec_lang['consent_accept_all']='ہمیشہ قبول کریں';
 $ec_lang['consent_decline']='ہمیشہ انکار کریں';
-$ec_lang['consent_current_granted']='آپ نے اس کی اجازت دی۔ ہم اس براؤزر پروفائل کے لیے ریکارڈنگ محدود رکھتے ہیں۔';
+$ec_lang['consent_current_granted']='آپ نے اس کی اجازت دی۔ یہ براؤزر ایک بے ترتیب کوڈ رکھتا ہے تاکہ ہم اسے گن سکیں۔';
 $ec_lang['consent_current_denied']='آپ نے اس سے انکار کیا۔ ہم اس براؤزر پروفائل کی ریکارڈنگ محدود کرنے کے لیے کچھ بھی محفوظ نہیں کرتے۔';
-$ec_lang['consent_region_label']='ریکارڈنگ محدود کرنے کے بارے میں آپ کا انتخاب۔';
+$ec_lang['consent_region_label']='گنتی کے کوڈ کے بارے میں آپ کا انتخاب۔';
 $ec_lang['consent_settings_link']='کوکی کی ترتیبات';
 $ec_lang['privacy_link']='رازداری کی پالیسی';
 $ec_lang['terms_link']='استعمال کی شرائط';

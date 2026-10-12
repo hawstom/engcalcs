@@ -88,13 +88,13 @@ $ec_lang['template_printable_subtitle']='Підзаголовок для дру�
 // NO EC_CONSENT_VERSION BUMP. Nothing about what is stored, who reads it or how long it lives has
 // moved; the sentence became more accurate, not different. Bumping would re-ask every visitor who
 // has already answered, for no change they could act on.
-$ec_lang['consent_body']='Чи можемо ми зберігати одноцифровий cookie-файл у цьому браузері, щоб пам\'ятати, що ми вже врахували цю сторінку? Він не фіксує нічого про вас і нічого з того, що ви вводите. Без нього ми не можемо відрізнити ваше друге відвідування від першого відвідування іншої людини.';
+$ec_lang['consent_body']='Чи можемо ми зберегти у цьому браузері випадковий код, щоб підраховувати, скільки браузерів користується кожною частиною цього сайту? Код створюється на місці, нічого не говорить ні про вас, ні про ваш пристрій і не фіксує нічого з того, що ви вводите. Без нього ми не можемо відрізнити ваше друге відвідування від першого відвідування іншої людини.';
 $ec_lang['consent_accept']='Прийняти цей запит';
 $ec_lang['consent_accept_all']='Приймати завжди';
 $ec_lang['consent_decline']='Відхиляти завжди';
-$ec_lang['consent_current_granted']='Ви дозволили це. Ми обмежуємо реєстрацію відвідувань для цього профілю браузера.';
+$ec_lang['consent_current_granted']='Ви дозволили це. Цей браузер зберігає випадковий код, щоб ми могли його врахувати.';
 $ec_lang['consent_current_denied']='Ви відхилили це. Ми нічого не зберігаємо, щоб обмежити реєстрацію відвідувань для цього профілю браузера.';
-$ec_lang['consent_region_label']='Ваш вибір щодо обмеження реєстрації відвідувань.';
+$ec_lang['consent_region_label']='Ваш вибір щодо коду для підрахунку.';
 $ec_lang['consent_settings_link']='Налаштування файлів cookie';
 $ec_lang['privacy_link']='Політика конфіденційності';
 $ec_lang['terms_link']='Умови використання';

@@ -88,13 +88,13 @@ $ec_lang['template_printable_subtitle']='ចំណងជើងរងដែលអ
 // NO EC_CONSENT_VERSION BUMP. Nothing about what is stored, who reads it or how long it lives has
 // moved; the sentence became more accurate, not different. Bumping would re-ask every visitor who
 // has already answered, for no change they could act on.
-$ec_lang['consent_body']='តើយើងអាចរក្សាទុកខូគី (cookie) មួយខ្ទង់ក្នុងកម្មវិធីរុករកនេះ ដើម្បីចងចាំថាយើងបានរាប់ទំព័រនេះរួចហើយបានទេ? វាមិនកត់ត្រាអ្វីទាក់ទងនឹងអ្នក ឬអ្វីដែលអ្នកវាយបញ្ចូលឡើយ។ បើគ្មានវា យើងមិនអាចដឹងថាតើនេះជាការចូលមើលលើកទីពីររបស់អ្នក ឬលើកទីមួយរបស់អ្នកផ្សេងឡើយ។';
+$ec_lang['consent_body']='តើយើងអាចរក្សាទុកកូដចៃដន្យមួយក្នុងកម្មវិធីរុករកនេះ ដើម្បីរាប់ថាមានកម្មវិធីរុករកប៉ុន្មានប្រើផ្នែកនីមួយៗនៃគេហទំព័រនេះបានទេ? កូដនេះត្រូវបានបង្កើតឡើងភ្លាមៗ មិនប្រាប់អ្វីអំពីអ្នក ឬឧបករណ៍របស់អ្នកទេ ហើយមិនកត់ត្រាអ្វីដែលអ្នកបញ្ចូលឡើយ។ បើគ្មានវា យើងមិនអាចញែកការចូលមើលលើកទីពីររបស់អ្នក ពីការចូលមើលលើកទីមួយរបស់អ្នកផ្សេងបានទេ។';
 $ec_lang['consent_accept']='យល់ព្រមលើសំណើនេះ';
 $ec_lang['consent_accept_all']='យល់ព្រមជានិច្ច';
 $ec_lang['consent_decline']='បដិសេធជានិច្ច';
-$ec_lang['consent_current_granted']='អ្នកបានអនុញ្ញាតរឿងនេះ។ យើងកំណត់ការកត់ត្រាសម្រាប់ទម្រង់កម្មវិធីរុករកនេះ។';
+$ec_lang['consent_current_granted']='អ្នកបានអនុញ្ញាតរឿងនេះ។ កម្មវិធីរុករកនេះរក្សាកូដចៃដន្យមួយ ដើម្បីឲ្យយើងអាចរាប់វា។';
 $ec_lang['consent_current_denied']='អ្នកបានបដិសេធរឿងនេះ។ យើងមិនរក្សាទុកអ្វីទាំងអស់ ដើម្បីកំណត់ការកត់ត្រាសម្រាប់ទម្រង់កម្មវិធីរុករកនេះ។';
-$ec_lang['consent_region_label']='ជម្រើសរបស់អ្នកអំពីការកំណត់ការកត់ត្រា។';
+$ec_lang['consent_region_label']='ជម្រើសរបស់អ្នកអំពីកូដរាប់។';
 $ec_lang['consent_settings_link']='ការកំណត់ខូគី';
 $ec_lang['privacy_link']='សេចក្ដីជូនដំណឹងឯកជនភាព';
 $ec_lang['terms_link']='លក្ខខណ្ឌប្រើប្រាស់';

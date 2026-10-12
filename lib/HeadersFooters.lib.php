@@ -284,6 +284,9 @@ endif;
 <p id="ec-page-welcome" class="d-print-none ec-welcome"><?=$ec_lang['template_welcome']?></p>
 <?php endif; ?>
 <script>EngCalcs.pageTitle = <?=json_encode($html_title)?>;
+<?php // The consent policy version, for EngCalcs.analyticsConsented() (js/Cookies.lib.js): an
+      // "Allow this" given for an older version is no yes at all, exactly as in ecConsentState(). ?>
+EngCalcs.consentVersion = <?=json_encode(EC_CONSENT_VERSION)?>;
 <?php // The single source of icon geometry, shared with PHP's ecIcon() (Task 231). JS-built
       // chrome builds its <svg> from these same strings; a path redrawn in JS would be a
       // second icon pretending to be the first. ?>

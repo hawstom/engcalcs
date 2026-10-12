@@ -88,13 +88,13 @@ $ec_lang['template_printable_subtitle']='Subtítulo Imprimible';
 // NO EC_CONSENT_VERSION BUMP. Nothing about what is stored, who reads it or how long it lives has
 // moved; the sentence became more accurate, not different. Bumping would re-ask every visitor who
 // has already answered, for no change they could act on.
-$ec_lang['consent_body']='¿Podemos guardar una cookie de un solo dígito en este navegador para recordar que ya contamos esta página? No registra nada sobre usted ni nada de lo que escriba. Sin ella, no podemos distinguir su segunda visita de la primera visita de otra persona.';
+$ec_lang['consent_body']='¿Podemos guardar un código aleatorio en este navegador para contar cuántos navegadores usan cada parte de este sitio? El código se genera en el momento, no dice nada sobre usted ni sobre su dispositivo, y no registra nada de lo que usted escriba. Sin él, no podemos distinguir su segunda visita de la primera visita de otra persona.';
 $ec_lang['consent_accept']='Aceptar';
 $ec_lang['consent_accept_all']='Aceptar siempre';
 $ec_lang['consent_decline']='Rechazar siempre';
-$ec_lang['consent_current_granted']='Usted permitió esto. Limitamos el registro para este perfil de navegador.';
+$ec_lang['consent_current_granted']='Usted permitió esto. Este navegador conserva un código aleatorio para que podamos contarlo.';
 $ec_lang['consent_current_denied']='Usted rechazó esto. No guardamos nada para limitar el registro de este perfil de navegador.';
-$ec_lang['consent_region_label']='Su elección sobre limitar el registro.';
+$ec_lang['consent_region_label']='Su elección sobre el código de conteo.';
 $ec_lang['consent_settings_link']='Configuración de cookies';
 $ec_lang['privacy_link']='Aviso de privacidad';
 $ec_lang['terms_link']='Términos de uso';

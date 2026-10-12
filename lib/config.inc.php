@@ -338,7 +338,7 @@ unset($ec_canonical_host, $ec_colon, $ec_canonical_dev_alias, $ec_canonical_dev_
 // Language demand log — stored in log/ at the project root, blocked from HTTP by log/.htaccess.
 // Each line: ISO-8601 UTC timestamp TAB lang-code TAB source TAB page-basename
 //   source='get'     explicit ?lang=XX selection — logged every occurrence
-//   source='cookie'  returning user with saved preference — logged once per session
+//   source='cookie'  returning user with saved preference — logged once per visit (ec_seen)
 //   source='browser' raw first Accept-Language tag (e.g. es-MX, zh-TW) — logged once ever per browser via ec_blang cookie
 //   source='anon'    a page load by somebody who has not consented to being counted once rather
 //                    than every time (Task 286). Carries the same raw Accept-Language tag as
@@ -349,8 +349,19 @@ unset($ec_canonical_host, $ec_colon, $ec_canonical_dev_alias, $ec_canonical_dev_
 // below for why it is not the optional marker it used to be. Rows written before 2026-08-21 carry
 // 'visit' or no column at all, and a last field holding neither token is a legacy 'visitor' row.
 // THE TWO ARE NEVER SUMMED: one counts people, the other counts page loads.
+// THE BROWSER CODE (Tom, 2026-10-08, call F01). Since then a 'visitor' row also carries this
+// browser's random code (EC_CODE_COOKIE below) as the field just before the bucket, so the report
+// can count distinct browsers. Rows before that date have no code; a code is recognised only on a
+// 'visitor' row and only as exactly 16 lowercase hex characters, which no older column can be.
 // Run log/lang-log-stats.sh to analyze.
-define('LANG_LOG', dirname(__DIR__) . '/log/engcalcs-lang.log');
+// The directory every usage log is written in. ONE override, for harnesses only: under PHP's own
+// development server (`php -S`, SAPI 'cli-server', which no production host runs) the environment
+// variable EC_TEST_LOG_DIR redirects every log to a temporary directory, so a harness can assert
+// on the rows a request wrote without touching the checkout's log/. A visitor cannot set a server
+// environment variable, and Apache never reports 'cli-server', so production always writes log/.
+define('EC_LOG_DIR', (PHP_SAPI === 'cli-server' && getenv('EC_TEST_LOG_DIR'))
+    ? rtrim(getenv('EC_TEST_LOG_DIR'), '/') : dirname(__DIR__) . '/log');
+define('LANG_LOG', EC_LOG_DIR . '/engcalcs-lang.log');
 
 // Confirmed-human calculator-usage log — a separate question from LANG_LOG above.
 // Written by log-calc-event.php, called via navigator.sendBeacon from
@@ -364,7 +375,7 @@ define('LANG_LOG', dirname(__DIR__) . '/log/engcalcs-lang.log');
 // Answers "what calculators/languages are humans actually using" (bots essentially
 // never run this far), as opposed to LANG_LOG's raw browser-preference/demand signal.
 // Run log/lang-log-stats.sh to analyze.
-define('CALC_USAGE_LOG', dirname(__DIR__) . '/log/engcalcs-calc-usage.log');
+define('CALC_USAGE_LOG', EC_LOG_DIR . '/engcalcs-calc-usage.log');
 
 // Confirmed-human PAGE-VIEW log — the "window shopping" tier between LANG_LOG (raw
 // reach, includes bots) and CALC_USAGE_LOG (confirmed human who actually calculated).
@@ -380,7 +391,7 @@ define('CALC_USAGE_LOG', dirname(__DIR__) . '/log/engcalcs-calc-usage.log');
 // the only device signal in the suite and it is one bit on purpose. Rows written before
 // 2026-09-08 have no fifth column; the report counts them as pointer unknown, never as fine.
 // Run log/lang-log-stats.sh to analyze.
-define('HUMAN_VIEW_LOG', dirname(__DIR__) . '/log/engcalcs-human-view.log');
+define('HUMAN_VIEW_LOG', EC_LOG_DIR . '/engcalcs-human-view.log');
 
 // Contact-form SEND log (ROADMAP Task 206) — the second of the two numbers that make the
 // contact funnel arithmetic instead of a guess: HUMAN_VIEW_LOG rows for page 'contact' are the
@@ -393,7 +404,7 @@ define('HUMAN_VIEW_LOG', dirname(__DIR__) . '/log/engcalcs-human-view.log');
 // — the same four fields as the two logs above, with page-basename fixed at 'contact' so the
 // send rows line up with the view rows they are divided by.
 // Run log/lang-log-stats.sh to analyze.
-define('CONTACT_SEND_LOG', dirname(__DIR__) . '/log/engcalcs-contact-send.log');
+define('CONTACT_SEND_LOG', EC_LOG_DIR . '/engcalcs-contact-send.log');
 
 // Named-calculation log (ROADMAP Task 215) — the closest instrument this suite can build to its
 // own mission. Written by log-title-event.php from EngCalcs.maybeLogTitleEvent()
@@ -410,7 +421,7 @@ define('CONTACT_SEND_LOG', dirname(__DIR__) . '/log/engcalcs-contact-send.log');
 // The closed set and the de-duplication bit per field live in ecNamingFieldBit().
 // Deduped once per (session, page, field), so editing a title five times counts once.
 // Run log/lang-log-stats.sh to analyze.
-define('TITLE_LOG', dirname(__DIR__) . '/log/engcalcs-title.log');
+define('TITLE_LOG', EC_LOG_DIR . '/engcalcs-title.log');
 
 // Behaviour-signal log (ROADMAP Tasks 216 and 200) — the questions the four logs above cannot
 // answer. Written by log-signal-event.php from EngCalcs.logSignal() (js/Calculators.lib.js).
@@ -473,45 +484,128 @@ define('TITLE_LOG', dirname(__DIR__) . '/log/engcalcs-title.log');
 // events dedupe per PAGE LOAD in JS and store nothing new. The cost is honest and small: a visitor
 // who reloads a page and clicks the same reference twice is two rows. The cost of the alternative
 // was a promise we would have had to go back on.
-define('SIGNAL_LOG', dirname(__DIR__) . '/log/engcalcs-signal.log');
+define('SIGNAL_LOG', EC_LOG_DIR . '/engcalcs-signal.log');
 
-// ---- Author/tester opt-out from the usage logs (ROADMAP Task 210) ----
-// Visit any page with ?ec_nolog=1 once per browser to stop that browser being counted by EVERY log
-// writer -- LANG_LOG, CALC_USAGE_LOG, HUMAN_VIEW_LOG, CONTACT_SEND_LOG, TITLE_LOG and SIGNAL_LOG;
-// ?ec_nolog=0 undoes it. A new writer joins that list by calling ecLoggingOptedOut(), and every one
-// of them must: an opt-out with an exception in it is not an opt-out.
-// Deliberately an opt-out AT WRITE TIME rather than a filter applied afterwards. The logs carry no
-// IP and no session id, so "that looks like the author exercising many calculators and languages"
-// is a guess -- it cannot be applied to data already written, and it would also throw away real
-// multilingual users, who are the readers we most want to see. Suppressing at the source is exact.
-// Per-device by nature: set it once in each browser used for hand-testing.
+// ---- Tester browsers: kept out of the counts, and counted on the side (ROADMAP Task 210) ----
+// Visit any page with ?ec_nolog=1 once per browser to mark that browser as a TESTER. From then on
+// no log writer -- LANG_LOG, CALC_USAGE_LOG, HUMAN_VIEW_LOG, CONTACT_SEND_LOG, TITLE_LOG and
+// SIGNAL_LOG -- writes a row for it. Each writer calls ecLoggingOptedOut() and, when it answers
+// true, hands its row to ecLogTester() instead, so a tester's activity goes to TESTER_LOG and never
+// to the main counts. ?ec_nolog=0 clears the mark. A new writer joins that list by calling both:
+// a tester exclusion with an exception in it is not an exclusion.
+//
+// Deliberately decided AT WRITE TIME rather than filtered afterwards. The logs carry no IP and no
+// session id, so "that looks like the author exercising many calculators and languages" is a
+// guess -- it cannot be applied to data already written, and it would also throw away real
+// multilingual users, who are the readers we most want to see.
+//
+// THE SIDE COUNT (Tom, 2026-10-07: *"I would be very interested to see a side count of 'tester
+// browsers'"*). The cookie value is "1.<YYYYMMDD>", the UTC day this browser was last tallied. The
+// first PAGE VIEW of each UTC day from a tester browser writes one 'day' row and restamps the cookie,
+// so the number of 'day' rows on a date is exactly the number of distinct tester browsers active
+// that day -- with no identifier, because a date is the same for everybody. The restamp also
+// renews the one-year lifetime, so a browser in use is never forgotten; one left unused for a year
+// lapses. A legacy value of plain "1" (written before 2026-10-07, ten-year lifetime) is honoured
+// and upgraded on its next request. 'on' and 'off' rows record the mark being set and cleared.
+//
+// EXEMPT FROM CONSENT, argued in dev/storage-rulings.md: the visitor asks for exactly this by
+// typing the address, and the cookie does nothing but carry out that request. Per host by nature:
+// set it on each host and in each browser used for testing.
 define('EC_NOLOG_COOKIE', 'ec_nolog');
-if (isset($_GET['ec_nolog']) && !headers_sent()) {
-    if ($_GET['ec_nolog'] === '0') {
-        setcookie(EC_NOLOG_COOKIE, '', time() - 86400, '/');
-        unset($_COOKIE[EC_NOLOG_COOKIE]);
-    } else {
-        // Ten years: this is a standing choice by someone who works on the site, not a preference
-        // anyone needs to revisit.
-        //
-        // THE ATTRIBUTES ARE NAMED, like every other cookie this suite sets (Task 322 half B).
-        // This was the one write left in the POSITIONAL form of setcookie(), whose fourth argument
-        // is the path and which has no slot for SameSite at all -- so the cross-site rule was
-        // whatever the visitor's browser applied, and browsers do not agree. httponly is true
-        // because ecLoggingOptedOut() is the only reader and it is PHP; secure follows the scheme,
-        // because this host answers on http as well and a Secure cookie set over http is silently
-        // dropped. ecCookieSecure() is defined further down this file and hoisted, so it is
-        // callable here.
-        setcookie(EC_NOLOG_COOKIE, '1', [
-            'expires'  => time() + (10 * 365 * 86400),
-            'path'     => '/',
-            'samesite' => 'Lax',
-            'secure'   => ecCookieSecure(),
-            'httponly' => true,
-        ]);
-        $_COOKIE[EC_NOLOG_COOKIE] = '1';
+define('EC_NOLOG_DAYS', 365);
+define('TESTER_LOG', EC_LOG_DIR . '/engcalcs-tester.log');
+
+/** True when this browser is marked as a tester. */
+function ecTesterBrowser() {
+    return isset($_COOKIE[EC_NOLOG_COOKIE])
+        && preg_match('/^1(\.[0-9]{8})?$/', (string) $_COOKIE[EC_NOLOG_COOKIE]) === 1;
+}
+
+/**
+ * Writes one row to TESTER_LOG: ts TAB event TAB page, then the bucket. $event is 'on', 'off',
+ * 'day', or the kind of row a main log would otherwise have received (reach, shopping, using,
+ * naming, behaviour, sends). Nothing from a command-line render is a visitor, as in
+ * logLanguageSelection().
+ */
+function ecLogTester($event, $page = '') {
+    if (PHP_SAPI === 'cli' || ecIsPrecacheRequest()) return;
+    $event = preg_replace('/[^a-z]/', '', (string) $event);
+    if ($event === '') return;
+    $page = substr(preg_replace('/[^A-Za-z0-9_-]/', '', (string) $page), 0, 64);
+    $dir = dirname(TESTER_LOG);
+    if (!is_dir($dir)) {
+        @mkdir($dir, 0750, true);
+    }
+    // No browser code here: a tester is counted on the side, never as a browser.
+    $bucket = ecLogBucketSuffix(false);
+    $line = gmdate('Y-m-d\TH:i:s\Z') . "\t" . $event . "\t" . $page . $bucket . "\n";
+    @file_put_contents(TESTER_LOG, $line, FILE_APPEND | LOCK_EX);
+}
+
+/** Sets the tester cookie, "1." plus $day (YYYYMMDD, or '' for not yet tallied), for a year. */
+function ecTesterStamp($day) {
+    if (headers_sent()) return;
+    $value = $day === '' ? '1' : '1.' . $day;
+    // THE ATTRIBUTES ARE NAMED, like every other cookie this suite sets (Task 322 half B).
+    // httponly is true because ecLoggingOptedOut() is the only reader and it is PHP; secure follows
+    // the scheme, because this host answers on http as well and a Secure cookie set over http is
+    // silently dropped.
+    setcookie(EC_NOLOG_COOKIE, $value, [
+        'expires'  => time() + EC_NOLOG_DAYS * 86400,
+        'path'     => '/',
+        'samesite' => 'Lax',
+        'secure'   => ecCookieSecure(),
+        'httponly' => true,
+    ]);
+    $_COOKIE[EC_NOLOG_COOKIE] = $value;
+}
+
+/**
+ * Applies ?ec_nolog=1 / ?ec_nolog=0, on any request. Runs once per request, from the bottom of the
+ * consent section below, because ecLogTester() appends ecLogBucketSuffix() and that reads the
+ * consent constants, which are defined further down this file than this function.
+ */
+function ecTesterRequest() {
+    $was = ecTesterBrowser();
+    $page = isset($_SERVER['SCRIPT_NAME']) ? basename($_SERVER['SCRIPT_NAME'], '.php') : '';
+    if (isset($_GET['ec_nolog'])) {
+        if ($_GET['ec_nolog'] === '0') {
+            if (isset($_COOKIE[EC_NOLOG_COOKIE])) {
+                if (!headers_sent()) {
+                    setcookie(EC_NOLOG_COOKIE, '', [
+                        'expires'  => time() - 86400,
+                        'path'     => '/',
+                        'samesite' => 'Lax',
+                        'secure'   => ecCookieSecure(),
+                        'httponly' => true,
+                    ]);
+                }
+                unset($_COOKIE[EC_NOLOG_COOKIE]);
+                if ($was) ecLogTester('off', $page);
+            }
+            return;
+        }
+        if (!$was) {
+            ecLogTester('on', $page);
+            // Stamped with no day yet, so the page view that carried ?ec_nolog=1 is tallied by
+            // ecTesterDayTally() like any other first page view of the day.
+            ecTesterStamp('');
+        }
     }
 }
+
+/**
+ * The first PAGE VIEW of each UTC day from a tester browser writes one 'day' row and restamps the
+ * cookie, which also renews its year. Called from lib/base.inc.php, which only pages load, so the
+ * beacons, the lock heartbeat and other background requests never count as a day's use.
+ */
+function ecTesterDayTally() {
+    if (ecIsPrecacheRequest() || !ecTesterBrowser()) return;
+    if (substr((string) $_COOKIE[EC_NOLOG_COOKIE], 2) === gmdate('Ymd')) return;
+    ecTesterStamp(gmdate('Ymd'));
+    ecLogTester('day', isset($_SERVER['SCRIPT_NAME']) ? basename($_SERVER['SCRIPT_NAME'], '.php') : '');
+}
+
 /**
  * True when this request is the service worker's background precache fetch (sw.php sends the
  * header X-EC-Precache: 1 on every one). It carries the visitor's cookies but is no view: the
@@ -522,11 +616,11 @@ function ecIsPrecacheRequest() {
     return isset($_SERVER['HTTP_X_EC_PRECACHE']) && $_SERVER['HTTP_X_EC_PRECACHE'] === '1';
 }
 /**
- * True when this request must not be counted: the browser opted out of being counted, or the
- * request is a service worker precache fetch. Checked by every log writer.
+ * True when this request must not reach the main logs: the browser is a tester's, or the request
+ * is a service worker precache fetch. Checked by every log writer.
  */
 function ecLoggingOptedOut() {
-    return ecIsPrecacheRequest() || (isset($_COOKIE[EC_NOLOG_COOKIE]) && $_COOKIE[EC_NOLOG_COOKIE] === '1');
+    return ecIsPrecacheRequest() || ecTesterBrowser();
 }
 
 // ---- Consent for the storage that is NOT strictly necessary (ROADMAP Task 286) ----
@@ -536,6 +630,7 @@ function ecLoggingOptedOut() {
 // to localStorage exactly as to cookies. Two things here fail that test and one is mixed:
 //
 //   ec_blang   analytics only; exists so a browser-language statistic is counted once per browser.
+//   ec_code    analytics only; the random browser code (EC_CODE_COOKIE below, since 2026-10-08).
 //   PHPSESSID  MIXED — after this task it is analytics ONLY. Its other job (remembering a chosen
 //              language) moved to the ec_language cookie, which the visitor set deliberately and
 //              which is therefore exempt on its own footing. See lib/Language.lib.php.
@@ -552,7 +647,10 @@ function ecLoggingOptedOut() {
 // cannot evidence is not much of a consent, and because bumping EC_CONSENT_VERSION is how a
 // materially changed notice re-asks everybody without a second mechanism.
 define('EC_CONSENT_COOKIE', 'ec_consent');
-define('EC_CONSENT_VERSION', '1');
+// '2' since 2026-10-08 (Tom, call F01): the ask changed from "a one-digit cookie" to "a random
+// code", so everybody who chose "Allow this" under version 1 is asked again. "Allow all" ('2') and
+// "Refuse all" ('0') are answered for every version and are not.
+define('EC_CONSENT_VERSION', '2');
 define('EC_CONSENT_DAYS', 365);
 
 // The de-duplication store: ONE DIGIT PER PAGE, and no identifier of any kind (ROADMAP Task 288).
@@ -597,6 +695,58 @@ define('EC_SEEN_SUBTITLE', 16);
 // because every page would log 'view' and nothing would ever log 'cookie'.
 define('EC_SEEN_VISIT', '_v');
 define('EC_SEEN_DEMAND', 1);
+
+// THE BROWSER CODE (Tom, 2026-10-08, call F01: "Go (random code, new consent text)").
+//
+// The question it answers: how many BROWSERS use each part of the site, in any window, and not
+// only how many times it was used. Something has to recognise a browser again across days to
+// answer that, and the proposal Tom approved is a code kept in the browser: *"after a visitor says
+// yes, the browser makes a random code (16 characters, derived from nothing about the person or
+// device). Every log row carries it."* Distinct codes are browsers; rows are uses.
+//
+//   VALUE     16 lowercase hex characters (64 bits) from a cryptographic random source:
+//             random_bytes() here, crypto.getRandomValues() in js/Cookies.lib.js. Nothing about
+//             the visitor, the device or the visit goes into it.
+//   LIFETIME  400 days, the most a browser will keep any cookie, written again on every page view
+//             (so on each day's first visit too). Doing it only once a day would need the date
+//             stored beside the code; renewing every time stores nothing more.
+//   WHO       Only a browser that said yes (ecAnalyticsConsented() here, EngCalcs.analyticsConsented()
+//             in JS). Deleted on Refuse all, on withdrawal, on a stale "Allow this" and by Start
+//             fresh / Erase everything (all through ecForgetAnalyticsStorage()).
+//   READABLE  by JavaScript, unlike ec_seen: the banner makes the code at the moment of the yes,
+//             without a page load, and deletes it at the moment of a no. That is the ONLY script
+//             write: every renewal is this file's Set-Cookie, because Safari caps a cookie written
+//             by script at 7 days (WebKit ITP) and would otherwise make the 400 days false.
+//
+// Visitors who refuse get no code; their rows still count as page loads, never as browsers.
+define('EC_CODE_COOKIE', 'ec_code');
+define('EC_CODE_DAYS', 400);
+
+/** This browser's code, or '' when it has none (or carries something we did not write). */
+function ecCountCode() {
+    if (!ecAnalyticsConsented() || empty($_COOKIE[EC_CODE_COOKIE])) return '';
+    $code = (string) $_COOKIE[EC_CODE_COOKIE];
+    return preg_match('/^[0-9a-f]{16}$/', $code) === 1 ? $code : '';
+}
+
+/**
+ * Makes the code if a said-yes browser has none, and renews its 400 days either way. Called on
+ * every PAGE VIEW from lib/base.inc.php (never from a beacon). A browser that has not said yes is
+ * left alone: nothing is written for it.
+ */
+function ecCountCodeRenew() {
+    if (!ecAnalyticsConsented() || headers_sent()) return;
+    $code = ecCountCode();
+    if ($code === '') $code = bin2hex(random_bytes(8));
+    setcookie(EC_CODE_COOKIE, $code, [
+        'expires'  => time() + EC_CODE_DAYS * 86400,
+        'path'     => '/',
+        'samesite' => 'Lax',
+        'secure'   => ecCookieSecure(),
+        'httponly' => false, // the banner makes and deletes it from JS; see above
+    ]);
+    $_COOKIE[EC_CODE_COOKIE] = $code;
+}
 
 /**
  * Whether cookies should carry the Secure attribute on THIS request.
@@ -667,7 +817,7 @@ function ecConsentSet($answer) {
  */
 function ecForgetAnalyticsStorage() {
     if (headers_sent()) return;
-    foreach (['ec_blang', EC_SEEN_COOKIE] as $name) {
+    foreach (['ec_blang', EC_SEEN_COOKIE, EC_CODE_COOKIE] as $name) {
         if (isset($_COOKIE[$name])) {
             setcookie($name, '', ['expires' => time() - 86400, 'path' => '/']);
             unset($_COOKIE[$name]);
@@ -732,6 +882,10 @@ function ecSeen($page, $flag) {
  *
  * A SESSION COOKIE — no expiry — so it lasts exactly as long as the visit it de-duplicates, and a
  * visitor who returns tomorrow is counted again, which is what "visits" has always meant here.
+ *
+ * It lasted a year for one day (2026-10-07), so that said-yes rows would count browsers. The
+ * browser code (EC_CODE_COOKIE, Tom's call F01 of 2026-10-08) answers that question directly, as
+ * distinct codes, and a year-long de-duplication would have left the rows unable to count uses.
  */
 function ecMarkSeen($page, $flag) {
     if (!ecAnalyticsConsented() || headers_sent() || ecIsPrecacheRequest()) return;
@@ -877,14 +1031,25 @@ function ecNamingFieldBit($field) {
  * a legacy visitor row, and log/lang-log-stats.sh reads it as one. The format is otherwise
  * unchanged, so a mixed-vintage log still reports correctly.
  */
-function ecLogBucketSuffix() {
-    return ecAnalyticsConsented() ? "\tvisitor" : "\tvisit";
+function ecLogBucketSuffix($withCode = true) {
+    if (!ecAnalyticsConsented()) return "\tvisit";
+    // The browser code (call F01, 2026-10-08) rides here, immediately before the bucket, so every
+    // writer that writes a said-yes row carries it without a second call to forget. A said-yes
+    // browser whose code is not made yet writes the row without one; it still counts as a use.
+    $code = $withCode ? ecCountCode() : '';
+    return ($code !== '' ? "\t" . $code : '') . "\tvisitor";
 }
 
 // A visitor who has withdrawn consent, or refused it, must not keep carrying the storage it
 // covered. Checked on every page load because withdrawal can happen in another tab.
-if (!ecAnalyticsConsented() && (isset($_COOKIE['ec_blang']) || isset($_COOKIE[EC_SEEN_COOKIE]))) {
+if (!ecAnalyticsConsented() && (isset($_COOKIE['ec_blang']) || isset($_COOKIE[EC_SEEN_COOKIE]) || isset($_COOKIE[EC_CODE_COOKIE]))) {
     ecForgetAnalyticsStorage();
+}
+
+// The tester mark (see ecTesterRequest() above; the daily tally is in lib/base.inc.php). Not for a command-line render,
+// which is never a visitor and has no cookies to set.
+if (PHP_SAPI !== 'cli') {
+    ecTesterRequest();
 }
 
 // Looped-network project locks (ROADMAP Task 195 Phase 2) — one small JSON record per project

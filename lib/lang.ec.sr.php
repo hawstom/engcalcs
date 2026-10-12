@@ -88,13 +88,13 @@ $ec_lang['template_printable_subtitle']='Поднаслов за штампу';
 // NO EC_CONSENT_VERSION BUMP. Nothing about what is stored, who reads it or how long it lives has
 // moved; the sentence became more accurate, not different. Bumping would re-ask every visitor who
 // has already answered, for no change they could act on.
-$ec_lang['consent_body']='Можемо ли да сачувамо једноцифрени колачић у овом прегледачу како бисмо запамтили да смо ову страницу већ убројали? Он не бележи ништа о вама нити било шта што укуцате. Без њега не можемо разликовати вашу другу посету од нечије прве.';
+$ec_lang['consent_body']='Можемо ли да сачувамо насумичан код у овом прегледачу како бисмо бројали колико прегледача користи сваки део ове странице? Код се прави на лицу места, не говори ништа о вама нити о вашем уређају и не бележи ништа што унесете. Без њега не можемо разликовати вашу другу посету од нечије прве.';
 $ec_lang['consent_accept']='Прихвати ово';
 $ec_lang['consent_accept_all']='Прихвати трајно';
 $ec_lang['consent_decline']='Одбиј трајно';
-$ec_lang['consent_current_granted']='Дозволили сте ово. Ограничавамо бележење за овај профил прегледача.';
+$ec_lang['consent_current_granted']='Дозволили сте ово. Овај прегледач чува насумичан код како бисмо га могли избројати.';
 $ec_lang['consent_current_denied']='Одбили сте ово. Не чувамо ништа, чиме ограничавамо бележење за овај профил прегледача.';
-$ec_lang['consent_region_label']='Ваш избор о ограничавању бележења.';
+$ec_lang['consent_region_label']='Ваш избор о коду за бројање.';
 $ec_lang['consent_settings_link']='Подешавања колачића';
 $ec_lang['privacy_link']='Обавештење о приватности';
 $ec_lang['terms_link']='Услови коришћења';

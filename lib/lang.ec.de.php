@@ -88,13 +88,13 @@ $ec_lang['template_printable_subtitle']='Druckbarer Untertitel';
 // NO EC_CONSENT_VERSION BUMP. Nothing about what is stored, who reads it or how long it lives has
 // moved; the sentence became more accurate, not different. Bumping would re-ask every visitor who
 // has already answered, for no change they could act on.
-$ec_lang['consent_body']='Dürfen wir ein einstelliges Cookie in diesem Browser speichern, um uns zu merken, dass wir diese Seite bereits gezählt haben? Es speichert nichts über Sie und nichts, was Sie eingeben. Ohne dieses Cookie können wir Ihren zweiten Besuch nicht von einem ersten Besuch einer anderen Person unterscheiden.';
+$ec_lang['consent_body']='Dürfen wir in diesem Browser einen zufälligen Code speichern, damit wir zählen können, wie viele Browser die einzelnen Teile dieser Seite nutzen? Der Code wird im Moment des Speicherns erzeugt, sagt nichts über Sie oder Ihr Gerät aus und hält nichts fest, was Sie eingeben. Ohne ihn können wir Ihren zweiten Besuch nicht vom ersten Besuch einer anderen Person unterscheiden.';
 $ec_lang['consent_accept']='Diesmal annehmen';
 $ec_lang['consent_accept_all']='Immer annehmen';
 $ec_lang['consent_decline']='Immer ablehnen';
-$ec_lang['consent_current_granted']='Sie haben dem zugestimmt. Wir schränken die Protokollierung für dieses Browserprofil ein.';
+$ec_lang['consent_current_granted']='Sie haben dem zugestimmt. Dieser Browser behält einen zufälligen Code, damit wir ihn zählen können.';
 $ec_lang['consent_current_denied']='Sie haben dies abgelehnt. Wir speichern nichts, um die Protokollierung für dieses Browserprofil einzuschränken.';
-$ec_lang['consent_region_label']='Ihre Wahl zur Einschränkung der Protokollierung.';
+$ec_lang['consent_region_label']='Ihre Wahl zum Zählcode.';
 $ec_lang['consent_settings_link']='Cookie-Einstellungen';
 $ec_lang['privacy_link']='Datenschutzerklärung';
 $ec_lang['terms_link']='Nutzungsbedingungen';

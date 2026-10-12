@@ -88,13 +88,13 @@ $ec_lang['template_printable_subtitle']='عنوان فرعي للطباعة';
 // NO EC_CONSENT_VERSION BUMP. Nothing about what is stored, who reads it or how long it lives has
 // moved; the sentence became more accurate, not different. Bumping would re-ask every visitor who
 // has already answered, for no change they could act on.
-$ec_lang['consent_body']='هل تسمح لنا بحفظ كوكي من رقم واحد في هذا المتصفح، لنتذكر أننا أحصينا هذه الصفحة من قبل؟ إنه لا يسجّل أي شيء عنك ولا أي شيء تكتبه. بدونه، لا يمكننا تمييز زيارتك الثانية عن زيارة أولى لشخص آخر.';
+$ec_lang['consent_body']='هل تسمح لنا بحفظ رمز عشوائي في هذا المتصفح لكي نحصي عدد المتصفحات التي تستخدم كل جزء من هذا الموقع؟ يُنشأ الرمز في لحظته، ولا يقول شيئاً عنك أو عن جهازك، ولا يسجّل أي شيء تدخله. بدونه لا نستطيع تمييز زيارتك الثانية عن زيارة أولى لشخص آخر.';
 $ec_lang['consent_accept']='الموافقة هذه المرة';
 $ec_lang['consent_accept_all']='الموافقة دائماً';
 $ec_lang['consent_decline']='رفض دائماً';
-$ec_lang['consent_current_granted']='لقد وافقت على هذا. نحن نحدّ من التسجيل لملف تعريف هذا المتصفح.';
+$ec_lang['consent_current_granted']='لقد وافقت على هذا. يحتفظ هذا المتصفح برمز عشوائي لكي نتمكن من إحصائه.';
 $ec_lang['consent_current_denied']='لقد رفضت هذا. لا نخزّن شيئاً للحد من التسجيل لملف تعريف هذا المتصفح.';
-$ec_lang['consent_region_label']='اختيارك بشأن الحد من التسجيل.';
+$ec_lang['consent_region_label']='اختيارك بشأن رمز العدّ.';
 $ec_lang['consent_settings_link']='إعدادات ملفات تعريف الارتباط';
 $ec_lang['privacy_link']='إشعار الخصوصية';
 $ec_lang['terms_link']='شروط الاستخدام';

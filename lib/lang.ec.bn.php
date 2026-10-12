@@ -88,13 +88,13 @@ $ec_lang['template_printable_subtitle']='মুদ্রণযোগ্য উ�
 // NO EC_CONSENT_VERSION BUMP. Nothing about what is stored, who reads it or how long it lives has
 // moved; the sentence became more accurate, not different. Bumping would re-ask every visitor who
 // has already answered, for no change they could act on.
-$ec_lang['consent_body']='এই ব্রাউজারে আমরা কি একটি একক-সংখ্যার কুকি সংরক্ষণ করতে পারি, এই মনে রাখতে যে আমরা এই পৃষ্ঠাটি ইতিমধ্যে গণনা করেছি? এটি আপনার সম্পর্কে বা আপনি যা টাইপ করেন তার কিছুই রেকর্ড করে না। এটি ছাড়া আমরা আপনার দ্বিতীয় পরিদর্শনকে অন্য কারও প্রথম পরিদর্শন থেকে আলাদা করতে পারি না।';
+$ec_lang['consent_body']='এই ব্রাউজারে আমরা কি একটি এলোমেলো কোড সংরক্ষণ করতে পারি, যাতে আমরা গণনা করতে পারি কতগুলো ব্রাউজার এই সাইটের কোন অংশ ব্যবহার করে? কোডটি সেই মুহূর্তেই তৈরি করা হয়, এটি আপনার বা আপনার ডিভাইসের সম্পর্কে কিছুই বলে না, এবং আপনি যা লেখেন তার কিছুই রেকর্ড করে না। এটি ছাড়া আমরা আপনার দ্বিতীয়বার আসাকে অন্য কারও প্রথমবার আসা থেকে আলাদা করতে পারি না।';
 $ec_lang['consent_accept']='এটি গ্রহণ করুন';
 $ec_lang['consent_accept_all']='সর্বদা গ্রহণ করুন';
 $ec_lang['consent_decline']='সর্বদা প্রত্যাখ্যান করুন';
-$ec_lang['consent_current_granted']='আপনি এটি অনুমতি দিয়েছেন। আমরা এই ব্রাউজার প্রোফাইলের জন্য লগিং সীমিত করি।';
+$ec_lang['consent_current_granted']='আপনি এটির অনুমতি দিয়েছেন। এই ব্রাউজার একটি এলোমেলো কোড রাখে, যাতে আমরা এটিকে গণনা করতে পারি।';
 $ec_lang['consent_current_denied']='আপনি এটি প্রত্যাখ্যান করেছেন। এই ব্রাউজার প্রোফাইলের লগিং সীমিত করতে আমরা কিছুই সংরক্ষণ করি না।';
-$ec_lang['consent_region_label']='লগিং সীমিত করা সংক্রান্ত আপনার সিদ্ধান্ত।';
+$ec_lang['consent_region_label']='গণনার কোড সম্পর্কে আপনার সিদ্ধান্ত।';
 $ec_lang['consent_settings_link']='কুকি সেটিংস';
 $ec_lang['privacy_link']='গোপনীয়তা নীতি';
 $ec_lang['terms_link']='ব্যবহারের শর্তাবলী';

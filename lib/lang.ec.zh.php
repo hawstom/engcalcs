@@ -88,13 +88,13 @@ $ec_lang['template_printable_subtitle']='可打印副标题';
 // NO EC_CONSENT_VERSION BUMP. Nothing about what is stored, who reads it or how long it lives has
 // moved; the sentence became more accurate, not different. Bumping would re-ask every visitor who
 // has already answered, for no change they could act on.
-$ec_lang['consent_body']='是否允许我们在此浏览器保存一个一位数的 cookie，用于记住本页面已被计数？它不会记录关于您的任何信息，也不会记录您输入的任何内容。如果没有它，我们将无法区分您的第二次访问和另一个人的第一次访问。';
+$ec_lang['consent_body']='是否允许我们在此浏览器中保存一个随机代码，以便统计本网站各部分分别有多少个浏览器在使用？该代码是即时随机生成的，不包含任何关于您或您设备的信息，也不会记录您输入的任何内容。如果没有它，我们就无法区分您的第二次访问和另一个人的第一次访问。';
 $ec_lang['consent_accept']='同意本次';
 $ec_lang['consent_accept_all']='同意，以后不再询问';
 $ec_lang['consent_decline']='拒绝，以后不再询问';
-$ec_lang['consent_current_granted']='您已同意。我们据此限制本浏览器的访问记录次数。';
+$ec_lang['consent_current_granted']='您已同意。此浏览器会保存一个随机代码，以便我们对其进行统计。';
 $ec_lang['consent_current_denied']='您已拒绝。我们不保存任何内容，以限制本浏览器的访问记录次数。';
-$ec_lang['consent_region_label']='您关于限制访问记录的选择。';
+$ec_lang['consent_region_label']='您对统计代码的选择。';
 $ec_lang['consent_settings_link']='Cookie 设置';
 $ec_lang['privacy_link']='隐私声明';
 $ec_lang['terms_link']='使用条款';

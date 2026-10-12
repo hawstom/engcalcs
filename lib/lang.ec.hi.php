@@ -88,13 +88,13 @@ $ec_lang['template_printable_subtitle']='प्रिंट करने यो�
 // NO EC_CONSENT_VERSION BUMP. Nothing about what is stored, who reads it or how long it lives has
 // moved; the sentence became more accurate, not different. Bumping would re-ask every visitor who
 // has already answered, for no change they could act on.
-$ec_lang['consent_body']='क्या हम यह याद रखने के लिए कि हम इस पृष्ठ को पहले ही गिन चुके हैं, इस ब्राउज़र में एक अंक की कुकी सहेज सकते हैं? यह आपके बारे में कुछ भी और आपके टाइप किए गए किसी भी शब्द को रिकॉर्ड नहीं करती। इसके बिना हम आपकी दूसरी विज़िट को किसी और की पहली विज़िट से अलग नहीं बता सकते।';
+$ec_lang['consent_body']='क्या हम इस ब्राउज़र में एक यादृच्छिक कोड सहेज सकते हैं, ताकि हम गिन सकें कि कितने ब्राउज़र इस साइट के किस भाग का उपयोग करते हैं? कोड उसी समय बना लिया जाता है, यह आपके या आपके डिवाइस के बारे में कुछ नहीं बताता, और आपके दर्ज किए गए किसी भी विवरण को दर्ज नहीं करता। इसके बिना हम आपकी दूसरी विज़िट को किसी और की पहली विज़िट से अलग नहीं कर सकते।';
 $ec_lang['consent_accept']='अभी स्वीकार करें';
 $ec_lang['consent_accept_all']='हमेशा के लिए स्वीकार करें';
 $ec_lang['consent_decline']='हमेशा के लिए अस्वीकार करें';
-$ec_lang['consent_current_granted']='आपने इसे स्वीकार किया है। हम इस ब्राउज़र प्रोफ़ाइल के लिए लॉगिंग सीमित रखते हैं।';
+$ec_lang['consent_current_granted']='आपने इसकी अनुमति दी है। यह ब्राउज़र एक यादृच्छिक कोड रखता है ताकि हम इसे गिन सकें।';
 $ec_lang['consent_current_denied']='आपने इसे अस्वीकार किया है। लॉगिंग सीमित रखने के लिए हम कुछ भी संग्रहीत नहीं करते।';
-$ec_lang['consent_region_label']='लॉगिंग सीमित करने के बारे में आपकी पसंद।';
+$ec_lang['consent_region_label']='गिनती वाले कोड के बारे में आपकी पसंद।';
 $ec_lang['consent_settings_link']='कुकी सेटिंग्स';
 $ec_lang['privacy_link']='गोपनीयता सूचना';
 $ec_lang['terms_link']='उपयोग की शर्तें';

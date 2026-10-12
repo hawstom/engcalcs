@@ -88,13 +88,13 @@ $ec_lang['template_printable_subtitle']='ሊታተም የሚችል ንዑስ ር
 // NO EC_CONSENT_VERSION BUMP. Nothing about what is stored, who reads it or how long it lives has
 // moved; the sentence became more accurate, not different. Bumping would re-ask every visitor who
 // has already answered, for no change they could act on.
-$ec_lang['consent_body']='ይህን ገጽ አስቀድመን እንደቆጠርን ለማስታወስ በዚህ አሳሽ ውስጥ የአንድ አሃዝ ኩኪ እንድናስቀምጥ ይፈቅዱልናል? ስለ እርስዎ ምንም አይመዘግብም፣ የሚተይቡትንም ምንም አይመዘግብም። ያለሱ የእርስዎን ሁለተኛ ጉብኝት ከሌላ ሰው የመጀመሪያ ጉብኝት መለየት አንችልም።';
+$ec_lang['consent_body']='የዚህ ድረ-ገጽ እያንዳንዱ ክፍል ስንት አሳሾች እንደሚጠቀሙበት መቁጠር እንድንችል፣ በዚህ አሳሽ ውስጥ የዘፈቀደ ኮድ እንድናስቀምጥ ይፈቅዱልናል? ኮዱ በቦታው የሚፈጠር ነው፣ ስለ እርስዎም ሆነ ስለ መሣሪያዎ ምንም አይናገርም፣ የሚያስገቡትንም ምንም አይመዘግብም። ያለሱ የእርስዎን ሁለተኛ ጉብኝት ከሌላ ሰው የመጀመሪያ ጉብኝት መለየት አንችልም።';
 $ec_lang['consent_accept']='ይህን ይፍቀዱ';
 $ec_lang['consent_accept_all']='ሁሌም ይፍቀዱ';
 $ec_lang['consent_decline']='ሁሌም ይከልክሉ';
-$ec_lang['consent_current_granted']='ይህን ፈቅደዋል። ለዚህ አሳሽ መገለጫ የመመዝገብን መጠን እንገድባለን።';
+$ec_lang['consent_current_granted']='ይህን ፈቅደዋል። ይህ አሳሽ የዘፈቀደ ኮድ ይይዛል፣ እኛም ለመቁጠር እንጠቀምበታለን።';
 $ec_lang['consent_current_denied']='ይህን ከልክለዋል። ለዚህ አሳሽ መገለጫ የመመዝገብን መጠን ለመገደብ ምንም አናስቀምጥም።';
-$ec_lang['consent_region_label']='የምዝገባ መገደብ ላይ ያደረጉት ምርጫ።';
+$ec_lang['consent_region_label']='ስለ መቁጠሪያው ኮድ ያደረጉት ምርጫ።';
 $ec_lang['consent_settings_link']='የኩኪ ቅንብሮች';
 $ec_lang['privacy_link']='የግላዊነት መግለጫ';
 $ec_lang['terms_link']='የአጠቃቀም ደንቦች';

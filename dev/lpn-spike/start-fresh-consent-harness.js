@@ -70,6 +70,9 @@ function constant(name) {
 const CONSENT_COOKIE = constant('EC_CONSENT_COOKIE');
 const CONSENT_VERSION = constant('EC_CONSENT_VERSION');
 const SEEN_COOKIE = constant('EC_SEEN_COOKIE');
+// The random browser code (Tom, call F01, 2026-10-08), made by the page itself once the visitor has
+// said yes -- so it is not planted below; the "Allow all" record makes it appear.
+const CODE_COOKIE = constant('EC_CODE_COOKIE');
 
 async function main() {
 	const env = require(path.join(REPO, 'dev', 'browser-pass', 'lib', 'env'));
@@ -132,6 +135,8 @@ async function main() {
 		let jar = await context.cookies(env.origin());
 		let names = jar.map((c) => c.name).sort();
 		ok('all three planted cookies are on the browser', ['ec_blang', CONSENT_COOKIE, SEEN_COOKIE].every((n) => names.includes(n)), names.join(','));
+		const code = jar.find((c) => c.name === CODE_COOKIE);
+		ok('a said-yes browser now carries its random code (' + CODE_COOKIE + ', 16 hex)', !!code && /^[0-9a-f]{16}$/.test(code.value), code ? code.value : names.join(','));
 
 		// A localStorage key too, so the same run also proves the wipe this button already did is
 		// unbroken by the change -- "Start fresh" promises to erase everything, not just the three
@@ -167,6 +172,7 @@ async function main() {
 		ok('the consent record is gone', !names.includes(CONSENT_COOKIE), names.join(','));
 		ok('ec_blang is gone', !names.includes('ec_blang'), names.join(','));
 		ok(SEEN_COOKIE + ' is gone', !names.includes(SEEN_COOKIE), names.join(','));
+		ok(CODE_COOKIE + ', the browser code, is gone', !names.includes(CODE_COOKIE), names.join(','));
 		const titlesLeft = await page.evaluate(() => localStorage.getItem('lpn_show_titles'));
 		ok('the pre-existing localStorage wipe still works', titlesLeft === null, String(titlesLeft));
 	} finally {

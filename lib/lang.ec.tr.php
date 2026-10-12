@@ -88,13 +88,13 @@ $ec_lang['template_printable_subtitle']='Yazdırılabilir Alt Başlık';
 // NO EC_CONSENT_VERSION BUMP. Nothing about what is stored, who reads it or how long it lives has
 // moved; the sentence became more accurate, not different. Bumping would re-ask every visitor who
 // has already answered, for no change they could act on.
-$ec_lang['consent_body']='Bu sayfayı zaten saydığımızı hatırlamak için bu tarayıcıda tek haneli bir çerez saklayabilir miyiz? Hakkınızda hiçbir şey ve yazdığınız hiçbir şey kaydetmez. Bu olmadan, ikinci ziyaretinizi başka birinin ilk ziyaretinden ayırt edemeyiz.';
+$ec_lang['consent_body']='Sitenin her bölümünü kaç tarayıcının kullandığını sayabilmemiz için bu tarayıcıya rastgele bir kod kaydedebilir miyiz? Kod o anda üretilir, sizin veya cihazınız hakkında hiçbir şey söylemez ve girdiğiniz hiçbir şeyi kaydetmez. Bu kod olmadan ikinci ziyaretinizi başka birinin ilk ziyaretinden ayırt edemeyiz.';
 $ec_lang['consent_accept']='Kabul et';
 $ec_lang['consent_accept_all']='Her zaman kabul et';
 $ec_lang['consent_decline']='Her zaman reddet';
-$ec_lang['consent_current_granted']='Buna izin verdiniz. Bu tarayıcı profili için kaydı sınırlıyoruz.';
+$ec_lang['consent_current_granted']='Buna izin verdiniz. Bu tarayıcı, sayılabilmesi için rastgele bir kod saklıyor.';
 $ec_lang['consent_current_denied']='Bunu reddettiniz. Bu tarayıcı profili için kaydı sınırlamak amacıyla hiçbir şey saklamıyoruz.';
-$ec_lang['consent_region_label']='Kaydı sınırlama tercihiniz.';
+$ec_lang['consent_region_label']='Sayım kodu hakkındaki tercihiniz.';
 $ec_lang['consent_settings_link']='Çerez ayarları';
 $ec_lang['privacy_link']='Gizlilik bildirimi';
 $ec_lang['terms_link']='Kullanım koşulları';
