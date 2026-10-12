@@ -109,6 +109,8 @@
 	// handed the base, because that is what its [TANKS] Elevation is, so its EN_PRESSURE at a tank is
 	// H - base. Moved onto the ground here, at the one door its pressures come through, so both
 	// engines report one number. Every other node's pressure passes untouched.
+	// **WATER HEIGHT IS FUNDAMENTAL AND PRESSURE UNITS ARE DERIVED** (Tom, 2026-10-12): pressure =
+	// SG x (H - z), in m or ft of water; psi, kPa and bar follow by fixed factors.
 	// **SPECIFIC GRAVITY IS APPLIED HERE, AFTER THE SHIFT** (Tom, 2026-10-12: *"1 ft or meter of
 	// water creates a pressure that varies with specific gravity"*). Under `Units LPS` the engine's
 	// pressure is a head of the fluid in METRES with no SG in it (measured: SG 1.1 left its junction
