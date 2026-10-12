@@ -32443,7 +32443,7 @@ var EngCalcs = EngCalcs || {};
 		head.appendChild(title); head.appendChild(quant); head.appendChild(close);
 		root.appendChild(head); root.appendChild(host); root.appendChild(grip);
 		tsbLayer.insertBefore(root, tsbTails);
-		tsbEls[b.id] = { root: root, title: title, quant: quant, host: host, rect: null };
+		tsbEls[b.id] = { root: root, head: head, close: close, title: title, quant: quant, host: host, rect: null };
 		root.addEventListener('pointerdown', function () { root.style.zIndex = String(++tsbZ); });
 		head.addEventListener('pointerdown', function (e) {
 			if (e.target === close || e.target.closest('select') || e.button > 0) { return; }
@@ -32509,7 +32509,7 @@ var EngCalcs = EngCalcs || {};
 			rec.quantKey = key;
 		}
 		rec.quant.value = pick.field;
-		rec.quant.style.display = '';
+		if (!rec.quant.parentNode) { rec.head.insertBefore(rec.quant, rec.close); }
 	}
 	function tsbDraw(b) {
 		var rec = tsbEls[b.id], pc = EngCalcs.pageConfig || {}, s = tsbSubject(b), frames, avail, pick, host, lay, say;
@@ -32524,7 +32524,7 @@ var EngCalcs = EngCalcs || {};
 		rec.root.style.width = b.w + 'px';
 		if (!s) { return; }
 		rec.title.textContent = b.n;
-		rec.quant.style.display = 'none';
+		if (rec.quant.parentNode) { rec.quant.parentNode.removeChild(rec.quant); }
 		frames = EngCalcs.lpnTimeRunFrames ? EngCalcs.lpnTimeRunFrames() : [];
 		say = function (text) {
 			var d = document.createElement('div');

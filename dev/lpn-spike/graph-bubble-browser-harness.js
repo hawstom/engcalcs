@@ -125,7 +125,6 @@ async function main() {
 			return out;
 		});
 		const boxOf = (a, sel) => a.page.evaluate((s) => { const e = document.querySelector(s); const r = e.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2, r: r.right, b: r.bottom, l: r.left, t: r.top }; }, sel);
-		const MENU = 'Time series graph';
 
 		// ---- 1. steady state: the row is greyed ----
 		console.log('1. BASIC NETWORK, steady state');
@@ -138,7 +137,8 @@ async function main() {
 		let row = await menu(a, await a.lang('lpn_tsb_menu'));
 		ok('the menu has a Time series graph row', !!row);
 		ok('it is greyed with a tip when there is no extended period run', row && row.off && row.title.length > 10, row && row.title);
-		await a.page.evaluate(() => { Array.from(document.querySelectorAll('.lpn-pane-ctxmenu button')).forEach((b) => { if (b.textContent.trim() === 'Time series graph') { b.click(); } }); });
+		const gl = await a.lang('lpn_tsb_menu');
+		await a.page.evaluate((l) => { Array.from(document.querySelectorAll('.lpn-pane-ctxmenu button')).forEach((b) => { if (b.textContent.trim() === l) { b.click(); } }); }, gl);
 		await a.settle(300);
 		ok('pressing a greyed row opens nothing', (await bubbles(a)).length === 0);
 		await a.page.keyboard.press('Escape');
@@ -153,7 +153,6 @@ async function main() {
 		await a.waitFor(() => a.page.evaluate(() => EngCalcs.lpnTimeRunState().frames > 1), 'EPS frames', 120000);
 		await a.settle(800);
 		const LBL = await a.lang('lpn_tsb_menu');
-		ok('the menu label is the English one', LBL === MENU, LBL);
 		await rightClick(a, await pointOf(a.page, 'node', '10'));
 		row = await menu(a, LBL);
 		ok('after the run the row is enabled', row && !row.off);
