@@ -147,12 +147,14 @@ async function main() {
 			ok('the toolbar has a Shape button with an icon', !!ic && ic.visible, JSON.stringify(ic));
 			ok('...drawn as one path and nothing else (no grips, no rectangles)', !!ic && ic.tags.length === 1 && ic.tags[0] === 'path', ic && ic.tags.join());
 			const pts = ic ? (ic.d.match(/-?\d+(\.\d+)?/g) || []).map(Number) : [];
-			// M x y L x y L x y L x y H x L x y: six points, five legs.
+			// Tom's own freehand drawing (2026-10-12): five uneven points, four strokes, open.
 			const legs = ic ? (ic.d.match(/[LHV]/g) || []).length : 0;
-			ok('...five legs, an open pentagon', legs === 5, ic && ic.d);
+			ok('...four strokes, his freehand outline', legs === 4, ic && ic.d);
+			const lens = [];
+			for (let i = 2; i + 3 < pts.length + 0 && i < 8; i += 2) { lens.push(Math.hypot(pts[i + 2] - pts[i], pts[i + 3] - pts[i + 1])); }
+			ok('...irregular, not a regular polygon (leg lengths differ by more than 30%)', pts.length === 10 && Math.max.apply(null, lens) > 1.3 * Math.min.apply(null, lens), JSON.stringify(lens));
 			const first = pts.slice(0, 2), last = pts.slice(-2), gap = Math.hypot(first[0] - last[0], first[1] - last[1]);
-			ok('...not closed: a gap between the first point and the last', !/z/i.test(ic ? ic.d : 'z') && gap > 2 && gap < 8, 'gap ' + gap.toFixed(2));
-			ok('...on the right side', first[0] > 17 && last[0] > 17, JSON.stringify([first, last]));
+			ok('...open: no close, and the ends are far apart', !/z/i.test(ic ? ic.d : 'z') && gap > 8, 'gap ' + gap.toFixed(2));
 			ok('...and not the Vertices icon', !vert || vert.indexOf(ic.d) < 0);
 			const shot = await P.locator('#lpn_toolbar').screenshot({ path: path.join(process.env.EC_SHOT_DIR || '/tmp', 'shape-toolbar.png') }).catch(() => null);
 			ok('the toolbar renders for a look (' + path.join(process.env.EC_SHOT_DIR || '/tmp', 'shape-toolbar.png') + ')', !!shot);
