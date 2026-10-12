@@ -44,7 +44,7 @@ and its two profile baseline entries are gone because those strings now comply.
 
 ## Left alone, and why
 
-- **Single checkboxes, "Selected: ... Cleared: ..." or "Select to ...; clear to ..."**:
+- **Single checkboxes (settled 2026-10-12: Tom said yes to "Checked")**, now "Checked: ... Cleared: ..." or "Check to ...; clear to ...":
   `ip_is_lateral`, `lpn_contour_show_tip`, `lpn_labels_use_units_tip`, `lpn_scenario_override_tip`,
   `lpn_scenario_basic_tip`. A lone checkbox is ticked, not chosen from a set; "Chosen: this reach
   is ..." reads badly. The natural replacement is *Checked / Check*, a word outside the call. For Tom.

@@ -75,7 +75,7 @@ is the one you meant. "The first one" is a complete answer.
   *The proposal:* PROPOSED English: 'Rest the pointer on a node, link or customer to see its label as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project.'
   @@ NEEDS RULING
 
-## Synonym entries to approve  (15, 13 to read @@ NEEDS RULING)
+## Synonym entries to approve  (15, 14 to read @@ NEEDS RULING)
 
 **These are translator notes (`$ec_lang_syn`), not visitor wording.** Each was written against an
 English string that has since changed, or against a key that no longer exists. Say which: keep it
@@ -108,12 +108,12 @@ never edits a synonym.
   @@ NEEDS RULING
 
 - **`ip_is_lateral`**
-  > <span class="ec-help" title="Selected: this reach is a segment of the test lateral, from which individual emitters withdraw water. Cleared: this reach is a main, only passing flow along to laterals not on the test path.">Lat. <span class="ec-tip">?</span></span>
+  > <span class="ec-help" title="Checked: this reach is a segment of the test lateral, from which individual emitters withdraw water. Cleared: this reach is a main, only passing flow along to laterals not on the test path.">Lat. <span class="ec-tip">?</span></span>
   *Why stale:* the English changed after this synonym was written
   *Written against:* <span class="ec-help" title="Checked: this reach is a segment of the test lateral, from which individual emitters withdraw water. Unchecked: this reach is a main, only passing flow along to laterals not on the test path.">Lat. <span class="ec-tip">?</span></span>
   *Current synonym:* | gloss: lateral, mainline; avoid: "test" read as typical/sample
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
-  _Ruled 2026-10-05: What's wrong with the way it is? I am confused on this on about what's happening and why a _syn is needed._
+  @@ NEEDS RULING
 
 - **`lpn_cp_restrict`**
   > Restrict these characters
@@ -545,7 +545,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**149 still to read**, of 152 new keys across 13 unmerged branch(es).
+**144 still to read**, of 147 new keys across 11 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -556,9 +556,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/selection-word (`2422186e`) — adds no English strings
-
-### feat/bentley-interop (`f43dde69`) — 101 new, 101 to read @@ NEEDS RULING
+### feat/bentley-interop (`ad8cfe6e`) — 101 new, 101 to read @@ NEEDS RULING
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -888,52 +886,46 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`2e5e81c4`) — adds no English strings
 
-### feat/match-property (`38f68c9a`) — 14 new, 14 to read @@ NEEDS RULING
+### feat/match-property (`e95c8ac1`) — 12 new, 12 to read @@ NEEDS RULING
 
-- **`lpn_match_done_many`**
-  > Matched {m} assets to {id}, except status and location. Values changed: {n}.
+- **`lpn_copy_props_done`**
+  > Copied properties of {id}.
   @@ NEEDS RULING
-- **`lpn_match_done_one`**
-  > Matched {to} to {id}, except status and location. Values changed: {n}.
+- **`lpn_copy_props_menu`**
+  > Copy properties
   @@ NEEDS RULING
-- **`lpn_match_kind`**
-  > Match properties applies to nodes and pipes, pumps, and valves only.
+- **`lpn_field_tank_base_elev`**
+  > Base elevation
   @@ NEEDS RULING
-- **`lpn_match_menu`**
-  > Match properties
+- **`lpn_field_tank_base_elev_tip`**
+  > Elevation of the tank bottom, from which water depth and volume are measured. Left blank, the bottom is at the ground elevation.
   @@ NEEDS RULING
-- **`lpn_match_menu_off_tip`**
-  > Select target objects to match this object's properties except activation status.
+- **`lpn_paste_done_many`**
+  > Pasted properties of {id} to {m} assets. Values changed: {n}.
   @@ NEEDS RULING
-- **`lpn_match_none`**
-  > {to} and {id} have no properties in common to copy.
+- **`lpn_paste_done_one`**
+  > Pasted properties of {id} to {to}. Values changed: {n}.
   @@ NEEDS RULING
-- **`lpn_match_select_first`**
-  > Select the targets first, then choose Match properties.
+- **`lpn_paste_props_menu`**
+  > Paste properties to selection
   @@ NEEDS RULING
-- **`lpn_match_selected_ask`**
-  > Copy this object's properties except activation status to {n} selected objects?
+- **`lpn_paste_props_off_kind`**
+  > No selected asset can take the copied properties.
   @@ NEEDS RULING
-- **`lpn_match_selected_ask_one`**
-  > Copy this object's properties except activation status to 1 selected object?
+- **`lpn_paste_props_off_none`**
+  > Nothing is copied. Right-click an asset and choose Copy properties.
   @@ NEEDS RULING
-- **`lpn_match_skip_breakdown`**
-  > Not copied: {n} (demand is a list of categories).
+- **`lpn_paste_skip_breakdown`**
+  > Not pasted: {n} (demand is a list of categories).
   @@ NEEDS RULING
-- **`lpn_match_skip_scn`**
-  > Not copied: {names}. A scenario cannot hold its own value for these; change them in Base.
+- **`lpn_paste_skip_valve`**
+  > Not pasted: {n} (the valve types differ).
   @@ NEEDS RULING
-- **`lpn_match_skip_valve`**
-  > Not copied: {n} (the valve types differ).
-  @@ NEEDS RULING
-- **`lpn_match_tip`**
-  > Copy the properties of one asset to the assets selected. Select the targets first, choose Match properties, then select the source. Status (Active, Shut), identity, location, and connections are never copied. Assets of a different type receive only the properties both types have.
-  @@ NEEDS RULING
-- **`lpn_mode_match`**
-  > Mode: Match properties. Select the asset to copy properties from. Status, identity, and location are not copied. Press Escape to cancel.
+- **`lpn_tank_ground_elev_tip`**
+  > Ground elevation at the tank. Pressure at the tank is measured from here, as at a junction.
   @@ NEEDS RULING
 
-### feat/shape (`4166d068`) — 27 new, 27 to read @@ NEEDS RULING
+### feat/shape (`6a957eac`) — 27 new, 27 to read @@ NEEDS RULING
 
 - **`lpn_file_import_shapes`**
   > Import GeoJSON shapes…
@@ -1017,7 +1009,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Draw a point, a polyline, or a polygon on the map. A Shape is annotation and is not part of the network. Specify each point, then specify the last point again, press Enter, or right-click to finish. Specify the first point again to close the Shape into a polygon.
   @@ NEEDS RULING
 
-### feat/si-example (`3883f0d2`) — 4 new, 4 to read @@ NEEDS RULING
+### feat/si-example (`0f3023d7`) — 4 new, 4 to read @@ NEEDS RULING
 
 - **`lpn_ex_net2_si_desc`**
   > Litres per second, with metres and millimetres. EPANET’s Net2, converted from gallons per minute, feet and inches: a branched distribution system with a tank.
@@ -1030,16 +1022,4 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 - **`lpn_ex_net3_si_title`**
   > EPANET Net3, L/s (SI)
-  @@ NEEDS RULING
-
-### feat/tank-ground (`0b488156`) — 3 new, 3 to read @@ NEEDS RULING
-
-- **`lpn_field_tank_base_elev`**
-  > Base elevation
-  @@ NEEDS RULING
-- **`lpn_field_tank_base_elev_tip`**
-  > Elevation of the tank bottom, from which water depth and volume are measured. Left blank, the bottom is at the ground elevation.
-  @@ NEEDS RULING
-- **`lpn_tank_ground_elev_tip`**
-  > Ground elevation at the tank. Pressure at the tank is measured from here, as at a junction.
   @@ NEEDS RULING
