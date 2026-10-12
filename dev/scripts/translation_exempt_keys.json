@@ -905,13 +905,6 @@
             ],
             "reason": "'No' is the Spanish and Italian word. Sprint 1012."
         },
-        "lpn_help_manual": {
-            "category": "cognate",
-            "languages": [
-                "fr"
-            ],
-            "reason": "'Guide' is the French word. Sprint 1012."
-        },
         "lpn_time_stat_minimum": {
             "category": "cognate",
             "languages": [
