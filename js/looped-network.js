@@ -32458,6 +32458,10 @@ var EngCalcs = EngCalcs || {};
 	function tsbDraw(b) {
 		var rec = tsbEls[b.id], pc = EngCalcs.pageConfig || {}, s = tsbSubject(b), frames, avail, pick, host, lay, say;
 		if (!rec) { return; }
+		// A hidden bubble measures zero wide, and a chart laid out then is drawn at the fallback size.
+		// It is drawn when it is shown again (tsbPlaceAll()).
+		if (rec.root.style.display === 'none') { rec.stale = true; return; }
+		rec.stale = false;
 		host = rec.host;
 		host.innerHTML = '';
 		host.style.height = tsbChartH(b.w) + 'px';
@@ -32514,6 +32518,7 @@ var EngCalcs = EngCalcs || {};
 			a = s ? tsbAnchor(s) : null;
 			if (!a) { rec.root.style.display = 'none'; rec.rect = null; return; }
 			rec.root.style.display = '';
+			if (rec.stale) { tsbDraw(b); }
 			w = Math.max(TSB_MIN_W, Math.min(b.w, lr.width - 2 * TSB_PAD));
 			h = TSB_HEAD_PX + tsbChartH(b.w) + 2;
 			rec.root.style.width = b.w + 'px';
@@ -32554,9 +32559,10 @@ var EngCalcs = EngCalcs || {};
 	}
 	function tsbOpen(ref) {
 		var pc = EngCalcs.pageConfig || {}, list = tsbList(), b, s, a, lr, n = 0, off, id;
+		// A record whose asset is gone is kept for Undo but is not on screen, so it does not count.
 		list.forEach(function (x) { if (x.g === ref.kind && x.n === ref.id && tsbEls[x.id]) { b = x; } });
 		if (b) { tsbEls[b.id].root.style.zIndex = String(++tsbZ); return; }
-		if (list.length >= TSB_MAX) {
+		if (list.filter(tsbSubject).length >= TSB_MAX) {
 			setNotice(String(pc.lpn_tsb_max || 'Close a graph before opening another. Up to {n} stay open.').replace('{n}', String(TSB_MAX)));
 			return;
 		}
@@ -35143,8 +35149,9 @@ var EngCalcs = EngCalcs || {};
 		// **A STORED SCENARIO TREE IS CARRIED, NEVER DROPPED** (dev/scenario-alternatives.md):
 		// written last, and only when the file brought one or an explicit act made one.
 		LPN_TREE_KEYS.forEach(function (k) { if (doc[k] !== undefined) { out[k] = doc[k]; } });
-		// Task 784's graph bubbles: presentation, project-wide, written only when there are some.
-		if (doc.bubbles && doc.bubbles.length) { out.bubbles = doc.bubbles; }
+		// Task 784 graph bubbles: presentation, project-wide, only for assets that still exist.
+		var liveBubbles = (doc.bubbles || []).filter(tsbSubject);
+		if (liveBubbles.length) { out.bubbles = liveBubbles; }
 		// From v4 the file is Cartesian. CLONED FIRST -- flipStoredY() mutates, and the object above
 		// holds live references to doc.nodes/links/labels, so flipping in place would turn the
 		// drawing upside down on screen every time it was saved.

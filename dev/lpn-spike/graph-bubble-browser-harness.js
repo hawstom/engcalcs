@@ -309,6 +309,41 @@ async function main() {
 		ok('three bubbles on Net3', (await bubbles(a)).length === 3);
 		ok('no page error', a.errors.length === 0, a.errors.join(' | ').slice(0, 300));
 
+		// ---- 6b. delete the asset, undo ----
+		console.log('6b. delete the asset, then undo');
+		await closeAll();
+		await openBubble(a, 'node', '10', LBL);
+		const nodeClick = await pointOf(a.page, 'node', '10');
+		await closePopup(a);
+		await a.page.mouse.click(nodeClick.x, nodeClick.y);
+		await a.settle(500);
+		await closePopup(a);
+		await a.page.keyboard.press('Delete');
+		await a.settle(1200);
+		const hiddenNow = await a.page.evaluate(() => { const b = document.querySelector('.lpn-tsb'); return !b || getComputedStyle(b).display === 'none'; });
+		ok('deleting the asset hides its bubble', hiddenNow);
+		const savedAfterDelete = await a.page.evaluate(() => {
+			for (let i = 0; i < localStorage.length; i++) {
+				const k = localStorage.key(i), v = localStorage.getItem(k);
+				if (k.indexOf('lpn_project_') === 0 && v.indexOf('"bubbles"') >= 0) { return true; }
+			}
+			return false;
+		});
+		// the saved project must not carry a bubble for an asset that no longer exists
+		ok('the saved project drops the bubble of a deleted asset', !savedAfterDelete, String(savedAfterDelete));
+		await a.page.keyboard.press('Control+z');
+		await a.settle(1800);
+		const back = await a.page.evaluate(() => {
+			const b = document.querySelector('.lpn-tsb');
+			if (!b || getComputedStyle(b).display === 'none') { return null; }
+			const r = b.getBoundingClientRect(), svg = b.querySelector('.lpn-tsb-chart svg');
+			return { w: r.width, vb: svg ? svg.getAttribute('viewBox') : null, tick: svg ? parseFloat(getComputedStyle(svg.querySelector('.lpn-profile-tick')).fontSize) : 0, svgw: svg ? svg.getBoundingClientRect().width : 0 };
+		});
+		ok('undo brings the bubble back', !!back);
+		const vbw = back && back.vb ? parseFloat(back.vb.split(' ')[2]) : 0;
+		ok('and its chart is drawn at the bubble\'s own size, not a default layout', back && Math.abs(vbw - back.svgw) <= 2, JSON.stringify(back));
+		await closeAll();
+
 		// ---- 7. phone, tall ----
 		console.log('7. a tall phone');
 		const pa = await Session.open(browser, 'bub3', { viewport: { width: 390, height: 800 }, hasTouch: true });
