@@ -99,6 +99,9 @@ async function main() {
 		const ri = rows.findIndex((r) => r.indexOf(chainLabel) === 0), rj = rows.findIndex((r) => r.indexOf(junctionLabel) === 0 && r.indexOf(chainLabel) !== 0);
 		ok('Chain is the first Insert row', ri === 0, rows.slice(0, 3).join(' | '));
 		ok('Junction follows it', rj === 1, rows.slice(0, 3).join(' | '));
+		const helpRows = await P.evaluate(() => Array.from(document.querySelectorAll('#lpn_hotkeys_popup table.lpn-notes-table tr')).map((r) => r.textContent.trim()));
+		const rowFor = helpRows.find((r) => r.indexOf('1' + chainLabel) === 0);
+		ok('Help\'s Map table has a row for key 1 naming the Chain tool', !!rowFor, helpRows.slice(0, 3).join(' | '));
 		ok('...and no uncaught page errors', a.errors.length === 0, a.errors.slice(0, 2).join(' | '));
 		await a.close();
 	} finally {
