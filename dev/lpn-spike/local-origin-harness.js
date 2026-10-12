@@ -491,8 +491,9 @@ console.log('\n--- one home for the concept ---');
 	// through this door exactly as a node's own does, and the customer branch's node-attachment
 	// lookup (customerAttachAtNode()) needs the same inward point to find the nearest pipe.
 	// +1 each: the GeoJSON Shape import's one crossing (Task 779, landGeoJsonShapes()).
-	ok('inwardX has one definition and 46 call sites', count(/inwardX\(/g) === 47, count(/inwardX\(/g));
-	ok('inwardY has one definition and 47 call sites', count(/inwardY\(/g) === 48, count(/inwardY\(/g));
+	// +1 each in gisPlanarPoint() and +1 each in landShapefileShapes(): the DXF and shapefile Shape imports (Task 779).
+	ok('inwardX has one definition and 46 call sites', count(/inwardX\(/g) === 49, count(/inwardX\(/g));
+	ok('inwardY has one definition and 47 call sites', count(/inwardY\(/g) === 50, count(/inwardY\(/g));
 	// And nothing else may take the flip on its own: a site that flips without shifting is exactly
 	// the mistake this task exists to prevent.
 	ok('cartesianY is called only by the two converters', count(/cartesianY\(/g) === 3,

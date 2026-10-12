@@ -1104,6 +1104,7 @@ require(ROOT + 'js/lpn-epanet.js');
 require(ROOT + 'js/lpn-inp.js');
 // The GeoJSON writer, after lpn-inp.js (it reads EngCalcs.lpnNumText), in the page's own order.
 require(ROOT + 'js/lpn-geojson.js');
+require(ROOT + 'js/lpn-gisread.js');
 const NODE_ENGINE_URL = 'file://' + path.join(ROOT, 'js', 'vendor', 'epanet-js.js');
 {
 	const browserLoad = global.EngCalcs.lpnEpanetLoad;
