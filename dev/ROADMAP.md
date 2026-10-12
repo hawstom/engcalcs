@@ -122,16 +122,6 @@ the block.
   Tom, 2026-09-28, on threats to validity: *"It's all Net3. Where's the infinite map?"* A generator of
   networks at any size and density (grid, radial, branched), a fresh seed each round, plus published
   utility-scale networks. Notes: dev/paper-notes-label-placement.md.
-- 100|759| **One word for the map selection, another for a menu choice; tips that earn their place.**
-  **CALLED 2026-10-11:** *"map selection is "Select/Selected/Selection" with "Highlight" approved for specific uses such
-  as "the selected objects are highlighted". And menu and dialog options choices/choose/chosen (never "selected")."*
-  Applied to the English on `chore/selection-word` (`dev/selection-word-changes.md`); closes when it merges.
-  **TIPS HALF MERGED 2026-10-06** (`feat/tip-door`, Tom: "Merge"): one style of tip, every `title` the styled
-  name tip; the ALL-CAPS headings dropped. Open: the selection word (Highlighted / Chosen).
-  Tom, 2026-10-03: a "studied, considered, carefully adopted, and audited" strategy to tell the map
-  selection set from menu choices (his leading candidate: Highlighted / Chosen), and an audit of tip
-  pollution in lpn (status strip, click-to-open, delays in master styles, tips that talk down).
-  Ida's audit: `dev/tip-and-selection-audit.md` (branch `chore/ida-tip`); decisions go to him as an interview.
 - 100|782| **Snap to asset, and Match properties: the small tools that replace Change type.**
   **SNAP MERGED 2026-10-11** (`feat/snap`, Tom: "merge"); Match properties on `feat/match-property`, targets first.
   Tom, 2026-10-10: if nobody else does Change type, *"abandon the project and institute a variety of smaller
@@ -144,10 +134,12 @@ the block.
   Tom, 2026-10-10: *"a right-click menu at assets that includes 'Time series graph' that makes a pretty
   'speech bubble' 200px to 400 px ... so that four or six could be arranged on the map. And it would be
   really cool if that presentation scenario could be saved."*
-- 100|787| **Raised tanks: a ground elevation and a base elevation.**
-  Tom, 2026-10-11, overruling the advice to give tank pressure a special meaning: *"Pressure is above ground. No
-  special meaning at tanks. ... Build Elevation (ground and pressure datum) and Elevation (depth and volume tank
-  base)."* EPANET's tank elevation is the base; ground is ours. Building on `feat/tank-ground`.
+- 75|788| **Translated Find guide and select/choose wording, swept across all 26 languages.**
+  Sprint 1012-delta QA (2026-10-12): about 20 languages still print English control names (Everything, equal to, AND)
+  in the Find guide's prose, which should name controls as the translated page does (code samples stay English); and
+  untouched keys may still use the menu-choice verb for the map selection (sw `lpn_pane_select_on_map`, sr). One sweep.
+- 50|789| **A way into Copy/Paste properties and the graph bubbles without a right-click.**
+  Perry, 2026-10-12: both open only from the asset right-click menu, which a touch screen does not have.
 - 75|539| **Gang the neighbour labels so their leaders stop crossing.**
   **DEMOTED TO 75 by Tom, 2026-10-11.**
   **PORTING THE BENCH TO MASTER, 2026-10-07** (Tom agreed D09: rules 1-3 as three defect branches;
