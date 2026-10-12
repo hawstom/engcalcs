@@ -1,0 +1,233 @@
+{
+  "sprint": "1012-delta",
+  "description": "Wave 0 adversarial English pass over 134 new and changed keys (15 already-ruled keys excluded). Remaining keys were read with their render sites and each had one plausible reading.",
+  "entries": [
+    {
+      "key": "lpn_field_tank_base_elev",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "\"Base\" collides with the Base scenario and does not say base of what",
+      "readings": [
+        "elevation of the tank bottom",
+        "elevation in the Base scenario",
+        "base of the structure including its foundation"
+      ],
+      "disposition": "english",
+      "resolution": "Rewritten: \"Base elevation\" -> \"Bottom elevation\""
+    },
+    {
+      "key": "lpn_result_depth",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "\"Depth\" alone reads as pipe burial depth or depth of cover",
+      "readings": [
+        "depth of water in the tank",
+        "burial depth of a node or pipe"
+      ],
+      "disposition": "english",
+      "resolution": "Rewritten: \"Depth\" -> \"Water depth\""
+    },
+    {
+      "key": "lpn_hotkeys_zoomwin_def",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "dangling \"zoom to\" leaves the object of the preposition open",
+      "readings": [
+        "drag a rectangle that you zoom to",
+        "zoom to the area the rectangle encloses"
+      ],
+      "disposition": "english",
+      "resolution": "Rewritten: \"Zoom Window: drag a rectangle to zoom to.\" -> \"Zoom Window: drag a rectangle on the map to zoom to that area.\""
+    },
+    {
+      "key": "lpn_junction_pattern_unknown",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "\"named\" for a pattern: the visitor-facing term for a library reference is the ID, as in lpn_link_end_unknown",
+      "readings": [
+        "no pattern has this ID",
+        "no pattern carries this descriptive name"
+      ],
+      "disposition": "english",
+      "resolution": "Rewritten: \"No pattern in this project is named {id}, so the junction was left as it was.\" -> \"No pattern in this project has the ID {id}, so the junction was left as it was.\""
+    },
+    {
+      "key": "lpn_tip_select",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "\"unselects whatever is selected\" departs from the Select/Selection vocabulary",
+      "readings": [
+        "clear the map selection",
+        "deselect a single item"
+      ],
+      "disposition": "english",
+      "resolution": "Rewritten: \"Use this mode to change, move, and drag assets and text on the map, or to pan the map. This is the default mode for the map. Pressing Esc a second time unselects whatever is selected.\" -> \"Use this mode to change, move, and drag assets and text on the map, or to pan the map. This is the default mode for the map. Pressing Esc a second time clears the selection.\""
+    },
+    {
+      "key": "lpn_scenario_delete_blocked",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "\"also exists outside\" has two possible subjects, the node or the link",
+      "readings": [
+        "the node exists outside the scenario",
+        "the link exists outside the scenario"
+      ],
+      "disposition": "english",
+      "resolution": "Rewritten: \"{id} is not deleted, because link {link} ends on it and also exists outside {scenario}. To delete both, delete them in the {base} scenario.\" -> \"{id} is not deleted, because link {link} ends on it, and that link also exists outside {scenario}. To delete both, delete them in the {base} scenario.\""
+    },
+    {
+      "key": "lpn_screenshot_tip",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "\"sharper-than-screen\" is an unusual compound; \"to mark up and then copy\" does not say what is marked up",
+      "readings": [
+        "the picture is marked up",
+        "the map area is marked up before the picture",
+        "sharper means focus rather than resolution"
+      ],
+      "disposition": "english",
+      "resolution": "Rewritten: \"Take a sharper-than-screen picture of the map area you drag, to mark up and then copy into a report with the Copy button. Click without dragging to take the whole map.\" -> \"Take a picture of the map area you drag, at a higher resolution than the screen. Mark it up, then copy it into a report with the Copy button. Click without dragging to take the whole map.\""
+    },
+    {
+      "key": "lpn_guide_keys_def",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "\"the current selection\" collides with the reserved map-selection sense; the shortcut carries selected text from the page",
+      "readings": [
+        "the map selection",
+        "text highlighted on the page"
+      ],
+      "disposition": "english",
+      "resolution": "Rewritten: \"<table class=\"lpn-notes-table\"><tbody><tr><td>?</td><td>Open the guide at the control under the pointer or holding focus.</td></tr><tr><td>F1</td><td>Open the guide at the entry for the box that has f\" -> \"<table class=\"lpn-notes-table\"><tbody><tr><td>?</td><td>Open the guide at the control under the pointer or holding focus.</td></tr><tr><td>F1</td><td>Open the guide at the entry for the box that has f\""
+    },
+    {
+      "key": "lpn_notes_7_def",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "\"across / down\" does not say which key goes which way; \"Navigate\" for backward movement is vague",
+      "readings": [
+        "Tab goes across and Enter goes down",
+        "either key goes either way"
+      ],
+      "disposition": "english",
+      "resolution": "Rewritten: \"<table class=\"lpn-notes-table\"><tbody><tr><td>Arrow keys</td><td>Navigate.</td></tr><tr><td>Tab, Enter</td><td>Finish entry and navigate across / down one cell.</td></tr><tr><td>Shift+Tab, Shift+Enter\" -> \"<table class=\"lpn-notes-table\"><tbody><tr><td>Arrow keys</td><td>Navigate.</td></tr><tr><td>Tab, Enter</td><td>Finish the entry and move one cell across (Tab) or down (Enter).</td></tr><tr><td>Shift+T\""
+    },
+    {
+      "key": "points_data_points_heading",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "Copy button is not named",
+      "readings": [],
+      "disposition": "dismissed",
+      "resolution": "Copy is the visible button label beside the heading; one reading."
+    },
+    {
+      "key": "mpf_solver_no_solution",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "\"in chosen units\" could be unit set or unit menu",
+      "readings": [],
+      "disposition": "dismissed",
+      "resolution": "Established phrasing for the unit the visitor chose in the menu; Tom's choose/chosen rule for menu options."
+    },
+    {
+      "key": "bpn_roughness_tip",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "roughness symbol set per method",
+      "readings": [],
+      "disposition": "dismissed",
+      "resolution": "Each symbol is named with its method and the typical values are stated; one reading."
+    },
+    {
+      "key": "lpn_guide_group_from",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "\"From {menu}\" could be origin of a movement",
+      "readings": [],
+      "disposition": "dismissed",
+      "resolution": "Heading over a group of boxes opened from that menu (js guide builder); {menu} is a menu name, one reading."
+    },
+    {
+      "key": "lpn_help_manual",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "\"Guide\" noun or verb",
+      "readings": [],
+      "disposition": "dismissed",
+      "resolution": "Menu item beside Help; \"Guide\" as noun is the only reading in a toolbar menu and the title of the box."
+    },
+    {
+      "key": "lpn_guide_contents",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "\"Contents\" as table of contents or things contained",
+      "readings": [],
+      "disposition": "dismissed",
+      "resolution": "Sits on a rail with the guide entries listed under it and next to Hide/Show contents; one reading."
+    },
+    {
+      "key": "lpn_export_table_current",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "\"Current\"/\"All\" lack a noun",
+      "readings": [],
+      "disposition": "dismissed",
+      "resolution": "The radio group heading (Tables or Scenarios) supplies the noun at render; gender agreement is the translator's routine task. A split into two keys per group is not worth 4 retranslations."
+    },
+    {
+      "key": "lpn_export_table_all",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "\"All\" lacks a noun",
+      "readings": [],
+      "disposition": "dismissed",
+      "resolution": "See lpn_export_table_current."
+    },
+    {
+      "key": "lpn_split_yes",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "Yes/No without the question",
+      "readings": [],
+      "disposition": "dismissed",
+      "resolution": "Answers lpn_split_pipe_ask, shown directly above the buttons; a Yes/No button is standard in every language."
+    },
+    {
+      "key": "lpn_backdrop_position_prompt2",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "\"method\" is unexplained",
+      "readings": [],
+      "disposition": "dismissed",
+      "resolution": "The panel immediately offers Node, Free point and Coordinates; one reading."
+    },
+    {
+      "key": "lpn_labels_customer_note",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "\"text size\" may mean the Text asset",
+      "readings": [],
+      "disposition": "dismissed",
+      "resolution": "Matches the setting \"Text size (pixels)\" which scales every label; the setting name is the referent."
+    },
+    {
+      "key": "lpn_curve_none",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "\"chosen\" vs stated/selected for curve references",
+      "readings": [],
+      "disposition": "dismissed",
+      "resolution": "A drop-down option, so choose/chosen is correct per the menu/dialog rule."
+    },
+    {
+      "key": "lpn_dxf_note_shortened",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "\"ends in three periods\" is an unusual way to say ellipsis",
+      "readings": [],
+      "disposition": "dismissed",
+      "resolution": "The three characters are shown literally in the file; the string is exact and unambiguous."
+    }
+  ]
+}
