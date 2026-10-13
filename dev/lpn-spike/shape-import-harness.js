@@ -249,7 +249,7 @@ async function main() {
 		note = await h.importVia('lpn_file_import_shp', fx('shapes-grid.shp'));
 		let d = await dlg();
 		ok('numbers that fit Web Mercator but not degrees are offered as EPSG:3857 by a question with one action button',
-			!!d && d.text.indexOf('EPSG:3857') >= 0 && d.text.indexOf('.shx, .dbf and .prj') >= 0 && d.buttons[0] === await L('lpn_shp_import_webmerc_ok'), JSON.stringify(d));
+			!!d && d.text.indexOf('EPSG:3857') >= 0 && d.text.indexOf(pick) >= 0 && d.buttons[0] === await L('lpn_shp_import_webmerc_ok'), JSON.stringify(d));
 		await press(1);
 		note = await a.notice();
 		ok('Cancel imports nothing and says what to pick', (await h.shapes()).length === 0 && note.indexOf((await L('lpn_shp_import_refuse_range')).replace('{file}', 'shapes-grid.shp')) === 0 && note.indexOf(pick) >= 0, note);
