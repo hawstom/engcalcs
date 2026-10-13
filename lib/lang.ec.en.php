@@ -4657,6 +4657,7 @@ $ec_lang['lpn_shp_import_unreadable']='{file} is not a shapefile this page can r
 $ec_lang['lpn_shp_import_pick_hint']='A shapefile is several files. Pick the .shp together with its .shx, .dbf and .prj (hold Ctrl or Shift to select several), or pick the .zip.';
 $ec_lang['lpn_shp_import_webmerc_ask']='{file} has no .prj file, and its numbers are not latitudes and longitudes, but they fit Web Mercator metres (EPSG:3857), the system QGIS and web maps use. Import them as EPSG:3857 and convert them to this project?';
 $ec_lang['lpn_shp_import_webmerc_ok']='Import as EPSG:3857';
+$ec_lang['lpn_shp_import_webmerc_far_ask']='{file} states {theirs}, and read in that system its coordinates fall {km} km from this project. Read as Web Mercator metres (EPSG:3857), the system QGIS and web maps use, they fall where this project is. Import them as EPSG:3857 and convert them to this project?';
 $ec_lang['lpn_shp_import_reprojected']='The coordinates were converted from {theirs} to {ours}.';
 $ec_lang['lpn_shp_import_unplaced']='{n} records have coordinates this project cannot place, such as a latitude beyond the limit of the map. Record numbers: {list}.';
 $ec_lang['lpn_shp_import_unplaced_one']='One record has coordinates this project cannot place, such as a latitude beyond the limit of the map. Record number: {list}.';

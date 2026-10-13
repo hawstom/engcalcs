@@ -4083,6 +4083,7 @@ EngCalcs.pageConfig = {
 	lpn_shp_import_unreadable: <?=json_encode($ec_lang['lpn_shp_import_unreadable'])?>,
 	lpn_shp_import_pick_hint: <?=json_encode($ec_lang['lpn_shp_import_pick_hint'])?>,
 	lpn_shp_import_webmerc_ask: <?=json_encode($ec_lang['lpn_shp_import_webmerc_ask'])?>,
+	lpn_shp_import_webmerc_far_ask: <?=json_encode($ec_lang['lpn_shp_import_webmerc_far_ask'])?>,
 	lpn_shp_import_webmerc_ok: <?=json_encode($ec_lang['lpn_shp_import_webmerc_ok'])?>,
 	lpn_shp_import_reprojected: <?=json_encode($ec_lang['lpn_shp_import_reprojected'])?>,
 	lpn_shp_import_unplaced: <?=json_encode($ec_lang['lpn_shp_import_unplaced'])?>,

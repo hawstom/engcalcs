@@ -328,9 +328,11 @@
 	 */
 	function fileInverse(prj) {
 		var id = null, d;
+		// EPSG:3857 is closed form and is answered before proj4 is asked for: a latitude-and-longitude
+		// project never loads proj4, and a null here read as "damaged" (Tom, 2026-10-13, test-n.shp).
+		if (prj && prj.epsg && key(prj.epsg) === WEBMERC) { return function (xy) { return webMercInverse(xy); }; }
 		if (!root.proj4 || !prj) { return null; }
-		if (prj.epsg && has(prj.epsg) && key(prj.epsg) !== WEBMERC) { id = name(prj.epsg); }
-		else if (prj.epsg && key(prj.epsg) === WEBMERC) { return function (xy) { return webMercInverse(xy); }; }
+		if (prj.epsg && has(prj.epsg)) { id = name(prj.epsg); }
 		if (!id) {
 			d = wktDef(prj.wkt);
 			if (!d) { return null; }

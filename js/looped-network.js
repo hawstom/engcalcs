@@ -37922,6 +37922,37 @@ var EngCalcs = EngCalcs || {};
 		if (isProjectedProject()) { return crsLabel(projectCrsCode()) + ' (' + projectCrsCode() + ')'; }
 		return String(pc.lpn_shapes_frame_xy || 'the X and Y of this project');
 	}
+	// { km } when a file's points, read as its .prj says (`toLonLat(q)` -> {lon, lat} or null), fall
+	// beyond the 300 km mission scope from every node, and the same numbers read as Web Mercator
+	// metres fall within it; else null. Nothing is decided here: the caller asks.
+	function gisMisnamedPrj(shapes, toLonLat) {
+		var SCOPE = 300, LIM = 20037508.343, box = null, a = null, w = null, fits = true;
+		function grow(b, ll) {
+			if (!ll || !isFinite(ll.lon) || !isFinite(ll.lat)) { return b; }
+			return b ? { w: Math.min(b.w, ll.lon), e: Math.max(b.e, ll.lon), s: Math.min(b.s, ll.lat), n: Math.max(b.n, ll.lat) }
+				: { w: ll.lon, e: ll.lon, s: ll.lat, n: ll.lat };
+		}
+		// Kilometres from the middle of `b` to the nearest point of the project's box.
+		function kmTo(b) {
+			var lon = (b.w + b.e) / 2, lat = (b.s + b.n) / 2, R = 6371, d = Math.PI / 180,
+				lon2 = Math.max(box.w, Math.min(box.e, lon)), lat2 = Math.max(box.s, Math.min(box.n, lat)),
+				h = Math.pow(Math.sin((lat2 - lat) * d / 2), 2) + Math.cos(lat * d) * Math.cos(lat2 * d) * Math.pow(Math.sin((lon2 - lon) * d / 2), 2);
+			return 2 * R * Math.asin(Math.min(1, Math.sqrt(h)));
+		}
+		(doc.nodes || []).forEach(function (n) { box = grow(box, nodeLonLat(n)); });
+		if (!box) { return null; }
+		shapes.forEach(function (sh) {
+			sh.pts.forEach(function (q) {
+				a = grow(a, toLonLat(q));
+				if (!(Math.abs(q.x) <= LIM && Math.abs(q.y) <= LIM)) { fits = false; }
+				else { w = grow(w, EngCalcs.lpnCrsInverse('EPSG:3857', { x: q.x, y: q.y })); }
+			});
+		});
+		if (!fits || !w) { return null; }
+		var km = a ? kmTo(a) : Infinity;
+		if (!(km > SCOPE) || kmTo(w) > SCOPE) { return null; }
+		return { km: isFinite(km) ? Math.round(km) : '?' };
+	}
 	function gisList(arr) { return arr.map(function (k) { return k.name + ' (' + k.n + ')'; }).join(', '); }
 	// A DXF's text, into Shapes. `done(report)` is called once; a harness drives this half.
 	function landDxfShapes(text, fileName, done) {
@@ -38041,6 +38072,11 @@ var EngCalcs = EngCalcs || {};
 					mode = geo ? 'lonlat' : 'planar';
 					lines.push(String(pc.lpn_shp_import_noprj || 'There is no .prj file, so the coordinates were read as {frame}, with no conversion.').replace('{frame}', gisFrameText()) + ' ' + pick);
 				}
+			} else if (opt.webMerc) {
+				// The .prj was overruled by the visitor's own answer to gisMisnamedAsk() below.
+				conv = EngCalcs.lpnCrsFileInverse({ epsg: 'EPSG:3857' });
+				mode = 'convert';
+				lines.push(convertedLine(dxfCrsName('EPSG:3857')));
 			} else if (prj.kind === 'geographic') {
 				mode = 'lonlat';
 				if (!geo) {
@@ -38072,6 +38108,29 @@ var EngCalcs = EngCalcs || {};
 			} else {
 				mode = 'planar';
 				lines.push(String(pc.lpn_shp_import_prj_other || 'The .prj states {theirs}. This project states no coordinate system, so the coordinates were read as {frame}, with no conversion.').replace('{theirs}', theirsName || prj.name).replace('{frame}', gisFrameText()));
+			}
+			// **A .prj THAT NAMES THE WRONG SYSTEM IS ASKED ABOUT, NEVER OVERRULED SILENTLY** (Tom,
+			// 2026-10-13: a QGIS file whose .prj states EPSG:2223 "came in about 1000 miles NNE of
+			// Hawaii"). Its numbers were Web Mercator metres under a State Plane .prj, so read as the
+			// .prj says they land 3,900 km from Elm Street, and read as EPSG:3857 they land on it.
+			// Asked only when the .prj's reading is beyond the 300 km mission scope from every node and
+			// the Web Mercator reading is within it; the same one-button question as a missing .prj.
+			if (!opt.webMerc && prj && prj.kind === 'projected' && prj.epsg !== 'EPSG:3857' &&
+				(mode === 'convert' || (mode === 'planar' && isProjectedProject()))) {
+				var far = gisMisnamedPrj(r.shapes, function (q) {
+					return mode === 'convert' ? conv({ x: q.x, y: q.y }) : EngCalcs.lpnCrsInverse(code, { x: q.x, y: q.y });
+				});
+				if (far) {
+					askDialog({
+						kind: 'confirm', ok: String(pc.lpn_shp_import_webmerc_ok || 'Import as EPSG:3857'),
+						text: String(pc.lpn_shp_import_webmerc_far_ask || '{file} states {theirs}, and read in that system its coordinates fall {km} km from this project. Read as Web Mercator metres (EPSG:3857), the system QGIS and web maps use, they fall where this project is. Import them as EPSG:3857 and convert them to this project?')
+							.replace('{file}', fileName).replace('{theirs}', theirsName || prj.name).replace('{km}', String(far.km))
+					}, function (yes) {
+						if (yes) { try { place(r, { webMerc: true }); } catch (e) { failed(e); } }
+						else { say(String(pc.lpn_shapes_import_none || 'Nothing was imported from {file}.').replace('{file}', fileName), { ok: false, reason: 'far' }); }
+					});
+					return;
+				}
 			}
 			var descCols = ['description', 'desc'], bad = [];
 			// Which dbf column gives the name and the description. A NAME column wins over ID, and an
