@@ -976,8 +976,6 @@ $ec_lang['lpn_ex_net2_desc']='EPANET-এর নমুনা থেকে এক�
 $ec_lang['lpn_ex_net3_title']='EPANET Net3';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_ex_net3_desc']='EPANET-এর বড় নমুনা: 92টি সংযোগস্থল, তিনটি ট্যাংক এবং দুটি জলাধার, যার একটি নদী। একটি পূর্ণ আকারের মডেল মানচিত্রে কেমন দেখায় তা এটি দেখায়।';
-$ec_lang['lpn_ex_net3_world_title']='EPANET Net3, lat/lon';
-$ec_lang['lpn_ex_net3_world_desc']='EPANET Net3-এর মতো একই নেটওয়ার্ক, পৃথিবীর একটি নির্বিচার স্থানে বসানো: এর স্থানাঙ্ক অক্ষাংশ ও দ্রাঘিমাংশ, এবং এর পেছনে একটি রাস্তার মানচিত্র আঁকা আছে।';
 $ec_lang['lpn_ex_elm_street_title']='Elm Street Center';
 $ec_lang['lpn_ex_elm_street_desc']='একটি বাণিজ্যিক স্থান, সর্বোচ্চ দিনের চাহিদার উপর অগ্নি প্রবাহের জন্য সমাধান করা, একটি নির্দিষ্ট মুহূর্তে, একটি সাইট পরিকল্পনার উপর আঁকা।';
 $ec_lang['lpn_tool_undo']='পূর্বাবস্থায় ফিরুন';

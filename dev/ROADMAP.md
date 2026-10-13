@@ -417,6 +417,7 @@ the block.
   Tom, 2026-10-11: *"convert Net2 and Net3 to SI and put them first in this order: Net3 SI, Net3 US, Net2 SI, Net2
   US."* Built on `feat/si-example`. Expand the gallery first, promote to the front later. KYPipe networks (CC BY-NC):
   ask the authors before shipping any.
+  Net2 (Branford) and Net3 (Novato) US and SI pairs are on `feat/si-example`; only Elm Street Center keeps a backdrop.
 - 50|146.09| **An inset overview map: the whole project, with a box round where you are.**
   Reworked by Tom 2026-08-25, and it is a different feature from the one this ID used to hold:
   *"146.09 reworked as a key/overview map inset like many games where the entire project is depicted

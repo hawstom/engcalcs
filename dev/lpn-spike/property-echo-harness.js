@@ -93,7 +93,7 @@ function openPage() {
 	const L = loadLoopedNetwork(INJECT, null, null);
 	setUnitSet('us');
 	L.reset();
-	const saved = L.acceptImportedText(fs.readFileSync(ROOT + 'examples/Net3.lwn', 'utf8'));
+	const saved = L.acceptImportedText(fs.readFileSync(ROOT + 'dev/water-network-examples/Net3.lwn', 'utf8'));
 	if (!saved) { throw new Error('Net3 did not open'); }
 	L.applySaved(saved);
 	L.buildDom();

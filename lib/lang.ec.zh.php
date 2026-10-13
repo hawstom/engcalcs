@@ -969,8 +969,6 @@ $ec_lang['lpn_ex_net2_desc']='来自 EPANET 示例、带有一个水箱的分支
 $ec_lang['lpn_ex_net3_title']='EPANET Net3';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_ex_net3_desc']='EPANET 的大型示例：92 个节点、3 个水箱和 2 个水库（其中一个为河流水源）。它展示了全尺寸模型在地图上的样子。';
-$ec_lang['lpn_ex_net3_world_title']='EPANET Net3，经纬度';
-$ec_lang['lpn_ex_net3_world_desc']='与 EPANET Net3 相同的管网，被放置在地球上一个任意位置：其坐标为经度和纬度，并在其后绘有街道地图。';
 $ec_lang['lpn_ex_elm_street_title']='Elm Street Center';
 $ec_lang['lpn_ex_elm_street_desc']='一个商业场地案例，在最大日用水量的基础上叠加消防流量，求解某一时刻的工况，绘制在场地平面图之上。';
 $ec_lang['lpn_tool_undo']='撤销';

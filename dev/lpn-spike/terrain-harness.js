@@ -634,7 +634,7 @@ function runFill(answers) {
 		const fs = require('fs'), path = require('path');
 		const ex = JSON.parse(fs.readFileSync(path.join(__dirname, '../../examples/Net3-Novato-CA-World.lwn'), 'utf8'));
 		ok('the georeferenced example carries Mapbox DEM', ex.settings.defaults.nodeElevSource === 'dem');
-		['Net1', 'Net2', 'Net3', 'Elm-Street-Center', 'Basic-example-SI-units', 'Basic-example-US-units'].forEach(function (n) {
+		['Net1', 'Net2-Branford-CT', 'Net2-Branford-CT-SI', 'Elm-Street-Center', 'Basic-example-SI-units', 'Basic-example-US-units'].forEach(function (n) {
 			const e = JSON.parse(fs.readFileSync(path.join(__dirname, '../../examples/' + n + '.lwn'), 'utf8'));
 			ok(n + ' (local) is unchanged', (e.settings.defaults.nodeElevSource || 'value') === 'value');
 		});

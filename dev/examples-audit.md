@@ -176,6 +176,6 @@ asks whether the whole document does. Both are cheap.
 Verbatim, *"for future organizational purposes"*:
 
 - Net3, Novato California, Source trace from Lake, 24 hr EPS, 5 miles square, 92 Junctions, 2 res, 3 tanks, no valves.
-- Net1, fictional, Chlorine, 11 Junctions, 1 res, 1 tank, 2 pumps
+- Net1, fictional, Chlorine, 9 Junctions, 1 res, 1 tank, 1 pump (his note said 11 junctions and 2 pumps; 11 is the total node count, and the file has one pump)
 - Net2, Branford Connectitut, Flouride (non-reactive), 35 Junctions, 0 res (1 source), 1 tank, no pump
 - Elm Street Center, Prescott Valley Arizona, 17 Junctions, 1 res, 1 pump, no EPS
