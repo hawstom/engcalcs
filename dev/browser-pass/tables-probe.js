@@ -34,7 +34,7 @@ const env = require('./lib/env.js');
 const { Session } = require('./lib/session.js');
 
 // The example's card title, or its language key (lpn_ex_*_title), which is the default's form.
-const EXAMPLE = process.argv.slice(2).find(a => !a.startsWith('--')) || 'lpn_ex_net3_world_title';
+const EXAMPLE = process.argv.slice(2).find(a => !a.startsWith('--')) || 'lpn_ex_net3_title';
 const PROFILE = process.argv.includes('--profile');
 // --solve presses Calculate first, so the tables carry their RESULT columns as Tom's do.
 const SOLVE = process.argv.includes('--solve');

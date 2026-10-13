@@ -970,8 +970,6 @@ $ec_lang['lpn_ex_net2_desc']='Ein verzweigtes Verteilnetz mit einem Tank, aus de
 $ec_lang['lpn_ex_net3_title']='EPANET Net3';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_ex_net3_desc']='Das große EPANET-Beispiel: 92 Entnahmeknoten, drei Tanks und zwei Reservoire, eines davon ein Fluss. Es zeigt, wie ein Modell in voller Größe auf der Karte aussieht.';
-$ec_lang['lpn_ex_net3_world_title']='EPANET Net3, Breite/Länge';
-$ec_lang['lpn_ex_net3_world_desc']='Das EPANET-Net3-Netz, umgerechnet auf Länge/Breite in Novato, CA, mit der Weltkarte im Hintergrund.';
 $ec_lang['lpn_ex_elm_street_title']='Elm Street Center';
 $ec_lang['lpn_ex_elm_street_desc']='Ein Gewerbestandort, berechnet für Löschwasser zusätzlich zum maximalen Tagesbedarf, zu einem einzelnen Zeitpunkt, über einen Lageplan gezeichnet.';
 $ec_lang['lpn_tool_undo']='Rückgängig';

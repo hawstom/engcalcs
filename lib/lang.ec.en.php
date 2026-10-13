@@ -1088,12 +1088,12 @@ $ec_lang['lpn_help_hotkeys']='Tables and Hotkeys';
 // whatever the 2026 thing is?"; Ida's design). Names both the Help row and the box's title bar. It
 // replaces lpn_help_hotkeys and the Help > Toolbar fly-out (lpn_help_icons, which still heads the
 // box's Toolbar section).
-$ec_lang['lpn_help_manual']='Guide';
+$ec_lang['lpn_help_manual']='User manual';
 // The Guide's contents rail, its search, its Boxes section and the "?" in every box's title bar.
 $ec_lang['lpn_guide_contents']='Contents';
 $ec_lang['lpn_guide_rail_hide']='Hide contents';
 $ec_lang['lpn_guide_rail_show']='Show contents';
-$ec_lang['lpn_guide_search']='Search the guide';
+$ec_lang['lpn_guide_search']='Search the user manual';
 $ec_lang['lpn_guide_boxes_heading']='Boxes';
 $ec_lang['lpn_guide_boxes_intro']='Each box can be moved, resized, docked at the left or right of the map, or closed. The ? in a box\'s title bar opens its help.';
 // Tom's own wording, 2026-10-07 (his typo "to not" corrected). Below lpn_guide_boxes_intro.
@@ -1119,14 +1119,14 @@ $ec_lang['lpn_guide_text_status_box']='Lists, in time order, each change during 
 $ec_lang['lpn_guide_text_full_box']='Lists every node and every link at every reporting time step, in the units shown on the Tables pane. Without an extended period simulation, it shows the current solution at a single instant. Download or print carries every time step, and the table shows one at a time.';
 $ec_lang['lpn_guide_text_calib_box']='Compares a file of field measurements with the calculated results at the same locations and times, one file for each parameter. The file is held for the current session only and is not saved with the project.';
 $ec_lang['lpn_guide_text_notes_popup']='Lists notes on how this page behaves and what it does not do, each as a term followed by its definition. It does not change the network.';
-$ec_lang['lpn_guide_text_hotkeys_popup']='Lists every toolbar button and menu row, the keyboard shortcuts, and an entry for each box. Choosing a row shows where that control is; it never runs it. To search, press Ctrl+K from anywhere, or / while the guide has focus.';
+$ec_lang['lpn_guide_text_hotkeys_popup']='Lists every toolbar button and menu row, the keyboard shortcuts, and an entry for each box. Choosing a row shows where that control is; it never runs it. To search, press Ctrl+K from anywhere, or / while the user manual has focus.';
 // The Find and replace chapter beyond its opening paragraphs, in the Guide's Boxes section
 // (Tom, 2026-10-07). Each _def is HTML: keep the tags. A query inside <code> runs as written in
 // English on a page in any language; translate it with the words the Find box shows in your
 // language, or leave it in English. Asset IDs (60, 247, 330) and the numbers are measured on Net1
 // and Net3 by dev/lpn-spike/user-guide-find-harness.js: never change them in translation.
 $ec_lang['lpn_guide_find_query_term']='The query language';
-$ec_lang['lpn_guide_find_query_def']='<table class="lpn-notes-table"><tbody><tr><td><code>Scope.Property condition value</code></td><td>One condition. The scope is Everything, Junction, Reservoir, Tank, Pipe, Pump, Valve, Text, Customer, or Source. The property is any entry in the Property list for that scope.</td></tr><tr><td>Conditions</td><td>equal to, above, below, contains, n highest, n lowest, and empty. Contains applies to text only. In n highest and n lowest, n is a count, as in 5 highest. With the letter n itself, as in <code>Pipe.Velocity n highest</code>, or with the Value box empty, 10 assets are listed. Empty finds the assets that have no value for the property. Connectivity has four conditions and takes no value.</td></tr><tr><td>Values</td><td>A number is entered without its unit, in the unit shown in Properties and on the Tables pane: 40, not 40 psi. Text, including an ID, is enclosed in single or double quotes: <code>\'60\'</code>.</td></tr><tr><td>AND, OR, and parentheses</td><td>AND is evaluated before OR, and parentheses group conditions. NOT is not available.</td></tr><tr><td>Spelling</td><td>Words are not case sensitive. The English words are accepted in every language, so a query copied from this guide runs on a page in any language.</td></tr></tbody></table>';
+$ec_lang['lpn_guide_find_query_def']='<table class="lpn-notes-table"><tbody><tr><td><code>Scope.Property condition value</code></td><td>One condition. The scope is Everything, Junction, Reservoir, Tank, Pipe, Pump, Valve, Text, Customer, or Source. The property is any entry in the Property list for that scope.</td></tr><tr><td>Conditions</td><td>equal to, above, below, contains, n highest, n lowest, and empty. Contains applies to text only. In n highest and n lowest, n is a count, as in 5 highest. With the letter n itself, as in <code>Pipe.Velocity n highest</code>, or with the Value box empty, 10 assets are listed. Empty finds the assets that have no value for the property. Connectivity has four conditions and takes no value.</td></tr><tr><td>Values</td><td>A number is entered without its unit, in the unit shown in Properties and on the Tables pane: 40, not 40 psi. Text, including an ID, is enclosed in single or double quotes: <code>\'60\'</code>.</td></tr><tr><td>AND, OR, and parentheses</td><td>AND is evaluated before OR, and parentheses group conditions. NOT is not available.</td></tr><tr><td>Spelling</td><td>Words are not case sensitive. The English words are accepted in every language, so a query copied from this user manual runs on a page in any language.</td></tr></tbody></table>';
 $ec_lang['lpn_guide_find_examples_term']='Worked examples on Net3';
 $ec_lang['lpn_guide_find_examples_def']='<p>Open the Net3 example to follow these. Pressure is in psi and velocity in ft/s.</p><table class="lpn-notes-table"><tbody><tr><td><code>Everything.ID equal to \'60\'</code></td><td>Junction 60 and Pipe 60. A junction and a pipe can have the same ID, so an ID search under Everything can return more than one asset.</td></tr><tr><td><code>Junction.Pressure below 40</code></td><td>Junctions 10, 40, 50, 20, and 153, lowest pressure first. Junction 10 is at -0.6 psi, a negative pressure that requires review.</td></tr><tr><td><code>Pipe.Velocity 5 highest</code></td><td>Pipes 60, 329, 125, 123, and 149, highest velocity first. Pipe 60 carries 9.3 ft/s.</td></tr><tr><td><code>Junction.Pressure below 20 OR Pipe.Velocity above 5</code></td><td>Junctions 10, 20, 40, and 50, and Pipes 60, 125, and 329: low pressures and high velocities in one list.</td></tr><tr><td><code>Junction.Pressure below 40 AND Junction.Elevation above 100</code></td><td>Junctions 10, 20, 40, and 50, the low pressures on high ground. Both conditions must name the same kind of asset: <code>Junction.Pressure below 40 AND Pipe.Velocity above 3</code> matches nothing, because no asset is both a junction and a pipe.</td></tr><tr><td><code>Pipe.Closed equal to \'closed\'</code></td><td>Pipe 330, the one pipe that is closed in the Net3 file.</td></tr><tr><td><code>Junction.Connectivity no open path to a source</code></td><td>Nothing, as the file is distributed. With Pipe 247 closed (see Replace and Undo), Junctions 215, 217, 219, and 225: the junctions that a break on Pipe 247 would leave without supply. Repeating this for each pipe is a criticality analysis.</td></tr></tbody></table>';
 $ec_lang['lpn_guide_find_results_term']='Results, the selection, and Tables';
@@ -1136,9 +1136,9 @@ $ec_lang['lpn_guide_find_replace_def']='<p>The Change what was found part of the
 $ec_lang['lpn_guide_find_notes_term']='Points to note';
 $ec_lang['lpn_guide_find_notes_def']='<ul><li>Values are compared at full precision and listed to four decimal places. Equal to rarely matches a calculated result; use above and below.</li><li>Pressure, head, flow, velocity, and the other results are those of the last calculation. With the Recalculate automatically setting cleared, they describe the network as it was at the last Calculate.</li><li>Above and below on text use dictionary order, with numbers in numeric order: on Net1, <code>Junction.ID above \'20\'</code> finds Junctions 21, 22, 23, 31, and 32.</li><li>Under Everything, only ID, Description, Tag, and Connectivity are offered. Choose a kind of asset in the What to search list to see its full list of properties.</li><li>A Text item has no ID. Search it by its words, as in <code>Text.Text contains \'pump\'</code>.</li><li>The four Connectivity conditions for a node are no links at node, no open links at node, no link path to a source, and no open path to a source. A source is a reservoir or a tank.</li></ul>';
 // Where the Guide lists its own keys, so that a search for one finds it.
-$ec_lang['lpn_guide_using_heading']='Using the guide';
-$ec_lang['lpn_guide_keys_term']='Guide keyboard shortcuts';
-$ec_lang['lpn_guide_keys_def']='<table class="lpn-notes-table"><tbody><tr><td>?</td><td>Open the guide at the control under the pointer or holding focus.</td></tr><tr><td>F1</td><td>Open the guide at the entry for the box that has focus.</td></tr><tr><td>Ctrl+K</td><td>Open the guide with the selected text in the search field.</td></tr><tr><td>/</td><td>Select the search field while the guide has focus.</td></tr><tr><td>Esc</td><td>Close the guide and return to where you were.</td></tr></tbody></table>';
+$ec_lang['lpn_guide_using_heading']='Using the user manual';
+$ec_lang['lpn_guide_keys_term']='User manual keyboard shortcuts';
+$ec_lang['lpn_guide_keys_def']='<table class="lpn-notes-table"><tbody><tr><td>?</td><td>Open the user manual at the control under the pointer or holding focus.</td></tr><tr><td>F1</td><td>Open the user manual at the entry for the box that has focus.</td></tr><tr><td>Ctrl+K</td><td>Open the user manual with the selected text in the search field.</td></tr><tr><td>/</td><td>Select the search field while the user manual has focus.</td></tr><tr><td>Esc</td><td>Close the user manual and return to where you were.</td></tr></tbody></table>';
 // Under a toolbar button in the User guide, naming the menu row that does the same thing.
 // {menu} becomes a path such as "Edit > Delete", drawn with chevrons; keep {menu} as it is.
 $ec_lang['lpn_guide_also']='Also in {menu}';
@@ -1214,25 +1214,27 @@ $ec_lang['lpn_map_unmeasurable']='This page could not determine the size of the 
 // setting is literally GPM or LPS, never "US" or "SI" -- so a water engineer reads the flow unit as
 // the name of the system, and the length units as detail that follows from it.
 $ec_lang['lpn_ex_basic_si_title']='Basic network, L/s (SI)';
-$ec_lang['lpn_ex_basic_si_desc']='Start here. A reservoir, a pump and a small loop: the smallest arrangement that still works as a water network. Litres per second, with metres and millimetres.';
+$ec_lang['lpn_ex_basic_si_desc']='Two reservoirs, a pump and a small loop. Litres per second, with metres and millimetres.';
 $ec_lang['lpn_ex_basic_us_title']='Basic network, gpm (US)';
-$ec_lang['lpn_ex_basic_us_desc']='The same starting network in gallons per minute, with feet and inches.';
+$ec_lang['lpn_ex_basic_us_desc']='Two reservoirs, a pump and a small loop. Gallons per minute, with feet and inches.';
 // **NOT PLAIN EPA Net1 ANY MORE, AND THE TITLE SAYS SO** (Tom, 2026-09-08: *"Net1 plus rule-based
 // controls: OK"*). Two `[RULES]` were added to the shipped file so the rule editor can be exercised
 // from the gallery; the rules stay, and the name stops claiming to be the sample as EPA ships it.
 $ec_lang['lpn_ex_net1_title']='EPANET Net1 plus rule-based controls';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_ex_net1_desc']='The smallest of the three EPANET example networks: one reservoir, a pump, and a single loop.';
-$ec_lang['lpn_ex_net2_title']='EPANET Net2';
+$ec_lang['lpn_ex_net1_desc']='A fictional EPANET example with chlorine, 1 reservoir and 1 tank.';
+$ec_lang['lpn_ex_net2_si_title']='EPANET Net2, L/s (SI)';
+$ec_lang['lpn_ex_net2_si_desc']='Litres per second, with metres and millimetres. An EPANET example at Branford, Connecticut, converted from gallons per minute, feet and inches: 35 junctions and 1 tank, with no reservoir, no pump and no valves, about 2 km by 4 km. Fluoride, a non-reactive substance, enters at one source.';
+$ec_lang['lpn_ex_net2_title']='EPANET Net2, gpm (US)';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_ex_net2_desc']='A branched distribution system with a tank, from EPANET’s examples.';
-$ec_lang['lpn_ex_net3_title']='EPANET Net3';
+$ec_lang['lpn_ex_net2_desc']='Gallons per minute, with feet and inches. An EPANET example at Branford, Connecticut: 35 junctions and 1 tank, with no reservoir, no pump and no valves, about 1 mile by 2 miles. Fluoride, a non-reactive substance, enters at one source.';
+$ec_lang['lpn_ex_net3_si_title']='EPANET Net3, L/s (SI)';
+$ec_lang['lpn_ex_net3_si_desc']='Litres per second, with metres and millimetres. An EPANET example at Novato, California, converted from gallons per minute, feet and inches, with the world map behind it: 92 junctions, 3 tanks and 2 reservoirs, no valves, about 8 km square. A 24-hour extended-period simulation, with a source trace from the Lake.';
+$ec_lang['lpn_ex_net3_title']='EPANET Net3, gpm (US)';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_ex_net3_desc']='The large EPANET example: 92 junctions, three tanks, and two reservoirs, one of them a river. It shows how a full-size model appears on the map.';
-$ec_lang['lpn_ex_net3_world_title']='EPANET Net3, lat/lon';
-$ec_lang['lpn_ex_net3_world_desc']='The EPANET Net3 network converted to lat/lon at Novato, CA with the world map behind it.';
-$ec_lang['lpn_ex_elm_street_title']='Elm Street Center';
-$ec_lang['lpn_ex_elm_street_desc']='A commercial site solved for fire flow on top of maximum day demand, at one moment in time, drawn over a site plan.';
+$ec_lang['lpn_ex_net3_desc']='Gallons per minute, with feet and inches. An EPANET example at Novato, California, with the world map behind it: 92 junctions, 3 tanks and 2 reservoirs, no valves, about 5 miles square. A 24-hour extended-period simulation, with a source trace from the Lake.';
+$ec_lang['lpn_ex_elm_street_title']='Elm Street Center, gpm (US)';
+$ec_lang['lpn_ex_elm_street_desc']='Gallons per minute, with feet and inches. Prescott Valley, Arizona: 17 junctions, 1 reservoir and 1 pump. A commercial site solved for fire flow on top of maximum day demand, at one moment in time, drawn over a site plan.';
 $ec_lang['lpn_tool_undo']='Undo';
 $ec_lang['lpn_confirm_example']='This adds the example to the network you already have. Continue?';
 $ec_lang['lpn_field_diameter']='Diameter';

@@ -146,7 +146,7 @@ function compareRow(tableId, id, heads, wantRow, bad) {
 
 // ---- build the source: Net3, plus the valve, the customer and the two Text rows it does not
 // carry -- one Text anchored to a node, one to a pipe, so both anchor kinds round-trip. -----------
-const net3 = JSON.parse(fs.readFileSync(path.join(ROOT, 'examples', 'Net3.lwn'), 'utf8'));
+const net3 = JSON.parse(fs.readFileSync(path.join(ROOT, 'dev', 'water-network-examples', 'Net3.lwn'), 'utf8'));
 L.applySaved(JSON.parse(JSON.stringify(net3)));
 L.refreshAll();
 const someJ = L.getDoc().nodes.filter((n) => n.type === 'junction').slice(0, 2).map((n) => n.id);

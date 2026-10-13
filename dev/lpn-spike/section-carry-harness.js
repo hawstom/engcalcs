@@ -331,7 +331,7 @@ done('the unknown is kept, and the engine is spared');
 console.log('\n6. A shipped example states what its own source .inp states');
 {
 	// **A GALLERY EXAMPLE IS A STORED PROJECT, NOT A RE-IMPORT**, so it does not gain a feature the
-	// day the importer does -- `examples/Net3.lwn` carried no `Quality` line for as long as the
+	// day the importer does -- `dev/water-network-examples/Net3.lwn` carried no `Quality` line for as long as the
 	// carry existed, and the first person to notice was Tom exporting one. The source `.inp` is the
 	// expectation here for the same reason it is everywhere else in this file.
 	// **AND CARRYING IS ONLY HALF OF IT** (2026-09-04). A section this page INTERPRETS is not in
@@ -347,12 +347,12 @@ console.log('\n6. A shipped example states what its own source .inp states');
 	// comparison would fail for the wrong reasons. Add a field here when the importer learns one.
 	const INTERPRETED = ['settings.quality', 'settings.reactions', 'settings.energy', 'times.qualityStep'];
 	const dig = (o, p) => p.split('.').reduce((v, k) => (v == null ? v : v[k]), o);
-	['Net1', 'Net2', 'Net3'].forEach((name) => {
+	[['Net1', 'Net1'], ['Net2', 'Net2-Branford-CT'], ['Net3', 'Net3-Novato-CA-World']].forEach(([name, file]) => {
 		const srcText = fs.readFileSync(
 			path.join(ROOT, 'dev', 'water-network-examples', name + '.inp'), 'utf8');
 		const src = sectionLines(srcText);
 		const carried = Object.keys(src).filter((n) => !SECTIONS_READ[n] && src[n].length);
-		const saved = JSON.parse(fs.readFileSync(path.join(ROOT, 'examples', name + '.lwn'), 'utf8'));
+		const saved = JSON.parse(fs.readFileSync(path.join(ROOT, 'examples', file + '.lwn'), 'utf8'));
 
 		byId.lpn_dialog_body.children.length = 0;
 		L.importInp({ name: name + '.inp', _text: srcText });

@@ -426,7 +426,10 @@ class Session {
 			const t = ((await c.$eval('.lpn-example-title', e => e.textContent)) || '').trim();
 			seen.push(t);
 			if (t !== title) { continue; }
-			await c.click();
+			// The wall is long now (the SI twins lead it), so a card can sit under the consent banner or
+			// a saved panel; Playwright then waits out its actionability timeout. A harness that is not
+			// testing the overlap clicks the card the way the DOM does.
+			await c.click({ timeout: 4000 }).catch(() => c.evaluate((e) => e.click()));
 			await this.settle(1500);
 			const n = await this.nodeCount();
 			if (!n) { throw new Error(`${this.name}: "${title}" was clicked and nothing was drawn`); }

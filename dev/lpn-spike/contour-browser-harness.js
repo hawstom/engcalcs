@@ -218,7 +218,7 @@ async function openNet3Saved(Session, browser, locale, saved, viewport, twoLegen
 	await a.goto('Looped-Network.php');
 	await a.answerTrainingPanel().catch(() => {});
 	await a.page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } });
-	await a.openExampleCard(await a.lang('lpn_ex_net3_title'));
+	await a.openExampleCard(await a.lang('lpn_ex_net1_title'));
 	await a.settle(1500);
 	if (twoLegends) {
 		// Pressure on the nodes and velocity on the links: two legends stacked on the map's bottom right.

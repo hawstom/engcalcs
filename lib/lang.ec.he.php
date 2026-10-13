@@ -970,8 +970,6 @@ $ec_lang['lpn_ex_net2_desc']='מערכת חלוקה מסועפת עם מכל, מ
 $ec_lang['lpn_ex_net3_title']='EPANET Net3';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_ex_net3_desc']='רשת הדוגמה הגדולה של EPANET: 92 צמתים, שלושה מכלים ושני מאגרים, אחד מהם נהר. היא מראה כיצד מודל בגודל מלא נראה על המפה.';
-$ec_lang['lpn_ex_net3_world_title']='EPANET Net3, lat/lon';
-$ec_lang['lpn_ex_net3_world_desc']='רשת EPANET Net3 הומרה לקו רוחב/קו אורך באזור נובאטו, קליפורניה, עם מפת העולם מוצגת מאחוריה.';
 $ec_lang['lpn_ex_elm_street_title']='Elm Street Center';
 $ec_lang['lpn_ex_elm_street_desc']='אתר מסחרי שנפתר עבור ספיקת כיבוי אש בנוסף לדרישת יום השיא, ברגע זמן אחד, משורטט מעל תוכנית האתר.';
 $ec_lang['lpn_tool_undo']='בטל';

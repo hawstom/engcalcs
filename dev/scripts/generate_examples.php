@@ -109,9 +109,10 @@ function exampleWork($name) {
 		'Basic-example-US-units.lwn' => 'design',
 		'Elm-Street-Center.lwn' => 'design',
 		'Net1.lwn' => 'maintenance',
-		'Net2.lwn' => 'maintenance',
-		'Net3.lwn' => 'maintenance',
-		'Net3-Novato-CA-World.lwn' => 'maintenance'
+		'Net2-Branford-CT.lwn' => 'maintenance',
+		'Net2-Branford-CT-SI.lwn' => 'maintenance',
+		'Net3-Novato-CA-World.lwn' => 'maintenance',
+		'Net3-Novato-CA-World-SI.lwn' => 'maintenance'
 	);
 	return $work[$name] ?? null;
 }

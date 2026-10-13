@@ -968,8 +968,6 @@ $ec_lang['lpn_ex_net2_desc']='ታንክ ያለው ቅርንጫፍ ያለው የ�
 $ec_lang['lpn_ex_net3_title']='EPANET Net3';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_ex_net3_desc']='ትልቁ የEPANET ናሙና፦ 92 መገናኛዎች፣ ሦስት ታንኮች እና ሁለት ማጠራቀሚያዎች፣ ከእነሱ አንዱ ወንዝ ነው። ሙሉ መጠን ያለው ሞዴል በካርታው ላይ እንዴት እንደሚታይ ያሳያል።';
-$ec_lang['lpn_ex_net3_world_title']='EPANET Net3, ኬክሮስ/ኬንትሮስ';
-$ec_lang['lpn_ex_net3_world_desc']='የEPANET Net3 መረብ ወደ ኬክሮስና ኬንትሮስ ተቀይሮ Novato, CA ላይ የተቀመጠ፣ ከጀርባው የዓለም ካርታ ያለው።';
 $ec_lang['lpn_ex_elm_street_title']='የElm Street ማዕከል';
 $ec_lang['lpn_ex_elm_street_desc']='በአንድ ወቅት ላይ፣ ከከፍተኛ ቀን ፍላጎት በላይ ለእሳት ፍሰት የተፈታ የንግድ ቦታ፣ በቦታ ንድፍ ላይ ተስሎ።';
 $ec_lang['lpn_tool_undo']='ቀልብስ';

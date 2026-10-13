@@ -47857,7 +47857,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// reach. The box shows every toolbar button with its tip written out, every menu row, and
 			// the map and table keys, with a search over all of it. `?` opens it from anywhere but a
 			// field, at the control under the pointer or holding focus -- see openGuideAt().
-			{ icon: 'help', label: pc.lpn_help_manual || 'Guide', hotkey: '?', fn: toggleHotkeysBox },
+			{ icon: 'help', label: pc.lpn_help_manual || 'User manual', hotkey: '?', fn: toggleHotkeysBox },
 			{ separator: true },
 			// ---- Group 2: helpers ----
 			// **A VERB, not a noun.** "Contribute" reads as money or code to most visitors; the

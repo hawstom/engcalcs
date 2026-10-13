@@ -353,7 +353,7 @@ async function main() {
 
 		console.log('\n--- a geographic project (Net3 at Novato): the frame the export writes is lon/lat ---');
 		a = await open(browser);
-		await a.openExampleCard(await a.lang('lpn_ex_net3_world_title'));
+		await a.openExampleCard(await a.lang('lpn_ex_net3_title'));
 		await a.settle(1500);
 		await a.page.setInputFiles('#lpn_backdrop_file', { name: 'aerial.png', mimeType: 'image/png', buffer: png(48, 30) });
 		await a.settle(1200);

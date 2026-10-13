@@ -969,8 +969,6 @@ $ec_lang['lpn_ex_net2_desc']='Sistem distribusi bercabang dengan satu tangki, da
 $ec_lang['lpn_ex_net3_title']='EPANET Net3';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_ex_net3_desc']='Contoh besar EPANET: 92 simpul, tiga tangki, dan dua reservoir, salah satunya sungai. Contoh ini menunjukkan tampilan model berukuran penuh pada peta.';
-$ec_lang['lpn_ex_net3_world_title']='EPANET Net3, lat/lon';
-$ec_lang['lpn_ex_net3_world_desc']='Jaringan yang sama dengan EPANET Net3, ditempatkan pada lokasi sembarang di permukaan bumi: koordinatnya berupa garis lintang dan garis bujur, dan peta jalan digambar di belakangnya.';
 $ec_lang['lpn_ex_elm_street_title']='Elm Street Center';
 $ec_lang['lpn_ex_elm_street_desc']='Lokasi komersial yang diselesaikan untuk debit kebakaran di atas kebutuhan hari maksimum, pada satu saat tertentu, digambar di atas rencana tapak.';
 $ec_lang['lpn_tool_undo']='Urungkan';

@@ -968,8 +968,6 @@ $ec_lang['lpn_ex_net2_desc']='EPANET\'in örneklerinden, depolu dallı bir dağ�
 $ec_lang['lpn_ex_net3_title']='EPANET Net3';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_ex_net3_desc']='EPANET\'in büyük örneği: 92 düğüm, 3 depo ve 2 rezervuar, biri bir nehir. Gerçek boyutlu bir modelin haritada nasıl göründüğünü görmek için açmaya değer.';
-$ec_lang['lpn_ex_net3_world_title']='EPANET Net3, enlem/boylam';
-$ec_lang['lpn_ex_net3_world_desc']='EPANET Net3 şebekesi, Novato, CA\'da enlem/boylama dönüştürülmüş hâli; arkasında dünya haritası çizilidir.';
 $ec_lang['lpn_ex_elm_street_title']='Elm Street Center';
 $ec_lang['lpn_ex_elm_street_desc']='Bir vaziyet planı üzerine çizilmiş, tek bir anda maksimum gün talebine ek olarak yangın debisi için çözülmüş ticari bir alan.';
 $ec_lang['lpn_tool_undo']='Geri al';

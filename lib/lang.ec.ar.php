@@ -1039,8 +1039,6 @@ $ec_lang['lpn_ex_net2_desc']='شبكة توزيع متفرعة تحتوي على
 $ec_lang['lpn_ex_net3_title']='EPANET Net3';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_ex_net3_desc']='أكبر أمثلة EPANET: 92 ملتقى، وثلاثة صهاريج، وخزانان أحدهما نهر. يبيّن شكل نموذج بحجم كامل على الخريطة.';
-$ec_lang['lpn_ex_net3_world_title']='EPANET Net3، خط العرض وخط الطول';
-$ec_lang['lpn_ex_net3_world_desc']='شبكة EPANET Net3 نفسها، محوَّلة إلى خط عرض/خط طول عند نوفاتو، كاليفورنيا، مع خريطة العالم خلفها.';
 $ec_lang['lpn_ex_elm_street_title']='مركز شارع إلم';
 $ec_lang['lpn_ex_elm_street_desc']='موقع تجاري تم حله لتدفق الحريق فوق أقصى طلب يومي، في لحظة زمنية واحدة، مرسوم فوق مخطط الموقع.';
 $ec_lang['lpn_tool_undo']='تراجع';

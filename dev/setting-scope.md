@@ -76,21 +76,22 @@ rows) are counted only when present. Regenerate with
 | Sub-heading | Controls | Project | This browser | This session |
 |---|---|---|---|---|
 | `lpn_set_sub_nodeSym` | 12 | 12 | 0 | 0 |
-| `lpn_set_sub_nodeColors` | 3 | 3 | 0 | 0 |
+| `lpn_set_sub_nodeColors` | 4 | 4 | 0 | 0 |
 | `lpn_set_sub_linkSym` | 19 | 19 | 0 | 0 |
-| `lpn_set_sub_linkColors` | 3 | 3 | 0 | 0 |
+| `lpn_set_sub_linkColors` | 5 | 5 | 0 | 0 |
 | `lpn_set_sub_custLbl` | 8 | 8 | 0 | 0 |
 | `lpn_set_sub_nodeLink` | 2 | 2 | 0 | 0 |
 | `lpn_set_sub_mapDisplay` | 18 | 18 | 0 | 0 |
 | `lpn_set_sub_page` | 2 | 0 | 2 | 0 |
 | `lpn_set_sub_idPrefixes` | 7 | 7 | 0 | 0 |
 | `lpn_set_sub_defaults` | 5 | 5 | 0 | 0 |
+| `lpn_set_sub_customProps` | 10 | 10 | 0 | 0 |
 | `lpn_set_sub_units` | 8 | 8 | 0 | 0 |
 | `lpn_set_sub_time` | 8 | 8 | 0 | 0 |
 | `lpn_set_sub_hydraulics` | 17 | 16 | 1 | 0 |
 | `lpn_set_sub_energy` | 5 | 5 | 0 | 0 |
 | `lpn_set_sub_quality` | 2 | 2 | 0 | 0 |
-| **Total** | 119 | 116 | 3 | 0 |
+| **Total** | 132 | 129 | 3 | 0 |
 
 Controls whose home is not their heading's default, as observed:
 
