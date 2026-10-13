@@ -73939,11 +73939,19 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	// Called wherever a document arrives (paneDocumentArrived()): a project Basic mode cannot show
 	// turns it off, and says so in Tom's words.
+	// The switch-off on arrival is this project's alone: the remembered choice stays the visitor's,
+	// so the next project that fits opens in Basic mode again if that is what they chose.
 	function basicModeFitOnArrival() {
-		var pc = EngCalcs.pageConfig || {};
-		if (!scenarioBasicMode || !basicModeMisfit()) { return; }
-		setScenarioBasicMode(false);
-		setNotice(pc.lpn_scenario_basic_misfit || 'This project has scenarios and alternatives relationships that are not compatible with Scenarios Basic mode, so Basic mode is disabled.');
+		var pc = EngCalcs.pageConfig || {}, was = scenarioBasicMode;
+		loadScenarioBasicPref();
+		if (scenarioBasicMode && basicModeMisfit()) {
+			scenarioBasicMode = false;
+			setNotice(pc.lpn_scenario_basic_misfit || 'This project has scenarios and alternatives relationships that are not compatible with Scenarios Basic mode, so Basic mode is disabled.');
+		}
+		if (scenarioBasicMode !== was) {
+			if (scenarioBasicMode) { closeScenarioManager(); }
+			refreshScenariosTab();
+		}
 	}
 	function setScenarioBasicMode(on) {
 		var pc = EngCalcs.pageConfig || {};
