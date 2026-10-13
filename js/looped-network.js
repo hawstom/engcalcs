@@ -6953,7 +6953,8 @@ var EngCalcs = EngCalcs || {};
 	function scenarioDeleteQuestion(sc) {
 		var pc = EngCalcs.pageConfig || {}, plan = scenarioDeletePlan(sc), parts;
 		parts = [(pc.lpn_scenario_delete_ask || 'Delete the scenario {name}? The drawing itself is not changed.').replace('{name}', scenarioDisplayName(sc))];
-		if (plan.n) { parts.push((pc.lpn_scenario_delete_goes || 'Its {n} overrides are deleted with it.').replace('{n}', String(plan.n))); }
+		if (plan.n === 1) { parts.push(pc.lpn_scenario_delete_goes_one || 'Its one override is deleted with it.'); }
+		else if (plan.n) { parts.push((pc.lpn_scenario_delete_goes || 'Its {n} overrides are deleted with it.').replace('{n}', String(plan.n))); }
 		if (plan.kept.length) { parts.push((pc.lpn_scenario_delete_stays || 'These alternatives it uses stay in the project: {list}.').replace('{list}', plan.kept.join(', '))); }
 		return parts.join(' ');
 	}

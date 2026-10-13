@@ -3811,6 +3811,7 @@ EngCalcs.pageConfig = {
 	lpn_scenario_delete: <?=json_encode($ec_lang['lpn_scenario_delete'])?>,
 	lpn_scenario_delete_ask: <?=json_encode($ec_lang['lpn_scenario_delete_ask'])?>,
 	lpn_scenario_delete_goes: <?=json_encode($ec_lang['lpn_scenario_delete_goes'])?>,
+	lpn_scenario_delete_goes_one: <?=json_encode($ec_lang['lpn_scenario_delete_goes_one'])?>,
 	lpn_scenario_delete_stays: <?=json_encode($ec_lang['lpn_scenario_delete_stays'])?>,
 	lpn_scenario_delete_has_children: <?=json_encode($ec_lang['lpn_scenario_delete_has_children'])?>,
 	lpn_scenario_override: <?=json_encode($ec_lang['lpn_scenario_override'])?>,
