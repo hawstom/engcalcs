@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**131 still to read on master**, of 136 untranslated keys, of 2681 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**127 still to read on master**, of 137 untranslated keys, of 2682 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -199,7 +199,7 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   @@ NEEDS RULING
 
-## lpn_  (136, 131 to read @@ NEEDS RULING)
+## lpn_  (137, 127 to read @@ NEEDS RULING)
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -230,7 +230,7 @@ never edits a synonym.
   @@ NEEDS RULING
 - **`lpn_copy_props_no_overrides`**
   > No overrides to copy.
-  @@ NEEDS RULING
+  _Ruled 2026-10-13: Approved as written._
 - **`lpn_customer_node_inactive`**
   > This customer is assigned to a junction that is inactive in this scenario, so its demand is not part of the solve.
   @@ NEEDS RULING
@@ -263,13 +263,13 @@ never edits a synonym.
   @@ NEEDS RULING
 - **`lpn_ovm_child_tip`**
   > Child scenarios override this value ({n} total). Click to clear their overrides.
-  @@ NEEDS RULING
+  _Ruled 2026-10-13: Approved as written._
 - **`lpn_ovm_dot_clear`**
   > Click to clear it.
-  @@ NEEDS RULING
+  _Ruled 2026-10-13: Approved as written._
 - **`lpn_ovm_dot_set`**
   > Inherited. Click to make it an override in this scenario, holding the value shown.
-  @@ NEEDS RULING
+  _Ruled 2026-10-13: Approved as written._
 - **`lpn_pane_inactive_show`**
   > Include inactive topology
   @@ NEEDS RULING
@@ -331,17 +331,14 @@ never edits a synonym.
   > Delete the scenario {name}? The drawing itself is not changed.
   @@ NEEDS RULING
 - **`lpn_scenario_delete_goes`**
-  > Its {n} overrides are deleted with it.
-  @@ NEEDS RULING
-- **`lpn_scenario_delete_goes_one`**
-  > Its one override is deleted with it.
+  > Its overrides ({n}) are deleted with it.
   @@ NEEDS RULING
 - **`lpn_scenario_delete_has_children`**
   > The scenario {name} cannot be deleted while other scenarios inherit from it: {list}. Delete those first, or give them another parent.
   @@ NEEDS RULING
 - **`lpn_scenario_delete_stays`**
   > These alternatives it uses stay in the project: {list}.
-  @@ NEEDS RULING
+  _Ruled 2026-10-13: Approved as written._
 - **`lpn_scncmp_none_checked`**
   > No scenario is checked for comparison. Check scenarios in the Scenario manager.
   @@ NEEDS RULING
@@ -525,8 +522,8 @@ never edits a synonym.
 - **`lpn_sm_base_named`**
   > The Base of a tree is not renamed.
   @@ NEEDS RULING
-- **`lpn_sm_basic_off`**
-  > Basic mode is off, so the Scenario manager and the Scenarios table are shown.
+- **`lpn_sm_basic_on`**
+  > Scenario manager is disabled when Basic mode is on.
   @@ NEEDS RULING
 - **`lpn_sm_col_parent`**
   > Parent
@@ -550,13 +547,19 @@ never edits a synonym.
   > Delete the alternative {name}?
   @@ NEEDS RULING
 - **`lpn_sm_help`**
-  > How scenarios and alternatives work:\n\nIn Basic mode, alternatives are hidden and automatic, and all new scenarios are children of the Base scenario.\n\nWith Basic mode off, a complex inheritance tree is available, and alternatives can be shared among scenarios. But the default behavior of edits when a new alternative association is needed (in the absence of proactive user management) is to create an alternative named like the current scenario, which gives each scenario its unique set of alternatives.\n\nProperties and settings are grouped into alternatives categories that appear as columns of the Scenarios table and as management options in Scenario manager.\n\nOverrides are created in scenarios, but they really belong to the respective alternatives associated with the scenario; so a scenario is like a window to its alternatives. Associations of alternatives to scenarios are managed in the Scenarios table in the bottom pane. Creating a new scenario creates no alternatives; the new scenario uses its parent's alternatives until overrides are created that need new alternatives. When overrides are created in a scenario, they are stored in their respective alternative for the scenario; if the scenario has no such alternative, a new alternative is created using the name of the scenario.\n\nExample: You create a "Figure: Node and link IDs" scenario and edit a Text to say "Node and Link IDs." When you create the scenario, no alternatives are created. But at the moment you save the Text, a Text alternative called "Figure: Node and link IDs" is created with the override for the Text value. In Basic mode, you see this as simply an override in the scenario itself.\n\nCopy properties copies only overrides. In any scenario other than Base, it copies only the overrides the asset has in that scenario.\n\nHow to manage scenarios:\n\n- Choose Scenarios or an alternatives category in the list at the top to show its tree.\n\n- Create a child of the selected item with Add child. Add base adds another Base, which starts as a copy of Base as it is now; later edits to Base do not change it. A new child is named after its parent; type a name to rename it. Copy copies the selected alternative. To copy a scenario, use Copy scenario in the Scenarios menu, in Basic mode; it copies the scenario's overrides, with the alternatives that hold them.\n\n- Drag an item onto another to make it a child of that item. A scenario moved to a new parent inherits from it everything it has not overridden; what it has overridden does not change. Drag an item between two items to reorder them.\n\n- Click an item to select it. Press F2, or choose Rename, to rename the selected item. Renaming a scenario asks whether to rename the alternatives that carry its name; in Basic mode they are renamed with it, without asking. Double-click a scenario, or press Enter, to make it current. Click the arrow beside an item, or press Left or Right, to collapse or expand it. Right-click an item for the same commands as the buttons.\n\n- Press Delete, or click the minus button, to delete the selected item. An item in use is not deleted, and the message names what uses it. Deleting a scenario with Basic mode off keeps the alternatives it uses. Deleting a scenario with Basic mode on also deletes each of its alternatives that no other scenario uses.\n\n- To make a scenario use another alternative, including Base, choose it in the scenario's row of the Scenarios table. An override made in a shared alternative changes every scenario that uses it.
+  > How scenarios and alternatives work:\n\nIn Basic mode, alternatives are hidden and automatic, and all new scenarios are children of the Base scenario.\n\nWith Basic mode off, a complex inheritance tree is available, and alternatives can be shared among scenarios. But the default behavior of edits when a new alternative association is needed (in the absence of proactive user management) is to create an alternative named like the current scenario, which gives each scenario its unique set of alternatives.\n\nProperties and settings belong to alternatives categories that appear as columns of the Scenarios table and as management options in Scenario manager.\n\nOverrides are created in scenarios, but they really belong to the respective alternatives associated with the scenario; so a scenario is like a window to its alternatives. Associations of alternatives to scenarios are managed in the Scenarios table in the bottom pane. Creating a new scenario creates no alternatives; the new scenario uses its parent's alternatives until overrides are created that need new alternatives. When overrides are created in a scenario, they are stored in their respective alternative for the scenario; if the scenario has no such alternative, a new alternative is created using the name of the scenario.\n\nExample: You create a "Figure: Node and link IDs" scenario and edit a Text to say "Node and Link IDs." When you create the scenario, no alternatives are created. But at the moment you save the Text, a Text alternative called "Figure: Node and link IDs" is created with the override for the Text value. In Basic mode, you see this as simply an override in the scenario itself.\n\nCopy properties copies only overrides. In any scenario other than Base, it copies only the overrides the asset has in that scenario.\n\nHow to manage scenarios:\n\n- Choose Scenarios or an alternatives category in the list at the top to show its tree.\n\n- Create a child of the selected item with Add child. Add base adds another Base, which starts as a copy of Base as it is now; later edits to Base do not change it. A new child is named after its parent; type a name to rename it. Copy copies the selected alternative. To copy a scenario, use Copy scenario in the Scenarios menu, in Basic mode; it copies the scenario's overrides, with the alternatives that hold them.\n\n- Drag an item onto another to make it a child of that item. A scenario moved to a new parent inherits from it everything it has not overridden; what it has overridden does not change. Drag an item between two items to reorder them.\n\n- Click an item to select it. Press F2 or choose Rename to rename the selected item. Renaming a scenario asks whether to rename the alternatives that carry its name; in Basic mode they are renamed with it, without asking. Double-click a scenario or press Enter to make it current. Click the arrow beside an item or press Left or Right to collapse or expand it. Right-click an item for the same commands as the buttons.\n\n- Press Delete or click the minus button to delete the selected item. An item in use is not deleted, and the message names what uses it. Deleting a scenario with Basic mode off keeps the alternatives it uses. Deleting a scenario with Basic mode on also deletes each of its alternatives that no other scenario uses.\n\n- To make a scenario use another alternative, including Base, choose it in the scenario's row of the Scenarios table. An override made in a shared alternative changes every scenario that uses it.
   @@ NEEDS RULING
 - **`lpn_sm_in_use`**
-  > {name} cannot be deleted while it is used by: {list}.
+  > {item} cannot be deleted while it is used by\n{list}
   @@ NEEDS RULING
 - **`lpn_sm_inherited`**
   > inherited
+  @@ NEEDS RULING
+- **`lpn_sm_item_alternative`**
+  > Alternative {name}
+  @@ NEEDS RULING
+- **`lpn_sm_item_scenario`**
+  > Scenario {name}
   @@ NEEDS RULING
 - **`lpn_sm_make_current`**
   > Make current
@@ -614,7 +617,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**70 still to read**, of 73 new keys across 12 unmerged branch(es).
+**74 still to read**, of 77 new keys across 14 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -625,7 +628,9 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/bentley-interop (`fdd206f6`) — adds no English strings
+### feat/bentley-interop (`df2b02cf`) — adds no English strings
+
+### feat/button-base (`dc0d9010`) — adds no English strings
 
 ### feat/desktop (`baba0f04`) — adds no English strings
 
@@ -653,7 +658,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/match-property (`05bda765`) — adds no English strings
 
-### feat/shape (`1917e940`) — 70 new, 70 to read @@ NEEDS RULING
+### feat/shape (`8ec6403d`) — 70 new, 70 to read @@ NEEDS RULING
 
 - **`lpn_dxf_import_binary`**
   > {file} is a binary DXF. Save it from your CAD program as an ASCII DXF, then import again.
@@ -866,6 +871,22 @@ build for that would be a gate nobody keeps. Refresh it with
   > Draw a point, a polyline, or a polygon on the map. A Shape is annotation and is not part of the network. Specify each point, then specify the last point again, press Enter, or right-click to finish. Specify the first point again to close the Shape into a polygon.
   @@ NEEDS RULING
 
+### feat/si-example-more (`11d519d9`) — 2 new, 2 to read @@ NEEDS RULING
+
+- **`lpn_ex_net1_si_desc`**
+  > Litres per second, with metres and millimetres. A fictional EPANET example converted from gallons per minute, feet and inches, with chlorine, 1 reservoir, 1 tank and 1 pump, and two rule-based controls.
+  @@ NEEDS RULING
+- **`lpn_ex_net1_si_title`**
+  > EPANET Net1 plus rule-based controls, L/s (SI)
+  @@ NEEDS RULING
+
 ### feat/tool-key (`dd4bae8c`) — adds no English strings
 
-### fix/report-legend (`ca7592e9`) — adds no English strings
+### feat/zoom-selection (`51bbb738`) — 2 new, 2 to read @@ NEEDS RULING
+
+- **`lpn_tool_zoom_selection`**
+  > Zoom to selection
+  @@ NEEDS RULING
+- **`lpn_tool_zoom_selection_tip`**
+  > Fit the selected assets to the map window. Select one or more assets first.
+  @@ NEEDS RULING

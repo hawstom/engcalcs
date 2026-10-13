@@ -71,6 +71,7 @@ async function main() {
 			if (e) { e.style.display = 'none'; }
 		});
 		const scenarioMenu = async (label) => {
+			await require('./manager-door.js').ensure(page, label);
 			await page.click('#lpn_scenario_btn');
 			await page.waitForSelector('#lpn_menu_popup', { state: 'visible' });
 			const rowsH = await page.$$('#lpn_menu_list button.lpn-menu-row');

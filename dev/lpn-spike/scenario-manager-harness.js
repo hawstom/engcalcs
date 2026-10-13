@@ -60,7 +60,7 @@ const INJECT =
 	"\t\tscenarioMenuRows: scenarioMenuRows, openScenarioManager: openScenarioManager,\n" +
 	"\t\tbasicMode: function () { return scenarioBasicMode; }, setBasicMode: setScenarioBasicMode,\n" +
 	"\t\tlastNotice: function () { return lastNoticeText; }, promote: promoteImplicitAlternative,\n" +
-	"\t\talternativeFor: alternativeFor, libInactiveIds: libInactiveIds, smInUseBy: smInUseBy,\n" +
+	"\t\talternativeFor: alternativeFor, libInactiveIds: libInactiveIds, smInUseBy: smInUseBy, smInUseText: smInUseText,\n" +
 	"\t\toverrideCount: overrideCount, smSharedText: smSharedText, scenarioTableCols: scenarioTableCols, scenarioTableRows: scenarioTableRows,\n" +
 	"\t\tsmImplicitKey: smImplicitKey, onlyInThisScenario: onlyInThisScenario, deleteElement: deleteElement, noticeLog: function () { return noticeLog; },\n" +
 	"\t\ttouchTree: touchTree, ovKey: ovKey, smParseCell: smParseCell,\n" +
@@ -130,6 +130,9 @@ async function run(mutate, quiet) {
 	ok('3.1 a scenario with a child is refused, naming it', r1.refused === 'in use' && r1.who.join() === g1.name, JSON.stringify(r1));
 	const r2 = L.smDelete('demand', d1.id);
 	ok('3.2 an alternative with a child is refused, naming it', r2.refused === 'in use' && r2.who.join() === dd.name, JSON.stringify(r2));
+	const want2 = PC.lpn_sm_in_use.replace(/\\n/g, '\n').replace('{item}', PC.lpn_sm_item_alternative.replace('{name}', d1.name)).replace('{list}', PC.lpn_sm_item_alternative.replace('{name}', dd.name));
+	ok('3.2a the refusal reads "Alternative X cannot be deleted while it is used by", a line break, then each user', L.smInUseText('demand', d1.id, d1.name) === want2 && /\n/.test(want2), JSON.stringify(L.smInUseText('demand', d1.id, d1.name)));
+	ok('3.2b a scenario with a child reads the same way, naming Scenario {name}', L.smInUseText('scenarios', c1.id, c1.name) === PC.lpn_sm_in_use.replace(/\\n/g, '\n').replace('{item}', PC.lpn_sm_item_scenario.replace('{name}', c1.name)).replace('{list}', PC.lpn_sm_item_scenario.replace('{name}', g1.name)), JSON.stringify(L.smInUseText('scenarios', c1.id, c1.name)));
 	ok('3.3 a leaf goes', L.smDelete('demand', dd.id) === true && L.smRecords('demand').filter((r) => !r.root).length === 2);
 	L.smAssign(c2.id, 'demand', 'Peak');
 	const r3 = L.smDelete('demand', d1.id);
@@ -275,10 +278,26 @@ async function run(mutate, quiet) {
 	const row = () => L.scenarioMenuRows().filter((r) => r.label === PC.lpn_sm_menu)[0];
 	ok('8.1 the Scenario manager row is present with Basic mode ticked', !!row() && L.basicMode() === true);
 	row().fn();
-	ok('8.2 choosing it turns Basic mode off', L.basicMode() === false);
-	ok('8.3 ...and says so in one line', L.lastNotice() === PC.lpn_sm_basic_off && !/\n/.test(L.lastNotice()), L.lastNotice());
+	ok('8.2 the row is disabled while Basic mode is on (Tom, 2026-10-13), and says why', row().disabled === true && row().tip === PC.lpn_sm_basic_on && /Basic mode/.test(PC.lpn_sm_basic_on), JSON.stringify([row().disabled, row().tip]));
+	const before8 = L.lastNotice();
+	row().fn();
+	ok('8.3 ...and no door through it turns Basic mode off', L.basicMode() === true && L.lastNotice() === before8);
+	L.setBasicMode(false);
+	ok('8.3a with Basic mode off the row is enabled', !row().disabled && L.basicMode() === false);
 	ok('8.4 the row is still there with Basic mode off', !!row());
 	L.setBasicMode(false);
+
+	say('--- 8b. the help text (Tom, 2026-10-13) ---');
+	const helpParas = PC.lpn_sm_help.split(/\\n\\n/);
+	const noPair = (t) => !/, or [^,.;:]*, to /.test(t) && !/, or [^,.;:]*, (?:and )?(?:then )?(?:to|you) /.test(t);
+	ok('8b.1 no sentence of the help sets an "or" clause off with a pair of commas, "Do this, or do that, to make this"', noPair(PC.lpn_sm_help), (PC.lpn_sm_help.match(/[^.]*, or [^.]*, to [^.]*\./) || [''])[0]);
+	ok('8b.2 the Example paragraph is in the help (Tom: "Example is good and important.")', helpParas.some((p) => /^Example: /.test(p)));
+	ok('8b.3 paragraph 4 of the help, the title counted, begins "Properties and settings belong to alternatives categories"', helpParas[3].indexOf('Properties and settings belong to alternatives categories') === 0, helpParas[3].slice(0, 80));
+	const tipSentences = PC.lpn_scenario_basic_tip.split(/(?<=\.) /);
+	ok('8b.4 the Basic mode tip ends with his two sentences, the manager one first',
+		tipSentences[tipSentences.length - 2] === PC.lpn_sm_basic_on && tipSentences[tipSentences.length - 1] === 'Basic mode is disabled when a project has scenarios and alternatives relationships that Basic mode cannot show.', JSON.stringify(tipSentences.slice(-2)));
+	ok('8b.5 the singular override key and the notice Choosing-turns-it-off are gone', PC.lpn_scenario_delete_goes_one === undefined && PC.lpn_sm_basic_off === undefined);
+	ok('8b.6 the deletion line has one form, "Its overrides ({n}) are deleted with it."', PC.lpn_scenario_delete_goes.indexOf('{n}') > 0 && /overrides \(\{n\}\)/.test(PC.lpn_scenario_delete_goes));
 
 	say('--- 9. save and reopen; an old file; .inp ---');
 	const fileNew = JSON.stringify(L.serializeProject());
@@ -536,7 +555,7 @@ const MUTATIONS = [
 	['only-in-this-scenario reads the scenario\'s own values alone', (src) => src.replace("var ov = (!scn || scn.isBase) ? null : resolvedOverrides(scn)[ovKey(el)];", "var ov = (!scn || scn.isBase) ? null : (scn.overrides || {})[ovKey(el)];"), true],
 	['a scenario\'s own alternative is not an item of its tree', (src) => src.replace("		}).map(function (s) { return smImplicitRecord(s, tree); });", "		}).map(function (s) { return smImplicitRecord(s, tree); }).slice(0, 0);")],
 	['the first override asks first', (src) => src.replace("		var scn = activeScenario(), key = ovKey(el), t = ownWriteTarget(scn, categoryOf(prop, elGroup(el)));\n", "		if (writeTargetFor(activeScenario(), categoryOf(prop, elGroup(el))).kind === 'scn') { askDialog({ kind: 'alert', text: 'x' }); }\n		var scn = activeScenario(), key = ovKey(el), t = ownWriteTarget(scn, categoryOf(prop, elGroup(el)));\n"), true],
-	['Basic mode stays on when the manager is chosen', (src) => src.replace("		if (scenarioBasicMode) {\n			setScenarioBasicMode(false);\n			setNotice(", "		if (false) {\n			setScenarioBasicMode(false);\n			setNotice(")]
+	['the manager row is enabled in Basic mode', (src) => src.replace("label: pc.lpn_sm_menu || 'Scenario manager…', disabled: scenarioBasicMode,", "label: pc.lpn_sm_menu || 'Scenario manager…', disabled: false,")]
 ];
 (async function main() {
 	let fails = await run(null, false) + await runTail(null, false);

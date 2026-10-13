@@ -178,11 +178,13 @@ async function main() {
 		const fb2 = rows.filter((r) => r.key === flowBef.key)[0];
 		ok('typed in Peak, it is Peak\'s override: marked, reading F=', fb2 && fb2.local && fb2.cells.st_value === 'F=', fb2 && JSON.stringify(fb2));
 
-		console.log('--- 3. the Settings box note names the column as the table does ---');
+		console.log('--- 3. the Settings box marks the held Flow row with a dot, and draws no note ---');
 		await a.toolbarClick(await L('lpn_tool_settings'));
 		await a.settle(1500);
-		const note = await page.evaluate(() => Array.from(document.querySelectorAll('#lpn_setbox_content .lpn-set-heldnote')).map((n) => n.textContent.trim()));
-		ok('the held Flow row\'s note says Bef.: Q= (the box\'s own column word)', note.some((t) => t.indexOf('Q=') >= 0 && t.indexOf(BEF) < 0), JSON.stringify(note));
+		const flowMark = await page.evaluate(() => ({
+			dots: Array.from(document.querySelectorAll('#lpn_setbox_content .lpn-set-held .lpn-ovm-dot')).length,
+			notes: document.querySelectorAll('#lpn_setbox_content .lpn-set-heldnote').length }));
+		ok('the held Flow row wears a dot, and no yellow note is drawn', flowMark.dots >= 1 && flowMark.notes === 0, JSON.stringify(flowMark));
 		await a.toolbarClick(await L('lpn_tool_settings'));
 		await a.settle(600);
 

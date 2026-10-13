@@ -149,6 +149,7 @@ async function main() {
 		const saved = () => page.evaluate(() => JSON.parse(localStorage.getItem('lpn_project_hover')));
 		const flush = async () => { await a.settle(2600); };
 		const scenarioMenu = async (label) => {
+			await require('./manager-door.js').ensure(page, label);
 			await page.click('#lpn_scenario_btn');
 			await page.waitForSelector('#lpn_menu_popup', { state: 'visible' });
 			let hit = false;
@@ -211,17 +212,15 @@ async function main() {
 		// ---- B1 ----
 		console.log('--- B1. the Settings box note names the scenario holding the override ---');
 		await openProject((d) => { byId(d.scenarios, 'f5').settings = { labelSettings: { link: { id: false } } }; });
-		const await0held = await L('lpn_settings_held_base');
 		await a.toolbarClick(await L('lpn_tool_settings'));
 		await page.waitForSelector('#lpn_settings_box', { state: 'visible' });
 		await a.settle(800);
-		const notes = await page.evaluate(() => Array.from(document.querySelectorAll('#lpn_settings_box .lpn-set-heldnote')).map((n) => n.textContent.trim()));
+		const L_clear = await L('lpn_ovm_dot_clear');
+		const dots = await page.evaluate(() => Array.from(document.querySelectorAll('#lpn_settings_box .lpn-ovm-dot')).map((n) => n.getAttribute('aria-label')));
 		const wantIn = (await L('lpn_settings_held_in')).replace('{scenario}', 'Fig 5');
-		ok('B1 a held row is marked in Fig 5', notes.length >= 1, JSON.stringify(notes));
-		ok('B1 every note begins by naming Fig 5, the scenario holding the override', notes.length > 0 && notes.every((n) => n.indexOf(wantIn) === 0), JSON.stringify(notes));
-		const BASEW = await L('lpn_scenario_base');
-		ok('Q2 ...then what Clear override restores, from Fig 4, its parent', notes.every((n) => n.indexOf(wantIn + ' ' + (await0held).replace('{base}', 'Fig 4').split('{value}')[0]) === 0), JSON.stringify(notes));
-		ok('B1 ...and no note begins with Base', notes.every((n) => n.indexOf(BASEW) !== 0));
+		ok('B1 a held row is marked with a dot in Fig 5', dots.length >= 1, JSON.stringify(dots));
+		ok('B1 every dot names Fig 5, the scenario holding the override, and says Click to clear it', dots.length > 0 && dots.every((n) => n === wantIn + ' ' + (L_clear)), JSON.stringify(dots));
+		ok('B1 no yellow override note is drawn under any row (Tom, 2026-10-13: the markers replace it)', (await page.evaluate(() => document.querySelectorAll('#lpn_settings_box .lpn-set-heldnote, #lpn_settings_box .lpn-set-heldclear').length)) === 0);
 
 		// ---- B2 ----
 		console.log('\n--- B2. a Text moved in Fig 5 moves in Fig 5 only ---');
@@ -355,7 +354,7 @@ async function main() {
 		await flush();
 		let asked = (a.dialogs[0] || {}).message || '';
 		ok('F1 Basic on: the question names the scenario and the overrides that go',
-			asked.indexOf((await L('lpn_scenario_delete_ask')).replace('{name}', 'Fig 6')) === 0 && asked.indexOf(await L('lpn_scenario_delete_goes_one')) >= 0, asked);
+			asked.indexOf((await L('lpn_scenario_delete_ask')).replace('{name}', 'Fig 6')) === 0 && asked.indexOf((await L('lpn_scenario_delete_goes')).replace('{n}', '1')) >= 0, asked);
 		ok('F1 ...and names nothing as staying', asked.indexOf((await L('lpn_scenario_delete_stays')).split('{list}')[0]) < 0, asked);
 		sv = await saved();
 		ok('B5 Basic on: Fig 6 is deleted, and its alternative with it', !byId(sv.scenarios, 'f6') && !byId(sv.alternatives, 'a1'), JSON.stringify(sv.alternatives));

@@ -118,6 +118,7 @@ function helpers(a) {
 		return v === null || v === '' ? NaN : +v;
 	};
 	const scenarioMenu = async (label) => {
+		await require('./manager-door.js').ensure(page, label);
 		await page.click('#lpn_scenario_btn');
 		await page.waitForSelector('#lpn_menu_popup', { state: 'visible' });
 		// A real click on the row (Playwright's), as a person makes it: the menu acts on the press.

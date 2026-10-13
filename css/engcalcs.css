@@ -1130,6 +1130,8 @@ html[lang="zh"] .ec-welcome {
 #lpn_popup_fields.lpn-ovm-gut1, #lpn_popup_title.lpn-ovm-gut1 { position: relative; padding-inline-start: 0.95em; }
 #lpn_popup_fields.lpn-ovm-gut1 .lpn-ovm { margin-inline-start: -0.95em; }
 #lpn_settings_box.lpn-ovm-gut .lpn-set-row, #lpn_settings_box.lpn-ovm-gut [data-lpn-setting] { position: relative; padding-inline-start: 1.9em; }
+/* A column heading over marked rows gives up the same room, or it sits 1.9em left of its column. */
+#lpn_settings_box.lpn-ovm-gut .lpn-set-colhead { padding-inline-start: calc(1.9em / 0.85); }   /* the heading is .85em, the rows 1em */
 .lpn-ovm { position: absolute; margin-inline-start: -1.9em; display: inline-flex; align-items: center; height: 1.3em; }
 #lpn_settings_box .lpn-ovm { margin-inline-start: 0; inset-inline-start: 0; top: 0.15em; }
 .lpn-ovm-cell { display: inline-flex; align-items: center; justify-content: center; width: 0.95em; height: 1.3em; }
@@ -3855,8 +3857,6 @@ label > .lpn-valwarn { margin-inline-start: .3em; }
    the row, and under it what Base has with Clear override. The edge is drawn inside the row's own
    box, so nothing beside it moves. */
 .lpn-set-held { box-shadow: inset 3px 0 0 var(--ec-held); padding-left: 6px; }
-.lpn-set-heldnote { margin: -2px 0 4px; padding-left: 6px; box-shadow: inset 3px 0 0 var(--ec-held); background: var(--ec-held-bg); }
-.lpn-set-heldclear { background: none; border: 0; padding: 0; font: inherit; color: var(--ec-accent); text-decoration: underline; cursor: pointer; }
 .lpn-set-viewgroup > button { margin: 2px 0 4px; }
 /* The box's left index marks a sub-heading under which the open scenario holds a value. */
 .lpn-setbox-link.lpn-setbox-link-held { box-shadow: inset 3px 0 0 var(--ec-held); }

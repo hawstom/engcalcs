@@ -78,6 +78,7 @@ async function main() {
 		const saved = () => page.evaluate(() => JSON.parse(localStorage.getItem('lpn_project_hover')));
 		const flush = async () => { await a.settle(2600); };
 		const scenarioMenu = async (label) => {
+			await require('./manager-door.js').ensure(page, label);
 			await page.click('#lpn_scenario_btn');
 			await page.waitForSelector('#lpn_menu_popup', { state: 'visible' });
 			let hit = false;
@@ -167,7 +168,7 @@ async function main() {
 			a.answerConfirmsWith(true);
 			await scenarioMenu(await L('lpn_scenario_delete'));
 			await flush();
-			const want = n === 1 ? await L('lpn_scenario_delete_goes_one') : (await L('lpn_scenario_delete_goes')).replace('{n}', '2');
+			const want = (await L('lpn_scenario_delete_goes')).replace('{n}', String(n));
 			ok('D1 Basic on, ' + n + ' override(s) made in the table: the question says "' + want + '"', askOf().indexOf(want) >= 0 &&
 				askOf().indexOf((await L('lpn_scenario_delete_ask')).replace('{name}', 'Fig X')) === 0, askOf());
 			const sv = await saved();
@@ -185,7 +186,7 @@ async function main() {
 		await scenarioMenu(await L('lpn_scenario_delete'));
 		await flush();
 		ok('D1 Basic off: the override stays, in the alternative the question names as staying',
-			askOf().indexOf((await L('lpn_scenario_delete_stays')).replace('{list}', 'Fig X')) >= 0 && askOf().indexOf((await L('lpn_scenario_delete_goes_one'))) < 0, askOf());
+			askOf().indexOf((await L('lpn_scenario_delete_stays')).replace('{list}', 'Fig X')) >= 0 && askOf().indexOf((await L('lpn_scenario_delete_goes')).split('{n}')[0]) < 0, askOf());
 		let sv = await saved();
 		ok('D1 ...and it does stay', ((byId(sv.alternatives, 'a1') || {}).values || {})['n:10'] !== undefined, JSON.stringify(sv.alternatives));
 
@@ -199,8 +200,8 @@ async function main() {
 		a.answerConfirmsWith(false);
 		await page.keyboard.press('Delete');
 		await flush();
-		ok('D2 the alternative asks first, saying its one override goes with it',
-			askOf() === (await L('lpn_sm_delete_alt_ask')).replace('{name}', 'Fig X') + ' ' + (await L('lpn_scenario_delete_goes_one')), askOf());
+		ok('D2 the alternative asks first, saying its overrides (1) go with it, one form for every count (Tom, 2026-10-13)',
+			askOf() === (await L('lpn_sm_delete_alt_ask')).replace('{name}', 'Fig X') + ' ' + (await L('lpn_scenario_delete_goes')).replace('{n}', '1'), askOf());
 		sv = await saved();
 		ok('D2 ...No keeps it', !!byId(sv.alternatives, 'a1'));
 		await openProject((d) => {
@@ -379,6 +380,62 @@ async function main() {
 		await openPop('10');
 		lm = await lefts();
 		ok('M6 in a scenario too, the ID line starts where the rows start', lm.id !== null && Math.abs(lm.id - lm.row) <= 2, JSON.stringify(lm));
+
+		// ---- U2: the refusal to delete an alternative a scenario uses (Tom, 2026-10-13) ----
+		console.log('\n--- U2. Delete an alternative in use: the refusal ---');
+		await openProject((d) => {
+			plain(d);
+			d.alternatives = [{ id: 'a1', category: 'physical', name: 'Shared', parent: null, values: { 'n:10': { elev: 701 } } }];
+			d.scenarios.push({ id: 'f6', name: 'Fig 6', overrides: {}, alternatives: { physical: 'a1' } });
+			d.scenarios.push({ id: 'f7', name: 'Fig 7', overrides: {}, alternatives: { physical: 'a1' } });
+		}, true);
+		await scenarioMenu(await L('lpn_sm_menu'));
+		await page.selectOption('#lpn_sm_tree_select', 'physical');
+		await a.settle(500);
+		await smRow('Shared');
+		a.dialogs.length = 0;
+		await page.keyboard.press('Delete');
+		await flush();
+		const inUse = ((a.dialogs.filter((x) => x.type === 'alert')[0]) || {}).message || '';
+		const useTpl = (await L('lpn_sm_in_use')).replace(/\\n/g, '\n');
+		const scnLine = async (n) => (await L('lpn_sm_item_scenario')).replace('{name}', n);
+		const wantUse2 = useTpl.replace('{item}', (await L('lpn_sm_item_alternative')).replace('{name}', 'Shared')).replace('{list}', (await scnLine('Fig 6')) + '\n' + (await scnLine('Fig 7')));
+		ok('U2 the refusal says the alternative cannot be deleted while it is used by, a real line break, then one Scenario line per user',
+			inUse === wantUse2 && inUse.split('\n').length === 3, JSON.stringify(inUse));
+		sv = await saved();
+		ok('U2 ...and nothing was deleted', !!byId(sv.alternatives, 'a1'));
+
+		// ---- ALN: the column headings line up with marked rows (Tom, 2026-10-13) ----
+		console.log('\n--- ALN. Settings: headings over marked rows ---');
+		const aligned = () => page.evaluate(() => {
+			const out = [];
+			document.querySelectorAll('#lpn_settings_box .lpn-set-colhead').forEach((h) => {
+				const box = h.parentElement;
+				const row = Array.from(box.querySelectorAll('[data-lpn-setting]')).filter((r) => r.offsetParent)[0];
+				if (!row || !h.offsetParent) { return; }
+				// Heading cells after the name spacer, against the row's own right-hand controls, in order.
+				const hs = Array.from(h.children).slice(1).map((c) => Math.round(c.getBoundingClientRect().left));
+				const rs = Array.from(row.querySelectorAll('input[type=text]')).filter((i) => i.offsetParent).map((i) => Math.round(i.getBoundingClientRect().left));
+				const first = hs.slice(0, 2).map((x, i) => (rs[i] === undefined ? null : Math.abs(x - rs[i])));
+				out.push({ box: box.id, off: first, nameLeft: Math.round(h.getBoundingClientRect().left), rowLeft: Math.round(row.getBoundingClientRect().left),
+					hpad: getComputedStyle(h).paddingInlineStart, rpad: getComputedStyle(row).paddingInlineStart });
+			});
+			return out;
+		});
+		for (const scn of ['f4', 'base']) {
+			await openProject((d) => { tree(d); d.project.activeScenario = scn; }, true);
+			await page.evaluate(() => { const p = document.getElementById('lpn_popup_close'); if (p && p.offsetParent) { p.click(); } });
+			await a.toolbarClick(await L('lpn_tool_settings'));
+			await page.waitForSelector('#lpn_settings_box', { state: 'visible' });
+			await a.settle(800);
+			// Open every collapsed section so the Labels tables are on screen.
+			await page.evaluate(() => document.querySelectorAll('#lpn_settings_box details').forEach((d) => { d.open = true; }));
+			await a.settle(500);
+			const al = await aligned();
+			ok('ALN ' + scn + ': at least the Node and Link label tables are measured', al.length >= 2, JSON.stringify(al));
+			ok('ALN ' + scn + ': each heading row gives up the same room as the rows under it (Bef. and Aft. sit over their boxes)',
+				al.every((r) => r.off.every((x) => x === null || x <= 2)), JSON.stringify(al));
+		}
 
 		// ---- CP: a custom property's design, typed in a scenario through the Settings box ----
 		console.log('\n--- CP. a custom property designed in a scenario is kept (Perry, 2026-10-13) ---');

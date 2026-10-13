@@ -5718,6 +5718,31 @@
             "on": "This project has scenarios and alternatives relationships that are not compatible with Scenarios Basic mode, so Basic mode is disabled.",
             "ruled": "2026-10-13",
             "answer": "OK."
+        },
+        "lpn_copy_props_no_overrides": {
+            "on": "No overrides to copy.",
+            "ruled": "2026-10-13",
+            "answer": "Approved as written."
+        },
+        "lpn_ovm_child_tip": {
+            "on": "Child scenarios override this value ({n} total). Click to clear their overrides.",
+            "ruled": "2026-10-13",
+            "answer": "Approved as written."
+        },
+        "lpn_ovm_dot_set": {
+            "on": "Inherited. Click to make it an override in this scenario, holding the value shown.",
+            "ruled": "2026-10-13",
+            "answer": "Approved as written."
+        },
+        "lpn_ovm_dot_clear": {
+            "on": "Click to clear it.",
+            "ruled": "2026-10-13",
+            "answer": "Approved as written."
+        },
+        "lpn_scenario_delete_stays": {
+            "on": "These alternatives it uses stay in the project: {list}.",
+            "ruled": "2026-10-13",
+            "answer": "Approved as written."
         }
     }
 }

@@ -6003,17 +6003,30 @@ var EngCalcs = EngCalcs || {};
 	// Who stands in the way of deleting an item, as names: its children, and for a stored record the
 	// scenarios naming it. Empty means it may go.
 	function smInUseBy(tree, key) {
+		return smInUseItems(tree, key).map(function (x) { return x.name; });
+	}
+	// The same, each as {name, scn}: scn true for a scenario, false for an alternative.
+	function smInUseItems(tree, key) {
 		var kind = smKind(tree), who = [];
 		if (kind === 'scn') {
-			scenarios.forEach(function (x) { if (x.parent === key) { who.push(scenarioDisplayName(x)); } });
+			scenarios.forEach(function (x) { if (x.parent === key) { who.push({ name: scenarioDisplayName(x), scn: true }); } });
 			return who;
 		}
 		// A scenario's own alternative is always used by that scenario, and by any child of it that
 		// holds nothing of its own there.
-		if (smImplicitOwner(tree, key)) { return smUsedBy(tree, key).map(scenarioDisplayName); }
-		storedUsers(kind, key).scenarios.forEach(function (sid) { who.push(scenarioDisplayName(scenarioById(sid))); });
-		storedUsers(kind, key).children.forEach(function (cid) { who.push(smName(tree, cid)); });
+		if (smImplicitOwner(tree, key)) { return smUsedBy(tree, key).map(function (x) { return { name: scenarioDisplayName(x), scn: true }; }); }
+		storedUsers(kind, key).scenarios.forEach(function (sid) { who.push({ name: scenarioDisplayName(scenarioById(sid)), scn: true }); });
+		storedUsers(kind, key).children.forEach(function (cid) { who.push({ name: smName(tree, cid), scn: false }); });
 		return who;
+	}
+	// "Alternative {name} cannot be deleted while it is used by" and one line per user, each led by
+	// Scenario or Alternative (Tom, 2026-10-13). The key holds a literal \n, as the guide keys do.
+	function smInUseText(tree, key, name) {
+		var pc = EngCalcs.pageConfig || {};
+		var label = function (scn, n) { return (scn ? (pc.lpn_sm_item_scenario || 'Scenario {name}') : (pc.lpn_sm_item_alternative || 'Alternative {name}')).replace('{name}', n); };
+		return (pc.lpn_sm_in_use || '{item} cannot be deleted while it is used by\\n{list}').replace(/\\n/g, '\n')
+			.replace('{item}', label(smKind(tree) === 'scn', name))
+			.replace('{list}', smInUseItems(tree, key).map(function (x) { return label(x.scn, x.name); }).join('\n'));
 	}
 	// **REFUSED WHILE IN USE, NAMING WHO** (H04). Base items never go.
 	function smDelete(tree, key) {
@@ -6955,11 +6968,10 @@ var EngCalcs = EngCalcs || {};
 		}
 		return n;
 	}
-	// "Its one override is deleted with it." / "Its {n} overrides are deleted with it.", or ''.
+	// "Its overrides ({n}) are deleted with it.", or '' (Tom, 2026-10-13: one form, no singular).
 	function overridesGoText(n) {
 		var pc = EngCalcs.pageConfig || {};
-		if (n === 1) { return pc.lpn_scenario_delete_goes_one || 'Its one override is deleted with it.'; }
-		return n ? (pc.lpn_scenario_delete_goes || 'Its {n} overrides are deleted with it.').replace('{n}', String(n)) : '';
+		return n ? (pc.lpn_scenario_delete_goes || 'Its overrides ({n}) are deleted with it.').replace('{n}', String(n)) : '';
 	}
 	function dropScenarioOrphans(plan) {
 		(plan && plan.orphans || []).forEach(function (o) { deleteStored(o.kind, o.id); });
@@ -7081,11 +7093,12 @@ var EngCalcs = EngCalcs || {};
 		// **THE ORDER IS TOM'S** (2026-10-11): *"Scenario manager..., -, Basic mode, New, Rename,
 		// Delete, -, Apply Base, list of scenarios."* The Scenarios table and the Scenario manager are
 		// where scenarios are managed, so the list of scenarios comes last.
-		// **THE SCENARIO MANAGER ROW IS ALWAYS HERE** (Tom, 2026-10-09, H03); choosing it while
-		// Basic mode is ticked turns Basic mode off and says so in one line (openScenarioManager()).
+		// **THE SCENARIO MANAGER ROW IS ALWAYS HERE, GREYED WHILE BASIC MODE IS ON** (Tom, 2026-10-13:
+		// "Scenario manager is disabled when Basic mode is on").
 		// **BASIC MODE** (Tom, 2026-09-30), ticked by default: see setScenarioBasicMode().
 		rows.push({
-			icon: 'scenarios', label: pc.lpn_sm_menu || 'Scenario manager…',
+			icon: 'scenarios', label: pc.lpn_sm_menu || 'Scenario manager…', disabled: scenarioBasicMode,
+			tip: scenarioBasicMode ? (pc.lpn_sm_basic_on || 'Scenario manager is disabled when Basic mode is on.') : undefined,
 			fn: function () { openScenarioManager(); }
 		});
 		rows.push({ separator: true });
@@ -54628,7 +54641,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// matches too.
 		function columnHeadings(box, group) {
 			var row = document.createElement('div'), lead = document.createElement('span');
-			row.className = 'lpn-set-note';
+			row.className = 'lpn-set-note lpn-set-colhead';
 			row.style.display = 'flex'; row.style.alignItems = 'flex-end'; row.style.gap = LPN_LABEL_ROW_GAP;
 			lead.style.flex = '1 1 auto';
 			row.appendChild(lead);
@@ -57835,41 +57848,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// and the note said Not stated). So those are read as Base reads them, through the same readers.
 	// A text that is empty or begins or ends in a space is quoted, or the note would show nothing.
 	function setboxQuoteBlank(t) { t = String(t); return /^\s|\s$|^$/.test(t) ? '"' + t + '"' : t; }
-	// **WHAT CLEAR OVERRIDE WOULD RESTORE** (Tom, 2026-10-12): read in `src`, the scenario the held
-	// one inherits from (its parent, Base for a child of Base), not always Base.
-	function setboxBaseText(row, src) {
-		var base = src || baseScenario(), v, opts, i, p = row.path;
-		// A parent that holds a view of its own (resolved) restores that one; else it follows Base's.
-		if (p[0] === 'view' && !base.isBase && heldView(base)) { return viewSummaryText(outwardViewOf(heldView(base))); }
-		if (p[0] === 'view') {
-			// Base's view is the live one: where leaving this scenario goes (followScenarioView()),
-			// which, with nothing remembered, is where the map is now.
-			v = viewBeforeScenarioView || currentView();
-			return v ? viewSummaryText(outwardViewOf(v)) : null;
-		}
-		if (p[0] === 'labelSettings' && settingRowValue(row, base) === undefined) {
-			if (p[1] === 'separator') { return paneInScenario(base, function () { return setboxQuoteBlank(labelSeparator()); }); }
-			if ((p[1] === 'prefix' || p[1] === 'suffix') && p.length === 4) {
-				return paneInScenario(base, function () {
-					var field = String(p[3]).split(':')[0];
-					return setboxQuoteBlank(p[1] === 'prefix' ? labelPrefixFor(p[2], field) : labelSuffixFor(p[2], field));
-				});
-			}
-		}
-		if (settingRowIsSelect(row)) {
-			v = settingRowValue(row, base);
-			if (v === undefined) { v = row.dflt; }
-			opts = settingRowOptions(row, base);
-			for (i = 0; i < opts.length; i++) { if (String(opts[i][0]) === String(v)) { return opts[i][1]; } }
-		}
-		v = settingRowValue(row, base);
-		return typeof v === 'string' ? setboxQuoteBlank(settingRowText(row, base)) : settingRowText(row, base);
-	}
 	function markHeldSetboxRows() {
 		var box = setboxEl(), scn = activeScenario(), rows = null, pc = EngCalcs.pageConfig || {};
 		// Base's text is read from the project's own objects, so never from inside a builder's view.
 		if (!box || setboxViewDepth) { return; }
-		Array.prototype.forEach.call(box.querySelectorAll('.lpn-set-heldnote'), function (n) { n.parentNode.removeChild(n); });
 		Array.prototype.forEach.call(box.querySelectorAll('.lpn-set-held'), function (el) { el.classList.remove('lpn-set-held'); });
 		Array.prototype.forEach.call(box.querySelectorAll('.lpn-setbox-link-held'), function (el) { el.classList.remove('lpn-setbox-link-held'); });
 		// The dot and the down triangle (Task 790; ovmGutter() says what they mean), drawn afresh.
@@ -57877,7 +57859,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		box.classList.toggle('lpn-ovm-gut', !!scn && scenarios.length > 1);
 		if (!scn || scenarios.length < 2) { setboxKeepPlace(); return; }
 		Array.prototype.forEach.call(box.querySelectorAll('[data-lpn-setting]'), function (el) {
-			var paths, held, note, text, btn, many, shared;
+			var paths, held;
 			try { paths = JSON.parse(el.getAttribute('data-lpn-setting')) || []; } catch (e) { paths = []; }
 			if (!paths.length) { return; }
 			if (!rows) { rows = settingTableRows(); }
@@ -57885,38 +57867,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			setboxMarks(el, paths, held, scn, rows);
 			if (!held.length) { return; }
 			el.classList.add('lpn-set-held');
-			many = held.length > 1;
-			text = held.map(function (r) {
-				var t = setboxBaseText(r, parentScenarioOf(scn)), part = setboxLabelPart(r.path);
-				if (t === null || t === undefined) { return null; }
-				// A Labels row edits six things: each held one is named by its column ("Decimals: 0").
-				if (part) { return settingTableFill(pc.lpn_settings_row_labels_field || '{labels}: {field}', { labels: part, field: t }); }
-				return many ? settingTableFill(pc.lpn_settings_row_of || '{setting}, {member}', { setting: settingTableLabel(r.path), member: t }) : t;
-			}).filter(function (t) { return t !== null; });
 			setboxIndexMarkHeld(el);
-			note = document.createElement('div');
-			note.className = 'lpn-set-note lpn-set-heldnote';
-			note.setAttribute('data-lpn-noseam', '1');
-			// **THE NOTE FIRST NAMES THE SCENARIO THAT HOLDS THE OVERRIDE** (Tom, 2026-10-12: an override
-			// in Fig 5 read "Base: Is active", as if Base held it), then says what Base has.
-			note.appendChild(document.createTextNode((pc.lpn_settings_held_in || 'Override in {scenario}.')
-				.split('{scenario}').join(scenarioDisplayName(scn)) + ' '));
-			if (text.length) {
-				note.appendChild(document.createTextNode((pc.lpn_settings_held_base || '{base}: {value}')
-					.split('{base}').join(scenarioDisplayName(parentScenarioOf(scn))).split('{value}').join(text.join('; ')) + ' '));
-			}
-			shared = smSharedText(held.map(function (r) { return r.cat; }).filter(function (c) { return !!c; }));
-			if (shared) { note.appendChild(document.createTextNode(shared + ' ')); }
-			btn = document.createElement('button');
-			btn.type = 'button';
-			btn.className = 'lpn-set-heldclear';
-			btn.textContent = pc.lpn_pane_clear_override || 'Clear override';
-			btn.addEventListener('click', function (e) {
-				if (e && e.preventDefault) { e.preventDefault(); }
-				clearHeldSetboxRows(held, scn);
-			});
-			note.appendChild(btn);
-			el.parentNode.insertBefore(note, el.nextSibling);
 		});
 		// A search in force keeps each new note with its row.
 		if ((document.getElementById('lpn_setbox_filter') || {}).value) { applySetboxFilter(); }
@@ -57949,16 +57900,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		else { g.appendChild(ovmCell('lpn-ovm-none')); }
 		// Last, so the row's grid keeps its own first and second child; CSS places it at the start.
 		el.appendChild(g);
-	}
-	// The column of a Labels row a path is (its Show tick, Decimals, Before, After, Use units, the
-	// two ranks), in that column's own words; null for any other row.
-	function setboxLabelPart(p) {
-		var pc = EngCalcs.pageConfig || {}, groups = { node: 1, link: 1, customer: 1 }, k;
-		if (p[0] !== 'labelSettings') { return null; }
-		if (groups[p[1]] && p.length === 3) { return pc.lpn_settings_row_label_on || 'Is active'; }
-		k = { decimals: 'lpn_labels_col_decimals', prefix: 'lpn_labels_col_before', suffix: 'lpn_labels_col_after',
-			useUnits: 'lpn_labels_use_units', show: 'lpn_settings_row_label_show', priority: 'lpn_settings_row_label_drop' }[p[1]];
-		return k && groups[p[2]] && p.length === 4 ? (pc[k] || p[1]) : null;
 	}
 	// The box's left index marks a sub-heading that holds an override, so a held value can be found.
 	function setboxIndexMarkHeld(el) {
@@ -58286,8 +58227,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		[].forEach.call(container.children, function (kid) {
 			var n, headMatch;
 			if (kid.classList.contains('lpn-set-sub')) { pendingSub = kid; return; }
-			// A held row's note (Base's value, Clear override) is shown and hidden with its row.
-			if (kid.classList.contains('lpn-set-heldnote')) { setboxShow(kid, lastShown); return; }
 			if (kid.classList.contains('lpn-set-subbody')) {
 				headMatch = pendingSub && words.length && setboxWordsMatch(setboxUnitText(pendingSub), words);
 				n = filterSetboxContainer(kid, headMatch ? [] : words);
@@ -74945,7 +74884,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		res = smTry(function () { return smDelete(tree, key); });
 		if (res !== true) {
 			if (res.refused === 'in use') {
-				tellNotice((pc.lpn_sm_in_use || '{name} cannot be deleted while it is used by: {list}.').replace('{name}', name).replace('{list}', res.who.join(', ')));
+				tellNotice(smInUseText(tree, key, name));
 			}
 			return;
 		}
@@ -75098,11 +75037,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var box = smBoxEl();
 		closeMenu();
 		hideOpenTips();
-		// **THE ROW IS ALWAYS THERE; CHOOSING IT TURNS BASIC MODE OFF AND SAYS SO** (H03).
-		if (scenarioBasicMode) {
-			setScenarioBasicMode(false);
-			setNotice((EngCalcs.pageConfig || {}).lpn_sm_basic_off || 'Basic mode is off, so the Scenario manager and the Scenarios table are shown.');
-		}
+		// Disabled while Basic mode is on (Tom, 2026-10-13); the row is greyed, and no door opens it.
+		if (scenarioBasicMode) { return; }
 		if (!box) { return; }
 		box.style.display = 'flex';
 		rebuildScenarioManager();

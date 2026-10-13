@@ -60,6 +60,7 @@ function helpers(a, page) {
 	const settle = (ms) => a.settle(ms);
 	const h = {};
 	h.scenarioMenu = async (label) => {
+		await require('./manager-door.js').ensure(page, label);
 		await page.click('#lpn_scenario_btn');
 		await page.waitForSelector('#lpn_menu_popup', { state: 'visible' });
 		for (const r of await page.$$('#lpn_menu_list button.lpn-menu-row')) {

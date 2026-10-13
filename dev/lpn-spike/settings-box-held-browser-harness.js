@@ -67,11 +67,12 @@ async function main() {
 		});
 		await a.toolbarClick(await L('lpn_pane_toggle'));
 		await a.settle(500);
-		const BASE = await L('lpn_scenario_base'), CLEAR = await L('lpn_pane_clear_override'),
-			HELD = await L('lpn_settings_held_base'), HW = await L('bpn_method_hw'), HELDIN = await L('lpn_settings_held_in');
-		// The note names the scenario holding the override first (Tom, 2026-10-12), then Base's value.
-		// Every held note this harness reads is in the scenario it calls Peak.
-		const baseNote = (v) => HELDIN.replace('{scenario}', 'Peak') + ' ' + HELD.replace('{base}', BASE).replace('{value}', v);
+		const BASE = await L('lpn_scenario_base'),
+			HELDIN = await L('lpn_settings_held_in'), DOTCLEAR = await L('lpn_ovm_dot_clear');
+		// A held row wears a dot (Task 790) whose tip names the scenario holding the override and says
+		// Click to clear it. The yellow note under the row is gone (Tom, 2026-10-13: the markers replace
+		// it). Every dot this harness reads is in the scenario it calls Peak.
+		const dotTip = HELDIN.replace('{scenario}', 'Peak') + ' ' + DOTCLEAR;
 
 		// ---- what a person does and sees ----
 		const tab = async (id) => { await page.click('#lpn_pane_tab_' + id); await a.settle(600); };
@@ -110,8 +111,8 @@ async function main() {
 		};
 		// Every marked row in the box: which settings it edits, and the note under it.
 		const marks = () => page.evaluate(() => Array.from(document.querySelectorAll('#lpn_settings_box .lpn-set-held')).map((el) => {
-			const n = el.nextElementSibling;
-			return { tag: el.getAttribute('data-lpn-setting'), note: n && n.classList.contains('lpn-set-heldnote') ? n.textContent.trim() : null };
+			const d = el.querySelector('.lpn-ovm-dot');
+			return { tag: el.getAttribute('data-lpn-setting'), note: d ? d.getAttribute('aria-label') : null };
 		}));
 		const notes = () => page.evaluate(() => document.querySelectorAll('#lpn_settings_box .lpn-set-heldnote').length);
 		const markOf = async (path) => (await marks()).filter((m) => JSON.parse(m.tag).some((p) => JSON.stringify(p) === JSON.stringify(path)))[0];
@@ -125,8 +126,7 @@ async function main() {
 			const h = await page.evaluateHandle((p) => {
 				const el = Array.from(document.querySelectorAll('#lpn_settings_box .lpn-set-held'))
 					.filter((e) => JSON.parse(e.getAttribute('data-lpn-setting')).some((q) => JSON.stringify(q) === p))[0];
-				const n = el && el.nextElementSibling;
-				return n ? n.querySelector('.lpn-set-heldclear') : null;
+				return el ? el.querySelector('.lpn-ovm-dot') : null;
 			}, JSON.stringify(path));
 			const el = h.asElement();
 			if (!el) { return false; }
@@ -218,9 +218,9 @@ async function main() {
 		ok('friction method picked in the box in Peak: the open Settings table marks its row at once', await tableLocal(FMW) === true);
 		let m = await markOf(['settings', 'method']);
 		ok('friction method picked in Peak: its row wears the amber mark', !!m, JSON.stringify(await marks()));
-		ok('...and the note under it reads "' + baseNote(HW) + '" with Clear override', m && m.note === baseNote(HW) + ' ' + CLEAR, m && m.note);
+		ok('...and its dot reads "' + dotTip + '"', m && m.note === dotTip, m && m.note);
 		const rm = await markOf(['settings', 'defaults', 'roughness']);
-		ok('...the new-asset roughness it set is marked "' + baseNote('100') + '": a Hazen-Williams C has no unit', rm && rm.note === baseNote('100') + ' ' + CLEAR, rm && rm.note);
+		ok('...the new-asset roughness it set is marked too', rm && rm.note === dotTip, rm && rm.note);
 		ok('...and the box\'s index marks Hydraulics as holding a value', await page.evaluate(() => {
 			const b = document.querySelector('#lpn_setbox_index [data-sub="lpn_set_sub_hydraulics"]'); return !!b && b.classList.contains('lpn-setbox-link-held');
 		}));
@@ -234,15 +234,15 @@ async function main() {
 		await (await textSizeInput()).asElement().evaluate((i) => { i.value = String(+i.value + 6); i.dispatchEvent(new Event('change', { bubbles: true })); });
 		await a.settle(1200);
 		const tsm = await markOf(['settings', 'textSize']);
-		ok('text size typed in Peak: marked, "' + baseNote(ts0) + '"', tsm && tsm.note === baseNote(ts0) + ' ' + CLEAR, tsm && tsm.note);
+		ok('text size typed in Peak: marked (was ' + ts0 + ' in Base)', tsm && tsm.note === dotTip, tsm && tsm.note);
 		ok('...and marked in the open table at once', await tableLocal(TSW) === true);
 		// The box's search keeps a held row's note with its row.
 		await page.evaluate((w) => { const f = document.getElementById('lpn_setbox_filter'); f.value = w; f.dispatchEvent(new Event('input', { bubbles: true })); }, TSW.split(/\s+/)[0]);
 		await a.settle(400);
-		ok('searching the box for "' + TSW.split(/\s+/)[0] + '" keeps the held row\'s note and its Clear override showing', await page.evaluate(() => {
+		ok('searching the box for "' + TSW.split(/\s+/)[0] + '" keeps the held row and its dot showing', await page.evaluate(() => {
 			const el = document.querySelector('#lpn_settings_box [data-lpn-setting=\'[["settings","textSize"]]\']');
-			const n = el && el.nextElementSibling;
-			return !!(el && el.offsetParent && n && n.classList.contains('lpn-set-heldnote') && n.offsetParent && n.querySelector('.lpn-set-heldclear').offsetParent);
+			const d = el && el.querySelector('.lpn-ovm-dot');
+			return !!(el && el.offsetParent && d && d.offsetParent);
 		}));
 		await page.evaluate(() => { const f = document.getElementById('lpn_setbox_filter'); f.value = ''; f.dispatchEvent(new Event('input', { bubbles: true })); });
 		await a.settle(300);
@@ -273,20 +273,17 @@ async function main() {
 
 		console.log('\n--- 4b. text typed into a label\'s boxes is marked as it is typed ---');
 		await openBox();
-		const BEF = await L('lpn_labels_col_before');
-		const quote = (t) => (/^\s|\s$|^$/.test(t) ? '"' + t + '"' : t);
 		const firstBefore = () => page.evaluateHandle(() => document.querySelector('#lpn_labels_node_fields [data-lpn-setting] input[type=text]'));
-		const baseBefore = await (await firstBefore()).asElement().evaluate((i) => i.value);
 		await (await firstBefore()).asElement().focus();
 		await page.keyboard.press('End');
 		await page.keyboard.type('ab', { delay: 40 });
 		await a.settle(500);
 		const lb = await page.evaluate(() => {
-			const i = document.activeElement, row = i && i.closest('[data-lpn-setting]'), n = row && row.nextElementSibling;
-			return { held: !!row && row.classList.contains('lpn-set-held'), note: n && n.classList.contains('lpn-set-heldnote') ? n.textContent.trim() : null, focus: i && i.tagName };
+			const i = document.activeElement, row = i && i.closest('[data-lpn-setting]'), d = row && row.querySelector('.lpn-ovm-dot');
+			return { held: !!row && row.classList.contains('lpn-set-held'), note: d ? d.getAttribute('aria-label') : null, focus: i && i.tagName };
 		});
 		ok('typing into a node label\'s Before box in Peak marks its row before the box is left', lb.held && lb.focus === 'INPUT', JSON.stringify(lb));
-		ok('...the note names the column and Base\'s own text: "' + baseNote(BEF + ': ' + quote(baseBefore)) + '"', lb.note === baseNote(BEF + ': ' + quote(baseBefore)) + ' ' + CLEAR, lb.note);
+		ok('...and its dot reads "' + dotTip + '"', lb.note === dotTip, lb.note);
 		await page.keyboard.press('Tab');
 		await a.settle(800);
 		const sep = () => page.evaluateHandle(() => document.querySelector('#lpn_labels_options [data-lpn-setting=\'[["labelSettings","separator"]]\'] input'));
@@ -295,7 +292,7 @@ async function main() {
 		await page.keyboard.type('|', { delay: 40 });
 		await a.settle(500);
 		const sm = await markOf(['labelSettings', 'separator']);
-		ok('typing into Text between values marks it, Base\'s single space quoted: ' + baseNote('" "'), sm && sm.note === baseNote('" "') + ' ' + CLEAR, sm && sm.note);
+		ok('typing into Text between values marks it with a dot', sm && sm.note === dotTip, sm && sm.note);
 		await page.keyboard.press('Tab');
 		await a.settle(800);
 
@@ -361,7 +358,7 @@ async function main() {
 		ok('the Save this view button is there in Peak, and pressed', holdState === 'pressed', holdState);
 		await a.settle(1200);
 		const vm = await markOf(['view']);
-		ok('Save this view in this scenario: the view rows are marked, with Clear override', vm && vm.note && vm.note.slice(-CLEAR.length) === CLEAR, vm && vm.note);
+		ok('Save this view in this scenario: the view rows are marked with a dot', vm && vm.note === dotTip, vm && vm.note);
 		const stored = await page.evaluate(() => {
 			// The autosave of the open project: its scenarios' own views (Base's live view is the
 			// file's top-level `view`, which is not a scenario's).
@@ -414,7 +411,7 @@ async function main() {
 		await openBox();
 		const vu = await markOf(['view']);
 		ok('Ctrl+Z on that release holds the view again and moves the map back to it', !!vu && (await view()).scale === '1:' + NP, (await view()).scale);
-		ok('...with the Base line under it naming Base\'s view', vu && vu.note && vu.note.indexOf('1:' + NB2) >= 0, vu && vu.note);
+		ok('...marked with its dot', vu && vu.note === dotTip, vu && vu.note);
 		ok('released again', await clearOf(['view']) && (await view()).scale === '1:' + NB2);
 		await scenarioMenu(BASE);
 		await openBox();

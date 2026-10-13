@@ -70,6 +70,7 @@ async function main() {
 		});
 		await page.evaluate(() => { delete window.lpnDialogAnswerer; });
 		const scenarioMenu = async (label) => {
+			await require('./manager-door.js').ensure(page, label);
 			await page.click('#lpn_scenario_btn');
 			await page.waitForSelector('#lpn_menu_popup', { state: 'visible' });
 			for (const r of await page.$$('#lpn_menu_list button.lpn-menu-row')) {
@@ -114,6 +115,10 @@ async function main() {
 		const SMMENU = await L('lpn_sm_menu');
 		const menuRows = await page.evaluate(() => Array.from(document.querySelectorAll('#lpn_menu_list button.lpn-menu-row')).map((r) => r.textContent.trim()));
 		ok('1.1 the Scenario manager row is in the menu with Basic mode ticked', menuRows.some((t) => t.indexOf(SMMENU) >= 0), JSON.stringify(menuRows));
+		ok('1.1b ...greyed, because the Scenario manager is disabled when Basic mode is on (Tom, 2026-10-13)', await page.evaluate((lab) => {
+			const r = Array.from(document.querySelectorAll('#lpn_menu_list button.lpn-menu-row')).filter((b) => b.textContent.trim().indexOf(lab) >= 0)[0];
+			return !!r && r.disabled === true;
+		}, SMMENU));
 		// Tom, 2026-10-11: "Scenario manager..., -, Basic mode, New, Rename, Delete, -, Apply Base, list of scenarios."
 		const menuSeq = await page.evaluate(() => Array.from(document.querySelectorAll('#lpn_menu_list > *')).filter((e) => e.offsetParent !== null || e.tagName === 'HR')
 			.map((e) => e.tagName === 'HR' ? '-' : e.textContent.trim()));
@@ -128,7 +133,7 @@ async function main() {
 		ok('1.3 the box is open', await page.evaluate(() => getComputedStyle(document.getElementById('lpn_sm_box')).display !== 'none'));
 		ok('1.4 Basic mode is off (the preference says so)', (await store('lpn_scnbasic')) === 'off');
 		const notice = await page.evaluate(() => (document.getElementById('lpn_map_notice') || document.body).textContent);
-		ok('1.5 ...and one line said so', notice.indexOf(await L('lpn_sm_basic_off')) >= 0, notice.slice(0, 160));
+		ok('1.5 ...by first turning Basic mode off, the door the greyed row points to (no notice said so)', notice.indexOf(await L('lpn_sm_basic_on')) < 0);
 		ok('1.6 the Scenarios tab is shown', await page.evaluate(() => { const b = document.getElementById('lpn_pane_tab_scenarios'); return !!b && getComputedStyle(b).display !== 'none'; }));
 		ok('1.7 the box starts on the Scenarios tree with Base', JSON.stringify(await names()) === JSON.stringify([await L('lpn_scenario_base')]), JSON.stringify(await names()));
 
