@@ -265,6 +265,7 @@ run_check "calculator page selftest"     blocking php dev/scripts/calculator_pag
 # number of sessions here is ZERO, not "one, gated". A session writes an identifier to a visitor's
 # device on the response that starts it, before any banner has asked and with no way to take it back.
 run_check "no PHP sessions"              blocking php dev/scripts/no_session_check.php
+run_check "status codes stated"          blocking php dev/scripts/status_code_check.php
 run_check "no-session selftest"          blocking php dev/scripts/no_session_selftest.php
 # EVERY DIRECTORY IS DECLARED WEB-SERVED OR BLOCKED, and the blocks are still there.
 # Deployment is `git pull`, so every tracked directory sits under the document root whether or not a
