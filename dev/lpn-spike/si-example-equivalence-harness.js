@@ -1,4 +1,4 @@
-// THE SI TWINS OF THE Net2 (BRANFORD) AND Net3 (NOVATO) EXAMPLES SOLVE LIKE THEIR US ORIGINALS (ROADMAP Task 786). Run with:
+// THE SI TWINS OF THE Net1, Net2 (BRANFORD) AND Net3 (NOVATO) EXAMPLES SOLVE LIKE THEIR US ORIGINALS (ROADMAP Task 786). Run with:
 //   node dev/lpn-spike/si-example-equivalence-harness.js
 //
 // Tom, 2026-10-11: convert Net2 and Net3 to SI. A converted file can be wrong silently -- a flow
@@ -109,7 +109,7 @@ function ruleMisses(ru, rs) {
 
 	// kind: 'geo' is a lat/lon project (degrees, drawing untouched), 'proj' a projected one whose
 	// drawing and origin shift convert and whose CRS becomes its metre twin.
-	const PAIRS = [['Net3-Novato-CA-World', 'geo', 'Net3'], ['Net2-Branford-CT', 'proj', 'Net2']];
+	const PAIRS = [['Net3-Novato-CA-World', 'geo', 'Net3'], ['Net2-Branford-CT', 'proj', 'Net2'], ['Net1', 'grid', 'Net1']];
 	for (const [file, kind, net] of PAIRS) {
 		console.log('\n== ' + file + ': US original against its SI twin');
 		const us = open(file + '.lwn'), si = open(file + '-SI.lwn');
@@ -144,6 +144,15 @@ function ruleMisses(ru, rs) {
 				c.condition.value = 17.1;	// left in feet
 				ok('a control threshold left in feet is caught', ruleMisses(ru, rs).length === 1);
 				c.condition.value = keep;
+			}
+			if (net === 'Net1') {
+				// [RULES]: every LEVEL/HEAD threshold is a length, rounded to 0.001 m; clock times carry across.
+				const lv = (doc) => doc.rules.filter((x) => /\b(LEVEL|HEAD)\b/i.test(x)).map((x) => Number(x.trim().split(/\s+/).pop()));
+				const a = lv(ru), b = lv(rs);
+				ok('every rule threshold (tank level) follows the rounding rule: ' + a.join(', ') + ' ft is ' + b.join(', ') + ' m',
+					a.length === 2 && a.every((v, i) => Math.abs(L3(v) - b[i]) < 1e-9));
+				ok('the rule clock times are untouched',
+					ru.rules.filter((x) => /CLOCKTIME/.test(x)).join('|') === rs.rules.filter((x) => /CLOCKTIME/.test(x)).join('|'));
 			}
 		}
 		ok('every unrounded input (roughness, minor loss) is within ' + MODEL_REL + ' relative',
@@ -189,6 +198,9 @@ function ruleMisses(ru, rs) {
 			if (kind === 'geo') {
 				ok('the georeference is carried: lat/lon project, no CRS, origin unchanged',
 					rs.project.coords === 'geo' && !rs.project.crs && JSON.stringify(rs.origin) === JSON.stringify(ru.origin));
+			} else if (kind === 'grid') {
+				ok('a local drawing: no CRS, no origin in either twin',
+					!ru.project.crs && !rs.project.crs && !(ru.origin && (ru.origin.x || ru.origin.y)) && !(rs.origin && (rs.origin.x || rs.origin.y)));
 			} else {
 				const F = 1200 / 3937;
 				ok('the CRS is the metre twin of the same projection (EPSG:2234 ftUS to EPSG:26956 m)',

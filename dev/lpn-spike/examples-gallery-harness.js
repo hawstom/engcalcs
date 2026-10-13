@@ -141,6 +141,7 @@ console.log('\n-- the gallery runs Net3, Net2, Elm Street, Net1, then the two ba
 	const f = examples.map(e => e.file);
 	report(f.slice(-2).join() === 'Basic-example-SI-units.lwn,Basic-example-US-units.lwn', 'the two basics are the last two cards', f.slice(-3).join());
 	report(f[f.length - 3] === 'Net1.lwn', 'Net1 sits just before them');
+	report(f[f.length - 4] === 'Net1-SI.lwn', 'Net1 SI sits just before Net1');
 }
 
 console.log('\n-- card descriptions read from the language file --');

@@ -74,6 +74,7 @@ d.links.forEach((l) => {
 	(l.verts || []).forEach((v) => { conv(v, ['x', 'y'], Dr); });
 	conv(l, ['_length'], L3);
 	conv(l, ['_diameter'], D50);
+	if (l.type === 'pump') { delete l.h0; delete l.a; delete l.b; }	// the fit is derived at open from the curve
 	if (l.curvePoints) { l.curvePoints = l.curvePoints.map((p) => [Q3(p[0]), L3(p[1])]); }
 	['_minorLoss', 'setting', '_setting'].forEach((k) => { if (l[k] !== undefined && l.type !== 'pipe') { throw new Error('link ' + l.id + ' has ' + k); } });
 });
@@ -112,7 +113,15 @@ const SUFFIX_SI = { ' ft H2O': ' m H2O', ' gpm': ' L/s', ' in': ' mm', ' ft': ' 
 		c.text = Object.assign({}, c.text, { value: String(v) });
 	}
 });
-if ((d.rules || []).length) { throw new Error('has rules; extend the converter'); }
+// [RULES]: a TANK/NODE LEVEL or HEAD threshold is a length (to 0.001 m, as a control depth is);
+// clock times and statuses carry across; any other quantity in a rule is refused until extended.
+d.rules = (d.rules || []).map((line) => {
+	const m = line.match(/^(\s*(?:IF|AND|OR)\s+(?:TANK|JUNCTION|NODE|RESERVOIR)\s+\S+\s+)(LEVEL|HEAD)(\s+\S+\s+)(\S+)\s*$/i);
+	if (m) { return m[1] + m[2] + m[3] + String(L3(Number(m[4]))); }
+	if (/^\s*(?:IF|AND|OR)\s+SYSTEM\s+(?:CLOCKTIME|TIME)\b/i.test(line) || /^\s*(?:RULE\s+\S+|PRIORITY\s+\d+|)\s*$/i.test(line)
+		|| /^\s*(?:THEN|ELSE|AND)\s+(?:PUMP|PIPE|VALVE)\s+\S+\s+STATUS\s+IS\s+\S+\s*$/i.test(line)) { return line; }
+	throw new Error('rule line "' + line + '"; extend the converter');
+});
 if (d.scenarios.some((s) => Object.keys(s.overrides || {}).length)) { throw new Error('scenario overrides'); }
 
 // Legend limits are numbers in the old display unit. A method fills them again from the data on

@@ -1224,6 +1224,8 @@ $ec_lang['lpn_ex_basic_us_desc']='Two reservoirs, a pump and a small loop. Gallo
 $ec_lang['lpn_ex_net1_title']='EPANET Net1 plus rule-based controls';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_ex_net1_desc']='A fictional EPANET example with chlorine, 1 reservoir and 1 tank.';
+$ec_lang['lpn_ex_net1_si_title']='EPANET Net1 plus rule-based controls, L/s (SI)';
+$ec_lang['lpn_ex_net1_si_desc']='Litres per second, with metres and millimetres. A fictional EPANET example converted from gallons per minute, feet and inches, with chlorine, 1 reservoir, 1 tank and 1 pump, and two rule-based controls.';
 $ec_lang['lpn_ex_net2_si_title']='EPANET Net2, L/s (SI)';
 $ec_lang['lpn_ex_net2_si_desc']='Litres per second, with metres and millimetres. An EPANET example at Branford, Connecticut, converted from gallons per minute, feet and inches: 35 junctions and 1 tank, with no reservoir, no pump and no valves, about 2 km by 4 km. Fluoride, a non-reactive substance, enters at one source.';
 $ec_lang['lpn_ex_net2_title']='EPANET Net2, gpm (US)';
