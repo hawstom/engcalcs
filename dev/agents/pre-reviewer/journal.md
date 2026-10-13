@@ -4307,3 +4307,15 @@ OBSERVED: Net2 US and SI open with project.basemap=satellite and request api.map
 OBSERVED: Net2 US labelSettings (suffix/decimals/show/priority/useUnits/customer) and symbolCap* dropped vs Tom's /tmp/Net2.epp; nodes/links identical.
 OBSERVED: translation payloads still carry lpn_ex_net3_world keys (orchestrator regenerates).
 OBSERVED: Net3 SI colorBreaks {} -> legend auto-breaks 14.1/28.1/42.2/56.3 m, not round.
+
+2026-10-12, feat/shape a4d9a471. OBSERVED: 7 earlier findings verified fixed on real files in Chromium. OBSERVED: the ArcGIS
+default "Id" column outranks a Name column as the source of the Shape ID. OBSERVED: my own harness misreported
+"0 shapes" by reading localStorage after a storage-full save. Lesson for this seat: when a count comes from saved storage,
+also read the live document and the status bar before calling it a defect.
+
+## 2026-10-13 review of feat/bentley-interop @ 5bcc28f0 (Perry)
+- OBSERVED: all listed harnesses pass; undo of Copy scenario/Rename/Delete restores exactly (probe-undo.js, Basic mode, crafted Net1).
+- OBSERVED: shipped examples contain no scenarios beyond Base, so misfit-on-arrival cannot hit them.
+- OBSERVED: "Its 1 overrides" plural defect in lpn_scenario_delete_goes.
+- OBSERVED: harness " | " in M1 output is the harness joining two strings, not a doubled notice; do not re-flag.
+- SPECULATION: global localStorage Basic pref means opening a misfit project in one tab turns Basic off for other tabs.

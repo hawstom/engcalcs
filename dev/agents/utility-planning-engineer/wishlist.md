@@ -999,3 +999,21 @@ Disagreement with the roadmap order: none known. I ranked Active Topology (Task 
 ### 2026-10-11 — new small row: optional "Ground elevation" on a tank, with "Pressure at ground"
 
 Ranked low-middle, below the built rows; from Tom's question, not my own find. (1) Tip/label fix first, near free. (2) Non-hydraulic Ground elevation property (project-stored, never written to .inp) plus Pressure at ground = head - ground; small-medium; adds a second elevation to explain. Citation: journal 2026-10-11; Bentley "Elevation" = ground at tanks, "Elevation (Base)" = tank base. Volume-curve route judged not a fix. Would not change a master-plan decision (plans list HWL and base); it removes a misreading.
+
+### 2026-10-12 — from the scenario consistency review, in my order (sizes are guesses, SPECULATION; evidence in journal 2026-10-12)
+
+1. **One honest Delete scenario confirm for both doors** (the menu and the manager): it names what is
+   removed and what stays. Today the confirm promises to delete overrides that survive the delete.
+   Small. First, because it is the one place the page states something false about the data.
+2. **Reparent carries the scenario's own unshared alternatives to the new parent's choices**, so that
+   "what it inherits follows the new parent" becomes true. Small to medium. This reverses my own
+   2026-10-05 line ranking re-parenting low. That ranking was about building the gesture; the gesture
+   now exists and its words are wrong.
+3. **Lazy Copy scenario with one "Share edits" tick box** in place of eager `_copy_for_` snapshots.
+   Medium.
+4. **Rename carries along the scenario's own alternatives that still bear its old name.** Small.
+5. **Operational alternative (controls and rules per scenario).** Large. From my seat this is the
+   biggest gap for system planning, and it is not this branch. I rank it below 1 to 4 only because
+   those are defects in something already shipped on the branch.
+Correction to my 2026-10-08 row 4: Bentley DOES have Merge Alternative (35003.html). Our merge is the
+restricted form of a Bentley command, not an invention.

@@ -199,7 +199,7 @@ async function main() {
 	const executablePath = env.findChromium();
 	const browser = await chromium.launch({ executablePath });
 	try {
-		const ex = process.env.EX ? process.env.EX.split(',') : ['lpn_ex_net3_world_title', 'lpn_ex_net3_title', 'lpn_ex_basic_us_title'];
+		const ex = process.env.EX ? process.env.EX.split(',') : ['lpn_ex_net3_title', 'lpn_ex_net3_title', 'lpn_ex_basic_us_title'];
 		// Twelve cases, not twenty-four, so the whole harness fits the runner's 300 s: the two
 		// pixel ratios and the two zooms are paired off rather than crossed.
 		const matrix = [[1, 0], [2, 4]];

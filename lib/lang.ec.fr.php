@@ -976,8 +976,6 @@ $ec_lang['lpn_ex_net2_desc']='Un réseau de distribution ramifié avec une bâch
 $ec_lang['lpn_ex_net3_title']='EPANET Net3';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_ex_net3_desc']='Le grand exemple d\'EPANET : 92 jonctions, trois bâches et deux réservoirs, dont l\'un est une rivière. Il montre l\'aspect d\'un modèle de taille réelle sur la carte.';
-$ec_lang['lpn_ex_net3_world_title']='EPANET Net3, lat/lon';
-$ec_lang['lpn_ex_net3_world_desc']='Le réseau EPANET Net3 converti en latitude/longitude à Novato, en Californie, avec la carte du monde en arrière-plan.';
 $ec_lang['lpn_ex_elm_street_title']='Elm Street Center';
 $ec_lang['lpn_ex_elm_street_desc']='Un site commercial résolu pour la lutte contre l\'incendie en plus de la demande du jour de pointe, à un instant donné, dessiné sur un plan de site.';
 $ec_lang['lpn_tool_undo']='Annuler';

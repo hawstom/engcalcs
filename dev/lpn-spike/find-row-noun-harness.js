@@ -45,7 +45,7 @@ function rowTexts() {
 }
 
 setUnitSet('us');
-L.applySaved(JSON.parse(fs.readFileSync(path.join(ROOT, 'examples', 'Net3.lwn'), 'utf8')));
+L.applySaved(JSON.parse(fs.readFileSync(path.join(ROOT, 'dev', 'water-network-examples', 'Net3.lwn'), 'utf8')));
 const doc = L.getDoc();
 const junctions = doc.nodes.filter((n) => n.type === 'junction');
 const linkIds = {};

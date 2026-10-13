@@ -112,7 +112,7 @@ async function centre(a) {
 
 exports.run = async function ({ browser, report }) {
 	const list = ['lpn_ex_net1_title', 'lpn_ex_basic_us_title', 'lpn_ex_basic_si_title', 'lpn_ex_net2_title',
-		'lpn_ex_elm_street_title', 'lpn_ex_net3_world_title'];
+		'lpn_ex_elm_street_title', 'lpn_ex_net3_title'];
 	for (const key of list) {
 		for (const vp of [null, { width: 1000, height: 650 }, { width: 700, height: 800 }]) {
 			const a = await Session.open(browser, 'zoomfurn-' + Date.now());
@@ -234,7 +234,7 @@ exports.run = async function ({ browser, report }) {
 		await n.page.route(/tile\.openstreetmap\.org|api\.mapbox\.com/, (route) => route.abort());
 		await n.goto();
 		await n.answerTrainingPanel().catch(() => {});
-		await n.openExampleCard(await lang(n, 'lpn_ex_net3_world_title'));
+		await n.openExampleCard(await lang(n, 'lpn_ex_net3_title'));
 		await n.settle(3000);
 		const c = await centre(n);
 		const timed = async () => {

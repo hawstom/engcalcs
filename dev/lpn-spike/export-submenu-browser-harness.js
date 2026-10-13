@@ -60,7 +60,7 @@ async function open(browser) {
 	await a.answerTrainingPanel().catch(() => {});
 	await a.page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } delete window.lpnDialogAnswerer; });
 	await a.settle(1000);
-	await a.openExampleCard(await a.lang('lpn_ex_net3_world_title'));
+	await a.openExampleCard(await a.lang('lpn_ex_net3_title'));
 	await a.settle(1500);
 	return a;
 }

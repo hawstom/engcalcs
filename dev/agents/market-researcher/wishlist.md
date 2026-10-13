@@ -610,3 +610,7 @@ Today's answer rests on three half-verified rivals. Worth one session: price and
 ## Antecedent software list does not exist; KYPipe is cited but unnamed in public
 
 2026-10-12. No repo file or sibling site keeps a list of comparison software (journal 2026-10-12). If Tom wants one, the natural home is a new sentence in librewaternet.org credits.html under "Everybody who extended EPANET before we did", which currently names nobody. Waiting on the University of Kentucky authors before any KYPipe example network ships (CC BY-NC).
+
+
+## 0q. Screenshots of Civil 3D Override/Child Override columns and a Bentley forum thread on inherited rows (2026-10-12)
+The icon artwork (down arrow, its pending state, the lock) and whether WaterGEMS tints inherited rows are in no text I can read. One screenshot each of Civil 3D Edit Feature Settings (with a child override present, before and after clicking the arrow) and a WaterGEMS Alternative Editor with mixed ticked/clear rows closes it. Also: three Autodesk or Bentley forum threads on "my child didn't update" for complaint evidence (same fetch limit as 0o). Cost: ten minutes of Tom's time.

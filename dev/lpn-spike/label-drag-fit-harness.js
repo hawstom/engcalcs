@@ -91,7 +91,7 @@ async function openNet3World(Session, browser, viewport) {
 	await a.page.route(/tile\.openstreetmap\.org|api\.mapbox\.com/, (route) => route.abort());
 	await a.goto('Looped-Network.php');
 	await a.answerTrainingPanel().catch(() => {});
-	await a.openExampleCard(await a.lang('lpn_ex_net3_world_title'));
+	await a.openExampleCard(await a.lang('lpn_ex_net3_title'));
 	await a.settle(1500);
 	await a.page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } });
 	return a;

@@ -969,8 +969,6 @@ $ec_lang['lpn_ex_net2_desc']='یک شبکهٔ توزیع انشعابی با ی�
 $ec_lang['lpn_ex_net3_title']='EPANET Net3';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_ex_net3_desc']='نمونهٔ بزرگ EPANET: 92 گره، سه تانک و دو مخزن، که یکی از آن‌ها رودخانه است. نشان می‌دهد یک مدل در اندازهٔ واقعی روی نقشه چگونه دیده می‌شود.';
-$ec_lang['lpn_ex_net3_world_title']='EPANET Net3، عرض/طول جغرافیایی';
-$ec_lang['lpn_ex_net3_world_desc']='شبکهٔ EPANET Net3، تبدیل‌شده به مختصات عرض/طول جغرافیایی در Novato، کالیفرنیا، با نقشهٔ جهان در پس‌زمینه.';
 $ec_lang['lpn_ex_elm_street_title']='مرکز خیابان اِلم';
 $ec_lang['lpn_ex_elm_street_desc']='یک سایت تجاری که برای جریان آتش‌نشانی به‌علاوهٔ حداکثر مصرف روزانه، در یک لحظهٔ زمانی مشخص و روی نقشهٔ سایت رسم و حل شده است.';
 $ec_lang['lpn_tool_undo']='واگرد';

@@ -969,8 +969,6 @@ $ec_lang['lpn_ex_net2_desc']='Una rete di distribuzione ramificata con una vasca
 $ec_lang['lpn_ex_net3_title']='EPANET Net3';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_ex_net3_desc']='Il grande esempio di EPANET: 92 nodi, tre vasche e due serbatoi, uno dei quali un fiume. Mostra come appare sulla mappa un modello di dimensioni reali.';
-$ec_lang['lpn_ex_net3_world_title']='EPANET Net3, lat/lon';
-$ec_lang['lpn_ex_net3_world_desc']='La rete EPANET Net3 convertita in coordinate lat/lon a Novato, CA, con la mappa del mondo sullo sfondo.';
 $ec_lang['lpn_ex_elm_street_title']='Elm Street Center';
 $ec_lang['lpn_ex_elm_street_desc']='Un sito commerciale risolto per la portata antincendio sommata alla richiesta massima giornaliera, in un solo istante, disegnato su una planimetria del sito.';
 $ec_lang['lpn_tool_undo']='Annulla';

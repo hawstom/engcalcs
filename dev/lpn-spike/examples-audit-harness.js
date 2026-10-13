@@ -10,7 +10,7 @@
 // that teaches this page to interpret a section it used to merely carry leaves the stored copy
 // behind. `section-carry-harness.js` §6 already holds one half of that -- the CARRIED text, and a
 // named list of interpreted fields -- and the named list is the weakness: it is a list somebody has
-// to extend, and Task 586's curve library did not extend it. `examples/Net3.lwn` was therefore
+// to extend, and Task 586's curve library did not extend it. `dev/water-network-examples/Net3.lwn` was therefore
 // shipping pump curves with EPA's own `104.` rewritten as `104` and the curve's name
 // (`Pump Curve for Pump 10 (Lake Source)`) gone, while every check in the tree passed. Task 587's
 // tank volume curve cost nothing only because no EPA file states a `VolCurve` -- which is luck, not
@@ -89,8 +89,14 @@ const PUBLISHED = JSON.parse(fs.readFileSync(path.join(OUT_DIR, 'manifest.json')
 // behind. Adding an example forces a line here, which is the point.
 const SOURCE_OF = {
 	'Net1.lwn': 'Net1.inp',
-	'Net2.lwn': 'Net2.inp',
-	'Net3.lwn': 'Net3.inp',
+	// Net2 is Tom's own georeferenced project file (a Branford, Connecticut placement of EPA's Net2
+	// that he saved from the page), so the geographic placement, the labels and the text objects are
+	// the curation; Net2.inp is its source model.
+	'Net2-Branford-CT.lwn': 'Net2.inp',
+	// The SI twins are CONVERTED from the US files, not imported, so a fresh import of the
+	// `.inp` cannot be their reference; si-example-equivalence-harness.js is.
+	'Net2-Branford-CT-SI.lwn': null,
+	'Net3-Novato-CA-World-SI.lwn': null,
 	// Net3 placed on the world (Task 497's geographic project). Its model is Net3's, so Net3.inp is
 	// its source too and the geographic coordinates are the curation.
 	'Net3-Novato-CA-World.lwn': 'Net3.inp',
@@ -201,8 +207,8 @@ PUBLISHED.forEach((f) => {
 Object.keys(SOURCE_OF).forEach((f) => {
 	ok(f + ' is still published', PUBLISHED.indexOf(f) >= 0, 'declared here but not in the manifest');
 });
-ok('at least four examples have a source .inp',
-	Object.keys(SOURCE_OF).filter((f) => SOURCE_OF[f]).length >= 4);
+ok('at least three examples have a source .inp',
+	Object.keys(SOURCE_OF).filter((f) => SOURCE_OF[f]).length >= 3);
 done('the roll call');
 
 // ------------------------------------------------------------------------------------------------
@@ -215,6 +221,8 @@ console.log('\n2. Opening a shipped example gives what importing its source .inp
 // settings standing in the "source" side of the comparison -- which reads exactly like a shipped
 // example having drifted, and is nothing of the kind.
 const FRESH = {};
+const PLACED = {};
+PUBLISHED.forEach((f) => { PLACED[f] = !!(JSON.parse(fs.readFileSync(path.join(OUT_DIR, f), 'utf8')).project || {}).crs; });
 PUBLISHED.filter((f) => SOURCE_OF[f]).forEach((file) => {
 	if (!FRESH[SOURCE_OF[file]]) { FRESH[SOURCE_OF[file]] = freshImport(SOURCE_OF[file]); }
 });
@@ -263,6 +271,12 @@ PUBLISHED.filter((f) => SOURCE_OF[f]).forEach((file) => {
 				// time -- `custom_date_installed` here.
 				if (k.indexOf('_custom_') === 0) { return; }
 				if (dump(e[k]) === dump(s[k])) { return; }
+				// A project PLACED on a coordinate system (`project.crs`) has had its drawing moved
+				// into that system, so the source's x and y tokens no longer spell anything it holds.
+				if (k === 'tok' && PLACED[file]) {
+					const strip = (t) => { const c = Object.assign({}, t || {}); delete c.x; delete c.y; return dump(c); };
+					if (strip(e.tok) === strip(s.tok)) { return; }
+				}
 				missing.push(e.id + '.' + k + ': source ' + dump(e[k]) + ' vs shipped ' + dump(s[k]));
 			});
 		});
@@ -420,6 +434,7 @@ done('the curated rules are the ones declared');
 // other six examples.
 {
 	const NOVATO = 'Net3-Novato-CA-World.lwn';
+	const NOVATO_SI = 'Net3-Novato-CA-World-SI.lwn';	// its unit conversion, which carries the design along
 	const open = openShipped(NOVATO);
 	const defs = ((open.settings || {}).customProps) || [];
 	ok('Net3-Novato ships exactly one custom property design', defs.length === 1, dump(defs));
@@ -453,7 +468,7 @@ done('the curated rules are the ones declared');
 		dump(vals));
 
 	// And it has not spread. Six other examples, none of them designed one.
-	const spread = PUBLISHED.filter((f) => f !== NOVATO).filter((f) => {
+	const spread = PUBLISHED.filter((f) => f !== NOVATO && f !== NOVATO_SI).filter((f) => {
 		const o = openShipped(f);
 		return (((o.settings || {}).customProps) || []).length > 0;
 	});

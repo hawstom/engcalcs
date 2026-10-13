@@ -57,7 +57,7 @@ exports.run = async function ({ browser, report }) {
 	// appear when you switch to them from another bottom pane tab."). Every way a project arrives
 	// with Time series already the tab on show: the gallery, a reload, and File > Open.
 	const fs = require('fs'), path = require('path');
-	const NET3 = fs.readFileSync(path.join(__dirname, '../../../examples/Net3.lwn'), 'utf8');
+	const NET3 = fs.readFileSync(path.join(__dirname, '../../../dev/water-network-examples/Net3.lwn'), 'utf8');
 	const readTs = (s) => s.page.evaluate(() => {
 		const note = document.getElementById('lpn_ts_note'), chart = document.getElementById('lpn_ts_chart');
 		return { frames: EngCalcs.lpnTimeRunFrames().length, note: note ? note.textContent : '',

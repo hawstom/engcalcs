@@ -154,7 +154,7 @@ async function main() {
 	try {
 		console.log('\n--- a geographic project: DIMENSIONS are longitude and latitude ---');
 		let a = await open(browser);
-		await a.openExampleCard(await a.lang('lpn_ex_net3_world_title'));
+		await a.openExampleCard(await a.lang('lpn_ex_net3_title'));
 		await a.settle(1500);
 		await addPicture(a);
 		let s = await storedBackdrop(a);

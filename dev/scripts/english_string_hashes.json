@@ -1,7 +1,7 @@
 {
     "description": "sha1 of each lang.ec.en.php $ec_lang value as of the last full translation sync. Maintained by detect_english_drift.php --update. A current-vs-manifest hash mismatch means that key's English changed and translations may be stale. Do not hand-edit.",
     "updated": "2026-09-30",
-    "count": 2564,
+    "count": 2562,
     "partial_updates": [
         {
             "date": "2026-08-08",
@@ -797,8 +797,8 @@
                 "lpn_basemap_satellite_show",
                 "lpn_basemap_satellite_tip",
                 "lpn_color_mode_manual",
-                "lpn_ex_net3_world_desc",
-                "lpn_ex_net3_world_title",
+                "lpn_ex_net3_desc",
+                "lpn_ex_net3_title",
                 "lpn_labels_col_drop",
                 "lpn_labels_mark_extrema_tip",
                 "lpn_notes_color_def",
@@ -1322,7 +1322,7 @@
                 "lpn_confirm_apply_prefix",
                 "lpn_delete_drops_overrides",
                 "lpn_demand_tip",
-                "lpn_ex_net3_world_desc",
+                "lpn_ex_net3_desc",
                 "lpn_field_active_tip",
                 "lpn_field_demand_pattern_tip",
                 "lpn_file_convert_as",
@@ -2204,7 +2204,7 @@
                 "lpn_ex_net1_title",
                 "lpn_ex_net2_desc",
                 "lpn_ex_net3_desc",
-                "lpn_ex_net3_world_desc",
+                "lpn_ex_net3_desc",
                 "lpn_examples_blank",
                 "lpn_examples_heading",
                 "lpn_examples_welcome",
@@ -6150,8 +6150,8 @@
         "lpn_ex_net2_title": "15b8b380ea1c68cbe004cd6a188fed57d8ceade3",
         "lpn_ex_net3_desc": "127abc36ac7fbb6c5601b543bab53420398b9d09",
         "lpn_ex_net3_title": "32244fe428de2e2160ba8cd36930dfd0db80da31",
-        "lpn_ex_net3_world_desc": "9cb467aba22807be667f5ba5aaea8e9cdfef2a0d",
-        "lpn_ex_net3_world_title": "b44a6f134cea03516fd2657f62203216738a5527",
+        "lpn_ex_net3_desc": "9cb467aba22807be667f5ba5aaea8e9cdfef2a0d",
+        "lpn_ex_net3_title": "b44a6f134cea03516fd2657f62203216738a5527",
         "lpn_examples_blank": "71c86a457c48b553029ec3141dac2df957a4368e",
         "lpn_examples_failed": "0e5eefbf586e465b71a6f4b46470ac6c9a77a214",
         "lpn_examples_heading": "b765e66c4d7ea977cef8dd67a2a9ad681f6df13d",
@@ -10825,11 +10825,11 @@
             "words": 2,
             "ends_sentence": false
         },
-        "lpn_ex_net3_world_desc": {
+        "lpn_ex_net3_desc": {
             "words": 16,
             "ends_sentence": true
         },
-        "lpn_ex_net3_world_title": {
+        "lpn_ex_net3_title": {
             "words": 3,
             "ends_sentence": false
         },
