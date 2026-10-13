@@ -44218,8 +44218,6 @@ var EngCalcs = EngCalcs || {};
 	// THE TOOL ON, and that is not the claim**: Delete removes what is selected and Esc returns to
 	// Select, so the tip says what to press to do the thing the button is named for.
 	var LPN_TOOL_ALT_KEYS = { 'select': 'Esc', 'delete': 'Delete' };
-	// **A IS AREA SELECT** (Tom, 2026-10-13): a named key like Esc, shown in the tip through this table.
-	LPN_TOOL_ALT_KEYS['select-area'] = 'A';
 	function toolTipWithKey(mode, tip) {
 		var pc = EngCalcs.pageConfig || {}, key = toolKeyFor(mode), alt = LPN_TOOL_ALT_KEYS[mode] || null;
 		if (key && alt) {
@@ -44233,6 +44231,8 @@ var EngCalcs = EngCalcs || {};
 		}
 		return tip;
 	}
+	// **A IS AREA SELECT** (Tom, 2026-10-13): a named key like Esc, shown in the tip through this table.
+	LPN_TOOL_ALT_KEYS['select-area'] = 'A';
 	function insertAssetRows() {
 		var pc = EngCalcs.pageConfig || {};
 		return [
