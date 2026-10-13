@@ -35133,7 +35133,7 @@ var EngCalcs = EngCalcs || {};
 		if (!on) { return; }
 		if (kind === 'unreadable') {
 			var said = pc.lpn_storage_unreadable || 'Not saved. This project could not be read from browser storage. Its stored copy is left exactly as it is and will not be written over, so nothing on this tab is being saved. Open a file or create a new project to keep working.';
-			setStatus(said, '', false, 'storage-unreadable');
+			setStatus(said, 'storage-unreadable', false, 'storage-unreadable');
 			// **AND A MODAL, because the status line is not durable enough for THIS one.** The first
 			// solve on the empty document runs `if (!doc.nodes.length) { setStatus(''); return; }`
 			// and the sentence is gone -- which is the exact silence this defect is made of, a named
@@ -35144,7 +35144,7 @@ var EngCalcs = EngCalcs || {};
 			if (!unreadableTold) { unreadableTold = true; askDialog({ kind: 'alert', text: said }); }
 			return;
 		}
-		setStatus(pc.lpn_storage_full || 'Not saved. Browser storage is full or unavailable, so your recent changes will be lost when you close this tab.', '', false, 'storage-full');
+		setStatus(pc.lpn_storage_full || 'Not saved. Browser storage is full or unavailable, so your recent changes will be lost when you close this tab.', 'storage-full', false, 'storage-full');
 	}
 	function projectKey(id) { return LPN_PROJECT_PREFIX + id; }
 	// The full reset behind "?lpn_wipe=1" and the Wipe memory button. Clears EVERY project key plus
@@ -68851,7 +68851,7 @@ var EngCalcs = EngCalcs || {};
 			if (dsBoxIsOpen()) { buildDemandScaleControls(); }
 			closeFireFlowRunBox();
 			buildFireFlowControls();
-			setStatus(pc.lpn_ff_err_solve || 'The solver reported an error and gave no answer.');
+			setStatus(pc.lpn_ff_err_solve || 'The solver reported an error and gave no answer.', 'solve-error');
 			if (window.console && console.warn) { console.warn('fire flow sweep failed:', err); }
 		});
 	}
@@ -71580,7 +71580,7 @@ var EngCalcs = EngCalcs || {};
 			// off means off now, so there is no state in which SOME of a run is up to date --
 			// see EC.lpnTimeStandDown() in js/lpn-time.js.)
 			'']
-			.filter(function (t) { return !!t; }).join(' '));
+			.filter(function (t) { return !!t; }).join(' '), 'solve-notes');
 		// The engine notes go to their OWN span, so their two-minute clock runs independently of
 		// this diagnostic. Written only when one of them was actually raised THIS solve --
 		// noteOnce() has already decided that -- so a later solve neither restarts a running clock
@@ -71637,7 +71637,7 @@ var EngCalcs = EngCalcs || {};
 	function runSolveEpanet(model) {
 		var pc = EngCalcs.pageConfig || {};
 		var myToken = ++epanetToken;
-		setStatus(pc.lpn_engine_loading || 'Loading the EPANET solver…');
+		setStatus(pc.lpn_engine_loading || 'Loading the EPANET solver…', 'engine-loading');
 		EngCalcs.lpnSolveEpanet(model, { tol: solveAccuracy() }).then(function (result) {
 			if (myToken !== epanetToken) { return; }   // a newer solve already started; drop this one
 			// **EPANET READ THIS NETWORK AND WOULD NOT TAKE IT** (Task 471). Not a load failure --
@@ -71657,7 +71657,7 @@ var EngCalcs = EngCalcs || {};
 				// way out, so a refusal written before it would be overwritten by its own note and
 				// the user would read nothing about the refusal at all.
 				applySolveResult(EngCalcs.lpnSolve(model, { tol: solveAccuracy() }));
-				setStatus(said);
+				setStatus(said, 'engine-refused');
 				if (window.console && console.warn) { console.warn('EPANET refused the network:', result.engineError); }
 				return;
 			}
@@ -71674,7 +71674,7 @@ var EngCalcs = EngCalcs || {};
 			var failWhy = EngCalcs.lpnEngineFailWhy ? EngCalcs.lpnEngineFailWhy(err) : 'offline';
 			setStatus(failWhy === 'offline'
 				? (pc.lpn_engine_failed || 'The EPANET solver could not be loaded. Showing the built-in solver instead.')
-				: (pc.lpn_engine_failed_why || '{reason} Showing the built-in solver instead.').replace('{reason}', EngCalcs.lpnEngineReason(failWhy)));
+				: (pc.lpn_engine_failed_why || '{reason} Showing the built-in solver instead.').replace('{reason}', EngCalcs.lpnEngineReason(failWhy)), 'engine-failed');
 			if (window.console && console.warn) { console.warn('EPANET engine load/solve failed:', err); }
 		});
 	}

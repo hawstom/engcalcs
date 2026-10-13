@@ -4329,3 +4329,12 @@ also read the live document and the status bar before calling it a defect.
 - OBSERVED: "Its 1 overrides" plural defect in lpn_scenario_delete_goes.
 - OBSERVED: harness " | " in M1 output is the harness joining two strings, not a doubled notice; do not re-flag.
 - SPECULATION: global localStorage Basic pref means opening a misfit project in one tab turns Basic off for other tabs.
+
+## 2026-10-13 (2nd) -- feat/bentley-interop @ 170052b6 (Perry)
+- OBSERVED (real Chromium, real in-page dialog with the native seam removed, probes /tmp/claude-1000/p/h1,h3,h4,h7,h9.js): DEFECT. In any scenario other than Base, a custom property's design edits in the Settings box (key, label, applies) are all lost: the page shows "Not named yet" on reopening and storage holds a blank row. In Base they keep. Master f5e5a36a keeps them in a scenario too. The setboxEditEnd fix covers Base only.
+- OBSERVED: Tom's three actions on Net3 with Fig 4 > Fig 5: Basic on refused in a dialog (misfit); Basic off delete Fig 5 asks and names the alternative "Fig 5" as staying, says nothing about its override; after that Basic on is allowed; Basic on delete with one override says "Its one override is deleted with it."; deleting the left-behind alternative asks with the same sentence.
+- OBSERVED: Copy properties on a node with no override in Fig 5, Basic off: dialog "No overrides to copy." with OK.
+- OBSERVED: Task 790 by mouse: triangle tip and dialog say (1 total), correct; OK clears; one Ctrl+Z restores (and puts the open scenario back to Fig 4); hollow-dot click makes an override, undo removes it; markers are not tab stops; single-scenario Base Properties identical to master to the pixel. Base of a project WITH scenarios gains a 30 px empty gutter (popup 432->463 px wide), ID row not indented.
+- CITED (code): help sentence "Creating a new scenario creates no alternatives" is false for Add base (one Base alternative per category) AND Copy scenario (copies its alternatives); the help's own later paragraph says the latter.
+- OBSERVED: graph-bubble harness 40/40; a bubble on Net3 node 10 inside a non-Base scenario draws one line and the now mark.
+- NOT CHECKED: Settings box marks by mouse (builder harness only), look of the dots, Scenarios table Base pick.

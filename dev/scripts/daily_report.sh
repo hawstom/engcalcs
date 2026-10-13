@@ -338,11 +338,21 @@ if [ -x "$PROD/log/lang-log-stats.sh" ] || [ -r "$PROD/log/lang-log-stats.sh" ];
             # cookie, nothing to do with dwell time); "page loads" is everybody else, one row per
             # page view. Both columns come from the >=10s-dwell "shopping" beacon, so robots are
             # nearly all excluded by behaviour; there is no robot list in this codebase.
-            echo " The two counts are different units; never add them:"
-            echo "   browsers    different browsers that accepted the consent banner"
-            echo "               (distinct random codes, since 2026-10-08)"
-            echo "   said yes    their views, counted once per page per visit"
-            echo "   page loads  everyone else, one row per page view"
+            # THE LEGEND FOLLOWS THE HEADER PRODUCTION PRINTED, not the one master prints: the
+            # report reads production's lang-log-stats.sh, which can lag master by a release
+            # (Tom, 2026-10-13: the descriptions "do not match the headings").
+            if printf '%s\n' "$out" | grep -qE '^ *rank +page +browsers'; then
+                echo " The columns are different units; never add them:"
+                echo "   browsers    different browsers that accepted the consent banner"
+                echo "               (distinct random codes, since 2026-10-08)"
+                echo "   said yes    views by those browsers, once per page per visit"
+                echo "   page loads  everyone else, one row per page view"
+            else
+                echo " The two counts are different units; never add them:"
+                echo "   people      views by browsers that accepted the consent banner,"
+                echo "               once per page per visit"
+                echo "   page loads  everyone else, one row per page view"
+            fi
             echo "   Both count only after 10+ seconds on the page, so robots are"
             echo "   nearly all excluded."
             printf '%s\n' "$out" | awk '
