@@ -92,7 +92,7 @@
    "resolution": "English fixed. 'Attached to' is now 'Attached asset': a noun phrase with no dangling preposition, matching how sprint 241 resolved lpn_pump_curve_source. 'Anchor' was rejected because an anchor block is a real water-works object."
   },
   {
-   "key": "lpn_ex_net3_world_desc",
+   "key": "lpn_ex_net3_desc",
    "source": "wave0",
    "lang": null,
    "complaint": "medium: 'placed in a real location' can mean either that it now sits somewhere on the real Earth (it is put at Novato, CA, which has nothing to do with Net3) or that it has been put back where the real Net3 system is. The second reading is a false claim about EPA's network, and it is the reading a reader who knows Net3 will take first.",

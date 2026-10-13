@@ -48,7 +48,7 @@ async function main() {
 	if (!executablePath) { console.error(NAME + ': no Chromium found. SKIPPING.'); env.stopServer(); process.exit(0); }
 	const browser = await chromium.launch({ executablePath });
 	try {
-		for (const v of [['new', 0], ['new', 2500], ['blank', 0], ['blank', 2500], ['Net1', 0], ['Net2', 0], ['Net3', 2500]]) {
+		for (const v of [['new', 0], ['new', 2500], ['blank', 0], ['blank', 2500], ['Net1', 0], ['Net2', 0], ['Net1', 2500]]) {
 			const delay = v[1];
 			console.log('\n--- ' + v[0] + ' project, one junction, x, reload after ' + delay + ' ms ---');
 			const a = await Session.open(browser, NAME + delay, { viewport: { width: 1400, height: 900 } });
@@ -66,7 +66,7 @@ async function main() {
 			await a.toolbarClick('Junction');
 			const r = await page.evaluate(() => { const b = document.getElementById('lpn_canvas').getBoundingClientRect(); return { x: b.x, y: b.y, w: b.width, h: b.height }; });
 			const corner = /^Net/.test(v[0]);
-			await page.mouse.click(r.x + r.w * (corner ? 0.97 : 0.3), r.y + r.h * (corner ? 0.97 : 0.4));
+			await page.mouse.click(r.x + r.w * (corner ? 0.97 : 0.3), r.y + r.h * (corner ? 0.88 : 0.4));
 			await a.settle(900);
 			await a.toolbarClick('Select');
 			await a.settle(1200);

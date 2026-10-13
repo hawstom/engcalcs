@@ -553,3 +553,11 @@ N. **One in-page "User guide" box replaces Help > Tables and Hotkeys and Help > 
 
 - Junction demand-pattern field shows the pattern actually in force as placeholder text, e.g. "(default: 1)" or "(constant)", read-only grey. Cost: one string, 27 translations. Buys the one thing Tom's rename bug lacked: visible state where it is read. (Journal 2026-10-11.)
 - One look for the suite's trees (Guide rail, scenario tree, Libraries): chevron expander, indent, one selected-row shade, one keyboard model. Defer boxed +/- and dotted connectors. (Journal 2026-10-11.)
+
+## Added 2026-10-12 (override marker)
+
+1. One shared `overrideMark()` builder and a two-cell gutter (filled dot, down triangle; hollow dot in Properties), CSS-drawn, used by the Scenarios table, Properties and Settings. Land it in Properties first.
+2. New token `--ec-held-ink` (darker amber, about 5.9:1 on white) so the glyph passes 3:1; keep `--ec-held` for the wash.
+3. Measure with dev/browser-pass before building: popup height with a ticked override at 1280, 1024 and 390 px, and the "(inherited)" width in de, ru and fr.
+4. A harness look at the Settings held bar in an RTL language (physical-left shadow, no rtl twin found).
+5. Decide, with Tom: a Base-row arrow ("follow Base again"), and whether a click on a dot whose alternative is shared with non-descendants needs a confirm.

@@ -34,7 +34,7 @@ exports.title = '43. A geographic map is visible and clickable at its own scale'
 
 // **BY KEY, NEVER BY WORDING.** The card's heading is a shipped English string, and a spec that
 // spells one out turns Tom's next rewording into a red build in a file about hydraulics.
-const EXAMPLE_KEY = 'lpn_ex_net3_world_title';
+const EXAMPLE_KEY = 'lpn_ex_net3_title';
 
 // The world layer's scale, and the four properties every stroke is drawn from.
 async function drawing(a) {

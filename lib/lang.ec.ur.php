@@ -968,8 +968,6 @@ $ec_lang['lpn_ex_net2_desc']='EPANET کے نمونوں میں سے ایک، ٹی
 $ec_lang['lpn_ex_net3_title']='EPANET Net3';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_ex_net3_desc']='EPANET کی بڑی مثال: 92 جنکشن، تین ٹینک اور دو ریزروائر، جن میں سے ایک دریا ہے۔ یہ دکھاتی ہے کہ مکمل سائز کا ماڈل نقشے پر کیسا نظر آتا ہے۔';
-$ec_lang['lpn_ex_net3_world_title']='EPANET Net3، عرض بلد/طول بلد';
-$ec_lang['lpn_ex_net3_world_desc']='EPANET Net3 جیسا ہی نیٹ ورک، دنیا پر کسی من مانی جگہ رکھا گیا: اس کے احداثیات عرض بلد اور طول بلد ہیں، اور اس کے پیچھے سڑکوں کا نقشہ کھینچا گیا ہے۔';
 $ec_lang['lpn_ex_elm_street_title']='Elm Street Center';
 $ec_lang['lpn_ex_elm_street_desc']='ایک تجارتی سائٹ، جسے زیادہ سے زیادہ روزانہ طلب کے ساتھ آگ بجھانے کے بہاؤ کے لیے، ایک لمحے کے وقت پر حل کیا گیا، سائٹ پلان پر بنایا گیا ہے۔';
 $ec_lang['lpn_tool_undo']='کالعدم کریں';

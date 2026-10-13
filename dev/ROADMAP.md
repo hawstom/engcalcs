@@ -135,6 +135,10 @@ the block.
   Tom, 2026-10-10: *"a right-click menu at assets that includes 'Time series graph' that makes a pretty
   'speech bubble' 200px to 400 px ... so that four or six could be arranged on the map. And it would be
   really cool if that presentation scenario could be saved."*
+- 100|790| **One override marker: overridden or inherited, in every scenario view.**
+  Tom, 2026-10-12 (interview q03): expose override vs inherited with a single-character marker, carried
+  through Properties and Settings, after Civil 3D's Override / Child override columns. Ida: a dot gutter;
+  Mary: Bentley's and Civil 3D's per-row checkbox. Tom's call between them first. Journals 2026-10-12.
 - 75|788| **Translated Find guide and select/choose wording, swept across all 26 languages.**
   Sprint 1012-delta QA (2026-10-12): about 20 languages still print English control names (Everything, equal to, AND)
   in the Find guide's prose, which should name controls as the translated page does (code samples stay English); and
@@ -414,6 +418,7 @@ the block.
   Tom, 2026-10-11: *"convert Net2 and Net3 to SI and put them first in this order: Net3 SI, Net3 US, Net2 SI, Net2
   US."* Built on `feat/si-example`. Expand the gallery first, promote to the front later. KYPipe networks (CC BY-NC):
   ask the authors before shipping any.
+  Net2 (Branford) and Net3 (Novato) US and SI pairs are on `feat/si-example`; only Elm Street Center keeps a backdrop.
 - 50|146.09| **An inset overview map: the whole project, with a box round where you are.**
   Reworked by Tom 2026-08-25, and it is a different feature from the one this ID used to hold:
   *"146.09 reworked as a key/overview map inset like many games where the entire project is depicted

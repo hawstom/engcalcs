@@ -138,7 +138,7 @@ const said = (w) => w.frames + '/' + w.hours + ' hours, worst head ' + (w.h / 0.
 
 	console.log('1. EACH SHIPPED EXAMPLE AGAINST EPANET ON EPA\'S OWN FILE');
 	ok('the Net1 example still carries its two rules', net1Rules.filter((l) => /^RULE /.test(l)).length === 2);
-	for (const [name, inp] of [['Net1', net1WithRules], ['Net2', ref('Net2')], ['Net3', ref('Net3')],
+	for (const [name, inp] of [['Net1', net1WithRules], ['Net2-Branford-CT', ref('Net2')],
 		['Net3-Novato-CA-World', ref('Net3')]]) {
 		const w = await compare(name, inp);
 		ok(name + ' matches EPANET at every hour', passes(w), said(w));
@@ -152,7 +152,7 @@ const said = (w) => w.frames + '/' + w.hours + ' hours, worst head ' + (w.h / 0.
 	}
 	// One control threshold moved: Net3's pump 335 starting at 18.1 ft instead of 17.1.
 	{
-		const w = await compare('Net3', ref('Net3'), (saved) => {
+		const w = await compare('Net3-Novato-CA-World', ref('Net3'), (saved) => {
 			const c = saved.controls.find((x) => x.link === '335' && x.condition && x.condition.cmp === 'below');
 			c.condition.value += 1;
 		});

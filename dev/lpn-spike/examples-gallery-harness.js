@@ -88,28 +88,94 @@ examples.forEach(function (ex) {
 	report(a.replace(DOC_ID_MEMBER, '') === b, `${ex.file} is otherwise a faithful copy, not a re-serialisation`);
 });
 
-// ---- THE BACKDROP IS PART OF THE EXAMPLE, and it has been silently dropped once ----------------
-// Tom put site plans behind Net2 and Net3, they shipped in commit b9baf53, and the very next commit
-// regenerated the examples from a session that did not have them -- 1.7 MB and 2.5 MB of PNG gone,
-// with nothing anywhere saying so. He noticed by opening the gallery: "Net2 and Net3 are still
-// coming in without their images. I think you are reverting me." He was right.
-//
-// Nothing derives this list; it is a DECLARATION that these three examples are drawn over a plan and
-// must arrive with it. An example that gains a backdrop adds itself here, which is the moment to
-// think about the megabytes; one that loses it fails loudly instead of quietly looking plainer.
-const WANT_BACKDROP = ['Net2.lwn', 'Net3.lwn', 'Elm-Street-Center.lwn'];
-console.log('\n-- the examples drawn over a site plan still carry it --');
-WANT_BACKDROP.forEach(function (file) {
+// ---- ONLY ELM STREET CENTER CARRIES A BACKDROP (Tom, 2026-10-12) ---------------------------------
+// *"Remove all the examples that have background images except Elm Street Center."* Net2 and Net3
+// had site plans behind them, and two of the four SI-twin files copied ~9 MB of them. The shelf now
+// holds Elm Street Center as its one example drawn over a plan, and it must keep it; any other
+// example gaining one fails here so the megabytes are a decision.
+console.log('\n-- the only example drawn over a site plan is Elm Street Center --');
+examples.forEach(function (ex) {
 	[srcDir, outDir].forEach(function (dir) {
 		const where = dir === srcDir ? 'authored' : 'served';
-		let d = null;
-		try { d = JSON.parse(fs.readFileSync(path.join(dir, file), 'utf8')); } catch (e) { /* reported below */ }
+		const d = JSON.parse(fs.readFileSync(path.join(dir, ex.file), 'utf8'));
 		const href = d && d.backdrop && d.backdrop.href;
-		report(!!href && /^data:image\//.test(href),
-			`${file} (${where}) still has its site plan`,
-			href ? `${Math.round(href.length / 1024)} KB` : 'NO BACKDROP');
+		const want = ex.file === 'Elm-Street-Center.lwn';
+		report(want ? (!!href && /^data:image\//.test(href)) : !href,
+			`${ex.file} (${where}) ${want ? 'still has its site plan' : 'has no backdrop'}`,
+			href ? `${Math.round(href.length / 1024)} KB` : 'none');
 	});
 });
+
+// ---- WHICH BASEMAP EACH EXAMPLE OPENS ON ----------------------------------------------------------
+// Tom, 2026-10-12: the two Net2 examples use the street map. No example stores satellite (Mapbox,
+// gated on the token; privacy.php says only the OSM tiles load unasked). Net3 and the opening page
+// request OSM, which was checked against the files, not assumed.
+console.log('\n-- the basemap each example opens with --');
+examples.forEach(function (ex) {
+	[srcDir, outDir].forEach(function (dir) {
+		const d = JSON.parse(fs.readFileSync(path.join(dir, ex.file), 'utf8'));
+		const b = (d.project || {}).basemap;
+		const net2 = /^Net2-Branford/.test(ex.file);
+		report(net2 ? b === 'osm' : (b === undefined || b === 'osm' || b === 'off'),
+			`${ex.file} (${dir === srcDir ? 'authored' : 'served'}) basemap is ${net2 ? 'OSM street map' : 'OSM or none'}`, String(b));
+	});
+});
+
+console.log('\n-- the Net2 pair carries the Net3 label and colour conventions, and matches each other --');
+{
+	const rd = f => JSON.parse(fs.readFileSync(path.join(outDir, f), 'utf8'));
+	const n3 = rd('Net3-Novato-CA-World.lwn'), pair = ['Net2-Branford-CT.lwn', 'Net2-Branford-CT-SI.lwn'].map(rd);
+	['colorNodeField', 'colorLinkField', 'colorRampNode', 'colorRampLink', 'colorClassesNode', 'colorClassesLink',
+		'colorLegendPosition', 'basemapStyle'].forEach(function (k) {
+		pair.forEach(function (n2, i) { report(n2.settings[k] === n3.settings[k], `Net2 ${i ? 'SI' : 'US'} ${k} = Net3's`, String(n2.settings[k])); });
+	});
+	pair.forEach(function (n2, i) {
+		report(n2.labelSettings.separator === n3.labelSettings.separator, `Net2 ${i ? 'SI' : 'US'} label separator = Net3's`);
+		report(JSON.stringify(n2.settings.colorModes) === JSON.stringify(n3.settings.colorModes), `Net2 ${i ? 'SI' : 'US'} colour modes = Net3's`);
+	});
+	report(JSON.stringify(pair[0].labelSettings) === JSON.stringify(pair[1].labelSettings), 'Net2 SI and US share label settings');
+}
+
+console.log('\n-- the gallery runs Net3, Net2, Elm Street, Net1, then the two basics last --');
+{
+	const f = examples.map(e => e.file);
+	report(f.slice(-2).join() === 'Basic-example-SI-units.lwn,Basic-example-US-units.lwn', 'the two basics are the last two cards', f.slice(-3).join());
+	report(f[f.length - 3] === 'Net1.lwn', 'Net1 sits just before them');
+}
+
+console.log('\n-- card descriptions read from the language file --');
+{
+	const en = fs.readFileSync(path.join(root, 'lib/lang.ec.en.php'), 'utf8');
+	const langOf = k => { const m = en.match(new RegExp("\\$ec_lang\\['" + k + "'\\]='((?:[^'\\\\]|\\\\.)*)';")); return m ? m[1].replace(/\\'/g, "'") : null; };
+	examples.forEach(function (ex) {
+		report(langOf(ex.descKey) === ex.description, `${ex.file}: manifest description equals ${ex.descKey}`);
+	});
+	examples.filter(e => /^lpn_ex_basic_/.test(e.titleKey)).forEach(function (ex) {
+		report(/^(A|Two) reservoirs?/.test(ex.description), `${ex.titleKey}: begins with what it is, a reservoir`, ex.description);
+		const f = JSON.parse(fs.readFileSync(path.join(outDir, ex.file), 'utf8'));
+		const c = (o, t) => o.filter(x => x.type === t).length;
+		report(c(f.nodes, 'reservoir') === 2 && c(f.nodes, 'junction') === 6 && c(f.links, 'pump') === 1 && c(f.links, 'pipe') === 6 && c(f.nodes, 'tank') === 0,
+			`${ex.file}: 2 reservoirs, 6 junctions, 1 pump, 6 pipes, no tank (the counts its description states)`);
+		report(!/start here|starting|the same|the smallest/i.test(ex.description), `${ex.titleKey}: none of the struck phrases`);
+	});
+	examples.filter(e => /^Net2/.test(e.file)).forEach(function (ex) {
+		// Wording is Tom's to reword; only that both twins state a size in their own length unit.
+		report(ex.system === 'si' ? /\bkm\b/.test(ex.description) : /\bmiles?\b/.test(ex.description),
+			`${ex.file}: states its size in its own length unit`);
+	});
+	const elm = examples.find(e => e.file === 'Elm-Street-Center.lwn');
+	report(/\(US\)$/.test(elm.title) && /^Gallons per minute, with feet and inches\./.test(elm.description), 'Elm Street Center discloses its units like the EPANET cards');
+}
+
+console.log('\n-- Net1: the counts the notes quote are the file\'s --');
+{
+	const n1 = JSON.parse(fs.readFileSync(path.join(outDir, 'Net1.lwn'), 'utf8'));
+	const cnt = (o, t) => Object.values(o).filter(x => x.type === t).length;
+	report(cnt(n1.nodes, 'junction') === 9, 'Net1 has 9 junctions', String(cnt(n1.nodes, 'junction')));
+	report(cnt(n1.nodes, 'reservoir') === 1 && cnt(n1.nodes, 'tank') === 1, 'Net1 has 1 reservoir and 1 tank');
+	report(cnt(n1.links, 'pump') === 1, 'Net1 has 1 pump', String(cnt(n1.links, 'pump')));
+	report(Object.keys(n1.nodes).length === 11, 'and 11 is the total node count');
+}
 
 console.log('\n-- the served copy carries the format marker (Task 315) --');
 examples.forEach(function (ex) {
@@ -229,14 +295,14 @@ console.log('\n-- layout: a deliberate order, not an accident of equal size --')
 		'every entry carries an explicit order');
 	const si = examples.filter(function (e) { return e.system === 'si'; });
 	report(si.length > 0, 'the shelf has at least one SI example', `${si.length}`);
-	// **THE HEAD OF THE WALL IS TOM'S, AND IT IS NOT SIZE-ORDERED** (2026-08-21): Net3-World leads
-	// because it is the real geographic project, Elm Street Center second. This used to assert that
-	// an SI example led -- that was Tom's 2026-08-14 ruling when the basics were the head, and it is
-	// superseded, not broken. What survives of it is checked just below: SI still precedes US among
-	// the two basics, which is what he actually cared about and what a size sort cannot express.
-	report(examples[0].file === 'Net3-Novato-CA-World.lwn', 'Net3-World leads the wall', examples[0].file);
-	report(examples[1].file === 'Elm-Street-Center.lwn', 'and Elm Street Center is second',
-		examples[1].file);
+	// **THE HEAD OF THE WALL IS TOM'S, AND IT IS NOT SIZE-ORDERED.** Tom, 2026-10-11 (Task 786): the
+	// first four are Net3 SI, Net3 US, Net2 SI, Net2 US, then Elm Street Center, Net1, and (Tom,
+	// 2026-10-12) the two basics last. What survives of his 2026-08-14 "an SI example leads" is
+	// that an SI example is first, and that each SI twin precedes its US twin.
+	['Net3-Novato-CA-World-SI.lwn', 'Net3-Novato-CA-World.lwn', 'Net2-Branford-CT-SI.lwn',
+		'Net2-Branford-CT.lwn', 'Elm-Street-Center.lwn'].forEach(function (f, i) {
+		report(examples[i].file === f, 'wall position ' + (i + 1) + ' is ' + f, examples[i].file);
+	});
 	let sorted = true;
 	for (let i = 1; i < examples.length; i++) {
 		const a = examples[i - 1], b = examples[i];
@@ -356,10 +422,9 @@ console.log('\n-- R-205: Net3-Novato-CA-World gets an all-labels zoom limit and 
 	// place and the world map, whatever words carry that from here on.
 	const novatoTitle = novato && novato.title || '';
 	const novatoDesc = novato && novato.description || '';
-	report(/Net3/.test(novatoTitle) && /lat.?\/.?lon/i.test(novatoTitle),
-		'lpn_ex_net3_world_title still names Net3 and lat/lon', novatoTitle);
-	report(/Novato/.test(novatoDesc) && /CA/.test(novatoDesc) && /world map/i.test(novatoDesc),
-		'lpn_ex_net3_world_desc still names Novato, CA and the world map', novatoDesc);
+	report(/Net3/.test(novatoTitle), 'lpn_ex_net3_title still names Net3', novatoTitle);
+	report(/Novato/.test(novatoDesc) && /California/.test(novatoDesc) && /world map/i.test(novatoDesc),
+		'lpn_ex_net3_desc still names Novato, California and the world map', novatoDesc);
 }
 
 console.log('\n-- R-205: the other EPANET examples say "example", not "sample" --');

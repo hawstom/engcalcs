@@ -970,8 +970,6 @@ $ec_lang['lpn_ex_net2_desc']='Un sistem de distribuție ramificat cu un bazin, d
 $ec_lang['lpn_ex_net3_title']='EPANET Net3';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_ex_net3_desc']='Exemplul mare EPANET: 92 de joncțiuni, trei bazine și două rezervoare, unul dintre ele un râu. Arată cum apare pe hartă un model de dimensiune reală.';
-$ec_lang['lpn_ex_net3_world_title']='EPANET Net3, lat/lon';
-$ec_lang['lpn_ex_net3_world_desc']='Rețeaua EPANET Net3 convertită în latitudine/longitudine la Novato, CA, cu harta lumii desenată în spate.';
 $ec_lang['lpn_ex_elm_street_title']='Elm Street Center';
 $ec_lang['lpn_ex_elm_street_desc']='Un amplasament comercial rezolvat pentru debitul de incendiu peste cerința zilei de vârf, la un moment dat, desenat peste un plan de amplasament.';
 $ec_lang['lpn_tool_undo']='Anulare';

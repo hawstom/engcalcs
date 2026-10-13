@@ -249,7 +249,7 @@ async function main() {
 		await a.goto('Looped-Network.php?ec_nolog=1');
 		await page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } });
 		const ELM = await S('lpn_ex_elm_street_title');
-		const NET3W = await S('lpn_ex_net3_world_title');
+		const NET3W = await S('lpn_ex_net3_title');
 
 		console.log('\n--- 1. units only: a new tab, its numbers converted, the original untouched ---');
 		await a.openExampleCard(ELM);

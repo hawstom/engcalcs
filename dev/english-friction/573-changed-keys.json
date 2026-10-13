@@ -12,7 +12,7 @@
   "lpn_confirm_apply_prefix": "Rename {n} assets so their IDs start with {prefix}? Each one keeps its number.",
   "lpn_delete_drops_overrides": "Deleting this asset also throws away {n} values that your scenarios hold for it. Continue?",
   "lpn_demand_tip": "Flows taken out of the network at this node. Enter a negative number for flow put into the network here.",
-  "lpn_ex_net3_world_desc": "The same network as EPANET Net3, put down at an arbitrary place on the globe: its coordinates are latitude and longitude, and a street map is drawn behind it.",
+  "lpn_ex_net3_desc": "The same network as EPANET Net3, put down at an arbitrary place on the globe: its coordinates are latitude and longitude, and a street map is drawn behind it.",
   "lpn_field_active_tip": "Uncheck this box to leave the asset on the drawing but out of the network: it is drawn grey and the solver ignores it. In a scenario this is how a proposed pipe is switched on and off.",
   "lpn_field_demand_pattern_tip": "How this junction’s demand rises and falls through the run. Leave it at No pattern and the junction follows the project’s Default Pattern instead.",
   "lpn_file_import_geo": "Open an xy file on the map…",

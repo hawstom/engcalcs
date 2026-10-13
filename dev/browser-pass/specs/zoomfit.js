@@ -90,7 +90,7 @@ async function walk(a, report, key, strictScale) {
 
 // One fresh profile per example: the examples wall is only on an empty canvas.
 exports.run = async function ({ browser, report }) {
-	for (const [key, strict] of [['lpn_ex_net1_title', true], ['lpn_ex_net3_world_title', false]]) {
+	for (const [key, strict] of [['lpn_ex_net1_title', true], ['lpn_ex_net3_title', false]]) {
 		const a = await Session.open(browser, 'zoomfit-' + Date.now());
 		try {
 			await a.page.route(/tile\.openstreetmap\.org|api\.mapbox\.com/, (route) => route.abort());

@@ -969,8 +969,6 @@ $ec_lang['lpn_ex_net2_desc']='Разгранати дистрибутивни с
 $ec_lang['lpn_ex_net3_title']='EPANET Net3';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_ex_net3_desc']='Велики EPANET пример: 92 чвора, три тенка и два резервоара, један од њих река. Показује како модел пуне величине изгледа на мапи.';
-$ec_lang['lpn_ex_net3_world_title']='EPANET Net3, геогр. шир./дуж.';
-$ec_lang['lpn_ex_net3_world_desc']='Мрежа EPANET Net3 претворена у географску ширину и дужину у Новату (Novato), Калифорнија, са светском мапом у позадини.';
 $ec_lang['lpn_ex_elm_street_title']='Elm Street Center';
 $ec_lang['lpn_ex_elm_street_desc']='Комерцијална локација решена за противпожарни проток изнад максималне дневне потрошње, у једном тренутку, нацртана преко плана локације.';
 $ec_lang['lpn_tool_undo']='Поништи';

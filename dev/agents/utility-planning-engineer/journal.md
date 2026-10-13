@@ -2919,3 +2919,44 @@ Tom asked about "ground Elevation + Base elevation" for raised tanks (low "press
 - **SPECULATION**: a VOLUME curve cannot fix the display; it changes volume vs depth, not the reference elevation of the pressure subtraction. Using ground as tank Elevation with a zero-volume lower stretch in the curve is a trick that also may trouble EPANET (zero area); untested.
 
 — Sue
+
+## 2026-10-12 — Sue: scenario system consistency review (feat/bentley-interop at a9be8bec, read-only)
+
+Tom asked for a review for "consistent logic and philosophy about scenarios across the app". The full
+review was returned to the orchestrator. Below is what a later invocation needs from it.
+
+- **OBSERVED, the core matches his model.** `ownWriteTarget()` (js:~5281) stores the scenario's own
+  alternative on the first override, named after the scenario and parented on what it inherited.
+  `treeLayers()` (js:~5142) resolves through the parent until a scenario names an alternative.
+- **OBSERVED, the surroundings still describe the derived model from before 10-12:**
+  - The delete confirm (lang:3235) promises "and its {n} overrides". The alternative survives the
+    delete, and `{n}` includes inherited values.
+  - The reparent claims (`smMove()` and `setScenarioParent()` comments, doc 918) are false for every
+    category in which the scenario holds its own alternative.
+  - Add Base in an alternative tree follows Base's values.
+  - Copy > Make copies snapshots siblings at once, named `_copy_for_`.
+  - The menu's New and Rename accept duplicate names; the manager refuses them.
+  - The Basic mode tip (lang:3254) describes the old model.
+  - The derived-layer functions (`alternativesOf()` and the rest) are dead except for their harness.
+  - The ready-made scenarios still store `s.demandMultiplier` implicitly, and the flow tests seed it.
+- **CITED, again:** Bentley's Scenarios Manager page lists no Copy for scenarios. The Alternatives
+  Manager has Duplicate and **Merge Alternative**.
+  <https://docs.bentley.com/LiveContent/web/Bentley%20WaterGEMS%20SS6-v1/en/35002.html>,
+  <https://docs.bentley.com/LiveContent/web/Bentley%20WaterGEMS%20SS6-v1/en/35003.html>
+- **My own error:** my 2026-10-08 entry's "NOT FOUND: any Bentley merge alternatives command" was
+  wrong. 35003.html lists "Merge Alternative: Moves all records from one alternative to another", and
+  my own 2026-10-05 entry had already cited it. Wish-list row 4 of 2026-10-08 ("I found no Bentley
+  merge") is wrong for the same reason.
+- **CITED, ambiguous:** WaterGEMS "Creating Scenarios" says "By default, a new scenario comprises the
+  Base Alternatives associated with each alternative type"
+  (<https://docs.bentley.com/LiveContent/web/Bentley%20WaterGEMS%20SS6-v1/en/GUID-B9F73478EF5B4A5A88D3C38AF5BA95B1.html>).
+  WaterCAD "Base and Child Scenarios" says child scenarios "Inherit data from a base scenario or other
+  child scenarios". I do not know whether a new Bentley CHILD scenario starts on its parent's choices
+  or on Base's. Tom's model assumes the parent's. Do not quote either page as settling it.
+- **NOT FOUND (searched three ways):** a Bentley page saying that an edit in a scenario that still uses
+  a Base alternative changes Base. That is my belief, not a citation. SPECULATION.
+- **SPECULATION:** Copy scenario should be lazy, under Tom's own rule. The copy names the same
+  alternatives. "Share edits" unticked means the first edit in a category creates the copy's own child
+  alternative. Re-derive before relying on it.
+- **SPECULATION:** fold the Text category into Presentation, so that one figure scenario is one
+  alternative.

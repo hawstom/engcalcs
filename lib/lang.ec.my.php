@@ -971,8 +971,6 @@ $ec_lang['lpn_ex_net2_desc']='EPANET ၏ နမူနာများမှ ရ�
 $ec_lang['lpn_ex_net3_title']='EPANET Net3';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_ex_net3_desc']='EPANET၏ ကြီးမားသော နမူနာ - ဆက်စပ်နေရာ ၉၂ ခု၊ ရေတိုက် သုံးခုနှင့် ရေကန် နှစ်ခု (တစ်ခုသည် မြစ်ဖြစ်သည်)။ အရွယ်အစားအပြည့် မော်ဒယ်တစ်ခု မြေပုံပေါ်တွင် မည်သို့ပေါ်သည်ကို ပြသည်။';
-$ec_lang['lpn_ex_net3_world_title']='EPANET Net3၊ lat/lon';
-$ec_lang['lpn_ex_net3_world_desc']='EPANET Net3 ကွန်ရက်ကို Novato, CA ရှိ လတ္တီတွဒ်/လောင်ဂျီတွဒ်သို့ ပြောင်းလဲထားပြီး၊ နောက်ခံတွင် ကမ္ဘာ့မြေပုံ ပါဝင်သည်။';
 $ec_lang['lpn_ex_elm_street_title']='Elm Street Center';
 $ec_lang['lpn_ex_elm_street_desc']='မီးငြိမ်းသတ်ရေးစီးနှုန်းကို အများဆုံးနေ့စဉ်လိုအပ်ချက်အပေါ် ပေါင်းထည့်၍ ဖြေရှင်းထားသော စီးပွားရေးနေရာတစ်ခု၊ အချိန်တစ်ခုတည်းတွင်၊ နေရာအစီအစဉ်ပုံပေါ်တွင် ရေးဆွဲထားသည်။';
 $ec_lang['lpn_tool_undo']='ပြန်ဖျက်ရန်';

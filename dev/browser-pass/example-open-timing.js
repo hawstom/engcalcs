@@ -104,7 +104,7 @@ async function main() {
 		// **BY KEY, NEVER BY LITERAL** (harness_wording_check.php): a card is matched against
 		// `pageConfig`'s own current English, read through the DOM stub's real language file, so a
 		// future rewording of these two titles does not turn this probe red for no reason.
-		const GRID_KEY = 'lpn_ex_net3_title', WORLD_KEY = 'lpn_ex_net3_world_title';
+		const GRID_KEY = 'lpn_ex_net2_title', WORLD_KEY = 'lpn_ex_net3_title';
 		async function openViaGallery(titleKey) {
 			const title = await s.lang(titleKey);
 			await s.menuClick(await s.lang('lpn_examples_menu'), 'file');
