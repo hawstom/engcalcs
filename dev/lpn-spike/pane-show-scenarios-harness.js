@@ -245,9 +245,9 @@ console.log('\n--- 9. renaming a scenario while shown renames its rows at once -
 	report(!!td9 && td9.textContent === 'Max Hour', 'the Scenario column reads the new name with no switch or solve',
 		td9 && td9.textContent);
 	const tip9 = L.td('junctions', J[1].id + SEP + peak.id, 'demand');
-	// The alternative was named after the scenario when its first override made it, and is a thing
-	// of its own from then on (Tom, 2026-10-12): renaming the scenario does not rename it.
-	report(!!tip9 && tipOf(tip9) === altTip('demand', 'Peak Hour'), '...and the alternative its overrides are in keeps the name it was given',
+	// Tom, 2026-10-12: "With Basic mode on, we must rename everything at once without asking": the
+	// alternative named after the scenario is renamed with it (with Basic mode off, he is asked).
+	report(!!tip9 && tipOf(tip9) === altTip('demand', 'Max Hour'), '...and in Basic mode the alternative named after it is renamed with it',
 		tipOf(tip9));
 	L.switchScenario(L.baseId());
 }

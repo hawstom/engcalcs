@@ -7096,7 +7096,7 @@ var EngCalcs = EngCalcs || {};
 			}
 		});
 		rows.push({
-			icon: 'copy', label: pc.lpn_scenario_copy || 'Copy scenario', disabled: scn.isBase || !scenarioBasicMode,
+			icon: 'duplicate', label: pc.lpn_scenario_copy || 'Copy scenario', disabled: scn.isBase || !scenarioBasicMode,
 			tip: !scenarioBasicMode ? (pc.lpn_scenario_copy_off || 'Copy scenario works in Basic mode. With Basic mode off, add a scenario and choose its alternatives in the Scenarios table.') : pc.lpn_scenario_copy_tip,
 			fn: function () { copyCurrentScenario(); }
 		});
