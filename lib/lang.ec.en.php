@@ -3237,6 +3237,7 @@ $ec_lang['lpn_scenario_rename']='Rename scenario…';
 $ec_lang['lpn_scenario_delete']='Delete scenario';
 $ec_lang['lpn_scenario_delete_ask']='Delete the scenario {name}? The drawing itself is not changed.';
 $ec_lang['lpn_scenario_delete_goes']='Its {n} overrides are deleted with it.';
+$ec_lang['lpn_scenario_delete_goes_one']='Its one override is deleted with it.';
 $ec_lang['lpn_scenario_delete_stays']='These alternatives it uses stay in the project: {list}.';
 $ec_lang['lpn_scenario_delete_has_children']='The scenario {name} cannot be deleted while other scenarios inherit from it: {list}. Delete those first, or give them another parent.';
 $ec_lang['lpn_scenario_override']='Override in this scenario';

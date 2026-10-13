@@ -353,7 +353,7 @@ async function main() {
 		await flush();
 		let asked = (a.dialogs[0] || {}).message || '';
 		ok('F1 Basic on: the question names the scenario and the overrides that go',
-			asked.indexOf((await L('lpn_scenario_delete_ask')).replace('{name}', 'Fig 6')) === 0 && asked.indexOf((await L('lpn_scenario_delete_goes')).replace('{n}', '1')) >= 0, asked);
+			asked.indexOf((await L('lpn_scenario_delete_ask')).replace('{name}', 'Fig 6')) === 0 && asked.indexOf(await L('lpn_scenario_delete_goes_one')) >= 0, asked);
 		ok('F1 ...and names nothing as staying', asked.indexOf((await L('lpn_scenario_delete_stays')).split('{list}')[0]) < 0, asked);
 		sv = await saved();
 		ok('B5 Basic on: Fig 6 is deleted, and its alternative with it', !byId(sv.scenarios, 'f6') && !byId(sv.alternatives, 'a1'), JSON.stringify(sv.alternatives));

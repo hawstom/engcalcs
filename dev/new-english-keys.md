@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**120 still to read on master**, of 120 untranslated keys, of 2669 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**121 still to read on master**, of 121 untranslated keys, of 2670 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -199,7 +199,7 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   @@ NEEDS RULING
 
-## lpn_  (120, 120 to read @@ NEEDS RULING)
+## lpn_  (121, 121 to read @@ NEEDS RULING)
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -308,6 +308,9 @@ never edits a synonym.
   @@ NEEDS RULING
 - **`lpn_scenario_delete_goes`**
   > Its {n} overrides are deleted with it.
+  @@ NEEDS RULING
+- **`lpn_scenario_delete_goes_one`**
+  > Its one override is deleted with it.
   @@ NEEDS RULING
 - **`lpn_scenario_delete_has_children`**
   > The scenario {name} cannot be deleted while other scenarios inherit from it: {list}. Delete those first, or give them another parent.
@@ -566,7 +569,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**76 still to read**, of 79 new keys across 14 unmerged branch(es).
+**79 still to read**, of 82 new keys across 13 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -577,11 +580,11 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/bentley-interop (`26801c63`) — adds no English strings
+### feat/bentley-interop (`5bcc28f0`) — adds no English strings
 
 ### feat/desktop (`baba0f04`) — adds no English strings
 
-### feat/graph-bubble (`3385a0aa`) — 6 new, 6 to read @@ NEEDS RULING
+### feat/graph-bubble (`e15c1b2e`) — 6 new, 6 to read @@ NEEDS RULING
 
 - **`lpn_tsb_close`**
   > Close graph
@@ -626,7 +629,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/match-property (`05bda765`) — adds no English strings
 
-### feat/shape (`3c3d172d`) — 66 new, 66 to read @@ NEEDS RULING
+### feat/shape (`0b31a248`) — 69 new, 69 to read @@ NEEDS RULING
 
 - **`lpn_dxf_import_binary`**
   > {file} is a binary DXF. Save it from your CAD program as an ASCII DXF, then import again.
@@ -674,7 +677,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Import shapefile shapes…
   @@ NEEDS RULING
 - **`lpn_file_import_shp_tip`**
-  > Read the points, lines, and polygons of an ESRI shapefile into this project as Shapes, with the attribute columns kept as properties. Pick the .zip, or the .shp together with its .dbf and .prj. Latitude and longitude are converted to the project coordinate system; any other coordinate system that differs from the project is refused, not converted.
+  > Read the points, lines, and polygons of an ESRI shapefile into this project as Shapes, with the attribute columns kept as properties. Pick the .zip, or the .shp together with its .shx, .dbf and .prj (hold Ctrl or Shift to select several). Coordinates in a different coordinate system than the project are converted, and the notice says so.
   @@ NEEDS RULING
 - **`lpn_geojson_import_done`**
   > {n} Shapes imported from {file}.
@@ -782,7 +785,10 @@ build for that would be a gate nobody keeps. Refresh it with
   > There is no .prj file, so the coordinates were read as {frame}, with no conversion.
   @@ NEEDS RULING
 - **`lpn_shp_import_noshp`**
-  > {file} has no .shp file in it. Pick the .zip of a shapefile, or the .shp together with its .dbf and .prj.
+  > {file} has no .shp file in it. Pick the .zip of a shapefile, or the .shp together with its .shx, .dbf and .prj (hold Ctrl or Shift to select several).
+  @@ NEEDS RULING
+- **`lpn_shp_import_pick_hint`**
+  > A shapefile is several files. Pick the .shp together with its .shx, .dbf and .prj (hold Ctrl or Shift to select several), or pick the .zip.
   @@ NEEDS RULING
 - **`lpn_shp_import_prj_other`**
   > The .prj states {theirs}. This project states no coordinate system, so the coordinates were read as {frame}, with no conversion.
@@ -817,6 +823,12 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_shp_import_unreadable`**
   > {file} is not a shapefile this page can read: {detail}
   @@ NEEDS RULING
+- **`lpn_shp_import_webmerc_ask`**
+  > {file} has no .prj file, and its numbers are not latitudes and longitudes, but they fit Web Mercator metres (EPSG:3857), the system QGIS and web maps use. Import them as EPSG:3857 and convert them to this project?
+  @@ NEEDS RULING
+- **`lpn_shp_import_webmerc_ok`**
+  > Import as EPSG:3857
+  @@ NEEDS RULING
 - **`lpn_snap_shape_point`**
   > {shape}, point {n}
   @@ NEEDS RULING
@@ -843,5 +855,3 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 
 ### feat/tool-key (`4217cd92`) — adds no English strings
-
-### fix/manual-name (`145c175f`) — adds no English strings
