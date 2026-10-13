@@ -230,7 +230,19 @@ async function main() {
 		const before = await bubbles(a), anchors0 = {};
 		for (const id of ['10', '15', '20']) { anchors0[id] = await pointOf(a.page, 'node', id); }
 		const cv = await a.page.evaluate(() => { const r = document.getElementById('lpn_canvas').getBoundingClientRect(); return { l: r.left, t: r.top, w: r.width, h: r.height }; });
-		await a.page.mouse.move(cv.l + cv.w / 2, cv.t + cv.h / 2);
+		// The wheel goes where the map itself is under the pointer: six bubbles can cover the centre
+		// (Net3 at Novato, since the examples moved to the world map).
+		const spot = await a.page.evaluate((c) => {
+			const cvs = document.getElementById('lpn_canvas');
+			for (const fy of [0.5, 0.3, 0.7, 0.15, 0.85]) {
+				for (const fx of [0.5, 0.3, 0.7, 0.15, 0.85]) {
+					const x = c.l + c.w * fx, y = c.t + c.h * fy, e = document.elementFromPoint(x, y);
+					if (e && cvs.contains(e)) { return { x: x, y: y }; }
+				}
+			}
+			return { x: c.l + c.w / 2, y: c.t + c.h / 2 };
+		}, cv);
+		await a.page.mouse.move(spot.x, spot.y);
 		await a.page.mouse.wheel(0, -300);
 		await a.settle(900);
 		const after = await bubbles(a);

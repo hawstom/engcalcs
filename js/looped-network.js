@@ -57720,9 +57720,17 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// step before it runs): the seam adds no step and no paths to someone else's.
 		if (ed.outside) { tookStep = true; basePaths = []; }
 		if (!tookStep) {
+			// **THE LIVE OBJECTS GO BACK, NOT COPIES OF THEM**: an editor in the box may hold the object
+			// it edits (a custom property's design row holds its `def`), and a copy put back here left
+			// every later edit of that row writing an object the project no longer had (a key renamed,
+			// then the label typed, saved nothing).
+			var lives = basePaths.map(function (c) { var r = c.path[0] === 'defaultPattern' ? null : settingProjectRoot(c.path[0]); return r ? settingGet({ r: r }, ['r'].concat(c.path.slice(1))) : undefined; });
 			basePaths.forEach(function (c) { if (c.root === 'project' || c.path[0] !== 'times') { setboxPut(c.path, c.before); } });
 			saveUndoSnapshot();
-			basePaths.forEach(function (c) { if (c.root === 'project' || c.path[0] !== 'times') { setboxPut(c.path, c.after); } });
+			basePaths.forEach(function (c, i) {
+				if (!(c.root === 'project' || c.path[0] !== 'times')) { return; }
+				if (c.path[0] === 'defaultPattern' || lives[i] === undefined) { setboxPut(c.path, c.after); } else { settingProjectPut(c.path, lives[i], true); }
+			});
 		}
 		undoTopHoldsSettingPaths(basePaths.filter(function (c) { return settingProjectRoot(c.path[0]); })
 			.map(function (c) { return { path: c.path, value: c.before }; }), true);
@@ -67816,14 +67824,15 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var r = settingProjectRoot(path[0]);
 		return r ? altCopy(settingGet({ r: r }, ['r'].concat(path.slice(1)))) : undefined;
 	}
-	function settingProjectPut(path, value) {
+	// `asIs` puts the very object given (setboxEditEnd() handing back the live one), not a copy.
+	function settingProjectPut(path, value, asIs) {
 		var node = settingProjectRoot(path[0]), i;
 		if (!node) { return; }
 		for (i = 1; i < path.length - 1; i++) {
 			if (!plainObject(node[path[i]])) { if (value === undefined) { return; } node[path[i]] = {}; }
 			node = node[path[i]];
 		}
-		if (value === undefined) { delete node[path[path.length - 1]]; } else { node[path[path.length - 1]] = altCopy(value); }
+		if (value === undefined) { delete node[path[path.length - 1]]; } else { node[path[path.length - 1]] = asIs ? value : altCopy(value); }
 	}
 	// `paths` are paths whose CURRENT value is the one to put back, or, with `given`, entries
 	// {path, value} carrying the value from before the edit. The first entry for a path wins.

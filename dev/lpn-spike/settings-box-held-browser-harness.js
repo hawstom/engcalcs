@@ -427,7 +427,7 @@ async function main() {
 		console.log('\n--- 7. a geographic project: the centre is a latitude and a longitude ---');
 		const b = await Session.open(browser, 'B');
 		await b.goto('Looped-Network.php');
-		await b.openExampleCard(await b.lang('lpn_ex_net3_world_title'));
+		await b.openExampleCard(await b.lang('lpn_ex_net3_title'));
 		await b.settle(1500);
 		await b.toolbarClick(await b.lang('lpn_tool_settings'));
 		await b.page.waitForSelector('#lpn_settings_box', { state: 'visible' });

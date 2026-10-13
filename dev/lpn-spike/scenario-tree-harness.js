@@ -363,7 +363,7 @@ console.log('\n--- 1. random stored trees (seed ' + SEED + ') ---');
 	let good = 0, cached = 0, inv = 0;
 	QUIET = true;
 	for (let t = 0; t < N; t++) {
-		randomTree(pick(['Net1.lwn', 'Net2.lwn', 'Net3.lwn']));
+		randomTree(pick(['Net1.lwn', 'Net2-Branford-CT.lwn', 'Net3-Novato-CA-World.lwn']));
 		if (!L.isExplicitTree()) { continue; }
 		if (checkAll('tree ' + t)) { good++; }
 		if (cacheFresh()) { cached++; }
@@ -504,7 +504,7 @@ console.log('\n--- 4. random mutations (seed ' + SEED + ') ---');
 	let steps = 0, good = 0, cached = 0, inv = 0, firstBad = '';
 	QUIET = true;
 	for (let t = 0; t < 12; t++) {
-		randomTree(pick(['Net1.lwn', 'Net2.lwn']));
+		randomTree(pick(['Net1.lwn', 'Net2-Branford-CT.lwn']));
 		for (let m = 0; m < 25; m++) {
 			const what = randomMutation();
 			steps++;
@@ -767,7 +767,7 @@ console.log('\n--- 7b. merge ---');
 
 	let tried = 0, allowed = 0, kept = 0, refusedClean = 0, refused = 0;
 	for (let n = 0; n < 25; n++) {
-		randomTree(pick(['Net1.lwn', 'Net2.lwn']));
+		randomTree(pick(['Net1.lwn', 'Net2-Branford-CT.lwn']));
 		const alts = (L.getDoc().alternatives || []).slice();
 		for (let i = 0; i < 6 && alts.length > 1; i++) {
 			const src = pick(alts), tgt = pick(alts.filter((x) => x.category === src.category && x !== src));

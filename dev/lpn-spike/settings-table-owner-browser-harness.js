@@ -251,7 +251,7 @@ async function main() {
 		const b = await Session.open(browser, 'B');
 		const pageB = b.page, HB = helpers(b);
 		await b.goto('Looped-Network.php');
-		await b.openExampleCard(await L('lpn_ex_net3_world_title'));
+		await b.openExampleCard(await L('lpn_ex_net3_title'));
 		await b.settle(2500);
 		await HB.hideConsent();
 		await b.toolbarClick(await L('lpn_pane_toggle'));

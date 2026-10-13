@@ -302,9 +302,10 @@ async function main() {
 		ok('scenario: Base diameter of pipe 11 is untouched', byId(sv.links, '11')._diameter === 14);
 		// 5a2. A junction's demand pattern IS held per scenario, so it is copied as an override, not skipped.
 		await openProject((d) => {
-			d.scenarios.push({ id: 's1', name: 'S1', overrides: {} });
+			// The pattern is S1's override: in a scenario Copy holds overrides only, and since 2026-10-13
+			// an asset with none says so in a dialog that would stand in front of the paste.
+			d.scenarios.push({ id: 's1', name: 'S1', overrides: { 'n:10': { demands: [{ base: 5, pattern: '1', category: null }] } } });
 			d.project = Object.assign({}, d.project, { activeScenario: 's1' });
-			byId(d.nodes, '10').demandPattern = '1';
 		});
 		await showTab('junctions');
 		note = await matchOnto('node', '10', 'node', '23');

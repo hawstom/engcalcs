@@ -66,7 +66,7 @@ const L = loadLoopedNetwork(EXAMPLE_EXPORTS +
 	"\t\t},\n");
 
 const CODE = /[a-z][A-Z]|\w\.\w|\u203a|_|\w:\w|\w\|\w/;
-const files = ['Net1.lwn', 'Net3-Novato-CA-World.lwn', 'Net3.lwn', 'Net2.lwn', 'Elm-Street-Center.lwn',
+const files = ['Net1.lwn', 'Net3-Novato-CA-World.lwn', 'Net3-Novato-CA-World-SI.lwn', 'Net2-Branford-CT.lwn', 'Net2-Branford-CT-SI.lwn', 'Elm-Street-Center.lwn',
 	'Basic-example-US-units.lwn', 'Basic-example-SI-units.lwn'];
 files.forEach(function (f) {
 	console.log('--- ' + f + ' ---');
