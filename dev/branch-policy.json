@@ -38,6 +38,7 @@
     ],
     "protected": [
         "feat/hover-label",
+        "feat/button-base",
         "feat/user-guide",
         "feat/section-grid",
         "feat/table-export",
