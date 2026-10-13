@@ -1125,7 +1125,10 @@ html[lang="zh"] .ec-welcome {
    value inherited, a down triangle one the scenarios below override. Placed in the padding the
    container gives up for it, so no row's text moves when a mark comes or goes, and on the right in a
    right-to-left language. Never a tab stop. */
-#lpn_popup_fields.lpn-ovm-gut { position: relative; padding-inline-start: 1.9em; }
+#lpn_popup_fields.lpn-ovm-gut, #lpn_popup_title.lpn-ovm-gut { position: relative; padding-inline-start: 1.9em; }
+/* Base draws no dot, so its gutter is the triangle's one cell. */
+#lpn_popup_fields.lpn-ovm-gut1, #lpn_popup_title.lpn-ovm-gut1 { position: relative; padding-inline-start: 0.95em; }
+#lpn_popup_fields.lpn-ovm-gut1 .lpn-ovm { margin-inline-start: -0.95em; }
 #lpn_settings_box.lpn-ovm-gut .lpn-set-row, #lpn_settings_box.lpn-ovm-gut [data-lpn-setting] { position: relative; padding-inline-start: 1.9em; }
 .lpn-ovm { position: absolute; margin-inline-start: -1.9em; display: inline-flex; align-items: center; height: 1.3em; }
 #lpn_settings_box .lpn-ovm { margin-inline-start: 0; inset-inline-start: 0; top: 0.15em; }

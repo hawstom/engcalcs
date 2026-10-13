@@ -357,6 +357,64 @@ async function main() {
 		sv = await saved();
 		ok('M5 ...and clicking it clears the override, as Clear override does', !byId(sv.scenarios, 'f5').settings, JSON.stringify(byId(sv.scenarios, 'f5')));
 
+		// ---- M6: Base's gutter, and the ID line ----
+		console.log('\n--- M6. the gutter in Base, and the ID line ---');
+		const lefts = () => page.evaluate(() => {
+			const t = document.querySelector('#lpn_popup_title input'), f = Array.from(document.querySelectorAll('#lpn_popup_fields > label')).filter((l) => l.offsetParent)[0];
+			const g = document.querySelector('#lpn_popup_fields .lpn-ovm');
+			return { id: t ? Math.round(t.parentElement.getBoundingClientRect().left + parseFloat(getComputedStyle(t.parentElement).paddingInlineStart)) : null,
+				row: f ? Math.round(f.getBoundingClientRect().left) : null, gutter: !!g, cells: g ? g.children.length : 0,
+				tcls: t ? t.parentElement.className + '/' + getComputedStyle(t.parentElement).paddingInlineStart + '/' + Math.round(t.parentElement.getBoundingClientRect().left) : '',
+				fcls: document.getElementById('lpn_popup_fields').className + '/' + getComputedStyle(document.getElementById('lpn_popup_fields')).paddingInlineStart + '/' + Math.round(document.getElementById('lpn_popup_fields').getBoundingClientRect().left) };
+		});
+		await openProject((d) => { tree(d); d.project.activeScenario = 'base'; }, true);
+		await openPop('23');
+		let lm = await lefts();
+		ok('M6 Base, a junction no scenario overrides: no gutter at all', !lm.gutter, JSON.stringify(lm));
+		await openPop('10');
+		lm = await lefts();
+		ok('M6 Base, junction 10 (overridden below): a one-cell gutter, the triangle alone', lm.gutter && lm.cells === 1, JSON.stringify(lm));
+		ok('M6 ...and the ID line starts where the rows start', lm.id !== null && Math.abs(lm.id - lm.row) <= 2, JSON.stringify(lm));
+		await scenarioMenu('Fig 4');
+		await openPop('10');
+		lm = await lefts();
+		ok('M6 in a scenario too, the ID line starts where the rows start', lm.id !== null && Math.abs(lm.id - lm.row) <= 2, JSON.stringify(lm));
+
+		// ---- CP: a custom property's design, typed in a scenario through the Settings box ----
+		console.log('\n--- CP. a custom property designed in a scenario is kept (Perry, 2026-10-13) ---');
+		for (const inScn of [false, true]) {
+			await openProject(plain, true);
+			if (inScn) {
+				a.answerPromptWith('Fig X');
+				await scenarioMenu(await L('lpn_scenario_new'));
+				await flush();
+			}
+			await page.evaluate(() => { const p = document.getElementById('lpn_popup_close'); if (p && p.offsetParent) { p.click(); } });
+			await a.toolbarClick(await L('lpn_tool_settings'));
+			await page.waitForSelector('#lpn_settings_box', { state: 'visible' });
+			await a.settle(800);
+			const add = page.locator('#lpn_settings_box button', { hasText: await L('lpn_cp_add') }).first();
+			await add.scrollIntoViewIfNeeded();
+			await add.click();
+			await a.settle(800);
+			const ins = page.locator('#lpn_settings_box details[open] .lpn-cp-body').last().locator('input[type=text]');
+			await ins.nth(0).click(); await page.keyboard.type('kk'); await page.keyboard.press('Tab'); await a.settle(500);
+			await page.keyboard.type('Label one'); await page.keyboard.press('Tab'); await a.settle(500);
+			await page.keyboard.type('J'); await page.keyboard.press('Tab'); await a.settle(500);
+			await ins.nth(1).click(); await page.keyboard.press('Control+A'); await page.keyboard.type('Label two'); await page.keyboard.press('Tab');
+			await flush();
+			sv = await saved();
+			const cp = ((sv.settings || {}).customProps || []).filter((x) => x.key === 'custom_kk')[0];
+			const where = inScn ? 'in a scenario' : 'in Base';
+			ok('CP ' + where + ': key, label and Applies to typed one after another are all saved', !!cp && cp.label === 'Label two' && cp.applies === 'J', JSON.stringify((sv.settings || {}).customProps));
+			await a.toolbarClick(await L('lpn_tool_settings'));
+			await a.settle(500);
+			await a.toolbarClick(await L('lpn_tool_settings'));
+			await a.settle(900);
+			const keys = await page.evaluate(() => Array.from(document.querySelectorAll('#lpn_settings_box .lpn-cp-key')).map((e) => e.textContent));
+			ok('CP ' + where + ': the Settings box, opened again, names it', keys.indexOf('kk') >= 0, JSON.stringify(keys));
+		}
+
 		ok('no page error', errors.length === 0, JSON.stringify(errors).slice(0, 400));
 	} finally {
 		await browser.close();

@@ -57706,7 +57706,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			if (inBaseScenario() || cat === null || cat === undefined) {
 				// The project's own: a Base edit, or a path no scenario may hold. A change made in
 				// the view of such a path lands on the project too.
-				if (c.root === 'view' && c.path[0] !== 'times') { settingProjectPut(c.path, c.after); }
+				// The view's own object is put there, not a copy: an editor in the box holds the object
+				// it edits (a custom property's design row holds its `def`), and with a copy every later
+				// edit of that row went to an object nothing saved (Perry, 2026-10-13).
+				if (c.root === 'view' && c.path[0] !== 'times') {
+					var live = settingGet({ r: setboxView }, ['r'].concat(c.path));
+					if (live !== null && typeof live === 'object') { settingProjectPut(c.path, live, true); } else { settingProjectPut(c.path, c.after); }
+				}
 				basePaths.push(c);
 				return;
 			}
@@ -63620,7 +63626,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			});
 		}
 		fields.innerHTML = '';
-		fields.classList.remove('lpn-ovm-gut');
+		// The ID line's room goes with the Properties box's own rows, not another box's.
+		[fields, fields.id === 'lpn_popup_fields' ? document.getElementById('lpn_popup_title') : null].forEach(function (e) { if (e && e.classList) { e.classList.remove('lpn-ovm-gut', 'lpn-ovm-gut1'); } });
 	}
 	// ---- the override marker (ROADMAP Task 184) ----
 	// EVERY EDIT IN A NON-BASE SCENARIO IS AN OVERRIDE, FULL STOP -- even when the typed value equals
@@ -63833,15 +63840,26 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	 * The gutter for the row just appended. `o`: {el, props, on, set(), clear(), line(), cats}. `line`
 	 * says what Clear would restore (Tom, 2026-10-12), shown under the row while it is an override.
 	 */
+	// The gutter's room, given to the rows and to the ID line above them (#lpn_popup_title), so
+	// every line of the box starts at one x.
+	function ovmGutterOn(fields, cls) {
+		var t = fields.id === 'lpn_popup_fields' ? document.getElementById('lpn_popup_title') : null;
+		[fields, t].forEach(function (e) { if (e && e.classList) { e.classList.add(cls); } });
+	}
 	function ovmGutter(fields, o) {
 		var pc = EngCalcs.pageConfig || {}, scn = activeScenario(), start, g, kids, n, note, base, shared;
 		if (!o.el || scenarios.length < 2 || !isOverridable(o.el, o.props[0])) { return; }
 		start = ovmRowStart(fields);
 		if (!start) { return; }
-		fields.classList.add('lpn-ovm-gut');
+		kids = childOverrideHolders(o.el, o.props);
+		n = kids.length;
+		// **BASE GIVES UP ONLY THE ROOM IT USES** (Perry, 2026-10-13): no dot is ever drawn there, so
+		// its gutter is the triangle's one cell, and only once a row has a triangle.
+		if (scn.isBase && !n) { return; }
+		ovmGutterOn(fields, scn.isBase ? 'lpn-ovm-gut1' : 'lpn-ovm-gut');
 		g = document.createElement('span');
 		g.className = 'lpn-ovm';
-		if (scn.isBase) { g.appendChild(ovmCell('lpn-ovm-none')); }
+		if (scn.isBase) { /* the triangle alone */ }
 		else if (o.on) {
 			g.appendChild(ovmCell('lpn-ovm-dot', (pc.lpn_settings_held_in || 'Override in {scenario}.').split('{scenario}').join(scenarioDisplayName(scn)) +
 				' ' + (pc.lpn_ovm_dot_clear || 'Click to clear it.'), function () {
@@ -63858,8 +63876,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				refreshPopupIfOpen();
 			}));
 		}
-		kids = childOverrideHolders(o.el, o.props);
-		n = kids.length;
 		if (n) {
 			g.appendChild(ovmCell('lpn-ovm-tri', (pc.lpn_ovm_child_tip || 'Child scenarios override this value ({n} total). Click to clear their overrides.').replace('{n}', String(n)), function () {
 				askClearChildOverrides(childOverrideHolders(o.el, o.props).length, function () {

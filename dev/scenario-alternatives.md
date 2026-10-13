@@ -1115,7 +1115,8 @@ in the open scenario; a click clears it. In Properties a hollow dot is an inheri
 it an override holding the value shown (the checkbox line it replaces is gone; while a value is an
 override, one line under it still says what Clear restores). A down triangle says scenarios below this
 one override the value, Base included; a click asks "Clear child overrides ({n} total)?" and clears
-them, one undo step. {n} counts the alternatives holding such an override, each once however many
+them, one undo step. Base never has a dot, so its gutter is the triangle's one cell, drawn only when a
+row has one; the ID line moves with the rows. {n} counts the alternatives holding such an override, each once however many
 scenarios share it; a Base of its own (Add base) is never counted. No mark is a tab stop. Not yet: the
 Scenarios table's cells, which still say "inherited" in words.
 
