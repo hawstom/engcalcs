@@ -2651,7 +2651,6 @@ $ec_lang['lpn_scenario_new_name']='ሁኔታ {n}';
 $ec_lang['lpn_scenario_prompt_name']='ለዚህ ሁኔታ ስም';
 $ec_lang['lpn_scenario_rename']='የሁኔታ ስም ቀይር…';
 $ec_lang['lpn_scenario_delete']='ሁኔታ አጥፋ';
-$ec_lang['lpn_scenario_delete_confirm']='ሁኔታ {name}ን እና {n} የራስ ዋጋዎቹን ይሰርዙ? ስዕሉ ራሱ አይለወጥም።';
 $ec_lang['lpn_scenario_override']='በዚህ ሁኔታ ውስጥ የራስ ዋጋ';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_scenario_override_tip']='ሲመረጥ፣ ቁጥሩ ተመሳሳይ ቢሆንም እንኳ ይህ ሁኔታ ለዚህ ዋጋ ወላጁን ይሽራል። የወላጁን ዋጋ ለመጠቀም ሳጥኑን ያጽዱ።';
@@ -3277,9 +3276,7 @@ $ec_lang['lpn_energy_curve_note']='እነዚህ ፓምፖች ምንም ነጥብ
 // "Drop" heads the priority column (Task 445): the number says the order values and labels are
 // given up in, and the term of art, Priority, lives in the heading's own tip. It replaced an icon,
 // so it must stay about as short as one -- a heading that needs a wider box is the wrong word.
-// 'lpn_labels_col_rank' is what it replaced, kept unrendered because "Rank" is the OLD sense.
 $ec_lang['lpn_labels_col_decimals_example']='0.000';
-$ec_lang['lpn_labels_col_rank']='ደረጃ';
 $ec_lang['lpn_labels_col_drop']='ውድቀት';
 
 // ---- Task 441 follow-up: the two symbology groups each carry a colour scheme -----------------
@@ -3890,8 +3887,6 @@ $ec_lang['lpn_copy_kept_link']='{name} እንደ ዋናው ተከፍቷል፣ �
 $ec_lang['lpn_copy_opened']='{file} እንደ ቅጂ ተከፍቶ በአዲስ ቁልፍ ተቀምጧል።';
 $ec_lang['lpn_scenario_basic']='መሰረታዊ ሁነታ';
 $ec_lang['lpn_scenario_basic_tip']='ሲመረጥ፣ ሁኔታ በውስጡ የተዘጋጁትን ዋጋዎች ብቻ ይይዛል። ሲጸዳ፣ ይህ ምናሌ ዋጋዎቹ በምድብ እንዴት እንደሚሰባሰቡ የሚያሳየውን የአማራጮች ቅድመ እይታ ሠንጠረዥም ያቀርባል፣ ሁኔታም የተለየ ጠቅላላ የመሮጫ ጊዜና የሃይድሮሊክ ጊዜ ደረጃ እንዲኖረው ያስችላል። በዚህ ባህሪ ላይ አስተያየት ተቀባይነት አለው።';
-$ec_lang['lpn_alt_title']='የአማራጮች ቅድመ እይታ';
-$ec_lang['lpn_alt_note']='መሠረት የእያንዳንዱን ምድብ መሠረት አማራጭ ይጠቀማል። እያንዳንዱ ሁኔታ ለሚቀየር ማንኛውም ምድብ የመሠረት አማራጩ ልጅ የሆነ የተለየ አማራጭ አለው። ቁጥሩ የተቀየሩት ዋጋዎች ብዛት ነው። የመጨረሻዎቹ ሦስት አምዶች የስሌት አማራጮች ናቸው፦ ለሁኔታው ዋጋ ያስገቡ፣ ወይም የወላጁን ዋጋ ለመጠቀም ባዶ ይተዉት። የፕሮጀክቱ ዋጋዎች በቅንብሮች፣ ስሌት፣ ጊዜ ውስጥ ናቸው።';
 $ec_lang['lpn_alt_cat_physical']='አካላዊ';
 $ec_lang['lpn_alt_cat_demand']='ፍላጎት';
 $ec_lang['lpn_alt_cat_topology']='የአካል ማንቃት';

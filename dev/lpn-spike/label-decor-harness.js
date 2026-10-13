@@ -176,7 +176,7 @@ eval([extract('labelBoxWidth'), extract('dataLabelOrigin')].join('\n'));
 // There is no second code path for the switch, which is what makes it free.
 {
 	const dec = extract('decorationFor');
-	report(/if \(!labelSettings\.markExtrema\) \{ return undefined; \}/.test(dec),
+	report(/if \(!scnLabels\(\['markExtrema'\]\)\) \{ return undefined; \}/.test(dec),
 		'the toggle is enforced in decorationFor(), before anything is drawn');
 	report(/if \(value === extrema\.max && value === extrema\.min\) \{ return undefined; \}/.test(dec),
 		'a value that is simultaneously max and min earns no mark');
@@ -189,6 +189,8 @@ eval([extract('labelBoxWidth'), extract('dataLabelOrigin')].join('\n'));
 // reverted twice. Asserting the plain behaviour is what stops it coming back a third time.
 {
 	let labelSettings = { markExtrema: true };
+	// The open scenario's label settings (dev/scenario-alternatives.md, stage 3): here, the project's.
+	function scnLabels(p) { return labelSettings[p[0]]; }
 	eval(extract('fieldExtrema') + '\n' + extract('decorationFor'));
 
 	let ex = fieldExtrema([1, 2, 3, 4, 5]);

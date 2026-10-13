@@ -2653,7 +2653,6 @@ $ec_lang['lpn_scenario_new_name']='Сценарий {n}';
 $ec_lang['lpn_scenario_prompt_name']='Название этого сценария';
 $ec_lang['lpn_scenario_rename']='Переименовать сценарий…';
 $ec_lang['lpn_scenario_delete']='Удалить сценарий';
-$ec_lang['lpn_scenario_delete_confirm']='Удалить сценарий {name} и {n} значений, принадлежащих только ему? Сам чертёж не изменится.';
 $ec_lang['lpn_scenario_override']='Переопределить в этом сценарии';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_scenario_override_tip']='Если отмечено, этот сценарий переопределяет значение родителя, даже если число совпадает. Снимите отметку, чтобы использовать значение родителя.';
@@ -3279,9 +3278,7 @@ $ec_lang['lpn_energy_curve_note']='Эти насосы ссылаются на �
 // "Drop" heads the priority column (Task 445): the number says the order values and labels are
 // given up in, and the term of art, Priority, lives in the heading's own tip. It replaced an icon,
 // so it must stay about as short as one -- a heading that needs a wider box is the wrong word.
-// 'lpn_labels_col_rank' is what it replaced, kept unrendered because "Rank" is the OLD sense.
 $ec_lang['lpn_labels_col_decimals_example']='0,000';
-$ec_lang['lpn_labels_col_rank']='Ранг';
 $ec_lang['lpn_labels_col_drop']='Пропуск';
 
 // ---- Task 441 follow-up: the two symbology groups each carry a colour scheme -----------------
@@ -3888,8 +3885,6 @@ $ec_lang['lpn_copy_kept_link']='Открыт {name} как оригинал, п�
 $ec_lang['lpn_copy_opened']='Файл {file} открыт как копия и сохранён с новой блокировкой.';
 $ec_lang['lpn_scenario_basic']='Базовый режим';
 $ec_lang['lpn_scenario_basic_tip']='Если отмечено, сценарий состоит только из заданных в нём значений. Если снято, меню предлагает также таблицу предварительного просмотра «Альтернативы», которая показывает, как эти значения сгруппированы по категориям, и позволяет задать для сценария отдельные общую продолжительность расчёта и гидравлический шаг по времени. Отзывы об этой функции приветствуются.';
-$ec_lang['lpn_alt_title']='Предварительный просмотр альтернатив';
-$ec_lang['lpn_alt_note']='База использует альтернативу «База» каждой категории. У каждого сценария есть отдельная альтернатива, дочерняя по отношению к альтернативе «База», для каждой изменённой категории. Число — количество изменённых значений. Последние три столбца — параметры расчёта: введите значение для сценария или оставьте поле пустым, чтобы использовать значение родителя. Значения проекта находятся в «Настройки > Расчёт > Время».';
 $ec_lang['lpn_alt_cat_physical']='Физические';
 $ec_lang['lpn_alt_cat_demand']='Расход отбора';
 $ec_lang['lpn_alt_cat_topology']='Включение элементов';

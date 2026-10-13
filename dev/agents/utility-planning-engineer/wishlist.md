@@ -23,6 +23,20 @@ The rules that keep it honest:
 - **A known-but-unbuilt item is not a miss.** Tom: *"it's not really a gap if it's on our radar."*
   Deepening something already listed counts as a contribution; ranking it is still useful.
 
+### 2026-10-05 — wants from the scenario-model review (journal, same date; sizes are guesses, SPECULATION)
+
+1. **Where-from on every value ("inherited from Base / local here") in the Settings table and Properties.**
+   Bentley shows it as a checkbox and a Base/Inherited column (CITED, Editing Alternatives page); Autodesk names
+   its absence as the common mistake. Small once the resolver reports the source.
+2. **Sync In writes local only on a real difference.** Protects inheritance from a Sheets round trip. Small, but
+   must be a design rule before Sync In is written.
+3. **"Clear local values equal to parent" bulk tool** with a preview. Small.
+4. **Dependents notice before a Base edit** ("changes N scenarios") and a refuse-with-list on deleting an
+   alternative in use; a Merge (fold into parent) instead. Medium.
+5. **A warning when a scenario's friction method differs from Base and it holds no roughness override.** Small.
+Ranked low against my own taste: re-parenting (Bentley has none for scenarios; I would not build it).
+
+
 ### 2026-09-25 — not a want, a ruling request: WaterCAD-migrator seat and interoperability trust, answered
 
 Tom asked whether this seat is a WaterCAD/WaterGEMS user or migrator, after IOD (a senior civil

@@ -2653,7 +2653,6 @@ $ec_lang['lpn_scenario_new_name']='תרחיש {n}';
 $ec_lang['lpn_scenario_prompt_name']='שם עבור תרחיש זה';
 $ec_lang['lpn_scenario_rename']='שינוי שם תרחיש…';
 $ec_lang['lpn_scenario_delete']='מחיקת תרחיש';
-$ec_lang['lpn_scenario_delete_confirm']='למחוק את התרחיש {name} ואת {n} הערכים המותאמים שלו? השרטוט עצמו אינו משתנה.';
 $ec_lang['lpn_scenario_override']='ערך מותאם בתרחיש זה';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_scenario_override_tip']='מסומן פירושו שתרחיש זה עוקף את ההורה שלו עבור ערך זה, גם כאשר המספר זהה. בטלו את הסימון בתיבה כדי להשתמש בערך של ההורה.';
@@ -3279,9 +3278,7 @@ $ec_lang['lpn_energy_curve_note']='משאבות אלה מפנות לעקומת �
 // "Drop" heads the priority column (Task 445): the number says the order values and labels are
 // given up in, and the term of art, Priority, lives in the heading's own tip. It replaced an icon,
 // so it must stay about as short as one -- a heading that needs a wider box is the wrong word.
-// 'lpn_labels_col_rank' is what it replaced, kept unrendered because "Rank" is the OLD sense.
 $ec_lang['lpn_labels_col_decimals_example']='0.000';
-$ec_lang['lpn_labels_col_rank']='דירוג';
 $ec_lang['lpn_labels_col_drop']='נשירה';
 
 // ---- Task 441 follow-up: the two symbology groups each carry a colour scheme -----------------
@@ -3889,8 +3886,6 @@ $ec_lang['lpn_copy_kept_link']='{name} נפתח כקובץ המקורי, לאח�
 $ec_lang['lpn_copy_opened']='{file} נפתח כעותק ונשמר, עם נעילה חדשה.';
 $ec_lang['lpn_scenario_basic']='מצב בסיסי';
 $ec_lang['lpn_scenario_basic_tip']='מסומן: תרחיש מורכב רק מהערכים שנקבעו בו. לא מסומן: תפריט זה מציע גם את טבלת התצוגה המקדימה של חלופות, המראה כיצד הערכים האלה מקובצים לפי קטגוריה, ומאפשרת לתרחיש זמן הרצה כולל וצעד זמן הידראולי נפרדים. משוב על תכונה זו יתקבל בברכה.';
-$ec_lang['lpn_alt_title']='תצוגה מקדימה של חלופות';
-$ec_lang['lpn_alt_note']='הבסיס משתמש בחלופת הבסיס של כל קטגוריה. לכל תרחיש יש חלופה נפרדת, צאצאית של חלופת הבסיס, לכל קטגוריה שהשתנתה. המספר הוא כמות הערכים ששונו. שלוש העמודות האחרונות הן אפשרויות חישוב: הזינו ערך לתרחיש, או השאירו ריק כדי להשתמש בערך ההורה. ערכי הפרויקט נמצאים בהגדרות, חישוב, זמן.';
 $ec_lang['lpn_alt_cat_physical']='פיזיקלי';
 $ec_lang['lpn_alt_cat_demand']='דרישה';
 $ec_lang['lpn_alt_cat_topology']='הפעלת נכסים';

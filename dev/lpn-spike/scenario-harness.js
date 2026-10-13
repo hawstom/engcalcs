@@ -41,6 +41,16 @@ const PC = global.EngCalcs.pageConfig;
 const fs = require('fs');
 const path = require('path');
 function byId(id) { return ensure(id); }
+// One scenario's values in a saved file: its own map, and the alternatives it names (where an
+// override stores the scenario's own alternative).
+function fileOwn(file, s) {
+	const out = JSON.parse(JSON.stringify(s.overrides || {}));
+	Object.keys(s.alternatives || {}).forEach(function (cat) {
+		const a = (file.alternatives || []).filter(function (x) { return x.id === s.alternatives[cat]; })[0];
+		Object.keys((a && a.values) || {}).forEach(function (k) { out[k] = Object.assign(out[k] || {}, a.values[k]); });
+	});
+	return out;
+}
 
 // The .inp reader, for section 10. Loaded here rather than there because the page loads it BEFORE
 // js/looped-network.js and onto the same EngCalcs, and the import path expects it to already exist.
@@ -78,6 +88,9 @@ const L = loadLoopedNetwork(
 	"\t\tactiveScenario: activeScenario, assembleModel: assembleModel, isActive: isActive,\n" +
 	"\t\tdeleteElement: deleteElement, deleteNode: deleteNode,\n" +
 	"\t\tserializeProject: serializeProject, applySaved: applySaved, migrateSaved: migrateSaved,\n" +
+	// A scenario's values as it resolves them: its own map, or the alternative it stores them in
+	// (an override stores the scenario's own alternative since 2026-10-12, ownWriteTarget()).
+	"\t\town: function (s) { return resolvedOverrides(s || activeScenario()); },\n" +
 	"\t\tsaveUndoSnapshot: saveUndoSnapshot, undo: undo,\n" +
 	"\t\trenderNodeFields: renderNodeFields, renderLinkFields: renderLinkFields,\n" +
 	"\t\trenameNode: renameNode,\n" +
@@ -203,7 +216,7 @@ console.log('\n--- the marker records intent, not a difference ---');
 {
 	L.setProp(j1, 'demand', 100);   // exactly Base's value
 	ok('an edit that equals Base STILL records an override',
-		L.hasOverride(j1, 'demand'), JSON.stringify(L.activeScenario().overrides[L.ovKey(j1)]));
+		L.hasOverride(j1, 'demand'), JSON.stringify(L.own()[L.ovKey(j1)]));
 	ok('...and it is counted', L.overrideCount() === 2, L.overrideCount());
 
 	// THE CASE THAT DECIDES THE WHOLE DESIGN, and the only one that can tell a marker from a diff:
@@ -226,7 +239,7 @@ console.log('\n--- the marker records intent, not a difference ---');
 	L.clearOverride(j2, 'demand');
 	ok('clearing the marker returns the value to Base', L.effective(j2, 'demand') === 100);
 	ok('...and the empty map is not left behind as a phantom mark',
-		L.activeScenario().overrides[L.ovKey(j2)] === undefined);
+		L.own()[L.ovKey(j2)] === undefined);
 	L.setProp(j2, 'demand', 500);
 
 	// A rename must CARRY the overrides. If it does not, the scenario's values quietly stop
@@ -236,17 +249,20 @@ console.log('\n--- the marker records intent, not a difference ---');
 	L.renameNode(j2id, 'J-9');
 	ok('renaming an element carries its scenario values with it',
 		L.effective(L.getDoc().nodes.filter(function (n) { return n.id === 'J-9'; })[0], 'demand') === 500,
-		JSON.stringify(L.activeScenario().overrides));
+		JSON.stringify(L.own()));
 	L.renameNode('J-9', j2id);
 	ok('...and back again, leaving nothing stranded under the old name',
-		L.effective(j2, 'demand') === 500 && !L.activeScenario().overrides[L.ovKeyFor('node', 'J-9')],
-		JSON.stringify(L.activeScenario().overrides));
+		L.effective(j2, 'demand') === 500 && !L.own()[L.ovKeyFor('node', 'J-9')],
+		JSON.stringify(L.own()));
 
 	// A property NOT on the whitelist is Base-owned identity and must write through even inside a
 	// scenario -- MEMBERSHIP is overridable, IDENTITY is not.
-	L.setProp(j2, 'elev', 42);
+	// (Elevation was the example until Tom made every property overridable, 2026-10-12; a name on
+	// no whitelist stands in for whatever is left.)
+	L.setProp(j2, 'zzNotListed', 42);
 	ok('a property outside the whitelist writes the element, not an override',
-		j2._elev === 42 && L.activeScenario().overrides[L.ovKey(j2)].elev === undefined);
+		j2._zzNotListed === 42 && L.own()[L.ovKey(j2)].zzNotListed === undefined);
+	delete j2._zzNotListed;
 }
 
 // ---------------------------------------------------------------------------
@@ -302,8 +318,8 @@ console.log('\n--- an override survives save and load ---');
 	L.applySaved(file);
 	const back = L.getScenarios()[1];
 	ok('the scenario comes back with its name', back.name === 'Fire flow', back.name);
-	ok('...and with its overrides', back.overrides[L.ovKey(j2)].demand === 500,
-		JSON.stringify(back.overrides));
+	ok('...and with its overrides', L.own(back)[L.ovKey(j2)].demand === 500,
+		JSON.stringify(L.own(back)));
 	ok('...and the document opens in the scenario it was saved in',
 		L.getProject().activeScenario === back.id);
 	// The elements are new objects after a load; re-find them rather than reusing the old handles.
@@ -403,13 +419,13 @@ console.log('\n--- deleting in a scenario switches off; deleting in Base really 
 	L.deleteElement('link', E.l2.id);
 	ok('Yes deletes it', L.getDoc().links.length === 2);
 	ok('...and drops every scenario\'s values for it',
-		L.getScenarios()[1].overrides[L.ovKey(E.l2)] === undefined,
-		JSON.stringify(L.getScenarios()[1].overrides));
+		L.own(L.getScenarios()[1])[L.ovKey(E.l2)] === undefined,
+		JSON.stringify(L.own(L.getScenarios()[1])));
 
 	L.undo();
 	ok('undo brings back the element AND the values that went with it',
-		L.getDoc().links.length === 3 && !!L.getScenarios()[1].overrides[L.ovKey(E.l2)],
-		JSON.stringify(L.getScenarios()[1].overrides));
+		L.getDoc().links.length === 3 && !!L.own(L.getScenarios()[1])[L.ovKey(E.l2)],
+		JSON.stringify(L.own(L.getScenarios()[1])));
 
 	// An element no scenario has touched is deleted without a question -- the confirm is about the
 	// invisible work, so an action with none must not manufacture one.
@@ -523,7 +539,7 @@ console.log('\n--- the readout, the halos, and the guards ---');
 	ok('from Base it names the property and counts what it will throw away',
 		/Diameter/.test(confirmText || '') && /\b1\b/.test(confirmText || ''), JSON.stringify(confirmText));
 	ok('...and the scenario goes back to the Base value',
-		!L.getScenarios()[1].overrides[L.ovKey(E.l1)], JSON.stringify(L.getScenarios()[1].overrides));
+		!L.own(L.getScenarios()[1])[L.ovKey(E.l1)], JSON.stringify(L.own(L.getScenarios()[1])));
 
 	lastAlert = null;
 	L.pushBaseToScenarios();
@@ -556,11 +572,11 @@ console.log('\n--- the push, scoped to one element ---');
 		JSON.stringify(confirmText));
 	ok('...and counts one value, not two', /\b1\b/.test(confirmText || '') && !/\b2\b/.test(confirmText || ''),
 		JSON.stringify(confirmText));
-	ok('the named element goes back to Base', !scn.overrides[L.ovKey(E.l1)],
-		JSON.stringify(scn.overrides));
+	ok('the named element goes back to Base', !L.own(scn)[L.ovKey(E.l1)],
+		JSON.stringify(L.own(scn)));
 	ok('...AND THE OTHER ONE IS UNTOUCHED -- the whole point of the task',
-		!!scn.overrides[L.ovKey(E.l2)] && scn.overrides[L.ovKey(E.l2)].diameter === 5,
-		JSON.stringify(scn.overrides));
+		!!L.own(scn)[L.ovKey(E.l2)] && L.own(scn)[L.ovKey(E.l2)].diameter === 5,
+		JSON.stringify(L.own(scn)));
 
 	// GROUP SCOPING: a node push considers node properties only. With a link override outstanding
 	// and Diameter on screen, it must report that nothing would change -- not silently clear the
@@ -571,7 +587,7 @@ console.log('\n--- the push, scoped to one element ---');
 		String(lastAlert || '').indexOf(PC.lpn_scenario_push_none) >= 0,
 		JSON.stringify(lastAlert));
 	ok('...and asked nothing, so nothing could be confirmed by habit', confirmText === null);
-	ok('...and l2 STILL has its own value', !!scn.overrides[L.ovKey(E.l2)], JSON.stringify(scn.overrides));
+	ok('...and l2 STILL has its own value', !!L.own(scn)[L.ovKey(E.l2)], JSON.stringify(L.own(scn)));
 
 	// ...and the node push is not merely inert: give the node its own overridden demand and the
 	// same call clears that, so the assertion above is about SCOPE and not about a broken button.
@@ -580,8 +596,8 @@ console.log('\n--- the push, scoped to one element ---');
 	L.switchScenario('base');
 	confirmAnswer = true; confirmText = null;
 	L.pushBaseToScenarios(E.j1);
-	ok('a node push DOES clear that node\'s own demand', !scn.overrides[L.ovKey(E.j1)],
-		JSON.stringify(scn.overrides));
+	ok('a node push DOES clear that node\'s own demand', !L.own(scn)[L.ovKey(E.j1)],
+		JSON.stringify(L.own(scn)));
 	// The confirm names the properties of THIS element's kind only. Diameter is on screen and is
 	// unreachable from a node either way, so listing it would be a promise about something that
 	// cannot happen -- the one part of the group filter a user actually sees.
@@ -589,14 +605,14 @@ console.log('\n--- the push, scoped to one element ---');
 	// second, resolved Demand it cannot write.
 	ok('...and named Base demand without naming Diameter',
 		/Base demand/.test(confirmText || '') && !/Diameter/.test(confirmText || ''), JSON.stringify(confirmText));
-	ok('...and STILL left the pipe alone', !!scn.overrides[L.ovKey(E.l2)], JSON.stringify(scn.overrides));
+	ok('...and STILL left the pipe alone', !!L.own(scn)[L.ovKey(E.l2)], JSON.stringify(L.own(scn)));
 
 	// Scope does not weaken the Base-only guard.
 	L.switchScenario(scn.id);
 	confirmText = null;
 	L.pushBaseToScenarios(E.l2);
 	ok('a scoped push from inside a scenario does nothing at all',
-		!!scn.overrides[L.ovKey(E.l2)] && confirmText === null, JSON.stringify(scn.overrides));
+		!!L.own(scn)[L.ovKey(E.l2)] && confirmText === null, JSON.stringify(L.own(scn)));
 	L.switchScenario('base');
 }
 
@@ -609,8 +625,10 @@ console.log('\n--- create, rename, delete, and the two things Base may not do --
 {
 	L.switchScenario('base');
 	const rows = openScenarioMenu();
-	ok('every scenario is listed, Base first', /Base/.test(rowText(rows[0])), rowText(rows[0]));
-	ok('...with a tick on the one you are in', /✓/.test(rowText(rows[0])), rowText(rows[0]));
+	// The scenarios are the last rows (Tom, 2026-10-11: the commands first, the list of scenarios last).
+	const firstScn = rows[rows.length - L.getScenarios().length];
+	ok('every scenario is listed, Base first', /Base/.test(rowText(firstScn)), rowText(firstScn));
+	ok('...with a tick on the one you are in', /✓/.test(rowText(firstScn)), rowText(firstScn));
 	ok('Base cannot be renamed', findRow(rows, /Rename/).disabled === true);
 	ok('Base cannot be deleted', findRow(rows, /Delete/).disabled === true);
 	ok('...and Base is the only place the push is offered', findRow(rows, /all scenarios/).disabled === false);
@@ -671,7 +689,7 @@ console.log('\n--- the write seam, per field (the Task 184 x Task 248 collision)
 	settingBox.value = '75';
 	(settingBox._listeners.change || []).forEach(function (fn) { fn({ target: settingBox }); });
 	ok('editing a valve setting in a scenario records an OVERRIDE',
-		L.hasOverride(valve, 'setting'), JSON.stringify(L.activeScenario().overrides[L.ovKey(valve)]));
+		L.hasOverride(valve, 'setting'), JSON.stringify(L.own()[L.ovKey(valve)]));
 	ok('...and BASE DOES NOT MOVE', L.baseValue(valve, 'setting') === 40, L.baseValue(valve, 'setting'));
 	L.switchScenario('base');
 	ok('...confirmed from Base itself', L.effective(valve, 'setting') === 40, L.effective(valve, 'setting'));
@@ -696,12 +714,12 @@ console.log('\n--- the write seam, per field (the Task 184 x Task 248 collision)
 	if (res) {
 		L.setProp(res, 'head', undefined);
 		ok('a blanked value still records an override', L.hasOverride(res, 'head'),
-			JSON.stringify(L.activeScenario().overrides[L.ovKey(res)]));
+			JSON.stringify(L.own()[L.ovKey(res)]));
 		const round = JSON.parse(JSON.stringify(L.serializeProject()));
 		const kept = round.scenarios.filter(function (x) { return x.id === scn.id; })[0];
 		ok('...and SURVIVES JSON.stringify, which drops undefined',
-			kept && kept.overrides[L.ovKey(res)] && 'head' in kept.overrides[L.ovKey(res)],
-			JSON.stringify(kept && kept.overrides[L.ovKey(res)]));
+			kept && fileOwn(round, kept)[L.ovKey(res)] && 'head' in fileOwn(round, kept)[L.ovKey(res)],
+			JSON.stringify(kept && fileOwn(round, kept)[L.ovKey(res)]));
 	}
 
 	// 4/5. The ordinary edit path must reach afterPropertyEdit(), which is what refreshes the
@@ -812,10 +830,10 @@ function modelHas(m, group, id) {
 	// --- an override on the NODE leaves the LINK alone: in the map, in the solve, and on screen ---
 	L.setProp(nodeOf('20'), 'demand', 500);
 	ok('the node carries the override', L.hasOverride(nodeOf('20'), 'demand'),
-		JSON.stringify(L.activeScenario().overrides));
+		JSON.stringify(L.own()));
 	ok('...and the pipe of the same name carries NOTHING',
-		L.activeScenario().overrides[L.ovKey(linkOf('20'))] === undefined,
-		JSON.stringify(Object.keys(L.activeScenario().overrides)));
+		L.own()[L.ovKey(linkOf('20'))] === undefined,
+		JSON.stringify(Object.keys(L.own())));
 	L.refreshLabelText();
 	ok('the node is haloed', L.nodeCircle('20').classList.contains('lpn-override'));
 	ok('...and the pipe is NOT -- this is the symptom Tom reported',
@@ -845,7 +863,7 @@ function modelHas(m, group, id) {
 	ok('the pipe is haloed by its own override', L.linkHalo('20').classList.contains('lpn-override'));
 	ok('...and the junction of the same name is NOT -- the reverse of Tom\'s symptom',
 		!L.nodeCircle('20').classList.contains('lpn-override'),
-		JSON.stringify(L.activeScenario().overrides));
+		JSON.stringify(L.own()));
 	L.clearOverride(linkOf('20'), 'active');
 	L.setProp(nodeOf('20'), 'demand', 500);
 	ok('the two elements hold their own values side by side',
@@ -858,16 +876,16 @@ function modelHas(m, group, id) {
 	L.applySaved(file);
 	ok('after a reload the node still has its demand and the pipe still has its diameter',
 		L.effective(nodeOf('20'), 'demand') === 500 && L.effective(linkOf('20'), 'diameter') === 4,
-		JSON.stringify(L.getScenarios()[1].overrides));
+		JSON.stringify(L.own(L.getScenarios()[1])));
 
 	// --- deleting one of the pair leaves the other's values alone ---
 	L.switchScenario('base');
 	confirmAnswer = true;
 	L.deleteElement('link', '20');
-	ok('deleting the pipe drops the pipe\'s values', !L.getScenarios()[1].overrides['l:20'],
-		JSON.stringify(L.getScenarios()[1].overrides));
-	ok('...and leaves the junction\'s untouched', !!L.getScenarios()[1].overrides['n:20'],
-		JSON.stringify(L.getScenarios()[1].overrides));
+	ok('deleting the pipe drops the pipe\'s values', !L.own(L.getScenarios()[1])['l:20'],
+		JSON.stringify(L.own(L.getScenarios()[1])));
+	ok('...and leaves the junction\'s untouched', !!L.own(L.getScenarios()[1])['n:20'],
+		JSON.stringify(L.own(L.getScenarios()[1])));
 	L.undo();
 }
 

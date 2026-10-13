@@ -2654,7 +2654,6 @@ $ec_lang['lpn_scenario_new_name']='Scénář {n}';
 $ec_lang['lpn_scenario_prompt_name']='Název tohoto scénáře';
 $ec_lang['lpn_scenario_rename']='Přejmenovat scénář…';
 $ec_lang['lpn_scenario_delete']='Smazat scénář';
-$ec_lang['lpn_scenario_delete_confirm']='Smazat scénář {name} a jeho specifické hodnoty ({n})? Samotný výkres se nemění.';
 $ec_lang['lpn_scenario_override']='Specifická hodnota v tomto scénáři';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_scenario_override_tip']='Zaškrtnuto znamená, že tento scénář pro tuto hodnotu přepisuje nadřazený scénář, i když je číslo stejné. Zrušením zaškrtnutí se použije hodnota nadřazeného scénáře.';
@@ -3280,9 +3279,7 @@ $ec_lang['lpn_energy_curve_note']='Tato čerpadla odkazují na křivku účinnos
 // "Drop" heads the priority column (Task 445): the number says the order values and labels are
 // given up in, and the term of art, Priority, lives in the heading's own tip. It replaced an icon,
 // so it must stay about as short as one -- a heading that needs a wider box is the wrong word.
-// 'lpn_labels_col_rank' is what it replaced, kept unrendered because "Rank" is the OLD sense.
 $ec_lang['lpn_labels_col_decimals_example']='0,000';
-$ec_lang['lpn_labels_col_rank']='Pořadí';
 $ec_lang['lpn_labels_col_drop']='Vynechat';
 
 // ---- Task 441 follow-up: the two symbology groups each carry a colour scheme -----------------
@@ -3889,8 +3886,6 @@ $ec_lang['lpn_copy_kept_link']='Soubor {name} byl otevřen jako originál, přes
 $ec_lang['lpn_copy_opened']='Soubor {file} byl otevřen jako kopie a uložen s novým zámkem.';
 $ec_lang['lpn_scenario_basic']='Základní režim';
 $ec_lang['lpn_scenario_basic_tip']='Zaškrtnuto: scénář sestává pouze z hodnot v něm nastavených. Nezaškrtnuto: tato nabídka nabízí také tabulku Náhled alternativ, která ukazuje, jak jsou tyto hodnoty seskupeny podle kategorií, a umožňuje, aby měl scénář samostatnou celkovou dobu běhu a hydraulický časový krok. Zpětná vazba k této funkci je vítána.';
-$ec_lang['lpn_alt_title']='Náhled alternativ';
-$ec_lang['lpn_alt_note']='Základní používá základní alternativu každé kategorie. Každý scénář má samostatnou alternativu, potomka základní alternativy, pro každou kategorii, která se změnila. Číslo udává počet změněných hodnot. Poslední tři sloupce jsou možnosti výpočtu: zadejte hodnotu pro scénář, nebo ponechte prázdné, aby se použila hodnota nadřazeného scénáře. Hodnoty projektu jsou v Nastavení, Výpočet, Čas.';
 $ec_lang['lpn_alt_cat_physical']='Fyzikální';
 $ec_lang['lpn_alt_cat_demand']='Odběr';
 $ec_lang['lpn_alt_cat_topology']='Aktivace prvků';

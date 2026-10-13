@@ -156,7 +156,7 @@ async function main() {
 		// ---- 1. nothing copied: Copy works, Paste is greyed with its tip ----
 		await selectTargets('link', ['12', '11']);
 		await rightClick(await pointOf('link', '11'));
-		ok('the menu offers Copy properties and Paste properties to selection', (await page.$$eval('.lpn-pane-ctxmenu button', (bs) => bs.length)) === 2 && (await rowOff(COPY)) === 0);
+		ok('the menu offers Copy properties and Paste properties to selection', (await page.$$eval('.lpn-pane-ctxmenu button', (bs, l) => l.every((x) => bs.some((b) => b.textContent.trim() === x)), [COPY, PASTE])) && (await rowOff(COPY)) === 0);
 		ok('Paste is greyed while nothing is copied', (await rowOff(PASTE)) === 1);
 		ok('...and its tip says nothing is copied', (await hoverTip(PASTE)) === (await a.lang('lpn_paste_props_off_none')));
 		await rowClick(PASTE);
@@ -205,6 +205,12 @@ async function main() {
 		await undo();
 		ok('ONE Undo restores all three', (await cell('pipes', '21', 'diameter')) === sel3[0] && (await cell('pipes', '22', 'diameter')) === sel3[1] && (await cell('pipes', '31', 'diameter')) === sel3[2], JSON.stringify(sel3));
 		await clearSelection();
+
+		// ---- 3a. copied but NOTHING selected: Paste is greyed with its own tip ----
+		await rightClick(await pointOf('link', '31'));
+		ok('copied, nothing selected: Paste is greyed', (await rowOff(PASTE)) === 1);
+		ok('...and the tip says to select the assets first', (await hoverTip(PASTE)) === (await a.lang('lpn_paste_props_off_select')));
+		await page.keyboard.press('Escape'); await a.settle(300);
 
 		// ---- 3b. a selection nothing in the clipboard fits ----
 		await selectTargets('node', ['23']);
@@ -279,8 +285,9 @@ async function main() {
 		const byId = (arr, id) => arr.filter((x) => x.id === id)[0];
 
 		// 5a. In a scenario the write goes through the one seam: an overridable property that differs becomes an override.
+		// In a scenario Copy holds the asset's overrides only (Tom, 2026-10-12), so pipe 10 holds one.
 		await openProject((d) => {
-			d.scenarios.push({ id: 's1', name: 'S1', overrides: {} });
+			d.scenarios.push({ id: 's1', name: 'S1', overrides: { 'l:10': { diameter: 16 } } });
 			d.project = Object.assign({}, d.project, { activeScenario: 's1' });
 			byId(d.links, '11')._diameter = 14;
 		});
@@ -289,7 +296,9 @@ async function main() {
 		await a.settle(1500);
 		let sv = await saved();
 		const s1 = sv.scenarios.filter((x) => x.id === 's1')[0];
-		ok('scenario: pipe 10 onto 11 writes exactly one override (the diameter)', JSON.stringify(Object.keys((s1.overrides || {})['l:11'] || {})) === '["diameter"]', JSON.stringify(s1.overrides));
+		const s1phys = (sv.alternatives || []).filter((r) => r.category === 'physical' && (s1.alternatives || {}).physical === r.id)[0];
+		ok('scenario: pipe 10 onto 11 writes exactly one override (the diameter), in S1\'s own alternative',
+			!!s1phys && JSON.stringify(Object.keys((s1phys.values || {})['l:11'] || {})) === '["diameter"]' && s1phys.values['l:11'].diameter === 16, JSON.stringify([s1, sv.alternatives]));
 		ok('scenario: Base diameter of pipe 11 is untouched', byId(sv.links, '11')._diameter === 14);
 		// 5a2. A junction's demand pattern IS held per scenario, so it is copied as an override, not skipped.
 		await openProject((d) => {

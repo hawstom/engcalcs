@@ -76,15 +76,17 @@ const SNAPSHOT = () => {
 // The project record also carries WHERE THE READER WAS LOOKING (`view`), which rides along on any save
 // and moves when a box opens; and the library index carries a timestamp. Neither is a setting, so a
 // project-side difference is read with both set aside.
-function plain(o) {
+// EXCEPT FOR THE MAP VIEW'S OWN ROWS (Map center, Map scale; Tom, 2026-10-06: the view is a setting
+// and Base has one, the live view): there the view is the very value being driven, so it is kept.
+function plain(o, keepView) {
 	const out = {};
 	Object.keys(o).forEach((k) => {
 		if (k === 'lpn_index') { return; }
-		try { const d = JSON.parse(o[k]); delete d.view; out[k] = d; } catch (e) { out[k] = o[k]; }
+		try { const d = JSON.parse(o[k]); if (!keepView) { delete d.view; } out[k] = d; } catch (e) { out[k] = o[k]; }
 	});
 	return out;
 }
-function differs(a, b) { return JSON.stringify(plain(a)) !== JSON.stringify(plain(b)); }
+function differs(a, b, keepView) { return JSON.stringify(plain(a, keepView)) !== JSON.stringify(plain(b, keepView)); }
 
 // The value controls of the Settings box, tagged in document order so a rebuild that replaces the
 // elements can still be found again by position. Buttons, the filter, files and the colour-band
@@ -194,6 +196,7 @@ async function main() {
 			let observed = 'session', tried = [];
 			const snap0 = await P(SNAPSHOT);
 			const was = await loc.evaluate((e) => ({ checked: e.checked, value: e.value }));
+			const isView = await loc.evaluate((e) => !!e.closest('#lpn_set_view_group'));
 			const attempts = [];
 			if (c.type === 'checkbox') { attempts.push({ kind: 'click' }); }
 			else if (c.type === 'radio') { attempts.push({ kind: 'click' }); }
@@ -231,7 +234,7 @@ async function main() {
 				for (let w = 0; w < 4 && !landed; w++) {
 					await a.settle(250);
 					const snap1 = await P(SNAPSHOT);
-					const dO = differs(snap0.other, snap1.other), dP = differs(snap0.proj, snap1.proj);
+					const dO = differs(snap0.other, snap1.other), dP = differs(snap0.proj, snap1.proj, isView);
 					// BOTH is the defect CLAUDE.md names: a setting belongs to the project or to the
 					// browser, never both. It is a class of its own here so that it can never pass.
 					if (dO && dP) { observed = 'both'; landed = true; }

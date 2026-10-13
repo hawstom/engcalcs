@@ -2651,7 +2651,6 @@ $ec_lang['lpn_scenario_new_name']='منظرنامہ {n}';
 $ec_lang['lpn_scenario_prompt_name']='اس منظرنامے کا نام';
 $ec_lang['lpn_scenario_rename']='منظرنامے کا نام بدلیں…';
 $ec_lang['lpn_scenario_delete']='منظرنامہ حذف کریں';
-$ec_lang['lpn_scenario_delete_confirm']='منظرنامہ {name} اور اس کی {n} اپنی قدریں حذف کریں؟ ڈرائنگ خود تبدیل نہیں ہوتی۔';
 $ec_lang['lpn_scenario_override']='اس منظرنامے میں اپنی قدر';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_scenario_override_tip']='منتخب ہونے کا مطلب ہے کہ یہ منظرنامہ اس قدر کے لیے اپنے والدین کی قدر کو بدل دیتا ہے، چاہے عدد یکساں ہو۔ والدین کی قدر استعمال کرنے کے لیے خانے سے نشان ہٹائیں۔';
@@ -3277,9 +3276,7 @@ $ec_lang['lpn_energy_curve_note']='یہ پمپ ایک ایسے افادیت وک
 // "Drop" heads the priority column (Task 445): the number says the order values and labels are
 // given up in, and the term of art, Priority, lives in the heading's own tip. It replaced an icon,
 // so it must stay about as short as one -- a heading that needs a wider box is the wrong word.
-// 'lpn_labels_col_rank' is what it replaced, kept unrendered because "Rank" is the OLD sense.
 $ec_lang['lpn_labels_col_decimals_example']='0.000';
-$ec_lang['lpn_labels_col_rank']='درجہ';
 $ec_lang['lpn_labels_col_drop']='حذف';
 
 // ---- Task 441 follow-up: the two symbology groups each carry a colour scheme -----------------
@@ -3886,8 +3883,6 @@ $ec_lang['lpn_copy_kept_link']='{name} کو اصل کے طور پر کھولا �
 $ec_lang['lpn_copy_opened']='{file} کو کاپی کے طور پر کھولا اور محفوظ کیا گیا، نئے لاک کے ساتھ۔';
 $ec_lang['lpn_scenario_basic']='بنیادی موڈ';
 $ec_lang['lpn_scenario_basic_tip']='منتخب: منظرنامہ صرف ان قدروں پر مشتمل ہوتا ہے جو اس میں مقرر کی گئی ہوں۔ نشان ہٹا ہوا: یہ مینو متبادلات کا پیش منظر جدول بھی پیش کرتا ہے، جو دکھاتا ہے کہ وہ قدریں زمرے کے لحاظ سے کیسے گروپ کی گئی ہیں، اور منظرنامے کو الگ کل رن ٹائم اور ہائیڈرالک ٹائم اسٹیپ رکھنے دیتا ہے۔ اس خصوصیت پر رائے کا خیرمقدم ہے۔';
-$ec_lang['lpn_alt_title']='متبادلات کا پیش منظر';
-$ec_lang['lpn_alt_note']='بنیاد ہر زمرے کا بنیادی متبادل استعمال کرتی ہے۔ ہر منظرنامے کا، ہر اس زمرے کے لیے جو تبدیل کیا گیا ہو، ایک الگ متبادل ہوتا ہے، جو بنیادی متبادل کی ذیلی شاخ ہے۔ عدد تبدیل شدہ قدروں کی تعداد ہے۔ آخری تین کالم حساب کے اختیارات ہیں: منظرنامے کے لیے قدر درج کریں، یا والدین کی قدر استعمال کرنے کے لیے اسے خالی چھوڑ دیں۔ پراجیکٹ کی قدریں ترتیبات، حساب، وقت میں ہیں۔';
 $ec_lang['lpn_alt_cat_physical']='طبعی';
 $ec_lang['lpn_alt_cat_demand']='طلب';
 $ec_lang['lpn_alt_cat_topology']='اثاثوں کی فعالیت';

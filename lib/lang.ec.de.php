@@ -2654,7 +2654,6 @@ $ec_lang['lpn_scenario_new_name']='Szenario {n}';
 $ec_lang['lpn_scenario_prompt_name']='Name für dieses Szenario';
 $ec_lang['lpn_scenario_rename']='Szenario umbenennen…';
 $ec_lang['lpn_scenario_delete']='Szenario löschen';
-$ec_lang['lpn_scenario_delete_confirm']='Das Szenario {name} und seine {n} Überschreibungen löschen? Die Zeichnung selbst wird nicht geändert.';
 $ec_lang['lpn_scenario_override']='In diesem Szenario überschreiben';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_scenario_override_tip']='Ausgewählt bedeutet, dass dieses Szenario für diesen Wert den übergeordneten Wert überschreibt, auch wenn die Zahl dieselbe ist. Abwählen, um den übergeordneten Wert zu verwenden.';
@@ -3280,9 +3279,7 @@ $ec_lang['lpn_energy_curve_note']='Diese Pumpen verweisen auf eine Wirkungsgradk
 // "Drop" heads the priority column (Task 445): the number says the order values and labels are
 // given up in, and the term of art, Priority, lives in the heading's own tip. It replaced an icon,
 // so it must stay about as short as one -- a heading that needs a wider box is the wrong word.
-// 'lpn_labels_col_rank' is what it replaced, kept unrendered because "Rank" is the OLD sense.
 $ec_lang['lpn_labels_col_decimals_example']='0,000';
-$ec_lang['lpn_labels_col_rank']='Rang';
 $ec_lang['lpn_labels_col_drop']='Weglassen';
 
 // ---- Task 441 follow-up: the two symbology groups each carry a colour scheme -----------------
@@ -3889,8 +3886,6 @@ $ec_lang['lpn_copy_kept_link']='{name} wurde als Original geöffnet, an einen ne
 $ec_lang['lpn_copy_opened']='{file} wurde als Kopie mit einer neuen Sperre geöffnet und gespeichert.';
 $ec_lang['lpn_scenario_basic']='Basismodus';
 $ec_lang['lpn_scenario_basic_tip']='Ausgewählt: Ein Szenario besteht nur aus den darin festgelegten Werten. Nicht ausgewählt: Dieses Menü bietet außerdem die Vorschautabelle Alternativen, die zeigt, wie diese Werte nach Kategorie gruppiert sind, und erlaubt einem Szenario eine eigene Gesamtlaufzeit und einen eigenen hydraulischen Zeitschritt. Rückmeldungen zu dieser Funktion sind willkommen.';
-$ec_lang['lpn_alt_title']='Vorschau der Alternativen';
-$ec_lang['lpn_alt_note']='Basis verwendet die Basisalternative jeder Kategorie. Jedes Szenario erhält für jede geänderte Kategorie eine eigene Alternative, ein Kind der Basisalternative. Die Zahl gibt an, wie viele Werte geändert sind. Die letzten drei Spalten sind Berechnungsoptionen: Für das Szenario einen Wert eingeben oder leer lassen, um den übergeordneten Wert zu verwenden. Die Projektwerte stehen unter Einstellungen, Berechnung, Zeit.';
 $ec_lang['lpn_alt_cat_physical']='Physikalisch';
 $ec_lang['lpn_alt_cat_demand']='Entnahme';
 $ec_lang['lpn_alt_cat_topology']='Aktivierung von Elementen';

@@ -336,15 +336,18 @@ console.log('\n--- six tabs, one renderer ---');
 	// that is a deliberate departure from "the toolbar's Add order": a customer is not a water
 	// asset, so it belongs with the other tab that is not one rather than between the valves and
 	// the notes. Order within the six water assets is unchanged and is still asserted.
-	report(ids.join(',') === 'junctions,reservoirs,tanks,pipes,pumps,valves,text,customers',
-		'eight asset tables, the six water assets in the toolbar’s Add order, nodes before links',
+	// **NINE SINCE 2026-10-06: Settings** (Tom: *"there will have to be a settings Table"*), last of
+	// the tables: one row per setting, not an asset, so after Customers.
+	// **TEN SINCE 2026-10-09: Scenarios** (Tom, H02), after Settings; its tab is shown only with Basic mode off.
+	report(ids.join(',') === 'junctions,reservoirs,tanks,pipes,pumps,valves,text,customers,settings,scenarios',
+		'eight asset tables, the six water assets in the toolbar’s Add order, nodes before links, then Settings and Scenarios',
 		ids.join(','));
 	// **PROFILE FOLLOWS TIME SERIES** (Tom, 2026-10-04: the graph tabs match the Graphs menu):
 	// after the eight tables, Time series, Profile, Frequency, Flow balance. It was last until
 	// then (2026-08-21). Asserted so a reorder cannot drop it among the tables.
 	report(L.paneTabIds().indexOf('profile') === L.paneTabIds().indexOf('timeseries') + 1
 		&& L.paneTabIds().indexOf('profile') >= 8,
-		'Profile follows Time series, after the eight tables',
+		'Profile follows Time series, after the tables',
 		L.paneTabIds().join(','));
 	report(L.paneTabIds()[0] === 'junctions',
 		'...so the strip OPENS on a table, which is what the Print table menu row acts on',
@@ -357,10 +360,11 @@ console.log('\n--- six tabs, one renderer ---');
 	// **TEN SINCE TASK 247**: Customers joined, with the tables, before the two drawings.
 	// **ELEVEN SINCE TASK 600**: Frequency joined the drawings, between Time series and Profile.
 	// **TWELVE SINCE TASK 600's flow balance**: System flow joined them, after Frequency.
-	report(L.paneTabIds().length === 12, 'twelve tabs in all', String(L.paneTabIds().length));
+	// **THIRTEEN SINCE 2026-10-06**: the Settings table joined the tables.
+	report(L.paneTabIds().length === 14, 'fourteen tabs in all', String(L.paneTabIds().length));
 	report(L.paneTabIds().indexOf('text') === 6 && ids.indexOf('text') === 6,
 		'Text IS a tab since 2026-09-08 (Tom), after the six that solve and before the drawings');
-	report(L.paneTabIds().indexOf('timeseries') === 8,
+	report(L.paneTabIds().indexOf('timeseries') === 10,
 		'Time series is the drawing BEFORE Profile (Task 599)', L.paneTabIds().join(','));
 	// Every table has a panel div of its own in the page, which is also what gives each its own
 	// scroll offset for nothing.
@@ -624,12 +628,14 @@ console.log('\n--- the write seam ---');
 	pcells.diameter._listeners.change[0]();
 	report(L.effective(pipe, 'diameter') === 400, 'typing a pipe diameter changes it in THIS scenario');
 	report(pipe._diameter === baseDia, '...and Base keeps its own', String(pipe._diameter));
-	// The elevation is not an overridable property, and is written exactly as the popup writes it.
+	// The elevation is overridable since 2026-10-12 (Tom: every property), so typed in a scenario it
+	// is that scenario's, as the popup writes it.
 	L.renderTable('junctions');
-	const cellsB = L.tableCells('junctions')[b.id];
+	const cellsB = L.tableCells('junctions')[b.id], elevB = b.elev;
 	cellsB.elev.value = '12.5';
 	cellsB.elev._listeners.change[0]();
-	report(b.elev === 12.5, 'typing in an elevation cell edits the elevation', String(b.elev));
+	report(L.effective(b, 'elev') === 12.5, 'typing in an elevation cell edits the elevation in THIS scenario', String(L.effective(b, 'elev')));
+	report(b.elev === elevB, '...and Base keeps its own', String(b.elev));
 	L.switchScenario('base');
 
 	// **AN EDIT MUST NOT MOVE THE ROW.** The sort was a gesture the user made once, and a table

@@ -2653,7 +2653,6 @@ $ec_lang['lpn_scenario_new_name']='Scenariul {n}';
 $ec_lang['lpn_scenario_prompt_name']='Nume pentru acest scenariu';
 $ec_lang['lpn_scenario_rename']='Redenumire scenariu…';
 $ec_lang['lpn_scenario_delete']='Ștergere scenariu';
-$ec_lang['lpn_scenario_delete_confirm']='Ștergeți scenariul {name} și cele {n} valori specifice ale lui? Desenul propriu-zis nu este modificat.';
 $ec_lang['lpn_scenario_override']='Valoare specifică în acest scenariu';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_scenario_override_tip']='Selectat înseamnă că acest scenariu înlocuiește valoarea părintelui pentru această valoare, chiar dacă numărul este același. Debifați caseta pentru a folosi valoarea părintelui.';
@@ -3279,9 +3278,7 @@ $ec_lang['lpn_energy_curve_note']='Aceste pompe indică o curbă de eficiență 
 // "Drop" heads the priority column (Task 445): the number says the order values and labels are
 // given up in, and the term of art, Priority, lives in the heading's own tip. It replaced an icon,
 // so it must stay about as short as one -- a heading that needs a wider box is the wrong word.
-// 'lpn_labels_col_rank' is what it replaced, kept unrendered because "Rank" is the OLD sense.
 $ec_lang['lpn_labels_col_decimals_example']='0,000';
-$ec_lang['lpn_labels_col_rank']='Rang';
 $ec_lang['lpn_labels_col_drop']='Omis';
 
 // ---- Task 441 follow-up: the two symbology groups each carry a colour scheme -----------------
@@ -3888,8 +3885,6 @@ $ec_lang['lpn_copy_kept_link']='{name} a fost deschis ca original, mutat într-u
 $ec_lang['lpn_copy_opened']='{file} a fost deschis ca o copie și salvat, cu o blocare nouă.';
 $ec_lang['lpn_scenario_basic']='Mod de bază';
 $ec_lang['lpn_scenario_basic_tip']='Selectat: un scenariu constă doar din valorile stabilite în el. Debifat: acest meniu oferă și tabelul de previzualizare a Alternativelor, care arată cum sunt grupate acele valori pe categorii, și permite unui scenariu să aibă o durată totală de rulare și un pas de timp hidraulic separate. Opiniile despre această funcție sunt binevenite.';
-$ec_lang['lpn_alt_title']='Previzualizare Alternative';
-$ec_lang['lpn_alt_note']='Baza folosește alternativa Bază a fiecărei categorii. Fiecare scenariu are o alternativă separată, subordonată alternativei Bază, pentru orice categorie modificată. Numărul este numărul de valori modificate. Ultimele trei coloane sunt opțiuni de calcul: introduceți o valoare pentru scenariu sau lăsați gol pentru a folosi valoarea părinte. Valorile proiectului se află în Setări, Calcul, Timp.';
 $ec_lang['lpn_alt_cat_physical']='Fizic';
 $ec_lang['lpn_alt_cat_demand']='Cerință';
 $ec_lang['lpn_alt_cat_topology']='Activarea elementelor';

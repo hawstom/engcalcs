@@ -2664,7 +2664,6 @@ $ec_lang['lpn_scenario_new_name']='Scénario {n}';
 $ec_lang['lpn_scenario_prompt_name']='Nom de ce scénario';
 $ec_lang['lpn_scenario_rename']='Renommer le scénario…';
 $ec_lang['lpn_scenario_delete']='Supprimer le scénario';
-$ec_lang['lpn_scenario_delete_confirm']='Supprimer le scénario {name} et ses {n} valeurs personnalisées ? Le dessin lui-même n\'est pas modifié.';
 $ec_lang['lpn_scenario_override']='Valeur personnalisée dans ce scénario';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_scenario_override_tip']='Cochée, ce scénario remplace la valeur de son parent pour cette valeur, même si le nombre est identique. Décochez la case pour utiliser celle de son parent.';
@@ -3290,9 +3289,7 @@ $ec_lang['lpn_energy_curve_note']='Ces pompes désignent une courbe de rendement
 // "Drop" heads the priority column (Task 445): the number says the order values and labels are
 // given up in, and the term of art, Priority, lives in the heading's own tip. It replaced an icon,
 // so it must stay about as short as one -- a heading that needs a wider box is the wrong word.
-// 'lpn_labels_col_rank' is what it replaced, kept unrendered because "Rank" is the OLD sense.
 $ec_lang['lpn_labels_col_decimals_example']='0,000';
-$ec_lang['lpn_labels_col_rank']='Rang';
 $ec_lang['lpn_labels_col_drop']='Abandon';
 
 // ---- Task 441 follow-up: the two symbology groups each carry a colour scheme -----------------
@@ -3900,8 +3897,6 @@ $ec_lang['lpn_copy_kept_link']='{name} ouvert comme original, déplacé à un no
 $ec_lang['lpn_copy_opened']='{file} ouvert comme copie et enregistré, avec un nouveau verrou.';
 $ec_lang['lpn_scenario_basic']='Mode de base';
 $ec_lang['lpn_scenario_basic_tip']='Cochée : un scénario ne comprend que les valeurs qui y sont définies. Décochée : ce menu propose aussi le tableau d\'aperçu des Alternatives, qui montre comment ces valeurs sont regroupées par catégorie, et permet à un scénario d\'avoir une durée totale de simulation et un pas de temps hydraulique distincts. Vos commentaires sur cette fonction sont les bienvenus.';
-$ec_lang['lpn_alt_title']='Aperçu des alternatives';
-$ec_lang['lpn_alt_note']='Base utilise l\'alternative Base de chaque catégorie. Chaque scénario a une alternative distincte, enfant de l\'alternative Base, pour toute catégorie modifiée. Le nombre est le total des valeurs modifiées. Les trois dernières colonnes sont des options de calcul : saisissez une valeur pour le scénario, ou laissez vide pour utiliser la valeur du parent. Les valeurs du projet se trouvent dans Paramètres, Calcul, Temps.';
 $ec_lang['lpn_alt_cat_physical']='Physique';
 $ec_lang['lpn_alt_cat_demand']='Demande';
 $ec_lang['lpn_alt_cat_topology']='Activation des éléments';

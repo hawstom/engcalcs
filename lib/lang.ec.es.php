@@ -2695,7 +2695,6 @@ $ec_lang['lpn_scenario_new_name']='Escenario {n}';
 $ec_lang['lpn_scenario_prompt_name']='Nombre para este escenario';
 $ec_lang['lpn_scenario_rename']='Renombrar escenario…';
 $ec_lang['lpn_scenario_delete']='Eliminar escenario';
-$ec_lang['lpn_scenario_delete_confirm']='¿Eliminar el escenario {name}, y los {n} valores que le pertenecen solo a él? El dibujo en sí no cambia.';
 $ec_lang['lpn_scenario_override']='Valor propio de este escenario';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_scenario_override_tip']='Marcado significa que este escenario reemplaza el valor de su padre para este dato, incluso cuando el número es el mismo. Desmarque la casilla para usar el del padre.';
@@ -2718,8 +2717,6 @@ $ec_lang['lpn_alt_cat_initial']='Configuración inicial';
 $ec_lang['lpn_alt_cat_topology']='Activación de elementos';
 $ec_lang['lpn_alt_cat_demand']='Demanda';
 $ec_lang['lpn_alt_cat_physical']='Físico';
-$ec_lang['lpn_alt_note']='Base usa la alternativa Base de cada categoría. Cada escenario tiene una alternativa propia, hija de la alternativa Base, para cada categoría que se cambia. El número es la cantidad de valores cambiados. Las tres últimas columnas son opciones de cálculo: ingrese un valor para el escenario, o déjelo en blanco para usar el valor del padre. Los valores del proyecto están en Configuración, Cálculo, Tiempo.';
-$ec_lang['lpn_alt_title']='Vista previa de alternativas';
 $ec_lang['lpn_scenario_basic_tip']='Marcado: un escenario consiste solo en los valores fijados en él. Sin marcar: este menú ofrece además la tabla de vista previa de Alternativas, que muestra cómo se agrupan esos valores por categoría, y permite que un escenario tenga un tiempo total de simulación y un paso de tiempo hidráulico propios. Se agradecen los comentarios sobre esta función.';
 $ec_lang['lpn_scenario_basic']='Modo básico';
 // Edited by TGH 2026-09-07
@@ -3375,9 +3372,7 @@ $ec_lang['lpn_energy_curve_note']='Estas bombas indican una curva de eficiencia 
 // "Drop" heads the priority column (Task 445): the number says the order values and labels are
 // given up in, and the term of art, Priority, lives in the heading's own tip. It replaced an icon,
 // so it must stay about as short as one -- a heading that needs a wider box is the wrong word.
-// 'lpn_labels_col_rank' is what it replaced, kept unrendered because "Rank" is the OLD sense.
 $ec_lang['lpn_labels_col_decimals_example']='0,000';
-$ec_lang['lpn_labels_col_rank']='Orden';
 $ec_lang['lpn_labels_col_drop']='Descarte';
 
 // ---- Task 441 follow-up: the two symbology groups each carry a colour scheme -----------------

@@ -668,7 +668,10 @@
 		});
 		model.nodes.forEach(function (m) {
 			if (!m || m.type !== 'tank') { return; }
-			var name = named[String(m.id)], curve = name ? curveById[name] : null, pts;
+			// The model states the name its scenario resolves (volCurveName, js/looped-network.js);
+			// a model built without it reads the document's own.
+			var name = m.volCurveName !== undefined ? (m.volCurveName ? String(m.volCurveName) : undefined) : named[String(m.id)],
+				curve = name ? curveById[name] : null, pts;
 			if (!curve) { return; }
 			pts = EC.lpnCurvePoints ? EC.lpnCurvePoints(curve) : null;
 			if (!volumeCurveUsable(pts)) { return; }
@@ -1323,12 +1326,13 @@
 	// ---- the time settings, edited ----
 
 	function ensureTimes() {
+		if (host.editTimes) { return host.editTimes(); }
 		var d = host.doc();
 		if (!d.times) { d.times = EC.lpnTimesDefaults(); d.times.text = {}; }
 		return d.times;
 	}
 	function commitStatistic(name) {
-		var times = host.doc().times, cur = (times && times.statistic) || 'NONE';
+		var times = host.editTimes ? host.editTimes() : host.doc().times, cur = (times && times.statistic) || 'NONE';
 		if (EC.LPN_STATISTICS.indexOf(name) < 0 || name === cur) { return; }
 		host.snapshot();
 		times = ensureTimes();
@@ -1403,7 +1407,7 @@
 	EC.lpnTimeRenderSettings = function () {
 		var panel = document.getElementById('lpn_set_time_fields'), S = strings(), times;
 		if (!panel || !host) { return; }
-		times = projectTimes() || EC.lpnTimesDefaults();
+		times = (host.editTimes ? host.editTimes() : projectTimes()) || EC.lpnTimesDefaults();
 		panel.textContent = '';
 		ovrNotes = {};
 		EC.LPN_TIME_FIELDS.forEach(function (pair) {
@@ -1427,6 +1431,8 @@
 					value: EC.lpnTimeText(times, pair[0], times[pair[0]] || 0)
 				});
 			input.addEventListener('change', function () { commitField(pair[0], input.value); });
+			// Which setting this row edits, for the held-value mark (setboxTag() in looped-network.js).
+			row.setAttribute('data-lpn-setting', JSON.stringify([['times', pair[0]]]));
 			row.appendChild(label);
 			row.appendChild(input);
 			panel.appendChild(row);
@@ -1447,6 +1453,7 @@
 		});
 		ssel.value = times.statistic || 'NONE';
 		ssel.addEventListener('change', function () { commitStatistic(ssel.value); });
+		srow.setAttribute('data-lpn-setting', JSON.stringify([['times', 'statistic']]));
 		srow.appendChild(el('span', {}, S.statistic));
 		srow.appendChild(ssel);
 		panel.appendChild(srow);
@@ -1456,8 +1463,8 @@
 	/**
 	 * **WHICH SCENARIOS OVERRIDE THIS PROJECT SETTING, under the setting.** Redrawn on its own, never
 	 * by rebuilding the seven inputs, because it follows every scenario edit and a rebuild would take
-	 * the focus from a box being typed in. Each scenario name is a button that opens the Alternatives
-	 * preview, where its own value is edited. The names are the visitor's own text and are set as
+	 * the focus from a box being typed in. Each scenario name is a button that opens the Settings
+	 * table on that scenario's row of this setting, where its own value is edited. The names are the visitor's own text and are set as
 	 * text, never as markup.
 	 */
 	EC.lpnTimeRenderOverrides = function () {
@@ -1472,7 +1479,7 @@
 			note.appendChild(document.createTextNode(S.scnOverrides + ' '));
 			mine.forEach(function (o, i) {
 				var b = el('button', { type: 'button', class: 'lpn-time-ovr-btn' }, o.name);
-				b.addEventListener('click', function () { if (host.openScenarioOptions) { host.openScenarioOptions(o.id); } });
+				b.addEventListener('click', function () { if (host.openScenarioOptions) { host.openScenarioOptions(o.id, key); } });
 				if (i) { note.appendChild(document.createTextNode(', ')); }
 				note.appendChild(b);
 				note.appendChild(document.createTextNode(' (' + o.text + ')'));

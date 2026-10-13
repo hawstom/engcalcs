@@ -2693,7 +2693,6 @@ $ec_lang['lpn_scenario_new_name']='အခြေအနေ {n}';
 $ec_lang['lpn_scenario_prompt_name']='ဤအခြေအနေအတွက် အမည်';
 $ec_lang['lpn_scenario_rename']='အခြေအနေ အမည်ပြောင်းရန်…';
 $ec_lang['lpn_scenario_delete']='အခြေအနေ ဖျက်ရန်';
-$ec_lang['lpn_scenario_delete_confirm']='အခြေအနေ {name} နှင့် ၎င်း၏ ကိုယ်ပိုင်တန်ဖိုး {n} ခုကို ဖျက်မလား။ ပုံဆွဲမှုကိုယ်တိုင်ကို မပြောင်းလဲပါ။';
 $ec_lang['lpn_scenario_override']='ဤအခြေအနေတွင် ကိုယ်ပိုင်တန်ဖိုး';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_scenario_override_tip']='ရွေးချယ်ထားလျှင် ဂဏန်းတူနေသော်လည်း ဤအခြေအနေက ဤတန်ဖိုးအတွက် ၎င်း၏ မိဘကို အစားထိုးသည်။ မိဘ၏တန်ဖိုးကို သုံးရန် ဘောက်စ်ကို ရှင်းလင်းပါ။';
@@ -2709,8 +2708,6 @@ $ec_lang['lpn_scenario_push_btn']='အခြေခံ တန်ဖိုးမ�
 $ec_lang['lpn_scenario_push_tip']='ယခု ပြသနေသော ဂုဏ်သတ္တိများအတွက် အခြေအနေအားလုံးသည် အခြေခံ တန်ဖိုးသို့ ပြန်သွားမည်။ ထိုအခြေအနေများ တစ်ခုတည်း ပိုင်ဆိုင်သော တန်ဖိုးများကို ပယ်ချမည်။';
 $ec_lang['lpn_scenario_basic']='အခြေခံ မုဒ်';
 $ec_lang['lpn_scenario_basic_tip']='ရွေးချယ်ထားလျှင် - အခြေအနေတစ်ခုတွင် ၎င်းထဲတွင် သတ်မှတ်ထားသော တန်ဖိုးများသာ ပါသည်။ ဖယ်ထားလျှင် - ဤမီနူးတွင် တန်ဖိုးများကို အမျိုးအစားအလိုက် အုပ်စုဖွဲ့ပုံကို ပြသော အစားထိုးရွေးချယ်မှု ကြိုတင်ကြည့်ဇယားကိုလည်း ပေးပြီး အခြေအနေတစ်ခုတွင် သီးခြား စုစုပေါင်းလည်ပတ်ချိန်နှင့် ဟိုက်ဒရောလစ် အချိန်အဆင့် ထားခွင့်ပြုသည်။ ဤလုပ်ဆောင်ချက်အတွက် တုံ့ပြန်ချက်ကို ကြိုဆိုသည်။';
-$ec_lang['lpn_alt_title']='အခြားရွေးစရာများ ကြိုတင်ကြည့်ရှုမှု';
-$ec_lang['lpn_alt_note']='အခြေခံ (Base) သည် အမျိုးအစားတိုင်း၏ အခြေခံ အစားထိုးကို သုံးသည်။ အခြေအနေတစ်ခုစီတွင် ပြောင်းလဲထားသော အမျိုးအစားတိုင်းအတွက် အခြေခံ အစားထိုး၏ အခွဲဖြစ်သော သီးခြား အစားထိုးတစ်ခု ရှိသည်။ ဂဏန်းသည် ပြောင်းလဲထားသော တန်ဖိုးအရေအတွက် ဖြစ်သည်။ နောက်ဆုံးကော်လံသုံးခုသည် တွက်ချက်မှု ရွေးစရာများ ဖြစ်သည် - အခြေအနေအတွက် တန်ဖိုးတစ်ခု ထည့်သွင်းပါ၊ သို့မဟုတ် မိဘတန်ဖိုးကို သုံးရန် အလွတ်ထားပါ။ ပရောဂျက်တန်ဖိုးများသည် ဆက်တင်များ၊ တွက်ချက်မှု၊ အချိန် တွင် ရှိသည်။';
 $ec_lang['lpn_alt_cat_physical']='ရုပ်ပိုင်းဆိုင်ရာ';
 $ec_lang['lpn_alt_cat_demand']='လိုအပ်ချက်';
 $ec_lang['lpn_alt_cat_topology']='အစိတ်အပိုင်း ဖွင့်ပိတ်မှု';
@@ -3373,9 +3370,7 @@ $ec_lang['lpn_energy_curve_note']='ဤရေတင်စက်များသည
 // "Drop" heads the priority column (Task 445): the number says the order values and labels are
 // given up in, and the term of art, Priority, lives in the heading's own tip. It replaced an icon,
 // so it must stay about as short as one -- a heading that needs a wider box is the wrong word.
-// 'lpn_labels_col_rank' is what it replaced, kept unrendered because "Rank" is the OLD sense.
 $ec_lang['lpn_labels_col_decimals_example']='0.000';
-$ec_lang['lpn_labels_col_rank']='အဆင့်';
 $ec_lang['lpn_labels_col_drop']='ချန်ရန်';
 
 // ---- Task 441 follow-up: the two symbology groups each carry a colour scheme -----------------

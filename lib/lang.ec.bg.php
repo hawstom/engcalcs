@@ -2695,7 +2695,6 @@ $ec_lang['lpn_scenario_new_name']='Сценарий {n}';
 $ec_lang['lpn_scenario_prompt_name']='Име за този сценарий';
 $ec_lang['lpn_scenario_rename']='Преименуване на сценарий…';
 $ec_lang['lpn_scenario_delete']='Изтриване на сценарий';
-$ec_lang['lpn_scenario_delete_confirm']='Да се изтрие ли сценарият {name} и неговите {n} свои стойности? Самият чертеж не се променя.';
 $ec_lang['lpn_scenario_override']='Своя стойност в този сценарий';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_scenario_override_tip']='Отметнато означава, че този сценарий замества стойността на родителския си сценарий за тази стойност, дори когато числото е същото. Изчистете отметката, за да се използва стойността на родителя.';
@@ -2718,8 +2717,6 @@ $ec_lang['lpn_alt_cat_initial']='Начални настройки';
 $ec_lang['lpn_alt_cat_topology']='Активиране на обекти';
 $ec_lang['lpn_alt_cat_demand']='Потребност';
 $ec_lang['lpn_alt_cat_physical']='Физически';
-$ec_lang['lpn_alt_note']='Базовият сценарий използва Базовата алтернатива на всяка категория. Всеки сценарий има отделна алтернатива, наследник на Базовата, за всяка променена категория. Числото е броят на променените стойности. Последните три колони са опции за изчисление: въведете стойност за сценария или я оставете празна, за да се използва стойността на родителя. Стойностите на проекта са в Настройки, Изчисление, Време.';
-$ec_lang['lpn_alt_title']='Преглед на алтернативите';
 $ec_lang['lpn_scenario_basic_tip']='Отметнато: сценарият се състои само от стойностите, зададени в него. Изчистено: това меню предлага и таблицата за преглед на Алтернативите, която показва как тези стойности са групирани по категории, и позволява на сценарий да има отделна обща продължителност на изчислението и хидравлична времева стъпка. Отзивите за тази функция са добре дошли.';
 $ec_lang['lpn_scenario_basic']='Основен режим';
 // Edited by TGH 2026-09-07
@@ -3375,9 +3372,7 @@ $ec_lang['lpn_energy_curve_note']='Тези помпи сочат крива н�
 // "Drop" heads the priority column (Task 445): the number says the order values and labels are
 // given up in, and the term of art, Priority, lives in the heading's own tip. It replaced an icon,
 // so it must stay about as short as one -- a heading that needs a wider box is the wrong word.
-// 'lpn_labels_col_rank' is what it replaced, kept unrendered because "Rank" is the OLD sense.
 $ec_lang['lpn_labels_col_decimals_example']='0,000';
-$ec_lang['lpn_labels_col_rank']='Ранг';
 $ec_lang['lpn_labels_col_drop']='Отпада';
 
 // ---- Task 441 follow-up: the two symbology groups each carry a colour scheme -----------------

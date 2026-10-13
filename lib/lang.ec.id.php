@@ -2656,7 +2656,6 @@ $ec_lang['lpn_scenario_new_name']='Skenario {n}';
 $ec_lang['lpn_scenario_prompt_name']='Nama untuk skenario ini';
 $ec_lang['lpn_scenario_rename']='Ganti nama skenario…';
 $ec_lang['lpn_scenario_delete']='Hapus skenario';
-$ec_lang['lpn_scenario_delete_confirm']='Hapus skenario {name}, beserta {n} nilai khususnya? Gambar itu sendiri tidak berubah.';
 $ec_lang['lpn_scenario_override']='Nilai khusus di skenario ini';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_scenario_override_tip']='Dicentang berarti skenario ini menimpa induknya untuk nilai ini, meskipun angkanya sama. Hapus centang untuk memakai nilai induk.';
@@ -3282,9 +3281,7 @@ $ec_lang['lpn_energy_curve_note']='Pompa-pompa ini memanggil kurva efisiensi yan
 // "Drop" heads the priority column (Task 445): the number says the order values and labels are
 // given up in, and the term of art, Priority, lives in the heading's own tip. It replaced an icon,
 // so it must stay about as short as one -- a heading that needs a wider box is the wrong word.
-// 'lpn_labels_col_rank' is what it replaced, kept unrendered because "Rank" is the OLD sense.
 $ec_lang['lpn_labels_col_decimals_example']='0,000';
-$ec_lang['lpn_labels_col_rank']='Peringkat';
 $ec_lang['lpn_labels_col_drop']='Lepas';
 
 // ---- Task 441 follow-up: the two symbology groups each carry a colour scheme -----------------
@@ -3892,8 +3889,6 @@ $ec_lang['lpn_copy_kept_link']='Membuka {name} sebagai berkas asli, yang dipinda
 $ec_lang['lpn_copy_opened']='{file} dibuka sebagai salinan dan disimpan, dengan kunci baru.';
 $ec_lang['lpn_scenario_basic']='Mode dasar';
 $ec_lang['lpn_scenario_basic_tip']='Dicentang: skenario hanya terdiri dari nilai yang diatur di dalamnya. Tidak dicentang: menu ini juga menawarkan tabel pratinjau Alternatif, yang menunjukkan bagaimana nilai-nilai itu dikelompokkan menurut kategori, dan memungkinkan skenario memiliki total waktu berjalan dan langkah waktu hidraulik tersendiri. Umpan balik tentang fitur ini diterima dengan senang hati.';
-$ec_lang['lpn_alt_title']='Pratinjau Alternatif';
-$ec_lang['lpn_alt_note']='Dasar menggunakan alternatif Dasar dari setiap kategori. Setiap skenario memiliki alternatif tersendiri, turunan dari alternatif Dasar, untuk kategori apa pun yang diubah. Angkanya adalah jumlah nilai yang diubah. Tiga kolom terakhir adalah opsi perhitungan: masukkan nilai untuk skenario, atau biarkan kosong untuk memakai nilai induk. Nilai proyek berada di Pengaturan, Perhitungan, Waktu.';
 $ec_lang['lpn_alt_cat_physical']='Fisik';
 $ec_lang['lpn_alt_cat_demand']='Kebutuhan';
 $ec_lang['lpn_alt_cat_topology']='Pengaktifan elemen';

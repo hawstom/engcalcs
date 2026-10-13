@@ -242,9 +242,8 @@ function nodeOf(id) { return L.getDoc().nodes.filter(n => n.id === id)[0]; }
 		L.hasOverride(l0, 'diameter') === false && L.effective(l0, 'diameter') === 6,
 		String(L.effective(l0, 'diameter')));
 
-	// **ELEVATION IS THE DELIBERATE EXCEPTION AND IT IS BASE-OWNED.** It is survey data, not a design
-	// variable, so it is not in LPN_OVERRIDABLE and pushSpecList() gives it no `prop` -- exactly as
-	// the property popup writes it. Asserted so the exception stays a decision rather than a bug.
+	// **ELEVATION IS NO EXCEPTION ANY MORE** (Tom, 2026-10-12: every property overridable): a
+	// replace inside a scenario writes the scenario's own ground, as the property popup does.
 	nodeOf(n.nodes[0]).elev = 100;
 	nodeOf(n.nodes[1]).elev = 100;
 	L.query('junction', 'elev', 'equals', '100');
@@ -252,8 +251,8 @@ function nodeOf(id) { return L.getDoc().nodes.filter(n => n.id === id)[0]; }
 	L.preview();
 	ok('elevation is replaceable', L.pending() && L.pending().length === 2, JSON.stringify(L.pending()));
 	L.apply();
-	ok('...and writes Base, because elevation is not a scenario variable',
-		nodeOf(n.nodes[0]).elev === 120 && L.hasOverride(nodeOf(n.nodes[0]), 'elev') === false);
+	ok('...and writes the scenario\'s own elevation, leaving Base\'s 100',
+		nodeOf(n.nodes[0]).elev === 100 && L.hasOverride(nodeOf(n.nodes[0]), 'elev') === true);
 }
 
 // ---- 5. what is offered, and where ---------------------------------------------------------------

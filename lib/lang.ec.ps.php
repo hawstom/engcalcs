@@ -2653,7 +2653,6 @@ $ec_lang['lpn_scenario_new_name']='سناریو {n}';
 $ec_lang['lpn_scenario_prompt_name']='د دې سناریو لپاره نوم';
 $ec_lang['lpn_scenario_rename']='د سناریو نوم بدلول…';
 $ec_lang['lpn_scenario_delete']='سناریو ړنګول';
-$ec_lang['lpn_scenario_delete_confirm']='سناریو {name}، او هغه {n} ارزښتونه چې یوازې ورسره اړه لري، ړنګ کړم؟ خپل انځور نه بدلیږي.';
 $ec_lang['lpn_scenario_override']='یوازې په دې سناریو کې';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_scenario_override_tip']='چک شوی یې معنی دا ده چې دا ارزښت یوازې دې سناریو پورې اړه لري، حتی که ورته شمېره وي لکه اساس کې. بکس پاک کړئ ترڅو بېرته د اساس ارزښت وکارول شي.';
@@ -3279,9 +3278,7 @@ $ec_lang['lpn_energy_curve_note']='دا پمپونه یوه داسې اغیزن�
 // "Drop" heads the priority column (Task 445): the number says the order values and labels are
 // given up in, and the term of art, Priority, lives in the heading's own tip. It replaced an icon,
 // so it must stay about as short as one -- a heading that needs a wider box is the wrong word.
-// 'lpn_labels_col_rank' is what it replaced, kept unrendered because "Rank" is the OLD sense.
 $ec_lang['lpn_labels_col_decimals_example']='0.000';
-$ec_lang['lpn_labels_col_rank']='رتبه';
 $ec_lang['lpn_labels_col_drop']='پرېښودل';
 
 // ---- Task 441 follow-up: the two symbology groups each carry a colour scheme -----------------
@@ -3892,8 +3889,6 @@ $ec_lang['lpn_copy_kept_link']='{name} د اصلي په توګه، په نوي �
 $ec_lang['lpn_copy_opened']='{file} د کاپي په توګه پرانیستل شو او د نوي بندیز سره وساتل شو.';
 $ec_lang['lpn_scenario_basic']='ساده حالت';
 $ec_lang['lpn_scenario_basic_tip']='ټاکل شوی: سناریو یوازې له هغو ارزښتونو جوړه ده چې پکې ټاکل شوي. پاک شوی: دا مینو د بدیلونو مخکتنې جدول هم وړاندې کوي، چې ښیي دا ارزښتونه په کټګورۍ سره څنګه ډلبندي شوي، او اجازه ورکوي چې سناریو جلا ټول چلولو وخت او هیدرولیکي وخت ګام ولري. د دې ځانګړتیا په اړه نظر ښه راغلاست دی.';
-$ec_lang['lpn_alt_title']='د بدیلونو مخکتنه';
-$ec_lang['lpn_alt_note']='اساسي هره کټګورۍ د اساسي بدیل کاروي. هره سناریو د هرې بدلې شوې کټګورۍ لپاره جلا بدیل لري، چې د اساسي بدیل ماشوم دی. شمېره د بدل شویو ارزښتونو شمېر دی. وروستي درې کالمونه د محاسبې اختیارونه دي: د سناریو لپاره ارزښت ولیکئ، یا یې خالي پرېږدئ ترڅو د والد ارزښت وکارول شي. د پروژې ارزښتونه په تنظیماتو، محاسبه، وخت کې دي.';
 $ec_lang['lpn_alt_cat_physical']='فزیکي';
 $ec_lang['lpn_alt_cat_demand']='غوښتنه';
 $ec_lang['lpn_alt_cat_topology']='د شتمنیو فعالول';

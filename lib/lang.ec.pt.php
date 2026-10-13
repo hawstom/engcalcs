@@ -2653,7 +2653,6 @@ $ec_lang['lpn_scenario_new_name']='Cenário {n}';
 $ec_lang['lpn_scenario_prompt_name']='Nome para este cenário';
 $ec_lang['lpn_scenario_rename']='Renomear cenário…';
 $ec_lang['lpn_scenario_delete']='Excluir cenário';
-$ec_lang['lpn_scenario_delete_confirm']='Excluir o cenário {name} e seus {n} valores individuais? O desenho em si não é alterado.';
 $ec_lang['lpn_scenario_override']='Valor individual neste cenário';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_scenario_override_tip']='Marcado significa que este cenário substitui o valor do pai, mesmo quando o número é o mesmo. Desmarque a caixa para usar o do pai.';
@@ -3279,9 +3278,7 @@ $ec_lang['lpn_energy_curve_note']='Estas bombas indicam uma curva de eficiência
 // "Drop" heads the priority column (Task 445): the number says the order values and labels are
 // given up in, and the term of art, Priority, lives in the heading's own tip. It replaced an icon,
 // so it must stay about as short as one -- a heading that needs a wider box is the wrong word.
-// 'lpn_labels_col_rank' is what it replaced, kept unrendered because "Rank" is the OLD sense.
 $ec_lang['lpn_labels_col_decimals_example']='0,000';
-$ec_lang['lpn_labels_col_rank']='Posição';
 $ec_lang['lpn_labels_col_drop']='Descarte';
 
 // ---- Task 441 follow-up: the two symbology groups each carry a colour scheme -----------------
@@ -3890,8 +3887,6 @@ $ec_lang['lpn_copy_kept_link']='{name} foi aberto como o original, movido para o
 $ec_lang['lpn_copy_opened']='{file} foi aberto como uma cópia e salvo, com um novo bloqueio.';
 $ec_lang['lpn_scenario_basic']='Modo básico';
 $ec_lang['lpn_scenario_basic_tip']='Marcado: um cenário consiste apenas nos valores definidos nele. Desmarcado: este menu também oferece a tabela de prévia de Alternativas, que mostra como esses valores são agrupados por categoria, e permite que um cenário tenha uma duração total e um passo de tempo hidráulico próprios. Comentários sobre este recurso são bem-vindos.';
-$ec_lang['lpn_alt_title']='Prévia de Alternativas';
-$ec_lang['lpn_alt_note']='Somente leitura. A Base usa a alternativa Base de todas as categorias. Cada cenário tem uma alternativa própria, filha da alternativa Base, para toda categoria que seja alterada. O número é a quantidade de valores alterados. As três últimas colunas são opções de cálculo: informe um valor para o cenário ou deixe em branco para usar o valor do pai. Os valores do projeto estão em Configurações, Cálculo, Tempo.';
 $ec_lang['lpn_alt_cat_physical']='Físico';
 $ec_lang['lpn_alt_cat_demand']='Demanda';
 $ec_lang['lpn_alt_cat_topology']='Ativação de elementos';

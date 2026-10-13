@@ -2652,7 +2652,6 @@ $ec_lang['lpn_scenario_new_name']='Сценарио {n}';
 $ec_lang['lpn_scenario_prompt_name']='Назив овог сценарија';
 $ec_lang['lpn_scenario_rename']='Преименуј сценарио…';
 $ec_lang['lpn_scenario_delete']='Обриши сценарио';
-$ec_lang['lpn_scenario_delete_confirm']='Обрисати сценарио {name} и {n} вредности које припадају само њему? Сам цртеж се не мења.';
 $ec_lang['lpn_scenario_override']='Само у овом сценарију';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_scenario_override_tip']='Означено значи да овај сценарио има унету вредност за ово поље, чак и када је исти број као Основа. Уклоните ознаку да бисте поново користили вредност из Основе.';
@@ -3278,9 +3277,7 @@ $ec_lang['lpn_energy_curve_note']='Ове пумпе упућују на кри�
 // "Drop" heads the priority column (Task 445): the number says the order values and labels are
 // given up in, and the term of art, Priority, lives in the heading's own tip. It replaced an icon,
 // so it must stay about as short as one -- a heading that needs a wider box is the wrong word.
-// 'lpn_labels_col_rank' is what it replaced, kept unrendered because "Rank" is the OLD sense.
 $ec_lang['lpn_labels_col_decimals_example']='0,000';
-$ec_lang['lpn_labels_col_rank']='Ранг';
 $ec_lang['lpn_labels_col_drop']='Изостави';
 
 // ---- Task 441 follow-up: the two symbology groups each carry a colour scheme -----------------
@@ -3889,8 +3886,6 @@ $ec_lang['lpn_copy_kept_link']='Отворено {name} као оригинал,
 $ec_lang['lpn_copy_opened']='Отворено {file} као копија и сачувано, са новим закључавањем.';
 $ec_lang['lpn_scenario_basic']='Основни режим';
 $ec_lang['lpn_scenario_basic_tip']='Означено: сценарио се састоји само од вредности постављених у њему. Неозначено: овај мени нуди и табелу Преглед алтернатива, која показује како су те вредности груписане по категоријама, и омогућава да сценарио има засебно укупно време рада и хидраулички временски корак. Повратне информације о овој функцији су добродошле.';
-$ec_lang['lpn_alt_title']='Преглед алтернатива';
-$ec_lang['lpn_alt_note']='Основа користи Основну алтернативу сваке категорије. Сваки сценарио има засебну алтернативу, дете Основне алтернативе, за сваку категорију која је измењена. Број је колико има измењених вредности. Последње три колоне су опције прорачуна: унесите вредност за сценарио или оставите празно да користи вредност родитеља. Вредности пројекта су у Подешавања, Прорачун, Време.';
 $ec_lang['lpn_alt_cat_physical']='Физичко';
 $ec_lang['lpn_alt_cat_demand']='Потрошња';
 $ec_lang['lpn_alt_cat_topology']='Активација елемената';

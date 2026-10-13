@@ -2695,7 +2695,6 @@ $ec_lang['lpn_scenario_new_name']='Сценарій {n}';
 $ec_lang['lpn_scenario_prompt_name']='Назва цього сценарію';
 $ec_lang['lpn_scenario_rename']='Перейменувати сценарій…';
 $ec_lang['lpn_scenario_delete']='Видалити сценарій';
-$ec_lang['lpn_scenario_delete_confirm']='Видалити сценарій {name} і {n} значень, які належать лише йому? Саме креслення не зміниться.';
 $ec_lang['lpn_scenario_override']='Лише в цьому сценарії';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_scenario_override_tip']='Вибрано означає, що цей сценарій перевизначає батьківський для цього значення, навіть якщо число те саме. Зніміть позначку, щоб використовувати значення батьківського.';
@@ -2718,8 +2717,6 @@ $ec_lang['lpn_alt_cat_initial']='Початкові налаштування';
 $ec_lang['lpn_alt_cat_topology']='Активація елементів';
 $ec_lang['lpn_alt_cat_demand']='Споживання';
 $ec_lang['lpn_alt_cat_physical']='Фізичні';
-$ec_lang['lpn_alt_note']='Базовий сценарій використовує базову альтернативу кожної категорії. Кожен сценарій має окрему альтернативу, дочірню до базової, для кожної зміненої категорії. Число — це кількість змінених значень. Останні три стовпці — параметри розрахунку: введіть значення для сценарію або залиште порожнім, щоб узяти значення батьківського. Значення проєкту задано в Налаштування, Розрахунок, Час.';
-$ec_lang['lpn_alt_title']='Попередній перегляд альтернатив';
 $ec_lang['lpn_scenario_basic_tip']='Вибрано: сценарій складається лише зі значень, заданих у ньому. Знято: це меню також пропонує таблицю попереднього перегляду альтернатив, яка показує, як ці значення згруповано за категоріями, і дає змогу задати сценарію окремий загальний час роботи та гідравлічний часовий крок. Відгуки про цю функцію вітаються.';
 $ec_lang['lpn_scenario_basic']='Базовий режим';
 // Edited by TGH 2026-09-07
@@ -3375,9 +3372,7 @@ $ec_lang['lpn_energy_curve_note']='Ці насоси посилаються на
 // "Drop" heads the priority column (Task 445): the number says the order values and labels are
 // given up in, and the term of art, Priority, lives in the heading's own tip. It replaced an icon,
 // so it must stay about as short as one -- a heading that needs a wider box is the wrong word.
-// 'lpn_labels_col_rank' is what it replaced, kept unrendered because "Rank" is the OLD sense.
 $ec_lang['lpn_labels_col_decimals_example']='0,000';
-$ec_lang['lpn_labels_col_rank']='Ранг';
 $ec_lang['lpn_labels_col_drop']='Пропуск';
 
 // ---- Task 441 follow-up: the two symbology groups each carry a colour scheme -----------------

@@ -2652,7 +2652,6 @@ $ec_lang['lpn_scenario_new_name']='سناریوی {n}';
 $ec_lang['lpn_scenario_prompt_name']='نامی برای این سناریو';
 $ec_lang['lpn_scenario_rename']='تغییر نام سناریو…';
 $ec_lang['lpn_scenario_delete']='حذف سناریو';
-$ec_lang['lpn_scenario_delete_confirm']='سناریوی {name} و {n} مقدار اختصاصی آن حذف شود؟ خود ترسیم تغییر نمی‌کند.';
 $ec_lang['lpn_scenario_override']='مقدار اختصاصی در این سناریو';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_scenario_override_tip']='علامت‌دار یعنی این سناریو برای این مقدار بر والد خود مقدم است، حتی وقتی عدد یکسان است. برای استفاده از مقدار والد، علامت جعبه را بردارید.';
@@ -3278,9 +3277,7 @@ $ec_lang['lpn_energy_curve_note']='این پمپ‌ها به یک منحنی ب�
 // "Drop" heads the priority column (Task 445): the number says the order values and labels are
 // given up in, and the term of art, Priority, lives in the heading's own tip. It replaced an icon,
 // so it must stay about as short as one -- a heading that needs a wider box is the wrong word.
-// 'lpn_labels_col_rank' is what it replaced, kept unrendered because "Rank" is the OLD sense.
 $ec_lang['lpn_labels_col_decimals_example']='0.000';
-$ec_lang['lpn_labels_col_rank']='رتبه';
 $ec_lang['lpn_labels_col_drop']='حذف';
 
 // ---- Task 441 follow-up: the two symbology groups each carry a colour scheme -----------------
@@ -3891,8 +3888,6 @@ $ec_lang['lpn_copy_kept_link']='{name} به‌عنوان فایل اصلی با�
 $ec_lang['lpn_copy_opened']='{file} به‌صورت یک نسخه باز و ذخیره شد، با یک قفل تازه.';
 $ec_lang['lpn_scenario_basic']='حالت پایه';
 $ec_lang['lpn_scenario_basic_tip']='علامت‌دار: یک سناریو فقط از مقدارهایی تشکیل می‌شود که در آن تنظیم شده‌اند. بدون علامت: این منو جدول پیش‌نمایش گزینه‌های جایگزین را نیز عرضه می‌کند، که نشان می‌دهد آن مقدارها بر پایهٔ دسته چگونه گروه‌بندی می‌شوند، و به هر سناریو اجازه می‌دهد کل مدت اجرا و گام زمانی هیدرولیکی جداگانه داشته باشد. بازخورد دربارهٔ این قابلیت خوش‌آمد است.';
-$ec_lang['lpn_alt_title']='پیش‌نمایش گزینه‌های جایگزین';
-$ec_lang['lpn_alt_note']='پایه از گزینهٔ جایگزین پایهٔ هر دسته استفاده می‌کند. هر سناریو برای هر دسته‌ای که تغییر کرده یک گزینهٔ جایگزین جداگانه دارد، که فرزند گزینهٔ جایگزین پایه است. عدد، شمار مقدارهای تغییریافته است. سه ستون آخر گزینه‌های محاسبه‌اند: برای سناریو مقداری وارد کنید، یا برای استفاده از مقدار والد خالی بگذارید. مقدارهای پروژه در تنظیمات، محاسبه، زمان هستند.';
 $ec_lang['lpn_alt_cat_physical']='فیزیکی';
 $ec_lang['lpn_alt_cat_demand']='مصرف';
 $ec_lang['lpn_alt_cat_topology']='فعال‌سازی المان‌ها';

@@ -152,9 +152,9 @@ console.log('\n--- one seam decides how a standing box opens (rule 2) ---');
 		// Criticality analysis (Tom, 2026-09-30): fire flow's sibling on the same shell, with a
 		// report table, so a phone wants the whole window for it as it does for fire flow's.
 		['openCriticalityBox', 'Criticality analysis'],
-		// The Alternatives table (dev/scenario-alternatives.md): one row per scenario and nine
-		// category columns, the widest case of all, so a phone wants the whole window for it.
-		['openAlternativesBox', 'the alternatives box'],
+		// The Scenario manager (dev/scenario-alternatives.md): a tree box that must still fill a phone;
+		// a phone wants the whole window for it, as for every standing box.
+		['openScenarioManager', 'the scenario box'],
 		// The Tables and Hotkeys box (Task 745): the same non-hog shell and memory as Notes, built
 		// the same way and for the same reason -- reference prose a reader keeps open beside the
 		// work, so a phone wants the same fill.
@@ -527,8 +527,10 @@ console.log('\n--- a box that fills the screen has to be scrollable by finger --
 	// still never a zero.
 	ok('...and blank still means "the file did not say"',
 		/input\.value = home\(\)\[key\] === undefined \? '' :/.test(body('hydNumberRow')));
-	ok('...in whichever of the row\'s two homes the value lives',
-		/\(o\.perScenario && !inBaseScenario\(\)\) \? activeScenario\(\) : settings\.hydraulics/
+	ok('...and the row has one home, the hydraulics object the Settings box seam points it at',
+		// In a scenario the box's seam (withSetboxView(), setboxEditEnd()) shows the scenario's value
+		// and sends an edit to the scenario, the demand multiplier included (stage 3b).
+		/var home = function \(\) \{ return settings\.hydraulics \|\| \(settings\.hydraulics = \{\}\); \};/
 			.test(body('hydNumberRow')));
 	ok('an unset hydraulics row shows NO number: no placeholder is set',
 		!/input\.placeholder\s*=/.test(body('hydNumberRow')));

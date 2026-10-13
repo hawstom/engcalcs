@@ -832,6 +832,7 @@ $ec_lang['lpn_node_customers_tip']='List of customers added here because this wa
 $ec_lang['lpn_node_customers_sum']='{total} {unit} from {n} Customers';
 $ec_lang['lpn_customer_detached']='⚠ This customer is not connected to a pipe, so its demand is not in the answers. Delete it, or draw a pipe and move the customer onto it.';
 $ec_lang['lpn_customer_fixed_head']='⚠ The near end of that pipe holds a fixed water surface, so this demand does not affect the simulation.';
+$ec_lang['lpn_customer_node_inactive']='This customer is assigned to a junction that is inactive in this scenario, so its demand is not part of the solve.';
 $ec_lang['lpn_customer_detached_count']='{n} customers are not connected to a pipe. Their demand is not accounted for.';
 $ec_lang['lpn_meter_pick_pipe']='Now select the pipe or the node that serves this customer. The customer stays where you put it. Press Escape to cancel.';
 $ec_lang['lpn_inp_export_flat_customers']='An EPANET file has no customers. The demand of the {n} customers in this project is written as a demand row on the junction each customer is assigned to, named with the customer\'s tag. The file does not record the customer itself: its location, the pipe that serves it, where along that pipe the service connects, or how many services it represents. That information remains in the project; save the project file to keep it.';
@@ -1115,7 +1116,6 @@ $ec_lang['lpn_guide_text_contour_box']='Controls the contour plot drawn on the m
 $ec_lang['lpn_guide_text_scncmp_box']='Solves every scenario from a copy of the drawing and tabulates, for each, the number of overrides, the lowest pressure, and the highest velocity. It does not change the project, and the scenario that is open is left as it was.';
 $ec_lang['lpn_guide_text_rptbox']='Shows the text report written by the EPANET engine for the last extended period simulation, including its warnings and the network summary. Each extended period simulation replaces it; a solve at a single instant does not, and an edit leaves the previous report in place.';
 $ec_lang['lpn_guide_text_status_box']='Lists, in time order, each change during the last extended period simulation: a pump, valve, or pipe opening or closing, a tank starting to fill or empty or becoming full or empty, and any time step that did not fully converge. Only changes are listed, not every time step.';
-$ec_lang['lpn_guide_text_alt_box']='Shows, for each scenario, which alternative it uses in each category, such as Physical, Demand, and Asset activation, and its calculation options: demand multiplier, total run time, and hydraulic time step. The alternatives are read-only. A scenario\'s calculation options can be typed here, and a blank uses its parent\'s value. Open it from the Scenarios menu after clearing Basic mode.';
 $ec_lang['lpn_guide_text_full_box']='Lists every node and every link at every reporting time step, in the units shown on the Tables pane. Without an extended period simulation, it shows the current solution at a single instant. Download or print carries every time step, and the table shows one at a time.';
 $ec_lang['lpn_guide_text_calib_box']='Compares a file of field measurements with the calculated results at the same locations and times, one file for each parameter. The file is held for the current session only and is not saved with the project.';
 $ec_lang['lpn_guide_text_notes_popup']='Lists notes on how this page behaves and what it does not do, each as a term followed by its definition. It does not change the network.';
@@ -1143,7 +1143,6 @@ $ec_lang['lpn_guide_keys_def']='<table class="lpn-notes-table"><tbody><tr><td>?<
 // {menu} becomes a path such as "Edit > Delete", drawn with chevrons; keep {menu} as it is.
 $ec_lang['lpn_guide_also']='Also in {menu}';
 $ec_lang['lpn_guide_how_popup']='Properties opens when you select an asset or text.';
-$ec_lang['lpn_guide_how_alt']='Alternatives preview is listed under Water, Scenarios when Basic mode is off.';
 $ec_lang['lpn_guide_not_shown']='This control is not on screen right now.';
 // The box's two context headings. "Tables" holds the two table-help entries that used to sit only
 // in the Notes list (lpn_notes_6/7, moved rather than duplicated); "Map" is new -- the digit tool
@@ -1595,6 +1594,14 @@ $ec_lang['lpn_pane_sel_only_none']='No elements are selected. Select elements on
 // Show scenarios (Tom, 2026-10-05): the table's cell menu switch that lists every asset once per
 // scenario, with a Scenario column after ID.
 $ec_lang['lpn_pane_scn_show']='Show scenarios';
+// Two switches on the cell menu while Show scenarios is on (Tom, 2026-10-07): keep only the rows whose
+// scenario holds a value of its own in this table, and keep only the open scenario's rows.
+$ec_lang['lpn_pane_scn_ov_only']='Overrides only';
+$ec_lang['lpn_pane_scn_cur_only']='Current scenario only';
+$ec_lang['lpn_pane_inactive_show']='Include inactive topology';
+// The line above a table while either switch is on, beside the filter's own Show all. {filters} is one
+// or both of the two switch names, joined by a comma; {n} the rows showing, {all} the rows without them.
+$ec_lang['lpn_pane_scn_filter_note']='{filters}. Showing {n} of {all}.';
 // The cell menu's item that removes the selected cells' scenario overrides, so each reads what its
 // scenario inherits (Tom, 2026-10-06). Greyed when no selected cell holds one.
 $ec_lang['lpn_pane_clear_override']='Clear override';
@@ -1668,6 +1675,7 @@ $ec_lang['lpn_change_type_lost']='These values will be lost:';
 $ec_lang['lpn_change_type_key']='Each line: ID: the property and value that would be lost';
 $ec_lang['lpn_change_type_line']='{id}: {property} {value}';
 $ec_lang['lpn_change_type_line_scenario']='{id}: {property} {value}, in scenario {scenario}';
+$ec_lang['lpn_change_type_line_alternative']='{id}: {property} {value}, in alternative {alternative}';
 $ec_lang['lpn_change_type_more']='And {n} more.';
 // Heads the lines a tank-to-reservoir or reservoir-to-tank change states rather than loses: the
 // water surface is carried, so the new head or water depth is listed with its value.
@@ -1679,6 +1687,7 @@ $ec_lang['lpn_change_type_no_curve']='{id}: No pump head curve, so the pump adds
 $ec_lang['lpn_change_type_becomes']='{id}: {property} {value}, in scenario {scenario}, becomes {new}';
 $ec_lang['lpn_change_type_customers']='Only a pipe serves customers, so these customers are connected instead to the node shown in parentheses, where their demand is already applied. They stay where they are drawn, and their demand is unchanged:';
 $ec_lang['lpn_change_type_setting']='These controls and rules give or test the setting of a link being changed. A setting is a different quantity on a pipe, a pump, and a valve, so these will read it differently:';
+$ec_lang['lpn_change_type_base_only']='Change type works in Base. A scenario can switch assets on and off in Active topology instead.';
 $ec_lang['lpn_change_type_rules']='These rule lines name a link by its kind, and will name its new kind instead:';
 $ec_lang['lpn_tables_menu_tip']='View and edit assets in tables in bottom panel.';
 // The Run row's own tip, NOT lpn_time_run_tip: this row exists partly to answer "where is my Run
@@ -1742,8 +1751,12 @@ $ec_lang['lpn_find_menu']='Find and replace';
 // placement are never pasted.
 $ec_lang['lpn_copy_props_menu']='Copy properties';
 $ec_lang['lpn_copy_props_done']='Copied properties of {id}.';
+$ec_lang['lpn_copy_props_no_overrides']='No overrides to copy.';
+$ec_lang['lpn_copy_props_done_ov']='Copied the overrides of {id} in this scenario.';
+$ec_lang['lpn_paste_alt_created']='Created {category} alternative {name} for this scenario.';
 $ec_lang['lpn_paste_props_menu']='Paste properties to selection';
 $ec_lang['lpn_paste_props_off_none']='Nothing is copied. Right-click an asset and choose Copy properties.';
+$ec_lang['lpn_paste_props_off_select']='Select the assets to paste to, then choose Paste properties to selection.';
 $ec_lang['lpn_paste_props_off_kind']='No selected asset can take the copied properties.';
 $ec_lang['lpn_tsb_menu']='Time series graph';
 $ec_lang['lpn_tsb_off_tip']='Needs extended period results. Set a Total run time in Settings, Calculation, Time, and calculate.';
@@ -2200,6 +2213,8 @@ $ec_lang['lpn_status_inp_exported_picture']='Exported {zip}, holding the EPANET 
 $ec_lang['lpn_status_inp_exported_no_picture']='Exported {file}. The background picture could not be saved, so the .inp names none; in EPANET, add it with View > Backdrop > Load.';
 // {n} is a whole number. Said plainly rather than hidden: a file that quietly loses a pump curve is
 // the failure this whole feature exists to prevent.
+$ec_lang['lpn_inp_export_flat_customers_inactive']='{n} of these customers are assigned to a junction that is inactive in this scenario, so their demand is not in the file.';
+$ec_lang['lpn_inp_export_flat_inactive_controls']='These controls and rules refer to an asset that is inactive in this scenario, so they are not in the file: {ids}';
 $ec_lang['lpn_inp_export_differences']='{n} things the .inp format cannot hold.';
 $ec_lang['lpn_inp_export_difference_one']='One thing the .inp format cannot hold.';
 $ec_lang['lpn_inp_export_refused']='This project cannot be written as an EPANET file: {detail}';
@@ -3226,7 +3241,10 @@ $ec_lang['lpn_scenario_new_name']='Scenario {n}';
 $ec_lang['lpn_scenario_prompt_name']='Name for this scenario';
 $ec_lang['lpn_scenario_rename']='Rename scenario…';
 $ec_lang['lpn_scenario_delete']='Delete scenario';
-$ec_lang['lpn_scenario_delete_confirm']='Delete the scenario {name}, and its {n} overrides? The drawing itself is not changed.';
+$ec_lang['lpn_scenario_delete_ask']='Delete the scenario {name}? The drawing itself is not changed.';
+$ec_lang['lpn_scenario_delete_goes']='Its {n} overrides are deleted with it.';
+$ec_lang['lpn_scenario_delete_stays']='These alternatives it uses stay in the project: {list}.';
+$ec_lang['lpn_scenario_delete_has_children']='The scenario {name} cannot be deleted while other scenarios inherit from it: {list}. Delete those first, or give them another parent.';
 $ec_lang['lpn_scenario_override']='Override in this scenario';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_scenario_override_tip']='Checked means this scenario overrides its parent for this value, even when the number is the same. Clear the box to use its parent\'s.';
@@ -3244,22 +3262,116 @@ $ec_lang['lpn_scenario_push_btn']='Apply Base values to all scenarios';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_scenario_push_tip']='Every scenario goes back to the Base value for the properties whose labels are showing right now. Values entered for them in any scenario are discarded.';
 $ec_lang['lpn_scenario_basic']='Basic mode';
-$ec_lang['lpn_scenario_basic_tip']='Checked: a scenario consists only of the values set in it. Cleared: this menu also offers the Alternatives preview table, which shows how those values are grouped by category, and allows a scenario to have a separate total run time and hydraulic time step. Feedback on this feature is welcome.';
-$ec_lang['lpn_alt_title']='Alternatives preview';
-$ec_lang['lpn_alt_calc_options']='Calculation options';
-$ec_lang['lpn_alt_note']='Base uses the Base alternative of every category. Each scenario has a separate alternative, a child of the Base alternative, for any category that is changed. The number is the count of changed values. The last three columns are calculation options: enter a value for the scenario, or leave it blank to use the parent value. The project values are in Settings, Calculation, Time.';
-$ec_lang['lpn_scenario_duration_tip']='Leave blank to inherit from parent. A total run time of 0:00 is a steady-state run.';
-$ec_lang['lpn_scenario_hyd_step_tip']='Leave blank to inherit from parent.';
+$ec_lang['lpn_scenario_basic_tip']='Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Choosing Scenario manager turns Basic mode off. A project whose scenarios and alternatives Basic mode cannot show keeps it off.';
+$ec_lang['lpn_scenario_basic_misfit']='This project has scenarios and alternatives relationships that are not compatible with Scenarios Basic mode, so Basic mode is disabled.';
+$ec_lang['lpn_scenario_copy']='Copy scenario';
+$ec_lang['lpn_scenario_copy_tip']='Copies the open scenario and its overrides, and opens the copy.';
+$ec_lang['lpn_scenario_copy_off']='Copy scenario works in Basic mode. With Basic mode off, add a scenario and choose its alternatives in the Scenarios table.';
+$ec_lang['lpn_sm_title']='Scenario manager';
+$ec_lang['lpn_sm_menu']='Scenario manager…';
+$ec_lang['lpn_sm_basic_off']='Basic mode is off, so the Scenario manager and the Scenarios table are shown.';
+$ec_lang['lpn_pane_tab_scenarios']='Scenarios';
+$ec_lang['lpn_sm_col_parent']='Parent';
+$ec_lang['lpn_sm_add_child']='Add child';
+$ec_lang['lpn_sm_add_base']='Add base';
+$ec_lang['lpn_sm_add_base_tip']='Add another Base scenario. It starts as a copy of Base, with its own alternatives, and later edits to Base do not change it.';
+$ec_lang['lpn_sm_add_base_alt_tip']='Add another Base alternative. It starts as a copy of Base\'s values in this category, and later edits to Base do not change it.';
+$ec_lang['lpn_sm_delete']='Delete the selected item. A used item is not deleted.';
+$ec_lang['lpn_sm_base_kept']='The Base of a tree is not deleted. Another Base added with Add base is deleted when nothing uses it.';
+$ec_lang['lpn_sm_rename']='Rename';
+$ec_lang['lpn_sm_rename_alts_ask']='Rename equally named alternatives?';
+$ec_lang['lpn_sm_make_current']='Make current';
+// Tips on greyed Scenario manager commands, saying why they are greyed (Perry, 2026-10-11).
+$ec_lang['lpn_sm_current_already']='This scenario is already the current scenario.';
+$ec_lang['lpn_sm_none_selected']='Select an item in the tree first.';
+$ec_lang['lpn_sm_base_named']='The Base of a tree is not renamed.';
+$ec_lang['lpn_sm_copy']='Copy';
+$ec_lang['lpn_sm_help']='How scenarios and alternatives work:\\n\\nIn Basic mode, alternatives are hidden and automatic, and all new scenarios are children of the Base scenario.\\n\\nProperties and settings are grouped into alternatives categories that appear as columns of the Scenarios table and as management options in Scenario manager.\\n\\nOverrides are created in scenarios, but they really belong to the respective alternatives associated with the scenario; so a scenario is like a window to its alternatives. Associations of alternatives to scenarios are managed in the Scenarios table in the bottom pane. Creating a new scenario creates no alternatives; the new scenario uses its parent\'s alternatives until overrides are created that need new alternatives. When overrides are created in a scenario, they are stored in their respective alternative for the scenario; if the scenario has no such alternative, a new alternative is created using the name of the scenario.\\n\\nWith Basic mode off, a complex inheritance tree is available, and alternatives can be shared among scenarios. But the default behavior of edits when a new alternative is needed is to create an alternative named like the current scenario, which gives each scenario its unique set of alternatives.\\n\\nExample: You create a "Figure: Node and link IDs" scenario and edit a Text to say "Node and Link IDs." When you create the scenario, no alternatives are created. But at the moment you save the Text, a Text alternative called "Figure: Node and link IDs" is created with the override for the Text value. In Basic mode, you see this as simply an override in the scenario itself.\\n\\nCopy properties copies only overrides. In any scenario other than Base, it copies only the overrides the asset has in that scenario.\\n\\nHow to manage scenarios:\\n\\n- Choose Scenarios or an alternatives category in the list at the top to show its tree.\\n\\n- Create a child of the selected item with Add child. Add base adds another Base, which starts as a copy of Base as it is now; later edits to Base do not change it. A new child is named after its parent; type a name to rename it. Copy copies the selected alternative. To copy a scenario, use Copy scenario in the Scenarios menu, in Basic mode; it copies the scenario\'s overrides, with the alternatives that hold them.\\n\\n- Drag an item onto another to make it a child of that item. A scenario moved to a new parent inherits from it everything it has not overridden; what it has overridden does not change. Drag an item between two items to reorder them.\\n\\n- Click an item to select it. Press F2, or choose Rename, to rename the selected item. Renaming a scenario asks whether to rename the alternatives that carry its name; in Basic mode they are renamed with it, without asking. Double-click a scenario, or press Enter, to make it current. Click the arrow beside an item, or press Left or Right, to collapse or expand it. Right-click an item for the same commands as the buttons.\\n\\n- Press Delete, or click the minus button, to delete the selected item. An item in use is not deleted, and the message names what uses it. Deleting a scenario with Basic mode off keeps the alternatives it uses. Deleting a scenario with Basic mode on also deletes each of its alternatives that no other scenario uses.\\n\\n- To make a scenario use another alternative, including Base, choose it in the scenario\'s row of the Scenarios table. An override made in a shared alternative changes every scenario that uses it.';
+$ec_lang['lpn_sm_in_use']='{name} cannot be deleted while it is used by: {list}.';
+$ec_lang['lpn_sm_name_taken']='The name {name} is already used in this tree.';
+$ec_lang['lpn_sm_cycle']='{name} cannot be moved under one of its own children.';
+$ec_lang['lpn_sm_used_by']='Used by scenarios: {n}';
+$ec_lang['lpn_sm_used_by_tip']='Used by: {list}';
+$ec_lang['lpn_sm_used_by_none']='Not used by any scenario';
+$ec_lang['lpn_sm_compare_tip']='Include in Scenario comparison';
+$ec_lang['lpn_sm_inherited']='inherited';
+$ec_lang['lpn_sm_shared_note']='Shared with: {list}';
+$ec_lang['lpn_scncmp_none_checked']='No scenario is checked for comparison. Check scenarios in the Scenario manager.';
 $ec_lang['lpn_time_scn_overrides']='Scenario overrides:';
+$ec_lang['lpn_settings_table_major']='Major heading';
+$ec_lang['lpn_settings_table_minor']='Minor heading';
+$ec_lang['lpn_settings_table_category']='Category';
+// The Settings table's third heading level, between Minor heading and Setting: the label field, coloured
+// field, asset or custom property a group of settings belongs to (Tom, 2026-10-07: "We could call it
+// 'Owner'.").
+$ec_lang['lpn_settings_table_owner']='Owner';
+$ec_lang['lpn_settings_table_setting']='Setting';
+$ec_lang['lpn_settings_table_yes']='Yes';
+$ec_lang['lpn_settings_table_no']='No';
+$ec_lang['lpn_settings_row_of']='{setting}, {member}';
+$ec_lang['lpn_settings_row_labels_field']='{labels}: {field}';
+$ec_lang['lpn_settings_row_labels_part']='{labels}: {field}, {part}';
+$ec_lang['lpn_settings_row_labels_customer']='Customer labels';
+$ec_lang['lpn_settings_row_label_before']='Text before';
+$ec_lang['lpn_settings_row_label_after']='Text after';
+// A label field's settings, named in the Setting column with the field itself in the Owner column
+// (Tom, 2026-10-07: "Symbology.Node labels.ID.Is Active", "Show order", "Drop order"). Whether the
+// value appears on the label at all; where it sits on the label (1 first); which value is given up
+// first when labels crowd (1 first).
+$ec_lang['lpn_settings_row_label_on']='Is active';
+$ec_lang['lpn_settings_row_label_show']='Show order';
+$ec_lang['lpn_settings_row_label_drop']='Drop order';
+// The Setting column of an ID prefix row; the asset it applies to is in the Owner column.
+$ec_lang['lpn_settings_row_id_prefix']='ID prefix';
+$ec_lang['lpn_settings_row_symbol_cap_multiple']='Largest symbol, as a multiple of a typical pipe length';
+$ec_lang['lpn_settings_row_symbol_cap_percentile']='Typical pipe length, as a percentile of all pipe lengths';
+$ec_lang['lpn_settings_row_contour_labels']='Contour labels';
+$ec_lang['lpn_settings_row_check_freq']='Status check frequency';
+$ec_lang['lpn_settings_row_max_check']='Maximum status checks';
+$ec_lang['lpn_settings_row_status_report']='Status report';
+$ec_lang['lpn_settings_row_pda_src']='Pressure driven options stated in the file';
+$ec_lang['lpn_settings_row_quality_option']='Quality option as the file states it';
+$ec_lang['lpn_settings_row_tolerance']='Accuracy (older projects)';
+$ec_lang['lpn_settings_row_emitter_exponent_old']='Emitter exponent (older projects)';
+$ec_lang['lpn_settings_row_elev_source_old']='Elevation source (older projects)';
+$ec_lang['lpn_settings_row_basemap']='Basemap';
+$ec_lang['lpn_settings_row_basemap_last']='Basemap to return to';
+$ec_lang['lpn_settings_row_customer_max_width']='Show customer labels when zoomed to this map width or less';
+$ec_lang['lpn_settings_row_quality_step']='Quality time step';
+$ec_lang['lpn_settings_row_view']='Map view (center and scale)';
+$ec_lang['lpn_settings_row_contour_fill']='Contour fill';
+$ec_lang['lpn_settings_row_contour_opacity']='Contour fill opacity';
+$ec_lang['lpn_settings_row_contour_interval']='Contour interval';
+$ec_lang['lpn_settings_row_contour_buffer']='Contour buffer';
+$ec_lang['lpn_settings_row_contour_terrain']='Contour ground between nodes from Mapbox DEM';
+$ec_lang['lpn_settings_row_new_asset']='New assets: {setting}';
+$ec_lang['lpn_settings_row_default']='{value} (default)';
+$ec_lang['lpn_settings_row_view_value']='Center {x}, {y}; scale {s}';
+$ec_lang['lpn_settings_held_in']='Override in {scenario}.';
+$ec_lang['lpn_settings_held_base']='{base}: {value}';
+$ec_lang['lpn_settings_view_center']='Map center';
+$ec_lang['lpn_settings_view_scale']='Map scale';
+$ec_lang['lpn_settings_view_scale_tip']='The scale at the center of the map, as 1:N. Type 1:2000, or just 2000, to zoom to that scale.';
+$ec_lang['lpn_settings_view_top_left']='Top left corner';
+$ec_lang['lpn_settings_view_bottom_right']='Bottom right corner';
+$ec_lang['lpn_settings_view_save']='Save this view in this scenario';
+$ec_lang['lpn_settings_view_save_tip']='Stores this map center and scale in the open scenario, so opening that scenario moves the map here. Moving the map afterward changes nothing until you press this again. Clear the override to follow the {base} view again.';
+$ec_lang['lpn_settings_row_basemap_osm']='Street map';
+$ec_lang['lpn_settings_row_basemap_satellite']='Satellite images';
+$ec_lang['lpn_settings_units_one_project']='Units are the same in every scenario.';
+$ec_lang['lpn_settings_restore_base_only']='Switch to Base to restore the defaults.';
 $ec_lang['lpn_alt_cat_physical']='Physical';
 $ec_lang['lpn_alt_cat_demand']='Demand';
-$ec_lang['lpn_alt_cat_topology']='Asset activation';
+$ec_lang['lpn_alt_cat_topology']='Active topology';
+$ec_lang['lpn_alt_cat_topology_tip']='Asset activation';
 $ec_lang['lpn_alt_cat_initial']='Initial settings';
 $ec_lang['lpn_alt_cat_constituent']='Constituent';
 $ec_lang['lpn_alt_cat_fireflow']='Fire flow';
 $ec_lang['lpn_alt_cat_energy']='Energy cost';
 $ec_lang['lpn_alt_cat_userdata']='Custom properties';
 $ec_lang['lpn_alt_cat_text']='Text';
+$ec_lang['lpn_alt_cat_presentation']='Presentation';
+$ec_lang['lpn_alt_cat_calculation']='Calculation';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_scenario_push_confirm']='Make every scenario use the Base values for these properties? Values entered for them in any scenario are discarded. You can undo this.';
 $ec_lang['lpn_scenario_push_scenarios']='Scenarios affected:';
@@ -3408,6 +3520,8 @@ $ec_lang['lpn_time_run_fell_back']='The numbers on screen came from the built-in
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_control_dangling_note']='These controls refer to an element that is no longer in this project, so they were ignored: {ids}';
 $ec_lang['lpn_control_unreadable_note']='These controls could not be read, so they were left out: {ids}';
+$ec_lang['lpn_control_inactive_note']='These controls refer to an asset that is inactive in this scenario, so they are ignored in its run: {ids}';
+$ec_lang['lpn_rule_inactive_note']='These rules refer to an asset that is inactive in this scenario, so they are ignored in its run: {ids}';
 $ec_lang['lpn_rule_dangling_note']='These rules refer to an element that is no longer in this project, so they were ignored in this run: {ids}';
 $ec_lang['lpn_rule_unreadable_note']='These rules could not be read, so they were ignored in this run: {ids}';
 $ec_lang['lpn_settings_text_size']='Text size (pixels)';
@@ -3964,9 +4078,7 @@ $ec_lang['lpn_energy_curve_note']='These pumps call an efficiency curve with no 
 // "Drop" heads the priority column (Task 445): the number says the order values and labels are
 // given up in, and the term of art, Priority, lives in the heading's own tip. It replaced an icon,
 // so it must stay about as short as one -- a heading that needs a wider box is the wrong word.
-// 'lpn_labels_col_rank' is what it replaced, kept unrendered because "Rank" is the OLD sense.
 $ec_lang['lpn_labels_col_decimals_example']='0.000';
-$ec_lang['lpn_labels_col_rank']='Rank';
 $ec_lang['lpn_labels_col_drop']='Drop';
 
 // ---- Task 441 follow-up: the two symbology groups each carry a colour scheme -----------------
@@ -4214,6 +4326,8 @@ $ec_lang['lpn_library_pattern_default_mark']='(default)';
 $ec_lang['lpn_library_pattern_default_tip']='The default demand pattern. Change it in Settings, Default demand pattern.';
 $ec_lang['lpn_library_pattern_default_deleted_to']='Pattern {id} was the default demand pattern. Junctions with no pattern now use pattern {now}.';
 $ec_lang['lpn_library_pattern_default_deleted_none']='Pattern {id} was the default demand pattern. Junctions with no pattern now use a constant demand.';
+$ec_lang['lpn_library_pattern_default_deleted_also']='Scenarios that also used it as their default: {list}.';
+$ec_lang['lpn_library_pattern_default_deleted_in']='Pattern {id} was the default demand pattern in these scenarios: {list}.';
 $ec_lang['lpn_library_control_add']='Add a control';
 // THE KEYWORDS IN THE EXAMPLES ARE NOT TRANSLATED and must be left exactly as they are: LINK,
 // OPEN, CLOSED, IF, NODE, ABOVE, BELOW, AT, TIME and CLOCKTIME are what the reader types into the

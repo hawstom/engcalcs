@@ -975,8 +975,6 @@ $ec_lang['lpn_copy_kept_link']='فُتح {name} بوصفه الأصل، بعد �
 $ec_lang['lpn_copy_opened']='فُتح {file} نسخةً وحُفظ، بقفل جديد.';
 $ec_lang['lpn_scenario_basic']='الوضع الأساسي';
 $ec_lang['lpn_scenario_basic_tip']='محدَّد: يتكون السيناريو من القيم المضبوطة فيه فقط. غير محدَّد: تعرض هذه القائمة أيضاً جدول معاينة البدائل، الذي يبيّن كيف تُجمَّع تلك القيم حسب الفئة، وتتيح أن تكون لسيناريو مدة تشغيل كلية وخطوة زمنية هيدروليكية منفصلتان. الملاحظات على هذه الميزة مرحَّب بها.';
-$ec_lang['lpn_alt_title']='معاينة البدائل';
-$ec_lang['lpn_alt_note']='للقراءة فقط. يستخدم الأساس بديل الأساس في كل فئة. ولكل سيناريو بديل منفصل، هو فرع من بديل الأساس، لأي فئة تتغير. الرقم هو عدد القيم المتغيّرة. الأعمدة الثلاثة الأخيرة خيارات حساب: أدخل قيمة للسيناريو، أو اتركها فارغة لاستخدام قيمة الأصل. قيم المشروع في الإعدادات، الحساب، الزمن.';
 $ec_lang['lpn_alt_cat_physical']='فيزيائي';
 $ec_lang['lpn_alt_cat_demand']='الطلب';
 $ec_lang['lpn_alt_cat_topology']='تفعيل العناصر';
@@ -2724,7 +2722,6 @@ $ec_lang['lpn_scenario_new_name']='سيناريو {n}';
 $ec_lang['lpn_scenario_prompt_name']='اسم هذا السيناريو';
 $ec_lang['lpn_scenario_rename']='إعادة تسمية السيناريو…';
 $ec_lang['lpn_scenario_delete']='حذف السيناريو';
-$ec_lang['lpn_scenario_delete_confirm']='هل تريد حذف السيناريو {name} وتجاوزاته البالغ عددها {n}؟ لا يتغير الرسم نفسه.';
 $ec_lang['lpn_scenario_override']='تجاوز في هذا السيناريو';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_scenario_override_tip']='يعني التحديد أن هذا السيناريو يتجاوز الأصل لهذه القيمة، حتى لو كان الرقم نفسه. ألغِ تحديد المربع لاستخدام قيمة الأصل.';
@@ -3407,9 +3404,7 @@ $ec_lang['lpn_energy_curve_note']='تستدعي هذه المضخات منحنى
 // "Drop" heads the priority column (Task 445): the number says the order values and labels are
 // given up in, and the term of art, Priority, lives in the heading's own tip. It replaced an icon,
 // so it must stay about as short as one -- a heading that needs a wider box is the wrong word.
-// 'lpn_labels_col_rank' is what it replaced, kept unrendered because "Rank" is the OLD sense.
 $ec_lang['lpn_labels_col_decimals_example']='0.000';
-$ec_lang['lpn_labels_col_rank']='الترتيب';
 $ec_lang['lpn_labels_col_drop']='حذف';
 
 // ---- Task 441 follow-up: the two symbology groups each carry a colour scheme -----------------

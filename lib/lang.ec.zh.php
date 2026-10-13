@@ -2652,7 +2652,6 @@ $ec_lang['lpn_scenario_new_name']='方案 {n}';
 $ec_lang['lpn_scenario_prompt_name']='该方案的名称';
 $ec_lang['lpn_scenario_rename']='重命名方案…';
 $ec_lang['lpn_scenario_delete']='删除方案';
-$ec_lang['lpn_scenario_delete_confirm']='删除方案 {name} 及其 {n} 个覆盖值？图纸本身不会更改。';
 $ec_lang['lpn_scenario_override']='在本方案中覆盖';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_scenario_override_tip']='勾选表示本方案对此数值覆盖其父方案，即使数字相同。取消勾选则使用其父方案的数值。';
@@ -3278,9 +3277,7 @@ $ec_lang['lpn_energy_curve_note']='以下水泵引用了没有数据点的效率
 // "Drop" heads the priority column (Task 445): the number says the order values and labels are
 // given up in, and the term of art, Priority, lives in the heading's own tip. It replaced an icon,
 // so it must stay about as short as one -- a heading that needs a wider box is the wrong word.
-// 'lpn_labels_col_rank' is what it replaced, kept unrendered because "Rank" is the OLD sense.
 $ec_lang['lpn_labels_col_decimals_example']='0.000';
-$ec_lang['lpn_labels_col_rank']='排名';
 $ec_lang['lpn_labels_col_drop']='省略';
 
 // ---- Task 441 follow-up: the two symbology groups each carry a colour scheme -----------------
@@ -3887,8 +3884,6 @@ $ec_lang['lpn_copy_kept_link']='已将 {name} 作为原始文件打开，它已�
 $ec_lang['lpn_copy_opened']='已将 {file} 作为副本打开并保存，并带有新的锁。';
 $ec_lang['lpn_scenario_basic']='基本模式';
 $ec_lang['lpn_scenario_basic_tip']='勾选时，方案仅由在其中设置的数值构成。取消勾选时，此菜单还会提供“备选方案预览”表，显示这些数值如何按类别分组，并允许方案具有单独的总运行时长和水力时间步长。欢迎对此功能提出反馈。';
-$ec_lang['lpn_alt_title']='备选方案预览';
-$ec_lang['lpn_alt_note']='基础方案对每个类别都使用基础备选方案。每个方案对任何有更改的类别都有一个单独的备选方案，它是基础备选方案的子项。数字是已更改数值的个数。最后三列是计算选项：为该方案输入一个值，或留空以使用父方案的值。项目的值位于“设置”、“计算”、“时间”中。';
 $ec_lang['lpn_alt_cat_physical']='物理';
 $ec_lang['lpn_alt_cat_demand']='需水量';
 $ec_lang['lpn_alt_cat_topology']='元件启用';

@@ -2651,7 +2651,6 @@ $ec_lang['lpn_scenario_new_name']='Senaryo {n}';
 $ec_lang['lpn_scenario_prompt_name']='Bu senaryo için ad';
 $ec_lang['lpn_scenario_rename']='Senaryoyu yeniden adlandır…';
 $ec_lang['lpn_scenario_delete']='Senaryoyu sil';
-$ec_lang['lpn_scenario_delete_confirm']='{name} senaryosu ve yalnızca ona ait olan {n} değer silinsin mi? Çizimin kendisi değişmez.';
 $ec_lang['lpn_scenario_override']='Yalnızca bu senaryoda';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_scenario_override_tip']='İşaretlemek, bu senaryonun bu değer için — Temel ile aynı sayı olsa bile — kendi girişine sahip olduğu anlamına gelir. Kutuyu boşaltarak yeniden Temel değerini kullanın.';
@@ -3277,9 +3276,7 @@ $ec_lang['lpn_energy_curve_note']='Bu pompalar, hiç noktası olmayan bir verim 
 // "Drop" heads the priority column (Task 445): the number says the order values and labels are
 // given up in, and the term of art, Priority, lives in the heading's own tip. It replaced an icon,
 // so it must stay about as short as one -- a heading that needs a wider box is the wrong word.
-// 'lpn_labels_col_rank' is what it replaced, kept unrendered because "Rank" is the OLD sense.
 $ec_lang['lpn_labels_col_decimals_example']='0,000';
-$ec_lang['lpn_labels_col_rank']='Sıra';
 $ec_lang['lpn_labels_col_drop']='Bırakma';
 
 // ---- Task 441 follow-up: the two symbology groups each carry a colour scheme -----------------
@@ -3886,8 +3883,6 @@ $ec_lang['lpn_copy_kept_link']='{name} orijinal olarak, yeni bir yere taşınmı
 $ec_lang['lpn_copy_opened']='{file} bir kopya olarak, yeni bir kilitle açıldı ve kaydedildi.';
 $ec_lang['lpn_scenario_basic']='Temel mod';
 $ec_lang['lpn_scenario_basic_tip']='İşaretliyse bir senaryo yalnızca içinde belirlenen değerlerden oluşur. İşaretsizse bu menü ayrıca bu değerlerin kategoriye göre nasıl gruplandığını gösteren Alternatifler önizleme tablosunu sunar ve bir senaryonun ayrı bir toplam çalışma süresine ve hidrolik zaman adımına sahip olmasına izin verir. Bu özellik hakkındaki geri bildirimler memnuniyetle karşılanır.';
-$ec_lang['lpn_alt_title']='Alternatifler önizlemesi';
-$ec_lang['lpn_alt_note']='Temel, her kategorinin Temel alternatifini kullanır. Her senaryo, değiştirilen her kategori için Temel alternatifin çocuğu olan ayrı bir alternatife sahiptir. Sayı, değiştirilen değerlerin sayısıdır. Son üç sütun hesaplama seçenekleridir: senaryo için bir değer girin veya üst değeri kullanmak için boş bırakın. Proje değerleri Ayarlar, Hesaplama, Zaman bölümündedir.';
 $ec_lang['lpn_alt_cat_physical']='Fiziksel';
 $ec_lang['lpn_alt_cat_demand']='Talep';
 $ec_lang['lpn_alt_cat_topology']='Varlık etkinleştirme';

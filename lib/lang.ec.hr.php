@@ -2653,7 +2653,6 @@ $ec_lang['lpn_scenario_new_name']='Scenarij {n}';
 $ec_lang['lpn_scenario_prompt_name']='Naziv ovog scenarija';
 $ec_lang['lpn_scenario_rename']='Preimenuj scenarij…';
 $ec_lang['lpn_scenario_delete']='Izbriši scenarij';
-$ec_lang['lpn_scenario_delete_confirm']='Izbrisati scenarij {name} i njegovih {n} zamjenskih vrijednosti? Sam crtež se ne mijenja.';
 $ec_lang['lpn_scenario_override']='Zamjena u ovom scenariju';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_scenario_override_tip']='Odabrano znači da ovaj scenarij zamjenjuje nadređeni za ovu vrijednost, čak i kada je broj isti. Isključite okvir da se koristi vrijednost nadređenog.';
@@ -3279,9 +3278,7 @@ $ec_lang['lpn_energy_curve_note']='Ove pumpe pozivaju krivulju učinkovitosti be
 // "Drop" heads the priority column (Task 445): the number says the order values and labels are
 // given up in, and the term of art, Priority, lives in the heading's own tip. It replaced an icon,
 // so it must stay about as short as one -- a heading that needs a wider box is the wrong word.
-// 'lpn_labels_col_rank' is what it replaced, kept unrendered because "Rank" is the OLD sense.
 $ec_lang['lpn_labels_col_decimals_example']='0,000';
-$ec_lang['lpn_labels_col_rank']='Poredak';
 $ec_lang['lpn_labels_col_drop']='Izostavi';
 
 // ---- Task 441 follow-up: the two symbology groups each carry a colour scheme -----------------
@@ -3888,8 +3885,6 @@ $ec_lang['lpn_copy_kept_link']='Otvoreno {name} kao izvornik, premješten na nov
 $ec_lang['lpn_copy_opened']='Otvoreno {file} kao kopija i spremljeno, s novim zaključavanjem.';
 $ec_lang['lpn_scenario_basic']='Osnovni način';
 $ec_lang['lpn_scenario_basic_tip']='Označeno: scenarij se sastoji samo od vrijednosti postavljenih u njemu. Neoznačeno: ovaj izbornik nudi i pregledničku tablicu Alternativa, koja prikazuje kako su te vrijednosti grupirane po kategorijama, te omogućuje da scenarij ima zasebno ukupno vrijeme rada i hidraulički vremenski korak. Povratne informacije o ovoj značajci su dobrodošle.';
-$ec_lang['lpn_alt_title']='Pregled alternativa';
-$ec_lang['lpn_alt_note']='Baza koristi Osnovnu alternativu svake kategorije. Svaki scenarij ima zasebnu alternativu, potomka Osnovne alternative, za svaku promijenjenu kategoriju. Broj je količina promijenjenih vrijednosti. Posljednja tri stupca su opcije proračuna: unesite vrijednost za scenarij ili ostavite prazno da se koristi vrijednost nadređenog. Vrijednosti projekta nalaze se u Postavke, Proračun, Vrijeme.';
 $ec_lang['lpn_alt_cat_physical']='Fizičko';
 $ec_lang['lpn_alt_cat_demand']='Potražnja';
 $ec_lang['lpn_alt_cat_topology']='Aktivacija elemenata';

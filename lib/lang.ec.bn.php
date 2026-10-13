@@ -2663,7 +2663,6 @@ $ec_lang['lpn_scenario_new_name']='দৃশ্যকল্প {n}';
 $ec_lang['lpn_scenario_prompt_name']='এই দৃশ্যকল্পের নাম';
 $ec_lang['lpn_scenario_rename']='দৃশ্যকল্পের নাম পরিবর্তন করুন…';
 $ec_lang['lpn_scenario_delete']='দৃশ্যকল্প মুছুন';
-$ec_lang['lpn_scenario_delete_confirm']='{name} দৃশ্যকল্প এবং তার {n}টি নিজস্ব মান মুছবেন? অঙ্কন নিজে বদলায় না।';
 $ec_lang['lpn_scenario_override']='এই দৃশ্যকল্পে নিজস্ব মান';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_scenario_override_tip']='টিক দেওয়া মানে এই দৃশ্যকল্প এই মানের জন্য তার ভিত্তিকে অগ্রাহ্য করে, সংখ্যা একই হলেও। ভিত্তির মান ব্যবহার করতে বাক্সের টিক তুলে দিন।';
@@ -3289,9 +3288,7 @@ $ec_lang['lpn_energy_curve_note']='এই পাম্পগুলো একট�
 // "Drop" heads the priority column (Task 445): the number says the order values and labels are
 // given up in, and the term of art, Priority, lives in the heading's own tip. It replaced an icon,
 // so it must stay about as short as one -- a heading that needs a wider box is the wrong word.
-// 'lpn_labels_col_rank' is what it replaced, kept unrendered because "Rank" is the OLD sense.
 $ec_lang['lpn_labels_col_decimals_example']='0.000';
-$ec_lang['lpn_labels_col_rank']='ক্রম';
 $ec_lang['lpn_labels_col_drop']='বাদ';
 
 // ---- Task 441 follow-up: the two symbology groups each carry a colour scheme -----------------
@@ -3899,8 +3896,6 @@ $ec_lang['lpn_copy_kept_link']='{name} মূল ফাইল হিসেবে
 $ec_lang['lpn_copy_opened']='{file} একটি অনুলিপি হিসেবে খোলা ও সংরক্ষিত হয়েছে, একটি নতুন লকসহ।';
 $ec_lang['lpn_scenario_basic']='সাধারণ মোড';
 $ec_lang['lpn_scenario_basic_tip']='টিক দেওয়া: একটি দৃশ্যকল্প শুধু তাতে নির্ধারিত মান নিয়ে গঠিত। টিক ছাড়া: এই মেনুতে বিকল্পগুলোর প্রিভিউ সারণিও পাওয়া যায়, যা দেখায় সেই মানগুলো ক্যাটাগরি অনুযায়ী কীভাবে সাজানো, এবং একটি দৃশ্যকল্পকে আলাদা মোট রান সময় ও হাইড্রোলিক টাইম স্টেপ রাখতে দেয়। এই বৈশিষ্ট্য নিয়ে মতামত স্বাগত।';
-$ec_lang['lpn_alt_title']='বিকল্পগুলোর প্রিভিউ';
-$ec_lang['lpn_alt_note']='ভিত্তি প্রতিটি ক্যাটাগরির ভিত্তি বিকল্প ব্যবহার করে। যে ক্যাটাগরি পরিবর্তিত হয়, তার জন্য প্রতিটি দৃশ্যকল্পের একটি আলাদা বিকল্প থাকে, যা ভিত্তি বিকল্পের সন্তান। সংখ্যাটি পরিবর্তিত মানের সংখ্যা। শেষ তিনটি কলাম হিসাবের অপশন: দৃশ্যকল্পের জন্য একটি মান লিখুন, অথবা ভিত্তির মান ব্যবহার করতে ফাঁকা রাখুন। প্রকল্পের মানগুলো সেটিংস, হিসাব, সময়-এ আছে।';
 $ec_lang['lpn_alt_cat_physical']='ভৌত';
 $ec_lang['lpn_alt_cat_demand']='চাহিদা';
 $ec_lang['lpn_alt_cat_topology']='উপাদান সক্রিয়করণ';

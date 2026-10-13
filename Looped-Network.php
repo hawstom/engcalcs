@@ -964,6 +964,12 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 		      // table! Yes!"). The pane generates one tab per row of paneTables(), so a Customer
 		      // table is a row in that list plus this host div, and nothing else. ?>
 		<div id="lpn_pane_customers" class="lpn-pane-panel lpn-pane-scroll" role="tabpanel" aria-labelledby="lpn_pane_tab_customers"></div>
+		<?php // The Settings table (Tom, 2026-10-05: "there will have to be a settings Table"): one row
+		      // per setting a scenario may hold, a row of paneTables() like the others. ?>
+		<div id="lpn_pane_settings" class="lpn-pane-panel lpn-pane-scroll" role="tabpanel" aria-labelledby="lpn_pane_tab_settings"></div>
+		<?php // The Scenarios table (Tom, 2026-10-09, H02): one row per scenario, one column per
+		      // alternatives category, each cell a pick-list of that category's alternatives. ?>
+		<div id="lpn_pane_scenarios" class="lpn-pane-panel lpn-pane-scroll" role="tabpanel" aria-labelledby="lpn_pane_tab_scenarios"></div>
 	</div>
 </div>
 <?php // position:fixed, not absolute: the popup is positioned from pointer-event clientX/clientY
@@ -1459,15 +1465,16 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 		<div id="lpn_status_report" class="lpn-ff-report"></div>
 	</div>
 </div>
-<?php // THE ALTERNATIVES TABLE (dev/scenario-alternatives.md). Offered only with Scenarios > Basic
-      // mode unticked: for each scenario, which alternative it uses in each category, read-only.
-      // The minimum honest view of a model that otherwise has no screen; the Advanced UX is not
-      // designed. Its position is NOT remembered, so it adds nothing to what a browser stores. ?>
-<div id="lpn_alt_box" class="d-print-none lpn-popover lpn-setbox lpn-ffbox" style="display:none;position:fixed;background:var(--ec-bg);border:1px solid var(--ec-ink);padding:40px 8px 8px;box-shadow:2px 2px 6px var(--ec-a-0-0-0-3)" role="dialog" aria-labelledby="lpn_altbox_title">
-	<div id="lpn_altbox_title" class="lpn-setbox-title"><?=$ec_lang['lpn_alt_title']?></div>
-	<button type="button" id="lpn_alt_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
+<?php // THE SCENARIO MANAGER (dev/scenario-alternatives.md, stage 6; Tom, 2026-10-09). A narrow
+      // docked box holding the inheritance tree of the scenarios and of each alternatives category:
+      // name, rename, add, delete and move children and branches, and nothing else. Its position is
+      // window furniture (localStorage `lpn_smbox`), never in the project file. The tree itself is
+      // built in JS (rebuildScenarioManager). ?>
+<div id="lpn_sm_box" class="d-print-none lpn-popover lpn-setbox lpn-ffbox" style="display:none;position:fixed;background:var(--ec-bg);border:1px solid var(--ec-ink);padding:40px 8px 8px;box-shadow:2px 2px 6px var(--ec-a-0-0-0-3)" role="dialog" aria-labelledby="lpn_smbox_title">
+	<div id="lpn_smbox_title" class="lpn-setbox-title"><?=ecTipLabel($ec_lang['lpn_sm_title'], $ec_lang['lpn_sm_help'])?></div>
+	<button type="button" id="lpn_sm_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
 	<div class="lpn-popover-body lpn-setbox-body">
-		<div id="lpn_alt_report" class="lpn-ff-report"></div>
+		<div id="lpn_sm_body" class="lpn-sm-body"></div>
 	</div>
 </div>
 <?php // THE FULL REPORT (ROADMAP Task 715). EPANET's Report > Full: every node and every link at
@@ -2020,9 +2027,12 @@ EngCalcs.pageConfig = {
 	lpn_node_customers_sum: <?=json_encode($ec_lang['lpn_node_customers_sum'])?>,
 	lpn_customer_detached: <?=json_encode($ec_lang['lpn_customer_detached'])?>,
 	lpn_customer_fixed_head: <?=json_encode($ec_lang['lpn_customer_fixed_head'])?>,
+	lpn_customer_node_inactive: <?=json_encode($ec_lang['lpn_customer_node_inactive'])?>,
 	lpn_customer_detached_count: <?=json_encode($ec_lang['lpn_customer_detached_count'])?>,
 	lpn_meter_pick_pipe: <?=json_encode($ec_lang['lpn_meter_pick_pipe'])?>,
 	lpn_inp_export_flat_customers: <?=json_encode($ec_lang['lpn_inp_export_flat_customers'])?>,
+	lpn_inp_export_flat_customers_inactive: <?=json_encode($ec_lang['lpn_inp_export_flat_customers_inactive'])?>,
+	lpn_inp_export_flat_inactive_controls: <?=json_encode($ec_lang['lpn_inp_export_flat_inactive_controls'])?>,
 	lpn_tool_vertices: <?=json_encode($ec_lang['lpn_tool_vertices'])?>,
 	lpn_area_hint_window_start: <?=json_encode($ec_lang['lpn_area_hint_window_start'])?>,
 	lpn_area_hint_window_go: <?=json_encode($ec_lang['lpn_area_hint_window_go'])?>,
@@ -2219,8 +2229,12 @@ EngCalcs.pageConfig = {
 	lpn_find_menu: <?=json_encode($ec_lang['lpn_find_menu'])?>,
 	lpn_copy_props_menu: <?=json_encode($ec_lang['lpn_copy_props_menu'])?>,
 	lpn_copy_props_done: <?=json_encode($ec_lang['lpn_copy_props_done'])?>,
+	lpn_copy_props_no_overrides: <?=json_encode($ec_lang['lpn_copy_props_no_overrides'])?>,
+	lpn_copy_props_done_ov: <?=json_encode($ec_lang['lpn_copy_props_done_ov'])?>,
+	lpn_paste_alt_created: <?=json_encode($ec_lang['lpn_paste_alt_created'])?>,
 	lpn_paste_props_menu: <?=json_encode($ec_lang['lpn_paste_props_menu'])?>,
 	lpn_paste_props_off_none: <?=json_encode($ec_lang['lpn_paste_props_off_none'])?>,
+	lpn_paste_props_off_select: <?=json_encode($ec_lang['lpn_paste_props_off_select'])?>,
 	lpn_paste_props_off_kind: <?=json_encode($ec_lang['lpn_paste_props_off_kind'])?>,
 	lpn_tsb_menu: <?=json_encode($ec_lang['lpn_tsb_menu'])?>,
 	lpn_tsb_off_tip: <?=json_encode($ec_lang['lpn_tsb_off_tip'])?>,
@@ -2411,6 +2425,10 @@ EngCalcs.pageConfig = {
 	lpn_pane_sel_only: <?=json_encode($ec_lang['lpn_pane_sel_only'])?>,
 	lpn_pane_sel_only_none: <?=json_encode($ec_lang['lpn_pane_sel_only_none'])?>,
 	lpn_pane_scn_show: <?=json_encode($ec_lang['lpn_pane_scn_show'])?>,
+	lpn_pane_scn_ov_only: <?=json_encode($ec_lang['lpn_pane_scn_ov_only'])?>,
+	lpn_pane_scn_cur_only: <?=json_encode($ec_lang['lpn_pane_scn_cur_only'])?>,
+	lpn_pane_inactive_show: <?=json_encode($ec_lang['lpn_pane_inactive_show'])?>,
+	lpn_pane_scn_filter_note: <?=json_encode($ec_lang['lpn_pane_scn_filter_note'])?>,
 	lpn_pane_clear_override: <?=json_encode($ec_lang['lpn_pane_clear_override'])?>,
 	lpn_pane_scn_alt_tip: <?=json_encode($ec_lang['lpn_pane_scn_alt_tip'])?>,
 	lpn_pane_goto_tip: <?=json_encode($ec_lang['lpn_pane_goto_tip'])?>,
@@ -2609,6 +2627,8 @@ EngCalcs.pageConfig = {
 	lpn_library_pattern_default_tip: <?=json_encode($ec_lang['lpn_library_pattern_default_tip'])?>,
 	lpn_library_pattern_default_deleted_to: <?=json_encode($ec_lang['lpn_library_pattern_default_deleted_to'])?>,
 	lpn_library_pattern_default_deleted_none: <?=json_encode($ec_lang['lpn_library_pattern_default_deleted_none'])?>,
+	lpn_library_pattern_default_deleted_also: <?=json_encode($ec_lang['lpn_library_pattern_default_deleted_also'])?>,
+	lpn_library_pattern_default_deleted_in: <?=json_encode($ec_lang['lpn_library_pattern_default_deleted_in'])?>,
 	lpn_junction_pattern_unknown: <?=json_encode($ec_lang['lpn_junction_pattern_unknown'])?>,
 	lpn_library_control_add: <?=json_encode($ec_lang['lpn_library_control_add'])?>,
 	lpn_library_control_tip: <?=json_encode($ec_lang['lpn_library_control_tip'])?>,
@@ -2637,7 +2657,7 @@ EngCalcs.pageConfig = {
 	lpn_help_manual: <?=json_encode($ec_lang['lpn_help_manual'])?>,
 	lpn_guide_also: <?=json_encode($ec_lang['lpn_guide_also'])?>,
 	lpn_guide_how_popup: <?=json_encode($ec_lang['lpn_guide_how_popup'])?>,
-	lpn_guide_how_alt: <?=json_encode($ec_lang['lpn_guide_how_alt'])?>,
+	lpn_sm_help: <?=json_encode($ec_lang['lpn_sm_help'])?>,
 	lpn_guide_not_shown: <?=json_encode($ec_lang['lpn_guide_not_shown'])?>,
 	lpn_guide_box_help: <?=json_encode($ec_lang['lpn_guide_box_help'])?>,
 	lpn_guide_contents: <?=json_encode($ec_lang['lpn_guide_contents'])?>,
@@ -2653,7 +2673,6 @@ EngCalcs.pageConfig = {
 	lpn_guide_text_scncmp_box: <?=json_encode($ec_lang['lpn_guide_text_scncmp_box'])?>,
 	lpn_guide_text_rptbox: <?=json_encode($ec_lang['lpn_guide_text_rptbox'])?>,
 	lpn_guide_text_status_box: <?=json_encode($ec_lang['lpn_guide_text_status_box'])?>,
-	lpn_guide_text_alt_box: <?=json_encode($ec_lang['lpn_guide_text_alt_box'])?>,
 	lpn_guide_text_full_box: <?=json_encode($ec_lang['lpn_guide_text_full_box'])?>,
 	lpn_guide_text_calib_box: <?=json_encode($ec_lang['lpn_guide_text_calib_box'])?>,
 	lpn_guide_text_notes_popup: <?=json_encode($ec_lang['lpn_guide_text_notes_popup'])?>,
@@ -2885,7 +2904,6 @@ EngCalcs.pageConfig = {
 	lpn_labels_col_after: <?=json_encode($ec_lang['lpn_labels_col_after'])?>,
 	lpn_labels_col_decimals: <?=json_encode($ec_lang['lpn_labels_col_decimals'])?>,
 	lpn_labels_col_decimals_example: <?=json_encode($ec_lang['lpn_labels_col_decimals_example'])?>,
-	lpn_labels_col_rank: <?=json_encode($ec_lang['lpn_labels_col_rank'])?>,
 <?php // **A KEY THAT WAS TRANSLATED INTO ALL 26 AND NEVER REACHED THE PAGE.** The Labels panel read
       // `pc.lpn_labels_col_drop` and this line was not here, so the heading fell through to its
       // English fallback in every language while `lang.ec.es.php` had carried "Descarte" all along.
@@ -3305,6 +3323,7 @@ EngCalcs.pageConfig = {
 	lpn_terrain_version: <?=json_encode(EC_TERRAIN_VERSION)?>,
 	lpn_terrain_days: <?=json_encode(EC_TERRAIN_DAYS)?>,
 	lpn_menu_project: <?=json_encode($ec_lang['lpn_menu_project'])?>,
+	lpn_change_type_base_only: <?=json_encode($ec_lang['lpn_change_type_base_only'])?>,
 	lpn_change_type_menu: <?=json_encode($ec_lang['lpn_change_type_menu'])?>,
 	lpn_change_type_tip: <?=json_encode($ec_lang['lpn_change_type_tip'])?>,
 	lpn_change_type_ok: <?=json_encode($ec_lang['lpn_change_type_ok'])?>,
@@ -3312,6 +3331,7 @@ EngCalcs.pageConfig = {
 	lpn_change_type_key: <?=json_encode($ec_lang['lpn_change_type_key'])?>,
 	lpn_change_type_line: <?=json_encode($ec_lang['lpn_change_type_line'])?>,
 	lpn_change_type_line_scenario: <?=json_encode($ec_lang['lpn_change_type_line_scenario'])?>,
+	lpn_change_type_line_alternative: <?=json_encode($ec_lang['lpn_change_type_line_alternative'])?>,
 	lpn_change_type_more: <?=json_encode($ec_lang['lpn_change_type_more'])?>,
 	lpn_change_type_meaning: <?=json_encode($ec_lang['lpn_change_type_meaning'])?>,
 	lpn_change_type_surface: <?=json_encode($ec_lang['lpn_change_type_surface'])?>,
@@ -3789,7 +3809,10 @@ EngCalcs.pageConfig = {
 	lpn_scenario_prompt_name: <?=json_encode($ec_lang['lpn_scenario_prompt_name'])?>,
 	lpn_scenario_rename: <?=json_encode($ec_lang['lpn_scenario_rename'])?>,
 	lpn_scenario_delete: <?=json_encode($ec_lang['lpn_scenario_delete'])?>,
-	lpn_scenario_delete_confirm: <?=json_encode($ec_lang['lpn_scenario_delete_confirm'])?>,
+	lpn_scenario_delete_ask: <?=json_encode($ec_lang['lpn_scenario_delete_ask'])?>,
+	lpn_scenario_delete_goes: <?=json_encode($ec_lang['lpn_scenario_delete_goes'])?>,
+	lpn_scenario_delete_stays: <?=json_encode($ec_lang['lpn_scenario_delete_stays'])?>,
+	lpn_scenario_delete_has_children: <?=json_encode($ec_lang['lpn_scenario_delete_has_children'])?>,
 	lpn_scenario_override: <?=json_encode($ec_lang['lpn_scenario_override'])?>,
 	lpn_scenario_override_tip: <?=json_encode($ec_lang['lpn_scenario_override_tip'])?>,
 	lpn_scenario_base_value: <?=json_encode($ec_lang['lpn_scenario_base_value'])?>,
@@ -3801,11 +3824,100 @@ EngCalcs.pageConfig = {
 	lpn_scenario_push_tip: <?=json_encode($ec_lang['lpn_scenario_push_tip'])?>,
 	lpn_scenario_basic: <?=json_encode($ec_lang['lpn_scenario_basic'])?>,
 	lpn_scenario_basic_tip: <?=json_encode($ec_lang['lpn_scenario_basic_tip'])?>,
-	lpn_alt_title: <?=json_encode($ec_lang['lpn_alt_title'])?>,
-	lpn_alt_calc_options: <?=json_encode($ec_lang['lpn_alt_calc_options'])?>,
-	lpn_alt_note: <?=json_encode($ec_lang['lpn_alt_note'])?>,
-	lpn_scenario_duration_tip: <?=json_encode($ec_lang['lpn_scenario_duration_tip'])?>,
-	lpn_scenario_hyd_step_tip: <?=json_encode($ec_lang['lpn_scenario_hyd_step_tip'])?>,
+	lpn_scenario_basic_misfit: <?=json_encode($ec_lang['lpn_scenario_basic_misfit'])?>,
+	lpn_scenario_copy: <?=json_encode($ec_lang['lpn_scenario_copy'])?>,
+	lpn_scenario_copy_tip: <?=json_encode($ec_lang['lpn_scenario_copy_tip'])?>,
+	lpn_scenario_copy_off: <?=json_encode($ec_lang['lpn_scenario_copy_off'])?>,
+	lpn_sm_title: <?=json_encode($ec_lang['lpn_sm_title'])?>,
+	lpn_sm_menu: <?=json_encode($ec_lang['lpn_sm_menu'])?>,
+	lpn_sm_basic_off: <?=json_encode($ec_lang['lpn_sm_basic_off'])?>,
+	lpn_pane_tab_scenarios: <?=json_encode($ec_lang['lpn_pane_tab_scenarios'])?>,
+	lpn_sm_col_parent: <?=json_encode($ec_lang['lpn_sm_col_parent'])?>,
+	lpn_sm_add_child: <?=json_encode($ec_lang['lpn_sm_add_child'])?>,
+	lpn_sm_add_base: <?=json_encode($ec_lang['lpn_sm_add_base'])?>,
+	lpn_sm_add_base_tip: <?=json_encode($ec_lang['lpn_sm_add_base_tip'])?>,
+	lpn_sm_add_base_alt_tip: <?=json_encode($ec_lang['lpn_sm_add_base_alt_tip'])?>,
+	lpn_sm_delete: <?=json_encode($ec_lang['lpn_sm_delete'])?>,
+	lpn_sm_base_kept: <?=json_encode($ec_lang['lpn_sm_base_kept'])?>,
+	lpn_sm_rename: <?=json_encode($ec_lang['lpn_sm_rename'])?>,
+	lpn_sm_rename_alts_ask: <?=json_encode($ec_lang['lpn_sm_rename_alts_ask'])?>,
+	lpn_sm_make_current: <?=json_encode($ec_lang['lpn_sm_make_current'])?>,
+	lpn_sm_current_already: <?=json_encode($ec_lang['lpn_sm_current_already'])?>,
+	lpn_sm_none_selected: <?=json_encode($ec_lang['lpn_sm_none_selected'])?>,
+	lpn_sm_base_named: <?=json_encode($ec_lang['lpn_sm_base_named'])?>,
+	lpn_sm_copy: <?=json_encode($ec_lang['lpn_sm_copy'])?>,
+	lpn_sm_in_use: <?=json_encode($ec_lang['lpn_sm_in_use'])?>,
+	lpn_sm_name_taken: <?=json_encode($ec_lang['lpn_sm_name_taken'])?>,
+	lpn_sm_cycle: <?=json_encode($ec_lang['lpn_sm_cycle'])?>,
+	lpn_sm_used_by: <?=json_encode($ec_lang['lpn_sm_used_by'])?>,
+	lpn_sm_used_by_tip: <?=json_encode($ec_lang['lpn_sm_used_by_tip'])?>,
+	lpn_sm_used_by_none: <?=json_encode($ec_lang['lpn_sm_used_by_none'])?>,
+	lpn_sm_compare_tip: <?=json_encode($ec_lang['lpn_sm_compare_tip'])?>,
+	lpn_sm_inherited: <?=json_encode($ec_lang['lpn_sm_inherited'])?>,
+	lpn_sm_shared_note: <?=json_encode($ec_lang['lpn_sm_shared_note'])?>,
+	lpn_scncmp_none_checked: <?=json_encode($ec_lang['lpn_scncmp_none_checked'])?>,
+	lpn_alt_cat_topology_tip: <?=json_encode($ec_lang['lpn_alt_cat_topology_tip'])?>,
+	lpn_settings_table_major: <?=json_encode($ec_lang['lpn_settings_table_major'])?>,
+	lpn_settings_table_minor: <?=json_encode($ec_lang['lpn_settings_table_minor'])?>,
+	lpn_settings_table_category: <?=json_encode($ec_lang['lpn_settings_table_category'])?>,
+	lpn_settings_table_owner: <?=json_encode($ec_lang['lpn_settings_table_owner'])?>,
+	lpn_settings_table_setting: <?=json_encode($ec_lang['lpn_settings_table_setting'])?>,
+	lpn_settings_table_yes: <?=json_encode($ec_lang['lpn_settings_table_yes'])?>,
+	lpn_settings_table_no: <?=json_encode($ec_lang['lpn_settings_table_no'])?>,
+	lpn_settings_row_of: <?=json_encode($ec_lang['lpn_settings_row_of'])?>,
+	lpn_settings_row_labels_field: <?=json_encode($ec_lang['lpn_settings_row_labels_field'])?>,
+	lpn_settings_row_labels_part: <?=json_encode($ec_lang['lpn_settings_row_labels_part'])?>,
+	lpn_settings_row_labels_customer: <?=json_encode($ec_lang['lpn_settings_row_labels_customer'])?>,
+	lpn_settings_row_label_before: <?=json_encode($ec_lang['lpn_settings_row_label_before'])?>,
+	lpn_settings_row_label_after: <?=json_encode($ec_lang['lpn_settings_row_label_after'])?>,
+	lpn_settings_row_label_on: <?=json_encode($ec_lang['lpn_settings_row_label_on'])?>,
+	lpn_settings_row_label_show: <?=json_encode($ec_lang['lpn_settings_row_label_show'])?>,
+	lpn_settings_row_label_drop: <?=json_encode($ec_lang['lpn_settings_row_label_drop'])?>,
+	lpn_settings_row_id_prefix: <?=json_encode($ec_lang['lpn_settings_row_id_prefix'])?>,
+	lpn_settings_row_symbol_cap_multiple: <?=json_encode($ec_lang['lpn_settings_row_symbol_cap_multiple'])?>,
+	lpn_settings_row_symbol_cap_percentile: <?=json_encode($ec_lang['lpn_settings_row_symbol_cap_percentile'])?>,
+	lpn_settings_row_contour_labels: <?=json_encode($ec_lang['lpn_settings_row_contour_labels'])?>,
+	lpn_settings_row_check_freq: <?=json_encode($ec_lang['lpn_settings_row_check_freq'])?>,
+	lpn_settings_row_max_check: <?=json_encode($ec_lang['lpn_settings_row_max_check'])?>,
+	lpn_settings_row_status_report: <?=json_encode($ec_lang['lpn_settings_row_status_report'])?>,
+	lpn_settings_row_pda_src: <?=json_encode($ec_lang['lpn_settings_row_pda_src'])?>,
+	lpn_settings_row_quality_option: <?=json_encode($ec_lang['lpn_settings_row_quality_option'])?>,
+	lpn_settings_row_tolerance: <?=json_encode($ec_lang['lpn_settings_row_tolerance'])?>,
+	lpn_settings_row_emitter_exponent_old: <?=json_encode($ec_lang['lpn_settings_row_emitter_exponent_old'])?>,
+	lpn_settings_row_elev_source_old: <?=json_encode($ec_lang['lpn_settings_row_elev_source_old'])?>,
+	lpn_settings_row_basemap: <?=json_encode($ec_lang['lpn_settings_row_basemap'])?>,
+	lpn_settings_row_basemap_last: <?=json_encode($ec_lang['lpn_settings_row_basemap_last'])?>,
+	lpn_settings_row_customer_max_width: <?=json_encode($ec_lang['lpn_settings_row_customer_max_width'])?>,
+	lpn_settings_row_quality_step: <?=json_encode($ec_lang['lpn_settings_row_quality_step'])?>,
+	lpn_settings_row_view: <?=json_encode($ec_lang['lpn_settings_row_view'])?>,
+	lpn_settings_row_contour_fill: <?=json_encode($ec_lang['lpn_settings_row_contour_fill'])?>,
+	lpn_settings_row_contour_opacity: <?=json_encode($ec_lang['lpn_settings_row_contour_opacity'])?>,
+	lpn_settings_row_contour_interval: <?=json_encode($ec_lang['lpn_settings_row_contour_interval'])?>,
+	lpn_settings_row_contour_buffer: <?=json_encode($ec_lang['lpn_settings_row_contour_buffer'])?>,
+	lpn_settings_row_contour_terrain: <?=json_encode($ec_lang['lpn_settings_row_contour_terrain'])?>,
+	lpn_settings_row_new_asset: <?=json_encode($ec_lang['lpn_settings_row_new_asset'])?>,
+	lpn_settings_row_default: <?=json_encode($ec_lang['lpn_settings_row_default'])?>,
+	lpn_settings_row_view_value: <?=json_encode($ec_lang['lpn_settings_row_view_value'])?>,
+	lpn_settings_held_in: <?=json_encode($ec_lang['lpn_settings_held_in'])?>,
+	lpn_settings_held_base: <?=json_encode($ec_lang['lpn_settings_held_base'])?>,
+	lpn_settings_view_center: <?=json_encode($ec_lang['lpn_settings_view_center'])?>,
+	lpn_settings_view_scale: <?=json_encode($ec_lang['lpn_settings_view_scale'])?>,
+	lpn_settings_view_scale_tip: <?=json_encode($ec_lang['lpn_settings_view_scale_tip'])?>,
+	lpn_settings_view_top_left: <?=json_encode($ec_lang['lpn_settings_view_top_left'])?>,
+	lpn_settings_view_bottom_right: <?=json_encode($ec_lang['lpn_settings_view_bottom_right'])?>,
+	lpn_settings_view_save: <?=json_encode($ec_lang['lpn_settings_view_save'])?>,
+	lpn_settings_view_save_tip: <?=json_encode($ec_lang['lpn_settings_view_save_tip'])?>,
+	lpn_settings_row_basemap_osm: <?=json_encode($ec_lang['lpn_settings_row_basemap_osm'])?>,
+	lpn_settings_row_basemap_satellite: <?=json_encode($ec_lang['lpn_settings_row_basemap_satellite'])?>,
+	lpn_settings_units_one_project: <?=json_encode($ec_lang['lpn_settings_units_one_project'])?>,
+	lpn_settings_restore_base_only: <?=json_encode($ec_lang['lpn_settings_restore_base_only'])?>,
+	lpn_settings_sym_all: <?=json_encode($ec_lang['lpn_settings_sym_all'])?>,
+	lpn_settings_sym_customer: <?=json_encode($ec_lang['lpn_settings_sym_customer'])?>,
+	lpn_settings_sym_node_colors: <?=json_encode($ec_lang['lpn_settings_sym_node_colors'])?>,
+	lpn_settings_sym_link_colors: <?=json_encode($ec_lang['lpn_settings_sym_link_colors'])?>,
+	lpn_settings_hydraulics: <?=json_encode($ec_lang['lpn_settings_hydraulics'])?>,
+	lpn_settings_quality: <?=json_encode($ec_lang['lpn_settings_quality'])?>,
+	lpn_settings_energy: <?=json_encode($ec_lang['lpn_settings_energy'])?>,
 	lpn_time_scn_overrides: <?=json_encode($ec_lang['lpn_time_scn_overrides'])?>,
 	lpn_alt_cat_physical: <?=json_encode($ec_lang['lpn_alt_cat_physical'])?>,
 	lpn_alt_cat_demand: <?=json_encode($ec_lang['lpn_alt_cat_demand'])?>,
@@ -3816,6 +3928,8 @@ EngCalcs.pageConfig = {
 	lpn_alt_cat_energy: <?=json_encode($ec_lang['lpn_alt_cat_energy'])?>,
 	lpn_alt_cat_userdata: <?=json_encode($ec_lang['lpn_alt_cat_userdata'])?>,
 	lpn_alt_cat_text: <?=json_encode($ec_lang['lpn_alt_cat_text'])?>,
+	lpn_alt_cat_presentation: <?=json_encode($ec_lang['lpn_alt_cat_presentation'])?>,
+	lpn_alt_cat_calculation: <?=json_encode($ec_lang['lpn_alt_cat_calculation'])?>,
 	lpn_scenario_push_confirm: <?=json_encode($ec_lang['lpn_scenario_push_confirm'])?>,
 	lpn_scenario_push_scenarios: <?=json_encode($ec_lang['lpn_scenario_push_scenarios'])?>,
 	lpn_scenario_push_values: <?=json_encode($ec_lang['lpn_scenario_push_values'])?>,
@@ -3926,6 +4040,8 @@ EngCalcs.pageConfig = {
 	lpn_control_dangling_note: <?=json_encode($ec_lang['lpn_control_dangling_note'])?>,
 	lpn_control_unreadable_note: <?=json_encode($ec_lang['lpn_control_unreadable_note'])?>,
 	lpn_rule_dangling_note: <?=json_encode($ec_lang['lpn_rule_dangling_note'])?>,
+	lpn_control_inactive_note: <?=json_encode($ec_lang['lpn_control_inactive_note'])?>,
+	lpn_rule_inactive_note: <?=json_encode($ec_lang['lpn_rule_inactive_note'])?>,
 	lpn_rule_unreadable_note: <?=json_encode($ec_lang['lpn_rule_unreadable_note'])?>,
 	lpn_unit_unknown: <?=json_encode($ec_lang['lpn_unit_unknown'])?>,
 	lpn_settings_text_size: <?=json_encode($ec_lang['lpn_settings_text_size'])?>,

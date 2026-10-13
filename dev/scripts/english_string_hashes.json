@@ -1,7 +1,7 @@
 {
     "description": "sha1 of each lang.ec.en.php $ec_lang value as of the last full translation sync. Maintained by detect_english_drift.php --update. A current-vs-manifest hash mismatch means that key's English changed and translations may be stale. Do not hand-edit.",
     "updated": "2026-09-30",
-    "count": 2564,
+    "count": 2555,
     "partial_updates": [
         {
             "date": "2026-08-08",
@@ -5685,7 +5685,6 @@
         "lpn_ago_minutes": "5bac86d4ed544f09d349c91c624aa7241b3b56d4",
         "lpn_ago_seconds": "c6619272c6c3cf26a6256ccc0a1bc81015d52ff0",
         "lpn_ago_unknown": "e5d8e78c934822133d687f84c0ba00f97fa6a57f",
-        "lpn_alt_calc_options": "dca03217b8825a4289ceba1db8aced6be7eae82a",
         "lpn_alt_cat_constituent": "23f55ca65c4227d087e565eb5b3356e1890408a9",
         "lpn_alt_cat_demand": "5dfc68721f3d071b69d27ebcd8245d0506b058de",
         "lpn_alt_cat_energy": "ff77aee41d3e26ecab377c93148d5ed4a9ef856d",
@@ -5695,8 +5694,6 @@
         "lpn_alt_cat_text": "c3328c39b0e29f78e9ff45db674248b1d245887d",
         "lpn_alt_cat_topology": "60f589c77fc1c75bf9a0f9e443e9c8884d498733",
         "lpn_alt_cat_userdata": "07daf13a314add9a92c0f8e5564d81ce72e4937c",
-        "lpn_alt_note": "565b82e0c015065395cad0151e2e635c3b8aff41",
-        "lpn_alt_title": "3b483c7274ec40fc831af1911b39edbd7951e704",
         "lpn_analyze_at_time": "1be8cf597eb115bc1363eb79aaad61961977f623",
         "lpn_analyze_menu": "0e524de0b8226a149e73a5ad0308dee279154e71",
         "lpn_analyze_menu_tip": "b325bff790d5e9886437194b2056a0b394e134d7",
@@ -6551,7 +6548,6 @@
         "lpn_guide_find_results_def": "213ae46a1f2fe7993ad7056ec8023da99aa30890",
         "lpn_guide_find_results_term": "2388ed3df6fc909eacece0f6e8669c46c7863ed3",
         "lpn_guide_group_from": "76fd031463fec9a637a0d8ee706c3439fbde38a2",
-        "lpn_guide_how_alt": "0cb7138633f7fdd561ca98649fc95815cc440c29",
         "lpn_guide_how_popup": "ca6daa3e6a1f410c7c9480cd7dfce4be6081a9ed",
         "lpn_guide_keys_def": "9ed7181549ab388f5582cd3ac1f900974685f98f",
         "lpn_guide_keys_term": "15064776bddc6e28ce8e82854ada9efbaaa3cdab",
@@ -6560,7 +6556,6 @@
         "lpn_guide_rail_hide": "18c436da80f26630c3cbd6213841b5496b80612c",
         "lpn_guide_rail_show": "0d66dcc281f7ece2fea4946ad11bf178de894c91",
         "lpn_guide_search": "6126f8cb7a22bb997666a8cf47ab08d0f40608d1",
-        "lpn_guide_text_alt_box": "ef51ccd2544ace5cba71fdacb06c3c1f121718fc",
         "lpn_guide_text_calib_box": "06af2abb8ed51385485b1f1d7a9b57d4194e1d14",
         "lpn_guide_text_contour_box": "9ffcfdeaf3575497520edb5f218783d463bc6544",
         "lpn_guide_text_energy_box": "f752908b4bac3305f2615d0f85fdef69d38ce71b",
@@ -6660,7 +6655,6 @@
         "lpn_labels_col_decimals": "2a4e3cb3c61a05b20a67803c34e108388104bb00",
         "lpn_labels_col_decimals_example": "725af3071b1eef0162f9a95017e7c21a35821798",
         "lpn_labels_col_drop": "0a088b3115056ef6acd3ab4b406c823e1724e216",
-        "lpn_labels_col_rank": "dd48a1149548f0b07ddec97e040571c91978fbab",
         "lpn_labels_col_show": "d97d1ee339e4eeaba8cac91dca37c8b4ec8f5501",
         "lpn_labels_customer_note": "500daba25a29181be5dd6f8829f74a70e948d582",
         "lpn_labels_customer_width_tip": "370e83af2dec2ad13798f4820ecb4f704c864f56",
@@ -7153,10 +7147,7 @@
         "lpn_scenario_deactivated": "e2346a19f78e8c9e1b105bf9f5bdb97368b7d98c",
         "lpn_scenario_delete": "92f18604ed3875b89df8b049319e29504e03e6d5",
         "lpn_scenario_delete_blocked": "507e26e6a8f143996f6317842d62bf1810732ebf",
-        "lpn_scenario_delete_confirm": "e4788e600ebea20d080d24a668987025ca9257bb",
         "lpn_scenario_delete_in_base": "681cb93e064e8298506f582ade94ce28cf3fa8b8",
-        "lpn_scenario_duration_tip": "a4d5bfcaf3880fe6e503d2f497fe0f40a17c4eec",
-        "lpn_scenario_hyd_step_tip": "3732c5f2ab58af4c7fc27e8d4333717e7b050029",
         "lpn_scenario_label": "569aae5b47e464b83049959de67717fbf2ff4407",
         "lpn_scenario_mark_tip": "9dced59c405c291c951a61e7e9c928dde016c532",
         "lpn_scenario_menu": "2dd4a83d012acd714fbd600cfb9847611783fea3",
@@ -8965,10 +8956,6 @@
             "words": 3,
             "ends_sentence": false
         },
-        "lpn_alt_calc_options": {
-            "words": 2,
-            "ends_sentence": false
-        },
         "lpn_alt_cat_constituent": {
             "words": 1,
             "ends_sentence": false
@@ -9002,14 +8989,6 @@
             "ends_sentence": false
         },
         "lpn_alt_cat_userdata": {
-            "words": 2,
-            "ends_sentence": false
-        },
-        "lpn_alt_note": {
-            "words": 37,
-            "ends_sentence": true
-        },
-        "lpn_alt_title": {
             "words": 2,
             "ends_sentence": false
         },
@@ -12429,10 +12408,6 @@
             "words": 2,
             "ends_sentence": false
         },
-        "lpn_guide_how_alt": {
-            "words": 12,
-            "ends_sentence": true
-        },
         "lpn_guide_how_popup": {
             "words": 9,
             "ends_sentence": true
@@ -12464,10 +12439,6 @@
         "lpn_guide_search": {
             "words": 3,
             "ends_sentence": false
-        },
-        "lpn_guide_text_alt_box": {
-            "words": 60,
-            "ends_sentence": true
         },
         "lpn_guide_text_calib_box": {
             "words": 37,
@@ -12862,10 +12833,6 @@
             "ends_sentence": false
         },
         "lpn_labels_col_drop": {
-            "words": 1,
-            "ends_sentence": false
-        },
-        "lpn_labels_col_rank": {
             "words": 1,
             "ends_sentence": false
         },
@@ -14837,20 +14804,8 @@
             "words": 26,
             "ends_sentence": true
         },
-        "lpn_scenario_delete_confirm": {
-            "words": 19,
-            "ends_sentence": true
-        },
         "lpn_scenario_delete_in_base": {
             "words": 12,
-            "ends_sentence": true
-        },
-        "lpn_scenario_duration_tip": {
-            "words": 16,
-            "ends_sentence": true
-        },
-        "lpn_scenario_hyd_step_tip": {
-            "words": 6,
             "ends_sentence": true
         },
         "lpn_scenario_label": {

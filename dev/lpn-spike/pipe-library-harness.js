@@ -248,7 +248,9 @@ head('4. A RENAME CARRIES EVERY REFERENCE, IN BASE AND IN A SCENARIO ALIKE');
 		`both the Base reference and the scenario one count as use: ${L.pipeTypeUsers('T_PVC').join(', ')}`);
 	check(L.libRenamePipeType(L.pipeTypeById('T_PVC'), 'T_PVC_C900') === true, 'the rename is accepted');
 	check(L.linkById('P1')._typeId === 'T_PVC_C900', 'Base\'s own reference moved');
-	const ov = L.getScenarios().filter((s) => s.id === 's1')[0].overrides['l:P2'];
+	// Wherever s1 holds it: its own map, or the alternative an override stored (2026-10-12).
+	const s1 = L.getScenarios().filter((s) => s.id === 's1')[0];
+	const ov = s1.overrides['l:P2'] || (L.getDoc().alternatives || []).filter((a) => a.id === (s1.alternatives || {}).physical).map((a) => (a.values || {})['l:P2'])[0];
 	check(!!ov && ov.typeId === 'T_PVC_C900',
 		`and so did the scenario's, which is the one a rename is most likely to strand: ${JSON.stringify(ov)}`);
 	check(L.pipeTypeUsers('T_PVC').length === 0 && L.pipeTypeUsers('T_PVC_C900').length === 2,

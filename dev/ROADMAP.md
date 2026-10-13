@@ -76,7 +76,8 @@ the block.
   user's to edit. **First item: the full alternatives and inheritance model under the hood** (stages
   4 and 5), after advice from every angle (*"Order matters... we are likely to make mistakes"*).
   Stages, answers and code: `dev/scenario-alternatives.md` on `feat/bentley-interop`. Basic mode
-  hides it until the Advanced UX is designed. Task 765 (Presentation) is folded in here.
+  hides it until the Advanced UX is designed. Task 765 (Presentation) is folded in here. Stage 6 (the
+  Scenario manager and the Scenarios table, Tom's calls of 2026-10-09) is built on the branch.
 - 100|779| **Shape: a simple drawn element, point, polyline or polygon, with snapping.**
   Tom, 2026-10-06: *"a very simple shape element type (if one point, it's a point, and if more,
   it's a polyline, and it can close into a polygon if you let it. Either way, we call it a
