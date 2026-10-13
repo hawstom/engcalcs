@@ -4307,3 +4307,8 @@ OBSERVED: Net2 US and SI open with project.basemap=satellite and request api.map
 OBSERVED: Net2 US labelSettings (suffix/decimals/show/priority/useUnits/customer) and symbolCap* dropped vs Tom's /tmp/Net2.epp; nodes/links identical.
 OBSERVED: translation payloads still carry lpn_ex_net3_world keys (orchestrator regenerates).
 OBSERVED: Net3 SI colorBreaks {} -> legend auto-breaks 14.1/28.1/42.2/56.3 m, not round.
+
+2026-10-12, feat/shape a4d9a471. OBSERVED: 7 earlier findings verified fixed on real files in Chromium. OBSERVED: the ArcGIS
+default "Id" column outranks a Name column as the source of the Shape ID. OBSERVED: my own harness misreported
+"0 shapes" by reading localStorage after a storage-full save. Lesson for this seat: when a count comes from saved storage,
+also read the live document and the status bar before calling it a defect.
