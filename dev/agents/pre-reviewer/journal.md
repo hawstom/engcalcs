@@ -4312,3 +4312,10 @@ OBSERVED: Net3 SI colorBreaks {} -> legend auto-breaks 14.1/28.1/42.2/56.3 m, no
 default "Id" column outranks a Name column as the source of the Shape ID. OBSERVED: my own harness misreported
 "0 shapes" by reading localStorage after a storage-full save. Lesson for this seat: when a count comes from saved storage,
 also read the live document and the status bar before calling it a defect.
+
+## 2026-10-13 review of feat/bentley-interop @ 5bcc28f0 (Perry)
+- OBSERVED: all listed harnesses pass; undo of Copy scenario/Rename/Delete restores exactly (probe-undo.js, Basic mode, crafted Net1).
+- OBSERVED: shipped examples contain no scenarios beyond Base, so misfit-on-arrival cannot hit them.
+- OBSERVED: "Its 1 overrides" plural defect in lpn_scenario_delete_goes.
+- OBSERVED: harness " | " in M1 output is the harness joining two strings, not a doubled notice; do not re-flag.
+- SPECULATION: global localStorage Basic pref means opening a misfit project in one tab turns Basic off for other tabs.
