@@ -44153,11 +44153,11 @@ var EngCalcs = EngCalcs || {};
 			// the small-screen breakpoint a door, where the whole toolbar is hidden -- the same
 			// reason Select itself has a row above.
 			{ icon: 'select-window', pointerOnly: true, label: pc.lpn_tool_area_window || 'Select a window',
-				tip: pc.lpn_tool_area_tip, fn: function () { setSelectAreaShape('window'); } },
+				tip: toolTipWithKey('select-area', pc.lpn_tool_area_tip), fn: function () { setSelectAreaShape('window'); } },
 			{ icon: 'select-lasso', pointerOnly: true, label: pc.lpn_tool_area_lasso || 'Select a lasso',
-				tip: pc.lpn_tool_area_tip, fn: function () { setSelectAreaShape('lasso'); } },
+				tip: toolTipWithKey('select-area', pc.lpn_tool_area_tip), fn: function () { setSelectAreaShape('lasso'); } },
 			{ icon: 'select-polygon', pointerOnly: true, label: pc.lpn_tool_area_polygon || 'Select a polygon',
-				tip: pc.lpn_tool_area_tip, fn: function () { setSelectAreaShape('polygon'); } },
+				tip: toolTipWithKey('select-area', pc.lpn_tool_area_tip), fn: function () { setSelectAreaShape('polygon'); } },
 			{ icon: 'undo', label: pc.lpn_tool_undo || 'Undo', tip: pc.lpn_tool_undo_tip, hotkey: 'Mod+Z', fn: undo },
 			// Find sits with Undo and Delete because it acts on the ELEMENTS, which is what this
 			// menu is about; View holds the things that change how the map is drawn. Every editor
@@ -44217,7 +44217,7 @@ var EngCalcs = EngCalcs || {};
 	// of the nine digits, and both facts were once told in prose instead. **NEITHER KEY SWITCHES
 	// THE TOOL ON, and that is not the claim**: Delete removes what is selected and Esc returns to
 	// Select, so the tip says what to press to do the thing the button is named for.
-	var LPN_TOOL_ALT_KEYS = { 'select': 'Esc', 'delete': 'Delete' };
+	var LPN_TOOL_ALT_KEYS = { 'select': 'Esc', 'delete': 'Delete', 'select-area': 'A' };
 	function toolTipWithKey(mode, tip) {
 		var pc = EngCalcs.pageConfig || {}, key = toolKeyFor(mode), alt = LPN_TOOL_ALT_KEYS[mode] || null;
 		if (key && alt) {
@@ -47665,7 +47665,7 @@ var EngCalcs = EngCalcs || {};
 		// The button SHOWS the shape it will draw, so the strip always states which of the three is
 		// current -- otherwise the only way to find out is to drag and see what happens.
 		function paintAreaButton() {
-			setIconLabel(areaBtn, 'select-' + selectAreaShape, areaShapeLabel(), pc.lpn_tool_area_tip);
+			setIconLabel(areaBtn, 'select-' + selectAreaShape, areaShapeLabel(), toolTipWithKey('select-area', pc.lpn_tool_area_tip));
 			// ASSIGNED, not appended: setIconLabel() adds `ec-help` to whatever is already there, so
 			// `+=` on a button repainted on every shape change grew the class list without bound.
 			if (areaBtn.className.indexOf('lpn-tool-more') < 0) { areaBtn.className += ' lpn-tool-more'; }
@@ -63315,6 +63315,20 @@ var EngCalcs = EngCalcs || {};
 		if (openMenuAnchor) { return; }
 		if (e.preventDefault) { e.preventDefault(); }
 		enterZoomWindow();
+	});
+
+	// **A IS AREA SELECT** (Tom, 2026-10-13, with W as the pattern, and F for Shape beside it): a named
+	// key, shown in the tip through LPN_TOOL_ALT_KEYS. Wired as W is: no modifier (Ctrl+A stays the
+	// table's select-all), never while typing, by character and by physical key, and an open menu keeps
+	// the letters for its mnemonics. It does what the toolbar button does: enter the tool with the shape
+	// it is showing, and cycle window, lasso, polygon when pressed again.
+	document.addEventListener('keydown', function (e) {
+		if (e.ctrlKey || e.metaKey || e.altKey || e.defaultPrevented) { return; }
+		if (isTextEntry(e.target)) { return; }
+		if (e.key !== 'a' && e.key !== 'A' && e.code !== 'KeyA') { return; }
+		if (openMenuAnchor) { return; }
+		if (e.preventDefault) { e.preventDefault(); }
+		setSelectAreaShape(mode === 'select-area' ? selectAreaShapeNext() : selectAreaShape);
 	});
 
 	/**

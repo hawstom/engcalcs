@@ -34,6 +34,7 @@ const { ROOT, loadLoopedNetwork, setUnitSet } = require('./lpn-dom-stub.js');
 const L = loadLoopedNetwork(
 	"\t\tgetMode: function () { return mode; }, setMode: setMode,\n" +
 	"\t\ttoolKeys: function () { return LPN_TOOL_KEYS; },\n" +
+	"\t\tareaShape: function () { return selectAreaShape; }, areaTip: function () { return toolTipWithKey('select-area', 'T'); },\n" +
 	"\t\tbuildLayers: function () { svg = document.getElementById('lpn_canvas');\n" +
 	"\t\t\tworld = el('g', {}, svg);\n" +
 	"\t\t\tlinksLayer = el('g', {}, world); nodesLayer = el('g', {}, world);\n" +
@@ -159,6 +160,47 @@ console.log('\n5. THE STRIP READS LEFT TO RIGHT IN THE SAME ORDER THE DIGITS DO'
 	['select', 'vertices', 'delete'].forEach(function (m) {
 		ok(m + ' is still in editGroup', new RegExp("mode: '" + m + "'[^}]*}, editGroup\\)").test(bar));
 	});
+}
+
+console.log('\n6. A IS AREA SELECT, WITH THE GUARDS THE DIGITS HAVE (Tom, 2026-10-13)');
+{
+	L.setMode('select');
+	press('a');
+	ok('"a" enters the area-select tool', L.getMode() === 'select-area', L.getMode());
+	ok('...with the shape it was showing (window)', L.areaShape() === 'window', L.areaShape());
+	press('A');
+	ok('pressing it again cycles to lasso, as the button does', L.getMode() === 'select-area' && L.areaShape() === 'lasso', L.areaShape());
+	press('a'); press('a');
+	ok('...then polygon, then back to window', L.areaShape() === 'window', L.areaShape());
+	L.setMode('select');
+	press('\u0444', { code: 'KeyA' });
+	ok('a Russian layout (key ф, code KeyA) enters it too', L.getMode() === 'select-area', L.getMode());
+	[['input', {}], ['textarea', {}], ['select', {}], ['div', { isContentEditable: true }]].forEach(function (pair) {
+		L.setMode('select');
+		press('a', { target: Object.assign({ tagName: pair[0].toUpperCase() }, pair[1]) });
+		ok('"a" typed into a <' + pair[0] + '> does not switch tools', L.getMode() === 'select', L.getMode());
+	});
+	[['ctrlKey'], ['metaKey'], ['altKey']].forEach(function (mod) {
+		L.setMode('select');
+		const o = {}; o[mod[0]] = true;
+		press('a', o);
+		ok(mod[0] + '+A is left to the table and the browser', L.getMode() === 'select', L.getMode());
+	});
+	ok('the tip names the key: ' + JSON.stringify(L.areaTip()), L.areaTip() === 'T Shortcut: A', L.areaTip());
+	// A is not a digit, so the digit map is unchanged and no digit is bound to the area tool.
+	ok('no digit is bound to select-area', Object.keys(L.toolKeys()).every(function (k) { return L.toolKeys()[k] !== 'select-area'; }));
+	const fs = require('fs');
+	const en = fs.readFileSync(ROOT + 'lib/lang.ec.en.php', 'utf8');
+	ok('the English area tip reads "Area select window/lasso/polygon."',
+		/\$ec_lang\['lpn_tool_area_tip'\]='Area select window\/lasso\/polygon\.';/.test(en));
+	const page = fs.readFileSync(ROOT + 'Looped-Network.php', 'utf8');
+	ok('Help\'s Map table has the A row, spliced beside the Chain row', /<td>A<\/td><td>' \. rtrim\(\$ec_lang\['lpn_tool_area_tip'\]/.test(page));
+	// F (Shape) is bound by feat/shape; until that merges it must be a no-op here.
+	L.setMode('select');
+	press('f');
+	const shapeThere = fs.readFileSync(ROOT + 'js/looped-network.js', 'utf8').indexOf("'add-shape'") >= 0;
+	ok(shapeThere ? '"f" starts the Shape tool' : '"f" is a no-op while there is no Shape tool on this branch',
+		L.getMode() === (shapeThere ? 'add-shape' : 'select'), L.getMode());
 }
 
 console.log(fails === 0 ? '\ntool keys harness: all checks passed'
