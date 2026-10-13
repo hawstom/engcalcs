@@ -490,9 +490,10 @@ async function main() {
 		ok('7.2 the old Alternatives box key is cleared', (await store('lpn_altbox')) === null);
 		// This project now has a Base of its own and a child of a child: Basic mode cannot show it
 		// (Tom, 2026-10-12), so ticking it is refused and says so.
+		a.dialogs.length = 0;
 		await scenarioMenu(await L('lpn_scenario_basic'));
-		ok('7.2a ticking Basic mode on is refused for a project it cannot show, in Tom\'s words',
-			(await store('lpn_scnbasic')) === 'off' && (await a.notice()) === (await L('lpn_scenario_basic_misfit')), await a.notice());
+		ok('7.2a ticking Basic mode on is refused for a project it cannot show, in Tom\'s words, in the dialog',
+			(await store('lpn_scnbasic')) === 'off' && a.dialogs.filter((x) => x.type === 'alert').map((x) => x.message).indexOf(await L('lpn_scenario_basic_misfit')) >= 0, JSON.stringify(a.dialogs));
 		ok('7.2b ...and the box stays open', await page.evaluate(() => getComputedStyle(document.getElementById('lpn_sm_box')).display !== 'none'));
 		// A fresh Net1 fits Basic mode: ticking it now closes the box and hides the tab.
 		await page.keyboard.press('Escape');

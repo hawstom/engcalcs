@@ -3847,6 +3847,7 @@ EngCalcs.pageConfig = {
 	lpn_sm_none_selected: <?=json_encode($ec_lang['lpn_sm_none_selected'])?>,
 	lpn_sm_base_named: <?=json_encode($ec_lang['lpn_sm_base_named'])?>,
 	lpn_sm_copy: <?=json_encode($ec_lang['lpn_sm_copy'])?>,
+	lpn_sm_delete_alt_ask: <?=json_encode($ec_lang['lpn_sm_delete_alt_ask'])?>,
 	lpn_sm_in_use: <?=json_encode($ec_lang['lpn_sm_in_use'])?>,
 	lpn_sm_name_taken: <?=json_encode($ec_lang['lpn_sm_name_taken'])?>,
 	lpn_sm_cycle: <?=json_encode($ec_lang['lpn_sm_cycle'])?>,

@@ -6938,13 +6938,28 @@ var EngCalcs = EngCalcs || {};
 			u = storedUsers(kind, id);
 			if (scenarioBasicMode && u.children.length === 0 && u.scenarios.every(function (x) { return x === sc.id; })) {
 				out.orphans.push({ kind: kind, id: id });
-				m = combineHolders([rec]);
-				Object.keys(m.values).forEach(function (k) { out.n += Object.keys(m.values[k]).length; });
-				out.n += settingLeaves(m.settings).length;
-				if (kind === 'calc' && typeof rec.demandMultiplier === 'number') { out.n++; }
+				out.n += storedOverrideCount(kind, rec);
 			} else if (out.kept.indexOf(String(rec.name || '')) < 0) { out.kept.push(String(rec.name || '')); }
 		});
 		return out;
+	}
+	// How many overrides one stored alternative or calculation set holds: its element values, its
+	// settings, and a calculation set's demand multiplier and two times.
+	function storedOverrideCount(kind, rec) {
+		var m = combineHolders([rec]), n = 0;
+		Object.keys(m.values).forEach(function (k) { n += Object.keys(m.values[k]).length; });
+		n += settingLeaves(m.settings).length;
+		if (kind === 'calc') {
+			if (typeof rec.demandMultiplier === 'number') { n++; }
+			LPN_SCENARIO_TIME_KEYS.forEach(function (key) { if (scenarioTimeValue(rec, key) !== undefined) { n++; } });
+		}
+		return n;
+	}
+	// "Its one override is deleted with it." / "Its {n} overrides are deleted with it.", or ''.
+	function overridesGoText(n) {
+		var pc = EngCalcs.pageConfig || {};
+		if (n === 1) { return pc.lpn_scenario_delete_goes_one || 'Its one override is deleted with it.'; }
+		return n ? (pc.lpn_scenario_delete_goes || 'Its {n} overrides are deleted with it.').replace('{n}', String(n)) : '';
 	}
 	function dropScenarioOrphans(plan) {
 		(plan && plan.orphans || []).forEach(function (o) { deleteStored(o.kind, o.id); });
@@ -6953,8 +6968,7 @@ var EngCalcs = EngCalcs || {};
 	function scenarioDeleteQuestion(sc) {
 		var pc = EngCalcs.pageConfig || {}, plan = scenarioDeletePlan(sc), parts;
 		parts = [(pc.lpn_scenario_delete_ask || 'Delete the scenario {name}? The drawing itself is not changed.').replace('{name}', scenarioDisplayName(sc))];
-		if (plan.n === 1) { parts.push(pc.lpn_scenario_delete_goes_one || 'Its one override is deleted with it.'); }
-		else if (plan.n) { parts.push((pc.lpn_scenario_delete_goes || 'Its {n} overrides are deleted with it.').replace('{n}', String(plan.n))); }
+		if (plan.n) { parts.push(overridesGoText(plan.n)); }
 		if (plan.kept.length) { parts.push((pc.lpn_scenario_delete_stays || 'These alternatives it uses stay in the project: {list}.').replace('{list}', plan.kept.join(', '))); }
 		return parts.join(' ');
 	}
@@ -52746,7 +52760,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			{ label: pc.lpn_copy_props_menu || 'Copy properties', enabled: true,
 				run: function () {
 					var got = copyProperties(hitRef);
-					if (got === 'none') { setNotice(pc.lpn_copy_props_no_overrides || 'No overrides to copy.'); return; }
+					// **NOTHING TO COPY IS SAID IN THE DIALOG** (Tom, 2026-10-13: *"a saving grace of an
+					// alert/dialog is that users would quickly learn that there is no point in copying
+					// properties where there are no overrides"*), as every other refusal here is
+					// (tellNotice()); the line also goes to the messages log.
+					if (got === 'none') { tellNotice(pc.lpn_copy_props_no_overrides || 'No overrides to copy.'); return; }
 					if (!got) { return; }
 					setNotice(String(inBaseScenario() ? (pc.lpn_copy_props_done || 'Copied properties of {id}.')
 						: (pc.lpn_copy_props_done_ov || 'Copied the overrides of {id} in this scenario.')).replace('{id}', hitRef.id));
@@ -74251,7 +74269,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	 *   2. every stored alternative and calculation set is a child of Base's (no parent, no Base of
 	 *      its own), so no alternative inherits from another;
 	 *   3. no stored alternative or calculation set is named by more than one scenario (none shared).
-	 * An alternative nobody names is allowed: it is no relationship, and Basic mode leaves it alone.
+	 * An alternative nobody names is allowed, whatever its parent: it is no relationship, and Basic
+	 * mode leaves it alone (Tom, 2026-10-13: *"No."*, to whether one should stop Basic mode).
 	 * Answers the first reason it does not fit, or '' when it fits.
 	 */
 	function basicModeMisfit() {
@@ -74268,8 +74287,14 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				named[k] = true;
 			});
 		});
-		(doc.alternatives || []).concat(doc.calcSets || []).forEach(function (r) {
-			if (!why && ((r.parent !== null && r.parent !== undefined) || r.root === true)) { why = 'tree'; }
+		// **ONLY ALTERNATIVES A SCENARIO NAMES ARE ASKED** (Tom, 2026-10-13, asked whether an
+		// alternative no scenario uses should stop a project showing in Basic mode: *"No."*). One left
+		// behind by a scenario deleted with Basic mode off may have a parent; it stops nothing.
+		(doc.alternatives || []).forEach(function (r) {
+			if (!why && named['a\u0000' + r.id] && ((r.parent !== null && r.parent !== undefined) || r.root === true)) { why = 'tree'; }
+		});
+		(doc.calcSets || []).forEach(function (r) {
+			if (!why && named['c\u0000' + r.id] && ((r.parent !== null && r.parent !== undefined) || r.root === true)) { why = 'tree'; }
 		});
 		return why;
 	}
@@ -74292,8 +74317,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function setScenarioBasicMode(on) {
 		var pc = EngCalcs.pageConfig || {};
 		// Ticking it on is refused, with the same sentence, for a project it cannot show.
+		// In the dialog (Tom, 2026-10-13: a line in the messages log is not discoverable), so nobody
+		// goes on working believing Basic mode is on.
 		if (on && basicModeMisfit()) {
-			setNotice(pc.lpn_scenario_basic_misfit || 'This project has scenarios and alternatives relationships that are not compatible with Scenarios Basic mode, so Basic mode is disabled.');
+			tellNotice(pc.lpn_scenario_basic_misfit || 'This project has scenarios and alternatives relationships that are not compatible with Scenarios Basic mode, so Basic mode is disabled.');
 			return false;
 		}
 		scenarioBasicMode = !!on;
@@ -74744,6 +74771,18 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				if (yes) { smActDeleteNow(tree, key, name, wasCurrent, from); }
 			});
 			return;
+		}
+		// **AN ALTERNATIVE THAT HOLDS OVERRIDES ASKS FIRST, SAYING HOW MANY GO WITH IT** (Tom,
+		// 2026-10-13: he deleted an alternative holding an override and was told nothing). One in use
+		// is refused below without asking; an empty one goes at once, as before.
+		if (tree !== 'scenarios' && !smInUseBy(tree, key).length) {
+			var rec = smRecord(tree, key), n = rec && !rec.implicit ? storedOverrideCount(smKind(tree), rec) : 0;
+			if (n) {
+				askDialog({ kind: 'confirm', text: (pc.lpn_sm_delete_alt_ask || 'Delete the alternative {name}?').replace('{name}', name) + ' ' + overridesGoText(n) }, function (yes) {
+					if (yes) { smActDeleteNow(tree, key, name, wasCurrent, from); }
+				});
+				return;
+			}
 		}
 		smActDeleteNow(tree, key, name, wasCurrent, from);
 	}

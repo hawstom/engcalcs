@@ -282,8 +282,10 @@ async function main() {
 		await a.toolbarClick(await L('lpn_pane_toggle'));
 		await a.settle(500);
 		await tab('junctions');
+		a.dialogs.length = 0;
 		await rightClickRow(['node', '10', await L('lpn_copy_props_menu')]);
-		ok('M1 Copy on an asset with no overrides in Fig 5 says "No overrides to copy."', (await a.notice()) === (await L('lpn_copy_props_no_overrides')), await a.notice());
+		ok('M1 Copy on an asset with no overrides in Fig 5 says "No overrides to copy." in the dialog (Tom, 2026-10-13)',
+			a.dialogs.length === 1 && a.dialogs[0].type === 'alert' && a.dialogs[0].message === (await L('lpn_copy_props_no_overrides')), JSON.stringify(a.dialogs));
 		await typeInto('junctions', '10', 'elev', '777');
 		await rightClickRow(['node', '10', await L('lpn_copy_props_menu')]);
 		ok('M1 with an override, Copy says it copied the overrides', (await a.notice()) === (await L('lpn_copy_props_done_ov')).replace('{id}', '10'), await a.notice());
@@ -460,8 +462,10 @@ async function main() {
 		ok('q01 arriving, Basic mode is turned off (the Scenarios tab shows)', await page.evaluate(() => getComputedStyle(document.getElementById('lpn_pane_tab_scenarios')).display !== 'none'));
 		ok('q01 ...for this project only: the remembered choice is not written', (await page.evaluate(() => localStorage.getItem('lpn_scnbasic'))) === null);
 		ok('q01 ...and says so in Tom\'s words', (await a.notice()) === MISFIT, await a.notice());
+		a.dialogs.length = 0;
 		await scenarioMenu(await L('lpn_scenario_basic'));
-		ok('q01 ticking Basic mode on is refused for it, with the same sentence', await page.evaluate(() => getComputedStyle(document.getElementById('lpn_pane_tab_scenarios')).display !== 'none') && (await a.notice()) === MISFIT);
+		ok('q01 ticking Basic mode on is refused for it, with the same sentence, in the dialog (Tom, 2026-10-13)', await page.evaluate(() => getComputedStyle(document.getElementById('lpn_pane_tab_scenarios')).display !== 'none') &&
+			a.dialogs.some((x) => x.type === 'alert' && x.message === MISFIT), JSON.stringify(a.dialogs));
 		await page.keyboard.press('Escape');
 		await page.click('#lpn_scenario_btn');
 		await page.waitForSelector('#lpn_menu_popup', { state: 'visible' });

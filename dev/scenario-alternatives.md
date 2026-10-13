@@ -1036,9 +1036,10 @@ off, and in the Scenario manager's Scenarios tree, with `lpn_scenario_copy_off`)
 scenario's own values and each stored alternative it names, as new alternatives named like the copy;
 what it inherits stays inherited. The Share edits / Separate edits question is gone. A project Basic
 mode cannot show turns Basic mode off when it arrives, in his words (`lpn_scenario_basic_misfit`), and
-ticking Basic mode on is refused for it; the test is `basicModeMisfit()`: a scenario with a parent
-other than Base or a Base of its own, an alternative or calculation set with a parent or a Base of its
-own, or one named by two scenarios.
+ticking Basic mode on is refused for it, in the dialog; the test is `basicModeMisfit()`: a scenario with
+a parent other than Base or a Base of its own, an alternative or calculation set a scenario names that has
+a parent or is a Base of its own, or one named by two scenarios. One no scenario names counts for
+nothing (below, 2026-10-13).
 
 **Renaming a scenario (q02).**
 
@@ -1085,6 +1086,25 @@ its own Base alternatives, one per category, each holding every value Base has n
 Child Alternatives", docs.bentley.com GUID-067F08A81CE747CDBDFB93AD301E0CFD); its "Creating
 Alternatives" page (GUID-630A2475...) says only how to make one, not whether it starts as a copy.
 Not snapshotted: the two scenario run times.
+
+### Tom's calls of 2026-10-13 (browser pass)
+
+**An alternative no scenario uses.** Asked: *"Unused alternatives: should an alternative that no
+scenario uses stop a project from showing in Basic mode? It doesn't now."* Tom: *"No."* Built:
+`basicModeMisfit()` asks only the alternatives and calculation sets a scenario names, so one left
+behind with a parent (a scenario deleted with Basic mode off keeps its alternatives) stops nothing.
+
+**Copy properties with nothing to copy.** Tom: *"a saving grace of an alert/dialog is that users would
+quickly learn that there is no point in copying properties where there are no overrides."* Built: "No
+overrides to copy." is said in the dialog, as every other refusal on the page is, and kept in the
+messages log. Ticking Basic mode on for a project it cannot show is refused in the dialog too.
+
+**Deleting what holds overrides says how many go** (his "I don't see this message"). Delete scenario
+with Basic mode on says so (it did; his project, Fig 4 > Fig 5, cannot be shown in Basic mode, so
+ticking it on was refused in a line of the messages log he did not see). With Basic mode off the
+overrides do not go: they stay in the alternative, which the question names as staying. Deleting an
+alternative that holds overrides now asks, "Delete the alternative {name}? Its one override is deleted
+with it."; an empty one still goes unasked.
 
 ### Next stage: what the advisers said (recorded, not built)
 
