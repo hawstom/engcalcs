@@ -5693,6 +5693,31 @@
             "on": "Split pipe {id} at this node?",
             "ruled": "2026-10-10",
             "answer": "I agree with Bentley that \"split\" is better than \"break\"."
+        },
+        "lpn_scenario_copy": {
+            "on": "Copy scenario",
+            "ruled": "2026-10-13",
+            "answer": "OK."
+        },
+        "lpn_scenario_copy_tip": {
+            "on": "Copies the open scenario and its overrides, and opens the copy.",
+            "ruled": "2026-10-13",
+            "answer": "OK."
+        },
+        "lpn_scenario_copy_off": {
+            "on": "Copy scenario works in Basic mode. With Basic mode off, add a scenario and choose its alternatives in the Scenarios table.",
+            "ruled": "2026-10-13",
+            "answer": "OK."
+        },
+        "lpn_sm_rename_alts_ask": {
+            "on": "Rename equally named alternatives?",
+            "ruled": "2026-10-13",
+            "answer": "OK."
+        },
+        "lpn_scenario_basic_misfit": {
+            "on": "This project has scenarios and alternatives relationships that are not compatible with Scenarios Basic mode, so Basic mode is disabled.",
+            "ruled": "2026-10-13",
+            "answer": "OK."
         }
     }
 }
