@@ -1450,8 +1450,8 @@ $ec_lang['lpn_tip_join']='{name} — {tip}';
 $ec_lang['lpn_tool_key_hint']='Shortcut: {key}';
 $ec_lang['lpn_tool_key_hint_two']='Shortcut: {key} or {key2}';
 $ec_lang['lpn_tool_add_chain_tip']='Chain junctions and pipes: specify a point on the map to add a junction, then specify each next point to add a pipe and a junction. Specify an existing node to continue from it. Press Escape to end the chain.';
-// Reworded 2026-10-13 on Tom's browser pass of feat/tool-key (the key A joins it as a Shortcut line);
-// the Shift rule lives on in the selection bubble (lpn_area_hint_shift).
+// Edited by TGH 2026-09-07; the Shift sentence rewritten 2026-09-08 on his ruling that Shift keeps
+// the selection and toggles what the shape catches (it used to say "add").
 $ec_lang['lpn_tool_area_tip']='Area select window/lasso/polygon.';
 $ec_lang['lpn_area_selected']='{n} selected.';
 // Edited by TGH 2026-09-07

@@ -44217,7 +44217,9 @@ var EngCalcs = EngCalcs || {};
 	// of the nine digits, and both facts were once told in prose instead. **NEITHER KEY SWITCHES
 	// THE TOOL ON, and that is not the claim**: Delete removes what is selected and Esc returns to
 	// Select, so the tip says what to press to do the thing the button is named for.
-	var LPN_TOOL_ALT_KEYS = { 'select': 'Esc', 'delete': 'Delete', 'select-area': 'A' };
+	var LPN_TOOL_ALT_KEYS = { 'select': 'Esc', 'delete': 'Delete' };
+	// **A IS AREA SELECT** (Tom, 2026-10-13): a named key like Esc, shown in the tip through this table.
+	LPN_TOOL_ALT_KEYS['select-area'] = 'A';
 	function toolTipWithKey(mode, tip) {
 		var pc = EngCalcs.pageConfig || {}, key = toolKeyFor(mode), alt = LPN_TOOL_ALT_KEYS[mode] || null;
 		if (key && alt) {
@@ -63302,6 +63304,20 @@ var EngCalcs = EngCalcs || {};
 		setMode(m);
 	});
 
+	// **A IS AREA SELECT** (Tom, 2026-10-13, with W as the pattern, and F for Shape beside it): a named
+	// key, shown in the tip through LPN_TOOL_ALT_KEYS. Wired as W is: no modifier (Ctrl+A stays the
+	// table's select-all), never while typing, by character and by physical key, and an open menu keeps
+	// the letters for its mnemonics. It does what the toolbar button does: enter the tool with the shape
+	// it is showing, and cycle window, lasso, polygon when pressed again.
+	document.addEventListener('keydown', function (e) {
+		if (e.ctrlKey || e.metaKey || e.altKey || e.defaultPrevented) { return; }
+		if (isTextEntry(e.target)) { return; }
+		if (e.key !== 'a' && e.key !== 'A' && e.code !== 'KeyA') { return; }
+		if (openMenuAnchor) { return; }
+		if (e.preventDefault) { e.preventDefault(); }
+		setSelectAreaShape(mode === 'select-area' ? selectAreaShapeNext() : selectAreaShape);
+	});
+
 	// **W IS ZOOM WINDOW** (Tom, 2026-10-07). Free of every other plain key on this page (the digits,
 	// Esc, Delete, +, =, -, and the menu mnemonics, which answer only inside an open menu). Same
 	// guard as the digit picker: never with a modifier, never while typing.
@@ -63315,20 +63331,6 @@ var EngCalcs = EngCalcs || {};
 		if (openMenuAnchor) { return; }
 		if (e.preventDefault) { e.preventDefault(); }
 		enterZoomWindow();
-	});
-
-	// **A IS AREA SELECT** (Tom, 2026-10-13, with W as the pattern, and F for Shape beside it): a named
-	// key, shown in the tip through LPN_TOOL_ALT_KEYS. Wired as W is: no modifier (Ctrl+A stays the
-	// table's select-all), never while typing, by character and by physical key, and an open menu keeps
-	// the letters for its mnemonics. It does what the toolbar button does: enter the tool with the shape
-	// it is showing, and cycle window, lasso, polygon when pressed again.
-	document.addEventListener('keydown', function (e) {
-		if (e.ctrlKey || e.metaKey || e.altKey || e.defaultPrevented) { return; }
-		if (isTextEntry(e.target)) { return; }
-		if (e.key !== 'a' && e.key !== 'A' && e.code !== 'KeyA') { return; }
-		if (openMenuAnchor) { return; }
-		if (e.preventDefault) { e.preventDefault(); }
-		setSelectAreaShape(mode === 'select-area' ? selectAreaShapeNext() : selectAreaShape);
 	});
 
 	/**
