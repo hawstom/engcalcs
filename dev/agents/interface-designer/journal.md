@@ -3875,3 +3875,14 @@ Prior art, NOT verified this session (recalled, tag SPECULATION until fetched): 
 source-then-targets with a Settings sub-dialog; Office Format Painter is copy-then-apply with a held
 clipboard; ArcGIS Pro and QGIS offer copy/paste of style; WaterGEMS has no equivalent I can name.
 Nobody's convention is a precedent for the disabled-until-selected-first form.
+
+## 2026-10-12 - One override marker across Scenarios table, Properties, Settings (feat/bentley-interop)
+
+- OBSERVED (js/looped-network.js:6066-6072, lib/lang.ec.en.php `lpn_sm_inherited`): the Scenarios table marks INHERITANCE with the word "(inherited)", not the override; the common cell carries the longest, most-translated mark.
+- OBSERVED (js/looped-network.js:63223-63266, overrideMarker): Properties spends a labelled checkbox line under every overridable field in a non-Base scenario, plus a "Base scenario: {value}" line when ticked. The code comment at :63229-63234 already records the reason Base shows nothing: a permanently unticked box on every row is noise.
+- OBSERVED (js/looped-network.js:57400-57460, css/engcalcs.css:3836-3841): Settings spends a full note div plus a 3px physical-left amber bar per held row; grep found no `html[dir=rtl]` twin for the bar, so it is probably on the wrong side in fa, ar, he, ps, ur.
+- OBSERVED (css/engcalcs.css:34, 2650): the family colour is `--ec-held` #e8a33d. SPECULATION (my arithmetic, about 2.2:1 on white): it misses the 3:1 non-text floor, so colour cannot be the only signal; shape must carry the state.
+- OBSERVED (lib/lang.ec.en.php `smSharedText`, "Shared with: {list}"): overrides live in alternatives that scenarios share, so "clear all descendants" can reach non-descendants. The confirm must say so.
+- CITED (from memory, not refetched): WCAG 2.2 SC 1.4.11 (3:1 non-text contrast) and SC 2.5.8 (24 CSS px target), W3C. The Excel red-triangle comment indicator is the corner-mark convention (Microsoft Excel); Civil 3D's Override and Child override columns are Tom's description, not verified by me.
+- SPECULATION: granularity differs by surface (category choice versus one property in an alternative); one glyph, two verbs, so the tip names the verb.
+- Recommendation: CSS-drawn filled dot, down triangle, hollow dot (forms only) in one fixed two-cell inline-start gutter, shown only when more than one scenario exists; click on dot clears (Undo is the guard), click on triangle confirms then clears descendants. Written report: ida-override-marker.md. If only one thing: the Properties popup first.
