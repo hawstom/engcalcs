@@ -134,6 +134,10 @@ the block.
   Tom, 2026-10-10: *"a right-click menu at assets that includes 'Time series graph' that makes a pretty
   'speech bubble' 200px to 400 px ... so that four or six could be arranged on the map. And it would be
   really cool if that presentation scenario could be saved."*
+- 100|790| **One override marker: overridden or inherited, in every scenario view.**
+  Tom, 2026-10-12 (interview q03): expose override vs inherited with a single-character marker, carried
+  through Properties and Settings, after Civil 3D's Override / Child override columns. Ida: a dot gutter;
+  Mary: Bentley's and Civil 3D's per-row checkbox. Tom's call between them first. Journals 2026-10-12.
 - 75|788| **Translated Find guide and select/choose wording, swept across all 26 languages.**
   Sprint 1012-delta QA (2026-10-12): about 20 languages still print English control names (Everything, equal to, AND)
   in the Find guide's prose, which should name controls as the translated page does (code samples stay English); and

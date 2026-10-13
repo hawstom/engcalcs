@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**4 still to read on master**, of 4 untranslated keys, of 2560 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**0 still to read on master**, of 0 untranslated keys, of 2558 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -199,26 +199,13 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   @@ NEEDS RULING
 
-## lpn_  (4, 4 to read @@ NEEDS RULING)
-
-- **`lpn_ex_net2_si_desc`**
-  > Litres per second, with metres and millimetres. An EPANET example at Branford, Connecticut, converted from gallons per minute, feet and inches: 35 junctions and 1 tank, with no reservoir, no pump and no valves, about 2 km by 4 km. Fluoride, a non-reactive substance, enters at one source.
-  @@ NEEDS RULING
-- **`lpn_ex_net2_si_title`**
-  > EPANET Net2, L/s (SI)
-  @@ NEEDS RULING
-- **`lpn_ex_net3_si_desc`**
-  > Litres per second, with metres and millimetres. An EPANET example at Novato, California, converted from gallons per minute, feet and inches, with the world map behind it: 92 junctions, 3 tanks and 2 reservoirs, no valves, about 8 km square. A 24-hour extended-period simulation, with a source trace from the Lake.
-  @@ NEEDS RULING
-- **`lpn_ex_net3_si_title`**
-  > EPANET Net3, L/s (SI)
-  @@ NEEDS RULING
+None on master. Every English key here is present in at least one other language.
 
 ---
 
 # Strings waiting on a branch
 
-**204 still to read**, of 207 new keys across 13 unmerged branch(es).
+**211 still to read**, of 214 new keys across 13 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -229,7 +216,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/bentley-interop (`9e4c0206`) — 117 new, 117 to read @@ NEEDS RULING
+### feat/bentley-interop (`26801c63`) — 117 new, 117 to read @@ NEEDS RULING
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -688,7 +675,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Not pasted: {n} (the valve types differ).
   @@ NEEDS RULING
 
-### feat/shape (`a4d9a471`) — 62 new, 62 to read @@ NEEDS RULING
+### feat/shape (`e18ba1cb`) — 65 new, 65 to read @@ NEEDS RULING
 
 - **`lpn_dxf_import_binary`**
   > {file} is a binary DXF. Save it from your CAD program as an ASCII DXF, then import again.
@@ -816,6 +803,9 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_shapes_import_more`**
   > and {n} more
   @@ NEEDS RULING
+- **`lpn_shapes_import_none`**
+  > Nothing was imported from {file}.
+  @@ NEEDS RULING
 - **`lpn_shp_import_attrs`**
   > Attribute columns kept as properties of each Shape: {list}.
   @@ NEEDS RULING
@@ -859,10 +849,16 @@ build for that would be a gate nobody keeps. Refresh it with
   > {file} has no .prj file, and its coordinates are not latitudes and longitudes, so they cannot be placed in this project.
   @@ NEEDS RULING
 - **`lpn_shp_import_skipped`**
-  > {n} records not imported: {list}.
+  > {n} records not imported, because their shape type is not read: {list}.
   @@ NEEDS RULING
 - **`lpn_shp_import_skipped_one`**
-  > One record not imported: {list}.
+  > One record not imported, because its shape type is not read: {list}.
+  @@ NEEDS RULING
+- **`lpn_shp_import_unplaced`**
+  > {n} records have coordinates this project cannot place, such as a latitude beyond the limit of the map. Record numbers: {list}.
+  @@ NEEDS RULING
+- **`lpn_shp_import_unplaced_one`**
+  > One record has coordinates this project cannot place, such as a latitude beyond the limit of the map. Record number: {list}.
   @@ NEEDS RULING
 - **`lpn_shp_import_unreadable`**
   > {file} is not a shapefile this page can read: {detail}
@@ -877,6 +873,19 @@ build for that would be a gate nobody keeps. Refresh it with
   > Draw a point, a polyline, or a polygon on the map. A Shape is annotation and is not part of the network. Specify each point, then specify the last point again, press Enter, or right-click to finish. Specify the first point again to close the Shape into a polygon.
   @@ NEEDS RULING
 
-### feat/si-example (`a61a5886`) — adds no English strings
+### feat/si-example (`6fb4f501`) — 4 new, 4 to read @@ NEEDS RULING
 
-### feat/tool-key (`896d92a7`) — adds no English strings
+- **`lpn_ex_net2_si_desc`**
+  > Litres per second, with metres and millimetres. An EPANET example at Branford, Connecticut, converted from gallons per minute, feet and inches: 35 junctions and 1 tank, with no reservoir, no pump and no valves, about 2 km by 4 km. Fluoride, a non-reactive substance, enters at one source.
+  @@ NEEDS RULING
+- **`lpn_ex_net2_si_title`**
+  > EPANET Net2, L/s (SI)
+  @@ NEEDS RULING
+- **`lpn_ex_net3_si_desc`**
+  > Litres per second, with metres and millimetres. An EPANET example at Novato, California, converted from gallons per minute, feet and inches, with the world map behind it: 92 junctions, 3 tanks and 2 reservoirs, no valves, about 8 km square. A 24-hour extended-period simulation, with a source trace from the Lake.
+  @@ NEEDS RULING
+- **`lpn_ex_net3_si_title`**
+  > EPANET Net3, L/s (SI)
+  @@ NEEDS RULING
+
+### feat/tool-key (`4217cd92`) — adds no English strings

@@ -99,50 +99,48 @@ lines rather than appending corrections.
   tile counts at a 900 ms settle (basemap.js now waits for a pointable tile). Pre-existing and unrelated: `scale-publish-harness.js` (2 checks). The full `node dev/browser-pass/run.js` is green (1853/1853, 2026-10-04, Task 761); browser-pass specs are not in
   check_all.
 
-## STATE — 2026-10-12 (fifteenth session, Arizona time)
+## STATE — 2026-10-13 (sixteenth session, Arizona time)
 
-### Master: c5f50997, pushed. Production: b7c99102 (10-09) when last read; ask, About box
+### Master: see the pushed SHA in the last report. Production: b7c99102 (10-09) when last read; ask, About box
 
-Landed this session: feat/tank-ground (his "OK. Merge."); translation sprint 1012-delta (Wave 0, 149 keys x 26,
-QA, glossary terms 98 workspace and 99 base elevation); fix/specific-gravity (his rule: pressure = SG x (H - z) in
-water column, every unit; tip stays deleted per his 10-04 call); fix/paste-column (tab-less paste is one column;
-"Checked" for single checkboxes); fix/label-drag (the 2x jump: flip across the anchor line, aligned pipe labels);
-the pkill guard in .claude/hooks/guard-wait-loops.php; Mary's antecedent list (her research only, his words).
-**fix/label-drag answers his production report: it reaches production when he pulls master.**
+Landed this session: feat/convert-search (his typed "Perfect. Merge."); fix/manual-name (the help book is the
+"User manual", his q08: name telegraphs chapters, index and search); Sue's scenario consistency review
+(dev/scenario-consistency-review-2026-10-12.md); Ida, Mary, Perry journals; Task 790 (override marker, Next).
 
 ### Branches awaiting his browser pass (pushed; all on the Branch previews page)
 
-- **feat/match-property** (05bda765, 8117): Copy properties / Paste properties to selection, no box, memory
-  only, Match door gone. Perry CONFIRMED. MERGE ONLY TOGETHER WITH feat/bentley-interop: alone, pasting
-  elevation inside a scenario writes Base. His "The table is good": nobody can find which table; ask him.
-- **feat/graph-bubble** (11236f20, 8110; Task 784; cut from match-property, merges after it): speech-bubble
-  time-series graphs from the right-click; saved project-wide in doc.bubbles. Perry CONFIRMED; his two defects
-  fixed. His call: bubbles keep screen size, so a far zoom-out piles them over the network.
-- **feat/bentley-interop** (036f9d23, 8116; Task 721): every one of his 10-12 findings fixed; every property
-  overridable, tank bottomElev included (master merged in); Base choosable in every table cell; double-click a
-  name in the Scenarios TABLE makes it current. Perry CONFIRMED round 6; his three gaps fixed with real-mouse
-  checks. Test-merge with feat/match-property conflicts only in dev/new-english-keys.md.
-- **feat/si-example** (9df2f3f0, 8111; Task 786): eight cards, Net3/Net2 SI+US twins, backdrops only on Elm
-  Street; Net2 from his .epp on the OSM street map (his call), Net3's label and
-  colour conventions. Basics last. Perry CONFIRMED scale bars.
-- **feat/shape** (cb281a99, 8108): the icon is his freehand outline; DXF layer SHAP. Import stays on Task 779.
-- **feat/convert-search** (b71bb912, 8119): Convert as carries the chooser's place search into Step 1. Perry
-  CONFIRMED; a state- or country-size search makes a huge site width.
+- **feat/bentley-interop** (a190670f, 8116; Task 721; holds feat/match-property): every 10-12 note and his
+  interview calls q01-q07 built (quoted in dev/scenario-alternatives.md, "Tom's calls of 2026-10-12"). Perry
+  READY at 5bcc28f0; CC then fixed "Its 1 overrides" and made the misfit switch-off of Basic mode per project
+  (it had written the browser preference, so every later project opened with Basic off). Merge it with
+  match-property inside; feat/match-property itself is then deleted.
+- **feat/graph-bubble** (0a8d0297, 8110; Task 784): holds bentley-interop; per-bubble quantity chooser
+  (lpn_tsb_quantity). Merges after bentley-interop. One check_all flake: sw-precache-log-harness, passes alone.
+- **feat/tool-key** (4217cd92, 8109): 0 Select, 1 Chain before Junction, F Shape on feat/shape.
+- **feat/si-example** (6fb4f501, 8111; Task 786): Net2 on the OSM street map (his call), Elm Street "(US)",
+  Basic cards last, his customers he adds himself.
+- **feat/shape** (0b31a248, 8108; Task 779): DXF and shapefile import; Perry's two rounds fixed. A .shp with
+  no .prj in a lat/lon project offers "Import as EPSG:3857" (his QGIS file had no .prj; not hidden extensions).
 
-### Questions out to him (10-12 second report)
+### Questions out to him
 
-- Which table did "The table is good" mean (Match round 3)?
-- Graph bubbles piling on a far zoom-out: acceptable, or a hide-all control?
-- Bentley: deleting a scenario leaves its own alternatives unused in the file; "Copy, share them" makes edits
-  in the copy change the original with no note at that moment.
-- The English he had not read (103 keys on new-english-keys.md) went into sprint 1012 before he read it; the
-  list was emptied by the sprint. If he edits any, the drift check queues the retranslation.
+- Override marker (Task 790): Ida's dot gutter or Mary's per-row checkbox.
+- Should the Basic-mode fit test count an alternative no scenario names? It does not now.
+- Should an imported Bentley file's second Base alternative hold full values, as Add base now makes?
+- q06 left unanswered; Text stays in the Text category. q07's "several models in one file" is his to raise.
 
 ### Next job
 
-Merge on his typed word (classifier needs it typed): match-property + bentley-interop together (suite on the
-combined merge, then a paste-elevation-in-scenario check), then graph-bubble; si-example, shape, convert-search
-each on his all-clear. Then Task 788 (translation sweep) as a small sprint, and the keys waiting on branches.
+Merge on his typed word: bentley-interop (regenerate payloads on the branch, check_all, then all-clear pin),
+then graph-bubble; tool-key, si-example, shape each on his all-clear. Then a translation sprint: Task 788 plus
+every key those branches add (deferred until they land so it runs once).
+
+### Traps met 2026-10-13 (sixteenth session)
+
+- **A merge commit run in a worktree took Tom as author.** Use GIT_AUTHOR_NAME/EMAIL or amend before push.
+- **A harness enshrined a defect** ("Its 1 overrides" checked as `{n}`=1). Read what a check asserts.
+- **A preview note CC wrote named quantities CC had not read.** Read the code before describing it.
+- **CC told him a .prj was hidden by Windows.** He had shown it was absent; take his facts first.
 
 ### Traps met 2026-10-12 (fourteenth session)
 
