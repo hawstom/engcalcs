@@ -930,7 +930,7 @@ $ec_lang['lpn_help_hotkeys']='טבלאות ומקשי קיצור';
 $ec_lang['lpn_hotkeys_tables_heading']='טבלאות';
 $ec_lang['lpn_hotkeys_map_heading']='מפה';
 $ec_lang['lpn_hotkeys_map_term']='קיצורי מקלדת למפה';
-$ec_lang['lpn_hotkeys_map_def']='<table class="lpn-notes-table"><tbody><tr><td>1 או Esc</td><td>בחירה.</td></tr><tr><td>2</td><td>הוספת צומת.</td></tr><tr><td>3</td><td>הוספת מאגר.</td></tr><tr><td>4</td><td>הוספת מכל.</td></tr><tr><td>5</td><td>הוספת צינור.</td></tr><tr><td>6</td><td>הוספת משאבה.</td></tr><tr><td>7</td><td>הוספת שסתום.</td></tr><tr><td>8</td><td>הוספת לקוח.</td></tr><tr><td>9</td><td>הוספת טקסט.</td></tr><tr><td>Delete</td><td>מחיקת הבחירה.</td></tr><tr><td>Ctrl+Z</td><td>ביטול השינוי האחרון.</td></tr><tr><td>+ או =</td><td>התקרבות.</td></tr><tr><td>-</td><td>התרחקות.</td></tr></tbody></table>';
+$ec_lang['lpn_hotkeys_map_def']='<table class="lpn-notes-table"><tbody><tr><td>0 או Esc</td><td>בחירה.</td></tr><tr><td>2</td><td>הוספת צומת.</td></tr><tr><td>3</td><td>הוספת מאגר.</td></tr><tr><td>4</td><td>הוספת מכל.</td></tr><tr><td>5</td><td>הוספת צינור.</td></tr><tr><td>6</td><td>הוספת משאבה.</td></tr><tr><td>7</td><td>הוספת שסתום.</td></tr><tr><td>8</td><td>הוספת לקוח.</td></tr><tr><td>9</td><td>הוספת טקסט.</td></tr><tr><td>Delete</td><td>מחיקת הבחירה.</td></tr><tr><td>Ctrl+Z</td><td>ביטול השינוי האחרון.</td></tr><tr><td>+ או =</td><td>התקרבות.</td></tr><tr><td>-</td><td>התרחקות.</td></tr></tbody></table>';
 // ---- The one-tap grievance link (ROADMAP Task 207, Rung 0) ----
 // The floor of the cost ladder in dev/dilettante-path.md: a visitor says something is wrong here
 // with one tap and nothing typed. Two sites, one behaviour -- a standing cell in the map's bottom

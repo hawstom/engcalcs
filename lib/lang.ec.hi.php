@@ -930,7 +930,7 @@ $ec_lang['lpn_help_hotkeys']='तालिकाएँ और कीबोर्
 $ec_lang['lpn_hotkeys_tables_heading']='तालिकाएँ';
 $ec_lang['lpn_hotkeys_map_heading']='मानचित्र';
 $ec_lang['lpn_hotkeys_map_term']='मानचित्र कीबोर्ड शॉर्टकट';
-$ec_lang['lpn_hotkeys_map_def']='<table class="lpn-notes-table"><tbody><tr><td>1 या Esc</td><td>चुनें।</td></tr><tr><td>2</td><td>जंक्शन जोड़ें।</td></tr><tr><td>3</td><td>जलाशय जोड़ें।</td></tr><tr><td>4</td><td>टैंक जोड़ें।</td></tr><tr><td>5</td><td>पाइप जोड़ें।</td></tr><tr><td>6</td><td>पंप जोड़ें।</td></tr><tr><td>7</td><td>वाल्व जोड़ें।</td></tr><tr><td>8</td><td>ग्राहक जोड़ें।</td></tr><tr><td>9</td><td>टेक्स्ट जोड़ें।</td></tr><tr><td>Delete</td><td>चयन हटाएँ।</td></tr><tr><td>Ctrl+Z</td><td>पिछला बदलाव पूर्ववत करें।</td></tr><tr><td>+ या =</td><td>ज़ूम इन।</td></tr><tr><td>-</td><td>ज़ूम आउट।</td></tr></tbody></table>';
+$ec_lang['lpn_hotkeys_map_def']='<table class="lpn-notes-table"><tbody><tr><td>0 या Esc</td><td>चुनें।</td></tr><tr><td>2</td><td>जंक्शन जोड़ें।</td></tr><tr><td>3</td><td>जलाशय जोड़ें।</td></tr><tr><td>4</td><td>टैंक जोड़ें।</td></tr><tr><td>5</td><td>पाइप जोड़ें।</td></tr><tr><td>6</td><td>पंप जोड़ें।</td></tr><tr><td>7</td><td>वाल्व जोड़ें।</td></tr><tr><td>8</td><td>ग्राहक जोड़ें।</td></tr><tr><td>9</td><td>टेक्स्ट जोड़ें।</td></tr><tr><td>Delete</td><td>चयन हटाएँ।</td></tr><tr><td>Ctrl+Z</td><td>पिछला बदलाव पूर्ववत करें।</td></tr><tr><td>+ या =</td><td>ज़ूम इन।</td></tr><tr><td>-</td><td>ज़ूम आउट।</td></tr></tbody></table>';
 // ---- The one-tap grievance link (ROADMAP Task 207, Rung 0) ----
 // The floor of the cost ladder in dev/dilettante-path.md: a visitor says something is wrong here
 // with one tap and nothing typed. Two sites, one behaviour -- a standing cell in the map's bottom

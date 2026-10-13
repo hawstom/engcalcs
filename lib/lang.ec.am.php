@@ -928,7 +928,7 @@ $ec_lang['lpn_help_hotkeys']='ሠንጠረዦችና አቋራጭ ቁልፎች';
 $ec_lang['lpn_hotkeys_tables_heading']='ሠንጠረዦች';
 $ec_lang['lpn_hotkeys_map_heading']='ካርታ';
 $ec_lang['lpn_hotkeys_map_term']='የካርታ የቁልፍ ሰሌዳ አቋራጮች';
-$ec_lang['lpn_hotkeys_map_def']='<table class="lpn-notes-table"><tbody><tr><td>1 ወይም Esc</td><td>ምረጥ።</td></tr><tr><td>2</td><td>መገናኛ ጨምር።</td></tr><tr><td>3</td><td>ማጠራቀሚያ ጨምር።</td></tr><tr><td>4</td><td>ታንክ ጨምር።</td></tr><tr><td>5</td><td>ቧንቧ ጨምር።</td></tr><tr><td>6</td><td>ፓምፕ ጨምር።</td></tr><tr><td>7</td><td>ቫልቭ ጨምር።</td></tr><tr><td>8</td><td>ደንበኛ ጨምር።</td></tr><tr><td>9</td><td>ጽሑፍ ጨምር።</td></tr><tr><td>Delete</td><td>ምርጫውን ሰርዝ።</td></tr><tr><td>Ctrl+Z</td><td>የመጨረሻውን ለውጥ ቀልብስ።</td></tr><tr><td>+ ወይም =</td><td>አጉላ።</td></tr><tr><td>-</td><td>አሳንስ።</td></tr></tbody></table>';
+$ec_lang['lpn_hotkeys_map_def']='<table class="lpn-notes-table"><tbody><tr><td>0 ወይም Esc</td><td>ምረጥ።</td></tr><tr><td>2</td><td>መገናኛ ጨምር።</td></tr><tr><td>3</td><td>ማጠራቀሚያ ጨምር።</td></tr><tr><td>4</td><td>ታንክ ጨምር።</td></tr><tr><td>5</td><td>ቧንቧ ጨምር።</td></tr><tr><td>6</td><td>ፓምፕ ጨምር።</td></tr><tr><td>7</td><td>ቫልቭ ጨምር።</td></tr><tr><td>8</td><td>ደንበኛ ጨምር።</td></tr><tr><td>9</td><td>ጽሑፍ ጨምር።</td></tr><tr><td>Delete</td><td>ምርጫውን ሰርዝ።</td></tr><tr><td>Ctrl+Z</td><td>የመጨረሻውን ለውጥ ቀልብስ።</td></tr><tr><td>+ ወይም =</td><td>አጉላ።</td></tr><tr><td>-</td><td>አሳንስ።</td></tr></tbody></table>';
 // ---- The one-tap grievance link (ROADMAP Task 207, Rung 0) ----
 // The floor of the cost ladder in dev/dilettante-path.md: a visitor says something is wrong here
 // with one tap and nothing typed. Two sites, one behaviour -- a standing cell in the map's bottom
