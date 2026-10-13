@@ -37983,7 +37983,7 @@ var EngCalcs = EngCalcs || {};
 			function go() { try { place(r); } catch (e) { failed(e); } }
 			if (!r.ok) {
 				if (r.detail === 'damaged') { failed(); return; }
-				if (r.detail === 'noshp') { say(String(pc.lpn_shp_import_noshp || '{file} has no .shp file in it. Pick the .zip of a shapefile, or the .shp together with its .dbf and .prj.').replace('{file}', fileName), { ok: false, reason: 'noshp' }); }
+				if (r.detail === 'noshp') { say(String(pc.lpn_shp_import_noshp || '{file} has no .shp file in it. Pick the .zip of a shapefile, or the .shp together with its .shx, .dbf and .prj (hold Ctrl or Shift to select several).').replace('{file}', fileName), { ok: false, reason: 'noshp' }); }
 				else if (r.detail === 'manyshp') { say(String(pc.lpn_shp_import_manyshp || '{file} holds more than one shapefile. Import one at a time.').replace('{file}', fileName), { ok: false, reason: 'manyshp' }); }
 				else { say(String(pc.lpn_shp_import_unreadable || '{file} is not a shapefile this page can read: {detail}').replace('{file}', fileName).replace('{detail}', r.detail || ''), { ok: false, reason: 'unreadable' }); }
 				return;
@@ -37996,7 +37996,8 @@ var EngCalcs = EngCalcs || {};
 			if ((isProjectedProject() || (isLatLonProject() && r.prj && r.prj.kind === 'projected')) && EngCalcs.lpnCrsLoad && EngCalcs.lpnCrsReady && !EngCalcs.lpnCrsReady()) { EngCalcs.lpnCrsLoad(go); return; }
 			go();
 		}).catch(failed);
-		function place(r) {
+		function place(r, opt) {
+			opt = opt || {};
 			var prj = r.prj, lines = [], skipped = [], items = [], ok = true, mode, geo = isLatLonProject(), code = projectCrsCode(), attrCols = [];
 			function refuse(key, fb, reason, theirs, hint) {
 				say(String(pc[key] || fb).replace('{file}', fileName).replace('{theirs}', theirs || '').replace('{ours}', geo ? gisFrameText() : (code ? crsLabel(code) + ' (' + code + ')' : ''))
@@ -38009,13 +38010,37 @@ var EngCalcs = EngCalcs || {};
 			}
 			var theirsName = prj ? (prj.epsg ? (prj.name ? prj.name + ' (' + prj.epsg + ')' : prj.epsg) : prj.name) : '';
 			if (!prj) {
-				if (geo) {
+				var pick = String(pc.lpn_shp_import_pick_hint || 'A shapefile is several files. Pick the .shp together with its .shx, .dbf and .prj (hold Ctrl or Shift to select several), or pick the .zip.');
+				if (geo && !opt.webMerc) {
 					// No .prj: degrees only if every number can be one.
 					r.shapes.forEach(function (sh) { sh.pts.forEach(function (q) { if (!(q.x >= -180 && q.x <= 180 && q.y >= -90 && q.y <= 90)) { ok = false; } }); });
-					if (!ok) { refuse('lpn_shp_import_refuse_range', '{file} has no .prj file, and its coordinates are not latitudes and longitudes, so they cannot be placed in this project.', 'range'); return; }
+					if (!ok) {
+						// **NEVER GUESSED, ALWAYS ASKED**: numbers that are not degrees but fit Web Mercator
+						// metres (the system QGIS and web maps use) are offered as EPSG:3857, by one button.
+						var wm = true, LIM = 20037508.343;
+						r.shapes.forEach(function (sh) { sh.pts.forEach(function (q) { if (!(Math.abs(q.x) <= LIM && Math.abs(q.y) <= LIM)) { wm = false; } }); });
+						if (wm && r.shapes.length) {
+							askDialog({
+								kind: 'confirm', ok: String(pc.lpn_shp_import_webmerc_ok || 'Import as EPSG:3857'),
+								text: String(pc.lpn_shp_import_webmerc_ask || '{file} has no .prj file, and its numbers are not latitudes and longitudes, but they fit Web Mercator metres (EPSG:3857), the system QGIS and web maps use. Import them as EPSG:3857 and convert them to this project?').replace('{file}', fileName) + ' ' + pick
+							}, function (yes) {
+								if (yes) { try { place(r, { webMerc: true }); } catch (e) { failed(e); } }
+								else { say(String(pc.lpn_shp_import_refuse_range || '{file} has no .prj file, and its coordinates are not latitudes and longitudes, so they cannot be placed in this project.').replace('{file}', fileName) + ' ' + pick, { ok: false, reason: 'range' }); }
+							});
+							return;
+						}
+						say(String(pc.lpn_shp_import_refuse_range || '{file} has no .prj file, and its coordinates are not latitudes and longitudes, so they cannot be placed in this project.').replace('{file}', fileName) + ' ' + pick, { ok: false, reason: 'range' });
+						return;
+					}
 				}
-				mode = geo ? 'lonlat' : 'planar';
-				lines.push(String(pc.lpn_shp_import_noprj || 'There is no .prj file, so the coordinates were read as {frame}, with no conversion.').replace('{frame}', gisFrameText()));
+				if (opt.webMerc) {
+					conv = EngCalcs.lpnCrsFileInverse({ epsg: 'EPSG:3857' });
+					mode = 'convert';
+					lines.push(convertedLine(dxfCrsName('EPSG:3857')));
+				} else {
+					mode = geo ? 'lonlat' : 'planar';
+					lines.push(String(pc.lpn_shp_import_noprj || 'There is no .prj file, so the coordinates were read as {frame}, with no conversion.').replace('{frame}', gisFrameText()) + ' ' + pick);
+				}
 			} else if (prj.kind === 'geographic') {
 				mode = 'lonlat';
 				if (!geo) {

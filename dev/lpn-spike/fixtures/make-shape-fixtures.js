@@ -147,4 +147,15 @@ fs.writeFileSync(path.join(here, 'shapes-grid.dbf'), dbf([{ name: 'NAME', type: 
 fs.writeFileSync(path.join(here, 'shapes-highlat.shp'), shp(0, [
 	{ type: 1, parts: [[[-112, 33]]] }, { type: 1, parts: [[[10, 89.5]]] }, { type: 1, parts: [[[-111, 34]]] }
 ]).shp);
+// Web Mercator, as QGIS writes it (ESRI WKT, no code) and as GDAL writes it (OGC WKT with the code),
+// at the same place as the first point of shapes-geo.zip: -112.0123, 33.4567.
+const R = 6378137, wmx = (lon) => R * lon * Math.PI / 180, wmy = (lat) => R * Math.log(Math.tan(Math.PI / 4 + lat * Math.PI / 360));
+const WM_ESRI = 'PROJCS["WGS_1984_Web_Mercator_Auxiliary_Sphere",GEOGCS["GCS_WGS_1984",DATUM["D_WGS_1984",SPHEROID["WGS_1984",6378137.0,298.257223563]],PRIMEM["Greenwich",0.0],UNIT["Degree",0.0174532925199433]],PROJECTION["Mercator_Auxiliary_Sphere"],PARAMETER["False_Easting",0.0],PARAMETER["False_Northing",0.0],PARAMETER["Central_Meridian",0.0],PARAMETER["Standard_Parallel_1",0.0],PARAMETER["Auxiliary_Sphere_Type",0.0],UNIT["Meter",1.0]]';
+const WM_OGC = 'PROJCS["WGS 84 / Pseudo-Mercator",GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,298.257223563,AUTHORITY["EPSG","7030"]],AUTHORITY["EPSG","6326"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4326"]],PROJECTION["Mercator_1SP"],PARAMETER["central_meridian",0],PARAMETER["scale_factor",1],PARAMETER["false_easting",0],PARAMETER["false_northing",0],UNIT["metre",1,AUTHORITY["EPSG","9001"]],AXIS["X",EAST],AXIS["Y",NORTH],EXTENSION["PROJ4","+proj=merc +a=6378137 +b=6378137 +lat_ts=0 +lon_0=0 +x_0=0 +y_0=0 +k=1 +units=m +nadgrids=@null +wktext +no_defs"],AUTHORITY["EPSG","3857"]]';
+const wmShp = shp(0, [{ type: 1, parts: [[[wmx(-112.0123), wmy(33.4567)]]] }, { type: 3, parts: [[[wmx(-112.3), wmy(33.3)], [wmx(-112.31), wmy(33.31)]]] }]);
+fs.writeFileSync(path.join(here, 'shapes-webmerc-qgis.zip'), zip([{ name: 'wm.shp', data: wmShp.shp }, { name: 'wm.prj', data: Buffer.from(WM_ESRI) }]));
+fs.writeFileSync(path.join(here, 'shapes-webmerc-ogc.zip'), zip([{ name: 'wm.shp', data: wmShp.shp }, { name: 'wm.prj', data: Buffer.from(WM_OGC) }]));
+fs.writeFileSync(path.join(here, 'shapes-webmerc-noprj.shp'), wmShp.shp);
+// Numbers too large for Web Mercator as well: no guess is offered.
+fs.writeFileSync(path.join(here, 'shapes-huge.shp'), shp(0, [{ type: 1, parts: [[[5e8, 6e8]]] }]).shp);
 console.log('wrote fixtures in ' + here);

@@ -240,6 +240,10 @@
 			m = /^(?:AUTHORITY|ID)\s*\[\s*"EPSG"\s*,\s*"?(\d+)"?/i.exec(t.slice(last));
 			if (m) { epsg = 'EPSG:' + m[1]; }
 		}
+		// QGIS and ArcGIS write Web Mercator without a code, by name or by method: WGS_1984_Web_Mercator_
+		// Auxiliary_Sphere (PROJECTION Mercator_Auxiliary_Sphere) or "WGS 84 / Pseudo-Mercator" (Popular
+		// Visualisation Pseudo Mercator). Both state EPSG:3857, which is closed-form in the suite.
+		if (!epsg && kind === 'projected' && /Mercator_Auxiliary_Sphere|Web_?Mercator|Pseudo.?Mercator|Popular.?Visuali[sz]ation/i.test(t)) { epsg = 'EPSG:3857'; }
 		return { kind: kind, name: name, epsg: epsg, wkt: t };
 	}
 

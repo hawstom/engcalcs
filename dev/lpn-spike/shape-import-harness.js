@@ -240,9 +240,37 @@ async function main() {
 		ok('a .shp with no .prj and in-range numbers is read as latitude and longitude', (await h.shapes()).length === 7 &&
 			note.indexOf((await L('lpn_shp_import_noprj')).replace('{frame}', await L('lpn_shapes_frame_latlon'))) >= 0, note);
 		await h.undo();
-		note = await h.importVia('lpn_file_import_shp', [fx('shapes-grid.shp')]);
-		ok('a .shp with no .prj and numbers beyond 180 is refused', (await h.shapes()).length === 0 &&
-			note === (await L('lpn_shp_import_refuse_range')).replace('{file}', 'shapes-grid.shp'), note);
+		const pick = await L('lpn_shp_import_pick_hint');
+		const dlg = () => P.evaluate(() => { const d = document.getElementById('lpn_dialog'); return d && getComputedStyle(d).display !== 'none' ? { text: document.getElementById('lpn_dialog_body').textContent, buttons: Array.from(document.querySelectorAll('#lpn_dialog_buttons button')).map((b) => b.textContent) } : null; });
+		const press = async (i) => { await P.evaluate((k) => { const b = document.querySelectorAll('#lpn_dialog_buttons button')[k]; b.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, detail: 1 })); }, i); await h.settle(800); };
+		note = await h.importVia('lpn_file_import_shp', fx('shapes-huge.shp'));
+		ok('a .shp with no .prj and numbers too large even for Web Mercator is refused, and the message says what to pick instead',
+			(await h.shapes()).length === 0 && (await dlg()) === null && note === (await L('lpn_shp_import_refuse_range')).replace('{file}', 'shapes-huge.shp') + ' ' + pick, note);
+		note = await h.importVia('lpn_file_import_shp', fx('shapes-grid.shp'));
+		let d = await dlg();
+		ok('numbers that fit Web Mercator but not degrees are offered as EPSG:3857 by a question with one action button',
+			!!d && d.text.indexOf('EPSG:3857') >= 0 && d.text.indexOf('.shx, .dbf and .prj') >= 0 && d.buttons[0] === await L('lpn_shp_import_webmerc_ok'), JSON.stringify(d));
+		await press(1);
+		note = await a.notice();
+		ok('Cancel imports nothing and says what to pick', (await h.shapes()).length === 0 && note.indexOf((await L('lpn_shp_import_refuse_range')).replace('{file}', 'shapes-grid.shp')) === 0 && note.indexOf(pick) >= 0, note);
+		await h.importVia('lpn_file_import_shp', fx('shapes-webmerc-noprj.shp'));
+		await press(0);
+		note = await a.notice(); sh = await h.shapes();
+		ok('the offered button imports them converted from EPSG:3857, exactly to the longitude and latitude they stand for',
+			sh.length === 2 && Math.abs(sh.find((x) => x.pts.length === 1).pts[0].x + 112.0123) < 1e-8 && Math.abs(sh.find((x) => x.pts.length === 1).pts[0].y - 33.4567) < 1e-8 &&
+			note.indexOf((await L('lpn_shp_import_reprojected')).split('{theirs}')[0]) >= 0 && note.indexOf('EPSG:3857') >= 0, note);
+		await h.undo();
+		note = await h.importVia('lpn_file_import_shp', fx('shapes-geo-noprj.shp'));
+		ok('a no-.prj import that goes ahead also says what to pick', note.indexOf(pick) >= 0, note);
+		await h.undo();
+		for (const z of ['shapes-webmerc-qgis.zip', 'shapes-webmerc-ogc.zip']) {
+			note = await h.importVia('lpn_file_import_shp', fx(z));
+			sh = await h.shapes();
+			ok(z + ' (a QGIS / GDAL EPSG:3857 .prj) is recognised and converted into a latitude-and-longitude project',
+				sh.length === 2 && Math.abs(sh.find((x) => x.pts.length === 1).pts[0].x + 112.0123) < 1e-8 && Math.abs(sh.find((x) => x.pts.length === 1).pts[0].y - 33.4567) < 1e-8 &&
+				note.indexOf('EPSG:3857') >= 0, note.slice(0, 300));
+			await h.undo();
+		}
 
 		console.log('\n--- 4. into a project in UTM 12N ---');
 		await h.newCrsProject('32612');
@@ -343,6 +371,23 @@ async function main() {
 		note = await h.importVia('lpn_file_import_shp', fx('shapes-geo.zip'));
 		ok('the unread MultiPatch sentence gives its reason', note.indexOf((await L('lpn_shp_import_skipped_one')).split('{list}')[0]) >= 0, note);
 
+
+		console.log('\n--- 8. a QGIS EPSG:3857 .prj into projected projects ---');
+		await h.newCrsProject('32612');
+		await a.dismissGallery().catch(() => {});
+		note = await h.importVia('lpn_file_import_shp', fx('shapes-webmerc-qgis.zip'));
+		sh = await h.shapes();
+		const w12 = await P.evaluate(() => EngCalcs.lpnCrsForward('EPSG:32612', { lon: -112.0123, lat: 33.4567 }));
+		const o12 = (await h.stored()).origin || { x: 0, y: 0 }, p12 = sh.length ? sh.find((x) => x.pts.length === 1).pts[0] : null;
+		ok('into UTM 12N it is converted, to the suite\'s transform within a millimetre', sh.length === 2 && Math.abs(p12.x + o12.x - w12.x) < 0.001 && note.indexOf('EPSG:3857') >= 0 && note.indexOf('EPSG:32612') >= 0, note.slice(0, 300) + JSON.stringify([p12, w12, o12]));
+		await h.newCrsProject('3857');
+		await a.dismissGallery().catch(() => {});
+		note = await h.importVia('lpn_file_import_shp', fx('shapes-webmerc-qgis.zip'));
+		sh = await h.shapes();
+		ok('into a project that IS EPSG:3857 the numbers are kept unchanged and it says so',
+			sh.length === 2 && note.indexOf((await L('lpn_shp_import_prj_same')).split('{crs}')[0]) >= 0, note.slice(0, 300));
+		const inp = await P.evaluate(() => { const i = document.getElementById('lpn_shp_file'); return { accept: i.accept, multiple: i.multiple }; });
+		ok('the shapefile chooser takes several files and all of .shp, .shx, .dbf, .prj and .zip', inp.multiple && ['.shp', '.shx', '.dbf', '.prj', '.zip'].every((e) => inp.accept.indexOf(e) >= 0), JSON.stringify(inp));
 		console.log('\n--- 7. F is the Shape tool ---');
 		await a.newProject('us');
 		await a.dismissGallery().catch(() => {});
