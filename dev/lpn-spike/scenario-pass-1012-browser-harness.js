@@ -457,10 +457,11 @@ async function main() {
 		console.log('\n--- q01. a project Basic mode cannot show turns it off; Copy scenario in Basic mode ---');
 		await openProject();   // Fig 5 is a child of Fig 4: Basic mode cannot show that
 		const MISFIT = await L('lpn_scenario_basic_misfit');
-		ok('q01 arriving, Basic mode is turned off', (await page.evaluate(() => localStorage.getItem('lpn_scnbasic'))) === 'off');
+		ok('q01 arriving, Basic mode is turned off (the Scenarios tab shows)', await page.evaluate(() => getComputedStyle(document.getElementById('lpn_pane_tab_scenarios')).display !== 'none'));
+		ok('q01 ...for this project only: the remembered choice is not written', (await page.evaluate(() => localStorage.getItem('lpn_scnbasic'))) === null);
 		ok('q01 ...and says so in Tom\'s words', (await a.notice()) === MISFIT, await a.notice());
 		await scenarioMenu(await L('lpn_scenario_basic'));
-		ok('q01 ticking Basic mode on is refused for it, with the same sentence', (await page.evaluate(() => localStorage.getItem('lpn_scnbasic'))) === 'off' && (await a.notice()) === MISFIT);
+		ok('q01 ticking Basic mode on is refused for it, with the same sentence', await page.evaluate(() => getComputedStyle(document.getElementById('lpn_pane_tab_scenarios')).display !== 'none') && (await a.notice()) === MISFIT);
 		await page.keyboard.press('Escape');
 		await page.click('#lpn_scenario_btn');
 		await page.waitForSelector('#lpn_menu_popup', { state: 'visible' });
@@ -477,7 +478,8 @@ async function main() {
 			d.scenarios.push({ id: 'f6', name: 'Fig 6', overrides: { 'n:10': { demand: 7 } }, alternatives: { physical: 'a1' } });
 			d.project.activeScenario = 'f6';
 		});
-		ok('q01 a project Basic mode can show opens with it on', (await page.evaluate(() => localStorage.getItem('lpn_scnbasic'))) === null);
+		ok('q01 a project Basic mode can show opens with it on', (await page.evaluate(() => localStorage.getItem('lpn_scnbasic'))) === null &&
+			await page.evaluate(() => getComputedStyle(document.getElementById('lpn_pane_tab_scenarios')).display === 'none'));
 		a.dialogs.length = 0;
 		await scenarioMenu(await L('lpn_scenario_copy'));
 		await flush();
