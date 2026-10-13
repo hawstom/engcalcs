@@ -2650,9 +2650,7 @@ $ec_lang['lpn_scenario_new_name']='方案 {n}';
 $ec_lang['lpn_scenario_prompt_name']='该方案的名称';
 $ec_lang['lpn_scenario_rename']='重命名方案…';
 $ec_lang['lpn_scenario_delete']='删除方案';
-$ec_lang['lpn_scenario_override']='在本方案中覆盖';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_scenario_override_tip']='勾选表示本方案对此数值覆盖其父方案，即使数字相同。取消勾选则使用其父方案的数值。';
 // "Base scenario", not bare "Base" -- an ENGLISH fix, so this needs no _syn either. This is the one
 // place the polysemy genuinely bites: here the word sits beside a NUMBER, in a field popup with no
 // scenario dropdown nearby to frame it, which is exactly the reading that invites "base amount".

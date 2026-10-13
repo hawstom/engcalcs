@@ -2651,9 +2651,7 @@ $ec_lang['lpn_scenario_new_name']='سناریو {n}';
 $ec_lang['lpn_scenario_prompt_name']='د دې سناریو لپاره نوم';
 $ec_lang['lpn_scenario_rename']='د سناریو نوم بدلول…';
 $ec_lang['lpn_scenario_delete']='سناریو ړنګول';
-$ec_lang['lpn_scenario_override']='یوازې په دې سناریو کې';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_scenario_override_tip']='چک شوی یې معنی دا ده چې دا ارزښت یوازې دې سناریو پورې اړه لري، حتی که ورته شمېره وي لکه اساس کې. بکس پاک کړئ ترڅو بېرته د اساس ارزښت وکارول شي.';
 // "Base scenario", not bare "Base" -- an ENGLISH fix, so this needs no _syn either. This is the one
 // place the polysemy genuinely bites: here the word sits beside a NUMBER, in a field popup with no
 // scenario dropdown nearby to frame it, which is exactly the reading that invites "base amount".

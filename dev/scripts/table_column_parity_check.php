@@ -97,13 +97,6 @@ const EC_TABLE_PARITY_ADVISORY = false;
 const EC_TABLE_PARITY_EXEMPT = [
     // (a) the scenario override marker: a statement about a row, drawn under it in the popup and
     // painted onto the cell in the table. Every type carries it, so every type declares it.
-    'junction/lpn_scenario_override' => 'a. the override marker is about a row, not a row',
-    'reservoir/lpn_scenario_override' => 'a. the override marker is about a row, not a row',
-    'tank/lpn_scenario_override' => 'a. the override marker is about a row, not a row',
-    'pipe/lpn_scenario_override' => 'a. the override marker is about a row, not a row',
-    'pump/lpn_scenario_override' => 'a. the override marker is about a row, not a row',
-    'valve/lpn_scenario_override' => 'a. the override marker is about a row, not a row',
-    'text/lpn_scenario_override' => 'a. the override marker is about a row, not a row',
     // (c) custom properties: paneCols() adds one column per doc.customProps entry (the `cp` columns),
     // so they are in every table already and there is no literal for the scan to match.
     'junction/fn:customPropLabel' => 'c. paneCols() builds one cp column per custom property',

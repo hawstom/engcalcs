@@ -223,7 +223,9 @@ $ovAllowed = [
     // the one write seam, and the scenario's own count beside its name
     'setOverride', 'clearOverride', 'overrideCount',
     // what Delete scenario says it removes: the values of the alternatives that go with it, read only
-    'scenarioDeletePlan',
+    'scenarioDeletePlan', 'storedOverrideCount',
+    // the down triangle (Task 790): the holder each child scenario writes to, read, and on a yes cleared
+    'childOverrideHolders', 'clearChildOverrides',
     // a new Base of its own: a snapshot of Base, written once into the record it creates
     'baseSnapshotOf', 'storeBaseSnapshot',
     // where a write lands, the scenario's own alternative made first (Tom, 2026-10-12)

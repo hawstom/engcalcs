@@ -1,7 +1,7 @@
 {
     "description": "sha1 of each lang.ec.en.php $ec_lang value as of the last full translation sync. Maintained by detect_english_drift.php --update. A current-vs-manifest hash mismatch means that key's English changed and translations may be stale. Do not hand-edit.",
     "updated": "2026-09-30",
-    "count": 2553,
+    "count": 2551,
     "partial_updates": [
         {
             "date": "2026-08-08",
@@ -7152,8 +7152,6 @@
         "lpn_scenario_new": "8c7cb9a76fb6edea4aea3207534aa9893497a61f",
         "lpn_scenario_new_name": "9c11646da10f3a7f45bbcdaa3f46a8e12e9a494c",
         "lpn_scenario_only_deleted": "64593b848d55aef5478051d0bd314db3d8bc66db",
-        "lpn_scenario_override": "f17309abaf2cd5e8c6c65555ad442ae35eaa095a",
-        "lpn_scenario_override_tip": "2dfba048318a7c784705e736fc3c872406a5573e",
         "lpn_scenario_overrides": "31e700ad9e543d09b019723299ac4087388e5582",
         "lpn_scenario_overrides_tip": "40a9824d2b15f13c605d24d9e5477af152c2be49",
         "lpn_scenario_preset_average_day": "d674202c07877bd6471bc1832422f6d3640415c2",
@@ -14820,14 +14818,6 @@
         },
         "lpn_scenario_only_deleted": {
             "words": 9,
-            "ends_sentence": true
-        },
-        "lpn_scenario_override": {
-            "words": 4,
-            "ends_sentence": false
-        },
-        "lpn_scenario_override_tip": {
-            "words": 28,
             "ends_sentence": true
         },
         "lpn_scenario_overrides": {

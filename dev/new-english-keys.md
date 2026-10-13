@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**131 still to read on master**, of 136 untranslated keys, of 2683 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**131 still to read on master**, of 136 untranslated keys, of 2681 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -614,7 +614,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**70 still to read**, of 73 new keys across 13 unmerged branch(es).
+**70 still to read**, of 73 new keys across 12 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -625,11 +625,9 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/bentley-interop (`291f0f92`) — adds no English strings
+### feat/bentley-interop (`fdd206f6`) — adds no English strings
 
 ### feat/desktop (`baba0f04`) — adds no English strings
-
-### feat/graph-bubble (`0a8d0297`) — adds no English strings
 
 ### feat/label-gang-search (`8b31a907`) — 3 new, all ruled
 

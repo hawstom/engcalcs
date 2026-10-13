@@ -2651,9 +2651,7 @@ $ec_lang['lpn_scenario_new_name']='Cenário {n}';
 $ec_lang['lpn_scenario_prompt_name']='Nome para este cenário';
 $ec_lang['lpn_scenario_rename']='Renomear cenário…';
 $ec_lang['lpn_scenario_delete']='Excluir cenário';
-$ec_lang['lpn_scenario_override']='Valor individual neste cenário';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_scenario_override_tip']='Marcado significa que este cenário substitui o valor do pai, mesmo quando o número é o mesmo. Desmarque a caixa para usar o do pai.';
 // "Base scenario", not bare "Base" -- an ENGLISH fix, so this needs no _syn either. This is the one
 // place the polysemy genuinely bites: here the word sits beside a NUMBER, in a field popup with no
 // scenario dropdown nearby to frame it, which is exactly the reading that invites "base amount".

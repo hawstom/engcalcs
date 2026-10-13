@@ -2661,9 +2661,7 @@ $ec_lang['lpn_scenario_new_name']='দৃশ্যকল্প {n}';
 $ec_lang['lpn_scenario_prompt_name']='এই দৃশ্যকল্পের নাম';
 $ec_lang['lpn_scenario_rename']='দৃশ্যকল্পের নাম পরিবর্তন করুন…';
 $ec_lang['lpn_scenario_delete']='দৃশ্যকল্প মুছুন';
-$ec_lang['lpn_scenario_override']='এই দৃশ্যকল্পে নিজস্ব মান';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_scenario_override_tip']='টিক দেওয়া মানে এই দৃশ্যকল্প এই মানের জন্য তার ভিত্তিকে অগ্রাহ্য করে, সংখ্যা একই হলেও। ভিত্তির মান ব্যবহার করতে বাক্সের টিক তুলে দিন।';
 // "Base scenario", not bare "Base" -- an ENGLISH fix, so this needs no _syn either. This is the one
 // place the polysemy genuinely bites: here the word sits beside a NUMBER, in a field popup with no
 // scenario dropdown nearby to frame it, which is exactly the reading that invites "base amount".
