@@ -934,6 +934,7 @@ $ec_lang['lpn_tool_area_polygon']='Select a polygon';
 $ec_lang['lpn_tool_delete']='Delete';
 $ec_lang['lpn_tool_zoom_extent']='Zoom to fit';
 $ec_lang_syn['lpn_tool_zoom_extent']='Zoom out (or in) until the whole drawing fits in the window; show everything at once (zoom to extents, fit to window, show all). | avoid: adjusting the zoom by an amount';
+$ec_lang['lpn_tool_zoom_selection']='Zoom to selection';
 $ec_lang['lpn_tool_zoom_window']='Zoom Window';
 $ec_lang['lpn_zoom_in']='Zoom in';
 $ec_lang['lpn_zoom_out']='Zoom out';
@@ -1461,6 +1462,7 @@ $ec_lang['lpn_tool_vertices_tip']='Add and remove pipe vertices. Specify a point
 $ec_lang['lpn_tool_undo_tip']='Undo history length = 20 actions';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_tool_zoom_extent_tip']='Fit the whole network to the map window. To zoom to a rectangle you drag instead, press W or click the small triangle in the corner of the Zoom to fit toolbar button. See also the zoom controls at the upper right of the map.';
+$ec_lang['lpn_tool_zoom_selection_tip']='Fit the selected assets to the map window. Select one or more assets first.';
 $ec_lang['lpn_tool_zoom_window_tip']='Specify corners or drag a rectangle. Press again for Zoom to fit.';
 // Tom's wording, 2026-09-25.
 $ec_lang['lpn_zoom_in_tip']='Zoom in. Shortcut: +';
