@@ -135,8 +135,9 @@ async function main() {
 			});
 			ok('toolbar button background is still "none" (transparent)',
 				toolbarSample.bg === 'rgba(0, 0, 0, 0)', toolbarSample.bg);
-			ok('toolbar button border-radius is still master\'s 4px',
-				/4px/.test(masterToolbar.base) && toolbarSample.radius === '4px', toolbarSample.radius);
+			// The radius joined the menu bar's on purpose (feat/button-base, one button base: --ec-btn-radius).
+			ok('toolbar button border-radius is the shared button base, 5px',
+				toolbarSample.radius === '5px', toolbarSample.radius);
 			ok('toolbar button padding is still master\'s "3px 5px"',
 				/padding: 3px 5px/.test(masterToolbar.base) && toolbarSample.padding === '3px 5px', toolbarSample.padding);
 
