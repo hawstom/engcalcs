@@ -405,7 +405,7 @@ async function main() {
 			await flush();
 			sv = await saved();
 			const cp = ((sv.settings || {}).customProps || []).filter((x) => x.key === 'custom_kk')[0];
-			const where = inScn ? 'in a scenario' : 'in Base';
+			const where = inScn ? '(Fig X)' : '(Base)';
 			ok('CP ' + where + ': key, label and Applies to typed one after another are all saved', !!cp && cp.label === 'Label two' && cp.applies === 'J', JSON.stringify((sv.settings || {}).customProps));
 			await a.toolbarClick(await L('lpn_tool_settings'));
 			await a.settle(500);
