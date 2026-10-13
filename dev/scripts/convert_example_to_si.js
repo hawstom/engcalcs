@@ -38,7 +38,8 @@ const r = (x) => Number(x.toPrecision(SIG));
 // TOM'S ROUNDING, 2026-10-13: "Round all the pipe diameters to the nearest 50 mm. Round all the base
 // demands and curve flows to the nearest 0.001 L/s. Round all the res. heads, tank depths and
 // diameters, control depths, curve heads and pipe lengths to the nearest 0.001m". An SI twin is an SI
-// design, not a bit-exact image of the US one. Elevations keep SIG significant figures.
+// design, not a bit-exact image of the US one. And the same day: "Elevations: Can you round them also
+// to the nearest 0.001m?"
 const step = (x, s) => Number((Math.round(x / s) * s).toFixed(Math.max(0, -Math.floor(Math.log10(s)))));
 const L = (x) => r(x * FT);
 const L3 = (x) => step(x * FT, 0.001), D50 = (x) => Math.max(50, step(x * IN, 50)), Q3 = (x) => step(x * GPM, 0.001);
@@ -64,8 +65,7 @@ if (d.units0.lpn_u_age) { d.units.lpn_u_age = d.units0.lpn_u_age; }
 const Dr = geo ? ((x) => x) : ((x) => Number((x * FT).toPrecision(DSIG)));
 d.nodes.forEach((n) => {
 	conv(n, ['x', 'y', 'lx', 'ly'], Dr);
-	conv(n, ['elev'], L);
-	conv(n, ['_head', '_level', 'minLevel', 'maxLevel', 'tankDiameter'], L3);
+	conv(n, ['elev', '_head', '_level', 'minLevel', 'maxLevel', 'tankDiameter'], L3);
 	conv(n, ['_demand'], Q3);
 	if (n.demands) { throw new Error('node ' + n.id + ' has a demand list; extend the converter'); }
 });

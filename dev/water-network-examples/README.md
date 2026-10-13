@@ -20,7 +20,7 @@ and a function cannot carry a description, cannot be authored by anyone who is n
 Tom 2026-10-11), made by `node dev/scripts/convert_example_to_si.js Net3-Novato-CA-World Net3-Novato-CA-World-SI "Net3-Novato-CA-World SI"`:
 ft to m, in to mm, gpm to L/s, rounded as Tom set it on 2026-10-13: pipe diameters to the nearest 50 mm;
 demands and curve flows to 0.001 L/s; reservoir heads, tank levels and diameters, control levels,
-curve heads and pipe lengths to 0.001 m; elevations to 6 significant figures. Hazen-Williams
+curve heads, pipe lengths and elevations to 0.001 m. Hazen-Williams
 roughness, minor loss k, patterns, times and the quality sections are carried across unchanged. A unit
 switch on the page reinterprets rather than converts, so an SI twin is a separate file. **The drawing
 converts with it** where it is a length: Net2 is drawn in its CRS's feet, so its drawing converts at

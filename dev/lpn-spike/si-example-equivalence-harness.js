@@ -16,8 +16,8 @@
 // TOM'S ROUNDING, 2026-10-13, MAKES THE TWIN AN SI DESIGN, NOT A BIT-EXACT IMAGE: "Round all the
 // pipe diameters to the nearest 50 mm. Round all the base demands and curve flows to the nearest
 // 0.001 L/s. Round all the res. heads, tank depths and diameters, control depths, curve heads and pipe
-// lengths to the nearest 0.001m". So every rounded number is checked EXACTLY against that rule applied
-// to the US file (0. below), the unrounded ones (elevations, roughness, minor loss) still to 1e-5, and
+// lengths to the nearest 0.001m", and then the elevations to 0.001 m too. So every rounded number is checked EXACTLY against that rule applied
+// to the US file (0. below), the unrounded ones (roughness, minor loss) still to 1e-5, and
 // the solves are bounded as the same network behaving alike, not as equal to the millimetre.
 'use strict';
 
@@ -67,8 +67,12 @@ function open(file, edit) {
 const MODEL_REL = 1e-5, FLOW_REL = 1e-4, FLOW_ABS = 1e-6;
 // The rounded twin against the original: a tank's level, hour by hour, within LEVEL_ABS. Measured
 // 2026-10-13 at 0.79 m (Net3 tank 3, where a 400 mm main stands in for 16 in) and 0.0009 m (Net2).
-// Heads and flows are printed, not bounded: a pump control that trips a step earlier moves a head
-// by tens of metres for that hour, which is the network obeying its own controls.
+// THE DIAMETERS ARE ALL OF IT, measured 2026-10-13: with the diameters exact and everything else
+// rounded, the worst tank differs by 0.02 m and pump 335 never switches differently. Every nominal
+// inch size rounds DOWN (16 in = 406.4 mm to 400), about 1.6% narrower, which is about 8% more
+// Hazen-Williams loss (D^-4.87) on every pipe. Net3 tank 1 then runs ~0.4 m lower by evening, so pump
+// 335 (on below 5.212 m) starts at 19 h instead of 22 h. Heads and flows are therefore printed, not
+// bounded: for those three hours one network is pumping and the other is not, up to 28 m of head.
 const LEVEL_ABS = 1.0;
 
 // 0. TOM'S RULE, number by number, on the files themselves (ft, in, gpm against m, mm, L/s).
@@ -80,7 +84,7 @@ function ruleMisses(ru, rs) {
 	const want = (a, b, at) => { if (typeof a === 'number' && Math.abs(a - b) > 1e-9) { miss.push(at + ': ' + b + ', rule gives ' + a); } };
 	ru.nodes.forEach((a, i) => {
 		const b = rs.nodes[i];
-		['_head', '_level', 'minLevel', 'maxLevel', 'tankDiameter'].forEach((k) => { if (typeof a[k] === 'number') { want(L3(a[k]), b[k], 'node ' + a.id + ' ' + k); } });
+		['elev', '_head', '_level', 'minLevel', 'maxLevel', 'tankDiameter'].forEach((k) => { if (typeof a[k] === 'number') { want(L3(a[k]), b[k], 'node ' + a.id + ' ' + k); } });
 		if (typeof a._demand === 'number') { want(Q3(a._demand), b._demand, 'node ' + a.id + ' demand'); }
 	});
 	ru.links.forEach((a, i) => {
@@ -121,7 +125,6 @@ function ruleMisses(ru, rs) {
 			&& us.links.map((l) => l.id).join() === si.links.map((l) => l.id).join());
 		us.nodes.forEach((a, i) => {
 			const b = si.nodes[i];
-			if (a.elev !== undefined) { num(a.elev, b.elev, 'node ' + a.id + ' elev', 1e-3); }
 		});
 		us.links.forEach((a, i) => {
 			const b = si.links[i];
@@ -133,7 +136,7 @@ function ruleMisses(ru, rs) {
 			const ru = JSON.parse(fs.readFileSync(ROOT + 'examples/' + file + '.lwn', 'utf8'));
 			const rs = JSON.parse(fs.readFileSync(ROOT + 'examples/' + file + '-SI.lwn', 'utf8'));
 			const miss = ruleMisses(ru, rs);
-			ok('every diameter, demand, head, level, length, curve point and control depth follows the rounding rule',
+			ok('every elevation, diameter, demand, head, level, length, curve point and control depth follows the rounding rule',
 				miss.length === 0, miss.length ? miss.length + ' miss, first ' + miss[0] : '');
 			if (net === 'Net3') {
 				const c = rs.controls.find((x) => x.link === '335' && x.condition && x.condition.cmp === 'below');
@@ -143,7 +146,7 @@ function ruleMisses(ru, rs) {
 				c.condition.value = keep;
 			}
 		}
-		ok('every unrounded input (elevation, roughness, minor loss) is within ' + MODEL_REL + ' relative',
+		ok('every unrounded input (roughness, minor loss) is within ' + MODEL_REL + ' relative',
 			wm.v < MODEL_REL, 'worst ' + wm.v.toExponential(2) + ' (' + wm.at + ')');
 		ok('the Hazen-Williams roughness is not touched',
 			us.method === si.method && us.links.every((l, i) => l.roughness === si.links[i].roughness));
@@ -220,7 +223,7 @@ function ruleMisses(ru, rs) {
 				ru.nodes.filter((n) => n._demand).slice(0, 3).forEach((a) => {
 				const b = rs.nodes.find((n) => n.id === a.id);
 				ok('node ' + a.id + ': ' + a._demand + ' gpm is ' + b._demand + ' L/s; ' + a.elev + ' ft is ' + b.elev + ' m',
-					Math.abs(Q3(a._demand) - b._demand) < 1e-9 && rel(a.elev * 0.3048, b.elev, 1e-3) < 1e-5);
+					Math.abs(Q3(a._demand) - b._demand) < 1e-9 && Math.abs(L3(a.elev) - b.elev) < 1e-9);
 			});
 			const a = ru.links.find((l) => l.type === 'pipe'), b = rs.links.find((l) => l.id === a.id);
 			ok('pipe ' + a.id + ': ' + a._length + ' ft is ' + b._length + ' m; ' + a._diameter + ' in is ' + b._diameter + ' mm',
