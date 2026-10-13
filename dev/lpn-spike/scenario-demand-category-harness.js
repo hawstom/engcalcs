@@ -108,9 +108,17 @@ function table(id) {
 		sels: findAll([t], 'SELECT'),
 		dels: findAll([t], 'BUTTON').filter(b => b.textContent === '×'),
 		add: findAll(kids, 'BUTTON').filter(b => b.textContent.indexOf(PC.lpn_demand_add) >= 0)[0],
-		// The table's own marker is the first one AFTER it: the identity band above carries the
-		// coordinates' markers, and ticking one of those is a different override entirely.
-		marker: kids.slice(kids.indexOf(t)).filter(l => l.tagName === 'LABEL' && l.className === 'lpn-ov-marker')[0]
+		// The table's own marker (Task 790's gutter) sits right before the block that holds it: the
+		// identity band above carries the coordinates' markers, a different override entirely. Its
+		// note, while it is an override, is the first one after the table.
+		marker: (function () {
+			const blk = kids.filter((k) => k === t || findAll([k], 'TABLE').indexOf(t) >= 0)[0], i = kids.indexOf(blk);
+			const g = i > 0 && String(kids[i - 1].className) === 'lpn-ovm' ? kids[i - 1] : null;
+			if (!g) { return null; }
+			const dot = g.children.filter((c) => /lpn-ovm-(dot|hollow)/.test(c.className))[0];
+			const note = kids.slice(i).filter((k) => k.className === 'lpn-ov-note')[0];
+			return { dot: dot, on: !!dot && /lpn-ovm-dot/.test(dot.className), textContent: note ? findAll([note], 'SPAN').map((x) => x.textContent).join('') : '' };
+		}())
 	};
 }
 function type(input, v) { input.value = v; input._listeners.change[0](); }
@@ -201,13 +209,10 @@ console.log('\n--- undo ---');
 console.log('\n--- the override marker ---');
 {
 	let t = table('J4');
-	ok('the table carries one ticked marker', !!t.marker &&
-		findAll([t.marker], 'INPUT')[0].checked === true);
+	ok('the table carries one filled dot (Task 790)', !!t.marker && t.marker.on);
 	ok('...naming Base\'s value', t.marker.textContent.indexOf('33') >= 0, t.marker.textContent);
-	const box = findAll([t.marker], 'INPUT')[0];
-	box.checked = false;
-	box._listeners.change[0]();
-	ok('unticking clears the list override', !ovOf('J4').demands && !ovOf('J4').demand,
+	t.marker.dot._listeners.click[0]();
+	ok('clicking the dot clears the list override', !ovOf('J4').demands && !ovOf('J4').demand,
 		JSON.stringify(ovOf('J4')));
 	ok('...and J4 is Base\'s one row again', L.effective(J('J4'), 'demands').length === 1 &&
 		near(L.resolvedDemand(J('J4')), J4_BASE));
@@ -215,13 +220,12 @@ console.log('\n--- the override marker ---');
 	L.switchScenario('base');
 	L.switchScenario(SCN.id);
 	t = table('J5');
-	const b5 = findAll([t.marker], 'INPUT')[0];
-	b5.checked = true;
-	b5._listeners.change[0]();
-	ok('ticking a breakdown junction records its whole list', (ovOf('J5').demands || []).length === 2,
+	ok('a junction the scenario inherits wears the hollow dot', !!t.marker && !t.marker.on);
+	t.marker.dot._listeners.click[0]();
+	ok('clicking it on a breakdown junction records its whole list', (ovOf('J5').demands || []).length === 2,
 		JSON.stringify(ovOf('J5')));
 	ok('...changing no number', near(L.baseDemandTotal(J('J5')), 40.75));
-	ok('...and the tick kept the file\'s own text for later export',
+	ok('...and the click kept the file\'s own text for later export',
 		ovOf('J5').demands[1].tok && ovOf('J5').demands[1].tok.base === '0.750', JSON.stringify(ovOf('J5').demands[1]));
 }
 

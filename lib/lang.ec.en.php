@@ -1606,6 +1606,10 @@ $ec_lang['lpn_pane_inactive_show']='Include inactive topology';
 $ec_lang['lpn_pane_scn_filter_note']='{filters}. Showing {n} of {all}.';
 // The cell menu's item that removes the selected cells' scenario overrides, so each reads what its
 // scenario inherits (Tom, 2026-10-06). Greyed when no selected cell holds one.
+$ec_lang['lpn_ovm_child_ask']='Clear child overrides ({n} total)?';
+$ec_lang['lpn_ovm_child_tip']='Child scenarios override this value ({n} total). Click to clear their overrides.';
+$ec_lang['lpn_ovm_dot_clear']='Click to clear it.';
+$ec_lang['lpn_ovm_dot_set']='Inherited. Click to make it an override in this scenario, holding the value shown.';
 $ec_lang['lpn_pane_clear_override']='Clear override';
 // The tip on a table cell holding a value set in its row's scenario (Tom, 2026-10-06: "Demand alt.:
 // Max day"). {category} is an lpn_alt_cat_* name; {alternative} is the alternative's name, which

@@ -57858,13 +57858,17 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		Array.prototype.forEach.call(box.querySelectorAll('.lpn-set-heldnote'), function (n) { n.parentNode.removeChild(n); });
 		Array.prototype.forEach.call(box.querySelectorAll('.lpn-set-held'), function (el) { el.classList.remove('lpn-set-held'); });
 		Array.prototype.forEach.call(box.querySelectorAll('.lpn-setbox-link-held'), function (el) { el.classList.remove('lpn-setbox-link-held'); });
-		if (!scn || scn.isBase) { setboxKeepPlace(); return; }
+		// The dot and the down triangle (Task 790; ovmGutter() says what they mean), drawn afresh.
+		Array.prototype.forEach.call(box.querySelectorAll('.lpn-ovm'), function (n) { n.parentNode.removeChild(n); });
+		box.classList.toggle('lpn-ovm-gut', !!scn && scenarios.length > 1);
+		if (!scn || scenarios.length < 2) { setboxKeepPlace(); return; }
 		Array.prototype.forEach.call(box.querySelectorAll('[data-lpn-setting]'), function (el) {
 			var paths, held, note, text, btn, many, shared;
 			try { paths = JSON.parse(el.getAttribute('data-lpn-setting')) || []; } catch (e) { paths = []; }
 			if (!paths.length) { return; }
 			if (!rows) { rows = settingTableRows(); }
 			held = setboxHeldRowsOf(paths, scn, rows);
+			setboxMarks(el, paths, held, scn, rows);
 			if (!held.length) { return; }
 			el.classList.add('lpn-set-held');
 			many = held.length > 1;
@@ -57903,6 +57907,34 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// A search in force keeps each new note with its row.
 		if ((document.getElementById('lpn_setbox_filter') || {}).value) { applySetboxFilter(); }
 		setboxKeepPlace();
+	}
+	// The Settings box's gutter for one row: a dot where the open scenario holds it (a click clears it,
+	// as Clear override does), and a down triangle where scenarios below it hold their own. No hollow
+	// dot here: typing a value is what holds it (Ida, 2026-10-12).
+	function setboxMarks(el, paths, held, scn, rows) {
+		var pc = EngCalcs.pageConfig || {}, g = document.createElement('span'), mine, kids;
+		g.className = 'lpn-ovm';
+		g.setAttribute('data-lpn-noseam', '1');
+		if (held.length) {
+			g.appendChild(ovmCell('lpn-ovm-dot', (pc.lpn_settings_held_in || 'Override in {scenario}.').split('{scenario}').join(scenarioDisplayName(scn)) +
+				' ' + (pc.lpn_ovm_dot_clear || 'Click to clear it.'), function () { clearHeldSetboxRows(held, scn); }));
+		} else { g.appendChild(ovmCell('lpn-ovm-none')); }
+		mine = rows.filter(function (r) { return paths.some(function (p) { return setboxPathUnder(r.path, p); }); });
+		kids = childSettingHolders(mine);
+		if (kids.length) {
+			g.appendChild(ovmCell('lpn-ovm-tri', (pc.lpn_ovm_child_tip || 'Child scenarios override this value ({n} total). Click to clear their overrides.').replace('{n}', String(kids.length)), function () {
+				var now = childSettingHolders(mine);
+				askClearChildOverrides(now.length, function () {
+					now.forEach(function (k) { settingRowClear(k.row, k.scn); });
+					settingTableAfterEdit();
+					refreshScenarioStatus();
+					refreshPaneIfOpen();
+				});
+			}));
+		} else if (!held.length) { return; }
+		else { g.appendChild(ovmCell('lpn-ovm-none')); }
+		// Last, so the row's grid keeps its own first and second child; CSS places it at the start.
+		el.appendChild(g);
 	}
 	// The column of a Labels row a path is (its Show tick, Decimals, Before, After, Use units, the
 	// two ranks), in that column's own words; null for any other row.
@@ -63580,6 +63612,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			});
 		}
 		fields.innerHTML = '';
+		fields.classList.remove('lpn-ovm-gut');
 	}
 	// ---- the override marker (ROADMAP Task 184) ----
 	// EVERY EDIT IN A NON-BASE SCENARIO IS AN OVERRIDE, FULL STOP -- even when the typed value equals
@@ -63671,128 +63704,224 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (!par || par.isBase) { return (pc.lpn_scenario_base_value || 'Base scenario: {value}').replace('{value}', v); }
 		return (pc.lpn_settings_held_base || '{base}: {value}').split('{base}').join(scenarioDisplayName(par)).split('{value}').join(v);
 	}
-	function overrideMarker(fields, el, prop, format) {
-		var pc = EngCalcs.pageConfig || {};
-		// Nothing at all in Base: there is no scenario to belong to, and a permanently-unticked box
-		// on every row of every popup would be noise the overwhelming majority of the time. A
-		// non-overridable row gets nothing either -- Tom, 2026-08-17, was not sold on announcing it
-		// here, and routed discoverability to the Walkthrough instead. A working in-popup marker is
-		// in git at 33b5c0f if that is ever reconsidered.
-		if (!el || inBaseScenario() || !isOverridable(el, prop)) { return; }
-		var label = document.createElement('label'), box = document.createElement('input'),
-			text = document.createElement('span'), on = hasOverride(el, prop), shared;
-		label.className = 'lpn-ov-marker';
-		box.type = 'checkbox';
-		box.checked = on;
-		box.addEventListener('change', function () {
-			saveUndoSnapshot();
-			// Ticking records the value the field is ALREADY showing -- which is Base's, since
-			// nothing overrode it yet. That is deliberate: the tick is a claim about intent, not an
-			// edit, so it must not change any number by itself.
-			if (box.checked) { setOverride(el, prop, effective(el, prop)); } else { clearOverride(el, prop); }
-			afterPropertyEdit(el);
-			refreshPopupIfOpen();
-		});
-		setFieldLabel(text, pc.lpn_scenario_override || 'Override in this scenario', pc.lpn_scenario_override_tip);
-		label.appendChild(box);
-		label.appendChild(document.createTextNode(' '));
-		label.appendChild(text);
-		if (on) {
-			var base = document.createElement('span');
-			base.className = 'lpn-ov-base';
-			base.textContent = inheritedLine(function () { return (format || formatPropValue)(effective(el, prop)); });
-			label.appendChild(base);
-			shared = smSharedText([categoryOf(prop, elGroup(el))]);
-			if (shared) {
-				base = document.createElement('span');
-				base.className = 'lpn-ov-base lpn-ov-shared';
-				base.textContent = ' ' + shared;
-				label.appendChild(base);
+	// ---- THE OVERRIDE MARKER: A DOT AND A DOWN TRIANGLE (Task 790) ----
+	//
+	// Tom, 2026-10-13: *"Ida's dot is fine. But this doesn't resolve the UI for indicating and clearing
+	// child overrides. The down triangle is fine, and should there be an alert, 'Clear child overrides
+	// ({n} total)?'"* Ida's design (her journal, 2026-10-12): a two-cell gutter at the inline start of
+	// the row, drawn by CSS so no font and no translation is involved. A filled dot is an override in
+	// this scenario, and a click clears it (Undo is the guard, as for Clear override). A hollow dot is
+	// a value this scenario inherits, and a click makes it an override holding the value shown (what
+	// the checkbox this replaces did). A down triangle says scenarios below this one override the
+	// value; a click asks, then clears theirs, so they follow this one again. Base has no dot (it
+	// holds no override) but carries the triangle. The gutter is drawn only when the project has more
+	// than one scenario.
+	//
+	// **NO MARKER IS A TAB STOP** (Declan's seat: a clerk tabbing through hundreds of rows must not
+	// pay one extra stop per field). The marks are pointer targets with a tip; the keyboard keeps
+	// typing a value (which makes the override) and the tables' Clear override.
+	//
+	// Scenarios below `scn` (for Base, every scenario), not reaching into a Base of its own added
+	// with Add base, whose values are its own copy and no override of anything.
+	function scenarioDescendants(scn) {
+		if (!scn) { return []; }
+		return scenarios.filter(function (d) {
+			var seen = {}, s = d;
+			if (d.isBase || d === scn) { return false; }
+			while (s && !s.isBase && !seen[s.id]) {
+				if (s.root === true) { return false; }
+				seen[s.id] = true;
+				s = parentScenarioOf(s);
+				if (s === scn) { return true; }
 			}
-		}
-		fields.appendChild(label);
-		fields.appendChild(document.createElement('br'));
+			return !!scn.isBase && !!s && s.isBase;
+		});
 	}
-	// **THE DEMAND TABLE'S ONE MARKER** (R-369). overrideMarker()'s shape and words, over the two
-	// properties a scenario can hold for this table: `demand` (row 0's base alone, as every file
-	// before R-369 has it) or `demands` (the whole list). Ticking records what is already showing
-	// -- the whole list where there is more than one row, row 0's base where there is one, which is
-	// exactly the override a tick recorded before -- and unticking clears both, so the junction
-	// follows Base's list again. The Base line names Base's own rows, added: `50 + 20 + 12.5`.
-	function demandOverrideMarker(fields, n) {
+	// The holders this scenario's own value resolves through for a category (none for Base).
+	function ownLayerObjs(scn, cat) {
+		return scn && !scn.isBase ? treeLayers(scn, cat).map(function (l) { return l.obj; }) : [];
+	}
+	/**
+	 * **WHERE THE SCENARIOS BELOW OVERRIDE ONE ELEMENT VALUE**: the holder each descendant writes to
+	 * for the category (its own alternative, or its own values in a file from before), when that
+	 * holder is not one the open scenario itself resolves through and it states any of `props`. Each
+	 * holder once, however many scenarios share it: {n} counts overrides, not scenarios.
+	 */
+	function childOverrideHolders(el, props) {
+		var scn = activeScenario(), key = ovKey(el), cat = categoryOf(props[0], elGroup(el)),
+			mine = ownLayerObjs(scn, cat), out = [], seen = [];
+		scenarioDescendants(scn).forEach(function (d) {
+			var t = writeTargetFor(d, cat), map, ov;
+			if (!t || t.obj.root === true || mine.indexOf(t.obj) >= 0 || seen.indexOf(t.obj) >= 0) { return; }
+			map = t.kind === 'alt' ? t.obj.values : t.obj.overrides;
+			ov = plainObject(map) ? map[key] : null;
+			if (!plainObject(ov) || !props.some(function (p) { return Object.prototype.hasOwnProperty.call(ov, p); })) { return; }
+			seen.push(t.obj);
+			out.push({ t: t, map: map, key: key });
+		});
+		return out;
+	}
+	function clearChildOverrides(el, props) {
+		var list = childOverrideHolders(el, props);
+		list.forEach(function (h) {
+			var ov = h.map[h.key];
+			props.forEach(function (p) { delete ov[p]; });
+			if (!Object.keys(ov).length) { delete h.map[h.key]; }
+			if (h.t.kind === 'alt' && !Object.keys(h.map).length) { delete h.t.obj.values; }
+		});
+		if (list.length) { touchTree('clearChildOverrides'); }
+		return list.length;
+	}
+	// The same for a Settings box row: [{row, scn}], one per holder and setting, cleared through the
+	// Settings table's own settingRowClear() in the scenario that writes there.
+	function childSettingHolders(rows) {
+		var scn = activeScenario(), out = [], seen = [], below = scenarioDescendants(scn);
+		rows.forEach(function (r) {
+			var mine = ownLayerObjs(scn, r.cat);
+			if (r.home === 'cp') { return; }
+			below.forEach(function (d) {
+				var t = writeTargetFor(d, r.cat);
+				if (!t || t.obj.root === true || mine.indexOf(t.obj) >= 0) { return; }
+				if (seen.some(function (x) { return x.obj === t.obj && x.row === r; })) { return; }
+				if (!settingRowIsLocal(r, d)) { return; }
+				seen.push({ obj: t.obj, row: r });
+				out.push({ row: r, scn: d });
+			});
+		});
+		return out;
+	}
+	// "Clear child overrides ({n} total)?", asked through the page's own dialog; `clear` runs on yes,
+	// as one undo step.
+	function askClearChildOverrides(n, clear) {
 		var pc = EngCalcs.pageConfig || {};
-		if (!n || inBaseScenario() || !isOverridable(n, 'demand')) { return; }
-		var label = document.createElement('label'), box = document.createElement('input'),
-			text = document.createElement('span'),
-			on = hasOverride(n, 'demand') || hasOverride(n, 'demands');
-		label.className = 'lpn-ov-marker';
-		box.type = 'checkbox';
-		box.checked = on;
-		box.addEventListener('change', function () {
+		askDialog({ kind: 'confirm', text: (pc.lpn_ovm_child_ask || 'Clear child overrides ({n} total)?').replace('{n}', String(n)) }, function (yes) {
+			if (!yes) { return; }
 			saveUndoSnapshot();
-			if (box.checked) {
+			clear();
+		});
+	}
+	// One mark of the gutter: a span, never focusable, acting on a click. The click is kept from the
+	// row's <label>, which would otherwise pass it to the row's own control.
+	function ovmCell(cls, tip, act) {
+		var c = document.createElement('span');
+		c.className = 'lpn-ovm-cell ' + cls;
+		if (tip) { c.title = tip; c.setAttribute('aria-label', tip); }
+		if (act) {
+			c.setAttribute('role', 'button');
+			c.addEventListener('click', function (e) { if (e) { e.preventDefault(); e.stopPropagation(); } act(); });
+		}
+		return c;
+	}
+	// The first node of the row just appended to `fields` (what lies after the previous <br> or block).
+	function ovmRowStart(fields) {
+		var kids = Array.prototype.slice.call(fields.childNodes || fields.children || []), i = kids.length - 1, blk = /^(DIV|TABLE|FIELDSET|P|H\d)$/;
+		while (i >= 0 && kids[i].nodeName === 'BR') { i--; }
+		if (i < 0) { return null; }
+		if (blk.test(kids[i].nodeName)) { return kids[i]; }
+		while (i > 0 && kids[i - 1].nodeName !== 'BR' && !blk.test(kids[i - 1].nodeName)) { i--; }
+		return kids[i];
+	}
+	/**
+	 * The gutter for the row just appended. `o`: {el, props, on, set(), clear(), line(), cats}. `line`
+	 * says what Clear would restore (Tom, 2026-10-12), shown under the row while it is an override.
+	 */
+	function ovmGutter(fields, o) {
+		var pc = EngCalcs.pageConfig || {}, scn = activeScenario(), start, g, kids, n, note, base, shared;
+		if (!o.el || scenarios.length < 2 || !isOverridable(o.el, o.props[0])) { return; }
+		start = ovmRowStart(fields);
+		if (!start) { return; }
+		fields.classList.add('lpn-ovm-gut');
+		g = document.createElement('span');
+		g.className = 'lpn-ovm';
+		if (scn.isBase) { g.appendChild(ovmCell('lpn-ovm-none')); }
+		else if (o.on) {
+			g.appendChild(ovmCell('lpn-ovm-dot', (pc.lpn_settings_held_in || 'Override in {scenario}.').split('{scenario}').join(scenarioDisplayName(scn)) +
+				' ' + (pc.lpn_ovm_dot_clear || 'Click to clear it.'), function () {
+				saveUndoSnapshot();
+				o.clear();
+				afterPropertyEdit(o.el);
+				refreshPopupIfOpen();
+			}));
+		} else {
+			g.appendChild(ovmCell('lpn-ovm-hollow', pc.lpn_ovm_dot_set || 'Inherited. Click to make it an override in this scenario, holding the value shown.', function () {
+				saveUndoSnapshot();
+				o.set();
+				afterPropertyEdit(o.el);
+				refreshPopupIfOpen();
+			}));
+		}
+		kids = childOverrideHolders(o.el, o.props);
+		n = kids.length;
+		if (n) {
+			g.appendChild(ovmCell('lpn-ovm-tri', (pc.lpn_ovm_child_tip || 'Child scenarios override this value ({n} total). Click to clear their overrides.').replace('{n}', String(n)), function () {
+				askClearChildOverrides(childOverrideHolders(o.el, o.props).length, function () {
+					clearChildOverrides(o.el, o.props);
+					afterPropertyEdit(o.el);
+					refreshScenarioStatus();
+					refreshPopupIfOpen();
+				});
+			}));
+		} else { g.appendChild(ovmCell('lpn-ovm-none')); }
+		fields.insertBefore(g, start);
+		if (!o.on || scn.isBase) { return; }
+		// While it is an override: what Clear restores, and who else the alternative reaches.
+		note = document.createElement('div');
+		note.className = 'lpn-ov-note';
+		base = document.createElement('span');
+		base.className = 'lpn-ov-base';
+		base.textContent = o.line();
+		note.appendChild(base);
+		shared = smSharedText(o.cats);
+		if (shared) {
+			base = document.createElement('span');
+			base.className = 'lpn-ov-base lpn-ov-shared';
+			base.textContent = ' ' + shared;
+			note.appendChild(base);
+		}
+		// Under the row: after the row's own <br>.
+		fields.appendChild(note);
+	}
+	function overrideMarker(fields, el, prop, format) {
+		if (!el || !isOverridable(el, prop)) { return; }
+		ovmGutter(fields, {
+			el: el, props: [prop], on: !inBaseScenario() && hasOverride(el, prop), cats: [categoryOf(prop, elGroup(el))],
+			// The hollow dot records the value the field is ALREADY showing: a claim about intent, not
+			// an edit, so it changes no number by itself.
+			set: function () { setOverride(el, prop, effective(el, prop)); },
+			clear: function () { clearOverride(el, prop); },
+			line: function () { return inheritedLine(function () { return (format || formatPropValue)(effective(el, prop)); }); }
+		});
+	}
+	// **THE DEMAND TABLE'S ONE MARKER** (R-369), over the two properties a scenario can hold for this
+	// table: `demand` (row 0's base alone, as every file before R-369 has it) or `demands` (the whole
+	// list). Making it an override records what is already showing -- the whole list where there is
+	// more than one row, row 0's base where there is one -- and clearing clears both, so the junction
+	// follows its parent's list again. The line names the parent's own rows, added: `50 + 20 + 12.5`.
+	function demandOverrideMarker(fields, n) {
+		if (!n || !isOverridable(n, 'demand')) { return; }
+		ovmGutter(fields, {
+			el: n, props: ['demand', 'demands'], on: !inBaseScenario() && (hasOverride(n, 'demand') || hasOverride(n, 'demands')), cats: ['demand'],
+			set: function () {
 				if (hasDemandBreakdown(n)) { setProp(n, 'demands', ownDemandRows(n)); }
 				else { setOverride(n, 'demand', effective(n, 'demand')); }
-			} else {
-				clearOverride(n, 'demands');
-				clearOverride(n, 'demand');
+			},
+			clear: function () { clearOverride(n, 'demands'); clearOverride(n, 'demand'); },
+			line: function () {
+				return inheritedLine(function () { return ownDemandRows(n).map(function (d) { return formatPropValue(d.base); }).join(' + '); });
 			}
-			afterPropertyEdit(n);
-			refreshPopupIfOpen();
 		});
-		setFieldLabel(text, pc.lpn_scenario_override || 'Override in this scenario', pc.lpn_scenario_override_tip);
-		label.appendChild(box);
-		label.appendChild(document.createTextNode(' '));
-		label.appendChild(text);
-		if (on) {
-			var base = document.createElement('span');
-			base.className = 'lpn-ov-base';
-			base.textContent = inheritedLine(function () {
-				return ownDemandRows(n).map(function (d) { return formatPropValue(d.base); }).join(' + ');
-			});
-			label.appendChild(base);
-			if (smSharedText(['demand'])) {
-				base = document.createElement('span');
-				base.className = 'lpn-ov-base lpn-ov-shared';
-				base.textContent = ' ' + smSharedText(['demand']);
-				label.appendChild(base);
-			}
-		}
-		fields.appendChild(label);
-		fields.appendChild(document.createElement('br'));
 	}
 	// **A TEXT'S POSITION, ONE MARKER FOR ITS TWO NUMBERS** (Tom, 2026-10-12): x and y move together
-	// (a drag writes both), so one box holds or releases both, on overrideMarker()'s shape. The Base
-	// line names Base's point in the order the popup's coordinate rows read.
+	// (a drag writes both), so one mark holds or releases both. The line names the parent's point in
+	// the order the popup's coordinate rows read.
 	function textPositionMarker(fields, lb) {
-		var pc = EngCalcs.pageConfig || {};
-		if (!lb || inBaseScenario() || !isOverridable(lb, 'x')) { return; }
-		var label = document.createElement('label'), box = document.createElement('input'),
-			text = document.createElement('span'), on = hasOverride(lb, 'x') || hasOverride(lb, 'y'), base;
-		label.className = 'lpn-ov-marker';
-		box.type = 'checkbox';
-		box.checked = on;
-		box.addEventListener('change', function () {
-			saveUndoSnapshot();
-			if (box.checked) { setProp(lb, 'x', effective(lb, 'x')); setProp(lb, 'y', effective(lb, 'y')); }
-			else { clearOverride(lb, 'x'); clearOverride(lb, 'y'); }
-			afterPropertyEdit(lb);
-			relayoutLabels();
-			refreshPopupIfOpen();
+		if (!lb || !isOverridable(lb, 'x')) { return; }
+		ovmGutter(fields, {
+			el: lb, props: ['x', 'y'], on: !inBaseScenario() && (hasOverride(lb, 'x') || hasOverride(lb, 'y')), cats: [categoryOf('x', 'label')],
+			set: function () { setProp(lb, 'x', effective(lb, 'x')); setProp(lb, 'y', effective(lb, 'y')); relayoutLabels(); },
+			clear: function () { clearOverride(lb, 'x'); clearOverride(lb, 'y'); relayoutLabels(); },
+			line: function () { return inheritedLine(function () { return coordText(labelCoordAxis(lb, 1)) + ', ' + coordText(labelCoordAxis(lb, 2)); }); }
 		});
-		setFieldLabel(text, pc.lpn_scenario_override || 'Override in this scenario', pc.lpn_scenario_override_tip);
-		label.appendChild(box);
-		label.appendChild(document.createTextNode(' '));
-		label.appendChild(text);
-		if (on) {
-			// Base's point in the popup's own reading order (labelCoordAxis()'s two slots).
-			base = document.createElement('span');
-			base.className = 'lpn-ov-base';
-			base.textContent = inheritedLine(function () { return coordText(labelCoordAxis(lb, 1)) + ', ' + coordText(labelCoordAxis(lb, 2)); });
-			label.appendChild(base);
-		}
-		fields.appendChild(label);
-		fields.appendChild(document.createElement('br'));
 	}
 	// Completes an ordinary value edit. Ending a field helper at scheduleSolve() alone is a THIRD of
 	// the job: this also refreshes the audit halos and the "Custom values" count, and saves.

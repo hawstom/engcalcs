@@ -142,6 +142,15 @@ function fieldsText() {
 	}
 	return walk(L.popupFields());
 }
+// The override marker's cells (Task 790), by class: 'lpn-ovm-dot', 'lpn-ovm-hollow', 'lpn-ovm-tri'.
+function marks(cls) {
+	const out = [];
+	(function walk(el) {
+		if (String(el.className || '').split(/\s+/).indexOf(cls) >= 0) { out.push(el); }
+		(el.children || []).forEach(walk);
+	})(L.popupFields());
+	return out;
+}
 function checkboxes() {
 	const out = [];
 	(function walk(el) {
@@ -272,7 +281,8 @@ console.log('\n--- the property row shows the marker and Base\'s value ---');
 {
 	L.renderNodeFields(j2.id);
 	const txt = fieldsText();
-	ok('a scenario row offers the override marker', txt.indexOf(PC.lpn_scenario_override) >= 0, txt);
+	ok('an overridden row wears the filled dot (Task 790)', marks('lpn-ovm-dot').length === 1, String(marks('lpn-ovm-dot').length));
+	ok('...and every other overridable row the hollow dot', marks('lpn-ovm-hollow').length > 3, String(marks('lpn-ovm-hollow').length));
 	// Built from the LIVE lang string, never a hardcoded 'Base: '. That literal broke on 2026-08-14
 	// when lpn_scenario_base_value became 'Base scenario: {value}' -- and it would have broken
 	// identically in all 26 translations, which is the tell that the assertion was testing the
@@ -282,11 +292,10 @@ console.log('\n--- the property row shows the marker and Base\'s value ---');
 		.replace('{value}', '100');
 	ok('...and shows Base\'s value beside the scenario\'s', txt.indexOf(baseShown) !== -1, txt);
 
-	const marker = checkboxes().filter(function (c) { return c.checked; })[0];
-	ok('the marker is ticked for an overridden property', !!marker);
-	marker.checked = false;
-	marker._listeners.change[0]();
-	ok('unticking it in the popup returns the value to Base', L.effective(j2, 'demand') === 100);
+	const marker = marks('lpn-ovm-dot')[0];
+	ok('the dot is a pointer target, never a tab stop', !!marker && marker.getAttribute('role') === 'button' && !marker.getAttribute('tabindex'));
+	marker._listeners.click[0]();
+	ok('clicking the dot in the popup returns the value to Base', L.effective(j2, 'demand') === 100);
 	L.renderNodeFields(j2.id);
 	ok('...and Base\'s value is no longer shown, because nothing is diverging',
 		fieldsText().indexOf(((EngCalcs.pageConfig && EngCalcs.pageConfig.lpn_scenario_base_value) || 'Base: {value}')
@@ -298,8 +307,7 @@ console.log('\n--- the property row shows the marker and Base\'s value ---');
 
 	L.switchScenario('base');
 	L.renderNodeFields(j2.id);
-	ok('in Base there is no marker at all',
-		fieldsText().indexOf(PC.lpn_scenario_override) < 0);
+	ok('in Base there is no dot at all', !marks('lpn-ovm-dot').length && !marks('lpn-ovm-hollow').length);
 	L.switchScenario(L.getScenarios()[1].id);
 }
 

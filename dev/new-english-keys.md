@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**127 still to read on master**, of 132 untranslated keys, of 2679 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**131 still to read on master**, of 136 untranslated keys, of 2683 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -199,7 +199,7 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   @@ NEEDS RULING
 
-## lpn_  (132, 127 to read @@ NEEDS RULING)
+## lpn_  (136, 131 to read @@ NEEDS RULING)
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -257,6 +257,18 @@ never edits a synonym.
   @@ NEEDS RULING
 - **`lpn_library_pattern_default_deleted_in`**
   > Pattern {id} was the default demand pattern in these scenarios: {list}.
+  @@ NEEDS RULING
+- **`lpn_ovm_child_ask`**
+  > Clear child overrides ({n} total)?
+  @@ NEEDS RULING
+- **`lpn_ovm_child_tip`**
+  > Child scenarios override this value ({n} total). Click to clear their overrides.
+  @@ NEEDS RULING
+- **`lpn_ovm_dot_clear`**
+  > Click to clear it.
+  @@ NEEDS RULING
+- **`lpn_ovm_dot_set`**
+  > Inherited. Click to make it an override in this scenario, holding the value shown.
   @@ NEEDS RULING
 - **`lpn_pane_inactive_show`**
   > Include inactive topology
@@ -602,7 +614,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**69 still to read**, of 72 new keys across 13 unmerged branch(es).
+**70 still to read**, of 73 new keys across 13 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -613,7 +625,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/bentley-interop (`e6043b0a`) — adds no English strings
+### feat/bentley-interop (`291f0f92`) — adds no English strings
 
 ### feat/desktop (`baba0f04`) — adds no English strings
 
@@ -643,7 +655,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/match-property (`05bda765`) — adds no English strings
 
-### feat/shape (`c0d67284`) — 69 new, 69 to read @@ NEEDS RULING
+### feat/shape (`1917e940`) — 70 new, 70 to read @@ NEEDS RULING
 
 - **`lpn_dxf_import_binary`**
   > {file} is a binary DXF. Save it from your CAD program as an ASCII DXF, then import again.
@@ -839,6 +851,9 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 - **`lpn_shp_import_webmerc_ask`**
   > {file} has no .prj file, and its numbers are not latitudes and longitudes, but they fit Web Mercator metres (EPSG:3857), the system QGIS and web maps use. Import them as EPSG:3857 and convert them to this project?
+  @@ NEEDS RULING
+- **`lpn_shp_import_webmerc_far_ask`**
+  > {file} states {theirs}, and read in that system its coordinates fall {km} km from this project. Read as Web Mercator metres (EPSG:3857), the system QGIS and web maps use, they fall where this project is. Import them as EPSG:3857 and convert them to this project?
   @@ NEEDS RULING
 - **`lpn_shp_import_webmerc_ok`**
   > Import as EPSG:3857

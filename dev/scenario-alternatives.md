@@ -1100,11 +1100,24 @@ overrides to copy." is said in the dialog, as every other refusal on the page is
 messages log. Ticking Basic mode on for a project it cannot show is refused in the dialog too.
 
 **Deleting what holds overrides says how many go** (his "I don't see this message"). Delete scenario
-with Basic mode on says so (it did; his project, Fig 4 > Fig 5, cannot be shown in Basic mode, so
-ticking it on was refused in a line of the messages log he did not see). With Basic mode off the
+with Basic mode on says so (it did, through both doors, in a harness of his steps; a likely reason he
+saw none: a project with Fig 5 under Fig 4 cannot be shown in Basic mode, and ticking it on was refused
+only in a line of the messages log, now a dialog). With Basic mode off the
 overrides do not go: they stay in the alternative, which the question names as staying. Deleting an
 alternative that holds overrides now asks, "Delete the alternative {name}? Its one override is deleted
 with it."; an empty one still goes unasked.
+
+**The override marker (Task 790).** Tom: *"Ida's dot is fine. But this doesn't resolve the UI for
+indicating and clearing child overrides. The down triangle is fine, and should there be an alert,
+'Clear child overrides ({n} total)?'"* Built in Properties and the Settings box (`ovmGutter()`,
+`setboxMarks()`): a two-cell gutter at the row's inline start, drawn in CSS. A filled dot is an override
+in the open scenario; a click clears it. In Properties a hollow dot is an inherited value; a click makes
+it an override holding the value shown (the checkbox line it replaces is gone; while a value is an
+override, one line under it still says what Clear restores). A down triangle says scenarios below this
+one override the value, Base included; a click asks "Clear child overrides ({n} total)?" and clears
+them, one undo step. {n} counts the alternatives holding such an override, each once however many
+scenarios share it; a Base of its own (Add base) is never counted. No mark is a tab stop. Not yet: the
+Scenarios table's cells, which still say "inherited" in words.
 
 ### Next stage: what the advisers said (recorded, not built)
 

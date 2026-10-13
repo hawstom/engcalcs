@@ -33,6 +33,8 @@
 	/* A value the open scenario holds (an override): the amber the tables' override wash uses. */
 	--ec-held: #e8a33d;
 	--ec-held-bg: #fff3cd;
+	/* The override marker's own ink (Task 790): the amber family, dark enough to read as a shape. */
+	--ec-held-ink: #8a5a00;
 	--ec-ok-ink: #267326;
 	--ec-bad-ink: #c00;
 	--ec-error-ink: #a00;
@@ -1117,7 +1119,23 @@ html[lang="zh"] .ec-welcome {
    row above stays the property and this reads as a note about it -- there is one of these under
    every editable field once you are inside a scenario, and at full weight they would outnumber and
    outshout the numbers they annotate. */
-.lpn-ov-marker { margin-left: 1.5em; font-size: 0.85em; }
+.lpn-ov-note { margin-inline-start: 1.5em; font-size: 0.85em; }
+/* THE OVERRIDE MARKER (Task 790, Ida's design): a two-cell gutter at the inline start of a row, drawn
+   in CSS so no font and no translation is involved. A filled dot is an override here, a hollow dot a
+   value inherited, a down triangle one the scenarios below override. Placed in the padding the
+   container gives up for it, so no row's text moves when a mark comes or goes, and on the right in a
+   right-to-left language. Never a tab stop. */
+#lpn_popup_fields.lpn-ovm-gut { position: relative; padding-inline-start: 1.9em; }
+#lpn_settings_box.lpn-ovm-gut .lpn-set-row, #lpn_settings_box.lpn-ovm-gut [data-lpn-setting] { position: relative; padding-inline-start: 1.9em; }
+.lpn-ovm { position: absolute; margin-inline-start: -1.9em; display: inline-flex; align-items: center; height: 1.3em; }
+#lpn_settings_box .lpn-ovm { margin-inline-start: 0; inset-inline-start: 0; top: 0.15em; }
+.lpn-ovm-cell { display: inline-flex; align-items: center; justify-content: center; width: 0.95em; height: 1.3em; }
+.lpn-ovm-cell[role="button"] { cursor: pointer; }
+.lpn-ovm-dot::before, .lpn-ovm-hollow::before { content: ''; display: block; width: 0.5em; height: 0.5em; border-radius: 50%; box-sizing: border-box; }
+.lpn-ovm-dot::before { background: var(--ec-held-ink); }
+.lpn-ovm-hollow::before { border: 1px solid var(--ec-ink-subtle); opacity: 0.6; }
+.lpn-ovm-hollow:hover::before { opacity: 1; border-color: var(--ec-held-ink); }
+.lpn-ovm-tri::before { content: ''; display: block; width: 0; height: 0; border-inline-start: 0.3em solid transparent; border-inline-end: 0.3em solid transparent; border-top: 0.45em solid var(--ec-held-ink); }
 .lpn-ov-base { margin-left: 0.6em; color: var(--ec-ink-subtle); }
 /* Feedback for the first-picked node of a pipe/pump (Tom, 2026-07-30: "otherwise there's no
    indication that anything is working") -- a wide red ring around the existing node fill/stroke,

@@ -252,6 +252,111 @@ async function main() {
 			a.dialogs.some((x) => x.type === 'alert' && x.message === MISFIT) && await page.evaluate(() => getComputedStyle(document.getElementById('lpn_pane_tab_scenarios')).display !== 'none'), JSON.stringify(a.dialogs));
 		await page.keyboard.press('Escape');
 
+		// ---- M5 ----
+		console.log('\n--- M5. Task 790: the dot and the down triangle ---');
+		// Base > Fig 4 > Fig 5. Fig 4 and Fig 5 each hold junction 10's elevation in their own
+		// Physical alternative; Fig 5 also holds a Settings value of its own.
+		const tree = (d) => {
+			d.alternatives = [{ id: 'a4', category: 'physical', name: 'Fig 4', parent: null, values: { 'n:10': { elev: 705 } } },
+				{ id: 'a5', category: 'physical', name: 'Fig 5', parent: 'a4', values: { 'n:10': { elev: 701 } } }];
+			byId(d.scenarios, 'f4').alternatives = { physical: 'a4' };
+			byId(d.scenarios, 'f5').alternatives = { physical: 'a5' };
+			byId(d.scenarios, 'f5').settings = { labelSettings: { link: { id: false } } };
+		};
+		const popMarks = () => page.evaluate(() => {
+			const q = (c) => Array.from(document.querySelectorAll('#lpn_popup_fields .' + c));
+			return { dot: q('lpn-ovm-dot').length, hollow: q('lpn-ovm-hollow').length, tri: q('lpn-ovm-tri').length,
+				triTip: (q('lpn-ovm-tri')[0] || {}).title || (q('lpn-ovm-tri')[0] || { getAttribute: () => '' }).getAttribute('aria-label'),
+				focusable: q('lpn-ovm-cell').filter((c) => c.tabIndex >= 0).length,
+				stops: Array.from(document.querySelectorAll('#lpn_popup_fields input, #lpn_popup_fields select, #lpn_popup_fields button, #lpn_popup_fields textarea, #lpn_popup_fields [tabindex]'))
+					.filter((e) => e.tabIndex >= 0 && !e.disabled && e.offsetParent).length };
+		});
+		const openPop = async (id) => {
+			await page.evaluate(() => { const p = document.getElementById('lpn_popup_close'); if (p && p.offsetParent) { p.click(); } });
+			await a.settle(300);
+			await clickNode(id);
+			await a.settle(500);
+		};
+		await openProject((d) => { tree(d); d.project.activeScenario = 'f4'; }, true);
+		await openPop('10');
+		let m = await popMarks();
+		const TRI1 = (await L('lpn_ovm_child_tip')).replace('{n}', '1');
+		ok('M5 in Fig 4, junction 10\'s elevation wears the dot (its override) and the triangle (Fig 5 overrides it)', m.dot === 1 && m.tri === 1, JSON.stringify(m));
+		ok('M5 ...every other overridable row the hollow dot', m.hollow > 3, JSON.stringify(m));
+		ok('M5 the triangle\'s tip counts the child overrides', m.triTip === TRI1, m.triTip);
+		ok('M5 no marker is a tab stop', m.focusable === 0, JSON.stringify(m));
+		a.dialogs.length = 0;
+		a.answerConfirmsWith(false);
+		await page.click('#lpn_popup_fields .lpn-ovm-tri');
+		await flush();
+		ok('M5 the triangle asks "' + (await L('lpn_ovm_child_ask')).replace('{n}', '1') + '"', askOf() === (await L('lpn_ovm_child_ask')).replace('{n}', '1'), askOf());
+		sv = await saved();
+		ok('M5 ...No clears nothing', ((byId(sv.alternatives, 'a5').values || {})['n:10'] || {}).elev === 701);
+		a.dialogs.length = 0;
+		a.answerConfirmsWith(true);
+		await page.click('#lpn_popup_fields .lpn-ovm-tri');
+		await flush();
+		sv = await saved();
+		ok('M5 ...Yes clears Fig 5\'s override, so Fig 5 follows Fig 4 again', !((byId(sv.alternatives, 'a5').values || {})['n:10'] || {}).elev &&
+			((byId(sv.alternatives, 'a4').values || {})['n:10'] || {}).elev === 705, JSON.stringify(sv.alternatives));
+		m = await popMarks();
+		ok('M5 ...and the triangle is gone', m.tri === 0 && m.dot === 1, JSON.stringify(m));
+		await page.click('#lpn_popup_fields .lpn-ovm-dot');
+		await flush();
+		sv = await saved();
+		m = await popMarks();
+		ok('M5 clicking the dot clears Fig 4\'s own override', !((byId(sv.alternatives, 'a4').values || {})['n:10'] || {}).elev && m.dot === 0, JSON.stringify(sv.alternatives));
+		const hollowBefore = m.hollow;
+		await page.click('#lpn_popup_fields .lpn-ovm-hollow >> nth=0');
+		await flush();
+		m = await popMarks();
+		ok('M5 clicking a hollow dot makes that value an override, holding what it showed', m.dot === 1 && m.hollow === hollowBefore - 1, JSON.stringify(m));
+		await scenarioMenu(await L('lpn_scenario_base'));
+		await openPop('10');
+		m = await popMarks();
+		ok('M5 Base has no dot, and its marks are no tab stop either', m.dot === 0 && m.hollow === 0 && m.focusable === 0, JSON.stringify(m));
+		await openProject((d) => { tree(d); d.project.activeScenario = 'base'; }, true);
+		await openPop('10');
+		m = await popMarks();
+		ok('M5 in Base the triangle counts every scenario\'s override of it (2 total)', m.tri === 1 && m.triTip === (await L('lpn_ovm_child_tip')).replace('{n}', '2'), JSON.stringify(m));
+		a.dialogs.length = 0;
+		await page.click('#lpn_popup_fields .lpn-ovm-tri');
+		await flush();
+		sv = await saved();
+		ok('M5 ...and asks "(2 total)", then clears both', askOf() === (await L('lpn_ovm_child_ask')).replace('{n}', '2') &&
+			!((byId(sv.alternatives, 'a4') || {}).values || {})['n:10'] && !((byId(sv.alternatives, 'a5') || {}).values || {})['n:10'], askOf() + ' ' + JSON.stringify(sv.alternatives));
+
+		// The Settings box.
+		await openProject((d) => { tree(d); d.project.activeScenario = 'f4'; }, true);
+		await page.evaluate(() => { const p = document.getElementById('lpn_popup_close'); if (p && p.offsetParent) { p.click(); } });
+		await a.toolbarClick(await L('lpn_tool_settings'));
+		await page.waitForSelector('#lpn_settings_box', { state: 'visible' });
+		await a.settle(800);
+		const setMarks = () => page.evaluate(() => {
+			const q = (c) => Array.from(document.querySelectorAll('#lpn_settings_box .' + c));
+			return { dot: q('lpn-ovm-dot').length, tri: q('lpn-ovm-tri').length, hollow: q('lpn-ovm-hollow').length,
+				focusable: q('lpn-ovm-cell').filter((c) => c.tabIndex >= 0).length };
+		});
+		m = await setMarks();
+		ok('M5 Settings in Fig 4: a triangle on the row Fig 5 overrides, no dot, no hollow dot', m.tri === 1 && m.dot === 0 && m.hollow === 0 && m.focusable === 0, JSON.stringify(m));
+		a.dialogs.length = 0;
+		await page.click('#lpn_settings_box .lpn-ovm-tri');
+		await flush();
+		sv = await saved();
+		ok('M5 ...which asks "(1 total)" and clears Fig 5\'s setting', askOf() === (await L('lpn_ovm_child_ask')).replace('{n}', '1') &&
+			!byId(sv.scenarios, 'f5').settings, askOf() + ' ' + JSON.stringify(byId(sv.scenarios, 'f5')));
+		await openProject((d) => { tree(d); d.project.activeScenario = 'f5'; }, true);
+		await page.evaluate(() => { const p = document.getElementById('lpn_popup_close'); if (p && p.offsetParent) { p.click(); } });
+		await a.toolbarClick(await L('lpn_tool_settings'));
+		await page.waitForSelector('#lpn_settings_box', { state: 'visible' });
+		await a.settle(800);
+		m = await setMarks();
+		ok('M5 Settings in Fig 5: the held row wears the dot', m.dot >= 1 && m.tri === 0, JSON.stringify(m));
+		await page.click('#lpn_settings_box .lpn-ovm-dot >> nth=0');
+		await flush();
+		sv = await saved();
+		ok('M5 ...and clicking it clears the override, as Clear override does', !byId(sv.scenarios, 'f5').settings, JSON.stringify(byId(sv.scenarios, 'f5')));
+
 		ok('no page error', errors.length === 0, JSON.stringify(errors).slice(0, 400));
 	} finally {
 		await browser.close();

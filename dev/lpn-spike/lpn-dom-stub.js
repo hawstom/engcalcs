@@ -68,7 +68,9 @@ function mkEl(tag, svgNS) {
     // in the middle of a value sets both.
     selectionStart: null, selectionEnd: null,
     appendChild(c) { this.children.push(c); c.parentNode = this; return c; },
-    insertBefore(c) { this.children.unshift(c); c.parentNode = this; return c; },
+    // Before `ref` when it is a child here (the override marker's gutter goes at the start of the row
+    // just built, Task 790); otherwise first, as this stub always did.
+    insertBefore(c, ref) { const i = ref ? this.children.indexOf(ref) : -1; if (i >= 0) { this.children.splice(i, 0, c); } else { this.children.unshift(c); } c.parentNode = this; return c; },
     // **A REAL SWAP, IN PLACE.** The Libraries box redraws a curve's chart and rebuilds one curve
     // entry this way, so a stub that lacked it could not run either path at all -- and the paste
     // handler's whole visible result is the entry that comes back.

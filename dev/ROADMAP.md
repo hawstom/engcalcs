@@ -138,7 +138,9 @@ the block.
 - 100|790| **One override marker: overridden or inherited, in every scenario view.**
   Tom, 2026-10-12 (interview q03): expose override vs inherited with a single-character marker, carried
   through Properties and Settings, after Civil 3D's Override / Child override columns. Ida: a dot gutter;
-  Mary: Bentley's and Civil 3D's per-row checkbox. Tom's call between them first. Journals 2026-10-12.
+  Mary: Bentley's and Civil 3D's per-row checkbox. Tom, 2026-10-13: Ida's dot, plus the down triangle and
+  "Clear child overrides ({n} total)?". Built on feat/bentley-interop in Properties and Settings; the
+  Scenarios table's cells remain (dev/scenario-alternatives.md, "Tom's calls of 2026-10-13").
 - 75|788| **Translated Find guide and select/choose wording, swept across all 26 languages.**
   Sprint 1012-delta QA (2026-10-12): about 20 languages still print English control names (Everything, equal to, AND)
   in the Find guide's prose, which should name controls as the translated page does (code samples stay English); and
