@@ -24,7 +24,7 @@
 			"x": 712.087894,
 			"y": 18.7549393,
 			"elev": 15.24,
-			"_demand": -43.8098,
+			"_demand": -43.81,
 			"demandPattern": "2",
 			"_initQuality": 1,
 			"_sourceType": "CONCEN",
@@ -37,7 +37,7 @@
 			"x": 577.828883,
 			"y": 723.86378,
 			"elev": 30.48,
-			"_demand": 0.504722,
+			"_demand": 0.505,
 			"_initQuality": 1
 		},
 		{
@@ -46,7 +46,7 @@
 			"x": 219.544282,
 			"y": 745.608563,
 			"elev": 18.288,
-			"_demand": 0.883263,
+			"_demand": 0.883,
 			"_initQuality": 1
 		},
 		{
@@ -55,7 +55,7 @@
 			"x": 332.992901,
 			"y": 1065.07914,
 			"elev": 18.288,
-			"_demand": 0.504722,
+			"_demand": 0.505,
 			"_initQuality": 1
 		},
 		{
@@ -64,7 +64,7 @@
 			"x": 563.646957,
 			"y": 945.983285,
 			"elev": 30.48,
-			"_demand": 0.504722,
+			"_demand": 0.505,
 			"_initQuality": 1
 		},
 		{
@@ -73,7 +73,7 @@
 			"x": 969.191216,
 			"y": 882.670029,
 			"elev": 38.1,
-			"_demand": 0.315451,
+			"_demand": 0.315,
 			"_initQuality": 1
 		},
 		{
@@ -82,7 +82,7 @@
 			"x": 1279.17903,
 			"y": 1616.16406,
 			"elev": 48.768,
-			"_demand": 0.252361,
+			"_demand": 0.252,
 			"_initQuality": 1
 		},
 		{
@@ -91,7 +91,7 @@
 			"x": 1393.59984,
 			"y": 1222.03275,
 			"elev": 33.528,
-			"_demand": 0.567812,
+			"_demand": 0.568,
 			"_initQuality": 1
 		},
 		{
@@ -100,7 +100,7 @@
 			"x": 1270.65794,
 			"y": 1749.43504,
 			"elev": 54.864,
-			"_demand": 0.883263,
+			"_demand": 0.883,
 			"_initQuality": 1
 		},
 		{
@@ -109,7 +109,7 @@
 			"x": 1369.05997,
 			"y": 908.226673,
 			"elev": 39.624,
-			"_demand": 0.315451,
+			"_demand": 0.315,
 			"_initQuality": 1
 		},
 		{
@@ -118,7 +118,7 @@
 			"x": 1295.19927,
 			"y": 2063.24102,
 			"elev": 56.388,
-			"_demand": 2.19428,
+			"_demand": 2.194,
 			"_initQuality": 1
 		},
 		{
@@ -127,7 +127,7 @@
 			"x": 1352.79695,
 			"y": 2557.58251,
 			"elev": 64.008,
-			"_demand": 1.00944,
+			"_demand": 1.009,
 			"_initQuality": 1
 		},
 		{
@@ -136,7 +136,7 @@
 			"x": 1297.01674,
 			"y": 2732.43664,
 			"elev": 64.008,
-			"_demand": 0.12618,
+			"_demand": 0.126,
 			"_initQuality": 1
 		},
 		{
@@ -145,7 +145,7 @@
 			"x": 1291.33665,
 			"y": 2821.28403,
 			"elev": 60.96,
-			"_demand": 0.12618,
+			"_demand": 0.126,
 			"_initQuality": 1
 		},
 		{
@@ -154,7 +154,7 @@
 			"x": 1238.39959,
 			"y": 2951.71495,
 			"elev": 57.912,
-			"_demand": 0.12618,
+			"_demand": 0.126,
 			"_initQuality": 1
 		},
 		{
@@ -163,7 +163,7 @@
 			"x": 805.573647,
 			"y": 2745.63243,
 			"elev": 45.72,
-			"_demand": 1.2618,
+			"_demand": 1.262,
 			"_initQuality": 1
 		},
 		{
@@ -172,7 +172,7 @@
 			"x": 794.225701,
 			"y": 2923.32801,
 			"elev": 54.864,
-			"_demand": 1.2618,
+			"_demand": 1.262,
 			"_initQuality": 1
 		},
 		{
@@ -181,7 +181,7 @@
 			"x": 619.39101,
 			"y": 2867.5569,
 			"elev": 30.48,
-			"_demand": 1.2618,
+			"_demand": 1.262,
 			"_initQuality": 1
 		},
 		{
@@ -190,7 +190,7 @@
 			"x": 556.074316,
 			"y": 2462.06904,
 			"elev": 45.72,
-			"_demand": 0.315451,
+			"_demand": 0.315,
 			"_initQuality": 1
 		},
 		{
@@ -199,7 +199,7 @@
 			"x": 1596.578,
 			"y": 2930.02056,
 			"elev": 51.816,
-			"_demand": 1.19871,
+			"_demand": 1.199,
 			"_initQuality": 1
 		},
 		{
@@ -208,7 +208,7 @@
 			"x": 1880.14204,
 			"y": 2680.53817,
 			"elev": 45.72,
-			"_demand": 1.00944,
+			"_demand": 1.009,
 			"_initQuality": 1
 		},
 		{
@@ -217,7 +217,7 @@
 			"x": 1993.48715,
 			"y": 3000.03534,
 			"elev": 60.96,
-			"_demand": 0.630902,
+			"_demand": 0.631,
 			"_initQuality": 1
 		},
 		{
@@ -226,7 +226,7 @@
 			"x": 1135.37009,
 			"y": 3168.15423,
 			"elev": 70.104,
-			"_demand": 0.504722,
+			"_demand": 0.505,
 			"_initQuality": 1
 		},
 		{
@@ -235,7 +235,7 @@
 			"x": 1232.7204,
 			"y": 3040.56241,
 			"elev": 57.912,
-			"_demand": 0.693992,
+			"_demand": 0.694,
 			"_initQuality": 1
 		},
 		{
@@ -244,7 +244,7 @@
 			"x": 1129.69234,
 			"y": 3257.00178,
 			"elev": 70.104,
-			"_demand": 0.378541,
+			"_demand": 0.379,
 			"_initQuality": 1
 		},
 		{
@@ -253,7 +253,7 @@
 			"x": 1276.11653,
 			"y": 3757.02255,
 			"elev": 39.624,
-			"_demand": 0.504722,
+			"_demand": 0.505,
 			"_initQuality": 1
 		},
 		{
@@ -271,7 +271,7 @@
 			"x": 1412.19351,
 			"y": 3721.12096,
 			"elev": 33.528,
-			"_demand": 0.441631,
+			"_demand": 0.442,
 			"_initQuality": 1
 		},
 		{
@@ -280,7 +280,7 @@
 			"x": 1651.3063,
 			"y": 3468.78843,
 			"elev": 39.624,
-			"_demand": 0.189271,
+			"_demand": 0.189,
 			"_initQuality": 1
 		},
 		{
@@ -289,7 +289,7 @@
 			"x": 1207.16578,
 			"y": 3440.37613,
 			"elev": 57.912,
-			"_demand": 1.07253,
+			"_demand": 1.073,
 			"_initQuality": 1
 		},
 		{
@@ -298,7 +298,7 @@
 			"x": 630.734753,
 			"y": 2689.86106,
 			"elev": 33.528,
-			"_demand": 1.07253,
+			"_demand": 1.073,
 			"_initQuality": 1
 		},
 		{
@@ -307,7 +307,7 @@
 			"x": 2070.94144,
 			"y": 3183.41888,
 			"elev": 54.864,
-			"_demand": 0.0946353,
+			"_demand": 0.095,
 			"_initQuality": 1
 		},
 		{
@@ -316,7 +316,7 @@
 			"x": 2059.56313,
 			"y": 3361.11254,
 			"elev": 57.912,
-			"_demand": 0.0946353,
+			"_demand": 0.095,
 			"_initQuality": 1
 		},
 		{
@@ -334,7 +334,7 @@
 			"x": 1897.88468,
 			"y": 3796.81335,
 			"elev": 33.528,
-			"_demand": 0.0630902,
+			"_demand": 0.063,
 			"_initQuality": 1
 		},
 		{
@@ -343,7 +343,7 @@
 			"x": 1040.86151,
 			"y": 3251.32355,
 			"elev": 71.628,
-			"_level": 17.2822,
+			"_level": 17.282,
 			"minLevel": 15.24,
 			"maxLevel": 21.336,
 			"tankDiameter": 15.24,
@@ -357,7 +357,7 @@
 			"from": "1",
 			"to": "2",
 			"verts": [],
-			"_diameter": 304.8,
+			"_diameter": 300,
 			"_roughness": 100,
 			"_length": 731.52,
 			"lenAuto": false,
@@ -370,7 +370,7 @@
 			"from": "2",
 			"to": "5",
 			"verts": [],
-			"_diameter": 304.8,
+			"_diameter": 300,
 			"_roughness": 100,
 			"_length": 243.84,
 			"lenAuto": false,
@@ -383,7 +383,7 @@
 			"from": "2",
 			"to": "3",
 			"verts": [],
-			"_diameter": 203.2,
+			"_diameter": 200,
 			"_roughness": 100,
 			"_length": 396.24,
 			"lenAuto": false,
@@ -396,7 +396,7 @@
 			"from": "3",
 			"to": "4",
 			"verts": [],
-			"_diameter": 203.2,
+			"_diameter": 200,
 			"_roughness": 100,
 			"_length": 365.76,
 			"lenAuto": false,
@@ -409,7 +409,7 @@
 			"from": "4",
 			"to": "5",
 			"verts": [],
-			"_diameter": 304.8,
+			"_diameter": 300,
 			"_roughness": 100,
 			"_length": 304.8,
 			"lenAuto": false,
@@ -422,7 +422,7 @@
 			"from": "5",
 			"to": "6",
 			"verts": [],
-			"_diameter": 304.8,
+			"_diameter": 300,
 			"_roughness": 100,
 			"_length": 365.76,
 			"lenAuto": false,
@@ -435,7 +435,7 @@
 			"from": "6",
 			"to": "7",
 			"verts": [],
-			"_diameter": 304.8,
+			"_diameter": 300,
 			"_roughness": 100,
 			"_length": 822.96,
 			"lenAuto": false,
@@ -448,7 +448,7 @@
 			"from": "7",
 			"to": "8",
 			"verts": [],
-			"_diameter": 304.8,
+			"_diameter": 300,
 			"_roughness": 140,
 			"_length": 365.76,
 			"lenAuto": false,
@@ -461,7 +461,7 @@
 			"from": "7",
 			"to": "9",
 			"verts": [],
-			"_diameter": 304.8,
+			"_diameter": 300,
 			"_roughness": 100,
 			"_length": 121.92,
 			"lenAuto": false,
@@ -474,7 +474,7 @@
 			"from": "8",
 			"to": "10",
 			"verts": [],
-			"_diameter": 203.2,
+			"_diameter": 200,
 			"_roughness": 140,
 			"_length": 304.8,
 			"lenAuto": false,
@@ -487,7 +487,7 @@
 			"from": "9",
 			"to": "11",
 			"verts": [],
-			"_diameter": 304.8,
+			"_diameter": 300,
 			"_roughness": 100,
 			"_length": 213.36,
 			"lenAuto": false,
@@ -500,7 +500,7 @@
 			"from": "11",
 			"to": "12",
 			"verts": [],
-			"_diameter": 304.8,
+			"_diameter": 300,
 			"_roughness": 100,
 			"_length": 579.12,
 			"lenAuto": false,
@@ -513,7 +513,7 @@
 			"from": "12",
 			"to": "13",
 			"verts": [],
-			"_diameter": 304.8,
+			"_diameter": 300,
 			"_roughness": 100,
 			"_length": 182.88,
 			"lenAuto": false,
@@ -526,7 +526,7 @@
 			"from": "13",
 			"to": "14",
 			"verts": [],
-			"_diameter": 304.8,
+			"_diameter": 300,
 			"_roughness": 100,
 			"_length": 121.92,
 			"lenAuto": false,
@@ -539,7 +539,7 @@
 			"from": "14",
 			"to": "15",
 			"verts": [],
-			"_diameter": 304.8,
+			"_diameter": 300,
 			"_roughness": 100,
 			"_length": 91.44,
 			"lenAuto": false,
@@ -552,7 +552,7 @@
 			"from": "13",
 			"to": "16",
 			"verts": [],
-			"_diameter": 203.2,
+			"_diameter": 200,
 			"_roughness": 100,
 			"_length": 457.2,
 			"lenAuto": false,
@@ -565,7 +565,7 @@
 			"from": "15",
 			"to": "17",
 			"verts": [],
-			"_diameter": 203.2,
+			"_diameter": 200,
 			"_roughness": 100,
 			"_length": 457.2,
 			"lenAuto": false,
@@ -578,7 +578,7 @@
 			"from": "16",
 			"to": "17",
 			"verts": [],
-			"_diameter": 203.2,
+			"_diameter": 200,
 			"_roughness": 100,
 			"_length": 182.88,
 			"lenAuto": false,
@@ -591,7 +591,7 @@
 			"from": "17",
 			"to": "18",
 			"verts": [],
-			"_diameter": 304.8,
+			"_diameter": 300,
 			"_roughness": 100,
 			"_length": 213.36,
 			"lenAuto": false,
@@ -604,7 +604,7 @@
 			"from": "18",
 			"to": "32",
 			"verts": [],
-			"_diameter": 304.8,
+			"_diameter": 300,
 			"_roughness": 100,
 			"_length": 106.68,
 			"lenAuto": false,
@@ -617,7 +617,7 @@
 			"from": "16",
 			"to": "19",
 			"verts": [],
-			"_diameter": 203.2,
+			"_diameter": 200,
 			"_roughness": 100,
 			"_length": 426.72,
 			"lenAuto": false,
@@ -630,7 +630,7 @@
 			"from": "14",
 			"to": "20",
 			"verts": [],
-			"_diameter": 304.8,
+			"_diameter": 300,
 			"_roughness": 100,
 			"_length": 335.28,
 			"lenAuto": false,
@@ -643,7 +643,7 @@
 			"from": "20",
 			"to": "21",
 			"verts": [],
-			"_diameter": 203.2,
+			"_diameter": 200,
 			"_roughness": 100,
 			"_length": 396.24,
 			"lenAuto": false,
@@ -656,7 +656,7 @@
 			"from": "21",
 			"to": "22",
 			"verts": [],
-			"_diameter": 203.2,
+			"_diameter": 200,
 			"_roughness": 100,
 			"_length": 396.24,
 			"lenAuto": false,
@@ -669,7 +669,7 @@
 			"from": "20",
 			"to": "22",
 			"verts": [],
-			"_diameter": 203.2,
+			"_diameter": 200,
 			"_roughness": 100,
 			"_length": 396.24,
 			"lenAuto": false,
@@ -682,7 +682,7 @@
 			"from": "24",
 			"to": "23",
 			"verts": [],
-			"_diameter": 304.8,
+			"_diameter": 300,
 			"_roughness": 100,
 			"_length": 182.88,
 			"lenAuto": false,
@@ -695,7 +695,7 @@
 			"from": "15",
 			"to": "24",
 			"verts": [],
-			"_diameter": 304.8,
+			"_diameter": 300,
 			"_roughness": 100,
 			"_length": 76.2,
 			"lenAuto": false,
@@ -708,7 +708,7 @@
 			"from": "23",
 			"to": "25",
 			"verts": [],
-			"_diameter": 304.8,
+			"_diameter": 300,
 			"_roughness": 100,
 			"_length": 91.44,
 			"lenAuto": false,
@@ -721,7 +721,7 @@
 			"from": "25",
 			"to": "26",
 			"verts": [],
-			"_diameter": 304.8,
+			"_diameter": 300,
 			"_roughness": 100,
 			"_length": 60.96,
 			"lenAuto": false,
@@ -734,7 +734,7 @@
 			"from": "25",
 			"to": "31",
 			"verts": [],
-			"_diameter": 304.8,
+			"_diameter": 300,
 			"_roughness": 100,
 			"_length": 182.88,
 			"lenAuto": false,
@@ -747,7 +747,7 @@
 			"from": "31",
 			"to": "27",
 			"verts": [],
-			"_diameter": 203.2,
+			"_diameter": 200,
 			"_roughness": 100,
 			"_length": 121.92,
 			"lenAuto": false,
@@ -760,7 +760,7 @@
 			"from": "27",
 			"to": "29",
 			"verts": [],
-			"_diameter": 203.2,
+			"_diameter": 200,
 			"_roughness": 100,
 			"_length": 121.92,
 			"lenAuto": false,
@@ -773,7 +773,7 @@
 			"from": "29",
 			"to": "28",
 			"verts": [],
-			"_diameter": 203.2,
+			"_diameter": 200,
 			"_roughness": 100,
 			"_length": 213.36,
 			"lenAuto": false,
@@ -786,7 +786,7 @@
 			"from": "22",
 			"to": "33",
 			"verts": [],
-			"_diameter": 203.2,
+			"_diameter": 200,
 			"_roughness": 100,
 			"_length": 304.8,
 			"lenAuto": false,
@@ -799,7 +799,7 @@
 			"from": "33",
 			"to": "34",
 			"verts": [],
-			"_diameter": 203.2,
+			"_diameter": 200,
 			"_roughness": 100,
 			"_length": 121.92,
 			"lenAuto": false,
@@ -812,7 +812,7 @@
 			"from": "32",
 			"to": "19",
 			"verts": [],
-			"_diameter": 203.2,
+			"_diameter": 200,
 			"_roughness": 100,
 			"_length": 152.4,
 			"lenAuto": false,
@@ -825,7 +825,7 @@
 			"from": "29",
 			"to": "35",
 			"verts": [],
-			"_diameter": 203.2,
+			"_diameter": 200,
 			"_roughness": 100,
 			"_length": 152.4,
 			"lenAuto": false,
@@ -838,7 +838,7 @@
 			"from": "35",
 			"to": "30",
 			"verts": [],
-			"_diameter": 203.2,
+			"_diameter": 200,
 			"_roughness": 100,
 			"_length": 304.8,
 			"lenAuto": false,
@@ -851,7 +851,7 @@
 			"from": "28",
 			"to": "35",
 			"verts": [],
-			"_diameter": 203.2,
+			"_diameter": 200,
 			"_roughness": 100,
 			"_length": 213.36,
 			"lenAuto": false,
@@ -864,7 +864,7 @@
 			"from": "28",
 			"to": "36",
 			"verts": [],
-			"_diameter": 203.2,
+			"_diameter": 200,
 			"_roughness": 100,
 			"_length": 91.44,
 			"lenAuto": false,

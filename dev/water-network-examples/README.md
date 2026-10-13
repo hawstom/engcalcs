@@ -18,14 +18,16 @@ and a function cannot carry a description, cannot be authored by anyone who is n
 
 **`Net2-Branford-CT-SI.lwn` and `Net3-Novato-CA-World-SI.lwn` are unit conversions of the two above** (Task 786,
 Tom 2026-10-11), made by `node dev/scripts/convert_example_to_si.js Net3-Novato-CA-World Net3-Novato-CA-World-SI "Net3-Novato-CA-World SI"`:
-ft to m, in to mm, gpm to L/s, every number rounded to 6 significant figures; Hazen-Williams
+ft to m, in to mm, gpm to L/s, rounded as Tom set it on 2026-10-13: pipe diameters to the nearest 50 mm;
+demands and curve flows to 0.001 L/s; reservoir heads, tank levels and diameters, control levels,
+curve heads and pipe lengths to 0.001 m; elevations to 6 significant figures. Hazen-Williams
 roughness, minor loss k, patterns, times and the quality sections are carried across unchanged. A unit
 switch on the page reinterprets rather than converts, so an SI twin is a separate file. **The drawing
 converts with it** where it is a length: Net2 is drawn in its CRS's feet, so its drawing converts at
 0.3048, its origin shift at the US survey foot, and its CRS becomes the metre twin (EPSG:2234 to
 EPSG:26956); Net3 is a lat/lon project, whose degrees are no length, so its drawing and view are
-carried untouched. `dev/lpn-spike/si-example-equivalence-harness.js` proves each pair solves alike (single
-instant and the whole EPANET extended-period run) and that both twins place a node on the same spot of the
+carried untouched. `dev/lpn-spike/si-example-equivalence-harness.js` checks every rounded number against that rule
+and that each pair behaves alike (tank levels within 1 m through the whole EPANET extended-period run) and that both twins place a node on the same spot of the
 Earth. They carry no `.inp` of their own. The converter reads the SHIPPED US file.
 
 **`Net2.lwn` and `Net3.lwn` are NOT examples any more.** They carry site plans (Tom, 2026-10-12: *"Remove all
