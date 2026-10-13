@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "fr",
-        "expected_key_count": 2560,
-        "delta_key_count": 4,
+        "expected_key_count": 2681,
+        "delta_key_count": 136,
         "exempt_key_count": 58,
         "exempt_keys": [
             "u_depthFrac",
@@ -737,18 +737,298 @@
         ]
     },
     "keys_to_translate": {
+        "lpn_customer_node_inactive": "This customer is assigned to a junction that is inactive in this scenario, so its demand is not part of the solve.",
         "lpn_ex_net2_si_title": "EPANET Net2, L\/s (SI)",
         "lpn_ex_net2_si_desc": "Litres per second, with metres and millimetres. An EPANET example at Branford, Connecticut, converted from gallons per minute, feet and inches: 35 junctions and 1 tank, with no reservoir, no pump and no valves, about 2 km by 4 km. Fluoride, a non-reactive substance, enters at one source.",
         "lpn_ex_net3_si_title": "EPANET Net3, L\/s (SI)",
-        "lpn_ex_net3_si_desc": "Litres per second, with metres and millimetres. An EPANET example at Novato, California, converted from gallons per minute, feet and inches, with the world map behind it: 92 junctions, 3 tanks and 2 reservoirs, no valves, about 8 km square. A 24-hour extended-period simulation, with a source trace from the Lake."
+        "lpn_ex_net3_si_desc": "Litres per second, with metres and millimetres. An EPANET example at Novato, California, converted from gallons per minute, feet and inches, with the world map behind it: 92 junctions, 3 tanks and 2 reservoirs, no valves, about 8 km square. A 24-hour extended-period simulation, with a source trace from the Lake.",
+        "lpn_pane_scn_ov_only": "Overrides only",
+        "lpn_pane_scn_cur_only": "Current scenario only",
+        "lpn_pane_inactive_show": "Include inactive topology",
+        "lpn_pane_scn_filter_note": "{filters}. Showing {n} of {all}.",
+        "lpn_ovm_child_ask": "Clear child overrides ({n} total)?",
+        "lpn_ovm_child_tip": "Child scenarios override this value ({n} total). Click to clear their overrides.",
+        "lpn_ovm_dot_clear": "Click to clear it.",
+        "lpn_ovm_dot_set": "Inherited. Click to make it an override in this scenario, holding the value shown.",
+        "lpn_change_type_line_alternative": "{id}: {property} {value}, in alternative {alternative}",
+        "lpn_change_type_base_only": "Change type works in Base. A scenario can switch assets on and off in Active topology instead.",
+        "lpn_copy_props_menu": "Copy properties",
+        "lpn_copy_props_done": "Copied properties of {id}.",
+        "lpn_copy_props_no_overrides": "No overrides to copy.",
+        "lpn_copy_props_done_ov": "Copied the overrides of {id} in this scenario.",
+        "lpn_paste_alt_created": "Created {category} alternative {name} for this scenario.",
+        "lpn_paste_props_menu": "Paste properties to selection",
+        "lpn_paste_props_off_none": "Nothing is copied. Right-click an asset and choose Copy properties.",
+        "lpn_paste_props_off_select": "Select the assets to paste to, then choose Paste properties to selection.",
+        "lpn_paste_props_off_kind": "No selected asset can take the copied properties.",
+        "lpn_tsb_menu": "Time series graph",
+        "lpn_tsb_off_tip": "Needs extended period results. Set a Total run time in Settings, Calculation, Time, and calculate.",
+        "lpn_tsb_close": "Close graph",
+        "lpn_tsb_resize": "Drag to resize",
+        "lpn_tsb_quantity": "Quantity to graph",
+        "lpn_tsb_max": "Close a graph before opening another. Up to {n} stay open.",
+        "lpn_paste_done_one": "Pasted properties of {id} to {to}. Values changed: {n}.",
+        "lpn_paste_done_many": "Pasted properties of {id} to {m} assets. Values changed: {n}.",
+        "lpn_paste_skip_breakdown": "Not pasted: {n} (demand is a list of categories).",
+        "lpn_paste_skip_valve": "Not pasted: {n} (the valve types differ).",
+        "lpn_inp_export_flat_customers_inactive": "{n} of these customers are assigned to a junction that is inactive in this scenario, so their demand is not in the file.",
+        "lpn_inp_export_flat_inactive_controls": "These controls and rules refer to an asset that is inactive in this scenario, so they are not in the file: {ids}",
+        "lpn_scenario_delete_ask": "Delete the scenario {name}? The drawing itself is not changed.",
+        "lpn_scenario_delete_goes": "Its {n} overrides are deleted with it.",
+        "lpn_scenario_delete_goes_one": "Its one override is deleted with it.",
+        "lpn_scenario_delete_stays": "These alternatives it uses stay in the project: {list}.",
+        "lpn_scenario_delete_has_children": "The scenario {name} cannot be deleted while other scenarios inherit from it: {list}. Delete those first, or give them another parent.",
+        "lpn_scenario_basic_misfit": "This project has scenarios and alternatives relationships that are not compatible with Scenarios Basic mode, so Basic mode is disabled.",
+        "lpn_scenario_copy": "Copy scenario",
+        "lpn_scenario_copy_tip": "Copies the open scenario and its overrides, and opens the copy.",
+        "lpn_scenario_copy_off": "Copy scenario works in Basic mode. With Basic mode off, add a scenario and choose its alternatives in the Scenarios table.",
+        "lpn_sm_title": "Scenario manager",
+        "lpn_sm_menu": "Scenario manager…",
+        "lpn_sm_basic_off": "Basic mode is off, so the Scenario manager and the Scenarios table are shown.",
+        "lpn_pane_tab_scenarios": "Scenarios",
+        "lpn_sm_col_parent": "Parent",
+        "lpn_sm_add_child": "Add child",
+        "lpn_sm_add_base": "Add base",
+        "lpn_sm_add_base_tip": "Add another Base scenario. It starts as a copy of Base, with its own alternatives, and later edits to Base do not change it.",
+        "lpn_sm_add_base_alt_tip": "Add another Base alternative. It starts as a copy of Base's values in this category, and later edits to Base do not change it.",
+        "lpn_sm_delete": "Delete the selected item. A used item is not deleted.",
+        "lpn_sm_base_kept": "The Base of a tree is not deleted. Another Base added with Add base is deleted when nothing uses it.",
+        "lpn_sm_rename": "Rename",
+        "lpn_sm_rename_alts_ask": "Rename equally named alternatives?",
+        "lpn_sm_make_current": "Make current",
+        "lpn_sm_current_already": "This scenario is already the current scenario.",
+        "lpn_sm_none_selected": "Select an item in the tree first.",
+        "lpn_sm_base_named": "The Base of a tree is not renamed.",
+        "lpn_sm_copy": "Copy",
+        "lpn_sm_help": "How scenarios and alternatives work:\\n\\nIn Basic mode, alternatives are hidden and automatic, and all new scenarios are children of the Base scenario.\\n\\nWith Basic mode off, a complex inheritance tree is available, and alternatives can be shared among scenarios. But the default behavior of edits when a new alternative association is needed (in the absence of proactive user management) is to create an alternative named like the current scenario, which gives each scenario its unique set of alternatives.\\n\\nProperties and settings are grouped into alternatives categories that appear as columns of the Scenarios table and as management options in Scenario manager.\\n\\nOverrides are created in scenarios, but they really belong to the respective alternatives associated with the scenario; so a scenario is like a window to its alternatives. Associations of alternatives to scenarios are managed in the Scenarios table in the bottom pane. Creating a new scenario creates no alternatives; the new scenario uses its parent's alternatives until overrides are created that need new alternatives. When overrides are created in a scenario, they are stored in their respective alternative for the scenario; if the scenario has no such alternative, a new alternative is created using the name of the scenario.\\n\\nExample: You create a \"Figure: Node and link IDs\" scenario and edit a Text to say \"Node and Link IDs.\" When you create the scenario, no alternatives are created. But at the moment you save the Text, a Text alternative called \"Figure: Node and link IDs\" is created with the override for the Text value. In Basic mode, you see this as simply an override in the scenario itself.\\n\\nCopy properties copies only overrides. In any scenario other than Base, it copies only the overrides the asset has in that scenario.\\n\\nHow to manage scenarios:\\n\\n- Choose Scenarios or an alternatives category in the list at the top to show its tree.\\n\\n- Create a child of the selected item with Add child. Add base adds another Base, which starts as a copy of Base as it is now; later edits to Base do not change it. A new child is named after its parent; type a name to rename it. Copy copies the selected alternative. To copy a scenario, use Copy scenario in the Scenarios menu, in Basic mode; it copies the scenario's overrides, with the alternatives that hold them.\\n\\n- Drag an item onto another to make it a child of that item. A scenario moved to a new parent inherits from it everything it has not overridden; what it has overridden does not change. Drag an item between two items to reorder them.\\n\\n- Click an item to select it. Press F2, or choose Rename, to rename the selected item. Renaming a scenario asks whether to rename the alternatives that carry its name; in Basic mode they are renamed with it, without asking. Double-click a scenario, or press Enter, to make it current. Click the arrow beside an item, or press Left or Right, to collapse or expand it. Right-click an item for the same commands as the buttons.\\n\\n- Press Delete, or click the minus button, to delete the selected item. An item in use is not deleted, and the message names what uses it. Deleting a scenario with Basic mode off keeps the alternatives it uses. Deleting a scenario with Basic mode on also deletes each of its alternatives that no other scenario uses.\\n\\n- To make a scenario use another alternative, including Base, choose it in the scenario's row of the Scenarios table. An override made in a shared alternative changes every scenario that uses it.",
+        "lpn_sm_delete_alt_ask": "Delete the alternative {name}?",
+        "lpn_sm_in_use": "{name} cannot be deleted while it is used by: {list}.",
+        "lpn_sm_name_taken": "The name {name} is already used in this tree.",
+        "lpn_sm_cycle": "{name} cannot be moved under one of its own children.",
+        "lpn_sm_used_by": "Used by scenarios: {n}",
+        "lpn_sm_used_by_tip": "Used by: {list}",
+        "lpn_sm_used_by_none": "Not used by any scenario",
+        "lpn_sm_compare_tip": "Include in Scenario comparison",
+        "lpn_sm_inherited": "inherited",
+        "lpn_sm_shared_note": "Shared with: {list}",
+        "lpn_scncmp_none_checked": "No scenario is checked for comparison. Check scenarios in the Scenario manager.",
+        "lpn_settings_table_major": "Major heading",
+        "lpn_settings_table_minor": "Minor heading",
+        "lpn_settings_table_category": "Category",
+        "lpn_settings_table_owner": "Owner",
+        "lpn_settings_table_setting": "Setting",
+        "lpn_settings_table_yes": "Yes",
+        "lpn_settings_table_no": "No",
+        "lpn_settings_row_of": "{setting}, {member}",
+        "lpn_settings_row_labels_field": "{labels}: {field}",
+        "lpn_settings_row_labels_part": "{labels}: {field}, {part}",
+        "lpn_settings_row_labels_customer": "Customer labels",
+        "lpn_settings_row_label_before": "Text before",
+        "lpn_settings_row_label_after": "Text after",
+        "lpn_settings_row_label_on": "Is active",
+        "lpn_settings_row_label_show": "Show order",
+        "lpn_settings_row_label_drop": "Drop order",
+        "lpn_settings_row_id_prefix": "ID prefix",
+        "lpn_settings_row_symbol_cap_multiple": "Largest symbol, as a multiple of a typical pipe length",
+        "lpn_settings_row_symbol_cap_percentile": "Typical pipe length, as a percentile of all pipe lengths",
+        "lpn_settings_row_contour_labels": "Contour labels",
+        "lpn_settings_row_check_freq": "Status check frequency",
+        "lpn_settings_row_max_check": "Maximum status checks",
+        "lpn_settings_row_status_report": "Status report",
+        "lpn_settings_row_pda_src": "Pressure driven options stated in the file",
+        "lpn_settings_row_quality_option": "Quality option as the file states it",
+        "lpn_settings_row_tolerance": "Accuracy (older projects)",
+        "lpn_settings_row_emitter_exponent_old": "Emitter exponent (older projects)",
+        "lpn_settings_row_elev_source_old": "Elevation source (older projects)",
+        "lpn_settings_row_basemap": "Basemap",
+        "lpn_settings_row_basemap_last": "Basemap to return to",
+        "lpn_settings_row_customer_max_width": "Show customer labels when zoomed to this map width or less",
+        "lpn_settings_row_quality_step": "Quality time step",
+        "lpn_settings_row_view": "Map view (center and scale)",
+        "lpn_settings_row_contour_fill": "Contour fill",
+        "lpn_settings_row_contour_opacity": "Contour fill opacity",
+        "lpn_settings_row_contour_interval": "Contour interval",
+        "lpn_settings_row_contour_buffer": "Contour buffer",
+        "lpn_settings_row_contour_terrain": "Contour ground between nodes from Mapbox DEM",
+        "lpn_settings_row_new_asset": "New assets: {setting}",
+        "lpn_settings_row_default": "{value} (default)",
+        "lpn_settings_row_view_value": "Center {x}, {y}; scale {s}",
+        "lpn_settings_held_in": "Override in {scenario}.",
+        "lpn_settings_held_base": "{base}: {value}",
+        "lpn_settings_view_center": "Map center",
+        "lpn_settings_view_scale": "Map scale",
+        "lpn_settings_view_scale_tip": "The scale at the center of the map, as 1:N. Type 1:2000, or just 2000, to zoom to that scale.",
+        "lpn_settings_view_top_left": "Top left corner",
+        "lpn_settings_view_bottom_right": "Bottom right corner",
+        "lpn_settings_view_save": "Save this view in this scenario",
+        "lpn_settings_view_save_tip": "Stores this map center and scale in the open scenario, so opening that scenario moves the map here. Moving the map afterward changes nothing until you press this again. Clear the override to follow the {base} view again.",
+        "lpn_settings_row_basemap_osm": "Street map",
+        "lpn_settings_row_basemap_satellite": "Satellite images",
+        "lpn_settings_units_one_project": "Units are the same in every scenario.",
+        "lpn_settings_restore_base_only": "Switch to Base to restore the defaults.",
+        "lpn_alt_cat_topology_tip": "Asset activation",
+        "lpn_alt_cat_presentation": "Presentation",
+        "lpn_alt_cat_calculation": "Calculation",
+        "lpn_control_inactive_note": "These controls refer to an asset that is inactive in this scenario, so they are ignored in its run: {ids}",
+        "lpn_rule_inactive_note": "These rules refer to an asset that is inactive in this scenario, so they are ignored in its run: {ids}",
+        "lpn_library_pattern_default_deleted_also": "Scenarios that also used it as their default: {list}.",
+        "lpn_library_pattern_default_deleted_in": "Pattern {id} was the default demand pattern in these scenarios: {list}."
     },
     "keys": {
+        "lpn_customer_node_inactive": "This customer is assigned to a junction that is inactive in this scenario, so its demand is not part of the solve.",
         "lpn_ex_net2_si_title": "EPANET Net2, L\/s (SI)",
         "lpn_ex_net2_si_desc": "Litres per second, with metres and millimetres. An EPANET example at Branford, Connecticut, converted from gallons per minute, feet and inches: 35 junctions and 1 tank, with no reservoir, no pump and no valves, about 2 km by 4 km. Fluoride, a non-reactive substance, enters at one source.",
         "lpn_ex_net3_si_title": "EPANET Net3, L\/s (SI)",
-        "lpn_ex_net3_si_desc": "Litres per second, with metres and millimetres. An EPANET example at Novato, California, converted from gallons per minute, feet and inches, with the world map behind it: 92 junctions, 3 tanks and 2 reservoirs, no valves, about 8 km square. A 24-hour extended-period simulation, with a source trace from the Lake."
+        "lpn_ex_net3_si_desc": "Litres per second, with metres and millimetres. An EPANET example at Novato, California, converted from gallons per minute, feet and inches, with the world map behind it: 92 junctions, 3 tanks and 2 reservoirs, no valves, about 8 km square. A 24-hour extended-period simulation, with a source trace from the Lake.",
+        "lpn_pane_scn_ov_only": "Overrides only",
+        "lpn_pane_scn_cur_only": "Current scenario only",
+        "lpn_pane_inactive_show": "Include inactive topology",
+        "lpn_pane_scn_filter_note": "{filters}. Showing {n} of {all}.",
+        "lpn_ovm_child_ask": "Clear child overrides ({n} total)?",
+        "lpn_ovm_child_tip": "Child scenarios override this value ({n} total). Click to clear their overrides.",
+        "lpn_ovm_dot_clear": "Click to clear it.",
+        "lpn_ovm_dot_set": "Inherited. Click to make it an override in this scenario, holding the value shown.",
+        "lpn_change_type_line_alternative": "{id}: {property} {value}, in alternative {alternative}",
+        "lpn_change_type_base_only": "Change type works in Base. A scenario can switch assets on and off in Active topology instead.",
+        "lpn_copy_props_menu": "Copy properties",
+        "lpn_copy_props_done": "Copied properties of {id}.",
+        "lpn_copy_props_no_overrides": "No overrides to copy.",
+        "lpn_copy_props_done_ov": "Copied the overrides of {id} in this scenario.",
+        "lpn_paste_alt_created": "Created {category} alternative {name} for this scenario.",
+        "lpn_paste_props_menu": "Paste properties to selection",
+        "lpn_paste_props_off_none": "Nothing is copied. Right-click an asset and choose Copy properties.",
+        "lpn_paste_props_off_select": "Select the assets to paste to, then choose Paste properties to selection.",
+        "lpn_paste_props_off_kind": "No selected asset can take the copied properties.",
+        "lpn_tsb_menu": "Time series graph",
+        "lpn_tsb_off_tip": "Needs extended period results. Set a Total run time in Settings, Calculation, Time, and calculate.",
+        "lpn_tsb_close": "Close graph",
+        "lpn_tsb_resize": "Drag to resize",
+        "lpn_tsb_quantity": "Quantity to graph",
+        "lpn_tsb_max": "Close a graph before opening another. Up to {n} stay open.",
+        "lpn_paste_done_one": "Pasted properties of {id} to {to}. Values changed: {n}.",
+        "lpn_paste_done_many": "Pasted properties of {id} to {m} assets. Values changed: {n}.",
+        "lpn_paste_skip_breakdown": "Not pasted: {n} (demand is a list of categories).",
+        "lpn_paste_skip_valve": "Not pasted: {n} (the valve types differ).",
+        "lpn_inp_export_flat_customers_inactive": "{n} of these customers are assigned to a junction that is inactive in this scenario, so their demand is not in the file.",
+        "lpn_inp_export_flat_inactive_controls": "These controls and rules refer to an asset that is inactive in this scenario, so they are not in the file: {ids}",
+        "lpn_scenario_delete_ask": "Delete the scenario {name}? The drawing itself is not changed.",
+        "lpn_scenario_delete_goes": "Its {n} overrides are deleted with it.",
+        "lpn_scenario_delete_goes_one": "Its one override is deleted with it.",
+        "lpn_scenario_delete_stays": "These alternatives it uses stay in the project: {list}.",
+        "lpn_scenario_delete_has_children": "The scenario {name} cannot be deleted while other scenarios inherit from it: {list}. Delete those first, or give them another parent.",
+        "lpn_scenario_basic_misfit": "This project has scenarios and alternatives relationships that are not compatible with Scenarios Basic mode, so Basic mode is disabled.",
+        "lpn_scenario_copy": "Copy scenario",
+        "lpn_scenario_copy_tip": "Copies the open scenario and its overrides, and opens the copy.",
+        "lpn_scenario_copy_off": "Copy scenario works in Basic mode. With Basic mode off, add a scenario and choose its alternatives in the Scenarios table.",
+        "lpn_sm_title": "Scenario manager",
+        "lpn_sm_menu": "Scenario manager…",
+        "lpn_sm_basic_off": "Basic mode is off, so the Scenario manager and the Scenarios table are shown.",
+        "lpn_pane_tab_scenarios": "Scenarios",
+        "lpn_sm_col_parent": "Parent",
+        "lpn_sm_add_child": "Add child",
+        "lpn_sm_add_base": "Add base",
+        "lpn_sm_add_base_tip": "Add another Base scenario. It starts as a copy of Base, with its own alternatives, and later edits to Base do not change it.",
+        "lpn_sm_add_base_alt_tip": "Add another Base alternative. It starts as a copy of Base's values in this category, and later edits to Base do not change it.",
+        "lpn_sm_delete": "Delete the selected item. A used item is not deleted.",
+        "lpn_sm_base_kept": "The Base of a tree is not deleted. Another Base added with Add base is deleted when nothing uses it.",
+        "lpn_sm_rename": "Rename",
+        "lpn_sm_rename_alts_ask": "Rename equally named alternatives?",
+        "lpn_sm_make_current": "Make current",
+        "lpn_sm_current_already": "This scenario is already the current scenario.",
+        "lpn_sm_none_selected": "Select an item in the tree first.",
+        "lpn_sm_base_named": "The Base of a tree is not renamed.",
+        "lpn_sm_copy": "Copy",
+        "lpn_sm_help": "How scenarios and alternatives work:\\n\\nIn Basic mode, alternatives are hidden and automatic, and all new scenarios are children of the Base scenario.\\n\\nWith Basic mode off, a complex inheritance tree is available, and alternatives can be shared among scenarios. But the default behavior of edits when a new alternative association is needed (in the absence of proactive user management) is to create an alternative named like the current scenario, which gives each scenario its unique set of alternatives.\\n\\nProperties and settings are grouped into alternatives categories that appear as columns of the Scenarios table and as management options in Scenario manager.\\n\\nOverrides are created in scenarios, but they really belong to the respective alternatives associated with the scenario; so a scenario is like a window to its alternatives. Associations of alternatives to scenarios are managed in the Scenarios table in the bottom pane. Creating a new scenario creates no alternatives; the new scenario uses its parent's alternatives until overrides are created that need new alternatives. When overrides are created in a scenario, they are stored in their respective alternative for the scenario; if the scenario has no such alternative, a new alternative is created using the name of the scenario.\\n\\nExample: You create a \"Figure: Node and link IDs\" scenario and edit a Text to say \"Node and Link IDs.\" When you create the scenario, no alternatives are created. But at the moment you save the Text, a Text alternative called \"Figure: Node and link IDs\" is created with the override for the Text value. In Basic mode, you see this as simply an override in the scenario itself.\\n\\nCopy properties copies only overrides. In any scenario other than Base, it copies only the overrides the asset has in that scenario.\\n\\nHow to manage scenarios:\\n\\n- Choose Scenarios or an alternatives category in the list at the top to show its tree.\\n\\n- Create a child of the selected item with Add child. Add base adds another Base, which starts as a copy of Base as it is now; later edits to Base do not change it. A new child is named after its parent; type a name to rename it. Copy copies the selected alternative. To copy a scenario, use Copy scenario in the Scenarios menu, in Basic mode; it copies the scenario's overrides, with the alternatives that hold them.\\n\\n- Drag an item onto another to make it a child of that item. A scenario moved to a new parent inherits from it everything it has not overridden; what it has overridden does not change. Drag an item between two items to reorder them.\\n\\n- Click an item to select it. Press F2, or choose Rename, to rename the selected item. Renaming a scenario asks whether to rename the alternatives that carry its name; in Basic mode they are renamed with it, without asking. Double-click a scenario, or press Enter, to make it current. Click the arrow beside an item, or press Left or Right, to collapse or expand it. Right-click an item for the same commands as the buttons.\\n\\n- Press Delete, or click the minus button, to delete the selected item. An item in use is not deleted, and the message names what uses it. Deleting a scenario with Basic mode off keeps the alternatives it uses. Deleting a scenario with Basic mode on also deletes each of its alternatives that no other scenario uses.\\n\\n- To make a scenario use another alternative, including Base, choose it in the scenario's row of the Scenarios table. An override made in a shared alternative changes every scenario that uses it.",
+        "lpn_sm_delete_alt_ask": "Delete the alternative {name}?",
+        "lpn_sm_in_use": "{name} cannot be deleted while it is used by: {list}.",
+        "lpn_sm_name_taken": "The name {name} is already used in this tree.",
+        "lpn_sm_cycle": "{name} cannot be moved under one of its own children.",
+        "lpn_sm_used_by": "Used by scenarios: {n}",
+        "lpn_sm_used_by_tip": "Used by: {list}",
+        "lpn_sm_used_by_none": "Not used by any scenario",
+        "lpn_sm_compare_tip": "Include in Scenario comparison",
+        "lpn_sm_inherited": "inherited",
+        "lpn_sm_shared_note": "Shared with: {list}",
+        "lpn_scncmp_none_checked": "No scenario is checked for comparison. Check scenarios in the Scenario manager.",
+        "lpn_settings_table_major": "Major heading",
+        "lpn_settings_table_minor": "Minor heading",
+        "lpn_settings_table_category": "Category",
+        "lpn_settings_table_owner": "Owner",
+        "lpn_settings_table_setting": "Setting",
+        "lpn_settings_table_yes": "Yes",
+        "lpn_settings_table_no": "No",
+        "lpn_settings_row_of": "{setting}, {member}",
+        "lpn_settings_row_labels_field": "{labels}: {field}",
+        "lpn_settings_row_labels_part": "{labels}: {field}, {part}",
+        "lpn_settings_row_labels_customer": "Customer labels",
+        "lpn_settings_row_label_before": "Text before",
+        "lpn_settings_row_label_after": "Text after",
+        "lpn_settings_row_label_on": "Is active",
+        "lpn_settings_row_label_show": "Show order",
+        "lpn_settings_row_label_drop": "Drop order",
+        "lpn_settings_row_id_prefix": "ID prefix",
+        "lpn_settings_row_symbol_cap_multiple": "Largest symbol, as a multiple of a typical pipe length",
+        "lpn_settings_row_symbol_cap_percentile": "Typical pipe length, as a percentile of all pipe lengths",
+        "lpn_settings_row_contour_labels": "Contour labels",
+        "lpn_settings_row_check_freq": "Status check frequency",
+        "lpn_settings_row_max_check": "Maximum status checks",
+        "lpn_settings_row_status_report": "Status report",
+        "lpn_settings_row_pda_src": "Pressure driven options stated in the file",
+        "lpn_settings_row_quality_option": "Quality option as the file states it",
+        "lpn_settings_row_tolerance": "Accuracy (older projects)",
+        "lpn_settings_row_emitter_exponent_old": "Emitter exponent (older projects)",
+        "lpn_settings_row_elev_source_old": "Elevation source (older projects)",
+        "lpn_settings_row_basemap": "Basemap",
+        "lpn_settings_row_basemap_last": "Basemap to return to",
+        "lpn_settings_row_customer_max_width": "Show customer labels when zoomed to this map width or less",
+        "lpn_settings_row_quality_step": "Quality time step",
+        "lpn_settings_row_view": "Map view (center and scale)",
+        "lpn_settings_row_contour_fill": "Contour fill",
+        "lpn_settings_row_contour_opacity": "Contour fill opacity",
+        "lpn_settings_row_contour_interval": "Contour interval",
+        "lpn_settings_row_contour_buffer": "Contour buffer",
+        "lpn_settings_row_contour_terrain": "Contour ground between nodes from Mapbox DEM",
+        "lpn_settings_row_new_asset": "New assets: {setting}",
+        "lpn_settings_row_default": "{value} (default)",
+        "lpn_settings_row_view_value": "Center {x}, {y}; scale {s}",
+        "lpn_settings_held_in": "Override in {scenario}.",
+        "lpn_settings_held_base": "{base}: {value}",
+        "lpn_settings_view_center": "Map center",
+        "lpn_settings_view_scale": "Map scale",
+        "lpn_settings_view_scale_tip": "The scale at the center of the map, as 1:N. Type 1:2000, or just 2000, to zoom to that scale.",
+        "lpn_settings_view_top_left": "Top left corner",
+        "lpn_settings_view_bottom_right": "Bottom right corner",
+        "lpn_settings_view_save": "Save this view in this scenario",
+        "lpn_settings_view_save_tip": "Stores this map center and scale in the open scenario, so opening that scenario moves the map here. Moving the map afterward changes nothing until you press this again. Clear the override to follow the {base} view again.",
+        "lpn_settings_row_basemap_osm": "Street map",
+        "lpn_settings_row_basemap_satellite": "Satellite images",
+        "lpn_settings_units_one_project": "Units are the same in every scenario.",
+        "lpn_settings_restore_base_only": "Switch to Base to restore the defaults.",
+        "lpn_alt_cat_topology_tip": "Asset activation",
+        "lpn_alt_cat_presentation": "Presentation",
+        "lpn_alt_cat_calculation": "Calculation",
+        "lpn_control_inactive_note": "These controls refer to an asset that is inactive in this scenario, so they are ignored in its run: {ids}",
+        "lpn_rule_inactive_note": "These rules refer to an asset that is inactive in this scenario, so they are ignored in its run: {ids}",
+        "lpn_library_pattern_default_deleted_also": "Scenarios that also used it as their default: {list}.",
+        "lpn_library_pattern_default_deleted_in": "Pattern {id} was the default demand pattern in these scenarios: {list}."
     },
     "key_context": {
+        "lpn_customer_node_inactive": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_customer_fixed_head",
+                    "value": "⚠ L'extrémité proche de cette conduite se trouve à une surface d'eau fixe, cette demande n'affecte donc pas la simulation.",
+                    "english": "⚠ The near end of that pipe holds a fixed water surface, so this demand does not affect the simulation."
+                },
+                "next_translated": {
+                    "key": "lpn_customer_detached_count",
+                    "value": "{n} clients ne sont connectés à aucune conduite. Leur demande n'est pas prise en compte.",
+                    "english": "{n} customers are not connected to a pipe. Their demand is not accounted for."
+                }
+            }
+        },
         "lpn_ex_net2_si_title": {
             "reason": "missing",
             "current_value": null,
@@ -810,6 +1090,2102 @@
                     "key": "lpn_ex_net3_title",
                     "value": "EPANET Net3",
                     "english": "EPANET Net3, gpm (US)"
+                }
+            }
+        },
+        "lpn_pane_scn_ov_only": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_scn_show",
+                    "value": "Afficher les scénarios",
+                    "english": "Show scenarios"
+                },
+                "next_translated": {
+                    "key": "lpn_pane_clear_override",
+                    "value": "Effacer la valeur personnalisée",
+                    "english": "Clear override"
+                }
+            }
+        },
+        "lpn_pane_scn_cur_only": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_scn_show",
+                    "value": "Afficher les scénarios",
+                    "english": "Show scenarios"
+                },
+                "next_translated": {
+                    "key": "lpn_pane_clear_override",
+                    "value": "Effacer la valeur personnalisée",
+                    "english": "Clear override"
+                }
+            }
+        },
+        "lpn_pane_inactive_show": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_scn_show",
+                    "value": "Afficher les scénarios",
+                    "english": "Show scenarios"
+                },
+                "next_translated": {
+                    "key": "lpn_pane_clear_override",
+                    "value": "Effacer la valeur personnalisée",
+                    "english": "Clear override"
+                }
+            }
+        },
+        "lpn_pane_scn_filter_note": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_scn_show",
+                    "value": "Afficher les scénarios",
+                    "english": "Show scenarios"
+                },
+                "next_translated": {
+                    "key": "lpn_pane_clear_override",
+                    "value": "Effacer la valeur personnalisée",
+                    "english": "Clear override"
+                }
+            }
+        },
+        "lpn_ovm_child_ask": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_scn_show",
+                    "value": "Afficher les scénarios",
+                    "english": "Show scenarios"
+                },
+                "next_translated": {
+                    "key": "lpn_pane_clear_override",
+                    "value": "Effacer la valeur personnalisée",
+                    "english": "Clear override"
+                }
+            }
+        },
+        "lpn_ovm_child_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_scn_show",
+                    "value": "Afficher les scénarios",
+                    "english": "Show scenarios"
+                },
+                "next_translated": {
+                    "key": "lpn_pane_clear_override",
+                    "value": "Effacer la valeur personnalisée",
+                    "english": "Clear override"
+                }
+            }
+        },
+        "lpn_ovm_dot_clear": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_scn_show",
+                    "value": "Afficher les scénarios",
+                    "english": "Show scenarios"
+                },
+                "next_translated": {
+                    "key": "lpn_pane_clear_override",
+                    "value": "Effacer la valeur personnalisée",
+                    "english": "Clear override"
+                }
+            }
+        },
+        "lpn_ovm_dot_set": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_scn_show",
+                    "value": "Afficher les scénarios",
+                    "english": "Show scenarios"
+                },
+                "next_translated": {
+                    "key": "lpn_pane_clear_override",
+                    "value": "Effacer la valeur personnalisée",
+                    "english": "Clear override"
+                }
+            }
+        },
+        "lpn_change_type_line_alternative": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_change_type_line_scenario",
+                    "value": "{id} : {property} {value}, dans le scénario {scenario}",
+                    "english": "{id}: {property} {value}, in scenario {scenario}"
+                },
+                "next_translated": {
+                    "key": "lpn_change_type_more",
+                    "value": "Et {n} autres.",
+                    "english": "And {n} more."
+                }
+            }
+        },
+        "lpn_change_type_base_only": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_change_type_setting",
+                    "value": "Ces commandes et règles donnent ou testent le réglage d'une liaison en cours de changement. Un réglage est une grandeur différente sur une conduite, une pompe et une vanne ; elles le liront donc différemment :",
+                    "english": "These controls and rules give or test the setting of a link being changed. A setting is a different quantity on a pipe, a pump, and a valve, so these will read it differently:"
+                },
+                "next_translated": {
+                    "key": "lpn_change_type_rules",
+                    "value": "Ces lignes de règle désignent une liaison par son genre et désigneront son nouveau genre à la place :",
+                    "english": "These rule lines name a link by its kind, and will name its new kind instead:"
+                }
+            }
+        },
+        "lpn_copy_props_menu": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_find_menu",
+                    "value": "Rechercher et remplacer",
+                    "english": "Find and replace"
+                },
+                "next_translated": {
+                    "key": "lpn_find_title",
+                    "value": "Rechercher et remplacer",
+                    "english": "Find and replace"
+                }
+            }
+        },
+        "lpn_copy_props_done": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_find_menu",
+                    "value": "Rechercher et remplacer",
+                    "english": "Find and replace"
+                },
+                "next_translated": {
+                    "key": "lpn_find_title",
+                    "value": "Rechercher et remplacer",
+                    "english": "Find and replace"
+                }
+            }
+        },
+        "lpn_copy_props_no_overrides": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_find_menu",
+                    "value": "Rechercher et remplacer",
+                    "english": "Find and replace"
+                },
+                "next_translated": {
+                    "key": "lpn_find_title",
+                    "value": "Rechercher et remplacer",
+                    "english": "Find and replace"
+                }
+            }
+        },
+        "lpn_copy_props_done_ov": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_find_menu",
+                    "value": "Rechercher et remplacer",
+                    "english": "Find and replace"
+                },
+                "next_translated": {
+                    "key": "lpn_find_title",
+                    "value": "Rechercher et remplacer",
+                    "english": "Find and replace"
+                }
+            }
+        },
+        "lpn_paste_alt_created": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_find_menu",
+                    "value": "Rechercher et remplacer",
+                    "english": "Find and replace"
+                },
+                "next_translated": {
+                    "key": "lpn_find_title",
+                    "value": "Rechercher et remplacer",
+                    "english": "Find and replace"
+                }
+            }
+        },
+        "lpn_paste_props_menu": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_find_menu",
+                    "value": "Rechercher et remplacer",
+                    "english": "Find and replace"
+                },
+                "next_translated": {
+                    "key": "lpn_find_title",
+                    "value": "Rechercher et remplacer",
+                    "english": "Find and replace"
+                }
+            }
+        },
+        "lpn_paste_props_off_none": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_find_menu",
+                    "value": "Rechercher et remplacer",
+                    "english": "Find and replace"
+                },
+                "next_translated": {
+                    "key": "lpn_find_title",
+                    "value": "Rechercher et remplacer",
+                    "english": "Find and replace"
+                }
+            }
+        },
+        "lpn_paste_props_off_select": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_find_menu",
+                    "value": "Rechercher et remplacer",
+                    "english": "Find and replace"
+                },
+                "next_translated": {
+                    "key": "lpn_find_title",
+                    "value": "Rechercher et remplacer",
+                    "english": "Find and replace"
+                }
+            }
+        },
+        "lpn_paste_props_off_kind": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_find_menu",
+                    "value": "Rechercher et remplacer",
+                    "english": "Find and replace"
+                },
+                "next_translated": {
+                    "key": "lpn_find_title",
+                    "value": "Rechercher et remplacer",
+                    "english": "Find and replace"
+                }
+            }
+        },
+        "lpn_tsb_menu": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_find_menu",
+                    "value": "Rechercher et remplacer",
+                    "english": "Find and replace"
+                },
+                "next_translated": {
+                    "key": "lpn_find_title",
+                    "value": "Rechercher et remplacer",
+                    "english": "Find and replace"
+                }
+            }
+        },
+        "lpn_tsb_off_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_find_menu",
+                    "value": "Rechercher et remplacer",
+                    "english": "Find and replace"
+                },
+                "next_translated": {
+                    "key": "lpn_find_title",
+                    "value": "Rechercher et remplacer",
+                    "english": "Find and replace"
+                }
+            }
+        },
+        "lpn_tsb_close": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_find_menu",
+                    "value": "Rechercher et remplacer",
+                    "english": "Find and replace"
+                },
+                "next_translated": {
+                    "key": "lpn_find_title",
+                    "value": "Rechercher et remplacer",
+                    "english": "Find and replace"
+                }
+            }
+        },
+        "lpn_tsb_resize": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_find_menu",
+                    "value": "Rechercher et remplacer",
+                    "english": "Find and replace"
+                },
+                "next_translated": {
+                    "key": "lpn_find_title",
+                    "value": "Rechercher et remplacer",
+                    "english": "Find and replace"
+                }
+            }
+        },
+        "lpn_tsb_quantity": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_find_menu",
+                    "value": "Rechercher et remplacer",
+                    "english": "Find and replace"
+                },
+                "next_translated": {
+                    "key": "lpn_find_title",
+                    "value": "Rechercher et remplacer",
+                    "english": "Find and replace"
+                }
+            }
+        },
+        "lpn_tsb_max": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_find_menu",
+                    "value": "Rechercher et remplacer",
+                    "english": "Find and replace"
+                },
+                "next_translated": {
+                    "key": "lpn_find_title",
+                    "value": "Rechercher et remplacer",
+                    "english": "Find and replace"
+                }
+            }
+        },
+        "lpn_paste_done_one": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_find_menu",
+                    "value": "Rechercher et remplacer",
+                    "english": "Find and replace"
+                },
+                "next_translated": {
+                    "key": "lpn_find_title",
+                    "value": "Rechercher et remplacer",
+                    "english": "Find and replace"
+                }
+            }
+        },
+        "lpn_paste_done_many": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_find_menu",
+                    "value": "Rechercher et remplacer",
+                    "english": "Find and replace"
+                },
+                "next_translated": {
+                    "key": "lpn_find_title",
+                    "value": "Rechercher et remplacer",
+                    "english": "Find and replace"
+                }
+            }
+        },
+        "lpn_paste_skip_breakdown": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_find_menu",
+                    "value": "Rechercher et remplacer",
+                    "english": "Find and replace"
+                },
+                "next_translated": {
+                    "key": "lpn_find_title",
+                    "value": "Rechercher et remplacer",
+                    "english": "Find and replace"
+                }
+            }
+        },
+        "lpn_paste_skip_valve": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_find_menu",
+                    "value": "Rechercher et remplacer",
+                    "english": "Find and replace"
+                },
+                "next_translated": {
+                    "key": "lpn_find_title",
+                    "value": "Rechercher et remplacer",
+                    "english": "Find and replace"
+                }
+            }
+        },
+        "lpn_inp_export_flat_customers_inactive": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_inp_exported_no_picture",
+                    "value": "{file} exporté. L'image de fond n'a pas pu être enregistrée ; le fichier .inp n'en cite donc aucune. Dans EPANET, ajoutez-la avec Affichage > Fond de plan > Charger.",
+                    "english": "Exported {file}. The background picture could not be saved, so the .inp names none; in EPANET, add it with View > Backdrop > Load."
+                },
+                "next_translated": {
+                    "key": "lpn_inp_export_differences",
+                    "value": "{n} éléments que le format .inp ne peut pas contenir.",
+                    "english": "{n} things the .inp format cannot hold."
+                }
+            }
+        },
+        "lpn_inp_export_flat_inactive_controls": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_inp_exported_no_picture",
+                    "value": "{file} exporté. L'image de fond n'a pas pu être enregistrée ; le fichier .inp n'en cite donc aucune. Dans EPANET, ajoutez-la avec Affichage > Fond de plan > Charger.",
+                    "english": "Exported {file}. The background picture could not be saved, so the .inp names none; in EPANET, add it with View > Backdrop > Load."
+                },
+                "next_translated": {
+                    "key": "lpn_inp_export_differences",
+                    "value": "{n} éléments que le format .inp ne peut pas contenir.",
+                    "english": "{n} things the .inp format cannot hold."
+                }
+            }
+        },
+        "lpn_scenario_delete_ask": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scenario_delete",
+                    "value": "Supprimer le scénario",
+                    "english": "Delete scenario"
+                },
+                "next_translated": {
+                    "key": "lpn_scenario_base_value",
+                    "value": "Scénario de base : {value}",
+                    "english": "Base scenario: {value}"
+                }
+            }
+        },
+        "lpn_scenario_delete_goes": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scenario_delete",
+                    "value": "Supprimer le scénario",
+                    "english": "Delete scenario"
+                },
+                "next_translated": {
+                    "key": "lpn_scenario_base_value",
+                    "value": "Scénario de base : {value}",
+                    "english": "Base scenario: {value}"
+                }
+            }
+        },
+        "lpn_scenario_delete_goes_one": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scenario_delete",
+                    "value": "Supprimer le scénario",
+                    "english": "Delete scenario"
+                },
+                "next_translated": {
+                    "key": "lpn_scenario_base_value",
+                    "value": "Scénario de base : {value}",
+                    "english": "Base scenario: {value}"
+                }
+            }
+        },
+        "lpn_scenario_delete_stays": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scenario_delete",
+                    "value": "Supprimer le scénario",
+                    "english": "Delete scenario"
+                },
+                "next_translated": {
+                    "key": "lpn_scenario_base_value",
+                    "value": "Scénario de base : {value}",
+                    "english": "Base scenario: {value}"
+                }
+            }
+        },
+        "lpn_scenario_delete_has_children": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scenario_delete",
+                    "value": "Supprimer le scénario",
+                    "english": "Delete scenario"
+                },
+                "next_translated": {
+                    "key": "lpn_scenario_base_value",
+                    "value": "Scénario de base : {value}",
+                    "english": "Base scenario: {value}"
+                }
+            }
+        },
+        "lpn_scenario_basic_misfit": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scenario_basic_tip",
+                    "value": "Cochée : un scénario ne comprend que les valeurs qui y sont définies. Décochée : ce menu propose aussi le tableau d'aperçu des Alternatives, qui montre comment ces valeurs sont regroupées par catégorie, et permet à un scénario d'avoir une durée totale de simulation et un pas de temps hydraulique distincts. Vos commentaires sur cette fonction sont les bienvenus.",
+                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Choosing Scenario manager turns Basic mode off. A project whose scenarios and alternatives Basic mode cannot show keeps it off."
+                },
+                "next_translated": {
+                    "key": "lpn_time_scn_overrides",
+                    "value": "Valeurs propres au scénario :",
+                    "english": "Scenario overrides:"
+                }
+            }
+        },
+        "lpn_scenario_copy": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scenario_basic_tip",
+                    "value": "Cochée : un scénario ne comprend que les valeurs qui y sont définies. Décochée : ce menu propose aussi le tableau d'aperçu des Alternatives, qui montre comment ces valeurs sont regroupées par catégorie, et permet à un scénario d'avoir une durée totale de simulation et un pas de temps hydraulique distincts. Vos commentaires sur cette fonction sont les bienvenus.",
+                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Choosing Scenario manager turns Basic mode off. A project whose scenarios and alternatives Basic mode cannot show keeps it off."
+                },
+                "next_translated": {
+                    "key": "lpn_time_scn_overrides",
+                    "value": "Valeurs propres au scénario :",
+                    "english": "Scenario overrides:"
+                }
+            }
+        },
+        "lpn_scenario_copy_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scenario_basic_tip",
+                    "value": "Cochée : un scénario ne comprend que les valeurs qui y sont définies. Décochée : ce menu propose aussi le tableau d'aperçu des Alternatives, qui montre comment ces valeurs sont regroupées par catégorie, et permet à un scénario d'avoir une durée totale de simulation et un pas de temps hydraulique distincts. Vos commentaires sur cette fonction sont les bienvenus.",
+                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Choosing Scenario manager turns Basic mode off. A project whose scenarios and alternatives Basic mode cannot show keeps it off."
+                },
+                "next_translated": {
+                    "key": "lpn_time_scn_overrides",
+                    "value": "Valeurs propres au scénario :",
+                    "english": "Scenario overrides:"
+                }
+            }
+        },
+        "lpn_scenario_copy_off": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scenario_basic_tip",
+                    "value": "Cochée : un scénario ne comprend que les valeurs qui y sont définies. Décochée : ce menu propose aussi le tableau d'aperçu des Alternatives, qui montre comment ces valeurs sont regroupées par catégorie, et permet à un scénario d'avoir une durée totale de simulation et un pas de temps hydraulique distincts. Vos commentaires sur cette fonction sont les bienvenus.",
+                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Choosing Scenario manager turns Basic mode off. A project whose scenarios and alternatives Basic mode cannot show keeps it off."
+                },
+                "next_translated": {
+                    "key": "lpn_time_scn_overrides",
+                    "value": "Valeurs propres au scénario :",
+                    "english": "Scenario overrides:"
+                }
+            }
+        },
+        "lpn_sm_title": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scenario_basic_tip",
+                    "value": "Cochée : un scénario ne comprend que les valeurs qui y sont définies. Décochée : ce menu propose aussi le tableau d'aperçu des Alternatives, qui montre comment ces valeurs sont regroupées par catégorie, et permet à un scénario d'avoir une durée totale de simulation et un pas de temps hydraulique distincts. Vos commentaires sur cette fonction sont les bienvenus.",
+                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Choosing Scenario manager turns Basic mode off. A project whose scenarios and alternatives Basic mode cannot show keeps it off."
+                },
+                "next_translated": {
+                    "key": "lpn_time_scn_overrides",
+                    "value": "Valeurs propres au scénario :",
+                    "english": "Scenario overrides:"
+                }
+            }
+        },
+        "lpn_sm_menu": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scenario_basic_tip",
+                    "value": "Cochée : un scénario ne comprend que les valeurs qui y sont définies. Décochée : ce menu propose aussi le tableau d'aperçu des Alternatives, qui montre comment ces valeurs sont regroupées par catégorie, et permet à un scénario d'avoir une durée totale de simulation et un pas de temps hydraulique distincts. Vos commentaires sur cette fonction sont les bienvenus.",
+                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Choosing Scenario manager turns Basic mode off. A project whose scenarios and alternatives Basic mode cannot show keeps it off."
+                },
+                "next_translated": {
+                    "key": "lpn_time_scn_overrides",
+                    "value": "Valeurs propres au scénario :",
+                    "english": "Scenario overrides:"
+                }
+            }
+        },
+        "lpn_sm_basic_off": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scenario_basic_tip",
+                    "value": "Cochée : un scénario ne comprend que les valeurs qui y sont définies. Décochée : ce menu propose aussi le tableau d'aperçu des Alternatives, qui montre comment ces valeurs sont regroupées par catégorie, et permet à un scénario d'avoir une durée totale de simulation et un pas de temps hydraulique distincts. Vos commentaires sur cette fonction sont les bienvenus.",
+                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Choosing Scenario manager turns Basic mode off. A project whose scenarios and alternatives Basic mode cannot show keeps it off."
+                },
+                "next_translated": {
+                    "key": "lpn_time_scn_overrides",
+                    "value": "Valeurs propres au scénario :",
+                    "english": "Scenario overrides:"
+                }
+            }
+        },
+        "lpn_pane_tab_scenarios": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scenario_basic_tip",
+                    "value": "Cochée : un scénario ne comprend que les valeurs qui y sont définies. Décochée : ce menu propose aussi le tableau d'aperçu des Alternatives, qui montre comment ces valeurs sont regroupées par catégorie, et permet à un scénario d'avoir une durée totale de simulation et un pas de temps hydraulique distincts. Vos commentaires sur cette fonction sont les bienvenus.",
+                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Choosing Scenario manager turns Basic mode off. A project whose scenarios and alternatives Basic mode cannot show keeps it off."
+                },
+                "next_translated": {
+                    "key": "lpn_time_scn_overrides",
+                    "value": "Valeurs propres au scénario :",
+                    "english": "Scenario overrides:"
+                }
+            }
+        },
+        "lpn_sm_col_parent": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scenario_basic_tip",
+                    "value": "Cochée : un scénario ne comprend que les valeurs qui y sont définies. Décochée : ce menu propose aussi le tableau d'aperçu des Alternatives, qui montre comment ces valeurs sont regroupées par catégorie, et permet à un scénario d'avoir une durée totale de simulation et un pas de temps hydraulique distincts. Vos commentaires sur cette fonction sont les bienvenus.",
+                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Choosing Scenario manager turns Basic mode off. A project whose scenarios and alternatives Basic mode cannot show keeps it off."
+                },
+                "next_translated": {
+                    "key": "lpn_time_scn_overrides",
+                    "value": "Valeurs propres au scénario :",
+                    "english": "Scenario overrides:"
+                }
+            }
+        },
+        "lpn_sm_add_child": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scenario_basic_tip",
+                    "value": "Cochée : un scénario ne comprend que les valeurs qui y sont définies. Décochée : ce menu propose aussi le tableau d'aperçu des Alternatives, qui montre comment ces valeurs sont regroupées par catégorie, et permet à un scénario d'avoir une durée totale de simulation et un pas de temps hydraulique distincts. Vos commentaires sur cette fonction sont les bienvenus.",
+                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Choosing Scenario manager turns Basic mode off. A project whose scenarios and alternatives Basic mode cannot show keeps it off."
+                },
+                "next_translated": {
+                    "key": "lpn_time_scn_overrides",
+                    "value": "Valeurs propres au scénario :",
+                    "english": "Scenario overrides:"
+                }
+            }
+        },
+        "lpn_sm_add_base": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scenario_basic_tip",
+                    "value": "Cochée : un scénario ne comprend que les valeurs qui y sont définies. Décochée : ce menu propose aussi le tableau d'aperçu des Alternatives, qui montre comment ces valeurs sont regroupées par catégorie, et permet à un scénario d'avoir une durée totale de simulation et un pas de temps hydraulique distincts. Vos commentaires sur cette fonction sont les bienvenus.",
+                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Choosing Scenario manager turns Basic mode off. A project whose scenarios and alternatives Basic mode cannot show keeps it off."
+                },
+                "next_translated": {
+                    "key": "lpn_time_scn_overrides",
+                    "value": "Valeurs propres au scénario :",
+                    "english": "Scenario overrides:"
+                }
+            }
+        },
+        "lpn_sm_add_base_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scenario_basic_tip",
+                    "value": "Cochée : un scénario ne comprend que les valeurs qui y sont définies. Décochée : ce menu propose aussi le tableau d'aperçu des Alternatives, qui montre comment ces valeurs sont regroupées par catégorie, et permet à un scénario d'avoir une durée totale de simulation et un pas de temps hydraulique distincts. Vos commentaires sur cette fonction sont les bienvenus.",
+                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Choosing Scenario manager turns Basic mode off. A project whose scenarios and alternatives Basic mode cannot show keeps it off."
+                },
+                "next_translated": {
+                    "key": "lpn_time_scn_overrides",
+                    "value": "Valeurs propres au scénario :",
+                    "english": "Scenario overrides:"
+                }
+            }
+        },
+        "lpn_sm_add_base_alt_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scenario_basic_tip",
+                    "value": "Cochée : un scénario ne comprend que les valeurs qui y sont définies. Décochée : ce menu propose aussi le tableau d'aperçu des Alternatives, qui montre comment ces valeurs sont regroupées par catégorie, et permet à un scénario d'avoir une durée totale de simulation et un pas de temps hydraulique distincts. Vos commentaires sur cette fonction sont les bienvenus.",
+                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Choosing Scenario manager turns Basic mode off. A project whose scenarios and alternatives Basic mode cannot show keeps it off."
+                },
+                "next_translated": {
+                    "key": "lpn_time_scn_overrides",
+                    "value": "Valeurs propres au scénario :",
+                    "english": "Scenario overrides:"
+                }
+            }
+        },
+        "lpn_sm_delete": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scenario_basic_tip",
+                    "value": "Cochée : un scénario ne comprend que les valeurs qui y sont définies. Décochée : ce menu propose aussi le tableau d'aperçu des Alternatives, qui montre comment ces valeurs sont regroupées par catégorie, et permet à un scénario d'avoir une durée totale de simulation et un pas de temps hydraulique distincts. Vos commentaires sur cette fonction sont les bienvenus.",
+                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Choosing Scenario manager turns Basic mode off. A project whose scenarios and alternatives Basic mode cannot show keeps it off."
+                },
+                "next_translated": {
+                    "key": "lpn_time_scn_overrides",
+                    "value": "Valeurs propres au scénario :",
+                    "english": "Scenario overrides:"
+                }
+            }
+        },
+        "lpn_sm_base_kept": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scenario_basic_tip",
+                    "value": "Cochée : un scénario ne comprend que les valeurs qui y sont définies. Décochée : ce menu propose aussi le tableau d'aperçu des Alternatives, qui montre comment ces valeurs sont regroupées par catégorie, et permet à un scénario d'avoir une durée totale de simulation et un pas de temps hydraulique distincts. Vos commentaires sur cette fonction sont les bienvenus.",
+                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Choosing Scenario manager turns Basic mode off. A project whose scenarios and alternatives Basic mode cannot show keeps it off."
+                },
+                "next_translated": {
+                    "key": "lpn_time_scn_overrides",
+                    "value": "Valeurs propres au scénario :",
+                    "english": "Scenario overrides:"
+                }
+            }
+        },
+        "lpn_sm_rename": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scenario_basic_tip",
+                    "value": "Cochée : un scénario ne comprend que les valeurs qui y sont définies. Décochée : ce menu propose aussi le tableau d'aperçu des Alternatives, qui montre comment ces valeurs sont regroupées par catégorie, et permet à un scénario d'avoir une durée totale de simulation et un pas de temps hydraulique distincts. Vos commentaires sur cette fonction sont les bienvenus.",
+                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Choosing Scenario manager turns Basic mode off. A project whose scenarios and alternatives Basic mode cannot show keeps it off."
+                },
+                "next_translated": {
+                    "key": "lpn_time_scn_overrides",
+                    "value": "Valeurs propres au scénario :",
+                    "english": "Scenario overrides:"
+                }
+            }
+        },
+        "lpn_sm_rename_alts_ask": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scenario_basic_tip",
+                    "value": "Cochée : un scénario ne comprend que les valeurs qui y sont définies. Décochée : ce menu propose aussi le tableau d'aperçu des Alternatives, qui montre comment ces valeurs sont regroupées par catégorie, et permet à un scénario d'avoir une durée totale de simulation et un pas de temps hydraulique distincts. Vos commentaires sur cette fonction sont les bienvenus.",
+                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Choosing Scenario manager turns Basic mode off. A project whose scenarios and alternatives Basic mode cannot show keeps it off."
+                },
+                "next_translated": {
+                    "key": "lpn_time_scn_overrides",
+                    "value": "Valeurs propres au scénario :",
+                    "english": "Scenario overrides:"
+                }
+            }
+        },
+        "lpn_sm_make_current": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scenario_basic_tip",
+                    "value": "Cochée : un scénario ne comprend que les valeurs qui y sont définies. Décochée : ce menu propose aussi le tableau d'aperçu des Alternatives, qui montre comment ces valeurs sont regroupées par catégorie, et permet à un scénario d'avoir une durée totale de simulation et un pas de temps hydraulique distincts. Vos commentaires sur cette fonction sont les bienvenus.",
+                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Choosing Scenario manager turns Basic mode off. A project whose scenarios and alternatives Basic mode cannot show keeps it off."
+                },
+                "next_translated": {
+                    "key": "lpn_time_scn_overrides",
+                    "value": "Valeurs propres au scénario :",
+                    "english": "Scenario overrides:"
+                }
+            }
+        },
+        "lpn_sm_current_already": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scenario_basic_tip",
+                    "value": "Cochée : un scénario ne comprend que les valeurs qui y sont définies. Décochée : ce menu propose aussi le tableau d'aperçu des Alternatives, qui montre comment ces valeurs sont regroupées par catégorie, et permet à un scénario d'avoir une durée totale de simulation et un pas de temps hydraulique distincts. Vos commentaires sur cette fonction sont les bienvenus.",
+                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Choosing Scenario manager turns Basic mode off. A project whose scenarios and alternatives Basic mode cannot show keeps it off."
+                },
+                "next_translated": {
+                    "key": "lpn_time_scn_overrides",
+                    "value": "Valeurs propres au scénario :",
+                    "english": "Scenario overrides:"
+                }
+            }
+        },
+        "lpn_sm_none_selected": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scenario_basic_tip",
+                    "value": "Cochée : un scénario ne comprend que les valeurs qui y sont définies. Décochée : ce menu propose aussi le tableau d'aperçu des Alternatives, qui montre comment ces valeurs sont regroupées par catégorie, et permet à un scénario d'avoir une durée totale de simulation et un pas de temps hydraulique distincts. Vos commentaires sur cette fonction sont les bienvenus.",
+                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Choosing Scenario manager turns Basic mode off. A project whose scenarios and alternatives Basic mode cannot show keeps it off."
+                },
+                "next_translated": {
+                    "key": "lpn_time_scn_overrides",
+                    "value": "Valeurs propres au scénario :",
+                    "english": "Scenario overrides:"
+                }
+            }
+        },
+        "lpn_sm_base_named": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scenario_basic_tip",
+                    "value": "Cochée : un scénario ne comprend que les valeurs qui y sont définies. Décochée : ce menu propose aussi le tableau d'aperçu des Alternatives, qui montre comment ces valeurs sont regroupées par catégorie, et permet à un scénario d'avoir une durée totale de simulation et un pas de temps hydraulique distincts. Vos commentaires sur cette fonction sont les bienvenus.",
+                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Choosing Scenario manager turns Basic mode off. A project whose scenarios and alternatives Basic mode cannot show keeps it off."
+                },
+                "next_translated": {
+                    "key": "lpn_time_scn_overrides",
+                    "value": "Valeurs propres au scénario :",
+                    "english": "Scenario overrides:"
+                }
+            }
+        },
+        "lpn_sm_copy": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scenario_basic_tip",
+                    "value": "Cochée : un scénario ne comprend que les valeurs qui y sont définies. Décochée : ce menu propose aussi le tableau d'aperçu des Alternatives, qui montre comment ces valeurs sont regroupées par catégorie, et permet à un scénario d'avoir une durée totale de simulation et un pas de temps hydraulique distincts. Vos commentaires sur cette fonction sont les bienvenus.",
+                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Choosing Scenario manager turns Basic mode off. A project whose scenarios and alternatives Basic mode cannot show keeps it off."
+                },
+                "next_translated": {
+                    "key": "lpn_time_scn_overrides",
+                    "value": "Valeurs propres au scénario :",
+                    "english": "Scenario overrides:"
+                }
+            }
+        },
+        "lpn_sm_help": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scenario_basic_tip",
+                    "value": "Cochée : un scénario ne comprend que les valeurs qui y sont définies. Décochée : ce menu propose aussi le tableau d'aperçu des Alternatives, qui montre comment ces valeurs sont regroupées par catégorie, et permet à un scénario d'avoir une durée totale de simulation et un pas de temps hydraulique distincts. Vos commentaires sur cette fonction sont les bienvenus.",
+                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Choosing Scenario manager turns Basic mode off. A project whose scenarios and alternatives Basic mode cannot show keeps it off."
+                },
+                "next_translated": {
+                    "key": "lpn_time_scn_overrides",
+                    "value": "Valeurs propres au scénario :",
+                    "english": "Scenario overrides:"
+                }
+            }
+        },
+        "lpn_sm_delete_alt_ask": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scenario_basic_tip",
+                    "value": "Cochée : un scénario ne comprend que les valeurs qui y sont définies. Décochée : ce menu propose aussi le tableau d'aperçu des Alternatives, qui montre comment ces valeurs sont regroupées par catégorie, et permet à un scénario d'avoir une durée totale de simulation et un pas de temps hydraulique distincts. Vos commentaires sur cette fonction sont les bienvenus.",
+                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Choosing Scenario manager turns Basic mode off. A project whose scenarios and alternatives Basic mode cannot show keeps it off."
+                },
+                "next_translated": {
+                    "key": "lpn_time_scn_overrides",
+                    "value": "Valeurs propres au scénario :",
+                    "english": "Scenario overrides:"
+                }
+            }
+        },
+        "lpn_sm_in_use": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scenario_basic_tip",
+                    "value": "Cochée : un scénario ne comprend que les valeurs qui y sont définies. Décochée : ce menu propose aussi le tableau d'aperçu des Alternatives, qui montre comment ces valeurs sont regroupées par catégorie, et permet à un scénario d'avoir une durée totale de simulation et un pas de temps hydraulique distincts. Vos commentaires sur cette fonction sont les bienvenus.",
+                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Choosing Scenario manager turns Basic mode off. A project whose scenarios and alternatives Basic mode cannot show keeps it off."
+                },
+                "next_translated": {
+                    "key": "lpn_time_scn_overrides",
+                    "value": "Valeurs propres au scénario :",
+                    "english": "Scenario overrides:"
+                }
+            }
+        },
+        "lpn_sm_name_taken": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scenario_basic_tip",
+                    "value": "Cochée : un scénario ne comprend que les valeurs qui y sont définies. Décochée : ce menu propose aussi le tableau d'aperçu des Alternatives, qui montre comment ces valeurs sont regroupées par catégorie, et permet à un scénario d'avoir une durée totale de simulation et un pas de temps hydraulique distincts. Vos commentaires sur cette fonction sont les bienvenus.",
+                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Choosing Scenario manager turns Basic mode off. A project whose scenarios and alternatives Basic mode cannot show keeps it off."
+                },
+                "next_translated": {
+                    "key": "lpn_time_scn_overrides",
+                    "value": "Valeurs propres au scénario :",
+                    "english": "Scenario overrides:"
+                }
+            }
+        },
+        "lpn_sm_cycle": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scenario_basic_tip",
+                    "value": "Cochée : un scénario ne comprend que les valeurs qui y sont définies. Décochée : ce menu propose aussi le tableau d'aperçu des Alternatives, qui montre comment ces valeurs sont regroupées par catégorie, et permet à un scénario d'avoir une durée totale de simulation et un pas de temps hydraulique distincts. Vos commentaires sur cette fonction sont les bienvenus.",
+                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Choosing Scenario manager turns Basic mode off. A project whose scenarios and alternatives Basic mode cannot show keeps it off."
+                },
+                "next_translated": {
+                    "key": "lpn_time_scn_overrides",
+                    "value": "Valeurs propres au scénario :",
+                    "english": "Scenario overrides:"
+                }
+            }
+        },
+        "lpn_sm_used_by": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scenario_basic_tip",
+                    "value": "Cochée : un scénario ne comprend que les valeurs qui y sont définies. Décochée : ce menu propose aussi le tableau d'aperçu des Alternatives, qui montre comment ces valeurs sont regroupées par catégorie, et permet à un scénario d'avoir une durée totale de simulation et un pas de temps hydraulique distincts. Vos commentaires sur cette fonction sont les bienvenus.",
+                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Choosing Scenario manager turns Basic mode off. A project whose scenarios and alternatives Basic mode cannot show keeps it off."
+                },
+                "next_translated": {
+                    "key": "lpn_time_scn_overrides",
+                    "value": "Valeurs propres au scénario :",
+                    "english": "Scenario overrides:"
+                }
+            }
+        },
+        "lpn_sm_used_by_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scenario_basic_tip",
+                    "value": "Cochée : un scénario ne comprend que les valeurs qui y sont définies. Décochée : ce menu propose aussi le tableau d'aperçu des Alternatives, qui montre comment ces valeurs sont regroupées par catégorie, et permet à un scénario d'avoir une durée totale de simulation et un pas de temps hydraulique distincts. Vos commentaires sur cette fonction sont les bienvenus.",
+                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Choosing Scenario manager turns Basic mode off. A project whose scenarios and alternatives Basic mode cannot show keeps it off."
+                },
+                "next_translated": {
+                    "key": "lpn_time_scn_overrides",
+                    "value": "Valeurs propres au scénario :",
+                    "english": "Scenario overrides:"
+                }
+            }
+        },
+        "lpn_sm_used_by_none": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scenario_basic_tip",
+                    "value": "Cochée : un scénario ne comprend que les valeurs qui y sont définies. Décochée : ce menu propose aussi le tableau d'aperçu des Alternatives, qui montre comment ces valeurs sont regroupées par catégorie, et permet à un scénario d'avoir une durée totale de simulation et un pas de temps hydraulique distincts. Vos commentaires sur cette fonction sont les bienvenus.",
+                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Choosing Scenario manager turns Basic mode off. A project whose scenarios and alternatives Basic mode cannot show keeps it off."
+                },
+                "next_translated": {
+                    "key": "lpn_time_scn_overrides",
+                    "value": "Valeurs propres au scénario :",
+                    "english": "Scenario overrides:"
+                }
+            }
+        },
+        "lpn_sm_compare_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scenario_basic_tip",
+                    "value": "Cochée : un scénario ne comprend que les valeurs qui y sont définies. Décochée : ce menu propose aussi le tableau d'aperçu des Alternatives, qui montre comment ces valeurs sont regroupées par catégorie, et permet à un scénario d'avoir une durée totale de simulation et un pas de temps hydraulique distincts. Vos commentaires sur cette fonction sont les bienvenus.",
+                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Choosing Scenario manager turns Basic mode off. A project whose scenarios and alternatives Basic mode cannot show keeps it off."
+                },
+                "next_translated": {
+                    "key": "lpn_time_scn_overrides",
+                    "value": "Valeurs propres au scénario :",
+                    "english": "Scenario overrides:"
+                }
+            }
+        },
+        "lpn_sm_inherited": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scenario_basic_tip",
+                    "value": "Cochée : un scénario ne comprend que les valeurs qui y sont définies. Décochée : ce menu propose aussi le tableau d'aperçu des Alternatives, qui montre comment ces valeurs sont regroupées par catégorie, et permet à un scénario d'avoir une durée totale de simulation et un pas de temps hydraulique distincts. Vos commentaires sur cette fonction sont les bienvenus.",
+                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Choosing Scenario manager turns Basic mode off. A project whose scenarios and alternatives Basic mode cannot show keeps it off."
+                },
+                "next_translated": {
+                    "key": "lpn_time_scn_overrides",
+                    "value": "Valeurs propres au scénario :",
+                    "english": "Scenario overrides:"
+                }
+            }
+        },
+        "lpn_sm_shared_note": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scenario_basic_tip",
+                    "value": "Cochée : un scénario ne comprend que les valeurs qui y sont définies. Décochée : ce menu propose aussi le tableau d'aperçu des Alternatives, qui montre comment ces valeurs sont regroupées par catégorie, et permet à un scénario d'avoir une durée totale de simulation et un pas de temps hydraulique distincts. Vos commentaires sur cette fonction sont les bienvenus.",
+                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Choosing Scenario manager turns Basic mode off. A project whose scenarios and alternatives Basic mode cannot show keeps it off."
+                },
+                "next_translated": {
+                    "key": "lpn_time_scn_overrides",
+                    "value": "Valeurs propres au scénario :",
+                    "english": "Scenario overrides:"
+                }
+            }
+        },
+        "lpn_scncmp_none_checked": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scenario_basic_tip",
+                    "value": "Cochée : un scénario ne comprend que les valeurs qui y sont définies. Décochée : ce menu propose aussi le tableau d'aperçu des Alternatives, qui montre comment ces valeurs sont regroupées par catégorie, et permet à un scénario d'avoir une durée totale de simulation et un pas de temps hydraulique distincts. Vos commentaires sur cette fonction sont les bienvenus.",
+                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Choosing Scenario manager turns Basic mode off. A project whose scenarios and alternatives Basic mode cannot show keeps it off."
+                },
+                "next_translated": {
+                    "key": "lpn_time_scn_overrides",
+                    "value": "Valeurs propres au scénario :",
+                    "english": "Scenario overrides:"
+                }
+            }
+        },
+        "lpn_settings_table_major": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_scn_overrides",
+                    "value": "Valeurs propres au scénario :",
+                    "english": "Scenario overrides:"
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "Physique",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_settings_table_minor": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_scn_overrides",
+                    "value": "Valeurs propres au scénario :",
+                    "english": "Scenario overrides:"
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "Physique",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_settings_table_category": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_scn_overrides",
+                    "value": "Valeurs propres au scénario :",
+                    "english": "Scenario overrides:"
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "Physique",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_settings_table_owner": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_scn_overrides",
+                    "value": "Valeurs propres au scénario :",
+                    "english": "Scenario overrides:"
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "Physique",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_settings_table_setting": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_scn_overrides",
+                    "value": "Valeurs propres au scénario :",
+                    "english": "Scenario overrides:"
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "Physique",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_settings_table_yes": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_scn_overrides",
+                    "value": "Valeurs propres au scénario :",
+                    "english": "Scenario overrides:"
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "Physique",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_settings_table_no": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_scn_overrides",
+                    "value": "Valeurs propres au scénario :",
+                    "english": "Scenario overrides:"
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "Physique",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_settings_row_of": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_scn_overrides",
+                    "value": "Valeurs propres au scénario :",
+                    "english": "Scenario overrides:"
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "Physique",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_settings_row_labels_field": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_scn_overrides",
+                    "value": "Valeurs propres au scénario :",
+                    "english": "Scenario overrides:"
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "Physique",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_settings_row_labels_part": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_scn_overrides",
+                    "value": "Valeurs propres au scénario :",
+                    "english": "Scenario overrides:"
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "Physique",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_settings_row_labels_customer": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_scn_overrides",
+                    "value": "Valeurs propres au scénario :",
+                    "english": "Scenario overrides:"
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "Physique",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_settings_row_label_before": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_scn_overrides",
+                    "value": "Valeurs propres au scénario :",
+                    "english": "Scenario overrides:"
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "Physique",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_settings_row_label_after": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_scn_overrides",
+                    "value": "Valeurs propres au scénario :",
+                    "english": "Scenario overrides:"
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "Physique",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_settings_row_label_on": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_scn_overrides",
+                    "value": "Valeurs propres au scénario :",
+                    "english": "Scenario overrides:"
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "Physique",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_settings_row_label_show": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_scn_overrides",
+                    "value": "Valeurs propres au scénario :",
+                    "english": "Scenario overrides:"
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "Physique",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_settings_row_label_drop": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_scn_overrides",
+                    "value": "Valeurs propres au scénario :",
+                    "english": "Scenario overrides:"
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "Physique",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_settings_row_id_prefix": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_scn_overrides",
+                    "value": "Valeurs propres au scénario :",
+                    "english": "Scenario overrides:"
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "Physique",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_settings_row_symbol_cap_multiple": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_scn_overrides",
+                    "value": "Valeurs propres au scénario :",
+                    "english": "Scenario overrides:"
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "Physique",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_settings_row_symbol_cap_percentile": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_scn_overrides",
+                    "value": "Valeurs propres au scénario :",
+                    "english": "Scenario overrides:"
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "Physique",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_settings_row_contour_labels": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_scn_overrides",
+                    "value": "Valeurs propres au scénario :",
+                    "english": "Scenario overrides:"
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "Physique",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_settings_row_check_freq": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_scn_overrides",
+                    "value": "Valeurs propres au scénario :",
+                    "english": "Scenario overrides:"
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "Physique",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_settings_row_max_check": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_scn_overrides",
+                    "value": "Valeurs propres au scénario :",
+                    "english": "Scenario overrides:"
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "Physique",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_settings_row_status_report": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_scn_overrides",
+                    "value": "Valeurs propres au scénario :",
+                    "english": "Scenario overrides:"
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "Physique",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_settings_row_pda_src": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_scn_overrides",
+                    "value": "Valeurs propres au scénario :",
+                    "english": "Scenario overrides:"
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "Physique",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_settings_row_quality_option": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_scn_overrides",
+                    "value": "Valeurs propres au scénario :",
+                    "english": "Scenario overrides:"
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "Physique",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_settings_row_tolerance": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_scn_overrides",
+                    "value": "Valeurs propres au scénario :",
+                    "english": "Scenario overrides:"
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "Physique",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_settings_row_emitter_exponent_old": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_scn_overrides",
+                    "value": "Valeurs propres au scénario :",
+                    "english": "Scenario overrides:"
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "Physique",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_settings_row_elev_source_old": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_scn_overrides",
+                    "value": "Valeurs propres au scénario :",
+                    "english": "Scenario overrides:"
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "Physique",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_settings_row_basemap": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_scn_overrides",
+                    "value": "Valeurs propres au scénario :",
+                    "english": "Scenario overrides:"
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "Physique",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_settings_row_basemap_last": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_scn_overrides",
+                    "value": "Valeurs propres au scénario :",
+                    "english": "Scenario overrides:"
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "Physique",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_settings_row_customer_max_width": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_scn_overrides",
+                    "value": "Valeurs propres au scénario :",
+                    "english": "Scenario overrides:"
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "Physique",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_settings_row_quality_step": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_scn_overrides",
+                    "value": "Valeurs propres au scénario :",
+                    "english": "Scenario overrides:"
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "Physique",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_settings_row_view": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_scn_overrides",
+                    "value": "Valeurs propres au scénario :",
+                    "english": "Scenario overrides:"
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "Physique",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_settings_row_contour_fill": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_scn_overrides",
+                    "value": "Valeurs propres au scénario :",
+                    "english": "Scenario overrides:"
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "Physique",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_settings_row_contour_opacity": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_scn_overrides",
+                    "value": "Valeurs propres au scénario :",
+                    "english": "Scenario overrides:"
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "Physique",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_settings_row_contour_interval": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_scn_overrides",
+                    "value": "Valeurs propres au scénario :",
+                    "english": "Scenario overrides:"
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "Physique",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_settings_row_contour_buffer": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_scn_overrides",
+                    "value": "Valeurs propres au scénario :",
+                    "english": "Scenario overrides:"
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "Physique",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_settings_row_contour_terrain": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_scn_overrides",
+                    "value": "Valeurs propres au scénario :",
+                    "english": "Scenario overrides:"
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "Physique",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_settings_row_new_asset": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_scn_overrides",
+                    "value": "Valeurs propres au scénario :",
+                    "english": "Scenario overrides:"
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "Physique",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_settings_row_default": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_scn_overrides",
+                    "value": "Valeurs propres au scénario :",
+                    "english": "Scenario overrides:"
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "Physique",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_settings_row_view_value": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_scn_overrides",
+                    "value": "Valeurs propres au scénario :",
+                    "english": "Scenario overrides:"
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "Physique",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_settings_held_in": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_scn_overrides",
+                    "value": "Valeurs propres au scénario :",
+                    "english": "Scenario overrides:"
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "Physique",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_settings_held_base": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_scn_overrides",
+                    "value": "Valeurs propres au scénario :",
+                    "english": "Scenario overrides:"
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "Physique",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_settings_view_center": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_scn_overrides",
+                    "value": "Valeurs propres au scénario :",
+                    "english": "Scenario overrides:"
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "Physique",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_settings_view_scale": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_scn_overrides",
+                    "value": "Valeurs propres au scénario :",
+                    "english": "Scenario overrides:"
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "Physique",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_settings_view_scale_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_scn_overrides",
+                    "value": "Valeurs propres au scénario :",
+                    "english": "Scenario overrides:"
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "Physique",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_settings_view_top_left": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_scn_overrides",
+                    "value": "Valeurs propres au scénario :",
+                    "english": "Scenario overrides:"
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "Physique",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_settings_view_bottom_right": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_scn_overrides",
+                    "value": "Valeurs propres au scénario :",
+                    "english": "Scenario overrides:"
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "Physique",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_settings_view_save": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_scn_overrides",
+                    "value": "Valeurs propres au scénario :",
+                    "english": "Scenario overrides:"
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "Physique",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_settings_view_save_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_scn_overrides",
+                    "value": "Valeurs propres au scénario :",
+                    "english": "Scenario overrides:"
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "Physique",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_settings_row_basemap_osm": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_scn_overrides",
+                    "value": "Valeurs propres au scénario :",
+                    "english": "Scenario overrides:"
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "Physique",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_settings_row_basemap_satellite": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_scn_overrides",
+                    "value": "Valeurs propres au scénario :",
+                    "english": "Scenario overrides:"
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "Physique",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_settings_units_one_project": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_scn_overrides",
+                    "value": "Valeurs propres au scénario :",
+                    "english": "Scenario overrides:"
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "Physique",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_settings_restore_base_only": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_scn_overrides",
+                    "value": "Valeurs propres au scénario :",
+                    "english": "Scenario overrides:"
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "Physique",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_alt_cat_topology_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_alt_cat_topology",
+                    "value": "Activation des éléments",
+                    "english": "Active topology"
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_initial",
+                    "value": "Réglages initiaux",
+                    "english": "Initial settings"
+                }
+            }
+        },
+        "lpn_alt_cat_presentation": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_alt_cat_text",
+                    "value": "Texte",
+                    "english": "Text"
+                },
+                "next_translated": {
+                    "key": "lpn_scenario_push_confirm",
+                    "value": "Faire revenir tous les scénarios aux valeurs de Base pour ces propriétés ? Les valeurs qui leur appartiennent uniquement sont abandonnées. Vous pouvez annuler cette action.",
+                    "english": "Make every scenario use the Base values for these properties? Values entered for them in any scenario are discarded. You can undo this."
+                }
+            }
+        },
+        "lpn_alt_cat_calculation": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_alt_cat_text",
+                    "value": "Texte",
+                    "english": "Text"
+                },
+                "next_translated": {
+                    "key": "lpn_scenario_push_confirm",
+                    "value": "Faire revenir tous les scénarios aux valeurs de Base pour ces propriétés ? Les valeurs qui leur appartiennent uniquement sont abandonnées. Vous pouvez annuler cette action.",
+                    "english": "Make every scenario use the Base values for these properties? Values entered for them in any scenario are discarded. You can undo this."
+                }
+            }
+        },
+        "lpn_control_inactive_note": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_control_unreadable_note",
+                    "value": "Ces contrôles n'ont pas pu être lus, ils ont donc été laissés de côté : {ids}",
+                    "english": "These controls could not be read, so they were left out: {ids}"
+                },
+                "next_translated": {
+                    "key": "lpn_rule_dangling_note",
+                    "value": "Ces règles se réfèrent à un élément qui ne fait plus partie de ce projet, elles ont donc été ignorées pour ce calcul : {ids}",
+                    "english": "These rules refer to an element that is no longer in this project, so they were ignored in this run: {ids}"
+                }
+            }
+        },
+        "lpn_rule_inactive_note": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_control_unreadable_note",
+                    "value": "Ces contrôles n'ont pas pu être lus, ils ont donc été laissés de côté : {ids}",
+                    "english": "These controls could not be read, so they were left out: {ids}"
+                },
+                "next_translated": {
+                    "key": "lpn_rule_dangling_note",
+                    "value": "Ces règles se réfèrent à un élément qui ne fait plus partie de ce projet, elles ont donc été ignorées pour ce calcul : {ids}",
+                    "english": "These rules refer to an element that is no longer in this project, so they were ignored in this run: {ids}"
+                }
+            }
+        },
+        "lpn_library_pattern_default_deleted_also": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_pattern_default_deleted_none",
+                    "value": "La courbe de modulation {id} était la courbe de modulation de la demande par défaut. Les jonctions sans courbe de modulation utilisent maintenant une demande constante.",
+                    "english": "Pattern {id} was the default demand pattern. Junctions with no pattern now use a constant demand."
+                },
+                "next_translated": {
+                    "key": "lpn_library_control_add",
+                    "value": "Ajouter un contrôle",
+                    "english": "Add a control"
+                }
+            }
+        },
+        "lpn_library_pattern_default_deleted_in": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_pattern_default_deleted_none",
+                    "value": "La courbe de modulation {id} était la courbe de modulation de la demande par défaut. Les jonctions sans courbe de modulation utilisent maintenant une demande constante.",
+                    "english": "Pattern {id} was the default demand pattern. Junctions with no pattern now use a constant demand."
+                },
+                "next_translated": {
+                    "key": "lpn_library_control_add",
+                    "value": "Ajouter un contrôle",
+                    "english": "Add a control"
                 }
             }
         }
