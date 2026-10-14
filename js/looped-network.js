@@ -30567,7 +30567,7 @@ var EngCalcs = EngCalcs || {};
 	// column and a lookup both key on it, the numbers as the Library box holds them (what the user
 	// typed, in the project's units, which the headings name). Controls and rules are left out: they
 	// refer to assets, not the other way round.
-	//   Patterns: one row a pattern, its multipliers across, headed by period number 1, 2, 3...
+	//   Patterns: one row a pattern, its ID and Description, then its multipliers across, headed by period number 1, 2, 3...
 	//   Curves: one sheet per curve type present, one row a point, headed as the Library heads it.
 	//   Pipe types: one row a type, one column a property it may state; blank where it states none.
 	//   Fittings: one row a fitting of a list, so a list's coefficients can be summed in place.
@@ -30577,11 +30577,12 @@ var EngCalcs = EngCalcs || {};
 		function txt(v) { return v === undefined || v === null ? '' : String(v); }
 		var pats = libPatternsRead().filter(function (p) { return p && p.id !== undefined && p.id !== null && p.id !== ''; });
 		if (pats.length) {
-			var n = 0, heads = [idH], numeric = [false], k;
+			// ID and Description, then one column a period: the other library sheets' first two.
+			var n = 0, heads = [idH, descH], numeric = [false, false], k;
 			pats.forEach(function (p) { n = Math.max(n, (p.multipliers || []).length); });
 			for (k = 1; k <= n; k++) { heads.push(String(k)); numeric.push(true); }
 			out.push({ name: pc.lpn_library_patterns || 'Patterns', heads: heads, numeric: numeric,
-				rows: pats.map(function (p) { return [txt(p.id)].concat((p.multipliers || []).map(txt)); }) });
+				rows: pats.map(function (p) { return [txt(p.id), txt(p.note)].concat((p.multipliers || []).map(txt)); }) });
 		}
 		var curves = libCurvesRead(), kinds = CURVE_KINDS.map(function (o) { return o[0]; });
 		curves.forEach(function (c) { if (kinds.indexOf(c.kind) < 0) { kinds.push(c.kind); } });
@@ -39483,6 +39484,10 @@ var EngCalcs = EngCalcs || {};
 			case 'report': return pc.lpn_inp_drop_report || 'This file contains EPANET report-format settings. The run report is available under Reports, Run, but it uses the standard EPANET format rather than the format these settings specify. The lines are kept and are written back if you save an EPANET file.';
 			// The ids on this one are the SECTION NAMES, which is the only true thing we can say
 			// about a part of the format nobody here has read.
+			// Comment lines a pattern or a control cannot keep: between the rows of one pattern, on
+			// the end of a pattern row, or above a control that was itself left out. The ids are the
+			// comment lines themselves, which is the only name they have.
+			case 'comments': return pc.lpn_inp_drop_comments || 'These comments in the patterns or the simple controls of this file sit where this page cannot keep them, for example between the rows of one pattern, so they were not imported. Every pattern and control was imported in full; only these comment lines are missing.';
 			case 'other-sections': return pc.lpn_inp_drop_sections || 'This file holds a section that this page does not read at all. Nothing here uses it. It is kept whole, and it is written back if you save an EPANET file.';
 			// Kept AND reported, the same pairing [RULES] has: the three lines survive the round
 			// trip, and nothing on this page acts on them.
@@ -57032,7 +57037,7 @@ var EngCalcs = EngCalcs || {};
 	}
 	function libImportRulesExisting() { return libImportRuleChunks(libRulesRead()); }
 	function libImportRulesWrite() {
-		return { push: function (clone) { doc.rules = libRules().concat(clone.lines || []); } };
+		return { push: function (clone) { doc.rules = libRulesAppend(libRules(), clone.lines || []); } };
 	}
 	var LIB_IMPORTABLE = {
 		// Dimensionless, and shared with no other page, so patterns carry no unit of their own
@@ -59578,7 +59583,7 @@ var EngCalcs = EngCalcs || {};
 				libControls()[i].raw = box.value.trim();
 				// The DESCRIPTION is not part of the sentence and survives a rewrite of it, with
 				// where it sits in the file. The record above is new, so it is carried across.
-				['note', 'noteSrc', 'noteAt', 'tail'].forEach(function (k) {
+				['head', 'note', 'noteSrc', 'noteAt', 'tail', 'foot'].forEach(function (k) {
 					if (ctl[k] !== undefined) { libControls()[i][k] = ctl[k]; }
 				});
 				ctl = libControls()[i];
@@ -59597,8 +59602,20 @@ var EngCalcs = EngCalcs || {};
 			entry.appendChild(headRow);
 			entry.appendChild(verdict);
 			del = libButton(pc.lpn_tool_delete || 'Delete', function () {
+				var all = libControls(), gone = all[i], next = all[i + 1], prev = all[i - 1];
 				saveUndoSnapshot();
-				doc.controls = libControls().filter(function (c, k) { return k !== i; });
+				// **A HEADING OR A TRAILING COMMENT BLOCK IS NOT THE CONTROL'S, AND STAYS.** The
+				// heading above it passes to the control below; the block after the last control
+				// passes to the one above. Only its own description goes with it.
+				if (gone && Array.isArray(gone.head) && gone.head.length) {
+					if (next) { next.head = gone.head.concat(next.head || []); }
+					else if (prev) { prev.foot = (prev.foot || []).concat(gone.head); }
+				}
+				if (gone && Array.isArray(gone.foot) && gone.foot.length) {
+					if (prev) { prev.foot = (prev.foot || []).concat(gone.foot); }
+					else if (next) { next.head = gone.foot.concat(next.head || []); }
+				}
+				doc.controls = all.filter(function (c, k) { return k !== i; });
 				libCommit();
 				rebuildLibraryBox();
 			});
@@ -59669,6 +59686,28 @@ var EngCalcs = EngCalcs || {};
 		var lines = libRulesRead();
 		return lines.slice(0, from).concat(put || [], lines.slice(to));
 	}
+	// **DELETING RULE `i` TAKES THE RULE AND ITS OWN DESCRIPTION, AND NOTHING ELSE.** A heading a
+	// blank line separates from it stays exactly where it is, and so does the next rule's
+	// description. One of the two blank lines that would then stand together goes too, so deleting
+	// rules one by one does not leave a growing gap.
+	function libRulesWithout(i) {
+		var lines = libRulesRead(), e = libRuleEntries(lines)[i], out;
+		if (!e) { return lines.slice(); }
+		out = lines.slice(0, e.descStart).concat(lines.slice(e.end));
+		if (e.descStart < out.length && !String(out[e.descStart]).trim()
+				&& (e.descStart === 0 || !String(out[e.descStart - 1]).trim())) {
+			out.splice(e.descStart, 1);
+		}
+		while (out.length && !String(out[out.length - 1]).trim()) { out.pop(); }
+		return out;
+	}
+	// Rule lines appended after the text already there. **A BLANK LINE GOES BETWEEN WHEN THAT TEXT
+	// ENDS IN A COMMENT**: otherwise those comments would stand directly above the new RULE line and
+	// read as its description, merged with the description it brings.
+	function libRulesAppend(lines, more) {
+		var last = lines.length ? String(lines[lines.length - 1]) : '';
+		return lines.concat(libRuleIsComment(last) ? [''] : [], more || []);
+	}
 	// What a rule in the box means right now: an { ok, block, missing } verdict, where `missing` is
 	// the id of an element the rule names and this network does not have. The identical three-state
 	// answer libReadControl() gives, and the identical reason for the third state -- EPANET rejects
@@ -59696,7 +59735,7 @@ var EngCalcs = EngCalcs || {};
 			while (used['R' + n]) { n++; }
 			name = 'R' + n;
 			saveUndoSnapshot();
-			doc.rules = libRules().concat([
+			doc.rules = libRulesAppend(libRules(), [
 				'RULE ' + name,
 				'IF TANK ' + (tank ? tank.id : '1') + ' LEVEL ABOVE 0',
 				'THEN ' + (pump && pump.type === 'pump' ? 'PUMP' : 'LINK') + ' ' +
@@ -59768,12 +59807,10 @@ var EngCalcs = EngCalcs || {};
 			entry.appendChild(box);
 			entry.appendChild(verdict);
 			del = libButton(pc.lpn_tool_delete || 'Delete', function () {
-				// The rule, its own description above it, and the blank lines after it -- but not the
-				// comment that introduces the NEXT rule, which is that rule's description.
-				var all = libRuleEntries(libRulesRead()), cur = all[i], next = all[i + 1];
-				if (!cur) { return; }
+				// The rule and its own description -- never a heading, never the next rule's.
+				if (!libRuleEntries(libRulesRead())[i]) { return; }
 				saveUndoSnapshot();
-				doc.rules = libRulesSplice(cur.descStart, next ? next.descStart : libRulesRead().length, []);
+				doc.rules = libRulesWithout(i);
 				libCommit();
 				rebuildLibraryBox();
 			});

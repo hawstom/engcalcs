@@ -1152,6 +1152,9 @@
 				0.81
 			],
 			"note": "Demand Pattern",
+			"head": [
+				";ID              \tMultipliers"
+			],
 			"tok": {
 				"m2": ".97",
 				"m3": ".97",

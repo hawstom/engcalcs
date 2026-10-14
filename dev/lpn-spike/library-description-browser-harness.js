@@ -8,7 +8,9 @@
 //   2. a description typed into each one is still there after the autosave and a reload;
 //   3. File > Export writes each as a `;` line directly above the thing it describes;
 //   4. that file, opened again, shows the same three descriptions;
-//   5. ?lang=es heads the field with the Spanish word for it.
+//   5. ?lang=es heads the field with the Spanish word for it;
+//   6. on a file whose [CONTROLS] and [RULES] open with a heading, a blank line, then a
+//      description, the heading is not the first one's Description and survives deleting it.
 // The .inp placement rules themselves are library-description-inp-harness.js's.
 //
 // Copyright 2009 Thomas Gail Haws
@@ -185,8 +187,9 @@ async function main() {
 		const inp = await exportInp();
 		ok('an .inp was exported', inp.length > 500, 'len ' + inp.length);
 		const P1 = section(inp, 'PATTERNS'), C1 = section(inp, 'CONTROLS'), R1 = section(inp, 'RULES');
-		ok('[PATTERNS] starts with the description line, then the pattern\'s rows',
-			P1[0] === ';' + DESC.patterns && /^\s*\S+\s+[-\d.]/.test(P1[1] || ''), JSON.stringify(P1.slice(0, 2)));
+		const pr = P1.findIndex((l) => !/^\s*;/.test(l));
+		ok('[PATTERNS]: the description line sits directly above the pattern\'s first row (under EPA\'s column heading)',
+			pr > 0 && P1[pr - 1] === ';' + DESC.patterns, JSON.stringify(P1.slice(0, pr + 1)));
 		ok('[CONTROLS] starts with the description line, then the control',
 			C1[0] === ';' + DESC.controls && /^LINK\s/i.test(C1[1] || ''), JSON.stringify(C1.slice(0, 2)));
 		const ri = R1.findIndex((l) => /^\s*RULE\s/i.test(l));
@@ -208,6 +211,36 @@ async function main() {
 			JSON.stringify([section(again, 'PATTERNS'), section(again, 'CONTROLS'), section(again, 'RULES')]) ===
 			JSON.stringify([P1, C1, R1]));
 		await closeLib();
+
+		console.log('\n--- 6. a heading is never a description, and never deleted with what it heads ---');
+		const HEADED = fs.readFileSync(path.join(__dirname, 'reference', 'Net1.inp'), 'utf8')
+			.replace(/\[CONTROLS\][^\[]*/i, '[CONTROLS]\n;Controls heading\n\n;Open below 110\nLINK 9 OPEN IF NODE 2 BELOW 110\nLINK 9 CLOSED IF NODE 2 ABOVE 140\n\n')
+			.replace(/\[RULES\][^\[]*/i, '[RULES]\n;Rules section heading\n\n;desc R1\nRULE R1\nIF TANK 2 LEVEL ABOVE 140\nTHEN PUMP 9 STATUS IS CLOSED\n\n;desc R2\nRULE R2\nIF TANK 2 LEVEL BELOW 110\nTHEN PUMP 9 STATUS IS OPEN\n\n');
+		await a.page.setInputFiles('#lpn_inp_file', { name: 'libdesc-headed.inp', mimeType: 'text/plain', buffer: Buffer.from(HEADED) });
+		await a.settle(1500);
+		await closeDialogs();
+		await openLib('rules');
+		const r1 = await firstDesc();
+		ok('rule R1\'s Description is "desc R1", not the section heading', !!r1 && r1.value === 'desc R1', JSON.stringify(r1));
+		await openLib('controls');
+		const c1 = await firstDesc();
+		ok('control 1\'s Description is "Open below 110", not the heading a blank line separates', !!c1 && c1.value === 'Open below 110', JSON.stringify(c1));
+		// Delete the first rule and the first control with the real Delete buttons.
+		for (const sec of ['rules', 'controls']) {
+			await openLib(sec);
+			await P(() => {
+				document.querySelector('#lpn_libbox_content .lpn-lib-entry button.lpn-lib-del')
+					.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, detail: 1 }));
+			});
+			await a.settle(400);
+		}
+		await closeLib();
+		const hx = await exportInp();
+		const HR = section(hx, 'RULES'), HC = section(hx, 'CONTROLS');
+		ok('after deleting R1 the rules heading is still there, above R2 and its description',
+			JSON.stringify(HR.slice(0, 3)) === JSON.stringify([';Rules section heading', ';desc R2', 'RULE R2']) && !HR.some((l) => /R1/.test(l)), JSON.stringify(HR));
+		ok('after deleting control 1 the controls heading is still there, above control 2',
+			JSON.stringify(HC) === JSON.stringify([';Controls heading', 'LINK 9 CLOSED IF NODE 2 ABOVE 140']), JSON.stringify(HC));
 
 		console.log('\n--- 5. ?lang=es ---');
 		const b = await Session.open(browser, NAME + '-es', { viewport: { width: 1400, height: 900 } });

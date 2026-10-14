@@ -2608,6 +2608,9 @@
 				1.67
 			],
 			"note": "General Default Demand Pattern",
+			"head": [
+				";ID              \tMultipliers"
+			],
 			"tok": {
 				"m4": ".76",
 				"m5": ".92",

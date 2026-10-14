@@ -387,9 +387,16 @@
 		var carried = {};   // section name -> the file's own lines, for every section not read below
 		// The `;PUMP:`-style line last seen inside [CURVES], waiting for the row it describes.
 		var pendingCurveType = null;
-		// The whole-line comments since the last row of [PATTERNS] or [CONTROLS], waiting for the
-		// row they describe. See the reading below.
-		var pendingLineCmts = [];
+		// The file's own comment and blank lines since the last row of [PATTERNS] or [CONTROLS],
+		// waiting for the row they sit above (`toks.preLines`), and what is left over at the end of
+		// each section (`sectionFoot`). See the reading below and lpnInpSplitPre().
+		var pendingRaw = [], sectionFoot = {};
+		function flushFoot() {
+			if ((section === 'PATTERNS' || section === 'CONTROLS') && pendingRaw.some(function (l) { return l.trim(); })) {
+				sectionFoot[section] = (sectionFoot[section] || []).concat(pendingRaw);
+			}
+			pendingRaw = [];
+		}
 		for (i = 0; i < lines.length; i++) {
 			line = lines[i];
 			semi = line.indexOf(';');
@@ -428,24 +435,25 @@
 			// ReadRuleData, Uexport.pas ExportControls), and Net3's controls carry three. So the
 			// comment lines above a control are read as its description and written back above
 			// it, and a comment line in [RULES] is carried with the rule text it sits in.
+			// Every comment AND every blank line is kept here, because a blank line is what tells a
+			// heading from a description: only the comments DIRECTLY above a row describe it, and
+			// a block separated from it by a blank line is a heading, kept and written back in place.
 			if (!line.trim() && (section === 'PATTERNS' || section === 'CONTROLS')) {
-				if (semi >= 0) { pendingLineCmts.push({ raw: lines[i].replace(/\s+$/, ''), text: cmt }); }
-				// EPANET's own reading: a blank line between the comment and the row means no
-				// description. A control has no EPANET reading to follow, and a blank line between
-				// a heading comment and the controls under it is ordinary layout, so it is kept.
-				else if (section === 'PATTERNS') { pendingLineCmts = []; }
+				pendingRaw.push(semi >= 0 ? lines[i].replace(/\s+$/, '') : '');
 				continue;
 			}
-			if (!line.trim() && section === 'RULES' && semi >= 0) {
+			// [RULES] keeps its comment lines and its blank lines, for the same reason: the blank
+			// line is what separates a heading from the description of the RULE under it.
+			if (!line.trim() && section === 'RULES') {
 				if (!carried.RULES) { carried.RULES = []; }
-				carried.RULES.push(lines[i].replace(/\s+$/, ''));
+				carried.RULES.push(semi >= 0 ? lines[i].replace(/\s+$/, '') : '');
 				continue;
 			}
 			if (!line.trim()) { continue; }
 			if (line.charAt(0) === '[' || /^\s*\[/.test(line)) {
+				flushFoot();
 				section = line.trim().replace(/^\[|\]\s*$/g, '').toUpperCase();
 				if (!rawSections[section]) { rawSections[section] = []; }
-				pendingLineCmts = [];
 				continue;
 			}
 			// **EVERY SECTION THIS READER DOES NOT TAKE APART IS KEPT AS TEXT, LINE FOR LINE.**
@@ -486,12 +494,20 @@
 				if (pendingCurveType) { toks.typeLine = pendingCurveType; pendingCurveType = null; }
 			}
 			if (section === 'PATTERNS' || section === 'CONTROLS') {
-				if (pendingLineCmts.length) { toks.lineCmts = pendingLineCmts; }
-				pendingLineCmts = [];
+				if (pendingRaw.some(function (l) { return l.trim(); })) { toks.preLines = pendingRaw; }
+				pendingRaw = [];
 			}
 			if (!rawSections[section]) { rawSections[section] = []; }
 			rawSections[section].push(toks);
 			seen[section] = (seen[section] || 0) + 1;
+		}
+		flushFoot();
+		// The blank lines at either END of [RULES] are layout between sections, not separators
+		// inside it; the exporter writes its own. Kept, they would grow by one on every round trip.
+		if (carried.RULES) {
+			while (carried.RULES.length && !carried.RULES[0].trim()) { carried.RULES.shift(); }
+			while (carried.RULES.length && !carried.RULES[carried.RULES.length - 1].trim()) { carried.RULES.pop(); }
+			if (!carried.RULES.length) { delete carried.RULES; }
 		}
 
 		// A file with no [JUNCTIONS] and no [PIPES] is not a network, whatever else it holds. This
@@ -717,6 +733,9 @@
 		}
 
 		var patterns = [], patternIndex = {}, times = null, controls = [];
+		// Comment lines in [PATTERNS] and [CONTROLS] that no pattern or control can keep, by
+		// section. Reported at the end as one `comments` difference each.
+		var lostComments = { PATTERNS: [], CONTROLS: [] };
 		rows = rawSections.PATTERNS || [];
 		for (i = 0; i < rows.length; i++) {
 			r = rows[i];
@@ -729,15 +748,30 @@
 				pat = { id: r[0], multipliers: [] };
 				patterns.push(pat); patternIndex[r[0]] = pat;
 			}
-			// **THE DESCRIPTION IS THE LAST WHOLE-LINE COMMENT ABOVE A RUN'S FIRST ROW**, exactly as
-			// EPANET's toolkit reads it (input2.c overwrites `LineComment` on each comment line;
-			// input3.c patterndata() takes it only when the row starts a run and the pattern has
-			// none yet). So in Net3, `;ID Multipliers` above `;General Default Demand Pattern` is a
-			// column heading and the second line is pattern 1's description. A bare `;` is none.
-			if (r.lineCmts && !pat.note && (i === 0 || rows[i - 1][0] !== r[0])) {
-				var pnote = EngCalcs.lpnDescText(r.lineCmts[r.lineCmts.length - 1].text);
-				if (pnote) { pat.note = pnote; }
+			// **THE DESCRIPTION IS THE LAST WHOLE-LINE COMMENT DIRECTLY ABOVE A RUN'S FIRST ROW**,
+			// exactly as EPANET's toolkit reads it (input2.c overwrites `LineComment` on each comment
+			// line and a blank line empties it; input3.c patterndata() takes it only when the row
+			// starts a run and the pattern has none yet). So in Net3, `;ID Multipliers` above
+			// `;General Default Demand Pattern` is a column heading and the second line is pattern
+			// 1's description. Every OTHER comment above a pattern's first row -- that heading, or a
+			// block a blank line separates -- is kept as `head` and written back where it stood.
+			// A comment anywhere a pattern cannot keep it is REPORTED, never dropped in silence.
+			var runStart = (i === 0 || rows[i - 1][0] !== r[0]);
+			if (r.preLines) {
+				var psp = EngCalcs.lpnInpSplitPre(r.preLines, true),
+					pnote = psp.desc.length ? EngCalcs.lpnDescText(psp.desc[0].replace(/^\s*;/, '')) : '';
+				if (!pnote) { psp.head = psp.head.concat(psp.desc); }
+				if (runStart && !pat.note && pnote) { pat.note = pnote; pnote = ''; }
+				if (runStart && pat.multipliers.length === 0 && EngCalcs.lpnInpHasComment(psp.head)) {
+					pat.head = psp.head;
+				} else {
+					lostComments.PATTERNS = lostComments.PATTERNS.concat(psp.head);
+				}
+				if (pnote) { lostComments.PATTERNS.push(psp.desc[0]); }
 			}
+			// A trailing comment on a pattern row means nothing to EPANET (input2.c replaces it
+			// with the line comment in [PATTERNS]) and has nowhere to go in six-per-line rows.
+			if (EngCalcs.lpnDescText(r.cmt)) { lostComments.PATTERNS.push(';' + r.cmt); }
 			for (var pj = 1; pj < r.length; pj++) {
 				var pv = parseFloat(r[pj]);
 				if (!isFinite(pv)) { continue; }
@@ -807,20 +841,30 @@
 		// `src` rule. With no comment above, a trailing `;comment` on the control's own line is its
 		// description and goes back on that line (`noteAt: 'end'`); with both, the trailing one is
 		// kept as `tail` and written back where it was.
+		//
+		// **ONLY THE COMMENTS DIRECTLY ABOVE IT.** A comment block a blank line separates from the
+		// control is a heading over what follows: it is kept as `head`, verbatim and blank lines
+		// included, and written back above the control -- never read as its description.
 		function readControlNote(ctl, r) {
-			var above = r.lineCmts || [], texts = [], note, trail = EngCalcs.lpnDescText(r.cmt);
-			above.forEach(function (c) { var t = EngCalcs.lpnDescText(c.text); if (t) { texts.push(t); } });
+			var sp = EngCalcs.lpnInpSplitPre(r.preLines, false), texts = [], note,
+				trail = EngCalcs.lpnDescText(r.cmt);
+			sp.desc.forEach(function (l) { var t = EngCalcs.lpnDescText(l.replace(/^\s*;/, '')); if (t) { texts.push(t); } });
 			note = texts.join(' ');
+			if (!note) { sp.head = sp.head.concat(sp.desc); sp.desc = []; }
+			if (EngCalcs.lpnInpHasComment(sp.head)) { ctl.head = sp.head; }
 			if (note) {
 				ctl.note = note;
-				if (above.length !== 1 || above[0].raw !== ';' + note) {
-					ctl.noteSrc = above.map(function (c) { return c.raw; });
-				}
+				if (sp.desc.length !== 1 || sp.desc[0] !== ';' + note) { ctl.noteSrc = sp.desc; }
 				if (trail) { ctl.tail = trail; }
 			} else if (trail) {
 				ctl.note = trail;
 				ctl.noteAt = 'end';
 			}
+		}
+		// A control that is not kept takes its comments with it, and the report says so.
+		function loseCtlPre(r) {
+			lostComments.CONTROLS = lostComments.CONTROLS.concat(r.preLines || []);
+			if (EngCalcs.lpnDescText(r.cmt)) { lostComments.CONTROLS.push(';' + r.cmt); }
 		}
 
 		// ---- nodes ----
@@ -1322,9 +1366,9 @@
 		if (haveClock) {
 			for (i = 0; i < rows.length; i++) {
 				var parsedCtl = EngCalcs.lpnParseControl(rows[i]);
-				if (!parsedCtl.ok) { drop('controls', [], parsedCtl.raw + ' (' + parsedCtl.error + ')'); continue; }
+				if (!parsedCtl.ok) { drop('controls', [], parsedCtl.raw + ' (' + parsedCtl.error + ')'); loseCtlPre(rows[i]); continue; }
 				var ctl = parsedCtl.control, cLink = linkIndex[ctl.link];
-				if (!cLink) { drop('controls', [ctl.link], ctl.raw + ' (link not in file)', 'link'); continue; }
+				if (!cLink) { drop('controls', [ctl.link], ctl.raw + ' (link not in file)', 'link'); loseCtlPre(rows[i]); continue; }
 				if (ctl.action.setting !== undefined) {
 					ctl.action.settingUnit = cLink.type === 'valve'
 						? valveSettingUnit((cLink.valveType || '').toUpperCase())
@@ -1332,7 +1376,7 @@
 				}
 				if (ctl.condition.kind === 'node') {
 					var cNode = nodeIndex[ctl.condition.node];
-					if (!cNode) { drop('controls', [ctl.condition.node], ctl.raw + ' (node not in file)', 'node'); continue; }
+					if (!cNode) { drop('controls', [ctl.condition.node], ctl.raw + ' (node not in file)', 'node'); loseCtlPre(rows[i]); continue; }
 					// 'head' and 'press' are keys of `scale` below, so a caller wanting SI
 					// multiplies by scale[unit] and never re-derives which is which.
 					ctl.condition.unit = cNode.type === 'junction' ? 'press' : 'head';
@@ -1341,6 +1385,20 @@
 				controls.push(ctl);
 			}
 		}
+		// **WHAT FOLLOWS THE LAST PATTERN OR CONTROL** stays with it as `foot`, written back after
+		// it; with nothing to stay with, it is reported.
+		[['PATTERNS', patterns], ['CONTROLS', controls]].forEach(function (pair) {
+			var foot = sectionFoot[pair[0]], last = pair[1][pair[1].length - 1];
+			if (!foot) { return; }
+			while (foot.length && !foot[0].trim()) { foot.shift(); }
+			while (foot.length && !foot[foot.length - 1].trim()) { foot.pop(); }
+			if (last && (pair[0] === 'PATTERNS' || haveClock)) { last.foot = foot; }
+			else { lostComments[pair[0]] = lostComments[pair[0]].concat(foot); }
+		});
+		['PATTERNS', 'CONTROLS'].forEach(function (sec) {
+			var lost = lostComments[sec].filter(function (l) { return EngCalcs.lpnDescText(String(l).replace(/^\s*;/, '')); });
+			if (lost.length) { drop('comments', lost.map(function (l) { return l.trim(); }), sec); }
+		});
 
 		// ---- geometry ----
 		rows = rawSections.COORDINATES || [];
@@ -2188,6 +2246,28 @@
 	 * Trimmed, because the reader trims: a leading space could not survive a round trip either, and
 	 * storing what the file cannot hold is how a field comes to disagree with its own document.
 	 */
+	/**
+	 * The comment and blank lines a file states above a row, split into what DESCRIBES the row and
+	 * what is a HEADING over it. The description is the run of comment lines directly above it, with
+	 * no blank line between; `onlyLast` keeps just the last of that run, EPANET's own reading for a
+	 * pattern (input2.c `LineComment`). Everything above it, blank lines included, is the heading,
+	 * kept as the file's own lines. Leading blank lines are layout and are not kept.
+	 */
+	EngCalcs.lpnInpSplitPre = function (lines, onlyLast) {
+		var L = (lines || []).map(String), k;
+		while (L.length && !L[0].trim()) { L.shift(); }
+		k = L.length;
+		while (k > 0 && L[k - 1].trim()) { k--; }
+		var out = { head: L.slice(0, k), desc: L.slice(k) };
+		if (onlyLast && out.desc.length > 1) {
+			out.head = out.head.concat(out.desc.slice(0, -1));
+			out.desc = out.desc.slice(-1);
+		}
+		return out;
+	};
+	EngCalcs.lpnInpHasComment = function (lines) {
+		return (lines || []).some(function (l) { return /^\s*;/.test(String(l)); });
+	};
 	EngCalcs.lpnDescText = function (v) {
 		return ((v === undefined || v === null) ? '' : String(v)).replace(/[\r\n]+/g, ' ').trim();
 	};
@@ -3045,9 +3125,16 @@
 		var patternRows = [], controlRows = [], timeRows = [];
 		(doc.patterns || []).forEach(function (pat) {
 			var mults = (pat.multipliers || []), k, line, note = EngCalcs.lpnDescText(pat.note);
+			// A heading the file stated above it, its own lines (see the reader).
+			if (Array.isArray(pat.head)) { pat.head.forEach(function (l) { patternRows.push(String(l)); }); }
 			// The description on the line above the first row, as EPANET's own writer puts it
-			// (inpfile.c: `\n;%s` before the rows) and as its reader takes it back.
-			if (note && mults.length) { patternRows.push(';' + note); }
+			// (inpfile.c: `\n;%s` before the rows) and as its reader takes it back. **EPANET WRITES
+			// IT EVEN FOR A PATTERN WITH NO MULTIPLIERS** -- the `if (Comment)` stands before the
+			// loop over the factors -- so this does too. A pattern with no rows cannot be stated in
+			// an .inp at all, so a blank line follows it: both EPANET's reader (a blank line
+			// empties `LineComment`, input2.c) and this one then keep it off the next pattern.
+			if (note) { patternRows.push(';' + note); }
+			if (note && !mults.length) { patternRows.push(''); }
 			// SIX PER LINE, which is EPANET's own layout and the one Net3 is written in. The id
 			// repeats on each line and the values concatenate; that is the format, not a nicety.
 			for (k = 0; k < mults.length; k += 6) {
@@ -3057,6 +3144,7 @@
 				}
 				patternRows.push(row(line));
 			}
+			if (Array.isArray(pat.foot)) { pat.foot.forEach(function (l) { patternRows.push(String(l)); }); }
 		});
 		// **A CONTROL GOES OUT AS THE LINE IT CAME IN AS.** Nothing on this page edits one yet, so
 		// its own text is exactly right and composing a sentence from the record could only differ
@@ -3070,6 +3158,8 @@
 			if (!ctl || !ctl.raw) { return; }
 			note = EngCalcs.lpnDescText(ctl.note);
 			line = ctl.raw;
+			// A heading the file stated above it, blank line and all (readControlNote()).
+			if (Array.isArray(ctl.head)) { ctl.head.forEach(function (l) { controlRows.push(String(l)); }); }
 			if (note && ctl.noteAt === 'end') {
 				line += ' ;' + note;
 			} else if (note) {
@@ -3084,6 +3174,7 @@
 			}
 			if (ctl.tail && ctl.noteAt !== 'end') { line += ' ;' + EngCalcs.lpnDescText(ctl.tail); }
 			controlRows.push(line);
+			if (Array.isArray(ctl.foot)) { ctl.foot.forEach(function (l) { controlRows.push(String(l)); }); }
 		});
 		// **THE OPEN SCENARIO'S OWN RUN TIME AND TIME STEP** (Task 755), when it states them, on the
 		// rule the demand multiplier follows: the export writes the scenario the user is looking at.

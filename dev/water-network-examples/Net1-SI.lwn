@@ -485,6 +485,9 @@
 				0.8
 			],
 			"note": "Demand Pattern",
+			"head": [
+				";ID              \tMultipliers"
+			],
 			"tok": {
 				"m0": "1.0",
 				"m6": "1.0"
