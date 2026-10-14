@@ -4345,3 +4345,11 @@ also read the live document and the status bar before calling it a defect.
 - OBSERVED (branch CSS vs merge-base CSS injected into same page): button-base changes are nearly invisible at 1400 and 390; tool corner radius 4 to 5 px, Tab focus ring is now blue and rounded instead of the browser's black rectangle; transport and menus unchanged. Dialog buttons not touched by selectors.
 - OBSERVED: Net1 SI opens with L/s, m, mm in Tables, footer and labels; pump curve 94.635 L/s at 76.2 m; rule thresholds 40.538/36.576 m, controls 33.528/42.672 m; tank rises 36.576 to 40.955 m then pump closes at step 10. Scale bar reads 5 m on a 21 m drawing whose pipes are 1609 m (same as master Net1 in feet).
 - SPECULATION: "two rule-based controls" undercounts: the file has 2 simple controls and 2 rules.
+
+## 2026-10-14 feat/text-inplace @ 71e59287 (Perry)
+- OBSERVED (real Chromium, probes in session scratchpad): builder harness 24/24 and vertex-mode harness pass. Editor overlays left/right/centre/top/bottom aligned, 45/-60 degree, 2x size, anchored (both sides) and 1000 px-wide Text within ~10 px of the words; its font is 12 px against 11 px map text (min 12), so it is about 9% larger than the words it covers.
+- OBSERVED: no leak. Digits, Delete, Backspace, +,-,f, Ctrl+Z/Y inside the box never reach the map (Ctrl+Z is the textarea's own undo); Esc closes only the box, an open Properties box stays. Wheel, drag-pan and toolbar Undo commit first. Nothing new in localStorage/cookies.
+- OBSERVED: Text tool: every commit click places another "Text" (3 clicks = 3 Texts); Esc closes the editor but the tool stays armed, second Esc leaves; the last placeholder is left on the map when leaving via the toolbar. Esc on a fresh Text keeps the placeholder.
+- OBSERVED: empty commit leaves an invisible Text (0x0 box, stored ""), not deletable by double-click; same as Properties on master but now easy to reach.
+- OBSERVED: window resize while editing leaves the box where it was while the words move. Touch emulation: double-tap (90 and 250 ms) opens the editor, single tap opens Properties, editor survives compat mouse events. NOT CHECKED: real soft keyboard, real double-tap zoom.
+- CITED: removed gesture came from 9e85a004 (2026-07-30, Task 146, generic "double-click a label to send it back"); no Tom quote asks for it specifically for Text.
