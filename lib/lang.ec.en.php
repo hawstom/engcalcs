@@ -4782,4 +4782,5 @@ $ec_lang['lpn_snip_tip_pen']='Pen';
 $ec_lang['lpn_snip_tip_eraser']='Eraser: click a stroke to remove it (E)';
 $ec_lang['lpn_snip_tip_undo']='Undo (Ctrl+Z)';
 $ec_lang['lpn_snip_tip_redo']='Redo (Ctrl+Y)';
+$ec_lang['lpn_snip_tip_copy']='Copy (Ctrl+C)';
 $ec_lang['lpn_screenshot_scale_tip']='The picture\'s size as a multiple of the area on the screen. A larger one is sharper and makes a bigger file.';

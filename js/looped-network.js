@@ -47174,7 +47174,7 @@ var EngCalcs = EngCalcs || {};
 			var undoBtn = button('lpn_snip_undo', 'undo', pc.lpn_snip_tip_undo || 'Undo (Ctrl+Z)', undo);
 			var redoBtn = button('lpn_snip_redo', 'redo', pc.lpn_snip_tip_redo || 'Redo (Ctrl+Y)', redo);
 			var blobNow = function () { return new Promise(function (res, rej) { cv.toBlob(function (b) { b ? res(b) : rej(new Error('toBlob')); }, 'image/png'); }); };
-			var copyBtn = button('lpn_snip_copy', 'copy', pc.points_data_copy || 'Copy', function () { copyBlob(blobNow()); });
+			var copyBtn = button('lpn_snip_copy', 'copy', pc.lpn_snip_tip_copy || 'Copy (Ctrl+C)', function () { copyBlob(blobNow()); });
 			button('lpn_snip_save', 'save', pc.lpn_file_save || 'Save', function () {
 				blobNow().then(snipDownload);   // one click, one download
 			});
@@ -47218,6 +47218,14 @@ var EngCalcs = EngCalcs || {};
 				if (k === 'Escape') { e.preventDefault(); if (eraser) { setEraser(false); } else if (!strokes.length) { closeSnipEditor(); } }
 				else if (mod && !e.shiftKey && (k === 'z' || k === 'Z')) { e.preventDefault(); undo(); }
 				else if (mod && (k === 'y' || k === 'Y' || (e.shiftKey && (k === 'z' || k === 'Z')))) { e.preventDefault(); redo(); }
+				// Ctrl+C (Cmd+C) copies the picture, as the Copy button does (Tom, 2026-10-14). It is never
+				// taken from a text field or from a selection of text the visitor made.
+				else if (mod && !e.shiftKey && !e.altKey && (k === 'c' || k === 'C')) {
+					var tg = e.target, sel = window.getSelection && String(window.getSelection());
+					if (tg && (/^(input|textarea|select)$/i.test(tg.tagName) || tg.isContentEditable)) { return; }
+					if (sel) { return; }
+					e.preventDefault(); copyBlob(blobNow());
+				}
 				else if (!mod && !e.altKey && (k === 'e' || k === 'E')) { e.preventDefault(); setEraser(!eraser); }
 			} };
 			document.addEventListener('keydown', snipEditor.onKey, true);
