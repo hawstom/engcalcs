@@ -6,6 +6,10 @@
 			"reason": "map symbology: the drawing's own ink, deliberately never themed (dev/theming-plan.md, Phase 2)"
 		},
 		{
+			"path": "^\\.lpn-shape",
+			"reason": "map symbology: a Shape, the user's own drawn annotation, in the drawing's ink (Task 779)"
+		},
+		{
 			"path": "^\\.lpn-link-symbol-backdrop",
 			"reason": "map symbology: the drawing's own ink"
 		},

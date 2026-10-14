@@ -77,15 +77,6 @@ the block.
   4 and 5), after advice from every angle (*"Order matters... we are likely to make mistakes"*).
   Stages, answers and code: `dev/scenario-alternatives.md` on `feat/bentley-interop`. Basic mode
   hides it until the Advanced UX is designed. Task 765 (Presentation) is folded in here.
-- 100|779| **Shape: a simple drawn element, point, polyline or polygon, with snapping.**
-  Tom, 2026-10-06: *"a very simple shape element type (if one point, it's a point, and if more,
-  it's a polyline, and it can close into a polygon if you let it. Either way, we call it a
-  'Shape', and we can export or import to and from points, polylines, and polygons.) and the
-  ability to snap or magnet to shape points."* Seams: DXF (Task 772), GeoJSON, survey points.
-  Tom, 2026-10-09: a one-point Shape is drawn as an ×, and the task is Next (calls page H12).
-  Tom, 2026-10-11 browser pass: an open, almost-closed polygon icon; a Shapes table to paste and copy shapes
-  (import/export), then shapefile and DXF import; *"the main presenting use case ... is to import shapes from GIS
-  or CAD to guide precise placement or map supplementation."*
 - 100|781| **Active topology first; then Change type becomes a new asset in the old one's place.**
   Tom, 2026-10-08, choosing "Active topology first": *"I never wanted what we have anyway. Now that
   I understand, I want it changed. Change type is to be make a new object at the location of the old
@@ -108,8 +99,8 @@ the block.
   it with the existing `gloss:` tag.
   **CONCEPT LAYER SHIPPED 2026-09-30** (`chore/term-concept`, `dev/term-concepts.md`): 131 glossary
   terms carry a coined `concept` id and a `definition`; a payload gives the definition as the source
-  and English as one rendering; `concept_check.php` blocks. All 131 definitions are filled (7d00bd86, 2026-10-02). Open: the four
-  new terms (label-sym-sally, label-user-tessa, label-long-dora, hydraulic-head) untranslated.
+  and English as one rendering; `concept_check.php` blocks. All 131 definitions are filled (7d00bd86, 2026-10-02). The four
+  new terms (label-sym-sally, label-user-tessa, label-long-dora, hydraulic-head) are translated in every language (checked 2026-10-14). Open: Tag and Label share one word in es, it and tr.
   **RULED 2026-09-30: Head and HGL stay split.** And on the coined ids: *"we should say something like
   label-sym-sally, label-user-tessa, label-word-gus, and label-long-dora (assuming those are
   'correct'); or we no longer need the anthro names ... This way the languages know that they all are
@@ -138,10 +129,6 @@ the block.
   Tom, 2026-10-12 (interview q03): expose override vs inherited with a single-character marker, carried
   through Properties and Settings, after Civil 3D's Override / Child override columns. Ida: a dot gutter;
   Mary: Bentley's and Civil 3D's per-row checkbox. Tom's call between them first. Journals 2026-10-12.
-- 75|788| **Translated Find guide and select/choose wording, swept across all 26 languages.**
-  Sprint 1012-delta QA (2026-10-12): about 20 languages still print English control names (Everything, equal to, AND)
-  in the Find guide's prose, which should name controls as the translated page does (code samples stay English); and
-  untouched keys may still use the menu-choice verb for the map selection (sw `lpn_pane_select_on_map`, sr). One sweep.
 - 50|789| **A way into Copy/Paste properties and the graph bubbles without a right-click.**
   Perry, 2026-10-12: both open only from the asset right-click menu, which a touch screen does not have.
 - 75|539| **Gang the neighbour labels so their leaders stop crossing.**
@@ -202,6 +189,7 @@ the block.
     parameters."* A named Run would carry the scenario, the required flow, the residual and the
     frame together, so a report says what it was a report OF.
 - 75|617| **More map view options, the opacity one having shipped.**
+  **THE CSS-FILTER STEP SHIPPED** (1233fc70, ffd4a73a, e1e05de5): Settings > Map > Basemap style, Normal/Muted/Faded/Grayscale, stored in the project; Muted is the new-project default. Next is the Mapbox Studio raster style on the existing token, which needs Tom's choice of style.
   **RETITLED BY TOM, 2026-09-18: *"Edit and retitle the task to remove 'A basemap the reader can
   tone down'. That is already provided by Settings background opacity. Focus the task on other map
   view options."*** Half of what this asked for exists; what is left is the menu of tile styles and
@@ -364,7 +352,7 @@ the block.
   - Read with `dev/label-placement-algorithms.md` section 12 and `?debug=perf`, which now prints
     `labelPass` inside `buildDom` and a label-measurement count.
 - 75|714| **Theming: colour tokens first, then a Light/Dark choice in Settings.**
-  **Phase 1b inline colours MERGED 2026-10-04** (`chore/theme-inline`): js/*.js literals on tokens or allow-listed; the check refuses new ones. Left: the button base (R-202), then dark mode.
+  **Phase 1b inline colours MERGED 2026-10-04** (`chore/theme-inline`): js/*.js literals on tokens or allow-listed; the check refuses new ones. **The button base (R-202) is on `feat/button-base`, awaiting his look**; then dark mode.
   Tom, 2026-09-24 (R-211): *"preparing for this and implementing it will force us into some
   important code discipline."* Ida's phased plan: `dev/theming-plan.md`. Phase 1 declares semantic
   colour tokens, folds the nine separate box styles onto them, and adds a check refusing a new
@@ -417,7 +405,7 @@ the block.
   Tom, 2026-10-11: *"convert Net2 and Net3 to SI and put them first in this order: Net3 SI, Net3 US, Net2 SI, Net2
   US."* Built on `feat/si-example`. Expand the gallery first, promote to the front later. KYPipe networks (CC BY-NC):
   ask the authors before shipping any.
-  Net2 (Branford), Net3 (Novato) and Net1 (`feat/si-example-more`) US and SI pairs exist; only Elm Street Center keeps a backdrop.
+  Net1, Net2 (Branford) and Net3 (Novato) US and SI pairs merged (with Tom's 10-13 rounding rule); only Elm Street Center keeps a backdrop.
 - 50|146.09| **An inset overview map: the whole project, with a box round where you are.**
   Reworked by Tom 2026-08-25, and it is a different feature from the one this ID used to hold:
   *"146.09 reworked as a key/overview map inset like many games where the entire project is depicted

@@ -359,8 +359,8 @@ console.log('\n-- flow unit leads, the way EPANET names a unit system --');
 		report(flowAt > 0, `${ex.titleKey}: the title names the flow unit`, t);
 		// In the description, the flow unit must come before the length units.
 		const dl = d.toLowerCase();
-		const flowWord = ex.system === 'si' ? 'litres per second' : 'gallons per minute';
-		const lenWord = ex.system === 'si' ? 'metres' : 'feet';
+		const flowWord = ex.system === 'si' ? 'liters per second' : 'gallons per minute';
+		const lenWord = ex.system === 'si' ? 'meters' : 'feet';
 		report(dl.indexOf(flowWord) >= 0 && dl.indexOf(flowWord) < dl.indexOf(lenWord),
 			`${ex.descKey}: flow unit is listed before the length units`);
 	});
