@@ -39487,7 +39487,7 @@ var EngCalcs = EngCalcs || {};
 			// Comment lines a pattern or a control cannot keep: between the rows of one pattern, on
 			// the end of a pattern row, or above a control that was itself left out. The ids are the
 			// comment lines themselves, which is the only name they have.
-			case 'comments': return pc.lpn_inp_drop_comments || 'These comments in the patterns or the simple controls of this file sit where this page cannot keep them, for example between the rows of one pattern, so they were not imported. Every pattern and control was imported in full; only these comment lines are missing.';
+			case 'comments': return pc.lpn_inp_drop_comments || 'These comment lines in the patterns or simple controls of this file were not imported, because this page has no place to keep them (for example, between the rows of one pattern). Every pattern and control was imported in full.';
 			case 'other-sections': return pc.lpn_inp_drop_sections || 'This file holds a section that this page does not read at all. Nothing here uses it. It is kept whole, and it is written back if you save an EPANET file.';
 			// Kept AND reported, the same pairing [RULES] has: the three lines survive the round
 			// trip, and nothing on this page acts on them.
