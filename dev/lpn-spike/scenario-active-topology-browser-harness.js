@@ -1,15 +1,16 @@
-// ACTIVE TOPOLOGY AND CHANGE TYPE, CLICKED IN A REAL CHROMIUM (Task 781). Run with:
+// ACTIVE TOPOLOGY AND MORPH, CLICKED IN A REAL CHROMIUM (Task 781). Run with:
 //   node dev/lpn-spike/scenario-active-topology-browser-harness.js
 //
 // The hydraulics, the file, undo, inheritance and the export are held headless by
 // scenario-active-topology-harness.js; this holds the real rows and buttons, on Net1:
-//   1. In scenario B, Water > Change type > Tank on junction 22 is refused in one sentence, no box.
+//   1. In scenario B, Water > Morph > Tank makes junction 22 a tank there; Ctrl+Z undoes it.
+//      (Tom's whole case is dev/lpn-spike/morph-browser-harness.js.)
 //   2. B switches 22 off in the Junctions table (Is active?): 22 and its four pipes are greyed.
 //   3. The Junctions and Pipes tables leave the inactive assets out; the cell menu's Include
 //      inactive topology brings them back, and the heading menu offers it too.
 //   4. With inactive topology included, row 22's Is active? box is cleared; selecting it makes 22
 //      active in B; Ctrl+Z undoes.
-//   5. Base: Change type makes 22 a tank in place, same ID; Ctrl+Z undoes.
+//   5. Base: Morph makes 22 a tank in place, same ID; Ctrl+Z undoes.
 // Every button is pressed with a MouseEvent of detail 1, as a person's click is.
 //
 // DO NOT PREFIX THIS WITH `flock`: it takes /tmp/engcalcs-browser.lock itself.
@@ -94,7 +95,7 @@ async function main() {
 			await settle(500);
 			return true;
 		};
-		const changeTo = async (typeKey) => a.menuClickSub(await L('lpn_change_type_menu'), await L(typeKey), 'project');
+		const changeTo = async (typeKey) => a.menuClickSub(await L('lpn_morph_menu'), await L(typeKey), 'project');
 		const press = async (label) => {
 			const hit = await page.evaluate((t) => {
 				const b = Array.from(document.querySelectorAll('#lpn_dialog_buttons button')).find((x) => x.textContent.trim() === t);
@@ -131,7 +132,7 @@ async function main() {
 		};
 		const ACTIVE = await L('lpn_field_active');
 
-		console.log('--- 1. Change type is refused in scenario B ---');
+		console.log('--- 1. Morph in scenario B ---');
 		a.answerPromptWith('B');
 		await scenarioMenu(await L('lpn_scenario_new'));
 		await page.evaluate(() => { delete window.lpnDialogAnswerer; });
@@ -139,9 +140,11 @@ async function main() {
 		await changeTo('lpn_tool_add_tank');
 		await settle(800);
 		ok('1.2 no box opens', !(await a.dialog()));
-		const said = await page.evaluate(() => (document.getElementById('lpn_map_notice') || {}).textContent || '');
-		ok('1.3 one sentence says Change type works in Base and points to Active topology', said.indexOf(await page.evaluate(() => EngCalcs.pageConfig.lpn_change_type_base_only)) >= 0, said.slice(0, 200));
-		ok('1.4 22 is still an active junction', /lpn-node-junction/.test(await nodeClass('22') || '') && !/lpn-inactive/.test(await nodeClass('22') || ''));
+		ok('1.3 22 is a tank in B', /lpn-node-tank/.test(await nodeClass('22') || ''), await nodeClass('22'));
+		await page.keyboard.press('Escape');
+		await page.keyboard.press('Control+z');
+		await settle(1200);
+		ok('1.4 Ctrl+Z: 22 is an active junction in B again', /lpn-node-junction/.test(await nodeClass('22') || '') && !/lpn-inactive/.test(await nodeClass('22') || ''), await nodeClass('22'));
 
 		console.log('\n--- 2. what a scenario does instead: switch 22 off ---');
 		await a.toolbarClick(await L('lpn_pane_toggle'));
@@ -214,13 +217,13 @@ async function main() {
 		await a.toolbarClick(await L('lpn_pane_toggle'));
 		await settle(400);
 
-		console.log('\n--- 5. Base: Change type is made in place ---');
+		console.log('\n--- 5. Base: Morph is made in place ---');
 		await scenarioMenu(await L('lpn_scenario_base'));
 		ok('5.1 in Base 22 is an active junction', /lpn-node-junction/.test(await nodeClass('22') || '') && !/lpn-inactive/.test(await nodeClass('22') || ''));
 		await clickNode('22');
 		await changeTo('lpn_tool_add_tank');
 		await settle(800);
-		if (await a.dialog()) { await press(await L('lpn_change_type_ok')); }
+		if (await a.dialog()) { await press(await L('lpn_morph_ok')); }
 		await settle(1200);
 		ok('5.2 22 is now a tank under the same ID', /lpn-node-tank/.test(await nodeClass('22') || '') && await selectedNode() === '22', await nodeClass('22'));
 		await page.keyboard.press('Control+z');

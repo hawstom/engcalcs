@@ -252,7 +252,10 @@ async function run(mutate, quiet) {
 	ok('7.3 undo: the tank again', L.nodeById('22').type === 'tank');
 	// Morph back to Base's own type removes the override rather than stating "junction".
 	morph([['node', '22']], 'junction');
-	ok('7.4 Morph back to junction in the scenario removes the type override', L.nodeById('22').type === 'junction' && !L.hasOverride(L.nodeById('22'), 'type'));
+	ok('7.4 Morph back to junction in the scenario removes the type override, and the tank\'s values with it',
+		L.nodeById('22').type === 'junction' && !L.hasOverride(L.nodeById('22'), 'type') &&
+		['level', 'minLevel', 'maxLevel', 'tankDiameter'].every((p) => !L.hasOverride(L.nodeById('22'), p)) && !L.resolvedOverrides(T)['n:22'],
+		JSON.stringify(L.resolvedOverrides(T)['n:22']));
 	L.undo();
 	ok('7.5 undo: the tank again', L.nodeById('22').type === 'tank');
 	// The scenario picks Base's Active topology alternative (the Scenarios table): the morph is not

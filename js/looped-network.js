@@ -38231,6 +38231,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		clearOverride(el, 'type');
 		clearOverride(el, 'valveType');
 		inherited = morphTypeIn(el, scn);
+		morphDropStrays(el, morphDesc(el, to, CHANGE_TYPE_NEW_VALVE));
 		if (to === inherited) { return; }
 		setOverride(el, 'type', to);
 		// A valve is born a throttle (TCV), as one drawn or changed in Base is.
@@ -38257,6 +38258,20 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				if (!(typeof top === 'number' && top >= carry.value)) { setOverride(el, 'maxLevel', carry.value); }
 			}
 		}
+	}
+	/**
+	 * **WHAT NO TYPE OF THE ASSET READS GOES FROM THE SCENARIO.** The scenario's own overrides of a
+	 * value that neither the type it is morphed to (`dest`) nor Base's type has -- a tank's depths,
+	 * once the scenario morphs it back to Base's junction -- are cleared, as Base clears what only an
+	 * old type had. An override of a value Base's type has (the junction's demand) is kept: the asset
+	 * reads it again the moment it is that type here.
+	 */
+	function morphDropStrays(el, dest) {
+		var baseDesc = morphDesc(el, morphBaseOf(el, 'type'), morphBaseOf(el, 'valveType'));
+		morphSpecsOf(el).forEach(function (spec) {
+			if (spec.custom || morphSpecHas(spec, dest) || morphSpecHas(spec, baseDesc)) { return; }
+			spec.props.forEach(function (p) { if (hasOverride(el, p)) { clearOverride(el, p); } });
+		});
 	}
 	/**
 	 * **THE COMMAND IN A SCENARIO.** Every selected asset of the right kind becomes `to` in this
@@ -38358,7 +38373,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		ovmGutter(fields, {
 			el: el, props: ['type'], on: !inBaseScenario() && hasOverride(el, 'type'), cats: ['topology'],
 			set: function () { setOverride(el, 'type', el.type); if (el.type === 'valve') { setOverride(el, 'valveType', el.valveType); } },
-			clear: function () { clearOverride(el, 'type'); clearOverride(el, 'valveType'); buildDom(); },
+			clear: function () {
+				clearOverride(el, 'type'); clearOverride(el, 'valveType');
+				morphDropStrays(el, morphDesc(el, morphTypeIn(el, activeScenario()), morphBaseOf(el, 'valveType')));
+				buildDom();
+			},
 			line: function () { return inheritedLine(function () { return names[el.type] || el.type; }); }
 		});
 	}

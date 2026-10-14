@@ -1,4 +1,4 @@
-// Headless check of ACTIVE TOPOLOGY and of Change type (Base only, in place; refused in a scenario) (Task 781). Run with:
+// Headless check of ACTIVE TOPOLOGY and of Morph in Base (in place) (Task 781). Run with:
 //   node dev/lpn-spike/scenario-active-topology-harness.js
 //
 // Tom, 2026-10-08, choosing "Active topology first": *"I never wanted what we have anyway. Now that
@@ -12,13 +12,13 @@
 //      hand-built Net1 with that pipe.
 //   2. A pipe deactivated in scenario D: D's heads equal a hand-built Net1 without it; the pipe is
 //      drawn greyed in D and in a node's absence its links are greyed too.
-//   3. Change type: in Base junction 22 becomes a tank in place (ID kept), equal to a hand-built
-//      Net1; in scenario B it is refused in one sentence, nothing changes; B switches pipe 21 off.
+//   3. Morph: in Base junction 22 becomes a tank in place (ID kept), equal to a hand-built Net1;
+//      B switches pipe 21 off. Morph in a scenario is dev/lpn-spike/morph-harness.js.
 //   4. Inheritance: C, a child of B, has B's topology and B's heads.
 //   5. Save and reopen; the .inp export of each scenario, reopened and solved.
 //   6. Undo and redo of the Base change.
-//   7. A link: pipe 10 -> valve refused in V, in place in Base.
-//   8. A file a type override was saved in opens with it dropped.
+//   7. A link: pipe 10 -> valve in place in Base.
+//   8. A file holding a type override opens with it read (Morph), Base untouched.
 //   9. Live mutations: each must turn this harness red.
 //
 // Copyright 2009 Thomas Gail Haws
@@ -198,7 +198,7 @@ async function run(mutate, quiet) {
 	base();
 	ok('2.8 in Base 111 is live and not greyed', L.linkLive(L.linkById('111')) && !/lpn-inactive/.test(L.linkClass('111') || ''));
 
-	say('\n--- 3. Change type works in Base only: in place there, refused in a scenario ---');
+	say('\n--- 3. Morph in Base: in place ---');
 	base();
 	const before0 = snap();
 	let q = change('node', '22', 'tank', undefined, true);
@@ -215,13 +215,6 @@ async function run(mutate, quiet) {
 	ok('3.5 one undo puts Base back byte for byte', snap() === before0 && L.nodeById('22').type === 'junction');
 	const B = L.createScenario('B');
 	L.switchScenario(B.id);
-	const before = snap();
-	q = change('node', '22', 'tank', undefined, true);
-	ok('3.6 in B, Change type is refused: no box, nothing changed, 22 still a junction', q.length === 0 && snap() === before && L.nodeById('22').type === 'junction', JSON.stringify(q.map((r) => r.kind)));
-	const said = L.lastNotice();
-	ok('3.7 ...one sentence says it works in Base and points to Active topology', said === PC.lpn_change_type_base_only && /Base/.test(said) && /Active topology/.test(said) && said.split('. ').length === 2, said);
-	q = change('link', '10', 'valve', undefined, true);
-	ok('3.8 a link is refused the same way', q.length === 0 && snap() === before && L.linkById('10').type === 'pipe');
 	// What a scenario does instead: switch an asset off. B has no pipe 21.
 	L.setProp(L.linkById('21'), 'active', false);
 	ok('3.9 B switches pipe 21 off in Active topology', !L.isActive(L.linkById('21')) && L.isActive(L.linkById('22')));
@@ -279,14 +272,8 @@ async function run(mutate, quiet) {
 	ok('6.2 redo brings the change back byte for byte', snap() === after && L.nodeById('22').type === 'tank');
 	L.undo();
 
-	say('\n--- 7. a link: pipe 10 -> valve is refused in V, in place in Base ---');
+	say('\n--- 7. a link: pipe 10 -> valve in place in Base ---');
 	{
-		base();
-		const V = L.createScenario('V');
-		L.switchScenario(V.id);
-		const pre7 = snap();
-		q = change('link', '10', 'valve', undefined, true);
-		ok('7.1 refused in V: no box, nothing changed', q.length === 0 && snap() === pre7 && L.linkById('10').type === 'pipe');
 		base();
 		change('link', '10', 'valve', undefined, true);
 		const v = L.linkById('10');
@@ -298,7 +285,7 @@ async function run(mutate, quiet) {
 		ok('7.5 undo restores the pipe and Base heads', L.linkById('10').type === 'pipe' && worst(base0.n, nativeHeads(L)) < 1e-6);
 	}
 
-	say('\n--- 8. a file holding a type override opens with it dropped ---');
+	say('\n--- 8. a file holding a type override opens with it read (Morph) ---');
 	{
 		const f = JSON.parse(fileL);
 		const sb = f.scenarios.filter((s) => s.name === 'B')[0];
@@ -306,9 +293,9 @@ async function run(mutate, quiet) {
 		const M = page();
 		M.importProject(f);
 		const ov = (M.getScenarios().filter((s) => s.name === 'B')[0].overrides || {})['n:12'] || {};
-		ok('8.1 the type and every value only a tank has are gone; the junction\'s own demand override stays',
-			JSON.stringify(ov) === JSON.stringify({ demand: 75 }), JSON.stringify(ov));
-		ok('8.2 12 is a junction in B', M.nodeById('12').type === 'junction');
+		ok('8.1 the override is kept whole', JSON.stringify(ov) === JSON.stringify({ type: 'tank', level: 10, maxLevel: 20, minLevel: 0, tankDiameter: 30, demand: 75 }), JSON.stringify(ov));
+		ok('8.2 12 is a tank in B, and a junction in Base', M.nodeById('12').type === 'tank' &&
+			(M.switchScenario(M.baseScenario().id), M.nodeById('12').type === 'junction'));
 	}
 
 	say('\n--- 10. Perry\'s case: a control and a rule naming what B replaces, and a customer on 22 ---');
@@ -361,14 +348,13 @@ async function run(mutate, quiet) {
 
 // **LIVE MUTATIONS: EACH MUST TURN THIS HARNESS RED** (dev/testing-notes.md).
 const MUTATIONS = [
-	['Change type is allowed outside Base', (src) => src.replace(
-		"if (!inBaseScenario()) { setNotice(", "if (false) { setNotice(")],
+	['Morph in Base is not made in place', (src) => src.replace(
+		"\t\tchangeSelectedTypeIn(to);\n\t}", "\t\tmorphInScenario(to);\n\t}")],
 	['a link whose end is inactive is drawn active', (src) => src.replace(
 		"off = !linkLive(el); ov = hasDisplayedOverride(el);", "off = !isActive(el); ov = hasDisplayedOverride(el);")],
 	['the solve keeps a link whose end is inactive', (src) => src.replace(
 		"\t\tvar links = doc.links.filter(function (l) {\n\t\t\treturn isActive(l) && live[l.from] && live[l.to];",
 		"\t\tvar links = doc.links.filter(function (l) {\n\t\t\treturn isActive(l);")],
-	['a type override is still read on open', (src) => src.replace("\t\tdropTypeOverrides();\n", "")],
 	['a control naming an inactive asset reaches the engine', (src) => src.replace("\t\tdropInactiveControls(model);\n", "")],
 	['a rule naming an inactive asset reaches the engine', (src) => src.replace("\t\t\tif (off) { inactive.push(b.name); return; }", "")]
 ];
