@@ -82,6 +82,10 @@ the block.
   a tank in that scenario without having to delete and reconstitute the pipes connecting to it ...
   changing element type never creates an override. I think we need to change that."* He named it
   *"Morph"*, with Transform as the translatable synonym. Reverses the 2026-10-10 Base-only decision.
+  *Manual:* Select the assets, then choose Water > Morph and a type. A node becomes a junction,
+  reservoir or tank; a link a pipe, pump or valve. Each keeps its ID, location and connections. In a
+  scenario the new type is that scenario's override, marked with a dot on the Type row; click the dot
+  to change back. Built on `feat/morph` (carries `feat/bentley-interop`); Perry reviewed it.
   **As the User Manual will say it:** Morph changes a node to another node type, or a link to another
   link type, and keeps its ID, its location and every connection. In Base it is an ordinary edit. In
   any other scenario it is an override, held in that scenario's alternative and inherited by its
@@ -213,7 +217,7 @@ the block.
 - 100|789| **Long press opens the asset menu on a touch screen.**
   Perry, 2026-10-12: Copy/Paste properties and the graph bubbles open only from the asset right-click
   menu. Tom, 2026-10-14: *"Isn't long press the standard alias for right-click on a touch screen?
-  Promote this to 100 and resolve promptly."* Building on `feat/long-press`, cut from `feat/bentley-interop`.
+  Promote this to 100 and resolve promptly."* Built; merged into `feat/bentley-interop`, closes when it lands.
 - 100|791| **Text halos twice as wide, with a Map appearance setting.**
   Tom, 2026-10-14: *"our text halos need to be bigger and maybe available as a setting under Map
   appearance. Can we double them?"* Building on `feat/text-halo`.
@@ -225,7 +229,8 @@ the block.
   Tom, 2026-10-14: *"please make Ctrl+C copy the screenshot to the clipboard."* Building on `feat/screenshot-copy`.
 - 100|794| **Edit a Text in place on the map.**
   Tom, 2026-10-14: *"It would be really nice for Text to be editable in place instead of only in the
-  properties box."* Double-click opens an editor over the Text. Building on `feat/text-inplace`.
+  properties box."* Double-click opens an editor over the Text; right-click a Text offers Edit text and
+  Reset position. Built; merged into `feat/bentley-interop` (Tom: *"if that's tidy"*), closes when it lands.
 - 100|795| **Tank depth in the time series graphs.**
   Tom, 2026-10-14: *"It would be really nice for the Time Series graphs for Tanks to be able to show
   depth."* (The tank depth base elevation he asked after is Task 787, closed 2026-10-12: Base
@@ -233,8 +238,10 @@ the block.
 - 100|796| **The EPANET run crashed on Tom's two-system test project.**
   Tom, 2026-10-14, on `Fotobi_US_WGS84.epp` (reservoir, pump and tank on each of two systems):
   *"EPANET solver message: memory access out of bounds"*, and "Solve did not converge" in the pump-off
-  scenarios. Also his question: can EPANET solve a system whose only source is a tank? Diagnosing on
-  `fix/epanet-oob`.
+  scenarios. Also his question: can EPANET solve a system whose only source is a tank? **Crash fixed on
+  master (889a56c2) and bentley:** controls for pumps out of the run, and an engine reused after a refusal.
+  A tank-only source is valid; a tank running dry stops the run. Open: "did not converge" goes away at
+  Accuracy 0.001 (now 1e-5), his call.
 - 75|539| **Gang the neighbour labels so their leaders stop crossing.**
   **DEMOTED TO 75 by Tom, 2026-10-11.**
   **PORTING THE BENCH TO MASTER, 2026-10-07** (Tom agreed D09: rules 1-3 as three defect branches;
