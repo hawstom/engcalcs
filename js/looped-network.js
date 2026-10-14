@@ -63484,7 +63484,8 @@ var EngCalcs = EngCalcs || {};
 	// **ENTER IS A NEW LINE, AS IN THE PROPERTIES BOX.** A Text is lines (Task 342), and the box
 	// beside it already types a newline on Enter; a second rule for the same words a few
 	// centimetres away is the thing to avoid, and a phone keyboard has no Shift+Enter to reach.
-	// Ctrl+Enter (Cmd+Enter), a press anywhere else, or Tab away commits; Esc cancels.
+	// Ctrl+Enter (Cmd+Enter), a press anywhere else, or Tab away commits; Esc cancels and keeps the
+	// words it opened with (a new Text's placeholder).
 	//
 	// **A ZOOM OR A PAN COMMITS.** Any press outside the editor commits before the map sees it, and
 	// a wheel turn does the same, so the editor is never left floating over a map that has moved.
@@ -63548,13 +63549,12 @@ var EngCalcs = EngCalcs || {};
 			if (e.key === 'Escape') { e.preventDefault(); closeTextEditor(false); }
 			else if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); closeTextEditor(true); }
 		};
+		// The press is committed and then goes on to the map untouched: in Select it selects what it
+		// lands on, and in the Text tool, a repeater like every inserter (Tom, 2026-10-07), it places
+		// the next Text and opens this editor on that one.
 		ed.onPress = function (e) {
 			if (e.target === ta) { return; }
-			var onMap = svg.contains(e.target);
 			closeTextEditor(true);
-			// In the Text tool, the press that finishes the words does not also place another Text
-			// under them; the next one does.
-			if (onMap && mode === 'add-text') { e.stopPropagation(); }
 		};
 		ed.onWheel = function () { closeTextEditor(true); };
 		window.addEventListener('keydown', ed.onKey, true);

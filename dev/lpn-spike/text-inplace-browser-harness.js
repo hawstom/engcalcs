@@ -8,8 +8,8 @@
 //   3. Esc cancels; one Undo restores the previous words; a press on the map commits;
 //   4. Properties, open on the Text, shows the new words at once;
 //   5. a rotated Text opens a rotated editor over its words, with Recalculate off;
-//   6. a new Text placed and typed in one go is ONE Undo step, and the press that finishes it
-//      places nothing;
+//   6. the Text tool repeats: the press that finishes one Text places the next; a new Text placed
+//      and typed in one go is ONE Undo step;
 //   7. the same on the Spanish page.
 //
 //   node dev/lpn-spike/text-inplace-browser-harness.js   (takes the browser lock itself)
@@ -185,10 +185,10 @@ async function main() {
 		await P.mouse.dblclick(c.x, c.y);
 		await h.settle(400);
 		ok('a double-click with Properties open still opens the editor', !!(await h.editor()), JSON.stringify(await h.editor()));
-		await P.keyboard.type('From the map');
+		await P.keyboard.type('Edited 42');
 		await P.keyboard.press('Control+Enter');
 		await h.settle(400);
-		ok('...and shows the new words with no reopen', (await h.popupText()) === 'From the map', await h.popupText());
+		ok('...and shows the new words with no reopen', (await h.popupText()) === 'Edited 42', await h.popupText());
 		await P.keyboard.press('Escape');
 
 		console.log('\n5. A rotated Text, with Recalculate off');
@@ -222,7 +222,7 @@ async function main() {
 		ok('the turned Text takes the edit with Recalculate off',
 			st[0]._text === 'Turned' && (await h.stored()).settings.autoRun === false, JSON.stringify(st));
 
-		console.log('\n6. A new Text typed in one go is one Undo step');
+		console.log('\n6. The Text tool repeats; a new Text typed in one go is one Undo step');
 		await a.toolbarClick(await a.lang('lpn_tool_add_text'));
 		await h.settle(200);
 		const spot2 = await h.canvasPoint(0.6, 0.25);
@@ -232,13 +232,21 @@ async function main() {
 		const away2 = await h.canvasPoint(0.25, 0.75);
 		await P.mouse.click(away2.x, away2.y);
 		await h.settle(400);
+		ed = await h.editor();
+		ok('the press that finishes it places the next Text, with the editor open on that one',
+			!!ed && ed.value === placeholder, JSON.stringify(ed));
+		await P.keyboard.press('Escape');
+		await h.settle(300);
 		st = await h.storedTexts();
-		ok('the press that finishes it places nothing', st.length === 2 && st[1]._text === 'Tank site', JSON.stringify(st));
+		ok('...and the finished one holds its words', st.length === 3 && st[1]._text === 'Tank site' &&
+			st[2]._text === placeholder, JSON.stringify(st));
 		await h.select();
 		await P.keyboard.press('Control+z');
 		await h.settle(500);
+		await P.keyboard.press('Control+z');
+		await h.settle(500);
 		st = await h.storedTexts();
-		ok('one Undo takes the whole new Text away', st.length === 1 && st[0]._text === 'Turned', JSON.stringify(st));
+		ok('two Undos take both new Texts away: placing and typing were one step', st.length === 1 && st[0]._text === 'Turned', JSON.stringify(st));
 		await a.close();
 
 		console.log('\n7. ?lang=es');
