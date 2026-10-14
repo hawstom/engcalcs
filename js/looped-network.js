@@ -12577,20 +12577,6 @@ var EngCalcs = EngCalcs || {};
 		repositionMultilineText(le.text, px, py);
 		applyTextLabelRotation(lb, le, px, py);
 	}
-	// Double-click-to-reset for a Text label -- only meaningful when anchored, where lb.x/lb.y is an
-	// offset from its node and "home" is DEFAULT_LABEL_OFFSET. A free-floating Text's lb.x/lb.y ARE
-	// its absolute position, so there is no default to reset to and this is a no-op.
-	function resetTextLabelHome(id) {
-		var lb = labelById(id);
-		if (!lb || !textIsAnchored(lb)) { return; }
-		var home = defaultLabelOffset();
-		if (lb.x === home.x && lb.y === home.y) { return; }
-		saveUndoSnapshot();
-		lb.x = home.x; lb.y = home.y;
-		labelEls[id].side = 'right';
-		updateLabelGeometry(id);
-		scheduleSolve();
-	}
 	function labelById(id) { return byId('label', id); }
 	// A node/link data label's visible glyphs live in <tspan> children (setMultilineText()) -- a
 	// hit-test (e.target on pointerdown, or elementFromPoint() on click/tap) lands on the tspan
@@ -49523,7 +49509,11 @@ var EngCalcs = EngCalcs || {};
 			// LABEL_LEADER_THRESHOLD) disappears along with it.
 			if (t.dataset.nodelbl !== undefined) { resetNodeLabelHome(t.dataset.nodelbl); }
 			else if (t.dataset.linklbl !== undefined) { resetLinkLabelHome(t.dataset.linklbl); }
-			else if (t.dataset.lbl !== undefined) { resetTextLabelHome(t.dataset.lbl); }
+			// **A DOUBLE-CLICK ON A TEXT EDITS ITS WORDS IN PLACE** (Tom, 2026-10-14), in Select. It
+			// used to send an attached Text back to its default spot beside its asset; editing is
+			// what a double-click on words means everywhere else, and the drag that moved it still
+			// moves it back.
+			else if (t.dataset.lbl !== undefined) { if (mode === 'select') { openTextEditor(t.dataset.lbl, false); } }
 			// **THE DOUBLE-CLICK NO LONGER BENDS A PIPE** (Task 567). It was the accidental edit
 			// path: in `select` mode -- the mode a person is in while doing nothing but reading --
 			// the browser's own dblclick reshaped somebody else's model, and it is easy to reach by
@@ -49829,8 +49819,12 @@ var EngCalcs = EngCalcs || {};
 				// every existing drawing's behaviour exactly as it was.
 				var nearLink = nearNode ? null : nearestLinkNearScreen(e.clientX, e.clientY, reachPx(e));
 				logLpnFirstAction('element');
-				addText(w.x, w.y, nearNode ? nearNode.id : null,
+				var placed = addText(w.x, w.y, nearNode ? nearNode.id : null,
 					nearLink ? { link: nearLink.link.id, t: nearLink.t } : null);
+				// **AND ITS WORDS ARE TYPED WHERE IT STANDS**: the placeholder opens selected in the
+				// in-place editor, so typing replaces it. Its commit adds no undo step of its own, so
+				// one Undo takes the whole new Text away.
+				if (placed) { openTextEditor(placed.id, true); }
 				// **THE TOOL STAYS ARMED, LIKE EVERY OTHER INSERTER** (Tom, 2026-10-07: *"All
 				// inserters should be in repeater mode. Text is not."*). A tap on a Text already there
 				// still opens it and leaves the tool (the branch above), which is what keeps a second
@@ -63468,6 +63462,125 @@ var EngCalcs = EngCalcs || {};
 		return box;
 	}
 
+	// **THE ONE DOOR A TEXT'S WORDS ARE WRITTEN THROUGH**, shared by the Properties box and the
+	// in-place editor below, so the two can never disagree about what an edit is. The words are
+	// scenario-overridable (Task 407): setProp(), never `lb._text =`. `noSnapshot` is for the edit
+	// that finishes a Text just placed, whose placement already took the undo step.
+	function writeTextWords(lb, value, noSnapshot) {
+		if (!lb || value === effective(lb, 'text')) { return false; }
+		if (!noSnapshot) { saveUndoSnapshot(); }
+		setProp(lb, 'text', value);
+		afterPropertyEdit(lb);
+		return true;
+	}
+
+	// ---- EDITING A TEXT IN PLACE (Tom, 2026-10-14: *"It would be really nice for Text to be
+	// editable in place instead of only in the properties box."*) -------------------------------
+	//
+	// A textarea laid over the Text at its own screen size, angle and alignment, the map's words
+	// hidden underneath while it is open. Opened by a double-click on a Text in Select, and by
+	// placing a new Text with the Text tool.
+	//
+	// **ENTER IS A NEW LINE, AS IN THE PROPERTIES BOX.** A Text is lines (Task 342), and the box
+	// beside it already types a newline on Enter; a second rule for the same words a few
+	// centimetres away is the thing to avoid, and a phone keyboard has no Shift+Enter to reach.
+	// Ctrl+Enter (Cmd+Enter), a press anywhere else, or Tab away commits; Esc cancels.
+	//
+	// **A ZOOM OR A PAN COMMITS.** Any press outside the editor commits before the map sees it, and
+	// a wheel turn does the same, so the editor is never left floating over a map that has moved.
+	// It is not a hydraulic edit, so it works with Recalculate off exactly as Properties does.
+	var textEditor = null;
+	function textEditorOpen() { return !!textEditor; }
+	function openTextEditor(labelId, fresh) {
+		var lb = labelById(labelId), le = labelEls[labelId], ta, ed, pt, s, fontPx, fx, fy, ang, cs;
+		if (!lb || !le || !le.text || !svg) { return false; }
+		closeTextEditor(true);
+		pt = textLabelPoint(lb);
+		s = worldToScreen(pt.x, pt.y);
+		// The map's own pixel size, but never so small the words cannot be read while typing.
+		fontPx = Math.max(12, (settings.textSize || 11) * (lb.sizeMult || 1));
+		fx = { start: 0, middle: 0.5, end: 1 }[labelHAlign(lb)];
+		fy = { hanging: 0, middle: 0.5, bottom: 1 }[labelVAlign(lb)];
+		ang = textLabelSvgAngle(lb) || 0;
+		cs = window.getComputedStyle(le.text);
+		ta = document.createElement('textarea');
+		ta.className = 'lpn-text-inplace';
+		ta.setAttribute('aria-label', (EngCalcs.pageConfig || {}).lpn_tool_add_text || 'Text');
+		ta.setAttribute('spellcheck', 'false');
+		ta.wrap = 'off';
+		ta.value = effective(lb, 'text') || '';
+		ta.style.fontSize = fontPx + 'px';
+		ta.style.lineHeight = '1.2';
+		ta.style.fontFamily = cs.fontFamily;
+		ta.style.fontWeight = textLabelWeight(lb);
+		ta.style.textAlign = fx === 0 ? 'left' : fx === 1 ? 'right' : 'center';
+		document.body.appendChild(ta);
+		ed = textEditor = { id: labelId, ta: ta, fresh: !!fresh, opened: Date.now(),
+			ax: s.x, ay: s.y, fx: fx, fy: fy, ang: ang, done: false };
+		function fit() {
+			var w, h;
+			ta.style.width = '1px'; ta.style.height = '1px';
+			w = Math.max(ta.scrollWidth + 2, fontPx * 2);
+			h = Math.max(ta.scrollHeight, fontPx * 1.2);
+			ta.style.width = w + 'px'; ta.style.height = h + 'px';
+			ta.style.left = (ed.ax - ed.fx * w) + 'px';
+			ta.style.top = (ed.ay - ed.fy * h) + 'px';
+			ta.style.transformOrigin = (ed.fx * w) + 'px ' + (ed.fy * h) + 'px';
+			ta.style.transform = ed.ang ? 'rotate(' + ed.ang.toFixed(3) + 'deg)' : '';
+		}
+		ed.fit = fit;
+		fit();
+		le.text.style.visibility = 'hidden';
+		ta.addEventListener('input', fit);
+		ta.addEventListener('blur', function () {
+			if (textEditor !== ed) { return; }
+			// The compatibility mouse events a touch sends after the tap that opened the editor
+			// take focus away at once; that is not the user leaving.
+			if (Date.now() - ed.opened < 600) { ta.focus(); return; }
+			closeTextEditor(true);
+		});
+		ed.onKey = function (e) {
+			if (e.target !== ta) { return; }
+			// **NOTHING THE USER TYPES HERE IS A SHORTCUT.** Stopped at the window, before the
+			// page's own capture-phase listeners, so a digit does not change tools, Delete does not
+			// delete the Text, Ctrl+Z is the textarea's own undo and Esc reaches nothing else.
+			e.stopPropagation();
+			if (e.key === 'Escape') { e.preventDefault(); closeTextEditor(false); }
+			else if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); closeTextEditor(true); }
+		};
+		ed.onPress = function (e) {
+			if (e.target === ta) { return; }
+			var onMap = svg.contains(e.target);
+			closeTextEditor(true);
+			// In the Text tool, the press that finishes the words does not also place another Text
+			// under them; the next one does.
+			if (onMap && mode === 'add-text') { e.stopPropagation(); }
+		};
+		ed.onWheel = function () { closeTextEditor(true); };
+		window.addEventListener('keydown', ed.onKey, true);
+		window.addEventListener('pointerdown', ed.onPress, true);
+		svg.addEventListener('wheel', ed.onWheel, true);
+		ta.focus();
+		ta.select();
+		return true;
+	}
+	function closeTextEditor(commit) {
+		var ed = textEditor, lb, le;
+		if (!ed || ed.done) { return; }
+		ed.done = true;
+		textEditor = null;
+		window.removeEventListener('keydown', ed.onKey, true);
+		window.removeEventListener('pointerdown', ed.onPress, true);
+		svg.removeEventListener('wheel', ed.onWheel, true);
+		lb = labelById(ed.id); le = labelEls[ed.id];
+		if (le && le.text) { le.text.style.visibility = ''; }
+		if (ed.ta.parentNode) { ed.ta.parentNode.removeChild(ed.ta); }
+		if (!commit || !lb) { return; }
+		// Empty words are written as empty, exactly as the Properties box writes them.
+		if (writeTextWords(lb, ed.ta.value, ed.fresh) && currentPopup && currentPopup.kind === 'label' &&
+			currentPopup.id === ed.id) { refreshPopupIfOpen(); }
+	}
+
 	// Editable text content for a Text label (Tom, 2026-07-30: "there is no way to edit it") -- no
 	// idField()/rename here, unlike node/link popups; a Text's id has no user-facing meaning to
 	// rename. Reuses pc.lpn_tool_add_text ("Text") for both the popup title and the field label,
@@ -63487,12 +63600,7 @@ var EngCalcs = EngCalcs || {};
 		input.rows = 3;
 		input.style.width = '100%';
 		input.value = effective(lb, 'text');
-		input.addEventListener('change', function () {
-			if (input.value === effective(lb, 'text')) { return; }
-			saveUndoSnapshot();
-			setProp(lb, 'text', input.value);
-			afterPropertyEdit(lb);
-		});
+		input.addEventListener('change', function () { writeTextWords(lb, input.value); });
 		// **NO VISIBLE LABEL ON THIS ROW: the popup's title already says "Text"** (Tom, 2026-08-18,
 		// with a screenshot of the word twice over). It reads as a mistake because it is one -- the
 		// title names the element and this is the element's own content, so the second word names
