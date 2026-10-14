@@ -1262,6 +1262,15 @@ html[lang="zh"] .ec-welcome {
 	paint-order: stroke fill;
 	stroke: #fff; stroke-width: 0.2em; stroke-linejoin: round;
 }
+/* The in-place Text editor (looped-network.js openTextEditor()): laid over the hidden map words at
+   their size, angle and alignment, so it must add no box metrics of its own. The outline marks it as
+   being edited without moving a glyph. */
+.lpn-text-inplace {
+	position: fixed; z-index: 1200; margin: 0; padding: 0; border: 0; resize: none; overflow: hidden;
+	white-space: pre; box-sizing: content-box; min-width: 0; min-height: 0;
+	background: var(--ec-bg); color: var(--ec-ink);
+	outline: 2px solid var(--ec-select); outline-offset: 2px; border-radius: 0;
+}
 /* pointer-events:none, found 2026-07-30 while verifying popup placement: labelsLayer draws ABOVE the
    symbol layers, so a leader line crossing a node swallowed the click meant for that node and the
    property popup simply never opened. A leader is not a thing you can click -- a label's own grab
