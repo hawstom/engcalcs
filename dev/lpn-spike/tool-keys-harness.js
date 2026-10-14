@@ -6,7 +6,7 @@
 // asked for it on the roadmap; what it needed was WHICH KEYS, and the answer is not ours.
 //
 // **THE NUMBERS ARE epanet-js's** (Tom, 2026-09-06, read out of the running product): 1 Select,
-// 2 Junction, 3 Reservoir, 4 Tank, 5 Pipe, 6 Pump, 7 Valve, 8 Customer. We bind every object we
+// (since 2026-10-12 Select is 0 and the chain 1) 2 Junction, 3 Reservoir, 4 Tank, 5 Pipe, 6 Pump, 7 Valve, 8 Customer. We bind every object we
 // share to the same digit they do, so an EPANET user's fingers already know this page -- which is
 // the whole value, and the reason section 1 asserts the exact mapping rather than "some digit works".
 //
@@ -34,6 +34,7 @@ const { ROOT, loadLoopedNetwork, setUnitSet } = require('./lpn-dom-stub.js');
 const L = loadLoopedNetwork(
 	"\t\tgetMode: function () { return mode; }, setMode: setMode,\n" +
 	"\t\ttoolKeys: function () { return LPN_TOOL_KEYS; },\n" +
+	"\t\tareaShape: function () { return selectAreaShape; }, areaTip: function () { return toolTipWithKey('select-area', 'T'); },\n" +
 	"\t\tbuildLayers: function () { svg = document.getElementById('lpn_canvas');\n" +
 	"\t\t\tworld = el('g', {}, svg);\n" +
 	"\t\t\tlinksLayer = el('g', {}, world); nodesLayer = el('g', {}, world);\n" +
@@ -57,7 +58,7 @@ function press(key, opts) {
 
 console.log('1. THE MAPPING IS epanet-js\'s, DIGIT FOR DIGIT');
 {
-	const want = { '1': 'select', '2': 'add-junction', '3': 'add-reservoir', '4': 'add-tank',
+	const want = { '0': 'select', '1': 'add-chain', '2': 'add-junction', '3': 'add-reservoir', '4': 'add-tank',
 		'5': 'add-pipe', '6': 'add-pump', '7': 'add-valve', '9': 'add-text' };
 	Object.keys(want).forEach(function (k) {
 		L.setMode('select');
@@ -69,10 +70,12 @@ console.log('1. THE MAPPING IS epanet-js\'s, DIGIT FOR DIGIT');
 	L.setMode('select');
 	press('8');
 	ok('"8" selects the Meter tool, which is epanet-js\'s Customer', L.getMode() === 'add-meter', L.getMode());
-	// **0 IS THE TENTH TOOL, Junction and Pipe (Task 719)**, the key being the position.
-	L.setMode('select');
+	// **0 IS SELECT AND 1 IS THE CHAIN (Tom, 2026-10-12)**: the chain sits beside Junction.
+	L.setMode('add-pipe');
 	press('0');
-	ok('"0" selects the Junction and Pipe tool', L.getMode() === 'add-chain', L.getMode());
+	ok('"0" returns to Select', L.getMode() === 'select', L.getMode());
+	ok('the whole map is exactly 0-9 in Tom\'s order', Object.keys(L.toolKeys()).map(function (k) { return k + ':' + L.toolKeys()[k]; }).join(' ')
+		=== '0:select 1:add-chain 2:add-junction 3:add-reservoir 4:add-tank 5:add-pipe 6:add-pump 7:add-valve 8:add-meter 9:add-text');
 }
 
 console.log('\n2. A DIGIT NEVER FIRES WHILE SOMEBODY IS TYPING');
@@ -145,19 +148,59 @@ console.log('\n5. THE STRIP READS LEFT TO RIGHT IN THE SAME ORDER THE DIGITS DO'
 	ok('every keyed mode has a button on the strip', placed.length === Object.keys(keys).length,
 		placed.length + ' of ' + Object.keys(keys).length);
 	placed.sort(function (a, b) { return a.at - b.at; });
-	// 0 is the tenth key, after 9, as on a keyboard row.
-	function tenth(k) { return k === '0' ? 10 : Number(k); }
+	function tenth(k) { return Number(k); }
 	const order = placed.map(function (p) { return p.key; }).join(' ');
 	ok('the keyed buttons are in ascending digit order: ' + order,
 		placed.every(function (p, n) { return n === 0 || tenth(p.key) > tenth(placed[n - 1].key); }), order);
 	// The one that regressed: Select is the lowest digit, so it is the first keyed button.
-	ok('Select (digit 1) is the first keyed button on the strip', placed[0] && placed[0].mode === 'select',
+	ok('Select (digit 0) is the first keyed button on the strip', placed[0] && placed[0].mode === 'select',
 		placed[0] && placed[0].mode);
 	// And the editing cluster stayed one cluster -- the half of Tom's instruction that chose
 	// "move it all" over "break up the Edit group".
 	['select', 'vertices', 'delete'].forEach(function (m) {
 		ok(m + ' is still in editGroup', new RegExp("mode: '" + m + "'[^}]*}, editGroup\\)").test(bar));
 	});
+}
+
+console.log('\n6. A IS AREA SELECT, WITH THE GUARDS THE DIGITS HAVE (Tom, 2026-10-13)');
+{
+	L.setMode('select');
+	press('a');
+	ok('"a" enters the area-select tool', L.getMode() === 'select-area', L.getMode());
+	ok('...with the shape it was showing (window)', L.areaShape() === 'window', L.areaShape());
+	press('A');
+	ok('pressing it again cycles to lasso, as the button does', L.getMode() === 'select-area' && L.areaShape() === 'lasso', L.areaShape());
+	press('a'); press('a');
+	ok('...then polygon, then back to window', L.areaShape() === 'window', L.areaShape());
+	L.setMode('select');
+	press('\u0444', { code: 'KeyA' });
+	ok('a Russian layout (key ф, code KeyA) enters it too', L.getMode() === 'select-area', L.getMode());
+	[['input', {}], ['textarea', {}], ['select', {}], ['div', { isContentEditable: true }]].forEach(function (pair) {
+		L.setMode('select');
+		press('a', { target: Object.assign({ tagName: pair[0].toUpperCase() }, pair[1]) });
+		ok('"a" typed into a <' + pair[0] + '> does not switch tools', L.getMode() === 'select', L.getMode());
+	});
+	[['ctrlKey'], ['metaKey'], ['altKey']].forEach(function (mod) {
+		L.setMode('select');
+		const o = {}; o[mod[0]] = true;
+		press('a', o);
+		ok(mod[0] + '+A is left to the table and the browser', L.getMode() === 'select', L.getMode());
+	});
+	ok('the tip names the key: ' + JSON.stringify(L.areaTip()), L.areaTip() === 'T Shortcut: A', L.areaTip());
+	// A is not a digit, so the digit map is unchanged and no digit is bound to the area tool.
+	ok('no digit is bound to select-area', Object.keys(L.toolKeys()).every(function (k) { return L.toolKeys()[k] !== 'select-area'; }));
+	const fs = require('fs');
+	const en = fs.readFileSync(ROOT + 'lib/lang.ec.en.php', 'utf8');
+	ok('the English area tip reads "Area select window/lasso/polygon."',
+		/\$ec_lang\['lpn_tool_area_tip'\]='Area select window\/lasso\/polygon\.';/.test(en));
+	const page = fs.readFileSync(ROOT + 'Looped-Network.php', 'utf8');
+	ok('Help\'s Map table has the A row, spliced beside the Chain row', /<td>A<\/td><td>' \. rtrim\(\$ec_lang\['lpn_tool_area_tip'\]/.test(page));
+	// F (Shape) is bound by feat/shape; until that merges it must be a no-op here.
+	L.setMode('select');
+	press('f');
+	const shapeThere = fs.readFileSync(ROOT + 'js/looped-network.js', 'utf8').indexOf("'add-shape'") >= 0;
+	ok(shapeThere ? '"f" starts the Shape tool' : '"f" is a no-op while there is no Shape tool on this branch',
+		L.getMode() === (shapeThere ? 'add-shape' : 'select'), L.getMode());
 }
 
 console.log(fails === 0 ? '\ntool keys harness: all checks passed'

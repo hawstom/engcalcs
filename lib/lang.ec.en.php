@@ -795,6 +795,12 @@ $ec_lang['lpn_tool_add_meter']='Customer';
 $ec_lang['lpn_tool_add_meter_tip']='Specify the customer point, then its connection: a link or node. The demand you give the customer is added to the node at the nearest end of that link.';
 $ec_lang['lpn_mode_add_meter']='Customer: specify where the customer is, then select the pipe or the node that serves it. Or use Esc to cancel.';
 $ec_lang['lpn_pane_tab_customers']='Customers';
+// The Shape table (Task 779). Closed is a polygon's closure, not a pipe's or valve's status, so it
+// is a key of its own and not lpn_field_closed: many languages use different words for the two.
+// Points is the column of the Shape's points, "Shape S1, point 2" in lpn_snap_shape_point.
+$ec_lang['lpn_pane_tab_shapes']='Shapes';
+$ec_lang['lpn_pane_shape_closed']='Closed';
+$ec_lang['lpn_pane_shape_points']='Points';
 $ec_lang['lpn_customer_heading']='Customer {id}';
 // ROADMAP Task 247. lpn_field_account and lpn_field_account_tip were DELETED 2026-09-19 (Tom:
 // "Didn't I say to trash Account number since they can just make a Custom property for that or
@@ -903,6 +909,10 @@ $ec_lang['lpn_pane_paste_text_no_position']='Row {row}: a new Text needs both {f
 // {id} is what the Text table's own Attached to cell named.
 $ec_lang['lpn_pane_paste_no_anchor']='Row {row}: {id} is not a node or a pipe in this network yet. Paste it first, then this Text.';
 $ec_lang['lpn_pane_paste_customer_no_position']='Row {row}: a new Customer needs both {first} and {second}.';
+$ec_lang['lpn_pane_paste_shape_no_points']='Row {row}: a new Shape needs its Points.';
+// {pair} is the Points heading's own pair in this project's axis words: X/Y, N/E or Lat/Lon.
+$ec_lang['lpn_pane_paste_shape_bad_points']='Row {row}: {text} is not a list of points. Write each point as {pair}, with a point (.) as the decimal mark, and separate the points with |.';
+$ec_lang['lpn_pane_paste_shape_closed_few']='Row {row}: a closed Shape needs at least three points.';
 $ec_lang['lpn_pane_paste_no_customer_ref']='Row {row}: a new Customer needs a connected pipe or node.';
 $ec_lang['lpn_pane_paste_no_pipe']='Row {row}: pipe {id} does not exist yet. Paste your pipes first, then your customers.';
 $ec_lang['lpn_pane_paste_no_customer_node']='Row {row}: node {id} does not exist yet. Paste your junctions first, then your customers.';
@@ -1119,14 +1129,14 @@ $ec_lang['lpn_guide_text_alt_box']='Shows, for each scenario, which alternative 
 $ec_lang['lpn_guide_text_full_box']='Lists every node and every link at every reporting time step, in the units shown on the Tables pane. Without an extended period simulation, it shows the current solution at a single instant. Download or print carries every time step, and the table shows one at a time.';
 $ec_lang['lpn_guide_text_calib_box']='Compares a file of field measurements with the calculated results at the same locations and times, one file for each parameter. The file is held for the current session only and is not saved with the project.';
 $ec_lang['lpn_guide_text_notes_popup']='Lists notes on how this page behaves and what it does not do, each as a term followed by its definition. It does not change the network.';
-$ec_lang['lpn_guide_text_hotkeys_popup']='Lists every toolbar button and menu row, the keyboard shortcuts, and an entry for each box. Choosing a row shows where that control is; it never runs it. To search, press Ctrl+K from anywhere, or / while the user manual has focus.';
+$ec_lang['lpn_guide_text_hotkeys_popup']='Lists every toolbar button and menu row, the keyboard shortcuts, and an entry for each box. Choosing a row shows where that control is; it never runs it. To search, press Ctrl+K from anywhere or / while the user manual has focus.';
 // The Find and replace chapter beyond its opening paragraphs, in the Guide's Boxes section
 // (Tom, 2026-10-07). Each _def is HTML: keep the tags. A query inside <code> runs as written in
 // English on a page in any language; translate it with the words the Find box shows in your
 // language, or leave it in English. Asset IDs (60, 247, 330) and the numbers are measured on Net1
 // and Net3 by dev/lpn-spike/user-guide-find-harness.js: never change them in translation.
 $ec_lang['lpn_guide_find_query_term']='The query language';
-$ec_lang['lpn_guide_find_query_def']='<table class="lpn-notes-table"><tbody><tr><td><code>Scope.Property condition value</code></td><td>One condition. The scope is Everything, Junction, Reservoir, Tank, Pipe, Pump, Valve, Text, Customer, or Source. The property is any entry in the Property list for that scope.</td></tr><tr><td>Conditions</td><td>equal to, above, below, contains, n highest, n lowest, and empty. Contains applies to text only. In n highest and n lowest, n is a count, as in 5 highest. With the letter n itself, as in <code>Pipe.Velocity n highest</code>, or with the Value box empty, 10 assets are listed. Empty finds the assets that have no value for the property. Connectivity has four conditions and takes no value.</td></tr><tr><td>Values</td><td>A number is entered without its unit, in the unit shown in Properties and on the Tables pane: 40, not 40 psi. Text, including an ID, is enclosed in single or double quotes: <code>\'60\'</code>.</td></tr><tr><td>AND, OR, and parentheses</td><td>AND is evaluated before OR, and parentheses group conditions. NOT is not available.</td></tr><tr><td>Spelling</td><td>Words are not case sensitive. The English words are accepted in every language, so a query copied from this user manual runs on a page in any language.</td></tr></tbody></table>';
+$ec_lang['lpn_guide_find_query_def']='<table class="lpn-notes-table"><tbody><tr><td><code>Scope.Property condition value</code></td><td>One condition. The scope is Everything, Junction, Reservoir, Tank, Pipe, Pump, Valve, Text, Customer, or Source. The property is any entry in the Property list for that scope.</td></tr><tr><td>Conditions</td><td>equal to, above, below, contains, n highest, n lowest, and empty. Contains applies to text only. In n highest and n lowest, n is a count, as in 5 highest. If the Value box is empty or n is the letter n itself, as in <code>Pipe.Velocity n highest</code>, 10 assets are listed. Empty finds the assets that have no value for the property. Connectivity has four conditions and takes no value.</td></tr><tr><td>Values</td><td>A number is entered without its unit, in the unit shown in Properties and on the Tables pane: 40, not 40 psi. Text, including an ID, is enclosed in single or double quotes: <code>\'60\'</code>.</td></tr><tr><td>AND, OR, and parentheses</td><td>AND is evaluated before OR, and parentheses group conditions. NOT is not available.</td></tr><tr><td>Spelling</td><td>Words are not case sensitive. The English words are accepted in every language, so a query copied from this user manual runs on a page in any language.</td></tr></tbody></table>';
 $ec_lang['lpn_guide_find_examples_term']='Worked examples on Net3';
 $ec_lang['lpn_guide_find_examples_def']='<p>Open the Net3 example to follow these. Pressure is in psi and velocity in ft/s.</p><table class="lpn-notes-table"><tbody><tr><td><code>Everything.ID equal to \'60\'</code></td><td>Junction 60 and Pipe 60. A junction and a pipe can have the same ID, so an ID search under Everything can return more than one asset.</td></tr><tr><td><code>Junction.Pressure below 40</code></td><td>Junctions 10, 40, 50, 20, and 153, lowest pressure first. Junction 10 is at -0.6 psi, a negative pressure that requires review.</td></tr><tr><td><code>Pipe.Velocity 5 highest</code></td><td>Pipes 60, 329, 125, 123, and 149, highest velocity first. Pipe 60 carries 9.3 ft/s.</td></tr><tr><td><code>Junction.Pressure below 20 OR Pipe.Velocity above 5</code></td><td>Junctions 10, 20, 40, and 50, and Pipes 60, 125, and 329: low pressures and high velocities in one list.</td></tr><tr><td><code>Junction.Pressure below 40 AND Junction.Elevation above 100</code></td><td>Junctions 10, 20, 40, and 50, the low pressures on high ground. Both conditions must name the same kind of asset: <code>Junction.Pressure below 40 AND Pipe.Velocity above 3</code> matches nothing, because no asset is both a junction and a pipe.</td></tr><tr><td><code>Pipe.Closed equal to \'closed\'</code></td><td>Pipe 330, the one pipe that is closed in the Net3 file.</td></tr><tr><td><code>Junction.Connectivity no open path to a source</code></td><td>Nothing, as the file is distributed. With Pipe 247 closed (see Replace and Undo), Junctions 215, 217, 219, and 225: the junctions that a break on Pipe 247 would leave without supply. Repeating this for each pipe is a criticality analysis.</td></tr></tbody></table>';
 $ec_lang['lpn_guide_find_results_term']='Results, the selection, and Tables';
@@ -1138,7 +1148,7 @@ $ec_lang['lpn_guide_find_notes_def']='<ul><li>Values are compared at full precis
 // Where the Guide lists its own keys, so that a search for one finds it.
 $ec_lang['lpn_guide_using_heading']='Using the user manual';
 $ec_lang['lpn_guide_keys_term']='User manual keyboard shortcuts';
-$ec_lang['lpn_guide_keys_def']='<table class="lpn-notes-table"><tbody><tr><td>?</td><td>Open the user manual at the control under the pointer or holding focus.</td></tr><tr><td>F1</td><td>Open the user manual at the entry for the box that has focus.</td></tr><tr><td>Ctrl+K</td><td>Open the user manual with the selected text in the search field.</td></tr><tr><td>/</td><td>Select the search field while the user manual has focus.</td></tr><tr><td>Esc</td><td>Close the user manual and return to where you were.</td></tr></tbody></table>';
+$ec_lang['lpn_guide_keys_def']='<table class="lpn-notes-table"><tbody><tr><td>?</td><td>Open the user manual at the control under the pointer or that has focus.</td></tr><tr><td>F1</td><td>Open the user manual at the entry for the box that has focus.</td></tr><tr><td>Ctrl+K</td><td>Open the user manual with the selected text in the search field.</td></tr><tr><td>/</td><td>Select the search field while the user manual has focus.</td></tr><tr><td>Esc</td><td>Close the user manual and return to where you were.</td></tr></tbody></table>';
 // Under a toolbar button in the User guide, naming the menu row that does the same thing.
 // {menu} becomes a path such as "Edit > Delete", drawn with chevrons; keep {menu} as it is.
 $ec_lang['lpn_guide_also']='Also in {menu}';
@@ -1151,10 +1161,10 @@ $ec_lang['lpn_guide_not_shown']='This control is not on screen right now.';
 $ec_lang['lpn_hotkeys_tables_heading']='Tables';
 $ec_lang['lpn_hotkeys_map_heading']='Map';
 $ec_lang['lpn_hotkeys_map_term']='Map keyboard shortcuts';
-// Same shape as lpn_notes_7_def: one table, one row per key. The nine digits are LPN_TOOL_KEYS in
+// Same shape as lpn_notes_7_def: one table, one row per key. The ten digits are LPN_TOOL_KEYS in
 // js/looped-network.js; Select also answers to Esc and Delete to the Delete key
 // (LPN_TOOL_ALT_KEYS); Ctrl+Z is undo(); +/- and = are keyZoom() (ROADMAP Task 682).
-$ec_lang['lpn_hotkeys_map_def']='<table class="lpn-notes-table"><tbody><tr><td>1 or Esc</td><td>Select.</td></tr><tr><td>2</td><td>Add a junction.</td></tr><tr><td>3</td><td>Add a reservoir.</td></tr><tr><td>4</td><td>Add a tank.</td></tr><tr><td>5</td><td>Add a pipe.</td></tr><tr><td>6</td><td>Add a pump.</td></tr><tr><td>7</td><td>Add a valve.</td></tr><tr><td>8</td><td>Add a customer.</td></tr><tr><td>9</td><td>Add text.</td></tr><tr><td>Delete</td><td>Delete the selection.</td></tr><tr><td>Ctrl+Z</td><td>Undo the last change.</td></tr><tr><td>+ or =</td><td>Zoom in.</td></tr><tr><td>-</td><td>Zoom out.</td></tr></tbody></table>';
+$ec_lang['lpn_hotkeys_map_def']='<table class="lpn-notes-table"><tbody><tr><td>0 or Esc</td><td>Select.</td></tr><tr><td>2</td><td>Add a junction.</td></tr><tr><td>3</td><td>Add a reservoir.</td></tr><tr><td>4</td><td>Add a tank.</td></tr><tr><td>5</td><td>Add a pipe.</td></tr><tr><td>6</td><td>Add a pump.</td></tr><tr><td>7</td><td>Add a valve.</td></tr><tr><td>8</td><td>Add a customer.</td></tr><tr><td>9</td><td>Add text.</td></tr><tr><td>Delete</td><td>Delete the selection.</td></tr><tr><td>Ctrl+Z</td><td>Undo the last change.</td></tr><tr><td>+ or =</td><td>Zoom in.</td></tr><tr><td>-</td><td>Zoom out.</td></tr></tbody></table>';
 // The W row of the Map table. Its own key, spliced into the table by Looped-Network.php, because a new row in
 // lpn_hotkeys_map_def is new markup that 'lang markup matches English' refuses until all 26 languages carry it.
 $ec_lang['lpn_hotkeys_zoomwin_def']='Zoom Window: drag a rectangle on the map to zoom to that area.';
@@ -1215,9 +1225,9 @@ $ec_lang['lpn_map_unmeasurable']='This page could not determine the size of the 
 // setting is literally GPM or LPS, never "US" or "SI" -- so a water engineer reads the flow unit as
 // the name of the system, and the length units as detail that follows from it.
 $ec_lang['lpn_ex_basic_si_title']='Basic network, L/s (SI)';
-$ec_lang['lpn_ex_basic_si_desc']='Two reservoirs, a pump and a small loop. Litres per second, with metres and millimetres.';
+$ec_lang['lpn_ex_basic_si_desc']='Two reservoirs, a pump, and a small loop. Liters per second, with meters and millimeters.';
 $ec_lang['lpn_ex_basic_us_title']='Basic network, gpm (US)';
-$ec_lang['lpn_ex_basic_us_desc']='Two reservoirs, a pump and a small loop. Gallons per minute, with feet and inches.';
+$ec_lang['lpn_ex_basic_us_desc']='Two reservoirs, a pump, and a small loop. Gallons per minute, with feet and inches.';
 // **NOT PLAIN EPA Net1 ANY MORE, AND THE TITLE SAYS SO** (Tom, 2026-09-08: *"Net1 plus rule-based
 // controls: OK"*). Two `[RULES]` were added to the shipped file so the rule editor can be exercised
 // from the gallery; the rules stay, and the name stops claiming to be the sample as EPA ships it.
@@ -1225,17 +1235,17 @@ $ec_lang['lpn_ex_net1_title']='EPANET Net1 plus rule-based controls';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_ex_net1_desc']='A fictional EPANET example with chlorine, 1 reservoir and 1 tank.';
 $ec_lang['lpn_ex_net2_si_title']='EPANET Net2, L/s (SI)';
-$ec_lang['lpn_ex_net2_si_desc']='Litres per second, with metres and millimetres. An EPANET example at Branford, Connecticut, converted from gallons per minute, feet and inches: 35 junctions and 1 tank, with no reservoir, no pump and no valves, about 2 km by 4 km. Fluoride, a non-reactive substance, enters at one source.';
+$ec_lang['lpn_ex_net2_si_desc']='Liters per second, with meters and millimeters. An EPANET example at Branford, Connecticut, converted from gallons per minute, feet, and inches: 35 junctions and 1 tank, with no reservoir, no pump, and no valves, about 2 km by 4 km. Fluoride, a non-reactive substance, enters at one source.';
 $ec_lang['lpn_ex_net2_title']='EPANET Net2, gpm (US)';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_ex_net2_desc']='Gallons per minute, with feet and inches. An EPANET example at Branford, Connecticut: 35 junctions and 1 tank, with no reservoir, no pump and no valves, about 1 mile by 2 miles. Fluoride, a non-reactive substance, enters at one source.';
+$ec_lang['lpn_ex_net2_desc']='Gallons per minute, with feet and inches. An EPANET example at Branford, Connecticut: 35 junctions and 1 tank, with no reservoir, no pump, and no valves, about 1 mile by 2 miles. Fluoride, a non-reactive substance, enters at one source.';
 $ec_lang['lpn_ex_net3_si_title']='EPANET Net3, L/s (SI)';
-$ec_lang['lpn_ex_net3_si_desc']='Litres per second, with metres and millimetres. An EPANET example at Novato, California, converted from gallons per minute, feet and inches, with the world map behind it: 92 junctions, 3 tanks and 2 reservoirs, no valves, about 8 km square. A 24-hour extended-period simulation, with a source trace from the Lake.';
+$ec_lang['lpn_ex_net3_si_desc']='Liters per second, with meters and millimeters. An EPANET example at Novato, California, converted from gallons per minute, feet, and inches, with the world map behind it: 92 junctions, 3 tanks, and 2 reservoirs, no valves, about 8 km square. A 24-hour extended-period simulation, with a source trace from the Lake.';
 $ec_lang['lpn_ex_net3_title']='EPANET Net3, gpm (US)';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_ex_net3_desc']='Gallons per minute, with feet and inches. An EPANET example at Novato, California, with the world map behind it: 92 junctions, 3 tanks and 2 reservoirs, no valves, about 5 miles square. A 24-hour extended-period simulation, with a source trace from the Lake.';
+$ec_lang['lpn_ex_net3_desc']='Gallons per minute, with feet and inches. An EPANET example at Novato, California, with the world map behind it: 92 junctions, 3 tanks, and 2 reservoirs, no valves, about 5 miles square. A 24-hour extended-period simulation, with a source trace from the Lake.';
 $ec_lang['lpn_ex_elm_street_title']='Elm Street Center, gpm (US)';
-$ec_lang['lpn_ex_elm_street_desc']='Gallons per minute, with feet and inches. Prescott Valley, Arizona: 17 junctions, 1 reservoir and 1 pump. A commercial site solved for fire flow on top of maximum day demand, at one moment in time, drawn over a site plan.';
+$ec_lang['lpn_ex_elm_street_desc']='Gallons per minute, with feet and inches. Prescott Valley, Arizona: 17 junctions, 1 reservoir, and 1 pump. A commercial site solved for fire flow on top of maximum day demand, at one moment in time, drawn over a site plan.';
 $ec_lang['lpn_tool_undo']='Undo';
 $ec_lang['lpn_confirm_example']='This adds the example to the network you already have. Continue?';
 $ec_lang['lpn_field_diameter']='Diameter';
@@ -1450,9 +1460,12 @@ $ec_lang['lpn_tip_join']='{name} — {tip}';
 $ec_lang['lpn_tool_key_hint']='Shortcut: {key}';
 $ec_lang['lpn_tool_key_hint_two']='Shortcut: {key} or {key2}';
 $ec_lang['lpn_tool_add_chain_tip']='Chain junctions and pipes: specify a point on the map to add a junction, then specify each next point to add a pipe and a junction. Specify an existing node to continue from it. Press Escape to end the chain.';
+// The Shape tool (Task 779). The word is Tom's: "we call it a 'Shape'".
+$ec_lang['lpn_tool_add_shape']='Shape';
+$ec_lang['lpn_tool_add_shape_tip']='Draw a point, a polyline, or a polygon on the map. A Shape is annotation and is not part of the network. Specify each point, then specify the last point again, press Enter, or right-click to finish. Specify the first point again to close the Shape into a polygon.';
 // Edited by TGH 2026-09-07; the Shift sentence rewritten 2026-09-08 on his ruling that Shift keeps
 // the selection and toggles what the shape catches (it used to say "add").
-$ec_lang['lpn_tool_area_tip']='Follow the on-screen prompts. Press again to cycle through window, lasso, and polygon. Hold Shift to keep the current selection and add or remove (toggle) what you select.';
+$ec_lang['lpn_tool_area_tip']='Area select window/lasso/polygon.';
 $ec_lang['lpn_area_selected']='{n} selected.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_area_none']='Nothing found in that area.';
@@ -1899,7 +1912,7 @@ $ec_lang_syn['lpn_profile_title']='Profile or cross section along a path, route,
 // the map to see the path, click to add a stop, double-click to finish.
 $ec_lang['lpn_profile_draw_start']='Select the node where the path starts.';
 $ec_lang['lpn_profile_draw_more']='Move over the map to see the path. Select a node to add it. Double-click to finish. Esc cancels.';
-$ec_lang['lpn_profile_draw_blocked']='No route from {a} to {b}. Select another node.';
+$ec_lang['lpn_profile_draw_blocked']='No route from {a} to {b}. Select a different start or end node.';
 $ec_lang['lpn_profile_tap_start']='Select the node where the path starts.';
 $ec_lang['lpn_profile_tap_more']='Select a node to see the path. Press and hold to add it. Double-tap to finish. Press Profile again to cancel.';
 $ec_lang['lpn_profile_say_idle']='Press Profile again to select a new path on the map.';
@@ -2671,6 +2684,9 @@ $ec_lang['lpn_snap_vertex']='{link}, vertex {n}';
 $ec_lang['lpn_snap_node_on_node']='{new} placed at the location of {target}. The two nodes are not connected.';
 // The same, for a node DRAGGED onto another node.
 $ec_lang['lpn_snap_moved_on_node']='{moved} moved to the location of {target}. The two nodes are not connected.';
+// The Shape (Task 779): map annotation, a point, a polyline or a polygon. Tom, 2026-10-06: "Either
+// way, we call it a 'Shape'". The tip beside the snap glyph on a Shape point: "Shape S1, point 2".
+$ec_lang['lpn_snap_shape_point']='{shape}, point {n}';
 // Plain-text wording of the concept mphl_total_junction_k/mphl_junction_loss already own (their
 // values carry k<sub>m</sub> markup, incompatible with this popup's textContent-only fields) --
 // Tom, 2026-07-30, "default to 2" matches mphl_total_junction_k_tip's own stated default exactly.
@@ -2833,6 +2849,7 @@ $ec_lang['lpn_mode_add_valve']='Mode: Add Valve. Select a start node and then an
 // sequence (click node, THEN click to place), but placing near a node anchors it in that ONE click.
 $ec_lang['lpn_mode_add_text']='Mode: Add Text. Specify a location on the map to place a Text. Specify a location near a node to attach the Text to that node. Switch to Select mode to change or move assets and labels.';
 $ec_lang['lpn_mode_add_chain']='Mode: Junction Pipe Chain. Specify a point on the map to add a junction, then specify each next point to add a pipe and a junction. Specify an existing node to continue from it. Press Escape to end the chain. Switch to Select mode to change or move assets and labels.';
+$ec_lang['lpn_mode_add_shape']='Mode: Add Shape. Specify each point. Specify the last point again or press Enter to finish; specify the first point to close a polygon.';
 // Toolbar button tips (Tom, 2026-07-30): hover/tap explanations on the two buttons a new user is
 // most likely to miss the point of -- that Select is what you use to edit/move things, and that a
 // label itself can be dragged. Both economize on translation for later, per CLAUDE.md's tip-only
@@ -4129,7 +4146,7 @@ $ec_lang['lpn_fitting_total']='Total minor (local) loss coefficient, k';
 // The pipe popup\'s own selector.
 $ec_lang['lpn_field_fittings']='Fittings list';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_field_fittings_tip']='A list of fittings from the project library. Its quantities and coefficients are added up into this pipe’s minor loss coefficient, and the coefficient box is then read only. Leave no list chosen to enter the coefficient yourself.';
+$ec_lang['lpn_field_fittings_tip']='A list of fittings from the project library. The quantities and coefficients in the list are summed into this pipe\'s minor loss coefficient, and the coefficient box is read only. To enter the coefficient directly, leave the list unchosen.';
 $ec_lang['lpn_fittings_none']='No fittings list chosen';
 // EPANET 2.2 user manual, Table 3.3, Minor Loss Coefficients for Selected Fittings. THE MANUAL\'S
 // OWN THIRTEEN NAMES, in its own order. CLAUDE.md: default to the EPANET terminology, since a
@@ -4589,6 +4606,68 @@ $ec_lang['lpn_analyze_time_moved']='⚠ This was computed at {time}, and the clo
 // a plane coordinate read as a degree is silent and puts a network in the Gulf of Guinea.
 $ec_lang['lpn_file_import_survey']='Import surveyed points…';
 $ec_lang['lpn_file_import_survey_tip']='Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not.';
+// GeoJSON import of Shapes (Task 779). Only points, lines and polygons come in, as Shapes; the
+// network is imported from an EPANET file. Every feature not imported is named in the report.
+$ec_lang['lpn_file_import_shapes']='Import GeoJSON shapes…';
+$ec_lang['lpn_file_import_shapes_tip']='Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network from an EPANET file. The project must be georeferenced or state a coordinate system.';
+$ec_lang['lpn_geojson_import_done']='{n} Shapes imported from {file}.';
+$ec_lang['lpn_geojson_import_done_one']='One Shape imported from {file}.';
+$ec_lang['lpn_geojson_import_renamed']='{n} feature names cannot be used as Shape IDs. Each Shape was given another ID and keeps its feature name: {list}.';
+$ec_lang['lpn_geojson_import_renamed_one']='One feature name cannot be used as a Shape ID. The Shape was given another ID and keeps its feature name: {list}.';
+$ec_lang['lpn_geojson_import_skipped']='{n} features not imported: {list}.';
+$ec_lang['lpn_geojson_import_skipped_one']='One feature not imported: {list}.';
+$ec_lang['lpn_geojson_import_why_network']='network asset';
+$ec_lang['lpn_geojson_import_why_geometry']='not a point, line, or polygon';
+$ec_lang['lpn_geojson_import_why_position']='position not a valid latitude and longitude';
+$ec_lang['lpn_geojson_import_holes']='{n} polygon holes not imported. A Shape has one boundary.';
+$ec_lang['lpn_geojson_import_holes_one']='One polygon hole not imported. A Shape has one boundary.';
+$ec_lang['lpn_geojson_import_parts']='{n} multipart features imported as one Shape for each part.';
+$ec_lang['lpn_geojson_import_parts_one']='One multipart feature imported as one Shape for each part.';
+$ec_lang['lpn_geojson_import_local']='GeoJSON positions are latitude and longitude, and this project has no place on the Earth to which they can be converted. Georeference it first with Map, World map, Attach, then import again.';
+$ec_lang['lpn_geojson_import_unreadable']='{file} is not a GeoJSON file: {detail}';
+$ec_lang['lpn_file_import_dxf']='Import DXF shapes…';
+$ec_lang['lpn_file_import_dxf_tip']='Read the points, lines, and polylines of an ASCII DXF file into this project as Shapes, with each layer name kept as a property. Other entities are counted and listed, not imported. The coordinates are read as the X and Y of this project, with no conversion.';
+$ec_lang['lpn_file_import_shp']='Import shapefile shapes…';
+$ec_lang['lpn_file_import_shp_tip']='Read the points, lines, and polygons of an ESRI shapefile into this project as Shapes, with the attribute columns kept as properties. Select either the .zip or the .shp together with its .shx, .dbf, and .prj (hold Ctrl or Shift to select several). Coordinates in a different coordinate system from the project are converted, and the notice states this.';
+$ec_lang['lpn_dxf_import_skipped']='{n} entities not imported: {list}.';
+$ec_lang['lpn_dxf_import_skipped_one']='One entity not imported: {list}.';
+$ec_lang['lpn_dxf_import_inblocks']='in block definitions';
+$ec_lang['lpn_dxf_import_bulge']='{n} polylines have arc segments, which were imported as straight segments between their vertices.';
+$ec_lang['lpn_dxf_import_bulge_one']='One polyline has arc segments, which were imported as straight segments between its vertices.';
+$ec_lang['lpn_dxf_import_units']='The drawing states its units as {theirs} and this project uses {ours}. The numbers were not changed.';
+$ec_lang['lpn_dxf_import_refuse_geo']='A DXF drawing is planar, and this project is in latitude and longitude, so the coordinates of {file} have no place in it. Use Convert as… to copy the project into a coordinate system, then import again.';
+$ec_lang['lpn_dxf_import_unreadable']='{file} is not an ASCII DXF file.';
+$ec_lang['lpn_dxf_import_binary']='{file} is a binary DXF. Save it from your CAD program as an ASCII DXF, then import again.';
+$ec_lang['lpn_shapes_import_frame']='The coordinates were read as {frame}, with no conversion.';
+$ec_lang['lpn_shapes_frame_xy']='the X and Y of this project';
+$ec_lang['lpn_shapes_frame_latlon']='latitude and longitude';
+$ec_lang['lpn_shp_import_skipped']='{n} records not imported, because their geometry type is not read: {list}.';
+$ec_lang['lpn_shp_import_skipped_one']='One record not imported, because its geometry type is not read: {list}.';
+$ec_lang['lpn_shp_import_attrs']='Attribute columns kept as properties of each Shape: {list}.';
+$ec_lang['lpn_shp_import_noprj']='There is no .prj file, so the coordinates were read as {frame}, with no conversion.';
+$ec_lang['lpn_shp_import_prj_same']='The .prj states {crs}, the coordinate system of this project, so the coordinates were not changed.';
+$ec_lang['lpn_shp_import_converted']='The coordinates are latitude and longitude. They were converted to {crs} by the transform the map uses.';
+$ec_lang['lpn_shp_import_prj_other']='The .prj states {theirs}. This project states no coordinate system, so the coordinates were read as {frame}, with no conversion.';
+$ec_lang['lpn_shp_import_refuse_local']='{file} is in latitude and longitude, and this project has no place on the Earth to which they can be converted. Georeference it first with Map, World map, Attach, then import again.';
+$ec_lang['lpn_shp_import_refuse_crs']='{file} states {theirs}, and this project is in {ours}. Nothing was imported and nothing was converted.';
+$ec_lang['lpn_shp_import_refuse_range']='{file} has no .prj file, and its coordinates are not latitudes and longitudes, so they cannot be placed in this project.';
+$ec_lang['lpn_shp_import_noshp']='{file} contains no .shp file. Select either the .zip of a shapefile or the .shp together with its .shx, .dbf, and .prj (hold Ctrl or Shift to select several).';
+$ec_lang['lpn_shp_import_manyshp']='{file} contains more than one shapefile. Import one at a time.';
+$ec_lang['lpn_shp_import_unreadable']='{file} is not a shapefile this page can read: {detail}';
+$ec_lang['lpn_shp_import_pick_hint']='A shapefile is several files. Select the .shp together with its .shx, .dbf, and .prj (hold Ctrl or Shift to select several), or select the .zip.';
+$ec_lang['lpn_shp_import_webmerc_ask']='{file} has no .prj file, and its numbers are not latitudes and longitudes, but they fit Web Mercator metres (EPSG:3857), the system QGIS and web maps use. Import them as EPSG:3857 and convert them to this project?';
+$ec_lang['lpn_shp_import_webmerc_ok']='Import as EPSG:3857';
+$ec_lang['lpn_shp_import_webmerc_far_ask']='{file} states {theirs}, and read in that system its coordinates fall {km} km from this project. Read as Web Mercator metres (EPSG:3857), the system QGIS and web maps use, they fall where this project is. Import them as EPSG:3857 and convert them to this project?';
+$ec_lang['lpn_shp_import_reprojected']='The coordinates were converted from {theirs} to {ours}.';
+$ec_lang['lpn_shp_import_unplaced']='{n} records have coordinates this project cannot place, such as a latitude beyond the limit of the map. Record numbers: {list}.';
+$ec_lang['lpn_shp_import_unplaced_one']='One record has coordinates this project cannot place, such as a latitude beyond the limit of the map. Record number: {list}.';
+$ec_lang['lpn_shapes_import_none']='Nothing was imported from {file}.';
+$ec_lang['lpn_shp_import_convert_hint']='Use Convert as… to copy the project into {theirs}, then import again.';
+$ec_lang['lpn_shp_import_damaged']='{file} is damaged or cut short, so nothing was imported.';
+$ec_lang['lpn_shp_import_deleted']='{n} records marked deleted in the .dbf were not imported.';
+$ec_lang['lpn_shp_import_deleted_one']='One record marked deleted in the .dbf was not imported.';
+$ec_lang['lpn_dxf_import_paperspace']='in paper space';
+$ec_lang['lpn_shapes_import_more']='and {n} more';
 $ec_lang['lpn_survey_read_error']='That file could not be read from your disk.';
 $ec_lang['lpn_survey_cancelled']='Nothing was created and nothing was changed.';
 // What the project calls its two axes, for a sentence js/lpn-survey.js writes about a column. The
@@ -4683,7 +4762,7 @@ $ec_lang['lpn_inp_drop_pressure_unit']='This file states a pressure unit other t
 
 // Map > Screenshot (Tom, 2026-10-05): a snipping tool that re-draws the dragged map area larger than its screen size (3x unless the Screenshot box says otherwise).
 $ec_lang['lpn_screenshot_menu']='Screenshot';
-$ec_lang['lpn_screenshot_tip']='Take a picture of the map area you drag, at a higher resolution than the screen. Mark it up, then copy it into a report with the Copy button. Click without dragging to take the whole map.';
+$ec_lang['lpn_screenshot_tip']='Take a picture of the map area you drag, at a higher resolution than the screen. Annotate it, then copy it into a report with the Copy button. Click without dragging to take the whole map.';
 $ec_lang['lpn_screenshot_hint']='Drag a rectangle over the map, or click for the whole map. Esc cancels.';
 $ec_lang['lpn_screenshot_copied']='Screenshot copied.';
 $ec_lang['lpn_screenshot_saved']='The clipboard is not available here, so the screenshot was downloaded as a PNG file.';

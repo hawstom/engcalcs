@@ -262,6 +262,7 @@ async function main() {
 	const LAY = { pipe: 'C-WATR-MODL-LINK-BASE', pump: 'C-WATR-MODL-PUMP-BASE', valve: 'C-WATR-MODL-VALV-BASE',
 		junction: 'C-WATR-MODL-NODE-BASE', tank: 'C-WATR-MODL-TANK-BASE', reservoir: 'C-WATR-MODL-RESV-BASE',
 		customer: 'C-WATR-MODL-CUST-BASE' };
+	ok('Net1: a Shape asset code is SHAP (Tom, 2026-10-11)', global.EngCalcs.lpnDxfAssetCodes.shape === 'SHAP');
 	const layers1 = d1.sections.TABLES.filter(e => e.type === 'LAYER').map(e => g(e, 2));
 	Object.keys(LAY).forEach(t => ok('Net1: layer ' + LAY[t] + ' is declared', layers1.indexOf(LAY[t]) >= 0));
 	const custLayer = d1.sections.TABLES.find(e => e.type === 'LAYER' && g(e, 2) === LAY.customer);

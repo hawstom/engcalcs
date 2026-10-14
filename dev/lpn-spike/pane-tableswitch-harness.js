@@ -139,11 +139,11 @@ L.addLink('pipe', jIds[2], jIds[3]);
 // tables" and "the no-wrap boundary is now a genuinely EMPTY last table", not a stand-in for one.
 
 L.openPane('junctions');
-['junctions', 'reservoirs', 'tanks', 'pipes', 'pumps', 'valves', 'text', 'customers']
+['junctions', 'reservoirs', 'tanks', 'pipes', 'pumps', 'valves', 'text', 'customers', 'shapes']
 	.forEach((id) => L.renderTable(id));
 
 const order = L.tableIds();
-report(order.join(',') === 'junctions,reservoirs,tanks,pipes,pumps,valves,text,customers',
+report(order.join(',') === 'junctions,reservoirs,tanks,pipes,pumps,valves,text,customers,shapes',
 	'the table order this harness assumes is the real one', JSON.stringify(order));
 
 console.log('\n--- 1. Ctrl+Shift+PageDown moves to the NEXT table; plain Ctrl+PageDown does not ---');
@@ -270,8 +270,11 @@ console.log('\n--- 8. an EMPTY table still answers the shortcut, in both directi
 	report(L.activeTab() === 'text', 'Valves -> Text', L.activeTab());
 	report(focusedIsEmptyNoteOf('text'), 'landed on Text\'s own empty-state note');
 	pressPageKey(L.activeTab(), 'PageDown', { shift: true });
-	report(L.activeTab() === 'customers', 'Text -> Customers, the LAST table', L.activeTab());
+	report(L.activeTab() === 'customers', 'Text -> Customers', L.activeTab());
 	report(focusedIsEmptyNoteOf('customers'), 'landed on Customers\' own empty-state note');
+	pressPageKey(L.activeTab(), 'PageDown', { shift: true });
+	report(L.activeTab() === 'shapes', 'Customers -> Shapes, the LAST table (Task 779)', L.activeTab());
+	report(focusedIsEmptyNoteOf('shapes'), 'landed on Shapes\' own empty-state note');
 
 	// **Customers IS NO LONGER THE END OF THE STRIP (Task 743)** -- Time series, Frequency and
 	// Profile follow it, so one more PageDown from here is no longer a no-op; section 9 below
@@ -279,7 +282,9 @@ console.log('\n--- 8. an EMPTY table still answers the shortcut, in both directi
 
 	// FROM an empty table, PageUp works too, walking back into a table that has real rows.
 	const claimed4 = pressPageKey(L.activeTab(), 'PageUp', { shift: true });
-	report(claimed4, 'Ctrl+Shift+PageUp FROM an empty table (Customers) is claimed');
+	report(claimed4, 'Ctrl+Shift+PageUp FROM an empty table (Shapes) is claimed');
+	report(L.activeTab() === 'customers', 'Shapes -> Customers', L.activeTab());
+	pressPageKey(L.activeTab(), 'PageUp', { shift: true });
 	report(L.activeTab() === 'text', 'Customers -> Text', L.activeTab());
 	pressPageKey(L.activeTab(), 'PageUp', { shift: true });
 	pressPageKey(L.activeTab(), 'PageUp', { shift: true });   // text -> valves -> pumps
@@ -298,9 +303,10 @@ console.log('\n--- 9. (Task 743) stepping onward from the last TABLE onto the gr
 {
 	// Customers is the last of the eight tables; the next three presses now reach Time series,
 	// Frequency and Profile in turn, each one landing on ITS OWN first control.
-	L.setPaneTab('customers');
-	const claimed1 = pressPageKey('customers', 'PageDown', { shift: true });
-	report(claimed1, 'Ctrl+Shift+PageDown out of Customers (the last table) is claimed');
+	// Shapes is the last table since Task 779.
+	L.setPaneTab('shapes');
+	const claimed1 = pressPageKey('shapes', 'PageDown', { shift: true });
+	report(claimed1, 'Ctrl+Shift+PageDown out of Shapes (the last table) is claimed');
 	report(L.activeTab() === 'timeseries', 'the tab moved onto Time series', L.activeTab());
 	report(L.focusedId() === 'lpn_ts_group',
 		'and the caret landed on Time series\' own first control, its group picker', L.focusedId());
@@ -350,13 +356,13 @@ console.log('\n--- 9. (Task 743) stepping onward from the last TABLE onto the gr
 
 	const back3 = pressPageKey('timeseries', 'PageUp', { shift: true });
 	report(back3, 'Ctrl+Shift+PageUp FROM Time series is claimed');
-	report(L.activeTab() === 'customers', 'Time series -> Customers, back among the tables', L.activeTab());
+	report(L.activeTab() === 'shapes', 'Time series -> Shapes, back among the tables', L.activeTab());
 	// **A GRAPH TAB CARRIES NO COLUMN OR ROW ACROSS** -- landing back in a table finds `colKey`
 	// null exactly as an empty-table SOURCE already does (section 8), so it takes the same "home
 	// column" path proven there and in section 4; Customers being empty in this harness means the
 	// visible proof here is the same empty-state note section 8 already checked.
-	report(focusedIsEmptyNoteOf('customers'),
-		'landed on Customers\' own empty-state note, the same door an empty table always answers on');
+	report(focusedIsEmptyNoteOf('shapes'),
+		'landed on Shapes\' own empty-state note, the same door an empty table always answers on');
 	L.setPaneTab('junctions');
 }
 

@@ -47,7 +47,7 @@ paneBody.getBoundingClientRect = function () {
 
 const L = loadLoopedNetwork(
 	"\t\tgetDoc: function () { return doc; }, addNode: addNode, addLink: addLink, addText: addText,\n" +
-	"\t\taddCustomer: addCustomer,\n" +
+	"\t\taddCustomer: addCustomer, addShape: function (sh) { addShapeToDoc(sh); buildShapeEls(sh); return sh; },\n" +
 	"\t\twirePane: wirePane, openPane: openPane, closePane: closePane, togglePane: togglePane,\n" +
 	"\t\tsetPaneTab: setPaneTab, paneIsOpen: paneIsOpen, paneState: function () { return paneState; },\n" +
 	"\t\tclampPaneHeight: clampPaneHeight, paneMaxHeight: paneMaxHeight,\n" +
@@ -336,8 +336,10 @@ console.log('\n--- six tabs, one renderer ---');
 	// that is a deliberate departure from "the toolbar's Add order": a customer is not a water
 	// asset, so it belongs with the other tab that is not one rather than between the valves and
 	// the notes. Order within the six water assets is unchanged and is still asserted.
-	report(ids.join(',') === 'junctions,reservoirs,tanks,pipes,pumps,valves,text,customers',
-		'eight asset tables, the six water assets in the toolbar’s Add order, nodes before links',
+	// **NINE SINCE 2026-10-11: Shapes** (Task 779), after Customers, the other table that is not
+	// a water asset.
+	report(ids.join(',') === 'junctions,reservoirs,tanks,pipes,pumps,valves,text,customers,shapes',
+		'nine tables, the six water assets in the toolbar’s Add order, nodes before links',
 		ids.join(','));
 	// **PROFILE FOLLOWS TIME SERIES** (Tom, 2026-10-04: the graph tabs match the Graphs menu):
 	// after the eight tables, Time series, Profile, Frequency, Flow balance. It was last until
@@ -357,10 +359,11 @@ console.log('\n--- six tabs, one renderer ---');
 	// **TEN SINCE TASK 247**: Customers joined, with the tables, before the two drawings.
 	// **ELEVEN SINCE TASK 600**: Frequency joined the drawings, between Time series and Profile.
 	// **TWELVE SINCE TASK 600's flow balance**: System flow joined them, after Frequency.
-	report(L.paneTabIds().length === 12, 'twelve tabs in all', String(L.paneTabIds().length));
+	// **THIRTEEN SINCE TASK 779**: Shapes joined the tables, after Customers.
+	report(L.paneTabIds().length === 13, 'thirteen tabs in all', String(L.paneTabIds().length));
 	report(L.paneTabIds().indexOf('text') === 6 && ids.indexOf('text') === 6,
 		'Text IS a tab since 2026-09-08 (Tom), after the six that solve and before the drawings');
-	report(L.paneTabIds().indexOf('timeseries') === 8,
+	report(L.paneTabIds().indexOf('timeseries') === 9,
 		'Time series is the drawing BEFORE Profile (Task 599)', L.paneTabIds().join(','));
 	// Every table has a panel div of its own in the page, which is also what gives each its own
 	// scroll offset for nothing.
@@ -430,6 +433,8 @@ console.log('\n--- each table lists exactly its own type ---');
 	// still be inputs still are.
 	const m1 = L.addCustomer(90, 20, { link: p1.id, t: 0.9 });
 	m1.account = '4417-A'; m1.demand = 3; m1.count = 4;
+	// A Shape (Task 779), so its table has a row to render.
+	L.addShape({ id: 'S1', pts: [{ x: 0, y: 0 }, { x: 50, y: 10 }], closed: false });
 
 	// EXACT COUNTS, and no id in two tables. Section 6 already left one reservoir on the map, which
 	// is why the reservoir count is 2 and why this is stated as counts rather than as "the one I
