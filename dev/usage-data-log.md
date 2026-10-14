@@ -1439,6 +1439,51 @@ the page-load bucket, and using/shopping within each pointer class — and never
 reach, shopping or using. **The first reading is the next weekly report; nothing on file has the
 column yet.**
 
+#### First reading of the pointer column (2026-10-14)
+
+Copied read-only from production (`log/` plus `spock/2026-10-01/`) and run through
+`log/lang-log-stats.sh --archive=`. Own traffic is not subtracted afterwards: a browser carrying
+`ec_nolog` is never written to these logs (`log-human-view.php`). Rows from the first
+pointer-bearing row (2026-09-08 11:14 MST) to 2026-10-14 06:41 MST, 36 days; rows before that carry
+no column and are left out, so "unknown" below is a browser that could not say, not a legacy row.
+
+Confirmed-human page views (shopping), by bucket. Never summed.
+
+| bucket | n | coarse | fine | unknown |
+|---|---|---|---|---|
+| said yes (people) | 1,992 | 153 (7.7%) | 1,808 (90.8%) | 31 (1.6%) |
+| page loads | 8,003 | 294 (3.7%) | 7,520 (94.0%) | 189 (2.4%) |
+
+Confirmed calculations (using), same rule: said yes 1,432 rows, 79 coarse (5.5%), 1,349 fine, 4
+unknown; page loads 4,893, 135 coarse (2.8%), 4,748 fine, 10 unknown.
+
+Coarse share on Looped-Network against the other calculators, shopping, known pointers only:
+
+| bucket | Looped-Network | all others |
+|---|---|---|
+| said yes | 10 of 70 (14%) | 143 of 1,891 (7.6%) |
+| page loads | 20 of 174 (11%) | 274 of 7,640 (3.6%) |
+
+Using, said yes: Looped-Network 9 of 61 coarse (15%), others 70 of 1,367 (5.1%). The Looped-Network
+cells are small (70 and 174 views); the page-load interval is 8 to 17%. The direction holds in
+both buckets and both tiers, but the people-bucket figure rests on a handful of finger users.
+
+Using over shopping within each pointer class, page loads: fine 4,748 of 7,520 (63%), coarse 135
+of 294 (46%, interval 40 to 52%). Said yes: fine 75%, coarse 52% (79 of 153). A finger gets as far
+as a calculation about two-thirds to three-quarters as often as a mouse; on Looped-Network the
+counts (9 of 10 and 52 of 60, said yes) are too small to read.
+
+Reading: roughly 1 person in 13 on a calculator, and 1 in 7 on Looped-Network, arrives on a
+finger, so a phone is a real minority use, likelier on the map than elsewhere; nothing here
+supports dropping phone support, and nothing supports a phone-first layout.
+
+What the answer changes (the task's own question). Not "almost nobody", so Looped-Network keeps
+paying for the phone-survivable compromises already in CLAUDE.md. Not "a third", so Task 284's
+two-pane layout is not re-argued on a phone's behalf and the toolbar stays a toolbar. What would
+move a decision is the Looped-Network share passing about 25% in the people bucket on a window
+several times this size. `coarse` includes tablets and touch laptops that report a finger, and a
+fine pointer says nothing about screen size; width is still unmeasured.
+
 ### The naming instrument for Looped-Network
 
 `engcalcs-title.log` accepts `save` and `rename` beside `title` and `subtitle`

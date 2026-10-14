@@ -710,3 +710,5 @@ red builds on 2026-09-15 before anybody wrote it down.
 - 0|787| CLOSED 2026-10-12 (`feat/tank-ground`, Tom: "OK. Merge."): tank Elevation is the ground and pressure datum, Base elevation the tank bottom EPANET uses; the .inp cannot carry the ground.
 - 0|779| CLOSED 2026-10-14 (`feat/shape`, Tom: "Merge feat/shape"): Shape tool (point, polyline, polygon; key F, for Figure), Shapes table, GeoJSON, shapefile and DXF import; merged with feat/tool-key.
 - 0|788| CLOSED 2026-10-14: sprint 1014 swept the Find guide's control names and the select verb in all 26 languages (dev/english-friction/1014.json).
+- 0|185| CLOSED 2026-10-14: Match properties (Task 782, on `feat/bentley-interop`) is this tool; its polygon/fence selection is left to Find and replace.
+- 0|285| CLOSED 2026-10-14: first pointer reading (09-08..10-14) in dev/usage-data-log.md: coarse 7.7% of people, ~14% on Looped-Network; a real minority, no decision flips.
