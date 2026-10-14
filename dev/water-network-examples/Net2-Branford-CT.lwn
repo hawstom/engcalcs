@@ -1188,6 +1188,7 @@
 				0.81,
 				0.81
 			],
+			"note": "Demand Pattern",
 			"tok": {
 				"m2": ".97",
 				"m3": ".97",
@@ -1280,6 +1281,7 @@
 				0.92,
 				0.92
 			],
+			"note": "Pump Station Outflow Pattern",
 			"tok": {
 				"m0": ".96",
 				"m1": ".96",
@@ -1367,6 +1369,7 @@
 				0.92,
 				1
 			],
+			"note": "Pump Station Fluoride Pattern",
 			"tok": {
 				"m0": ".98",
 				"m3": ".99",
