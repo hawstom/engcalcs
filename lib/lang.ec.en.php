@@ -177,8 +177,6 @@ $ec_lang['hw_pressure_neg_short']='Negative pressure';
 $ec_lang['hw_pressure_neg']='Downstream pressure is below zero. The hydraulic grade line falls below the pipe, so the pipe would not flow full and this result may not be valid.';
 $ec_lang['hw_roughness']='Hazen-Williams coefficient, C';
 $ec_lang['hw_note_1']='<dl><dt>This calculator does not model the pipe profile between the two ends.</dt><dd>It uses only the upstream and downstream elevations you enter. If the ground rises higher than either end somewhere in between, the pressure at that high point is lower than any pressure reported here. Run the calculator again for the length from the upstream end to the high point to check it.</dd><dd>Where the hydraulic grade line falls below the pipe, the water is under negative pressure. Air comes out of solution, a thin-walled pipe can collapse, and dirty groundwater can be drawn in through the joints. Keep the line under positive pressure everywhere, and consider an air valve at each high point.</dd><dt>The upstream pressure is a boundary condition you supply.</dt><dd>Read it from a gauge, from a tank water level (the height of water above the pipe), or from a pump curve. A pump delivers less pressure as flow rises, so use the point on the curve that matches the flow entered above.</dd><dt>Add up the minor (local) loss coefficients yourself.</dt><dd>Total the K values for every valve, bend, tee, meter, and entrance on the line, and enter that total. Follow the link on that input for typical values. On a long transmission main these losses are small next to friction, but in short station piping they can be most of the loss.</dd></dl>';
-$ec_lang['hw_notes_epanet_term']='Hazen-Williams constants now match EPANET (August 2026)';
-$ec_lang['hw_notes_epanet_def']='In August 2026 the Hazen-Williams coefficient and exponent were changed to match EPANET. Head loss results differ from earlier versions of this page by up to 0.1 percent, which is far smaller than the uncertainty in the C value itself.';
 // Manning Irregular
 $ec_lang['mi_menu']='Manning Irregular Channel';
 $ec_lang_syn['mi_menu']='| gloss: irregular channel';
@@ -748,8 +746,6 @@ $ec_lang['bpn_notes_2_term']='Branched networks only, no loops';
 $ec_lang['bpn_notes_2_def']='Every line has exactly one upstream line (a tree). This tool does not solve looped networks, which require iterative methods (EPANET or similar). Because the network has no loops, the solution is direct and exact.';
 $ec_lang['bpn_notes_3_term']='No active pressure controls';
 $ec_lang['bpn_notes_3_def']='You can add a fixed minor-loss valve (a k-value), but not pressure-reducing or pressure-sustaining valves (PRV/PSV). Their open/closed state depends on flow and pressure, which would force iteration.';
-$ec_lang['bpn_notes_epanet_term']='Hazen-Williams constants now match EPANET (August 2026)';
-$ec_lang['bpn_notes_epanet_def']='In August 2026 the Hazen-Williams coefficient and exponent were changed to match EPANET. Head loss results differ from earlier versions of this page by up to 0.1 percent, which is far smaller than the uncertainty in the C value itself.';
 $ec_lang['bpn_supply2_q']='Supply flow 2';
 $ec_lang['bpn_supply2_h']='Supply head 2';
 $ec_lang['bpn_supply3_q']='Supply flow 3';
@@ -2643,8 +2639,6 @@ $ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>Arrow
 // settings.colorFrozenBreaks in js/looped-network.js.
 $ec_lang['lpn_notes_color_term']='Color band boundaries stay the same';
 $ec_lang['lpn_notes_color_def']='Color band boundaries are set when you choose a data classification method. They are not set again at each time step, because that would make the colors mean something new at every step, and that is not helpful for visualizing your system. EPANET works the same way. To get new boundaries, choose a method again or enter your own boundaries.';
-$ec_lang['lpn_notes_epanet_term']='Hazen-Williams constants match EPANET';
-$ec_lang['lpn_notes_epanet_def']='In August 2026 the Hazen-Williams coefficient and exponent were changed to match EPANET. Head loss results differ from earlier versions of this page by up to 0.1 percent, which is far smaller than the uncertainty in the C value itself.';
 $ec_lang['lpn_notes_engine_term']='Which EPANET this page runs';
 $ec_lang['lpn_notes_engine_def']='The EPANET solver on this page is OWA-EPANET 2.3.5, released on 20 February 2025. EPANET is developed by Open Water Analytics, a community that works with the United States Environmental Protection Agency, which released version 2.2.0 in December 2019. The run report calls it 2.3.05 because the engine writes the last number in two digits. It is delivered to this page through epanet-js 0.9.0 by Luke Butler, under the MIT license, and it runs in the browser: the network is never sent to a server to be solved.';
 $ec_lang['lpn_id_invalid']='Enter an ID with no spaces and no quotation marks.';

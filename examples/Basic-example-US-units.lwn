@@ -276,10 +276,10 @@
 		},
 		"prefix": {
 			"node": {
-				"id": "N"
+				"id": ""
 			},
 			"link": {
-				"id": "L"
+				"id": ""
 			}
 		},
 		"separator": " ",

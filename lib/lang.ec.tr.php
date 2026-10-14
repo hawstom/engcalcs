@@ -152,8 +152,6 @@ $ec_lang['hw_pressure_neg_short']='Negatif basınç';
 $ec_lang['hw_pressure_neg']='Mansap basıncı sıfırın altında. HGL borunun altına düşüyor, bu nedenle boru tam dolu akmayabilir ve bu sonuç geçerli olmayabilir.';
 $ec_lang['hw_roughness']='Hazen-Williams katsayısı, C';
 $ec_lang['hw_note_1']='<dl><dt>Bu hesaplayıcı, iki uç arasındaki boru profilini modellemez.</dt><dd>Yalnızca girdiğiniz memba ve mansap kotlarını kullanır. Zemin, aradaki bir noktada her iki uçtan daha yükseğe çıkıyorsa, o yüksek noktadaki basınç burada bildirilen basınçlardan daha düşüktür. Bunu kontrol etmek için hesaplayıcıyı, memba ucundan yüksek noktaya kadar olan uzunluk için tekrar çalıştırın.</dd><dd>HGL\'nin borunun altına düştüğü yerlerde, su negatif basınç altındadır. Hava çözeltiden çıkar, ince cidarlı bir boru çökebilir ve kirli yeraltı suyu eklem yerlerinden içeri çekilebilir. Hattı her yerde pozitif basınç altında tutun ve her yüksek noktada bir hava vanası kullanmayı düşünün.</dd><dt>Memba basıncı, sizin sağladığınız bir sınır koşuludur.</dt><dd>Bunu bir manometreden, bir tank su seviyesinden (borunun üzerindeki su yüksekliği) veya bir pompa eğrisinden okuyun. Debi arttıkça pompa daha az basınç sağlar, bu yüzden yukarıda girilen debiye karşılık gelen eğri üzerindeki noktayı kullanın.</dd><dt>Yerel kayıp katsayılarını kendiniz toplayın.</dt><dd>Hat üzerindeki her vana, dirsek, T-parçası, sayaç ve giriş için K değerlerini toplayın ve bu toplamı girin. Tipik değerler için o girdinin yanındaki bağlantıyı izleyin. Uzun bir iletim hattında bu kayıplar sürtünmenin yanında küçüktür, ancak kısa istasyon borulamasında kayıpların çoğunu oluşturabilirler.</dd></dl>';
-$ec_lang['hw_notes_epanet_term']='Hazen-Williams sabitleri artık EPANET ile aynı (Ağustos 2026)';
-$ec_lang['hw_notes_epanet_def']='Ağustos 2026\'da Hazen-Williams katsayısı ve üssü, EPANET ile aynı olacak şekilde değiştirildi. Yük kaybı sonuçları bu sayfanın önceki sürümlerinden en fazla yüzde 0,1 farklıdır; bu, C değerinin kendi belirsizliğinden çok daha küçüktür.';
 // Manning Irregular
 $ec_lang['mi_menu']='Manning Düzensiz Kesitli Kanal';
 $ec_lang['mi_main_title']='Ücretsiz Çevrimiçi Manning Düzensiz Kesitli Kanal Hesaplayıcısı';
@@ -624,8 +622,6 @@ $ec_lang['bpn_notes_2_term']='Yalnızca dallı şebekeler, döngü yok';
 $ec_lang['bpn_notes_2_def']='Her hattın tam olarak bir memba hattı vardır (bir ağaç). Bu araç, yinelemeli yöntemler (EPANET veya benzeri) gerektiren halkalı şebekeleri çözmez. Şebekede halka olmadığı için çözüm doğrudan ve kesindir.';
 $ec_lang['bpn_notes_3_term']='Aktif basınç kontrolü yok';
 $ec_lang['bpn_notes_3_def']='Sabit bir yerel kayıp vanası (bir k değeri) ekleyebilirsiniz, ancak basınç düşürücü veya basınç sürdürücü vanalar (PRV/PSV) ekleyemezsiniz. Bunların açık/kapalı durumu debiye ve basınca bağlıdır, bu da yinelemeyi zorunlu kılar.';
-$ec_lang['bpn_notes_epanet_term']='Hazen-Williams sabitleri artık EPANET ile aynı (Ağustos 2026)';
-$ec_lang['bpn_notes_epanet_def']='Ağustos 2026\'da Hazen-Williams katsayısı ve üssü, EPANET ile aynı olacak şekilde değiştirildi. Yük kaybı sonuçları bu sayfanın önceki sürümlerinden en fazla yüzde 0,1 farklıdır; bu, C değerinin kendi belirsizliğinden çok daha küçüktür.';
 $ec_lang['bpn_supply2_q']='Besleme debisi 2';
 $ec_lang['bpn_supply2_h']='Besleme yükü 2';
 $ec_lang['bpn_supply3_q']='Besleme debisi 3';
@@ -1810,7 +1806,7 @@ $ec_lang['lpn_inp_drop_quality']='Bu dosya su kalitesini tanımlıyor: borularda
 $ec_lang['lpn_inp_drop_sources_mixing']='Bu dosya, bir kimyasalın şebekeye nerede enjekte edildiğini ve her depoda suyun nasıl karıştığını belirtir. Her kaynak uygulandığı düğümde, her depo da karışım modelini gösterir. İkisi de şebeke bir toplam çalışma süresi boyunca çalıştırıldığında kullanılır.';
 $ec_lang['lpn_inp_drop_energy']='Bu EPANET dosyası, pompalama maliyeti modelleme verisi içeriyor. Bu sayfa bunu okuyup kullanıyor. Modeli EPANET motoruyla çalıştırın, sonra her pompanın ne kadar çalıştığını, çektiği gücü, kullandığı enerjiyi ve bunun maliyetini görmek için Su, Raporlar, Pompa enerjisi\'ni açın. Satırlar korunur ve bir EPANET dosyası kaydederseniz geri yazılır.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_inp_drop_tags']='Bu dosya, bazı düğümlerine, borularına veya diğer öğelerine etiket veriyor. Her etiket tam olarak geldi ve her biri kendi öğesinin özelliklerinde durur; orada okuyabilir veya değiştirebilirsiniz.';
+$ec_lang['lpn_inp_drop_tags']='Bu dosya, bazı düğümlerine, borularına veya diğer öğelerine künye atıyor. Her künye tam olarak geldi ve her biri kendi öğesinin özelliklerinde durur; orada okuyabilir veya değiştirebilirsiniz.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_inp_drop_report']='Bu dosya EPANET rapor biçimi ayarları içeriyor. Çalıştırma raporu Raporlar, Çalıştırma altında bulunur, ancak bu ayarların belirttiği biçimi değil, standart EPANET biçimini kullanır. Satırlar korunur ve bir EPANET dosyası kaydederseniz geri yazılır.';
 $ec_lang['lpn_inp_drop_sections']='Bu dosya, bu sayfanın hiç okumadığı bir bölüm içeriyor. Burada kullanılmaz. Bütün olarak korunur ve bir EPANET dosyası kaydederseniz geri yazılır.';
@@ -2099,8 +2095,6 @@ $ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>Ok tu
 // settings.colorFrozenBreaks in js/looped-network.js.
 $ec_lang['lpn_notes_color_term']='Renk bandı sınırları aynı kalır';
 $ec_lang['lpn_notes_color_def']='Renk bandı sınırları, bir veri sınıflandırma yöntemi seçtiğinizde belirlenir. Her zaman adımında yeniden belirlenmez, çünkü bu, renklerin her adımda yeni bir şey ifade etmesine yol açar ve bu, sisteminizi görselleştirmek için yararlı değildir. EPANET de aynı şekilde çalışır. Yeni sınırlar almak için yöntemi yeniden seçin veya kendi sınırlarınızı yazın.';
-$ec_lang['lpn_notes_epanet_term']='Hazen-Williams sabitleri artık EPANET ile eşleşiyor';
-$ec_lang['lpn_notes_epanet_def']='Ağustos 2026\'da Hazen-Williams katsayısı ve üssü, EPANET ile eşleşecek şekilde değiştirildi. Yük kaybı sonuçları bu sayfanın önceki sürümlerinden en fazla yüzde 0,1 farklıdır; bu, C değerinin kendisindeki belirsizlikten çok daha küçüktür.';
 $ec_lang['lpn_notes_engine_term']='Bu sayfa hangi EPANET\'i çalıştırıyor';
 $ec_lang['lpn_notes_engine_def']='Bu sayfadaki EPANET çözücüsü, 20 Şubat 2025\'te yayımlanan OWA-EPANET 2.3.5\'tir. EPANET, Aralık 2019\'da 2.2.0 sürümünü yayımlayan Amerika Birleşik Devletleri Çevre Koruma Ajansı ile çalışan bir topluluk olan Open Water Analytics tarafından geliştirilir. Çalışma raporu ona 2.3.05 der, çünkü motor son sayıyı iki basamakla yazar. Bu sayfaya, Luke Butler\'ın MIT lisansı altındaki epanet-js 0.9.0\'ı üzerinden ulaşır ve tarayıcınızın içinde çalışır: şebekeniz çözülmek üzere hiçbir yere gönderilmez.';
 $ec_lang['lpn_id_invalid']='Boşluk ve tırnak işareti içermeyen bir kimlik girin.';
@@ -2242,9 +2236,9 @@ $ec_lang['lpn_field_desc']='Açıklama';
 // page a Label is our own annotation and a Text is EPANET's label, and a third word in that
 // neighbourhood is the collision CLAUDE.md's vocabulary rule exists to stop. Tag is EPANET's own
 // word for this and a hydraulic engineer already knows it.
-$ec_lang['lpn_field_tag']='Etiket';
+$ec_lang['lpn_field_tag']='Künye';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_field_tag_tip']='Bir etiket, bir basınç bölgesi veya bir iş emri gibi istediğiniz herhangi bir anlamı taşıyabilir. Ne burada ne de EPANET\'te hiçbir hesaplama onu okumaz. Bir etiket tek bir sözcüktür: EPANET ilk boşlukta okumayı durdurur, bu yüzden yazarken bir boşluk reddedilir. EPANET dosyasına ve ondan geri taşınır.';
+$ec_lang['lpn_field_tag_tip']='Bir künye, bir basınç bölgesi veya bir iş emri gibi istediğiniz herhangi bir anlamı taşıyabilir. Ne burada ne de EPANET\'te hiçbir hesaplama onu okumaz. Bir künye tek bir sözcüktür: EPANET ilk boşlukta okumayı durdurur, bu yüzden yazarken bir boşluk reddedilir. EPANET dosyasına ve ondan geri taşınır.';
 $ec_lang['lpn_pump_effic_curve']='Pompa verim eğrisi';
 $ec_lang['lpn_pump_effic_curve_tip']='Bu pompanın her debide ne kadar verimli olduğunu belirten, Kitaplıklar kutusundaki eğri. Birden çok pompa aynı eğriyi kullanabilir, ve onu orada düzenlemek hepsini değiştirir. Bu pompa yalnızca başvuruyu tutar; noktaların kendisi Kitaplıklar, Eğriler altında okunur ve düzenlenir.';
 // **THE STRINGS EVERY CURVE CONTROL SHARES** (Task 586). One chooser serves a pump's head curve, a

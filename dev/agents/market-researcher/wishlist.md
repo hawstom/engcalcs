@@ -614,3 +614,6 @@ Today's answer rests on three half-verified rivals. Worth one session: price and
 
 ## 0q. Screenshots of Civil 3D Override/Child Override columns and a Bentley forum thread on inherited rows (2026-10-12)
 The icon artwork (down arrow, its pending state, the lock) and whether WaterGEMS tints inherited rows are in no text I can read. One screenshot each of Civil 3D Edit Feature Settings (with a child override present, before and after clicking the arrow) and a WaterGEMS Alternative Editor with mixed ticked/clear rows closes it. Also: three Autodesk or Bentley forum threads on "my child didn't update" for complaint evidence (same fetch limit as 0o). Cost: ten minutes of Tom's time.
+
+## Length adjustment factor: I could not find a tool that offers one (2026-10-14)
+Per-pipe user length override and a 3D (x,y,z) length exist in WaterGEMS (docs.bentley.com SS6 Pipe Attributes); no project-wide factor found anywhere I could reach. Wish: someone with a WaterGEMS/InfoWater/KYPipe licence confirm in the product, and read Walski's Advanced Water Distribution Modeling and AWWA M32 on length from maps. Cost: an hour with the books.
