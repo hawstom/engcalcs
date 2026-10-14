@@ -2670,6 +2670,8 @@ $ec_lang['lpn_field_roughness']='Roughness';
 // selector lands (see numberFieldPlain()'s own note).
 $ec_lang['lpn_field_roughness_tip']='Hazen-Williams C. A higher number means a smoother pipe: about 150 for new plastic, 130 for new steel or iron, and 100 for old pipe.';
 $ec_lang['lpn_field_length']='Length';
+// Task 643 (Tom, 2026-10-14): an Auto length is the slope distance. No claim about accuracy (Task 641).
+$ec_lang['lpn_field_length_slope_tip']='Pipe length. When Auto is checked, the length is measured along the slope: the drawn length combined with the difference in elevation between the two end nodes.';
 $ec_lang['lpn_field_from']='From';
 $ec_lang['lpn_field_to']='To';
 // Tom, 2026-10-09: From and To are editable text. Said in the box a refused ID is said in.
