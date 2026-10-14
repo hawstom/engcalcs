@@ -75840,10 +75840,19 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			lead.className = 'lpn-tree-spacer';
 		}
 		row.appendChild(lead);
+		// **THE CHILD ICON ONLY WHERE THERE ARE CHILDREN** (Tom, 2026-10-14: *"It appears when it can
+		// have no meaning. It might be useful if it appeared only when an entry has descendants."*).
+		// It was drawn on every item, after the icon per node of Civil 3D's Toolspace, to say "a
+		// child"; a leaf now keeps the icon's width empty, so every name on a level still starts at
+		// one edge. A Base keeps its own icon.
 		icon = document.createElement('span');
-		icon.className = 'lpn-sm-icon lpn-sm-icon-' + smIconKind(tree, r);
 		icon.setAttribute('aria-hidden', 'true');
-		icon.innerHTML = '<svg viewBox="0 0 16 16" width="16" height="16">' + SM_ICONS[smIconKind(tree, r)] + '</svg>';
+		if (r.depth === 0 || r.hasKids) {
+			icon.className = 'lpn-sm-icon lpn-sm-icon-' + smIconKind(tree, r);
+			icon.innerHTML = '<svg viewBox="0 0 16 16" width="16" height="16">' + SM_ICONS[smIconKind(tree, r)] + '</svg>';
+		} else {
+			icon.className = 'lpn-sm-icon lpn-sm-icon-none';
+		}
 		row.appendChild(icon);
 		name.className = 'lpn-sm-name';
 		if (smState.editing === r.key) {

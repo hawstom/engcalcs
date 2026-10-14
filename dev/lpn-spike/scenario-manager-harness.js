@@ -132,6 +132,10 @@ async function run(mutate, quiet) {
 	ok('3.2 an alternative with a child is refused, naming it', r2.refused === 'in use' && r2.who.join() === dd.name, JSON.stringify(r2));
 	const want2 = PC.lpn_sm_in_use.replace(/\\n/g, '\n').replace('{item}', PC.lpn_sm_item_alternative.replace('{name}', d1.name)).replace('{list}', PC.lpn_sm_item_alternative.replace('{name}', dd.name));
 	ok('3.2a the refusal reads "Alternative X cannot be deleted while it is used by", a line break, then each user', L.smInUseText('demand', d1.id, d1.name) === want2 && /\n/.test(want2), JSON.stringify(L.smInUseText('demand', d1.id, d1.name)));
+	// Tom, 2026-10-14: the Alternative on line 1, "cannot be deleted while it is used by" alone on line 2, the users from line 3.
+	const lines2 = L.smInUseText('demand', d1.id, d1.name).split('\n');
+	ok('3.2c line 1 is the alternative alone, line 2 the phrase alone, line 3 the first user', lines2.length === 3 && lines2[0] === PC.lpn_sm_item_alternative.replace('{name}', d1.name) &&
+		lines2[1] === PC.lpn_sm_in_use.split('\\n')[1] && lines2[2] === PC.lpn_sm_item_alternative.replace('{name}', dd.name), JSON.stringify(lines2));
 	ok('3.2b a scenario with a child reads the same way, naming Scenario {name}', L.smInUseText('scenarios', c1.id, c1.name) === PC.lpn_sm_in_use.replace(/\\n/g, '\n').replace('{item}', PC.lpn_sm_item_scenario.replace('{name}', c1.name)).replace('{list}', PC.lpn_sm_item_scenario.replace('{name}', g1.name)), JSON.stringify(L.smInUseText('scenarios', c1.id, c1.name)));
 	ok('3.3 a leaf goes', L.smDelete('demand', dd.id) === true && L.smRecords('demand').filter((r) => !r.root).length === 2);
 	L.smAssign(c2.id, 'demand', 'Peak');
