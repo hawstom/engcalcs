@@ -3289,6 +3289,7 @@ $ec_lang['lpn_scenario_push_tip']='Every scenario goes back to the Base value fo
 $ec_lang['lpn_scenario_basic']='Basic mode';
 $ec_lang['lpn_scenario_basic_tip']='Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Scenario manager is disabled when Basic mode is on. Basic mode is disabled when a project has scenarios and alternatives relationships that Basic mode cannot show.';
 $ec_lang['lpn_scenario_basic_misfit']='This project has scenarios and alternatives relationships that are not compatible with Scenarios Basic mode, so Basic mode is disabled.';
+$ec_lang['lpn_scenario_basic_misfit_base']='The Base scenario uses an alternative other than Base.';
 $ec_lang['lpn_scenario_copy']='Copy scenario';
 $ec_lang['lpn_scenario_copy_tip']='Copies the open scenario and its overrides, and opens the copy.';
 $ec_lang['lpn_scenario_copy_off']='Copy scenario works in Basic mode. With Basic mode off, add a scenario and choose its alternatives in the Scenarios table.';

@@ -7563,8 +7563,15 @@ var EngCalcs = EngCalcs || {};
 			if (scenarios.indexOf(holder) >= 0) { return [holder]; }
 			return scenarios.filter(function (sc) { return treeLayers(sc, holder.category).some(function (l) { return l.obj === holder; }); });
 		}
+		// **AN ALTERNATIVE BASE ITSELF USES IS BASE'S VALUES**, so the push leaves it alone: clearing it
+		// would change what Base shows, the one thing "apply Base values" promises not to do.
+		var baseHeld = [];
+		LPN_ALT_CATEGORIES.forEach(function (cat) {
+			treeLayers(baseScenario(), cat).forEach(function (l) { baseHeld.push(l.obj); });
+		});
 		eachOverrideMap(function (map, holder) {
 			var any = false;
+			if (baseHeld.indexOf(holder) >= 0) { return; }
 			// Walks the map by KEY and matches on the property NAME only -- deliberately group-blind,
 			// because no property in pushSpecList() exists on both groups (`active` is the only name
 			// LPN_OVERRIDABLE shares, and it is not pushable). Task 324.
@@ -7589,7 +7596,8 @@ var EngCalcs = EngCalcs || {};
 		askDialog({ kind: 'confirm', text: msg }, function (yes) {
 			if (!yes) { return; }
 			saveUndoSnapshot();
-			eachOverrideMap(function (map) {
+			eachOverrideMap(function (map, holder) {
+				if (baseHeld.indexOf(holder) >= 0) { return; }
 				scopedKeys(map).forEach(function (k) {
 					active.forEach(function (spec) {
 						(spec.ovProps || [spec.prop]).forEach(function (p) { delete map[k][p]; });
@@ -75986,6 +75994,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		});
 		return why;
 	}
+	// The refusal, plus the reason when it is the one a visitor cannot see from the tree: Base itself
+	// using an alternative (Perry, 2026-10-14).
+	function basicMisfitText() {
+		var pc = EngCalcs.pageConfig || {};
+		return (pc.lpn_scenario_basic_misfit || 'This project has scenarios and alternatives relationships that are not compatible with Scenarios Basic mode, so Basic mode is disabled.')
+			+ (basicModeMisfit() === 'base' ? ' ' + (pc.lpn_scenario_basic_misfit_base || 'The Base scenario uses an alternative other than Base.') : '');
+	}
 	// Called wherever a document arrives (paneDocumentArrived()): a project Basic mode cannot show
 	// turns it off, and says so in Tom's words.
 	// The switch-off on arrival is this project's alone: the remembered choice stays the visitor's,
@@ -75995,7 +76010,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		loadScenarioBasicPref();
 		if (scenarioBasicMode && basicModeMisfit()) {
 			scenarioBasicMode = false;
-			setNotice(pc.lpn_scenario_basic_misfit || 'This project has scenarios and alternatives relationships that are not compatible with Scenarios Basic mode, so Basic mode is disabled.');
+			setNotice(basicMisfitText());
 		}
 		if (scenarioBasicMode !== was) {
 			if (scenarioBasicMode) { closeScenarioManager(); }
@@ -76008,7 +76023,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// In the dialog (Tom, 2026-10-13: a line in the messages log is not discoverable), so nobody
 		// goes on working believing Basic mode is on.
 		if (on && basicModeMisfit()) {
-			tellNotice(pc.lpn_scenario_basic_misfit || 'This project has scenarios and alternatives relationships that are not compatible with Scenarios Basic mode, so Basic mode is disabled.');
+			tellNotice(basicMisfitText());
 			return false;
 		}
 		scenarioBasicMode = !!on;

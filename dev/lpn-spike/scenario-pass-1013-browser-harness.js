@@ -11,6 +11,8 @@
 //   M5  Task 790: the dot (an override here), the hollow dot (inherited) and the down triangle
 //       (child scenarios override it) in Properties and the Settings box; no marker is a tab stop;
 //       the triangle asks "Clear child overrides ({n} total)?" and clears them.
+//   BP  Apply Base values to all scenarios keeps the alternative Base uses; Basic mode's refusal
+//       says Base uses an alternative.
 // Wording is read from the page's own language strings, never written here.
 //
 //   node dev/lpn-spike/scenario-pass-1013-browser-harness.js   (takes the browser lock itself)
@@ -472,6 +474,33 @@ async function main() {
 			const keys = await page.evaluate(() => Array.from(document.querySelectorAll('#lpn_settings_box .lpn-cp-key')).map((e) => e.textContent));
 			ok('CP ' + where + ': the Settings box, opened again, names it', keys.indexOf('kk') >= 0, JSON.stringify(keys));
 		}
+
+		// ---- BP: Apply Base values keeps the alternative Base itself uses (Perry, 2026-10-14) ----
+		console.log('\n--- BP. Apply Base values, with Base using an alternative ---');
+		await openProject((d) => {
+			plain(d);
+			d.alternatives = [{ id: 'a1', category: 'physical', name: 'Base own', parent: null, values: { 'n:10': { elev: 701 } } },
+				{ id: 'a2', category: 'physical', name: 'Other', parent: null, values: { 'n:10': { elev: 702 } } }];
+			byId(d.scenarios, 'base').alternatives = { physical: 'a1' };
+			d.scenarios.push({ id: 'f6', name: 'Fig 6', overrides: { 'n:11': { elev: 703 } }, alternatives: { physical: 'a2' } });
+			d.project.activeScenario = 'base';
+		}, true);
+		a.dialogs.length = 0;
+		a.answerConfirmsWith(true);
+		ok('BP the scenario menu offers "' + (await L('lpn_scenario_push_btn')) + '"', await scenarioMenu(await L('lpn_scenario_push_btn')));
+		await flush();
+		ok('BP ...and asks first', askOf().indexOf((await L('lpn_scenario_push_confirm')).slice(0, 20)) === 0, askOf());
+		ok('BP ...counting only the values outside Base\'s own alternative (2)', /\b2\s*$/.test(askOf()), askOf());
+		sv = await saved();
+		ok('BP the alternative Base uses keeps junction 10\'s elevation, so Base still shows 701',
+			((byId(sv.alternatives, 'a1').values || {})['n:10'] || {}).elev === 701, JSON.stringify(sv.alternatives));
+		ok('BP ...another alternative\'s value is discarded', !((byId(sv.alternatives, 'a2').values || {})['n:10']), JSON.stringify(sv.alternatives));
+		ok('BP ...and a scenario\'s own value too', !(byId(sv.scenarios, 'f6').overrides || {})['n:11'], JSON.stringify(byId(sv.scenarios, 'f6')));
+		a.dialogs.length = 0;
+		await scenarioMenu(await L('lpn_scenario_basic'));
+		const WHY = (await L('lpn_scenario_basic_misfit')) + ' ' + (await L('lpn_scenario_basic_misfit_base'));
+		ok('BP Basic mode refused for it says Base uses an alternative', a.dialogs.some((x) => x.type === 'alert' && x.message === WHY), JSON.stringify(a.dialogs));
+		await page.keyboard.press('Escape');
 
 		ok('no page error', errors.length === 0, JSON.stringify(errors).slice(0, 400));
 	} finally {

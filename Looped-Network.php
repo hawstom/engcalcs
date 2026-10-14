@@ -3845,6 +3845,7 @@ EngCalcs.pageConfig = {
 	lpn_scenario_basic: <?=json_encode($ec_lang['lpn_scenario_basic'])?>,
 	lpn_scenario_basic_tip: <?=json_encode($ec_lang['lpn_scenario_basic_tip'])?>,
 	lpn_scenario_basic_misfit: <?=json_encode($ec_lang['lpn_scenario_basic_misfit'])?>,
+	lpn_scenario_basic_misfit_base: <?=json_encode($ec_lang['lpn_scenario_basic_misfit_base'])?>,
 	lpn_scenario_copy: <?=json_encode($ec_lang['lpn_scenario_copy'])?>,
 	lpn_scenario_copy_tip: <?=json_encode($ec_lang['lpn_scenario_copy_tip'])?>,
 	lpn_scenario_copy_off: <?=json_encode($ec_lang['lpn_scenario_copy_off'])?>,
