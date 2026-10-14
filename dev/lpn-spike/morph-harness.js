@@ -331,7 +331,7 @@ async function run(mutate, quiet) {
 // **LIVE MUTATIONS: EACH MUST TURN THIS HARNESS RED** (dev/testing-notes.md).
 const MUTATIONS = [
 	['Morph in a scenario changes Base instead', (src) => src.replace(
-		"if (!inBaseScenario()) { morphInScenario(to); return; }", "")],
+		"if (!inBaseFor('topology')) { morphInScenario(to); return; }", "")],
 	['the elements are not laid out for the scenario', (src) => src.replace(
 		"\t\t// The elements laid out as the scenario showing sees them (Morph) before any is drawn.\n\t\tmorphViewSync();\n", "")],
 	['the file is written with the scenario\'s types', (src) => src.replace(

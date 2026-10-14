@@ -12,7 +12,7 @@
 //      a drop onto its own child is refused; Enter and a double-click make a scenario current.
 //   4. A category tree (Demand): "Used by scenarios: N" with the list in its tip.
 //   5. The Scenarios table: one row per scenario, a column per category; picking an alternative in a
-//      cell assigns it; Clear override inherits again; the Base row has no pick-list.
+//      cell assigns it; Clear override inherits again; the Base row picks as well (Tom, 2026-10-14).
 //   6. Copy is greyed on the Scenarios tree (Copy scenario is the menu's, in Basic mode); the Compare
 //      checkbox is stored in the project.
 //   7. Basic mode ticked again closes the box and hides the tab; the box's position is the only
@@ -344,7 +344,9 @@ async function main() {
 			return s ? { value: s.value, options: Array.from(s.options).map((o) => o.value + '=' + o.textContent) } : { text: td.textContent.trim() };
 		}, [row, cat]);
 		const baseCell = await cellSel(0, 'demand');
-		ok('5.3 the Base row has no pick-list', !!baseCell.text, JSON.stringify(baseCell));
+		// Tom, 2026-10-14: Base may use any alternative with Basic mode off (his Base rule is Basic mode's).
+		ok('5.3 the Base row has a pick-list too, reading Base, with Base\'s own alternative as its blank row', !baseCell.text && baseCell.value === '' &&
+			baseCell.options[0] === '=' + (await L('lpn_scenario_base')), JSON.stringify(baseCell));
 		const peakRow = trs.indexOf('Peak Hour');
 		const parentOf = (name) => page.evaluate((n) => { const tr = Array.from(document.querySelectorAll('#lpn_pane_scenarios tbody tr')).filter((r) => r.querySelector('td').textContent.trim() === n)[0]; return tr ? tr.children[1].textContent.trim() : null; }, name);
 		ok('5.2b a Base of its own has a blank Parent; a child shows its parent', (await parentOf('Base2')) === '' && (await parentOf('Peak Hour')) === 'Base', String(await parentOf('Base2')) + ' / ' + String(await parentOf('Peak Hour')));
@@ -367,9 +369,10 @@ async function main() {
 		const pc = await cellSel(peakRow, 'demand');
 		// Peak Hour's demand stored its own alternative, named Peak Hour (Tom, 2026-10-12: a
 		// first-class alternative), so the cell names it; the blank row says what inheriting gives
-		// (Base), and Base is not offered twice.
+		// ("Base (inherited)", Tom 2026-10-14: a bare "Base" there blanked the select once Base was
+		// chosen), and Base is offered once.
 		ok('5.4 a scenario\'s Demand cell is a pick-list with the alternatives, its own chosen', pc.options && pc.options.some((o) => o === 'Dry year=Dry year') &&
-			pc.value === 'Peak Hour' && pc.options[0] === '=' + await L('lpn_scenario_base') && pc.options.filter((o) => /=Base$/.test(o)).length === 1, JSON.stringify(pc));
+			pc.value === 'Peak Hour' && pc.options[0] === '=' + await L('lpn_scenario_base') + ' (' + await L('lpn_sm_inherited') + ')' && pc.options.filter((o) => /=Base$/.test(o)).length === 1, JSON.stringify(pc));
 		await page.evaluate(([row]) => {
 			const tr = document.querySelectorAll('#lpn_pane_scenarios tbody tr')[row], th = Array.from(document.querySelectorAll('#lpn_pane_scenarios thead th'));
 			const i = th.findIndex((t) => t._lpnColKey === 'sc_demand'), s = tr.children[i].querySelector('select');

@@ -47,7 +47,8 @@ Nothing carries a parent pointer, so a scenario of a scenario cannot be written 
 ## Tom's Basic-mode constraints on top
 
 1. **One scenario tree of depth one.** Base is the root; every other scenario is Base's child.
-2. **One root alternative per category, used by Base.** We call it the Base alternative of that
+2. **One root alternative per category, used by Base** (in Basic mode; with Basic mode off Base may
+   name any alternative, Tom's calls of 2026-10-14 below). We call it the Base alternative of that
    category ("Base Demand", "Base Physical"...). **Its values are the element's own**, which is
    what the element has always meant here.
 3. **A scenario uses the Base alternative of a category until it holds a local value of a property
@@ -1014,8 +1015,10 @@ Tom's calls of 2026-10-09 (H01-H08), in his words where they govern:
   added (`baseSnapshotOf()`; Tom's calls below), so a later Base edit does not reach it. A stage-4 record with parent null and no
   flag hangs from Base.
 - **Order** (Tom asked for it): `project.scenarioOrdered` is set by the first reorder and freezes the
-  order then shown into the stored array; until then scenarios sort by name, so a file that never
-  reorders opens as it did. The stored order is shown everywhere scenarios are listed.
+  order then shown into the stored array; until then siblings sort by name, so a file that never
+  reorders opens as it did. Every list of scenarios (the Scenarios menu and the Water menu's
+  submenu, the Scenarios table, Show scenarios rows, Compare) follows the Scenario manager's tree,
+  depth first, siblings in that order (Tom, 2026-10-14, below; `scenariosForDisplay()`).
 - **Copy** (H05, superseded 2026-10-12, below): Basic mode only, own alternatives copied, no question.
 - **Compare** solves a checked set kept in `project.compareSet`; absent means every scenario, and
   checking everything deletes the key.
@@ -1153,6 +1156,33 @@ them, one undo step. Base never has a dot, so its gutter is the triangle's one c
 row has one; the ID line moves with the rows. {n} counts the alternatives holding such an override, each once however many
 scenarios share it; a Base of its own (Add base) is never counted. No mark is a tab stop. Not yet: the
 Scenarios table's cells, which still say "inherited" in words.
+
+### Tom's calls of 2026-10-14 (browser pass)
+
+**Base may use any alternative, with Basic mode off.** Tom: *"Is it universal and absolute that Base
+scenario must have only base alternatives? While building my scenarios and alternatives, it seems to
+be a handicap that I can't temporarily set some alternative or another current so that I can create
+its overrides."* His words of 2026-09-30 ("the Base scenario uses all the Base alternatives") are one
+of his rules for Basic mode, so with Basic mode off Base is an ordinary root scenario, as in Bentley.
+Built: Base's row in the Scenarios table picks like any row; `base.alternatives[cat]` / `base.calc`
+name a stored record (`basePick()`), Base reads and writes that record for the category (an edit in
+Base goes into it), and every scenario that inherits the category from Base inherits the pick. Blank
+or Base gives Base its own alternative again. A Base naming any record makes the project one Basic
+mode cannot show (`basicModeMisfit()` 'base'). A Base of its own (Add base) takes nothing from Base.
+Where Base names nothing it writes the elements and the project, exactly as before (`inBaseFor()`,
+`plainBase()`). Drawing, deleting, Change type, Apply Base values, Restore defaults and the view stay
+Base's acts on the drawing itself.
+
+**The inherited ring.** *"Tanks show amber circle on map, but has overrides only in parent, not
+here."* The amber ring is an override where the open scenario writes (hasOverride()'s rule); a value
+it takes from a parent scenario or a parent alternative wears a thinner dashed gray ring instead, with
+its own tip (`lpn_scenario_mark_inh_tip`), the map's hollow dot (Task 790).
+
+**Scenario order** follows the Scenario manager's tree everywhere (above, Order). **The child icon**
+in the manager is drawn only on an item with children; it had been drawn on every child scenario
+after Civil 3D's icon per node, and a leaf now keeps its width empty. **A Base picked under Base**
+blanked the Calculation select, because the blank row also read "Base"; it now reads "Base
+(inherited)". **The Settings box** starts 1.9rem wider, the gutter's width, measured.
 
 ### Next stage: what the advisers said (recorded, not built)
 

@@ -63,7 +63,7 @@ const INJECT =
 	"\t\talternativeFor: alternativeFor, libInactiveIds: libInactiveIds, smInUseBy: smInUseBy, smInUseText: smInUseText,\n" +
 	"\t\toverrideCount: overrideCount, smSharedText: smSharedText, scenarioTableCols: scenarioTableCols, scenarioTableRows: scenarioTableRows,\n" +
 	"\t\tsmImplicitKey: smImplicitKey, onlyInThisScenario: onlyInThisScenario, deleteElement: deleteElement, noticeLog: function () { return noticeLog; },\n" +
-	"\t\ttouchTree: touchTree, ovKey: ovKey, smParseCell: smParseCell,\n" +
+	"\t\ttouchTree: touchTree, ovKey: ovKey, smParseCell: smParseCell, scenarioById: scenarioById, basicModeMisfit: basicModeMisfit,\n" +
 	"\t\tbuildLayers: function () { svg = document.getElementById('lpn_canvas');\n" +
 	"\t\t\tworld = el('g', {}, svg);\n" +
 	"\t\t\tbackdropLayer = el('g', {}, world); gridLayer = el('g', {}, world);\n" +
@@ -221,7 +221,10 @@ async function run(mutate, quiet) {
 	L.switchScenario(R2.id);
 	ok('5.11d ...and picking it back restores its number', (L.smAssign(R2.id, 'demand', 'R2'), L.effective(L.nodeById('22'), 'demand') === 310));
 	L.switchScenario(R.id);
-	ok('5.12 a Base row cannot choose', L.smAssign(BASE, 'demand', 'PeakDemand').refused === 'base');
+	// Tom, 2026-10-14: Base may use any alternative (his Base-uses-Base-alternatives rule is Basic mode's).
+	ok('5.12 a Base row may choose an alternative, and choosing blank gives Base its own again',
+		L.smAssign(BASE, 'demand', 'PeakDemand') === true && L.smCellValue(L.scenarioById(BASE), 'demand') === 'PeakDemand' &&
+		L.smAssign(BASE, 'demand', '') === true && L.smCellValue(L.scenarioById(BASE), 'demand') === '' && L.scenarioById(BASE).alternatives === undefined);
 	ok('5.13 the table has a row per scenario and a column per category', (() => {
 		const cols = L.scenarioTableCols(), rows = L.scenarioTableRows();
 		return cols.length === 2 + 11 && rows.length === L.scenariosForDisplay().length && rows[0].id === BASE;
@@ -551,6 +554,51 @@ async function runTail(mutate, quiet) {
 		ok('14.12 the Calculation column offers Base as well', P.smCellChoices(Kid, 'calculation').length >= 1 &&
 			(P.smCellChoices(Kid, 'calculation').some((o) => o[0] === BASEW) || P.smChoice(Kid, 'calculation').base === true));
 	}
+
+	// Tom, 2026-10-14: "Is it universal and absolute that Base scenario must have only base
+	// alternatives? ... it seems to be a handicap that I can't temporarily set some alternative or
+	// another current so that I can create its overrides." His Base-uses-Base-alternatives rule is one
+	// of his Basic mode rules (2026-09-30); with Basic mode off Base is an ordinary root, as in Bentley.
+	say('--- 15. Base may use any alternative (Basic mode off) ---');
+	{
+		const P = page();
+		P.importInp({ name: 'Net1.inp', _text: NET1 });
+		P.setBasicMode(false);
+		const solve = () => { const r = solver.lpnSolve(P.assembleModel(), { tol: 1e-10 }); return r && r.converged ? r.heads : null; };
+		const BASE = P.baseScenario(), BASEW = PC.lpn_scenario_base, j22 = P.nodeById('22'), d0 = j22._demand;
+		const base0 = solve();
+		const Big = P.createScenario('Big');
+		P.switchScenario(Big.id);
+		P.setProp(j22, 'demand', 900);
+		const bigH = solve();
+		const Kid = P.createScenario('Kid');   // a child of Base, holding nothing
+		P.switchScenario(BASE.id);
+		const bigAlt = Big.alternatives.demand;
+		ok('15.1 Base picks the Big demand alternative in its own row', P.smAssign(BASE.id, 'demand', 'Big') === true && BASE.alternatives && BASE.alternatives.demand === bigAlt &&
+			P.smCellValue(BASE, 'demand') === 'Big' && P.smCellText(BASE, 'demand') === 'Big', JSON.stringify(BASE.alternatives));
+		ok('15.2 ...Base now solves as Big does, to 1e-9, and the element itself is untouched', !!solve() && Math.abs(solve()['22'] - bigH['22']) < 1e-9 && j22._demand === d0, String(solve() && solve()['22']));
+		P.setProp(j22, 'demand', 950);
+		const alt = P.getDoc().alternatives.filter((a) => a.id === bigAlt)[0];
+		ok('15.3 an edit in Base goes to the alternative Base uses, not the element', alt.values['n:22'].demand === 950 && j22._demand === d0, JSON.stringify(alt.values['n:22']));
+		P.setProp(P.nodeById('12'), 'elev', 777);
+		ok('15.4 ...while a category Base names nothing for still writes the element', P.effective(P.nodeById('12'), 'elev') === 777 && !(P.getDoc().alternatives || []).some((a) => a.category === 'physical'), JSON.stringify([P.nodeById('12')._elev, P.nodeById('12').elev, P.effective(P.nodeById('12'), 'elev'), (P.getDoc().alternatives || []).map((a) => a.category)]));
+		P.switchScenario(Kid.id);
+		ok('15.5 a child holding nothing inherits Base\'s pick, and its cell says so', Math.abs(solve()['22'] - (P.switchScenario(Big.id), solve())['22']) < 1e-9 &&
+			(P.switchScenario(Kid.id), /\(/.test(P.smCellText(Kid, 'demand')) && P.smCellText(Kid, 'demand').indexOf('Big') === 0), P.smCellText(Kid, 'demand'));
+		P.setProp(P.nodeById('12'), 'demand', 300);
+		const kidAlt = P.getDoc().alternatives.filter((a) => a.id === Kid.alternatives.demand)[0];
+		ok('15.6 ...and its first override makes its own alternative a child of the one it inherited from Base', !!kidAlt && kidAlt.parent === bigAlt &&
+			P.effective(j22, 'demand') === 950, JSON.stringify(kidAlt));
+		ok('15.7 Base counts among the users of Big, and Basic mode cannot show the project', P.smUsedBy('demand', bigAlt).indexOf(BASE) >= 0 && P.basicModeMisfit() === 'base');
+		const text = JSON.stringify(P.serializeProject());
+		const Q = page();
+		Q.importProject(JSON.parse(text));
+		ok('15.8 the pick is in the file and survives a save and reopen', JSON.stringify(Q.serializeProject()) === text && Q.baseScenario().alternatives.demand === bigAlt);
+		P.switchScenario(BASE.id);
+		ok('15.9 choosing Base (or blank) in Base\'s row gives Base its own alternative again: it solves as before, to 1e-9',
+			P.smAssign(BASE.id, 'demand', BASEW) === true && BASE.alternatives === undefined && Math.abs(solve()['22'] - base0['22']) < 1e-9 && P.basicModeMisfit() !== 'base', String(solve()['22']));
+		ok('15.10 ...and the Kid alternative now hangs from Big, which no longer reaches Base', kidAlt.parent === bigAlt && P.effective(j22, 'demand') === d0);
+	}
 	return fails;
 }
 
@@ -563,7 +611,9 @@ const MUTATIONS = [
 	['a copy shares the alternatives it names', (src) => src.replace("				c = altCopy(orig);\n				c.id = treeNewId(storedList(kind), kind === 'calc' ? 'c' : 'a');\n				c.name = smUniqueName(cat, name);\n				storedList(kind).push(c);\n				copies[cat] = c.id;", "				copies[cat] = orig.id;")],
 	['an assignment drops the values the scenario held', (src) => src.replace("			kept = promoteStored(s.id, cat, smUniqueName(cat, scenarioDisplayName(s), smImplicitKey(s, cat)));\n			if (kept.refused) { return kept; }", "			kept = { name: 'x' };\n			takeScenarioLocals(s, cat);")],
 	['a new child is not named for its parent', (src) => src.replace("name = 'Child_' + n + '_of_' + parent;", "name = 'Child_' + n;")],
-	['only-in-this-scenario reads the scenario\'s own values alone', (src) => src.replace("var ov = (!scn || scn.isBase) ? null : resolvedOverrides(scn)[ovKey(el)];", "var ov = (!scn || scn.isBase) ? null : (scn.overrides || {})[ovKey(el)];"), true],
+	['Base\'s pick is not read by the resolver', (src) => src.replace("named = s && !seen[s.id] ? basePick(s, cat) : undefined;", "named = undefined;"), true],
+	['an edit in Base always writes the element', (src) => src.replace("if (!inBaseFor(categoryOf(prop, elGroup(el))) && isOverridable(el, prop)) { setOverride(el, prop, value); return; }", "if (!inBaseScenario() && isOverridable(el, prop)) { setOverride(el, prop, value); return; }"), true],
+	['only-in-this-scenario reads the scenario\'s own values alone', (src) => src.replace("var ov = (!scn || plainBase(scn)) ? null : resolvedOverrides(scn)[ovKey(el)];", "var ov = (!scn || plainBase(scn)) ? null : (scn.overrides || {})[ovKey(el)];"), true],
 	['a scenario\'s own alternative is not an item of its tree', (src) => src.replace("		}).map(function (s) { return smImplicitRecord(s, tree); });", "		}).map(function (s) { return smImplicitRecord(s, tree); }).slice(0, 0);")],
 	['the first override asks first', (src) => src.replace("		var scn = activeScenario(), key = ovKey(el), t = ownWriteTarget(scn, categoryOf(prop, elGroup(el)));\n", "		if (writeTargetFor(activeScenario(), categoryOf(prop, elGroup(el))).kind === 'scn') { askDialog({ kind: 'alert', text: 'x' }); }\n		var scn = activeScenario(), key = ovKey(el), t = ownWriteTarget(scn, categoryOf(prop, elGroup(el)));\n"), true],
 	['the manager row is enabled in Basic mode', (src) => src.replace("label: pc.lpn_sm_menu || 'Scenario manager…', disabled: scenarioBasicMode,", "label: pc.lpn_sm_menu || 'Scenario manager…', disabled: false,")]

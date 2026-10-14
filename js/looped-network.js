@@ -3986,7 +3986,7 @@ var EngCalcs = EngCalcs || {};
 	 */
 	function writeNodeCoord(n, isY, inward, outward) {
 		if (!n) { return; }
-		if (!inBaseScenario()) {
+		if (!inBaseFor(categoryOf(isY ? 'y' : 'x', 'node'))) {
 			if (outward === undefined) { outward = isY ? outwardY(inward) : outwardX(inward); }
 			setOverride(n, isY ? 'y' : 'x', outward);
 			return;
@@ -4055,7 +4055,7 @@ var EngCalcs = EngCalcs || {};
 		// (Task 674). The override IS the typed characters, so it needs no source of its own; and
 		// Base's coordinate has not moved, so Base's `_xsrc`/`_ysrc` is still true. Writing one here
 		// from inside a scenario would file a source record for a number the element does not hold.
-		if (isLatLonProject() && inBaseScenario()) { n[isY ? LPN_GEO_YSRC : LPN_GEO_XSRC] = v; }
+		if (isLatLonProject() && inBaseFor(categoryOf(isY ? 'y' : 'x', 'node'))) { n[isY ? LPN_GEO_YSRC : LPN_GEO_XSRC] = v; }
 		updateNode(n.id);
 		// Every other label on the map is an obstacle to this node's, and the node has just moved --
 		// the same call every node drag ends in.
@@ -4351,7 +4351,7 @@ var EngCalcs = EngCalcs || {};
 		// alternative is a second copy of a number the drawing already states. Asked AFTER the
 		// override above, so a length the user typed in this scenario still wins; and gated on an
 		// END having moved, so the ordinary case is two hash lookups and no polyline walk.
-		if (prop === 'length' && el.lenAuto && !inBaseScenario() && linkEndIsMoved(el)) {
+		if (prop === 'length' && el.lenAuto && !inPlainBase() && linkEndIsMoved(el)) {
 			return linkGeomLength(el);
 		}
 		if (LPN_TYPE_PROP_SET[prop]) {
@@ -4737,6 +4737,46 @@ var EngCalcs = EngCalcs || {};
 		return !!(LPN_OVERRIDABLE[elGroup(el)] || {})[prop];
 	}
 	function inBaseScenario() { return !!activeScenario().isBase; }
+	// **BASE MAY USE ANY ALTERNATIVE OF A CATEGORY, AS IN BENTLEY** (Tom, 2026-10-14: *"Is it universal
+	// and absolute that Base scenario must have only base alternatives? While building my scenarios
+	// and alternatives, it seems to be a handicap that I can't temporarily set some alternative or
+	// another current so that I can create its overrides."*). His rule that Base uses every Base
+	// alternative is one of his Basic mode rules (2026-09-30, dev/scenario-alternatives.md); with
+	// Basic mode off, Base is an ordinary root scenario. `base.alternatives[cat]` / `base.calc` name a
+	// stored record; Base then reads and writes that record for the category, as any scenario does,
+	// and its children inherit it. Where it names none, Base is the elements and the project, as ever.
+	// basePick(): the stored id Base names for a category, or undefined.
+	function basePick(s, cat) {
+		var v;
+		if (!s || !s.isBase) { return undefined; }
+		v = storedChoiceOf(s, cat);
+		return (v === undefined || v === LPN_BASE_CHOICE) ? undefined : v;
+	}
+	function baseHasPicks(s) {
+		return !!s && !!s.isBase && LPN_ALT_CATEGORIES.some(function (cat) { return basePick(s, cat) !== undefined; });
+	}
+	// Base, naming no alternative: the elements and the project, with nothing to resolve.
+	function plainBase(s) { return !!s && !!s.isBase && !baseHasPicks(s); }
+	function inPlainBase() { return plainBase(activeScenario()); }
+	// Runs fn with Base naming `id` (null or undefined: nothing) for one category, then puts its
+	// choice back. Read-only use: what a value would be one step up Base's chain.
+	function withBasePick(b, cat, id, fn) {
+		var field = cat === 'calculation' ? 'calc' : 'alternatives', was = altCopy(b[field]);
+		if (cat === 'calculation') { if (id === null || id === undefined) { delete b.calc; } else { b.calc = id; } }
+		else {
+			b.alternatives = Object.assign({}, b.alternatives || {});
+			if (id === null || id === undefined) { delete b.alternatives[cat]; } else { b.alternatives[cat] = id; }
+			if (!Object.keys(b.alternatives).length) { delete b.alternatives; }
+		}
+		touchTree('withBasePick');
+		try { return fn(); } finally {
+			if (was === undefined) { delete b[field]; } else { b[field] = was; }
+			touchTree('withBasePick');
+		}
+	}
+	// True where an edit of this category in the open scenario writes the elements or the project:
+	// Base, naming no alternative for the category.
+	function inBaseFor(cat) { var s = activeScenario(); return !!s.isBase && basePick(s, cat) === undefined; }
 	// **THE MARKER IS "LOCAL WHERE THIS SCENARIO WRITES"**: in its own values, or in the stored
 	// alternative it names for the property's category. An inherited value is not marked.
 	function hasOverride(el, prop) {
@@ -4758,7 +4798,7 @@ var EngCalcs = EngCalcs || {};
 		return el['_' + prop];
 	}
 	function setOverride(el, prop, value) {
-		if (!el || !isOverridable(el, prop) || inBaseScenario()) { return; }
+		if (!el || !isOverridable(el, prop) || inBaseFor(categoryOf(prop, elGroup(el)))) { return; }
 		var scn = activeScenario(), key = ovKey(el), t = ownWriteTarget(scn, categoryOf(prop, elGroup(el)));
 		// A stored alternative the scenario names takes the write (one source of truth: a scenario
 		// that names one holds no local value in its category).
@@ -4804,7 +4844,7 @@ var EngCalcs = EngCalcs || {};
 		// writeDemandRows(). And once a scenario owns the whole list, row 0's base is a row of it,
 		// so a `demand` write lands there rather than minting a second override beside it.
 		if (prop === 'demands' && elGroup(el) === 'node') { writeDemandRows(el, value); return; }
-		if (prop === 'demand' && !inBaseScenario() && demandOverrideRows(el)) {
+		if (prop === 'demand' && !inBaseFor('demand') && demandOverrideRows(el)) {
 			var dr = ownDemandRows(el);
 			dr[0].base = value;
 			writeDemandRows(el, dr);
@@ -4812,8 +4852,8 @@ var EngCalcs = EngCalcs || {};
 		}
 		// **A MORPH IN A SCENARIO IS AN OVERRIDE OF THE TYPE** (Task 781): see morphInScenario(). In
 		// Base the type is the element's own, and Morph there goes through applyNodeTypeChange().
-		if (LPN_MORPH_PROP[prop] && inBaseScenario()) { el[prop] = value; return; }   // base-write: setProp() in Base, the one door
-		if (!inBaseScenario() && isOverridable(el, prop)) { setOverride(el, prop, value); return; }
+		if (LPN_MORPH_PROP[prop] && inBaseFor('topology')) { el[prop] = value; return; }   // base-write: setProp() in Base, the one door
+		if (!inBaseFor(categoryOf(prop, elGroup(el))) && isOverridable(el, prop)) { setOverride(el, prop, value); return; }
 		// A Text's x or y arrives outward, as a node's does, and Base keeps it in the drawing frame.
 		if (LPN_COORD_PROP[prop] && elGroup(el) === 'label') { el[prop] = textCoordIn(el, prop, value); return; }   // base-write: setProp() in Base, the one door
 		if (LPN_BARE_PROP[prop] && isOverridable(el, prop)) { el[prop] = value; return; }   // base-write: setProp() in Base, the one door
@@ -4844,7 +4884,7 @@ var EngCalcs = EngCalcs || {};
 		// 0): each stored alternative or calculation set in the chain of each category, folded as it
 		// resolves, so a value an alternative and its parent both state counts once. Only when a tree
 		// is stored, so a project without one counts exactly as before.
-		if (isExplicitTree() && !scn.isBase) {
+		if (isExplicitTree() && !plainBase(scn)) {
 			LPN_ALT_CATEGORIES.forEach(function (cat) {
 				var layers = treeLayers(scn, cat).filter(function (l) { return l.kind !== 'scn'; }).map(function (l) { return l.obj; }), m;
 				if (!layers.length) { return; }
@@ -5141,7 +5181,7 @@ var EngCalcs = EngCalcs || {};
 	// and the two times folded into their mirror paths, or null. Asked only when the tree is stored.
 	function resolvedSettingsBlock(scn) {
 		var c = treeState();
-		if (!scn || scn.isBase) { return null; }
+		if (!scn || plainBase(scn)) { return null; }
 		if (!Object.prototype.hasOwnProperty.call(c.st, scn.id)) { c.st[scn.id] = buildResolvedSettings(scn); }
 		return c.st[scn.id];
 	}
@@ -5169,8 +5209,12 @@ var EngCalcs = EngCalcs || {};
 			// A scenario that chose Base for the category inherits nothing past itself.
 			if (named === LPN_BASE_CHOICE) { return out; }
 			if (named !== undefined) { return out.concat(storedChain(isCalc ? 'calc' : 'alt', named, cat)); }
-			s = parentScenarioOf(s);
+			// A Base of its own (Add base) takes nothing from Base.
+			s = s.root === true ? null : parentScenarioOf(s);
 		}
+		// Base, itself or reached as the root of the chain, adds the record it names (basePick()).
+		named = s && !seen[s.id] ? basePick(s, cat) : undefined;
+		if (named !== undefined) { return out.concat(storedChain(isCalc ? 'calc' : 'alt', named, cat)); }
 		return out;
 	}
 	function storedChain(kind, id, cat) {
@@ -5219,7 +5263,7 @@ var EngCalcs = EngCalcs || {};
 	}
 	function buildResolvedOverrides(scn) {
 		var out = {}, c = treeState(), layers = {}, holders = {};
-		if (scn.isBase) { return scn.overrides || {}; }
+		if (plainBase(scn)) { return scn.overrides || {}; }
 		LPN_ALT_CATEGORIES.forEach(function (cat) {
 			layers[cat] = treeLayers(scn, cat);
 			layers[cat].forEach(function (layer) {
@@ -5278,7 +5322,13 @@ var EngCalcs = EngCalcs || {};
 	 */
 	function writeTargetFor(scn, cat) {
 		var id, r;
-		if (!scn || scn.isBase) { return null; }
+		if (!scn) { return null; }
+		// Base writes the record it names for the category (basePick()), else the elements and project.
+		if (scn.isBase) {
+			id = basePick(scn, cat);
+			r = id === undefined ? null : (cat === 'calculation' ? calcSetById(id) : altById(id));
+			return r ? { kind: cat === 'calculation' ? 'calc' : 'alt', obj: r } : null;
+		}
 		// (A scenario that chose Base names no record, so it writes its own values, as below.)
 		if (cat === 'calculation') {
 			r = scn.calc !== undefined ? calcSetById(scn.calc) : null;
@@ -5403,7 +5453,16 @@ var EngCalcs = EngCalcs || {};
 			if (list.length) { doc[k] = list; } else { delete doc[k]; }
 		});
 		scenarios.forEach(function (s) {
-			if (s.isBase) { delete s.parent; delete s.alternatives; delete s.calc; delete s.root; return; }
+			// Base takes no parent, and names only stored records (basePick()): Base's own is no choice.
+			if (s.isBase) {
+				delete s.parent; delete s.root;
+				if (s.alternatives !== undefined && plainObject(s.alternatives)) {
+					Object.keys(s.alternatives).forEach(function (cat) { var a = altById(s.alternatives[cat]); if (!a || a.category !== cat) { delete s.alternatives[cat]; } });
+				}
+				if (s.alternatives !== undefined && (!plainObject(s.alternatives) || !Object.keys(s.alternatives).length)) { delete s.alternatives; }
+				if (s.calc !== undefined && !calcSetById(s.calc)) { delete s.calc; }
+				return;
+			}
 			if (s.parent !== undefined) {
 				var ps = scenarioById(s.parent);
 				if (!ps || ps === s || scenarioParentLoops(s.id, s.parent)) { delete s.parent; }
@@ -5633,8 +5692,10 @@ var EngCalcs = EngCalcs || {};
 	function assignStored(kind, scnId, cat, id, opts) {
 		var s = scenarioById(scnId), r;
 		if (kind === 'calc') { cat = 'calculation'; }
-		if (!s || s.isBase) { return treeRefuse('base'); }
+		if (!s) { return treeRefuse('base'); }
 		if (kind === 'alt' && !storedCategoryOk(cat)) { return treeRefuse('category'); }
+		// Base naming its own alternative names nothing (basePick()).
+		if (s.isBase && id === LPN_BASE_CHOICE) { id = null; }
 		if (id === LPN_BASE_CHOICE) {
 			r = { id: LPN_BASE_CHOICE };
 		} else if (id !== null && id !== undefined) {
@@ -5665,7 +5726,7 @@ var EngCalcs = EngCalcs || {};
 		var p = s, seen = {}, named, r;
 		seen[s.id] = true;
 		if ((named = storedChoiceOf(s, cat)) !== undefined) { return named === LPN_BASE_CHOICE ? null : named; }
-		for (p = parentScenarioOf(s); p && !p.isBase && !seen[p.id]; p = parentScenarioOf(p)) {
+		for (p = s.root === true ? null : parentScenarioOf(s); p && !p.isBase && !seen[p.id]; p = p.root === true ? null : parentScenarioOf(p)) {
 			seen[p.id] = true;
 			if (scenarioHoldsLocal(p, cat)) {
 				r = promoteStored(p.id, cat, p.name);
@@ -5673,7 +5734,9 @@ var EngCalcs = EngCalcs || {};
 			}
 			if ((named = storedChoiceOf(p, cat)) !== undefined) { return named === LPN_BASE_CHOICE ? null : named; }
 		}
-		return null;
+		// Reached Base: what Base names for the category, if anything.
+		named = p && p.isBase ? basePick(p, cat) : undefined;
+		return named === undefined ? null : named;
 	}
 	// LPN_BASE_CHOICE when the scenario chose Base on purpose.
 	function storedChoiceOf(s, cat) {
@@ -5789,7 +5852,8 @@ var EngCalcs = EngCalcs || {};
 	// nothing of its own, which is what its parent scenario uses.
 	function smImplicitParentKey(owner, cat) {
 		var p = owner.root === true ? null : parentScenarioOf(owner), c;
-		if (!p || p.isBase) { return 'base'; }
+		if (!p) { return 'base'; }
+		if (p.isBase) { c = basePick(p, cat); return c === undefined ? 'base' : c; }
 		c = smChoice(p, cat);
 		if (c.id !== null && c.id !== undefined) { return c.id; }
 		if (c.own) { return smImplicitKey(c.via || p, cat); }
@@ -6015,7 +6079,7 @@ var EngCalcs = EngCalcs || {};
 	function smInUseText(tree, key, name) {
 		var pc = EngCalcs.pageConfig || {};
 		var label = function (scn, n) { return (scn ? (pc.lpn_sm_item_scenario || 'Scenario {name}') : (pc.lpn_sm_item_alternative || 'Alternative {name}')).replace('{name}', n); };
-		return (pc.lpn_sm_in_use || '{item} cannot be deleted while it is used by\\n{list}').replace(/\\n/g, '\n')
+		return (pc.lpn_sm_in_use || '{item}\\ncannot be deleted while it is used by\\n{list}').replace(/\\n/g, '\n')
 			.replace('{item}', label(smKind(tree) === 'scn', name))
 			.replace('{list}', smInUseItems(tree, key).map(function (x) { return label(x.scn, x.name); }).join('\n'));
 	}
@@ -6121,8 +6185,11 @@ var EngCalcs = EngCalcs || {};
 			if (named !== undefined) { return { id: named, via: inherited ? p : null }; }
 			if (scenarioHoldsLocal(p, cat)) { return { id: null, own: true, via: inherited ? p : null }; }
 			inherited = true;
-			p = parentScenarioOf(p);
+			p = p.root === true ? null : parentScenarioOf(p);
 		}
+		// Base names a stored record (basePick()): its own choice, or inherited from it.
+		named = p && p.isBase && !seen[p.id] ? basePick(p, cat) : undefined;
+		if (named !== undefined) { return { id: named, via: inherited ? p : null }; }
 		return { id: null, base: true, via: null };
 	}
 	// The scenarios that use an item (naming it, or inheriting it): the Base item's users are those
@@ -6157,7 +6224,7 @@ var EngCalcs = EngCalcs || {};
 	function smInheritText(s, cat) {
 		var pc = EngCalcs.pageConfig || {}, p = s.root === true ? null : parentScenarioOf(s), t;
 		if (!p) { return smName(cat, smBaseKey(cat)); }
-		t = p.isBase ? smName(cat, smBaseKey(cat)) : smCellText(p, cat);
+		t = smCellText(p, cat);
 		return /\)$/.test(t) && t.indexOf(' (' + (pc.lpn_sm_inherited || 'inherited') + ')') > 0 ? t : t + ' (' + (pc.lpn_sm_inherited || 'inherited') + ')';
 	}
 	function smCellChoices(s, cat) {
@@ -6185,7 +6252,8 @@ var EngCalcs = EngCalcs || {};
 	 */
 	function smAssign(scnId, cat, name) {
 		var s = scenarioById(scnId), kind = cat === 'calculation' ? 'calc' : 'alt', rec = null, kept = null, res;
-		if (!s || s.isBase) { return treeRefuse('base'); }
+		// Base may pick too (basePick()); Base's own alternative is no pick.
+		if (!s) { return treeRefuse('base'); }
 		if (name !== '' && name !== null && name !== undefined && name === smName(cat, smBaseKey(cat))) {
 			// Base, chosen on purpose: no record has its name (smNameTaken()).
 			rec = { id: LPN_BASE_CHOICE };
@@ -6280,7 +6348,7 @@ var EngCalcs = EngCalcs || {};
 	// to, in the given categories; '' when it writes to its own values or nobody else uses it.
 	function smSharedText(cats) {
 		var scn = activeScenario(), names = [], seen = {}, pc = EngCalcs.pageConfig || {};
-		if (!scn || scn.isBase) { return ''; }
+		if (!scn || plainBase(scn)) { return ''; }
 		cats.forEach(function (cat) {
 			var t = writeTargetFor(scn, cat);
 			if (!t || t.kind === 'scn') { return; }
@@ -6535,7 +6603,7 @@ var EngCalcs = EngCalcs || {};
 	// view -- asks this, so a harness that blinds it (dev/lpn-spike/scenario-settings-routing-harness.js)
 	// gets back the page exactly as it was before any reader was routed.
 	function scenarioSettingsBlock(scn) {
-		if (scn && !scn.isBase && isExplicitTree()) { return resolvedSettingsBlock(scn); }
+		if (scn && !plainBase(scn) && isExplicitTree()) { return resolvedSettingsBlock(scn); }
 		return (scn && !scn.isBase && plainObject(scn.settings)) ? scn.settings : null;
 	}
 	function scenarioHasElsewhereSetting(scn) {
@@ -6546,7 +6614,7 @@ var EngCalcs = EngCalcs || {};
 	// demand multiplier and the two times in it for a path that can reach them, or null.
 	function scenarioSettingSource(scn, p) {
 		var block = scenarioSettingsBlock(scn);
-		if (!scn || scn.isBase) { return null; }
+		if (!scn || plainBase(scn)) { return null; }
 		// The resolved block already holds the multiplier and the two times, folded in.
 		if (isExplicitTree()) { return block; }
 		if (((p[0] === 'settings' && (p.length === 1 || p[1] === 'hydraulics')) || p[0] === 'times') &&
@@ -6586,8 +6654,10 @@ var EngCalcs = EngCalcs || {};
 	 */
 	function setScenarioSetting(scn, path, value) {
 		var p = settingPath(path), node, i;
-		if (!scn || scn.isBase || LPN_SETTING_ROOTS.indexOf(p[0]) < 0) { return false; }
+		if (!scn || LPN_SETTING_ROOTS.indexOf(p[0]) < 0) { return false; }
 		if (!categoryOfSetting(p) || settingHasOtherHome(p)) { return false; }
+		// Base writes a setting only into the record it names for the category (basePick()).
+		if (scn.isBase && !writeTargetFor(scn, categoryOfSetting(p))) { return false; }
 		touchTree('setScenarioSetting');
 		// A stored alternative or calculation set the scenario names takes the write; a value written
 		// where it names none makes its own first (ownWriteTarget()).
@@ -7320,7 +7390,7 @@ var EngCalcs = EngCalcs || {};
 			{ key: 'length', group: 'link', field: 'length', label: pc.lpn_field_length || 'Length',
 				applies: function (l) { return l.type === 'pipe'; },
 				get: function (l) { return effective(l, 'length'); },
-				set: function (l, v) { setProp(l, 'length', v); if (inBaseScenario()) { l.lenAuto = false; } } },
+				set: function (l, v) { setProp(l, 'length', v); if (inBaseFor(categoryOf('length', 'link'))) { l.lenAuto = false; } } },
 			// **A LINK'S OPEN/CLOSED STATUS (gap #2, ranked highest).** Overridable, and a `prop`
 			// is safe here: replaceValueOf()'s `choices` gate below normalizes and validates the
 			// typed word BEFORE replaceWrite() ever calls setProp(), so there is no custom `set`
@@ -9279,7 +9349,7 @@ var EngCalcs = EngCalcs || {};
 	// ONLY: inside a scenario the position is an override and the element's own record must stay.
 	function copySnapProvenance(c, dst) {
 		var s = c && c.src;
-		if (!dst || !inBaseScenario()) { return; }
+		if (!dst || !inBaseFor(categoryOf('x', 'node'))) { return; }
 		delete dst[LPN_GEO_XSRC]; delete dst[LPN_GEO_YSRC];
 		if (dst.tok) {
 			delete dst.tok.x; delete dst.tok.y;
@@ -9299,8 +9369,8 @@ var EngCalcs = EngCalcs || {};
 	// so a typed 38.5 on the target is 38.5 on the node too.
 	function writeNodeAtSnap(n, c) {
 		var ov = c.ov || null;
-		writeNodeCoord(n, false, c.x, (!inBaseScenario() && ov && typeof ov.x === 'number') ? ov.x : undefined);
-		writeNodeCoord(n, true, c.y, (!inBaseScenario() && ov && typeof ov.y === 'number') ? ov.y : undefined);
+		writeNodeCoord(n, false, c.x, (!inBaseFor(categoryOf('x', 'node')) && ov && typeof ov.x === 'number') ? ov.x : undefined);
+		writeNodeCoord(n, true, c.y, (!inBaseFor(categoryOf('y', 'node')) && ov && typeof ov.y === 'number') ? ov.y : undefined);
 		copySnapProvenance(c, n);
 	}
 	// **THE GLYPH AND THE NAME.** One group in the world layer, redrawn on every call at a constant
@@ -9408,7 +9478,7 @@ var EngCalcs = EngCalcs || {};
 	// scenario it is held as null, which tankBottom() reads as the ground.
 	function setTankBottom(n, v) {
 		if (typeof v === 'number' && isFinite(v)) { setProp(n, 'bottomElev', v); return; }
-		if (inBaseScenario()) { delete n.bottomElev; return; }   // base-write: the Base door of setTankBottom()
+		if (inBaseFor(categoryOf('bottomElev', 'node'))) { delete n.bottomElev; return; }   // base-write: the Base door of setTankBottom()
 		setProp(n, 'bottomElev', null);
 	}
 	function nodeFixedHead(n) {
@@ -9679,7 +9749,7 @@ var EngCalcs = EngCalcs || {};
 	 * effective values back as ordinary local ones.
 	 */
 	function setPipeType(l, id) {
-		var t = id ? pipeTypeById(id) : null, inBase = inBaseScenario();
+		var t = id ? pipeTypeById(id) : null, inBase = inBaseFor(categoryOf('typeId', 'link'));
 		setProp(l, 'typeId', id || null);
 		if (!t) { return; }
 		LPN_TYPE_PROPS.forEach(function (d) {
@@ -11284,7 +11354,7 @@ var EngCalcs = EngCalcs || {};
 		// A RENDER WRITES NOTHING FROM INSIDE A SCENARIO: the fill would put breaks computed from the
 		// scenario's data into Base's object, or an override into the scenario nobody made. There
 		// the breaks follow the data until someone sets them.
-		if (!inBaseScenario()) { return tidy; }
+		if (!inPlainBase()) { return tidy; }
 		settings.colorBreaks = settings.colorBreaks || {};
 		settings.colorBreaks[colorBreakKey(group, field)] = tidy.slice();
 		return tidy;
@@ -12936,7 +13006,7 @@ var EngCalcs = EngCalcs || {};
 	// lb.x/lb.y as the current scenario has them, in the drawing frame: Base's own numbers untouched
 	// unless the scenario holds a position, so Base pays one lookup and no conversion.
 	function textOwnPoint(lb) {
-		var oc = inBaseScenario() ? null : resolvedOverrides(activeScenario())[ovKey(lb)], x = lb.x, y = lb.y;
+		var oc = inPlainBase() ? null : resolvedOverrides(activeScenario())[ovKey(lb)], x = lb.x, y = lb.y;
 		if (oc && typeof oc.x === 'number') { x = textCoordIn(lb, 'x', oc.x); }
 		if (oc && typeof oc.y === 'number') { y = textCoordIn(lb, 'y', oc.y); }
 		return { x: x, y: y };
@@ -12944,7 +13014,7 @@ var EngCalcs = EngCalcs || {};
 	// The one door a gesture moves a Text through, drawing-frame numbers in: in Base the element, in
 	// a scenario an override of both (setProp()), so moving a note in Fig 5 moves it in Fig 5 only.
 	function setTextPoint(lb, x, y) {
-		if (inBaseScenario()) { lb.x = x; lb.y = y; return; }   // base-write: setTextPoint() in Base, the one door
+		if (inBaseFor(categoryOf('x', 'label'))) { lb.x = x; lb.y = y; return; }   // base-write: setTextPoint() in Base, the one door
 		setProp(lb, 'x', textCoordOut(lb, 'x', x));
 		setProp(lb, 'y', textCoordOut(lb, 'y', y));
 	}
@@ -12953,7 +13023,7 @@ var EngCalcs = EngCalcs || {};
 	function textAllZoom(lb) { return !!lb && effective(lb, 'allZoom') === true; }
 	// Stored only when ticked in Base (absence is the default); a scenario holds its own either way.
 	function setTextAllZoom(lb, on) {
-		if (!inBaseScenario()) { setProp(lb, 'allZoom', on); return; }
+		if (!inBaseFor(categoryOf('allZoom', 'label'))) { setProp(lb, 'allZoom', on); return; }
 		if (on) { lb.allZoom = true; } else { delete lb.allZoom; }   // base-write: setTextAllZoom() in Base, the one door
 	}
 	// **DETACHING A TEXT** (Tom, 2026-10-05: *"Text that is attached to an asset needs to be able to
@@ -14544,7 +14614,7 @@ var EngCalcs = EngCalcs || {};
 		// scenario's length into Base under every other scenario at once. That is defect 2 of
 		// dev/scenario-seam-repair.md, against this same line, arriving by a new door. In a scenario
 		// the auto length is DERIVED instead and stored nowhere: see effective()'s `length` fork.
-		if (l.lenAuto && inBaseScenario()) { l._length = linkGeomLength(l); }   // base-write: in Base the drawing IS the document
+		if (l.lenAuto && inBaseFor(categoryOf('x', 'node'))) { l._length = linkGeomLength(l); }   // base-write: in Base the drawing IS the document
 		updateArrow(id);
 		positionPumpSymbol(id);
 	}
@@ -27246,7 +27316,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 					// -- and lenAuto is Base-owned geometry, so it is only cleared in Base.
 					{ key: 'length', label: 'lpn_field_length', unit: function () { return 'lpn_u_length'; }, em: 4.2,
 						prop: 'length', get: function (l) { return effective(l, 'length'); },
-						set: function (l, v) { setProp(l, 'length', v); if (inBaseScenario()) { l.lenAuto = false; } } },
+						set: function (l, v) { setProp(l, 'length', v); if (inBaseFor(categoryOf('length', 'link'))) { l.lenAuto = false; } } },
 					// Label, symbol and unit all follow settings.method (Task 271), through the same
 					// function the popup and the Labels legend use.
 					{ key: 'roughness', label: roughnessLabel, em: 6,
@@ -28495,7 +28565,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	function paneScnRowHoldsOverride(spec, row) {
 		var x = row._lpnScn;
-		if (!x || x.scn.isBase) { return false; }
+		if (!x || plainBase(x.scn)) { return false; }
 		if (x.el._lpnSetting) { return settingRowIsLocal(x.el, x.scn); }
 		return paneColsBase(spec).some(function (c) { return !!paneColProp(c) && paneScnCellIsLocal(c, row); });
 	}
@@ -28586,7 +28656,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// the Pipes table with Show scenarios off shows the open scenario's values, so a value that
 	// scenario holds wears the same amber, with the same tip. Customers have no overrides.
 	function paneMarksOpenScenario(spec) {
-		return !spec.scnRows && !inBaseScenario() && (spec.id === 'settings' || (!!spec.group && paneScnAvailable(spec)));
+		return !spec.scnRows && !inPlainBase() && (spec.id === 'settings' || (!!spec.group && paneScnAvailable(spec)));
 	}
 	function paneScnRowOf(row) {
 		if (row && row._lpnScn) { return row._lpnScn; }
@@ -28594,7 +28664,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	function paneScnCellIsLocal(c, row) {
 		var x = paneScnRowOf(row), ov, p, has = Object.prototype.hasOwnProperty;
-		if (!x || x.scn.isBase) { return false; }
+		if (!x || plainBase(x.scn)) { return false; }
 		if (c.scnLocal) { return !!c.scnLocal(x.el, x.scn); }
 		p = paneColProp(c);
 		// Local where this scenario WRITES (hasOverride()'s rule), so a stored alternative it names
@@ -28641,7 +28711,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		return rows.map(function (r) {
 			var x = r._lpnScn, ov;
 			if (x && x.el._lpnSetting) { return settingRowIsLocal(x.el, x.scn) ? '1' : ''; }
-			ov = x && !x.scn.isBase ? resolvedOverrides(x.scn)[ovKey(x.el)] : null;
+			ov = x && !plainBase(x.scn) ? resolvedOverrides(x.scn)[ovKey(x.el)] : null;
 			return ov ? Object.keys(ov).join(',') : '';
 		}).join('|') + '||' + scenariosForDisplay().map(scenarioDisplayName).join('|');
 	}
@@ -29182,7 +29252,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			if (f && g === 'node') { add(['settings', 'contourInterval', contourIntervalKey(f)]); }
 		});
 		scenarios.forEach(function (s) {
-			if (s.isBase) { return; }
+			if (plainBase(s)) { return; }
 			settingLeaves(scenarioSettingsBlock(s) || {}).forEach(function (l) { add(l.path); held.push(l); });
 		});
 		out = out.filter(function (r) {
@@ -29219,7 +29289,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			return (v === null || v === undefined || v === '') ? undefined : v;
 		}
 		if (row.home === 'dm') {
-			v = scn.isBase ? undefined : heldCalcOption(scn, 'demandMultiplier');
+			v = heldCalcOption(scn, 'demandMultiplier');
 			if (v === undefined) { v = (settings.hydraulics || {}).demandMultiplier; }
 			return (typeof v === 'number' && isFinite(v)) ? v : undefined;
 		}
@@ -29372,7 +29442,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			refreshPopupIfOpen();
 			return true;
 		}
-		if (!scn.isBase) {
+		// Base writes like a scenario where it names a record for the row's category (basePick()).
+		if (!scn.isBase || writeTargetFor(scn, row.cat)) {
 			if (row.home === 'dm') { touchTree('demandMultiplier'); calcWriteTargetOf(scn).demandMultiplier = p.v; return true; }
 			if (row.home === 'time2') { return setScenarioTime(String(p.text === undefined || p.text === null ? '' : p.text).trim() === '' ? calcTargetOf(scn) : calcWriteTargetOf(scn), k, p.text); }
 			if (row.path[0] === 'times') {
@@ -29406,8 +29477,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// scenario WRITES, so a value it only inherits is not marked. Base holds none.
 	function settingRowIsLocal(row, scn) {
 		var t;
-		if (!scn || scn.isBase || row.home === 'cp') { return false; }
-		t = writeTargetFor(scn, row.cat).obj;
+		if (!scn || row.home === 'cp') { return false; }
+		t = writeTargetFor(scn, row.cat);
+		// Base holds a value only in the record it names for the category (basePick()).
+		if (!t) { return false; }
+		t = t.obj;
 		if (row.home === 'dm') { return typeof t.demandMultiplier === 'number' && isFinite(t.demandMultiplier); }
 		if (row.home === 'time2') { return scenarioTimeValue(t, row.path[1]) !== undefined; }
 		return settingGet({ r: t.settings }, ['r'].concat(row.path)) !== undefined;
@@ -32836,7 +32910,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			x = row && row._lpnScn;
 			scn = x ? x.scn : activeScenario();
 			el = paneRowEl(row);
-			if (!el || scn.isBase) { continue; }
+			if (!el || plainBase(scn)) { continue; }
 			for (c = box.c0; c <= box.c1; c++) {
 				col = cols[c];
 				// A Settings table row: the column says whether it holds an override, and clears it.
@@ -37908,7 +37982,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// **IN BASE, IN PLACE; IN ANY OTHER SCENARIO, AN OVERRIDE OF THE TYPE** (Tom, 2026-10-14,
 		// reversing the Base-only rule of 2026-10-10: *"changing element type never creates an
 		// override. I think we need to change that."*).
-		if (!inBaseScenario()) { morphInScenario(to); return; }
+		if (!inBaseFor('topology')) { morphInScenario(to); return; }
 		changeSelectedTypeIn(to);
 	}
 	// Every selected asset of the right kind that is not already `to` in the scenario showing.
@@ -38082,7 +38156,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	// The type an asset is in a scenario: its override there (its own or inherited), else Base's.
 	function morphTypeIn(el, scn) {
-		var mo = (!scn || scn.isBase) ? null : resolvedOverrides(scn)[ovKey(el)];
+		var mo = !scn ? null : resolvedOverrides(scn)[ovKey(el)];
 		if (mo && typeof mo.type === 'string' && morphTypeValid(el, mo.type)) { return mo.type; }
 		return morphBaseOf(el, 'type');
 	}
@@ -38155,7 +38229,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function morphApply() {
 		var scn = activeScenario(), R, key, el, ov, e, sig = [];
 		morphView.doc = doc; morphView.scenarios = scenarios; morphView.scn = project.activeScenario; morphView.epoch = treeEpoch;
-		if (!scn || scn.isBase || !morphView.any) { morphView.sig = ''; return; }
+		// Base too, where it names an Active topology alternative (Basic mode off) that morphs an asset.
+		if (!scn || !morphView.any) { morphView.sig = ''; return; }
 		morphKeysOf(scn).forEach(function (pair) {
 			key = pair[0]; ov = pair[1];
 			el = morphElementByKey(key);
@@ -38395,13 +38470,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function morphTypeRow(fields, el) {
 		var pc = EngCalcs.pageConfig || {}, names, here;
 		if (!el || scenarios.length < 2) { return; }
-		if (!morphedHere(el) && !(!inBaseScenario() && hasOverride(el, 'type')) && !childOverrideHolders(el, ['type']).length) { return; }
+		if (!morphedHere(el) && !(!inBaseFor('topology') && hasOverride(el, 'type')) && !childOverrideHolders(el, ['type']).length) { return; }
 		names = { junction: pc.lpn_tool_add_junction || 'Junction', reservoir: pc.lpn_tool_add_reservoir || 'Reservoir', tank: pc.lpn_tool_add_tank || 'Tank',
 			pipe: pc.lpn_tool_add_pipe || 'Pipe', pump: pc.lpn_tool_add_pump || 'Pump', valve: pc.lpn_tool_add_valve || 'Valve' };
 		here = names[el.type] || el.type;
 		readonlyField(fields, pc.lpn_field_type || 'Type', here, pc.lpn_field_type_tip);
 		ovmGutter(fields, {
-			el: el, props: ['type'], on: !inBaseScenario() && hasOverride(el, 'type'), cats: ['topology'],
+			el: el, props: ['type'], on: !inBaseFor('topology') && hasOverride(el, 'type'), cats: ['topology'],
 			set: function () { setOverride(el, 'type', el.type); if (el.type === 'valve') { setOverride(el, 'valveType', el.valveType); } },
 			clear: function () {
 				clearOverride(el, 'type'); clearOverride(el, 'valveType');
@@ -41406,7 +41481,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// **AND ITS OWN TEXT POSITIONS AND ALIGNMENT** (Tom, 2026-10-12), stored outward as a node's
 			// are; the size and bold reach the corner shift through labelSize().
 			textOverride: function (id) {
-				var lb = labelById(id), ov = (lb && !inBaseScenario()) ? resolvedOverrides(activeScenario())[ovKey(lb)] : null;
+				var lb = labelById(id), ov = (lb && !inPlainBase()) ? resolvedOverrides(activeScenario())[ovKey(lb)] : null;
 				return ov ? { x: ov.x, y: ov.y, align: ov.align, valign: ov.valign } : null;
 			},
 			// The same rule for the one DOCUMENT-level option a scenario can carry: the export
@@ -59151,7 +59226,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// Runs `fn` (a builder of the box) against the open scenario's view; in Base, as it always ran.
 	function withSetboxView(fn) {
 		var real, out;
-		if (inBaseScenario() || setboxViewDepth) { return fn(); }
+		if (inPlainBase() || setboxViewDepth) { return fn(); }
 		setboxViewSync();
 		real = { settings: settings, labelSettings: labelSettings };
 		settings = setboxView.settings; labelSettings = setboxView.labelSettings;
@@ -59165,7 +59240,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	// The [TIMES] block the box edits: the project's in Base, the scenario's view otherwise.
 	function setboxEditTimes() {
-		if (inBaseScenario()) {
+		if (inBaseFor('calculation')) {
 			if (!doc.times) { doc.times = EngCalcs.lpnTimesDefaults(); doc.times.text = {}; }
 			return doc.times;
 		}
@@ -59235,7 +59310,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function setboxEditBegin(e) {
 		if (setboxEdit) { return; }
 		if (e && e.target && (e.type === 'click' || e.type === 'change')) { setboxPin(e.target); }
-		if (!inBaseScenario()) { setboxViewSync(); }
+		if (!inPlainBase()) { setboxViewSync(); }
 		// **A KEYSTROKE IS NOT A REBUILD** (Perry's re-review, 2026-10-06: typing "abcdef" into a
 		// label's Before box in a scenario stored "f", because each keystroke's rebuild swapped the box
 		// for a copy with the caret at 0). An `input` event routes its value and redraws the map, but
@@ -59249,7 +59324,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// changed nothing this seam could see and was dropped, leaving the scenario's old value. For
 		// the length of the edit the globals are the scenario's view, as they are while the box is
 		// built, so every value typed is a change of the view; setboxEditEnd() puts them back.
-		if (!inBaseScenario() && setboxView) {
+		if (!inPlainBase() && setboxView) {
 			setboxEdit.real = { settings: settings, labelSettings: labelSettings };
 			settings = setboxView.settings; labelSettings = setboxView.labelSettings;
 			setboxViewDepth++;
@@ -59275,7 +59350,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		tookStep = undoStack.length !== ed.undoLen || undoStack[undoStack.length - 1] !== ed.undoTop;
 		changes.forEach(function (c) {
 			var cat = c.path[0] === 'times' ? 'calculation' : categoryOfSetting(c.path);
-			if (inBaseScenario() || cat === null || cat === undefined) {
+			// Base writes the project's own except where it names a record for the category (basePick()).
+			if (cat === null || cat === undefined || inBaseFor(cat)) {
 				// The project's own: a Base edit, or a path no scenario may hold. A change made in
 				// the view of such a path lands on the project too.
 				// The view's own object is put there, not a copy: an editor in the box holds the object
@@ -59395,7 +59471,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	// The Settings table rows a tagged row edits that scenario `scn` holds.
 	function setboxHeldRowsOf(paths, scn, rows) {
-		if (!scn || scn.isBase) { return []; }
+		if (!scn || plainBase(scn)) { return []; }
 		return rows.filter(function (r) {
 			return paths.some(function (p) { return setboxPathUnder(r.path, p); }) && settingRowIsLocal(r, scn);
 		});
@@ -62627,7 +62703,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// Choosing what is already in force writes nothing; choosing "1" over another stated
 			// default returns to the implied one, which is the same run.
 			if (v === (effDefaultPattern() || null)) { fill(); return; }
-			if (!inBaseScenario()) {
+			if (!inBaseFor('demand')) {
 				// **IN A SCENARIO, THE SCENARIO STATES IT** through setScenarioSetting(). Written on
 				// doc.defaultPattern, the box's seam would see no change wherever Base already holds the
 				// value picked (or holds none and "1" is picked), and the scenario would keep its own.
@@ -65212,8 +65288,17 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	// **THE LINE BESIDE AN OVERRIDE SAYS WHAT CLEAR OVERRIDE WOULD RESTORE, AND FROM WHERE** (Tom,
 	// 2026-10-12): the parent scenario's value as it resolves there, named; Base's in Base's words.
+	// The category of the marker whose line is being written, for Base (ovmGutter()).
+	var inheritedLineCat = null;
 	function inheritedLine(fn) {
-		var pc = EngCalcs.pageConfig || {}, par = parentScenarioOf(activeScenario()), v = paneInScenario(par, fn);
+		var pc = EngCalcs.pageConfig || {}, scn = activeScenario(), par = parentScenarioOf(scn), v;
+		// Base naming an alternative: what Clear restores is that alternative's parent's value, so the
+		// line reads Base with the alternative's parent named in its place, for that moment.
+		if (scn.isBase && inheritedLineCat !== null && basePick(scn, inheritedLineCat) !== undefined) {
+			v = withBasePick(scn, inheritedLineCat, (writeTargetFor(scn, inheritedLineCat).obj || {}).parent, fn);
+			return (pc.lpn_scenario_base_value || 'Base scenario: {value}').replace('{value}', v);
+		}
+		v = paneInScenario(par, fn);
 		if (!par || par.isBase) { return (pc.lpn_scenario_base_value || 'Base scenario: {value}').replace('{value}', v); }
 		return (pc.lpn_settings_held_base || '{base}: {value}').split('{base}').join(scenarioDisplayName(par)).split('{value}').join(v);
 	}
@@ -65252,7 +65337,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	// The holders this scenario's own value resolves through for a category (none for Base).
 	function ownLayerObjs(scn, cat) {
-		return scn && !scn.isBase ? treeLayers(scn, cat).map(function (l) { return l.obj; }) : [];
+		return scn && !plainBase(scn) ? treeLayers(scn, cat).map(function (l) { return l.obj; }) : [];
 	}
 	/**
 	 * **WHERE THE SCENARIOS BELOW OVERRIDE ONE ELEMENT VALUE**: the holder each descendant writes to
@@ -65345,19 +65430,22 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		[fields, t].forEach(function (e) { if (e && e.classList) { e.classList.add(cls); } });
 	}
 	function ovmGutter(fields, o) {
-		var pc = EngCalcs.pageConfig || {}, scn = activeScenario(), start, g, kids, n, note, base, shared;
+		var pc = EngCalcs.pageConfig || {}, scn = activeScenario(), start, g, kids, n, note, base, shared, baseHere;
 		if (!o.el || scenarios.length < 2 || !isOverridable(o.el, o.props[0])) { return; }
 		start = ovmRowStart(fields);
 		if (!start) { return; }
 		kids = childOverrideHolders(o.el, o.props);
 		n = kids.length;
+		// Base, where it writes the element: where it names an alternative for the category
+		// (basePick()), its rows are marked as any scenario's are.
+		baseHere = !!scn.isBase && inBaseFor(o.cats[0]);
 		// **BASE GIVES UP ONLY THE ROOM IT USES** (Perry, 2026-10-13): no dot is ever drawn there, so
 		// its gutter is the triangle's one cell, and only once a row has a triangle.
-		if (scn.isBase && !n) { return; }
-		ovmGutterOn(fields, scn.isBase ? 'lpn-ovm-gut1' : 'lpn-ovm-gut');
+		if (baseHere && !n) { return; }
+		ovmGutterOn(fields, baseHere ? 'lpn-ovm-gut1' : 'lpn-ovm-gut');
 		g = document.createElement('span');
 		g.className = 'lpn-ovm';
-		if (scn.isBase) { /* the triangle alone */ }
+		if (baseHere) { /* the triangle alone */ }
 		else if (o.on) {
 			g.appendChild(ovmCell('lpn-ovm-dot', (pc.lpn_settings_held_in || 'Override in {scenario}.').split('{scenario}').join(scenarioDisplayName(scn)) +
 				' ' + (pc.lpn_ovm_dot_clear || 'Click to clear it.'), function () {
@@ -65385,13 +65473,14 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			}));
 		} else { g.appendChild(ovmCell('lpn-ovm-none')); }
 		fields.insertBefore(g, start);
-		if (!o.on || scn.isBase) { return; }
+		if (!o.on || baseHere) { return; }
 		// While it is an override: what Clear restores, and who else the alternative reaches.
 		note = document.createElement('div');
 		note.className = 'lpn-ov-note';
 		base = document.createElement('span');
 		base.className = 'lpn-ov-base';
-		base.textContent = o.line();
+		inheritedLineCat = o.cats[0];
+		try { base.textContent = o.line(); } finally { inheritedLineCat = null; }
 		note.appendChild(base);
 		shared = smSharedText(o.cats);
 		if (shared) {
@@ -65406,7 +65495,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function overrideMarker(fields, el, prop, format) {
 		if (!el || !isOverridable(el, prop)) { return; }
 		ovmGutter(fields, {
-			el: el, props: [prop], on: !inBaseScenario() && hasOverride(el, prop), cats: [categoryOf(prop, elGroup(el))],
+			el: el, props: [prop], on: !inBaseFor(categoryOf(prop, elGroup(el))) && hasOverride(el, prop), cats: [categoryOf(prop, elGroup(el))],
 			// The hollow dot records the value the field is ALREADY showing: a claim about intent, not
 			// an edit, so it changes no number by itself.
 			set: function () { setOverride(el, prop, effective(el, prop)); },
@@ -65422,7 +65511,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function demandOverrideMarker(fields, n) {
 		if (!n || !isOverridable(n, 'demand')) { return; }
 		ovmGutter(fields, {
-			el: n, props: ['demand', 'demands'], on: !inBaseScenario() && (hasOverride(n, 'demand') || hasOverride(n, 'demands')), cats: ['demand'],
+			el: n, props: ['demand', 'demands'], on: !inBaseFor('demand') && (hasOverride(n, 'demand') || hasOverride(n, 'demands')), cats: ['demand'],
 			set: function () {
 				if (hasDemandBreakdown(n)) { setProp(n, 'demands', ownDemandRows(n)); }
 				else { setOverride(n, 'demand', effective(n, 'demand')); }
@@ -65439,7 +65528,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function textPositionMarker(fields, lb) {
 		if (!lb || !isOverridable(lb, 'x')) { return; }
 		ovmGutter(fields, {
-			el: lb, props: ['x', 'y'], on: !inBaseScenario() && (hasOverride(lb, 'x') || hasOverride(lb, 'y')), cats: [categoryOf('x', 'label')],
+			el: lb, props: ['x', 'y'], on: !inBaseFor(categoryOf('x', 'label')) && (hasOverride(lb, 'x') || hasOverride(lb, 'y')), cats: [categoryOf('x', 'label')],
 			set: function () { setProp(lb, 'x', effective(lb, 'x')); setProp(lb, 'y', effective(lb, 'y')); relayoutLabels(); },
 			clear: function () { clearOverride(lb, 'x'); clearOverride(lb, 'y'); relayoutLabels(); },
 			line: function () { return inheritedLine(function () { return coordText(labelCoordAxis(lb, 1)) + ', ' + coordText(labelCoordAxis(lb, 2)); }); }
@@ -65869,7 +65958,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// uses it, while Base and every other scenario go on following the drawing. The Auto
 			// checkbox keeps showing Base's state, and unticking the override marker returns to it.
 
-			if (inBaseScenario()) { l.lenAuto = false; auto.checked = false; }
+			if (inBaseFor(categoryOf('length', 'link'))) { l.lenAuto = false; auto.checked = false; }
 			refreshPopupIfOpen();
 			scheduleSolve();
 		});
@@ -65882,7 +65971,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// `lenAuto` itself is that same kind of flag and is deliberately not overridable.
 			if (l.lenAuto) {
 				l._length = linkGeomLength(l);   // base-write: Auto reverts to the drawing, which every scenario shares; the override is cleared on the next line
-				if (!inBaseScenario()) { clearOverride(l, 'length'); }
+				if (!inBaseFor(categoryOf('length', 'link'))) { clearOverride(l, 'length'); }
 				input.value = effective(l, 'length').toFixed(2);
 				refreshPopupIfOpen();
 			}
@@ -68273,7 +68362,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			saveUndoSnapshot();
 			// **A VALVE MORPHED IN THIS SCENARIO HAS ITS VALVE TYPE HERE** (Task 781): the type is the
 			// scenario's override, so its valve type and setting are too, and Base keeps its own.
-			if (!inBaseScenario() && morphedHere(l)) {
+			if (morphedHere(l)) {
 				setProp(l, 'valveType', v);
 				setProp(l, 'setting', defaultValveSetting(v));
 				buildDom();
@@ -69747,7 +69836,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// The same two questions asked of any scenario, not only the one showing (the Tables' scenario
 	// rows): an asset is active there unless its resolved Active Topology says otherwise.
 	function activeInScenario(el, scn) {
-		var ov = (!scn || scn.isBase) ? null : resolvedOverrides(scn)[ovKey(el)];
+		var ov = (!scn || plainBase(scn)) ? null : resolvedOverrides(scn)[ovKey(el)];
 		if (ov && Object.prototype.hasOwnProperty.call(ov, 'active')) { return ov.active !== false; }
 		return el._active !== false;
 	}
@@ -69818,7 +69907,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	//
 	// The stored override rows, or null. The live array: callers that hand rows onward copy them.
 	function demandOverrideRows(n) {
-		if (!n || inBaseScenario()) { return null; }
+		if (!n || inBaseFor('demand')) { return null; }
 		var ov = resolvedOverrides(activeScenario())[ovKey(n)];
 		return (ov && Array.isArray(ov.demands) && ov.demands.length) ? ov.demands : null;
 	}
@@ -69855,7 +69944,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// edit that changed one cell leaves the document byte-identical everywhere else.
 	function writeDemandRows(n, rows) {
 		var r0 = rows && rows[0] ? rows[0] : { base: 0 }, extras;
-		if (!inBaseScenario()) {
+		if (!inBaseFor('demand')) {
 			clearOverride(n, 'demand');
 			setOverride(n, 'demands', rows.map(function (r) {
 				var o = { base: r.base, pattern: r.pattern || null, category: r.category || null };
@@ -70095,7 +70184,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// undefined means "the project's own". calcTargetOf() is where an edit of one lands.
 	function heldCalcOption(s, key) {
 		var m;
-		if (!s || s.isBase) { return undefined; }
+		if (!s || plainBase(s)) { return undefined; }
 		if (isExplicitTree()) {
 			m = settingGet({ r: resolvedSettingsBlock(s) }, key === 'demandMultiplier'
 				? ['r', 'settings', 'hydraulics', 'demandMultiplier'] : ['r', 'times', key]);
@@ -70241,7 +70330,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// Base, the project's own value (Base has no other).
 	function scenarioTimeText(s, key) {
 		var pt, v;
-		if (s.isBase) {
+		if (s.isBase && !writeTargetFor(s, 'calculation')) {
 			pt = projectTimes();
 			return EngCalcs.lpnTimeText ? EngCalcs.lpnTimeText(pt, key, pt[key] || 0) : String(pt[key] || 0);
 		}
@@ -76009,6 +76098,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function basicModeMisfit() {
 		var named = {}, why = '';
 		scenarios.forEach(function (sc) {
+			// Base naming any alternative is Basic mode's one rule broken: "the Base scenario uses all
+			// the Base alternatives" (Tom, 2026-09-30).
+			if (!why && sc.isBase && baseHasPicks(sc)) { why = 'base'; return; }
 			if (why || sc.isBase) { return; }
 			if (sc.parent !== undefined && sc.parent !== null && !(scenarioById(sc.parent) || {}).isBase) { why = 'parent'; return; }
 			if (sc.root === true) { why = 'root'; return; }
@@ -76749,10 +76841,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		LPN_ALT_CATEGORIES.forEach(function (cat) {
 			cols.push({
 				key: 'sc_' + cat, label: function () { return altCategoryLabel(cat); }, str: true, em: 9,
-				get: function (r) { return r.scn.isBase ? smName(cat, smBaseKey(cat)) : smCellValue(r.scn, cat); },
-				plainFor: function (r) { return !!r.scn.isBase; },
-				choicesFor: function (r) { return !r.scn.isBase; },
-				choices: function (r) { return (r && r.scn && !r.scn.isBase) ? smCellChoices(r.scn, cat) : []; },
+				// **BASE'S ROW PICKS TOO** (Tom, 2026-10-14; basePick()): blank, or Base, is Base's own
+				// alternative of the category; any other names the alternative Base then uses.
+				get: function (r) { return smCellValue(r.scn, cat); },
+				// Every row is a pick-list; asked also by the table's signature, which rebuilds the
+				// table when a row's options change (an override elsewhere stored a new alternative).
+				choicesFor: function () { return true; },
+				choices: function (r) { return (r && r.scn) ? smCellChoices(r.scn, cat) : []; },
 				// Blank, Base, or an alternative of the category, by its name (Perry, 2026-10-12: Base
 				// picked in a cell was refused here, so the cell snapped back to inheriting). A name
 				// typed or pasted in another case is read as the name it matches.
