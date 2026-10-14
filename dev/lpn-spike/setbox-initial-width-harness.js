@@ -106,7 +106,11 @@ console.log('\n-- the box\'s initial width is derived from that new index and th
 	const seventyPct = 0.7 * oldContentPx;
 	ok('70% of the old content width beats its hard minimum, so 70% is what ships',
 		seventyPct > floorContentPx, seventyPct + ' vs floor ' + floorContentPx);
-	const expectedBoxPx = newIndexPx + overheadPx + seventyPct;
+	// **PLUS THE OVERRIDE GUTTER** (Task 790; Tom, 2026-10-14): measured in Chromium, the 1.9em gutter
+	// made rows wrap that widening the box by that much gave back, so the box carries it.
+	const gutM = css.match(/#lpn_settings_box\.lpn-ovm-gut \.lpn-set-row, #lpn_settings_box\.lpn-ovm-gut \[data-lpn-setting\] \{[^}]*padding-inline-start:\s*([0-9.]+)em/);
+	ok('the Settings box\'s override gutter is still 1.9em', !!gutM && gutM[1] === '1.9', gutM && gutM[1]);
+	const expectedBoxPx = newIndexPx + overheadPx + seventyPct + (gutM ? parseFloat(gutM[1]) * 16 : 0);
 	const expectedBoxRem = expectedBoxPx / 16;
 	ok('...and the box\'s new initial width matches that arithmetic to a hundredth of a rem',
 		boxRem !== null && Math.abs(boxRem - expectedBoxRem) < 0.005,

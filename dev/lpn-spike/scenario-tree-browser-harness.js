@@ -127,7 +127,14 @@ async function main() {
 		ok('1.2 Base and Peak have an expanded chevron, Night a spacer', rows[0].chev && rows[0].chev.exp === 'true' && rows[1].chev && rows[1].chev.exp === 'true' && !rows[2].chev && rows[2].spacer, JSON.stringify(rows.map((r) => [r.name, r.chev, r.spacer])));
 		ok('1.3 the treeitem says so too (aria-expanded on Base and Peak, none on Night)', rows[0].exp === 'true' && rows[1].exp === 'true' && rows[2].exp === null);
 		ok('1.4 every chevron is at least 24 px square', rows.filter((r) => r.chev).every((r) => r.chev.w >= 24 && r.chev.h >= 24), JSON.stringify(rows.map((r) => r.chev)));
-		ok('1.5 an icon per kind: Base the base icon, Peak and Night the child icon', rows[0].icon === 'lpn-sm-icon-scnbase' && rows[1].icon === 'lpn-sm-icon-scn' && rows[2].icon === 'lpn-sm-icon-scn', JSON.stringify(rows.map((r) => r.icon)));
+		// Tom, 2026-10-14: the child icon only on an entry that has descendants; a leaf keeps its width.
+		ok('1.5 Base the base icon, Peak (a parent) the child icon, Night (a leaf) none', rows[0].icon === 'lpn-sm-icon-scnbase' && rows[1].icon === 'lpn-sm-icon-scn' && rows[2].icon === 'lpn-sm-icon-none', JSON.stringify(rows.map((r) => r.icon)));
+		const leafGap = await page.evaluate(() => Array.from(document.querySelectorAll('#lpn_sm_tree .lpn-sm-row')).map((r) => {
+			const ic = r.querySelector('.lpn-sm-icon'), nm = r.querySelector('.lpn-sm-name');
+			return [ic.getBoundingClientRect().width, !!ic.querySelector('svg'), nm.getBoundingClientRect().left - r.getBoundingClientRect().left];
+		}));
+		ok('1.5b ...the leaf\'s empty icon is as wide as a drawn one, so its name starts one indent further than its parent\'s',
+			leafGap[2][0] === leafGap[1][0] && !leafGap[2][1] && Math.abs((leafGap[2][2] - leafGap[1][2]) - (leafGap[1][2] - leafGap[0][2])) < 0.5, JSON.stringify(leafGap));
 		const iconColours = await page.evaluate(() => Array.from(document.querySelectorAll('#lpn_sm_tree .lpn-sm-icon')).map((i) => getComputedStyle(i).color));
 		ok('1.6 the Base icon is drawn in a different token colour from a child\'s', iconColours[0] !== iconColours[1], JSON.stringify(iconColours));
 		// **THE FOOTER MOVED INTO THE "?"** (Tom, 2026-10-11: "Move the footer text to the tip.").

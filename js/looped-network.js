@@ -5826,10 +5826,10 @@ var EngCalcs = EngCalcs || {};
 		}
 		return (r.parent === null || r.parent === undefined || !storedById(kind === 'calc' ? doc.calcSets : doc.alternatives, r.parent)) ? 'base' : r.parent;
 	}
-	// The order siblings are shown in: scenarios by scenariosForDisplay() (sorted by name until a
+	// The order siblings are shown in: scenarios by scenarioSiblingOrder() (sorted by name until a
 	// reorder is stored), everything else by stored order.
 	function smOrdered(tree) {
-		return tree === 'scenarios' ? scenariosForDisplay().filter(function (s) { return !s.isBase; }) : smRecords(tree);
+		return tree === 'scenarios' ? scenarioSiblingOrder().filter(function (s) { return !s.isBase; }) : smRecords(tree);
 	}
 	function smChildren(tree, parentKey) {
 		return smOrdered(tree).filter(function (r) { return smParentKey(tree, r.id) === parentKey; }).map(function (r) { return r.id; });
@@ -6104,7 +6104,7 @@ var EngCalcs = EngCalcs || {};
 	function smStoreScenarioOrder() {
 		var shown;
 		if (project.scenarioOrdered === true) { return; }
-		shown = scenariosForDisplay();
+		shown = scenarioSiblingOrder();
 		scenarios.length = 0;
 		shown.forEach(function (s) { scenarios.push(s); });
 		project.scenarioOrdered = true;
@@ -6150,19 +6150,26 @@ var EngCalcs = EngCalcs || {};
 	// **THE BLANK ROW SAYS WHAT CHOOSING IT GIVES**: while the scenario names an alternative of its
 	// own (which its first override now stores), blank is "inherit", so it reads its parent's
 	// choice, "(inherited)", and never repeats the name already chosen.
+	// **"(inherited)" UNDER BASE TOO** (Tom, 2026-10-14: *"when I first change the Calculation
+	// alternative for a scenario to Base the selector goes blank"*): a child of Base that chose Base
+	// had a blank row reading "Base", so Base itself was not offered, and the select, holding a value
+	// none of its options had, showed nothing. Now the blank row says it inherits, and Base is listed.
 	function smInheritText(s, cat) {
 		var pc = EngCalcs.pageConfig || {}, p = s.root === true ? null : parentScenarioOf(s), t;
-		if (!p || p.isBase) { return smName(cat, smBaseKey(cat)); }
-		t = smCellText(p, cat);
+		if (!p) { return smName(cat, smBaseKey(cat)); }
+		t = p.isBase ? smName(cat, smBaseKey(cat)) : smCellText(p, cat);
 		return /\)$/.test(t) && t.indexOf(' (' + (pc.lpn_sm_inherited || 'inherited') + ')') > 0 ? t : t + ' (' + (pc.lpn_sm_inherited || 'inherited') + ')';
 	}
 	function smCellChoices(s, cat) {
-		var out = [['', smCellValue(s, cat) === '' ? smCellText(s, cat) : smInheritText(s, cat)]], mine = smImplicitKey(s, cat), base = smName(cat, smBaseKey(cat));
+		var out = [['', smCellValue(s, cat) === '' ? smCellText(s, cat) : smInheritText(s, cat)]], mine = smImplicitKey(s, cat), base = smName(cat, smBaseKey(cat)), val;
 		// Offered unless the blank row already reads Base (the same choice twice); chosen, it is
 		// listed so the cell can show it.
 		if (out[0][1] !== base) { out.push([base, base]); }
 		// Its own alternative is the blank row's text already.
 		smRecords(cat).forEach(function (r) { if (r.id !== mine) { out.push([String(r.name || ''), String(r.name || '')]); } });
+		// **THE VALUE THE CELL HOLDS IS ALWAYS ONE OF ITS OPTIONS**, or the select shows nothing.
+		val = smCellValue(s, cat);
+		if (val !== '' && !out.some(function (o) { return o[0] === val; })) { out.splice(1, 0, [val, val]); }
 		return out;
 	}
 	function smCellValue(s, cat) {
@@ -6762,7 +6769,30 @@ var EngCalcs = EngCalcs || {};
 	//
 	// **A COPY, NEVER THE STORED ARRAY.** `scenarios` is serializeProject()'s own order and a file
 	// round-trips byte-identical; only the reading of it for display is sorted.
+	//
+	// **AND EVERY LIST FOLLOWS THE SCENARIO MANAGER'S TREE** (Tom, 2026-10-14: *"The order of scenarios
+	// in the bottom list and the Water menu is confusing. They are not sorted by name, they don't
+	// follow the Scenario manager."*): depth first, each scenario followed by its children, siblings
+	// in the order above (scenarioSiblingOrder()), Base and its tree first, then any Base of its own.
 	function scenariosForDisplay() {
+		var flat = scenarioSiblingOrder(), out = [], seen = {}, kids = {}, roots = [];
+		flat.forEach(function (s) {
+			var p = (s.isBase || s.root === true) ? null : parentScenarioOf(s);
+			if (!p) { roots.push(s); } else { (kids[p.id] = kids[p.id] || []).push(s); }
+		});
+		function walk(s) {
+			if (seen[s.id]) { return; }
+			seen[s.id] = true;
+			out.push(s);
+			(kids[s.id] || []).forEach(walk);
+		}
+		roots.forEach(walk);
+		// A scenario only a parent loop reaches (a hand-edited file) is still listed, last.
+		flat.forEach(walk);
+		return out;
+	}
+	// The sibling order: Base first, then by name until a reorder is stored, then the stored order.
+	function scenarioSiblingOrder() {
 		var base = [], rest = [];
 		scenarios.forEach(function (s) { (s.isBase ? base : rest).push(s); });
 		// **ONCE THE ORDER HAS BEEN SET BY HAND IT IS THE STORED ONE, EVERYWHERE SCENARIOS ARE
@@ -72430,10 +72460,27 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var shown = scnLabels([group]) || {};
 		return fields.some(function (f) { return !!shown[f]; });
 	}
+	// **THE AMBER RING IS AN OVERRIDE IN THIS SCENARIO, NEVER ONE IT INHERITS** (Task 790's one
+	// marker, overridden vs inherited; Tom, 2026-10-14, of tanks whose levels a child scenario took
+	// from its parent's alternative: *"Tanks show amber circle on map, but has overrides only in
+	// parent, not here."*). Local is hasOverride()'s rule: where this scenario writes, its own values
+	// or the stored alternative it names, not that alternative's parent.
+	function overrideIsLocal(scn, el, prop) {
+		var m = localOverrideMap(scn, categoryOf(prop, elGroup(el)))[ovKey(el)], has = Object.prototype.hasOwnProperty;
+		if (!m) { return false; }
+		return has.call(m, prop) || (prop === 'demand' && has.call(m, 'demands')) || (prop === 'demands' && has.call(m, 'demand'));
+	}
 	function hasDisplayedOverride(el) {
-		var ov = resolvedOverrides(activeScenario())[ovKey(el)];
+		var scn = activeScenario(), ov = resolvedOverrides(scn)[ovKey(el)];
 		if (!ov) { return false; }
-		return Object.keys(ov).some(function (p) { return overrideIsDisplayed(el, p); });
+		return Object.keys(ov).some(function (p) { return overrideIsDisplayed(el, p) && overrideIsLocal(scn, el, p); });
+	}
+	// A shown value the scenario inherits from a parent scenario or a parent alternative, and holds
+	// none of its own: the dashed gray ring, the map's hollow dot.
+	function hasInheritedDisplayedOverride(el) {
+		var scn = activeScenario(), ov = resolvedOverrides(scn)[ovKey(el)];
+		if (!ov) { return false; }
+		return Object.keys(ov).some(function (p) { return overrideIsDisplayed(el, p) && !overrideIsLocal(scn, el, p); });
 	}
 	// **THE RING HAS TO SAY WHAT IT IS, ON THE ELEMENT ITSELF** (ROADMAP Task 512). Tom, 2026-08-24,
 	// of two junctions in his own file: *"I don't know why, and I can't get them to unhighlight. I
@@ -72448,7 +72495,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	//
 	// Named with the SCENARIO, because that is the answer to "why": the ring is not a state of the
 	// element, it is a fact about which scenario is showing. Switch to Base and it is gone.
-	function setOverrideTitle(el, marked) {
+	function setOverrideTitle(el, marked, inherited) {
 		if (!el) { return; }
 		var t = null, i;
 		// A direct-child walk rather than querySelector(':scope > title'), so this works unchanged
@@ -72462,12 +72509,14 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// First child, so a reader hits it before any other content of the element.
 			el.insertBefore(t, el.firstChild);
 		}
-		t.textContent = overrideMarkText();
+		t.textContent = overrideMarkText(inherited);
 	}
-	function overrideMarkText() {
+	function overrideMarkText(inherited) {
 		var pc = EngCalcs.pageConfig || {};
-		return (pc.lpn_scenario_mark_tip
-			|| 'The amber ring means this asset has an override in the scenario {name}.')
+		return (inherited ? (pc.lpn_scenario_mark_inh_tip
+			|| 'The dashed gray ring means the scenario {name} inherits an override for this asset from its parent scenario or alternative.')
+			: (pc.lpn_scenario_mark_tip
+			|| 'The amber ring means this asset has an override in the scenario {name}.'))
 			.replace('{name}', scenarioDisplayName(activeScenario()));
 	}
 	/**
@@ -72494,24 +72543,28 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (group === 'link') { linkScenarioMarks(el); }
 	}
 	function nodeScenarioMarks(el) {
-		var ne = el ? nodeEls[el.id] : null, off, ov;
+		var ne = el ? nodeEls[el.id] : null, off, ov, inh;
 		if (!ne) { return; }
 		off = !isActive(el); ov = hasDisplayedOverride(el);
+		inh = !ov && hasInheritedDisplayedOverride(el);
 		ne.circle.classList.toggle('lpn-override', ov);
-		setOverrideTitle(ne.circle, ov);
+		ne.circle.classList.toggle('lpn-override-inh', inh);
+		setOverrideTitle(ne.circle, ov || inh, inh);
 		ne.circle.classList.toggle('lpn-inactive', off);
 		if (ne.symbol) { ne.symbol.classList.toggle('lpn-inactive', off); }
 		ne.text.classList.toggle('lpn-inactive', off);
 	}
 	function linkScenarioMarks(el) {
-		var le = el ? linkEls[el.id] : null, off, ov;
+		var le = el ? linkEls[el.id] : null, off, ov, inh;
 		if (!le) { return; }
 		// **A LINK WHOSE END IS INACTIVE IS DRAWN INACTIVE** (Task 781): it is out of the solve
 		// (assembleModel()), and Bentley greys what it leaves out.
 		off = !linkLive(el); ov = hasDisplayedOverride(el);
 		if (le.halo) {
+			inh = !ov && hasInheritedDisplayedOverride(el);
 			le.halo.classList.toggle('lpn-override', ov);
-			setOverrideTitle(le.halo, ov);
+			le.halo.classList.toggle('lpn-override-inh', inh);
+			setOverrideTitle(le.halo, ov || inh, inh);
 		}
 		le.line.classList.toggle('lpn-inactive', off);
 		le.text.classList.toggle('lpn-inactive', off);
@@ -76254,10 +76307,19 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			lead.className = 'lpn-tree-spacer';
 		}
 		row.appendChild(lead);
+		// **THE CHILD ICON ONLY WHERE THERE ARE CHILDREN** (Tom, 2026-10-14: *"It appears when it can
+		// have no meaning. It might be useful if it appeared only when an entry has descendants."*).
+		// It was drawn on every item, after the icon per node of Civil 3D's Toolspace, to say "a
+		// child"; a leaf now keeps the icon's width empty, so every name on a level still starts at
+		// one edge. A Base keeps its own icon.
 		icon = document.createElement('span');
-		icon.className = 'lpn-sm-icon lpn-sm-icon-' + smIconKind(tree, r);
 		icon.setAttribute('aria-hidden', 'true');
-		icon.innerHTML = '<svg viewBox="0 0 16 16" width="16" height="16">' + SM_ICONS[smIconKind(tree, r)] + '</svg>';
+		if (r.depth === 0 || r.hasKids) {
+			icon.className = 'lpn-sm-icon lpn-sm-icon-' + smIconKind(tree, r);
+			icon.innerHTML = '<svg viewBox="0 0 16 16" width="16" height="16">' + SM_ICONS[smIconKind(tree, r)] + '</svg>';
+		} else {
+			icon.className = 'lpn-sm-icon lpn-sm-icon-none';
+		}
 		row.appendChild(icon);
 		name.className = 'lpn-sm-name';
 		if (smState.editing === r.key) {
