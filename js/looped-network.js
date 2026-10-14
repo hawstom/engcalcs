@@ -48458,6 +48458,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (paneState.open) { closePane(); }
 		paneState.h = LPN_PANE_DEFAULT;
 		paneState.tab = paneTabs[0].id;
+		// The Scenarios tab follows the Basic mode just read, or the strip wraps differently than a reload's.
+		refreshScenariosTab();
 		loadPaneState();
 		if (document.getElementById('lpn_pane_body')) { document.getElementById('lpn_pane_body').style.height = ''; }
 		Object.keys(paneColPrefs).forEach(function (k) { delete paneColPrefs[k]; });
