@@ -32668,7 +32668,9 @@ var EngCalcs = EngCalcs || {};
 	// starting level (see its `pressure` branch), so over a run it is a flat line while the head
 	// above it moves. The head is the tank's moving reading, and it is offered.
 	var PG_FIELDS = {
-		node: ['pressure', 'head', 'demandActual', 'quality'],
+		// 'depth' is a tank-only result (Task 783): pgAvailable() keeps a candidate only if the run has a
+		// number for this element, so a junction, a reservoir and every link never offer it.
+		node: ['pressure', 'head', 'depth', 'demandActual', 'quality'],
 		link: ['velocity', 'flow', 'headloss', 'gradient', 'friction', 'status', 'quality', 'rate']
 	};
 	var PG_SKIP_BY_TYPE = { tank: { pressure: 1 } };
