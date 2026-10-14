@@ -536,6 +536,9 @@
 			// EPANET's own words, untranslated on purpose -- they name what it choked on, and
 			// nothing of ours could reconstruct that.
 			runRefusedWhy: pageConfig.lpn_engine_refused_why || 'EPANET solver message: {message}',
+			// A run EPANET started and could not finish (Tom, 2026-10-14: a tank emptied, the
+			// junctions it fed lost their only source, Error 110 at 7:24). "Did not start" was false.
+			runStopped: pageConfig.lpn_time_run_stopped || 'The EPANET run stopped at {time}, so it has no results. The EPANET run report says why.',
 			runFellBack: pageConfig.lpn_time_run_fell_back || 'The numbers on screen came from the built-in solver instead. It solves one instant at a time, so this is the network at {time} only, with every tank at its initial level.',
 			runReport: pageConfig.lpn_time_run_report || 'Run report',
 			runSlowAdvice: pageConfig.lpn_time_run_slow || 'This network took {secs} s to calculate, and it is set to recalculate after every change. To stop that and get a Calculate button back, turn off “Recalculate automatically” in Settings, under Calculation, Hydraulics.',
@@ -1217,8 +1220,10 @@
 	// What the refusal itself says, without the fallback sentence -- the status bar wants all three
 	// and the run box wants only these two, so the shared part is composed once.
 	function refusedText(run) {
-		var S = strings(), why = (run && run.engineError) || '';
-		return why ? S.runRefused + ' ' + S.runRefusedWhy.replace('{message}', why) : S.runRefused;
+		var S = strings(), why = (run && run.engineError) || '',
+			head = (run && typeof run.stoppedAt === 'number')
+				? S.runStopped.replace('{time}', EC.lpnTimeElapsedText(run.stoppedAt)) : S.runRefused;
+		return why ? head + ' ' + S.runRefusedWhy.replace('{message}', why) : head;
 	}
 
 	// The statistic the project asks for, or null (Task 735).
