@@ -387,6 +387,9 @@
 		var carried = {};   // section name -> the file's own lines, for every section not read below
 		// The `;PUMP:`-style line last seen inside [CURVES], waiting for the row it describes.
 		var pendingCurveType = null;
+		// The whole-line comments since the last row of [PATTERNS] or [CONTROLS], waiting for the
+		// row they describe. See the reading below.
+		var pendingLineCmts = [];
 		for (i = 0; i < lines.length; i++) {
 			line = lines[i];
 			semi = line.indexOf(';');
@@ -415,10 +418,34 @@
 					};
 				}
 			}
+			// **A DESCRIPTION IN [PATTERNS], [CONTROLS] AND [RULES] IS A WHOLE-LINE COMMENT ABOVE
+			// THE THING IT DESCRIBES.** For a pattern that is EPANET's own rule: the toolkit keeps
+			// the whole-line comment directly before a pattern's first row as its Comment, in
+			// [PATTERNS] and [CURVES] only (input2.c, `LineComment`, which a blank line clears;
+			// input3.c patterndata()), and writes it back as `;<comment>` on the line above
+			// (inpfile.c). EPANET has no description for a control or a rule; its GUI keeps both
+			// sections as the file's own lines, comments in place (Uimport.pas ReadControlData /
+			// ReadRuleData, Uexport.pas ExportControls), and Net3's controls carry three. So the
+			// comment lines above a control are read as its description and written back above
+			// it, and a comment line in [RULES] is carried with the rule text it sits in.
+			if (!line.trim() && (section === 'PATTERNS' || section === 'CONTROLS')) {
+				if (semi >= 0) { pendingLineCmts.push({ raw: lines[i].replace(/\s+$/, ''), text: cmt }); }
+				// EPANET's own reading: a blank line between the comment and the row means no
+				// description. A control has no EPANET reading to follow, and a blank line between
+				// a heading comment and the controls under it is ordinary layout, so it is kept.
+				else if (section === 'PATTERNS') { pendingLineCmts = []; }
+				continue;
+			}
+			if (!line.trim() && section === 'RULES' && semi >= 0) {
+				if (!carried.RULES) { carried.RULES = []; }
+				carried.RULES.push(lines[i].replace(/\s+$/, ''));
+				continue;
+			}
 			if (!line.trim()) { continue; }
 			if (line.charAt(0) === '[' || /^\s*\[/.test(line)) {
 				section = line.trim().replace(/^\[|\]\s*$/g, '').toUpperCase();
 				if (!rawSections[section]) { rawSections[section] = []; }
+				pendingLineCmts = [];
 				continue;
 			}
 			// **EVERY SECTION THIS READER DOES NOT TAKE APART IS KEPT AS TEXT, LINE FOR LINE.**
@@ -457,6 +484,10 @@
 			if (section === 'CURVES') {
 				toks.raw = lines[i].replace(/\s+$/, '');
 				if (pendingCurveType) { toks.typeLine = pendingCurveType; pendingCurveType = null; }
+			}
+			if (section === 'PATTERNS' || section === 'CONTROLS') {
+				if (pendingLineCmts.length) { toks.lineCmts = pendingLineCmts; }
+				pendingLineCmts = [];
 			}
 			if (!rawSections[section]) { rawSections[section] = []; }
 			rawSections[section].push(toks);
@@ -698,6 +729,15 @@
 				pat = { id: r[0], multipliers: [] };
 				patterns.push(pat); patternIndex[r[0]] = pat;
 			}
+			// **THE DESCRIPTION IS THE LAST WHOLE-LINE COMMENT ABOVE A RUN'S FIRST ROW**, exactly as
+			// EPANET's toolkit reads it (input2.c overwrites `LineComment` on each comment line;
+			// input3.c patterndata() takes it only when the row starts a run and the pattern has
+			// none yet). So in Net3, `;ID Multipliers` above `;General Default Demand Pattern` is a
+			// column heading and the second line is pattern 1's description. A bare `;` is none.
+			if (r.lineCmts && !pat.note && (i === 0 || rows[i - 1][0] !== r[0])) {
+				var pnote = EngCalcs.lpnDescText(r.lineCmts[r.lineCmts.length - 1].text);
+				if (pnote) { pat.note = pnote; }
+			}
 			for (var pj = 1; pj < r.length; pj++) {
 				var pv = parseFloat(r[pj]);
 				if (!isFinite(pv)) { continue; }
@@ -759,6 +799,28 @@
 			var d = EngCalcs.lpnDescText(r.cmt);
 			if (d) { el.desc = d; }
 			return el;
+		}
+		// **A CONTROL'S DESCRIPTION** is the whole-line comments above it, back to the control
+		// before (see the [PATTERNS]/[CONTROLS]/[RULES] note in the line loop for why EPANET leaves
+		// this to us). Several lines read as one description joined by spaces, and their own text
+		// is kept in `noteSrc` so an unedited control writes them back line for line, the curve's
+		// `src` rule. With no comment above, a trailing `;comment` on the control's own line is its
+		// description and goes back on that line (`noteAt: 'end'`); with both, the trailing one is
+		// kept as `tail` and written back where it was.
+		function readControlNote(ctl, r) {
+			var above = r.lineCmts || [], texts = [], note, trail = EngCalcs.lpnDescText(r.cmt);
+			above.forEach(function (c) { var t = EngCalcs.lpnDescText(c.text); if (t) { texts.push(t); } });
+			note = texts.join(' ');
+			if (note) {
+				ctl.note = note;
+				if (above.length !== 1 || above[0].raw !== ';' + note) {
+					ctl.noteSrc = above.map(function (c) { return c.raw; });
+				}
+				if (trail) { ctl.tail = trail; }
+			} else if (trail) {
+				ctl.note = trail;
+				ctl.noteAt = 'end';
+			}
 		}
 
 		// ---- nodes ----
@@ -1275,6 +1337,7 @@
 					// multiplies by scale[unit] and never re-derives which is which.
 					ctl.condition.unit = cNode.type === 'junction' ? 'press' : 'head';
 				}
+				readControlNote(ctl, rows[i]);
 				controls.push(ctl);
 			}
 		}
@@ -2981,7 +3044,10 @@
 		// which is the same rule for a quantity whose text is not a number (`24:00`, `12 am`).
 		var patternRows = [], controlRows = [], timeRows = [];
 		(doc.patterns || []).forEach(function (pat) {
-			var mults = (pat.multipliers || []), k, line;
+			var mults = (pat.multipliers || []), k, line, note = EngCalcs.lpnDescText(pat.note);
+			// The description on the line above the first row, as EPANET's own writer puts it
+			// (inpfile.c: `\n;%s` before the rows) and as its reader takes it back.
+			if (note && mults.length) { patternRows.push(';' + note); }
 			// SIX PER LINE, which is EPANET's own layout and the one Net3 is written in. The id
 			// repeats on each line and the values concatenate; that is the format, not a nicety.
 			for (k = 0; k < mults.length; k += 6) {
@@ -2996,8 +3062,28 @@
 		// its own text is exactly right and composing a sentence from the record could only differ
 		// from it. THE DAY A CONTROL EDITOR EXISTS this must compose from the record instead, and
 		// `raw` becomes a fallback -- an edited control would otherwise be written back unedited.
+		// **ITS DESCRIPTION GOES BACK WHERE IT CAME FROM**: the comment lines above it, verbatim
+		// while they still say the description (`noteSrc`), else one `;` line; or on the control's
+		// own line when it was a trailing comment there. See readControlNote() in the reader.
 		(doc.controls || []).forEach(function (ctl) {
-			if (ctl && ctl.raw) { controlRows.push(ctl.raw); }
+			var note, src, line;
+			if (!ctl || !ctl.raw) { return; }
+			note = EngCalcs.lpnDescText(ctl.note);
+			line = ctl.raw;
+			if (note && ctl.noteAt === 'end') {
+				line += ' ;' + note;
+			} else if (note) {
+				src = Array.isArray(ctl.noteSrc) ? ctl.noteSrc : null;
+				if (src && src.map(function (s) {
+					return EngCalcs.lpnDescText(String(s).replace(/^\s*;/, ''));
+				}).filter(Boolean).join(' ') === note) {
+					src.forEach(function (s) { controlRows.push(String(s)); });
+				} else {
+					controlRows.push(';' + note);
+				}
+			}
+			if (ctl.tail && ctl.noteAt !== 'end') { line += ' ;' + EngCalcs.lpnDescText(ctl.tail); }
+			controlRows.push(line);
 		});
 		// **THE OPEN SCENARIO'S OWN RUN TIME AND TIME STEP** (Task 755), when it states them, on the
 		// rule the demand multiplier follows: the export writes the scenario the user is looking at.
