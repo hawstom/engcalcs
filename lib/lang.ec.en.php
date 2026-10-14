@@ -1692,6 +1692,7 @@ $ec_lang['lpn_tables_menu']='Tables';
 // popup already uses, {value} the number or name with its unit, {scenario} a scenario's name.
 // dev/asset-type.md.
 $ec_lang['lpn_morph_menu']='Morph';
+$ec_lang_syn['lpn_morph_menu']='Transform | Change the type of an asset (a node into a junction, reservoir or tank; a link into a pipe, pump or valve) while it keeps its ID, location and connections.';
 $ec_lang['lpn_morph_tip']='Change the selected nodes into junctions, reservoirs, or tanks, or the selected links into pipes, pumps, or valves. Each keeps its ID, its location, its connections, and every value the new type also has. In Base the asset itself is changed, and you are asked first if any value would be lost. In any other scenario the new type is an override in that scenario only, and the values only the new type has start from Settings > New assets.';
 $ec_lang['lpn_morph_ok']='Morph';
 // {ids} lists the selected assets of the other kind (nodes when a link type was chosen, and links
