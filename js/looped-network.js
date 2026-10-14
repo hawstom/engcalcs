@@ -5839,10 +5839,10 @@ var EngCalcs = EngCalcs || {};
 		}
 		return (r.parent === null || r.parent === undefined || !storedById(kind === 'calc' ? doc.calcSets : doc.alternatives, r.parent)) ? 'base' : r.parent;
 	}
-	// The order siblings are shown in: scenarios by scenariosForDisplay() (sorted by name until a
+	// The order siblings are shown in: scenarios by scenarioSiblingOrder() (sorted by name until a
 	// reorder is stored), everything else by stored order.
 	function smOrdered(tree) {
-		return tree === 'scenarios' ? scenariosForDisplay().filter(function (s) { return !s.isBase; }) : smRecords(tree);
+		return tree === 'scenarios' ? scenarioSiblingOrder().filter(function (s) { return !s.isBase; }) : smRecords(tree);
 	}
 	function smChildren(tree, parentKey) {
 		return smOrdered(tree).filter(function (r) { return smParentKey(tree, r.id) === parentKey; }).map(function (r) { return r.id; });
@@ -6117,7 +6117,7 @@ var EngCalcs = EngCalcs || {};
 	function smStoreScenarioOrder() {
 		var shown;
 		if (project.scenarioOrdered === true) { return; }
-		shown = scenariosForDisplay();
+		shown = scenarioSiblingOrder();
 		scenarios.length = 0;
 		shown.forEach(function (s) { scenarios.push(s); });
 		project.scenarioOrdered = true;
@@ -6775,7 +6775,30 @@ var EngCalcs = EngCalcs || {};
 	//
 	// **A COPY, NEVER THE STORED ARRAY.** `scenarios` is serializeProject()'s own order and a file
 	// round-trips byte-identical; only the reading of it for display is sorted.
+	//
+	// **AND EVERY LIST FOLLOWS THE SCENARIO MANAGER'S TREE** (Tom, 2026-10-14: *"The order of scenarios
+	// in the bottom list and the Water menu is confusing. They are not sorted by name, they don't
+	// follow the Scenario manager."*): depth first, each scenario followed by its children, siblings
+	// in the order above (scenarioSiblingOrder()), Base and its tree first, then any Base of its own.
 	function scenariosForDisplay() {
+		var flat = scenarioSiblingOrder(), out = [], seen = {}, kids = {}, roots = [];
+		flat.forEach(function (s) {
+			var p = (s.isBase || s.root === true) ? null : parentScenarioOf(s);
+			if (!p) { roots.push(s); } else { (kids[p.id] = kids[p.id] || []).push(s); }
+		});
+		function walk(s) {
+			if (seen[s.id]) { return; }
+			seen[s.id] = true;
+			out.push(s);
+			(kids[s.id] || []).forEach(walk);
+		}
+		roots.forEach(walk);
+		// A scenario only a parent loop reaches (a hand-edited file) is still listed, last.
+		flat.forEach(walk);
+		return out;
+	}
+	// The sibling order: Base first, then by name until a reorder is stored, then the stored order.
+	function scenarioSiblingOrder() {
 		var base = [], rest = [];
 		scenarios.forEach(function (s) { (s.isBase ? base : rest).push(s); });
 		// **ONCE THE ORDER HAS BEEN SET BY HAND IT IS THE STORED ONE, EVERYWHERE SCENARIOS ARE

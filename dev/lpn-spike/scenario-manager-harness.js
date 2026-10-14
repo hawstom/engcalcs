@@ -56,7 +56,7 @@ const INJECT =
 	"\t\tsmAssign: smAssign, smCopyScenario: smCopyScenario, smCopyStored: smCopyStored, smChoice: smChoice, smCellText: smCellText,\n" +
 	"\t\tsmCellChoices: smCellChoices, smCellValue: smCellValue, smUsedBy: smUsedBy, smUsedByText: smUsedByText,\n" +
 	"\t\tsmCompareSet: smCompareSet, smCompareChecked: smCompareChecked, compareScenarios: compareScenarios,\n" +
-	"\t\tscenarioCompareModels: scenarioCompareModels, scenariosForDisplay: scenariosForDisplay,\n" +
+	"\t\tscenarioCompareModels: scenarioCompareModels, scenariosForDisplay: scenariosForDisplay, scenarioSiblingOrder: scenarioSiblingOrder,\n" +
 	"\t\tscenarioMenuRows: scenarioMenuRows, openScenarioManager: openScenarioManager,\n" +
 	"\t\tbasicMode: function () { return scenarioBasicMode; }, setBasicMode: setScenarioBasicMode,\n" +
 	"\t\tlastNotice: function () { return lastNoticeText; }, promote: promoteImplicitAlternative,\n" +
@@ -150,8 +150,12 @@ async function run(mutate, quiet) {
 	ok('4.2 a cycle is refused (c2 under its own child)', L.smMove('scenarios', c2.id, g1.id, 'into').refused === 'parent' && c2.parent === undefined);
 	ok('4.3 ...and a scenario under itself', L.smMove('scenarios', c2.id, c2.id, 'into').refused === 'self');
 	ok('4.4 into Base: g1 back under Base, with no parent stored', L.smMove('scenarios', g1.id, BASE, 'into') === true && g1.parent === undefined && g1.root === undefined);
-	ok('4.5 a project that never reordered still sorts by name', L.getProject().scenarioOrdered === undefined &&
-		L.scenariosForDisplay().map((s) => s.name).join() === ['Base', 'Base2', 'Base3', 'Child_1_of_Base', 'Child_1_of_Child_1_of_Base', 'Child_2_of_Base'].join(), L.scenariosForDisplay().map((s) => s.name).join());
+	ok('4.5 a project that never reordered still sorts siblings by name', L.getProject().scenarioOrdered === undefined &&
+		L.scenarioSiblingOrder().map((s) => s.name).join() === ['Base', 'Base2', 'Base3', 'Child_1_of_Base', 'Child_1_of_Child_1_of_Base', 'Child_2_of_Base'].join(), L.scenarioSiblingOrder().map((s) => s.name).join());
+	// Tom, 2026-10-14: every scenario list follows the Scenario manager's tree, depth first.
+	ok('4.5b ...and every list shows them in the Scenario manager\'s tree order, depth first',
+		L.scenariosForDisplay().map((s) => s.name).join() === ['Base', 'Child_1_of_Base', 'Child_1_of_Child_1_of_Base', 'Child_2_of_Base', 'Base2', 'Base3'].join() &&
+		L.scenariosForDisplay().map((s) => s.id).join() === L.smRows('scenarios').map((r) => r.key).join(), L.scenariosForDisplay().map((s) => s.name).join());
 	ok('4.6 between: g1 goes before c1, as c1\'s sibling', L.smMove('scenarios', g1.id, c1.id, 'before') === true && g1.parent === undefined);
 	ok('4.7 the first reorder stores the order', L.getProject().scenarioOrdered === true);
 	let order = L.scenariosForDisplay().map((s) => s.id);
@@ -163,7 +167,11 @@ async function run(mutate, quiet) {
 		const rows = L.scenarioMenuRows().filter((r) => r.scenarioId).map((r) => r.scenarioId);
 		return rows.join() === order.join();
 	})(), '');
-	ok('4.12 a new scenario goes last once the order is stored', (() => { const n = L.smAdd('scenarios', BASE, false); return L.scenariosForDisplay().slice(-1)[0].id === n.id; })());
+	ok('4.12 a new scenario goes last once the order is stored, and is listed last of Base\'s children', (() => {
+		const n = L.smAdd('scenarios', BASE, false), shown = L.scenariosForDisplay().map((s) => s.id);
+		return L.scenarioSiblingOrder().slice(-1)[0].id === n.id && shown.join() === L.smRows('scenarios').map((r) => r.key).join() &&
+			L.smChildren('scenarios', BASE).slice(-1)[0] === n.id;
+	})());
 	ok('4.13 onto a Base of its own: c1 under Base2, parent kept and root dropped', L.smMove('scenarios', c1.id, b2.id, 'into') === true && c1.parent === b2.id && c1.root === undefined);
 	ok('4.14 beside a root: c1 becomes a Base of its own', L.smMove('scenarios', c1.id, b3.id, 'after') === true && c1.root === true && c1.parent === undefined);
 	ok('4.15 nothing goes before the Base item', L.smMove('scenarios', c2.id, BASE, 'before').refused === 'base');
