@@ -556,27 +556,6 @@ the block.
     monthly, ACEC office downtown Phoenix, virtual option, plus an offered introduction to EWB-USA.
     **The action is to pick a month and call him**, and the introduction is the larger prize: EWB-USA
     reaches every chapter at once, which is the same leverage a faculty advisor has over a club.
-- 50|285| **We do not know what devices anybody uses this on.**
-  Several decisions have quietly assumed an answer. Tom, 2026-08-11: *"we don't know whether anybody uses this on a phone."*
-  **Instrumented 2026-09-08, not yet read:** `log-human-view.php` and `log-calc-event.php` carry
-  `pointer: coarse|fine|''` as a fifth column and the report prints it as its own DEVICE tier. Every
-  row on file predates it; the first reading is the next weekly report. Close this once one has been
-  read into `dev/usage-data-log.md`. Until then the sentence below still describes the record.
-  Before that date the two writers recorded **page and language and nothing else**, so
-  there was no device signal anywhere in this project's instrumentation — every touch-target,
-  breakpoint and two-pane-layout argument ever made here has rested on a guess.
-  - **Not a small guess.** "Touch-friendly" is load-bearing in the suite's own conventions (the
-    whole-label `.ec-help` tap-target rule exists for it) and Task 284's layout hinges on it. All of
-    it may well be right; none of it is measured.
-  - **The cheapest honest signal is a COARSE one, and it should stay coarse.** A full user-agent
-    string is fingerprinting-grade data on a suite that offers a logging opt-out and takes it
-    seriously. One bucket per event — `pointer: coarse|fine` from a media query, or a viewport-width
-    band — answers the question without identifying anybody, and is a one-field addition to the
-    existing beacon.
-  - **Decide what the answer would CHANGE before collecting it.** "Almost nobody" means we stop
-    paying for phone-shaped compromises on `lpn_` specifically, which is a real design freedom rather
-    than a disappointment; "a third of them" makes several open tasks much more urgent.
-  - Add the reading to `dev/usage-data-log.md` as its own tier, not folded into reach/shopping/using.
 - 50|498| **A public roadmap, with epanet-js's Canny board as the worked example.**
   Tom, 2026-08-23: epanet-js runs one at `roadmap.epanetjs.com`, powered by Canny. Noted as an
   example to weigh, not a decision. The thing to weigh is that `dev/ROADMAP.md` is written for us and
