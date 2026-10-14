@@ -668,6 +668,9 @@ $ec_lang['lpn_tool_add_meter']='ደንበኛ';
 $ec_lang['lpn_tool_add_meter_tip']='የደንበኛውን ነጥብ ያመልክቱ፣ ከዚያም ግንኙነቱን፦ ግንኙነት ወይም ነጥብ። ለደንበኛው የሚሰጡት ፍላጎት በዚያ ግንኙነት ቅርብ ጫፍ ላለው ነጥብ ይታከላል።';
 $ec_lang['lpn_mode_add_meter']='ደንበኛ፦ ደንበኛው የት እንዳለ ያመልክቱ፣ ከዚያም የሚያገለግለውን ቧንቧ ወይም ነጥብ ይምረጡ። ወይም ለመሰረዝ Esc ይጠቀሙ።';
 $ec_lang['lpn_pane_tab_customers']='ደንበኞች';
+$ec_lang['lpn_pane_tab_shapes']='ስዕሎች';
+$ec_lang['lpn_pane_shape_closed']='ዝግ';
+$ec_lang['lpn_pane_shape_points']='ነጥቦች';
 $ec_lang['lpn_customer_heading']='ደንበኛ {id}';
 // ROADMAP Task 247. lpn_field_account and lpn_field_account_tip were DELETED 2026-09-19 (Tom:
 // "Didn't I say to trash Account number since they can just make a Custom property for that or
@@ -776,6 +779,9 @@ $ec_lang['lpn_pane_paste_text_no_position']='ረድፍ {row}፦ አዲስ ጽሑ
 // {id} is what the Text table's own Attached to cell named.
 $ec_lang['lpn_pane_paste_no_anchor']='ረድፍ {row}፦ {id} በዚህ መረብ ውስጥ እስካሁን ነጥብ ወይም ቧንቧ አይደለም። መጀመሪያ እሱን ይለጥፉ፣ ከዚያም ይህን ጽሑፍ ይለጥፉ።';
 $ec_lang['lpn_pane_paste_customer_no_position']='ረድፍ {row}፦ አዲስ ደንበኛ ሁለቱንም {first} እና {second} ይፈልጋል።';
+$ec_lang['lpn_pane_paste_shape_no_points']='ረድፍ {row}፦ አዲስ ስዕል ነጥቦቹን ይፈልጋል።';
+$ec_lang['lpn_pane_paste_shape_bad_points']='ረድፍ {row}፦ {text} የነጥቦች ዝርዝር አይደለም። እያንዳንዱን ነጥብ እንደ {pair} ይጻፉ፣ የአስርዮሽ ምልክቱ ነጥብ (.) ይሁን፣ ነጥቦቹንም በ| ይለዩ።';
+$ec_lang['lpn_pane_paste_shape_closed_few']='ረድፍ {row}፦ ዝግ ስዕል ቢያንስ ሦስት ነጥቦች ያስፈልጉታል።';
 $ec_lang['lpn_pane_paste_no_customer_ref']='ረድፍ {row}፦ አዲስ ደንበኛ የተገናኘ ቧንቧ ወይም ነጥብ ይፈልጋል።';
 $ec_lang['lpn_pane_paste_no_pipe']='ረድፍ {row}፦ ቧንቧ {id} ገና የለም። መጀመሪያ ቧንቧዎችዎን ይለጥፉ፣ ከዚያም ደንበኞችዎን።';
 $ec_lang['lpn_pane_paste_no_customer_node']='ረድፍ {row}፦ ነጥብ {id} ገና የለም። መጀመሪያ መገናኛዎችዎን ይለጥፉ፣ ከዚያም ደንበኞችዎን።';
@@ -953,23 +959,27 @@ $ec_lang['lpn_map_unmeasurable']='ይህ ገጽ የመሳያ ቦታውን መጠ
 // setting is literally GPM or LPS, never "US" or "SI" -- so a water engineer reads the flow unit as
 // the name of the system, and the length units as detail that follows from it.
 $ec_lang['lpn_ex_basic_si_title']='መሠረታዊ መረብ፣ L/s (SI)';
-$ec_lang['lpn_ex_basic_si_desc']='እዚህ ይጀምሩ። ማጠራቀሚያ፣ ፓምፕ እና ትንሽ ቀለበት፦ የውሃ መረብ ተብሎ ገና ሊሠራ የሚችል ትንሹ አዘገጃጀት። ሊትር በሰከንድ፣ ከሜትርና ሚሊሜትር ጋር።';
+$ec_lang['lpn_ex_basic_si_desc']='ሁለት ማጠራቀሚያዎች፣ ፓምፕ እና ትንሽ ቀለበት። ሊትር በሰከንድ፣ ከሜትርና ሚሊሜትር ጋር።';
 $ec_lang['lpn_ex_basic_us_title']='መሠረታዊ መረብ፣ gpm (US)';
-$ec_lang['lpn_ex_basic_us_desc']='ተመሳሳዩ መነሻ መረብ በጋሎን በደቂቃ፣ ከጫማና ኢንች ጋር።';
+$ec_lang['lpn_ex_basic_us_desc']='ሁለት ማጠራቀሚያዎች፣ ፓምፕ እና ትንሽ ቀለበት። ጋሎን በደቂቃ፣ ከጫማና ኢንች ጋር።';
 // **NOT PLAIN EPA Net1 ANY MORE, AND THE TITLE SAYS SO** (Tom, 2026-09-08: *"Net1 plus rule-based
 // controls: OK"*). Two `[RULES]` were added to the shipped file so the rule editor can be exercised
 // from the gallery; the rules stay, and the name stops claiming to be the sample as EPA ships it.
 $ec_lang['lpn_ex_net1_title']='EPANET Net1 ከደንብ ላይ ከተመሰረቱ መቆጣጠሪያዎች ጋር';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_ex_net1_desc']='ከሦስቱ የEPANET ናሙና መረቦች ትንሹ፦ አንድ ማጠራቀሚያ፣ አንድ ፓምፕ እና አንድ ቀለበት።';
-$ec_lang['lpn_ex_net2_title']='EPANET Net2';
+$ec_lang['lpn_ex_net1_desc']='ክሎሪን፣ 1 ማጠራቀሚያና 1 ታንክ ያለው ምናባዊ የEPANET ምሳሌ።';
+$ec_lang['lpn_ex_net2_si_title']='EPANET Net2፣ L/s (SI)';
+$ec_lang['lpn_ex_net2_si_desc']='ሊትር በሰከንድ፣ ከሜትርና ሚሊሜትር ጋር። በብራንፎርድ፣ ኮነቲከት የሚገኝ የEPANET ምሳሌ፣ ከጋሎን በደቂቃ፣ ጫማና ኢንች የተቀየረ፦ 35 መገናኛዎችና 1 ታንክ፣ ማጠራቀሚያ፣ ፓምፕና ቫልቭ የሌለው፣ ወደ 2 ኪሜ በ4 ኪሜ። ፍሎራይድ፣ ምላሽ የማይሰጥ ንጥረ ነገር፣ በአንድ ምንጭ ይገባል።';
+$ec_lang['lpn_ex_net2_title']='EPANET Net2, gpm (US)';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_ex_net2_desc']='ታንክ ያለው ቅርንጫፍ ያለው የስርጭት ስርዓት፣ ከEPANET ናሙናዎች።';
-$ec_lang['lpn_ex_net3_title']='EPANET Net3';
+$ec_lang['lpn_ex_net2_desc']='ጋሎን በደቂቃ፣ ከጫማና ኢንች ጋር። በብራንፎርድ፣ ኮነቲከት የሚገኝ የEPANET ምሳሌ፦ 35 መገናኛዎችና 1 ታንክ፣ ማጠራቀሚያ፣ ፓምፕና ቫልቭ የሌለው፣ ወደ 1 ማይል በ2 ማይል። ፍሎራይድ፣ ምላሽ የማይሰጥ ንጥረ ነገር፣ በአንድ ምንጭ ይገባል።';
+$ec_lang['lpn_ex_net3_si_title']='EPANET Net3፣ L/s (SI)';
+$ec_lang['lpn_ex_net3_si_desc']='ሊትር በሰከንድ፣ ከሜትርና ሚሊሜትር ጋር። በኖቫቶ፣ ካሊፎርኒያ የሚገኝ የEPANET ምሳሌ፣ ከጋሎን በደቂቃ፣ ጫማና ኢንች የተቀየረ፣ የዓለም ካርታው ከጀርባው ሆኖ፦ 92 መገናኛዎች፣ 3 ታንኮችና 2 ማጠራቀሚያዎች፣ ቫልቭ የሌለው፣ ወደ 8 ኪሜ ካሬ። የ24 ሰዓት የተራዘመ ጊዜ ማስመሰያ፣ ከሐይቁ የምንጭ ፍለጋ ጋር።';
+$ec_lang['lpn_ex_net3_title']='EPANET Net3, gpm (US)';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_ex_net3_desc']='ትልቁ የEPANET ናሙና፦ 92 መገናኛዎች፣ ሦስት ታንኮች እና ሁለት ማጠራቀሚያዎች፣ ከእነሱ አንዱ ወንዝ ነው። ሙሉ መጠን ያለው ሞዴል በካርታው ላይ እንዴት እንደሚታይ ያሳያል።';
-$ec_lang['lpn_ex_elm_street_title']='የElm Street ማዕከል';
-$ec_lang['lpn_ex_elm_street_desc']='በአንድ ወቅት ላይ፣ ከከፍተኛ ቀን ፍላጎት በላይ ለእሳት ፍሰት የተፈታ የንግድ ቦታ፣ በቦታ ንድፍ ላይ ተስሎ።';
+$ec_lang['lpn_ex_net3_desc']='ጋሎን በደቂቃ፣ ከጫማና ኢንች ጋር። በኖቫቶ፣ ካሊፎርኒያ የሚገኝ የEPANET ምሳሌ፣ የዓለም ካርታው ከጀርባው ሆኖ፦ 92 መገናኛዎች፣ 3 ታንኮችና 2 ማጠራቀሚያዎች፣ ቫልቭ የሌለው፣ ወደ 5 ማይል ካሬ። የ24 ሰዓት የተራዘመ ጊዜ ማስመሰያ፣ ከሐይቁ የምንጭ ፍለጋ ጋር።';
+$ec_lang['lpn_ex_elm_street_title']='የElm Street ማዕከል፣ gpm (US)';
+$ec_lang['lpn_ex_elm_street_desc']='ጋሎን በደቂቃ፣ ከጫማና ኢንች ጋር። ፕሬስኮት ቫሊ፣ አሪዞና፦ 17 መገናኛዎች፣ 1 ማጠራቀሚያና 1 ፓምፕ። ከከፍተኛ ቀን ፍላጎት በላይ ለእሳት ፍሰት የተፈታ የንግድ ቦታ፣ በአንድ ቅጽበት፣ በቦታ ንድፍ ላይ ተስሎ።';
 $ec_lang['lpn_tool_undo']='ቀልብስ';
 $ec_lang['lpn_confirm_example']='ይህ ናሙናውን ቀድሞ ወዳለዎት መረብ ይጨምራል። ይቀጥሉ?';
 $ec_lang['lpn_field_diameter']='ዲያሜትር';
@@ -1169,7 +1179,7 @@ $ec_lang['lpn_tool_key_hint']='አቋራጭ፦ {key}ን ይጫኑ።';
 $ec_lang['lpn_tool_key_hint_two']='አቋራጭ፦ {key} ወይም {key2} ይጫኑ።';
 // Edited by TGH 2026-09-07; the Shift sentence rewritten 2026-09-08 on his ruling that Shift keeps
 // the selection and toggles what the shape catches (it used to say "add").
-$ec_lang['lpn_tool_area_tip']='የስክሪን መመሪያዎችን ይከተሉ። በመስኮት፣ በላሶ እና በፖሊጎን መካከል ለመቀያየር እንደገና ይጫኑ። አሁን ያለውን ምርጫ ለማቆየት እና የመረጡትን ለመጨመር ወይም ለማስወገድ (ለመቀያየር) Shift ይያዙ።';
+$ec_lang['lpn_tool_area_tip']='የአካባቢ ምርጫ፦ መስኮት፣ ላሶ ወይም ፖሊጎን።';
 $ec_lang['lpn_area_selected']='{n} ተመርጠዋል።';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_area_none']='በዚያ ቦታ ውስጥ ምንም አልተገኘም።';
@@ -2097,7 +2107,7 @@ $ec_lang['lpn_id_invalid']='ክፍተትና ጥቅስ ምልክት የሌለበ�
 $ec_lang['lpn_id_taken']='ያ መለያ አስቀድሞ ጥቅም ላይ ውሏል።';
 $ec_lang['lpn_diag_no_fixed_head']='ማጠራቀሚያ ወይም ታንክ ይጨምሩ። መረቡ ከመፈታቱ በፊት ቢያንስ አንድ የታወቀ የውሃ ደረጃ ያስፈልገዋል።';
 $ec_lang['lpn_diag_dangling_link']='ቧንቧ ወይም ፓምፕ ከዚህ በኋላ ወደሌለ ነጥብ ይገናኛል፦';
-$ec_lang['lpn_diag_unreachable']='እነዚህ ነጥቦች ወደ ማጠራቀሚያ የሚወስድ መንገድ የላቸውም፦';
+$ec_lang['lpn_diag_unreachable']='እነዚህ ነጥቦች ወደ ማጠራቀሚያ ወይም ታንክ የሚወስድ መንገድ የላቸውም፦';
 // BOTH OF THESE NAME THE VALVES. The page ends each one with a list of IDs, which is the reason
 // this calculator writes its own messages instead of showing EPANET\'s numbered errors: a person
 // looking at a drawing can act on \'V3\' and can do nothing at all with \'error 110\'.
@@ -3794,6 +3804,66 @@ $ec_lang['lpn_ff_err_unknown']='ውጤት የለም። የስህተት ኮድ፦
 // a plane coordinate read as a degree is silent and puts a network in the Gulf of Guinea.
 $ec_lang['lpn_file_import_survey']='የተቀየሱ ነጥቦች አስገባ…';
 $ec_lang['lpn_file_import_survey_tip']='ከጽሑፍ ፋይል የተቀየሱ ነጥቦች ዝርዝር አንብብና በእያንዳንዱ ነጥብ ላይ አንድ መገናኛ ፍጠር፣ ፋይሉ ለማይገልጸው ነገር ሁሉ የአዲስ ንብረት ቅንብሮችን ተጠቀም። መግለጫውን እንደ የመስክ ኮዶች አንብብ ካልመረጡ በስተቀር ምንም ቧንቧ አይሳልም፣ ምንም ረድፍም ሳይሰየም አይተውም። ይህ ፕሮጀክት ቀድሞውኑ የሚጠቀምበትን የመጋጠሚያ ስርዓት ያነባል፣ ጂዮ-ማጣቀሻ ያለው ወይም የሌለው ቢሆንም።';
+$ec_lang['lpn_file_import_shapes']='የGeoJSON ስዕሎች አስገባ…';
+$ec_lang['lpn_file_import_shapes_tip']='የGeoJSON ፋይል ነጥቦችን፣ መስመሮችንና ፖሊጎኖችን እንደ ስዕሎች ወደዚህ ፕሮጀክት አንብብ። በፋይሉ ውስጥ ያሉ የመረብ አካሎች አይገቡም፤ መረቡን ከEPANET ፋይል አስገባ። ፕሮጀክቱ ጂዮ-ማጣቀሻ ያለው መሆን ወይም የመጋጠሚያ ስርዓት መግለጽ አለበት።';
+$ec_lang['lpn_geojson_import_done']='{n} ስዕሎች ከ{file} ገብተዋል።';
+$ec_lang['lpn_geojson_import_done_one']='አንድ ስዕል ከ{file} ገብቷል።';
+$ec_lang['lpn_geojson_import_renamed']='የ{n} ገጽታዎች ስሞች እንደ ስዕል መለያ ሊጠቀሙ አይችሉም። እያንዳንዱ ስዕል ሌላ መለያ ተሰጥቶታል፣ የገጽታ ስሙንም ይይዛል፦ {list}።';
+$ec_lang['lpn_geojson_import_renamed_one']='የአንድ ገጽታ ስም እንደ ስዕል መለያ ሊጠቀም አይችልም። ስዕሉ ሌላ መለያ ተሰጥቶታል፣ የገጽታ ስሙንም ይይዛል፦ {list}።';
+$ec_lang['lpn_geojson_import_skipped']='{n} ገጽታዎች አልገቡም፦ {list}።';
+$ec_lang['lpn_geojson_import_skipped_one']='አንድ ገጽታ አልገባም፦ {list}።';
+$ec_lang['lpn_geojson_import_why_network']='የመረብ አካል';
+$ec_lang['lpn_geojson_import_why_geometry']='ነጥብ፣ መስመር ወይም ፖሊጎን አይደለም';
+$ec_lang['lpn_geojson_import_why_position']='ቦታው ትክክለኛ ኬክሮስና ኬንትሮስ አይደለም';
+$ec_lang['lpn_geojson_import_holes']='{n} የፖሊጎን ቀዳዳዎች አልገቡም። ስዕል አንድ ወሰን ብቻ አለው።';
+$ec_lang['lpn_geojson_import_holes_one']='አንድ የፖሊጎን ቀዳዳ አልገባም። ስዕል አንድ ወሰን ብቻ አለው።';
+$ec_lang['lpn_geojson_import_parts']='{n} ባለብዙ ክፍል ገጽታዎች ለእያንዳንዱ ክፍል አንድ ስዕል ሆነው ገብተዋል።';
+$ec_lang['lpn_geojson_import_parts_one']='አንድ ባለብዙ ክፍል ገጽታ ለእያንዳንዱ ክፍል አንድ ስዕል ሆኖ ገብቷል።';
+$ec_lang['lpn_geojson_import_local']='የGeoJSON ቦታዎች ኬክሮስና ኬንትሮስ ናቸው፣ ይህ ፕሮጀክት ደግሞ ወደ እነሱ የሚቀየርበት በምድር ላይ ቦታ የለውም። መጀመሪያ በካርታ፣ የዓለም ካርታ፣ አያይዝ ጂዮ-ማጣቀሻ ያድርጉት፣ ከዚያ እንደገና ያስገቡ።';
+$ec_lang['lpn_geojson_import_unreadable']='{file} የGeoJSON ፋይል አይደለም፦ {detail}';
+$ec_lang['lpn_file_import_dxf']='የDXF ስዕሎች አስገባ…';
+$ec_lang['lpn_file_import_dxf_tip']='የASCII DXF ፋይል ነጥቦችን፣ መስመሮችንና ፖሊላይኖችን እንደ ስዕሎች ወደዚህ ፕሮጀክት አንብብ፣ የእያንዳንዱ ንብርብር ስም እንደ ንብረት ተይዞ። ሌሎች ንጥሎች ይቆጠራሉ ይዘረዘራሉም፣ አይገቡም። መጋጠሚያዎቹ ያለ ምንም ልወጣ እንደ የዚህ ፕሮጀክት X እና Y ይነበባሉ።';
+$ec_lang['lpn_file_import_shp']='የshapefile ስዕሎች አስገባ…';
+$ec_lang['lpn_file_import_shp_tip']='የESRI shapefile ነጥቦችን፣ መስመሮችንና ፖሊጎኖችን እንደ ስዕሎች ወደዚህ ፕሮጀክት አንብብ፣ የባህሪ አምዶቹ እንደ ንብረቶች ተይዘው። .zip ን ወይም .shp ን ከ.shx፣ .dbf እና .prj ጋር ይምረጡ (ብዙ ለመምረጥ Ctrl ወይም Shift ይያዙ)። ከፕሮጀክቱ የተለየ የመጋጠሚያ ስርዓት ያላቸው መጋጠሚያዎች ይቀየራሉ፣ ማስታወቂያውም ይህን ይገልጻል።';
+$ec_lang['lpn_dxf_import_skipped']='{n} ንጥሎች አልገቡም፦ {list}።';
+$ec_lang['lpn_dxf_import_skipped_one']='አንድ ንጥል አልገባም፦ {list}።';
+$ec_lang['lpn_dxf_import_inblocks']='በብሎክ ትርጓሜዎች ውስጥ';
+$ec_lang['lpn_dxf_import_bulge']='{n} ፖሊላይኖች የቅስት ክፍሎች አሏቸው፣ እነሱም በመታጠፊያዎቻቸው መካከል እንደ ቀጥተኛ ክፍሎች ገብተዋል።';
+$ec_lang['lpn_dxf_import_bulge_one']='አንድ ፖሊላይን የቅስት ክፍሎች አሉት፣ እነሱም በመታጠፊያዎቹ መካከል እንደ ቀጥተኛ ክፍሎች ገብተዋል።';
+$ec_lang['lpn_dxf_import_units']='የDXF ንድፉ መለኪያ ክፍሎቹን {theirs} ሲል ይገልጻል፣ ይህ ፕሮጀክት ደግሞ {ours} ይጠቀማል። ቁጥሮቹ አልተቀየሩም።';
+$ec_lang['lpn_dxf_import_refuse_geo']='የDXF ንድፍ በጠፍጣፋ ገጽ ላይ ነው፣ ይህ ፕሮጀክት ደግሞ በኬክሮስና ኬንትሮስ ነው፣ ስለዚህ የ{file} መጋጠሚያዎች በውስጡ ቦታ የላቸውም። ፕሮጀክቱን ወደ መጋጠሚያ ስርዓት ለመቅዳት እንደ… ቀይር ይጠቀሙ፣ ከዚያ እንደገና ያስገቡ።';
+$ec_lang['lpn_dxf_import_unreadable']='{file} የASCII DXF ፋይል አይደለም።';
+$ec_lang['lpn_dxf_import_binary']='{file} የሁለትዮሽ DXF ነው። ከCAD ፕሮግራምዎ እንደ ASCII DXF ያስቀምጡት፣ ከዚያ እንደገና ያስገቡ።';
+$ec_lang['lpn_shapes_import_frame']='መጋጠሚያዎቹ ያለ ምንም ልወጣ እንደ {frame} ተነብበዋል።';
+$ec_lang['lpn_shapes_frame_xy']='የዚህ ፕሮጀክት X እና Y';
+$ec_lang['lpn_shapes_frame_latlon']='ኬክሮስና ኬንትሮስ';
+$ec_lang['lpn_shp_import_skipped']='{n} መዝገቦች የቅርጽ ዓይነታቸው ስለማይነበብ አልገቡም፦ {list}።';
+$ec_lang['lpn_shp_import_skipped_one']='አንድ መዝገብ የቅርጽ ዓይነቱ ስለማይነበብ አልገባም፦ {list}።';
+$ec_lang['lpn_shp_import_attrs']='የባህሪ አምዶች እንደ የእያንዳንዱ ስዕል ንብረቶች ተይዘዋል፦ {list}።';
+$ec_lang['lpn_shp_import_noprj']='.prj ፋይል የለም፣ ስለዚህ መጋጠሚያዎቹ ያለ ምንም ልወጣ እንደ {frame} ተነብበዋል።';
+$ec_lang['lpn_shp_import_prj_same']='.prj {crs}ን ይገልጻል፣ ይህም የዚህ ፕሮጀክት የመጋጠሚያ ስርዓት ነው፣ ስለዚህ መጋጠሚያዎቹ አልተቀየሩም።';
+$ec_lang['lpn_shp_import_converted']='መጋጠሚያዎቹ ኬክሮስና ኬንትሮስ ናቸው። ካርታው በሚጠቀምበት ልወጣ ወደ {crs} ተቀይረዋል።';
+$ec_lang['lpn_shp_import_prj_other']='.prj {theirs}ን ይገልጻል። ይህ ፕሮጀክት ምንም የመጋጠሚያ ስርዓት አይገልጽም፣ ስለዚህ መጋጠሚያዎቹ ያለ ምንም ልወጣ እንደ {frame} ተነብበዋል።';
+$ec_lang['lpn_shp_import_refuse_local']='{file} በኬክሮስና ኬንትሮስ ነው፣ ይህ ፕሮጀክት ደግሞ ወደ እነሱ የሚቀየርበት በምድር ላይ ቦታ የለውም። መጀመሪያ በካርታ፣ የዓለም ካርታ፣ አያይዝ ጂዮ-ማጣቀሻ ያድርጉት፣ ከዚያ እንደገና ያስገቡ።';
+$ec_lang['lpn_shp_import_refuse_crs']='{file} {theirs}ን ይገልጻል፣ ይህ ፕሮጀክት ደግሞ በ{ours} ነው። ምንም አልገባም፣ ምንም አልተቀየረም።';
+$ec_lang['lpn_shp_import_refuse_range']='{file} .prj ፋይል የለውም፣ መጋጠሚያዎቹም ኬክሮስና ኬንትሮስ አይደሉም፣ ስለዚህ በዚህ ፕሮጀክት ውስጥ ሊቀመጡ አይችሉም።';
+$ec_lang['lpn_shp_import_noshp']='{file} .shp ፋይል አልያዘም። የshapefile .zip ን ወይም .shp ን ከ.shx፣ .dbf እና .prj ጋር ይምረጡ (ብዙ ለመምረጥ Ctrl ወይም Shift ይያዙ)።';
+$ec_lang['lpn_shp_import_manyshp']='{file} ከአንድ በላይ shapefile ይዟል። አንድ በአንድ ያስገቡ።';
+$ec_lang['lpn_shp_import_unreadable']='{file} ይህ ገጽ ሊያነበው የሚችል shapefile አይደለም፦ {detail}';
+$ec_lang['lpn_shp_import_pick_hint']='shapefile ብዙ ፋይሎች ነው። .shp ን ከ.shx፣ .dbf እና .prj ጋር ይምረጡ (ብዙ ለመምረጥ Ctrl ወይም Shift ይያዙ)፣ ወይም .zip ን ይምረጡ።';
+$ec_lang['lpn_shp_import_webmerc_ask']='{file} .prj ፋይል የለውም፣ ቁጥሮቹም ኬክሮስና ኬንትሮስ አይደሉም፣ ነገር ግን QGIS እና የድር ካርታዎች ከሚጠቀሙበት ስርዓት ከWeb Mercator ሜትሮች (EPSG:3857) ጋር ይስማማሉ። እንደ EPSG:3857 አስገብተው ወደዚህ ፕሮጀክት ይቀይሯቸው?';
+$ec_lang['lpn_shp_import_webmerc_ok']='እንደ EPSG:3857 አስገባ';
+$ec_lang['lpn_shp_import_webmerc_far_ask']='{file} {theirs}ን ይገልጻል፣ በዚያ ስርዓት ሲነበብ መጋጠሚያዎቹ ከዚህ ፕሮጀክት {km} ኪሜ ርቀው ይወድቃሉ። QGIS እና የድር ካርታዎች እንደሚጠቀሙበት ስርዓት እንደ Web Mercator ሜትሮች (EPSG:3857) ሲነበቡ ይህ ፕሮጀክት ባለበት ይወድቃሉ። እንደ EPSG:3857 አስገብተው ወደዚህ ፕሮጀክት ይቀይሯቸው?';
+$ec_lang['lpn_shp_import_reprojected']='መጋጠሚያዎቹ ከ{theirs} ወደ {ours} ተቀይረዋል።';
+$ec_lang['lpn_shp_import_unplaced']='{n} መዝገቦች ይህ ፕሮጀክት ሊያስቀምጣቸው የማይችላቸው መጋጠሚያዎች አሏቸው፣ ለምሳሌ ከካርታው ወሰን በላይ የሆነ ኬክሮስ። የመዝገብ ቁጥሮች፦ {list}።';
+$ec_lang['lpn_shp_import_unplaced_one']='አንድ መዝገብ ይህ ፕሮጀክት ሊያስቀምጣቸው የማይችላቸው መጋጠሚያዎች አሉት፣ ለምሳሌ ከካርታው ወሰን በላይ የሆነ ኬክሮስ። የመዝገብ ቁጥር፦ {list}።';
+$ec_lang['lpn_shapes_import_none']='ከ{file} ምንም አልገባም።';
+$ec_lang['lpn_shp_import_convert_hint']='ፕሮጀክቱን ወደ {theirs} ለመቅዳት እንደ… ቀይር ይጠቀሙ፣ ከዚያ እንደገና ያስገቡ።';
+$ec_lang['lpn_shp_import_damaged']='{file} ተበላሽቷል ወይም ተቆርጧል፣ ስለዚህ ምንም አልገባም።';
+$ec_lang['lpn_shp_import_deleted']='በ.dbf ውስጥ እንደተሰረዙ የተመለከቱ {n} መዝገቦች አልገቡም።';
+$ec_lang['lpn_shp_import_deleted_one']='በ.dbf ውስጥ እንደተሰረዘ የተመለከተ አንድ መዝገብ አልገባም።';
+$ec_lang['lpn_dxf_import_paperspace']='በወረቀት ቦታ ውስጥ';
+$ec_lang['lpn_shapes_import_more']='እና ሌሎች {n}';
 $ec_lang['lpn_survey_read_error']='ያ ፋይል ከዲስክዎ ሊነበብ አልቻለም።';
 $ec_lang['lpn_survey_cancelled']='ምንም አልተፈጠረም ምንም አልተለወጠም።';
 // What the project calls its two axes, for a sentence js/lpn-survey.js writes about a column. The
@@ -3998,6 +4068,8 @@ $ec_lang['lpn_fb_failed']='ወደ እኛ አልደረሰም። የጻፉት አ�
 $ec_lang['lpn_fb_bad_email']='ይህ የኢሜይል አድራሻ ትክክል አይመስልም። ያስተካክሉት፣ ወይም ባዶ ይተዉት።';
 $ec_lang['lpn_fb_busy']='ባለፉት ጥቂት ደቂቃዎች ውስጥ ብዙ መልዕክቶች ደርሰዋል። የጻፉት አሁንም እዚህ አለ፣ ስለዚህ በኋላ እንደገና መሞከር ይችላሉ።';
 $ec_lang['lpn_tool_add_chain_tip']='መገናኛዎችንና ቧንቧዎችን በሰንሰለት ያያይዙ፦ መገናኛ ለመጨመር በካርታው ላይ ነጥብ ያመልክቱ፣ ከዚያም ቧንቧና መገናኛ ለመጨመር እያንዳንዱን ቀጣይ ነጥብ ያመልክቱ። ከነባር ነጥብ ለመቀጠል እሱን ያመልክቱ። ሰንሰለቱን ለመጨረስ Escape ይጫኑ።';
+$ec_lang['lpn_tool_add_shape']='ስዕል';
+$ec_lang['lpn_tool_add_shape_tip']='በካርታው ላይ ነጥብ፣ ፖሊላይን ወይም ፖሊጎን ይሳሉ። ስዕል ማብራሪያ ነው፣ የመረቡ አካል አይደለም። እያንዳንዱን ነጥብ ያመልክቱ፣ ለመጨረስ የመጨረሻውን ነጥብ እንደገና ያመልክቱ፣ Enter ይጫኑ፣ ወይም በቀኝ ጠቅ ያድርጉ። ስዕሉን ወደ ፖሊጎን ለመዝጋት የመጀመሪያውን ነጥብ እንደገና ያመልክቱ።';
 $ec_lang['lpn_pane_filter_sel_note']='የተመረጡት ብቻ። ከ{all} ውስጥ {n} እየታየ ነው።';
 $ec_lang['lpn_pane_filter_sel_and']='በ{q} ተጣርቷል፣ የተመረጡት ብቻ ናቸው። ከ{all} ውስጥ {n} እየታየ ነው።';
 $ec_lang['lpn_pane_filter_sel_none']='ከተመረጡት አካሎች ውስጥ አንዳቸውም በዚህ ሠንጠረዥ ውስጥ የሉም።';
@@ -4058,6 +4130,7 @@ $ec_lang['lpn_copy_opened_unsaved']='{file} እንደ ቅጂ ተከፍቷል፣ 
 $ec_lang['lpn_engine_unavailable_why']='የግፊትና የፍሰት መቆጣጠሪያ ቫልቮች (PRV፣ PSV፣ FCV) ያለ EPANET ፈታች ሊፈቱ አይችሉም። {reason}';
 $ec_lang['lpn_engine_needed_failed_why']='ይህ መረብ በEPANET ፈታች ብቻ ሊፈታ ይችላል። {reason}';
 $ec_lang['lpn_mode_add_chain']='ሁነታ፦ የመገናኛና ቧንቧ ሰንሰለት። መገናኛ ለመጨመር በካርታው ላይ ነጥብ ያመልክቱ፣ ከዚያም ቧንቧና መገናኛ ለመጨመር እያንዳንዱን ቀጣይ ነጥብ ያመልክቱ። ከነባር ነጥብ ለመቀጠል እሱን ያመልክቱ። ሰንሰለቱን ለመጨረስ Escape ይጫኑ። ንብረቶችንና ምልክቶችን ለመቀየር ወይም ለማንቀሳቀስ ወደ ምረጥ ሁነታ ይቀይሩ።';
+$ec_lang['lpn_mode_add_shape']='ሁነታ፦ ስዕል ጨምር። እያንዳንዱን ነጥብ ያመልክቱ። ለመጨረስ የመጨረሻውን ነጥብ እንደገና ያመልክቱ ወይም Enter ይጫኑ፤ ፖሊጎን ለመዝጋት የመጀመሪያውን ነጥብ ያመልክቱ።';
 $ec_lang['lpn_cp_allow_tip']='እነዚህን ቁምፊዎች ብቻ ፍቀድ፦';
 $ec_lang['lpn_cp_characters_tip']='"@" ማንኛውም ፊደል ማለት ነው፤ "#" ማንኛውም የቁጥር አኃዝ ማለት ነው፣ እና "-"፣ "."፣ እና "," እንዲፈቀዱ ከፈለጉ በተናጠል መዘርዘር አለብዎት፤ ማንኛውም ባዶ ቦታ ቁምፊዎች በሌሎች ቁምፊዎች መካከል መሆን አለባቸው።';
 $ec_lang['lpn_valwarn_diameter']='የቧንቧ ወይም የቫልቭ ዲያሜትር በተለምዶ በ{min} እና በ{max} {unit} መካከል ነው። ቁጥሩንና የዲያሜትሩን መለኪያ ክፍል ያረጋግጡ።';
@@ -4210,11 +4283,11 @@ $ec_lang['lpn_guide_box_help']='የዚህ ሳጥን እገዛ';
 $ec_lang['lpn_guide_box_named']='{box} ሳጥን';
 $ec_lang['lpn_guide_dimmed']='የደበዘዘ ስም በመሳሪያ አሞሌው ላይ አሁን የተደበቀ አዝራር ነው።';
 $ec_lang['lpn_guide_text_popup']='የተመረጠውን አካል ወይም ጽሑፍ፣ ወይም በርካታ የተመረጡ አካሎችን ንብረቶች በምርጫው አጠገብ፣ ወይም ሳጥኑ ለመጨረሻ ጊዜ በተንቀሳቀሰበት ቦታ ያሳያል። የተስተካከለ ዋጋ መረቡን ወዲያውኑ ይለውጣል፣ የአካሉ የካርታ ምልክትና የሠንጠረዦች ፓነልም ይከተላሉ። የመጨረሻው ስሌት ውጤቶች ከግብዓቶቹ በታች ተዘርዝረዋል፣ ሊስተካከሉም አይችሉም።';
-$ec_lang['lpn_guide_text_find_popup']='ሁኔታን የሚያሟሉ አካሎችን ያገኛል፣ ለምሳሌ ከ8 in. ያነሱ ሁሉንም ቧንቧዎች ወይም ከ40 psi በታች ያሉ ሁሉንም መገናኛዎች፣ እንዲሁም በሁሉም ላይ አንድ ንብረት በአንድ ክዋኔ መቀየር ይችላል። ሞዴሉ ከመፈታቱ በፊት ለመፈተሽ (የጠፋ ከፍታ፣ በተሳሳተ አሃድ የገባ ዲያሜትር)፣ ከተፈታ በኋላ ችግር ያለባቸውን ቦታዎች ለመዘርዘር (ዝቅተኛ ግፊት፣ ከፍተኛ ፍጥነት)፣ እና በብዙ አካሎች ላይ አንድ እርማት ለማድረግ ይጠቀሙበት።\n\nየምን ፈልግ፣ ንብረት፣ መስፈርት እና ዋጋ ዝርዝሮች አንድ መስፈርት ገንብተው በመጠይቅ ሳጥን ውስጥ እንደ አንድ መስመር ጽሑፍ ይጽፉታል። መስመሩ በቀጥታ ሊስተካከል ይችላል፣ ዝርዝሮቹም ይከተሉታል። ዝርዝሮቹ መግለጽ የማይችሉት መጠይቅ፣ ለምሳሌ በወይም የተያያዙ ሁለት መስፈርቶች፣ ዝርዝሮቹን ይደብቃል፣ በምትኩ መቆጣጠሪያዎቹን ተጠቀም አዝራሩ እስኪጫን ድረስ። ለመፈለግ በመጠይቅ ሳጥኑ ውስጥ Enter ወይም ፈልግ አዝራሩን ይጫኑ።';
-$ec_lang['lpn_guide_text_settings_box']='ሁሉም ቅንብሮችና ሁለት ዳግም ማስጀመሪያ አዝራሮች በቅንብሮች ሳጥን ውስጥ ናቸው። ቅንብሮችን የሚያገኙበት ሌላ ቦታ የለም። ሳጥኑ ሊፈለግ ይችላል፦ በቅንብሮችን ፈልግ ውስጥ አንድ ወይም ከዚያ በላይ ቃላት ይተይቡ፣ ሁሉንም የሚጠቅሱ ቅንብሮች ብቻ ይዘረዘራሉ። ቅንብሮች ከፕሮጀክቱ ጋር ይቀመጣሉ፣ የስራውን ሂደት ሳጥን አሳይ እና በገጽ ስር ያሉት ሲቀሩ፣ እነዚህ በዚህ አሳሽ ውስጥ ይቀመጣሉ። የዚህ ሳጥን ቦታና መጠንም በዚህ አሳሽ ውስጥ ብቻ ይቀመጣል።';
+$ec_lang['lpn_guide_text_find_popup']='ሁኔታን የሚያሟሉ አካሎችን ያገኛል፣ ለምሳሌ ከ8 in. ያነሱ ሁሉንም ቧንቧዎች ወይም ከ40 psi በታች ያሉ ሁሉንም መገናኛዎች፣ እንዲሁም በሁሉም ላይ አንድ ንብረት በአንድ ክዋኔ መቀየር ይችላል። ሞዴሉ ከመፈታቱ በፊት ለመፈተሽ (የጠፋ ከፍታ፣ በተሳሳተ አሃድ የገባ ዲያሜትር)፣ ከተፈታ በኋላ ችግር ያለባቸውን ቦታዎች ለመዘርዘር (ዝቅተኛ ግፊት፣ ከፍተኛ ፍጥነት)፣ እና በብዙ አካሎች ላይ አንድ እርማት ለማድረግ ይጠቀሙበት።\n\nምን መፈለግ፣ ንብረት፣ መስፈርት እና ዋጋ ዝርዝሮች አንድ መስፈርት ገንብተው በመጠይቅ ሳጥን ውስጥ እንደ አንድ መስመር ጽሑፍ ይጽፉታል። መስመሩ በቀጥታ ሊስተካከል ይችላል፣ ዝርዝሮቹም ይከተሉታል። ዝርዝሮቹ መግለጽ የማይችሉት መጠይቅ፣ ለምሳሌ በወይም የተያያዙ ሁለት መስፈርቶች፣ ዝርዝሮቹን ይደብቃል፣ በምትኩ መቆጣጠሪያዎችን ተጠቀም አዝራሩ እስኪጫን ድረስ። ለመፈለግ በመጠይቅ ሳጥኑ ውስጥ Enter ወይም ፈልግ አዝራሩን ይጫኑ።';
+$ec_lang['lpn_guide_text_settings_box']='ሁሉም ቅንብሮችና ሁለት ዳግም ማስጀመሪያ አዝራሮች በቅንብሮች ሳጥን ውስጥ ናቸው። ቅንብሮችን የሚያገኙበት ሌላ ቦታ የለም። ሳጥኑ ሊፈለግ ይችላል፦ በቅንብሮችን ፈልግ ውስጥ አንድ ወይም ከዚያ በላይ ቃላት ይተይቡ፣ ሁሉንም የሚጠቅሱ ቅንብሮች ብቻ ይዘረዘራሉ። ቅንብሮች ከፕሮጀክቱ ጋር ይቀመጣሉ፣ የሩጫ ሂደት ሳጥን አሳይ እና በገጽ ስር ያሉት ሲቀሩ፣ እነዚህ በዚህ አሳሽ ውስጥ ይቀመጣሉ። የዚህ ሳጥን ቦታና መጠንም በዚህ አሳሽ ውስጥ ብቻ ይቀመጣል።';
 $ec_lang['lpn_guide_text_library_box']='የፕሮጀክቱን ስርዓቶች፣ ኩርባዎች፣ የቧንቧ ዓይነቶች፣ ማገናኛዎች፣ መቆጣጠሪያዎችና ህጎች ይይዛል። አካል ስርዓትን፣ ኩርባን፣ የቧንቧ ዓይነትን ወይም ማገናኛን በመለያው ይጠቅሳል፣ ያ ንጥል እዚህ ይስተካከላል። መቆጣጠሪያዎችና ህጎች ለመላው መረብ ይሠራሉ። ህጎች የሚተገበሩት በEPANET ፈታች ብቻ ነው። ሁሉም ከፕሮጀክቱ ጋር ይቀመጣሉ።';
 $ec_lang['lpn_guide_text_energy_box']='የእያንዳንዱን ፓምፕ የኃይል አጠቃቀም፣ ከፍተኛ ኃይል እና ወጪ በመጨረሻው የተራዘመ ጊዜ ማስመሰያ ላይ ሪፖርት ያደርጋል፣ የእያንዳንዱን ፓምፕ ብቃትና በቅንብሮች፣ ኃይል ውስጥ የተዘጋጀውን የኃይል ዋጋ ተጠቅሞ። በቅንብሮች ውስጥ ጠቅላላ የመሮጫ ጊዜ እና የተፈታ መረብ ያስፈልገዋል። መረቡን አይለውጥም።';
-$ec_lang['lpn_guide_text_contour_box']='በካርታው ላይ በቀለም ነጥብ በ ውስጥ ከተመረጠው የነጥብ ዋጋ የተሳለውን የኮንቱር ስዕል ይቆጣጠራል፦ የቀለም ዕቅድ፣ መሙያውና ግልጽነቱ፣ የኮንቱር መስመር ክፍተትና ምልክቶች፣ እና ቀለሙ ከእያንዳንዱ ቧንቧ ምን ያህል እንደሚደርስ። ማጥፋት ስዕሉን ይደብቃል፣ የነጥብ ቀለሞቹን ግን ይተዋል። የሚለውጠው ማሳያውን ብቻ ነው፣ መረቡን አይደለም።';
+$ec_lang['lpn_guide_text_contour_box']='በካርታው ላይ በነጥብ ቀለም በ ውስጥ ከተመረጠው የነጥብ ዋጋ የተሳለውን የኮንቱር ስዕል ይቆጣጠራል፦ የቀለም ዕቅድ፣ መሙያውና ግልጽነቱ፣ የኮንቱር መስመር ክፍተትና ምልክቶች፣ እና ቀለሙ ከእያንዳንዱ ቧንቧ ምን ያህል እንደሚደርስ። ማጥፋት ስዕሉን ይደብቃል፣ የነጥብ ቀለሞቹን ግን ይተዋል። የሚለውጠው ማሳያውን ብቻ ነው፣ መረቡን አይደለም።';
 $ec_lang['lpn_guide_text_scncmp_box']='እያንዳንዱን ሁኔታ ከስዕሉ ቅጂ ይፈታል፣ ለእያንዳንዱም የራስ ዋጋዎችን ብዛት፣ ዝቅተኛውን ግፊት እና ከፍተኛውን ፍጥነት በሠንጠረዥ ያሳያል። ፕሮጀክቱን አይለውጥም፣ የተከፈተውም ሁኔታ እንደነበረ ይቀራል።';
 $ec_lang['lpn_guide_text_rptbox']='በመጨረሻው የተራዘመ ጊዜ ማስመሰያ የEPANET ፈታች የጻፈውን የጽሑፍ ሪፖርት ያሳያል፣ ማስጠንቀቂያዎቹንና የመረቡን ማጠቃለያ ጨምሮ። እያንዳንዱ የተራዘመ ጊዜ ማስመሰያ ይተካዋል፤ በአንድ ቅጽበት መፍታት አይተካውም፣ ማስተካከልም የቀደመውን ሪፖርት እንዳለ ይተዋል።';
 $ec_lang['lpn_guide_text_status_box']='በመጨረሻው የተራዘመ ጊዜ ማስመሰያ ወቅት እያንዳንዱን ለውጥ በጊዜ ቅደም ተከተል ይዘረዝራል፦ የፓምፕ፣ ቫልቭ ወይም ቧንቧ መከፈት ወይም መዘጋት፣ ታንክ መሙላት ወይም መራቆት ሲጀምር ወይም ሲሞላ ወይም ባዶ ሲሆን፣ እና ሙሉ በሙሉ ያልተሰባሰበ ማንኛውም የጊዜ ደረጃ። የሚዘረዘሩት ለውጦች ብቻ ናቸው፣ እያንዳንዱ የጊዜ ደረጃ አይደለም።';
@@ -4224,15 +4297,15 @@ $ec_lang['lpn_guide_text_calib_box']='የመስክ መለኪያዎችን ፋይ�
 $ec_lang['lpn_guide_text_notes_popup']='ይህ ገጽ እንዴት እንደሚሠራና ምን እንደማያደርግ ማስታወሻዎችን ይዘረዝራል፣ እያንዳንዱ እንደ ቃልና ትርጉሙ። መረቡን አይለውጥም።';
 $ec_lang['lpn_guide_text_hotkeys_popup']='እያንዳንዱን የመሳሪያ አሞሌ አዝራር፣ የምናሌ ረድፍ፣ የቁልፍ ሰሌዳ አቋራጮችን እና ለእያንዳንዱ ሳጥን አንድ ግቤት ይዘረዝራል። ረድፍ መምረጥ ያ መቆጣጠሪያ የት እንዳለ ያሳያል፣ በጭራሽ አያስኬደውም። ለመፈለግ ከየትኛውም ቦታ Ctrl+K ይጫኑ፣ ወይም መመሪያው ትኩረት ሲኖረው / ይጫኑ።';
 $ec_lang['lpn_guide_find_query_term']='የመጠይቅ ቋንቋ';
-$ec_lang['lpn_guide_find_query_def']='<table class="lpn-notes-table"><tbody><tr><td><code>Scope.Property condition value</code></td><td>አንድ መስፈርት። ወሰኑ Everything፣ Junction፣ Reservoir፣ Tank፣ Pipe፣ Pump፣ Valve፣ Text፣ Customer ወይም Source ነው። ንብረቱ ለዚያ ወሰን በንብረት ዝርዝር ውስጥ ያለ ማንኛውም ግቤት ነው።</td></tr><tr><td>መስፈርቶች</td><td>equal to፣ above፣ below፣ contains፣ n highest፣ n lowest እና empty። Contains የሚሠራው ለጽሑፍ ብቻ ነው። በ n highest እና n lowest ውስጥ n ቆጠራ ነው፣ እንደ 5 highest። ፊደሉ n ራሱ ሲጻፍ፣ እንደ <code>Pipe.Velocity n highest</code>፣ ወይም የዋጋ ሳጥኑ ባዶ ሲሆን፣ 10 አካሎች ይዘረዘራሉ። Empty ለንብረቱ ምንም ዋጋ የሌላቸውን አካሎች ያገኛል። ግንኙነት አራት መስፈርቶች አሉት፣ ዋጋም አይወስድም።</td></tr><tr><td>ዋጋዎች</td><td>ቁጥር ያለ አሃዱ ይገባል፣ በንብረቶች ሳጥንና በሠንጠረዦች ፓነል ላይ በሚታየው አሃድ፦ 40 እንጂ 40 psi አይደለም። መለያን ጨምሮ ጽሑፍ በነጠላ ወይም ድርብ ጥቅስ ይከበባል፦ <code>\'60\'</code>።</td></tr><tr><td>AND፣ OR እና ቅንፎች</td><td>AND ከ OR በፊት ይሰላል፣ ቅንፎች መስፈርቶችን ይሰበስባሉ። NOT የለም።</td></tr><tr><td>አጻጻፍ</td><td>ቃላት ለፊደል መጠን ግድ የላቸውም። የእንግሊዝኛ ቃላት በሁሉም ቋንቋ ተቀባይነት አላቸው፣ ስለዚህ ከዚህ መመሪያ የተቀዳ መጠይቅ በማንኛውም ቋንቋ ገጽ ላይ ይሠራል።</td></tr></tbody></table>';
+$ec_lang['lpn_guide_find_query_def']='<table class="lpn-notes-table"><tbody><tr><td><code>Scope.Property condition value</code></td><td>አንድ መስፈርት። ወሰኑ ሁሉም ነገር፣ መገናኛ፣ ማጠራቀሚያ፣ ታንክ፣ ቧንቧ፣ ፓምፕ፣ ቫልቭ፣ ጽሑፍ፣ ደንበኛ ወይም ምንጭ ነው። ንብረቱ ለዚያ ወሰን በንብረት ዝርዝር ውስጥ ያለ ማንኛውም ግቤት ነው።</td></tr><tr><td>መስፈርቶች</td><td>እኩል ነው፣ ይበልጣል፣ ያንሳል፣ ይይዛል፣ ከፍተኛ n፣ ዝቅተኛ n እና ባዶ። ይይዛል የሚሠራው ለጽሑፍ ብቻ ነው። በከፍተኛ n እና ዝቅተኛ n ውስጥ n ቆጠራ ነው፣ እንደ ከፍተኛ 5። ፊደሉ n ራሱ ሲጻፍ፣ እንደ <code>Pipe.Velocity n highest</code>፣ ወይም የዋጋ ሳጥኑ ባዶ ሲሆን፣ 10 አካሎች ይዘረዘራሉ። ባዶ ለንብረቱ ምንም ዋጋ የሌላቸውን አካሎች ያገኛል። ግንኙነት አራት መስፈርቶች አሉት፣ ዋጋም አይወስድም።</td></tr><tr><td>ዋጋዎች</td><td>ቁጥር ያለ አሃዱ ይገባል፣ በንብረቶች ሳጥንና በሠንጠረዦች ፓነል ላይ በሚታየው አሃድ፦ 40 እንጂ 40 psi አይደለም። መለያን ጨምሮ ጽሑፍ በነጠላ ወይም ድርብ ጥቅስ ይከበባል፦ <code>\'60\'</code>።</td></tr><tr><td>እና፣ ወይም እና ቅንፎች</td><td>እና ከወይም በፊት ይሰላል፣ ቅንፎች መስፈርቶችን ይሰበስባሉ። NOT የለም።</td></tr><tr><td>አጻጻፍ</td><td>ቃላት ለፊደል መጠን ግድ የላቸውም። የእንግሊዝኛ ቃላት በሁሉም ቋንቋ ተቀባይነት አላቸው፣ ስለዚህ ከዚህ መመሪያ የተቀዳ መጠይቅ በማንኛውም ቋንቋ ገጽ ላይ ይሠራል።</td></tr></tbody></table>';
 $ec_lang['lpn_guide_find_examples_term']='በNet3 ላይ የተሠሩ ምሳሌዎች';
-$ec_lang['lpn_guide_find_examples_def']='<p>እነዚህን ለመከተል የNet3 ምሳሌን ይክፈቱ። ግፊት በ psi፣ ፍጥነት በ ft/s ነው።</p><table class="lpn-notes-table"><tbody><tr><td><code>Everything.ID equal to \'60\'</code></td><td>መገናኛ 60 እና ቧንቧ 60። መገናኛና ቧንቧ አንድ መለያ ሊኖራቸው ይችላል፣ ስለዚህ በ Everything ስር የመለያ ፍለጋ ከአንድ በላይ አካል ሊመልስ ይችላል።</td></tr><tr><td><code>Junction.Pressure below 40</code></td><td>መገናኛዎች 10፣ 40፣ 50፣ 20 እና 153፣ ዝቅተኛው ግፊት መጀመሪያ። መገናኛ 10 በ -0.6 psi ነው፣ ይህ ግምገማ የሚያስፈልገው አሉታዊ ግፊት ነው።</td></tr><tr><td><code>Pipe.Velocity 5 highest</code></td><td>ቧንቧዎች 60፣ 329፣ 125፣ 123 እና 149፣ ከፍተኛው ፍጥነት መጀመሪያ። ቧንቧ 60 9.3 ft/s ይሸከማል።</td></tr><tr><td><code>Junction.Pressure below 20 OR Pipe.Velocity above 5</code></td><td>መገናኛዎች 10፣ 20፣ 40 እና 50፣ እና ቧንቧዎች 60፣ 125 እና 329፦ ዝቅተኛ ግፊቶችና ከፍተኛ ፍጥነቶች በአንድ ዝርዝር።</td></tr><tr><td><code>Junction.Pressure below 40 AND Junction.Elevation above 100</code></td><td>መገናኛዎች 10፣ 20፣ 40 እና 50፣ በከፍተኛ መሬት ላይ ያሉ ዝቅተኛ ግፊቶች። ሁለቱም መስፈርቶች አንድ ዓይነት አካል መሰየም አለባቸው፦ <code>Junction.Pressure below 40 AND Pipe.Velocity above 3</code> ምንም አያገኝም፣ ምክንያቱም ማንም አካል መገናኛም ቧንቧም አይደለም።</td></tr><tr><td><code>Pipe.Closed equal to \'closed\'</code></td><td>ቧንቧ 330፣ በNet3 ፋይል ውስጥ የተዘጋው ብቸኛ ቧንቧ።</td></tr><tr><td><code>Junction.Connectivity no open path to a source</code></td><td>ፋይሉ እንደተሰራጨ ምንም። ቧንቧ 247 ሲዘጋ (ተካ እና ቀልብስ ይመልከቱ)፣ መገናኛዎች 215፣ 217፣ 219 እና 225፦ በቧንቧ 247 ላይ የሚደርስ መሰበር ያለ አቅርቦት የሚተዋቸው መገናኛዎች። ይህን ለእያንዳንዱ ቧንቧ መድገም ወሳኝነት ትንተና ነው።</td></tr></tbody></table>';
+$ec_lang['lpn_guide_find_examples_def']='<p>እነዚህን ለመከተል የNet3 ምሳሌን ይክፈቱ። ግፊት በ psi፣ ፍጥነት በ ft/s ነው።</p><table class="lpn-notes-table"><tbody><tr><td><code>Everything.ID equal to \'60\'</code></td><td>መገናኛ 60 እና ቧንቧ 60። መገናኛና ቧንቧ አንድ መለያ ሊኖራቸው ይችላል፣ ስለዚህ በሁሉም ነገር ስር የመለያ ፍለጋ ከአንድ በላይ አካል ሊመልስ ይችላል።</td></tr><tr><td><code>Junction.Pressure below 40</code></td><td>መገናኛዎች 10፣ 40፣ 50፣ 20 እና 153፣ ዝቅተኛው ግፊት መጀመሪያ። መገናኛ 10 በ -0.6 psi ነው፣ ይህ ግምገማ የሚያስፈልገው አሉታዊ ግፊት ነው።</td></tr><tr><td><code>Pipe.Velocity 5 highest</code></td><td>ቧንቧዎች 60፣ 329፣ 125፣ 123 እና 149፣ ከፍተኛው ፍጥነት መጀመሪያ። ቧንቧ 60 9.3 ft/s ይሸከማል።</td></tr><tr><td><code>Junction.Pressure below 20 OR Pipe.Velocity above 5</code></td><td>መገናኛዎች 10፣ 20፣ 40 እና 50፣ እና ቧንቧዎች 60፣ 125 እና 329፦ ዝቅተኛ ግፊቶችና ከፍተኛ ፍጥነቶች በአንድ ዝርዝር።</td></tr><tr><td><code>Junction.Pressure below 40 AND Junction.Elevation above 100</code></td><td>መገናኛዎች 10፣ 20፣ 40 እና 50፣ በከፍተኛ መሬት ላይ ያሉ ዝቅተኛ ግፊቶች። ሁለቱም መስፈርቶች አንድ ዓይነት አካል መሰየም አለባቸው፦ <code>Junction.Pressure below 40 AND Pipe.Velocity above 3</code> ምንም አያገኝም፣ ምክንያቱም ማንም አካል መገናኛም ቧንቧም አይደለም።</td></tr><tr><td><code>Pipe.Closed equal to \'closed\'</code></td><td>ቧንቧ 330፣ በNet3 ፋይል ውስጥ የተዘጋው ብቸኛ ቧንቧ።</td></tr><tr><td><code>Junction.Connectivity no open path to a source</code></td><td>ፋይሉ እንደተሰራጨ ምንም። ቧንቧ 247 ሲዘጋ (ተካ እና ቀልብስ ይመልከቱ)፣ መገናኛዎች 215፣ 217፣ 219 እና 225፦ በቧንቧ 247 ላይ የሚደርስ መሰበር ያለ አቅርቦት የሚተዋቸው መገናኛዎች። ይህን ለእያንዳንዱ ቧንቧ መድገም ወሳኝነት ትንተና ነው።</td></tr></tbody></table>';
 $ec_lang['lpn_guide_find_results_term']='ውጤቶች፣ ምርጫው እና ሠንጠረዦች';
-$ec_lang['lpn_guide_find_results_def']='<p>የተመሳሰሉት አካሎች ከፈልግ አዝራሩ በታች ተዘርዝረዋል። Above እና n highest ከፍተኛውን ዋጋ መጀመሪያ፣ below እና n lowest ዝቅተኛውን ዋጋ መጀመሪያ ይዘረዝራሉ፣ ሌሎች መስፈርቶች በተገኘው ዋጋ፣ ከዚያም በመለያ ይዘረዝራሉ። AND ወይም OR ያለው መጠይቅ ነጥቦቹን ከዚያ ግንኙነቶቹን፣ እያንዳንዱን በመለያ ይዘረዝራል። አንድ ብቻ ተመሳሳይ ሲሆን ወዲያውኑ በካርታው ላይ ይታያል። ካርታውን በዚያ አካል ላይ ለማድረግ ረድፍ ይምረጡ። ምንም ካልተመረጠ አካሉም ይመረጣል፤ የሆነ ነገር ከተመረጠ አካሉ ይደምቃል፣ ምርጫው አይቀየርም። ወደ ምርጫው ለመጨመር ወይም ለማስወገድ በረድፍ ላይ Shift+ጠቅ ወይም Ctrl+ጠቅ ያድርጉ። ፈልግ ሁሉንም ተመሳሳዮች ራሱ አይመርጥም።</p><p>በሠንጠረዥ ውስጥ አጣራ አዝራሩ ተመሳሳዩን መጠይቅ በሠንጠረዦች ፓነል ላይ ይተገብራል። መጠይቁ የሚመለከተው እያንዳንዱ ሠንጠረዥ የተመሳሰሉትን ረድፎች ብቻ ያሳያል፣ ከላያቸው መጠይቁንና የረድፍ ቁጥሩን። ሁሉንም ተመሳሳዮች በካርታው ላይ ለመምረጥ እነዚያን ረድፎች ይምረጡና ከቀኝ-ጠቅ ምናሌ ካርታ ላይ ምረጥ ይምረጡ። የሠንጠረዥ ማጣሪያ ከፕሮጀክቱ ጋር አይቀመጥም፣ ገጹ እንደገና ሲጫን ያበቃል። ከእንግዲህ እንዳይመሳሰል የተስተካከለ ረድፍ በሠንጠረዡ ውስጥ ይቆያል፣ ደብዝዞ በማስጠንቀቂያ ምልክት ተለይቶ፣ በሠንጠረዥ ውስጥ አጣራ አዝራሩ እንደገና እስኪጫን ድረስ።</p>';
+$ec_lang['lpn_guide_find_results_def']='<p>የተመሳሰሉት አካሎች ከፈልግ አዝራሩ በታች ተዘርዝረዋል። ይበልጣል እና ከፍተኛ n ከፍተኛውን ዋጋ መጀመሪያ፣ ያንሳል እና ዝቅተኛ n ዝቅተኛውን ዋጋ መጀመሪያ ይዘረዝራሉ፣ ሌሎች መስፈርቶች በተገኘው ዋጋ፣ ከዚያም በመለያ ይዘረዝራሉ። በእና ወይም በወይም የተያያዙ መስፈርቶች ያሉት መጠይቅ ነጥቦቹን ከዚያ ግንኙነቶቹን፣ እያንዳንዱን በመለያ ይዘረዝራል። አንድ ብቻ ተመሳሳይ ሲሆን ወዲያውኑ በካርታው ላይ ይታያል። ካርታውን በዚያ አካል ላይ ለማድረግ ረድፍ ይምረጡ። ምንም ካልተመረጠ አካሉም ይመረጣል፤ የሆነ ነገር ከተመረጠ አካሉ ይደምቃል፣ ምርጫው አይቀየርም። ወደ ምርጫው ለመጨመር ወይም ለማስወገድ በረድፍ ላይ Shift+ጠቅ ወይም Ctrl+ጠቅ ያድርጉ። ፈልግ ሁሉንም ተመሳሳዮች ራሱ አይመርጥም።</p><p>በአሁኑ ሠንጠረዥ ውስጥ አጣራ አዝራሩ ተመሳሳዩን መጠይቅ በሠንጠረዦች ፓነል ላይ ይተገብራል። መጠይቁ የሚመለከተው እያንዳንዱ ሠንጠረዥ የተመሳሰሉትን ረድፎች ብቻ ያሳያል፣ ከላያቸው መጠይቁንና የረድፍ ቁጥሩን። ሁሉንም ተመሳሳዮች በካርታው ላይ ለመምረጥ እነዚያን ረድፎች ይምረጡና ከቀኝ-ጠቅ ምናሌ ካርታ ላይ ምረጥ ይምረጡ። የሠንጠረዥ ማጣሪያ ከፕሮጀክቱ ጋር አይቀመጥም፣ ገጹ እንደገና ሲጫን ያበቃል። ከእንግዲህ እንዳይመሳሰል የተስተካከለ ረድፍ በሠንጠረዡ ውስጥ ይቆያል፣ ደብዝዞ በማስጠንቀቂያ ምልክት ተለይቶ፣ በአሁኑ ሠንጠረዥ ውስጥ አጣራ አዝራሩ እንደገና እስኪጫን ድረስ።</p>';
 $ec_lang['lpn_guide_find_replace_term']='ተካ እና ቀልብስ';
-$ec_lang['lpn_guide_find_replace_def']='<p>የተገኘውን ቀይር የሳጥኑ ክፍል መጠይቁ ባገኘው እያንዳንዱ አካል ላይ አንድ ንብረት ይጽፋል። ንብረቱን በሚቀየረው ንብረት ዝርዝር ውስጥ ይምረጡ፣ አዲሱን ዋጋ በአዲስ ዋጋ ሳጥን ውስጥ በሚታየው አሃድ ያስገቡ፣ ከዚያም ለውጥ አዝራሩን ይጫኑ። ሳጥኑ ከዚያ አዲሱ ዋጋ ያላቸውን ሳይቆጥር ስንት አካሎች እንደሚለወጡ ይናገራል። ለውጡን ለመተግበር ቀይራቸው አዝራሩን ይጫኑ፣ ወይም ይቅር። አንድ ቀልብስ ሙሉውን ምትክ ይቀለብሳል።</p><p>በNet1 ላይ ምሳሌ፦ <code>Pipe.Diameter below 10</code> ቧንቧዎች 31፣ 122፣ 113 እና 121ን ያገኛል። ዲያሜትር ይምረጡ፣ 10 ያስገቡ እና ለውጥ ይጫኑ፤ ሳጥኑ "4 አካሎችን ይቀየሩ?" ያሳያል። አራቱንም ቧንቧዎች ወደ 10 in. ለማዘጋጀት ቀይራቸው ይጫኑ። አንድ ቀልብስ ወደ 6 እና 8 in. ይመልሳቸዋል።</p><p>በNet3 ላይ ምሳሌ፦ <code>Pipe.ID equal to \'247\'</code> ቧንቧ 247ን ያገኛል። ዝግ ይምረጡ፣ በአዲስ ዋጋ ዝርዝር ውስጥ እንደገና ዝግ ይምረጡ፣ ከዚያ ለውጥ፣ ቀይራቸው ይጫኑ፣ ለላይኛው የግንኙነት ምሳሌ ቧንቧውን ለመዝጋት። ቀልብስ እንደገና ይከፍተዋል።</p><p>ተካ አንድ ዓይነት አካል ይፈልጋል፣ ስለዚህ በ Everything ስር መጀመሪያ በምን ፈልግ ዝርዝር ውስጥ አንድ ዓይነት አካል ይምረጡ። ከመሠረት ሌላ በሆነ ሁኔታ ውስጥ፣ ምትክ በዚያ ሁኔታ ውስጥ ይቀመጣል፣ በንብረቶች ውስጥ ያው ማስተካከያ እንደሚሆነው። የMapbox ከፍታዎች ባሉበት፣ ከፍታ ከተተየበ ዋጋ ይልቅ ከMapbox DEM ሊተካ ይችላል።</p>';
+$ec_lang['lpn_guide_find_replace_def']='<p>የተገኙትን ለውጥ የሳጥኑ ክፍል መጠይቁ ባገኘው እያንዳንዱ አካል ላይ አንድ ንብረት ይጽፋል። ንብረቱን በሚቀየረው ንብረት ዝርዝር ውስጥ ይምረጡ፣ አዲሱን ዋጋ በአዲስ ዋጋ ሳጥን ውስጥ በሚታየው አሃድ ያስገቡ፣ ከዚያም ለውጥ አዝራሩን ይጫኑ። ሳጥኑ ከዚያ አዲሱ ዋጋ ያላቸውን ሳይቆጥር ስንት አካሎች እንደሚለወጡ ይናገራል። ለውጡን ለመተግበር ይቀይሩ አዝራሩን ይጫኑ፣ ወይም ይቅር። አንድ ቀልብስ ሙሉውን ምትክ ይቀለብሳል።</p><p>በNet1 ላይ ምሳሌ፦ <code>Pipe.Diameter below 10</code> ቧንቧዎች 31፣ 122፣ 113 እና 121ን ያገኛል። ዲያሜትር ይምረጡ፣ 10 ያስገቡ እና ለውጥ ይጫኑ፤ ሳጥኑ "4 አካሎችን ይቀየሩ?" ያሳያል። አራቱንም ቧንቧዎች ወደ 10 in. ለማዘጋጀት ይቀይሩ ይጫኑ። አንድ ቀልብስ ወደ 6 እና 8 in. ይመልሳቸዋል።</p><p>በNet3 ላይ ምሳሌ፦ <code>Pipe.ID equal to \'247\'</code> ቧንቧ 247ን ያገኛል። ዝግ ይምረጡ፣ በአዲስ ዋጋ ዝርዝር ውስጥ እንደገና ዝግ ይምረጡ፣ ከዚያ ለውጥ፣ ይቀይሩ ይጫኑ፣ ለላይኛው የግንኙነት ምሳሌ ቧንቧውን ለመዝጋት። ቀልብስ እንደገና ይከፍተዋል።</p><p>ለውጥ አንድ ዓይነት አካል ይፈልጋል፣ ስለዚህ በሁሉም ነገር ስር መጀመሪያ በምን መፈለግ ዝርዝር ውስጥ አንድ ዓይነት አካል ይምረጡ። ከመሠረት ሌላ በሆነ ሁኔታ ውስጥ፣ ምትክ በዚያ ሁኔታ ውስጥ ይቀመጣል፣ በንብረቶች ውስጥ ያው ማስተካከያ እንደሚሆነው። የMapbox ከፍታዎች ባሉበት፣ ከፍታ ከተተየበ ዋጋ ይልቅ ከMapbox DEM ሊተካ ይችላል።</p>';
 $ec_lang['lpn_guide_find_notes_term']='ልብ ሊባሉ የሚገባቸው ነጥቦች';
-$ec_lang['lpn_guide_find_notes_def']='<ul><li>ዋጋዎች በሙሉ ትክክለኛነት ይነጻጸራሉ፣ እስከ አራት የአስርዮሽ ቦታዎችም ይዘረዘራሉ። Equal to ከተሰላ ውጤት ጋር አልፎ አልፎ ይመሳሰላል፤ above እና below ይጠቀሙ።</li><li>ግፊት፣ ሄድ፣ ፍሰት፣ ፍጥነት እና ሌሎቹ ውጤቶች የመጨረሻው ስሌት ናቸው። በራስ-ሰር እንደገና አስላ ቅንብር ሲጸዳ፣ መረቡን በመጨረሻው አስላ ጊዜ እንደነበረ ይገልጻሉ።</li><li>በጽሑፍ ላይ above እና below የመዝገበ ቃላት ቅደም ተከተል ይጠቀማሉ፣ ቁጥሮች በቁጥር ቅደም ተከተል፦ በNet1 ላይ <code>Junction.ID above \'20\'</code> መገናኛዎች 21፣ 22፣ 23፣ 31 እና 32ን ያገኛል።</li><li>በ Everything ስር የሚቀርቡት ID፣ Description፣ Tag እና Connectivity ብቻ ናቸው። ሙሉ የንብረት ዝርዝሩን ለማየት በምን ፈልግ ዝርዝር ውስጥ አንድ ዓይነት አካል ይምረጡ።</li><li>የጽሑፍ ንጥል መለያ የለውም። በቃላቱ ይፈልጉት፣ እንደ <code>Text.Text contains \'pump\'</code>።</li><li>ለአንድ ነጥብ አራቱ የግንኙነት መስፈርቶች no links at node፣ no open links at node፣ no link path to a source እና no open path to a source ናቸው። ምንጭ ማጠራቀሚያ ወይም ታንክ ነው።</li></ul>';
+$ec_lang['lpn_guide_find_notes_def']='<ul><li>ዋጋዎች በሙሉ ትክክለኛነት ይነጻጸራሉ፣ እስከ አራት የአስርዮሽ ቦታዎችም ይዘረዘራሉ። እኩል ነው ከተሰላ ውጤት ጋር አልፎ አልፎ ይመሳሰላል፤ ይበልጣል እና ያንሳል ይጠቀሙ።</li><li>ግፊት፣ ሄድ፣ ፍሰት፣ ፍጥነት እና ሌሎቹ ውጤቶች የመጨረሻው ስሌት ናቸው። በራስ-ሰር እንደገና አስላ ቅንብር ሲጸዳ፣ መረቡን በመጨረሻው አስላ ጊዜ እንደነበረ ይገልጻሉ።</li><li>በጽሑፍ ላይ ይበልጣል እና ያንሳል የመዝገበ ቃላት ቅደም ተከተል ይጠቀማሉ፣ ቁጥሮች በቁጥር ቅደም ተከተል፦ በNet1 ላይ <code>Junction.ID above \'20\'</code> መገናኛዎች 21፣ 22፣ 23፣ 31 እና 32ን ያገኛል።</li><li>በሁሉም ነገር ስር የሚቀርቡት መለያ፣ መግለጫ፣ ተለጣፊ እና ግንኙነት ብቻ ናቸው። ሙሉ የንብረት ዝርዝሩን ለማየት በምን መፈለግ ዝርዝር ውስጥ አንድ ዓይነት አካል ይምረጡ።</li><li>የጽሑፍ ንጥል መለያ የለውም። በቃላቱ ይፈልጉት፣ እንደ <code>Text.Text contains \'pump\'</code>።</li><li>ለአንድ ነጥብ አራቱ የግንኙነት መስፈርቶች በመገናኛው ላይ ምንም አገናኝ የለም፣ በመገናኛው ላይ ክፍት አገናኝ የለም፣ ወደ ምንጭ የሚወስድ አገናኝ መንገድ የለም እና ወደ ምንጭ የሚወስድ ክፍት መንገድ የለም ናቸው። ምንጭ ማጠራቀሚያ ወይም ታንክ ነው።</li></ul>';
 $ec_lang['lpn_guide_using_heading']='መመሪያውን መጠቀም';
 $ec_lang['lpn_guide_keys_term']='የመመሪያ የቁልፍ ሰሌዳ አቋራጮች';
 $ec_lang['lpn_guide_keys_def']='<table class="lpn-notes-table"><tbody><tr><td>?</td><td>መመሪያውን ጠቋሚው ባለበት ወይም ትኩረት ባለው መቆጣጠሪያ ላይ ይከፍታል።</td></tr><tr><td>F1</td><td>መመሪያውን ትኩረት ላለው ሳጥን ግቤት ይከፍታል።</td></tr><tr><td>Ctrl+K</td><td>መመሪያውን የተመረጠው ጽሑፍ በመፈለጊያ መስኩ ውስጥ ሆኖ ይከፍታል።</td></tr><tr><td>/</td><td>መመሪያው ትኩረት ሲኖረው የመፈለጊያ መስኩን ይመርጣል።</td></tr><tr><td>Esc</td><td>መመሪያውን ዘግቶ ወደነበሩበት ይመልሳል።</td></tr></tbody></table>';
@@ -4293,6 +4366,7 @@ $ec_lang['lpn_split_no']='አይ';
 $ec_lang['lpn_snap_vertex']='{link}፣ መታጠፊያ {n}';
 $ec_lang['lpn_snap_node_on_node']='{new} በ{target} ቦታ ላይ ተቀመጠ። ሁለቱ ነጥቦች አልተገናኙም።';
 $ec_lang['lpn_snap_moved_on_node']='{moved} ወደ {target} ቦታ ተንቀሳቀሰ። ሁለቱ ነጥቦች አልተገናኙም።';
+$ec_lang['lpn_snap_shape_point']='{shape}፣ ነጥብ {n}';
 $ec_lang['lpn_settings_hover_card']='በማንዣበብ ሙሉውን ምልክት አሳይ';
 $ec_lang['lpn_settings_hover_card_tip']='ጠቋሚውን በነጥብ፣ ግንኙነት ወይም ደንበኛ ላይ ያሳርፉ፣ ምልክቱ ከካርታው ጋር ቢስማማም ባይስማማም፣ በማንኛውም መጠን፣ በቅንብሮች ውስጥ እንደተገለጸው ለማየት። ይህ የዚህ አሳሽ ቅንብር ነው፣ የፕሮጀክቱ አይደለም።';
 $ec_lang['lpn_scenario_delete_in_base']='ከስዕሉ ለማስወገድ በ{base} ሁኔታ ውስጥ ይሰርዙት።';

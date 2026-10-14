@@ -31604,7 +31604,7 @@ var EngCalcs = EngCalcs || {};
 		} else if (which === 'nowhere') {
 			txt = pc.lpn_profile_edit_nowhere || 'A point on the path has to be a node. The path is unchanged.';
 		} else if (which === 'blocked') {
-			txt = (pc.lpn_profile_draw_blocked || 'No route from {a} to {b}. Select another node.')
+			txt = (pc.lpn_profile_draw_blocked || 'No route from {a} to {b}. Select a different start or end node.')
 				.replace('{a}', detail[0]).replace('{b}', detail[1]);
 		} else if (which === 'idle' || !d) {
 			txt = pc.lpn_profile_say_idle || 'Press Profile again to select a new path on the map.';
@@ -37790,8 +37790,8 @@ var EngCalcs = EngCalcs || {};
 				'One Shape imported from {file}.').replace('{file}', fileName));
 			if (renamed.length) {
 				lines.push(counted('lpn_geojson_import_renamed', renamed.length,
-					'{n} feature names cannot be Shape IDs and are kept with the Shapes: {list}.',
-					'One feature name cannot be a Shape ID and is kept with the Shape: {list}.').replace('{list}', renamed.join(', ')));
+					'{n} feature names cannot be used as Shape IDs. Each Shape was given another ID and keeps its feature name: {list}.',
+					'One feature name cannot be used as a Shape ID. The Shape was given another ID and keeps its feature name: {list}.').replace('{list}', renamed.join(', ')));
 			}
 			if (r.skipped.length) {
 				var why = { network: pc.lpn_geojson_import_why_network || 'network asset',
@@ -37898,8 +37898,8 @@ var EngCalcs = EngCalcs || {};
 				'One Shape imported from {file}.').replace('{file}', fileName));
 		if (renamed.length) {
 			lines.push(gisCounted('lpn_geojson_import_renamed', renamed.length,
-				'{n} feature names cannot be Shape IDs and are kept with the Shapes: {list}.',
-				'One feature name cannot be a Shape ID and is kept with the Shape: {list}.')
+				'{n} feature names cannot be used as Shape IDs. Each Shape was given another ID and keeps its feature name: {list}.',
+				'One feature name cannot be used as a Shape ID. The Shape was given another ID and keeps its feature name: {list}.')
 				.replace('{list}', renamed.slice(0, 5).join(', ') + (renamed.length > 5 ? ', ' +
 					String(pc.lpn_shapes_import_more || 'and {n} more').replace('{n}', String(renamed.length - 5)) : '')));
 		}
@@ -38014,8 +38014,8 @@ var EngCalcs = EngCalcs || {};
 			function go() { try { place(r); } catch (e) { failed(e); } }
 			if (!r.ok) {
 				if (r.detail === 'damaged') { failed(); return; }
-				if (r.detail === 'noshp') { say(String(pc.lpn_shp_import_noshp || '{file} has no .shp file in it. Pick the .zip of a shapefile, or the .shp together with its .shx, .dbf and .prj (hold Ctrl or Shift to select several).').replace('{file}', fileName), { ok: false, reason: 'noshp' }); }
-				else if (r.detail === 'manyshp') { say(String(pc.lpn_shp_import_manyshp || '{file} holds more than one shapefile. Import one at a time.').replace('{file}', fileName), { ok: false, reason: 'manyshp' }); }
+				if (r.detail === 'noshp') { say(String(pc.lpn_shp_import_noshp || '{file} contains no .shp file. Select either the .zip of a shapefile or the .shp together with its .shx, .dbf, and .prj (hold Ctrl or Shift to select several).').replace('{file}', fileName), { ok: false, reason: 'noshp' }); }
+				else if (r.detail === 'manyshp') { say(String(pc.lpn_shp_import_manyshp || '{file} contains more than one shapefile. Import one at a time.').replace('{file}', fileName), { ok: false, reason: 'manyshp' }); }
 				else { say(String(pc.lpn_shp_import_unreadable || '{file} is not a shapefile this page can read: {detail}').replace('{file}', fileName).replace('{detail}', r.detail || ''), { ok: false, reason: 'unreadable' }); }
 				return;
 			}
@@ -38041,7 +38041,7 @@ var EngCalcs = EngCalcs || {};
 			}
 			var theirsName = prj ? (prj.epsg ? (prj.name ? prj.name + ' (' + prj.epsg + ')' : prj.epsg) : prj.name) : '';
 			if (!prj) {
-				var pick = String(pc.lpn_shp_import_pick_hint || 'A shapefile is several files. Pick the .shp together with its .shx, .dbf and .prj (hold Ctrl or Shift to select several), or pick the .zip.');
+				var pick = String(pc.lpn_shp_import_pick_hint || 'A shapefile is several files. Select the .shp together with its .shx, .dbf, and .prj (hold Ctrl or Shift to select several), or select the .zip.');
 				if (geo && !opt.webMerc) {
 					// No .prj: degrees only if every number can be one.
 					r.shapes.forEach(function (sh) { sh.pts.forEach(function (q) { if (!(q.x >= -180 && q.x <= 180 && q.y >= -90 && q.y <= 90)) { ok = false; } }); });
@@ -38207,8 +38207,8 @@ var EngCalcs = EngCalcs || {};
 			var sk = r.skipped;
 			if (sk.length) {
 				var total = sk.reduce(function (s, k) { return s + k.n; }, 0);
-				skipped.push(gisCounted('lpn_shp_import_skipped', total, '{n} records not imported, because their shape type is not read: {list}.',
-					'One record not imported, because its shape type is not read: {list}.').replace('{list}', gisList(sk)));
+				skipped.push(gisCounted('lpn_shp_import_skipped', total, '{n} records not imported, because their geometry type is not read: {list}.',
+					'One record not imported, because its geometry type is not read: {list}.').replace('{list}', gisList(sk)));
 			}
 			if (bad.length) {
 				var nums = bad.map(function (k) { return k.name; });
