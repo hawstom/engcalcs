@@ -668,6 +668,9 @@ $ec_lang['lpn_tool_add_meter']='Müşteri';
 $ec_lang['lpn_tool_add_meter_tip']='Müşteri noktasını, ardından bağlantısını belirtin: bir hat veya düğüm. Müşteriye verdiğiniz talep, o hattın yakın ucundaki düğüme eklenir.';
 $ec_lang['lpn_mode_add_meter']='Müşteri: müşterinin bulunduğu yeri belirtin, ardından onu besleyen boruyu veya düğümü seçin. İptal etmek için Esc kullanın.';
 $ec_lang['lpn_pane_tab_customers']='Müşteriler';
+$ec_lang['lpn_pane_tab_shapes']='Figürler';
+$ec_lang['lpn_pane_shape_closed']='Kapalı';
+$ec_lang['lpn_pane_shape_points']='Noktalar';
 $ec_lang['lpn_customer_heading']='Müşteri {id}';
 // ROADMAP Task 247. lpn_field_account and lpn_field_account_tip were DELETED 2026-09-19 (Tom:
 // "Didn't I say to trash Account number since they can just make a Custom property for that or
@@ -776,6 +779,9 @@ $ec_lang['lpn_pane_paste_text_no_position']='Satır {row}: yeni bir Metnin hem {
 // {id} is what the Text table's own Attached to cell named.
 $ec_lang['lpn_pane_paste_no_anchor']='Satır {row}: {id} bu ağda henüz bir düğüm veya boru değil. Önce onu, sonra bu Metni yapıştırın.';
 $ec_lang['lpn_pane_paste_customer_no_position']='Satır {row}: yeni bir Müşterinin hem {first} hem de {second} değerine ihtiyacı var.';
+$ec_lang['lpn_pane_paste_shape_no_points']='Satır {row}: yeni bir Figürün Noktalar değerine ihtiyacı var.';
+$ec_lang['lpn_pane_paste_shape_bad_points']='Satır {row}: {text} bir nokta listesi değil. Her noktayı {pair} biçiminde yazın, ondalık ayırıcı olarak nokta (.) kullanın ve noktaları | ile ayırın.';
+$ec_lang['lpn_pane_paste_shape_closed_few']='Satır {row}: kapalı bir Figür en az üç nokta gerektirir.';
 $ec_lang['lpn_pane_paste_no_customer_ref']='Satır {row}: yeni bir Müşterinin bağlı bir boru veya düğüme ihtiyacı var.';
 $ec_lang['lpn_pane_paste_no_pipe']='Satır {row}: {id} borusu henüz yok. Önce borularınızı, sonra müşterilerinizi yapıştırın.';
 $ec_lang['lpn_pane_paste_no_customer_node']='Satır {row}: {id} düğümü henüz yok. Önce düğümlerinizi, sonra müşterilerinizi yapıştırın.';
@@ -953,23 +959,27 @@ $ec_lang['lpn_map_unmeasurable']='Bu sayfa çizim alanının boyutunu hesaplayam
 // setting is literally GPM or LPS, never "US" or "SI" -- so a water engineer reads the flow unit as
 // the name of the system, and the length units as detail that follows from it.
 $ec_lang['lpn_ex_basic_si_title']='Temel şebeke, L/s (SI)';
-$ec_lang['lpn_ex_basic_si_desc']='Buradan başlayın. Bir rezervuar, bir pompa ve küçük bir halka: bir su şebekesi olarak çalışan en küçük düzenleme. Saniyede litre, metre ve milimetre birimleriyle.';
+$ec_lang['lpn_ex_basic_si_desc']='İki rezervuar, bir pompa ve küçük bir halka. Saniyede litre, metre ve milimetre birimleriyle.';
 $ec_lang['lpn_ex_basic_us_title']='Temel şebeke, g/d (ABD)';
-$ec_lang['lpn_ex_basic_us_desc']='Aynı başlangıç şebekesi, dakikada galon, fit ve inç birimleriyle.';
+$ec_lang['lpn_ex_basic_us_desc']='İki rezervuar, bir pompa ve küçük bir halka. Dakikada galon, fit ve inç birimleriyle.';
 // **NOT PLAIN EPA Net1 ANY MORE, AND THE TITLE SAYS SO** (Tom, 2026-09-08: *"Net1 plus rule-based
 // controls: OK"*). Two `[RULES]` were added to the shipped file so the rule editor can be exercised
 // from the gallery; the rules stay, and the name stops claiming to be the sample as EPA ships it.
 $ec_lang['lpn_ex_net1_title']='EPANET Net1 artı kural tabanlı kontroller';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_ex_net1_desc']='EPANET\'in kendi üç örnek şebekesinin en küçüğü: bir rezervuar, bir pompa ve tek bir halka.';
-$ec_lang['lpn_ex_net2_title']='EPANET Net2';
+$ec_lang['lpn_ex_net1_desc']='Klor içeren kurgusal bir EPANET örneği, 1 rezervuar ve 1 depo.';
+$ec_lang['lpn_ex_net2_si_title']='EPANET Net2, L/sn (SI)';
+$ec_lang['lpn_ex_net2_si_desc']='Saniyede litre, metre ve milimetre birimleriyle. Branford, Connecticut\'taki bir EPANET örneği; dakikada galon, fit ve inç biriminden dönüştürülmüştür: 35 düğüm ve 1 depo, rezervuar, pompa ve vana yok, yaklaşık 2 km × 4 km. Tepkimeye girmeyen bir madde olan florür, bir kaynaktan girer.';
+$ec_lang['lpn_ex_net2_title']='EPANET Net2, g/d (ABD)';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_ex_net2_desc']='EPANET\'in örneklerinden, depolu dallı bir dağıtım sistemi.';
-$ec_lang['lpn_ex_net3_title']='EPANET Net3';
+$ec_lang['lpn_ex_net2_desc']='Dakikada galon, fit ve inç birimleriyle. Branford, Connecticut\'taki bir EPANET örneği: 35 düğüm ve 1 depo, rezervuar, pompa ve vana yok, yaklaşık 1 mil × 2 mil. Tepkimeye girmeyen bir madde olan florür, bir kaynaktan girer.';
+$ec_lang['lpn_ex_net3_si_title']='EPANET Net3, L/sn (SI)';
+$ec_lang['lpn_ex_net3_si_desc']='Saniyede litre, metre ve milimetre birimleriyle. Novato, California\'daki bir EPANET örneği; dakikada galon, fit ve inç biriminden dönüştürülmüştür, arkasında dünya haritasıyla: 92 düğüm, 3 depo ve 2 rezervuar, vana yok, yaklaşık 8 km kare. 24 saatlik uzun süreli simülasyon, Göl\'den bir kaynak izleme ile.';
+$ec_lang['lpn_ex_net3_title']='EPANET Net3, g/d (ABD)';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_ex_net3_desc']='EPANET\'in büyük örneği: 92 düğüm, 3 depo ve 2 rezervuar, biri bir nehir. Gerçek boyutlu bir modelin haritada nasıl göründüğünü görmek için açmaya değer.';
-$ec_lang['lpn_ex_elm_street_title']='Elm Street Center';
-$ec_lang['lpn_ex_elm_street_desc']='Bir vaziyet planı üzerine çizilmiş, tek bir anda maksimum gün talebine ek olarak yangın debisi için çözülmüş ticari bir alan.';
+$ec_lang['lpn_ex_net3_desc']='Dakikada galon, fit ve inç birimleriyle. Novato, California\'daki bir EPANET örneği, arkasında dünya haritasıyla: 92 düğüm, 3 depo ve 2 rezervuar, vana yok, yaklaşık 5 mil kare. 24 saatlik uzun süreli simülasyon, Göl\'den bir kaynak izleme ile.';
+$ec_lang['lpn_ex_elm_street_title']='Elm Street Center, g/d (ABD)';
+$ec_lang['lpn_ex_elm_street_desc']='Dakikada galon, fit ve inç birimleriyle. Prescott Valley, Arizona: 17 düğüm, 1 rezervuar ve 1 pompa. Bir vaziyet planı üzerine çizilmiş, tek bir anda maksimum gün talebine ek olarak yangın debisi için çözülmüş ticari bir alan.';
 $ec_lang['lpn_tool_undo']='Geri al';
 $ec_lang['lpn_confirm_example']='Bu, örneği mevcut şebekenize ekler. Devam edilsin mi?';
 $ec_lang['lpn_field_diameter']='Çap';
@@ -1169,7 +1179,7 @@ $ec_lang['lpn_tool_key_hint']='Kısayol: {key} tuşuna basın.';
 $ec_lang['lpn_tool_key_hint_two']='Kısayol: {key} veya {key2} tuşuna basın.';
 // Edited by TGH 2026-09-07; the Shift sentence rewritten 2026-09-08 on his ruling that Shift keeps
 // the selection and toggles what the shape catches (it used to say "add").
-$ec_lang['lpn_tool_area_tip']='Ekrandaki istemleri izleyin. Pencere, kement ve çokgen arasında geçiş yapmak için tekrar basın. Mevcut seçimi korumak ve seçtiklerinizi eklemek veya çıkarmak (değiştirmek) için Shift tuşunu basılı tutun.';
+$ec_lang['lpn_tool_area_tip']='Pencere, kement veya çokgenle alan seçimi.';
 $ec_lang['lpn_area_selected']='{n} seçildi.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_area_none']='O alanda hiçbir şey bulunamadı.';
@@ -1177,7 +1187,7 @@ $ec_lang['lpn_area_none']='O alanda hiçbir şey bulunamadı.';
 $ec_lang['lpn_tool_vertices_tip']='Boru kırılma noktalarını ekleyin ve kaldırın. Bir kırılma noktası eklemek için bir boru üzerinde nokta belirtin, kaldırmak için bir kırılma noktasını seçin, taşımak için bir kırılma noktasını sürükleyin. Bir kırılma noktası otomatik uzunluğu değiştirir, ancak küçük (yerel) kayıpları eklemez veya değiştirmez.';
 $ec_lang['lpn_tool_undo_tip']='Geri alma geçmişi uzunluğu = 20 eylem';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_tool_zoom_extent_tip']='Tüm şebekeyi harita penceresine sığdırın. Önce sığdırmadan Pencere Yakınlaştır için W tuşuna basın veya Tümünü göster araç çubuğu düğmesinin köşesindeki küçük üçgene tıklayın. Ayrıca sağ üstteki harita yakınlaştırma denetimlerine bakın.';
+$ec_lang['lpn_tool_zoom_extent_tip']='Tüm şebekeyi harita penceresine sığdırın. Bunun yerine sürüklediğiniz bir dikdörtgene yakınlaştırmak için W tuşuna basın veya Tümünü göster araç çubuğu düğmesinin köşesindeki küçük üçgeni seçin. Ayrıca haritanın sağ üstündeki yakınlaştırma denetimlerine bakın.';
 $ec_lang['lpn_tool_zoom_window_tip']='Köşeleri belirtin veya bir dikdörtgen sürükleyin. Tümünü göster için tekrar basın.';
 // Tom's wording, 2026-09-25.
 $ec_lang['lpn_zoom_in_tip']='Yakınlaştır. Kısayol: +';
@@ -3785,6 +3795,66 @@ $ec_lang['lpn_ff_err_unknown']='Sonuç yok. Hata kodu: {code}';
 // a plane coordinate read as a degree is silent and puts a network in the Gulf of Guinea.
 $ec_lang['lpn_file_import_survey']='Ölçülmüş noktaları içe aktar…';
 $ec_lang['lpn_file_import_survey_tip']='Bir metin dosyasından ölçülmüş noktaların bir listesini okur ve her noktada bir düğüm oluşturur; dosyanın belirtmediği her şey için yeni varlık ayarlarını kullanır. Saha kodları olarak açıklamayı oku kutusunu işaretlemediğiniz sürece hiçbir boru çizilmez ve hiçbir satır adı belirtilmeden atlanmaz. Bu projenin zaten kullandığı koordinat sistemini okur, coğrafi referanslı olsun ya da olmasın.';
+$ec_lang['lpn_file_import_shapes']='GeoJSON figürlerini içe aktar…';
+$ec_lang['lpn_file_import_shapes_tip']='Bir GeoJSON dosyasındaki noktaları, çizgileri ve çokgenleri bu projeye Figür olarak okur. Dosyadaki şebeke varlıkları içe aktarılmaz; şebekeyi bir EPANET dosyasından içe aktarın. Proje coğrafi referanslı olmalı veya bir koordinat sistemi belirtmelidir.';
+$ec_lang['lpn_geojson_import_done']='{n} Figür {file} dosyasından içe aktarıldı.';
+$ec_lang['lpn_geojson_import_done_one']='{file} dosyasından bir Figür içe aktarıldı.';
+$ec_lang['lpn_geojson_import_renamed']='{n} nesne adı Figür ID\'si olarak kullanılamaz. Her Figüre başka bir ID verildi ve nesne adı korundu: {list}.';
+$ec_lang['lpn_geojson_import_renamed_one']='Bir nesne adı Figür ID\'si olarak kullanılamaz. Figüre başka bir ID verildi ve nesne adı korundu: {list}.';
+$ec_lang['lpn_geojson_import_skipped']='{n} nesne içe aktarılmadı: {list}.';
+$ec_lang['lpn_geojson_import_skipped_one']='Bir nesne içe aktarılmadı: {list}.';
+$ec_lang['lpn_geojson_import_why_network']='şebeke varlığı';
+$ec_lang['lpn_geojson_import_why_geometry']='nokta, çizgi veya çokgen değil';
+$ec_lang['lpn_geojson_import_why_position']='konum geçerli bir enlem ve boylam değil';
+$ec_lang['lpn_geojson_import_holes']='{n} çokgen deliği içe aktarılmadı. Bir Figürün tek bir sınırı vardır.';
+$ec_lang['lpn_geojson_import_holes_one']='Bir çokgen deliği içe aktarılmadı. Bir Figürün tek bir sınırı vardır.';
+$ec_lang['lpn_geojson_import_parts']='{n} çok parçalı nesne, her parça için ayrı bir Figür olarak içe aktarıldı.';
+$ec_lang['lpn_geojson_import_parts_one']='Bir çok parçalı nesne, her parça için ayrı bir Figür olarak içe aktarıldı.';
+$ec_lang['lpn_geojson_import_local']='GeoJSON konumları enlem ve boylamdır ve bu projenin, bunların dönüştürülebileceği Dünya üzerinde bir yeri yoktur. Önce Harita, Dünya haritası, Ekle ile coğrafi referanslayın, sonra yeniden içe aktarın.';
+$ec_lang['lpn_geojson_import_unreadable']='{file} bir GeoJSON dosyası değil: {detail}';
+$ec_lang['lpn_file_import_dxf']='DXF figürlerini içe aktar…';
+$ec_lang['lpn_file_import_dxf_tip']='Bir ASCII DXF dosyasındaki noktaları, çizgileri ve çoklu çizgileri bu projeye Figür olarak okur; her katman adı bir özellik olarak korunur. Diğer öğeler sayılır ve listelenir, içe aktarılmaz. Koordinatlar dönüşüm yapılmadan bu projenin X ve Y değerleri olarak okunur.';
+$ec_lang['lpn_file_import_shp']='Shapefile figürlerini içe aktar…';
+$ec_lang['lpn_file_import_shp_tip']='Bir ESRI shapefile dosyasındaki noktaları, çizgileri ve çokgenleri bu projeye Figür olarak okur; öznitelik sütunları özellik olarak korunur. .zip dosyasını ya da .shp dosyasını .shx, .dbf ve .prj dosyalarıyla birlikte seçin (birden çok dosya seçmek için Ctrl veya Shift tuşunu basılı tutun). Projeden farklı bir koordinat sistemindeki koordinatlar dönüştürülür ve bildirimde bu belirtilir.';
+$ec_lang['lpn_dxf_import_skipped']='{n} öğe içe aktarılmadı: {list}.';
+$ec_lang['lpn_dxf_import_skipped_one']='Bir öğe içe aktarılmadı: {list}.';
+$ec_lang['lpn_dxf_import_inblocks']='blok tanımlarında';
+$ec_lang['lpn_dxf_import_bulge']='{n} çoklu çizgide yay segmentleri var; bunlar kırılma noktaları arasında düz segmentler olarak içe aktarıldı.';
+$ec_lang['lpn_dxf_import_bulge_one']='Bir çoklu çizgide yay segmentleri var; bunlar kırılma noktaları arasında düz segmentler olarak içe aktarıldı.';
+$ec_lang['lpn_dxf_import_units']='Çizim birimlerini {theirs} olarak belirtiyor, bu proje ise {ours} kullanıyor. Sayılar değiştirilmedi.';
+$ec_lang['lpn_dxf_import_refuse_geo']='Bir DXF çizimi düzlemseldir ve bu proje enlem ve boylamdadır, bu yüzden {file} dosyasının koordinatlarının projede yeri yoktur. Projeyi bir koordinat sistemine kopyalamak için Farklı dönüştür… komutunu kullanın, sonra yeniden içe aktarın.';
+$ec_lang['lpn_dxf_import_unreadable']='{file} bir ASCII DXF dosyası değil.';
+$ec_lang['lpn_dxf_import_binary']='{file} ikili bir DXF dosyasıdır. CAD programınızdan ASCII DXF olarak kaydedin, sonra yeniden içe aktarın.';
+$ec_lang['lpn_shapes_import_frame']='Koordinatlar dönüşüm yapılmadan {frame} olarak okundu.';
+$ec_lang['lpn_shapes_frame_xy']='bu projenin X ve Y değerleri';
+$ec_lang['lpn_shapes_frame_latlon']='enlem ve boylam';
+$ec_lang['lpn_shp_import_skipped']='{n} kayıt, geometri türü okunmadığı için içe aktarılmadı: {list}.';
+$ec_lang['lpn_shp_import_skipped_one']='Bir kayıt, geometri türü okunmadığı için içe aktarılmadı: {list}.';
+$ec_lang['lpn_shp_import_attrs']='Her Figürün özellikleri olarak korunan öznitelik sütunları: {list}.';
+$ec_lang['lpn_shp_import_noprj']='.prj dosyası yok, bu yüzden koordinatlar dönüşüm yapılmadan {frame} olarak okundu.';
+$ec_lang['lpn_shp_import_prj_same']='.prj dosyası {crs} değerini belirtiyor; bu, bu projenin koordinat sistemidir, bu yüzden koordinatlar değiştirilmedi.';
+$ec_lang['lpn_shp_import_converted']='Koordinatlar enlem ve boylamdır. Haritanın kullandığı dönüşümle {crs} sistemine dönüştürüldü.';
+$ec_lang['lpn_shp_import_prj_other']='.prj dosyası {theirs} değerini belirtiyor. Bu proje bir koordinat sistemi belirtmiyor, bu yüzden koordinatlar dönüşüm yapılmadan {frame} olarak okundu.';
+$ec_lang['lpn_shp_import_refuse_local']='{file} enlem ve boylamdadır ve bu projenin, bunların dönüştürülebileceği Dünya üzerinde bir yeri yoktur. Önce Harita, Dünya haritası, Ekle ile coğrafi referanslayın, sonra yeniden içe aktarın.';
+$ec_lang['lpn_shp_import_refuse_crs']='{file} {theirs} değerini belirtiyor ve bu proje {ours} sistemindedir. Hiçbir şey içe aktarılmadı ve hiçbir şey dönüştürülmedi.';
+$ec_lang['lpn_shp_import_refuse_range']='{file} dosyasında .prj dosyası yok ve koordinatları enlem ve boylam değil, bu yüzden bu projeye yerleştirilemez.';
+$ec_lang['lpn_shp_import_noshp']='{file} içinde .shp dosyası yok. Bir shapefile\'ın .zip dosyasını ya da .shp dosyasını .shx, .dbf ve .prj dosyalarıyla birlikte seçin (birden çok dosya seçmek için Ctrl veya Shift tuşunu basılı tutun).';
+$ec_lang['lpn_shp_import_manyshp']='{file} birden fazla shapefile içeriyor. Birer birer içe aktarın.';
+$ec_lang['lpn_shp_import_unreadable']='{file} bu sayfanın okuyabildiği bir shapefile değil: {detail}';
+$ec_lang['lpn_shp_import_pick_hint']='Bir shapefile birkaç dosyadan oluşur. .shp dosyasını .shx, .dbf ve .prj dosyalarıyla birlikte seçin (birden çok dosya seçmek için Ctrl veya Shift tuşunu basılı tutun) ya da .zip dosyasını seçin.';
+$ec_lang['lpn_shp_import_webmerc_ask']='{file} dosyasında .prj dosyası yok ve sayıları enlem ve boylam değil; ancak QGIS\'in ve web haritalarının kullandığı Web Mercator metresine (EPSG:3857) uyuyor. EPSG:3857 olarak içe aktarılıp bu projeye dönüştürülsün mü?';
+$ec_lang['lpn_shp_import_webmerc_ok']='EPSG:3857 olarak içe aktar';
+$ec_lang['lpn_shp_import_webmerc_far_ask']='{file} dosyası {theirs} değerini belirtiyor ve bu sistemde okunduğunda koordinatları bu projeden {km} km uzağa düşüyor. QGIS\'in ve web haritalarının kullandığı Web Mercator metresi (EPSG:3857) olarak okunduğunda, bu projenin bulunduğu yere düşüyor. EPSG:3857 olarak içe aktarılıp bu projeye dönüştürülsün mü?';
+$ec_lang['lpn_shp_import_reprojected']='Koordinatlar {theirs} sisteminden {ours} sistemine dönüştürüldü.';
+$ec_lang['lpn_shp_import_unplaced']='{n} kaydın, bu projenin yerleştiremediği koordinatları var, örneğin haritanın sınırını aşan bir enlem. Kayıt numaraları: {list}.';
+$ec_lang['lpn_shp_import_unplaced_one']='Bir kaydın, bu projenin yerleştiremediği koordinatları var, örneğin haritanın sınırını aşan bir enlem. Kayıt numarası: {list}.';
+$ec_lang['lpn_shapes_import_none']='{file} dosyasından hiçbir şey içe aktarılmadı.';
+$ec_lang['lpn_shp_import_convert_hint']='Projeyi {theirs} sistemine kopyalamak için Farklı dönüştür… komutunu kullanın, sonra yeniden içe aktarın.';
+$ec_lang['lpn_shp_import_damaged']='{file} hasarlı veya yarım kesilmiş, bu yüzden hiçbir şey içe aktarılmadı.';
+$ec_lang['lpn_shp_import_deleted']='{n} kayıt .dbf dosyasında silinmiş olarak işaretli olduğu için içe aktarılmadı.';
+$ec_lang['lpn_shp_import_deleted_one']='Bir kayıt .dbf dosyasında silinmiş olarak işaretli olduğu için içe aktarılmadı.';
+$ec_lang['lpn_dxf_import_paperspace']='kâğıt uzayında';
+$ec_lang['lpn_shapes_import_more']='ve {n} tane daha';
 $ec_lang['lpn_survey_read_error']='O dosya diskinizden okunamadı.';
 $ec_lang['lpn_survey_cancelled']='Hiçbir şey oluşturulmadı ve hiçbir şey değişmedi.';
 // What the project calls its two axes, for a sentence js/lpn-survey.js writes about a column. The
@@ -3991,6 +4061,8 @@ $ec_lang['lpn_fb_failed']='Bu bize ulaşmadı. Yazdığınız şey burada duruyo
 $ec_lang['lpn_fb_bad_email']='Bu e-posta adresi doğru görünmüyor. Düzeltin veya boş bırakın.';
 $ec_lang['lpn_fb_busy']='Son birkaç dakikada çok fazla ileti geldi. Yazdığınız şey burada duruyor, bu yüzden daha sonra yeniden deneyebilirsiniz.';
 $ec_lang['lpn_tool_add_chain_tip']='Düğümleri ve boruları zincirleyin: bir düğüm eklemek için haritada bir nokta belirtin, sonra her bir sonraki noktayı belirterek bir boru ve bir düğüm ekleyin. Oradan devam etmek için mevcut bir düğümü belirtin. Zinciri bitirmek için Esc tuşuna basın.';
+$ec_lang['lpn_tool_add_shape']='Figür';
+$ec_lang['lpn_tool_add_shape_tip']='Haritada bir nokta, çoklu çizgi veya çokgen çizin. Figür yalnızca haritaya eklenen bir çizimdir ve şebekenin parçası değildir. Her noktayı belirtin, ardından bitirmek için son noktayı yeniden belirtin, Enter tuşuna basın veya sağ tıklayın. Figürü çokgen olarak kapatmak için ilk noktayı yeniden belirtin.';
 $ec_lang['lpn_pane_filter_sel_note']='Yalnızca seçim. {all} öğeden {n} tanesi gösteriliyor.';
 $ec_lang['lpn_pane_filter_sel_and']='{q} ile süzüldü ve yalnızca seçim. {all} öğeden {n} tanesi gösteriliyor.';
 $ec_lang['lpn_pane_filter_sel_none']='Seçili öğelerin hiçbiri bu tabloda değil.';
@@ -4051,6 +4123,7 @@ $ec_lang['lpn_copy_opened_unsaved']='{file} bir kopya olarak açıldı; yeni bir
 $ec_lang['lpn_engine_unavailable_why']='Basınç ve debi kontrol vanaları (PRV, PSV, FCV) EPANET çözücüsü olmadan çözülemez. {reason}';
 $ec_lang['lpn_engine_needed_failed_why']='Bu şebeke yalnızca EPANET çözücüsüyle çözülebilir. {reason}';
 $ec_lang['lpn_mode_add_chain']='Mod: Düğüm Boru Zinciri. Bir düğüm eklemek için haritada bir nokta belirtin, sonra her bir sonraki noktayı belirterek bir boru ve bir düğüm ekleyin. Oradan devam etmek için mevcut bir düğümü belirtin. Zinciri bitirmek için Esc tuşuna basın. Öğeleri ve etiketleri değiştirmek veya taşımak için Seç moduna geçin.';
+$ec_lang['lpn_mode_add_shape']='Mod: Figür Ekle. Her noktayı belirtin. Bitirmek için son noktayı yeniden belirtin veya Enter tuşuna basın; çokgeni kapatmak için ilk noktayı belirtin.';
 $ec_lang['lpn_cp_allow_tip']='Yalnızca bu karakterlere izin ver:';
 $ec_lang['lpn_cp_characters_tip']='"@" herhangi bir harf, "#" herhangi bir sayısal basamak demektir; "-", "." ve "," izinliyse ayrıca listelenmelidir; boşluk karakterleri ise diğer karakterlerin arasında olmalıdır.';
 $ec_lang['lpn_valwarn_diameter']='Bir boru veya vana çapı normalde {min} ile {max} {unit} arasındadır. Sayıyı ve çap birimini kontrol edin.';
@@ -4207,7 +4280,7 @@ $ec_lang['lpn_guide_text_find_popup']='Bir koşulu sağlayan varlıkları bulur 
 $ec_lang['lpn_guide_text_settings_box']='Tüm ayarlar ve iki sıfırlama düğmesi Ayarlar kutusundadır. Ayarları bulabileceğiniz başka bir yer yoktur. Kutuda arama yapılabilir: Ayarlarda ara alanına bir veya daha fazla sözcük yazın; yalnızca hepsini içeren ayarlar listelenir. Ayarlar projeyle birlikte kaydedilir; Çalıştırma ilerleme kutusunu göster ve Sayfa altındakiler bunun dışındadır, onlar bu tarayıcıda tutulur. Bu kutunun konumu ve boyutu da yalnızca bu tarayıcıda tutulur.';
 $ec_lang['lpn_guide_text_library_box']='Projenin desenlerini, eğrilerini, boru türlerini, bağlantı parçalarını, kontrollerini ve kurallarını barındırır. Bir varlık bir desene, eğriye, boru türüne veya bağlantı parçasına kimliğiyle (ID) başvurur ve o öğe burada düzenlenir. Kontroller ve kurallar tüm şebekeye uygulanır. Kurallar yalnızca EPANET motoru tarafından uygulanır. Hepsi projeyle birlikte kaydedilir.';
 $ec_lang['lpn_guide_text_energy_box']='Son uzun süreli simülasyon boyunca her pompanın enerji kullanımını, tepe gücünü ve maliyetini, her pompanın verimini ve Ayarlar, Enerji altında belirlenen enerji fiyatını kullanarak raporlar. Ayarlarda bir Toplam çalışma süresi ve çözülmüş bir şebeke gerektirir. Şebekeyi değiştirmez.';
-$ec_lang['lpn_guide_text_contour_box']='Haritada, Düğümleri renklendirme ölçütü olarak seçilen düğüm değerinden çizilen eş değer eğrisi grafiğini denetler: renk şeması, dolgu ve opaklığı, eş değer eğrisi aralığı ve etiketleri ve rengin her borudan ne kadar uzağa ulaştığı. Kapatmak grafiği gizler ve düğüm renklerini bırakır. Yalnızca görüntüyü değiştirir, şebekeyi değiştirmez.';
+$ec_lang['lpn_guide_text_contour_box']='Haritada, Düğümleri şuna göre renklendir listesinde seçilen düğüm değerinden çizilen eş değer eğrisi grafiğini denetler: renk şeması, dolgu ve opaklığı, eş değer eğrisi aralığı ve etiketleri ve rengin her borudan ne kadar uzağa ulaştığı. Kapatmak grafiği gizler ve düğüm renklerini bırakır. Yalnızca görüntüyü değiştirir, şebekeyi değiştirmez.';
 $ec_lang['lpn_guide_text_scncmp_box']='Her senaryoyu çizimin bir kopyasından çözer ve her biri için geçersiz kılma sayısını, en düşük basıncı ve en yüksek hızı tablolaştırır. Projeyi değiştirmez ve açık olan senaryo olduğu gibi bırakılır.';
 $ec_lang['lpn_guide_text_rptbox']='Son uzun süreli simülasyon için EPANET motorunun yazdığı metin raporunu, uyarıları ve şebeke özetiyle birlikte gösterir. Her uzun süreli simülasyon onun yerine geçer; tek bir andaki çözüm geçmez ve bir düzenleme önceki raporu yerinde bırakır.';
 $ec_lang['lpn_guide_text_status_box']='Son uzun süreli simülasyon sırasındaki her değişikliği zaman sırasıyla listeler: bir pompanın, vananın veya borunun açılıp kapanması, bir deponun dolmaya veya boşalmaya başlaması ya da dolması veya boşalması ve tam yakınsamayan her zaman adımı. Yalnızca değişiklikler listelenir, her zaman adımı değil.';
@@ -4217,13 +4290,13 @@ $ec_lang['lpn_guide_text_calib_box']='Bir saha ölçümü dosyasını, aynı yer
 $ec_lang['lpn_guide_text_notes_popup']='Bu sayfanın nasıl davrandığına ve neler yapmadığına dair notları, her biri bir terim ve onu izleyen tanım olarak listeler. Şebekeyi değiştirmez.';
 $ec_lang['lpn_guide_text_hotkeys_popup']='Her araç çubuğu düğmesini ve menü satırını, klavye kısayollarını ve her kutu için bir girdiyi listeler. Bir satırı seçmek o denetimin nerede olduğunu gösterir; onu asla çalıştırmaz. Aramak için her yerden Ctrl+K tuşlarına veya kılavuzda odak varken / tuşuna basın.';
 $ec_lang['lpn_guide_find_query_term']='Sorgu dili';
-$ec_lang['lpn_guide_find_query_def']='<table class="lpn-notes-table"><tbody><tr><td><code>Kapsam.Özellik koşul değer</code></td><td>Tek bir koşul. Kapsam Her şey, Düğüm, Rezervuar, Depo, Boru, Pompa, Vana, Metin, Müşteri veya Kaynak olabilir. Özellik, o kapsam için Özellik listesindeki herhangi bir girdidir.</td></tr><tr><td>Koşullar</td><td>şuna eşit, şundan büyük, şundan küçük, içerir, en yüksek n, en düşük n ve boş. İçerir yalnızca metne uygulanır. En yüksek n ve en düşük n koşullarında n bir sayıdır, 5 en yüksek gibi. n harfinin kendisiyle (<code>Pipe.Velocity n highest</code> gibi) ya da Değer kutusu boşken 10 varlık listelenir. Boş, özelliği için değeri olmayan varlıkları bulur. Bağlantı özelliğinin dört koşulu vardır ve değer almaz.</td></tr><tr><td>Değerler</td><td>Bir sayı birimi olmadan, Özellikler\'de ve Tablolar panelinde gösterilen birimle girilir: 40 psi değil, 40. Bir kimlik (ID) dahil metin, tek veya çift tırnak içine alınır: <code>\'60\'</code>.</td></tr><tr><td>VE, VEYA ve parantezler</td><td>VE, VEYA\'dan önce değerlendirilir ve parantezler koşulları gruplar. DEĞİL kullanılamaz.</td></tr><tr><td>Yazım</td><td>Sözcüklerde büyük/küçük harf ayrımı yoktur. İngilizce sözcükler her dilde kabul edilir, bu yüzden bu kılavuzdan kopyalanan bir sorgu her dildeki bir sayfada çalışır.</td></tr></tbody></table>';
+$ec_lang['lpn_guide_find_query_def']='<table class="lpn-notes-table"><tbody><tr><td><code>Scope.Property condition value</code></td><td>Tek bir koşul. Kapsam Her şey, Düğüm, Rezervuar, Depo, Boru, Pompa, Vana, Metin, Müşteri veya Kaynak olabilir. Özellik, o kapsam için Özellik listesindeki herhangi bir girdidir.</td></tr><tr><td>Koşullar</td><td>şuna eşit, şundan büyük, şundan küçük, içerir, en yüksek n, en düşük n ve boş. İçerir yalnızca metne uygulanır. En yüksek n ve en düşük n koşullarında n bir sayıdır, En yüksek 5 gibi. n harfinin kendisiyle (<code>Pipe.Velocity n highest</code> gibi) ya da Değer kutusu boşken 10 varlık listelenir. Boş, özelliği için değeri olmayan varlıkları bulur. Bağlantı özelliğinin dört koşulu vardır ve değer almaz.</td></tr><tr><td>Değerler</td><td>Bir sayı birimi olmadan, Özellikler\'de ve Tablolar panelinde gösterilen birimle girilir: 40 psi değil, 40. Bir kimlik (ID) dahil metin, tek veya çift tırnak içine alınır: <code>\'60\'</code>.</td></tr><tr><td>VE, VEYA ve parantezler</td><td>VE, VEYA\'dan önce değerlendirilir ve parantezler koşulları gruplar. DEĞİL kullanılamaz.</td></tr><tr><td>Yazım</td><td>Sözcüklerde büyük/küçük harf ayrımı yoktur. İngilizce sözcükler her dilde kabul edilir, bu yüzden bu kılavuzdan kopyalanan bir sorgu her dildeki bir sayfada çalışır.</td></tr></tbody></table>';
 $ec_lang['lpn_guide_find_examples_term']='Net3 üzerinde çözümlü örnekler';
 $ec_lang['lpn_guide_find_examples_def']='<p>Bunları izlemek için Net3 örneğini açın. Basınç psi, hız ft/s cinsindendir.</p><table class="lpn-notes-table"><tbody><tr><td><code>Everything.ID equal to \'60\'</code></td><td>60 numaralı düğüm ve 60 numaralı boru. Bir düğüm ve bir boru aynı kimliğe (ID) sahip olabilir, bu yüzden Her şey altında bir ID araması birden fazla varlık döndürebilir.</td></tr><tr><td><code>Junction.Pressure below 40</code></td><td>10, 40, 50, 20 ve 153 numaralı düğümler, en düşük basınç önce. 10 numaralı düğüm -0,6 psi\'dedir, bu incelenmesi gereken negatif bir basınçtır.</td></tr><tr><td><code>Pipe.Velocity 5 highest</code></td><td>60, 329, 125, 123 ve 149 numaralı borular, en yüksek hız önce. 60 numaralı boru 9,3 ft/s taşır.</td></tr><tr><td><code>Junction.Pressure below 20 OR Pipe.Velocity above 5</code></td><td>10, 20, 40 ve 50 numaralı düğümler ile 60, 125 ve 329 numaralı borular: düşük basınçlar ve yüksek hızlar tek bir listede.</td></tr><tr><td><code>Junction.Pressure below 40 AND Junction.Elevation above 100</code></td><td>10, 20, 40 ve 50 numaralı düğümler, yüksek arazideki düşük basınçlar. Her iki koşul da aynı türde bir varlığı adlandırmalıdır: <code>Junction.Pressure below 40 AND Pipe.Velocity above 3</code> hiçbir şeyle eşleşmez, çünkü hiçbir varlık hem düğüm hem boru değildir.</td></tr><tr><td><code>Pipe.Closed equal to \'closed\'</code></td><td>330 numaralı boru, Net3 dosyasında kapalı olan tek boru.</td></tr><tr><td><code>Junction.Connectivity no open path to a source</code></td><td>Dosya dağıtıldığı haliyle hiçbir şey. 247 numaralı boru kapalıyken (bkz. Değiştir ve Geri al), 215, 217, 219 ve 225 numaralı düğümler: 247 numaralı borudaki bir kırılmanın susuz bırakacağı düğümler. Bunu her boru için tekrarlamak bir kritiklik analizidir.</td></tr></tbody></table>';
 $ec_lang['lpn_guide_find_results_term']='Sonuçlar, seçim ve Tablolar';
 $ec_lang['lpn_guide_find_results_def']='<p>Eşleşen varlıklar Bul düğmesinin altında listelenir. Şundan büyük ve en yüksek n önce en yüksek değeri, şundan küçük ve en düşük n önce en düşük değeri listeler; diğer koşullar bulunan değere göre, sonra ID\'ye göre listeler. VE veya VEYA içeren bir sorgu önce düğümleri, sonra hatları, her birini ID\'ye göre listeler. Tek bir eşleşme haritada hemen gösterilir. Haritayı o varlığa ortalamak için bir satırı seçin. Hiçbir şey seçili değilse varlık da seçilir; bir şey seçiliyse varlık vurgulanır ve seçim değişmez. Seçime eklemek veya çıkarmak için bir satırı Shift+tıklayın ya da Ctrl+tıklayın. Bul kendi başına tüm eşleşmeleri seçmez.</p><p>Geçerli tabloda filtrele düğmesi aynı sorguyu Tablolar paneline uygular. Sorgunun uygulandığı her tablo yalnızca eşleşen satırları gösterir; sorgu ve satır sayısı üstlerinde yer alır. Haritada tüm eşleşmeleri seçmek için bu satırları seçin ve sağ tık menüsünden Haritada seç\'i seçin. Bir tablo filtresi projeyle birlikte kaydedilmez ve sayfa yeniden yüklendiğinde sona erer. Artık eşleşmeyecek şekilde düzenlenen bir satır, Geçerli tabloda filtrele düğmesine yeniden basılana kadar tabloda soluk ve bir uyarı işaretiyle kalır.</p>';
 $ec_lang['lpn_guide_find_replace_term']='Değiştir ve Geri al';
-$ec_lang['lpn_guide_find_replace_def']='<p>Kutunun Bulunanları değiştir bölümü, sorgunun bulduğu her varlıkta tek bir özelliği yazar. Değiştirilecek özellik listesinden özelliği seçin, yeni değeri Yeni değer kutusuna görüntülenen birimle girin ve Değiştir düğmesine basın. Kutu, yeni değere zaten sahip olanlar sayılmadan kaç varlığın değişeceğini bildirir. Değişikliği uygulamak için Bunları değiştir düğmesine basın veya İptal\'i seçin. Tek bir Geri al, değiştirmenin tamamını geri alır.</p><p>Net1 üzerinde örnek: <code>Pipe.Diameter below 10</code> 31, 122, 113 ve 121 numaralı boruları bulur. Çap\'ı seçin, 10 girin ve Değiştir\'e basın; kutu "4 varlık değiştirilsin mi?" gösterir. Dört boruyu da 10 inç yapmak için Bunları değiştir\'e basın. Tek bir Geri al onları 6 ve 8 inçe döndürür.</p><p>Net3 üzerinde örnek: <code>Pipe.ID equal to \'247\'</code> 247 numaralı boruyu bulur. Kapalı\'yı seçin, Yeni değer listesinde yine Kapalı\'yı seçin ve boruyu yukarıdaki bağlantı durumu örneği için kapatmak üzere Değiştir\'e, ardından Bunları değiştir\'e basın. Geri al onu yeniden açar.</p><p>Değiştirme tek bir tür varlık gerektirir, bu yüzden Her şey altında önce Nerede aransın listesinden bir varlık türü seçin. Temel dışındaki bir senaryoda, değiştirme o senaryoda saklanır, Özellikler\'deki aynı düzenleme gibi. Mapbox kotlarının bulunduğu yerlerde, Kot yazılan bir değer yerine Mapbox DEM\'den değiştirilebilir.</p>';
+$ec_lang['lpn_guide_find_replace_def']='<p>Kutunun Bulunanları değiştir bölümü, sorgunun bulduğu her varlıkta tek bir özelliği yazar. Değiştirilecek özellik listesinden özelliği seçin, yeni değeri Yeni değer kutusuna görüntülenen birimle girin ve Değiştir düğmesine basın. Kutu, yeni değere zaten sahip olanlar sayılmadan kaç varlığın değişeceğini bildirir. Değişikliği uygulamak için Bunları değiştir düğmesine basın veya İptal\'i seçin. Tek bir Geri al, değiştirmenin tamamını geri alır.</p><p>Net1 üzerinde örnek: <code>Pipe.Diameter below 10</code> 31, 122, 113 ve 121 numaralı boruları bulur. Çap\'ı seçin, 10 girin ve Değiştir\'e basın; kutu "4 varlık değiştirilsin mi?" gösterir. Dört boruyu da 10 inç yapmak için Bunları değiştir\'e basın. Tek bir Geri al onları 6 ve 8 inçe döndürür.</p><p>Net3 üzerinde örnek: <code>Pipe.ID equal to \'247\'</code> 247 numaralı boruyu bulur. Kapalı\'yı seçin, Yeni değer listesinde yine Kapalı\'yı seçin ve boruyu yukarıdaki bağlantı durumu örneği için kapatmak üzere Değiştir\'e, ardından Bunları değiştir\'e basın. Geri al onu yeniden açar.</p><p>Değiştirme tek bir tür varlık gerektirir, bu yüzden Her şey altında önce Nerede aransın listesinden bir varlık türü seçin. Temel dışındaki bir senaryoda, değiştirme o senaryoda saklanır, Özellikler\'deki aynı düzenleme gibi. Mapbox kotlarının bulunduğu yerlerde, Kot yazılan bir değer yerine Mapbox DEM verisinden değiştirilebilir.</p>';
 $ec_lang['lpn_guide_find_notes_term']='Dikkat edilecek noktalar';
 $ec_lang['lpn_guide_find_notes_def']='<ul><li>Değerler tam duyarlılıkla karşılaştırılır ve dört ondalık basamakla listelenir. Şuna eşit, hesaplanmış bir sonuçla nadiren eşleşir; şundan büyük ve şundan küçük kullanın.</li><li>Basınç, yük, debi, hız ve diğer sonuçlar son hesaplamanınkilerdir. Otomatik olarak yeniden hesapla ayarı kapalıyken, şebekeyi son Hesapla\'daki haliyle tanımlarlar.</li><li>Metinde şundan büyük ve şundan küçük sözlük sırasını kullanır; sayılar sayısal sıradadır: Net1\'de <code>Junction.ID above \'20\'</code> 21, 22, 23, 31 ve 32 numaralı düğümleri bulur.</li><li>Her şey altında yalnızca ID, Açıklama, Etiket ve Bağlantı sunulur. Özelliklerin tam listesini görmek için Nerede aransın listesinden bir varlık türü seçin.</li><li>Bir Metin öğesinin ID\'si yoktur. Onu sözcükleriyle arayın: <code>Text.Text contains \'pump\'</code> gibi.</li><li>Bir düğüm için dört Bağlantı koşulu düğümde bağlantı yok, düğümde açık bağlantı yok, kaynağa giden bağlantı yolu yok ve kaynağa giden açık yol yok koşullarıdır. Kaynak bir rezervuar veya depodur.</li></ul>';
 $ec_lang['lpn_guide_using_heading']='Kılavuzu kullanma';
@@ -4286,6 +4359,7 @@ $ec_lang['lpn_split_no']='Hayır';
 $ec_lang['lpn_snap_vertex']='{link}, kırılma noktası {n}';
 $ec_lang['lpn_snap_node_on_node']='{new}, {target} konumuna yerleştirildi. İki düğüm bağlı değil.';
 $ec_lang['lpn_snap_moved_on_node']='{moved}, {target} konumuna taşındı. İki düğüm bağlı değil.';
+$ec_lang['lpn_snap_shape_point']='{shape}, nokta {n}';
 $ec_lang['lpn_settings_hover_card']='Üzerine gelince tam etiketi göster';
 $ec_lang['lpn_settings_hover_card_tip']='İşaretçiyi bir düğümün, hattın veya müşterinin üzerinde tutarak etiketini Ayarlar\'da belirtildiği şekilde, her ölçekte ve etiket haritaya sığsın ya da sığmasın görün. Bu, proje için değil, bu tarayıcı için bir ayardır.';
 $ec_lang['lpn_scenario_delete_in_base']='Çizimden kaldırmak için {base} senaryosunda silin.';

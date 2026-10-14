@@ -141,6 +141,7 @@ console.log('\n-- the gallery runs Net3, Net2, Elm Street, Net1, then the two ba
 	const f = examples.map(e => e.file);
 	report(f.slice(-2).join() === 'Basic-example-SI-units.lwn,Basic-example-US-units.lwn', 'the two basics are the last two cards', f.slice(-3).join());
 	report(f[f.length - 3] === 'Net1.lwn', 'Net1 sits just before them');
+	report(f[f.length - 4] === 'Net1-SI.lwn', 'Net1 SI sits just before Net1');
 }
 
 console.log('\n-- card descriptions read from the language file --');
@@ -358,8 +359,8 @@ console.log('\n-- flow unit leads, the way EPANET names a unit system --');
 		report(flowAt > 0, `${ex.titleKey}: the title names the flow unit`, t);
 		// In the description, the flow unit must come before the length units.
 		const dl = d.toLowerCase();
-		const flowWord = ex.system === 'si' ? 'litres per second' : 'gallons per minute';
-		const lenWord = ex.system === 'si' ? 'metres' : 'feet';
+		const flowWord = ex.system === 'si' ? 'liters per second' : 'gallons per minute';
+		const lenWord = ex.system === 'si' ? 'meters' : 'feet';
 		report(dl.indexOf(flowWord) >= 0 && dl.indexOf(flowWord) < dl.indexOf(lenWord),
 			`${ex.descKey}: flow unit is listed before the length units`);
 	});

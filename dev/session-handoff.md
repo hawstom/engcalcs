@@ -99,39 +99,46 @@ lines rather than appending corrections.
   tile counts at a 900 ms settle (basemap.js now waits for a pointable tile). Pre-existing and unrelated: `scale-publish-harness.js` (2 checks). The full `node dev/browser-pass/run.js` is green (1853/1853, 2026-10-04, Task 761); browser-pass specs are not in
   check_all.
 
-## STATE — 2026-10-13 (sixteenth session, Arizona time)
+## STATE — 2026-10-14 (seventeenth session, Arizona time)
 
 ### Master: see the pushed SHA in the last report. Production: b7c99102 (10-09) when last read; ask, About box
 
-Landed 2026-10-13: feat/si-example (his "OK to merge"), fix/report-legend (legend follows the header
-production printed; production's log script lags master), fix/status-code (every setStatus has a code;
-status_code_check). Retired previews: si-example, graph-bubble (served from browser cache afterwards; say so).
+Landed 2026-10-14 on his word: feat/si-example-more, feat/button-base, feat/zoom-selection.
+Landed 2026-10-13/14: fix/si-rounding (his "merge"), feat/shape with feat/tool-key merged into it (his
+"Merge feat/shape" and "Merge this branch into the shape branch"; F is Shape, "F for Figure"), and
+translation sprint 1014 (74 new keys, 57 resyncs, Task 788 Find-guide sweep, glossary term Shape).
+Deleted keys: lpn_scenario_delete_goes_one, lpn_sm_basic_off (both on feat/bentley-interop).
 
 ### Branches awaiting his word (pushed; all on the Branch previews page)
 
-- **feat/bentley-interop** (df2b02cf, 8116; Task 721 + 790; holds feat/match-property AND feat/graph-bubble,
-  his "merge it into bentley-interop"): his help text in lpn_sm_help, his five OK'd strings, Copy properties
-  dialog, Task 790 dot + down triangle. Perry's defects (custom property lost in a scenario; Base gutter)
-  fixed in dc51ce4b. Deleted keys lpn_scenario_override(_tip). After merge delete match-property, graph-bubble.
-- **fix/si-rounding** (01db68fa, 8111): his 10-13 rounding rule, elevations included; harness checks the rule
-  exactly and prints head differences (0.96 m at 0 h, all from 50 mm diameters; he accepted it).
-- **feat/tool-key** (dd4bae8c, 8109): A area select, tip "Area select window/lasso/polygon."; F on feat/shape.
-  Conflicts with feat/shape at the toolbar; merge one, then master into the other.
-- **feat/shape** (6849809a, 8108; Task 779): his /tmp/shp.zip files: EPSG:2223 misnamed .prj asks to read
-  as 3857; 3857 reads without proj4. Fixtures dev/lpn-spike/fixtures/tom-test-*.
+- **feat/bentley-interop** (8116; Tasks 721, 790, 782, 784): his 10-13 browser notes all built
+  (manager greyed in Basic, his help sentences, comma pairs gone, one-form delete line, refusal wording,
+  Settings headings aligned, yellow note gone; Base triangle gutter already worked). Perry passed it.
+  Master merged in (Shapes tab before Settings/Scenarios); two seam fixes (parity count 8; workspace
+  import now refreshes the Scenarios tab). After merge delete match-property, graph-bubble.
 
 ### Questions out to him
 
-- His help says "Creating a new scenario creates no alternatives"; Add base and Copy scenario do. Meant?
-- Did he mean to drop the Example paragraph from the help?
-- Basic-off delete wording "These alternatives it uses stay..." acceptable? Hollow dots clutter?
-- Undo of an edit also returns to the scenario it was made in. Wanted?
+- Task 617's next step: which Mapbox Studio style, if any, beside Normal/Muted/Faded/Grayscale?
+- Tag and Label share one word in es (Etiqueta), it (Etichetta), tr (Etiket): pick a distinct Tag word?
+- cs shows Zdroj for both Reservoir and Source in the Find scope list: which should change?
 - Bentley import: answered "no direct import; a flattened .inp only". Awaiting what he wants next.
 
 ### Next job
 
 Merge on his typed word, each after master is merged in and check_all passes on the merge. Then a
-translation sprint (needs his explicit word): Task 788 plus every key these branches add.
+small sprint for the keys feat/bentley-interop adds (147 waiting on branches). Wish-list candidates
+next: plural-aware count strings (Perry; after bentley merges), New junction without a canvas click
+(Declan; check his row's reply first), Number of services decimals (Mary; Tom's or Sue's call).
+
+### Traps met 2026-10-14 (seventeenth session)
+
+- **Wave 0 undid his word calls** (Check for a checkbox, click for a button; Task 759). Brief Wave 0 with them.
+- **A pre-reviewer wrote its journal into the main checkout** while master's suite ran there. Tell Perry
+  which worktree to write in.
+- **The classifier refused killing a superseded suite run.** Let it finish; do not edit its tree meanwhile.
+- **A master merge broke a branch harness through layout**: three new pane tabs wrapped the tab strip, which
+  exposed a missing refresh on workspace import. Run the branch suite after every master merge into it.
 
 ### Traps met 2026-10-13 (sixteenth session)
 

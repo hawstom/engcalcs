@@ -668,6 +668,9 @@ $ec_lang['lpn_tool_add_meter']='לקוח';
 $ec_lang['lpn_tool_add_meter_tip']='ציינו את נקודת הלקוח, ואז את החיבור שלו: קישור או צומת. הדרישה שמזינים ללקוח מתווספת לצומת בקצה הקרוב של אותו קישור.';
 $ec_lang['lpn_mode_add_meter']='לקוח: ציינו היכן הלקוח, ואז בחרו את הצינור או הצומת המשרתים אותו. או הקישו Esc כדי לבטל.';
 $ec_lang['lpn_pane_tab_customers']='לקוחות';
+$ec_lang['lpn_pane_tab_shapes']='צורות';
+$ec_lang['lpn_pane_shape_closed']='סגורה';
+$ec_lang['lpn_pane_shape_points']='נקודות';
 $ec_lang['lpn_customer_heading']='לקוח {id}';
 // ROADMAP Task 247. lpn_field_account and lpn_field_account_tip were DELETED 2026-09-19 (Tom:
 // "Didn't I say to trash Account number since they can just make a Custom property for that or
@@ -776,6 +779,9 @@ $ec_lang['lpn_pane_paste_text_no_position']='שורה {row}: טקסט חדש ז�
 // {id} is what the Text table's own Attached to cell named.
 $ec_lang['lpn_pane_paste_no_anchor']='שורה {row}: {id} אינו צומת או צינור ברשת זו עדיין. הדביקו אותו קודם, ולאחר מכן את הטקסט הזה.';
 $ec_lang['lpn_pane_paste_customer_no_position']='שורה {row}: לקוח חדש זקוק גם ל-{first} וגם ל-{second}.';
+$ec_lang['lpn_pane_paste_shape_no_points']='שורה {row}: צורה חדשה זקוקה לנקודות.';
+$ec_lang['lpn_pane_paste_shape_bad_points']='שורה {row}: {text} אינו רשימת נקודות. כתבו כל נקודה בצורה {pair}, עם נקודה (.) כסימן עשרוני, והפרידו בין הנקודות באמצעות |.';
+$ec_lang['lpn_pane_paste_shape_closed_few']='שורה {row}: צורה סגורה זקוקה לשלוש נקודות לפחות.';
 $ec_lang['lpn_pane_paste_no_customer_ref']='שורה {row}: לקוח חדש זקוק לצינור או צומת מחובר.';
 $ec_lang['lpn_pane_paste_no_pipe']='שורה {row}: הצינור {id} עדיין אינו קיים. הדביקו קודם את הצינורות שלכם, ולאחר מכן את הלקוחות.';
 $ec_lang['lpn_pane_paste_no_customer_node']='שורה {row}: הצומת {id} עדיין אינו קיים. הדביקו קודם את הצמתים שלכם, ולאחר מכן את הלקוחות.';
@@ -955,23 +961,27 @@ $ec_lang['lpn_map_unmeasurable']='עמוד זה לא הצליח לקבוע את 
 // setting is literally GPM or LPS, never "US" or "SI" -- so a water engineer reads the flow unit as
 // the name of the system, and the length units as detail that follows from it.
 $ec_lang['lpn_ex_basic_si_title']='רשת בסיסית, L/s (מטרי)';
-$ec_lang['lpn_ex_basic_si_desc']='התחילו כאן. מאגר, משאבה וטבעת קטנה: הסידור הקטן ביותר שעדיין פועל כרשת מים. ליטרים לשנייה, עם מטרים ומילימטרים.';
+$ec_lang['lpn_ex_basic_si_desc']='שני מאגרים, משאבה וטבעת קטנה. ליטרים לשנייה, עם מטרים ומילימטרים.';
 $ec_lang['lpn_ex_basic_us_title']='רשת בסיסית, gpm (ארה"ב)';
-$ec_lang['lpn_ex_basic_us_desc']='אותה רשת פתיחה בגלונים לדקה, עם רגל ואינץ׳.';
+$ec_lang['lpn_ex_basic_us_desc']='שני מאגרים, משאבה וטבעת קטנה. גלונים לדקה, עם רגל ואינץ׳.';
 // **NOT PLAIN EPA Net1 ANY MORE, AND THE TITLE SAYS SO** (Tom, 2026-09-08: *"Net1 plus rule-based
 // controls: OK"*). Two `[RULES]` were added to the shipped file so the rule editor can be exercised
 // from the gallery; the rules stay, and the name stops claiming to be the sample as EPA ships it.
 $ec_lang['lpn_ex_net1_title']='EPANET Net1 בתוספת בקרות מבוססות-חוקים';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_ex_net1_desc']='הקטנה מבין שלוש רשתות הדוגמה של EPANET: מאגר אחד, משאבה וטבעת יחידה.';
-$ec_lang['lpn_ex_net2_title']='EPANET Net2';
+$ec_lang['lpn_ex_net1_desc']='דוגמה בדיונית של EPANET עם כלור, מאגר אחד ומכל אחד.';
+$ec_lang['lpn_ex_net2_si_title']='EPANET Net2, L/s (מטרי)';
+$ec_lang['lpn_ex_net2_si_desc']='ליטרים לשנייה, עם מטרים ומילימטרים. דוגמה של EPANET בבראנפורד, קונטיקט, שהומרה מגלונים לדקה, רגל ואינץ׳: 35 צמתים ומכל אחד, ללא מאגר, ללא משאבה וללא שסתומים, בשטח של כ-2 ק״מ על 4 ק״מ. פלואוריד, חומר שאינו מגיב, נכנס במקור אחד.';
+$ec_lang['lpn_ex_net2_title']='EPANET Net2, gpm (ארה"ב)';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_ex_net2_desc']='מערכת חלוקה מסועפת עם מכל, מתוך דוגמאות EPANET.';
-$ec_lang['lpn_ex_net3_title']='EPANET Net3';
+$ec_lang['lpn_ex_net2_desc']='גלונים לדקה, עם רגל ואינץ׳. דוגמה של EPANET בבראנפורד, קונטיקט: 35 צמתים ומכל אחד, ללא מאגר, ללא משאבה וללא שסתומים, בשטח של כ-1 מייל על 2 מייל. פלואוריד, חומר שאינו מגיב, נכנס במקור אחד.';
+$ec_lang['lpn_ex_net3_si_title']='EPANET Net3, L/s (מטרי)';
+$ec_lang['lpn_ex_net3_si_desc']='ליטרים לשנייה, עם מטרים ומילימטרים. דוגמה של EPANET בנובאטו, קליפורניה, שהומרה מגלונים לדקה, רגל ואינץ׳, עם מפת העולם ברקע: 92 צמתים, 3 מכלים ו-2 מאגרים, ללא שסתומים, בשטח של כ-8 ק״מ על 8 ק״מ. סימולציה של 24 שעות לפרק זמן מורחב, עם מעקב מקור מהאגם.';
+$ec_lang['lpn_ex_net3_title']='EPANET Net3, gpm (ארה"ב)';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_ex_net3_desc']='רשת הדוגמה הגדולה של EPANET: 92 צמתים, שלושה מכלים ושני מאגרים, אחד מהם נהר. היא מראה כיצד מודל בגודל מלא נראה על המפה.';
-$ec_lang['lpn_ex_elm_street_title']='Elm Street Center';
-$ec_lang['lpn_ex_elm_street_desc']='אתר מסחרי שנפתר עבור ספיקת כיבוי אש בנוסף לדרישת יום השיא, ברגע זמן אחד, משורטט מעל תוכנית האתר.';
+$ec_lang['lpn_ex_net3_desc']='גלונים לדקה, עם רגל ואינץ׳. דוגמה של EPANET בנובאטו, קליפורניה, עם מפת העולם ברקע: 92 צמתים, 3 מכלים ו-2 מאגרים, ללא שסתומים, בשטח של כ-5 מייל על 5 מייל. סימולציה של 24 שעות לפרק זמן מורחב, עם מעקב מקור מהאגם.';
+$ec_lang['lpn_ex_elm_street_title']='Elm Street Center, gpm (ארה"ב)';
+$ec_lang['lpn_ex_elm_street_desc']='גלונים לדקה, עם רגל ואינץ׳. פרסקוט ואלי, אריזונה: 17 צמתים, מאגר אחד ומשאבה אחת. אתר מסחרי שנפתר עבור ספיקת כיבוי אש בנוסף לדרישת יום השיא, ברגע זמן אחד, משורטט מעל תוכנית האתר.';
 $ec_lang['lpn_tool_undo']='בטל';
 $ec_lang['lpn_confirm_example']='פעולה זו מוסיפה את הדוגמה לרשת שכבר יש לכם. להמשיך?';
 $ec_lang['lpn_field_diameter']='קוטר';
@@ -1171,7 +1181,7 @@ $ec_lang['lpn_tool_key_hint']='קיצור דרך: לחצו על {key}.';
 $ec_lang['lpn_tool_key_hint_two']='קיצור דרך: הקישו {key} או {key2}.';
 // Edited by TGH 2026-09-07; the Shift sentence rewritten 2026-09-08 on his ruling that Shift keeps
 // the selection and toggles what the shape catches (it used to say "add").
-$ec_lang['lpn_tool_area_tip']='פעלו לפי ההנחיות שעל המסך. לחצו שוב כדי לעבור בין חלון, לאסו ומצולע. החזיקו Shift כדי לשמור על הבחירה הנוכחית ולהוסיף או להסיר (להחליף) את מה שבוחרים.';
+$ec_lang['lpn_tool_area_tip']='בחירת שטח: חלון, לאסו או מצולע.';
 $ec_lang['lpn_area_selected']='{n} נבחרו.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_area_none']='לא נמצא דבר באזור זה.';
@@ -1534,7 +1544,7 @@ $ec_lang['lpn_replace_asked']='התבקשו רומים עבור {n} צמתים. 
 $ec_lang['lpn_replace_btn']='החלף';
 // The count IS the confirmation: a bulk write reaches assets spread over a map the user is not
 // looking at, so it is shown, and answered, before anything is written. {n} is a whole number.
-$ec_lang['lpn_replace_preview']='לשנות {n} אלמנטים?';
+$ec_lang['lpn_replace_preview']='לשנות {n} נכסים?';
 $ec_lang['lpn_replace_apply']='שנה אותם';
 $ec_lang['lpn_replace_done']='{n} נכסים שונו. ניתן לבטל זאת בפעולה אחת.';
 $ec_lang['lpn_replace_none']='שום דבר לא ישתנה.';
@@ -1556,7 +1566,7 @@ $ec_lang['lpn_profile_title']='פרופיל לאורך מסלול';
 // the map to see the path, click to add a stop, double-click to finish.
 $ec_lang['lpn_profile_draw_start']='בחרו את הצומת שבו המסלול מתחיל.';
 $ec_lang['lpn_profile_draw_more']='הזיזו את המצביע מעל המפה כדי לראות את המסלול. בחרו צומת כדי להוסיף אותו. לחצו פעמיים כדי לסיים. Esc מבטל.';
-$ec_lang['lpn_profile_draw_blocked']='אין מסלול מ-{a} אל {b}. בחרו צומת אחר.';
+$ec_lang['lpn_profile_draw_blocked']='אין מסלול מ-{a} אל {b}. בחרו צומת התחלה או צומת סיום אחר.';
 $ec_lang['lpn_profile_tap_start']='בחרו את הצומת שבו המסלול מתחיל.';
 $ec_lang['lpn_profile_tap_more']='בחרו צומת כדי לראות את המסלול. לחצו והחזיקו כדי להוסיף אותו. הקישו פעמיים כדי לסיים. לחצו שוב על פרופיל כדי לבטל.';
 $ec_lang['lpn_profile_say_idle']='לחצו שוב על פרופיל כדי לבחור מסלול חדש על המפה.';
@@ -2099,7 +2109,7 @@ $ec_lang['lpn_id_invalid']='הזינו מזהה ללא רווחים וללא מ�
 $ec_lang['lpn_id_taken']='מזהה זה כבר בשימוש.';
 $ec_lang['lpn_diag_no_fixed_head']='הוסיפו מאגר או מכל. הרשת זקוקה לפחות למפלס מים ידוע אחד לפני שניתן לפתור אותה.';
 $ec_lang['lpn_diag_dangling_link']='צינור או משאבה מתחברים לצומת שכבר אינו קיים:';
-$ec_lang['lpn_diag_unreachable']='לצמתים אלה אין נתיב למאגר:';
+$ec_lang['lpn_diag_unreachable']='לצמתים אלה אין נתיב למאגר או למכל:';
 // BOTH OF THESE NAME THE VALVES. The page ends each one with a list of IDs, which is the reason
 // this calculator writes its own messages instead of showing EPANET\'s numbered errors: a person
 // looking at a drawing can act on \'V3\' and can do nothing at all with \'error 110\'.
@@ -3787,6 +3797,66 @@ $ec_lang['lpn_ff_err_unknown']='אין תוצאה. קוד שגיאה: {code}';
 // a plane coordinate read as a degree is silent and puts a network in the Gulf of Guinea.
 $ec_lang['lpn_file_import_survey']='ייבוא נקודות סקר…';
 $ec_lang['lpn_file_import_survey_tip']='קורא רשימת נקודות סקר מקובץ טקסט ויוצר צומת אחד בכל נקודה, תוך שימוש בהגדרות הנכסים החדשים עבור כל מה שהקובץ אינו קובע. לא משורטטים צינורות אלא אם מסמנים קריאת התיאור כקודי שטח, ושום שורה אינה מושמטת בלי שייאמר מהי. הוא קורא את מערכת הקואורדינטות שהפרויקט כבר משתמש בה, מיוחסת גיאוגרפית או לא.';
+$ec_lang['lpn_file_import_shapes']='ייבוא צורות GeoJSON…';
+$ec_lang['lpn_file_import_shapes_tip']='קורא את הנקודות, הקווים והמצולעים של קובץ GeoJSON לתוך פרויקט זה כצורות. נכסי רשת שבקובץ אינם מיובאים; ייבאו את הרשת מקובץ EPANET. הפרויקט חייב להיות מיוחס גיאוגרפית או לקבוע מערכת קואורדינטות.';
+$ec_lang['lpn_geojson_import_done']='יובאו {n} צורות מתוך {file}.';
+$ec_lang['lpn_geojson_import_done_one']='יובאה צורה אחת מתוך {file}.';
+$ec_lang['lpn_geojson_import_renamed']='לא ניתן להשתמש ב-{n} שמות של אובייקטים כמזהי צורה. כל צורה קיבלה מזהה אחר ושומרת את שם האובייקט שלה: {list}.';
+$ec_lang['lpn_geojson_import_renamed_one']='לא ניתן להשתמש בשם אובייקט אחד כמזהה צורה. הצורה קיבלה מזהה אחר ושומרת את שם האובייקט שלה: {list}.';
+$ec_lang['lpn_geojson_import_skipped']='{n} אובייקטים לא יובאו: {list}.';
+$ec_lang['lpn_geojson_import_skipped_one']='אובייקט אחד לא יובא: {list}.';
+$ec_lang['lpn_geojson_import_why_network']='נכס רשת';
+$ec_lang['lpn_geojson_import_why_geometry']='אינו נקודה, קו או מצולע';
+$ec_lang['lpn_geojson_import_why_position']='המיקום אינו קו רוחב וקו אורך תקפים';
+$ec_lang['lpn_geojson_import_holes']='{n} חורים במצולעים לא יובאו. לצורה יש גבול אחד.';
+$ec_lang['lpn_geojson_import_holes_one']='חור אחד במצולע לא יובא. לצורה יש גבול אחד.';
+$ec_lang['lpn_geojson_import_parts']='{n} אובייקטים מרובי חלקים יובאו כצורה אחת לכל חלק.';
+$ec_lang['lpn_geojson_import_parts_one']='אובייקט אחד מרובה חלקים יובא כצורה אחת לכל חלק.';
+$ec_lang['lpn_geojson_import_local']='המיקומים ב-GeoJSON הם קווי רוחב וקווי אורך, ולפרויקט זה אין מקום על פני כדור הארץ שאליו אפשר להמיר אותם. ייחסו אותו תחילה גיאוגרפית באמצעות מפה, מפת העולם, צירוף, ואז ייבאו שוב.';
+$ec_lang['lpn_geojson_import_unreadable']='{file} אינו קובץ GeoJSON: {detail}';
+$ec_lang['lpn_file_import_dxf']='ייבוא צורות DXF…';
+$ec_lang['lpn_file_import_dxf_tip']='קורא את הנקודות, הקווים והפוליליינים של קובץ DXF בפורמט ASCII לתוך פרויקט זה כצורות, ושם כל שכבה נשמר כמאפיין. ישויות אחרות נספרות ומפורטות ואינן מיובאות. הקואורדינטות נקראות כ-X ו-Y של פרויקט זה, ללא המרה.';
+$ec_lang['lpn_file_import_shp']='ייבוא צורות Shapefile…';
+$ec_lang['lpn_file_import_shp_tip']='קורא את הנקודות, הקווים והמצולעים של קובץ Shapefile של ESRI לתוך פרויקט זה כצורות, ועמודות התכונות נשמרות כמאפיינים. בחרו את קובץ ה-zip, או את קובץ ה-shp יחד עם ה-shx, ה-dbf וה-prj שלו (החזיקו Ctrl או Shift כדי לבחור כמה קבצים). קואורדינטות במערכת קואורדינטות השונה מזו של הפרויקט מומרות, וההודעה מציינת זאת.';
+$ec_lang['lpn_dxf_import_skipped']='{n} ישויות לא יובאו: {list}.';
+$ec_lang['lpn_dxf_import_skipped_one']='ישות אחת לא יובאה: {list}.';
+$ec_lang['lpn_dxf_import_inblocks']='בהגדרות בלוקים';
+$ec_lang['lpn_dxf_import_bulge']='ל-{n} פוליליינים יש מקטעי קשת, שיובאו כמקטעים ישרים בין קודקודיהם.';
+$ec_lang['lpn_dxf_import_bulge_one']='לפוליליין אחד יש מקטעי קשת, שיובאו כמקטעים ישרים בין קודקודיו.';
+$ec_lang['lpn_dxf_import_units']='השרטוט קובע את יחידותיו כ-{theirs} והפרויקט משתמש ב-{ours}. המספרים לא שונו.';
+$ec_lang['lpn_dxf_import_refuse_geo']='שרטוט DXF הוא מישורי, והפרויקט הזה במערכת של קו רוחב וקו אורך, ולכן לקואורדינטות של {file} אין בו מקום. השתמשו ב"המרה בשם…" כדי להעתיק את הפרויקט למערכת קואורדינטות, ואז ייבאו שוב.';
+$ec_lang['lpn_dxf_import_unreadable']='{file} אינו קובץ DXF בפורמט ASCII.';
+$ec_lang['lpn_dxf_import_binary']='{file} הוא קובץ DXF בינארי. שמרו אותו מתוכנת ה-CAD כקובץ DXF בפורמט ASCII, ואז ייבאו שוב.';
+$ec_lang['lpn_shapes_import_frame']='הקואורדינטות נקראו כ{frame}, ללא המרה.';
+$ec_lang['lpn_shapes_frame_xy']='-X ו-Y של פרויקט זה';
+$ec_lang['lpn_shapes_frame_latlon']='קו רוחב וקו אורך';
+$ec_lang['lpn_shp_import_skipped']='{n} רשומות לא יובאו, מפני שסוג הצורה שלהן אינו נקרא: {list}.';
+$ec_lang['lpn_shp_import_skipped_one']='רשומה אחת לא יובאה, מפני שסוג הצורה שלה אינו נקרא: {list}.';
+$ec_lang['lpn_shp_import_attrs']='עמודות תכונות שנשמרו כמאפיינים של כל צורה: {list}.';
+$ec_lang['lpn_shp_import_noprj']='אין קובץ prj, ולכן הקואורדינטות נקראו כ{frame}, ללא המרה.';
+$ec_lang['lpn_shp_import_prj_same']='קובץ ה-prj קובע {crs}, מערכת הקואורדינטות של פרויקט זה, ולכן הקואורדינטות לא שונו.';
+$ec_lang['lpn_shp_import_converted']='הקואורדינטות הן קו רוחב וקו אורך. הן הומרו ל-{crs} באמצעות התמרה שבה המפה משתמשת.';
+$ec_lang['lpn_shp_import_prj_other']='קובץ ה-prj קובע {theirs}. הפרויקט הזה אינו קובע מערכת קואורדינטות, ולכן הקואורדינטות נקראו כ{frame}, ללא המרה.';
+$ec_lang['lpn_shp_import_refuse_local']='{file} הוא בקו רוחב וקו אורך, ולפרויקט זה אין מקום על פני כדור הארץ שאליו אפשר להמיר אותם. ייחסו אותו תחילה גיאוגרפית באמצעות מפה, מפת העולם, צירוף, ואז ייבאו שוב.';
+$ec_lang['lpn_shp_import_refuse_crs']='{file} קובע {theirs}, והפרויקט הזה ב-{ours}. דבר לא יובא ודבר לא הומר.';
+$ec_lang['lpn_shp_import_refuse_range']='ל-{file} אין קובץ prj, והקואורדינטות שלו אינן קווי רוחב וקווי אורך, ולכן אי אפשר למקם אותן בפרויקט זה.';
+$ec_lang['lpn_shp_import_noshp']='{file} אינו כולל קובץ shp. בחרו את קובץ ה-zip של Shapefile, או את קובץ ה-shp יחד עם ה-shx, ה-dbf וה-prj שלו (החזיקו Ctrl או Shift כדי לבחור כמה קבצים).';
+$ec_lang['lpn_shp_import_manyshp']='{file} כולל יותר מ-Shapefile אחד. ייבאו אחד בכל פעם.';
+$ec_lang['lpn_shp_import_unreadable']='{file} אינו Shapefile שעמוד זה יכול לקרוא: {detail}';
+$ec_lang['lpn_shp_import_pick_hint']='Shapefile הוא כמה קבצים. בחרו את קובץ ה-shp יחד עם ה-shx, ה-dbf וה-prj שלו (החזיקו Ctrl או Shift כדי לבחור כמה קבצים), או בחרו את קובץ ה-zip.';
+$ec_lang['lpn_shp_import_webmerc_ask']='ל-{file} אין קובץ prj, והמספרים שבו אינם קווי רוחב וקווי אורך, אך הם מתאימים למטרים של Web Mercator (EPSG:3857), המערכת שבה משתמשים QGIS ומפות אינטרנט. לייבא אותם כ-EPSG:3857 ולהמיר אותם לפרויקט זה?';
+$ec_lang['lpn_shp_import_webmerc_ok']='ייבוא כ-EPSG:3857';
+$ec_lang['lpn_shp_import_webmerc_far_ask']='{file} קובע {theirs}, ובקריאה במערכת זו הקואורדינטות שלו נופלות {km} ק״מ מפרויקט זה. בקריאה כמטרים של Web Mercator (EPSG:3857), המערכת שבה משתמשים QGIS ומפות אינטרנט, הן נופלות במקום שבו נמצא פרויקט זה. לייבא אותם כ-EPSG:3857 ולהמיר אותם לפרויקט זה?';
+$ec_lang['lpn_shp_import_reprojected']='הקואורדינטות הומרו מ-{theirs} ל-{ours}.';
+$ec_lang['lpn_shp_import_unplaced']='ל-{n} רשומות יש קואורדינטות שהפרויקט הזה אינו יכול למקם, כגון קו רוחב מעבר לגבול המפה. מספרי הרשומות: {list}.';
+$ec_lang['lpn_shp_import_unplaced_one']='לרשומה אחת יש קואורדינטות שהפרויקט הזה אינו יכול למקם, כגון קו רוחב מעבר לגבול המפה. מספר הרשומה: {list}.';
+$ec_lang['lpn_shapes_import_none']='דבר לא יובא מתוך {file}.';
+$ec_lang['lpn_shp_import_convert_hint']='השתמשו ב"המרה בשם…" כדי להעתיק את הפרויקט ל-{theirs}, ואז ייבאו שוב.';
+$ec_lang['lpn_shp_import_damaged']='{file} פגום או קטוע, ולכן דבר לא יובא.';
+$ec_lang['lpn_shp_import_deleted']='{n} רשומות המסומנות כמחוקות בקובץ ה-dbf לא יובאו.';
+$ec_lang['lpn_shp_import_deleted_one']='רשומה אחת המסומנת כמחוקה בקובץ ה-dbf לא יובאה.';
+$ec_lang['lpn_dxf_import_paperspace']='במרחב נייר';
+$ec_lang['lpn_shapes_import_more']='ועוד {n}';
 $ec_lang['lpn_survey_read_error']='לא ניתן היה לקרוא קובץ זה מהדיסק שלכם.';
 $ec_lang['lpn_survey_cancelled']='שום דבר לא נוצר ושום דבר לא השתנה.';
 // What the project calls its two axes, for a sentence js/lpn-survey.js writes about a column. The
@@ -3994,6 +4064,8 @@ $ec_lang['lpn_fb_failed']='ההודעה לא הגיעה אלינו. מה שכת�
 $ec_lang['lpn_fb_bad_email']='כתובת הדוא״ל נראית שגויה. תקנו אותה, או השאירו את השדה ריק.';
 $ec_lang['lpn_fb_busy']='הגיעו יותר מדי הודעות בדקות האחרונות. מה שכתבתם עדיין כאן, כך שאפשר לנסות שוב מאוחר יותר.';
 $ec_lang['lpn_tool_add_chain_tip']='שרשרת צמתים וצינורות: ציינו נקודה על המפה כדי להוסיף צומת, ואז ציינו כל נקודה הבאה כדי להוסיף צינור וצומת. ציינו צומת קיים כדי להמשיך ממנו. הקישו Escape כדי לסיים את השרשרת.';
+$ec_lang['lpn_tool_add_shape']='צורה';
+$ec_lang['lpn_tool_add_shape_tip']='שרטוט נקודה, פוליליין או מצולע על המפה. צורה היא הערת הסבר ואינה חלק מהרשת. ציינו כל נקודה, ואז ציינו שוב את הנקודה האחרונה, הקישו Enter או לחצו לחיצה ימנית כדי לסיים. ציינו שוב את הנקודה הראשונה כדי לסגור את הצורה למצולע.';
 $ec_lang['lpn_pane_filter_sel_note']='הנבחרים בלבד. מוצגים {n} מתוך {all}.';
 $ec_lang['lpn_pane_filter_sel_and']='מסונן לפי {q} ולפי הנבחרים בלבד. מוצגים {n} מתוך {all}.';
 $ec_lang['lpn_pane_filter_sel_none']='אף אחד מהאלמנטים הנבחרים אינו בטבלה זו.';
@@ -4054,6 +4126,7 @@ $ec_lang['lpn_copy_opened_unsaved']='{file} נפתח כעותק, עם נעילה
 $ec_lang['lpn_engine_unavailable_why']='אי אפשר לפתור שסתומי בקרת לחץ וספיקה (PRV, PSV, FCV) בלי פותר EPANET. {reason}';
 $ec_lang['lpn_engine_needed_failed_why']='רשת זו ניתנת לפתרון רק בפותר EPANET. {reason}';
 $ec_lang['lpn_mode_add_chain']='מצב: שרשרת צמתים וצינורות. ציינו נקודה על המפה כדי להוסיף צומת, ואז ציינו כל נקודה הבאה כדי להוסיף צינור וצומת. ציינו צומת קיים כדי להמשיך ממנו. הקישו Escape כדי לסיים את השרשרת. עברו למצב בחירה כדי לשנות או להזיז נכסים ותוויות.';
+$ec_lang['lpn_mode_add_shape']='מצב: הוספת צורה. ציינו כל נקודה. ציינו שוב את הנקודה האחרונה או הקישו Enter כדי לסיים; ציינו את הנקודה הראשונה כדי לסגור מצולע.';
 $ec_lang['lpn_cp_allow_tip']='אפשר רק תווים אלה:';
 $ec_lang['lpn_cp_characters_tip']='"@" מציין כל אות; "#" מציין כל ספרה, ועליכם לרשום בנפרד את "-", "." ו-"," אם הם מותרים; ותווי רווח לבן חייבים להימצא בין תווים אחרים.';
 $ec_lang['lpn_valwarn_diameter']='קוטר צינור או שסתום הוא בדרך כלל בין {min} ל-{max} {unit}. בדקו את המספר ואת יחידת הקוטר.';
@@ -4220,15 +4293,15 @@ $ec_lang['lpn_guide_text_calib_box']='משווה קובץ של מדידות שד
 $ec_lang['lpn_guide_text_notes_popup']='מפרטת הערות על אופן הפעולה של עמוד זה ועל מה שהוא אינו עושה, כל אחת כמונח ואחריו הגדרתו. היא אינה משנה את הרשת.';
 $ec_lang['lpn_guide_text_hotkeys_popup']='מפרטת כל כפתור בסרגל הכלים וכל שורת תפריט, את קיצורי המקלדת, ורשומה לכל תיבה. בחירה בשורה מראה היכן הפקד נמצא; היא לעולם אינה מפעילה אותו. כדי לחפש, לחצו Ctrl+K מכל מקום, או / כשהמדריך במיקוד.';
 $ec_lang['lpn_guide_find_query_term']='שפת השאילתה';
-$ec_lang['lpn_guide_find_query_def']='<table class="lpn-notes-table"><tbody><tr><td><code>Scope.Property condition value</code></td><td>תנאי אחד. ההיקף הוא Everything, Junction, Reservoir, Tank, Pipe, Pump, Valve, Text, Customer או Source. המאפיין הוא כל רשומה ברשימת מאפיין עבור אותו היקף.</td></tr><tr><td>תנאים</td><td>equal to, above, below, contains, n highest, n lowest ו-empty. התנאי contains חל על טקסט בלבד. ב-n highest וב-n lowest, n הוא מספר, כמו ב-5 highest. עם האות n עצמה, כמו ב-<code>Pipe.Velocity n highest</code>, או כשתיבת הערך ריקה, מפורטים 10 נכסים. התנאי empty מוצא את הנכסים שאין להם ערך עבור המאפיין. לקישוריות יש ארבעה תנאים והיא אינה מקבלת ערך.</td></tr><tr><td>ערכים</td><td>מספר מוזן ללא יחידתו, ביחידה המוצגת במאפיינים ובחלונית טבלאות: 40, לא 40 psi. טקסט, כולל מזהה, מוקף במירכאות בודדות או כפולות: <code>\'60\'</code>.</td></tr><tr><td>AND, OR וסוגריים</td><td>AND מוערך לפני OR, וסוגריים מקבצים תנאים. NOT אינו זמין.</td></tr><tr><td>איות</td><td>אין הבחנה בין אותיות גדולות לקטנות. המילים באנגלית מתקבלות בכל שפה, ולכן שאילתה שהועתקה ממדריך זה פועלת בעמוד בכל שפה.</td></tr></tbody></table>';
+$ec_lang['lpn_guide_find_query_def']='<table class="lpn-notes-table"><tbody><tr><td><code>Scope.Property condition value</code></td><td>תנאי אחד. ההיקף, כפי שהוא מופיע ברשימה מה לחפש, הוא הכול, צומת, מאגר, מכל, צינור, משאבה, שסתום, טקסט, לקוח או מקור. המאפיין הוא כל רשומה ברשימה מאפיין עבור אותו היקף.</td></tr><tr><td>תנאים</td><td>שווה ל, גדול מ, קטן מ, מכיל, n הגבוהים ביותר, n הנמוכים ביותר וריק. התנאי מכיל חל על טקסט בלבד. בתנאים n הגבוהים ביותר ו-n הנמוכים ביותר, n הוא מספר, כמו ב-5 הגבוהים ביותר. עם האות n עצמה, כמו ב-<code>Pipe.Velocity n highest</code>, או כשתיבת הערך ריקה, מפורטים 10 נכסים. התנאי ריק מוצא את הנכסים שאין להם ערך עבור המאפיין. לקישוריות יש ארבעה תנאים והיא אינה מקבלת ערך.</td></tr><tr><td>ערכים</td><td>מספר מוזן ללא יחידתו, ביחידה המוצגת במאפיינים ובחלונית טבלאות: 40, לא 40 psi. טקסט, כולל מזהה, מוקף במירכאות בודדות או כפולות: <code>\'60\'</code>.</td></tr><tr><td>וגם, או וסוגריים</td><td>וגם (AND) מוערך לפני או (OR), וסוגריים מקבצים תנאים. NOT אינו זמין.</td></tr><tr><td>איות</td><td>אין הבחנה בין אותיות גדולות לקטנות. המילים באנגלית מתקבלות בכל שפה, ולכן שאילתה שהועתקה ממדריך זה פועלת בעמוד בכל שפה.</td></tr></tbody></table>';
 $ec_lang['lpn_guide_find_examples_term']='דוגמאות עבודה על Net3';
-$ec_lang['lpn_guide_find_examples_def']='<p>פתחו את הדוגמה Net3 כדי לעקוב אחר הדוגמאות. הלחץ ב-psi והמהירות ב-ft/s.</p><table class="lpn-notes-table"><tbody><tr><td><code>Everything.ID equal to \'60\'</code></td><td>צומת 60 וצינור 60. לצומת ולצינור יכול להיות אותו מזהה, ולכן חיפוש מזהה תחת Everything עשוי להחזיר יותר מנכס אחד.</td></tr><tr><td><code>Junction.Pressure below 40</code></td><td>צמתים 10, 40, 50, 20 ו-153, הלחץ הנמוך ביותר ראשון. בצומת 10 הלחץ הוא -0.6 psi, לחץ שלילי הדורש בדיקה.</td></tr><tr><td><code>Pipe.Velocity 5 highest</code></td><td>צינורות 60, 329, 125, 123 ו-149, המהירות הגבוהה ביותר ראשונה. בצינור 60 זורמת מהירות של 9.3 ft/s.</td></tr><tr><td><code>Junction.Pressure below 20 OR Pipe.Velocity above 5</code></td><td>צמתים 10, 20, 40 ו-50, וצינורות 60, 125 ו-329: לחצים נמוכים ומהירויות גבוהות ברשימה אחת.</td></tr><tr><td><code>Junction.Pressure below 40 AND Junction.Elevation above 100</code></td><td>צמתים 10, 20, 40 ו-50, הלחצים הנמוכים בקרקע גבוהה. שני התנאים חייבים לציין את אותו סוג נכס: <code>Junction.Pressure below 40 AND Pipe.Velocity above 3</code> אינו תואם דבר, כי אין נכס שהוא גם צומת וגם צינור.</td></tr><tr><td><code>Pipe.Closed equal to \'closed\'</code></td><td>צינור 330, הצינור היחיד הסגור בקובץ Net3.</td></tr><tr><td><code>Junction.Connectivity no open path to a source</code></td><td>אף צומת, כפי שהקובץ מופץ. כשצינור 247 סגור (ראו החלפה וביטול), צמתים 215, 217, 219 ו-225: הצמתים שפיצוץ בצינור 247 היה משאיר ללא אספקה. חזרה על כך לכל צינור היא ניתוח קריטיות.</td></tr></tbody></table>';
+$ec_lang['lpn_guide_find_examples_def']='<p>פתחו את הדוגמה Net3 כדי לעקוב אחר הדוגמאות. הלחץ ב-psi והמהירות ב-ft/s.</p><table class="lpn-notes-table"><tbody><tr><td><code>Everything.ID equal to \'60\'</code></td><td>צומת 60 וצינור 60. לצומת ולצינור יכול להיות אותו מזהה, ולכן חיפוש מזהה תחת הכול עשוי להחזיר יותר מנכס אחד.</td></tr><tr><td><code>Junction.Pressure below 40</code></td><td>צמתים 10, 40, 50, 20 ו-153, הלחץ הנמוך ביותר ראשון. בצומת 10 הלחץ הוא -0.6 psi, לחץ שלילי הדורש בדיקה.</td></tr><tr><td><code>Pipe.Velocity 5 highest</code></td><td>צינורות 60, 329, 125, 123 ו-149, המהירות הגבוהה ביותר ראשונה. בצינור 60 זורמת מהירות של 9.3 ft/s.</td></tr><tr><td><code>Junction.Pressure below 20 OR Pipe.Velocity above 5</code></td><td>צמתים 10, 20, 40 ו-50, וצינורות 60, 125 ו-329: לחצים נמוכים ומהירויות גבוהות ברשימה אחת.</td></tr><tr><td><code>Junction.Pressure below 40 AND Junction.Elevation above 100</code></td><td>צמתים 10, 20, 40 ו-50, הלחצים הנמוכים בקרקע גבוהה. שני התנאים חייבים לציין את אותו סוג נכס: <code>Junction.Pressure below 40 AND Pipe.Velocity above 3</code> אינו תואם דבר, כי אין נכס שהוא גם צומת וגם צינור.</td></tr><tr><td><code>Pipe.Closed equal to \'closed\'</code></td><td>צינור 330, הצינור היחיד הסגור בקובץ Net3.</td></tr><tr><td><code>Junction.Connectivity no open path to a source</code></td><td>אף צומת, כפי שהקובץ מופץ. כשצינור 247 סגור (ראו החלפה וביטול), צמתים 215, 217, 219 ו-225: הצמתים שפיצוץ בצינור 247 היה משאיר ללא אספקה. חזרה על כך לכל צינור היא ניתוח קריטיות.</td></tr></tbody></table>';
 $ec_lang['lpn_guide_find_results_term']='תוצאות, הבחירה וטבלאות';
 $ec_lang['lpn_guide_find_results_def']='<p>הנכסים התואמים מפורטים מתחת לכפתור חפש. התנאים above ו-n highest מפרטים תחילה את הערך הגבוה ביותר, התנאים below ו-n lowest את הנמוך ביותר, ותנאים אחרים לפי הערך שנמצא ולאחר מכן לפי מזהה. שאילתה עם AND או OR מפרטת צמתים ולאחר מכן קישורים, כל אחד לפי מזהה. התאמה בודדת מוצגת במפה מיד. בחרו שורה כדי למרכז את המפה על אותו נכס. אם דבר אינו נבחר, הנכס נבחר גם הוא; אם משהו נבחר, הנכס מודגש והבחירה אינה משתנה. Shift+לחיצה או Ctrl+לחיצה על שורה מוסיפה אותה לבחירה או מסירה אותה. חיפוש אינו בוחר את כל ההתאמות מעצמו.</p><p>הכפתור סינון בטבלה הנוכחית מחיל את אותה שאילתה על החלונית טבלאות. כל טבלה שהשאילתה חלה עליה מציגה רק את השורות התואמות, עם השאילתה ומספר השורות מעליהן. כדי לבחור את כל ההתאמות במפה, בחרו את השורות האלה ובחרו בחירה במפה מתפריט הלחיצה הימנית. מסנן טבלה אינו נשמר עם הפרויקט ומסתיים בטעינה מחדש של העמוד. שורה שנערכה כך שאינה תואמת עוד נשארת בטבלה, עמומה ומסומנת בסימן אזהרה, עד שיילחץ שוב הכפתור סינון בטבלה הנוכחית.</p>';
 $ec_lang['lpn_guide_find_replace_term']='החלפה וביטול';
-$ec_lang['lpn_guide_find_replace_def']='<p>החלק שינוי מה שנמצא בתיבה כותב מאפיין אחד בכל נכס שהשאילתה מצאה. בחרו את המאפיין ברשימה מאפיין לשינוי, הזינו את הערך החדש בתיבה ערך חדש ביחידה המוצגת, ולחצו על הכפתור החלף. התיבה מציינת אז כמה נכסים ישתנו, ללא אלה שכבר יש להם את הערך החדש. לחצו על הכפתור שנה אותם כדי להחיל את השינוי, או על בטל. ביטול אחד מבטל את ההחלפה כולה.</p><p>דוגמה על Net1: <code>Pipe.Diameter below 10</code> מוצאת את צינורות 31, 122, 113 ו-121. בחרו קוטר, הזינו 10 ולחצו על החלף; התיבה מציגה "לשנות 4 אלמנטים?". לחצו על שנה אותם כדי להגדיר את כל ארבעת הצינורות ל-10 אינץ\'. ביטול אחד מחזיר אותם ל-6 ול-8 אינץ\'.</p><p>דוגמה על Net3: <code>Pipe.ID equal to \'247\'</code> מוצאת את צינור 247. בחרו סגור, בחרו שוב סגור ברשימה ערך חדש, ולחצו על החלף ולאחר מכן על שנה אותם, כדי לסגור את הצינור עבור דוגמת הקישוריות שלמעלה. ביטול פותח אותו שוב.</p><p>החלפה דורשת סוג נכס אחד, ולכן תחת Everything בחרו תחילה סוג נכס ברשימה מה לחפש. בתרחיש שאינו בסיס, החלפה נשמרת בתרחיש זה, כמו אותה עריכה במאפיינים. כשזמינים רומים מ-Mapbox, ניתן להחליף את הרום ב-DEM של Mapbox במקום בערך מוקלד.</p>';
+$ec_lang['lpn_guide_find_replace_def']='<p>החלק שינוי מה שנמצא בתיבה כותב מאפיין אחד בכל נכס שהשאילתה מצאה. בחרו את המאפיין ברשימה מאפיין לשינוי, הזינו את הערך החדש בתיבה ערך חדש ביחידה המוצגת, ולחצו על הכפתור החלף. התיבה מציינת אז כמה נכסים ישתנו, ללא אלה שכבר יש להם את הערך החדש. לחצו על הכפתור שנה אותם כדי להחיל את השינוי, או על בטל. ביטול אחד מבטל את ההחלפה כולה.</p><p>דוגמה על Net1: <code>Pipe.Diameter below 10</code> מוצאת את צינורות 31, 122, 113 ו-121. בחרו קוטר, הזינו 10 ולחצו על החלף; התיבה מציגה "לשנות 4 נכסים?". לחצו על שנה אותם כדי להגדיר את כל ארבעת הצינורות ל-10 אינץ\'. ביטול אחד מחזיר אותם ל-6 ול-8 אינץ\'.</p><p>דוגמה על Net3: <code>Pipe.ID equal to \'247\'</code> מוצאת את צינור 247. בחרו סגור, בחרו שוב סגור ברשימה ערך חדש, ולחצו על החלף ולאחר מכן על שנה אותם, כדי לסגור את הצינור עבור דוגמת הקישוריות שלמעלה. ביטול פותח אותו שוב.</p><p>החלפה דורשת סוג נכס אחד, ולכן תחת הכול בחרו תחילה סוג נכס ברשימה מה לחפש. בתרחיש שאינו בסיס, החלפה נשמרת בתרחיש זה, כמו אותה עריכה במאפיינים. כשזמינים רומים מ-Mapbox, ניתן להחליף את הרום ב-DEM של Mapbox במקום בערך מוקלד.</p>';
 $ec_lang['lpn_guide_find_notes_term']='נקודות לתשומת לב';
-$ec_lang['lpn_guide_find_notes_def']='<ul><li>ערכים מושווים בדיוק מלא ומפורטים בארבע ספרות אחרי הנקודה העשרונית. התנאי equal to כמעט אינו תואם תוצאה מחושבת; השתמשו ב-above וב-below.</li><li>לחץ, עומד, ספיקה, מהירות ושאר התוצאות הם של החישוב האחרון. כשההגדרה חשב מחדש אוטומטית מנוקה, הם מתארים את הרשת כפי שהייתה בחישוב האחרון.</li><li>above ו-below על טקסט משתמשים בסדר מילוני, כשמספרים בסדר מספרי: ב-Net1, <code>Junction.ID above \'20\'</code> מוצאת את צמתים 21, 22, 23, 31 ו-32.</li><li>תחת Everything מוצעים רק ID, Description, Tag ו-Connectivity. בחרו סוג נכס ברשימה מה לחפש כדי לראות את רשימת המאפיינים המלאה שלו.</li><li>לפריט טקסט אין מזהה. חפשו אותו לפי המילים שלו, כמו ב-<code>Text.Text contains \'pump\'</code>.</li><li>ארבעת תנאי הקישוריות לצומת הם no links at node, no open links at node, no link path to a source ו-no open path to a source. מקור הוא מאגר או מכל.</li></ul>';
+$ec_lang['lpn_guide_find_notes_def']='<ul><li>ערכים מושווים בדיוק מלא ומפורטים בארבע ספרות אחרי הנקודה העשרונית. התנאי שווה ל כמעט אינו תואם תוצאה מחושבת; השתמשו בגדול מ ובקטן מ.</li><li>לחץ, גובה, ספיקה, מהירות ושאר התוצאות הם של החישוב האחרון. כשההגדרה חשב מחדש אוטומטית מנוקה, הם מתארים את הרשת כפי שהייתה בחישוב האחרון.</li><li>גדול מ וקטן מ על טקסט משתמשים בסדר מילוני, כשמספרים בסדר מספרי: ב-Net1, <code>Junction.ID above \'20\'</code> מוצאת את צמתים 21, 22, 23, 31 ו-32.</li><li>תחת הכול מוצעים רק מזהה, תיאור, תגית וקישוריות. בחרו סוג נכס ברשימה מה לחפש כדי לראות את רשימת המאפיינים המלאה שלו.</li><li>לפריט טקסט אין מזהה. חפשו אותו לפי המילים שלו, כמו ב-<code>Text.Text contains \'pump\'</code>.</li><li>ארבעת תנאי הקישוריות לצומת הם אין קישורים בצומת, אין קישורים פתוחים בצומת, אין מסלול קישורים למקור ואין מסלול פתוח למקור. מקור הוא מאגר או מכל.</li></ul>';
 $ec_lang['lpn_guide_using_heading']='שימוש במדריך';
 $ec_lang['lpn_guide_keys_term']='קיצורי מקלדת במדריך';
 $ec_lang['lpn_guide_keys_def']='<table class="lpn-notes-table"><tbody><tr><td>?</td><td>פתיחת המדריך בפקד שמתחת למצביע או שבמיקוד.</td></tr><tr><td>F1</td><td>פתיחת המדריך ברשומה של התיבה שבמיקוד.</td></tr><tr><td>Ctrl+K</td><td>פתיחת המדריך כשהטקסט הנבחר בשדה החיפוש.</td></tr><tr><td>/</td><td>בחירת שדה החיפוש כשהמדריך במיקוד.</td></tr><tr><td>Esc</td><td>סגירת המדריך וחזרה למקום שבו הייתם.</td></tr></tbody></table>';
@@ -4289,6 +4362,7 @@ $ec_lang['lpn_split_no']='לא';
 $ec_lang['lpn_snap_vertex']='{link}, נקודת עיקול {n}';
 $ec_lang['lpn_snap_node_on_node']='{new} ממוקם במקום של {target}. שני הצמתים אינם מחוברים.';
 $ec_lang['lpn_snap_moved_on_node']='{moved} הוזז למקום של {target}. שני הצמתים אינם מחוברים.';
+$ec_lang['lpn_snap_shape_point']='{shape}, נקודה {n}';
 $ec_lang['lpn_settings_hover_card']='הצגת התווית המלאה בריחוף';
 $ec_lang['lpn_settings_hover_card_tip']='החזיקו את המצביע על צומת, קישור או לקוח כדי לראות את התווית שלו כפי שצוינה בהגדרות, בכל קנה מידה, בין אם התווית נכנסת במפה ובין אם לא. זו הגדרה של דפדפן זה, לא של הפרויקט.';
 $ec_lang['lpn_scenario_delete_in_base']='כדי להסיר אותו מהשרטוט, מחקו אותו בתרחיש {base}.';

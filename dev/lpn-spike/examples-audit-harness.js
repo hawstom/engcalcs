@@ -95,6 +95,7 @@ const SOURCE_OF = {
 	'Net2-Branford-CT.lwn': 'Net2.inp',
 	// The SI twins are CONVERTED from the US files, not imported, so a fresh import of the
 	// `.inp` cannot be their reference; si-example-equivalence-harness.js is.
+	'Net1-SI.lwn': null,
 	'Net2-Branford-CT-SI.lwn': null,
 	'Net3-Novato-CA-World-SI.lwn': null,
 	// Net3 placed on the world (Task 497's geographic project). Its model is Net3's, so Net3.inp is
@@ -387,6 +388,11 @@ done('the file\'s own characters come back');
 // simple control cannot express and therefore the reason rules exist at all.
 // dev/lpn-spike/net1-rules-harness.js measures that they change the run.
 console.log('\n5. Net1 ships two curated rules, and nothing else ships any');
+const NET1_RULES_SI = [
+	'RULE 1', 'IF SYSTEM CLOCKTIME >= 10 AM', 'AND SYSTEM CLOCKTIME < 2 PM', 'AND TANK 2 LEVEL ABOVE 40.538',
+	'THEN PUMP 9 STATUS IS CLOSED', 'PRIORITY 1', '', 'RULE 2', 'IF SYSTEM CLOCKTIME >= 3 PM',
+	'AND TANK 2 LEVEL BELOW 36.576', 'THEN PUMP 9 STATUS IS OPEN', 'PRIORITY 1'
+];	// the SI twin: the same two rules, tank levels converted to metres (convert_example_to_si.js)
 const NET1_RULES = [
 	'RULE 1',
 	'IF SYSTEM CLOCKTIME >= 10 AM',
@@ -403,10 +409,10 @@ const NET1_RULES = [
 ];
 PUBLISHED.forEach((file) => {
 	const open = openShipped(file);
-	const want = file === 'Net1.lwn' ? NET1_RULES : [];
+	const want = file === 'Net1.lwn' ? NET1_RULES : file === 'Net1-SI.lwn' ? NET1_RULES_SI : [];
 	ok(file + ' ships exactly the rules declared for it',
 		dump(open.rules || []) === dump(want), dump(open.rules || []).slice(0, 300));
-	if (file !== 'Net1.lwn') { return; }
+	if (file !== 'Net1.lwn' && file !== 'Net1-SI.lwn') { return; }
 	// Every id a rule names is an id the project has -- libReadRule()'s own question, asked of the
 	// shipped file rather than of a box somebody is typing in.
 	const ids = {};

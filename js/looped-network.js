@@ -15044,7 +15044,9 @@ var EngCalcs = EngCalcs || {};
 	// What a Zoom to fit shows round a drawing that is a single point: 250 m in a geographic
 	// project, a few streets either way; 250 drawing units (feet or metres) in a grid one.
 	var LPN_POINT_FIT_M = 250;
-	function fitItems(atScale, modelOnly) {
+	// `subset` (Zoom to selection only) is {node:{id:1}, link:{id:1}, label:{id:1}}: anything not in
+	// it contributes nothing, so the same arithmetic frames the selection and not the drawing.
+	function fitItems(atScale, modelOnly, subset) {
 		var out = [], sc = state.s || 1,
 			ignoreDataLabels = !!modelOnly || labelsPastThreshold(atScale);
 		function boxFor(x, y, bx, by, bw, bh) {
@@ -15072,6 +15074,7 @@ var EngCalcs = EngCalcs || {};
 			(sh.pts || []).forEach(function (p) { fitItem(out, p.x, p.y, 6, 6, 6, 6); });
 		});
 		doc.nodes.forEach(function (n) {
+			if (subset && !subset.node[n.id]) { return; }
 			// nodeRadiusFull(), NEVER nodeRadius() -- see its own comment. The fit must not bake in
 			// whichever scale happened to be live when it was asked for.
 			var rad = nodeRadiusFull(n) * sc + 1, ne = nodeEls[n.id] || {}, nat = nodeAt(n);
@@ -15094,6 +15097,7 @@ var EngCalcs = EngCalcs || {};
 			boxFor(ax, ay, lx, base.y - ascent, tw, dataLabelBoxHeight(lc));
 		});
 		doc.links.forEach(function (l) {
+			if (subset && !subset.link[l.id]) { return; }
 			// symbolFactorFull(), not the capped symbolFactor() -- same reason as nodeRadiusFull().
 			var le = linkEls[l.id], j, v, vr = VERTEX_HANDLE_R * symbolFactorFull() * sc;
 			for (j = 0; j < l.verts.length; j++) {
@@ -15121,6 +15125,7 @@ var EngCalcs = EngCalcs || {};
 				lx, ly - ascent, tw, dataLabelBoxHeight(lc));
 		});
 		doc.labels.forEach(function (lb) {
+			if (subset && !subset.label[lb.id]) { return; }
 			var le = labelEls[lb.id]; if (!le) { return; }
 			if (ignoreDataLabels && le.text && le.text.classList &&
 				le.text.classList.contains('lpn-lbl-hidden')) { return; }
@@ -15129,6 +15134,15 @@ var EngCalcs = EngCalcs || {};
 				box = textLabelBox(lb, le, px, py);
 			boxFor(px, py, box.x, box.y, box.w, box.h);
 		});
+		// A selected customer: a meter is a few pixels wide and is not part of the fit proper, so it
+		// is a point with a small reach in pixels.
+		if (subset) {
+			(doc.customers || []).forEach(function (c) {
+				if (!subset.customer[c.id]) { return; }
+				var cp = customerPoint(c), cr = 12;
+				fitItem(out, cp.x, cp.y, cr, cr, cr, cr);
+			});
+		}
 		// An empty drawing still needs two distinct points, or every scale "fits" and the bisection
 		// returns maxScale() on a blank canvas.
 		if (!out.length) { fitItem(out, 0, 0, 0, 0, 0, 0); fitItem(out, 10, 10, 0, 0, 0, 0); return out; }
@@ -15520,6 +15534,41 @@ var EngCalcs = EngCalcs || {};
 			out.push({ l: b.left - cr.left, r: b.right - cr.left, t: b.top - cr.top, b: b.bottom - cr.top });
 		}
 		return out;
+	}
+	// **ZOOM TO SELECTION: THE SAME FRAME AS ZOOM TO FIT, ROUND WHAT IS SELECTED** (Franco's wish
+	// list, row 8). The model's own items only -- no lettering is reserved for, so a press never
+	// depends on the labels' layout -- through fitScaleFor()/fitWindow(), the arithmetic Zoom to fit
+	// uses. A selected pipe brings its two end nodes and its vertices. One asset (or several at one
+	// point) takes fitItems()'s street-scale frame, so it is never zoomed to infinity. The margin is
+	// the fit's own 16 px plus LPN_SELECTION_FIT_MARGIN_PX. Never a status message: with nothing
+	// selected the Map-menu row is disabled and the function does nothing.
+	var LPN_SELECTION_FIT_MARGIN_PX = 48;
+	function zoomSelection() {
+		labelCacheReanchorPending = true;
+		labelCacheReanchor++;
+		try { return zoomSelectionRun(); } finally { labelCacheReanchor--; }
+	}
+	function zoomSelectionRun() {
+		if (!mapSized || !selections.length) { return; }
+		var subset = { node: {}, link: {}, label: {}, customer: {} };
+		selections.forEach(function (sel) {
+			subset[sel.kind][sel.id] = 1;
+			if (sel.kind === 'link') {
+				var l = linkById(sel.id);
+				if (l) { subset.node[l.from] = 1; subset.node[l.to] = 1; }
+			}
+		});
+		var r = svg.getBoundingClientRect(), pad = 16 + LPN_SELECTION_FIT_MARGIN_PX,
+			padTop = Math.max(pad, overlayReserve('lpn_mode_hint') + LPN_SELECTION_FIT_MARGIN_PX),
+			padBottom = Math.max(pad, overlayReserve('lpn_map_footer') + LPN_SELECTION_FIT_MARGIN_PX),
+			items = fitItems(state.s, true, subset),
+			s = Math.min(fitScaleFor(items, 'x', 'l', 'r', r.width, pad, pad),
+				fitScaleFor(items, 'y', 't', 'b', r.height, padTop, padBottom));
+		state.s = s;
+		state.tx = fitWindow(items, s, 'x', 'l', 'r', r.width, pad, pad).t;
+		state.ty = fitWindow(items, s, 'y', 't', 'b', r.height, padTop, padBottom).t;
+		setTransform();
+		onZoomChanged();
 	}
 	// Every piece of lettering and every leader line as the browser DREW it, as fit items at the
 	// scale in force. Only what is visible counts: a label a threshold or the shed has hidden is not
@@ -34723,7 +34772,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		} else if (which === 'nowhere') {
 			txt = pc.lpn_profile_edit_nowhere || 'A point on the path has to be a node. The path is unchanged.';
 		} else if (which === 'blocked') {
-			txt = (pc.lpn_profile_draw_blocked || 'No route from {a} to {b}. Select another node.')
+			txt = (pc.lpn_profile_draw_blocked || 'No route from {a} to {b}. Select a different start or end node.')
 				.replace('{a}', detail[0]).replace('{b}', detail[1]);
 		} else if (which === 'idle' || !d) {
 			txt = pc.lpn_profile_say_idle || 'Press Profile again to select a new path on the map.';
@@ -41334,8 +41383,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				'One Shape imported from {file}.').replace('{file}', fileName));
 			if (renamed.length) {
 				lines.push(counted('lpn_geojson_import_renamed', renamed.length,
-					'{n} feature names cannot be Shape IDs and are kept with the Shapes: {list}.',
-					'One feature name cannot be a Shape ID and is kept with the Shape: {list}.').replace('{list}', renamed.join(', ')));
+					'{n} feature names cannot be used as Shape IDs. Each Shape was given another ID and keeps its feature name: {list}.',
+					'One feature name cannot be used as a Shape ID. The Shape was given another ID and keeps its feature name: {list}.').replace('{list}', renamed.join(', ')));
 			}
 			if (r.skipped.length) {
 				var why = { network: pc.lpn_geojson_import_why_network || 'network asset',
@@ -41442,8 +41491,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				'One Shape imported from {file}.').replace('{file}', fileName));
 		if (renamed.length) {
 			lines.push(gisCounted('lpn_geojson_import_renamed', renamed.length,
-				'{n} feature names cannot be Shape IDs and are kept with the Shapes: {list}.',
-				'One feature name cannot be a Shape ID and is kept with the Shape: {list}.')
+				'{n} feature names cannot be used as Shape IDs. Each Shape was given another ID and keeps its feature name: {list}.',
+				'One feature name cannot be used as a Shape ID. The Shape was given another ID and keeps its feature name: {list}.')
 				.replace('{list}', renamed.slice(0, 5).join(', ') + (renamed.length > 5 ? ', ' +
 					String(pc.lpn_shapes_import_more || 'and {n} more').replace('{n}', String(renamed.length - 5)) : '')));
 		}
@@ -41558,8 +41607,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			function go() { try { place(r); } catch (e) { failed(e); } }
 			if (!r.ok) {
 				if (r.detail === 'damaged') { failed(); return; }
-				if (r.detail === 'noshp') { say(String(pc.lpn_shp_import_noshp || '{file} has no .shp file in it. Pick the .zip of a shapefile, or the .shp together with its .shx, .dbf and .prj (hold Ctrl or Shift to select several).').replace('{file}', fileName), { ok: false, reason: 'noshp' }); }
-				else if (r.detail === 'manyshp') { say(String(pc.lpn_shp_import_manyshp || '{file} holds more than one shapefile. Import one at a time.').replace('{file}', fileName), { ok: false, reason: 'manyshp' }); }
+				if (r.detail === 'noshp') { say(String(pc.lpn_shp_import_noshp || '{file} contains no .shp file. Select either the .zip of a shapefile or the .shp together with its .shx, .dbf, and .prj (hold Ctrl or Shift to select several).').replace('{file}', fileName), { ok: false, reason: 'noshp' }); }
+				else if (r.detail === 'manyshp') { say(String(pc.lpn_shp_import_manyshp || '{file} contains more than one shapefile. Import one at a time.').replace('{file}', fileName), { ok: false, reason: 'manyshp' }); }
 				else { say(String(pc.lpn_shp_import_unreadable || '{file} is not a shapefile this page can read: {detail}').replace('{file}', fileName).replace('{detail}', r.detail || ''), { ok: false, reason: 'unreadable' }); }
 				return;
 			}
@@ -41585,7 +41634,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			}
 			var theirsName = prj ? (prj.epsg ? (prj.name ? prj.name + ' (' + prj.epsg + ')' : prj.epsg) : prj.name) : '';
 			if (!prj) {
-				var pick = String(pc.lpn_shp_import_pick_hint || 'A shapefile is several files. Pick the .shp together with its .shx, .dbf and .prj (hold Ctrl or Shift to select several), or pick the .zip.');
+				var pick = String(pc.lpn_shp_import_pick_hint || 'A shapefile is several files. Select the .shp together with its .shx, .dbf, and .prj (hold Ctrl or Shift to select several), or select the .zip.');
 				if (geo && !opt.webMerc) {
 					// No .prj: degrees only if every number can be one.
 					r.shapes.forEach(function (sh) { sh.pts.forEach(function (q) { if (!(q.x >= -180 && q.x <= 180 && q.y >= -90 && q.y <= 90)) { ok = false; } }); });
@@ -41751,8 +41800,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			var sk = r.skipped;
 			if (sk.length) {
 				var total = sk.reduce(function (s, k) { return s + k.n; }, 0);
-				skipped.push(gisCounted('lpn_shp_import_skipped', total, '{n} records not imported, because their shape type is not read: {list}.',
-					'One record not imported, because its shape type is not read: {list}.').replace('{list}', gisList(sk)));
+				skipped.push(gisCounted('lpn_shp_import_skipped', total, '{n} records not imported, because their geometry type is not read: {list}.',
+					'One record not imported, because its geometry type is not read: {list}.').replace('{list}', gisList(sk)));
 			}
 			if (bad.length) {
 				var nums = bad.map(function (k) { return k.name; });
@@ -49948,6 +49997,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var pc = EngCalcs.pageConfig || {};
 		return [
 			{ icon: 'zoom', label: pc.lpn_tool_zoom_extent || 'Zoom to fit', tip: pc.lpn_tool_zoom_extent_tip, fn: zoomExtent },
+			// Beside Zoom to fit, which frames everything; this frames what is selected. Disabled
+			// with nothing selected, never hidden (Tom, 2026-09-22: keep all rows visible).
+			{ icon: 'zoom', label: pc.lpn_tool_zoom_selection || 'Zoom to selection', tip: pc.lpn_tool_zoom_selection_tip, disabled: !selectionCount(), fn: zoomSelection },
 			// **A DOOR TO ZOOM WINDOW THAT NEEDS NO ZOOM TO FIT FIRST** (Tom, 2026-10-07: "We need a way to
 			// zoom window without Zoom to Fit first."). The toolbar button still reaches it by a second
 			// press; this row and the W key enter it directly. Pointer-only, like every tool that

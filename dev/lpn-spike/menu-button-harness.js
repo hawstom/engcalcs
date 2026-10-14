@@ -54,9 +54,8 @@ function toolbarRulesOnMaster() {
 	const text = execFileSync('git', ['show', 'master:css/engcalcs.css'], { cwd: env.REPO, encoding: 'utf8' });
 	const grab = (re) => { const m = re.exec(text); if (!m) { throw new Error('rule not found on master: ' + re); } return m[0]; };
 	return {
-		base: grab(/#lpn_toolbar button:not\(\.lpn-transport-btn\) \{[^}]*\}/),
-		hover: grab(/#lpn_toolbar button:not\(\.lpn-transport-btn\):hover \{[^}]*\}/),
-		pressed: grab(/#lpn_toolbar button:not\(\.lpn-transport-btn\)\[aria-pressed="true"\] \{[^}]*\}/)
+		// Only the toolbar's own padding rule: hover and pressed now share the button base with the menu bar.
+		base: grab(/^#lpn_toolbar button:not\(\.lpn-transport-btn\) \{[^}]*\}/m)
 	};
 }
 
@@ -135,8 +134,9 @@ async function main() {
 			});
 			ok('toolbar button background is still "none" (transparent)',
 				toolbarSample.bg === 'rgba(0, 0, 0, 0)', toolbarSample.bg);
-			ok('toolbar button border-radius is still master\'s 4px',
-				/4px/.test(masterToolbar.base) && toolbarSample.radius === '4px', toolbarSample.radius);
+			// The radius joined the menu bar's on purpose (feat/button-base, one button base: --ec-btn-radius).
+			ok('toolbar button border-radius is the shared button base, 5px',
+				toolbarSample.radius === '5px', toolbarSample.radius);
 			ok('toolbar button padding is still master\'s "3px 5px"',
 				/padding: 3px 5px/.test(masterToolbar.base) && toolbarSample.padding === '3px 5px', toolbarSample.padding);
 

@@ -104,7 +104,7 @@ const EC_HARNESS_WORDING_EXCEPT = [
             . 'not ours; lpn_library_rule_tip quotes a rule of the same shape as an example.',
     ],
     'dev/lpn-spike/examples-gallery-harness.js' => [
-        'litres per second' =>
+        'liters per second' =>
             '(a) the assertion is that the FLOW unit is named before the length units inside the '
             . 'example description, so the two unit words are the specification being held.',
         'gallons per minute' =>

@@ -679,6 +679,27 @@
    "words": "feat/convert-search: Perfect. Merge.",
    "context": "Typed in the session on 2026-10-12 above his pasted browser-pass report, which says the same.",
    "pin_note": "Pinned to the head served on the preview; merged directly with no further commits."
+  },
+  "feat/si-example-more": {
+   "head": "e89c63a4f9cb5d5aa70734b94f1a8138c3ae1837",
+   "date": "2026-10-14",
+   "words": "Merge feat/si-example-more",
+   "context": "Typed in the session on 2026-10-14 after the preview listed in that day's report.",
+   "pin_note": "He cleared the previewed head 7811251b. The pin is the master merge into the branch, plus regenerated translation payloads where the branch added keys; no feature change."
+  },
+  "feat/button-base": {
+   "head": "f7c5614b20edb1c5207f0b42c5d477b99ceb3fa6",
+   "date": "2026-10-14",
+   "words": "Merge feat/button-base",
+   "context": "Typed in the session on 2026-10-14 after the preview listed in that day's report.",
+   "pin_note": "He cleared the previewed head 234bcc76. The pin is the master merge into the branch, plus regenerated translation payloads where the branch added keys; no feature change."
+  },
+  "feat/zoom-selection": {
+   "head": "bc0bc7737c045963fe761c5b0247ae0bdbe745e1",
+   "date": "2026-10-14",
+   "words": "Merge feat/zoom-selection",
+   "context": "Typed in the session on 2026-10-14 after the preview listed in that day's report.",
+   "pin_note": "He cleared the previewed head 29e354ca. The pin is the master merge into the branch, plus regenerated translation payloads where the branch added keys; no feature change."
   }
  }
 }

@@ -668,6 +668,9 @@ $ec_lang['lpn_tool_add_meter']='Abonat';
 $ec_lang['lpn_tool_add_meter_tip']='Specificați punctul abonatului, apoi conexiunea lui: o legătură sau un nod. Cerința pe care o atribuiți abonatului este adăugată nodului de la capătul cel mai apropiat al acelei legături.';
 $ec_lang['lpn_mode_add_meter']='Abonat: specificați unde se află abonatul, apoi selectați conducta sau nodul care îl deservește. Sau folosiți Esc pentru a anula.';
 $ec_lang['lpn_pane_tab_customers']='Abonați';
+$ec_lang['lpn_pane_tab_shapes']='Figuri';
+$ec_lang['lpn_pane_shape_closed']='Închisă';
+$ec_lang['lpn_pane_shape_points']='Puncte';
 $ec_lang['lpn_customer_heading']='Abonat {id}';
 // ROADMAP Task 247. lpn_field_account and lpn_field_account_tip were DELETED 2026-09-19 (Tom:
 // "Didn't I say to trash Account number since they can just make a Custom property for that or
@@ -776,6 +779,9 @@ $ec_lang['lpn_pane_paste_text_no_position']='Rândul {row}: un Text nou are nevo
 // {id} is what the Text table's own Attached to cell named.
 $ec_lang['lpn_pane_paste_no_anchor']='Rândul {row}: {id} nu este încă un nod sau o conductă în această rețea. Lipiți-l mai întâi, apoi acest Text.';
 $ec_lang['lpn_pane_paste_customer_no_position']='Rândul {row}: un Abonat nou are nevoie atât de {first} cât și de {second}.';
+$ec_lang['lpn_pane_paste_shape_no_points']='Rândul {row}: o Figură nouă are nevoie de Puncte.';
+$ec_lang['lpn_pane_paste_shape_bad_points']='Rândul {row}: {text} nu este o listă de puncte. Scrieți fiecare punct ca {pair}, cu punct (.) ca separator zecimal, și separați punctele prin |.';
+$ec_lang['lpn_pane_paste_shape_closed_few']='Rândul {row}: o Figură închisă are nevoie de cel puțin trei puncte.';
 $ec_lang['lpn_pane_paste_no_customer_ref']='Rândul {row}: un Abonat nou are nevoie de o conductă sau un nod conectat.';
 $ec_lang['lpn_pane_paste_no_pipe']='Rândul {row}: conducta {id} nu există încă. Lipiți mai întâi conductele, apoi abonații.';
 $ec_lang['lpn_pane_paste_no_customer_node']='Rândul {row}: nodul {id} nu există încă. Lipiți mai întâi joncțiunile, apoi abonații.';
@@ -955,23 +961,27 @@ $ec_lang['lpn_map_unmeasurable']='Această pagină nu a putut determina dimensiu
 // setting is literally GPM or LPS, never "US" or "SI" -- so a water engineer reads the flow unit as
 // the name of the system, and the length units as detail that follows from it.
 $ec_lang['lpn_ex_basic_si_title']='Rețea de bază, L/s (SI)';
-$ec_lang['lpn_ex_basic_si_desc']='Începeți de aici. Un rezervor, o pompă și un mic inel: cel mai mic aranjament care funcționează totuși ca o rețea de apă. Litri pe secundă, cu metri și milimetri.';
+$ec_lang['lpn_ex_basic_si_desc']='Două rezervoare, o pompă și un mic inel. Litri pe secundă, cu metri și milimetri.';
 $ec_lang['lpn_ex_basic_us_title']='Rețea de bază, gpm (SUA)';
-$ec_lang['lpn_ex_basic_us_desc']='Aceeași rețea de pornire, în galoane pe minut, cu picioare și inci.';
+$ec_lang['lpn_ex_basic_us_desc']='Două rezervoare, o pompă și un mic inel. Galoane pe minut, cu picioare și inci.';
 // **NOT PLAIN EPA Net1 ANY MORE, AND THE TITLE SAYS SO** (Tom, 2026-09-08: *"Net1 plus rule-based
 // controls: OK"*). Two `[RULES]` were added to the shipped file so the rule editor can be exercised
 // from the gallery; the rules stay, and the name stops claiming to be the sample as EPA ships it.
 $ec_lang['lpn_ex_net1_title']='EPANET Net1 plus controale bazate pe reguli';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_ex_net1_desc']='Cea mai mică dintre cele trei rețele de exemplu ale EPANET: un rezervor, o pompă și un singur inel.';
-$ec_lang['lpn_ex_net2_title']='EPANET Net2';
+$ec_lang['lpn_ex_net1_desc']='Un exemplu EPANET fictiv, cu clor, un rezervor și un bazin.';
+$ec_lang['lpn_ex_net2_si_title']='EPANET Net2, L/s (SI)';
+$ec_lang['lpn_ex_net2_si_desc']='Litri pe secundă, cu metri și milimetri. Un exemplu EPANET de la Branford, Connecticut, convertit din galoane pe minut, picioare și inci: 35 de joncțiuni și un bazin, fără rezervor, fără pompă și fără vane, pe aproximativ 2 km pe 4 km. Fluorura, o substanță nereactivă, intră dintr-o singură sursă.';
+$ec_lang['lpn_ex_net2_title']='EPANET Net2, gpm (US)';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_ex_net2_desc']='Un sistem de distribuție ramificat cu un bazin, din exemplele EPANET.';
-$ec_lang['lpn_ex_net3_title']='EPANET Net3';
+$ec_lang['lpn_ex_net2_desc']='Galoane pe minut, cu picioare și inci. Un exemplu EPANET de la Branford, Connecticut: 35 de joncțiuni și un bazin, fără rezervor, fără pompă și fără vane, pe aproximativ 1 milă pe 2 mile. Fluorura, o substanță nereactivă, intră dintr-o singură sursă.';
+$ec_lang['lpn_ex_net3_si_title']='EPANET Net3, L/s (SI)';
+$ec_lang['lpn_ex_net3_si_desc']='Litri pe secundă, cu metri și milimetri. Un exemplu EPANET de la Novato, California, convertit din galoane pe minut, picioare și inci, cu harta lumii în spate: 92 de joncțiuni, trei bazine și două rezervoare, fără vane, cu latura de aproximativ 8 km. O simulare pe perioadă extinsă de 24 de ore, cu o urmărire sursă de la Lac.';
+$ec_lang['lpn_ex_net3_title']='EPANET Net3, gpm (US)';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_ex_net3_desc']='Exemplul mare EPANET: 92 de joncțiuni, trei bazine și două rezervoare, unul dintre ele un râu. Arată cum apare pe hartă un model de dimensiune reală.';
-$ec_lang['lpn_ex_elm_street_title']='Elm Street Center';
-$ec_lang['lpn_ex_elm_street_desc']='Un amplasament comercial rezolvat pentru debitul de incendiu peste cerința zilei de vârf, la un moment dat, desenat peste un plan de amplasament.';
+$ec_lang['lpn_ex_net3_desc']='Galoane pe minut, cu picioare și inci. Un exemplu EPANET de la Novato, California, cu harta lumii în spate: 92 de joncțiuni, trei bazine și două rezervoare, fără vane, cu latura de aproximativ 5 mile. O simulare pe perioadă extinsă de 24 de ore, cu o urmărire sursă de la Lac.';
+$ec_lang['lpn_ex_elm_street_title']='Elm Street Center, gpm (US)';
+$ec_lang['lpn_ex_elm_street_desc']='Galoane pe minut, cu picioare și inci. Prescott Valley, Arizona: 17 joncțiuni, un rezervor și o pompă. Un amplasament comercial rezolvat pentru debitul de incendiu peste cerința zilei maxime, la un moment dat, desenat peste un plan de amplasament.';
 $ec_lang['lpn_tool_undo']='Anulare';
 $ec_lang['lpn_confirm_example']='Aceasta adaugă exemplul la rețeaua pe care o aveți deja. Continuați?';
 $ec_lang['lpn_field_diameter']='Diametru';
@@ -1171,7 +1181,7 @@ $ec_lang['lpn_tool_key_hint']='Comandă rapidă: apăsați {key}.';
 $ec_lang['lpn_tool_key_hint_two']='Comandă rapidă: apăsați {key} sau {key2}.';
 // Edited by TGH 2026-09-07; the Shift sentence rewritten 2026-09-08 on his ruling that Shift keeps
 // the selection and toggles what the shape catches (it used to say "add").
-$ec_lang['lpn_tool_area_tip']='Urmați indicațiile de pe ecran. Apăsați din nou pentru a parcurge pe rând fereastra, lasoul și poligonul. Țineți apăsat Shift pentru a păstra selecția curentă și a adăuga sau elimina (comuta) ceea ce selectați.';
+$ec_lang['lpn_tool_area_tip']='Selectare de zonă cu fereastră, lasou sau poligon.';
 $ec_lang['lpn_area_selected']='{n} selectate.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_area_none']='Nu s-a găsit nimic în acea zonă.';
@@ -1179,7 +1189,7 @@ $ec_lang['lpn_area_none']='Nu s-a găsit nimic în acea zonă.';
 $ec_lang['lpn_tool_vertices_tip']='Adăugați și eliminați vârfurile conductelor. Specificați un punct pe o conductă pentru a adăuga un vârf, selectați un vârf pentru a-l elimina și trageți un vârf pentru a-l muta. Un vârf modifică lungimea automată, dar nu adaugă și nu modifică pierderile locale (minore).';
 $ec_lang['lpn_tool_undo_tip']='Lungimea istoricului de anulare = 20 de acțiuni';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_tool_zoom_extent_tip']='Încadrează întreaga rețea în fereastra hărții. Pentru Zoom fereastră fără încadrare prealabilă, apăsați W sau faceți clic pe triunghiul mic din colțul butonului Încadrează tot de pe bara de instrumente. Vedeți și comenzile de zoom ale hărții din dreapta sus.';
+$ec_lang['lpn_tool_zoom_extent_tip']='Încadrează întreaga rețea în fereastra hărții. Pentru a mări în schimb la un dreptunghi pe care îl trageți, apăsați W sau selectați triunghiul mic din colțul butonului Încadrează tot de pe bara de instrumente. Vedeți și comenzile de zoom ale hărții din dreapta sus.';
 $ec_lang['lpn_tool_zoom_window_tip']='Specificați colțurile sau trageți un dreptunghi. Apăsați din nou pentru Încadrează tot.';
 // Tom's wording, 2026-09-25.
 $ec_lang['lpn_zoom_in_tip']='Mărire. Comandă rapidă: +';
@@ -3787,6 +3797,66 @@ $ec_lang['lpn_ff_err_unknown']='Niciun rezultat. Cod de eroare: {code}';
 // a plane coordinate read as a degree is silent and puts a network in the Gulf of Guinea.
 $ec_lang['lpn_file_import_survey']='Importă puncte topografice…';
 $ec_lang['lpn_file_import_survey_tip']='Citește o listă de puncte topografice dintr-un fișier text și creează câte o joncțiune la fiecare punct, preluând setările pentru elemente noi pentru tot ce fișierul nu precizează. Nu se desenează nicio conductă decât dacă selectați Citește descrierea ca pe coduri de teren, iar niciun rând nu este omis fără a fi numit. Citește sistemul de coordonate pe care acest proiect îl folosește deja, georeferențiat sau nu.';
+$ec_lang['lpn_file_import_shapes']='Importă figuri GeoJSON…';
+$ec_lang['lpn_file_import_shapes_tip']='Citește punctele, liniile și poligoanele dintr-un fișier GeoJSON în acest proiect, ca Figuri. Elementele de rețea din fișier nu sunt importate; importați rețeaua dintr-un fișier EPANET. Proiectul trebuie să fie georeferențiat sau să indice un sistem de coordonate.';
+$ec_lang['lpn_geojson_import_done']='{n} Figuri importate din {file}.';
+$ec_lang['lpn_geojson_import_done_one']='O Figură importată din {file}.';
+$ec_lang['lpn_geojson_import_renamed']='{n} nume de entități nu pot fi folosite ca ID-uri de Figură. Fiecărei Figuri i s-a atribuit alt ID și își păstrează numele entității: {list}.';
+$ec_lang['lpn_geojson_import_renamed_one']='Un nume de entitate nu poate fi folosit ca ID de Figură. Figura a primit alt ID și își păstrează numele entității: {list}.';
+$ec_lang['lpn_geojson_import_skipped']='{n} entități neimportate: {list}.';
+$ec_lang['lpn_geojson_import_skipped_one']='O entitate neimportată: {list}.';
+$ec_lang['lpn_geojson_import_why_network']='element de rețea';
+$ec_lang['lpn_geojson_import_why_geometry']='nu este punct, linie sau poligon';
+$ec_lang['lpn_geojson_import_why_position']='poziție care nu este o latitudine și o longitudine valide';
+$ec_lang['lpn_geojson_import_holes']='{n} găuri de poligon neimportate. O Figură are un singur contur.';
+$ec_lang['lpn_geojson_import_holes_one']='O gaură de poligon neimportată. O Figură are un singur contur.';
+$ec_lang['lpn_geojson_import_parts']='{n} entități cu mai multe părți importate ca o Figură pentru fiecare parte.';
+$ec_lang['lpn_geojson_import_parts_one']='O entitate cu mai multe părți importată ca o Figură pentru fiecare parte.';
+$ec_lang['lpn_geojson_import_local']='Pozițiile GeoJSON sunt latitudine și longitudine, iar acest proiect nu are un loc pe Pământ în care să poată fi convertite. Georeferențiați-l mai întâi cu Hartă, Harta lumii, Atașează, apoi importați din nou.';
+$ec_lang['lpn_geojson_import_unreadable']='{file} nu este un fișier GeoJSON: {detail}';
+$ec_lang['lpn_file_import_dxf']='Importă figuri DXF…';
+$ec_lang['lpn_file_import_dxf_tip']='Citește punctele, liniile și poliliniile dintr-un fișier DXF ASCII în acest proiect, ca Figuri, păstrând numele fiecărui strat ca proprietate. Celelalte entități sunt numărate și listate, nu importate. Coordonatele sunt citite ca X și Y ale acestui proiect, fără conversie.';
+$ec_lang['lpn_file_import_shp']='Importă figuri shapefile…';
+$ec_lang['lpn_file_import_shp_tip']='Citește punctele, liniile și poligoanele dintr-un shapefile ESRI în acest proiect, ca Figuri, păstrând coloanele de atribute ca proprietăți. Selectați fie fișierul .zip, fie fișierul .shp împreună cu .shx, .dbf și .prj (țineți apăsat Ctrl sau Shift pentru a selecta mai multe). Coordonatele dintr-un sistem de coordonate diferit de cel al proiectului sunt convertite, iar notificarea indică acest lucru.';
+$ec_lang['lpn_dxf_import_skipped']='{n} entități neimportate: {list}.';
+$ec_lang['lpn_dxf_import_skipped_one']='O entitate neimportată: {list}.';
+$ec_lang['lpn_dxf_import_inblocks']='în definițiile de blocuri';
+$ec_lang['lpn_dxf_import_bulge']='{n} polilinii au segmente de arc, care au fost importate ca segmente drepte între vârfurile lor.';
+$ec_lang['lpn_dxf_import_bulge_one']='O polilinie are segmente de arc, care au fost importate ca segmente drepte între vârfurile sale.';
+$ec_lang['lpn_dxf_import_units']='Desenul indică unitățile sale ca {theirs}, iar acest proiect folosește {ours}. Numerele nu au fost modificate.';
+$ec_lang['lpn_dxf_import_refuse_geo']='Un desen DXF este plan, iar acest proiect este în latitudine și longitudine, deci coordonatele din {file} nu au loc în el. Folosiți Convertește ca… pentru a copia proiectul într-un sistem de coordonate, apoi importați din nou.';
+$ec_lang['lpn_dxf_import_unreadable']='{file} nu este un fișier DXF ASCII.';
+$ec_lang['lpn_dxf_import_binary']='{file} este un fișier DXF binar. Salvați-l din programul CAD ca DXF ASCII, apoi importați din nou.';
+$ec_lang['lpn_shapes_import_frame']='Coordonatele au fost citite ca {frame}, fără conversie.';
+$ec_lang['lpn_shapes_frame_xy']='X și Y ale acestui proiect';
+$ec_lang['lpn_shapes_frame_latlon']='latitudine și longitudine';
+$ec_lang['lpn_shp_import_skipped']='{n} înregistrări neimportate, deoarece tipul lor de geometrie nu este citit: {list}.';
+$ec_lang['lpn_shp_import_skipped_one']='O înregistrare neimportată, deoarece tipul ei de geometrie nu este citit: {list}.';
+$ec_lang['lpn_shp_import_attrs']='Coloane de atribute păstrate ca proprietăți ale fiecărei Figuri: {list}.';
+$ec_lang['lpn_shp_import_noprj']='Nu există fișier .prj, deci coordonatele au fost citite ca {frame}, fără conversie.';
+$ec_lang['lpn_shp_import_prj_same']='Fișierul .prj indică {crs}, sistemul de coordonate al acestui proiect, deci coordonatele nu au fost modificate.';
+$ec_lang['lpn_shp_import_converted']='Coordonatele sunt latitudine și longitudine. Au fost convertite în {crs} prin transformarea folosită de hartă.';
+$ec_lang['lpn_shp_import_prj_other']='Fișierul .prj indică {theirs}. Acest proiect nu indică niciun sistem de coordonate, deci coordonatele au fost citite ca {frame}, fără conversie.';
+$ec_lang['lpn_shp_import_refuse_local']='{file} este în latitudine și longitudine, iar acest proiect nu are un loc pe Pământ în care să poată fi convertite. Georeferențiați-l mai întâi cu Hartă, Harta lumii, Atașează, apoi importați din nou.';
+$ec_lang['lpn_shp_import_refuse_crs']='{file} indică {theirs}, iar acest proiect este în {ours}. Nu s-a importat și nu s-a convertit nimic.';
+$ec_lang['lpn_shp_import_refuse_range']='{file} nu are fișier .prj, iar coordonatele sale nu sunt latitudini și longitudini, deci nu pot fi plasate în acest proiect.';
+$ec_lang['lpn_shp_import_noshp']='{file} nu conține niciun fișier .shp. Selectați fie fișierul .zip al unui shapefile, fie fișierul .shp împreună cu .shx, .dbf și .prj (țineți apăsat Ctrl sau Shift pentru a selecta mai multe).';
+$ec_lang['lpn_shp_import_manyshp']='{file} conține mai mult de un shapefile. Importați câte unul.';
+$ec_lang['lpn_shp_import_unreadable']='{file} nu este un shapefile pe care această pagină îl poate citi: {detail}';
+$ec_lang['lpn_shp_import_pick_hint']='Un shapefile este format din mai multe fișiere. Selectați fișierul .shp împreună cu .shx, .dbf și .prj (țineți apăsat Ctrl sau Shift pentru a selecta mai multe) sau selectați fișierul .zip.';
+$ec_lang['lpn_shp_import_webmerc_ask']='{file} nu are fișier .prj, iar numerele sale nu sunt latitudini și longitudini, dar se potrivesc cu metrii Web Mercator (EPSG:3857), sistemul folosit de QGIS și de hărțile web. Le importați ca EPSG:3857 și le convertiți pentru acest proiect?';
+$ec_lang['lpn_shp_import_webmerc_ok']='Importă ca EPSG:3857';
+$ec_lang['lpn_shp_import_webmerc_far_ask']='{file} indică {theirs}, iar citite în acest sistem, coordonatele sale se află la {km} km de acest proiect. Citite ca metri Web Mercator (EPSG:3857), sistemul folosit de QGIS și de hărțile web, ele se află acolo unde este acest proiect. Le importați ca EPSG:3857 și le convertiți pentru acest proiect?';
+$ec_lang['lpn_shp_import_reprojected']='Coordonatele au fost convertite din {theirs} în {ours}.';
+$ec_lang['lpn_shp_import_unplaced']='{n} înregistrări au coordonate pe care acest proiect nu le poate plasa, de exemplu o latitudine dincolo de limita hărții. Numere de înregistrare: {list}.';
+$ec_lang['lpn_shp_import_unplaced_one']='O înregistrare are coordonate pe care acest proiect nu le poate plasa, de exemplu o latitudine dincolo de limita hărții. Număr de înregistrare: {list}.';
+$ec_lang['lpn_shapes_import_none']='Nu s-a importat nimic din {file}.';
+$ec_lang['lpn_shp_import_convert_hint']='Folosiți Convertește ca… pentru a copia proiectul în {theirs}, apoi importați din nou.';
+$ec_lang['lpn_shp_import_damaged']='{file} este deteriorat sau trunchiat, deci nu s-a importat nimic.';
+$ec_lang['lpn_shp_import_deleted']='{n} înregistrări marcate ca șterse în .dbf nu au fost importate.';
+$ec_lang['lpn_shp_import_deleted_one']='O înregistrare marcată ca ștearsă în .dbf nu a fost importată.';
+$ec_lang['lpn_dxf_import_paperspace']='în spațiul hârtie';
+$ec_lang['lpn_shapes_import_more']='și încă {n}';
 $ec_lang['lpn_survey_read_error']='Acel fișier nu a putut fi citit de pe disc.';
 $ec_lang['lpn_survey_cancelled']='Nimic nu a fost creat și nimic nu a fost schimbat.';
 // What the project calls its two axes, for a sentence js/lpn-survey.js writes about a column. The
@@ -3880,7 +3950,7 @@ $ec_lang['lpn_copy_copy']='O copie; creează o blocare nouă';
 $ec_lang['lpn_copy_kept_link']='{name} a fost deschis ca original, mutat într-un loc nou. Salvează scrie acum în acest fișier.';
 $ec_lang['lpn_copy_opened']='{file} a fost deschis ca o copie și salvat, cu o blocare nouă.';
 $ec_lang['lpn_scenario_basic']='Mod de bază';
-$ec_lang['lpn_scenario_basic_tip']='Selectat: un scenariu constă doar din valorile stabilite în el. Debifat: acest meniu oferă și tabelul de previzualizare a Alternativelor, care arată cum sunt grupate acele valori pe categorii, și permite unui scenariu să aibă o durată totală de rulare și un pas de timp hidraulic separate. Opiniile despre această funcție sunt binevenite.';
+$ec_lang['lpn_scenario_basic_tip']='Bifat: un scenariu constă doar din valorile stabilite în el. Debifat: acest meniu oferă și tabelul de previzualizare a Alternativelor, care arată cum sunt grupate acele valori pe categorii, și permite unui scenariu să aibă o durată totală de rulare și un pas de timp hidraulic separate. Opiniile despre această funcție sunt binevenite.';
 $ec_lang['lpn_alt_cat_physical']='Fizic';
 $ec_lang['lpn_alt_cat_demand']='Cerință';
 $ec_lang['lpn_alt_cat_topology']='Activarea elementelor';
@@ -3993,6 +4063,8 @@ $ec_lang['lpn_fb_failed']='Mesajul nu a ajuns la noi. Ce ați scris este încă 
 $ec_lang['lpn_fb_bad_email']='Această adresă de e-mail nu pare corectă. Corectați-o sau lăsați câmpul gol.';
 $ec_lang['lpn_fb_busy']='Au sosit prea multe mesaje în ultimele minute. Ce ați scris este încă aici, deci puteți încerca din nou mai târziu.';
 $ec_lang['lpn_tool_add_chain_tip']='Înlănțuiți joncțiuni și conducte: specificați un punct pe hartă pentru a adăuga o joncțiune, apoi specificați fiecare punct următor pentru a adăuga o conductă și o joncțiune. Specificați un nod existent pentru a continua de la el. Apăsați Escape pentru a încheia lanțul.';
+$ec_lang['lpn_tool_add_shape']='Figură';
+$ec_lang['lpn_tool_add_shape_tip']='Desenați pe hartă un punct, o polilinie sau un poligon. O Figură este o adnotare și nu face parte din rețea. Specificați fiecare punct, apoi specificați din nou ultimul punct, apăsați Enter sau faceți clic dreapta pentru a termina. Specificați din nou primul punct pentru a închide Figura într-un poligon.';
 $ec_lang['lpn_pane_filter_sel_note']='Doar selecția. Se afișează {n} din {all}.';
 $ec_lang['lpn_pane_filter_sel_and']='Filtrat după {q} și doar selecția. Se afișează {n} din {all}.';
 $ec_lang['lpn_pane_filter_sel_none']='Niciunul dintre elementele selectate nu se află în acest tabel.';
@@ -4053,6 +4125,7 @@ $ec_lang['lpn_copy_opened_unsaved']='{file} a fost deschis ca o copie, cu o bloc
 $ec_lang['lpn_engine_unavailable_why']='Vanele de control al presiunii și al debitului (PRV, PSV, FCV) nu pot fi rezolvate fără rezolvitorul EPANET. {reason}';
 $ec_lang['lpn_engine_needed_failed_why']='Această rețea poate fi rezolvată doar de rezolvitorul EPANET. {reason}';
 $ec_lang['lpn_mode_add_chain']='Mod: Lanț joncțiune-conductă. Specificați un punct pe hartă pentru a adăuga o joncțiune, apoi specificați fiecare punct următor pentru a adăuga o conductă și o joncțiune. Specificați un nod existent pentru a continua de la el. Apăsați Escape pentru a încheia lanțul. Comutați la modul Selectare pentru a modifica sau muta elemente și etichete.';
+$ec_lang['lpn_mode_add_shape']='Mod: Adăugare Figură. Specificați fiecare punct. Specificați din nou ultimul punct sau apăsați Enter pentru a termina; specificați primul punct pentru a închide un poligon.';
 $ec_lang['lpn_cp_allow_tip']='Permite doar aceste caractere:';
 $ec_lang['lpn_cp_characters_tip']='„@” înseamnă orice literă; „#” înseamnă orice cifră, iar „-”, „.” și „,” trebuie enumerate separat dacă sunt permise; iar orice spațiu alb trebuie să se afle între alte caractere.';
 $ec_lang['lpn_valwarn_diameter']='Diametrul unei conducte sau al unei vane este în mod normal între {min} și {max} {unit}. Verificați numărul și unitatea diametrului.';
@@ -4193,11 +4266,11 @@ $ec_lang['lpn_tank_ground_elev_tip']='Cota terenului la bazin. Presiunea la bazi
 $ec_lang['lpn_guide_about_heading']='Despre acest calculator';
 $ec_lang['lpn_guide_group_from']='Din {menu}';
 $ec_lang['lpn_guide_menu_named']='Meniul {menu}';
-$ec_lang['lpn_help_manual']='Ghid';
+$ec_lang['lpn_help_manual']='Manual de utilizare';
 $ec_lang['lpn_guide_contents']='Cuprins';
 $ec_lang['lpn_guide_rail_hide']='Ascunde cuprinsul';
 $ec_lang['lpn_guide_rail_show']='Arată cuprinsul';
-$ec_lang['lpn_guide_search']='Căutare în ghid';
+$ec_lang['lpn_guide_search']='Căutare în manualul de utilizare';
 $ec_lang['lpn_guide_boxes_heading']='Casete';
 $ec_lang['lpn_guide_boxes_intro']='Fiecare casetă poate fi mutată, redimensionată, ancorată în stânga sau în dreapta hărții ori închisă. Semnul ? din bara de titlu a casetei deschide ajutorul ei.';
 $ec_lang['lpn_guide_boxes_autohide']='Când cursorul părăsește caseta, o casetă fără focalizare se ascunde după o scurtă întârziere. O casetă cu focalizare se ascunde când faceți clic în afara ei, apăsați Esc sau părăsiți-o cu Tab, cu cursorul în altă parte.';
@@ -4217,20 +4290,20 @@ $ec_lang['lpn_guide_text_alt_box']='Arată, pentru fiecare scenariu, ce alternat
 $ec_lang['lpn_guide_text_full_box']='Listează fiecare nod și fiecare legătură la fiecare pas de timp de raportare, în unitățile arătate în panoul Tabele. Fără simulare pe perioadă extinsă, arată soluția curentă la un singur moment. Descărcarea sau tipărirea cuprinde fiecare pas de timp, iar tabelul arată câte unul pe rând.';
 $ec_lang['lpn_guide_text_calib_box']='Compară un fișier de măsurători din teren cu rezultatele calculate în aceleași locuri și momente, câte un fișier pentru fiecare parametru. Fișierul este păstrat numai pe durata sesiunii curente și nu este salvat cu proiectul.';
 $ec_lang['lpn_guide_text_notes_popup']='Listează note despre comportamentul acestei pagini și despre ce nu face, fiecare ca un termen urmat de definiția lui. Nu modifică rețeaua.';
-$ec_lang['lpn_guide_text_hotkeys_popup']='Listează fiecare buton al barei de instrumente și fiecare rând de meniu, comenzile rapide de la tastatură și câte o intrare pentru fiecare casetă. Alegerea unui rând arată unde se află acel control; nu îl execută. Pentru a căuta, apăsați Ctrl+K de oriunde sau / cât timp ghidul are focalizarea.';
+$ec_lang['lpn_guide_text_hotkeys_popup']='Listează fiecare buton al barei de instrumente și fiecare rând de meniu, comenzile rapide de la tastatură și câte o intrare pentru fiecare casetă. Alegerea unui rând arată unde se află acel control; nu îl execută. Pentru a căuta, apăsați Ctrl+K de oriunde sau / cât timp manualul de utilizare are focalizarea.';
 $ec_lang['lpn_guide_find_query_term']='Limbajul interogărilor';
-$ec_lang['lpn_guide_find_query_def']='<table class="lpn-notes-table"><tbody><tr><td><code>Domeniu.Proprietate condiție valoare</code></td><td>O condiție. Domeniul este Everything, Junction, Reservoir, Tank, Pipe, Pump, Valve, Text, Customer sau Source. Proprietatea este orice intrare din lista Proprietate pentru acel domeniu.</td></tr><tr><td>Condiții</td><td>equal to, above, below, contains, n highest, n lowest și empty. Contains se aplică numai textului. La n highest și n lowest, n este un număr, ca în 5 highest. Cu litera n însăși, ca în <code>Pipe.Velocity n highest</code>, sau cu caseta Valoare goală, sunt listate 10 elemente. Empty găsește elementele care nu au nicio valoare pentru proprietate. Conectivitatea are patru condiții și nu primește valoare.</td></tr><tr><td>Valori</td><td>Un număr se introduce fără unitate, în unitatea arătată în Proprietăți și în panoul Tabele: 40, nu 40 psi. Textul, inclusiv un ID, se încadrează între ghilimele simple sau duble: <code>\'60\'</code>.</td></tr><tr><td>AND, OR și parantezele</td><td>AND se evaluează înaintea lui OR, iar parantezele grupează condițiile. NOT nu este disponibil.</td></tr><tr><td>Ortografie</td><td>Cuvintele nu țin cont de majuscule. Cuvintele englezești sunt acceptate în orice limbă, deci o interogare copiată din acest ghid rulează pe o pagină în orice limbă.</td></tr></tbody></table>';
+$ec_lang['lpn_guide_find_query_def']='<table class="lpn-notes-table"><tbody><tr><td><code>Domeniu.Proprietate condiție valoare</code></td><td>O condiție. Domeniul, ales în lista Ce se caută, este Toate, Joncțiune, Rezervor, Bazin, Conductă, Pompă, Vană, Text, Abonat sau Sursă. Proprietatea este orice intrare din lista Proprietate pentru acel domeniu.</td></tr><tr><td>Condiții</td><td>egal cu, mai mare decât, mai mic decât, conține, cele mai mari n, cele mai mici n și gol. Conține se aplică numai textului. La cele mai mari n și cele mai mici n, n este un număr, ca în cele mai mari 5. Cu litera n însăși, ca în <code>Pipe.Velocity n highest</code>, sau cu caseta Valoare goală, sunt listate 10 elemente. Condiția gol găsește elementele care nu au nicio valoare pentru proprietate. Conectivitatea are patru condiții și nu primește valoare.</td></tr><tr><td>Valori</td><td>Un număr se introduce fără unitate, în unitatea arătată în Proprietăți și în panoul Tabele: 40, nu 40 psi. Textul, inclusiv un ID, se încadrează între ghilimele simple sau duble: <code>\'60\'</code>.</td></tr><tr><td>ȘI, SAU și parantezele</td><td>ȘI se evaluează înaintea lui SAU, iar parantezele grupează condițiile. Negarea (NOT) nu este disponibilă.</td></tr><tr><td>Ortografie</td><td>Cuvintele nu țin cont de majuscule. Cuvintele englezești sunt acceptate în orice limbă, deci o interogare copiată din acest manual de utilizare rulează pe o pagină în orice limbă.</td></tr></tbody></table>';
 $ec_lang['lpn_guide_find_examples_term']='Exemple lucrate pe Net3';
-$ec_lang['lpn_guide_find_examples_def']='<p>Deschideți exemplul Net3 pentru a le urmări. Presiunea este în psi, iar viteza în ft/s.</p><table class="lpn-notes-table"><tbody><tr><td><code>Everything.ID equal to \'60\'</code></td><td>Joncțiunea 60 și conducta 60. O joncțiune și o conductă pot avea același ID, deci o căutare după ID la Everything poate returna mai multe elemente.</td></tr><tr><td><code>Junction.Pressure below 40</code></td><td>Joncțiunile 10, 40, 50, 20 și 153, începând cu cea mai mică presiune. Joncțiunea 10 are -0,6 psi, o presiune negativă care necesită verificare.</td></tr><tr><td><code>Pipe.Velocity 5 highest</code></td><td>Conductele 60, 329, 125, 123 și 149, începând cu cea mai mare viteză. Conducta 60 transportă 9,3 ft/s.</td></tr><tr><td><code>Junction.Pressure below 20 OR Pipe.Velocity above 5</code></td><td>Joncțiunile 10, 20, 40 și 50 și conductele 60, 125 și 329: presiuni scăzute și viteze mari într-o singură listă.</td></tr><tr><td><code>Junction.Pressure below 40 AND Junction.Elevation above 100</code></td><td>Joncțiunile 10, 20, 40 și 50, presiunile scăzute de pe terenul înalt. Ambele condiții trebuie să indice același tip de element: <code>Junction.Pressure below 40 AND Pipe.Velocity above 3</code> nu găsește nimic, deoarece niciun element nu este și joncțiune, și conductă.</td></tr><tr><td><code>Pipe.Closed equal to \'closed\'</code></td><td>Conducta 330, singura conductă închisă în fișierul Net3.</td></tr><tr><td><code>Junction.Connectivity no open path to a source</code></td><td>Nimic, așa cum este distribuit fișierul. Cu conducta 247 închisă (vezi Înlocuire și Anulare), joncțiunile 215, 217, 219 și 225: joncțiunile pe care o avarie a conductei 247 le-ar lăsa fără alimentare. Repetarea pentru fiecare conductă este o analiză de criticitate.</td></tr></tbody></table>';
+$ec_lang['lpn_guide_find_examples_def']='<p>Deschideți exemplul Net3 pentru a le urmări. Presiunea este în psi, iar viteza în ft/s.</p><table class="lpn-notes-table"><tbody><tr><td><code>Everything.ID equal to \'60\'</code></td><td>Joncțiunea 60 și conducta 60. O joncțiune și o conductă pot avea același ID, deci o căutare după ID la Toate poate returna mai multe elemente.</td></tr><tr><td><code>Junction.Pressure below 40</code></td><td>Joncțiunile 10, 40, 50, 20 și 153, începând cu cea mai mică presiune. Joncțiunea 10 are -0,6 psi, o presiune negativă care necesită verificare.</td></tr><tr><td><code>Pipe.Velocity 5 highest</code></td><td>Conductele 60, 329, 125, 123 și 149, începând cu cea mai mare viteză. Conducta 60 transportă 9,3 ft/s.</td></tr><tr><td><code>Junction.Pressure below 20 OR Pipe.Velocity above 5</code></td><td>Joncțiunile 10, 20, 40 și 50 și conductele 60, 125 și 329: presiuni scăzute și viteze mari într-o singură listă.</td></tr><tr><td><code>Junction.Pressure below 40 AND Junction.Elevation above 100</code></td><td>Joncțiunile 10, 20, 40 și 50, presiunile scăzute de pe terenul înalt. Ambele condiții trebuie să indice același tip de element: <code>Junction.Pressure below 40 AND Pipe.Velocity above 3</code> nu găsește nimic, deoarece niciun element nu este și joncțiune, și conductă.</td></tr><tr><td><code>Pipe.Closed equal to \'closed\'</code></td><td>Conducta 330, singura conductă închisă în fișierul Net3.</td></tr><tr><td><code>Junction.Connectivity no open path to a source</code></td><td>Nimic, așa cum este distribuit fișierul. Cu conducta 247 închisă (vezi Înlocuire și Anulare), joncțiunile 215, 217, 219 și 225: joncțiunile pe care o avarie a conductei 247 le-ar lăsa fără alimentare. Repetarea pentru fiecare conductă este o analiză de criticitate.</td></tr></tbody></table>';
 $ec_lang['lpn_guide_find_results_term']='Rezultate, selecția și Tabele';
-$ec_lang['lpn_guide_find_results_def']='<p>Elementele care corespund sunt listate sub butonul Găsire. Above și n highest listează întâi valoarea cea mai mare, below și n lowest întâi valoarea cea mai mică, iar celelalte condiții listează după valoarea găsită, apoi după ID. O interogare cu AND sau OR listează nodurile, apoi legăturile, fiecare după ID. O singură potrivire este afișată imediat pe hartă. Selectați un rând pentru a centra harta pe acel element. Dacă nu este selectat nimic, elementul este și selectat; dacă ceva este selectat, elementul este evidențiat, iar selecția nu se schimbă. Shift+clic sau Ctrl+clic pe un rând îl adaugă la selecție sau îl elimină. Găsirea nu selectează singură toate potrivirile.</p><p>Butonul Filtrează în tabelul curent aplică aceeași interogare panoului Tabele. Fiecare tabel la care se aplică interogarea arată numai rândurile care corespund, cu interogarea și numărul de rânduri deasupra. Pentru a selecta pe hartă toate potrivirile, selectați acele rânduri și alegeți Selectează pe hartă din meniul clic dreapta. Un filtru de tabel nu este salvat cu proiectul și se încheie când pagina este reîncărcată. Un rând editat astfel încât să nu mai corespundă rămâne în tabel, atenuat și marcat cu un semn de avertizare, până când butonul Filtrează în tabelul curent este apăsat din nou.</p>';
+$ec_lang['lpn_guide_find_results_def']='<p>Elementele care corespund sunt listate sub butonul Găsire. Mai mare decât și cele mai mari n listează întâi valoarea cea mai mare, mai mic decât și cele mai mici n întâi valoarea cea mai mică, iar celelalte condiții listează după valoarea găsită, apoi după ID. O interogare cu AND sau OR listează nodurile, apoi legăturile, fiecare după ID. O singură potrivire este afișată imediat pe hartă. Selectați un rând pentru a centra harta pe acel element. Dacă nu este selectat nimic, elementul este și selectat; dacă ceva este selectat, elementul este evidențiat, iar selecția nu se schimbă. Shift+clic sau Ctrl+clic pe un rând îl adaugă la selecție sau îl elimină. Butonul Găsire nu selectează singur toate potrivirile.</p><p>Butonul Filtrează în tabelul curent aplică aceeași interogare panoului Tabele. Fiecare tabel la care se aplică interogarea arată numai rândurile care corespund, cu interogarea și numărul de rânduri deasupra. Pentru a selecta pe hartă toate potrivirile, selectați acele rânduri și alegeți Selectează pe hartă din meniul clic dreapta. Un filtru de tabel nu este salvat cu proiectul și se încheie când pagina este reîncărcată. Un rând editat astfel încât să nu mai corespundă rămâne în tabel, atenuat și marcat cu un semn de avertizare, până când butonul Filtrează în tabelul curent este apăsat din nou.</p>';
 $ec_lang['lpn_guide_find_replace_term']='Înlocuire și Anulare';
-$ec_lang['lpn_guide_find_replace_def']='<p>Partea Modificați ce s-a găsit din casetă scrie o proprietate la fiecare element găsit de interogare. Alegeți proprietatea în lista Proprietate de modificat, introduceți noua valoare în caseta Valoare nouă în unitatea afișată și apăsați butonul Înlocuire. Caseta indică apoi câte elemente s-ar modifica, fără a le număra pe cele care au deja noua valoare. Apăsați butonul Modifică-le pentru a aplica schimbarea sau Anulare. O singură Anulare inversează întreaga înlocuire.</p><p>Exemplu pe Net1: <code>Pipe.Diameter below 10</code> găsește conductele 31, 122, 113 și 121. Alegeți Diametru, introduceți 10 și apăsați Înlocuire; caseta arată „Modificați 4 elemente?”. Apăsați Modifică-le pentru a seta toate cele patru conducte la 10 in. O singură Anulare le readuce la 6 și 8 in.</p><p>Exemplu pe Net3: <code>Pipe.ID equal to \'247\'</code> găsește conducta 247. Alegeți Închisă, alegeți din nou Închisă în lista Valoare nouă și apăsați Înlocuire, apoi Modifică-le, pentru a închide conducta pentru exemplul de conectivitate de mai sus. Anularea o deschide din nou.</p><p>Înlocuirea necesită un singur tip de element, deci la Everything alegeți mai întâi un tip de element în lista Ce se caută. Într-un scenariu altul decât Base, o înlocuire este stocată în acel scenariu, ca aceeași editare din Proprietăți. Acolo unde sunt disponibile cotele Mapbox, Cota poate fi înlocuită din Mapbox DEM în loc de o valoare tastată.</p>';
+$ec_lang['lpn_guide_find_replace_def']='<p>Partea Modifică ce a fost găsit din casetă scrie o proprietate la fiecare element găsit de interogare. Alegeți proprietatea în lista Proprietatea de modificat, introduceți noua valoare în caseta Valoare nouă în unitatea afișată și apăsați butonul Înlocuiește. Caseta indică apoi câte elemente s-ar modifica, fără a le număra pe cele care au deja noua valoare. Apăsați butonul Modifică-le pentru a aplica schimbarea sau Anulare. O singură Anulare inversează întreaga înlocuire.</p><p>Exemplu pe Net1: <code>Pipe.Diameter below 10</code> găsește conductele 31, 122, 113 și 121. Alegeți Diametru, introduceți 10 și apăsați Înlocuiește; caseta arată „Modificați 4 elemente?”. Apăsați Modifică-le pentru a seta toate cele patru conducte la 10 in. O singură Anulare le readuce la 6 și 8 in.</p><p>Exemplu pe Net3: <code>Pipe.ID equal to \'247\'</code> găsește conducta 247. Alegeți Închisă, alegeți din nou Închisă în lista Valoare nouă și apăsați Înlocuiește, apoi Modifică-le, pentru a închide conducta pentru exemplul de conectivitate de mai sus. Anularea o deschide din nou.</p><p>Înlocuirea necesită un singur tip de element, deci la Toate alegeți mai întâi un tip de element în lista Ce se caută. Într-un scenariu altul decât Base, o înlocuire este stocată în acel scenariu, ca aceeași editare din Proprietăți. Acolo unde sunt disponibile cotele Mapbox, Cota poate fi înlocuită din Mapbox DEM în loc de o valoare tastată.</p>';
 $ec_lang['lpn_guide_find_notes_term']='Observații';
-$ec_lang['lpn_guide_find_notes_def']='<ul><li>Valorile sunt comparate la precizie completă și listate cu patru zecimale. Equal to se potrivește rar cu un rezultat calculat; folosiți above și below.</li><li>Presiunea, sarcina, debitul, viteza și celelalte rezultate sunt cele ale ultimului calcul. Cu setarea Recalculează automat debifată, ele descriu rețeaua așa cum era la ultimul Calculează.</li><li>Above și below pe text folosesc ordinea din dicționar, cu numerele în ordine numerică: pe Net1, <code>Junction.ID above \'20\'</code> găsește joncțiunile 21, 22, 23, 31 și 32.</li><li>La Everything sunt oferite numai ID, Description, Tag și Connectivity. Alegeți un tip de element în lista Ce se caută pentru a vedea lista completă a proprietăților lui.</li><li>Un element Text nu are ID. Căutați-l după cuvintele lui, ca în <code>Text.Text contains \'pump\'</code>.</li><li>Cele patru condiții Connectivity pentru un nod sunt no links at node, no open links at node, no link path to a source și no open path to a source. O sursă este un rezervor sau un bazin.</li></ul>';
-$ec_lang['lpn_guide_using_heading']='Folosirea ghidului';
-$ec_lang['lpn_guide_keys_term']='Comenzi rapide ale ghidului';
-$ec_lang['lpn_guide_keys_def']='<table class="lpn-notes-table"><tbody><tr><td>?</td><td>Deschide ghidul la controlul aflat sub cursor sau care are focalizarea.</td></tr><tr><td>F1</td><td>Deschide ghidul la intrarea pentru caseta care are focalizarea.</td></tr><tr><td>Ctrl+K</td><td>Deschide ghidul cu textul selectat în câmpul de căutare.</td></tr><tr><td>/</td><td>Selectează câmpul de căutare cât timp ghidul are focalizarea.</td></tr><tr><td>Esc</td><td>Închide ghidul și revine la locul unde ați fost.</td></tr></tbody></table>';
+$ec_lang['lpn_guide_find_notes_def']='<ul><li>Valorile sunt comparate la precizie completă și listate cu patru zecimale. Egal cu se potrivește rar cu un rezultat calculat; folosiți mai mare decât și mai mic decât.</li><li>Presiunea, sarcina, debitul, viteza și celelalte rezultate sunt cele ale ultimului calcul. Cu setarea Recalculează automat debifată, ele descriu rețeaua așa cum era la ultimul Calculează.</li><li>Mai mare decât și mai mic decât pe text folosesc ordinea din dicționar, cu numerele în ordine numerică: pe Net1, <code>Junction.ID above \'20\'</code> găsește joncțiunile 21, 22, 23, 31 și 32.</li><li>La Toate sunt oferite numai ID, Descriere, Marcaj și Conectivitate. Alegeți un tip de element în lista Ce se caută pentru a vedea lista completă a proprietăților lui.</li><li>Un element Text nu are ID. Căutați-l după cuvintele lui, ca în <code>Text.Text contains \'pump\'</code>.</li><li>Cele patru condiții Conectivitate pentru un nod sunt fără legături la nod, fără legături deschise la nod, fără traseu de legături către o sursă și fără traseu deschis către o sursă. O sursă este un rezervor sau un bazin.</li></ul>';
+$ec_lang['lpn_guide_using_heading']='Folosirea manualului de utilizare';
+$ec_lang['lpn_guide_keys_term']='Comenzi rapide ale manualului de utilizare';
+$ec_lang['lpn_guide_keys_def']='<table class="lpn-notes-table"><tbody><tr><td>?</td><td>Deschide manualul de utilizare la controlul aflat sub cursor sau care are focalizarea.</td></tr><tr><td>F1</td><td>Deschide manualul de utilizare la intrarea pentru caseta care are focalizarea.</td></tr><tr><td>Ctrl+K</td><td>Deschide manualul de utilizare cu textul selectat în câmpul de căutare.</td></tr><tr><td>/</td><td>Selectează câmpul de căutare cât timp manualul de utilizare are focalizarea.</td></tr><tr><td>Esc</td><td>Închide manualul de utilizare și revine la locul unde ați fost.</td></tr></tbody></table>';
 $ec_lang['lpn_guide_also']='De asemenea în {menu}';
 $ec_lang['lpn_guide_how_popup']='Proprietăți se deschide când selectați un element sau un text.';
 $ec_lang['lpn_guide_how_alt']='Previzualizarea alternativelor este listată la Apă, Scenarii când Mod de bază este dezactivat.';
@@ -4288,6 +4361,7 @@ $ec_lang['lpn_split_no']='Nu';
 $ec_lang['lpn_snap_vertex']='{link}, vârful {n}';
 $ec_lang['lpn_snap_node_on_node']='{new} plasat în locul lui {target}. Cele două noduri nu sunt conectate.';
 $ec_lang['lpn_snap_moved_on_node']='{moved} mutat în locul lui {target}. Cele două noduri nu sunt conectate.';
+$ec_lang['lpn_snap_shape_point']='{shape}, punctul {n}';
 $ec_lang['lpn_settings_hover_card']='Arată eticheta completă la trecerea cursorului';
 $ec_lang['lpn_settings_hover_card_tip']='Țineți cursorul pe un nod, o legătură sau un abonat pentru a-i vedea eticheta așa cum este specificată în Setări, la orice scară, indiferent dacă eticheta încape pe hartă. Aceasta este o setare pentru acest browser, nu pentru proiect.';
 $ec_lang['lpn_scenario_delete_in_base']='Pentru a-l elimina din desen, ștergeți-l în scenariul {base}.';
