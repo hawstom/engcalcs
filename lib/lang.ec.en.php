@@ -3231,7 +3231,7 @@ $ec_lang['lpn_scenario_delete']='Delete scenario';
 $ec_lang['lpn_scenario_delete_confirm']='Delete the scenario {name}, and its {n} overrides? The drawing itself is not changed.';
 $ec_lang['lpn_scenario_override']='Override in this scenario';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_scenario_override_tip']='Selected means this scenario overrides its parent for this value, even when the number is the same. Clear the box to use its parent\'s.';
+$ec_lang['lpn_scenario_override_tip']='Checked means this scenario overrides its parent for this value, even when the number is the same. Clear the box to use its parent\'s.';
 // "Base scenario", not bare "Base" -- an ENGLISH fix, so this needs no _syn either. This is the one
 // place the polysemy genuinely bites: here the word sits beside a NUMBER, in a field popup with no
 // scenario dropdown nearby to frame it, which is exactly the reading that invites "base amount".
@@ -3246,7 +3246,7 @@ $ec_lang['lpn_scenario_push_btn']='Apply Base values to all scenarios';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_scenario_push_tip']='Every scenario goes back to the Base value for the properties whose labels are showing right now. Values entered for them in any scenario are discarded.';
 $ec_lang['lpn_scenario_basic']='Basic mode';
-$ec_lang['lpn_scenario_basic_tip']='Selected: a scenario consists only of the values set in it. Cleared: this menu also offers the Alternatives preview table, which shows how those values are grouped by category, and allows a scenario to have a separate total run time and hydraulic time step. Feedback on this feature is welcome.';
+$ec_lang['lpn_scenario_basic_tip']='Checked: a scenario consists only of the values set in it. Cleared: this menu also offers the Alternatives preview table, which shows how those values are grouped by category, and allows a scenario to have a separate total run time and hydraulic time step. Feedback on this feature is welcome.';
 $ec_lang['lpn_alt_title']='Alternatives preview';
 $ec_lang['lpn_alt_calc_options']='Calculation options';
 $ec_lang['lpn_alt_note']='Base uses the Base alternative of every category. Each scenario has a separate alternative, a child of the Base alternative, for any category that is changed. The number is the count of changed values. The last three columns are calculation options: enter a value for the scenario, or leave it blank to use the parent value. The project values are in Settings, Calculation, Time.';
@@ -4612,8 +4612,8 @@ $ec_lang['lpn_file_import_shapes']='Import GeoJSON shapes…';
 $ec_lang['lpn_file_import_shapes_tip']='Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network from an EPANET file. The project must be georeferenced or state a coordinate system.';
 $ec_lang['lpn_geojson_import_done']='{n} Shapes imported from {file}.';
 $ec_lang['lpn_geojson_import_done_one']='One Shape imported from {file}.';
-$ec_lang['lpn_geojson_import_renamed']='{n} feature names cannot be Shape IDs and are kept with the Shapes: {list}.';
-$ec_lang['lpn_geojson_import_renamed_one']='One feature name cannot be a Shape ID and is kept with the Shape: {list}.';
+$ec_lang['lpn_geojson_import_renamed']='{n} feature names cannot be used as Shape IDs. Each Shape was given another ID and keeps its feature name: {list}.';
+$ec_lang['lpn_geojson_import_renamed_one']='One feature name cannot be used as a Shape ID. The Shape was given another ID and keeps its feature name: {list}.';
 $ec_lang['lpn_geojson_import_skipped']='{n} features not imported: {list}.';
 $ec_lang['lpn_geojson_import_skipped_one']='One feature not imported: {list}.';
 $ec_lang['lpn_geojson_import_why_network']='network asset';

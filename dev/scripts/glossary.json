@@ -4821,6 +4821,22 @@
                 "zh": "底部高程"
             },
             "source": "sprint 1012-delta"
+        },
+        "100": {
+            "term": "Shape",
+            "concept": "drawing-shape-fig",
+            "definition": "A user-drawn map annotation with no hydraulic meaning: a point, a polyline, or a polygon, with its own ID, points, and optional description. It can be imported from or exported to GIS and CAD files (GeoJSON, shapefile, DXF) and snapped to. It is not a network asset, not a channel cross section, and not the Text (label-user-tessa) a user places on the map.",
+            "symbol": "",
+            "avoid": [
+                "a word meaning the geometric form or outline of a thing (the shape of a pipe, a cross-section shape)",
+                "a word for a hydraulic or network element"
+            ],
+            "context": "The toolbar's Shape tool (key F, for Figure), the Shapes table, and the GeoJSON, shapefile, and DXF import and export messages (lpn_tool_add_shape, lpn_pane_tab_shapes, lpn_geojson_*, lpn_shp_*, lpn_dxf_*).",
+            "translation_notes": "Tom, 2026-10-13: \"The synonym for Shape is Figure, not really Form.\" Choose your language's word for a drawn figure in the drafting or GIS sense (a feature drawn on a map), used as a noun for one object, and use it the same way in every Shape key. [2026-10-14, Wave 0 sprint 1014: the term recurs in about 40 keys.]",
+            "translations": {
+                "en": "Shape"
+            },
+            "source": "wave0-1014"
         }
     }
 }

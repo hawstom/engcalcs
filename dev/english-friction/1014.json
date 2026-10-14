@@ -35,8 +35,8 @@
         "box is ticked",
         "the value was verified"
       ],
-      "disposition": "english",
-      "resolution": "APPLIED: 'Checked means' -> 'Selected means'."
+      "disposition": "dismissed",
+      "resolution": "REVERTED by the orchestrator: feat/bentley-interop rewrites this tip to Tom's own 2026-10-13 wording; a second edit here would conflict. Raise it there if still wanted."
     },
     {
       "key": "lpn_scenario_basic_tip",
@@ -47,8 +47,8 @@
         "ticked",
         "verified"
       ],
-      "disposition": "english",
-      "resolution": "APPLIED: 'Checked:' -> 'Selected:'."
+      "disposition": "dismissed",
+      "resolution": "REVERTED by the orchestrator: feat/bentley-interop rewrites this tip to Tom's own 2026-10-13 wording; a second edit here would conflict. Raise it there if still wanted."
     },
     {
       "key": "lpn_tool_zoom_extent_tip",
@@ -282,8 +282,8 @@
         "the name is kept as a property",
         "the name is kept in the list only"
       ],
-      "disposition": "refer-to-human",
-      "resolution": "Proposed rewrite, not applied because it asserts what is stored: '{n} feature names cannot be used as Shape IDs. Each Shape was given another ID and keeps its feature name: {list}.' and _one: 'One feature name cannot be used as a Shape ID. The Shape was given another ID and keeps its feature name: {list}.' Needs a yes that the name is retained as a property (js/looped-network.js ~37778)."
+      "disposition": "english",
+      "resolution": "APPLIED by the orchestrator after verifying js/looped-network.js (the name is kept as the description, or as a source_name property): both forms rewritten as proposed."
     },
     {
       "key": "lpn_pane_shape_closed",
@@ -332,7 +332,7 @@
         "drawn annotation object"
       ],
       "disposition": "glossary",
-      "resolution": "PROPOSED, not written (glossary edits make payloads stale, which the orchestrator regenerates): add glossary term 'Shape' (concept: annotation-shape): 'a user-drawn annotation, a point, polyline, or polygon on the map; not part of the network and not solved; capitalized in English as a defined object, like Junction or Tank'. Translators use one word everywhere."
+      "resolution": "WRITTEN by the orchestrator: glossary term 'Shape' (concept drawing-shape-fig), with Tom's 2026-10-13 synonym Figure in translation_notes."
     }
   ]
 }
