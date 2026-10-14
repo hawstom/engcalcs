@@ -103,6 +103,7 @@ lines rather than appending corrections.
 
 ### Master: see the pushed SHA in the last report. Production: b7c99102 (10-09) when last read; ask, About box
 
+Landed 2026-10-14 on his word: feat/si-example-more, feat/button-base, feat/zoom-selection.
 Landed 2026-10-13/14: fix/si-rounding (his "merge"), feat/shape with feat/tool-key merged into it (his
 "Merge feat/shape" and "Merge this branch into the shape branch"; F is Shape, "F for Figure"), and
 translation sprint 1014 (74 new keys, 57 resyncs, Task 788 Find-guide sweep, glossary term Shape).
@@ -115,10 +116,6 @@ Deleted keys: lpn_scenario_delete_goes_one, lpn_sm_basic_off (both on feat/bentl
   Settings headings aligned, yellow note gone; Base triangle gutter already worked). Perry passed it.
   Master merged in (Shapes tab before Settings/Scenarios); two seam fixes (parity count 8; workspace
   import now refreshes the Scenarios tab). After merge delete match-property, graph-bubble.
-- **feat/si-example-more** (8111; Task 786): Net1 SI with its rules converted. Perry passed it.
-- **feat/button-base** (8108; Task 714 R-202): one button shape/hover/pressed/focus for menus and toolbar.
-- **feat/zoom-selection** (8109; Franco's wish): Map > Zoom to selection. Phone: Properties can cover it.
-  Merge master into the last three before merging; they predate sprint 1014.
 
 ### Questions out to him
 

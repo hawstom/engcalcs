@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**2 still to read on master**, of 2 untranslated keys, of 2632 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**4 still to read on master**, of 4 untranslated keys, of 2634 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -199,7 +199,7 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   @@ NEEDS RULING
 
-## lpn_  (2, 2 to read @@ NEEDS RULING)
+## lpn_  (4, 4 to read @@ NEEDS RULING)
 
 - **`lpn_ex_net1_si_desc`**
   > Liters per second, with meters and millimeters. A fictional EPANET example converted from gallons per minute, feet, and inches, with chlorine, 1 reservoir, 1 tank, 1 pump, and two rule-based controls.
@@ -207,12 +207,18 @@ never edits a synonym.
 - **`lpn_ex_net1_si_title`**
   > EPANET Net1 plus rule-based controls, L/s (SI)
   @@ NEEDS RULING
+- **`lpn_tool_zoom_selection`**
+  > Zoom to selection
+  @@ NEEDS RULING
+- **`lpn_tool_zoom_selection_tip`**
+  > Fit the selected assets to the map window. Select one or more assets first.
+  @@ NEEDS RULING
 
 ---
 
 # Strings waiting on a branch
 
-**145 still to read**, of 148 new keys across 12 unmerged branch(es).
+**143 still to read**, of 146 new keys across 9 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -625,8 +631,6 @@ build for that would be a gate nobody keeps. Refresh it with
   > Drag to resize
   @@ NEEDS RULING
 
-### feat/button-base (`234bcc76`) — adds no English strings
-
 ### feat/desktop (`baba0f04`) — adds no English strings
 
 ### feat/label-gang-search (`8b31a907`) — 3 new, all ruled
@@ -682,15 +686,4 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 - **`lpn_paste_skip_valve`**
   > Not pasted: {n} (the valve types differ).
-  @@ NEEDS RULING
-
-### feat/si-example-more (`19439bb2`) — adds no English strings
-
-### feat/zoom-selection (`29e354ca`) — 2 new, 2 to read @@ NEEDS RULING
-
-- **`lpn_tool_zoom_selection`**
-  > Zoom to selection
-  @@ NEEDS RULING
-- **`lpn_tool_zoom_selection_tip`**
-  > Fit the selected assets to the map window. Select one or more assets first.
   @@ NEEDS RULING

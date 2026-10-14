@@ -352,7 +352,7 @@ the block.
   - Read with `dev/label-placement-algorithms.md` section 12 and `?debug=perf`, which now prints
     `labelPass` inside `buildDom` and a label-measurement count.
 - 75|714| **Theming: colour tokens first, then a Light/Dark choice in Settings.**
-  **Phase 1b inline colours MERGED 2026-10-04** (`chore/theme-inline`): js/*.js literals on tokens or allow-listed; the check refuses new ones. **The button base (R-202) is on `feat/button-base`, awaiting his look**; then dark mode.
+  **Phase 1b inline colours MERGED 2026-10-04** (`chore/theme-inline`): js/*.js literals on tokens or allow-listed; the check refuses new ones. **The button base (R-202) MERGED 2026-10-14** (`feat/button-base`); next, dark mode.
   Tom, 2026-09-24 (R-211): *"preparing for this and implementing it will force us into some
   important code discipline."* Ida's phased plan: `dev/theming-plan.md`. Phase 1 declares semantic
   colour tokens, folds the nine separate box styles onto them, and adds a check refusing a new
