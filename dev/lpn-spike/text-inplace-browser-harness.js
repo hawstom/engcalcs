@@ -1,7 +1,8 @@
 // **A TEXT IS EDITED IN PLACE** (Tom, 2026-10-14: *"It would be really nice for Text to be editable
 // in place instead of only in the properties box."*). In real Chromium, with real presses and keys:
-//   1. the Text tool places a Text and opens the in-place editor on it, placeholder selected;
-//      Esc keeps the placeholder;
+//   1. the Text tool places a Text and opens the in-place editor on it, placeholder selected, at
+//      the map words' own font size; a press on the map keeps the placeholder and places the next;
+//      Esc on a new Text takes it away, and so does leaving the tool with its placeholder untouched;
 //   2. a double-click on the Text in Select opens the editor, not Properties; Enter is a new line,
 //      Ctrl+Enter commits, and the map and the saved project hold both lines; a digit and Delete
 //      typed into it are words, not shortcuts;
@@ -10,7 +11,9 @@
 //   5. a rotated Text opens a rotated editor over its words, with Recalculate off;
 //   6. the Text tool repeats: the press that finishes one Text places the next; a new Text placed
 //      and typed in one go is ONE Undo step;
-//   7. the same on the Spanish page.
+//   7. the same on the Spanish page;
+//   8. empty words delete the Text, as one Undo step, from the editor and from Properties;
+//   9. a window resize that moves the words commits the editor.
 //
 //   node dev/lpn-spike/text-inplace-browser-harness.js   (takes the browser lock itself)
 'use strict';
@@ -123,10 +126,31 @@ async function main() {
 			!!ed && ed.value === placeholder && ed.focused && ed.allSelected, JSON.stringify(ed));
 		let texts = await h.mapTexts();
 		ok('...and the map words are hidden under it', texts.length === 1 && texts[0].vis === 'hidden', JSON.stringify(texts));
+		const mapPx = await P.evaluate(() => {
+			const t = document.querySelector('#lpn_canvas text.lpn-lbl[data-lbl]');
+			return parseFloat(t.style.fontSize || getComputedStyle(t).fontSize) * t.getScreenCTM().a;
+		});
+		ok('...typed at the map words\' own size, not a 12 px floor', !!ed && Math.abs(ed.font - mapPx) < 0.05 && ed.font < 12,
+			JSON.stringify({ editor: ed && ed.font, map: mapPx }));
+		const spotB = await h.canvasPoint(0.55, 0.3);
+		await P.mouse.click(spotB.x, spotB.y);
+		await h.settle(400);
+		ed = await h.editor();
+		ok('a press on the map keeps the placeholder and places the next Text', !!ed && (await h.mapTexts()).length === 2, JSON.stringify(await h.mapTexts()));
 		await P.keyboard.press('Escape');
-		await h.settle(200);
-		ok('Esc closes it and keeps the placeholder', !(await h.editor()) &&
-			(await h.mapTexts())[0].rows.join('|') === placeholder, JSON.stringify(await h.mapTexts()));
+		await h.settle(300);
+		texts = await h.mapTexts();
+		ok('Esc on that new Text takes it away', !(await h.editor()) && texts.length === 1 && texts[0].rows.join('|') === placeholder,
+			JSON.stringify(texts));
+		ok('...and the saved project holds just the first', (await h.storedTexts()).length === 1);
+		const spotC = await h.canvasPoint(0.3, 0.6);
+		await P.mouse.click(spotC.x, spotC.y);
+		await h.settle(300);
+		ok('the tool is still armed and places another', (await h.mapTexts()).length === 2 && !!(await h.editor()));
+		await a.toolbarClick(await a.lang('lpn_tool_select'));
+		await h.settle(400);
+		ok('leaving by the toolbar with the placeholder untouched takes that Text away',
+			!(await h.editor()) && (await h.mapTexts()).length === 1 && (await h.storedTexts()).length === 1, JSON.stringify(await h.mapTexts()));
 		const id = (await h.mapTexts())[0].id;
 
 		console.log('\n2. A double-click in Select edits it; Enter is a new line; Ctrl+Enter commits');
@@ -238,15 +262,55 @@ async function main() {
 		await P.keyboard.press('Escape');
 		await h.settle(300);
 		st = await h.storedTexts();
-		ok('...and the finished one holds its words', st.length === 3 && st[1]._text === 'Tank site' &&
-			st[2]._text === placeholder, JSON.stringify(st));
+		ok('...and the finished one holds its words; Esc took the next one away', st.length === 2 && st[1]._text === 'Tank site',
+			JSON.stringify(st));
 		await h.select();
 		await P.keyboard.press('Control+z');
 		await h.settle(500);
+		st = await h.storedTexts();
+		ok('one Undo takes the typed Text away: placing and typing were one step, the taken-back one left none',
+			st.length === 1 && st[0]._text === 'Turned', JSON.stringify(st));
+
+		console.log('\n8. Empty words delete the Text, as one Undo step');
+		c = await h.textCentre(id);
+		await P.mouse.dblclick(c.x, c.y);
+		await h.settle(400);
+		await P.keyboard.press('Control+a');
+		await P.keyboard.press('Delete');
+		await P.keyboard.press('Control+Enter');
+		await h.settle(500);
+		ok('committing empty words from the editor deletes the Text', (await h.mapTexts()).length === 0 &&
+			(await h.storedTexts()).length === 0, JSON.stringify(await h.storedTexts()));
 		await P.keyboard.press('Control+z');
 		await h.settle(500);
-		st = await h.storedTexts();
-		ok('two Undos take both new Texts away: placing and typing were one step', st.length === 1 && st[0]._text === 'Turned', JSON.stringify(st));
+		ok('...and one Undo brings it back with its words', (await h.storedTexts()).length === 1 &&
+			(await h.storedTexts())[0]._text === 'Turned', JSON.stringify(await h.storedTexts()));
+		c = await h.textCentre(id);
+		await P.mouse.click(c.x, c.y);
+		await h.settle(700);
+		ok('Properties is open on it', (await h.popupText()) === 'Turned', await h.popupText());
+		await P.evaluate(() => {
+			const t = document.querySelector('#lpn_popup_fields textarea');
+			t.value = '  \n ';
+			t.dispatchEvent(new Event('change', { bubbles: true }));
+		});
+		await h.settle(500);
+		ok('emptying the words in Properties deletes it too, and the box closes', (await h.mapTexts()).length === 0 &&
+			(await h.storedTexts()).length === 0 && (await h.popupText()) === null, JSON.stringify(await h.storedTexts()));
+		await P.keyboard.press('Control+z');
+		await h.settle(500);
+		ok('...one Undo again', (await h.storedTexts()).length === 1);
+
+		console.log('\n9. A window resize that moves the words commits the editor');
+		c = await h.textCentre(id);
+		await P.mouse.dblclick(c.x, c.y);
+		await h.settle(400);
+		await P.keyboard.type('Resized');
+		await P.setViewportSize({ width: 1100, height: 900 });
+		await h.settle(800);
+		ok('the editor is closed and the words written', !(await h.editor()) && (await h.storedTexts())[0]._text === 'Resized',
+			JSON.stringify(await h.storedTexts()));
+		await P.setViewportSize({ width: 1400, height: 900 });
 		await a.close();
 
 		console.log('\n7. ?lang=es');
@@ -259,7 +323,8 @@ async function main() {
 		await g.settle(300);
 		ed = await g.editor();
 		ok('es: the editor opens with the Spanish placeholder', !!ed && ed.value === await b.lang('lpn_new_text'), JSON.stringify(ed));
-		await g.P.keyboard.press('Escape');
+		await g.P.keyboard.press('Control+Enter');
+		await g.settle(300);
 		await g.select();
 		const idEs = (await g.mapTexts())[0].id;
 		c = await g.textCentre(idEs);

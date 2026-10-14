@@ -54027,7 +54027,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// timer fires the drag is dropped, the selection the press found is put back (a right-click never
 	// changes the selection), and the lift's click is swallowed so no tap action follows the menu.
 	var LONG_PRESS_MS = 500;
-	var lpress = null, lpSwallowClickUntil = 0, lpDropTap = function () {};
+	var lpress = null, lpSwallowClickUntil = 0, lpSwallowDown = false, lpDropTap = function () {};
 	function lpCancel() { if (lpress && lpress.timer) { clearTimeout(lpress.timer); lpress.timer = null; } if (lpress && !lpress.fired) { lpress = null; } }
 	function lpFire() {
 		var lp = lpress;
@@ -54038,6 +54038,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		ctxSel = lp.sel;
 		setSelectionList(lp.sel);
 		lpSwallowClickUntil = Date.now() + 5000;
+		lpSwallowDown = true;
 		ctxOpenAssetMenu(lp.x, lp.y, lp.hit);
 	}
 	document.addEventListener('pointerdown', function (e) {
@@ -54064,7 +54065,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		}, true);
 	});
 	document.addEventListener('click', function (e) {
-		if (Date.now() < lpSwallowClickUntil && ctxOnCanvas(e)) { lpSwallowClickUntil = 0; e.stopPropagation(); e.preventDefault(); }
+		if (Date.now() < lpSwallowClickUntil && ctxOnCanvas(e)) { lpSwallowClickUntil = 0; lpSwallowDown = false; e.stopPropagation(); e.preventDefault(); }
+	}, true);
+	// The lift's compatibility mousedown would close the menu it just opened (a press on a Text or a
+	// label is not preventDefault()ed the way a press on a junction is, so the browser sends one).
+	document.addEventListener('mousedown', function (e) {
+		if (lpSwallowDown && Date.now() < lpSwallowClickUntil && ctxOnCanvas(e)) { lpSwallowDown = false; e.stopPropagation(); }
 	}, true);
 	document.addEventListener('contextmenu', function (e) {
 		if (!ctxOnCanvas(e) || !lpress) { return; }
