@@ -840,6 +840,8 @@
         "lpn_ex_basic_us_desc": "Two reservoirs, a pump, and a small loop. Gallons per minute, with feet and inches.",
         "lpn_ex_net1_title": "EPANET Net1 plus rule-based controls",
         "lpn_ex_net1_desc": "A fictional EPANET example with chlorine, 1 reservoir and 1 tank.",
+        "lpn_ex_net1_si_title": "EPANET Net1 plus rule-based controls, L\/s (SI)",
+        "lpn_ex_net1_si_desc": "Liters per second, with meters and millimeters. A fictional EPANET example converted from gallons per minute, feet, and inches, with chlorine, 1 reservoir, 1 tank, 1 pump, and two rule-based controls.",
         "lpn_ex_net2_si_title": "EPANET Net2, L\/s (SI)",
         "lpn_ex_net2_si_desc": "Liters per second, with meters and millimeters. An EPANET example at Branford, Connecticut, converted from gallons per minute, feet, and inches: 35 junctions and 1 tank, with no reservoir, no pump, and no valves, about 2 km by 4 km. Fluoride, a non-reactive substance, enters at one source.",
         "lpn_ex_net2_title": "EPANET Net2, gpm (US)",
@@ -2632,7 +2634,7 @@
         "lpn_snip_tip_redo": "Redo (Ctrl+Y)",
         "lpn_screenshot_scale_tip": "The picture's size as a multiple of the area on the screen. A larger one is sharper and makes a bigger file."
     },
-    "count": 2630,
+    "count": 2632,
     "active_prefixes": [
         "about",
         "bpn",
