@@ -148,7 +148,10 @@ the block.
   combines the drawn horizontal length with the end nodes' elevation difference; a typed length is
   untouched. Building on `feat/slope-length`. Still open: a length adjustment factor or increment.
   Tom: *"ask Mary to research whether anybody offers 'Length adjustment factor' for auto lengths. I
-  don't want to break a tacit complicit oversight on this or be ridiculously pedantic."* Nothing
+  don't want to break a tacit complicit oversight on this or be ridiculously pedantic."* **Mary,
+  2026-10-14: no tool she searched offers one** (WaterGEMS has a typed per-pipe length and a 3D length
+  from node elevations; its "Length Adjustment" is a surge device). She advises against a project
+  factor: a reviewer cannot audit it. Our typed length is already the per-pipe override. Nothing
   about length accuracy is claimed in public until this closes (Task 641).
 - 100|681| **Economize the label layout: it is half the cost of a project switch.**
   **PROMOTED TO 100 by Tom, 2026-10-14.** (c)/(d) and (b) shipped; what is left is to measure his switch again and find the next cost.
