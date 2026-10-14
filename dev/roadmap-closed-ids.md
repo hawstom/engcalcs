@@ -708,3 +708,5 @@ red builds on 2026-09-15 before anybody wrote it down.
 - 0|783| CLOSED 2026-10-11 (`feat/tank-volume`, Tom: "merge"): tank Depth and Usable volume (zero at the lowest water depth) in the Tanks table, Properties, Find and the time series; Recalculate OFF keeps them as a snapshot.
 - 0|759| CLOSED 2026-10-12: map selection is Select/Selected/Selection, menu and dialog options are chosen (`chore/selection-word`), single checkboxes say Checked (`fix/paste-column`), Tom's calls of 10-11 and 10-12; translations resynced in sprint 1012-delta.
 - 0|787| CLOSED 2026-10-12 (`feat/tank-ground`, Tom: "OK. Merge."): tank Elevation is the ground and pressure datum, Base elevation the tank bottom EPANET uses; the .inp cannot carry the ground.
+- 0|779| CLOSED 2026-10-14 (`feat/shape`, Tom: "Merge feat/shape"): Shape tool (point, polyline, polygon; key F, for Figure), Shapes table, GeoJSON, shapefile and DXF import; merged with feat/tool-key.
+- 0|788| CLOSED 2026-10-14: sprint 1014 swept the Find guide's control names and the select verb in all 26 languages (dev/english-friction/1014.json).
