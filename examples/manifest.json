@@ -83,7 +83,7 @@
             "titleKey": "lpn_ex_net1_si_title",
             "descKey": "lpn_ex_net1_si_desc",
             "title": "EPANET Net1 plus rule-based controls, L/s (SI)",
-            "description": "Litres per second, with metres and millimetres. A fictional EPANET example converted from gallons per minute, feet and inches, with chlorine, 1 reservoir, 1 tank and 1 pump, and two rule-based controls.",
+            "description": "Liters per second, with meters and millimeters. A fictional EPANET example converted from gallons per minute, feet, and inches, with chlorine, 1 reservoir, 1 tank, 1 pump, and two rule-based controls.",
             "system": "si",
             "coords": "xy",
             "work": "maintenance",
