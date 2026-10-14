@@ -1,0 +1,1252 @@
+{
+	"format": "hawsedc-lpn",
+	"app": "https://epanet-plus-plus.org/app/",
+	"v": 12,
+	"project": {
+		"name": "Fotobi_US_WGS84",
+		"activeScenario": "base",
+		"coords": "geo",
+		"basemap": "satellite",
+		"docId": "dmv3f9f6f3i9Bqjuv",
+		"scenarioOrdered": true
+	},
+	"scenarios": [
+		{
+			"id": "base",
+			"name": "Base",
+			"isBase": true,
+			"overrides": {}
+		},
+		{
+			"id": "s2",
+			"name": "EPS",
+			"overrides": {
+				"n:R-NE": {
+					"active": false
+				},
+				"n:T-NW": {
+					"level": 23
+				},
+				"n:T-NE": {
+					"level": 23
+				}
+			}
+		},
+		{
+			"id": "flow_static",
+			"name": "1. Flow test: Static",
+			"overrides": {}
+		},
+		{
+			"id": "flow_mid",
+			"name": "2. Flow test: Mid",
+			"overrides": {}
+		},
+		{
+			"id": "flow_max",
+			"name": "3. Flow test: Max",
+			"overrides": {}
+		},
+		{
+			"id": "average_day",
+			"name": "4. Average Day",
+			"overrides": {}
+		},
+		{
+			"id": "max_day",
+			"name": "5. Max Day",
+			"overrides": {}
+		},
+		{
+			"id": "s1",
+			"name": "No wells",
+			"overrides": {
+				"l:P-NW": {
+					"active": false
+				},
+				"l:P-NE": {
+					"active": false
+				},
+				"n:R-NW": {
+					"active": false
+				},
+				"n:R-NE": {
+					"active": false
+				},
+				"n:T-NW": {
+					"level": 23
+				},
+				"n:T-NE": {
+					"level": 23
+				}
+			}
+		},
+		{
+			"id": "s6",
+			"name": "EPS Pump off",
+			"overrides": {
+				"l:P-NW": {
+					"active": false
+				},
+				"l:P-NE": {
+					"active": false
+				},
+				"n:T-NW": {
+					"level": 23
+				},
+				"n:T-NE": {
+					"level": 23
+				}
+			}
+		},
+		{
+			"id": "dry",
+			"name": "Tanks run dry",
+			"overrides": {
+				"l:P-NW": {
+					"active": false
+				},
+				"l:P-NE": {
+					"active": false
+				},
+				"n:T-NW": {
+					"level": 23
+				},
+				"n:T-NE": {
+					"level": 23
+				},
+				"n:J-NW-S-1": {
+					"demands": [
+						{
+							"base": 1,
+							"pattern": "FLAT",
+							"category": null
+						}
+					]
+				},
+				"n:J-NW-S-2": {
+					"demands": [
+						{
+							"base": 1,
+							"pattern": "FLAT",
+							"category": null
+						}
+					]
+				},
+				"n:J-NW-S-3": {
+					"demands": [
+						{
+							"base": 1,
+							"pattern": "FLAT",
+							"category": null
+						}
+					]
+				},
+				"n:J-NE-S-1": {
+					"demands": [
+						{
+							"base": 1,
+							"pattern": "FLAT",
+							"category": null
+						}
+					]
+				},
+				"n:J-NE-S-2": {
+					"demands": [
+						{
+							"base": 1,
+							"pattern": "FLAT",
+							"category": null
+						}
+					]
+				},
+				"n:J-NE-S-3": {
+					"demands": [
+						{
+							"base": 1,
+							"pattern": "FLAT",
+							"category": null
+						}
+					]
+				}
+			}
+		}
+	],
+	"nodes": [
+		{
+			"id": "T-NW",
+			"type": "tank",
+			"x": -0.2702318143012904,
+			"y": 5.8134044822496955,
+			"_level": 15.01,
+			"minLevel": 15,
+			"maxLevel": 23,
+			"tankDiameter": 10,
+			"elev": 331.69,
+			"desc": "18,000 L per Kayla",
+			"bottomElev": 331.69
+		},
+		{
+			"id": "T-NE",
+			"type": "tank",
+			"x": -0.26889891323452975,
+			"y": 5.813356953716903,
+			"_level": 15.01,
+			"minLevel": 15,
+			"maxLevel": 23,
+			"tankDiameter": 10,
+			"elev": 342.19,
+			"desc": "Location per Data\\Map_With system locations.pdf",
+			"_active": true,
+			"bottomElev": 342.19
+		},
+		{
+			"id": "J-NW-S-3",
+			"type": "junction",
+			"x": -0.269953,
+			"y": 5.814323,
+			"_demand": 1,
+			"_active": true,
+			"elev": 320.21,
+			"demandPattern": null
+		},
+		{
+			"id": "J-NW-S-2",
+			"type": "junction",
+			"x": -0.269921210869719,
+			"y": 5.813501356563014,
+			"_demand": 1,
+			"desc": "per Data\\Map_With system locations.pdf",
+			"_active": true,
+			"elev": 333.99,
+			"demandPattern": null
+		},
+		{
+			"id": "J1",
+			"type": "junction",
+			"x": -0.2701186886946947,
+			"y": 5.8135208341501325,
+			"_demand": 0,
+			"elev": 330.38,
+			"_active": true
+		},
+		{
+			"id": "J2",
+			"type": "junction",
+			"x": -0.27022511080803674,
+			"y": 5.813412693869715,
+			"_demand": 0,
+			"elev": 331.69,
+			"_active": true
+		},
+		{
+			"id": "J-NW-S-1",
+			"type": "junction",
+			"x": -0.2702126384558423,
+			"y": 5.813403017204836,
+			"_demand": 1,
+			"elev": 331.69,
+			"_active": true,
+			"demandPattern": null
+		},
+		{
+			"id": "R-NW",
+			"type": "reservoir",
+			"x": -0.26977647187205867,
+			"y": 5.814100177539859,
+			"elev": 280,
+			"desc": "AT A20"
+		},
+		{
+			"id": "J-A20",
+			"type": "junction",
+			"x": -0.2699790234891055,
+			"y": 5.814134478632808,
+			"_demand": 0,
+			"elev": 319.88,
+			"lx": -2.884209792424191e-06,
+			"ly": 1.92571106986646e-06
+		},
+		{
+			"id": "J4",
+			"type": "junction",
+			"x": -0.26998878076201616,
+			"y": 5.814136700723446,
+			"_demand": 0,
+			"elev": 319.88
+		},
+		{
+			"id": "J-NE-S-3",
+			"type": "junction",
+			"x": -0.268783801516738,
+			"y": 5.814517572149468,
+			"_demand": 1,
+			"elev": 315.94,
+			"demandPattern": null
+		},
+		{
+			"id": "J-NE-S-2",
+			"type": "junction",
+			"x": -0.2684510794500116,
+			"y": 5.813866014543352,
+			"_demand": 1,
+			"elev": 334.32,
+			"demandPattern": null
+		},
+		{
+			"id": "R-NE",
+			"type": "reservoir",
+			"x": -0.26859973724423863,
+			"y": 5.813450163935718,
+			"elev": 300
+		},
+		{
+			"id": "J-A60",
+			"type": "junction",
+			"x": -0.2688757128482145,
+			"y": 5.813547102719274,
+			"_demand": 0,
+			"elev": 340.55,
+			"desc": "A60"
+		},
+		{
+			"id": "J8",
+			"type": "junction",
+			"x": -0.2688916191287337,
+			"y": 5.813557127326818,
+			"_demand": 0,
+			"elev": 340.55
+		},
+		{
+			"id": "J9",
+			"type": "junction",
+			"x": -0.26889570021904674,
+			"y": 5.8133731832775855,
+			"_demand": 0,
+			"elev": 342.19
+		},
+		{
+			"id": "J-NE-S-1",
+			"type": "junction",
+			"x": -0.26885822643379814,
+			"y": 5.813362750021337,
+			"_demand": 1,
+			"elev": 342.85,
+			"demandPattern": null
+		}
+	],
+	"links": [
+		{
+			"id": "L7",
+			"type": "pipe",
+			"from": "J1",
+			"to": "J-NW-S-2",
+			"verts": [
+				{
+					"x": -0.2700102542637941,
+					"y": 5.8135162962623195
+				}
+			],
+			"_diameter": 1,
+			"_roughness": 130,
+			"_length": 72.23993256370659,
+			"lenAuto": true,
+			"_status": "open",
+			"_k": 2
+		},
+		{
+			"id": "L10",
+			"type": "pipe",
+			"from": "J2",
+			"to": "J1",
+			"verts": [
+				{
+					"x": -0.27013884429072793,
+					"y": 5.81352163561404
+				}
+			],
+			"_diameter": 1.25,
+			"_roughness": 130,
+			"_length": 57.77549115947183,
+			"lenAuto": true,
+			"_status": "open",
+			"_k": 2
+		},
+		{
+			"id": "L11",
+			"type": "pipe",
+			"from": "T-NW",
+			"to": "J2",
+			"verts": [],
+			"_diameter": 1.25,
+			"_roughness": 130,
+			"_length": 20,
+			"lenAuto": false,
+			"_status": "open",
+			"_k": 2
+		},
+		{
+			"id": "L12",
+			"type": "pipe",
+			"from": "J2",
+			"to": "J-NW-S-1",
+			"verts": [],
+			"_diameter": 1,
+			"_roughness": 130,
+			"_length": 25,
+			"lenAuto": false,
+			"_status": "open",
+			"_k": 2
+		},
+		{
+			"id": "P-NW",
+			"type": "pump",
+			"from": "R-NW",
+			"to": "J-A20",
+			"verts": [],
+			"_diameter": 4,
+			"_roughness": 130,
+			"_length": 74.64292521217065,
+			"lenAuto": true,
+			"_status": "open",
+			"_k": 2,
+			"_curveId": "C1"
+		},
+		{
+			"id": "L15",
+			"type": "pipe",
+			"from": "J-NW-S-3",
+			"to": "J4",
+			"verts": [],
+			"_diameter": 1.25,
+			"_roughness": 130,
+			"_length": 68.83097214785326,
+			"lenAuto": true,
+			"_status": "open",
+			"_k": 2
+		},
+		{
+			"id": "L16",
+			"type": "pipe",
+			"from": "J4",
+			"to": "J1",
+			"verts": [],
+			"_diameter": 1.25,
+			"_roughness": 130,
+			"_length": 228.37631114489005,
+			"lenAuto": true,
+			"_status": "open",
+			"_k": 1.5
+		},
+		{
+			"id": "L17",
+			"type": "pipe",
+			"from": "J-A20",
+			"to": "J4",
+			"verts": [],
+			"_diameter": 1,
+			"_roughness": 130,
+			"_length": 3.635864309938181,
+			"lenAuto": true,
+			"_status": "open",
+			"_k": 2
+		},
+		{
+			"id": "L19",
+			"type": "pipe",
+			"from": "J8",
+			"to": "J-A60",
+			"verts": [],
+			"_diameter": 1,
+			"_roughness": 130,
+			"_length": 6.828793996751056,
+			"lenAuto": true,
+			"_status": "open",
+			"_k": 2
+		},
+		{
+			"id": "P-NE",
+			"type": "pump",
+			"from": "R-NE",
+			"to": "J-A60",
+			"verts": [],
+			"_diameter": 4,
+			"_roughness": 130,
+			"_length": 106.2662203284887,
+			"lenAuto": true,
+			"_status": "open",
+			"_k": 2,
+			"_curveId": "C1",
+			"_energyPrice": 0.1
+		},
+		{
+			"id": "L20",
+			"type": "pipe",
+			"from": "J8",
+			"to": "J-NE-S-2",
+			"verts": [
+				{
+					"x": -0.26879265382552575,
+					"y": 5.813575477705379
+				},
+				{
+					"x": -0.2685762364637687,
+					"y": 5.813652792705281
+				},
+				{
+					"x": -0.26846866026333027,
+					"y": 5.813673242815854
+				}
+			],
+			"_diameter": 1,
+			"_roughness": 130,
+			"_length": 230.07822915580581,
+			"lenAuto": true,
+			"_status": "open",
+			"_k": 2
+		},
+		{
+			"id": "L21",
+			"type": "pipe",
+			"from": "J8",
+			"to": "J-NE-S-3",
+			"verts": [
+				{
+					"x": -0.26896351372222194,
+					"y": 5.813662941520774
+				},
+				{
+					"x": -0.26900384905135977,
+					"y": 5.813668639476982
+				},
+				{
+					"x": -0.2689941551378239,
+					"y": 5.813826216370577
+				},
+				{
+					"x": -0.26893615567856627,
+					"y": 5.813899053991268
+				},
+				{
+					"x": -0.26885387294321267,
+					"y": 5.814369799519353
+				}
+			],
+			"_diameter": 1.25,
+			"_roughness": 130,
+			"_length": 385.05972595133846,
+			"lenAuto": true,
+			"_status": "open",
+			"_k": 2
+		},
+		{
+			"id": "L22",
+			"type": "pipe",
+			"from": "T-NE",
+			"to": "J9",
+			"verts": [],
+			"_diameter": 1.25,
+			"_roughness": 130,
+			"_length": 20,
+			"lenAuto": false,
+			"_status": "open",
+			"_k": 2
+		},
+		{
+			"id": "L23",
+			"type": "pipe",
+			"from": "J9",
+			"to": "J8",
+			"verts": [
+				{
+					"x": -0.26885990039582774,
+					"y": 5.813430069475171
+				}
+			],
+			"_diameter": 1.25,
+			"_roughness": 130,
+			"_length": 71.91359394022102,
+			"lenAuto": true,
+			"_status": "open",
+			"_k": 2
+		},
+		{
+			"id": "L24",
+			"type": "pipe",
+			"from": "J9",
+			"to": "J-NE-S-1",
+			"verts": [],
+			"_diameter": 1,
+			"_roughness": 130,
+			"_length": 14.132679261410416,
+			"lenAuto": true,
+			"_status": "open",
+			"_k": 2
+		}
+	],
+	"labels": [
+		{
+			"id": "X4",
+			"_text": "SCHOOL",
+			"x": -0.2682810071332165,
+			"y": 5.813821104643333,
+			"anchorNode": null,
+			"sizeMult": 1,
+			"rot": 5
+		},
+		{
+			"id": "X42",
+			"_text": "Scenario: Base\nEPS: Steady state\nBase demand per station:  1 gpm\n- Multiplier: 4 X 0.1 L/s = 24 L/min =  6.4 gpm = 6.4\n- Pattern (default): none\nTank levels: Empty\nWells: 40' deep\nPumps:\n- Active\n- Curve C1 80' static, 60' @12 gpm\nPipe: 1.25\" mains, 1\" laterals\nIssues: None.",
+			"x": -0.26976869840486223,
+			"y": 5.813878117218011,
+			"anchorNode": null,
+			"sizeMult": 1,
+			"_active": true,
+			"align": "left"
+		},
+		{
+			"id": "X43",
+			"_text": "",
+			"x": -0.2697501024244415,
+			"y": 5.813468671113977,
+			"anchorNode": null,
+			"sizeMult": 1
+		}
+	],
+	"nextId": {
+		"J": 11,
+		"R": 2,
+		"T": 1,
+		"L": 25,
+		"P": 2,
+		"V": 1,
+		"X": 44,
+		"M": 1
+	},
+	"customers": [],
+	"origin": {
+		"x": 0,
+		"y": 0
+	},
+	"labelSettings": {
+		"node": {
+			"id": false,
+			"desc": false,
+			"tag": false,
+			"demand": false,
+			"elev": false,
+			"initQuality": false,
+			"demandActual": true,
+			"level": false,
+			"head": false,
+			"pressure": true,
+			"quality": false
+		},
+		"link": {
+			"id": false,
+			"desc": false,
+			"tag": false,
+			"length": false,
+			"diameter": true,
+			"roughness": false,
+			"km": false,
+			"initStatus": false,
+			"bulkCoeff": false,
+			"wallCoeff": false,
+			"flow": true,
+			"velocity": true,
+			"headloss": false,
+			"gradient": false,
+			"friction": false,
+			"rate": false,
+			"quality": false,
+			"status": false
+		},
+		"customer": {
+			"id": false,
+			"desc": false,
+			"tag": false,
+			"demand": true,
+			"count": false,
+			"demandActual": false
+		},
+		"decimals": {
+			"node": {
+				"demand": 1,
+				"elev": 2,
+				"initQuality": 2,
+				"demandActual": 1,
+				"level": 2,
+				"head": 2,
+				"pressure": 2,
+				"quality": 1,
+				"quality:trace": 0
+			},
+			"link": {
+				"length": 0,
+				"diameter": 2,
+				"roughness": 0,
+				"km": 2,
+				"bulkCoeff": 1,
+				"wallCoeff": 1,
+				"flow": 1,
+				"velocity": 1,
+				"headloss": 2,
+				"gradient": 2,
+				"friction": 3,
+				"rate": 1,
+				"quality": 1,
+				"quality:trace": 0
+			},
+			"customer": {
+				"demand": 1,
+				"demandActual": 1
+			}
+		},
+		"prefix": {
+			"node": {},
+			"link": {},
+			"customer": {}
+		},
+		"suffix": {
+			"node": {
+				"level": " ft H2O",
+				"head": " ft H2O",
+				"demand": " gpm"
+			},
+			"link": {
+				"diameter": " in"
+			},
+			"customer": {
+				"demand": " gpm"
+			}
+		},
+		"useUnits": {
+			"node": {
+				"initQuality": true,
+				"quality": true
+			},
+			"link": {
+				"length": false,
+				"diameter": false,
+				"quality": true
+			},
+			"customer": {}
+		},
+		"separator": " ",
+		"show": {
+			"node": {
+				"id": 1,
+				"desc": 2,
+				"tag": 3,
+				"demand": 4,
+				"elev": 5,
+				"initQuality": 6,
+				"demandActual": 7,
+				"level": 9,
+				"head": 10,
+				"pressure": 11,
+				"quality:chemical": 12,
+				"quality:trace": 13,
+				"quality:age": 14
+			},
+			"link": {
+				"id": 1,
+				"desc": 2,
+				"tag": 3,
+				"length": 4,
+				"diameter": 5,
+				"roughness": 6,
+				"km": 7,
+				"initStatus": 8,
+				"bulkCoeff": 9,
+				"wallCoeff": 10,
+				"flow": 11,
+				"velocity": 12,
+				"headloss": 13,
+				"gradient": 14,
+				"friction": 15,
+				"rate": 16,
+				"quality:chemical": 17,
+				"quality:trace": 18,
+				"quality:age": 19,
+				"status": 20
+			},
+			"customer": {
+				"id": 1,
+				"desc": 2,
+				"tag": 3,
+				"demand": 4,
+				"count": 5,
+				"demandActual": 6
+			}
+		},
+		"priority": {
+			"node": {
+				"id": 2,
+				"desc": 4,
+				"tag": 6,
+				"demand": 10,
+				"elev": 8,
+				"initQuality": 16,
+				"demandActual": 26,
+				"level": 12,
+				"head": 14,
+				"pressure": 28,
+				"quality:chemical": 22,
+				"quality:trace": 20,
+				"quality:age": 18
+			},
+			"link": {
+				"id": 2,
+				"desc": 4,
+				"tag": 6,
+				"length": 18,
+				"diameter": 38,
+				"roughness": 22,
+				"km": 16,
+				"initStatus": 12,
+				"bulkCoeff": 10,
+				"wallCoeff": 8,
+				"flow": 40,
+				"velocity": 36,
+				"headloss": 28,
+				"gradient": 34,
+				"friction": 14,
+				"rate": 20,
+				"quality:chemical": 32,
+				"quality:trace": 30,
+				"quality:age": 26,
+				"status": 24
+			},
+			"customer": {
+				"id": 2,
+				"desc": 4,
+				"tag": 6,
+				"demand": 8,
+				"count": 10,
+				"demandActual": 12
+			}
+		},
+		"markExtrema": false,
+		"customerMaxWidth": 1000
+	},
+	"backdrop": null,
+	"settings": {
+		"idPrefixes": {
+			"J": "J",
+			"R": "R",
+			"T": "T",
+			"L": "L",
+			"P": "P",
+			"V": "V",
+			"X": "X",
+			"M": "C",
+			"S": "S"
+		},
+		"customProps": [],
+		"emitterExponent": 0.5,
+		"hydraulics": {
+			"demandMultiplier": 6.4
+		},
+		"qualityOptions": {},
+		"quality": {
+			"mode": "none",
+			"traceNode": ""
+		},
+		"fileOptions": {},
+		"engine": "epanet",
+		"autoRun": true,
+		"nodeElevSource": "value",
+		"defaults": {
+			"nodeElev": 0,
+			"demand": 0,
+			"diameter": 4,
+			"roughness": 130,
+			"k": 2,
+			"tankLevel": 20,
+			"tankMinLevel": 0,
+			"tankMaxLevel": 30,
+			"tankDiameter": 50,
+			"nodeElevSource": "dem"
+		},
+		"sectionsOpen": {
+			"idPrefixes": false,
+			"defaults": true,
+			"mapDisplay": false,
+			"colors": false,
+			"computation": false,
+			"files": false
+		},
+		"textSize": 15,
+		"symbolSize": 15,
+		"linkWidth": 8,
+		"symbolOpacity": 1,
+		"labelMaxWidth": null,
+		"symbolCapMultiple": 0.5,
+		"symbolCapPercentile": 50,
+		"basemapStyle": "normal",
+		"backdropOpacity": 1,
+		"alignPipeLabels": true,
+		"labelFlipLeftOfVertical": 20,
+		"maskLabels": true,
+		"showArrows": true,
+		"leaderSnapDeg": 0,
+		"legendPosition": "off",
+		"colorNodeField": "",
+		"colorLinkField": "",
+		"colorRampNode": "ylorbr",
+		"colorRampLink": "viridis",
+		"colorClassesNode": 7,
+		"colorClassesLink": 7,
+		"colorReverseNode": false,
+		"colorReverseLink": false,
+		"contourFill": "",
+		"contourLines": false,
+		"contourLabels": true,
+		"contourOpacity": 0.6,
+		"contourInterval": {},
+		"contourBuffer": 1.5,
+		"contourTerrain": false,
+		"colorLegendPosition": "off",
+		"colorBreaks": {
+			"node.pressure": [
+				3.05,
+				6.1,
+				9.15,
+				12.2,
+				15.2,
+				18.3
+			]
+		},
+		"colorModes": {},
+		"reactions": {
+			"tank": {}
+		},
+		"energy": {
+			"effic": {}
+		},
+		"sources": {
+			"read": true
+		},
+		"mixing": {
+			"read": true
+		},
+		"tags": {
+			"read": true
+		},
+		"method": "hw"
+	},
+	"patterns": [
+		{
+			"id": "P1",
+			"multipliers": [
+				0.001,
+				0.0001,
+				0.0001,
+				0.0001,
+				0.0001,
+				0.0001,
+				0.0001,
+				0.0001,
+				0.0001,
+				0.0001,
+				0.0001,
+				0.0001,
+				0.0001,
+				0.0001,
+				0.0001,
+				1,
+				0.0001,
+				0.0001,
+				0.0001,
+				0.0001,
+				0.0001,
+				0.0001,
+				0.0001,
+				0.0001
+			]
+		},
+		{
+			"id": "P8",
+			"multipliers": [
+				0.0001,
+				0.0001,
+				0.0001,
+				0.0001,
+				0.0001,
+				0.0001,
+				0.0001,
+				0.0001,
+				0.0001,
+				1,
+				1,
+				1,
+				1,
+				1,
+				1,
+				1,
+				1,
+				0.0001,
+				0.0001,
+				0.0001,
+				0.0001,
+				0.0001,
+				0.0001,
+				0.0001
+			]
+		},
+		{
+			"id": "P12",
+			"multipliers": [
+				0.0001,
+				0.0001,
+				0.0001,
+				0.0001,
+				0.0001,
+				0.0001,
+				0.0001,
+				1,
+				1,
+				1,
+				1,
+				1,
+				1,
+				1,
+				1,
+				1,
+				1,
+				1,
+				1,
+				0.0001,
+				0.0001,
+				0.0001,
+				0.0001,
+				0.0001
+			]
+		},
+		{
+			"id": "P16",
+			"multipliers": [
+				0.0001,
+				0.0001,
+				0.0001,
+				0.0001,
+				0.0001,
+				1,
+				1,
+				1,
+				1,
+				1,
+				1,
+				1,
+				1,
+				1,
+				1,
+				1,
+				1,
+				1,
+				1,
+				1,
+				1,
+				0.0001,
+				0.0001,
+				0.0001
+			]
+		},
+		{
+			"id": "FLAT",
+			"multipliers": [
+				1
+			]
+		}
+	],
+	"defaultPattern": "P1",
+	"curves": [
+		{
+			"id": "C1",
+			"kind": "head",
+			"points": [
+				[
+					0,
+					80
+				],
+				[
+					12,
+					60
+				]
+			],
+			"note": "Placeholder pump"
+		}
+	],
+	"pipeTypes": [],
+	"fittingSets": [],
+	"profiles": [],
+	"times": {
+		"duration": 86400,
+		"hydraulicStep": 360,
+		"patternStep": 3600,
+		"patternStart": 0,
+		"reportStep": 3600,
+		"reportStart": 0,
+		"startClock": 0,
+		"text": {
+			"duration": "24",
+			"hydraulicStep": "0.1",
+			"patternStep": "1"
+		}
+	},
+	"controls": [
+		{
+			"link": "P-NW",
+			"raw": "LINK P-NW OPEN IF NODE T-NW BELOW 18",
+			"action": {
+				"status": "open"
+			},
+			"condition": {
+				"kind": "node",
+				"node": "T-NW",
+				"cmp": "below",
+				"value": 18,
+				"unit": "head"
+			},
+			"text": {
+				"value": "18"
+			}
+		},
+		{
+			"link": "P-NW",
+			"raw": "LINK P-NW CLOSED IF NODE T-NW ABOVE 24",
+			"action": {
+				"status": "closed"
+			},
+			"condition": {
+				"kind": "node",
+				"node": "T-NW",
+				"cmp": "above",
+				"value": 24,
+				"unit": "head"
+			},
+			"text": {
+				"value": "24"
+			}
+		},
+		{
+			"link": "P-NE",
+			"raw": "LINK P-NE OPEN IF NODE T-NE BELOW 18",
+			"action": {
+				"status": "open"
+			},
+			"condition": {
+				"kind": "node",
+				"node": "T-NE",
+				"cmp": "below",
+				"value": 18,
+				"unit": "head"
+			},
+			"text": {
+				"value": "18"
+			}
+		},
+		{
+			"link": "P-NE",
+			"raw": "LINK P-NE CLOSED IF NODE T-NE ABOVE 24",
+			"action": {
+				"status": "closed"
+			},
+			"condition": {
+				"kind": "node",
+				"node": "T-NE",
+				"cmp": "above",
+				"value": 24,
+				"unit": "head"
+			},
+			"text": {
+				"value": "24"
+			}
+		}
+	],
+	"rules": [],
+	"inpSections": {},
+	"view": {
+		"cx": -0.2691524417416279,
+		"cy": 5.823772676142444,
+		"s": 496602.8526466771
+	},
+	"units": {
+		"lpn_u_length": "ft",
+		"lpn_u_diameter": "in",
+		"lpn_u_elevhead": "fth2o",
+		"lpn_u_pressure": "psi",
+		"lpn_u_flow": "gpm",
+		"lpn_u_velocity": "ftps",
+		"lpn_u_gradient": "gradePercent",
+		"lpn_u_roughness": "ft",
+		"lpn_u_age": "hr"
+	},
+	"bubbles": [
+		{
+			"id": "tsb1",
+			"g": "node",
+			"n": "J-NW-S-2",
+			"x": 288,
+			"y": -368,
+			"w": 300,
+			"f": "pressure"
+		},
+		{
+			"id": "tsb2",
+			"g": "node",
+			"n": "J-NW-S-3",
+			"x": -458,
+			"y": -47,
+			"w": 300,
+			"f": "pressure"
+		},
+		{
+			"id": "tsb3",
+			"g": "node",
+			"n": "T-NW",
+			"x": -328,
+			"y": -234,
+			"w": 300,
+			"f": "head"
+		},
+		{
+			"id": "tsb4",
+			"g": "node",
+			"n": "J-NW-S-1",
+			"x": 211,
+			"y": -110,
+			"w": 300,
+			"f": "pressure"
+		},
+		{
+			"id": "tsb5",
+			"g": "node",
+			"n": "J-NE-S-1",
+			"x": 244,
+			"y": -216,
+			"w": 300,
+			"f": "pressure"
+		},
+		{
+			"id": "tsb6",
+			"g": "node",
+			"n": "J-NE-S-3",
+			"x": 181,
+			"y": 19,
+			"w": 300,
+			"f": "pressure"
+		},
+		{
+			"id": "tsb7",
+			"g": "node",
+			"n": "J-NE-S-2",
+			"x": 50,
+			"y": -135,
+			"w": 300,
+			"f": "pressure"
+		}
+	]
+}
