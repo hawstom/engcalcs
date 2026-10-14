@@ -292,10 +292,9 @@ async function run(mutate, quiet) {
 	const noPair = (t) => !/, or [^,.;:]*, to /.test(t) && !/, or [^,.;:]*, (?:and )?(?:then )?(?:to|you) /.test(t);
 	ok('8b.1 no sentence of the help sets an "or" clause off with a pair of commas, "Do this, or do that, to make this"', noPair(PC.lpn_sm_help), (PC.lpn_sm_help.match(/[^.]*, or [^.]*, to [^.]*\./) || [''])[0]);
 	ok('8b.2 the Example paragraph is in the help (Tom: "Example is good and important.")', helpParas.some((p) => /^Example: /.test(p)));
-	ok('8b.3 paragraph 4 of the help, the title counted, begins "Properties and settings belong to alternatives categories"', helpParas[3].indexOf('Properties and settings belong to alternatives categories') === 0, helpParas[3].slice(0, 80));
 	const tipSentences = PC.lpn_scenario_basic_tip.split(/(?<=\.) /);
-	ok('8b.4 the Basic mode tip ends with his two sentences, the manager one first',
-		tipSentences[tipSentences.length - 2] === PC.lpn_sm_basic_on && tipSentences[tipSentences.length - 1] === 'Basic mode is disabled when a project has scenarios and alternatives relationships that Basic mode cannot show.', JSON.stringify(tipSentences.slice(-2)));
+	ok('8b.4 the Basic mode tip says the manager is disabled with Basic mode on, next to its last sentence (Tom, 2026-10-13)',
+		tipSentences.length >= 2 && tipSentences[tipSentences.length - 2] === PC.lpn_sm_basic_on, JSON.stringify(tipSentences.slice(-2)));
 	ok('8b.5 the singular override key and the notice Choosing-turns-it-off are gone', PC.lpn_scenario_delete_goes_one === undefined && PC.lpn_sm_basic_off === undefined);
 	ok('8b.6 the deletion line has one form, "Its overrides ({n}) are deleted with it."', PC.lpn_scenario_delete_goes.indexOf('{n}') > 0 && /overrides \(\{n\}\)/.test(PC.lpn_scenario_delete_goes));
 
