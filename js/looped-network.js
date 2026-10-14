@@ -36332,7 +36332,7 @@ var EngCalcs = EngCalcs || {};
 			var dz;
 			if (!l || !l.lenAuto || typeof l._length !== 'number' || !isFinite(l._length)) { return; }
 			dz = autoLenRise(linkEndElev(byId[l.from]), linkEndElev(byId[l.to]), fL / fE);
-			if (dz && isFinite(dz)) { l._length = Math.sqrt(l._length * l._length + dz * dz); }
+			if (dz && isFinite(dz)) { l._length = Math.sqrt(l._length * l._length + dz * dz); }   // base-write: migration of a saved document, before any scenario is showing
 		});
 	}
 	function migrateSaved(saved) {
