@@ -54,9 +54,8 @@ function toolbarRulesOnMaster() {
 	const text = execFileSync('git', ['show', 'master:css/engcalcs.css'], { cwd: env.REPO, encoding: 'utf8' });
 	const grab = (re) => { const m = re.exec(text); if (!m) { throw new Error('rule not found on master: ' + re); } return m[0]; };
 	return {
-		base: grab(/#lpn_toolbar button:not\(\.lpn-transport-btn\) \{[^}]*\}/),
-		hover: grab(/#lpn_toolbar button:not\(\.lpn-transport-btn\):hover \{[^}]*\}/),
-		pressed: grab(/#lpn_toolbar button:not\(\.lpn-transport-btn\)\[aria-pressed="true"\] \{[^}]*\}/)
+		// Only the toolbar's own padding rule: hover and pressed now share the button base with the menu bar.
+		base: grab(/^#lpn_toolbar button:not\(\.lpn-transport-btn\) \{[^}]*\}/m)
 	};
 }
 
