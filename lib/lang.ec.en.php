@@ -3404,6 +3404,9 @@ $ec_lang['lpn_engine_refused']='The EPANET solver rejected this network, so the 
 // is the only part a user can act on, and nothing of ours could reconstruct it.
 $ec_lang['lpn_engine_refused_why']='EPANET solver message: {message}';
 $ec_lang['lpn_engine_refused_fallback']='The numbers on screen came from the built-in solver instead.';
+// A run EPANET started and could not finish, for example when a tank empties and the junctions it
+// fed have no other source (Error 110). {time} is the run time it stopped at, H:MM.
+$ec_lang['lpn_time_run_stopped']='The EPANET run stopped at {time}, so it has no results. The EPANET run report says why.';
 // The run's own version of that last sentence: a period run has a moment and a tank level to name,
 // and a one-moment solve does not, which is where the shared label stops.
 $ec_lang['lpn_time_run_fell_back']='The numbers on screen came from the built-in solver instead. It solves one instant at a time, so this is the network at {time} only, with every tank at its initial level.';
