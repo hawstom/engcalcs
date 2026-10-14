@@ -1221,7 +1221,8 @@ html[lang="zh"] .ec-welcome {
    proportional to the LETTERING: a Text label at 3x gets a 3x halo instead of a hairline, and the
    clearance arithmetic in alignedLabelPlacement(), which is written in fractions of the font size,
    stays true at every text size rather than only at the shipped one.
-   0.2em is 0.1em of white outside the glyph (~1.1px at the shipped 11px), a little tighter than the
+   DOUBLED to 0.4em on 2026-10-14 (Tom) and now the project setting Text halo width, `--lpn-halo` on the <svg>
+   (0.4 = 40 percent of the text size). The paragraph below describes the old 0.2em: 0.2em is 0.1em of white outside the glyph (~1.1px at the shipped 11px), a little tighter than the
    0.15-of-font-size pad the rect drew. Tighter on purpose: half the stroke falls INSIDE the glyph,
    where the fill paints over it everywhere except in a counter -- the enclosed hole of an e or an
    8 -- and a heavy halo closes those up. `stroke-linejoin: round` keeps a sharp corner from
@@ -1229,7 +1230,7 @@ html[lang="zh"] .ec-welcome {
 .lpn-lbl {
 	fill: #333; pointer-events: none; user-select: none;
 	paint-order: stroke fill;
-	stroke: #fff; stroke-width: 0.2em; stroke-linejoin: round;
+	stroke: #fff; stroke-width: calc(var(--lpn-halo, 0.4) * 1em); stroke-linejoin: round;
 }
 /* pointer-events:none, found 2026-07-30 while verifying popup placement: labelsLayer draws ABOVE the
    symbol layers, so a leader line crossing a node swallowed the click meant for that node and the

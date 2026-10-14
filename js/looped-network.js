@@ -6139,6 +6139,11 @@ var EngCalcs = EngCalcs || {};
 			// the control exists because a clean drawing with no backdrop reads better without the
 			// patches, which is a judgement about the sheet and therefore the user's to make.
 			maskLabels: true,
+			// **TEXT HALO WIDTH, percent of the text size** (Tom, 2026-10-14: "our text halos need
+			// to be bigger and maybe available as a setting ... Can we double them?"). The stroke
+			// width stays in em, so 40 is the old 0.2em doubled to 0.4em. A project saved before
+			// this reads as undefined and gets 40; applyTextHalo() writes --lpn-halo on the <svg>.
+			textHalo: 40,
 			// **FLOW-DIRECTION ARROWS, ON** (Tom, 2026-09-01: "it would be nice to have a Settings
 			// option to turn off flow direction arrows"). A switch that takes something away, so the
 			// default is what the page has always drawn -- an upgrade must not restyle anyone's map.
@@ -37020,6 +37025,7 @@ var EngCalcs = EngCalcs || {};
 		}
 		refreshValueColors();
 		renderLabelsLegend();
+		applyTextHalo();
 		applyMaskLabels();   // the setting belongs to the project, so opening one can change it
 		updateEmptyHint();
 		clearStatusHidden();   // hidden messages belong to the network that was on screen
@@ -48452,6 +48458,7 @@ var EngCalcs = EngCalcs || {};
 		refreshValueColors();
 		applyLabelVisibility();
 		applyMaskLabels();
+		applyTextHalo();
 		updateEmptyHint();
 		updateModeHint(); // initial mode is 'select', set before setMode() ever runs -- render it now
 		renderTabs();
@@ -52781,6 +52788,13 @@ var EngCalcs = EngCalcs || {};
 		doc.links.forEach(function (l) { updateArrow(l.id); });
 		relayoutLabels();
 	}
+	function textHaloPct() {
+		var v = settings.textHalo;
+		return (typeof v === 'number' && isFinite(v) && v >= 0) ? v : 40;
+	}
+	function applyTextHalo() {
+		if (svg) { svg.style.setProperty('--lpn-halo', String(textHaloPct() / 100)); }
+	}
 	function applyMaskLabels() {
 		if (svg) { svg.classList.toggle('lpn-masks-off', settings.maskLabels === false); }
 	}
@@ -53911,6 +53925,16 @@ var EngCalcs = EngCalcs || {};
 			applyMaskLabels(); saveToStorage();
 		});
 		row(mapBody, pc.lpn_settings_mask_labels || 'Solid background behind labels', maskInput);
+		var haloInput = document.createElement('input');
+		haloInput.type = 'number'; haloInput.className = 'ec-spin';
+		haloInput.step = '5'; haloInput.min = '0'; haloInput.max = '100'; haloInput.value = textHaloPct();
+		haloInput.addEventListener('change', function () {
+			var v = +haloInput.value;
+			if (haloInput.value !== '' && isFinite(v) && v >= 0 && v <= 100) { settings.textHalo = v; applyTextHalo(); saveToStorage(); }
+			else { haloInput.value = textHaloPct(); }
+		});
+		row(mapBody, pc.lpn_settings_text_halo || 'Text halo width (percent of text size)', haloInput,
+			pc.lpn_settings_text_halo_tip);
 		// **ONE CONTROL, NOT A CHECKBOX AND A PICKER** (ROADMAP Task 408). Tom asked for "a toggle
 		// or picker for the increment"; Off is one of the increments, exactly as it is one of the
 		// legend placements, so there is one decision and no question of which control wins.

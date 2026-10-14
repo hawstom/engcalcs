@@ -3432,6 +3432,8 @@ $ec_lang['lpn_settings_align_labels']='Draw link labels along the link line';
 $ec_lang['lpn_settings_readability_bias']='Label flip angle adjustment (degrees)';
 $ec_lang['lpn_settings_readability_bias_tip']='Flip a label to keep it right side up when it leans more than this many degrees left of vertical.';
 $ec_lang['lpn_settings_mask_labels']='Solid background behind labels';
+$ec_lang['lpn_settings_text_halo']='Text halo width (percent of text size)';
+$ec_lang['lpn_settings_text_halo_tip']='Width of the solid outline behind map text, as a percent of the text size. Applies when Solid background behind labels is on.';
 // Task 408: dragging a label away from its node draws a leader line, and this pulls that line onto
 // a round angle when the drag comes close to one. The values are numbers and the degree sign, which
 // need no translation; "Off" borrows lpn_settings_legend_off, the same word for the same idea.
