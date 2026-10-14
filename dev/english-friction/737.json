@@ -1,0 +1,29 @@
+{
+ "sprint": "737",
+ "description": "Term-centric sweep for Task 737: one word per concept. Collisions found by audit 2026-10-14: Label=Tag (es, it, tr, hr), Reservoir=Source (cs), Label=Description (fr), Elevation=Head (he).",
+ "entries": [
+  {
+   "key": "lpn_find_scope_source",
+   "source": "translator",
+   "lang": "cs",
+   "complaint": "English Source names two things: a water-quality source node (Find scope, Source type, Source quality) and the origin of water in Source trace / Source share. Czech needs two words: Dávkování and původ.",
+   "readings": [
+    "quality source node",
+    "origin of traced water"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Not an English defect: Tom's standing rule already splits the analysis (Source trace) from the percentage (Source share), and a language may render the node and the origin with two words. Recorded in glossary source-trace."
+  },
+  {
+   "key": "lpn_field_tag",
+   "source": "translator",
+   "lang": "es",
+   "complaint": "Etiqueta is the map Label; Código is the survey code; no standard Spanish GIS word for Tag was free. Marcador chosen as best fit, not native-verified.",
+   "readings": [
+    "asset tag"
+   ],
+   "disposition": "glossary",
+   "resolution": "Recorded in glossary term 95 (Tag) as es marcador, 2026-10-14. Told Tom in that day's report; his word overrides it."
+  }
+ ]
+}

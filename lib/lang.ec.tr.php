@@ -1810,7 +1810,7 @@ $ec_lang['lpn_inp_drop_quality']='Bu dosya su kalitesini tanımlıyor: borularda
 $ec_lang['lpn_inp_drop_sources_mixing']='Bu dosya, bir kimyasalın şebekeye nerede enjekte edildiğini ve her depoda suyun nasıl karıştığını belirtir. Her kaynak uygulandığı düğümde, her depo da karışım modelini gösterir. İkisi de şebeke bir toplam çalışma süresi boyunca çalıştırıldığında kullanılır.';
 $ec_lang['lpn_inp_drop_energy']='Bu EPANET dosyası, pompalama maliyeti modelleme verisi içeriyor. Bu sayfa bunu okuyup kullanıyor. Modeli EPANET motoruyla çalıştırın, sonra her pompanın ne kadar çalıştığını, çektiği gücü, kullandığı enerjiyi ve bunun maliyetini görmek için Su, Raporlar, Pompa enerjisi\'ni açın. Satırlar korunur ve bir EPANET dosyası kaydederseniz geri yazılır.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_inp_drop_tags']='Bu dosya, bazı düğümlerine, borularına veya diğer öğelerine etiket veriyor. Her etiket tam olarak geldi ve her biri kendi öğesinin özelliklerinde durur; orada okuyabilir veya değiştirebilirsiniz.';
+$ec_lang['lpn_inp_drop_tags']='Bu dosya, bazı düğümlerine, borularına veya diğer öğelerine künye atıyor. Her künye tam olarak geldi ve her biri kendi öğesinin özelliklerinde durur; orada okuyabilir veya değiştirebilirsiniz.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_inp_drop_report']='Bu dosya EPANET rapor biçimi ayarları içeriyor. Çalıştırma raporu Raporlar, Çalıştırma altında bulunur, ancak bu ayarların belirttiği biçimi değil, standart EPANET biçimini kullanır. Satırlar korunur ve bir EPANET dosyası kaydederseniz geri yazılır.';
 $ec_lang['lpn_inp_drop_sections']='Bu dosya, bu sayfanın hiç okumadığı bir bölüm içeriyor. Burada kullanılmaz. Bütün olarak korunur ve bir EPANET dosyası kaydederseniz geri yazılır.';
@@ -2242,9 +2242,9 @@ $ec_lang['lpn_field_desc']='Açıklama';
 // page a Label is our own annotation and a Text is EPANET's label, and a third word in that
 // neighbourhood is the collision CLAUDE.md's vocabulary rule exists to stop. Tag is EPANET's own
 // word for this and a hydraulic engineer already knows it.
-$ec_lang['lpn_field_tag']='Etiket';
+$ec_lang['lpn_field_tag']='Künye';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_field_tag_tip']='Bir etiket, bir basınç bölgesi veya bir iş emri gibi istediğiniz herhangi bir anlamı taşıyabilir. Ne burada ne de EPANET\'te hiçbir hesaplama onu okumaz. Bir etiket tek bir sözcüktür: EPANET ilk boşlukta okumayı durdurur, bu yüzden yazarken bir boşluk reddedilir. EPANET dosyasına ve ondan geri taşınır.';
+$ec_lang['lpn_field_tag_tip']='Bir künye, bir basınç bölgesi veya bir iş emri gibi istediğiniz herhangi bir anlamı taşıyabilir. Ne burada ne de EPANET\'te hiçbir hesaplama onu okumaz. Bir künye tek bir sözcüktür: EPANET ilk boşlukta okumayı durdurur, bu yüzden yazarken bir boşluk reddedilir. EPANET dosyasına ve ondan geri taşınır.';
 $ec_lang['lpn_pump_effic_curve']='Pompa verim eğrisi';
 $ec_lang['lpn_pump_effic_curve_tip']='Bu pompanın her debide ne kadar verimli olduğunu belirten, Kitaplıklar kutusundaki eğri. Birden çok pompa aynı eğriyi kullanabilir, ve onu orada düzenlemek hepsini değiştirir. Bu pompa yalnızca başvuruyu tutar; noktaların kendisi Kitaplıklar, Eğriler altında okunur ve düzenlenir.';
 // **THE STRINGS EVERY CURVE CONTROL SHARES** (Task 586). One chooser serves a pump's head curve, a

@@ -372,9 +372,10 @@
             "category": "loanword",
             "languages": [
                 "de",
-                "id"
+                "id",
+                "it"
             ],
-            "reason": "Tag -- the EPANET field name, the ordinary loanword in German and Indonesian."
+            "reason": "Tag -- the EPANET field name, the ordinary loanword in German and Indonesian. Added it, sprint 737 (2026-10-14): Tag is the standard Italian loanword and frees Etichetta for the map Label."
         },
         "lpn_field_text_align_center": {
             "category": "cognate",
@@ -959,6 +960,13 @@
                 "fr"
             ],
             "reason": "'{shape}, point {n}': 'point' is the French word, spelled identically."
+        },
+        "lpn_field_demand_category": {
+            "category": "cognate",
+            "languages": [
+                "fr"
+            ],
+            "reason": "Description -- the French word is Description (sprint 737, 2026-10-14, replacing Libellé, which collided with the map Label)."
         }
     }
 }

@@ -142,30 +142,30 @@ $ec_lang['hw_main_title']='מחשבון אובדן לחץ בצינור Hazen-Wil
 $ec_lang['hw_main_desc']='אובדן לחץ בצינור Hazen-Williams בקוטר, גסות וספיקה נתונים';
 $ec_lang['hw_hgl_1']='HGL מורד';
 $ec_lang['hw_hgl_2']='HGL מעלה';
-$ec_lang['hw_elev_up']='גובה מעלה';
+$ec_lang['hw_elev_up']='רום מעלה';
 $ec_lang['hw_pressure_up']='לחץ מעלה';
-$ec_lang['hw_elev_down']='גובה מורד';
+$ec_lang['hw_elev_down']='רום מורד';
 $ec_lang['hw_pressure_down']='לחץ מורד';
 $ec_lang['hw_pressure_check']='בדיקת לחץ';
 $ec_lang['hw_pressure_ok_short']='לחץ חיובי';
 $ec_lang['hw_pressure_neg_short']='לחץ שלילי';
-$ec_lang['hw_pressure_neg']='לחץ המורד נמוך מאפס. קו גובה המים (HGL) יורד מתחת לצינור, כך שהצינור לא יזרום מלא, וייתכן שתוצאה זו אינה תקפה.';
+$ec_lang['hw_pressure_neg']='לחץ המורד נמוך מאפס. קו העומד ההידראולי (HGL) יורד מתחת לצינור, כך שהצינור לא יזרום מלא, וייתכן שתוצאה זו אינה תקפה.';
 $ec_lang['hw_roughness']='מקדם Hazen-Williams, C';
-$ec_lang['hw_note_1']='<dl><dt>מחשבון זה אינו מדמה את פרופיל הצינור בין שני הקצוות.</dt><dd>הוא משתמש רק בגבהים במעלה ובמורד שהזנת. אם הקרקע עולה גבוה יותר משני הקצוות באמצע המסלול, הלחץ באותה נקודה גבוהה נמוך מכל לחץ המדווח כאן. הפעל את המחשבון שוב עבור האורך מהקצה במעלה ועד לנקודה הגבוהה כדי לבדוק זאת.</dd><dd>במקום שבו קו גובה המים (HGL) יורד מתחת לצינור, המים נמצאים בלחץ שלילי. אוויר משתחרר מהתמיסה, צינור דק-דופן עלול לקרוס, ומי תהום מזוהמים עלולים להישאב פנימה דרך המפרקים. שמור על לחץ חיובי לאורך כל הקו, ושקול התקנת שסתום אוויר בכל נקודה גבוהה.</dd><dt>לחץ המעלה הוא תנאי גבול שאתה מספק.</dt><dd>קרא אותו ממד לחץ, ממפלס המים במיכל (גובה המים מעל הצינור), או מעקומת משאבה. משאבה מספקת לחץ נמוך יותר ככל שהספיקה עולה, לכן השתמש בנקודה על העקומה המתאימה לספיקה שהוזנה למעלה.</dd><dt>סכם בעצמך את מקדמי ההפסד המקומי.</dt><dd>סכם את ערכי ה-K עבור כל שסתום, עיקול, מסתעף, מד ספיקה וכניסה בקו, והזן את הסכום. עקוב אחר הקישור בשדה זה לערכים טיפוסיים. בקו הולכה ראשי וארוך הפסדים אלה קטנים לעומת החיכוך, אך בצנרת קצרה בתחנה הם עשויים להוות את רוב ההפסד.</dd></dl>';
+$ec_lang['hw_note_1']='<dl><dt>מחשבון זה אינו מדמה את פרופיל הצינור בין שני הקצוות.</dt><dd>הוא משתמש רק בגבהים במעלה ובמורד שהזנת. אם הקרקע עולה גבוה יותר משני הקצוות באמצע המסלול, הלחץ באותה נקודה גבוהה נמוך מכל לחץ המדווח כאן. הפעל את המחשבון שוב עבור האורך מהקצה במעלה ועד לנקודה הגבוהה כדי לבדוק זאת.</dd><dd>במקום שבו קו העומד ההידראולי (HGL) יורד מתחת לצינור, המים נמצאים בלחץ שלילי. אוויר משתחרר מהתמיסה, צינור דק-דופן עלול לקרוס, ומי תהום מזוהמים עלולים להישאב פנימה דרך המפרקים. שמור על לחץ חיובי לאורך כל הקו, ושקול התקנת שסתום אוויר בכל נקודה גבוהה.</dd><dt>לחץ המעלה הוא תנאי גבול שאתה מספק.</dt><dd>קרא אותו ממד לחץ, ממפלס המים במיכל (גובה המים מעל הצינור), או מעקומת משאבה. משאבה מספקת לחץ נמוך יותר ככל שהספיקה עולה, לכן השתמש בנקודה על העקומה המתאימה לספיקה שהוזנה למעלה.</dd><dt>סכם בעצמך את מקדמי ההפסד המקומי.</dt><dd>סכם את ערכי ה-K עבור כל שסתום, עיקול, מסתעף, מד ספיקה וכניסה בקו, והזן את הסכום. עקוב אחר הקישור בשדה זה לערכים טיפוסיים. בקו הולכה ראשי וארוך הפסדים אלה קטנים לעומת החיכוך, אך בצנרת קצרה בתחנה הם עשויים להוות את רוב ההפסד.</dd></dl>';
 
 
 // Manning Irregular
 $ec_lang['mi_menu']='תעלה בעלת חתך לא סדיר — Manning';
 $ec_lang['mi_main_title']='מחשבון תעלה בעלת חתך לא סדיר לפי Manning — חינם מקוון';
 $ec_lang['mi_main_desc']='זרימה אחידה בתעלה בעלת חתך לא סדיר לפי נוסחת Manning';
-$ec_lang['mi_waterSurfaceElevation']='גובה מפלס המים';
+$ec_lang['mi_waterSurfaceElevation']='רום מפלס המים';
 $ec_lang['mi_q_617']='<span class="ec-help" title="הספיקה המורכבת, Q, המחושבת באמצעות מקדם n מורכב לכל אזור, בהתאם למשוואה 6-17 של Chow (בהנחת מהירויות שוות)">Q <span class="ec-tip">?</span></span>';
 $ec_lang['mi_xSecPoints']='נקודות חתך רוחב';
 $ec_lang['mi_groupPoint']='נקודה';
 $ec_lang['mi_groupSegment']='קטע';
 $ec_lang['mi_groupRegion']='אזור';
 $ec_lang['mi_station']='פיקטה';
-$ec_lang['mi_elevation']='גובה';
+$ec_lang['mi_elevation']='רום';
 $ec_lang['mi_n']='n';
 $ec_lang['mi_is_bank']='R<sub>h</sub>, Q<br />גבול<br />בין אזורים<br />(גדה)';
 $ec_lang['mi_tau']='מאמץ<br />גזירה<br />תחתון<br />τ';
@@ -227,8 +227,8 @@ $ec_lang['mphl_junction_loss']='הפסד מקומי, h<sub>m</sub>';
 $ec_lang['mphl_total_loss'] = 'הפסד כולל, h<sub>L</sub>';
 $ec_lang['mphl_egl_1']='EGL מורד';
 $ec_lang['mphl_egl_2']='EGL מעלה';
-$ec_lang['mphl_hgl_egl_tip']='תוצאה זו עלולה שלא להיות תקפה במקום שבו הצינור עולה מעל קו גובה המים (HGL).';
-$ec_lang['mphl_note_1']='<dl><dt>מחשבון זה אינו מדמה את פרופיל הצינור בין שני הקצוות.</dt><dd>אם קו גובה המים (HGL) יורד מתחת לחלק העליון של הצינור בנקודה כלשהי, ייתכן שחישוב זה אינו תקף.</dd><dt>עבור כניסה פתוחה (תעלת ניקוז), יש לבדוק תנאי שליטה בכניסה.</dt><dd>1. HGL המעלה אינו יכול להיות נמוך מגובה זרימה נורמלית במעלה (ולא נמוך מהצינור!).</dd><dd>2. גובה המים העליון של תעלת ניקוז מיוצג טוב יותר על ידי EGL המעלה מאשר HGL המעלה.</dd><dd>3. ראה <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">את המדריך הקצר שלי</a> לחישובי גובה מים עליון פשוטים לתעלות ניקוז סטנדרטיות באמצעות <a target="_blank" href="https://www.fhwa.dot.gov/engineering/hydraulics/software/hy8/">HY-8</a>, תוכנת תעלות הניקוז החינמית של מנהל הדרכים הפדרלי של ארצות הברית.</dd><dd>4. עמוד זה פותר רק את מקרה שליטת היציאה: צינור הזורם מלא, כאשר תנאי המורד קובעים את גובה המים. תכנון תעלת ניקוז כרוך בהחלטה האם שליטת הכניסה או שליטת היציאה קובעת, ולכן יש להשתמש ב-HY-8 בכל מקרה שבו אחת מהן עשויה לחול.</dd></dl>';
+$ec_lang['mphl_hgl_egl_tip']='תוצאה זו עלולה שלא להיות תקפה במקום שבו הצינור עולה מעל קו העומד ההידראולי (HGL).';
+$ec_lang['mphl_note_1']='<dl><dt>מחשבון זה אינו מדמה את פרופיל הצינור בין שני הקצוות.</dt><dd>אם קו העומד ההידראולי (HGL) יורד מתחת לחלק העליון של הצינור בנקודה כלשהי, ייתכן שחישוב זה אינו תקף.</dd><dt>עבור כניסה פתוחה (תעלת ניקוז), יש לבדוק תנאי שליטה בכניסה.</dt><dd>1. HGL המעלה אינו יכול להיות נמוך מגובה זרימה נורמלית במעלה (ולא נמוך מהצינור!).</dd><dd>2. גובה המים העליון של תעלת ניקוז מיוצג טוב יותר על ידי EGL המעלה מאשר HGL המעלה.</dd><dd>3. ראה <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">את המדריך הקצר שלי</a> לחישובי גובה מים עליון פשוטים לתעלות ניקוז סטנדרטיות באמצעות <a target="_blank" href="https://www.fhwa.dot.gov/engineering/hydraulics/software/hy8/">HY-8</a>, תוכנת תעלות הניקוז החינמית של מנהל הדרכים הפדרלי של ארצות הברית.</dd><dd>4. עמוד זה פותר רק את מקרה שליטת היציאה: צינור הזורם מלא, כאשר תנאי המורד קובעים את גובה המים. תכנון תעלת ניקוז כרוך בהחלטה האם שליטת הכניסה או שליטת היציאה קובעת, ולכן יש להשתמש ב-HY-8 בכל מקרה שבו אחת מהן עשויה לחול.</dd></dl>';
 // Manning Trapezoid. See mpf_ for missing text.
 $ec_lang['mtc_menu']='תעלה טרפזואידית — Manning';
 $ec_lang['mtc_main_title']='מחשבון תעלה טרפזואידית לפי נוסחת Manning — חינם מקוון';
@@ -293,10 +293,10 @@ $ec_lang['or_shape_rectangular']='מלבני';
 $ec_lang['or_diameter']='<span class="ec-help" title="קוטר לצורה עגולה; גובה לצורה מלבנית">קוטר או גובה, D <span class="ec-tip">?</span></span>';
 $ec_lang['or_width']='<span class="ec-help" title="פתחים מלבניים בלבד">רוחב, W <span class="ec-tip">?</span></span>';
 $ec_lang['or_invert']='<span class="ec-help" title="תחתית הפתח">גובה תחתית הפתח <span class="ec-tip">?</span></span>';
-$ec_lang['or_hwe']='גובה מפלס מים עליון';
-$ec_lang['or_twe']='גובה מפלס מים תחתון';
+$ec_lang['or_hwe']='רום מפלס מים עליון';
+$ec_lang['or_twe']='רום מפלס מים תחתון';
 $ec_lang['or_cd']='מקדם הספיקה, C<sub>d</sub>';
-$ec_lang['or_centroid_elev']='גובה הצנטרואיד';
+$ec_lang['or_centroid_elev']='רום הצנטרואיד';
 $ec_lang['or_head']='<span class="ec-help" title="אנרגיה ליחידת משקל של המים — גובה עמוד המים, ולא לחץ">עומק יעיל, h <span class="ec-tip">?</span></span>';
 $ec_lang['or_area']='שטח הפתח, A';
 $ec_lang['or_regime']='בדיקת משטר הפתח';
@@ -319,13 +319,13 @@ $ec_lang['or_notes_4_def']='כאשר TWE גבוה מתחתית הפתח, המח�
 $ec_lang['mhp_main_menu']='הידרו-כוח זעיר';
 $ec_lang['mhp_main_title']='מחשבון הידרו-כוח זעיר חינמי מקוון';
 $ec_lang['mhp_main_desc']='מחשבון הספק הידרו-כוח זעיר עם זרימה טבעית בנהר';
-$ec_lang['mhp_gross_head']='גובה ברוטו, H<sub>gross</sub>';
+$ec_lang['mhp_gross_head']='עומד ברוטו, H<sub>gross</sub>';
 $ec_lang['mhp_diameter']='<span class="ec-help" title="קוטר צינור הלחץ (צינור אספקה)">קוטר צינור הלחץ, D <span class="ec-tip">?</span></span>';
 $ec_lang['mhp_length']='אורך, L';
 $ec_lang['mhp_efficiency']='יעילות מתקן, η (0–1)';
 $ec_lang['mhp_vel_check']='בדיקת מהירות';
 $ec_lang['mhp_hl_check']='בדיקת אובדן לחץ';
-$ec_lang['mhp_hnet']='גובה נטו, H<sub>net</sub>';
+$ec_lang['mhp_hnet']='עומד נטו, H<sub>net</sub>';
 $ec_lang['mhp_power']='הספק יציאה, P';
 $ec_lang['mhp_annual_kwh']='P כאנרגיה שנתית';
 $ec_lang['mhp_vel_low']='מהירות נמוכה — סיכון של שקוע משקעים וסחיפת אוויר.';
@@ -334,15 +334,15 @@ $ec_lang['mhp_vel_ok_short']='בסדר';
 $ec_lang['mhp_vel_high_short']='גבוה';
 $ec_lang['mhp_vel_low_short']='נמוך';
 $ec_lang['mhp_vel_ok_tip']='המהירות בטווח היעיל לתכנון צינור הלחץ.';
-$ec_lang['mhp_hl_ok_tip']='אובדן הלחץ נמוך מ-10% מהגובה הברוטו. גודל צינור זה כלכלי.';
-$ec_lang['mhp_hl_warn_tip']='אובדן הלחץ עולה על 10% מהגובה הברוטו. שקלו צינור גדול יותר.';
-$ec_lang['mhp_hl_bad_tip']='אובדן הלחץ עולה על 20% מהגובה הברוטו. שנו את גודל הצינור.';
+$ec_lang['mhp_hl_ok_tip']='אובדן הלחץ נמוך מ-10% מהעומד הברוטו. גודל צינור זה כלכלי.';
+$ec_lang['mhp_hl_warn_tip']='אובדן הלחץ עולה על 10% מהעומד הברוטו. שקלו צינור גדול יותר.';
+$ec_lang['mhp_hl_bad_tip']='אובדן הלחץ עולה על 20% מהעומד הברוטו. שנו את גודל הצינור.';
 $ec_lang['mhp_notes_1_term']='אובדן לחץ';
-$ec_lang['mhp_notes_1_def']='סך אובדן צינור הלחץ h<sub>L</sub> = h<sub>f</sub> + h<sub>m</sub>, כאשר h<sub>f</sub> = f(L/D)(v²/2g) הוא אובדן חיכוך לפי דארסי-ויסבאך ו-h<sub>m</sub> = k<sub>m</sub>·v²/2g מכסה כניסה, עקומות ושסתומים. גובה נטו H<sub>net</sub> = H<sub>gross</sub> − h<sub>L</sub>.';
+$ec_lang['mhp_notes_1_def']='סך אובדן צינור הלחץ h<sub>L</sub> = h<sub>f</sub> + h<sub>m</sub>, כאשר h<sub>f</sub> = f(L/D)(v²/2g) הוא אובדן חיכוך לפי דארסי-ויסבאך ו-h<sub>m</sub> = k<sub>m</sub>·v²/2g מכסה כניסה, עקומות ושסתומים. עומד נטו H<sub>net</sub> = H<sub>gross</sub> − h<sub>L</sub>.';
 $ec_lang['mhp_notes_2_term']='מהירות';
-$ec_lang['mhp_notes_2_def']='ודאו שהמהירות סבירה ביחס לגובה הזמין ולעלות הצינור. מהירות נמוכה מאוד עשויה להצביע על צינור גדול מדי; מהירות גבוהה מאוד עלולה להגביר אובדני חיכוך וסיכון לפגיעת פטיש מים.';
+$ec_lang['mhp_notes_2_def']='ודאו שהמהירות סבירה ביחס לעומד הזמין ולעלות הצינור. מהירות נמוכה מאוד עשויה להצביע על צינור גדול מדי; מהירות גבוהה מאוד עלולה להגביר אובדני חיכוך וסיכון לפגיעת פטיש מים.';
 $ec_lang['mhp_notes_3_term']='יעד אובדן לחץ';
-$ec_lang['mhp_notes_3_def']='אובדן בצינור האספקה (penstock) מתחת ל-10% מהגובה הברוטו הוא בדרך כלל כלכלי. האיזון האופטימלי בין עלות הצינור להספק שאבד נמצא לרוב סביב 4–6% במקומות שבהם מחיר החשמל גבוה.';
+$ec_lang['mhp_notes_3_def']='אובדן בצינור האספקה (penstock) מתחת ל-10% מהעומד הברוטו הוא בדרך כלל כלכלי. האיזון האופטימלי בין עלות הצינור להספק שאבד נמצא לרוב סביב 4–6% במקומות שבהם מחיר החשמל גבוה.';
 $ec_lang['mhp_notes_6_term']='יעילות';
 $ec_lang['mhp_notes_6_def']='יעילות המתקן האופיינית η נעה בין 0.70 ל-0.85 לטורבינות Pelton ורוחב-זרימה הנפוצות בהידרו-כוח זעיר. השתמשו ב-0.75 כאומדן ראשוני שמרני.';
 $ec_lang['mhp_notes_7_term']='אנרגיה שנתית';
@@ -352,9 +352,9 @@ $ec_lang['mhp_notes_7_def']='האנרגיה השנתית מניחה פעולה �
 $ec_lang['odt_main_menu']='זמן ריקון בריכה ומיכל';
 $ec_lang['odt_main_title']='מחשבון חינם מקוון לזמן ריקון בריכה, אגן ומיכל (פתח)';
 $ec_lang['odt_main_desc']='זמן ריקון בריכה, אגן או מיכל — יציאה דרך פתח, שיטת נפח קוני';
-$ec_lang['odt_h1_elev']='גובה מפלס המים ההתחלתי';
+$ec_lang['odt_h1_elev']='רום מפלס המים ההתחלתי';
 $ec_lang['odt_a1']='שטח התחלתי, A<sub>1</sub>';
-$ec_lang['odt_h2_elev']='גובה מפלס המים הסופי';
+$ec_lang['odt_h2_elev']='רום מפלס המים הסופי';
 $ec_lang['odt_a0']='שטח בגובה הפתח, A<sub>0</sub>';
 $ec_lang['odt_a_ending']='<span class="ec-help" title="מחושב באינטרפולציה ממודל חתך קוני בגובה הסופי">שטח סופי, A<sub>2</sub> <span class="ec-tip">?</span></span>';
 $ec_lang['odt_h2_check']='בדיקת גובה סופי';
@@ -580,7 +580,7 @@ $ec_lang['bpn_main_menu']='רשת צנרת מסועפת';
 $ec_lang['bpn_main_title']='מחשבון חינמי מקוון ללחץ ברשת צנרת מסועפת (ללא לולאות)';
 $ec_lang['bpn_main_desc']='ספיקה ולחץ ברשת צנרת מסועפת (עצית)';
 // Edited by TGH 2026-09-07
-$ec_lang['bpn_h_source_tip']='גובה אספקה סטטי: גובה המקור בספיקה אפס. מפלס מים במאגר או במיכל מעל רום ההספקה, או גובה הסתימה של משאבה. הוסיפו נקודות אספקה 2 ו-3 כדי להגדיר עקומת משאבה או עקומת אספקה משתנה; הכלי קורא את הגובה בספיקת התכנון.';
+$ec_lang['bpn_h_source_tip']='עומד אספקה סטטי: עומד המקור בספיקה אפס. מפלס מים במאגר או במיכל מעל רום ההספקה, או עומד הסתימה של משאבה. הוסיפו נקודות אספקה 2 ו-3 כדי להגדיר עקומת משאבה או עקומת אספקה משתנה; הכלי קורא את העומד בספיקת התכנון.';
 $ec_lang['bpn_elev_source']='רום אספקה';
 $ec_lang['bpn_q_total']='ספיקה כוללת';
 $ec_lang['bpn_q_total_tip']='הספיקה הכוללת היוצאת מהמקור (סכום כל הדרישות ברשת).';
@@ -627,13 +627,13 @@ $ec_lang['bpn_notes_3_def']='ניתן להוסיף שסתום בעל הפסד מ
 
 
 $ec_lang['bpn_supply2_q']='ספיקת אספקה 2';
-$ec_lang['bpn_supply2_h']='גובה אספקה 2';
+$ec_lang['bpn_supply2_h']='עומד אספקה 2';
 $ec_lang['bpn_supply3_q']='ספיקת אספקה 3';
-$ec_lang['bpn_supply3_h']='גובה אספקה 3';
-$ec_lang['bpn_supply_pt_tip']='נקודות עקומת אספקה 2 ו-3, אופציונליות. הזינו ספיקה וגובה לכל אחת כדי לדגם משאבה, או כל מקור שהגובה שלו יורד ככל שהוא מספק יותר; הכלי קורא את הגובה בספיקת התכנון. נקודה 1 לעיל היא הגובה הסטטי בספיקה אפס. השאירו את 2 ו-3 ריקות עבור גובה מאגר קבוע.';
-$ec_lang['bpn_h_supply']='גובה אספקה';
-$ec_lang['bpn_h_supply_tip']='גובה המקור בספיקת התכנון, נקרא מעקומת האספקה. שווה לגובה המקור שהוזן כאשר העקומה שטוחה (מאגר).';
-$ec_lang['bpn_supply1_h']='גובה אספקה סטטי';
+$ec_lang['bpn_supply3_h']='עומד אספקה 3';
+$ec_lang['bpn_supply_pt_tip']='נקודות עקומת אספקה 2 ו-3, אופציונליות. הזינו ספיקה ועומד לכל אחת כדי לדגם משאבה, או כל מקור שהעומד שלו יורד ככל שהוא מספק יותר; הכלי קורא את העומד בספיקת התכנון. נקודה 1 לעיל היא העומד הסטטי בספיקה אפס. השאירו את 2 ו-3 ריקות עבור עומד מאגר קבוע.';
+$ec_lang['bpn_h_supply']='עומד אספקה';
+$ec_lang['bpn_h_supply_tip']='עומד המקור בספיקת התכנון, נקרא מעקומת האספקה. שווה לעומד המקור שהוזן כאשר העקומה שטוחה (מאגר).';
+$ec_lang['bpn_supply1_h']='עומד אספקה סטטי';
 $ec_lang['lpn_main_menu']='רשת אספקת מים';
 $ec_lang['lpn_main_title']='מידול חינמי מקוון לרשת חלוקת מים עם פותר EPANET';
 $ec_lang['lpn_main_desc']='ניתוח רשת אספקת מים: ציירו רשת צנרת טבעתית או ייבאו קובצי EPANET';
@@ -863,11 +863,11 @@ $ec_lang['lpn_field_elev']='רום';
 // was no tank. Since Task 248 there is one, and the two are different assets: a reservoir's level
 // never moves, a tank's does. Raising a reservoir's head is still a legitimate thing to do -- it is
 // just not how you model storage any more.
-$ec_lang['lpn_field_head']='גובה';
+$ec_lang['lpn_field_head']='עומד';
 // 'head' is a documented trap term in glossary.json (anatomical head; pressure). The tip says
 // outright that it is a height and not a pressure, which is the exact confusion the glossary's
 // avoid list guards against.
-$ec_lang['lpn_field_head_tip']='מפלס פני המים במאגר, נמדד כגובה, לא כלחץ. השאירו ריק כדי להציב את פני המים ברום המאגר.';
+$ec_lang['lpn_field_head_tip']='מפלס פני המים במאגר, נמדד כעומד, לא כלחץ. השאירו ריק כדי להציב את פני המים ברום המאגר.';
 // ---- Tank fields (Task 248) ----
 // EVERY ONE OF THESE IS A HEIGHT IN THE ELEVATION/HEAD UNIT, the tank diameter included, and each
 // tip says so in words a reader can act on. The diameter is the one that catches people: it is a
@@ -1019,13 +1019,13 @@ $ec_lang['lpn_units_length']='אורך';
 $ec_lang['lpn_units_mapcoords']='קואורדינטות מפה';
 $ec_lang['lpn_units_mapcoords_deg']='מעלות';
 $ec_lang['lpn_units_usft']='רגל-מדידה אמריקאית (US survey ft)';
-$ec_lang['lpn_units_elevhead']='רום וגובה';
+$ec_lang['lpn_units_elevhead']='רום ועומד';
 // Head loss GRADIENT (headloss/length, dimensionless -- grade or gradePercent, same options as
 // mpf_/mphl_'s 'slope' family but lpn_'s own 'gradient' family so it can default to gradePercent)
 // alongside the existing total head loss (ROADMAP Task 177, Tom agreed 2026-07-30) -- matches
 // mpf_/mphl_'s own friction-slope convention rather than inventing a per-1000-length form.
-$ec_lang['lpn_result_gradient']='שיפוע אובדן הגובה';
-$ec_lang['lpn_result_gradient_tip']='אובדן הגובה מחולק באורך הצינור. השתמשו בו כדי להשוות צינורות באורכים שונים מול מגבלת תכנון אחת.';
+$ec_lang['lpn_result_gradient']='שיפוע אובדן העומד';
+$ec_lang['lpn_result_gradient_tip']='אובדן העומד מחולק באורך הצינור. השתמשו בו כדי להשוות צינורות באורכים שונים מול מגבלת תכנון אחת.';
 $ec_lang['lpn_result_water_age']='גיל המים';
 $ec_lang['lpn_result_water_age_tip']='הזמן שהמים המגיעים לנקודה זו שהו במערכת. היכן שזרימות נפגשות, המספר הוא ממוצע הגילאים המגיעים, משוקלל לפי ספיקה. במכל זהו הגיל הממוצע של המים המוחזקים, ולכן מכל שמתחלף לאט מחזיק בדרך כלל את המים הישנים ביותר ברשת. אין מגבלה רגולטורית להשוואה, ולכן יש להעריך אותו ביחס לתנאים במערכת שבמודל.';
 $ec_lang['lpn_result_source_share']='חלק מקור';
@@ -1052,13 +1052,13 @@ $ec_lang['lpn_result_reaction_rate']='קצב תגובה';
 $ec_lang['lpn_result_status']='מצב';
 $ec_lang['lpn_result_status_open']='פתוח';
 $ec_lang['lpn_result_status_closed']='סגור';
-$ec_lang['lpn_result_head']='גובה';
+$ec_lang['lpn_result_head']='עומד';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_result_head_tip']='האנרגיה הפוטנציאלית של המים בצומת זה, מבוטאת כגובה עמוד מים. זהו גובה מוחלט, בעוד שהלחץ הוא מדידת מד.';
+$ec_lang['lpn_result_head_tip']='האנרגיה הפוטנציאלית של המים בצומת זה, מבוטאת כגובה עמוד מים. זהו עומד מוחלט, בעוד שהלחץ הוא מדידת מד.';
 $ec_lang['lpn_result_pressure']='לחץ';
 $ec_lang['lpn_result_flow']='ספיקה';
 $ec_lang['lpn_result_velocity']='מהירות';
-$ec_lang['lpn_result_headloss']='אובדן גובה';
+$ec_lang['lpn_result_headloss']='אובדן עומד';
 // The three reset controls -- Clear project (toolbar), Restore all settings and Delete all projects
 // (Settings panel) -- get THREE tips, not one shared one. The shared version claimed they had to be
 // "used together" to reach a first-time-visitor state; that is false (Tom caught it 2026-07-31).
@@ -1576,9 +1576,9 @@ $ec_lang['lpn_profile_no_path']='שני צמתים אלה אינם מחוברי�
 $ec_lang['lpn_profile_no_solve']='אין עדיין תוצאות, כך שרק קו הקרקע מצויר.';
 $ec_lang['lpn_profile_summary']='צמתים: {n}, אורך: {len} {u}';
 $ec_lang['lpn_profile_axis_station']='מרחק לאורך המסלול ({u})';
-$ec_lang['lpn_profile_axis_elev']='רום וגובה ({u})';
+$ec_lang['lpn_profile_axis_elev']='רום ועומד ({u})';
 $ec_lang['lpn_profile_ground']='פני הקרקע';
-$ec_lang['lpn_profile_hgl']='קו האנרגיה ההידראולי';
+$ec_lang['lpn_profile_hgl']='קו העומד ההידראולי';
 // ---- Task 509: the two operations the control column took with it ----------------------------
 // Task 506 removed the From/To pull-downs and the waypoint chips, and with them the only way to
 // change ONE end of a path or take ONE node off it. They come back in an overlay box over the map,
@@ -2102,7 +2102,7 @@ $ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>מק�
 $ec_lang['lpn_notes_color_term']='גבולות רצועות הצבע נשארים זהים';
 $ec_lang['lpn_notes_color_def']='גבולות רצועות הצבע נקבעים כשבוחרים שיטת סיווג נתונים. הם אינם נקבעים מחדש בכל צעד זמן, מפני שאז הצבעים היו מקבלים משמעות חדשה בכל צעד, ואין בכך תועלת בהמחשת המערכת. EPANET פועל באותו אופן. כדי לקבל גבולות חדשים, בחרו שיטה שוב או הזינו גבולות משלכם.';
 $ec_lang['lpn_notes_epanet_term']='קבועי Hazen-Williams תואמים ל-EPANET';
-$ec_lang['lpn_notes_epanet_def']='באוגוסט 2026 המקדם והמעריך של Hazen-Williams שונו כדי להתאים ל-EPANET. תוצאות אובדן הגובה שונות מגרסאות קודמות של עמוד זה בעד 0.1 אחוז, פחות בהרבה מאי-הוודאות בערך C עצמו.';
+$ec_lang['lpn_notes_epanet_def']='באוגוסט 2026 המקדם והמעריך של Hazen-Williams שונו כדי להתאים ל-EPANET. תוצאות אובדן העומד שונות מגרסאות קודמות של עמוד זה בעד 0.1 אחוז, פחות בהרבה מאי-הוודאות בערך C עצמו.';
 $ec_lang['lpn_notes_engine_term']='איזה EPANET עמוד זה מריץ';
 $ec_lang['lpn_notes_engine_def']='פותר EPANET בעמוד זה הוא OWA-EPANET 2.3.5, שפורסם ב-20 בפברואר 2025. EPANET מפותח על ידי Open Water Analytics, קהילה העובדת עם סוכנות הגנת הסביבה של ארצות הברית, שפרסמה את גרסה 2.2.0 בדצמבר 2019. דוח ההרצה קורא לו 2.3.05 מפני שהמנוע כותב את המספר האחרון בשתי ספרות. הוא מועבר לעמוד זה באמצעות epanet-js 0.9.0 מאת Luke Butler, ברישיון MIT, והוא רץ בדפדפן: הרשת לעולם אינה נשלחת לשרת כדי להיפתר.';
 $ec_lang['lpn_id_invalid']='הזינו מזהה ללא רווחים וללא מרכאות.';
@@ -2190,7 +2190,7 @@ $ec_lang['lpn_field_valve_setting_drop']='ירידת לחץ';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_field_valve_setting_drop_tip']='הלחץ שהשסתום מסיר. שסתום שובר לחץ תמיד מסיר בדיוק כמות לחץ זו, בכל כיוון שהמים זורמים. זוהי ירידה על פני השסתום, לא לחץ שיש לשמור עליו.';
 $ec_lang['lpn_inp_drop_gpv_curve']='שסתום זה מפנה לעקומת אובדן לחץ שאינה בקובץ. השסתום יובא ללא עקומה, ולכן הוא נשאר פתוח לגמרי עד שתיבחר עקומה.';
-$ec_lang['lpn_gpv_curve_source']='עקומת אובדן גובה שסתום';
+$ec_lang['lpn_gpv_curve_source']='עקומת אובדן עומד שסתום';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_gpv_curve_source_tip']='העקומה בתיבת הספריות הקובעת את אובדן הלחץ דרך שסתום זה בכל ספיקה. כמה שסתומים יכולים להשתמש באותה עקומה, ועריכתה שם משנה את כולם.';
 $ec_lang['lpn_field_valve_setting_pressure']='הגדרת לחץ';
@@ -2214,7 +2214,7 @@ $ec_lang['lpn_field_km_short']='אובדן מקומי, k';
 // `lpn_pump_curve_ref_note` went with the change: they were the two halves of `curveRef`, which
 // named ANOTHER PUMP to copy points from because there was nothing else to point at. Two pumps on
 // one curve name the same curve now, so there is no borrow to describe.
-$ec_lang['lpn_pump_curve_source']='עקומת גובה משאבה';
+$ec_lang['lpn_pump_curve_source']='עקומת עומד משאבה';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_pump_curve_source_tip']='העקומה בתיבת הספריות הקובעת את העומד שמשאבה זו מוסיפה בכל ספיקה. כמה משאבות יכולות להשתמש באותה עקומה, ועריכתה שם משנה את כולן.';
 // **"THE NOTES BELOW" DO NOT EXIST ON THIS PAGE** (Tom, 2026-09-05: *"There are no notes below.
@@ -2269,10 +2269,10 @@ $ec_lang['lpn_curve_library_link_tip']='פותח את תיבת הספריות ב
 // decides the two column headings and their units. EPANET states it in a `;PUMP:`-style comment
 // above the curve's own rows, which this page reads and writes back, so a curve nothing references
 // still knows what it is.
-$ec_lang['lpn_curve_kind_head']='גובה משאבה';
+$ec_lang['lpn_curve_kind_head']='עומד משאבה';
 $ec_lang['lpn_curve_kind_effic']='יעילות משאבה';
 $ec_lang['lpn_curve_kind_volume']='נפח מכל';
-$ec_lang['lpn_curve_kind_headloss']='אובדן גובה שסתום';
+$ec_lang['lpn_curve_kind_headloss']='אובדן עומד שסתום';
 // **NOT A FIFTH KIND.** A curve whose file states no type comment and which nothing references, so
 // there is nothing to state. It is never offered as a choice; it is only shown, already selected,
 // on a curve in that state, so it can be seen and changed.
@@ -3545,7 +3545,7 @@ $ec_lang['lpn_demand_add']='הוספת קטגוריית דרישה';
 $ec_lang['lpn_demand_remove']='הסרת דרישה זו';
 // A RESERVOIR AND A PUMP TAKE A PATTERN TOO, on the same rule: whole-project settings live in the
 // Libraries box, one asset’s own choice lives in its property popup.
-$ec_lang['lpn_field_head_pattern']='תבנית גובה';
+$ec_lang['lpn_field_head_pattern']='תבנית עומד';
 $ec_lang['lpn_field_head_pattern_tip']='תבנית מפלס המים של מאגר זה במהלך ההרצה. העומד שלמעלה מוכפל בתבנית.';
 $ec_lang['lpn_field_pump_speed']='מהירות יחסית';
 $ec_lang['lpn_field_pump_speed_tip']='יחסית למהירות הסיבוב ששימשה ליצירת עקומת הביצועים המפורסמת של המשאבה. מתעלמים ממנו (לא מוכפל) אם יש תבנית מהירות.';
@@ -4308,7 +4308,7 @@ $ec_lang['lpn_guide_find_results_def']='<p>הנכסים התואמים מפור�
 $ec_lang['lpn_guide_find_replace_term']='החלפה וביטול';
 $ec_lang['lpn_guide_find_replace_def']='<p>החלק שינוי מה שנמצא בתיבה כותב מאפיין אחד בכל נכס שהשאילתה מצאה. בחרו את המאפיין ברשימה מאפיין לשינוי, הזינו את הערך החדש בתיבה ערך חדש ביחידה המוצגת, ולחצו על הכפתור החלף. התיבה מציינת אז כמה נכסים ישתנו, ללא אלה שכבר יש להם את הערך החדש. לחצו על הכפתור שנה אותם כדי להחיל את השינוי, או על בטל. ביטול אחד מבטל את ההחלפה כולה.</p><p>דוגמה על Net1: <code>Pipe.Diameter below 10</code> מוצאת את צינורות 31, 122, 113 ו-121. בחרו קוטר, הזינו 10 ולחצו על החלף; התיבה מציגה "לשנות 4 נכסים?". לחצו על שנה אותם כדי להגדיר את כל ארבעת הצינורות ל-10 אינץ\'. ביטול אחד מחזיר אותם ל-6 ול-8 אינץ\'.</p><p>דוגמה על Net3: <code>Pipe.ID equal to \'247\'</code> מוצאת את צינור 247. בחרו סגור, בחרו שוב סגור ברשימה ערך חדש, ולחצו על החלף ולאחר מכן על שנה אותם, כדי לסגור את הצינור עבור דוגמת הקישוריות שלמעלה. ביטול פותח אותו שוב.</p><p>החלפה דורשת סוג נכס אחד, ולכן תחת הכול בחרו תחילה סוג נכס ברשימה מה לחפש. בתרחיש שאינו בסיס, החלפה נשמרת בתרחיש זה, כמו אותה עריכה במאפיינים. כשזמינים רומים מ-Mapbox, ניתן להחליף את הרום ב-DEM של Mapbox במקום בערך מוקלד.</p>';
 $ec_lang['lpn_guide_find_notes_term']='נקודות לתשומת לב';
-$ec_lang['lpn_guide_find_notes_def']='<ul><li>ערכים מושווים בדיוק מלא ומפורטים בארבע ספרות אחרי הנקודה העשרונית. התנאי שווה ל כמעט אינו תואם תוצאה מחושבת; השתמשו בגדול מ ובקטן מ.</li><li>לחץ, גובה, ספיקה, מהירות ושאר התוצאות הם של החישוב האחרון. כשההגדרה חשב מחדש אוטומטית מנוקה, הם מתארים את הרשת כפי שהייתה בחישוב האחרון.</li><li>גדול מ וקטן מ על טקסט משתמשים בסדר מילוני, כשמספרים בסדר מספרי: ב-Net1, <code>Junction.ID above \'20\'</code> מוצאת את צמתים 21, 22, 23, 31 ו-32.</li><li>תחת הכול מוצעים רק מזהה, תיאור, תגית וקישוריות. בחרו סוג נכס ברשימה מה לחפש כדי לראות את רשימת המאפיינים המלאה שלו.</li><li>לפריט טקסט אין מזהה. חפשו אותו לפי המילים שלו, כמו ב-<code>Text.Text contains \'pump\'</code>.</li><li>ארבעת תנאי הקישוריות לצומת הם אין קישורים בצומת, אין קישורים פתוחים בצומת, אין מסלול קישורים למקור ואין מסלול פתוח למקור. מקור הוא מאגר או מכל.</li></ul>';
+$ec_lang['lpn_guide_find_notes_def']='<ul><li>ערכים מושווים בדיוק מלא ומפורטים בארבע ספרות אחרי הנקודה העשרונית. התנאי שווה ל כמעט אינו תואם תוצאה מחושבת; השתמשו בגדול מ ובקטן מ.</li><li>לחץ, עומד, ספיקה, מהירות ושאר התוצאות הם של החישוב האחרון. כשההגדרה חשב מחדש אוטומטית מנוקה, הם מתארים את הרשת כפי שהייתה בחישוב האחרון.</li><li>גדול מ וקטן מ על טקסט משתמשים בסדר מילוני, כשמספרים בסדר מספרי: ב-Net1, <code>Junction.ID above \'20\'</code> מוצאת את צמתים 21, 22, 23, 31 ו-32.</li><li>תחת הכול מוצעים רק מזהה, תיאור, תגית וקישוריות. בחרו סוג נכס ברשימה מה לחפש כדי לראות את רשימת המאפיינים המלאה שלו.</li><li>לפריט טקסט אין מזהה. חפשו אותו לפי המילים שלו, כמו ב-<code>Text.Text contains \'pump\'</code>.</li><li>ארבעת תנאי הקישוריות לצומת הם אין קישורים בצומת, אין קישורים פתוחים בצומת, אין מסלול קישורים למקור ואין מסלול פתוח למקור. מקור הוא מאגר או מכל.</li></ul>';
 $ec_lang['lpn_guide_using_heading']='שימוש במדריך';
 $ec_lang['lpn_guide_keys_term']='קיצורי מקלדת במדריך';
 $ec_lang['lpn_guide_keys_def']='<table class="lpn-notes-table"><tbody><tr><td>?</td><td>פתיחת המדריך בפקד שמתחת למצביע או שבמיקוד.</td></tr><tr><td>F1</td><td>פתיחת המדריך ברשומה של התיבה שבמיקוד.</td></tr><tr><td>Ctrl+K</td><td>פתיחת המדריך כשהטקסט הנבחר בשדה החיפוש.</td></tr><tr><td>/</td><td>בחירת שדה החיפוש כשהמדריך במיקוד.</td></tr><tr><td>Esc</td><td>סגירת המדריך וחזרה למקום שבו הייתם.</td></tr></tbody></table>';
