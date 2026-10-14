@@ -2101,8 +2101,6 @@ $ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>מק�
 // settings.colorFrozenBreaks in js/looped-network.js.
 $ec_lang['lpn_notes_color_term']='גבולות רצועות הצבע נשארים זהים';
 $ec_lang['lpn_notes_color_def']='גבולות רצועות הצבע נקבעים כשבוחרים שיטת סיווג נתונים. הם אינם נקבעים מחדש בכל צעד זמן, מפני שאז הצבעים היו מקבלים משמעות חדשה בכל צעד, ואין בכך תועלת בהמחשת המערכת. EPANET פועל באותו אופן. כדי לקבל גבולות חדשים, בחרו שיטה שוב או הזינו גבולות משלכם.';
-$ec_lang['lpn_notes_epanet_term']='קבועי Hazen-Williams תואמים ל-EPANET';
-$ec_lang['lpn_notes_epanet_def']='באוגוסט 2026 המקדם והמעריך של Hazen-Williams שונו כדי להתאים ל-EPANET. תוצאות אובדן הגובה שונות מגרסאות קודמות של עמוד זה בעד 0.1 אחוז, פחות בהרבה מאי-הוודאות בערך C עצמו.';
 $ec_lang['lpn_notes_engine_term']='איזה EPANET עמוד זה מריץ';
 $ec_lang['lpn_notes_engine_def']='פותר EPANET בעמוד זה הוא OWA-EPANET 2.3.5, שפורסם ב-20 בפברואר 2025. EPANET מפותח על ידי Open Water Analytics, קהילה העובדת עם סוכנות הגנת הסביבה של ארצות הברית, שפרסמה את גרסה 2.2.0 בדצמבר 2019. דוח ההרצה קורא לו 2.3.05 מפני שהמנוע כותב את המספר האחרון בשתי ספרות. הוא מועבר לעמוד זה באמצעות epanet-js 0.9.0 מאת Luke Butler, ברישיון MIT, והוא רץ בדפדפן: הרשת לעולם אינה נשלחת לשרת כדי להיפתר.';
 $ec_lang['lpn_id_invalid']='הזינו מזהה ללא רווחים וללא מרכאות.';

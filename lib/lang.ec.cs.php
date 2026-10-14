@@ -2101,8 +2101,6 @@ $ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>Šipk
 // settings.colorFrozenBreaks in js/looped-network.js.
 $ec_lang['lpn_notes_color_term']='Hranice barevných pásem zůstávají stejné';
 $ec_lang['lpn_notes_color_def']='Hranice barevných pásem se nastaví, když zvolíte metodu třídění dat. Znovu se nenastavují při každém časovém kroku, protože by pak barvy při každém kroku znamenaly něco jiného, což pro sledování vašeho systému není užitečné. EPANET funguje stejně. Chcete-li nové hranice, zvolte metodu znovu nebo zadejte vlastní hranice.';
-$ec_lang['lpn_notes_epanet_term']='Konstanty Hazen-Williams odpovídají programu EPANET';
-$ec_lang['lpn_notes_epanet_def']='V srpnu 2026 byl součinitel a exponent Hazen-Williams upraveny tak, aby odpovídaly programu EPANET. Výsledky ztráty tlakové výšky se od dřívějších verzí této stránky liší až o 0,1 procenta, což je mnohem méně, než je nejistota samotné hodnoty C.';
 $ec_lang['lpn_notes_engine_term']='Který EPANET tato stránka používá';
 $ec_lang['lpn_notes_engine_def']='Řešič EPANET na této stránce je OWA-EPANET 2.3.5, vydaný 20. února 2025. EPANET vyvíjí Open Water Analytics, komunita spolupracující s Agenturou pro ochranu životního prostředí USA (EPA), která v prosinci 2019 vydala verzi 2.2.0. Zpráva o výpočtu jej označuje jako 2.3.05, protože nástroj zapisuje poslední číslo na dvě číslice. Na tuto stránku se dostává přes epanet-js 0.9.0 od Lukea Butlera, pod licencí MIT, a běží ve vašem prohlížeči: vaše síť se nikdy nikam neposílá k výpočtu.';
 $ec_lang['lpn_id_invalid']='Zadejte ID bez mezer a bez uvozovek.';

@@ -2101,8 +2101,6 @@ $ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>Tipke
 // settings.colorFrozenBreaks in js/looped-network.js.
 $ec_lang['lpn_notes_color_term']='Granice raspona boja ostaju iste';
 $ec_lang['lpn_notes_color_def']='Granice raspona boja postavljaju se kada odaberete metodu klasifikacije podataka. Ne postavljaju se ponovno u svakom vremenskom koraku, jer bi boje u svakom koraku značile nešto novo, što ne pomaže pri vizualizaciji sustava. EPANET radi na isti način. Da biste dobili nove granice, ponovno odaberite metodu ili unesite vlastite granice.';
-$ec_lang['lpn_notes_epanet_term']='Hazen-Williams konstante odgovaraju EPANET-u';
-$ec_lang['lpn_notes_epanet_def']='U kolovozu 2026. koeficijent i eksponent Hazen-Williamsa promijenjeni su kako bi odgovarali EPANET-u. Rezultati gubitka tlačne visine razlikuju se od ranijih verzija ove stranice do 0,1 posto, što je znatno manje od nesigurnosti same vrijednosti C.';
 $ec_lang['lpn_notes_engine_term']='Koju verziju EPANET-a ova stranica pokreće';
 $ec_lang['lpn_notes_engine_def']='EPANET rješavač na ovoj stranici je OWA-EPANET 2.3.5, objavljen 20. veljače 2025. EPANET razvija Open Water Analytics, zajednica koja surađuje s Agencijom za zaštitu okoliša Sjedinjenih Američkih Država (EPA), koja je verziju 2.2.0 objavila u prosincu 2019. Izvještaj o pokretanju naziva ga 2.3.05 jer program zadnji broj zapisuje s dvije znamenke. Do ove stranice dolazi preko epanet-js 0.9.0 autora Lukea Butlera, pod MIT licencijom, i radi u pregledniku: mreža se nikada ne šalje poslužitelju na rješavanje.';
 $ec_lang['lpn_id_invalid']='Unesite ID bez razmaka i bez navodnika.';
