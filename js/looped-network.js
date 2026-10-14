@@ -59535,7 +59535,7 @@ var EngCalcs = EngCalcs || {};
 		}
 		list.forEach(function (ctl, i) {
 			var entry = libEl('div', 'lpn-lib-entry'),
-				descRow = libEl('div', 'lpn-lib-curve-row'),
+				descRow = libEl('div', 'lpn-lib-curve-row lpn-lib-desc-row'),
 				headRow = libEl('div', 'lpn-lib-head'),
 				box = document.createElement('input'),
 				verdict = libEl('div', 'lpn-lib-verdict ec-help'),
@@ -59724,7 +59724,7 @@ var EngCalcs = EngCalcs || {};
 			// before the first RULE line is not a rule, and a comment written above it would read
 			// back as part of it.
 			if (e.name) {
-				descRow = libEl('div', 'lpn-lib-curve-row');
+				descRow = libEl('div', 'lpn-lib-curve-row lpn-lib-desc-row');
 				descRow.appendChild(libDescField(function () {
 					var cur = now(i);
 					return cur ? libRuleDesc(libRulesRead(), cur) : '';
