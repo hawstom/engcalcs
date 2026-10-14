@@ -23,6 +23,9 @@
 	--ec-accent-open: #05378a;
 	--ec-accent-hover-bg: #eaf1fc;
 	--ec-accent-open-bg: #d7e6fb;
+	/* The one button base: menu-bar items and toolbar buttons (R-202) */
+	--ec-btn-radius: 5px;
+	--ec-btn-border-w: 1px;
 	/* Brand blue: consent buttons, nav */
 	--ec-brand: #1a6faf;
 	--ec-brand-hover: #14588c;
@@ -1561,12 +1564,27 @@ html[lang="zh"] .ec-welcome {
 
    Bigger, too. An icon with a button around it is read as the button; an icon alone is the target,
    and 1.35em is the size at which a 24-unit drawing survives without one. */
-#lpn_toolbar button:not(.lpn-transport-btn) {
-	background: none; border: 1px solid transparent; border-radius: 4px;
-	font: inherit; color: inherit; padding: 3px 5px; line-height: 1; cursor: pointer;
+/* ONE BUTTON BASE (Task 714 phase 1b, R-202). Menu-bar items and toolbar buttons share one shape
+   (--ec-btn-radius, --ec-btn-border-w), one hover, one pressed/open paint and one focus ring, all
+   from the --ec-accent family. They differ only in what is at rest: a menu item is outlined in the
+   accent (Tom, 2026-09-25: "I love the outlined version"), a toolbar button is bare with black ink
+   ("leaving the toolbar black"). Padding and size are each control's own and are not unified. */
+.lpn-menubar-item, #lpn_toolbar button:not(.lpn-transport-btn) {
+	border: var(--ec-btn-border-w) solid transparent; border-radius: var(--ec-btn-radius);
+	font: inherit; cursor: pointer;
 }
-#lpn_toolbar button:not(.lpn-transport-btn):hover { background: var(--ec-hover-bg); border-color: var(--ec-hover-border); }
-#lpn_toolbar button:not(.lpn-transport-btn)[aria-pressed="true"] { background: var(--ec-pressed-bg); border-color: var(--ec-pressed-border); }
+.lpn-menubar-item:hover, #lpn_toolbar button:not(.lpn-transport-btn):hover:not(:disabled) {
+	background: var(--ec-accent-hover-bg); border-color: var(--ec-accent-hover);
+}
+.lpn-menubar-item[aria-expanded="true"], #lpn_toolbar button:not(.lpn-transport-btn)[aria-pressed="true"] {
+	background: var(--ec-accent-open-bg); border-color: var(--ec-accent-open);
+}
+.lpn-menubar-item:focus-visible, #lpn_toolbar button:not(.lpn-transport-btn):focus-visible {
+	outline: 2px solid var(--ec-accent); outline-offset: 2px;
+}
+#lpn_toolbar button:not(.lpn-transport-btn) {
+	background: none; color: inherit; padding: 3px 5px; line-height: 1;
+}
 #lpn_toolbar button:not(.lpn-transport-btn):disabled { opacity: .4; cursor: default; background: none; border-color: transparent; }
 #lpn_toolbar button .ec-icon { width: 1.35em; height: 1.35em; vertical-align: -0.25em; }
 /* **THE TRANSPORT IS THE ONE EXCEPTION, AND IT KEEPS ITS BUTTONS** (same message: "The Transport is
@@ -1734,12 +1752,11 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
    the text in every state (so the rule reads as one outlined shape, not a box with a stray ring),
    and both move together on hover and open. */
 .lpn-menubar-item {
-	background: var(--ec-bg); color: var(--ec-accent); border: 1px solid var(--ec-accent); border-radius: 5px;
-	font: inherit; padding: 3px 10px; cursor: pointer;
+	background: var(--ec-bg); color: var(--ec-accent); border-color: var(--ec-accent);
+	padding: 3px 10px;
 }
-.lpn-menubar-item:hover { background: var(--ec-accent-hover-bg); border-color: var(--ec-accent-hover); color: var(--ec-accent-hover); }
-.lpn-menubar-item[aria-expanded="true"] { background: var(--ec-accent-open-bg); border-color: var(--ec-accent-open); color: var(--ec-accent-open); }
-.lpn-menubar-item:focus-visible { outline: 2px solid var(--ec-accent); outline-offset: 2px; }
+.lpn-menubar-item:hover { color: var(--ec-accent-hover); }
+.lpn-menubar-item[aria-expanded="true"] { color: var(--ec-accent-open); }
 /* THE HOME MARK (Task 625). Now an ordinary .lpn-menubar-item button -- it became a MENU when Tom
    pointed out that the leftmost slot is the Apple-menu position and carries that expectation -- so
    it inherits the bar's own paint, hover and 640px collapse and needs none of its own. All that is
