@@ -4338,3 +4338,10 @@ also read the live document and the status bar before calling it a defect.
 - CITED (code): help sentence "Creating a new scenario creates no alternatives" is false for Add base (one Base alternative per category) AND Copy scenario (copies its alternatives); the help's own later paragraph says the latter.
 - OBSERVED: graph-bubble harness 40/40; a bubble on Net3 node 10 inside a non-Base scenario draws one line and the now mark.
 - NOT CHECKED: Settings box marks by mouse (builder harness only), look of the dots, Scenarios table Base pick.
+
+## 2026-10-14 three-branch pre-review: zoom-selection, button-base, si-example-more (Perry)
+- OBSERVED (real Chromium, Net3 geographic fixture with a vertex pipe, a loose customer, a Text, scenario "Alt"): Zoom to selection frames a customer, node, vertex pipe, Tables-pane selection and area-select result; row greyed with nothing selected; 390 px Map menu fits (84-355 of 390). Builder harness 30/30. Not checked: a lone Text lands with its anchor, not its box, at canvas centre.
+- OBSERVED: at 390 px the floating Properties box covers the middle of the map, so a zoomed-to single asset is hidden behind it (same for every selection; fit ignores that box).
+- OBSERVED (branch CSS vs merge-base CSS injected into same page): button-base changes are nearly invisible at 1400 and 390; tool corner radius 4 to 5 px, Tab focus ring is now blue and rounded instead of the browser's black rectangle; transport and menus unchanged. Dialog buttons not touched by selectors.
+- OBSERVED: Net1 SI opens with L/s, m, mm in Tables, footer and labels; pump curve 94.635 L/s at 76.2 m; rule thresholds 40.538/36.576 m, controls 33.528/42.672 m; tank rises 36.576 to 40.955 m then pump closes at step 10. Scale bar reads 5 m on a 21 m drawing whose pipes are 1609 m (same as master Net1 in feet).
+- SPECULATION: "two rule-based controls" undercounts: the file has 2 simple controls and 2 rules.

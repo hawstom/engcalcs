@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "ru",
-        "expected_key_count": 2632,
-        "delta_key_count": 2,
+        "expected_key_count": 2634,
+        "delta_key_count": 4,
         "exempt_key_count": 24,
         "exempt_keys": [
             "calc_units_us",
@@ -703,14 +703,34 @@
         ]
     },
     "keys_to_translate": {
+        "lpn_tool_zoom_selection": "Zoom to selection",
         "lpn_ex_net1_si_title": "EPANET Net1 plus rule-based controls, L\/s (SI)",
-        "lpn_ex_net1_si_desc": "Liters per second, with meters and millimeters. A fictional EPANET example converted from gallons per minute, feet, and inches, with chlorine, 1 reservoir, 1 tank, 1 pump, and two rule-based controls."
+        "lpn_ex_net1_si_desc": "Liters per second, with meters and millimeters. A fictional EPANET example converted from gallons per minute, feet, and inches, with chlorine, 1 reservoir, 1 tank, 1 pump, and two rule-based controls.",
+        "lpn_tool_zoom_selection_tip": "Fit the selected assets to the map window. Select one or more assets first."
     },
     "keys": {
+        "lpn_tool_zoom_selection": "Zoom to selection",
         "lpn_ex_net1_si_title": "EPANET Net1 plus rule-based controls, L\/s (SI)",
-        "lpn_ex_net1_si_desc": "Liters per second, with meters and millimeters. A fictional EPANET example converted from gallons per minute, feet, and inches, with chlorine, 1 reservoir, 1 tank, 1 pump, and two rule-based controls."
+        "lpn_ex_net1_si_desc": "Liters per second, with meters and millimeters. A fictional EPANET example converted from gallons per minute, feet, and inches, with chlorine, 1 reservoir, 1 tank, 1 pump, and two rule-based controls.",
+        "lpn_tool_zoom_selection_tip": "Fit the selected assets to the map window. Select one or more assets first."
     },
     "key_context": {
+        "lpn_tool_zoom_selection": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_zoom_extent",
+                    "value": "Показать всё",
+                    "english": "Zoom to fit"
+                },
+                "next_translated": {
+                    "key": "lpn_tool_zoom_window",
+                    "value": "Окно масштабирования",
+                    "english": "Zoom Window"
+                }
+            }
+        },
         "lpn_ex_net1_si_title": {
             "reason": "missing",
             "current_value": null,
@@ -740,6 +760,22 @@
                     "key": "lpn_ex_net2_si_title",
                     "value": "EPANET Net2, л\/с (СИ)",
                     "english": "EPANET Net2, L\/s (SI)"
+                }
+            }
+        },
+        "lpn_tool_zoom_selection_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_zoom_extent_tip",
+                    "value": "Вписать всю сеть в окно карты. Чтобы вместо этого приблизить перетаскиваемый прямоугольник, нажмите W или выберите маленький треугольник в углу кнопки «Показать всё» на панели инструментов. См. также элементы управления масштабом в правом верхнем углу карты.",
+                    "english": "Fit the whole network to the map window. To zoom to a rectangle you drag instead, press W or click the small triangle in the corner of the Zoom to fit toolbar button. See also the zoom controls at the upper right of the map."
+                },
+                "next_translated": {
+                    "key": "lpn_tool_zoom_window_tip",
+                    "value": "Укажите углы или перетащите прямоугольник. Нажмите ещё раз для команды «Показать всё».",
+                    "english": "Specify corners or drag a rectangle. Press again for Zoom to fit."
                 }
             }
         }

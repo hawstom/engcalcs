@@ -38,6 +38,7 @@
     ],
     "protected": [
         "feat/si-example-more",
+        "feat/zoom-selection",
         "feat/hover-label",
         "feat/button-base",
         "feat/user-guide",

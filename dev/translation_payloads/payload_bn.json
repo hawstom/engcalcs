@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "bn",
-        "expected_key_count": 2632,
-        "delta_key_count": 2,
+        "expected_key_count": 2634,
+        "delta_key_count": 4,
         "exempt_key_count": 41,
         "exempt_keys": [
             "u_imgd",
@@ -720,14 +720,34 @@
         ]
     },
     "keys_to_translate": {
+        "lpn_tool_zoom_selection": "Zoom to selection",
         "lpn_ex_net1_si_title": "EPANET Net1 plus rule-based controls, L\/s (SI)",
-        "lpn_ex_net1_si_desc": "Liters per second, with meters and millimeters. A fictional EPANET example converted from gallons per minute, feet, and inches, with chlorine, 1 reservoir, 1 tank, 1 pump, and two rule-based controls."
+        "lpn_ex_net1_si_desc": "Liters per second, with meters and millimeters. A fictional EPANET example converted from gallons per minute, feet, and inches, with chlorine, 1 reservoir, 1 tank, 1 pump, and two rule-based controls.",
+        "lpn_tool_zoom_selection_tip": "Fit the selected assets to the map window. Select one or more assets first."
     },
     "keys": {
+        "lpn_tool_zoom_selection": "Zoom to selection",
         "lpn_ex_net1_si_title": "EPANET Net1 plus rule-based controls, L\/s (SI)",
-        "lpn_ex_net1_si_desc": "Liters per second, with meters and millimeters. A fictional EPANET example converted from gallons per minute, feet, and inches, with chlorine, 1 reservoir, 1 tank, 1 pump, and two rule-based controls."
+        "lpn_ex_net1_si_desc": "Liters per second, with meters and millimeters. A fictional EPANET example converted from gallons per minute, feet, and inches, with chlorine, 1 reservoir, 1 tank, 1 pump, and two rule-based controls.",
+        "lpn_tool_zoom_selection_tip": "Fit the selected assets to the map window. Select one or more assets first."
     },
     "key_context": {
+        "lpn_tool_zoom_selection": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_zoom_extent",
+                    "value": "সম্পূর্ণ অঙ্কন দেখান",
+                    "english": "Zoom to fit"
+                },
+                "next_translated": {
+                    "key": "lpn_tool_zoom_window",
+                    "value": "জুম উইন্ডো",
+                    "english": "Zoom Window"
+                }
+            }
+        },
         "lpn_ex_net1_si_title": {
             "reason": "missing",
             "current_value": null,
@@ -757,6 +777,22 @@
                     "key": "lpn_ex_net2_si_desc",
                     "value": "লিটার প্রতি সেকেন্ড, মিটার ও মিলিমিটার সহ। কানেকটিকাটের ব্র্যানফোর্ডে একটি EPANET উদাহরণ, গ্যালন প্রতি মিনিট, ফুট ও ইঞ্চি থেকে রূপান্তরিত: 35টি সংযোগস্থল ও 1টি ট্যাংক, কোনো জলাধার, পাম্প বা ভালভ নেই, প্রায় 2 কিমি বাই 4 কিমি। ফ্লুরাইড, একটি অপ্রতিক্রিয়াশীল পদার্থ, একটি উৎসে প্রবেশ করে।",
                     "english": "Liters per second, with meters and millimeters. An EPANET example at Branford, Connecticut, converted from gallons per minute, feet, and inches: 35 junctions and 1 tank, with no reservoir, no pump, and no valves, about 2 km by 4 km. Fluoride, a non-reactive substance, enters at one source."
+                }
+            }
+        },
+        "lpn_tool_zoom_selection_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_zoom_extent_tip",
+                    "value": "পুরো নেটওয়ার্ক মানচিত্র উইন্ডোতে ধরান। এর বদলে টেনে একটি আয়তক্ষেত্রে জুম করতে W চাপুন, অথবা সম্পূর্ণ অঙ্কন দেখান টুলবার বোতামের কোণের ছোট ত্রিভুজটি নির্বাচন করুন। মানচিত্রের ওপরের ডানের জুম নিয়ন্ত্রণও দেখুন।",
+                    "english": "Fit the whole network to the map window. To zoom to a rectangle you drag instead, press W or click the small triangle in the corner of the Zoom to fit toolbar button. See also the zoom controls at the upper right of the map."
+                },
+                "next_translated": {
+                    "key": "lpn_tool_zoom_window_tip",
+                    "value": "কোণ নির্দিষ্ট করুন অথবা একটি আয়তক্ষেত্র টানুন। সম্পূর্ণ অঙ্কন দেখান-এর জন্য আবার চাপুন।",
+                    "english": "Specify corners or drag a rectangle. Press again for Zoom to fit."
                 }
             }
         }

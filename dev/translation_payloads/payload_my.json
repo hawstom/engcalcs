@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "my",
-        "expected_key_count": 2632,
-        "delta_key_count": 2,
+        "expected_key_count": 2634,
+        "delta_key_count": 4,
         "exempt_key_count": 43,
         "exempt_keys": [
             "u_imgd",
@@ -722,14 +722,34 @@
         ]
     },
     "keys_to_translate": {
+        "lpn_tool_zoom_selection": "Zoom to selection",
         "lpn_ex_net1_si_title": "EPANET Net1 plus rule-based controls, L\/s (SI)",
-        "lpn_ex_net1_si_desc": "Liters per second, with meters and millimeters. A fictional EPANET example converted from gallons per minute, feet, and inches, with chlorine, 1 reservoir, 1 tank, 1 pump, and two rule-based controls."
+        "lpn_ex_net1_si_desc": "Liters per second, with meters and millimeters. A fictional EPANET example converted from gallons per minute, feet, and inches, with chlorine, 1 reservoir, 1 tank, 1 pump, and two rule-based controls.",
+        "lpn_tool_zoom_selection_tip": "Fit the selected assets to the map window. Select one or more assets first."
     },
     "keys": {
+        "lpn_tool_zoom_selection": "Zoom to selection",
         "lpn_ex_net1_si_title": "EPANET Net1 plus rule-based controls, L\/s (SI)",
-        "lpn_ex_net1_si_desc": "Liters per second, with meters and millimeters. A fictional EPANET example converted from gallons per minute, feet, and inches, with chlorine, 1 reservoir, 1 tank, 1 pump, and two rule-based controls."
+        "lpn_ex_net1_si_desc": "Liters per second, with meters and millimeters. A fictional EPANET example converted from gallons per minute, feet, and inches, with chlorine, 1 reservoir, 1 tank, 1 pump, and two rule-based controls.",
+        "lpn_tool_zoom_selection_tip": "Fit the selected assets to the map window. Select one or more assets first."
     },
     "key_context": {
+        "lpn_tool_zoom_selection": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_zoom_extent",
+                    "value": "ပုံလုံးပြရန်",
+                    "english": "Zoom to fit"
+                },
+                "next_translated": {
+                    "key": "lpn_tool_zoom_window",
+                    "value": "ဇူးမ် ဘောင်",
+                    "english": "Zoom Window"
+                }
+            }
+        },
         "lpn_ex_net1_si_title": {
             "reason": "missing",
             "current_value": null,
@@ -759,6 +779,22 @@
                     "key": "lpn_ex_net2_si_desc",
                     "value": "တစ်စက္ကန့်လျှင် လီတာ၊ မီတာနှင့် မီလီမီတာ ဖြင့်။ ကော်နက်တီကတ်ပြည်နယ် ဘရန်ဖို့ဒ်ရှိ EPANET နမူနာတစ်ခုကို တစ်မိနစ်လျှင် ဂါလန်၊ ပေနှင့် လက်မမှ ပြောင်းထားသည် - ဆက်စပ်နေရာ ၃၅ ခုနှင့် ရေတိုက် ၁ ခု၊ ရေကန်၊ ရေတင်စက်နှင့် ဗားလ် မပါဘဲ၊ ၂ ကီလိုမီတာ × ၄ ကီလိုမီတာခန့်။ ဓာတ်မပြုသော ဖလိုရိုက်သည် ရင်းမြစ်တစ်ခုမှ ဝင်ရောက်သည်။",
                     "english": "Liters per second, with meters and millimeters. An EPANET example at Branford, Connecticut, converted from gallons per minute, feet, and inches: 35 junctions and 1 tank, with no reservoir, no pump, and no valves, about 2 km by 4 km. Fluoride, a non-reactive substance, enters at one source."
+                }
+            }
+        },
+        "lpn_tool_zoom_selection_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_zoom_extent_tip",
+                    "value": "ကွန်ရက်တစ်ခုလုံးကို မြေပုံဝင်းဒိုးတွင် ဆန့်ညီစေပါ။ ဆွဲလိုက်သော လေးထောင့်ကွက်သို့ ချဲ့လိုလျှင် W ကို နှိပ်ပါ၊ (သို့) ပုံလုံးပြရန် ကိရိယာဘားခလုတ်၏ ထောင့်ရှိ တြိဂံငယ်ကို ရွေးချယ်ပါ။ မြေပုံ၏ ညာဘက်အပေါ်ရှိ ချဲ့ချုံ့ခလုတ်များကိုလည်း ကြည့်ပါ။",
+                    "english": "Fit the whole network to the map window. To zoom to a rectangle you drag instead, press W or click the small triangle in the corner of the Zoom to fit toolbar button. See also the zoom controls at the upper right of the map."
+                },
+                "next_translated": {
+                    "key": "lpn_tool_zoom_window_tip",
+                    "value": "ထောင့်များကို သတ်မှတ်ပါ သို့မဟုတ် လေးထောင့်တစ်ခု ဆွဲပါ။ ပုံလုံးပြရန်အတွက် ထပ်နှိပ်ပါ။",
+                    "english": "Specify corners or drag a rectangle. Press again for Zoom to fit."
                 }
             }
         }

@@ -253,7 +253,11 @@ async function main() {
 		await a.openMenu('map');
 		const rows = await page.$$eval('#lpn_menu_list button.lpn-menu-row', (els) => els.map((b) => b.textContent.trim()));
 		const iFit = rows.findIndex((t) => t.indexOf(zfLabel) === 0), iZw = rows.findIndex((t) => t.indexOf(zwLabel) === 0);
-		ok('the Map menu has a Zoom Window row right after Zoom to fit', iFit >= 0 && iZw === iFit + 1, rows.slice(0, 4).join(' | '));
+		// Zoom to selection sits between them, so "right after" allows that one row.
+		const zsLabel = (await a.lang('lpn_tool_zoom_selection')).trim();
+		const iZs = rows.findIndex((t) => t.indexOf(zsLabel) === 0);
+		ok('the Map menu has a Zoom Window row right after Zoom to fit (and Zoom to selection)',
+			iFit >= 0 && iZs === iFit + 1 && iZw === iZs + 1, rows.slice(0, 4).join(' | '));
 		const hk = await page.$$eval('#lpn_menu_list button.lpn-menu-row', (els) => els.map((b) => b.getAttribute('data-hotkey')));
 		ok('...and the row shows its key', hk[iZw] === 'W', String(hk[iZw]));
 		ok('not in Zoom Window yet, and Zoom to fit never pressed', (await mode()).pressed !== 'true');
