@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "he",
-        "expected_key_count": 2560,
-        "delta_key_count": 4,
+        "expected_key_count": 2630,
+        "delta_key_count": 74,
         "exempt_key_count": 25,
         "exempt_keys": [
             "u_imgd",
@@ -704,18 +704,254 @@
         ]
     },
     "keys_to_translate": {
+        "lpn_pane_tab_shapes": "Shapes",
+        "lpn_pane_shape_closed": "Closed",
+        "lpn_pane_shape_points": "Points",
+        "lpn_pane_paste_shape_no_points": "Row {row}: a new Shape needs its Points.",
+        "lpn_pane_paste_shape_bad_points": "Row {row}: {text} is not a list of points. Write each point as {pair}, with a point (.) as the decimal mark, and separate the points with |.",
+        "lpn_pane_paste_shape_closed_few": "Row {row}: a closed Shape needs at least three points.",
         "lpn_ex_net2_si_title": "EPANET Net2, L\/s (SI)",
         "lpn_ex_net2_si_desc": "Litres per second, with metres and millimetres. An EPANET example at Branford, Connecticut, converted from gallons per minute, feet and inches: 35 junctions and 1 tank, with no reservoir, no pump and no valves, about 2 km by 4 km. Fluoride, a non-reactive substance, enters at one source.",
         "lpn_ex_net3_si_title": "EPANET Net3, L\/s (SI)",
-        "lpn_ex_net3_si_desc": "Litres per second, with metres and millimetres. An EPANET example at Novato, California, converted from gallons per minute, feet and inches, with the world map behind it: 92 junctions, 3 tanks and 2 reservoirs, no valves, about 8 km square. A 24-hour extended-period simulation, with a source trace from the Lake."
+        "lpn_ex_net3_si_desc": "Litres per second, with metres and millimetres. An EPANET example at Novato, California, converted from gallons per minute, feet and inches, with the world map behind it: 92 junctions, 3 tanks and 2 reservoirs, no valves, about 8 km square. A 24-hour extended-period simulation, with a source trace from the Lake.",
+        "lpn_tool_add_shape": "Shape",
+        "lpn_tool_add_shape_tip": "Draw a point, a polyline, or a polygon on the map. A Shape is annotation and is not part of the network. Specify each point, then specify the last point again, press Enter, or right-click to finish. Specify the first point again to close the Shape into a polygon.",
+        "lpn_snap_shape_point": "{shape}, point {n}",
+        "lpn_mode_add_shape": "Mode: Add Shape. Specify each point. Specify the last point again or press Enter to finish; specify the first point to close a polygon.",
+        "lpn_file_import_shapes": "Import GeoJSON shapes…",
+        "lpn_file_import_shapes_tip": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network from an EPANET file. The project must be georeferenced or state a coordinate system.",
+        "lpn_geojson_import_done": "{n} Shapes imported from {file}.",
+        "lpn_geojson_import_done_one": "One Shape imported from {file}.",
+        "lpn_geojson_import_renamed": "{n} feature names cannot be Shape IDs and are kept with the Shapes: {list}.",
+        "lpn_geojson_import_renamed_one": "One feature name cannot be a Shape ID and is kept with the Shape: {list}.",
+        "lpn_geojson_import_skipped": "{n} features not imported: {list}.",
+        "lpn_geojson_import_skipped_one": "One feature not imported: {list}.",
+        "lpn_geojson_import_why_network": "network asset",
+        "lpn_geojson_import_why_geometry": "not a point, line, or polygon",
+        "lpn_geojson_import_why_position": "position not a valid latitude and longitude",
+        "lpn_geojson_import_holes": "{n} polygon holes not imported. A Shape has one boundary.",
+        "lpn_geojson_import_holes_one": "One polygon hole not imported. A Shape has one boundary.",
+        "lpn_geojson_import_parts": "{n} multipart features imported as one Shape for each part.",
+        "lpn_geojson_import_parts_one": "One multipart feature imported as one Shape for each part.",
+        "lpn_geojson_import_local": "GeoJSON positions are latitude and longitude, and this project has no place on the Earth to which they can be converted. Georeference it first with Map, World map, Attach, then import again.",
+        "lpn_geojson_import_unreadable": "{file} is not a GeoJSON file: {detail}",
+        "lpn_file_import_dxf": "Import DXF shapes…",
+        "lpn_file_import_dxf_tip": "Read the points, lines, and polylines of an ASCII DXF file into this project as Shapes, with each layer name kept as a property. Other entities are counted and listed, not imported. The coordinates are read as the X and Y of this project, with no conversion.",
+        "lpn_file_import_shp": "Import shapefile shapes…",
+        "lpn_file_import_shp_tip": "Read the points, lines, and polygons of an ESRI shapefile into this project as Shapes, with the attribute columns kept as properties. Pick the .zip, or the .shp together with its .shx, .dbf and .prj (hold Ctrl or Shift to select several). Coordinates in a different coordinate system than the project are converted, and the notice says so.",
+        "lpn_dxf_import_skipped": "{n} entities not imported: {list}.",
+        "lpn_dxf_import_skipped_one": "One entity not imported: {list}.",
+        "lpn_dxf_import_inblocks": "in block definitions",
+        "lpn_dxf_import_bulge": "{n} polylines have arc segments, which were imported as straight segments between their vertices.",
+        "lpn_dxf_import_bulge_one": "One polyline has arc segments, which were imported as straight segments between its vertices.",
+        "lpn_dxf_import_units": "The drawing states its units as {theirs} and this project uses {ours}. The numbers were not changed.",
+        "lpn_dxf_import_refuse_geo": "A DXF drawing is flat, and this project is in latitude and longitude, so the coordinates of {file} have no place in it. Use Convert as… to copy the project into a coordinate system, then import again.",
+        "lpn_dxf_import_unreadable": "{file} is not an ASCII DXF file.",
+        "lpn_dxf_import_binary": "{file} is a binary DXF. Save it from your CAD program as an ASCII DXF, then import again.",
+        "lpn_shapes_import_frame": "The coordinates were read as {frame}, with no conversion.",
+        "lpn_shapes_frame_xy": "the X and Y of this project",
+        "lpn_shapes_frame_latlon": "latitude and longitude",
+        "lpn_shp_import_skipped": "{n} records not imported, because their shape type is not read: {list}.",
+        "lpn_shp_import_skipped_one": "One record not imported, because its shape type is not read: {list}.",
+        "lpn_shp_import_attrs": "Attribute columns kept as properties of each Shape: {list}.",
+        "lpn_shp_import_noprj": "There is no .prj file, so the coordinates were read as {frame}, with no conversion.",
+        "lpn_shp_import_prj_same": "The .prj states {crs}, the coordinate system of this project, so the coordinates were not changed.",
+        "lpn_shp_import_converted": "The coordinates are latitude and longitude. They were converted to {crs} by the transform the map uses.",
+        "lpn_shp_import_prj_other": "The .prj states {theirs}. This project states no coordinate system, so the coordinates were read as {frame}, with no conversion.",
+        "lpn_shp_import_refuse_local": "{file} is in latitude and longitude, and this project has no place on the Earth to which they can be converted. Georeference it first with Map, World map, Attach, then import again.",
+        "lpn_shp_import_refuse_crs": "{file} states {theirs}, and this project is in {ours}. Nothing was imported and nothing was converted.",
+        "lpn_shp_import_refuse_range": "{file} has no .prj file, and its coordinates are not latitudes and longitudes, so they cannot be placed in this project.",
+        "lpn_shp_import_noshp": "{file} has no .shp file in it. Pick the .zip of a shapefile, or the .shp together with its .shx, .dbf and .prj (hold Ctrl or Shift to select several).",
+        "lpn_shp_import_manyshp": "{file} holds more than one shapefile. Import one at a time.",
+        "lpn_shp_import_unreadable": "{file} is not a shapefile this page can read: {detail}",
+        "lpn_shp_import_pick_hint": "A shapefile is several files. Pick the .shp together with its .shx, .dbf and .prj (hold Ctrl or Shift to select several), or pick the .zip.",
+        "lpn_shp_import_webmerc_ask": "{file} has no .prj file, and its numbers are not latitudes and longitudes, but they fit Web Mercator metres (EPSG:3857), the system QGIS and web maps use. Import them as EPSG:3857 and convert them to this project?",
+        "lpn_shp_import_webmerc_ok": "Import as EPSG:3857",
+        "lpn_shp_import_webmerc_far_ask": "{file} states {theirs}, and read in that system its coordinates fall {km} km from this project. Read as Web Mercator metres (EPSG:3857), the system QGIS and web maps use, they fall where this project is. Import them as EPSG:3857 and convert them to this project?",
+        "lpn_shp_import_reprojected": "The coordinates were converted from {theirs} to {ours}.",
+        "lpn_shp_import_unplaced": "{n} records have coordinates this project cannot place, such as a latitude beyond the limit of the map. Record numbers: {list}.",
+        "lpn_shp_import_unplaced_one": "One record has coordinates this project cannot place, such as a latitude beyond the limit of the map. Record number: {list}.",
+        "lpn_shapes_import_none": "Nothing was imported from {file}.",
+        "lpn_shp_import_convert_hint": "Use Convert as… to copy the project into {theirs}, then import again.",
+        "lpn_shp_import_damaged": "{file} is damaged or cut short, so nothing was imported.",
+        "lpn_shp_import_deleted": "{n} records marked deleted in the .dbf were not imported.",
+        "lpn_shp_import_deleted_one": "One record marked deleted in the .dbf was not imported.",
+        "lpn_dxf_import_paperspace": "in paper space",
+        "lpn_shapes_import_more": "and {n} more"
     },
     "keys": {
+        "lpn_pane_tab_shapes": "Shapes",
+        "lpn_pane_shape_closed": "Closed",
+        "lpn_pane_shape_points": "Points",
+        "lpn_pane_paste_shape_no_points": "Row {row}: a new Shape needs its Points.",
+        "lpn_pane_paste_shape_bad_points": "Row {row}: {text} is not a list of points. Write each point as {pair}, with a point (.) as the decimal mark, and separate the points with |.",
+        "lpn_pane_paste_shape_closed_few": "Row {row}: a closed Shape needs at least three points.",
         "lpn_ex_net2_si_title": "EPANET Net2, L\/s (SI)",
         "lpn_ex_net2_si_desc": "Litres per second, with metres and millimetres. An EPANET example at Branford, Connecticut, converted from gallons per minute, feet and inches: 35 junctions and 1 tank, with no reservoir, no pump and no valves, about 2 km by 4 km. Fluoride, a non-reactive substance, enters at one source.",
         "lpn_ex_net3_si_title": "EPANET Net3, L\/s (SI)",
-        "lpn_ex_net3_si_desc": "Litres per second, with metres and millimetres. An EPANET example at Novato, California, converted from gallons per minute, feet and inches, with the world map behind it: 92 junctions, 3 tanks and 2 reservoirs, no valves, about 8 km square. A 24-hour extended-period simulation, with a source trace from the Lake."
+        "lpn_ex_net3_si_desc": "Litres per second, with metres and millimetres. An EPANET example at Novato, California, converted from gallons per minute, feet and inches, with the world map behind it: 92 junctions, 3 tanks and 2 reservoirs, no valves, about 8 km square. A 24-hour extended-period simulation, with a source trace from the Lake.",
+        "lpn_tool_add_shape": "Shape",
+        "lpn_tool_add_shape_tip": "Draw a point, a polyline, or a polygon on the map. A Shape is annotation and is not part of the network. Specify each point, then specify the last point again, press Enter, or right-click to finish. Specify the first point again to close the Shape into a polygon.",
+        "lpn_snap_shape_point": "{shape}, point {n}",
+        "lpn_mode_add_shape": "Mode: Add Shape. Specify each point. Specify the last point again or press Enter to finish; specify the first point to close a polygon.",
+        "lpn_file_import_shapes": "Import GeoJSON shapes…",
+        "lpn_file_import_shapes_tip": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network from an EPANET file. The project must be georeferenced or state a coordinate system.",
+        "lpn_geojson_import_done": "{n} Shapes imported from {file}.",
+        "lpn_geojson_import_done_one": "One Shape imported from {file}.",
+        "lpn_geojson_import_renamed": "{n} feature names cannot be Shape IDs and are kept with the Shapes: {list}.",
+        "lpn_geojson_import_renamed_one": "One feature name cannot be a Shape ID and is kept with the Shape: {list}.",
+        "lpn_geojson_import_skipped": "{n} features not imported: {list}.",
+        "lpn_geojson_import_skipped_one": "One feature not imported: {list}.",
+        "lpn_geojson_import_why_network": "network asset",
+        "lpn_geojson_import_why_geometry": "not a point, line, or polygon",
+        "lpn_geojson_import_why_position": "position not a valid latitude and longitude",
+        "lpn_geojson_import_holes": "{n} polygon holes not imported. A Shape has one boundary.",
+        "lpn_geojson_import_holes_one": "One polygon hole not imported. A Shape has one boundary.",
+        "lpn_geojson_import_parts": "{n} multipart features imported as one Shape for each part.",
+        "lpn_geojson_import_parts_one": "One multipart feature imported as one Shape for each part.",
+        "lpn_geojson_import_local": "GeoJSON positions are latitude and longitude, and this project has no place on the Earth to which they can be converted. Georeference it first with Map, World map, Attach, then import again.",
+        "lpn_geojson_import_unreadable": "{file} is not a GeoJSON file: {detail}",
+        "lpn_file_import_dxf": "Import DXF shapes…",
+        "lpn_file_import_dxf_tip": "Read the points, lines, and polylines of an ASCII DXF file into this project as Shapes, with each layer name kept as a property. Other entities are counted and listed, not imported. The coordinates are read as the X and Y of this project, with no conversion.",
+        "lpn_file_import_shp": "Import shapefile shapes…",
+        "lpn_file_import_shp_tip": "Read the points, lines, and polygons of an ESRI shapefile into this project as Shapes, with the attribute columns kept as properties. Pick the .zip, or the .shp together with its .shx, .dbf and .prj (hold Ctrl or Shift to select several). Coordinates in a different coordinate system than the project are converted, and the notice says so.",
+        "lpn_dxf_import_skipped": "{n} entities not imported: {list}.",
+        "lpn_dxf_import_skipped_one": "One entity not imported: {list}.",
+        "lpn_dxf_import_inblocks": "in block definitions",
+        "lpn_dxf_import_bulge": "{n} polylines have arc segments, which were imported as straight segments between their vertices.",
+        "lpn_dxf_import_bulge_one": "One polyline has arc segments, which were imported as straight segments between its vertices.",
+        "lpn_dxf_import_units": "The drawing states its units as {theirs} and this project uses {ours}. The numbers were not changed.",
+        "lpn_dxf_import_refuse_geo": "A DXF drawing is flat, and this project is in latitude and longitude, so the coordinates of {file} have no place in it. Use Convert as… to copy the project into a coordinate system, then import again.",
+        "lpn_dxf_import_unreadable": "{file} is not an ASCII DXF file.",
+        "lpn_dxf_import_binary": "{file} is a binary DXF. Save it from your CAD program as an ASCII DXF, then import again.",
+        "lpn_shapes_import_frame": "The coordinates were read as {frame}, with no conversion.",
+        "lpn_shapes_frame_xy": "the X and Y of this project",
+        "lpn_shapes_frame_latlon": "latitude and longitude",
+        "lpn_shp_import_skipped": "{n} records not imported, because their shape type is not read: {list}.",
+        "lpn_shp_import_skipped_one": "One record not imported, because its shape type is not read: {list}.",
+        "lpn_shp_import_attrs": "Attribute columns kept as properties of each Shape: {list}.",
+        "lpn_shp_import_noprj": "There is no .prj file, so the coordinates were read as {frame}, with no conversion.",
+        "lpn_shp_import_prj_same": "The .prj states {crs}, the coordinate system of this project, so the coordinates were not changed.",
+        "lpn_shp_import_converted": "The coordinates are latitude and longitude. They were converted to {crs} by the transform the map uses.",
+        "lpn_shp_import_prj_other": "The .prj states {theirs}. This project states no coordinate system, so the coordinates were read as {frame}, with no conversion.",
+        "lpn_shp_import_refuse_local": "{file} is in latitude and longitude, and this project has no place on the Earth to which they can be converted. Georeference it first with Map, World map, Attach, then import again.",
+        "lpn_shp_import_refuse_crs": "{file} states {theirs}, and this project is in {ours}. Nothing was imported and nothing was converted.",
+        "lpn_shp_import_refuse_range": "{file} has no .prj file, and its coordinates are not latitudes and longitudes, so they cannot be placed in this project.",
+        "lpn_shp_import_noshp": "{file} has no .shp file in it. Pick the .zip of a shapefile, or the .shp together with its .shx, .dbf and .prj (hold Ctrl or Shift to select several).",
+        "lpn_shp_import_manyshp": "{file} holds more than one shapefile. Import one at a time.",
+        "lpn_shp_import_unreadable": "{file} is not a shapefile this page can read: {detail}",
+        "lpn_shp_import_pick_hint": "A shapefile is several files. Pick the .shp together with its .shx, .dbf and .prj (hold Ctrl or Shift to select several), or pick the .zip.",
+        "lpn_shp_import_webmerc_ask": "{file} has no .prj file, and its numbers are not latitudes and longitudes, but they fit Web Mercator metres (EPSG:3857), the system QGIS and web maps use. Import them as EPSG:3857 and convert them to this project?",
+        "lpn_shp_import_webmerc_ok": "Import as EPSG:3857",
+        "lpn_shp_import_webmerc_far_ask": "{file} states {theirs}, and read in that system its coordinates fall {km} km from this project. Read as Web Mercator metres (EPSG:3857), the system QGIS and web maps use, they fall where this project is. Import them as EPSG:3857 and convert them to this project?",
+        "lpn_shp_import_reprojected": "The coordinates were converted from {theirs} to {ours}.",
+        "lpn_shp_import_unplaced": "{n} records have coordinates this project cannot place, such as a latitude beyond the limit of the map. Record numbers: {list}.",
+        "lpn_shp_import_unplaced_one": "One record has coordinates this project cannot place, such as a latitude beyond the limit of the map. Record number: {list}.",
+        "lpn_shapes_import_none": "Nothing was imported from {file}.",
+        "lpn_shp_import_convert_hint": "Use Convert as… to copy the project into {theirs}, then import again.",
+        "lpn_shp_import_damaged": "{file} is damaged or cut short, so nothing was imported.",
+        "lpn_shp_import_deleted": "{n} records marked deleted in the .dbf were not imported.",
+        "lpn_shp_import_deleted_one": "One record marked deleted in the .dbf was not imported.",
+        "lpn_dxf_import_paperspace": "in paper space",
+        "lpn_shapes_import_more": "and {n} more"
     },
     "key_context": {
+        "lpn_pane_tab_shapes": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_tab_customers",
+                    "value": "לקוחות",
+                    "english": "Customers"
+                },
+                "next_translated": {
+                    "key": "lpn_customer_heading",
+                    "value": "לקוח {id}",
+                    "english": "Customer {id}"
+                }
+            }
+        },
+        "lpn_pane_shape_closed": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_tab_customers",
+                    "value": "לקוחות",
+                    "english": "Customers"
+                },
+                "next_translated": {
+                    "key": "lpn_customer_heading",
+                    "value": "לקוח {id}",
+                    "english": "Customer {id}"
+                }
+            }
+        },
+        "lpn_pane_shape_points": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_tab_customers",
+                    "value": "לקוחות",
+                    "english": "Customers"
+                },
+                "next_translated": {
+                    "key": "lpn_customer_heading",
+                    "value": "לקוח {id}",
+                    "english": "Customer {id}"
+                }
+            }
+        },
+        "lpn_pane_paste_shape_no_points": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_paste_customer_no_position",
+                    "value": "שורה {row}: לקוח חדש זקוק גם ל-{first} וגם ל-{second}.",
+                    "english": "Row {row}: a new Customer needs both {first} and {second}."
+                },
+                "next_translated": {
+                    "key": "lpn_pane_paste_no_customer_ref",
+                    "value": "שורה {row}: לקוח חדש זקוק לצינור או צומת מחובר.",
+                    "english": "Row {row}: a new Customer needs a connected pipe or node."
+                }
+            }
+        },
+        "lpn_pane_paste_shape_bad_points": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_paste_customer_no_position",
+                    "value": "שורה {row}: לקוח חדש זקוק גם ל-{first} וגם ל-{second}.",
+                    "english": "Row {row}: a new Customer needs both {first} and {second}."
+                },
+                "next_translated": {
+                    "key": "lpn_pane_paste_no_customer_ref",
+                    "value": "שורה {row}: לקוח חדש זקוק לצינור או צומת מחובר.",
+                    "english": "Row {row}: a new Customer needs a connected pipe or node."
+                }
+            }
+        },
+        "lpn_pane_paste_shape_closed_few": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_paste_customer_no_position",
+                    "value": "שורה {row}: לקוח חדש זקוק גם ל-{first} וגם ל-{second}.",
+                    "english": "Row {row}: a new Customer needs both {first} and {second}."
+                },
+                "next_translated": {
+                    "key": "lpn_pane_paste_no_customer_ref",
+                    "value": "שורה {row}: לקוח חדש זקוק לצינור או צומת מחובר.",
+                    "english": "Row {row}: a new Customer needs a connected pipe or node."
+                }
+            }
+        },
         "lpn_ex_net2_si_title": {
             "reason": "missing",
             "current_value": null,
@@ -777,6 +1013,1030 @@
                     "key": "lpn_ex_net3_title",
                     "value": "EPANET Net3",
                     "english": "EPANET Net3, gpm (US)"
+                }
+            }
+        },
+        "lpn_tool_add_shape": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_add_chain_tip",
+                    "value": "שרשרת צמתים וצינורות: ציינו נקודה על המפה כדי להוסיף צומת, ואז ציינו כל נקודה הבאה כדי להוסיף צינור וצומת. ציינו צומת קיים כדי להמשיך ממנו. הקישו Escape כדי לסיים את השרשרת.",
+                    "english": "Chain junctions and pipes: specify a point on the map to add a junction, then specify each next point to add a pipe and a junction. Specify an existing node to continue from it. Press Escape to end the chain."
+                },
+                "next_translated": {
+                    "key": "lpn_tool_area_tip",
+                    "value": "פעלו לפי ההנחיות שעל המסך. לחצו שוב כדי לעבור בין חלון, לאסו ומצולע. החזיקו Shift כדי לשמור על הבחירה הנוכחית ולהוסיף או להסיר (להחליף) את מה שבוחרים.",
+                    "english": "Area select window\/lasso\/polygon."
+                }
+            }
+        },
+        "lpn_tool_add_shape_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_add_chain_tip",
+                    "value": "שרשרת צמתים וצינורות: ציינו נקודה על המפה כדי להוסיף צומת, ואז ציינו כל נקודה הבאה כדי להוסיף צינור וצומת. ציינו צומת קיים כדי להמשיך ממנו. הקישו Escape כדי לסיים את השרשרת.",
+                    "english": "Chain junctions and pipes: specify a point on the map to add a junction, then specify each next point to add a pipe and a junction. Specify an existing node to continue from it. Press Escape to end the chain."
+                },
+                "next_translated": {
+                    "key": "lpn_tool_area_tip",
+                    "value": "פעלו לפי ההנחיות שעל המסך. לחצו שוב כדי לעבור בין חלון, לאסו ומצולע. החזיקו Shift כדי לשמור על הבחירה הנוכחית ולהוסיף או להסיר (להחליף) את מה שבוחרים.",
+                    "english": "Area select window\/lasso\/polygon."
+                }
+            }
+        },
+        "lpn_snap_shape_point": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_snap_moved_on_node",
+                    "value": "{moved} הוזז למקום של {target}. שני הצמתים אינם מחוברים.",
+                    "english": "{moved} moved to the location of {target}. The two nodes are not connected."
+                },
+                "next_translated": {
+                    "key": "lpn_field_valve_type",
+                    "value": "סוג שסתום",
+                    "english": "Valve type"
+                }
+            }
+        },
+        "lpn_mode_add_shape": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_mode_add_chain",
+                    "value": "מצב: שרשרת צמתים וצינורות. ציינו נקודה על המפה כדי להוסיף צומת, ואז ציינו כל נקודה הבאה כדי להוסיף צינור וצומת. ציינו צומת קיים כדי להמשיך ממנו. הקישו Escape כדי לסיים את השרשרת. עברו למצב בחירה כדי לשנות או להזיז נכסים ותוויות.",
+                    "english": "Mode: Junction Pipe Chain. Specify a point on the map to add a junction, then specify each next point to add a pipe and a junction. Specify an existing node to continue from it. Press Escape to end the chain. Switch to Select mode to change or move assets and labels."
+                },
+                "next_translated": {
+                    "key": "lpn_tip_select",
+                    "value": "השתמשו במצב זה כדי לשנות, להזיז ולגרור נכסים וטקסט על המפה, או להזיז את המפה. זהו מצב ברירת המחדל של המפה. הקשה שנייה על Esc מבטלת את הבחירה.",
+                    "english": "Use this mode to change, move, and drag assets and text on the map, or to pan the map. This is the default mode for the map. Pressing Esc a second time clears the selection."
+                }
+            }
+        },
+        "lpn_file_import_shapes": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "קורא רשימת נקודות סקר מקובץ טקסט ויוצר צומת אחד בכל נקודה, תוך שימוש בהגדרות הנכסים החדשים עבור כל מה שהקובץ אינו קובע. לא משורטטים צינורות אלא אם מסמנים קריאת התיאור כקודי שטח, ושום שורה אינה מושמטת בלי שייאמר מהי. הוא קורא את מערכת הקואורדינטות שהפרויקט כבר משתמש בה, מיוחסת גיאוגרפית או לא.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "לא ניתן היה לקרוא קובץ זה מהדיסק שלכם.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_file_import_shapes_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "קורא רשימת נקודות סקר מקובץ טקסט ויוצר צומת אחד בכל נקודה, תוך שימוש בהגדרות הנכסים החדשים עבור כל מה שהקובץ אינו קובע. לא משורטטים צינורות אלא אם מסמנים קריאת התיאור כקודי שטח, ושום שורה אינה מושמטת בלי שייאמר מהי. הוא קורא את מערכת הקואורדינטות שהפרויקט כבר משתמש בה, מיוחסת גיאוגרפית או לא.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "לא ניתן היה לקרוא קובץ זה מהדיסק שלכם.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_geojson_import_done": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "קורא רשימת נקודות סקר מקובץ טקסט ויוצר צומת אחד בכל נקודה, תוך שימוש בהגדרות הנכסים החדשים עבור כל מה שהקובץ אינו קובע. לא משורטטים צינורות אלא אם מסמנים קריאת התיאור כקודי שטח, ושום שורה אינה מושמטת בלי שייאמר מהי. הוא קורא את מערכת הקואורדינטות שהפרויקט כבר משתמש בה, מיוחסת גיאוגרפית או לא.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "לא ניתן היה לקרוא קובץ זה מהדיסק שלכם.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_geojson_import_done_one": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "קורא רשימת נקודות סקר מקובץ טקסט ויוצר צומת אחד בכל נקודה, תוך שימוש בהגדרות הנכסים החדשים עבור כל מה שהקובץ אינו קובע. לא משורטטים צינורות אלא אם מסמנים קריאת התיאור כקודי שטח, ושום שורה אינה מושמטת בלי שייאמר מהי. הוא קורא את מערכת הקואורדינטות שהפרויקט כבר משתמש בה, מיוחסת גיאוגרפית או לא.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "לא ניתן היה לקרוא קובץ זה מהדיסק שלכם.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_geojson_import_renamed": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "קורא רשימת נקודות סקר מקובץ טקסט ויוצר צומת אחד בכל נקודה, תוך שימוש בהגדרות הנכסים החדשים עבור כל מה שהקובץ אינו קובע. לא משורטטים צינורות אלא אם מסמנים קריאת התיאור כקודי שטח, ושום שורה אינה מושמטת בלי שייאמר מהי. הוא קורא את מערכת הקואורדינטות שהפרויקט כבר משתמש בה, מיוחסת גיאוגרפית או לא.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "לא ניתן היה לקרוא קובץ זה מהדיסק שלכם.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_geojson_import_renamed_one": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "קורא רשימת נקודות סקר מקובץ טקסט ויוצר צומת אחד בכל נקודה, תוך שימוש בהגדרות הנכסים החדשים עבור כל מה שהקובץ אינו קובע. לא משורטטים צינורות אלא אם מסמנים קריאת התיאור כקודי שטח, ושום שורה אינה מושמטת בלי שייאמר מהי. הוא קורא את מערכת הקואורדינטות שהפרויקט כבר משתמש בה, מיוחסת גיאוגרפית או לא.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "לא ניתן היה לקרוא קובץ זה מהדיסק שלכם.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_geojson_import_skipped": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "קורא רשימת נקודות סקר מקובץ טקסט ויוצר צומת אחד בכל נקודה, תוך שימוש בהגדרות הנכסים החדשים עבור כל מה שהקובץ אינו קובע. לא משורטטים צינורות אלא אם מסמנים קריאת התיאור כקודי שטח, ושום שורה אינה מושמטת בלי שייאמר מהי. הוא קורא את מערכת הקואורדינטות שהפרויקט כבר משתמש בה, מיוחסת גיאוגרפית או לא.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "לא ניתן היה לקרוא קובץ זה מהדיסק שלכם.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_geojson_import_skipped_one": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "קורא רשימת נקודות סקר מקובץ טקסט ויוצר צומת אחד בכל נקודה, תוך שימוש בהגדרות הנכסים החדשים עבור כל מה שהקובץ אינו קובע. לא משורטטים צינורות אלא אם מסמנים קריאת התיאור כקודי שטח, ושום שורה אינה מושמטת בלי שייאמר מהי. הוא קורא את מערכת הקואורדינטות שהפרויקט כבר משתמש בה, מיוחסת גיאוגרפית או לא.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "לא ניתן היה לקרוא קובץ זה מהדיסק שלכם.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_geojson_import_why_network": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "קורא רשימת נקודות סקר מקובץ טקסט ויוצר צומת אחד בכל נקודה, תוך שימוש בהגדרות הנכסים החדשים עבור כל מה שהקובץ אינו קובע. לא משורטטים צינורות אלא אם מסמנים קריאת התיאור כקודי שטח, ושום שורה אינה מושמטת בלי שייאמר מהי. הוא קורא את מערכת הקואורדינטות שהפרויקט כבר משתמש בה, מיוחסת גיאוגרפית או לא.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "לא ניתן היה לקרוא קובץ זה מהדיסק שלכם.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_geojson_import_why_geometry": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "קורא רשימת נקודות סקר מקובץ טקסט ויוצר צומת אחד בכל נקודה, תוך שימוש בהגדרות הנכסים החדשים עבור כל מה שהקובץ אינו קובע. לא משורטטים צינורות אלא אם מסמנים קריאת התיאור כקודי שטח, ושום שורה אינה מושמטת בלי שייאמר מהי. הוא קורא את מערכת הקואורדינטות שהפרויקט כבר משתמש בה, מיוחסת גיאוגרפית או לא.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "לא ניתן היה לקרוא קובץ זה מהדיסק שלכם.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_geojson_import_why_position": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "קורא רשימת נקודות סקר מקובץ טקסט ויוצר צומת אחד בכל נקודה, תוך שימוש בהגדרות הנכסים החדשים עבור כל מה שהקובץ אינו קובע. לא משורטטים צינורות אלא אם מסמנים קריאת התיאור כקודי שטח, ושום שורה אינה מושמטת בלי שייאמר מהי. הוא קורא את מערכת הקואורדינטות שהפרויקט כבר משתמש בה, מיוחסת גיאוגרפית או לא.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "לא ניתן היה לקרוא קובץ זה מהדיסק שלכם.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_geojson_import_holes": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "קורא רשימת נקודות סקר מקובץ טקסט ויוצר צומת אחד בכל נקודה, תוך שימוש בהגדרות הנכסים החדשים עבור כל מה שהקובץ אינו קובע. לא משורטטים צינורות אלא אם מסמנים קריאת התיאור כקודי שטח, ושום שורה אינה מושמטת בלי שייאמר מהי. הוא קורא את מערכת הקואורדינטות שהפרויקט כבר משתמש בה, מיוחסת גיאוגרפית או לא.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "לא ניתן היה לקרוא קובץ זה מהדיסק שלכם.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_geojson_import_holes_one": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "קורא רשימת נקודות סקר מקובץ טקסט ויוצר צומת אחד בכל נקודה, תוך שימוש בהגדרות הנכסים החדשים עבור כל מה שהקובץ אינו קובע. לא משורטטים צינורות אלא אם מסמנים קריאת התיאור כקודי שטח, ושום שורה אינה מושמטת בלי שייאמר מהי. הוא קורא את מערכת הקואורדינטות שהפרויקט כבר משתמש בה, מיוחסת גיאוגרפית או לא.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "לא ניתן היה לקרוא קובץ זה מהדיסק שלכם.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_geojson_import_parts": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "קורא רשימת נקודות סקר מקובץ טקסט ויוצר צומת אחד בכל נקודה, תוך שימוש בהגדרות הנכסים החדשים עבור כל מה שהקובץ אינו קובע. לא משורטטים צינורות אלא אם מסמנים קריאת התיאור כקודי שטח, ושום שורה אינה מושמטת בלי שייאמר מהי. הוא קורא את מערכת הקואורדינטות שהפרויקט כבר משתמש בה, מיוחסת גיאוגרפית או לא.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "לא ניתן היה לקרוא קובץ זה מהדיסק שלכם.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_geojson_import_parts_one": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "קורא רשימת נקודות סקר מקובץ טקסט ויוצר צומת אחד בכל נקודה, תוך שימוש בהגדרות הנכסים החדשים עבור כל מה שהקובץ אינו קובע. לא משורטטים צינורות אלא אם מסמנים קריאת התיאור כקודי שטח, ושום שורה אינה מושמטת בלי שייאמר מהי. הוא קורא את מערכת הקואורדינטות שהפרויקט כבר משתמש בה, מיוחסת גיאוגרפית או לא.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "לא ניתן היה לקרוא קובץ זה מהדיסק שלכם.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_geojson_import_local": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "קורא רשימת נקודות סקר מקובץ טקסט ויוצר צומת אחד בכל נקודה, תוך שימוש בהגדרות הנכסים החדשים עבור כל מה שהקובץ אינו קובע. לא משורטטים צינורות אלא אם מסמנים קריאת התיאור כקודי שטח, ושום שורה אינה מושמטת בלי שייאמר מהי. הוא קורא את מערכת הקואורדינטות שהפרויקט כבר משתמש בה, מיוחסת גיאוגרפית או לא.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "לא ניתן היה לקרוא קובץ זה מהדיסק שלכם.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_geojson_import_unreadable": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "קורא רשימת נקודות סקר מקובץ טקסט ויוצר צומת אחד בכל נקודה, תוך שימוש בהגדרות הנכסים החדשים עבור כל מה שהקובץ אינו קובע. לא משורטטים צינורות אלא אם מסמנים קריאת התיאור כקודי שטח, ושום שורה אינה מושמטת בלי שייאמר מהי. הוא קורא את מערכת הקואורדינטות שהפרויקט כבר משתמש בה, מיוחסת גיאוגרפית או לא.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "לא ניתן היה לקרוא קובץ זה מהדיסק שלכם.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_file_import_dxf": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "קורא רשימת נקודות סקר מקובץ טקסט ויוצר צומת אחד בכל נקודה, תוך שימוש בהגדרות הנכסים החדשים עבור כל מה שהקובץ אינו קובע. לא משורטטים צינורות אלא אם מסמנים קריאת התיאור כקודי שטח, ושום שורה אינה מושמטת בלי שייאמר מהי. הוא קורא את מערכת הקואורדינטות שהפרויקט כבר משתמש בה, מיוחסת גיאוגרפית או לא.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "לא ניתן היה לקרוא קובץ זה מהדיסק שלכם.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_file_import_dxf_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "קורא רשימת נקודות סקר מקובץ טקסט ויוצר צומת אחד בכל נקודה, תוך שימוש בהגדרות הנכסים החדשים עבור כל מה שהקובץ אינו קובע. לא משורטטים צינורות אלא אם מסמנים קריאת התיאור כקודי שטח, ושום שורה אינה מושמטת בלי שייאמר מהי. הוא קורא את מערכת הקואורדינטות שהפרויקט כבר משתמש בה, מיוחסת גיאוגרפית או לא.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "לא ניתן היה לקרוא קובץ זה מהדיסק שלכם.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_file_import_shp": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "קורא רשימת נקודות סקר מקובץ טקסט ויוצר צומת אחד בכל נקודה, תוך שימוש בהגדרות הנכסים החדשים עבור כל מה שהקובץ אינו קובע. לא משורטטים צינורות אלא אם מסמנים קריאת התיאור כקודי שטח, ושום שורה אינה מושמטת בלי שייאמר מהי. הוא קורא את מערכת הקואורדינטות שהפרויקט כבר משתמש בה, מיוחסת גיאוגרפית או לא.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "לא ניתן היה לקרוא קובץ זה מהדיסק שלכם.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_file_import_shp_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "קורא רשימת נקודות סקר מקובץ טקסט ויוצר צומת אחד בכל נקודה, תוך שימוש בהגדרות הנכסים החדשים עבור כל מה שהקובץ אינו קובע. לא משורטטים צינורות אלא אם מסמנים קריאת התיאור כקודי שטח, ושום שורה אינה מושמטת בלי שייאמר מהי. הוא קורא את מערכת הקואורדינטות שהפרויקט כבר משתמש בה, מיוחסת גיאוגרפית או לא.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "לא ניתן היה לקרוא קובץ זה מהדיסק שלכם.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_dxf_import_skipped": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "קורא רשימת נקודות סקר מקובץ טקסט ויוצר צומת אחד בכל נקודה, תוך שימוש בהגדרות הנכסים החדשים עבור כל מה שהקובץ אינו קובע. לא משורטטים צינורות אלא אם מסמנים קריאת התיאור כקודי שטח, ושום שורה אינה מושמטת בלי שייאמר מהי. הוא קורא את מערכת הקואורדינטות שהפרויקט כבר משתמש בה, מיוחסת גיאוגרפית או לא.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "לא ניתן היה לקרוא קובץ זה מהדיסק שלכם.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_dxf_import_skipped_one": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "קורא רשימת נקודות סקר מקובץ טקסט ויוצר צומת אחד בכל נקודה, תוך שימוש בהגדרות הנכסים החדשים עבור כל מה שהקובץ אינו קובע. לא משורטטים צינורות אלא אם מסמנים קריאת התיאור כקודי שטח, ושום שורה אינה מושמטת בלי שייאמר מהי. הוא קורא את מערכת הקואורדינטות שהפרויקט כבר משתמש בה, מיוחסת גיאוגרפית או לא.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "לא ניתן היה לקרוא קובץ זה מהדיסק שלכם.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_dxf_import_inblocks": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "קורא רשימת נקודות סקר מקובץ טקסט ויוצר צומת אחד בכל נקודה, תוך שימוש בהגדרות הנכסים החדשים עבור כל מה שהקובץ אינו קובע. לא משורטטים צינורות אלא אם מסמנים קריאת התיאור כקודי שטח, ושום שורה אינה מושמטת בלי שייאמר מהי. הוא קורא את מערכת הקואורדינטות שהפרויקט כבר משתמש בה, מיוחסת גיאוגרפית או לא.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "לא ניתן היה לקרוא קובץ זה מהדיסק שלכם.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_dxf_import_bulge": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "קורא רשימת נקודות סקר מקובץ טקסט ויוצר צומת אחד בכל נקודה, תוך שימוש בהגדרות הנכסים החדשים עבור כל מה שהקובץ אינו קובע. לא משורטטים צינורות אלא אם מסמנים קריאת התיאור כקודי שטח, ושום שורה אינה מושמטת בלי שייאמר מהי. הוא קורא את מערכת הקואורדינטות שהפרויקט כבר משתמש בה, מיוחסת גיאוגרפית או לא.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "לא ניתן היה לקרוא קובץ זה מהדיסק שלכם.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_dxf_import_bulge_one": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "קורא רשימת נקודות סקר מקובץ טקסט ויוצר צומת אחד בכל נקודה, תוך שימוש בהגדרות הנכסים החדשים עבור כל מה שהקובץ אינו קובע. לא משורטטים צינורות אלא אם מסמנים קריאת התיאור כקודי שטח, ושום שורה אינה מושמטת בלי שייאמר מהי. הוא קורא את מערכת הקואורדינטות שהפרויקט כבר משתמש בה, מיוחסת גיאוגרפית או לא.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "לא ניתן היה לקרוא קובץ זה מהדיסק שלכם.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_dxf_import_units": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "קורא רשימת נקודות סקר מקובץ טקסט ויוצר צומת אחד בכל נקודה, תוך שימוש בהגדרות הנכסים החדשים עבור כל מה שהקובץ אינו קובע. לא משורטטים צינורות אלא אם מסמנים קריאת התיאור כקודי שטח, ושום שורה אינה מושמטת בלי שייאמר מהי. הוא קורא את מערכת הקואורדינטות שהפרויקט כבר משתמש בה, מיוחסת גיאוגרפית או לא.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "לא ניתן היה לקרוא קובץ זה מהדיסק שלכם.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_dxf_import_refuse_geo": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "קורא רשימת נקודות סקר מקובץ טקסט ויוצר צומת אחד בכל נקודה, תוך שימוש בהגדרות הנכסים החדשים עבור כל מה שהקובץ אינו קובע. לא משורטטים צינורות אלא אם מסמנים קריאת התיאור כקודי שטח, ושום שורה אינה מושמטת בלי שייאמר מהי. הוא קורא את מערכת הקואורדינטות שהפרויקט כבר משתמש בה, מיוחסת גיאוגרפית או לא.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "לא ניתן היה לקרוא קובץ זה מהדיסק שלכם.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_dxf_import_unreadable": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "קורא רשימת נקודות סקר מקובץ טקסט ויוצר צומת אחד בכל נקודה, תוך שימוש בהגדרות הנכסים החדשים עבור כל מה שהקובץ אינו קובע. לא משורטטים צינורות אלא אם מסמנים קריאת התיאור כקודי שטח, ושום שורה אינה מושמטת בלי שייאמר מהי. הוא קורא את מערכת הקואורדינטות שהפרויקט כבר משתמש בה, מיוחסת גיאוגרפית או לא.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "לא ניתן היה לקרוא קובץ זה מהדיסק שלכם.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_dxf_import_binary": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "קורא רשימת נקודות סקר מקובץ טקסט ויוצר צומת אחד בכל נקודה, תוך שימוש בהגדרות הנכסים החדשים עבור כל מה שהקובץ אינו קובע. לא משורטטים צינורות אלא אם מסמנים קריאת התיאור כקודי שטח, ושום שורה אינה מושמטת בלי שייאמר מהי. הוא קורא את מערכת הקואורדינטות שהפרויקט כבר משתמש בה, מיוחסת גיאוגרפית או לא.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "לא ניתן היה לקרוא קובץ זה מהדיסק שלכם.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_shapes_import_frame": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "קורא רשימת נקודות סקר מקובץ טקסט ויוצר צומת אחד בכל נקודה, תוך שימוש בהגדרות הנכסים החדשים עבור כל מה שהקובץ אינו קובע. לא משורטטים צינורות אלא אם מסמנים קריאת התיאור כקודי שטח, ושום שורה אינה מושמטת בלי שייאמר מהי. הוא קורא את מערכת הקואורדינטות שהפרויקט כבר משתמש בה, מיוחסת גיאוגרפית או לא.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "לא ניתן היה לקרוא קובץ זה מהדיסק שלכם.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_shapes_frame_xy": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "קורא רשימת נקודות סקר מקובץ טקסט ויוצר צומת אחד בכל נקודה, תוך שימוש בהגדרות הנכסים החדשים עבור כל מה שהקובץ אינו קובע. לא משורטטים צינורות אלא אם מסמנים קריאת התיאור כקודי שטח, ושום שורה אינה מושמטת בלי שייאמר מהי. הוא קורא את מערכת הקואורדינטות שהפרויקט כבר משתמש בה, מיוחסת גיאוגרפית או לא.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "לא ניתן היה לקרוא קובץ זה מהדיסק שלכם.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_shapes_frame_latlon": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "קורא רשימת נקודות סקר מקובץ טקסט ויוצר צומת אחד בכל נקודה, תוך שימוש בהגדרות הנכסים החדשים עבור כל מה שהקובץ אינו קובע. לא משורטטים צינורות אלא אם מסמנים קריאת התיאור כקודי שטח, ושום שורה אינה מושמטת בלי שייאמר מהי. הוא קורא את מערכת הקואורדינטות שהפרויקט כבר משתמש בה, מיוחסת גיאוגרפית או לא.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "לא ניתן היה לקרוא קובץ זה מהדיסק שלכם.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_shp_import_skipped": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "קורא רשימת נקודות סקר מקובץ טקסט ויוצר צומת אחד בכל נקודה, תוך שימוש בהגדרות הנכסים החדשים עבור כל מה שהקובץ אינו קובע. לא משורטטים צינורות אלא אם מסמנים קריאת התיאור כקודי שטח, ושום שורה אינה מושמטת בלי שייאמר מהי. הוא קורא את מערכת הקואורדינטות שהפרויקט כבר משתמש בה, מיוחסת גיאוגרפית או לא.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "לא ניתן היה לקרוא קובץ זה מהדיסק שלכם.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_shp_import_skipped_one": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "קורא רשימת נקודות סקר מקובץ טקסט ויוצר צומת אחד בכל נקודה, תוך שימוש בהגדרות הנכסים החדשים עבור כל מה שהקובץ אינו קובע. לא משורטטים צינורות אלא אם מסמנים קריאת התיאור כקודי שטח, ושום שורה אינה מושמטת בלי שייאמר מהי. הוא קורא את מערכת הקואורדינטות שהפרויקט כבר משתמש בה, מיוחסת גיאוגרפית או לא.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "לא ניתן היה לקרוא קובץ זה מהדיסק שלכם.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_shp_import_attrs": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "קורא רשימת נקודות סקר מקובץ טקסט ויוצר צומת אחד בכל נקודה, תוך שימוש בהגדרות הנכסים החדשים עבור כל מה שהקובץ אינו קובע. לא משורטטים צינורות אלא אם מסמנים קריאת התיאור כקודי שטח, ושום שורה אינה מושמטת בלי שייאמר מהי. הוא קורא את מערכת הקואורדינטות שהפרויקט כבר משתמש בה, מיוחסת גיאוגרפית או לא.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "לא ניתן היה לקרוא קובץ זה מהדיסק שלכם.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_shp_import_noprj": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "קורא רשימת נקודות סקר מקובץ טקסט ויוצר צומת אחד בכל נקודה, תוך שימוש בהגדרות הנכסים החדשים עבור כל מה שהקובץ אינו קובע. לא משורטטים צינורות אלא אם מסמנים קריאת התיאור כקודי שטח, ושום שורה אינה מושמטת בלי שייאמר מהי. הוא קורא את מערכת הקואורדינטות שהפרויקט כבר משתמש בה, מיוחסת גיאוגרפית או לא.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "לא ניתן היה לקרוא קובץ זה מהדיסק שלכם.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_shp_import_prj_same": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "קורא רשימת נקודות סקר מקובץ טקסט ויוצר צומת אחד בכל נקודה, תוך שימוש בהגדרות הנכסים החדשים עבור כל מה שהקובץ אינו קובע. לא משורטטים צינורות אלא אם מסמנים קריאת התיאור כקודי שטח, ושום שורה אינה מושמטת בלי שייאמר מהי. הוא קורא את מערכת הקואורדינטות שהפרויקט כבר משתמש בה, מיוחסת גיאוגרפית או לא.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "לא ניתן היה לקרוא קובץ זה מהדיסק שלכם.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_shp_import_converted": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "קורא רשימת נקודות סקר מקובץ טקסט ויוצר צומת אחד בכל נקודה, תוך שימוש בהגדרות הנכסים החדשים עבור כל מה שהקובץ אינו קובע. לא משורטטים צינורות אלא אם מסמנים קריאת התיאור כקודי שטח, ושום שורה אינה מושמטת בלי שייאמר מהי. הוא קורא את מערכת הקואורדינטות שהפרויקט כבר משתמש בה, מיוחסת גיאוגרפית או לא.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "לא ניתן היה לקרוא קובץ זה מהדיסק שלכם.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_shp_import_prj_other": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "קורא רשימת נקודות סקר מקובץ טקסט ויוצר צומת אחד בכל נקודה, תוך שימוש בהגדרות הנכסים החדשים עבור כל מה שהקובץ אינו קובע. לא משורטטים צינורות אלא אם מסמנים קריאת התיאור כקודי שטח, ושום שורה אינה מושמטת בלי שייאמר מהי. הוא קורא את מערכת הקואורדינטות שהפרויקט כבר משתמש בה, מיוחסת גיאוגרפית או לא.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "לא ניתן היה לקרוא קובץ זה מהדיסק שלכם.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_shp_import_refuse_local": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "קורא רשימת נקודות סקר מקובץ טקסט ויוצר צומת אחד בכל נקודה, תוך שימוש בהגדרות הנכסים החדשים עבור כל מה שהקובץ אינו קובע. לא משורטטים צינורות אלא אם מסמנים קריאת התיאור כקודי שטח, ושום שורה אינה מושמטת בלי שייאמר מהי. הוא קורא את מערכת הקואורדינטות שהפרויקט כבר משתמש בה, מיוחסת גיאוגרפית או לא.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "לא ניתן היה לקרוא קובץ זה מהדיסק שלכם.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_shp_import_refuse_crs": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "קורא רשימת נקודות סקר מקובץ טקסט ויוצר צומת אחד בכל נקודה, תוך שימוש בהגדרות הנכסים החדשים עבור כל מה שהקובץ אינו קובע. לא משורטטים צינורות אלא אם מסמנים קריאת התיאור כקודי שטח, ושום שורה אינה מושמטת בלי שייאמר מהי. הוא קורא את מערכת הקואורדינטות שהפרויקט כבר משתמש בה, מיוחסת גיאוגרפית או לא.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "לא ניתן היה לקרוא קובץ זה מהדיסק שלכם.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_shp_import_refuse_range": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "קורא רשימת נקודות סקר מקובץ טקסט ויוצר צומת אחד בכל נקודה, תוך שימוש בהגדרות הנכסים החדשים עבור כל מה שהקובץ אינו קובע. לא משורטטים צינורות אלא אם מסמנים קריאת התיאור כקודי שטח, ושום שורה אינה מושמטת בלי שייאמר מהי. הוא קורא את מערכת הקואורדינטות שהפרויקט כבר משתמש בה, מיוחסת גיאוגרפית או לא.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "לא ניתן היה לקרוא קובץ זה מהדיסק שלכם.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_shp_import_noshp": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "קורא רשימת נקודות סקר מקובץ טקסט ויוצר צומת אחד בכל נקודה, תוך שימוש בהגדרות הנכסים החדשים עבור כל מה שהקובץ אינו קובע. לא משורטטים צינורות אלא אם מסמנים קריאת התיאור כקודי שטח, ושום שורה אינה מושמטת בלי שייאמר מהי. הוא קורא את מערכת הקואורדינטות שהפרויקט כבר משתמש בה, מיוחסת גיאוגרפית או לא.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "לא ניתן היה לקרוא קובץ זה מהדיסק שלכם.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_shp_import_manyshp": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "קורא רשימת נקודות סקר מקובץ טקסט ויוצר צומת אחד בכל נקודה, תוך שימוש בהגדרות הנכסים החדשים עבור כל מה שהקובץ אינו קובע. לא משורטטים צינורות אלא אם מסמנים קריאת התיאור כקודי שטח, ושום שורה אינה מושמטת בלי שייאמר מהי. הוא קורא את מערכת הקואורדינטות שהפרויקט כבר משתמש בה, מיוחסת גיאוגרפית או לא.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "לא ניתן היה לקרוא קובץ זה מהדיסק שלכם.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_shp_import_unreadable": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "קורא רשימת נקודות סקר מקובץ טקסט ויוצר צומת אחד בכל נקודה, תוך שימוש בהגדרות הנכסים החדשים עבור כל מה שהקובץ אינו קובע. לא משורטטים צינורות אלא אם מסמנים קריאת התיאור כקודי שטח, ושום שורה אינה מושמטת בלי שייאמר מהי. הוא קורא את מערכת הקואורדינטות שהפרויקט כבר משתמש בה, מיוחסת גיאוגרפית או לא.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "לא ניתן היה לקרוא קובץ זה מהדיסק שלכם.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_shp_import_pick_hint": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "קורא רשימת נקודות סקר מקובץ טקסט ויוצר צומת אחד בכל נקודה, תוך שימוש בהגדרות הנכסים החדשים עבור כל מה שהקובץ אינו קובע. לא משורטטים צינורות אלא אם מסמנים קריאת התיאור כקודי שטח, ושום שורה אינה מושמטת בלי שייאמר מהי. הוא קורא את מערכת הקואורדינטות שהפרויקט כבר משתמש בה, מיוחסת גיאוגרפית או לא.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "לא ניתן היה לקרוא קובץ זה מהדיסק שלכם.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_shp_import_webmerc_ask": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "קורא רשימת נקודות סקר מקובץ טקסט ויוצר צומת אחד בכל נקודה, תוך שימוש בהגדרות הנכסים החדשים עבור כל מה שהקובץ אינו קובע. לא משורטטים צינורות אלא אם מסמנים קריאת התיאור כקודי שטח, ושום שורה אינה מושמטת בלי שייאמר מהי. הוא קורא את מערכת הקואורדינטות שהפרויקט כבר משתמש בה, מיוחסת גיאוגרפית או לא.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "לא ניתן היה לקרוא קובץ זה מהדיסק שלכם.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_shp_import_webmerc_ok": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "קורא רשימת נקודות סקר מקובץ טקסט ויוצר צומת אחד בכל נקודה, תוך שימוש בהגדרות הנכסים החדשים עבור כל מה שהקובץ אינו קובע. לא משורטטים צינורות אלא אם מסמנים קריאת התיאור כקודי שטח, ושום שורה אינה מושמטת בלי שייאמר מהי. הוא קורא את מערכת הקואורדינטות שהפרויקט כבר משתמש בה, מיוחסת גיאוגרפית או לא.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "לא ניתן היה לקרוא קובץ זה מהדיסק שלכם.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_shp_import_webmerc_far_ask": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "קורא רשימת נקודות סקר מקובץ טקסט ויוצר צומת אחד בכל נקודה, תוך שימוש בהגדרות הנכסים החדשים עבור כל מה שהקובץ אינו קובע. לא משורטטים צינורות אלא אם מסמנים קריאת התיאור כקודי שטח, ושום שורה אינה מושמטת בלי שייאמר מהי. הוא קורא את מערכת הקואורדינטות שהפרויקט כבר משתמש בה, מיוחסת גיאוגרפית או לא.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "לא ניתן היה לקרוא קובץ זה מהדיסק שלכם.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_shp_import_reprojected": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "קורא רשימת נקודות סקר מקובץ טקסט ויוצר צומת אחד בכל נקודה, תוך שימוש בהגדרות הנכסים החדשים עבור כל מה שהקובץ אינו קובע. לא משורטטים צינורות אלא אם מסמנים קריאת התיאור כקודי שטח, ושום שורה אינה מושמטת בלי שייאמר מהי. הוא קורא את מערכת הקואורדינטות שהפרויקט כבר משתמש בה, מיוחסת גיאוגרפית או לא.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "לא ניתן היה לקרוא קובץ זה מהדיסק שלכם.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_shp_import_unplaced": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "קורא רשימת נקודות סקר מקובץ טקסט ויוצר צומת אחד בכל נקודה, תוך שימוש בהגדרות הנכסים החדשים עבור כל מה שהקובץ אינו קובע. לא משורטטים צינורות אלא אם מסמנים קריאת התיאור כקודי שטח, ושום שורה אינה מושמטת בלי שייאמר מהי. הוא קורא את מערכת הקואורדינטות שהפרויקט כבר משתמש בה, מיוחסת גיאוגרפית או לא.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "לא ניתן היה לקרוא קובץ זה מהדיסק שלכם.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_shp_import_unplaced_one": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "קורא רשימת נקודות סקר מקובץ טקסט ויוצר צומת אחד בכל נקודה, תוך שימוש בהגדרות הנכסים החדשים עבור כל מה שהקובץ אינו קובע. לא משורטטים צינורות אלא אם מסמנים קריאת התיאור כקודי שטח, ושום שורה אינה מושמטת בלי שייאמר מהי. הוא קורא את מערכת הקואורדינטות שהפרויקט כבר משתמש בה, מיוחסת גיאוגרפית או לא.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "לא ניתן היה לקרוא קובץ זה מהדיסק שלכם.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_shapes_import_none": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "קורא רשימת נקודות סקר מקובץ טקסט ויוצר צומת אחד בכל נקודה, תוך שימוש בהגדרות הנכסים החדשים עבור כל מה שהקובץ אינו קובע. לא משורטטים צינורות אלא אם מסמנים קריאת התיאור כקודי שטח, ושום שורה אינה מושמטת בלי שייאמר מהי. הוא קורא את מערכת הקואורדינטות שהפרויקט כבר משתמש בה, מיוחסת גיאוגרפית או לא.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "לא ניתן היה לקרוא קובץ זה מהדיסק שלכם.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_shp_import_convert_hint": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "קורא רשימת נקודות סקר מקובץ טקסט ויוצר צומת אחד בכל נקודה, תוך שימוש בהגדרות הנכסים החדשים עבור כל מה שהקובץ אינו קובע. לא משורטטים צינורות אלא אם מסמנים קריאת התיאור כקודי שטח, ושום שורה אינה מושמטת בלי שייאמר מהי. הוא קורא את מערכת הקואורדינטות שהפרויקט כבר משתמש בה, מיוחסת גיאוגרפית או לא.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "לא ניתן היה לקרוא קובץ זה מהדיסק שלכם.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_shp_import_damaged": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "קורא רשימת נקודות סקר מקובץ טקסט ויוצר צומת אחד בכל נקודה, תוך שימוש בהגדרות הנכסים החדשים עבור כל מה שהקובץ אינו קובע. לא משורטטים צינורות אלא אם מסמנים קריאת התיאור כקודי שטח, ושום שורה אינה מושמטת בלי שייאמר מהי. הוא קורא את מערכת הקואורדינטות שהפרויקט כבר משתמש בה, מיוחסת גיאוגרפית או לא.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "לא ניתן היה לקרוא קובץ זה מהדיסק שלכם.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_shp_import_deleted": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "קורא רשימת נקודות סקר מקובץ טקסט ויוצר צומת אחד בכל נקודה, תוך שימוש בהגדרות הנכסים החדשים עבור כל מה שהקובץ אינו קובע. לא משורטטים צינורות אלא אם מסמנים קריאת התיאור כקודי שטח, ושום שורה אינה מושמטת בלי שייאמר מהי. הוא קורא את מערכת הקואורדינטות שהפרויקט כבר משתמש בה, מיוחסת גיאוגרפית או לא.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "לא ניתן היה לקרוא קובץ זה מהדיסק שלכם.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_shp_import_deleted_one": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "קורא רשימת נקודות סקר מקובץ טקסט ויוצר צומת אחד בכל נקודה, תוך שימוש בהגדרות הנכסים החדשים עבור כל מה שהקובץ אינו קובע. לא משורטטים צינורות אלא אם מסמנים קריאת התיאור כקודי שטח, ושום שורה אינה מושמטת בלי שייאמר מהי. הוא קורא את מערכת הקואורדינטות שהפרויקט כבר משתמש בה, מיוחסת גיאוגרפית או לא.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "לא ניתן היה לקרוא קובץ זה מהדיסק שלכם.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_dxf_import_paperspace": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "קורא רשימת נקודות סקר מקובץ טקסט ויוצר צומת אחד בכל נקודה, תוך שימוש בהגדרות הנכסים החדשים עבור כל מה שהקובץ אינו קובע. לא משורטטים צינורות אלא אם מסמנים קריאת התיאור כקודי שטח, ושום שורה אינה מושמטת בלי שייאמר מהי. הוא קורא את מערכת הקואורדינטות שהפרויקט כבר משתמש בה, מיוחסת גיאוגרפית או לא.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "לא ניתן היה לקרוא קובץ זה מהדיסק שלכם.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_shapes_import_more": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "קורא רשימת נקודות סקר מקובץ טקסט ויוצר צומת אחד בכל נקודה, תוך שימוש בהגדרות הנכסים החדשים עבור כל מה שהקובץ אינו קובע. לא משורטטים צינורות אלא אם מסמנים קריאת התיאור כקודי שטח, ושום שורה אינה מושמטת בלי שייאמר מהי. הוא קורא את מערכת הקואורדינטות שהפרויקט כבר משתמש בה, מיוחסת גיאוגרפית או לא.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "לא ניתן היה לקרוא קובץ זה מהדיסק שלכם.",
+                    "english": "That file could not be read from your disk."
                 }
             }
         }

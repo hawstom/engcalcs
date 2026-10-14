@@ -1132,6 +1132,24 @@ html[lang="zh"] .ec-welcome {
 	fill: var(--ec-ink-strong); stroke: var(--lpn-map-bg, var(--ec-bg)); stroke-width: 3px; paint-order: stroke;
 	vector-effect: non-scaling-stroke; font-family: sans-serif;
 }
+/* **THE SHAPE (Task 779)**: the user's own drawn annotation, a point, a polyline or a polygon. One
+   style and no styling control yet. Purple, so it is never read as a pipe (the map ink) or as the
+   snap glyph (amber). Constant on screen at every zoom: the strokes are non-scaling, and the x and
+   the point grips are scaled by --lpn-hair (one screen pixel in world units). Nothing here takes a
+   pointer event; the page finds a Shape by distance (shapeHitOver() in js/looped-network.js). The
+   grips show only on a selected Shape. */
+.lpn-shapes, .lpn-shape, .lpn-shape * { pointer-events: none; }
+.lpn-shape-line { fill: none; stroke: #6a3d9a; stroke-width: 1.5px; vector-effect: non-scaling-stroke; stroke-linejoin: round; }
+.lpn-shape-line.lpn-shape-closed { fill: #6a3d9a; fill-opacity: .06; }
+.lpn-shape-x { fill: none; stroke: #6a3d9a; stroke-width: 2px; vector-effect: non-scaling-stroke; transform: scale(calc(5 * var(--lpn-hair, 0))); }
+.lpn-shape-handle { display: none; }
+.lpn-shape-handle rect { fill: #fff; stroke: #6a3d9a; stroke-width: 1.5px; vector-effect: non-scaling-stroke; transform: scale(calc(4 * var(--lpn-hair, 0))); }
+.lpn-shape.lpn-selected .lpn-shape-handle { display: inline; }
+.lpn-shape.lpn-selected .lpn-shape-line, .lpn-shape.lpn-selected .lpn-shape-x { stroke: #1976d2; stroke-width: 2.5px; }
+.lpn-shape.lpn-hover:not(.lpn-selected) .lpn-shape-line, .lpn-shape.lpn-hover:not(.lpn-selected) .lpn-shape-x { stroke-width: 2.5px; }
+.lpn-shape-draftg { pointer-events: none; }
+.lpn-shape-draft { fill: none; stroke: #6a3d9a; stroke-width: 1.5px; stroke-dasharray: 5 3; vector-effect: non-scaling-stroke; }
+.lpn-shape-draft-pt { fill: #fff; stroke: #6a3d9a; stroke-width: 1.5px; vector-effect: non-scaling-stroke; }
 /* The select-area marquee (Task 266). Blue rather than the rubber band's red, because the rubber
    band says "a pipe will be drawn here" and this says "these are the ones I mean" -- two shapes
    that both follow the pointer and must never be mistaken for each other. A faint wash inside it,

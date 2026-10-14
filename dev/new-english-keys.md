@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**4 still to read on master**, of 4 untranslated keys, of 2560 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**74 still to read on master**, of 74 untranslated keys, of 2630 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -199,8 +199,38 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   @@ NEEDS RULING
 
-## lpn_  (4, 4 to read @@ NEEDS RULING)
+## lpn_  (74, 74 to read @@ NEEDS RULING)
 
+- **`lpn_dxf_import_binary`**
+  > {file} is a binary DXF. Save it from your CAD program as an ASCII DXF, then import again.
+  @@ NEEDS RULING
+- **`lpn_dxf_import_bulge`**
+  > {n} polylines have arc segments, which were imported as straight segments between their vertices.
+  @@ NEEDS RULING
+- **`lpn_dxf_import_bulge_one`**
+  > One polyline has arc segments, which were imported as straight segments between its vertices.
+  @@ NEEDS RULING
+- **`lpn_dxf_import_inblocks`**
+  > in block definitions
+  @@ NEEDS RULING
+- **`lpn_dxf_import_paperspace`**
+  > in paper space
+  @@ NEEDS RULING
+- **`lpn_dxf_import_refuse_geo`**
+  > A DXF drawing is flat, and this project is in latitude and longitude, so the coordinates of {file} have no place in it. Use Convert as… to copy the project into a coordinate system, then import again.
+  @@ NEEDS RULING
+- **`lpn_dxf_import_skipped`**
+  > {n} entities not imported: {list}.
+  @@ NEEDS RULING
+- **`lpn_dxf_import_skipped_one`**
+  > One entity not imported: {list}.
+  @@ NEEDS RULING
+- **`lpn_dxf_import_units`**
+  > The drawing states its units as {theirs} and this project uses {ours}. The numbers were not changed.
+  @@ NEEDS RULING
+- **`lpn_dxf_import_unreadable`**
+  > {file} is not an ASCII DXF file.
+  @@ NEEDS RULING
 - **`lpn_ex_net2_si_desc`**
   > Litres per second, with metres and millimetres. An EPANET example at Branford, Connecticut, converted from gallons per minute, feet and inches: 35 junctions and 1 tank, with no reservoir, no pump and no valves, about 2 km by 4 km. Fluoride, a non-reactive substance, enters at one source.
   @@ NEEDS RULING
@@ -213,12 +243,192 @@ never edits a synonym.
 - **`lpn_ex_net3_si_title`**
   > EPANET Net3, L/s (SI)
   @@ NEEDS RULING
+- **`lpn_file_import_dxf`**
+  > Import DXF shapes…
+  @@ NEEDS RULING
+- **`lpn_file_import_dxf_tip`**
+  > Read the points, lines, and polylines of an ASCII DXF file into this project as Shapes, with each layer name kept as a property. Other entities are counted and listed, not imported. The coordinates are read as the X and Y of this project, with no conversion.
+  @@ NEEDS RULING
+- **`lpn_file_import_shapes`**
+  > Import GeoJSON shapes…
+  @@ NEEDS RULING
+- **`lpn_file_import_shapes_tip`**
+  > Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network from an EPANET file. The project must be georeferenced or state a coordinate system.
+  @@ NEEDS RULING
+- **`lpn_file_import_shp`**
+  > Import shapefile shapes…
+  @@ NEEDS RULING
+- **`lpn_file_import_shp_tip`**
+  > Read the points, lines, and polygons of an ESRI shapefile into this project as Shapes, with the attribute columns kept as properties. Pick the .zip, or the .shp together with its .shx, .dbf and .prj (hold Ctrl or Shift to select several). Coordinates in a different coordinate system than the project are converted, and the notice says so.
+  @@ NEEDS RULING
+- **`lpn_geojson_import_done`**
+  > {n} Shapes imported from {file}.
+  @@ NEEDS RULING
+- **`lpn_geojson_import_done_one`**
+  > One Shape imported from {file}.
+  @@ NEEDS RULING
+- **`lpn_geojson_import_holes`**
+  > {n} polygon holes not imported. A Shape has one boundary.
+  @@ NEEDS RULING
+- **`lpn_geojson_import_holes_one`**
+  > One polygon hole not imported. A Shape has one boundary.
+  @@ NEEDS RULING
+- **`lpn_geojson_import_local`**
+  > GeoJSON positions are latitude and longitude, and this project has no place on the Earth to which they can be converted. Georeference it first with Map, World map, Attach, then import again.
+  @@ NEEDS RULING
+- **`lpn_geojson_import_parts`**
+  > {n} multipart features imported as one Shape for each part.
+  @@ NEEDS RULING
+- **`lpn_geojson_import_parts_one`**
+  > One multipart feature imported as one Shape for each part.
+  @@ NEEDS RULING
+- **`lpn_geojson_import_renamed`**
+  > {n} feature names cannot be Shape IDs and are kept with the Shapes: {list}.
+  @@ NEEDS RULING
+- **`lpn_geojson_import_renamed_one`**
+  > One feature name cannot be a Shape ID and is kept with the Shape: {list}.
+  @@ NEEDS RULING
+- **`lpn_geojson_import_skipped`**
+  > {n} features not imported: {list}.
+  @@ NEEDS RULING
+- **`lpn_geojson_import_skipped_one`**
+  > One feature not imported: {list}.
+  @@ NEEDS RULING
+- **`lpn_geojson_import_unreadable`**
+  > {file} is not a GeoJSON file: {detail}
+  @@ NEEDS RULING
+- **`lpn_geojson_import_why_geometry`**
+  > not a point, line, or polygon
+  @@ NEEDS RULING
+- **`lpn_geojson_import_why_network`**
+  > network asset
+  @@ NEEDS RULING
+- **`lpn_geojson_import_why_position`**
+  > position not a valid latitude and longitude
+  @@ NEEDS RULING
+- **`lpn_mode_add_shape`**
+  > Mode: Add Shape. Specify each point. Specify the last point again or press Enter to finish; specify the first point to close a polygon.
+  @@ NEEDS RULING
+- **`lpn_pane_paste_shape_bad_points`**
+  > Row {row}: {text} is not a list of points. Write each point as {pair}, with a point (.) as the decimal mark, and separate the points with |.
+  @@ NEEDS RULING
+- **`lpn_pane_paste_shape_closed_few`**
+  > Row {row}: a closed Shape needs at least three points.
+  @@ NEEDS RULING
+- **`lpn_pane_paste_shape_no_points`**
+  > Row {row}: a new Shape needs its Points.
+  @@ NEEDS RULING
+- **`lpn_pane_shape_closed`**
+  > Closed
+  @@ NEEDS RULING
+- **`lpn_pane_shape_points`**
+  > Points
+  @@ NEEDS RULING
+- **`lpn_pane_tab_shapes`**
+  > Shapes
+  @@ NEEDS RULING
+- **`lpn_shapes_frame_latlon`**
+  > latitude and longitude
+  @@ NEEDS RULING
+- **`lpn_shapes_frame_xy`**
+  > the X and Y of this project
+  @@ NEEDS RULING
+- **`lpn_shapes_import_frame`**
+  > The coordinates were read as {frame}, with no conversion.
+  @@ NEEDS RULING
+- **`lpn_shapes_import_more`**
+  > and {n} more
+  @@ NEEDS RULING
+- **`lpn_shapes_import_none`**
+  > Nothing was imported from {file}.
+  @@ NEEDS RULING
+- **`lpn_shp_import_attrs`**
+  > Attribute columns kept as properties of each Shape: {list}.
+  @@ NEEDS RULING
+- **`lpn_shp_import_convert_hint`**
+  > Use Convert as… to copy the project into {theirs}, then import again.
+  @@ NEEDS RULING
+- **`lpn_shp_import_converted`**
+  > The coordinates are latitude and longitude. They were converted to {crs} by the transform the map uses.
+  @@ NEEDS RULING
+- **`lpn_shp_import_damaged`**
+  > {file} is damaged or cut short, so nothing was imported.
+  @@ NEEDS RULING
+- **`lpn_shp_import_deleted`**
+  > {n} records marked deleted in the .dbf were not imported.
+  @@ NEEDS RULING
+- **`lpn_shp_import_deleted_one`**
+  > One record marked deleted in the .dbf was not imported.
+  @@ NEEDS RULING
+- **`lpn_shp_import_manyshp`**
+  > {file} holds more than one shapefile. Import one at a time.
+  @@ NEEDS RULING
+- **`lpn_shp_import_noprj`**
+  > There is no .prj file, so the coordinates were read as {frame}, with no conversion.
+  @@ NEEDS RULING
+- **`lpn_shp_import_noshp`**
+  > {file} has no .shp file in it. Pick the .zip of a shapefile, or the .shp together with its .shx, .dbf and .prj (hold Ctrl or Shift to select several).
+  @@ NEEDS RULING
+- **`lpn_shp_import_pick_hint`**
+  > A shapefile is several files. Pick the .shp together with its .shx, .dbf and .prj (hold Ctrl or Shift to select several), or pick the .zip.
+  @@ NEEDS RULING
+- **`lpn_shp_import_prj_other`**
+  > The .prj states {theirs}. This project states no coordinate system, so the coordinates were read as {frame}, with no conversion.
+  @@ NEEDS RULING
+- **`lpn_shp_import_prj_same`**
+  > The .prj states {crs}, the coordinate system of this project, so the coordinates were not changed.
+  @@ NEEDS RULING
+- **`lpn_shp_import_refuse_crs`**
+  > {file} states {theirs}, and this project is in {ours}. Nothing was imported and nothing was converted.
+  @@ NEEDS RULING
+- **`lpn_shp_import_refuse_local`**
+  > {file} is in latitude and longitude, and this project has no place on the Earth to which they can be converted. Georeference it first with Map, World map, Attach, then import again.
+  @@ NEEDS RULING
+- **`lpn_shp_import_refuse_range`**
+  > {file} has no .prj file, and its coordinates are not latitudes and longitudes, so they cannot be placed in this project.
+  @@ NEEDS RULING
+- **`lpn_shp_import_reprojected`**
+  > The coordinates were converted from {theirs} to {ours}.
+  @@ NEEDS RULING
+- **`lpn_shp_import_skipped`**
+  > {n} records not imported, because their shape type is not read: {list}.
+  @@ NEEDS RULING
+- **`lpn_shp_import_skipped_one`**
+  > One record not imported, because its shape type is not read: {list}.
+  @@ NEEDS RULING
+- **`lpn_shp_import_unplaced`**
+  > {n} records have coordinates this project cannot place, such as a latitude beyond the limit of the map. Record numbers: {list}.
+  @@ NEEDS RULING
+- **`lpn_shp_import_unplaced_one`**
+  > One record has coordinates this project cannot place, such as a latitude beyond the limit of the map. Record number: {list}.
+  @@ NEEDS RULING
+- **`lpn_shp_import_unreadable`**
+  > {file} is not a shapefile this page can read: {detail}
+  @@ NEEDS RULING
+- **`lpn_shp_import_webmerc_ask`**
+  > {file} has no .prj file, and its numbers are not latitudes and longitudes, but they fit Web Mercator metres (EPSG:3857), the system QGIS and web maps use. Import them as EPSG:3857 and convert them to this project?
+  @@ NEEDS RULING
+- **`lpn_shp_import_webmerc_far_ask`**
+  > {file} states {theirs}, and read in that system its coordinates fall {km} km from this project. Read as Web Mercator metres (EPSG:3857), the system QGIS and web maps use, they fall where this project is. Import them as EPSG:3857 and convert them to this project?
+  @@ NEEDS RULING
+- **`lpn_shp_import_webmerc_ok`**
+  > Import as EPSG:3857
+  @@ NEEDS RULING
+- **`lpn_snap_shape_point`**
+  > {shape}, point {n}
+  @@ NEEDS RULING
+- **`lpn_tool_add_shape`**
+  > Shape
+  @@ NEEDS RULING
+- **`lpn_tool_add_shape_tip`**
+  > Draw a point, a polyline, or a polygon on the map. A Shape is annotation and is not part of the network. Specify each point, then specify the last point again, press Enter, or right-click to finish. Specify the first point again to close the Shape into a polygon.
+  @@ NEEDS RULING
 
 ---
 
 # Strings waiting on a branch
 
-**327 still to read**, of 330 new keys across 13 unmerged branch(es).
+**265 still to read**, of 268 new keys across 13 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -229,7 +439,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/bentley-interop (`a190670f`) — 121 new, 121 to read @@ NEEDS RULING
+### feat/bentley-interop (`291f0f92`) — 128 new, 128 to read @@ NEEDS RULING
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -552,8 +762,11 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_sm_delete`**
   > Delete the selected item. A used item is not deleted.
   @@ NEEDS RULING
+- **`lpn_sm_delete_alt_ask`**
+  > Delete the alternative {name}?
+  @@ NEEDS RULING
 - **`lpn_sm_help`**
-  > How scenarios and alternatives work:\n\nIn Basic mode, alternatives are hidden and automatic, and all new scenarios are children of the Base scenario.\n\nProperties and settings are grouped into alternatives categories that appear as columns of the Scenarios table and as management options in Scenario manager.\n\nOverrides are created in scenarios, but they really belong to the respective alternatives associated with the scenario; so a scenario is like a window to its alternatives. Associations of alternatives to scenarios are managed in the Scenarios table in the bottom pane. Creating a new scenario creates no alternatives; the new scenario uses its parent's alternatives until overrides are created that need new alternatives. When overrides are created in a scenario, they are stored in their respective alternative for the scenario; if the scenario has no such alternative, a new alternative is created using the name of the scenario.\n\nWith Basic mode off, a complex inheritance tree is available, and alternatives can be shared among scenarios. But the default behavior of edits when a new alternative is needed is to create an alternative named like the current scenario, which gives each scenario its unique set of alternatives.\n\nExample: You create a "Figure: Node and link IDs" scenario and edit a Text to say "Node and Link IDs." When you create the scenario, no alternatives are created. But at the moment you save the Text, a Text alternative called "Figure: Node and link IDs" is created with the override for the Text value. In Basic mode, you see this as simply an override in the scenario itself.\n\nCopy properties copies only overrides. In any scenario other than Base, it copies only the overrides the asset has in that scenario.\n\nHow to manage scenarios:\n\n- Choose Scenarios or an alternatives category in the list at the top to show its tree.\n\n- Create a child of the selected item with Add child. Add base adds another Base, which starts as a copy of Base as it is now; later edits to Base do not change it. A new child is named after its parent; type a name to rename it. Copy copies the selected alternative. To copy a scenario, use Copy scenario in the Scenarios menu, in Basic mode; it copies the scenario's overrides, with the alternatives that hold them.\n\n- Drag an item onto another to make it a child of that item. A scenario moved to a new parent inherits from it everything it has not overridden; what it has overridden does not change. Drag an item between two items to reorder them.\n\n- Click an item to select it. Press F2, or choose Rename, to rename the selected item. Renaming a scenario asks whether to rename the alternatives that carry its name; in Basic mode they are renamed with it, without asking. Double-click a scenario, or press Enter, to make it current. Click the arrow beside an item, or press Left or Right, to collapse or expand it. Right-click an item for the same commands as the buttons.\n\n- Press Delete, or click the minus button, to delete the selected item. An item in use is not deleted, and the message names what uses it. Deleting a scenario with Basic mode off keeps the alternatives it uses. Deleting a scenario with Basic mode on also deletes each of its alternatives that no other scenario uses.\n\n- To make a scenario use another alternative, including Base, choose it in the scenario's row of the Scenarios table. An override made in a shared alternative changes every scenario that uses it.
+  > How scenarios and alternatives work:\n\nIn Basic mode, alternatives are hidden and automatic, and all new scenarios are children of the Base scenario.\n\nWith Basic mode off, a complex inheritance tree is available, and alternatives can be shared among scenarios. But the default behavior of edits when a new alternative association is needed (in the absence of proactive user management) is to create an alternative named like the current scenario, which gives each scenario its unique set of alternatives.\n\nProperties and settings are grouped into alternatives categories that appear as columns of the Scenarios table and as management options in Scenario manager.\n\nOverrides are created in scenarios, but they really belong to the respective alternatives associated with the scenario; so a scenario is like a window to its alternatives. Associations of alternatives to scenarios are managed in the Scenarios table in the bottom pane. Creating a new scenario creates no alternatives; the new scenario uses its parent's alternatives until overrides are created that need new alternatives. When overrides are created in a scenario, they are stored in their respective alternative for the scenario; if the scenario has no such alternative, a new alternative is created using the name of the scenario.\n\nExample: You create a "Figure: Node and link IDs" scenario and edit a Text to say "Node and Link IDs." When you create the scenario, no alternatives are created. But at the moment you save the Text, a Text alternative called "Figure: Node and link IDs" is created with the override for the Text value. In Basic mode, you see this as simply an override in the scenario itself.\n\nCopy properties copies only overrides. In any scenario other than Base, it copies only the overrides the asset has in that scenario.\n\nHow to manage scenarios:\n\n- Choose Scenarios or an alternatives category in the list at the top to show its tree.\n\n- Create a child of the selected item with Add child. Add base adds another Base, which starts as a copy of Base as it is now; later edits to Base do not change it. A new child is named after its parent; type a name to rename it. Copy copies the selected alternative. To copy a scenario, use Copy scenario in the Scenarios menu, in Basic mode; it copies the scenario's overrides, with the alternatives that hold them.\n\n- Drag an item onto another to make it a child of that item. A scenario moved to a new parent inherits from it everything it has not overridden; what it has overridden does not change. Drag an item between two items to reorder them.\n\n- Click an item to select it. Press F2, or choose Rename, to rename the selected item. Renaming a scenario asks whether to rename the alternatives that carry its name; in Basic mode they are renamed with it, without asking. Double-click a scenario, or press Enter, to make it current. Click the arrow beside an item, or press Left or Right, to collapse or expand it. Right-click an item for the same commands as the buttons.\n\n- Press Delete, or click the minus button, to delete the selected item. An item in use is not deleted, and the message names what uses it. Deleting a scenario with Basic mode off keeps the alternatives it uses. Deleting a scenario with Basic mode on also deletes each of its alternatives that no other scenario uses.\n\n- To make a scenario use another alternative, including Base, choose it in the scenario's row of the Scenarios table. An override made in a shared alternative changes every scenario that uses it.
   @@ NEEDS RULING
 - **`lpn_sm_in_use`**
   > {name} cannot be deleted while it is used by: {list}.
@@ -593,6 +806,24 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 - **`lpn_sm_used_by_tip`**
   > Used by: {list}
+  @@ NEEDS RULING
+- **`lpn_tsb_close`**
+  > Close graph
+  @@ NEEDS RULING
+- **`lpn_tsb_max`**
+  > Close a graph before opening another. Up to {n} stay open.
+  @@ NEEDS RULING
+- **`lpn_tsb_menu`**
+  > Time series graph
+  @@ NEEDS RULING
+- **`lpn_tsb_off_tip`**
+  > Needs extended period results. Set a Total run time in Settings, Calculation, Time, and calculate.
+  @@ NEEDS RULING
+- **`lpn_tsb_quantity`**
+  > Quantity to graph
+  @@ NEEDS RULING
+- **`lpn_tsb_resize`**
+  > Drag to resize
   @@ NEEDS RULING
 
 ### feat/desktop (`baba0f04`) — adds no English strings
@@ -1036,216 +1267,8 @@ build for that would be a gate nobody keeps. Refresh it with
   > Not pasted: {n} (the valve types differ).
   @@ NEEDS RULING
 
-### feat/shape (`0b31a248`) — 69 new, 69 to read @@ NEEDS RULING
+### feat/shape (`c0d67284`) — adds no English strings
 
-- **`lpn_dxf_import_binary`**
-  > {file} is a binary DXF. Save it from your CAD program as an ASCII DXF, then import again.
-  @@ NEEDS RULING
-- **`lpn_dxf_import_bulge`**
-  > {n} polylines have arc segments, which were imported as straight segments between their vertices.
-  @@ NEEDS RULING
-- **`lpn_dxf_import_bulge_one`**
-  > One polyline has arc segments, which were imported as straight segments between its vertices.
-  @@ NEEDS RULING
-- **`lpn_dxf_import_inblocks`**
-  > in block definitions
-  @@ NEEDS RULING
-- **`lpn_dxf_import_paperspace`**
-  > in paper space
-  @@ NEEDS RULING
-- **`lpn_dxf_import_refuse_geo`**
-  > A DXF drawing is flat, and this project is in latitude and longitude, so the coordinates of {file} have no place in it. Use Convert as… to copy the project into a coordinate system, then import again.
-  @@ NEEDS RULING
-- **`lpn_dxf_import_skipped`**
-  > {n} entities not imported: {list}.
-  @@ NEEDS RULING
-- **`lpn_dxf_import_skipped_one`**
-  > One entity not imported: {list}.
-  @@ NEEDS RULING
-- **`lpn_dxf_import_units`**
-  > The drawing states its units as {theirs} and this project uses {ours}. The numbers were not changed.
-  @@ NEEDS RULING
-- **`lpn_dxf_import_unreadable`**
-  > {file} is not an ASCII DXF file.
-  @@ NEEDS RULING
-- **`lpn_file_import_dxf`**
-  > Import DXF shapes…
-  @@ NEEDS RULING
-- **`lpn_file_import_dxf_tip`**
-  > Read the points, lines, and polylines of an ASCII DXF file into this project as Shapes, with each layer name kept as a property. Other entities are counted and listed, not imported. The coordinates are read as the X and Y of this project, with no conversion.
-  @@ NEEDS RULING
-- **`lpn_file_import_shapes`**
-  > Import GeoJSON shapes…
-  @@ NEEDS RULING
-- **`lpn_file_import_shapes_tip`**
-  > Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network from an EPANET file. The project must be georeferenced or state a coordinate system.
-  @@ NEEDS RULING
-- **`lpn_file_import_shp`**
-  > Import shapefile shapes…
-  @@ NEEDS RULING
-- **`lpn_file_import_shp_tip`**
-  > Read the points, lines, and polygons of an ESRI shapefile into this project as Shapes, with the attribute columns kept as properties. Pick the .zip, or the .shp together with its .shx, .dbf and .prj (hold Ctrl or Shift to select several). Coordinates in a different coordinate system than the project are converted, and the notice says so.
-  @@ NEEDS RULING
-- **`lpn_geojson_import_done`**
-  > {n} Shapes imported from {file}.
-  @@ NEEDS RULING
-- **`lpn_geojson_import_done_one`**
-  > One Shape imported from {file}.
-  @@ NEEDS RULING
-- **`lpn_geojson_import_holes`**
-  > {n} polygon holes not imported. A Shape has one boundary.
-  @@ NEEDS RULING
-- **`lpn_geojson_import_holes_one`**
-  > One polygon hole not imported. A Shape has one boundary.
-  @@ NEEDS RULING
-- **`lpn_geojson_import_local`**
-  > GeoJSON positions are latitude and longitude, and this project has no place on the Earth to which they can be converted. Georeference it first with Map, World map, Attach, then import again.
-  @@ NEEDS RULING
-- **`lpn_geojson_import_parts`**
-  > {n} multipart features imported as one Shape for each part.
-  @@ NEEDS RULING
-- **`lpn_geojson_import_parts_one`**
-  > One multipart feature imported as one Shape for each part.
-  @@ NEEDS RULING
-- **`lpn_geojson_import_renamed`**
-  > {n} feature names cannot be Shape IDs and are kept with the Shapes: {list}.
-  @@ NEEDS RULING
-- **`lpn_geojson_import_renamed_one`**
-  > One feature name cannot be a Shape ID and is kept with the Shape: {list}.
-  @@ NEEDS RULING
-- **`lpn_geojson_import_skipped`**
-  > {n} features not imported: {list}.
-  @@ NEEDS RULING
-- **`lpn_geojson_import_skipped_one`**
-  > One feature not imported: {list}.
-  @@ NEEDS RULING
-- **`lpn_geojson_import_unreadable`**
-  > {file} is not a GeoJSON file: {detail}
-  @@ NEEDS RULING
-- **`lpn_geojson_import_why_geometry`**
-  > not a point, line, or polygon
-  @@ NEEDS RULING
-- **`lpn_geojson_import_why_network`**
-  > network asset
-  @@ NEEDS RULING
-- **`lpn_geojson_import_why_position`**
-  > position not a valid latitude and longitude
-  @@ NEEDS RULING
-- **`lpn_mode_add_shape`**
-  > Mode: Add Shape. Specify each point. Specify the last point again or press Enter to finish; specify the first point to close a polygon.
-  @@ NEEDS RULING
-- **`lpn_pane_paste_shape_bad_points`**
-  > Row {row}: {text} is not a list of points. Write each point as {pair}, with a point (.) as the decimal mark, and separate the points with |.
-  @@ NEEDS RULING
-- **`lpn_pane_paste_shape_closed_few`**
-  > Row {row}: a closed Shape needs at least three points.
-  @@ NEEDS RULING
-- **`lpn_pane_paste_shape_no_points`**
-  > Row {row}: a new Shape needs its Points.
-  @@ NEEDS RULING
-- **`lpn_pane_shape_closed`**
-  > Closed
-  @@ NEEDS RULING
-- **`lpn_pane_shape_points`**
-  > Points
-  @@ NEEDS RULING
-- **`lpn_pane_tab_shapes`**
-  > Shapes
-  @@ NEEDS RULING
-- **`lpn_shapes_frame_latlon`**
-  > latitude and longitude
-  @@ NEEDS RULING
-- **`lpn_shapes_frame_xy`**
-  > the X and Y of this project
-  @@ NEEDS RULING
-- **`lpn_shapes_import_frame`**
-  > The coordinates were read as {frame}, with no conversion.
-  @@ NEEDS RULING
-- **`lpn_shapes_import_more`**
-  > and {n} more
-  @@ NEEDS RULING
-- **`lpn_shapes_import_none`**
-  > Nothing was imported from {file}.
-  @@ NEEDS RULING
-- **`lpn_shp_import_attrs`**
-  > Attribute columns kept as properties of each Shape: {list}.
-  @@ NEEDS RULING
-- **`lpn_shp_import_convert_hint`**
-  > Use Convert as… to copy the project into {theirs}, then import again.
-  @@ NEEDS RULING
-- **`lpn_shp_import_converted`**
-  > The coordinates are latitude and longitude. They were converted to {crs} by the transform the map uses.
-  @@ NEEDS RULING
-- **`lpn_shp_import_damaged`**
-  > {file} is damaged or cut short, so nothing was imported.
-  @@ NEEDS RULING
-- **`lpn_shp_import_deleted`**
-  > {n} records marked deleted in the .dbf were not imported.
-  @@ NEEDS RULING
-- **`lpn_shp_import_deleted_one`**
-  > One record marked deleted in the .dbf was not imported.
-  @@ NEEDS RULING
-- **`lpn_shp_import_manyshp`**
-  > {file} holds more than one shapefile. Import one at a time.
-  @@ NEEDS RULING
-- **`lpn_shp_import_noprj`**
-  > There is no .prj file, so the coordinates were read as {frame}, with no conversion.
-  @@ NEEDS RULING
-- **`lpn_shp_import_noshp`**
-  > {file} has no .shp file in it. Pick the .zip of a shapefile, or the .shp together with its .shx, .dbf and .prj (hold Ctrl or Shift to select several).
-  @@ NEEDS RULING
-- **`lpn_shp_import_pick_hint`**
-  > A shapefile is several files. Pick the .shp together with its .shx, .dbf and .prj (hold Ctrl or Shift to select several), or pick the .zip.
-  @@ NEEDS RULING
-- **`lpn_shp_import_prj_other`**
-  > The .prj states {theirs}. This project states no coordinate system, so the coordinates were read as {frame}, with no conversion.
-  @@ NEEDS RULING
-- **`lpn_shp_import_prj_same`**
-  > The .prj states {crs}, the coordinate system of this project, so the coordinates were not changed.
-  @@ NEEDS RULING
-- **`lpn_shp_import_refuse_crs`**
-  > {file} states {theirs}, and this project is in {ours}. Nothing was imported and nothing was converted.
-  @@ NEEDS RULING
-- **`lpn_shp_import_refuse_local`**
-  > {file} is in latitude and longitude, and this project has no place on the Earth to which they can be converted. Georeference it first with Map, World map, Attach, then import again.
-  @@ NEEDS RULING
-- **`lpn_shp_import_refuse_range`**
-  > {file} has no .prj file, and its coordinates are not latitudes and longitudes, so they cannot be placed in this project.
-  @@ NEEDS RULING
-- **`lpn_shp_import_reprojected`**
-  > The coordinates were converted from {theirs} to {ours}.
-  @@ NEEDS RULING
-- **`lpn_shp_import_skipped`**
-  > {n} records not imported, because their shape type is not read: {list}.
-  @@ NEEDS RULING
-- **`lpn_shp_import_skipped_one`**
-  > One record not imported, because its shape type is not read: {list}.
-  @@ NEEDS RULING
-- **`lpn_shp_import_unplaced`**
-  > {n} records have coordinates this project cannot place, such as a latitude beyond the limit of the map. Record numbers: {list}.
-  @@ NEEDS RULING
-- **`lpn_shp_import_unplaced_one`**
-  > One record has coordinates this project cannot place, such as a latitude beyond the limit of the map. Record number: {list}.
-  @@ NEEDS RULING
-- **`lpn_shp_import_unreadable`**
-  > {file} is not a shapefile this page can read: {detail}
-  @@ NEEDS RULING
-- **`lpn_shp_import_webmerc_ask`**
-  > {file} has no .prj file, and its numbers are not latitudes and longitudes, but they fit Web Mercator metres (EPSG:3857), the system QGIS and web maps use. Import them as EPSG:3857 and convert them to this project?
-  @@ NEEDS RULING
-- **`lpn_shp_import_webmerc_ok`**
-  > Import as EPSG:3857
-  @@ NEEDS RULING
-- **`lpn_snap_shape_point`**
-  > {shape}, point {n}
-  @@ NEEDS RULING
-- **`lpn_tool_add_shape`**
-  > Shape
-  @@ NEEDS RULING
-- **`lpn_tool_add_shape_tip`**
-  > Draw a point, a polyline, or a polygon on the map. A Shape is annotation and is not part of the network. Specify each point, then specify the last point again, press Enter, or right-click to finish. Specify the first point again to close the Shape into a polygon.
-  @@ NEEDS RULING
+### feat/tool-key (`dd4bae8c`) — adds no English strings
 
-### feat/si-example (`416d68b7`) — adds no English strings
-
-### feat/tool-key (`4217cd92`) — adds no English strings
+### fix/report-legend (`ca7592e9`) — adds no English strings

@@ -3279,7 +3279,7 @@ var EngCalcs = EngCalcs || {};
 	// there; `node` is the one exception, a fallback holding the junction id ONLY once the pipe a
 	// node-exact connection ran through has been deleted (customerNodeFallback(), Tom, 2026-09-25) --
 	// so a Customer connected to a node cannot be detached by deleting or re-routing the main.
-	var doc = { nodes: [], links: [], labels: [], customers: [], origin: { x: 0, y: 0 } };
+	var doc = { nodes: [], links: [], labels: [], customers: [], shapes: [], origin: { x: 0, y: 0 } };
 
 	// The structural ID letters: LOOKUP KEYS into nextId and settings.idPrefixes, not the text an ID
 	// starts with -- that is settings.idPrefixes[key], which the user can change.
@@ -3288,8 +3288,9 @@ var EngCalcs = EngCalcs || {};
 	// is a first tank numbered T4, never a collision.
 	// V is the valve -- EPANET's own default letter, so an imported V1 keeps its name.
 	// M is the meter, and a Customer is what it stands for (Task 247).
-	var LPN_ID_KEY = { junction: 'J', reservoir: 'R', tank: 'T', pipe: 'L', pump: 'P', valve: 'V', text: 'X', meter: 'M' };
-	function newNextId() { return { J: 1, R: 1, T: 1, L: 1, P: 1, V: 1, X: 1, M: 1 }; }
+	// S is the Shape (Task 779), map annotation like Text.
+	var LPN_ID_KEY = { junction: 'J', reservoir: 'R', tank: 'T', pipe: 'L', pump: 'P', valve: 'V', text: 'X', meter: 'M', shape: 'S' };
+	function newNextId() { return { J: 1, R: 1, T: 1, L: 1, P: 1, V: 1, X: 1, M: 1, S: 1 }; }
 	var nextId = newNextId();
 	// Re-derive the counters from the ids actually present, matching against the CURRENT
 	// settings.idPrefixes, not a hardcoded single-letter regex -- a customized prefix can be any
@@ -3297,7 +3298,7 @@ var EngCalcs = EngCalcs || {};
 	// is not matched after a rename, so a counter can under-count. mintId() is the real guarantee.
 	function recountNextId() {
 		nextId = newNextId();
-		doc.nodes.concat(doc.links, doc.labels, doc.customers || []).forEach(function (x) {
+		doc.nodes.concat(doc.links, doc.labels, doc.customers || [], doc.shapes || []).forEach(function (x) {
 			Object.keys(settings.idPrefixes).forEach(function (key) {
 				var p = settings.idPrefixes[key] || key, rest = String(x.id).indexOf(p) === 0 ? String(x.id).slice(p.length) : null;
 				if (rest !== null && /^\d+$/.test(rest) && nextId[key] !== undefined) { nextId[key] = Math.max(nextId[key], +rest + 1); }
@@ -3818,7 +3819,7 @@ var EngCalcs = EngCalcs || {};
 		if (crsIsLatLonCode(String(code))) { return false; }
 		if (project.crs) { return false; }
 		if (doc && ((doc.nodes && doc.nodes.length) || (doc.links && doc.links.length) ||
-			(doc.labels && doc.labels.length))) { return false; }
+			(doc.labels && doc.labels.length) || (doc.shapes && doc.shapes.length))) { return false; }
 		project.crs = String(code);
 		return true;
 	}
@@ -4349,6 +4350,9 @@ var EngCalcs = EngCalcs || {};
 		if (!el) { return 'node'; }
 		if (el.from !== undefined) { return 'link'; }
 		if (el._text !== undefined) { return 'label'; }
+		// A Shape (Task 779): points and no type. Asked only by the Tables pane, where a Shape row's
+		// ID cell is plain (it has no rename, as a Text and a Customer have none).
+		if (Array.isArray(el.pts) && el.type === undefined) { return 'shape'; }
 		return 'node';
 	}
 	// THE OVERRIDE MAP'S KEY, and it carries the element's GROUP because an id alone does not
@@ -5966,7 +5970,7 @@ var EngCalcs = EngCalcs || {};
 			// M is the structural (internal) letter for Customer (LPN_ID_KEY.meter); its default
 			// DISPLAYED prefix is 'C' (R-229) -- a project stored with the old 'M' default keeps it,
 			// since only the user touches a file's data.
-			idPrefixes: { J: 'J', R: 'R', T: 'T', L: 'L', P: 'P', V: 'V', X: 'X', M: 'C' },
+			idPrefixes: { J: 'J', R: 'R', T: 'T', L: 'L', P: 'P', V: 'V', X: 'X', M: 'C', S: 'S' },
 			// **THE CUSTOM PROPERTY DESIGNS** (Task 636). MODELLING data by CLAUDE.md's
 			// project-versus-browser rule, not window furniture: a document whose assets carry a
 			// value under a key means nothing without the design of that key, so the list rides in
@@ -7041,6 +7045,274 @@ var EngCalcs = EngCalcs || {};
 	addSnapProvider(snapProviderNodes);
 	addSnapProvider(snapProviderVertices);
 	addSnapProvider(snapProviderPipeLine);
+	// ---- THE SHAPE (ROADMAP Task 779) ------------------------------------------------------------
+	//
+	// Tom, 2026-10-06: *"a very simple shape element type (if one point, it's a point, and if more,
+	// it's a polyline, and it can close into a polygon if you let it. Either way, we call it a
+	// 'Shape', and we can export or import to and from points, polylines, and polygons.) and the
+	// ability to snap or magnet to shape points."* And 2026-10-09: a one-point Shape is drawn as an x.
+	//
+	// **MAP ANNOTATION, NOT HYDRAULICS.** `doc.shapes` is a list of `{ id, pts: [{x, y}...], closed }`
+	// (plus `desc` where an import stated one). Nothing that solves, reports or writes an `.inp`
+	// reads it, and nothing in it is per scenario: a Shape is drawn once, for every scenario. Its
+	// points are POSITIONS, so eachStoredPoint() and flipStoredY() visit them exactly as they visit a
+	// node, and a geographic project stores them in longitude and latitude like every other point.
+	//
+	// **IT IS FOUND BY DISTANCE, NOT BY THE BROWSER'S HIT TEST.** Every drawn part of a Shape carries
+	// `pointer-events: none`, and shapeHitOver() measures the press against the stored points in
+	// double precision. That keeps a Shape under every asset (a press on a junction a Shape point
+	// sits on is a press on the junction) and keeps it out of the float32 hit-test trouble a
+	// latitude-and-longitude map has (see the note above hitConfirmed()). The one exception is the
+	// point grips of a SELECTED Shape, which outrank everything: they are what the hand is on.
+	var shapesLayer = null, shapeEls = {};
+	var shapeDraft = null;     // the Shape being drawn: { pts: [{x, y}...], live: {x, y} | null }
+	var shapeDraftEl = null;   // its drawing, in the world layer
+	// Read through docShapesRead(); a Shape is added through addShapeToDoc(), the one write that
+	// gives a document its list (a render must not put an empty one into a file that stated none).
+	function docShapesRead() { return doc.shapes || []; }
+	function addShapeToDoc(s) {
+		if (!doc.shapes) { doc.shapes = []; }
+		doc.shapes.push(s);
+	}
+	function shapeById(id) {
+		var a = docShapesRead(), i;
+		for (i = 0; i < a.length; i++) { if (a[i].id === id) { return a[i]; } }
+		return null;
+	}
+	// The drawn extent of one Shape, or null for one with no points.
+	function shapeBox(s) {
+		var b = null;
+		(s && s.pts || []).forEach(function (p) {
+			b = b ? { x0: Math.min(b.x0, p.x), y0: Math.min(b.y0, p.y), x1: Math.max(b.x1, p.x), y1: Math.max(b.y1, p.y) }
+				: { x0: p.x, y0: p.y, x1: p.x, y1: p.y };
+		});
+		return b;
+	}
+	function shapeNoun(s) {
+		return String((EngCalcs.pageConfig || {}).lpn_tool_add_shape || 'Shape') + ' ' + (s ? s.id : '');
+	}
+	function shapePointsAttr(pts) {
+		return pts.map(function (p) { return p.x + ',' + p.y; }).join(' ');
+	}
+	function removeShapeEls(id) {
+		var r = shapeEls[id];
+		if (r && r.g && r.g.parentNode) { r.g.parentNode.removeChild(r.g); }
+		delete shapeEls[id];
+	}
+	// One Shape's drawing, rebuilt whole on every change: it is a handful of elements, and a
+	// rebuild cannot leave a stale part behind. The x and the grips are a fixed size on screen by
+	// CSS (`--lpn-hair` is one screen pixel in world units), so a zoom redraws nothing here.
+	function buildShapeEls(s) {
+		var keep = selectionMarkEl({ kind: 'shape', id: s.id }), wasSel = !!(keep && keep.classList.contains('lpn-selected')),
+			g, rec, pts = s.pts || [];
+		removeShapeEls(s.id);
+		if (!shapesLayer) { return; }
+		g = el('g', { 'class': 'lpn-shape', 'data-shape': s.id }, shapesLayer);
+		rec = { g: g, handles: [] };
+		if (pts.length === 1) {
+			el('path', { 'class': 'lpn-shape-x', d: 'M-1 -1L1 1M-1 1L1 -1' },
+				el('g', { transform: 'translate(' + pts[0].x + ',' + pts[0].y + ')' }, g));
+		} else if (pts.length > 1) {
+			el(s.closed ? 'polygon' : 'polyline', { 'class': 'lpn-shape-line' + (s.closed ? ' lpn-shape-closed' : ''),
+				points: shapePointsAttr(pts) }, g);
+		}
+		pts.forEach(function (p, i) {
+			var h = el('g', { 'class': 'lpn-shape-handle', 'data-shapept': s.id, 'data-pidx': String(i),
+				transform: 'translate(' + p.x + ',' + p.y + ')' }, g);
+			el('rect', { x: -1, y: -1, width: 2, height: 2 }, h);
+			rec.handles.push(h);
+		});
+		shapeEls[s.id] = rec;
+		if (wasSel) { g.classList.add('lpn-selected'); }
+	}
+	function buildAllShapeEls() {
+		Object.keys(shapeEls).forEach(removeShapeEls);
+		shapeEls = {};
+		if (shapesLayer) { shapesLayer.innerHTML = ''; }
+		docShapesRead().forEach(buildShapeEls);
+	}
+	function deleteShapeById(id) {
+		if (isSelected('shape', id)) { deselectOne('shape', id); }
+		doc.shapes = docShapesRead().filter(function (s) { return s.id !== id; });
+		removeShapeEls(id);
+	}
+	// What a press at this screen point lands on among the Shapes. A grip of a SELECTED Shape first
+	// (it outranks every asset, see above), then the nearest Shape whose line or point is in reach.
+	// Returns { shape, pidx } with pidx -1 for the line, or null.
+	function shapeHitNear(cx, cy, px, gripsOnly) {
+		var w = screenToWorld(cx, cy), tolW = px / (state.s || 1), best = null, bestD = tolW, list = docShapesRead(), i, j, s, d, n;
+		for (i = 0; i < list.length; i++) {
+			s = list[i];
+			if (!isSelected('shape', s.id)) { continue; }
+			for (j = 0; j < s.pts.length; j++) {
+				d = Math.hypot(s.pts[j].x - w.x, s.pts[j].y - w.y);
+				if (d <= bestD) { best = { shape: s, pidx: j }; bestD = d; }
+			}
+		}
+		if (best || gripsOnly) { return best; }
+		for (i = 0; i < list.length; i++) {
+			s = list[i]; n = s.pts.length;
+			if (!shapeEls[s.id] || !n) { continue; }
+			if (n === 1) { d = Math.hypot(s.pts[0].x - w.x, s.pts[0].y - w.y); }
+			else {
+				d = Infinity;
+				for (j = 0; j + 1 < n; j++) { d = Math.min(d, distToSegment(w, s.pts[j], s.pts[j + 1])); }
+				if (s.closed) { d = Math.min(d, distToSegment(w, s.pts[n - 1], s.pts[0])); }
+			}
+			if (d <= bestD) { best = { shape: s, pidx: -1 }; bestD = d; }
+		}
+		return best;
+	}
+	// The hit a press resolves to once Shapes are counted: `t` is what mapHitAt() found. A selected
+	// Shape's grip overrules it; otherwise an asset or a label stays the hit and a Shape is found only
+	// where the press is on bare map. The Shape's own drawn element is returned, so the rest of the
+	// page reads it by its dataset like any other hit.
+	function shapeHitOver(cx, cy, t, px) {
+		var grip = shapeHitNear(cx, cy, px, true), h;
+		if (grip && shapeEls[grip.shape.id]) { return shapeEls[grip.shape.id].handles[grip.pidx]; }
+		if (t && t !== svg && hitIsElement(t)) { return t; }
+		h = shapeHitNear(cx, cy, px, false);
+		return (h && shapeEls[h.shape.id]) ? shapeEls[h.shape.id].g : t;
+	}
+	// **THE MAGNET TO SHAPE POINTS** (Task 782's seam): rank 1, beside a pipe's bend, so a node, a
+	// bend and another Shape's point all land on a Shape point exactly, and a Shape point lands on
+	// them. `src` is the stored point, so its file characters come along (copySnapProvenance()).
+	function snapProviderShapeVertices(wx, wy, tolW, opts) {
+		var out = [], pc = EngCalcs.pageConfig || {}, list = docShapesRead(), i, j, s, p, d;
+		if (!snapKindWanted(opts, 'shape')) { return out; }
+		for (i = 0; i < list.length; i++) {
+			s = list[i];
+			if (!shapeEls[s.id] || snapExcluded(opts, 'shapes', s.id)) { continue; }
+			for (j = 0; j < (s.pts || []).length; j++) {
+				p = s.pts[j];
+				d = Math.hypot(p.x - wx, p.y - wy);
+				if (d > tolW) { continue; }
+				out.push({ kind: 'shape', rank: 1, x: p.x, y: p.y, dist: d, glyph: 'diamond',
+					name: String(pc.lpn_snap_shape_point || '{shape}, point {n}')
+						.split('{shape}').join(shapeNoun(s)).split('{n}').join(String(j + 1)),
+					shape: s, pidx: j, src: p });
+			}
+		}
+		return out;
+	}
+	addSnapProvider(snapProviderShapeVertices);
+	// ---- drawing one: the Shape tool ----
+	// Each press adds a point (snapped, as the glyph shows). A press on the LAST point again, a
+	// double-click (which is that), Enter or a right-click finishes it; with one point it is a point
+	// Shape. A press on the FIRST point of three or more closes it into a polygon. Escape abandons
+	// it. Nothing is written to the document until it is finished, so an abandoned Shape leaves
+	// nothing behind and needs no undo step; a finished one is one undo step.
+	function paintShapeDraft() {
+		var pts, d, s = state.s || 1, h = 4 / s;
+		if (!shapeDraftEl) { return; }
+		while (shapeDraftEl.firstChild) { shapeDraftEl.removeChild(shapeDraftEl.firstChild); }
+		if (!shapeDraft) { shapeDraftEl.style.display = 'none'; return; }
+		pts = shapeDraft.live ? shapeDraft.pts.concat([shapeDraft.live]) : shapeDraft.pts;
+		if (pts.length > 1) { el('polyline', { 'class': 'lpn-shape-draft', points: shapePointsAttr(pts) }, shapeDraftEl); }
+		d = shapeDraft.pts.map(function (p) {
+			return 'M' + (p.x - h) + ' ' + (p.y - h) + 'h' + (2 * h) + 'v' + (2 * h) + 'h' + (-2 * h) + 'Z';
+		}).join('');
+		el('path', { 'class': 'lpn-shape-draft-pt', d: d }, shapeDraftEl);
+		shapeDraftEl.style.display = '';
+	}
+	function shapeDraftCancel() {
+		if (!shapeDraft) { return false; }
+		shapeDraft = null;
+		paintShapeDraft();
+		return true;
+	}
+	function shapeDraftFinish(closed) {
+		var pts, s;
+		if (!shapeDraft) { return null; }
+		pts = shapeDraft.pts;
+		shapeDraft = null;
+		paintShapeDraft();
+		if (!pts.length) { return null; }
+		saveUndoSnapshot();
+		logLpnFirstAction('element');
+		s = { id: mintId(LPN_ID_KEY.shape), pts: pts, closed: !!closed && pts.length >= 3 };
+		addShapeToDoc(s);
+		buildShapeEls(s);
+		scheduleSave();
+		return s;
+	}
+	// The point a press in the Shape tool puts down: the magnet's target exactly, with its file
+	// characters, else the pointer.
+	function shapeToolPoint(snapHit, w) {
+		var at = snapHit ? { x: snapHit.x, y: snapHit.y } : { x: w.x, y: w.y };
+		if (snapHit) { copySnapProvenance(snapHit, at); }
+		return at;
+	}
+	function shapeToolTap(e, w, snapHit) {
+		var px = reachPx(e), pts, first, last, sf, sl;
+		if (e.button === 2) { return; }   // the contextmenu listener finishes it
+		if (!shapeDraft) { shapeDraft = { pts: [shapeToolPoint(snapHit, w)], live: null }; paintShapeDraft(); return; }
+		pts = shapeDraft.pts; first = pts[0]; last = pts[pts.length - 1];
+		sf = worldToScreen(first.x, first.y); sl = worldToScreen(last.x, last.y);
+		if (Math.hypot(e.clientX - sl.x, e.clientY - sl.y) <= px) { shapeDraftFinish(false); return; }
+		if (Math.hypot(e.clientX - sf.x, e.clientY - sf.y) <= px) {
+			if (pts.length >= 3) { shapeDraftFinish(true); }
+			return;
+		}
+		pts.push(shapeToolPoint(snapHit, w));
+		shapeDraft.live = null;
+		paintShapeDraft();
+	}
+	function shapeToolHover(e) {
+		var w, sh;
+		if (mode !== 'add-shape' || !shapeDraft) { return; }
+		sh = toolSnapAt(e);
+		w = screenToWorld(e.clientX, e.clientY);
+		shapeDraft.live = sh ? { x: sh.x, y: sh.y } : { x: w.x, y: w.y };
+		paintShapeDraft();
+	}
+	// Enter finishes and Escape abandons, ahead of every other key handler, and only while a Shape
+	// is being drawn: with none, Escape goes on to leave the tool as it always has.
+	document.addEventListener('keydown', function (e) {
+		if (mode !== 'add-shape' || !shapeDraft || keyboardIsTyping()) { return; }
+		if (e.key === 'Escape' || e.key === 'Esc') { shapeDraftCancel(); e.stopPropagation(); if (e.preventDefault) { e.preventDefault(); } }
+		else if (e.key === 'Enter') { shapeDraftFinish(false); e.stopPropagation(); if (e.preventDefault) { e.preventDefault(); } }
+	}, true);
+	document.addEventListener('contextmenu', function (e) {
+		if (mode !== 'add-shape' || !e.target || !e.target.closest || !e.target.closest('#lpn_canvas')) { return; }
+		e.preventDefault();
+		shapeDraftFinish(false);
+	});
+	// ---- moving one ----
+	// The whole Shape follows the hand; a grip moves one point and magnets like a node does, less
+	// the Shape's own points (a point snapping to its neighbour would fold the Shape).
+	function shapeDragStart(t, e, common) {
+		var w = screenToWorld(e.clientX, e.clientY), s, p;
+		if (t.dataset.shapept !== undefined) {
+			s = shapeById(t.dataset.shapept); p = s && s.pts[+t.dataset.pidx];
+			if (!p) { return null; }
+			return Object.assign({ type: 'shapept', id: s.id, pidx: +t.dataset.pidx, offX: p.x - w.x, offY: p.y - w.y }, common);
+		}
+		s = shapeById(t.dataset.shape);
+		if (!s) { return null; }
+		return Object.assign({ type: 'shape', id: s.id, w0: w,
+			orig: s.pts.map(function (q) { return { x: q.x, y: q.y }; }) }, common);
+	}
+	function shapeApplyDrag(p) {
+		var s = shapeById(drag.id), w = screenToWorld(p.x, p.y), c, np;
+		if (!s) { return; }
+		snapshotDragOnce();
+		if (drag.type === 'shape') {
+			s.pts.forEach(function (q, i) {
+				q.x = drag.orig[i].x + (w.x - drag.w0.x);
+				q.y = drag.orig[i].y + (w.y - drag.w0.y);
+			});
+		} else {
+			c = drag.alt ? null : snapAtWorld(w.x + drag.offX, w.y + drag.offY, drag.reach || POINTER_REACH_PX,
+				{ exclude: { shapes: (function () { var o = {}; o[s.id] = true; return o; }()) } });
+			np = c ? { x: c.x, y: c.y } : { x: w.x + drag.offX, y: w.y + drag.offY };
+			if (c) { copySnapProvenance(c, np); }
+			s.pts[drag.pidx] = np;
+			showSnapMark(c);
+		}
+		buildShapeEls(s);
+		scheduleSave();
+	}
 	// The snap for a WORLD point, at a reach in SCREEN pixels. Null when nothing is in reach.
 	function snapAtWorld(wx, wy, px, opts) {
 		var tolW = px / (state.s || 1), all = [], i;
@@ -7113,13 +7385,15 @@ var EngCalcs = EngCalcs || {};
 	// node, and a bend in open space takes a vertex. Junction and Pipe (the chain) is left as it
 	// was: each of its presses makes a junction joined to the one before, and one landing on a
 	// pipe's line or bend unjoined to that pipe would look connected and not be.
+	// A Shape point (Task 779) is a target for every one of them, and the Shape tool takes all four.
 	var SNAP_KINDS_BY_MODE = {
-		'add-junction': { node: true, vertex: true, line: true },
-		'add-reservoir': { node: true, vertex: true, line: true },
-		'add-tank': { node: true, vertex: true, line: true },
-		'add-pipe': { node: true, vertex: true },
-		'add-pump': { node: true, vertex: true },
-		'add-valve': { node: true, vertex: true }
+		'add-junction': { node: true, vertex: true, line: true, shape: true },
+		'add-reservoir': { node: true, vertex: true, line: true, shape: true },
+		'add-tank': { node: true, vertex: true, line: true, shape: true },
+		'add-pipe': { node: true, vertex: true, shape: true },
+		'add-pump': { node: true, vertex: true, shape: true },
+		'add-valve': { node: true, vertex: true, shape: true },
+		'add-shape': { node: true, vertex: true, line: true, shape: true }
 	};
 	// What a press in this mode, at this point, would snap to. Null with Alt held (the bare
 	// pointer), in a mode that does not snap, and when nothing is in reach.
@@ -7135,7 +7409,8 @@ var EngCalcs = EngCalcs || {};
 		if (!kinds || (e && e.altKey)) { return null; }
 		opts = { kinds: kinds };
 		if (mode === 'add-junction' || mode === 'add-reservoir' || mode === 'add-tank') {
-			if (!inBaseScenario()) { opts.kinds = { node: true }; }
+			// A Shape point (Task 779) is a position and splits nothing, so it stays a target there.
+			if (!inBaseScenario()) { opts.kinds = { node: true, shape: true }; }
 			else { opts.onLink = tapLinkId(mapHitAt(e.clientX, e.clientY)); }
 		}
 		return snapAtScreen(e.clientX, e.clientY, reachPx(e), opts);
@@ -12162,6 +12437,8 @@ var EngCalcs = EngCalcs || {};
 		// such layer; those fall back to nodesLayer, which IS emptied above.
 		if (linkSymbolLayer) { linkSymbolLayer.innerHTML = ''; }
 		if (customersLayer) { customersLayer.innerHTML = ''; }
+		// The Shapes (Task 779) are their own layer and are rebuilt with everything else.
+		buildAllShapeEls();
 		// A wholesale rebuild is a new drawing as far as the symbol cap knows (Task 705).
 		invalidateLinkLengths();
 		nodeEls = {}; linkEls = {}; labelEls = {}; incidentLinks = {}; labelsByAnchor = {};
@@ -12774,6 +13051,11 @@ var EngCalcs = EngCalcs || {};
 		// closer to the edge than the arithmetic thinks, against 16px of reserve.
 
 
+		// A Shape's points are drawn content too (Task 779), each with the few pixels its x or grip
+		// takes, so a fit frames a Shape drawn beyond the network and a project of Shapes alone.
+		docShapesRead().forEach(function (sh) {
+			(sh.pts || []).forEach(function (p) { fitItem(out, p.x, p.y, 6, 6, 6, 6); });
+		});
 		doc.nodes.forEach(function (n) {
 			// nodeRadiusFull(), NEVER nodeRadius() -- see its own comment. The fit must not bake in
 			// whichever scale happened to be live when it was asked for.
@@ -18143,6 +18425,7 @@ var EngCalcs = EngCalcs || {};
 		if (sel.kind === 'node') { return !!nodeById(sel.id); }
 		if (sel.kind === 'link') { return !!linkById(sel.id); }
 		if (sel.kind === 'customer') { return !!customerById(sel.id); }
+		if (sel.kind === 'shape') { return !!shapeById(sel.id); }
 		return !!labelById(sel.id);
 	}
 	// The ONE element each kind wears the mark on. A link wears it on its HALO -- the wider line
@@ -18156,6 +18439,8 @@ var EngCalcs = EngCalcs || {};
 		// A meter wears the mark on its BOX, which is the whole symbol -- there is no halo under it
 		// and the connector is not pickable, so the box is what a reader sees and grabs.
 		if (sel.kind === 'customer') { return custEls[sel.id] && custEls[sel.id].box; }
+		// A Shape wears it on its group, which is what shows its point grips (Task 779).
+		if (sel.kind === 'shape') { return shapeEls[sel.id] && shapeEls[sel.id].g; }
 		return labelEls[sel.id] && labelEls[sel.id].text;
 	}
 	function paintSelection(sel, on) {
@@ -18267,6 +18552,10 @@ var EngCalcs = EngCalcs || {};
 		// function already makes of a node's own data label.
 		else if (d.cust !== undefined) { setSelection('customer', d.cust); }
 		else if (d.custhandle !== undefined) { setSelection('customer', d.custhandle); }
+		// A Shape and its point grips are the Shape (Task 779). A grip of a Shape already in a
+		// multiple selection keeps that selection, so the grip can be dragged.
+		else if (d.shapept !== undefined) { if (!isSelected('shape', d.shapept)) { setSelection('shape', d.shapept); } }
+		else if (d.shape !== undefined) { setSelection('shape', d.shape); }
 		else { clearSelection(); }
 	}
 	// The same reading of a hit, ADDED to the subject rather than replacing it. It is deliberately
@@ -18278,7 +18567,7 @@ var EngCalcs = EngCalcs || {};
 		var d = (t && t.dataset) || {};
 		return !!(d.node || d.nodelbl !== undefined || d.linklbl !== undefined ||
 			d.link !== undefined || d.lbl !== undefined || d.cust !== undefined ||
-			d.custhandle !== undefined);
+			d.custhandle !== undefined || d.shape !== undefined || d.shapept !== undefined);
 	}
 	function toggleFromHit(t) {
 		var d = (t && t.dataset) || {};
@@ -18289,6 +18578,8 @@ var EngCalcs = EngCalcs || {};
 		else if (d.lbl !== undefined) { toggleInSelection('label', d.lbl); }
 		else if (d.cust !== undefined) { toggleInSelection('customer', d.cust); }
 		else if (d.custhandle !== undefined) { toggleInSelection('customer', d.custhandle); }
+		else if (d.shape !== undefined) { toggleInSelection('shape', d.shape); }
+		else if (d.shapept !== undefined) { toggleInSelection('shape', d.shapept); }
 		// Shift on bare canvas keeps what is there: clearing would make an accidental miss cost
 		// the whole selection, which is the one thing a modifier click exists to protect.
 	}
@@ -18308,6 +18599,8 @@ var EngCalcs = EngCalcs || {};
 		if (d.lbl !== undefined) { return { kind: 'label', id: d.lbl }; }
 		if (d.cust !== undefined) { return { kind: 'customer', id: d.cust }; }
 		if (d.custhandle !== undefined) { return { kind: 'customer', id: d.custhandle }; }
+		if (d.shape !== undefined) { return { kind: 'shape', id: d.shape }; }
+		if (d.shapept !== undefined) { return { kind: 'shape', id: d.shapept }; }
 		return null;
 	}
 	var hoverPreview = null;   // {kind, id} of the one element currently wearing .lpn-hover, or null
@@ -18434,6 +18727,7 @@ var EngCalcs = EngCalcs || {};
 		if (sel.kind === 'node') { e = nodeById(sel.id); return e ? nodeLabelFieldLines(e, ls, null) : []; }
 		if (sel.kind === 'link') { e = linkById(sel.id); return e ? linkLabelFieldLines(e, ls, null) : []; }
 		if (sel.kind === 'customer') { e = customerById(sel.id); return e ? customerLabelLines(e, ls) : []; }
+		if (sel.kind === 'shape') { e = shapeById(sel.id); return e ? [{ text: shapeNoun(e) }] : []; }
 		return [];
 	}
 	function hoverCardLines(sel) {
@@ -18449,7 +18743,7 @@ var EngCalcs = EngCalcs || {};
 	}
 	var hoverCardOtherRaf = null, hoverCardOtherAt = null;
 	function hoverCardOtherTarget(x, y) {
-		var t = hoverTargetFromHit(mapHitAt(x, y));
+		var t = hoverTargetFromHit(mode === 'delete' ? shapeHitOver(x, y, mapHitAt(x, y), POINTER_REACH_PX) : mapHitAt(x, y));
 		if (mode === 'delete') { return t && t.kind !== 'label' ? t : null; }
 		if (t && t.kind === 'node') { return t; }
 		var near = nearestNodeNearScreen(x, y, POINTER_REACH_PX);
@@ -18505,10 +18799,15 @@ var EngCalcs = EngCalcs || {};
 		// took the nodes first would hand deleteElement() link ids that had already gone -- and a
 		// multi-element delete is exactly where that ordering starts to matter, because a marquee
 		// routinely catches both ends of a pipe and the pipe itself.
-		subject.filter(function (s) { return s.kind !== 'node'; })
-			.forEach(function (s) { deleteElement(s.kind, s.id); });
-		subject.filter(function (s) { return s.kind === 'node'; })
-			.forEach(function (s) { deleteElement(s.kind, s.id); });
+		// ONE undo step for the whole subject (saveUndoSnapshot()'s group). A delete that stops to
+		// ask first (scenario overrides) takes its own step when it is answered.
+		undoGroup = { taken: false };
+		try {
+			subject.filter(function (s) { return s.kind !== 'node'; })
+				.forEach(function (s) { deleteElement(s.kind, s.id); });
+			subject.filter(function (s) { return s.kind === 'node'; })
+				.forEach(function (s) { deleteElement(s.kind, s.id); });
+		} finally { undoGroup = null; }
 		return true;
 	}
 	// A typed Delete/Backspace belongs to whatever field has focus, always. Without this, editing an
@@ -18907,6 +19206,12 @@ var EngCalcs = EngCalcs || {};
 		(doc.customers || []).forEach(function (c) {
 			var pt = customerPoint(c);
 			if (pt && inArea(ring, pt.x, pt.y)) { out.push({ kind: 'customer', id: c.id }); }
+		});
+		// A Shape is caught when every point of it is inside, the rule a pipe follows (Task 779).
+		docShapesRead().forEach(function (sh) {
+			if (shapeEls[sh.id] && sh.pts.length && sh.pts.every(function (p) { return inArea(ring, p.x, p.y); })) {
+				out.push({ kind: 'shape', id: sh.id });
+			}
 		});
 		return out;
 	}
@@ -20228,6 +20533,7 @@ var EngCalcs = EngCalcs || {};
 			return { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
 		}
 		if (cand.group === 'customer') { return customerPoint(cand.el); }
+		if (cand.group === 'shape') { var sb = shapeBox(cand.el); return sb ? { x: (sb.x0 + sb.x1) / 2, y: (sb.y0 + sb.y1) / 2 } : null; }
 		return textLabelPoint(cand.el);
 	}
 	// **HOW MUCH OF THE DRAWING A RESULT NEEDS AROUND IT** (Tom, 2026-08-18: *"something like twice
@@ -20259,6 +20565,8 @@ var EngCalcs = EngCalcs || {};
 		// A customer borrows its own main's length, which is the neighbourhood a service belongs to:
 		// arriving at a meter and stopping shows you a dot on a pipe you cannot see the ends of. A
 		// detached one has no neighbourhood at all and returns 0.
+		// A Shape's own extent, so arriving at one shows the whole of it.
+		if (group === 'shape') { var shb = shapeBox(el); return shb ? Math.hypot(shb.x1 - shb.x0, shb.y1 - shb.y0) : 0; }
 		if (group === 'customer') {
 			var cLink = customerLink(el);
 			return cLink ? findContextLength('link', cLink) : 0;
@@ -20294,7 +20602,7 @@ var EngCalcs = EngCalcs || {};
 	function findGoTo(group, id) {
 		var el = group === 'node' ? nodeById(id)
 			: (group === 'link' ? linkById(id)
-			: (group === 'customer' ? customerById(id) : labelById(id))), p, v;
+			: (group === 'customer' ? customerById(id) : (group === 'shape' ? shapeById(id) : labelById(id)))), p, v;
 		if (!el) { return; }
 		// **A GO-TO NEVER REPLACES A SELECTION** (Tom, 2026-09-28; see setLocated()). Nothing
 		// selected: select it, as before. Something selected: leave the set alone and mark this one.
@@ -20313,7 +20621,7 @@ var EngCalcs = EngCalcs || {};
 		var refs = [], pts = [], box = null, pad, v, el, p;
 		(list || []).forEach(function (t) {
 			el = t.group === 'node' ? nodeById(t.id) : (t.group === 'link' ? linkById(t.id)
-				: (t.group === 'customer' ? customerById(t.id) : labelById(t.id)));
+				: (t.group === 'customer' ? customerById(t.id) : (t.group === 'shape' ? shapeById(t.id) : labelById(t.id))));
 			if (!el) { return; }
 			refs.push({ kind: t.group, id: t.id });
 			p = findPointOf({ group: t.group, el: el });
@@ -24352,6 +24660,112 @@ var EngCalcs = EngCalcs || {};
 			set: function (c, v) { setCustomerCoordAxis(c, slot, v); customerEdited(c); }
 		};
 	}
+	/**
+	 * **THE SHAPE TABLE'S COLUMNS** (Task 779), designed for the round trip Tom asked for (2026-10-11:
+	 * *"I need to be able to paste shapes so that I can import and export."*): ID, Description,
+	 * Closed and Points. Points is the pipe Vertices cell's own format -- `a/b|a/b|...`, in the
+	 * same axis order and with the same heading -- so one reader serves both and a sheet laid out
+	 * for one pastes into the other. A one-point Shape is one pair.
+	 *
+	 * **THE ID IS PLAIN**, as a Text's and a Customer's are: a Shape has no rename anywhere else.
+	 *
+	 * **A PASTED NUMBER COMES BACK OUT CHARACTER FOR CHARACTER** (Tom's use case: shapes from GIS
+	 * or CAD to place assets precisely by). Each point keeps the text it was pasted as in `tok`,
+	 * the channel an `.inp` coordinate uses, and shapePointText() hands it back while it still
+	 * reads as the stored number; a move retires it by itself.
+	 */
+	function paneShapeCols() {
+		var verts = paneColVerts();
+		return [
+			paneColId(),
+			paneColDesc(),
+			{ key: 'closed', label: 'lpn_pane_shape_closed', bool: true, em: 2,
+				get: function (s) { return !!s.closed; },
+				// A polygon needs three points; fewer stays open, as the Shape tool leaves it.
+				set: function (s, v) { s.closed = !!v && (s.pts || []).length >= 3; buildShapeEls(s); scheduleSave(); } },
+			{ key: 'verts', str: true, em: 12, noMulti: true, parse: paneParseShapePoints,
+				label: function () { return (EngCalcs.pageConfig || {}).lpn_pane_shape_points || 'Points'; },
+				unitText: verts.unitText,
+				get: function (s) {
+					return (s.pts || []).map(function (p) { return shapePointText(p, 1) + '/' + shapePointText(p, 2); }).join('|');
+				},
+				set: function (s, pts) {
+					s.pts = pts;
+					if (pts.length < 3) { s.closed = false; }
+					buildShapeEls(s);
+					scheduleSave();
+				} }
+		];
+	}
+	// One coordinate of a Shape point as the table shows it: the text it was pasted or read as,
+	// while that text still says the stored number, else the Vertices cell's own rendering.
+	function shapePointText(p, slot) {
+		var isY = coordSlotIsY(slot), t = p.tok ? p.tok[isY ? 'y' : 'x'] : undefined;
+		if (typeof t === 'string' && t !== '' && isFinite(+t) && (isY ? inwardY(+t) === p.y : inwardX(+t) === p.x)) { return t; }
+		return paneVertText(p, slot);
+	}
+	// The Points cell: the Vertices reader, then each point's own text kept beside its number.
+	// Never empty: a Shape with no points is not a Shape.
+	function paneParseShapePoints(t) {
+		var r, texts;
+		if (t === '') { return { ok: false }; }
+		r = paneParseVerts(t);
+		if (!r.ok || !r.v.length) { return { ok: false }; }
+		texts = t.indexOf('|') !== -1
+			? t.split('|').map(function (g) { return g.trim().split('/').map(function (x) { return x.trim(); }); })
+			: null;
+		if (!texts) {
+			texts = [];
+			t.split('/').map(function (x) { return x.trim(); }).forEach(function (x, i) {
+				if (i % 2) { texts[texts.length - 1].push(x); } else { texts.push([x]); }
+			});
+		}
+		r.v.forEach(function (p, i) {
+			// Both texts, always: the fallback rendering rounds to six decimals, so even a text
+			// that String() would reproduce is not safe to leave to it.
+			var a = texts[i][0], b = texts[i][1];
+			p.tok = { x: coordSlotIsY(1) ? b : a, y: coordSlotIsY(1) ? a : b };
+		});
+		return r;
+	}
+	// **A PASTED SHAPE ROW IS JUDGED WHOLE, AND A REFUSAL SAYS WHY** (Perry's review, 2026-10-11):
+	// a Points cell with comma decimals or space-separated pairs is refused, never converted, and
+	// the row's reason names the format the cell wanted; Closed on fewer than three points is
+	// refused rather than quietly left open. `pts` is the row's points after the paste (pasted or
+	// kept), `closedOn` whether the row says Closed. Returns the reason, or null.
+	function paneShapeRowError(row, ptsText, pts, closedOn) {
+		var pc = EngCalcs.pageConfig || {}, pair = String(paneColVerts().unitText()).split('|')[0];
+		if (ptsText !== null && !pts) {
+			return String(pc.lpn_pane_paste_shape_bad_points ||
+				'Row {row}: {text} is not a list of points. Write each point as {pair}, with a point (.) as the decimal mark, and separate the points with |.')
+				.replace('{row}', String(row)).replace('{text}', ptsText).replace('{pair}', pair);
+		}
+		if (closedOn && pts && pts.length < 3) {
+			return panePasteSay('lpn_pane_paste_shape_closed_few', 'Row {row}: a closed Shape needs at least three points.', row);
+		}
+		return null;
+	}
+	// The existing Shape rows a paste lands on, judged before anything is written.
+	function paneShapeUpdateErrors(rows, cols, box, cells, nRows, nCols, srcRows, srcCols, lineOffset) {
+		var errs = [], r, cIdx, el, col, t, ptsText, closedT, pts, closedOn, p, e;
+		for (r = 0; r < nRows && box.r0 + r < rows.length; r++) {
+			el = rows[box.r0 + r]; ptsText = null; closedT = null;
+			for (cIdx = 0; cIdx < nCols; cIdx++) {
+				col = cols[box.c0 + cIdx];
+				t = cells[r % srcRows][cIdx % srcCols];
+				if (!col || t === undefined) { continue; }
+				if (col.key === 'verts') { ptsText = String(t).trim(); }
+				if (col.key === 'closed') { closedT = String(t).trim(); }
+			}
+			if (ptsText === null && closedT === null) { continue; }
+			pts = el.pts;
+			if (ptsText !== null) { p = paneParseShapePoints(ptsText); pts = p.ok ? p.v : null; }
+			closedOn = closedT !== null ? !!(paneParseCellText({ bool: true }, closedT).v) : !!el.closed;
+			e = paneShapeRowError(r + 1 + lineOffset, ptsText, pts, closedOn && closedT !== null);
+			if (e) { errs.push(e); }
+		}
+		return errs;
+	}
 	function paneCustomerCols() {
 		var pc = EngCalcs.pageConfig || {};
 		return [
@@ -24857,6 +25271,14 @@ var EngCalcs = EngCalcs || {};
 				id: 'customers', panel: 'lpn_pane_customers', label: 'lpn_pane_tab_customers',
 				group: 'customer', type: 'customer',
 				cols: paneCustomerCols()
+			},
+			// **THE SHAPE TABLE** (Task 779; Tom, 2026-10-11: *"I see no Shapes table. I need to be
+			// able to paste shapes so that I can import and export."*). A Shape is in no scenario,
+			// so like Customers it has no scenario view; see paneShapeCols() for the columns.
+			{
+				id: 'shapes', panel: 'lpn_pane_shapes', label: 'lpn_pane_tab_shapes',
+				group: 'shape', type: 'shape',
+				cols: paneShapeCols()
 			}
 		].map(function (spec) {
 			// The per-type view state. On the SPEC, so six tables genuinely have six of everything
@@ -25073,6 +25495,7 @@ var EngCalcs = EngCalcs || {};
 		// of them (Tom, 2026-09-08). A customer is the same shape (Task 247).
 		if (spec.group === 'label') { return (doc.labels || []).slice(); }
 		if (spec.group === 'customer') { return (doc.customers || []).slice(); }
+		if (spec.group === 'shape') { return docShapesRead().slice(); }
 		return pool.filter(function (x) { return x.type === spec.type; });
 	}
 	// **THE ONE PLACE A ROW'S MEMBERSHIP IS DECIDED**, and so the one place an edit is noticed.
@@ -25859,7 +26282,8 @@ var EngCalcs = EngCalcs || {};
 		return x ? x.el.id + ' ' + scenarioDisplayName(x.scn) : (row ? row.id : '');
 	}
 	// A customer carries nothing a scenario can change (Task 247), so its table has no such view.
-	function paneScnAvailable(spec) { return spec.group !== 'customer'; }
+	// Nor does a Shape (Task 779): it is drawn once, for every scenario.
+	function paneScnAvailable(spec) { return spec.group !== 'customer' && spec.group !== 'shape'; }
 	function paneInScenario(scn, fn) {
 		var was = project.activeScenario;
 		if (!scn || scn.id === was) { return fn(); }
@@ -27775,7 +28199,7 @@ var EngCalcs = EngCalcs || {};
 	// (a node or a link) by ID in its own `anchor` column, exactly as a Pipe names its two nodes; a
 	// Customer names its serving pipe or node exactly the same way. Each refuses a row only when
 	// what it needs is not there yet, never because the TABLE cannot make the kind of thing at all.
-	function paneCanCreate(spec) { return !spec.scnRows && (spec.group === 'node' || spec.group === 'link' || spec.group === 'label' || spec.group === 'customer'); }
+	function paneCanCreate(spec) { return !spec.scnRows && (spec.group === 'node' || spec.group === 'link' || spec.group === 'label' || spec.group === 'customer' || spec.group === 'shape'); }
 	// **A HEADING ROW IS NOT A ROW.** Copying a whole table puts its headings on the clipboard
 	// (paneCopyTsv()), and a spreadsheet kept for this purpose has them too -- so a first line
 	// whose every filled cell is the heading of the column it lands on, with or without its unit,
@@ -27930,6 +28354,18 @@ var EngCalcs = EngCalcs || {};
 					}
 				}
 			}
+			// **A SHAPE IS ITS POINTS** (Task 779): a new row must state them, in the Points cell's
+			// own format, and the whole cell or nothing, exactly as a typed cell is read.
+			if (!err && spec.group === 'shape') {
+				if (!txt('verts')) {
+					err = panePasteSay('lpn_pane_paste_shape_no_points', 'Row {row}: a new Shape needs its Points.', row);
+				} else {
+					vp = paneParseShapePoints(txt('verts'));
+					plan.pts = vp.ok ? vp.v : null;
+					err = paneShapeRowError(row, txt('verts'), plan.pts,
+						txt('closed') !== '' && !!paneParseCellText({ bool: true }, txt('closed')).v);
+				}
+			}
 			// Every other cell: blank keeps the default a drawn element is born with (spec §2), a
 			// result or identity cell is left to the solve and counted, and anything else must read
 			// as its column reads a typed value.
@@ -27981,6 +28417,10 @@ var EngCalcs = EngCalcs || {};
 				plan.anchorNode || plan.anchorLink ? 0 : inwardY(plan.yv),
 				plan.anchorNode || null, plan.anchorLink ? { link: plan.anchorLink, t: 0.5 } : null, plan.id);
 			if (el.anchorNode || el.anchorLink) { el.x = 0; el.y = 0; updateLabelGeometry(el.id); }
+		} else if (spec.group === 'shape') {
+			el = { id: plan.id, pts: plan.pts, closed: false };
+			addShapeToDoc(el);
+			buildShapeEls(el);
 		} else {
 			el = addCustomer(inwardX(plan.xv), inwardY(plan.yv),
 				plan.customerLink ? { link: plan.customerLink, t: plan.customerT } : null, plan.id);
@@ -28162,6 +28602,10 @@ var EngCalcs = EngCalcs || {};
 			var renames = paneIdRenames(spec, rows, cols, box, cells, nRows, nCols, srcRows, srcCols),
 				renameErrs = paneRenameErrors(spec, renames, lineOffset);
 			if (renameErrs.length) { return paneRefuse(renameErrs); }
+			if (spec.group === 'shape') {
+				var shapeErrs = paneShapeUpdateErrors(rows, cols, box, cells, nRows, nCols, srcRows, srcCols, lineOffset);
+				if (shapeErrs.length) { return paneRefuse(shapeErrs); }
+			}
 			if (!overflow && !opts.idsOk && renames.length) { return paneAskIdChanges(spec, opts.raw, renames.length); }
 		}
 		if (mayAsk && extra) { return paneAskOverflow(spec, opts.raw, nRows, extra); }
@@ -32706,7 +33150,7 @@ var EngCalcs = EngCalcs || {};
 		'add-tank': 'lpn_mode_add_tank',
 		'add-pipe': 'lpn_mode_add_pipe', 'add-pump': 'lpn_mode_add_pump',
 		'add-valve': 'lpn_mode_add_valve', 'add-meter': 'lpn_mode_add_meter',
-		'add-text': 'lpn_mode_add_text', 'add-chain': 'lpn_mode_add_chain',
+		'add-text': 'lpn_mode_add_text', 'add-chain': 'lpn_mode_add_chain', 'add-shape': 'lpn_mode_add_shape',
 		'vertices': 'lpn_mode_vertices',
 		'zoom-window': 'lpn_mode_zoom_window'
 	};
@@ -32752,6 +33196,8 @@ var EngCalcs = EngCalcs || {};
 		if (mode === 'add-meter' && newMode !== 'add-meter') { setPendingMeter(null); }
 		// The snap glyph belongs to the tool that showed it (Task 782).
 		hideSnapMark();
+		// A half-drawn Shape dies with its tool, as a half-drawn pipe does (Task 779).
+		if (mode === 'add-shape' && newMode !== 'add-shape') { shapeDraftCancel(); }
 		// The hover preview is a Select-mode-only signal (Ida's wishlist item 1): leaving 'select'
 		// for any other tool drops it rather than leaving a highlight nothing will now clear, since
 		// the pointermove listener that maintains it does no work outside 'select'.
@@ -33197,6 +33643,14 @@ var EngCalcs = EngCalcs || {};
 			if (!el) { return; }
 			saveUndoSnapshot();
 			deleteCustomerById(id);
+			return;
+		}
+		// A Shape is annotation and is in no scenario, so it goes outright, like a meter (Task 779).
+		if (kind === 'shape') {
+			if (!shapeById(id)) { return; }
+			saveUndoSnapshot();
+			deleteShapeById(id);
+			scheduleSave();
 			return;
 		}
 		// One guard for both branches. A delete gesture can name an element that is already gone --
@@ -34360,6 +34814,9 @@ var EngCalcs = EngCalcs || {};
 		// A meter's y, on exactly the label rule above it: flipped whether it is an OFFSET from an
 		// attachment or an absolute position, because y-down to y-up applies to both.
 		(o.customers || []).forEach(function (c) { if (typeof c.y === 'number') { c.y = -c.y; } });
+		(o.shapes || []).forEach(function (sh) {
+			(sh.pts || []).forEach(function (p) { if (typeof p.y === 'number') { p.y = -p.y; } });
+		});
 		if (o.backdrop && typeof o.backdrop.ty === 'number') { o.backdrop.ty = -o.backdrop.ty; }
 		// The saved VIEW is a world REGION -- a centre point and an extent in drawing units -- so its
 		// centre's y belongs here like every other y. The extent is a size, and sizes do not flip.
@@ -34403,6 +34860,8 @@ var EngCalcs = EngCalcs || {};
 		// here -- the node it is offset from is shifted by the `o.nodes` pass above, and shifting the
 		// offset too would move the meter twice.
 		(o.customers || []).forEach(function (c) { if (!c.link && !c.node) { visit(c); } });
+		// A Shape's points are positions on the map, like a node's (Task 779).
+		(o.shapes || []).forEach(function (sh) { (sh.pts || []).forEach(function (p) { visit(p); }); });
 		if (o.backdrop && typeof o.backdrop.tx === 'number') {
 			visit({}, function () { return { x: o.backdrop.tx, y: o.backdrop.ty }; },
 				function (x, y) { o.backdrop.tx = x; o.backdrop.ty = y; });
@@ -34843,6 +35302,9 @@ var EngCalcs = EngCalcs || {};
 			// nothing without the meters lumped into it. A document that has none writes an empty
 			// list, so nothing about an existing file's other sections moves and no version is owed.
 			customers: doc.customers || [],
+			// **THE SHAPES** (Task 779): map annotation, written only when there is one, so a file
+			// without any is byte for byte what it was before Shapes existed.
+			shapes: (doc.shapes && doc.shapes.length) ? doc.shapes : undefined,
 			// The frame every coordinate above is measured from (Task 354). Written unconditionally,
 			// including the {0, 0} an ordinary drawing has, because a file that omits it is a file
 			// whose reader has to guess -- and the guess is only right until somebody hand-edits one.
@@ -34930,7 +35392,8 @@ var EngCalcs = EngCalcs || {};
 	function projectIsEmpty(id) {
 		var saved = id === library.openId ? doc : readJSON(projectKey(id));
 		return !!saved && !(saved.nodes && saved.nodes.length) && !(saved.links && saved.links.length) &&
-			!(saved.labels && saved.labels.length) && !(saved.customers && saved.customers.length);
+			!(saved.labels && saved.labels.length) && !(saved.customers && saved.customers.length) &&
+			!(saved.shapes && saved.shapes.length);
 	}
 	function saveIndex() { return writeJSON(LPN_INDEX_KEY, library); }
 	// ---- "differs from the file", the only thing the asterisk may mean ----
@@ -35233,10 +35696,10 @@ var EngCalcs = EngCalcs || {};
 	// Counted for the harness: a reuse that quietly never happens looks exactly like one that works.
 	var drawingsBuilt = 0, drawingsReused = 0;
 	function drawingLayers(d) {
-		return [d.customersLayer, d.linksLayer, d.linkSymbolLayer, d.nodesLayer, d.labelsLayer];
+		return [d.shapesLayer, d.customersLayer, d.linksLayer, d.linkSymbolLayer, d.nodesLayer, d.labelsLayer];
 	}
 	function captureDrawing() {
-		return { customersLayer: customersLayer, linksLayer: linksLayer,
+		return { shapesLayer: shapesLayer, shapeEls: shapeEls, customersLayer: customersLayer, linksLayer: linksLayer,
 			linkSymbolLayer: linkSymbolLayer, nodesLayer: nodesLayer, labelsLayer: labelsLayer,
 			nodeEls: nodeEls, linkEls: linkEls, labelEls: labelEls, incidentLinks: incidentLinks,
 			labelsByAnchor: labelsByAnchor, labelsByLinkAnchor: labelsByLinkAnchor,
@@ -35246,6 +35709,7 @@ var EngCalcs = EngCalcs || {};
 			labelWorkSkipped: labelWorkSkipped, lastLayoutScale: lastLayoutScale };
 	}
 	function adoptDrawing(d) {
+		shapesLayer = d.shapesLayer || shapesLayer; shapeEls = d.shapeEls || {};
 		customersLayer = d.customersLayer; linksLayer = d.linksLayer;
 		linkSymbolLayer = d.linkSymbolLayer; nodesLayer = d.nodesLayer; labelsLayer = d.labelsLayer;
 		nodeEls = d.nodeEls; linkEls = d.linkEls; labelEls = d.labelEls; incidentLinks = d.incidentLinks;
@@ -35278,7 +35742,7 @@ var EngCalcs = EngCalcs || {};
 			L.parentNode.insertBefore(n, L);
 			return n;
 		}
-		adoptDrawing({ customersLayer: twin(customersLayer), linksLayer: twin(linksLayer),
+		adoptDrawing({ shapesLayer: twin(shapesLayer), shapeEls: {}, customersLayer: twin(customersLayer), linksLayer: twin(linksLayer),
 			linkSymbolLayer: twin(linkSymbolLayer), nodesLayer: twin(nodesLayer),
 			labelsLayer: twin(labelsLayer), nodeEls: {}, linkEls: {}, labelEls: {}, incidentLinks: {},
 			labelsByAnchor: {}, labelsByLinkAnchor: {}, custEls: {}, custLblEls: {}, customersByLink: {},
@@ -35926,7 +36390,7 @@ var EngCalcs = EngCalcs || {};
 		// so a file whose `nodes` is a string or a number would install and then break the renderer
 		// rather than being refused here. Absent is fine -- that is an empty project; present and
 		// not an array is not a project document.
-		var lists = ['nodes', 'links', 'labels', 'customers'], i;
+		var lists = ['nodes', 'links', 'labels', 'customers', 'shapes'], i;
 		for (i = 0; i < lists.length; i++) {
 			if (saved[lists[i]] !== undefined && !Array.isArray(saved[lists[i]])) { return null; }
 		}
@@ -35981,6 +36445,8 @@ var EngCalcs = EngCalcs || {};
 		// version bump, because nothing MOVED: this adds demand rows beside the junction's own
 		// rather than taking anything out of them.
 		doc.customers = saved.customers || [];
+		// The Shapes (Task 779). A file written before they existed has none.
+		doc.shapes = Array.isArray(saved.shapes) ? saved.shapes : [];
 		// The clock (Task 423). A file written before this existed has none and behaves exactly as
 		// it always did -- an empty pattern list resolves to a multiplier of 1 everywhere.
 		doc.patterns = saved.patterns || [];
@@ -36740,7 +37206,7 @@ var EngCalcs = EngCalcs || {};
 		var id = newProjectId();
 		// Computed BEFORE the push below, or the project would be counted against itself.
 		var name = nextProjectName();
-		doc = { nodes: [], links: [], labels: [], customers: [], origin: { x: 0, y: 0 } };
+		doc = { nodes: [], links: [], labels: [], customers: [], shapes: [], origin: { x: 0, y: 0 } };
 		nextId = newNextId();
 		project = { name: name, activeScenario: 'base' };
 		// Only when geographic: an absent key is the grid default, and writing 'grid' explicitly
@@ -37232,6 +37698,541 @@ var EngCalcs = EngCalcs || {};
 					: (pcX.lpn_geojson_results_out || 'No results are included, because the network is not solved.')));
 		});
 	}
+	// ---- IMPORT GeoJSON SHAPES (Task 779) ----------------------------------------------------------
+	//
+	// js/lpn-geojson.js reads the file (lpnGeoJsonShapes); this half places each position in the
+	// project and reports. A geographic project stores the file's longitude and latitude exactly,
+	// characters and all, through the same source record a typed coordinate uses; a projected one
+	// converts them by the transform its map uses (numbers of ours). A local grid has no place on
+	// the Earth and is refused, as the export refuses it. One undo step for the whole import.
+	function pickGeoJsonFile() {
+		var input = document.getElementById('lpn_geojson_file');
+		if (input) { input.click(); }
+	}
+	function importGeoJsonShapesFromFile(file) {
+		var reader = new FileReader();
+		reader.onload = function (ev) { landGeoJsonShapes(String(ev.target.result), file.name); };
+		reader.onerror = function () {
+			setNotice((EngCalcs.pageConfig || {}).lpn_survey_read_error || 'That file could not be read from your disk.');
+		};
+		reader.readAsText(file);
+	}
+	// The text of a file, into Shapes. `done(report)` is called once with what happened, which is
+	// also what the notice says; a harness drives this half.
+	function landGeoJsonShapes(text, fileName, done) {
+		var pc = EngCalcs.pageConfig || {};
+		function say(msg, rep) { setNotice(msg); if (done) { done(rep); } }
+		if (!isLatLonProject() && !isProjectedProject()) {
+			say(pc.lpn_geojson_import_local || 'GeoJSON positions are latitude and longitude, and this project has no place on the Earth to which they can be converted. Georeference it first with Map, World map, Attach, then import again.', { ok: false, reason: 'local' });
+			return;
+		}
+		function go() {
+			var r = EngCalcs.lpnGeoJsonShapes ? EngCalcs.lpnGeoJsonShapes(text) : { ok: false, detail: '' },
+				geo = isLatLonProject(), code = projectCrsCode(), made = [], used = {}, lines = [], renamed = [];
+			// The singular where the count is one: `key` holds {n}, `key_one` says it for one.
+			function counted(key, n, fallback, fallbackOne) {
+				return n === 1 ? String(pc[key + '_one'] || fallbackOne) : String(pc[key] || fallback).replace('{n}', String(n));
+			}
+			if (!r.ok) {
+				say((pc.lpn_geojson_import_unreadable || '{file} is not a GeoJSON file: {detail}')
+					.replace('{file}', fileName).replace('{detail}', r.detail || ''), { ok: false, reason: 'unreadable' });
+				return;
+			}
+			allIds().forEach(function (x) { used[x] = true; });
+			r.shapes.forEach(function (sh) {
+				var pts = [], ok = true, id;
+				sh.pts.forEach(function (q) {
+					var p, xy;
+					// The project's OUTWARD pair first, then the one crossing into the drawing frame.
+					if (geo) {
+						if (Math.abs(q.lat) > LPN_MERC_MAX_LAT) { ok = false; return; }
+						xy = { x: q.lon, y: q.lat };
+					} else {
+						xy = EngCalcs.lpnCrsForward ? EngCalcs.lpnCrsForward(code, { lon: q.lon, lat: q.lat }) : null;
+						if (!xy) { ok = false; return; }
+					}
+					p = { x: inwardX(xy.x), y: inwardY(xy.y) };
+					if (geo) {
+						p[LPN_GEO_XSRC] = q.lon; p[LPN_GEO_YSRC] = q.lat;
+						if (q.tok && (q.tok.x || q.tok.y)) { p.tok = { x: q.tok.x, y: q.tok.y }; }
+					}
+					if (typeof q.z === 'number') {
+						p.z = q.z;
+						if (q.tok && q.tok.z) { (p.tok = p.tok || {}).z = q.tok.z; }
+					}
+					pts.push(p);
+				});
+				if (!ok || !pts.length) { r.skipped.push({ name: sh.name || '?', why: 'position' }); return; }
+				id = (sh.name && /^[^\s"']+$/.test(sh.name) && !used[sh.name]) ? sh.name : null;
+				if (!id) { id = mintId(LPN_ID_KEY.shape); }
+				used[id] = true;
+				var s = { id: id, pts: pts, closed: !!sh.closed };
+				if (sh.desc) { s.desc = sh.desc; }
+				if (sh.props) { s.props = sh.props; }
+				// **A NAME THAT CANNOT BE THE ID IS KEPT, AND SAID** (Perry's review): as the
+				// description where the file stated none, else as a `source_name` property, and both
+				// ride back out on export. The notice lists each one beside the ID it was given.
+				if (sh.srcName && sh.srcName !== id) {
+					if (!s.desc) { s.desc = sh.srcName; }
+					else { s.props = s.props || {}; s.props.source_name = sh.srcName; }
+					renamed.push(sh.srcName + ' (' + id + ')');
+				}
+				if (sh.fid !== undefined) { s.fid = sh.fid; }
+				made.push(s);
+			});
+			if (made.length) {
+				saveUndoSnapshot();
+				logLpnFirstAction('element');
+				made.forEach(function (s) { addShapeToDoc(s); buildShapeEls(s); });
+				scheduleSave();
+			}
+			lines.push(counted('lpn_geojson_import_done', made.length, '{n} Shapes imported from {file}.',
+				'One Shape imported from {file}.').replace('{file}', fileName));
+			if (renamed.length) {
+				lines.push(counted('lpn_geojson_import_renamed', renamed.length,
+					'{n} feature names cannot be Shape IDs and are kept with the Shapes: {list}.',
+					'One feature name cannot be a Shape ID and is kept with the Shape: {list}.').replace('{list}', renamed.join(', ')));
+			}
+			if (r.skipped.length) {
+				var why = { network: pc.lpn_geojson_import_why_network || 'network asset',
+					geometry: pc.lpn_geojson_import_why_geometry || 'not a point, line, or polygon',
+					position: pc.lpn_geojson_import_why_position || 'position not a valid latitude and longitude' };
+				lines.push(counted('lpn_geojson_import_skipped', r.skipped.length, '{n} features not imported: {list}.',
+					'One feature not imported: {list}.')
+					.replace('{list}', r.skipped.map(function (k) { return k.name + ' (' + why[k.why] + ')'; }).join(', ')));
+			}
+			if (r.holes) {
+				lines.push(counted('lpn_geojson_import_holes', r.holes, '{n} polygon holes not imported. A Shape has one boundary.',
+					'One polygon hole not imported. A Shape has one boundary.'));
+			}
+			if (r.multipart) {
+				lines.push(counted('lpn_geojson_import_parts', r.multipart, '{n} multipart features imported as one Shape for each part.',
+					'One multipart feature imported as one Shape for each part.'));
+			}
+			say(lines.join(' '), { ok: true, made: made.map(function (s) { return s.id; }), skipped: r.skipped, holes: r.holes, multipart: r.multipart, renamed: renamed });
+		}
+		if (!isLatLonProject() && EngCalcs.lpnCrsLoad && EngCalcs.lpnCrsReady && !EngCalcs.lpnCrsReady()) { EngCalcs.lpnCrsLoad(go); return; }
+		go();
+	}
+	// ---- IMPORT DXF AND SHAPEFILE SHAPES (Task 779) -------------------------------------------------
+	//
+	// Tom, 2026-10-12: *"Import from dxf and shapefile before merging,"* for the use case of
+	// 2026-10-11: *"import shapes from GIS or CAD to guide precise placement or map supplementation."*
+	// js/lpn-gisread.js reads the file; this half places the coordinates and reports, in the
+	// GeoJSON import's own way (landGeoJsonShapes()): the same ID rule, the same kept names, one undo
+	// step. **NOTHING IS REPROJECTED UNLESS THE FILE STATES LATITUDE AND LONGITUDE**, which the map's
+	// own transform already converts for GeoJSON; a planar file is read as the project's own numbers
+	// and the notice says so, and a planar file that states another system than the project's is
+	// refused. A DXF carries no coordinate system, so it is always read as the project's X and Y
+	// (its $INSUNITS is compared with the project's length unit and a difference is said), and a
+	// latitude-and-longitude project refuses it: a flat drawing has no place in degrees.
+	function pickDxfShapesFile() {
+		var input = document.getElementById('lpn_dxf_shapes_file');
+		if (input) { input.click(); }
+	}
+	function pickShapefile() {
+		var input = document.getElementById('lpn_shp_file');
+		if (input) { input.click(); }
+	}
+	function importDxfShapesFromFile(file) {
+		var reader = new FileReader();
+		reader.onload = function (ev) {
+			try { landDxfShapes(String(ev.target.result), file.name); }
+			catch (e) {
+				setNotice(String((EngCalcs.pageConfig || {}).lpn_dxf_import_unreadable || '{file} is not an ASCII DXF file.').replace('{file}', file.name));
+			}
+		};
+		reader.onerror = function () {
+			setNotice((EngCalcs.pageConfig || {}).lpn_survey_read_error || 'That file could not be read from your disk.');
+		};
+		reader.readAsText(file);
+	}
+	function importShapefileFromFiles(files) {
+		var got = [], left = files.length, bad = false;
+		files.forEach(function (f, i) {
+			var reader = new FileReader();
+			reader.onload = function (ev) {
+				got[i] = { name: f.name, bytes: new Uint8Array(ev.target.result) };
+				if (--left === 0 && !bad) { landShapefileShapes(got, null); }
+			};
+			reader.onerror = function () {
+				if (!bad) {
+					bad = true;
+					setNotice((EngCalcs.pageConfig || {}).lpn_survey_read_error || 'That file could not be read from your disk.');
+				}
+			};
+			reader.readAsArrayBuffer(f);
+		});
+	}
+	// The text sentence with a count: `key` holds {n}, `key_one` says it for one.
+	function gisCounted(key, n, fallback, fallbackOne) {
+		var pc = EngCalcs.pageConfig || {};
+		return n === 1 ? String(pc[key + '_one'] || fallbackOne) : String(pc[key] || fallback).replace('{n}', String(n));
+	}
+	// The ID, kept name, description, properties, undo and the notice, for Shapes already in the
+	// project frame. `items` are [{ name, srcName, desc, props, closed, pts: [{x, y, tok?, ...}] }].
+	function gisPlaceShapes(items, fileName, extraLines, skippedLines, done, extra) {
+		var made = [], used = {}, renamed = [], lines = [], pc = EngCalcs.pageConfig || {};
+		allIds().forEach(function (x) { used[x] = true; });
+		items.forEach(function (sh) {
+			var id = (sh.name && /^[^\s"']+$/.test(sh.name) && !used[sh.name]) ? sh.name : mintId(LPN_ID_KEY.shape), s;
+			used[id] = true;
+			s = { id: id, pts: sh.pts, closed: !!sh.closed };
+			if (sh.desc) { s.desc = sh.desc; }
+			if (sh.props && Object.keys(sh.props).length) { s.props = sh.props; }
+			if (sh.srcName && sh.srcName !== id) {
+				if (!s.desc) { s.desc = sh.srcName; }
+				else { s.props = s.props || {}; s.props.source_name = sh.srcName; }
+				renamed.push(sh.srcName + ' (' + id + ')');
+			}
+			made.push(s);
+		});
+		if (made.length) {
+			saveUndoSnapshot();
+			logLpnFirstAction('element');
+			made.forEach(function (s) { addShapeToDoc(s); buildShapeEls(s); });
+			scheduleSave();
+		}
+		lines.push(made.length === 0 ? String(pc.lpn_shapes_import_none || 'Nothing was imported from {file}.').replace('{file}', fileName)
+			: gisCounted('lpn_geojson_import_done', made.length, '{n} Shapes imported from {file}.',
+				'One Shape imported from {file}.').replace('{file}', fileName));
+		if (renamed.length) {
+			lines.push(gisCounted('lpn_geojson_import_renamed', renamed.length,
+				'{n} feature names cannot be Shape IDs and are kept with the Shapes: {list}.',
+				'One feature name cannot be a Shape ID and is kept with the Shape: {list}.')
+				.replace('{list}', renamed.slice(0, 5).join(', ') + (renamed.length > 5 ? ', ' +
+					String(pc.lpn_shapes_import_more || 'and {n} more').replace('{n}', String(renamed.length - 5)) : '')));
+		}
+		Array.prototype.push.apply(lines, skippedLines);
+		Array.prototype.push.apply(lines, extraLines);
+		setNotice(lines.join(' '));
+		if (done) {
+			done(Object.assign({ ok: true, made: made.map(function (s) { return s.id; }), renamed: renamed }, extra || {}));
+		}
+	}
+	// Planar numbers into the drawing frame, each keeping the characters it was written as.
+	function gisPlanarPoint(q) {
+		var p = { x: inwardX(q.x), y: inwardY(q.y) };
+		if (q.tok && (q.tok.x || q.tok.y)) { p.tok = { x: q.tok.x, y: q.tok.y }; }
+		return p;
+	}
+	function gisFrameText() {
+		var pc = EngCalcs.pageConfig || {};
+		if (isLatLonProject()) { return String(pc.lpn_shapes_frame_latlon || 'latitude and longitude'); }
+		if (isProjectedProject()) { return crsLabel(projectCrsCode()) + ' (' + projectCrsCode() + ')'; }
+		return String(pc.lpn_shapes_frame_xy || 'the X and Y of this project');
+	}
+	// { km } when a file's points, read as its .prj says (`toLonLat(q)` -> {lon, lat} or null), fall
+	// beyond the 300 km mission scope from every node, and the same numbers read as Web Mercator
+	// metres fall within it; else null. Nothing is decided here: the caller asks.
+	function gisMisnamedPrj(shapes, toLonLat) {
+		var SCOPE = 300, LIM = 20037508.343, box = null, a = null, w = null, fits = true;
+		function grow(b, ll) {
+			if (!ll || !isFinite(ll.lon) || !isFinite(ll.lat)) { return b; }
+			return b ? { w: Math.min(b.w, ll.lon), e: Math.max(b.e, ll.lon), s: Math.min(b.s, ll.lat), n: Math.max(b.n, ll.lat) }
+				: { w: ll.lon, e: ll.lon, s: ll.lat, n: ll.lat };
+		}
+		// Kilometres from the middle of `b` to the nearest point of the project's box.
+		function kmTo(b) {
+			var lon = (b.w + b.e) / 2, lat = (b.s + b.n) / 2, R = 6371, d = Math.PI / 180,
+				lon2 = Math.max(box.w, Math.min(box.e, lon)), lat2 = Math.max(box.s, Math.min(box.n, lat)),
+				h = Math.pow(Math.sin((lat2 - lat) * d / 2), 2) + Math.cos(lat * d) * Math.cos(lat2 * d) * Math.pow(Math.sin((lon2 - lon) * d / 2), 2);
+			return 2 * R * Math.asin(Math.min(1, Math.sqrt(h)));
+		}
+		(doc.nodes || []).forEach(function (n) { box = grow(box, nodeLonLat(n)); });
+		if (!box) { return null; }
+		shapes.forEach(function (sh) {
+			sh.pts.forEach(function (q) {
+				a = grow(a, toLonLat(q));
+				if (!(Math.abs(q.x) <= LIM && Math.abs(q.y) <= LIM)) { fits = false; }
+				else { w = grow(w, EngCalcs.lpnCrsInverse('EPSG:3857', { x: q.x, y: q.y })); }
+			});
+		});
+		if (!fits || !w) { return null; }
+		var km = a ? kmTo(a) : Infinity;
+		if (!(km > SCOPE) || kmTo(w) > SCOPE) { return null; }
+		return { km: isFinite(km) ? Math.round(km) : '?' };
+	}
+	function gisList(arr) { return arr.map(function (k) { return k.name + ' (' + k.n + ')'; }).join(', '); }
+	// A DXF's text, into Shapes. `done(report)` is called once; a harness drives this half.
+	function landDxfShapes(text, fileName, done) {
+		var pc = EngCalcs.pageConfig || {}, r = EngCalcs.lpnDxfShapes(text), lines = [], skipped = [], items, unit, ours, theirs;
+		function refuse(key, fb, reason) {
+			setNotice(String(pc[key] || fb).replace('{file}', fileName));
+			if (done) { done({ ok: false, reason: reason }); }
+		}
+		if (!r.ok) {
+			if (r.detail === 'binary') { refuse('lpn_dxf_import_binary', '{file} is a binary DXF. Save it from your CAD program as an ASCII DXF, then import again.', 'binary'); }
+			else { refuse('lpn_dxf_import_unreadable', '{file} is not an ASCII DXF file.', 'unreadable'); }
+			return;
+		}
+		if (isLatLonProject()) {
+			refuse('lpn_dxf_import_refuse_geo', 'A DXF drawing is flat, and this project is in latitude and longitude, so the coordinates of {file} have no place in it. Use Convert as… to copy the project into a coordinate system, then import again.', 'geo');
+			return;
+		}
+		items = r.shapes.map(function (sh) {
+			return { closed: sh.closed, props: sh.layer ? { layer: sh.layer } : null, pts: sh.pts.map(gisPlanarPoint) };
+		});
+		var sk = r.skipped.slice();
+		if (r.inBlocks) { sk.push({ name: String(pc.lpn_dxf_import_inblocks || 'in block definitions'), n: r.inBlocks }); }
+		if (r.paperSpace) { sk.push({ name: String(pc.lpn_dxf_import_paperspace || 'in paper space'), n: r.paperSpace }); }
+		if (sk.length) {
+			var total = sk.reduce(function (s, k) { return s + k.n; }, 0);
+			skipped.push(gisCounted('lpn_dxf_import_skipped', total, '{n} entities not imported: {list}.',
+				'One entity not imported: {list}.').replace('{list}', gisList(sk)));
+		}
+		if (r.bulged) {
+			skipped.push(gisCounted('lpn_dxf_import_bulge', r.bulged,
+				'{n} polylines have arc segments, which were imported as straight segments between their vertices.',
+				'One polyline has arc segments, which were imported as straight segments between its vertices.'));
+		}
+		lines.push(String(pc.lpn_shapes_import_frame || 'The coordinates were read as {frame}, with no conversion.').replace('{frame}', gisFrameText()));
+		// The drawing's stated units against the project's length unit, said and not acted on.
+		ours = isProjectedProject() ? ((EngCalcs.lpnCrsUnit && EngCalcs.lpnCrsUnit(projectCrsCode()) || {}).units || '') : unitKey('lpn_u_length');
+		theirs = r.unit;
+		// A foot and a US survey foot differ by 2 ppm and are one unit here; a unit is named as the
+		// page names it (ft), never as the projection library spells it (us-ft).
+		function uName(u) { return String(pc['u_' + (u === 'us-ft' ? 'ft' : u)] || u); }
+		if (theirs && ours && (theirs === 'us-ft' ? 'ft' : theirs) !== (ours === 'us-ft' ? 'ft' : ours)) {
+			lines.push(String(pc.lpn_dxf_import_units || 'The drawing states its units as {theirs} and this project uses {ours}. The numbers were not changed.')
+				.replace('{theirs}', uName(theirs)).replace('{ours}', uName(ours)));
+		}
+		gisPlaceShapes(items, fileName, lines, skipped, done, { skipped: r.skipped, inBlocks: r.inBlocks, paperSpace: r.paperSpace, bulged: r.bulged, unit: r.unit });
+	}
+	// The files of a shapefile ([{ name, bytes }]), into Shapes.
+	function landShapefileShapes(files, done) {
+		var pc = EngCalcs.pageConfig || {}, fileName = files.map(function (f) { return f.name; }).join(', ');
+		if (files.length > 1) {
+			var shp = files.filter(function (f) { return /\.shp$/i.test(f.name); });
+			if (shp.length === 1) { fileName = shp[0].name; }
+		}
+		function say(msg, rep) { setNotice(msg); if (done) { done(rep); } }
+		function failed(e) {
+			say(String(pc.lpn_shp_import_damaged || '{file} is damaged or cut short, so nothing was imported.').replace('{file}', fileName), { ok: false, reason: 'damaged', error: String(e && e.message || e) });
+		}
+		EngCalcs.lpnShapefileRead(files).then(function (r) {
+			function go() { try { place(r); } catch (e) { failed(e); } }
+			if (!r.ok) {
+				if (r.detail === 'damaged') { failed(); return; }
+				if (r.detail === 'noshp') { say(String(pc.lpn_shp_import_noshp || '{file} has no .shp file in it. Pick the .zip of a shapefile, or the .shp together with its .shx, .dbf and .prj (hold Ctrl or Shift to select several).').replace('{file}', fileName), { ok: false, reason: 'noshp' }); }
+				else if (r.detail === 'manyshp') { say(String(pc.lpn_shp_import_manyshp || '{file} holds more than one shapefile. Import one at a time.').replace('{file}', fileName), { ok: false, reason: 'manyshp' }); }
+				else { say(String(pc.lpn_shp_import_unreadable || '{file} is not a shapefile this page can read: {detail}').replace('{file}', fileName).replace('{detail}', r.detail || ''), { ok: false, reason: 'unreadable' }); }
+				return;
+			}
+			var prj = r.prj, geoFile = prj ? prj.kind === 'geographic' : false;
+			if (geoFile && !isLatLonProject() && !isProjectedProject()) {
+				say(String(pc.lpn_shp_import_refuse_local || '{file} is in latitude and longitude, and this project has no place on the Earth to which they can be converted. Georeference it first with Map, World map, Attach, then import again.').replace('{file}', fileName), { ok: false, reason: 'local' });
+				return;
+			}
+			if ((isProjectedProject() || (isLatLonProject() && r.prj && r.prj.kind === 'projected')) && EngCalcs.lpnCrsLoad && EngCalcs.lpnCrsReady && !EngCalcs.lpnCrsReady()) { EngCalcs.lpnCrsLoad(go); return; }
+			go();
+		}).catch(failed);
+		function place(r, opt) {
+			opt = opt || {};
+			var prj = r.prj, lines = [], skipped = [], items = [], ok = true, mode, geo = isLatLonProject(), code = projectCrsCode(), attrCols = [];
+			function refuse(key, fb, reason, theirs, hint) {
+				say(String(pc[key] || fb).replace('{file}', fileName).replace('{theirs}', theirs || '').replace('{ours}', geo ? gisFrameText() : (code ? crsLabel(code) + ' (' + code + ')' : ''))
+					+ (hint ? ' ' + String(pc.lpn_shp_import_convert_hint || 'Use Convert as… to copy the project into {theirs}, then import again.').replace('{theirs}', theirs || '') : ''), { ok: false, reason: reason });
+			}
+			var conv = null;
+			function convertedLine(theirs) {
+				return String(pc.lpn_shp_import_reprojected || 'The coordinates were converted from {theirs} to {ours}.')
+					.replace('{theirs}', theirs).replace('{ours}', geo ? gisFrameText() : crsLabel(code) + ' (' + code + ')');
+			}
+			var theirsName = prj ? (prj.epsg ? (prj.name ? prj.name + ' (' + prj.epsg + ')' : prj.epsg) : prj.name) : '';
+			if (!prj) {
+				var pick = String(pc.lpn_shp_import_pick_hint || 'A shapefile is several files. Pick the .shp together with its .shx, .dbf and .prj (hold Ctrl or Shift to select several), or pick the .zip.');
+				if (geo && !opt.webMerc) {
+					// No .prj: degrees only if every number can be one.
+					r.shapes.forEach(function (sh) { sh.pts.forEach(function (q) { if (!(q.x >= -180 && q.x <= 180 && q.y >= -90 && q.y <= 90)) { ok = false; } }); });
+					if (!ok) {
+						// **NEVER GUESSED, ALWAYS ASKED**: numbers that are not degrees but fit Web Mercator
+						// metres (the system QGIS and web maps use) are offered as EPSG:3857, by one button.
+						var wm = true, LIM = 20037508.343;
+						r.shapes.forEach(function (sh) { sh.pts.forEach(function (q) { if (!(Math.abs(q.x) <= LIM && Math.abs(q.y) <= LIM)) { wm = false; } }); });
+						if (wm && r.shapes.length) {
+							askDialog({
+								kind: 'confirm', ok: String(pc.lpn_shp_import_webmerc_ok || 'Import as EPSG:3857'),
+								text: String(pc.lpn_shp_import_webmerc_ask || '{file} has no .prj file, and its numbers are not latitudes and longitudes, but they fit Web Mercator metres (EPSG:3857), the system QGIS and web maps use. Import them as EPSG:3857 and convert them to this project?').replace('{file}', fileName) + ' ' + pick
+							}, function (yes) {
+								if (yes) { try { place(r, { webMerc: true }); } catch (e) { failed(e); } }
+								else { say(String(pc.lpn_shp_import_refuse_range || '{file} has no .prj file, and its coordinates are not latitudes and longitudes, so they cannot be placed in this project.').replace('{file}', fileName) + ' ' + pick, { ok: false, reason: 'range' }); }
+							});
+							return;
+						}
+						say(String(pc.lpn_shp_import_refuse_range || '{file} has no .prj file, and its coordinates are not latitudes and longitudes, so they cannot be placed in this project.').replace('{file}', fileName) + ' ' + pick, { ok: false, reason: 'range' });
+						return;
+					}
+				}
+				if (opt.webMerc) {
+					conv = EngCalcs.lpnCrsFileInverse({ epsg: 'EPSG:3857' });
+					mode = 'convert';
+					lines.push(convertedLine(dxfCrsName('EPSG:3857')));
+				} else {
+					mode = geo ? 'lonlat' : 'planar';
+					lines.push(String(pc.lpn_shp_import_noprj || 'There is no .prj file, so the coordinates were read as {frame}, with no conversion.').replace('{frame}', gisFrameText()) + ' ' + pick);
+				}
+			} else if (opt.webMerc) {
+				// The .prj was overruled by the visitor's own answer to gisMisnamedAsk() below.
+				conv = EngCalcs.lpnCrsFileInverse({ epsg: 'EPSG:3857' });
+				mode = 'convert';
+				lines.push(convertedLine(dxfCrsName('EPSG:3857')));
+			} else if (prj.kind === 'geographic') {
+				mode = 'lonlat';
+				if (!geo) {
+					lines.push(String(pc.lpn_shp_import_converted || 'The coordinates are latitude and longitude. They were converted to {crs} by the transform the map uses.').replace('{crs}', crsLabel(code) + ' (' + code + ')'));
+				}
+			} else if (geo && (conv = EngCalcs.lpnCrsFileInverse && EngCalcs.lpnCrsFileInverse(prj))) {
+				mode = 'convert';
+				lines.push(convertedLine(theirsName));
+			} else if (geo) {
+				refuse('lpn_shp_import_refuse_crs', '{file} states {theirs}, and this project is in {ours}. Nothing was imported and nothing was converted.', 'crs', theirsName);
+				return;
+			} else if (isProjectedProject()) {
+				// By code where the file states one, else by arithmetic: an ArcGIS .prj states the method
+				// and its parameters (no EPSG code), and is the same system when both give the same plane.
+				if ((prj.epsg && prj.epsg === code) || (!prj.epsg && EngCalcs.lpnCrsMatchWkt && EngCalcs.lpnCrsMatchWkt(code, prj.wkt) === true)) {
+					mode = 'planar';
+					lines.push(String(pc.lpn_shp_import_prj_same || 'The .prj states {crs}, the coordinate system of this project, so the coordinates were not changed.').replace('{crs}', crsLabel(code) + ' (' + code + ')'));
+				} else if ((conv = EngCalcs.lpnCrsFileInverse && EngCalcs.lpnCrsFileInverse(prj))) {
+					// **A DIFFERENT PROJECTED SYSTEM IS CONVERTED, AND SAID** (Tom, 2026-10-12: "Convert and
+					// say so"): back to longitude and latitude by the file's own system, then forward by the
+					// project's, the suite's transform both ways. The numbers are new, so none keeps source text.
+					mode = 'convert';
+					lines.push(convertedLine(theirsName || prj.name));
+				} else {
+					// Only a system that cannot be identified is refused.
+					refuse('lpn_shp_import_refuse_crs', '{file} states {theirs}, and this project is in {ours}. Nothing was imported and nothing was converted.', 'crs', theirsName || prj.name);
+					return;
+				}
+			} else {
+				mode = 'planar';
+				lines.push(String(pc.lpn_shp_import_prj_other || 'The .prj states {theirs}. This project states no coordinate system, so the coordinates were read as {frame}, with no conversion.').replace('{theirs}', theirsName || prj.name).replace('{frame}', gisFrameText()));
+			}
+			// **A .prj THAT NAMES THE WRONG SYSTEM IS ASKED ABOUT, NEVER OVERRULED SILENTLY** (Tom,
+			// 2026-10-13: a QGIS file whose .prj states EPSG:2223 "came in about 1000 miles NNE of
+			// Hawaii"). Its numbers were Web Mercator metres under a State Plane .prj, so read as the
+			// .prj says they land 3,900 km from Elm Street, and read as EPSG:3857 they land on it.
+			// Asked only when the .prj's reading is beyond the 300 km mission scope from every node and
+			// the Web Mercator reading is within it; the same one-button question as a missing .prj.
+			if (!opt.webMerc && prj && prj.kind === 'projected' && prj.epsg !== 'EPSG:3857' &&
+				(mode === 'convert' || (mode === 'planar' && isProjectedProject()))) {
+				var far = gisMisnamedPrj(r.shapes, function (q) {
+					return mode === 'convert' ? conv({ x: q.x, y: q.y }) : EngCalcs.lpnCrsInverse(code, { x: q.x, y: q.y });
+				});
+				if (far) {
+					askDialog({
+						kind: 'confirm', ok: String(pc.lpn_shp_import_webmerc_ok || 'Import as EPSG:3857'),
+						text: String(pc.lpn_shp_import_webmerc_far_ask || '{file} states {theirs}, and read in that system its coordinates fall {km} km from this project. Read as Web Mercator metres (EPSG:3857), the system QGIS and web maps use, they fall where this project is. Import them as EPSG:3857 and convert them to this project?')
+							.replace('{file}', fileName).replace('{theirs}', theirsName || prj.name).replace('{km}', String(far.km))
+					}, function (yes) {
+						if (yes) { try { place(r, { webMerc: true }); } catch (e) { failed(e); } }
+						else { say(String(pc.lpn_shapes_import_none || 'Nothing was imported from {file}.').replace('{file}', fileName), { ok: false, reason: 'far' }); }
+					});
+					return;
+				}
+			}
+			var descCols = ['description', 'desc'], bad = [];
+			// Which dbf column gives the name and the description. A NAME column wins over ID, and an
+			// ID column names Shapes only when it tells records apart: ArcGIS writes an Id of zeros
+			// first in every file it makes, and a column of zeros or repeats is not a name.
+			var nameCol = null, descCol = null;
+			(r.fields || []).forEach(function (f) {
+				if (!nameCol && f.toLowerCase() === 'name') { nameCol = f; }
+				if (!descCol && descCols.indexOf(f.toLowerCase()) >= 0) { descCol = f; }
+			});
+			if (!nameCol) {
+				(r.fields || []).forEach(function (f) {
+					var seen = {}, distinct = true, rows = {}, any = false;
+					if (nameCol || f.toLowerCase() !== 'id') { return; }
+					r.shapes.forEach(function (sh) {
+						var v = sh.attrs ? String(sh.attrs[f]) : '';
+						if (rows[sh.row]) { return; }
+						rows[sh.row] = true;
+						if (v === '' || /^0+$/.test(v) || seen[v]) { distinct = false; }
+						seen[v] = true; any = true;
+					});
+					if (any && distinct) { nameCol = f; }
+				});
+			}
+			var byRow = {};
+			r.shapes.forEach(function (sh) { byRow[sh.row] = (byRow[sh.row] || 0) + 1; });
+			r.shapes.forEach(function (sh) {
+				var pts = [], good = true, a = sh.attrs, props = {}, name = '';
+				sh.pts.forEach(function (q) {
+					var xy, p;
+					if (mode === 'convert') {
+						// The file's plane position to longitude and latitude; the stored number is then new.
+						var ll = conv({ x: q.x, y: q.y });
+						if (!ll) { good = false; return; }
+						q = { x: ll.lon, y: ll.lat, tok: null };
+					}
+					if (mode === 'lonlat' || mode === 'convert') {
+						if (!(q.x >= -180 && q.x <= 180 && q.y >= -90 && q.y <= 90)) { good = false; return; }
+						if (geo) {
+							if (Math.abs(q.y) > LPN_MERC_MAX_LAT) { good = false; return; }
+							xy = { x: q.x, y: q.y };
+						} else {
+							xy = EngCalcs.lpnCrsForward ? EngCalcs.lpnCrsForward(code, { lon: q.x, lat: q.y }) : null;
+							if (!xy) { good = false; return; }
+						}
+						p = { x: inwardX(xy.x), y: inwardY(xy.y) };
+						if (geo) {
+							p[LPN_GEO_XSRC] = q.x; p[LPN_GEO_YSRC] = q.y;
+							if (q.tok) { p.tok = { x: q.tok.x, y: q.tok.y }; }
+						}
+					} else { p = gisPlanarPoint(q); }
+					pts.push(p);
+				});
+				if (!good || !pts.length) { bad.push({ name: String(sh.row), n: 1 }); return; }
+				if (a) {
+					Object.keys(a).forEach(function (k) {
+						if (k !== nameCol && k !== descCol && a[k] !== '' && a[k] !== undefined) { props[k] = a[k]; }
+					});
+					if (nameCol && a[nameCol] !== '' && a[nameCol] !== undefined) { name = String(a[nameCol]); }
+				}
+				items.push({
+					name: byRow[sh.row] > 1 ? '' : name, srcName: name,
+					desc: descCol && a && a[descCol] !== '' && a[descCol] !== undefined ? String(a[descCol]) : '',
+					props: props, closed: sh.closed, pts: pts
+				});
+			});
+			if (r.fields && r.fields.length) {
+				attrCols = r.fields.filter(function (f) { return f !== nameCol && f !== descCol; });
+				if (attrCols.length) {
+					lines.push(String(pc.lpn_shp_import_attrs || 'Attribute columns kept as properties of each Shape: {list}.').replace('{list}', attrCols.slice(0, 8).join(', ') + (attrCols.length > 8 ? ', ' +
+						String(pc.lpn_shapes_import_more || 'and {n} more').replace('{n}', String(attrCols.length - 8)) : '')));
+				}
+			}
+			var sk = r.skipped;
+			if (sk.length) {
+				var total = sk.reduce(function (s, k) { return s + k.n; }, 0);
+				skipped.push(gisCounted('lpn_shp_import_skipped', total, '{n} records not imported, because their shape type is not read: {list}.',
+					'One record not imported, because its shape type is not read: {list}.').replace('{list}', gisList(sk)));
+			}
+			if (bad.length) {
+				var nums = bad.map(function (k) { return k.name; });
+				skipped.push(gisCounted('lpn_shp_import_unplaced', bad.length,
+					'{n} records have coordinates this project cannot place, such as a latitude beyond the limit of the map. Record numbers: {list}.',
+					'One record has coordinates this project cannot place, such as a latitude beyond the limit of the map. Record number: {list}.')
+					.replace('{list}', nums.slice(0, 8).join(', ') + (nums.length > 8 ? ', ' +
+						String(pc.lpn_shapes_import_more || 'and {n} more').replace('{n}', String(nums.length - 8)) : '')));
+			}
+			if (r.deletedRows) {
+				skipped.push(gisCounted('lpn_shp_import_deleted', r.deletedRows, '{n} records marked deleted in the .dbf were not imported.',
+					'One record marked deleted in the .dbf was not imported.'));
+			}
+			if (r.holes) {
+				skipped.push(gisCounted('lpn_geojson_import_holes', r.holes, '{n} polygon holes not imported. A Shape has one boundary.',
+					'One polygon hole not imported. A Shape has one boundary.'));
+			}
+			if (r.multipart) {
+				skipped.push(gisCounted('lpn_geojson_import_parts', r.multipart, '{n} multipart features imported as one Shape for each part.',
+					'One multipart feature imported as one Shape for each part.'));
+			}
+			gisPlaceShapes(items, fileName, lines, skipped, done, { skipped: r.skipped, holes: r.holes, multipart: r.multipart, deletedRows: r.deletedRows, mode: mode });
+		}
+	}
 	// ---- EXPORT DXF FILE (ROADMAP Task 772) ---------------------------------------------------------
 	//
 	// **THE MODEL'S DATA, AS ATTRIBUTED BLOCKS** (Tom's DXF Interface Manager specification,
@@ -37443,7 +38444,7 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {}, G = frame.fwd, snap = serializeProject(),
 			geo = isLatLonProject(), tt = dxfTagTable(),
 			org = (!geo && snap.origin && isFinite(snap.origin.x)) ? snap.origin : { x: 0, y: 0 },
-			fileNode = {}, nodes = [], links = [], customers = [];
+			fileNode = {}, nodes = [], links = [], customers = [], shapes = [];
 		function attrs(type, pairs) { return pairs.map(function (p) { return { tag: tt.tagOf(type, p[0]), value: p[1] }; }); }
 		snap.nodes.forEach(function (n) { fileNode[n.id] = n; });
 		// A node's OUTWARD position: this scenario's own if it moved the node, else the file's
@@ -37479,6 +38480,16 @@ var EngCalcs = EngCalcs || {};
 				['ID', c.id], ['DEMAND', dxfVal(c, 'demand')], ['COUNT', dxfVal(c, 'count')],
 				['TAG', c.tag || ''], ['DESC', c.desc || '']]) });
 		});
+		// **THE SHAPES** (Task 779): geometry only, a POINT or an LWPOLYLINE, from the file's numbers
+		// like a pipe's bends.
+		(snap.shapes || []).forEach(function (fs) {
+			var pts = [];
+			(fs.pts || []).forEach(function (v) {
+				var q = G(v.x + org.x, v.y + org.y);
+				if (q) { pts.push(q); }
+			});
+			if (pts.length) { shapes.push({ id: fs.id, pts: pts, closed: !!fs.closed && pts.length >= 3 }); }
+		});
 		// **THE LAYER NAMES**: js/lpn-dxf.js's one prefix, its fixed asset codes (NODE, LINK, ...), and the scenario on screen as the alternative (BASE for Base). The whole network
 		// as that scenario has it is written; an overrides-only layer per alternative waits on
 		// Task 721, which owns the alternatives model.
@@ -37507,7 +38518,7 @@ var EngCalcs = EngCalcs || {};
 		return {
 			insunits: frame.insunits, measurement: frame.measurement,
 			codes: codes, alternative: alternative, locale: dxfLocale(), idTags: tt.idTags,
-			nodes: nodes, links: links, customers: customers, readme: readme,
+			nodes: nodes, links: links, customers: customers, shapes: shapes, readme: readme,
 			tags: tt.tags, prompts: tt.prompts
 		};
 	}
@@ -39280,7 +40291,8 @@ var EngCalcs = EngCalcs || {};
 	// Nothing anywhere whose coordinates a new coordinate system would have to move: no node, no
 	// Text, no background image. Then there is nothing for the placement steps to place.
 	function convasNothingToPlace() {
-		return !doc.nodes.length && !(doc.labels && doc.labels.length) && !(backdrop && backdrop.href);
+		return !doc.nodes.length && !(doc.labels && doc.labels.length) && !(doc.shapes && doc.shapes.length) &&
+			!(backdrop && backdrop.href);
 	}
 	// A file opened through the row's file route: the same box, unless there is nothing to convert.
 	function convertAsLanded() {
@@ -43941,6 +44953,13 @@ var EngCalcs = EngCalcs || {};
 			  tip: pc.lpn_file_import_survey_tip, fn: pickSurveyFile },
 			{ icon: 'open', label: pc.lpn_file_import_inp || 'Import EPANET file…',
 			  tip: pc.lpn_file_import_inp_tip, fn: pickInpFile },
+			// The points, lines and polygons of a GeoJSON file, as Shapes (Task 779).
+			{ icon: 'open', label: pc.lpn_file_import_shapes || 'Import GeoJSON shapes…',
+			  tip: pc.lpn_file_import_shapes_tip, fn: pickGeoJsonFile },
+			{ icon: 'open', label: pc.lpn_file_import_dxf || 'Import DXF shapes…',
+			  tip: pc.lpn_file_import_dxf_tip, fn: pickDxfShapesFile },
+			{ icon: 'open', label: pc.lpn_file_import_shp || 'Import shapefile shapes…',
+			  tip: pc.lpn_file_import_shp_tip, fn: pickShapefile },
 			// **THE LIBRARY IMPORT WIZARD'S OWN DOOR, AND ITS ONLY ONE** (Task 611). Tom,
 			// 2026-09-17: *"Move the button to the File menu. I thought you already did that."* Then
 			// 2026-09-18: *"Remove buttons except at the File menu."* The Libraries box carried the
@@ -44153,11 +45172,11 @@ var EngCalcs = EngCalcs || {};
 			// the small-screen breakpoint a door, where the whole toolbar is hidden -- the same
 			// reason Select itself has a row above.
 			{ icon: 'select-window', pointerOnly: true, label: pc.lpn_tool_area_window || 'Select a window',
-				tip: pc.lpn_tool_area_tip, fn: function () { setSelectAreaShape('window'); } },
+				tip: toolTipWithKey('select-area', pc.lpn_tool_area_tip), fn: function () { setSelectAreaShape('window'); } },
 			{ icon: 'select-lasso', pointerOnly: true, label: pc.lpn_tool_area_lasso || 'Select a lasso',
-				tip: pc.lpn_tool_area_tip, fn: function () { setSelectAreaShape('lasso'); } },
+				tip: toolTipWithKey('select-area', pc.lpn_tool_area_tip), fn: function () { setSelectAreaShape('lasso'); } },
 			{ icon: 'select-polygon', pointerOnly: true, label: pc.lpn_tool_area_polygon || 'Select a polygon',
-				tip: pc.lpn_tool_area_tip, fn: function () { setSelectAreaShape('polygon'); } },
+				tip: toolTipWithKey('select-area', pc.lpn_tool_area_tip), fn: function () { setSelectAreaShape('polygon'); } },
 			{ icon: 'undo', label: pc.lpn_tool_undo || 'Undo', tip: pc.lpn_tool_undo_tip, hotkey: 'Mod+Z', fn: undo },
 			// Find sits with Undo and Delete because it acts on the ELEMENTS, which is what this
 			// menu is about; View holds the things that change how the map is drawn. Every editor
@@ -44217,7 +45236,10 @@ var EngCalcs = EngCalcs || {};
 	// of the nine digits, and both facts were once told in prose instead. **NEITHER KEY SWITCHES
 	// THE TOOL ON, and that is not the claim**: Delete removes what is selected and Esc returns to
 	// Select, so the tip says what to press to do the thing the button is named for.
-	var LPN_TOOL_ALT_KEYS = { 'select': 'Esc', 'delete': 'Delete' };
+	// **F IS THE SHAPE TOOL** (Tom, 2026-10-12, with Zoom window's W as the pattern): a named key, not a
+	// digit, shown in the tip through this same table. The letter is the English "figure"; Shape's
+	// own name has no free initial (S is the Shapes table and the mnemonics).
+	var LPN_TOOL_ALT_KEYS = { 'select': 'Esc', 'delete': 'Delete', 'add-shape': 'F' };
 	function toolTipWithKey(mode, tip) {
 		var pc = EngCalcs.pageConfig || {}, key = toolKeyFor(mode), alt = LPN_TOOL_ALT_KEYS[mode] || null;
 		if (key && alt) {
@@ -44231,6 +45253,8 @@ var EngCalcs = EngCalcs || {};
 		}
 		return tip;
 	}
+	// **A IS AREA SELECT** (Tom, 2026-10-13): a named key like Esc, shown in the tip through this table.
+	LPN_TOOL_ALT_KEYS['select-area'] = 'A';
 	function insertAssetRows() {
 		var pc = EngCalcs.pageConfig || {};
 		return [
@@ -44240,6 +45264,7 @@ var EngCalcs = EngCalcs || {};
 			// of the two doors: a reader who opens the menu rather than hovering the strip was told
 			// nothing at all, about any of the eight tools. No new key, and the digit still comes
 			// from LPN_TOOL_KEYS rather than from a translator.
+			{ icon: 'chain', pointerOnly: true, label: pc.lpn_tool_add_chain || 'Junction Pipe Chain', tip: toolTipWithKey('add-chain', pc.lpn_tool_add_chain_tip), hotkey: toolKeyFor('add-chain'), fn: function () { setMode('add-chain'); } },
 			{ icon: 'junction', pointerOnly: true, label: pc.lpn_tool_add_junction || 'Junction', tip: toolTipWithKey('add-junction'), hotkey: toolKeyFor('add-junction'), fn: function () { setMode('add-junction'); } },
 			{ icon: 'reservoir', pointerOnly: true, label: pc.lpn_tool_add_reservoir || 'Reservoir', tip: toolTipWithKey('add-reservoir'), hotkey: toolKeyFor('add-reservoir'), fn: function () { setMode('add-reservoir'); } },
 			{ icon: 'tank', pointerOnly: true, label: pc.lpn_tool_add_tank || 'Tank', tip: toolTipWithKey('add-tank'), hotkey: toolKeyFor('add-tank'), fn: function () { setMode('add-tank'); } },
@@ -44252,7 +45277,8 @@ var EngCalcs = EngCalcs || {};
 			// Text stays last, being the only tool that adds nothing hydraulic.
 			{ icon: 'customer', pointerOnly: true, label: pc.lpn_tool_add_meter || 'Customer', tip: toolTipWithKey('add-meter', pc.lpn_tool_add_meter_tip), hotkey: toolKeyFor('add-meter'), fn: function () { setMode('add-meter'); } },
 			{ icon: 'text', pointerOnly: true, label: pc.lpn_tool_add_text || 'Text', tip: toolTipWithKey('add-text'), hotkey: toolKeyFor('add-text'), fn: function () { setMode('add-text'); } },
-			{ icon: 'chain', pointerOnly: true, label: pc.lpn_tool_add_chain || 'Junction Pipe Chain', tip: toolTipWithKey('add-chain', pc.lpn_tool_add_chain_tip), hotkey: toolKeyFor('add-chain'), fn: function () { setMode('add-chain'); } },
+			// Beside Text, the other tool that adds nothing hydraulic (Task 779). No digit is left.
+			{ icon: 'shape', pointerOnly: true, label: pc.lpn_tool_add_shape || 'Shape', tip: toolTipWithKey('add-shape', pc.lpn_tool_add_shape_tip), hotkey: 'F', fn: function () { setMode('add-shape'); } },
 			{ separator: true },
 			// Dev-only, last, and wearing a bracketed label so it reads as not-a-real-feature.
 			// Deliberately NOT translated: scaffolding for measuring how ~100 links performs, and it
@@ -47026,6 +48052,31 @@ var EngCalcs = EngCalcs || {};
 				if (f) { importProfileFromFile(f); }
 			});
 		}
+		// GeoJSON Shapes (Task 779): the same hidden-input door as the surveyed points below.
+		var gjInput = document.getElementById('lpn_geojson_file');
+		if (gjInput) {
+			gjInput.addEventListener('change', function () {
+				var f = gjInput.files[0];
+				gjInput.value = '';
+				if (f) { importGeoJsonShapesFromFile(f); }
+			});
+		}
+		var dxfInput = document.getElementById('lpn_dxf_shapes_file');
+		if (dxfInput) {
+			dxfInput.addEventListener('change', function () {
+				var f = dxfInput.files[0];
+				dxfInput.value = '';
+				if (f) { importDxfShapesFromFile(f); }
+			});
+		}
+		var shpInput = document.getElementById('lpn_shp_file');
+		if (shpInput) {
+			shpInput.addEventListener('change', function () {
+				var fs = Array.prototype.slice.call(shpInput.files);
+				shpInput.value = '';
+				if (fs.length) { importShapefileFromFiles(fs); }
+			});
+		}
 		var surveyInput = document.getElementById('lpn_survey_file');
 		if (!surveyInput) { return; }
 		surveyInput.addEventListener('change', function () {
@@ -47061,7 +48112,7 @@ var EngCalcs = EngCalcs || {};
 			snap.project = JSON.parse(JSON.stringify(project));
 			markEdited();
 			pushUndoSnapshot(snap);
-			doc = { nodes: [], links: [], labels: [], customers: [], origin: { x: 0, y: 0 } };
+			doc = { nodes: [], links: [], labels: [], customers: [], shapes: [], origin: { x: 0, y: 0 } };
 			nextId = newNextId();
 			// Empties the PROJECT, so the container resets with the network: scenarios back to Base alone,
 			// since their overrides key element IDs that no longer exist. Preferences survive.
@@ -47128,6 +48179,9 @@ var EngCalcs = EngCalcs || {};
 		// the least of the things on the map, so where one overlaps a main or a junction the main or
 		// the junction shows and takes the press -- a mouse's precedence is nothing but paint order.
 		// The selection grip stays in labelsLayer, on top, because it is the thing in the hand.
+		// **SHAPES PAINT UNDER EVERYTHING ELSE IN THE MODEL** (Task 779): they are annotation, and
+		// where one crosses a main the main shows.
+		shapesLayer = el('g', { 'class': 'lpn-shapes' }, modelLayer);
 		customersLayer = el('g', { 'class': 'lpn-customers' }, modelLayer);
 		linksLayer = el('g', { 'class': 'lpn-symbols' }, modelLayer);
 		// **A PUMP OR VALVE SYMBOL PAINTS OVER EVERY PIPE AND UNDER EVERY NODE, AND IT NEEDS ITS OWN
@@ -47168,6 +48222,8 @@ var EngCalcs = EngCalcs || {};
 		// they are one drawing in progress, not two things, and giving them a second appearance
 		// would read as an object that already exists.
 		pendingPathEl = el('polyline', { 'class': 'lpn-rubberband', style: 'display:none' }, world);
+		// The Shape being drawn (Task 779), in the same layer as the pipe's band.
+		shapeDraftEl = el('g', { 'class': 'lpn-shape-draftg', style: 'display:none' }, world);
 		// The object-snap glyph and name (Task 782): above the drawing, under the debug boxes.
 		snapMarkEl = el('g', { 'class': 'lpn-snap-mark', style: 'display:none' }, world);
 		// Above everything, and EMPTY unless ?debug=boxes is on the URL -- see drawCollisionBoxes().
@@ -47627,8 +48683,8 @@ var EngCalcs = EngCalcs || {};
 
 		// **THE EDIT GROUP SITS LEFT OF THE INSERT GROUP SO THE STRIP READS IN KEYBOARD ORDER**
 		// (Tom, 2026-09-08: "Toolbar buttons should be in keyboard order, which means to break up
-		// the Edit group or move it all left of the Insert group."). LPN_TOOL_KEYS binds 1 Select,
-		// 2 Junction ... 9 Text, and every keyed button except Select was already in ascending
+		// the Edit group or move it all left of the Insert group."). LPN_TOOL_KEYS binds 0 Select,
+		// 1 Chain, 2 Junction ... 9 Text, and every keyed button except Select was already in ascending
 		// order; Select alone sat eighth, because the all-keyed Insert group came first. Of his two
 		// remedies this is the one that keeps the editing cluster intact, and it also puts the
 		// resting-state tool leftmost after the file commands. The cost of getting this wrong is a
@@ -47665,7 +48721,7 @@ var EngCalcs = EngCalcs || {};
 		// The button SHOWS the shape it will draw, so the strip always states which of the three is
 		// current -- otherwise the only way to find out is to drag and see what happens.
 		function paintAreaButton() {
-			setIconLabel(areaBtn, 'select-' + selectAreaShape, areaShapeLabel(), pc.lpn_tool_area_tip);
+			setIconLabel(areaBtn, 'select-' + selectAreaShape, areaShapeLabel(), toolTipWithKey('select-area', pc.lpn_tool_area_tip));
 			// ASSIGNED, not appended: setIconLabel() adds `ec-help` to whatever is already there, so
 			// `+=` on a button repainted on every shape change grew the class list without bound.
 			if (areaBtn.className.indexOf('lpn-tool-more') < 0) { areaBtn.className += ' lpn-tool-more'; }
@@ -47693,9 +48749,10 @@ var EngCalcs = EngCalcs || {};
 
 		var addGroup = group();
 		addGroup.dataset.edits = '1';
-		// Junction, Reservoir, Tank, Pipe, Pump, Valve, Meter, Text -- the same order as the Insert menu and
-		// the ID-prefix rows. See insertAssetRows() for why that order.
+		// Chain, Junction, Reservoir, Tank, Pipe, Pump, Valve, Meter, Text -- the same order as the Insert menu
+		// and keys 1 to 9 (the ID-prefix rows have no Chain, and otherwise follow it). See insertAssetRows() for why that order.
 		[
+			{ mode: 'add-chain', key: 'lpn_tool_add_chain', icon: 'chain', tip: pc.lpn_tool_add_chain_tip },
 			{ mode: 'add-junction', key: 'lpn_tool_add_junction', icon: 'junction' },
 			{ mode: 'add-reservoir', key: 'lpn_tool_add_reservoir', icon: 'reservoir' },
 			{ mode: 'add-tank', key: 'lpn_tool_add_tank', icon: 'tank' },
@@ -47704,7 +48761,7 @@ var EngCalcs = EngCalcs || {};
 			{ mode: 'add-valve', key: 'lpn_tool_add_valve', icon: 'valve' },
 			{ mode: 'add-meter', key: 'lpn_tool_add_meter', icon: 'customer', tip: pc.lpn_tool_add_meter_tip },
 			{ mode: 'add-text', key: 'lpn_tool_add_text', icon: 'text' },
-			{ mode: 'add-chain', key: 'lpn_tool_add_chain', icon: 'chain', tip: pc.lpn_tool_add_chain_tip }
+			{ mode: 'add-shape', key: 'lpn_tool_add_shape', icon: 'shape', tip: pc.lpn_tool_add_shape_tip }
 		].forEach(function (t) { modeButton(t, addGroup); });
 
 		var viewGroup = group();
@@ -48023,6 +49080,7 @@ var EngCalcs = EngCalcs || {};
 		svg.addEventListener('pointermove', function (e) {
 			if (e.pointerType === 'touch' || drag) { return; }
 			showSnapMark(toolSnapAt(e));
+			shapeToolHover(e);
 		});
 		svg.addEventListener('pointerleave', function (e) {
 			if (e.pointerType !== 'touch' && !drag) { hideSnapMark(); }
@@ -48044,7 +49102,8 @@ var EngCalcs = EngCalcs || {};
 				hoverPreviewRaf = null;
 				if (mode !== 'select' || drag || !hoverPreviewAt) { return; }
 				hoverCard.nx = hoverPreviewAt.x; hoverCard.ny = hoverPreviewAt.y;
-				setHoverPreview(hoverTargetFromHit(mapHitAt(hoverPreviewAt.x, hoverPreviewAt.y)));
+				setHoverPreview(hoverTargetFromHit(shapeHitOver(hoverPreviewAt.x, hoverPreviewAt.y,
+					mapHitAt(hoverPreviewAt.x, hoverPreviewAt.y), POINTER_REACH_PX)));
 			});
 		});
 		// Leaving the canvas (or the window, or losing capture) is the one case a pointermove never
@@ -48197,11 +49256,16 @@ var EngCalcs = EngCalcs || {};
 			if (e.pointerType === 'touch') {
 				t = touchNodeOver(e.clientX, e.clientY, t);
 			}
+			// A Shape is found by distance, under every asset; a selected Shape's grip over them all.
+			t = shapeHitOver(e.clientX, e.clientY, t, reachPx(e));
 			// **SHIFT ADDS, AND ADDS BY TOGGLING** (Task 266). It is how a marquee that caught one
 			// thing too many is corrected, and how a selection of three unrelated pipes is built at
 			// all -- neither of which any ring can do.
 			if (e.shiftKey) { toggleFromHit(t); } else { selectFromHit(t); }
-			if (t.dataset.node) {
+			if (t.dataset.shape !== undefined || t.dataset.shapept !== undefined) {
+				// A Shape moves whole; its grip moves one point (Task 779).
+				drag = shapeDragStart(t, e, common) || Object.assign({ type: 'pan', tx0: state.tx, ty0: state.ty }, common);
+			} else if (t.dataset.node) {
 				var n = nodeById(t.dataset.node), w0 = screenToWorld(e.clientX, e.clientY);
 				drag = { type: 'node', id: t.dataset.node,
 					offX: nodeDrawX(n) - w0.x, offY: nodeDrawY(n) - w0.y };
@@ -48388,6 +49452,9 @@ var EngCalcs = EngCalcs || {};
 			// double-click on this map -- while the chooser is running, a double-click is the end of
 			// the route and never a vertex, a label reset or a vertex removal.
 			if (profileDrawEnd() || profileTookDblclick()) { return; }
+			// In the Shape tool a double-click is its two presses, the second of which finished the
+			// Shape (shapeToolTap()); it means nothing else there (Task 779).
+			if (mode === 'add-shape') { return; }
 			// **A POLYGON RING CLOSES ON A DOUBLE-CLICK**, which is the same ending the profile's
 			// own path chooser uses and the one every drawing program uses for a polyline. It runs
 			// before any of the meanings below, exactly as the profile's does: while a ring is being
@@ -48720,6 +49787,9 @@ var EngCalcs = EngCalcs || {};
 			else if (mode === 'add-chain') {
 				chainTap(e, w, t);
 			}
+			else if (mode === 'add-shape') {
+				shapeToolTap(e, w, snapHit);
+			}
 			else if (mode === 'add-pipe' || mode === 'add-pump' || mode === 'add-valve') {
 				// Same snap: elementFromPoint requires landing exactly on the node's small hit
 				// area, which a real tap on a real screen routinely misses by a few pixels -- that
@@ -48763,8 +49833,9 @@ var EngCalcs = EngCalcs || {};
 					// state until a second NODE arrives, so no undo snapshot is owed and an
 					// abandoned drawing leaves nothing behind.
 					// A bend magnets to another pipe's vertex (Task 782), carrying its characters.
-					var bend = snapHit && snapHit.kind === 'vertex' ? { x: snapHit.x, y: snapHit.y } : { x: w.x, y: w.y };
-					if (snapHit && snapHit.kind === 'vertex') { copySnapProvenance(snapHit, bend); }
+					var bendSnap = snapHit && (snapHit.kind === 'vertex' || snapHit.kind === 'shape'),
+						bend = bendSnap ? { x: snapHit.x, y: snapHit.y } : { x: w.x, y: w.y };
+					if (bendSnap) { copySnapProvenance(snapHit, bend); }
 					pendingLinkVerts.push(bend);
 					drawPendingPath();
 				}
@@ -48795,7 +49866,11 @@ var EngCalcs = EngCalcs || {};
 				// deleteElement() owns the snapshot for the two real elements: inside a scenario the
 				// gesture is an `active` override rather than a deletion, and in Base it may have to
 				// ask first -- neither of which a snapshot taken out here could know about.
-				if (t.dataset.node) { deleteElement('node', t.dataset.node); }
+				t = shapeHitOver(e.clientX, e.clientY, t, reachPx(e));
+				if (t.dataset.shape !== undefined || t.dataset.shapept !== undefined) {
+					deleteElement('shape', t.dataset.shape !== undefined ? t.dataset.shape : t.dataset.shapept);
+				}
+				else if (t.dataset.node) { deleteElement('node', t.dataset.node); }
 				// No saveUndoSnapshot() here any more -- removeVertex() takes its own, so this would
 			// push a second identical snapshot and cost the user a dead press of Undo.
 			else if (t.classList.contains('lpn-vhandle')) { removeVertex(t.dataset.link, +t.dataset.vidx); }
@@ -49078,6 +50153,8 @@ var EngCalcs = EngCalcs || {};
 			setPanning(true);
 			state.tx = drag.tx0 + (p.x - drag.startX); state.ty = drag.ty0 + (p.y - drag.startY);
 			setTransform();
+		} else if (drag.type === 'shape' || drag.type === 'shapept') {
+			shapeApplyDrag(p);
 		} else if (drag.type === 'node') {
 			snapshotDragOnce();
 			var w = screenToWorld(p.x, p.y), n = nodeById(drag.id);
@@ -60318,7 +61395,8 @@ var EngCalcs = EngCalcs || {};
 		if (group !== 'link') { out = out.concat(doc.nodes.map(function (x) { return x.id; })); }
 		if (group !== 'node') { out = out.concat(doc.links.map(function (x) { return x.id; })); }
 		return out.concat(doc.labels.map(function (x) { return x.id; }))
-			.concat((doc.customers || []).map(function (x) { return x.id; }));
+			.concat((doc.customers || []).map(function (x) { return x.id; }))
+			.concat((doc.shapes || []).map(function (x) { return x.id; }));
 	}
 	function validateNewId(newId, oldId, group) {
 		var pc = EngCalcs.pageConfig || {};
@@ -62139,12 +63217,14 @@ var EngCalcs = EngCalcs || {};
 		selectedRefs().forEach(function (s) {
 			var el = s.kind === 'node' ? nodeById(s.id)
 					: (s.kind === 'link' ? linkById(s.id)
-					: (s.kind === 'customer' ? customerById(s.id) : labelById(s.id))),
+					: (s.kind === 'customer' ? customerById(s.id)
+					: (s.kind === 'shape' ? shapeById(s.id) : labelById(s.id)))),
 				// A Text object carries no `type`; its table is keyed 'text'. Never undefined --
 				// that was Tom's *"9 undefined assets selected"* (2026-09-08).
 				// A Text and a meter both carry no `type`; their tables are keyed 'text' and
 				// 'customer'. Never undefined -- that was Tom's *"9 undefined assets selected"*.
 				ty = s.kind === 'label' ? 'text' : s.kind === 'customer' ? 'customer'
+					: s.kind === 'shape' ? String((EngCalcs.pageConfig || {}).lpn_tool_add_shape || 'Shape')
 					: (el && el.type) || s.kind;
 			if (!el) { return; }
 			if (!byType[ty]) { byType[ty] = []; }
@@ -62284,6 +63364,8 @@ var EngCalcs = EngCalcs || {};
 			if (sel.kind === 'node') { openPopup(sel.id); }
 			else if (sel.kind === 'link') { openLinkPopup(sel.id); }
 			else if (sel.kind === 'customer') { openCustomerPopup(sel.id); }
+			// A Shape has no properties box (Task 779): its points are edited on the map.
+			else if (sel.kind === 'shape') { return false; }
 			else { openLabelPopup(sel.id); }
 			return true;
 		}
@@ -62327,6 +63409,8 @@ var EngCalcs = EngCalcs || {};
 				(l.verts || []).forEach(take);
 			} else if (s.kind === 'customer') {
 				if (customerById(s.id)) { take(customerPoint(customerById(s.id))); }
+			} else if (s.kind === 'shape') {
+				if (shapeById(s.id)) { shapeById(s.id).pts.forEach(take); }
 			} else if (labelById(s.id)) { take(textLabelPoint(labelById(s.id))); }
 		});
 		return box;
@@ -63049,8 +64133,16 @@ var EngCalcs = EngCalcs || {};
 		stack.push(snap);
 		if (stack.length > UNDO_LIMIT) { stack.shift(); }
 	}
+	// **ONE GESTURE, ONE UNDO STEP** (Perry's review of Task 779): while a group is open, only its
+	// first snapshot is pushed, so a Delete of a mixed selection (a Shape, a junction, a pipe) comes
+	// back with one Ctrl+Z. See deleteSelection().
+	var undoGroup = null;
 	function saveUndoSnapshot() {
 		markEdited(); // one seam, because every real mutation snapshots before it changes anything
+		if (undoGroup) {
+			if (undoGroup.taken) { return; }
+			undoGroup.taken = true;
+		}
 		pushUndoSnapshot(makeUndoSnapshot());
 	}
 	// Switching projects drops the undo history (Task 146.08). The stack holds snapshots of the
@@ -63285,11 +64377,13 @@ var EngCalcs = EngCalcs || {};
 	 * user is unaffected and nothing new is created, drawn or stored.
 	 */
 	var LPN_TOOL_KEYS = {
-		'1': 'select', '2': 'add-junction', '3': 'add-reservoir', '4': 'add-tank',
-		'5': 'add-pipe', '6': 'add-pump', '7': 'add-valve', '8': 'add-meter', '9': 'add-text',
-		// Junction and Pipe (Task 719) is the tenth tool, so its key is the tenth digit: the key
-		// IS the position, as the nine above are.
-		'0': 'add-chain'
+		// **0 IS SELECT, 1 IS THE CHAIN, AND THE REST FOLLOW THE INSERT GROUP** (Tom, 2026-10-12: "Chain
+		// command is last, far from the junction command, and with a shortcut key separated from the
+		// junction command ... '0' seems like an appropriate mnemonic, if any, for Select ... 0 Select,
+		// all the other edit buttons, 1 Chain, 2 Junction, etc"). The Insert group runs in key order,
+		// Chain first.
+		'0': 'select', '1': 'add-chain', '2': 'add-junction', '3': 'add-reservoir', '4': 'add-tank',
+		'5': 'add-pipe', '6': 'add-pump', '7': 'add-valve', '8': 'add-meter', '9': 'add-text'
 	};
 	document.addEventListener('keydown', function (e) {
 		if (e.ctrlKey || e.metaKey || e.altKey) { return; }
@@ -63298,6 +64392,20 @@ var EngCalcs = EngCalcs || {};
 		if (!m) { return; }
 		if (e.preventDefault) { e.preventDefault(); }
 		setMode(m);
+	});
+
+	// **A IS AREA SELECT** (Tom, 2026-10-13, with W as the pattern, and F for Shape beside it): a named
+	// key, shown in the tip through LPN_TOOL_ALT_KEYS. Wired as W is: no modifier (Ctrl+A stays the
+	// table's select-all), never while typing, by character and by physical key, and an open menu keeps
+	// the letters for its mnemonics. It does what the toolbar button does: enter the tool with the shape
+	// it is showing, and cycle window, lasso, polygon when pressed again.
+	document.addEventListener('keydown', function (e) {
+		if (e.ctrlKey || e.metaKey || e.altKey || e.defaultPrevented) { return; }
+		if (isTextEntry(e.target)) { return; }
+		if (e.key !== 'a' && e.key !== 'A' && e.code !== 'KeyA') { return; }
+		if (openMenuAnchor) { return; }
+		if (e.preventDefault) { e.preventDefault(); }
+		setSelectAreaShape(mode === 'select-area' ? selectAreaShapeNext() : selectAreaShape);
 	});
 
 	// **W IS ZOOM WINDOW** (Tom, 2026-10-07). Free of every other plain key on this page (the digits,
@@ -63313,6 +64421,17 @@ var EngCalcs = EngCalcs || {};
 		if (openMenuAnchor) { return; }
 		if (e.preventDefault) { e.preventDefault(); }
 		enterZoomWindow();
+	});
+
+	// **F IS THE SHAPE TOOL** (Tom, 2026-10-12): F for Figure, its synonym (Tom, 2026-10-13). Wired exactly as W is above: no modifier, never while
+	// typing, by character and by physical key, and an open menu keeps the letters for its mnemonics.
+	document.addEventListener('keydown', function (e) {
+		if (e.ctrlKey || e.metaKey || e.altKey || e.defaultPrevented) { return; }
+		if (isTextEntry(e.target)) { return; }
+		if (e.key !== 'f' && e.key !== 'F' && e.code !== 'KeyF') { return; }
+		if (openMenuAnchor) { return; }
+		if (e.preventDefault) { e.preventDefault(); }
+		setMode('add-shape');
 	});
 
 	/**

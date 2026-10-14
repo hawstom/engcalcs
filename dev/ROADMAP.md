@@ -86,6 +86,7 @@ the block.
   Tom, 2026-10-11 browser pass: an open, almost-closed polygon icon; a Shapes table to paste and copy shapes
   (import/export), then shapefile and DXF import; *"the main presenting use case ... is to import shapes from GIS
   or CAD to guide precise placement or map supplementation."*
+  Notes: `dev/shapes.md`.
 - 100|781| **Active topology first; then Change type becomes a new asset in the old one's place.**
   Tom, 2026-10-08, choosing "Active topology first": *"I never wanted what we have anyway. Now that
   I understand, I want it changed. Change type is to be make a new object at the location of the old
