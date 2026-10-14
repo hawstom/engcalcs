@@ -1684,15 +1684,23 @@ $ec_lang['lpn_menu_project']='Water';
 // one exception, and it is exempt because it is a position in a run rather than a command.
 $ec_lang['lpn_menu_project_tip']='Everything specific to water network modeling (except the animation play controls)';
 $ec_lang['lpn_tables_menu']='Tables';
-// Water > Change type (Tom, 2026-10-05: *"It would be nice to provide a tool under Water or Tables
+// Water > Morph (Task 781; Tom, 2026-10-14: *"I like the term 'Morph' (Transform) for this feature"*;
+// first built as Change type, Tom, 2026-10-05: *"It would be nice to provide a tool under Water or Tables
 // to Change node type for any asset, where if it has information that can't be ported to the new
 // type, we alert and ask."*). The fly-out reuses lpn_tool_add_junction/_reservoir/_tank. The box it
 // asks in lists one line per value lost: {id} is the asset's ID, {property} a field label the
 // popup already uses, {value} the number or name with its unit, {scenario} a scenario's name.
 // dev/asset-type.md.
-$ec_lang['lpn_change_type_menu']='Change type';
-$ec_lang['lpn_change_type_tip']='Change the selected nodes into junctions, reservoirs, or tanks, or the selected links into pipes, pumps, or valves. Each keeps its ID, its place, its connections, and every value the new type also has. If anything would be lost, you are asked first.';
-$ec_lang['lpn_change_type_ok']='Change';
+$ec_lang['lpn_morph_menu']='Morph';
+$ec_lang['lpn_morph_tip']='Change the selected nodes into junctions, reservoirs, or tanks, or the selected links into pipes, pumps, or valves. Each keeps its ID, its location, its connections, and every value the new type also has. In Base the asset itself is changed, and you are asked first if any value would be lost. In any other scenario the new type is an override in that scenario only, and the values only the new type has start from Settings > New assets.';
+$ec_lang['lpn_morph_ok']='Morph';
+// {ids} lists the selected assets of the other kind (nodes when a link type was chosen, and links
+// when a node type was chosen), separated by commas.
+$ec_lang['lpn_morph_other_kind']='A node can be morphed only into another type of node, and a link only into another type of link. Not morphed: {ids}';
+// The Properties row shown where a scenario morphs the asset (Task 781): the type it is in this
+// scenario, beside the override marker.
+$ec_lang['lpn_field_type']='Type';
+$ec_lang['lpn_field_type_tip']='The type of this asset in this scenario. Morph made it an override here; clear the override to give the asset the type of the parent scenario again.';
 $ec_lang['lpn_change_type_lost']='These values will be lost:';
 // The key to the lines under it (Tom, 2026-10-06: *"Provide a key for the loss report. 'ID: Lost entry'."*).
 $ec_lang['lpn_change_type_key']='Each line: ID: the property and value that would be lost';
@@ -1710,7 +1718,6 @@ $ec_lang['lpn_change_type_no_curve']='{id}: No pump head curve, so the pump adds
 $ec_lang['lpn_change_type_becomes']='{id}: {property} {value}, in scenario {scenario}, becomes {new}';
 $ec_lang['lpn_change_type_customers']='Only a pipe serves customers, so these customers are connected instead to the node shown in parentheses, where their demand is already applied. They stay where they are drawn, and their demand is unchanged:';
 $ec_lang['lpn_change_type_setting']='These controls and rules give or test the setting of a link being changed. A setting is a different quantity on a pipe, a pump, and a valve, so these will read it differently:';
-$ec_lang['lpn_change_type_base_only']='Change type works in Base. A scenario can switch assets on and off in Active topology instead.';
 $ec_lang['lpn_change_type_rules']='These rule lines name a link by its kind, and will name its new kind instead:';
 $ec_lang['lpn_tables_menu_tip']='View and edit assets in tables in bottom panel.';
 // The Run row's own tip, NOT lpn_time_run_tip: this row exists partly to answer "where is my Run

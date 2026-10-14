@@ -4292,6 +4292,13 @@ var EngCalcs = EngCalcs || {};
 	// dev/scripts/scenario_seam_check.php PARSES this literal and refuses an unmarked write to any
 	// name in it. writeDemandRows() is the one door and ownDemandRows() the one read.
 	var LPN_DEMANDS_STORAGE = { demandPattern: true, demandCategory: true, extraDemands: true };
+	// **AN ASSET'S TYPE, AND A MORPHED VALVE'S OWN TYPE, MAY BE A SCENARIO'S OVERRIDE** (Morph, Task
+	// 781; Tom, 2026-10-14: *"I would like to create a scenario called 'Tank at J1' and change the J1
+	// junction to a tank in that scenario without having to delete and reconstitute the pipes
+	// connecting to it."*). Not in LPN_OVERRIDABLE: the type is not a field any editor offers, and
+	// every reader asks the element, which morphViewSync() lays out as the scenario sees it.
+	// isOverridable() answers for them, and both live in Active topology (LPN_ALT_CATEGORY_OF).
+	var LPN_MORPH_PROP = { type: true, valveType: true };
 
 	// The one resolver seam. Solver, renderer, labels and popups read element properties through
 	// this, so adding scenarios changes only what this function finds, not its callers.
@@ -4333,6 +4340,8 @@ var EngCalcs = EngCalcs || {};
 		// fresh copy of the effective rows, never the stored array, so no reader can edit an
 		// override by holding what it was handed.
 		if (prop === 'demands') { return ownDemandRows(el); }
+		// **THE TYPE IS READ OFF THE ELEMENT, AS LAID OUT FOR THE SCENARIO SHOWING** (morphViewSync()).
+		if (LPN_MORPH_PROP[prop]) { return el[prop]; }
 		var ov = resolvedOverrides(activeScenario())[ovKey(el)], tid, t;
 		// Row 0's base IS the breakdown's first row once the scenario owns the whole list.
 		if (prop === 'demand' && ov && Array.isArray(ov.demands) && ov.demands.length) { return ov.demands[0].base; }
@@ -4724,6 +4733,7 @@ var EngCalcs = EngCalcs || {};
 	function isOverridable(el, prop) {
 		var d = customPropDefs().length ? customPropDefByKey(prop) : null;
 		if (d) { return customPropApplies(d, el); }
+		if (LPN_MORPH_PROP[prop]) { return elGroup(el) === 'link' || (elGroup(el) === 'node' && prop === 'type'); }
 		return !!(LPN_OVERRIDABLE[elGroup(el)] || {})[prop];
 	}
 	function inBaseScenario() { return !!activeScenario().isBase; }
@@ -4743,6 +4753,7 @@ var EngCalcs = EngCalcs || {};
 			return prop === 'y' ? outwardY(el.y) : outwardX(el.x);
 		}
 		if (prop === 'active' && el['_' + prop] === undefined) { return true; }
+		if (LPN_MORPH_PROP[prop]) { return morphBaseOf(el, prop); }
 		if (LPN_BARE_PROP[prop]) { return el[prop]; }
 		return el['_' + prop];
 	}
@@ -4761,6 +4772,8 @@ var EngCalcs = EngCalcs || {};
 		// the call site, so every future blank-capable field is covered without anyone remembering.
 		scn.overrides[key][prop] = (value === undefined) ? null : value;
 		touchTreeKey('setOverride', layerId, holderMap, key);
+		// A morph lays the asset out afresh (morphViewCheck()), so the view must see the write.
+		if (LPN_MORPH_PROP[prop]) { touchTree('setOverride'); }
 	}
 	function clearOverride(el, prop) {
 		var scn = activeScenario(), key = ovKey(el), t = writeTargetFor(scn, categoryOf(prop, elGroup(el))),
@@ -4772,6 +4785,7 @@ var EngCalcs = EngCalcs || {};
 		if (!Object.keys(ov).length) { delete map[key]; }
 		if (t && t.kind === 'alt' && !Object.keys(map).length) { delete t.obj.values; }
 		touchTreeKey('clearOverride', (t && t.kind === 'alt' ? 'alt' : 'scn') + '\u0000' + (t ? t.obj.id : scn.id), map, key);
+		if (LPN_MORPH_PROP[prop]) { touchTree('clearOverride'); }
 	}
 	// THE ONE WRITE SEAM every property editor goes through. In Base it writes the element (which
 	// IS the propagation -- there is no push upward in the delta model); in a scenario it records
@@ -4796,6 +4810,9 @@ var EngCalcs = EngCalcs || {};
 			writeDemandRows(el, dr);
 			return;
 		}
+		// **A MORPH IN A SCENARIO IS AN OVERRIDE OF THE TYPE** (Task 781): see morphInScenario(). In
+		// Base the type is the element's own, and Morph there goes through applyNodeTypeChange().
+		if (LPN_MORPH_PROP[prop] && inBaseScenario()) { el[prop] = value; return; }   // base-write: setProp() in Base, the one door
 		if (!inBaseScenario() && isOverridable(el, prop)) { setOverride(el, prop, value); return; }
 		// A Text's x or y arrives outward, as a node's does, and Base keeps it in the drawing frame.
 		if (LPN_COORD_PROP[prop] && elGroup(el) === 'label') { el[prop] = textCoordIn(el, prop, value); return; }   // base-write: setProp() in Base, the one door
@@ -4905,7 +4922,7 @@ var EngCalcs = EngCalcs || {};
 	var LPN_ALT_CATEGORY_OF = {
 		node: { x: 'physical', y: 'physical', emitter: 'physical', head: 'physical',
 			demand: 'demand', demands: 'demand',
-			active: 'topology',
+			active: 'topology', type: 'topology',
 			level: 'initial',
 			initQuality: 'constituent', tankCoeff: 'constituent', sourceType: 'constituent',
 			sourceQuality: 'constituent', sourcePattern: 'constituent',
@@ -4919,7 +4936,7 @@ var EngCalcs = EngCalcs || {};
 			mixingModel: 'constituent', mixingFraction: 'constituent' },
 		link: { diameter: 'physical', roughness: 'physical', k: 'physical', length: 'physical',
 			typeId: 'physical', fittingsId: 'physical', curveId: 'physical', efficCurveId: 'physical',
-			active: 'topology',
+			active: 'topology', type: 'topology', valveType: 'topology',
 			status: 'initial', setting: 'initial',
 			bulkCoeff: 'constituent', wallCoeff: 'constituent',
 			energyPrice: 'energy', energyPattern: 'energy',
@@ -5356,36 +5373,6 @@ var EngCalcs = EngCalcs || {};
 	 * that is not there, or not of that category, goes (it inherits again). Empty lists and maps go.
 	 * A calculation set's options are cleaned exactly as a scenario's are.
 	 */
-	// **A TYPE OVERRIDE IS NO LONGER READ** (Task 781). For one day (2026-10-07/08) this branch could
-	// store an asset's type per scenario: `type` in a scenario's override map, beside fields such as
-	// `minLevel` or `valveType` stored under their own names. Change type in a scenario now makes a
-	// new asset instead, and nothing reads those keys. A file written that day opens with them
-	// removed, so the asset is Base's type in that scenario again; it was never public, and turning
-	// it into new assets would mint IDs the file never had. Only maps naming a `type` are touched.
-	var LPN_RETIRED_TYPE_KEYS = ['type', 'minLevel', 'maxLevel', 'tankDiameter', 'volCurve', 'mixingModel', 'mixingFraction',
-		'headPattern', 'demandPattern', 'demandCategory', 'extraDemands', 'demandItemized', 'valveType', 'lenAuto', 'speed', 'speedPattern'];
-	function dropTypeOverrides() {
-		eachOverrideMap(function (map) {
-			Object.keys(map).forEach(function (key) {
-				var ov = map[key];
-				var g = ovKeyGroup(key), id = String(key).slice(ovKeyFor(g, '').length),
-					el = g === 'node' ? nodeById(id) : g === 'link' ? linkById(id) : null;
-				if (!plainObject(ov) || typeof ov.type !== 'string') { return; }
-				LPN_RETIRED_TYPE_KEYS.forEach(function (k) { delete ov[k]; });
-				// And the values only that type had (a tank's water depth on what Base has as a junction).
-				if (el && g === 'node') {
-					typeOwnedNodeSpecs().forEach(function (spec) {
-						if (!spec.custom && spec.types.indexOf(el.type) < 0) { spec.props.forEach(function (name) { delete ov[name]; }); }
-					});
-				} else if (el) {
-					typeOwnedLinkSpecs(el).forEach(function (spec) {
-						if (!spec.custom && !spec.has(linkTypeDesc(el))) { spec.props.forEach(function (name) { delete ov[name]; }); }
-					});
-				}
-				if (!Object.keys(ov).length) { delete map[key]; }
-			});
-		}, null, true);
-	}
 	function sanitizeScenarioTree() {
 		['alternatives', 'calcSets'].forEach(function (k) {
 			var seen = {}, list = doc[k];
@@ -14404,6 +14391,8 @@ var EngCalcs = EngCalcs || {};
 	var labelPassDeferred = false;
 	function buildDom() {
 		var i;
+		// The elements laid out as the scenario showing sees them (Morph) before any is drawn.
+		morphViewSync();
 		linksLayer.innerHTML = ''; nodesLayer.innerHTML = ''; labelsLayer.innerHTML = '';
 		// **THE SYMBOL LAYER IS THE FOURTH ONE AND IT WAS NOT BEING EMPTIED** (Tom, 2026-09-12:
 		// *"I drew two junctions and a pump on a blank Project1 map. Then I closed the project
@@ -27589,6 +27578,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (spec.group === 'label') { return (doc.labels || []).slice(); }
 		if (spec.group === 'customer') { return (doc.customers || []).slice(); }
 		if (spec.group === 'shape') { return docShapesRead().slice(); }
+		// **WITH SHOW SCENARIOS, AN ASSET IS IN EVERY TABLE OF A TYPE IT IS IN SOME SCENARIO** (Morph):
+		// junction J1, a tank in Tank at J1, has its Base row in Junctions and that scenario's in Tanks.
+		if (spec.scnRows && morphView.any) {
+			var shown = scenariosForDisplay();
+			return pool.filter(function (x) { return shown.some(function (sc) { return morphTypeIn(x, sc) === spec.type; }); });
+		}
 		return pool.filter(function (x) { return x.type === spec.type; });
 	}
 	// **THE ONE PLACE A ROW'S MEMBERSHIP IS DECIDED**, and so the one place an edit is noticed.
@@ -28391,9 +28386,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var was = project.activeScenario, todo;
 		if (!scn || scn.id === was) { return fn(); }
 		project.activeScenario = scn.id;
+		morphViewFollow();
 		paneScnSwapDepth++;
 		try { return fn(); } finally {
 			project.activeScenario = was;
+			morphViewFollow();
 			if (--paneScnSwapDepth === 0 && paneScnSwapPending.length) {
 				todo = paneScnSwapPending; paneScnSwapPending = [];
 				todo.forEach(function (f) { f(); });
@@ -28434,6 +28431,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				if (spec.scnCurOnly && sc.id !== activeScenario().id) { return; }
 				// An asset not in this scenario's network has no row of this scenario's.
 				if (topo && !liveInScenario(el, sc)) { return; }
+				// **A ROW ONLY WHERE THE ASSET IS THIS TABLE'S TYPE** (Morph).
+				if (morphView.any && spec.type && morphTypeIn(el, sc) !== spec.type) { return; }
 				row = { id: paneScnRowKey(el.id, sc.id), _lpnScn: { el: el, scn: sc, info: info } };
 				if (spec.scnOvOnly && !paneScnRowHoldsOverride(spec, row)) { return; }
 				list.push(row);
@@ -37517,12 +37516,15 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function applyNodeTypeChange(n, to) {
 		var from = n.type, key = ovKey(n), birth = nodeBirthFields(to), k,
 			carry = waterSurfaceCarry(n, to), depths = [];
+		morphPinBase(n, to);
 		typeOwnedNodeSpecs().forEach(function (spec) {
 			if (!changeTypeDrops(spec, from, to)) { return; }
 			spec.keys.forEach(function (sk) {
 				delete n[sk];   // base-write: the type is Base-owned, so what only the old type had goes from Base
 				if (n.tok) { delete n.tok[sk]; }
 			});
+			// A scenario that morphs the node into a type having this value still reads it.
+			if (morphKeepsSpec(n, spec)) { return; }
 			eachElementOverride(key, function (ov, owner, map) {
 				spec.props.forEach(function (p) { delete ov[p]; });
 				if (!Object.keys(ov).length) { delete map[key]; }
@@ -37820,12 +37822,14 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			t = pipeTypeById(l._typeId);
 			if (pipeTypeStates(t, 'diameter')) { l._diameter = t.props.diameter; }   // base-write: the type is Base-owned, and Base's inherited diameter is carried onto the element
 		}
+		morphPinBase(l, to);
 		typeOwnedLinkSpecs(l).forEach(function (spec) {
 			if (!linkChangeDrops(spec, from, dest)) { return; }
 			spec.keys.forEach(function (sk) {
 				delete l[sk];   // base-write: the type is Base-owned, so what only the old type had goes from Base
 				if (l.tok) { delete l.tok[sk]; }
 			});
+			if (morphKeepsSpec(l, spec)) { return; }
 			eachElementOverride(key, function (ov, owner, map) {
 				spec.props.forEach(function (p) { delete ov[p]; });
 				if (!Object.keys(ov).length) { delete map[key]; }
@@ -37861,13 +37865,20 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	 * the document exactly as it was, because nothing has been written before the answer.
 	 */
 	function changeSelectedType(to) {
-		var isNode = LPN_NODE_TYPES.indexOf(to) >= 0, isLink = LPN_LINK_TYPES.indexOf(to) >= 0;
+		var pc = EngCalcs.pageConfig || {}, isNode = LPN_NODE_TYPES.indexOf(to) >= 0, isLink = LPN_LINK_TYPES.indexOf(to) >= 0, other;
 		if (!isNode && !isLink) { return; }
+		// **A NODE MORPHS ONLY INTO A NODE, AND A LINK ONLY INTO A LINK**: a node has no ends and a
+		// link has no place of its own, so the rest of the selection is left as it is, and said.
+		other = selectedRefs().filter(function (r) { return r.kind === (isNode ? 'link' : 'node'); }).map(function (r) { return r.id; });
+		if (other.length) {
+			setNotice(String(pc.lpn_morph_other_kind || 'A node morphs only into another kind of node, and a link only into another kind of link. Not morphed: {ids}')
+				.replace('{ids}', function () { return other.slice(0, 20).join(', ') + (other.length > 20 ? ', ...' : ''); }));
+		}
 		if (!changeTypeTargets(to).length) { return; }
-		// **CHANGE TYPE WORKS IN BASE ONLY**, in place, keeping the ID. Bentley Morph, epanet-js and
-		// DC Water's Change Node Class all change a type as a plain edit, never per scenario; a
-		// scenario switches assets on and off in Active topology instead (Tom, 2026-10-10).
-		if (!inBaseScenario()) { setNotice((EngCalcs.pageConfig || {}).lpn_change_type_base_only || 'Change type works in Base. A scenario can switch assets on and off in Active topology instead.'); return; }
+		// **IN BASE, IN PLACE; IN ANY OTHER SCENARIO, AN OVERRIDE OF THE TYPE** (Tom, 2026-10-14,
+		// reversing the Base-only rule of 2026-10-10: *"changing element type never creates an
+		// override. I think we need to change that."*).
+		if (!inBaseScenario()) { morphInScenario(to); return; }
 		changeSelectedTypeIn(to);
 	}
 	// Every selected asset of the right kind that is not already `to` in the scenario showing.
@@ -37967,8 +37978,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			text.push([pc.lpn_change_type_rules || 'These rule lines name a link by its kind, and will name its new kind instead:']
 				.concat(capped(rules)).join('\n'));
 		}
-		askDialog({ kind: 'confirm', title: pc.lpn_change_type_menu || 'Change type',
-			ok: pc.lpn_change_type_ok || 'Change', text: text.join('\n\n') }, function (yes) {
+		askDialog({ kind: 'confirm', title: pc.lpn_morph_menu || 'Change type',
+			ok: pc.lpn_morph_ok || 'Change', text: text.join('\n\n') }, function (yes) {
 			if (yes) { proceed(); }
 		});
 	}
@@ -37992,6 +38003,364 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		return LPN_NODE_TYPES.map(function (t) { return row(t, nodes); })
 			.concat([{ separator: true }])
 			.concat(LPN_LINK_TYPES.map(function (t) { return row(t, links); }));
+	}
+	// ---- MORPH IN A SCENARIO: AN ASSET'S TYPE AS AN OVERRIDE (Task 781) ----------------------------
+	//
+	// Tom, 2026-10-14: *"I would like to create a scenario called 'Tank at J1' and change the J1
+	// junction to a tank in that scenario without having to delete and reconstitute the pipes
+	// connecting to it."* dev/scenario-alternatives.md, "Morph".
+	//
+	// **THE OVERRIDE.** `type` (and, for a link morphed into a valve, `valveType`) in the scenario's
+	// override of the asset, in the Active topology category: which assets the scenario's network is
+	// made of. Every value the new type needs is an ordinary override of its own property, in that
+	// property's own category (a tank's diameter in Physical, its water depth in Initial settings),
+	// born from Settings > New assets. Base is untouched; the ID, the place and every connected link
+	// stay; a child scenario inherits the morph as it inherits any Active topology value.
+	//
+	// **EVERY READER ASKS THE ELEMENT, AND THE ELEMENT ANSWERS FOR THE SCENARIO SHOWING.** Several
+	// hundred lines read `n.type` off the element: the symbol, the tables, Properties, Find, the
+	// labels, both solvers' model and the .inp writer. Rather than route each through a resolver
+	// (and miss one), morphViewSync() lays the elements out as the open scenario sees them -- its
+	// type, and New assets values in any field of the new type that neither Base nor an override
+	// states -- and withBaseTypes() lays them back as Base around everything that writes the
+	// document down: the file, the autosave, the undo snapshot. The same objects are edited in place,
+	// so a reference held across either keeps working. Every value a user edits on a laid-out asset
+	// goes through setProp() into the scenario's override, so nothing laid out is ever written back.
+	var morphView = { doc: null, scenarios: null, scn: null, epoch: -1, list: [], byEl: new Map(), any: false, sig: '' };
+	function morphSpecsOf(el) { return elGroup(el) === 'link' ? typeOwnedLinkSpecs(el) : typeOwnedNodeSpecs(); }
+	function morphDesc(el, type, valveType) {
+		if (elGroup(el) !== 'link') { return { type: type }; }
+		return { type: type, valveType: type === 'valve' ? String(valveType || CHANGE_TYPE_NEW_VALVE).toUpperCase() : null };
+	}
+	function morphSpecHas(spec, desc) { return spec.has ? spec.has(desc) : spec.types.indexOf(desc.type) >= 0; }
+	// The property a stored key is overridden by: `_level` is `level`, `minLevel` is itself.
+	function morphKeyProp(spec, k) {
+		if (k.charAt(0) === '_' && spec.props.indexOf(k.slice(1)) >= 0) { return k.slice(1); }
+		return spec.props.indexOf(k) >= 0 ? k : null;
+	}
+	function morphTypeValid(el, t) { return (elGroup(el) === 'link' ? LPN_LINK_TYPES : LPN_NODE_TYPES).indexOf(t) >= 0; }
+	function morphElementByKey(key) {
+		var g = ovKeyGroup(key), id = String(key).slice(ovKeyFor(g, '').length), el;
+		if (g === 'node') { el = nodeById(id); } else if (g === 'link') { el = linkById(id); } else { return null; }
+		return (el && ovKey(el) === key) ? el : null;
+	}
+	// Base's own value of `type` or `valveType`, whether or not the element is laid out.
+	function morphBaseOf(el, prop) {
+		var e = el ? morphView.byEl.get(el) : null;
+		if (!e) { return el ? el[prop] : undefined; }
+		return prop === 'type' ? e.type : (e.hadVT ? e.vt : undefined);
+	}
+	// The type an asset is in a scenario: its override there (its own or inherited), else Base's.
+	function morphTypeIn(el, scn) {
+		var ov = (!scn || scn.isBase) ? null : resolvedOverrides(scn)[ovKey(el)];
+		if (ov && typeof ov.type === 'string' && morphTypeValid(el, ov.type)) { return ov.type; }
+		return morphBaseOf(el, 'type');
+	}
+	// Is this asset another type in the scenario showing than it is in Base?
+	function morphedHere(el) { return !!el && morphView.byEl.has(el); }
+	function morphOverridesExist() {
+		var any = false;
+		eachOverrideMap(function (map) {
+			if (any) { return; }
+			Object.keys(map).forEach(function (k) { if (plainObject(map[k]) && typeof map[k].type === 'string') { any = true; } });
+		}, null, true);
+		return any;
+	}
+	function morphMaterialize(el, ov) {
+		var isLink = elGroup(el) === 'link', e = { el: el, type: el.type, hadVT: Object.prototype.hasOwnProperty.call(el, 'valveType'), vt: el.valveType, filled: {} },
+			view = morphDesc(el, ov.type, ov.valveType !== undefined && ov.valveType !== null ? ov.valveType : (el.type === 'valve' ? el.valveType : undefined)),
+			birth, k;
+		el.type = ov.type;   // base-write: laid out for the scenario showing, laid back by morphUnmaterialize() before anything is written down
+		if (isLink) {
+			if (view.type === 'valve') { el.valveType = view.valveType; }   // base-write: laid out, as the type is
+		}
+		// A field of the new type that Base never had and no override states reads as a newly drawn
+		// one of that type would, so the asset is whole whatever alternative the scenario names.
+		birth = isLink ? linkBirthFields(ov.type, el) : nodeBirthFields(ov.type);
+		morphSpecsOf(el).forEach(function (spec) {
+			if (spec.custom || !morphSpecHas(spec, view)) { return; }
+			spec.keys.forEach(function (sk) {
+				if (sk === 'valveType' || el[sk] !== undefined || birth[sk] === undefined) { return; }
+				el[sk] = birth[sk];   // base-write: a laid-out default, removed again by morphUnmaterialize()
+				e.filled[sk] = birth[sk];
+			});
+		});
+		if (!isLink && ov.type !== 'reservoir' && el.elev === undefined && !Object.prototype.hasOwnProperty.call(e.filled, 'elev')) {
+			k = (scnSetting('defaults') || {}).nodeElev;
+			if (k !== undefined) { el.elev = k; e.filled.elev = k; }   // base-write: a laid-out default, removed again by morphUnmaterialize()
+		}
+		return e;
+	}
+	function morphUnmaterialize(e) {
+		var el = e.el;
+		Object.keys(e.filled).forEach(function (k) { if (el[k] === e.filled[k]) { delete el[k]; } });   // base-write: laying Base back
+		el.type = e.type;   // base-write: laying Base back
+		if (elGroup(el) === 'link') {
+			if (e.hadVT) { el.valveType = e.vt; } else { delete el.valveType; }   // base-write: laying Base back
+		}
+	}
+	// **A CONTROL CARRIES WHAT ITS NUMBERS MEASURE, READ FROM THE TYPES** (libAnnotateControl()): a
+	// valve's setting unit, a node's pressure or level. Read again for every control naming an asset
+	// laid out or laid back, so a scenario's run converts by the scenario's type and Base's by Base's.
+	function morphAnnotateControls(list) {
+		var nodes = {}, links = {};
+		if (!list.length) { return; }
+		list.forEach(function (e) { (elGroup(e.el) === 'link' ? links : nodes)[e.el.id] = true; });
+		libControlsRead().forEach(function (c) {
+			if (c && (links[c.link] || (c.condition && c.condition.kind === 'node' && nodes[c.condition.node]))) { libAnnotateControl(c); }
+		});
+	}
+	function morphUnapply() {
+		var list = morphView.list, sameDoc = morphView.doc === doc;
+		morphView.list = [];
+		morphView.byEl = new Map();
+		// A document swapped whole (an undo, an open) came in as Base; the old objects are gone.
+		if (!sameDoc) { return; }
+		list.forEach(function (e) {
+			var live = elGroup(e.el) === 'link' ? linkById(e.el.id) : nodeById(e.el.id);
+			if (live === e.el) { morphUnmaterialize(e); }
+		});
+		morphAnnotateControls(list);
+	}
+	function morphApply() {
+		var scn = activeScenario(), R, key, el, ov, e, sig = [];
+		morphView.doc = doc; morphView.scenarios = scenarios; morphView.scn = project.activeScenario; morphView.epoch = treeEpoch;
+		if (!scn || scn.isBase || !morphView.any) { morphView.sig = ''; return; }
+		morphKeysOf(scn).forEach(function (pair) {
+			key = pair[0]; ov = pair[1];
+			el = morphElementByKey(key);
+			if (!el || !morphTypeValid(el, ov.type) || morphView.byEl.has(el)) { return; }
+			// The same type Base has (a valve keeping Base's valve type) lays nothing out.
+			if (ov.type === el.type && !(el.type === 'valve' && typeof ov.valveType === 'string' && ov.valveType.toUpperCase() !== String(el.valveType || 'TCV').toUpperCase())) { return; }
+			e = morphMaterialize(el, ov);
+			morphView.list.push(e);
+			morphView.byEl.set(el, e);
+			sig.push(key + '=' + el.type + (el.type === 'valve' ? '/' + el.valveType : ''));
+		});
+		morphView.sig = sig.join('|');
+		morphAnnotateControls(morphView.list);
+	}
+	// The overrides stating a type in one scenario, as [key, override] pairs, kept per scenario until
+	// the tree moves: a table read in another scenario lays the elements out once per cell.
+	var morphKeysCache = { epoch: -1, doc: null, scenarios: null, by: {} };
+	function morphKeysOf(scn) {
+		var c = morphKeysCache, R, out = [];
+		if (c.epoch !== treeEpoch || c.doc !== doc || c.scenarios !== scenarios) {
+			c = morphKeysCache = { epoch: treeEpoch, doc: doc, scenarios: scenarios, by: {} };
+		}
+		if (c.by[scn.id]) { return c.by[scn.id]; }
+		R = resolvedOverrides(scn);
+		Object.keys(R).forEach(function (key) {
+			if (plainObject(R[key]) && typeof R[key].type === 'string') { out.push([key, R[key]]); }
+		});
+		c.by[scn.id] = out;
+		return out;
+	}
+	/** **LAY THE ELEMENTS OUT FOR THE SCENARIO SHOWING**, Base's first put back. buildDom() calls it. */
+	function morphViewSync() {
+		morphUnapply();
+		morphView.any = morphOverridesExist();
+		morphApply();
+	}
+	// The cheap form, for a temporary swap of the scenario showing: nothing at all in a project where
+	// no scenario morphs anything.
+	function morphViewFollow() {
+		if (!morphView.any && !morphView.list.length) { return; }
+		morphUnapply();
+		morphApply();
+	}
+	/**
+	 * **IS THE LAYOUT STILL THE SCENARIO SHOWING?** Asked by the solve: a tree edit (an alternative
+	 * picked in the Scenarios table, one deleted) moves the epoch, and a whole document swapped in
+	 * moves `doc`. Lays the elements out again when anything moved, and redraws the map when what
+	 * is laid out changed. Answers whether it did.
+	 */
+	function morphViewCheck() {
+		var was;
+		if (morphView.doc === doc && morphView.scenarios === scenarios && morphView.scn === project.activeScenario && morphView.epoch === treeEpoch) { return false; }
+		was = morphView.sig;
+		morphViewSync();
+		if (morphView.sig === was) { return false; }
+		if (!paneScnSwapDepth && typeof setTimeout === 'function') { setTimeout(function () { buildDom(); refreshPaneIfOpen(); refreshPopupIfOpen(); }, 0); }
+		return true;
+	}
+	/** Run `fn` with every element as Base has it, and lay them out again after. */
+	function withBaseTypes(fn) {
+		if (!morphView.list.length) { return fn(); }
+		morphUnapply();
+		try { return fn(); } finally { morphApply(); }
+	}
+	// A tank and a reservoir are both a water surface, and in a scenario too the surface stays where
+	// the scenario has it (waterSurfaceCarry() is Base's half). Read in the scenario's own terms.
+	function morphSurfaceCarry(el, to) {
+		var e = effective(el, 'elev'), from = el.type, h;
+		// An imported reservoir states a head and no ground (Task 390): the ground it is given is the
+		// typed default, as in Base (waterSurfaceCarry()).
+		if (e === undefined && !elevSourceIsDem()) { e = (scnSetting('defaults') || {}).nodeElev; }
+		if (elGroup(el) === 'link' || typeof e !== 'number') { return null; }
+		if (from === 'tank' && to === 'reservoir') {
+			h = effective(el, 'bottomElev');
+			return { prop: 'level', newProp: 'head', value: (typeof h === 'number' && isFinite(h) ? h : e) + (effective(el, 'level') || 0) };
+		}
+		if (from === 'reservoir' && to === 'tank') {
+			h = effective(el, 'head');
+			if (h === undefined || h === null || h === '') { return { prop: 'head', newProp: 'level', value: 0 }; }
+			return h >= e ? { prop: 'head', newProp: 'level', value: h - e } : null;
+		}
+		return null;
+	}
+	/**
+	 * **ONE ASSET MORPHED IN SCENARIO `scn`**, read as the scenario sees it. Back to the type it
+	 * inherits, the override goes; any other type is written as the override, with every value the
+	 * new type has and the old one did not born from Settings > New assets where nothing (Base or an
+	 * override) states it already, and a water surface carried between a tank and a reservoir.
+	 * Values both types have are the same properties, so they carry by themselves; values only the
+	 * old type had stay where they are, unread, and come back if the asset is morphed back.
+	 */
+	function morphOne(el, to, scn) {
+		var isLink = elGroup(el) === 'link', key = ovKey(el), from = isLink ? linkTypeDesc(el) : { type: el.type },
+			dest = isLink ? morphDesc(el, to, CHANGE_TYPE_NEW_VALVE) : { type: to },
+			carry = morphSurfaceCarry(el, to), birth = isLink ? linkBirthFields(to, el) : nodeBirthFields(to),
+			rawBase = {}, held = {}, inherited;
+		// What Base itself holds for each field, read with Base laid back, and what the scenario holds.
+		withBaseTypes(function () {
+			morphSpecsOf(el).forEach(function (spec) { spec.keys.forEach(function (k) { rawBase[k] = el[k]; }); });
+			rawBase.baseElev = el.elev;
+		});
+		held = resolvedOverrides(scn)[key] || {};
+		clearOverride(el, 'type');
+		clearOverride(el, 'valveType');
+		inherited = morphTypeIn(el, scn);
+		if (to === inherited) { return; }
+		setOverride(el, 'type', to);
+		// A valve is born a throttle (TCV), as one drawn or changed in Base is.
+		if (isLink && to === 'valve') { setOverride(el, 'valveType', CHANGE_TYPE_NEW_VALVE); }
+		morphSpecsOf(el).forEach(function (spec) {
+			if (spec.custom || !morphSpecHas(spec, dest) || morphSpecHas(spec, from)) { return; }
+			spec.keys.forEach(function (k) {
+				var p = morphKeyProp(spec, k);
+				if (!p || birth[k] === undefined || !isOverridable(el, p)) { return; }
+				if (Object.prototype.hasOwnProperty.call(held, p) || rawBase[k] !== undefined) { return; }
+				setOverride(el, p, birth[k]);
+			});
+		});
+		if (!isLink && to !== 'reservoir' && rawBase.baseElev === undefined && !Object.prototype.hasOwnProperty.call(held, 'elev') &&
+				(scnSetting('defaults') || {}).nodeElev !== undefined) {
+			setOverride(el, 'elev', (scnSetting('defaults') || {}).nodeElev);
+		}
+		if (carry) {
+			setOverride(el, carry.newProp, carry.value);
+			// A tank may not start above its own highest water depth (EPANET refuses it).
+			if (to === 'tank') {
+				var top = Object.prototype.hasOwnProperty.call(held, 'maxLevel') ? held.maxLevel
+					: (rawBase.maxLevel !== undefined ? rawBase.maxLevel : birth.maxLevel);
+				if (!(typeof top === 'number' && top >= carry.value)) { setOverride(el, 'maxLevel', carry.value); }
+			}
+		}
+	}
+	/**
+	 * **THE COMMAND IN A SCENARIO.** Every selected asset of the right kind becomes `to` in this
+	 * scenario only. Asks first, in the page's own box, only where a control or rule tests or sets
+	 * the asset and would read it differently as the new type; nothing is written before the answer.
+	 * One undo step for the whole selection.
+	 */
+	function morphInScenario(to) {
+		var pc = EngCalcs.pageConfig || {}, isNode = LPN_NODE_TYPES.indexOf(to) >= 0, targets = changeTypeTargets(to),
+			scn = activeScenario(), meaning = [], text = [], MAX = 20;
+		if (!targets.length) { return; }
+		targets.forEach(function (el) {
+			meaning = meaning.concat(isNode ? nodeTypeChangeReport(el, to).meaning : linkTypeChangeReport(el, to).meaning);
+		});
+		function proceed() {
+			saveUndoSnapshot();
+			targets.forEach(function (el) {
+				if ((isNode ? nodeById(el.id) : linkById(el.id)) === el) { morphOne(el, to, scn); }
+			});
+			touchTree('morphInScenario');
+			buildDom();
+			refreshScenarioMarks();
+			refreshScenarioStatus();
+			refreshPaneIfOpen();
+			refreshPopupIfOpen();
+			scheduleSolve();
+			scheduleSave();
+		}
+		if (!meaning.length) { proceed(); return; }
+		if (meaning.length > MAX) {
+			meaning = meaning.slice(0, MAX).concat([String(pc.lpn_change_type_more || 'And {n} more.').replace('{n}', String(meaning.length - MAX))]);
+		}
+		text.push([isNode
+			? (pc.lpn_change_type_meaning || 'These controls and rules test a node being changed, and will read it differently: a junction is tested by its pressure, and a tank or reservoir by its water level.')
+			: (pc.lpn_change_type_setting || 'These controls and rules give or test the setting of a link being changed. A setting is a different quantity on a pipe, a pump, and a valve, so these will read it differently:')]
+			.concat(meaning).join('\n'));
+		askDialog({ kind: 'confirm', title: pc.lpn_morph_menu || 'Morph', ok: pc.lpn_morph_ok || 'Morph', text: text.join('\n\n') }, function (yes) {
+			if (yes) { proceed(); }
+		});
+	}
+	/**
+	 * **A BASE MORPH NEVER TAKES AWAY WHAT A MORPHED SCENARIO STILL READS.** Base dropping a value
+	 * only its old type had (a junction's demand, as Base becomes a tank) would leave a scenario
+	 * that keeps the asset a junction with no demand. So before Base lets go, every scenario where the
+	 * asset is morphed into a type that has the value, and that states none of its own, is given
+	 * Base's as an override; and the overrides of those values are kept, not stripped.
+	 */
+	function morphKeepsSpec(el, spec) {
+		var types = {};
+		eachOverrideMap(function (map) {
+			var ov = map[ovKey(el)];
+			if (plainObject(ov) && typeof ov.type === 'string' && morphTypeValid(el, ov.type)) { types[ov.type + '/' + (ov.valveType || '')] = ov; }
+		}, null, true);
+		return Object.keys(types).some(function (k) {
+			var ov = types[k];
+			return morphSpecHas(spec, morphDesc(el, ov.type, ov.valveType || (el.type === 'valve' ? el.valveType : undefined)));
+		});
+	}
+	function morphPinBase(el, to) {
+		var isLink = elGroup(el) === 'link', from = isLink ? linkTypeDesc(el) : { type: el.type },
+			dest = isLink ? linkTargetDesc(to, el) : { type: to }, wrote = false;
+		if (!morphOverridesExist()) { return; }
+		scenarios.forEach(function (s) {
+			var t, desc, R, ov;
+			if (s.isBase) { return; }
+			R = resolvedOverrides(s);
+			ov = R[ovKey(el)];
+			if (!plainObject(ov) || typeof ov.type !== 'string' || !morphTypeValid(el, ov.type)) { return; }
+			t = ov.type;
+			desc = morphDesc(el, t, ov.valveType || (el.type === 'valve' ? el.valveType : undefined));
+			morphSpecsOf(el).forEach(function (spec) {
+				var props, p, v;
+				if (spec.custom || !morphSpecHas(spec, desc) || !morphSpecHas(spec, from) || morphSpecHas(spec, dest)) { return; }
+				props = spec.props.indexOf('demands') >= 0 ? ['demands'] : spec.props;
+				p = props[0];
+				if (!p || spec.props.some(function (q) { return Object.prototype.hasOwnProperty.call(ov, q); })) { return; }
+				v = p === 'demands' ? ownDemandRows(el) : baseValue(el, p);
+				if (v === undefined) { return; }
+				var m = ownWriteMap(s, categoryOf(p, elGroup(el)));
+				if (!m) { return; }
+				if (!plainObject(m[ovKey(el)])) { m[ovKey(el)] = {}; }
+				m[ovKey(el)][p] = altCopy(v);
+				wrote = true;
+			});
+		});
+		if (wrote) { touchTree('morphPinBase'); }
+	}
+	// **THE TYPE ROW IN PROPERTIES, WHERE A SCENARIO MORPHS THE ASSET** (or a scenario below Base's
+	// does): the type it is here, with the override marker, whose dot clears the morph so the asset
+	// takes its type from its parent again.
+	function morphTypeRow(fields, el) {
+		var pc = EngCalcs.pageConfig || {}, names, here;
+		if (!el || scenarios.length < 2) { return; }
+		if (!morphedHere(el) && !(!inBaseScenario() && hasOverride(el, 'type')) && !childOverrideHolders(el, ['type']).length) { return; }
+		names = { junction: pc.lpn_tool_add_junction || 'Junction', reservoir: pc.lpn_tool_add_reservoir || 'Reservoir', tank: pc.lpn_tool_add_tank || 'Tank',
+			pipe: pc.lpn_tool_add_pipe || 'Pipe', pump: pc.lpn_tool_add_pump || 'Pump', valve: pc.lpn_tool_add_valve || 'Valve' };
+		here = names[el.type] || el.type;
+		readonlyField(fields, pc.lpn_field_type || 'Type', here, pc.lpn_field_type_tip);
+		ovmGutter(fields, {
+			el: el, props: ['type'], on: !inBaseScenario() && hasOverride(el, 'type'), cats: ['topology'],
+			set: function () { setOverride(el, 'type', el.type); if (el.type === 'valve') { setOverride(el, 'valveType', el.valveType); } },
+			clear: function () { clearOverride(el, 'type'); clearOverride(el, 'valveType'); buildDom(); },
+			line: function () { return inheritedLine(function () { return names[el.type] || el.type; }); }
+		});
 	}
 	// ---- The examples gallery (ROADMAP Task 314) ---------------------------------------------
 	//
@@ -38842,7 +39211,18 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// dev/lpn-spike/file-naming-harness.js holds it against the config.
 	var LPN_FILE_APP = 'https://epanet-plus-plus.org/app/';
 	var LPN_TREE_KEYS = ['alternatives', 'calcSets'];
-	function serializeProject() {
+	// **BASE'S TYPES, ALWAYS, UNLESS `asSeen`** (Morph): a file, an autosave and the dirty signature
+	// are the document, never a scenario's view of it. Only the .inp export, which writes the
+	// scenario showing (inpExportDocument()), asks for the view, and nothing keeps that one.
+	function serializeProject(asSeen) {
+		if (!asSeen && morphView.list.length) {
+			return withBaseTypes(function () {
+				var o = serializeProject(true);
+				o.nodes = JSON.parse(JSON.stringify(o.nodes));
+				o.links = JSON.parse(JSON.stringify(o.links));
+				return o;
+			});
+		}
 		var out = {
 			format: LPN_FILE_FORMAT, app: LPN_FILE_APP,
 			v: openDocVersion, project: project, scenarios: scenarios,
@@ -40060,7 +40440,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// verbatim; a scenario's own tree keys already do, on the scenario object.
 		LPN_TREE_KEYS.forEach(function (k) { if (saved[k] !== undefined) { doc[k] = saved[k]; } else { delete doc[k]; } });
 		sanitizeScenarioTree();
-		dropTypeOverrides();
 		touchTree('applySaved');
 		// Task 510's saved paths, taken VERBATIM. An id naming a node this document does not have
 		// is the user's data and is reported where it is used, never pruned here -- see
@@ -40939,7 +41318,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// it always was, character for character. [TIMES] goes by inpExportOptions().times instead,
 	// beside the run time and time step that were there first.
 	function inpExportDocument() {
-		var snap = serializeProject(), block = scenarioSettingsBlock(activeScenario()), out;
+		var snap = serializeProject(true), block = scenarioSettingsBlock(activeScenario()), out;
 		if (!block || (!plainObject(block.settings) && block.defaultPattern === undefined)) { return snap; }
 		out = Object.assign({}, snap);
 		if (plainObject(block.settings)) { out.settings = settingOverlay(snap.settings, block.settings, ['settings']); }
@@ -50999,8 +51378,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// and no letter anybody has learned moves.
 			{ separator: true },
 			{
-				icon: 'retype', label: pc.lpn_change_type_menu || 'Change type',
-				tip: pc.lpn_change_type_tip,
+				icon: 'retype', label: pc.lpn_morph_menu || 'Change type',
+				tip: pc.lpn_morph_tip,
 				submenu: changeTypeRows
 			}
 		];
@@ -66583,6 +66962,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// PNEZD, the surveying convention the trade already reads.
 		descField(fields, n);
 		tagField(fields, n);
+		morphTypeRow(fields, n);
 		if (n.type === 'tank') {
 			// SIX INPUTS AND THEIR COMPUTED ROWS, in the order a person builds a tank: the ground it
 			// stands on, where its base sits, how much water is in it right now, how far it can go
@@ -67689,6 +68069,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// order.
 		descField(fields, l);
 		tagField(fields, l);
+		morphTypeRow(fields, l);
 		if (l.type === 'valve') {
 			renderValveFields(fields, l, linkId);
 		} else if (l.type === 'pump') {
@@ -67841,6 +68222,16 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		], vt, function (v) {
 			if (v === vt) { return; }
 			saveUndoSnapshot();
+			// **A VALVE MORPHED IN THIS SCENARIO HAS ITS VALVE TYPE HERE** (Task 781): the type is the
+			// scenario's override, so its valve type and setting are too, and Base keeps its own.
+			if (!inBaseScenario() && morphedHere(l)) {
+				setProp(l, 'valveType', v);
+				setProp(l, 'setting', defaultValveSetting(v));
+				buildDom();
+				refreshPopupIfOpen();
+				scheduleSolve();
+				return;
+			}
 			l.valveType = v;
 			// The moment an active type is chosen is the moment the 664 KB engine becomes necessary,
 			// and the moment the user is most likely to still be online. See warmEpanetEngine().
@@ -68834,7 +69225,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// must push it only if the user actually commits.
 	function makeUndoSnapshot() {
 		return {
-			state: JSON.parse(JSON.stringify({ doc: doc, scenarios: scenarios, active: project.activeScenario })),
+			state: withBaseTypes(function () { return JSON.parse(JSON.stringify({ doc: doc, scenarios: scenarios, active: project.activeScenario })); }),
 			// **THE BACKDROP IS SHALLOW-COPIED, AND THAT IS NOT A SHORTCUT.** Its `href` is a base64
 			// data URI -- 1.7 MB on Net2, 2.5 MB on Net3 -- so deep-cloning it into every one of
 			// twenty snapshots costs fifty megabytes to make a Move undoable. A shallow copy
@@ -69931,6 +70322,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// Connectivity): it must see the whole network, not the one the solver is handed.
 	function assembleModel(keepDisconnected) {
 		var live = {};
+		// The solve reads every type off the element, so the layout must be the scenario showing's.
+		morphViewCheck();
 		doc.nodes.forEach(function (n) { if (isActive(n)) { live[n.id] = true; } });
 		var nodes = doc.nodes.filter(isActive).map(function (n) {
 			if (n.type === 'tank') {
@@ -74857,6 +75250,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		try {
 			compareScenarios().forEach(function (s) {
 				project.activeScenario = s.id;
+				morphViewFollow();
 				// **AND THE OPTIONS IT RAN UNDER, read during the same swap** (Task 755): the
 				// multiplier and the clock are the scenario's own or the project's, and the report
 				// states them per row rather than leaving the reader to look each one up.
@@ -74867,6 +75261,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			});
 		} finally {
 			project.activeScenario = was;
+			morphViewFollow();
 		}
 		return out;
 	}

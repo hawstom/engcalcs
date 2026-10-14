@@ -5096,14 +5096,14 @@
                 "lpn_change_type_line_scenario",
                 "lpn_change_type_lost",
                 "lpn_change_type_meaning",
-                "lpn_change_type_menu",
+                "lpn_morph_menu",
                 "lpn_change_type_more",
                 "lpn_change_type_no_curve",
-                "lpn_change_type_ok",
+                "lpn_morph_ok",
                 "lpn_change_type_rules",
                 "lpn_change_type_setting",
                 "lpn_change_type_surface",
-                "lpn_change_type_tip",
+                "lpn_morph_tip",
                 "lpn_choice_default",
                 "lpn_contour_show",
                 "lpn_contour_show_tip",
@@ -5873,14 +5873,14 @@
         "lpn_change_type_line_scenario": "3559026c81cd937420b7b7b548ee578e445722a4",
         "lpn_change_type_lost": "a76cfd66aeab4bea0dc94ae39a81c6206ecfda26",
         "lpn_change_type_meaning": "3cd123d8868e65fa0d2cb61b5f49a00c547882aa",
-        "lpn_change_type_menu": "6e6f60c8b6ac90dba84303fb48273c30945c6d3f",
+        "lpn_morph_menu": "6e6f60c8b6ac90dba84303fb48273c30945c6d3f",
         "lpn_change_type_more": "285d6463c6b4074e1b78333ea6c9030e20ded99c",
         "lpn_change_type_no_curve": "7e3303867fcf193ac90dc1b762d4ab4796fe5aab",
-        "lpn_change_type_ok": "64fbd995d3b6b156ee26ae3c03e6516434c34c12",
+        "lpn_morph_ok": "64fbd995d3b6b156ee26ae3c03e6516434c34c12",
         "lpn_change_type_rules": "f4132fb760b7b663801f84a0bfff1312beac99ad",
         "lpn_change_type_setting": "3d2ec110036b2fd2cbfb9cbd2e08e18999f7de1a",
         "lpn_change_type_surface": "9de9cd1b4871b110727514dc9c0bd1a2dd5bc4c4",
-        "lpn_change_type_tip": "0e813b9287f30de292b8bfe93e9babb73e7043ec",
+        "lpn_morph_tip": "0e813b9287f30de292b8bfe93e9babb73e7043ec",
         "lpn_choice_default": "808d7dca8a74d84af27a2d6602c3d786de45fe1e",
         "lpn_close": "bbfa773e5a63a5ea58c9b6207e608ca0120e592a",
         "lpn_close_browser_confirm": "5ee2a3507d8a3187e2a46298c241be802090edbf",
@@ -9520,7 +9520,7 @@
             "words": 30,
             "ends_sentence": true
         },
-        "lpn_change_type_menu": {
+        "lpn_morph_menu": {
             "words": 2,
             "ends_sentence": false
         },
@@ -9532,7 +9532,7 @@
             "words": 24,
             "ends_sentence": false
         },
-        "lpn_change_type_ok": {
+        "lpn_morph_ok": {
             "words": 1,
             "ends_sentence": false
         },
@@ -9548,7 +9548,7 @@
             "words": 31,
             "ends_sentence": true
         },
-        "lpn_change_type_tip": {
+        "lpn_morph_tip": {
             "words": 43,
             "ends_sentence": true
         },
