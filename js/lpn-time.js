@@ -908,7 +908,7 @@
 		state.failed = null;
 		state.failedWhy = null;
 		state.wantedByUser = false;
-		host.status(strings().running);
+		host.status(strings().running, 'time-running');
 		if (shown) { boxStart(token); }
 		EC.lpnEpanetRun(model, {
 			onProgress: function (p) {
@@ -1187,7 +1187,7 @@
 		state.failed = 'engine';
 		state.failedWhy = why || 'offline';
 		host.apply(host.native(model));
-		host.status(noEngineText(state.t));
+		host.status(noEngineText(state.t), 'time-no-engine');
 		renderPanel();
 		return true;
 	}
@@ -1210,7 +1210,7 @@
 		host.status([
 			refusedText(run),
 			S.runFellBack.replace('{time}', EC.lpnTimeElapsedText(state.t))
-		].filter(function (t) { return !!t; }).join(' '));
+		].filter(function (t) { return !!t; }).join(' '), 'time-run-refused');
 		renderPanel();
 		return true;
 	}
@@ -1591,7 +1591,7 @@
 		// The status line keeps it until the next solve replaces it, which is what that line is
 		// for -- unlike the completion summary above, which is old news within the minute.
 		if (boxState.suppressed) {
-			if (host && host.status) { host.status(boxMessage(strings())); }
+			if (host && host.status) { host.status(boxMessage(strings()), 'time-done-kept'); }
 			return;
 		}
 		renderBox(true);

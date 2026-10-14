@@ -81,7 +81,7 @@ global.window.print = function () {
 
 const L = loadLoopedNetwork(
 	"\t\tgetDoc: function () { return doc; }, addNode: addNode, addLink: addLink, addText: addText,\n" +
-	"\t\taddCustomer: addCustomer,\n" +
+	"\t\taddCustomer: addCustomer, addShape: function (sh) { addShapeToDoc(sh); buildShapeEls(sh); return sh; },\n" +
 	"\t\tsetProp: setProp, wirePane: wirePane, openPane: openPane, setPaneTab: setPaneTab,\n" +
 	"\t\tpaneTables: paneTables,\n" +
 	// A solve RESULT, planted rather than computed: the sheet's job is to print what the page
@@ -140,6 +140,8 @@ L.addText(50, 50);   // the Text table (2026-09-08) prints too, so it needs one 
 // on j1 leaves j2, whose printed demand and elevation are the two values section 4 states, saying
 // exactly what was typed into it, and leaves the demand ORDER section 6 asserts unchanged.
 const m1 = L.addCustomer(10, 20, { link: p1.id, t: 0.1 });
+// A Shape (Task 779), so the Shapes table has a row to print.
+L.addShape({ id: 'S1', pts: [{ x: 0, y: 0 }, { x: 50, y: 10 }], closed: false });
 m1.account = '4417-A'; m1.demand = 3; m1.count = 4;
 // A result, planted rather than solved: the sheet's job is to print what the page holds, and a
 // solve here would only make the number harder to state.
@@ -176,8 +178,8 @@ console.log('\n--- one printer, seven tables ---');
 	// Eight since 2026-09-15: Customers (Task 247), which prints through the one printer exactly
 	// as the seven before it do, and is the assertion that says so.
 	// Nine since 2026-10-06: the Settings table prints through the same printer.
-	// Ten since 2026-10-09: the Scenarios table prints through it too.
-	report(TABLES.length === 10, 'there are ten tables to print', TABLES.join(','));
+	// Ten since 2026-10-09: the Scenarios table prints through it too. Eleven with Shapes (Task 779).
+	report(TABLES.length === 11, 'there are eleven tables to print', TABLES.join(','));
 	// No per-type print code. The cheap guard is that the per-type names never appear -- the same
 	// guard pane-harness.js keeps over the renderer, for the same reason.
 	report(!/function print(Junctions|Reservoirs|Tanks|Pipes|Pumps|Valves)\b/.test(src),

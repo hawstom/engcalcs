@@ -219,6 +219,7 @@ console.log('\n--- one place hides a panel, tips and all ---');
 		[/pendingPathEl\.style\.display = 'none'; return;/, 'the dashed line of a link being drawn (Task 567)'],
 		[/selectAreaEl\.style\.display = 'none'; return;/, 'the select-area marquee on the map (Task 266)'],
 		[/snapMarkEl\.style\.display = 'none';/, 'the object-snap glyph and name on the map (Task 782), drawing furniture with no control'],
+		[/shapeDraftEl\.style\.display = 'none'; return;/, 'the Shape being drawn on the map (Task 779), drawing furniture with no control'],
 		[/marker\.style\.display = 'none';/, 'the column-drag insertion marker (2026-09-26, fourth '
 			+ 'pass), declared with its reason beside NOT_A_PANEL_SHOW above'],
 		[/zoomWinEl\.style\.display = 'none'; return;/, 'the Zoom Window drag box on the map (Task 682), the same kind of shape as the select-area marquee above'],
@@ -312,6 +313,7 @@ const CONDITIONAL_DISPLAY = [
 	[/^georefRefreshBar$/, /^georefBarEl\('lpn_georef_\w+'\)$/, 'a control inside the georeference bar'],
 	[/^paintZoomWin$/, /^zoomWinEl$/, 'the Zoom Window drag box on the map'],
 	[/^showSnapMark$/, /^snapMarkEl$/, 'the object-snap glyph and name on the map (Task 782): shown while a tool or drag has caught a target'],
+	[/^paintShapeDraft$/, /^shapeDraftEl$/, 'the Shape being drawn on the map (Task 779): shown while the Shape tool has points down'],
 	[/^mapgeoShow$/, /^b$/, 'a control inside the map-geometry bar'],
 	[/^mapgeoRefreshBar$/, /^bar$/, 'the map-geometry bar: a fixed strip, not a draggable box'],
 	[/^setPendingLinkFrom$/, /^rubberBandEl$/, 'the rubber-band line of a link being drawn'],

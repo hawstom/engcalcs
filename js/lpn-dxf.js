@@ -52,8 +52,8 @@
 	// The ASSET CODE is FIXED per type, four characters, whatever the project's ID prefixes are.
 	// Tom, 2026-10-11: *"Let's change our layer name groups as follows: N___ to NODE, L___ to LINK,
 	// R___ to RESV, T___ to TANK, P___ to PUMP, V___ to VALV, S___ to SHAP"*. Customers were not
-	// named; CUST is our decision. A Shape's code is SHAP (the shape branch adds the type).
-	var ASSET_CODE = { junction: 'NODE', pipe: 'LINK', reservoir: 'RESV', tank: 'TANK', pump: 'PUMP', valve: 'VALV', customer: 'CUST' };
+	// named; CUST is our decision. A Shape's code is SHAP.
+	var ASSET_CODE = { junction: 'NODE', pipe: 'LINK', reservoir: 'RESV', tank: 'TANK', pump: 'PUMP', valve: 'VALV', customer: 'CUST', shape: 'SHAP' };
 	// Layer order and ACI colours (1-9 only, so every program shows the same colour). Never 5, blue,
 	// which is unreadable on a dark screen (Tom, 2026-10-07: choose among 1, 2, 3, 4, 6 and 7); the
 	// pipe is yellow (2) because cyan (4) is the junction's; the customer is white (7; Tom,
@@ -61,7 +61,10 @@
 	var TYPES = [
 		{ type: 'pipe', color: 2 }, { type: 'pump', color: 6 }, { type: 'valve', color: 1 },
 		{ type: 'junction', color: 4 }, { type: 'tank', color: 3 }, { type: 'reservoir', color: 3 },
-		{ type: 'customer', color: 7 }
+		{ type: 'customer', color: 7 },
+		// A Shape (Task 779) is magenta (6), the colour nearest its purple on the map. Pumps share it;
+		// the layer name tells the two apart.
+		{ type: 'shape', color: 6 }
 	];
 	// **THE READ-ME IS OUTSIDE THE MODEL PREFIX**, so an import of C-WATR-MODL-* never reads it as an
 	// asset. White (ACI 7; Tom: *"Make the README layer white."*) and not plotted.
@@ -242,6 +245,7 @@
 		(model.nodes || []).forEach(function (n) { grow(n.x, n.y); });
 		(model.links || []).forEach(function (l) { (l.pts || []).forEach(function (p) { grow(p.x, p.y); }); });
 		(model.customers || []).forEach(function (c) { grow(c.x, c.y); });
+		(model.shapes || []).forEach(function (sh) { (sh.pts || []).forEach(function (p) { grow(p.x, p.y); }); });
 		if (!isFinite(ext.x0)) { ext = { x0: 0, y0: 0, x1: 1, y1: 1 }; }
 		// The read-me's top-left corner sits above the top-left of the network, 3 units up and clear
 		// of its own height: a line of MTEXT is 5/3 of the text height from the next (the Reference's
@@ -258,7 +262,10 @@
 			'layerReadme'
 		].forEach(function (k) { H[k] = w.handle(); });
 		var hasCustomers = !!(model.customers || []).length;
-		var layerTypes = TYPES.filter(function (T) { return T.type !== 'customer' || hasCustomers; });
+		var hasShapes = !!(model.shapes || []).length;
+		var layerTypes = TYPES.filter(function (T) {
+			return (T.type !== 'customer' || hasCustomers) && (T.type !== 'shape' || hasShapes);
+		});
 		layerTypes.forEach(function (T) { H['layer:' + T.type] = w.handle(); });
 		Object.keys(BLOCK_OF).forEach(function (t) {
 			if (t === 'customer' && !hasCustomers) { return; }
@@ -273,9 +280,11 @@
 			body.g(0, type).g(5, h).g(330, owner || H.brModel).g(100, 'AcDbEntity').g(8, layer);
 			return h;
 		}
-		function lwpoly(pts, layer) {
+		// Group 70 is the polyline flag, and bit 1 is Closed (DXF Reference, LWPOLYLINE): a closed one
+		// joins its last vertex to its first, so the first is not written twice.
+		function lwpoly(pts, layer, closed) {
 			entity('LWPOLYLINE', layer);
-			body.g(100, 'AcDbPolyline').g(90, pts.length).g(70, 0);
+			body.g(100, 'AcDbPolyline').g(90, pts.length).g(70, closed ? 1 : 0);
 			pts.forEach(function (p) { body.g(10, num(p.x)).g(20, num(p.y)); });
 		}
 		// An attribute's place in the block, in block units: stacked to the right of the symbol,
@@ -440,6 +449,21 @@
 		(model.nodes || []).forEach(function (n) {
 			if (!BLOCK_OF[n.type]) { return; }
 			insert(n.type, n.x, n.y, 0, valuesOf(n.type, n.attrs), layerOf(n.type));
+		});
+		// **A SHAPE IS GEOMETRY AND NOTHING ELSE** (Task 779; Tom's specification: *"AutoCAD objects:
+		// polylines, points (nodes), and attributed block inserts only"*): one point is a POINT
+		// (DXF Reference, POINT: subclass AcDbPoint, location 10/20/30), more is an LWPOLYLINE, closed
+		// where the Shape is. No block and no attribute: a Shape carries no data to transfer.
+		(model.shapes || []).forEach(function (sh) {
+			var lay = layerOf('shape'), p;
+			if (!sh.pts || !sh.pts.length) { return; }
+			if (sh.pts.length === 1) {
+				p = sh.pts[0];
+				entity('POINT', lay);
+				body.g(100, 'AcDbPoint').g(10, num(p.x)).g(20, num(p.y)).g(30, '0.0');
+				return;
+			}
+			lwpoly(sh.pts, lay, !!sh.closed);
 		});
 		if (readme.length) { mtext(readme, readmeAt.x, readmeAt.y, README_LAYER); }
 		// ---- BLOCKS, built next for the same reason ----

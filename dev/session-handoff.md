@@ -103,37 +103,35 @@ lines rather than appending corrections.
 
 ### Master: see the pushed SHA in the last report. Production: b7c99102 (10-09) when last read; ask, About box
 
-Landed this session: feat/convert-search (his typed "Perfect. Merge."); fix/manual-name (the help book is the
-"User manual", his q08: name telegraphs chapters, index and search); Sue's scenario consistency review
-(dev/scenario-consistency-review-2026-10-12.md); Ida, Mary, Perry journals; Task 790 (override marker, Next).
+Landed 2026-10-13: feat/si-example (his "OK to merge"), fix/report-legend (legend follows the header
+production printed; production's log script lags master), fix/status-code (every setStatus has a code;
+status_code_check). Retired previews: si-example, graph-bubble (served from browser cache afterwards; say so).
 
-### Branches awaiting his browser pass (pushed; all on the Branch previews page)
+### Branches awaiting his word (pushed; all on the Branch previews page)
 
-- **feat/bentley-interop** (a190670f, 8116; Task 721; holds feat/match-property): every 10-12 note and his
-  interview calls q01-q07 built (quoted in dev/scenario-alternatives.md, "Tom's calls of 2026-10-12"). Perry
-  READY at 5bcc28f0; CC then fixed "Its 1 overrides" and made the misfit switch-off of Basic mode per project
-  (it had written the browser preference, so every later project opened with Basic off). Merge it with
-  match-property inside; feat/match-property itself is then deleted.
-- **feat/graph-bubble** (0a8d0297, 8110; Task 784): holds bentley-interop; per-bubble quantity chooser
-  (lpn_tsb_quantity). Merges after bentley-interop. One check_all flake: sw-precache-log-harness, passes alone.
-- **feat/tool-key** (4217cd92, 8109): 0 Select, 1 Chain before Junction, F Shape on feat/shape.
-- **feat/si-example** (6fb4f501, 8111; Task 786): Net2 on the OSM street map (his call), Elm Street "(US)",
-  Basic cards last, his customers he adds himself.
-- **feat/shape** (0b31a248, 8108; Task 779): DXF and shapefile import; Perry's two rounds fixed. A .shp with
-  no .prj in a lat/lon project offers "Import as EPSG:3857" (his QGIS file had no .prj; not hidden extensions).
+- **feat/bentley-interop** (df2b02cf, 8116; Task 721 + 790; holds feat/match-property AND feat/graph-bubble,
+  his "merge it into bentley-interop"): his help text in lpn_sm_help, his five OK'd strings, Copy properties
+  dialog, Task 790 dot + down triangle. Perry's defects (custom property lost in a scenario; Base gutter)
+  fixed in dc51ce4b. Deleted keys lpn_scenario_override(_tip). After merge delete match-property, graph-bubble.
+- **fix/si-rounding** (01db68fa, 8111): his 10-13 rounding rule, elevations included; harness checks the rule
+  exactly and prints head differences (0.96 m at 0 h, all from 50 mm diameters; he accepted it).
+- **feat/tool-key** (dd4bae8c, 8109): A area select, tip "Area select window/lasso/polygon."; F on feat/shape.
+  Conflicts with feat/shape at the toolbar; merge one, then master into the other.
+- **feat/shape** (6849809a, 8108; Task 779): his /tmp/shp.zip files: EPSG:2223 misnamed .prj asks to read
+  as 3857; 3857 reads without proj4. Fixtures dev/lpn-spike/fixtures/tom-test-*.
 
 ### Questions out to him
 
-- Override marker (Task 790): Ida's dot gutter or Mary's per-row checkbox.
-- Should the Basic-mode fit test count an alternative no scenario names? It does not now.
-- Should an imported Bentley file's second Base alternative hold full values, as Add base now makes?
-- q06 left unanswered; Text stays in the Text category. q07's "several models in one file" is his to raise.
+- His help says "Creating a new scenario creates no alternatives"; Add base and Copy scenario do. Meant?
+- Did he mean to drop the Example paragraph from the help?
+- Basic-off delete wording "These alternatives it uses stay..." acceptable? Hollow dots clutter?
+- Undo of an edit also returns to the scenario it was made in. Wanted?
+- Bentley import: answered "no direct import; a flattened .inp only". Awaiting what he wants next.
 
 ### Next job
 
-Merge on his typed word: bentley-interop (regenerate payloads on the branch, check_all, then all-clear pin),
-then graph-bubble; tool-key, si-example, shape each on his all-clear. Then a translation sprint: Task 788 plus
-every key those branches add (deferred until they land so it runs once).
+Merge on his typed word, each after master is merged in and check_all passes on the merge. Then a
+translation sprint (needs his explicit word): Task 788 plus every key these branches add.
 
 ### Traps met 2026-10-13 (sixteenth session)
 

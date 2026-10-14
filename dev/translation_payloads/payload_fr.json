@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "fr",
-        "expected_key_count": 2681,
-        "delta_key_count": 136,
+        "expected_key_count": 2752,
+        "delta_key_count": 207,
         "exempt_key_count": 58,
         "exempt_keys": [
             "u_depthFrac",
@@ -737,11 +737,19 @@
         ]
     },
     "keys_to_translate": {
+        "lpn_pane_tab_shapes": "Shapes",
+        "lpn_pane_shape_closed": "Closed",
+        "lpn_pane_shape_points": "Points",
         "lpn_customer_node_inactive": "This customer is assigned to a junction that is inactive in this scenario, so its demand is not part of the solve.",
+        "lpn_pane_paste_shape_no_points": "Row {row}: a new Shape needs its Points.",
+        "lpn_pane_paste_shape_bad_points": "Row {row}: {text} is not a list of points. Write each point as {pair}, with a point (.) as the decimal mark, and separate the points with |.",
+        "lpn_pane_paste_shape_closed_few": "Row {row}: a closed Shape needs at least three points.",
         "lpn_ex_net2_si_title": "EPANET Net2, L\/s (SI)",
         "lpn_ex_net2_si_desc": "Litres per second, with metres and millimetres. An EPANET example at Branford, Connecticut, converted from gallons per minute, feet and inches: 35 junctions and 1 tank, with no reservoir, no pump and no valves, about 2 km by 4 km. Fluoride, a non-reactive substance, enters at one source.",
         "lpn_ex_net3_si_title": "EPANET Net3, L\/s (SI)",
         "lpn_ex_net3_si_desc": "Litres per second, with metres and millimetres. An EPANET example at Novato, California, converted from gallons per minute, feet and inches, with the world map behind it: 92 junctions, 3 tanks and 2 reservoirs, no valves, about 8 km square. A 24-hour extended-period simulation, with a source trace from the Lake.",
+        "lpn_tool_add_shape": "Shape",
+        "lpn_tool_add_shape_tip": "Draw a point, a polyline, or a polygon on the map. A Shape is annotation and is not part of the network. Specify each point, then specify the last point again, press Enter, or right-click to finish. Specify the first point again to close the Shape into a polygon.",
         "lpn_pane_scn_ov_only": "Overrides only",
         "lpn_pane_scn_cur_only": "Current scenario only",
         "lpn_pane_inactive_show": "Include inactive topology",
@@ -773,9 +781,10 @@
         "lpn_paste_skip_valve": "Not pasted: {n} (the valve types differ).",
         "lpn_inp_export_flat_customers_inactive": "{n} of these customers are assigned to a junction that is inactive in this scenario, so their demand is not in the file.",
         "lpn_inp_export_flat_inactive_controls": "These controls and rules refer to an asset that is inactive in this scenario, so they are not in the file: {ids}",
+        "lpn_snap_shape_point": "{shape}, point {n}",
+        "lpn_mode_add_shape": "Mode: Add Shape. Specify each point. Specify the last point again or press Enter to finish; specify the first point to close a polygon.",
         "lpn_scenario_delete_ask": "Delete the scenario {name}? The drawing itself is not changed.",
-        "lpn_scenario_delete_goes": "Its {n} overrides are deleted with it.",
-        "lpn_scenario_delete_goes_one": "Its one override is deleted with it.",
+        "lpn_scenario_delete_goes": "Its overrides ({n}) are deleted with it.",
         "lpn_scenario_delete_stays": "These alternatives it uses stay in the project: {list}.",
         "lpn_scenario_delete_has_children": "The scenario {name} cannot be deleted while other scenarios inherit from it: {list}. Delete those first, or give them another parent.",
         "lpn_scenario_basic_misfit": "This project has scenarios and alternatives relationships that are not compatible with Scenarios Basic mode, so Basic mode is disabled.",
@@ -784,7 +793,7 @@
         "lpn_scenario_copy_off": "Copy scenario works in Basic mode. With Basic mode off, add a scenario and choose its alternatives in the Scenarios table.",
         "lpn_sm_title": "Scenario manager",
         "lpn_sm_menu": "Scenario manager…",
-        "lpn_sm_basic_off": "Basic mode is off, so the Scenario manager and the Scenarios table are shown.",
+        "lpn_sm_basic_on": "Scenario manager is disabled when Basic mode is on.",
         "lpn_pane_tab_scenarios": "Scenarios",
         "lpn_sm_col_parent": "Parent",
         "lpn_sm_add_child": "Add child",
@@ -800,9 +809,11 @@
         "lpn_sm_none_selected": "Select an item in the tree first.",
         "lpn_sm_base_named": "The Base of a tree is not renamed.",
         "lpn_sm_copy": "Copy",
-        "lpn_sm_help": "How scenarios and alternatives work:\\n\\nIn Basic mode, alternatives are hidden and automatic, and all new scenarios are children of the Base scenario.\\n\\nWith Basic mode off, a complex inheritance tree is available, and alternatives can be shared among scenarios. But the default behavior of edits when a new alternative association is needed (in the absence of proactive user management) is to create an alternative named like the current scenario, which gives each scenario its unique set of alternatives.\\n\\nProperties and settings are grouped into alternatives categories that appear as columns of the Scenarios table and as management options in Scenario manager.\\n\\nOverrides are created in scenarios, but they really belong to the respective alternatives associated with the scenario; so a scenario is like a window to its alternatives. Associations of alternatives to scenarios are managed in the Scenarios table in the bottom pane. Creating a new scenario creates no alternatives; the new scenario uses its parent's alternatives until overrides are created that need new alternatives. When overrides are created in a scenario, they are stored in their respective alternative for the scenario; if the scenario has no such alternative, a new alternative is created using the name of the scenario.\\n\\nExample: You create a \"Figure: Node and link IDs\" scenario and edit a Text to say \"Node and Link IDs.\" When you create the scenario, no alternatives are created. But at the moment you save the Text, a Text alternative called \"Figure: Node and link IDs\" is created with the override for the Text value. In Basic mode, you see this as simply an override in the scenario itself.\\n\\nCopy properties copies only overrides. In any scenario other than Base, it copies only the overrides the asset has in that scenario.\\n\\nHow to manage scenarios:\\n\\n- Choose Scenarios or an alternatives category in the list at the top to show its tree.\\n\\n- Create a child of the selected item with Add child. Add base adds another Base, which starts as a copy of Base as it is now; later edits to Base do not change it. A new child is named after its parent; type a name to rename it. Copy copies the selected alternative. To copy a scenario, use Copy scenario in the Scenarios menu, in Basic mode; it copies the scenario's overrides, with the alternatives that hold them.\\n\\n- Drag an item onto another to make it a child of that item. A scenario moved to a new parent inherits from it everything it has not overridden; what it has overridden does not change. Drag an item between two items to reorder them.\\n\\n- Click an item to select it. Press F2, or choose Rename, to rename the selected item. Renaming a scenario asks whether to rename the alternatives that carry its name; in Basic mode they are renamed with it, without asking. Double-click a scenario, or press Enter, to make it current. Click the arrow beside an item, or press Left or Right, to collapse or expand it. Right-click an item for the same commands as the buttons.\\n\\n- Press Delete, or click the minus button, to delete the selected item. An item in use is not deleted, and the message names what uses it. Deleting a scenario with Basic mode off keeps the alternatives it uses. Deleting a scenario with Basic mode on also deletes each of its alternatives that no other scenario uses.\\n\\n- To make a scenario use another alternative, including Base, choose it in the scenario's row of the Scenarios table. An override made in a shared alternative changes every scenario that uses it.",
+        "lpn_sm_help": "How scenarios and alternatives work:\\n\\nIn Basic mode, alternatives are hidden and automatic, and all new scenarios are children of the Base scenario.\\n\\nWith Basic mode off, a complex inheritance tree is available, and alternatives can be shared among scenarios. But the default behavior of edits when a new alternative association is needed (in the absence of proactive user management) is to create an alternative named like the current scenario, which gives each scenario its unique set of alternatives.\\n\\nProperties and settings belong to alternatives categories that appear as columns of the Scenarios table and as management options in Scenario manager.\\n\\nOverrides are created in scenarios, but they really belong to the respective alternatives associated with the scenario; so a scenario is like a window to its alternatives. Associations of alternatives to scenarios are managed in the Scenarios table in the bottom pane. Creating a new scenario creates no alternatives; the new scenario uses its parent's alternatives until overrides are created that need new alternatives. When overrides are created in a scenario, they are stored in their respective alternative for the scenario; if the scenario has no such alternative, a new alternative is created using the name of the scenario.\\n\\nExample: You create a \"Figure: Node and link IDs\" scenario and edit a Text to say \"Node and Link IDs.\" When you create the scenario, no alternatives are created. But at the moment you save the Text, a Text alternative called \"Figure: Node and link IDs\" is created with the override for the Text value. In Basic mode, you see this as simply an override in the scenario itself.\\n\\nCopy properties copies only overrides. In any scenario other than Base, it copies only the overrides the asset has in that scenario.\\n\\nHow to manage scenarios:\\n\\n- Choose Scenarios or an alternatives category in the list at the top to show its tree.\\n\\n- Create a child of the selected item with Add child. Add base adds another Base, which starts as a copy of Base as it is now; later edits to Base do not change it. A new child is named after its parent; type a name to rename it. Copy copies the selected alternative. To copy a scenario, use Copy scenario in the Scenarios menu, in Basic mode; it copies the scenario's overrides, with the alternatives that hold them.\\n\\n- Drag an item onto another to make it a child of that item. A scenario moved to a new parent inherits from it everything it has not overridden; what it has overridden does not change. Drag an item between two items to reorder them.\\n\\n- Click an item to select it. Press F2 or choose Rename to rename the selected item. Renaming a scenario asks whether to rename the alternatives that carry its name; in Basic mode they are renamed with it, without asking. Double-click a scenario or press Enter to make it current. Click the arrow beside an item or press Left or Right to collapse or expand it. Right-click an item for the same commands as the buttons.\\n\\n- Press Delete or click the minus button to delete the selected item. An item in use is not deleted, and the message names what uses it. Deleting a scenario with Basic mode off keeps the alternatives it uses. Deleting a scenario with Basic mode on also deletes each of its alternatives that no other scenario uses.\\n\\n- To make a scenario use another alternative, including Base, choose it in the scenario's row of the Scenarios table. An override made in a shared alternative changes every scenario that uses it.",
         "lpn_sm_delete_alt_ask": "Delete the alternative {name}?",
-        "lpn_sm_in_use": "{name} cannot be deleted while it is used by: {list}.",
+        "lpn_sm_in_use": "{item} cannot be deleted while it is used by\\n{list}",
+        "lpn_sm_item_scenario": "Scenario {name}",
+        "lpn_sm_item_alternative": "Alternative {name}",
         "lpn_sm_name_taken": "The name {name} is already used in this tree.",
         "lpn_sm_cycle": "{name} cannot be moved under one of its own children.",
         "lpn_sm_used_by": "Used by scenarios: {n}",
@@ -872,14 +883,82 @@
         "lpn_control_inactive_note": "These controls refer to an asset that is inactive in this scenario, so they are ignored in its run: {ids}",
         "lpn_rule_inactive_note": "These rules refer to an asset that is inactive in this scenario, so they are ignored in its run: {ids}",
         "lpn_library_pattern_default_deleted_also": "Scenarios that also used it as their default: {list}.",
-        "lpn_library_pattern_default_deleted_in": "Pattern {id} was the default demand pattern in these scenarios: {list}."
+        "lpn_library_pattern_default_deleted_in": "Pattern {id} was the default demand pattern in these scenarios: {list}.",
+        "lpn_file_import_shapes": "Import GeoJSON shapes…",
+        "lpn_file_import_shapes_tip": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network from an EPANET file. The project must be georeferenced or state a coordinate system.",
+        "lpn_geojson_import_done": "{n} Shapes imported from {file}.",
+        "lpn_geojson_import_done_one": "One Shape imported from {file}.",
+        "lpn_geojson_import_renamed": "{n} feature names cannot be Shape IDs and are kept with the Shapes: {list}.",
+        "lpn_geojson_import_renamed_one": "One feature name cannot be a Shape ID and is kept with the Shape: {list}.",
+        "lpn_geojson_import_skipped": "{n} features not imported: {list}.",
+        "lpn_geojson_import_skipped_one": "One feature not imported: {list}.",
+        "lpn_geojson_import_why_network": "network asset",
+        "lpn_geojson_import_why_geometry": "not a point, line, or polygon",
+        "lpn_geojson_import_why_position": "position not a valid latitude and longitude",
+        "lpn_geojson_import_holes": "{n} polygon holes not imported. A Shape has one boundary.",
+        "lpn_geojson_import_holes_one": "One polygon hole not imported. A Shape has one boundary.",
+        "lpn_geojson_import_parts": "{n} multipart features imported as one Shape for each part.",
+        "lpn_geojson_import_parts_one": "One multipart feature imported as one Shape for each part.",
+        "lpn_geojson_import_local": "GeoJSON positions are latitude and longitude, and this project has no place on the Earth to which they can be converted. Georeference it first with Map, World map, Attach, then import again.",
+        "lpn_geojson_import_unreadable": "{file} is not a GeoJSON file: {detail}",
+        "lpn_file_import_dxf": "Import DXF shapes…",
+        "lpn_file_import_dxf_tip": "Read the points, lines, and polylines of an ASCII DXF file into this project as Shapes, with each layer name kept as a property. Other entities are counted and listed, not imported. The coordinates are read as the X and Y of this project, with no conversion.",
+        "lpn_file_import_shp": "Import shapefile shapes…",
+        "lpn_file_import_shp_tip": "Read the points, lines, and polygons of an ESRI shapefile into this project as Shapes, with the attribute columns kept as properties. Pick the .zip, or the .shp together with its .shx, .dbf and .prj (hold Ctrl or Shift to select several). Coordinates in a different coordinate system than the project are converted, and the notice says so.",
+        "lpn_dxf_import_skipped": "{n} entities not imported: {list}.",
+        "lpn_dxf_import_skipped_one": "One entity not imported: {list}.",
+        "lpn_dxf_import_inblocks": "in block definitions",
+        "lpn_dxf_import_bulge": "{n} polylines have arc segments, which were imported as straight segments between their vertices.",
+        "lpn_dxf_import_bulge_one": "One polyline has arc segments, which were imported as straight segments between its vertices.",
+        "lpn_dxf_import_units": "The drawing states its units as {theirs} and this project uses {ours}. The numbers were not changed.",
+        "lpn_dxf_import_refuse_geo": "A DXF drawing is flat, and this project is in latitude and longitude, so the coordinates of {file} have no place in it. Use Convert as… to copy the project into a coordinate system, then import again.",
+        "lpn_dxf_import_unreadable": "{file} is not an ASCII DXF file.",
+        "lpn_dxf_import_binary": "{file} is a binary DXF. Save it from your CAD program as an ASCII DXF, then import again.",
+        "lpn_shapes_import_frame": "The coordinates were read as {frame}, with no conversion.",
+        "lpn_shapes_frame_xy": "the X and Y of this project",
+        "lpn_shapes_frame_latlon": "latitude and longitude",
+        "lpn_shp_import_skipped": "{n} records not imported, because their shape type is not read: {list}.",
+        "lpn_shp_import_skipped_one": "One record not imported, because its shape type is not read: {list}.",
+        "lpn_shp_import_attrs": "Attribute columns kept as properties of each Shape: {list}.",
+        "lpn_shp_import_noprj": "There is no .prj file, so the coordinates were read as {frame}, with no conversion.",
+        "lpn_shp_import_prj_same": "The .prj states {crs}, the coordinate system of this project, so the coordinates were not changed.",
+        "lpn_shp_import_converted": "The coordinates are latitude and longitude. They were converted to {crs} by the transform the map uses.",
+        "lpn_shp_import_prj_other": "The .prj states {theirs}. This project states no coordinate system, so the coordinates were read as {frame}, with no conversion.",
+        "lpn_shp_import_refuse_local": "{file} is in latitude and longitude, and this project has no place on the Earth to which they can be converted. Georeference it first with Map, World map, Attach, then import again.",
+        "lpn_shp_import_refuse_crs": "{file} states {theirs}, and this project is in {ours}. Nothing was imported and nothing was converted.",
+        "lpn_shp_import_refuse_range": "{file} has no .prj file, and its coordinates are not latitudes and longitudes, so they cannot be placed in this project.",
+        "lpn_shp_import_noshp": "{file} has no .shp file in it. Pick the .zip of a shapefile, or the .shp together with its .shx, .dbf and .prj (hold Ctrl or Shift to select several).",
+        "lpn_shp_import_manyshp": "{file} holds more than one shapefile. Import one at a time.",
+        "lpn_shp_import_unreadable": "{file} is not a shapefile this page can read: {detail}",
+        "lpn_shp_import_pick_hint": "A shapefile is several files. Pick the .shp together with its .shx, .dbf and .prj (hold Ctrl or Shift to select several), or pick the .zip.",
+        "lpn_shp_import_webmerc_ask": "{file} has no .prj file, and its numbers are not latitudes and longitudes, but they fit Web Mercator metres (EPSG:3857), the system QGIS and web maps use. Import them as EPSG:3857 and convert them to this project?",
+        "lpn_shp_import_webmerc_ok": "Import as EPSG:3857",
+        "lpn_shp_import_webmerc_far_ask": "{file} states {theirs}, and read in that system its coordinates fall {km} km from this project. Read as Web Mercator metres (EPSG:3857), the system QGIS and web maps use, they fall where this project is. Import them as EPSG:3857 and convert them to this project?",
+        "lpn_shp_import_reprojected": "The coordinates were converted from {theirs} to {ours}.",
+        "lpn_shp_import_unplaced": "{n} records have coordinates this project cannot place, such as a latitude beyond the limit of the map. Record numbers: {list}.",
+        "lpn_shp_import_unplaced_one": "One record has coordinates this project cannot place, such as a latitude beyond the limit of the map. Record number: {list}.",
+        "lpn_shapes_import_none": "Nothing was imported from {file}.",
+        "lpn_shp_import_convert_hint": "Use Convert as… to copy the project into {theirs}, then import again.",
+        "lpn_shp_import_damaged": "{file} is damaged or cut short, so nothing was imported.",
+        "lpn_shp_import_deleted": "{n} records marked deleted in the .dbf were not imported.",
+        "lpn_shp_import_deleted_one": "One record marked deleted in the .dbf was not imported.",
+        "lpn_dxf_import_paperspace": "in paper space",
+        "lpn_shapes_import_more": "and {n} more"
     },
     "keys": {
+        "lpn_pane_tab_shapes": "Shapes",
+        "lpn_pane_shape_closed": "Closed",
+        "lpn_pane_shape_points": "Points",
         "lpn_customer_node_inactive": "This customer is assigned to a junction that is inactive in this scenario, so its demand is not part of the solve.",
+        "lpn_pane_paste_shape_no_points": "Row {row}: a new Shape needs its Points.",
+        "lpn_pane_paste_shape_bad_points": "Row {row}: {text} is not a list of points. Write each point as {pair}, with a point (.) as the decimal mark, and separate the points with |.",
+        "lpn_pane_paste_shape_closed_few": "Row {row}: a closed Shape needs at least three points.",
         "lpn_ex_net2_si_title": "EPANET Net2, L\/s (SI)",
         "lpn_ex_net2_si_desc": "Litres per second, with metres and millimetres. An EPANET example at Branford, Connecticut, converted from gallons per minute, feet and inches: 35 junctions and 1 tank, with no reservoir, no pump and no valves, about 2 km by 4 km. Fluoride, a non-reactive substance, enters at one source.",
         "lpn_ex_net3_si_title": "EPANET Net3, L\/s (SI)",
         "lpn_ex_net3_si_desc": "Litres per second, with metres and millimetres. An EPANET example at Novato, California, converted from gallons per minute, feet and inches, with the world map behind it: 92 junctions, 3 tanks and 2 reservoirs, no valves, about 8 km square. A 24-hour extended-period simulation, with a source trace from the Lake.",
+        "lpn_tool_add_shape": "Shape",
+        "lpn_tool_add_shape_tip": "Draw a point, a polyline, or a polygon on the map. A Shape is annotation and is not part of the network. Specify each point, then specify the last point again, press Enter, or right-click to finish. Specify the first point again to close the Shape into a polygon.",
         "lpn_pane_scn_ov_only": "Overrides only",
         "lpn_pane_scn_cur_only": "Current scenario only",
         "lpn_pane_inactive_show": "Include inactive topology",
@@ -911,9 +990,10 @@
         "lpn_paste_skip_valve": "Not pasted: {n} (the valve types differ).",
         "lpn_inp_export_flat_customers_inactive": "{n} of these customers are assigned to a junction that is inactive in this scenario, so their demand is not in the file.",
         "lpn_inp_export_flat_inactive_controls": "These controls and rules refer to an asset that is inactive in this scenario, so they are not in the file: {ids}",
+        "lpn_snap_shape_point": "{shape}, point {n}",
+        "lpn_mode_add_shape": "Mode: Add Shape. Specify each point. Specify the last point again or press Enter to finish; specify the first point to close a polygon.",
         "lpn_scenario_delete_ask": "Delete the scenario {name}? The drawing itself is not changed.",
-        "lpn_scenario_delete_goes": "Its {n} overrides are deleted with it.",
-        "lpn_scenario_delete_goes_one": "Its one override is deleted with it.",
+        "lpn_scenario_delete_goes": "Its overrides ({n}) are deleted with it.",
         "lpn_scenario_delete_stays": "These alternatives it uses stay in the project: {list}.",
         "lpn_scenario_delete_has_children": "The scenario {name} cannot be deleted while other scenarios inherit from it: {list}. Delete those first, or give them another parent.",
         "lpn_scenario_basic_misfit": "This project has scenarios and alternatives relationships that are not compatible with Scenarios Basic mode, so Basic mode is disabled.",
@@ -922,7 +1002,7 @@
         "lpn_scenario_copy_off": "Copy scenario works in Basic mode. With Basic mode off, add a scenario and choose its alternatives in the Scenarios table.",
         "lpn_sm_title": "Scenario manager",
         "lpn_sm_menu": "Scenario manager…",
-        "lpn_sm_basic_off": "Basic mode is off, so the Scenario manager and the Scenarios table are shown.",
+        "lpn_sm_basic_on": "Scenario manager is disabled when Basic mode is on.",
         "lpn_pane_tab_scenarios": "Scenarios",
         "lpn_sm_col_parent": "Parent",
         "lpn_sm_add_child": "Add child",
@@ -938,9 +1018,11 @@
         "lpn_sm_none_selected": "Select an item in the tree first.",
         "lpn_sm_base_named": "The Base of a tree is not renamed.",
         "lpn_sm_copy": "Copy",
-        "lpn_sm_help": "How scenarios and alternatives work:\\n\\nIn Basic mode, alternatives are hidden and automatic, and all new scenarios are children of the Base scenario.\\n\\nWith Basic mode off, a complex inheritance tree is available, and alternatives can be shared among scenarios. But the default behavior of edits when a new alternative association is needed (in the absence of proactive user management) is to create an alternative named like the current scenario, which gives each scenario its unique set of alternatives.\\n\\nProperties and settings are grouped into alternatives categories that appear as columns of the Scenarios table and as management options in Scenario manager.\\n\\nOverrides are created in scenarios, but they really belong to the respective alternatives associated with the scenario; so a scenario is like a window to its alternatives. Associations of alternatives to scenarios are managed in the Scenarios table in the bottom pane. Creating a new scenario creates no alternatives; the new scenario uses its parent's alternatives until overrides are created that need new alternatives. When overrides are created in a scenario, they are stored in their respective alternative for the scenario; if the scenario has no such alternative, a new alternative is created using the name of the scenario.\\n\\nExample: You create a \"Figure: Node and link IDs\" scenario and edit a Text to say \"Node and Link IDs.\" When you create the scenario, no alternatives are created. But at the moment you save the Text, a Text alternative called \"Figure: Node and link IDs\" is created with the override for the Text value. In Basic mode, you see this as simply an override in the scenario itself.\\n\\nCopy properties copies only overrides. In any scenario other than Base, it copies only the overrides the asset has in that scenario.\\n\\nHow to manage scenarios:\\n\\n- Choose Scenarios or an alternatives category in the list at the top to show its tree.\\n\\n- Create a child of the selected item with Add child. Add base adds another Base, which starts as a copy of Base as it is now; later edits to Base do not change it. A new child is named after its parent; type a name to rename it. Copy copies the selected alternative. To copy a scenario, use Copy scenario in the Scenarios menu, in Basic mode; it copies the scenario's overrides, with the alternatives that hold them.\\n\\n- Drag an item onto another to make it a child of that item. A scenario moved to a new parent inherits from it everything it has not overridden; what it has overridden does not change. Drag an item between two items to reorder them.\\n\\n- Click an item to select it. Press F2, or choose Rename, to rename the selected item. Renaming a scenario asks whether to rename the alternatives that carry its name; in Basic mode they are renamed with it, without asking. Double-click a scenario, or press Enter, to make it current. Click the arrow beside an item, or press Left or Right, to collapse or expand it. Right-click an item for the same commands as the buttons.\\n\\n- Press Delete, or click the minus button, to delete the selected item. An item in use is not deleted, and the message names what uses it. Deleting a scenario with Basic mode off keeps the alternatives it uses. Deleting a scenario with Basic mode on also deletes each of its alternatives that no other scenario uses.\\n\\n- To make a scenario use another alternative, including Base, choose it in the scenario's row of the Scenarios table. An override made in a shared alternative changes every scenario that uses it.",
+        "lpn_sm_help": "How scenarios and alternatives work:\\n\\nIn Basic mode, alternatives are hidden and automatic, and all new scenarios are children of the Base scenario.\\n\\nWith Basic mode off, a complex inheritance tree is available, and alternatives can be shared among scenarios. But the default behavior of edits when a new alternative association is needed (in the absence of proactive user management) is to create an alternative named like the current scenario, which gives each scenario its unique set of alternatives.\\n\\nProperties and settings belong to alternatives categories that appear as columns of the Scenarios table and as management options in Scenario manager.\\n\\nOverrides are created in scenarios, but they really belong to the respective alternatives associated with the scenario; so a scenario is like a window to its alternatives. Associations of alternatives to scenarios are managed in the Scenarios table in the bottom pane. Creating a new scenario creates no alternatives; the new scenario uses its parent's alternatives until overrides are created that need new alternatives. When overrides are created in a scenario, they are stored in their respective alternative for the scenario; if the scenario has no such alternative, a new alternative is created using the name of the scenario.\\n\\nExample: You create a \"Figure: Node and link IDs\" scenario and edit a Text to say \"Node and Link IDs.\" When you create the scenario, no alternatives are created. But at the moment you save the Text, a Text alternative called \"Figure: Node and link IDs\" is created with the override for the Text value. In Basic mode, you see this as simply an override in the scenario itself.\\n\\nCopy properties copies only overrides. In any scenario other than Base, it copies only the overrides the asset has in that scenario.\\n\\nHow to manage scenarios:\\n\\n- Choose Scenarios or an alternatives category in the list at the top to show its tree.\\n\\n- Create a child of the selected item with Add child. Add base adds another Base, which starts as a copy of Base as it is now; later edits to Base do not change it. A new child is named after its parent; type a name to rename it. Copy copies the selected alternative. To copy a scenario, use Copy scenario in the Scenarios menu, in Basic mode; it copies the scenario's overrides, with the alternatives that hold them.\\n\\n- Drag an item onto another to make it a child of that item. A scenario moved to a new parent inherits from it everything it has not overridden; what it has overridden does not change. Drag an item between two items to reorder them.\\n\\n- Click an item to select it. Press F2 or choose Rename to rename the selected item. Renaming a scenario asks whether to rename the alternatives that carry its name; in Basic mode they are renamed with it, without asking. Double-click a scenario or press Enter to make it current. Click the arrow beside an item or press Left or Right to collapse or expand it. Right-click an item for the same commands as the buttons.\\n\\n- Press Delete or click the minus button to delete the selected item. An item in use is not deleted, and the message names what uses it. Deleting a scenario with Basic mode off keeps the alternatives it uses. Deleting a scenario with Basic mode on also deletes each of its alternatives that no other scenario uses.\\n\\n- To make a scenario use another alternative, including Base, choose it in the scenario's row of the Scenarios table. An override made in a shared alternative changes every scenario that uses it.",
         "lpn_sm_delete_alt_ask": "Delete the alternative {name}?",
-        "lpn_sm_in_use": "{name} cannot be deleted while it is used by: {list}.",
+        "lpn_sm_in_use": "{item} cannot be deleted while it is used by\\n{list}",
+        "lpn_sm_item_scenario": "Scenario {name}",
+        "lpn_sm_item_alternative": "Alternative {name}",
         "lpn_sm_name_taken": "The name {name} is already used in this tree.",
         "lpn_sm_cycle": "{name} cannot be moved under one of its own children.",
         "lpn_sm_used_by": "Used by scenarios: {n}",
@@ -1010,9 +1092,117 @@
         "lpn_control_inactive_note": "These controls refer to an asset that is inactive in this scenario, so they are ignored in its run: {ids}",
         "lpn_rule_inactive_note": "These rules refer to an asset that is inactive in this scenario, so they are ignored in its run: {ids}",
         "lpn_library_pattern_default_deleted_also": "Scenarios that also used it as their default: {list}.",
-        "lpn_library_pattern_default_deleted_in": "Pattern {id} was the default demand pattern in these scenarios: {list}."
+        "lpn_library_pattern_default_deleted_in": "Pattern {id} was the default demand pattern in these scenarios: {list}.",
+        "lpn_file_import_shapes": "Import GeoJSON shapes…",
+        "lpn_file_import_shapes_tip": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network from an EPANET file. The project must be georeferenced or state a coordinate system.",
+        "lpn_geojson_import_done": "{n} Shapes imported from {file}.",
+        "lpn_geojson_import_done_one": "One Shape imported from {file}.",
+        "lpn_geojson_import_renamed": "{n} feature names cannot be Shape IDs and are kept with the Shapes: {list}.",
+        "lpn_geojson_import_renamed_one": "One feature name cannot be a Shape ID and is kept with the Shape: {list}.",
+        "lpn_geojson_import_skipped": "{n} features not imported: {list}.",
+        "lpn_geojson_import_skipped_one": "One feature not imported: {list}.",
+        "lpn_geojson_import_why_network": "network asset",
+        "lpn_geojson_import_why_geometry": "not a point, line, or polygon",
+        "lpn_geojson_import_why_position": "position not a valid latitude and longitude",
+        "lpn_geojson_import_holes": "{n} polygon holes not imported. A Shape has one boundary.",
+        "lpn_geojson_import_holes_one": "One polygon hole not imported. A Shape has one boundary.",
+        "lpn_geojson_import_parts": "{n} multipart features imported as one Shape for each part.",
+        "lpn_geojson_import_parts_one": "One multipart feature imported as one Shape for each part.",
+        "lpn_geojson_import_local": "GeoJSON positions are latitude and longitude, and this project has no place on the Earth to which they can be converted. Georeference it first with Map, World map, Attach, then import again.",
+        "lpn_geojson_import_unreadable": "{file} is not a GeoJSON file: {detail}",
+        "lpn_file_import_dxf": "Import DXF shapes…",
+        "lpn_file_import_dxf_tip": "Read the points, lines, and polylines of an ASCII DXF file into this project as Shapes, with each layer name kept as a property. Other entities are counted and listed, not imported. The coordinates are read as the X and Y of this project, with no conversion.",
+        "lpn_file_import_shp": "Import shapefile shapes…",
+        "lpn_file_import_shp_tip": "Read the points, lines, and polygons of an ESRI shapefile into this project as Shapes, with the attribute columns kept as properties. Pick the .zip, or the .shp together with its .shx, .dbf and .prj (hold Ctrl or Shift to select several). Coordinates in a different coordinate system than the project are converted, and the notice says so.",
+        "lpn_dxf_import_skipped": "{n} entities not imported: {list}.",
+        "lpn_dxf_import_skipped_one": "One entity not imported: {list}.",
+        "lpn_dxf_import_inblocks": "in block definitions",
+        "lpn_dxf_import_bulge": "{n} polylines have arc segments, which were imported as straight segments between their vertices.",
+        "lpn_dxf_import_bulge_one": "One polyline has arc segments, which were imported as straight segments between its vertices.",
+        "lpn_dxf_import_units": "The drawing states its units as {theirs} and this project uses {ours}. The numbers were not changed.",
+        "lpn_dxf_import_refuse_geo": "A DXF drawing is flat, and this project is in latitude and longitude, so the coordinates of {file} have no place in it. Use Convert as… to copy the project into a coordinate system, then import again.",
+        "lpn_dxf_import_unreadable": "{file} is not an ASCII DXF file.",
+        "lpn_dxf_import_binary": "{file} is a binary DXF. Save it from your CAD program as an ASCII DXF, then import again.",
+        "lpn_shapes_import_frame": "The coordinates were read as {frame}, with no conversion.",
+        "lpn_shapes_frame_xy": "the X and Y of this project",
+        "lpn_shapes_frame_latlon": "latitude and longitude",
+        "lpn_shp_import_skipped": "{n} records not imported, because their shape type is not read: {list}.",
+        "lpn_shp_import_skipped_one": "One record not imported, because its shape type is not read: {list}.",
+        "lpn_shp_import_attrs": "Attribute columns kept as properties of each Shape: {list}.",
+        "lpn_shp_import_noprj": "There is no .prj file, so the coordinates were read as {frame}, with no conversion.",
+        "lpn_shp_import_prj_same": "The .prj states {crs}, the coordinate system of this project, so the coordinates were not changed.",
+        "lpn_shp_import_converted": "The coordinates are latitude and longitude. They were converted to {crs} by the transform the map uses.",
+        "lpn_shp_import_prj_other": "The .prj states {theirs}. This project states no coordinate system, so the coordinates were read as {frame}, with no conversion.",
+        "lpn_shp_import_refuse_local": "{file} is in latitude and longitude, and this project has no place on the Earth to which they can be converted. Georeference it first with Map, World map, Attach, then import again.",
+        "lpn_shp_import_refuse_crs": "{file} states {theirs}, and this project is in {ours}. Nothing was imported and nothing was converted.",
+        "lpn_shp_import_refuse_range": "{file} has no .prj file, and its coordinates are not latitudes and longitudes, so they cannot be placed in this project.",
+        "lpn_shp_import_noshp": "{file} has no .shp file in it. Pick the .zip of a shapefile, or the .shp together with its .shx, .dbf and .prj (hold Ctrl or Shift to select several).",
+        "lpn_shp_import_manyshp": "{file} holds more than one shapefile. Import one at a time.",
+        "lpn_shp_import_unreadable": "{file} is not a shapefile this page can read: {detail}",
+        "lpn_shp_import_pick_hint": "A shapefile is several files. Pick the .shp together with its .shx, .dbf and .prj (hold Ctrl or Shift to select several), or pick the .zip.",
+        "lpn_shp_import_webmerc_ask": "{file} has no .prj file, and its numbers are not latitudes and longitudes, but they fit Web Mercator metres (EPSG:3857), the system QGIS and web maps use. Import them as EPSG:3857 and convert them to this project?",
+        "lpn_shp_import_webmerc_ok": "Import as EPSG:3857",
+        "lpn_shp_import_webmerc_far_ask": "{file} states {theirs}, and read in that system its coordinates fall {km} km from this project. Read as Web Mercator metres (EPSG:3857), the system QGIS and web maps use, they fall where this project is. Import them as EPSG:3857 and convert them to this project?",
+        "lpn_shp_import_reprojected": "The coordinates were converted from {theirs} to {ours}.",
+        "lpn_shp_import_unplaced": "{n} records have coordinates this project cannot place, such as a latitude beyond the limit of the map. Record numbers: {list}.",
+        "lpn_shp_import_unplaced_one": "One record has coordinates this project cannot place, such as a latitude beyond the limit of the map. Record number: {list}.",
+        "lpn_shapes_import_none": "Nothing was imported from {file}.",
+        "lpn_shp_import_convert_hint": "Use Convert as… to copy the project into {theirs}, then import again.",
+        "lpn_shp_import_damaged": "{file} is damaged or cut short, so nothing was imported.",
+        "lpn_shp_import_deleted": "{n} records marked deleted in the .dbf were not imported.",
+        "lpn_shp_import_deleted_one": "One record marked deleted in the .dbf was not imported.",
+        "lpn_dxf_import_paperspace": "in paper space",
+        "lpn_shapes_import_more": "and {n} more"
     },
     "key_context": {
+        "lpn_pane_tab_shapes": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_tab_customers",
+                    "value": "Clients",
+                    "english": "Customers"
+                },
+                "next_translated": {
+                    "key": "lpn_customer_heading",
+                    "value": "Client {id}",
+                    "english": "Customer {id}"
+                }
+            }
+        },
+        "lpn_pane_shape_closed": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_tab_customers",
+                    "value": "Clients",
+                    "english": "Customers"
+                },
+                "next_translated": {
+                    "key": "lpn_customer_heading",
+                    "value": "Client {id}",
+                    "english": "Customer {id}"
+                }
+            }
+        },
+        "lpn_pane_shape_points": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_tab_customers",
+                    "value": "Clients",
+                    "english": "Customers"
+                },
+                "next_translated": {
+                    "key": "lpn_customer_heading",
+                    "value": "Client {id}",
+                    "english": "Customer {id}"
+                }
+            }
+        },
         "lpn_customer_node_inactive": {
             "reason": "missing",
             "current_value": null,
@@ -1026,6 +1216,54 @@
                     "key": "lpn_customer_detached_count",
                     "value": "{n} clients ne sont connectés à aucune conduite. Leur demande n'est pas prise en compte.",
                     "english": "{n} customers are not connected to a pipe. Their demand is not accounted for."
+                }
+            }
+        },
+        "lpn_pane_paste_shape_no_points": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_paste_customer_no_position",
+                    "value": "Ligne {row} : un nouveau client a besoin à la fois de {first} et de {second}.",
+                    "english": "Row {row}: a new Customer needs both {first} and {second}."
+                },
+                "next_translated": {
+                    "key": "lpn_pane_paste_no_customer_ref",
+                    "value": "Ligne {row} : un nouveau client a besoin d'une conduite ou d'un nœud connecté.",
+                    "english": "Row {row}: a new Customer needs a connected pipe or node."
+                }
+            }
+        },
+        "lpn_pane_paste_shape_bad_points": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_paste_customer_no_position",
+                    "value": "Ligne {row} : un nouveau client a besoin à la fois de {first} et de {second}.",
+                    "english": "Row {row}: a new Customer needs both {first} and {second}."
+                },
+                "next_translated": {
+                    "key": "lpn_pane_paste_no_customer_ref",
+                    "value": "Ligne {row} : un nouveau client a besoin d'une conduite ou d'un nœud connecté.",
+                    "english": "Row {row}: a new Customer needs a connected pipe or node."
+                }
+            }
+        },
+        "lpn_pane_paste_shape_closed_few": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_paste_customer_no_position",
+                    "value": "Ligne {row} : un nouveau client a besoin à la fois de {first} et de {second}.",
+                    "english": "Row {row}: a new Customer needs both {first} and {second}."
+                },
+                "next_translated": {
+                    "key": "lpn_pane_paste_no_customer_ref",
+                    "value": "Ligne {row} : un nouveau client a besoin d'une conduite ou d'un nœud connecté.",
+                    "english": "Row {row}: a new Customer needs a connected pipe or node."
                 }
             }
         },
@@ -1090,6 +1328,38 @@
                     "key": "lpn_ex_net3_title",
                     "value": "EPANET Net3",
                     "english": "EPANET Net3, gpm (US)"
+                }
+            }
+        },
+        "lpn_tool_add_shape": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_add_chain_tip",
+                    "value": "Enchaîner jonctions et conduites : indiquez un point sur la carte pour ajouter une jonction, puis indiquez chaque point suivant pour ajouter une conduite et une jonction. Indiquez un nœud existant pour continuer à partir de lui. Appuyez sur Échap pour terminer la chaîne.",
+                    "english": "Chain junctions and pipes: specify a point on the map to add a junction, then specify each next point to add a pipe and a junction. Specify an existing node to continue from it. Press Escape to end the chain."
+                },
+                "next_translated": {
+                    "key": "lpn_tool_area_tip",
+                    "value": "Suivez les invites à l'écran. Appuyez de nouveau pour passer tour à tour de la fenêtre au lasso puis au polygone. Maintenez Maj enfoncée pour conserver la sélection actuelle et ajouter ou retirer (basculer) ce que vous sélectionnez.",
+                    "english": "Area select window\/lasso\/polygon."
+                }
+            }
+        },
+        "lpn_tool_add_shape_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_add_chain_tip",
+                    "value": "Enchaîner jonctions et conduites : indiquez un point sur la carte pour ajouter une jonction, puis indiquez chaque point suivant pour ajouter une conduite et une jonction. Indiquez un nœud existant pour continuer à partir de lui. Appuyez sur Échap pour terminer la chaîne.",
+                    "english": "Chain junctions and pipes: specify a point on the map to add a junction, then specify each next point to add a pipe and a junction. Specify an existing node to continue from it. Press Escape to end the chain."
+                },
+                "next_translated": {
+                    "key": "lpn_tool_area_tip",
+                    "value": "Suivez les invites à l'écran. Appuyez de nouveau pour passer tour à tour de la fenêtre au lasso puis au polygone. Maintenez Maj enfoncée pour conserver la sélection actuelle et ajouter ou retirer (basculer) ce que vous sélectionnez.",
+                    "english": "Area select window\/lasso\/polygon."
                 }
             }
         },
@@ -1589,6 +1859,38 @@
                 }
             }
         },
+        "lpn_snap_shape_point": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_snap_moved_on_node",
+                    "value": "{moved} déplacé à l'emplacement de {target}. Les deux nœuds ne sont pas connectés.",
+                    "english": "{moved} moved to the location of {target}. The two nodes are not connected."
+                },
+                "next_translated": {
+                    "key": "lpn_field_valve_type",
+                    "value": "Type de vanne",
+                    "english": "Valve type"
+                }
+            }
+        },
+        "lpn_mode_add_shape": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_mode_add_chain",
+                    "value": "Mode : Chaîne jonction-conduite. Indiquez un point sur la carte pour ajouter une jonction, puis indiquez chaque point suivant pour ajouter une conduite et une jonction. Indiquez un nœud existant pour continuer à partir de lui. Appuyez sur Échap pour terminer la chaîne. Passez en mode Sélectionner pour modifier ou déplacer des éléments et des étiquettes.",
+                    "english": "Mode: Junction Pipe Chain. Specify a point on the map to add a junction, then specify each next point to add a pipe and a junction. Specify an existing node to continue from it. Press Escape to end the chain. Switch to Select mode to change or move assets and labels."
+                },
+                "next_translated": {
+                    "key": "lpn_tip_select",
+                    "value": "Utilisez ce mode pour modifier, déplacer et faire glisser des éléments et des textes de la carte, ou pour déplacer la carte. C'est le mode par défaut de la carte. Appuyer une seconde fois sur Échap annule la sélection.",
+                    "english": "Use this mode to change, move, and drag assets and text on the map, or to pan the map. This is the default mode for the map. Pressing Esc a second time clears the selection."
+                }
+            }
+        },
         "lpn_scenario_delete_ask": {
             "reason": "missing",
             "current_value": null,
@@ -1606,22 +1908,6 @@
             }
         },
         "lpn_scenario_delete_goes": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_scenario_delete",
-                    "value": "Supprimer le scénario",
-                    "english": "Delete scenario"
-                },
-                "next_translated": {
-                    "key": "lpn_scenario_base_value",
-                    "value": "Scénario de base : {value}",
-                    "english": "Base scenario: {value}"
-                }
-            }
-        },
-        "lpn_scenario_delete_goes_one": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
@@ -1676,7 +1962,7 @@
                 "previous_translated": {
                     "key": "lpn_scenario_basic_tip",
                     "value": "Cochée : un scénario ne comprend que les valeurs qui y sont définies. Décochée : ce menu propose aussi le tableau d'aperçu des Alternatives, qui montre comment ces valeurs sont regroupées par catégorie, et permet à un scénario d'avoir une durée totale de simulation et un pas de temps hydraulique distincts. Vos commentaires sur cette fonction sont les bienvenus.",
-                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Choosing Scenario manager turns Basic mode off. A project whose scenarios and alternatives Basic mode cannot show keeps it off."
+                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Scenario manager is disabled when Basic mode is on. Basic mode is disabled when a project has scenarios and alternatives relationships that Basic mode cannot show."
                 },
                 "next_translated": {
                     "key": "lpn_time_scn_overrides",
@@ -1692,7 +1978,7 @@
                 "previous_translated": {
                     "key": "lpn_scenario_basic_tip",
                     "value": "Cochée : un scénario ne comprend que les valeurs qui y sont définies. Décochée : ce menu propose aussi le tableau d'aperçu des Alternatives, qui montre comment ces valeurs sont regroupées par catégorie, et permet à un scénario d'avoir une durée totale de simulation et un pas de temps hydraulique distincts. Vos commentaires sur cette fonction sont les bienvenus.",
-                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Choosing Scenario manager turns Basic mode off. A project whose scenarios and alternatives Basic mode cannot show keeps it off."
+                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Scenario manager is disabled when Basic mode is on. Basic mode is disabled when a project has scenarios and alternatives relationships that Basic mode cannot show."
                 },
                 "next_translated": {
                     "key": "lpn_time_scn_overrides",
@@ -1708,7 +1994,7 @@
                 "previous_translated": {
                     "key": "lpn_scenario_basic_tip",
                     "value": "Cochée : un scénario ne comprend que les valeurs qui y sont définies. Décochée : ce menu propose aussi le tableau d'aperçu des Alternatives, qui montre comment ces valeurs sont regroupées par catégorie, et permet à un scénario d'avoir une durée totale de simulation et un pas de temps hydraulique distincts. Vos commentaires sur cette fonction sont les bienvenus.",
-                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Choosing Scenario manager turns Basic mode off. A project whose scenarios and alternatives Basic mode cannot show keeps it off."
+                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Scenario manager is disabled when Basic mode is on. Basic mode is disabled when a project has scenarios and alternatives relationships that Basic mode cannot show."
                 },
                 "next_translated": {
                     "key": "lpn_time_scn_overrides",
@@ -1724,7 +2010,7 @@
                 "previous_translated": {
                     "key": "lpn_scenario_basic_tip",
                     "value": "Cochée : un scénario ne comprend que les valeurs qui y sont définies. Décochée : ce menu propose aussi le tableau d'aperçu des Alternatives, qui montre comment ces valeurs sont regroupées par catégorie, et permet à un scénario d'avoir une durée totale de simulation et un pas de temps hydraulique distincts. Vos commentaires sur cette fonction sont les bienvenus.",
-                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Choosing Scenario manager turns Basic mode off. A project whose scenarios and alternatives Basic mode cannot show keeps it off."
+                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Scenario manager is disabled when Basic mode is on. Basic mode is disabled when a project has scenarios and alternatives relationships that Basic mode cannot show."
                 },
                 "next_translated": {
                     "key": "lpn_time_scn_overrides",
@@ -1740,7 +2026,7 @@
                 "previous_translated": {
                     "key": "lpn_scenario_basic_tip",
                     "value": "Cochée : un scénario ne comprend que les valeurs qui y sont définies. Décochée : ce menu propose aussi le tableau d'aperçu des Alternatives, qui montre comment ces valeurs sont regroupées par catégorie, et permet à un scénario d'avoir une durée totale de simulation et un pas de temps hydraulique distincts. Vos commentaires sur cette fonction sont les bienvenus.",
-                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Choosing Scenario manager turns Basic mode off. A project whose scenarios and alternatives Basic mode cannot show keeps it off."
+                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Scenario manager is disabled when Basic mode is on. Basic mode is disabled when a project has scenarios and alternatives relationships that Basic mode cannot show."
                 },
                 "next_translated": {
                     "key": "lpn_time_scn_overrides",
@@ -1756,7 +2042,7 @@
                 "previous_translated": {
                     "key": "lpn_scenario_basic_tip",
                     "value": "Cochée : un scénario ne comprend que les valeurs qui y sont définies. Décochée : ce menu propose aussi le tableau d'aperçu des Alternatives, qui montre comment ces valeurs sont regroupées par catégorie, et permet à un scénario d'avoir une durée totale de simulation et un pas de temps hydraulique distincts. Vos commentaires sur cette fonction sont les bienvenus.",
-                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Choosing Scenario manager turns Basic mode off. A project whose scenarios and alternatives Basic mode cannot show keeps it off."
+                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Scenario manager is disabled when Basic mode is on. Basic mode is disabled when a project has scenarios and alternatives relationships that Basic mode cannot show."
                 },
                 "next_translated": {
                     "key": "lpn_time_scn_overrides",
@@ -1765,14 +2051,14 @@
                 }
             }
         },
-        "lpn_sm_basic_off": {
+        "lpn_sm_basic_on": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_scenario_basic_tip",
                     "value": "Cochée : un scénario ne comprend que les valeurs qui y sont définies. Décochée : ce menu propose aussi le tableau d'aperçu des Alternatives, qui montre comment ces valeurs sont regroupées par catégorie, et permet à un scénario d'avoir une durée totale de simulation et un pas de temps hydraulique distincts. Vos commentaires sur cette fonction sont les bienvenus.",
-                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Choosing Scenario manager turns Basic mode off. A project whose scenarios and alternatives Basic mode cannot show keeps it off."
+                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Scenario manager is disabled when Basic mode is on. Basic mode is disabled when a project has scenarios and alternatives relationships that Basic mode cannot show."
                 },
                 "next_translated": {
                     "key": "lpn_time_scn_overrides",
@@ -1788,7 +2074,7 @@
                 "previous_translated": {
                     "key": "lpn_scenario_basic_tip",
                     "value": "Cochée : un scénario ne comprend que les valeurs qui y sont définies. Décochée : ce menu propose aussi le tableau d'aperçu des Alternatives, qui montre comment ces valeurs sont regroupées par catégorie, et permet à un scénario d'avoir une durée totale de simulation et un pas de temps hydraulique distincts. Vos commentaires sur cette fonction sont les bienvenus.",
-                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Choosing Scenario manager turns Basic mode off. A project whose scenarios and alternatives Basic mode cannot show keeps it off."
+                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Scenario manager is disabled when Basic mode is on. Basic mode is disabled when a project has scenarios and alternatives relationships that Basic mode cannot show."
                 },
                 "next_translated": {
                     "key": "lpn_time_scn_overrides",
@@ -1804,7 +2090,7 @@
                 "previous_translated": {
                     "key": "lpn_scenario_basic_tip",
                     "value": "Cochée : un scénario ne comprend que les valeurs qui y sont définies. Décochée : ce menu propose aussi le tableau d'aperçu des Alternatives, qui montre comment ces valeurs sont regroupées par catégorie, et permet à un scénario d'avoir une durée totale de simulation et un pas de temps hydraulique distincts. Vos commentaires sur cette fonction sont les bienvenus.",
-                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Choosing Scenario manager turns Basic mode off. A project whose scenarios and alternatives Basic mode cannot show keeps it off."
+                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Scenario manager is disabled when Basic mode is on. Basic mode is disabled when a project has scenarios and alternatives relationships that Basic mode cannot show."
                 },
                 "next_translated": {
                     "key": "lpn_time_scn_overrides",
@@ -1820,7 +2106,7 @@
                 "previous_translated": {
                     "key": "lpn_scenario_basic_tip",
                     "value": "Cochée : un scénario ne comprend que les valeurs qui y sont définies. Décochée : ce menu propose aussi le tableau d'aperçu des Alternatives, qui montre comment ces valeurs sont regroupées par catégorie, et permet à un scénario d'avoir une durée totale de simulation et un pas de temps hydraulique distincts. Vos commentaires sur cette fonction sont les bienvenus.",
-                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Choosing Scenario manager turns Basic mode off. A project whose scenarios and alternatives Basic mode cannot show keeps it off."
+                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Scenario manager is disabled when Basic mode is on. Basic mode is disabled when a project has scenarios and alternatives relationships that Basic mode cannot show."
                 },
                 "next_translated": {
                     "key": "lpn_time_scn_overrides",
@@ -1836,7 +2122,7 @@
                 "previous_translated": {
                     "key": "lpn_scenario_basic_tip",
                     "value": "Cochée : un scénario ne comprend que les valeurs qui y sont définies. Décochée : ce menu propose aussi le tableau d'aperçu des Alternatives, qui montre comment ces valeurs sont regroupées par catégorie, et permet à un scénario d'avoir une durée totale de simulation et un pas de temps hydraulique distincts. Vos commentaires sur cette fonction sont les bienvenus.",
-                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Choosing Scenario manager turns Basic mode off. A project whose scenarios and alternatives Basic mode cannot show keeps it off."
+                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Scenario manager is disabled when Basic mode is on. Basic mode is disabled when a project has scenarios and alternatives relationships that Basic mode cannot show."
                 },
                 "next_translated": {
                     "key": "lpn_time_scn_overrides",
@@ -1852,7 +2138,7 @@
                 "previous_translated": {
                     "key": "lpn_scenario_basic_tip",
                     "value": "Cochée : un scénario ne comprend que les valeurs qui y sont définies. Décochée : ce menu propose aussi le tableau d'aperçu des Alternatives, qui montre comment ces valeurs sont regroupées par catégorie, et permet à un scénario d'avoir une durée totale de simulation et un pas de temps hydraulique distincts. Vos commentaires sur cette fonction sont les bienvenus.",
-                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Choosing Scenario manager turns Basic mode off. A project whose scenarios and alternatives Basic mode cannot show keeps it off."
+                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Scenario manager is disabled when Basic mode is on. Basic mode is disabled when a project has scenarios and alternatives relationships that Basic mode cannot show."
                 },
                 "next_translated": {
                     "key": "lpn_time_scn_overrides",
@@ -1868,7 +2154,7 @@
                 "previous_translated": {
                     "key": "lpn_scenario_basic_tip",
                     "value": "Cochée : un scénario ne comprend que les valeurs qui y sont définies. Décochée : ce menu propose aussi le tableau d'aperçu des Alternatives, qui montre comment ces valeurs sont regroupées par catégorie, et permet à un scénario d'avoir une durée totale de simulation et un pas de temps hydraulique distincts. Vos commentaires sur cette fonction sont les bienvenus.",
-                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Choosing Scenario manager turns Basic mode off. A project whose scenarios and alternatives Basic mode cannot show keeps it off."
+                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Scenario manager is disabled when Basic mode is on. Basic mode is disabled when a project has scenarios and alternatives relationships that Basic mode cannot show."
                 },
                 "next_translated": {
                     "key": "lpn_time_scn_overrides",
@@ -1884,7 +2170,7 @@
                 "previous_translated": {
                     "key": "lpn_scenario_basic_tip",
                     "value": "Cochée : un scénario ne comprend que les valeurs qui y sont définies. Décochée : ce menu propose aussi le tableau d'aperçu des Alternatives, qui montre comment ces valeurs sont regroupées par catégorie, et permet à un scénario d'avoir une durée totale de simulation et un pas de temps hydraulique distincts. Vos commentaires sur cette fonction sont les bienvenus.",
-                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Choosing Scenario manager turns Basic mode off. A project whose scenarios and alternatives Basic mode cannot show keeps it off."
+                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Scenario manager is disabled when Basic mode is on. Basic mode is disabled when a project has scenarios and alternatives relationships that Basic mode cannot show."
                 },
                 "next_translated": {
                     "key": "lpn_time_scn_overrides",
@@ -1900,7 +2186,7 @@
                 "previous_translated": {
                     "key": "lpn_scenario_basic_tip",
                     "value": "Cochée : un scénario ne comprend que les valeurs qui y sont définies. Décochée : ce menu propose aussi le tableau d'aperçu des Alternatives, qui montre comment ces valeurs sont regroupées par catégorie, et permet à un scénario d'avoir une durée totale de simulation et un pas de temps hydraulique distincts. Vos commentaires sur cette fonction sont les bienvenus.",
-                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Choosing Scenario manager turns Basic mode off. A project whose scenarios and alternatives Basic mode cannot show keeps it off."
+                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Scenario manager is disabled when Basic mode is on. Basic mode is disabled when a project has scenarios and alternatives relationships that Basic mode cannot show."
                 },
                 "next_translated": {
                     "key": "lpn_time_scn_overrides",
@@ -1916,7 +2202,7 @@
                 "previous_translated": {
                     "key": "lpn_scenario_basic_tip",
                     "value": "Cochée : un scénario ne comprend que les valeurs qui y sont définies. Décochée : ce menu propose aussi le tableau d'aperçu des Alternatives, qui montre comment ces valeurs sont regroupées par catégorie, et permet à un scénario d'avoir une durée totale de simulation et un pas de temps hydraulique distincts. Vos commentaires sur cette fonction sont les bienvenus.",
-                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Choosing Scenario manager turns Basic mode off. A project whose scenarios and alternatives Basic mode cannot show keeps it off."
+                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Scenario manager is disabled when Basic mode is on. Basic mode is disabled when a project has scenarios and alternatives relationships that Basic mode cannot show."
                 },
                 "next_translated": {
                     "key": "lpn_time_scn_overrides",
@@ -1932,7 +2218,7 @@
                 "previous_translated": {
                     "key": "lpn_scenario_basic_tip",
                     "value": "Cochée : un scénario ne comprend que les valeurs qui y sont définies. Décochée : ce menu propose aussi le tableau d'aperçu des Alternatives, qui montre comment ces valeurs sont regroupées par catégorie, et permet à un scénario d'avoir une durée totale de simulation et un pas de temps hydraulique distincts. Vos commentaires sur cette fonction sont les bienvenus.",
-                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Choosing Scenario manager turns Basic mode off. A project whose scenarios and alternatives Basic mode cannot show keeps it off."
+                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Scenario manager is disabled when Basic mode is on. Basic mode is disabled when a project has scenarios and alternatives relationships that Basic mode cannot show."
                 },
                 "next_translated": {
                     "key": "lpn_time_scn_overrides",
@@ -1948,7 +2234,7 @@
                 "previous_translated": {
                     "key": "lpn_scenario_basic_tip",
                     "value": "Cochée : un scénario ne comprend que les valeurs qui y sont définies. Décochée : ce menu propose aussi le tableau d'aperçu des Alternatives, qui montre comment ces valeurs sont regroupées par catégorie, et permet à un scénario d'avoir une durée totale de simulation et un pas de temps hydraulique distincts. Vos commentaires sur cette fonction sont les bienvenus.",
-                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Choosing Scenario manager turns Basic mode off. A project whose scenarios and alternatives Basic mode cannot show keeps it off."
+                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Scenario manager is disabled when Basic mode is on. Basic mode is disabled when a project has scenarios and alternatives relationships that Basic mode cannot show."
                 },
                 "next_translated": {
                     "key": "lpn_time_scn_overrides",
@@ -1964,7 +2250,7 @@
                 "previous_translated": {
                     "key": "lpn_scenario_basic_tip",
                     "value": "Cochée : un scénario ne comprend que les valeurs qui y sont définies. Décochée : ce menu propose aussi le tableau d'aperçu des Alternatives, qui montre comment ces valeurs sont regroupées par catégorie, et permet à un scénario d'avoir une durée totale de simulation et un pas de temps hydraulique distincts. Vos commentaires sur cette fonction sont les bienvenus.",
-                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Choosing Scenario manager turns Basic mode off. A project whose scenarios and alternatives Basic mode cannot show keeps it off."
+                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Scenario manager is disabled when Basic mode is on. Basic mode is disabled when a project has scenarios and alternatives relationships that Basic mode cannot show."
                 },
                 "next_translated": {
                     "key": "lpn_time_scn_overrides",
@@ -1980,7 +2266,7 @@
                 "previous_translated": {
                     "key": "lpn_scenario_basic_tip",
                     "value": "Cochée : un scénario ne comprend que les valeurs qui y sont définies. Décochée : ce menu propose aussi le tableau d'aperçu des Alternatives, qui montre comment ces valeurs sont regroupées par catégorie, et permet à un scénario d'avoir une durée totale de simulation et un pas de temps hydraulique distincts. Vos commentaires sur cette fonction sont les bienvenus.",
-                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Choosing Scenario manager turns Basic mode off. A project whose scenarios and alternatives Basic mode cannot show keeps it off."
+                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Scenario manager is disabled when Basic mode is on. Basic mode is disabled when a project has scenarios and alternatives relationships that Basic mode cannot show."
                 },
                 "next_translated": {
                     "key": "lpn_time_scn_overrides",
@@ -1996,7 +2282,7 @@
                 "previous_translated": {
                     "key": "lpn_scenario_basic_tip",
                     "value": "Cochée : un scénario ne comprend que les valeurs qui y sont définies. Décochée : ce menu propose aussi le tableau d'aperçu des Alternatives, qui montre comment ces valeurs sont regroupées par catégorie, et permet à un scénario d'avoir une durée totale de simulation et un pas de temps hydraulique distincts. Vos commentaires sur cette fonction sont les bienvenus.",
-                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Choosing Scenario manager turns Basic mode off. A project whose scenarios and alternatives Basic mode cannot show keeps it off."
+                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Scenario manager is disabled when Basic mode is on. Basic mode is disabled when a project has scenarios and alternatives relationships that Basic mode cannot show."
                 },
                 "next_translated": {
                     "key": "lpn_time_scn_overrides",
@@ -2012,7 +2298,7 @@
                 "previous_translated": {
                     "key": "lpn_scenario_basic_tip",
                     "value": "Cochée : un scénario ne comprend que les valeurs qui y sont définies. Décochée : ce menu propose aussi le tableau d'aperçu des Alternatives, qui montre comment ces valeurs sont regroupées par catégorie, et permet à un scénario d'avoir une durée totale de simulation et un pas de temps hydraulique distincts. Vos commentaires sur cette fonction sont les bienvenus.",
-                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Choosing Scenario manager turns Basic mode off. A project whose scenarios and alternatives Basic mode cannot show keeps it off."
+                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Scenario manager is disabled when Basic mode is on. Basic mode is disabled when a project has scenarios and alternatives relationships that Basic mode cannot show."
                 },
                 "next_translated": {
                     "key": "lpn_time_scn_overrides",
@@ -2028,7 +2314,7 @@
                 "previous_translated": {
                     "key": "lpn_scenario_basic_tip",
                     "value": "Cochée : un scénario ne comprend que les valeurs qui y sont définies. Décochée : ce menu propose aussi le tableau d'aperçu des Alternatives, qui montre comment ces valeurs sont regroupées par catégorie, et permet à un scénario d'avoir une durée totale de simulation et un pas de temps hydraulique distincts. Vos commentaires sur cette fonction sont les bienvenus.",
-                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Choosing Scenario manager turns Basic mode off. A project whose scenarios and alternatives Basic mode cannot show keeps it off."
+                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Scenario manager is disabled when Basic mode is on. Basic mode is disabled when a project has scenarios and alternatives relationships that Basic mode cannot show."
                 },
                 "next_translated": {
                     "key": "lpn_time_scn_overrides",
@@ -2044,7 +2330,7 @@
                 "previous_translated": {
                     "key": "lpn_scenario_basic_tip",
                     "value": "Cochée : un scénario ne comprend que les valeurs qui y sont définies. Décochée : ce menu propose aussi le tableau d'aperçu des Alternatives, qui montre comment ces valeurs sont regroupées par catégorie, et permet à un scénario d'avoir une durée totale de simulation et un pas de temps hydraulique distincts. Vos commentaires sur cette fonction sont les bienvenus.",
-                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Choosing Scenario manager turns Basic mode off. A project whose scenarios and alternatives Basic mode cannot show keeps it off."
+                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Scenario manager is disabled when Basic mode is on. Basic mode is disabled when a project has scenarios and alternatives relationships that Basic mode cannot show."
                 },
                 "next_translated": {
                     "key": "lpn_time_scn_overrides",
@@ -2060,7 +2346,39 @@
                 "previous_translated": {
                     "key": "lpn_scenario_basic_tip",
                     "value": "Cochée : un scénario ne comprend que les valeurs qui y sont définies. Décochée : ce menu propose aussi le tableau d'aperçu des Alternatives, qui montre comment ces valeurs sont regroupées par catégorie, et permet à un scénario d'avoir une durée totale de simulation et un pas de temps hydraulique distincts. Vos commentaires sur cette fonction sont les bienvenus.",
-                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Choosing Scenario manager turns Basic mode off. A project whose scenarios and alternatives Basic mode cannot show keeps it off."
+                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Scenario manager is disabled when Basic mode is on. Basic mode is disabled when a project has scenarios and alternatives relationships that Basic mode cannot show."
+                },
+                "next_translated": {
+                    "key": "lpn_time_scn_overrides",
+                    "value": "Valeurs propres au scénario :",
+                    "english": "Scenario overrides:"
+                }
+            }
+        },
+        "lpn_sm_item_scenario": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scenario_basic_tip",
+                    "value": "Cochée : un scénario ne comprend que les valeurs qui y sont définies. Décochée : ce menu propose aussi le tableau d'aperçu des Alternatives, qui montre comment ces valeurs sont regroupées par catégorie, et permet à un scénario d'avoir une durée totale de simulation et un pas de temps hydraulique distincts. Vos commentaires sur cette fonction sont les bienvenus.",
+                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Scenario manager is disabled when Basic mode is on. Basic mode is disabled when a project has scenarios and alternatives relationships that Basic mode cannot show."
+                },
+                "next_translated": {
+                    "key": "lpn_time_scn_overrides",
+                    "value": "Valeurs propres au scénario :",
+                    "english": "Scenario overrides:"
+                }
+            }
+        },
+        "lpn_sm_item_alternative": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scenario_basic_tip",
+                    "value": "Cochée : un scénario ne comprend que les valeurs qui y sont définies. Décochée : ce menu propose aussi le tableau d'aperçu des Alternatives, qui montre comment ces valeurs sont regroupées par catégorie, et permet à un scénario d'avoir une durée totale de simulation et un pas de temps hydraulique distincts. Vos commentaires sur cette fonction sont les bienvenus.",
+                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Scenario manager is disabled when Basic mode is on. Basic mode is disabled when a project has scenarios and alternatives relationships that Basic mode cannot show."
                 },
                 "next_translated": {
                     "key": "lpn_time_scn_overrides",
@@ -2076,7 +2394,7 @@
                 "previous_translated": {
                     "key": "lpn_scenario_basic_tip",
                     "value": "Cochée : un scénario ne comprend que les valeurs qui y sont définies. Décochée : ce menu propose aussi le tableau d'aperçu des Alternatives, qui montre comment ces valeurs sont regroupées par catégorie, et permet à un scénario d'avoir une durée totale de simulation et un pas de temps hydraulique distincts. Vos commentaires sur cette fonction sont les bienvenus.",
-                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Choosing Scenario manager turns Basic mode off. A project whose scenarios and alternatives Basic mode cannot show keeps it off."
+                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Scenario manager is disabled when Basic mode is on. Basic mode is disabled when a project has scenarios and alternatives relationships that Basic mode cannot show."
                 },
                 "next_translated": {
                     "key": "lpn_time_scn_overrides",
@@ -2092,7 +2410,7 @@
                 "previous_translated": {
                     "key": "lpn_scenario_basic_tip",
                     "value": "Cochée : un scénario ne comprend que les valeurs qui y sont définies. Décochée : ce menu propose aussi le tableau d'aperçu des Alternatives, qui montre comment ces valeurs sont regroupées par catégorie, et permet à un scénario d'avoir une durée totale de simulation et un pas de temps hydraulique distincts. Vos commentaires sur cette fonction sont les bienvenus.",
-                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Choosing Scenario manager turns Basic mode off. A project whose scenarios and alternatives Basic mode cannot show keeps it off."
+                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Scenario manager is disabled when Basic mode is on. Basic mode is disabled when a project has scenarios and alternatives relationships that Basic mode cannot show."
                 },
                 "next_translated": {
                     "key": "lpn_time_scn_overrides",
@@ -2108,7 +2426,7 @@
                 "previous_translated": {
                     "key": "lpn_scenario_basic_tip",
                     "value": "Cochée : un scénario ne comprend que les valeurs qui y sont définies. Décochée : ce menu propose aussi le tableau d'aperçu des Alternatives, qui montre comment ces valeurs sont regroupées par catégorie, et permet à un scénario d'avoir une durée totale de simulation et un pas de temps hydraulique distincts. Vos commentaires sur cette fonction sont les bienvenus.",
-                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Choosing Scenario manager turns Basic mode off. A project whose scenarios and alternatives Basic mode cannot show keeps it off."
+                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Scenario manager is disabled when Basic mode is on. Basic mode is disabled when a project has scenarios and alternatives relationships that Basic mode cannot show."
                 },
                 "next_translated": {
                     "key": "lpn_time_scn_overrides",
@@ -2124,7 +2442,7 @@
                 "previous_translated": {
                     "key": "lpn_scenario_basic_tip",
                     "value": "Cochée : un scénario ne comprend que les valeurs qui y sont définies. Décochée : ce menu propose aussi le tableau d'aperçu des Alternatives, qui montre comment ces valeurs sont regroupées par catégorie, et permet à un scénario d'avoir une durée totale de simulation et un pas de temps hydraulique distincts. Vos commentaires sur cette fonction sont les bienvenus.",
-                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Choosing Scenario manager turns Basic mode off. A project whose scenarios and alternatives Basic mode cannot show keeps it off."
+                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Scenario manager is disabled when Basic mode is on. Basic mode is disabled when a project has scenarios and alternatives relationships that Basic mode cannot show."
                 },
                 "next_translated": {
                     "key": "lpn_time_scn_overrides",
@@ -2140,7 +2458,7 @@
                 "previous_translated": {
                     "key": "lpn_scenario_basic_tip",
                     "value": "Cochée : un scénario ne comprend que les valeurs qui y sont définies. Décochée : ce menu propose aussi le tableau d'aperçu des Alternatives, qui montre comment ces valeurs sont regroupées par catégorie, et permet à un scénario d'avoir une durée totale de simulation et un pas de temps hydraulique distincts. Vos commentaires sur cette fonction sont les bienvenus.",
-                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Choosing Scenario manager turns Basic mode off. A project whose scenarios and alternatives Basic mode cannot show keeps it off."
+                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Scenario manager is disabled when Basic mode is on. Basic mode is disabled when a project has scenarios and alternatives relationships that Basic mode cannot show."
                 },
                 "next_translated": {
                     "key": "lpn_time_scn_overrides",
@@ -2156,7 +2474,7 @@
                 "previous_translated": {
                     "key": "lpn_scenario_basic_tip",
                     "value": "Cochée : un scénario ne comprend que les valeurs qui y sont définies. Décochée : ce menu propose aussi le tableau d'aperçu des Alternatives, qui montre comment ces valeurs sont regroupées par catégorie, et permet à un scénario d'avoir une durée totale de simulation et un pas de temps hydraulique distincts. Vos commentaires sur cette fonction sont les bienvenus.",
-                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Choosing Scenario manager turns Basic mode off. A project whose scenarios and alternatives Basic mode cannot show keeps it off."
+                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Scenario manager is disabled when Basic mode is on. Basic mode is disabled when a project has scenarios and alternatives relationships that Basic mode cannot show."
                 },
                 "next_translated": {
                     "key": "lpn_time_scn_overrides",
@@ -2172,7 +2490,7 @@
                 "previous_translated": {
                     "key": "lpn_scenario_basic_tip",
                     "value": "Cochée : un scénario ne comprend que les valeurs qui y sont définies. Décochée : ce menu propose aussi le tableau d'aperçu des Alternatives, qui montre comment ces valeurs sont regroupées par catégorie, et permet à un scénario d'avoir une durée totale de simulation et un pas de temps hydraulique distincts. Vos commentaires sur cette fonction sont les bienvenus.",
-                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Choosing Scenario manager turns Basic mode off. A project whose scenarios and alternatives Basic mode cannot show keeps it off."
+                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Scenario manager is disabled when Basic mode is on. Basic mode is disabled when a project has scenarios and alternatives relationships that Basic mode cannot show."
                 },
                 "next_translated": {
                     "key": "lpn_time_scn_overrides",
@@ -2188,7 +2506,7 @@
                 "previous_translated": {
                     "key": "lpn_scenario_basic_tip",
                     "value": "Cochée : un scénario ne comprend que les valeurs qui y sont définies. Décochée : ce menu propose aussi le tableau d'aperçu des Alternatives, qui montre comment ces valeurs sont regroupées par catégorie, et permet à un scénario d'avoir une durée totale de simulation et un pas de temps hydraulique distincts. Vos commentaires sur cette fonction sont les bienvenus.",
-                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Choosing Scenario manager turns Basic mode off. A project whose scenarios and alternatives Basic mode cannot show keeps it off."
+                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Scenario manager is disabled when Basic mode is on. Basic mode is disabled when a project has scenarios and alternatives relationships that Basic mode cannot show."
                 },
                 "next_translated": {
                     "key": "lpn_time_scn_overrides",
@@ -2204,7 +2522,7 @@
                 "previous_translated": {
                     "key": "lpn_scenario_basic_tip",
                     "value": "Cochée : un scénario ne comprend que les valeurs qui y sont définies. Décochée : ce menu propose aussi le tableau d'aperçu des Alternatives, qui montre comment ces valeurs sont regroupées par catégorie, et permet à un scénario d'avoir une durée totale de simulation et un pas de temps hydraulique distincts. Vos commentaires sur cette fonction sont les bienvenus.",
-                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Choosing Scenario manager turns Basic mode off. A project whose scenarios and alternatives Basic mode cannot show keeps it off."
+                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Scenario manager is disabled when Basic mode is on. Basic mode is disabled when a project has scenarios and alternatives relationships that Basic mode cannot show."
                 },
                 "next_translated": {
                     "key": "lpn_time_scn_overrides",
@@ -3186,6 +3504,966 @@
                     "key": "lpn_library_control_add",
                     "value": "Ajouter un contrôle",
                     "english": "Add a control"
+                }
+            }
+        },
+        "lpn_file_import_shapes": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "Lit une liste de points relevés dans un fichier texte et crée une jonction à chaque point, en reprenant les paramètres des nouveaux éléments pour tout ce que le fichier ne précise pas. Aucune conduite n'est dessinée, sauf si vous cochez Lire la description comme des codes de terrain, et aucune ligne n'est jamais ignorée sans être nommée. Il utilise le système de coordonnées que ce projet emploie déjà, géoréférencé ou non.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "Ce fichier n'a pas pu être lu depuis votre disque.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_file_import_shapes_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "Lit une liste de points relevés dans un fichier texte et crée une jonction à chaque point, en reprenant les paramètres des nouveaux éléments pour tout ce que le fichier ne précise pas. Aucune conduite n'est dessinée, sauf si vous cochez Lire la description comme des codes de terrain, et aucune ligne n'est jamais ignorée sans être nommée. Il utilise le système de coordonnées que ce projet emploie déjà, géoréférencé ou non.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "Ce fichier n'a pas pu être lu depuis votre disque.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_geojson_import_done": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "Lit une liste de points relevés dans un fichier texte et crée une jonction à chaque point, en reprenant les paramètres des nouveaux éléments pour tout ce que le fichier ne précise pas. Aucune conduite n'est dessinée, sauf si vous cochez Lire la description comme des codes de terrain, et aucune ligne n'est jamais ignorée sans être nommée. Il utilise le système de coordonnées que ce projet emploie déjà, géoréférencé ou non.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "Ce fichier n'a pas pu être lu depuis votre disque.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_geojson_import_done_one": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "Lit une liste de points relevés dans un fichier texte et crée une jonction à chaque point, en reprenant les paramètres des nouveaux éléments pour tout ce que le fichier ne précise pas. Aucune conduite n'est dessinée, sauf si vous cochez Lire la description comme des codes de terrain, et aucune ligne n'est jamais ignorée sans être nommée. Il utilise le système de coordonnées que ce projet emploie déjà, géoréférencé ou non.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "Ce fichier n'a pas pu être lu depuis votre disque.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_geojson_import_renamed": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "Lit une liste de points relevés dans un fichier texte et crée une jonction à chaque point, en reprenant les paramètres des nouveaux éléments pour tout ce que le fichier ne précise pas. Aucune conduite n'est dessinée, sauf si vous cochez Lire la description comme des codes de terrain, et aucune ligne n'est jamais ignorée sans être nommée. Il utilise le système de coordonnées que ce projet emploie déjà, géoréférencé ou non.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "Ce fichier n'a pas pu être lu depuis votre disque.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_geojson_import_renamed_one": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "Lit une liste de points relevés dans un fichier texte et crée une jonction à chaque point, en reprenant les paramètres des nouveaux éléments pour tout ce que le fichier ne précise pas. Aucune conduite n'est dessinée, sauf si vous cochez Lire la description comme des codes de terrain, et aucune ligne n'est jamais ignorée sans être nommée. Il utilise le système de coordonnées que ce projet emploie déjà, géoréférencé ou non.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "Ce fichier n'a pas pu être lu depuis votre disque.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_geojson_import_skipped": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "Lit une liste de points relevés dans un fichier texte et crée une jonction à chaque point, en reprenant les paramètres des nouveaux éléments pour tout ce que le fichier ne précise pas. Aucune conduite n'est dessinée, sauf si vous cochez Lire la description comme des codes de terrain, et aucune ligne n'est jamais ignorée sans être nommée. Il utilise le système de coordonnées que ce projet emploie déjà, géoréférencé ou non.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "Ce fichier n'a pas pu être lu depuis votre disque.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_geojson_import_skipped_one": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "Lit une liste de points relevés dans un fichier texte et crée une jonction à chaque point, en reprenant les paramètres des nouveaux éléments pour tout ce que le fichier ne précise pas. Aucune conduite n'est dessinée, sauf si vous cochez Lire la description comme des codes de terrain, et aucune ligne n'est jamais ignorée sans être nommée. Il utilise le système de coordonnées que ce projet emploie déjà, géoréférencé ou non.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "Ce fichier n'a pas pu être lu depuis votre disque.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_geojson_import_why_network": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "Lit une liste de points relevés dans un fichier texte et crée une jonction à chaque point, en reprenant les paramètres des nouveaux éléments pour tout ce que le fichier ne précise pas. Aucune conduite n'est dessinée, sauf si vous cochez Lire la description comme des codes de terrain, et aucune ligne n'est jamais ignorée sans être nommée. Il utilise le système de coordonnées que ce projet emploie déjà, géoréférencé ou non.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "Ce fichier n'a pas pu être lu depuis votre disque.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_geojson_import_why_geometry": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "Lit une liste de points relevés dans un fichier texte et crée une jonction à chaque point, en reprenant les paramètres des nouveaux éléments pour tout ce que le fichier ne précise pas. Aucune conduite n'est dessinée, sauf si vous cochez Lire la description comme des codes de terrain, et aucune ligne n'est jamais ignorée sans être nommée. Il utilise le système de coordonnées que ce projet emploie déjà, géoréférencé ou non.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "Ce fichier n'a pas pu être lu depuis votre disque.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_geojson_import_why_position": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "Lit une liste de points relevés dans un fichier texte et crée une jonction à chaque point, en reprenant les paramètres des nouveaux éléments pour tout ce que le fichier ne précise pas. Aucune conduite n'est dessinée, sauf si vous cochez Lire la description comme des codes de terrain, et aucune ligne n'est jamais ignorée sans être nommée. Il utilise le système de coordonnées que ce projet emploie déjà, géoréférencé ou non.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "Ce fichier n'a pas pu être lu depuis votre disque.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_geojson_import_holes": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "Lit une liste de points relevés dans un fichier texte et crée une jonction à chaque point, en reprenant les paramètres des nouveaux éléments pour tout ce que le fichier ne précise pas. Aucune conduite n'est dessinée, sauf si vous cochez Lire la description comme des codes de terrain, et aucune ligne n'est jamais ignorée sans être nommée. Il utilise le système de coordonnées que ce projet emploie déjà, géoréférencé ou non.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "Ce fichier n'a pas pu être lu depuis votre disque.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_geojson_import_holes_one": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "Lit une liste de points relevés dans un fichier texte et crée une jonction à chaque point, en reprenant les paramètres des nouveaux éléments pour tout ce que le fichier ne précise pas. Aucune conduite n'est dessinée, sauf si vous cochez Lire la description comme des codes de terrain, et aucune ligne n'est jamais ignorée sans être nommée. Il utilise le système de coordonnées que ce projet emploie déjà, géoréférencé ou non.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "Ce fichier n'a pas pu être lu depuis votre disque.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_geojson_import_parts": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "Lit une liste de points relevés dans un fichier texte et crée une jonction à chaque point, en reprenant les paramètres des nouveaux éléments pour tout ce que le fichier ne précise pas. Aucune conduite n'est dessinée, sauf si vous cochez Lire la description comme des codes de terrain, et aucune ligne n'est jamais ignorée sans être nommée. Il utilise le système de coordonnées que ce projet emploie déjà, géoréférencé ou non.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "Ce fichier n'a pas pu être lu depuis votre disque.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_geojson_import_parts_one": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "Lit une liste de points relevés dans un fichier texte et crée une jonction à chaque point, en reprenant les paramètres des nouveaux éléments pour tout ce que le fichier ne précise pas. Aucune conduite n'est dessinée, sauf si vous cochez Lire la description comme des codes de terrain, et aucune ligne n'est jamais ignorée sans être nommée. Il utilise le système de coordonnées que ce projet emploie déjà, géoréférencé ou non.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "Ce fichier n'a pas pu être lu depuis votre disque.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_geojson_import_local": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "Lit une liste de points relevés dans un fichier texte et crée une jonction à chaque point, en reprenant les paramètres des nouveaux éléments pour tout ce que le fichier ne précise pas. Aucune conduite n'est dessinée, sauf si vous cochez Lire la description comme des codes de terrain, et aucune ligne n'est jamais ignorée sans être nommée. Il utilise le système de coordonnées que ce projet emploie déjà, géoréférencé ou non.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "Ce fichier n'a pas pu être lu depuis votre disque.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_geojson_import_unreadable": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "Lit une liste de points relevés dans un fichier texte et crée une jonction à chaque point, en reprenant les paramètres des nouveaux éléments pour tout ce que le fichier ne précise pas. Aucune conduite n'est dessinée, sauf si vous cochez Lire la description comme des codes de terrain, et aucune ligne n'est jamais ignorée sans être nommée. Il utilise le système de coordonnées que ce projet emploie déjà, géoréférencé ou non.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "Ce fichier n'a pas pu être lu depuis votre disque.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_file_import_dxf": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "Lit une liste de points relevés dans un fichier texte et crée une jonction à chaque point, en reprenant les paramètres des nouveaux éléments pour tout ce que le fichier ne précise pas. Aucune conduite n'est dessinée, sauf si vous cochez Lire la description comme des codes de terrain, et aucune ligne n'est jamais ignorée sans être nommée. Il utilise le système de coordonnées que ce projet emploie déjà, géoréférencé ou non.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "Ce fichier n'a pas pu être lu depuis votre disque.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_file_import_dxf_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "Lit une liste de points relevés dans un fichier texte et crée une jonction à chaque point, en reprenant les paramètres des nouveaux éléments pour tout ce que le fichier ne précise pas. Aucune conduite n'est dessinée, sauf si vous cochez Lire la description comme des codes de terrain, et aucune ligne n'est jamais ignorée sans être nommée. Il utilise le système de coordonnées que ce projet emploie déjà, géoréférencé ou non.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "Ce fichier n'a pas pu être lu depuis votre disque.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_file_import_shp": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "Lit une liste de points relevés dans un fichier texte et crée une jonction à chaque point, en reprenant les paramètres des nouveaux éléments pour tout ce que le fichier ne précise pas. Aucune conduite n'est dessinée, sauf si vous cochez Lire la description comme des codes de terrain, et aucune ligne n'est jamais ignorée sans être nommée. Il utilise le système de coordonnées que ce projet emploie déjà, géoréférencé ou non.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "Ce fichier n'a pas pu être lu depuis votre disque.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_file_import_shp_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "Lit une liste de points relevés dans un fichier texte et crée une jonction à chaque point, en reprenant les paramètres des nouveaux éléments pour tout ce que le fichier ne précise pas. Aucune conduite n'est dessinée, sauf si vous cochez Lire la description comme des codes de terrain, et aucune ligne n'est jamais ignorée sans être nommée. Il utilise le système de coordonnées que ce projet emploie déjà, géoréférencé ou non.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "Ce fichier n'a pas pu être lu depuis votre disque.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_dxf_import_skipped": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "Lit une liste de points relevés dans un fichier texte et crée une jonction à chaque point, en reprenant les paramètres des nouveaux éléments pour tout ce que le fichier ne précise pas. Aucune conduite n'est dessinée, sauf si vous cochez Lire la description comme des codes de terrain, et aucune ligne n'est jamais ignorée sans être nommée. Il utilise le système de coordonnées que ce projet emploie déjà, géoréférencé ou non.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "Ce fichier n'a pas pu être lu depuis votre disque.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_dxf_import_skipped_one": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "Lit une liste de points relevés dans un fichier texte et crée une jonction à chaque point, en reprenant les paramètres des nouveaux éléments pour tout ce que le fichier ne précise pas. Aucune conduite n'est dessinée, sauf si vous cochez Lire la description comme des codes de terrain, et aucune ligne n'est jamais ignorée sans être nommée. Il utilise le système de coordonnées que ce projet emploie déjà, géoréférencé ou non.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "Ce fichier n'a pas pu être lu depuis votre disque.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_dxf_import_inblocks": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "Lit une liste de points relevés dans un fichier texte et crée une jonction à chaque point, en reprenant les paramètres des nouveaux éléments pour tout ce que le fichier ne précise pas. Aucune conduite n'est dessinée, sauf si vous cochez Lire la description comme des codes de terrain, et aucune ligne n'est jamais ignorée sans être nommée. Il utilise le système de coordonnées que ce projet emploie déjà, géoréférencé ou non.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "Ce fichier n'a pas pu être lu depuis votre disque.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_dxf_import_bulge": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "Lit une liste de points relevés dans un fichier texte et crée une jonction à chaque point, en reprenant les paramètres des nouveaux éléments pour tout ce que le fichier ne précise pas. Aucune conduite n'est dessinée, sauf si vous cochez Lire la description comme des codes de terrain, et aucune ligne n'est jamais ignorée sans être nommée. Il utilise le système de coordonnées que ce projet emploie déjà, géoréférencé ou non.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "Ce fichier n'a pas pu être lu depuis votre disque.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_dxf_import_bulge_one": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "Lit une liste de points relevés dans un fichier texte et crée une jonction à chaque point, en reprenant les paramètres des nouveaux éléments pour tout ce que le fichier ne précise pas. Aucune conduite n'est dessinée, sauf si vous cochez Lire la description comme des codes de terrain, et aucune ligne n'est jamais ignorée sans être nommée. Il utilise le système de coordonnées que ce projet emploie déjà, géoréférencé ou non.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "Ce fichier n'a pas pu être lu depuis votre disque.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_dxf_import_units": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "Lit une liste de points relevés dans un fichier texte et crée une jonction à chaque point, en reprenant les paramètres des nouveaux éléments pour tout ce que le fichier ne précise pas. Aucune conduite n'est dessinée, sauf si vous cochez Lire la description comme des codes de terrain, et aucune ligne n'est jamais ignorée sans être nommée. Il utilise le système de coordonnées que ce projet emploie déjà, géoréférencé ou non.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "Ce fichier n'a pas pu être lu depuis votre disque.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_dxf_import_refuse_geo": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "Lit une liste de points relevés dans un fichier texte et crée une jonction à chaque point, en reprenant les paramètres des nouveaux éléments pour tout ce que le fichier ne précise pas. Aucune conduite n'est dessinée, sauf si vous cochez Lire la description comme des codes de terrain, et aucune ligne n'est jamais ignorée sans être nommée. Il utilise le système de coordonnées que ce projet emploie déjà, géoréférencé ou non.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "Ce fichier n'a pas pu être lu depuis votre disque.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_dxf_import_unreadable": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "Lit une liste de points relevés dans un fichier texte et crée une jonction à chaque point, en reprenant les paramètres des nouveaux éléments pour tout ce que le fichier ne précise pas. Aucune conduite n'est dessinée, sauf si vous cochez Lire la description comme des codes de terrain, et aucune ligne n'est jamais ignorée sans être nommée. Il utilise le système de coordonnées que ce projet emploie déjà, géoréférencé ou non.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "Ce fichier n'a pas pu être lu depuis votre disque.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_dxf_import_binary": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "Lit une liste de points relevés dans un fichier texte et crée une jonction à chaque point, en reprenant les paramètres des nouveaux éléments pour tout ce que le fichier ne précise pas. Aucune conduite n'est dessinée, sauf si vous cochez Lire la description comme des codes de terrain, et aucune ligne n'est jamais ignorée sans être nommée. Il utilise le système de coordonnées que ce projet emploie déjà, géoréférencé ou non.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "Ce fichier n'a pas pu être lu depuis votre disque.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_shapes_import_frame": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "Lit une liste de points relevés dans un fichier texte et crée une jonction à chaque point, en reprenant les paramètres des nouveaux éléments pour tout ce que le fichier ne précise pas. Aucune conduite n'est dessinée, sauf si vous cochez Lire la description comme des codes de terrain, et aucune ligne n'est jamais ignorée sans être nommée. Il utilise le système de coordonnées que ce projet emploie déjà, géoréférencé ou non.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "Ce fichier n'a pas pu être lu depuis votre disque.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_shapes_frame_xy": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "Lit une liste de points relevés dans un fichier texte et crée une jonction à chaque point, en reprenant les paramètres des nouveaux éléments pour tout ce que le fichier ne précise pas. Aucune conduite n'est dessinée, sauf si vous cochez Lire la description comme des codes de terrain, et aucune ligne n'est jamais ignorée sans être nommée. Il utilise le système de coordonnées que ce projet emploie déjà, géoréférencé ou non.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "Ce fichier n'a pas pu être lu depuis votre disque.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_shapes_frame_latlon": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "Lit une liste de points relevés dans un fichier texte et crée une jonction à chaque point, en reprenant les paramètres des nouveaux éléments pour tout ce que le fichier ne précise pas. Aucune conduite n'est dessinée, sauf si vous cochez Lire la description comme des codes de terrain, et aucune ligne n'est jamais ignorée sans être nommée. Il utilise le système de coordonnées que ce projet emploie déjà, géoréférencé ou non.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "Ce fichier n'a pas pu être lu depuis votre disque.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_shp_import_skipped": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "Lit une liste de points relevés dans un fichier texte et crée une jonction à chaque point, en reprenant les paramètres des nouveaux éléments pour tout ce que le fichier ne précise pas. Aucune conduite n'est dessinée, sauf si vous cochez Lire la description comme des codes de terrain, et aucune ligne n'est jamais ignorée sans être nommée. Il utilise le système de coordonnées que ce projet emploie déjà, géoréférencé ou non.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "Ce fichier n'a pas pu être lu depuis votre disque.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_shp_import_skipped_one": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "Lit une liste de points relevés dans un fichier texte et crée une jonction à chaque point, en reprenant les paramètres des nouveaux éléments pour tout ce que le fichier ne précise pas. Aucune conduite n'est dessinée, sauf si vous cochez Lire la description comme des codes de terrain, et aucune ligne n'est jamais ignorée sans être nommée. Il utilise le système de coordonnées que ce projet emploie déjà, géoréférencé ou non.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "Ce fichier n'a pas pu être lu depuis votre disque.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_shp_import_attrs": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "Lit une liste de points relevés dans un fichier texte et crée une jonction à chaque point, en reprenant les paramètres des nouveaux éléments pour tout ce que le fichier ne précise pas. Aucune conduite n'est dessinée, sauf si vous cochez Lire la description comme des codes de terrain, et aucune ligne n'est jamais ignorée sans être nommée. Il utilise le système de coordonnées que ce projet emploie déjà, géoréférencé ou non.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "Ce fichier n'a pas pu être lu depuis votre disque.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_shp_import_noprj": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "Lit une liste de points relevés dans un fichier texte et crée une jonction à chaque point, en reprenant les paramètres des nouveaux éléments pour tout ce que le fichier ne précise pas. Aucune conduite n'est dessinée, sauf si vous cochez Lire la description comme des codes de terrain, et aucune ligne n'est jamais ignorée sans être nommée. Il utilise le système de coordonnées que ce projet emploie déjà, géoréférencé ou non.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "Ce fichier n'a pas pu être lu depuis votre disque.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_shp_import_prj_same": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "Lit une liste de points relevés dans un fichier texte et crée une jonction à chaque point, en reprenant les paramètres des nouveaux éléments pour tout ce que le fichier ne précise pas. Aucune conduite n'est dessinée, sauf si vous cochez Lire la description comme des codes de terrain, et aucune ligne n'est jamais ignorée sans être nommée. Il utilise le système de coordonnées que ce projet emploie déjà, géoréférencé ou non.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "Ce fichier n'a pas pu être lu depuis votre disque.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_shp_import_converted": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "Lit une liste de points relevés dans un fichier texte et crée une jonction à chaque point, en reprenant les paramètres des nouveaux éléments pour tout ce que le fichier ne précise pas. Aucune conduite n'est dessinée, sauf si vous cochez Lire la description comme des codes de terrain, et aucune ligne n'est jamais ignorée sans être nommée. Il utilise le système de coordonnées que ce projet emploie déjà, géoréférencé ou non.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "Ce fichier n'a pas pu être lu depuis votre disque.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_shp_import_prj_other": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "Lit une liste de points relevés dans un fichier texte et crée une jonction à chaque point, en reprenant les paramètres des nouveaux éléments pour tout ce que le fichier ne précise pas. Aucune conduite n'est dessinée, sauf si vous cochez Lire la description comme des codes de terrain, et aucune ligne n'est jamais ignorée sans être nommée. Il utilise le système de coordonnées que ce projet emploie déjà, géoréférencé ou non.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "Ce fichier n'a pas pu être lu depuis votre disque.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_shp_import_refuse_local": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "Lit une liste de points relevés dans un fichier texte et crée une jonction à chaque point, en reprenant les paramètres des nouveaux éléments pour tout ce que le fichier ne précise pas. Aucune conduite n'est dessinée, sauf si vous cochez Lire la description comme des codes de terrain, et aucune ligne n'est jamais ignorée sans être nommée. Il utilise le système de coordonnées que ce projet emploie déjà, géoréférencé ou non.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "Ce fichier n'a pas pu être lu depuis votre disque.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_shp_import_refuse_crs": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "Lit une liste de points relevés dans un fichier texte et crée une jonction à chaque point, en reprenant les paramètres des nouveaux éléments pour tout ce que le fichier ne précise pas. Aucune conduite n'est dessinée, sauf si vous cochez Lire la description comme des codes de terrain, et aucune ligne n'est jamais ignorée sans être nommée. Il utilise le système de coordonnées que ce projet emploie déjà, géoréférencé ou non.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "Ce fichier n'a pas pu être lu depuis votre disque.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_shp_import_refuse_range": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "Lit une liste de points relevés dans un fichier texte et crée une jonction à chaque point, en reprenant les paramètres des nouveaux éléments pour tout ce que le fichier ne précise pas. Aucune conduite n'est dessinée, sauf si vous cochez Lire la description comme des codes de terrain, et aucune ligne n'est jamais ignorée sans être nommée. Il utilise le système de coordonnées que ce projet emploie déjà, géoréférencé ou non.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "Ce fichier n'a pas pu être lu depuis votre disque.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_shp_import_noshp": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "Lit une liste de points relevés dans un fichier texte et crée une jonction à chaque point, en reprenant les paramètres des nouveaux éléments pour tout ce que le fichier ne précise pas. Aucune conduite n'est dessinée, sauf si vous cochez Lire la description comme des codes de terrain, et aucune ligne n'est jamais ignorée sans être nommée. Il utilise le système de coordonnées que ce projet emploie déjà, géoréférencé ou non.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "Ce fichier n'a pas pu être lu depuis votre disque.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_shp_import_manyshp": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "Lit une liste de points relevés dans un fichier texte et crée une jonction à chaque point, en reprenant les paramètres des nouveaux éléments pour tout ce que le fichier ne précise pas. Aucune conduite n'est dessinée, sauf si vous cochez Lire la description comme des codes de terrain, et aucune ligne n'est jamais ignorée sans être nommée. Il utilise le système de coordonnées que ce projet emploie déjà, géoréférencé ou non.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "Ce fichier n'a pas pu être lu depuis votre disque.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_shp_import_unreadable": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "Lit une liste de points relevés dans un fichier texte et crée une jonction à chaque point, en reprenant les paramètres des nouveaux éléments pour tout ce que le fichier ne précise pas. Aucune conduite n'est dessinée, sauf si vous cochez Lire la description comme des codes de terrain, et aucune ligne n'est jamais ignorée sans être nommée. Il utilise le système de coordonnées que ce projet emploie déjà, géoréférencé ou non.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "Ce fichier n'a pas pu être lu depuis votre disque.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_shp_import_pick_hint": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "Lit une liste de points relevés dans un fichier texte et crée une jonction à chaque point, en reprenant les paramètres des nouveaux éléments pour tout ce que le fichier ne précise pas. Aucune conduite n'est dessinée, sauf si vous cochez Lire la description comme des codes de terrain, et aucune ligne n'est jamais ignorée sans être nommée. Il utilise le système de coordonnées que ce projet emploie déjà, géoréférencé ou non.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "Ce fichier n'a pas pu être lu depuis votre disque.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_shp_import_webmerc_ask": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "Lit une liste de points relevés dans un fichier texte et crée une jonction à chaque point, en reprenant les paramètres des nouveaux éléments pour tout ce que le fichier ne précise pas. Aucune conduite n'est dessinée, sauf si vous cochez Lire la description comme des codes de terrain, et aucune ligne n'est jamais ignorée sans être nommée. Il utilise le système de coordonnées que ce projet emploie déjà, géoréférencé ou non.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "Ce fichier n'a pas pu être lu depuis votre disque.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_shp_import_webmerc_ok": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "Lit une liste de points relevés dans un fichier texte et crée une jonction à chaque point, en reprenant les paramètres des nouveaux éléments pour tout ce que le fichier ne précise pas. Aucune conduite n'est dessinée, sauf si vous cochez Lire la description comme des codes de terrain, et aucune ligne n'est jamais ignorée sans être nommée. Il utilise le système de coordonnées que ce projet emploie déjà, géoréférencé ou non.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "Ce fichier n'a pas pu être lu depuis votre disque.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_shp_import_webmerc_far_ask": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "Lit une liste de points relevés dans un fichier texte et crée une jonction à chaque point, en reprenant les paramètres des nouveaux éléments pour tout ce que le fichier ne précise pas. Aucune conduite n'est dessinée, sauf si vous cochez Lire la description comme des codes de terrain, et aucune ligne n'est jamais ignorée sans être nommée. Il utilise le système de coordonnées que ce projet emploie déjà, géoréférencé ou non.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "Ce fichier n'a pas pu être lu depuis votre disque.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_shp_import_reprojected": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "Lit une liste de points relevés dans un fichier texte et crée une jonction à chaque point, en reprenant les paramètres des nouveaux éléments pour tout ce que le fichier ne précise pas. Aucune conduite n'est dessinée, sauf si vous cochez Lire la description comme des codes de terrain, et aucune ligne n'est jamais ignorée sans être nommée. Il utilise le système de coordonnées que ce projet emploie déjà, géoréférencé ou non.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "Ce fichier n'a pas pu être lu depuis votre disque.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_shp_import_unplaced": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "Lit une liste de points relevés dans un fichier texte et crée une jonction à chaque point, en reprenant les paramètres des nouveaux éléments pour tout ce que le fichier ne précise pas. Aucune conduite n'est dessinée, sauf si vous cochez Lire la description comme des codes de terrain, et aucune ligne n'est jamais ignorée sans être nommée. Il utilise le système de coordonnées que ce projet emploie déjà, géoréférencé ou non.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "Ce fichier n'a pas pu être lu depuis votre disque.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_shp_import_unplaced_one": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "Lit une liste de points relevés dans un fichier texte et crée une jonction à chaque point, en reprenant les paramètres des nouveaux éléments pour tout ce que le fichier ne précise pas. Aucune conduite n'est dessinée, sauf si vous cochez Lire la description comme des codes de terrain, et aucune ligne n'est jamais ignorée sans être nommée. Il utilise le système de coordonnées que ce projet emploie déjà, géoréférencé ou non.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "Ce fichier n'a pas pu être lu depuis votre disque.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_shapes_import_none": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "Lit une liste de points relevés dans un fichier texte et crée une jonction à chaque point, en reprenant les paramètres des nouveaux éléments pour tout ce que le fichier ne précise pas. Aucune conduite n'est dessinée, sauf si vous cochez Lire la description comme des codes de terrain, et aucune ligne n'est jamais ignorée sans être nommée. Il utilise le système de coordonnées que ce projet emploie déjà, géoréférencé ou non.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "Ce fichier n'a pas pu être lu depuis votre disque.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_shp_import_convert_hint": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "Lit une liste de points relevés dans un fichier texte et crée une jonction à chaque point, en reprenant les paramètres des nouveaux éléments pour tout ce que le fichier ne précise pas. Aucune conduite n'est dessinée, sauf si vous cochez Lire la description comme des codes de terrain, et aucune ligne n'est jamais ignorée sans être nommée. Il utilise le système de coordonnées que ce projet emploie déjà, géoréférencé ou non.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "Ce fichier n'a pas pu être lu depuis votre disque.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_shp_import_damaged": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "Lit une liste de points relevés dans un fichier texte et crée une jonction à chaque point, en reprenant les paramètres des nouveaux éléments pour tout ce que le fichier ne précise pas. Aucune conduite n'est dessinée, sauf si vous cochez Lire la description comme des codes de terrain, et aucune ligne n'est jamais ignorée sans être nommée. Il utilise le système de coordonnées que ce projet emploie déjà, géoréférencé ou non.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "Ce fichier n'a pas pu être lu depuis votre disque.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_shp_import_deleted": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "Lit une liste de points relevés dans un fichier texte et crée une jonction à chaque point, en reprenant les paramètres des nouveaux éléments pour tout ce que le fichier ne précise pas. Aucune conduite n'est dessinée, sauf si vous cochez Lire la description comme des codes de terrain, et aucune ligne n'est jamais ignorée sans être nommée. Il utilise le système de coordonnées que ce projet emploie déjà, géoréférencé ou non.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "Ce fichier n'a pas pu être lu depuis votre disque.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_shp_import_deleted_one": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "Lit une liste de points relevés dans un fichier texte et crée une jonction à chaque point, en reprenant les paramètres des nouveaux éléments pour tout ce que le fichier ne précise pas. Aucune conduite n'est dessinée, sauf si vous cochez Lire la description comme des codes de terrain, et aucune ligne n'est jamais ignorée sans être nommée. Il utilise le système de coordonnées que ce projet emploie déjà, géoréférencé ou non.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "Ce fichier n'a pas pu être lu depuis votre disque.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_dxf_import_paperspace": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "Lit une liste de points relevés dans un fichier texte et crée une jonction à chaque point, en reprenant les paramètres des nouveaux éléments pour tout ce que le fichier ne précise pas. Aucune conduite n'est dessinée, sauf si vous cochez Lire la description comme des codes de terrain, et aucune ligne n'est jamais ignorée sans être nommée. Il utilise le système de coordonnées que ce projet emploie déjà, géoréférencé ou non.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "Ce fichier n'a pas pu être lu depuis votre disque.",
+                    "english": "That file could not be read from your disk."
+                }
+            }
+        },
+        "lpn_shapes_import_more": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "Lit une liste de points relevés dans un fichier texte et crée une jonction à chaque point, en reprenant les paramètres des nouveaux éléments pour tout ce que le fichier ne précise pas. Aucune conduite n'est dessinée, sauf si vous cochez Lire la description comme des codes de terrain, et aucune ligne n'est jamais ignorée sans être nommée. Il utilise le système de coordonnées que ce projet emploie déjà, géoréférencé ou non.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_read_error",
+                    "value": "Ce fichier n'a pas pu être lu depuis votre disque.",
+                    "english": "That file could not be read from your disk."
                 }
             }
         }

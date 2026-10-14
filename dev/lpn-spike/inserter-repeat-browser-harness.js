@@ -93,7 +93,7 @@ async function main() {
 		console.log('\n--- junction pipe chain ---');
 		{
 			const bn = await count(a, 'data-node'), bl = await count(a, 'data-link');
-			await pick('0');
+			await pick('1');
 			for (let i = 0; i < 4; i++) { await click(spot()); }
 			const an = await count(a, 'data-node'), al = await count(a, 'data-link');
 			ok('chain: four clicks after one pick place four nodes and three pipes', an - bn === 4 && al - bl === 3, (an - bn) + ' nodes, ' + (al - bl) + ' links');

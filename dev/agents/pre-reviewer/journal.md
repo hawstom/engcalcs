@@ -4315,6 +4315,16 @@ OBSERVED: Select Area (window/lasso) never picks Shapes; no Tables tab; Find una
 OBSERVED: Arabic page: Shape strings are English (untranslated, expected); phone 390 draws by taps, closes by tap on first point.
 NOT CHECKED: Recalc OFF at runtime (code path calls only save/rebuild), projected-CRS import, visual appearance (colour, grips, 6% fill), dark theme, touch drag of grips.
 
+# Perry journal: feat/shape 0a1f1359 (2026-10-12), round after Tom's 2026-10-11 pass
+OBSERVED (decays): own scripts in real Chromium, new local and geo projects.
+- 200 Shapes pasted three ways (LF + header; CRLF + header + trailing CRLF; no header with spaces around cells): all 200 made, one notice, copy-all gives Points text byte-identical to input (trailing zeros, 8 decimals), paste-back reports "200 not changed", one Undo restores. Reload keeps exact text. Project with doc.origin 512000/3456000: exact text, new pastes exact, reload exact.
+- Refused cleanly with row named: comma decimal (512345,67 and 33,45), space-separated pairs, WKT, trailing pipe, no ID, duplicate ID in paste, lat out of range, no Points. Scientific notation and leading plus kept as typed.
+- Quirks: Closed=1 on a 2-point row is silently left open; a quoted cell is NOT unquoted (shared libPasteCells, pre-existing, no quote handling, a multi-line quoted cell breaks into rows); a line with no tab is split on commas/spaces (pre-existing).
+- es/ar: tab, column headings Closed/Points/Shape and the bad-paste sentence use English words inside a translated sentence (new keys untranslated, expected).
+- Icon at 5x beside Text and Chain: clearly an open pentagon, distinct from Vertices. Vertices is NOT adjacent to Shape in the toolbar (Text, Shape sit after Customer).
+- Builder's harness shape-table-browser-harness not run by me (lock held >280 s).
+NOT CHECKED: scenario active at runtime, file with no origin rebased on Open (my Open reused the stored project, origin stayed 0), 1x pixel look of icon, touch.
+
 # Perry journal: fix/run-report f908c408 (2026-10-11)
 OBSERVED: builder's run-report-units-harness passes (57 checks). My own old-vs-new comparison (reportUnits stripped vs kept) on a hand-built 10-node .inp with emitters, PRV, FCV, head-curve pump with speed pattern, volume-curve tank, reservoir pattern, pressure/level/clock controls, 5 rules, PDA, chlorine with wall order 0 and 1, 24 h: heads, pressures, demands, flows, velocities, headlosses, levels, qualities, statuses, event timeline identical (3375 values, bad 0) for gpm, gph, mgd, afd, imgd, lpm, mld, cmd, cmh, m3ps, lps, in US and SI sets.
 OBSERVED: with D-W or C-M roughness on an ill-posed (hydraulically unbalanced) network, old vs new differ at ~1e-6 and "Balanced after 17 vs 16 trials" appears; not wall-related. Unreproduced on a well-posed network; not checked.

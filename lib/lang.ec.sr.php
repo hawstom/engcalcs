@@ -929,7 +929,7 @@ $ec_lang['lpn_help_hotkeys']='Табеле и пречице';
 $ec_lang['lpn_hotkeys_tables_heading']='Табеле';
 $ec_lang['lpn_hotkeys_map_heading']='Мапа';
 $ec_lang['lpn_hotkeys_map_term']='Пречице на тастатури за мапу';
-$ec_lang['lpn_hotkeys_map_def']='<table class="lpn-notes-table"><tbody><tr><td>1 или Esc</td><td>Изабери.</td></tr><tr><td>2</td><td>Додај чвор.</td></tr><tr><td>3</td><td>Додај резервоар.</td></tr><tr><td>4</td><td>Додај танк.</td></tr><tr><td>5</td><td>Додај цев.</td></tr><tr><td>6</td><td>Додај пумпу.</td></tr><tr><td>7</td><td>Додај вентил.</td></tr><tr><td>8</td><td>Додај потрошача.</td></tr><tr><td>9</td><td>Додај текст.</td></tr><tr><td>Delete</td><td>Обриши избор.</td></tr><tr><td>Ctrl+Z</td><td>Поништи последњу измену.</td></tr><tr><td>+ или =</td><td>Увећај.</td></tr><tr><td>-</td><td>Умањи.</td></tr></tbody></table>';
+$ec_lang['lpn_hotkeys_map_def']='<table class="lpn-notes-table"><tbody><tr><td>0 или Esc</td><td>Изабери.</td></tr><tr><td>2</td><td>Додај чвор.</td></tr><tr><td>3</td><td>Додај резервоар.</td></tr><tr><td>4</td><td>Додај танк.</td></tr><tr><td>5</td><td>Додај цев.</td></tr><tr><td>6</td><td>Додај пумпу.</td></tr><tr><td>7</td><td>Додај вентил.</td></tr><tr><td>8</td><td>Додај потрошача.</td></tr><tr><td>9</td><td>Додај текст.</td></tr><tr><td>Delete</td><td>Обриши избор.</td></tr><tr><td>Ctrl+Z</td><td>Поништи последњу измену.</td></tr><tr><td>+ или =</td><td>Увећај.</td></tr><tr><td>-</td><td>Умањи.</td></tr></tbody></table>';
 // ---- The one-tap grievance link (ROADMAP Task 207, Rung 0) ----
 // The floor of the cost ladder in dev/dilettante-path.md: a visitor says something is wrong here
 // with one tap and nothing typed. Two sites, one behaviour -- a standing cell in the map's bottom
