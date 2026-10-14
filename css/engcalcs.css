@@ -1079,6 +1079,11 @@ html[lang="zh"] .ec-welcome {
    overridden and mid-pipe-draw shows the pending ring -- that one is about what your next click
    does, and it is the more urgent of the two. */
 .lpn-node.lpn-override { stroke: #e8a33d; stroke-width: calc(0.5 * var(--lpn-sym, 0)); }
+/* INHERITED, NOT OVERRIDDEN HERE (Task 790's hollow dot, on the map; Tom, 2026-10-14): a value the
+   open scenario takes from a parent scenario or a parent alternative. Gray and dashed, and thinner,
+   so it never reads as the amber of an override made in this scenario. */
+.lpn-link-halo.lpn-override-inh { stroke: #9e9e9e; stroke-width: calc(2.857 * var(--lpn-lw, 0)); stroke-dasharray: calc(4 * var(--lpn-lw, 0)) calc(3 * var(--lpn-lw, 0)); }
+.lpn-node.lpn-override-inh { stroke: #9e9e9e; stroke-width: calc(0.3 * var(--lpn-sym, 0)); stroke-dasharray: calc(0.9 * var(--lpn-sym, 0)) calc(0.6 * var(--lpn-sym, 0)); }
 /* SELECTED: the subject of the next command (ROADMAP Task 415, setSelection() in
    js/looped-network.js). Blue, and it is not spending the map's colour budget on the model: red
    says condition, amber says override, and both are statements about the DOCUMENT, while this one

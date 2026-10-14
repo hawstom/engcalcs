@@ -3822,6 +3822,7 @@ EngCalcs.pageConfig = {
 	lpn_scenario_menu: <?=json_encode($ec_lang['lpn_scenario_menu'])?>,
 	lpn_scenario_tip: <?=json_encode($ec_lang['lpn_scenario_tip'])?>,
 	lpn_scenario_mark_tip: <?=json_encode($ec_lang['lpn_scenario_mark_tip'])?>,
+	lpn_scenario_mark_inh_tip: <?=json_encode($ec_lang['lpn_scenario_mark_inh_tip'])?>,
 	lpn_scenario_overrides_tip: <?=json_encode($ec_lang['lpn_scenario_overrides_tip'])?>,
 	lpn_scenario_new: <?=json_encode($ec_lang['lpn_scenario_new'])?>,
 	lpn_scenario_new_name: <?=json_encode($ec_lang['lpn_scenario_new_name'])?>,

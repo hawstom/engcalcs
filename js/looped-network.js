@@ -6163,19 +6163,26 @@ var EngCalcs = EngCalcs || {};
 	// **THE BLANK ROW SAYS WHAT CHOOSING IT GIVES**: while the scenario names an alternative of its
 	// own (which its first override now stores), blank is "inherit", so it reads its parent's
 	// choice, "(inherited)", and never repeats the name already chosen.
+	// **"(inherited)" UNDER BASE TOO** (Tom, 2026-10-14: *"when I first change the Calculation
+	// alternative for a scenario to Base the selector goes blank"*): a child of Base that chose Base
+	// had a blank row reading "Base", so Base itself was not offered, and the select, holding a value
+	// none of its options had, showed nothing. Now the blank row says it inherits, and Base is listed.
 	function smInheritText(s, cat) {
 		var pc = EngCalcs.pageConfig || {}, p = s.root === true ? null : parentScenarioOf(s), t;
-		if (!p || p.isBase) { return smName(cat, smBaseKey(cat)); }
-		t = smCellText(p, cat);
+		if (!p) { return smName(cat, smBaseKey(cat)); }
+		t = p.isBase ? smName(cat, smBaseKey(cat)) : smCellText(p, cat);
 		return /\)$/.test(t) && t.indexOf(' (' + (pc.lpn_sm_inherited || 'inherited') + ')') > 0 ? t : t + ' (' + (pc.lpn_sm_inherited || 'inherited') + ')';
 	}
 	function smCellChoices(s, cat) {
-		var out = [['', smCellValue(s, cat) === '' ? smCellText(s, cat) : smInheritText(s, cat)]], mine = smImplicitKey(s, cat), base = smName(cat, smBaseKey(cat));
+		var out = [['', smCellValue(s, cat) === '' ? smCellText(s, cat) : smInheritText(s, cat)]], mine = smImplicitKey(s, cat), base = smName(cat, smBaseKey(cat)), val;
 		// Offered unless the blank row already reads Base (the same choice twice); chosen, it is
 		// listed so the cell can show it.
 		if (out[0][1] !== base) { out.push([base, base]); }
 		// Its own alternative is the blank row's text already.
 		smRecords(cat).forEach(function (r) { if (r.id !== mine) { out.push([String(r.name || ''), String(r.name || '')]); } });
+		// **THE VALUE THE CELL HOLDS IS ALWAYS ONE OF ITS OPTIONS**, or the select shows nothing.
+		val = smCellValue(s, cat);
+		if (val !== '' && !out.some(function (o) { return o[0] === val; })) { out.splice(1, 0, [val, val]); }
 		return out;
 	}
 	function smCellValue(s, cat) {
@@ -72041,10 +72048,27 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var shown = scnLabels([group]) || {};
 		return fields.some(function (f) { return !!shown[f]; });
 	}
+	// **THE AMBER RING IS AN OVERRIDE IN THIS SCENARIO, NEVER ONE IT INHERITS** (Task 790's one
+	// marker, overridden vs inherited; Tom, 2026-10-14, of tanks whose levels a child scenario took
+	// from its parent's alternative: *"Tanks show amber circle on map, but has overrides only in
+	// parent, not here."*). Local is hasOverride()'s rule: where this scenario writes, its own values
+	// or the stored alternative it names, not that alternative's parent.
+	function overrideIsLocal(scn, el, prop) {
+		var m = localOverrideMap(scn, categoryOf(prop, elGroup(el)))[ovKey(el)], has = Object.prototype.hasOwnProperty;
+		if (!m) { return false; }
+		return has.call(m, prop) || (prop === 'demand' && has.call(m, 'demands')) || (prop === 'demands' && has.call(m, 'demand'));
+	}
 	function hasDisplayedOverride(el) {
-		var ov = resolvedOverrides(activeScenario())[ovKey(el)];
+		var scn = activeScenario(), ov = resolvedOverrides(scn)[ovKey(el)];
 		if (!ov) { return false; }
-		return Object.keys(ov).some(function (p) { return overrideIsDisplayed(el, p); });
+		return Object.keys(ov).some(function (p) { return overrideIsDisplayed(el, p) && overrideIsLocal(scn, el, p); });
+	}
+	// A shown value the scenario inherits from a parent scenario or a parent alternative, and holds
+	// none of its own: the dashed gray ring, the map's hollow dot.
+	function hasInheritedDisplayedOverride(el) {
+		var scn = activeScenario(), ov = resolvedOverrides(scn)[ovKey(el)];
+		if (!ov) { return false; }
+		return Object.keys(ov).some(function (p) { return overrideIsDisplayed(el, p) && !overrideIsLocal(scn, el, p); });
 	}
 	// **THE RING HAS TO SAY WHAT IT IS, ON THE ELEMENT ITSELF** (ROADMAP Task 512). Tom, 2026-08-24,
 	// of two junctions in his own file: *"I don't know why, and I can't get them to unhighlight. I
@@ -72059,7 +72083,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	//
 	// Named with the SCENARIO, because that is the answer to "why": the ring is not a state of the
 	// element, it is a fact about which scenario is showing. Switch to Base and it is gone.
-	function setOverrideTitle(el, marked) {
+	function setOverrideTitle(el, marked, inherited) {
 		if (!el) { return; }
 		var t = null, i;
 		// A direct-child walk rather than querySelector(':scope > title'), so this works unchanged
@@ -72073,12 +72097,14 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// First child, so a reader hits it before any other content of the element.
 			el.insertBefore(t, el.firstChild);
 		}
-		t.textContent = overrideMarkText();
+		t.textContent = overrideMarkText(inherited);
 	}
-	function overrideMarkText() {
+	function overrideMarkText(inherited) {
 		var pc = EngCalcs.pageConfig || {};
-		return (pc.lpn_scenario_mark_tip
-			|| 'The amber ring means this asset has an override in the scenario {name}.')
+		return (inherited ? (pc.lpn_scenario_mark_inh_tip
+			|| 'The dashed gray ring means the scenario {name} inherits an override for this asset from its parent scenario or alternative.')
+			: (pc.lpn_scenario_mark_tip
+			|| 'The amber ring means this asset has an override in the scenario {name}.'))
 			.replace('{name}', scenarioDisplayName(activeScenario()));
 	}
 	/**
@@ -72105,24 +72131,28 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (group === 'link') { linkScenarioMarks(el); }
 	}
 	function nodeScenarioMarks(el) {
-		var ne = el ? nodeEls[el.id] : null, off, ov;
+		var ne = el ? nodeEls[el.id] : null, off, ov, inh;
 		if (!ne) { return; }
 		off = !isActive(el); ov = hasDisplayedOverride(el);
+		inh = !ov && hasInheritedDisplayedOverride(el);
 		ne.circle.classList.toggle('lpn-override', ov);
-		setOverrideTitle(ne.circle, ov);
+		ne.circle.classList.toggle('lpn-override-inh', inh);
+		setOverrideTitle(ne.circle, ov || inh, inh);
 		ne.circle.classList.toggle('lpn-inactive', off);
 		if (ne.symbol) { ne.symbol.classList.toggle('lpn-inactive', off); }
 		ne.text.classList.toggle('lpn-inactive', off);
 	}
 	function linkScenarioMarks(el) {
-		var le = el ? linkEls[el.id] : null, off, ov;
+		var le = el ? linkEls[el.id] : null, off, ov, inh;
 		if (!le) { return; }
 		// **A LINK WHOSE END IS INACTIVE IS DRAWN INACTIVE** (Task 781): it is out of the solve
 		// (assembleModel()), and Bentley greys what it leaves out.
 		off = !linkLive(el); ov = hasDisplayedOverride(el);
 		if (le.halo) {
+			inh = !ov && hasInheritedDisplayedOverride(el);
 			le.halo.classList.toggle('lpn-override', ov);
-			setOverrideTitle(le.halo, ov);
+			le.halo.classList.toggle('lpn-override-inh', inh);
+			setOverrideTitle(le.halo, ov || inh, inh);
 		}
 		le.line.classList.toggle('lpn-inactive', off);
 		le.text.classList.toggle('lpn-inactive', off);

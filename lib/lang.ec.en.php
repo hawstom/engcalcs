@@ -3260,6 +3260,7 @@ $ec_lang['lpn_scenario_overrides']='No. of overrides';
 // {name} is the active scenario's display name -- the ring is a fact about WHICH SCENARIO is
 // showing, not a state of the element, and naming the scenario is what makes that recoverable.
 $ec_lang['lpn_scenario_mark_tip']='The amber ring means this asset has an override in the scenario {name}.';
+$ec_lang['lpn_scenario_mark_inh_tip']='The dashed gray ring means the scenario {name} inherits an override for this asset from its parent scenario or alternative.';
 $ec_lang['lpn_scenario_overrides_tip']='Each override is marked on the map with an amber ring. Switch to {base} or another parent scenario to see the drawing without them.';
 $ec_lang['lpn_scenario_menu']='Scenarios';
 $ec_lang['lpn_scenario_tip']='The set of values the drawing is showing and the page is solving right now. Click to switch scenarios, or to add, rename, or delete one.';
