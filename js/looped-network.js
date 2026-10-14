@@ -53062,6 +53062,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// Add-* and Delete tools act on a plain click (tap without drag), same threshold as
 		// the spike's tap-vs-drag detection.
 		var downPt = null;
+		lpDropTap = function () { downPt = null; }; // a long press that opened the menu is not also a tap (Task 789)
 		// THE CLICK THAT ENDS A REGISTRATION IS NOT A TAP FOR A TOOL. The LAST click of a
 		// Scale/Position sequence clears regMode in a CAPTURE-phase listener, and the tool's own
 		// pointerup runs afterwards in the bubble phase of the same event, by which time the flag it
@@ -53838,15 +53839,75 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (e.button !== 2 || !ctxOnCanvas(e)) { return; }
 		if (mode === 'select' && ctxHit) { e.stopPropagation(); }
 	}, true);
+	// **LONG PRESS IS A TOUCH SCREEN'S RIGHT-CLICK** (Task 789; Tom, 2026-10-14: *"Isn't long press
+	// the standard alias for right-click on a touch screen?"*). A finger or pen held ~500 ms on a node
+	// or a pipe, travelling less than its own tap slop, opens THIS menu at the press point through the
+	// same door the right-click uses (ctxOpenAssetMenu). It is cancelled by a move past the slop, a
+	// second finger (a pinch), a lift or a cancel before the time. Chrome on Android also fires a
+	// `contextmenu` at the end of a long press; that one is swallowed (it is the same gesture), so the
+	// menu never opens twice. A mouse is untouched: this arms only for pointerType touch or pen.
+	// The press itself is allowed to select and arm a drag, as every press does (Task 415); when the
+	// timer fires the drag is dropped, the selection the press found is put back (a right-click never
+	// changes the selection), and the lift's click is swallowed so no tap action follows the menu.
+	var LONG_PRESS_MS = 500;
+	var lpress = null, lpSwallowClickUntil = 0, lpDropTap = function () {};
+	function lpCancel() { if (lpress && lpress.timer) { clearTimeout(lpress.timer); lpress.timer = null; } if (lpress && !lpress.fired) { lpress = null; } }
+	function lpFire() {
+		var lp = lpress;
+		if (!lp || lp.fired) { return; }
+		if (lp.timer) { clearTimeout(lp.timer); lp.timer = null; }
+		lp.fired = true;
+		drag = null; dragDirty = false; hideSnapMark(); lpDropTap();
+		ctxSel = lp.sel;
+		setSelectionList(lp.sel);
+		lpSwallowClickUntil = Date.now() + 5000;
+		ctxOpenAssetMenu(lp.x, lp.y, lp.hit);
+	}
+	document.addEventListener('pointerdown', function (e) {
+		var t;
+		if (lpress && lpress.id !== e.pointerId) { lpCancel(); lpSwallowClickUntil = 0; return; } // a second finger
+		lpress = null;
+		if ((e.pointerType !== 'touch' && e.pointerType !== 'pen') || !ctxOnCanvas(e) || mode !== 'select' || profileDrawActive() || profileEditActive()) { return; }
+		t = mapHitAt(e.clientX, e.clientY);
+		if (e.pointerType === 'touch') { t = touchNodeOver(e.clientX, e.clientY, t); }
+		t = hoverTargetFromHit(t);
+		if (!t || (t.kind !== 'node' && t.kind !== 'link')) { return; }
+		lpSwallowClickUntil = 0;
+		lpress = { id: e.pointerId, x: e.clientX, y: e.clientY, hit: t, sel: selectedRefs(), fired: false, slop: tapMovePx(e),
+			timer: setTimeout(lpFire, LONG_PRESS_MS) };
+	}, true);
+	document.addEventListener('pointermove', function (e) {
+		if (!lpress || lpress.fired || lpress.id !== e.pointerId) { return; }
+		if (Math.hypot(e.clientX - lpress.x, e.clientY - lpress.y) > lpress.slop) { lpCancel(); }
+	}, true);
+	['pointerup', 'pointercancel'].forEach(function (t) {
+		document.addEventListener(t, function (e) {
+			if (!lpress || lpress.id !== e.pointerId) { return; }
+			if (lpress.fired) { lpress = null; } else { lpCancel(); }
+		}, true);
+	});
+	document.addEventListener('click', function (e) {
+		if (Date.now() < lpSwallowClickUntil && ctxOnCanvas(e)) { lpSwallowClickUntil = 0; e.stopPropagation(); e.preventDefault(); }
+	}, true);
 	document.addEventListener('contextmenu', function (e) {
-		var pc = EngCalcs.pageConfig || {}, hit, hasTargets, hitRef;
+		if (!ctxOnCanvas(e) || !lpress) { return; }
+		e.preventDefault();
+		e.stopImmediatePropagation();
+		lpFire(); // the browser got there first (Chrome on Android): same gesture, same menu, once
+	}, true);
+	document.addEventListener('contextmenu', function (e) {
+		var hit;
 		if (!ctxOnCanvas(e) || mode !== 'select') { return; }
 		hit = ctxHit; ctxHit = null;
 		if (!hit) { return; }
 		e.preventDefault();
+		ctxOpenAssetMenu(e.clientX, e.clientY, hit);
+	});
+	function ctxOpenAssetMenu(cx, cy, hit) {
+		var pc = EngCalcs.pageConfig || {}, hasTargets, hitRef;
 		hitRef = { kind: hit.kind, id: hit.id };
 		hasTargets = pasteTargets(ctxSel).length > 0;
-		openMapContextMenu(e.clientX, e.clientY, [
+		openMapContextMenu(cx, cy, [
 			{ label: pc.lpn_copy_props_menu || 'Copy properties', enabled: true,
 				run: function () {
 					var got = copyProperties(hitRef);
@@ -53860,7 +53921,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 						: (pc.lpn_copy_props_done_ov || 'Copied the overrides of {id} in this scenario.')).replace('{id}', hitRef.id));
 				} },
 			{ label: pc.lpn_paste_props_menu || 'Paste properties to selection', enabled: hasTargets,
-				tip: !propClip ? (pc.lpn_paste_props_off_none || 'Nothing is copied. Right-click an asset and choose Copy properties.')
+				tip: !propClip ? (pc.lpn_paste_props_off_none || 'Nothing is copied. Right-click or long press an asset and choose Copy properties.')
 					: (!ctxSel.some(function (r) { return r.kind === 'node' || r.kind === 'link'; })
 						? (pc.lpn_paste_props_off_select || 'Select the assets to paste to, then choose Paste properties to selection.')
 						: (pc.lpn_paste_props_off_kind || 'No selected asset can take the copied properties.')),
@@ -53869,7 +53930,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				tip: pc.lpn_tsb_off_tip || 'Needs extended period results. Set a Total run time in Settings, Calculation, Time, and calculate.',
 				run: function () { tsbOpen(hitRef); } }
 		]);
-	});
+	}
 
 	// ---- ROADMAP Task 277: a move is undoable ----
 	//
