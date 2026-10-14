@@ -93,6 +93,7 @@ the block.
   Tom, 2026-10-14: mnemonic, definitional keys over coined names (*"we don't need more confusion"*).
   **WHAT IS LEFT: every language gives each concept below its own word, used everywhere, and no two
   concepts share a word.** Known collisions: Tag and Label are one word in es (Etiqueta), it
+  **SPRINT 737 DONE 2026-10-14** for the collisions: Tag is Marcador (es), Tag (it), Künye (tr), Etiketa (hr); cs Reservoir Zdroj, quality Source Dávkování; fr Label Étiquette; he Head עומד, HGL fixed. Still open: one-concept-two-words drift in am, bn, fa, hi, km, my, pt, ru, uk, zh (`concept-collisions` audit, journal of the sprint in `dev/english-friction/737.json`).
   (Etichetta) and tr (Etiket); cs uses Zdroj for both Reservoir and Source.
   | Concept | English |
   |---|---|
@@ -132,11 +133,6 @@ the block.
   Tom, 2026-10-12 (interview q03): expose override vs inherited with a single-character marker, carried
   through Properties and Settings, after Civil 3D's Override / Child override columns. Ida: a dot gutter;
   Mary: Bentley's and Civil 3D's per-row checkbox. Tom's call between them first. Journals 2026-10-12.
-- 100|221| **Retire the "constants now match EPANET" note (Task 213).** Delete
-  **PROMOTED TO 100 by Tom, 2026-10-14, ahead of its 2027-08-01 check date.** Building on `chore/retire-epanet-note`.
-  `<prefix>_notes_epanet_term`/`_def` from `Hazen-Williams.php`, `Branched-Network.php`,
-  `Looped-Network.php` and all 5 lang files (en, es, pt, fr, tr). A dated "we changed this" note is
-  useful for about a year; after that it is archaeology in a user-facing Notes list.
 - 100|625| **"HawsEDC Calculators" in the Help menu, above Privacy notice.**
   Tom, 2026-10-14: *"Add 'HawsEDC Calculators' in Help menu above Privacy notice. Then close the
   task."* That answers the last open question of the app page divorce (shipped 2026-09-11; record in

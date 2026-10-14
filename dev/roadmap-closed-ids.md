@@ -712,3 +712,4 @@ red builds on 2026-09-15 before anybody wrote it down.
 - 0|788| CLOSED 2026-10-14: sprint 1014 swept the Find guide's control names and the select verb in all 26 languages (dev/english-friction/1014.json).
 - 0|185| CLOSED 2026-10-14: Match properties (Task 782, on `feat/bentley-interop`) is this tool; its polygon/fence selection is left to Find and replace.
 - 0|285| CLOSED 2026-10-14: first pointer reading (09-08..10-14) in dev/usage-data-log.md: coarse 7.7% of people, ~14% on Looped-Network; a real minority, no decision flips.
+- 0|221| CLOSED 2026-10-14 (`chore/retire-epanet-note`, Tom: promote to 100): the six *_notes_epanet_term/_def keys deleted from Hazen-Williams, Branched-Network and Looped-Network in all 27 languages.
