@@ -1782,6 +1782,11 @@ $ec_lang['lpn_paste_props_off_none']='Nothing is copied. Right-click or long pre
 $ec_lang['lpn_paste_props_off_select']='Select the assets to paste to, then choose Paste properties to selection.';
 $ec_lang['lpn_paste_props_off_kind']='No selected asset can take the copied properties.';
 $ec_lang['lpn_tsb_menu']='Time series graph';
+// The map's right-click (and long press) menu on a Text and on a dragged label (2026-10-14). Edit text
+// opens the in-place editor; Reset position sends a dragged label or an attached Text home.
+$ec_lang['lpn_ctx_edit_text']='Edit text';
+$ec_lang['lpn_ctx_reset_position']='Reset position';
+$ec_lang['lpn_ctx_reset_position_off_tip']='Only a label or an attached Text that has been dragged from its own position can be reset.';
 $ec_lang['lpn_tsb_off_tip']='Needs extended period results. Set a Total run time in Settings, Calculation, Time, and calculate.';
 $ec_lang['lpn_tsb_close']='Close graph';
 $ec_lang['lpn_tsb_resize']='Drag to resize';

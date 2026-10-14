@@ -14668,11 +14668,17 @@ var EngCalcs = EngCalcs || {};
 	// Double-click-to-reset for a Text label -- only meaningful when anchored, where lb.x/lb.y is an
 	// offset from its node and "home" is DEFAULT_LABEL_OFFSET. A free-floating Text's lb.x/lb.y ARE
 	// its absolute position, so there is no default to reset to and this is a no-op.
+	// Reached from the right-click (and long press) menu's Reset position since 2026-10-14, when a
+	// double-click on a Text became editing its words.
+	function textMovedFromHome(lb) {
+		var home, own;
+		if (!lb || !textIsAnchored(lb)) { return false; }
+		home = defaultLabelOffset(); own = textOwnPoint(lb);
+		return own.x !== home.x || own.y !== home.y;
+	}
 	function resetTextLabelHome(id) {
-		var lb = labelById(id);
-		if (!lb || !textIsAnchored(lb)) { return; }
-		var home = defaultLabelOffset(), own = textOwnPoint(lb);
-		if (own.x === home.x && own.y === home.y) { return; }
+		var lb = labelById(id), home = defaultLabelOffset();
+		if (!textMovedFromHome(lb)) { return; }
 		saveUndoSnapshot();
 		setTextPoint(lb, home.x, home.y);
 		labelEls[id].side = 'right';
@@ -36771,6 +36777,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// is built over several clicks, so leaving the tool mid-ring is a real gesture -- and a ring
 		// left on the map by a tool that is no longer running is a shape nothing can finish.
 		if (mode === 'select-area' && newMode !== 'select-area') { areaCancel(); }
+		// An in-place Text editor does not outlive the tool it was opened in; an untouched new Text
+		// goes with it (see closeTextEditor()).
+		if (newMode !== mode && textEditor) { closeTextEditor('leave'); }
 		// **R-181's ARMED FLAG UN-ARMS ON ANY MODE CHANGE, NOT ONLY A ZOOM-WINDOW EXIT** -- picking
 		// any other tool between the first and second press means there was no "second, consecutive
 		// press" left to complete (Ida's spec, Task 682 follow-up). This runs before the
@@ -53982,16 +53991,20 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		paneClampMenu(menu, x, y);
 		if (first) { first.focus(); }
 	}
-	// **ONLY A NODE OR A LINK IS INTERCEPTED.** Captured on the document ahead of the map's press
-	// handlers, so the press neither selects nor opens a property sheet; empty canvas (right-drag
-	// pans), Text labels and customers are left exactly as they were. The selection is recorded at
-	// the press, so a multi-selection the right-click is made on can be offered the paste.
+	// **ONLY A NODE, A LINK OR A TEXT IS INTERCEPTED** (a node's or link's own label counts as that
+	// asset, marked `onLabel`). Captured on the document ahead of the map's press handlers, so the
+	// press neither selects, drags nor opens a property sheet; empty canvas (right-drag pans) and
+	// customers are left exactly as they were. The selection is recorded at the press, so a
+	// multi-selection the right-click is made on can be offered the paste.
 	var ctxSel = [], ctxHit = null;
 	function ctxOnCanvas(e) { return !!(e.target && e.target.closest && e.target.closest('#lpn_canvas')); }
-	function ctxTarget(e) {
-		var t = hoverTargetFromHit(mapHitAt(e.clientX, e.clientY));
-		return t && (t.kind === 'node' || t.kind === 'link') ? t : null;
+	function ctxTargetFromHit(raw) {
+		var d = (raw && raw.dataset) || {}, t = hoverTargetFromHit(raw);
+		if (!t || (t.kind !== 'node' && t.kind !== 'link' && t.kind !== 'label')) { return null; }
+		if (d.nodelbl !== undefined || d.linklbl !== undefined) { t.onLabel = true; }
+		return t;
 	}
+	function ctxTarget(e) { return ctxTargetFromHit(mapHitAt(e.clientX, e.clientY)); }
 	document.addEventListener('pointerdown', function (e) {
 		if (e.button !== 2 || !ctxOnCanvas(e) || mode !== 'select') { return; }
 		ctxHit = ctxTarget(e);
@@ -54004,8 +54017,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (mode === 'select' && ctxHit) { e.stopPropagation(); }
 	}, true);
 	// **LONG PRESS IS A TOUCH SCREEN'S RIGHT-CLICK** (Task 789; Tom, 2026-10-14: *"Isn't long press
-	// the standard alias for right-click on a touch screen?"*). A finger or pen held ~500 ms on a node
-	// or a pipe, travelling less than its own tap slop, opens THIS menu at the press point through the
+	// the standard alias for right-click on a touch screen?"*). A finger or pen held ~500 ms on a node,
+	// a pipe, a label or a Text (whatever ctxTargetFromHit() takes), travelling less than its own tap slop, opens THIS menu at the press point through the
 	// same door the right-click uses (ctxOpenAssetMenu). It is cancelled by a move past the slop, a
 	// second finger (a pinch), a lift or a cancel before the time. Chrome on Android also fires a
 	// `contextmenu` at the end of a long press; that one is swallowed (it is the same gesture), so the
@@ -54034,8 +54047,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if ((e.pointerType !== 'touch' && e.pointerType !== 'pen') || !ctxOnCanvas(e) || mode !== 'select' || profileDrawActive() || profileEditActive()) { return; }
 		t = mapHitAt(e.clientX, e.clientY);
 		if (e.pointerType === 'touch') { t = touchNodeOver(e.clientX, e.clientY, t); }
-		t = hoverTargetFromHit(t);
-		if (!t || (t.kind !== 'node' && t.kind !== 'link')) { return; }
+		t = ctxTargetFromHit(t);
+		if (!t) { return; }
 		lpSwallowClickUntil = 0;
 		lpress = { id: e.pointerId, x: e.clientX, y: e.clientY, hit: t, sel: selectedRefs(), fired: false, slop: tapMovePx(e),
 			timer: setTimeout(lpFire, LONG_PRESS_MS) };
@@ -54067,11 +54080,35 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		e.preventDefault();
 		ctxOpenAssetMenu(e.clientX, e.clientY, hit);
 	});
+	// **RESET POSITION** sends a dragged label, or an attached Text, back to its own spot, one undo
+	// step (Tom, 2026-10-14, when a double-click on a Text became editing it). Greyed, never hidden,
+	// where there is nothing to send back.
+	function ctxResetRow(hit) {
+		var pc = EngCalcs.pageConfig || {}, el, on;
+		if (hit.kind === 'label') { on = textMovedFromHome(labelById(hit.id)); }
+		else { el = hit.kind === 'node' ? nodeById(hit.id) : linkById(hit.id); on = !!el && el.lx !== undefined; }
+		return { label: pc.lpn_ctx_reset_position || 'Reset position', enabled: on,
+			tip: pc.lpn_ctx_reset_position_off_tip || 'Only a label or an attached Text that has been dragged from its own position can be reset.',
+			run: function () {
+				if (hit.kind === 'label') { resetTextLabelHome(hit.id); }
+				else if (hit.kind === 'node') { resetNodeLabelHome(hit.id); }
+				else { resetLinkLabelHome(hit.id); }
+			} };
+	}
 	function ctxOpenAssetMenu(cx, cy, hit) {
-		var pc = EngCalcs.pageConfig || {}, hasTargets, hitRef;
+		var pc = EngCalcs.pageConfig || {}, hasTargets, hitRef, rows;
 		hitRef = { kind: hit.kind, id: hit.id };
+		// A Text has its own two rows and none of an asset's.
+		if (hit.kind === 'label') {
+			openMapContextMenu(cx, cy, [
+				{ label: pc.lpn_ctx_edit_text || 'Edit text', enabled: true,
+					run: function () { openTextEditor(hitRef.id, false); } },
+				ctxResetRow(hitRef)
+			]);
+			return;
+		}
 		hasTargets = pasteTargets(ctxSel).length > 0;
-		openMapContextMenu(cx, cy, [
+		rows = [
 			{ label: pc.lpn_copy_props_menu || 'Copy properties', enabled: true,
 				run: function () {
 					var got = copyProperties(hitRef);
@@ -54093,7 +54130,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			{ label: pc.lpn_tsb_menu || 'Time series graph', enabled: tsbHasRun(),
 				tip: pc.lpn_tsb_off_tip || 'Needs extended period results. Set a Total run time in Settings, Calculation, Time, and calculate.',
 				run: function () { tsbOpen(hitRef); } }
-		]);
+		];
+		if (hit.onLabel) { rows.push(ctxResetRow(hitRef)); }
+		openMapContextMenu(cx, cy, rows);
 	}
 
 	// ---- ROADMAP Task 277: a move is undoable ----
@@ -68333,8 +68372,14 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// in-place editor below, so the two can never disagree about what an edit is. The words are
 	// scenario-overridable (Task 407): setProp(), never `lb._text =`. `noSnapshot` is for the edit
 	// that finishes a Text just placed, whose placement already took the undo step.
+	//
+	// **EMPTY WORDS DELETE THE TEXT** (Perry, 2026-10-14): a Text with no words draws nothing and has
+	// nothing left to click, so it could never be reached again. Blank (or only spaces and new lines)
+	// is a delete, through deleteElement(), the Delete key's own door: one undo step, and inside a
+	// scenario it excludes the Text from that scenario exactly as Delete does. Returns 'deleted'.
 	function writeTextWords(lb, value, noSnapshot) {
 		if (!lb || value === effective(lb, 'text')) { return false; }
+		if (!String(value).trim()) { deleteElement('label', lb.id); return 'deleted'; }
 		if (!noSnapshot) { saveUndoSnapshot(); }
 		setProp(lb, 'text', value);
 		afterPropertyEdit(lb);
@@ -68352,10 +68397,17 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// beside it already types a newline on Enter; a second rule for the same words a few
 	// centimetres away is the thing to avoid, and a phone keyboard has no Shift+Enter to reach.
 	// Ctrl+Enter (Cmd+Enter), a press anywhere else, or Tab away commits; Esc cancels and keeps the
-	// words it opened with (a new Text's placeholder).
+	// words it opened with.
+	//
+	// **A NEW TEXT THAT WAS NEVER WRITTEN IS NEVER LEFT BEHIND** (Perry, 2026-10-14). Esc on a Text
+	// the tool has just placed takes the placement back, and so does leaving the tool (a toolbar
+	// press, anything off the map, another tool) while its placeholder is still untouched. Its
+	// placement's own undo step goes with it, so nothing is left on the map or on the Undo stack.
 	//
 	// **A ZOOM OR A PAN COMMITS.** Any press outside the editor commits before the map sees it, and
-	// a wheel turn does the same, so the editor is never left floating over a map that has moved.
+	// a wheel turn does the same, so the editor is never left floating over a map that has moved; so
+	// does a window resize that moves the words (a phone's keyboard opening changes only the height
+	// and moves nothing, so it does not close the box it opened for).
 	// It is not a hydraulic edit, so it works with Recalculate off exactly as Properties does.
 	var textEditor = null;
 	function textEditorOpen() { return !!textEditor; }
@@ -68365,8 +68417,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		closeTextEditor(true);
 		pt = textLabelPoint(lb);
 		s = worldToScreen(pt.x, pt.y);
-		// The map's own pixel size, but never so small the words cannot be read while typing.
-		fontPx = Math.max(12, (settings.textSize || 11) * (lb.sizeMult || 1));
+		// The map's own pixel size, so the box covers the words it replaces (Perry, 2026-10-14); only
+		// words drawn under 9 px are typed at 12 px, because they cannot be read while typing.
+		fontPx = (scnSetting('textSize') || 11) * textSizeMult(lb);
+		if (fontPx < 9) { fontPx = 12; }
 		fx = { start: 0, middle: 0.5, end: 1 }[labelHAlign(lb)];
 		fy = { hanging: 0, middle: 0.5, bottom: 1 }[labelVAlign(lb)];
 		ang = textLabelSvgAngle(lb) || 0;
@@ -68383,7 +68437,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		ta.style.fontWeight = textLabelWeight(lb);
 		ta.style.textAlign = fx === 0 ? 'left' : fx === 1 ? 'right' : 'center';
 		document.body.appendChild(ta);
-		ed = textEditor = { id: labelId, ta: ta, fresh: !!fresh, opened: Date.now(),
+		ed = textEditor = { id: labelId, ta: ta, fresh: !!fresh, opened: Date.now(), orig: ta.value,
+			// The step the placement took, so a placement taken back takes its step back too.
+			placeSnap: fresh ? undoStack[undoStack.length - 1] : null, winW: window.innerWidth,
 			ax: s.x, ay: s.y, fx: fx, fy: fy, ang: ang, done: false };
 		function fit() {
 			var w, h;
@@ -68419,33 +68475,64 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// The press is committed and then goes on to the map untouched: in Select it selects what it
 		// lands on, and in the Text tool, a repeater like every inserter (Tom, 2026-10-07), it places
 		// the next Text and opens this editor on that one.
+		// A press off the map is leaving it (the toolbar, a menu, a pane): 'leave'.
 		ed.onPress = function (e) {
 			if (e.target === ta) { return; }
-			closeTextEditor(true);
+			closeTextEditor(ctxOnCanvas(e) ? true : 'leave');
 		};
 		ed.onWheel = function () { closeTextEditor(true); };
+		// After the page's own resize handling has redrawn the map, so the words are where they now
+		// are: a width change, or words that moved, commits.
+		ed.onResize = function () {
+			setTimeout(function () {
+				var p, q;
+				if (textEditor !== ed) { return; }
+				p = labelById(ed.id) && textLabelPoint(labelById(ed.id));
+				q = p && worldToScreen(p.x, p.y);
+				if (window.innerWidth !== ed.winW || !q || Math.hypot(q.x - ed.ax, q.y - ed.ay) > 1) { closeTextEditor(true); }
+			}, 120);
+		};
 		window.addEventListener('keydown', ed.onKey, true);
 		window.addEventListener('pointerdown', ed.onPress, true);
+		window.addEventListener('resize', ed.onResize);
 		svg.addEventListener('wheel', ed.onWheel, true);
 		ta.focus();
 		ta.select();
 		return true;
 	}
+	// `commit`: true writes the words, false cancels, 'leave' writes them unless this is a new Text
+	// still holding its untouched placeholder, which is then taken back.
 	function closeTextEditor(commit) {
-		var ed = textEditor, lb, le;
+		var ed = textEditor, lb, le, done;
 		if (!ed || ed.done) { return; }
 		ed.done = true;
 		textEditor = null;
 		window.removeEventListener('keydown', ed.onKey, true);
 		window.removeEventListener('pointerdown', ed.onPress, true);
+		window.removeEventListener('resize', ed.onResize);
 		svg.removeEventListener('wheel', ed.onWheel, true);
 		lb = labelById(ed.id); le = labelEls[ed.id];
 		if (le && le.text) { le.text.style.visibility = ''; }
 		if (ed.ta.parentNode) { ed.ta.parentNode.removeChild(ed.ta); }
-		if (!commit || !lb) { return; }
-		// Empty words are written as empty, exactly as the Properties box writes them.
-		if (writeTextWords(lb, ed.ta.value, ed.fresh) && currentPopup && currentPopup.kind === 'label' &&
-			currentPopup.id === ed.id) { refreshPopupIfOpen(); }
+		if (!lb) { return; }
+		if (ed.fresh && (!commit || (commit === 'leave' && ed.ta.value === ed.orig) || !ed.ta.value.trim())) {
+			takeBackNewText(ed);
+			return;
+		}
+		if (!commit) { return; }
+		done = writeTextWords(lb, ed.ta.value, ed.fresh);
+		if (done && currentPopup && currentPopup.kind === 'label' && currentPopup.id === ed.id) { refreshPopupIfOpen(); }
+	}
+	// The placement's own step is popped and restored, so the Text goes with no step left behind; if
+	// anything has stepped since (it cannot, while the editor holds the keys and the presses), the
+	// Text is removed outright, which is what that step would have done.
+	function takeBackNewText(ed) {
+		if (ed.placeSnap && undoStack[undoStack.length - 1] === ed.placeSnap) {
+			undoStack.pop();
+			restoreUndoSnapshot(ed.placeSnap);
+		} else if (labelById(ed.id)) {
+			deleteLabelById(ed.id);
+		}
 	}
 
 	// Editable text content for a Text label (Tom, 2026-07-30: "there is no way to edit it") -- no
@@ -68467,7 +68554,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		input.rows = 3;
 		input.style.width = '100%';
 		input.value = effective(lb, 'text');
-		input.addEventListener('change', function () { writeTextWords(lb, input.value); });
+		input.addEventListener('change', function () {
+			if (writeTextWords(lb, input.value) === 'deleted') { refreshPopupIfOpen(); }
+		});
 		// **NO VISIBLE LABEL ON THIS ROW: the popup's title already says "Text"** (Tom, 2026-08-18,
 		// with a screenshot of the word twice over). It reads as a mistake because it is one -- the
 		// title names the element and this is the element's own content, so the second word names
