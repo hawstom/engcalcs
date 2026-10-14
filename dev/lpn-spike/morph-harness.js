@@ -54,7 +54,7 @@ const INJECT =
 	"\t\tserializeProject: serializeProject, undo: undo, redo: redo, importProject: importProject,\n" +
 	"\t\tsetSelectionList: setSelectionList, changeSelectedType: changeSelectedType,\n" +
 	"\t\tnodeById: nodeById, linkById: linkById, assembleModel: assembleModel, importInp: importInpFromFile,\n" +
-	"\t\tlastNotice: function () { return lastNoticeText; }, buildDom: buildDom,\n" +
+	"\t\tlastNotice: function () { return lastNoticeText; }, buildDom: buildDom, breakPipeAtPoint: breakPipeAtPoint,\n" +
 	"\t\texportInp: function () { return EngCalcs.lpnExportInp(inpExportDocument(), inpExportOptions()); },\n" +
 	"\t\tbuildLayers: function () { svg = document.getElementById('lpn_canvas');\n" +
 	"\t\t\tworld = el('g', {}, svg);\n" +
@@ -285,6 +285,28 @@ async function run(mutate, quiet) {
 		base();
 		ok('8.5 in Base 10 is the pipe, valve type absent', L.linkById('10').type === 'pipe' && L.linkById('10').valveType === undefined);
 		ok('8.6 ...and Base\'s export is unchanged', L.exportInp().inp === inpBase0);
+		// Perry, 2026-10-14: a split in Base copied V's morph onto the new half.
+		const p10 = L.linkById('10'), a = L.nodeById(p10.from), b = L.nodeById(p10.to);
+		L.saveUndoSnapshot();
+		const made = L.breakPipeAtPoint(p10, 'junction', (a.x + b.x) / 2, (a.y + b.y) / 2);
+		const mid = L.linkById('10').to;
+		const half = L.getDoc().links.filter((l) => l.id !== '10' && l.from === mid)[0];
+		L.switchScenario(V.id);
+		ok('8.7 pipe 10 split in Base: in V, 10 is still the valve and the new half a pipe, holding no type override',
+			!!made && mid !== '11' && L.linkById('10').type === 'valve' && !!half && half.to === '11' && L.linkById(half.id).type === 'pipe' &&
+			!(L.resolvedOverrides(V)['l:' + half.id] || {}).type && (L.resolvedOverrides(V)['l:' + half.id] || {}).setting === undefined,
+			half && (half.id + ' ' + L.linkById(half.id).type + ' ' + JSON.stringify(L.resolvedOverrides(V)['l:' + half.id])));
+		base();
+		L.undo();
+		ok('8.8 undo: one pipe 10 again', !L.getDoc().links.some((l) => half && l.id === half.id), half && half.id + ' ' + L.getDoc().links.length + ' ' + L.linkById('10').to);
+		// A pump has no head curve until one is chosen: said, as Base says it.
+		const P2 = L.createScenario('Pump');
+		L.switchScenario(P2.id);
+		const q8 = morph([['link', '11']], 'pump');
+		ok('8.9 pipe 11 into a pump in a scenario: the box says it has no head curve, in Base\'s words',
+			q8.length === 1 && q8[0].text.indexOf(String(PC.lpn_change_type_no_curve).replace('{id}', '11')) >= 0 && L.linkById('11').type === 'pump',
+			q8[0] && q8[0].text);
+		base();
 	}
 
 	say('\n--- 9. a reservoir keeps its surface; a node is refused a link type ---');
@@ -324,6 +346,26 @@ async function run(mutate, quiet) {
 	}
 	ok('11.0 (the document before any of this saved as it was opened)', file0.length > 0);
 
+	say('\n--- 12. what a scenario morph would lose is said first ---');
+	{
+		const text = NET1.replace(/\[RULES\]\n/, '[RULES]\nRULE R1\nIF JUNCTION 22 PRESSURE BELOW 1\nTHEN LINK 112 STATUS IS CLOSED\n');
+		const P = page();
+		P.importInp({ name: 'Net1-rule.inp', _text: text });
+		P.getDoc().customers.push({ id: 'M9', demand: 25, count: 1, link: null, node: '22', x: 0, y: 0 });
+		P.buildDom();
+		const Z = P.createScenario('Tank at J1');
+		P.switchScenario(Z.id);
+		asked = [];
+		P.setSelectionList([{ kind: 'node', id: '22' }]);
+		P.changeSelectedType('tank');
+		const t = asked[0] ? asked[0].text : '';
+		ok('12.1 one box, listing customer M9 as lost in this scenario, in Base\'s words', asked.length === 1 &&
+			t.indexOf(String(PC.lpn_change_type_lost)) >= 0 &&
+			t.indexOf(String(PC.lpn_change_type_line_scenario).replace('{id}', '22').replace('{property}', PC.lpn_tool_add_meter).replace('{value}', 'M9').replace('{scenario}', 'Tank at J1')) >= 0, t);
+		ok('12.2 ...and the rule naming JUNCTION 22', t.indexOf('IF JUNCTION 22 PRESSURE BELOW 1') >= 0);
+		ok('12.3 answered, 22 is a tank in the scenario', P.nodeById('22').type === 'tank');
+	}
+
 	global.EngCalcs.lpnTimeRun = timeRunWas;
 	return fails;
 }
@@ -341,7 +383,9 @@ const MUTATIONS = [
 	['the undo snapshot keeps the scenario\'s types', (src) => src.replace(
 		"state: withBaseTypes(function () { return JSON.parse(JSON.stringify({ doc: doc, scenarios: scenarios, active: project.activeScenario })); }),",
 		"state: JSON.parse(JSON.stringify({ doc: doc, scenarios: scenarios, active: project.activeScenario })),")],
-	['a Base morph strips what a morphed scenario reads', (src) => src.replace("\t\tmorphPinBase(n, to);\n", "")]
+	['a Base morph strips what a morphed scenario reads', (src) => src.replace("\t\tmorphPinBase(n, to);\n", "")],
+	['a split copies the morph onto the new half', (src) => src.replace("\t\t\tdelete c2.type; delete c2.valveType;\n", "")],
+	['a scenario morph says nothing of a customer\'s demand', (src) => src.replace("lost.push(changeTypeLine(LINE_S, el.id, pc.lpn_tool_add_meter", "void(changeTypeLine(LINE_S, el.id, pc.lpn_tool_add_meter")]
 ];
 
 (async function main() {

@@ -8975,8 +8975,8 @@ var EngCalcs = EngCalcs || {};
 	}
 	// ---- OBJECT SNAP: THE MAGNET (ROADMAP Task 782) -----------------------------------------------
 	//
-	// Tom, 2026-10-10, listing the tools that replace per-scenario Change type: *"Snap/magnet to
-	// asset"*. CAD object snap, in his AutoCAD/Civil 3D sense: while a node is placed or moved, or a
+	// Tom, 2026-10-10, listing small tools he wanted beside Change type (then Base-only; Morph works
+	// per scenario since 2026-10-14): *"Snap/magnet to asset"*. CAD object snap, in his AutoCAD/Civil 3D sense: while a node is placed or moved, or a
 	// bend is moved, the point jumps to an existing node, a pipe vertex, or the nearest point on a
 	// pipe when one is within reach, a glyph and a name show what it caught, and a held Alt key
 	// places at the bare pointer instead. The reach is the gesture's own reachPx() -- the number every
@@ -37036,7 +37036,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			if (cum[k + 1] < splitAlong - 1e-12) { keepVerts.push(v); }
 			else { newVerts.push(Object.assign({}, v)); }
 		});
-		clone = JSON.parse(JSON.stringify(l));
+		// Base's own pipe, even where Base names an Active topology alternative that morphs it.
+		clone = withBaseTypes(function () { return JSON.parse(JSON.stringify(l)); });
 		node = at ? addNode(nodeType, at.x, at.y) : addNode(nodeType, r.x, r.y);
 		if (at) { copySnapProvenance(at, node); }
 		nl = addLink('pipe', node.id, oldTo, newVerts);
@@ -37068,11 +37069,19 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		}
 		// Scenario overrides: copied to both, the minor loss to the original only, a length divided.
 		// Every scenario AND every stored alternative holds such a map (eachOverrideMap()).
+		var nd = morphDesc(nl, morphBaseOf(nl, 'type'), morphBaseOf(nl, 'valveType'));
 		eachOverrideMap(function (map) {
 			var key = ovKeyFor('link', oldId), ov = map[key], c2;
 			if (!ov) { return; }
 			c2 = JSON.parse(JSON.stringify(ov));
 			delete c2.k; delete c2.fittingsId;
+			// **A MORPH STAYS ON THE ORIGINAL HALF** (Task 781): the new half is a new pipe, Base's
+			// type in every scenario, so neither the type override nor a value only another type reads
+			// (a morphed valve's setting, held in another category's map) is copied to it.
+			morphSpecsOf(nl).forEach(function (spec) {
+				if (!spec.custom && !morphSpecHas(spec, nd)) { spec.props.forEach(function (p) { delete c2[p]; }); }
+			});
+			delete c2.type; delete c2.valveType;
 			if (typeof ov.length === 'number') {
 				ov.length = ov.length * frac;
 				c2.length = c2.length * (1 - frac);
@@ -37379,11 +37388,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	//
 	// **LINKS TOO**, under the same rule and the same box: see the link half below.
 	//
-	// **THE TYPE IS BASE-OWNED**, like a valve's type (renderValveFields()): it is not in
-	// LPN_OVERRIDABLE, so a change made in Base changes the asset in every scenario, and the
-	// scenario overrides of what the old type alone had go with it. **OUTSIDE BASE, CHANGE TYPE IS
-	// REFUSED** (changeSelectedType()): other programs change a type only as a plain edit, and a
-	// scenario switches assets on and off in Active topology instead (Tom, 2026-10-10).
+	// **IN BASE THE TYPE IS THE ELEMENT'S OWN**: it is not in LPN_OVERRIDABLE, so a change made in
+	// Base changes the asset in every scenario that does not morph it, and the scenario overrides of
+	// what the old type alone had go with it. **IN ANY OTHER SCENARIO MORPH IS AN OVERRIDE OF THE
+	// TYPE** (Tom, 2026-10-14; morphInScenario(), "MORPH IN A SCENARIO" below).
 	var LPN_NODE_TYPES = ['junction', 'reservoir', 'tank'];
 	/**
 	 * Every node property that belongs to SOME node types and not to others. A key named in no row
@@ -38386,10 +38394,24 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	 */
 	function morphInScenario(to) {
 		var pc = EngCalcs.pageConfig || {}, isNode = LPN_NODE_TYPES.indexOf(to) >= 0, targets = changeTypeTargets(to),
-			scn = activeScenario(), meaning = [], text = [], MAX = 20;
+			scn = activeScenario(), meaning = [], lost = [], born = [], text = [], MAX = 20,
+			LINE_S = pc.lpn_change_type_line_scenario || '{id}: {property} {value}, in scenario {scenario}';
 		if (!targets.length) { return; }
 		targets.forEach(function (el) {
 			meaning = meaning.concat(isNode ? nodeTypeChangeReport(el, to).meaning : linkTypeChangeReport(el, to).meaning);
+			// **WHAT BASE WOULD SAY, SAID HERE TOO** (Perry, 2026-10-14). A customer's demand lands on
+			// a junction and nowhere else (Task 247), so a junction morphed into a tank or reservoir
+			// takes no customer demand in this scenario.
+			if (isNode && el.type === 'junction' && to !== 'junction') {
+				customerRowsOf(el.id).forEach(function (r) {
+					lost.push(changeTypeLine(LINE_S, el.id, pc.lpn_tool_add_meter || 'Customer', r.customer.id, scenarioDisplayName(scn)));
+				});
+			}
+			// A pump with no head curve adds no head, as one changed in Base or drawn.
+			if (!isNode && to === 'pump' && !effective(el, 'curveId')) {
+				born.push(String(pc.lpn_change_type_no_curve || '{id}: No pump head curve, so the pump adds no head until one is chosen, and an .inp export writes it as a pipe')
+					.replace('{id}', function () { return String(el.id); }));
+			}
 		});
 		function proceed() {
 			saveUndoSnapshot();
@@ -38405,14 +38427,24 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			scheduleSolve();
 			scheduleSave();
 		}
-		if (!meaning.length) { proceed(); return; }
-		if (meaning.length > MAX) {
-			meaning = meaning.slice(0, MAX).concat([String(pc.lpn_change_type_more || 'And {n} more.').replace('{n}', String(meaning.length - MAX))]);
+		if (!meaning.length && !lost.length && !born.length) { proceed(); return; }
+		function capped(lines) {
+			if (lines.length <= MAX) { return lines; }
+			return lines.slice(0, MAX).concat([String(pc.lpn_change_type_more || 'And {n} more.').replace('{n}', String(lines.length - MAX))]);
 		}
-		text.push([isNode
-			? (pc.lpn_change_type_meaning || 'These controls and rules test a node being changed, and will read it differently: a junction is tested by its pressure, and a tank or reservoir by its water level.')
-			: (pc.lpn_change_type_setting || 'These controls and rules give or test the setting of a link being changed. A setting is a different quantity on a pipe, a pump, and a valve, so these will read it differently:')]
-			.concat(meaning).join('\n'));
+		if (lost.length) {
+			text.push(String(pc.lpn_change_type_key || 'Each line: ID: the property and value that would be lost'));
+			text.push([pc.lpn_change_type_lost || 'These values will be lost:'].concat(capped(lost)).join('\n'));
+		}
+		if (born.length) {
+			text.push([pc.lpn_change_type_born || 'These values are new, set as on a newly drawn asset:'].concat(capped(born)).join('\n'));
+		}
+		if (meaning.length) {
+			text.push([isNode
+				? (pc.lpn_change_type_meaning || 'These controls and rules test a node being changed, and will read it differently: a junction is tested by its pressure, and a tank or reservoir by its water level.')
+				: (pc.lpn_change_type_setting || 'These controls and rules give or test the setting of a link being changed. A setting is a different quantity on a pipe, a pump, and a valve, so these will read it differently:')]
+				.concat(capped(meaning)).join('\n'));
+		}
 		askDialog({ kind: 'confirm', title: pc.lpn_morph_menu || 'Morph', ok: pc.lpn_morph_ok || 'Morph', text: text.join('\n\n') }, function (yes) {
 			if (yes) { proceed(); }
 		});

@@ -1701,7 +1701,7 @@ $ec_lang['lpn_morph_other_kind']='A node can be morphed only into another type o
 // The Properties row shown where a scenario morphs the asset (Task 781): the type it is in this
 // scenario, beside the override marker.
 $ec_lang['lpn_field_type']='Type';
-$ec_lang['lpn_field_type_tip']='The type of this asset in this scenario. Morph made it an override here; clear the override to give the asset the type of the parent scenario again.';
+$ec_lang['lpn_field_type_tip']='The type of this asset in this scenario, set by Morph. Clear the override to use the parent scenario\'s type.';
 $ec_lang['lpn_change_type_lost']='These values will be lost:';
 // The key to the lines under it (Tom, 2026-10-06: *"Provide a key for the loss report. 'ID: Lost entry'."*).
 $ec_lang['lpn_change_type_key']='Each line: ID: the property and value that would be lost';
