@@ -111,8 +111,9 @@ exports.run = async function ({ browser, report }) {
 		// old 410 px pane is 287 px, which is above the box's own 25rem floor (266 px), so that is the
 		// shipped pane and it is BELOW the 384 px stack query: the shipped box lays its rows out
 		// stacked, by that ruling. Asserted as the ruling states it, not as the old 34rem.
-		report.ok(seen.box >= 420 && seen.box <= 440 && seen.pane >= 266 && seen.pane <= 300,
-			'the box ships at 26.965rem, with a content pane of about 287 px (R-204)',
+		// Plus the 1.9rem override gutter (Task 790; Tom, 2026-10-14): 28.865rem, a pane of about 317 px.
+		report.ok(seen.box >= 450 && seen.box <= 470 && seen.pane >= 296 && seen.pane <= 330,
+			'the box ships at 28.865rem, with a content pane of about 317 px (R-204, plus the override gutter)',
 			`box ${seen.box} px, pane ${seen.pane} px`);
 
 		const lefts = [...new Set(seen.rows.map(r => r.left))];

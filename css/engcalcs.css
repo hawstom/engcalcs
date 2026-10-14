@@ -3396,8 +3396,15 @@ table.lpn-notes-table td:first-child { font-weight: bold; width: 40%; }
    split every other PC/phone difference in this box uses -- @media (max-width: 640px) below
    overrides the index unconditionally and the box's own min(_, 94vw) already governs a phone, so
    this base rule only ever reaches a screen wider than that. */
+/* **26.965rem -> 28.865rem: PLUS THE OVERRIDE GUTTER, 1.9rem** (Tom, 2026-10-14: "the Settings box
+   default width may be too small now. We will have to observe and maybe add an estimated amount for
+   the glyphs and orange line that were just added"). Measured in Chromium on his Fotobi project
+   (two or more scenarios, so the Task 790 gutter is drawn): at 26.965rem the gutter's 30.4 px made 3
+   rows taller in English and 7 in German; widening the box by 26 px (English) and 30 px (German)
+   gave back every one. The orange line is an inset shadow and takes no width. So the box grows by
+   exactly the gutter, 1.9em of the 1rem rows. */
 .lpn-setbox {
-	width: min(26.965rem, 94vw);
+	width: min(28.865rem, 94vw);
 	height: min(46rem, 92vh);
 	flex-direction: column;
 	box-sizing: border-box;
