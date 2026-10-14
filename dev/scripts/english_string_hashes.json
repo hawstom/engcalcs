@@ -5507,6 +5507,27 @@
                 "mpf_solver_no_solution"
             ],
             "reason": "[--force] Sprint 1014 (2026-10-14): all 26 language agents were given this full 57-key drift list and compared every key present in their file against the current English, rewriting where it no longer matched (hi 12, bg 11, zh 15, id 24, es 20, pt 14, he 12, ro 24, tr 12, ar 28, it 11, de 17, fr 20, hr 13, fa 17, cs 12, ru 12, uk 24, bn 11, sr 23, ur 10, my 12, am 11, km 14, ps 20, sw 28)."
+        },
+        {
+            "date": "2026-10-14",
+            "keys": [
+                "lpn_contour_show_tip"
+            ],
+            "reason": "Reverted to master's English (Tom's Task 759 calls: Check for a checkbox, click for a button). Translations: the checkbox tips were never changed; zoom_extent was resynced against 'select the small triangle', the same act."
+        },
+        {
+            "date": "2026-10-14",
+            "keys": [
+                "lpn_labels_use_units_tip"
+            ],
+            "reason": "Reverted to master's English (Tom's Task 759 calls: Check for a checkbox, click for a button). Translations: the checkbox tips were never changed; zoom_extent was resynced against 'select the small triangle', the same act."
+        },
+        {
+            "date": "2026-10-14",
+            "keys": [
+                "lpn_tool_zoom_extent_tip"
+            ],
+            "reason": "Reverted to master's English (Tom's Task 759 calls: Check for a checkbox, click for a button). Translations: the checkbox tips were never changed; zoom_extent was resynced against 'select the small triangle', the same act."
         }
     ],
     "hashes": {
@@ -5922,7 +5943,7 @@
         "lpn_contour_opacity": "bc7b9a208b5edfcb8abd970849e73e89fddd34ab",
         "lpn_contour_plot": "d708b174a0e64380136a667c558020798f258fc7",
         "lpn_contour_show": "f00dd9cb6cdedde07f70f2ed33f532fc7944a997",
-        "lpn_contour_show_tip": "8b342505066032be4aeb0289ec9a1b2c30078c78",
+        "lpn_contour_show_tip": "5a3d781a7d2d22ff6d02cb9663d325f5130331d2",
         "lpn_contour_support": "6c63cdc5c71aafdd53cb5bd1ed7c2bf5b82fc58b",
         "lpn_contour_support_dem": "e48840d0d47b61924e0364b54ad0832c833e14a9",
         "lpn_contour_support_lines": "83cb6df3575f1ce1812a9f6a75a47af0c6e34f7b",
@@ -6770,7 +6791,7 @@
         "lpn_labels_show_tip": "f1bf077fad10f8a819c42f20beb7898c980c04e0",
         "lpn_labels_suffix_gradient_tip": "0d81185664a13d09dbf74823e8ea04cf759c31e7",
         "lpn_labels_use_units": "b18ef3a13c6dc43681ae1a2d82cac610c0f7f966",
-        "lpn_labels_use_units_tip": "7a9ff4fe1fc00978e736bd3f915ba27971178dc6",
+        "lpn_labels_use_units_tip": "2eb1c112ab3970438e127fc55c098ab8ae46efa3",
         "lpn_library_control_add": "f2e4e66615db27d7980bf30464bf15d954d84057",
         "lpn_library_control_bad": "4f9dd5267cce4c646d42c4f6c63efd80aa6118a8",
         "lpn_library_control_missing": "4d03d3ef64bd9d13d319496c8fdb1a28911becbf",
@@ -7730,7 +7751,7 @@
         "lpn_tool_vertices": "b3a015034320657530371b364cd275afb53b69cb",
         "lpn_tool_vertices_tip": "77dfc24631af78f81e5bf11a7fcb4842acda59bf",
         "lpn_tool_zoom_extent": "be866a8e867398648cdf09d8a972d5bbc745c029",
-        "lpn_tool_zoom_extent_tip": "1f3d1da6ea4a7ecba6c07eb6b02b039087f39760",
+        "lpn_tool_zoom_extent_tip": "7babee9cbeeaf1df0d65d3019679bc6ab994341d",
         "lpn_tool_zoom_window": "f3743ae9a422224f3b166001754cc973b35fd00a",
         "lpn_tool_zoom_window_tip": "af3a676e18143d8115e23d236d591072e563ee10",
         "lpn_ts_add": "b68a1120d5e8fbb4218017becd8f9000e7d82568",

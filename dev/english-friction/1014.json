@@ -11,8 +11,8 @@
         "tick the box",
         "inspect the contour"
       ],
-      "disposition": "english",
-      "resolution": "APPLIED: 'check to bring them back as they were' -> 'select to show them again as they were'."
+      "disposition": "dismissed",
+      "resolution": "REVERTED by the orchestrator: Tom's calls of 2026-10-11/12 (Task 759) keep Check/Checked for a single checkbox and click for a button; Wave 0 should not have changed it."
     },
     {
       "key": "lpn_labels_use_units_tip",
@@ -23,8 +23,8 @@
         "tick the box",
         "verify the unit"
       ],
-      "disposition": "english",
-      "resolution": "APPLIED: 'Check to show' -> 'Select to show'."
+      "disposition": "dismissed",
+      "resolution": "REVERTED by the orchestrator: Tom's calls of 2026-10-11/12 (Task 759) keep Check/Checked for a single checkbox and click for a button; Wave 0 should not have changed it."
     },
     {
       "key": "lpn_scenario_override_tip",
@@ -59,8 +59,8 @@
         "click with a mouse",
         "any pointer selection"
       ],
-      "disposition": "english",
-      "resolution": "APPLIED: 'press W or click the small triangle' -> 'press W or select the small triangle'."
+      "disposition": "dismissed",
+      "resolution": "REVERTED by the orchestrator: Tom's calls of 2026-10-11/12 (Task 759) keep Check/Checked for a single checkbox and click for a button; Wave 0 should not have changed it."
     },
     {
       "key": "lpn_guide_text_hotkeys_popup",

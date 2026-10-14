@@ -216,9 +216,9 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/sprint-1014 (`5ba9e4d5`) — adds no English strings
+### chore/sprint-1014 (`89cff518`) — adds no English strings
 
-### feat/bentley-interop (`2cca39c3`) — 133 new, 133 to read @@ NEEDS RULING
+### feat/bentley-interop (`bfe405fc`) — 133 new, 133 to read @@ NEEDS RULING
 
 - **`lpn_alt_cat_calculation`**
   > Calculation

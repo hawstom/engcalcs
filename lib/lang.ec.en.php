@@ -1473,7 +1473,7 @@ $ec_lang['lpn_area_none']='Nothing found in that area.';
 $ec_lang['lpn_tool_vertices_tip']='Add and remove pipe vertices. Specify a point on a pipe to add a vertex, select a vertex to remove it, and drag a vertex to move it. A vertex changes automatic length, but doesn’t add or change minor (local) losses.';
 $ec_lang['lpn_tool_undo_tip']='Undo history length = 20 actions';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_tool_zoom_extent_tip']='Fit the whole network to the map window. To zoom to a rectangle you drag instead, press W or select the small triangle in the corner of the Zoom to fit toolbar button. See also the zoom controls at the upper right of the map.';
+$ec_lang['lpn_tool_zoom_extent_tip']='Fit the whole network to the map window. To zoom to a rectangle you drag instead, press W or click the small triangle in the corner of the Zoom to fit toolbar button. See also the zoom controls at the upper right of the map.';
 $ec_lang['lpn_tool_zoom_window_tip']='Specify corners or drag a rectangle. Press again for Zoom to fit.';
 // Tom's wording, 2026-09-25.
 $ec_lang['lpn_zoom_in_tip']='Zoom in. Shortcut: +';
@@ -2013,7 +2013,7 @@ $ec_lang['lpn_contour_menu']='Contour';
 $ec_lang['lpn_contour_tip']='Show a contour plot on the map: the node colors spread along and beside the pipes, with labeled contour lines. Opens a box to tune it or turn it off.';
 $ec_lang['lpn_contour_plot']='Contour plot';
 $ec_lang['lpn_contour_show']='Show contours';
-$ec_lang['lpn_contour_show_tip']='Clear to hide the fill and the contour lines; select to show them again as they were. Node colors stay.';
+$ec_lang['lpn_contour_show_tip']='Clear to hide the fill and the contour lines; check to bring them back as they were. Node colors stay.';
 $ec_lang['lpn_contour_fill']='Fill';
 $ec_lang['lpn_contour_fill_tip']='Smooth blends the colors from one class to the next. Bands paints each class of the color key flat.';
 $ec_lang['lpn_contour_fill_smooth']='Smooth';
@@ -2956,7 +2956,7 @@ $ec_lang['lpn_labels_show_tip']='The order in which values appear on a label. Th
 // Tom's own words for the control (R-331: "a code or a toggle to 'Use units' for the After string").
 // It heads a narrow column and names each row's tick box.
 $ec_lang['lpn_labels_use_units']='Use units';
-$ec_lang['lpn_labels_use_units_tip']='Select to show the unit in the After box and on the label, and to update it when the units change. Clear to enter custom After text.';
+$ec_lang['lpn_labels_use_units_tip']='Check to show the unit in the After box and on the label, and to update it when the units change. Clear to enter custom After text.';
 // EPANET's own name for a link's starting state, beside the Status row, which is the run's answer.
 $ec_lang['lpn_labels_init_status']='Initial status';
 // The Symbology index, reworked (Tom, R-333: "Node labels, Node colors, Link labels, Link colors,
