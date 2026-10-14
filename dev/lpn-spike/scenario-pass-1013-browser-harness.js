@@ -400,8 +400,9 @@ async function main() {
 		const useTpl = (await L('lpn_sm_in_use')).replace(/\\n/g, '\n');
 		const scnLine = async (n) => (await L('lpn_sm_item_scenario')).replace('{name}', n);
 		const wantUse2 = useTpl.replace('{item}', (await L('lpn_sm_item_alternative')).replace('{name}', 'Shared')).replace('{list}', (await scnLine('Fig 6')) + '\n' + (await scnLine('Fig 7')));
-		ok('U2 the refusal says the alternative cannot be deleted while it is used by, a real line break, then one Scenario line per user',
-			inUse === wantUse2 && inUse.split('\n').length === 3, JSON.stringify(inUse));
+		// Tom, 2026-10-14: the Alternative alone on line 1, the phrase alone on line 2, one user per line after.
+		ok('U2 the refusal: the alternative on line 1, "cannot be deleted while it is used by" on line 2, then one Scenario line per user',
+			inUse === wantUse2 && inUse.split('\n').length === 4 && inUse.split('\n')[0] === (await L('lpn_sm_item_alternative')).replace('{name}', 'Shared'), JSON.stringify(inUse));
 		sv = await saved();
 		ok('U2 ...and nothing was deleted', !!byId(sv.alternatives, 'a1'));
 
