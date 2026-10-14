@@ -2581,7 +2581,7 @@ $ec_lang['lpn_settings_custom_props']='Propriétés personnalisées';
 // of what a reader needs before opening the design table.
 $ec_lang['lpn_settings_custom_props_note']='Propriétés définies par l\'utilisateur. Enregistrées avec le projet et les scénarios comme toutes les autres propriétés.';
 $ec_lang['lpn_cp_design']='Conception';
-$ec_lang['lpn_cp_design_tip']='Une ligne par propriété personnalisée ; chacune s\'ouvre pour afficher : Clé, Libellé, S\'applique à, Valider comme, Autoriser ou restreindre, le champ de caractères nommé par ce choix, Limite inférieure de longueur, Limite supérieure de longueur, Limite basse, Limite haute.';
+$ec_lang['lpn_cp_design_tip']='Une ligne par propriété personnalisée ; chacune s\'ouvre pour afficher : Clé, Étiquette, S\'applique à, Valider comme, Autoriser ou restreindre, le champ de caractères nommé par ce choix, Limite inférieure de longueur, Limite supérieure de longueur, Limite basse, Limite haute.';
 $ec_lang['lpn_cp_add']='Ajouter une propriété personnalisée';
 $ec_lang['lpn_cp_add_tip']='Ajoute une ligne au tableau de conception et l\'ouvre pour modification.';
 $ec_lang['lpn_cp_remove_tip']='Retire cette propriété du tableau de conception. Les valeurs déjà saisies sur les éléments sont conservées dans le fichier et sont rétablies si une propriété de même clé est de nouveau définie.';
@@ -2592,7 +2592,7 @@ $ec_lang['lpn_cp_unnamed']='Pas encore nommée';
 // full name of the column is ever written out.
 $ec_lang['lpn_cp_key']='Clé';
 $ec_lang['lpn_cp_key_tip']='Clé : une propriété est enregistrée sous ce nom. Les espaces ne sont pas autorisés, et un préfixe est ajouté automatiquement pour que votre clé ne puisse jamais entrer en collision avec un champ intégré.';
-$ec_lang['lpn_cp_label']='Libellé';
+$ec_lang['lpn_cp_label']='Étiquette';
 $ec_lang['lpn_cp_label_tip']='Étiquette : apparaît dans la boîte des propriétés, dans Rechercher et en tête d\'une colonne de tableau.';
 $ec_lang['lpn_cp_applies']='S\'applique à';
 $ec_lang['lpn_cp_applies_tip']='S\'applique à : liste de préfixes d\'identifiant séparés par des virgules pour les éléments qui utilisent cette propriété, par exemple J,L,R.';
@@ -3365,7 +3365,7 @@ $ec_lang['lpn_library_curve_equation_tip']='La courbe ajustée sur les points, e
 $ec_lang['lpn_library_curve_values_tip']='Sélectionnez une ou deux colonnes dans un tableur, copiez-les, puis collez-les dans la première cellule où vous voulez qu\'elles arrivent. Les lignes sont ajoutées au fur et à mesure des besoins. Vous pouvez aussi coller des lignes copiées directement depuis un fichier EPANET, y compris le nom de la courbe.';
 // EPANET states a curve's description in the comment above its rows, and this page has read it and
 // written it back since Task 586 without showing it to anybody.
-$ec_lang['lpn_library_curve_note_label']='Note descriptive';
+$ec_lang['lpn_library_curve_note_label']='Description';
 $ec_lang['lpn_library_curve_remove_point']='Supprimer ce point';
 // The OUT direction of ROADMAP Task 186: two columns, tab separated, ready to paste into a
 // spreadsheet. The prompt is what a browser that refuses the clipboard gets instead.
@@ -3551,7 +3551,7 @@ $ec_lang['lpn_field_demand_pattern']='Courbe de modulation de la demande';
 // A JUNCTION’S DEMAND IS A LIST (Task 468). The PATTERN says what KIND of user this is
 // (“residential”); the CATEGORY says WHO it is (“Elm Acres”). Nothing validates a category and there
 // is no list to choose one from, which is why the tip describes it rather than instructing.
-$ec_lang['lpn_field_demand_category']='Libellé';
+$ec_lang['lpn_field_demand_category']='Description';
 $ec_lang['lpn_demand_add']='Ajouter une catégorie de demande';
 $ec_lang['lpn_demand_remove']='Retirer cette demande';
 // A RESERVOIR AND A PUMP TAKE A PATTERN TOO, on the same rule: whole-project settings live in the
