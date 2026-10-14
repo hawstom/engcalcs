@@ -77,48 +77,51 @@ the block.
   4 and 5), after advice from every angle (*"Order matters... we are likely to make mistakes"*).
   Stages, answers and code: `dev/scenario-alternatives.md` on `feat/bentley-interop`. Basic mode
   hides it until the Advanced UX is designed. Task 765 (Presentation) is folded in here.
-- 100|781| **Active topology first; then Change type becomes a new asset in the old one's place.**
-  Tom, 2026-10-08, choosing "Active topology first": *"I never wanted what we have anyway. Now that
-  I understand, I want it changed. Change type is to be make a new object at the location of the old
-  object. And that's physically analogous."* Active topology: an element exists only in the
-  scenarios that include it (a new tank, pipe or subdivision). Change type then adds the new asset
-  in this scenario, switches the old one off and carries the values across; the type-per-scenario
-  override built on `feat/bentley-interop` goes. Seam: Task 721.
-  **Decided 2026-10-10: Change type works in Base only, in place, keeping the ID**; the per-scenario
-  version is removed on `feat/bentley-interop` (Mary: Bentley's Morph, epanet-js and DC Water change a
-  node's type as a plain edit, none per scenario). Tom, 2026-10-10: *"Is Change really Copy? That's not
-  what I asked for... Does anybody else do it? And if not, let's drop it."* Closes when the branch merges.
-- 100|737| **Coined names for interface elements, so every language names each one once.**
-  Tom, 2026-09-28: *"The key here is for every language to invent unique words for each interface
-  element and to use them consistently... it might be handy to literally make up unique, but memorable
-  keys"*, e.g. a Sally (symbology annotation label). Later the same day: *"a keywords table where
-  we are less concerned about what key you assign to each row as that they be unique and canonical"*
-  (dynamic asset annotation = Label, asset management key = Tag, asset notes = Description, user map
-  annotation = Text, z = Elevation, y = depth, p = pressure, total potential = Head/HGL, energy = EGL).
-  Plan: re-key glossary.json by concept (id + definition), English one rendering among 27; keys cite
-  it with the existing `gloss:` tag.
-  **CONCEPT LAYER SHIPPED 2026-09-30** (`chore/term-concept`, `dev/term-concepts.md`): 131 glossary
-  terms carry a coined `concept` id and a `definition`; a payload gives the definition as the source
-  and English as one rendering; `concept_check.php` blocks. All 131 definitions are filled (7d00bd86, 2026-10-02). The four
-  new terms (label-sym-sally, label-user-tessa, label-long-dora, hydraulic-head) are translated in every language (checked 2026-10-14). Open: Tag and Label share one word in es, it and tr.
-  **RULED 2026-09-30: Head and HGL stay split.** And on the coined ids: *"we should say something like
-  label-sym-sally, label-user-tessa, label-word-gus, and label-long-dora (assuming those are
-  'correct'); or we no longer need the anthro names ... This way the languages know that they all are
-  merely labels, and they can inter-compare."* Re-key those four concept ids with the family prefix.
-  **RE-KEYED 2026-09-30**: sally/tessa/gus/dora are now label-sym-sally/label-user-tessa/
-  label-word-gus/label-long-dora everywhere (glossary.json, key_concepts.json, concept_selftest.php,
-  dev/term-concepts.md); definitions unchanged.
+- 100|781| **Morph: change an asset's type in one scenario, keeping its pipes.**
+  Tom, 2026-10-14: *"I would like to create a scenario called 'Tank at J1' and change the J1 junction to
+  a tank in that scenario without having to delete and reconstitute the pipes connecting to it ...
+  changing element type never creates an override. I think we need to change that."* He named it
+  *"Morph"*, with Transform as the translatable synonym. Reverses the 2026-10-10 Base-only decision.
+  **As the User Manual will say it:** Morph changes a node to another node type, or a link to another
+  link type, and keeps its ID, its location and every connection. In Base it is an ordinary edit. In
+  any other scenario it is an override, held in that scenario's alternative and inherited by its
+  children: the asset is drawn, listed, solved and exported as its new type there and as its old type
+  everywhere else. Values the two types share carry across; the new type's own values start from
+  Settings > New assets and are overrides you then edit. Clearing the override restores the base type.
+  Building on `feat/morph`, cut from and kept merged with `feat/bentley-interop`; closes with it.
+- 100|737| **One canonical word per concept, so every language names each one once.**
+  Tom, 2026-10-14: mnemonic, definitional keys over coined names (*"we don't need more confusion"*).
+  **WHAT IS LEFT: every language gives each concept below its own word, used everywhere, and no two
+  concepts share a word.** Known collisions: Tag and Label are one word in es (Etiqueta), it
+  (Etichetta) and tr (Etiket); cs uses Zdroj for both Reservoir and Source.
+  | Concept | English |
+  |---|---|
+  | Dynamic asset property annotation | Label |
+  | Asset management key | Tag |
+  | Asset notes | Description |
+  | User map annotation | Text |
+  | Hydraulic z | Elevation |
+  | Hydraulic y | Depth |
+  | Hydraulic p | Pressure |
+  | Partial or incremental potential energy | Head |
+  | Total potential energy at a point | Head |
+  | Total potential energy as a line | HGL |
+  | Total energy as a line | EGL |
+  The concept layer exists (`dev/term-concepts.md`, `concept_check.php`; glossary terms carry a
+  concept id and a definition, and payloads send the definition as the source). Head and HGL stay
+  split (Tom, 2026-09-30).
 - 100|741| **The infinite map: generated networks for the label bench.**
   **ROUND 5 DONE 2026-09-30** on `feat/label-placer`: generator, L-Town and C-Town, pre-registered protocol, `dev/label-trials/round-5-2026-09-29.md`; five rule proposals await his ruling.
   Tom, 2026-09-28, on threats to validity: *"It's all Net3. Where's the infinite map?"* A generator of
   networks at any size and density (grid, radial, branched), a fresh seed each round, plus published
   utility-scale networks. Notes: dev/paper-notes-label-placement.md.
 - 100|782| **Snap to asset, and Match properties: the small tools that replace Change type.**
-  **SNAP MERGED 2026-10-11** (`feat/snap`, Tom: "merge"); Match properties on `feat/match-property`, targets first.
+  **SNAP MERGED 2026-10-11** (`feat/snap`); **Match properties is on `feat/bentley-interop`** (merged in from `feat/match-property`) and closes this task when that branch merges.
   Tom, 2026-10-10: if nobody else does Change type, *"abandon the project and institute a variety of smaller
   and better tools: Snap/magnet to asset; Match properties from one asset to others (as applicable); Change
   link connections (done); Split pipe (done)."* Seam: Task 779 snapping to shape points.
 - 100|784| **A small time-series graph bubble on the map, from an asset's right-click.**
+  **BUILT, on `feat/bentley-interop`** (merged in from `feat/graph-bubble`); closes when that branch merges.
   **PROMOTED TO 100 by Tom, 2026-10-11** (*"784 time-series bubbles: Promote to 100."*).
   Tom, 2026-10-11, looking for it: *"multiple concurrent map time series graph bubbles available by right-clicking
   an asset."* The asset right-click menu now exists on `feat/match-property` as a row list (`openMapContextMenu`).
@@ -129,8 +132,110 @@ the block.
   Tom, 2026-10-12 (interview q03): expose override vs inherited with a single-character marker, carried
   through Properties and Settings, after Civil 3D's Override / Child override columns. Ida: a dot gutter;
   Mary: Bentley's and Civil 3D's per-row checkbox. Tom's call between them first. Journals 2026-10-12.
-- 50|789| **A way into Copy/Paste properties and the graph bubbles without a right-click.**
-  Perry, 2026-10-12: both open only from the asset right-click menu, which a touch screen does not have.
+- 100|221| **Retire the "constants now match EPANET" note (Task 213).** Delete
+  **PROMOTED TO 100 by Tom, 2026-10-14, ahead of its 2027-08-01 check date.** Building on `chore/retire-epanet-note`.
+  `<prefix>_notes_epanet_term`/`_def` from `Hazen-Williams.php`, `Branched-Network.php`,
+  `Looped-Network.php` and all 5 lang files (en, es, pt, fr, tr). A dated "we changed this" note is
+  useful for about a year; after that it is archaeology in a user-facing Notes list.
+- 100|625| **"HawsEDC Calculators" in the Help menu, above Privacy notice.**
+  Tom, 2026-10-14: *"Add 'HawsEDC Calculators' in Help menu above Privacy notice. Then close the
+  task."* That answers the last open question of the app page divorce (shipped 2026-09-11; record in
+  `dev/chrome-audit.md`, `dev/help-menu-mastermind.md`). Building on `feat/help-calculators`; closes on merge.
+- 100|643| **Slope distance for automatic lengths, and whether anyone offers a length factor.**
+  Tom, 2026-09-13: *"this is straining at a gnat while we are swallowing the camel of slope distance,
+  pipe dips, pipe depth"*. **Decided 2026-10-14: *"Let's go ahead and use slope distance for our
+  calculations in case it's significant which occasionally will be true."*** An automatic length
+  combines the drawn horizontal length with the end nodes' elevation difference; a typed length is
+  untouched. Building on `feat/slope-length`. Still open: a length adjustment factor or increment.
+  Tom: *"ask Mary to research whether anybody offers 'Length adjustment factor' for auto lengths. I
+  don't want to break a tacit complicit oversight on this or be ridiculously pedantic."* Nothing
+  about length accuracy is claimed in public until this closes (Task 641).
+- 100|681| **Economize the label layout: it is half the cost of a project switch.**
+  **PROMOTED TO 100 by Tom, 2026-10-14.** (c)/(d) and (b) shipped; what is left is to measure his switch again and find the next cost.
+  **DEMOTED TO 75 by Tom, 2026-10-11.**
+  **(c)/(d) MERGED 2026-10-03** (`feat/label-cache`, Tom: *"I am impressed. This is a major efficiency
+  feature. Done."*): a bank per wheel notch, rounded outward, final; revisits run no pass (Novato ~85 -> ~13 ms). (e) already existed (one pass per wheel
+  burst). **(b) on `perf/label-pass`, 2026-10-07:** the same layout, labelPass 254 -> 98 ms (Novato, every field
+  on, Chrome); certain shed rungs not drawn, ring search cut to the grid. `label-pass-economy-browser-harness.js`.
+  Tom, 2026-09-16: *"if laying out the labels takes 2 sec, we have to figure out how to economize."*
+  - **THE NUMBER IS HIS: the label pass is 56% of `buildDom`**, which is about 1.9 s of his 4.6 s
+    switch into a geographic Net3 with every field on. Here, on a machine 6x faster, the same pass is
+    306 ms.
+  - **THE MEASURING IS ALREADY FIXED AND IS NOT WHAT IS LEFT.** `measuredTextWidth()` banks every answer
+    on (class, size, string): 8,140 browser measurements a switch became 100 once warm. What remains
+    is composing the rows, the first-fit, the ring pass, the gang repair and the shed -- arithmetic
+    and DOM writes, not layout reads.
+  - **(a) IS DONE, 2026-09-16.** The pass ran at the outgoing project's zoom and was superseded by
+    the view restore moments later; `buildDom()` now defers it and `refreshAllFromDocument()` runs
+    it once, after the camera is where it belongs. With Task 680's keep on top, a switch runs the
+    pass ZERO times.
+    (b) `dev/label-placement-algorithms.md` section 1 says the published engines run a cheap first
+    approximation before any search, and we have the search without it. (c) A label whose content
+    and scale have not changed since the last pass could keep its placement, which is the same
+    "keep what you already worked out" argument as Task 680.
+  - **(d) TOM'S OWN PROPOSAL, 2026-09-17: bank the answer PER ZOOM LEVEL.** *"We should be able to
+    save label position and shedding state for every node at every zoom level. And I assume that
+    that would give us almost instantaneous zooming."* It is (c) with a key, and the key is the
+    hard part. **It does NOT require Task 683's snapping and must not be built as though it does**
+    (Franco, 2026-09-17): key the cache on a ROUNDED BUCKET of the continuous scale and let the view
+    go on tracking the fingers exactly. What still needs his seat is the reading question -- banked
+    positions do not slide as you pinch, they JUMP between buckets, and the moment that is likeliest
+    to happen is the last half-second before a tap, which is the worst instant for a label to
+    relocate in a tight cluster.
+    - **TOM RULED IT AFTER 680's SECOND HALF, 2026-09-17, and gave the design rule that matters:**
+      *"What we need to be vigilant for is unnecessary passes. We have to be aware of whether the
+      pre-placements are final or not. I would agitate for using the next more zoomed out (larger
+      text) bucket and not revisiting it. And of course the buckets should correlate to the PC mouse
+      zoom levels."* **Round OUTWARD, never to nearest**, and treat a bucket's answer as final rather
+      than as a first guess to refine -- a refinement pass is the cost this whole task exists to
+      remove. Bucket boundaries follow the wheel's own notches (Task 683), **as a cache key and never
+      as a view snap** (Task 683 rules the view out).
+  - **(e) AND A PLACEMENT DELAY WHILE THE WHEEL IS STILL TURNING.** Tom, same day: *"if a person is
+    scrolling fast, there is no label placement recalculation until they stop. Maybe this is already
+    done, because the truth is that zoom performance is not terrible on Net3."* **Check before
+    building** -- `scheduleReshed()` is already deferred and `onZoomChanged()` already skips the
+    whole pipeline while annotation is hidden, so some of this exists. Measure what a fast wheel
+    burst actually costs before adding a second timer.
+  - Read with `dev/label-placement-algorithms.md` section 12 and `?debug=perf`, which now prints
+    `labelPass` inside `buildDom` and a label-measurement count.
+- 100|749| **Bentley interop: read and write the WaterCAD/WaterGEMS `.wtg.sqlite` file.**
+  **PROMOTED TO 100 by Tom, 2026-10-14. Blocked on a sample file**: a small WaterCAD model with one child scenario, saved as `.sqlite` and as `.inp`.
+  Tom, 2026-10-06: *"As far as bentley-interop goes, the goal is to engage with the .sqlite file and
+  connect to Google Sheets for Sync in and Sync out"* (the Sheets half is Task 752). The model it
+  needs is Task 721. Phase 1 (`dev/bentley-interop.md`): the schema is unpublished, no public sample
+  exists, the EULA's reverse-engineering clause is his to read. **Tom has no WaterCAD** (a friend
+  might help), so the deciding test, a small model with a child scenario saved as `.sqlite` and as
+  `.inp`, waits on finding one. Presentation never travels through a Bentley file (Bentley keeps
+  display in the `.wtg`); the project file is its only home.
+- 100|785| **Rewrite the Guide's chapters to the Find and replace model.**
+  **PROMOTED TO 100, 2026-10-14** (Tom asked to re-evaluate and close or promote). Not closable: the audit lists open gaps in every chapter. Scenarios and Library chapters wait for `feat/bentley-interop`.
+  Split from Task 763 on its close, 2026-10-11. Every chapter but Find and replace is audited, not rewritten:
+  `dev/user-guide-audit.md`.
+- 100|789| **Long press opens the asset menu on a touch screen.**
+  Perry, 2026-10-12: Copy/Paste properties and the graph bubbles open only from the asset right-click
+  menu. Tom, 2026-10-14: *"Isn't long press the standard alias for right-click on a touch screen?
+  Promote this to 100 and resolve promptly."* Building on `feat/long-press`, cut from `feat/bentley-interop`.
+- 100|791| **Text halos twice as wide, with a Map appearance setting.**
+  Tom, 2026-10-14: *"our text halos need to be bigger and maybe available as a setting under Map
+  appearance. Can we double them?"* Building on `feat/text-halo`.
+- 100|792| **A Description on Library patterns, controls and rules.**
+  Tom, 2026-10-14: *"Let's add Description to the Library Patterns, Controls, and Rules."* Curves
+  already carry one. The .inp carries it as EPANET's own comment where EPANET has one. Building on
+  `feat/library-description`.
+- 100|793| **Ctrl+C in the Screenshot tool copies the picture.**
+  Tom, 2026-10-14: *"please make Ctrl+C copy the screenshot to the clipboard."* Building on `feat/screenshot-copy`.
+- 100|794| **Edit a Text in place on the map.**
+  Tom, 2026-10-14: *"It would be really nice for Text to be editable in place instead of only in the
+  properties box."* Double-click opens an editor over the Text. Building on `feat/text-inplace`.
+- 100|795| **Tank depth in the time series graphs.**
+  Tom, 2026-10-14: *"It would be really nice for the Time Series graphs for Tanks to be able to show
+  depth."* (The tank depth base elevation he asked after is Task 787, closed 2026-10-12: Base
+  elevation is the tank bottom.) Building on `feat/tank-depth-graph`.
+- 100|796| **The EPANET run crashed on Tom's two-system test project.**
+  Tom, 2026-10-14, on `Fotobi_US_WGS84.epp` (reservoir, pump and tank on each of two systems):
+  *"EPANET solver message: memory access out of bounds"*, and "Solve did not converge" in the pump-off
+  scenarios. Also his question: can EPANET solve a system whose only source is a tank? Diagnosing on
+  `fix/epanet-oob`.
 - 75|539| **Gang the neighbour labels so their leaders stop crossing.**
   **DEMOTED TO 75 by Tom, 2026-10-11.**
   **PORTING THE BENCH TO MASTER, 2026-10-07** (Tom agreed D09: rules 1-3 as three defect branches;
@@ -304,53 +409,6 @@ the block.
     from `81792180`, the SHA Tom had deployed, and pushed. CLAUDE.md's Git Workflow carries the
     procedure and the correction of the 2026-09-13 advice that a clean release could not be
     extracted.
-- 75|681| **Economize the label layout: it is half the cost of a project switch.**
-  **DEMOTED TO 75 by Tom, 2026-10-11.**
-  **(c)/(d) MERGED 2026-10-03** (`feat/label-cache`, Tom: *"I am impressed. This is a major efficiency
-  feature. Done."*): a bank per wheel notch, rounded outward, final; revisits run no pass (Novato ~85 -> ~13 ms). (e) already existed (one pass per wheel
-  burst). **(b) on `perf/label-pass`, 2026-10-07:** the same layout, labelPass 254 -> 98 ms (Novato, every field
-  on, Chrome); certain shed rungs not drawn, ring search cut to the grid. `label-pass-economy-browser-harness.js`.
-  Tom, 2026-09-16: *"if laying out the labels takes 2 sec, we have to figure out how to economize."*
-  - **THE NUMBER IS HIS: the label pass is 56% of `buildDom`**, which is about 1.9 s of his 4.6 s
-    switch into a geographic Net3 with every field on. Here, on a machine 6x faster, the same pass is
-    306 ms.
-  - **THE MEASURING IS ALREADY FIXED AND IS NOT WHAT IS LEFT.** `measuredTextWidth()` banks every answer
-    on (class, size, string): 8,140 browser measurements a switch became 100 once warm. What remains
-    is composing the rows, the first-fit, the ring pass, the gang repair and the shed -- arithmetic
-    and DOM writes, not layout reads.
-  - **(a) IS DONE, 2026-09-16.** The pass ran at the outgoing project's zoom and was superseded by
-    the view restore moments later; `buildDom()` now defers it and `refreshAllFromDocument()` runs
-    it once, after the camera is where it belongs. With Task 680's keep on top, a switch runs the
-    pass ZERO times.
-    (b) `dev/label-placement-algorithms.md` section 1 says the published engines run a cheap first
-    approximation before any search, and we have the search without it. (c) A label whose content
-    and scale have not changed since the last pass could keep its placement, which is the same
-    "keep what you already worked out" argument as Task 680.
-  - **(d) TOM'S OWN PROPOSAL, 2026-09-17: bank the answer PER ZOOM LEVEL.** *"We should be able to
-    save label position and shedding state for every node at every zoom level. And I assume that
-    that would give us almost instantaneous zooming."* It is (c) with a key, and the key is the
-    hard part. **It does NOT require Task 683's snapping and must not be built as though it does**
-    (Franco, 2026-09-17): key the cache on a ROUNDED BUCKET of the continuous scale and let the view
-    go on tracking the fingers exactly. What still needs his seat is the reading question -- banked
-    positions do not slide as you pinch, they JUMP between buckets, and the moment that is likeliest
-    to happen is the last half-second before a tap, which is the worst instant for a label to
-    relocate in a tight cluster.
-    - **TOM RULED IT AFTER 680's SECOND HALF, 2026-09-17, and gave the design rule that matters:**
-      *"What we need to be vigilant for is unnecessary passes. We have to be aware of whether the
-      pre-placements are final or not. I would agitate for using the next more zoomed out (larger
-      text) bucket and not revisiting it. And of course the buckets should correlate to the PC mouse
-      zoom levels."* **Round OUTWARD, never to nearest**, and treat a bucket's answer as final rather
-      than as a first guess to refine -- a refinement pass is the cost this whole task exists to
-      remove. Bucket boundaries follow the wheel's own notches (Task 683), **as a cache key and never
-      as a view snap** (Task 683 rules the view out).
-  - **(e) AND A PLACEMENT DELAY WHILE THE WHEEL IS STILL TURNING.** Tom, same day: *"if a person is
-    scrolling fast, there is no label placement recalculation until they stop. Maybe this is already
-    done, because the truth is that zoom performance is not terrible on Net3."* **Check before
-    building** -- `scheduleReshed()` is already deferred and `onZoomChanged()` already skips the
-    whole pipeline while annotation is hidden, so some of this exists. Measure what a fast wheel
-    burst actually costs before adding a second timer.
-  - Read with `dev/label-placement-algorithms.md` section 12 and `?debug=perf`, which now prints
-    `labelPass` inside `buildDom` and a label-measurement count.
 - 75|714| **Theming: colour tokens first, then a Light/Dark choice in Settings.**
   **Phase 1b inline colours MERGED 2026-10-04** (`chore/theme-inline`): js/*.js literals on tokens or allow-listed; the check refuses new ones. **The button base (R-202) MERGED 2026-10-14** (`feat/button-base`); next, dark mode.
   Tom, 2026-09-24 (R-211): *"preparing for this and implementing it will force us into some
@@ -360,14 +418,16 @@ the block.
   - **Phase 1 tokens and the check are built on `feat/theme-token` (see the end of the plan).** Phase 1b remains: the button base below, and inline colours in `js/*.js`.
   - **MOD's phone-like buttons (R-202) belong inside phase 1**: one button base for menu items and
     toolbar buttons, one accent colour, previewed on a branch. Retire the menu hint (R-203) once it ships.
-- 75|749| **Bentley interop: read and write the WaterCAD/WaterGEMS `.wtg.sqlite` file.**
-  Tom, 2026-10-06: *"As far as bentley-interop goes, the goal is to engage with the .sqlite file and
-  connect to Google Sheets for Sync in and Sync out"* (the Sheets half is Task 752). The model it
-  needs is Task 721. Phase 1 (`dev/bentley-interop.md`): the schema is unpublished, no public sample
-  exists, the EULA's reverse-engineering clause is his to read. **Tom has no WaterCAD** (a friend
-  might help), so the deciding test, a small model with a child scenario saved as `.sqlite` and as
-  `.inp`, waits on finding one. Presentation never travels through a Bentley file (Bentley keeps
-  display in the `.wtg`); the project file is its only home.
+- 75|720| **Background layers from a GIS server.**
+  **PROMOTED TO 75 by Tom, 2026-10-14.**
+  Tom, 2026-09-25, on WaterCAD's background layers: *"This seems like a GIS REST server offering."*
+  A fifth third-party service is a new paragraph in `privacy.php` (CLAUDE.md).
+- 75|733| **Grow the native solver, in phases, to everything EPANET's solves.** Tom, 2026-09-26
+  **PROMOTED TO 75 by Tom, 2026-10-14.**
+  (R-325): *"it would be fun and maybe wise ... to gradually, in phases, build out our native solver
+  to do everything that the EPANET solver does. This way the math is less of a black box for us."*
+  Phases to scope: PRV/PSV/FCV, then a time dimension (EPS), then quality. Supersedes the CLAUDE.md
+  line that the built-in solver is not getting a time dimension only when a phase ships.
 - 75|752| **Google Sheets: sync the scenarios and their alternatives out and in.**
   **Direction, Tom 2026-10-07, on Bentley's Connection** (a saved, re-runnable set of directions from
   a source to a model, run for Sync In and Sync Out, not a live link): *"Nice. That's where we should head."*
@@ -468,10 +528,6 @@ the block.
       shipped 2026-08-29). He said he will test and send ideas. **Ask for that list if it does not
       arrive** — a colleague who will answer is worth more than the whole usage instrument on the
       question of why somebody wanted the page.
-- 50|221| **Retire the "constants now match EPANET" note (Task 213) — CHECK: 2027-08-01.** Delete
-  `<prefix>_notes_epanet_term`/`_def` from `Hazen-Williams.php`, `Branched-Network.php`,
-  `Looped-Network.php` and all 5 lang files (en, es, pt, fr, tr). A dated "we changed this" note is
-  useful for about a year; after that it is archaeology in a user-facing Notes list.
 - 50|234| **Canal Seepage must prove its worth or go.** Tom, 2026-08-08: *"in my crosshairs"*. After
   Task 232 removed `Irrigation.php`, `cs_` is the remaining page Tom is not proud of — his standing
   position is that it was AI momentum rather than a real need, and it is already under a
@@ -573,34 +629,6 @@ the block.
     sentences, and only one of them mentions being offline.
   - Same class as the favicon 404 and the `ea-php56` default: **a second host does not inherit the
     first host's external configuration, and nothing inside this repository can see it.**
-- 50|625| **The app page divorce: what is left is one unanswered question.**
-  **TOM, 2026-09-18: *"I don't see anything actionable."* Correct -- the build shipped on 2026-09-11
-  and this row has been carrying its own history rather than a next step.** Dropped to 50 and the
-  [H] struck. **The only thing genuinely open is whether the app page should carry any link back to
-  the suite's other calculators**, which nobody has asked him and which costs nothing to leave as it
-  is. Everything else here is the record of a finished job and belongs in the closed ledger the day
-  he says so.
-  **SHIPPED AND DEPLOYED 2026-09-11.** `echoHeader("EngCalcsApp", ...)` suppresses the suite navbar
-  and the H1/welcome block, keeping the CSS and JS. **NO H1 at all**, on Tom's ruling
-  (*"app.epanetjs.com has no h1 ... this is not a storefront page"*, verified). Install and the
-  Language picker MOVED rather than went; the other 15 calculators are untouched. The Hydraulics
-  menu and all eight "See also" lines now read LibreWaterNet.org, same tab, and
-  `Looped-Network.php` is declared in `EC_MENU_EXEMPT_CALCULATORS` -- that check's premise, "no
-  visitor can reach it", is false for the page that IS librewaternet.org's front door.
-  - **THE MENU BAR IS SETTLED. DO NOT REOPEN IT.** The far-left tower went link -> Mac-style menu
-    -> link in one day and Tom called it (*"we are chasing our tail"*). It is a LINK, tipped
-    "Welcome page, LibreWaterNet.org"; Help holds the commands. Three citable reasons, not
-    remembered ones: macOS has TWO slots (Apple menu, and a separate bold app-name menu holding
-    About) and we merged them; VS Code puts About in HELP on Windows and Linux; and two of three
-    testers never found the menu bar at all. These users are on Windows. Full citations:
-    `dev/help-menu-mastermind.md` §9. **Not EPANET did NOT come back with Help's other rows** --
-    that ruling was written before not-epanet.org was retired, and the harness asserts its absence.
-  - **STILL OPEN AND HIS:** the About box's words are written but `About.php` (the SUITE's about,
-    for the other 15 calculators) still says what it always did. Ida's remaining items are the
-    responsive merge above ~1750 px and her first-visit cue's real-world verdict -- the cue is
-    BUILT, hidden below 640 px on his instruction, and unvalidated by eye.
-  - Measurements behind all of it: `dev/chrome-audit.md`,
-    `dev/app-chrome-postdivorce-recommendations.md`, `dev/help-menu-mastermind.md`.
 - 50|629| **[H] GUARDED: a geographic project opening on the XY default view, in pixels.**
   **THE SEAM IS FIXED AND THE ROOT IS NOT REMOVED.** `applyView()` refuses a geographic camera
   showing no pixel of the Earth (`viewIsReachable()`); `false` already meant "nothing usable", so
@@ -653,19 +681,6 @@ the block.
   bar of map height) and the blocker named is real (nowhere standard to put the current file
   name), so this is open rather than closed.** Anything that reopens it has to answer the file
   name question first. He suggested the interface designer could noodle it.
-- 50|643| **The camel behind grid-to-ground: slope distance and a length adjustment.**
-  Tom, 2026-09-13, answering the projection brief's question about grid versus ground length:
-  *"this is straining at a gnat while we are swallowing the camel of slope distance, pipe dips, pipe
-  depth, some of which are trivial, but all of which are usually much more of a factor than grid to
-  ground."* **This task is the camel**, and Task 641 is gated on it in one respect: ground length is
-  computed there but **nothing about length accuracy is claimed in public until this exists.**
-  - Two candidate controls, neither decided: a **project-wide setting to use slope distance for
-    automatic lengths** (we have elevations, so the arithmetic is free), and a **length adjustment
-    for unmapped bends** -- *"length factor"* or *"length increment"* -- at asset level, project
-    level, or both.
-  - **WHO DECIDES IS NAMED AND IT IS NOT US:** *"Only Sue knows. Or only our human connections
-    know."* Ask the `utility-planning-engineer` seat and a real surveyor before choosing between a
-    factor and an increment; the difference matters to whoever has to defend a length in a report.
 - 50|649| **Retire the nested repository: serve the suite by Alias at both mounts.**
   Tom asked on 2026-09-13 how the repositories and the web deployment should be organized, guessing
   that *"we want web under repository, or in other words, the repositories fully transcendent of web
@@ -862,9 +877,6 @@ the block.
   Tom, 2026-09-26 (R-320): *"This is an extension, not base EPANET. We can provide this, but it's
   not a blocker for EPANET++."* His UI sketch: Settings, Quality holds a short list of parameters
   with toggles plus an open-ended list of reactive species, no scarier than Custom Properties.
-- 50|720| **Background layers from a GIS server.**
-  Tom, 2026-09-25, on WaterCAD's background layers: *"This seems like a GIS REST server offering."*
-  A fifth third-party service is a new paragraph in `privacy.php` (CLAUDE.md).
 - 50|722| **Change and revision tracking.**
   Tom, 2026-09-25, from WaterCAD: *"I like change/revision tracking very cool."*
 - 50|725| **One wide fire-flow table instead of two reports.**
@@ -879,11 +891,6 @@ the block.
   and on the free GIS-to-EPS gap, *"I'd love to collaborate to provide this."* Who to write to
   (Gusnet, QGISRed, Giswater): Mary's journal, 2026-10-06. **GeoJSON EXPORT MERGED 2026-10-07**
   (`feat/geojson`, File > Export > GeoJSON file). Open: the import half.
-- 50|733| **Grow the native solver, in phases, to everything EPANET's solves.** Tom, 2026-09-26
-  (R-325): *"it would be fun and maybe wise ... to gradually, in phases, build out our native solver
-  to do everything that the EPANET solver does. This way the math is less of a black box for us."*
-  Phases to scope: PRV/PSV/FCV, then a time dimension (EPS), then quality. Supersedes the CLAUDE.md
-  line that the built-in solver is not getting a time dimension only when a phase ships.
 - 50|734| **Where space is open east or west, one label on one line.** Tom, 2026-09-26 (R-319):
   *"where there is infinite space east or west, we might want to recognize that infinity and
   leverage it by using single-line concatenation of properties."* After Task 539's current round.
@@ -898,9 +905,6 @@ the block.
   **BUILT 2026-10-08 on `feat/hover-label`**, asked again by outside tester DDN ("whether to show these
   should be a setting"): Select mode, card on rest, setting in Map and page; Perry passed it. Open: field
   names in words, and other modes (calls page G07, G08).
-- 50|785| **Rewrite the Guide's chapters to the Find and replace model.**
-  Split from Task 763 on its close, 2026-10-11. Every chapter but Find and replace is audited, not rewritten:
-  `dev/user-guide-audit.md`.
 - 25|144| **Diagnose the Hazen-Williams conversion leak — full record in `dev/hazen-williams-leak.md`.**
   **The 11% outlier does not reproduce and the fix it was waiting for already shipped** (2026-07-28,
   `9c47608f`, one day after the snapshot). The 2026-08-21 report gives HW 58% use-of-shopping, ordinary
@@ -911,52 +915,6 @@ the block.
     clicks against 580 counted humans; Google organic cannot characterize this audience. What settles
     it is one run of the rebuilt `log/lang-log-stats.sh` over HW and the band pages, same window and
     same bucket, long enough that the denominator is not marked `~`.
-- 25|185| **Match/Copy properties tool (originated during Task 146).**
-  **DROPPED TO 50 BY TOM, 2026-09-17** (*"Task 185: Demote to 50"*), which supersedes the
-  promotion below rather than cancelling its reasoning: the feature is still wanted, nothing is
-  waiting on it.
-  **RAISED TO 100 BY TOM, 2026-09-07.** The earlier gate -- 100 with Task 186, and only once all of
-  the EPANET file is implemented -- is superseded by his own promotion, exactly as Task 186's was.
-  - **THE PREMISE IT WAS CONCEIVED UNDER IS GONE, AND HE KEPT IT ANYWAY.** Tom, 2026-09-06: *"This
-    was conceived 'in the absence of the table editor'. But now we have a table editor.
-    Nevertheless, this could be a very cool visual feature if done right."* So it is no longer the
-    cheap stand-in for Task 186 -- the line below calling it "the cheap 80% of Task 186" is
-    superseded -- it is a POINTING tool that a table cannot replace, wanted for what it is.
-  - **HIS SPEC, VERBATIM AND IN HIS OWN NUMBERING** (2026-09-06):
-    1. Invoke it -- **under the Edit menu, and maybe on the toolbar with a nice icon**.
-    2. Get prompted to select the source asset to copy from.
-    3. **A specialised properties box for the source asset opens**, with recommended or previous
-       (remembered by the BROWSER) checkboxes ticked for the properties to copy.
-    4. Click Copy.
-    5. (a) Click other assets **of the same type** to receive the designated properties.
-       (b) Optional or future: click in space to start a **polygon window selection** of every asset
-       fully inside the drawn polygon, documented in the tip on the Copy button. While drawing,
-       **right-click to choose Finish as polygon or Finish as fence**.
-    6. The properties are copied to all indicated assets, **as a SINGLE undo operation**.
-  - **"Previous (by browser)" is the project/browser split doing its work, not an exception to it**:
-    which boxes were ticked last time is furniture -- a fact about the person, not the document --
-    so it is a `localStorage` sibling key and `serializeProject()` must never learn about it.
-    `lpn_furniture_check.php` will require it to be declared.
-  - **Same type only, in step 5a, and that is load-bearing**: a pump's properties are not a pipe's,
-    and a tool that silently skips non-matching clicks teaches nothing. Say why the click did
-    nothing.
-  - Two things a decision is owed on before building: **ID is never copyable** (IDs are unique) and
-    **geometry is never copyable** (that is a move, not a property copy).
-  - Original phrasing, kept because the good idea is in it. Tom, 2026-07-30: "In the absence of the
-  table editor, some sort of Match or Copy tool would be very cool. Checkboxes (or current visible
-  labels) say what properties to copy, top shows (or initial click gives) the Source object then you
-  click the Target objects." Same interaction as AutoCAD's MATCHPROP and every GIS attribute-copy
-  tool: a toolbar mode, first click sets the source, every later click applies to a target, Escape
-  or a mode change ends it. **The good idea in Tom's own phrasing is "or current visible labels"** —
-  the Labels panel already IS a per-property checkbox list, already knows which properties are
-  interesting to this user right now, and is already on screen; reusing it as the property filter
-  means the tool needs no property picker of its own, and what you see on the map is what gets
-  copied.
-
-  **Kept and still liked (Tom, 2026-08-13): "Very nice idea. I love it."** Keep it a click-source-
-  then-click-targets tool: that is the right shape when you are drawing 15 pipes and want this one
-  to look like that one. Do not grow it into a query tool — search-and-replace is now Task 389 and
-  is a better fit for its own job, so the two ship side by side rather than one becoming the other.
 - 25|225.13| **`dev/lpn-file-lock-test-punchlist.md` §13 needs the rewrite §0–§8 got** (Tom: *"Some
   stuff no longer exists or is renamed"*), before anybody is asked to run that section again.
   Split out of Task 225 when the rest of it closed 2026-08-09 — this piece is a punch-list document
