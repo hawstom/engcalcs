@@ -38052,8 +38052,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	// The type an asset is in a scenario: its override there (its own or inherited), else Base's.
 	function morphTypeIn(el, scn) {
-		var ov = (!scn || scn.isBase) ? null : resolvedOverrides(scn)[ovKey(el)];
-		if (ov && typeof ov.type === 'string' && morphTypeValid(el, ov.type)) { return ov.type; }
+		var mo = (!scn || scn.isBase) ? null : resolvedOverrides(scn)[ovKey(el)];
+		if (mo && typeof mo.type === 'string' && morphTypeValid(el, mo.type)) { return mo.type; }
 		return morphBaseOf(el, 'type');
 	}
 	// Is this asset another type in the scenario showing than it is in Base?

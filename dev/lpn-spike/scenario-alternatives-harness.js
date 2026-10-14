@@ -36,7 +36,7 @@ const L = loadLoopedNetwork(
 	"\t\tdeleteScenario: deleteScenario, activeScenario: activeScenario, baseScenario: baseScenario,\n" +
 	"\t\tserializeProject: serializeProject, projectFileText: projectFileText, applySaved: applySaved,\n" +
 	"\t\tacceptImportedText: acceptImportedText, buildDom: buildDom,\n" +
-	"\t\tOVERRIDABLE: LPN_OVERRIDABLE, CATS: LPN_ALT_CATEGORIES, CATEGORY_OF: LPN_ALT_CATEGORY_OF,\n" +
+	"\t\tOVERRIDABLE: LPN_OVERRIDABLE, CATS: LPN_ALT_CATEGORIES, CATEGORY_OF: LPN_ALT_CATEGORY_OF, MORPH: LPN_MORPH_PROP, isOverridable: isOverridable,\n" +
 	"\t\tcategoryOf: categoryOf, alternativesOf: alternativesOf, alternativeFor: alternativeFor,\n" +
 	"\t\tallAlternatives: allAlternatives, resolveThroughAlternatives: resolveThroughAlternatives,\n" +
 	"\t\talternativeOverrides: alternativeOverrides,\n" +
@@ -79,7 +79,8 @@ console.log('\n--- every overridable property has a category ---');
 	});
 	Object.keys(L.CATEGORY_OF).forEach(function (g) {
 		Object.keys(L.CATEGORY_OF[g]).forEach(function (p) {
-			if (!has(L.OVERRIDABLE[g] || {}, p)) { stale.push(g + '.' + p); }
+			// A morph's type (Task 781) is overridable through isOverridable() and named in no editor's list.
+			if (!has(L.OVERRIDABLE[g] || {}, p) && !(has(L.MORPH, p) && L.isOverridable(g === 'link' ? { from: 'a', to: 'b' } : { type: 'junction' }, p))) { stale.push(g + '.' + p); }
 			if (L.CATS.indexOf(L.CATEGORY_OF[g][p]) < 0) { badCat.push(g + '.' + p); }
 		});
 	});

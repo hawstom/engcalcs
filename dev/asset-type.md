@@ -1,4 +1,4 @@
-# Change type (Water > Change type)
+# Morph (Water > Morph), formerly Change type
 
 Tom, 2026-10-05: *"It would be nice to provide a tool under Water or Tables to Change node type for
 any asset, where if it has information that can't be ported to the new type, we alert and ask."*
@@ -47,13 +47,11 @@ Links follow under "Links" below.
     `libAnnotateControl()` draws the same line.
   - A rule clause that names the node by a kind it no longer is.
 - **One undo** reverses the whole change, the selection included.
-- **Base-owned; outside Base, a new asset in the old one's place** (Tom, 2026-10-08, Task 781).
-  The type is not in `LPN_OVERRIDABLE`. In Base a change applies in every scenario. In any other
-  scenario Change type first asks "Current scenario is not Base. Create new assets? The selected
-  assets become inactive in this scenario." (Create new assets, Switch to Base, Cancel), then
-  replaces each asset with a new one, active only in that scenario's topology. The type override
-  of 2026-10-07 is gone. See `dev/scenario-alternatives.md`, "Active topology, and Change type in
-  a scenario".
+- **In Base, in place; in any other scenario, an override of the type** (Task 781, Tom 2026-10-14).
+  This file describes the Base change. In a scenario Morph writes the type as an Active topology
+  override and the new type's values as ordinary overrides; see `dev/scenario-alternatives.md`,
+  "Morph". The two earlier scenario versions (a type override, 2026-10-07; a new coincident asset,
+  2026-10-08) and the Base-only rule of 2026-10-10 are superseded.
 
 ## Why Water, at the foot
 

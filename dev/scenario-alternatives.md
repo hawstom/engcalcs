@@ -67,7 +67,7 @@ here. Each property is in exactly one category. The category id is what the code
 |---|---|---|---|
 | Physical (`physical`) | Physical | pipe `diameter`, `roughness`, `k`, `length`, `typeId`, `fittingsId`; pump `curveId`, `efficCurveId`; junction `emitter`; reservoir `head`, `headPattern`; node `x`, `y`, `elev`; tank `minLevel`, `maxLevel`, `tankDiameter`, `volCurve` | **SPECULATION** for `emitter` and `head`: Bentley's reservoir "elevation" and junction emitter coefficient are element attributes we believe sit in Physical; not confirmed from a cited page. **Position has no Bentley home at all**: Bentley's geometry does not vary by scenario. Ours does (Tom, 2026-09-15), so a Physical child alternative holding `x`/`y` is ours alone and has no Bentley translation. |
 | Demand (`demand`) | Demand | junction `demand`, `demands` (the whole breakdown, R-369) | Tom's Peak Hour example. |
-| Asset activation (`topology`; Tom, 2026-09-30) | Active Topology | node `active`, link `active` | Task 753 ("Activation") is Tom's call on the words; the id here is neutral. Drawing inside a scenario (`bornInScenario()`) writes `active: true` there, so it creates that scenario's topology child alternative, exactly as Bentley's own "element added in a child topology" does. A link whose end is inactive is itself out (`linkLive()`). See "Active topology, and Change type in a scenario". |
+| Asset activation (`topology`; Tom, 2026-09-30) | Active Topology | node `active`, link `active`; node and link `type`, link `valveType` (Morph, Task 781) | Task 753 ("Activation") is Tom's call on the words; the id here is neutral. Drawing inside a scenario (`bornInScenario()`) writes `active: true` there, so it creates that scenario's topology child alternative, exactly as Bentley's own "element added in a child topology" does. A link whose end is inactive is itself out (`linkLive()`). See "Active topology, and Morph". |
 | Initial settings (`initial`) | Initial Settings | link `status`, valve `setting`, tank `level`, pump `speed`, `speedPattern` | **CITED** for pipe status: *"a pipe can start in an open or closed position and a pump can start in an on or off condition"*, <https://docs.bentley.com/LiveContent/web/Bentley%20WaterGEMS%20SS6-v1/en/31010.html>. Tank level and valve setting: Bentley's SCADAConnect page lists *"initial conditions with regard to such properties as tank water levels, pump status and settings and valve status"*, <https://docs.bentley.com/LiveContent/web/Bentley%20WaterCAD%20CONNECT%20Edition%20Help-v1/en/GUID-E8008FFA-6E0C-4A98-AAF6-C6CC742D5A71.html>, which does not name the alternative; placing them in Initial Settings is SPECULATION on that reading. |
 | Constituent (`constituent`) | Water Quality: Constituent | node `initQuality`, `sourceType`, `sourceQuality`, `sourcePattern`; tank `tankCoeff`, `mixingModel`, `mixingFraction`; pipe `bulkCoeff`, `wallCoeff` | Bentley splits water quality into Age, Constituent and Trace; everything we let a scenario vary is a chemical's. |
 | Fire flow (`fireflow`) | Fire Flow | junction `fireFlow` | The required fire flow per junction (Task 530). |
@@ -93,7 +93,7 @@ scenario; Bentley's own Physical alternative carries elevation. They are stored 
 the file names them (`LPN_BARE_PROP`); `scenario_seam_check.php` refuses an unmarked bare write.
 The categories for `elev`, the tank geometry, `headPattern`, mixing, `speed` and `speedPattern` are
 SPECULATION from Bentley's alternative names, not from a cited page. **Still not a scenario's**:
-element ids and types (Change type in a scenario makes a new asset), link ends and bends, a Text's
+element ids (an asset's type is, through Morph, in Active topology), link ends and bends, a Text's
 position and size, an asset's description and tag, and everything a Customer carries.
 
 ## The key decision: derive the alternatives (A) or store them (B)
@@ -728,8 +728,8 @@ named set and stops pretending to have a parent. Recommendation: keep the column
   **A custom property's design stays the project's in every scenario** (the Excluded table): its
   rows have no category, are never marked, and are read-only in a scenario's row.
 - **(6c, Q11) Clear override, never Reset**: already true of every visitor string.
-- **Asset-type overrides (6a)**: built 2026-10-07 as type overrides and replaced 2026-10-08 by a new
-  asset in the old one's place; see "Active topology, and Change type in a scenario" below.
+- **Asset-type overrides (6a)**: built 2026-10-07, replaced 2026-10-08 by a new asset in the old
+  one's place, retired 2026-10-10, and built again 2026-10-14 as Morph; see "Morph" below.
 
 Harnesses: `settings-table-owner-browser-harness.js` (real Chromium: Owner, Rank gone, Before/After
 stated or not and typed in a scenario, the box note, both filters and the banner in the Settings
@@ -737,7 +737,7 @@ and Pipes tables, Net3 lat/lon's custom property rows); `pane-clear-override-spe
 (a 117-pipe column cleared under a time bound, Q12's marks, one undo); `settings-table-labels-harness.js`
 (Owner and Setting words on every example, no duplicates, Tom's example rows).
 
-### Active topology, and Change type in a scenario (Task 781, 2026-10-08)
+### Active topology, and Morph (Task 781, 2026-10-08 and 2026-10-14)
 
 Tom, 2026-10-08, choosing "Active topology first": *"I never wanted what we have anyway. Now that I
 understand, I want it changed. Change type is to be make a new object at the location of the old
@@ -781,14 +781,53 @@ on."* What this task added or confirmed:
   so the box is the visible form of what Basic mode already does; hiding it would leave a deleted
   pipe with no way back but undo. The tree it resolves through stays hidden.
 
-**Change type works in Base only** (Tom, 2026-10-10, retiring the per-scenario version built
-2026-10-08). Bentley Morph, epanet-js and DC Water's Change Node Class change a node's type only as
-a plain edit, never per scenario, and the per-scenario version (a new coincident asset, the old one
-deactivated) was confusing and costly. In Base the asset keeps its ID and changes type in every
-scenario, with its own box. Outside Base the command is refused in one sentence
-(`lpn_change_type_base_only`): a scenario switches assets on and off in Active topology instead.
-Rejected: the per-scenario replacement. A project already holding such copies opens them as
-ordinary assets; there is no migration.
+**Morph** (Task 781; Tom, 2026-10-14, reversing the Base-only rule of 2026-10-10: *"I would like to
+create a scenario called 'Tank at J1' and change the J1 junction to a tank in that scenario without
+having to delete and reconstitute the pipes connecting to it. But as we ended up, changing element
+type never creates an override. I think we need to change that."*; on the name: *"I like the term
+'Morph' (Transform) for this feature"*). Water > Morph, formerly Change type. In Base it changes the
+asset in place, as before (`dev/asset-type.md`). In any other scenario:
+
+- **The new type is an override in Active topology** (`type`, and `valveType` for a link morphed into
+  a valve, which is born a TCV). Active topology rather than Physical, because a morph is the
+  one-element form of what Bentley's Active Topology alternative does (switch the junction off, add a
+  tank), so it maps there on a Bentley export; and because it keeps the morph independent of the
+  Physical alternative a scenario names, so a scenario using "Upsized mains" can still inherit "Tank
+  at J1". Neither name is in `LPN_OVERRIDABLE`: no editor offers the type as a field.
+  `isOverridable()` answers for them (`LPN_MORPH_PROP`), so `setProp()`, `setOverride()` and
+  `clearOverride()` are the one door, as for every other value.
+- **The ID, the location and every connected link stay.** Values both types have are the same
+  properties and carry by themselves. Each value only the new type has, where neither Base nor an
+  override states it, is written as an ordinary override of its own property, in that property's
+  category (a tank's depths and diameter in Physical, its water depth in Initial settings), from
+  Settings > New assets. A tank and a reservoir keep the water surface, as in Base. Asks first only
+  where a control or rule tests or sets the asset and would read it differently.
+- **Every reader asks the element** (`morphViewSync()`): the elements are laid out as the open
+  scenario sees them (its type, and New assets values for any field of that type nothing states) and
+  laid back as Base by `withBaseTypes()` around the file, the autosave and the undo snapshot. So the
+  map, Properties, the Tables, Find, the labels, both solvers and the scenario's `.inp` export see the
+  morphed type, and Base and the file never do. The solve re-checks the layout (`morphViewCheck()`),
+  so a topology alternative picked in the Scenarios table is seen at once. With Show scenarios, an
+  asset has a row in each table of a type it is in some scenario.
+- **Properties shows a Type row** where the asset is morphed (or a child scenario morphs it), with
+  the override marker; its dot clears the morph. Morph back to the type the scenario inherits does
+  the same. Either way the scenario's overrides of values neither that type nor Base's type has (a
+  tank's depths) are cleared; an override Base's type reads (a junction's demand) is kept.
+- **A child scenario inherits the morph**, as any Active topology value. One undo step for the
+  selection. A node morphs only into a node and a link only into a link; the rest of a mixed
+  selection is left as it is, and said (`lpn_morph_other_kind`).
+- **A Base morph never takes away what a morphed scenario reads** (`morphPinBase()`,
+  `morphKeepsSpec()`): a scenario keeping the asset a junction while Base makes it a tank is given
+  Base's demand as its own override first, and keeps its overrides of it.
+- Rejected, and not to be proposed again: a new coincident asset with the old one switched off
+  (2026-10-08, retired 2026-10-10 as confusing and costly). Bentley Morph, epanet-js and DC Water
+  change a type only as a plain edit; ours is per scenario because Tom asked for it.
+
+Harnesses: `morph-harness.js` (Net1, both engines against hand-built `.inp` networks: Tom's case on
+junction 22, Base unchanged, the scenario's export under [TANKS] reopened and solved, save and
+reopen byte-identical, undo and redo, inheritance, Clear override, Base's Active topology picked, a
+pipe into a valve, a reservoir into a tank, Base morphing under a scenario's morph, six mutations)
+and `morph-browser-harness.js` (real Chromium, English and Spanish).
 
 - **A control or rule naming an asset inactive in a scenario is left out of that scenario's run and
   of its `.inp` export, and said** (Perry, 2026-10-08: EPANET refused the input, Error 200, and the
@@ -798,22 +837,17 @@ ordinary assets; there is no migration.
   project" would be false); in the export, js/lpn-inp.js drops them as `inactive-control` and
   `inactive-rule`, rebuilding `[RULES]` only when a block is dropped, and the export alert names
   them. Base, where the assets are active, runs and writes them as before.
-**The type override is gone** (built 2026-10-07 for Tom's 6a, removed 2026-10-08): `type` in a
-scenario's override map, the elements laid out per scenario (`typeViewSync()`, `withBaseTypes()`),
-`pinTypeOverrideInheritance()`, `LPN_TYPE_FIELD_CATEGORY_OF`, `writeOverrideIn()`, and their three
-harnesses. Rejected for Tom's reason: an asset is one physical object, and a different object in a
-scenario is a different asset. **A file saved with a type override** (only this branch, for one day)
-opens with the type and every value only that type had removed (`dropTypeOverrides()`), so the
-asset is Base's type in that scenario again. Migrating it into new assets would mint IDs the file
-never had, so it is not lossless and was not done.
+**A file saved with a type override** (2026-10-07, one day, this branch only) opens with it read as
+a morph: its `type` and the tank values beside it are the same names Morph writes now.
 
 Harnesses: `scenario-active-topology-harness.js` (Net1, both engines, against hand-built `.inp`
 networks: a pipe drawn in N; pipe 111 deactivated in D and a node's links greyed with it; junction
-22 a tank in B with its four pipes replaced and B's own pipe diameter carried; Base unchanged to
-1e-6 and its export character-identical; C a child of B; undo and redo; save and reopen; each
-scenario's export reopened and solved; pipe 10 a valve in V; a type-override file opened; seven
-live mutations) and `scenario-active-topology-browser-harness.js` (real Chromium: the question and
-its buttons, Cancel, the box, the greying, the Tables and both menus, the Active column, Ctrl+Z, Base).
+22 a tank in Base in place; Base unchanged to 1e-6 and its export character-identical; C a child
+of B; undo and redo; save and reopen; each scenario's export reopened and solved; pipe 10 a valve
+in Base; a type-override file opened as a morph; live mutations) and
+`scenario-active-topology-browser-harness.js` (real Chromium: Morph in B and Ctrl+Z, the greying,
+the Tables and both menus, the Active column, Ctrl+Z, Morph in Base). Morph in a scenario:
+`morph-harness.js` and `morph-browser-harness.js`, above.
 
 ## The long burn: from Basic mode to the full model (2026-10-06)
 
