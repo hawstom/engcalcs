@@ -155,6 +155,7 @@ async function main() {
 			'settings","contour',                                             // the Contour box
 			'project","basemap',                                              // the Map menu and the corner toggle
 			'settings","idPrefixes","X"',                                      // Text has no prefix row, by design
+			'settings","idPrefixes","S"',                                      // Shape (Task 779): no box row on master either; the table edits it
 			'settings","nodeElevSource"',                                      // the older mirror of New assets: Elevation source
 			'settings","defaults","tank',                                      // no box row: the table edits them
 			'times","qualityStep"',
