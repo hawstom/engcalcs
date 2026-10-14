@@ -117,7 +117,9 @@ function ecVenueCase(string $name, $got, $want): void
     $out = shell_exec('php ' . escapeshellarg(__DIR__ . '/property_venue_check.php') . ' 2>&1');
     ecVenueCase('the real check runs and reports its counts',
         (bool) preg_match('/editable table column\(s\) checked across (\d+) element types/', (string) $out, $m)
-            && (int) $m[1] === 9,
+            // Eight: the element types Find has a group for. Shapes, Settings and Scenarios are tables
+            // with no Find group, so the check counts none of them.
+            && (int) $m[1] === 8,
         true);
     ecVenueCase('every exemption names a column the page still builds',
         strpos((string) $out, 'has stopped being watched'), false);
