@@ -128,6 +128,15 @@ const EC_TABLE_PARITY_EXEMPT = [
     // elements -- the meters attached to it -- and those have a table of their own, with a row per
     // customer. A column here would be a count in a cell that nothing can edit.
     'junction/lpn_node_customers' => 'e. a roll-up of the Customers table\'s own rows, not a junction property',
+    // (f) the table IS the type (Morph, Task 781). Each table holds one type, so a Type column would
+    // say the same word on every row; with Show scenarios a morphed asset's scenario row sits in the
+    // table of the type it is in that scenario, which is how the table states it.
+    'junction/lpn_field_type' => 'f. each table is one type; a morphed row sits in its own type\'s table',
+    'reservoir/lpn_field_type' => 'f. each table is one type; a morphed row sits in its own type\'s table',
+    'tank/lpn_field_type' => 'f. each table is one type; a morphed row sits in its own type\'s table',
+    'pipe/lpn_field_type' => 'f. each table is one type; a morphed row sits in its own type\'s table',
+    'pump/lpn_field_type' => 'f. each table is one type; a morphed row sits in its own type\'s table',
+    'valve/lpn_field_type' => 'f. each table is one type; a morphed row sits in its own type\'s table',
     // (d) a label that arrives as a nested helper's parameter.
     'text/fn:labelText' => 'd. alignRow() is declared inside renderLabelFields(); the two rows it '
         . 'builds are the lpn_field_text_align and lpn_field_text_valign columns',

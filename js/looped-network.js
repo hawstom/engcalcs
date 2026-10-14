@@ -37901,7 +37901,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// link has no place of its own, so the rest of the selection is left as it is, and said.
 		other = selectedRefs().filter(function (r) { return r.kind === (isNode ? 'link' : 'node'); }).map(function (r) { return r.id; });
 		if (other.length) {
-			setNotice(String(pc.lpn_morph_other_kind || 'A node morphs only into another kind of node, and a link only into another kind of link. Not morphed: {ids}')
+			setNotice(String(pc.lpn_morph_other_kind || 'A node can be morphed only into another type of node, and a link only into another type of link. Not morphed: {ids}')
 				.replace('{ids}', function () { return other.slice(0, 20).join(', ') + (other.length > 20 ? ', ...' : ''); }));
 		}
 		if (!changeTypeTargets(to).length) { return; }
@@ -38008,8 +38008,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			text.push([pc.lpn_change_type_rules || 'These rule lines name a link by its kind, and will name its new kind instead:']
 				.concat(capped(rules)).join('\n'));
 		}
-		askDialog({ kind: 'confirm', title: pc.lpn_morph_menu || 'Change type',
-			ok: pc.lpn_morph_ok || 'Change', text: text.join('\n\n') }, function (yes) {
+		askDialog({ kind: 'confirm', title: pc.lpn_morph_menu || 'Morph',
+			ok: pc.lpn_morph_ok || 'Morph', text: text.join('\n\n') }, function (yes) {
 			if (yes) { proceed(); }
 		});
 	}
@@ -51427,7 +51427,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// and no letter anybody has learned moves.
 			{ separator: true },
 			{
-				icon: 'retype', label: pc.lpn_morph_menu || 'Change type',
+				icon: 'retype', label: pc.lpn_morph_menu || 'Morph',
 				tip: pc.lpn_morph_tip,
 				submenu: changeTypeRows
 			}
