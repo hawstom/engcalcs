@@ -7550,8 +7550,15 @@ var EngCalcs = EngCalcs || {};
 			if (scenarios.indexOf(holder) >= 0) { return [holder]; }
 			return scenarios.filter(function (sc) { return treeLayers(sc, holder.category).some(function (l) { return l.obj === holder; }); });
 		}
+		// **AN ALTERNATIVE BASE ITSELF USES IS BASE'S VALUES**, so the push leaves it alone: clearing it
+		// would change what Base shows, the one thing "apply Base values" promises not to do.
+		var baseHeld = [];
+		LPN_ALT_CATEGORIES.forEach(function (cat) {
+			treeLayers(baseScenario(), cat).forEach(function (l) { baseHeld.push(l.obj); });
+		});
 		eachOverrideMap(function (map, holder) {
 			var any = false;
+			if (baseHeld.indexOf(holder) >= 0) { return; }
 			// Walks the map by KEY and matches on the property NAME only -- deliberately group-blind,
 			// because no property in pushSpecList() exists on both groups (`active` is the only name
 			// LPN_OVERRIDABLE shares, and it is not pushable). Task 324.
@@ -7576,7 +7583,8 @@ var EngCalcs = EngCalcs || {};
 		askDialog({ kind: 'confirm', text: msg }, function (yes) {
 			if (!yes) { return; }
 			saveUndoSnapshot();
-			eachOverrideMap(function (map) {
+			eachOverrideMap(function (map, holder) {
+				if (baseHeld.indexOf(holder) >= 0) { return; }
 				scopedKeys(map).forEach(function (k) {
 					active.forEach(function (spec) {
 						(spec.ovProps || [spec.prop]).forEach(function (p) { delete map[k][p]; });
@@ -14657,11 +14665,17 @@ var EngCalcs = EngCalcs || {};
 	// Double-click-to-reset for a Text label -- only meaningful when anchored, where lb.x/lb.y is an
 	// offset from its node and "home" is DEFAULT_LABEL_OFFSET. A free-floating Text's lb.x/lb.y ARE
 	// its absolute position, so there is no default to reset to and this is a no-op.
+	// Reached from the right-click (and long press) menu's Reset position since 2026-10-14, when a
+	// double-click on a Text became editing its words.
+	function textMovedFromHome(lb) {
+		var home, own;
+		if (!lb || !textIsAnchored(lb)) { return false; }
+		home = defaultLabelOffset(); own = textOwnPoint(lb);
+		return own.x !== home.x || own.y !== home.y;
+	}
 	function resetTextLabelHome(id) {
-		var lb = labelById(id);
-		if (!lb || !textIsAnchored(lb)) { return; }
-		var home = defaultLabelOffset(), own = textOwnPoint(lb);
-		if (own.x === home.x && own.y === home.y) { return; }
+		var lb = labelById(id), home = defaultLabelOffset();
+		if (!textMovedFromHome(lb)) { return; }
 		saveUndoSnapshot();
 		setTextPoint(lb, home.x, home.y);
 		labelEls[id].side = 'right';
@@ -36770,6 +36784,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// is built over several clicks, so leaving the tool mid-ring is a real gesture -- and a ring
 		// left on the map by a tool that is no longer running is a shape nothing can finish.
 		if (mode === 'select-area' && newMode !== 'select-area') { areaCancel(); }
+		// An in-place Text editor does not outlive the tool it was opened in; an untouched new Text
+		// goes with it (see closeTextEditor()).
+		if (newMode !== mode && textEditor) { closeTextEditor('leave'); }
 		// **R-181's ARMED FLAG UN-ARMS ON ANY MODE CHANGE, NOT ONLY A ZOOM-WINDOW EXIT** -- picking
 		// any other tool between the first and second press means there was no "second, consecutive
 		// press" left to complete (Ida's spec, Task 682 follow-up). This runs before the
@@ -53627,7 +53644,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// LABEL_LEADER_THRESHOLD) disappears along with it.
 			if (t.dataset.nodelbl !== undefined) { resetNodeLabelHome(t.dataset.nodelbl); }
 			else if (t.dataset.linklbl !== undefined) { resetLinkLabelHome(t.dataset.linklbl); }
-			else if (t.dataset.lbl !== undefined) { resetTextLabelHome(t.dataset.lbl); }
+			// **A DOUBLE-CLICK ON A TEXT EDITS ITS WORDS IN PLACE** (Tom, 2026-10-14), in Select. It
+			// used to send an attached Text back to its default spot beside its asset; editing is
+			// what a double-click on words means everywhere else, and the drag that moved it still
+			// moves it back.
+			else if (t.dataset.lbl !== undefined) { if (mode === 'select') { openTextEditor(t.dataset.lbl, false); } }
 			// **THE DOUBLE-CLICK NO LONGER BENDS A PIPE** (Task 567). It was the accidental edit
 			// path: in `select` mode -- the mode a person is in while doing nothing but reading --
 			// the browser's own dblclick reshaped somebody else's model, and it is easy to reach by
@@ -53649,6 +53670,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// Add-* and Delete tools act on a plain click (tap without drag), same threshold as
 		// the spike's tap-vs-drag detection.
 		var downPt = null;
+		lpDropTap = function () { downPt = null; }; // a long press that opened the menu is not also a tap (Task 789)
 		// THE CLICK THAT ENDS A REGISTRATION IS NOT A TAP FOR A TOOL. The LAST click of a
 		// Scale/Position sequence clears regMode in a CAPTURE-phase listener, and the tool's own
 		// pointerup runs afterwards in the bubble phase of the same event, by which time the flag it
@@ -53933,8 +53955,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				// every existing drawing's behaviour exactly as it was.
 				var nearLink = nearNode ? null : nearestLinkNearScreen(e.clientX, e.clientY, reachPx(e));
 				logLpnFirstAction('element');
-				addText(w.x, w.y, nearNode ? nearNode.id : null,
+				var placed = addText(w.x, w.y, nearNode ? nearNode.id : null,
 					nearLink ? { link: nearLink.link.id, t: nearLink.t } : null);
+				// **AND ITS WORDS ARE TYPED WHERE IT STANDS**: the placeholder opens selected in the
+				// in-place editor, so typing replaces it. Its commit adds no undo step of its own, so
+				// one Undo takes the whole new Text away.
+				if (placed) { openTextEditor(placed.id, true); }
 				// **THE TOOL STAYS ARMED, LIKE EVERY OTHER INSERTER** (Tom, 2026-10-07: *"All
 				// inserters should be in repeater mode. Text is not."*). A tap on a Text already there
 				// still opens it and leaves the tool (the branch above), which is what keeps a second
@@ -54404,16 +54430,20 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		paneClampMenu(menu, x, y);
 		if (first) { first.focus(); }
 	}
-	// **ONLY A NODE OR A LINK IS INTERCEPTED.** Captured on the document ahead of the map's press
-	// handlers, so the press neither selects nor opens a property sheet; empty canvas (right-drag
-	// pans), Text labels and customers are left exactly as they were. The selection is recorded at
-	// the press, so a multi-selection the right-click is made on can be offered the paste.
+	// **ONLY A NODE, A LINK OR A TEXT IS INTERCEPTED** (a node's or link's own label counts as that
+	// asset, marked `onLabel`). Captured on the document ahead of the map's press handlers, so the
+	// press neither selects, drags nor opens a property sheet; empty canvas (right-drag pans) and
+	// customers are left exactly as they were. The selection is recorded at the press, so a
+	// multi-selection the right-click is made on can be offered the paste.
 	var ctxSel = [], ctxHit = null;
 	function ctxOnCanvas(e) { return !!(e.target && e.target.closest && e.target.closest('#lpn_canvas')); }
-	function ctxTarget(e) {
-		var t = hoverTargetFromHit(mapHitAt(e.clientX, e.clientY));
-		return t && (t.kind === 'node' || t.kind === 'link') ? t : null;
+	function ctxTargetFromHit(raw) {
+		var d = (raw && raw.dataset) || {}, t = hoverTargetFromHit(raw);
+		if (!t || (t.kind !== 'node' && t.kind !== 'link' && t.kind !== 'label')) { return null; }
+		if (d.nodelbl !== undefined || d.linklbl !== undefined) { t.onLabel = true; }
+		return t;
 	}
+	function ctxTarget(e) { return ctxTargetFromHit(mapHitAt(e.clientX, e.clientY)); }
 	document.addEventListener('pointerdown', function (e) {
 		if (e.button !== 2 || !ctxOnCanvas(e) || mode !== 'select') { return; }
 		ctxHit = ctxTarget(e);
@@ -54425,15 +54455,105 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (e.button !== 2 || !ctxOnCanvas(e)) { return; }
 		if (mode === 'select' && ctxHit) { e.stopPropagation(); }
 	}, true);
+	// **LONG PRESS IS A TOUCH SCREEN'S RIGHT-CLICK** (Task 789; Tom, 2026-10-14: *"Isn't long press
+	// the standard alias for right-click on a touch screen?"*). A finger or pen held ~500 ms on a node,
+	// a pipe, a label or a Text (whatever ctxTargetFromHit() takes), travelling less than its own tap slop, opens THIS menu at the press point through the
+	// same door the right-click uses (ctxOpenAssetMenu). It is cancelled by a move past the slop, a
+	// second finger (a pinch), a lift or a cancel before the time. Chrome on Android also fires a
+	// `contextmenu` at the end of a long press; that one is swallowed (it is the same gesture), so the
+	// menu never opens twice. A mouse is untouched: this arms only for pointerType touch or pen.
+	// The press itself is allowed to select and arm a drag, as every press does (Task 415); when the
+	// timer fires the drag is dropped, the selection the press found is put back (a right-click never
+	// changes the selection), and the lift's click is swallowed so no tap action follows the menu.
+	var LONG_PRESS_MS = 500;
+	var lpress = null, lpSwallowClickUntil = 0, lpSwallowDown = false, lpDropTap = function () {};
+	function lpCancel() { if (lpress && lpress.timer) { clearTimeout(lpress.timer); lpress.timer = null; } if (lpress && !lpress.fired) { lpress = null; } }
+	function lpFire() {
+		var lp = lpress;
+		if (!lp || lp.fired) { return; }
+		if (lp.timer) { clearTimeout(lp.timer); lp.timer = null; }
+		lp.fired = true;
+		drag = null; dragDirty = false; hideSnapMark(); lpDropTap();
+		ctxSel = lp.sel;
+		setSelectionList(lp.sel);
+		lpSwallowClickUntil = Date.now() + 5000;
+		lpSwallowDown = true;
+		ctxOpenAssetMenu(lp.x, lp.y, lp.hit);
+	}
+	document.addEventListener('pointerdown', function (e) {
+		var t;
+		if (lpress && lpress.id !== e.pointerId) { lpCancel(); lpSwallowClickUntil = 0; return; } // a second finger
+		lpress = null;
+		if ((e.pointerType !== 'touch' && e.pointerType !== 'pen') || !ctxOnCanvas(e) || mode !== 'select' || profileDrawActive() || profileEditActive()) { return; }
+		t = mapHitAt(e.clientX, e.clientY);
+		if (e.pointerType === 'touch') { t = touchNodeOver(e.clientX, e.clientY, t); }
+		t = ctxTargetFromHit(t);
+		if (!t) { return; }
+		lpSwallowClickUntil = 0;
+		lpress = { id: e.pointerId, x: e.clientX, y: e.clientY, hit: t, sel: selectedRefs(), fired: false, slop: tapMovePx(e),
+			timer: setTimeout(lpFire, LONG_PRESS_MS) };
+	}, true);
+	document.addEventListener('pointermove', function (e) {
+		if (!lpress || lpress.fired || lpress.id !== e.pointerId) { return; }
+		if (Math.hypot(e.clientX - lpress.x, e.clientY - lpress.y) > lpress.slop) { lpCancel(); }
+	}, true);
+	['pointerup', 'pointercancel'].forEach(function (t) {
+		document.addEventListener(t, function (e) {
+			if (!lpress || lpress.id !== e.pointerId) { return; }
+			if (lpress.fired) { lpress = null; } else { lpCancel(); }
+		}, true);
+	});
+	document.addEventListener('click', function (e) {
+		if (Date.now() < lpSwallowClickUntil && ctxOnCanvas(e)) { lpSwallowClickUntil = 0; lpSwallowDown = false; e.stopPropagation(); e.preventDefault(); }
+	}, true);
+	// The lift's compatibility mousedown would close the menu it just opened (a press on a Text or a
+	// label is not preventDefault()ed the way a press on a junction is, so the browser sends one).
+	document.addEventListener('mousedown', function (e) {
+		if (lpSwallowDown && Date.now() < lpSwallowClickUntil && ctxOnCanvas(e)) { lpSwallowDown = false; e.stopPropagation(); }
+	}, true);
 	document.addEventListener('contextmenu', function (e) {
-		var pc = EngCalcs.pageConfig || {}, hit, hasTargets, hitRef;
+		if (!ctxOnCanvas(e) || !lpress) { return; }
+		e.preventDefault();
+		e.stopImmediatePropagation();
+		lpFire(); // the browser got there first (Chrome on Android): same gesture, same menu, once
+	}, true);
+	document.addEventListener('contextmenu', function (e) {
+		var hit;
 		if (!ctxOnCanvas(e) || mode !== 'select') { return; }
 		hit = ctxHit; ctxHit = null;
 		if (!hit) { return; }
 		e.preventDefault();
+		ctxOpenAssetMenu(e.clientX, e.clientY, hit);
+	});
+	// **RESET POSITION** sends a dragged label, or an attached Text, back to its own spot, one undo
+	// step (Tom, 2026-10-14, when a double-click on a Text became editing it). Greyed, never hidden,
+	// where there is nothing to send back.
+	function ctxResetRow(hit) {
+		var pc = EngCalcs.pageConfig || {}, el, on;
+		if (hit.kind === 'label') { on = textMovedFromHome(labelById(hit.id)); }
+		else { el = hit.kind === 'node' ? nodeById(hit.id) : linkById(hit.id); on = !!el && el.lx !== undefined; }
+		return { label: pc.lpn_ctx_reset_position || 'Reset position', enabled: on,
+			tip: pc.lpn_ctx_reset_position_off_tip || 'Only a label or an attached Text that has been dragged from its own position can be reset.',
+			run: function () {
+				if (hit.kind === 'label') { resetTextLabelHome(hit.id); }
+				else if (hit.kind === 'node') { resetNodeLabelHome(hit.id); }
+				else { resetLinkLabelHome(hit.id); }
+			} };
+	}
+	function ctxOpenAssetMenu(cx, cy, hit) {
+		var pc = EngCalcs.pageConfig || {}, hasTargets, hitRef, rows;
 		hitRef = { kind: hit.kind, id: hit.id };
+		// A Text has its own two rows and none of an asset's.
+		if (hit.kind === 'label') {
+			openMapContextMenu(cx, cy, [
+				{ label: pc.lpn_ctx_edit_text || 'Edit text', enabled: true,
+					run: function () { openTextEditor(hitRef.id, false); } },
+				ctxResetRow(hitRef)
+			]);
+			return;
+		}
 		hasTargets = pasteTargets(ctxSel).length > 0;
-		openMapContextMenu(e.clientX, e.clientY, [
+		rows = [
 			{ label: pc.lpn_copy_props_menu || 'Copy properties', enabled: true,
 				run: function () {
 					var got = copyProperties(hitRef);
@@ -54447,7 +54567,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 						: (pc.lpn_copy_props_done_ov || 'Copied the overrides of {id} in this scenario.')).replace('{id}', hitRef.id));
 				} },
 			{ label: pc.lpn_paste_props_menu || 'Paste properties to selection', enabled: hasTargets,
-				tip: !propClip ? (pc.lpn_paste_props_off_none || 'Nothing is copied. Right-click an asset and choose Copy properties.')
+				tip: !propClip ? (pc.lpn_paste_props_off_none || 'Nothing is copied. Right-click or long press an asset and choose Copy properties.')
 					: (!ctxSel.some(function (r) { return r.kind === 'node' || r.kind === 'link'; })
 						? (pc.lpn_paste_props_off_select || 'Select the assets to paste to, then choose Paste properties to selection.')
 						: (pc.lpn_paste_props_off_kind || 'No selected asset can take the copied properties.')),
@@ -54455,8 +54575,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			{ label: pc.lpn_tsb_menu || 'Time series graph', enabled: tsbHasRun(),
 				tip: pc.lpn_tsb_off_tip || 'Needs extended period results. Set a Total run time in Settings, Calculation, Time, and calculate.',
 				run: function () { tsbOpen(hitRef); } }
-		]);
-	});
+		];
+		if (hit.onLabel) { rows.push(ctxResetRow(hitRef)); }
+		openMapContextMenu(cx, cy, rows);
+	}
 
 	// ---- ROADMAP Task 277: a move is undoable ----
 	//
@@ -68703,6 +68825,173 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		return box;
 	}
 
+	// **THE ONE DOOR A TEXT'S WORDS ARE WRITTEN THROUGH**, shared by the Properties box and the
+	// in-place editor below, so the two can never disagree about what an edit is. The words are
+	// scenario-overridable (Task 407): setProp(), never `lb._text =`. `noSnapshot` is for the edit
+	// that finishes a Text just placed, whose placement already took the undo step.
+	//
+	// **EMPTY WORDS DELETE THE TEXT** (Perry, 2026-10-14): a Text with no words draws nothing and has
+	// nothing left to click, so it could never be reached again. Blank (or only spaces and new lines)
+	// is a delete, through deleteElement(), the Delete key's own door: one undo step, and inside a
+	// scenario it excludes the Text from that scenario exactly as Delete does. Returns 'deleted'.
+	function writeTextWords(lb, value, noSnapshot) {
+		if (!lb || value === effective(lb, 'text')) { return false; }
+		if (!String(value).trim()) { deleteElement('label', lb.id); return 'deleted'; }
+		if (!noSnapshot) { saveUndoSnapshot(); }
+		setProp(lb, 'text', value);
+		afterPropertyEdit(lb);
+		return true;
+	}
+
+	// ---- EDITING A TEXT IN PLACE (Tom, 2026-10-14: *"It would be really nice for Text to be
+	// editable in place instead of only in the properties box."*) -------------------------------
+	//
+	// A textarea laid over the Text at its own screen size, angle and alignment, the map's words
+	// hidden underneath while it is open. Opened by a double-click on a Text in Select, and by
+	// placing a new Text with the Text tool.
+	//
+	// **ENTER IS A NEW LINE, AS IN THE PROPERTIES BOX.** A Text is lines (Task 342), and the box
+	// beside it already types a newline on Enter; a second rule for the same words a few
+	// centimetres away is the thing to avoid, and a phone keyboard has no Shift+Enter to reach.
+	// Ctrl+Enter (Cmd+Enter), a press anywhere else, or Tab away commits; Esc cancels and keeps the
+	// words it opened with.
+	//
+	// **A NEW TEXT THAT WAS NEVER WRITTEN IS NEVER LEFT BEHIND** (Perry, 2026-10-14). Esc on a Text
+	// the tool has just placed takes the placement back, and so does leaving the tool (a toolbar
+	// press, anything off the map, another tool) while its placeholder is still untouched. Its
+	// placement's own undo step goes with it, so nothing is left on the map or on the Undo stack.
+	//
+	// **A ZOOM OR A PAN COMMITS.** Any press outside the editor commits before the map sees it, and
+	// a wheel turn does the same, so the editor is never left floating over a map that has moved; so
+	// does a window resize that moves the words (a phone's keyboard opening changes only the height
+	// and moves nothing, so it does not close the box it opened for).
+	// It is not a hydraulic edit, so it works with Recalculate off exactly as Properties does.
+	var textEditor = null;
+	function textEditorOpen() { return !!textEditor; }
+	function openTextEditor(labelId, fresh) {
+		var lb = labelById(labelId), le = labelEls[labelId], ta, ed, pt, s, fontPx, fx, fy, ang, cs;
+		if (!lb || !le || !le.text || !svg) { return false; }
+		closeTextEditor(true);
+		pt = textLabelPoint(lb);
+		s = worldToScreen(pt.x, pt.y);
+		// The map's own pixel size, so the box covers the words it replaces (Perry, 2026-10-14); only
+		// words drawn under 9 px are typed at 12 px, because they cannot be read while typing.
+		fontPx = (scnSetting('textSize') || 11) * textSizeMult(lb);
+		if (fontPx < 9) { fontPx = 12; }
+		fx = { start: 0, middle: 0.5, end: 1 }[labelHAlign(lb)];
+		fy = { hanging: 0, middle: 0.5, bottom: 1 }[labelVAlign(lb)];
+		ang = textLabelSvgAngle(lb) || 0;
+		cs = window.getComputedStyle(le.text);
+		ta = document.createElement('textarea');
+		ta.className = 'lpn-text-inplace';
+		ta.setAttribute('aria-label', (EngCalcs.pageConfig || {}).lpn_tool_add_text || 'Text');
+		ta.setAttribute('spellcheck', 'false');
+		ta.wrap = 'off';
+		ta.value = effective(lb, 'text') || '';
+		ta.style.fontSize = fontPx + 'px';
+		ta.style.lineHeight = '1.2';
+		ta.style.fontFamily = cs.fontFamily;
+		ta.style.fontWeight = textLabelWeight(lb);
+		ta.style.textAlign = fx === 0 ? 'left' : fx === 1 ? 'right' : 'center';
+		document.body.appendChild(ta);
+		ed = textEditor = { id: labelId, ta: ta, fresh: !!fresh, opened: Date.now(), orig: ta.value,
+			// The step the placement took, so a placement taken back takes its step back too.
+			placeSnap: fresh ? undoStack[undoStack.length - 1] : null, winW: window.innerWidth,
+			ax: s.x, ay: s.y, fx: fx, fy: fy, ang: ang, done: false };
+		function fit() {
+			var w, h;
+			ta.style.width = '1px'; ta.style.height = '1px';
+			w = Math.max(ta.scrollWidth + 2, fontPx * 2);
+			h = Math.max(ta.scrollHeight, fontPx * 1.2);
+			ta.style.width = w + 'px'; ta.style.height = h + 'px';
+			ta.style.left = (ed.ax - ed.fx * w) + 'px';
+			ta.style.top = (ed.ay - ed.fy * h) + 'px';
+			ta.style.transformOrigin = (ed.fx * w) + 'px ' + (ed.fy * h) + 'px';
+			ta.style.transform = ed.ang ? 'rotate(' + ed.ang.toFixed(3) + 'deg)' : '';
+		}
+		ed.fit = fit;
+		fit();
+		le.text.style.visibility = 'hidden';
+		ta.addEventListener('input', fit);
+		ta.addEventListener('blur', function () {
+			if (textEditor !== ed) { return; }
+			// The compatibility mouse events a touch sends after the tap that opened the editor
+			// take focus away at once; that is not the user leaving.
+			if (Date.now() - ed.opened < 600) { ta.focus(); return; }
+			closeTextEditor(true);
+		});
+		ed.onKey = function (e) {
+			if (e.target !== ta) { return; }
+			// **NOTHING THE USER TYPES HERE IS A SHORTCUT.** Stopped at the window, before the
+			// page's own capture-phase listeners, so a digit does not change tools, Delete does not
+			// delete the Text, Ctrl+Z is the textarea's own undo and Esc reaches nothing else.
+			e.stopPropagation();
+			if (e.key === 'Escape') { e.preventDefault(); closeTextEditor(false); }
+			else if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); closeTextEditor(true); }
+		};
+		// The press is committed and then goes on to the map untouched: in Select it selects what it
+		// lands on, and in the Text tool, a repeater like every inserter (Tom, 2026-10-07), it places
+		// the next Text and opens this editor on that one.
+		// A press off the map is leaving it (the toolbar, a menu, a pane): 'leave'.
+		ed.onPress = function (e) {
+			if (e.target === ta) { return; }
+			closeTextEditor(ctxOnCanvas(e) ? true : 'leave');
+		};
+		ed.onWheel = function () { closeTextEditor(true); };
+		// After the page's own resize handling has redrawn the map, so the words are where they now
+		// are: a width change, or words that moved, commits.
+		ed.onResize = function () {
+			setTimeout(function () {
+				var p, q;
+				if (textEditor !== ed) { return; }
+				p = labelById(ed.id) && textLabelPoint(labelById(ed.id));
+				q = p && worldToScreen(p.x, p.y);
+				if (window.innerWidth !== ed.winW || !q || Math.hypot(q.x - ed.ax, q.y - ed.ay) > 1) { closeTextEditor(true); }
+			}, 120);
+		};
+		window.addEventListener('keydown', ed.onKey, true);
+		window.addEventListener('pointerdown', ed.onPress, true);
+		window.addEventListener('resize', ed.onResize);
+		svg.addEventListener('wheel', ed.onWheel, true);
+		ta.focus();
+		ta.select();
+		return true;
+	}
+	// `commit`: true writes the words, false cancels, 'leave' writes them unless this is a new Text
+	// still holding its untouched placeholder, which is then taken back.
+	function closeTextEditor(commit) {
+		var ed = textEditor, lb, le, done;
+		if (!ed || ed.done) { return; }
+		ed.done = true;
+		textEditor = null;
+		window.removeEventListener('keydown', ed.onKey, true);
+		window.removeEventListener('pointerdown', ed.onPress, true);
+		window.removeEventListener('resize', ed.onResize);
+		svg.removeEventListener('wheel', ed.onWheel, true);
+		lb = labelById(ed.id); le = labelEls[ed.id];
+		if (le && le.text) { le.text.style.visibility = ''; }
+		if (ed.ta.parentNode) { ed.ta.parentNode.removeChild(ed.ta); }
+		if (!lb) { return; }
+		if (ed.fresh && (!commit || (commit === 'leave' && ed.ta.value === ed.orig) || !ed.ta.value.trim())) {
+			takeBackNewText(ed);
+			return;
+		}
+		if (!commit) { return; }
+		done = writeTextWords(lb, ed.ta.value, ed.fresh);
+		if (done && currentPopup && currentPopup.kind === 'label' && currentPopup.id === ed.id) { refreshPopupIfOpen(); }
+	}
+	// The placement's own step is popped and restored, so the Text goes with no step left behind; if
+	// anything has stepped since (it cannot, while the editor holds the keys and the presses), the
+	// Text is removed outright, which is what that step would have done.
+	function takeBackNewText(ed) {
+		if (ed.placeSnap && undoStack[undoStack.length - 1] === ed.placeSnap) {
+			undoStack.pop();
+			restoreUndoSnapshot(ed.placeSnap);
+		} else if (labelById(ed.id)) {
+			deleteLabelById(ed.id);
+		}
+	}
+
 	// Editable text content for a Text label (Tom, 2026-07-30: "there is no way to edit it") -- no
 	// idField()/rename here, unlike node/link popups; a Text's id has no user-facing meaning to
 	// rename. Reuses pc.lpn_tool_add_text ("Text") for both the popup title and the field label,
@@ -68723,10 +69012,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		input.style.width = '100%';
 		input.value = effective(lb, 'text');
 		input.addEventListener('change', function () {
-			if (input.value === effective(lb, 'text')) { return; }
-			saveUndoSnapshot();
-			setProp(lb, 'text', input.value);
-			afterPropertyEdit(lb);
+			if (writeTextWords(lb, input.value) === 'deleted') { refreshPopupIfOpen(); }
 		});
 		// **NO VISIBLE LABEL ON THIS ROW: the popup's title already says "Text"** (Tom, 2026-08-18,
 		// with a screenshot of the word twice over). It reads as a mistake because it is one -- the
@@ -76155,6 +76441,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		});
 		return why;
 	}
+	// The refusal, plus the reason when it is the one a visitor cannot see from the tree: Base itself
+	// using an alternative (Perry, 2026-10-14).
+	function basicMisfitText() {
+		var pc = EngCalcs.pageConfig || {};
+		return (pc.lpn_scenario_basic_misfit || 'This project has scenarios and alternatives relationships that are not compatible with Scenarios Basic mode, so Basic mode is disabled.')
+			+ (basicModeMisfit() === 'base' ? ' ' + (pc.lpn_scenario_basic_misfit_base || 'The Base scenario uses an alternative other than Base.') : '');
+	}
 	// Called wherever a document arrives (paneDocumentArrived()): a project Basic mode cannot show
 	// turns it off, and says so in Tom's words.
 	// The switch-off on arrival is this project's alone: the remembered choice stays the visitor's,
@@ -76164,7 +76457,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		loadScenarioBasicPref();
 		if (scenarioBasicMode && basicModeMisfit()) {
 			scenarioBasicMode = false;
-			setNotice(pc.lpn_scenario_basic_misfit || 'This project has scenarios and alternatives relationships that are not compatible with Scenarios Basic mode, so Basic mode is disabled.');
+			setNotice(basicMisfitText());
 		}
 		if (scenarioBasicMode !== was) {
 			if (scenarioBasicMode) { closeScenarioManager(); }
@@ -76177,7 +76470,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// In the dialog (Tom, 2026-10-13: a line in the messages log is not discoverable), so nobody
 		// goes on working believing Basic mode is on.
 		if (on && basicModeMisfit()) {
-			tellNotice(pc.lpn_scenario_basic_misfit || 'This project has scenarios and alternatives relationships that are not compatible with Scenarios Basic mode, so Basic mode is disabled.');
+			tellNotice(basicMisfitText());
 			return false;
 		}
 		scenarioBasicMode = !!on;

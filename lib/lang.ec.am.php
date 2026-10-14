@@ -2099,8 +2099,6 @@ $ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>የ�
 // settings.colorFrozenBreaks in js/looped-network.js.
 $ec_lang['lpn_notes_color_term']='የቀለም ክልል ወሰኖች ተመሳሳይ ሆነው ይቆያሉ';
 $ec_lang['lpn_notes_color_def']='የቀለም ክልል ወሰኖች የሚዘጋጁት የመረጃ ምደባ ዘዴ ሲመርጡ ነው። በእያንዳንዱ የጊዜ ደረጃ እንደገና አይዘጋጁም፣ ምክንያቱም ያ ቀለሞቹ በእያንዳንዱ ደረጃ አዲስ ትርጉም እንዲኖራቸው ያደርጋል፣ ይህም ስርዓትዎን ለማየት አይጠቅምም። EPANET በተመሳሳይ መንገድ ይሠራል። አዲስ ወሰኖች ለማግኘት፣ ዘዴ እንደገና ይምረጡ ወይም የራስዎን ወሰኖች ያስገቡ።';
-$ec_lang['lpn_notes_epanet_term']='የHazen-Williams ቋሚ ቁጥሮች ከEPANET ጋር ይመሳሰላሉ';
-$ec_lang['lpn_notes_epanet_def']='እ.ኤ.አ. ነሐሴ 2026 የHazen-Williams ኮፊሸንትና አርቃቂ ከEPANET ጋር እንዲመሳሰሉ ተቀይረዋል። የሄድ ኪሳራ ውጤቶች ከዚህ ገጽ ቀደምት እትሞች እስከ 0.1 በመቶ ይለያያሉ፣ ይህም ከራሱ ከC ዋጋ አለመረጋገጥ በጣም ያነሰ ነው።';
 $ec_lang['lpn_notes_engine_term']='ይህ ገጽ የትኛውን EPANET እንደሚያስኬድ';
 $ec_lang['lpn_notes_engine_def']='በዚህ ገጽ ላይ ያለው የEPANET ፈታች OWA-EPANET 2.3.5 ነው፣ የካቲት 20 2025 የተለቀቀ። EPANET የሚዘጋጀው Open Water Analytics በተባለ ማህበረሰብ ነው፣ ከዩ.ኤስ. የአካባቢ ጥበቃ ኤጀንሲ ጋር የሚሰራ፣ እ.ኤ.አ. በታህሳስ 2019 ስሪት 2.2.0ን የለቀቀው። የስራ ሪፖርቱ 2.3.05 ብሎ ይጠራዋል፣ ምክንያቱም ፈታቹ የመጨረሻውን ቁጥር በሁለት አሃዝ ስለሚጽፍ። ወደዚህ ገጽ የሚደርሰው በLuke Butler በተባለው epanet-js 0.9.0 በኩል ነው፣ በMIT ፍቃድ ስር፣ በአሳሽዎ ውስጥ ይሰራል፦ መረብዎ ለመፍትሔ ወደ ውጭ በጭራሽ አይላክም።';
 $ec_lang['lpn_id_invalid']='ክፍተትና ጥቅስ ምልክት የሌለበት መለያ ያስገቡ።';

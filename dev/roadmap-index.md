@@ -7,17 +7,29 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**90 open tasks.** Next (100): 7 · Soon (75): 13 · Someday (50): 35 · Maybe (25): 16 · Parked (5): 19
+**93 open tasks.** Next (100): 19 · Soon (75): 13 · Someday (50): 27 · Maybe (25): 15 · Parked (5): 19
 
-## 100 — Next (7)
+## 100 — Next (19)
 
+- Task 625 — "HawsEDC Calculators" in the Help menu, above Privacy notice.
+- Task 643 — Slope distance for automatic lengths, and whether anyone offers a length factor.
+- ! Task 681 — Economize the label layout: it is half the cost of a project switch.
 - Task 721 — The scenario and alternatives model: Bentley's tree, plus Presentation and Calculation.
-- Task 737 — Coined names for interface elements, so every language names each one once.
+- Task 737 — One canonical word per concept, so every language names each one once.
 - Task 741 — The infinite map: generated networks for the label bench.
-- ! Task 781 — Active topology first; then Change type becomes a new asset in the old one's place.
+- Task 749 — Bentley interop: read and write the WaterCAD/WaterGEMS `.wtg.sqlite` file.
+- Task 781 — Morph: change an asset's type in one scenario, keeping its pipes.
 - ! Task 782 — Snap to asset, and Match properties: the small tools that replace Change type.
 - Task 784 — A small time-series graph bubble on the map, from an asset's right-click.
+- Task 785 — Rewrite the Guide's chapters to the Find and replace model.
+- Task 789 — Long press opens the asset menu on a touch screen.
 - Task 790 — One override marker: overridden or inherited, in every scenario view.
+- Task 791 — Text halos twice as wide, with a Map appearance setting.
+- Task 792 — A Description on Library patterns, controls and rules.
+- Task 793 — Ctrl+C in the Screenshot tool copies the picture.
+- Task 794 — Edit a Text in place on the map.
+- Task 795 — Tank depth in the time series graphs.
+- Task 796 — The EPANET run crashed on Tom's two-system test project.
 
 ## 75 — Soon (13)
 
@@ -27,32 +39,28 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 623 — File loss judged only by people whose files are throwaway.
 - Task 639 — Layers: the first heading under Map and page.
 - Task 676 — Watch the sites, and send a derived weekly report.
-- ! Task 681 — Economize the label layout: it is half the cost of a project switch.
 - Task 714 — Theming: colour tokens first, then a Light/Dark choice in Settings.
-- Task 749 — Bentley interop: read and write the WaterCAD/WaterGEMS `.wtg.sqlite` file.
+- Task 720 — Background layers from a GIS server.
+- Task 733 — Grow the native solver, in phases, to everything EPANET's solves.
 - Task 752 — Google Sheets: sync the scenarios and their alternatives out and in.
 - Task 756 — Cross-platform: the suite as a desktop application, beyond the web folder.
 - Task 772 — AutoCAD: import, export, and perhaps sync, on a long-lived branch.
 - ! Task 786 — More native SI examples, since SI is chosen twice as often as US.
 
-## 50 — Someday (35)
+## 50 — Someday (27)
 
 - ! Task 146.09 — An inset overview map: the whole project, with a box round where you are.
 - Task 217 — A suite-owned, multilingual Manning's n table, built from primary sources.
 - Task 218 — Find advisors and proteges: a standing, nagged commitment.
-- Task 221 — Retire the "constants now match EPANET" note (Task 213) — CHECK: 2027-08-01.
 - Task 234 — Canal Seepage must prove its worth or go.
 - Task 269 — Both EWB chapters answered, and Phoenix invited a talk.
-- Task 285 — We do not know what devices anybody uses this on.
 - Task 498 — A public roadmap, with epanet-js's Canny board as the worked example.
 - Task 614 — The sewer-slope cluster is the largest demand we do not convert.
 - Task 620 — [H] · A changed icon never reaches a returning visitor.
 - Task 622 — [H] · A refused terrain lookup is reported as an unreachable one.
-- Task 625 — The app page divorce: what is left is one unanswered question.
 - Task 629 — [H] · GUARDED: a geographic project opening on the XY default view, in pixels.
 - Task 631 — Four things Tom hit while testing, none of them urgent.
 - Task 633 — The project tab strip, and whether it could collapse into the toolbar.
-- Task 643 — The camel behind grid-to-ground: slope distance and a length adjustment.
 - Task 649 — Retire the nested repository: serve the suite by Alias at both mounts.
 - Task 667 — Tom's reflections on saving, locking and who can see your work.
 - Task 675 — A labelled grid, with the significant digits picked out.
@@ -62,21 +70,16 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 707 — Five minutes of a real browser on the Task 706 repair.
 - Task 712 — Tank water depth as a map label field.
 - Task 717 — EPANET-MSX, multi-species water quality.
-- Task 720 — Background layers from a GIS server.
 - Task 722 — Change and revision tracking.
 - Task 725 — One wide fire-flow table instead of two reports.
 - Task 728 — Import a GIS shapefile or geodatabase as a network.
-- Task 733 — Grow the native solver, in phases, to everything EPANET's solves.
 - Task 734 — Where space is open east or west, one label on one line.
 - Task 736 — [H] · Count installs and app launches, if the consent text allows it.
 - Task 773 — Hover shows an asset's full label, as if every field were ticked.
-- Task 785 — Rewrite the Guide's chapters to the Find and replace model.
-- Task 789 — A way into Copy/Paste properties and the graph bubbles without a right-click.
 
-## 25 — Maybe (16)
+## 25 — Maybe (15)
 
 - Task 144 — Diagnose the Hazen-Williams conversion leak — full record in `dev/hazen-williams-leak.md`.
-- Task 185 — Match/Copy properties tool (originated during Task 146).
 - Task 225.13 — `dev/lpn-file-lock-test-punchlist.md` §13 needs the rewrite §0–§8 got
 - Task 303 — Usage logging: the remaining lower-value questions.
 - Task 348 — Sub-categories and paging in the examples gallery.
@@ -118,5 +121,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-80 of 90 titles are within 4–12 words. `!` marks the rest;
+84 of 93 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.

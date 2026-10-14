@@ -2102,8 +2102,6 @@ $ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>Tombo
 // settings.colorFrozenBreaks in js/looped-network.js.
 $ec_lang['lpn_notes_color_term']='Batas pita warna tetap sama';
 $ec_lang['lpn_notes_color_def']='Batas pita warna ditetapkan saat Anda memilih metode klasifikasi data. Batas ini tidak ditetapkan ulang pada setiap langkah waktu, karena itu akan membuat warna berarti sesuatu yang baru di setiap langkah, dan itu tidak membantu untuk memvisualisasikan sistem Anda. EPANET bekerja dengan cara yang sama. Untuk mendapatkan batas baru, pilih metode lagi atau masukkan batas Anda sendiri.';
-$ec_lang['lpn_notes_epanet_term']='Konstanta Hazen-Williams disesuaikan dengan EPANET';
-$ec_lang['lpn_notes_epanet_def']='Pada Agustus 2026, koefisien dan eksponen Hazen-Williams diubah agar sesuai dengan EPANET. Hasil kehilangan tinggi tekan berbeda dari versi halaman ini sebelumnya hingga 0.1 persen, yang jauh lebih kecil daripada ketidakpastian pada nilai C itu sendiri.';
 $ec_lang['lpn_notes_engine_term']='EPANET mana yang dijalankan halaman ini';
 $ec_lang['lpn_notes_engine_def']='Penyelesai EPANET pada halaman ini adalah OWA-EPANET 2.3.5, dirilis 20 Februari 2025. EPANET dikembangkan oleh Open Water Analytics, komunitas yang bekerja sama dengan Badan Perlindungan Lingkungan Amerika Serikat (EPA), yang merilis versi 2.2.0 pada Desember 2019. Laporan proses menyebutnya 2.3.05 karena mesin menulis angka terakhir dalam dua digit. Penyelesai ini dihadirkan ke halaman ini melalui epanet-js 0.9.0 oleh Luke Butler, di bawah lisensi MIT, dan berjalan di dalam peramban: jaringan tidak pernah dikirim ke server untuk diselesaikan.';
 $ec_lang['lpn_id_invalid']='Masukkan ID tanpa spasi dan tanpa tanda kutip.';

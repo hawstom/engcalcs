@@ -1,7 +1,7 @@
 {
     "description": "sha1 of each lang.ec.en.php $ec_lang value as of the last full translation sync. Maintained by detect_english_drift.php --update. A current-vs-manifest hash mismatch means that key's English changed and translations may be stale. Do not hand-edit.",
     "updated": "2026-10-14",
-    "count": 2619,
+    "count": 2613,
     "partial_updates": [
         {
             "date": "2026-08-08",
@@ -5564,8 +5564,6 @@
         "bpn_notes_2_term": "c3a5661aa41b75b32a32e5a94de6bba7b2214bb2",
         "bpn_notes_3_def": "19d6c1ed226d372c70b11be62b86a1cf6b7fbeae",
         "bpn_notes_3_term": "e4854845bef632f5027b0e1e5b96946c5cefdb36",
-        "bpn_notes_epanet_def": "58224d932181c3c20dfda2d61e6a8bc168d12e6b",
-        "bpn_notes_epanet_term": "eaa98e2a9ef3f7b99b94388e5711a4ead691271f",
         "bpn_p_down": "daf59b583c15b61e514de23f520d3b0a5fba08c6",
         "bpn_p_down_tip": "018fc99d1d9045271eb9db822f205b4896225920",
         "bpn_p_min": "f83853a49155e0a41b66a1a39ba33c8970e63e3a",
@@ -5676,8 +5674,6 @@
         "hw_main_menu": "64fd4495671148c3f1bbe9763fd91c0fe043a280",
         "hw_main_title": "557f6c30a2b7aec557bb560f487d9580f3d1ba09",
         "hw_note_1": "03c3422fa0707d19d2ad6bdb7171732ceb3d9174",
-        "hw_notes_epanet_def": "58224d932181c3c20dfda2d61e6a8bc168d12e6b",
-        "hw_notes_epanet_term": "eaa98e2a9ef3f7b99b94388e5711a4ead691271f",
         "hw_pressure_check": "9addcafc32d09be6160369f0dc750e52bcbec80b",
         "hw_pressure_down": "b69a38b540154ec306f9d544f8614fbf6e3cdfd4",
         "hw_pressure_neg": "a85974db47c2e0e7dc08a296319c03621466eb9e",
@@ -6995,8 +6991,6 @@
         "lpn_notes_color_term": "67c44c744f65a9a0f9f43f6a39ab3e4d11d382c7",
         "lpn_notes_engine_def": "7c74f8b955e1f50c67669dfe77f8ccdd62e1dc90",
         "lpn_notes_engine_term": "c6f36a42793ded5c4e7f0d5f99b68d7f12063716",
-        "lpn_notes_epanet_def": "58224d932181c3c20dfda2d61e6a8bc168d12e6b",
-        "lpn_notes_epanet_term": "bf763064f120b082f63d20ec1b5efbcee7003d9e",
         "lpn_offscreen_intact": "87677a7da46359e93755bf8f8fd495de202419f4",
         "lpn_omitted_note": "afa55e7ec0217f02855d13fb034510c89b69e83e",
         "lpn_pane_clear_override": "c82ec91818876c5388e6dd0ade0afec73c8b8114",
@@ -8284,14 +8278,6 @@
             "words": 4,
             "ends_sentence": false
         },
-        "bpn_notes_epanet_def": {
-            "words": 40,
-            "ends_sentence": true
-        },
-        "bpn_notes_epanet_term": {
-            "words": 7,
-            "ends_sentence": false
-        },
         "bpn_p_down": {
             "words": 2,
             "ends_sentence": true
@@ -8731,14 +8717,6 @@
         "hw_note_1": {
             "words": 221,
             "ends_sentence": true
-        },
-        "hw_notes_epanet_def": {
-            "words": 40,
-            "ends_sentence": true
-        },
-        "hw_notes_epanet_term": {
-            "words": 7,
-            "ends_sentence": false
         },
         "hw_pressure_check": {
             "words": 2,
@@ -14006,14 +13984,6 @@
         },
         "lpn_notes_engine_term": {
             "words": 5,
-            "ends_sentence": false
-        },
-        "lpn_notes_epanet_def": {
-            "words": 40,
-            "ends_sentence": true
-        },
-        "lpn_notes_epanet_term": {
-            "words": 4,
             "ends_sentence": false
         },
         "lpn_offscreen_intact": {

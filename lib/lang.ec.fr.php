@@ -152,8 +152,6 @@ $ec_lang['hw_pressure_neg_short']='Pression négative';
 $ec_lang['hw_pressure_neg']='La pression aval est inférieure à zéro. La LHP passe sous la conduite, si bien que celle-ci ne s\'écoulerait pas pleine et ce résultat peut ne pas être valide.';
 $ec_lang['hw_roughness']='Coefficient Hazen-Williams, C';
 $ec_lang['hw_note_1']='<dl><dt>Cet outil de calcul ne modélise pas le profil de la conduite entre les deux extrémités.</dt><dd>Il n\'utilise que les cotes amont et aval que vous saisissez. Si le terrain s\'élève plus haut que l\'une ou l\'autre extrémité en un point intermédiaire, la pression en ce point haut est inférieure à toute pression indiquée ici. Relancez le calcul pour la longueur allant de l\'extrémité amont jusqu\'au point haut afin de le vérifier.</dd><dd>Là où la LHP passe sous la conduite, l\'eau est sous pression négative. L\'air sort de solution, une conduite à paroi mince peut s\'effondrer, et de l\'eau souterraine contaminée peut être aspirée par les joints. Maintenez une pression positive partout le long de la conduite et prévoyez une ventouse (purgeur d\'air) à chaque point haut.</dd><dt>La pression amont est une condition aux limites que vous fournissez.</dt><dd>Relevez-la sur un manomètre, à partir du niveau d\'eau d\'un réservoir (la hauteur d\'eau au-dessus de la conduite), ou à partir d\'une courbe de pompe. Une pompe fournit une pression moindre lorsque le débit augmente ; utilisez donc le point de la courbe correspondant au débit saisi ci-dessus.</dd><dt>Additionnez vous-même les coefficients de perte de charge singulière.</dt><dd>Totalisez les valeurs K de chaque vanne, coude, té, compteur et entrée de la conduite, et saisissez ce total. Suivez le lien de ce champ pour des valeurs typiques. Sur une conduite d\'adduction longue, ces pertes sont faibles par rapport au frottement, mais dans une tuyauterie de station courte, elles peuvent représenter l\'essentiel de la perte.</dd></dl>';
-$ec_lang['hw_notes_epanet_term']='Les constantes de Hazen-Williams correspondent maintenant à EPANET (août 2026)';
-$ec_lang['hw_notes_epanet_def']='En août 2026, le coefficient et l\'exposant de Hazen-Williams ont été modifiés pour correspondre à EPANET. Les résultats de perte de charge diffèrent de ceux des versions précédentes de cette page de 0,1 pour cent au maximum, bien moins que l\'incertitude sur la valeur de C elle-même.';
 // Manning Irregular
 $ec_lang['mi_menu']='Canal à section irrégulière Manning';
 $ec_lang['mi_main_title']='Calculateur Manning gratuit en ligne de canal à section irrégulière';
@@ -624,8 +622,6 @@ $ec_lang['bpn_notes_2_term']='Réseaux ramifiés uniquement, sans boucles';
 $ec_lang['bpn_notes_2_def']='Chaque tronçon a exactement un tronçon amont (une arborescence). Cet outil ne résout pas les réseaux maillés (bouclés), qui exigent des méthodes itératives (EPANET ou similaire). Comme le réseau ne comporte aucune boucle, la solution est directe et exacte.';
 $ec_lang['bpn_notes_3_term']='Pas de régulation active de pression';
 $ec_lang['bpn_notes_3_def']='Vous pouvez ajouter une vanne à perte de charge singulière fixe (une valeur k), mais pas de vannes réductrices ou stabilisatrices de pression (PRV/PSV). Leur état ouvert/fermé dépend du débit et de la pression, ce qui imposerait des itérations.';
-$ec_lang['bpn_notes_epanet_term']='Les constantes de Hazen-Williams correspondent maintenant à EPANET (août 2026)';
-$ec_lang['bpn_notes_epanet_def']='En août 2026, le coefficient et l\'exposant de Hazen-Williams ont été modifiés pour correspondre à EPANET. Les résultats de perte de charge diffèrent de ceux des versions précédentes de cette page de 0,1 pour cent au maximum, bien moins que l\'incertitude sur la valeur de C elle-même.';
 $ec_lang['bpn_supply2_q']='Débit d\'alimentation 2';
 $ec_lang['bpn_supply2_h']='Charge d\'alimentation 2';
 $ec_lang['bpn_supply3_q']='Débit d\'alimentation 3';
@@ -2110,8 +2106,6 @@ $ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>Touch
 // settings.colorFrozenBreaks in js/looped-network.js.
 $ec_lang['lpn_notes_color_term']='Les limites des plages de couleurs restent les mêmes';
 $ec_lang['lpn_notes_color_def']='Les limites des plages de couleurs sont définies lorsque vous choisissez une méthode de classification des données. Elles ne sont pas redéfinies à chaque pas de temps, car cela ferait signifier autre chose aux couleurs à chaque pas, ce qui ne serait pas utile pour visualiser votre réseau. EPANET fonctionne de la même façon. Pour obtenir de nouvelles limites, choisissez de nouveau une méthode ou saisissez vos propres limites.';
-$ec_lang['lpn_notes_epanet_term']='Les constantes de Hazen-Williams correspondent maintenant à EPANET (août 2026)';
-$ec_lang['lpn_notes_epanet_def']='En août 2026, le coefficient et l\'exposant de Hazen-Williams ont été modifiés pour correspondre à EPANET. Les résultats de perte de charge diffèrent des versions précédentes de cette page de 0,1 pour cent au plus, ce qui est bien plus petit que l\'incertitude sur la valeur de C elle-même.';
 $ec_lang['lpn_notes_engine_term']='Quel EPANET fait fonctionner cette page';
 $ec_lang['lpn_notes_engine_def']='Le solveur EPANET de cette page est OWA-EPANET 2.3.5, publié le 20 février 2025. EPANET est développé par Open Water Analytics, une communauté qui travaille avec l\'Agence de protection de l\'environnement des États-Unis, laquelle a publié la version 2.2.0 en décembre 2019. Le rapport de calcul l\'appelle 2.3.05, car le moteur écrit le dernier nombre sur deux chiffres. Il arrive sur cette page via epanet-js 0.9.0 de Luke Butler, sous licence MIT, et il s\'exécute dans votre navigateur : votre réseau n\'est jamais envoyé où que ce soit pour être calculé.';
 $ec_lang['lpn_id_invalid']='Entrez un identifiant sans espace ni guillemets.';
@@ -2581,7 +2575,7 @@ $ec_lang['lpn_settings_custom_props']='Propriétés personnalisées';
 // of what a reader needs before opening the design table.
 $ec_lang['lpn_settings_custom_props_note']='Propriétés définies par l\'utilisateur. Enregistrées avec le projet et les scénarios comme toutes les autres propriétés.';
 $ec_lang['lpn_cp_design']='Conception';
-$ec_lang['lpn_cp_design_tip']='Une ligne par propriété personnalisée ; chacune s\'ouvre pour afficher : Clé, Libellé, S\'applique à, Valider comme, Autoriser ou restreindre, le champ de caractères nommé par ce choix, Limite inférieure de longueur, Limite supérieure de longueur, Limite basse, Limite haute.';
+$ec_lang['lpn_cp_design_tip']='Une ligne par propriété personnalisée ; chacune s\'ouvre pour afficher : Clé, Étiquette, S\'applique à, Valider comme, Autoriser ou restreindre, le champ de caractères nommé par ce choix, Limite inférieure de longueur, Limite supérieure de longueur, Limite basse, Limite haute.';
 $ec_lang['lpn_cp_add']='Ajouter une propriété personnalisée';
 $ec_lang['lpn_cp_add_tip']='Ajoute une ligne au tableau de conception et l\'ouvre pour modification.';
 $ec_lang['lpn_cp_remove_tip']='Retire cette propriété du tableau de conception. Les valeurs déjà saisies sur les éléments sont conservées dans le fichier et sont rétablies si une propriété de même clé est de nouveau définie.';
@@ -2592,7 +2586,7 @@ $ec_lang['lpn_cp_unnamed']='Pas encore nommée';
 // full name of the column is ever written out.
 $ec_lang['lpn_cp_key']='Clé';
 $ec_lang['lpn_cp_key_tip']='Clé : une propriété est enregistrée sous ce nom. Les espaces ne sont pas autorisés, et un préfixe est ajouté automatiquement pour que votre clé ne puisse jamais entrer en collision avec un champ intégré.';
-$ec_lang['lpn_cp_label']='Libellé';
+$ec_lang['lpn_cp_label']='Étiquette';
 $ec_lang['lpn_cp_label_tip']='Étiquette : apparaît dans la boîte des propriétés, dans Rechercher et en tête d\'une colonne de tableau.';
 $ec_lang['lpn_cp_applies']='S\'applique à';
 $ec_lang['lpn_cp_applies_tip']='S\'applique à : liste de préfixes d\'identifiant séparés par des virgules pour les éléments qui utilisent cette propriété, par exemple J,L,R.';
@@ -3360,7 +3354,7 @@ $ec_lang['lpn_library_curve_equation_tip']='La courbe ajustée sur les points, e
 $ec_lang['lpn_library_curve_values_tip']='Sélectionnez une ou deux colonnes dans un tableur, copiez-les, puis collez-les dans la première cellule où vous voulez qu\'elles arrivent. Les lignes sont ajoutées au fur et à mesure des besoins. Vous pouvez aussi coller des lignes copiées directement depuis un fichier EPANET, y compris le nom de la courbe.';
 // EPANET states a curve's description in the comment above its rows, and this page has read it and
 // written it back since Task 586 without showing it to anybody.
-$ec_lang['lpn_library_curve_note_label']='Note descriptive';
+$ec_lang['lpn_library_curve_note_label']='Description';
 $ec_lang['lpn_library_curve_remove_point']='Supprimer ce point';
 // The OUT direction of ROADMAP Task 186: two columns, tab separated, ready to paste into a
 // spreadsheet. The prompt is what a browser that refuses the clipboard gets instead.
@@ -3546,7 +3540,7 @@ $ec_lang['lpn_field_demand_pattern']='Courbe de modulation de la demande';
 // A JUNCTION’S DEMAND IS A LIST (Task 468). The PATTERN says what KIND of user this is
 // (“residential”); the CATEGORY says WHO it is (“Elm Acres”). Nothing validates a category and there
 // is no list to choose one from, which is why the tip describes it rather than instructing.
-$ec_lang['lpn_field_demand_category']='Libellé';
+$ec_lang['lpn_field_demand_category']='Description';
 $ec_lang['lpn_demand_add']='Ajouter une catégorie de demande';
 $ec_lang['lpn_demand_remove']='Retirer cette demande';
 // A RESERVOIR AND A PUMP TAKE A PATTERN TOO, on the same rule: whole-project settings live in the

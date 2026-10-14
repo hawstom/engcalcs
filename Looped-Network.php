@@ -1975,7 +1975,6 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 	<dt><?=$ec_lang['lpn_notes_3_term']?></dt><dd><?=$ec_lang['lpn_notes_3_def']?></dd>
 	<dt><?=$ec_lang['lpn_notes_5_term']?></dt><dd><?=$ec_lang['lpn_notes_5_def']?></dd>
 	<dt><?=$ec_lang['lpn_notes_color_term']?></dt><dd><?=$ec_lang['lpn_notes_color_def']?></dd>
-	<dt><?=$ec_lang['lpn_notes_epanet_term']?></dt><dd><?=$ec_lang['lpn_notes_epanet_def']?></dd>
 	<dt><?=$ec_lang['lpn_notes_engine_term']?></dt><dd><?=$ec_lang['lpn_notes_engine_def']?></dd>
 </dl>
 </section>
@@ -2251,6 +2250,9 @@ EngCalcs.pageConfig = {
 	lpn_paste_props_off_select: <?=json_encode($ec_lang['lpn_paste_props_off_select'])?>,
 	lpn_paste_props_off_kind: <?=json_encode($ec_lang['lpn_paste_props_off_kind'])?>,
 	lpn_tsb_menu: <?=json_encode($ec_lang['lpn_tsb_menu'])?>,
+	lpn_ctx_edit_text: <?=json_encode($ec_lang['lpn_ctx_edit_text'])?>,
+	lpn_ctx_reset_position: <?=json_encode($ec_lang['lpn_ctx_reset_position'])?>,
+	lpn_ctx_reset_position_off_tip: <?=json_encode($ec_lang['lpn_ctx_reset_position_off_tip'])?>,
 	lpn_tsb_off_tip: <?=json_encode($ec_lang['lpn_tsb_off_tip'])?>,
 	lpn_tsb_close: <?=json_encode($ec_lang['lpn_tsb_close'])?>,
 	lpn_tsb_resize: <?=json_encode($ec_lang['lpn_tsb_resize'])?>,
@@ -3845,6 +3847,7 @@ EngCalcs.pageConfig = {
 	lpn_scenario_basic: <?=json_encode($ec_lang['lpn_scenario_basic'])?>,
 	lpn_scenario_basic_tip: <?=json_encode($ec_lang['lpn_scenario_basic_tip'])?>,
 	lpn_scenario_basic_misfit: <?=json_encode($ec_lang['lpn_scenario_basic_misfit'])?>,
+	lpn_scenario_basic_misfit_base: <?=json_encode($ec_lang['lpn_scenario_basic_misfit_base'])?>,
 	lpn_scenario_copy: <?=json_encode($ec_lang['lpn_scenario_copy'])?>,
 	lpn_scenario_copy_tip: <?=json_encode($ec_lang['lpn_scenario_copy_tip'])?>,
 	lpn_scenario_copy_off: <?=json_encode($ec_lang['lpn_scenario_copy_off'])?>,
@@ -4064,6 +4067,7 @@ EngCalcs.pageConfig = {
 	lpn_engine_refused: <?=json_encode($ec_lang['lpn_engine_refused'])?>,
 	lpn_engine_refused_why: <?=json_encode($ec_lang['lpn_engine_refused_why'])?>,
 	lpn_engine_refused_fallback: <?=json_encode($ec_lang['lpn_engine_refused_fallback'])?>,
+	lpn_time_run_stopped: <?=json_encode($ec_lang['lpn_time_run_stopped'])?>,
 	lpn_control_dangling_note: <?=json_encode($ec_lang['lpn_control_dangling_note'])?>,
 	lpn_control_unreadable_note: <?=json_encode($ec_lang['lpn_control_unreadable_note'])?>,
 	lpn_rule_dangling_note: <?=json_encode($ec_lang['lpn_rule_dangling_note'])?>,

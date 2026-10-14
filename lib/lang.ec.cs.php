@@ -165,7 +165,7 @@ $ec_lang['mi_groupPoint']='Bod';
 $ec_lang['mi_groupSegment']='Úsek';
 $ec_lang['mi_groupRegion']='Oblast';
 $ec_lang['mi_station']='Sta.';
-$ec_lang['mi_elevation']='Kóta';
+$ec_lang['mi_elevation']='Nadmořská výška';
 $ec_lang['mi_n']='n<br />seg-<br />mentu';
 $ec_lang['mi_is_bank']='R<sub>h</sub>, Q<br />hranice<br />oblasti<br />(Břeh)';
 $ec_lang['mi_tau']='Tečné<br />nap. dna<br />τ';
@@ -971,15 +971,15 @@ $ec_lang['lpn_ex_net1_title']='EPANET Net1 s řízením pomocí pravidel';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_ex_net1_desc']='Fiktivní příklad EPANET s chlorem, 1 zdrojem a 1 nádrží.';
 $ec_lang['lpn_ex_net2_si_title']='EPANET Net2, L/s (SI)';
-$ec_lang['lpn_ex_net2_si_desc']='Litry za sekundu, s metry a milimetry. Příklad EPANET z Branfordu ve státě Connecticut, převedený z galonů za minutu, stop a palců: 35 uzlů a 1 nádrž, bez zdroje, bez čerpadla a bez ventilů, přibližně 2 km krát 4 km. Fluorid, nereaktivní látka, vstupuje v jednom zdroji.';
+$ec_lang['lpn_ex_net2_si_desc']='Litry za sekundu, s metry a milimetry. Příklad EPANET z Branfordu ve státě Connecticut, převedený z galonů za minutu, stop a palců: 35 uzlů a 1 nádrž, bez zdroje, bez čerpadla a bez ventilů, přibližně 2 km krát 4 km. Fluorid, nereaktivní látka, vstupuje v jednom dávkování.';
 $ec_lang['lpn_ex_net2_title']='EPANET Net2, gpm (US)';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_ex_net2_desc']='Galony za minutu, se stopami a palci. Příklad EPANET z Branfordu ve státě Connecticut: 35 uzlů a 1 nádrž, bez zdroje, bez čerpadla a bez ventilů, přibližně 1 míle krát 2 míle. Fluorid, nereaktivní látka, vstupuje v jednom zdroji.';
+$ec_lang['lpn_ex_net2_desc']='Galony za minutu, se stopami a palci. Příklad EPANET z Branfordu ve státě Connecticut: 35 uzlů a 1 nádrž, bez zdroje, bez čerpadla a bez ventilů, přibližně 1 míle krát 2 míle. Fluorid, nereaktivní látka, vstupuje v jednom dávkování.';
 $ec_lang['lpn_ex_net3_si_title']='EPANET Net3, L/s (SI)';
-$ec_lang['lpn_ex_net3_si_desc']='Litry za sekundu, s metry a milimetry. Příklad EPANET z Novata v Kalifornii, převedený z galonů za minutu, stop a palců, s mapou světa v pozadí: 92 uzlů, 3 nádrže a 2 zdroje, bez ventilů, přibližně 8 km na stranu. 24hodinová simulace s časovým průběhem, se sledováním zdroje z jezera (Lake).';
+$ec_lang['lpn_ex_net3_si_desc']='Litry za sekundu, s metry a milimetry. Příklad EPANET z Novata v Kalifornii, převedený z galonů za minutu, stop a palců, s mapou světa v pozadí: 92 uzlů, 3 nádrže a 2 zdroje, bez ventilů, přibližně 8 km na stranu. 24hodinová simulace s časovým průběhem, se sledováním původu z jezera (Lake).';
 $ec_lang['lpn_ex_net3_title']='EPANET Net3, gpm (US)';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_ex_net3_desc']='Galony za minutu, se stopami a palci. Příklad EPANET z Novata v Kalifornii, s mapou světa v pozadí: 92 uzlů, 3 nádrže a 2 zdroje, bez ventilů, přibližně 5 mil na stranu. 24hodinová simulace s časovým průběhem, se sledováním zdroje z jezera (Lake).';
+$ec_lang['lpn_ex_net3_desc']='Galony za minutu, se stopami a palci. Příklad EPANET z Novata v Kalifornii, s mapou světa v pozadí: 92 uzlů, 3 nádrže a 2 zdroje, bez ventilů, přibližně 5 mil na stranu. 24hodinová simulace s časovým průběhem, se sledováním původu z jezera (Lake).';
 $ec_lang['lpn_ex_elm_street_title']='Elm Street Center, gpm (US)';
 $ec_lang['lpn_ex_elm_street_desc']='Galony za minutu, se stopami a palci. Prescott Valley v Arizoně: 17 uzlů, 1 zdroj a 1 čerpadlo. Komerční areál řešený pro požární průtok navíc k maximálnímu dennímu odběru, v jednom okamžiku, nakreslený na podkladu situačního plánu.';
 $ec_lang['lpn_tool_undo']='Zpět';
@@ -1028,15 +1028,15 @@ $ec_lang['lpn_result_gradient']='Gradient ztráty tlakové výšky';
 $ec_lang['lpn_result_gradient_tip']='Ztráta tlakové výšky dělená délkou potrubí. Použijte ji k porovnání potrubí různých délek podle jednoho návrhového limitu.';
 $ec_lang['lpn_result_water_age']='Stáří vody';
 $ec_lang['lpn_result_water_age_tip']='Doba, kterou voda dosahující tohoto bodu strávila v systému. Kde se průtoky setkávají, je číslo průměrem stáří přitékající vody vážených průtokem. V nádrži je to průměrné stáří uložené vody, takže nádrž, která se obměňuje pomalu, obvykle drží nejstarší vodu v síti. Neexistuje žádný předpisový limit, s nímž by se dalo porovnat, proto jej posuzujte podle poměrů v modelovaném systému.';
-$ec_lang['lpn_result_source_share']='Podíl zdroje';
-$ec_lang['lpn_result_source_share_tip']='Podíl vody dosahující tohoto bodu, který pocházel ze sledovaného uzlu. To udává analýza Sledování zdroje.';
+$ec_lang['lpn_result_source_share']='Podíl původu';
+$ec_lang['lpn_result_source_share_tip']='Podíl vody dosahující tohoto bodu, který pocházel ze sledovaného uzlu. To udává analýza Sledování původu.';
 // **THE LINK HALF OF THE THREE QUALITY ANSWERS** (ROADMAP Task 638). EPANET reports a node's own
 // value and a LINK's AVERAGE over the water standing in it, so the two are different quantities and
 // take different words. Three whole names rather than one name built from a word and a heading: a
 // label composed at render time breaks in a gendered, a word-order and a right-to-left language,
 // which is the rule in CLAUDE.md under Concept-level label reuse.
 $ec_lang['lpn_result_avg_water_age']='Průměrné stáří vody';
-$ec_lang['lpn_result_avg_source_share']='Průměrný podíl zdroje';
+$ec_lang['lpn_result_avg_source_share']='Průměrný podíl původu';
 $ec_lang['lpn_result_avg_concentration']='Průměrná koncentrace';
 // EPANET's own two link report columns, in EPANET's own words. A friction factor is the
 // dimensionless Darcy-Weisbach f the head loss along this link works out to, whichever friction
@@ -1809,7 +1809,7 @@ $ec_lang['lpn_inp_drop_setting']='Tato potrubí, čerpadla a ventily mají nasta
 $ec_lang['lpn_inp_drop_rules']='Tento soubor obsahuje řízení založená na pravidlech. Tato stránka je čte a používá. Při výpočtu modelu se pravidla uplatní, přičemž každá hladina, tlak a průtok v nich se převede do jednotek, které tento projekt zobrazuje. Pravidlo zobrazíte nebo upravíte otevřením Pravidla v Knihovny. Pravidla jsou zachována přesně tak, jak jsou uvedena v souboru, a při uložení souboru EPANET se zapíší zpět.';
 $ec_lang['lpn_inp_drop_eps']='Tento soubor popisuje simulaci s časovým průběhem. Modul simulace s časovým průběhem této stránky se nenačetl, proto byly importovány pouze počáteční podmínky.';
 $ec_lang['lpn_inp_drop_quality']='Tento soubor popisuje kvalitu vody: počáteční koncentrace a rychlosti reakcí v potrubích a nádržích. Tato stránka tyto hodnoty čte a používá. Zvolte chemickou látku v Nastavení, Výpočet, Kvalita a poté spusťte model, aby se vypočetly koncentrace v celé síti v průběhu výpočtu. Řádky jsou zachovány a při uložení souboru EPANET se zapíší zpět.';
-$ec_lang['lpn_inp_drop_sources_mixing']='Tento soubor uvádí, kde se do sítě dávkuje chemická látka a jak se voda mísí v každé nádrži. Každý zdroj se zobrazí u uzlu, kde je uplatněn, a každá nádrž ukazuje svůj model míšení. Oba se použijí, když se síť počítá po celkovou dobu běhu.';
+$ec_lang['lpn_inp_drop_sources_mixing']='Tento soubor uvádí, kde se do sítě dávkuje chemická látka a jak se voda mísí v každé nádrži. Každé dávkování se zobrazí u uzlu, kde je uplatněn, a každá nádrž ukazuje svůj model míšení. Oba se použijí, když se síť počítá po celkovou dobu běhu.';
 $ec_lang['lpn_inp_drop_energy']='Tento soubor EPANET obsahuje údaje pro modelování nákladů na čerpání. Tato stránka je čte a používá. Spusťte model pomocí řešiče EPANET a pak otevřete Voda, Sestavy, Energie čerpadel, kde uvidíte, jak dlouho každé čerpadlo běželo, jaký příkon mělo, kolik energie spotřebovalo a kolik to stálo. Řádky jsou zachovány a při uložení souboru EPANET se zapíší zpět.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_inp_drop_tags']='Tento soubor přiřazuje značky některým uzlům, potrubím nebo jiným prvkům. Každá značka byla importována a zobrazuje se ve vlastnostech svého prvku, kde ji lze zobrazit nebo upravit.';
@@ -2101,8 +2101,6 @@ $ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>Šipk
 // settings.colorFrozenBreaks in js/looped-network.js.
 $ec_lang['lpn_notes_color_term']='Hranice barevných pásem zůstávají stejné';
 $ec_lang['lpn_notes_color_def']='Hranice barevných pásem se nastaví, když zvolíte metodu třídění dat. Znovu se nenastavují při každém časovém kroku, protože by pak barvy při každém kroku znamenaly něco jiného, což pro sledování vašeho systému není užitečné. EPANET funguje stejně. Chcete-li nové hranice, zvolte metodu znovu nebo zadejte vlastní hranice.';
-$ec_lang['lpn_notes_epanet_term']='Konstanty Hazen-Williams odpovídají programu EPANET';
-$ec_lang['lpn_notes_epanet_def']='V srpnu 2026 byl součinitel a exponent Hazen-Williams upraveny tak, aby odpovídaly programu EPANET. Výsledky ztráty tlakové výšky se od dřívějších verzí této stránky liší až o 0,1 procenta, což je mnohem méně, než je nejistota samotné hodnoty C.';
 $ec_lang['lpn_notes_engine_term']='Který EPANET tato stránka používá';
 $ec_lang['lpn_notes_engine_def']='Řešič EPANET na této stránce je OWA-EPANET 2.3.5, vydaný 20. února 2025. EPANET vyvíjí Open Water Analytics, komunita spolupracující s Agenturou pro ochranu životního prostředí USA (EPA), která v prosinci 2019 vydala verzi 2.2.0. Zpráva o výpočtu jej označuje jako 2.3.05, protože nástroj zapisuje poslední číslo na dvě číslice. Na tuto stránku se dostává přes epanet-js 0.9.0 od Lukea Butlera, pod licencí MIT, a běží ve vašem prohlížeči: vaše síť se nikdy nikam neposílá k výpočtu.';
 $ec_lang['lpn_id_invalid']='Zadejte ID bez mezer a bez uvozovek.';
@@ -3046,7 +3044,7 @@ $ec_lang['lpn_settings_quality_track_tip']='Zvolte, co má výpočet sledovat v 
 $ec_lang['lpn_settings_quality_source']='Sledovaný uzel';
 $ec_lang['lpn_settings_quality_source_tip']='Uzel, jehož voda se sleduje. Každý ostatní uzel pak ukazuje podíl své vody, který pochází z tohoto uzlu.';
 $ec_lang['lpn_quality_none']='Nic';
-$ec_lang['lpn_quality_trace']='Sledování zdroje';
+$ec_lang['lpn_quality_trace']='Sledování původu';
 $ec_lang['lpn_quality_chemical']='Chemická látka, která reaguje';
 $ec_lang['lpn_quality_needs_run']='Kvalita vody se přenáší podél potrubí v čase, takže potřebuje řešič EPANET a celkovou dobu běhu. Nastavte Celkovou dobu běhu v části Čas, poté stiskněte tlačítko Vypočítat.';
 // **THE CHEMICAL / REACTION MODE** (ROADMAP Task 566, dev/water-quality.md). EPANET's own words
@@ -3079,7 +3077,7 @@ $ec_lang['lpn_quality_named_concentration']='Koncentrace {chemical}';
 $ec_lang['lpn_quality_named_avg_concentration']='Průměrná koncentrace {chemical}';
 $ec_lang['lpn_quality_initial']='Počáteční kvalita';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_quality_initial_tip']='Množství chemické látky v tomto uzlu na začátku výpočtu. Zdroj si tuto hodnotu ponechává po celý výpočet, což je obvyklý způsob, jakým se udává zbytková koncentrace opouštějící úpravnu vody. Prázdné pole znamená 0.';
+$ec_lang['lpn_quality_initial_tip']='Množství chemické látky v tomto uzlu na začátku výpočtu. Dávkování si tuto hodnotu ponechává po celý výpočet, což je obvyklý způsob, jakým se udává zbytková koncentrace opouštějící úpravnu vody. Prázdné pole znamená 0.';
 $ec_lang['lpn_result_concentration']='Koncentrace';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_result_concentration_tip']='Množství chemické látky zbývající v tomto bodě po transportu a reakci. Jednotky jsou ty, které byly zadány spolu s názvem chemické látky v Nastavení, Výpočet, Kvalita.';
@@ -3090,7 +3088,7 @@ $ec_lang['lpn_result_concentration_tip']='Množství chemické látky zbývajíc
 // none: it is written in the units named beside the chemical, and nobody converts it.
 $ec_lang['lpn_source_type']='Typ dávkování';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_source_type_tip']='Jaký druh dávky tento uzel přidává do vody, která jím prochází. Koncentrace bere vodu vstupující zde do sítě, jako by měla hodnotu Kvalita zdroje. Hmotnostní dávkovač přidává hmotnost chemické látky každou minutu, ať je průtok jakýkoli. Dávkovač na mezní hodnotu zvýší koncentraci opouštějící tento uzel na hodnotu Kvalita zdroje, a ne výš. Dávkovač úměrný průtoku přidá hodnotu Kvalita zdroje k tomu, co už ve vodě je.';
+$ec_lang['lpn_source_type_tip']='Jaký druh dávky tento uzel přidává do vody, která jím prochází. Koncentrace bere vodu vstupující zde do sítě, jako by měla hodnotu Kvalita dávkování. Hmotnostní dávkovač přidává hmotnost chemické látky každou minutu, ať je průtok jakýkoli. Dávkovač na mezní hodnotu zvýší koncentraci opouštějící tento uzel na hodnotu Kvalita dávkování, a ne výš. Dávkovač úměrný průtoku přidá hodnotu Kvalita dávkování k tomu, co už ve vodě je.';
 // R-350: "Source type should default to none... it's ignored if Source Quality is blank." The
 // disabled state's own word, shown only while the box beside it carries no quality.
 $ec_lang['lpn_source_type_none']='Žádný';
@@ -3098,10 +3096,10 @@ $ec_lang['lpn_source_type_concen']='Koncentrace';
 $ec_lang['lpn_source_type_mass']='Hmotnostní dávkovač';
 $ec_lang['lpn_source_type_setpoint']='Dávkovač na mezní hodnotu';
 $ec_lang['lpn_source_type_flowpaced']='Dávkovač úměrný průtoku';
-$ec_lang['lpn_source_quality']='Kvalita zdroje';
+$ec_lang['lpn_source_quality']='Kvalita dávkování';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_source_quality_tip']='Síla dávky. U všech typů kromě hmotnostního dávkovače je to koncentrace v jednotkách uvedených u chemické látky v Nastavení, Výpočet, Kvalita; u hmotnostního dávkovače je to hmotnostní průtok za minutu. Prázdné pole znamená žádný zdroj chemické látky, funkčně rovnocenné 0.';
-$ec_lang['lpn_source_pattern']='Vzorec zdroje';
+$ec_lang['lpn_source_quality_tip']='Síla dávky. U všech typů kromě hmotnostního dávkovače je to koncentrace v jednotkách uvedených u chemické látky v Nastavení, Výpočet, Kvalita; u hmotnostního dávkovače je to hmotnostní průtok za minutu. Prázdné pole znamená žádné dávkování chemické látky, funkčně rovnocenné 0.';
+$ec_lang['lpn_source_pattern']='Vzorec dávkování';
 $ec_lang['lpn_source_pattern_tip']='Časový vzorec, který v průběhu výpočtu škáluje dávku, pro dávkování, které není konstantní. Žádný vzorec znamená, že dávka je stejná v každém kroku.';
 $ec_lang['lpn_mixing_model']='Model mísení';
 $ec_lang['lpn_mixing_model_tip']='Model toho, jak se voda již přítomná v této nádrži mísí s přítokem. Úplné míšení okamžitě promíchá celý přítok s celým objemem nádrže. Dvoukomorové míšení nejprve plní vstupní zónu a přebytek předává do hlavní zóny. Pístový tok FIFO vypouští vodu v pořadí, v jakém přitekla. Pístový tok LIFO ji vrství, takže voda, která přitekla poslední, odtéká první. Volba ovlivňuje stáří vody a zbytkovou koncentraci, nikoli tlak ani průtok.';
@@ -4090,14 +4088,14 @@ $ec_lang['lpn_change_type_becomes']='{id}: {property} {value}, ve scénáři {sc
 $ec_lang['lpn_change_type_customers']='Potrubí zásobuje odběratele pouze samo, proto budou tito odběratelé místo toho připojeni k uzlu uvedenému v závorkách, kde je jejich odběr již zahrnut. Zůstávají tam, kde jsou nakresleni, a jejich odběr se nemění:';
 $ec_lang['lpn_change_type_setting']='Tato řízení a pravidla zadávají nebo testují nastavení měněného spoje. Nastavení je u potrubí, čerpadla a ventilu jiná veličina, proto je budou číst jinak:';
 $ec_lang['lpn_change_type_rules']='Tyto řádky pravidel uvádějí spoj podle jeho druhu a místo toho uvedou jeho nový druh:';
-$ec_lang['lpn_find_scope_source']='Zdroj';
-$ec_lang['lpn_find_source_no_chemical']='Nesleduje se žádná chemická látka, takže žádný uzel nemá zdroj.';
+$ec_lang['lpn_find_scope_source']='Dávkování';
+$ec_lang['lpn_find_source_no_chemical']='Nesleduje se žádná chemická látka, takže žádný uzel nemá dávkování.';
 $ec_lang['lpn_profile_open']='Otevřít soubor profilu EPANET…';
 $ec_lang['lpn_profile_file_done']='Profil načten ze souboru: v této síti nalezeno {used} z {total} uzlů.';
 $ec_lang['lpn_profile_file_missing']='Uvedeno v souboru, ale není v této síti: {ids}.';
 $ec_lang['lpn_profile_file_short']='Soubor uvádí méně než dva uzly této sítě, takže není co vykreslit jako profil.';
 $ec_lang['lpn_pgraph_none']='Tento prvek nemá v aktuálním výpočtu žádné výsledky.';
-$ec_lang['lpn_pgraph_source_share_from']='Podíl zdroje z uzlu {node}';
+$ec_lang['lpn_pgraph_source_share_from']='Podíl původu z uzlu {node}';
 $ec_lang['lpn_result_pump_head']='Tlaková výška';
 $ec_lang['lpn_result_pump_head_tip']='Tlaková výška, kterou čerpadlo přidává mezi sáním a výtlakem, zobrazená jako kladné číslo. Řešič a soubory EPANET ji nesou jako zápornou ztrátu tlakové výšky.';
 $ec_lang['lpn_report_pump_head']='Tlaková výška čerpadla';
@@ -4293,7 +4291,7 @@ $ec_lang['lpn_guide_text_calib_box']='Porovnává soubor terénních měření s
 $ec_lang['lpn_guide_text_notes_popup']='Uvádí poznámky o tom, jak se tato stránka chová a co nedělá, každou jako pojem následovaný definicí. Síť nemění.';
 $ec_lang['lpn_guide_text_hotkeys_popup']='Uvádí každé tlačítko panelu nástrojů a každý řádek nabídky, klávesové zkratky a položku pro každé okno. Zvolením řádku se zobrazí, kde se tento ovládací prvek nachází; nikdy jej nespustí. Hledání spustíte stisknutím Ctrl+K odkudkoli, nebo / když má fokus příručka.';
 $ec_lang['lpn_guide_find_query_term']='Dotazovací jazyk';
-$ec_lang['lpn_guide_find_query_def']='<table class="lpn-notes-table"><tbody><tr><td><code>Scope.Property condition value</code></td><td>Jedna podmínka. Rozsah (seznam Kde hledat) je Vše, Uzel, Zdroj, Nádrž, Potrubí, Čerpadlo, Ventil, Text, Odběratel nebo Zdroj. Vlastnost je jakákoli položka seznamu Vlastnost pro tento rozsah.</td></tr><tr><td>Podmínky</td><td>rovno, větší než, menší než, obsahuje, n nejvyšších, n nejnižších a prázdné. Obsahuje platí pouze pro text. V n nejvyšších a n nejnižších je n počet, jako v 5 nejvyšších. Se samotným písmenem n, jako v <code>Pipe.Velocity n highest</code>, nebo s prázdným polem Hodnota se vypíše 10 prvků. Prázdné najde prvky, které nemají pro danou vlastnost žádnou hodnotu. Propojení má čtyři podmínky a nebere hodnotu.</td></tr><tr><td>Hodnoty</td><td>Číslo se zadává bez jednotky, v jednotce zobrazené ve Vlastnostech a na panelu Tabulky: 40, ne 40 psi. Text, včetně ID, se uzavírá do jednoduchých nebo dvojitých uvozovek: <code>\'60\'</code>.</td></tr><tr><td>A, NEBO a závorky</td><td>A se vyhodnocuje před NEBO a závorky seskupují podmínky. NOT není k dispozici.</td></tr><tr><td>Pravopis</td><td>Velikost písmen se nerozlišuje. Anglická slova se přijímají ve všech jazycích, takže dotaz zkopírovaný z této příručky funguje na stránce v libovolném jazyce.</td></tr></tbody></table>';
+$ec_lang['lpn_guide_find_query_def']='<table class="lpn-notes-table"><tbody><tr><td><code>Scope.Property condition value</code></td><td>Jedna podmínka. Rozsah (seznam Kde hledat) je Vše, Uzel, Zdroj, Nádrž, Potrubí, Čerpadlo, Ventil, Text, Odběratel nebo Dávkování. Vlastnost je jakákoli položka seznamu Vlastnost pro tento rozsah.</td></tr><tr><td>Podmínky</td><td>rovno, větší než, menší než, obsahuje, n nejvyšších, n nejnižších a prázdné. Obsahuje platí pouze pro text. V n nejvyšších a n nejnižších je n počet, jako v 5 nejvyšších. Se samotným písmenem n, jako v <code>Pipe.Velocity n highest</code>, nebo s prázdným polem Hodnota se vypíše 10 prvků. Prázdné najde prvky, které nemají pro danou vlastnost žádnou hodnotu. Propojení má čtyři podmínky a nebere hodnotu.</td></tr><tr><td>Hodnoty</td><td>Číslo se zadává bez jednotky, v jednotce zobrazené ve Vlastnostech a na panelu Tabulky: 40, ne 40 psi. Text, včetně ID, se uzavírá do jednoduchých nebo dvojitých uvozovek: <code>\'60\'</code>.</td></tr><tr><td>A, NEBO a závorky</td><td>A se vyhodnocuje před NEBO a závorky seskupují podmínky. NOT není k dispozici.</td></tr><tr><td>Pravopis</td><td>Velikost písmen se nerozlišuje. Anglická slova se přijímají ve všech jazycích, takže dotaz zkopírovaný z této příručky funguje na stránce v libovolném jazyce.</td></tr></tbody></table>';
 $ec_lang['lpn_guide_find_examples_term']='Řešené příklady na Net3';
 $ec_lang['lpn_guide_find_examples_def']='<p>Chcete-li příklady sledovat, otevřete příklad Net3. Tlak je v psi a rychlost v ft/s.</p><table class="lpn-notes-table"><tbody><tr><td><code>Everything.ID equal to \'60\'</code></td><td>Uzel 60 a potrubí 60. Uzel a potrubí mohou mít stejné ID, takže hledání ID v rozsahu Vše může vrátit více než jeden prvek.</td></tr><tr><td><code>Junction.Pressure below 40</code></td><td>Uzly 10, 40, 50, 20 a 153, nejnižší tlak první. Uzel 10 má -0,6 psi, tedy záporný tlak, který vyžaduje kontrolu.</td></tr><tr><td><code>Pipe.Velocity 5 highest</code></td><td>Potrubí 60, 329, 125, 123 a 149, nejvyšší rychlost první. Potrubím 60 protéká 9,3 ft/s.</td></tr><tr><td><code>Junction.Pressure below 20 OR Pipe.Velocity above 5</code></td><td>Uzly 10, 20, 40 a 50 a potrubí 60, 125 a 329: nízké tlaky a vysoké rychlosti v jednom seznamu.</td></tr><tr><td><code>Junction.Pressure below 40 AND Junction.Elevation above 100</code></td><td>Uzly 10, 20, 40 a 50, nízké tlaky na vysoko položeném terénu. Obě podmínky musí uvádět stejný druh prvku: <code>Junction.Pressure below 40 AND Pipe.Velocity above 3</code> nevyhovuje nic, protože žádný prvek není současně uzlem a potrubím.</td></tr><tr><td><code>Pipe.Closed equal to \'closed\'</code></td><td>Potrubí 330, jediné potrubí uzavřené v souboru Net3.</td></tr><tr><td><code>Junction.Connectivity no open path to a source</code></td><td>Nic, tak jak je soubor distribuován. S uzavřeným potrubím 247 (viz Nahradit a Zpět) uzly 215, 217, 219 a 225: uzly, které by porucha potrubí 247 nechala bez zásobování. Opakování pro každé potrubí je analýza kritičnosti.</td></tr></tbody></table>';
 $ec_lang['lpn_guide_find_results_term']='Výsledky, výběr a Tabulky';

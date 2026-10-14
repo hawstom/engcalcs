@@ -2100,8 +2100,6 @@ $ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>Vituf
 // settings.colorFrozenBreaks in js/looped-network.js.
 $ec_lang['lpn_notes_color_term']='Mipaka ya bendi za rangi inabaki ile ile';
 $ec_lang['lpn_notes_color_def']='Mipaka ya bendi za rangi huwekwa unapochagua njia ya kuainisha data. Haiwekwi tena kwa kila hatua ya muda, kwa sababu hilo lingefanya rangi zimaanishe kitu kipya kwa kila hatua, jambo ambalo halisaidii kuonyesha mfumo wako. EPANET hufanya kazi kwa njia hiyo hiyo. Ili kupata mipaka mipya, chagua njia tena au andika mipaka yako.';
-$ec_lang['lpn_notes_epanet_term']='Vigezo vya Hazen-Williams vinalingana na EPANET';
-$ec_lang['lpn_notes_epanet_def']='Mnamo Agosti 2026 mgawo na kipeo cha Hazen-Williams vilibadilishwa ili kulingana na EPANET. Matokeo ya upotevu wa kimo yanatofautiana na matoleo ya awali ya ukurasa huu kwa hadi asilimia 0.1, jambo dogo zaidi kuliko kutokuwa na uhakika kwa thamani ya C yenyewe.';
 $ec_lang['lpn_notes_engine_term']='EPANET gani inayoendeshwa na ukurasa huu';
 $ec_lang['lpn_notes_engine_def']='Kitatuzi cha EPANET kwenye ukurasa huu ni OWA-EPANET 2.3.5, kilichotolewa tarehe 20 Februari 2025. EPANET inatengenezwa na Open Water Analytics, jumuiya inayofanya kazi na Shirika la Ulinzi wa Mazingira la Marekani, ambalo lilitoa toleo la 2.2.0 Desemba 2019. Ripoti ya uendeshaji inaiita 2.3.05 kwa sababu kitatuzi huandika namba ya mwisho kwa tarakimu mbili. Inafikishwa kwenye ukurasa huu kupitia epanet-js 0.9.0 ya Luke Butler, chini ya leseni ya MIT, na inaendeshwa kwenye kivinjari: mtandao haupelekwi kamwe kwenye seva ili kutatuliwa.';
 $ec_lang['lpn_id_invalid']='Ingiza kitambulisho kisicho na nafasi wala alama za nukuu.';

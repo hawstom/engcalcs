@@ -337,7 +337,17 @@
 			// stated twice with different rows.
 			volCurvesWritten = {},
 			warnings = [],
+			// **EVERY ROW THAT NAMES AN ELEMENT NAMES ONE THIS FILE DECLARES** (Tom, 2026-10-14,
+			// Fotobi). The model is this run's network: an inactive asset, a link whose end is
+			// inactive, and a node with no path to a source are already out of it. A control, an
+			// [ENERGY] row or a reaction coefficient read from the document can still name one, and
+			// EPANET refuses the whole input over it (Error 204, 216) -- which is how a pump switched
+			// off in a scenario took the run down. So each such row is checked against these two
+			// lists, the model's own, at the one place the text is written.
+			inNode = {}, inLink = {},
 			i, n, k, link;
+		for (i = 0; i < model.nodes.length; i++) { inNode[model.nodes[i].id] = model.nodes[i].type; }
+		for (i = 0; i < model.links.length; i++) { inLink[model.links[i].id] = model.links[i].type; }
 
 		for (i = 0; i < model.nodes.length; i++) {
 			n = model.nodes[i];
@@ -644,9 +654,17 @@
 			// 17.1` is 17.1 FEET -- and this file is LPS. Copied through, that tank would switch its
 			// pump at 17.1 metres, which is above its own maximum level, so the pump never starts and
 			// the run is quietly wrong rather than visibly broken.
+			var controlsOut = [];
 			(time.controls || []).forEach(function (c) {
 				var line, act = c.action || {}, cond = c.condition;
 				if (!cond) { return; }
+				// **A CONTROL ON AN ASSET OUT OF THIS RUN IS LEFT OUT OF THE RUN** (EPANET Error 204).
+				// The ids ride on the warnings as `control-inactive`, the code js/looped-network.js
+				// uses for the same drop; where it is said is the page's business, not this file's.
+				if (!inLink[String(c.link)] || (cond.kind === 'node' && !inNode[String(cond.node)])) {
+					if (controlsOut.indexOf(String(c.link)) < 0) { controlsOut.push(String(c.link)); }
+					return;
+				}
 				if (act.status) { line = ' LINK ' + c.link + ' ' + (act.status === 'closed' ? 'CLOSED' : 'OPEN'); }
 				else if (isFinite(act.setting)) {
 					line = ' LINK ' + c.link + ' ' +
@@ -662,6 +680,7 @@
 				} else { return; }
 				controlRows.push(line);
 			});
+			if (controlsOut.length) { warnings.push({ code: 'control-inactive', ids: controlsOut }); }
 			// H:MM rather than a bare number, because a BARE NUMBER IN [TIMES] IS HOURS -- writing
 			// 86400 for a one-day duration asks EPANET for a ten-year run.
 			[['Duration', 'duration'], ['Hydraulic Timestep', 'hydraulicStep'],
@@ -692,7 +711,8 @@
 		// quality column empty until the user picks one.
 		var qual = model.quality || {}, qualMode = qual.mode, qualLine = '';
 		if (qualMode === 'age') { qualLine = 'AGE'; }
-		else if (qualMode === 'trace' && qual.traceNode) { qualLine = 'TRACE ' + qual.traceNode; }
+		// The same for a trace node out of this run: EPANET refuses a trace on a node it lacks.
+		else if (qualMode === 'trace' && qual.traceNode && inNode[qual.traceNode]) { qualLine = 'TRACE ' + qual.traceNode; }
 		else if (qualMode === 'chemical') {
 			// **THE CHEMICAL'S NAME AND ITS UNITS ARE THE USER'S OWN TEXT, PASSED THROUGH.**
 			// `Chlorine mg/L` is a name and a unit label, and EPANET converts neither -- a
@@ -758,6 +778,8 @@
 				var m2 = react[pair[0]] || {};
 				Object.keys(m2).forEach(function (id) {
 					if (typeof m2[id] !== 'number' || !isFinite(m2[id])) { return; }
+					// A pipe or tank out of this run has no row: EPANET refuses one naming it.
+					if (pair[0] === 'tank' ? inNode[id] !== 'tank' : inLink[id] !== 'pipe') { return; }
 					reactionRows.push(' ' + pair[1] + '  ' + id + '  ' + m2[id]);
 				});
 			});
@@ -796,6 +818,9 @@
 			var m3 = energyIn[pair[0]] || {};
 			Object.keys(m3).forEach(function (id) {
 				if (m3[id] === undefined || m3[id] === null || m3[id] === '') { return; }
+				// A pump out of this run (inactive, or its reservoir is) is not a pump in this file:
+				// `PUMP <id> PRICE` naming it is EPANET's Error 216 and refuses the whole input.
+				if (!pumpsWritten[id]) { return; }
 				energyRows.push(' PUMP  ' + id + '  ' + pair[1] + '  ' + m3[id]);
 			});
 		});
@@ -1345,6 +1370,29 @@
 	// TOPOLOGY click pays ~1.5 ms rather than ~10.
 	var workspace = null, workspaceUrl;
 
+	/**
+	 * **A REFUSAL RETIRES THE ENGINE IT HAPPENED IN** (Tom, 2026-10-14: "memory access out of
+	 * bounds" on a network with nothing unusual in it).
+	 *
+	 * Measured on the vendored epanet-js 0.9.0, in node and in Chromium alike: closing a Project
+	 * whose open() EPANET refused leaves the engine's memory damaged, and some later call in the
+	 * SAME Workspace fails for no reason of its own -- a malloc that never returns in one order of
+	 * calls, a "memory access out of bounds" trap on every call after it in another (Tom's message,
+	 * word for word). dev/lpn-spike/epanet-topology-refusal-harness.js, part E, holds a sequence
+	 * that does it through this file's own functions. Not closing the refused Project
+	 * avoids the damage but leaks it, and its report (the only place EPANET names the offending
+	 * line) is unreadable until it is closed.
+	 *
+	 * So the refused Project is closed for its report, and then the whole Workspace is dropped:
+	 * the warm session goes with it WITHOUT being touched, and the next solve or run builds a
+	 * fresh engine. That costs one ~9 ms instantiation per refusal, and a refusal is rare. A run
+	 * still walking the old Workspace keeps its own reference and finishes there.
+	 */
+	function retireEngine() {
+		session = null;
+		workspace = null;
+	}
+
 	function workspaceFor(mod, moduleUrl) {
 		if (workspace && workspaceUrl === moduleUrl) { return Promise.resolve(workspace); }
 		return Promise.resolve().then(function () {
@@ -1654,20 +1702,26 @@
 			} catch (e) {
 				// A Project that threw part-way through is of unknown state -- half its values
 				// pushed, hydraulics possibly still open. Keeping it would make the NEXT solve
-				// answer from that unknown state, so drop it and let the next call reopen cold.
-				closeSession();
+				// answer from that unknown state, so drop it -- and the engine it lives in, untouched
+				// (retireEngine()) -- and let the next call reopen cold.
+				retireEngine();
 				return engineRefusal(e, { warnings: (s.warnings || []).concat(valueWarnings(model)) });
 			}
 		}, function (e) {
 			// openSession() itself threw: EPANET would not even parse the file we wrote. The same
 			// condition one step earlier, and the same answer.
-			closeSession();
+			retireEngine();
 			return engineRefusal(e, {});
 		});
 	}
+	// **ONE SOLVE AT A TIME THROUGH THE WARM SESSION.** Two solves started together used to share
+	// it: the second, finding a different signature, closed the Project the first was about to
+	// solve in, and both came back refused ("Error 102: no network data available"). Each solve
+	// now waits for the one before it; a solve takes milliseconds, so the queue is never felt.
+	var solveQueue = Promise.resolve();
 	EngCalcs.lpnSolveEpanet = function (model, options) {
-		var p;
-		try { p = solveEpanetInner(model, options); } catch (e) { p = Promise.reject(e); }
+		var p = solveQueue.then(function () { return solveEpanetInner(model, options); });
+		solveQueue = p.then(function () {}, function () {});
 		return stageOf(p, 'run');
 	};
 
@@ -2086,8 +2140,12 @@
 					// so the page can tell this apart from an engine it could not fetch, and it
 					// carries the engine's own report because a rejected open still writes one and
 					// that text is the only place the offending line is named.
+					// Closing it is what flushes that report, and is also what damages the engine,
+					// so the engine is retired straight after (retireEngine()).
+					var refusedReport = shutdown();
+					if (ws === workspace) { retireEngine(); }
 					return engineRefusal(e, {
-						warnings: built.warnings, frames: [], report: shutdown(),
+						warnings: built.warnings, frames: [], report: refusedReport,
 						duration: duration, reportStart: reportStart, reportStep: reportStep
 					});
 				}
@@ -2237,8 +2295,14 @@
 						});
 					}
 					function failed(e) {
+						// A run that threw part-way is the same damaged engine as a refusal.
+						var failedReport = shutdown();
+						if (ws === workspace) { retireEngine(); }
+						// `stoppedAt`: the run STARTED and stopped part-way (a tank ran dry and left
+						// junctions with no source is EPANET's Error 110), which is not "rejected, so the
+						// run did not start" -- js/lpn-time.js says which.
 						resolve(engineRefusal(e, {
-							warnings: built.warnings, frames: [], report: shutdown(),
+							warnings: built.warnings, frames: [], report: failedReport, stoppedAt: t,
 							duration: duration, reportStart: reportStart, reportStep: reportStep
 						}));
 					}

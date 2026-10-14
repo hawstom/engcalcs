@@ -59,7 +59,6 @@ echoCalculatorForm(
 
 <h2><?=$ec_lang['ws_notes_heading']?></h2>
 <?php echo $ec_lang['hw_note_1']; ?>
-<dl><dt><?=$ec_lang['hw_notes_epanet_term']?></dt><dd><?=$ec_lang['hw_notes_epanet_def']?></dd></dl>
 
 <script>
 EngCalcs.pageConfig = {
