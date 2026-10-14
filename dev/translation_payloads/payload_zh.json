@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "zh",
-        "expected_key_count": 2628,
-        "delta_key_count": 4,
+        "expected_key_count": 2629,
+        "delta_key_count": 5,
         "exempt_key_count": 23,
         "exempt_keys": [
             "calc_units_us",
@@ -705,13 +705,15 @@
         "lpn_tool_zoom_selection": "Zoom to selection",
         "lpn_ex_net1_si_title": "EPANET Net1 plus rule-based controls, L\/s (SI)",
         "lpn_ex_net1_si_desc": "Liters per second, with meters and millimeters. A fictional EPANET example converted from gallons per minute, feet, and inches, with chlorine, 1 reservoir, 1 tank, 1 pump, and two rule-based controls.",
-        "lpn_tool_zoom_selection_tip": "Fit the selected assets to the map window. Select one or more assets first."
+        "lpn_tool_zoom_selection_tip": "Fit the selected assets to the map window. Select one or more assets first.",
+        "lpn_time_run_stopped": "The EPANET run stopped at {time}, so it has no results. Its run report says why."
     },
     "keys": {
         "lpn_tool_zoom_selection": "Zoom to selection",
         "lpn_ex_net1_si_title": "EPANET Net1 plus rule-based controls, L\/s (SI)",
         "lpn_ex_net1_si_desc": "Liters per second, with meters and millimeters. A fictional EPANET example converted from gallons per minute, feet, and inches, with chlorine, 1 reservoir, 1 tank, 1 pump, and two rule-based controls.",
-        "lpn_tool_zoom_selection_tip": "Fit the selected assets to the map window. Select one or more assets first."
+        "lpn_tool_zoom_selection_tip": "Fit the selected assets to the map window. Select one or more assets first.",
+        "lpn_time_run_stopped": "The EPANET run stopped at {time}, so it has no results. Its run report says why."
     },
     "key_context": {
         "lpn_tool_zoom_selection": {
@@ -775,6 +777,22 @@
                     "key": "lpn_tool_zoom_window_tip",
                     "value": "指定两个对角，或拖出一个矩形。再按一次可“缩放至全图”。",
                     "english": "Specify corners or drag a rectangle. Press again for Zoom to fit."
+                }
+            }
+        },
+        "lpn_time_run_stopped": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_engine_refused_fallback",
+                    "value": "屏幕上显示的数值改由内置求解器提供。",
+                    "english": "The numbers on screen came from the built-in solver instead."
+                },
+                "next_translated": {
+                    "key": "lpn_time_run_fell_back",
+                    "value": "屏幕上显示的数值改由内置求解器提供。它每次只计算一个时刻，因此这仅是 {time} 时刻的管网状态，所有水箱仍处于初始水位。",
+                    "english": "The numbers on screen came from the built-in solver instead. It solves one instant at a time, so this is the network at {time} only, with every tank at its initial level."
                 }
             }
         }

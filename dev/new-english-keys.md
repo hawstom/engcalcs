@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**4 still to read on master**, of 4 untranslated keys, of 2628 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**5 still to read on master**, of 5 untranslated keys, of 2629 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -199,13 +199,16 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   @@ NEEDS RULING
 
-## lpn_  (4, 4 to read @@ NEEDS RULING)
+## lpn_  (5, 5 to read @@ NEEDS RULING)
 
 - **`lpn_ex_net1_si_desc`**
   > Liters per second, with meters and millimeters. A fictional EPANET example converted from gallons per minute, feet, and inches, with chlorine, 1 reservoir, 1 tank, 1 pump, and two rule-based controls.
   @@ NEEDS RULING
 - **`lpn_ex_net1_si_title`**
   > EPANET Net1 plus rule-based controls, L/s (SI)
+  @@ NEEDS RULING
+- **`lpn_time_run_stopped`**
+  > The EPANET run stopped at {time}, so it has no results. Its run report says why.
   @@ NEEDS RULING
 - **`lpn_tool_zoom_selection`**
   > Zoom to selection
@@ -218,7 +221,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**556 still to read**, of 559 new keys across 20 unmerged branch(es).
+**558 still to read**, of 561 new keys across 19 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -229,7 +232,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/bentley-interop (`4de1c02d`) — 134 new, 134 to read @@ NEEDS RULING
+### feat/bentley-interop (`3b5f2488`) — 137 new, 137 to read @@ NEEDS RULING
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -260,6 +263,15 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 - **`lpn_copy_props_no_overrides`**
   > No overrides to copy.
+  @@ NEEDS RULING
+- **`lpn_ctx_edit_text`**
+  > Edit text
+  @@ NEEDS RULING
+- **`lpn_ctx_reset_position`**
+  > Reset position
+  @@ NEEDS RULING
+- **`lpn_ctx_reset_position_off_tip`**
+  > Only a label or an attached Text that has been dragged from its own position can be reset.
   @@ NEEDS RULING
 - **`lpn_customer_node_inactive`**
   > This customer is assigned to a junction that is inactive in this scenario, so its demand is not part of the solve.
@@ -319,7 +331,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > No selected asset can take the copied properties.
   @@ NEEDS RULING
 - **`lpn_paste_props_off_none`**
-  > Nothing is copied. Right-click an asset and choose Copy properties.
+  > Nothing is copied. Right-click or long press an asset and choose Copy properties.
   @@ NEEDS RULING
 - **`lpn_paste_props_off_select`**
   > Select the assets to paste to, then choose Paste properties to selection.
@@ -660,7 +672,11 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`2e5e81c4`) — adds no English strings
 
-### feat/library-description (`c2e6744c`) — adds no English strings
+### feat/library-description (`f27ec19d`) — 1 new, 1 to read @@ NEEDS RULING
+
+- **`lpn_inp_drop_comments`**
+  > These comments in the patterns or the simple controls of this file sit where this page cannot keep them, for example between the rows of one pattern, so they were not imported. Every pattern and control was imported in full; only these comment lines are missing.
+  @@ NEEDS RULING
 
 ### feat/long-press (`725b38d9`) — 133 new, 133 to read @@ NEEDS RULING
 
@@ -1097,7 +1113,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Not pasted: {n} (the valve types differ).
   @@ NEEDS RULING
 
-### feat/morph (`36c2c011`) — 139 new, 139 to read @@ NEEDS RULING
+### feat/morph (`2cc499ab`) — 139 new, 139 to read @@ NEEDS RULING
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -1133,7 +1149,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Type
   @@ NEEDS RULING
 - **`lpn_field_type_tip`**
-  > The type of this asset in this scenario. Morph made it an override here; clear the override to give the asset the type of the parent scenario again.
+  > The type of this asset in this scenario, set by Morph. Clear the override to use the parent scenario's type.
   @@ NEEDS RULING
 - **`lpn_inp_export_flat_customers_inactive`**
   > {n} of these customers are assigned to a junction that is inactive in this scenario, so their demand is not in the file.
@@ -1523,7 +1539,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Copy (Ctrl+C)
   @@ NEEDS RULING
 
-### feat/slope-length (`971ad605`) — 1 new, 1 to read @@ NEEDS RULING
+### feat/slope-length (`7688af15`) — 1 new, 1 to read @@ NEEDS RULING
 
 - **`lpn_field_length_slope_tip`**
   > Pipe length. When Auto is checked, the length is measured along the slope: the drawn length combined with the difference in elevation between the two end nodes.
@@ -1540,15 +1556,9 @@ build for that would be a gate nobody keeps. Refresh it with
   > Width of the solid outline behind map text, as a percent of the text size. Applies when Solid background behind labels is on.
   @@ NEEDS RULING
 
-### feat/text-inplace (`fa33bb26`) — adds no English strings
+### feat/text-inplace (`6917d21a`) — adds no English strings
 
-### fix/control-inactive-link (`3717dc68`) — 1 new, 1 to read @@ NEEDS RULING
-
-- **`lpn_time_run_stopped`**
-  > The EPANET run stopped at {time}, so it has no results. The EPANET run report says why.
-  @@ NEEDS RULING
-
-### fix/epanet-oob (`ec692443`) — 135 new, 135 to read @@ NEEDS RULING
+### fix/epanet-oob (`4594bb4b`) — 134 new, 134 to read @@ NEEDS RULING
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -1933,9 +1943,6 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 - **`lpn_sm_used_by_tip`**
   > Used by: {list}
-  @@ NEEDS RULING
-- **`lpn_time_run_stopped`**
-  > The EPANET run stopped at {time}, so it has no results. The EPANET run report says why.
   @@ NEEDS RULING
 - **`lpn_tsb_close`**
   > Close graph
