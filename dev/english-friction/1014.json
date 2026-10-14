@@ -1,0 +1,338 @@
+{
+  "sprint": "1014",
+  "description": "Wave 0 adversarial English pass over the 128 keys wave0_keyset.php --new-and-changed leaves for review (132 new or changed, 3 already ruled by Tom, 1 skipped for an existing $ec_lang_syn). Each string was asked for every plausible reading; 23 keys have English fixes applied directly in lib/lang.ec.en.php, 3 $ec_lang_syn entries and 1 glossary term are PROPOSED only (nothing written to $ec_lang_syn or glossary.json), and 1 key is referred to Tom. Reviewed and passed without change: all other keys.",
+  "entries": [
+    {
+      "key": "lpn_contour_show_tip",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "\"check\" breaks the Select/Clear checkbox rule (Tom, 2026-10-04) and reads as verify/inspect to a translator.",
+      "readings": [
+        "tick the box",
+        "inspect the contour"
+      ],
+      "disposition": "english",
+      "resolution": "APPLIED: 'check to bring them back as they were' -> 'select to show them again as they were'."
+    },
+    {
+      "key": "lpn_labels_use_units_tip",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "\"Check to show\" is the struck checkbox verb.",
+      "readings": [
+        "tick the box",
+        "verify the unit"
+      ],
+      "disposition": "english",
+      "resolution": "APPLIED: 'Check to show' -> 'Select to show'."
+    },
+    {
+      "key": "lpn_scenario_override_tip",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "\"Checked means\" is the struck checkbox state word.",
+      "readings": [
+        "box is ticked",
+        "the value was verified"
+      ],
+      "disposition": "english",
+      "resolution": "APPLIED: 'Checked means' -> 'Selected means'."
+    },
+    {
+      "key": "lpn_scenario_basic_tip",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "\"Checked:\" pairs with \"Cleared:\"; the state word for a checkbox is \"selected\".",
+      "readings": [
+        "ticked",
+        "verified"
+      ],
+      "disposition": "english",
+      "resolution": "APPLIED: 'Checked:' -> 'Selected:'."
+    },
+    {
+      "key": "lpn_tool_zoom_extent_tip",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "\"click the small triangle\" names a device gesture for a control; rule is Select a button.",
+      "readings": [
+        "click with a mouse",
+        "any pointer selection"
+      ],
+      "disposition": "english",
+      "resolution": "APPLIED: 'press W or click the small triangle' -> 'press W or select the small triangle'."
+    },
+    {
+      "key": "lpn_guide_text_hotkeys_popup",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "Comma before an \"or\" clause: 'press Ctrl+K from anywhere, or / while the user manual has focus' (Tom's 2026-10-13 rule).",
+      "readings": [
+        "or / is a second place to press Ctrl+K",
+        "or / is a second key"
+      ],
+      "disposition": "english",
+      "resolution": "APPLIED: comma removed: 'from anywhere or / while'."
+    },
+    {
+      "key": "lpn_guide_keys_def",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "\"or holding focus\" reads as the pointer holding focus, or the control holding the pointer; a control does not hold.",
+      "readings": [
+        "the control that is under the pointer or holds focus",
+        "the pointer, or something, holding focus"
+      ],
+      "disposition": "english",
+      "resolution": "APPLIED: 'or holding focus' -> 'or that has focus'."
+    },
+    {
+      "key": "lpn_guide_find_query_def",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "Comma pair around an \"or\" clause ('as in X, or with the Value box empty, 10 assets are listed'); the subject of the main clause is also far from its verb.",
+      "readings": [
+        "10 assets when n is the letter n",
+        "10 assets only with an empty Value box"
+      ],
+      "disposition": "english",
+      "resolution": "APPLIED: 'With the letter n itself, as in <code>Pipe.Velocity n highest</code>, or with the Value box empty, 10 assets are listed.' -> 'If the Value box is empty or n is the letter n itself, as in <code>Pipe.Velocity n highest</code>, 10 assets are listed.'"
+    },
+    {
+      "key": "lpn_field_fittings_tip",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "'Leave no list chosen' is a double negative; 'Its' has no clear antecedent; 'added up into' and 'then read only' imply a sequence that is not there.",
+      "readings": [
+        "its = the library, the pipe, or the list",
+        "the box becomes read only after the sum"
+      ],
+      "disposition": "english",
+      "resolution": "APPLIED: 'A list of fittings from the project library. The quantities and coefficients in the list are summed into this pipe's minor loss coefficient, and the coefficient box is read only. To enter the coefficient directly, leave the list unchosen.' (also straightens the curly apostrophe)"
+    },
+    {
+      "key": "lpn_profile_draw_blocked",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "'Select another node.' does not say which of the two named nodes.",
+      "readings": [
+        "replace {a}",
+        "replace {b}",
+        "replace either"
+      ],
+      "disposition": "english",
+      "resolution": "APPLIED: 'Select another node.' -> 'Select a different start or end node.'"
+    },
+    {
+      "key": "lpn_screenshot_tip",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "'Mark it up' is idiom (annotate vs mark up as markup language/price).",
+      "readings": [
+        "annotate the image",
+        "increase the price"
+      ],
+      "disposition": "english",
+      "resolution": "APPLIED: 'Mark it up, then' -> 'Annotate it, then'."
+    },
+    {
+      "key": "lpn_dxf_import_refuse_geo",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "\"flat\" is a homemade substitute for the conventional term and can read as level or horizontal; the contrast is planar vs geographic.",
+      "readings": [
+        "horizontal/level",
+        "planar (x,y) coordinates",
+        "two-dimensional"
+      ],
+      "disposition": "english",
+      "resolution": "APPLIED: 'A DXF drawing is flat,' -> 'A DXF drawing is planar,'."
+    },
+    {
+      "key": "lpn_file_import_shp_tip",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "'Pick' is informal and the device-verb rule says Select; serial comma missing in '.shx, .dbf and .prj'; comma before the \"or\" clause; 'different ... than'; 'the notice says so' has software saying.",
+      "readings": [
+        "pick = choose at random",
+        "the notice says = speaks"
+      ],
+      "disposition": "english",
+      "resolution": "APPLIED: 'Pick the .zip, or the .shp together with its .shx, .dbf and .prj' -> 'Select either the .zip or the .shp together with its .shx, .dbf, and .prj'; 'different coordinate system than the project ... the notice says so' -> 'different coordinate system from the project ... the notice states this'."
+    },
+    {
+      "key": "lpn_shp_import_noshp",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "'has no .shp file in it' is loose; 'Pick'; missing serial comma; comma before \"or\" clause.",
+      "readings": [
+        "pick at random"
+      ],
+      "disposition": "english",
+      "resolution": "APPLIED: '{file} has no .shp file in it. Pick the .zip of a shapefile, or the .shp ... .dbf and .prj' -> '{file} contains no .shp file. Select either the .zip of a shapefile or the .shp ... .dbf, and .prj'."
+    },
+    {
+      "key": "lpn_shp_import_manyshp",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "'holds' is a listed AI-ism family (a file does not hold).",
+      "readings": [
+        "physically holds",
+        "contains"
+      ],
+      "disposition": "english",
+      "resolution": "APPLIED: 'holds more than one shapefile' -> 'contains more than one shapefile'."
+    },
+    {
+      "key": "lpn_shp_import_pick_hint",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "'Pick' and missing serial comma.",
+      "readings": [
+        "pick at random"
+      ],
+      "disposition": "english",
+      "resolution": "APPLIED: 'Pick the .shp together with its .shx, .dbf and .prj ..., or pick the .zip.' -> 'Select the .shp together with its .shx, .dbf, and .prj ..., or select the .zip.'"
+    },
+    {
+      "key": "lpn_ex_basic_si_desc",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "British spelling 'Litres/metres/millimetres' in a new string (APA/Merriam-Webster ratchet); missing serial comma.",
+      "readings": [
+        "none beyond spelling"
+      ],
+      "disposition": "english",
+      "resolution": "APPLIED: 'Two reservoirs, a pump and a small loop. Litres per second, with metres and millimetres.' -> 'Two reservoirs, a pump, and a small loop. Liters per second, with meters and millimeters.'"
+    },
+    {
+      "key": "lpn_ex_basic_us_desc",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "Missing serial comma.",
+      "readings": [
+        "none"
+      ],
+      "disposition": "english",
+      "resolution": "APPLIED: 'a pump and a small loop' -> 'a pump, and a small loop'."
+    },
+    {
+      "key": "lpn_ex_net2_si_desc",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "British spelling; missing serial commas ('feet and inches', 'no pump and no valves'). 'converted from gallons per minute, feet and inches' could read as three things or as two.",
+      "readings": [
+        "gpm, feet, inches",
+        "gpm-feet and inches"
+      ],
+      "disposition": "english",
+      "resolution": "APPLIED: Litres/metres/millimetres -> Liters/meters/millimeters; 'feet and inches' -> 'feet, and inches'; 'no reservoir, no pump and no valves' -> 'no reservoir, no pump, and no valves'."
+    },
+    {
+      "key": "lpn_ex_net2_desc",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "Missing serial comma.",
+      "readings": [
+        "none"
+      ],
+      "disposition": "english",
+      "resolution": "APPLIED: 'no pump and no valves' -> 'no pump, and no valves'."
+    },
+    {
+      "key": "lpn_ex_net3_si_desc",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "British spelling; missing serial commas.",
+      "readings": [
+        "none beyond spelling"
+      ],
+      "disposition": "english",
+      "resolution": "APPLIED: Litres/metres/millimetres -> Liters/meters/millimeters; 'feet and inches' -> 'feet, and inches'; '3 tanks and 2 reservoirs' -> '3 tanks, and 2 reservoirs'."
+    },
+    {
+      "key": "lpn_ex_net3_desc",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "Missing serial comma.",
+      "readings": [
+        "none"
+      ],
+      "disposition": "english",
+      "resolution": "APPLIED: '3 tanks and 2 reservoirs' -> '3 tanks, and 2 reservoirs'."
+    },
+    {
+      "key": "lpn_ex_elm_street_desc",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "Missing serial comma.",
+      "readings": [
+        "none"
+      ],
+      "disposition": "english",
+      "resolution": "APPLIED: '1 reservoir and 1 pump' -> '1 reservoir, and 1 pump'."
+    },
+    {
+      "key": "lpn_geojson_import_renamed",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "'cannot be Shape IDs and are kept with the Shapes' does not say what is kept or where; the list is 'name (ID)', so the Shape got a different ID. Same for the _one form.",
+      "readings": [
+        "the name is kept as the Shape's ID anyway",
+        "the name is kept as a property",
+        "the name is kept in the list only"
+      ],
+      "disposition": "refer-to-human",
+      "resolution": "Proposed rewrite, not applied because it asserts what is stored: '{n} feature names cannot be used as Shape IDs. Each Shape was given another ID and keeps its feature name: {list}.' and _one: 'One feature name cannot be used as a Shape ID. The Shape was given another ID and keeps its feature name: {list}.' Needs a yes that the name is retained as a property (js/looped-network.js ~37778)."
+    },
+    {
+      "key": "lpn_pane_shape_closed",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "Bare adjective column heading. Translators may render it as the verb 'to close' or as a closed/open state.",
+      "readings": [
+        "Close (command)",
+        "Closed (state: polygon vs polyline)"
+      ],
+      "disposition": "intent",
+      "resolution": "$ec_lang_syn PROPOSAL, not written: 'polygon or polyline; whether the last point connects to the first | layout: column heading; gloss: closed (state, not a command); avoid: the verb to close'."
+    },
+    {
+      "key": "lpn_pane_shape_points",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "Bare 'Points' heading beside many other numeric columns; could be a count or the coordinate list.",
+      "readings": [
+        "the number of points",
+        "the list of point coordinates"
+      ],
+      "disposition": "intent",
+      "resolution": "$ec_lang_syn PROPOSAL, not written: 'vertices, coordinates of the points | layout: column heading; gloss: the list of point coordinates, not a count; avoid: score or marks'."
+    },
+    {
+      "key": "lpn_notes_7_def",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "'move one cell across' and 'one cell back' assume left-to-right reading; 'across' is not a direction in RTL languages (ar, fa, he, ps, ur).",
+      "readings": [
+        "to the right",
+        "to the next column in reading direction"
+      ],
+      "disposition": "intent",
+      "resolution": "$ec_lang_syn PROPOSAL, not written: 'to the next column, to the right in left-to-right languages and to the left in right-to-left languages | layout: keyboard shortcut table; gloss: Tab moves along the row, Enter moves down a column'."
+    },
+    {
+      "key": "lpn_tool_add_shape",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "'Shape' is a capitalized object name with no ordinary-English definition here: an annotation drawn by the user (point, polyline, polygon), not a geometric figure, a hydraulic cross section, and not a network asset. It recurs in about 40 keys (lpn_pane_tab_shapes, lpn_geojson_*, lpn_shp_*, lpn_dxf_*, lpn_mode_add_shape, lpn_snap_shape_point).",
+      "readings": [
+        "geometric form",
+        "cross-section shape of a channel",
+        "drawn annotation object"
+      ],
+      "disposition": "glossary",
+      "resolution": "PROPOSED, not written (glossary edits make payloads stale, which the orchestrator regenerates): add glossary term 'Shape' (concept: annotation-shape): 'a user-drawn annotation, a point, polyline, or polygon on the map; not part of the network and not solved; capitalized in English as a defined object, like Junction or Tank'. Translators use one word everywhere."
+    }
+  ]
+}

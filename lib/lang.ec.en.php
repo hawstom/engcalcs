@@ -1129,14 +1129,14 @@ $ec_lang['lpn_guide_text_alt_box']='Shows, for each scenario, which alternative 
 $ec_lang['lpn_guide_text_full_box']='Lists every node and every link at every reporting time step, in the units shown on the Tables pane. Without an extended period simulation, it shows the current solution at a single instant. Download or print carries every time step, and the table shows one at a time.';
 $ec_lang['lpn_guide_text_calib_box']='Compares a file of field measurements with the calculated results at the same locations and times, one file for each parameter. The file is held for the current session only and is not saved with the project.';
 $ec_lang['lpn_guide_text_notes_popup']='Lists notes on how this page behaves and what it does not do, each as a term followed by its definition. It does not change the network.';
-$ec_lang['lpn_guide_text_hotkeys_popup']='Lists every toolbar button and menu row, the keyboard shortcuts, and an entry for each box. Choosing a row shows where that control is; it never runs it. To search, press Ctrl+K from anywhere, or / while the user manual has focus.';
+$ec_lang['lpn_guide_text_hotkeys_popup']='Lists every toolbar button and menu row, the keyboard shortcuts, and an entry for each box. Choosing a row shows where that control is; it never runs it. To search, press Ctrl+K from anywhere or / while the user manual has focus.';
 // The Find and replace chapter beyond its opening paragraphs, in the Guide's Boxes section
 // (Tom, 2026-10-07). Each _def is HTML: keep the tags. A query inside <code> runs as written in
 // English on a page in any language; translate it with the words the Find box shows in your
 // language, or leave it in English. Asset IDs (60, 247, 330) and the numbers are measured on Net1
 // and Net3 by dev/lpn-spike/user-guide-find-harness.js: never change them in translation.
 $ec_lang['lpn_guide_find_query_term']='The query language';
-$ec_lang['lpn_guide_find_query_def']='<table class="lpn-notes-table"><tbody><tr><td><code>Scope.Property condition value</code></td><td>One condition. The scope is Everything, Junction, Reservoir, Tank, Pipe, Pump, Valve, Text, Customer, or Source. The property is any entry in the Property list for that scope.</td></tr><tr><td>Conditions</td><td>equal to, above, below, contains, n highest, n lowest, and empty. Contains applies to text only. In n highest and n lowest, n is a count, as in 5 highest. With the letter n itself, as in <code>Pipe.Velocity n highest</code>, or with the Value box empty, 10 assets are listed. Empty finds the assets that have no value for the property. Connectivity has four conditions and takes no value.</td></tr><tr><td>Values</td><td>A number is entered without its unit, in the unit shown in Properties and on the Tables pane: 40, not 40 psi. Text, including an ID, is enclosed in single or double quotes: <code>\'60\'</code>.</td></tr><tr><td>AND, OR, and parentheses</td><td>AND is evaluated before OR, and parentheses group conditions. NOT is not available.</td></tr><tr><td>Spelling</td><td>Words are not case sensitive. The English words are accepted in every language, so a query copied from this user manual runs on a page in any language.</td></tr></tbody></table>';
+$ec_lang['lpn_guide_find_query_def']='<table class="lpn-notes-table"><tbody><tr><td><code>Scope.Property condition value</code></td><td>One condition. The scope is Everything, Junction, Reservoir, Tank, Pipe, Pump, Valve, Text, Customer, or Source. The property is any entry in the Property list for that scope.</td></tr><tr><td>Conditions</td><td>equal to, above, below, contains, n highest, n lowest, and empty. Contains applies to text only. In n highest and n lowest, n is a count, as in 5 highest. If the Value box is empty or n is the letter n itself, as in <code>Pipe.Velocity n highest</code>, 10 assets are listed. Empty finds the assets that have no value for the property. Connectivity has four conditions and takes no value.</td></tr><tr><td>Values</td><td>A number is entered without its unit, in the unit shown in Properties and on the Tables pane: 40, not 40 psi. Text, including an ID, is enclosed in single or double quotes: <code>\'60\'</code>.</td></tr><tr><td>AND, OR, and parentheses</td><td>AND is evaluated before OR, and parentheses group conditions. NOT is not available.</td></tr><tr><td>Spelling</td><td>Words are not case sensitive. The English words are accepted in every language, so a query copied from this user manual runs on a page in any language.</td></tr></tbody></table>';
 $ec_lang['lpn_guide_find_examples_term']='Worked examples on Net3';
 $ec_lang['lpn_guide_find_examples_def']='<p>Open the Net3 example to follow these. Pressure is in psi and velocity in ft/s.</p><table class="lpn-notes-table"><tbody><tr><td><code>Everything.ID equal to \'60\'</code></td><td>Junction 60 and Pipe 60. A junction and a pipe can have the same ID, so an ID search under Everything can return more than one asset.</td></tr><tr><td><code>Junction.Pressure below 40</code></td><td>Junctions 10, 40, 50, 20, and 153, lowest pressure first. Junction 10 is at -0.6 psi, a negative pressure that requires review.</td></tr><tr><td><code>Pipe.Velocity 5 highest</code></td><td>Pipes 60, 329, 125, 123, and 149, highest velocity first. Pipe 60 carries 9.3 ft/s.</td></tr><tr><td><code>Junction.Pressure below 20 OR Pipe.Velocity above 5</code></td><td>Junctions 10, 20, 40, and 50, and Pipes 60, 125, and 329: low pressures and high velocities in one list.</td></tr><tr><td><code>Junction.Pressure below 40 AND Junction.Elevation above 100</code></td><td>Junctions 10, 20, 40, and 50, the low pressures on high ground. Both conditions must name the same kind of asset: <code>Junction.Pressure below 40 AND Pipe.Velocity above 3</code> matches nothing, because no asset is both a junction and a pipe.</td></tr><tr><td><code>Pipe.Closed equal to \'closed\'</code></td><td>Pipe 330, the one pipe that is closed in the Net3 file.</td></tr><tr><td><code>Junction.Connectivity no open path to a source</code></td><td>Nothing, as the file is distributed. With Pipe 247 closed (see Replace and Undo), Junctions 215, 217, 219, and 225: the junctions that a break on Pipe 247 would leave without supply. Repeating this for each pipe is a criticality analysis.</td></tr></tbody></table>';
 $ec_lang['lpn_guide_find_results_term']='Results, the selection, and Tables';
@@ -1148,7 +1148,7 @@ $ec_lang['lpn_guide_find_notes_def']='<ul><li>Values are compared at full precis
 // Where the Guide lists its own keys, so that a search for one finds it.
 $ec_lang['lpn_guide_using_heading']='Using the user manual';
 $ec_lang['lpn_guide_keys_term']='User manual keyboard shortcuts';
-$ec_lang['lpn_guide_keys_def']='<table class="lpn-notes-table"><tbody><tr><td>?</td><td>Open the user manual at the control under the pointer or holding focus.</td></tr><tr><td>F1</td><td>Open the user manual at the entry for the box that has focus.</td></tr><tr><td>Ctrl+K</td><td>Open the user manual with the selected text in the search field.</td></tr><tr><td>/</td><td>Select the search field while the user manual has focus.</td></tr><tr><td>Esc</td><td>Close the user manual and return to where you were.</td></tr></tbody></table>';
+$ec_lang['lpn_guide_keys_def']='<table class="lpn-notes-table"><tbody><tr><td>?</td><td>Open the user manual at the control under the pointer or that has focus.</td></tr><tr><td>F1</td><td>Open the user manual at the entry for the box that has focus.</td></tr><tr><td>Ctrl+K</td><td>Open the user manual with the selected text in the search field.</td></tr><tr><td>/</td><td>Select the search field while the user manual has focus.</td></tr><tr><td>Esc</td><td>Close the user manual and return to where you were.</td></tr></tbody></table>';
 // Under a toolbar button in the User guide, naming the menu row that does the same thing.
 // {menu} becomes a path such as "Edit > Delete", drawn with chevrons; keep {menu} as it is.
 $ec_lang['lpn_guide_also']='Also in {menu}';
@@ -1225,9 +1225,9 @@ $ec_lang['lpn_map_unmeasurable']='This page could not determine the size of the 
 // setting is literally GPM or LPS, never "US" or "SI" -- so a water engineer reads the flow unit as
 // the name of the system, and the length units as detail that follows from it.
 $ec_lang['lpn_ex_basic_si_title']='Basic network, L/s (SI)';
-$ec_lang['lpn_ex_basic_si_desc']='Two reservoirs, a pump and a small loop. Litres per second, with metres and millimetres.';
+$ec_lang['lpn_ex_basic_si_desc']='Two reservoirs, a pump, and a small loop. Liters per second, with meters and millimeters.';
 $ec_lang['lpn_ex_basic_us_title']='Basic network, gpm (US)';
-$ec_lang['lpn_ex_basic_us_desc']='Two reservoirs, a pump and a small loop. Gallons per minute, with feet and inches.';
+$ec_lang['lpn_ex_basic_us_desc']='Two reservoirs, a pump, and a small loop. Gallons per minute, with feet and inches.';
 // **NOT PLAIN EPA Net1 ANY MORE, AND THE TITLE SAYS SO** (Tom, 2026-09-08: *"Net1 plus rule-based
 // controls: OK"*). Two `[RULES]` were added to the shipped file so the rule editor can be exercised
 // from the gallery; the rules stay, and the name stops claiming to be the sample as EPA ships it.
@@ -1235,17 +1235,17 @@ $ec_lang['lpn_ex_net1_title']='EPANET Net1 plus rule-based controls';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_ex_net1_desc']='A fictional EPANET example with chlorine, 1 reservoir and 1 tank.';
 $ec_lang['lpn_ex_net2_si_title']='EPANET Net2, L/s (SI)';
-$ec_lang['lpn_ex_net2_si_desc']='Litres per second, with metres and millimetres. An EPANET example at Branford, Connecticut, converted from gallons per minute, feet and inches: 35 junctions and 1 tank, with no reservoir, no pump and no valves, about 2 km by 4 km. Fluoride, a non-reactive substance, enters at one source.';
+$ec_lang['lpn_ex_net2_si_desc']='Liters per second, with meters and millimeters. An EPANET example at Branford, Connecticut, converted from gallons per minute, feet, and inches: 35 junctions and 1 tank, with no reservoir, no pump, and no valves, about 2 km by 4 km. Fluoride, a non-reactive substance, enters at one source.';
 $ec_lang['lpn_ex_net2_title']='EPANET Net2, gpm (US)';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_ex_net2_desc']='Gallons per minute, with feet and inches. An EPANET example at Branford, Connecticut: 35 junctions and 1 tank, with no reservoir, no pump and no valves, about 1 mile by 2 miles. Fluoride, a non-reactive substance, enters at one source.';
+$ec_lang['lpn_ex_net2_desc']='Gallons per minute, with feet and inches. An EPANET example at Branford, Connecticut: 35 junctions and 1 tank, with no reservoir, no pump, and no valves, about 1 mile by 2 miles. Fluoride, a non-reactive substance, enters at one source.';
 $ec_lang['lpn_ex_net3_si_title']='EPANET Net3, L/s (SI)';
-$ec_lang['lpn_ex_net3_si_desc']='Litres per second, with metres and millimetres. An EPANET example at Novato, California, converted from gallons per minute, feet and inches, with the world map behind it: 92 junctions, 3 tanks and 2 reservoirs, no valves, about 8 km square. A 24-hour extended-period simulation, with a source trace from the Lake.';
+$ec_lang['lpn_ex_net3_si_desc']='Liters per second, with meters and millimeters. An EPANET example at Novato, California, converted from gallons per minute, feet, and inches, with the world map behind it: 92 junctions, 3 tanks, and 2 reservoirs, no valves, about 8 km square. A 24-hour extended-period simulation, with a source trace from the Lake.';
 $ec_lang['lpn_ex_net3_title']='EPANET Net3, gpm (US)';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_ex_net3_desc']='Gallons per minute, with feet and inches. An EPANET example at Novato, California, with the world map behind it: 92 junctions, 3 tanks and 2 reservoirs, no valves, about 5 miles square. A 24-hour extended-period simulation, with a source trace from the Lake.';
+$ec_lang['lpn_ex_net3_desc']='Gallons per minute, with feet and inches. An EPANET example at Novato, California, with the world map behind it: 92 junctions, 3 tanks, and 2 reservoirs, no valves, about 5 miles square. A 24-hour extended-period simulation, with a source trace from the Lake.';
 $ec_lang['lpn_ex_elm_street_title']='Elm Street Center, gpm (US)';
-$ec_lang['lpn_ex_elm_street_desc']='Gallons per minute, with feet and inches. Prescott Valley, Arizona: 17 junctions, 1 reservoir and 1 pump. A commercial site solved for fire flow on top of maximum day demand, at one moment in time, drawn over a site plan.';
+$ec_lang['lpn_ex_elm_street_desc']='Gallons per minute, with feet and inches. Prescott Valley, Arizona: 17 junctions, 1 reservoir, and 1 pump. A commercial site solved for fire flow on top of maximum day demand, at one moment in time, drawn over a site plan.';
 $ec_lang['lpn_tool_undo']='Undo';
 $ec_lang['lpn_confirm_example']='This adds the example to the network you already have. Continue?';
 $ec_lang['lpn_field_diameter']='Diameter';
@@ -1473,7 +1473,7 @@ $ec_lang['lpn_area_none']='Nothing found in that area.';
 $ec_lang['lpn_tool_vertices_tip']='Add and remove pipe vertices. Specify a point on a pipe to add a vertex, select a vertex to remove it, and drag a vertex to move it. A vertex changes automatic length, but doesn’t add or change minor (local) losses.';
 $ec_lang['lpn_tool_undo_tip']='Undo history length = 20 actions';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_tool_zoom_extent_tip']='Fit the whole network to the map window. To zoom to a rectangle you drag instead, press W or click the small triangle in the corner of the Zoom to fit toolbar button. See also the zoom controls at the upper right of the map.';
+$ec_lang['lpn_tool_zoom_extent_tip']='Fit the whole network to the map window. To zoom to a rectangle you drag instead, press W or select the small triangle in the corner of the Zoom to fit toolbar button. See also the zoom controls at the upper right of the map.';
 $ec_lang['lpn_tool_zoom_window_tip']='Specify corners or drag a rectangle. Press again for Zoom to fit.';
 // Tom's wording, 2026-09-25.
 $ec_lang['lpn_zoom_in_tip']='Zoom in. Shortcut: +';
@@ -1912,7 +1912,7 @@ $ec_lang_syn['lpn_profile_title']='Profile or cross section along a path, route,
 // the map to see the path, click to add a stop, double-click to finish.
 $ec_lang['lpn_profile_draw_start']='Select the node where the path starts.';
 $ec_lang['lpn_profile_draw_more']='Move over the map to see the path. Select a node to add it. Double-click to finish. Esc cancels.';
-$ec_lang['lpn_profile_draw_blocked']='No route from {a} to {b}. Select another node.';
+$ec_lang['lpn_profile_draw_blocked']='No route from {a} to {b}. Select a different start or end node.';
 $ec_lang['lpn_profile_tap_start']='Select the node where the path starts.';
 $ec_lang['lpn_profile_tap_more']='Select a node to see the path. Press and hold to add it. Double-tap to finish. Press Profile again to cancel.';
 $ec_lang['lpn_profile_say_idle']='Press Profile again to select a new path on the map.';
@@ -2013,7 +2013,7 @@ $ec_lang['lpn_contour_menu']='Contour';
 $ec_lang['lpn_contour_tip']='Show a contour plot on the map: the node colors spread along and beside the pipes, with labeled contour lines. Opens a box to tune it or turn it off.';
 $ec_lang['lpn_contour_plot']='Contour plot';
 $ec_lang['lpn_contour_show']='Show contours';
-$ec_lang['lpn_contour_show_tip']='Clear to hide the fill and the contour lines; check to bring them back as they were. Node colors stay.';
+$ec_lang['lpn_contour_show_tip']='Clear to hide the fill and the contour lines; select to show them again as they were. Node colors stay.';
 $ec_lang['lpn_contour_fill']='Fill';
 $ec_lang['lpn_contour_fill_tip']='Smooth blends the colors from one class to the next. Bands paints each class of the color key flat.';
 $ec_lang['lpn_contour_fill_smooth']='Smooth';
@@ -2956,7 +2956,7 @@ $ec_lang['lpn_labels_show_tip']='The order in which values appear on a label. Th
 // Tom's own words for the control (R-331: "a code or a toggle to 'Use units' for the After string").
 // It heads a narrow column and names each row's tick box.
 $ec_lang['lpn_labels_use_units']='Use units';
-$ec_lang['lpn_labels_use_units_tip']='Check to show the unit in the After box and on the label, and to update it when the units change. Clear to enter custom After text.';
+$ec_lang['lpn_labels_use_units_tip']='Select to show the unit in the After box and on the label, and to update it when the units change. Clear to enter custom After text.';
 // EPANET's own name for a link's starting state, beside the Status row, which is the run's answer.
 $ec_lang['lpn_labels_init_status']='Initial status';
 // The Symbology index, reworked (Tom, R-333: "Node labels, Node colors, Link labels, Link colors,
@@ -3231,7 +3231,7 @@ $ec_lang['lpn_scenario_delete']='Delete scenario';
 $ec_lang['lpn_scenario_delete_confirm']='Delete the scenario {name}, and its {n} overrides? The drawing itself is not changed.';
 $ec_lang['lpn_scenario_override']='Override in this scenario';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_scenario_override_tip']='Checked means this scenario overrides its parent for this value, even when the number is the same. Clear the box to use its parent\'s.';
+$ec_lang['lpn_scenario_override_tip']='Selected means this scenario overrides its parent for this value, even when the number is the same. Clear the box to use its parent\'s.';
 // "Base scenario", not bare "Base" -- an ENGLISH fix, so this needs no _syn either. This is the one
 // place the polysemy genuinely bites: here the word sits beside a NUMBER, in a field popup with no
 // scenario dropdown nearby to frame it, which is exactly the reading that invites "base amount".
@@ -3246,7 +3246,7 @@ $ec_lang['lpn_scenario_push_btn']='Apply Base values to all scenarios';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_scenario_push_tip']='Every scenario goes back to the Base value for the properties whose labels are showing right now. Values entered for them in any scenario are discarded.';
 $ec_lang['lpn_scenario_basic']='Basic mode';
-$ec_lang['lpn_scenario_basic_tip']='Checked: a scenario consists only of the values set in it. Cleared: this menu also offers the Alternatives preview table, which shows how those values are grouped by category, and allows a scenario to have a separate total run time and hydraulic time step. Feedback on this feature is welcome.';
+$ec_lang['lpn_scenario_basic_tip']='Selected: a scenario consists only of the values set in it. Cleared: this menu also offers the Alternatives preview table, which shows how those values are grouped by category, and allows a scenario to have a separate total run time and hydraulic time step. Feedback on this feature is welcome.';
 $ec_lang['lpn_alt_title']='Alternatives preview';
 $ec_lang['lpn_alt_calc_options']='Calculation options';
 $ec_lang['lpn_alt_note']='Base uses the Base alternative of every category. Each scenario has a separate alternative, a child of the Base alternative, for any category that is changed. The number is the count of changed values. The last three columns are calculation options: enter a value for the scenario, or leave it blank to use the parent value. The project values are in Settings, Calculation, Time.';
@@ -4146,7 +4146,7 @@ $ec_lang['lpn_fitting_total']='Total minor (local) loss coefficient, k';
 // The pipe popup\'s own selector.
 $ec_lang['lpn_field_fittings']='Fittings list';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_field_fittings_tip']='A list of fittings from the project library. Its quantities and coefficients are added up into this pipe’s minor loss coefficient, and the coefficient box is then read only. Leave no list chosen to enter the coefficient yourself.';
+$ec_lang['lpn_field_fittings_tip']='A list of fittings from the project library. The quantities and coefficients in the list are summed into this pipe\'s minor loss coefficient, and the coefficient box is read only. To enter the coefficient directly, leave the list unchosen.';
 $ec_lang['lpn_fittings_none']='No fittings list chosen';
 // EPANET 2.2 user manual, Table 3.3, Minor Loss Coefficients for Selected Fittings. THE MANUAL\'S
 // OWN THIRTEEN NAMES, in its own order. CLAUDE.md: default to the EPANET terminology, since a
@@ -4628,14 +4628,14 @@ $ec_lang['lpn_geojson_import_unreadable']='{file} is not a GeoJSON file: {detail
 $ec_lang['lpn_file_import_dxf']='Import DXF shapes…';
 $ec_lang['lpn_file_import_dxf_tip']='Read the points, lines, and polylines of an ASCII DXF file into this project as Shapes, with each layer name kept as a property. Other entities are counted and listed, not imported. The coordinates are read as the X and Y of this project, with no conversion.';
 $ec_lang['lpn_file_import_shp']='Import shapefile shapes…';
-$ec_lang['lpn_file_import_shp_tip']='Read the points, lines, and polygons of an ESRI shapefile into this project as Shapes, with the attribute columns kept as properties. Pick the .zip, or the .shp together with its .shx, .dbf and .prj (hold Ctrl or Shift to select several). Coordinates in a different coordinate system than the project are converted, and the notice says so.';
+$ec_lang['lpn_file_import_shp_tip']='Read the points, lines, and polygons of an ESRI shapefile into this project as Shapes, with the attribute columns kept as properties. Select either the .zip or the .shp together with its .shx, .dbf, and .prj (hold Ctrl or Shift to select several). Coordinates in a different coordinate system from the project are converted, and the notice states this.';
 $ec_lang['lpn_dxf_import_skipped']='{n} entities not imported: {list}.';
 $ec_lang['lpn_dxf_import_skipped_one']='One entity not imported: {list}.';
 $ec_lang['lpn_dxf_import_inblocks']='in block definitions';
 $ec_lang['lpn_dxf_import_bulge']='{n} polylines have arc segments, which were imported as straight segments between their vertices.';
 $ec_lang['lpn_dxf_import_bulge_one']='One polyline has arc segments, which were imported as straight segments between its vertices.';
 $ec_lang['lpn_dxf_import_units']='The drawing states its units as {theirs} and this project uses {ours}. The numbers were not changed.';
-$ec_lang['lpn_dxf_import_refuse_geo']='A DXF drawing is flat, and this project is in latitude and longitude, so the coordinates of {file} have no place in it. Use Convert as… to copy the project into a coordinate system, then import again.';
+$ec_lang['lpn_dxf_import_refuse_geo']='A DXF drawing is planar, and this project is in latitude and longitude, so the coordinates of {file} have no place in it. Use Convert as… to copy the project into a coordinate system, then import again.';
 $ec_lang['lpn_dxf_import_unreadable']='{file} is not an ASCII DXF file.';
 $ec_lang['lpn_dxf_import_binary']='{file} is a binary DXF. Save it from your CAD program as an ASCII DXF, then import again.';
 $ec_lang['lpn_shapes_import_frame']='The coordinates were read as {frame}, with no conversion.';
@@ -4651,10 +4651,10 @@ $ec_lang['lpn_shp_import_prj_other']='The .prj states {theirs}. This project sta
 $ec_lang['lpn_shp_import_refuse_local']='{file} is in latitude and longitude, and this project has no place on the Earth to which they can be converted. Georeference it first with Map, World map, Attach, then import again.';
 $ec_lang['lpn_shp_import_refuse_crs']='{file} states {theirs}, and this project is in {ours}. Nothing was imported and nothing was converted.';
 $ec_lang['lpn_shp_import_refuse_range']='{file} has no .prj file, and its coordinates are not latitudes and longitudes, so they cannot be placed in this project.';
-$ec_lang['lpn_shp_import_noshp']='{file} has no .shp file in it. Pick the .zip of a shapefile, or the .shp together with its .shx, .dbf and .prj (hold Ctrl or Shift to select several).';
-$ec_lang['lpn_shp_import_manyshp']='{file} holds more than one shapefile. Import one at a time.';
+$ec_lang['lpn_shp_import_noshp']='{file} contains no .shp file. Select either the .zip of a shapefile or the .shp together with its .shx, .dbf, and .prj (hold Ctrl or Shift to select several).';
+$ec_lang['lpn_shp_import_manyshp']='{file} contains more than one shapefile. Import one at a time.';
 $ec_lang['lpn_shp_import_unreadable']='{file} is not a shapefile this page can read: {detail}';
-$ec_lang['lpn_shp_import_pick_hint']='A shapefile is several files. Pick the .shp together with its .shx, .dbf and .prj (hold Ctrl or Shift to select several), or pick the .zip.';
+$ec_lang['lpn_shp_import_pick_hint']='A shapefile is several files. Select the .shp together with its .shx, .dbf, and .prj (hold Ctrl or Shift to select several), or select the .zip.';
 $ec_lang['lpn_shp_import_webmerc_ask']='{file} has no .prj file, and its numbers are not latitudes and longitudes, but they fit Web Mercator metres (EPSG:3857), the system QGIS and web maps use. Import them as EPSG:3857 and convert them to this project?';
 $ec_lang['lpn_shp_import_webmerc_ok']='Import as EPSG:3857';
 $ec_lang['lpn_shp_import_webmerc_far_ask']='{file} states {theirs}, and read in that system its coordinates fall {km} km from this project. Read as Web Mercator metres (EPSG:3857), the system QGIS and web maps use, they fall where this project is. Import them as EPSG:3857 and convert them to this project?';
@@ -4762,7 +4762,7 @@ $ec_lang['lpn_inp_drop_pressure_unit']='This file states a pressure unit other t
 
 // Map > Screenshot (Tom, 2026-10-05): a snipping tool that re-draws the dragged map area larger than its screen size (3x unless the Screenshot box says otherwise).
 $ec_lang['lpn_screenshot_menu']='Screenshot';
-$ec_lang['lpn_screenshot_tip']='Take a picture of the map area you drag, at a higher resolution than the screen. Mark it up, then copy it into a report with the Copy button. Click without dragging to take the whole map.';
+$ec_lang['lpn_screenshot_tip']='Take a picture of the map area you drag, at a higher resolution than the screen. Annotate it, then copy it into a report with the Copy button. Click without dragging to take the whole map.';
 $ec_lang['lpn_screenshot_hint']='Drag a rectangle over the map, or click for the whole map. Esc cancels.';
 $ec_lang['lpn_screenshot_copied']='Screenshot copied.';
 $ec_lang['lpn_screenshot_saved']='The clipboard is not available here, so the screenshot was downloaded as a PNG file.';
