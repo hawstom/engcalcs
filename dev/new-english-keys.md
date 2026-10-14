@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**6 still to read on master**, of 6 untranslated keys, of 2562 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**2 still to read on master**, of 2 untranslated keys, of 2632 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -199,20 +199,8 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   @@ NEEDS RULING
 
-## lpn_  (6, 6 to read @@ NEEDS RULING)
+## lpn_  (2, 2 to read @@ NEEDS RULING)
 
-- **`lpn_ex_net2_si_desc`**
-  > Litres per second, with metres and millimetres. An EPANET example at Branford, Connecticut, converted from gallons per minute, feet and inches: 35 junctions and 1 tank, with no reservoir, no pump and no valves, about 2 km by 4 km. Fluoride, a non-reactive substance, enters at one source.
-  @@ NEEDS RULING
-- **`lpn_ex_net2_si_title`**
-  > EPANET Net2, L/s (SI)
-  @@ NEEDS RULING
-- **`lpn_ex_net3_si_desc`**
-  > Litres per second, with metres and millimetres. An EPANET example at Novato, California, converted from gallons per minute, feet and inches, with the world map behind it: 92 junctions, 3 tanks and 2 reservoirs, no valves, about 8 km square. A 24-hour extended-period simulation, with a source trace from the Lake.
-  @@ NEEDS RULING
-- **`lpn_ex_net3_si_title`**
-  > EPANET Net3, L/s (SI)
-  @@ NEEDS RULING
 - **`lpn_tool_zoom_selection`**
   > Zoom to selection
   @@ NEEDS RULING
@@ -224,7 +212,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**215 still to read**, of 218 new keys across 14 unmerged branch(es).
+**145 still to read**, of 148 new keys across 12 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -235,7 +223,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/bentley-interop (`bf07924a`) — 133 new, 133 to read @@ NEEDS RULING
+### feat/bentley-interop (`50fc9870`) — 133 new, 133 to read @@ NEEDS RULING
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -637,7 +625,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Drag to resize
   @@ NEEDS RULING
 
-### feat/button-base (`234bcc76`) — adds no English strings
+### feat/button-base (`f7c5614b`) — adds no English strings
 
 ### feat/desktop (`baba0f04`) — adds no English strings
 
@@ -696,228 +684,13 @@ build for that would be a gate nobody keeps. Refresh it with
   > Not pasted: {n} (the valve types differ).
   @@ NEEDS RULING
 
-### feat/shape (`4a256a6b`) — 70 new, 70 to read @@ NEEDS RULING
-
-- **`lpn_dxf_import_binary`**
-  > {file} is a binary DXF. Save it from your CAD program as an ASCII DXF, then import again.
-  @@ NEEDS RULING
-- **`lpn_dxf_import_bulge`**
-  > {n} polylines have arc segments, which were imported as straight segments between their vertices.
-  @@ NEEDS RULING
-- **`lpn_dxf_import_bulge_one`**
-  > One polyline has arc segments, which were imported as straight segments between its vertices.
-  @@ NEEDS RULING
-- **`lpn_dxf_import_inblocks`**
-  > in block definitions
-  @@ NEEDS RULING
-- **`lpn_dxf_import_paperspace`**
-  > in paper space
-  @@ NEEDS RULING
-- **`lpn_dxf_import_refuse_geo`**
-  > A DXF drawing is flat, and this project is in latitude and longitude, so the coordinates of {file} have no place in it. Use Convert as… to copy the project into a coordinate system, then import again.
-  @@ NEEDS RULING
-- **`lpn_dxf_import_skipped`**
-  > {n} entities not imported: {list}.
-  @@ NEEDS RULING
-- **`lpn_dxf_import_skipped_one`**
-  > One entity not imported: {list}.
-  @@ NEEDS RULING
-- **`lpn_dxf_import_units`**
-  > The drawing states its units as {theirs} and this project uses {ours}. The numbers were not changed.
-  @@ NEEDS RULING
-- **`lpn_dxf_import_unreadable`**
-  > {file} is not an ASCII DXF file.
-  @@ NEEDS RULING
-- **`lpn_file_import_dxf`**
-  > Import DXF shapes…
-  @@ NEEDS RULING
-- **`lpn_file_import_dxf_tip`**
-  > Read the points, lines, and polylines of an ASCII DXF file into this project as Shapes, with each layer name kept as a property. Other entities are counted and listed, not imported. The coordinates are read as the X and Y of this project, with no conversion.
-  @@ NEEDS RULING
-- **`lpn_file_import_shapes`**
-  > Import GeoJSON shapes…
-  @@ NEEDS RULING
-- **`lpn_file_import_shapes_tip`**
-  > Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network from an EPANET file. The project must be georeferenced or state a coordinate system.
-  @@ NEEDS RULING
-- **`lpn_file_import_shp`**
-  > Import shapefile shapes…
-  @@ NEEDS RULING
-- **`lpn_file_import_shp_tip`**
-  > Read the points, lines, and polygons of an ESRI shapefile into this project as Shapes, with the attribute columns kept as properties. Pick the .zip, or the .shp together with its .shx, .dbf and .prj (hold Ctrl or Shift to select several). Coordinates in a different coordinate system than the project are converted, and the notice says so.
-  @@ NEEDS RULING
-- **`lpn_geojson_import_done`**
-  > {n} Shapes imported from {file}.
-  @@ NEEDS RULING
-- **`lpn_geojson_import_done_one`**
-  > One Shape imported from {file}.
-  @@ NEEDS RULING
-- **`lpn_geojson_import_holes`**
-  > {n} polygon holes not imported. A Shape has one boundary.
-  @@ NEEDS RULING
-- **`lpn_geojson_import_holes_one`**
-  > One polygon hole not imported. A Shape has one boundary.
-  @@ NEEDS RULING
-- **`lpn_geojson_import_local`**
-  > GeoJSON positions are latitude and longitude, and this project has no place on the Earth to which they can be converted. Georeference it first with Map, World map, Attach, then import again.
-  @@ NEEDS RULING
-- **`lpn_geojson_import_parts`**
-  > {n} multipart features imported as one Shape for each part.
-  @@ NEEDS RULING
-- **`lpn_geojson_import_parts_one`**
-  > One multipart feature imported as one Shape for each part.
-  @@ NEEDS RULING
-- **`lpn_geojson_import_renamed`**
-  > {n} feature names cannot be Shape IDs and are kept with the Shapes: {list}.
-  @@ NEEDS RULING
-- **`lpn_geojson_import_renamed_one`**
-  > One feature name cannot be a Shape ID and is kept with the Shape: {list}.
-  @@ NEEDS RULING
-- **`lpn_geojson_import_skipped`**
-  > {n} features not imported: {list}.
-  @@ NEEDS RULING
-- **`lpn_geojson_import_skipped_one`**
-  > One feature not imported: {list}.
-  @@ NEEDS RULING
-- **`lpn_geojson_import_unreadable`**
-  > {file} is not a GeoJSON file: {detail}
-  @@ NEEDS RULING
-- **`lpn_geojson_import_why_geometry`**
-  > not a point, line, or polygon
-  @@ NEEDS RULING
-- **`lpn_geojson_import_why_network`**
-  > network asset
-  @@ NEEDS RULING
-- **`lpn_geojson_import_why_position`**
-  > position not a valid latitude and longitude
-  @@ NEEDS RULING
-- **`lpn_mode_add_shape`**
-  > Mode: Add Shape. Specify each point. Specify the last point again or press Enter to finish; specify the first point to close a polygon.
-  @@ NEEDS RULING
-- **`lpn_pane_paste_shape_bad_points`**
-  > Row {row}: {text} is not a list of points. Write each point as {pair}, with a point (.) as the decimal mark, and separate the points with |.
-  @@ NEEDS RULING
-- **`lpn_pane_paste_shape_closed_few`**
-  > Row {row}: a closed Shape needs at least three points.
-  @@ NEEDS RULING
-- **`lpn_pane_paste_shape_no_points`**
-  > Row {row}: a new Shape needs its Points.
-  @@ NEEDS RULING
-- **`lpn_pane_shape_closed`**
-  > Closed
-  @@ NEEDS RULING
-- **`lpn_pane_shape_points`**
-  > Points
-  @@ NEEDS RULING
-- **`lpn_pane_tab_shapes`**
-  > Shapes
-  @@ NEEDS RULING
-- **`lpn_shapes_frame_latlon`**
-  > latitude and longitude
-  @@ NEEDS RULING
-- **`lpn_shapes_frame_xy`**
-  > the X and Y of this project
-  @@ NEEDS RULING
-- **`lpn_shapes_import_frame`**
-  > The coordinates were read as {frame}, with no conversion.
-  @@ NEEDS RULING
-- **`lpn_shapes_import_more`**
-  > and {n} more
-  @@ NEEDS RULING
-- **`lpn_shapes_import_none`**
-  > Nothing was imported from {file}.
-  @@ NEEDS RULING
-- **`lpn_shp_import_attrs`**
-  > Attribute columns kept as properties of each Shape: {list}.
-  @@ NEEDS RULING
-- **`lpn_shp_import_convert_hint`**
-  > Use Convert as… to copy the project into {theirs}, then import again.
-  @@ NEEDS RULING
-- **`lpn_shp_import_converted`**
-  > The coordinates are latitude and longitude. They were converted to {crs} by the transform the map uses.
-  @@ NEEDS RULING
-- **`lpn_shp_import_damaged`**
-  > {file} is damaged or cut short, so nothing was imported.
-  @@ NEEDS RULING
-- **`lpn_shp_import_deleted`**
-  > {n} records marked deleted in the .dbf were not imported.
-  @@ NEEDS RULING
-- **`lpn_shp_import_deleted_one`**
-  > One record marked deleted in the .dbf was not imported.
-  @@ NEEDS RULING
-- **`lpn_shp_import_manyshp`**
-  > {file} holds more than one shapefile. Import one at a time.
-  @@ NEEDS RULING
-- **`lpn_shp_import_noprj`**
-  > There is no .prj file, so the coordinates were read as {frame}, with no conversion.
-  @@ NEEDS RULING
-- **`lpn_shp_import_noshp`**
-  > {file} has no .shp file in it. Pick the .zip of a shapefile, or the .shp together with its .shx, .dbf and .prj (hold Ctrl or Shift to select several).
-  @@ NEEDS RULING
-- **`lpn_shp_import_pick_hint`**
-  > A shapefile is several files. Pick the .shp together with its .shx, .dbf and .prj (hold Ctrl or Shift to select several), or pick the .zip.
-  @@ NEEDS RULING
-- **`lpn_shp_import_prj_other`**
-  > The .prj states {theirs}. This project states no coordinate system, so the coordinates were read as {frame}, with no conversion.
-  @@ NEEDS RULING
-- **`lpn_shp_import_prj_same`**
-  > The .prj states {crs}, the coordinate system of this project, so the coordinates were not changed.
-  @@ NEEDS RULING
-- **`lpn_shp_import_refuse_crs`**
-  > {file} states {theirs}, and this project is in {ours}. Nothing was imported and nothing was converted.
-  @@ NEEDS RULING
-- **`lpn_shp_import_refuse_local`**
-  > {file} is in latitude and longitude, and this project has no place on the Earth to which they can be converted. Georeference it first with Map, World map, Attach, then import again.
-  @@ NEEDS RULING
-- **`lpn_shp_import_refuse_range`**
-  > {file} has no .prj file, and its coordinates are not latitudes and longitudes, so they cannot be placed in this project.
-  @@ NEEDS RULING
-- **`lpn_shp_import_reprojected`**
-  > The coordinates were converted from {theirs} to {ours}.
-  @@ NEEDS RULING
-- **`lpn_shp_import_skipped`**
-  > {n} records not imported, because their shape type is not read: {list}.
-  @@ NEEDS RULING
-- **`lpn_shp_import_skipped_one`**
-  > One record not imported, because its shape type is not read: {list}.
-  @@ NEEDS RULING
-- **`lpn_shp_import_unplaced`**
-  > {n} records have coordinates this project cannot place, such as a latitude beyond the limit of the map. Record numbers: {list}.
-  @@ NEEDS RULING
-- **`lpn_shp_import_unplaced_one`**
-  > One record has coordinates this project cannot place, such as a latitude beyond the limit of the map. Record number: {list}.
-  @@ NEEDS RULING
-- **`lpn_shp_import_unreadable`**
-  > {file} is not a shapefile this page can read: {detail}
-  @@ NEEDS RULING
-- **`lpn_shp_import_webmerc_ask`**
-  > {file} has no .prj file, and its numbers are not latitudes and longitudes, but they fit Web Mercator metres (EPSG:3857), the system QGIS and web maps use. Import them as EPSG:3857 and convert them to this project?
-  @@ NEEDS RULING
-- **`lpn_shp_import_webmerc_far_ask`**
-  > {file} states {theirs}, and read in that system its coordinates fall {km} km from this project. Read as Web Mercator metres (EPSG:3857), the system QGIS and web maps use, they fall where this project is. Import them as EPSG:3857 and convert them to this project?
-  @@ NEEDS RULING
-- **`lpn_shp_import_webmerc_ok`**
-  > Import as EPSG:3857
-  @@ NEEDS RULING
-- **`lpn_snap_shape_point`**
-  > {shape}, point {n}
-  @@ NEEDS RULING
-- **`lpn_tool_add_shape`**
-  > Shape
-  @@ NEEDS RULING
-- **`lpn_tool_add_shape_tip`**
-  > Draw a point, a polyline, or a polygon on the map. A Shape is annotation and is not part of the network. Specify each point, then specify the last point again, press Enter, or right-click to finish. Specify the first point again to close the Shape into a polygon.
-  @@ NEEDS RULING
-
-### feat/si-example-more (`78b63385`) — 2 new, 2 to read @@ NEEDS RULING
+### feat/si-example-more (`e566234b`) — 2 new, 2 to read @@ NEEDS RULING
 
 - **`lpn_ex_net1_si_desc`**
-  > Litres per second, with metres and millimetres. A fictional EPANET example converted from gallons per minute, feet and inches, with chlorine, 1 reservoir, 1 tank and 1 pump, and two rule-based controls.
+  > Liters per second, with meters and millimeters. A fictional EPANET example converted from gallons per minute, feet, and inches, with chlorine, 1 reservoir, 1 tank, 1 pump, and two rule-based controls.
   @@ NEEDS RULING
 - **`lpn_ex_net1_si_title`**
   > EPANET Net1 plus rule-based controls, L/s (SI)
   @@ NEEDS RULING
 
-### feat/tool-key (`dd4bae8c`) — adds no English strings
-
-### feat/zoom-selection (`51bbb738`) — adds no English strings
+### feat/zoom-selection (`684bfd9c`) — adds no English strings

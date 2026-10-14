@@ -222,10 +222,9 @@ console.log('\n--- a toolbar button repainted after initTips() keeps one tip ---
 	ok('...the selection bubble appends it to every instruction',
 		/pc\.lpn_area_hint_shift \|\|/.test(SRC));
 	const areaTip = /\$ec_lang\['lpn_tool_area_tip'\]='([^']*)'/.exec(lang0);
-	// Tom rewrote the button's tip on 2026-10-04 in his own words, so it states the Shift rule
-	// rather than repeating the bubble's sentence word for word.
-	ok('...and the toolbar button\'s own tip states it too',
-		!!areaTip && /Shift/.test(areaTip[1]), areaTip && areaTip[1]);
+	// Tom reworded the button's tip on 2026-10-13 to "Area select window/lasso/polygon", so the Shift
+	// rule now lives in the selection bubble alone (asserted above).
+	ok('...and the toolbar button\'s own tip is the short name Tom ruled', !!areaTip && /^Area select window\/lasso\/polygon/.test(areaTip[1]), areaTip && areaTip[1]);
 
 	global.bootstrap = global.window.bootstrap = priorBootstrap;
 	global.EngCalcs.initTips = priorInit;

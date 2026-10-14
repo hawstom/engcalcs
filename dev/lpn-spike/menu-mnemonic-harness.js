@@ -251,7 +251,7 @@ async function rowSuite(page, label, opts) {
 	}, pc.lpn_tool_undo);
 	ok('...right-justified (floated to the inline end), on the label\'s line, label unmoved', /inline-end|right/.test(geo.float) && geo.labelStill && geo.oneLine, JSON.stringify(geo));
 	ok('...in a muted colour', geo.color !== geo.rowColor, JSON.stringify(geo));
-	ok('Select shows its digit 1, Delete the Delete key', (edit.find((r) => r.t === pc.lpn_tool_select) || {}).hk === '1' && (edit.find((r) => r.t === pc.lpn_tool_delete) || {}).hk === 'Delete');
+	ok('Select shows its digit 0, Delete the Delete key', (edit.find((r) => r.t === pc.lpn_tool_select) || {}).hk === '0' && (edit.find((r) => r.t === pc.lpn_tool_delete) || {}).hk === 'Delete');
 	ok('a row with no shortcut shows none (Find and replace)', (edit.find((r) => r.t === pc.lpn_find_menu) || { hk: 'x' }).hk === '');
 	await page.click('#lpn_menu_edit');
 	await page.click('#lpn_menu_project');

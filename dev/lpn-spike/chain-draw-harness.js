@@ -197,8 +197,8 @@ console.log('\n--- 6. other ways out: right-click, the tool button, another tool
 console.log('\n--- 7. the shortcut and touch ---');
 {
 	const doc = fresh();
-	key('0');
-	ok('0 selects the tool', L.getMode() === 'add-chain');
+	key('1');
+	ok('1 selects the tool', L.getMode() === 'add-chain');
 	click(100, 100, { touch: true });
 	click(300, 100, { touch: true });
 	ok('a tap per vertex works', doc.nodes.length === 2 && doc.links.length === 1);
@@ -206,8 +206,8 @@ console.log('\n--- 7. the shortcut and touch ---');
 	fire('pointerdown', { pointerId: 4, clientX: 500, clientY: 500, pointerType: 'touch', button: 0 });
 	fire('pointerup', { pointerId: 4, clientX: 560, clientY: 560, pointerType: 'touch', button: 0 });
 	ok('a travelling touch places nothing', doc.nodes.length === 2 && doc.links.length === 1);
-	key('1');
-	ok('1 returns to Select and abandons the chain', L.getMode() === 'select' && L.pendingFrom() === null);
+	key('0');
+	ok('0 returns to Select and abandons the chain', L.getMode() === 'select' && L.pendingFrom() === null);
 }
 
 

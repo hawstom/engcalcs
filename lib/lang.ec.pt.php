@@ -668,6 +668,9 @@ $ec_lang['lpn_tool_add_meter']='Cliente';
 $ec_lang['lpn_tool_add_meter_tip']='Indique o ponto do cliente e depois sua conexão: um trecho ou nó. A demanda que você atribui ao cliente é somada ao nó na extremidade mais próxima desse trecho.';
 $ec_lang['lpn_mode_add_meter']='Cliente: indique onde o cliente está, depois selecione o tubo ou o nó que o atende. Ou use Esc para cancelar.';
 $ec_lang['lpn_pane_tab_customers']='Clientes';
+$ec_lang['lpn_pane_tab_shapes']='Figuras';
+$ec_lang['lpn_pane_shape_closed']='Fechado';
+$ec_lang['lpn_pane_shape_points']='Pontos';
 $ec_lang['lpn_customer_heading']='Cliente {id}';
 // ROADMAP Task 247. lpn_field_account and lpn_field_account_tip were DELETED 2026-09-19 (Tom:
 // "Didn't I say to trash Account number since they can just make a Custom property for that or
@@ -776,6 +779,9 @@ $ec_lang['lpn_pane_paste_text_no_position']='Linha {row}: um novo Texto precisa 
 // {id} is what the Text table's own Attached to cell named.
 $ec_lang['lpn_pane_paste_no_anchor']='Linha {row}: {id} ainda não é um nó nem um trecho nesta rede. Cole-o primeiro e depois este Texto.';
 $ec_lang['lpn_pane_paste_customer_no_position']='Linha {row}: um novo Cliente precisa de {first} e {second}.';
+$ec_lang['lpn_pane_paste_shape_no_points']='Linha {row}: uma nova Figura precisa de seus Pontos.';
+$ec_lang['lpn_pane_paste_shape_bad_points']='Linha {row}: {text} não é uma lista de pontos. Escreva cada ponto como {pair}, com ponto (.) como separador decimal, e separe os pontos com |.';
+$ec_lang['lpn_pane_paste_shape_closed_few']='Linha {row}: uma Figura fechada precisa de pelo menos três pontos.';
 $ec_lang['lpn_pane_paste_no_customer_ref']='Linha {row}: um novo Cliente precisa de um trecho ou nó conectado.';
 $ec_lang['lpn_pane_paste_no_pipe']='Linha {row}: o trecho {id} ainda não existe. Cole seus trechos primeiro e depois seus clientes.';
 $ec_lang['lpn_pane_paste_no_customer_node']='Linha {row}: o nó {id} ainda não existe. Cole suas junções primeiro e depois seus clientes.';
@@ -928,7 +934,7 @@ $ec_lang['lpn_help_hotkeys']='Tabelas e atalhos de teclado';
 $ec_lang['lpn_hotkeys_tables_heading']='Tabelas';
 $ec_lang['lpn_hotkeys_map_heading']='Mapa';
 $ec_lang['lpn_hotkeys_map_term']='Atalhos de teclado do mapa';
-$ec_lang['lpn_hotkeys_map_def']='<table class="lpn-notes-table"><tbody><tr><td>1 ou Esc</td><td>Selecionar.</td></tr><tr><td>2</td><td>Adicionar uma junção.</td></tr><tr><td>3</td><td>Adicionar um reservatório.</td></tr><tr><td>4</td><td>Adicionar um tanque.</td></tr><tr><td>5</td><td>Adicionar um tubo.</td></tr><tr><td>6</td><td>Adicionar uma bomba.</td></tr><tr><td>7</td><td>Adicionar uma válvula.</td></tr><tr><td>8</td><td>Adicionar um cliente.</td></tr><tr><td>9</td><td>Adicionar texto.</td></tr><tr><td>Delete</td><td>Excluir a seleção.</td></tr><tr><td>Ctrl+Z</td><td>Desfazer a última alteração.</td></tr><tr><td>+ ou =</td><td>Aumentar o zoom.</td></tr><tr><td>-</td><td>Diminuir o zoom.</td></tr></tbody></table>';
+$ec_lang['lpn_hotkeys_map_def']='<table class="lpn-notes-table"><tbody><tr><td>0 ou Esc</td><td>Selecionar.</td></tr><tr><td>2</td><td>Adicionar uma junção.</td></tr><tr><td>3</td><td>Adicionar um reservatório.</td></tr><tr><td>4</td><td>Adicionar um tanque.</td></tr><tr><td>5</td><td>Adicionar um tubo.</td></tr><tr><td>6</td><td>Adicionar uma bomba.</td></tr><tr><td>7</td><td>Adicionar uma válvula.</td></tr><tr><td>8</td><td>Adicionar um cliente.</td></tr><tr><td>9</td><td>Adicionar texto.</td></tr><tr><td>Delete</td><td>Excluir a seleção.</td></tr><tr><td>Ctrl+Z</td><td>Desfazer a última alteração.</td></tr><tr><td>+ ou =</td><td>Aumentar o zoom.</td></tr><tr><td>-</td><td>Diminuir o zoom.</td></tr></tbody></table>';
 // ---- The one-tap grievance link (ROADMAP Task 207, Rung 0) ----
 // The floor of the cost ladder in dev/dilettante-path.md: a visitor says something is wrong here
 // with one tap and nothing typed. Two sites, one behaviour -- a standing cell in the map's bottom
@@ -938,7 +944,7 @@ $ec_lang['lpn_hotkeys_map_def']='<table class="lpn-notes-table"><tbody><tr><td>1
 // is the honesty boundary that document draws: a thank-you must never imply an answer.
 $ec_lang['lpn_wrong_btn']='Algo errado aqui?';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_wrong_tip']='Relata um erro nesta página. Abre uma caixa para escolher o problema, adicionar um comentário e informar um endereço de e-mail se uma resposta for desejada. Todos os campos são opcionais, e nada é enviado até você pressionar Enviar.';
+$ec_lang['lpn_wrong_tip']='Relatar um erro nesta página. Abre uma caixa para escolher o problema, adicionar um comentário e informar um endereço de e-mail se uma resposta for desejada. Todos os campos são opcionais, e nada é enviado até você pressionar Enviar.';
 $ec_lang['lpn_wrong_thanks']='Obrigado. Seu relatório foi recebido.';
 $ec_lang['lpn_status_example_opened']='{name} aberto como uma cópia. Salve-a com Arquivo, Salvar como.';
 // Stands while the fault stands, rather than expiring like every other notice on the map: it
@@ -953,23 +959,27 @@ $ec_lang['lpn_map_unmeasurable']='Esta página não conseguiu determinar o taman
 // setting is literally GPM or LPS, never "US" or "SI" -- so a water engineer reads the flow unit as
 // the name of the system, and the length units as detail that follows from it.
 $ec_lang['lpn_ex_basic_si_title']='Rede básica, L/s (SI)';
-$ec_lang['lpn_ex_basic_si_desc']='Comece aqui. Um reservatório, uma bomba e um pequeno anel: o menor arranjo que ainda funciona como uma rede de água. Litros por segundo, com metros e milímetros.';
+$ec_lang['lpn_ex_basic_si_desc']='Dois reservatórios, uma bomba e um pequeno anel. Litros por segundo, com metros e milímetros.';
 $ec_lang['lpn_ex_basic_us_title']='Rede básica, gpm (EUA)';
-$ec_lang['lpn_ex_basic_us_desc']='A mesma rede inicial em galões por minuto, com pés e polegadas.';
+$ec_lang['lpn_ex_basic_us_desc']='Dois reservatórios, uma bomba e um pequeno anel. Galões por minuto, com pés e polegadas.';
 // **NOT PLAIN EPA Net1 ANY MORE, AND THE TITLE SAYS SO** (Tom, 2026-09-08: *"Net1 plus rule-based
 // controls: OK"*). Two `[RULES]` were added to the shipped file so the rule editor can be exercised
 // from the gallery; the rules stay, and the name stops claiming to be the sample as EPA ships it.
 $ec_lang['lpn_ex_net1_title']='EPANET Net1 com controles baseados em regras';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_ex_net1_desc']='A menor das três redes de exemplo do próprio EPANET: um reservatório, uma bomba e um único anel.';
-$ec_lang['lpn_ex_net2_title']='EPANET Net2';
+$ec_lang['lpn_ex_net1_desc']='Um exemplo fictício do EPANET com cloro, 1 reservatório e 1 tanque.';
+$ec_lang['lpn_ex_net2_si_title']='EPANET Net2, L/s (SI)';
+$ec_lang['lpn_ex_net2_si_desc']='Litros por segundo, com metros e milímetros. Um exemplo do EPANET em Branford, Connecticut, convertido de galões por minuto, pés e polegadas: 35 junções e 1 tanque, sem reservatório, sem bomba e sem válvulas, com cerca de 2 km por 4 km. O fluoreto, uma substância não reativa, entra em uma fonte.';
+$ec_lang['lpn_ex_net2_title']='EPANET Net2, gpm (EUA)';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_ex_net2_desc']='Um sistema de distribuição ramificado com um tanque, dos exemplos do EPANET.';
-$ec_lang['lpn_ex_net3_title']='EPANET Net3';
+$ec_lang['lpn_ex_net2_desc']='Galões por minuto, com pés e polegadas. Um exemplo do EPANET em Branford, Connecticut: 35 junções e 1 tanque, sem reservatório, sem bomba e sem válvulas, com cerca de 1 milha por 2 milhas. O fluoreto, uma substância não reativa, entra em uma fonte.';
+$ec_lang['lpn_ex_net3_si_title']='EPANET Net3, L/s (SI)';
+$ec_lang['lpn_ex_net3_si_desc']='Litros por segundo, com metros e milímetros. Um exemplo do EPANET em Novato, Califórnia, convertido de galões por minuto, pés e polegadas, com o mapa do mundo por trás: 92 junções, 3 tanques e 2 reservatórios, sem válvulas, com cerca de 8 km de lado. Uma simulação de período estendido de 24 horas, com um rastreamento de fonte a partir do Lago.';
+$ec_lang['lpn_ex_net3_title']='EPANET Net3, gpm (EUA)';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_ex_net3_desc']='O grande exemplo do EPANET: 92 junções, três tanques e dois reservatórios, um deles um rio. Mostra como um modelo de tamanho real aparece no mapa.';
-$ec_lang['lpn_ex_elm_street_title']='Elm Street Center';
-$ec_lang['lpn_ex_elm_street_desc']='Um local comercial resolvido para vazão de incêndio somada à demanda máxima diária, em um único instante, desenhado sobre uma planta do local.';
+$ec_lang['lpn_ex_net3_desc']='Galões por minuto, com pés e polegadas. Um exemplo do EPANET em Novato, Califórnia, com o mapa do mundo por trás: 92 junções, 3 tanques e 2 reservatórios, sem válvulas, com cerca de 5 milhas de lado. Uma simulação de período estendido de 24 horas, com um rastreamento de fonte a partir do Lago.';
+$ec_lang['lpn_ex_elm_street_title']='Elm Street Center, gpm (EUA)';
+$ec_lang['lpn_ex_elm_street_desc']='Galões por minuto, com pés e polegadas. Prescott Valley, Arizona: 17 junções, 1 reservatório e 1 bomba. Um local comercial resolvido para vazão de incêndio somada à demanda máxima diária, em um único instante, desenhado sobre uma planta do local.';
 $ec_lang['lpn_tool_undo']='Desfazer';
 $ec_lang['lpn_confirm_example']='Isso adiciona o exemplo à rede que você já tem. Continuar?';
 $ec_lang['lpn_field_diameter']='Diâmetro';
@@ -1169,7 +1179,7 @@ $ec_lang['lpn_tool_key_hint']='Atalho: pressione {key}.';
 $ec_lang['lpn_tool_key_hint_two']='Atalho: pressione {key} ou {key2}.';
 // Edited by TGH 2026-09-07; the Shift sentence rewritten 2026-09-08 on his ruling that Shift keeps
 // the selection and toggles what the shape catches (it used to say "add").
-$ec_lang['lpn_tool_area_tip']='Siga as instruções na tela. Pressione novamente para alternar entre janela, laço e polígono. Mantenha Shift pressionado para manter a seleção atual e adicionar ou remover (alternar) o que você selecionar.';
+$ec_lang['lpn_tool_area_tip']='Selecionar uma área por janela, laço ou polígono.';
 $ec_lang['lpn_area_selected']='{n} selecionados.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_area_none']='Nada encontrado nessa área.';
@@ -1177,7 +1187,7 @@ $ec_lang['lpn_area_none']='Nada encontrado nessa área.';
 $ec_lang['lpn_tool_vertices_tip']='Adicione e remova vértices de tubo. Indique um ponto em um tubo para adicionar um vértice, selecione um vértice para removê-lo e arraste um vértice para movê-lo. Um vértice altera o comprimento automático, mas não adiciona nem altera perdas localizadas (menores).';
 $ec_lang['lpn_tool_undo_tip']='Tamanho do histórico de desfazer = 20 ações';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_tool_zoom_extent_tip']='Ajusta a rede inteira à janela do mapa. Para Janela de zoom sem ajuste prévio, pressione W ou clique no pequeno triângulo no canto do botão Ver tudo da barra de ferramentas. Veja também os controles de zoom do mapa, no canto superior direito.';
+$ec_lang['lpn_tool_zoom_extent_tip']='Ajustar a rede inteira à janela do mapa. Para, em vez disso, ampliar um retângulo que você arrastar, pressione W ou selecione o pequeno triângulo no canto do botão Ver tudo da barra de ferramentas. Veja também os controles de zoom do mapa, no canto superior direito.';
 $ec_lang['lpn_tool_zoom_window_tip']='Indique dois cantos ou arraste um retângulo. Pressione novamente para Ver tudo.';
 // Tom's wording, 2026-09-25.
 $ec_lang['lpn_zoom_in_tip']='Aumentar zoom. Atalho: +';
@@ -1554,7 +1564,7 @@ $ec_lang['lpn_profile_title']='Perfil ao longo de um caminho';
 // the map to see the path, click to add a stop, double-click to finish.
 $ec_lang['lpn_profile_draw_start']='Selecione o nó onde o caminho começa.';
 $ec_lang['lpn_profile_draw_more']='Mova o cursor sobre o mapa para ver o caminho. Selecione um nó para adicioná-lo. Clique duas vezes para terminar. Esc cancela.';
-$ec_lang['lpn_profile_draw_blocked']='Não há rota de {a} até {b}. Selecione outro nó.';
+$ec_lang['lpn_profile_draw_blocked']='Não há rota de {a} até {b}. Selecione outro nó inicial ou final.';
 $ec_lang['lpn_profile_tap_start']='Selecione o nó onde o caminho começa.';
 $ec_lang['lpn_profile_tap_more']='Selecione um nó para ver o caminho. Pressione e segure para adicioná-lo. Toque duas vezes para terminar. Pressione Perfil novamente para cancelar.';
 $ec_lang['lpn_profile_say_idle']='Pressione Perfil novamente para selecionar um novo caminho no mapa.';
@@ -3794,6 +3804,66 @@ $ec_lang['lpn_ff_err_unknown']='Sem resultado. Código de erro: {code}';
 // a plane coordinate read as a degree is silent and puts a network in the Gulf of Guinea.
 $ec_lang['lpn_file_import_survey']='Importar pontos levantados…';
 $ec_lang['lpn_file_import_survey_tip']='Lê uma lista de pontos levantados de um arquivo de texto e cria uma junção em cada ponto, usando as configurações de novo elemento para tudo que o arquivo não informa. Nenhum tubo é desenhado, a menos que você marque Ler a descrição como códigos de campo, e nenhuma linha é descartada sem ser nomeada. Ele lê o sistema de coordenadas que este projeto já usa, georreferenciado ou não.';
+$ec_lang['lpn_file_import_shapes']='Importar figuras GeoJSON…';
+$ec_lang['lpn_file_import_shapes_tip']='Ler os pontos, as linhas e os polígonos de um arquivo GeoJSON para este projeto como Figuras. Os elementos de rede do arquivo não são importados; importe a rede a partir de um arquivo EPANET. O projeto deve estar georreferenciado ou indicar um sistema de coordenadas.';
+$ec_lang['lpn_geojson_import_done']='{n} Figuras importadas de {file}.';
+$ec_lang['lpn_geojson_import_done_one']='Uma Figura importada de {file}.';
+$ec_lang['lpn_geojson_import_renamed']='{n} nomes de feição não podem ser usados como IDs de Figura. Cada Figura recebeu outro ID e mantém o nome da feição: {list}.';
+$ec_lang['lpn_geojson_import_renamed_one']='Um nome de feição não pode ser usado como ID de Figura. A Figura recebeu outro ID e mantém o nome da feição: {list}.';
+$ec_lang['lpn_geojson_import_skipped']='{n} feições não importadas: {list}.';
+$ec_lang['lpn_geojson_import_skipped_one']='Uma feição não importada: {list}.';
+$ec_lang['lpn_geojson_import_why_network']='elemento de rede';
+$ec_lang['lpn_geojson_import_why_geometry']='não é um ponto, linha ou polígono';
+$ec_lang['lpn_geojson_import_why_position']='posição que não é uma latitude e longitude válidas';
+$ec_lang['lpn_geojson_import_holes']='{n} furos de polígono não importados. Uma Figura tem um único contorno.';
+$ec_lang['lpn_geojson_import_holes_one']='Um furo de polígono não importado. Uma Figura tem um único contorno.';
+$ec_lang['lpn_geojson_import_parts']='{n} feições de várias partes importadas como uma Figura para cada parte.';
+$ec_lang['lpn_geojson_import_parts_one']='Uma feição de várias partes importada como uma Figura para cada parte.';
+$ec_lang['lpn_geojson_import_local']='As posições GeoJSON são latitude e longitude, e este projeto não tem lugar na Terra para o qual possam ser convertidas. Georreferencie-o primeiro em Mapa, Mapa do mundo, Anexar, depois importe de novo.';
+$ec_lang['lpn_geojson_import_unreadable']='{file} não é um arquivo GeoJSON: {detail}';
+$ec_lang['lpn_file_import_dxf']='Importar figuras DXF…';
+$ec_lang['lpn_file_import_dxf_tip']='Ler os pontos, as linhas e as polilinhas de um arquivo DXF ASCII para este projeto como Figuras, mantendo o nome de cada camada como propriedade. As demais entidades são contadas e listadas, não importadas. As coordenadas são lidas como o X e o Y deste projeto, sem conversão.';
+$ec_lang['lpn_file_import_shp']='Importar figuras de shapefile…';
+$ec_lang['lpn_file_import_shp_tip']='Ler os pontos, as linhas e os polígonos de um shapefile ESRI para este projeto como Figuras, mantendo as colunas de atributos como propriedades. Selecione o .zip ou o .shp junto com seus .shx, .dbf e .prj (mantenha Ctrl ou Shift pressionado para selecionar vários). As coordenadas em um sistema de coordenadas diferente do projeto são convertidas, e o aviso informa isso.';
+$ec_lang['lpn_dxf_import_skipped']='{n} entidades não importadas: {list}.';
+$ec_lang['lpn_dxf_import_skipped_one']='Uma entidade não importada: {list}.';
+$ec_lang['lpn_dxf_import_inblocks']='em definições de bloco';
+$ec_lang['lpn_dxf_import_bulge']='{n} polilinhas têm segmentos em arco, que foram importados como segmentos retos entre seus vértices.';
+$ec_lang['lpn_dxf_import_bulge_one']='Uma polilinha tem segmentos em arco, que foram importados como segmentos retos entre seus vértices.';
+$ec_lang['lpn_dxf_import_units']='O desenho indica suas unidades como {theirs} e este projeto usa {ours}. Os números não foram alterados.';
+$ec_lang['lpn_dxf_import_refuse_geo']='Um desenho DXF é plano, e este projeto está em latitude e longitude, então as coordenadas de {file} não têm lugar nele. Use Converter como… para copiar o projeto para um sistema de coordenadas, depois importe de novo.';
+$ec_lang['lpn_dxf_import_unreadable']='{file} não é um arquivo DXF ASCII.';
+$ec_lang['lpn_dxf_import_binary']='{file} é um DXF binário. Salve-o a partir do seu programa CAD como um DXF ASCII, depois importe de novo.';
+$ec_lang['lpn_shapes_import_frame']='As coordenadas foram lidas como {frame}, sem conversão.';
+$ec_lang['lpn_shapes_frame_xy']='o X e o Y deste projeto';
+$ec_lang['lpn_shapes_frame_latlon']='latitude e longitude';
+$ec_lang['lpn_shp_import_skipped']='{n} registros não importados, porque o tipo de forma deles não é lido: {list}.';
+$ec_lang['lpn_shp_import_skipped_one']='Um registro não importado, porque o tipo de forma dele não é lido: {list}.';
+$ec_lang['lpn_shp_import_attrs']='Colunas de atributos mantidas como propriedades de cada Figura: {list}.';
+$ec_lang['lpn_shp_import_noprj']='Não há arquivo .prj, então as coordenadas foram lidas como {frame}, sem conversão.';
+$ec_lang['lpn_shp_import_prj_same']='O .prj indica {crs}, o sistema de coordenadas deste projeto, então as coordenadas não foram alteradas.';
+$ec_lang['lpn_shp_import_converted']='As coordenadas são latitude e longitude. Foram convertidas para {crs} pela transformação que o mapa usa.';
+$ec_lang['lpn_shp_import_prj_other']='O .prj indica {theirs}. Este projeto não indica sistema de coordenadas, então as coordenadas foram lidas como {frame}, sem conversão.';
+$ec_lang['lpn_shp_import_refuse_local']='{file} está em latitude e longitude, e este projeto não tem lugar na Terra para o qual possam ser convertidas. Georreferencie-o primeiro em Mapa, Mapa do mundo, Anexar, depois importe de novo.';
+$ec_lang['lpn_shp_import_refuse_crs']='{file} indica {theirs}, e este projeto está em {ours}. Nada foi importado e nada foi convertido.';
+$ec_lang['lpn_shp_import_refuse_range']='{file} não tem arquivo .prj, e suas coordenadas não são latitudes e longitudes, então não podem ser posicionadas neste projeto.';
+$ec_lang['lpn_shp_import_noshp']='{file} não contém arquivo .shp. Selecione o .zip de um shapefile ou o .shp junto com seus .shx, .dbf e .prj (mantenha Ctrl ou Shift pressionado para selecionar vários).';
+$ec_lang['lpn_shp_import_manyshp']='{file} contém mais de um shapefile. Importe um de cada vez.';
+$ec_lang['lpn_shp_import_unreadable']='{file} não é um shapefile que esta página consiga ler: {detail}';
+$ec_lang['lpn_shp_import_pick_hint']='Um shapefile é composto de vários arquivos. Selecione o .shp junto com seus .shx, .dbf e .prj (mantenha Ctrl ou Shift pressionado para selecionar vários), ou selecione o .zip.';
+$ec_lang['lpn_shp_import_webmerc_ask']='{file} não tem arquivo .prj, e seus números não são latitudes e longitudes, mas se ajustam a metros Web Mercator (EPSG:3857), o sistema que o QGIS e os mapas da web usam. Importá-los como EPSG:3857 e convertê-los para este projeto?';
+$ec_lang['lpn_shp_import_webmerc_ok']='Importar como EPSG:3857';
+$ec_lang['lpn_shp_import_webmerc_far_ask']='{file} indica {theirs}, e lidas nesse sistema suas coordenadas ficam a {km} km deste projeto. Lidas como metros Web Mercator (EPSG:3857), o sistema que o QGIS e os mapas da web usam, ficam onde este projeto está. Importá-los como EPSG:3857 e convertê-los para este projeto?';
+$ec_lang['lpn_shp_import_reprojected']='As coordenadas foram convertidas de {theirs} para {ours}.';
+$ec_lang['lpn_shp_import_unplaced']='{n} registros têm coordenadas que este projeto não consegue posicionar, como uma latitude além do limite do mapa. Números dos registros: {list}.';
+$ec_lang['lpn_shp_import_unplaced_one']='Um registro tem coordenadas que este projeto não consegue posicionar, como uma latitude além do limite do mapa. Número do registro: {list}.';
+$ec_lang['lpn_shapes_import_none']='Nada foi importado de {file}.';
+$ec_lang['lpn_shp_import_convert_hint']='Use Converter como… para copiar o projeto para {theirs}, depois importe de novo.';
+$ec_lang['lpn_shp_import_damaged']='{file} está danificado ou foi cortado, então nada foi importado.';
+$ec_lang['lpn_shp_import_deleted']='{n} registros marcados como excluídos no .dbf não foram importados.';
+$ec_lang['lpn_shp_import_deleted_one']='Um registro marcado como excluído no .dbf não foi importado.';
+$ec_lang['lpn_dxf_import_paperspace']='no espaço do papel';
+$ec_lang['lpn_shapes_import_more']='e mais {n}';
 $ec_lang['lpn_survey_read_error']='Esse arquivo não pôde ser lido do seu disco.';
 $ec_lang['lpn_survey_cancelled']='Nada foi criado e nada foi alterado.';
 // What the project calls its two axes, for a sentence js/lpn-survey.js writes about a column. The
@@ -4002,6 +4072,8 @@ $ec_lang['lpn_fb_failed']='Isso não chegou até nós. O que você escreveu cont
 $ec_lang['lpn_fb_bad_email']='Esse endereço de e-mail não parece correto. Corrija-o ou deixe-o em branco.';
 $ec_lang['lpn_fb_busy']='Chegaram mensagens demais nos últimos minutos. O que você escreveu continua aqui, então você pode tentar mais tarde.';
 $ec_lang['lpn_tool_add_chain_tip']='Encadear junções e tubos: indique um ponto no mapa para adicionar uma junção e depois indique cada ponto seguinte para adicionar um tubo e uma junção. Indique um nó existente para continuar a partir dele. Pressione Esc para encerrar a cadeia.';
+$ec_lang['lpn_tool_add_shape']='Figura';
+$ec_lang['lpn_tool_add_shape_tip']='Desenhar um ponto, uma polilinha ou um polígono no mapa. Uma Figura é uma anotação e não faz parte da rede. Indique cada ponto, depois indique o último ponto de novo, pressione Enter ou clique com o botão direito para concluir. Indique o primeiro ponto de novo para fechar a Figura em um polígono.';
 $ec_lang['lpn_pane_filter_sel_note']='Somente a seleção. Mostrando {n} de {all}.';
 $ec_lang['lpn_pane_filter_sel_and']='Filtrado por {q} e somente a seleção. Mostrando {n} de {all}.';
 $ec_lang['lpn_pane_filter_sel_none']='Nenhum dos elementos selecionados está nesta tabela.';
@@ -4062,6 +4134,7 @@ $ec_lang['lpn_copy_opened_unsaved']='Abriu {file} como uma cópia, com um novo b
 $ec_lang['lpn_engine_unavailable_why']='Válvulas de controle de pressão e de vazão (PRV, PSV, FCV) não podem ser resolvidas sem o solucionador do EPANET. {reason}';
 $ec_lang['lpn_engine_needed_failed_why']='Esta rede só pode ser resolvida pelo solucionador do EPANET. {reason}';
 $ec_lang['lpn_mode_add_chain']='Modo: Cadeia de junção e tubo. Indique um ponto no mapa para adicionar uma junção e depois indique cada ponto seguinte para adicionar um tubo e uma junção. Indique um nó existente para continuar a partir dele. Pressione Esc para encerrar a cadeia. Mude para o modo Selecionar para alterar ou mover elementos e rótulos.';
+$ec_lang['lpn_mode_add_shape']='Modo: Adicionar Figura. Indique cada ponto. Indique o último ponto de novo ou pressione Enter para concluir; indique o primeiro ponto para fechar um polígono.';
 $ec_lang['lpn_cp_allow_tip']='Permitir somente estes caracteres:';
 $ec_lang['lpn_cp_characters_tip']='"@" significa qualquer letra; "#" significa qualquer dígito numérico, e você deve listar separadamente "-", "." e "," se forem permitidos; e quaisquer espaços em branco devem ficar entre outros caracteres.';
 $ec_lang['lpn_valwarn_diameter']='O diâmetro de um tubo ou de uma válvula normalmente fica entre {min} e {max} {unit}. Verifique o número e a unidade do diâmetro.';
@@ -4180,7 +4253,7 @@ $ec_lang['lpn_pda_deficit_note']='Junções que recebem menos que sua demanda: {
 $ec_lang['lpn_diag_pda_pressures']='A pressão necessária deve ser maior que a pressão mínima. Altere uma delas em Configurações.';
 $ec_lang['lpn_inp_drop_pressure_unit']='Este arquivo indica uma unidade de pressão diferente da que esta página lê para a sua unidade de vazão, que é psi para unidades dos EUA e metros nos demais casos. Toda pressão do arquivo é lida assim, então verifique as configurações de válvulas, os emissores e os limites dirigidos pela pressão que ele contém. A linha é mantida e é gravada de volta.';
 $ec_lang['lpn_screenshot_menu']='Captura de tela';
-$ec_lang['lpn_screenshot_tip']='Captura uma imagem da área do mapa que você arrastar, em resolução maior que a da tela. Faça anotações nela e depois copie-a para um relatório com o botão Copiar. Clique sem arrastar para capturar o mapa inteiro.';
+$ec_lang['lpn_screenshot_tip']='Capturar uma imagem da área do mapa que você arrastar, em resolução maior que a da tela. Faça anotações nela e depois copie-a para um relatório com o botão Copiar. Clique sem arrastar para capturar o mapa inteiro.';
 $ec_lang['lpn_screenshot_hint']='Arraste um retângulo sobre o mapa, ou clique para o mapa inteiro. Esc cancela.';
 $ec_lang['lpn_screenshot_copied']='Captura de tela copiada.';
 $ec_lang['lpn_screenshot_saved']='A área de transferência não está disponível aqui, então a captura de tela foi baixada como um arquivo PNG.';
@@ -4202,11 +4275,11 @@ $ec_lang['lpn_tank_ground_elev_tip']='Elevação do terreno no tanque. A pressã
 $ec_lang['lpn_guide_about_heading']='Sobre esta calculadora';
 $ec_lang['lpn_guide_group_from']='Do menu {menu}';
 $ec_lang['lpn_guide_menu_named']='Menu {menu}';
-$ec_lang['lpn_help_manual']='Guia';
+$ec_lang['lpn_help_manual']='Manual do usuário';
 $ec_lang['lpn_guide_contents']='Conteúdo';
 $ec_lang['lpn_guide_rail_hide']='Ocultar o conteúdo';
 $ec_lang['lpn_guide_rail_show']='Mostrar o conteúdo';
-$ec_lang['lpn_guide_search']='Pesquisar no guia';
+$ec_lang['lpn_guide_search']='Pesquisar no manual do usuário';
 $ec_lang['lpn_guide_boxes_heading']='Caixas';
 $ec_lang['lpn_guide_boxes_intro']='Cada caixa pode ser movida, redimensionada, acoplada à esquerda ou à direita do mapa, ou fechada. O ? na barra de título de uma caixa abre a sua ajuda.';
 $ec_lang['lpn_guide_boxes_autohide']='Quando o ponteiro sai, uma caixa sem foco é ocultada após um breve intervalo. Uma caixa com foco é ocultada quando você clica fora dela, pressiona Esc ou sai dela com Tab estando o ponteiro em outro lugar.';
@@ -4226,9 +4299,9 @@ $ec_lang['lpn_guide_text_alt_box']='Mostra, para cada cenário, qual alternativa
 $ec_lang['lpn_guide_text_full_box']='Lista todos os nós e todos os trechos em cada passo de tempo do relatório, nas unidades mostradas no painel Tabelas. Sem simulação de período estendido, mostra a solução atual em um único instante. Baixar ou imprimir inclui todos os passos de tempo, e a tabela mostra um de cada vez.';
 $ec_lang['lpn_guide_text_calib_box']='Compara um arquivo de medições de campo com os resultados calculados nos mesmos locais e horários, um arquivo para cada parâmetro. O arquivo é mantido apenas durante a sessão atual e não é salvo com o projeto.';
 $ec_lang['lpn_guide_text_notes_popup']='Lista observações sobre o comportamento desta página e o que ela não faz, cada uma como um termo seguido de sua definição. Não altera a rede.';
-$ec_lang['lpn_guide_text_hotkeys_popup']='Lista todos os botões da barra de ferramentas e todas as linhas de menu, os atalhos de teclado e uma entrada para cada caixa. Escolher uma linha mostra onde está esse controle; nunca o executa. Para pesquisar, pressione Ctrl+K em qualquer lugar, ou / enquanto o guia tem o foco.';
+$ec_lang['lpn_guide_text_hotkeys_popup']='Lista todos os botões da barra de ferramentas e todas as linhas de menu, os atalhos de teclado e uma entrada para cada caixa. Escolher uma linha mostra onde está esse controle; nunca o executa. Para pesquisar, pressione Ctrl+K em qualquer lugar, ou / enquanto o manual do usuário tem o foco.';
 $ec_lang['lpn_guide_find_query_term']='A linguagem de consulta';
-$ec_lang['lpn_guide_find_query_def']='<table class="lpn-notes-table"><tbody><tr><td><code>Escopo.Propriedade condição valor</code></td><td>Uma condição. O escopo é Tudo, Junção, Reservatório, Tanque, Tubo, Bomba, Válvula, Texto, Cliente ou Fonte. A propriedade é qualquer entrada da lista Propriedade para esse escopo.</td></tr><tr><td>Condições</td><td>igual a, maior que, menor que, contém, n maiores, n menores e vazio. Contém se aplica somente a texto. Em n maiores e n menores, n é uma contagem, como em 5 maiores. Com a própria letra n, como em <code>Pipe.Velocity n highest</code>, ou com a caixa Valor vazia, são listados 10 elementos. Vazio encontra os elementos que não têm valor para a propriedade. Conectividade tem quatro condições e não recebe valor.</td></tr><tr><td>Valores</td><td>Um número é digitado sem a unidade, na unidade mostrada em Propriedades e no painel Tabelas: 40, não 40 psi. O texto, inclusive um ID, é colocado entre aspas simples ou duplas: <code>\'60\'</code>.</td></tr><tr><td>E, OU e parênteses</td><td>E é avaliado antes de OU, e os parênteses agrupam condições. NÃO não está disponível.</td></tr><tr><td>Grafia</td><td>As palavras não diferenciam maiúsculas de minúsculas. As palavras em inglês são aceitas em todos os idiomas, de modo que uma consulta copiada deste guia funciona em uma página em qualquer idioma.</td></tr></tbody></table>';
+$ec_lang['lpn_guide_find_query_def']='<table class="lpn-notes-table"><tbody><tr><td><code>Escopo.Propriedade condição valor</code></td><td>Uma condição. O escopo é Tudo, Junção, Reservatório, Tanque, Tubo, Bomba, Válvula, Texto, Cliente ou Fonte. A propriedade é qualquer entrada da lista Propriedade para esse escopo.</td></tr><tr><td>Condições</td><td>igual a, maior que, menor que, contém, n maiores, n menores e vazio. Contém se aplica somente a texto. Em n maiores e n menores, n é uma contagem, como em 5 maiores. Com a própria letra n, como em <code>Pipe.Velocity n highest</code>, ou com a caixa Valor vazia, são listados 10 elementos. Vazio encontra os elementos que não têm valor para a propriedade. Conectividade tem quatro condições e não recebe valor.</td></tr><tr><td>Valores</td><td>Um número é digitado sem a unidade, na unidade mostrada em Propriedades e no painel Tabelas: 40, não 40 psi. O texto, inclusive um ID, é colocado entre aspas simples ou duplas: <code>\'60\'</code>.</td></tr><tr><td>E, OU e parênteses</td><td>E é avaliado antes de OU, e os parênteses agrupam condições. NÃO não está disponível.</td></tr><tr><td>Grafia</td><td>As palavras não diferenciam maiúsculas de minúsculas. As palavras em inglês são aceitas em todos os idiomas, de modo que uma consulta copiada deste manual do usuário funciona em uma página em qualquer idioma.</td></tr></tbody></table>';
 $ec_lang['lpn_guide_find_examples_term']='Exemplos práticos na Net3';
 $ec_lang['lpn_guide_find_examples_def']='<p>Abra o exemplo Net3 para acompanhar. A pressão está em psi e a velocidade em ft/s.</p><table class="lpn-notes-table"><tbody><tr><td><code>Everything.ID equal to \'60\'</code></td><td>A junção 60 e o tubo 60. Uma junção e um tubo podem ter o mesmo ID, de modo que uma pesquisa de ID em Tudo pode retornar mais de um elemento.</td></tr><tr><td><code>Junction.Pressure below 40</code></td><td>Junções 10, 40, 50, 20 e 153, da menor pressão para a maior. A junção 10 está a -0,6 psi, uma pressão negativa que exige revisão.</td></tr><tr><td><code>Pipe.Velocity 5 highest</code></td><td>Tubos 60, 329, 125, 123 e 149, da maior velocidade para a menor. O tubo 60 conduz 9,3 ft/s.</td></tr><tr><td><code>Junction.Pressure below 20 OR Pipe.Velocity above 5</code></td><td>Junções 10, 20, 40 e 50, e tubos 60, 125 e 329: pressões baixas e velocidades altas em uma só lista.</td></tr><tr><td><code>Junction.Pressure below 40 AND Junction.Elevation above 100</code></td><td>Junções 10, 20, 40 e 50, as pressões baixas em terreno alto. As duas condições devem se referir ao mesmo tipo de elemento: <code>Junction.Pressure below 40 AND Pipe.Velocity above 3</code> não corresponde a nada, porque nenhum elemento é ao mesmo tempo uma junção e um tubo.</td></tr><tr><td><code>Pipe.Closed equal to \'closed\'</code></td><td>O tubo 330, o único tubo fechado no arquivo Net3.</td></tr><tr><td><code>Junction.Connectivity no open path to a source</code></td><td>Nenhuma, como o arquivo é distribuído. Com o tubo 247 fechado (ver Substituir e Desfazer), as junções 215, 217, 219 e 225: as junções que uma ruptura no tubo 247 deixaria sem abastecimento. Repetir isto para cada tubo é uma análise de criticidade.</td></tr></tbody></table>';
 $ec_lang['lpn_guide_find_results_term']='Resultados, a seleção e as Tabelas';
@@ -4237,9 +4310,9 @@ $ec_lang['lpn_guide_find_replace_term']='Substituir e Desfazer';
 $ec_lang['lpn_guide_find_replace_def']='<p>A parte Alterar o que foi encontrado da caixa grava uma propriedade em todos os elementos que a consulta encontrou. Escolha a propriedade na lista Propriedade a alterar, digite o novo valor na caixa Novo valor na unidade exibida e pressione o botão Substituir. A caixa então informa quantos elementos seriam alterados, sem contar os que já têm o novo valor. Pressione o botão Alterar para aplicar a alteração, ou Cancelar. Um Desfazer reverte a substituição inteira.</p><p>Exemplo na Net1: <code>Pipe.Diameter below 10</code> encontra os tubos 31, 122, 113 e 121. Escolha Diâmetro, digite 10 e pressione Substituir; a caixa mostra "Alterar 4 elementos?". Pressione Alterar para definir os quatro tubos como 10 pol. Um Desfazer os devolve a 6 e 8 pol.</p><p>Exemplo na Net3: <code>Pipe.ID equal to \'247\'</code> encontra o tubo 247. Escolha Fechado, escolha Fechado novamente na lista Novo valor e pressione Substituir e depois Alterar, para fechar o tubo para o exemplo de conectividade acima. Desfazer o abre novamente.</p><p>Substituir exige um único tipo de elemento; portanto, em Tudo, escolha primeiro um tipo de elemento na lista O que pesquisar. Em um cenário diferente de Base, a substituição é armazenada nesse cenário, como seria a mesma edição em Propriedades. Onde há elevações do Mapbox disponíveis, a Elevação pode ser substituída pelo DEM do Mapbox em vez de um valor digitado.</p>';
 $ec_lang['lpn_guide_find_notes_term']='Pontos a observar';
 $ec_lang['lpn_guide_find_notes_def']='<ul><li>Os valores são comparados com precisão total e listados com quatro casas decimais. Igual a raramente corresponde a um resultado calculado; use maior que e menor que.</li><li>Pressão, carga, vazão, velocidade e os demais resultados são os do último cálculo. Com a configuração Recalcular automaticamente desmarcada, eles descrevem a rede como estava no último Calcular.</li><li>Maior que e menor que aplicados a texto usam a ordem de dicionário, com os números em ordem numérica: na Net1, <code>Junction.ID above \'20\'</code> encontra as junções 21, 22, 23, 31 e 32.</li><li>Em Tudo, só são oferecidos ID, Descrição, Etiqueta e Conectividade. Escolha um tipo de elemento na lista O que pesquisar para ver a lista completa de propriedades.</li><li>Um item de Texto não tem ID. Pesquise-o pelas suas palavras, como em <code>Text.Text contains \'pump\'</code>.</li><li>As quatro condições de Conectividade para um nó são sem trechos no nó, sem trechos abertos no nó, sem caminho de trechos até uma origem e sem caminho aberto até uma origem. Uma origem é um reservatório ou um tanque.</li></ul>';
-$ec_lang['lpn_guide_using_heading']='Como usar o guia';
-$ec_lang['lpn_guide_keys_term']='Atalhos de teclado do guia';
-$ec_lang['lpn_guide_keys_def']='<table class="lpn-notes-table"><tbody><tr><td>?</td><td>Abre o guia no controle que está sob o ponteiro ou que tem o foco.</td></tr><tr><td>F1</td><td>Abre o guia na entrada da caixa que tem o foco.</td></tr><tr><td>Ctrl+K</td><td>Abre o guia com o texto selecionado no campo de pesquisa.</td></tr><tr><td>/</td><td>Seleciona o campo de pesquisa enquanto o guia tem o foco.</td></tr><tr><td>Esc</td><td>Fecha o guia e retorna ao ponto em que você estava.</td></tr></tbody></table>';
+$ec_lang['lpn_guide_using_heading']='Como usar o manual do usuário';
+$ec_lang['lpn_guide_keys_term']='Atalhos de teclado do manual do usuário';
+$ec_lang['lpn_guide_keys_def']='<table class="lpn-notes-table"><tbody><tr><td>?</td><td>Abrir o manual do usuário no controle que está sob o ponteiro ou que tem o foco.</td></tr><tr><td>F1</td><td>Abrir o manual do usuário na entrada da caixa que tem o foco.</td></tr><tr><td>Ctrl+K</td><td>Abrir o manual do usuário com o texto selecionado no campo de pesquisa.</td></tr><tr><td>/</td><td>Selecionar o campo de pesquisa enquanto o manual do usuário tem o foco.</td></tr><tr><td>Esc</td><td>Fechar o manual do usuário e retornar ao ponto em que você estava.</td></tr></tbody></table>';
 $ec_lang['lpn_guide_also']='Também em {menu}';
 $ec_lang['lpn_guide_how_popup']='Propriedades abre quando você seleciona um elemento ou um texto.';
 $ec_lang['lpn_guide_how_alt']='A Prévia de Alternativas está listada em Água, Cenários quando o Modo básico está desativado.';
@@ -4297,6 +4370,7 @@ $ec_lang['lpn_split_no']='Não';
 $ec_lang['lpn_snap_vertex']='{link}, vértice {n}';
 $ec_lang['lpn_snap_node_on_node']='{new} colocado na posição de {target}. Os dois nós não estão conectados.';
 $ec_lang['lpn_snap_moved_on_node']='{moved} movido para a posição de {target}. Os dois nós não estão conectados.';
+$ec_lang['lpn_snap_shape_point']='{shape}, ponto {n}';
 $ec_lang['lpn_settings_hover_card']='Mostrar o rótulo completo ao passar o ponteiro';
 $ec_lang['lpn_settings_hover_card_tip']='Mantenha o ponteiro sobre um nó, trecho ou cliente para ver seu rótulo conforme especificado em Configurações, em qualquer escala, caiba ou não o rótulo no mapa. Esta é uma configuração deste navegador, não do projeto.';
 $ec_lang['lpn_scenario_delete_in_base']='Para removê-lo do desenho, exclua-o no cenário {base}.';

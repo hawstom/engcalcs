@@ -35,7 +35,14 @@ const geo = d.project.coords === 'geo';
 const crs = d.project.crs || null;
 if (crs && !CRS_METRE_TWIN[crs]) { throw new Error(crs + ' has no metre twin listed; extend the converter'); }
 const r = (x) => Number(x.toPrecision(SIG));
-const L = (x) => r(x * FT), Dm = (x) => r(x * IN), Q = (x) => r(x * GPM);
+// TOM'S ROUNDING, 2026-10-13: "Round all the pipe diameters to the nearest 50 mm. Round all the base
+// demands and curve flows to the nearest 0.001 L/s. Round all the res. heads, tank depths and
+// diameters, control depths, curve heads and pipe lengths to the nearest 0.001m". An SI twin is an SI
+// design, not a bit-exact image of the US one. And the same day: "Elevations: Can you round them also
+// to the nearest 0.001m?"
+const step = (x, s) => Number((Math.round(x / s) * s).toFixed(Math.max(0, -Math.floor(Math.log10(s)))));
+const L = (x) => r(x * FT);
+const L3 = (x) => step(x * FT, 0.001), D50 = (x) => Math.max(50, step(x * IN, 50)), Q3 = (x) => step(x * GPM, 0.001);
 function conv(rec, keys, f) {
 	keys.forEach((k) => {
 		if (typeof rec[k] === 'number') { rec[k] = f(rec[k]); }
@@ -58,16 +65,16 @@ if (d.units0.lpn_u_age) { d.units.lpn_u_age = d.units0.lpn_u_age; }
 const Dr = geo ? ((x) => x) : ((x) => Number((x * FT).toPrecision(DSIG)));
 d.nodes.forEach((n) => {
 	conv(n, ['x', 'y', 'lx', 'ly'], Dr);
-	conv(n, ['elev', '_head', '_level', 'minLevel', 'maxLevel', 'tankDiameter'], L);
-	conv(n, ['_demand'], Q);
+	conv(n, ['elev', '_head', '_level', 'minLevel', 'maxLevel', 'tankDiameter'], L3);
+	conv(n, ['_demand'], Q3);
 	if (n.demands) { throw new Error('node ' + n.id + ' has a demand list; extend the converter'); }
 });
 d.links.forEach((l) => {
 	conv(l, ['lx', 'ly'], Dr);
 	(l.verts || []).forEach((v) => { conv(v, ['x', 'y'], Dr); });
-	conv(l, ['_length'], L);
-	conv(l, ['_diameter'], Dm);
-	if (l.curvePoints) { l.curvePoints = l.curvePoints.map((p) => [Q(p[0]), L(p[1])]); }
+	conv(l, ['_length'], L3);
+	conv(l, ['_diameter'], D50);
+	if (l.curvePoints) { l.curvePoints = l.curvePoints.map((p) => [Q3(p[0]), L3(p[1])]); }
 	['_minorLoss', 'setting', '_setting'].forEach((k) => { if (l[k] !== undefined && l.type !== 'pipe') { throw new Error('link ' + l.id + ' has ' + k); } });
 });
 (d.labels || []).forEach((t) => { conv(t, ['x', 'y'], Dr); });
@@ -91,7 +98,7 @@ const SUFFIX_SI = { ' ft H2O': ' m H2O', ' gpm': ' L/s', ' in': ' mm', ' ft': ' 
 });
 (d.curves || []).forEach((c) => {
 	if (c.kind !== 'head') { throw new Error('curve ' + c.id + ' is ' + c.kind + '; extend the converter'); }
-	c.points = c.points.map((p) => [Q(p[0]), L(p[1])]);
+	c.points = c.points.map((p) => [Q3(p[0]), L3(p[1])]);
 	const comments = (c.src || []).filter((s) => /^;/.test(s));
 	c.src = comments.concat(c.points.map((p) => ' ' + String(c.id).padEnd(16) + '\t' + String(p[0]).padEnd(12) + '\t' + p[1]));
 	delete c.tok;
@@ -99,7 +106,7 @@ const SUFFIX_SI = { ' ft H2O': ' m H2O', ' gpm': ' L/s', ' in': ' mm', ' ft': ' 
 (d.controls || []).forEach((c) => {
 	if (c.condition && c.condition.kind === 'node') {
 		if (c.condition.unit !== 'head') { throw new Error('control on a pressure; extend the converter'); }
-		const v = L(c.condition.value);
+		const v = L3(c.condition.value);
 		c.raw = c.raw.replace(/\S+\s*$/, String(v));
 		c.condition.value = v;
 		c.text = Object.assign({}, c.text, { value: String(v) });

@@ -234,6 +234,10 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 	<?php // The Profile tab menu's EPANET .PRO picker (Task 604). Its own input: it sets the profile path, not a project. ?>
 	<input type="file" id="lpn_profile_file" accept=".pro,.txt,text/plain" style="display:none">
 	<input type="file" id="lpn_survey_file" accept=".csv,.txt,.pnt,.pts,text/csv,text/plain" style="display:none">
+	<input type="file" id="lpn_geojson_file" accept=".geojson,.json,application/geo+json,application/json" style="display:none">
+	<?php // Task 779: DXF and shapefile Shapes. Each its own input, as the GeoJSON one is; the shapefile one takes several files so a .shp can arrive with its .dbf and .prj. ?>
+	<input type="file" id="lpn_dxf_shapes_file" accept=".dxf" style="display:none">
+	<input type="file" id="lpn_shp_file" accept=".zip,.shp,.dbf,.prj,.cpg,.shx" multiple style="display:none">
 	<?php // Library import (Task 611). A picker of its own, and it takes the same two extensions
 	      // #lpn_project_file does because it reads the same kind of file -- but it lands somewhere
 	      // else entirely: it copies one library (pipe types, fittings or curves) into the project
@@ -964,6 +968,9 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 		      // table! Yes!"). The pane generates one tab per row of paneTables(), so a Customer
 		      // table is a row in that list plus this host div, and nothing else. ?>
 		<div id="lpn_pane_customers" class="lpn-pane-panel lpn-pane-scroll" role="tabpanel" aria-labelledby="lpn_pane_tab_customers"></div>
+		<?php // The Shape table (Task 779; Tom, 2026-10-11: "I need to be able to paste shapes so that
+		      // I can import and export."). ?>
+		<div id="lpn_pane_shapes" class="lpn-pane-panel lpn-pane-scroll" role="tabpanel" aria-labelledby="lpn_pane_tab_shapes"></div>
 	</div>
 </div>
 <?php // position:fixed, not absolute: the popup is positioned from pointer-event clientX/clientY
@@ -1926,7 +1933,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 <section class="lpn-guide-section" data-guide-section="map">
 <h2><?=$ec_lang['lpn_hotkeys_map_heading']?></h2>
 <dl>
-	<dt class="lpn-guide-dup"><?=$ec_lang['lpn_hotkeys_map_term']?></dt><dd><?=str_replace('</tbody></table>', '<tr><td>W</td><td>' . $ec_lang['lpn_hotkeys_zoomwin_def'] . '</td></tr></tbody></table>', $ec_lang['lpn_hotkeys_map_def'])?></dd>
+	<dt class="lpn-guide-dup"><?=$ec_lang['lpn_hotkeys_map_term']?></dt><dd><?=str_replace('</tbody></table>', '<tr><td>W</td><td>' . $ec_lang['lpn_hotkeys_zoomwin_def'] . '</td></tr></tbody></table>', preg_replace('~</tr>~', '</tr><tr><td>1</td><td>' . $ec_lang['lpn_tool_add_chain'] . '</td></tr><tr><td>A</td><td>' . rtrim($ec_lang['lpn_tool_area_tip'], '.') . '</td></tr>', $ec_lang['lpn_hotkeys_map_def'], 1))?></dd>
 </dl>
 </section>
 <section class="lpn-guide-section" data-guide-section="snip">
@@ -1996,6 +2003,9 @@ EngCalcs.pageConfig = {
 	lpn_tool_add_meter_tip: <?=json_encode($ec_lang['lpn_tool_add_meter_tip'])?>,
 	lpn_mode_add_meter: <?=json_encode($ec_lang['lpn_mode_add_meter'])?>,
 	lpn_pane_tab_customers: <?=json_encode($ec_lang['lpn_pane_tab_customers'])?>,
+	lpn_pane_tab_shapes: <?=json_encode($ec_lang['lpn_pane_tab_shapes'])?>,
+	lpn_pane_shape_closed: <?=json_encode($ec_lang['lpn_pane_shape_closed'])?>,
+	lpn_pane_shape_points: <?=json_encode($ec_lang['lpn_pane_shape_points'])?>,
 	lpn_customer_heading: <?=json_encode($ec_lang['lpn_customer_heading'])?>,
 	lpn_field_meter_demand: <?=json_encode($ec_lang['lpn_field_meter_demand'])?>,
 	lpn_field_meter_count: <?=json_encode($ec_lang['lpn_field_meter_count'])?>,
@@ -2063,6 +2073,9 @@ EngCalcs.pageConfig = {
 	lpn_pane_paste_text_no_position: <?=json_encode($ec_lang['lpn_pane_paste_text_no_position'])?>,
 	lpn_pane_paste_no_anchor: <?=json_encode($ec_lang['lpn_pane_paste_no_anchor'])?>,
 	lpn_pane_paste_customer_no_position: <?=json_encode($ec_lang['lpn_pane_paste_customer_no_position'])?>,
+	lpn_pane_paste_shape_no_points: <?=json_encode($ec_lang['lpn_pane_paste_shape_no_points'])?>,
+	lpn_pane_paste_shape_bad_points: <?=json_encode($ec_lang['lpn_pane_paste_shape_bad_points'])?>,
+	lpn_pane_paste_shape_closed_few: <?=json_encode($ec_lang['lpn_pane_paste_shape_closed_few'])?>,
 	lpn_pane_paste_no_customer_ref: <?=json_encode($ec_lang['lpn_pane_paste_no_customer_ref'])?>,
 	lpn_pane_paste_no_pipe: <?=json_encode($ec_lang['lpn_pane_paste_no_pipe'])?>,
 	lpn_pane_paste_no_customer_node: <?=json_encode($ec_lang['lpn_pane_paste_no_customer_node'])?>,
@@ -2831,6 +2844,7 @@ EngCalcs.pageConfig = {
 	lpn_snap_vertex: <?=json_encode($ec_lang['lpn_snap_vertex'])?>,
 	lpn_snap_node_on_node: <?=json_encode($ec_lang['lpn_snap_node_on_node'])?>,
 	lpn_snap_moved_on_node: <?=json_encode($ec_lang['lpn_snap_moved_on_node'])?>,
+	lpn_snap_shape_point: <?=json_encode($ec_lang['lpn_snap_shape_point'])?>,
 	lpn_field_to: <?=json_encode($ec_lang['lpn_field_to'])?>,
 	// The minor-loss table, the same one mphl, hw, dw, mhp, bpn and ip all link to. One URL rather
 	// than three: k is one quantity whatever friction method carries the pipe alongside it. The
@@ -2921,6 +2935,7 @@ EngCalcs.pageConfig = {
 	lpn_mode_add_valve: <?=json_encode($ec_lang['lpn_mode_add_valve'])?>,
 	lpn_mode_add_text: <?=json_encode($ec_lang['lpn_mode_add_text'])?>,
 	lpn_mode_add_chain: <?=json_encode($ec_lang['lpn_mode_add_chain'])?>,
+	lpn_mode_add_shape: <?=json_encode($ec_lang['lpn_mode_add_shape'])?>,
 	lpn_tip_select: <?=json_encode($ec_lang['lpn_tip_select'])?>,
 	bpn_demand: <?=json_encode($ec_lang['bpn_demand'])?>,
 	bpn_method: <?=json_encode($ec_lang['bpn_method'])?>,
@@ -3211,6 +3226,8 @@ EngCalcs.pageConfig = {
 	lpn_tool_key_hint: <?=json_encode($ec_lang['lpn_tool_key_hint'])?>,
 	lpn_tool_key_hint_two: <?=json_encode($ec_lang['lpn_tool_key_hint_two'])?>,
 	lpn_tool_add_chain_tip: <?=json_encode($ec_lang['lpn_tool_add_chain_tip'])?>,
+	lpn_tool_add_shape: <?=json_encode($ec_lang['lpn_tool_add_shape'])?>,
+	lpn_tool_add_shape_tip: <?=json_encode($ec_lang['lpn_tool_add_shape_tip'])?>,
 	lpn_tool_undo_tip: <?=json_encode($ec_lang['lpn_tool_undo_tip'])?>,
 	lpn_tool_zoom_extent_tip: <?=json_encode($ec_lang['lpn_tool_zoom_extent_tip'])?>,
 	lpn_screenshot_menu: <?=json_encode($ec_lang['lpn_screenshot_menu'])?>,
@@ -4035,6 +4052,66 @@ EngCalcs.pageConfig = {
         // search and terrain blocks above it are. ?>
 	lpn_file_import_survey: <?=json_encode($ec_lang['lpn_file_import_survey'])?>,
 	lpn_file_import_survey_tip: <?=json_encode($ec_lang['lpn_file_import_survey_tip'])?>,
+	lpn_file_import_shapes: <?=json_encode($ec_lang['lpn_file_import_shapes'])?>,
+	lpn_file_import_shapes_tip: <?=json_encode($ec_lang['lpn_file_import_shapes_tip'])?>,
+	lpn_file_import_dxf: <?=json_encode($ec_lang['lpn_file_import_dxf'])?>,
+	lpn_file_import_dxf_tip: <?=json_encode($ec_lang['lpn_file_import_dxf_tip'])?>,
+	lpn_file_import_shp: <?=json_encode($ec_lang['lpn_file_import_shp'])?>,
+	lpn_file_import_shp_tip: <?=json_encode($ec_lang['lpn_file_import_shp_tip'])?>,
+	lpn_dxf_import_skipped: <?=json_encode($ec_lang['lpn_dxf_import_skipped'])?>,
+	lpn_dxf_import_skipped_one: <?=json_encode($ec_lang['lpn_dxf_import_skipped_one'])?>,
+	lpn_dxf_import_inblocks: <?=json_encode($ec_lang['lpn_dxf_import_inblocks'])?>,
+	lpn_dxf_import_bulge: <?=json_encode($ec_lang['lpn_dxf_import_bulge'])?>,
+	lpn_dxf_import_bulge_one: <?=json_encode($ec_lang['lpn_dxf_import_bulge_one'])?>,
+	lpn_dxf_import_units: <?=json_encode($ec_lang['lpn_dxf_import_units'])?>,
+	lpn_dxf_import_refuse_geo: <?=json_encode($ec_lang['lpn_dxf_import_refuse_geo'])?>,
+	lpn_dxf_import_unreadable: <?=json_encode($ec_lang['lpn_dxf_import_unreadable'])?>,
+	lpn_dxf_import_binary: <?=json_encode($ec_lang['lpn_dxf_import_binary'])?>,
+	lpn_shapes_import_frame: <?=json_encode($ec_lang['lpn_shapes_import_frame'])?>,
+	lpn_shapes_frame_xy: <?=json_encode($ec_lang['lpn_shapes_frame_xy'])?>,
+	lpn_shapes_frame_latlon: <?=json_encode($ec_lang['lpn_shapes_frame_latlon'])?>,
+	lpn_shp_import_skipped: <?=json_encode($ec_lang['lpn_shp_import_skipped'])?>,
+	lpn_shp_import_skipped_one: <?=json_encode($ec_lang['lpn_shp_import_skipped_one'])?>,
+	lpn_shp_import_attrs: <?=json_encode($ec_lang['lpn_shp_import_attrs'])?>,
+	lpn_shp_import_noprj: <?=json_encode($ec_lang['lpn_shp_import_noprj'])?>,
+	lpn_shp_import_prj_same: <?=json_encode($ec_lang['lpn_shp_import_prj_same'])?>,
+	lpn_shp_import_converted: <?=json_encode($ec_lang['lpn_shp_import_converted'])?>,
+	lpn_shp_import_prj_other: <?=json_encode($ec_lang['lpn_shp_import_prj_other'])?>,
+	lpn_shp_import_refuse_local: <?=json_encode($ec_lang['lpn_shp_import_refuse_local'])?>,
+	lpn_shp_import_refuse_crs: <?=json_encode($ec_lang['lpn_shp_import_refuse_crs'])?>,
+	lpn_shp_import_refuse_range: <?=json_encode($ec_lang['lpn_shp_import_refuse_range'])?>,
+	lpn_shp_import_noshp: <?=json_encode($ec_lang['lpn_shp_import_noshp'])?>,
+	lpn_shp_import_manyshp: <?=json_encode($ec_lang['lpn_shp_import_manyshp'])?>,
+	lpn_shp_import_unreadable: <?=json_encode($ec_lang['lpn_shp_import_unreadable'])?>,
+	lpn_shp_import_pick_hint: <?=json_encode($ec_lang['lpn_shp_import_pick_hint'])?>,
+	lpn_shp_import_webmerc_ask: <?=json_encode($ec_lang['lpn_shp_import_webmerc_ask'])?>,
+	lpn_shp_import_webmerc_far_ask: <?=json_encode($ec_lang['lpn_shp_import_webmerc_far_ask'])?>,
+	lpn_shp_import_webmerc_ok: <?=json_encode($ec_lang['lpn_shp_import_webmerc_ok'])?>,
+	lpn_shp_import_reprojected: <?=json_encode($ec_lang['lpn_shp_import_reprojected'])?>,
+	lpn_shp_import_unplaced: <?=json_encode($ec_lang['lpn_shp_import_unplaced'])?>,
+	lpn_shp_import_unplaced_one: <?=json_encode($ec_lang['lpn_shp_import_unplaced_one'])?>,
+	lpn_shapes_import_none: <?=json_encode($ec_lang['lpn_shapes_import_none'])?>,
+	lpn_shp_import_convert_hint: <?=json_encode($ec_lang['lpn_shp_import_convert_hint'])?>,
+	lpn_shp_import_damaged: <?=json_encode($ec_lang['lpn_shp_import_damaged'])?>,
+	lpn_shp_import_deleted: <?=json_encode($ec_lang['lpn_shp_import_deleted'])?>,
+	lpn_shp_import_deleted_one: <?=json_encode($ec_lang['lpn_shp_import_deleted_one'])?>,
+	lpn_dxf_import_paperspace: <?=json_encode($ec_lang['lpn_dxf_import_paperspace'])?>,
+	lpn_shapes_import_more: <?=json_encode($ec_lang['lpn_shapes_import_more'])?>,
+	lpn_geojson_import_done: <?=json_encode($ec_lang['lpn_geojson_import_done'])?>,
+	lpn_geojson_import_done_one: <?=json_encode($ec_lang['lpn_geojson_import_done_one'])?>,
+	lpn_geojson_import_renamed: <?=json_encode($ec_lang['lpn_geojson_import_renamed'])?>,
+	lpn_geojson_import_renamed_one: <?=json_encode($ec_lang['lpn_geojson_import_renamed_one'])?>,
+	lpn_geojson_import_skipped_one: <?=json_encode($ec_lang['lpn_geojson_import_skipped_one'])?>,
+	lpn_geojson_import_holes_one: <?=json_encode($ec_lang['lpn_geojson_import_holes_one'])?>,
+	lpn_geojson_import_parts_one: <?=json_encode($ec_lang['lpn_geojson_import_parts_one'])?>,
+	lpn_geojson_import_skipped: <?=json_encode($ec_lang['lpn_geojson_import_skipped'])?>,
+	lpn_geojson_import_why_network: <?=json_encode($ec_lang['lpn_geojson_import_why_network'])?>,
+	lpn_geojson_import_why_geometry: <?=json_encode($ec_lang['lpn_geojson_import_why_geometry'])?>,
+	lpn_geojson_import_why_position: <?=json_encode($ec_lang['lpn_geojson_import_why_position'])?>,
+	lpn_geojson_import_holes: <?=json_encode($ec_lang['lpn_geojson_import_holes'])?>,
+	lpn_geojson_import_parts: <?=json_encode($ec_lang['lpn_geojson_import_parts'])?>,
+	lpn_geojson_import_local: <?=json_encode($ec_lang['lpn_geojson_import_local'])?>,
+	lpn_geojson_import_unreadable: <?=json_encode($ec_lang['lpn_geojson_import_unreadable'])?>,
 	lpn_survey_read_error: <?=json_encode($ec_lang['lpn_survey_read_error'])?>,
 	lpn_survey_cancelled: <?=json_encode($ec_lang['lpn_survey_cancelled'])?>,
 	lpn_survey_axis_north: <?=json_encode($ec_lang['lpn_survey_axis_north'])?>,
@@ -4104,6 +4181,7 @@ EngCalcs.pageConfig = {
 <script src="/engcalcs/js/lpn-inp.js?v=<?=filemtime(__DIR__.'/js/lpn-inp.js')?>"></script>
 <?php // The GeoJSON writer (ROADMAP Task 728). Pure; reads EngCalcs.lpnNumText from lpn-inp.js, so AFTER it. ?>
 <script src="/engcalcs/js/lpn-geojson.js?v=<?=filemtime(__DIR__.'/js/lpn-geojson.js')?>"></script>
+<script src="/engcalcs/js/lpn-gisread.js?v=<?=filemtime(__DIR__.'/js/lpn-gisread.js')?>"></script>
 <?php // The clock's RUN half (ROADMAP Task 248). AFTER lpn-patterns.js, which it reads for
       // lpnParseTime, lpnTimeText and lpnTimesDefaults; BEFORE looped-network.js, which calls
       // EngCalcs.lpnTimeInit() at script scope to register its own bottom-pane tab. Get this

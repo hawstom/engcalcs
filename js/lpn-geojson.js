@@ -103,7 +103,7 @@
 			inverse = opts.crsInverse || EngCalcs.lpnCrsInverse,
 			results = opts.results || null, hasResults = !!results,
 			nodes = doc.nodes || [], links = doc.links || [],
-			nodeById = {}, features = [], counts = { junction: 0, reservoir: 0, tank: 0, pipe: 0, pump: 0, valve: 0 },
+			nodeById = {}, features = [], counts = { junction: 0, reservoir: 0, tank: 0, pipe: 0, pump: 0, valve: 0, shape: 0 },
 			i, j, bad = null;
 
 		function refuse(error, detail) { return { ok: false, error: error, detail: detail === undefined ? '' : detail }; }
@@ -329,6 +329,40 @@
 			counts[lk.type]++;
 		}
 
+		// ---- Shapes (Task 779): map annotation, in no scenario ----
+		(doc.shapes || []).forEach(function (sh) {
+			var pts = sh.pts || [], ring = [], k, g, sp, area = 0, c;
+			for (k = 0; k < pts.length; k++) {
+				c = position(pts[k], absX(pts[k], null), absY(pts[k], null));
+				if (!c) { return; }
+				// An elevation the file stated rides through as the third number (RFC 7946 3.1.1).
+				if (typeof pts[k].z === 'number') { c.push(num(pts[k], 'z', pts[k].z)); }
+				ring.push(c);
+			}
+			if (!ring.length) { return; }
+			if (ring.length === 1) { g = { type: 'Point', coordinates: ring[0] }; }
+			else if (sh.closed && ring.length >= 3) {
+				// RFC 7946 3.1.6: a linear ring is closed (its first and last positions are the same)
+				// and an exterior ring is counterclockwise. The Shape keeps the order it was drawn in;
+				// a clockwise one is written reversed, from the same first point.
+				for (k = 0; k < pts.length; k++) {
+					var a = ring[k], b = ring[(k + 1) % ring.length];
+					area += (+jsonText(a[0])) * (+jsonText(b[1])) - (+jsonText(b[0])) * (+jsonText(a[1]));
+				}
+				if (area < 0) { ring = [ring[0]].concat(ring.slice(1).reverse()); }
+				g = { type: 'Polygon', coordinates: [ring.concat([ring[0]])] };
+			} else { g = { type: 'LineString', coordinates: ring }; }
+			sp = { name: String(sh.id), element: 'Shape' };
+			putText(sp, 'description', sh.desc);
+			// The other properties an imported feature stated, carried through as they came.
+			Object.keys(sh.props || {}).forEach(function (key) { if (!(key in sp)) { sp[key] = sh.props[key]; } });
+			var f = { type: 'Feature' };
+			if (sh.fid !== undefined) { f.id = sh.fid; }
+			f.geometry = g; f.properties = sp;
+			features.push(f);
+			counts.shape++;
+		});
+
 		if (bad) { return refuse('range', bad); }
 		if (!features.length) { return refuse('empty'); }
 
@@ -360,4 +394,133 @@
 				lines.join(',\n') + '\n]}\n'
 		};
 	};
+
+	/**
+	 * **READ A GeoJSON FILE'S POINTS, LINES AND POLYGONS AS SHAPES** (Task 779). Pure: the caller
+	 * places the positions in the project. RFC 7946: section 3.1.1 a position is [longitude,
+	 * latitude] and may carry an elevation; 3.1.2 Point; 3.1.4 LineString (two or more positions);
+	 * 3.1.6 Polygon, whose first ring is the exterior and whose first and last positions are the
+	 * same; 3.1.3, 3.1.5 and 3.1.7 the Multi* forms; 3.1.8 GeometryCollection; 3.2 Feature; 3.3
+	 * FeatureCollection. A bare geometry or a single Feature is read as a collection of one.
+	 *
+	 * **NOTHING IS DROPPED WITHOUT BEING NAMED.** A feature carrying `node_type` or `link_type` is a
+	 * network asset (the writer above and Gusnet both mark them so) and is listed, not imported. A
+	 * geometry that is not one of the seven, or a position that is not a longitude and latitude, is
+	 * listed. A Multi* or a GeometryCollection becomes one Shape per part and is counted; a polygon's
+	 * holes are counted. The closing position of a ring is the first position again, so it is not a
+	 * point of the Shape. A third number is carried as `z`. Every number keeps its characters where
+	 * the browser reports them (JSON.parse source text access), else String() of the value.
+	 *
+	 * Returns { ok: true, shapes: [{ name, srcName, desc, props, fid, closed, pts: [{ lon, lat, z?, tok }] }],
+	 *           skipped: [{ name, why: 'network' | 'geometry' | 'position' }], holes, multipart }
+	 *      or { ok: false, detail }.
+	 */
+	EngCalcs.lpnGeoJsonShapes = function (text) {
+		var root2, out = [], skipped = [], holes = 0, multipart = 0;
+		try {
+			root2 = JSON.parse(String(text), function (key, value, ctx) {
+				if (typeof value === 'number' && ctx && typeof ctx.source === 'string') {
+					return new Num(value, ctx.source);
+				}
+				return value;
+			});
+		} catch (e) { return { ok: false, detail: String(e && e.message ? e.message : e) }; }
+		function n(v) { return v instanceof Num ? v.v : v; }
+		function tokOf(v) { return v instanceof Num ? v.t : (typeof v === 'number' ? String(v) : undefined); }
+		function plain(v) {
+			var o, k;
+			if (v instanceof Num) { return v.v; }
+			if (Array.isArray(v)) { return v.map(plain); }
+			if (v && typeof v === 'object') { o = {}; for (k in v) { if (Object.prototype.hasOwnProperty.call(v, k)) { o[k] = plain(v[k]); } } return o; }
+			return v;
+		}
+		function pos(c) {
+			var lon, lat, p;
+			if (!Array.isArray(c) || c.length < 2) { return null; }
+			lon = n(c[0]); lat = n(c[1]);
+			if (typeof lon !== 'number' || typeof lat !== 'number' || !(lon >= -180 && lon <= 180 && lat >= -90 && lat <= 90)) { return null; }
+			p = { lon: lon, lat: lat, tok: { x: tokOf(c[0]), y: tokOf(c[1]) } };
+			if (c.length > 2 && typeof n(c[2]) === 'number') { p.z = n(c[2]); p.tok.z = tokOf(c[2]); }
+			return p;
+		}
+		function list(cs) {
+			var r = [], i, p;
+			if (!Array.isArray(cs)) { return null; }
+			for (i = 0; i < cs.length; i++) { p = pos(cs[i]); if (!p) { return null; } r.push(p); }
+			return r;
+		}
+		function sameXY(a, b) { return a.lon === b.lon && a.lat === b.lat; }
+		// One geometry into Shapes (pushed onto `into`); false when it cannot be read.
+		function geom(g, into) {
+			var p, l, i, parts;
+			if (!g || typeof g !== 'object') { return false; }
+			switch (g.type) {
+			case 'Point':
+				p = pos(g.coordinates); if (!p) { return 'position'; }
+				into.push({ closed: false, pts: [p] }); return true;
+			case 'LineString':
+				l = list(g.coordinates); if (!l || !l.length) { return 'position'; }
+				into.push({ closed: false, pts: l }); return true;
+			case 'Polygon':
+				if (!Array.isArray(g.coordinates) || !g.coordinates.length) { return 'position'; }
+				l = list(g.coordinates[0]); if (!l || !l.length) { return 'position'; }
+				if (l.length > 1 && sameXY(l[0], l[l.length - 1])) { l.pop(); }
+				holes += g.coordinates.length - 1;
+				into.push({ closed: l.length >= 3, pts: l }); return true;
+			case 'MultiPoint': case 'MultiLineString': case 'MultiPolygon':
+				if (!Array.isArray(g.coordinates)) { return 'position'; }
+				parts = [];
+				for (i = 0; i < g.coordinates.length; i++) {
+					var r = geom({ type: g.type.slice(5), coordinates: g.coordinates[i] }, parts);
+					if (r !== true) { return r; }
+				}
+				if (parts.length > 1) { multipart++; }
+				Array.prototype.push.apply(into, parts); return true;
+			case 'GeometryCollection':
+				if (!Array.isArray(g.geometries)) { return 'geometry'; }
+				parts = [];
+				for (i = 0; i < g.geometries.length; i++) {
+					var r2 = geom(g.geometries[i], parts);
+					if (r2 !== true) { return r2; }
+				}
+				if (parts.length > 1) { multipart++; }
+				Array.prototype.push.apply(into, parts); return true;
+			default:
+				return 'geometry';
+			}
+		}
+		var feats;
+		if (!root2 || typeof root2 !== 'object') { return { ok: false, detail: 'not a JSON object' }; }
+		if (root2.type === 'FeatureCollection') {
+			if (!Array.isArray(root2.features)) { return { ok: false, detail: 'a FeatureCollection with no features list' }; }
+			feats = root2.features;
+		} else if (root2.type === 'Feature') { feats = [root2]; }
+		else if (typeof root2.type === 'string') { feats = [{ type: 'Feature', geometry: root2, properties: null }]; }
+		else { return { ok: false, detail: 'no GeoJSON type member' }; }
+		feats.forEach(function (f, idx) {
+			var pr = (f && f.properties && typeof f.properties === 'object') ? plain(f.properties) : {},
+				name = (pr.name !== undefined && pr.name !== null && pr.name !== '') ? String(pr.name)
+					: (f && f.id !== undefined ? String(plain(f.id)) : ''),
+				label = name || ('#' + (idx + 1)), got = [], r, props = {}, k;
+			if (pr.node_type !== undefined || pr.link_type !== undefined) { skipped.push({ name: label, why: 'network' }); return; }
+			r = geom(f && f.geometry, got);
+			if (r !== true) { skipped.push({ name: label, why: r === 'position' ? 'position' : 'geometry' }); return; }
+			for (k in pr) {
+				if (Object.prototype.hasOwnProperty.call(pr, k) && k !== 'name' && k !== 'description' && k !== 'element') { props[k] = pr[k]; }
+			}
+			got.forEach(function (sh) {
+				// The ID is tried from a single-part feature's name; every part keeps the name the
+				// file gave it (`srcName`), so the page can carry it where it cannot be an ID.
+				sh.name = got.length > 1 ? '' : name;
+				sh.srcName = name;
+				if (pr.description !== undefined && pr.description !== null && pr.description !== '') { sh.desc = String(pr.description); }
+				if (Object.keys(props).length) { sh.props = JSON.parse(JSON.stringify(props)); }
+				if (f && f.id !== undefined && got.length === 1) { sh.fid = plain(f.id); }
+				out.push(sh);
+			});
+		});
+		return { ok: true, shapes: out, skipped: skipped, holes: holes, multipart: multipart };
+	};
+	/** A number and the characters it was written as in the file. */
+	function Num(v, t) { this.v = v; this.t = t; }
 }(typeof globalThis !== 'undefined' ? globalThis : this));

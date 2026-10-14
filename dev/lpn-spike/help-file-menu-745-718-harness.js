@@ -124,12 +124,12 @@ console.log('\n-- Task 745: the Tables and Hotkeys box exists and opens from Hel
 	// object the toolbar's own shortcuts come from -- so a digit rebound later and never re-gathered
 	// here is a red build rather than a silently stale help box.
 	const toolKeysMatch = src.match(/var LPN_TOOL_KEYS = \{([^}]*)\}/);
-	// **0 (Junction and Pipe, Task 719) IS NOT YET IN THE TABLE**, for the reason Redo is not: a row
-	// there is new markup, and 'lang markup matches English' refuses it until all 26 languages carry
-	// the row. The key is named on the tool's own tip meanwhile. When the row lands, drop this filter.
+	// Digit 1 (the Chain) is spliced into the table by Looped-Network.php, like the W row, so it is
+	// checked against that source below rather than against the language value.
 	const allDigits = toolKeysMatch ? (toolKeysMatch[1].match(/'(\d)':/g) || []).map(s => s[1]) : [];
-	const digits = allDigits.filter(d => d !== '0');
-	report(allDigits.length === 10 && digits.length === 9, 'read all ten tool digits out of LPN_TOOL_KEYS (nine in the table)', `${allDigits.length}`);
+	const digits = allDigits.filter(d => d !== '1');
+	report(/<td>1<\/td><td>' \. \$ec_lang\['lpn_tool_add_chain'\]/.test(page), 'digit 1 (the Chain) is spliced into the Map table with the tool\'s own label');
+	report(allDigits.length === 10 && digits.length === 9, 'read all ten tool digits out of LPN_TOOL_KEYS (nine in the language value, the Chain spliced)', `${allDigits.length}`);
 	const mapDef = mapDefMatch ? mapDefMatch[1] : '';
 	digits.forEach(function (d) {
 		report(new RegExp('<td>' + d + '(?: |<)').test(mapDef), 'digit ' + d + ' is in the Map table');
