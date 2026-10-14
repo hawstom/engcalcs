@@ -189,9 +189,9 @@ async function main() {
 		const BASEW = await L('lpn_scenario_base');
 		const listed = all.map(strip).filter((t) => treeNames.indexOf(t) >= 0);
 		ok('O6 the scenario menu lists every scenario in the manager\'s tree order (depth first)', JSON.stringify(listed) === JSON.stringify(treeNames), JSON.stringify(listed));
-		ok('O6 ...EPS is followed by its child EPS Pump off and then that one\'s four children, before the flow tests',
+		ok('O6 ...EPS is followed by its child EPS Pump off and then that one\'s four children, and only then by EPS\'s siblings',
 			treeNames.indexOf('EPS Pump off') === treeNames.indexOf('EPS') + 1 && treeNames.indexOf('1-hr drain w pump off') === treeNames.indexOf('EPS Pump off') + 1 &&
-			treeNames.indexOf('1. Flow test: Static') > treeNames.indexOf('16-hr drain w pump off'), JSON.stringify(treeNames));
+			treeNames.indexOf('16-hr drain w pump off') === treeNames.indexOf('EPS Pump off') + 4 && treeNames.indexOf('No wells') > treeNames.indexOf('16-hr drain w pump off'), JSON.stringify(treeNames));
 		// ---- I2 ----
 		console.log('\n--- I2. The child icon only where there are children ---');
 		const rows = await smRows();

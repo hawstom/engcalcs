@@ -6092,7 +6092,7 @@ var EngCalcs = EngCalcs || {};
 	function smInUseText(tree, key, name) {
 		var pc = EngCalcs.pageConfig || {};
 		var label = function (scn, n) { return (scn ? (pc.lpn_sm_item_scenario || 'Scenario {name}') : (pc.lpn_sm_item_alternative || 'Alternative {name}')).replace('{name}', n); };
-		return (pc.lpn_sm_in_use || '{item} cannot be deleted while it is used by\\n{list}').replace(/\\n/g, '\n')
+		return (pc.lpn_sm_in_use || '{item}\\ncannot be deleted while it is used by\\n{list}').replace(/\\n/g, '\n')
 			.replace('{item}', label(smKind(tree) === 'scn', name))
 			.replace('{list}', smInUseItems(tree, key).map(function (x) { return label(x.scn, x.name); }).join('\n'));
 	}
