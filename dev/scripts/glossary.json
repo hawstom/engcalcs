@@ -4265,7 +4265,7 @@
                 "a price tag, a name tag, or an HTML tag"
             ],
             "context": "A free-text category word an EPANET .inp file may carry for a junction, pipe or other asset, in its [TAGS] section. This page carries tags through a round trip and shows each asset's Tag in its Properties (lpn_field_tag), where the user can edit it.",
-            "translation_notes": "There is no settled word for this in most languages, and the natural candidate collides with the word this suite already uses for its own Label object. Four sprint-573 agents independently borrowed the English 'tag' rather than take that collision, which is the recommended handling: borrow, or use a word your language reserves for a data field's category value. Never reuse the Label word. | [2026-09-14, sprint 667 write-back] Harvested from the shipped lpn_field_tag each agent chose. FOUR ARE DELIBERATELY ABSENT -- es, it, sw and tr each rendered Tag and this page's own Label with the IDENTICAL word (Etiqueta, Etichetta, Lebo, Etiket), so the Properties box shows two fields with one name. Absent means unconfirmed, not untranslated; see dev/english-friction/667-lpn-delta.json.",
+            "translation_notes": "There is no settled word for this in most languages, and the natural candidate collides with the word this suite already uses for its own Label object. Four sprint-573 agents independently borrowed the English 'tag' rather than take that collision, which is the recommended handling: borrow, or use a word your language reserves for a data field's category value. Never reuse the Label word. | [2026-09-14, sprint 667 write-back] Harvested from the shipped lpn_field_tag each agent chose. FOUR ARE DELIBERATELY ABSENT -- es, it, sw and tr each rendered Tag and this page's own Label with the IDENTICAL word (Etiqueta, Etichetta, Lebo, Etiket), so the Properties box shows two fields with one name. Absent means unconfirmed, not untranslated; see dev/english-friction/667-lpn-delta.json. | [2026-10-14, sprint 1014] sw now renders Tag as 'Tagi', distinct from its Label word Lebo, so sw is no longer one of the colliding four; es, it and tr still collide (Etiqueta, Etichetta, Etiket).",
             "translations": {
                 "en": "Tag",
                 "am": "ተለጣፊ",
@@ -4289,7 +4289,8 @@
                 "sr": "Таг",
                 "uk": "Тег",
                 "ur": "ٹیگ",
-                "zh": "标记"
+                "zh": "标记",
+                "sw": "Tagi"
             },
             "source": "harvested"
         },
@@ -4832,9 +4833,35 @@
                 "a word for a hydraulic or network element"
             ],
             "context": "The toolbar's Shape tool (key F, for Figure), the Shapes table, and the GeoJSON, shapefile, and DXF import and export messages (lpn_tool_add_shape, lpn_pane_tab_shapes, lpn_geojson_*, lpn_shp_*, lpn_dxf_*).",
-            "translation_notes": "Tom, 2026-10-13: \"The synonym for Shape is Figure, not really Form.\" Choose your language's word for a drawn figure in the drafting or GIS sense (a feature drawn on a map), used as a noun for one object, and use it the same way in every Shape key. [2026-10-14, Wave 0 sprint 1014: the term recurs in about 40 keys.]",
+            "translation_notes": "Tom, 2026-10-13: \"The synonym for Shape is Figure, not really Form.\" Choose your language's word for a drawn figure in the drafting or GIS sense (a feature drawn on a map), used as a noun for one object, and use it the same way in every Shape key. [2026-10-14, Wave 0 sprint 1014: the term recurs in about 40 keys.] | [2026-10-14, sprint 1014 write-back] Harvested from each language's shipped lpn_tool_add_shape. zh chose 形状 because 图形 is already its Graphs word; pt, ar, fa, ur and ps chose words their files do not use for picture or plot.",
             "translations": {
-                "en": "Shape"
+                "en": "Shape",
+                "am": "ስዕል",
+                "ar": "شكل",
+                "bg": "Фигура",
+                "bn": "চিত্র",
+                "cs": "Útvar",
+                "de": "Figur",
+                "es": "Figura",
+                "fa": "شکل",
+                "fr": "Figure",
+                "he": "צורה",
+                "hi": "आकृति",
+                "hr": "Lik",
+                "id": "Bentuk",
+                "it": "Figura",
+                "km": "រូបគូរ",
+                "my": "ရေးဆွဲပုံ",
+                "ps": "شکل",
+                "pt": "Figura",
+                "ro": "Figură",
+                "ru": "Фигура",
+                "sr": "Фигура",
+                "sw": "Kielelezo",
+                "tr": "Figür",
+                "uk": "Фігура",
+                "ur": "شکل",
+                "zh": "形状"
             },
             "source": "wave0-1014"
         }

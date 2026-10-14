@@ -668,6 +668,9 @@ $ec_lang['lpn_tool_add_meter']='用户';
 $ec_lang['lpn_tool_add_meter_tip']='指定用户所在的点，再指定其连接：一条连接线或一个节点。您为该用户设定的需水量会加到该连接线最近一端的节点上。';
 $ec_lang['lpn_mode_add_meter']='模式：用户。点击用户所在的位置，然后点击为其供水的管道或节点。或按 Esc 取消。';
 $ec_lang['lpn_pane_tab_customers']='用户';
+$ec_lang['lpn_pane_tab_shapes']='形状';
+$ec_lang['lpn_pane_shape_closed']='闭合';
+$ec_lang['lpn_pane_shape_points']='点';
 $ec_lang['lpn_customer_heading']='用户 {id}';
 // ROADMAP Task 247. lpn_field_account and lpn_field_account_tip were DELETED 2026-09-19 (Tom:
 // "Didn't I say to trash Account number since they can just make a Custom property for that or
@@ -776,6 +779,9 @@ $ec_lang['lpn_pane_paste_text_no_position']='第 {row} 行：新的文字需要�
 // {id} is what the Text table's own Attached to cell named.
 $ec_lang['lpn_pane_paste_no_anchor']='第 {row} 行：{id} 尚不是此管网中的节点或管道。请先粘贴它，再粘贴此文字。';
 $ec_lang['lpn_pane_paste_customer_no_position']='第 {row} 行：新的用户需要同时给出 {first} 和 {second}。';
+$ec_lang['lpn_pane_paste_shape_no_points']='第 {row} 行：新的形状需要给出各点。';
+$ec_lang['lpn_pane_paste_shape_bad_points']='第 {row} 行：{text} 不是点列表。请将每个点写成 {pair}，小数点使用英文句点 (.)，各点之间用 | 分隔。';
+$ec_lang['lpn_pane_paste_shape_closed_few']='第 {row} 行：闭合的形状至少需要三个点。';
 $ec_lang['lpn_pane_paste_no_customer_ref']='第 {row} 行：新的用户需要连接到一条管道或一个节点。';
 $ec_lang['lpn_pane_paste_no_pipe']='第 {row} 行：管道 {id} 尚不存在。请先粘贴您的管道，再粘贴您的用户。';
 $ec_lang['lpn_pane_paste_no_customer_node']='第 {row} 行：节点 {id} 尚不存在。请先粘贴您的节点，再粘贴您的用户。';
@@ -884,7 +890,7 @@ $ec_lang['lpn_field_tank_diameter_tip']='水箱的横向宽度（直径）。其
 // 'head' is a documented trap term in glossary.json. This tip names it as a level, which is the
 // same guard lpn_field_head_tip carries for the reservoir.
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_tank_head_tip']='水箱内水面的标高：底部高程加上水深。';
+$ec_lang['lpn_tank_head_tip']='水箱内的水面高程：底部高程加上水深。';
 $ec_lang['lpn_close']='关闭';
 // The property popup's own name, in its drag bar (Tom, 2026-09-08: *"maybe the right title is
 // 'Properties'"*). It names the BOX, not the element in it: lpn_popup_title below the bar carries
@@ -929,7 +935,7 @@ $ec_lang['lpn_help_hotkeys']='表格与快捷键';
 $ec_lang['lpn_hotkeys_tables_heading']='表格';
 $ec_lang['lpn_hotkeys_map_heading']='地图';
 $ec_lang['lpn_hotkeys_map_term']='地图键盘快捷键';
-$ec_lang['lpn_hotkeys_map_def']='<table class="lpn-notes-table"><tbody><tr><td>0 或 Esc</td><td>选择。</td></tr><tr><td>2</td><td>添加节点。</td></tr><tr><td>3</td><td>添加水库。</td></tr><tr><td>4</td><td>添加水池。</td></tr><tr><td>5</td><td>添加管道。</td></tr><tr><td>6</td><td>添加水泵。</td></tr><tr><td>7</td><td>添加阀门。</td></tr><tr><td>8</td><td>添加用户。</td></tr><tr><td>9</td><td>添加文字。</td></tr><tr><td>Delete</td><td>删除所选内容。</td></tr><tr><td>Ctrl+Z</td><td>撤销上一次更改。</td></tr><tr><td>+ 或 =</td><td>放大。</td></tr><tr><td>-</td><td>缩小。</td></tr></tbody></table>';
+$ec_lang['lpn_hotkeys_map_def']='<table class="lpn-notes-table"><tbody><tr><td>0 或 Esc</td><td>选择。</td></tr><tr><td>2</td><td>添加节点。</td></tr><tr><td>3</td><td>添加水库。</td></tr><tr><td>4</td><td>添加水箱。</td></tr><tr><td>5</td><td>添加管道。</td></tr><tr><td>6</td><td>添加水泵。</td></tr><tr><td>7</td><td>添加阀门。</td></tr><tr><td>8</td><td>添加用户。</td></tr><tr><td>9</td><td>添加文字。</td></tr><tr><td>Delete</td><td>删除所选内容。</td></tr><tr><td>Ctrl+Z</td><td>撤销上一次更改。</td></tr><tr><td>+ 或 =</td><td>放大。</td></tr><tr><td>-</td><td>缩小。</td></tr></tbody></table>';
 // ---- The one-tap grievance link (ROADMAP Task 207, Rung 0) ----
 // The floor of the cost ladder in dev/dilettante-path.md: a visitor says something is wrong here
 // with one tap and nothing typed. Two sites, one behaviour -- a standing cell in the map's bottom
@@ -954,23 +960,27 @@ $ec_lang['lpn_map_unmeasurable']='本页面无法确定绘图区域的尺寸，�
 // setting is literally GPM or LPS, never "US" or "SI" -- so a water engineer reads the flow unit as
 // the name of the system, and the length units as detail that follows from it.
 $ec_lang['lpn_ex_basic_si_title']='基本管网，升/秒（公制）';
-$ec_lang['lpn_ex_basic_si_desc']='从这里开始。一个水库、一台水泵和一个小环路：能作为一个供水管网运行的最小配置。单位为升每秒，配以米和毫米。';
+$ec_lang['lpn_ex_basic_si_desc']='两个水库、一台水泵和一个小环路。单位为升每秒，配以米和毫米。';
 $ec_lang['lpn_ex_basic_us_title']='基本管网，加仑/分钟（美制）';
-$ec_lang['lpn_ex_basic_us_desc']='与上例相同的起始管网，单位为加仑每分钟，配以英尺和英寸。';
+$ec_lang['lpn_ex_basic_us_desc']='两个水库、一台水泵和一个小环路。单位为加仑每分钟，配以英尺和英寸。';
 // **NOT PLAIN EPA Net1 ANY MORE, AND THE TITLE SAYS SO** (Tom, 2026-09-08: *"Net1 plus rule-based
 // controls: OK"*). Two `[RULES]` were added to the shipped file so the rule editor can be exercised
 // from the gallery; the rules stay, and the name stops claiming to be the sample as EPA ships it.
 $ec_lang['lpn_ex_net1_title']='EPANET Net1（含基于规则的控制）';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_ex_net1_desc']='EPANET 自带的三个示例管网中最小的一个：一个水库、一台水泵和一个环路。';
-$ec_lang['lpn_ex_net2_title']='EPANET Net2';
+$ec_lang['lpn_ex_net1_desc']='一个虚构的 EPANET 示例，含氯、1 个水库和 1 个水箱。';
+$ec_lang['lpn_ex_net2_si_title']='EPANET Net2，升/秒（公制）';
+$ec_lang['lpn_ex_net2_si_desc']='单位为升每秒，配以米和毫米。这是位于康涅狄格州布兰福德的 EPANET 示例，由加仑每分钟、英尺和英寸换算而来：35 个节点和 1 个水箱，无水库、无水泵、无阀门，范围约 2 km × 4 km。氟化物为非反应性物质，从一处水源进入。';
+$ec_lang['lpn_ex_net2_title']='EPANET Net2，加仑/分钟（美制）';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_ex_net2_desc']='来自 EPANET 示例、带有一个水箱的分支配水系统。';
-$ec_lang['lpn_ex_net3_title']='EPANET Net3';
+$ec_lang['lpn_ex_net2_desc']='单位为加仑每分钟，配以英尺和英寸。位于康涅狄格州布兰福德的 EPANET 示例：35 个节点和 1 个水箱，无水库、无水泵、无阀门，范围约 1 英里 × 2 英里。氟化物为非反应性物质，从一处水源进入。';
+$ec_lang['lpn_ex_net3_si_title']='EPANET Net3，升/秒（公制）';
+$ec_lang['lpn_ex_net3_si_desc']='单位为升每秒，配以米和毫米。这是位于加利福尼亚州诺瓦托的 EPANET 示例，由加仑每分钟、英尺和英寸换算而来，后面衬有世界地图：92 个节点、3 个水箱和 2 个水库，无阀门，范围约 8 km 见方。24 小时延时模拟，并带有来自 Lake 的水源追踪。';
+$ec_lang['lpn_ex_net3_title']='EPANET Net3，加仑/分钟（美制）';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_ex_net3_desc']='EPANET 的大型示例：92 个节点、3 个水箱和 2 个水库（其中一个为河流水源）。它展示了全尺寸模型在地图上的样子。';
-$ec_lang['lpn_ex_elm_street_title']='Elm Street Center';
-$ec_lang['lpn_ex_elm_street_desc']='一个商业场地案例，在最大日用水量的基础上叠加消防流量，求解某一时刻的工况，绘制在场地平面图之上。';
+$ec_lang['lpn_ex_net3_desc']='单位为加仑每分钟，配以英尺和英寸。位于加利福尼亚州诺瓦托的 EPANET 示例，后面衬有世界地图：92 个节点、3 个水箱和 2 个水库，无阀门，范围约 5 英里见方。24 小时延时模拟，并带有来自 Lake 的水源追踪。';
+$ec_lang['lpn_ex_elm_street_title']='Elm Street Center，加仑/分钟（美制）';
+$ec_lang['lpn_ex_elm_street_desc']='单位为加仑每分钟，配以英尺和英寸。亚利桑那州普雷斯科特谷：17 个节点、1 个水库和 1 台水泵。一个商业场地，在最大日需水量的基础上叠加消防流量，求解某一时刻的工况，绘制在场地平面图之上。';
 $ec_lang['lpn_tool_undo']='撤销';
 $ec_lang['lpn_confirm_example']='这会将示例添加到您现有的管网中。是否继续？';
 $ec_lang['lpn_field_diameter']='管径';
@@ -1170,15 +1180,15 @@ $ec_lang['lpn_tool_key_hint']='快捷键：按 {key}。';
 $ec_lang['lpn_tool_key_hint_two']='快捷键：按 {key} 或 {key2}。';
 // Edited by TGH 2026-09-07; the Shift sentence rewritten 2026-09-08 on his ruling that Shift keeps
 // the selection and toggles what the shape catches (it used to say "add").
-$ec_lang['lpn_tool_area_tip']='按照屏幕提示操作。再次点击可在窗口、套索和多边形之间切换。按住 Shift 键可保留当前选择，并将所选内容加入或移出（切换）选择。';
+$ec_lang['lpn_tool_area_tip']='区域选中：窗口/套索/多边形。';
 $ec_lang['lpn_area_selected']='已选择 {n} 个。';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_area_none']='该区域内未找到任何内容。';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_tool_vertices_tip']='添加和删除管道折点。在管道上指定一点可添加折点，选择折点可删除它，拖动折点可移动它。折点会改变自动计算的长度，但不会增加或改变局部（次要）损失。';
+$ec_lang['lpn_tool_vertices_tip']='添加和删除管道折点。在管道上指定一点可添加折点，选中折点可删除它，拖动折点可移动它。折点会改变自动计算的长度，但不会增加或改变局部（次要）损失。';
 $ec_lang['lpn_tool_undo_tip']='撤销历史长度 = 20 步操作';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_tool_zoom_extent_tip']='将整个管网缩放至适合地图窗口。如需不先缩放而直接使用“窗口缩放”，请按 W，或点击“缩放至全图”工具栏按钮角上的小三角。另见地图右上角的缩放控件。';
+$ec_lang['lpn_tool_zoom_extent_tip']='将整个管网缩放至适合地图窗口。如需改为缩放到所拖出的矩形，请按 W，或选中“缩放至全图”工具栏按钮角上的小三角。另见地图右上角的缩放控件。';
 $ec_lang['lpn_tool_zoom_window_tip']='指定两个对角，或拖出一个矩形。再按一次可“缩放至全图”。';
 // Tom's wording, 2026-09-25.
 $ec_lang['lpn_zoom_in_tip']='放大。快捷键：+';
@@ -1555,12 +1565,12 @@ $ec_lang['lpn_profile_title']='沿路线的剖面图';
 // the map to see the path, click to add a stop, double-click to finish.
 $ec_lang['lpn_profile_draw_start']='点击路径起点的节点。';
 $ec_lang['lpn_profile_draw_more']='在地图上移动以查看路径。点击节点将其加入路径。双击完成。按 Esc 取消。';
-$ec_lang['lpn_profile_draw_blocked']='没有从 {a} 到 {b} 的路径。请选择其他节点。';
+$ec_lang['lpn_profile_draw_blocked']='没有从 {a} 到 {b} 的路径。请选中其他起点或终点节点。';
 $ec_lang['lpn_profile_tap_start']='点按路径起点的节点。';
 $ec_lang['lpn_profile_tap_more']='点按节点以查看路径。长按将其加入路径。双击完成。再次点按"剖面图"以取消。';
-$ec_lang['lpn_profile_say_idle']='再次按“剖面图”，即可在地图上选择新路径。';
-$ec_lang['lpn_profile_none']='尚无路径。再次按“剖面图”，即可在地图上选择一条。';
-$ec_lang['lpn_profile_choose']='请选择一个起点节点和一个终点节点。';
+$ec_lang['lpn_profile_say_idle']='再次按“剖面图”，即可在地图上选中新路径。';
+$ec_lang['lpn_profile_none']='尚无路径。再次按“剖面图”，即可在地图上选中一条。';
+$ec_lang['lpn_profile_choose']='请选中一个起点节点和一个终点节点。';
 $ec_lang['lpn_profile_no_path']='这两个节点之间没有任何路线相连。';
 $ec_lang['lpn_profile_no_solve']='尚无求解结果，因此只绘制了地面线。';
 $ec_lang['lpn_profile_summary']='节点数：{n}，长度：{len} {u}';
@@ -1614,7 +1624,7 @@ $ec_lang['lpn_ts_add']='添加所选';
 $ec_lang['lpn_ts_add_none']='未找到可添加的内容。';
 $ec_lang['lpn_ts_clear']='全部移除';
 $ec_lang['lpn_ts_chip_tip']='将 {id} 从图中移除';
-$ec_lang['lpn_ts_none']='目前没有可绘制的内容。请在地图上选择元件，然后按“添加所选”。';
+$ec_lang['lpn_ts_none']='目前没有可绘制的内容。请在地图上选中元件，然后按“添加所选”。';
 // The run belongs to EPANET alone, so this is also what a page whose engine is unreachable lands
 // on; the status bar says why in that case, and lpn_time_no_period covers the project that has set
 // no run time at all.
@@ -2280,7 +2290,7 @@ $ec_lang['lpn_pump_effic_unstated']='此水泵引用了名为 {name} 的效率�
 // from a "Mode:" prefix + the tool's own label, per CLAUDE.md's concept-level label reuse rule --
 // word order/grammar around a mode name varies by language, so each mode gets its own full string.
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_mode_select']='模式：选择。选择某个元件或标签以查看或更改它。拖动可移动节点或标签。使用“折点”工具可添加或删除管道上的弯折。';
+$ec_lang['lpn_mode_select']='模式：选择。选中某个元件或标签以查看或更改它。拖动可移动节点或标签。使用“折点”工具可添加或删除管道上的弯折。';
 $ec_lang['lpn_mode_delete']='模式：删除。点击某个元件即可将其移除。';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_mode_vertices']='模式：折点。每条管道的所有折点都以小方块手柄的形式显示在地图上。点击管道可添加折点，点击手柄可删除它，或拖动手柄以移动它。此模式下地图上的其他内容不会改变。';
@@ -2302,7 +2312,7 @@ $ec_lang['lpn_mode_add_text']='模式：添加文字。点击地图以放置一�
 // label itself can be dragged. Both economize on translation for later, per CLAUDE.md's tip-only
 // whole-label-wrap convention -- the button itself is already the click target (no separate "?"
 // glyph needed), so the tip goes straight on the button as a title, matched to the .ec-help class.
-$ec_lang['lpn_tip_select']='使用此模式可更改、移动和拖动地图元素，或平移地图。这是地图的默认模式。再按一次 Esc 将取消选择当前所选内容。';
+$ec_lang['lpn_tip_select']='使用此模式可更改、移动和拖动地图上的元件和文字，或平移地图。这是地图的默认模式。再按一次 Esc 将清除所选内容。';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_field_auto']='自动';
 $ec_lang['lpn_method_switch_confirm']='更改摩擦计算方法不会改变您已在管道中输入的糙率数值，而某一方法下的糙率对另一方法而言没有意义。更改后请检查每条管道。仍要更改吗？';
@@ -3642,7 +3652,7 @@ $ec_lang['lpn_ff_scope']='要测试的节点';
 $ec_lang['lpn_ff_all']='所有节点';
 $ec_lang['lpn_ff_selected']='所选节点';
 $ec_lang['lpn_ff_no_junctions']='此项目目前还没有节点，因此没有可测试的对象。';
-$ec_lang['lpn_ff_no_selection']='未选中任何节点。请选择节点，或选择“全部”选项。';
+$ec_lang['lpn_ff_no_selection']='未选中任何节点。请选中节点，或选择“所有节点”。';
 $ec_lang['lpn_ff_skipped']='所选元素中有 {n} 个不是节点，因此未进行测试。';
 $ec_lang['lpn_ff_required']='所需消防流量';
 $ec_lang['lpn_ff_required_tip']='消火栓按适用的消防规范或消防部门要求所需的流量。除非为某节点另行输入所需消防流量，否则每个节点都按此值测试。';
@@ -3652,7 +3662,7 @@ $ec_lang['lpn_ff_residual']='需维持的余压';
 $ec_lang['lpn_ff_residual_tip']='节点在提供消防流量的同时必须维持的压力。AWWA M31 和 NFPA 291 采用 20 psi（140 kPa）。';
 $ec_lang['lpn_ff_design']='设计校核（对系统的影响）';
 $ec_lang['lpn_ff_design_tip']='这是一个独立的问题：在该处抽取该流量后，是否有其他节点的压力低于最小压力，或有管道的流速超过流速限值？此校核不需要额外计算。';
-$ec_lang['lpn_ff_design_no_selection']='设计校核范围已设置为“所选”，但目前未选中任何元件。请选择元件，或选择“全部”选项。';
+$ec_lang['lpn_ff_design_no_selection']='设计校核范围已设置为“所选”，但目前未选中任何元件。请在地图上选中元件，或选择“全部”。';
 $ec_lang['lpn_ff_minpressure']='其他部位允许的最低压力';
 $ec_lang['lpn_ff_minpressure_tip']='当某个节点正在抽取其消防流量时，若其他节点的压力低于此值，则报告为设计问题。';
 $ec_lang['lpn_ff_maxvelocity']='允许的最高流速';
@@ -3791,6 +3801,66 @@ $ec_lang['lpn_ff_err_unknown']='没有结果。错误代码：{code}';
 // a plane coordinate read as a degree is silent and puts a network in the Gulf of Guinea.
 $ec_lang['lpn_file_import_survey']='导入测量点…';
 $ec_lang['lpn_file_import_survey_tip']='从文本文件中读取测量点列表，并在每个点创建一个节点，文件未说明的内容一律采用新建元件的设置。除非勾选“将说明读取为现场代码”，否则不会绘制管道，也不会有任何行在未被指明的情况下被丢弃。读取时使用本项目已在使用的坐标系，无论是否已地理配准。';
+$ec_lang['lpn_file_import_shapes']='导入 GeoJSON 形状…';
+$ec_lang['lpn_file_import_shapes_tip']='将 GeoJSON 文件中的点、线和多边形作为形状读入本项目。文件中的管网元件不会导入；请从 EPANET 文件导入管网。项目必须已完成地理配准，或已指明坐标系。';
+$ec_lang['lpn_geojson_import_done']='已从 {file} 导入 {n} 个形状。';
+$ec_lang['lpn_geojson_import_done_one']='已从 {file} 导入 1 个形状。';
+$ec_lang['lpn_geojson_import_renamed']='有 {n} 个要素名称不能用作形状 ID。这些形状已被赋予其他 ID，并保留各自的要素名称：{list}。';
+$ec_lang['lpn_geojson_import_renamed_one']='有 1 个要素名称不能用作形状 ID。该形状已被赋予其他 ID，并保留其要素名称：{list}。';
+$ec_lang['lpn_geojson_import_skipped']='{n} 个要素未导入：{list}。';
+$ec_lang['lpn_geojson_import_skipped_one']='1 个要素未导入：{list}。';
+$ec_lang['lpn_geojson_import_why_network']='管网元件';
+$ec_lang['lpn_geojson_import_why_geometry']='不是点、线或多边形';
+$ec_lang['lpn_geojson_import_why_position']='位置不是有效的纬度和经度';
+$ec_lang['lpn_geojson_import_holes']='{n} 个多边形孔洞未导入。一个形状只有一条边界。';
+$ec_lang['lpn_geojson_import_holes_one']='1 个多边形孔洞未导入。一个形状只有一条边界。';
+$ec_lang['lpn_geojson_import_parts']='{n} 个多部分要素已导入，每个部分各成为一个形状。';
+$ec_lang['lpn_geojson_import_parts_one']='1 个多部分要素已导入，每个部分各成为一个形状。';
+$ec_lang['lpn_geojson_import_local']='GeoJSON 的位置是纬度和经度，而本项目在地球上没有位置，无法将其转换。请先用“地图”、“世界地图”、“附加”进行地理配准，然后再次导入。';
+$ec_lang['lpn_geojson_import_unreadable']='{file} 不是 GeoJSON 文件：{detail}';
+$ec_lang['lpn_file_import_dxf']='导入 DXF 形状…';
+$ec_lang['lpn_file_import_dxf_tip']='将 ASCII DXF 文件中的点、线和多段线作为形状读入本项目，并将每个图层名称保留为一个属性。其他实体只计数并列出，不导入。坐标按本项目的 X 和 Y 读取，不做转换。';
+$ec_lang['lpn_file_import_shp']='导入 shapefile 形状…';
+$ec_lang['lpn_file_import_shp_tip']='将 ESRI shapefile 中的点、线和多边形作为形状读入本项目，并将属性列保留为属性。请选择 .zip，或同时选择 .shp 及其 .shx、.dbf 和 .prj（按住 Ctrl 或 Shift 可选择多个）。与项目坐标系不同的坐标会被转换，通知中会说明这一点。';
+$ec_lang['lpn_dxf_import_skipped']='{n} 个实体未导入：{list}。';
+$ec_lang['lpn_dxf_import_skipped_one']='1 个实体未导入：{list}。';
+$ec_lang['lpn_dxf_import_inblocks']='在块定义中';
+$ec_lang['lpn_dxf_import_bulge']='{n} 条多段线含有圆弧段，已作为其顶点之间的直线段导入。';
+$ec_lang['lpn_dxf_import_bulge_one']='1 条多段线含有圆弧段，已作为其顶点之间的直线段导入。';
+$ec_lang['lpn_dxf_import_units']='该图纸的单位为 {theirs}，而本项目使用 {ours}。数值未作更改。';
+$ec_lang['lpn_dxf_import_refuse_geo']='DXF 图纸是平面的，而本项目采用纬度和经度，因此 {file} 的坐标在其中没有位置。请用“转换为…”将项目复制到某个坐标系中，然后再次导入。';
+$ec_lang['lpn_dxf_import_unreadable']='{file} 不是 ASCII DXF 文件。';
+$ec_lang['lpn_dxf_import_binary']='{file} 是二进制 DXF。请在 CAD 程序中将其另存为 ASCII DXF，然后再次导入。';
+$ec_lang['lpn_shapes_import_frame']='坐标已按{frame}读取，未做转换。';
+$ec_lang['lpn_shapes_frame_xy']='本项目的 X 和 Y';
+$ec_lang['lpn_shapes_frame_latlon']='纬度和经度';
+$ec_lang['lpn_shp_import_skipped']='{n} 条记录未导入，因为其形状类型不被读取：{list}。';
+$ec_lang['lpn_shp_import_skipped_one']='1 条记录未导入，因为其形状类型不被读取：{list}。';
+$ec_lang['lpn_shp_import_attrs']='作为各形状的属性保留的属性列：{list}。';
+$ec_lang['lpn_shp_import_noprj']='没有 .prj 文件，因此坐标已按{frame}读取，未做转换。';
+$ec_lang['lpn_shp_import_prj_same']='.prj 指明 {crs}，即本项目的坐标系，因此坐标未作更改。';
+$ec_lang['lpn_shp_import_converted']='这些坐标是纬度和经度，已通过地图所用的变换转换为 {crs}。';
+$ec_lang['lpn_shp_import_prj_other']='.prj 指明 {theirs}。本项目未指明坐标系，因此坐标已按{frame}读取，未做转换。';
+$ec_lang['lpn_shp_import_refuse_local']='{file} 采用纬度和经度，而本项目在地球上没有位置，无法将其转换。请先用“地图”、“世界地图”、“附加”进行地理配准，然后再次导入。';
+$ec_lang['lpn_shp_import_refuse_crs']='{file} 指明 {theirs}，而本项目采用 {ours}。未导入任何内容，也未转换任何内容。';
+$ec_lang['lpn_shp_import_refuse_range']='{file} 没有 .prj 文件，其坐标也不是纬度和经度，因此无法放入本项目。';
+$ec_lang['lpn_shp_import_noshp']='{file} 不包含 .shp 文件。请选择 shapefile 的 .zip，或同时选择 .shp 及其 .shx、.dbf 和 .prj（按住 Ctrl 或 Shift 可选择多个）。';
+$ec_lang['lpn_shp_import_manyshp']='{file} 包含多个 shapefile。请一次导入一个。';
+$ec_lang['lpn_shp_import_unreadable']='{file} 不是本页面可读取的 shapefile：{detail}';
+$ec_lang['lpn_shp_import_pick_hint']='shapefile 由多个文件组成。请同时选择 .shp 及其 .shx、.dbf 和 .prj（按住 Ctrl 或 Shift 可选择多个），或选择 .zip。';
+$ec_lang['lpn_shp_import_webmerc_ask']='{file} 没有 .prj 文件，其数值也不是纬度和经度，但符合 Web 墨卡托米制坐标 (EPSG:3857)，即 QGIS 和网络地图所用的坐标系。是否将其作为 EPSG:3857 导入，并转换到本项目？';
+$ec_lang['lpn_shp_import_webmerc_ok']='作为 EPSG:3857 导入';
+$ec_lang['lpn_shp_import_webmerc_far_ask']='{file} 指明 {theirs}，按该坐标系读取时，其坐标落在距本项目 {km} km 处。按 Web 墨卡托米制坐标 (EPSG:3857)，即 QGIS 和网络地图所用的坐标系读取时，则落在本项目所在之处。是否将其作为 EPSG:3857 导入，并转换到本项目？';
+$ec_lang['lpn_shp_import_reprojected']='坐标已从 {theirs} 转换为 {ours}。';
+$ec_lang['lpn_shp_import_unplaced']='{n} 条记录的坐标无法在本项目中定位，例如纬度超出地图的范围。记录编号：{list}。';
+$ec_lang['lpn_shp_import_unplaced_one']='1 条记录的坐标无法在本项目中定位，例如纬度超出地图的范围。记录编号：{list}。';
+$ec_lang['lpn_shapes_import_none']='没有从 {file} 导入任何内容。';
+$ec_lang['lpn_shp_import_convert_hint']='请用“转换为…”将项目复制到 {theirs}，然后再次导入。';
+$ec_lang['lpn_shp_import_damaged']='{file} 已损坏或被截断，因此未导入任何内容。';
+$ec_lang['lpn_shp_import_deleted']='.dbf 中标记为已删除的 {n} 条记录未导入。';
+$ec_lang['lpn_shp_import_deleted_one']='.dbf 中标记为已删除的 1 条记录未导入。';
+$ec_lang['lpn_dxf_import_paperspace']='在图纸空间中';
+$ec_lang['lpn_shapes_import_more']='以及另外 {n} 个';
 $ec_lang['lpn_survey_read_error']='无法从您的磁盘读取该文件。';
 $ec_lang['lpn_survey_cancelled']='未创建任何内容，也未更改任何内容。';
 // What the project calls its two axes, for a sentence js/lpn-survey.js writes about a column. The
@@ -3961,7 +4031,7 @@ $ec_lang['lpn_crit_summary']='在 {total} 个元件中，有 {n} 个会使需水
 $ec_lang['lpn_crit_baseline_below']='在没有任何断开时已经低于该压力的节点：{n}。它们不计入。';
 $ec_lang['lpn_crit_working']='处理中：{done} / {total} 个元件。';
 $ec_lang['lpn_crit_stopped']='已在 {done} / {total} 个元件后停止。下方的结果是已经完成的那些。';
-$ec_lang['lpn_crit_no_selection']='未选中任何连接线。请选择连接线，或选择“全部连接线”。';
+$ec_lang['lpn_crit_no_selection']='未选中任何连接线。请选中连接线，或选择“全部连接线”。';
 $ec_lang['lpn_crit_no_links']='此项目目前还没有连接线，因此没有可断开的对象。';
 $ec_lang['lpn_crit_busy']='另一项分析正在运行。请停止它，或等待其完成。';
 $ec_lang['lpn_crit_skipped']='所选元素中有 {n} 个不是连接线，因此未被断开。';
@@ -3981,7 +4051,7 @@ $ec_lang['lpn_dock_left']='停靠在地图左侧';
 $ec_lang['lpn_dock_right']='停靠在地图右侧';
 $ec_lang['lpn_dock_float']='浮动';
 $ec_lang['lpn_dock_autohide']='自动隐藏';
-$ec_lang['lpn_popup_none']='未选择任何对象。请在地图上选择一个元件以查看其属性。';
+$ec_lang['lpn_popup_none']='未选中任何对象。请在地图上选中一个元件以查看其属性。';
 $ec_lang['lpn_hotkeys_snip_heading']='屏幕截图';
 $ec_lang['lpn_hotkeys_snip_term']='屏幕截图键盘快捷键';
 $ec_lang['lpn_hotkeys_snip_def']='<table class="lpn-notes-table"><tbody><tr><td>S</td><td>截取，在“屏幕截图”打开时。</td></tr><tr><td>E</td><td>橡皮擦，在标注视图中。</td></tr><tr><td>Ctrl+Z, Ctrl+Y</td><td>撤销和重做，在标注视图中。</td></tr><tr><td>Esc</td><td>取消截取，或退出橡皮擦。在标注视图中，未绘制任何内容时将其关闭。</td></tr></tbody></table>';
@@ -3999,11 +4069,13 @@ $ec_lang['lpn_fb_failed']='消息未能送达。您所写的内容仍保留在�
 $ec_lang['lpn_fb_bad_email']='该电子邮件地址似乎不正确。请更正，或留空。';
 $ec_lang['lpn_fb_busy']='最近几分钟内收到的消息过多。您所写的内容仍保留在此，可以稍后重试。';
 $ec_lang['lpn_tool_add_chain_tip']='连续添加节点和管道：在地图上指定一个点以添加节点，然后依次指定下一个点以添加一根管道和一个节点。指定已有节点可从该节点继续。按 Escape 键结束连续添加。';
+$ec_lang['lpn_tool_add_shape']='形状';
+$ec_lang['lpn_tool_add_shape_tip']='在地图上绘制点、折线或多边形。形状属于标注，不属于管网。依次指定各点，然后再次指定最后一个点、按 Enter 键或点击鼠标右键结束。再次指定第一个点，可将形状闭合为多边形。';
 $ec_lang['lpn_pane_filter_sel_note']='仅限所选内容。显示 {all} 项中的 {n} 项。';
 $ec_lang['lpn_pane_filter_sel_and']='已按 {q} 过滤，且仅限所选内容。显示 {all} 项中的 {n} 项。';
 $ec_lang['lpn_pane_filter_sel_none']='所选元件均不在此表中。';
 $ec_lang['lpn_pane_sel_only']='仅限所选内容';
-$ec_lang['lpn_pane_sel_only_none']='未选择任何元件。请先在地图上选择元件。';
+$ec_lang['lpn_pane_sel_only_none']='未选中任何元件。请先在地图上选中元件。';
 $ec_lang['lpn_pane_scn_show']='显示方案';
 $ec_lang['lpn_pane_clear_override']='清除覆盖值';
 $ec_lang['lpn_pane_scn_alt_tip']='{category}备选：{alternative}';
@@ -4059,6 +4131,7 @@ $ec_lang['lpn_copy_opened_unsaved']='已将 {file} 作为副本打开，并带�
 $ec_lang['lpn_engine_unavailable_why']='没有 EPANET 求解器就无法求解压力和流量控制阀（PRV、PSV、FCV）。{reason}';
 $ec_lang['lpn_engine_needed_failed_why']='此管网只能由 EPANET 求解器求解。{reason}';
 $ec_lang['lpn_mode_add_chain']='模式：节点管道链。在地图上指定一个点以添加节点，然后依次指定下一个点以添加一根管道和一个节点。指定已有节点可从该节点继续。按 Escape 键结束连续添加。切换到“选择”模式可更改或移动元件和标签。';
+$ec_lang['lpn_mode_add_shape']='模式：添加形状。依次指定各点。再次指定最后一个点或按 Enter 键结束；指定第一个点可闭合为多边形。';
 $ec_lang['lpn_cp_allow_tip']='仅允许这些字符：';
 $ec_lang['lpn_cp_characters_tip']='“@”表示任意字母；“#”表示任意数字，如果允许“-”、“.”和“,”，必须另行列出；任何空白字符必须位于其他字符之间。';
 $ec_lang['lpn_valwarn_diameter']='管道或阀门直径通常在 {min} 至 {max} {unit} 之间。请检查数值和直径单位。';
@@ -4111,7 +4184,7 @@ $ec_lang['lpn_ds_multiplier_tip']='每项需水量所乘的系数；1.5 表示�
 $ec_lang['lpn_ds_run']='运行';
 $ec_lang['lpn_ds_head_search']='系统能承受多大的需水量缩放系数？';
 $ec_lang['lpn_ds_head_search_selected']='这些节点能承受多大的需水量缩放系数？';
-$ec_lang['lpn_ds_outside_below']='在需水量缩放系数为 {m} 时，未选择的节点中低于 {pressure} 的有：{n} 个（{ids}）。它们不限制本结果。';
+$ec_lang['lpn_ds_outside_below']='在需水量缩放系数为 {m} 时，未选中的节点中低于 {pressure} 的有：{n} 个（{ids}）。它们不限制本结果。';
 $ec_lang['lpn_ds_holds_max']='✓ 在需水量缩放系数达到 {max}（搜索上限）之前，每个节点都保持 {pressure}。';
 $ec_lang['lpn_ds_below_zero']='⚠ 即使缩放后的需水量为零，至少仍有一个节点低于 {pressure}。';
 $ec_lang['lpn_ds_found']='✓ 在需水量缩放系数达到 {m} 之前，所检查的每个节点都至少保持 {pressure}。';
@@ -4130,7 +4203,7 @@ $ec_lang['lpn_ds_col_scaled_tip']='需水量已乘以需水量缩放系数。';
 $ec_lang['lpn_ds_col_unscaled']='缩放前';
 $ec_lang['lpn_ds_col_unscaled_tip']='需水量保持当前方案在此时间步的原值，与地图上显示的数值相同。';
 $ec_lang['lpn_ds_no_junctions']='本项目尚无节点，因此没有可缩放的需水量。';
-$ec_lang['lpn_ds_no_selection']='未选择任何节点。请选择节点，或选择“所有节点”。';
+$ec_lang['lpn_ds_no_selection']='未选中任何节点。请选中节点，或选择“所有节点”。';
 $ec_lang['lpn_ds_skipped']='所选元件中不是节点而保持原样的：{n} 个。';
 $ec_lang['lpn_ds_bad_multiplier']='请输入大于或等于零的需水量缩放系数，例如 1.5。';
 $ec_lang['lpn_ds_stale']='图纸已更改，因此需水量缩放结果已被清除。请重新运行。';
@@ -4199,11 +4272,11 @@ $ec_lang['lpn_tank_ground_elev_tip']='水箱处的地面高程。水箱处的压
 $ec_lang['lpn_guide_about_heading']='关于此计算器';
 $ec_lang['lpn_guide_group_from']='来自 {menu}';
 $ec_lang['lpn_guide_menu_named']='{menu}菜单';
-$ec_lang['lpn_help_manual']='指南';
+$ec_lang['lpn_help_manual']='用户手册';
 $ec_lang['lpn_guide_contents']='目录';
 $ec_lang['lpn_guide_rail_hide']='隐藏目录';
 $ec_lang['lpn_guide_rail_show']='显示目录';
-$ec_lang['lpn_guide_search']='搜索指南';
+$ec_lang['lpn_guide_search']='搜索用户手册';
 $ec_lang['lpn_guide_boxes_heading']='框';
 $ec_lang['lpn_guide_boxes_intro']='每个框都可以移动、调整大小、停靠在地图左侧或右侧，或关闭。框标题栏中的 ? 可打开其帮助。';
 $ec_lang['lpn_guide_boxes_autohide']='指针离开后，没有焦点的框会在短暂延迟后隐藏。有焦点的框在点击框外、按 Esc 或按 Tab 离开该框（且指针在别处）时隐藏。';
@@ -4223,22 +4296,22 @@ $ec_lang['lpn_guide_text_alt_box']='显示每个方案在各类别（如物理�
 $ec_lang['lpn_guide_text_full_box']='列出每个报告时间步的每个节点和每条连接线，单位与“表格”窗格中显示的相同。没有延时模拟时，显示单一时刻的当前解。下载或打印包含每个时间步，表格一次显示一个。';
 $ec_lang['lpn_guide_text_calib_box']='将现场测量值文件与相同位置和时间的计算结果进行比较，每个参数一个文件。该文件仅在当前会话中保留，不随项目保存。';
 $ec_lang['lpn_guide_text_notes_popup']='列出关于本页面行为方式及其不具备功能的说明，每条为一个术语及其定义。它不会更改管网。';
-$ec_lang['lpn_guide_text_hotkeys_popup']='列出每个工具栏按钮和菜单行、键盘快捷键，以及每个框的条目。选择某一行会显示该控件所在位置，而不会运行它。要搜索，请在任何位置按 Ctrl+K，或在指南有焦点时按 /。';
+$ec_lang['lpn_guide_text_hotkeys_popup']='列出每个工具栏按钮和菜单行、键盘快捷键，以及每个框的条目。选择某一行会显示该控件所在位置，而不会运行它。要搜索，请在任何位置按 Ctrl+K，或在用户手册有焦点时按 /。';
 $ec_lang['lpn_guide_find_query_term']='查询语言';
-$ec_lang['lpn_guide_find_query_def']='<table class="lpn-notes-table"><tbody><tr><td><code>Scope.Property condition value</code></td><td>一个条件。范围为 Everything、Junction、Reservoir、Tank、Pipe、Pump、Valve、Text、Customer 或 Source。属性为该范围的“属性”列表中的任一项。</td></tr><tr><td>条件</td><td>equal to（等于）、above（大于）、below（小于）、contains（包含）、n highest（最高 n 个）、n lowest（最低 n 个）和 empty（为空）。contains 仅适用于文字。在 n highest 和 n lowest 中，n 是个数，如 5 highest。若写字母 n 本身，如 <code>Pipe.Velocity n highest</code>，或“数值”框为空，则列出 10 个元件。empty 查找该属性没有值的元件。“连通性”有四个条件，不需要数值。</td></tr><tr><td>数值</td><td>数字不带单位，按“属性”和“表格”窗格中显示的单位输入：40，而不是 40 psi。文字（包括 ID）用单引号或双引号括起来：<code>\'60\'</code>。</td></tr><tr><td>AND、OR 和括号</td><td>AND 先于 OR 计算，括号用于将条件分组。不提供 NOT。</td></tr><tr><td>拼写</td><td>不区分大小写。各种语言都接受英文单词，因此从本指南复制的查询可在任何语言的页面上运行。</td></tr></tbody></table>';
+$ec_lang['lpn_guide_find_query_def']='<table class="lpn-notes-table"><tbody><tr><td><code>Scope.Property condition value</code></td><td>一个条件。“搜索范围”为全部、节点、水库、水箱、管道、水泵、阀门、文字、用户或水源。属性为该范围的“属性”列表中的任一项。</td></tr><tr><td>条件</td><td>等于、大于、小于、包含、最高 n 个、最低 n 个和为空。“包含”仅适用于文字。在“最高 n 个”和“最低 n 个”中，n 是个数，如 <code>5 highest</code>。若“数值”框为空，或 n 是字母 n 本身，如 <code>Pipe.Velocity n highest</code>，则列出 10 个元件。“为空”查找该属性没有值的元件。“连通性”有四个条件，不需要数值。</td></tr><tr><td>数值</td><td>数字不带单位，按“属性”和“表格”窗格中显示的单位输入：40，而不是 40 psi。文字（包括 ID）用单引号或双引号括起来：<code>\'60\'</code>。</td></tr><tr><td>且、或和括号</td><td>且（<code>AND</code>）先于或（<code>OR</code>）计算，括号用于将条件分组。不提供 <code>NOT</code>。</td></tr><tr><td>拼写</td><td>不区分大小写。各种语言都接受英文单词，因此从本用户手册复制的查询可在任何语言的页面上运行。</td></tr></tbody></table>';
 $ec_lang['lpn_guide_find_examples_term']='Net3 上的示例';
-$ec_lang['lpn_guide_find_examples_def']='<p>打开示例 Net3 以便对照。压力单位为 psi，流速单位为 ft/s。</p><table class="lpn-notes-table"><tbody><tr><td><code>Everything.ID equal to \'60\'</code></td><td>节点 60 和管道 60。节点和管道可以有相同的 ID，因此在 Everything 下按 ID 搜索可能返回多个元件。</td></tr><tr><td><code>Junction.Pressure below 40</code></td><td>节点 10、40、50、20 和 153，压力最低的在前。节点 10 的压力为 -0.6 psi，这是需要复核的负压。</td></tr><tr><td><code>Pipe.Velocity 5 highest</code></td><td>管道 60、329、125、123 和 149，流速最高的在前。管道 60 的流速为 9.3 ft/s。</td></tr><tr><td><code>Junction.Pressure below 20 OR Pipe.Velocity above 5</code></td><td>节点 10、20、40 和 50，以及管道 60、125 和 329：低压和高流速列在同一份清单中。</td></tr><tr><td><code>Junction.Pressure below 40 AND Junction.Elevation above 100</code></td><td>节点 10、20、40 和 50，即位于高地的低压节点。两个条件必须指同一种元件：<code>Junction.Pressure below 40 AND Pipe.Velocity above 3</code> 没有任何匹配，因为没有元件既是节点又是管道。</td></tr><tr><td><code>Pipe.Closed equal to \'closed\'</code></td><td>管道 330，即 Net3 文件中唯一关闭的管道。</td></tr><tr><td><code>Junction.Connectivity no open path to a source</code></td><td>按文件原样没有结果。若关闭管道 247（见“替换与撤销”），则为节点 215、217、219 和 225：即管道 247 破裂会使其失去供水的节点。对每条管道重复此操作即为关键性分析。</td></tr></tbody></table>';
+$ec_lang['lpn_guide_find_examples_def']='<p>打开示例 Net3 以便对照。压力单位为 psi，流速单位为 ft/s。</p><table class="lpn-notes-table"><tbody><tr><td><code>Everything.ID equal to \'60\'</code></td><td>节点 60 和管道 60。节点和管道可以有相同的 ID，因此在“全部”下按 ID 搜索可能返回多个元件。</td></tr><tr><td><code>Junction.Pressure below 40</code></td><td>节点 10、40、50、20 和 153，压力最低的在前。节点 10 的压力为 -0.6 psi，这是需要复核的负压。</td></tr><tr><td><code>Pipe.Velocity 5 highest</code></td><td>管道 60、329、125、123 和 149，流速最高的在前。管道 60 的流速为 9.3 ft/s。</td></tr><tr><td><code>Junction.Pressure below 20 OR Pipe.Velocity above 5</code></td><td>节点 10、20、40 和 50，以及管道 60、125 和 329：低压和高流速列在同一份清单中。</td></tr><tr><td><code>Junction.Pressure below 40 AND Junction.Elevation above 100</code></td><td>节点 10、20、40 和 50，即位于高地的低压节点。两个条件必须指同一种元件：<code>Junction.Pressure below 40 AND Pipe.Velocity above 3</code> 没有任何匹配，因为没有元件既是节点又是管道。</td></tr><tr><td><code>Pipe.Closed equal to \'closed\'</code></td><td>管道 330，即 Net3 文件中唯一关闭的管道。</td></tr><tr><td><code>Junction.Connectivity no open path to a source</code></td><td>按文件原样没有结果。若关闭管道 247（见“替换与撤销”），则为节点 215、217、219 和 225：即管道 247 破裂会使其失去供水的节点。对每条管道重复此操作即为关键性分析。</td></tr></tbody></table>';
 $ec_lang['lpn_guide_find_results_term']='结果、选择与表格';
-$ec_lang['lpn_guide_find_results_def']='<p>匹配的元件列在“查找”按钮下方。大于和“最高 n 个”先列最高值，小于和“最低 n 个”先列最低值，其他条件按所找到的值排列，再按 ID 排列。含 AND 或 OR 的查询先列节点，再列连接线，各按 ID 排列。只有一个匹配时，立即显示在地图上。选择某一行可使地图居中于该元件。若未选中任何内容，该元件同时被选中；若已有选中内容，则该元件高亮显示，选择不变。按住 Shift 点击或按住 Ctrl 点击某一行，可将其加入选择或从选择中移除。“查找”本身不会选中所有匹配项。</p><p>“在当前表格中过滤”按钮将同一查询应用于“表格”窗格。查询所适用的每个表格只显示匹配的行，并在其上方显示查询和行数。要在地图上选中所有匹配项，请选择这些行，并在右键菜单中选择“在地图上选中”。表格过滤不随项目保存，重新加载页面后即结束。某行被编辑后不再匹配时，它仍留在表格中，变灰并带警告标志，直到再次按下“在当前表格中过滤”按钮。</p>';
+$ec_lang['lpn_guide_find_results_def']='<p>匹配的元件列在“查找”按钮下方。大于和“最高 n 个”先列最高值，小于和“最低 n 个”先列最低值，其他条件按所找到的值排列，再按 ID 排列。含 AND 或 OR 的查询先列节点，再列连接线，各按 ID 排列。只有一个匹配时，立即显示在地图上。选中某一行可使地图居中于该元件。若未选中任何内容，该元件同时被选中；若已有选中内容，则该元件高亮显示，所选内容不变。按住 Shift 点击或按住 Ctrl 点击某一行，可将其加入所选内容或从中移除。“查找”本身不会选中所有匹配项。</p><p>“在当前表格中过滤”按钮将同一查询应用于“表格”窗格。查询所适用的每个表格只显示匹配的行，并在其上方显示查询和行数。要在地图上选中所有匹配项，请选中这些行，并在右键菜单中选择“在地图上选中”。表格过滤不随项目保存，重新加载页面后即结束。某行被编辑后不再匹配时，它仍留在表格中，变灰并带警告标志，直到再次按下“在当前表格中过滤”按钮。</p>';
 $ec_lang['lpn_guide_find_replace_term']='替换与撤销';
-$ec_lang['lpn_guide_find_replace_def']='<p>框中的“更改查找到的内容”部分会在查询找到的每个元件上写入一个属性。在“要更改的属性”列表中选择属性，在“新值”框中按显示单位输入新值，然后按“替换”按钮。随后框中会说明将有多少个元件发生变化，不包括已经是新值的元件。按“更改它们”按钮应用更改，或按“取消”。一次“撤销”即可撤回整个替换。</p><p>Net1 上的示例：<code>Pipe.Diameter below 10</code> 找到管道 31、122、113 和 121。选择“管径”，输入 10，然后按“替换”；框中显示“更改 4 个元件？”。按“更改它们”将这四条管道全部设为 10 in。一次“撤销”使它们恢复为 6 in 和 8 in。</p><p>Net3 上的示例：<code>Pipe.ID equal to \'247\'</code> 找到管道 247。选择“关闭”，在“新值”列表中再次选择“关闭”，然后按“替换”，再按“更改它们”，即可关闭该管道，用于上述连通性示例。“撤销”会重新打开它。</p><p>替换要求只涉及一种元件，因此在 Everything 下，请先在“搜索范围”列表中选择一种元件。在基础以外的方案中，替换值存储在该方案中，与在“属性”中进行同样的编辑相同。在有 Mapbox 高程数据的地方，“高程”可以用 Mapbox DEM 替换，而不用键入的值。</p>';
+$ec_lang['lpn_guide_find_replace_def']='<p>框中的“更改查找到的内容”部分会在查询找到的每个元件上写入一个属性。在“要更改的属性”列表中选择属性，在“新值”框中按显示单位输入新值，然后按“替换”按钮。随后框中会说明将有多少个元件发生变化，不包括已经是新值的元件。按“更改它们”按钮应用更改，或按“取消”。一次“撤销”即可撤回整个替换。</p><p>Net1 上的示例：<code>Pipe.Diameter below 10</code> 找到管道 31、122、113 和 121。选择“管径”，输入 10，然后按“替换”；框中显示“要更改 4 个元件吗？”。按“更改它们”将这四条管道全部设为 10 in。一次“撤销”使它们恢复为 6 in 和 8 in。</p><p>Net3 上的示例：<code>Pipe.ID equal to \'247\'</code> 找到管道 247。选择“关闭”，在“新值”列表中再次选择“关闭”，然后按“替换”，再按“更改它们”，即可关闭该管道，用于上述连通性示例。“撤销”会重新打开它。</p><p>替换要求只涉及一种元件，因此在“全部”下，请先在“搜索范围”列表中选择一种元件。在基础以外的方案中，替换值存储在该方案中，与在“属性”中进行同样的编辑相同。在有 Mapbox 高程数据的地方，“高程”可以用 Mapbox DEM 替换，而不用键入的值。</p>';
 $ec_lang['lpn_guide_find_notes_term']='注意事项';
-$ec_lang['lpn_guide_find_notes_def']='<ul><li>数值按完整精度比较，并列出到四位小数。“等于”很少与计算结果匹配；请使用大于和小于。</li><li>压力、水头、流量、流速和其他结果均来自上一次计算。清除“自动重新计算”设置后，它们描述的是上一次“计算”时的管网。</li><li>文字的大于和小于按字典顺序比较，数字按数值顺序：在 Net1 上，<code>Junction.ID above \'20\'</code> 找到节点 21、22、23、31 和 32。</li><li>在 Everything 下，只提供 ID、说明、标记和连通性。在“搜索范围”列表中选择一种元件，可查看其完整的属性列表。</li><li>文字项没有 ID。请按其中的字词搜索，如 <code>Text.Text contains \'pump\'</code>。</li><li>节点的四个“连通性”条件为：节点无连接线、节点无开放连接线、无连接线通往水源、无开放路径通往水源。水源是水库或水箱。</li></ul>';
-$ec_lang['lpn_guide_using_heading']='使用指南';
-$ec_lang['lpn_guide_keys_term']='指南键盘快捷键';
-$ec_lang['lpn_guide_keys_def']='<table class="lpn-notes-table"><tbody><tr><td>?</td><td>在指针下方或具有焦点的控件处打开指南。</td></tr><tr><td>F1</td><td>在具有焦点的框的条目处打开指南。</td></tr><tr><td>Ctrl+K</td><td>打开指南，并将所选文字放入搜索栏。</td></tr><tr><td>/</td><td>在指南具有焦点时选中搜索栏。</td></tr><tr><td>Esc</td><td>关闭指南并返回原来的位置。</td></tr></tbody></table>';
+$ec_lang['lpn_guide_find_notes_def']='<ul><li>数值按完整精度比较，并列出到四位小数。“等于”很少与计算结果匹配；请使用大于和小于。</li><li>压力、水头、流量、流速和其他结果均来自上一次计算。清除“自动重新计算”设置后，它们描述的是上一次“计算”时的管网。</li><li>文字的大于和小于按字典顺序比较，数字按数值顺序：在 Net1 上，<code>Junction.ID above \'20\'</code> 找到节点 21、22、23、31 和 32。</li><li>在“全部”下，只提供 ID、说明、标记和连通性。在“搜索范围”列表中选择一种元件，可查看其完整的属性列表。</li><li>文字项没有 ID。请按其中的字词搜索，如 <code>Text.Text contains \'pump\'</code>。</li><li>节点的四个“连通性”条件为：节点无连接线、节点无开放连接线、无连接线通往水源、无开放路径通往水源。水源是水库或水箱。</li></ul>';
+$ec_lang['lpn_guide_using_heading']='使用用户手册';
+$ec_lang['lpn_guide_keys_term']='用户手册键盘快捷键';
+$ec_lang['lpn_guide_keys_def']='<table class="lpn-notes-table"><tbody><tr><td>?</td><td>在指针下方或具有焦点的控件处打开用户手册。</td></tr><tr><td>F1</td><td>在具有焦点的框的条目处打开用户手册。</td></tr><tr><td>Ctrl+K</td><td>打开用户手册，并将所选文字放入搜索栏。</td></tr><tr><td>/</td><td>在用户手册具有焦点时选中搜索栏。</td></tr><tr><td>Esc</td><td>关闭用户手册并返回原来的位置。</td></tr></tbody></table>';
 $ec_lang['lpn_guide_also']='{menu}中的其他项';
-$ec_lang['lpn_guide_how_popup']='选择元件或文字时，将打开“属性”。';
+$ec_lang['lpn_guide_how_popup']='选中元件或文字时，将打开“属性”。';
 $ec_lang['lpn_guide_how_alt']='清除“基本模式”后，“备选方案预览”列在“水务”、“情景”之下。';
 $ec_lang['lpn_guide_not_shown']='此控件当前不在屏幕上。';
 $ec_lang['lpn_hotkeys_zoomwin_def']='窗口缩放：在地图上拖出一个矩形，缩放到该区域。';
@@ -4294,6 +4367,7 @@ $ec_lang['lpn_split_no']='否';
 $ec_lang['lpn_snap_vertex']='{link}，折点 {n}';
 $ec_lang['lpn_snap_node_on_node']='{new} 已放置在 {target} 的位置。这两个节点未连接。';
 $ec_lang['lpn_snap_moved_on_node']='{moved} 已移到 {target} 的位置。这两个节点未连接。';
+$ec_lang['lpn_snap_shape_point']='{shape}，点 {n}';
 $ec_lang['lpn_settings_hover_card']='悬停时显示完整标签';
 $ec_lang['lpn_settings_hover_card_tip']='将指针停在节点、连接线或用户上，即可按“设置”中指定的方式查看其标签，无论比例尺如何、标签在地图上是否放得下。这是针对本浏览器的设置，不属于项目。';
 $ec_lang['lpn_scenario_delete_in_base']='要将其从图纸中移除，请在{base}方案中删除。';

@@ -333,6 +333,105 @@
       ],
       "disposition": "glossary",
       "resolution": "WRITTEN by the orchestrator: glossary term 'Shape' (concept drawing-shape-fig), with Tom's 2026-10-13 synonym Figure in translation_notes."
+    },
+    {
+      "key": "lpn_tool_area_tip",
+      "source": "translator",
+      "lang": "hi,es,pt,ro,ru,fa",
+      "complaint": "The tip was cut to a bare 'Area select window/lasso/polygon.' and no longer teaches cycling or Shift.",
+      "readings": [],
+      "disposition": "dismissed",
+      "resolution": "Tom's own wording, 2026-10-13 (he added the period and took the cycle text out). Not reopened."
+    },
+    {
+      "key": "lpn_shp_import_skipped",
+      "source": "translator",
+      "lang": "ro,he,de,hr,cs,sw",
+      "complaint": "'shape type' (the shapefile's own term for a record's geometry) collides with the new Shape concept.",
+      "readings": [],
+      "disposition": "english",
+      "resolution": "APPLIED by the orchestrator: 'shape type' -> 'geometry type' in both forms; the translators had already rendered it as geometry type."
+    },
+    {
+      "key": "lpn_ex_net3_si_desc",
+      "source": "translator",
+      "lang": "es,ru",
+      "complaint": "'a source trace from the Lake' does not say that Lake is a reservoir's name.",
+      "readings": [],
+      "disposition": "dismissed",
+      "resolution": "Kept for this sprint; the translators rendered it as the reservoir named Lake. A candidate English edit for the next pass ('from the reservoir Lake')."
+    },
+    {
+      "key": "lpn_ex_net3_desc",
+      "source": "translator",
+      "lang": "ar",
+      "complaint": "'about 5 miles square' can be read as an area or a side length.",
+      "readings": [],
+      "disposition": "dismissed",
+      "resolution": "'N miles square' is the standard English for a square N miles on a side; ar rendered the side-length reading."
+    },
+    {
+      "key": "lpn_find_query_hint",
+      "source": "translator",
+      "lang": "zh",
+      "complaint": "Prose says AND/OR while the controls show the localized words.",
+      "readings": [],
+      "disposition": "intent",
+      "resolution": "The typed query syntax stays English (AND, OR); prose and controls name the localized words beside it, as the brief says."
+    },
+    {
+      "key": "lpn_geojson_import_renamed",
+      "source": "translator",
+      "lang": "fa,cs,sw",
+      "complaint": "'feature' (a GeoJSON/GIS feature) has no defined term and collides with the asset word in some languages.",
+      "readings": [],
+      "disposition": "glossary",
+      "resolution": "PROPOSED for the next pass: a glossary term 'feature (GIS)'. This sprint each language chose a word distinct from its asset word."
+    },
+    {
+      "key": "lpn_ex_net1_desc",
+      "source": "translator",
+      "lang": "fr,pt",
+      "complaint": "The description does not mention the rule-based controls the title names; 'fictional' questioned.",
+      "readings": [],
+      "disposition": "dismissed",
+      "resolution": "The title carries the rules; Net1 is EPANET's own fictional sample (master's own wording)."
+    },
+    {
+      "key": "lpn_ex_basic_si_desc",
+      "source": "translator",
+      "lang": "fr,tr",
+      "complaint": "Says two reservoirs where the old translation said one.",
+      "readings": [],
+      "disposition": "dismissed",
+      "resolution": "Verified in examples/Basic-example-*.lwn: two reservoirs. The English is right; the old translations were stale."
+    },
+    {
+      "key": "lpn_result_head",
+      "source": "translator",
+      "lang": "he",
+      "complaint": "The he page shows node Head as גובה while the glossary prefers עומד.",
+      "readings": [],
+      "disposition": "intent",
+      "resolution": "Recorded; the guide follows the page's own label. A he Head/HGL pass is owed (Task 737 rules Head and HGL split)."
+    },
+    {
+      "key": "lpn_field_tag",
+      "source": "translator",
+      "lang": "es,it,tr,hr",
+      "complaint": "Tag and Label share one word (Etiqueta, Etichetta, Etiket, Oznaka).",
+      "readings": [],
+      "disposition": "glossary",
+      "resolution": "Known since sprint 667 (glossary label-word-gus note). sw fixed its own (Tagi) this sprint. Raised to Tom in the sprint report."
+    },
+    {
+      "key": "lpn_find_scope_source",
+      "source": "translator",
+      "lang": "cs",
+      "complaint": "The Find scope list shows Zdroj for both Reservoir and Source.",
+      "readings": [],
+      "disposition": "glossary",
+      "resolution": "Recorded for a cs pass: the glossary's cs Reservoir is Zdroj, so Source needs another word. Raised in the sprint report."
     }
   ]
 }
