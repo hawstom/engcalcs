@@ -1,7 +1,7 @@
 {
     "meta": {
         "language": "cs",
-        "expected_key_count": 2634,
+        "expected_key_count": 2628,
         "delta_key_count": 4,
         "exempt_key_count": 42,
         "exempt_keys": [
@@ -48,7 +48,7 @@
             "lpn_library_curve_y",
             "lpn_library_import_count"
         ],
-        "out_of_scope_key_count": 10,
+        "out_of_scope_key_count": 6,
         "coverage": "coverage: core calculators [mpf, mtc, lpn] x core languages [es, pt, fr, tr] (in scope iff calculator OR language is core; identity strings always)",
         "active_prefixes": [
             "lpn"
