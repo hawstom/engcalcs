@@ -113,6 +113,15 @@ sweeps), fix/control-inactive-link (Task 796 crash: Fotobi), fix/example-id-labe
 roadmap calls (625, 643, 681, 749, 785, 789 to 100; 720, 733 to 75; 185, 221, 285 closed).
 Deleted keys: bpn_, hw_ and lpn_notes_epanet_def and _term (master, six); lpn_scenario_delete_goes_one, lpn_sm_basic_off (bentley).
 
+### Merge first, next session (Tom, 2026-10-15: "It's good as is. Merge in the handoff, not now.")
+
+- **feat/text-halo** at 6bc34454 (all-clear pinned). Each label row is one text run; the whole-layer
+  SVG filter was tried and dropped (labels vanished on lat/lon maps, raster cost 5-10x).
+- **fix/search-zoom-accuracy** at 176bab1e (defect track): Settings search, phone fit at 90%, Accuracy
+  0.001 for all projects. His same words, which also settle the 90% limit and leave a saved view as is
+  on opening an example.
+- Merge both in one batch with this file's edits, one full check_all.
+
 ### Branches awaiting his word (pushed; all on the Branch previews page with test steps)
 
 - **feat/bentley-interop** (Tasks 721, 790, 782, 784, 789, 794): now also carries long press (789), Text
@@ -122,13 +131,15 @@ Deleted keys: bpn_, hw_ and lpn_notes_epanet_def and _term (master, six); lpn_sc
 - **Morph (781) is now on feat/bentley-interop** (fast-forwarded to feat/morph 323ec7f3; feat/morph
   deleted). It carries `$ec_lang_syn['lpn_morph_menu']` (Transform) on his word "Transform"; the
   description half of that synonym is CC's wording, awaiting his OK.
-- **feat/text-halo** (791).
 
 ### Questions out to him
 
 - All of 10-14's were answered 2026-10-15 (R-400, Tasks 617, 796). Open now: why Fotobi's "1-hr drain
   w pump off" fails to converge while its siblings do not (R-386), and CC + Mary on Base with a
   non-Base alternative (Task 801).
+- Trickle flows (R-402): at Accuracy 0.001 a zero-demand hour can leave ~0.005 L/s circling a loop.
+  Tom, 10-15: "How can there be flows in zero-demand hours? Something tells me we may have gone down a
+  bad road." Answered 10-15; his call on showing them as zero is still open.
 
 ### Next job
 
