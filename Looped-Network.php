@@ -3245,6 +3245,7 @@ EngCalcs.pageConfig = {
 	lpn_snip_tip_eraser: <?=json_encode($ec_lang['lpn_snip_tip_eraser'])?>,
 	lpn_snip_tip_undo: <?=json_encode($ec_lang['lpn_snip_tip_undo'])?>,
 	lpn_snip_tip_redo: <?=json_encode($ec_lang['lpn_snip_tip_redo'])?>,
+	lpn_snip_tip_copy: <?=json_encode($ec_lang['lpn_snip_tip_copy'])?>,
 	lpn_screenshot_scale_tip: <?=json_encode($ec_lang['lpn_screenshot_scale_tip'])?>,
 	lpn_tool_zoom_selection_tip: <?=json_encode($ec_lang['lpn_tool_zoom_selection_tip'])?>,
 	lpn_tool_zoom_window_tip: <?=json_encode($ec_lang['lpn_tool_zoom_window_tip'])?>,
