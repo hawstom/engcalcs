@@ -66943,6 +66943,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			var right = 0, j, el, rr, rg;
 			for (j = 0; j < cur.length; j++) {
 				el = cur[j];
+				// A row that fills whatever width the box has (a Text's words, R-394) has no width of
+				// its own to ask for; measured here it would be the whole window.
+				if (el.nodeType === 1 && el.classList.contains('lpn-fill-row')) { continue; }
 				if (el.nodeType === 3) {
 					if (!/\S/.test(el.nodeValue)) { continue; }
 					rg = document.createRange(); rg.selectNodeContents(el); rr = rg.getBoundingClientRect();
@@ -69304,8 +69307,14 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// A TEXTAREA, because a Text object is lines (Task 342). Three rows and full width: it has to
 		// LOOK like somewhere you may press Enter, or the capability is invisible. Enter types a
 		// newline rather than committing, which is what a textarea does by itself.
+		// **AS WIDE AS THE BOX, AND IT FOLLOWS THE BOX** (Tom, 2026-10-15: *"The Properties text editor
+		// box is initially too narrow, and it won't drag wider ... I think it should always adjust for
+		// its width to fill the properties box width."*). The row is a block (the page's label rule
+		// makes every label an inline-block, which shrinks to the words and so held the box to them);
+		// the box drags taller only, and wider by dragging the Properties box itself.
 		input.rows = 3;
-		input.style.width = '100%';
+		input.className = 'lpn-text-words';
+		label.className = 'lpn-text-words-row lpn-fill-row';
 		input.value = effective(lb, 'text');
 		input.addEventListener('change', function () {
 			if (writeTextWords(lb, input.value) === 'deleted') { refreshPopupIfOpen(); }
@@ -69331,6 +69340,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// (effectiveFontSize(lb.sizeMult) in buildLabelEls/refreshFontSizes above).
 		var sizeLabel = document.createElement('label'), sizeInput = document.createElement('input');
 		sizeInput.type = 'number'; sizeInput.step = 'any'; sizeInput.min = '0.1';
+		// A multiplier is a short number (1, 1.5, 2): a short box (Tom, 2026-10-15: *"5 times longer
+		// than it ever needs to be"*).
+		sizeInput.className = 'lpn-num-short';
 		sizeInput.value = textSizeMult(lb);
 		sizeInput.addEventListener('change', function () {
 			var v = +sizeInput.value;

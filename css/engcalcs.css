@@ -1987,6 +1987,12 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
    floor is a width, as it is on every other box here -- the property rows stop fitting first. */
 .lpn-propbox { flex-direction: column; resize: both; overflow: hidden; min-width: min(17rem, 94vw); }
 .lpn-propbox .lpn-popover-body { flex: 1 1 auto; min-height: 0; max-height: none; }
+/* A Text's words in Properties fill the box's width and follow it when the box is dragged wider;
+   the words box itself drags taller only (R-394). A short number (the Text's Size multiplier) gets
+   a short box. */
+.lpn-text-words-row { display: block; }
+.lpn-text-words { display: block; width: 100%; box-sizing: border-box; resize: vertical; }
+.lpn-num-short { width: 4em; }
 /* **PROPERTY AND CONDITION SHARE ONE LINE** (Tom, 2026-08-27, of the Find box on a phone). Two
    halves of one phrase -- "Diameter / greater than" -- each narrower than the sentence it belongs
    to, so pairing them costs nothing and buys back a whole line where lines are scarcest.
