@@ -538,8 +538,11 @@ EngCalcs.lpnCollide = (function () {
 	// Tom: *"we only have to check for violation on the nearest side. We have no reason to check the
 	// other side because we will never use it."* The hysteresis now applies only while a user drags
 	// a label, so the far side is genuinely unreachable here and there is nothing to model.
+	// A label the user moved says which side its text hangs on (`side`, the page's hysteresis rule,
+	// Task 807); every other label hangs on the nearest side.
+	function hangsRight(lbl, c) { return lbl.side ? lbl.side === 'right' : c.x >= lbl.anchor.x; }
 	function labelBoxAtEnd(lbl, c) {
-		var left = c.x >= lbl.anchor.x ? c.x : c.x - lbl.w;
+		var left = hangsRight(lbl, c) ? c.x : c.x - lbl.w;
 		return box(left + lbl.w / 2, c.y + lbl.yOff + lbl.h / 2, lbl.w, lbl.h, 0, 'label', lbl.id);
 	}
 	// **ONE BOX PER LINE, NOT ONE BOX FOR THE STACK** (ROADMAP Task 406).
@@ -560,7 +563,7 @@ EngCalcs.lpnCollide = (function () {
 	// nearly invisible on screen.
 	function labelLineBoxes(lbl, c) {
 		var whole = labelBoxAtEnd(lbl, c), n = lbl.lines && lbl.lines.length,
-			toRight = c.x >= lbl.anchor.x, top = whole.cy - lbl.h / 2, lh, out = [], i, w, left;
+			toRight = hangsRight(lbl, c), top = whole.cy - lbl.h / 2, lh, out = [], i, w, left;
 		if (!n || n < 2) { return [whole]; }
 		lh = lbl.h / n;
 		for (i = 0; i < n; i++) {

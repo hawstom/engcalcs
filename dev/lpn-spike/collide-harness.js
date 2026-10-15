@@ -527,16 +527,21 @@ console.log("\n--- goal 3: an auto-placed label never sits on its own leader (To
 {
 	const geom = require('../../js/lpn-geom.js').lpnGeom;
 	const page = fs.readFileSync(path.join(__dirname, '../../js/looped-network.js'), 'utf8');
-	const at = page.search(/function dataLabelOrigin\s*\(/);
-	let i = page.indexOf('{', at), depth = 0, end = i;
-	for (; end < page.length; end++) {
-		if (page[end] === '{') { depth++; }
-		else if (page[end] === '}') { depth--; if (depth === 0) { end++; break; } }
+	function fnSrc(name) {
+		const at = page.search(new RegExp('function ' + name + '\\s*\\('));
+		let i = page.indexOf('{', at), depth = 0, end = i;
+		for (; end < page.length; end++) {
+			if (page[end] === '{') { depth++; }
+			else if (page[end] === '}') { depth--; if (depth === 0) { end++; break; } }
+		}
+		return page.slice(at, end);
 	}
 	const W = 40;
-	const Geom = geom, ADVERSE_FRAC = 0.75;
+	const Geom = geom;
+	const DATA_LABEL_FLIP_FRAC = +/var DATA_LABEL_FLIP_FRAC = ([0-9.]+)/.exec(page)[1];
 	const labelBoxWidth = () => W;
-	const dataLabelOrigin = eval('(' + page.slice(at, end) + ')');
+	const movedLabelSide = eval('(' + fnSrc('movedLabelSide') + ')');
+	const dataLabelOrigin = eval('(' + fnSrc('dataLabelOrigin') + ')');
 
 	const anchor = { x: 0, y: 0 };
 	// Sweep both prior sides across the whole dead band and well past it.
@@ -554,14 +559,28 @@ console.log("\n--- goal 3: an auto-placed label never sits on its own leader (To
 	report(onNearSide === 0, 'an auto-placed box never contains its own anchor, at any endpoint or prior side',
 		swept + ' swept');
 
-	// ...and the hysteresis is still there for a hand on a label, which is what it was for.
+	// ...and a label the user MOVED holds its side until its leader end is HALF ITS WIDTH past the
+	// anchor's line (Tom, 2026-10-15), in the hand and after it, and from its stored side on reload.
 	const held = { side: 'left' };
-	const dragged = dataLabelOrigin(held, anchor, { x: 6, y: -20 }, true);
+	const dragged = dataLabelOrigin(held, anchor, { x: 6, y: -20 }, true, true);
 	report(held.side === 'left' && dragged.x === 6 - W,
 		'a DRAGGED label keeps the hysteresis -- it is what stops a flicker under the hand');
 	const auto = { side: 'left' };
 	dataLabelOrigin(auto, anchor, { x: 6, y: -20 }, false);
 	report(auto.side === 'right', '...and the same endpoint auto-placed takes the nearest side instead');
+	let firstFlip = null;
+	for (let endX = 0; endX <= W; endX += 0.5) {
+		const owner = { lside: 'left' }, h = {};
+		dataLabelOrigin(h, anchor, { x: endX, y: 0 }, owner, false);
+		if (h.side === 'right') { firstFlip = endX; break; }
+	}
+	report(firstFlip === W / 2 + 0.5, 'a moved label let go flips only once its end is past half its width (' + W / 2 + ')', 'flipped at ' + firstFlip);
+	const reloaded = { lside: 'right' }, h2 = {};
+	dataLabelOrigin(h2, anchor, { x: -W / 2, y: 0 }, reloaded, false);
+	report(h2.side === 'right', 'after a reload the stored side holds right up to half the width');
+	const fresh = {}, h3 = {};
+	dataLabelOrigin(h3, anchor, { x: -3, y: 0 }, fresh, false);
+	report(h3.side === 'left' && fresh.lside === 'left', 'a file with no stored side starts from the nearest side, and stores it');
 }
 
 console.log('\n--- the measured constants are the ones that SHIP --------------------------------');

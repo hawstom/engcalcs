@@ -31,6 +31,9 @@ A layout that breaks one of these is wrong, however good its other numbers.
 - **N3. No leader passes through another node's symbol.**
 - **N4. A hand-placed label stays exactly where the user put it and is never hidden.** A leader the
   user dragged ends at its stored end point and is never stretched (Task 807).
+  Its text keeps its side of that end until the end is half the label's width past the vertical
+  line through its node, in the hand, on release, on redraw and across a reload (Tom, 2026-10-15);
+  the side is stored with the label as `lside`.
 - **N5. No label overwrites a Text object.**
 
 (There is no N2.)

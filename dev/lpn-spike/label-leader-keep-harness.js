@@ -306,10 +306,76 @@ async function run(Session, browser) {
 				Math.hypot(reset.end.x - back.end.x, reset.end.y - back.end.y) > dragged * 0.2,
 				'end ' + fmt(reset && reset.end) + ', ' + home.toFixed(4) + ' from its node (dragged: ' + dragged.toFixed(4) + ')');
 		}
+		await sectionSide(a, c, mid);
 		ok('no uncaught page errors', a.errors.length === 0, a.errors.slice(0, 1).join(' | '));
 	} finally {
 		await a.close();
 	}
+}
+
+// **7. THE SIDE HOLDS UNTIL HALF THE WIDTH IS PAST** (Tom, 2026-10-15: *"A label should not flip
+// until half of its width is past the flipping point."*). A label whose text hangs right of its
+// leader end is dragged so the end lands 0.3 of its width LEFT of its node's line: it must still
+// hang right on release, after a zoom, and after a reload. Dragged on to 0.7 of its width past, it
+// flips.
+async function sectionSide(a, c, mid) {
+	console.log('\n--- 7. a moved label keeps its side until half its width is past ---');
+	const page = a.page;
+	await wheel(a, mid, 2, -1);
+	const labs = (await visibleLabels(page, 'data-nodelbl')).filter((l) =>
+		l.x > c.x + 250 && l.x + l.w < c.x + c.w - 250 && l.y > c.y + 200 && l.y + l.h < c.y + c.h - 200);
+	let S = null, sp = null;
+	for (const l of labs) {
+		const p = await probe(page, 'node', l.id);
+		if (p && p.lx === undefined && p.side === 'right' && p.end.x > p.anchor.x) { S = l; sp = p; break; }
+	}
+	ok('an automatic label hanging right of its leader end, to move', !!S);
+	if (!S) { return; }
+	const nodeSX = await page.evaluate((id) => {
+		const e = document.querySelector('#lpn_canvas [data-node="' + id + '"]');
+		const r = e.getBoundingClientRect(); return r.left + r.width / 2;
+	}, S.id);
+	const box = async () => page.evaluate((id) => {
+		const r = document.querySelector('#lpn_canvas text[data-nodelbl="' + id + '"]').getBoundingClientRect();
+		return { l: r.left, r: r.right, w: r.width };
+	}, S.id);
+	const b0 = await box(), grab = await grabPoint(page, 'data-nodelbl', S.id);
+	// The text hangs right, so the end is the box's left edge: put it 0.3 of a width past the line.
+	await drag(page, grab, (nodeSX - 0.3 * b0.w) - b0.l, 30, 25);
+	await a.settle(1200);
+	let p = await probe(page, 'node', S.id);
+	ok('the end is left of its node, by less than half the label\'s width', p && p.end.x < p.anchor.x &&
+		(p.anchor.x - p.end.x) < p.w / 2,
+		p ? 'past the line by ' + ((p.anchor.x - p.end.x) / p.w).toFixed(2) + ' of its width' : '');
+	ok('on release it still hangs right: no flip short of half its width', p && p.side === 'right' && p.lside === 'right',
+		p ? 'side ' + p.side + ', stored ' + p.lside : '');
+	const b1 = await box();
+	ok('...and the text starts at the leader end, right of it', Math.abs(b1.l - (nodeSX - 0.3 * b0.w)) < 6, 'text left ' + b1.l.toFixed(1) + ' vs end ' + (nodeSX - 0.3 * b0.w).toFixed(1));
+	await wheel(a, mid, 2, 1);
+	p = await probe(page, 'node', S.id);
+	ok('after a zoom out it still hangs right', p && p.side === 'right', p ? p.side : '');
+	await wheel(a, mid, 2, -1);
+	await a.settle(1500);
+	await page.reload();
+	await a.settle(2500);
+	await a.answerTrainingPanel().catch(() => {});
+	await page.evaluate(() => { const e = document.getElementById('ec-consent'); if (e) { e.remove(); } });
+	p = await probe(page, 'node', S.id);
+	ok('after a reload it still hangs right', p && p.side === 'right' && p.lside === 'right', p ? 'side ' + p.side + ', stored ' + p.lside : 'no label');
+	// Now past half the width: it flips.
+	await wheel(a, mid, 10, -1);
+	const nodeSX2 = await page.evaluate((id) => {
+		const e = document.querySelector('#lpn_canvas [data-node="' + id + '"]');
+		const r = e.getBoundingClientRect(); return r.left + r.width / 2;
+	}, S.id);
+	const b2 = await box(), g2 = await grabPoint(page, 'data-nodelbl', S.id);
+	ok('the label can be grabbed again', !!g2);
+	if (!g2) { return; }
+	await drag(page, g2, (nodeSX2 - 0.8 * b2.w) - b2.l, 0, 30);
+	await a.settle(1200);
+	p = await probe(page, 'node', S.id);
+	ok('dragged past half its width, it flips to hang left', p && p.side === 'left' && p.lside === 'left',
+		p ? 'side ' + p.side + ', stored ' + p.lside + ' (text dragged 0.8 of its width past the line)' : '');
 }
 
 async function main() {

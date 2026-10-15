@@ -353,13 +353,14 @@ var EngCalcs = EngCalcs || {};
 	// allowed to move with the zoom, unlike B itself. labelBoxWidth() rather than tw directly, so
 	// the box concept stays in one place (since Task 333 the two are equal).
 	//
-	// **THE HYSTERESIS IS FOR A HAND ON A LABEL, AND FOR NOTHING ELSE.** Tom, 2026-08-16: *"we only
+	// **THE HYSTERESIS IS FOR A LABEL THE USER MOVED, AND FOR NOTHING ELSE** (in the hand and after
+	// it, Task 807; see movedLabelSide()). Tom, 2026-08-16: *"we only
 	// have to check for violation on the nearest side. We have no reason to check the other side
 	// because we will never use it."* labelSideAtEnd() holds the PREVIOUS side (in holder.side)
 	// inside a dead band either side of the anchor's vertical line, which can leave the box on the
 	// anchor's side with the leader running the width of the text to reach its endpoint. That is
-	// right while a user DRAGS -- without it a label pulled just past the line flickers a full
-	// box-width from side to side -- and wrong otherwise.
+	// right for a label the user placed -- without it a label pulled just past the line flickers a
+	// full box-width from side to side, and one let go there jumps -- and wrong otherwise.
 	//
 	// An auto-placed label is not dragged: its endpoint comes from seventeen discrete candidates, so
 	// there is no continuous sweep to damp. Taking the nearest side unconditionally also makes
@@ -373,14 +374,14 @@ var EngCalcs = EngCalcs || {};
 	// follows the cursor rigidly -- `gx` is how far from the box's left edge it was picked up -- and
 	// the end is wherever that puts it on the side the rule leaves standing. Where the box straddles
 	// the anchor's line neither side stands; the box sits at the rule's edge on the nearer side, so it
-	// lags the cursor by under a quarter of its width instead of jumping its width.
+	// lags the cursor by under half its width instead of jumping its width.
 	// dev/lpn-spike/label-drag-track-harness.js.
 	function heldLabelEnd(holder, anchor, cw, d) {
-		var w = labelBoxWidth(holder), left = cw.x - d.gx, hyst = (w / 2) * (2 * ADVERSE_FRAC - 1),
+		var w = labelBoxWidth(holder), left = cw.x - d.gx, hyst = (w / 2) * (2 * DATA_LABEL_FLIP_FRAC - 1),
 			prev = holder.side || 'right', order = [prev, prev === 'right' ? 'left' : 'right'], i, e, x, er, el, side;
 		for (i = 0; i < 2; i++) {
 			e = order[i] === 'right' ? left : left + w;
-			if (Geom.labelSideAtEnd(order[i], e, anchor.x, w / 2, ADVERSE_FRAC) === order[i]) {
+			if (Geom.labelSideAtEnd(order[i], e, anchor.x, w / 2, DATA_LABEL_FLIP_FRAC) === order[i]) {
 				holder.side = order[i];
 				return { x: e, y: cw.y + d.offY };
 			}
@@ -395,21 +396,33 @@ var EngCalcs = EngCalcs || {};
 		x = side === 'right' ? left + er : left + w - el;
 		return { x: x, y: cw.y + d.offY };
 	}
-	// **`inHand` IS A LABEL UNDER THE POINTER RIGHT NOW, NOT A LABEL THAT WAS ONCE DRAGGED** (Task
-	// 807). Once it is let go, a dragged label hangs on the nearest side like any other, which is
-	// the side the placer reserved for it (Collide.labelBoxAtEnd()). Held to its last side instead,
-	// a label dropped just past its node's line came back from a reload lying across its own node,
-	// with nothing allowed to move it off.
+	// **A MOVED LABEL KEEPS ITS SIDE UNTIL ITS LEADER END IS HALF ITS WIDTH PAST THE NODE'S LINE**
+	// (Tom, 2026-10-15: *"We had a hysteresis rule. Did that get lost? ... A label should not flip
+	// until half of its width is past the flipping point."*). The flipping point is the vertical
+	// line through the anchor. The rule holds in the hand, on release, on every redraw and across a
+	// reload: the side is stored with the label (`lside`, beside lx/ly), because a side remembered
+	// only by the drawing came back from a reload as "right" and laid N103's label across its own
+	// node. An automatic label still takes the nearest side: it has no sweep to damp.
+	var DATA_LABEL_FLIP_FRAC = 1;   // labelSideAtEnd()'s band is halfW * (2f - 1): f = 1 is half the width
 	function labelInHand(holder) {
 		if (!drag || drag.id === undefined) { return false; }
 		return (drag.type === 'nodelbl' && nodeEls[drag.id] === holder) ||
 			(drag.type === 'linklbl' && linkEls[drag.id] === holder);
 	}
-	function dataLabelOrigin(holder, anchor, end, inHand) {
+	// The side a MOVED label's text hangs on, with nothing written: the placer asks this before the
+	// renderer does, so the two agree. In the hand, heldLabelEnd() has just decided it; otherwise
+	// the stored side is the one to hold, and a file from before `lside` starts from the nearest.
+	function movedLabelSide(holder, owner, anchor, end, inHand) {
+		var near = end.x >= anchor.x ? 'right' : 'left',
+			prev = inHand ? (holder.side || near) : ((owner && owner.lside) || holder.side || near);
+		return Geom.labelSideAtEnd(prev, end.x, anchor.x, labelBoxWidth(holder) / 2, DATA_LABEL_FLIP_FRAC);
+	}
+	// `owner` is the node or pipe of a MOVED label (or `true`), else falsy for an automatic one.
+	function dataLabelOrigin(holder, anchor, end, owner, inHand) {
 		var w = labelBoxWidth(holder);
-		holder.side = inHand
-			? Geom.labelSideAtEnd(holder.side, end.x, anchor.x, w / 2, ADVERSE_FRAC)
+		holder.side = owner ? movedLabelSide(holder, owner, anchor, end, inHand)
 			: (end.x >= anchor.x ? 'right' : 'left');
+		if (owner && owner !== true && owner.lside !== holder.side) { owner.lside = holder.side; }
 		return { x: holder.side === 'right' ? end.x : end.x - w, y: end.y };
 	}
 	// Approximate vertical box of a left-anchored, top-down multi-line <text> (node/link labels).
@@ -435,7 +448,7 @@ var EngCalcs = EngCalcs || {};
 		// repair (Task 539 phase three) and KEEPS the ground it stands on. See shedCrossingLabels().
 		setLabelAssemblyHidden(ne, !!ne.hiddenDropped || !!ne.hiddenCrossed);
 		var anchor = nodeAt(n), end = nodeLabelPos(n),
-			org = dataLabelOrigin(ne, anchor, end, labelInHand(ne));
+			org = dataLabelOrigin(ne, anchor, end, n.lx !== undefined ? n : null, labelInHand(ne));
 		repositionMultilineText(ne.text, org.x, org.y);
 		updateDataLeader(ne, anchor, end);
 	}
@@ -939,9 +952,10 @@ var EngCalcs = EngCalcs || {};
 	// own obstacles. A drawing with no dragged label gets back the obstacles it came with.
 	function withDraggedLabels(obs, fs) {
 		var boxes = [], segs = [], min = leaderThreshold();
-		function add(key, holder, anchor, home) {
+		function add(key, holder, anchor, home, owner) {
 			if (!holder || holder.empty) { return; }
 			var spec = { id: key, anchor: anchor, home: home, w: labelBoxWidth(holder),
+				side: movedLabelSide(holder, owner, anchor, home, labelInHand(holder)),
 				h: dataLabelBoxHeight(holder.lineCount), yOff: -fs * 0.85, lines: labelRowWidths(holder) };
 			Collide.labelLineBoxes(spec, home).forEach(function (b) { boxes.push(b); });
 			if (Math.hypot(home.x - anchor.x, home.y - anchor.y) > min) {
@@ -949,10 +963,10 @@ var EngCalcs = EngCalcs || {};
 			}
 		}
 		doc.nodes.forEach(function (n) {
-			if (n.lx !== undefined) { add(nodeLabelKey(n.id), nodeEls[n.id], nodeAt(n), nodeLabelBase(n)); }
+			if (n.lx !== undefined) { add(nodeLabelKey(n.id), nodeEls[n.id], nodeAt(n), nodeLabelBase(n), n); }
 		});
 		doc.links.forEach(function (l) {
-			if (l.lx !== undefined) { add(linkLabelKey(l.id), linkEls[l.id], linkLabelMid(l), linkLabelBase(l)); }
+			if (l.lx !== undefined) { add(linkLabelKey(l.id), linkEls[l.id], linkLabelMid(l), linkLabelBase(l), l); }
 		});
 		if (!boxes.length && !segs.length) { return obs; }
 		return { boxes: obs.boxes.concat(boxes), segments: obs.segments.concat(segs) };
@@ -1013,7 +1027,7 @@ var EngCalcs = EngCalcs || {};
 			// link label against ground nothing occupies, clearing a conflict that is really there.
 			var at = nodeLabelBase(n),
 				w = labelBoxWidth(ne), h = dataLabelBoxHeight(ne.lineCount),
-				b = Collide.boxFromRect({ x: at.x >= nodeDrawX(n) ? at.x : at.x - w,
+				b = Collide.boxFromRect({ x: movedLabelSide(ne, n, nodeAt(n), at, labelInHand(ne)) === 'right' ? at.x : at.x - w,
 					y: at.y - fs * 0.85, w: w, h: h });
 			b.kind = 'label';
 			obs.boxes.push(b);
@@ -1486,7 +1500,7 @@ var EngCalcs = EngCalcs || {};
 			mid = lone ? linkLabelMid(l) : linkLabelMid(l, along),
 			anchor = { x: mid.x, y: mid.y },
 			end = lone ? linkLabelPos(l) : { x: mid.x + d.x, y: mid.y + d.y },
-			org = dataLabelOrigin(isPrimary ? le : part, anchor, end, isPrimary && labelInHand(le));
+			org = dataLabelOrigin(isPrimary ? le : part, anchor, end, (lone && l.lx !== undefined) ? l : null, isPrimary && labelInHand(le));
 		repositionMultilineText(part.text, org.x, org.y);
 		if (isPrimary) { updateDataLeader(le, anchor, end); }
 	}
@@ -1551,14 +1565,14 @@ var EngCalcs = EngCalcs || {};
 	function resetNodeLabelHome(id) {
 		var n = nodeById(id); if (!n || n.lx === undefined) { return; }
 		saveUndoSnapshot();
-		delete n.lx; delete n.ly;
+		delete n.lx; delete n.ly; delete n.lside;
 		layoutNodeLabel(id);
 		scheduleSolve();
 	}
 	function resetLinkLabelHome(id) {
 		var l = linkById(id); if (!l || l.lx === undefined) { return; }
 		saveUndoSnapshot();
-		delete l.lx; delete l.ly;
+		delete l.lx; delete l.ly; delete l.lside;
 		layoutLinkLabel(id);
 		scheduleSolve();
 	}
@@ -2817,7 +2831,7 @@ var EngCalcs = EngCalcs || {};
 		// **EVERY NODE LABEL STARTS FROM ITS FULL CONTENT** (Task 469), before anything is measured
 		// into a placement spec. Shedding down from whatever survived the last pass is a ratchet.
 		if (shedNodes) { unshedNodeLabels(fsNow); }
-		function addDataLabel(key, holder, anchor, home, dragged, lineCount) {
+		function addDataLabel(key, holder, anchor, home, dragged, lineCount, owner) {
 			// Every nudge is cleared and re-derived from scratch on every pass, dragged or not, so
 			// the pass is IDEMPOTENT: running it twice on an unchanged drawing gives the same answer
 			// as running it once. Keeping the previous nudge and searching from there is what made
@@ -2828,6 +2842,7 @@ var EngCalcs = EngCalcs || {};
 			holders[key] = holder;
 			labels.push({
 				id: key, anchor: anchor, home: home, dragged: !!dragged,
+				side: dragged ? movedLabelSide(holder, owner, anchor, home, labelInHand(holder)) : undefined,
 				w: labelBoxWidth(holder), h: dataLabelBoxHeight(lineCount), yOff: -fs * 0.85,
 				lines: labelRowWidths(holder)
 			});
@@ -2848,7 +2863,7 @@ var EngCalcs = EngCalcs || {};
 			var ne = nodeEls[n.id]; if (!ne) { return; }
 			ne.hiddenDropped = false;
 			if (n.lx !== undefined) {
-				addDataLabel(nodeLabelKey(n.id), ne, nodeAt(n), nodeLabelBase(n), true, ne.lineCount);
+				addDataLabel(nodeLabelKey(n.id), ne, nodeAt(n), nodeLabelBase(n), true, ne.lineCount, n);
 				return;
 			}
 			addNodeFirstFit(n, ne);
@@ -2872,7 +2887,7 @@ var EngCalcs = EngCalcs || {};
 				return;
 			}
 			addDataLabel(linkLabelKey(l.id), le, linkLabelMid(l), linkLabelBase(l),
-				l.lx !== undefined, le.lineCount);
+				l.lx !== undefined, le.lineCount, l);
 		});
 		// **LINKS PLACE FIRST, NODES SURVIVE FIRST** -- two different orders answering two different
 		// questions, exactly the split ESRI Maplex draws between label priority and what is left
@@ -33639,7 +33654,7 @@ var EngCalcs = EngCalcs || {};
 		nl.verts = newVerts;   // base-write: construction: whole copies, so a vertex keeps its typed characters
 		// Everything the pipe carries comes across, except what is its own place or identity.
 		Object.keys(clone).forEach(function (k) {
-			if (k === 'id' || k === 'from' || k === 'to' || k === 'verts' || k === 'lx' || k === 'ly' ||
+			if (k === 'id' || k === 'from' || k === 'to' || k === 'verts' || k === 'lx' || k === 'ly' || k === 'lside' ||
 				k === 'tag' || k === '_k' || k === 'fittingsId' || k === '_fittingsId') { return; }
 			nl[k] = clone[k];   // base-write: construction: the new half is born in Base as a copy of the pipe it came from
 		});
@@ -36327,12 +36342,12 @@ var EngCalcs = EngCalcs || {};
 		(saved.nodes || []).forEach(function (n) {
 			if (n.lx === undefined && n.ly === undefined) { return; }
 			if (!absurd(n.lx, n.ly)) { return; }
-			delete n.lx; delete n.ly; dropped++;
+			delete n.lx; delete n.ly; delete n.lside; dropped++;
 		});
 		(saved.links || []).forEach(function (l) {
 			if (l.lx === undefined && l.ly === undefined) { return; }
 			if (!absurd(l.lx, l.ly)) { return; }
-			delete l.lx; delete l.ly; dropped++;
+			delete l.lx; delete l.ly; delete l.lside; dropped++;
 		});
 		// An ANCHORED Text's x/y is an offset from its anchor; a FREE one's is a position, and a
 		// position is never absurd -- it is just somewhere. Telling those two apart is the whole
@@ -72309,7 +72324,7 @@ var EngCalcs = EngCalcs || {};
 			anchor: kind === 'node' ? nodeAt(x) : linkLabelMid(x),
 			leader: (L && L.style.display !== 'none') ? { x1: +L.getAttribute('x1'), y1: +L.getAttribute('y1'),
 				x2: +L.getAttribute('x2'), y2: +L.getAttribute('y2') } : null,
-			hidden: !!(h.text && h.text.style.visibility === 'hidden') };
+			hidden: !!(h.text && h.text.style.visibility === 'hidden'), side: h.side, lside: x.lside, w: labelBoxWidth(h) };
 	};
 	// The Full report's Type column harness opens the box through this, not through the menu.
 	EngCalcs.lpnOpenFullReportBox = function () { return openFullReportBox(); };
