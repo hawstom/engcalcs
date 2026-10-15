@@ -77,8 +77,15 @@ const get = (e, code) => { const p = e.g.find((q) => q[0] === code); return p ? 
 const getAll = (e, code) => e.g.filter((q) => q[0] === code).map((q) => q[1]);
 const near = (a, b, rel) => Math.abs(a - b) <= (rel || 1e-9) * Math.max(1, Math.abs(a), Math.abs(b));
 
+// EC_EZDXF_PYTHON, else ~/venvs/ezdxf/bin/python when it exists (where check_all's machine keeps
+// ezdxf, so a run finds it with nothing set), else python3.
+function ezdxfPython() {
+	if (process.env.EC_EZDXF_PYTHON) { return process.env.EC_EZDXF_PYTHON; }
+	const venv = path.join(require('os').homedir(), 'venvs', 'ezdxf', 'bin', 'python');
+	return fs.existsSync(venv) ? venv : 'python3';
+}
 function ezdxfAudit(file) {
-	const py = process.env.EC_EZDXF_PYTHON || 'python3';
+	const py = ezdxfPython();
 	const r = spawnSync(py, ['-c', [
 		'import sys',
 		'try:',
@@ -91,6 +98,7 @@ function ezdxfAudit(file) {
 		'print("ERR", len(auditor.errors) + len(a.errors), "FIX", len(auditor.fixes) + len(a.fixes))',
 		'for e in list(auditor.errors) + list(a.errors): print("  ", e.message)'
 	].join('\n'), file], { encoding: 'utf8' });
+	if (r.error) { return 'NOEZDXF (' + py + ': ' + r.error.message + ')'; }
 	return (r.stdout || '') + (r.stderr || '');
 }
 
@@ -200,10 +208,12 @@ function checkDrawing(label, out, geo) {
 	const tmp = path.join(require('os').tmpdir(), NAME + '-' + process.pid + '-' + label.replace(/\W+/g, '_') + '.dxf');
 	fs.writeFileSync(tmp, Buffer.from(T, 'latin1'));
 	const audit = ezdxfAudit(tmp);
-	if (/NOEZDXF/.test(audit) || !/ERR/.test(audit)) {
+	// NOT RUN only when there is no ezdxf to ask. An auditor that crashed (a traceback, no ERR line)
+	// on our file is a FAIL: ezdxf recover is built to read broken files, so a crash is a finding.
+	if (/^NOEZDXF/.test(audit)) {
 		console.log('  NOT RUN  ' + label + ': ezdxf audit (set EC_EZDXF_PYTHON to a Python with ezdxf)');
 	} else {
-		ok(label + ': ezdxf recover + audit: 0 errors', /ERR 0 /.test(audit), audit.trim().split('\n').slice(0, 4).join(' / '));
+		ok(label + ': ezdxf recover + audit: 0 errors and 0 fixes', /^ERR 0 FIX 0$/m.test(audit), audit.trim().split('\n').slice(0, 4).join(' / '));
 	}
 	fs.unlinkSync(tmp);
 }
