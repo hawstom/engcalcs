@@ -922,6 +922,31 @@ var EngCalcs = EngCalcs || {};
 	//
 	// The cost is one extra placeLabelsFirstFit() on a CONTENT pass and none on a drag frame: this
 	// runs where the shed runs.
+	// **A DRAGGED LABEL IS A FIXED OBSTACLE TO EVERY AUTOMATIC NODE LABEL** (Task 807). It no
+	// longer moves, so the stretch that used to carry it clear of a crowd is gone and the crowd has
+	// to keep clear of it instead. Its rows and its drawn leader, exactly where the user put them;
+	// the node first-fit, its shed and the gang repair are handed these alongside the drawing's
+	// own obstacles. A drawing with no dragged label gets back the obstacles it came with.
+	function withDraggedLabels(obs, fs) {
+		var boxes = [], segs = [], min = leaderThreshold();
+		function add(key, holder, anchor, home) {
+			if (!holder || holder.empty) { return; }
+			var spec = { id: key, anchor: anchor, home: home, w: labelBoxWidth(holder),
+				h: dataLabelBoxHeight(holder.lineCount), yOff: -fs * 0.85, lines: labelRowWidths(holder) };
+			Collide.labelLineBoxes(spec, home).forEach(function (b) { boxes.push(b); });
+			if (Math.hypot(home.x - anchor.x, home.y - anchor.y) > min) {
+				segs.push(Collide.segment(anchor.x, anchor.y, home.x, home.y, 'leader', key));
+			}
+		}
+		doc.nodes.forEach(function (n) {
+			if (n.lx !== undefined) { add(nodeLabelKey(n.id), nodeEls[n.id], nodeAt(n), nodeLabelBase(n)); }
+		});
+		doc.links.forEach(function (l) {
+			if (l.lx !== undefined) { add(linkLabelKey(l.id), linkEls[l.id], linkLabelMid(l), linkLabelBase(l)); }
+		});
+		if (!boxes.length && !segs.length) { return obs; }
+		return { boxes: obs.boxes.concat(boxes), segments: obs.segments.concat(segs) };
+	}
 	function predictNodeLabelBoxes(fs) {
 		var specs = [], obs = staticObstacles(), stationed = [];
 		// **THE PIPE LABELS ARE IN THE PREDICTION, AT FULL CONTENT, and leaving them out costs
@@ -946,7 +971,7 @@ var EngCalcs = EngCalcs || {};
 			specs.push(nodeFirstFitSpec(n, ne, fs));
 		});
 		if (!specs.length) { return []; }
-		return Collide.placeLabelsFirstFit(rankNodeLabels(specs), obs,
+		return Collide.placeLabelsFirstFit(rankNodeLabels(specs), withDraggedLabels(obs, fs),
 			{ pad: fs * LPN_ALIGNED_PAD_FRAC });
 	}
 	function shedAlignedForConflicts(fsNow, fs) {
@@ -2851,8 +2876,8 @@ var EngCalcs = EngCalcs || {};
 		// before this pass runs, which is the graceful form of the same ruling; a repair on top is a
 		// second, cruder mechanism reaching the same situation by another door, and a reader cannot
 		// tell the two apart. If a node label still cannot fit once link labels have shed, it drops.
-		var pad = fs * LPN_ALIGNED_PAD_FRAC,
-			nodePlaced = Collide.placeLabelsFirstFit(nodeLabels, obs, { pad: pad });
+		var pad = fs * LPN_ALIGNED_PAD_FRAC, nodeObs = withDraggedLabels(obs, fs),
+			nodePlaced = Collide.placeLabelsFirstFit(nodeLabels, nodeObs, { pad: pad });
 		// **AND THEN THE ONES THAT DID NOT FIT GIVE UP A PROPERTY AND TRY AGAIN** (Task 469). This
 		// is the graceful rung the node half never had; the drop above is now its terminal one.
 		//
@@ -2863,7 +2888,7 @@ var EngCalcs = EngCalcs || {};
 		// debounced scheduleReshed() -- which is exactly where the link cascade lives. A drag frame
 		// places whatever content the last content pass decided, and re-decides on the way out.
 		if (shedNodes) {
-			nodePlaced = shedNodeLabelsForCrowding(nodeLabels, nodePlaced, obs, pad, fsNow);
+			nodePlaced = shedNodeLabelsForCrowding(nodeLabels, nodePlaced, nodeObs, pad, fsNow);
 		}
 		// Every number the ring pass is steered by goes through ONE place, so ?debug=labels can
 		// override them live without a second code path deciding anything (see labelTuning()). It
@@ -2897,7 +2922,7 @@ var EngCalcs = EngCalcs || {};
 		// flicker every pass here is written to avoid. Measured, so the price is on the record: on
 		// Net3-World with every label field on the whole repair is 19-58 ms a pass, against 25-90 ms
 		// for ONE of the four to six placeLabelsFirstFit() calls the same pass already makes.
-		var repaired = Collide.repairCrossingGangs(nodeLabels, nodePlaced, obs, {
+		var repaired = Collide.repairCrossingGangs(nodeLabels, nodePlaced, nodeObs, {
 			pad: pad, leaderMin: leaderThreshold(),
 			// The closing count is a second sweep of the whole drawing for a number no decision
 			// reads, so it is taken only when the bench is open to print it.
@@ -72259,6 +72284,19 @@ var EngCalcs = EngCalcs || {};
 	// The heads and flows on screen, for dev/lpn-spike/snap-browser-harness.js (Task 782): it asserts
 	// that a model edited by snapping still solves.
 	EngCalcs.lpnSolveProbe = function () { return lastSolveResult; };
+	// One data label as stored and as drawn, in drawing units, for
+	// dev/lpn-spike/label-leader-keep-harness.js (Task 807): a dragged label must not move.
+	EngCalcs.lpnLabelProbe = function (kind, id) {
+		var x = kind === 'node' ? nodeById(id) : linkById(id),
+			h = kind === 'node' ? nodeEls[id] : linkEls[id], L = h && h.leader;
+		if (!x || !h) { return null; }
+		return { lx: x.lx, ly: x.ly, nudge: h.nudge ? { x: h.nudge.x, y: h.nudge.y } : null,
+			end: kind === 'node' ? nodeLabelPos(x) : linkLabelPos(x),
+			anchor: kind === 'node' ? nodeAt(x) : linkLabelMid(x),
+			leader: (L && L.style.display !== 'none') ? { x1: +L.getAttribute('x1'), y1: +L.getAttribute('y1'),
+				x2: +L.getAttribute('x2'), y2: +L.getAttribute('y2') } : null,
+			hidden: !!(h.text && h.text.style.visibility === 'hidden') };
+	};
 	// The Full report's Type column harness opens the box through this, not through the menu.
 	EngCalcs.lpnOpenFullReportBox = function () { return openFullReportBox(); };
 
