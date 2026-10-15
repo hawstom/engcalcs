@@ -120,7 +120,7 @@ uncommitted; silence means commit and push.
 
 ### A merge batch costs one check_all run (Tom, 2026-10-15)
 
-Five branches merged on 2026-10-15 took two full suite runs of ~25 min each; the first failed on a
+Five branches merged on 2026-10-15 took two full suite runs of ~57 min each; the first failed on a
 brittle harness (`epanet-topology-refusal-harness.js` pinned EPANET's give-up time, which moved by
 three hours on a 0.2% pipe-length change). The suite had grown from ~8 min on 10-02 as browser
 harnesses, which run one at a time, went from 1 to 59. Tom: *"It sounds to me like we have a huge
