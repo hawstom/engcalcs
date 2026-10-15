@@ -15,7 +15,7 @@
 //      used to go to EPANET anyway (Error 216, the whole run refused). Before the fix this part
 //      did not merely fail: the refusals damaged the engine and a later run hung inside it;
 //   3. "did not converge" in the pump-off scenarios, which he asked about, is EPANET's verdict at
-//      this page's Accuracy of 0.00001, not a wrong network: removing a pump leaves a dead-end
+//      the former default Accuracy of 0.00001 (0.001 since R-388), not a wrong network: removing a pump leaves a dead-end
 //      pipe with no flow where it stood, the flows elsewhere are a ten-thousandth of a gpm, and at
 //      EPANET's own default Accuracy (0.001) the same network converges -- to heads within a
 //      millimetre of both the unconverged answer and the built-in solver's.
@@ -102,8 +102,12 @@ async function everyScenario(label) {
 	console.log('\n--- 3. "did not converge" with the pumps off is the Accuracy, not the network ---');
 	load();
 	const m = modelOf('EPS Pump off');
-	const tight = await EngCalcs.lpnSolveEpanet(clone(m), {});
-	ok('at this page\'s Accuracy (0.00001) EPANET reports it did not converge', tight.ok && tight.converged === false,
+	const dflt = await EngCalcs.lpnSolveEpanet(clone(m), {});
+	ok('at this page\'s default Accuracy (0.001, R-388) EPANET converges', dflt.ok && dflt.converged === true, dflt.iterations + ' iterations');
+	const strict = clone(m);
+	strict.hydraulics = Object.assign({}, strict.hydraulics, { accuracy: 0.00001 });
+	const tight = await EngCalcs.lpnSolveEpanet(strict, {});
+	ok('at the former default Accuracy (0.00001) EPANET reports it did not converge', tight.ok && tight.converged === false,
 		'relative error ' + tight.relativeError + ' after ' + tight.iterations);
 	const loose = clone(m);
 	loose.hydraulics = Object.assign({}, loose.hydraulics, { accuracy: 0.001 });

@@ -81,7 +81,7 @@ rows) are counted only when present. Regenerate with
 | `lpn_set_sub_linkColors` | 5 | 5 | 0 | 0 |
 | `lpn_set_sub_custLbl` | 8 | 8 | 0 | 0 |
 | `lpn_set_sub_nodeLink` | 2 | 2 | 0 | 0 |
-| `lpn_set_sub_mapDisplay` | 18 | 18 | 0 | 0 |
+| `lpn_set_sub_mapDisplay` | 19 | 19 | 0 | 0 |
 | `lpn_set_sub_page` | 2 | 0 | 2 | 0 |
 | `lpn_set_sub_idPrefixes` | 7 | 7 | 0 | 0 |
 | `lpn_set_sub_defaults` | 5 | 5 | 0 | 0 |
@@ -91,7 +91,7 @@ rows) are counted only when present. Regenerate with
 | `lpn_set_sub_hydraulics` | 17 | 16 | 1 | 0 |
 | `lpn_set_sub_energy` | 5 | 5 | 0 | 0 |
 | `lpn_set_sub_quality` | 2 | 2 | 0 | 0 |
-| **Total** | 132 | 129 | 3 | 0 |
+| **Total** | 133 | 130 | 3 | 0 |
 
 Controls whose home is not their heading's default, as observed:
 
