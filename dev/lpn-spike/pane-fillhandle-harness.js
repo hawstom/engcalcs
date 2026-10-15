@@ -185,7 +185,7 @@ console.log('\n--- 5. a non-settable column caught in the drag is skipped and co
 			L.cellText('junctions', id, 'id'));
 		report(L.cellText('junctions', id, 'pressure') === beforePressure[i], 'row ' + i + '\'s Pressure (result) is untouched');
 	});
-	const m = /Filled (\d+) cells\. (\d+) were not changed/.exec(L.notice());
+	const m = /Cells filled: (\d+)\. Cells not changed: (\d+)/.exec(L.notice());
 	report(!!m, 'the notice reports what was filled and what was skipped', L.notice());
 	if (m) { report(+m[2] > 0, '{skipped} counts at least the id and Pressure cells in range', L.notice()); }
 }

@@ -117,7 +117,7 @@ console.log('\n--- 2. the id column is skipped by name and counted in {skipped} 
 	});
 	report(L.cellText('junctions', ids[2], 'demand') === '55', 'the settable column in range still fills',
 		L.cellText('junctions', ids[2], 'demand'));
-	const m = /(\d+) were not changed/.exec(L.notice());
+	const m = /Cells not changed: (\d+)/.exec(L.notice());
 	report(!!m && +m[1] >= 4, '{skipped} counts (at least) the 4 id cells that were "not changed"', L.notice());
 }
 
