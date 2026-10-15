@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "my",
-        "expected_key_count": 2629,
-        "delta_key_count": 5,
+        "expected_key_count": 2632,
+        "delta_key_count": 8,
         "exempt_key_count": 43,
         "exempt_keys": [
             "u_imgd",
@@ -726,14 +726,20 @@
         "lpn_ex_net1_si_title": "EPANET Net1 plus rule-based controls, L\/s (SI)",
         "lpn_ex_net1_si_desc": "Liters per second, with meters and millimeters. A fictional EPANET example converted from gallons per minute, feet, and inches, with chlorine, 1 reservoir, 1 tank, 1 pump, and two rule-based controls.",
         "lpn_tool_zoom_selection_tip": "Fit the selected assets to the map window. Select one or more assets first.",
-        "lpn_time_run_stopped": "The EPANET run stopped at {time}, so it has no results. Its run report says why."
+        "lpn_inp_drop_comments": "These comment lines in the patterns or simple controls of this file were not imported, because this page has no place to keep them (for example, between the rows of one pattern). Every pattern and control was imported in full.",
+        "lpn_field_length_slope_tip": "Pipe length. When Auto is checked, the length is measured along the slope: the drawn length combined with the difference in elevation between the two end nodes.",
+        "lpn_time_run_stopped": "The EPANET run stopped at {time}, so it has no results. Its run report says why.",
+        "lpn_snip_tip_copy": "Copy (Ctrl+C)"
     },
     "keys": {
         "lpn_tool_zoom_selection": "Zoom to selection",
         "lpn_ex_net1_si_title": "EPANET Net1 plus rule-based controls, L\/s (SI)",
         "lpn_ex_net1_si_desc": "Liters per second, with meters and millimeters. A fictional EPANET example converted from gallons per minute, feet, and inches, with chlorine, 1 reservoir, 1 tank, 1 pump, and two rule-based controls.",
         "lpn_tool_zoom_selection_tip": "Fit the selected assets to the map window. Select one or more assets first.",
-        "lpn_time_run_stopped": "The EPANET run stopped at {time}, so it has no results. Its run report says why."
+        "lpn_inp_drop_comments": "These comment lines in the patterns or simple controls of this file were not imported, because this page has no place to keep them (for example, between the rows of one pattern). Every pattern and control was imported in full.",
+        "lpn_field_length_slope_tip": "Pipe length. When Auto is checked, the length is measured along the slope: the drawn length combined with the difference in elevation between the two end nodes.",
+        "lpn_time_run_stopped": "The EPANET run stopped at {time}, so it has no results. Its run report says why.",
+        "lpn_snip_tip_copy": "Copy (Ctrl+C)"
     },
     "key_context": {
         "lpn_tool_zoom_selection": {
@@ -800,6 +806,38 @@
                 }
             }
         },
+        "lpn_inp_drop_comments": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_drop_sections",
+                    "value": "ဤဖိုင်တွင် ဤစာမျက်နှာက လုံးဝ မဖတ်သော အပိုင်းတစ်ခု ပါရှိသည်။ ဤနေရာတွင် ၎င်းကို အသုံးမပြုပါ။ ၎င်းကို အပြည့်အစုံ ဆက်ထိန်းသိမ်းထားပြီး၊ EPANET ဖိုင်တစ်ခု သိမ်းလိုက်ပါက ၎င်းကို ပြန်ရေးပေးမည်။",
+                    "english": "This file holds a section that this page does not read at all. Nothing here uses it. It is kept whole, and it is written back if you save an EPANET file."
+                },
+                "next_translated": {
+                    "key": "lpn_inp_drop_quality_options",
+                    "value": "ဤဖိုင်သည် EPANET ရေအရည်အသွေး ရွေးစရာများကို ဖော်ပြသည် - ရေအရည်အသွေး ခွဲခြမ်းစိတ်ဖြာမှု အမျိုးအစားကို အမည်ပေးသော Quality option နှင့် ဓာတုပစ္စည်းနှင့် တွဲပါသော ဆက်တင်နှစ်ခု Relative diffusivity နှင့် Quality tolerance။ သုံးခုလုံးကို ထားပြီး သုံးသည်။ ရေအသက်၊ ရင်းမြစ်ခြေရာခံခြင်းနှင့် ဓာတုပစ္စည်းတစ်ခုကို ဤနေရာတွင် တစ်ခုစီ တွက်ချက်ပြီး ဓာတုပစ္စည်းဆက်တင်နှစ်ခုကို ဓာတုပစ္စည်းတစ်ခု လည်ပတ်သည့်အခါ သုံးသည်။ EPANET ဖိုင်သိမ်းလျှင် ၎င်းတို့အားလုံးကို ပြန်ရေးသည်။",
+                    "english": "This file states EPANET water quality options: the Quality option, which names the kind of water quality analysis, and two settings that go with a chemical, Relative diffusivity and Quality tolerance. All three are kept and used. Water age, source trace, and a chemical are each computed here, and the two chemical settings are used when a chemical is run. All of them are written back if you save an EPANET file."
+                }
+            }
+        },
+        "lpn_field_length_slope_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_field_length",
+                    "value": "အလျား",
+                    "english": "Length"
+                },
+                "next_translated": {
+                    "key": "lpn_field_from",
+                    "value": "မှ",
+                    "english": "From"
+                }
+            }
+        },
         "lpn_time_run_stopped": {
             "reason": "missing",
             "current_value": null,
@@ -813,6 +851,22 @@
                     "key": "lpn_time_run_fell_back",
                     "value": "မျက်နှာပြင်ပေါ်ရှိ ဂဏန်းများသည် တွင်ပါ ဖြေရှင်းစက်မှ ရခဲ့သည်။ ၎င်းသည် တစ်ကြိမ်လျှင် အချိန်တစ်ခုကို ဖြေရှင်းသဖြင့် ဤသည်မှာ {time} ရှိ ကွန်ရက်သာဖြစ်ပြီး ရေတိုက်တိုင်းသည် စတင်အဆင့်တွင် ရှိသည်။",
                     "english": "The numbers on screen came from the built-in solver instead. It solves one instant at a time, so this is the network at {time} only, with every tank at its initial level."
+                }
+            }
+        },
+        "lpn_snip_tip_copy": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_snip_tip_redo",
+                    "value": "ပြန်လုပ်ရန် (Ctrl+Y)",
+                    "english": "Redo (Ctrl+Y)"
+                },
+                "next_translated": {
+                    "key": "lpn_screenshot_scale_tip",
+                    "value": "မျက်နှာပြင်ပေါ်ရှိ နယ်ပယ်၏ ဆအဖြစ် ပြသော ပုံအရွယ်။ ပိုကြီးလျှင် ပိုကြည်လင်ပြီး ဖိုင်ပိုကြီးသည်။",
+                    "english": "The picture's size as a multiple of the area on the screen. A larger one is sharper and makes a bigger file."
                 }
             }
         }

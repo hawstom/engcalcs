@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "ps",
-        "expected_key_count": 2629,
-        "delta_key_count": 5,
+        "expected_key_count": 2632,
+        "delta_key_count": 8,
         "exempt_key_count": 37,
         "exempt_keys": [
             "u_imgd",
@@ -720,14 +720,20 @@
         "lpn_ex_net1_si_title": "EPANET Net1 plus rule-based controls, L\/s (SI)",
         "lpn_ex_net1_si_desc": "Liters per second, with meters and millimeters. A fictional EPANET example converted from gallons per minute, feet, and inches, with chlorine, 1 reservoir, 1 tank, 1 pump, and two rule-based controls.",
         "lpn_tool_zoom_selection_tip": "Fit the selected assets to the map window. Select one or more assets first.",
-        "lpn_time_run_stopped": "The EPANET run stopped at {time}, so it has no results. Its run report says why."
+        "lpn_inp_drop_comments": "These comment lines in the patterns or simple controls of this file were not imported, because this page has no place to keep them (for example, between the rows of one pattern). Every pattern and control was imported in full.",
+        "lpn_field_length_slope_tip": "Pipe length. When Auto is checked, the length is measured along the slope: the drawn length combined with the difference in elevation between the two end nodes.",
+        "lpn_time_run_stopped": "The EPANET run stopped at {time}, so it has no results. Its run report says why.",
+        "lpn_snip_tip_copy": "Copy (Ctrl+C)"
     },
     "keys": {
         "lpn_tool_zoom_selection": "Zoom to selection",
         "lpn_ex_net1_si_title": "EPANET Net1 plus rule-based controls, L\/s (SI)",
         "lpn_ex_net1_si_desc": "Liters per second, with meters and millimeters. A fictional EPANET example converted from gallons per minute, feet, and inches, with chlorine, 1 reservoir, 1 tank, 1 pump, and two rule-based controls.",
         "lpn_tool_zoom_selection_tip": "Fit the selected assets to the map window. Select one or more assets first.",
-        "lpn_time_run_stopped": "The EPANET run stopped at {time}, so it has no results. Its run report says why."
+        "lpn_inp_drop_comments": "These comment lines in the patterns or simple controls of this file were not imported, because this page has no place to keep them (for example, between the rows of one pattern). Every pattern and control was imported in full.",
+        "lpn_field_length_slope_tip": "Pipe length. When Auto is checked, the length is measured along the slope: the drawn length combined with the difference in elevation between the two end nodes.",
+        "lpn_time_run_stopped": "The EPANET run stopped at {time}, so it has no results. Its run report says why.",
+        "lpn_snip_tip_copy": "Copy (Ctrl+C)"
     },
     "key_context": {
         "lpn_tool_zoom_selection": {
@@ -794,6 +800,38 @@
                 }
             }
         },
+        "lpn_inp_drop_comments": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_drop_sections",
+                    "value": "دا فایل یوه برخه لري چې دا پاڼه یې هیڅکله نه لولي. دلته هیڅ شی نه یې کاروي. بشپړه ساتل کیږي، او که تاسو EPANET فایل وساتئ، بېرته لیکل کیږي.",
+                    "english": "This file holds a section that this page does not read at all. Nothing here uses it. It is kept whole, and it is written back if you save an EPANET file."
+                },
+                "next_translated": {
+                    "key": "lpn_inp_drop_quality_options",
+                    "value": "دا فایل د EPANET د اوبو کیفیت اختیارونه بیانوي: د کیفیت اختیار، چې د اوبو کیفیت شننې ډول نوموي، او دوه ټاکنې چې له یوې کیمیاوي مادې سره ځي، نسبي خپریدنه او د کیفیت زغم. دا درې واړه ساتل کیږي او کارول کیږي. د اوبو عمر، د سرچینې رهیابي، او یوه کیمیاوي ماده هر یو دلته محاسبه کیږي، او دوه کیمیاوي ټاکنې کارول کیږي کله چې یوه کیمیاوي ماده وچلول شي. ټول بېرته لیکل کیږي که تاسو EPANET فایل وساتئ.",
+                    "english": "This file states EPANET water quality options: the Quality option, which names the kind of water quality analysis, and two settings that go with a chemical, Relative diffusivity and Quality tolerance. All three are kept and used. Water age, source trace, and a chemical are each computed here, and the two chemical settings are used when a chemical is run. All of them are written back if you save an EPANET file."
+                }
+            }
+        },
+        "lpn_field_length_slope_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_field_length",
+                    "value": "اوږدوالی",
+                    "english": "Length"
+                },
+                "next_translated": {
+                    "key": "lpn_field_from",
+                    "value": "له",
+                    "english": "From"
+                }
+            }
+        },
         "lpn_time_run_stopped": {
             "reason": "missing",
             "current_value": null,
@@ -807,6 +845,22 @@
                     "key": "lpn_time_run_fell_back",
                     "value": "په سکرین کې شمېرې پر ځای یې له دننه جوړ شوي حل کوونکي څخه راغلې. دا یو وخت یوازې یوه شېبه حلوي، نو دا شبکه یوازې په {time} کې ده، هر ټانک په خپله پیل کچه.",
                     "english": "The numbers on screen came from the built-in solver instead. It solves one instant at a time, so this is the network at {time} only, with every tank at its initial level."
+                }
+            }
+        },
+        "lpn_snip_tip_copy": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_snip_tip_redo",
+                    "value": "بیا کول (Ctrl+Y)",
+                    "english": "Redo (Ctrl+Y)"
+                },
+                "next_translated": {
+                    "key": "lpn_screenshot_scale_tip",
+                    "value": "د انځور اندازه د سکرین پر ساحې د ضرب په توګه. لوی یې روښانه دی او لوی فایل جوړوي.",
+                    "english": "The picture's size as a multiple of the area on the screen. A larger one is sharper and makes a bigger file."
                 }
             }
         }
