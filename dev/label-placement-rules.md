@@ -29,8 +29,8 @@ A layout that breaks one of these is wrong, however good its other numbers.
 
 - **N1. No label overwrites a symbol or another label.**
 - **N3. No leader passes through another node's symbol.**
-- **N4. A hand-placed label stays where the user put it and is never hidden.** A leader the user
-  dragged passes through its stored end point.
+- **N4. A hand-placed label stays exactly where the user put it and is never hidden.** A leader the
+  user dragged ends at its stored end point and is never stretched (Task 807).
 - **N5. No label overwrites a Text object.**
 
 (There is no N2.)

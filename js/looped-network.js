@@ -138,7 +138,14 @@ var EngCalcs = EngCalcs || {};
 	// than off it, clamped well inside the ends so it never crowds a node.
 	// `along` overrides the half-way station, passed only by the aligned-label station search: an
 	// aligned label cannot be nudged sideways without leaving its pipe, so it SLIDES.
+	// **A DRAGGED LABEL'S LEADER STARTS AT THE TRUE HALF-WAY POINT, NEVER THE DODGED ONE** (Task
+	// 807). The dodge depends on the arrows, which come and go with a solve and whose size is in
+	// screen pixels, so measuring a user's offset from it moved his label on every recalculation
+	// and every zoom step. His offset is a fact about the drawing; it is measured from one.
 	function linkLabelMid(l, along) {
+		if (along === undefined && labelIsDragged(l)) {
+			return Geom.pointAlongPolyline(linkPointList(l), LINK_LABEL_ALONG);
+		}
 		var clear = (ARROW_NOMINAL_LEN * arrowFactor()) * 1.5;
 		return Geom.dodgeAlongPolyline(linkPointList(l), along === undefined ? LINK_LABEL_ALONG : along,
 			arrowAlongDistances(l), clear, 0.12, 0.88);
@@ -295,11 +302,10 @@ var EngCalcs = EngCalcs || {};
 	}
 	// Final rendered offset from the anchor = the persisted drag offset (or default) PLUS this
 	// element's current placement nudge.
-	// **A MANUALLY PLACED LABEL MOVES ONLY ALONG ITS OWN LEADER, GUARANTEED WHERE THE NUDGE IS
-	// COMPUTED, NOT HERE.** Goal 1 of dev/label-placement-goals.md gives a dragged label candidates
-	// on the RAY through its stored endpoint and nowhere else: pushed further out at the same angle,
-	// never sideways or nearer. Every nudge is re-derived from scratch on every pass and none is
-	// written into n.lx/n.ly.
+	// **A MANUALLY PLACED LABEL DOES NOT MOVE, GUARANTEED WHERE THE NUDGE IS COMPUTED, NOT HERE.**
+	// Goal 1 of dev/label-placement-goals.md gives a dragged label one candidate, its stored
+	// endpoint (Task 807), so its nudge is zero. Every nudge is re-derived from scratch on every
+	// pass and none is written into n.lx/n.ly.
 	// A nudge computed for an AUTO-placed label is meaningless the instant that label becomes
 	// dragged, and the other way round -- it was searched for on a different candidate set. The pass
 	// stamps which kind it was solving (holder.nudgeManual) and this refuses the nudge until the
@@ -1528,10 +1534,9 @@ var EngCalcs = EngCalcs || {};
 	// handles and the current font size into plain boxes and segments, which is what lets the
 	// placement be tested without a browser.
 	//
-	// A MANUALLY DRAGGED LABEL (n.lx/l.lx defined) keeps the endpoint the user gave it: its
-	// candidates lie on the RAY through that endpoint, pushed further out along the same line, never
-	// sideways and never nearer. The nudge is our transient extension -- re-derived from scratch on
-	// every pass, never written into n.lx/l.ly -- so it is neither undo-tracked nor persisted.
+	// A MANUALLY DRAGGED LABEL (n.lx/l.lx defined) keeps the endpoint the user gave it, exactly:
+	// its only candidate is that endpoint, so its nudge is always zero (Task 807). Only a reset
+	// (double-click) hands it back to the placer.
 	//
 	// **THE REACH IS A MULTIPLE OF THE LABEL'S OWN SIZE, NOT A PIXEL COUNT.** At 28 screen pixels a
 	// 3-line label at the default text size is 50 x 38.5 px, so the whole search disc fits INSIDE the
@@ -2777,13 +2782,6 @@ var EngCalcs = EngCalcs || {};
 		// **EVERY NODE LABEL STARTS FROM ITS FULL CONTENT** (Task 469), before anything is measured
 		// into a placement spec. Shedding down from whatever survived the last pass is a ratchet.
 		if (shedNodes) { unshedNodeLabels(fsNow); }
-		// The one data label the pointer is carrying right now, if any. It is placed exactly where
-		// the pointer puts it (js/lpn-collide.js candidatesFor()), never pushed along its leader.
-		function labelHeldByDrag(key) {
-			if (!drag || drag.id === undefined) { return false; }
-			return (drag.type === 'nodelbl' && key === nodeLabelKey(drag.id)) ||
-				(drag.type === 'linklbl' && key === linkLabelKey(drag.id));
-		}
 		function addDataLabel(key, holder, anchor, home, dragged, lineCount) {
 			// Every nudge is cleared and re-derived from scratch on every pass, dragged or not, so
 			// the pass is IDEMPOTENT: running it twice on an unchanged drawing gives the same answer
@@ -2794,7 +2792,7 @@ var EngCalcs = EngCalcs || {};
 			if (holder.empty) { return; }   // nothing rendered -- no box to place
 			holders[key] = holder;
 			labels.push({
-				id: key, anchor: anchor, home: home, dragged: !!dragged, held: labelHeldByDrag(key),
+				id: key, anchor: anchor, home: home, dragged: !!dragged,
 				w: labelBoxWidth(holder), h: dataLabelBoxHeight(lineCount), yOff: -fs * 0.85,
 				lines: labelRowWidths(holder)
 			});
@@ -2809,8 +2807,8 @@ var EngCalcs = EngCalcs || {};
 			nodeLabels.push(nodeFirstFitSpec(n, ne, fs));
 		}
 		// **NODE LABELS TAKE THE FIRST-FIT NOW, NOT THE RING** (Task 398). A dragged one is the
-		// exception and keeps the ring: goal 1 gives it candidates along the ray through its own
-		// stored endpoint, it is never dropped, and it never jumps sides -- the user put it there.
+		// exception and keeps the ring, where its one candidate is the endpoint the user stored
+		// (Task 807): it is never moved, never dropped, and never jumps sides -- the user put it there.
 		doc.nodes.forEach(function (n) {
 			var ne = nodeEls[n.id]; if (!ne) { return; }
 			ne.hiddenDropped = false;
@@ -13762,8 +13760,8 @@ var EngCalcs = EngCalcs || {};
 		//      piece of lettering and every leader as drawn, and if any of it is outside the frame,
 		//      solve again with those measured boxes. Repeat until nothing is outside.
 		// Step 3 exists because the home boxes are not where the labels end up: the placement pass
-		// pushes a label out along its own leader to clear its neighbours (a dragged one by ~80 px on
-		// the Basic SI example), and that push is decided at the scale being drawn, so only a layout
+		// moves an automatic label to clear its neighbours (a dragged one no longer moves, Task 807),
+		// and that move is decided at the scale being drawn, so only a layout
 		// AT the target scale can say where the lettering is -- a fixed point, solved by iterating.
 		// **IT STILL CANNOT DEPEND ON THE VIEW WE ARRIVED FROM**: the settle starts from step 2's
 		// answer, never from state.s, and the scale only ever steps DOWN, so it ends, and a second

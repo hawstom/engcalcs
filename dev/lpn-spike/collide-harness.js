@@ -143,15 +143,13 @@ const LBL = { id: 'n:J1', anchor: { x: 0, y: 0 }, home: { x: 4, y: -4 }, w: 20, 
 		return d <= Math.PI / 4 + 1e-9;
 	}), 'a candidate neighbours the NEAREST direction on the next circle out');
 
-	// GOAL 1: a dragged label's candidates lie on the RAY through the endpoint the user gave it.
+	// GOAL 1 (Task 807): a dragged label's one candidate is the endpoint the user gave it.
 	const dragged = Object.assign({}, LBL, { dragged: true, home: { x: 30, y: -40 } });
 	const ray = C.candidatesFor(dragged, 10, 25);
-	report(ray[0].x === 30 && ray[0].y === -40, 'the stored endpoint is the first candidate');
-	const cross = ray.every(c => near(c.x * -40 - c.y * 30, 0, 1e-9));
-	report(cross, 'and every other candidate is collinear with it -- stretched, never turned');
-	report(ray.every(c => Math.hypot(c.x, c.y) >= 50 - 1e-9), '...and never nearer than the user put it');
+	report(ray.length === 1 && ray[0].x === 30 && ray[0].y === -40,
+		'a dragged label has exactly one candidate, the stored endpoint -- never stretched');
 	report(C.candidatesFor(Object.assign({}, LBL, { dragged: true, home: { x: 0, y: 0 } }), 10, 25).length === 1,
-		'a dragged label sitting on its own anchor has no ray, and does not produce NaN');
+		'a dragged label sitting on its own anchor has one candidate, and does not produce NaN');
 }
 
 // ---- 3. the ranking ---------------------------------------------------------------------------
@@ -249,16 +247,14 @@ console.log('\n--- the pass itself ---');
 	report(order.indexOf('n:J12') < order.indexOf('n:J0'),
 		'the most crowded label chooses before the one in the corner', order.slice(0, 5).join(' '));
 
-	// GOAL 1 END TO END: a dragged label in the middle of the crowd stays on its own ray.
+	// GOAL 1 END TO END: a dragged label in the middle of the crowd stays exactly where it was put.
 	const dl = crowd(0);
 	dl.labels[12].dragged = true;
 	dl.labels[12].home = { x: 20 + 12, y: 20 - 9 };
 	const res = C.placeLabels(dl.labels, dl.obs, { inner: 6, outer: 15, k: 0.5 })
 		.filter(r => r.id === 'n:J12')[0];
-	report(near((res.x - 20) * -9 - (res.y - 20) * 12, 0, 1e-6),
-		'a dragged label placed among 24 others is still on the line the user drew', res.x + ',' + res.y);
-	report(Math.hypot(res.x - 20, res.y - 20) >= 15 - 1e-9,
-		'...and is never pulled back nearer than the endpoint it was given');
+	report(res.x === 32 && res.y === 11 && res.dx === 0 && res.dy === 0,
+		'a dragged label placed among 24 others is exactly where the user put it', res.x + ',' + res.y);
 }
 
 console.log('\n--- the index agrees with the definition it stands in for ---');
