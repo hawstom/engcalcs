@@ -125,8 +125,10 @@ async function main() {
 			heads.every((h) => isFinite(h)), said(steady));
 		const run = await EngCalcs.lpnEpanetRun(clone(model));
 		if (name === 'Tanks run dry') {
+			// Both tanks close at 15048 s (4:10:48). EPANET then limps on disconnected, and how long
+			// before Error 110 swings by hours on a 0.2% length change, so only the bounds are held.
 			ok(name + ': EPANET stops the run when the tanks are empty, and the result says when',
-				!!run && run.refused && /110/.test(run.engineError) && run.stoppedAt > 6 * 3600 && run.stoppedAt < 9 * 3600 &&
+				!!run && run.refused && /110/.test(run.engineError) && run.stoppedAt >= 15048 && run.stoppedAt < 24 * 3600 &&
 				/disconnected/.test(run.report || ''), said(run) + ' stoppedAt=' + (run && run.stoppedAt));
 			continue;
 		}
