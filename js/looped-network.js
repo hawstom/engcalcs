@@ -395,9 +395,19 @@ var EngCalcs = EngCalcs || {};
 		x = side === 'right' ? left + er : left + w - el;
 		return { x: x, y: cw.y + d.offY };
 	}
-	function dataLabelOrigin(holder, anchor, end, dragged) {
+	// **`inHand` IS A LABEL UNDER THE POINTER RIGHT NOW, NOT A LABEL THAT WAS ONCE DRAGGED** (Task
+	// 807). Once it is let go, a dragged label hangs on the nearest side like any other, which is
+	// the side the placer reserved for it (Collide.labelBoxAtEnd()). Held to its last side instead,
+	// a label dropped just past its node's line came back from a reload lying across its own node,
+	// with nothing allowed to move it off.
+	function labelInHand(holder) {
+		if (!drag || drag.id === undefined) { return false; }
+		return (drag.type === 'nodelbl' && nodeEls[drag.id] === holder) ||
+			(drag.type === 'linklbl' && linkEls[drag.id] === holder);
+	}
+	function dataLabelOrigin(holder, anchor, end, inHand) {
 		var w = labelBoxWidth(holder);
-		holder.side = dragged
+		holder.side = inHand
 			? Geom.labelSideAtEnd(holder.side, end.x, anchor.x, w / 2, ADVERSE_FRAC)
 			: (end.x >= anchor.x ? 'right' : 'left');
 		return { x: holder.side === 'right' ? end.x : end.x - w, y: end.y };
@@ -425,7 +435,7 @@ var EngCalcs = EngCalcs || {};
 		// repair (Task 539 phase three) and KEEPS the ground it stands on. See shedCrossingLabels().
 		setLabelAssemblyHidden(ne, !!ne.hiddenDropped || !!ne.hiddenCrossed);
 		var anchor = nodeAt(n), end = nodeLabelPos(n),
-			org = dataLabelOrigin(ne, anchor, end, labelIsDragged(n));
+			org = dataLabelOrigin(ne, anchor, end, labelInHand(ne));
 		repositionMultilineText(ne.text, org.x, org.y);
 		updateDataLeader(ne, anchor, end);
 	}
@@ -1476,7 +1486,7 @@ var EngCalcs = EngCalcs || {};
 			mid = lone ? linkLabelMid(l) : linkLabelMid(l, along),
 			anchor = { x: mid.x, y: mid.y },
 			end = lone ? linkLabelPos(l) : { x: mid.x + d.x, y: mid.y + d.y },
-			org = dataLabelOrigin(isPrimary ? le : part, anchor, end, labelIsDragged(l));
+			org = dataLabelOrigin(isPrimary ? le : part, anchor, end, isPrimary && labelInHand(le));
 		repositionMultilineText(part.text, org.x, org.y);
 		if (isPrimary) { updateDataLeader(le, anchor, end); }
 	}
@@ -49622,7 +49632,10 @@ var EngCalcs = EngCalcs || {};
 			// gesture whose whole point is that nothing in the drawing changed. The cull keeps a
 			// full view-span of margin on every side, so a pan shorter than a screen never reaches
 			// a stretch that has not been labelled yet, and a longer one fills in on release.
-			var wasPan = drag && drag.type === 'pan';
+			var wasPan = drag && drag.type === 'pan',
+				// A data label let go takes its nearest side (labelInHand()); laid out once more
+				// with the hand gone, so it does so at the drop and not at some later redraw.
+				wasLabel = drag && drag.pointerId === e.pointerId && (drag.type === 'nodelbl' || drag.type === 'linklbl');
 			// **THE PATH HANDLE COMMITS ON RELEASE**, before `drag` is dropped -- it is the one drag
 			// type whose whole result is decided by where the pointer let go (Task 509).
 			if (drag && drag.type === 'profilehandle' && drag.pointerId === e.pointerId) { profileHandleDrop(); }
@@ -49670,6 +49683,7 @@ var EngCalcs = EngCalcs || {};
 			// Task 647: a pan is the gesture that can put the whole network off screen by hand,
 			// and its release is the "at rest" moment -- never mid-drag.
 			if (wasPan && !drag) { relayoutLabels(); updateOffscreenNotice(); }
+			if (wasLabel && !drag) { relayoutLabels(); }
 		}
 		svg.addEventListener('pointerup', function (e) { endPointer(e, false); });
 		svg.addEventListener('pointercancel', function (e) { endPointer(e, true); });
