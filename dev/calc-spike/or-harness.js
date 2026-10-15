@@ -325,23 +325,13 @@ for (const cell of ['h1', 'q_max', 'vol', 't_min', 't_hr', 't_day']) {
 	r.eq(parseFloat(odt.html(cell)), 0, `and the ${cell} cell is zeroed rather than left stale`);
 }
 
-// KNOWN DEFECT, found by this harness and deliberately NOT asserted, because a red check would
-// block every commit until someone else's file is edited and dev/calc-spike is the only
-// territory this harness owns.
-//
-//   js/orifice-drain-time.js, the else branch that handles a refused design (the one that sets
-//   this.var.h1, q_max, vol and the four t_* to 0) does not set this.var.a_ending. It is
-//   therefore undefined, writeFormResult multiplies it by the unit factor, and the "ending pond
-//   area" cell shows the visitor the literal string NaN while every other cell reads 0.000.
-//   The fix is one line -- this.var.a_ending = 0; beside the others -- and the assertion waiting
-//   for it is:
-//
-//       r.eq(parseFloat(odt.html('a_ending')), 0, 'and the ending area is zeroed too');
+// The ending pond area too: it once printed NaN here while every other cell read 0 (the refused
+// branch of js/orifice-drain-time.js did not set a_ending). Fixed since; asserted now.
+r.eq(parseFloat(odt.html('a_ending')), 0, 'and the ending area is zeroed too');
 //
 // Recorded here rather than only in a commit message because this file is where the next person
 // to touch this calculator will look.
-r.ok(true, 'KNOWN DEFECT (not asserted): a_ending prints NaN on a refused design',
-	`a_ending = "${odt.html('a_ending')}", every other cell = 0`);
+r.eq(parseFloat(odt.html('a_ending')), 0, 'and the ending area is zeroed too');
 // And the boundary itself is accepted: h2 exactly at the crown, D/2 above the centroid.
 const atCrown = odtRun({ h1: 10, h2: 0.25, a1: 40000, a0: 20000, cd: 0.61, d: 6 });
 r.ok(atCrown.tSec > 0 && /✓/.test(odt.html('h2_check')),
