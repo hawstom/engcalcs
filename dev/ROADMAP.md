@@ -97,7 +97,7 @@ the block.
   Tom, 2026-10-14: mnemonic, definitional keys over coined names (*"we don't need more confusion"*).
   **WHAT IS LEFT: every language gives each concept below its own word, used everywhere, and no two
   concepts share a word.** Known collisions: Tag and Label are one word in es (Etiqueta), it
-  **SPRINT 737 DONE 2026-10-14** for the collisions: Tag is Marcador (es), Tag (it), Künye (tr), Etiketa (hr); cs Reservoir Zdroj, quality Source Dávkování; fr Label Étiquette; he Head עומד, HGL fixed. Still open: one-concept-two-words drift in am, bn, fa, hi, km, my, pt, ru, uk, zh (`concept-collisions` audit, journal of the sprint in `dev/english-friction/737.json`).
+  **SPRINT 737 DONE 2026-10-14** for the collisions: Tag is Marcador (es), Tag (it), Künye (tr), Etiketa (hr); cs Reservoir Zdroj, quality Source Dávkování; fr Label Étiquette; he Head עומד, HGL fixed. **SPRINT 737b DONE 2026-10-16**: the same sweep in am, bn, fa, hi, km, my, pt, ru, uk, zh (Head unified in bn, hi, km, my; HGL split from the gradient in ru, zh; `dev/english-friction/737b.json`). Open: Tom's word on km Tag (ស្លាកសម្គាល់ holds the Label word) and on the Select-mode English, which says "label" for Labels and Text both.
   (Etichetta) and tr (Etiket); cs uses Zdroj for both Reservoir and Source.
   | Concept | English |
   |---|---|
