@@ -13593,6 +13593,9 @@ var EngCalcs = EngCalcs || {};
 	// How many times Zoom to fit may re-solve against the labels as drawn. Two is the most any
 	// example has needed; the cap exists so a layout that never settles cannot hang a click.
 	var LPN_FIT_SETTLE_PASSES = 8;
+	// Zoom to fit never shrinks the network below this share of its own lettering-free fit to make
+	// room for labels and map furniture (R-403). See capToNetwork() in zoomExtentRun().
+	var LPN_FIT_NETWORK_SHARE = 0.9;
 	// What the last Zoom to fit settled on, so a press from that same view can be answered by one
 	// measurement instead of a relayout (see zoomExtent()). In memory only; never saved.
 	var lastFit = null;
@@ -13790,6 +13793,37 @@ var EngCalcs = EngCalcs || {};
 		// press from the fitted view retraces the same steps to the same place.
 		items = fitItems(state.s, true);
 		var modelItems = items;
+		// **THE NETWORK'S OWN FIT: NODES, VERTICES AND PIPES, NO LETTERING, NO FURNITURE** (R-403).
+		// Everything below makes room -- for Texts, data labels, the legend, the scale bar -- and on
+		// a desktop that costs the network 3-12% of its size. On a phone the same lettering and
+		// furniture are the same size in PIXELS on a map a quarter as wide, and the room they took
+		// shrank the network to 19-65% of the map (Tom, 2026-10-15: *"All of the examples fail to
+		// Zoom to fit."*; measured at 360-412 px, the legend alone reserving 130-200 px of a side).
+		// So ON A PHONE (smallScreen(), the page's one phone test) the room made for them is
+		// capped: the answer is never smaller than LPN_FIT_NETWORK_SHARE of this one, and when the
+		// cap bites the frame is centred on the network and lettering may overhang or sit under the
+		// legend. **NOT ON A DESKTOP, deliberately:** there the same lettering costs the gallery's
+		// networks 1-26% (measured at 1280, 1440 and 1920 px; Elm Street at 1280 is the 26%), a
+		// cost Tom has looked at and accepted, and a cap tight enough to help a phone would move
+		// desktop fits he has not asked to change. dev/lpn-spike/phone-fit-browser-harness.js.
+		var netSubset = { node: {}, link: {}, label: {}, customer: {} };
+		doc.nodes.forEach(function (n) { netSubset.node[n.id] = 1; });
+		doc.links.forEach(function (l) { netSubset.link[l.id] = 1; });
+		var netItems = fitItems(state.s, true, netSubset), netFit,
+			basePads = [padLeft, padRight, padTop, padBottom];
+		items = netItems;
+		netFit = solve();
+		items = modelItems;
+		function capToNetwork() {
+			if (!smallScreen()) { return; }
+			var floor = LPN_FIT_NETWORK_SHARE * netFit;
+			if (!(state.s < floor && floor > minScale())) { return; }
+			// Placed inside the BASE margins: the edges the settle reserved for the legend and the
+			// scale bar are what the cap gives up, and centring in them pushed Net2's west end off
+			// the map (a 145 px right reserve on a 358 px map).
+			padLeft = basePads[0]; padRight = basePads[1]; padTop = basePads[2]; padBottom = basePads[3];
+			apply(floor, place(floor, netItems));
+		}
 		s = solve(labelTuning().fitRoom * settings.textSize);
 		// **STEP 1'S ANSWER IS KEPT AS THE FALLBACK, and it is the only one that cannot be absurd.**
 		// It is the MODEL alone -- nodes, vertices and pipes -- so it is a statement about the
@@ -13853,6 +13887,7 @@ var EngCalcs = EngCalcs || {};
 			apply(s, at);
 			settleOnDrawnInk();
 		}
+		capToNetwork();
 		lastFit = { seed: seed, s: state.s, tx: state.tx, ty: state.ty, pads: [padLeft, padRight, padTop, padBottom] };
 		// **A PRESS THAT BEAT THE RESULTS DOES NOT GET A SECOND ONE WHEN THEY LAND.** A build once
 		// re-ran this fit from applySolveResult() when a press had landed ahead of a due solve, on
