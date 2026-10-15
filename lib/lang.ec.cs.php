@@ -2668,14 +2668,8 @@ $ec_lang['lpn_scenario_delete']='Smazat scénář';
 // Same label-versus-sentence distinction that decided the eigenvalue fixes in sprint 316.
 $ec_lang['lpn_scenario_base_value']='Základní scénář: {value}';
 $ec_lang['lpn_scenario_deactivated']='{id} je ve scénáři {scenario} vyloučen ze sítě. Zůstává ve výkresu a v ostatních scénářích.';
-$ec_lang['lpn_scenario_push_btn']='Použít základní hodnoty ve všech scénářích';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_scenario_push_tip']='Každý scénář se vrátí k základní hodnotě u vlastností, jejichž popisky jsou právě zobrazeny. Hodnoty patřící jen těmto scénářům se zahodí.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_scenario_push_confirm']='Nastavit ve všech scénářích základní hodnoty pro tyto vlastnosti? Hodnoty patřící jen těmto scénářům se zahodí. Tuto akci lze vrátit zpět.';
-$ec_lang['lpn_scenario_push_scenarios']='Dotčené scénáře:';
-$ec_lang['lpn_scenario_push_values']='Zahozené hodnoty:';
-$ec_lang['lpn_scenario_push_none']='Žádný scénář nepřepisuje Základní u žádné z těchto vlastností, takže by se nic nezměnilo. Nic se nezahazuje.';
 $ec_lang['lpn_scenario_preset_flow_static']='1. Zkouška průtoku: statická';
 $ec_lang['lpn_scenario_preset_flow_static_tip']='Kalibrace zkoušky průtoku pro navrhovanou síť při nulovém průtoku. V tomto scénáři nastavte odběr ve všech uzlech na 0.';
 $ec_lang['lpn_scenario_preset_flow_mid']='2. Zkouška průtoku: střední';

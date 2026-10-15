@@ -2661,14 +2661,8 @@ $ec_lang['lpn_scenario_delete']='Senaryoyu sil';
 // Same label-versus-sentence distinction that decided the eigenvalue fixes in sprint 316.
 $ec_lang['lpn_scenario_base_value']='Temel senaryo: {value}';
 $ec_lang['lpn_scenario_deactivated']='{id}, {scenario} içinde şebeke dışında. Hâlâ çizimde ve diğer senaryolarınızda bulunuyor.';
-$ec_lang['lpn_scenario_push_btn']='Temel değerlerini tüm senaryolara uygula';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_scenario_push_tip']='Şu anda gösterilen etiketlere sahip özellikler için her senaryo Temel değerine döner. Herhangi bir senaryoda bu özellikler için girilmiş değerler atılır.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_scenario_push_confirm']='Her senaryo bu özellikler için Temel değerlerini kullansın mı? Herhangi bir senaryoda bu özellikler için girilmiş değerler atılır. Bunu geri alabilirsiniz.';
-$ec_lang['lpn_scenario_push_scenarios']='Etkilenen senaryolar:';
-$ec_lang['lpn_scenario_push_values']='Atılan değerler:';
-$ec_lang['lpn_scenario_push_none']='Hiçbir senaryonun bu özelliklerden herhangi biri için kendi değeri yok, bu yüzden hiçbir şey değişmez. Hiçbir şey atılmaz.';
 $ec_lang['lpn_scenario_preset_flow_static']='1. Debi testi: Statik';
 $ec_lang['lpn_scenario_preset_flow_static_tip']='Tasarım şebekesi için, debi sıfırken debi testi kalibrasyonu. Bu senaryoda tüm düğümlerdeki talebi 0 yapın.';
 $ec_lang['lpn_scenario_preset_flow_mid']='2. Debi testi: Orta';

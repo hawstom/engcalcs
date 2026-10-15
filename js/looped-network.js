@@ -6342,6 +6342,224 @@ var EngCalcs = EngCalcs || {};
 		touchTree('smCopyStored');
 		return c;
 	}
+	// ---- MERGE UPWARD (Task 801; Tom, 2026-10-15) ---------------------------------------------------
+	//
+	// **AN ALTERNATIVE'S OWN VALUES MOVE UP INTO AN ANCESTOR OF ITS CHOICE, AND IT THEN INHERITS THEM**
+	// (Mary: WaterGEMS merges a preferred alternative up into Base; Tom: *"Maybe 'Merge upward' and it
+	// lets you choose how many steps upward to target the merge (in case you want to skip parent)?"*).
+	// The target is chosen by name from the ancestors, parent first, up to the category's Base item.
+	// **A SKIPPED LEVEL IS NAMED, NEVER TOUCHED** (his *"Yes. Perfect."*): where an alternative between
+	// the two holds its own value for something merged, the question names those assets and fields
+	// first, and that value stays where it is, so the source reads it from there afterwards. The
+	// source stays in the tree, emptied (no automatic demotion). One undo step (smTry()). It replaced
+	// Apply Base values (Tom: *"this command is too confusing and dangerous"*).
+	//
+	// Into a stored alternative every value goes, a Morph's `type` included: it is an Active
+	// topology value like any other. Into the Base item (the drawing and the project themselves) two
+	// things stay in the source, and the question says so: a Morph, because a type change in Base is
+	// Morph in Base, which rebuilds the asset and pins what other scenarios read (morphPinBase()); and
+	// a saved view, because Base holds none (heldView() stops before Base).
+	//
+	// The ancestors of an item, parent first, as [{key, name}]; empty for a root and for scenarios.
+	function smMergeTargets(tree, key) {
+		var out = [], k, n = 0;
+		if (smKind(tree) === 'scn' || key === null || key === undefined || smIsBaseKey(tree, key) || !smRecord(tree, key)) { return out; }
+		for (k = smParentKey(tree, key); k !== null && k !== undefined && n++ < 1000; k = smParentKey(tree, k)) {
+			out.push({ key: k, name: smName(tree, k) });
+		}
+		return out;
+	}
+	// One item's OWN values in its category, never what it inherits: {values: {ovKey: {prop: v}},
+	// leaves: [{path, value}]}. A calculation set's multiplier and two times are leaves at their
+	// mirror paths (scenarioSettingTree()); a scenario's own alternative in a file from before
+	// 2026-10-12 is its local values in the category. Read only.
+	function smOwnContent(tree, key) {
+		var r = smRecord(tree, key), kind = smKind(tree), vals = {}, ovs;
+		if (!r || kind === 'scn') { return { values: {}, leaves: [] }; }
+		if (r.implicit) {
+			ovs = plainObject(r.owner.overrides) ? r.owner.overrides : {};
+			Object.keys(ovs).forEach(function (k) {
+				Object.keys(plainObject(ovs[k]) ? ovs[k] : {}).forEach(function (p) {
+					if (categoryOf(p, ovKeyGroup(k)) === tree) { (vals[k] = vals[k] || {})[p] = ovs[k][p]; }
+				});
+			});
+			return { values: vals, leaves: settingLeaves(scenarioSettingTree(r.owner)).filter(function (l) { return categoryOfSetting(l.path) === tree; }) };
+		}
+		return { values: plainObject(r.values) ? r.values : {}, leaves: settingLeaves(kind === 'calc' ? scenarioSettingTree(r) : r.settings) };
+	}
+	function smMergeElement(key) {
+		var g = ovKeyGroup(key), id = String(key).slice(ovKeyFor(g, '').length);
+		return g === 'node' ? nodeById(id) : g === 'link' ? linkById(id) : g === 'label' ? labelById(id) : null;
+	}
+	// "Junction 22: Diameter", for the list of skipped values: the asset as Base draws it, and the
+	// field as the Tables pane heads it.
+	function smMergeItemText(key, prop) {
+		var pc = EngCalcs.pageConfig || {}, el = smMergeElement(key), g = ovKeyGroup(key), t, words, name, label = null, d;
+		words = { junction: pc.lpn_tool_add_junction || 'Junction', reservoir: pc.lpn_tool_add_reservoir || 'Reservoir', tank: pc.lpn_tool_add_tank || 'Tank',
+			pipe: pc.lpn_tool_add_pipe || 'Pipe', pump: pc.lpn_tool_add_pump || 'Pump', valve: pc.lpn_tool_add_valve || 'Valve' };
+		t = g === 'label' ? (pc.lpn_tool_add_text || 'Text') : ((el ? words[morphBaseOf(el, 'type')] : '') || '');
+		name = (t ? t + ' ' : '') + String(key).slice(ovKeyFor(g, '').length);
+		if (LPN_MORPH_PROP[prop]) { label = pc.lpn_field_type || 'Type'; }
+		else if ((d = customPropDefs().length ? customPropDefByKey(prop) : null)) { label = customPropLabel(d); }
+		else {
+			paneTables().forEach(function (spec) {
+				if (label !== null || spec.group !== g) { return; }
+				(spec.cols || []).forEach(function (c) { if (label === null && (c.prop === prop || (!c.prop && c.key === prop))) { label = paneHeadingLabelOnly(c); } });
+			});
+			if (label === null) { pushSpecList().forEach(function (s) { if (label === null && s.group === g && s.prop === prop) { label = s.label; } }); }
+		}
+		return (pc.lpn_sm_merge_line || '{asset}: {property}').replace('{asset}', name).replace('{property}', label === null ? prop : label);
+	}
+	function smMergeLeafText(path) {
+		var pc = EngCalcs.pageConfig || {}, p = path.slice(), o;
+		// A calculation set's typed run time is the same setting as the time itself.
+		if (p[0] === 'times' && p[1] === 'text') { p = ['times', p[2]]; }
+		o = settingTableOwnerSetting(p);
+		return (pc.lpn_sm_merge_line || '{asset}: {property}').replace('{asset}', o.owner || pc.lpn_tool_settings || 'Settings').replace('{property}', o.setting);
+	}
+	// Do two setting paths meet (one is the other, or lies under it)?
+	function smPathsMeet(a, b) {
+		var i, n = Math.min(a.length, b.length);
+		for (i = 0; i < n; i++) { if (String(a[i]) !== String(b[i])) { return false; } }
+		return true;
+	}
+	/**
+	 * **WHAT A MERGE OF `key` INTO `targetKey` WOULD DO**, read only, or null for a target that is
+	 * not an ancestor: {items: [{k, prop, v}], leaves: [{path, value}], n (merged), own (every own
+	 * value, kept ones included), skipped: [{name, lines}] (each skipped alternative holding its own
+	 * value for something merged, and which), keepsMorph, keepsView}. A whole demand list shadows
+	 * the same holder's row-0 `demand`, so only the list is merged (and both leave the source).
+	 */
+	function smMergePlan(tree, key, targetKey) {
+		var ups = smMergeTargets(tree, key), at = -1, own = smOwnContent(tree, key), toBase = smIsBaseKey(tree, targetKey),
+			out = { items: [], leaves: [], n: 0, own: 0, skipped: [], keepsMorph: false, keepsView: false }, between, has = Object.prototype.hasOwnProperty;
+		ups.forEach(function (u, i) { if (at < 0 && u.key === targetKey) { at = i; } });
+		if (at < 0) { return null; }
+		between = ups.slice(0, at).map(function (u) { return { name: u.name, c: smOwnContent(tree, u.key), lines: [] }; });
+		Object.keys(own.values).forEach(function (k) {
+			var ov = plainObject(own.values[k]) ? own.values[k] : {};
+			Object.keys(ov).forEach(function (prop) {
+				out.own++;
+				if (prop === 'demand' && has.call(ov, 'demands')) { return; }
+				if (toBase && (LPN_MORPH_PROP[prop] || !smMergeElement(k))) { if (LPN_MORPH_PROP[prop]) { out.keepsMorph = true; } return; }
+				out.items.push({ k: k, prop: prop, v: ov[prop] });
+				between.forEach(function (b) {
+					var bo = b.c.values[k];
+					if (!plainObject(bo)) { return; }
+					// The demand pair is one value: a skipped row-0 `demand` and a merged list meet.
+					if (has.call(bo, prop) || ((prop === 'demand' || prop === 'demands') && (has.call(bo, 'demand') || has.call(bo, 'demands')))) {
+						b.lines.push(smMergeItemText(k, prop));
+					}
+				});
+			});
+		});
+		own.leaves.forEach(function (l) {
+			out.own++;
+			if (toBase && l.path[0] === 'view') { out.keepsView = true; return; }
+			out.leaves.push(l);
+			between.forEach(function (b) {
+				if (b.c.leaves.some(function (bl) { return smPathsMeet(bl.path, l.path); })) { b.lines.push(smMergeLeafText(l.path)); }
+			});
+		});
+		out.n = out.items.length + out.leaves.length;
+		out.skipped = between.filter(function (b) { return b.lines.length; }).map(function (b) { return { name: b.name, lines: b.lines }; });
+		return out;
+	}
+	// A leaf written into the project itself (the Base item): settings, labelSettings and project
+	// carry their old value on the undo step; `times` and `defaultPattern` are the document's.
+	function smMergeBaseLeaf(path, v) {
+		var root, node, i, times;
+		if (path[0] === 'times') {
+			times = doc.times || (doc.times = EngCalcs.lpnTimesDefaults());
+			if (path[1] === 'text') { times.text = times.text || {}; times.text[path[2]] = v; } else { times[path[1]] = v; }
+			return;
+		}
+		if (path[0] === 'defaultPattern') { doc.defaultPattern = v; return; }
+		root = settingProjectRoot(path[0]);
+		if (!root) { return; }
+		undoTopHoldsSettingPaths([path]);
+		node = root;
+		for (i = 1; i < path.length - 1; i++) {
+			if (!plainObject(node[path[i]])) { node[path[i]] = {}; }
+			node = node[path[i]];
+		}
+		node[path[path.length - 1]] = altCopy(v);
+	}
+	// Removes one merged leaf from a stored record: a calculation set's multiplier and times have
+	// homes of their own.
+	function smMergeDropLeaf(kind, r, path) {
+		if (kind === 'calc' && path.join('.') === 'settings.hydraulics.demandMultiplier') { delete r.demandMultiplier; return; }
+		if (kind === 'calc' && path[0] === 'times' && LPN_SCENARIO_TIME_KEYS.indexOf(path[path.length - 1]) >= 0) {
+			if (!plainObject(r.times)) { return; }
+			if (path[1] === 'text') { if (plainObject(r.times.text)) { delete r.times.text[path[2]]; if (!Object.keys(r.times.text).length) { delete r.times.text; } } }
+			else { delete r.times[path[1]]; }
+			if (!Object.keys(r.times).length) { delete r.times; }
+			return;
+		}
+		settingDelete(r, path);
+	}
+	/**
+	 * **MERGE UPWARD, THE ACT.** Answers {source: id, target: key, merged: n} or {refused}. A
+	 * scenario's own alternative from an older file is stored first (smMaterialize()), and with it
+	 * any ancestor's, so an implicit target is looked up again through the scenario that owned it.
+	 * No snapshot: the caller's smTry() makes it one undo step.
+	 */
+	function smMergeUpward(tree, key, targetKey) {
+		var kind = smKind(tree), owner, src, tgt, plan, values = {}, settingsTree = {}, merged, b;
+		if (kind === 'scn') { return treeRefuse('scenarios'); }
+		if (!smMergeTargets(tree, key).some(function (u) { return u.key === targetKey; })) { return treeRefuse('target'); }
+		owner = smImplicitOwner(tree, targetKey);
+		key = smMaterialize(tree, key);
+		if (key && key.refused) { return key; }
+		if (owner) {
+			targetKey = smImplicitOwner(tree, targetKey) ? smMaterialize(tree, targetKey) : storedChoiceOf(owner, tree);
+			if (targetKey && targetKey.refused) { return targetKey; }
+		}
+		plan = smMergePlan(tree, key, targetKey);
+		if (!plan) { return treeRefuse('target'); }
+		if (!plan.n) { return treeRefuse('empty'); }
+		src = smRecord(tree, key);
+		if (smIsBaseKey(tree, targetKey)) {
+			// The drawing and the project, written as Base writes them (setProp() in Base), with Base's
+			// own pick for the category set aside so the write reaches the elements.
+			b = baseScenario();
+			paneInScenario(b, function () {
+				withBasePick(b, tree, null, function () {
+					plan.items.forEach(function (it) { setProp(smMergeElement(it.k), it.prop, altCopy(it.v)); });
+					plan.leaves.forEach(function (l) { smMergeBaseLeaf(l.path, l.value); });
+				});
+			});
+		} else {
+			tgt = smRecord(tree, targetKey);
+			plan.items.forEach(function (it) { (values[it.k] = values[it.k] || {})[it.prop] = it.v; });
+			plan.leaves.forEach(function (l) {
+				if (kind === 'calc' && l.path.join('.') === 'settings.hydraulics.demandMultiplier') { tgt.demandMultiplier = l.value; return; }
+				if (kind === 'calc' && l.path[0] === 'times') {
+					tgt.times = plainObject(tgt.times) ? tgt.times : {};
+					if (l.path[1] === 'text') { tgt.times.text = plainObject(tgt.times.text) ? tgt.times.text : {}; tgt.times.text[l.path[2]] = l.value; }
+					else { tgt.times[l.path[1]] = l.value; }
+					return;
+				}
+				putResolvedLeaf(settingsTree, l.path, altCopy(l.value));
+			});
+			// Nearer first, by the rule they resolve by (combineHolders()), the demand pair included.
+			merged = combineHolders([{ values: values, settings: settingsTree }, tgt]);
+			if (kind === 'alt') { if (Object.keys(merged.values).length) { tgt.values = merged.values; } else { delete tgt.values; } }
+			if (Object.keys(merged.settings).length) { tgt.settings = merged.settings; } else { delete tgt.settings; }
+		}
+		plan.items.forEach(function (it) {
+			var ov = plainObject(src.values) ? src.values[it.k] : null;
+			if (!ov) { return; }
+			delete ov[it.prop];
+			if (it.prop === 'demands') { delete ov.demand; }
+			if (!Object.keys(ov).length) { delete src.values[it.k]; }
+		});
+		if (plainObject(src.values) && !Object.keys(src.values).length) { delete src.values; }
+		plan.leaves.forEach(function (l) { smMergeDropLeaf(kind, src, l.path); });
+		treeDropEmpty();
+		touchTree('smMergeUpward');
+		return { source: key, target: targetKey, merged: plan.n };
+	}
 	// **WHEN AN OVERRIDE IS WRITTEN INTO A SHARED ALTERNATIVE, THE NOTE SAYS WHO ELSE USES IT** (the
 	// market researcher's call, 2026-10-09; Tom, 2026-10-05: *editing a shared alternative changes
 	// every scenario that uses it*). Names the other scenarios using what the open scenario writes
@@ -7182,8 +7400,10 @@ var EngCalcs = EngCalcs || {};
 	function scenarioMenuRows() {
 		var pc = EngCalcs.pageConfig || {}, rows = [], scn = activeScenario();
 		// **THE ORDER IS TOM'S** (2026-10-11): *"Scenario manager..., -, Basic mode, New, Rename,
-		// Delete, -, Apply Base, list of scenarios."* The Scenarios table and the Scenario manager are
-		// where scenarios are managed, so the list of scenarios comes last.
+		// Delete, -, Apply Base, list of scenarios."* Apply Base values and the rule before it are
+		// retired (Task 801; Tom, 2026-10-15: *"this command is too confusing and dangerous"*); Merge
+		// upward in the Scenario manager takes its place. The Scenarios table and the Scenario manager
+		// are where scenarios are managed, so the list of scenarios comes last.
 		// **THE SCENARIO MANAGER ROW IS ALWAYS HERE, GREYED WHILE BASIC MODE IS ON** (Tom, 2026-10-13:
 		// "Scenario manager is disabled when Basic mode is on").
 		// **BASIC MODE** (Tom, 2026-09-30), ticked by default: see setScenarioBasicMode().
@@ -7259,20 +7479,6 @@ var EngCalcs = EngCalcs || {};
 				});
 			}
 		});
-		rows.push({ separator: true });
-		rows.push({
-			label: pc.lpn_scenario_push_btn || 'Apply Base values to all scenarios',
-			tip: pc.lpn_scenario_push_tip,
-			// BASE-LEVEL ONLY, and disabled rather than hidden so the vocabulary stays learnable
-			// (the menu convention this file already follows). Run from inside a scenario the
-			// action has no meaning: it pushes Base's values outward, and Base is not where you
-			// are standing.
-			disabled: !scn.isBase || scenarios.length < 2,
-			// Wrapped, NOT passed by reference: pushBaseToScenarios() now takes an element to scope
-			// itself to, and openMenu() calling fn(anything) would silently turn the all-elements
-			// push into a push against whatever it happened to hand over.
-			fn: function () { pushBaseToScenarios(); }
-		});
 		scenariosForDisplay().forEach(function (s) {
 			rows.push({
 				// scenarioId is what makes a row a scenario, so a reader of the rows (the harness)
@@ -7305,10 +7511,10 @@ var EngCalcs = EngCalcs || {};
 		refreshScenarioStatus();
 	}
 
-	// The property list BOTH pushes share -- the Settings panel's "apply starting values to every
-	// element" and the scenario menu's "apply Base values to every scenario". Shared, not copied:
-	// the two must agree about which properties exist, which elements carry them, and what each is
-	// called.
+	// The property list the Settings panel's "apply starting values to every element" and Find and
+	// replace share. (The scenario menu's "apply Base values to every scenario" read it too, until
+	// Task 801 retired it; the "both pushes" below are from then.) Shared, not copied: they must
+	// agree about which properties exist, which elements carry them, and what each is called.
 	// `applies` is what keeps a push physical rather than blindly per-field: a reservoir has no
 	// demand, and a pump has no diameter/roughness/km, so neither is counted or touched.
 	function pushSpecList() {
@@ -7500,8 +7706,7 @@ var EngCalcs = EngCalcs || {};
 		});
 	}
 	// Is this push spec's property visible on the map right now? The one place that question is
-	// asked, so the Settings push and the scenario push cannot come to different answers about the
-	// same checkbox -- and the one place `altField` is honoured.
+	// asked, and the one place `altField` is honoured.
 	function pushFieldShown(s) {
 		// A spec whose group is 'any' has no side of labelSettings to be shown on -- the custom
 		// properties (Task 636) and nothing else. They carry no map label, so BOTH pushes skip
@@ -7511,91 +7716,6 @@ var EngCalcs = EngCalcs || {};
 		if (!m) { return false; }
 		return !!(m[s.field] || (s.altField && m[s.altField]));
 	}
-	// **THE DANGEROUS ACTION** (Task 184). Base-side, it forces the displayed properties onto every
-	// scenario, ignoring their markers. In the delta model "forcing Base's value onto a scenario" IS
-	// clearing that scenario's override, so the value follows Base and no stale marker claims an
-	// intent the user has overruled. Writing Base's number in as a fresh override would pin every
-	// scenario permanently to today's Base value, the opposite of what a push is for.
-	//
-	// SCOPED BY THE DISPLAYED LABELS, the same filter the Settings push uses: the Labels panel is
-	// already a per-property checkbox list and already on screen, so the user's own current view
-	// defines the blast radius and this needs no property picker.
-	// `only` (Task 317) narrows the same action to ONE element -- a parameter rather than a second
-	// function, because the counting, the naming, the warning and the undo snapshot are already
-	// here and a fork of them drifts silently. The element-scoped push is the SAFE and COMMON case,
-	// which is why it lives in the element's own popup while the all-elements version stays in the
-	// scenario menu where it is deliberately harder to reach.
-	function pushBaseToScenarios(only) {
-		var pc = EngCalcs.pageConfig || {};
-		if (!inBaseScenario()) { return; }
-		var key = only ? ovKey(only) : null, group = only ? elGroup(only) : null;
-		// Scoped to ONE element, the other group's properties are nonsense: a node has no diameter,
-		// so counting one produces a confirm naming properties this element cannot hold.
-		var active = pushSpecList().filter(function (s) {
-			return s.prop && pushFieldShown(s) && (!group || s.group === group);
-		});
-		if (!active.length) {
-			tellNotice(pc.lpn_push_none_displayed || 'None of these values is showing as a label right now, so there is nothing to apply. Turn on the labels for the properties you want in the Labels panel, then try again.');
-			return;
-		}
-		// Counted, not estimated: how many overrides would actually be discarded. Zero says so in
-		// its own words, because "nothing to push" and "pushed nothing" look identical afterwards.
-		var hits = 0, touchedIds = {}, touched;
-		// The one place the scope is applied, to both the count and the delete -- so a confirm can
-		// never promise a different blast radius from the one that happens.
-		function scopedKeys(map) { return key ? (map[key] ? [key] : []) : Object.keys(map); }
-		// **SCENARIOS, NOT MAPS**: one scenario's values sit in one alternative per category, so a
-		// map is counted as every scenario that reads through it.
-		function users(holder) {
-			if (scenarios.indexOf(holder) >= 0) { return [holder]; }
-			return scenarios.filter(function (sc) { return treeLayers(sc, holder.category).some(function (l) { return l.obj === holder; }); });
-		}
-		// **AN ALTERNATIVE BASE ITSELF USES IS BASE'S VALUES**, so the push leaves it alone: clearing it
-		// would change what Base shows, the one thing "apply Base values" promises not to do.
-		var baseHeld = [];
-		LPN_ALT_CATEGORIES.forEach(function (cat) {
-			treeLayers(baseScenario(), cat).forEach(function (l) { baseHeld.push(l.obj); });
-		});
-		eachOverrideMap(function (map, holder) {
-			var any = false;
-			if (baseHeld.indexOf(holder) >= 0) { return; }
-			// Walks the map by KEY and matches on the property NAME only -- deliberately group-blind,
-			// because no property in pushSpecList() exists on both groups (`active` is the only name
-			// LPN_OVERRIDABLE shares, and it is not pushable). Task 324.
-			scopedKeys(map).forEach(function (k) {
-				active.forEach(function (spec) {
-					(spec.ovProps || [spec.prop]).forEach(function (p) {
-						if (Object.prototype.hasOwnProperty.call(map[k], p)) { hits++; any = true; }
-					});
-				});
-			});
-			if (any) { users(holder).forEach(function (sc) { touchedIds[sc.id] = true; }); }
-		}, null, true);
-		touched = Object.keys(touchedIds).length;
-		if (!hits) { tellNotice(pc.lpn_scenario_push_none || 'No scenario overrides Base for any of these properties, so nothing would change. Nothing is discarded.'); return; }
-		// NAMES the properties as well as counting them, and NAMES THE ELEMENT when scoped to one --
-		// reusing lpn_field_id ("ID") rather than minting a key, per the whole-label reuse rule.
-		var msg = (pc.lpn_scenario_push_confirm || 'Make every scenario use the Base values for these properties? Values entered for them in any scenario are discarded. You can undo this.')
-			+ (only ? '\n\n' + (pc.lpn_field_id || 'ID') + ': ' + only.id : '')
-			+ '\n\n' + (pc.lpn_push_properties || 'Properties:') + ' ' + active.map(function (s) { return s.label; }).join(', ')
-			+ '\n' + (pc.lpn_scenario_push_scenarios || 'Scenarios affected:') + ' ' + touched
-			+ '\n' + (pc.lpn_scenario_push_values || 'Values discarded:') + ' ' + hits;
-		askDialog({ kind: 'confirm', text: msg }, function (yes) {
-			if (!yes) { return; }
-			saveUndoSnapshot();
-			eachOverrideMap(function (map, holder) {
-				if (baseHeld.indexOf(holder) >= 0) { return; }
-				scopedKeys(map).forEach(function (k) {
-					active.forEach(function (spec) {
-						(spec.ovProps || [spec.prop]).forEach(function (p) { delete map[k][p]; });
-					});
-					if (!Object.keys(map[k]).length) { delete map[k]; }
-				});
-			});
-			applyScenarioChange();
-		});
-	}
-
 	/**
 	 * **THE SHIPPED LABEL DEFAULTS, ONE ROW PER PROPERTY** (Tom, 2026-09-26, R-326..R-334: *"Initial
 	 * defaults and all examples need to be consistent"*). The authority is Tom's own table,
@@ -67777,7 +67897,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		qualityResultRow(fields, n);
 		customPropFields(fields, n);
 		activeField(fields, n);
-		pushHereButton(fields, n);
 		importNotesField(fields, n);
 		tipsIn(fields);
 	}
@@ -68737,7 +68856,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		closedField(fields, l, linkId);
 		customPropFields(fields, l);
 		activeField(fields, l);
-		pushHereButton(fields, l);
 		if (lastSolveResult && !linkResultHeld(l) && lastSolveResult.flows[linkId] !== undefined) {
 			readonlyUnitField(fields, pc.lpn_result_flow || 'Flow', resultUnit('flow'), shownFlow(lastSolveResult.flows[linkId]));
 			// A pump has no diameter (Tom, 2026-07-30: "how can a pump have a velocity if it has no
@@ -69890,27 +70008,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// 12 inch loop vs. without" case stays coherent.
 	// Offered on every node and every link, in Base too: unticking here in Base is how a proposed
 	// element is parked without deleting it.
-	// THE EVERYDAY PUSH, in the element's own popup (ROADMAP Task 317). Same action and the same two
-	// strings as the scenario menu's row -- it IS that action, narrowed by WHERE the button is, so a
-	// second label would be two names for one thing in 27 languages.
-	// Base only, and ABSENT rather than disabled outside Base: the menu row is disabled there
-	// because a menu teaches its own vocabulary by staying the same shape, but a popup is a list of
-	// this element's properties and a permanently dead button on every one of them is noise. It is
-	// also absent when there are no scenarios, where the action has nothing to act on.
-	function pushHereButton(fields, el) {
-		var pc = EngCalcs.pageConfig || {};
-		if (!el || !inBaseScenario() || scenarios.length < 2) { return; }
-		var btn = document.createElement('button');
-		btn.type = 'button';
-		btn.textContent = pc.lpn_scenario_push_btn || 'Apply Base values to all scenarios';
-		helpTip(btn, pc.lpn_scenario_push_tip);
-		btn.addEventListener('click', function () {
-			pushBaseToScenarios(el);
-			refreshPopupIfOpen();
-		});
-		fields.appendChild(btn);
-		fields.appendChild(document.createElement('br'));
-	}
 	function activeField(fields, el) {
 		var pc = EngCalcs.pageConfig || {}, label = document.createElement('label'),
 			input = document.createElement('input'), text = document.createElement('span');
@@ -76901,6 +76998,14 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			off: !valid || isBase || tree === 'scenarios',
 			offTip: tree === 'scenarios' ? (pc.lpn_scenario_copy_off || 'Copy scenario works in Basic mode. With Basic mode off, add a scenario and choose its alternatives in the Scenarios table.') : (!valid ? noSel : null),
 			fn: function () { smActCopy(key); } });
+		// **MERGE UPWARD, ON AN ALTERNATIVE THAT HAS A PARENT** (Task 801): not in the Scenarios tree,
+		// where it means nothing; greyed on a Base, which has nothing above it.
+		if (tree !== 'scenarios') {
+			out.push({ id: 'merge', label: pc.lpn_sm_merge_up || 'Merge upward', off: !valid || !smMergeTargets(tree, key).length,
+				tip: pc.lpn_sm_merge_up_tip,
+				offTip: !valid ? noSel : (pc.lpn_sm_merge_up_root || 'A Base alternative has nothing above it to merge into.'),
+				fn: function () { smActMergeUpward(key); } });
+		}
 		out.push({ separator: true });
 		out.push({ id: 'del', label: pc.lpn_tool_delete || 'Delete', face: '−', off: !valid || isBase,
 			tip: isBase ? (pc.lpn_sm_base_kept || 'The Base of a tree is not deleted. Another Base added with Add base is deleted when nothing uses it.')
@@ -77298,6 +77403,54 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (!res || res.refused) { return; }
 		smState.sel = res.id;
 		smAfter(true, false);
+	}
+	// **MERGE UPWARD** (Task 801): which ancestor, then what it does, skipped values named, then the
+	// act as one undo step. Nothing is written before the second answer.
+	function smActMergeUpward(key) {
+		var tree = smState.tree, pc = EngCalcs.pageConfig || {}, ups, name, first;
+		if (tree === 'scenarios' || key === null || key === undefined) { return; }
+		ups = smMergeTargets(tree, key);
+		if (!ups.length) { return; }
+		name = smName(tree, key);
+		first = smMergePlan(tree, key, ups[0].key);
+		if (!first || !first.own) { tellNotice((pc.lpn_sm_merge_none || 'The alternative {name} holds no overrides to merge.').replace('{name}', name)); return; }
+		askDialog({ kind: 'choice', text: (pc.lpn_sm_merge_pick || 'Merge the overrides of {name} into which alternative? Its parent is listed first.').replace('{name}', name),
+			choices: ups.map(function (u, i) { return { label: u.name, value: u.key, isDefault: i === 0 }; })
+				.concat([{ label: pc.lpn_cancel || 'Cancel', value: null, cancel: true }]) }, function (tk) {
+			var plan, parts, tname;
+			if (tk === null || tk === undefined) { return; }
+			plan = smMergePlan(tree, key, tk);
+			if (!plan) { return; }
+			tname = smName(tree, tk);
+			if (!plan.n) {
+				// Only what stays (a Morph, a view) was there to merge into Base.
+				tellNotice([(pc.lpn_sm_merge_none || 'The alternative {name} holds no overrides to merge.').replace('{name}', name)]
+					.concat(smMergeKeptText(plan, name)).join('\n\n'));
+				return;
+			}
+			parts = [(pc.lpn_sm_merge_ask || 'Move the overrides ({n}) of {name} up into {target}? Afterward, it inherits them instead of holding them. You can undo this.')
+				.replace(/\{name\}/g, name).replace('{n}', String(plan.n)).replace('{target}', tname)];
+			plan.skipped.forEach(function (s) {
+				parts.push((pc.lpn_sm_merge_skipped || '{between} also overrides these values. It is skipped and not changed, so {name} will read them from {between}, not from {target}:')
+					.replace(/\{between\}/g, s.name).replace('{name}', name).replace('{target}', tname) + '\n' + s.lines.join('\n'));
+			});
+			parts = parts.concat(smMergeKeptText(plan, name));
+			askDialog({ kind: 'confirm', text: parts.join('\n\n') }, function (yes) {
+				var res;
+				if (!yes) { return; }
+				res = smTry(function () { return smMergeUpward(tree, key, tk); });
+				if (!res || res.refused) { return; }
+				smState.sel = res.source;
+				smAfter(true, false);
+			});
+		});
+	}
+	// What a merge into Base leaves in the source, said in the question.
+	function smMergeKeptText(plan, name) {
+		var pc = EngCalcs.pageConfig || {}, out = [];
+		if (plan.keepsMorph) { out.push((pc.lpn_sm_merge_keeps_morph || 'A change of type made with Morph is not merged into Base. It stays in {name}. To change the type in Base, use Morph in the Base scenario.').replace(/\{name\}/g, name)); }
+		if (plan.keepsView) { out.push((pc.lpn_sm_merge_keeps_view || 'A saved view is not merged into Base. It stays in {name}.').replace(/\{name\}/g, name)); }
+		return out;
 	}
 	// The Scenarios menu's Copy scenario: the open scenario, copied, and the copy made current.
 	function copyCurrentScenario() {

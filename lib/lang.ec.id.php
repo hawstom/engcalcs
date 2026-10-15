@@ -2670,14 +2670,8 @@ $ec_lang['lpn_scenario_delete']='Hapus skenario';
 // Same label-versus-sentence distinction that decided the eigenvalue fixes in sprint 316.
 $ec_lang['lpn_scenario_base_value']='Skenario Dasar: {value}';
 $ec_lang['lpn_scenario_deactivated']='{id} dikecualikan dari jaringan pada {scenario}. Aset tetap ada di gambar dan di skenario lain.';
-$ec_lang['lpn_scenario_push_btn']='Terapkan nilai Dasar ke semua skenario';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_scenario_push_tip']='Setiap skenario kembali menggunakan nilai Dasar untuk properti yang labelnya sedang ditampilkan sekarang. Nilai yang dimasukkan untuk properti ini di skenario mana pun akan dibuang.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_scenario_push_confirm']='Jadikan setiap skenario menggunakan nilai Dasar untuk properti ini? Nilai yang dimasukkan untuk properti ini di skenario mana pun akan dibuang. Anda dapat membatalkan tindakan ini.';
-$ec_lang['lpn_scenario_push_scenarios']='Skenario yang terpengaruh:';
-$ec_lang['lpn_scenario_push_values']='Nilai yang dibuang:';
-$ec_lang['lpn_scenario_push_none']='Tidak ada skenario yang menimpa Dasar untuk properti-properti ini, sehingga tidak ada yang berubah. Tidak ada yang dibuang.';
 $ec_lang['lpn_scenario_preset_flow_static']='1. Uji aliran: Statis';
 $ec_lang['lpn_scenario_preset_flow_static_tip']='Kalibrasi uji aliran untuk jaringan desain pada debit 0. Dalam skenario ini, atur kebutuhan di semua simpul menjadi 0.';
 $ec_lang['lpn_scenario_preset_flow_mid']='2. Uji aliran: Menengah';

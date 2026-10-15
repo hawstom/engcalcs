@@ -2666,14 +2666,8 @@ $ec_lang['lpn_scenario_delete']='Обриши сценарио';
 // Same label-versus-sentence distinction that decided the eigenvalue fixes in sprint 316.
 $ec_lang['lpn_scenario_base_value']='Основни сценарио: {value}';
 $ec_lang['lpn_scenario_deactivated']='{id} је изван мреже у сценарију {scenario}. И даље је на цртежу и у вашим осталим сценаријима.';
-$ec_lang['lpn_scenario_push_btn']='Примени вредности из Основе на све сценарије';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_scenario_push_tip']='Сваки сценарио се враћа на вредност из Основе за особине чије ознаке су тренутно приказане. Вредности унете за њих у било ком сценарију се одбацују.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_scenario_push_confirm']='Да ли желите да сви сценарији користе вредности из Основе за ове особине? Вредности унете за њих у било ком сценарију се одбацују. Ово можете поништити.';
-$ec_lang['lpn_scenario_push_scenarios']='Погођени сценарији:';
-$ec_lang['lpn_scenario_push_values']='Одбачене вредности:';
-$ec_lang['lpn_scenario_push_none']='Ниједан сценарио нема властиту вредност ни за једну од ових особина, па се ништа не би променило. Ништа се не одбацује.';
 $ec_lang['lpn_scenario_preset_flow_static']='1. Тест протока: Статички';
 $ec_lang['lpn_scenario_preset_flow_static_tip']='Калибрација теста протока за пројектовану мрежу при протоку 0. У овом сценарију поставите потрошњу на свим чворовима на 0.';
 $ec_lang['lpn_scenario_preset_flow_mid']='2. Тест протока: Средњи';

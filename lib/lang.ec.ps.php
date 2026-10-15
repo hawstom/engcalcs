@@ -2667,14 +2667,8 @@ $ec_lang['lpn_scenario_delete']='سناریو ړنګول';
 // Same label-versus-sentence distinction that decided the eigenvalue fixes in sprint 316.
 $ec_lang['lpn_scenario_base_value']='د اساس سناریو: {value}';
 $ec_lang['lpn_scenario_deactivated']='{id} په {scenario} کې د شبکې نه بهر دی. دا لاهم په انځور کې دی، او ستاسو په نورو سناریوګانو کې هم.';
-$ec_lang['lpn_scenario_push_btn']='د اساس ارزښتونه ټولو سناریوګانو ته پلي کول';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_scenario_push_tip']='هره سناریو د هغو ملکیتونو لپاره چې اوس یې لیبلونه ښکاره دي، بېرته د اساس ارزښت ته ورځي. هغه ارزښتونه چې یوازې دې سناریوګانو پورې اړه لري، غورځول کیږي.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_scenario_push_confirm']='ټولې سناریوګانې دې ملکیتونو لپاره د اساس ارزښتونه وکاروي؟ هغه ارزښتونه چې یوازې دې سناریوګانو پورې اړه لري، غورځول کیږي. تاسو دا بېرته کولی شئ.';
-$ec_lang['lpn_scenario_push_scenarios']='اغیزمن شوي سناریوګانې:';
-$ec_lang['lpn_scenario_push_values']='غورځول شوي ارزښتونه:';
-$ec_lang['lpn_scenario_push_none']='هیڅ سناریو د دې ملکیتونو لپاره خپل ارزښت نلري، نو هیڅ به ونه بدلیږي. هیڅ شی نه غورځول کیږي.';
 $ec_lang['lpn_scenario_preset_flow_static']='1. د بهاو ازموینه: ثابت';
 $ec_lang['lpn_scenario_preset_flow_static_tip']='د ډیزاین شبکې لپاره د بهاو ازموینې کالیبریشن په 0 بهاو کې. پدې سناریو کې په ټولو جنکشنونو کې تقاضا 0 وټاکئ.';
 $ec_lang['lpn_scenario_preset_flow_mid']='2. د بهاو ازموینه: منځنی';

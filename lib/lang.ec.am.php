@@ -2665,14 +2665,8 @@ $ec_lang['lpn_scenario_delete']='ሁኔታ አጥፋ';
 // Same label-versus-sentence distinction that decided the eigenvalue fixes in sprint 316.
 $ec_lang['lpn_scenario_base_value']='መሠረት፦ {value}';
 $ec_lang['lpn_scenario_deactivated']='{id} በ{scenario} ውስጥ ከመረቡ ውጭ ነው። በስዕሉ እና በሌሎች ሁኔታዎች ውስጥ ይቀራል።';
-$ec_lang['lpn_scenario_push_btn']='የመሠረት ዋጋዎችን ለሁሉም ሁኔታዎች ተግብር';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_scenario_push_tip']='እያንዳንዱ ሁኔታ አሁን ለሚታዩት ምልክቶች ወደ መሠረት ዋጋ ይመለሳል። ለእነዚያ ሁኔታዎች ብቻ የሆኑ ዋጋዎች ይጣላሉ።';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_scenario_push_confirm']='እያንዳንዱ ሁኔታ ለእነዚህ ንብረቶች የመሠረት ዋጋዎችን እንዲጠቀም ማድረግ? ለእነዚያ ሁኔታዎች ብቻ የሆኑ ዋጋዎች ይጣላሉ። ይህን መልሰው መቀልበስ ይችላሉ።';
-$ec_lang['lpn_scenario_push_scenarios']='የተነኩ ሁኔታዎች፦';
-$ec_lang['lpn_scenario_push_values']='የተጣሉ ዋጋዎች፦';
-$ec_lang['lpn_scenario_push_none']='ከእነዚህ ባህሪያት ለማናቸውም መሠረትን የሚሽር ሁኔታ የለም፣ ስለዚህ ምንም አይለወጥም። ምንም አይጣልም።';
 $ec_lang['lpn_scenario_preset_flow_static']='1. የፍሰት ሙከራ፦ የማይንቀሳቀስ';
 $ec_lang['lpn_scenario_preset_flow_static_tip']='ለንድፍ መረብ የፍሰት ሙከራ ማስተካከያ በ0 ፍሰት። በዚህ ሁኔታ ውስጥ በሁሉም መገናኛዎች ላይ ያለውን ፍላጎት ወደ 0 ያዘጋጁ።';
 $ec_lang['lpn_scenario_preset_flow_mid']='2. የፍሰት ሙከራ፦ መካከለኛ';

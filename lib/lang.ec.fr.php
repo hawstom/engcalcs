@@ -2674,14 +2674,8 @@ $ec_lang['lpn_scenario_delete']='Supprimer le scénario';
 // Same label-versus-sentence distinction that decided the eigenvalue fixes in sprint 316.
 $ec_lang['lpn_scenario_base_value']='Scénario de base : {value}';
 $ec_lang['lpn_scenario_deactivated']='{id} est exclu du réseau dans {scenario}. Il reste dans le dessin et dans les autres scénarios.';
-$ec_lang['lpn_scenario_push_btn']='Appliquer les valeurs de Base à tous les scénarios';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_scenario_push_tip']='Chaque scénario revient à la valeur de Base pour les propriétés dont les étiquettes sont actuellement affichées. Les valeurs qui appartiennent uniquement à ces scénarios sont abandonnées.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_scenario_push_confirm']='Faire revenir tous les scénarios aux valeurs de Base pour ces propriétés ? Les valeurs qui leur appartiennent uniquement sont abandonnées. Vous pouvez annuler cette action.';
-$ec_lang['lpn_scenario_push_scenarios']='Scénarios concernés :';
-$ec_lang['lpn_scenario_push_values']='Valeurs abandonnées :';
-$ec_lang['lpn_scenario_push_none']='Aucun scénario ne remplace la valeur de Base pour l\'une de ces propriétés ; rien ne changerait donc. Rien n\'est abandonné.';
 $ec_lang['lpn_scenario_preset_flow_static']='1. Test de débit : statique';
 $ec_lang['lpn_scenario_preset_flow_static_tip']='Étalonnage du test de débit pour un réseau de conception à débit nul. Dans ce scénario, réglez la demande de toutes les jonctions à 0.';
 $ec_lang['lpn_scenario_preset_flow_mid']='2. Test de débit : intermédiaire';

@@ -2677,14 +2677,8 @@ $ec_lang['lpn_scenario_delete']='দৃশ্যকল্প মুছুন';
 // Same label-versus-sentence distinction that decided the eigenvalue fixes in sprint 316.
 $ec_lang['lpn_scenario_base_value']='ভিত্তি দৃশ্যকল্প: {value}';
 $ec_lang['lpn_scenario_deactivated']='{scenario}-এ {id} নেটওয়ার্ক থেকে বাদ দেওয়া হয়েছে। এটি অঙ্কনে এবং অন্য দৃশ্যকল্পগুলোতে থাকে।';
-$ec_lang['lpn_scenario_push_btn']='সব দৃশ্যকল্পে ভিত্তির মান প্রয়োগ করুন';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_scenario_push_tip']='যেসব বৈশিষ্ট্যের লেবেল এখন দেখানো হচ্ছে, সেগুলোর জন্য প্রতিটি দৃশ্যকল্প ভিত্তির মানে ফিরে যায়। যেকোনো দৃশ্যকল্পে এগুলোর জন্য প্রবেশ করানো মানগুলো বাতিল করা হয়।';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_scenario_push_confirm']='প্রতিটি দৃশ্যকল্পকে এই বৈশিষ্ট্যগুলোর জন্য ভিত্তির মান ব্যবহার করাবেন? যেকোনো দৃশ্যকল্পে এগুলোর জন্য প্রবেশ করানো মানগুলো বাতিল করা হবে। আপনি এটি পূর্বাবস্থায় ফেরাতে পারবেন।';
-$ec_lang['lpn_scenario_push_scenarios']='প্রভাবিত দৃশ্যকল্প:';
-$ec_lang['lpn_scenario_push_values']='বাদ যাওয়া মান:';
-$ec_lang['lpn_scenario_push_none']='এই বৈশিষ্ট্যগুলোর কোনোটির জন্য কোনো দৃশ্যকল্প ভিত্তিকে অগ্রাহ্য করে না, তাই কিছুই বদলাবে না। কিছুই বাদ যায় না।';
 $ec_lang['lpn_scenario_preset_flow_static']='1. প্রবাহ পরীক্ষা: স্থির';
 $ec_lang['lpn_scenario_preset_flow_static_tip']='শূন্য প্রবাহে একটি ডিজাইন নেটওয়ার্কের জন্য প্রবাহ পরীক্ষার ক্যালিব্রেশন। এই দৃশ্যকল্পে সব সংযোগস্থলের চাহিদা ০ সেট করুন।';
 $ec_lang['lpn_scenario_preset_flow_mid']='2. প্রবাহ পরীক্ষা: মধ্য';

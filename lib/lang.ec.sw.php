@@ -2666,14 +2666,8 @@ $ec_lang['lpn_scenario_delete']='Futa senario';
 // Same label-versus-sentence distinction that decided the eigenvalue fixes in sprint 316.
 $ec_lang['lpn_scenario_base_value']='Senario ya Msingi: {value}';
 $ec_lang['lpn_scenario_deactivated']='{id} imetengwa na mtandao katika {scenario}. Inabaki kwenye mchoro na katika senario nyingine.';
-$ec_lang['lpn_scenario_push_btn']='Weka thamani za Msingi kwenye senario zote';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_scenario_push_tip']='Kila senario inarudi kwenye thamani ya Msingi kwa sifa ambazo lebo zake zinaonyeshwa sasa hivi. Thamani zinazomilikiwa na senario hizo pekee zinatupwa.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_scenario_push_confirm']='Fanya kila senario itumie thamani za Msingi kwa sifa hizi? Thamani zinazomilikiwa na senario hizo pekee zinatupwa. Unaweza kutengua hili.';
-$ec_lang['lpn_scenario_push_scenarios']='Senario zinazoathirika:';
-$ec_lang['lpn_scenario_push_values']='Thamani zinazotupwa:';
-$ec_lang['lpn_scenario_push_none']='Hakuna senario inayobadilisha Msingi kwa sifa yoyote kati ya hizi, hivyo hakuna kitakachobadilika. Hakuna kinachotupwa.';
 $ec_lang['lpn_scenario_preset_flow_static']='1. Jaribio la mtiririko: Tuli';
 $ec_lang['lpn_scenario_preset_flow_static_tip']='Urekebishaji wa jaribio la mtiririko kwa mtandao wa kubuni kwenye mtiririko 0. Katika senario hii, weka mahitaji kwenye miunganiko yote kuwa 0.';
 $ec_lang['lpn_scenario_preset_flow_mid']='2. Jaribio la mtiririko: Wastani';

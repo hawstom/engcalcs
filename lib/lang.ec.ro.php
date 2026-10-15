@@ -2667,14 +2667,8 @@ $ec_lang['lpn_scenario_delete']='Ștergere scenariu';
 // Same label-versus-sentence distinction that decided the eigenvalue fixes in sprint 316.
 $ec_lang['lpn_scenario_base_value']='Scenariul de bază: {value}';
 $ec_lang['lpn_scenario_deactivated']='{id} este exclus din rețea în {scenario}. Rămâne pe desen și în celelalte scenarii.';
-$ec_lang['lpn_scenario_push_btn']='Aplică valorile de Bază la toate scenariile';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_scenario_push_tip']='Fiecare scenariu revine la valoarea de Bază pentru proprietățile ale căror etichete sunt afișate acum. Valorile introduse pentru ele în orice scenariu sunt eliminate.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_scenario_push_confirm']='Faceți ca fiecare scenariu să folosească valorile de Bază pentru aceste proprietăți? Valorile introduse pentru ele în orice scenariu sunt eliminate. Puteți anula această acțiune.';
-$ec_lang['lpn_scenario_push_scenarios']='Scenarii afectate:';
-$ec_lang['lpn_scenario_push_values']='Valori eliminate:';
-$ec_lang['lpn_scenario_push_none']='Niciun scenariu nu înlocuiește Baza pentru vreuna dintre aceste proprietăți, deci nimic nu s-ar schimba. Nimic nu este eliminat.';
 $ec_lang['lpn_scenario_preset_flow_static']='1. Test de debit: Static';
 $ec_lang['lpn_scenario_preset_flow_static_tip']='Calibrarea testului de debit pentru o rețea de proiectare la debit 0. În acest scenariu, setați cerința tuturor joncțiunilor la 0.';
 $ec_lang['lpn_scenario_preset_flow_mid']='2. Test de debit: Mediu';

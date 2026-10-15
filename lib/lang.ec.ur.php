@@ -2665,14 +2665,8 @@ $ec_lang['lpn_scenario_delete']='منظرنامہ حذف کریں';
 // Same label-versus-sentence distinction that decided the eigenvalue fixes in sprint 316.
 $ec_lang['lpn_scenario_base_value']='بنیادی منظرنامہ: {value}';
 $ec_lang['lpn_scenario_deactivated']='{id}، {scenario} میں نیٹ ورک سے باہر ہے۔ یہ اب بھی ڈرائنگ میں، اور آپ کے دیگر منظرناموں میں موجود ہے۔';
-$ec_lang['lpn_scenario_push_btn']='بنیاد کی قدریں تمام منظرناموں پر لاگو کریں';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_scenario_push_tip']='ہر منظرنامہ ان خصوصیات کے لیے بنیاد کی قدر پر واپس چلا جاتا ہے جن کے لیبل ابھی دکھائے جا رہے ہیں۔ کسی بھی منظرنامے میں ان کے لیے درج کردہ قدریں ضائع کر دی جاتی ہیں۔';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_scenario_push_confirm']='ہر منظرنامے کو ان خصوصیات کے لیے بنیاد کی قدریں استعمال کرنے دیں؟ کسی بھی منظرنامے میں ان کے لیے درج کردہ قدریں ضائع کر دی جاتی ہیں۔ آپ اسے واپس کر سکتے ہیں۔';
-$ec_lang['lpn_scenario_push_scenarios']='متاثرہ منظرنامے:';
-$ec_lang['lpn_scenario_push_values']='ضائع کی گئی قدریں:';
-$ec_lang['lpn_scenario_push_none']='ان خصوصیات میں سے کسی کے لیے کوئی منظرنامہ بنیاد کو تبدیل نہیں کرتا، اس لیے کچھ نہیں بدلے گا۔ کچھ ضائع نہیں ہوتا۔';
 $ec_lang['lpn_scenario_preset_flow_static']='1. فلو ٹیسٹ: جامد';
 $ec_lang['lpn_scenario_preset_flow_static_tip']='ڈیزائن نیٹ ورک کے لیے صفر بہاؤ پر فلو ٹیسٹ کی کیلیبریشن۔ اس منظرنامے میں تمام جنکشنز کی طلب 0 مقرر کریں۔';
 $ec_lang['lpn_scenario_preset_flow_mid']='2. فلو ٹیسٹ: درمیانہ';

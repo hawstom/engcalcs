@@ -13,7 +13,7 @@
 //
 // The fix makes the whole list ONE overridable property, `demands`. This drives the REAL popup
 // controls inside a scenario and asks, of every one of them, the question that matters: did Base
-// move? Then clearing, the Base-side push, undo, save and load, a file written before R-369 that
+// move? Then clearing, undo, save and load, a file written before R-369 that
 // overrides only `demand`, the solver, the .inp writer, a pattern rename, and Base itself.
 //
 // Copyright 2009 Thomas Gail Haws
@@ -51,7 +51,7 @@ const L = loadLoopedNetwork(
 	"\t\tgetScenarios: function () { return scenarios; }, activeScenario: activeScenario,\n" +
 	"\t\tresolvedDemand: resolvedDemand, baseDemandTotal: baseDemandTotal,\n" +
 	"\t\trenderNodeFields: renderNodeFields, paneTables: paneTables, pushSpecs: pushSpecList,\n" +
-	"\t\tpushBaseToScenarios: pushBaseToScenarios, labelSettings: function () { return labelSettings; },\n" +
+	"\t\tclearOverride: clearOverride, labelSettings: function () { return labelSettings; },\n" +
 	"\t\tsaveUndoSnapshot: saveUndoSnapshot, undo: undo,\n" +
 	"\t\tlibRenamePattern: libRenamePattern, libPatterns: libPatterns,\n" +
 	"\t\texportOptions: inpExportOptions,\n" +
@@ -320,15 +320,15 @@ console.log('\n--- a scenario saved before R-369 ---');
 }
 
 // ---------------------------------------------------------------------------
-// 9. The Base-side push clears a scenario's list.
+// 9. Clearing the scenario's list (the override dot's own door) puts J1 back on Base's. Until
+//    Task 801 this was Apply Base values, which is retired.
 // ---------------------------------------------------------------------------
-console.log('\n--- Apply Base values to all scenarios ---');
+console.log('\n--- clearing the scenario\'s list ---');
 {
-	L.labelSettings().node.demand = true;
-	L.switchScenario('base');
-	L.pushBaseToScenarios(J('J1'));
 	L.switchScenario(SCN.id);
-	ok('the push discards the scenario\'s list, and J1 follows Base again',
+	L.clearOverride(J('J1'), 'demands');
+	L.clearOverride(J('J1'), 'demand');
+	ok('a cleared list is gone, and J1 follows Base again',
 		!ovOf('J1').demands && near(L.resolvedDemand(J('J1')), J1_BASE), JSON.stringify(ovOf('J1')));
 	L.switchScenario('base');
 }

@@ -2668,14 +2668,8 @@ $ec_lang['lpn_scenario_delete']='Szenario löschen';
 // Same label-versus-sentence distinction that decided the eigenvalue fixes in sprint 316.
 $ec_lang['lpn_scenario_base_value']='Basisszenario: {value}';
 $ec_lang['lpn_scenario_deactivated']='{id} ist in {scenario} nicht Teil des Netzes. Es verbleibt in der Zeichnung und in den anderen Szenarien.';
-$ec_lang['lpn_scenario_push_btn']='Basiswerte auf alle Szenarien anwenden';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_scenario_push_tip']='Jedes Szenario wird für die gerade angezeigten Eigenschaften auf den Basiswert zurückgesetzt. Für sie in einem Szenario eingegebene Werte werden verworfen.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_scenario_push_confirm']='Sollen alle Szenarien für diese Eigenschaften die Basiswerte verwenden? Für sie in einem Szenario eingegebene Werte werden verworfen. Sie können dies rückgängig machen.';
-$ec_lang['lpn_scenario_push_scenarios']='Betroffene Szenarien:';
-$ec_lang['lpn_scenario_push_values']='Verworfene Werte:';
-$ec_lang['lpn_scenario_push_none']='Kein Szenario überschreibt Basis bei einer dieser Eigenschaften, daher würde sich nichts ändern. Es wird nichts verworfen.';
 $ec_lang['lpn_scenario_preset_flow_static']='1. Durchflusstest: Statisch';
 $ec_lang['lpn_scenario_preset_flow_static_tip']='Kalibrierung des Durchflusstests für ein Planungsnetz bei Durchfluss 0. Setzen Sie in diesem Szenario die Entnahme an allen Entnahmeknoten auf 0.';
 $ec_lang['lpn_scenario_preset_flow_mid']='2. Durchflusstest: Mittel';

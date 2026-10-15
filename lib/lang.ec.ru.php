@@ -2667,14 +2667,8 @@ $ec_lang['lpn_scenario_delete']='Удалить сценарий';
 // Same label-versus-sentence distinction that decided the eigenvalue fixes in sprint 316.
 $ec_lang['lpn_scenario_base_value']='Базовый сценарий: {value}';
 $ec_lang['lpn_scenario_deactivated']='{id} исключён из сети в сценарии {scenario}. Он остаётся на чертеже и в других сценариях.';
-$ec_lang['lpn_scenario_push_btn']='Применить значения Базы ко всем сценариям';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_scenario_push_tip']='Все сценарии возвращаются к значениям Базы для свойств, метки которых показаны сейчас. Значения, введённые для них в любом сценарии, будут удалены.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_scenario_push_confirm']='Заставить все сценарии использовать значения Базы для этих свойств? Значения, введённые для них в любом сценарии, будут удалены. Это действие можно отменить.';
-$ec_lang['lpn_scenario_push_scenarios']='Затронутые сценарии:';
-$ec_lang['lpn_scenario_push_values']='Удаляемые значения:';
-$ec_lang['lpn_scenario_push_none']='Ни один сценарий не имеет собственного значения ни для одного из этих свойств, поэтому ничего не изменится. Ничего не будет удалено.';
 $ec_lang['lpn_scenario_preset_flow_static']='1. Проверка расхода: статика';
 $ec_lang['lpn_scenario_preset_flow_static_tip']='Калибровка по проверке расхода для проектируемой сети при нулевом расходе. В этом сценарии задайте расход отбора во всех узлах равным 0.';
 $ec_lang['lpn_scenario_preset_flow_mid']='2. Проверка расхода: средний';

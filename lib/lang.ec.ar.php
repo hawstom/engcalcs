@@ -2736,14 +2736,8 @@ $ec_lang['lpn_scenario_delete']='حذف السيناريو';
 // Same label-versus-sentence distinction that decided the eigenvalue fixes in sprint 316.
 $ec_lang['lpn_scenario_base_value']='سيناريو الأساس: {value}';
 $ec_lang['lpn_scenario_deactivated']='يُستثنى {id} من الشبكة في {scenario}. يبقى في الرسم وفي السيناريوهات الأخرى.';
-$ec_lang['lpn_scenario_push_btn']='تطبيق قيم الأساس على جميع السيناريوهات';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_scenario_push_tip']='تعود جميع السيناريوهات إلى قيمة الأساس للخصائص التي تظهر تسمياتها الآن. تُلغى القيم التي تخص تلك السيناريوهات وحدها.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_scenario_push_confirm']='هل تريد جعل جميع السيناريوهات تستخدم قيم الأساس لهذه الخصائص؟ تُلغى القيم التي تخص تلك السيناريوهات وحدها. يمكنك التراجع عن هذا.';
-$ec_lang['lpn_scenario_push_scenarios']='السيناريوهات المتأثرة:';
-$ec_lang['lpn_scenario_push_values']='القيم المهمَلة:';
-$ec_lang['lpn_scenario_push_none']='لا يتجاوز أي سيناريو الأساس في أي من هذه الخصائص، فلن يتغير شيء. لا تُهمَل أي قيمة.';
 $ec_lang['lpn_scenario_preset_flow_static']='1. اختبار التدفق: ساكن';
 $ec_lang['lpn_scenario_preset_flow_static_tip']='معايرة اختبار التدفق لشبكة تصميمية عند تدفق صفر. في هذا السيناريو، اضبط الطلب عند جميع الملتقيات على 0.';
 $ec_lang['lpn_scenario_preset_flow_mid']='2. اختبار التدفق: وسطي';

@@ -2666,14 +2666,8 @@ $ec_lang['lpn_scenario_delete']='Elimina scenario';
 // Same label-versus-sentence distinction that decided the eigenvalue fixes in sprint 316.
 $ec_lang['lpn_scenario_base_value']='Scenario base: {value}';
 $ec_lang['lpn_scenario_deactivated']='{id} è escluso dalla rete in {scenario}. Rimane comunque nel disegno e negli altri scenari.';
-$ec_lang['lpn_scenario_push_btn']='Applica i valori di Base a tutti gli scenari';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_scenario_push_tip']='Ogni scenario torna al valore di Base per le proprietà le cui etichette sono mostrate in questo momento. I valori che appartengono solo a quegli scenari vengono eliminati.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_scenario_push_confirm']='Far usare a tutti gli scenari i valori di Base per queste proprietà? I valori che appartengono solo a quegli scenari vengono eliminati. Puoi annullare questa azione.';
-$ec_lang['lpn_scenario_push_scenarios']='Scenari coinvolti:';
-$ec_lang['lpn_scenario_push_values']='Valori eliminati:';
-$ec_lang['lpn_scenario_push_none']='Nessuno scenario ha un valore personalizzato per queste proprietà, quindi non cambierebbe nulla. Non viene eliminato nulla.';
 $ec_lang['lpn_scenario_preset_flow_static']='1. Prova di portata: statica';
 $ec_lang['lpn_scenario_preset_flow_static_tip']='Taratura della prova di portata per una rete di progetto a portata 0. In questo scenario, imposta la richiesta di tutti i nodi a 0.';
 $ec_lang['lpn_scenario_preset_flow_mid']='2. Prova di portata: intermedia';

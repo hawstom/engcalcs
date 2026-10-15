@@ -2663,14 +2663,8 @@ $ec_lang['lpn_scenario_delete']='Excluir cenário';
 // Same label-versus-sentence distinction that decided the eigenvalue fixes in sprint 316.
 $ec_lang['lpn_scenario_base_value']='Cenário base: {value}';
 $ec_lang['lpn_scenario_deactivated']='{id} está excluído da rede em {scenario}. Permanece no desenho e nos outros cenários.';
-$ec_lang['lpn_scenario_push_btn']='Aplicar valores da Base a todos os cenários';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_scenario_push_tip']='Todo cenário volta ao valor da Base para as propriedades cujos rótulos estão sendo mostrados agora. Valores que pertencem somente a esses cenários são descartados.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_scenario_push_confirm']='Fazer todo cenário usar os valores da Base para estas propriedades? Valores que pertencem somente a esses cenários são descartados. Você pode desfazer isso.';
-$ec_lang['lpn_scenario_push_scenarios']='Cenários afetados:';
-$ec_lang['lpn_scenario_push_values']='Valores descartados:';
-$ec_lang['lpn_scenario_push_none']='Nenhum cenário substitui a Base para nenhuma destas propriedades, então nada mudaria. Nada é descartado.';
 $ec_lang['lpn_scenario_preset_flow_static']='1. Teste de vazão: Estático';
 $ec_lang['lpn_scenario_preset_flow_static_tip']='Calibração do teste de vazão para uma rede de projeto com vazão 0. Neste cenário, defina a demanda em todas as junções como 0.';
 $ec_lang['lpn_scenario_preset_flow_mid']='2. Teste de vazão: Intermediário';

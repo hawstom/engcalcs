@@ -2666,14 +2666,8 @@ $ec_lang['lpn_scenario_delete']='حذف سناریو';
 // Same label-versus-sentence distinction that decided the eigenvalue fixes in sprint 316.
 $ec_lang['lpn_scenario_base_value']='سناریوی پایه: {value}';
 $ec_lang['lpn_scenario_deactivated']='{id} در {scenario} از شبکه کنار گذاشته شده است. در ترسیم و در سناریوهای دیگر می‌ماند.';
-$ec_lang['lpn_scenario_push_btn']='اعمال مقادیر پایه به همه سناریوها';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_scenario_push_tip']='هر سناریو برای ویژگی‌هایی که برچسب‌هایشان اکنون نمایان است، به مقدار پایه بازمی‌گردد. مقادیری که برای آن سناریوها وارد شده دور ریخته می‌شوند.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_scenario_push_confirm']='همه سناریوها برای این ویژگی‌ها از مقادیر پایه استفاده کنند؟ مقادیری که برای آن سناریوها وارد شده دور ریخته می‌شوند. می‌توانید این کار را واگرد کنید.';
-$ec_lang['lpn_scenario_push_scenarios']='سناریوهای تحت تأثیر:';
-$ec_lang['lpn_scenario_push_values']='مقدارهای دورریخته‌شده:';
-$ec_lang['lpn_scenario_push_none']='هیچ سناریویی برای هیچ‌یک از این ویژگی‌ها بر پایه (Base) مقدم نیست، پس چیزی تغییر نمی‌کند. چیزی دور ریخته نمی‌شود.';
 $ec_lang['lpn_scenario_preset_flow_static']='۱. آزمایش جریان: ایستا';
 $ec_lang['lpn_scenario_preset_flow_static_tip']='کالیبراسیون آزمایش جریان برای شبکهٔ طراحی در جریان صفر. در این سناریو، مصرف را در همهٔ گره‌ها صفر بگذارید.';
 $ec_lang['lpn_scenario_preset_flow_mid']='۲. آزمایش جریان: میانی';

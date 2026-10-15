@@ -2667,14 +2667,8 @@ $ec_lang['lpn_scenario_delete']='מחיקת תרחיש';
 // Same label-versus-sentence distinction that decided the eigenvalue fixes in sprint 316.
 $ec_lang['lpn_scenario_base_value']='תרחיש בסיס: {value}';
 $ec_lang['lpn_scenario_deactivated']='{id} אינו כלול ברשת ב-{scenario}. הוא נשאר בשרטוט ובתרחישים האחרים.';
-$ec_lang['lpn_scenario_push_btn']='החלת ערכי הבסיס על כל התרחישים';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_scenario_push_tip']='כל תרחיש חוזר לערך הבסיס עבור התכונות שתוויותיהן מוצגות כרגע. ערכים ששייכים לתרחישים אלה בלבד נמחקים.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_scenario_push_confirm']='להחיל על כל תרחיש את ערכי הבסיס עבור תכונות אלה? ערכים ששייכים לתרחישים אלה בלבד נמחקים. ניתן לבטל פעולה זו.';
-$ec_lang['lpn_scenario_push_scenarios']='תרחישים מושפעים:';
-$ec_lang['lpn_scenario_push_values']='ערכים שיימחקו:';
-$ec_lang['lpn_scenario_push_none']='אין תרחיש שערכו עוקף את הבסיס עבור אחד מהמאפיינים האלה, ולכן דבר לא ישתנה. דבר אינו נמחק.';
 $ec_lang['lpn_scenario_preset_flow_static']='1. מבחן ספיקה: סטטי';
 $ec_lang['lpn_scenario_preset_flow_static_tip']='כיול מבחן ספיקה לרשת תכן בספיקה אפס. בתרחיש זה הגדירו את הדרישה בכל הצמתים ל-0.';
 $ec_lang['lpn_scenario_preset_flow_mid']='2. מבחן ספיקה: בינוני';

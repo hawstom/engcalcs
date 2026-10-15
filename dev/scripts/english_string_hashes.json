@@ -1,7 +1,7 @@
 {
     "description": "sha1 of each lang.ec.en.php $ec_lang value as of the last full translation sync. Maintained by detect_english_drift.php --update. A current-vs-manifest hash mismatch means that key's English changed and translations may be stale. Do not hand-edit.",
     "updated": "2026-10-14",
-    "count": 2613,
+    "count": 2607,
     "partial_updates": [
         {
             "date": "2026-08-08",
@@ -7285,12 +7285,6 @@
         "lpn_scenario_preset_mult_tip": "7c5c5a6168e38cfb14d337d510102ef167782ba2",
         "lpn_scenario_preset_peak_hour": "e601dcacc8af2f2538b6b1d406e93522b54afd31",
         "lpn_scenario_prompt_name": "f05ee5e127dbbf90ad0cde70708c2f2d84110677",
-        "lpn_scenario_push_btn": "a6395ef6908a852924ef3e6a960cee547c57bc90",
-        "lpn_scenario_push_confirm": "590e6acf48c9097bb958d8aef261fcc398053a08",
-        "lpn_scenario_push_none": "0bab8e0e639587555bb32fafc55cc48fab0a755f",
-        "lpn_scenario_push_scenarios": "5ca15c8902528111bf621c9f3108f8afd0c6b39f",
-        "lpn_scenario_push_tip": "c6e7f79501329f2c2510bfb1ce5ab67d1068d30d",
-        "lpn_scenario_push_values": "f679d1aafc918ab2ce8afca529a696a277ee8963",
         "lpn_scenario_rename": "7e5528377133d56e10d2add5502a3879d1b3715e",
         "lpn_scenario_tip": "a1b3cc93de198afb68169fa9e3a5b118ae034fd5",
         "lpn_scncmp_at": "6330e9ee2e886a93d5af212b8eb28bf8d7bc0522",
@@ -15161,30 +15155,6 @@
         "lpn_scenario_prompt_name": {
             "words": 4,
             "ends_sentence": false
-        },
-        "lpn_scenario_push_btn": {
-            "words": 6,
-            "ends_sentence": false
-        },
-        "lpn_scenario_push_confirm": {
-            "words": 23,
-            "ends_sentence": true
-        },
-        "lpn_scenario_push_none": {
-            "words": 16,
-            "ends_sentence": true
-        },
-        "lpn_scenario_push_scenarios": {
-            "words": 2,
-            "ends_sentence": true
-        },
-        "lpn_scenario_push_tip": {
-            "words": 26,
-            "ends_sentence": true
-        },
-        "lpn_scenario_push_values": {
-            "words": 2,
-            "ends_sentence": true
         },
         "lpn_scenario_rename": {
             "words": 2,

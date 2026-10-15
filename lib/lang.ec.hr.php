@@ -2667,14 +2667,8 @@ $ec_lang['lpn_scenario_delete']='Izbriši scenarij';
 // Same label-versus-sentence distinction that decided the eigenvalue fixes in sprint 316.
 $ec_lang['lpn_scenario_base_value']='Bazni scenarij: {value}';
 $ec_lang['lpn_scenario_deactivated']='{id} je isključen iz mreže u scenariju {scenario}. Ostaje u crtežu i u drugim scenarijima.';
-$ec_lang['lpn_scenario_push_btn']='Primijeni vrijednosti Baze na sve scenarije';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_scenario_push_tip']='Svaki scenarij vraća se na vrijednost iz Baze za svojstva čije se oznake trenutačno prikazuju. Vrijednosti koje pripadaju samo tim scenarijima se odbacuju.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_scenario_push_confirm']='Postaviti da svi scenariji koriste vrijednosti iz Baze za ova svojstva? Vrijednosti koje pripadaju samo tim scenarijima bit će odbačene. Ovo možete poništiti.';
-$ec_lang['lpn_scenario_push_scenarios']='Scenariji na koje ovo utječe:';
-$ec_lang['lpn_scenario_push_values']='Odbačene vrijednosti:';
-$ec_lang['lpn_scenario_push_none']='Nijedan scenarij ne zamjenjuje Bazu ni za jedno od ovih svojstava, pa se ništa ne bi promijenilo. Ništa se ne odbacuje.';
 $ec_lang['lpn_scenario_preset_flow_static']='1. Test protoka: statički';
 $ec_lang['lpn_scenario_preset_flow_static_tip']='Kalibracija testom protoka za projektiranu mrežu pri nultom protoku. U ovom scenariju postavite potražnju na svim čvorovima na 0.';
 $ec_lang['lpn_scenario_preset_flow_mid']='2. Test protoka: srednji';

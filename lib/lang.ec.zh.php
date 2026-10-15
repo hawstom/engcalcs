@@ -2666,14 +2666,8 @@ $ec_lang['lpn_scenario_delete']='删除方案';
 // Same label-versus-sentence distinction that decided the eigenvalue fixes in sprint 316.
 $ec_lang['lpn_scenario_base_value']='基础情景：{value}';
 $ec_lang['lpn_scenario_deactivated']='{id} 在 {scenario} 中被排除在管网之外。它仍保留在图纸和其他方案中。';
-$ec_lang['lpn_scenario_push_btn']='将基础方案数值应用于所有方案';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_scenario_push_tip']='所有方案中当前显示标签的属性都将恢复为基础方案的数值，各方案专属的数值将被舍弃。';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_scenario_push_confirm']='使所有方案对这些属性都采用基础方案的数值？各方案专属的数值将被舍弃。此操作可撤销。';
-$ec_lang['lpn_scenario_push_scenarios']='受影响的方案：';
-$ec_lang['lpn_scenario_push_values']='被舍弃的数值：';
-$ec_lang['lpn_scenario_push_none']='没有任何方案对这些属性覆盖基础方案，因此不会有任何变化。不会舍弃任何内容。';
 $ec_lang['lpn_scenario_preset_flow_static']='1. 流量测试：静态';
 $ec_lang['lpn_scenario_preset_flow_static_tip']='针对设计管网在零流量下的流量测试校准。在此方案中，将所有节点的需水量设为 0。';
 $ec_lang['lpn_scenario_preset_flow_mid']='2. 流量测试：中等';

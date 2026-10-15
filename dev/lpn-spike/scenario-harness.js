@@ -18,7 +18,7 @@
 //   4. an inactive element is out of the solve, and drawing inside a scenario is how it gets there
 //   5. deleting in Base drops every scenario's overrides on that element; deleting in a scenario
 //      does not delete anything at all
-//   6. the status readout, the halos, and the two guards on the pushes
+//   6. the status readout and the halos; Apply Base values is retired (Task 801), in the menu and in Properties
 //
 // MUTATION-TESTED, 2026-08-14, because a harness that has never failed has never been shown to be
 // able to. Eleven defects were introduced into js/looped-network.js one at a time and all eleven
@@ -106,7 +106,7 @@ const L = loadLoopedNetwork(
 	"\t\tflyoutRows: function () { return document.getElementById('lpn_menu_list2'); },\n" +
 	"\t\twireScenarioButton: wireScenarioButton, statusText: function () { return document.getElementById('lpn_scenario_btn').textContent; },\n" +
 	"\t\tstatusTip: function () { return document.getElementById('lpn_scenario_btn').title || ''; },\n" +
-	"\t\tpushBaseToScenarios: pushBaseToScenarios, labelSettings: function () { return labelSettings; },\n" +
+	"\t\tlabelSettings: function () { return labelSettings; },\n" +
 	"\t\trefreshLabelText: refreshLabelText, refreshScenarioMarks: refreshScenarioMarks,\n" +
 	"\t\tnodeCircle: function (id) { return nodeEls[id].circle; },\n" +
 	"\t\tlinkHalo: function (id) { return linkEls[id].halo; },\n" +
@@ -448,7 +448,7 @@ console.log('\n--- deleting in a scenario switches off; deleting in Base really 
 }
 
 // ---------------------------------------------------------------------------
-// 7. The readout, the halos, and the guards on the two pushes
+// 7. The readout and the halos (the pushes' guards went with Apply Base values, Task 801)
 // ---------------------------------------------------------------------------
 console.log('\n--- the readout, the halos, and the guards ---');
 {
@@ -534,94 +534,19 @@ console.log('\n--- the readout, the halos, and the guards ---');
 	ok('an element that is off is drawn greyed', L.linkLine(E.l2.id).classList.contains('lpn-inactive'));
 	L.clearOverride(E.l2, 'active');
 
-	// THE TWO PUSHES. Both are Base-level, and both must refuse rather than do something plausible.
-	lastAlert = null;
-	L.pushBaseToScenarios();
-	ok('the scenario push does nothing at all from inside a scenario',
-		L.hasOverride(E.l1, 'diameter'), 'the override is still there');
-
+	// APPLY BASE VALUES IS RETIRED (Task 801; Tom, 2026-10-15: "this command is too confusing and
+	// dangerous"): not in the Scenarios menu, not as a button in Properties, and its words are gone.
 	L.switchScenario('base');
-	L.labelSettings().link.diameter = true;
-	confirmAnswer = true; confirmText = null;
-	L.pushBaseToScenarios();
-	ok('from Base it names the property and counts what it will throw away',
-		/Diameter/.test(confirmText || '') && /\b1\b/.test(confirmText || ''), JSON.stringify(confirmText));
-	ok('...and the scenario goes back to the Base value',
-		!L.own(L.getScenarios()[1])[L.ovKey(E.l1)], JSON.stringify(L.own(L.getScenarios()[1])));
-
-	lastAlert = null;
-	L.pushBaseToScenarios();
-	ok('a second push says there is nothing left to do',
-		String(lastAlert || '').indexOf(PC.lpn_scenario_push_none) >= 0,
-		JSON.stringify(lastAlert));
-}
-
-// ---------------------------------------------------------------------------
-// 7b. The SCOPED push -- one element, not the whole drawing (Task 317)
-// ---------------------------------------------------------------------------
-// Tom: "each property or element -- maybe start only with the element level". The everyday case is
-// "I corrected P-12 in Base and want that one correction everywhere", and the danger of getting it
-// wrong is invisible: a push that takes one element too many looks exactly like one that did not,
-// until somebody opens the other scenario. So the assertions are about what SURVIVES, not only
-// about what went.
-console.log('\n--- the push, scoped to one element ---');
-{
-	const E = reload();
-	const scn = L.getScenarios()[1];
-	L.switchScenario(scn.id);
-	L.setProp(E.l1, 'diameter', 4);
-	L.setProp(E.l2, 'diameter', 5);
-	L.switchScenario('base');
-	L.labelSettings().link.diameter = true;
-
-	confirmAnswer = true; confirmText = null;
-	L.pushBaseToScenarios(E.l1);
-	ok('the confirm NAMES the element it is scoped to', new RegExp(E.l1.id).test(confirmText || ''),
-		JSON.stringify(confirmText));
-	ok('...and counts one value, not two', /\b1\b/.test(confirmText || '') && !/\b2\b/.test(confirmText || ''),
-		JSON.stringify(confirmText));
-	ok('the named element goes back to Base', !L.own(scn)[L.ovKey(E.l1)],
-		JSON.stringify(L.own(scn)));
-	ok('...AND THE OTHER ONE IS UNTOUCHED -- the whole point of the task',
-		!!L.own(scn)[L.ovKey(E.l2)] && L.own(scn)[L.ovKey(E.l2)].diameter === 5,
-		JSON.stringify(L.own(scn)));
-
-	// GROUP SCOPING: a node push considers node properties only. With a link override outstanding
-	// and Diameter on screen, it must report that nothing would change -- not silently clear the
-	// link's value on its way past, and not ask a question the user could confirm out of habit.
-	lastAlert = null; confirmText = null;
-	L.pushBaseToScenarios(E.j1);
-	ok('a node push sees no link property to push',
-		String(lastAlert || '').indexOf(PC.lpn_scenario_push_none) >= 0,
-		JSON.stringify(lastAlert));
-	ok('...and asked nothing, so nothing could be confirmed by habit', confirmText === null);
-	ok('...and l2 STILL has its own value', !!L.own(scn)[L.ovKey(E.l2)], JSON.stringify(L.own(scn)));
-
-	// ...and the node push is not merely inert: give the node its own overridden demand and the
-	// same call clears that, so the assertion above is about SCOPE and not about a broken button.
-	L.switchScenario(scn.id);
-	L.setProp(E.j1, 'demand', 0.01);
-	L.switchScenario('base');
-	confirmAnswer = true; confirmText = null;
-	L.pushBaseToScenarios(E.j1);
-	ok('a node push DOES clear that node\'s own demand', !L.own(scn)[L.ovKey(E.j1)],
-		JSON.stringify(L.own(scn)));
-	// The confirm names the properties of THIS element's kind only. Diameter is on screen and is
-	// unreachable from a node either way, so listing it would be a promise about something that
-	// cannot happen -- the one part of the group filter a user actually sees.
-	// "Base demand" since 2026-08-25: the push writes the STORED number, and the page now has a
-	// second, resolved Demand it cannot write.
-	ok('...and named Base demand without naming Diameter',
-		/Base demand/.test(confirmText || '') && !/Diameter/.test(confirmText || ''), JSON.stringify(confirmText));
-	ok('...and STILL left the pipe alone', !!L.own(scn)[L.ovKey(E.l2)], JSON.stringify(L.own(scn)));
-
-	// Scope does not weaken the Base-only guard.
-	L.switchScenario(scn.id);
-	confirmText = null;
-	L.pushBaseToScenarios(E.l2);
-	ok('a scoped push from inside a scenario does nothing at all',
-		!!L.own(scn)[L.ovKey(E.l2)] && confirmText === null, JSON.stringify(L.own(scn)));
-	L.switchScenario('base');
+	const menuNow = openScenarioMenu().map(rowText).join(' | ');
+	ok('the Scenarios menu no longer offers Apply Base values', !/Apply Base/i.test(menuNow), menuNow);
+	L.closeMenu();
+	L.openLinkPopup(E.l1.id, 10, 10);
+	ok('...nor does a pipe\'s Properties, in Base with a scenario', !/Apply Base/i.test(fieldsText()), fieldsText().slice(0, 200));
+	L.openPopup(E.j1.id, 10, 10);
+	ok('...nor a junction\'s', !/Apply Base/i.test(fieldsText()));
+	ok('...and its six words are gone from the page', ['lpn_scenario_push_btn', 'lpn_scenario_push_tip', 'lpn_scenario_push_confirm',
+		'lpn_scenario_push_scenarios', 'lpn_scenario_push_values', 'lpn_scenario_push_none'].every(function (k) { return PC[k] === undefined; }));
+	L.switchScenario(L.getScenarios()[1].id);
 }
 
 // ---------------------------------------------------------------------------
@@ -639,13 +564,11 @@ console.log('\n--- create, rename, delete, and the two things Base may not do --
 	ok('...with a tick on the one you are in', /✓/.test(rowText(firstScn)), rowText(firstScn));
 	ok('Base cannot be renamed', findRow(rows, /Rename/).disabled === true);
 	ok('Base cannot be deleted', findRow(rows, /Delete/).disabled === true);
-	ok('...and Base is the only place the push is offered', findRow(rows, /all scenarios/).disabled === false);
 
 	L.switchScenario(L.getScenarios()[1].id);
 	const rows2 = openScenarioMenu();
 	ok('inside a scenario, rename and delete are live',
 		findRow(rows2, /Rename/).disabled === false && findRow(rows2, /Delete/).disabled === false);
-	ok('...and the push is not', findRow(rows2, /all scenarios/).disabled === true);
 
 	// Created through the menu row, the way a user does, rather than by calling createScenario().
 	promptAnswer = 'No fire';

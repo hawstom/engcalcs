@@ -228,6 +228,8 @@ $ovAllowed = [
     'childOverrideHolders', 'clearChildOverrides',
     // a new Base of its own: a snapshot of Base, written once into the record it creates
     'baseSnapshotOf', 'storeBaseSnapshot',
+    // Merge upward (Task 801): one alternative's own values read, written into an ancestor, removed from it
+    'smOwnContent', 'smMergePlan', 'smMergeUpward',
     // where a write lands, the scenario's own alternative made first (Tom, 2026-10-12)
     'ownWriteMap',
     // the derived (Basic mode) alternatives, read off each scenario's own map

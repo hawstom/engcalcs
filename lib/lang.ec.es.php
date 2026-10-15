@@ -2705,9 +2705,7 @@ $ec_lang['lpn_scenario_delete']='Eliminar escenario';
 // Same label-versus-sentence distinction that decided the eigenvalue fixes in sprint 316.
 $ec_lang['lpn_scenario_base_value']='Escenario base: {value}';
 $ec_lang['lpn_scenario_deactivated']='{id} está excluido de la red en {scenario}. Permanece en el dibujo y en los demás escenarios.';
-$ec_lang['lpn_scenario_push_btn']='Aplicar los valores de Base a todos los escenarios';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_scenario_push_tip']='Todos los escenarios vuelven al valor de Base para las propiedades cuyas etiquetas se muestran ahora mismo. Se descartan los valores que pertenecen solo a esos escenarios.';
 $ec_lang['lpn_alt_cat_text']='Texto';
 $ec_lang['lpn_alt_cat_userdata']='Propiedades personalizadas';
 $ec_lang['lpn_alt_cat_energy']='Costo de energía';
@@ -2720,10 +2718,6 @@ $ec_lang['lpn_alt_cat_physical']='Físico';
 $ec_lang['lpn_scenario_basic_tip']='Marcado: un escenario consiste solo en los valores fijados en él. Sin marcar: este menú ofrece además la tabla de vista previa de Alternativas, que muestra cómo se agrupan esos valores por categoría, y permite que un escenario tenga un tiempo total de simulación y un paso de tiempo hidráulico propios. Se agradecen los comentarios sobre esta función.';
 $ec_lang['lpn_scenario_basic']='Modo básico';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_scenario_push_confirm']='¿Hacer que todos los escenarios usen los valores de Base para estas propiedades? Se descartan los valores que pertenecen solo a esos escenarios. Puede deshacer esto.';
-$ec_lang['lpn_scenario_push_scenarios']='Escenarios afectados:';
-$ec_lang['lpn_scenario_push_values']='Valores descartados:';
-$ec_lang['lpn_scenario_push_none']='Ningún escenario reemplaza a Base en ninguna de estas propiedades, así que nada cambiaría. No se descarta nada.';
 $ec_lang['lpn_scenario_preset_flow_static']='1. Prueba de flujo: Estática';
 $ec_lang['lpn_scenario_preset_flow_static_tip']='Calibración con prueba de flujo para una red de diseño con caudal 0. En este escenario, fije la demanda en todos los nudos en 0.';
 $ec_lang['lpn_scenario_preset_flow_mid']='2. Prueba de flujo: Intermedia';

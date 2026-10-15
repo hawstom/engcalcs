@@ -2668,14 +2668,8 @@ $ec_lang['lpn_scenario_delete']='परिदृश्य हटाएँ';
 // Same label-versus-sentence distinction that decided the eigenvalue fixes in sprint 316.
 $ec_lang['lpn_scenario_base_value']='आधार परिदृश्य: {value}';
 $ec_lang['lpn_scenario_deactivated']='{id} को {scenario} में नेटवर्क से बाहर रखा गया है। यह ड्राइंग में और अन्य परिदृश्यों में बना रहता है।';
-$ec_lang['lpn_scenario_push_btn']='सभी परिदृश्यों पर आधार मान लागू करें';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_scenario_push_tip']='हर परिदृश्य अभी दिख रहे लेबलों के गुणों के लिए आधार मान पर वापस चला जाता है। उन परिदृश्यों के अकेले के मान त्याग दिए जाते हैं।';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_scenario_push_confirm']='हर परिदृश्य को इन गुणों के लिए आधार मान उपयोग करवाएँ? उन परिदृश्यों के अकेले के मान त्याग दिए जाते हैं। आप इसे पूर्ववत् कर सकते हैं।';
-$ec_lang['lpn_scenario_push_scenarios']='प्रभावित परिदृश्य:';
-$ec_lang['lpn_scenario_push_values']='त्यागे गए मान:';
-$ec_lang['lpn_scenario_push_none']='इनमें से किसी भी गुण के लिए कोई परिदृश्य आधार का मान नहीं बदलता, इसलिए कुछ नहीं बदलेगा। कुछ भी त्यागा नहीं जाता।';
 $ec_lang['lpn_scenario_preset_flow_static']='1. प्रवाह परीक्षण: स्थिर';
 $ec_lang['lpn_scenario_preset_flow_static_tip']='डिज़ाइन नेटवर्क के लिए 0 प्रवाह पर प्रवाह परीक्षण अंशांकन। इस परिदृश्य में सभी जंक्शनों की माँग 0 रखें।';
 $ec_lang['lpn_scenario_preset_flow_mid']='2. प्रवाह परीक्षण: मध्य';
