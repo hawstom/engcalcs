@@ -210,17 +210,17 @@ async function main() {
 		await h.key('Escape');
 
 		console.log('\n--- 4. one command list: the buttons and the right-click menu ---');
-		const want = ['current', 'add', 'addbase', 'rename', 'copy', '|', 'del'];
-		const wantText = [await L('lpn_sm_make_current'), await L('lpn_sm_add_child'), await L('lpn_sm_add_base'), await L('lpn_sm_rename'), await L('lpn_sm_copy'), '|', await L('lpn_tool_delete')];
+		const want = ['current', 'overrides', 'add', 'addbase', 'rename', 'copy', '|', 'del'];
+		const wantText = [await L('lpn_sm_make_current'), await L('lpn_sm_list_overrides'), await L('lpn_sm_add_child'), await L('lpn_sm_add_base'), await L('lpn_sm_rename'), await L('lpn_sm_copy'), '|', await L('lpn_tool_delete')];
 		await h.rowOf('Night').locator('.lpn-sm-name').click({ button: 'right' });
 		await a.settle(300);
 		let m = await h.menu();
-		ok('4.1 the menu on Night: Make current, Add child, Add base, Rename, Copy scenario, separator, Delete', JSON.stringify(m.map((x) => x === '|' ? '|' : x.text)) === JSON.stringify(wantText), JSON.stringify(m.map((x) => x === '|' ? '|' : x.text)));
+		ok('4.1 the menu on Night: Make current, List overrides (Task 800), Add child, Add base, Rename, Copy scenario, separator, Delete', JSON.stringify(m.map((x) => x === '|' ? '|' : x.text)) === JSON.stringify(wantText), JSON.stringify(m.map((x) => x === '|' ? '|' : x.text)));
 		let btns = await h.buttons();
 		ok('4.2 ...the same commands as the buttons, in the same order', JSON.stringify(btns.map((b) => b.cmd)) === JSON.stringify(want.filter((x) => x !== '|')) && JSON.stringify(m.filter((x) => x !== '|').map((x) => x.cmd)) === JSON.stringify(btns.map((b) => b.cmd)), JSON.stringify(btns.map((b) => b.cmd)));
 		const offOf = (list) => list.filter((x) => x !== '|').filter((x) => x.off).map((x) => x.cmd).join();
 		// Copy is always greyed on the Scenarios tree: Copy scenario is Basic mode's (Tom, 2026-10-12).
-		ok('4.3 ...and the same ones on and off (on Night only Copy is off)', JSON.stringify(m.filter((x) => x !== '|').map((x) => x.off)) === JSON.stringify(btns.map((b) => b.off)) && offOf(btns) === 'copy', offOf(btns));
+		ok('4.3 ...and the same ones on and off (on Night, which holds no overrides of its own, List overrides and Copy are off)', JSON.stringify(m.filter((x) => x !== '|').map((x) => x.off)) === JSON.stringify(btns.map((b) => b.off)) && offOf(btns) === 'overrides,copy', offOf(btns));
 		await page.keyboard.press('Escape');
 		await page.mouse.click(5, 5);
 		await a.settle(300);
@@ -228,8 +228,8 @@ async function main() {
 		await a.settle(300);
 		m = await h.menu();
 		btns = await h.buttons();
-		ok('4.4 on Base (the open scenario) the menu still lists all seven rows, Make current, Rename, Copy and Delete greyed', m.length === 7 && offOf(m) === 'current,rename,copy,del', JSON.stringify(m));
-		ok('4.5 the buttons grey the same four', offOf(btns) === 'current,rename,copy,del', JSON.stringify(btns));
+		ok('4.4 on Base (the open scenario) the menu still lists all eight rows, Make current, List overrides, Rename, Copy and Delete greyed', m.length === 8 && offOf(m) === 'current,overrides,rename,copy,del', JSON.stringify(m));
+		ok('4.5 the buttons grey the same five', offOf(btns) === 'current,overrides,rename,copy,del', JSON.stringify(btns));
 		const cols = await page.evaluate(() => { const r = Array.from(document.querySelectorAll('.lpn-sm-menu button')); return [getComputedStyle(r.find((b) => b.getAttribute('data-sm-cmd') === 'del')).color, getComputedStyle(r.find((b) => b.getAttribute('data-sm-cmd') === 'add')).color]; });
 		ok('4.6 a greyed row is drawn greyed (its colour differs from a live row\'s)', cols[0] !== cols[1], JSON.stringify(cols));
 		ok('4.7 the greyed Delete says why in its tip', m.find((x) => x.cmd === 'del').title === await L('lpn_sm_base_kept'));
@@ -247,7 +247,7 @@ async function main() {
 		await h.rowOf('Peak').locator('.lpn-sm-name').click({ button: 'right' });
 		await a.settle(300);
 		m = await h.menu();
-		ok('4.10 on the current scenario, Make current is greyed in the menu and the button', offOf(m) === 'current,copy' && offOf(await h.buttons()) === 'current,copy', offOf(m));
+		ok('4.10 on the current scenario, Make current is greyed in the menu and the button (and List overrides, Night holding none)', offOf(m) === 'current,overrides,copy' && offOf(await h.buttons()) === 'current,overrides,copy', offOf(m));
 		await page.mouse.click(5, 5);
 		await a.settle(300);
 		ok('4.11 no page errors so far', errors.length === 0, errors.join(' | '));
