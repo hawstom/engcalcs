@@ -227,11 +227,17 @@ the block.
   scenarios. Also his question: can EPANET solve a system whose only source is a tank? **Crash fixed on
   master (889a56c2) and bentley:** controls for pumps out of the run, and an engine reused after a refusal.
   A tank-only source is valid; a tank running dry stops the run. Open: "did not converge" goes away at
-  Accuracy 0.001 (now 1e-5), his call.
+  Accuracy 0.001 (now 1e-5). **Tom, 2026-10-15: *"Yes. And tip says 1e-9, so sync that."*** Default to 0.001; R-388.
 - 100|797| **Run the browser harnesses side by side to cut check_all time.**
   Tom, 2026-10-15: *"a huge overhead for merges that I did not see or foresee"*. One suite took ~8 min on
   10-02 and ~25 min on 10-15: browser harnesses run one at a time and grew from 1 to 59. Measure first;
   the efficiency audit of 2026-10-15 reports what each harness costs.
+- 100|800| **A tidy list and count of one scenario's own overrides.**
+  Tom, 2026-10-15, on Fotobi's "1-hr drain w pump off" (24 overrides vs its siblings' 23): *"I don't know how to see a tidy list of overrides to audit ... that count seems inflated ... I should see the count of only the present overrides, not the inherited overrides. I count 13 diameter overrides, 1 text override, and 2 calculation overrides."* Also his screenshot note: tanks show the amber circle while their overrides are only in the parent. Review R-386.
+- 100|801| **Retire Apply Base values; may Base use a non-Base alternative?**
+  Tom, 2026-10-15: *"I don't think we need this command any more now that we have the circles and the down arrows. And this command is too confusing and dangerous."* And: *"I am not sure that it is meaningful to put a non-base alternative with the Base scenario ... It seems to create a certain circularity that we should avoid. What do you and Mary find?"* **Mary, 2026-10-15:** Bentley documents no circularity and no push-down command; WaterGEMS merges a preferred alternative UP into Base; skeletonization requires Base on parent alternatives only. She recommends forbidding Base on a child alternative, retiring Apply Base values, and on open merging such a child up into Base with a notice. Awaiting Tom. R-387.
+- 100|807| **Leave a leader exactly where the user put it.**
+  Tom, 2026-10-15: *"Let's try leaving exactly in place the leader locations set by the user. I think that our stretching them is frustrating to them. If they want to give us control, they will reset the leader."* R-398.
 - 75|539| **Gang the neighbour labels so their leaders stop crossing.**
   **DEMOTED TO 75 by Tom, 2026-10-11.**
   **PORTING THE BENCH TO MASTER, 2026-10-07** (Tom agreed D09: rules 1-3 as three defect branches;
@@ -290,6 +296,7 @@ the block.
     parameters."* A named Run would carry the scenario, the required flow, the residual and the
     frame together, so a report says what it was a report OF.
 - 75|617| **More map view options, the opacity one having shipped.**
+  **Tom, 2026-10-15, on CC's recommendation of Mapbox Outdoors as the one added tile style: *"I approve."*** Next: build it.
   **THE CSS-FILTER STEP SHIPPED** (1233fc70, ffd4a73a, e1e05de5): Settings > Map > Basemap style, Normal/Muted/Faded/Grayscale, stored in the project; Muted is the new-project default. Next is the Mapbox Studio raster style on the existing token, which needs Tom's choice of style.
   **RETITLED BY TOM, 2026-09-18: *"Edit and retitle the task to remove 'A basemap the reader can
   tone down'. That is already provided by Settings background opacity. Focus the task on other map
@@ -462,6 +469,22 @@ the block.
   US."* Built on `feat/si-example`. Expand the gallery first, promote to the front later. KYPipe networks (CC BY-NC):
   ask the authors before shipping any.
   Net1, Net2 (Branford) and Net3 (Novato) US and SI pairs merged (with Tom's 10-13 rounding rule); only Elm Street Center keeps a backdrop.
+- 75|798| **Field values in Text, by {} keys disclosed in the User Manual.**
+  Tom, 2026-10-15: *"Allow field/reference text in Text using {}. Define/disclose the keys in the User Manual."*
+- 75|799| **Try Tables and Graphs as dockable boxes too, on an option branch.**
+  Tom, 2026-10-15: *"Can we try a UI option branch for everything in the bottom pane to be available also as dockable boxes: (a) Tables and (b) Graphs?"* Seam with the bottom-pane tab strip.
+- 75|802| **The Scenarios table flies out from the Scenario Manager's right side.**
+  Tom, 2026-10-15: *"Could we stick that table onto the right side of the Scenario Manager to accomplish (a) that both are available in the same gesture and (b) that it flies out over the map instead of displacing the map?"* R-389.
+- 75|803| **See every unused alternative at a glance.**
+  Tom, 2026-10-15: *"Maybe an 'Unused alternatives' button ... unless the selector (instead of a button) includes 'All unused' (and 'All'?), where all the headings are listed with a scrollbar."* R-390.
+- 75|804| **Time series balloons become a Presentation override.**
+  Tom, 2026-10-15: *"The Time series balloons/bubbles should be a Presentation override."* R-391.
+- 75|805| **A clean map: hide the override ambers and the map's own controls.**
+  Tom, 2026-10-15: *"It would be good to be able to hide the amber override indicators from the map. Maybe a Map, Clean map button is a good idea after all with zoom buttons, error messenger, ambers, and satellite button hiding."* R-396.
+- 75|806| **Descriptions take several lines and paragraphs.**
+  Tom, 2026-10-15: *"I think that all Description fields should allow multiple lines and paragraphs like most software to allow internal documentation."* R-395.
+- 75|808| **Show the time series up to where a stopped run ended.**
+  Tom, 2026-10-15, on a tank running dry: *"It would be nice to see truncated time series graphs if those are available."* R-385.
 - 50|146.09| **An inset overview map: the whole project, with a box round where you are.**
   Reworked by Tom 2026-08-25, and it is a different feature from the one this ID used to hold:
   *"146.09 reworked as a key/overview map inset like many games where the entire project is depicted

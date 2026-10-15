@@ -41,8 +41,8 @@ to leave something uncommitted.
 - **A batch of merges costs one `check_all` run, about 25 minutes; tell Tom the wait before
   starting it.** Merge the whole batch, then fold in the payload regeneration, roadmap closures and
   handoff edits, all before the run: every later master commit is another full run. On the merge
-  result run `sh dev/scripts/run_harnesses.sh --node-only` first (a few minutes), so a failure
-  surfaces before the 25-minute gate. Merge master into a branch while it is built, not at the end.
+  result run `sh dev/scripts/check_all.sh --fast` and `sh dev/scripts/run_harnesses.sh --node-only`
+  first (a few minutes each), so a failure surfaces before the 25-minute gate. Merge master into a branch while it is built, not at the end.
 - **A branch names its capability, in the singular** (`customer`, `projection`, `graph`,
   `custom-property`). A public menu label naming a real collection may be plural.
 - **Merged or killed, never left to rot.** `branch_hygiene_check.php` reports stale branches.

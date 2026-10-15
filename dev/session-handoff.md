@@ -126,11 +126,9 @@ Deleted keys: bpn_, hw_ and lpn_notes_epanet_def and _term (master, six); lpn_sc
 
 ### Questions out to him
 
-- Accuracy default 1e-5 vs 0.001 (Fotobi pump-off scenarios converge at 0.001, same heads).
-- Apply Base values with Base on an alternative: other scenarios now fall to the elements' own values,
-  not to Base's alternative. Should the push copy Base's values into them instead?
-- Task 617: CC recommended Mapbox Outdoors as the one added style; awaiting yes.
-- Morph's Transform synonym description; es Marcador for Tag; the Length tip "measured along the slope" (merged with slope-length 10-15; keep it or not?).
+- All of 10-14's were answered 2026-10-15 (R-400, Tasks 617, 796). Open now: why Fotobi's "1-hr drain
+  w pump off" fails to converge while its siblings do not (R-386), and CC + Mary on Base with a
+  non-Base alternative (Task 801).
 
 ### Next job
 
