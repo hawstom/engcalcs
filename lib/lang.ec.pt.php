@@ -156,14 +156,14 @@ $ec_lang['hw_note_1']='<dl><dt>Esta calculadora não modela o perfil da tubulaç
 $ec_lang['mi_menu']='Canal de seção irregular de acordo com Manning';
 $ec_lang['mi_main_title']='Calculadora gratuita online de canal de seção irregular de acordo com Manning';
 $ec_lang['mi_main_desc']='Calculadora de escoamento uniforme de Manning para canal de seção irregular';
-$ec_lang['mi_waterSurfaceElevation']='Nível da superfície d\'água';
+$ec_lang['mi_waterSurfaceElevation']='Elevação da superfície d\'água';
 $ec_lang['mi_q_617']='<span class="ec-help" title="A vazão composta, Q, usando um n composto para cada região de acordo com Chow 6-17, velocidades iguais">Q <span class="ec-tip">?</span></span>';
 $ec_lang['mi_xSecPoints']='Pontos da seção transversal';
 $ec_lang['mi_groupPoint']='Ponto';
 $ec_lang['mi_groupSegment']='Segmento';
 $ec_lang['mi_groupRegion']='Região';
 $ec_lang['mi_station']='Est.';
-$ec_lang['mi_elevation']='Alt.';
+$ec_lang['mi_elevation']='Elev.';
 $ec_lang['mi_n']='n<br />do seg-<br />mento';
 $ec_lang['mi_is_bank']='Div. de<br />regiões<br />R<sub>h</sub>, Q<br />(Margem)';
 $ec_lang['mi_tau']='Cisalh. de<br />fundo, τ';
@@ -290,11 +290,11 @@ $ec_lang['or_shape_circular']='Circular';
 $ec_lang['or_shape_rectangular']='Retangular';
 $ec_lang['or_diameter']='<span class="ec-help" title="Diâmetro para circular; altura para retangular">Diâmetro ou altura, D <span class="ec-tip">?</span></span>';
 $ec_lang['or_width']='<span class="ec-help" title="Apenas para aberturas retangulares">Largura, W <span class="ec-tip">?</span></span>';
-$ec_lang['or_invert']='<span class="ec-help" title="Fundo da abertura">Cota da soleira <span class="ec-tip">?</span></span>';
+$ec_lang['or_invert']='<span class="ec-help" title="Fundo da abertura">Elevação da soleira <span class="ec-tip">?</span></span>';
 $ec_lang['or_hwe']='Nível d\'água a montante';
 $ec_lang['or_twe']='Nível d\'água a jusante';
 $ec_lang['or_cd']='Coeficiente de descarga, C<sub>d</sub>';
-$ec_lang['or_centroid_elev']='Cota do centroide';
+$ec_lang['or_centroid_elev']='Elevação do centroide';
 $ec_lang['or_head']='<span class="ec-help" title="Energia por unidade de peso de água — uma altura da coluna de água, não uma pressão">Carga efetiva, h <span class="ec-tip">?</span></span>';
 $ec_lang['or_area']='Área da abertura, A';
 $ec_lang['or_regime']='Verificação do regime de orifício';
@@ -317,13 +317,13 @@ $ec_lang['or_notes_4_def']='Quando o TWE está acima da soleira da abertura, est
 $ec_lang['mhp_main_menu']='Micro-Hidroelétrica';
 $ec_lang['mhp_main_title']='Calculadora Gratuita de Potência Micro-Hidroelétrica';
 $ec_lang['mhp_main_desc']='Calculadora de Potência de Micro-Hidroelétrica a Fio d\'Água';
-$ec_lang['mhp_gross_head']='Altura bruta, H<sub>gross</sub>';
+$ec_lang['mhp_gross_head']='Carga bruta, H<sub>gross</sub>';
 $ec_lang['mhp_diameter']='<span class="ec-help" title="Diâmetro da conduta forçada (tubulação de adução)">Diâmetro da conduta forçada, D <span class="ec-tip">?</span></span>';
 $ec_lang['mhp_length']='Comprimento, L';
 $ec_lang['mhp_efficiency']='Rendimento da instalação, η (0–1)';
 $ec_lang['mhp_vel_check']='Verificação da velocidade';
 $ec_lang['mhp_hl_check']='Verificação da perda de carga';
-$ec_lang['mhp_hnet']='Altura líquida, H<sub>net</sub>';
+$ec_lang['mhp_hnet']='Carga líquida, H<sub>net</sub>';
 $ec_lang['mhp_power']='Potência produzida, P';
 $ec_lang['mhp_annual_kwh']='P como energia anual';
 $ec_lang['mhp_vel_low']='Velocidade baixa — risco de sedimentação e arrastamento de ar.';
@@ -336,7 +336,7 @@ $ec_lang['mhp_hl_ok_tip']='A perda de carga é menor que 10% da carga bruta. Est
 $ec_lang['mhp_hl_warn_tip']='A perda de carga é maior que 10% da carga bruta. Considere uma tubulação maior.';
 $ec_lang['mhp_hl_bad_tip']='A perda de carga é maior que 20% da carga bruta. Redimensione a tubulação.';
 $ec_lang['mhp_notes_1_term']='Perda de carga';
-$ec_lang['mhp_notes_1_def']='Perda total na conduta forçada h<sub>L</sub> = h<sub>f</sub> + h<sub>m</sub>, onde h<sub>f</sub> = f(L/D)(v²/2g) é a perda por atrito de Darcy-Weisbach e h<sub>m</sub> = k<sub>m</sub>·v²/2g cobre entradas, curvas e válvulas. Altura líquida H<sub>net</sub> = H<sub>gross</sub> − h<sub>L</sub>.';
+$ec_lang['mhp_notes_1_def']='Perda total na conduta forçada h<sub>L</sub> = h<sub>f</sub> + h<sub>m</sub>, onde h<sub>f</sub> = f(L/D)(v²/2g) é a perda por atrito de Darcy-Weisbach e h<sub>m</sub> = k<sub>m</sub>·v²/2g cobre entradas, curvas e válvulas. Carga líquida H<sub>net</sub> = H<sub>gross</sub> − h<sub>L</sub>.';
 $ec_lang['mhp_notes_2_term']='Velocidade';
 $ec_lang['mhp_notes_2_def']='Verifique se a velocidade é razoável para o desnível disponível e o custo da tubulação. Velocidade muito baixa pode indicar tubulação sobredimensionada; velocidade muito alta pode aumentar as perdas por atrito e o risco de golpe de aríete.';
 $ec_lang['mhp_notes_3_term']='Objetivo de perda de carga';
@@ -350,14 +350,14 @@ $ec_lang['mhp_notes_7_def']='A energia anual pressupõe operação contínua a p
 $ec_lang['odt_main_menu']='Tempo de Esvaziamento de Lagoa e Tanque';
 $ec_lang['odt_main_title']='Calculadora Gratuita Online de Tempo de Esvaziamento de Lagoa, Bacia ou Tanque (Orifício)';
 $ec_lang['odt_main_desc']='Tempo de Esvaziamento de Lagoa, Bacia ou Tanque — Saída por Orifício, Método do Volume Cônico';
-$ec_lang['odt_h1_elev']='Cota inicial da superfície d\'água';
+$ec_lang['odt_h1_elev']='Elevação inicial da superfície d\'água';
 $ec_lang['odt_a1']='Área inicial, A<sub>1</sub>';
-$ec_lang['odt_h2_elev']='Cota final da superfície d\'água';
+$ec_lang['odt_h2_elev']='Elevação final da superfície d\'água';
 $ec_lang['odt_a0']='Área no nível do orifício, A<sub>0</sub>';
-$ec_lang['odt_a_ending']='<span class="ec-help" title="Interpolada a partir do modelo cônico na cota final">Área final, A<sub>2</sub> <span class="ec-tip">?</span></span>';
-$ec_lang['odt_h2_check']='Verificação da cota final';
-$ec_lang['odt_h2_ok']='Cota final acima do topo do orifício';
-$ec_lang['odt_h2_warn']='Cota final igual ou abaixo do topo do orifício';
+$ec_lang['odt_a_ending']='<span class="ec-help" title="Interpolada a partir do modelo cônico na elevação final">Área final, A<sub>2</sub> <span class="ec-tip">?</span></span>';
+$ec_lang['odt_h2_check']='Verificação da elevação final';
+$ec_lang['odt_h2_ok']='Elevação final acima do topo do orifício';
+$ec_lang['odt_h2_warn']='Elevação final igual ou abaixo do topo do orifício';
 $ec_lang['odt_h2_warn_tip']='Topo do orifício = centroide + D/2';
 $ec_lang['odt_d']='<span class="ec-help" title="Diâmetro (circular) ou altura (retangular)">Orifício D <span class="ec-tip">?</span></span>';
 $ec_lang['odt_w']='<span class="ec-help" title="Apenas retangular">Largura do orifício, W <span class="ec-tip">?</span></span>';
@@ -366,10 +366,10 @@ $ec_lang['odt_t_min']='Tempo de esvaziamento (min)';
 $ec_lang['odt_t_hr']='Tempo de esvaziamento (h)';
 $ec_lang['odt_t_day']='Tempo de esvaziamento (dias)';
 $ec_lang['odt_notes_1_term']='Fórmula';
-$ec_lang['odt_notes_1_def']='t = √H<sub>1</sub> / (C<sub>d</sub> A<sub>or</sub> √(2g)) × (2A<sub>x</sub>/5 + 8√(A<sub>x</sub>A<sub>0</sub>)/15 + 16A<sub>0</sub>/15) fornece o tempo de esvaziamento da carga H até o orifício. Tempo de esvaziamento = t(H<sub>1</sub>,A<sub>1</sub>,A<sub>0</sub>) − t(H<sub>2</sub>,A<sub>2</sub>,A<sub>0</sub>), onde H<sub>1</sub> = cota inicial − cota do orifício, H<sub>2</sub> = cota final − cota do orifício.';
+$ec_lang['odt_notes_1_def']='t = √H<sub>1</sub> / (C<sub>d</sub> A<sub>or</sub> √(2g)) × (2A<sub>x</sub>/5 + 8√(A<sub>x</sub>A<sub>0</sub>)/15 + 16A<sub>0</sub>/15) fornece o tempo de esvaziamento da carga H até o orifício. Tempo de esvaziamento = t(H<sub>1</sub>,A<sub>1</sub>,A<sub>0</sub>) − t(H<sub>2</sub>,A<sub>2</sub>,A<sub>0</sub>), onde H<sub>1</sub> = elevação inicial − elevação do orifício, H<sub>2</sub> = elevação final − elevação do orifício.';
 $ec_lang['odt_notes_2_term']='Método';
-$ec_lang['odt_notes_2_def']='O método do volume cônico modela a lagoa ou bacia como uma seção cônica entre a área inicial A<sub>1</sub> na superfície inicial da água e a área A<sub>0</sub> na cota do centroide do orifício. A<sub>2</sub>, a área da lagoa na cota final, é interpolada a partir de A<sub>1</sub> e A<sub>0</sub> usando o modelo de seção cônica. O tempo de esvaziamento da cota inicial até a cota final é igual ao tempo total de esvaziamento de H<sub>1</sub> até o orifício menos o tempo restante de H<sub>2</sub> até o orifício.';
-$ec_lang['odt_h1']='<span class="ec-help" title="Cota inicial da superfície d\'água menos a cota do centroide do orifício">Carga inicial, H<sub>1</sub> <span class="ec-tip">?</span></span>';
+$ec_lang['odt_notes_2_def']='O método do volume cônico modela a lagoa ou bacia como uma seção cônica entre a área inicial A<sub>1</sub> na superfície inicial da água e a área A<sub>0</sub> na elevação do centroide do orifício. A<sub>2</sub>, a área da lagoa na elevação final, é interpolada a partir de A<sub>1</sub> e A<sub>0</sub> usando o modelo de seção cônica. O tempo de esvaziamento da elevação inicial até a elevação final é igual ao tempo total de esvaziamento de H<sub>1</sub> até o orifício menos o tempo restante de H<sub>2</sub> até o orifício.';
+$ec_lang['odt_h1']='<span class="ec-help" title="Elevação inicial da superfície d\'água menos a elevação do centroide do orifício">Carga inicial, H<sub>1</sub> <span class="ec-tip">?</span></span>';
 $ec_lang['odt_q_max']='Vazão máxima, Q<sub>max</sub>';
 $ec_lang['odt_vol']='Volume esvaziado';
 $ec_lang['odt_sketch_start']='Início';
@@ -466,7 +466,7 @@ $ec_lang['rc_qt']='<span class="ec-help" title="Vazão por unidade de largura na
 $ec_lang['rc_np']='Porosidade do enrocamento, n<sub>p</sub>';
 $ec_lang['rc_sg']='<span class="ec-help" title="Densidade relativa à água. Granito britado ou basalto típico ≈ 2,65. Faixa válida de Robinson: 2,54 a 2,82.">Densidade relativa da rocha, sg <span class="ec-tip">?</span></span>';
 $ec_lang['rc_SD']='<span class="ec-help" title="Desvio padrão granulométrico. Rocha uniforme ≈ 1,25. Faixa válida Robinson: 1,15 a 1,47.">Graduação SD = D<sub>84.1</sub>/D<sub>50</sub> <span class="ec-tip">?</span></span>';
-$ec_lang['rc_yn']='<span class="ec-help" title="O remanso (Hp > yn) é desejável porque reduz a erosão a montante. (USDA)">Tirante normal no canal de entrada, y<sub>n</sub> <span class="ec-tip">?</span></span>';
+$ec_lang['rc_yn']='<span class="ec-help" title="O remanso (Hp > yn) é desejável porque reduz a erosão a montante. (USDA)">Profundidade normal no canal de entrada, y<sub>n</sub> <span class="ec-tip">?</span></span>';
 $ec_lang['rc_D50']='<span class="ec-help" title="Eq. 1 (S0 < 0,10) ou Eq. 2 (0,10–0,40). Válido: D50 15–278 mm, S0 0,02–0,40. Fora da faixa: extrapolado.">Tamanho mediano necessário da rocha, D<sub>50</sub> <span class="ec-tip">?</span></span>';
 $ec_lang['rc_eq_used']='Equação aplicada';
 $ec_lang['rc_sg_check']='Verificação de densidade relativa';
@@ -486,7 +486,7 @@ $ec_lang['rc_SD_high_tip']='Faixa válida: 1,15–1,47';
 $ec_lang['rc_layer']='Espessura da camada de rocha (2 × D<sub>50</sub>)';
 $ec_lang['rc_crest_radius']='Raio de curva na crista superior (40 × D<sub>50</sub>)';
 $ec_lang['rc_crest_length']='Comprimento de arco na crista superior';
-$ec_lang['rc_apron_length']='<span class="ec-help" title="Necessário para suporte estrutural da rocha da calha. “O tirante mínimo a jusante resultante do trecho de saída e da resistência do canal a jusante é suficiente para garantir a estabilidade do enrocamento no trecho de saída.” (Robinson)">Comprimento da laje de saída (15 × D<sub>50</sub>) <span class="ec-tip">?</span></span>';
+$ec_lang['rc_apron_length']='<span class="ec-help" title="Necessário para suporte estrutural da rocha da calha. “A profundidade mínima a jusante resultante do trecho de saída e da resistência do canal a jusante é suficiente para garantir a estabilidade do enrocamento no trecho de saída.” (Robinson)">Comprimento da laje de saída (15 × D<sub>50</sub>) <span class="ec-tip">?</span></span>';
 $ec_lang['rc_n_chute']='Rugosidade de Manning na calha, n';
 $ec_lang['rc_Vm']='<span class="ec-help" title="Fração de qt que flui pelos poros da rocha. O restante qs flui pela superfície. np padrão = 0,45 para rocha britada angular.">Velocidade através do manto de pedra, V<sub>m</sub> <span class="ec-tip">?</span></span>';
 $ec_lang['rc_qm']='Vazão específica no manto, q<sub>m</sub>';
@@ -505,15 +505,15 @@ $ec_lang['rc_eq_warn_high']='S<sub>0</sub> > 0,40 — acima da faixa de validaç
 $ec_lang['rc_notes_1_term']='Equações de dimensionamento de rocha';
 $ec_lang['rc_notes_1_def']='Robinson, Rice & Kadavy (1998) desenvolveram duas equações empíricas para o tamanho mediano do revestimento de rocha D<sub>50</sub> a partir da declividade do canal e da vazão unitária. A Equação 1 se aplica a declividades suaves (S<sub>0</sub> < 0,10); a Equação 2 se aplica a declividades íngremes (0,10 ≤ S<sub>0</sub> ≤ 0,40). Ambas as equações exigem q<sub>t</sub> em m²/s e retornam D<sub>50</sub> em mm. A faixa validada é 0,02 ≤ S<sub>0</sub> ≤ 0,40.';
 $ec_lang['rc_notes_2_term']='Vazão específica';
-$ec_lang['rc_notes_2_def']='q<sub>t</sub> é a vazão específica total na crista da calha (vazão total por unidade de largura). Para um canal de largura de base B com vazão total Q, q<sub>t</sub> ≈ Q / B, ou calculada a partir da condição de tirante crítico na entrada da calha.';
+$ec_lang['rc_notes_2_def']='q<sub>t</sub> é a vazão específica total na crista da calha (vazão total por unidade de largura). Para um canal de largura de base B com vazão total Q, q<sub>t</sub> ≈ Q / B, ou calculada a partir da condição de profundidade crítica na entrada da calha.';
 $ec_lang['rc_notes_3_term']='Fluxo através do manto de pedra';
 $ec_lang['rc_notes_3_def']='Uma fração da vazão total flui pelos poros do enrocamento (vazão de manto q<sub>m</sub>); o restante flui pela superfície da rocha (q<sub>s</sub> = q<sub>t</sub> − q<sub>m</sub>). A lâmina d\'água d é calculada pela equação de Manning aplicada à vazão superficial q<sub>s</sub> usando a rugosidade n da calha. A porosidade padrão n<sub>p</sub> = 0,45 é típica para rocha britada angular.';
 $ec_lang['rc_notes_5_term']='Faixa válida de tamanho de rocha';
 $ec_lang['rc_notes_5_def']='As equações foram desenvolvidas usando uma faixa de D<sub>50</sub> de 15 mm a 278 mm. Resultados fora desta faixa são extrapolados e devem ser usados com julgamento de engenharia adicional.';
-$ec_lang['rc_notes_6_term']='Cota da superfície da laje de saída';
-$ec_lang['rc_notes_6_def']='A cota do topo do enrocamento no trecho de saída deve estar na mesma cota ou abaixo da cota do fundo do canal a jusante. Se estiver mais alta, a rocha de saída será instável.';
+$ec_lang['rc_notes_6_term']='Elevação da superfície da laje de saída';
+$ec_lang['rc_notes_6_def']='A elevação do topo do enrocamento no trecho de saída deve estar na mesma elevação ou abaixo da elevação do fundo do canal a jusante. Se estiver mais alta, a rocha de saída será instável.';
 $ec_lang['rc_notes_7_term']='Remanso na Entrada';
-$ec_lang['rc_notes_7_def']='Quando o tirante normal no canal de entrada é menor que a carga no vertedor (H<sub>p</sub>) necessária para escoar q<sub>t</sub>, ocorre fluxo restringido ou remanso a montante da entrada do canal. Isso é geralmente aceitável — o remanso reduz a velocidade e previne erosão a montante. Para verificar: usar uma calculadora de vertedor para encontrar H<sub>p</sub> para o q<sub>t</sub> e largura de crista dados, e comparar com o tirante normal do canal de entrada. Se H<sub>p</sub> exceder o tirante normal, ocorrerá remanso.';
+$ec_lang['rc_notes_7_def']='Quando a profundidade normal no canal de entrada é menor que a carga no vertedor (H<sub>p</sub>) necessária para escoar q<sub>t</sub>, ocorre fluxo restringido ou remanso a montante da entrada do canal. Isso é geralmente aceitável — o remanso reduz a velocidade e previne erosão a montante. Para verificar: usar uma calculadora de vertedor para encontrar H<sub>p</sub> para o q<sub>t</sub> e largura de crista dados, e comparar com a profundidade normal do canal de entrada. Se H<sub>p</sub> exceder a profundidade normal, ocorrerá remanso.';
 $ec_lang['rc_notes_4_term']='Referência';
 $ec_lang['rc_notes_4_def']='Robinson, K.M., Rice, C.E., e Kadavy, K.C. (1998). "<a target="_blank" href="https://www.fs.usda.gov/biology/nsaec/fishxing/fplibrary/Robinson_1998_Design_of_Rock_Chutes.pdf">Design of rock chutes</a>." <em>Transactions of the ASAE</em>, 41(3), 621–626. O USDA ARS também publica uma <a target="_blank" href="https://data.nal.usda.gov/dataset/rock-chute-design">planilha Excel</a> baseada no mesmo método.';
 // Sketch labels
@@ -1397,7 +1397,7 @@ $ec_lang['lpn_help_walkthroughs']='Tutoriais';
 // wanted is emptying the DRAWING while keeping the project: duplicate a project, delete its network,
 // keep its settings and its background image.
 $ec_lang['lpn_edit_delete_network']='Excluir rede';
-$ec_lang['lpn_confirm_delete_network']='Excluir todos os nós, tubos e rótulos de texto deste projeto? A imagem de fundo, o nome do projeto e suas configurações são mantidos.';
+$ec_lang['lpn_confirm_delete_network']='Excluir todos os nós, tubos e textos deste projeto? A imagem de fundo, o nome do projeto e suas configurações são mantidos.';
 // Find and replace (Tasks 420, 353 and 389). One panel does all three jobs: an exact ID lookup,
 // which is what EPANET's Map Finder does; a condition on a value, which nothing else offers; and a
 // write to everything the condition matched. **It is called by the standard name** -- Tom,
@@ -1773,7 +1773,7 @@ $ec_lang['lpn_net_bad_file']='Isso parece ser um arquivo .net do EPANET, mas est
 $ec_lang['lpn_inp_report_heading']='{file} importado';
 $ec_lang['lpn_inp_report_counts']='{nodes} junções, reservatórios e tanques, {links} tubulações, bombas e válvulas, em {units}.';
 $ec_lang['lpn_inp_report_clean']='Todos os dados do arquivo foram importados. Nada foi omitido.';
-$ec_lang['lpn_inp_report_label_anchor']='Os rótulos de texto são posicionados como o EPANET os posiciona, a partir do canto superior esquerdo.';
+$ec_lang['lpn_inp_report_label_anchor']='Os textos são posicionados como o EPANET os posiciona, a partir do canto superior esquerdo.';
 // **R-219; Tom, 2026-09-24, answering R-190**: dropping the "These are already lat/lon" button in
 // favor of typing 1 for Step 2's Ground distance field means both Import and Convert as have to say
 // that door still exists. Shown for any file that lands as a plain XY drawing -- Feet, Meters, None
@@ -3577,7 +3577,7 @@ $ec_lang['lpn_search_nofetch']='Este navegador não consegue alcançar o serviç
 // Shown three times -- the menu tip, the confirm and the result notice -- so that the three cannot
 // drift into three different claims about the same data. One sentence, translated once.
 $ec_lang['lpn_terrain_accuracy']='O Mapbox compila isto a partir de muitos conjuntos de dados públicos de elevação, então sua precisão depende do local. Onde existe um levantamento lidar nacional, como o USGS 3DEP em grande parte dos Estados Unidos e seus equivalentes em outros lugares, pode ser melhor que 1 m na horizontal e alguns decímetros na vertical. Onde só existem dados globais, é cerca de 30 m na horizontal e vários metros na vertical. O Mapbox não informa qual fonte se aplica. Trate-o como um mapa de curvas de nível, não como um levantamento topográfico, e verifique qualquer valor do qual o projeto dependa.';
-$ec_lang['lpn_terrain_consent_1']='Preencher elevações envia a posição de cada nó que precisa de uma — sua latitude e longitude — para api.mapbox.com, para consultar a altura do terreno ali.';
+$ec_lang['lpn_terrain_consent_1']='Preencher elevações envia a posição de cada nó que precisa de uma — sua latitude e longitude — para api.mapbox.com, para consultar a elevação do terreno ali.';
 $ec_lang['lpn_terrain_consent_2']='Esta é uma questão diferente das imagens do mapa atrás do seu projeto. As imagens dizem apenas para onde você está olhando. Estas posições são a sua rede em si. O Mapbox receberá essas coordenadas e o seu endereço IP. Não enviamos mais nada: nenhum nome, nenhum tubo, nenhum projeto. Não guardamos nenhum registro disso, e nada é armazenado neste dispositivo, exceto a sua resposta a esta pergunta.';
 $ec_lang['lpn_terrain_consent_3']='Podemos enviar as posições dos seus nós para o Mapbox?';
 $ec_lang['lpn_terrain_consent_4']='Se você disser não, tudo o mais nesta página continua funcionando exatamente como agora, e você pode digitar as elevações você mesmo, como antes. Lembramos de um sim para não precisar perguntar de novo. Um não não é armazenado de forma alguma.';
@@ -3919,10 +3919,10 @@ $ec_lang['lpn_contour_support']='Mapa de isolinhas: {n} nós, interpolados ao lo
 $ec_lang['lpn_contour_support_lines']='Isolinhas a cada {i} {u}.';
 $ec_lang['lpn_contour_too_many']='Isolinhas demais neste intervalo; aumente-o para desenhá-las.';
 $ec_lang['lpn_contour_dem']='Terreno entre os nós a partir do DEM do Mapbox';
-$ec_lang['lpn_contour_dem_tip']='Entre os nós, a pressão passa a ser a carga interpolada menos a altura do terreno do DEM do Mapbox, e por isso pode cair abaixo da menor pressão dos nós em um morro onde a rede não tem nenhum nó. Trate o terreno como um mapa de curvas de nível, não como um levantamento topográfico.';
+$ec_lang['lpn_contour_dem_tip']='Entre os nós, a pressão passa a ser a carga interpolada menos a elevação do terreno do DEM do Mapbox, e por isso pode cair abaixo da menor pressão dos nós em um morro onde a rede não tem nenhum nó. Trate o terreno como um mapa de curvas de nível, não como um levantamento topográfico.';
 $ec_lang['lpn_contour_support_dem']='Entre os nós, a pressão é a carga interpolada menos a elevação do terreno do DEM do Mapbox, amostrada aproximadamente a cada {m} m.';
 $ec_lang['lpn_contour_dem_failed']='Não foi possível ler o terreno do DEM do Mapbox, então a pressão é interpolada somente entre os nós.';
-$ec_lang['lpn_contour_consent_1']='Desenhar a pressão sobre o terreno envia a área coberta pela sua rede, como números de blocos de mapa do Mapbox, para api.mapbox.com, para ler a altura do terreno ali.';
+$ec_lang['lpn_contour_consent_1']='Desenhar a pressão sobre o terreno envia a área coberta pela sua rede, como números de blocos de mapa do Mapbox, para api.mapbox.com, para ler a elevação do terreno ali.';
 $ec_lang['lpn_contour_consent_2']='Esta é uma questão diferente das imagens do mapa atrás do seu projeto. As imagens dizem apenas para onde você está olhando. Estes blocos dizem onde está a sua rede. O Mapbox receberá esses números de blocos e o seu endereço IP. Não enviamos mais nada: nenhum nome, nenhum tubo, nenhum projeto. Não guardamos nenhum registro disso, e nada é armazenado neste dispositivo além da sua resposta a esta pergunta.';
 $ec_lang['lpn_contour_consent_3']='Podemos enviar ao Mapbox os números de blocos da área da sua rede?';
 $ec_lang['lpn_contour_consent_4']='Se você disser não, tudo o mais nesta página continua funcionando exatamente como agora, e o mapa de isolinhas é desenhado somente entre os nós. Lembramos de um sim para não precisar perguntar de novo. Um não não é armazenado de forma alguma.';

@@ -115,6 +115,9 @@ ok('Pattern 1 does not start at 1.0 -- so this test can tell the two answers apa
 {
 	// A junction that names its own pattern uses that one, not the document default.
 	const named = doc.nodes.filter(n => n.demandPattern && n.demandPattern !== '1' && n._demand);
+	// Net3 has such junctions; if it ever stops having one, this check has nothing to test, and
+	// says so as a failure rather than passing on nothing.
+	ok('Net3 has a junction naming its own pattern, so the next check tests something', named.length > 0);
 	if (named.length) {
 		const j = named[0];
 		const p = EngCalcs.lpnPatternById(doc.patterns, j.demandPattern);
@@ -122,8 +125,6 @@ ok('Pattern 1 does not start at 1.0 -- so this test can tell the two answers apa
 		ok('a junction naming its own pattern uses THAT one',
 			near(modelNode[j.id].demand / GPM, j._demand * m),
 			j.id + ' on pattern ' + j.demandPattern + ' (x' + m + ')');
-	} else {
-		ok('a junction naming its own pattern uses THAT one', true, 'none in Net3 -- not applicable');
 	}
 }
 

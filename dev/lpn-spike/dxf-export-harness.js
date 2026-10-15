@@ -154,10 +154,17 @@ function exportNow() {
 	return new Promise((resolve) => { L.dxfFrame((frame) => resolve(L.dxfExportText(frame))); });
 }
 
+// EC_EZDXF_PYTHON, else ~/venvs/ezdxf/bin/python when it exists (where check_all's machine keeps
+// ezdxf, so a run finds it with nothing set), else python3.
+function ezdxfPython() {
+	if (process.env.EC_EZDXF_PYTHON) { return process.env.EC_EZDXF_PYTHON; }
+	const venv = path.join(require('os').homedir(), 'venvs', 'ezdxf', 'bin', 'python');
+	return fs.existsSync(venv) ? venv : 'python3';
+}
 // Run the independent auditor if there is one. Never fails the suite for its absence.
 function ezdxfAudit(file, label) {
 	const { spawnSync } = require('child_process');
-	const py = process.env.EC_EZDXF_PYTHON || 'python3';
+	const py = ezdxfPython();
 	const probe = spawnSync(py, ['-c', 'import ezdxf'], { encoding: 'utf8' });
 	if (probe.error || probe.status !== 0) {
 		console.log('  NOT RUN ' + label + ': ezdxf audit (no Python with ezdxf; set EC_EZDXF_PYTHON)');

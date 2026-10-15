@@ -264,7 +264,7 @@ $ec_lang['mtc_vel_high']='سرعت بالا است و ممکن است واقع�
 $ec_lang['mtc_iteration_tip']='یک گزینه زبری (روش Blodgett–Bathurst توصیه می‌شود) و یک گزینه اندازه سنگ (روش Isbash توصیه می‌شود) انتخاب کنید تا به‌طور خودکار به یک اندازه سنگ یکنواخت متناسب با دبی هدف شما تکرار شود. برای روش کامل به یادداشت‌های زیر مراجعه کنید، یا برای رد شدن از تکرار، مقدار زبری دلخواه خود را (برای راهنمایی روی پیوند کلیک کنید) وارد کرده و اندازه سنگ را نادیده بگیرید.';
 $ec_lang['mtc_note_1']='<dl><dt>تکرار خودکار طراحی اندازهٔ سنگ و زبری</dt><dd>یک گزینهٔ زبری (روش Blodgett–Bathurst توصیه می‌شود) و یک گزینهٔ اندازهٔ سنگ طراحی (روش Isbash توصیه می‌شود) انتخاب کنید. عمق و ضریب ایمنی اندازهٔ سنگ را تنظیم کنید تا با یک اندازهٔ سنگ یکنواخت به دبی هدف خود برسید. هر بار که یک ورودی را تغییر می‌دهید، ماشین‌حساب این گام‌ها را تکرار می‌کند: 1. زبری از روی اندازهٔ سنگ طراحی محاسبه می‌شود. 2. مقدار زبری از روشی که انتخاب کرده‌اید در ورودی زبری کپی می‌شود. 3. دبی کانال و اندازهٔ سنگ موردنیاز محاسبه می‌شوند. 4. اندازهٔ سنگ طراحی تنظیم می‌شود. 5. تا زمانی که خطای اندازهٔ سنگ طراحی بسیار کوچک شود تکرار می‌شود.</dd><dt>ماشین‌حساب پایه (بدون تکرار)</dt><dd>مقدار زبری دلخواه خود را وارد کنید. ناحیهٔ ورودی اندازهٔ سنگ طراحی را نادیده بگیرید.</dd></dl>';
 $ec_lang['mtc_note_2_term']='بررسی سرعت';
-$ec_lang['mtc_note_2_def']='سرعت بالا نشان‌دهنده افت ارتفاع زیادی است که چنین انرژی مخصوص بالایی ایجاد کرده است. این انرژی می‌تواند به‌سرعت در گسترش‌ها، خم‌ها یا موانع از بین برود. بررسی کنید که این وضعیت برای محل مورد نظر معقول است.';
+$ec_lang['mtc_note_2_def']='سرعت بالا نشان‌دهنده افت تراز زیادی است که چنین انرژی مخصوص بالایی ایجاد کرده است. این انرژی می‌تواند به‌سرعت در گسترش‌ها، خم‌ها یا موانع از بین برود. بررسی کنید که این وضعیت برای محل مورد نظر معقول است.';
 $ec_lang['mtc_solver_no_solution']='با این ورودی‌های کانال، برای دبی Q مشخص هیچ جوابی یافت نشد.';
 // Weir Flow Simple
 $ec_lang['ws_main_menu']='جریان سرریز ساده';
@@ -352,14 +352,14 @@ $ec_lang['mhp_notes_7_def']='انرژی سالانه بر اساس عملکرد 
 $ec_lang['odt_main_menu']='زمان تخلیه استخر & مخزن';
 $ec_lang['odt_main_title']='ماشین‌حساب رایگان آنلاین زمان تخلیه استخر، حوضچه و مخزن (دریچه)';
 $ec_lang['odt_main_desc']='زمان تخلیه استخر، حوضچه یا مخزن — خروجی دریچه، روش حجم مخروطی';
-$ec_lang['odt_h1_elev']='ارتفاع سطح آب اولیه';
+$ec_lang['odt_h1_elev']='تراز سطح آب اولیه';
 $ec_lang['odt_a1']='مساحت اولیه، A<sub>1</sub>';
-$ec_lang['odt_h2_elev']='ارتفاع سطح آب نهایی';
-$ec_lang['odt_a0']='مساحت در ارتفاع دریچه، A<sub>0</sub>';
-$ec_lang['odt_a_ending']='<span class="ec-help" title="درون‌یابی‌شده از مدل مخروطی در ارتفاع نهایی">مساحت نهایی، A<sub>2</sub> <span class="ec-tip">?</span></span>';
-$ec_lang['odt_h2_check']='بررسی ارتفاع نهایی';
-$ec_lang['odt_h2_ok']='ارتفاع نهایی بالاتر از تاج دریچه';
-$ec_lang['odt_h2_warn']='ارتفاع نهایی در سطح یا پایین‌تر از تاج دریچه';
+$ec_lang['odt_h2_elev']='تراز سطح آب نهایی';
+$ec_lang['odt_a0']='مساحت در تراز دریچه، A<sub>0</sub>';
+$ec_lang['odt_a_ending']='<span class="ec-help" title="درون‌یابی‌شده از مدل مخروطی در تراز نهایی">مساحت نهایی، A<sub>2</sub> <span class="ec-tip">?</span></span>';
+$ec_lang['odt_h2_check']='بررسی تراز نهایی';
+$ec_lang['odt_h2_ok']='تراز نهایی بالاتر از تاج دریچه';
+$ec_lang['odt_h2_warn']='تراز نهایی در سطح یا پایین‌تر از تاج دریچه';
 $ec_lang['odt_h2_warn_tip']='تاج دریچه = مرکز ثقل + D/2';
 $ec_lang['odt_d']='<span class="ec-help" title="قطر (برای دایره‌ای) یا ارتفاع (برای مستطیلی)">قطر دریچه D <span class="ec-tip">?</span></span>';
 $ec_lang['odt_w']='<span class="ec-help" title="فقط برای مستطیلی">عرض دریچه، W <span class="ec-tip">?</span></span>';
@@ -368,10 +368,10 @@ $ec_lang['odt_t_min']='زمان تخلیه (min)';
 $ec_lang['odt_t_hr']='زمان تخلیه (hr)';
 $ec_lang['odt_t_day']='زمان تخلیه (days)';
 $ec_lang['odt_notes_1_term']='فرمول';
-$ec_lang['odt_notes_1_def']='t = √H<sub>1</sub> / (C<sub>d</sub> A<sub>or</sub> √(2g)) × (2A<sub>x</sub>/5 + 8√(A<sub>x</sub>A<sub>0</sub>)/15 + 16A<sub>0</sub>/15) زمان تخلیه از هد H تا دریچه را می‌دهد. زمان تخلیه = t(H<sub>1</sub>,A<sub>1</sub>,A<sub>0</sub>) − t(H<sub>2</sub>,A<sub>2</sub>,A<sub>0</sub>)، که H<sub>1</sub> = ارتفاع اولیه − ارتفاع دریچه، H<sub>2</sub> = ارتفاع نهایی − ارتفاع دریچه.';
+$ec_lang['odt_notes_1_def']='t = √H<sub>1</sub> / (C<sub>d</sub> A<sub>or</sub> √(2g)) × (2A<sub>x</sub>/5 + 8√(A<sub>x</sub>A<sub>0</sub>)/15 + 16A<sub>0</sub>/15) زمان تخلیه از هد H تا دریچه را می‌دهد. زمان تخلیه = t(H<sub>1</sub>,A<sub>1</sub>,A<sub>0</sub>) − t(H<sub>2</sub>,A<sub>2</sub>,A<sub>0</sub>)، که H<sub>1</sub> = تراز اولیه − تراز دریچه، H<sub>2</sub> = تراز نهایی − تراز دریچه.';
 $ec_lang['odt_notes_2_term']='روش';
-$ec_lang['odt_notes_2_def']='روش حجم مخروطی استخر یا حوضچه را به صورت یک مقطع مخروطی بین مساحت اولیه A<sub>1</sub> در سطح آب اولیه و مساحت A<sub>0</sub> در ارتفاع مرکز ثقل دریچه مدل می‌کند. A<sub>2</sub>، مساحت استخر در ارتفاع نهایی، از A<sub>1</sub> و A<sub>0</sub> با استفاده از مدل مقطع مخروطی درون‌یابی می‌شود. زمان تخلیه از ارتفاع اولیه تا نهایی برابر است با زمان تخلیه کل از H<sub>1</sub> تا دریچه منهای زمان تخلیه باقی‌مانده از H<sub>2</sub> تا دریچه.';
-$ec_lang['odt_h1']='<span class="ec-help" title="ارتفاع سطح آب اولیه منهای ارتفاع مرکز ثقل دریچه">هد اولیه، H<sub>1</sub> <span class="ec-tip">?</span></span>';
+$ec_lang['odt_notes_2_def']='روش حجم مخروطی استخر یا حوضچه را به صورت یک مقطع مخروطی بین مساحت اولیه A<sub>1</sub> در سطح آب اولیه و مساحت A<sub>0</sub> در تراز مرکز ثقل دریچه مدل می‌کند. A<sub>2</sub>، مساحت استخر در تراز نهایی، از A<sub>1</sub> و A<sub>0</sub> با استفاده از مدل مقطع مخروطی درون‌یابی می‌شود. زمان تخلیه از تراز اولیه تا نهایی برابر است با زمان تخلیه کل از H<sub>1</sub> تا دریچه منهای زمان تخلیه باقی‌مانده از H<sub>2</sub> تا دریچه.';
+$ec_lang['odt_h1']='<span class="ec-help" title="تراز سطح آب اولیه منهای تراز مرکز ثقل دریچه">هد اولیه، H<sub>1</sub> <span class="ec-tip">?</span></span>';
 $ec_lang['odt_q_max']='حداکثر دبی، Q<sub>max</sub>';
 $ec_lang['odt_vol']='حجم تخلیه‌شده';
 $ec_lang['odt_sketch_start']='شروع';
@@ -1778,7 +1778,7 @@ $ec_lang['lpn_net_bad_file']='این شبیه یک فایل net. از EPANET ا�
 $ec_lang['lpn_inp_report_heading']='{file} وارد شد';
 $ec_lang['lpn_inp_report_counts']='{nodes} گره، مخزن و تانک، {links} لوله، پمپ و شیر، در واحدهای {units}.';
 $ec_lang['lpn_inp_report_clean']='همه‌چیز از فایل منتقل شد. چیزی جا نماند.';
-$ec_lang['lpn_inp_report_label_anchor']='برچسب‌های متنی همان‌گونه که EPANET قرار می‌دهد، از گوشهٔ بالا-چپ آن‌ها، جای‌گذاری می‌شوند.';
+$ec_lang['lpn_inp_report_label_anchor']='متن‌ها همان‌گونه که EPANET قرار می‌دهد، از گوشهٔ بالا-چپ آن‌ها، جای‌گذاری می‌شوند.';
 // **R-219; Tom, 2026-09-24, answering R-190**: dropping the "These are already lat/lon" button in
 // favor of typing 1 for Step 2's Ground distance field means both Import and Convert as have to say
 // that door still exists. Shown for any file that lands as a plain XY drawing -- Feet, Meters, None
@@ -3526,7 +3526,7 @@ $ec_lang['lpn_field_demand_pattern']='الگوی مصرف';
 // A JUNCTION’S DEMAND IS A LIST (Task 468). The PATTERN says what KIND of user this is
 // (“residential”); the CATEGORY says WHO it is (“Elm Acres”). Nothing validates a category and there
 // is no list to choose one from, which is why the tip describes it rather than instructing.
-$ec_lang['lpn_field_demand_category']='شرح';
+$ec_lang['lpn_field_demand_category']='توضیح';
 $ec_lang['lpn_demand_add']='افزودن دستهٔ مصرف';
 $ec_lang['lpn_demand_remove']='حذف این مصرف';
 // A RESERVOIR AND A PUMP TAKE A PATTERN TOO, on the same rule: whole-project settings live in the

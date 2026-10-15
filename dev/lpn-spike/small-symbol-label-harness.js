@@ -109,21 +109,23 @@ console.log('\n--- the floor is INACTIVE at every ordinary setting, at every zoo
 	// of node label placement wearing a bug fix's clothes: it re-places labels further from their
 	// nodes instead of letting them shed a value, which is a decision node-shed-harness.js holds
 	// and nobody asked to revisit.
-	const def = L.defaultSettings();
+	const def = L.defaultSettings(), ratios = [];
 	[1, 4, 20, 5000].forEach(function (s) {
 		L.setScale(s);
 		L.settings().symbolSize = def.symbolSize;
 		L.settings().textSize = def.textSize;
 		const d = L.defaultLabelOffset(), home3 = Math.hypot(d.x, d.y) * 3;
+		ratios.push(home3 / (L.fs() * L.minReach()));
 		report(home3 >= L.fs() * L.minReach(),
 			'shipped symbolSize ' + def.symbolSize + '/textSize ' + def.textSize + ' at scale ' + s +
 				': the floor does not bind',
 			home3.toFixed(3) + ' >= ' + (L.fs() * L.minReach()).toFixed(3));
 	});
 	L.setScale(1);
-	// Scale-invariant by construction -- both quantities are 1/state.s -- so say so once rather
-	// than trusting the four rows above to keep saying it.
-	report(true, '...which is scale-invariant: both quantities are screen pixels over state.s');
+	// Scale-invariant by construction -- both quantities are 1/state.s -- and measured: the ratio
+	// of the two is the same at all four zooms, to rounding.
+	report(ratios.every(function (r) { return Math.abs(r - ratios[0]) <= 1e-9 * ratios[0]; }),
+		'...which is scale-invariant: both quantities are screen pixels over state.s', ratios.map(function (r) { return r.toFixed(6); }).join(' '));
 }
 
 console.log(`\n${failures ? 'FAILURES: ' + failures : 'all ' + checks + ' checks passed'}`);

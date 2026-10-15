@@ -555,8 +555,12 @@ console.log('\n--- patterns and scenarios ---');
 (async function () {
 	console.log('\n--- the same file through the real EPANET engine ---');
 	const GPM = 6.309019640343977e-5;
-	try {
-		const mod = await import('file://' + path.join(ROOT, 'js', 'vendor', 'epanet-js.js'));
+	const ENGINE = path.join(ROOT, 'js', 'vendor', 'epanet-js.js');
+	if (!fs.existsSync(ENGINE)) {
+		// The one genuine skip: no vendored engine in this checkout. Everything above ran without it.
+		console.log('  skip  the EPANET cross-check   engine absent: ' + ENGINE);
+	} else try {
+		const mod = await import('file://' + ENGINE);
 		const ws = new mod.Workspace();
 		await ws.loadModule();
 		const p = new mod.Project(ws);
@@ -586,10 +590,9 @@ console.log('\n--- patterns and scenarios ---');
 		ok('...and a blank pattern column on a demand row means the PROJECT default',
 			near(demands.J3, 7.5 * 0.6, 1e-6), 'J3 draws ' + demands.J3.toFixed(4) + ' gpm');
 	} catch (err) {
-		// The engine is a vendored wasm module and can legitimately be unavailable in a bare
-		// checkout. That is a SKIP with the reason, never a silent pass and never a failure of
-		// the page: everything above this line ran without it.
-		console.log('  skip  the EPANET cross-check   engine unavailable: ' + err.message);
+		// The engine IS here, so a throw is a finding: the engine would not load our file, or a
+		// reading above went wrong. It used to print "skip", which hid a regression as an absence.
+		ok('the EPANET cross-check ran', false, err && err.stack ? err.stack.split('\n').slice(0, 3).join(' / ') : String(err));
 	}
 	// -----------------------------------------------------------------------
 	// Searching for a category (Tom, 2026-08-26: *"is it feasible to search for

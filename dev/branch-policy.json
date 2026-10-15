@@ -152,7 +152,8 @@
         "feat/geojson",
         "feat/dxf",
         "feat/message-dismiss",
-        "feat/workspace"
+        "feat/workspace",
+        "feat/leader-keep"
     ],
     "feature_freeze": {
         "active": false,
