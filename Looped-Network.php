@@ -3930,6 +3930,7 @@ EngCalcs.pageConfig = {
 	lpn_engine_refused_why: <?=json_encode($ec_lang['lpn_engine_refused_why'])?>,
 	lpn_engine_refused_fallback: <?=json_encode($ec_lang['lpn_engine_refused_fallback'])?>,
 	lpn_time_run_stopped: <?=json_encode($ec_lang['lpn_time_run_stopped'])?>,
+	lpn_time_run_stopped_kept: <?=json_encode($ec_lang['lpn_time_run_stopped_kept'])?>,
 	lpn_control_dangling_note: <?=json_encode($ec_lang['lpn_control_dangling_note'])?>,
 	lpn_control_unreadable_note: <?=json_encode($ec_lang['lpn_control_unreadable_note'])?>,
 	lpn_rule_dangling_note: <?=json_encode($ec_lang['lpn_rule_dangling_note'])?>,

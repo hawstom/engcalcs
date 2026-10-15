@@ -2153,7 +2153,7 @@
 				return new Promise(function (resolve) {
 					// The frames, by their own reporting time, so the quality pass can find the one
 					// it is standing on without searching the array at every step.
-					var frameAt = {};
+					var frameAt = {}, hydPhase = true;
 					// **THE ENERGY ACCUMULATOR, FILLED AT EVERY HYDRAULIC STEP** (Task 566). The
 					// pumps are named once, here, so the loop below asks the engine only about
 					// links that can consume anything.
@@ -2295,6 +2295,7 @@
 						});
 					}
 					function failed(e) {
+						var kept = hydPhase ? frames : [], last = kept.length ? kept[kept.length - 1].t : null;
 						// A run that threw part-way is the same damaged engine as a refusal.
 						var failedReport = shutdown();
 						if (ws === workspace) { retireEngine(); }
@@ -2302,7 +2303,15 @@
 						// junctions with no source is EPANET's Error 110), which is not "rejected, so the
 						// run did not start" -- js/lpn-time.js says which.
 						resolve(engineRefusal(e, {
-							warnings: built.warnings, frames: [], report: failedReport, stoppedAt: t,
+							// **THE PERIODS ALREADY SOLVED STAY** (Task 808). Each frame is pushed only
+							// after runH() and every read of it returned, so a frame in the list is a
+							// whole period EPANET solved; the period that threw never became one. Only
+							// a stop in the hydraulic walk keeps them -- a stop in the quality walk
+							// would leave frames with no water age beside the ones that have it.
+							// `solvedTo` is the last of them; nothing is carried past it, estimated or
+							// zeroed.
+							warnings: built.warnings, frames: kept, partial: kept.length > 0, solvedTo: last,
+							report: failedReport, stoppedAt: t,
 							duration: duration, reportStart: reportStart, reportStep: reportStep
 						}));
 					}
@@ -2357,6 +2366,7 @@
 						try {
 							// closeH() flushes the saved hydraulics the quality walk reads. It is
 							// the precondition, not tidying up.
+							hydPhase = false;
 							p.closeH();
 							p.openQ();
 							// EN_SAVE here is what writes `temp.out` at all -- see the rateOn note
