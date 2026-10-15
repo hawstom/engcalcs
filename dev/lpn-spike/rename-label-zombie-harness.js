@@ -139,7 +139,8 @@ async function main() {
 			const tag = await page.evaluate(([at, nm]) => {
 				const t = Array.from(document.querySelectorAll('#lpn_canvas text.lpn-lbl[' + at + ']:not([data-repeat])')).find((e) => {
 					const first = e.querySelector('tspan') ? e.querySelector('tspan').textContent : e.textContent;
-					return first.trim() === nm;
+					// A label row is one text run since the halo fix, so the name may lead "P2A, 12 in".
+					return first.trim().split(/[,\s]/)[0] === nm;
 				});
 				if (!t) { return null; }
 				t.setAttribute('data-harness-probe', '1');
