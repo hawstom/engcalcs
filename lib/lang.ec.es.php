@@ -152,8 +152,6 @@ $ec_lang['hw_pressure_neg_short']='Presión negativa';
 $ec_lang['hw_pressure_neg']='La presión aguas abajo es menor que cero. El HGL queda por debajo de la tubería, por lo que la tubería no fluiría llena y este resultado puede no ser válido.';
 $ec_lang['hw_roughness']='Coeficiente de Hazen-Williams, C';
 $ec_lang['hw_note_1']='<dl><dt>Esta calculadora no representa el perfil de la tubería entre los dos extremos.</dt><dd>Usa solo las elevaciones aguas arriba y aguas abajo que usted ingresa. Si el terreno se eleva por encima de cualquiera de los dos extremos en algún punto intermedio, la presión en ese punto alto es menor que cualquier presión indicada aquí. Vuelva a ejecutar la calculadora para el tramo desde el extremo aguas arriba hasta el punto alto para verificarlo.</dd><dd>Donde el HGL queda por debajo de la tubería, el agua está bajo presión negativa. El aire sale de la solución, una tubería de paredes delgadas puede colapsar, y puede ingresar agua subterránea contaminada a través de las juntas. Mantenga la línea bajo presión positiva en todo su recorrido, y considere una válvula de aire en cada punto alto.</dd><dt>La presión aguas arriba es una condición de frontera que usted proporciona.</dt><dd>Léala en un manómetro, en el nivel de agua de un tanque (la altura de agua sobre la tubería), o en la curva de un bombeo. Un bombeo entrega menos presión a medida que aumenta el caudal, así que use el punto de la curva que corresponda al caudal ingresado arriba.</dd><dt>Sume usted mismo los coeficientes de pérdida localizada.</dt><dd>Sume los valores de K de cada válvula, codo, tee, medidor y entrada en la línea, e ingrese ese total. Siga el enlace de ese campo para ver valores típicos. En una línea de conducción larga estas pérdidas son pequeñas frente a la fricción, pero en tuberías cortas dentro de una estación pueden ser la mayor parte de la pérdida.</dd></dl>';
-$ec_lang['hw_notes_epanet_term']='Las constantes de Hazen-Williams ahora coinciden con EPANET (agosto de 2026)';
-$ec_lang['hw_notes_epanet_def']='En agosto de 2026 se cambiaron el coeficiente y el exponente de Hazen-Williams para coincidir con EPANET. Los resultados de pérdida de carga difieren de los de las versiones anteriores de esta página hasta en un 0,1 por ciento, mucho menos que la incertidumbre del propio valor de C.';
 // Manning Irregular
 $ec_lang['mi_menu']='Canal de sección irregular según Manning';
 $ec_lang['mi_main_title']='Calculadora gratis en línea de Manning para canal de sección irregular';
@@ -165,7 +163,7 @@ $ec_lang['mi_groupPoint']='Punto';
 $ec_lang['mi_groupSegment']='Segmento';
 $ec_lang['mi_groupRegion']='Región';
 $ec_lang['mi_station']='Est.';
-$ec_lang['mi_elevation']='Alt.';
+$ec_lang['mi_elevation']='Elev.';
 $ec_lang['mi_n']='n<br />del seg-<br />mento';
 $ec_lang['mi_is_bank']='Div. de<br />regiones<br />R<sub>h</sub> y Q<br />(margen)';
 $ec_lang['mi_tau']='Cortante<br />de fondo<br />τ';
@@ -624,8 +622,6 @@ $ec_lang['bpn_notes_2_term']='Solo redes ramificadas, sin bucles';
 $ec_lang['bpn_notes_2_def']='Cada tramo tiene exactamente un tramo aguas arriba (un árbol). Esta herramienta no resuelve redes con bucles, que requieren métodos iterativos (EPANET o similar). Como la red no tiene bucles, la solución es directa y exacta.';
 $ec_lang['bpn_notes_3_term']='Sin controles de presión activos';
 $ec_lang['bpn_notes_3_def']='Puede agregar una válvula de pérdida localizada fija (un valor k), pero no válvulas reductoras o sostenedoras de presión (PRV/PSV). Su estado abierto/cerrado depende del caudal y la presión, lo que forzaría la iteración.';
-$ec_lang['bpn_notes_epanet_term']='Las constantes de Hazen-Williams ahora coinciden con EPANET (agosto de 2026)';
-$ec_lang['bpn_notes_epanet_def']='En agosto de 2026 se cambiaron el coeficiente y el exponente de Hazen-Williams para coincidir con EPANET. Los resultados de pérdida de carga difieren de los de las versiones anteriores de esta página hasta en un 0,1 por ciento, mucho menos que la incertidumbre del propio valor de C.';
 $ec_lang['bpn_supply2_q']='Caudal de suministro 2';
 $ec_lang['bpn_supply2_h']='Carga de suministro 2';
 $ec_lang['bpn_supply3_q']='Caudal de suministro 3';
@@ -710,7 +706,7 @@ $ec_lang['lpn_customer_detached']='⚠ Este cliente no está conectado a una tub
 $ec_lang['lpn_customer_fixed_head']='⚠ El extremo cercano de esa tubería tiene una superficie de agua fija, así que esta demanda no afecta la simulación.';
 $ec_lang['lpn_customer_detached_count']='{n} clientes no están conectados a una tubería. Su demanda no se contabiliza.';
 $ec_lang['lpn_meter_pick_pipe']='Ahora seleccione la tubería o el nudo que abastece a este cliente. El cliente permanece donde lo colocó. Presione Escape para cancelar.';
-$ec_lang['lpn_inp_export_flat_customers']='Un archivo de EPANET no tiene clientes. La demanda de los {n} clientes de este proyecto se escribe como una fila de demanda en el nudo al que está asignado cada cliente, nombrada con la etiqueta del cliente. El archivo no registra el cliente en sí: su ubicación, la tubería que lo abastece, el punto de esa tubería donde se conecta el servicio, ni cuántos servicios representa. Esa información permanece en el proyecto; guarde el archivo de proyecto para conservarla.';
+$ec_lang['lpn_inp_export_flat_customers']='Un archivo de EPANET no tiene clientes. La demanda de los {n} clientes de este proyecto se escribe como una fila de demanda en el nudo al que está asignado cada cliente, nombrada con el marcador del cliente. El archivo no registra el cliente en sí: su ubicación, la tubería que lo abastece, el punto de esa tubería donde se conecta el servicio, ni cuántos servicios representa. Esa información permanece en el proyecto; guarde el archivo de proyecto para conservarla.';
 
 $ec_lang['lpn_area_hint_window_start']='Especifique una esquina de la ventana.';
 $ec_lang['lpn_area_hint_window_go']='Especifique la esquina opuesta para terminar.';
@@ -1031,15 +1027,15 @@ $ec_lang['lpn_result_gradient']='Gradiente de pérdida de carga';
 $ec_lang['lpn_result_gradient_tip']='Pérdida de carga dividida entre la longitud de la tubería. Úselo para comparar tuberías de diferente longitud contra un mismo límite de diseño.';
 $ec_lang['lpn_result_water_age']='Edad del agua';
 $ec_lang['lpn_result_water_age_tip']='Tiempo que ha pasado en el sistema el agua que llega a este punto. Donde se juntan caudales, el número es el promedio de las edades que llegan, ponderado por caudal. En un depósito es la edad promedio del agua que contiene, por lo que un depósito que se renueva lentamente suele tener el agua más vieja de una red. No hay un límite normativo con el cual compararlo, así que evalúelo con respecto a las condiciones del sistema que se modela.';
-$ec_lang['lpn_result_source_share']='Aporte de origen';
-$ec_lang['lpn_result_source_share_tip']='Parte del agua que llega a este punto y que provino del nodo de rastreo. Esto es lo que reporta el análisis Rastreo de origen.';
+$ec_lang['lpn_result_source_share']='Aporte de fuente';
+$ec_lang['lpn_result_source_share_tip']='Parte del agua que llega a este punto y que provino del nodo de rastreo. Esto es lo que reporta el análisis Rastreo de fuente.';
 // **THE LINK HALF OF THE THREE QUALITY ANSWERS** (ROADMAP Task 638). EPANET reports a node's own
 // value and a LINK's AVERAGE over the water standing in it, so the two are different quantities and
 // take different words. Three whole names rather than one name built from a word and a heading: a
 // label composed at render time breaks in a gendered, a word-order and a right-to-left language,
 // which is the rule in CLAUDE.md under Concept-level label reuse.
 $ec_lang['lpn_result_avg_water_age']='Edad promedio del agua';
-$ec_lang['lpn_result_avg_source_share']='Aporte promedio de origen';
+$ec_lang['lpn_result_avg_source_share']='Aporte promedio de fuente';
 $ec_lang['lpn_result_avg_concentration']='Concentración promedio';
 // EPANET's own two link report columns, in EPANET's own words. A friction factor is the
 // dimensionless Darcy-Weisbach f the head loss along this link works out to, whichever friction
@@ -1494,15 +1490,15 @@ $ec_lang['lpn_find_prop_demand_desc']='Descripción de esta categoría de demand
 // recognise, and "is behind closed links" never said behind them RELATIVE TO WHAT. Do not restore.
 $ec_lang['lpn_find_op_conn_unlinked']='sin líneas en el nodo';
 $ec_lang['lpn_find_op_conn_noopen']='sin líneas abiertas en el nodo';
-$ec_lang['lpn_find_op_conn_nolinksource']='sin ruta de líneas hasta un origen';
-$ec_lang['lpn_find_op_conn_noopensource']='sin ruta abierta hasta un origen';
+$ec_lang['lpn_find_op_conn_nolinksource']='sin ruta de líneas hasta una fuente';
+$ec_lang['lpn_find_op_conn_noopensource']='sin ruta abierta hasta una fuente';
 // What a result row prints beside the node id: the fault it has, in three words.
 // What a result row prints beside the id: the NARROWEST condition true of that node, because "no
 // links" says more than "no open path to a source" and both are true of the same node.
 // "None" is the good news a report is run for, so it is said out loud rather than left as a blank
 // box.
 $ec_lang['lpn_find_conn_none']='Todos los nodos están conectados.';
-$ec_lang['lpn_find_conn_no_fixed']='Esta red no tiene ningún embalse ni depósito, así que no hay ningún origen al que llegar. Solo se puede buscar sin líneas en el nodo y sin líneas abiertas en el nodo.';
+$ec_lang['lpn_find_conn_no_fixed']='Esta red no tiene ningún embalse ni depósito, así que no hay ninguna fuente a la que llegar. Solo se puede buscar sin líneas en el nodo y sin líneas abiertas en el nodo.';
 // Task 540: the query written as one line, above the Find button -- and typed into. The controls
 // write it and it writes the controls, so it teaches the shape of a search by being operated from
 // either end.
@@ -1847,11 +1843,11 @@ $ec_lang['lpn_inp_drop_quality']='Este archivo describe la calidad del agua: con
 $ec_lang['lpn_inp_drop_sources_mixing']='Este archivo indica dónde se inyecta un producto químico en la red y cómo se mezcla el agua en cada depósito. Cada fuente se muestra en el nudo donde se aplica, y cada depósito muestra su modelo de mezcla. Ambos se usan cuando la red se ejecuta durante un tiempo total de simulación.';
 $ec_lang['lpn_inp_drop_energy']='Este archivo EPANET incluye datos para modelar el costo de bombeo. Esta página los lee y los usa. Ejecute el modelo con el solucionador de EPANET, y luego abra Agua, Informes, Energía de las bombas para ver cuánto tiempo funcionó cada bomba, la potencia que consumió, la energía que usó y lo que costó. Las líneas se conservan, y se vuelven a escribir si guarda un archivo EPANET.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_inp_drop_tags']='Este archivo asigna etiquetas a algunos nudos, tuberías u otros elementos. Cada etiqueta se importó y aparece en las propiedades de su elemento, donde se puede ver o editar.';
+$ec_lang['lpn_inp_drop_tags']='Este archivo asigna marcadores a algunos nudos, tuberías u otros elementos. Cada marcador se importó y aparece en las propiedades de su elemento, donde se puede ver o editar.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_inp_drop_report']='Este archivo contiene ajustes de formato de informe de EPANET. El informe de ejecución está disponible en Informes, Ejecución, pero usa el formato estándar de EPANET y no el que especifican estos ajustes. Las líneas se conservan y se vuelven a escribir si guarda un archivo de EPANET.';
 $ec_lang['lpn_inp_drop_sections']='Este archivo contiene una sección que esta página no lee en absoluto. Nada aquí la usa. Se conserva completa, y se vuelve a escribir si guarda un archivo EPANET.';
-$ec_lang['lpn_inp_drop_quality_options']='Este archivo indica opciones de calidad del agua de EPANET: la opción Quality, que nombra el tipo de análisis de calidad del agua, y dos ajustes que acompañan a un producto químico, Relative diffusivity y Quality tolerance. Las tres se conservan y se usan. Aquí se calculan la edad del agua, el rastreo de origen y un producto químico, y los dos ajustes del producto químico se usan cuando se ejecuta un producto químico. Todas se vuelven a escribir si guarda un archivo de EPANET.';
+$ec_lang['lpn_inp_drop_quality_options']='Este archivo indica opciones de calidad del agua de EPANET: la opción Quality, que nombra el tipo de análisis de calidad del agua, y dos ajustes que acompañan a un producto químico, Relative diffusivity y Quality tolerance. Las tres se conservan y se usan. Aquí se calculan la edad del agua, el rastreo de fuente y un producto químico, y los dos ajustes del producto químico se usan cuando se ejecuta un producto químico. Todas se vuelven a escribir si guarda un archivo de EPANET.';
 $ec_lang['lpn_inp_drop_file_options']='Este archivo hace referencia a un archivo auxiliar: Map, que contiene coordenadas, o Hydraulics, que contiene resultados hidráulicos ya calculados. Esta página no puede abrir ninguno de los dos, así que esas líneas se conservan tal como están y se vuelven a escribir si guarda un archivo EPANET.';
 $ec_lang['lpn_inp_drop_other_options']='Este archivo indica opciones que esta página no lee. Nada aquí las usa. Se conservan y se vuelven a escribir si guarda un archivo EPANET.';
 $ec_lang['lpn_inp_drop_net_options']='Este archivo .net de EPANET indica ajustes para los que esta página no tiene control, así que sus valores se muestran aquí en lugar de incorporarse. Todo lo demás se incorporó. Si los necesita, abra el archivo en EPANET y use Archivo, Exportar, Network para guardarlo como archivo .inp, luego importe ese.';
@@ -2143,8 +2139,6 @@ $ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>Tecla
 // settings.colorFrozenBreaks in js/looped-network.js.
 $ec_lang['lpn_notes_color_term']='Los límites de las bandas de color permanecen iguales';
 $ec_lang['lpn_notes_color_def']='Los límites de las bandas de color se fijan cuando se elige un método de Asignación de rangos. No se vuelven a fijar en cada paso de tiempo, porque eso haría que los colores significaran algo nuevo en cada paso, y eso no ayuda a visualizar el sistema. EPANET funciona de la misma manera. Para obtener nuevos límites, elija un método de nuevo o ingrese límites propios.';
-$ec_lang['lpn_notes_epanet_term']='Las constantes de Hazen-Williams coinciden con EPANET';
-$ec_lang['lpn_notes_epanet_def']='En agosto de 2026 se cambiaron el coeficiente y el exponente de Hazen-Williams para coincidir con EPANET. Los resultados de pérdida de carga difieren de los de las versiones anteriores de esta página hasta en un 0,1 por ciento, mucho menos que la incertidumbre del propio valor de C.';
 $ec_lang['lpn_notes_engine_term']='Qué versión de EPANET usa esta página';
 $ec_lang['lpn_notes_engine_def']='El solucionador de EPANET de esta página es OWA-EPANET 2.3.5, publicado el 20 de febrero de 2025. EPANET lo desarrolla Open Water Analytics, una comunidad que trabaja con la Agencia de Protección Ambiental de los Estados Unidos, que publicó la versión 2.2.0 en diciembre de 2019. El informe de ejecución lo llama 2.3.05 porque el motor escribe el último número con dos dígitos. Llega a esta página a través de epanet-js 0.9.0 de Luke Butler, bajo licencia MIT, y funciona dentro de su navegador: su red nunca se envía a ningún lado para resolverse.';
 $ec_lang['lpn_id_invalid']='Ingrese un ID sin espacios y sin comillas.';
@@ -2286,9 +2280,9 @@ $ec_lang['lpn_field_desc']='Descripción';
 // page a Label is our own annotation and a Text is EPANET's label, and a third word in that
 // neighbourhood is the collision CLAUDE.md's vocabulary rule exists to stop. Tag is EPANET's own
 // word for this and a hydraulic engineer already knows it.
-$ec_lang['lpn_field_tag']='Etiqueta';
+$ec_lang['lpn_field_tag']='Marcador';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_field_tag_tip']='Una etiqueta puede tener el significado que usted necesite, como una zona de presión o una orden de trabajo. Ningún cálculo aquí ni en EPANET la lee. Una etiqueta es una sola palabra: EPANET deja de leer en el primer espacio, así que un espacio se rechaza al escribirlo. Se conserva al importar y al exportar el archivo de EPANET.';
+$ec_lang['lpn_field_tag_tip']='Un marcador puede tener el significado que usted necesite, como una zona de presión o una orden de trabajo. Ningún cálculo aquí ni en EPANET lo lee. Un marcador es una sola palabra: EPANET deja de leer en el primer espacio, así que un espacio se rechaza al escribirlo. Se conserva al importar y al exportar el archivo de EPANET.';
 $ec_lang['lpn_pump_effic_curve']='Curva de eficiencia de la bomba';
 $ec_lang['lpn_pump_effic_curve_tip']='La curva del cuadro Bibliotecas que indica qué tan eficiente es esta bomba en cada caudal. Varias bombas pueden usar la misma curva, y editarla allí cambia todas ellas. Esta bomba solo guarda la referencia; los puntos mismos se leen y se editan en Bibliotecas, Curvas.';
 // **THE STRINGS EVERY CURVE CONTROL SHARES** (Task 586). One chooser serves a pump's head curve, a
@@ -3103,7 +3097,7 @@ $ec_lang['lpn_settings_quality_track_tip']='Elija qué debe rastrear la ejecuci�
 $ec_lang['lpn_settings_quality_source']='Nodo de rastreo';
 $ec_lang['lpn_settings_quality_source_tip']='El nodo cuya agua se rastrea. Cada uno de los demás nodos muestra entonces el aporte de su agua que proviene de ese nodo.';
 $ec_lang['lpn_quality_none']='Nada';
-$ec_lang['lpn_quality_trace']='Rastreo de origen';
+$ec_lang['lpn_quality_trace']='Rastreo de fuente';
 $ec_lang['lpn_quality_chemical']='Un producto químico reactivo';
 $ec_lang['lpn_quality_needs_run']='La calidad del agua se transporta por las tuberías mientras el agua viaja, así que necesita una simulación de período extendido: el solucionador de EPANET y un tiempo total de simulación. Configure un Tiempo total de simulación en Tiempo, y luego presione el botón Calcular.';
 // **THE CHEMICAL / REACTION MODE** (ROADMAP Task 566, dev/water-quality.md). EPANET's own words
@@ -4103,7 +4097,7 @@ $ec_lang['lpn_profile_file_done']='Perfil leído del archivo: se encontraron {us
 $ec_lang['lpn_profile_file_missing']='Nombrados en el archivo pero no en esta red: {ids}.';
 $ec_lang['lpn_profile_file_short']='El archivo nombra menos de dos nodos de esta red, así que no hay perfil que dibujar.';
 $ec_lang['lpn_pgraph_none']='Este elemento no tiene resultados en la ejecución actual.';
-$ec_lang['lpn_pgraph_source_share_from']='Aporte de origen desde {node}';
+$ec_lang['lpn_pgraph_source_share_from']='Aporte de fuente desde {node}';
 $ec_lang['lpn_result_pump_head']='Carga';
 $ec_lang['lpn_result_pump_head_tip']='La carga que la bomba agrega de la succión a la descarga, mostrada como número positivo. El solucionador y los archivos de EPANET la manejan como una pérdida de carga negativa.';
 $ec_lang['lpn_report_pump_head']='Carga de la bomba';
@@ -4307,7 +4301,7 @@ $ec_lang['lpn_guide_find_results_def']='<p>Los elementos que coinciden se enumer
 $ec_lang['lpn_guide_find_replace_term']='Reemplazar y Deshacer';
 $ec_lang['lpn_guide_find_replace_def']='<p>La parte Cambiar lo encontrado del cuadro escribe una propiedad en todos los elementos que encontró la consulta. Elija la propiedad en la lista Propiedad para cambiar, ingrese el nuevo valor en el cuadro Nuevo valor en la unidad mostrada, y presione el botón Reemplazar. El cuadro indica entonces cuántos elementos cambiarían, sin contar los que ya tienen el nuevo valor. Presione el botón Cambiarlos para aplicar el cambio, o Cancelar. Un solo Deshacer revierte todo el reemplazo.</p><p>Ejemplo en Net1: <code>Pipe.Diameter below 10</code> encuentra las tuberías 31, 122, 113 y 121. Elija Diámetro, ingrese 10 y presione Reemplazar; el cuadro muestra "¿Cambiar 4 elementos?". Presione Cambiarlos para fijar las cuatro tuberías en 10 in. Un solo Deshacer las devuelve a 6 y 8 in.</p><p>Ejemplo en Net3: <code>Pipe.ID equal to \'247\'</code> encuentra la tubería 247. Elija Cerrada, elija Cerrada de nuevo en la lista Nuevo valor y presione Reemplazar y luego Cambiarlos, para cerrar la tubería en el ejemplo de conectividad anterior. Deshacer la abre de nuevo.</p><p>Reemplazar requiere un solo tipo de elemento, así que en Todo, primero elija un tipo de elemento en la lista Qué buscar. En un escenario distinto de Base, el reemplazo se almacena en ese escenario, como lo haría la misma edición en Propiedades. Donde hay elevaciones de Mapbox disponibles, Elevación se puede reemplazar desde el DEM de Mapbox en lugar de un valor escrito.</p>';
 $ec_lang['lpn_guide_find_notes_term']='Puntos a tener en cuenta';
-$ec_lang['lpn_guide_find_notes_def']='<ul><li>Los valores se comparan con precisión completa y se enumeran con cuatro decimales. Igual a rara vez coincide con un resultado calculado; use mayor que y menor que.</li><li>La presión, la carga, el caudal, la velocidad y los demás resultados son los del último cálculo. Con la opción Recalcular automáticamente desactivada, describen la red tal como estaba en el último Calcular.</li><li>Mayor que y menor que sobre texto usan el orden alfabético, con los números en orden numérico: en Net1, <code>Junction.ID above \'20\'</code> encuentra los nudos 21, 22, 23, 31 y 32.</li><li>En Todo, solo se ofrecen ID, Descripción, Etiqueta y Conectividad. Elija un tipo de elemento en la lista Qué buscar para ver su lista completa de propiedades.</li><li>Un elemento Texto no tiene ID. Se busca por sus palabras, como en <code>Text.Text contains \'pump\'</code>.</li><li>Las cuatro condiciones de Conectividad para un nodo son sin líneas en el nodo, sin líneas abiertas en el nodo, sin ruta de líneas hasta un origen y sin ruta abierta hasta un origen. Un origen es un embalse o un depósito.</li></ul>';
+$ec_lang['lpn_guide_find_notes_def']='<ul><li>Los valores se comparan con precisión completa y se enumeran con cuatro decimales. Igual a rara vez coincide con un resultado calculado; use mayor que y menor que.</li><li>La presión, la carga, el caudal, la velocidad y los demás resultados son los del último cálculo. Con la opción Recalcular automáticamente desactivada, describen la red tal como estaba en el último Calcular.</li><li>Mayor que y menor que sobre texto usan el orden alfabético, con los números en orden numérico: en Net1, <code>Junction.ID above \'20\'</code> encuentra los nudos 21, 22, 23, 31 y 32.</li><li>En Todo, solo se ofrecen ID, Descripción, Marcador y Conectividad. Elija un tipo de elemento en la lista Qué buscar para ver su lista completa de propiedades.</li><li>Un elemento Texto no tiene ID. Se busca por sus palabras, como en <code>Text.Text contains \'pump\'</code>.</li><li>Las cuatro condiciones de Conectividad para un nodo son sin líneas en el nodo, sin líneas abiertas en el nodo, sin ruta de líneas hasta un origen y sin ruta abierta hasta un origen. Un origen es un embalse o un depósito.</li></ul>';
 $ec_lang['lpn_guide_using_heading']='Uso del manual del usuario';
 $ec_lang['lpn_guide_keys_term']='Atajos de teclado del manual del usuario';
 $ec_lang['lpn_guide_keys_def']='<table class="lpn-notes-table"><tbody><tr><td>?</td><td>Abrir el manual del usuario en el control que está bajo el puntero o que tiene el foco.</td></tr><tr><td>F1</td><td>Abrir el manual del usuario en la entrada del cuadro que tiene el foco.</td></tr><tr><td>Ctrl+K</td><td>Abrir el manual del usuario con el texto seleccionado en el campo de búsqueda.</td></tr><tr><td>/</td><td>Seleccionar el campo de búsqueda mientras el manual del usuario tiene el foco.</td></tr><tr><td>Esc</td><td>Cerrar el manual del usuario y volver al punto donde estaba.</td></tr></tbody></table>';

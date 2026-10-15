@@ -580,10 +580,10 @@ $ec_lang['bpn_main_menu']='Rete di tubazioni ramificata';
 $ec_lang['bpn_main_title']='Calcolatore online gratuito di pressione per reti di tubazioni ramificate (senza anelli)';
 $ec_lang['bpn_main_desc']='Portata e pressione in rete di tubazioni ramificata (ad albero)';
 // Edited by TGH 2026-09-07
-$ec_lang['bpn_h_source_tip']='Carico statico di alimentazione: il carico della fonte a portata zero. Il livello dell\'acqua di un serbatoio o cisterna sopra la quota di alimentazione, oppure il carico a valvola chiusa di una pompa. Aggiungere i punti di alimentazione 2 e 3 per definire una pompa o una curva di alimentazione variabile; lo strumento legge il carico alla portata di progetto.';
+$ec_lang['bpn_h_source_tip']='Carico statico di alimentazione: il carico della sorgente a portata zero. Il livello dell\'acqua di un serbatoio o cisterna sopra la quota di alimentazione, oppure il carico a valvola chiusa di una pompa. Aggiungere i punti di alimentazione 2 e 3 per definire una pompa o una curva di alimentazione variabile; lo strumento legge il carico alla portata di progetto.';
 $ec_lang['bpn_elev_source']='Quota di alimentazione';
 $ec_lang['bpn_q_total']='Portata totale';
-$ec_lang['bpn_q_total_tip']='Portata totale in uscita dalla fonte (la somma di tutte le richieste della rete).';
+$ec_lang['bpn_q_total_tip']='Portata totale in uscita dalla sorgente (la somma di tutte le richieste della rete).';
 $ec_lang['bpn_p_min']='Pressione minima';
 $ec_lang['bpn_p_min_tip']='La pressione più bassa a valle in qualsiasi punto della rete; il punto critico di erogazione.';
 $ec_lang['bpn_method']='Metodo di attrito';
@@ -610,8 +610,8 @@ $ec_lang['bpn_p_down']='Press. valle';
 // Edited by TGH 2026-09-07
 $ec_lang['bpn_p_down_tip']='Carico di pressione relativa al nodo di valle di questo tratto. Un valore negativo (segnalato) indica pressione subatmosferica; verificare il progetto.';
 $ec_lang['bpn_sketch_heading']='Schema della rete';
-$ec_lang['bpn_source_label']='Fonte';
-$ec_lang['bpn_line_problem']='Questo tratto non è collegato alla fonte: punta a un ID a monte sconosciuto, punta a se stesso, ripete un ID già usato da un altro tratto, oppure forma un anello. I tratti non collegati restano irrisolti.';
+$ec_lang['bpn_source_label']='Sorgente';
+$ec_lang['bpn_line_problem']='Questo tratto non è collegato alla sorgente: punta a un ID a monte sconosciuto, punta a se stesso, ripete un ID già usato da un altro tratto, oppure forma un anello. I tratti non collegati restano irrisolti.';
 $ec_lang['bpn_bad_id_short']='ID non valido';
 
 
@@ -630,9 +630,9 @@ $ec_lang['bpn_supply2_q']='Portata di alimentazione 2';
 $ec_lang['bpn_supply2_h']='Carico di alimentazione 2';
 $ec_lang['bpn_supply3_q']='Portata di alimentazione 3';
 $ec_lang['bpn_supply3_h']='Carico di alimentazione 3';
-$ec_lang['bpn_supply_pt_tip']='Punti opzionali 2 e 3 della curva di alimentazione. Inserire una portata e un carico per ciascuno per modellare una pompa, o qualsiasi fonte il cui carico diminuisce erogando più portata; lo strumento legge il carico alla portata di progetto. Il punto 1 sopra è il carico statico a portata zero. Lasciare 2 e 3 vuoti per un carico di serbatoio costante.';
+$ec_lang['bpn_supply_pt_tip']='Punti opzionali 2 e 3 della curva di alimentazione. Inserire una portata e un carico per ciascuno per modellare una pompa, o qualsiasi sorgente il cui carico diminuisce erogando più portata; lo strumento legge il carico alla portata di progetto. Il punto 1 sopra è il carico statico a portata zero. Lasciare 2 e 3 vuoti per un carico di serbatoio costante.';
 $ec_lang['bpn_h_supply']='Carico di alimentazione';
-$ec_lang['bpn_h_supply_tip']='Carico della fonte alla portata di progetto, letto dalla curva di alimentazione. Coincide con il carico di fonte inserito quando la curva è piatta (un serbatoio).';
+$ec_lang['bpn_h_supply_tip']='Carico della sorgente alla portata di progetto, letto dalla curva di alimentazione. Coincide con il carico di sorgente inserito quando la curva è piatta (un serbatoio).';
 $ec_lang['bpn_supply1_h']='Carico statico di alimentazione';
 $ec_lang['lpn_main_menu']='Rete di distribuzione idrica';
 $ec_lang['lpn_main_title']='Modellazione online gratuita di reti di distribuzione idrica con il risolutore EPANET';
@@ -710,7 +710,7 @@ $ec_lang['lpn_customer_detached']='⚠ Questo cliente non è collegato a una tub
 $ec_lang['lpn_customer_fixed_head']='⚠ L\'estremità più vicina di quella tubazione ha una superficie dell\'acqua fissa, quindi questa richiesta non influisce sulla simulazione.';
 $ec_lang['lpn_customer_detached_count']='{n} clienti non sono collegati a una tubazione. La loro richiesta non è considerata.';
 $ec_lang['lpn_meter_pick_pipe']='Ora seleziona la tubazione o il nodo che serve questo cliente. Il cliente resta dove lo hai messo. Premi Esc per annullare.';
-$ec_lang['lpn_inp_export_flat_customers']='Un file EPANET non ha clienti. La richiesta dei {n} clienti di questo progetto è scritta come riga di richiesta sul nodo a cui ciascun cliente è assegnato, e ogni riga prende il nome dall\'etichetta identificativa del cliente. Il file non registra il cliente stesso: la sua posizione, la tubazione che lo serve, il punto lungo quella tubazione in cui il servizio si collega, o quanti servizi rappresenta. Queste informazioni restano nel progetto; salva il file di progetto per conservarle.';
+$ec_lang['lpn_inp_export_flat_customers']='Un file EPANET non ha clienti. La richiesta dei {n} clienti di questo progetto è scritta come riga di richiesta sul nodo a cui ciascun cliente è assegnato, e ogni riga prende il nome dal tag del cliente. Il file non registra il cliente stesso: la sua posizione, la tubazione che lo serve, il punto lungo quella tubazione in cui il servizio si collega, o quanti servizi rappresenta. Queste informazioni restano nel progetto; salva il file di progetto per conservarle.';
 
 $ec_lang['lpn_area_hint_window_start']='Indica un angolo della finestra.';
 $ec_lang['lpn_area_hint_window_go']='Indica l\'angolo opposto per terminare.';
@@ -1035,7 +1035,7 @@ $ec_lang['lpn_result_source_share_tip']='Quanta parte dell\'acqua che arriva in 
 // label composed at render time breaks in a gendered, a word-order and a right-to-left language,
 // which is the rule in CLAUDE.md under Concept-level label reuse.
 $ec_lang['lpn_result_avg_water_age']='Età media dell\'acqua';
-$ec_lang['lpn_result_avg_source_share']='Quota media della fonte';
+$ec_lang['lpn_result_avg_source_share']='Quota media della sorgente';
 $ec_lang['lpn_result_avg_concentration']='Concentrazione media';
 // EPANET's own two link report columns, in EPANET's own words. A friction factor is the
 // dimensionless Darcy-Weisbach f the head loss along this link works out to, whichever friction
@@ -1490,15 +1490,15 @@ $ec_lang['lpn_find_prop_demand_desc']='Descrizione di questa categoria di richie
 // recognise, and "is behind closed links" never said behind them RELATIVE TO WHAT. Do not restore.
 $ec_lang['lpn_find_op_conn_unlinked']='nessuna tubazione al nodo';
 $ec_lang['lpn_find_op_conn_noopen']='nessuna tubazione aperta al nodo';
-$ec_lang['lpn_find_op_conn_nolinksource']='nessun percorso verso una fonte';
-$ec_lang['lpn_find_op_conn_noopensource']='nessun percorso aperto verso una fonte';
+$ec_lang['lpn_find_op_conn_nolinksource']='nessun percorso verso una sorgente';
+$ec_lang['lpn_find_op_conn_noopensource']='nessun percorso aperto verso una sorgente';
 // What a result row prints beside the node id: the fault it has, in three words.
 // What a result row prints beside the id: the NARROWEST condition true of that node, because "no
 // links" says more than "no open path to a source" and both are true of the same node.
 // "None" is the good news a report is run for, so it is said out loud rather than left as a blank
 // box.
 $ec_lang['lpn_find_conn_none']='Ogni nodo è collegato.';
-$ec_lang['lpn_find_conn_no_fixed']='Questa rete non ha un serbatoio o una vasca, quindi non c\'è una fonte da raggiungere. Si possono cercare solo nessuna tubazione al nodo e nessuna tubazione aperta al nodo.';
+$ec_lang['lpn_find_conn_no_fixed']='Questa rete non ha un serbatoio o una vasca, quindi non c\'è una sorgente da raggiungere. Si possono cercare solo nessuna tubazione al nodo e nessuna tubazione aperta al nodo.';
 // Task 540: the query written as one line, above the Find button -- and typed into. The controls
 // write it and it writes the controls, so it teaches the shape of a search by being operated from
 // either end.
@@ -1811,7 +1811,7 @@ $ec_lang['lpn_inp_drop_quality']='Questo file descrive la qualità dell\'acqua: 
 $ec_lang['lpn_inp_drop_sources_mixing']='Questo file indica dove una sostanza chimica viene iniettata nella rete e come si mescola l\'acqua in ogni vasca. Ogni sorgente è mostrata sul nodo in cui è applicata, e ogni vasca mostra il proprio modello di miscelazione. Entrambi sono usati quando la rete viene simulata su una durata totale della simulazione.';
 $ec_lang['lpn_inp_drop_energy']='Questo file EPANET include dati di modellazione del costo di pompaggio. Questa pagina li legge e li usa. Calcola il modello con il motore EPANET, poi apri Acqua, Rapporti, Energia delle pompe per vedere per quanto tempo ogni pompa ha funzionato, la potenza assorbita, l\'energia usata e quanto è costata. Le righe sono conservate, e sono riscritte se salvi un file EPANET.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_inp_drop_tags']='Questo file assegna etichette identificative ad alcuni nodi, tubazioni o altri elementi. Ogni etichetta identificativa è stata importata e compare nelle proprietà del proprio elemento, dove può essere visualizzata o modificata.';
+$ec_lang['lpn_inp_drop_tags']='Questo file assegna tag ad alcuni nodi, tubazioni o altri elementi. Ogni tag è stato importato e compare nelle proprietà del proprio elemento, dove può essere visualizzato o modificato.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_inp_drop_report']='Questo file contiene impostazioni di formato del rapporto di EPANET. Il rapporto della simulazione è disponibile in Rapporti, Calcolo, ma usa il formato standard di EPANET invece di quello specificato da queste impostazioni. Le righe sono conservate e sono riscritte se salvi un file EPANET.';
 $ec_lang['lpn_inp_drop_sections']='Questo file contiene una sezione che questa pagina non legge affatto. Nulla qui la usa. È conservata per intero, ed è riscritta se salvi un file EPANET.';
@@ -2100,8 +2100,6 @@ $ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>Tasti
 // settings.colorFrozenBreaks in js/looped-network.js.
 $ec_lang['lpn_notes_color_term']='I limiti delle fasce di colore restano gli stessi';
 $ec_lang['lpn_notes_color_def']='I limiti delle fasce di colore vengono impostati quando scegli un metodo di classificazione dei dati. Non vengono impostati di nuovo a ogni passo temporale, perché ciò farebbe sì che i colori assumano un significato nuovo a ogni passo, il che non aiuta a visualizzare il tuo sistema. EPANET funziona allo stesso modo. Per ottenere nuovi limiti, scegli di nuovo un metodo oppure digita i tuoi limiti.';
-$ec_lang['lpn_notes_epanet_term']='Le costanti di Hazen-Williams corrispondono a EPANET';
-$ec_lang['lpn_notes_epanet_def']='Nell\'agosto 2026 il coefficiente e l\'esponente di Hazen-Williams sono stati modificati per corrispondere a EPANET. I risultati di perdita di carico differiscono dalle versioni precedenti di questa pagina fino allo 0,1 percento, un valore molto più piccolo dell\'incertezza sul valore di C stesso.';
 $ec_lang['lpn_notes_engine_term']='Quale EPANET esegue questa pagina';
 $ec_lang['lpn_notes_engine_def']='Il risolutore EPANET di questa pagina è OWA-EPANET 2.3.5, rilasciato il 20 febbraio 2025. EPANET è sviluppato da Open Water Analytics, una comunità che collabora con l\'Agenzia per la protezione dell\'ambiente degli Stati Uniti (EPA), che ha rilasciato la versione 2.2.0 nel dicembre 2019. Il rapporto di calcolo lo chiama 2.3.05 perché il motore scrive l\'ultimo numero con due cifre. Raggiunge questa pagina tramite epanet-js 0.9.0 di Luke Butler, sotto licenza MIT, e viene eseguito all\'interno del tuo browser: la tua rete non viene mai inviata altrove per essere risolta.';
 $ec_lang['lpn_id_invalid']='Inserisci un ID senza spazi e senza virgolette.';
@@ -2243,9 +2241,9 @@ $ec_lang['lpn_field_desc']='Descrizione';
 // page a Label is our own annotation and a Text is EPANET's label, and a third word in that
 // neighbourhood is the collision CLAUDE.md's vocabulary rule exists to stop. Tag is EPANET's own
 // word for this and a hydraulic engineer already knows it.
-$ec_lang['lpn_field_tag']='Etichetta';
+$ec_lang['lpn_field_tag']='Tag';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_field_tag_tip']='Un\'etichetta può avere qualunque significato ti serva, per esempio una zona di pressione o un ordine di lavoro. Nessun calcolo qui o in EPANET la legge. Un\'etichetta è una sola parola: EPANET smette di leggere al primo spazio, quindi uno spazio viene rifiutato mentre lo digiti. Viene importata ed esportata nel file EPANET.';
+$ec_lang['lpn_field_tag_tip']='Un tag può avere qualunque significato ti serva, per esempio una zona di pressione o un ordine di lavoro. Nessun calcolo qui o in EPANET lo legge. Un tag è una sola parola: EPANET smette di leggere al primo spazio, quindi uno spazio viene rifiutato mentre lo digiti. Viene importato ed esportato nel file EPANET.';
 $ec_lang['lpn_pump_effic_curve']='Curva di efficienza della pompa';
 $ec_lang['lpn_pump_effic_curve_tip']='La curva nella finestra Librerie che indica l\'efficienza di questa pompa a ogni portata. Più pompe possono usare la stessa curva, e modificarla lì cambia tutte le pompe. Questa pompa contiene solo il riferimento; i punti stessi si leggono e si modificano in Librerie, Curve.';
 // **THE STRINGS EVERY CURVE CONTROL SHARES** (Task 586). One chooser serves a pump's head curve, a
@@ -4306,7 +4304,7 @@ $ec_lang['lpn_guide_find_results_def']='<p>Gli elementi corrispondenti sono elen
 $ec_lang['lpn_guide_find_replace_term']='Sostituisci e Annulla';
 $ec_lang['lpn_guide_find_replace_def']='<p>La parte Modifica ciò che è stato trovato del riquadro scrive una proprietà su ogni elemento trovato dalla ricerca. Scegli la proprietà nell\'elenco Proprietà da modificare, inserisci il nuovo valore nel campo Nuovo valore nell\'unità visualizzata e premi il pulsante Sostituisci. Il riquadro indica poi quanti elementi cambierebbero, esclusi quelli che hanno già il nuovo valore. Premi il pulsante Modificali per applicare la modifica, oppure Annulla. Un solo Annulla ripristina l\'intera sostituzione.</p><p>Esempio su Net1: <code>Pipe.Diameter below 10</code> trova le tubazioni 31, 122, 113 e 121. Scegli Diametro, inserisci 10 e premi Sostituisci; il riquadro mostra "Modificare 4 elementi?". Premi Modificali per portare tutte e quattro le tubazioni a 10 in. Un solo Annulla le riporta a 6 e 8 in.</p><p>Esempio su Net3: <code>Pipe.ID equal to \'247\'</code> trova la tubazione 247. Scegli Chiusa, scegli di nuovo Chiusa nell\'elenco Nuovo valore, e premi Sostituisci, poi Modificali, per chiudere la tubazione per l\'esempio di connettività qui sopra. Annulla la riapre.</p><p>Sostituisci richiede un solo tipo di elemento, quindi sotto Tutto scegli prima un tipo di elemento nell\'elenco Cosa cercare. In uno scenario diverso da Base, una sostituzione è memorizzata in quello scenario, come lo sarebbe la stessa modifica in Proprietà. Dove sono disponibili le quote Mapbox, la Quota può essere sostituita dal DEM Mapbox invece che da un valore digitato.</p>';
 $ec_lang['lpn_guide_find_notes_term']='Punti da tenere presenti';
-$ec_lang['lpn_guide_find_notes_def']='<ul><li>I valori sono confrontati a piena precisione ed elencati con quattro cifre decimali. Uguale a raramente corrisponde a un risultato calcolato; usa maggiore di e minore di.</li><li>Pressione, carico, portata, velocità e gli altri risultati sono quelli dell\'ultimo calcolo. Con l\'impostazione Ricalcola automaticamente deselezionata, descrivono la rete com\'era all\'ultimo Calcola.</li><li>Maggiore di e minore di sul testo usano l\'ordine alfabetico, con i numeri in ordine numerico: su Net1, <code>Junction.ID above \'20\'</code> trova i nodi 21, 22, 23, 31 e 32.</li><li>Sotto Tutto sono offerti solo ID, Descrizione, Etichetta e Connettività. Scegli un tipo di elemento nell\'elenco Cosa cercare per vedere l\'elenco completo delle sue proprietà.</li><li>Un elemento Testo non ha un ID. Cercalo per le sue parole, come in <code>Text.Text contains \'pump\'</code>.</li><li>Le quattro condizioni di connettività per un nodo sono nessuna tubazione al nodo, nessuna tubazione aperta al nodo, nessun percorso verso una fonte e nessun percorso aperto verso una fonte. Una fonte è un serbatoio o una vasca.</li></ul>';
+$ec_lang['lpn_guide_find_notes_def']='<ul><li>I valori sono confrontati a piena precisione ed elencati con quattro cifre decimali. Uguale a raramente corrisponde a un risultato calcolato; usa maggiore di e minore di.</li><li>Pressione, carico, portata, velocità e gli altri risultati sono quelli dell\'ultimo calcolo. Con l\'impostazione Ricalcola automaticamente deselezionata, descrivono la rete com\'era all\'ultimo Calcola.</li><li>Maggiore di e minore di sul testo usano l\'ordine alfabetico, con i numeri in ordine numerico: su Net1, <code>Junction.ID above \'20\'</code> trova i nodi 21, 22, 23, 31 e 32.</li><li>Sotto Tutto sono offerti solo ID, Descrizione, Etichetta e Connettività. Scegli un tipo di elemento nell\'elenco Cosa cercare per vedere l\'elenco completo delle sue proprietà.</li><li>Un elemento Testo non ha un ID. Cercalo per le sue parole, come in <code>Text.Text contains \'pump\'</code>.</li><li>Le quattro condizioni di connettività per un nodo sono nessuna tubazione al nodo, nessuna tubazione aperta al nodo, nessun percorso verso una sorgente e nessun percorso aperto verso una sorgente. Una fonte è un serbatoio o una vasca.</li></ul>';
 $ec_lang['lpn_guide_using_heading']='Uso della guida';
 $ec_lang['lpn_guide_keys_term']='Scorciatoie da tastiera della guida';
 $ec_lang['lpn_guide_keys_def']='<table class="lpn-notes-table"><tbody><tr><td>?</td><td>Apre la guida sul controllo sotto il puntatore o che ha il focus.</td></tr><tr><td>F1</td><td>Apre la guida sulla voce del riquadro che ha il focus.</td></tr><tr><td>Ctrl+K</td><td>Apre la guida con il testo selezionato nel campo di ricerca.</td></tr><tr><td>/</td><td>Seleziona il campo di ricerca mentre la guida ha il focus.</td></tr><tr><td>Esc</td><td>Chiude la guida e torna al punto in cui ci si trovava.</td></tr></tbody></table>';

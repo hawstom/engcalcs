@@ -72,10 +72,10 @@ console.log('\n-- Task 745: the Help menu is three groups, divided by two separa
 	report(group2At.every((v, i) => i === 0 || v > group2At[i - 1]), 'group 2 stands in Tom\'s order');
 
 	// Group 3, true about.
-	const group3 = ['lpn_help_welcome', 'lpn_help_screenshots', 'privacy_link',
+	const group3 = ['lpn_help_welcome', 'lpn_help_screenshots', 'menu_brand', 'privacy_link',
 		'terms_link', 'about_main_menu'];
 	const group3At = group3.map(k => rows.indexOf('pc.' + k));
-	report(group3At.every(i => i > sep2), 'group 3 (Welcome, Screenshot, Privacy, Terms, About) is entirely after the second separator');
+	report(group3At.every(i => i > sep2), 'group 3 (Welcome, Screenshot, HawsEDC Calculators, Privacy, Terms, About) is entirely after the second separator');
 	report(group3At.every((v, i) => i === 0 || v > group3At[i - 1]), 'group 3 stands in Tom\'s order');
 
 	// Every row named by Tom is present; every row NOT named by him that Help used to carry (there

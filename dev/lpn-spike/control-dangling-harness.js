@@ -12,9 +12,11 @@
 // checks BOTH halves of the coupling:
 //
 //   * a control whose element was deleted does not reach the model block, and the run survives;
-//   * the same control forced back into the block DOES take the run down -- which is the assertion
-//     that keeps the first one honest. Without it this harness would still pass if EPANET quietly
-//     tolerated a dangling control, and the guard would be untested ceremony.
+//   * the same control forced back into the block is left out again by js/lpn-epanet.js's writer,
+//     the second guard, and said (`control-inactive`);
+//   * the line itself, handed to EPANET as text, IS refused -- which is the assertion that keeps
+//     the first two honest. Without it this harness would still pass if EPANET quietly tolerated a
+//     dangling control, and the guards would be untested ceremony.
 //
 // Net3 is the network because its six controls cover both sides of the question: two name a link
 // and a time, four name a link AND the tank node they watch.
@@ -108,18 +110,33 @@ function check(ok, msg, detail) {
 	check(good.ok, 'and the document holding a dangling control RUNS');
 	if (!good.ok) { console.log(JSON.stringify(good.issues || good)); }
 
-	// The same run with the dangling sentence forced back into the block. This must FAIL, or the
-	// guard above is protecting against nothing and this harness proves nothing.
+	// The same run with the dangling sentence forced back into the block. js/lpn-epanet.js's own
+	// writer is the second guard (Tom, 2026-10-14: a control on a pump switched off in a scenario
+	// refused the run): a control naming a link the model lacks is not written, and is reported.
+	const forced = Object.assign({}, model, {
+		time: Object.assign({}, model.time, { controls: model.time.controls.concat([dangling]) })
+	});
+	const built = EngCalcs.lpnToInp(forced, { eps: true });
+	const w = (built.warnings || []).find((x) => x.code === 'control-inactive');
+	check(!/LINK GONE/.test(built.inp) && !!w && w.ids.indexOf('GONE') >= 0,
+		'forced back into the block, the writer still leaves it out and says so', JSON.stringify(w));
+	const forcedRun = await EngCalcs.lpnEpanetRun(forced);
+	check(forcedRun.ok, '...so that run RUNS too', forcedRun.ok ? '' : String(forcedRun.engineError));
+
+	// And the line itself, handed to EPANET as text, must be REFUSED, or both guards protect
+	// against nothing and this harness proves nothing. A Workspace of its own: closing a refused
+	// Project damages the engine it is in (see retireEngine() in js/lpn-epanet.js).
 	let ran = false, why = '';
 	try {
-		const bad = await EngCalcs.lpnEpanetRun(Object.assign({}, model, {
-			time: Object.assign({}, model.time, { controls: model.time.controls.concat([dangling]) })
-		}));
-		ran = !!(bad && bad.ok);
-		why = ran ? '' : JSON.stringify((bad && bad.issues) || bad);
+		const mod = await EngCalcs.lpnEpanetLoad();
+		const ws = new mod.Workspace();
+		await ws.loadModule();
+		ws.writeFile('bad.inp', built.inp.replace('[CONTROLS]\n', '[CONTROLS]\n LINK GONE OPEN AT TIME 1:00\n'));
+		const p = new mod.Project(ws);
+		p.open('bad.inp', 'bad.rpt', 'bad.out');
+		ran = true;
 	} catch (e) { why = String(e && e.message || e); }
-	check(!ran, 'while the SAME run with the dangling control put back is rejected by EPANET',
-		ran ? 'it ran -- EPANET tolerated it, so the guard is untested' : why);
+	check(!ran && /20[04]/.test(why), 'while EPANET itself rejects that line', ran ? 'it opened -- EPANET tolerated it, so the guards are untested' : why);
 
 	console.log(failures ? `\n${failures} FAILED` : '\nall checks passed');
 	process.exit(failures ? 1 : 0);

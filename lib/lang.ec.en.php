@@ -177,8 +177,6 @@ $ec_lang['hw_pressure_neg_short']='Negative pressure';
 $ec_lang['hw_pressure_neg']='Downstream pressure is below zero. The hydraulic grade line falls below the pipe, so the pipe would not flow full and this result may not be valid.';
 $ec_lang['hw_roughness']='Hazen-Williams coefficient, C';
 $ec_lang['hw_note_1']='<dl><dt>This calculator does not model the pipe profile between the two ends.</dt><dd>It uses only the upstream and downstream elevations you enter. If the ground rises higher than either end somewhere in between, the pressure at that high point is lower than any pressure reported here. Run the calculator again for the length from the upstream end to the high point to check it.</dd><dd>Where the hydraulic grade line falls below the pipe, the water is under negative pressure. Air comes out of solution, a thin-walled pipe can collapse, and dirty groundwater can be drawn in through the joints. Keep the line under positive pressure everywhere, and consider an air valve at each high point.</dd><dt>The upstream pressure is a boundary condition you supply.</dt><dd>Read it from a gauge, from a tank water level (the height of water above the pipe), or from a pump curve. A pump delivers less pressure as flow rises, so use the point on the curve that matches the flow entered above.</dd><dt>Add up the minor (local) loss coefficients yourself.</dt><dd>Total the K values for every valve, bend, tee, meter, and entrance on the line, and enter that total. Follow the link on that input for typical values. On a long transmission main these losses are small next to friction, but in short station piping they can be most of the loss.</dd></dl>';
-$ec_lang['hw_notes_epanet_term']='Hazen-Williams constants now match EPANET (August 2026)';
-$ec_lang['hw_notes_epanet_def']='In August 2026 the Hazen-Williams coefficient and exponent were changed to match EPANET. Head loss results differ from earlier versions of this page by up to 0.1 percent, which is far smaller than the uncertainty in the C value itself.';
 // Manning Irregular
 $ec_lang['mi_menu']='Manning Irregular Channel';
 $ec_lang_syn['mi_menu']='| gloss: irregular channel';
@@ -748,8 +746,6 @@ $ec_lang['bpn_notes_2_term']='Branched networks only, no loops';
 $ec_lang['bpn_notes_2_def']='Every line has exactly one upstream line (a tree). This tool does not solve looped networks, which require iterative methods (EPANET or similar). Because the network has no loops, the solution is direct and exact.';
 $ec_lang['bpn_notes_3_term']='No active pressure controls';
 $ec_lang['bpn_notes_3_def']='You can add a fixed minor-loss valve (a k-value), but not pressure-reducing or pressure-sustaining valves (PRV/PSV). Their open/closed state depends on flow and pressure, which would force iteration.';
-$ec_lang['bpn_notes_epanet_term']='Hazen-Williams constants now match EPANET (August 2026)';
-$ec_lang['bpn_notes_epanet_def']='In August 2026 the Hazen-Williams coefficient and exponent were changed to match EPANET. Head loss results differ from earlier versions of this page by up to 0.1 percent, which is far smaller than the uncertainty in the C value itself.';
 $ec_lang['bpn_supply2_q']='Supply flow 2';
 $ec_lang['bpn_supply2_h']='Supply head 2';
 $ec_lang['bpn_supply3_q']='Supply flow 3';
@@ -2298,6 +2294,7 @@ $ec_lang['lpn_inp_drop_tags']='This file assigns tags to some junctions, pipes, 
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_inp_drop_report']='This file contains EPANET report-format settings. The run report is available under Reports, Run, but it uses the standard EPANET format rather than the format these settings specify. The lines are kept and are written back if you save an EPANET file.';
 $ec_lang['lpn_inp_drop_sections']='This file holds a section that this page does not read at all. Nothing here uses it. It is kept whole, and it is written back if you save an EPANET file.';
+$ec_lang['lpn_inp_drop_comments']='These comment lines in the patterns or simple controls of this file were not imported, because this page has no place to keep them (for example, between the rows of one pattern). Every pattern and control was imported in full.';
 $ec_lang['lpn_inp_drop_quality_options']='This file states EPANET water quality options: the Quality option, which names the kind of water quality analysis, and two settings that go with a chemical, Relative diffusivity and Quality tolerance. All three are kept and used. Water age, source trace, and a chemical are each computed here, and the two chemical settings are used when a chemical is run. All of them are written back if you save an EPANET file.';
 $ec_lang['lpn_inp_drop_file_options']='This file refers to an auxiliary file: Map, which holds coordinates, or Hydraulics, which holds previously computed hydraulics. This page cannot open either, so the lines are kept as they are and written back if you save an EPANET file.';
 $ec_lang['lpn_inp_drop_other_options']='This file states options this page does not read. Nothing here uses them. They are kept and are written back if you save an EPANET file.';
@@ -2602,8 +2599,6 @@ $ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>Arrow
 // settings.colorFrozenBreaks in js/looped-network.js.
 $ec_lang['lpn_notes_color_term']='Color band boundaries stay the same';
 $ec_lang['lpn_notes_color_def']='Color band boundaries are set when you choose a data classification method. They are not set again at each time step, because that would make the colors mean something new at every step, and that is not helpful for visualizing your system. EPANET works the same way. To get new boundaries, choose a method again or enter your own boundaries.';
-$ec_lang['lpn_notes_epanet_term']='Hazen-Williams constants match EPANET';
-$ec_lang['lpn_notes_epanet_def']='In August 2026 the Hazen-Williams coefficient and exponent were changed to match EPANET. Head loss results differ from earlier versions of this page by up to 0.1 percent, which is far smaller than the uncertainty in the C value itself.';
 $ec_lang['lpn_notes_engine_term']='Which EPANET this page runs';
 $ec_lang['lpn_notes_engine_def']='The EPANET solver on this page is OWA-EPANET 2.3.5, released on 20 February 2025. EPANET is developed by Open Water Analytics, a community that works with the United States Environmental Protection Agency, which released version 2.2.0 in December 2019. The run report calls it 2.3.05 because the engine writes the last number in two digits. It is delivered to this page through epanet-js 0.9.0 by Luke Butler, under the MIT license, and it runs in the browser: the network is never sent to a server to be solved.';
 $ec_lang['lpn_id_invalid']='Enter an ID with no spaces and no quotation marks.';
@@ -2670,6 +2665,8 @@ $ec_lang['lpn_field_roughness']='Roughness';
 // selector lands (see numberFieldPlain()'s own note).
 $ec_lang['lpn_field_roughness_tip']='Hazen-Williams C. A higher number means a smoother pipe: about 150 for new plastic, 130 for new steel or iron, and 100 for old pipe.';
 $ec_lang['lpn_field_length']='Length';
+// Task 643 (Tom, 2026-10-14): an Auto length is the slope distance. No claim about accuracy (Task 641).
+$ec_lang['lpn_field_length_slope_tip']='Pipe length. When Auto is checked, the length is measured along the slope: the drawn length combined with the difference in elevation between the two end nodes.';
 $ec_lang['lpn_field_from']='From';
 $ec_lang['lpn_field_to']='To';
 // Tom, 2026-10-09: From and To are editable text. Said in the box a refused ID is said in.
@@ -3404,6 +3401,9 @@ $ec_lang['lpn_engine_refused']='The EPANET solver rejected this network, so the 
 // is the only part a user can act on, and nothing of ours could reconstruct it.
 $ec_lang['lpn_engine_refused_why']='EPANET solver message: {message}';
 $ec_lang['lpn_engine_refused_fallback']='The numbers on screen came from the built-in solver instead.';
+// A run EPANET started and could not finish, for example when a tank empties and the junctions it
+// fed have no other source (Error 110). {time} is the run time it stopped at, H:MM.
+$ec_lang['lpn_time_run_stopped']='The EPANET run stopped at {time}, so it has no results. Its run report says why.';
 // The run's own version of that last sentence: a period run has a moment and a tank level to name,
 // and a one-moment solve does not, which is where the shared label stops.
 $ec_lang['lpn_time_run_fell_back']='The numbers on screen came from the built-in solver instead. It solves one instant at a time, so this is the network at {time} only, with every tank at its initial level.';
@@ -4784,4 +4784,5 @@ $ec_lang['lpn_snip_tip_pen']='Pen';
 $ec_lang['lpn_snip_tip_eraser']='Eraser: click a stroke to remove it (E)';
 $ec_lang['lpn_snip_tip_undo']='Undo (Ctrl+Z)';
 $ec_lang['lpn_snip_tip_redo']='Redo (Ctrl+Y)';
+$ec_lang['lpn_snip_tip_copy']='Copy (Ctrl+C)';
 $ec_lang['lpn_screenshot_scale_tip']='The picture\'s size as a multiple of the area on the screen. A larger one is sharper and makes a bigger file.';

@@ -44,7 +44,7 @@ console.log('\n-- the Notes are still CONTENT, not a JS string --');
 	// Every note is still a real <dt>/<dd> pair emitted by PHP from a lang key. If these ever move
 	// into JS they leave the indexable document, and no other check would notice.
 	const dts = (page.match(/<dt><\?=\$ec_lang\['lpn_notes_/g) || []).length;
-	report(dts >= 9, 'every note is still PHP-rendered markup in the page', `${dts} terms`);
+	report(dts >= 8, 'every note is still PHP-rendered markup in the page', `${dts} terms`);
 	report(page.indexOf('data-guide-section="notes"') > 0, 'and the Guide has a Notes section');
 	// **THE TABLE NOTE SPLIT INTO TWO TABLES** (Tom, 2026-09-26: reorganize the one list into two
 	// two-column tables, "Table columns help" and "Table keyboard shortcuts"). lpn_notes_6 is the
@@ -347,14 +347,14 @@ console.log('\n-- the strings exist --');
 	report(en.indexOf(`$ec_lang['${k}']`) >= 0, `${k} is in lang.ec.en.php`);
 });
 
-console.log('\n-- the Notes trim (Tom, 2026-10-06): five advisories stay, two scope notes move to About, the tour is gone --');
+console.log('\n-- the Notes trim (Tom, 2026-10-06): four advisories stay, two scope notes move to About, the tour is gone --');
 {
 	const grab = (id, len) => { const at = page.indexOf('id="' + id + '"'); return page.slice(at, at + len); };
 	const notesAt = page.indexOf('data-guide-section="notes"');
 	const notes = page.slice(notesAt, page.indexOf('</dl>', notesAt));
 	const keys = (notes.match(/<dt><\?=\$ec_lang\['(lpn_notes_\w+?)_term'\]/g) || []).map(m => m.replace(/.*\['|_term.*/g, ''));
-	report(JSON.stringify(keys) === JSON.stringify(['lpn_notes_3', 'lpn_notes_5', 'lpn_notes_color', 'lpn_notes_epanet', 'lpn_notes_engine']),
-		'the Guide\'s Notes section shows exactly the five kept notes', keys.join(','));
+	report(JSON.stringify(keys) === JSON.stringify(['lpn_notes_3', 'lpn_notes_5', 'lpn_notes_color', 'lpn_notes_engine']),
+		'the Guide\'s Notes section shows exactly the four kept notes', keys.join(','));
 	const aboutAt = page.indexOf('id="lpn_about_popup"');
 	const about = page.slice(aboutAt, page.indexOf('<div id="lpn_hotkeys_popup"'));
 	const guideAbout = page.indexOf('data-guide-section="about"');

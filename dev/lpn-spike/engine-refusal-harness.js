@@ -91,11 +91,12 @@ async function refusalSection() {
 	const model = buildModel(EngCalcs, parsed);
 	await EngCalcs.lpnEpanetLoad(ENGINE);
 
-	// The control the page drops: a sentence naming a link nobody drew. Forced back in, because
-	// the guard is only worth testing if what it guards against is real.
-	const dangling = { link: 'GONE', action: { status: 'open' }, condition: { kind: 'time', seconds: 3600 } };
+	// An input EPANET refuses that no guard of ours removes: a junction on a pattern the file does
+	// not have (Error 205). (A control naming a link nobody drew used to be the example; since
+	// 2026-10-14 js/lpn-epanet.js's writer leaves such a control out itself.)
 	const bad = Object.assign({}, model, {
-		time: Object.assign({}, model.time, { controls: model.time.controls.concat([dangling]) })
+		nodes: model.nodes.map((n, i) => (i === model.nodes.findIndex((m) => m.type === 'junction')
+			? Object.assign({}, n, { demandPattern: 'NO-SUCH-PATTERN' }) : n))
 	});
 
 	let threw = '';

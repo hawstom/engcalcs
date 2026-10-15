@@ -1968,7 +1968,6 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 	<dt><?=$ec_lang['lpn_notes_3_term']?></dt><dd><?=$ec_lang['lpn_notes_3_def']?></dd>
 	<dt><?=$ec_lang['lpn_notes_5_term']?></dt><dd><?=$ec_lang['lpn_notes_5_def']?></dd>
 	<dt><?=$ec_lang['lpn_notes_color_term']?></dt><dd><?=$ec_lang['lpn_notes_color_def']?></dd>
-	<dt><?=$ec_lang['lpn_notes_epanet_term']?></dt><dd><?=$ec_lang['lpn_notes_epanet_def']?></dd>
 	<dt><?=$ec_lang['lpn_notes_engine_term']?></dt><dd><?=$ec_lang['lpn_notes_engine_def']?></dd>
 </dl>
 </section>
@@ -2835,6 +2834,7 @@ EngCalcs.pageConfig = {
 	// of these tables now reads from (Task 500). The KEYS here are the pageConfig contract.
 	lpn_roughness_urls: <?=json_encode(ecRefRoughnessUrls())?>,
 	lpn_field_length: <?=json_encode($ec_lang['lpn_field_length'])?>,
+	lpn_field_length_slope_tip: <?=json_encode($ec_lang['lpn_field_length_slope_tip'])?>,
 	lpn_field_from: <?=json_encode($ec_lang['lpn_field_from'])?>,
 	lpn_link_end_unknown: <?=json_encode($ec_lang['lpn_link_end_unknown'])?>,
 	lpn_link_end_same: <?=json_encode($ec_lang['lpn_link_end_same'])?>,
@@ -3246,6 +3246,7 @@ EngCalcs.pageConfig = {
 	lpn_snip_tip_eraser: <?=json_encode($ec_lang['lpn_snip_tip_eraser'])?>,
 	lpn_snip_tip_undo: <?=json_encode($ec_lang['lpn_snip_tip_undo'])?>,
 	lpn_snip_tip_redo: <?=json_encode($ec_lang['lpn_snip_tip_redo'])?>,
+	lpn_snip_tip_copy: <?=json_encode($ec_lang['lpn_snip_tip_copy'])?>,
 	lpn_screenshot_scale_tip: <?=json_encode($ec_lang['lpn_screenshot_scale_tip'])?>,
 	lpn_tool_zoom_selection_tip: <?=json_encode($ec_lang['lpn_tool_zoom_selection_tip'])?>,
 	lpn_tool_zoom_window_tip: <?=json_encode($ec_lang['lpn_tool_zoom_window_tip'])?>,
@@ -3552,6 +3553,7 @@ EngCalcs.pageConfig = {
 	lpn_inp_drop_tags: <?=json_encode($ec_lang['lpn_inp_drop_tags'])?>,
 	lpn_inp_drop_report: <?=json_encode($ec_lang['lpn_inp_drop_report'])?>,
 	lpn_inp_drop_sections: <?=json_encode($ec_lang['lpn_inp_drop_sections'])?>,
+	lpn_inp_drop_comments: <?=json_encode($ec_lang['lpn_inp_drop_comments'])?>,
 	lpn_inp_drop_quality_options: <?=json_encode($ec_lang['lpn_inp_drop_quality_options'])?>,
 	lpn_inp_drop_file_options: <?=json_encode($ec_lang['lpn_inp_drop_file_options'])?>,
 	lpn_inp_drop_other_options: <?=json_encode($ec_lang['lpn_inp_drop_other_options'])?>,
@@ -3927,6 +3929,7 @@ EngCalcs.pageConfig = {
 	lpn_engine_refused: <?=json_encode($ec_lang['lpn_engine_refused'])?>,
 	lpn_engine_refused_why: <?=json_encode($ec_lang['lpn_engine_refused_why'])?>,
 	lpn_engine_refused_fallback: <?=json_encode($ec_lang['lpn_engine_refused_fallback'])?>,
+	lpn_time_run_stopped: <?=json_encode($ec_lang['lpn_time_run_stopped'])?>,
 	lpn_control_dangling_note: <?=json_encode($ec_lang['lpn_control_dangling_note'])?>,
 	lpn_control_unreadable_note: <?=json_encode($ec_lang['lpn_control_unreadable_note'])?>,
 	lpn_rule_dangling_note: <?=json_encode($ec_lang['lpn_rule_dangling_note'])?>,

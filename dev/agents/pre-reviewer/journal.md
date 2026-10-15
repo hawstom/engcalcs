@@ -4345,3 +4345,18 @@ also read the live document and the status bar before calling it a defect.
 - OBSERVED (branch CSS vs merge-base CSS injected into same page): button-base changes are nearly invisible at 1400 and 390; tool corner radius 4 to 5 px, Tab focus ring is now blue and rounded instead of the browser's black rectangle; transport and menus unchanged. Dialog buttons not touched by selectors.
 - OBSERVED: Net1 SI opens with L/s, m, mm in Tables, footer and labels; pump curve 94.635 L/s at 76.2 m; rule thresholds 40.538/36.576 m, controls 33.528/42.672 m; tank rises 36.576 to 40.955 m then pump closes at step 10. Scale bar reads 5 m on a 21 m drawing whose pipes are 1609 m (same as master Net1 in feet).
 - SPECULATION: "two rule-based controls" undercounts: the file has 2 simple controls and 2 rules.
+
+## 2026-10-14 feat/slope-length (Task 643) pre-review (Perry)
+- OBSERVED (real Chromium): builder harness slope-length-browser-harness.js passes in full; unit-change, tank-ground, survey-codes, curve-library, mercator harnesses pass. Basic US L6 420.00 to 442.72 (5.41%), SI L6 0.50%, others under 0.03%; both open stamped v13.
+- OBSERVED: a v13 file whose Auto length is horizontal (ends 0/40, L=300): editing J2 elevation to 0 gives 300 and to 90 gives 313.21 (the drawing is re-measured, no negative drift). v12 open then page reload: length 302.65 stored once, v13, no second migration.
+- OBSERVED: elevation is not scenario-overridable (J2 shows 40 in a scenario carrying an elev override); Auto length unchanged there. Not a defect.
+- OBSERVED: a file opened through the picker shows the unsaved mark for v12 and v13 alike, so migration is not what marks it.
+- NOT CHECKED: Find and replace, paste, Settings push, Morph, redo, Recalculate OFF label pass (code read only), elevation-unit switch.
+- SPECULATION: re-adding a Length tip Tom deleted 2026-10-04 (commit eccbd119) needs his word.
+
+## 2026-10-14 feat/library-description @ 478c0eea (Perry)
+- CITED (fetched EPANET dev input2.c/input3.c): LineComment set only for sections PATTERNS and CURVES from a token-less line (blank line sets it empty, so it cancels); cleared on any row; pattern takes it only at the first row of a run and only if it has none. Builder's pattern rule matches.
+- OBSERVED (node probe over docFromInp/lpnExportInp, real Chromium on crafted .inp): DEFECT. [RULES] import drops blank lines but keeps comments, so a heading comment, blank, then ";desc R1" reads as ONE description ("Rules section heading desc R1"); clearing/editing R1's description or deleting R1 deletes the heading line.
+- OBSERVED: a heading comment before the first control (Net3: two comments over four controls) becomes control 1's description only; trailing comment after the last control, comments between rows of one pattern, an extra comment above a pattern's description, a trailing comment on a pattern row: gone on import with the import report's dropped list empty.
+- OBSERVED: Library spreadsheet export Patterns sheet has no Description column (Curves, Pipe types, Fittings sheets do). Empty pattern with a description writes no description to .inp.
+- OBSERVED: builder's browser harness 3 sections x en/es pass; inp harness, library harness, inp-export 4497 checks, Net3 roundtrip pass; Net1/2/3 PATTERNS/CONTROLS tokens unchanged (Net2/3 CONTROLS byte-identical, comments kept). Rule edit/delete sequences by mouse keep the right lines. Not done: mutation check of the harnesses.

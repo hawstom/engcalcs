@@ -111,6 +111,7 @@ Tip text removed from the Looped Network page on Tom's 2026-10-04 tip verdicts, 
 ## Properties box: length field
 
 - Length of the pipe. With Auto turned on the length is measured from what you drew. Turn Auto off to type a length that differs from the drawing. (`lpn_field_length_tip`)
+- Superseded in part by Task 643: an Auto length is now the slope distance, the drawn length combined with the difference in elevation between the two end nodes (`lpn_field_length_slope_tip`).
 
 ## Reports dialogs: col n field
 

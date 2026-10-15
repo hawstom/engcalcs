@@ -98,6 +98,9 @@ function buildNetwork() {
 	const pipe = L.addLink('pipe', r.id, j.id);
 	L.setProp(j, 'demand', 150);
 	L.setProp(pipe, 'length', 710);
+	// TYPED, as the Properties box records a typed length: Auto off. An Auto length is the slope
+	// distance (Task 643) and follows a unit switch that changes the rise, so it is not the subject.
+	pipe.lenAuto = false;
 	L.setProp(pipe, 'diameter', 8);
 	j.elev = 40;
 	L.buildDom();

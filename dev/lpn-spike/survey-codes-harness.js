@@ -267,8 +267,11 @@ const r = importFile(CODED, true);
 		out(branch.verts[1]) === '5200,4800', branch && branch.verts.map(out).join(' '));
 	ok('a pipe takes the New assets diameter and roughness, and an automatic length',
 		d.links.every(l => l._diameter === L.settings().defaults.diameter && l._roughness === L.settings().defaults.roughness && l.lenAuto === true));
-	ok('the automatic length follows the vertices (1>3 via 2 is 200 ft)',
-		Math.abs(at('1', '3')._length - 200) < 1e-9, String(at('1', '3')._length));
+	// Task 643: an automatic length is the SLOPE distance -- 200 ft along the vertices, and the
+	// 49.2 ft between the well (150.00) and point 3 (100.80). A vertex carries no elevation of its
+	// own, so point 2's surveyed 101.20 does not bend the profile.
+	ok('the automatic length follows the vertices and the slope (1>3 via 2: 200 ft level, 49.2 ft of fall)',
+		Math.abs(at('1', '3')._length - Math.sqrt(200 * 200 + 49.2 * 49.2)) < 1e-9, String(at('1', '3')._length));
 	ok('the description is kept on the node, codes and all', L.node('5').desc === 'FH.WL1 -0 HYD-A');
 	ok('ONE undo takes the whole file back', L.undoDepth() === 1);
 }
