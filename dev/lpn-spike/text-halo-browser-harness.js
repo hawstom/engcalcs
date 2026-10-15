@@ -38,17 +38,23 @@ async function main() {
 		await a.page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } });
 		await a.openExampleCard(await a.lang('lpn_ex_net1_title'));
 		await a.settle(800);
+		// The halo is the label layer's filter since Task 791: its radius is the outside half of the
+		// old stroke, so `ratio` (2 x radius over the font size) reads in the setting's own terms.
 		const halo = () => a.page.evaluate(() => {
 			const t = Array.from(document.querySelectorAll('text.lpn-lbl')).find((e) => (e.textContent || '').trim() && getComputedStyle(e).visibility !== 'hidden');
 			if (!t) { return null; }
 			const c = getComputedStyle(t), fs = parseFloat(c.fontSize);
-			return { sw: parseFloat(c.strokeWidth), fs, ratio: parseFloat(c.strokeWidth) / fs, paint: c.paintOrder, stroke: c.stroke };
+			const L = document.querySelector('.lpn-lbl-layer'), f = document.getElementById('lpn-lbl-halo');
+			const r = f ? +f.querySelector('feMorphology').getAttribute('radius') : NaN;
+			const on = !!L && getComputedStyle(L).filter !== 'none';
+			return { r, fs, ratio: on ? 2 * r / fs : 0, filter: L && getComputedStyle(L).filter, stroke: c.stroke,
+				flood: f && getComputedStyle(f.querySelector('feFlood')).floodColor };
 		});
 		const h0 = await halo();
 		console.log('  default', JSON.stringify(h0));
 		ok('a map label exists', !!h0);
 		ok('default halo is 0.4 of the font size (old 0.2 doubled)', h0 && Math.abs(h0.ratio - 0.4) < 0.01, h0 && h0.ratio);
-		ok('still painted stroke first, white', h0 && /^stroke/.test(h0.paint) && /255, 255, 255/.test(h0.stroke), h0 && (h0.paint + ' ' + h0.stroke));
+		ok('drawn by the label layer\'s filter, in white, with no stroke on the ink', h0 && /lpn-lbl-halo/.test(h0.filter) && /255, 255, 255/.test(h0.flood) && h0.stroke === 'none', h0 && (h0.filter + ' ' + h0.flood + ' ' + h0.stroke));
 
 		await a.toolbarClick(await a.lang('lpn_tool_settings'));
 		await a.settle(500);
@@ -107,7 +113,7 @@ async function main() {
 		await a.settle(400);
 		await setRow(0); await a.settle(300);
 		const h4 = await halo();
-		ok('0 draws no halo', h4 && h4.sw === 0, h4 && h4.sw);
+		ok('0 draws no halo', h4 && h4.filter === 'none', h4 && h4.filter);
 		ok('no uncaught page errors', a.errors.length === 0, a.errors.join('\n'));
 	} finally { await browser.close(); env.stopServer(); }
 	console.log(fails ? '\n' + fails + ' text halo check(s) FAILED' : '\nText halo harness: all checks passed.');

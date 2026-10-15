@@ -1209,29 +1209,29 @@ html[lang="zh"] .ec-welcome {
 /* No font-size here -- it must be set inline in world units at each text element (see the
    buildNodeEls/buildLabelEls comments in looped-network.js for why a screen-pixel-flavored
    CSS font-size is wrong inside this scaled SVG group). */
-/* THE LEGIBILITY BACKING IS A HALO ON THE GLYPHS, NOT A RECT BEHIND THEM (Task 376, the way
-   epanetjs does it). `paint-order: stroke fill` paints the stroke first and the fill on top, so a
-   white stroke reads as an outline that follows the letters and merges between close characters --
-   and it costs one declaration where the rect cost an element per label, a pad constant, a rotation
-   kept in step with the text, and a rect left behind whenever a label was hidden.
-   **WIDTH IS `em`, NOT --lpn-hair, AND THE DIFFERENCE MATTERS TWICE.** Both are screen-pixel
-   constants here -- the font-size on each label is itself a pixel size divided by the scale -- so
-   either one answers the defect the old world-unit pad had, where 0.4 world units reached 24px a
-   side at working zoom and turned every pipe a label lay along into pale grey. But `em` also stays
-   proportional to the LETTERING: a Text label at 3x gets a 3x halo instead of a hairline, and the
-   clearance arithmetic in alignedLabelPlacement(), which is written in fractions of the font size,
-   stays true at every text size rather than only at the shipped one.
-   DOUBLED to 0.4em on 2026-10-14 (Tom) and now the project setting Text halo width, `--lpn-halo` on the <svg>
-   (0.4 = 40 percent of the text size). The paragraph below describes the old 0.2em: 0.2em is 0.1em of white outside the glyph (~1.1px at the shipped 11px), a little tighter than the
-   0.15-of-font-size pad the rect drew. Tighter on purpose: half the stroke falls INSIDE the glyph,
-   where the fill paints over it everywhere except in a counter -- the enclosed hole of an e or an
-   8 -- and a heavy halo closes those up. `stroke-linejoin: round` keeps a sharp corner from
-   throwing a spike. */
-.lpn-lbl {
-	fill: #333; pointer-events: none; user-select: none;
-	paint-order: stroke fill;
-	stroke: #fff; stroke-width: calc(var(--lpn-halo, 0.4) * 1em); stroke-linejoin: round;
-}
+/* THE LEGIBILITY BACKING IS A HALO, AND IT IS ONE EFFECT FOR THE WHOLE LABEL LAYER (Task 791).
+   The ink is a plain fill with no stroke at all, so letter edges are as crisp as the font. The halo
+   is the SVG filter #lpn-lbl-halo on the layer (built by labelHaloFilter() in js/looped-network.js):
+   every glyph's shape, widened by the halo radius, flooded white and laid UNDER the whole layer. So
+   no halo can ever cover ink -- not a separator comma's over the digit beside it, not one label's
+   over a label it overlaps -- and nothing per label is drawn twice.
+   **NOT `paint-order: stroke fill`**, the Task 376 halo, which the browser applies per piece of text:
+   each tspan's and each label's stroke painted over the ink before it (Tom, R-393), and the half of
+   the stroke inside the glyph softened its edges (R-405, "our tiny halos were making our text look
+   fuzzy"). NOT a halo pass plus an ink copy of every label either: that was right and cost 19-67%
+   more label time (dev/lpn-spike/halo-under-ink-browser-harness.js --timing).
+   **THE RADIUS IS SCREEN PIXELS**, half of Text halo width (--lpn-halo, a fraction of the text
+   size) times the text size, so it matches the old stroke's outside half. A Text at 2x or 3x sits
+   in a nested group whose own filter adds the rest (labelHaloHost()), so its halo is 2x or 3x too. */
+.lpn-lbl { fill: #333; pointer-events: none; user-select: none; }
+.lpn-lbl-layer { filter: url(#lpn-lbl-halo); }
+.lpn-lbl-halo-flood { flood-color: #fff; flood-opacity: 1; }
+/* WHILE THE MAP MOVES (`lpn-moving`, written by noteViewMoving()), the old per-label stroke stands
+   in for the filter, because the filter re-rasters at every frame of a pan or zoom and cost up to
+   ten times the stroke's raster time on a 1,600-label drawing. It comes back 160 ms after the map
+   stops. */
+.lpn-moving .lpn-lbl-layer, .lpn-moving .lpn-lbl-size { filter: none; }
+.lpn-moving .lpn-lbl { paint-order: stroke fill; stroke: #fff; stroke-width: calc(var(--lpn-halo, 0.4) * 1em); stroke-linejoin: round; }
 /* pointer-events:none, found 2026-07-30 while verifying popup placement: labelsLayer draws ABOVE the
    symbol layers, so a leader line crossing a node swallowed the click meant for that node and the
    property popup simply never opened. A leader is not a thing you can click -- a label's own grab
@@ -1485,8 +1485,10 @@ html[lang="zh"] .ec-welcome {
 /* Masking is switchable (Task 330, Tom 2026-08-14: "We want to be able to turn off and on
    background masking"). One class on the <svg>, written by applyMaskLabels() from the PROJECT's own
    setting -- masking is a property of how the sheet is meant to be read, not of the browser, so per
-   Task 263 it is saved with the project like units and ID prefixes. Since Task 376 "off" is
-   `stroke: none` on the text itself; there is no longer an element to hide. */
+   Task 263 it is saved with the project like units and ID prefixes. "Off" (or a Text halo width
+   of 0) takes the halo filter off the label layer and its size groups (Task 791). */
+.lpn-masks-off .lpn-lbl-layer, .lpn-masks-off .lpn-lbl-size,
+.lpn-halo-none .lpn-lbl-layer, .lpn-halo-none .lpn-lbl-size { filter: none; }
 .lpn-masks-off .lpn-lbl { stroke: none; }
 /* Pump curve entry inside the element property popup (Tom, 2026-07-30: "the table needs headings
    for Head and Flow"). Scoped rather than left to the suite's general results-table styling: this
