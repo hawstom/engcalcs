@@ -69155,8 +69155,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	//
 	// **A ZOOM OR A PAN COMMITS.** Any press outside the editor commits before the map sees it, and
 	// a wheel turn does the same, so the editor is never left floating over a map that has moved; so
-	// does a window resize that moves the words (a phone's keyboard opening changes only the height
-	// and moves nothing, so it does not close the box it opened for).
+	// does a window resize that changes the width. A change of height alone (a phone's keyboard
+	// opening or closing) moves the box with the words and keeps it open.
 	// It is not a hydraulic edit, so it works with Recalculate off exactly as Properties does.
 	var textEditor = null;
 	function textEditorOpen() { return !!textEditor; }
@@ -69231,14 +69231,18 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		};
 		ed.onWheel = function () { closeTextEditor(true); };
 		// After the page's own resize handling has redrawn the map, so the words are where they now
-		// are: a width change, or words that moved, commits.
+		// are: a width change commits. **A HEIGHT CHANGE ALONE IS A PHONE'S KEYBOARD** (Tom,
+		// 2026-10-15: *"On a phone, the text opens for editing, but when the on-screen keyboard
+		// appears, it closes."*): an Android keyboard shortens the window, the map shortens with it
+		// and keeps its centre, so the words move up -- the box moves with them and stays open.
 		ed.onResize = function () {
 			setTimeout(function () {
 				var p, q;
 				if (textEditor !== ed) { return; }
 				p = labelById(ed.id) && textLabelPoint(labelById(ed.id));
 				q = p && worldToScreen(p.x, p.y);
-				if (window.innerWidth !== ed.winW || !q || Math.hypot(q.x - ed.ax, q.y - ed.ay) > 1) { closeTextEditor(true); }
+				if (window.innerWidth !== ed.winW || !q) { closeTextEditor(true); return; }
+				if (Math.hypot(q.x - ed.ax, q.y - ed.ay) > 1) { ed.ax = q.x; ed.ay = q.y; fit(); }
 			}, 120);
 		};
 		window.addEventListener('keydown', ed.onKey, true);

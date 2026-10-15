@@ -13,7 +13,9 @@
 //      and typed in one go is ONE Undo step;
 //   7. the same on the Spanish page;
 //   8. empty words delete the Text, as one Undo step, from the editor and from Properties;
-//   9. a window resize that moves the words commits the editor.
+//   9. a window resize that moves the words commits the editor;
+//  10. on a touch phone, the on-screen keyboard opening (the window shortens, the map with it) keeps
+//      the editor open and moves it with the words (R-392), and closing it again does the same.
 //
 //   node dev/lpn-spike/text-inplace-browser-harness.js   (takes the browser lock itself)
 'use strict';
@@ -312,6 +314,57 @@ async function main() {
 			JSON.stringify(await h.storedTexts()));
 		await P.setViewportSize({ width: 1400, height: 900 });
 		await a.close();
+
+		console.log('\n10. On a phone the on-screen keyboard keeps the editor open (R-392)');
+		{
+			const ph = await Session.open(browser, NAME + '-phone', { viewport: { width: 1200, height: 800 }, hasTouch: true, isMobile: true });
+			const PP = ph.page;
+			await PP.route(/tile\.openstreetmap\.org|api\.mapbox\.com|nominatim/, (route) => route.abort());
+			await ph.goto('Looped-Network.php');
+			await ph.answerTrainingPanel().catch(() => {});
+			await PP.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } });
+			await ph.settle(800);
+			await ph.newProject('us');
+			await ph.dismissGallery();
+			await ph.settle(600);
+			const k = helpers(ph);
+			// Placed while the window is wide enough to show the Text tool, then narrowed to a phone.
+			await ph.toolbarClick(await ph.lang('lpn_tool_add_text'));
+			await k.settle(200);
+			const sp = await k.canvasPoint(0.5, 0.3);
+			await PP.touchscreen.tap(sp.x, sp.y);
+			await k.settle(300);
+			await PP.keyboard.type('Phone');
+			await PP.keyboard.press('Control+Enter');
+			await k.settle(300);
+			await k.select();
+			await PP.setViewportSize({ width: 412, height: 800 });
+			await k.settle(1000);
+			const pid = (await k.mapTexts())[0].id;
+			let pc = await k.textCentre(pid);
+			await PP.touchscreen.tap(pc.x, pc.y);
+			await new Promise((r) => setTimeout(r, 90));
+			await PP.touchscreen.tap(pc.x, pc.y);
+			await k.settle(700);
+			ok('a double tap opens the editor on the phone', !!(await k.editor()), JSON.stringify(await k.editor()));
+			// The keyboard: the window loses about 350 px of height and keeps its width.
+			await PP.setViewportSize({ width: 412, height: 450 });
+			await k.settle(800);
+			let pe = await k.editor();
+			pc = await k.textCentre(pid);
+			ok('the keyboard opening leaves the editor open and focused', !!pe && pe.focused, JSON.stringify(pe));
+			ok('...and over the words, which moved with the shorter map', !!pe && !!pc && Math.abs(pe.cy - pc.y) < 12 && Math.abs(pe.cx - pc.x) < 40,
+				JSON.stringify({ editor: pe, words: pc }));
+			await PP.keyboard.type('Keyed');
+			await PP.setViewportSize({ width: 412, height: 800 });
+			await k.settle(800);
+			pe = await k.editor();
+			pc = await k.textCentre(pid);
+			ok('the keyboard closing leaves it open over the words too', !!pe && Math.abs(pe.cy - pc.y) < 12, JSON.stringify({ editor: pe, words: pc }));
+			await PP.keyboard.press('Control+Enter');
+			ok('...and what was typed under the keyboard is written', (await k.storedTexts())[0]._text === 'Keyed', JSON.stringify(await k.storedTexts()));
+			await ph.close();
+		}
 
 		console.log('\n7. ?lang=es');
 		const b = await open(Session, browser, 'Looped-Network.php?lang=es', NAME + '-es');
