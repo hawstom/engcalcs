@@ -700,6 +700,13 @@
    "words": "Merge feat/zoom-selection",
    "context": "Typed in the session on 2026-10-14 after the preview listed in that day's report.",
    "pin_note": "He cleared the previewed head 29e354ca. The pin is the master merge into the branch, plus regenerated translation payloads where the branch added keys; no feature change."
+  },
+  "feat/text-halo": {
+   "head": "6bc3445482b3b9277a29c35b98c611237b4d0a74",
+   "date": "2026-10-15",
+   "words": "feat/text-halo: It's good as is. Merge in the handoff, not now.",
+   "context": "Typed in the session on 2026-10-15 after the report on the renovated halo (one run per label row; the whole-layer filter dropped). Same message: \"fix/search-zoom-accuracy: It's good as is. Merge in the handoff, not now.\"",
+   "pin_note": "He cleared the previewed head 6bc34454, the pin itself."
   }
  }
 }
