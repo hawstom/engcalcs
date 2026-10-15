@@ -21,8 +21,8 @@ lines rather than appending corrections.
 - **Never wrap `run_harnesses.sh` or `check_all.sh` in the browser lock**: each browser harness
   takes that lock itself, so the wrapper deadlocks every one (2026-09-25, 280 s NOT RUN apiece).
   Brief agents to write journals to the scratchpad while a suite runs in the main checkout.
-- Since 2026-10-02 (jasmine, 24 threads) `check_all.sh` runs four suites at once in slots, ~8 min
-  each; run it with no outer flock. A branch cut before `f9829cee` still uses the single browser lock,
+- Since 2026-10-02 (jasmine, 24 threads) `check_all.sh` runs four suites at once in slots, ~25 min
+  each by 2026-10-15 (Task 797); run it with no outer flock. A branch cut before `f9829cee` still uses the single browser lock,
   so its browser harnesses can print `NOT RUN` under load: merge master into it first.
 
 ## RULINGS
@@ -99,9 +99,14 @@ lines rather than appending corrections.
   tile counts at a 900 ms settle (basemap.js now waits for a pointable tile). Pre-existing and unrelated: `scale-publish-harness.js` (2 checks). The full `node dev/browser-pass/run.js` is green (1853/1853, 2026-10-04, Task 761); browser-pass specs are not in
   check_all.
 
-## STATE — 2026-10-14 (eighteenth session, Arizona time)
+## STATE — 2026-10-15 (nineteenth session, Arizona time)
 
 ### Master: see the pushed SHA in the last report. Production: b7c99102 (10-09) when last read; ask, About box
+
+Landed 2026-10-15: feat/help-calculators (625), feat/screenshot-copy (793), feat/tank-depth-graph (795),
+feat/slope-length (643; the length-factor question stays open), feat/library-description (792).
+feat/morph was merged INTO feat/bentley-interop on his word, "Don't merge bentley-interop into master."
+Tom's Android reaches the previews through Termux (see branch-preview memory).
 
 Landed 2026-10-14: sprint 737 (one word per concept; es Marcador, tr Künye, hr Etiketa for Tag; cs and he
 sweeps), fix/control-inactive-link (Task 796 crash: Fotobi), fix/example-id-label, retired EPANET note,
@@ -114,11 +119,10 @@ Deleted keys: bpn_, hw_ and lpn_notes_epanet_def and _term (master, six); lpn_sc
   in place with right-click Edit text / Reset position (794), fix/epanet-oob, and Perry's 10-14 defect
   fixed (Apply Base values keeps the alternative Base uses). New key lpn_scenario_basic_misfit_base.
   After it lands delete match-property, graph-bubble.
-- **feat/morph** (781): built on bentley; carries `$ec_lang_syn['lpn_morph_menu']` (Transform) on his
-  word "Transform"; the description half of that synonym is CC's wording, awaiting his OK. Merge bentley
-  into it again before it lands.
-- **feat/help-calculators** (625), **feat/screenshot-copy** (793), **feat/text-halo** (791),
-  **feat/tank-depth-graph** (795), **feat/slope-length** (643), **feat/library-description** (792).
+- **Morph (781) is now on feat/bentley-interop** (fast-forwarded to feat/morph 323ec7f3; feat/morph
+  deleted). It carries `$ec_lang_syn['lpn_morph_menu']` (Transform) on his word "Transform"; the
+  description half of that synonym is CC's wording, awaiting his OK.
+- **feat/text-halo** (791).
 
 ### Questions out to him
 
@@ -126,7 +130,7 @@ Deleted keys: bpn_, hw_ and lpn_notes_epanet_def and _term (master, six); lpn_sc
 - Apply Base values with Base on an alternative: other scenarios now fall to the elements' own values,
   not to Base's alternative. Should the push copy Base's values into them instead?
 - Task 617: CC recommended Mapbox Outdoors as the one added style; awaiting yes.
-- Morph's Transform synonym description; es Marcador for Tag; length tip wording on slope-length.
+- Morph's Transform synonym description; es Marcador for Tag; the Length tip "measured along the slope" (merged with slope-length 10-15; keep it or not?).
 
 ### Next job
 

@@ -137,16 +137,12 @@ the block.
   Tom, 2026-10-12 (interview q03): expose override vs inherited with a single-character marker, carried
   through Properties and Settings, after Civil 3D's Override / Child override columns. Ida: a dot gutter;
   Mary: Bentley's and Civil 3D's per-row checkbox. Tom's call between them first. Journals 2026-10-12.
-- 100|625| **"HawsEDC Calculators" in the Help menu, above Privacy notice.**
-  Tom, 2026-10-14: *"Add 'HawsEDC Calculators' in Help menu above Privacy notice. Then close the
-  task."* That answers the last open question of the app page divorce (shipped 2026-09-11; record in
-  `dev/chrome-audit.md`, `dev/help-menu-mastermind.md`). Building on `feat/help-calculators`; closes on merge.
 - 100|643| **Slope distance for automatic lengths, and whether anyone offers a length factor.**
   Tom, 2026-09-13: *"this is straining at a gnat while we are swallowing the camel of slope distance,
   pipe dips, pipe depth"*. **Decided 2026-10-14: *"Let's go ahead and use slope distance for our
   calculations in case it's significant which occasionally will be true."*** An automatic length
   combines the drawn horizontal length with the end nodes' elevation difference; a typed length is
-  untouched. Building on `feat/slope-length`. Still open: a length adjustment factor or increment.
+  untouched. Slope distance merged 2026-10-15 (`feat/slope-length`). Still open: a length adjustment factor or increment.
   Tom: *"ask Mary to research whether anybody offers 'Length adjustment factor' for auto lengths. I
   don't want to break a tacit complicit oversight on this or be ridiculously pedantic."* **Mary,
   2026-10-14: no tool she searched offers one** (WaterGEMS has a typed per-pipe length and a 3D length
@@ -221,20 +217,10 @@ the block.
 - 100|791| **Text halos twice as wide, with a Map appearance setting.**
   Tom, 2026-10-14: *"our text halos need to be bigger and maybe available as a setting under Map
   appearance. Can we double them?"* Building on `feat/text-halo`.
-- 100|792| **A Description on Library patterns, controls and rules.**
-  Tom, 2026-10-14: *"Let's add Description to the Library Patterns, Controls, and Rules."* Curves
-  already carry one. The .inp carries it as EPANET's own comment where EPANET has one. Building on
-  `feat/library-description`.
-- 100|793| **Ctrl+C in the Screenshot tool copies the picture.**
-  Tom, 2026-10-14: *"please make Ctrl+C copy the screenshot to the clipboard."* Building on `feat/screenshot-copy`.
 - 100|794| **Edit a Text in place on the map.**
   Tom, 2026-10-14: *"It would be really nice for Text to be editable in place instead of only in the
   properties box."* Double-click opens an editor over the Text; right-click a Text offers Edit text and
   Reset position. Built; merged into `feat/bentley-interop` (Tom: *"if that's tidy"*), closes when it lands.
-- 100|795| **Tank depth in the time series graphs.**
-  Tom, 2026-10-14: *"It would be really nice for the Time Series graphs for Tanks to be able to show
-  depth."* (The tank depth base elevation he asked after is Task 787, closed 2026-10-12: Base
-  elevation is the tank bottom.) Building on `feat/tank-depth-graph`.
 - 100|796| **The EPANET run crashed on Tom's two-system test project.**
   Tom, 2026-10-14, on `Fotobi_US_WGS84.epp` (reservoir, pump and tank on each of two systems):
   *"EPANET solver message: memory access out of bounds"*, and "Solve did not converge" in the pump-off
@@ -242,6 +228,10 @@ the block.
   master (889a56c2) and bentley:** controls for pumps out of the run, and an engine reused after a refusal.
   A tank-only source is valid; a tank running dry stops the run. Open: "did not converge" goes away at
   Accuracy 0.001 (now 1e-5), his call.
+- 100|797| **Run the browser harnesses side by side to cut check_all time.**
+  Tom, 2026-10-15: *"a huge overhead for merges that I did not see or foresee"*. One suite took ~8 min on
+  10-02 and ~25 min on 10-15: browser harnesses run one at a time and grew from 1 to 59. Measure first;
+  the efficiency audit of 2026-10-15 reports what each harness costs.
 - 75|539| **Gang the neighbour labels so their leaders stop crossing.**
   **DEMOTED TO 75 by Tom, 2026-10-11.**
   **PORTING THE BENCH TO MASTER, 2026-10-07** (Tom agreed D09: rules 1-3 as three defect branches;

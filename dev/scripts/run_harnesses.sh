@@ -33,6 +33,14 @@
 # 300 s is far above the slowest honest harness on a loaded machine and far below the point where
 # somebody kills the run by hand. A timed-out harness counts as FAILED, which is what it is.
 DIR="$(cd "$(dirname "$0")/../lpn-spike" && pwd)"
+
+# --node-only: the quick pass to run on a merge result BEFORE check_all (2026-10-15, when one suite
+# had grown to ~25 min). It skips the browser harnesses, which run one at a time and are most of
+# that wait, and gives the rest every core. It is a pre-check, never the gate: check_all runs all.
+NODE_ONLY=""
+[ "${1:-}" = "--node-only" ] && NODE_ONLY=1
+is_browser() { grep -qE 'puppeteer|playwright|chromium' "$1" 2>/dev/null; }
+SKIPPED=0
 # `timeout` is in GNU coreutils and is present everywhere this runs; if it ever is not, run without
 # it rather than skipping the harnesses, because no net is better than no tests.
 if command -v timeout >/dev/null 2>&1; then RUN_ONE="timeout 300"; else RUN_ONE=""; fi
@@ -40,6 +48,7 @@ if command -v timeout >/dev/null 2>&1; then RUN_ONE="timeout 300"; else RUN_ONE=
 ASKED=0
 for f in "$DIR"/*harness*.js "$DIR"/validate*.js; do
 	[ -f "$f" ] || continue
+	if [ -n "$NODE_ONLY" ] && is_browser "$f"; then SKIPPED=$((SKIPPED + 1)); continue; fi
 	ASKED=$((ASKED + 1))
 done
 
@@ -79,12 +88,14 @@ if [ -z "$JOBS" ]; then
 	JOBS=$((CORES / ${EC_CHECK_SLOTS:-4}))
 	[ "$JOBS" -lt 1 ] && JOBS=1
 	[ "$JOBS" -gt 6 ] && JOBS=6
+	[ -n "$NODE_ONLY" ] && JOBS="$CORES"
 fi
 
 OUT="$(mktemp -d)"
 trap 'rm -rf "$OUT"' EXIT INT TERM
 
 echo "$ASKED harness file(s) to run, $JOBS at a time (browser harnesses one at a time)."
+[ -n "$NODE_ONLY" ] && echo "--node-only: $SKIPPED browser harness(es) skipped; check_all runs them."
 
 # One harness, into its own output file. Writes an empty marker file beside it when it FAILED, so
 # the parent can tell a failure from a pass without a shared variable a subshell cannot write to.
@@ -111,8 +122,9 @@ N=0
 PENDING=0
 for f in "$DIR"/*harness*.js "$DIR"/validate*.js; do
 	[ -f "$f" ] || continue
+	if [ -n "$NODE_ONLY" ] && is_browser "$f"; then continue; fi
 	N=$((N + 1))
-	if grep -qE 'puppeteer|playwright|chromium' "$f" 2>/dev/null; then
+	if is_browser "$f"; then
 		# Exclusive: let the pool drain first, then run it alone.
 		[ "$PENDING" -gt 0 ] && wait
 		PENDING=0
@@ -130,6 +142,7 @@ FAILED=""
 N=0
 for f in "$DIR"/*harness*.js "$DIR"/validate*.js; do
 	[ -f "$f" ] || continue
+	if [ -n "$NODE_ONLY" ] && is_browser "$f"; then continue; fi
 	N=$((N + 1))
 	[ -f "$OUT/$N" ] && cat "$OUT/$N"
 	if [ -f "$OUT/$N.failed" ]; then
