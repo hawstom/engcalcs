@@ -229,3 +229,26 @@ Never call it "preview". Scope: `dev/looped-network-calculator-scope.md`; ROADMA
 
 ---
 
+
+
+## A Description is lines and paragraphs (Task 806, Tom 2026-10-15)
+
+*"I think that all Description fields should allow multiple lines and paragraphs like most software
+to allow internal documentation."* Every Description (an element's, a customer's, and a pattern's,
+curve's, control's, pipe type's and fitting list's in the Library) is a growing textarea: Enter types
+a newline, Ctrl+Enter commits and leaves, Tab moves on. Stored with `\n`; `lpnDescText()` is the one
+normalizer (CRLF to LF, trailing blanks off each line, blank lines at the ends off the text).
+
+**The .inp.** EPANET holds one line (a trailing `;comment`; for a pattern or curve the one comment
+line above its rows) and has no continuation syntax; a raw newline would turn the next line into a
+data row. The first line goes exactly where EPANET puts a description and each later line goes on a
+whole-line `;|` comment directly after it (a bare `;|` is a blank line). EPANET reads a comment as
+nothing. This page reads the run back into one description; a `;|` line that follows no element row
+is an ordinary comment. A one-line description is written exactly as before. Rejected: escaping `\n`
+inside the trailing comment (ambiguous with a real backslash, unreadable in EPANET's own GUI).
+
+**Display.** A map label shows the first line and an ellipsis. A Tables cell shows the first line (a
+text input cannot hold a line break), italic, with the whole text in its tip; typing in it edits the
+first line and keeps the rest. A copy carries the whole text, quoted. CSV and XLSX/ODS quote or
+break lines, GeoJSON is JSON, and DXF writes the caret escape `^J`. `description-lines-harness.js`,
+`description-lines-browser-harness.js`.

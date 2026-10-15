@@ -208,6 +208,10 @@ it. **A core calculator, in scope in all 26 languages. Never call it "preview".*
   project in metres**, its lengths measured on the ground (`isWebMercProject()`). EPSG:4326 is the
   suggested row. Mission scope is a 300 km system span; `geodesicMeters()` is flat per leg
   (206 ppm at scope). `dev/geographic-projects.md`.
+- **A Description is lines and paragraphs**, stored with `\n` (Tom, 2026-10-15). The `.inp` holds the
+  first line where EPANET puts a description and each later line on a `;|` comment line after it
+  (`lpnDescText()`); a one-line description is written exactly as before. A Tables cell shows the
+  first line, the whole text in its tip. `dev/lpn-rulings.md`.
 - **Reads and writes EPANET `.inp`** (`js/lpn-inp.js`). Import reports every difference, never
   rejects, never drops silently. Export is character-exact on Net1/2/3.
 - **Design for a pointer; make a phone survivable.** Never call it a PC application in public — it
