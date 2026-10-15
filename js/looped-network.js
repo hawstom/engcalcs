@@ -4943,7 +4943,8 @@ var EngCalcs = EngCalcs || {};
 		var out = [], cat = kind === 'calc' ? 'calculation' : r.category, map = kind === 'alt' && plainObject(r.values) ? r.values : {};
 		Object.keys(map).forEach(function (key) {
 			Object.keys(plainObject(map[key]) ? map[key] : {}).forEach(function (prop) {
-				if (categoryOf(prop, ovKeyGroup(key)) === cat) { out.push({ cat: cat, kind: kind, obj: r, key: key, prop: prop, value: map[key][prop] }); }
+				// Every value it holds, a stray one of another category too: Delete takes all of them.
+				out.push({ cat: cat, kind: kind, obj: r, key: key, prop: prop, value: map[key][prop] });
 			});
 		});
 		settingLeaves(r.settings).forEach(function (l) { out.push({ cat: cat, kind: kind, obj: r, path: l.path, value: l.value }); });
