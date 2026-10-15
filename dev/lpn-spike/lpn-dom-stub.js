@@ -274,6 +274,9 @@ function mkEl(tag, svgNS) {
       return /bold/.test((this._styleAttr || '') + ' ' + (this.style.fontWeight || ''));
     },
     getComputedTextLength() { return this._textWidth(); },
+    // A run of characters inside one tspan, the way a real one measures a plain segment that shares
+    // its run with others (Task 791): n characters at this element's size.
+    getSubStringLength(start, n) { return (n ? n * CHAR_W : 0) * (this._isBold() ? 1.12 : 1) * (this._fontSize() / BASE_FS); },
     setPointerCapture() {}, releasePointerCapture() {},
     remove() { if (this.parentNode) { this.parentNode.removeChild(this); } },
     // **FOCUS IS RECORDED, OR NOTHING THAT MOVES IT CAN BE TESTED AT ALL.** These were both empty

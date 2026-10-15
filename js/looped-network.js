@@ -3032,15 +3032,31 @@ var EngCalcs = EngCalcs || {};
 	// which is what a leader line points at. A Text OBJECT passes a negative value so a three-line
 	// note straddles the point the user placed it on -- see textLabelFirstDy(), where the rule that
 	// one line must render pixel-identically to before is stated.
+	//
+	// **PLAIN SEGMENTS SHARE ONE RUN** (Task 791, Tom R-393: *"In a pipe label, the halo of the
+	// separator comma can hide what's near it, and vice versa"*). The halo is `paint-order: stroke
+	// fill`, which the browser applies piece by piece: every tspan's white stroke is painted after the
+	// ink of the tspans before it, so a unit mark, a separator or the next value nibbled the last
+	// glyph before it (`10"` read `1C"`, `5280'` read `528C'`). Inside one run the stroke is laid
+	// down for the whole run before any of its ink, so a row is now one tspan, broken only where a
+	// segment needs its own (an extrema mark's text-decoration). Fewer elements is cheaper, too.
+	// NOT a filter on the label layer, tried and measured: in Chromium it erased every label on a
+	// latitude/longitude map and cost 5 to 10 times the stroke's raster time on 1,600 labels.
 	function setMultilineText(textEl, x, rows, firstDy) {
 		while (textEl.firstChild) { textEl.removeChild(textEl.firstChild); }
 		rows.forEach(function (row, i) {
+			var plain = null;   // the row's current undecorated run, if the last segment was one
 			row.forEach(function (seg, j) {
+				// The run remembers its segments, so the shed pricing (noteRowWidths()) can still bank
+				// one width per segment without a tspan per segment.
+				if (!seg.decoration && plain) { plain.textContent += seg.text; plain.lpnSegs.push(seg.text); return; }
 				// **dy IN `em`, NOT IN WORLD UNITS.** An em resolves against the element's own
 				// font-size, so line spacing follows a zoom by itself and the tspans never have to be
 				// rebuilt for one; in world units the attribute is stale the instant the scale
 				// changes. 1.2 is effectiveLineHeight()'s own multiple of the font size.
 				var tspan = el('tspan', j === 0 ? { x: x, dy: i === 0 ? (firstDy ? firstDy + 'em' : 0) : '1.2em' } : {}, textEl);
+				plain = seg.decoration ? null : tspan;
+				tspan.lpnSegs = [seg.text];
 				if (seg.decoration) {
 					tspan.setAttribute('text-decoration', seg.decoration === 'high' ? 'overline' : 'underline');
 					tspan.setAttribute('class', seg.decoration === 'high' ? 'lpn-max' : 'lpn-min');
@@ -3084,14 +3100,31 @@ var EngCalcs = EngCalcs || {};
 			c = t.childNodes[i];
 			if (c.nodeType !== 1 || !c.getAttribute) { continue; }
 			w = 0;
-			try {
-				w = measuredTextWidth(t, c.textContent, fs,
-					function () { return c.getComputedTextLength(); });
-			} catch (err) { w = 0; }
-			// **THE PER-SEGMENT WIDTHS RIDE ALONG FOR FREE** (Task 436). This loop already reads
-			// every tspan; keeping the individual figures as well as the row sums costs one array
-			// and no extra layout, and it is what lets the shed cascade below stop redrawing.
-			seg.push(w);
+			// **A RUN HOLDING SEVERAL SEGMENTS IS MEASURED SEGMENT BY SEGMENT** (Task 791: plain
+			// segments share one tspan so no piece's halo covers another's ink). Each piece's width
+			// is its own substring's, through the same cache keyed on the same text a tspan of its
+			// own was, so the shed pricing below sees one width per segment exactly as before.
+			if (c.lpnSegs && c.lpnSegs.length > 1 && c.lpnSegs.join('') === c.textContent) {
+				(function (run) {
+					var off = 0;
+					run.lpnSegs.forEach(function (str) {
+						var at = off, sw = 0;
+						try {
+							sw = measuredTextWidth(t, str, fs, function () { return run.getSubStringLength(at, str.length); });
+						} catch (err) { sw = 0; }
+						seg.push(sw); w += sw; off += str.length;
+					});
+				})(c);
+			} else {
+				try {
+					w = measuredTextWidth(t, c.textContent, fs,
+						function () { return c.getComputedTextLength(); });
+				} catch (err) { w = 0; }
+				// **THE PER-SEGMENT WIDTHS RIDE ALONG FOR FREE** (Task 436). This loop already reads
+				// every tspan; keeping the individual figures as well as the row sums costs one array
+				// and no extra layout, and it is what lets the shed cascade below stop redrawing.
+				seg.push(w);
+			}
 			hasX = c.getAttribute('x') != null;
 			if (hasX || !out.length) { out.push(w); } else { out[out.length - 1] += w; }
 		}
