@@ -1097,7 +1097,6 @@
 			"node.pressure": "pressure",
 			"link.velocity": "pretty"
 		},
-		"tolerance": 1e-9,
 		"labelReadabilityBias": 110,
 		"mapHeight": 500,
 		"method": "hw",

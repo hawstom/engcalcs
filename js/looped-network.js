@@ -54304,10 +54304,8 @@ var EngCalcs = EngCalcs || {};
 		// EPANET's by total flow) and that is a refinement of the same quantity, not a different
 		// one. Two rows a reader cannot tell apart was the alternative.
 		//
-		// **THE EFFECTIVE DEFAULT DOES NOT MOVE.** Unset still means our own 1e-9 natively, which is
-		// six orders tighter than EPANET's 0.001 and is deliberate: at this page's scale the extra
-		// iterations are free, and it is what keeps a disagreement between the two engines from ever
-		// being just tolerance. Adopting EPANET's NAME is not adopting its default.
+		// **UNSET MEANS EPANET'S OWN 0.001, IN BOTH ENGINES, since R-388 (2026-10-15).** It meant
+		// 1e-9 natively and 1e-5 in EPANET before; see solveAccuracy().
 		// ---- EPANET's [OPTIONS], the ones that ACT (ROADMAP Task 553) ----
 		//
 		// Tom, 2026-08-28, naming what a person must be able to see: *"the default pattern must be
@@ -65036,18 +65034,22 @@ var EngCalcs = EngCalcs || {};
 	 * had deliberately loosened or tightened it — keeps solving to exactly the number it always did.
 	 * Nothing writes `settings.tolerance` any more.
 	 *
-	 * **1e-9 IS OURS AND STAYS OURS.** EPANET's own default for the same option is 0.001; taking its
-	 * NAME is not taking its default. At this page's scale the extra iterations are free, and the
-	 * tight number is what stops a disagreement between the two engines from ever being tolerance —
-	 * see js/lpn-solver.js's note beside `tol`.
+	 * **AN EMPTY BOX MEANS EPANET'S OWN 0.001, IN BOTH ENGINES** (R-388; Tom, 2026-10-15, asked
+	 * whether the default should be 0.001 instead of 1e-5: *"Yes. And tip says 1e-9, so sync
+	 * that."*). Until then an empty box meant 1e-5 in the EPANET engine and 1e-9 in the built-in
+	 * one, and the tip quoted the second. His two-system project reported "did not converge" at
+	 * 1e-5 and converged at 0.001 (Task 796). One number now, LPN_DEFAULT_ACCURACY, which is also
+	 * what the Settings tip quotes and what js/lpn-epanet.js writes when nothing is stated. A
+	 * project that STATES an Accuracy keeps it: nothing here rewrites a stored number.
 	 */
+	var LPN_DEFAULT_ACCURACY = 0.001;
 	function solveAccuracy() {
 		var a = (settings.hydraulics || {}).accuracy;
 		if (typeof a === 'number' && isFinite(a) && a > 0) { return a; }
 		if (typeof settings.tolerance === 'number' && isFinite(settings.tolerance) && settings.tolerance > 0) {
 			return settings.tolerance;
 		}
-		return 1e-9;
+		return LPN_DEFAULT_ACCURACY;
 	}
 	/**
 	 * The hydraulic options as an ENGINE wants them: a shallow clone, with the two unit-bearing

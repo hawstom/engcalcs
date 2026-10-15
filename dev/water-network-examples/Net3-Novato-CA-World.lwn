@@ -2662,7 +2662,6 @@
 			"node.pressure": "pressure",
 			"link.velocity": "pretty"
 		},
-		"tolerance": 1e-09,
 		"reactions": {
 			"orderBulk": 1,
 			"orderTank": 1,
