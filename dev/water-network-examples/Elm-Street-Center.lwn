@@ -661,7 +661,6 @@
 			"X": "X"
 		},
 		"emitterExponent": 0.5,
-		"tolerance": 1e-9,
 		"engine": "epanet",
 		"defaults": {
 			"nodeElev": 0,

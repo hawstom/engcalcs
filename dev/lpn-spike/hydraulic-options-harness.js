@@ -477,8 +477,9 @@ function optModel(hyd) {
 	// strength of the documentation. The label says "Stop there" because that is what happens.
 	// The pair still changes the answer, decisively: given one trial on a network that needs more,
 	// keeping on settles it and stopping there does not.
-	const keepTrying = await headB({ trials: 1, unbalanced: 'continue', unbalancedTrials: 200 });
-	const stopThere = await headB({ trials: 1, unbalanced: 'stop' });
+	// Accuracy 1e-5 stated: measured at what an empty box meant before R-388 made it 0.001.
+	const keepTrying = await headB({ accuracy: 1e-5, trials: 1, unbalanced: 'continue', unbalancedTrials: 200 });
+	const stopThere = await headB({ accuracy: 1e-5, trials: 1, unbalanced: 'stop' });
 	ok('one trial and "keep trying" reaches the settled answer anyway',
 		keepTrying !== null && Math.abs(keepTrying - solved) < 1e-9, solved + ' vs ' + keepTrying);
 	ok('...and "stop there" does not, which is the whole difference',
@@ -487,7 +488,7 @@ function optModel(hyd) {
 	// stopping there by another name, which is why the count row appears with that choice and only
 	// with it.
 	ok('...and "keep trying" with no extra trials is the same as stopping',
-		Math.abs(await headB({ trials: 1, unbalanced: 'continue', unbalancedTrials: 0 }) - stopThere) < 1e-12);
+		Math.abs(await headB({ accuracy: 1e-5, trials: 1, unbalanced: 'continue', unbalancedTrials: 0 }) - stopThere) < 1e-12);
 
 	// **DAMPING.** The smallest of the five, and asserted as a difference rather than a direction:
 	// damping changes the route the iteration takes, so where it lands differs in the last digits

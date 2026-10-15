@@ -13631,6 +13631,9 @@ var EngCalcs = EngCalcs || {};
 	// How many times Zoom to fit may re-solve against the labels as drawn. Two is the most any
 	// example has needed; the cap exists so a layout that never settles cannot hang a click.
 	var LPN_FIT_SETTLE_PASSES = 8;
+	// Zoom to fit never shrinks the network below this share of its own lettering-free fit to make
+	// room for labels and map furniture (R-403). See capToNetwork() in zoomExtentRun().
+	var LPN_FIT_NETWORK_SHARE = 0.9;
 	// What the last Zoom to fit settled on, so a press from that same view can be answered by one
 	// measurement instead of a relayout (see zoomExtent()). In memory only; never saved.
 	var lastFit = null;
@@ -13748,14 +13751,34 @@ var EngCalcs = EngCalcs || {};
 			padTop = Math.max(pad, overlayReserve('lpn_mode_hint')),
 			padBottom = Math.max(pad, overlayReserve('lpn_map_footer'));
 		var items, s;
+		// **A PIECE OF INK WIDER (OR TALLER) THAN THE WINDOW ON ITS OWN IS LEFT OUT OF THAT AXIS**
+		// (R-399; Tom, 2026-10-15, on a phone in tall mode: *"Zoom to fit doesn't work for Basic
+		// example SI units ... It zooms out magnitudes wider than it should."*). A Text is a fixed
+		// size on SCREEN, so no scale makes it narrower: the Basic examples' title, "HawsEDC
+		// Calculators" at four times the text size, is about 450 px wide and a phone canvas is 410.
+		// fitScaleFor() then answers minScale(), the drawing-sized floor (since 68d6b76b, 2026-09-16),
+		// and because Texts are in step 1's MODEL items too, the model fallback below bottomed out
+		// with it -- the 1,400 m network drawn as a 4 px mark. Measured 0.00286 against a desktop
+		// 0.83. Dropping such an item from the axis it cannot fit changes nothing when everything
+		// fits, which is every desktop fit; on a narrow window the network is framed and that one
+		// Text overhangs, which is the trade the fallback below already states. Per axis, so a title
+		// too wide to fit still has its height reserved. dev/lpn-spike/phone-fit-browser-harness.js.
+		function fitsAlone(it, loKey, hiKey, span, padLo, padHi) {
+			return it[loKey] + it[hiKey] <= span - padLo - padHi;
+		}
+		function fittable(set, loKey, hiKey, span, padLo, padHi) {
+			var kept = set.filter(function (it) { return fitsAlone(it, loKey, hiKey, span, padLo, padHi); });
+			return kept.length ? kept : set;
+		}
 		function solve(extra) {
 			var e = extra || 0;
-			return Math.min(fitScaleFor(items, 'x', 'l', 'r', r.width, padLeft + e, padRight + e),
-				fitScaleFor(items, 'y', 't', 'b', r.height, padTop + e, padBottom + e));
+			return Math.min(
+				fitScaleFor(fittable(items, 'l', 'r', r.width, padLeft + e, padRight + e), 'x', 'l', 'r', r.width, padLeft + e, padRight + e),
+				fitScaleFor(fittable(items, 't', 'b', r.height, padTop + e, padBottom + e), 'y', 't', 'b', r.height, padTop + e, padBottom + e));
 		}
 		function place(v, set) {
-			return { tx: fitWindow(set, v, 'x', 'l', 'r', r.width, padLeft, padRight).t,
-				ty: fitWindow(set, v, 'y', 't', 'b', r.height, padTop, padBottom).t };
+			return { tx: fitWindow(fittable(set, 'l', 'r', r.width, padLeft, padRight), v, 'x', 'l', 'r', r.width, padLeft, padRight).t,
+				ty: fitWindow(fittable(set, 't', 'b', r.height, padTop, padBottom), v, 'y', 't', 'b', r.height, padTop, padBottom).t };
 		}
 		// **ROOM FOR LABELS IS NOT MADE AT A SCALE THAT HIDES THEM** (R-263, Tom 2026-09-25: *"some
 		// label placements cause Zoom to Fit to leave too much padding."*). Past the labeling
@@ -13808,6 +13831,37 @@ var EngCalcs = EngCalcs || {};
 		// press from the fitted view retraces the same steps to the same place.
 		items = fitItems(state.s, true);
 		var modelItems = items;
+		// **THE NETWORK'S OWN FIT: NODES, VERTICES AND PIPES, NO LETTERING, NO FURNITURE** (R-403).
+		// Everything below makes room -- for Texts, data labels, the legend, the scale bar -- and on
+		// a desktop that costs the network 3-12% of its size. On a phone the same lettering and
+		// furniture are the same size in PIXELS on a map a quarter as wide, and the room they took
+		// shrank the network to 19-65% of the map (Tom, 2026-10-15: *"All of the examples fail to
+		// Zoom to fit."*; measured at 360-412 px, the legend alone reserving 130-200 px of a side).
+		// So ON A PHONE (smallScreen(), the page's one phone test) the room made for them is
+		// capped: the answer is never smaller than LPN_FIT_NETWORK_SHARE of this one, and when the
+		// cap bites the frame is centred on the network and lettering may overhang or sit under the
+		// legend. **NOT ON A DESKTOP, deliberately:** there the same lettering costs the gallery's
+		// networks 1-26% (measured at 1280, 1440 and 1920 px; Elm Street at 1280 is the 26%), a
+		// cost Tom has looked at and accepted, and a cap tight enough to help a phone would move
+		// desktop fits he has not asked to change. dev/lpn-spike/phone-fit-browser-harness.js.
+		var netSubset = { node: {}, link: {}, label: {}, customer: {} };
+		doc.nodes.forEach(function (n) { netSubset.node[n.id] = 1; });
+		doc.links.forEach(function (l) { netSubset.link[l.id] = 1; });
+		var netItems = fitItems(state.s, true, netSubset), netFit,
+			basePads = [padLeft, padRight, padTop, padBottom];
+		items = netItems;
+		netFit = solve();
+		items = modelItems;
+		function capToNetwork() {
+			if (!smallScreen()) { return; }
+			var floor = LPN_FIT_NETWORK_SHARE * netFit;
+			if (!(state.s < floor && floor > minScale())) { return; }
+			// Placed inside the BASE margins: the edges the settle reserved for the legend and the
+			// scale bar are what the cap gives up, and centring in them pushed Net2's west end off
+			// the map (a 145 px right reserve on a 358 px map).
+			padLeft = basePads[0]; padRight = basePads[1]; padTop = basePads[2]; padBottom = basePads[3];
+			apply(floor, place(floor, netItems));
+		}
 		s = solve(labelTuning().fitRoom * settings.textSize);
 		// **STEP 1'S ANSWER IS KEPT AS THE FALLBACK, and it is the only one that cannot be absurd.**
 		// It is the MODEL alone -- nodes, vertices and pipes -- so it is a statement about the
@@ -13871,6 +13925,7 @@ var EngCalcs = EngCalcs || {};
 			apply(s, at);
 			settleOnDrawnInk();
 		}
+		capToNetwork();
 		lastFit = { seed: seed, s: state.s, tx: state.tx, ty: state.ty, pads: [padLeft, padRight, padTop, padBottom] };
 		// **A PRESS THAT BEAT THE RESULTS DOES NOT GET A SECOND ONE WHEN THEY LAND.** A build once
 		// re-ran this fit from applySolveResult() when a press had landed ahead of a due solve, on
@@ -13920,16 +13975,24 @@ var EngCalcs = EngCalcs || {};
 		// `true` when something is outside the padded frame, the overlay's rectangle when something
 		// is under an overlay, null when all is clear.
 		function firstObstruction(all) {
-			var i, j, it, x, y, e = 0.5, furn = mapFurnitureRects(r), f, bl, br, bt, bb, outside = false;
+			var i, j, it, x, y, e = 0.5, furn = mapFurnitureRects(r), f, bl, br, bt, bb, fx, fy, outside = false;
 			for (i = 0; i < all.length; i++) {
 				it = all[i]; x = state.tx + state.s * it.x; y = state.ty + state.s * it.y;
 				bl = x - it.l; br = x + it.r; bt = y - it.t; bb = y + it.b;
-				for (j = 0; j < furn.length; j++) {
-					f = furn[j];
-					if (Math.min(br, f.r) - Math.max(bl, f.l) > e && Math.min(bb, f.b) - Math.max(bt, f.t) > e) { return f; }
+				// Ink that cannot fit the window on an axis at any scale (see fitsAlone()) overhangs
+				// on that axis by design, so it is not an obstruction there, and it is not judged
+				// against the furniture either: it covers some corner at every scale, and reserving an
+				// edge for it would only step the zoom down for nothing.
+				fx = fitsAlone(it, 'l', 'r', r.width, padLeft, padRight);
+				fy = fitsAlone(it, 't', 'b', r.height, padTop, padBottom);
+				if (fx && fy) {
+					for (j = 0; j < furn.length; j++) {
+						f = furn[j];
+						if (Math.min(br, f.r) - Math.max(bl, f.l) > e && Math.min(bb, f.b) - Math.max(bt, f.t) > e) { return f; }
+					}
 				}
-				if (bl < padLeft - e || br > r.width - padRight + e ||
-					bt < padTop - e || bb > r.height - padBottom + e) { outside = true; }
+				if ((fx && (bl < padLeft - e || br > r.width - padRight + e)) ||
+					(fy && (bt < padTop - e || bb > r.height - padBottom + e))) { outside = true; }
 			}
 			return outside || null;
 		}
@@ -54364,10 +54427,8 @@ var EngCalcs = EngCalcs || {};
 		// EPANET's by total flow) and that is a refinement of the same quantity, not a different
 		// one. Two rows a reader cannot tell apart was the alternative.
 		//
-		// **THE EFFECTIVE DEFAULT DOES NOT MOVE.** Unset still means our own 1e-9 natively, which is
-		// six orders tighter than EPANET's 0.001 and is deliberate: at this page's scale the extra
-		// iterations are free, and it is what keeps a disagreement between the two engines from ever
-		// being just tolerance. Adopting EPANET's NAME is not adopting its default.
+		// **UNSET MEANS EPANET'S OWN 0.001, IN BOTH ENGINES, since R-388 (2026-10-15).** It meant
+		// 1e-9 natively and 1e-5 in EPANET before; see solveAccuracy().
 		// ---- EPANET's [OPTIONS], the ones that ACT (ROADMAP Task 553) ----
 		//
 		// Tom, 2026-08-28, naming what a person must be able to see: *"the default pattern must be
@@ -55231,6 +55292,24 @@ var EngCalcs = EngCalcs || {};
 		});
 		return shown;
 	}
+	/**
+	 * **A NEW SEARCH STARTS AT THE TOP OF ITS RESULTS** (R-397; Tom, 2026-10-15: *"When I type a
+	 * search term, the scrollbar doesn't go to the top. So my results appear empty."*).
+	 *
+	 * Regressed by 4de96172 (2026-09-04), which put one pane-height of blank room after the content
+	 * (`.lpn-setbox-content::after`) so the last section can scroll to the top. Before that, a
+	 * filter that shrank the content below the pane clamped the scroll back to 0 by itself; with the
+	 * blank room the old scroll position is still reachable, so a reader scrolled halfway down saw
+	 * only the blank. Only a CHANGE OF THE SEARCH TEXT resets it: a rebuild of the box (a setting
+	 * changed) re-runs applySetboxFilter() too, and must leave the reader where they were.
+	 */
+	function filterSetboxFromTop() {
+		var content = document.getElementById('lpn_setbox_content'),
+			index = document.getElementById('lpn_setbox_index');
+		applySetboxFilter();
+		if (content) { content.scrollTop = 0; }
+		if (index) { index.scrollTop = 0; }
+	}
 	function applySetboxFilter() {
 		var box = setboxEl(), input = document.getElementById('lpn_setbox_filter'),
 			none = document.getElementById('lpn_setbox_none'), pc = EngCalcs.pageConfig || {},
@@ -55755,14 +55834,14 @@ var EngCalcs = EngCalcs || {};
 			// PHP tip helpers build a label-plus-glyph, which is the wrong shape for a bare input.
 			helpTip(filter, filter.title);
 			// `input`, not `change`: a filter that waits for blur is not a filter.
-			filter.addEventListener('input', applySetboxFilter);
+			filter.addEventListener('input', filterSetboxFromTop);
 			// Escape inside the box CLEARS THE FILTER before it closes the box -- the convention
 			// every search field has, and the alternative loses the box over a typo.
 			filter.addEventListener('keydown', function (e) {
 				if (e.key === 'Escape' && filter.value) {
 					e.stopPropagation();
 					filter.value = '';
-					applySetboxFilter();
+					filterSetboxFromTop();
 				}
 			});
 		}
@@ -65096,18 +65175,22 @@ var EngCalcs = EngCalcs || {};
 	 * had deliberately loosened or tightened it — keeps solving to exactly the number it always did.
 	 * Nothing writes `settings.tolerance` any more.
 	 *
-	 * **1e-9 IS OURS AND STAYS OURS.** EPANET's own default for the same option is 0.001; taking its
-	 * NAME is not taking its default. At this page's scale the extra iterations are free, and the
-	 * tight number is what stops a disagreement between the two engines from ever being tolerance —
-	 * see js/lpn-solver.js's note beside `tol`.
+	 * **AN EMPTY BOX MEANS EPANET'S OWN 0.001, IN BOTH ENGINES** (R-388; Tom, 2026-10-15, asked
+	 * whether the default should be 0.001 instead of 1e-5: *"Yes. And tip says 1e-9, so sync
+	 * that."*). Until then an empty box meant 1e-5 in the EPANET engine and 1e-9 in the built-in
+	 * one, and the tip quoted the second. His two-system project reported "did not converge" at
+	 * 1e-5 and converged at 0.001 (Task 796). One number now, LPN_DEFAULT_ACCURACY, which is also
+	 * what the Settings tip quotes and what js/lpn-epanet.js writes when nothing is stated. A
+	 * project that STATES an Accuracy keeps it: nothing here rewrites a stored number.
 	 */
+	var LPN_DEFAULT_ACCURACY = 0.001;
 	function solveAccuracy() {
 		var a = (settings.hydraulics || {}).accuracy;
 		if (typeof a === 'number' && isFinite(a) && a > 0) { return a; }
 		if (typeof settings.tolerance === 'number' && isFinite(settings.tolerance) && settings.tolerance > 0) {
 			return settings.tolerance;
 		}
-		return 1e-9;
+		return LPN_DEFAULT_ACCURACY;
 	}
 	/**
 	 * The hydraulic options as an ENGINE wants them: a shallow clone, with the two unit-bearing
