@@ -146,7 +146,7 @@ async function main() {
 		console.log('\n--- 2. add, rename, delete ---');
 		await clickRow(await L('lpn_scenario_base'));
 		const toolbar = () => page.evaluate(() => Array.from(document.querySelectorAll('#lpn_sm_body .lpn-sm-tools button')).map((b) => b.textContent));
-		ok('1.9 the toolbar is Make current, Add child, Add base, Rename, Copy, then minus (the menu\'s order)', JSON.stringify(await toolbar()) === JSON.stringify([await L('lpn_sm_make_current'), await L('lpn_sm_add_child'), await L('lpn_sm_add_base'), await L('lpn_sm_rename'), await L('lpn_sm_copy'), '\u2212']) && (await L('lpn_sm_add_base')) === 'Add base' && (await L('lpn_sm_add_child')) === 'Add child', JSON.stringify(await toolbar()));
+		ok('1.9 the toolbar is Make current, List overrides (Task 800), Add child, Add base, Rename, Copy, then minus (the menu\'s order)', JSON.stringify(await toolbar()) === JSON.stringify([await L('lpn_sm_make_current'), await L('lpn_sm_list_overrides'), await L('lpn_sm_add_child'), await L('lpn_sm_add_base'), await L('lpn_sm_rename'), await L('lpn_sm_copy'), '\u2212']) && (await L('lpn_sm_add_base')) === 'Add base' && (await L('lpn_sm_add_child')) === 'Add child', JSON.stringify(await toolbar()));
 		const tipOf = (id) => page.evaluate((i) => { const b = document.getElementById(i); return b ? [b.getAttribute('aria-disabled'), b.title] : null; }, id);
 		ok('1.10a on Base, the current scenario, Make current is greyed and its tip says why', JSON.stringify(await tipOf('lpn_sm_current')) === JSON.stringify(['true', await L('lpn_sm_current_already')]), JSON.stringify(await tipOf('lpn_sm_current')));
 		ok('1.10b ...and Rename is greyed and its tip says why', JSON.stringify(await tipOf('lpn_sm_rename')) === JSON.stringify(['true', await L('lpn_sm_base_named')]), JSON.stringify(await tipOf('lpn_sm_rename')));
@@ -231,7 +231,7 @@ async function main() {
 		await rowOf('Peak Hour').locator('.lpn-sm-name').click({ button: 'right' });
 		await settle(300);
 		const items = await ctxItems();
-		ok('2.8 right-click offers make current, add child, add base, rename, copy, delete', JSON.stringify(items) === JSON.stringify([await L('lpn_sm_make_current'), await L('lpn_sm_add_child'), await L('lpn_sm_add_base'), await L('lpn_sm_rename'), await L('lpn_sm_copy'), await L('lpn_tool_delete')]), JSON.stringify(items));
+		ok('2.8 right-click offers make current, list overrides, add child, add base, rename, copy, delete', JSON.stringify(items) === JSON.stringify([await L('lpn_sm_make_current'), await L('lpn_sm_list_overrides'), await L('lpn_sm_add_child'), await L('lpn_sm_add_base'), await L('lpn_sm_rename'), await L('lpn_sm_copy'), await L('lpn_tool_delete')]), JSON.stringify(items));
 		await ctxPick(await L('lpn_sm_add_child'));
 		await page.keyboard.press('Enter');
 		await settle(500);
