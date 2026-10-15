@@ -4859,52 +4859,100 @@ var EngCalcs = EngCalcs || {};
 		if (LPN_BARE_PROP[prop] && isOverridable(el, prop)) { el[prop] = value; return; }   // base-write: setProp() in Base, the one door
 		el['_' + prop] = value;
 	}
-	function overrideCount(scn) {
-		var total = 0;
-		Object.keys(scn.overrides || {}).forEach(function (key) { total += Object.keys(scn.overrides[key]).length; });
-		// **A DEMAND MULTIPLIER COUNTS AS ONE**, though it is not an element override and lives
-		// nowhere near `overrides`. This number is what the scenario menu shows beside a name, and
-		// it is read as "how much does this scenario change" -- a max-day scenario whose whole
-		// content is a 1.8 would otherwise say (0) and read as an empty scenario nobody finished.
-		// **AND ONLY WHEN IT DIFFERS FROM THE DOCUMENT'S OWN.** Since a new scenario is seeded with
-		// the project's multiplier, counting the mere presence of the field would badge every
-		// freshly created scenario (1) before anybody had changed anything -- the opposite of the
-		// misreading the count exists to prevent.
-		//
-		// **A DOCUMENT THAT STATES NONE MEANS 1** (Task 721), which is what docDemandMultiplier()
-		// solves with. So a scenario stating 1 on such a document changes nothing and counts nothing:
-		// the ready-made 4. Average Day would otherwise read (1) beside a value equal to Base's.
-		// **A SCENARIO'S OWN RUN TIME OR TIME STEP COUNTS THE SAME WAY** (Task 755): one each, and
-		// only where it differs from the project's own, for the same reason as the multiplier.
-		total += calcOptionLeaves(scn).length;
-		// **AND EACH SETTING IT HOLDS OF ITS OWN** (Tom, 2026-10-05), one per value, by presence
-		// as an element override counts: nothing seeds a scenario's settings block.
-		total += scenarioSettingLeaves(scn).length;
-		// **AND WHAT IT TAKES FROM THE ALTERNATIVES IT USES** (Perry, 2026-10-09: Horse via Dry year read
-		// 0): each stored alternative or calculation set in the chain of each category, folded as it
-		// resolves, so a value an alternative and its parent both state counts once. Only when a tree
-		// is stored, so a project without one counts exactly as before.
-		if (isExplicitTree() && !plainBase(scn)) {
-			LPN_ALT_CATEGORIES.forEach(function (cat) {
-				var layers = treeLayers(scn, cat).filter(function (l) { return l.kind !== 'scn'; }).map(function (l) { return l.obj; }), m;
-				if (!layers.length) { return; }
-				m = combineHolders(layers);
-				Object.keys(m.values).forEach(function (k) { total += Object.keys(m.values[k]).length; });
-				total += settingLeaves(m.settings).length;
-				// The multiplier and the two times count as calcOptionLeaves() counts a scenario's own:
-				// the nearest one stated, and only where it differs from the project's.
-				if (cat === 'calculation') {
-					var docDm = (settings.hydraulics || {}).demandMultiplier, dm = layers.filter(function (r) { return typeof r.demandMultiplier === 'number'; })[0];
-					if (!(typeof docDm === 'number' && isFinite(docDm))) { docDm = 1; }
-					if (dm && dm.demandMultiplier !== docDm) { total++; }
-					LPN_SCENARIO_TIME_KEYS.forEach(function (k) {
-						var r = layers.filter(function (x) { return scenarioTimeValue(x, k) !== undefined; })[0];
-						if (r && scenarioTimeValue(r, k) !== projectTimes()[k]) { total++; }
-					});
-				}
+	// **THE COUNT IS THE SCENARIO'S OWN OVERRIDES, NEVER WHAT IT INHERITS** (Task 800; Tom, 2026-10-15,
+	// on a scenario reading 24 where he counted 16: *"I should see the count of only the present
+	// overrides, not the inherited overrides."*). The number beside a name, in the status strip and in
+	// Compare is ownOverrideItems().length, so the list that audits it can never disagree with it.
+	function overrideCount(scn) { return ownOverrideItems(scn).length; }
+	/**
+	 * **ONE SCENARIO'S OWN OVERRIDES, ONE ITEM PER VALUE**: what it sets itself, where it writes
+	 * (writeTargetFor(), the marker's rule): its own values, and the values held in the alternative or
+	 * calculation set it names for a category -- never that record's parents, and never what it takes
+	 * from its parent scenario. A Base of its own (Add base) is a copy, not an override, and counts
+	 * nothing. Each item is {cat, kind: 'scn' | 'alt' | 'calc', obj (the holder), key and prop (an
+	 * element value) or path (a setting), value}.
+	 *
+	 * **A DEMAND MULTIPLIER, RUN TIME OR TIME STEP COUNTS ONLY WHERE IT DIFFERS FROM THE PROJECT'S
+	 * OWN** (Task 721, 755): a scenario stating the project's own multiplier changes nothing, and a
+	 * document that states none means 1. Every other value counts by presence, as the marker reads it:
+	 * an override equal to its parent's value is still an override (Tom, 2026-10-05).
+	 */
+	function ownOverrideItems(scn) {
+		var out = [];
+		if (!scn) { return out; }
+		function elementValues(cat, kind, obj, map, onlyCat) {
+			Object.keys(plainObject(map) ? map : {}).forEach(function (key) {
+				var ov = map[key];
+				Object.keys(plainObject(ov) ? ov : {}).forEach(function (prop) {
+					var c = categoryOf(prop, ovKeyGroup(key));
+					if (onlyCat && c !== cat) { return; }
+					out.push({ cat: onlyCat ? cat : c, kind: kind, obj: obj, key: key, prop: prop, value: ov[prop] });
+				});
 			});
 		}
-		return total;
+		// Its own values, whatever it names: a value an older reader left in a scenario that names an
+		// alternative is nearest, so it is its own too.
+		if (!scn.isBase) {
+			elementValues(null, 'scn', scn, scn.overrides, false);
+			scenarioSettingLeaves(scn).forEach(function (l) { out.push({ cat: categoryOfSetting(l.path), kind: 'scn', obj: scn, path: l.path, value: l.value }); });
+			calcOptionLeaves(scn).forEach(function (l) { out.push({ cat: 'calculation', kind: 'scn', obj: scn, path: l.path, value: l.value }); });
+		}
+		if (!isExplicitTree()) { return out; }
+		LPN_ALT_CATEGORIES.forEach(function (cat) {
+			var t = writeTargetFor(scn, cat), r;
+			if (!t || t.kind === 'scn' || t.obj.root === true) { return; }
+			r = t.obj;
+			if (t.kind === 'alt') {
+				elementValues(cat, 'alt', r, r.values, true);
+				settingLeaves(r.settings).forEach(function (l) { out.push({ cat: cat, kind: 'alt', obj: r, path: l.path, value: l.value }); });
+			} else {
+				settingLeaves(r.settings).forEach(function (l) { out.push({ cat: cat, kind: 'calc', obj: r, path: l.path, value: l.value }); });
+				calcOptionLeaves(r).forEach(function (l) { out.push({ cat: cat, kind: 'calc', obj: r, path: l.path, value: l.value }); });
+			}
+		});
+		return out;
+	}
+	/**
+	 * **THE VALUE AN OWN OVERRIDE REPLACES**: what the scenario would read for it without the holders
+	 * it writes to -- the named alternative's parent chain, else its parent scenario's chain, else
+	 * Base's own (the element, or the project's setting). {value} or {none: true} for an asset the
+	 * drawing no longer has.
+	 */
+	function ownOverrideInherited(scn, it) {
+		var own = [scn], t = writeTargetFor(scn, it.cat), layers, i, l, map, ov, has = Object.prototype.hasOwnProperty, el, p, v, dm, rows, want;
+		if (t && t.kind !== 'scn') { own.push(t.obj); }
+		layers = treeLayers(scn, it.cat).filter(function (x) { return own.indexOf(x.obj) < 0; });
+		if (it.key !== undefined) {
+			for (i = 0; i < layers.length; i++) {
+				l = layers[i];
+				map = l.kind === 'scn' ? l.obj.overrides : (l.kind === 'alt' ? l.obj.values : null);
+				ov = plainObject(map) ? map[it.key] : null;
+				if (!plainObject(ov)) { continue; }
+				if (has.call(ov, it.prop)) { return { value: ov[it.prop] }; }
+				// The demand pair is one value (R-369): a row-0 demand and a whole list answer each other.
+				if (it.prop === 'demand' && Array.isArray(ov.demands) && ov.demands.length) { return { value: ov.demands[0].base }; }
+				if (it.prop === 'demands' && has.call(ov, 'demand')) { return { value: [{ base: ov.demand }] }; }
+			}
+			el = smMergeElement(it.key);
+			if (!el) { return { none: true }; }
+			if (it.prop === 'demands') {
+				rows = [{ base: baseValue(el, 'demand') }];
+				(el.extraDemands || []).forEach(function (d) { rows.push(d); });
+				return { value: rows };
+			}
+			return { value: baseValue(el, it.prop) };
+		}
+		want = it.path.join('.');
+		for (i = 0; i < layers.length; i++) {
+			v = layerSettingLeaves(layers[i]).filter(function (x) { return x.path.join('.') === want; })[0];
+			if (v) { return { value: v.value }; }
+		}
+		p = it.path;
+		if (want === 'settings.hydraulics.demandMultiplier') {
+			dm = (settings.hydraulics || {}).demandMultiplier;
+			return { value: (typeof dm === 'number' && isFinite(dm)) ? dm : 1 };
+		}
+		return { value: p.length > 1 ? settingGet(settingRootValue(p[0]), p.slice(1)) : settingRootValue(p[0]) };
 	}
 	// The three calculation options with homes of their own that this scenario COUNTS: each only
 	// where it differs from the project's own (see overrideCount()). Read by the count and by the
@@ -6398,21 +6446,30 @@ var EngCalcs = EngCalcs || {};
 	// "Junction 22: Diameter", for the list of skipped values: the asset as Base draws it, and the
 	// field as the Tables pane heads it.
 	function smMergeItemText(key, prop) {
-		var pc = EngCalcs.pageConfig || {}, el = smMergeElement(key), g = ovKeyGroup(key), t, words, name, label = null, d;
+		var pc = EngCalcs.pageConfig || {}, parts = smItemParts(key, prop);
+		return (pc.lpn_sm_merge_line || '{asset}: {property}').replace('{asset}', parts.asset).replace('{property}', parts.label === null ? prop : parts.label);
+	}
+	// The pieces of that line, for it and for the override list (Task 800): the asset's kind word
+	// and id, the field as the Tables pane heads it (`label`; null where no table names it), and the
+	// column that writes it, when one does. `look` is the property a column is sought for: a whole
+	// demand list is the Demand column's.
+	function smItemParts(key, prop, look) {
+		var pc = EngCalcs.pageConfig || {}, el = smMergeElement(key), g = ovKeyGroup(key), t, words, label = null, d, col = null;
+		look = look || prop;
 		words = { junction: pc.lpn_tool_add_junction || 'Junction', reservoir: pc.lpn_tool_add_reservoir || 'Reservoir', tank: pc.lpn_tool_add_tank || 'Tank',
 			pipe: pc.lpn_tool_add_pipe || 'Pipe', pump: pc.lpn_tool_add_pump || 'Pump', valve: pc.lpn_tool_add_valve || 'Valve' };
 		t = g === 'label' ? (pc.lpn_tool_add_text || 'Text') : ((el ? words[morphBaseOf(el, 'type')] : '') || '');
-		name = (t ? t + ' ' : '') + String(key).slice(ovKeyFor(g, '').length);
 		if (LPN_MORPH_PROP[prop]) { label = pc.lpn_field_type || 'Type'; }
 		else if ((d = customPropDefs().length ? customPropDefByKey(prop) : null)) { label = customPropLabel(d); }
 		else {
 			paneTables().forEach(function (spec) {
 				if (label !== null || spec.group !== g) { return; }
-				(spec.cols || []).forEach(function (c) { if (label === null && (c.prop === prop || (!c.prop && c.key === prop))) { label = paneHeadingLabelOnly(c); } });
+				(spec.cols || []).forEach(function (c) { if (label === null && (c.prop === look || (!c.prop && c.key === look))) { label = paneHeadingLabelOnly(c); col = c; } });
 			});
-			if (label === null) { pushSpecList().forEach(function (s) { if (label === null && s.group === g && s.prop === prop) { label = s.label; } }); }
+			if (label === null) { pushSpecList().forEach(function (s) { if (label === null && s.group === g && s.prop === look) { label = s.label; } }); }
 		}
-		return (pc.lpn_sm_merge_line || '{asset}: {property}').replace('{asset}', name).replace('{property}', label === null ? prop : label);
+		return { kind: t, id: String(key).slice(ovKeyFor(g, '').length), group: g, el: el,
+			asset: (t ? t + ' ' : '') + String(key).slice(ovKeyFor(g, '').length), label: label, col: col };
 	}
 	function smMergeLeafText(path) {
 		var pc = EngCalcs.pageConfig || {}, p = path.slice(), o;
@@ -77083,6 +77140,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			out.push({ id: 'current', label: pc.lpn_sm_make_current || 'Make current', off: !valid || key === project.activeScenario,
 				offTip: !valid ? noSel : (pc.lpn_sm_current_already || 'This scenario is already the current scenario.'),
 				fn: function () { smActCurrent(key); } });
+			// **A TIDY LIST OF ONE SCENARIO'S OWN OVERRIDES, TO AUDIT THE COUNT** (Task 800; Tom,
+			// 2026-10-15: *"I don't know how to see a tidy list of overrides to audit"*).
+			out.push({ id: 'overrides', label: pc.lpn_sm_list_overrides || 'List overrides', tip: pc.lpn_sm_list_overrides_tip,
+				off: !valid || !scenarioById(key) || !overrideCount(scenarioById(key)),
+				offTip: !valid ? noSel : (pc.lpn_sm_list_overrides_none || 'This scenario has no overrides of its own.'),
+				fn: function () { smActListOverrides(key); } });
 		}
 		out.push({ id: 'add', label: pc.lpn_sm_add_child || 'Add child', fn: function () { smActAdd(valid ? key : smBaseKey(tree)); } });
 		out.push({ id: 'addbase', label: pc.lpn_sm_add_base || 'Add base', tip: tree === 'scenarios' ? pc.lpn_sm_add_base_tip : pc.lpn_sm_add_base_alt_tip, fn: function () { smActAdd(null); } });
@@ -77489,6 +77552,128 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		smTry(function () { smCompareSet(id, on); return true; });
 		saveToStorage();
 		dropScenarioCompareRun();
+	}
+	// ---- THE OVERRIDE LIST (Task 800) ----
+	//
+	// Tom, 2026-10-15, on "1-hr drain w pump off" reading 24 overrides: *"I don't know how to see a
+	// tidy list of overrides to audit ... I should see the count of only the present overrides, not
+	// the inherited overrides."* One scenario's own overrides (ownOverrideItems(), the items the count
+	// counts), grouped by category and the alternative holding them, each with the value it replaces.
+	// Drawn in the page's one dialog, in the report tables' style; an asset's ID goes to it on the map,
+	// as an ID in the Library does.
+	//
+	// The groups: [{cat, name, items: [{asset, id, group, property, value, inherited, valueTip, inhTip}]}],
+	// in category order, the scenario's own values before the alternative it names.
+	function ownOverrideGroups(scn) {
+		var groups = [], byHolder = {};
+		ownOverrideItems(scn).forEach(function (it) {
+			var hid = it.cat + '\u0000' + it.kind + '\u0000' + (it.obj.id || ''), g = byHolder[hid], parts, own, inh, o;
+			if (!g) {
+				g = byHolder[hid] = { cat: it.cat, kind: it.kind, name: it.kind === 'scn' ? scenarioDisplayName(it.obj) : String(it.obj.name || ''), items: [] };
+				groups.push(g);
+			}
+			inh = ownOverrideInherited(scn, it);
+			if (it.key !== undefined) {
+				parts = smItemParts(it.key, it.prop, it.prop === 'demands' ? 'demand' : it.prop);
+				own = ovlValueText(it.value, parts);
+				o = { asset: parts.kind, id: parts.id, group: parts.group, gone: !parts.el,
+					property: parts.label === null ? it.prop : parts.label + (parts.col && paneHeadingUnitText(parts.col) ? ' (' + paneHeadingUnitText(parts.col) + ')' : '') };
+			} else {
+				parts = smLeafParts(it.path);
+				own = ovlValueText(it.value, null, it.path);
+				o = { asset: parts.owner, id: null, group: null, gone: false, property: parts.setting };
+			}
+			o.value = own.text; o.valueTip = own.tip;
+			own = inh.none ? { text: FF_DASH, tip: '' } : ovlValueText(inh.value, parts && it.key !== undefined ? parts : null, it.path);
+			o.inherited = own.text; o.inhTip = own.tip;
+			g.items.push(o);
+		});
+		groups.sort(function (a, b) {
+			return (LPN_ALT_CATEGORIES.indexOf(a.cat) - LPN_ALT_CATEGORIES.indexOf(b.cat)) || ((a.kind === 'scn' ? 0 : 1) - (b.kind === 'scn' ? 0 : 1));
+		});
+		groups.forEach(function (g) {
+			g.items.sort(function (a, b) {
+				return String(a.asset + ' ' + (a.id || '')).localeCompare(String(b.asset + ' ' + (b.id || '')), undefined, { numeric: true }) ||
+					String(a.property).localeCompare(String(b.property));
+			});
+		});
+		return groups;
+	}
+	// A setting's owner and name, as the Settings table words them; a calculation set's typed run
+	// time is the same setting as the time itself.
+	function smLeafParts(path) {
+		var pc = EngCalcs.pageConfig || {}, p = path.slice(), o;
+		if (p[0] === 'times' && p[1] === 'text') { p = ['times', p[2]]; }
+		o = settingTableOwnerSetting(p);
+		return { owner: o.owner || pc.lpn_tool_settings || 'Settings', setting: o.setting };
+	}
+	// One value as the list shows it: {text, tip} (the tip holds the whole of a long text). A demand
+	// list is its rows' base demands added, as the marker's line writes them; a choice is its label.
+	function ovlValueText(v, parts, path) {
+		var text, i, ch, full;
+		if (v === undefined || v === null || v === '') { return { text: FF_DASH, tip: '' }; }
+		if (Array.isArray(v) && v.length && plainObject(v[0]) && Object.prototype.hasOwnProperty.call(v[0], 'base')) {
+			return { text: v.map(function (r) { return formatPropValue(r.base); }).join(' + '), tip: '' };
+		}
+		if (parts && parts.col && parts.col.choices && parts.el) {
+			ch = parts.col.choices(parts.el) || [];
+			for (i = 0; i < ch.length; i++) { if (ch[i][0] === v) { return { text: String(ch[i][1]), tip: '' }; } }
+		}
+		if (path && path[0] === 'times' && typeof v === 'number' && EngCalcs.lpnFormatTime) { return { text: EngCalcs.lpnFormatTime(v), tip: '' }; }
+		full = String(typeof v === 'object' ? JSON.stringify(v) : formatPropValue(v));
+		text = full.split('\n')[0];
+		if (text === full && text.length <= 60) { return { text: full, tip: '' }; }
+		return { text: text.slice(0, 60) + ' \u2026', tip: full };
+	}
+	function smActListOverrides(key) {
+		var pc = EngCalcs.pageConfig || {}, scn = scenarioById(key), groups, n;
+		if (!scn) { return; }
+		groups = ownOverrideGroups(scn);
+		n = groups.reduce(function (s, g) { return s + g.items.length; }, 0);
+		openDialog(function (body) {
+			ffEl('p', 'lpn-dialog-msg', (pc.lpn_scenario_overrides || 'No. of overrides') + ': ' + n, body);
+			ffEl('p', 'lpn-ff-note', pc.lpn_ovl_note || 'These are the values this scenario sets itself in the alternatives it uses, each with the value it replaces. Values it inherits are neither listed nor counted. Click an ID to go to the asset on the map.', body);
+			groups.forEach(function (g) {
+				var wrap = ffEl('div', 'lpn-ovl-group', null, body), table, tr;
+				wrap.setAttribute('data-cat', g.cat);
+				ffEl('p', 'lpn-ff-summary', (pc.lpn_ovl_group || '{category}: {alternative}').replace('{category}', smTreeLabel(g.cat)).replace('{alternative}', g.name) +
+					' (' + g.items.length + ')', wrap);
+				table = ffEl('table', 'lpn-ff-table', null, ffEl('div', 'lpn-ff-tablewrap', null, wrap));
+				tr = ffEl('tr', null, null, ffEl('thead', null, null, table));
+				[pc.lpn_crit_col_asset || 'Asset', pc.lpn_find_property || 'Property', pc.lpn_ovl_col_override || 'Override',
+					[pc.lpn_ovl_col_inherited || 'Inherited value', pc.lpn_ovl_col_inherited_tip || 'The value this scenario reads without the override: the value of the parent of the alternative, or the Base value.']
+				].forEach(function (h) {
+					var th = ffEl('th', null, Array.isArray(h) ? h[0] : h, tr);
+					if (Array.isArray(h)) { th.title = h[1]; }
+				});
+				table = ffEl('tbody', null, null, table);
+				g.items.forEach(function (o) {
+					var row = ffEl('tr', null, null, table), td = ffEl('td', null, null, row), b, c;
+					if (o.id !== null) {
+						if (o.asset) { td.appendChild(document.createTextNode(o.asset + ' ')); }
+						if (o.gone) { td.appendChild(document.createTextNode(o.id)); }
+						else {
+							b = ffEl('button', 'lpn-pane-goto', o.id, td);
+							b.type = 'button';
+							b.title = pc.lpn_goto_on_map || 'Go to on map';
+							b.setAttribute('data-goto', o.group + ':' + o.id);
+							b.addEventListener('click', function () {
+								closeDialog();
+								afterDialogAnswer();
+								findGoTo(o.group, o.id);
+							});
+						}
+					} else { td.textContent = o.asset; }
+					ffCell(row, o.property);
+					c = ffCell(row, o.value, 'lpn-ovl-value');
+					if (o.valueTip) { c.title = o.valueTip; }
+					c = ffCell(row, o.inherited, 'lpn-ovl-inherited');
+					if (o.inhTip) { c.title = o.inhTip; }
+				});
+			});
+			initTipsIn(body);
+		}, [{ label: pc.lpn_dialog_ok || 'OK', isDefault: true, cancel: true, fn: function () { } }],
+		{ title: (pc.lpn_ovl_title || 'Overrides: {name}').replace('{name}', scenarioDisplayName(scn)) });
 	}
 	// An alternative (or calculation set) is copied beside itself; a scenario is copied from the
 	// Scenarios menu, in Basic mode (copyCurrentScenario()).
